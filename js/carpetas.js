@@ -28,6 +28,8 @@ var Carpetas = (function () {
     });
   }
 
+  /* ---------- listar ---------- */
+
   async function subcarpetas(dir) {
     var lista = [];
     for await (var pareja of dir.entries()) {
@@ -51,6 +53,8 @@ var Carpetas = (function () {
     catch (e) { return false; }
   }
 
+  /* ---------- crear ---------- */
+
   function crear(dir, nombre) {
     return dir.getDirectoryHandle(nombre, { create: true });
   }
@@ -65,6 +69,8 @@ var Carpetas = (function () {
     }
     return actual;
   }
+
+  /* ---------- mover y renombrar carpetas ---------- */
 
   async function copiarDentro(origen, destino) {
     var copiados = 0;
@@ -94,18 +100,18 @@ var Carpetas = (function () {
     return n;
   }
 
-  /* Mueve una carpeta entera de un sitio a otro.
+  /* Lleva una carpeta entera a otro sitio, o le cambia el nombre.
 
      El navegador no sabe mover carpetas, así que se copia todo, se
      comprueba que ha llegado igual, y solo entonces se borra el original.
      Si algo falla por el camino, el original sigue donde estaba. */
-  async function mover(padreOrigen, nombre, padreDestino) {
+  async function trasladar(padreOrigen, nombre, padreDestino, nombreDestino) {
     var origen = await padreOrigen.getDirectoryHandle(nombre);
-    if (await existe(padreDestino, nombre)) {
-      throw new Error('Ya hay una carpeta con ese nombre en el destino.');
+    if (await existe(padreDestino, nombreDestino)) {
+      throw new Error('Ya hay una carpeta llamada "' + nombreDestino + '" en el destino.');
     }
     var esperados = await contarFicheros(origen);
-    var destino = await padreDestino.getDirectoryHandle(nombre, { create: true });
+    var destino = await padreDestino.getDirectoryHandle(nombreDestino, { create: true });
     await copiarDentro(origen, destino);
     var llegados = await contarFicheros(destino);
     if (llegados !== esperados) {
@@ -115,6 +121,56 @@ var Carpetas = (function () {
     await padreOrigen.removeEntry(nombre, { recursive: true });
     return esperados;
   }
+
+  function mover(padreOrigen, nombre, padreDestino) {
+    return trasladar(padreOrigen, nombre, padreDestino, nombre);
+  }
+
+  function renombrar(padre, nombre, nombreNuevo) {
+    if (nombre === nombreNuevo) return Promise.resolve(0);
+    return trasladar(padre, nombre, padre, nombreNuevo);
+  }
+
+  /* ---------- ficheros sueltos ----------
+
+     Cambiarle el nombre a un fichero sí es instantáneo: el navegador
+     tiene move() desde hace tiempo. Si no estuviera, se copia y se borra,
+     que en un solo fichero tampoco cuesta nada. */
+  async function renombrarFichero(dir, nombre, nombreNuevo) {
+    if (nombre === nombreNuevo) return true;
+    var h = await dir.getFileHandle(nombre);
+    if (typeof h.move === 'function') {
+      await h.move(nombreNuevo);
+      return true;
+    }
+    var f = await h.getFile();
+    var salida = await dir.getFileHandle(nombreNuevo, { create: true });
+    var w = await salida.createWritable();
+    await w.write(f);
+    await w.close();
+    await dir.removeEntry(nombre);
+    return true;
+  }
+
+  /* Abre el cuadro de "Abrir archivo" de Windows para traer un documento
+     desde donde esté: Descargas, el escritorio, un pendrive. */
+  async function elegirFichero() {
+    var lista = await window.showOpenFilePicker({ multiple: false });
+    return lista[0];
+  }
+
+  /* Guarda una copia del fichero elegido dentro de la carpeta, con el
+     nombre que se le haya montado. El original no se toca. */
+  async function copiarFicheroEn(dir, ficheroHandle, nombreNuevo) {
+    var f = await ficheroHandle.getFile();
+    var salida = await dir.getFileHandle(nombreNuevo, { create: true });
+    var w = await salida.createWritable();
+    await w.write(f);
+    await w.close();
+    return f.name;
+  }
+
+  /* ---------- ficheros de texto ---------- */
 
   async function leerTexto(dir, nombre) {
     try {
@@ -156,7 +212,10 @@ var Carpetas = (function () {
   return {
     soportado: soportado, elegir: elegir, permiso: permiso,
     subcarpetas: subcarpetas, ficheros: ficheros, existe: existe,
-    crear: crear, bajar: bajar, mover: mover, contarFicheros: contarFicheros,
+    crear: crear, bajar: bajar, mover: mover, renombrar: renombrar,
+    contarFicheros: contarFicheros,
+    renombrarFichero: renombrarFichero, elegirFichero: elegirFichero,
+    copiarFicheroEn: copiarFicheroEn,
     leerTexto: leerTexto, escribirTexto: escribirTexto,
     leerJson: leerJson, guardarJson: guardarJson
   };

@@ -83,8 +83,10 @@ var U = (function () {
     setTimeout(function () { d.remove(); }, clase === 'malo' ? 9000 : 4500);
   }
 
-  /* Cuadro de confirmación. Devuelve una promesa con true o false. */
-  function preguntar(titulo, cuerpoHtml, textoAceptar) {
+  /* Cuadro de confirmación. Devuelve una promesa con true o false.
+     Con 'sinCancelar' a true se esconde el botón de Cancelar, para los
+     cuadros que solo enseñan algo. */
+  function preguntar(titulo, cuerpoHtml, textoAceptar, sinCancelar) {
     return new Promise(function (resolver) {
       var capa = document.getElementById('capa');
       document.getElementById('cuadro-titulo').textContent = titulo;
@@ -92,6 +94,7 @@ var U = (function () {
       var aceptar = document.getElementById('cuadro-aceptar');
       var cancelar = document.getElementById('cuadro-cancelar');
       aceptar.textContent = textoAceptar || 'Aceptar';
+      cancelar.classList.toggle('oculto', !!sinCancelar);
       capa.classList.remove('oculto');
 
       function cerrar(valor) {
