@@ -757,6 +757,7 @@
     }
 
     var html = '<h4>' + U.escapar(p.nombre) + '</h4>';
+
     if (p.categoria === 'ALUMNADO') {
       /* Lo que se consulta a diario va arriba: la edad de hoy, si sigue
          matriculado, el grupo y los datos de contacto de los tutores
