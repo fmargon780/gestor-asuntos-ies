@@ -29,6 +29,7 @@ body {
 .suave { color: var(--tinta-suave); font-weight: 400; }
 code { background: #eef1f5; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
 
+/* ---------- arranque ---------- */
 .arranque {
   min-height: 100vh;
   display: flex; align-items: center; justify-content: center;
@@ -56,6 +57,7 @@ code { background: #eef1f5; padding: 1px 5px; border-radius: 4px; font-size: 13p
 .carpeta-estado { color: var(--tinta-suave); font-size: 13px; margin-top: 2px; }
 .carpeta-estado.puesta { color: #1e7a46; }
 
+/* ---------- botones y campos ---------- */
 .boton {
   font: inherit; font-size: 14px;
   background: var(--papel); color: var(--tinta);
@@ -77,6 +79,7 @@ code { background: #eef1f5; padding: 1px 5px; border-radius: 4px; font-size: 13p
 .campo:focus { outline: 2px solid var(--azul-claro); border-color: var(--azul); }
 .etiqueta { display: block; font-weight: 600; margin: 18px 0 7px; }
 
+/* ---------- estructura ---------- */
 #aplicacion { display: flex; min-height: 100vh; }
 
 .lateral {
@@ -107,6 +110,7 @@ code { background: #eef1f5; padding: 1px 5px; border-radius: 4px; font-size: 13p
 .acciones .campo { width: 300px; }
 h3 { margin: 30px 0 8px; font-size: 16px; }
 
+/* ---------- listas ---------- */
 .lista { display: flex; flex-direction: column; gap: 8px; }
 .tarjeta {
   background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio);
@@ -129,6 +133,7 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
   padding: 28px; text-align: center; color: var(--tinta-suave);
 }
 
+/* ---------- nuevo asunto ---------- */
 .formulario { background: var(--papel); border: 1px solid var(--linea); border-radius: 12px; padding: 22px 24px 26px; box-shadow: var(--sombra); }
 .formulario .etiqueta:first-child { margin-top: 0; }
 .tipos { display: flex; flex-wrap: wrap; gap: 7px; }
@@ -179,6 +184,7 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 .vista-nombre { font-family: "Consolas", "Menlo", monospace; font-size: 15px; font-weight: 600; word-break: break-word; }
 .vista-ruta { color: var(--tinta-suave); font-size: 13px; margin-top: 6px; }
 
+/* ---------- personas ---------- */
 .dos-paneles { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
 .ficha { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 18px 20px; box-shadow: var(--sombra); }
 .ficha h4 { margin: 0 0 12px; font-size: 17px; }
@@ -186,10 +192,12 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 .ficha-dato span:first-child { color: var(--tinta-suave); }
 .ficha-dato span:last-child { word-break: break-word; }
 
+/* ---------- ajustes ---------- */
 .alta-tipo { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
 .fila-tipo { display: flex; align-items: center; gap: 12px; background: var(--papel); border: 1px solid var(--linea); border-radius: 8px; padding: 9px 14px; }
 .fila-tipo .nombre-tipo { font-weight: 600; flex: 1; }
 
+/* ---------- avisos y cuadros ---------- */
 .aviso { border-radius: var(--radio); padding: 14px 16px; margin-bottom: 18px; }
 .aviso p { margin: 6px 0 0; }
 .aviso-rojo { background: var(--rojo); border: 1px solid #f0b7b1; }
@@ -209,4 +217,22 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
   .dos-paneles, .dos-columnas { grid-template-columns: 1fr; }
   .contenido { padding: 20px 16px 50px; }
   .acciones .campo { width: 100%; }
+}
+
+/* ---------- documentos ---------- */
+.lista-documentos { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; max-height: 220px; overflow-y: auto; }
+.fila-documento {
+  display: flex; align-items: center; gap: 12px;
+  border: 1px solid var(--linea); border-radius: 8px; padding: 8px 12px;
+}
+.nombre-documento { flex: 1; font-size: 13px; word-break: break-word; }
+.registro-campos { display: grid; grid-template-columns: 70px 1fr 1fr 110px; gap: 12px; align-items: start; }
+.opciones { display: flex; gap: 6px; flex-wrap: wrap; }
+.opcion {
+  display: flex; align-items: center; gap: 6px; cursor: pointer;
+  border: 1px solid var(--linea); border-radius: 8px; padding: 8px 10px; font-size: 13px;
+}
+.opcion:has(input:checked) { background: var(--azul-claro); border-color: var(--azul); font-weight: 600; }
+@media (max-width: 700px) {
+  .registro-campos { grid-template-columns: 1fr 1fr; }
 }
