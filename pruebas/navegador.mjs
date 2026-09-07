@@ -255,9 +255,9 @@ await comprobar('y enseña su puesto debajo',
   pagina.locator('#resultados-tercero .resultado-pie').first().textContent()
     .then(t => t.indexOf('Música P.E.S.') !== -1), true);
 await pagina.click('#resultados-tercero .resultado');
-await comprobar('el nombre lleva los cuatro últimos dígitos del DNI',
+await comprobar('el nombre lleva los cuatro últimos caracteres del DNI',
   pagina.locator('#vista-nombre').textContent()
-    .then(t => t.indexOf('Aguado Ranea, Marcos Antonio 7591') !== -1), true);
+    .then(t => t.indexOf('Aguado Ranea, Marcos Antonio 591R') !== -1), true);
 await comprobar('al personal no se le ofrece grupo',
   pagina.locator('#bloque-grupo').isHidden(), true);
 
