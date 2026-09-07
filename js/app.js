@@ -328,7 +328,7 @@
         '<label class="etiqueta">Categoría</label>' +
         '<select id="cierre-categoria" class="campo">' + opciones + '</select>' +
         '<label class="etiqueta">Carpeta del tercero</label>' +
-        '<input id="cierre-tercero" class="campo" value="' + U.escapar(a.leido.resto || '') + '">' +
+        '<input id="cierre-tercero" class="campo" value="' + U.escapar(Nombres.terceroDeResto(a.leido.resto)) + '">' +
         '<p class="nota">Se creará dentro de la categoría si todavía no existe.</p>',
         'Continuar');
       if (!ok) return;

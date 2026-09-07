@@ -159,6 +159,19 @@ var Nombres = (function () {
   function terceroAlumno(alumno) {
     return U.limpiarNombre(alumno.nombre + (alumno.id ? ' ' + alumno.id : ''));
   }
+
+  /* Del resto de un nombre de carpeta quita lo que va DELANTE del tercero
+     y se puede reconocer por su forma: el año académico y el grupo.
+     De "26-27 3ºA Cordero Navas, Lucía 1139877" deja "Cordero Navas, Lucía 1139877".
+     La descripción libre no se puede distinguir del tercero, así que se
+     queda: el campo del cuadro es editable y ahí se quita a mano. */
+  function terceroDeResto(resto) {
+    var t = String(resto || '').trim();
+    t = t.replace(/^\d{2}[-\/]\d{2}\s+/, '');
+    t = t.replace(/^\d[ºo°](?:Bach|FP|Div)?[A-Za-z]?\s+/i, '');
+    return U.limpiarNombre(t);
+  }
+
   /* Del personal se ponen los CUATRO ÚLTIMOS CARACTERES del documento,
      con la letra incluida: 12345678Z -> 678Z, X1234567L -> 567L.
      Lo pidió Francisco el 7-sep-2026: con la letra el dato identifica
@@ -243,6 +256,7 @@ var Nombres = (function () {
     TIPOS_DOCUMENTO_POR_DEFECTO: TIPOS_DOCUMENTO_POR_DEFECTO,
     codigoRegistro: codigoRegistro, montarDocumento: montarDocumento,
     extensionDe: extensionDe,
-    terceroAlumno: terceroAlumno, terceroPersonal: terceroPersonal, terceroEmpresa: terceroEmpresa
+    terceroAlumno: terceroAlumno, terceroDeResto: terceroDeResto,
+    terceroPersonal: terceroPersonal, terceroEmpresa: terceroEmpresa
   };
 })();
