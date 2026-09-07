@@ -159,11 +159,14 @@ var Nombres = (function () {
   function terceroAlumno(alumno) {
     return U.limpiarNombre(alumno.nombre + (alumno.id ? ' ' + alumno.id : ''));
   }
-  /* Del personal se ponen los cuatro últimos DÍGITOS del documento.
-     En un DNI la letra del final no cuenta: 12345678Z -> 5678. */
+  /* Del personal se ponen los CUATRO ÚLTIMOS CARACTERES del documento,
+     con la letra incluida: 12345678Z -> 678Z, X1234567L -> 567L.
+     Lo pidió Francisco el 7-sep-2026: con la letra el dato identifica
+     mejor y es como se venía escribiendo a mano en el centro. Si el
+     documento no acaba en letra, salen los cuatro últimos números. */
   function terceroPersonal(persona) {
-    var digitos = String(persona.documento || '').replace(/\D/g, '');
-    var cuatro = digitos.slice(-4);
+    var doc = String(persona.documento || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
+    var cuatro = doc.slice(-4);
     return U.limpiarNombre(persona.nombre + (cuatro ? ' ' + cuatro : ''));
   }
   function terceroEmpresa(empresa) {
