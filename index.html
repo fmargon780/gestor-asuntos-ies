@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestor de Asuntos</title>
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+<section id="arranque" class="arranque">
+  <div class="arranque-caja">
+    <h1>Gestor de Asuntos</h1>
+    <p class="lema">Expedientes y asuntos del centro, sobre vuestras carpetas de siempre.</p>
+
+    <div id="aviso-navegador" class="aviso aviso-rojo oculto">
+      <strong>Este navegador no sirve.</strong>
+      <p>La aplicación necesita Google Chrome o Microsoft Edge en un ordenador.
+         En otros navegadores no se puede dar acceso a una carpeta.</p>
+    </div>
+
+    <div id="paso-carpetas">
+      <p class="explica">Para empezar, señala las dos carpetas con las que trabajas.
+         Solo hay que hacerlo una vez en cada ordenador.</p>
+
+      <div class="carpeta-fila">
+        <div>
+          <div class="carpeta-rotulo">1. Carpeta de asuntos abiertos</div>
+          <div class="carpeta-estado" id="estado-abiertos">Sin señalar</div>
+        </div>
+        <button id="btn-abiertos" class="boton">Elegir carpeta</button>
+      </div>
+
+      <div class="carpeta-fila">
+        <div>
+          <div class="carpeta-rotulo">2. Carpeta ARCHIVO</div>
+          <div class="carpeta-estado" id="estado-archivo">Sin señalar</div>
+        </div>
+        <button id="btn-archivo" class="boton">Elegir carpeta</button>
+      </div>
+
+      <div class="carpeta-fila">
+        <div>
+          <div class="carpeta-rotulo">3. ¿Quién eres?</div>
+          <div class="carpeta-estado">Se anota en el registro de cada asunto.</div>
+        </div>
+        <input id="campo-usuario" class="campo" placeholder="Tu nombre" style="max-width:220px">
+      </div>
+
+      <button id="btn-entrar" class="boton boton-principal boton-ancho" disabled>Entrar</button>
+      <p class="nota">Nada de lo que hagas aquí sale de este ordenador.
+         La aplicación trabaja directamente sobre tus carpetas.</p>
+    </div>
+  </div>
+</section>
+
+<div id="aplicacion" class="oculto">
+
+  <nav class="lateral">
+    <div class="marca">Gestor de Asuntos</div>
+    <button class="pestana activa" data-pantalla="abiertos"><span>Asuntos abiertos</span><span class="cuenta" id="cuenta-abiertos"></span></button>
+    <button class="pestana" data-pantalla="nuevo"><span>Nuevo asunto</span></button>
+    <button class="pestana" data-pantalla="archivo"><span>Archivo</span></button>
+    <button class="pestana" data-pantalla="personas"><span>Personas y empresas</span></button>
+    <div class="lateral-pie">
+      <button class="pestana" data-pantalla="ajustes"><span>Ajustes</span></button>
+      <div class="usuario" id="usuario-pie"></div>
+    </div>
+  </nav>
+
+  <main class="contenido">
+
+    <section id="pantalla-abiertos" class="pantalla">
+      <header class="cabecera">
+        <h2>Asuntos abiertos</h2>
+        <div class="acciones">
+          <input id="buscar-abiertos" class="campo" placeholder="Buscar por nombre, tipo o tercero">
+          <button id="btn-recargar" class="boton">Actualizar</button>
+        </div>
+      </header>
+      <div id="lista-abiertos" class="lista"></div>
+    </section>
+
+    <section id="pantalla-nuevo" class="pantalla oculto">
+      <header class="cabecera"><h2>Nuevo asunto</h2></header>
+
+      <div class="formulario">
+        <label class="etiqueta">¿De qué es el asunto?</label>
+        <div class="categorias" id="categorias-lista"></div>
+
+        <div id="bloque-tipos" class="oculto">
+          <label class="etiqueta">Tipo de asunto</label>
+          <div class="tipos" id="tipos-lista"></div>
+          <p class="nota">¿Falta un tipo? Los tipos se añaden en
+             <button type="button" class="enlace" id="ir-a-ajustes">Ajustes</button>,
+             para que la lista se mantenga ordenada y no se llene de nombres repetidos.</p>
+        </div>
+
+        <div id="bloque-tercero" class="oculto">
+          <label class="etiqueta" id="etiqueta-tercero">Tercero</label>
+          <input id="buscar-tercero" class="campo" placeholder="Escribe tres letras del nombre">
+          <div id="resultados-tercero" class="resultados"></div>
+          <div id="tercero-elegido" class="elegido oculto"></div>
+        </div>
+
+        <div id="bloque-detalles" class="oculto">
+          <div class="dos-columnas">
+            <div>
+              <label class="etiqueta">Fecha de inicio</label>
+              <input id="campo-fecha" type="date" class="campo">
+            </div>
+            <div>
+              <label class="etiqueta">Año académico <span class="suave">(opcional)</span></label>
+              <input id="campo-curso" class="campo" placeholder="26-27">
+            </div>
+          </div>
+
+          <div id="bloque-grupo" class="oculto">
+            <label class="interruptor">
+              <input type="checkbox" id="campo-grupo">
+              <span>Añadir el grupo al nombre <strong id="grupo-vista"></strong></span>
+            </label>
+          </div>
+
+          <label class="etiqueta">Descripción corta <span class="suave">(opcional)</span></label>
+          <input id="campo-descripcion" class="campo" placeholder="Por ejemplo: Cambio de optativa">
+
+          <div class="vista-previa">
+            <div class="vista-rotulo">Se creará esta carpeta</div>
+            <div id="vista-nombre" class="vista-nombre"></div>
+            <div id="vista-ruta" class="vista-ruta"></div>
+          </div>
+
+          <button id="btn-crear" class="boton boton-principal boton-ancho">Crear el asunto</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="pantalla-archivo" class="pantalla oculto">
+      <header class="cabecera">
+        <h2>Archivo</h2>
+        <div class="acciones">
+          <input id="buscar-archivo" class="campo" placeholder="Buscar en todo el archivo">
+          <button id="btn-recargar-archivo" class="boton">Actualizar</button>
+        </div>
+      </header>
+      <p class="explica" id="explica-archivo">Pulsa Actualizar para leer el archivo. Puede tardar unos segundos la primera vez.</p>
+      <div id="lista-archivo" class="lista"></div>
+    </section>
+
+    <section id="pantalla-personas" class="pantalla oculto">
+      <header class="cabecera">
+        <h2>Personas y empresas</h2>
+        <div class="acciones">
+          <select id="filtro-personas" class="campo">
+            <option value="ALUMNADO">Alumnado</option>
+            <option value="PERSONAL">Personal</option>
+            <option value="EMPRESAS">Empresas</option>
+            <option value="OTROS">Otros</option>
+          </select>
+          <input id="buscar-personas" class="campo" placeholder="Escribe un nombre">
+        </div>
+      </header>
+      <div class="dos-paneles">
+        <div id="lista-personas" class="lista"></div>
+        <div id="ficha-persona" class="ficha"><p class="explica">Elige a alguien de la lista para ver su ficha.</p></div>
+      </div>
+    </section>
+
+    <section id="pantalla-ajustes" class="pantalla oculto">
+      <header class="cabecera"><h2>Ajustes</h2></header>
+
+      <h3>Tipos de asunto</h3>
+      <p class="explica">Esta lista la comparten todos los ordenadores del centro:
+         se guarda en la carpeta <code>_GESTOR</code>, dentro de la carpeta de asuntos abiertos.
+         La lista de partida es una propuesta; cámbiala a vuestro gusto.</p>
+      <div class="alta-tipo">
+        <input id="nuevo-tipo" class="campo" placeholder="TIPO NUEVO" style="max-width:260px">
+        <select id="nueva-categoria" class="campo" style="max-width:180px">
+          <option value="ALUMNADO">ALUMNADO</option>
+          <option value="PERSONAL">PERSONAL</option>
+          <option value="EMPRESAS">EMPRESAS</option>
+          <option value="OTROS">OTROS</option>
+        </select>
+        <button id="btn-anadir-tipo" class="boton">Añadir</button>
+      </div>
+      <div id="tabla-tipos" class="lista"></div>
+
+      <h3>Cómo se abrevia cada grupo</h3>
+      <p class="explica">Cuando pides que el nombre del asunto lleve el grupo del alumno,
+         se escribe abreviado. Aquí tienes, grupo por grupo, lo que trae Séneca y lo que
+         escribe la aplicación. Si alguno no te cuadra, dímelo.</p>
+      <div id="tabla-grupos" class="lista"></div>
+
+      <h3>Ficheros de datos</h3>
+      <p class="explica">Van en <code>_GESTOR/datos</code>, dentro de la carpeta de asuntos abiertos.</p>
+      <div id="estado-datos" class="lista"></div>
+
+      <h3>Carpetas de este ordenador</h3>
+      <div id="estado-carpetas" class="lista"></div>
+      <button id="btn-olvidar" class="boton">Volver a elegir las carpetas</button>
+    </section>
+
+  </main>
+</div>
+
+<div id="capa" class="capa oculto">
+  <div class="cuadro">
+    <h3 id="cuadro-titulo"></h3>
+    <div id="cuadro-cuerpo"></div>
+    <div class="cuadro-botones">
+      <button id="cuadro-cancelar" class="boton">Cancelar</button>
+      <button id="cuadro-aceptar" class="boton boton-principal">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<div id="mensajes" class="mensajes"></div>
+
+<script src="js/util.js"></script>
+<script src="js/almacen.js"></script>
+<script src="js/carpetas.js"></script>
+<script src="js/nombres.js"></script>
+<script src="js/datos.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
