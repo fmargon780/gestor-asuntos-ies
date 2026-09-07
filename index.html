@@ -76,6 +76,13 @@
         <h2>Asuntos abiertos</h2>
         <div class="acciones">
           <input id="buscar-abiertos" class="campo" placeholder="Buscar por nombre, tipo o tercero">
+          <label class="etiqueta-en-linea" for="orden-abiertos">Ordenar por</label>
+          <select id="orden-abiertos" class="campo">
+            <option value="fecha-asc">Fecha de apertura · los más antiguos arriba</option>
+            <option value="fecha-desc">Fecha de apertura · los más recientes arriba</option>
+            <option value="tipo">Tipo de asunto</option>
+            <option value="tercero">Tercero</option>
+          </select>
           <button id="btn-recargar" class="boton">Actualizar</button>
         </div>
       </header>

@@ -346,6 +346,50 @@ await comprobar('y dice que está archivado',
   pagina.locator('#asuntos-del-tercero .resultado-pie').first().textContent()
     .then(t => t.indexOf('Archivado') !== -1), true);
 
+/* --- dar de alta un solicitante que aún no está en el RegAlum --- */
+await pagina.click('.pestana[data-pantalla="nuevo"]');
+await pagina.click('.categoria-boton[data-categoria="ALUMNADO"]');
+await pagina.click('#tipos-lista .tipo-boton');
+await pagina.fill('#buscar-tercero', 'aspirante');
+await pagina.waitForTimeout(300);
+await comprobar('si no está, ofrece darlo de alta como solicitante',
+  pagina.locator('#resultados-tercero button').textContent()
+    .then(t => t.indexOf('solicitante') !== -1), true);
+await pagina.click('#resultados-tercero button');
+await pagina.waitForSelector('#capa:not(.oculto)');
+await comprobar('el cuadro explica para qué es',
+  pagina.locator('#cuadro-cuerpo').textContent()
+    .then(t => t.indexOf('todavía no está matriculado') !== -1), true);
+await pagina.fill('.alta-campo[data-campo="Nombre"]', 'Nuevo Aspirante, Lucas');
+await pagina.fill('.alta-campo[data-campo="Fecha de nacimiento"]', '10/04/2012');
+await pagina.click('#cuadro-aceptar');
+await pagina.waitForTimeout(400);
+await comprobar('el solicitante aparece marcado como tal',
+  pagina.locator('#resultados-tercero .resultado-pie').first().textContent()
+    .then(t => t.indexOf('Solicitante, todavía sin matricular') !== -1), true);
+await pagina.click('#resultados-tercero .resultado');
+await comprobar('al solicitante no se le ofrece grupo',
+  pagina.locator('#bloque-grupo').isHidden(), true);
+await comprobar('sin Nº, el nombre de la carpeta va solo con el nombre',
+  pagina.locator('#vista-nombre').textContent()
+    .then(t => t.indexOf('Nuevo Aspirante, Lucas') !== -1), true);
+await comprobar('se ha escrito el solicitantes.csv', pagina.evaluate(async () => {
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+  const d = await g.getDirectoryHandle('datos');
+  const n = [];
+  for await (const p of d.entries()) n.push(p[0]);
+  return n.indexOf('solicitantes.csv') !== -1;
+}), true);
+
+/* --- ordenar los asuntos abiertos --- */
+await pagina.click('.pestana[data-pantalla="abiertos"]');
+await comprobar('el orden por defecto es por fecha, los más antiguos arriba',
+  pagina.locator('#orden-abiertos').inputValue(), 'fecha-asc');
+await pagina.selectOption('#orden-abiertos', 'fecha-desc');
+await comprobar('se puede cambiar el orden',
+  pagina.locator('#orden-abiertos').inputValue(), 'fecha-desc');
+await pagina.selectOption('#orden-abiertos', 'fecha-asc');
+
 /* --- ajustes --- */
 await pagina.click('.pestana[data-pantalla="ajustes"]');
 await pagina.waitForSelector('#tabla-grupos .fila-tipo');
@@ -353,7 +397,13 @@ await comprobar('la tabla de grupos lista solo las unidades de este curso',
   pagina.locator('#tabla-grupos .fila-tipo').count(), 3);
 await comprobar('Ajustes dice a qué curso corresponde el fichero',
   pagina.locator('#estado-datos .fila-tipo').first().textContent()
-    .then(t => t.indexOf('curso 26-27') !== -1 && t.indexOf('3 matriculados de 4') !== -1), true);
+    .then(t => t.indexOf('curso 26-27') !== -1 && t.indexOf('3 matriculados de 5') !== -1), true);
+await comprobar('y cuenta el solicitante dado de alta a mano',
+  pagina.locator('#estado-datos').textContent()
+    .then(t => t.indexOf('1 dados de alta a mano, todavía sin matricular') !== -1), true);
+await comprobar('Ajustes dice que reconoce todas las columnas del RegAlum',
+  pagina.locator('#estado-datos').textContent()
+    .then(t => t.indexOf('Las reconozco todas') !== -1), true);
 await comprobar('Ajustes lista cada fichero de personal con su curso',
   pagina.locator('#estado-datos').textContent()
     .then(t => t.indexOf('RelPerCen 24-25.csv') !== -1 &&

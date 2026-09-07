@@ -254,3 +254,11 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
   .visor { height: 38vh; }
   .doc-campos { max-height: none; }
 }
+
+/* La etiqueta del desplegable de ordenación, en la misma línea que él. */
+.etiqueta-en-linea {
+  font-size: 13px;
+  color: #5a6472;
+  white-space: nowrap;
+}
+#orden-abiertos { width: auto; }
