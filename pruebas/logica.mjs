@@ -302,6 +302,59 @@ comprobar('y se cuenta aparte', P2.manuales, 1);
 comprobar('el fichero de Séneca no se ha tocado',
   (await Carpetas.leerTexto(datosPer, 'RelPerCen.csv')).split('\n').length, 5);
 
+/* ---------- varios RelPerCen: cursos anteriores y personal no docente ---------- */
+Datos.olvidar();
+const datosVarios = dirFalso('datos');
+const CAB = '"Empleado/a","DNI/Pasaporte","Puesto","Fecha de toma de posesión","Fecha de cese"';
+
+/* Profesorado de hace dos cursos: uno sigue, otro se fue. */
+await Carpetas.escribirTexto(datosVarios, 'RelPerCen 24-25.csv', CAB + '\r\n' +
+  '"Aguado Ranea, Marcos Antonio","33357591R","Música P.E.S.","01/09/2011",""\r\n' +
+  '"Vieja Guardia, Antonia","11112233A","Latín P.E.S.","01/09/2010",""\r\n');
+
+/* Profesorado de este curso: la que se fue ya no sale. */
+await Carpetas.escribirTexto(datosVarios, 'RelPerCen 26-27.csv', CAB + '\r\n' +
+  '"Aguado Ranea, Marcos Antonio","33357591R","Jefatura de Estudios","01/09/2011",""\r\n' +
+  '"Cherino Elena, Paula","26835483A","Inglés P.E.S.","01/09/2026","31/08/2027"\r\n');
+
+/* Personal no docente de este curso, en su propio fichero. */
+await Carpetas.escribirTexto(datosVarios, 'RelPerCen PAS 26-27.csv', CAB + '\r\n' +
+  '"Ordóñez Gil, Rafael","44556677B","Ordenanza","01/09/2015",""\r\n');
+
+comprobar('el curso sale del nombre del fichero',
+  Datos.cursoDelFichero('RelPerCen PAS 26-27.csv'), '26-27');
+comprobar('también escrito con los años enteros',
+  Datos.cursoDelFichero('RelPerCen 2024-2025.csv'), '24-25');
+comprobar('un solo año también vale',
+  Datos.cursoDelFichero('RelPerCen 2025.csv'), '25-26');
+comprobar('sin año, se entiende que es el de hoy',
+  Datos.cursoDelFichero('RelPerCen.csv'), '26-27');
+
+const V = await Datos.cargar(datosVarios, 'PERSONAL');
+comprobar('junta los tres ficheros sin repetir a nadie', V.lista.length, 4);
+comprobar('y dice cuál es el curso más reciente', V.curso, '26-27');
+comprobar('lista los tres ficheros en Ajustes', V.ficheros.length, 3);
+
+const marcosV = V.lista.find(x => x.nombre.indexOf('Aguado') === 0);
+comprobar('quien sale en los dos cursos sigue en el centro', marcosV.enElCentro, true);
+comprobar('se le guardan los dos cursos', marcosV.cursos, ['24-25', '26-27']);
+comprobar('y vale el puesto del fichero más nuevo', marcosV.puesto, 'Jefatura de Estudios');
+
+const antonia = V.lista.find(x => x.nombre.indexOf('Vieja') === 0);
+comprobar('quien solo sale en el fichero viejo ya no está', antonia.enElCentro, false);
+comprobar('y se sabe cuál fue su último curso aquí', antonia.cursoUltimo, '24-25');
+comprobar('pero se la sigue encontrando', Datos.buscar(V.lista, 'vieja').length, 1);
+
+const ordenanza = V.lista.find(x => x.nombre.indexOf('Ordóñez') === 0);
+comprobar('el personal no docente entra igual', ordenanza.enElCentro, true);
+comprobar('con su puesto', ordenanza.puesto, 'Ordenanza');
+
+comprobar('cuenta bien cuántos están hoy en el centro', V.enElCentro, 3);
+
+const fichaAntonia = Datos.destacadosPersona(antonia);
+comprobar('la ficha dice desde cuándo no está',
+  fichaAntonia.destacados[1].valor.indexOf('su último curso aquí fue el 24-25') !== -1, true);
+
 comprobar('una fecha de ayer ya pasó', U.yaPaso('06/09/2026'), true);
 comprobar('la de hoy todavía no', U.yaPaso('07/09/2026'), false);
 comprobar('una fecha vacía no cuenta como pasada', U.yaPaso(''), false);

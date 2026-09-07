@@ -137,7 +137,22 @@ await pagina.evaluate(async () => {
     '"Aguado Ranea, Marcos Antonio","33357591R","Música P.E.S.","01/09/2011","","952276078","620177026","maguran591","maguran591@g.educaand.es"',
     '"Sánchez Alegría, María José","07862312S","Dibujo P.E.S.","01/09/2005","06/09/2026","656633968","656633968","msanale312","msanale312@g.educaand.es"'
   ].join('\r\n') + '\r\n';
-  d._hijos.set('RelPerCen.csv', window.__disco.fich('RelPerCen.csv', per));
+  d._hijos.set('RelPerCen 26-27.csv', window.__disco.fich('RelPerCen 26-27.csv', per));
+
+  /* un curso anterior: una profesora que ya no está */
+  const viejo = [
+    '"Empleado/a","DNI/Pasaporte","Puesto","Fecha de toma de posesión","Fecha de cese"',
+    '"Aguado Ranea, Marcos Antonio","33357591R","Música P.E.S.","01/09/2011",""',
+    '"Vieja Guardia, Antonia","11112233A","Latín P.E.S.","01/09/2010",""'
+  ].join('\r\n') + '\r\n';
+  d._hijos.set('RelPerCen 24-25.csv', window.__disco.fich('RelPerCen 24-25.csv', viejo));
+
+  /* y el personal no docente, en su propio fichero */
+  const pas = [
+    '"Empleado/a","DNI/Pasaporte","Puesto","Fecha de toma de posesión","Fecha de cese"',
+    '"Ordóñez Gil, Rafael","44556677B","Ordenanza","01/09/2015",""'
+  ].join('\r\n') + '\r\n';
+  d._hijos.set('RelPerCen PAS 26-27.csv', window.__disco.fich('RelPerCen PAS 26-27.csv', pas));
 });
 
 await pagina.click('#btn-entrar');
@@ -247,7 +262,22 @@ await comprobar('al personal no se le ofrece grupo',
   pagina.locator('#bloque-grupo').isHidden(), true);
 
 await pagina.click('#btn-cambiar-tercero');
+await pagina.fill('#buscar-tercero', 'ordonez');
+await pagina.waitForTimeout(300);
+await pagina.waitForSelector('#resultados-tercero .resultado');
+await comprobar('el personal no docente sale de su propio fichero',
+  pagina.locator('#resultados-tercero .resultado-pie').first().textContent()
+    .then(t => t.indexOf('Ordenanza') !== -1), true);
+
+await pagina.fill('#buscar-tercero', 'vieja guardia');
+await pagina.waitForTimeout(300);
+await pagina.waitForSelector('#resultados-tercero .resultado');
+await comprobar('quien solo está en un curso viejo se encuentra, pero avisa',
+  pagina.locator('#resultados-tercero .resultado-pie').first().textContent()
+    .then(t => t.indexOf('su último curso aquí: 24-25') !== -1), true);
+
 await pagina.fill('#buscar-tercero', 'sanchez alegria');
+await pagina.waitForTimeout(300);
 await pagina.waitForSelector('#resultados-tercero .resultado');
 await comprobar('avisa de quien ya cesó',
   pagina.locator('#resultados-tercero .resultado-pie').first().textContent()
@@ -324,10 +354,13 @@ await comprobar('la tabla de grupos lista solo las unidades de este curso',
 await comprobar('Ajustes dice a qué curso corresponde el fichero',
   pagina.locator('#estado-datos .fila-tipo').first().textContent()
     .then(t => t.indexOf('curso 26-27') !== -1 && t.indexOf('3 matriculados de 4') !== -1), true);
-await comprobar('Ajustes cuenta cuánto personal sigue en el centro',
-  pagina.locator('#estado-datos .fila-tipo').nth(1).textContent()
-    .then(t => t.indexOf('RelPerCen.csv') !== -1 &&
-               t.indexOf('1 en el centro de 2 fichas') !== -1), true);
+await comprobar('Ajustes lista cada fichero de personal con su curso',
+  pagina.locator('#estado-datos').textContent()
+    .then(t => t.indexOf('RelPerCen 24-25.csv') !== -1 &&
+               t.indexOf('RelPerCen PAS 26-27.csv') !== -1), true);
+await comprobar('y cuenta cuánto personal sigue en el centro',
+  pagina.locator('#estado-datos').textContent()
+    .then(t => t.indexOf('2 en el centro (curso 26-27) de 4 fichas') !== -1), true);
 await comprobar('y abrevia bien el de Bachillerato',
   pagina.locator('#tabla-grupos .fila-tipo').filter({ hasText: '1º Bach A' })
     .locator('.nombre-tipo').textContent(), '1ºBachA');

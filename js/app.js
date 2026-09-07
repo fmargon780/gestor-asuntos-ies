@@ -448,7 +448,7 @@
         vacio.innerHTML = fuente.fichero
           ? 'Nadie con ese nombre en ' + U.escapar(fuente.fichero) +
             ' ni en las altas a mano.'
-          : 'Todavía no está el fichero RelPerCen.csv en la carpeta _GESTOR/datos.';
+          : 'Todavía no hay ningún fichero RelPerCen en la carpeta _GESTOR/datos.';
       } else {
         vacio.textContent = 'No está en la lista todavía.';
       }
@@ -492,8 +492,10 @@
     var trozos = [];
     if (p.puesto) trozos.push(p.puesto);
     if (!p.enElCentro) {
-      trozos.push('Ya no está en el centro' +
-                  (p.fechaCese ? ' (cesó el ' + p.fechaCese + ')' : ''));
+      var porque = p.fechaCese && p.esteCurso
+        ? ' (cesó el ' + p.fechaCese + ')'
+        : (p.cursoUltimo ? ' (su último curso aquí: ' + p.cursoUltimo + ')' : '');
+      trozos.push('Ya no está en el centro' + porque);
     }
     if (p.documento) trozos.push(p.documento);
     if (!p.deSeneca) trozos.push('alta a mano');
@@ -755,7 +757,6 @@
     }
 
     var html = '<h4>' + U.escapar(p.nombre) + '</h4>';
-
     if (p.categoria === 'ALUMNADO') {
       /* Lo que se consulta a diario va arriba: la edad de hoy, si sigue
          matriculado, el grupo y los datos de contacto de los tutores
@@ -991,12 +992,19 @@
           ' que hay en el fichero'
         : 'No está. Déjalo en _GESTOR/datos y vuelve a entrar.'));
     var personal = await Datos.cargar(E.datos, 'PERSONAL');
-    estado.appendChild(filaEstado('RelPerCen.csv (personal)',
-      personal.fichero
-        ? personal.fichero + '  ·  ' + personal.enElCentro + ' en el centro de ' +
-          personal.lista.length + ' fichas' +
-          (personal.manuales ? '  ·  ' + personal.manuales + ' de alta a mano' : '')
-        : 'No está. Déjalo en _GESTOR/datos y vuelve a entrar.'));
+    if (!personal.ficheros.length) {
+      estado.appendChild(filaEstado('RelPerCen (personal)',
+        'No hay ninguno. Déjalos en _GESTOR/datos y vuelve a entrar.'));
+    } else {
+      personal.ficheros.forEach(function (r) {
+        estado.appendChild(filaEstado(r.fichero,
+          'curso ' + r.curso + '  ·  ' + r.filas + ' personas'));
+      });
+      estado.appendChild(filaEstado('Personal en total',
+        personal.enElCentro + ' en el centro (curso ' + personal.curso + ') de ' +
+        personal.lista.length + ' fichas' +
+        (personal.manuales ? '  ·  ' + personal.manuales + ' de alta a mano' : '')));
+    }
     for (var cat in Datos.LISTAS) {
       if (cat === 'PERSONAL') continue;
       var l = await Datos.cargar(E.datos, cat);
