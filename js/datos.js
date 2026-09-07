@@ -61,13 +61,39 @@ var Datos = (function () {
 
   /* ---------- alumnado (RegAlum de Séneca) ---------- */
 
-  function columna(cabecera, nombre) {
-    var objetivo = U.normalizar(nombre);
-    for (var i = 0; i < cabecera.length; i++) {
-      if (U.normalizar(cabecera[i]) === objetivo) return i;
+  /* Busca una columna por su título. Se le pueden dar varios títulos
+     posibles, porque Séneca no siempre los escribe igual según qué
+     informe se descargue. Primero se prueba el nombre exacto; si no
+     aparece ninguno, se admite que el título empiece por él. */
+  function columna(cabecera, nombres) {
+    var lista = [].concat(nombres);
+    var i, j;
+    for (j = 0; j < lista.length; j++) {
+      var objetivo = U.normalizar(lista[j]);
+      for (i = 0; i < cabecera.length; i++) {
+        if (U.normalizar(cabecera[i]) === objetivo) return i;
+      }
+    }
+    for (j = 0; j < lista.length; j++) {
+      var trozo = U.normalizar(lista[j]);
+      for (i = 0; i < cabecera.length; i++) {
+        if (U.normalizar(cabecera[i]).indexOf(trozo) === 0) return i;
+      }
     }
     return -1;
   }
+
+  /* Los títulos que puede traer cada columna del RegAlum. */
+  var COL_ALUMNO = {
+    nombre: ['Alumno/a', 'Alumno', 'Alumno/a (Apellidos, Nombre)', 'Apellidos y nombre'],
+    id: ['Nº Id. Escolar', 'Nº Id.Escolar', 'Nº Identificación Escolar',
+         'Nº de identificación escolar', 'Id. Escolar', 'Número de identificación escolar'],
+    curso: ['Curso'],
+    unidad: ['Unidad', 'Unidad/Grupo', 'Grupo'],
+    ano: ['Año de la matrícula', 'Año matrícula', 'Año académico', 'Curso académico'],
+    estado: ['Estado Matrícula', 'Estado de matrícula', 'Estado de la matrícula', 'Estado'],
+    nac: ['Fecha de nacimiento', 'F. Nacimiento', 'Fecha nacimiento']
+  };
 
   async function ficheroQueEmpiezaPor(dir, prefijo) {
     var lista = await Carpetas.ficheros(dir);
@@ -103,32 +129,58 @@ var Datos = (function () {
     if (CACHE.ALUMNADO) return CACHE.ALUMNADO;
     var fichero = await ficheroQueEmpiezaPor(dirDatos, 'RegAlum');
     if (!fichero) {
-      CACHE.ALUMNADO = { lista: [], fichero: null, ano: 0, curso: '', matriculados: 0 };
+      var sueltos = [];
+      var soloSolicitantes = await anadirSolicitantes(dirDatos, sueltos, null);
+      CACHE.ALUMNADO = { lista: sueltos, fichero: null, ano: 0, curso: '',
+                         sinAnos: false, columnas: {}, faltan: [], cabecera: [],
+                         matriculados: 0, solicitantes: soloSolicitantes };
       return CACHE.ALUMNADO;
     }
 
     var texto = await Carpetas.leerTexto(dirDatos, fichero.nombre);
     var t = aTabla(texto);
     if (!t.filas.length) {
-      CACHE.ALUMNADO = { lista: [], fichero: fichero.nombre, ano: 0, curso: '', matriculados: 0 };
+      var vacios = [];
+      var soloSol = await anadirSolicitantes(dirDatos, vacios, null);
+      CACHE.ALUMNADO = { lista: vacios, fichero: fichero.nombre, ano: 0, curso: '',
+                         sinAnos: false, columnas: {}, faltan: [], cabecera: [],
+                         matriculados: 0, solicitantes: soloSol };
       return CACHE.ALUMNADO;
     }
 
     var cab = t.filas[0];
-    var iNombre = columna(cab, 'Alumno/a');
-    var iId = columna(cab, 'Nº Id. Escolar');
-    var iCurso = columna(cab, 'Curso');
-    var iUnidad = columna(cab, 'Unidad');
-    var iAno = columna(cab, 'Año de la matrícula');
-    var iNac = columna(cab, 'Fecha de nacimiento');
-    var iEstado = columna(cab, 'Estado Matrícula');
+    var iNombre = columna(cab, COL_ALUMNO.nombre);
+    var iId = columna(cab, COL_ALUMNO.id);
+    var iCurso = columna(cab, COL_ALUMNO.curso);
+    var iUnidad = columna(cab, COL_ALUMNO.unidad);
+    var iAno = columna(cab, COL_ALUMNO.ano);
+    var iNac = columna(cab, COL_ALUMNO.nac);
+    var iEstado = columna(cab, COL_ALUMNO.estado);
+    if (iNombre === -1) iNombre = 0;
 
-    /* El curso de la descarga. */
+    /* Qué columnas se han encontrado y cuáles no. Se enseña en Ajustes:
+       si un día Séneca cambia un título, se ve ahí en vez de quedarse
+       sin saber por qué la aplicación no ofrece el grupo. */
+    var columnas = {
+      'Alumno/a': iNombre, 'Nº Id. Escolar': iId, 'Curso': iCurso,
+      'Unidad': iUnidad, 'Año de la matrícula': iAno,
+      'Estado Matrícula': iEstado, 'Fecha de nacimiento': iNac
+    };
+    var faltan = Object.keys(columnas).filter(function (k) { return columnas[k] === -1; });
+
+    /* El curso de la descarga: el año más alto de la columna "Año de la
+       matrícula".
+
+       Si esa columna no viene, o no trae ningún año legible, es que la
+       descarga es una foto del curso de hoy: una fila por alumno, sin
+       histórico. Entonces todo el que no esté anulado ni trasladado
+       cuenta como matriculado ahora. */
     var anoUltimo = 0;
     for (var g = 1; g < t.filas.length; g++) {
       var aa = iAno === -1 ? 0 : parseInt(t.filas[g][iAno], 10) || 0;
       if (aa > anoUltimo) anoUltimo = aa;
     }
+    var sinAnos = !anoUltimo;
 
     var porId = {};
     for (var f = 1; f < t.filas.length; f++) {
@@ -174,7 +226,7 @@ var Datos = (function () {
         r.cursoUltima = curso;
       }
       /* Y la de este curso, que es la única que da grupo. */
-      if (anoUltimo && ano === anoUltimo) {
+      if (sinAnos || ano === anoUltimo) {
         r.matriculado = true;
         r.unidad = unidad;
         r.curso = curso;
@@ -188,11 +240,48 @@ var Datos = (function () {
       lista[i].busca = U.normalizar(lista[i].nombre + ' ' + lista[i].id);
       if (lista[i].matriculado) matriculados++;
     }
+    var solicitantes = await anadirSolicitantes(dirDatos, lista, porId);
+
     CACHE.ALUMNADO = {
       lista: lista, fichero: fichero.nombre, ano: anoUltimo,
-      curso: U.cursoDeAno(anoUltimo), matriculados: matriculados
+      curso: sinAnos ? U.cursoActual() : U.cursoDeAno(anoUltimo),
+      sinAnos: sinAnos, columnas: columnas, faltan: faltan,
+      cabecera: cab.map(function (x) { return String(x).trim(); }),
+      matriculados: matriculados, solicitantes: solicitantes
     };
     return CACHE.ALUMNADO;
+  }
+
+  /* ---------- solicitantes ----------
+
+     Quien ha pedido plaza pero todavía no está matriculado no sale en el
+     RegAlum, y sin embargo tiene gestiones: la solicitud, la
+     documentación, las reclamaciones. Se da de alta a mano en
+     solicitantes.csv y aparece en el buscador junto al resto del
+     alumnado, marcado como solicitante.
+
+     No se le ofrece grupo, porque todavía no tiene. Y si ya trae Nº de
+     identificación escolar, se pone: así, el día que se matricule, su
+     carpeta del archivo ya se llama igual que la que montará el RegAlum. */
+  async function anadirSolicitantes(dirDatos, lista, porId) {
+    var manual = await cargarLista(dirDatos, 'ALUMNADO', 'ALUMNADO_MANUAL');
+    var cuantos = 0;
+    for (var i = 0; i < manual.lista.length; i++) {
+      var p = manual.lista[i];
+      var id = String(p.campos['Nº Id. Escolar'] || '').trim();
+      var clave = id || U.normalizar(p.nombre);
+      if (porId && porId[clave]) continue;   /* ya está matriculado */
+      lista.push({
+        nombre: p.nombre, id: id, ano: 0, categoria: 'ALUMNADO',
+        campos: p.campos, fechaNac: String(p.campos['Fecha de nacimiento'] || '').trim(),
+        matriculado: false, solicitante: true, deSeneca: false,
+        unidad: '', curso: '', anoUltima: 0, unidadUltima: '', cursoUltima: '',
+        busca: U.normalizar(p.nombre + ' ' + id)
+      });
+      cuantos++;
+    }
+    lista.sort(function (a, b) { return U.normalizar(a.nombre) < U.normalizar(b.nombre) ? -1 : 1; });
+    return cuantos;
   }
 
   /* ---------- personal (RelPerCen de Séneca + altas a mano) ----------
@@ -363,6 +452,9 @@ var Datos = (function () {
   }
 
   var LISTAS = {
+    ALUMNADO: { fichero: 'solicitantes.csv',
+                cabecera: ['Nombre', 'Nº Id. Escolar', 'Fecha de nacimiento',
+                           'Teléfono de contacto', 'Correo de contacto'] },
     PERSONAL: { fichero: 'personal.csv',
                 cabecera: ['Nombre', 'Documento', 'Puesto', 'Teléfono', 'Correo'] },
     EMPRESAS: { fichero: 'empresas.csv',
@@ -410,7 +502,8 @@ var Datos = (function () {
   /* Da de alta un tercero nuevo y lo escribe en su CSV. */
   async function anadirALista(dirDatos, categoria, valores) {
     var def = LISTAS[categoria];
-    var clave = categoria === 'PERSONAL' ? 'PERSONAL_MANUAL' : categoria;
+    var clave = (categoria === 'PERSONAL' || categoria === 'ALUMNADO')
+      ? categoria + '_MANUAL' : categoria;
     var actual = await cargarLista(dirDatos, categoria, clave);
     var filas = actual.lista.map(function (p) {
       return def.cabecera.map(function (c) { return p.campos[c] || ''; });
@@ -447,7 +540,7 @@ var Datos = (function () {
   function olvidar(categoria) {
     if (!categoria) { CACHE = {}; return; }
     delete CACHE[categoria];
-    if (categoria === 'PERSONAL') delete CACHE.PERSONAL_MANUAL;
+    delete CACHE[categoria + '_MANUAL'];
   }
 
   /* Las unidades distintas de ESTE curso, para poder enseñar en Ajustes
@@ -490,6 +583,9 @@ var Datos = (function () {
       meter('Matrícula', 'Matriculado en el curso ' + U.cursoDeAno(alumno.ano));
       if (alumno.unidad) meter('Grupo', alumno.unidad);
       if (alumno.curso) meter('Curso', alumno.curso);
+    } else if (alumno.solicitante) {
+      meter('Matrícula', 'Solicitante  ·  todavía sin matricular');
+      if (!alumno.id) meter('Nº Id. Escolar', 'Todavía no lo tiene');
     } else {
       meter('Matrícula', 'No está matriculado este curso');
       if (alumno.anoUltima) {
