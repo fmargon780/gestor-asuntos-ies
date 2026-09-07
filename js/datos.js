@@ -203,10 +203,10 @@ var Datos = (function () {
      por separado.
 
      De qué curso es cada fichero lo dice su nombre:
-       RelPerCen 26-27.csv          -> 26-27
-       RelPerCen PAS 26-27.csv      -> 26-27
-       RelPerCen 2026-2027.csv      -> 26-27
-       RelPerCen.csv (sin año)      -> el curso de hoy
+       RelPerCen 26-27.csv             -> 26-27
+       RelPerCenNodocente 2627.csv     -> 26-27
+       RelPerCen 2026-2027.csv         -> 26-27
+       RelPerCen.csv (sin año)         -> el curso de hoy
 
      Una persona está EN EL CENTRO si sale en algún fichero del curso más
      alto de todos y su fecha de cese no ha pasado. Quien solo sale en
@@ -218,12 +218,25 @@ var Datos = (function () {
      nombre. Si no lleva año, se supone que es la descarga de hoy. */
   function cursoDelFichero(nombre) {
     var n = String(nombre || '');
+
+    /* 2026-2027 */
     var largo = n.match(/(20\d{2})\s*[-–\/]\s*20\d{2}/);
     if (largo) return U.cursoDeAno(largo[1]);
-    var corto = n.match(/(?:^|[^\d])(\d{2})\s*[-–]\s*(\d{2})(?!\d)/);
-    if (corto) return corto[1] + '-' + corto[2];
+
+    /* 26-27, 26/27, 2627: dos pares seguidos, el segundo uno más que el
+       primero. Es lo que distingue "2627" (el curso) de "2026" (un año). */
+    var pares = n.match(/(?:^|[^\d])(\d{2})\s*[-–\/ ]?\s*(\d{2})(?!\d)/g) || [];
+    for (var i = 0; i < pares.length; i++) {
+      var d = pares[i].match(/(\d{2})\s*[-–\/ ]?\s*(\d{2})$/);
+      if (!d) continue;
+      var a = parseInt(d[1], 10), b = parseInt(d[2], 10);
+      if ((a + 1) % 100 === b) return d[1] + '-' + d[2];
+    }
+
+    /* 2026 a secas */
     var suelto = n.match(/(20\d{2})/);
     if (suelto) return U.cursoDeAno(suelto[1]);
+
     return U.cursoActual();
   }
 

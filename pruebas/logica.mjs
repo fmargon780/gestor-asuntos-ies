@@ -318,7 +318,7 @@ await Carpetas.escribirTexto(datosVarios, 'RelPerCen 26-27.csv', CAB + '\r\n' +
   '"Cherino Elena, Paula","26835483A","Inglés P.E.S.","01/09/2026","31/08/2027"\r\n');
 
 /* Personal no docente de este curso, en su propio fichero. */
-await Carpetas.escribirTexto(datosVarios, 'RelPerCen PAS 26-27.csv', CAB + '\r\n' +
+await Carpetas.escribirTexto(datosVarios, 'RelPerCenNodocente 2627.csv', CAB + '\r\n' +
   '"Ordóñez Gil, Rafael","44556677B","Ordenanza","01/09/2015",""\r\n');
 
 comprobar('el curso sale del nombre del fichero',
@@ -329,6 +329,14 @@ comprobar('un solo año también vale',
   Datos.cursoDelFichero('RelPerCen 2025.csv'), '25-26');
 comprobar('sin año, se entiende que es el de hoy',
   Datos.cursoDelFichero('RelPerCen.csv'), '26-27');
+comprobar('el año pegado, como lo escribe Séneca',
+  Datos.cursoDelFichero('RelPerCenNodocente 2627.csv'), '26-27');
+comprobar('el año pegado de un curso viejo',
+  Datos.cursoDelFichero('RelPerCenNodocente 2425.csv'), '24-25');
+comprobar('2026 a secas es un año, no un curso pegado',
+  Datos.cursoDelFichero('RelPerCen 2026.csv'), '26-27');
+comprobar('2025 a secas es el curso 25-26',
+  Datos.cursoDelFichero('RelPerCen 2025.csv'), '25-26');
 
 const V = await Datos.cargar(datosVarios, 'PERSONAL');
 comprobar('junta los tres ficheros sin repetir a nadie', V.lista.length, 4);

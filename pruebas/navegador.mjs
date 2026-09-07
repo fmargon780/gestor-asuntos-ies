@@ -152,7 +152,7 @@ await pagina.evaluate(async () => {
     '"Empleado/a","DNI/Pasaporte","Puesto","Fecha de toma de posesión","Fecha de cese"',
     '"Ordóñez Gil, Rafael","44556677B","Ordenanza","01/09/2015",""'
   ].join('\r\n') + '\r\n';
-  d._hijos.set('RelPerCen PAS 26-27.csv', window.__disco.fich('RelPerCen PAS 26-27.csv', pas));
+  d._hijos.set('RelPerCenNodocente 2627.csv', window.__disco.fich('RelPerCenNodocente 2627.csv', pas));
 });
 
 await pagina.click('#btn-entrar');
@@ -357,7 +357,7 @@ await comprobar('Ajustes dice a qué curso corresponde el fichero',
 await comprobar('Ajustes lista cada fichero de personal con su curso',
   pagina.locator('#estado-datos').textContent()
     .then(t => t.indexOf('RelPerCen 24-25.csv') !== -1 &&
-               t.indexOf('RelPerCen PAS 26-27.csv') !== -1), true);
+               t.indexOf('RelPerCenNodocente 2627.csv') !== -1), true);
 await comprobar('y cuenta cuánto personal sigue en el centro',
   pagina.locator('#estado-datos').textContent()
     .then(t => t.indexOf('2 en el centro (curso 26-27) de 4 fichas') !== -1), true);
