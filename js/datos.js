@@ -2,14 +2,15 @@
    datos.js — de dónde salen los terceros.
 
    Alumnado: del RegAlum.csv de Séneca, que se deja en
-             _GESTOR/datos. Se queda con la matrícula más
-             reciente de cada alumno.
+             _GESTOR/datos.
    Personal, empresas y otros: de tres CSV que mantiene la
              propia aplicación, en la misma carpeta.
    ============================================================ */
 var Datos = (function () {
 
   var CACHE = {};   /* lo leído en esta sesión, para no releer 10 MB cada vez */
+
+  /* ---------- lectura de CSV ---------- */
 
   function partirLinea(linea, sep) {
     var campos = [], actual = '', dentro = false;
@@ -54,6 +55,8 @@ var Datos = (function () {
     return lineas.join('\r\n') + '\r\n';
   }
 
+  /* ---------- alumnado (RegAlum de Séneca) ---------- */
+
   function columna(cabecera, nombre) {
     var objetivo = U.normalizar(nombre);
     for (var i = 0; i < cabecera.length; i++) {
@@ -74,14 +77,38 @@ var Datos = (function () {
     return mejor;
   }
 
+  /* Una matrícula en estos estados no cuenta: el alumno no está en el
+     centro este curso aunque la fila exista. */
+  var ESTADOS_QUE_NO_CUENTAN = ['anulada', 'trasladada'];
+
+  /* En el RegAlum hay una fila por cada matrícula, no una por alumno.
+     Un alumno que lleve cuatro cursos en el centro sale cuatro veces.
+
+     De ahí salen dos cosas distintas, y no hay que confundirlas:
+
+       - El curso al que corresponde la descarga: el año más alto de
+         toda la columna "Año de la matrícula".
+       - Si un alumno concreto sigue matriculado: tiene una fila de ese
+         año y esa matrícula no está anulada ni trasladada.
+
+     Solo se ofrece el grupo de quien sigue matriculado, y se ofrece el
+     de este curso. Al que ya se fue no se le ofrece ninguno: su último
+     grupo es de otro año y meterlo en el nombre de una carpeta de hoy
+     sería mentir. */
   async function cargarAlumnado(dirDatos) {
     if (CACHE.ALUMNADO) return CACHE.ALUMNADO;
     var fichero = await ficheroQueEmpiezaPor(dirDatos, 'RegAlum');
-    if (!fichero) { CACHE.ALUMNADO = { lista: [], fichero: null }; return CACHE.ALUMNADO; }
+    if (!fichero) {
+      CACHE.ALUMNADO = { lista: [], fichero: null, ano: 0, curso: '', matriculados: 0 };
+      return CACHE.ALUMNADO;
+    }
 
     var texto = await Carpetas.leerTexto(dirDatos, fichero.nombre);
     var t = aTabla(texto);
-    if (!t.filas.length) { CACHE.ALUMNADO = { lista: [], fichero: fichero.nombre }; return CACHE.ALUMNADO; }
+    if (!t.filas.length) {
+      CACHE.ALUMNADO = { lista: [], fichero: fichero.nombre, ano: 0, curso: '', matriculados: 0 };
+      return CACHE.ALUMNADO;
+    }
 
     var cab = t.filas[0];
     var iNombre = columna(cab, 'Alumno/a');
@@ -90,6 +117,14 @@ var Datos = (function () {
     var iUnidad = columna(cab, 'Unidad');
     var iAno = columna(cab, 'Año de la matrícula');
     var iNac = columna(cab, 'Fecha de nacimiento');
+    var iEstado = columna(cab, 'Estado Matrícula');
+
+    /* El curso de la descarga. */
+    var anoUltimo = 0;
+    for (var g = 1; g < t.filas.length; g++) {
+      var aa = iAno === -1 ? 0 : parseInt(t.filas[g][iAno], 10) || 0;
+      if (aa > anoUltimo) anoUltimo = aa;
+    }
 
     var porId = {};
     for (var f = 1; f < t.filas.length; f++) {
@@ -99,25 +134,60 @@ var Datos = (function () {
       var id = iId === -1 ? '' : String(fila[iId] || '').trim();
       var clave = id || U.normalizar(nombre);
       var ano = iAno === -1 ? 0 : parseInt(fila[iAno], 10) || 0;
-      if (porId[clave] && porId[clave].ano >= ano) continue;
-      var campos = {};
-      for (var c = 0; c < cab.length; c++) {
-        var v = String(fila[c] === undefined ? '' : fila[c]).trim();
-        if (v) campos[String(cab[c]).trim()] = v;
+      var estado = iEstado === -1 ? '' : U.normalizar(fila[iEstado]);
+      var cuenta = ESTADOS_QUE_NO_CUENTAN.indexOf(estado) === -1;
+      var unidad = iUnidad === -1 ? '' : String(fila[iUnidad] || '').trim();
+      var curso = iCurso === -1 ? '' : String(fila[iCurso] || '').trim();
+
+      if (!porId[clave]) {
+        porId[clave] = {
+          nombre: nombre, id: id, ano: 0, categoria: 'ALUMNADO', campos: {},
+          fechaNac: '', matriculado: false, unidad: '', curso: '',
+          anoUltima: 0, unidadUltima: '', cursoUltima: ''
+        };
       }
-      porId[clave] = {
-        nombre: nombre, id: id, ano: ano,
-        curso: iCurso === -1 ? '' : String(fila[iCurso] || '').trim(),
-        unidad: iUnidad === -1 ? '' : String(fila[iUnidad] || '').trim(),
-        fechaNac: iNac === -1 ? '' : String(fila[iNac] || '').trim(),
-        campos: campos, categoria: 'ALUMNADO'
-      };
+      var r = porId[clave];
+
+      /* Los datos de contacto salen de la fila más reciente que haya. */
+      if (ano >= r.ano) {
+        r.ano = ano;
+        r.nombre = nombre;
+        r.fechaNac = iNac === -1 ? '' : String(fila[iNac] || '').trim();
+        var campos = {};
+        for (var c = 0; c < cab.length; c++) {
+          var v = String(fila[c] === undefined ? '' : fila[c]).trim();
+          if (v) campos[String(cab[c]).trim()] = v;
+        }
+        r.campos = campos;
+      }
+
+      if (!cuenta) continue;
+
+      /* La última matrícula buena, para poder decir de cuándo es. */
+      if (ano > r.anoUltima) {
+        r.anoUltima = ano;
+        r.unidadUltima = unidad;
+        r.cursoUltima = curso;
+      }
+      /* Y la de este curso, que es la única que da grupo. */
+      if (anoUltimo && ano === anoUltimo) {
+        r.matriculado = true;
+        r.unidad = unidad;
+        r.curso = curso;
+      }
     }
 
     var lista = Object.keys(porId).map(function (k) { return porId[k]; });
     lista.sort(function (a, b) { return U.normalizar(a.nombre) < U.normalizar(b.nombre) ? -1 : 1; });
-    for (var i = 0; i < lista.length; i++) lista[i].busca = U.normalizar(lista[i].nombre + ' ' + lista[i].id);
-    CACHE.ALUMNADO = { lista: lista, fichero: fichero.nombre };
+    var matriculados = 0;
+    for (var i = 0; i < lista.length; i++) {
+      lista[i].busca = U.normalizar(lista[i].nombre + ' ' + lista[i].id);
+      if (lista[i].matriculado) matriculados++;
+    }
+    CACHE.ALUMNADO = {
+      lista: lista, fichero: fichero.nombre, ano: anoUltimo,
+      curso: U.cursoDeAno(anoUltimo), matriculados: matriculados
+    };
     return CACHE.ALUMNADO;
   }
 
@@ -202,16 +272,18 @@ var Datos = (function () {
     if (categoria) delete CACHE[categoria]; else CACHE = {};
   }
 
-  /* Las unidades distintas que trae el fichero, para poder enseñar en
-     Ajustes cómo queda abreviada cada una. */
+  /* Las unidades distintas de ESTE curso, para poder enseñar en Ajustes
+     cómo queda abreviada cada una. */
   function unidadesDistintas(lista) {
     var vistas = {};
     for (var i = 0; i < lista.length; i++) {
+      if (!lista[i].matriculado) continue;
       var u = String(lista[i].unidad || '').trim();
       if (!u || vistas[u]) continue;
       vistas[u] = { unidad: u, curso: lista[i].curso || '', cuantos: 0 };
     }
     for (var j = 0; j < lista.length; j++) {
+      if (!lista[j].matriculado) continue;
       var v = String(lista[j].unidad || '').trim();
       if (vistas[v]) vistas[v].cuantos++;
     }
@@ -235,8 +307,19 @@ var Datos = (function () {
     var edad = U.edadDesde(alumno.fechaNac);
     if (edad !== '') meter('Edad actual', edad + ' años');
     if (alumno.fechaNac) { meter('Fecha de nacimiento', alumno.fechaNac); fuera['fecha de nacimiento'] = true; }
-    if (alumno.unidad) meter('Grupo', alumno.unidad);
-    if (alumno.curso) meter('Curso', alumno.curso);
+
+    if (alumno.matriculado) {
+      meter('Matrícula', 'Matriculado en el curso ' + U.cursoDeAno(alumno.ano));
+      if (alumno.unidad) meter('Grupo', alumno.unidad);
+      if (alumno.curso) meter('Curso', alumno.curso);
+    } else {
+      meter('Matrícula', 'No está matriculado este curso');
+      if (alumno.anoUltima) {
+        meter('Última matrícula', U.cursoDeAno(alumno.anoUltima) +
+          (alumno.cursoUltima ? '  ·  ' + alumno.cursoUltima : '') +
+          (alumno.unidadUltima ? '  ·  ' + alumno.unidadUltima : ''));
+      }
+    }
 
     var claves = Object.keys(alumno.campos);
     /* Primero todo lo que hable de tutores o de la familia. */
