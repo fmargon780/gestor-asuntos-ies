@@ -123,6 +123,17 @@ comprobar('sin grupo el nombre queda como antes',
                    tercero: 'Cordero Navas, Lucía 1139877' }),
   '260907 MATRICULA 26-27 Cordero Navas, Lucía 1139877');
 
+/* Al cerrar un asunto que no tiene ficha, la carpeta del tercero se propone
+   con el resto del nombre. De ahí hay que quitar el año académico y el grupo,
+   que van delante. Lo que no se toca es un nombre de empresa. */
+comprobar('el tercero propuesto al cerrar no lleva el año académico ni el grupo',
+  ['26-27 3ºA Cordero Navas, Lucía 1139877',
+   '26-27 Cordero Navas, Lucía 1139877',
+   'Papelería Sur, S.L. B12345678'].map(r => Nombres.terceroDeResto(r)),
+  ['Cordero Navas, Lucía 1139877',
+   'Cordero Navas, Lucía 1139877',
+   'Papelería Sur, S.L. B12345678']);
+
 /* ---------- la edad ---------- */
 comprobar('edad de quien ya ha cumplido este año', U.edadDesde('14/03/2013'), 13);
 comprobar('edad de quien todavía no ha cumplido', U.edadDesde('27/11/2011'), 14);
