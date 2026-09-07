@@ -122,6 +122,13 @@ await pagina.evaluate(async () => {
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
   const d = await g.getDirectoryHandle('datos', { create: true });
   d._hijos.set('RegAlum.csv', window.__disco.fich('RegAlum.csv', csv));
+
+  const per = [
+    '"Empleado/a","DNI/Pasaporte","Puesto","Fecha de toma de posesión","Fecha de cese","Teléfono","Móvil avisos de emergencia","Usuario IdEA","Cuenta Google/Microsoft"',
+    '"Aguado Ranea, Marcos Antonio","33357591R","Música P.E.S.","01/09/2011","","952276078","620177026","maguran591","maguran591@g.educaand.es"',
+    '"Sánchez Alegría, María José","07862312S","Dibujo P.E.S.","01/09/2005","06/09/2026","656633968","656633968","msanale312","msanale312@g.educaand.es"'
+  ].join('\r\n') + '\r\n';
+  d._hijos.set('RelPerCen.csv', window.__disco.fich('RelPerCen.csv', per));
 });
 
 await pagina.click('#btn-entrar');
@@ -211,6 +218,51 @@ await comprobar('y de cuándo fue su última matrícula',
 
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 
+/* --- el personal sale del RelPerCen de Séneca --- */
+await pagina.click('.pestana[data-pantalla="nuevo"]');
+await pagina.click('.categoria-boton[data-categoria="PERSONAL"]');
+await pagina.click('#tipos-lista .tipo-boton');
+await pagina.fill('#buscar-tercero', 'aguado');
+await pagina.waitForSelector('#resultados-tercero .resultado');
+await comprobar('encuentra al profesorado del RelPerCen',
+  pagina.locator('#resultados-tercero .resultado').first().textContent()
+    .then(t => t.indexOf('Aguado Ranea') !== -1), true);
+await comprobar('y enseña su puesto debajo',
+  pagina.locator('#resultados-tercero .resultado-pie').first().textContent()
+    .then(t => t.indexOf('Música P.E.S.') !== -1), true);
+await pagina.click('#resultados-tercero .resultado');
+await comprobar('el nombre lleva los cuatro últimos dígitos del DNI',
+  pagina.locator('#vista-nombre').textContent()
+    .then(t => t.indexOf('Aguado Ranea, Marcos Antonio 7591') !== -1), true);
+await comprobar('al personal no se le ofrece grupo',
+  pagina.locator('#bloque-grupo').isHidden(), true);
+
+await pagina.click('#btn-cambiar-tercero');
+await pagina.fill('#buscar-tercero', 'sanchez alegria');
+await pagina.waitForSelector('#resultados-tercero .resultado');
+await comprobar('avisa de quien ya cesó',
+  pagina.locator('#resultados-tercero .resultado-pie').first().textContent()
+    .then(t => t.indexOf('Ya no está en el centro') !== -1), true);
+
+await pagina.click('.pestana[data-pantalla="personas"]');
+await pagina.selectOption('#filtro-personas', 'PERSONAL');
+await pagina.waitForTimeout(250);
+await pagina.fill('#buscar-personas', 'sanchez');
+await pagina.waitForTimeout(250);
+await pagina.click('#lista-personas .resultado');
+const fichaPer = await pagina.locator('#ficha-persona').textContent();
+await comprobar('la ficha del personal empieza por el puesto',
+  fichaPer.indexOf('Dibujo P.E.S.') !== -1, true);
+await comprobar('y dice que ya no está en el centro',
+  fichaPer.indexOf('Ya no está en el centro') !== -1, true);
+await comprobar('el puesto sale antes que el resto del fichero',
+  fichaPer.indexOf('Puesto') < fichaPer.indexOf('Usuario IdEA'), true);
+
+await pagina.fill('#buscar-personas', '');
+await pagina.selectOption('#filtro-personas', 'ALUMNADO');
+await pagina.waitForTimeout(250);
+await pagina.click('.pestana[data-pantalla="abiertos"]');
+
 /* --- cerrar el asunto --- */
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.getByRole('button', { name: 'Cerrar', exact: true }).click();
@@ -263,6 +315,10 @@ await comprobar('la tabla de grupos lista solo las unidades de este curso',
 await comprobar('Ajustes dice a qué curso corresponde el fichero',
   pagina.locator('#estado-datos .fila-tipo').first().textContent()
     .then(t => t.indexOf('curso 26-27') !== -1 && t.indexOf('3 matriculados de 4') !== -1), true);
+await comprobar('Ajustes cuenta cuánto personal sigue en el centro',
+  pagina.locator('#estado-datos .fila-tipo').nth(1).textContent()
+    .then(t => t.indexOf('RelPerCen.csv') !== -1 &&
+               t.indexOf('1 en el centro de 2 fichas') !== -1), true);
 await comprobar('y abrevia bien el de Bachillerato',
   pagina.locator('#tabla-grupos .fila-tipo').filter({ hasText: '1º Bach A' })
     .locator('.nombre-tipo').textContent(), '1ºBachA');

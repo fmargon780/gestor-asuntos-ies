@@ -253,6 +253,57 @@ await Datos.anadirALista(datos, 'PERSONAL',
 const personal2 = await Datos.cargar(datos, 'PERSONAL');
 comprobar('guarda y relee el alta', personal2.lista[0].nombre, 'Marmolejo González, Francisco');
 comprobar('el documento se lee bien', personal2.lista[0].documento, '11112222X');
+comprobar('el alta a mano no viene de Séneca', personal2.lista[0].deSeneca, false);
+
+/* ---------- personal del RelPerCen de Séneca ---------- */
+Datos.olvidar();
+const datosPer = dirFalso('datos');
+await Carpetas.escribirTexto(datosPer, 'RelPerCen.csv',
+  '"Empleado/a","DNI/Pasaporte","Puesto","Fecha de toma de posesión","Fecha de cese","Teléfono","Móvil avisos de emergencia","Usuario IdEA","Cuenta Google/Microsoft"\r\n' +
+  '"Aguado Ranea, Marcos Antonio","33357591R","Música P.E.S.","01/09/2011","","952276078","620177026","maguran591","maguran591@g.educaand.es"\r\n' +
+  '"Bonilla Cascado, Manuel","52561060B","Música P.E.S.","01/09/2003","15/09/2026","952594821","606557122","mboncas060","mboncas060@g.educaand.es"\r\n' +
+  '"Sánchez Alegría, María José","07862312S","Dibujo P.E.S.","01/09/2005","06/09/2026","656633968","656633968","msanale312","msanale312@g.educaand.es"\r\n');
+
+const P = await Datos.cargar(datosPer, 'PERSONAL');
+comprobar('lee las tres fichas del RelPerCen', P.lista.length, 3);
+comprobar('y dice de qué fichero salen', P.fichero, 'RelPerCen.csv');
+
+const marcos = P.lista.find(x => x.nombre.indexOf('Aguado') === 0);
+comprobar('sin fecha de cese, sigue en el centro', marcos.enElCentro, true);
+comprobar('le coge el puesto', marcos.puesto, 'Música P.E.S.');
+comprobar('y viene de Séneca', marcos.deSeneca, true);
+
+const manuel = P.lista.find(x => x.nombre.indexOf('Bonilla') === 0);
+comprobar('cesa dentro de unos días, así que todavía está', manuel.enElCentro, true);
+
+const mariaJose = P.lista.find(x => x.nombre.indexOf('Sánchez') === 0);
+comprobar('cesó ayer, ya no está en el centro', mariaJose.enElCentro, false);
+comprobar('y se guarda la fecha del cese', mariaJose.fechaCese, '06/09/2026');
+comprobar('cuenta bien cuántos siguen en el centro', P.enElCentro, 2);
+
+comprobar('el nombre del tercero lleva los cuatro últimos dígitos',
+  Nombres.terceroPersonal(marcos), 'Aguado Ranea, Marcos Antonio 7591');
+
+comprobar('se puede buscar por la asignatura',
+  Datos.buscar(P.lista, 'musica').length, 2);
+
+const fichaPer = Datos.destacadosPersona(mariaJose);
+comprobar('la ficha empieza por el puesto', fichaPer.destacados[0].titulo, 'Puesto');
+comprobar('y avisa de que ya no está',
+  fichaPer.destacados[1].valor.indexOf('Ya no está en el centro'), 0);
+
+/* Quien se da de alta a mano se suma a los de Séneca. */
+await Datos.anadirALista(datosPer, 'PERSONAL',
+  { 'Nombre': 'Marmolejo González, Francisco', 'Documento': '11112222X', 'Puesto': 'Auxiliar administrativo' });
+const P2 = await Datos.cargar(datosPer, 'PERSONAL');
+comprobar('el alta a mano se suma a la lista de Séneca', P2.lista.length, 4);
+comprobar('y se cuenta aparte', P2.manuales, 1);
+comprobar('el fichero de Séneca no se ha tocado',
+  (await Carpetas.leerTexto(datosPer, 'RelPerCen.csv')).split('\n').length, 5);
+
+comprobar('una fecha de ayer ya pasó', U.yaPaso('06/09/2026'), true);
+comprobar('la de hoy todavía no', U.yaPaso('07/09/2026'), false);
+comprobar('una fecha vacía no cuenta como pasada', U.yaPaso(''), false);
 
 /* ---------- crear, cerrar y reabrir ---------- */
 const nombreAsunto = Nombres.montar({ fecha: '2026-09-07', tipo: 'MATRICULA', curso: '26-27',
