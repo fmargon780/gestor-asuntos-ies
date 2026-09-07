@@ -455,7 +455,7 @@
       var d = document.createElement('div');
       d.className = 'resultado';
       var pie = p.categoria === 'ALUMNADO'
-        ? [p.unidad, p.curso, p.id ? 'Nº ' + p.id : ''].filter(Boolean).join('  ·  ')
+        ? pieAlumno(p)
         : [p.documento, p.nif, p.referencia, p.campos['Puesto'] || ''].filter(Boolean).join('  ·  ');
       d.innerHTML = '<div>' + U.escapar(p.nombre) + '</div>' +
                     '<div class="resultado-pie">' + U.escapar(pie) + '</div>';
@@ -463,6 +463,23 @@
       caja.appendChild(d);
     });
     if (E.nuevo.categoria !== 'ALUMNADO') caja.appendChild(botonAlta(texto));
+  }
+
+  /* Lo que se lee debajo del nombre de un alumno, tanto en el buscador
+     del formulario como en la pantalla de Personas. Si ya no está
+     matriculado hay que decirlo: es la diferencia entre poner el grupo
+     bueno y poner uno de hace tres cursos. */
+  function pieAlumno(p) {
+    if (p.matriculado) {
+      return [p.unidad, p.curso, p.id ? 'Nº ' + p.id : ''].filter(Boolean).join('  ·  ');
+    }
+    var trozos = ['No matriculado este curso'];
+    if (p.anoUltima) {
+      trozos.push('última matrícula: ' + U.cursoDeAno(p.anoUltima) +
+                  (p.unidadUltima ? ' ' + p.unidadUltima : ''));
+    }
+    if (p.id) trozos.push('Nº ' + p.id);
+    return trozos.join('  ·  ');
   }
 
   function botonAlta(texto) {
@@ -491,14 +508,20 @@
       $('buscar-tercero').focus();
     };
 
-    /* El grupo solo tiene sentido en el alumnado. */
-    var grupo = p.categoria === 'ALUMNADO' ? Nombres.grupoCompacto(p.unidad, p.curso) : '';
+    /* El grupo solo tiene sentido en el alumnado, y solo en quien sigue
+       matriculado este curso. Al que ya no está no se le ofrece. */
+    var grupo = (p.categoria === 'ALUMNADO' && p.matriculado)
+      ? Nombres.grupoCompacto(p.unidad, p.curso) : '';
     if (grupo) {
       $('grupo-vista').textContent = '(' + grupo + ')';
       $('bloque-grupo').classList.remove('oculto');
     } else {
       $('campo-grupo').checked = false;
       $('bloque-grupo').classList.add('oculto');
+    }
+    if (p.categoria === 'ALUMNADO' && !p.matriculado) {
+      caja.querySelector('.elegido-caja > div').innerHTML +=
+        '<div class="resultado-pie">' + U.escapar(pieAlumno(p)) + '</div>';
     }
 
     $('bloque-detalles').classList.remove('oculto');
@@ -676,7 +699,7 @@
       var d = document.createElement('div');
       d.className = 'resultado';
       var pie = p.categoria === 'ALUMNADO'
-        ? [p.unidad, p.curso].filter(Boolean).join('  ·  ')
+        ? pieAlumno(p)
         : [p.documento, p.nif, p.referencia].filter(Boolean).join('  ·  ');
       d.innerHTML = '<div>' + U.escapar(p.nombre) + '</div>' +
                     '<div class="resultado-pie">' + U.escapar(pie) + '</div>';
@@ -711,9 +734,9 @@
     var html = '<h4>' + U.escapar(p.nombre) + '</h4>';
 
     if (p.categoria === 'ALUMNADO') {
-      /* Lo que se consulta a diario va arriba: la edad de hoy, el grupo y
-         los datos de contacto de los tutores legales. El resto del fichero
-         de Séneca sigue estando, más abajo. */
+      /* Lo que se consulta a diario va arriba: la edad de hoy, si sigue
+         matriculado, el grupo y los datos de contacto de los tutores
+         legales. El resto del fichero de Séneca sigue estando, más abajo. */
       var d = Datos.destacadosAlumno(p);
       html += pintarFilas(d.destacados);
       if (d.resto.length) {
@@ -929,8 +952,11 @@
     });
 
     estado.appendChild(filaEstado('RegAlum.csv (alumnado)',
-      alumnado.fichero ? alumnado.fichero + '  ·  ' + alumnado.lista.length + ' alumnos'
-                       : 'No está. Déjalo en _GESTOR/datos y vuelve a entrar.'));
+      alumnado.fichero
+        ? alumnado.fichero + '  ·  curso ' + (alumnado.curso || 'sin determinar') +
+          '  ·  ' + alumnado.matriculados + ' matriculados de ' + alumnado.lista.length +
+          ' que hay en el fichero'
+        : 'No está. Déjalo en _GESTOR/datos y vuelve a entrar.'));
     for (var cat in Datos.LISTAS) {
       var l = await Datos.cargar(E.datos, cat);
       estado.appendChild(filaEstado(Datos.LISTAS[cat].fichero, l.lista.length + ' fichas'));
