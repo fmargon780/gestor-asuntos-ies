@@ -10,6 +10,7 @@
     datos: null,         /* _GESTOR/datos */
     usuario: '',
     tipos: [],
+    tiposDocumento: [],
     registro: { asuntos: {} },
     listaAbiertos: [],
     listaArchivo: [],
@@ -25,6 +26,7 @@
 
   var CARPETA_GESTOR = '_GESTOR';
   var FICHERO_TIPOS = 'tipos.json';
+  var FICHERO_TIPOS_DOC = 'tipos-documento.json';
   var FICHERO_ASUNTOS = 'asuntos.json';
 
   function $(id) { return document.getElementById(id); }
@@ -96,7 +98,13 @@
       E.gestor = await Carpetas.crear(E.abiertos, CARPETA_GESTOR);
       E.datos = await Carpetas.crear(E.gestor, 'datos');
       await cargarTipos();
+      await cargarTiposDocumento();
       await cargarRegistro();
+
+      Documentos.configurar({
+        tipos: function () { return E.tiposDocumento; },
+        curso: function () { return U.cursoActual(); }
+      });
 
       $('arranque').classList.add('oculto');
       $('aplicacion').classList.remove('oculto');
@@ -118,6 +126,20 @@
       await Carpetas.guardarJson(E.gestor, FICHERO_TIPOS, t);
     }
     E.tipos = t;
+  }
+
+  async function cargarTiposDocumento() {
+    var t = await Carpetas.leerJson(E.gestor, FICHERO_TIPOS_DOC);
+    if (!t || !t.length) {
+      t = Nombres.TIPOS_DOCUMENTO_POR_DEFECTO.slice();
+      await Carpetas.guardarJson(E.gestor, FICHERO_TIPOS_DOC, t);
+    }
+    E.tiposDocumento = t;
+  }
+
+  async function guardarTiposDocumento() {
+    E.tiposDocumento.sort();
+    await Carpetas.guardarJson(E.gestor, FICHERO_TIPOS_DOC, E.tiposDocumento);
   }
 
   async function guardarTipos() {
@@ -250,13 +272,7 @@
   }
 
   async function verDocumentos(a) {
-    var lista = await Carpetas.ficheros(a.handle);
-    var html = lista.length
-      ? '<ul>' + lista.map(function (f) { return '<li>' + U.escapar(f.nombre) + '</li>'; }).join('') + '</ul>'
-      : '<p class="explica">La carpeta está vacía.</p>';
-    html += '<p class="explica">Los documentos se guardan y se abren desde el explorador, ' +
-            'como siempre. Aquí solo se ven.</p>';
-    await U.preguntar(a.nombre, html, 'Cerrar');
+    await Documentos.abrir(a);
   }
 
   $('buscar-abiertos').oninput = pintarAbiertos;
@@ -772,6 +788,70 @@
      PANTALLA: AJUSTES
      ========================================================== */
 
+  /* ---------- cambiarle el nombre a un tipo de asunto ----------
+
+     Los asuntos ABIERTOS se renombran: son pocos y es el trabajo vivo.
+
+     El ARCHIVO no se toca. Renombrar allí obligaría a copiar y borrar
+     carpeta por carpeta, con Dropbox resincronizando de fondo, y el
+     nombre de una carpeta archivada es el rastro de lo que se hizo aquel
+     día. En su lugar, el nombre viejo se guarda como alias del tipo: las
+     carpetas antiguas se siguen reconociendo y se enseñan con el nombre
+     nuevo, sin mover un solo fichero. */
+  async function renombrarTipo(tipo) {
+    var ok = await U.preguntar('Cambiar el nombre del tipo',
+      '<label class="etiqueta">Nombre nuevo</label>' +
+      '<input id="tipo-nuevo-nombre" class="campo" value="' + U.escapar(tipo.tipo) + '">' +
+      '<p class="nota">Se cambiará en los asuntos abiertos que lo usen. ' +
+      'Las carpetas del archivo no se tocan: se seguirán llamando como se llaman, ' +
+      'y el buscador las encontrará igual.</p>', 'Cambiar');
+    if (!ok) return;
+
+    var nombreNuevo = U.limpiarNombre($('tipo-nuevo-nombre').value).toUpperCase();
+    if (!nombreNuevo || nombreNuevo === tipo.tipo) return;
+
+    var repetido = E.tipos.some(function (t) {
+      return t !== tipo && U.normalizar(t.tipo) === U.normalizar(nombreNuevo);
+    });
+    if (repetido) { U.aviso('Ya hay otro tipo con ese nombre.', 'malo'); return; }
+
+    var nombreViejo = tipo.tipo;
+    var afectadas = E.listaAbiertos.filter(function (a) {
+      return a.leido.reconocido && a.leido.tipo === nombreViejo;
+    });
+
+    var cambiadas = 0, fallos = [];
+    for (var i = 0; i < afectadas.length; i++) {
+      var a = afectadas[i];
+      var nombreCarpeta = a.nombre.replace(a.nombre.slice(7, 7 + nombreViejo.length), nombreNuevo);
+      try {
+        await Carpetas.renombrar(E.abiertos, a.nombre, nombreCarpeta);
+        var ficha = E.registro.asuntos[a.nombre];
+        if (ficha) {
+          ficha.tipo = nombreNuevo;
+          await anotar(nombreCarpeta, ficha);
+        }
+        cambiadas++;
+      } catch (e) {
+        fallos.push(a.nombre + ': ' + e.message);
+      }
+    }
+
+    tipo.alias = tipo.alias || [];
+    if (tipo.alias.indexOf(nombreViejo) === -1) tipo.alias.push(nombreViejo);
+    tipo.tipo = nombreNuevo;
+    await guardarTipos();
+
+    await verAbiertos();
+    pintarAjustes();
+
+    if (fallos.length) {
+      U.aviso('Cambiadas ' + cambiadas + ' carpetas. ' + fallos.length + ' no se han podido.', 'malo');
+    } else {
+      U.aviso('Tipo renombrado. Carpetas abiertas cambiadas: ' + cambiadas + '.', 'bueno');
+    }
+  }
+
   async function pintarAjustes() {
     var caja = $('tabla-tipos');
     caja.innerHTML = '';
@@ -785,7 +865,14 @@
       deEsta.forEach(function (tipo) {
         var f = document.createElement('div');
         f.className = 'fila-tipo';
-        f.innerHTML = '<span class="nombre-tipo">' + U.escapar(tipo.tipo) + '</span>';
+        f.innerHTML = '<span class="nombre-tipo">' + U.escapar(tipo.tipo) + '</span>' +
+          ((tipo.alias && tipo.alias.length)
+            ? '<span class="suave">antes: ' + U.escapar(tipo.alias.join(', ')) + '</span>' : '');
+        var editar = document.createElement('button');
+        editar.className = 'boton';
+        editar.textContent = 'Cambiar el nombre';
+        editar.onclick = function () { renombrarTipo(tipo); };
+        f.appendChild(editar);
         var quitar = document.createElement('button');
         quitar.className = 'boton boton-peligro';
         quitar.textContent = 'Quitar';
@@ -823,6 +910,24 @@
       });
     }
 
+    var tdoc = $('tabla-tipos-documento');
+    tdoc.innerHTML = '';
+    E.tiposDocumento.forEach(function (nombre) {
+      var f = document.createElement('div');
+      f.className = 'fila-tipo';
+      f.innerHTML = '<span class="nombre-tipo">' + U.escapar(nombre) + '</span>';
+      var quitar = document.createElement('button');
+      quitar.className = 'boton boton-peligro';
+      quitar.textContent = 'Quitar';
+      quitar.onclick = async function () {
+        E.tiposDocumento = E.tiposDocumento.filter(function (x) { return x !== nombre; });
+        await guardarTiposDocumento();
+        pintarAjustes();
+      };
+      f.appendChild(quitar);
+      tdoc.appendChild(f);
+    });
+
     estado.appendChild(filaEstado('RegAlum.csv (alumnado)',
       alumnado.fichero ? alumnado.fichero + '  ·  ' + alumnado.lista.length + ' alumnos'
                        : 'No está. Déjalo en _GESTOR/datos y vuelve a entrar.'));
@@ -855,6 +960,20 @@
     $('nuevo-tipo').value = '';
     pintarAjustes();
     U.aviso('Tipo añadido.', 'bueno');
+  };
+
+  $('btn-anadir-tipo-doc').onclick = async function () {
+    var nombre = U.limpiarNombre($('nuevo-tipo-doc').value).toUpperCase();
+    if (!nombre) return;
+    var repetido = E.tiposDocumento.some(function (t) {
+      return U.normalizar(t) === U.normalizar(nombre);
+    });
+    if (repetido) { U.aviso('Ese tipo de documento ya está en la lista.', 'malo'); return; }
+    E.tiposDocumento.push(nombre);
+    await guardarTiposDocumento();
+    $('nuevo-tipo-doc').value = '';
+    pintarAjustes();
+    U.aviso('Tipo de documento añadido.', 'bueno');
   };
 
   $('btn-olvidar').onclick = async function () {
