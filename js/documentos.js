@@ -13,11 +13,16 @@
      - Poner nombre: para los que ya están dentro de la carpeta,
        porque han llegado por otro camino. Ese sí se renombra en
        el sitio, y es instantáneo.
+
+   En los dos casos el documento se ve a la izquierda mientras se
+   rellenan los campos, para poder leer la fecha de la factura o el
+   sello del registro sin abrir nada aparte.
    ============================================================ */
 var Documentos = (function () {
 
   var ctx = { tipos: function () { return []; }, curso: function () { return ''; } };
   var asuntoActual = null;
+  var urlVisor = null;   /* la dirección temporal del documento que se está viendo */
 
   function configurar(o) { ctx = o; }
 
@@ -27,9 +32,42 @@ var Documentos = (function () {
 
   async function abrir(asunto) {
     asuntoActual = asunto;
+    var cuadro = document.querySelector('#capa .cuadro');
+    cuadro.classList.add('cuadro-ancho');
     var esperar = U.preguntar(asunto.nombre, '<div id="doc-cuerpo"></div>', 'Cerrar', true);
     await pintarLista();
     await esperar;
+    soltarVisor();
+    cuadro.classList.remove('cuadro-ancho');
+  }
+
+  /* El navegador guarda en memoria el documento que enseña hasta que se
+     le dice que ya no hace falta. */
+  function soltarVisor() {
+    if (urlVisor) { URL.revokeObjectURL(urlVisor); urlVisor = null; }
+  }
+
+  /* Qué se puede enseñar. Los PDF y las imágenes los pinta el navegador
+     por su cuenta; un Word o un Excel no sabe. */
+  function visorDe(fichero, nombre) {
+    soltarVisor();
+    var ext = Nombres.extensionDe(nombre);
+    var tipo = fichero.type || '';
+    if (tipo === 'application/pdf' || ext === 'pdf') {
+      urlVisor = URL.createObjectURL(fichero);
+      /* Sin la barra de Chrome: enseña el nombre interno del fichero, que no
+         dice nada, y roba sitio a la página. Se sigue pudiendo desplazar y
+         hacer zoom con la rueda. */
+      return '<iframe id="doc-visor" src="' + urlVisor +
+             '#toolbar=0&navpanes=0&view=FitH" title="Documento"></iframe>';
+    }
+    if (tipo.indexOf('image/') === 0 || ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].indexOf(ext) !== -1) {
+      urlVisor = URL.createObjectURL(fichero);
+      return '<img id="doc-visor" src="' + urlVisor + '" alt="Documento">';
+    }
+    return '<p class="explica" id="doc-sin-visor">Este tipo de fichero no se puede ver aquí. ' +
+           'El navegador solo sabe enseñar PDF e imágenes.<br>' +
+           'Ponle el nombre igual: lo de la derecha funciona lo mismo.</p>';
   }
 
   async function pintarLista() {
@@ -76,10 +114,20 @@ var Documentos = (function () {
 
   var ultimasOpciones = null;
 
-  function pintarFormulario(opciones) {
+  async function pintarFormulario(opciones) {
     var caja = $('doc-cuerpo');
     if (!caja) return;
     ultimasOpciones = opciones;   /* lo usa la vista previa */
+
+    /* El documento, para poder verlo mientras se le pone el nombre. */
+    var fichero = null;
+    try {
+      var h = opciones.handle ||
+              await asuntoActual.handle.getFileHandle(opciones.nombreActual);
+      fichero = await h.getFile();
+    } catch (e) { fichero = null; }
+    var visor = fichero ? visorDe(fichero, opciones.nombreActual)
+                        : '<p class="explica">No he podido abrir el documento para verlo.</p>';
 
     var previo = leerNombre(opciones.nombreActual);
     var tipos = ctx.tipos();
@@ -87,6 +135,10 @@ var Documentos = (function () {
     var fecha = previo.fecha || hoy;
 
     caja.innerHTML =
+      '<div class="doc-partido">' +
+      '<div class="visor">' + visor + '</div>' +
+      '<div class="doc-campos">' +
+
       '<p class="explica">' +
         (opciones.modo === 'anadir'
           ? 'Se guardará una copia en la carpeta del asunto. El original se queda donde está.'
@@ -156,7 +208,9 @@ var Documentos = (function () {
       '<div class="cuadro-botones">' +
         '<button type="button" class="boton" id="doc-volver">Volver</button>' +
         '<button type="button" class="boton boton-principal" id="doc-guardar">Guardar</button>' +
-      '</div>';
+      '</div>' +
+
+      '</div></div>';
 
     /* refrescar la vista previa con cualquier cambio */
     Array.prototype.forEach.call(caja.querySelectorAll('input, select'), function (c) {
@@ -167,7 +221,7 @@ var Documentos = (function () {
       $('doc-registro').classList.toggle('oculto', !$('doc-hay-registro').checked);
       refrescar();
     };
-    $('doc-volver').onclick = function () { pintarLista(); };
+    $('doc-volver').onclick = function () { soltarVisor(); pintarLista(); };
     $('doc-guardar').onclick = function () { guardar(opciones); };
     refrescar();
   }
@@ -227,6 +281,7 @@ var Documentos = (function () {
         await Carpetas.renombrarFichero(asuntoActual.handle, opciones.nombreActual, nombre);
         U.aviso('Documento renombrado.', 'bueno');
       }
+      soltarVisor();
       await pintarLista();
     } catch (e) {
       U.aviso('No he podido guardarlo: ' + e.message, 'malo');

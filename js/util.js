@@ -55,6 +55,16 @@ var U = (function () {
     return new Date().toISOString();
   }
 
+  /* El año en que empieza un curso -> el curso académico.
+     Séneca escribe 2026 en la columna "Año de la matrícula", y eso es
+     el curso 26-27. */
+  function cursoDeAno(ano) {
+    var a = parseInt(ano, 10);
+    if (!a) return '';
+    var b = (a + 1) % 100;
+    return String(a % 100).padStart(2, '0') + '-' + String(b).padStart(2, '0');
+  }
+
   /* La edad que tiene hoy alguien nacido en esa fecha.
      Séneca escribe DD/MM/AAAA. Se admite también AAAA-MM-DD. */
   function edadDesde(fecha) {
@@ -117,7 +127,7 @@ var U = (function () {
   return {
     normalizar: normalizar, limpiarNombre: limpiarNombre, hoyIso: hoyIso,
     aAaMmDd: aAaMmDd, fechaLegible: fechaLegible, cursoActual: cursoActual,
-    edadDesde: edadDesde,
+    cursoDeAno: cursoDeAno, edadDesde: edadDesde,
     ahora: ahora, aviso: aviso, preguntar: preguntar, escapar: escapar
   };
 })();
