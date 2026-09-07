@@ -200,14 +200,44 @@
         return { nombre: c.nombre, handle: c.handle, leido: leido, ficha: ficha,
                  busca: U.normalizar(c.nombre) };
       });
-    E.listaAbiertos.sort(function (a, b) { return a.nombre < b.nombre ? 1 : -1; });
     $('cuenta-abiertos').textContent = E.listaAbiertos.length || '';
     pintarAbiertos();
   }
 
+  /* Cómo se ordenan los asuntos abiertos.
+
+     Por defecto, del más antiguo al más reciente: lo que lleva más
+     tiempo abierto es lo que hay que mirar primero. El orden elegido se
+     recuerda en este ordenador. */
+  var ORDENES = {
+    'fecha-asc':  function (a, b) { return clave(a.leido.fecha) < clave(b.leido.fecha) ? -1 : 1; },
+    'fecha-desc': function (a, b) { return clave(a.leido.fecha) > clave(b.leido.fecha) ? -1 : 1; },
+    'tipo':       function (a, b) { return texto(a, 'tipo') < texto(b, 'tipo') ? -1 : 1; },
+    'tercero':    function (a, b) { return texto(a, 'tercero') < texto(b, 'tercero') ? -1 : 1; }
+  };
+
+  /* Un asunto sin fecha en el nombre se va al final en los dos sentidos. */
+  function clave(fecha) {
+    return /^\d{6}$/.test(fecha) ? fecha : '999999';
+  }
+
+  function texto(a, cual) {
+    if (cual === 'tipo') return U.normalizar(a.leido.tipo || 'zzz');
+    return U.normalizar(a.ficha.tercero || a.leido.resto || 'zzz');
+  }
+
+  function ordenElegido() {
+    var v = '';
+    try { v = window.localStorage.getItem('orden-abiertos') || ''; } catch (e) {}
+    return ORDENES[v] ? v : 'fecha-asc';
+  }
+
   function pintarAbiertos() {
     var q = U.normalizar($('buscar-abiertos').value);
+    var orden = ordenElegido();
+    $('orden-abiertos').value = orden;
     var lista = E.listaAbiertos.filter(function (a) { return !q || a.busca.indexOf(q) !== -1; });
+    lista.sort(ORDENES[orden]);
     var caja = $('lista-abiertos');
     caja.innerHTML = '';
     if (!lista.length) {
@@ -276,6 +306,10 @@
   }
 
   $('buscar-abiertos').oninput = pintarAbiertos;
+  $('orden-abiertos').onchange = function () {
+    try { window.localStorage.setItem('orden-abiertos', this.value); } catch (e) {}
+    pintarAbiertos();
+  };
   $('btn-recargar').onclick = function () { verAbiertos(); };
 
   /* ---------- cerrar un asunto ---------- */
@@ -441,9 +475,10 @@
       var vacio = document.createElement('div');
       vacio.className = 'vacio';
       if (E.nuevo.categoria === 'ALUMNADO') {
-        vacio.innerHTML = fuente.fichero
+        vacio.innerHTML = (fuente.fichero
           ? 'Nadie con ese nombre en ' + U.escapar(fuente.fichero) + '.'
-          : 'Todavía no está el fichero RegAlum.csv en la carpeta _GESTOR/datos.';
+          : 'Todavía no está el fichero RegAlum.csv en la carpeta _GESTOR/datos.') +
+          '<br>Si es un solicitante que aún no se ha matriculado, dale de alta aquí.';
       } else if (E.nuevo.categoria === 'PERSONAL') {
         vacio.innerHTML = fuente.fichero
           ? 'Nadie con ese nombre en ' + U.escapar(fuente.fichero) +
@@ -453,7 +488,7 @@
         vacio.textContent = 'No está en la lista todavía.';
       }
       caja.appendChild(vacio);
-      if (E.nuevo.categoria !== 'ALUMNADO') caja.appendChild(botonAlta(texto));
+      caja.appendChild(botonAlta(texto));
       return;
     }
 
@@ -465,7 +500,7 @@
       d.onclick = function () { fijarTercero(p); };
       caja.appendChild(d);
     });
-    if (E.nuevo.categoria !== 'ALUMNADO') caja.appendChild(botonAlta(texto));
+    caja.appendChild(botonAlta(texto));
   }
 
   /* Lo que se lee debajo del nombre de un alumno, tanto en el buscador
@@ -475,6 +510,10 @@
   function pieAlumno(p) {
     if (p.matriculado) {
       return [p.unidad, p.curso, p.id ? 'Nº ' + p.id : ''].filter(Boolean).join('  ·  ');
+    }
+    if (p.solicitante) {
+      return ['Solicitante, todavía sin matricular',
+              p.id ? 'Nº ' + p.id : 'sin Nº de identificación escolar'].join('  ·  ');
     }
     var trozos = ['No matriculado este curso'];
     if (p.anoUltima) {
@@ -512,7 +551,8 @@
     var b = document.createElement('button');
     b.className = 'boton';
     b.style.marginTop = '6px';
-    b.textContent = '+ Dar de alta uno nuevo';
+    b.textContent = E.nuevo.categoria === 'ALUMNADO'
+      ? '+ Dar de alta un solicitante' : '+ Dar de alta uno nuevo';
     b.onclick = function () { altaTercero(E.nuevo.categoria, texto); };
     return b;
   }
@@ -636,7 +676,15 @@
              '<input class="campo alta-campo" data-campo="' + U.escapar(c) + '" value="' +
              (i === 0 ? U.escapar(sugerencia || '') : '') + '">';
     }).join('');
-    var ok = await U.preguntar('Dar de alta en ' + categoria, campos, 'Guardar');
+    var titulo = categoria === 'ALUMNADO'
+      ? 'Dar de alta un solicitante'
+      : 'Dar de alta en ' + categoria;
+    var aclara = categoria === 'ALUMNADO'
+      ? '<p class="explica">Para quien ha pedido plaza y todavía no está ' +
+        'matriculado. Si ya tiene Nº de identificación escolar, ponlo: así su ' +
+        'carpeta se llamará igual el día que se matricule.</p>'
+      : '';
+    var ok = await U.preguntar(titulo, aclara + campos, 'Guardar');
     if (!ok) return;
     var valores = {};
     Array.prototype.forEach.call(document.querySelectorAll('.alta-campo'), function (i) {
@@ -731,13 +779,12 @@
       d.onclick = function () { verFicha(p); };
       caja.appendChild(d);
     });
-    if ($('filtro-personas').value !== 'ALUMNADO') {
-      var b = document.createElement('button');
-      b.className = 'boton';
-      b.textContent = '+ Dar de alta uno nuevo';
-      b.onclick = function () { altaDesdePersonas(); };
-      caja.appendChild(b);
-    }
+    var b = document.createElement('button');
+    b.className = 'boton';
+    b.textContent = $('filtro-personas').value === 'ALUMNADO'
+      ? '+ Dar de alta un solicitante' : '+ Dar de alta uno nuevo';
+    b.onclick = function () { altaDesdePersonas(); };
+    caja.appendChild(b);
   }
 
   async function altaDesdePersonas() {
@@ -992,6 +1039,29 @@
           '  ·  ' + alumnado.matriculados + ' matriculados de ' + alumnado.lista.length +
           ' que hay en el fichero'
         : 'No está. Déjalo en _GESTOR/datos y vuelve a entrar.'));
+
+    /* Qué columnas ha reconocido del RegAlum. Si un día Séneca le cambia
+       el título a una, aquí se ve cuál falta, y así se entiende por qué
+       la aplicación deja de ofrecer el grupo o la edad. */
+    if (alumnado.fichero) {
+      if (alumnado.sinAnos) {
+        estado.appendChild(filaEstado('Año de la matrícula',
+          'El fichero no trae años. Se toma como la foto del curso de hoy: ' +
+          'todo el que no esté anulado ni trasladado cuenta como matriculado.'));
+      }
+      if (alumnado.faltan && alumnado.faltan.length) {
+        estado.appendChild(filaEstado('Columnas que no encuentro',
+          alumnado.faltan.join(', ') + '  ·  el fichero trae: ' +
+          (alumnado.cabecera || []).join(', ')));
+      } else {
+        estado.appendChild(filaEstado('Columnas del RegAlum',
+          'Las reconozco todas.'));
+      }
+      if (alumnado.solicitantes) {
+        estado.appendChild(filaEstado('solicitantes.csv',
+          alumnado.solicitantes + ' dados de alta a mano, todavía sin matricular'));
+      }
+    }
     var personal = await Datos.cargar(E.datos, 'PERSONAL');
     if (!personal.ficheros.length) {
       estado.appendChild(filaEstado('RelPerCen (personal)',
@@ -1007,7 +1077,7 @@
         (personal.manuales ? '  ·  ' + personal.manuales + ' de alta a mano' : '')));
     }
     for (var cat in Datos.LISTAS) {
-      if (cat === 'PERSONAL') continue;
+      if (cat === 'PERSONAL' || cat === 'ALUMNADO') continue;
       var l = await Datos.cargar(E.datos, cat);
       estado.appendChild(filaEstado(Datos.LISTAS[cat].fichero, l.lista.length + ' fichas'));
     }
