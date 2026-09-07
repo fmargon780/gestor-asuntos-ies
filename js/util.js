@@ -65,6 +65,27 @@ var U = (function () {
     return String(a % 100).padStart(2, '0') + '-' + String(b).padStart(2, '0');
   }
 
+  /* Una fecha de Séneca (DD/MM/AAAA) pasada a Date. Devuelve null si no
+     se entiende o si viene vacía. */
+  function aFecha(texto) {
+    var t = String(texto || '').trim();
+    var esp = t.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+    var iso = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (esp) return new Date(+esp[3], +esp[2] - 1, +esp[1]);
+    if (iso) return new Date(+iso[1], +iso[2] - 1, +iso[3]);
+    return null;
+  }
+
+  /* True si esa fecha ya pasó. El mismo día todavía no ha pasado: quien
+     cesa hoy sigue estando hoy en el centro. */
+  function yaPaso(texto) {
+    var f = aFecha(texto);
+    if (!f) return false;
+    var hoy = new Date();
+    hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+    return f.getTime() < hoy.getTime();
+  }
+
   /* La edad que tiene hoy alguien nacido en esa fecha.
      Séneca escribe DD/MM/AAAA. Se admite también AAAA-MM-DD. */
   function edadDesde(fecha) {
@@ -128,6 +149,7 @@ var U = (function () {
     normalizar: normalizar, limpiarNombre: limpiarNombre, hoyIso: hoyIso,
     aAaMmDd: aAaMmDd, fechaLegible: fechaLegible, cursoActual: cursoActual,
     cursoDeAno: cursoDeAno, edadDesde: edadDesde,
+    aFecha: aFecha, yaPaso: yaPaso,
     ahora: ahora, aviso: aviso, preguntar: preguntar, escapar: escapar
   };
 })();

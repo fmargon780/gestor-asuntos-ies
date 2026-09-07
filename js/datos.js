@@ -3,8 +3,12 @@
 
    Alumnado: del RegAlum.csv de Séneca, que se deja en
              _GESTOR/datos.
-   Personal, empresas y otros: de tres CSV que mantiene la
-             propia aplicación, en la misma carpeta.
+   Personal: del RelPerCen.csv de Séneca, que se deja en la misma
+             carpeta, más un personal.csv a mano para quien no
+             aparece en Séneca (conserjería, administración,
+             limpieza, empresas de servicios…).
+   Empresas y otros: de dos CSV que mantiene la propia aplicación,
+             en la misma carpeta.
    ============================================================ */
 var Datos = (function () {
 
@@ -191,6 +195,79 @@ var Datos = (function () {
     return CACHE.ALUMNADO;
   }
 
+  /* ---------- personal (RelPerCen de Séneca + altas a mano) ----------
+
+     El RelPerCen trae solo al profesorado. Conserjería, administración,
+     limpieza y demás no salen ahí, así que se siguen dando de alta a
+     mano en personal.csv y las dos listas se juntan en una sola.
+
+     La columna "Fecha de cese" dice hasta cuándo está cada persona en
+     el centro. Si esa fecha ya pasó, la persona sigue apareciendo en la
+     búsqueda (sus asuntos viejos siguen existiendo) pero la aplicación
+     avisa de que ya no está. */
+  async function cargarPersonal(dirDatos) {
+    if (CACHE.PERSONAL) return CACHE.PERSONAL;
+
+    var lista = [];
+    var vistos = {};
+    var fichero = await ficheroQueEmpiezaPor(dirDatos, 'RelPerCen');
+    var enElCentro = 0;
+
+    if (fichero) {
+      var texto = await Carpetas.leerTexto(dirDatos, fichero.nombre);
+      var t = aTabla(texto);
+      if (t.filas.length) {
+        var cab = t.filas[0].map(function (x) { return String(x).trim(); });
+        var iNombre = columna(cab, 'Empleado/a');
+        var iDoc = columna(cab, 'DNI/Pasaporte');
+        var iPuesto = columna(cab, 'Puesto');
+        var iCese = columna(cab, 'Fecha de cese');
+        if (iNombre === -1) iNombre = 0;
+        if (iDoc === -1) iDoc = 1;
+
+        for (var f = 1; f < t.filas.length; f++) {
+          var fila = t.filas[f];
+          var nombre = String(fila[iNombre] || '').trim();
+          if (!nombre) continue;
+          var documento = String(fila[iDoc] || '').trim();
+          var puesto = iPuesto === -1 ? '' : String(fila[iPuesto] || '').trim();
+          var cese = iCese === -1 ? '' : String(fila[iCese] || '').trim();
+          var campos = {};
+          for (var c = 0; c < cab.length; c++) {
+            var v = String(fila[c] === undefined ? '' : fila[c]).trim();
+            if (v) campos[cab[c]] = v;
+          }
+          var esta = !U.yaPaso(cese);
+          if (esta) enElCentro++;
+          vistos[U.normalizar(nombre)] = true;
+          lista.push({
+            nombre: nombre, documento: documento, nif: '', referencia: '',
+            puesto: puesto, fechaCese: cese, enElCentro: esta,
+            deSeneca: true, categoria: 'PERSONAL', campos: campos,
+            busca: U.normalizar(nombre + ' ' + documento + ' ' + puesto)
+          });
+        }
+      }
+    }
+
+    /* Y encima, los que se han dado de alta a mano. Si alguien está en
+       las dos listas manda Séneca, que es el dato bueno. */
+    var manual = await cargarLista(dirDatos, 'PERSONAL', 'PERSONAL_MANUAL');
+    for (var m = 0; m < manual.lista.length; m++) {
+      var p = manual.lista[m];
+      if (vistos[U.normalizar(p.nombre)]) continue;
+      lista.push(p);
+      enElCentro++;
+    }
+
+    lista.sort(function (a, b) { return U.normalizar(a.nombre) < U.normalizar(b.nombre) ? -1 : 1; });
+    CACHE.PERSONAL = {
+      lista: lista, fichero: fichero ? fichero.nombre : null,
+      manuales: manual.lista.length, enElCentro: enElCentro
+    };
+    return CACHE.PERSONAL;
+  }
+
   var LISTAS = {
     PERSONAL: { fichero: 'personal.csv',
                 cabecera: ['Nombre', 'Documento', 'Puesto', 'Teléfono', 'Correo'] },
@@ -200,8 +277,9 @@ var Datos = (function () {
                 cabecera: ['Nombre', 'Referencia', 'Teléfono', 'Correo'] }
   };
 
-  async function cargarLista(dirDatos, categoria) {
-    if (CACHE[categoria]) return CACHE[categoria];
+  async function cargarLista(dirDatos, categoria, clave) {
+    clave = clave || categoria;
+    if (CACHE[clave]) return CACHE[clave];
     var def = LISTAS[categoria];
     var texto = await Carpetas.leerTexto(dirDatos, def.fichero);
     var lista = [];
@@ -224,32 +302,36 @@ var Datos = (function () {
           documento: categoria === 'PERSONAL' ? String(fila[1] || '').trim() : '',
           nif: categoria === 'EMPRESAS' ? String(fila[1] || '').trim() : '',
           referencia: categoria === 'OTROS' ? String(fila[1] || '').trim() : '',
-          campos: campos, categoria: categoria,
-          busca: U.normalizar(nombre + ' ' + (fila[1] || ''))
+          campos: campos, categoria: categoria, deSeneca: false,
+          enElCentro: true, fechaCese: '', puesto: campos['Puesto'] || '',
+          busca: U.normalizar(nombre + ' ' + (fila[1] || '') + ' ' + (campos['Puesto'] || ''))
         });
       }
     }
     lista.sort(function (a, b) { return U.normalizar(a.nombre) < U.normalizar(b.nombre) ? -1 : 1; });
-    CACHE[categoria] = { lista: lista, fichero: def.fichero };
-    return CACHE[categoria];
+    CACHE[clave] = { lista: lista, fichero: def.fichero };
+    return CACHE[clave];
   }
 
   /* Da de alta un tercero nuevo y lo escribe en su CSV. */
   async function anadirALista(dirDatos, categoria, valores) {
     var def = LISTAS[categoria];
-    var actual = await cargarLista(dirDatos, categoria);
+    var clave = categoria === 'PERSONAL' ? 'PERSONAL_MANUAL' : categoria;
+    var actual = await cargarLista(dirDatos, categoria, clave);
     var filas = actual.lista.map(function (p) {
       return def.cabecera.map(function (c) { return p.campos[c] || ''; });
     });
     filas.push(def.cabecera.map(function (c) { return valores[c] || ''; }));
     filas.sort(function (a, b) { return U.normalizar(a[0]) < U.normalizar(b[0]) ? -1 : 1; });
     await Carpetas.escribirTexto(dirDatos, def.fichero, aCsv(def.cabecera, filas));
+    delete CACHE[clave];
     delete CACHE[categoria];
-    return cargarLista(dirDatos, categoria);
+    return cargar(dirDatos, categoria);
   }
 
   async function cargar(dirDatos, categoria) {
     if (categoria === 'ALUMNADO') return cargarAlumnado(dirDatos);
+    if (categoria === 'PERSONAL') return cargarPersonal(dirDatos);
     return cargarLista(dirDatos, categoria);
   }
 
@@ -269,7 +351,9 @@ var Datos = (function () {
   }
 
   function olvidar(categoria) {
-    if (categoria) delete CACHE[categoria]; else CACHE = {};
+    if (!categoria) { CACHE = {}; return; }
+    delete CACHE[categoria];
+    if (categoria === 'PERSONAL') delete CACHE.PERSONAL_MANUAL;
   }
 
   /* Las unidades distintas de ESTE curso, para poder enseñar en Ajustes
@@ -350,9 +434,53 @@ var Datos = (function () {
     return { destacados: filas, resto: resto };
   }
 
+  /* La ficha de una persona del centro. Arriba lo que se consulta a
+     diario: qué puesto ocupa, si sigue en el centro y cómo se le
+     localiza. Abajo, el resto de columnas del fichero de Séneca. */
+  function destacadosPersona(persona) {
+    var fuera = {};
+    var filas = [];
+
+    function meter(titulo, valor) {
+      if (valor === '' || valor === undefined || valor === null) return;
+      filas.push({ titulo: titulo, valor: String(valor) });
+    }
+
+    if (persona.puesto) { meter('Puesto', persona.puesto); fuera['puesto'] = true; }
+
+    if (persona.enElCentro) {
+      meter('Situación', persona.fechaCese
+        ? 'En el centro hasta el ' + persona.fechaCese
+        : 'En el centro');
+    } else {
+      meter('Situación', 'Ya no está en el centro' +
+        (persona.fechaCese ? '  ·  cesó el ' + persona.fechaCese : ''));
+    }
+    fuera['fecha de cese'] = true;
+
+    var claves = Object.keys(persona.campos);
+    for (var i = 0; i < claves.length; i++) {
+      var t = U.normalizar(claves[i]);
+      if (fuera[t]) continue;
+      if (/telefono|movil|correo|e-?mail|cuenta/.test(t)) {
+        meter(claves[i], persona.campos[claves[i]]);
+        fuera[t] = true;
+      }
+    }
+
+    var resto = [];
+    for (var k = 0; k < claves.length; k++) {
+      if (!fuera[U.normalizar(claves[k])]) {
+        resto.push({ titulo: claves[k], valor: persona.campos[claves[k]] });
+      }
+    }
+    return { destacados: filas, resto: resto };
+  }
+
   return {
     aTabla: aTabla, aCsv: aCsv, cargar: cargar, anadirALista: anadirALista,
     buscar: buscar, olvidar: olvidar, LISTAS: LISTAS,
-    unidadesDistintas: unidadesDistintas, destacadosAlumno: destacadosAlumno
+    unidadesDistintas: unidadesDistintas, destacadosAlumno: destacadosAlumno,
+    destacadosPersona: destacadosPersona
   };
 })();
