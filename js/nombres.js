@@ -120,18 +120,31 @@ var Nombres = (function () {
 
   /* Lee un nombre de carpeta y saca lo que puede: la fecha y el tipo.
      El resto se devuelve tal cual, porque ahí van juntos el año académico,
-     el grupo, la descripción y el tercero, y no siempre están los cuatro. */
+     el grupo, la descripción y el tercero, y no siempre están los cuatro.
+
+     Un tipo puede arrastrar nombres viejos, guardados en su lista 'alias'.
+     Eso pasa cuando se le cambia el nombre: las carpetas ya archivadas
+     siguen llamándose como se llamaban, y no se tocan, pero aquí se
+     reconocen igual y se enseñan con el nombre nuevo. */
   function leer(nombre, tipos) {
     var m = String(nombre).match(/^(\d{6})\s+(.*)$/);
     if (!m) return { fecha: '', tipo: '', resto: nombre, reconocido: false };
     var fecha = m[1], resto = m[2];
-    var candidatos = (tipos || []).slice().sort(function (a, b) {
-      return b.tipo.length - a.tipo.length;
+
+    var candidatos = [];
+    (tipos || []).forEach(function (t) {
+      candidatos.push({ texto: t.tipo, tipo: t.tipo, categoria: t.categoria });
+      (t.alias || []).forEach(function (viejo) {
+        candidatos.push({ texto: viejo, tipo: t.tipo, categoria: t.categoria, porAlias: true });
+      });
     });
+    candidatos.sort(function (a, b) { return b.texto.length - a.texto.length; });
+
     for (var i = 0; i < candidatos.length; i++) {
-      var t = candidatos[i].tipo;
+      var t = candidatos[i].texto;
       if (U.normalizar(resto).indexOf(U.normalizar(t) + ' ') === 0) {
-        return { fecha: fecha, tipo: t, categoria: candidatos[i].categoria,
+        return { fecha: fecha, tipo: candidatos[i].tipo, categoria: candidatos[i].categoria,
+                 nombreViejo: candidatos[i].porAlias ? t : '',
                  resto: resto.slice(t.length).trim(), reconocido: true };
       }
     }
@@ -157,6 +170,62 @@ var Nombres = (function () {
     return U.limpiarNombre(empresa.nombre + (empresa.nif ? ' ' + empresa.nif : ''));
   }
 
+  /* ============================================================
+     LOS DOCUMENTOS DE DENTRO DE LA CARPETA
+
+         AAMMDD  [REGISTRO]  TIPO  [AÑO ACADÉMICO] . extensión
+
+         260907 26EM1234 SOLICITUD 26-27.pdf
+
+     La fecha es la DEL DOCUMENTO, no la del día en que se archiva:
+     la de una factura es la que trae impresa. Así la carpeta se ordena
+     por el orden real de los hechos.
+     ============================================================ */
+
+  var TIPOS_DOCUMENTO_POR_DEFECTO = [
+    'SOLICITUD', 'FACTURA', 'CERTIFICADO', 'MATRICULA', 'RESOLUCION',
+    'NOTIFICACION', 'INFORME', 'ACTA', 'COMUNICACION', 'JUSTIFICANTE',
+    'PRESUPUESTO', 'ALBARAN', 'CONTRATO', 'RECURSO', 'ANEXO'
+  ];
+
+  /* El código del registro de Séneca.
+
+     Séneca lleva cuatro series distintas, y el mismo número se repite
+     cada año, así que el código las distingue todas:
+
+         26 E M 1234
+         |  | | |
+         |  | | +-- los cuatro dígitos del asiento
+         |  | +---- M manual, A automático
+         |  +------ E entrada, S salida
+         +--------- los dos últimos dígitos del año                     */
+  function codigoRegistro(r) {
+    if (!r) return '';
+    var numero = String(r.numero || '').replace(/\D/g, '');
+    if (!numero) return '';
+    while (numero.length < 4) numero = '0' + numero;
+    var ano = String(r.ano || '').replace(/\D/g, '');
+    if (ano.length > 2) ano = ano.slice(-2);
+    if (ano.length !== 2) return '';
+    return ano + (r.sentido === 'S' ? 'S' : 'E') + (r.modo === 'A' ? 'A' : 'M') + numero;
+  }
+
+  function montarDocumento(datos) {
+    var partes = [];
+    partes.push(U.aAaMmDd(datos.fecha));
+    if (datos.codigo) partes.push(U.limpiarNombre(datos.codigo));
+    partes.push(U.limpiarNombre(datos.tipo).toUpperCase());
+    if (datos.curso) partes.push(U.limpiarNombre(datos.curso));
+    var base = U.limpiarNombre(partes.filter(function (p) { return p; }).join(' '));
+    var ext = String(datos.extension || '').replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+    return base + (ext ? '.' + ext : '');
+  }
+
+  function extensionDe(nombre) {
+    var m = String(nombre || '').match(/\.([A-Za-z0-9]{1,8})$/);
+    return m ? m[1].toLowerCase() : '';
+  }
+
   function categoriaDeTipo(tipos, tipo) {
     for (var i = 0; i < tipos.length; i++) {
       if (U.normalizar(tipos[i].tipo) === U.normalizar(tipo)) return tipos[i].categoria;
@@ -168,6 +237,9 @@ var Nombres = (function () {
     POR_DEFECTO: POR_DEFECTO, CATEGORIAS: CATEGORIAS,
     montar: montar, leer: leer, categoriaDeTipo: categoriaDeTipo,
     grupoCompacto: grupoCompacto,
+    TIPOS_DOCUMENTO_POR_DEFECTO: TIPOS_DOCUMENTO_POR_DEFECTO,
+    codigoRegistro: codigoRegistro, montarDocumento: montarDocumento,
+    extensionDe: extensionDe,
     terceroAlumno: terceroAlumno, terceroPersonal: terceroPersonal, terceroEmpresa: terceroEmpresa
   };
 })();
