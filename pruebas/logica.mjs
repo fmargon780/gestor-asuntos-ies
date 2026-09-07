@@ -256,6 +256,83 @@ comprobar('guarda y relee el alta', personal2.lista[0].nombre, 'Marmolejo Gonzá
 comprobar('el documento se lee bien', personal2.lista[0].documento, '11112222X');
 comprobar('el alta a mano no viene de Séneca', personal2.lista[0].deSeneca, false);
 
+/* ---------- un RegAlum sin columna de año ----------
+   Es la descarga "de este curso": una fila por alumno y sin histórico.
+   Ahí todo el que no esté anulado cuenta como matriculado, y por tanto
+   se le puede poner el grupo. */
+Datos.olvidar();
+const datosFoto = dirFalso('datos');
+await Carpetas.escribirTexto(datosFoto, 'RegAlum.csv',
+  'Alumno/a;Nº Id. Escolar;Curso;Unidad;Estado Matrícula;Fecha de nacimiento\r\n' +
+  'Aguilar Ponce, Marina;1140233;2º de E.S.O.;2º B;Matriculada;14/03/2013\r\n' +
+  'Bermúdez Ortiz, Álvaro;1140501;1º de E.S.O.;1º C;Anulada;02/09/2014\r\n');
+const F = await Datos.cargar(datosFoto, 'ALUMNADO');
+comprobar('sin columna de año, el fichero es la foto de hoy', F.sinAnos, true);
+comprobar('y el curso es el de hoy', F.curso, '26-27');
+const marinaF = F.lista.find(x => x.nombre.indexOf('Aguilar') === 0);
+comprobar('la alumna cuenta como matriculada', marinaF.matriculado, true);
+comprobar('y se le puede poner el grupo',
+  Nombres.grupoCompacto(marinaF.unidad, marinaF.curso), '2ºB');
+const alvaroF = F.lista.find(x => x.nombre.indexOf('Bermúdez') === 0);
+comprobar('una matrícula anulada sigue sin contar', alvaroF.matriculado, false);
+comprobar('avisa de la columna que falta', F.faltan, ['Año de la matrícula']);
+
+/* Los títulos se reconocen aunque Séneca los escriba de otra manera. */
+Datos.olvidar();
+const datosOtros = dirFalso('datos');
+await Carpetas.escribirTexto(datosOtros, 'RegAlum.csv',
+  'Alumno;Nº Identificación Escolar;Curso;Unidad/Grupo;Año académico;Estado de matrícula;F. Nacimiento\r\n' +
+  'Solano Vega, Ruth;1138002;1º de Bachillerato;1º Bach A;2026;Matriculada;11/05/2009\r\n');
+const O = await Datos.cargar(datosOtros, 'ALUMNADO');
+comprobar('reconoce los títulos escritos de otra forma', O.faltan.length, 0);
+const ruthO = O.lista[0];
+comprobar('y la alumna sale matriculada', ruthO.matriculado, true);
+comprobar('con su grupo de Bachillerato',
+  Nombres.grupoCompacto(ruthO.unidad, ruthO.curso), '1ºBachA');
+
+/* ---------- solicitantes: alumnado que aún no está en el RegAlum ---------- */
+Datos.olvidar();
+const datosSol = dirFalso('datos');
+await Carpetas.escribirTexto(datosSol, 'RegAlum.csv',
+  'Alumno/a;Nº Id. Escolar;Curso;Unidad;Año de la matrícula;Estado Matrícula;Fecha de nacimiento\r\n' +
+  'Aguilar Ponce, Marina;1140233;2º de E.S.O.;2º B;2026;Matriculada;14/03/2013\r\n');
+await Datos.anadirALista(datosSol, 'ALUMNADO', {
+  'Nombre': 'Nuevo Aspirante, Lucas', 'Nº Id. Escolar': '',
+  'Fecha de nacimiento': '10/04/2012', 'Teléfono de contacto': '600999888'
+});
+const S = await Datos.cargar(datosSol, 'ALUMNADO');
+comprobar('el solicitante se suma al alumnado', S.lista.length, 2);
+comprobar('y se cuenta aparte', S.solicitantes, 1);
+const lucas = S.lista.find(x => x.nombre.indexOf('Nuevo') === 0);
+comprobar('no está matriculado', lucas.matriculado, false);
+comprobar('pero está marcado como solicitante', lucas.solicitante, true);
+comprobar('sin Nº, la carpeta va solo con el nombre',
+  Nombres.terceroAlumno(lucas), 'Nuevo Aspirante, Lucas');
+comprobar('se le calcula la edad igual', U.edadDesde(lucas.fechaNac), 14);
+const fichaLucas = Datos.destacadosAlumno(lucas);
+comprobar('la ficha dice que es solicitante',
+  fichaLucas.destacados.some(f => f.valor.indexOf('Solicitante') === 0), true);
+
+/* Con Nº de identificación escolar, la carpeta ya se llama como la que
+   montará el RegAlum el día que se matricule. */
+await Datos.anadirALista(datosSol, 'ALUMNADO', {
+  'Nombre': 'Con Numero, Sara', 'Nº Id. Escolar': '1150999'
+});
+const S2 = await Datos.cargar(datosSol, 'ALUMNADO');
+const sara = S2.lista.find(x => x.nombre.indexOf('Con Numero') === 0);
+comprobar('con Nº, la carpeta lo lleva',
+  Nombres.terceroAlumno(sara), 'Con Numero, Sara 1150999');
+
+/* Y si el solicitante ya aparece en el RegAlum, no se duplica. */
+await Datos.anadirALista(datosSol, 'ALUMNADO', {
+  'Nombre': 'Aguilar Ponce, Marina', 'Nº Id. Escolar': '1140233'
+});
+const S3 = await Datos.cargar(datosSol, 'ALUMNADO');
+comprobar('quien ya está matriculado no se duplica',
+  S3.lista.filter(x => x.nombre.indexOf('Aguilar') === 0).length, 1);
+comprobar('y la ficha buena es la del RegAlum',
+  S3.lista.find(x => x.nombre.indexOf('Aguilar') === 0).matriculado, true);
+
 /* ---------- personal del RelPerCen de Séneca ---------- */
 Datos.olvidar();
 const datosPer = dirFalso('datos');
