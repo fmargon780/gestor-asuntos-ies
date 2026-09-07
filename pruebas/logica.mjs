@@ -42,6 +42,7 @@ function ficheroFalso(nombre, texto) {
     async getFile() {
       const self = this;
       return { async arrayBuffer() { return new TextEncoder().encode(self._texto).buffer; },
+               size: new TextEncoder().encode(self._texto).length,
                _texto: self._texto };
     },
     async createWritable() {
@@ -367,6 +368,46 @@ const ficheroRaro = ficheroFalso('personal.csv', null);
 ficheroRaro.getFile = async () => ({ async arrayBuffer() { return Uint8Array.from(bytes, c => c.charCodeAt(0)).buffer; } });
 datos._hijos.set('cp1252.csv', ficheroRaro);
 const texto1252 = await Carpetas.leerTexto(datos, 'cp1252.csv');
+/* ---------- renombrar un fichero donde move() no está permitido ----------
+   Es lo que pasa en Dropbox: el navegador tiene move(), pero al usarlo
+   contesta "The request is not allowed by the user agent or the platform
+   in the current context". Hay que copiar y borrar. */
+const dirDrop = dirFalso('dropbox');
+await Carpetas.escribirTexto(dirDrop, 'f5481d91.pdf', 'el pdf entero');
+const hDrop = await dirDrop.getFileHandle('f5481d91.pdf');
+hDrop.move = async () => {
+  const e = new Error("Failed to execute 'move' on 'FileSystemFileHandle': " +
+    'The request is not allowed by the user agent or the platform in the current context.');
+  e.name = 'NotAllowedError';
+  throw e;
+};
+await Carpetas.renombrarFichero(dirDrop, 'f5481d91.pdf', '260907 26EM0358 MATRICULA 26-27.pdf');
+comprobar('si move() falla, el fichero se renombra igual',
+  (await Carpetas.ficheros(dirDrop)).map(f => f.nombre),
+  ['260907 26EM0358 MATRICULA 26-27.pdf']);
+comprobar('y el contenido llega entero',
+  await Carpetas.leerTexto(dirDrop, '260907 26EM0358 MATRICULA 26-27.pdf'), 'el pdf entero');
+
+/* Si la copia sale a medias, no se borra el original. */
+const dirMalo = dirFalso('malo');
+await Carpetas.escribirTexto(dirMalo, 'original.pdf', 'contenido completo');
+const hMalo = await dirMalo.getFileHandle('original.pdf');
+hMalo.move = async () => { throw new Error('no se puede'); };
+const crearOriginal = dirMalo.getFileHandle.bind(dirMalo);
+dirMalo.getFileHandle = async (n, o) => {
+  const h = await crearOriginal(n, o);
+  if (n === 'copia.pdf') {
+    h.createWritable = async () => ({ async write() { h._texto = 'a medias'; }, async close() {} });
+  }
+  return h;
+};
+let saltoElAviso = false;
+try { await Carpetas.renombrarFichero(dirMalo, 'original.pdf', 'copia.pdf'); }
+catch (e) { saltoElAviso = true; }
+comprobar('una copia incompleta se detecta', saltoElAviso, true);
+comprobar('y el original sigue estando',
+  (await Carpetas.ficheros(dirMalo)).map(f => f.nombre), ['original.pdf']);
+
 comprobar('lee un CSV en cp1252 sin romper las tildes', texto1252.indexOf('Muñoz, José') !== -1, true);
 
 console.log(fallos ? '\n' + fallos + ' PRUEBAS FALLAN' : '\nTodas las pruebas pasan.');

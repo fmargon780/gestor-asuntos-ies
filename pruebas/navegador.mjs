@@ -62,6 +62,15 @@ const preparacion = `
       async write(c) { f._texto = typeof c === 'string' ? c : await c.text(); },
       async close() {}
     });
+    /* Las carpetas del centro están en Dropbox, y ahí Chrome tiene
+       move() pero lo rechaza. El disco de mentira hace lo mismo, para
+       que las pruebas pasen por el camino que se usa de verdad. */
+    f.move = async () => {
+      const e = new Error("Failed to execute 'move' on 'FileSystemFileHandle': " +
+        'The request is not allowed by the user agent or the platform in the current context.');
+      e.name = 'NotAllowedError';
+      throw e;
+    };
     return f;
   }
 

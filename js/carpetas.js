@@ -133,21 +133,38 @@ var Carpetas = (function () {
 
   /* ---------- ficheros sueltos ----------
 
-     Cambiarle el nombre a un fichero sí es instantáneo: el navegador
-     tiene move() desde hace tiempo. Si no estuviera, se copia y se borra,
-     que en un solo fichero tampoco cuesta nada. */
+     Cambiar el nombre de un fichero.
+
+     Lo rápido es pedírselo al navegador con move(), pero move() no
+     funciona en todas partes: en carpetas sincronizadas con Dropbox o
+     con OneDrive, Chrome lo rechaza con "The request is not allowed by
+     the user agent or the platform in the current context". Cuando eso
+     pasa se hace a mano: se copia el fichero con el nombre nuevo, se
+     comprueba que la copia pesa lo mismo, y solo entonces se borra el
+     original. Si la copia no cuadra, se deshace y no se borra nada. */
   async function renombrarFichero(dir, nombre, nombreNuevo) {
     if (nombre === nombreNuevo) return true;
     var h = await dir.getFileHandle(nombre);
+
     if (typeof h.move === 'function') {
-      await h.move(nombreNuevo);
-      return true;
+      try {
+        await h.move(nombreNuevo);
+        return true;
+      } catch (e) { /* no se puede aquí: se copia y se borra */ }
     }
+
     var f = await h.getFile();
     var salida = await dir.getFileHandle(nombreNuevo, { create: true });
     var w = await salida.createWritable();
     await w.write(f);
     await w.close();
+
+    var copia = await (await dir.getFileHandle(nombreNuevo)).getFile();
+    if (copia.size !== f.size) {
+      try { await dir.removeEntry(nombreNuevo); } catch (e2) {}
+      throw new Error('La copia no ha salido completa. No se ha borrado el original.');
+    }
+
     await dir.removeEntry(nombre);
     return true;
   }
