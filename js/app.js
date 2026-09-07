@@ -365,6 +365,7 @@
       var cuantos = E.tipos.filter(function (t) { return t.categoria === cat; }).length;
       var b = document.createElement('button');
       b.className = 'categoria-boton' + (E.nuevo.categoria === cat ? ' elegido' : '');
+      b.setAttribute('data-categoria', cat);
       b.innerHTML = U.escapar(cat) +
         '<small>' + U.escapar(DESCRIPCION_CATEGORIA[cat]) + ' · ' + cuantos + ' tipos</small>';
       b.onclick = function () { elegirCategoria(cat); };
@@ -443,6 +444,11 @@
         vacio.innerHTML = fuente.fichero
           ? 'Nadie con ese nombre en ' + U.escapar(fuente.fichero) + '.'
           : 'Todavía no está el fichero RegAlum.csv en la carpeta _GESTOR/datos.';
+      } else if (E.nuevo.categoria === 'PERSONAL') {
+        vacio.innerHTML = fuente.fichero
+          ? 'Nadie con ese nombre en ' + U.escapar(fuente.fichero) +
+            ' ni en las altas a mano.'
+          : 'Todavía no está el fichero RelPerCen.csv en la carpeta _GESTOR/datos.';
       } else {
         vacio.textContent = 'No está en la lista todavía.';
       }
@@ -454,11 +460,8 @@
     encontrados.forEach(function (p) {
       var d = document.createElement('div');
       d.className = 'resultado';
-      var pie = p.categoria === 'ALUMNADO'
-        ? pieAlumno(p)
-        : [p.documento, p.nif, p.referencia, p.campos['Puesto'] || ''].filter(Boolean).join('  ·  ');
       d.innerHTML = '<div>' + U.escapar(p.nombre) + '</div>' +
-                    '<div class="resultado-pie">' + U.escapar(pie) + '</div>';
+                    '<div class="resultado-pie">' + U.escapar(pieDe(p)) + '</div>';
       d.onclick = function () { fijarTercero(p); };
       caja.appendChild(d);
     });
@@ -480,6 +483,27 @@
     }
     if (p.id) trozos.push('Nº ' + p.id);
     return trozos.join('  ·  ');
+  }
+
+  /* Lo que se lee debajo del nombre de alguien del centro. Si ya cesó
+     hay que decirlo: sus asuntos viejos siguen ahí, pero abrirle uno
+     nuevo casi siempre es una equivocación. */
+  function piePersona(p) {
+    var trozos = [];
+    if (p.puesto) trozos.push(p.puesto);
+    if (!p.enElCentro) {
+      trozos.push('Ya no está en el centro' +
+                  (p.fechaCese ? ' (cesó el ' + p.fechaCese + ')' : ''));
+    }
+    if (p.documento) trozos.push(p.documento);
+    if (!p.deSeneca) trozos.push('alta a mano');
+    return trozos.join('  ·  ');
+  }
+
+  function pieDe(p) {
+    if (p.categoria === 'ALUMNADO') return pieAlumno(p);
+    if (p.categoria === 'PERSONAL') return piePersona(p);
+    return [p.documento, p.nif, p.referencia, p.campos['Puesto'] || ''].filter(Boolean).join('  ·  ');
   }
 
   function botonAlta(texto) {
@@ -519,9 +543,11 @@
       $('campo-grupo').checked = false;
       $('bloque-grupo').classList.add('oculto');
     }
-    if (p.categoria === 'ALUMNADO' && !p.matriculado) {
+    var avisa = (p.categoria === 'ALUMNADO' && !p.matriculado) ||
+                (p.categoria === 'PERSONAL' && !p.enElCentro);
+    if (avisa) {
       caja.querySelector('.elegido-caja > div').innerHTML +=
-        '<div class="resultado-pie">' + U.escapar(pieAlumno(p)) + '</div>';
+        '<div class="resultado-pie">' + U.escapar(pieDe(p)) + '</div>';
     }
 
     $('bloque-detalles').classList.remove('oculto');
@@ -698,11 +724,8 @@
     lista.forEach(function (p) {
       var d = document.createElement('div');
       d.className = 'resultado';
-      var pie = p.categoria === 'ALUMNADO'
-        ? pieAlumno(p)
-        : [p.documento, p.nif, p.referencia].filter(Boolean).join('  ·  ');
       d.innerHTML = '<div>' + U.escapar(p.nombre) + '</div>' +
-                    '<div class="resultado-pie">' + U.escapar(pie) + '</div>';
+                    '<div class="resultado-pie">' + U.escapar(pieDe(p)) + '</div>';
       d.onclick = function () { verFicha(p); };
       caja.appendChild(d);
     });
@@ -743,6 +766,16 @@
         html += '<p class="nota"><button type="button" class="enlace" id="ver-resto">' +
                 'Ver los demás datos del fichero (' + d.resto.length + ')</button></p>' +
                 '<div id="resto-ficha" class="oculto">' + pintarFilas(d.resto) + '</div>';
+      }
+    } else if (p.categoria === 'PERSONAL') {
+      /* Igual que en el alumnado: arriba el puesto, si sigue en el centro
+         y por dónde se le localiza; el resto del fichero, debajo. */
+      var dp = Datos.destacadosPersona(p);
+      html += pintarFilas(dp.destacados);
+      if (dp.resto.length) {
+        html += '<p class="nota"><button type="button" class="enlace" id="ver-resto">' +
+                'Ver los demás datos del fichero (' + dp.resto.length + ')</button></p>' +
+                '<div id="resto-ficha" class="oculto">' + pintarFilas(dp.resto) + '</div>';
       }
     } else {
       html += pintarFilas(Object.keys(p.campos).map(function (c) {
@@ -957,7 +990,15 @@
           '  ·  ' + alumnado.matriculados + ' matriculados de ' + alumnado.lista.length +
           ' que hay en el fichero'
         : 'No está. Déjalo en _GESTOR/datos y vuelve a entrar.'));
+    var personal = await Datos.cargar(E.datos, 'PERSONAL');
+    estado.appendChild(filaEstado('RelPerCen.csv (personal)',
+      personal.fichero
+        ? personal.fichero + '  ·  ' + personal.enElCentro + ' en el centro de ' +
+          personal.lista.length + ' fichas' +
+          (personal.manuales ? '  ·  ' + personal.manuales + ' de alta a mano' : '')
+        : 'No está. Déjalo en _GESTOR/datos y vuelve a entrar.'));
     for (var cat in Datos.LISTAS) {
+      if (cat === 'PERSONAL') continue;
       var l = await Datos.cargar(E.datos, cat);
       estado.appendChild(filaEstado(Datos.LISTAS[cat].fichero, l.lista.length + ' fichas'));
     }
