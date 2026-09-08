@@ -15,7 +15,7 @@
     listaAbiertos: [],
     listaArchivo: [],
     sueltos: [],         /* documentos sueltos en la carpeta de abiertos */
-    reciales: {},         /* los que han llegado con la aplicación abierta */
+    reciales: {},        /* los que han llegado con la aplicación abierta */
     pendiente: null,     /* el suelto que se va a meter en el asunto que se está creando */
     nuevo: { tipo: null, categoria: null, tercero: null }
   };
@@ -340,7 +340,10 @@
     await Documentos.abrir(a);
   }
 
-  $('buscar-abiertos').oninput = pintarAbiertos;
+  $('buscar-abiertos').oninput = function () {
+    pintarAbiertos();
+    plegarAlBuscar();
+  };
   $('orden-abiertos').onchange = function () {
     try { window.localStorage.setItem('orden-abiertos', this.value); } catch (e) {}
     pintarAbiertos();
@@ -386,7 +389,14 @@
       }
       caja.appendChild(tarjetaSuelto(s, pie, !!E.reciales[s.nombre]));
     }
-    $('btn-sueltos-visto').classList.toggle('oculto', !Object.keys(E.reciales).length);
+
+    var cuantosNuevos = Object.keys(E.reciales).length;
+    $('btn-sueltos-visto').classList.toggle('oculto', !cuantosNuevos);
+    var rotulo = $('nuevos-sueltos');
+    rotulo.textContent = cuantosNuevos === 1 ? '1 nuevo' : cuantosNuevos + ' nuevos';
+    rotulo.classList.toggle('oculto', !cuantosNuevos);
+
+    pintarPliegue();
   }
 
   function tarjetaSuelto(s, pie, esNuevo) {
@@ -458,6 +468,54 @@
     actualizarTitulo();
     pintarSueltos();
   };
+
+  /* ---------- plegar y desplegar la lista ----------
+
+     Mientras se busca entre los asuntos, esta lista estorba: se pliega
+     sola al escribir en el buscador y se vuelve a abrir al borrarlo.
+     Si se pliega a mano, se queda plegada también la próxima vez, en
+     este ordenador. Aun plegada, la cabecera sigue diciendo cuántos hay
+     y si ha llegado alguno nuevo. */
+  var plegado = leerPliegueGuardado();
+  var plegadoPorLaBusqueda = false;
+
+  function leerPliegueGuardado() {
+    try { return window.localStorage.getItem('sueltos-plegados') === 'si'; }
+    catch (e) { return false; }
+  }
+
+  function guardarPliegue() {
+    try { window.localStorage.setItem('sueltos-plegados', plegado ? 'si' : 'no'); }
+    catch (e) {}
+  }
+
+  function pintarPliegue() {
+    $('cuerpo-sueltos').classList.toggle('oculto', plegado);
+    $('flecha-sueltos').textContent = plegado ? '▸' : '▾';
+    $('btn-plegar-sueltos').title = plegado
+      ? 'Desplegar los documentos sin clasificar'
+      : 'Plegar los documentos sin clasificar';
+  }
+
+  $('btn-plegar-sueltos').onclick = function () {
+    plegado = !plegado;
+    plegadoPorLaBusqueda = false;
+    guardarPliegue();
+    pintarPliegue();
+  };
+
+  function plegarAlBuscar() {
+    var buscando = $('buscar-abiertos').value.trim().length > 0;
+    if (buscando && !plegado) {
+      plegado = true;
+      plegadoPorLaBusqueda = true;
+      pintarPliegue();
+    } else if (!buscando && plegadoPorLaBusqueda) {
+      plegado = false;
+      plegadoPorLaBusqueda = false;
+      pintarPliegue();
+    }
+  }
 
   /* ---------- mirar cada poco si ha llegado algo ----------
 
