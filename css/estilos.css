@@ -137,16 +137,26 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 
    Lo que alguien deja suelto en la carpeta de asuntos abiertos: casi
    siempre, una tarea nueva del equipo directivo. Va arriba del todo y
-   en ámbar, para que se distinga de un asunto ya montado. */
+   en ámbar, para que se distinga de un asunto ya montado.
+
+   La cabecera entera es el botón de plegar, y se pliega sola cuando se
+   está buscando entre los asuntos. Aun plegada sigue diciendo si ha
+   llegado algo nuevo. */
 #bloque-sueltos { margin-bottom: 26px; }
 .sueltos-cabecera {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; flex-wrap: wrap;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 8px;
 }
-.sueltos-cabecera h3 { margin: 0 0 6px; }
+.plegador {
+  display: flex; align-items: center; gap: 8px;
+  font: inherit; font-size: 16px; font-weight: 600; color: var(--tinta);
+  background: none; border: 0; padding: 4px 0; cursor: pointer; text-align: left;
+}
+.plegador:hover { color: var(--azul); }
+.plegador .flecha { font-size: 12px; color: var(--tinta-suave); width: 12px; }
 .cuenta-sueltos {
   background: var(--ambar); border: 1px solid var(--ambar-linea);
-  border-radius: 20px; padding: 1px 9px; font-size: 12px; margin-left: 6px;
+  border-radius: 20px; padding: 1px 9px; font-size: 12px; font-weight: 600;
 }
 .tarjeta-nueva { background: var(--ambar); border-color: var(--ambar-linea); }
 .marca-nueva {
