@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gestor de Asuntos</title>
 <link rel="stylesheet" href="css/estilos.css">
+<link rel="stylesheet" href="css/plazos.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -80,10 +81,19 @@
           <select id="filtro-estado" class="campo campo-estado">
             <option value="">Todos los estados</option>
           </select>
+          <label class="etiqueta-en-linea" for="filtro-plazo">Plazo</label>
+          <select id="filtro-plazo" class="campo">
+            <option value="">Todos los plazos</option>
+            <option value="vencidos">Solo los vencidos</option>
+            <option value="pronto">Vencidos y de esta semana</option>
+            <option value="conplazo">Solo los que tienen plazo</option>
+            <option value="sinplazo">Solo los que no tienen plazo</option>
+          </select>
           <label class="etiqueta-en-linea" for="orden-abiertos">Ordenar por</label>
           <select id="orden-abiertos" class="campo">
             <option value="fecha-asc">Fecha · los más antiguos arriba</option>
             <option value="fecha-desc">Fecha · los más recientes arriba</option>
+            <option value="limite">Fecha límite · lo que antes vence</option>
             <option value="estado">Estado del asunto</option>
             <option value="tipo">Tipo de asunto</option>
             <option value="tercero">Tercero</option>
@@ -204,7 +214,12 @@
             </div>
           </div>
           <input id="campo-via-dato" class="campo" placeholder="Teléfono, correo o aclaración, si lo ha dado">
-          <p class="nota">El estado y la vía de comunicación no salen en el nombre de la carpeta.
+
+          <label class="etiqueta">Fecha límite <span class="suave">(opcional)</span></label>
+          <input id="campo-limite" type="date" class="campo">
+          <p id="nota-limite" class="nota oculto"></p>
+
+          <p class="nota">El estado, la vía de comunicación y la fecha límite no salen en el nombre de la carpeta.
              Se guardan en la carpeta del centro, y los ve todo el que abra la aplicación.</p>
 
           <div class="vista-previa">
@@ -255,7 +270,8 @@
       <h3>Tipos de asunto</h3>
       <p class="explica">Esta lista la comparten todos los ordenadores del centro:
          se guarda en la carpeta <code>_GESTOR</code>, dentro de la carpeta de asuntos abiertos.
-         La lista de partida es una propuesta; cámbiala a vuestro gusto.</p>
+         La lista de partida es una propuesta; cámbiala a vuestro gusto.
+         Los días de plazo de cada tipo sirven para poner sola la fecha límite de los asuntos nuevos.</p>
       <div class="alta-tipo">
         <input id="nuevo-tipo" class="campo" placeholder="TIPO NUEVO" style="max-width:260px">
         <select id="nueva-categoria" class="campo" style="max-width:180px">
@@ -322,6 +338,7 @@
 <script src="js/almacen.js"></script>
 <script src="js/carpetas.js"></script>
 <script src="js/nombres.js"></script>
+<script src="js/plazos.js"></script>
 <script src="js/datos.js"></script>
 <script src="js/documentos.js"></script>
 <script src="js/app.js"></script>
