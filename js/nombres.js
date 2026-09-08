@@ -210,13 +210,17 @@ var Nombres = (function () {
      esta lista no se ordena nunca sola.
      ============================================================ */
 
+  /* 'espera' quiere decir que el trabajo está fuera del departamento:
+     lo nuestro está hecho y toca esperar a que otro conteste, firme o
+     traiga algo. Esos asuntos se enseñan aparte, para no mezclarlos con
+     los que hay que gestionar hoy. */
   var ESTADOS_POR_DEFECTO = [
-    'PENDIENTE',
-    'EN TRÁMITE',
-    'ENVIADO A FIRMA',
-    'FIRMADO',
-    'A LA ESPERA DEL TERCERO',
-    'RESUELTO'
+    { nombre: 'PENDIENTE',               espera: false },
+    { nombre: 'EN TRÁMITE',              espera: false },
+    { nombre: 'ENVIADO A FIRMA',         espera: true  },
+    { nombre: 'FIRMADO',                 espera: false },
+    { nombre: 'A LA ESPERA DEL TERCERO', espera: true  },
+    { nombre: 'RESUELTO',                espera: false }
   ];
 
   /* ============================================================
