@@ -89,12 +89,19 @@
 
       <div id="bloque-sueltos" class="oculto">
         <div class="sueltos-cabecera">
-          <h3>Sin clasificar <span class="cuenta-sueltos" id="cuenta-sueltos"></span></h3>
+          <button type="button" id="btn-plegar-sueltos" class="plegador">
+            <span class="flecha" id="flecha-sueltos">▾</span>
+            <span>Sin clasificar</span>
+            <span class="cuenta-sueltos" id="cuenta-sueltos"></span>
+            <span class="marca-nueva oculto" id="nuevos-sueltos"></span>
+          </button>
           <button id="btn-sueltos-visto" class="boton oculto">Ya los he visto</button>
         </div>
-        <p class="explica">Documentos que están sueltos en la carpeta de asuntos abiertos,
-           todavía sin carpeta propia. Aquí es donde aparece lo que os deja el equipo directivo.</p>
-        <div id="lista-sueltos" class="lista"></div>
+        <div id="cuerpo-sueltos">
+          <p class="explica">Documentos que están sueltos en la carpeta de asuntos abiertos,
+             todavía sin carpeta propia. Aquí es donde aparece lo que os deja el equipo directivo.</p>
+          <div id="lista-sueltos" class="lista"></div>
+        </div>
       </div>
 
       <div id="lista-abiertos" class="lista"></div>
