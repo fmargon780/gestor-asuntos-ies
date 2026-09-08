@@ -12,6 +12,7 @@
     tipos: [],
     tiposDocumento: [],
     estados: [],         /* estados de tramitación, compartidos en _GESTOR */
+    guias: {},           /* la guía de pasos de cada tipo de asunto */
     registro: { asuntos: {} },
     listaAbiertos: [],
     vista: 'departamento',   /* cuál de las tres tarjetas está elegida */
@@ -34,6 +35,7 @@
   var FICHERO_TIPOS_DOC = 'tipos-documento.json';
   var FICHERO_ASUNTOS = 'asuntos.json';
   var FICHERO_ESTADOS = 'estados.json';
+  var FICHERO_GUIAS = 'guias.json';
 
   var TITULO = 'Gestor de Asuntos';
   var SEGUNDOS_ENTRE_MIRADAS = 20;
@@ -109,6 +111,7 @@
       await cargarTipos();
       await cargarTiposDocumento();
       await cargarEstados();
+      await cargarGuias();
       await cargarRegistro();
 
       Documentos.configurar({
@@ -197,6 +200,61 @@
 
   async function guardarEstados() {
     await Carpetas.guardarJson(E.gestor, FICHERO_ESTADOS, E.estados);
+  }
+
+  /* ---------- las guías de procedimiento ----------
+
+     Una guía por tipo de asunto: la lista de pasos que hay que dar.
+     Se guardan todas juntas en _GESTOR/guias.json, con el nombre del
+     tipo como clave. Se releen antes de escribir y al abrir Ajustes,
+     por si el compañero las ha tocado desde el otro ordenador. */
+
+  async function cargarGuias() {
+    var g = await Carpetas.leerJson(E.gestor, FICHERO_GUIAS);
+    E.guias = (g && typeof g === 'object' && !Array.isArray(g)) ? g : {};
+  }
+
+  async function guardarGuia(tipo, pasos) {
+    await cargarGuias();
+    if (pasos && pasos.length) E.guias[tipo] = pasos;
+    else delete E.guias[tipo];
+    await Carpetas.guardarJson(E.gestor, FICHERO_GUIAS, E.guias);
+  }
+
+  /* La guía que le toca a un asunto, por su tipo. */
+  function guiaDelTipo(tipo) {
+    return (tipo && E.guias[tipo]) ? E.guias[tipo] : [];
+  }
+
+  function guiaDelAsunto(a) {
+    return guiaDelTipo(a.ficha.tipo || a.leido.tipo || '');
+  }
+
+  /* Abre la guía de un asunto con casillas. Lo que se marca se guarda
+     en la ficha del asunto, no en la guía: la guía es del tipo, y lo
+     marcado es de este asunto concreto. */
+  async function verGuiaDe(a) {
+    await cargarGuias();
+    var pasos = guiaDelAsunto(a);
+    if (!pasos.length) {
+      U.aviso('Este tipo de asunto todavía no tiene guía. Se escribe en Ajustes.');
+      return;
+    }
+    var guardando = null;
+    await Guias.abrir('Guía · ' + (a.ficha.tipo || a.leido.tipo), pasos,
+      a.ficha.pasosHechos || [], function (marcados) {
+        guardando = (guardando || Promise.resolve()).then(function () {
+          return anotar(a.nombre, {
+            pasosHechos: marcados,
+            pasosEl: U.ahora(),
+            pasosPor: E.usuario
+          });
+        }).catch(function (e) {
+          U.aviso('No he podido guardar lo marcado: ' + e.message, 'malo');
+        });
+      });
+    if (guardando) await guardando;
+    pintarAbiertos();
   }
 
   async function guardarTipos() {
@@ -744,6 +802,17 @@
       bvia.onclick = function () { editarVia(a); };
       acciones.appendChild(bvia);
 
+      var pasos = guiaDelAsunto(a);
+      if (pasos.length) {
+        var hechos = Guias.hechosDe(pasos, a.ficha.pasosHechos || []);
+        var bguia = document.createElement('button');
+        bguia.className = 'boton' + (hechos === pasos.length ? ' boton-marcado' : '');
+        bguia.textContent = 'Guía ' + hechos + '/' + pasos.length;
+        bguia.title = 'Los pasos de este tipo de asunto';
+        bguia.onclick = function () { verGuiaDe(a); };
+        acciones.appendChild(bguia);
+      }
+
       var editar = document.createElement('button');
       editar.className = 'boton';
       editar.textContent = 'Editar';
@@ -1072,6 +1141,7 @@
     pintarPendiente();
     pintarCategorias();
     if (E.nuevo.categoria) pintarTipos();
+    pintarGuiaNueva(E.nuevo.tipo || '');
     refrescarVista();
   }
 
@@ -1120,6 +1190,7 @@
     E.nuevo.tercero = null;
     pintarCategorias();
     pintarTipos();
+    pintarGuiaNueva('');
     $('bloque-tipos').classList.remove('oculto');
     $('bloque-tercero').classList.add('oculto');
     $('bloque-detalles').classList.add('oculto');
@@ -1143,11 +1214,29 @@
     });
   }
 
+  /* La guía del tipo elegido, debajo de la lista de tipos: lo que hay
+     que tener en cuenta en un asunto de este tipo. Aquí solo se lee;
+     las casillas para ir marcando están dentro del asunto ya creado. */
+  function pintarGuiaNueva(tipo) {
+    var caja = $('guia-nuevo');
+    if (!caja) return;
+    var pasos = guiaDelTipo(tipo);
+    if (!pasos.length) {
+      caja.classList.add('oculto');
+      caja.innerHTML = '';
+      return;
+    }
+    caja.classList.remove('oculto');
+    caja.innerHTML = '<div class="guia-rotulo">Guía de ' + U.escapar(tipo) + '</div>' +
+                     Guias.vista(pasos, [], false);
+  }
+
   function elegirTipo(t) {
     E.nuevo.tipo = t.tipo;
     E.nuevo.categoria = t.categoria;
     E.nuevo.tercero = null;
     pintarTipos();
+    pintarGuiaNueva(t.tipo);
     $('bloque-tercero').classList.remove('oculto');
     $('bloque-detalles').classList.add('oculto');
     $('etiqueta-tercero').textContent = {
@@ -1688,6 +1777,19 @@
     tipo.tipo = nombreNuevo;
     await guardarTipos();
 
+    /* La guía es del tipo, así que se va con él al nombre nuevo. */
+    var guiaVieja = guiaDelTipo(nombreViejo);
+    if (guiaVieja.length) {
+      try {
+        await cargarGuias();
+        E.guias[nombreNuevo] = guiaVieja;
+        delete E.guias[nombreViejo];
+        await Carpetas.guardarJson(E.gestor, FICHERO_GUIAS, E.guias);
+      } catch (e) {
+        U.aviso('El tipo se ha renombrado, pero su guía no: ' + e.message, 'malo');
+      }
+    }
+
     await verAbiertos();
     pintarAjustes();
 
@@ -1698,7 +1800,26 @@
     }
   }
 
+  /* Escribir la guía de un tipo de asunto. Se relee el fichero antes de
+     abrir el editor, por si el compañero la ha cambiado mientras tanto. */
+  async function editarGuia(tipo) {
+    await cargarGuias();
+    var pasos = await Guias.editar(tipo.tipo, guiaDelTipo(tipo.tipo));
+    if (pasos === null) return;
+    try {
+      await guardarGuia(tipo.tipo, pasos);
+      pintarAjustes();
+      pintarAbiertos();
+      U.aviso(pasos.length
+        ? 'Guía guardada: ' + pasos.length + ' pasos.'
+        : 'Guía vacía: este tipo se queda sin guía.', 'bueno');
+    } catch (e) {
+      U.aviso('No he podido guardar la guía: ' + e.message, 'malo');
+    }
+  }
+
   async function pintarAjustes() {
+    await cargarGuias();
     var caja = $('tabla-tipos');
     caja.innerHTML = '';
     Nombres.CATEGORIAS.forEach(function (cat) {
@@ -1714,6 +1835,14 @@
         f.innerHTML = '<span class="nombre-tipo">' + U.escapar(tipo.tipo) + '</span>' +
           ((tipo.alias && tipo.alias.length)
             ? '<span class="suave">antes: ' + U.escapar(tipo.alias.join(', ')) + '</span>' : '');
+        var pasos = guiaDelTipo(tipo.tipo);
+        var guia = document.createElement('button');
+        guia.className = 'boton' + (pasos.length ? ' boton-marcado' : '');
+        guia.textContent = pasos.length ? 'Guía · ' + pasos.length + ' pasos' : 'Escribir la guía';
+        guia.title = 'Los pasos que hay que dar en un asunto de este tipo';
+        guia.onclick = function () { editarGuia(tipo); };
+        f.appendChild(guia);
+
         var editar = document.createElement('button');
         editar.className = 'boton';
         editar.textContent = 'Cambiar el nombre';
