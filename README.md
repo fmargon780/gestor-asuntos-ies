@@ -27,6 +27,13 @@ carpetas, y a partir de ahí crea, nombra, mueve y busca dentro de ellas.
   van en el orden del trámite y se comparten con el resto de ordenadores.
   Desde la tarjeta del asunto se cambian de un clic, y arriba se puede dejar
   la lista con los de un solo estado.
+- **Tres montones, no uno.** La pantalla de asuntos abiertos se reparte en
+  *Por clasificar* (documentos que aún no son un asunto), *En el departamento*
+  (lo que nos toca mover) y *A la espera de terceros* (lo nuestro está hecho y
+  falta que conteste otro). Se elige uno con las tarjetas de arriba, que llevan
+  la cuenta. Cada estado dice a cuál de los dos últimos pertenece: en Ajustes se
+  marca con la casilla "Depende de otros". Lo que lleva más de quince días
+  esperando se avisa en rojo.
 - **Vía de comunicación preferente.** Si el tercero ha dicho que prefiere el
   teléfono, el correo o iPasen para ESTE asunto, se apunta en su tarjeta.
   No es la ficha de la persona: es lo que ha pedido para esta gestión.
@@ -58,7 +65,7 @@ Dentro de la carpeta de asuntos abiertos, en `_GESTOR`:
 |---|---|
 | `tipos.json` | Los tipos de asunto y a qué categoría va cada uno. Lo comparten todos los ordenadores. |
 | `tipos-documento.json` | Los tipos que salen al nombrar un documento. |
-| `estados.json` | Los estados de tramitación, en el orden en que se siguen. |
+| `estados.json` | Los estados de tramitación, en el orden en que se siguen, y cuáles significan que se espera a un tercero. |
 | `asuntos.json` | El registro: quién abrió cada asunto, en qué estado está, la vía de comunicación, cuándo se cerró y dónde está. |
 | `datos/RegAlum.csv` | El histórico de matrículas de Séneca. Lo deja el usuario. |
 | `datos/personal.csv` | Personal del centro. Lo crea y lo mantiene la aplicación. |
