@@ -14,6 +14,9 @@
     registro: { asuntos: {} },
     listaAbiertos: [],
     listaArchivo: [],
+    sueltos: [],         /* documentos sueltos en la carpeta de abiertos */
+    reciales: {},         /* los que han llegado con la aplicación abierta */
+    pendiente: null,     /* el suelto que se va a meter en el asunto que se está creando */
     nuevo: { tipo: null, categoria: null, tercero: null }
   };
 
@@ -28,6 +31,9 @@
   var FICHERO_TIPOS = 'tipos.json';
   var FICHERO_TIPOS_DOC = 'tipos-documento.json';
   var FICHERO_ASUNTOS = 'asuntos.json';
+
+  var TITULO = 'Gestor de Asuntos';
+  var SEGUNDOS_ENTRE_MIRADAS = 20;
 
   function $(id) { return document.getElementById(id); }
 
@@ -110,6 +116,7 @@
       $('aplicacion').classList.remove('oculto');
       $('usuario-pie').textContent = E.usuario ? 'Sesión de ' + E.usuario : '';
       await verAbiertos();
+      vigilarLaCarpeta();
     } catch (e) {
       U.aviso('No he podido entrar: ' + e.message, 'malo');
     }
@@ -190,9 +197,12 @@
      PANTALLA: ASUNTOS ABIERTOS
      ========================================================== */
 
-  async function verAbiertos() {
-    var carpetas = await Carpetas.subcarpetas(E.abiertos);
-    E.listaAbiertos = carpetas
+  /* Se lee la carpeta entera de una vez: las carpetas son los asuntos,
+     y los ficheros sueltos son trabajo que todavía no tiene carpeta. */
+  async function verAbiertos(yaLeido) {
+    var hay = yaLeido || await Carpetas.contenido(E.abiertos);
+
+    E.listaAbiertos = hay.carpetas
       .filter(function (c) { return c.nombre.charAt(0) !== '_'; })
       .map(function (c) {
         var leido = Nombres.leer(c.nombre, E.tipos);
@@ -200,8 +210,33 @@
         return { nombre: c.nombre, handle: c.handle, leido: leido, ficha: ficha,
                  busca: U.normalizar(c.nombre) };
       });
+
+    E.sueltos = hay.ficheros.filter(function (f) { return esDocumentoDeTrabajo(f.nombre); });
+
+    /* Un documento que ya se ha metido en su carpeta deja de estar recién
+       llegado: se quita del contador de la pestaña del navegador. */
+    Object.keys(E.reciales).forEach(function (n) {
+      var sigue = E.sueltos.some(function (f) { return f.nombre === n; });
+      if (!sigue) delete E.reciales[n];
+    });
+    actualizarTitulo();
+
     $('cuenta-abiertos').textContent = E.listaAbiertos.length || '';
     pintarAbiertos();
+    await pintarSueltos();
+  }
+
+  /* Windows y Dropbox dejan por ahí ficheros suyos que no son trabajo
+     de nadie, y Word deja los temporales que empiezan por ~$. */
+  var FICHEROS_DEL_SISTEMA = ['desktop.ini', 'thumbs.db', '.ds_store', 'icon\r'];
+
+  function esDocumentoDeTrabajo(nombre) {
+    var n = String(nombre || '');
+    if (!n) return false;
+    if (n.charAt(0) === '.' || n.charAt(0) === '_') return false;
+    if (n.indexOf('~$') === 0) return false;
+    if (FICHEROS_DEL_SISTEMA.indexOf(n.toLowerCase()) !== -1) return false;
+    return true;
   }
 
   /* Cómo se ordenan los asuntos abiertos.
@@ -312,6 +347,178 @@
   };
   $('btn-recargar').onclick = function () { verAbiertos(); };
 
+  /* ==========================================================
+     DOCUMENTOS SIN CLASIFICAR
+
+     Un fichero suelto en la carpeta de asuntos abiertos es trabajo que
+     todavía no tiene carpeta: casi siempre, algo que ha dejado ahí el
+     equipo directivo. Se enseñan arriba del todo, y los que llegan con
+     la aplicación abierta se marcan como nuevos.
+     ========================================================== */
+
+  async function pintarSueltos() {
+    var caja = $('lista-sueltos');
+    caja.innerHTML = '';
+    if (!E.sueltos.length) {
+      $('bloque-sueltos').classList.add('oculto');
+      $('cuenta-sueltos').textContent = '';
+      $('btn-sueltos-visto').classList.add('oculto');
+      return;
+    }
+    $('bloque-sueltos').classList.remove('oculto');
+    $('cuenta-sueltos').textContent = E.sueltos.length;
+
+    /* La fecha de cada documento obliga a abrirlo. Con muchos ficheros
+       sueltos se deja de mirar: la lista tiene que salir al momento. */
+    var conFecha = E.sueltos.length <= 40;
+
+    for (var i = 0; i < E.sueltos.length; i++) {
+      var s = E.sueltos[i];
+      var pie = '';
+      if (conFecha) {
+        try {
+          var f = await s.handle.getFile();
+          var d = new Date(f.lastModified);
+          pie = 'Puesto ahí el ' + d.toLocaleDateString('es-ES') + ' a las ' +
+                String(d.getHours()).padStart(2, '0') + ':' +
+                String(d.getMinutes()).padStart(2, '0');
+        } catch (e) { pie = ''; }
+      }
+      caja.appendChild(tarjetaSuelto(s, pie, !!E.reciales[s.nombre]));
+    }
+    $('btn-sueltos-visto').classList.toggle('oculto', !Object.keys(E.reciales).length);
+  }
+
+  function tarjetaSuelto(s, pie, esNuevo) {
+    var div = document.createElement('div');
+    div.className = 'tarjeta' + (esNuevo ? ' tarjeta-nueva' : '');
+    div.innerHTML =
+      '<div class="tarjeta-texto">' +
+        '<div class="tarjeta-nombre">' +
+          (esNuevo ? '<span class="marca-nueva">NUEVO</span>' : '') +
+          U.escapar(s.nombre) +
+        '</div>' +
+        '<div class="tarjeta-pie">' + U.escapar(pie) + '</div>' +
+      '</div>';
+
+    var acciones = document.createElement('div');
+    acciones.className = 'acciones';
+
+    var ver = document.createElement('button');
+    ver.className = 'boton';
+    ver.textContent = 'Abrir';
+    ver.title = 'Lo abre en otra pestaña para verlo';
+    ver.onclick = function () { abrirSuelto(s); };
+    acciones.appendChild(ver);
+
+    var crear = document.createElement('button');
+    crear.className = 'boton boton-principal';
+    crear.textContent = 'Crear asunto con él';
+    crear.onclick = function () { empezarAsuntoCon(s); };
+    acciones.appendChild(crear);
+
+    div.appendChild(acciones);
+    return div;
+  }
+
+  async function abrirSuelto(s) {
+    try {
+      var f = await s.handle.getFile();
+      var url = URL.createObjectURL(f);
+      window.open(url, '_blank');
+      setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+    } catch (e) {
+      U.aviso('No he podido abrir el documento: ' + e.message, 'malo');
+    }
+  }
+
+  function empezarAsuntoCon(s) {
+    E.pendiente = s;
+    delete E.reciales[s.nombre];
+    actualizarTitulo();
+    ir('nuevo');
+  }
+
+  function pintarPendiente() {
+    var caja = $('aviso-pendiente');
+    if (!E.pendiente) { caja.classList.add('oculto'); caja.innerHTML = ''; return; }
+    caja.classList.remove('oculto');
+    caja.innerHTML = '<strong>Este asunto se crea con un documento.</strong>' +
+      '<p>' + U.escapar(E.pendiente.nombre) + ' se meterá dentro de la carpeta nueva. ' +
+      'Después se abrirá el cuadro para ponerle el nombre.</p>';
+    var b = document.createElement('button');
+    b.className = 'boton';
+    b.textContent = 'Dejarlo donde está';
+    b.onclick = function () { E.pendiente = null; pintarPendiente(); };
+    caja.appendChild(b);
+  }
+
+  $('btn-sueltos-visto').onclick = function () {
+    E.reciales = {};
+    actualizarTitulo();
+    pintarSueltos();
+  };
+
+  /* ---------- mirar cada poco si ha llegado algo ----------
+
+     El navegador no avisa solo cuando aparece un fichero, así que hay
+     que ir a mirar. Solo se leen los nombres de la carpeta, no se abre
+     nada, y por eso no se nota aunque haya cientos de asuntos.
+
+     Mientras la pestaña esté cerrada no hay aviso: esto solo funciona
+     con la aplicación abierta. */
+  var mirando = false;
+
+  function vigilarLaCarpeta() {
+    setInterval(mirarLaCarpeta, SEGUNDOS_ENTRE_MIRADAS * 1000);
+    window.addEventListener('focus', mirarLaCarpeta);
+  }
+
+  async function mirarLaCarpeta() {
+    if (!E.abiertos || mirando) return;
+    if ($('aplicacion').classList.contains('oculto')) return;
+    mirando = true;
+    try {
+      var hay = await Carpetas.contenido(E.abiertos);
+
+      var antes = E.sueltos.map(function (f) { return f.nombre; });
+      var ahora = hay.ficheros
+        .filter(function (f) { return esDocumentoDeTrabajo(f.nombre); })
+        .map(function (f) { return f.nombre; });
+      var llegados = ahora.filter(function (n) { return antes.indexOf(n) === -1; });
+
+      var carpetasAntes = E.listaAbiertos.map(function (a) { return a.nombre; }).join('|');
+      var carpetasAhora = hay.carpetas
+        .filter(function (c) { return c.nombre.charAt(0) !== '_'; })
+        .map(function (c) { return c.nombre; }).join('|');
+
+      var algoCambia = llegados.length || antes.length !== ahora.length ||
+                       carpetasAntes !== carpetasAhora;
+      if (!algoCambia) return;
+
+      llegados.forEach(function (n) { E.reciales[n] = true; });
+      await verAbiertos(hay);
+
+      if (llegados.length === 1) {
+        U.aviso('Ha llegado un documento nuevo: ' + llegados[0], 'bueno');
+      } else if (llegados.length > 1) {
+        U.aviso('Han llegado ' + llegados.length + ' documentos nuevos.', 'bueno');
+      }
+    } catch (e) {
+      /* Si se ha perdido el permiso sobre la carpeta, ya se verá al
+         pulsar cualquier botón. Aquí no se molesta al usuario. */
+    } finally {
+      mirando = false;
+    }
+  }
+
+  /* El contador de la pestaña del navegador, para enterarse aunque se
+     esté trabajando en otra ventana. */
+  function actualizarTitulo() {
+    var n = Object.keys(E.reciales).length;
+    document.title = n ? '(' + n + ') ' + TITULO : TITULO;
+  }
+
   /* ---------- cerrar un asunto ---------- */
 
   async function cerrarAsunto(a) {
@@ -397,6 +604,7 @@
   function prepararNuevo() {
     if (!$('campo-fecha').value) $('campo-fecha').value = U.hoyIso();
     actualizarCursoNuevo();
+    pintarPendiente();
     pintarCategorias();
     if (E.nuevo.categoria) pintarTipos();
     refrescarVista();
@@ -657,12 +865,28 @@
         U.aviso('Ya hay un asunto abierto con ese mismo nombre.', 'malo');
         return;
       }
-      await Carpetas.crear(E.abiertos, nombre);
+      var carpeta = await Carpetas.crear(E.abiertos, nombre);
       await anotar(nombre, {
         estado: 'abierto', tipo: d.tipo, categoria: E.nuevo.categoria,
         tercero: d.tercero, curso: d.curso, grupo: d.grupo, descripcion: d.descripcion,
         abiertoEl: U.ahora(), abiertoPor: E.usuario
       });
+
+      /* Si el asunto se ha empezado desde un documento suelto, ese
+         documento se mete ahora en la carpeta recién creada. */
+      var traido = E.pendiente;
+      if (traido) {
+        try {
+          await Carpetas.moverFichero(E.abiertos, traido.nombre, carpeta);
+        } catch (e2) {
+          U.aviso('El asunto está creado, pero el documento no ha podido entrar: ' +
+                  e2.message, 'malo');
+          traido = null;
+        }
+        E.pendiente = null;
+        pintarPendiente();
+      }
+
       U.aviso('Asunto creado.', 'bueno');
       navigator.clipboard.writeText(nombre).catch(function () {});
       E.nuevo = { tipo: null, categoria: null, tercero: null };
@@ -674,6 +898,13 @@
       $('bloque-detalles').classList.add('oculto');
       await verAbiertos();
       ir('abiertos');
+
+      /* Con el documento ya dentro, se abre el cuadro de siempre para
+         ponerle el nombre que le toca. */
+      if (traido) {
+        var recien = E.listaAbiertos.filter(function (a) { return a.nombre === nombre; })[0];
+        if (recien) await verDocumentos(recien);
+      }
     } catch (e) {
       U.aviso('No he podido crear la carpeta: ' + e.message, 'malo');
     }
