@@ -30,12 +30,16 @@ var Carpetas = (function () {
 
   /* ---------- listar ---------- */
 
+  function porNombre(a, b) {
+    return a.nombre < b.nombre ? -1 : (a.nombre > b.nombre ? 1 : 0);
+  }
+
   async function subcarpetas(dir) {
     var lista = [];
     for await (var pareja of dir.entries()) {
       if (pareja[1].kind === 'directory') lista.push({ nombre: pareja[0], handle: pareja[1] });
     }
-    lista.sort(function (a, b) { return a.nombre < b.nombre ? -1 : (a.nombre > b.nombre ? 1 : 0); });
+    lista.sort(porNombre);
     return lista;
   }
 
@@ -44,8 +48,25 @@ var Carpetas = (function () {
     for await (var pareja of dir.entries()) {
       if (pareja[1].kind === 'file') lista.push({ nombre: pareja[0], handle: pareja[1] });
     }
-    lista.sort(function (a, b) { return a.nombre < b.nombre ? -1 : (a.nombre > b.nombre ? 1 : 0); });
+    lista.sort(porNombre);
     return lista;
+  }
+
+  /* Lo que hay en una carpeta, carpetas y ficheros, en una sola pasada.
+
+     La pantalla de asuntos abiertos necesita las dos cosas a la vez, y
+     se relee cada poco para ver si ha llegado algo nuevo. Aquí solo se
+     leen los nombres: no se abre ningún fichero. */
+  async function contenido(dir) {
+    var carpetas = [], sueltos = [];
+    for await (var pareja of dir.entries()) {
+      var ficha = { nombre: pareja[0], handle: pareja[1] };
+      if (pareja[1].kind === 'directory') carpetas.push(ficha);
+      else sueltos.push(ficha);
+    }
+    carpetas.sort(porNombre);
+    sueltos.sort(porNombre);
+    return { carpetas: carpetas, ficheros: sueltos };
   }
 
   async function existe(dir, nombre) {
@@ -169,6 +190,38 @@ var Carpetas = (function () {
     return true;
   }
 
+  /* Lleva un fichero suelto dentro de otra carpeta.
+
+     Misma precaución que al renombrar: primero se prueba con move(), y
+     si Dropbox no lo permite se copia, se comprueba que la copia pesa
+     lo mismo, y solo entonces se borra el original. */
+  async function moverFichero(dirOrigen, nombre, dirDestino, nombreDestino) {
+    var destino = nombreDestino || nombre;
+    var h = await dirOrigen.getFileHandle(nombre);
+
+    if (typeof h.move === 'function') {
+      try {
+        await h.move(dirDestino, destino);
+        return true;
+      } catch (e) { /* no se puede aquí: se copia y se borra */ }
+    }
+
+    var f = await h.getFile();
+    var salida = await dirDestino.getFileHandle(destino, { create: true });
+    var w = await salida.createWritable();
+    await w.write(f);
+    await w.close();
+
+    var copia = await (await dirDestino.getFileHandle(destino)).getFile();
+    if (copia.size !== f.size) {
+      try { await dirDestino.removeEntry(destino); } catch (e2) {}
+      throw new Error('La copia no ha salido completa. No se ha borrado el original.');
+    }
+
+    await dirOrigen.removeEntry(nombre);
+    return true;
+  }
+
   /* Abre el cuadro de "Abrir archivo" de Windows para traer un documento
      desde donde esté: Descargas, el escritorio, un pendrive. */
   async function elegirFichero() {
@@ -228,11 +281,11 @@ var Carpetas = (function () {
 
   return {
     soportado: soportado, elegir: elegir, permiso: permiso,
-    subcarpetas: subcarpetas, ficheros: ficheros, existe: existe,
+    subcarpetas: subcarpetas, ficheros: ficheros, contenido: contenido, existe: existe,
     crear: crear, bajar: bajar, mover: mover, renombrar: renombrar,
     contarFicheros: contarFicheros,
-    renombrarFichero: renombrarFichero, elegirFichero: elegirFichero,
-    copiarFicheroEn: copiarFicheroEn,
+    renombrarFichero: renombrarFichero, moverFichero: moverFichero,
+    elegirFichero: elegirFichero, copiarFicheroEn: copiarFicheroEn,
     leerTexto: leerTexto, escribirTexto: escribirTexto,
     leerJson: leerJson, guardarJson: guardarJson
   };
