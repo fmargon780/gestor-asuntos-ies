@@ -133,6 +133,11 @@ var Documentos = (function () {
     var tipos = ctx.tipos();
     var hoy = U.hoyIso();
     var fecha = previo.fecha || hoy;
+    var curso = previo.curso || ctx.curso(fecha);
+    /* Si el curso ya venía del nombre del fichero, es una elección hecha
+       y no se toca. Si es el calculado por defecto, se sigue recalculando
+       mientras el usuario no lo cambie a mano. */
+    var cursoDocAuto = previo.curso ? '' : curso;
 
     caja.innerHTML =
       '<div class="doc-partido">' +
@@ -153,7 +158,7 @@ var Documentos = (function () {
         '</div>' +
         '<div>' +
           '<label class="etiqueta">Año académico <span class="suave">(opcional)</span></label>' +
-          '<input id="doc-curso" class="campo" value="' + U.escapar(previo.curso || ctx.curso()) + '">' +
+          '<input id="doc-curso" class="campo" value="' + U.escapar(curso) + '">' +
         '</div>' +
       '</div>' +
 
@@ -217,6 +222,14 @@ var Documentos = (function () {
       c.oninput = refrescar;
       c.onchange = refrescar;
     });
+    $('doc-fecha').oninput = $('doc-fecha').onchange = function () {
+      var actual = $('doc-curso').value.trim();
+      if (!actual || actual === cursoDocAuto) {
+        cursoDocAuto = ctx.curso($('doc-fecha').value);
+        $('doc-curso').value = cursoDocAuto;
+      }
+      refrescar();
+    };
     $('doc-hay-registro').onchange = function () {
       $('doc-registro').classList.toggle('oculto', !$('doc-hay-registro').checked);
       refrescar();

@@ -42,13 +42,24 @@ var U = (function () {
     return aammdd.slice(4, 6) + '/' + aammdd.slice(2, 4) + '/20' + aammdd.slice(0, 2);
   }
 
-  /* El año académico que toca hoy. De septiembre a diciembre, el que empieza. */
-  function cursoActual() {
-    var d = new Date();
-    var a = d.getFullYear() % 100;
-    if (d.getMonth() + 1 < 9) a = a - 1;
-    var b = (a + 1) % 100;
+  /* El año académico al que pertenece una fecha (AAAA-MM-DD). De
+     septiembre a diciembre, el que empieza; de enero a agosto, el que
+     empezó el año anterior. */
+  function cursoDeFecha(iso) {
+    var p = String(iso || '').split('-');
+    if (p.length !== 3) return '';
+    var ano = parseInt(p[0], 10);
+    var mes = parseInt(p[1], 10);
+    if (!ano || !mes) return '';
+    if (mes < 9) ano = ano - 1;
+    var a = ano % 100;
+    var b = (ano + 1) % 100;
     return String(a).padStart(2, '0') + '-' + String(b).padStart(2, '0');
+  }
+
+  /* El año académico que toca hoy. */
+  function cursoActual() {
+    return cursoDeFecha(hoyIso());
   }
 
   function ahora() {
@@ -148,7 +159,7 @@ var U = (function () {
   return {
     normalizar: normalizar, limpiarNombre: limpiarNombre, hoyIso: hoyIso,
     aAaMmDd: aAaMmDd, fechaLegible: fechaLegible, cursoActual: cursoActual,
-    cursoDeAno: cursoDeAno, edadDesde: edadDesde,
+    cursoDeFecha: cursoDeFecha, cursoDeAno: cursoDeAno, edadDesde: edadDesde,
     aFecha: aFecha, yaPaso: yaPaso,
     ahora: ahora, aviso: aviso, preguntar: preguntar, escapar: escapar
   };

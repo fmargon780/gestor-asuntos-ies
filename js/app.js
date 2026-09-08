@@ -103,7 +103,7 @@
 
       Documentos.configurar({
         tipos: function () { return E.tiposDocumento; },
-        curso: function () { return U.cursoActual(); }
+        curso: function (fecha) { return U.cursoDeFecha(fecha); }
       });
 
       $('arranque').classList.add('oculto');
@@ -382,9 +382,21 @@
      PANTALLA: NUEVO ASUNTO
      ========================================================== */
 
+  /* El curso académico del campo se sigue calculando solo de la fecha de
+     inicio mientras el usuario no lo haya cambiado a mano. */
+  var cursoNuevoAuto = '';
+
+  function actualizarCursoNuevo() {
+    var actual = $('campo-curso').value.trim();
+    if (!actual || actual === cursoNuevoAuto) {
+      cursoNuevoAuto = U.cursoDeFecha($('campo-fecha').value);
+      $('campo-curso').value = cursoNuevoAuto;
+    }
+  }
+
   function prepararNuevo() {
     if (!$('campo-fecha').value) $('campo-fecha').value = U.hoyIso();
-    if (!$('campo-curso').value) $('campo-curso').value = U.cursoActual();
+    actualizarCursoNuevo();
     pintarCategorias();
     if (E.nuevo.categoria) pintarTipos();
     refrescarVista();
@@ -609,7 +621,8 @@
     return U.limpiarNombre(p.nombre + (p.referencia ? ' ' + p.referencia : ''));
   }
 
-  ['campo-fecha', 'campo-curso', 'campo-descripcion'].forEach(function (id) {
+  $('campo-fecha').oninput = function () { actualizarCursoNuevo(); refrescarVista(); };
+  ['campo-curso', 'campo-descripcion'].forEach(function (id) {
     $(id).oninput = refrescarVista;
   });
   $('campo-grupo').onchange = refrescarVista;
