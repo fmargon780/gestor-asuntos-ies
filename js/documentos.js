@@ -16,7 +16,9 @@
 
    En los dos casos el documento se ve a la izquierda mientras se
    rellenan los campos, para poder leer la fecha de la factura o el
-   sello del registro sin abrir nada aparte.
+   sello del registro sin abrir nada aparte. Se enseña a todo el
+   ancho de su columna, y con el botón "Ver más grande" ocupa
+   toda la ventana.
    ============================================================ */
 var Documentos = (function () {
 
@@ -57,7 +59,7 @@ var Documentos = (function () {
       urlVisor = URL.createObjectURL(fichero);
       /* Sin la barra de Chrome: enseña el nombre interno del fichero, que no
          dice nada, y roba sitio a la página. Se sigue pudiendo desplazar y
-         hacer zoom con la rueda. */
+         hacer zoom con Ctrl y la rueda. */
       return '<iframe id="doc-visor" src="' + urlVisor +
              '#toolbar=0&navpanes=0&view=FitH" title="Documento"></iframe>';
     }
@@ -136,7 +138,14 @@ var Documentos = (function () {
 
     caja.innerHTML =
       '<div class="doc-partido">' +
-      '<div class="visor">' + visor + '</div>' +
+
+      '<div>' +
+        '<div class="visor-barra">' +
+          '<button type="button" class="boton" id="doc-ampliar">Ver más grande</button>' +
+        '</div>' +
+        '<div class="visor">' + visor + '</div>' +
+      '</div>' +
+
       '<div class="doc-campos">' +
 
       '<p class="explica">' +
@@ -221,6 +230,14 @@ var Documentos = (function () {
       $('doc-registro').classList.toggle('oculto', !$('doc-hay-registro').checked);
       refrescar();
     };
+
+    /* Esconde los campos para que el documento ocupe toda la ventana. */
+    $('doc-ampliar').onclick = function () {
+      var partido = caja.querySelector('.doc-partido');
+      var ampliado = partido.classList.toggle('solo-visor');
+      $('doc-ampliar').textContent = ampliado ? 'Volver a los campos' : 'Ver más grande';
+    };
+
     $('doc-volver').onclick = function () { soltarVisor(); pintarLista(); };
     $('doc-guardar').onclick = function () { guardar(opciones); };
     refrescar();
