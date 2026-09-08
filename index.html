@@ -86,11 +86,24 @@
           <button id="btn-recargar" class="boton">Actualizar</button>
         </div>
       </header>
+
+      <div id="bloque-sueltos" class="oculto">
+        <div class="sueltos-cabecera">
+          <h3>Sin clasificar <span class="cuenta-sueltos" id="cuenta-sueltos"></span></h3>
+          <button id="btn-sueltos-visto" class="boton oculto">Ya los he visto</button>
+        </div>
+        <p class="explica">Documentos que están sueltos en la carpeta de asuntos abiertos,
+           todavía sin carpeta propia. Aquí es donde aparece lo que os deja el equipo directivo.</p>
+        <div id="lista-sueltos" class="lista"></div>
+      </div>
+
       <div id="lista-abiertos" class="lista"></div>
     </section>
 
     <section id="pantalla-nuevo" class="pantalla oculto">
       <header class="cabecera"><h2>Nuevo asunto</h2></header>
+
+      <div id="aviso-pendiente" class="aviso aviso-ambar oculto"></div>
 
       <div class="formulario">
         <label class="etiqueta">¿De qué es el asunto?</label>
