@@ -313,6 +313,14 @@
       var d = posEstado(a) - posEstado(b);
       if (d) return d;
       return clave(a.leido.fecha) < clave(b.leido.fecha) ? -1 : 1;
+    },
+    /* Lo que antes vence, arriba. Los que no tienen fecha límite van al
+       final: no urgen, pero siguen estando. */
+    'limite':     function (a, b) {
+      var ka = a.ficha.limite || '9999-99-99';
+      var kb = b.ficha.limite || '9999-99-99';
+      if (ka !== kb) return ka < kb ? -1 : 1;
+      return clave(a.leido.fecha) < clave(b.leido.fecha) ? -1 : 1;
     }
   };
 
@@ -338,6 +346,65 @@
   function colorEstado(situacion) {
     var i = posDeEstado(situacion);
     return 'estado-' + (i === -1 ? 'x' : (i % 6));
+  }
+
+  /* ---------- la fecha límite de un asunto ----------
+
+     Las cuentas y los textos están en plazos.js. Aquí solo queda lo que
+     necesita saber de los tipos y de las fichas de los asuntos. */
+
+  /* Los días de plazo que el centro le ha puesto a un tipo en Ajustes.
+     Devuelve null si ese tipo no tiene plazo. */
+  function plazoDeTipo(nombreTipo) {
+    for (var i = 0; i < E.tipos.length; i++) {
+      if (E.tipos[i].tipo === nombreTipo) {
+        var n = parseInt(E.tipos[i].plazo, 10);
+        return (!isNaN(n) && n > 0) ? n : null;
+      }
+    }
+    return null;
+  }
+
+  /* El plazo de un asunto, ya masticado. Null si no tiene fecha límite. */
+  function plazoDe(a) {
+    return Plazos.de((a.ficha && a.ficha.limite) || '');
+  }
+
+  /* Cuadro para poner, cambiar o quitar la fecha límite de un asunto que
+     ya está abierto. */
+  async function editarPlazo(a) {
+    var p = plazoDe(a);
+    var delTipo = plazoDeTipo(a.leido.tipo || (a.ficha && a.ficha.tipo) || '');
+    var sugerida = '';
+    if (!p && delTipo && a.ficha && a.ficha.abiertoEl) {
+      sugerida = Plazos.sumarDias(String(a.ficha.abiertoEl).slice(0, 10), delTipo);
+    }
+
+    var ok = await U.preguntar('Fecha límite del asunto',
+      '<p class="explica">Hasta cuándo hay de plazo para resolverlo. ' +
+      'No sale en el nombre de la carpeta: se guarda en la carpeta del centro ' +
+      'y lo ve todo el que abra la aplicación.</p>' +
+      '<label class="etiqueta">Fecha límite</label>' +
+      '<input id="plazo-fecha" type="date" class="campo" value="' +
+      U.escapar(p ? p.limite : sugerida) + '">' +
+      (delTipo ? '<p class="nota">El tipo ' + U.escapar(a.leido.tipo || '') +
+                 ' tiene ' + delTipo + ' días de plazo en Ajustes.</p>' : '') +
+      '<p class="nota">Déjala en blanco para que el asunto se quede sin plazo.</p>',
+      'Guardar');
+    if (!ok) return;
+
+    var valor = $('plazo-fecha').value;
+    try {
+      await anotar(a.nombre, {
+        limite: valor,
+        limiteEl: U.ahora(),
+        limitePor: E.usuario
+      });
+      pintarAbiertos();
+      U.aviso(valor ? 'Fecha límite guardada.' : 'Asunto sin fecha límite.', 'bueno');
+    } catch (e) {
+      U.aviso('No he podido guardarla: ' + e.message, 'malo');
+    }
   }
 
   function nombreVia(clave) {
@@ -579,8 +646,8 @@
     var esClasificar = E.vista === 'clasificar';
     $('zona-clasificar').classList.toggle('oculto', !esClasificar);
     $('zona-asuntos').classList.toggle('oculto', esClasificar);
-    /* Ordenar y filtrar por estado solo tiene sentido con asuntos. */
-    $('filtro-estado').parentNode.querySelectorAll('#filtro-estado, #orden-abiertos')
+    /* Ordenar y filtrar por estado o por plazo solo tiene sentido con asuntos. */
+    $('filtro-estado').parentNode.querySelectorAll('#filtro-estado, #filtro-plazo, #orden-abiertos')
       .forEach(function (el) { el.classList.toggle('oculto', esClasificar); });
     Array.prototype.forEach.call(document.querySelectorAll('.etiqueta-en-linea'), function (el) {
       el.classList.toggle('oculto', esClasificar);
@@ -645,9 +712,11 @@
     var orden = ordenElegido();
     $('orden-abiertos').value = orden;
     var filtro = $('filtro-estado').value;
+    var plazo = $('filtro-plazo').value;
     var lista = E.listaAbiertos.filter(function (a) {
       if (!deLaVista(a, E.vista)) return false;
       if (q && a.busca.indexOf(q) === -1) return false;
+      if (!Plazos.pasaFiltro(a.ficha.limite || '', plazo)) return false;
       if (filtro === '__sin__') return !a.ficha.situacion;
       if (filtro) return a.ficha.situacion === filtro;
       return true;
@@ -678,7 +747,7 @@
 
   function textoVacio() {
     if (!E.listaAbiertos.length) return 'No hay asuntos abiertos. Crea el primero en "Nuevo asunto".';
-    if ($('buscar-abiertos').value.trim() || $('filtro-estado').value) {
+    if ($('buscar-abiertos').value.trim() || $('filtro-estado').value || $('filtro-plazo').value) {
       return 'Ningún asunto coincide con lo que buscas.';
     }
     if (E.vista === 'espera') return 'No hay nada esperando a terceros. Mejor así.';
@@ -704,12 +773,19 @@
     else if (dias === 1) pie.push('en espera desde ayer');
     else if (dias > 1) pie.push('en espera desde hace ' + dias + ' días');
 
+    /* El plazo se ve de dos formas: una etiqueta de color arriba, junto
+       al tipo y al estado, y la fecha completa en el pie. En el archivo
+       no se enseña: allí ya no vence nada. */
+    var p = (modo === 'abierto') ? plazoDe(a) : null;
+    if (p) pie.push('Fecha límite ' + Plazos.legible(p.limite));
+
     div.innerHTML = ICONO_CARPETA +
       '<div class="tarjeta-texto">' +
         '<div class="tarjeta-nombre">' +
           (a.leido.tipo ? '<span class="marca-tipo">' + U.escapar(a.leido.tipo) + '</span>' : '') +
           (situacion ? '<span class="marca-estado ' + colorEstado(situacion) + '">' +
                        U.escapar(situacion) + '</span>' : '') +
+          (p ? '<span class="marca-plazo ' + p.clase + '">' + U.escapar(p.texto) + '</span>' : '') +
           U.escapar(a.nombre) +
         '</div>' +
         '<div class="tarjeta-pie' + (esperaLarga ? ' pie-aviso' : '') + '">' +
@@ -743,6 +819,14 @@
       bvia.title = via || 'Apuntar la vía de comunicación preferente';
       bvia.onclick = function () { editarVia(a); };
       acciones.appendChild(bvia);
+
+      var bplazo = document.createElement('button');
+      bplazo.className = 'boton' + (p ? ' boton-marcado' : '');
+      bplazo.textContent = 'Plazo';
+      bplazo.title = p ? 'Fecha límite ' + Plazos.legible(p.limite) + ' · ' + p.texto
+                       : 'Poner una fecha límite a este asunto';
+      bplazo.onclick = function () { editarPlazo(a); };
+      acciones.appendChild(bplazo);
 
       var editar = document.createElement('button');
       editar.className = 'boton';
@@ -790,6 +874,7 @@
     pintarSueltos();
   };
   $('filtro-estado').onchange = function () { pintarAbiertos(); };
+  $('filtro-plazo').onchange = function () { pintarAbiertos(); };
 
   $('orden-abiertos').onchange = function () {
     try { window.localStorage.setItem('orden-abiertos', this.value); } catch (e) {}
@@ -1065,9 +1150,40 @@
     }
   }
 
+  /* La fecha límite del asunto nuevo se calcula sola: fecha de inicio
+     más los días de plazo que el tipo tenga puestos en Ajustes. Se deja
+     de calcular en cuanto el usuario la cambia a mano. */
+  var limiteNuevoAuto = '';
+
+  function actualizarLimiteNuevo() {
+    var campo = $('campo-limite');
+    var nota = $('nota-limite');
+    var dias = plazoDeTipo(E.nuevo.tipo || '');
+
+    if (campo.value && campo.value !== limiteNuevoAuto) {
+      /* Puesta a mano: no se toca. */
+    } else if (dias) {
+      limiteNuevoAuto = Plazos.sumarDias($('campo-fecha').value, dias);
+      campo.value = limiteNuevoAuto;
+    } else {
+      if (campo.value === limiteNuevoAuto) campo.value = '';
+      limiteNuevoAuto = '';
+    }
+
+    if (dias && E.nuevo.tipo) {
+      nota.textContent = E.nuevo.tipo + ' tiene ' + dias +
+        ' días de plazo en Ajustes. Puedes cambiar la fecha.';
+      nota.classList.remove('oculto');
+    } else {
+      nota.textContent = '';
+      nota.classList.add('oculto');
+    }
+  }
+
   function prepararNuevo() {
     if (!$('campo-fecha').value) $('campo-fecha').value = U.hoyIso();
     pintarEstadoNuevo();
+    actualizarLimiteNuevo();
     actualizarCursoNuevo();
     pintarPendiente();
     pintarCategorias();
@@ -1157,6 +1273,7 @@
     $('buscar-tercero').value = '';
     $('resultados-tercero').innerHTML = '';
     $('tercero-elegido').classList.add('oculto');
+    actualizarLimiteNuevo();
     $('buscar-tercero').focus();
   }
 
@@ -1316,7 +1433,11 @@
     return U.limpiarNombre(p.nombre + (p.referencia ? ' ' + p.referencia : ''));
   }
 
-  $('campo-fecha').oninput = function () { actualizarCursoNuevo(); refrescarVista(); };
+  $('campo-fecha').oninput = function () {
+    actualizarCursoNuevo();
+    actualizarLimiteNuevo();
+    refrescarVista();
+  };
   ['campo-curso', 'campo-descripcion'].forEach(function (id) {
     $(id).oninput = refrescarVista;
   });
@@ -1359,6 +1480,7 @@
         situacion: $('campo-estado').value,
         via: $('campo-via').value,
         viaDato: $('campo-via-dato').value.trim(),
+        limite: $('campo-limite').value,
         abiertoEl: U.ahora(), abiertoPor: E.usuario
       });
 
@@ -1384,6 +1506,8 @@
       $('campo-estado').value = E.estados.length ? E.estados[0].nombre : '';
       $('campo-via').value = '';
       $('campo-via-dato').value = '';
+      $('campo-limite').value = '';
+      limiteNuevoAuto = '';
       $('campo-grupo').checked = false;
       $('bloque-tipos').classList.add('oculto');
       $('bloque-grupo').classList.add('oculto');
@@ -1714,6 +1838,33 @@
         f.innerHTML = '<span class="nombre-tipo">' + U.escapar(tipo.tipo) + '</span>' +
           ((tipo.alias && tipo.alias.length)
             ? '<span class="suave">antes: ' + U.escapar(tipo.alias.join(', ')) + '</span>' : '');
+
+        /* Los días de plazo de este tipo. En blanco, el tipo no pone
+           fecha límite y el asunto nace sin plazo. */
+        var etiquetaPlazo = document.createElement('label');
+        etiquetaPlazo.className = 'plazo-tipo';
+        var casilla = document.createElement('input');
+        casilla.type = 'number';
+        casilla.min = '0';
+        casilla.className = 'campo campo-plazo';
+        casilla.value = (tipo.plazo ? String(tipo.plazo) : '');
+        casilla.placeholder = '—';
+        casilla.title = 'Días de plazo para resolver este tipo de asunto. ' +
+                        'Déjalo en blanco si no tiene plazo.';
+        casilla.onchange = async function () {
+          var n = parseInt(casilla.value, 10);
+          if (!isNaN(n) && n > 0) tipo.plazo = n; else delete tipo.plazo;
+          await guardarTipos();
+          U.aviso(tipo.plazo ? tipo.tipo + ': ' + tipo.plazo + ' días de plazo.'
+                             : tipo.tipo + ' se queda sin plazo.', 'bueno');
+        };
+        etiquetaPlazo.appendChild(casilla);
+        var diasTexto = document.createElement('span');
+        diasTexto.className = 'suave';
+        diasTexto.textContent = 'días de plazo';
+        etiquetaPlazo.appendChild(diasTexto);
+        f.appendChild(etiquetaPlazo);
+
         var editar = document.createElement('button');
         editar.className = 'boton';
         editar.textContent = 'Cambiar el nombre';
