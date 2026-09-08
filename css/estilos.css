@@ -108,6 +108,12 @@ code { background: #eef1f5; padding: 1px 5px; border-radius: 4px; font-size: 13p
 .cabecera h2 { margin: 0; font-size: 21px; }
 .acciones { display: flex; gap: 8px; align-items: center; }
 .acciones .campo { width: 300px; }
+/* En la cabecera de asuntos abiertos caben ya cuatro cosas: si no entran,
+   que bajen de línea en vez de salirse por la derecha. */
+.cabecera .acciones { flex-wrap: wrap; justify-content: flex-end; }
+#buscar-abiertos { width: 230px; min-width: 0; }
+#filtro-estado { width: 170px; min-width: 0; }
+#orden-abiertos { width: 250px; min-width: 0; }
 h3 { margin: 30px 0 8px; font-size: 16px; }
 
 /* ---------- listas ---------- */
@@ -116,14 +122,37 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
   background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio);
   padding: 13px 16px; box-shadow: var(--sombra);
   display: flex; align-items: center; gap: 16px;
+  flex-wrap: wrap;
 }
-.tarjeta-texto { flex: 1; min-width: 0; }
+/* Si la pantalla es estrecha, los botones bajan enteros a la línea de
+   abajo en vez de estrujar el nombre del asunto. */
+.tarjeta-texto { flex: 1 1 340px; min-width: 0; }
+.tarjeta .acciones { flex: 0 0 auto; margin-left: auto; }
 .tarjeta-nombre { font-weight: 600; word-break: break-word; }
 .tarjeta-pie { color: var(--tinta-suave); font-size: 13px; margin-top: 3px; }
 .marca-tipo {
   display: inline-block; background: var(--azul-claro); color: var(--azul);
   border-radius: 20px; padding: 2px 10px; font-size: 12px; font-weight: 600; margin-right: 8px;
 }
+/* La etiqueta de color del estado del asunto. El color sale del sitio
+   que ocupa en la lista de Ajustes, y hay seis que se van repitiendo. */
+.marca-estado {
+  display: inline-block; border-radius: 20px; padding: 2px 10px;
+  font-size: 12px; font-weight: 600; margin-right: 8px;
+  border: 1px solid transparent;
+}
+.estado-0 { background: #eef1f5; color: #4a5765; border-color: #d7dde5; }
+.estado-1 { background: #e8f0f8; color: #1f4e79; border-color: #c3d8ec; }
+.estado-2 { background: #fff4d6; color: #8a6100; border-color: #e6c377; }
+.estado-3 { background: #f0eafb; color: #5b3fa0; border-color: #d6c8f0; }
+.estado-4 { background: #fdecec; color: #a4302a; border-color: #f2c4c0; }
+.estado-5 { background: #e7f5ec; color: #1e6b3f; border-color: #bfe3cd; }
+.estado-x { background: #eef1f5; color: #5d6b7a; border-color: #d7dde5; }
+
+/* El desplegable de estado no debe ocupar los 300px de los buscadores. */
+.acciones .campo-estado { width: auto; min-width: 165px; }
+.boton-marcado { border-color: var(--azul); color: var(--azul); }
+
 .marca-categoria {
   display: inline-block; background: #eef1f5; color: var(--tinta-suave);
   border-radius: 20px; padding: 2px 10px; font-size: 12px; margin-right: 8px;
@@ -249,6 +278,7 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
   .dos-paneles, .dos-columnas { grid-template-columns: 1fr; }
   .contenido { padding: 20px 16px 50px; }
   .acciones .campo { width: 100%; }
+  .acciones .campo-estado { width: 100%; }
 }
 
 /* ---------- documentos ---------- */

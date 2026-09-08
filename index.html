@@ -76,10 +76,15 @@
         <h2>Asuntos abiertos</h2>
         <div class="acciones">
           <input id="buscar-abiertos" class="campo" placeholder="Buscar por nombre, tipo o tercero">
+          <label class="etiqueta-en-linea" for="filtro-estado">Estado</label>
+          <select id="filtro-estado" class="campo campo-estado">
+            <option value="">Todos los estados</option>
+          </select>
           <label class="etiqueta-en-linea" for="orden-abiertos">Ordenar por</label>
           <select id="orden-abiertos" class="campo">
-            <option value="fecha-asc">Fecha de apertura · los más antiguos arriba</option>
-            <option value="fecha-desc">Fecha de apertura · los más recientes arriba</option>
+            <option value="fecha-asc">Fecha · los más antiguos arriba</option>
+            <option value="fecha-desc">Fecha · los más recientes arriba</option>
+            <option value="estado">Estado del asunto</option>
             <option value="tipo">Tipo de asunto</option>
             <option value="tercero">Tercero</option>
           </select>
@@ -153,6 +158,20 @@
           <label class="etiqueta">Descripción corta <span class="suave">(opcional)</span></label>
           <input id="campo-descripcion" class="campo" placeholder="Por ejemplo: Cambio de optativa">
 
+          <div class="dos-columnas">
+            <div>
+              <label class="etiqueta">Estado</label>
+              <select id="campo-estado" class="campo"></select>
+            </div>
+            <div>
+              <label class="etiqueta">Vía de comunicación <span class="suave">(opcional)</span></label>
+              <select id="campo-via" class="campo"></select>
+            </div>
+          </div>
+          <input id="campo-via-dato" class="campo" placeholder="Teléfono, correo o aclaración, si lo ha dado">
+          <p class="nota">El estado y la vía de comunicación no salen en el nombre de la carpeta.
+             Se guardan en la carpeta del centro, y los ve todo el que abra la aplicación.</p>
+
           <div class="vista-previa">
             <div class="vista-rotulo">Se creará esta carpeta</div>
             <div id="vista-nombre" class="vista-nombre"></div>
@@ -213,6 +232,16 @@
         <button id="btn-anadir-tipo" class="boton">Añadir</button>
       </div>
       <div id="tabla-tipos" class="lista"></div>
+
+      <h3>Estados del asunto</h3>
+      <p class="explica">Dicen por dónde va cada gestión: pendiente, enviado a la firma, resuelto…
+         También se comparten con el resto de ordenadores. Van en el orden del trámite,
+         no por orden alfabético: con las flechas los subes y los bajas.</p>
+      <div class="alta-tipo">
+        <input id="nuevo-estado" class="campo" placeholder="ESTADO NUEVO" style="max-width:260px">
+        <button id="btn-anadir-estado" class="boton">Añadir</button>
+      </div>
+      <div id="tabla-estados" class="lista"></div>
 
       <h3>Tipos de documento</h3>
       <p class="explica">Son los que salen al poner nombre a un documento dentro de

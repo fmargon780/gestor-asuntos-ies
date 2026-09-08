@@ -22,6 +22,14 @@ carpetas, y a partir de ahí crea, nombra, mueve y busca dentro de ellas.
   arriba del todo. Personal, empresas y otros desde tres CSV que mantiene la
   propia aplicación.
 - **Los asuntos de un tercero**, abiertos y archivados, en una sola lista.
+- **Estado de cada asunto.** Dice por dónde va la tramitación: pendiente,
+  enviado a la firma, resuelto... Los estados los pone el centro en Ajustes,
+  van en el orden del trámite y se comparten con el resto de ordenadores.
+  Desde la tarjeta del asunto se cambian de un clic, y arriba se puede dejar
+  la lista con los de un solo estado.
+- **Vía de comunicación preferente.** Si el tercero ha dicho que prefiere el
+  teléfono, el correo o iPasen para ESTE asunto, se apunta en su tarjeta.
+  No es la ficha de la persona: es lo que ha pedido para esta gestión.
 
 ## El nombre de la carpeta
 
@@ -31,6 +39,12 @@ carpetas, y a partir de ahí crea, nombra, mueve y busca dentro de ellas.
 
 El nombre es la ficha del asunto: si siempre se monta igual, el archivo se
 puede leer entero años después sin más ayuda que la lista de tipos.
+
+El estado y la vía de comunicación **no** entran en el nombre de la carpeta:
+cambian a lo largo de la tramitación, y renombrar carpetas en un Dropbox
+sincronizado cada vez que algo avanza sería pedir problemas. Van en
+`_GESTOR/asuntos.json`, que está en la misma carpeta compartida y lo lee
+cualquiera que abra la aplicación.
 
 El grupo es opcional y se abrevia. En la ESO no lleva la etapa (`1ºA`), pero en
 Bachillerato y en Formación Profesional sí (`1ºBachA`, `1ºFPA`), para que dos
@@ -43,7 +57,9 @@ Dentro de la carpeta de asuntos abiertos, en `_GESTOR`:
 | Fichero | Qué es |
 |---|---|
 | `tipos.json` | Los tipos de asunto y a qué categoría va cada uno. Lo comparten todos los ordenadores. |
-| `asuntos.json` | El registro: quién abrió cada asunto, cuándo se cerró y dónde está. |
+| `tipos-documento.json` | Los tipos que salen al nombrar un documento. |
+| `estados.json` | Los estados de tramitación, en el orden en que se siguen. |
+| `asuntos.json` | El registro: quién abrió cada asunto, en qué estado está, la vía de comunicación, cuándo se cerró y dónde está. |
 | `datos/RegAlum.csv` | El histórico de matrículas de Séneca. Lo deja el usuario. |
 | `datos/personal.csv` | Personal del centro. Lo crea y lo mantiene la aplicación. |
 | `datos/empresas.csv` | Proveedores. Igual. |

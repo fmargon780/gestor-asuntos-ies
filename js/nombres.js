@@ -198,6 +198,49 @@ var Nombres = (function () {
      por el orden real de los hechos.
      ============================================================ */
 
+  /* ============================================================
+     LOS ESTADOS DEL ASUNTO
+
+     Dicen por dónde va la tramitación: si está sin empezar, si se ha
+     mandado a la firma, si se espera a un tercero... La lista se guarda
+     en la carpeta del centro, así que la ven todos los ordenadores, y
+     se cambia en Ajustes.
+
+     El orden importa: es el orden del trámite, no el alfabético. Por eso
+     esta lista no se ordena nunca sola.
+     ============================================================ */
+
+  var ESTADOS_POR_DEFECTO = [
+    'PENDIENTE',
+    'EN TRÁMITE',
+    'ENVIADO A FIRMA',
+    'FIRMADO',
+    'A LA ESPERA DEL TERCERO',
+    'RESUELTO'
+  ];
+
+  /* ============================================================
+     LA VÍA DE COMUNICACIÓN PREFERENTE
+
+     Es de cada asunto, no del tercero: los datos estables de la persona
+     ya están en su ficha. Aquí se apunta lo que ha dicho para ESTE
+     asunto, y no siempre habrá algo que apuntar.
+     ============================================================ */
+
+  var VIAS = [
+    { clave: 'TELEFONO',   texto: 'Teléfono',           corto: 'Teléfono' },
+    { clave: 'CORREO',     texto: 'Correo electrónico', corto: 'Correo' },
+    { clave: 'IPASEN',     texto: 'iPasen / Séneca',    corto: 'iPasen' },
+    { clave: 'PRESENCIAL', texto: 'En persona',         corto: 'En persona' }
+  ];
+
+  function via(clave) {
+    for (var i = 0; i < VIAS.length; i++) {
+      if (VIAS[i].clave === clave) return VIAS[i];
+    }
+    return null;
+  }
+
   var TIPOS_DOCUMENTO_POR_DEFECTO = [
     'SOLICITUD', 'FACTURA', 'CERTIFICADO', 'MATRICULA', 'RESOLUCION',
     'NOTIFICACION', 'INFORME', 'ACTA', 'COMUNICACION', 'JUSTIFICANTE',
@@ -251,6 +294,7 @@ var Nombres = (function () {
 
   return {
     POR_DEFECTO: POR_DEFECTO, CATEGORIAS: CATEGORIAS,
+    ESTADOS_POR_DEFECTO: ESTADOS_POR_DEFECTO, VIAS: VIAS, via: via,
     montar: montar, leer: leer, categoriaDeTipo: categoriaDeTipo,
     grupoCompacto: grupoCompacto,
     TIPOS_DOCUMENTO_POR_DEFECTO: TIPOS_DOCUMENTO_POR_DEFECTO,
