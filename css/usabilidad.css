@@ -1,0 +1,63 @@
+/* ============================================================
+   usabilidad.css — el aspecto de lo que añade js/usabilidad.js:
+   el botón de Volver, los botones de Cancelar, las etiquetas de lo
+   que se está filtrando y la vista compacta de los asuntos abiertos.
+   ============================================================ */
+
+/* ---------- volver y cancelar ---------- */
+.cabecera-izq { display: flex; align-items: center; gap: 12px; }
+.boton-volver { padding: 6px 12px; font-size: 13px; }
+
+.botones-formulario {
+  display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px;
+}
+.botones-formulario .boton { padding: 11px 22px; font-size: 15px; }
+
+/* ---------- lo que se está filtrando ----------
+
+   Sin esta barra, una lista corta parecía una lista vacía. Cada
+   filtro se quita con su aspa; "Limpiar todo" los quita de una vez. */
+.filtros-puestos {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: var(--azul-claro); border: 1px solid #c3d8ec;
+  border-radius: 8px; padding: 8px 12px; margin: 0 0 14px;
+}
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--papel); border: 1px solid #c3d8ec; border-radius: 20px;
+  padding: 3px 5px 3px 12px; font-size: 13px; max-width: 420px;
+}
+.chip-x {
+  font: inherit; font-size: 16px; line-height: 1;
+  background: none; border: 0; color: var(--tinta-suave);
+  cursor: pointer; padding: 1px 6px; border-radius: 20px;
+}
+.chip-x:hover { background: #e2ebf4; color: var(--rojo-linea); }
+.filtros-cuenta { color: var(--azul); font-size: 13px; margin-left: auto; }
+.boton-limpiar { padding: 5px 12px; font-size: 13px; }
+
+/* ---------- vista compacta de los asuntos abiertos ----------
+
+   Cada asunto en una línea. El nombre de la carpeta ya lleva la fecha,
+   el tipo y el tercero, así que con esa línea y la etiqueta del estado
+   se sabe lo del día a día. Al pulsar la fila, se abre y enseña el pie
+   y los botones. */
+.lista-compacta { gap: 3px; }
+.lista-compacta .tarjeta {
+  padding: 5px 12px; gap: 10px; flex-wrap: nowrap;
+  border-radius: 7px; box-shadow: none;
+}
+.lista-compacta .tarjeta:hover { background: #f7fafd; }
+.lista-compacta .tarjeta-icono { width: 17px; height: 17px; }
+.lista-compacta .tarjeta-texto { flex: 1 1 auto; cursor: pointer; }
+.lista-compacta .tarjeta-nombre {
+  font-weight: 500; font-size: 14px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; word-break: normal;
+}
+.lista-compacta .marca-tipo,
+.lista-compacta .marca-estado { padding: 1px 8px; font-size: 11px; margin-right: 6px; }
+.lista-compacta .campo-estado { padding: 4px 8px; font-size: 13px; min-width: 150px; }
+.lista-compacta .tarjeta:not(.abierta) .tarjeta-pie { display: none; }
+.lista-compacta .tarjeta:not(.abierta) .acciones .boton { display: none; }
+.lista-compacta .tarjeta.abierta { flex-wrap: wrap; padding: 10px 12px; }
+.lista-compacta .tarjeta.abierta .tarjeta-nombre { white-space: normal; word-break: break-word; }
