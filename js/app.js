@@ -14,6 +14,7 @@
     estados: [],         /* estados de tramitación, compartidos en _GESTOR */
     registro: { asuntos: {} },
     listaAbiertos: [],
+    vista: 'departamento',   /* cuál de las tres tarjetas está elegida */
     listaArchivo: [],
     sueltos: [],         /* documentos sueltos en la carpeta de abiertos */
     reciales: {},        /* los que han llegado con la aplicación abierta */
@@ -118,7 +119,9 @@
       $('arranque').classList.add('oculto');
       $('aplicacion').classList.remove('oculto');
       $('usuario-pie').textContent = E.usuario ? 'Sesión de ' + E.usuario : '';
+      E.vista = vistaGuardada();
       await verAbiertos();
+      irVista(E.vista);
       vigilarLaCarpeta();
     } catch (e) {
       U.aviso('No he podido entrar: ' + e.message, 'malo');
@@ -153,14 +156,43 @@
   }
 
   /* Los estados de tramitación. Se guardan en el orden en que los pone
-     el usuario, que es el orden del trámite: no se ordenan solos. */
+     el usuario, que es el orden del trámite: no se ordenan solos.
+
+     Cada estado es { nombre, espera }. Las primeras versiones guardaban
+     solo el nombre, así que aquí se admiten las dos formas y el fichero
+     se deja ya con la nueva. */
+  function normalizarEstados(lista) {
+    var deFabrica = {};
+    Nombres.ESTADOS_POR_DEFECTO.forEach(function (e) { deFabrica[e.nombre] = e.espera; });
+    return (lista || []).map(function (e) {
+      if (typeof e === 'string') return { nombre: e, espera: !!deFabrica[e] };
+      return { nombre: String((e && e.nombre) || ''), espera: !!(e && e.espera) };
+    }).filter(function (e) { return e.nombre; });
+  }
+
   async function cargarEstados() {
-    var e = await Carpetas.leerJson(E.gestor, FICHERO_ESTADOS);
-    if (!e || !e.length) {
-      e = Nombres.ESTADOS_POR_DEFECTO.slice();
-      await Carpetas.guardarJson(E.gestor, FICHERO_ESTADOS, e);
-    }
+    var leido = await Carpetas.leerJson(E.gestor, FICHERO_ESTADOS);
+    var eraTexto = !!(leido && leido.length && typeof leido[0] === 'string');
+    var e = normalizarEstados(leido);
+    if (!e.length) e = Nombres.ESTADOS_POR_DEFECTO.map(function (x) {
+      return { nombre: x.nombre, espera: x.espera };
+    });
     E.estados = e;
+    if (!leido || !leido.length || eraTexto) await guardarEstados();
+  }
+
+  /* El sitio que ocupa un estado en la lista, y si es de los que
+     significan "esto ya no depende de nosotros". */
+  function posDeEstado(nombre) {
+    for (var i = 0; i < E.estados.length; i++) {
+      if (E.estados[i].nombre === nombre) return i;
+    }
+    return -1;
+  }
+
+  function esDeEspera(nombre) {
+    var i = posDeEstado(nombre);
+    return i !== -1 && !!E.estados[i].espera;
   }
 
   async function guardarEstados() {
@@ -249,6 +281,7 @@
 
     $('cuenta-abiertos').textContent = E.listaAbiertos.length || '';
     pintarFiltroEstado();
+    pintarCuentas();
     pintarAbiertos();
     await pintarSueltos();
   }
@@ -286,8 +319,7 @@
   /* El sitio que ocupa el estado del asunto en la lista de Ajustes.
      Los que no tienen estado, o tienen uno que ya se quitó, al final. */
   function posEstado(a) {
-    var s = a.ficha.situacion || '';
-    var i = E.estados.indexOf(s);
+    var i = posDeEstado(a.ficha.situacion || '');
     return i === -1 ? 9999 : i;
   }
 
@@ -304,7 +336,7 @@
   /* Cada estado se pinta de un color, según el sitio que ocupa en la
      lista. Hay seis colores y se van repitiendo. */
   function colorEstado(situacion) {
-    var i = E.estados.indexOf(situacion);
+    var i = posDeEstado(situacion);
     return 'estado-' + (i === -1 ? 'x' : (i % 6));
   }
 
@@ -521,6 +553,70 @@
     }
   }
 
+  /* ---------- las tres tarjetas de arriba ----------
+
+     El trabajo de la pantalla se reparte en tres montones, según dónde
+     esté ahora mismo: papeles que aún no son un asunto, asuntos que nos
+     toca mover, y asuntos que dependen de que conteste otro. Se ve un
+     montón cada vez, para no mezclarlos. */
+
+  var VISTAS = ['clasificar', 'departamento', 'espera'];
+  var DIAS_DE_AVISO = 15;
+
+  function vistaGuardada() {
+    var v = '';
+    try { v = window.localStorage.getItem('vista-abiertos') || ''; } catch (e) {}
+    return VISTAS.indexOf(v) !== -1 ? v : 'departamento';
+  }
+
+  function irVista(cual) {
+    E.vista = VISTAS.indexOf(cual) !== -1 ? cual : 'departamento';
+    try { window.localStorage.setItem('vista-abiertos', E.vista); } catch (e) {}
+
+    Array.prototype.forEach.call(document.querySelectorAll('.panel'), function (b) {
+      b.classList.toggle('activo', b.dataset.vista === E.vista);
+    });
+    var esClasificar = E.vista === 'clasificar';
+    $('zona-clasificar').classList.toggle('oculto', !esClasificar);
+    $('zona-asuntos').classList.toggle('oculto', esClasificar);
+    /* Ordenar y filtrar por estado solo tiene sentido con asuntos. */
+    $('filtro-estado').parentNode.querySelectorAll('#filtro-estado, #orden-abiertos')
+      .forEach(function (el) { el.classList.toggle('oculto', esClasificar); });
+    Array.prototype.forEach.call(document.querySelectorAll('.etiqueta-en-linea'), function (el) {
+      el.classList.toggle('oculto', esClasificar);
+    });
+
+    pintarAbiertos();
+    pintarSueltos();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.panel'), function (b) {
+    b.onclick = function () { irVista(b.dataset.vista); };
+  });
+
+  /* Cuántos días lleva un asunto en el estado que tiene puesto. */
+  function diasEnEstado(a) {
+    var d = new Date(a.ficha.situacionEl || a.ficha.abiertoEl || '');
+    if (isNaN(d.getTime())) return -1;
+    return Math.floor((Date.now() - d.getTime()) / 86400000);
+  }
+
+  function deLaVista(a, vista) {
+    if (vista === 'espera') return esDeEspera(a.ficha.situacion || '');
+    return !esDeEspera(a.ficha.situacion || '');
+  }
+
+  function pintarCuentas() {
+    var enEspera = E.listaAbiertos.filter(function (a) { return deLaVista(a, 'espera'); });
+    $('cuenta-clasificar').textContent = E.sueltos.length;
+    $('cuenta-departamento').textContent = E.listaAbiertos.length - enEspera.length;
+    $('cuenta-espera').textContent = enEspera.length;
+
+    var viejo = enEspera.some(function (a) { return diasEnEstado(a) >= DIAS_DE_AVISO; });
+    $('cuenta-espera').classList.toggle('cuenta-roja', viejo);
+    $('cuenta-clasificar').classList.toggle('cuenta-ambar', E.sueltos.length > 0);
+  }
+
   /* El desplegable de arriba que deja ver solo los asuntos que están en
      un estado. Se rehace cada vez porque la lista de estados se puede
      cambiar en Ajustes. */
@@ -530,7 +626,7 @@
     sel.innerHTML = '<option value="">Todos los estados</option>' +
       '<option value="__sin__">Sin estado</option>' +
       E.estados.map(function (e) {
-        return '<option value="' + U.escapar(e) + '">' + U.escapar(e) + '</option>';
+        return '<option value="' + U.escapar(e.nombre) + '">' + U.escapar(e.nombre) + '</option>';
       }).join('');
     sel.value = antes;
     if (sel.selectedIndex === -1) sel.value = '';
@@ -543,12 +639,14 @@
   }
 
   function pintarAbiertos() {
+    pintarCuentas();
     var q = U.normalizar($('buscar-abiertos').value);
     var rotulo = $('cuenta-lista-abiertos');
     var orden = ordenElegido();
     $('orden-abiertos').value = orden;
     var filtro = $('filtro-estado').value;
     var lista = E.listaAbiertos.filter(function (a) {
+      if (!deLaVista(a, E.vista)) return false;
       if (q && a.busca.indexOf(q) === -1) return false;
       if (filtro === '__sin__') return !a.ficha.situacion;
       if (filtro) return a.ficha.situacion === filtro;
@@ -559,10 +657,7 @@
     var caja = $('lista-abiertos');
     caja.innerHTML = '';
     if (!lista.length) {
-      caja.innerHTML = '<div class="vacio">' +
-        (E.listaAbiertos.length ? 'Ningún asunto coincide con lo que buscas.'
-                                : 'No hay asuntos abiertos. Crea el primero en "Nuevo asunto".') +
-        '</div>';
+      caja.innerHTML = '<div class="vacio">' + textoVacio() + '</div>';
       return;
     }
     lista.forEach(function (a) { caja.appendChild(tarjetaAsunto(a, 'abierto')); });
@@ -581,6 +676,15 @@
     '<path d="M13.8 3H7A1.5 1.5 0 0 0 5.5 4.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.7z"/>' +
     '<path d="M13.8 3v4.7h4.7"/></svg>';
 
+  function textoVacio() {
+    if (!E.listaAbiertos.length) return 'No hay asuntos abiertos. Crea el primero en "Nuevo asunto".';
+    if ($('buscar-abiertos').value.trim() || $('filtro-estado').value) {
+      return 'Ningún asunto coincide con lo que buscas.';
+    }
+    if (E.vista === 'espera') return 'No hay nada esperando a terceros. Mejor así.';
+    return 'Nada pendiente de gestionar aquí ahora mismo.';
+  }
+
   function tarjetaAsunto(a, modo) {
     var div = document.createElement('div');
     div.className = 'tarjeta tarjeta-asunto';
@@ -594,6 +698,12 @@
     if (via) pie.push(via);
     if (modo === 'archivado' && a.ruta) pie.push(a.ruta);
 
+    var dias = (modo === 'abierto' && esDeEspera(situacion)) ? diasEnEstado(a) : -1;
+    var esperaLarga = dias >= DIAS_DE_AVISO;
+    if (dias === 0) pie.push('en espera desde hoy');
+    else if (dias === 1) pie.push('en espera desde ayer');
+    else if (dias > 1) pie.push('en espera desde hace ' + dias + ' días');
+
     div.innerHTML = ICONO_CARPETA +
       '<div class="tarjeta-texto">' +
         '<div class="tarjeta-nombre">' +
@@ -602,7 +712,8 @@
                        U.escapar(situacion) + '</span>' : '') +
           U.escapar(a.nombre) +
         '</div>' +
-        '<div class="tarjeta-pie">' + U.escapar(pie.join('  ·  ')) + '</div>' +
+        '<div class="tarjeta-pie' + (esperaLarga ? ' pie-aviso' : '') + '">' +
+          U.escapar(pie.join('  ·  ')) + '</div>' +
       '</div>';
 
     var acciones = document.createElement('div');
@@ -615,7 +726,7 @@
       var sel = document.createElement('select');
       sel.className = 'campo campo-estado';
       sel.title = 'Estado del asunto';
-      var lista = E.estados.slice();
+      var lista = E.estados.map(function (e) { return e.nombre; });
       if (situacion && lista.indexOf(situacion) === -1) lista.push(situacion);
       sel.innerHTML = '<option value="">Sin estado</option>' +
         lista.map(function (e) {
@@ -676,7 +787,7 @@
 
   $('buscar-abiertos').oninput = function () {
     pintarAbiertos();
-    plegarAlBuscar();
+    pintarSueltos();
   };
   $('filtro-estado').onchange = function () { pintarAbiertos(); };
 
@@ -696,23 +807,35 @@
      ========================================================== */
 
   async function pintarSueltos() {
+    var q = U.normalizar($('buscar-abiertos').value);
+    var lista = E.sueltos.filter(function (s) {
+      return !q || U.normalizar(s.nombre).indexOf(q) !== -1;
+    });
+
+    var cuantosNuevos = Object.keys(E.reciales).length;
+    $('btn-sueltos-visto').classList.toggle('oculto', !cuantosNuevos);
+    var rotulo = $('nuevos-sueltos');
+    rotulo.textContent = cuantosNuevos === 1 ? '1 nuevo' : cuantosNuevos + ' nuevos';
+    rotulo.classList.toggle('oculto', !cuantosNuevos);
+    pintarCuentas();
+
+    /* Saber la fecha de cada documento obliga a abrirlo, así que solo se
+       hace cuando esta lista está a la vista. */
+    if (E.vista !== 'clasificar') return;
+
     var caja = $('lista-sueltos');
     caja.innerHTML = '';
-    if (!E.sueltos.length) {
-      $('bloque-sueltos').classList.add('oculto');
-      $('cuenta-sueltos').textContent = '';
-      $('btn-sueltos-visto').classList.add('oculto');
+    if (!lista.length) {
+      caja.innerHTML = '<div class="vacio">' + (E.sueltos.length
+        ? 'Ningún documento coincide con lo que buscas.'
+        : 'No hay documentos sueltos. Todo lo que ha llegado está ya dentro de su asunto.') +
+        '</div>';
       return;
     }
-    $('bloque-sueltos').classList.remove('oculto');
-    $('cuenta-sueltos').textContent = E.sueltos.length;
 
-    /* La fecha de cada documento obliga a abrirlo. Con muchos ficheros
-       sueltos se deja de mirar: la lista tiene que salir al momento. */
-    var conFecha = E.sueltos.length <= 40;
-
-    for (var i = 0; i < E.sueltos.length; i++) {
-      var s = E.sueltos[i];
+    var conFecha = lista.length <= 40;
+    for (var i = 0; i < lista.length; i++) {
+      var s = lista[i];
       var pie = '';
       if (conFecha) {
         try {
@@ -726,14 +849,6 @@
       }
       caja.appendChild(tarjetaSuelto(s, pie, !!E.reciales[s.nombre]));
     }
-
-    var cuantosNuevos = Object.keys(E.reciales).length;
-    $('btn-sueltos-visto').classList.toggle('oculto', !cuantosNuevos);
-    var rotulo = $('nuevos-sueltos');
-    rotulo.textContent = cuantosNuevos === 1 ? '1 nuevo' : cuantosNuevos + ' nuevos';
-    rotulo.classList.toggle('oculto', !cuantosNuevos);
-
-    pintarPliegue();
   }
 
   function tarjetaSuelto(s, pie, esNuevo) {
@@ -807,54 +922,6 @@
     actualizarTitulo();
     pintarSueltos();
   };
-
-  /* ---------- plegar y desplegar la lista ----------
-
-     Mientras se busca entre los asuntos, esta lista estorba: se pliega
-     sola al escribir en el buscador y se vuelve a abrir al borrarlo.
-     Si se pliega a mano, se queda plegada también la próxima vez, en
-     este ordenador. Aun plegada, la cabecera sigue diciendo cuántos hay
-     y si ha llegado alguno nuevo. */
-  var plegado = leerPliegueGuardado();
-  var plegadoPorLaBusqueda = false;
-
-  function leerPliegueGuardado() {
-    try { return window.localStorage.getItem('sueltos-plegados') === 'si'; }
-    catch (e) { return false; }
-  }
-
-  function guardarPliegue() {
-    try { window.localStorage.setItem('sueltos-plegados', plegado ? 'si' : 'no'); }
-    catch (e) {}
-  }
-
-  function pintarPliegue() {
-    $('cuerpo-sueltos').classList.toggle('oculto', plegado);
-    $('flecha-sueltos').textContent = plegado ? '▸' : '▾';
-    $('btn-plegar-sueltos').title = plegado
-      ? 'Desplegar los documentos sin clasificar'
-      : 'Plegar los documentos sin clasificar';
-  }
-
-  $('btn-plegar-sueltos').onclick = function () {
-    plegado = !plegado;
-    plegadoPorLaBusqueda = false;
-    guardarPliegue();
-    pintarPliegue();
-  };
-
-  function plegarAlBuscar() {
-    var buscando = $('buscar-abiertos').value.trim().length > 0;
-    if (buscando && !plegado) {
-      plegado = true;
-      plegadoPorLaBusqueda = true;
-      pintarPliegue();
-    } else if (!buscando && plegadoPorLaBusqueda) {
-      plegado = false;
-      plegadoPorLaBusqueda = false;
-      pintarPliegue();
-    }
-  }
 
   /* ---------- mirar cada poco si ha llegado algo ----------
 
@@ -1017,10 +1084,11 @@
     var antes = sel.value;
     sel.innerHTML = '<option value="">Sin estado</option>' +
       E.estados.map(function (e) {
-        return '<option value="' + U.escapar(e) + '">' + U.escapar(e) + '</option>';
+        return '<option value="' + U.escapar(e.nombre) + '">' + U.escapar(e.nombre) + '</option>';
       }).join('');
-    sel.value = antes || E.estados[0] || '';
-    if (sel.selectedIndex === -1) sel.value = E.estados[0] || '';
+    var primero = E.estados.length ? E.estados[0].nombre : '';
+    sel.value = antes || primero;
+    if (sel.selectedIndex === -1) sel.value = primero;
 
     var via = $('campo-via');
     if (!via.options.length) {
@@ -1313,7 +1381,7 @@
       navigator.clipboard.writeText(nombre).catch(function () {});
       E.nuevo = { tipo: null, categoria: null, tercero: null };
       $('campo-descripcion').value = '';
-      $('campo-estado').value = E.estados[0] || '';
+      $('campo-estado').value = E.estados.length ? E.estados[0].nombre : '';
       $('campo-via').value = '';
       $('campo-via-dato').value = '';
       $('campo-grupo').checked = false;
@@ -1775,12 +1843,33 @@
       caja.innerHTML = '<div class="vacio">No hay ningún estado. Añade el primero aquí arriba.</div>';
       return;
     }
-    E.estados.forEach(function (nombre, i) {
+    E.estados.forEach(function (estado, i) {
+      var nombre = estado.nombre;
       var f = document.createElement('div');
       f.className = 'fila-tipo';
       f.innerHTML = '<span class="marca-estado ' + colorEstado(nombre) + '">' +
                     U.escapar(nombre) + '</span>' +
                     '<span class="nombre-tipo suave">' + cuantosCon(nombre) + '</span>';
+
+      /* Esta casilla es la que decide en cuál de las tres tarjetas de
+         arriba aparece el asunto. */
+      var etiqueta = document.createElement('label');
+      etiqueta.className = 'interruptor interruptor-fila';
+      var casilla = document.createElement('input');
+      casilla.type = 'checkbox';
+      casilla.checked = !!estado.espera;
+      casilla.onchange = async function () {
+        estado.espera = casilla.checked;
+        await guardarEstados();
+        pintarTablaEstados();
+        pintarAbiertos();
+      };
+      etiqueta.appendChild(casilla);
+      var texto = document.createElement('span');
+      texto.textContent = 'Depende de otros';
+      texto.title = 'Con esto marcado, el asunto sale en "A la espera de terceros"';
+      etiqueta.appendChild(texto);
+      f.appendChild(etiqueta);
 
       var subir = document.createElement('button');
       subir.className = 'boton';
@@ -1854,12 +1943,12 @@
     var nuevo = U.limpiarNombre($('estado-nuevo-nombre').value).toUpperCase();
     if (!nuevo || nuevo === viejo) return;
     var repetido = E.estados.some(function (e) {
-      return e !== viejo && U.normalizar(e) === U.normalizar(nuevo);
+      return e.nombre !== viejo && U.normalizar(e.nombre) === U.normalizar(nuevo);
     });
     if (repetido) { U.aviso('Ya hay otro estado con ese nombre.', 'malo'); return; }
 
     try {
-      E.estados = E.estados.map(function (e) { return e === viejo ? nuevo : e; });
+      E.estados.forEach(function (e) { if (e.nombre === viejo) e.nombre = nuevo; });
       await guardarEstados();
 
       await cargarRegistro();
@@ -1892,7 +1981,7 @@
     if (!ok) return;
 
     try {
-      E.estados = E.estados.filter(function (e) { return e !== nombre; });
+      E.estados = E.estados.filter(function (e) { return e.nombre !== nombre; });
       await guardarEstados();
 
       if (n) {
@@ -1936,9 +2025,9 @@
   $('btn-anadir-estado').onclick = async function () {
     var nombre = U.limpiarNombre($('nuevo-estado').value).toUpperCase();
     if (!nombre) return;
-    var repetido = E.estados.some(function (e) { return U.normalizar(e) === U.normalizar(nombre); });
+    var repetido = E.estados.some(function (e) { return U.normalizar(e.nombre) === U.normalizar(nombre); });
     if (repetido) { U.aviso('Ese estado ya está en la lista.', 'malo'); return; }
-    E.estados.push(nombre);
+    E.estados.push({ nombre: nombre, espera: false });
     await guardarEstados();
     $('nuevo-estado').value = '';
     pintarTablaEstados();
