@@ -102,6 +102,8 @@
         </div>
       </header>
 
+      <div id="panel-avisos" class="oculto"></div>
+
       <div class="paneles">
         <button type="button" class="panel" data-vista="clasificar">
           <svg class="panel-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -303,6 +305,16 @@
       </div>
       <div id="tabla-tipos-documento" class="lista"></div>
 
+      <h3>Avisos de vencimiento</h3>
+      <p class="explica">Al abrir la aplicación sale un aviso arriba con lo que ha vencido
+         y lo que está a punto de vencer. Aquí eliges con cuánta antelación quieres el aviso.
+         Esto es solo de este ordenador.</p>
+      <div class="alta-tipo">
+        <label class="etiqueta-en-linea" for="avisos-dias">Avisar con</label>
+        <input id="avisos-dias" type="number" min="0" class="campo campo-plazo">
+        <span class="suave">días de antelación</span>
+      </div>
+
       <h3>Cómo se abrevia cada grupo</h3>
       <p class="explica">Cuando pides que el nombre del asunto lleve el grupo del alumno,
          se escribe abreviado. Aquí tienes, grupo por grupo, lo que trae Séneca y lo que
@@ -342,5 +354,6 @@
 <script src="js/datos.js"></script>
 <script src="js/documentos.js"></script>
 <script src="js/app.js"></script>
+<script src="js/avisos.js"></script>
 </body>
 </html>
