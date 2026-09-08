@@ -118,6 +118,21 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 
 /* ---------- listas ---------- */
 .lista { display: flex; flex-direction: column; gap: 8px; }
+
+/* Rótulo que encabeza cada una de las dos listas de la pantalla de
+   asuntos abiertos: arriba los documentos sueltos, abajo los asuntos.
+   Sin él, las dos listas parecían una sola. */
+.rotulo-lista {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 16px; font-weight: 600; color: var(--tinta);
+  margin: 26px 0 8px;
+}
+.rotulo-icono { width: 20px; height: 20px; flex: 0 0 auto; color: var(--azul); }
+.rotulo-icono-suelto { color: #a1730a; }
+.cuenta-lista {
+  background: var(--azul-claro); border: 1px solid #c3d8ec; color: var(--azul);
+  border-radius: 20px; padding: 1px 9px; font-size: 12px; font-weight: 600;
+}
 .tarjeta {
   background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio);
   padding: 13px 16px; box-shadow: var(--sombra);
@@ -128,6 +143,25 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
    abajo en vez de estrujar el nombre del asunto. */
 .tarjeta-texto { flex: 1 1 340px; min-width: 0; }
 .tarjeta .acciones { flex: 0 0 auto; margin-left: auto; }
+
+/* Las dos clases de fila no se pueden confundir a simple vista:
+   el asunto es una carpeta con franja azul; el documento suelto es una
+   hoja, con franja y fondo de color arena. */
+.tarjeta-icono { width: 22px; height: 22px; flex: 0 0 auto; }
+.tarjeta-asunto { border-left: 5px solid var(--azul); }
+.tarjeta-asunto .tarjeta-icono { color: var(--azul); }
+.tarjeta-suelto {
+  border-left: 5px solid var(--ambar-linea);
+  background: #fffdf4;
+}
+.tarjeta-suelto .tarjeta-icono { color: #a1730a; }
+.tarjeta-suelto .tarjeta-nombre { font-weight: 500; }
+.marca-ext {
+  display: inline-block; background: #f3ede1; color: #7a5c12;
+  border: 1px solid #e3d6b8; border-radius: 5px;
+  padding: 1px 7px; font-size: 11px; font-weight: 700; margin-right: 8px;
+  letter-spacing: .3px;
+}
 .tarjeta-nombre { font-weight: 600; word-break: break-word; }
 .tarjeta-pie { color: var(--tinta-suave); font-size: 13px; margin-top: 3px; }
 .marca-tipo {

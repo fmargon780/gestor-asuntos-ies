@@ -394,6 +394,7 @@
 
   function pintarAbiertos() {
     var q = U.normalizar($('buscar-abiertos').value);
+    var rotulo = $('cuenta-lista-abiertos');
     var orden = ordenElegido();
     $('orden-abiertos').value = orden;
     var filtro = $('filtro-estado').value;
@@ -404,6 +405,7 @@
       return true;
     });
     lista.sort(ORDENES[orden]);
+    if (rotulo) rotulo.textContent = lista.length;
     var caja = $('lista-abiertos');
     caja.innerHTML = '';
     if (!lista.length) {
@@ -416,9 +418,22 @@
     lista.forEach(function (a) { caja.appendChild(tarjetaAsunto(a, 'abierto')); });
   }
 
+  /* Dos dibujos para que se vea de un golpe qué es cada fila:
+     una carpeta para los asuntos, una hoja para los documentos sueltos. */
+  var ICONO_CARPETA =
+    '<svg class="tarjeta-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-width="1.7" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.2l2 2.6h8.8A1.5 1.5 0 0 1 21 9.1v9A1.5 1.5 0 0 1 19.5 19.6h-15A1.5 1.5 0 0 1 3 18.1z"/></svg>';
+
+  var ICONO_DOCUMENTO =
+    '<svg class="tarjeta-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-width="1.7" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M13.8 3H7A1.5 1.5 0 0 0 5.5 4.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.7z"/>' +
+    '<path d="M13.8 3v4.7h4.7"/></svg>';
+
   function tarjetaAsunto(a, modo) {
     var div = document.createElement('div');
-    div.className = 'tarjeta';
+    div.className = 'tarjeta tarjeta-asunto';
     var tercero = a.ficha.tercero || '';
     var situacion = a.ficha.situacion || '';
     var via = textoVia(a.ficha);
@@ -429,7 +444,7 @@
     if (via) pie.push(via);
     if (modo === 'archivado' && a.ruta) pie.push(a.ruta);
 
-    div.innerHTML =
+    div.innerHTML = ICONO_CARPETA +
       '<div class="tarjeta-texto">' +
         '<div class="tarjeta-nombre">' +
           (a.leido.tipo ? '<span class="marca-tipo">' + U.escapar(a.leido.tipo) + '</span>' : '') +
@@ -546,7 +561,8 @@
         try {
           var f = await s.handle.getFile();
           var d = new Date(f.lastModified);
-          pie = 'Puesto ahí el ' + d.toLocaleDateString('es-ES') + ' a las ' +
+          pie = isNaN(d.getTime()) ? ''
+              : 'Puesto ahí el ' + d.toLocaleDateString('es-ES') + ' a las ' +
                 String(d.getHours()).padStart(2, '0') + ':' +
                 String(d.getMinutes()).padStart(2, '0');
         } catch (e) { pie = ''; }
@@ -565,11 +581,13 @@
 
   function tarjetaSuelto(s, pie, esNuevo) {
     var div = document.createElement('div');
-    div.className = 'tarjeta' + (esNuevo ? ' tarjeta-nueva' : '');
-    div.innerHTML =
+    div.className = 'tarjeta tarjeta-suelto' + (esNuevo ? ' tarjeta-nueva' : '');
+    var ext = Nombres.extensionDe(s.nombre);
+    div.innerHTML = ICONO_DOCUMENTO +
       '<div class="tarjeta-texto">' +
         '<div class="tarjeta-nombre">' +
           (esNuevo ? '<span class="marca-nueva">NUEVO</span>' : '') +
+          (ext ? '<span class="marca-ext">' + U.escapar(ext.toUpperCase()) + '</span>' : '') +
           U.escapar(s.nombre) +
         '</div>' +
         '<div class="tarjeta-pie">' + U.escapar(pie) + '</div>' +

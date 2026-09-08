@@ -96,7 +96,12 @@
         <div class="sueltos-cabecera">
           <button type="button" id="btn-plegar-sueltos" class="plegador">
             <span class="flecha" id="flecha-sueltos">▾</span>
-            <span>Sin clasificar</span>
+            <svg class="rotulo-icono rotulo-icono-suelto" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true">
+              <path d="M13.8 3H7A1.5 1.5 0 0 0 5.5 4.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.7z"/>
+              <path d="M13.8 3v4.7h4.7"/>
+            </svg>
+            <span>Documentos sin asunto</span>
             <span class="cuenta-sueltos" id="cuenta-sueltos"></span>
             <span class="marca-nueva oculto" id="nuevos-sueltos"></span>
           </button>
@@ -109,6 +114,14 @@
         </div>
       </div>
 
+      <div class="rotulo-lista">
+        <svg class="rotulo-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.7" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.2l2 2.6h8.8A1.5 1.5 0 0 1 21 9.1v9A1.5 1.5 0 0 1 19.5 19.6h-15A1.5 1.5 0 0 1 3 18.1z"/>
+        </svg>
+        <span>Asuntos con carpeta</span>
+        <span class="cuenta-lista" id="cuenta-lista-abiertos"></span>
+      </div>
       <div id="lista-abiertos" class="lista"></div>
     </section>
 
