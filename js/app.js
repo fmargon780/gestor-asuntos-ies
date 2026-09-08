@@ -11,6 +11,7 @@
     usuario: '',
     tipos: [],
     tiposDocumento: [],
+    estados: [],         /* estados de tramitación, compartidos en _GESTOR */
     registro: { asuntos: {} },
     listaAbiertos: [],
     listaArchivo: [],
@@ -31,6 +32,7 @@
   var FICHERO_TIPOS = 'tipos.json';
   var FICHERO_TIPOS_DOC = 'tipos-documento.json';
   var FICHERO_ASUNTOS = 'asuntos.json';
+  var FICHERO_ESTADOS = 'estados.json';
 
   var TITULO = 'Gestor de Asuntos';
   var SEGUNDOS_ENTRE_MIRADAS = 20;
@@ -105,6 +107,7 @@
       E.datos = await Carpetas.crear(E.gestor, 'datos');
       await cargarTipos();
       await cargarTiposDocumento();
+      await cargarEstados();
       await cargarRegistro();
 
       Documentos.configurar({
@@ -149,6 +152,21 @@
     await Carpetas.guardarJson(E.gestor, FICHERO_TIPOS_DOC, E.tiposDocumento);
   }
 
+  /* Los estados de tramitación. Se guardan en el orden en que los pone
+     el usuario, que es el orden del trámite: no se ordenan solos. */
+  async function cargarEstados() {
+    var e = await Carpetas.leerJson(E.gestor, FICHERO_ESTADOS);
+    if (!e || !e.length) {
+      e = Nombres.ESTADOS_POR_DEFECTO.slice();
+      await Carpetas.guardarJson(E.gestor, FICHERO_ESTADOS, e);
+    }
+    E.estados = e;
+  }
+
+  async function guardarEstados() {
+    await Carpetas.guardarJson(E.gestor, FICHERO_ESTADOS, E.estados);
+  }
+
   async function guardarTipos() {
     E.tipos.sort(function (a, b) {
       var ka = a.categoria + ' ' + a.tipo, kb = b.categoria + ' ' + b.tipo;
@@ -169,6 +187,14 @@
     var antes = E.registro.asuntos[clave] || {};
     E.registro.asuntos[clave] = Object.assign(antes, datos);
     await Carpetas.guardarJson(E.gestor, FICHERO_ASUNTOS, E.registro);
+    refrescarFichas();
+  }
+
+  /* Al releer el registro, las tarjetas ya pintadas se quedan con la
+     ficha vieja. Aquí se les vuelve a enganchar la buena. */
+  function refrescarFichas() {
+    E.listaAbiertos.forEach(function (a) { a.ficha = E.registro.asuntos[a.nombre] || {}; });
+    E.listaArchivo.forEach(function (a) { a.ficha = E.registro.asuntos[a.nombre] || {}; });
   }
 
   /* ==========================================================
@@ -222,6 +248,7 @@
     actualizarTitulo();
 
     $('cuenta-abiertos').textContent = E.listaAbiertos.length || '';
+    pintarFiltroEstado();
     pintarAbiertos();
     await pintarSueltos();
   }
@@ -248,8 +275,21 @@
     'fecha-asc':  function (a, b) { return clave(a.leido.fecha) < clave(b.leido.fecha) ? -1 : 1; },
     'fecha-desc': function (a, b) { return clave(a.leido.fecha) > clave(b.leido.fecha) ? -1 : 1; },
     'tipo':       function (a, b) { return texto(a, 'tipo') < texto(b, 'tipo') ? -1 : 1; },
-    'tercero':    function (a, b) { return texto(a, 'tercero') < texto(b, 'tercero') ? -1 : 1; }
+    'tercero':    function (a, b) { return texto(a, 'tercero') < texto(b, 'tercero') ? -1 : 1; },
+    'estado':     function (a, b) {
+      var d = posEstado(a) - posEstado(b);
+      if (d) return d;
+      return clave(a.leido.fecha) < clave(b.leido.fecha) ? -1 : 1;
+    }
   };
+
+  /* El sitio que ocupa el estado del asunto en la lista de Ajustes.
+     Los que no tienen estado, o tienen uno que ya se quitó, al final. */
+  function posEstado(a) {
+    var s = a.ficha.situacion || '';
+    var i = E.estados.indexOf(s);
+    return i === -1 ? 9999 : i;
+  }
 
   /* Un asunto sin fecha en el nombre se va al final en los dos sentidos. */
   function clave(fecha) {
@@ -259,6 +299,91 @@
   function texto(a, cual) {
     if (cual === 'tipo') return U.normalizar(a.leido.tipo || 'zzz');
     return U.normalizar(a.ficha.tercero || a.leido.resto || 'zzz');
+  }
+
+  /* Cada estado se pinta de un color, según el sitio que ocupa en la
+     lista. Hay seis colores y se van repitiendo. */
+  function colorEstado(situacion) {
+    var i = E.estados.indexOf(situacion);
+    return 'estado-' + (i === -1 ? 'x' : (i % 6));
+  }
+
+  function nombreVia(clave) {
+    var v = Nombres.via(clave);
+    return v ? v.texto : (clave || '');
+  }
+
+  /* "Teléfono: 600 11 22 33", para el pie de la tarjeta. */
+  function textoVia(ficha) {
+    if (!ficha || !ficha.via) return '';
+    var n = nombreVia(ficha.via);
+    return ficha.viaDato ? n + ': ' + ficha.viaDato : n;
+  }
+
+  /* Guarda el estado que se acaba de elegir en el desplegable. */
+  async function ponerEstado(a, situacion) {
+    try {
+      await anotar(a.nombre, {
+        situacion: situacion,
+        situacionEl: U.ahora(),
+        situacionPor: E.usuario
+      });
+      pintarAbiertos();
+    } catch (e) {
+      U.aviso('No he podido guardar el estado: ' + e.message, 'malo');
+    }
+  }
+
+  /* Cuadro para apuntar por dónde prefiere hablar el tercero EN ESTE
+     asunto. Se guarda en la carpeta del centro, así que lo ve todo el
+     que abra la aplicación sobre ella. */
+  async function editarVia(a) {
+    var actual = a.ficha.via || '';
+    var opciones = '<option value="">Sin indicar</option>' +
+      Nombres.VIAS.map(function (v) {
+        return '<option value="' + v.clave + '"' + (v.clave === actual ? ' selected' : '') +
+               '>' + U.escapar(v.texto) + '</option>';
+      }).join('');
+
+    var ok = await U.preguntar('Vía de comunicación preferente',
+      '<p class="explica">Es solo de este asunto. Los datos de siempre de la persona ' +
+      'están en su ficha; aquí va lo que haya dicho para esta gestión.</p>' +
+      '<label class="etiqueta">Por dónde prefiere que le hablemos</label>' +
+      '<select id="via-clave" class="campo">' + opciones + '</select>' +
+      '<label class="etiqueta">Teléfono, correo o aclaración <span class="suave">(opcional)</span></label>' +
+      '<input id="via-dato" class="campo" value="' + U.escapar(a.ficha.viaDato || '') + '" ' +
+      'placeholder="Por ejemplo: 600 11 22 33">',
+      'Guardar');
+    if (!ok) return;
+
+    try {
+      await anotar(a.nombre, {
+        via: $('via-clave').value,
+        viaDato: $('via-dato').value.trim(),
+        viaEl: U.ahora(),
+        viaPor: E.usuario
+      });
+      pintarAbiertos();
+      pintarArchivo();
+      U.aviso('Vía de comunicación guardada.', 'bueno');
+    } catch (e) {
+      U.aviso('No he podido guardarla: ' + e.message, 'malo');
+    }
+  }
+
+  /* El desplegable de arriba que deja ver solo los asuntos que están en
+     un estado. Se rehace cada vez porque la lista de estados se puede
+     cambiar en Ajustes. */
+  function pintarFiltroEstado() {
+    var sel = $('filtro-estado');
+    var antes = sel.value;
+    sel.innerHTML = '<option value="">Todos los estados</option>' +
+      '<option value="__sin__">Sin estado</option>' +
+      E.estados.map(function (e) {
+        return '<option value="' + U.escapar(e) + '">' + U.escapar(e) + '</option>';
+      }).join('');
+    sel.value = antes;
+    if (sel.selectedIndex === -1) sel.value = '';
   }
 
   function ordenElegido() {
@@ -271,13 +396,19 @@
     var q = U.normalizar($('buscar-abiertos').value);
     var orden = ordenElegido();
     $('orden-abiertos').value = orden;
-    var lista = E.listaAbiertos.filter(function (a) { return !q || a.busca.indexOf(q) !== -1; });
+    var filtro = $('filtro-estado').value;
+    var lista = E.listaAbiertos.filter(function (a) {
+      if (q && a.busca.indexOf(q) === -1) return false;
+      if (filtro === '__sin__') return !a.ficha.situacion;
+      if (filtro) return a.ficha.situacion === filtro;
+      return true;
+    });
     lista.sort(ORDENES[orden]);
     var caja = $('lista-abiertos');
     caja.innerHTML = '';
     if (!lista.length) {
       caja.innerHTML = '<div class="vacio">' +
-        (E.listaAbiertos.length ? 'Ningún asunto coincide con la búsqueda.'
+        (E.listaAbiertos.length ? 'Ningún asunto coincide con lo que buscas.'
                                 : 'No hay asuntos abiertos. Crea el primero en "Nuevo asunto".') +
         '</div>';
       return;
@@ -289,16 +420,21 @@
     var div = document.createElement('div');
     div.className = 'tarjeta';
     var tercero = a.ficha.tercero || '';
+    var situacion = a.ficha.situacion || '';
+    var via = textoVia(a.ficha);
     var pie = [];
     if (a.leido.fecha) pie.push('Abierto el ' + U.fechaLegible(a.leido.fecha));
     if (tercero) pie.push(tercero);
     else if (a.leido.resto) pie.push(a.leido.resto);
+    if (via) pie.push(via);
     if (modo === 'archivado' && a.ruta) pie.push(a.ruta);
 
     div.innerHTML =
       '<div class="tarjeta-texto">' +
         '<div class="tarjeta-nombre">' +
           (a.leido.tipo ? '<span class="marca-tipo">' + U.escapar(a.leido.tipo) + '</span>' : '') +
+          (situacion ? '<span class="marca-estado ' + colorEstado(situacion) + '">' +
+                       U.escapar(situacion) + '</span>' : '') +
           U.escapar(a.nombre) +
         '</div>' +
         '<div class="tarjeta-pie">' + U.escapar(pie.join('  ·  ')) + '</div>' +
@@ -306,6 +442,32 @@
 
     var acciones = document.createElement('div');
     acciones.className = 'acciones';
+
+    /* En los asuntos abiertos, el estado se cambia aquí mismo y la vía
+       de comunicación se apunta con el botón de al lado. En el archivo
+       no: allí lo que hay es el rastro de lo que se hizo. */
+    if (modo === 'abierto') {
+      var sel = document.createElement('select');
+      sel.className = 'campo campo-estado';
+      sel.title = 'Estado del asunto';
+      var lista = E.estados.slice();
+      if (situacion && lista.indexOf(situacion) === -1) lista.push(situacion);
+      sel.innerHTML = '<option value="">Sin estado</option>' +
+        lista.map(function (e) {
+          return '<option value="' + U.escapar(e) + '"' + (e === situacion ? ' selected' : '') +
+                 '>' + U.escapar(e) + '</option>';
+        }).join('');
+      sel.onchange = function () { ponerEstado(a, sel.value); };
+      acciones.appendChild(sel);
+
+      var bvia = document.createElement('button');
+      bvia.className = 'boton' + (a.ficha.via ? ' boton-marcado' : '');
+      var v = Nombres.via(a.ficha.via);
+      bvia.textContent = v ? v.corto : (a.ficha.via || 'Vía');
+      bvia.title = via || 'Apuntar la vía de comunicación preferente';
+      bvia.onclick = function () { editarVia(a); };
+      acciones.appendChild(bvia);
+    }
 
     var copiar = document.createElement('button');
     copiar.className = 'boton';
@@ -344,6 +506,8 @@
     pintarAbiertos();
     plegarAlBuscar();
   };
+  $('filtro-estado').onchange = function () { pintarAbiertos(); };
+
   $('orden-abiertos').onchange = function () {
     try { window.localStorage.setItem('orden-abiertos', this.value); } catch (e) {}
     pintarAbiertos();
@@ -661,6 +825,7 @@
 
   function prepararNuevo() {
     if (!$('campo-fecha').value) $('campo-fecha').value = U.hoyIso();
+    pintarEstadoNuevo();
     actualizarCursoNuevo();
     pintarPendiente();
     pintarCategorias();
@@ -670,6 +835,27 @@
 
   /* Primero la categoría. Con cuatro botones se llega a los diez tipos
      que hacen falta, en vez de enseñar los cuarenta de golpe. */
+  /* El estado con el que nace el asunto. Se propone el primero de la
+     lista de Ajustes, que es el primer paso del trámite. */
+  function pintarEstadoNuevo() {
+    var sel = $('campo-estado');
+    var antes = sel.value;
+    sel.innerHTML = '<option value="">Sin estado</option>' +
+      E.estados.map(function (e) {
+        return '<option value="' + U.escapar(e) + '">' + U.escapar(e) + '</option>';
+      }).join('');
+    sel.value = antes || E.estados[0] || '';
+    if (sel.selectedIndex === -1) sel.value = E.estados[0] || '';
+
+    var via = $('campo-via');
+    if (!via.options.length) {
+      via.innerHTML = '<option value="">Sin indicar</option>' +
+        Nombres.VIAS.map(function (v) {
+          return '<option value="' + v.clave + '">' + U.escapar(v.texto) + '</option>';
+        }).join('');
+    }
+  }
+
   function pintarCategorias() {
     var caja = $('categorias-lista');
     caja.innerHTML = '';
@@ -927,6 +1113,9 @@
       await anotar(nombre, {
         estado: 'abierto', tipo: d.tipo, categoria: E.nuevo.categoria,
         tercero: d.tercero, curso: d.curso, grupo: d.grupo, descripcion: d.descripcion,
+        situacion: $('campo-estado').value,
+        via: $('campo-via').value,
+        viaDato: $('campo-via-dato').value.trim(),
         abiertoEl: U.ahora(), abiertoPor: E.usuario
       });
 
@@ -949,6 +1138,9 @@
       navigator.clipboard.writeText(nombre).catch(function () {});
       E.nuevo = { tipo: null, categoria: null, tercero: null };
       $('campo-descripcion').value = '';
+      $('campo-estado').value = E.estados[0] || '';
+      $('campo-via').value = '';
+      $('campo-via-dato').value = '';
       $('campo-grupo').checked = false;
       $('bloque-tipos').classList.add('oculto');
       $('bloque-grupo').classList.add('oculto');
@@ -1180,8 +1372,12 @@
     }
     caja.innerHTML = salida.map(function (a) {
       var leido = Nombres.leer(a.nombre, E.tipos);
+      var ficha = E.registro.asuntos[a.nombre] || {};
+      var situacion = ficha.situacion || '';
       return '<div class="resultado"><div>' +
              (leido.tipo ? '<span class="marca-tipo">' + U.escapar(leido.tipo) + '</span>' : '') +
+             (situacion ? '<span class="marca-estado ' + colorEstado(situacion) + '">' +
+                          U.escapar(situacion) + '</span>' : '') +
              U.escapar(a.nombre) + '</div>' +
              '<div class="resultado-pie">' + a.donde +
              (leido.fecha ? '  ·  ' + U.fechaLegible(leido.fecha) : '') + '</div></div>';
@@ -1293,6 +1489,8 @@
       });
     });
 
+    pintarTablaEstados();
+
     var estado = $('estado-datos');
     estado.innerHTML = '';
     var alumnado = await Datos.cargar(E.datos, 'ALUMNADO');
@@ -1390,6 +1588,156 @@
     carp.appendChild(filaEstado('Archivo', E.archivo.name));
   }
 
+  /* ---------- los estados del asunto, en Ajustes ----------
+
+     Van en el orden del trámite, no en orden alfabético, así que se
+     pueden subir y bajar con las flechas. */
+
+  function pintarTablaEstados() {
+    var caja = $('tabla-estados');
+    caja.innerHTML = '';
+    if (!E.estados.length) {
+      caja.innerHTML = '<div class="vacio">No hay ningún estado. Añade el primero aquí arriba.</div>';
+      return;
+    }
+    E.estados.forEach(function (nombre, i) {
+      var f = document.createElement('div');
+      f.className = 'fila-tipo';
+      f.innerHTML = '<span class="marca-estado ' + colorEstado(nombre) + '">' +
+                    U.escapar(nombre) + '</span>' +
+                    '<span class="nombre-tipo suave">' + cuantosCon(nombre) + '</span>';
+
+      var subir = document.createElement('button');
+      subir.className = 'boton';
+      subir.textContent = '▲';
+      subir.title = 'Subirlo un puesto';
+      subir.disabled = (i === 0);
+      subir.onclick = function () { moverEstado(i, -1); };
+      f.appendChild(subir);
+
+      var bajar = document.createElement('button');
+      bajar.className = 'boton';
+      bajar.textContent = '▼';
+      bajar.title = 'Bajarlo un puesto';
+      bajar.disabled = (i === E.estados.length - 1);
+      bajar.onclick = function () { moverEstado(i, 1); };
+      f.appendChild(bajar);
+
+      var editar = document.createElement('button');
+      editar.className = 'boton';
+      editar.textContent = 'Cambiar el nombre';
+      editar.onclick = function () { renombrarEstado(nombre); };
+      f.appendChild(editar);
+
+      var quitar = document.createElement('button');
+      quitar.className = 'boton boton-peligro';
+      quitar.textContent = 'Quitar';
+      quitar.onclick = function () { quitarEstado(nombre); };
+      f.appendChild(quitar);
+
+      caja.appendChild(f);
+    });
+  }
+
+  /* Cuántos asuntos están ahora mismo en ese estado. */
+  function contarCon(nombre) {
+    var n = 0;
+    Object.keys(E.registro.asuntos).forEach(function (k) {
+      if (E.registro.asuntos[k].situacion === nombre) n++;
+    });
+    return n;
+  }
+
+  function cuantosCon(nombre) {
+    var n = contarCon(nombre);
+    if (!n) return 'Ningún asunto';
+    return n === 1 ? '1 asunto' : n + ' asuntos';
+  }
+
+  async function moverEstado(i, salto) {
+    var j = i + salto;
+    if (j < 0 || j >= E.estados.length) return;
+    var guardado = E.estados[i];
+    E.estados[i] = E.estados[j];
+    E.estados[j] = guardado;
+    await guardarEstados();
+    pintarTablaEstados();
+    pintarFiltroEstado();
+    pintarAbiertos();
+  }
+
+  /* Al cambiarle el nombre a un estado hay que cambiarlo también en los
+     asuntos que lo tienen puesto, abiertos y archivados. */
+  async function renombrarEstado(viejo) {
+    var ok = await U.preguntar('Cambiar el nombre del estado',
+      '<label class="etiqueta">Nombre nuevo</label>' +
+      '<input id="estado-nuevo-nombre" class="campo" value="' + U.escapar(viejo) + '">' +
+      '<p class="nota">Se cambiará también en los asuntos que estén en este estado. ' +
+      'Las carpetas no se tocan: el estado no forma parte del nombre.</p>', 'Cambiar');
+    if (!ok) return;
+
+    var nuevo = U.limpiarNombre($('estado-nuevo-nombre').value).toUpperCase();
+    if (!nuevo || nuevo === viejo) return;
+    var repetido = E.estados.some(function (e) {
+      return e !== viejo && U.normalizar(e) === U.normalizar(nuevo);
+    });
+    if (repetido) { U.aviso('Ya hay otro estado con ese nombre.', 'malo'); return; }
+
+    try {
+      E.estados = E.estados.map(function (e) { return e === viejo ? nuevo : e; });
+      await guardarEstados();
+
+      await cargarRegistro();
+      var n = 0;
+      Object.keys(E.registro.asuntos).forEach(function (k) {
+        if (E.registro.asuntos[k].situacion === viejo) {
+          E.registro.asuntos[k].situacion = nuevo;
+          n++;
+        }
+      });
+      await Carpetas.guardarJson(E.gestor, FICHERO_ASUNTOS, E.registro);
+      refrescarFichas();
+
+      pintarAjustes();
+      pintarFiltroEstado();
+      pintarAbiertos();
+      U.aviso('Estado renombrado. Asuntos cambiados: ' + n + '.', 'bueno');
+    } catch (e) {
+      U.aviso('No he podido cambiarlo: ' + e.message, 'malo');
+    }
+  }
+
+  async function quitarEstado(nombre) {
+    var n = contarCon(nombre);
+    var ok = await U.preguntar('Quitar el estado',
+      '<p>Se quita <strong>' + U.escapar(nombre) + '</strong> de la lista.</p>' +
+      (n ? '<p class="nota">Hay ' + n + ' asunto' + (n === 1 ? '' : 's') +
+           ' en este estado. Se quedarán sin estado, y podrás ponerles otro.</p>'
+         : '<p class="nota">No hay ningún asunto en este estado.</p>'), 'Quitar');
+    if (!ok) return;
+
+    try {
+      E.estados = E.estados.filter(function (e) { return e !== nombre; });
+      await guardarEstados();
+
+      if (n) {
+        await cargarRegistro();
+        Object.keys(E.registro.asuntos).forEach(function (k) {
+          if (E.registro.asuntos[k].situacion === nombre) E.registro.asuntos[k].situacion = '';
+        });
+        await Carpetas.guardarJson(E.gestor, FICHERO_ASUNTOS, E.registro);
+        refrescarFichas();
+      }
+
+      pintarAjustes();
+      pintarFiltroEstado();
+      pintarAbiertos();
+      U.aviso('Estado quitado.', 'bueno');
+    } catch (e) {
+      U.aviso('No he podido quitarlo: ' + e.message, 'malo');
+    }
+  }
+
   function filaEstado(titulo, valor) {
     var d = document.createElement('div');
     d.className = 'fila-tipo';
@@ -1408,6 +1756,19 @@
     $('nuevo-tipo').value = '';
     pintarAjustes();
     U.aviso('Tipo añadido.', 'bueno');
+  };
+
+  $('btn-anadir-estado').onclick = async function () {
+    var nombre = U.limpiarNombre($('nuevo-estado').value).toUpperCase();
+    if (!nombre) return;
+    var repetido = E.estados.some(function (e) { return U.normalizar(e) === U.normalizar(nombre); });
+    if (repetido) { U.aviso('Ese estado ya está en la lista.', 'malo'); return; }
+    E.estados.push(nombre);
+    await guardarEstados();
+    $('nuevo-estado').value = '';
+    pintarTablaEstados();
+    pintarFiltroEstado();
+    U.aviso('Estado añadido.', 'bueno');
   };
 
   $('btn-anadir-tipo-doc').onclick = async function () {
