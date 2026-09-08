@@ -1,0 +1,132 @@
+/* ---------- la guía de pasos de cada tipo de asunto ----------
+
+   Se ve en tres sitios: al elegir el tipo en Nuevo asunto (solo lectura),
+   dentro de cada asunto abierto (con casillas) y en Ajustes (para
+   escribirla). Los tres comparten el aspecto de la lista. */
+
+.cuadro-medio {
+  max-width: min(820px, 96vw);
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+}
+
+.guia-lectura {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.paso-lectura {
+  border: 1px solid var(--linea);
+  border-left: 4px solid var(--azul);
+  border-radius: 8px;
+  background: var(--papel);
+  padding: 10px 14px;
+}
+
+.paso-linea {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.paso-titulo-texto { font-weight: 600; }
+
+.paso-lectura.paso-hecho { border-left-color: #1e7a46; background: var(--verde); }
+.paso-lectura.paso-hecho .paso-titulo-texto { text-decoration: line-through; opacity: .7; }
+
+.paso-numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--azul-claro);
+  color: var(--azul);
+  font-size: 12px;
+  font-weight: 700;
+  flex: none;
+}
+
+.paso-casilla { width: 16px; height: 16px; flex: none; }
+
+.paso-cuerpo-texto {
+  margin: 6px 0 0 32px;
+  color: var(--tinta-suave);
+  line-height: 1.55;
+  font-size: 14px;
+}
+.paso-cuerpo-texto p { margin: 0 0 6px; }
+.paso-cuerpo-texto ul, .paso-cuerpo-texto ol { margin: 6px 0; padding-left: 20px; }
+.paso-cuerpo-texto a { color: var(--azul); }
+
+/* La guía dentro de la pantalla de Nuevo asunto. */
+.guia-caja {
+  margin-top: 14px;
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  background: var(--fondo);
+  padding: 14px;
+}
+.guia-rotulo {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tinta-suave);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  margin-bottom: 10px;
+}
+
+/* ---------- escribir la guía ---------- */
+
+.guia-barra {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--linea);
+  margin-bottom: 12px;
+  position: sticky;
+  top: 0;
+  background: var(--papel);
+  z-index: 2;
+}
+
+.guia-enlace-fila { display: flex; gap: 6px; margin-bottom: 12px; }
+.guia-enlace-fila .campo { flex: 1; }
+
+.paso-editor {
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  background: var(--papel);
+}
+
+.paso-cabecera { display: flex; align-items: center; gap: 8px; }
+.paso-cabecera .paso-titulo { flex: 1; }
+.paso-mandos { display: flex; gap: 4px; }
+.paso-mandos .boton { padding: 6px 9px; }
+
+.paso-cuerpo {
+  margin-top: 8px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 10px 12px;
+  min-height: 72px;
+  line-height: 1.55;
+  font-size: 14px;
+  outline: none;
+}
+.paso-cuerpo:focus { border-color: var(--azul); box-shadow: 0 0 0 2px var(--azul-claro); }
+.paso-cuerpo:empty:before {
+  content: attr(data-vacio);
+  color: #9aa7b4;
+}
+.paso-cuerpo ul, .paso-cuerpo ol { margin: 6px 0; padding-left: 20px; }
+.paso-cuerpo a { color: var(--azul); }
