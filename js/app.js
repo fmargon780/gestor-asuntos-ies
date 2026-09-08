@@ -727,9 +727,11 @@
     caja.innerHTML = '';
     if (!lista.length) {
       caja.innerHTML = '<div class="vacio">' + textoVacio() + '</div>';
+      avisarALosModulos();
       return;
     }
     lista.forEach(function (a) { caja.appendChild(tarjetaAsunto(a, 'abierto')); });
+    avisarALosModulos();
   }
 
   /* Dos dibujos para que se vea de un golpe qué es cada fila:
@@ -2209,6 +2211,42 @@
     await Almacen.borrar('archivo');
     location.reload();
   };
+
+  /* ==========================================================
+     PUENTE PARA LOS MÓDULOS DE FUERA
+
+     Lo de dentro de este fichero no se ve desde otros. Este puente
+     enseña lo justo para que módulos como los avisos puedan mirar los
+     asuntos y mover la pantalla, sin tener que volver a tocar app.js
+     cada vez que se añade uno.
+     ========================================================== */
+
+  window.Gestor = {
+    /* Los asuntos abiertos tal y como están ahora en memoria. */
+    asuntos: function () { return E.listaAbiertos.slice(); },
+    tipos: function () { return E.tipos.slice(); },
+    usuario: function () { return E.usuario; },
+
+    /* Deja la lista con los asuntos que cumplan ese filtro de plazo y
+       enseña el montón del departamento, que es donde se trabaja. */
+    filtrarPorPlazo: function (valor) {
+      $('filtro-plazo').value = valor;
+      $('filtro-estado').value = '';
+      $('buscar-abiertos').value = '';
+      ir('abiertos');
+      irVista('departamento');
+    },
+
+    /* Funciones que se llaman cada vez que se repinta la lista de
+       asuntos abiertos. Los módulos se apuntan aquí. */
+    alRefrescar: []
+  };
+
+  function avisarALosModulos() {
+    (window.Gestor.alRefrescar || []).forEach(function (f) {
+      try { f(); } catch (e) { /* un módulo roto no puede tumbar la aplicación */ }
+    });
+  }
 
   /* ========================================================== */
   arrancar();
