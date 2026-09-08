@@ -342,7 +342,11 @@ var Documentos = (function () {
         break;
       }
     }
-    salida.curso = resto.trim();
+    /* Solo se admite como año académico algo con forma de año académico:
+       26-27. Lo demás que quede en el nombre no es el año, y meterlo en
+       ese campo hacía que saliera un texto cualquiera donde no toca. */
+    var mCurso = resto.match(/\b(\d{2})\s*[-\/]\s*(\d{2})\b/);
+    salida.curso = mCurso ? mCurso[1] + '-' + mCurso[2] : '';
     return salida;
   }
 
