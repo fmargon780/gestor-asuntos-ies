@@ -30,3 +30,9 @@
 @media (max-width: 900px) {
   #filtro-plazo { width: 100%; }
 }
+
+/* ---------- el aviso de lo que vence ----------
+   Va arriba de la pantalla de asuntos abiertos, antes de las tres
+   tarjetas, y solo aparece cuando hay algo que decir. */
+#panel-avisos { margin: 4px 0 18px; }
+.avisos-botones { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
