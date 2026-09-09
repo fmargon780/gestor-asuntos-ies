@@ -1,0 +1,11 @@
+/* El botón de Salir, al pie de la barra de la izquierda.
+   Va separado de Ajustes por una línea, para que no se pulse sin querer. */
+.pestana-salir {
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,.14);
+  border-radius: 0 0 8px 8px;
+  color: #a9bed4;
+}
+.pestana-salir:hover { background: rgba(255,255,255,.08); color: #fff; }
+.salir-icono { width: 18px; height: 18px; flex: 0 0 auto; }
