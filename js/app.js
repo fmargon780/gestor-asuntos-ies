@@ -2216,9 +2216,10 @@
      PUENTE PARA LOS MÓDULOS DE FUERA
 
      Lo de dentro de este fichero no se ve desde otros. Este puente
-     enseña lo justo para que módulos como los avisos puedan mirar los
-     asuntos y mover la pantalla, sin tener que volver a tocar app.js
-     cada vez que se añade uno.
+     enseña lo justo para que módulos como los avisos o los asuntos que
+     se repiten puedan mirar los asuntos, crear carpetas y mover la
+     pantalla, sin tener que volver a tocar app.js cada vez que se
+     añade uno.
      ========================================================== */
 
   window.Gestor = {
@@ -2236,6 +2237,19 @@
       ir('abiertos');
       irVista('departamento');
     },
+
+    /* Las dos carpetas y la de _GESTOR, para que un módulo pueda crear
+       carpetas y guardar sus propios ficheros de configuración usando
+       Carpetas, igual que hace la aplicación. */
+    carpetaAbiertos: function () { return E.abiertos; },
+    carpetaGestor: function () { return E.gestor; },
+
+    /* Apunta o cambia la ficha de un asunto en asuntos.json. */
+    anotar: function (nombre, datos) { return anotar(nombre, datos); },
+
+    /* Vuelve a leer la carpeta y repinta. Se llama después de crear
+       carpetas desde fuera. */
+    recargar: function () { return verAbiertos(); },
 
     /* Funciones que se llaman cada vez que se repinta la lista de
        asuntos abiertos. Los módulos se apuntan aquí. */
