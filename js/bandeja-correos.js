@@ -22,7 +22,8 @@
    Hay un caso que no es un asunto nuevo: la respuesta a un correo que
    salió de aquí. Como esos correos llevan por asunto el nombre de la
    carpeta, al volver se reconocen, y entonces la tarjeta ofrece
-   guardar el correo dentro de ese asunto en vez de crear otro.
+   guardar el correo dentro de ese asunto en vez de crear otro. Si ese
+   asunto ya estaba archivado, se ofrece reabrirlo.
 
    La carpeta de la bandeja se señala una vez en Ajustes. Mientras no
    se señale, este módulo no enseña nada y la aplicación funciona como
@@ -232,11 +233,11 @@
     return dentro.getDirectoryHandle(nombre);
   }
 
-  async function guardarEnAsunto(item, elAsunto) {
+  async function guardarEnAsunto(item, elAsunto, reabierto) {
     var d = item.datos;
     var destino;
     try {
-      destino = await carpetaDelAsunto(elAsunto.nombre, elAsunto.ficha);
+      destino = await carpetaDelAsunto(elAsunto.nombre, reabierto ? {} : elAsunto.ficha);
     } catch (e) {
       U.aviso('No encuentro la carpeta de ese asunto: ' + e.message, 'malo');
       return;
@@ -247,6 +248,7 @@
         'Respuesta por correo de ' +
         ((d.de && (d.de.nombre || d.de.correo)) || 'remitente desconocido') +
         ', recibida el ' + fechaLegible(d.fechaUltimo || d.fecha) + '.' +
+        (reabierto ? '\nCon este correo se ha reabierto el asunto.' : '') +
         (d.enlace ? '\nEn Gmail: ' + d.enlace : ''));
     } catch (e) { /* la nota es lo menos importante */ }
     await borrarDeLaBandeja(item);
@@ -254,6 +256,32 @@
       ? 'Guardado en ' + elAsunto.nombre + '.'
       : 'Anotado en ' + elAsunto.nombre + '.', 'bueno');
     if (window.Gestor && window.Gestor.recargar) window.Gestor.recargar();
+  }
+
+  /* Una respuesta a un asunto archivado casi siempre quiere decir que
+     la gestión ha vuelto a moverse. Se ofrece reabrirlo: la carpeta
+     vuelve a los asuntos abiertos y el correo entra ya dentro.
+
+     El reabrir es el de siempre, el mismo del botón de la pantalla de
+     Archivo, con su cuadro de confirmación. Si él cancela, la carpeta
+     no habrá llegado a los abiertos y aquí no se hace nada más: el
+     correo se queda en la bandeja. */
+  async function reabrirYGuardar(item, elAsunto) {
+    if (typeof App.reabrirAsunto !== 'function') {
+      U.aviso('Esta versión de la aplicación no sabe reabrir asuntos.', 'malo');
+      return;
+    }
+    var ficha = elAsunto.ficha || {};
+    var dentro;
+    try {
+      dentro = await Carpetas.bajar(App.E.archivo, [ficha.categoria, ficha.tercero], false);
+    } catch (e) {
+      U.aviso('No encuentro la carpeta de ese asunto en el ARCHIVO: ' + e.message, 'malo');
+      return;
+    }
+    await App.reabrirAsunto({ nombre: elAsunto.nombre, padre: dentro, ficha: ficha });
+    if (!(await Carpetas.existe(App.E.abiertos, elAsunto.nombre))) return;
+    await guardarEnAsunto(item, elAsunto, true);
   }
 
   /* ==========================================================
@@ -377,7 +405,21 @@
     var acciones = document.createElement('div');
     acciones.className = 'acciones';
 
-    if (yaEsta) {
+    if (yaEsta && estaArchivado(yaEsta.ficha)) {
+      /* Si contestan a un asunto archivado, la gestión ha vuelto a
+         moverse: lo primero que se ofrece es reabrirlo. */
+      var reabrir = document.createElement('button');
+      reabrir.className = 'boton boton-principal';
+      reabrir.textContent = 'Reabrir y guardar aquí';
+      reabrir.onclick = function () { reabrirYGuardar(item, yaEsta); };
+      acciones.appendChild(reabrir);
+
+      var soloGuardar = document.createElement('button');
+      soloGuardar.className = 'boton';
+      soloGuardar.textContent = 'Guardar sin reabrir';
+      soloGuardar.onclick = function () { guardarEnAsunto(item, yaEsta); };
+      acciones.appendChild(soloGuardar);
+    } else if (yaEsta) {
       var guardar = document.createElement('button');
       guardar.className = 'boton boton-principal';
       guardar.textContent = 'Guardar en ese asunto';
