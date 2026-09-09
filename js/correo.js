@@ -13,15 +13,23 @@
        o una versión legible. Con un botón se cambia de uno a otro.
      - CUERPO: el saludo y la despedida hechos; el medio, en blanco.
 
-   Nada de esto se guarda: es un cuadro de usar y tirar.
+   Lo único que sí queda guardado es el rastro: en cuanto se copia el
+   cuerpo o se abre la ventana de redactar, se apunta una nota en el
+   asunto diciendo a quién se le ha escrito y qué día. Así el compañero
+   ve lo que ya está hecho sin tener que preguntar. Debajo salen además
+   el botón para dejar el asunto a la espera del tercero y el
+   recordatorio de guardar el PDF del hilo en la carpeta.
    ============================================================ */
 (function () {
 
   var CENTRO = 'IES Fuente Lucena';
 
   var viendo = null;         /* el asunto que se está mirando */
+  var modoDelAsunto = 'abierto';
   var elegidos = {};         /* qué correos van marcados */
   var asuntoLargo = true;    /* true: nombre de la carpeta; false: versión legible */
+  var yaApuntado = false;    /* la nota se escribe una vez por cuadro, no una por botón */
+  var algoCambiado = false;  /* al cerrar, la ficha se repinta si se ha tocado algo */
 
   function $(id) { return document.getElementById(id); }
 
@@ -162,18 +170,114 @@
     window.location.href = url;
   }
 
+  /* ---------- el rastro que queda en el asunto ----------
+
+     Se escribe una sola vez por cada vez que se abre el cuadro: da
+     igual que se copie el cuerpo y además se abra Gmail. En un asunto
+     archivado no se escribe nada, porque sus notas ya no se tocan. */
+
+  function textoDeLaNota() {
+    var para = paraDelCuadro();
+    var asunto = $('correo-asunto') ? $('correo-asunto').value : '';
+    return 'Correo ' + (para ? 'a ' + para : 'preparado') +
+           (asunto ? ' — asunto: "' + asunto + '"' : '');
+  }
+
+  /* El estado que toca después de escribir a alguien de fuera. La lista
+     la pone el centro en Ajustes, así que no se da por hecho que exista
+     uno llamado "A LA ESPERA DEL TERCERO": se busca entre los que están
+     marcados como de espera, y de esos manda el que hable del tercero.
+     "ENVIADO A FIRMA" también es de espera, pero no es lo que pasa
+     cuando se manda un correo a una familia. */
+  function estadoDeEspera() {
+    var lista = ((App.E && App.E.estados) || []).filter(function (e) { return e.espera; });
+    if (!lista.length) return '';
+    var conTercero = lista.filter(function (e) {
+      return U.normalizar(e.nombre).indexOf('tercero') !== -1;
+    });
+    if (conTercero.length) return conTercero[0].nombre;
+    var conEspera = lista.filter(function (e) {
+      return U.normalizar(e.nombre).indexOf('espera') !== -1;
+    });
+    if (conEspera.length) return conEspera[0].nombre;
+    return lista[lista.length - 1].nombre;
+  }
+
+  async function apuntarElRastro(a) {
+    if (yaApuntado) { pintarRastro(a, ''); return; }
+    yaApuntado = true;
+
+    if (modoDelAsunto === 'archivado' || !window.Notas) {
+      pintarRastro(a, '');
+      return;
+    }
+    try {
+      await window.Notas.anadir(a, textoDeLaNota());
+      algoCambiado = true;
+      pintarRastro(a, 'Apuntado en las notas del asunto.');
+    } catch (e) {
+      pintarRastro(a, 'No he podido apuntarlo en el asunto: ' + e.message);
+    }
+  }
+
+  function pintarRastro(a, aviso) {
+    var caja = $('correo-caja');
+    if (!caja) return;
+    var sitio = $('correo-rastro');
+    if (!sitio) {
+      sitio = document.createElement('div');
+      sitio.id = 'correo-rastro';
+      sitio.className = 'aviso aviso-ambar';
+      sitio.style.marginTop = '14px';
+      caja.appendChild(sitio);
+    }
+
+    var espera = estadoDeEspera();
+    var ahora = (a.ficha && a.ficha.situacion) || '';
+    var puedeEsperar = modoDelAsunto !== 'archivado' && espera && ahora !== espera;
+
+    sitio.innerHTML = '<strong>' + U.escapar(aviso || 'Rastro del correo') + '</strong>' +
+      '<p>Acuérdate de guardar el PDF del hilo en la carpeta del asunto, ' +
+      'con el botón "Gestionar documentos".</p>';
+
+    if (!puedeEsperar) return;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'boton';
+    b.style.marginTop = '8px';
+    b.textContent = 'Poner el asunto en ' + espera;
+    b.onclick = async function () {
+      b.disabled = true;
+      try {
+        await App.ponerEstado(a, espera);
+        if (a.ficha) a.ficha.situacion = espera;
+        algoCambiado = true;
+        b.textContent = 'Hecho: ' + espera;
+      } catch (e) {
+        b.disabled = false;
+        U.aviso('No he podido cambiar el estado: ' + e.message, 'malo');
+      }
+    };
+    sitio.appendChild(b);
+  }
+
   /* ---------- el cuadro ---------- */
 
   async function abrirCuadro(a) {
     viendo = a;
     elegidos = {};
     asuntoLargo = true;
+    yaApuntado = false;
+    algoCambiado = false;
     var esperar = U.preguntar('Correo de este asunto',
       '<div id="correo-caja"><p class="explica">Preparando…</p></div>', 'Cerrar', true);
     var persona = null;
     try { persona = await buscarPersona(a); } catch (e) { persona = null; }
     pintarCuadro(a, persona);
     await esperar;
+    /* Si se ha apuntado la nota o cambiado el estado, la ficha que hay
+       detrás se ha quedado vieja: se vuelve a abrir. */
+    if (algoCambiado) App.abrirFicha(a, modoDelAsunto);
   }
 
   function pintarCuadro(a, persona) {
@@ -243,9 +347,15 @@
 
     $('correo-copiar-para').onclick = function () { copiar(paraDelCuadro(), this); };
     $('correo-copiar-asunto').onclick = function () { copiar($('correo-asunto').value, this); };
-    $('correo-copiar-cuerpo').onclick = function () { copiar($('correo-cuerpo-texto').value, this); };
-    $('correo-gmail').onclick = abrirGmail;
-    $('correo-ordenador').onclick = abrirDelOrdenador;
+
+    /* Estos tres son los que quieren decir "esto ya va para fuera", y
+       por eso son los que dejan rastro en el asunto. */
+    $('correo-copiar-cuerpo').onclick = function () {
+      copiar($('correo-cuerpo-texto').value, this);
+      apuntarElRastro(a);
+    };
+    $('correo-gmail').onclick = function () { abrirGmail(); apuntarElRastro(a); };
+    $('correo-ordenador').onclick = function () { abrirDelOrdenador(); apuntarElRastro(a); };
   }
 
   /* ---------- el botón dentro de la ficha del asunto ---------- */
@@ -257,6 +367,7 @@
 
     App.abrirFicha = function (a, modo) {
       actual = a;
+      modoDelAsunto = modo || 'abierto';
       comoEra(a, modo);
       poner();
     };
