@@ -177,6 +177,18 @@
     await window.Gestor.recargar();
   }
 
+  /* ---------- lo que se deja a la vista ----------
+
+     La ficha del asunto enseña las notas dentro de la pantalla, sin
+     ventana. Para no escribir dos veces lo mismo, usa estas piezas. */
+  window.Notas = {
+    de: notasDe,
+    frescas: notasFrescas,
+    anadir: anadirNota,
+    pintar: pintarLista,
+    cuando: cuando
+  };
+
   /* ---------- arranque ---------- */
 
   function enganchar() {
