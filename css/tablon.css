@@ -1,0 +1,108 @@
+/* ============================================================
+   tablon.css — el tablón de notas rápidas, a la derecha de los
+   asuntos abiertos.
+   ============================================================ */
+
+/* La pantalla pasa a tener dos columnas: los asuntos a la izquierda y
+   el tablón a la derecha. Las filas van sin separación para que las
+   piezas de la izquierda queden como estaban. */
+#pantalla-abiertos.con-tablon {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  column-gap: 24px;
+  row-gap: 0;
+  align-items: start;
+}
+#pantalla-abiertos.con-tablon > * { grid-column: 1; min-width: 0; }
+#pantalla-abiertos.con-tablon > #tablon {
+  grid-column: 2;
+  grid-row: 1 / span 30;
+  align-self: start;
+  position: sticky;
+  top: 22px;
+}
+
+#tablon {
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 14px 15px 16px;
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
+}
+
+.tablon-cabecera {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 10px;
+}
+.tablon-titulo { font-weight: 600; font-size: 16px; }
+
+/* ---------- escribir una nota ---------- */
+
+.tablon-nueva { margin-bottom: 14px; }
+.tablon-nueva textarea { resize: vertical; font-size: 14px; }
+.tablon-fila {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin-top: 8px;
+}
+.tablon-colores { display: flex; gap: 6px; }
+.tablon-color {
+  width: 20px; height: 20px; padding: 0;
+  border: 1px solid rgba(0,0,0,.18); border-radius: 50%;
+  cursor: pointer; background: #fff;
+}
+.tablon-color.elegido { box-shadow: 0 0 0 2px var(--azul); }
+.tablon-fecha { width: 145px; font-size: 13px; padding: 6px 8px; }
+.tablon-pegar { width: 100%; margin-top: 8px; padding: 8px; }
+
+.tablon-vacio {
+  color: var(--tinta-suave); font-size: 13px; line-height: 1.5;
+  border: 1px dashed var(--linea); border-radius: 8px;
+  padding: 14px; text-align: center;
+}
+
+.tablon-ver-hechas { display: block; margin: 12px auto 0; font-size: 13px; }
+
+/* ---------- cada papel ---------- */
+
+.papel {
+  border: 1px solid; border-radius: 8px;
+  padding: 10px 12px; margin-bottom: 10px;
+  box-shadow: 0 1px 2px rgba(20,30,45,.08);
+  font-size: 14px; line-height: 1.45;
+}
+.color-amarillo { background: #fff7cc; border-color: #e3d074; }
+.color-azul     { background: #e3f0fb; border-color: #a9c9e6; }
+.color-verde    { background: #e4f6e9; border-color: #a7d8b8; }
+.color-rosa     { background: #fde8ee; border-color: #f0b8c8; }
+
+.tablon-color.color-amarillo { background: #fff7cc; }
+.tablon-color.color-azul     { background: #e3f0fb; }
+.tablon-color.color-verde    { background: #e4f6e9; }
+.tablon-color.color-rosa     { background: #fde8ee; }
+
+.papel-texto { white-space: pre-wrap; word-break: break-word; }
+.papel-pie { color: #6b6650; font-size: 12px; margin-top: 6px; }
+
+.papel-fecha {
+  display: inline-block; margin-bottom: 5px;
+  background: rgba(255,255,255,.7); border: 1px solid rgba(0,0,0,.12);
+  border-radius: 20px; padding: 1px 9px; font-size: 12px; font-weight: 600;
+}
+.papel-hoy { background: var(--azul); border-color: var(--azul); color: #fff; }
+.papel-atrasada { background: var(--rojo-linea); border-color: var(--rojo-linea); color: #fff; }
+
+.papel-hecha { opacity: .62; }
+.papel-hecha .papel-texto { text-decoration: line-through; }
+
+.papel-botones { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.papel-boton { padding: 3px 7px; font-size: 11.5px; border-radius: 6px; }
+
+/* En pantalla estrecha el tablón se va abajo, a lo ancho. */
+@media (max-width: 1100px) {
+  #pantalla-abiertos.con-tablon { display: block; }
+  #pantalla-abiertos.con-tablon > #tablon {
+    position: static; max-height: none; margin-top: 24px;
+  }
+}
