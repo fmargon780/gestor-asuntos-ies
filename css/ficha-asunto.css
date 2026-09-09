@@ -1,0 +1,57 @@
+/* ============================================================
+   ficha-asunto.css — el aspecto de la pantalla de un asunto.
+   ============================================================ */
+
+/* El nombre del asunto, en la lista, se pulsa para entrar. */
+.nombre-pulsable { cursor: pointer; }
+.nombre-pulsable:hover { text-decoration: underline; }
+
+.ficha-cabecera { margin-bottom: 16px; }
+.ficha-marcas { margin: 12px 0 4px; }
+.ficha-nombre {
+  margin: 0; font-size: 20px; line-height: 1.35; word-break: break-word;
+}
+
+/* La barra de botones, debajo del nombre. */
+.ficha-acciones {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  padding: 12px 0 18px; border-bottom: 1px solid var(--linea); margin-bottom: 18px;
+}
+.ficha-acciones .campo-estado { width: auto; min-width: 180px; }
+
+/* Dos columnas: a la izquierda lo que se trabaja (guía y notas), a la
+   derecha lo que se consulta (datos, contacto y documentos). */
+.ficha-columnas {
+  display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 20px; align-items: start;
+}
+.ficha-izquierda, .ficha-derecha { display: flex; flex-direction: column; gap: 16px; }
+
+.ficha-bloque {
+  background: var(--papel); border: 1px solid var(--linea);
+  border-radius: var(--radio); padding: 16px 18px; box-shadow: var(--sombra);
+}
+.ficha-titulo { margin: 0 0 10px; font-size: 15px; }
+.ficha-bloque .explica { margin: 0; }
+
+.ficha-datos { display: flex; flex-direction: column; }
+.ficha-datos .ficha-dato {
+  display: grid; grid-template-columns: 150px 1fr; gap: 10px;
+  padding: 5px 0; border-bottom: 1px solid #f0f3f7; font-size: 14px;
+}
+.ficha-datos .ficha-dato:last-child { border-bottom: 0; }
+.ficha-datos .ficha-dato span:first-child { color: var(--tinta-suave); }
+.ficha-datos .ficha-dato span:last-child { word-break: break-word; }
+
+.ficha-persona-nombre { margin: 0 0 8px; font-size: 15px; }
+
+.ficha-documentos { display: flex; flex-direction: column; gap: 6px; }
+.ficha-documento {
+  border: 1px solid var(--linea); border-radius: 8px; padding: 7px 11px;
+  font-size: 13px; word-break: break-word;
+}
+
+@media (max-width: 1000px) {
+  .ficha-columnas { grid-template-columns: 1fr; }
+  .ficha-datos .ficha-dato { grid-template-columns: 1fr; gap: 0; }
+}
