@@ -19,6 +19,11 @@
    en la carpeta recién creada, se apunta una nota con el remitente, y
    el correo desaparece de la bandeja.
 
+   Hay un caso que no es un asunto nuevo: la respuesta a un correo que
+   salió de aquí. Como esos correos llevan por asunto el nombre de la
+   carpeta, al volver se reconocen, y entonces la tarjeta ofrece
+   guardar el correo dentro de ese asunto en vez de crear otro.
+
    La carpeta de la bandeja se señala una vez en Ajustes. Mientras no
    se señale, este módulo no enseña nada y la aplicación funciona como
    siempre.
@@ -179,6 +184,79 @@
   }
 
   /* ==========================================================
+     ¿ES LA RESPUESTA DE UN ASUNTO QUE YA EXISTE?
+
+     Los correos que se mandan desde la aplicación llevan por asunto el
+     nombre de la carpeta. Cuando el tercero contesta, ese nombre vuelve
+     dentro del "Re:". Si no se mirara, la bandeja propondría crear otra
+     carpeta para la misma gestión, con la fecha de hoy, y nadie se
+     daría cuenta.
+
+     Se mira contra asuntos.json, que tiene todos: los abiertos y los ya
+     archivados.
+     ========================================================== */
+
+  function sinElRe(texto) {
+    var t = String(texto || '');
+    var antes;
+    do { antes = t; t = t.replace(/^\s*(re|rv|fwd|fw)\s*:\s*/i, ''); } while (t !== antes);
+    return t;
+  }
+
+  function asuntoQueYaExiste(datos) {
+    var registro = (App.E.registro && App.E.registro.asuntos) || {};
+    var titulo = U.normalizar(sinElRe(datos.asunto));
+    if (titulo.length < 12) return null;
+    var mejor = null;
+    Object.keys(registro).forEach(function (nombre) {
+      var n = U.normalizar(nombre);
+      if (n.length < 12) return;
+      if (titulo.indexOf(n) === -1) return;
+      if (!mejor || n.length > U.normalizar(mejor.nombre).length) {
+        mejor = { nombre: nombre, ficha: registro[nombre] || {} };
+      }
+    });
+    return mejor;
+  }
+
+  function estaArchivado(ficha) {
+    return String((ficha && ficha.estado) || '') === 'cerrado';
+  }
+
+  /* La carpeta de un asunto que ya existe. Si está archivado, hay que
+     bajar por ARCHIVO / CATEGORÍA / TERCERO. */
+  async function carpetaDelAsunto(nombre, ficha) {
+    if (!estaArchivado(ficha)) return App.E.abiertos.getDirectoryHandle(nombre);
+    if (!App.E.archivo) throw new Error('No hay carpeta de ARCHIVO señalada.');
+    var dentro = await Carpetas.bajar(App.E.archivo, [ficha.categoria, ficha.tercero], false);
+    return dentro.getDirectoryHandle(nombre);
+  }
+
+  async function guardarEnAsunto(item, elAsunto) {
+    var d = item.datos;
+    var destino;
+    try {
+      destino = await carpetaDelAsunto(elAsunto.nombre, elAsunto.ficha);
+    } catch (e) {
+      U.aviso('No encuentro la carpeta de ese asunto: ' + e.message, 'malo');
+      return;
+    }
+    var metidos = await meterLosFicheros(d, destino);
+    try {
+      await window.Notas.anadir({ nombre: elAsunto.nombre, ficha: {} },
+        'Respuesta por correo de ' +
+        ((d.de && (d.de.nombre || d.de.correo)) || 'remitente desconocido') +
+        ', recibida el ' + fechaLegible(d.fechaUltimo || d.fecha) + '.' +
+        (d.enlace ? '\nEn Gmail: ' + d.enlace : ''));
+    } catch (e) { /* la nota es lo menos importante */ }
+    await borrarDeLaBandeja(item);
+    U.aviso(metidos
+      ? 'Guardado en ' + elAsunto.nombre + '.'
+      : 'Anotado en ' + elAsunto.nombre + '.', 'bueno');
+    if (window.Gestor && window.Gestor.recargar) window.Gestor.recargar();
+  }
+
+  /* ==========================================================
      LA BANDEJA EN PANTALLA
      ========================================================== */
 
@@ -271,27 +349,45 @@
         '<div class="tarjeta-pie propuesta-correo"></div>' +
       '</div>';
 
-    /* La propuesta se calcula al pintar, sin esperar: primero sale la
-       tarjeta y un momento después lo que se ha reconocido. */
-    proponer(d).then(function (p) {
-      var linea = div.querySelector('.propuesta-correo');
-      if (!linea) return;
-      if (!p.tercero && !p.tipo) {
-        linea.textContent = 'Sin reconocer: elegirás tú el tercero y el tipo.';
-        return;
-      }
-      var trozos = [];
-      if (p.tipo) trozos.push(p.tipo.tipo);
-      if (p.tercero) trozos.push(App.textoTercero(p.tercero));
-      linea.innerHTML = '<span class="marca-tipo">Propuesta</span>' + U.escapar(trozos.join('  ·  '));
-    }).catch(function () {});
+    /* Si el asunto del correo lleva dentro el nombre de un asunto que
+       ya existe, es una respuesta: no hay que crear nada nuevo. */
+    var yaEsta = asuntoQueYaExiste(d);
+    var linea = div.querySelector('.propuesta-correo');
+
+    if (yaEsta) {
+      linea.innerHTML = '<span class="marca-tipo">Respuesta de</span>' +
+        U.escapar(yaEsta.nombre) +
+        (estaArchivado(yaEsta.ficha) ? '  ·  <strong>asunto archivado</strong>' : '');
+    } else {
+      /* La propuesta se calcula al pintar, sin esperar: primero sale la
+         tarjeta y un momento después lo que se ha reconocido. */
+      proponer(d).then(function (p) {
+        if (!linea) return;
+        if (!p.tercero && !p.tipo) {
+          linea.textContent = 'Sin reconocer: elegirás tú el tercero y el tipo.';
+          return;
+        }
+        var trozos = [];
+        if (p.tipo) trozos.push(p.tipo.tipo);
+        if (p.tercero) trozos.push(App.textoTercero(p.tercero));
+        linea.innerHTML = '<span class="marca-tipo">Propuesta</span>' + U.escapar(trozos.join('  ·  '));
+      }).catch(function () {});
+    }
 
     var acciones = document.createElement('div');
     acciones.className = 'acciones';
 
+    if (yaEsta) {
+      var guardar = document.createElement('button');
+      guardar.className = 'boton boton-principal';
+      guardar.textContent = 'Guardar en ese asunto';
+      guardar.onclick = function () { guardarEnAsunto(item, yaEsta); };
+      acciones.appendChild(guardar);
+    }
+
     var crear = document.createElement('button');
-    crear.className = 'boton boton-principal';
-    crear.textContent = 'Crear el asunto';
+    crear.className = 'boton' + (yaEsta ? '' : ' boton-principal');
+    crear.textContent = yaEsta ? 'Crear uno nuevo' : 'Crear el asunto';
     crear.onclick = function () { llevarANuevo(item); };
     acciones.appendChild(crear);
 
@@ -399,23 +495,47 @@
     return nombre.indexOf(p) === 0 ? nombre.slice(p.length) : nombre;
   }
 
-  async function engancharCorreo(item, nombreAsunto) {
-    var d = item.datos;
-    var destino = await App.E.abiertos.getDirectoryHandle(nombreAsunto);
-    var metidos = 0;
+  /* Un nombre que no pise a otro. En un asunto con varios correos, el
+     segundo PDF del mismo día sería "260907 CORREO (2).pdf". */
+  async function nombreLibre(destino, nombre) {
+    var punto = nombre.lastIndexOf('.');
+    var tronco = punto > 0 ? nombre.slice(0, punto) : nombre;
+    var extension = punto > 0 ? nombre.slice(punto) : '';
+    var intento = nombre;
+    for (var n = 2; n < 50; n++) {
+      try {
+        await destino.getFileHandle(intento);
+      } catch (e) {
+        return intento;          /* no existe: está libre */
+      }
+      intento = tronco + ' (' + n + ')' + extension;
+    }
+    return intento;
+  }
 
+  async function meterLosFicheros(d, destino) {
+    var metidos = 0;
     if (d.pdf) {
       try {
-        await copiarALaCarpeta(d.pdf, destino, U.aAaMmDd(d.fecha) + ' CORREO.pdf');
+        var comoPdf = await nombreLibre(destino, U.aAaMmDd(d.fechaUltimo || d.fecha) + ' CORREO.pdf');
+        await copiarALaCarpeta(d.pdf, destino, comoPdf);
         metidos++;
       } catch (e) { U.aviso('El PDF del correo no ha podido entrar: ' + e.message, 'malo'); }
     }
     for (var i = 0; i < (d.adjuntos || []).length; i++) {
       try {
-        await copiarALaCarpeta(d.adjuntos[i], destino, sinElId(d.adjuntos[i], d.id));
+        var suyo = await nombreLibre(destino, sinElId(d.adjuntos[i], d.id));
+        await copiarALaCarpeta(d.adjuntos[i], destino, suyo);
         metidos++;
       } catch (e) { /* un adjunto que falle no puede parar lo demás */ }
     }
+    return metidos;
+  }
+
+  async function engancharCorreo(item, nombreAsunto) {
+    var d = item.datos;
+    var destino = await App.E.abiertos.getDirectoryHandle(nombreAsunto);
+    var metidos = await meterLosFicheros(d, destino);
 
     try {
       var texto = 'Abierto desde un correo de ' +
