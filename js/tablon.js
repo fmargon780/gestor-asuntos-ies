@@ -14,6 +14,11 @@
    asuntos abiertos: las ve el compañero desde su ordenador, igual que
    los asuntos. Antes de escribir se vuelve a leer el fichero, para no
    pisar lo que él haya puesto mientras tanto.
+
+   Una nota puede marcarse "Solo para mí": entonces sale únicamente en
+   el tablón de quien la escribió. No es un secreto —el fichero está en
+   la carpeta compartida y quien lo abra la leería—, es para no llenarle
+   el tablón al otro de recordatorios que no son suyos.
    ============================================================ */
 (function () {
 
@@ -26,6 +31,7 @@
   var verHechas = false;
   var editando = '';        /* el id de la nota que se está cambiando */
   var colorElegido = 'amarillo';
+  var soloParaMi = false;   /* cómo nacerá la próxima nota */
   var fallo = '';           /* lo último que ha ido mal al leer o escribir */
 
   function $(id) { return document.getElementById(id); }
@@ -42,6 +48,7 @@
         autor: String(n.autor || ''),
         creado: String(n.creado || ''),
         para: /^\d{4}-\d{2}-\d{2}$/.test(n.para || '') ? n.para : '',
+        privada: !!n.privada,
         hecha: !!n.hecha,
         hechaPor: String(n.hechaPor || ''),
         hechaEl: String(n.hechaEl || '')
@@ -71,6 +78,20 @@
     } catch (e) {
       U.aviso('No he podido guardar la nota: ' + e.message, 'malo');
     }
+  }
+
+  /* ---------- quién soy, y qué notas veo ----------
+
+     Una nota privada es de quien la escribió. Se comparan los nombres
+     con los que se entra en la aplicación, sin mayúsculas ni tildes. */
+
+  function quienSoy() {
+    return (window.Gestor && window.Gestor.usuario && window.Gestor.usuario()) || '';
+  }
+
+  function laVeo(n) {
+    if (!n.privada) return true;
+    return U.normalizar(n.autor) === U.normalizar(quienSoy());
   }
 
   /* ---------- fechas ---------- */
@@ -134,8 +155,10 @@
     var escrito = $('tablon-texto') ? $('tablon-texto').value : '';
     var fechaPuesta = $('tablon-para') ? $('tablon-para').value : '';
 
-    var pendientes = ordenar(notas.filter(function (n) { return !n.hecha; }));
-    var hechas = notas.filter(function (n) { return n.hecha; });
+    /* Las notas privadas de otro no salen aquí. */
+    var mias = notas.filter(laVeo);
+    var pendientes = ordenar(mias.filter(function (n) { return !n.hecha; }));
+    var hechas = mias.filter(function (n) { return n.hecha; });
 
     c.innerHTML = '';
     c.appendChild(cabecera(pendientes.length));
@@ -179,6 +202,26 @@
 
   /* ---------- escribir una nota ---------- */
 
+  /* La casilla de "Solo para mí". Se usa en dos sitios: al escribir una
+     nota nueva y al cambiar una que ya está puesta. */
+  function casillaSoloParaMi(id, marcada, alCambiar) {
+    var etiqueta = document.createElement('label');
+    etiqueta.className = 'tablon-solo-mia';
+    etiqueta.title = 'La verás solo tú, en este tablón';
+
+    var casilla = document.createElement('input');
+    casilla.type = 'checkbox';
+    casilla.id = id;
+    casilla.checked = !!marcada;
+    if (alCambiar) casilla.onchange = function () { alCambiar(casilla.checked); };
+    etiqueta.appendChild(casilla);
+
+    var texto = document.createElement('span');
+    texto.textContent = 'Solo para mí';
+    etiqueta.appendChild(texto);
+    return etiqueta;
+  }
+
   function formulario(escrito, fechaPuesta) {
     var caja = document.createElement('div');
     caja.className = 'tablon-nueva';
@@ -216,6 +259,10 @@
 
     caja.appendChild(fila);
 
+    caja.appendChild(casillaSoloParaMi('tablon-solo-mia', soloParaMi, function (valor) {
+      soloParaMi = valor;
+    }));
+
     var pegar = document.createElement('button');
     pegar.type = 'button';
     pegar.className = 'boton boton-principal tablon-pegar';
@@ -234,14 +281,15 @@
     var texto = (campo.value || '').trim();
     if (!texto) { campo.focus(); return; }
     var para = $('tablon-para').value || '';
-    var quien = (window.Gestor && window.Gestor.usuario && window.Gestor.usuario()) || '';
+    var quien = quienSoy();
+    var privada = soloParaMi;
     campo.value = '';
     $('tablon-para').value = '';
     cambiar(function (lista) {
       lista.push({
         id: 'n' + Date.now() + Math.floor(Math.random() * 1000),
         texto: texto, color: colorElegido, autor: quien,
-        creado: new Date().toISOString(), para: para,
+        creado: new Date().toISOString(), para: para, privada: privada,
         hecha: false, hechaPor: '', hechaEl: ''
       });
       return lista;
@@ -261,20 +309,41 @@
       campo.value = n.texto;
       d.appendChild(campo);
 
+      var casilla = casillaSoloParaMi('papel-solo-mia', n.privada);
+      d.appendChild(casilla);
+
       var botones = document.createElement('div');
       botones.className = 'papel-botones';
       botones.appendChild(boton('Guardar', function () {
         var nuevo = (campo.value || '').trim();
+        var privadaAhora = !!casilla.querySelector('input').checked;
         editando = '';
         if (!nuevo) { pintar(); return; }
         cambiar(function (lista) {
-          lista.forEach(function (x) { if (x.id === n.id) x.texto = nuevo; });
+          lista.forEach(function (x) {
+            if (x.id !== n.id) return;
+            x.texto = nuevo;
+            x.privada = privadaAhora;
+            /* Una nota se hace privada para su autor. Si la escribió el
+               compañero y la escondes tú, dejarías de verla sin poder
+               volver atrás, así que pasa a ser tuya. */
+            if (privadaAhora && U.normalizar(x.autor) !== U.normalizar(quienSoy())) {
+              x.autor = quienSoy();
+            }
+          });
           return lista;
         });
       }, true));
       botones.appendChild(boton('Dejarlo', function () { editando = ''; pintar(); }));
       d.appendChild(botones);
       return d;
+    }
+
+    if (n.privada) {
+      var candado = document.createElement('span');
+      candado.className = 'papel-privada';
+      candado.textContent = 'Solo para mí';
+      d.appendChild(candado);
     }
 
     if (n.para) {
@@ -304,7 +373,7 @@
 
     if (!n.hecha) {
       botones.appendChild(boton('Hecha', function () {
-        var quien = (window.Gestor && window.Gestor.usuario && window.Gestor.usuario()) || '';
+        var quien = quienSoy();
         cambiar(function (lista) {
           lista.forEach(function (x) {
             if (x.id !== n.id) return;
@@ -330,7 +399,9 @@
     botones.appendChild(boton('Borrar', async function () {
       var ok = await U.preguntar('Borrar la nota',
         '<p class="explica">' + U.escapar(n.texto) + '</p>' +
-        '<p class="nota">Se borra para todos, y no se puede recuperar.</p>', 'Borrar');
+        '<p class="nota">' + (n.privada
+          ? 'Es una nota tuya. No se puede recuperar.'
+          : 'Se borra para todos, y no se puede recuperar.') + '</p>', 'Borrar');
       if (!ok) return;
       cambiar(function (lista) {
         return lista.filter(function (x) { return x.id !== n.id; });
@@ -379,8 +450,11 @@
     }
   }
 
+  var enganchado = false;
+
   function enganchar() {
-    if (!window.Gestor) return;
+    if (enganchado || !window.Gestor) return;
+    enganchado = true;
     window.Gestor.alRefrescar.push(function () {
       if (!window.Gestor.carpetaGestor()) return;
       if (!arrancado) { arrancado = true; refrescar(); return; }
@@ -393,9 +467,9 @@
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', enganchar);
-  } else {
-    enganchar();
-  }
+  /* El puente ya está puesto cuando se carga este fichero. Por si algún
+     día cambiara el orden, se reintenta al terminar la página. */
+  enganchar();
+  if (!enganchado) document.addEventListener('DOMContentLoaded', enganchar);
+
 })();

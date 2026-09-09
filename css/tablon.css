@@ -64,6 +64,23 @@
 
 .tablon-ver-hechas { display: block; margin: 12px auto 0; font-size: 13px; }
 
+/* ---------- la nota que solo ve quien la escribió ---------- */
+
+.tablon-solo-mia {
+  display: flex; align-items: center; gap: 7px;
+  margin-top: 9px; font-size: 13px; color: var(--tinta-suave);
+  cursor: pointer;
+}
+.tablon-solo-mia input { width: 15px; height: 15px; cursor: pointer; }
+.papel .tablon-solo-mia { margin: 8px 0 0; color: #6b6650; }
+
+.papel-privada {
+  display: inline-block; margin: 0 6px 5px 0;
+  background: rgba(255,255,255,.7); border: 1px dashed rgba(0,0,0,.25);
+  border-radius: 20px; padding: 1px 9px; font-size: 12px; font-weight: 600;
+  color: #6b6650;
+}
+
 /* ---------- cada papel ---------- */
 
 .papel {
