@@ -19,10 +19,20 @@
    sello del registro sin abrir nada aparte. Se enseña a todo el
    ancho de su columna, y con el botón "Ver más grande" ocupa
    toda la ventana.
+
+   Si el tipo de documento que hace falta no está en la lista, se crea
+   aquí mismo, sin salir del cuadro. Antes de crearlo se mira si ya hay
+   uno que se le parezca aunque esté escrito de otra manera: mayúsculas,
+   tildes, espacios, guiones, puntos o el plural. Así la lista no se
+   llena de dos nombres para la misma cosa.
    ============================================================ */
 var Documentos = (function () {
 
-  var ctx = { tipos: function () { return []; }, curso: function () { return ''; } };
+  var ctx = {
+    tipos: function () { return []; },
+    curso: function () { return ''; },
+    crearTipo: null            /* lo pone nucleo.js: guarda el tipo nuevo en _GESTOR */
+  };
   var asuntoActual = null;
   var urlVisor = null;   /* la dirección temporal del documento que se está viendo */
 
@@ -85,6 +95,8 @@ var Documentos = (function () {
       html += '<div class="lista-documentos">' + lista.map(function (f, i) {
         return '<div class="fila-documento">' +
                  '<span class="nombre-documento">' + U.escapar(f.nombre) + '</span>' +
+                 '<button type="button" class="boton" data-copiar="' + i + '" ' +
+                   'title="Copiar el nombre del documento, sin la extensión">Copiar nombre</button>' +
                  '<button type="button" class="boton" data-renombrar="' + i + '">Poner nombre</button>' +
                '</div>';
       }).join('') + '</div>';
@@ -94,6 +106,22 @@ var Documentos = (function () {
             'Añadir documento</button>';
 
     caja.innerHTML = html;
+
+    /* El nombre, sin la extensión, para pegarlo en el registro de Séneca
+       o en un correo. */
+    Array.prototype.forEach.call(caja.querySelectorAll('[data-copiar]'), function (b) {
+      b.onclick = function () {
+        var f = lista[Number(b.dataset.copiar)];
+        var sinExtension = String(f.nombre).replace(/\.[A-Za-z0-9]{1,8}$/, '');
+        navigator.clipboard.writeText(sinExtension).then(function () {
+          var antes = b.textContent;
+          b.textContent = 'Copiado';
+          setTimeout(function () { b.textContent = antes; }, 1400);
+        }).catch(function () {
+          U.aviso('No he podido copiarlo.', 'malo');
+        });
+      };
+    });
 
     Array.prototype.forEach.call(caja.querySelectorAll('[data-renombrar]'), function (b) {
       b.onclick = function () {
@@ -115,6 +143,12 @@ var Documentos = (function () {
   /* ---------- el formulario del nombre ---------- */
 
   var ultimasOpciones = null;
+  var ultimoTipo = '';       /* el tipo elegido antes de abrir el cuadro de crear uno */
+
+  /* El valor de la opción que abre el cuadro de crear un tipo nuevo.
+     No es un tipo: son dos guiones bajos a cada lado para que no pueda
+     coincidir nunca con uno de verdad. */
+  var TIPO_NUEVO = '__nuevo__';
 
   async function pintarFormulario(opciones) {
     var caja = $('doc-cuerpo');
@@ -132,7 +166,6 @@ var Documentos = (function () {
                         : '<p class="explica">No he podido abrir el documento para verlo.</p>';
 
     var previo = leerNombre(opciones.nombreActual);
-    var tipos = ctx.tipos();
     var hoy = U.hoyIso();
     var fecha = previo.fecha || hoy;
     var curso = previo.curso || ctx.curso(fecha);
@@ -172,13 +205,7 @@ var Documentos = (function () {
       '</div>' +
 
       '<label class="etiqueta">Tipo de documento</label>' +
-      '<select id="doc-tipo" class="campo">' +
-        tipos.map(function (t) {
-          return '<option value="' + U.escapar(t) + '"' +
-                 (U.normalizar(t) === U.normalizar(previo.tipo) ? ' selected' : '') + '>' +
-                 U.escapar(t) + '</option>';
-        }).join('') +
-      '</select>' +
+      '<select id="doc-tipo" class="campo">' + opcionesDeTipo(previo.tipo) + '</select>' +
 
       '<label class="interruptor">' +
         '<input type="checkbox" id="doc-hay-registro"' + (previo.registro ? ' checked' : '') + '>' +
@@ -226,6 +253,17 @@ var Documentos = (function () {
 
       '</div></div>';
 
+    /* La última opción de la lista de tipos no es un tipo: abre el cuadro
+       de crear uno. Se engancha antes que el refresco general para que la
+       vista previa no llegue a enseñar el nombre postizo. */
+    ultimoTipo = $('doc-tipo').value;
+    $('doc-tipo').addEventListener('change', function () {
+      var sel = $('doc-tipo');
+      if (sel.value !== TIPO_NUEVO) { ultimoTipo = sel.value; return; }
+      sel.value = ultimoTipo || (ctx.tipos()[0] || '');
+      abrirCuadroDeTipoNuevo();
+    });
+
     /* refrescar la vista previa con cualquier cambio */
     Array.prototype.forEach.call(caja.querySelectorAll('input, select'), function (c) {
       c.oninput = refrescar;
@@ -256,6 +294,207 @@ var Documentos = (function () {
     refrescar();
   }
 
+  /* ---------- la lista de tipos de documento ---------- */
+
+  function opcionesDeTipo(elegido) {
+    return ctx.tipos().map(function (t) {
+      return '<option value="' + U.escapar(t) + '"' +
+             (U.normalizar(t) === U.normalizar(elegido) ? ' selected' : '') + '>' +
+             U.escapar(t) + '</option>';
+    }).join('') +
+    '<option value="' + TIPO_NUEVO + '">+  Crear un tipo nuevo…</option>';
+  }
+
+  /* ---------- crear un tipo sin salir del cuadro ----------
+
+     Lo que se quiere evitar es acabar con FACTURA, Facturas y
+     FACTURA-RECTIFICATIVA conviviendo en la lista. Para eso cada nombre
+     se reduce a su hueso: sin tildes, sin mayúsculas, sin espacios ni
+     guiones ni puntos, y sin la S del plural. Dos nombres con el mismo
+     hueso son el mismo tipo escrito de dos maneras. */
+
+  function hueso(texto) {
+    return String(texto || '')
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+
+  function huesoSinPlural(texto) {
+    return hueso(texto).replace(/e?s$/, '');
+  }
+
+  /* Cuántas letras hay que cambiar para pasar de una palabra a la otra.
+     Sirve para cazar la errata: FACTURA y FCATURA están a dos. */
+  function distancia(a, b) {
+    if (a === b) return 0;
+    if (!a.length) return b.length;
+    if (!b.length) return a.length;
+    var fila = [];
+    for (var j = 0; j <= b.length; j++) fila[j] = j;
+    for (var i = 1; i <= a.length; i++) {
+      var anterior = fila[0];
+      fila[0] = i;
+      for (var k = 1; k <= b.length; k++) {
+        var guardar = fila[k];
+        fila[k] = Math.min(
+          fila[k] + 1,
+          fila[k - 1] + 1,
+          anterior + (a.charAt(i - 1) === b.charAt(k - 1) ? 0 : 1)
+        );
+        anterior = guardar;
+      }
+    }
+    return fila[b.length];
+  }
+
+  /* Los tipos de la lista que se parecen al nombre que se está
+     escribiendo. 'igual' quiere decir que es el mismo escrito de otra
+     manera, y entonces no se crea nada: se usa el que ya está. */
+  function parecidos(nombre, lista) {
+    var h = hueso(nombre);
+    var hp = huesoSinPlural(nombre);
+    if (!h) return [];
+    var salida = [];
+    (lista || []).forEach(function (t) {
+      var k = hueso(t);
+      var kp = huesoSinPlural(t);
+      if (!k) return;
+      var d = distancia(h, k);
+      var largo = Math.max(h.length, k.length);
+      var igual = (k === h) || (kp === hp);
+      var cerca = igual ||
+                  (largo >= 6 ? d <= 2 : d <= 1) ||
+                  (h.length >= 4 && k.length >= 4 && (k.indexOf(h) !== -1 || h.indexOf(k) !== -1));
+      if (cerca) salida.push({ tipo: t, igual: igual, distancia: d });
+    });
+    salida.sort(function (a, b) {
+      if (a.igual !== b.igual) return a.igual ? -1 : 1;
+      return a.distancia - b.distancia;
+    });
+    return salida;
+  }
+
+  function cerrarCuadroDeTipoNuevo() {
+    var caja = $('doc-tipo-nuevo');
+    if (caja) caja.parentNode.removeChild(caja);
+  }
+
+  function abrirCuadroDeTipoNuevo() {
+    var sel = $('doc-tipo');
+    if (!sel || $('doc-tipo-nuevo')) return;
+
+    var caja = document.createElement('div');
+    caja.id = 'doc-tipo-nuevo';
+    caja.style.cssText = 'margin:8px 0 4px;padding:10px 12px;border:1px solid #d7dee6;' +
+                         'border-radius:8px;background:#f7f9fb';
+    caja.innerHTML =
+      '<label class="etiqueta">Nombre del tipo nuevo</label>' +
+      '<input id="doc-tipo-nombre" class="campo" autocomplete="off" ' +
+        'placeholder="Por ejemplo: DILIGENCIA">' +
+      '<div id="doc-tipo-aviso" class="nota"></div>' +
+      '<div id="doc-tipo-botones" style="display:flex;gap:8px;justify-content:flex-end;' +
+        'margin-top:8px">' +
+        '<button type="button" class="boton" id="doc-tipo-cancelar">Cancelar</button>' +
+        '<button type="button" class="boton boton-principal" id="doc-tipo-crear">Crear y usar</button>' +
+      '</div>';
+    sel.parentNode.insertBefore(caja, sel.nextSibling);
+
+    $('doc-tipo-nombre').oninput = pintarAvisoDeTipo;
+    $('doc-tipo-nombre').onkeydown = function (ev) {
+      if (ev.key === 'Enter') { ev.preventDefault(); crearYUsarTipo(); }
+      if (ev.key === 'Escape') { ev.preventDefault(); cerrarCuadroDeTipoNuevo(); }
+    };
+    $('doc-tipo-cancelar').onclick = cerrarCuadroDeTipoNuevo;
+    $('doc-tipo-crear').onclick = crearYUsarTipo;
+    pintarAvisoDeTipo();
+    $('doc-tipo-nombre').focus();
+  }
+
+  function usarTipoDeLaLista(tipo) {
+    var sel = $('doc-tipo');
+    sel.value = tipo;
+    ultimoTipo = tipo;
+    cerrarCuadroDeTipoNuevo();
+    refrescar();
+  }
+
+  /* El aviso que va debajo del campo. Dice una de tres cosas: que el
+     tipo ya existe, que hay otros que se le parecen, o que se va a
+     crear. Los parecidos salen como botones: pulsarlos usa el que ya
+     está, que es lo que se quiere casi siempre. */
+  function pintarAvisoDeTipo() {
+    var campo = $('doc-tipo-nombre');
+    var aviso = $('doc-tipo-aviso');
+    var crear = $('doc-tipo-crear');
+    if (!campo || !aviso || !crear) return;
+
+    var limpio = U.limpiarNombre(campo.value).toUpperCase();
+    aviso.innerHTML = '';
+
+    function decir(texto) {
+      var p = document.createElement('div');
+      p.textContent = texto;
+      aviso.appendChild(p);
+    }
+
+    function botonUsar(tipo) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'boton';
+      b.style.margin = '6px 6px 0 0';
+      b.textContent = 'Usar ' + tipo;
+      b.onclick = function () { usarTipoDeLaLista(tipo); };
+      aviso.appendChild(b);
+    }
+
+    if (!limpio) {
+      crear.disabled = true;
+      decir('Escribe el nombre del tipo.');
+      return;
+    }
+
+    var lista = parecidos(limpio, ctx.tipos());
+    var mismo = lista.filter(function (p) { return p.igual; })[0];
+
+    if (mismo) {
+      crear.disabled = true;
+      decir('Ese tipo ya está en la lista, escrito así: ' + mismo.tipo + '.');
+      botonUsar(mismo.tipo);
+      return;
+    }
+
+    crear.disabled = false;
+    if (lista.length) {
+      decir('Ojo, hay tipos que se le parecen. Si es el mismo, usa el que ya está:');
+      lista.slice(0, 4).forEach(function (p) { botonUsar(p.tipo); });
+    } else {
+      decir('Se creará ' + limpio + ', y queda en la lista del centro para todos.');
+    }
+  }
+
+  async function crearYUsarTipo() {
+    var campo = $('doc-tipo-nombre');
+    if (!campo) return;
+    var limpio = U.limpiarNombre(campo.value).toUpperCase();
+    if (!limpio) return;
+    if (typeof ctx.crearTipo !== 'function') {
+      U.aviso('Desde aquí no se pueden crear tipos. Se crean en Ajustes.', 'malo');
+      return;
+    }
+    try {
+      await ctx.crearTipo(limpio);
+      var sel = $('doc-tipo');
+      sel.innerHTML = opcionesDeTipo(limpio);
+      sel.value = limpio;
+      ultimoTipo = limpio;
+      cerrarCuadroDeTipoNuevo();
+      refrescar();
+      U.aviso('Tipo de documento ' + limpio + ' añadido a la lista del centro.', 'bueno');
+    } catch (e) {
+      U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+    }
+  }
+
   function botonOpcion(grupo, valor, texto, marcado) {
     return '<label class="opcion"><input type="radio" name="' + grupo + '" value="' + valor + '"' +
            (marcado ? ' checked' : '') + '><span>' + texto + '</span></label>';
@@ -276,10 +515,12 @@ var Documentos = (function () {
         numero: $('doc-numero').value.trim()
       };
     }
+    var tipo = $('doc-tipo').value;
+    if (tipo === TIPO_NUEVO) tipo = ultimoTipo || '';
     return {
       fecha: $('doc-fecha').value,
       codigo: Nombres.codigoRegistro(registro),
-      tipo: $('doc-tipo').value,
+      tipo: tipo,
       curso: $('doc-curso').value.trim(),
       extension: Nombres.extensionDe(opciones.nombreActual)
     };
@@ -350,5 +591,6 @@ var Documentos = (function () {
     return salida;
   }
 
-  return { configurar: configurar, abrir: abrir, leerNombre: leerNombre };
+  return { configurar: configurar, abrir: abrir, leerNombre: leerNombre,
+           parecidos: parecidos };
 })();
