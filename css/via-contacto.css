@@ -1,0 +1,15 @@
+/* ============================================================
+   via-contacto.css — los botones con el teléfono o el correo que ya
+   están en la ficha del tercero.
+   ============================================================ */
+
+.via-sugerencias {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  margin-top: 8px;
+}
+.via-rotulo { font-size: 12px; color: var(--tinta-suave); }
+.boton.via-sugerencia {
+  padding: 4px 11px; font-size: 13px; border-radius: 20px;
+  background: var(--azul-claro); border-color: #c3d8ec; color: var(--azul);
+}
+.boton.via-sugerencia:hover { background: #dbe8f5; }
