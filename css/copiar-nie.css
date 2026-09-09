@@ -1,0 +1,24 @@
+/* ============================================================
+   copiar-nie.css — el botón que copia el Nº de identificación escolar.
+   Es un botón de los de siempre; aquí solo se afina.
+   ============================================================ */
+
+.boton-nie {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .2px;
+}
+
+/* El que va debajo del nombre, en las listas de resultados: más
+   pequeño, para que no le quite sitio al nombre. */
+.boton-nie-chico {
+  margin-left: 8px;
+  padding: 1px 8px;
+  font-size: 11px;
+  vertical-align: middle;
+}
+
+/* El de la ficha del alumno, justo debajo de su nombre. */
+.fila-nie {
+  margin: 2px 0 12px;
+}
