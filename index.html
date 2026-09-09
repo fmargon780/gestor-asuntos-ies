@@ -6,6 +6,7 @@
 <title>Gestor de Asuntos</title>
 <link rel="stylesheet" href="css/estilos.css">
 <link rel="stylesheet" href="css/plazos.css">
+<link rel="stylesheet" href="css/ajustes.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -270,7 +271,12 @@
     <section id="pantalla-ajustes" class="pantalla oculto">
       <header class="cabecera"><h2>Ajustes</h2></header>
 
-      <h3>Tipos de asunto</h3>
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Tipos de asunto</span>
+          <span class="bloque-pie">Qué gestiones existen, y los días de plazo de cada una</span>
+        </summary>
+        <div class="bloque-cuerpo">
       <p class="explica">Esta lista la comparten todos los ordenadores del centro:
          se guarda en la carpeta <code>_GESTOR</code>, dentro de la carpeta de asuntos abiertos.
          La lista de partida es una propuesta; cámbiala a vuestro gusto.
@@ -286,8 +292,15 @@
         <button id="btn-anadir-tipo" class="boton">Añadir</button>
       </div>
       <div id="tabla-tipos" class="lista"></div>
+        </div>
+      </details>
 
-      <h3>Estados del asunto</h3>
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Estados del asunto</span>
+          <span class="bloque-pie">Por dónde va la tramitación, en el orden del trámite</span>
+        </summary>
+        <div class="bloque-cuerpo">
       <p class="explica">Dicen por dónde va cada gestión: pendiente, enviado a la firma, resuelto…
          También se comparten con el resto de ordenadores. Van en el orden del trámite,
          no por orden alfabético: con las flechas los subes y los bajas.</p>
@@ -296,8 +309,15 @@
         <button id="btn-anadir-estado" class="boton">Añadir</button>
       </div>
       <div id="tabla-estados" class="lista"></div>
+        </div>
+      </details>
 
-      <h3>Tipos de documento</h3>
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Tipos de documento</span>
+          <span class="bloque-pie">Los que salen al nombrar un documento dentro de un asunto</span>
+        </summary>
+        <div class="bloque-cuerpo">
       <p class="explica">Son los que salen al poner nombre a un documento dentro de
          la carpeta de un asunto. También se comparten entre los ordenadores.</p>
       <div class="alta-tipo">
@@ -305,8 +325,15 @@
         <button id="btn-anadir-tipo-doc" class="boton">Añadir</button>
       </div>
       <div id="tabla-tipos-documento" class="lista"></div>
+        </div>
+      </details>
 
-      <h3>Asuntos que se repiten</h3>
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Asuntos que se repiten</span>
+          <span class="bloque-pie">Gestiones que vuelven cada mes, trimestre o curso</span>
+        </summary>
+        <div class="bloque-cuerpo">
       <p class="explica">Gestiones que vuelven cada mes, cada trimestre o cada curso.
          Se apuntan aquí una vez y la aplicación avisa cuando toca. La carpeta no se crea
          sola: se crea cuando pulses el botón del aviso. Esta lista se comparte con
@@ -315,8 +342,15 @@
         <button id="btn-anadir-recurrente" class="boton">+ Añadir uno</button>
       </div>
       <div id="tabla-recurrentes" class="lista"></div>
+        </div>
+      </details>
 
-      <h3>Avisos de vencimiento</h3>
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Avisos de vencimiento</span>
+          <span class="bloque-pie">Con cuánta antelación avisar de lo que vence</span>
+        </summary>
+        <div class="bloque-cuerpo">
       <p class="explica">Al abrir la aplicación sale un aviso arriba con lo que ha vencido
          y lo que está a punto de vencer. Aquí eliges con cuánta antelación quieres el aviso.
          Esto es solo de este ordenador.</p>
@@ -325,20 +359,43 @@
         <input id="avisos-dias" type="number" min="0" class="campo campo-plazo">
         <span class="suave">días de antelación</span>
       </div>
+        </div>
+      </details>
 
-      <h3>Cómo se abrevia cada grupo</h3>
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Cómo se abrevia cada grupo</span>
+          <span class="bloque-pie">Cómo queda escrito el grupo del alumno en el nombre</span>
+        </summary>
+        <div class="bloque-cuerpo">
       <p class="explica">Cuando pides que el nombre del asunto lleve el grupo del alumno,
          se escribe abreviado. Aquí tienes, grupo por grupo, lo que trae Séneca y lo que
          escribe la aplicación. Si alguno no te cuadra, dímelo.</p>
       <div id="tabla-grupos" class="lista"></div>
+        </div>
+      </details>
 
-      <h3>Ficheros de datos</h3>
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Ficheros de datos</span>
+          <span class="bloque-pie">Qué CSV hay cargados y qué columnas se reconocen</span>
+        </summary>
+        <div class="bloque-cuerpo">
       <p class="explica">Van en <code>_GESTOR/datos</code>, dentro de la carpeta de asuntos abiertos.</p>
       <div id="estado-datos" class="lista"></div>
+        </div>
+      </details>
 
-      <h3>Carpetas de este ordenador</h3>
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Carpetas de este ordenador</span>
+          <span class="bloque-pie">Las dos carpetas señaladas aquí</span>
+        </summary>
+        <div class="bloque-cuerpo">
       <div id="estado-carpetas" class="lista"></div>
       <button id="btn-olvidar" class="boton">Volver a elegir las carpetas</button>
+        </div>
+      </details>
     </section>
 
   </main>
