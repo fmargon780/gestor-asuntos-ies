@@ -9,6 +9,10 @@
    Este fichero no guarda nada por su cuenta: para cambiar el estado,
    la vía, el plazo, el nombre o el cierre llama a lo que ya hace la
    aplicación. Así no hay dos sitios que hagan lo mismo.
+
+   Como aquí dentro está todo, la tarjeta de la lista se queda solo
+   con "Copiar nombre" y "Cerrar". Esa poda también se hace aquí, un
+   poco más abajo.
    ============================================================ */
 (function () {
 
@@ -37,11 +41,20 @@
     App.ir(modoActual === 'archivado' ? 'archivo' : 'abiertos');
   }
 
-  /* El nombre del asunto, en la tarjeta de la lista, abre la ficha. */
+  /* El nombre del asunto, en la tarjeta de la lista, abre la ficha.
+
+     Y ya que dentro de la ficha están todos los botones, la tarjeta se
+     queda solo con los dos que se usan sin entrar: copiar el nombre
+     para pegarlo en un correo, y cerrar el asunto cuando se termina.
+     Lo demás (estado, vía, plazo, editar, guía, notas y documentos) se
+     hace dentro. */
+  var BOTONES_DE_LA_TARJETA = ['Copiar nombre', 'Cerrar', 'Reabrir'];
+
   (function () {
     var comoEra = App.tarjetaAsunto;
     App.tarjetaAsunto = function (a, modo) {
       var div = comoEra(a, modo);
+
       var nombre = div.querySelector('.tarjeta-nombre');
       if (nombre) {
         nombre.classList.add('nombre-pulsable');
@@ -51,6 +64,15 @@
           App.abrirFicha(a, modo);
         };
       }
+
+      var acciones = div.querySelector('.acciones');
+      if (acciones) {
+        Array.prototype.slice.call(acciones.children).forEach(function (h) {
+          var texto = (h.textContent || '').trim();
+          if (BOTONES_DE_LA_TARJETA.indexOf(texto) === -1) acciones.removeChild(h);
+        });
+      }
+
       return div;
     };
   })();
