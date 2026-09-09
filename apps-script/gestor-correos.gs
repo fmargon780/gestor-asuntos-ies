@@ -82,8 +82,7 @@ function guardarHilo(hilo, carpeta) {
     correos: direccionesDelHilo(mensajes),
     mensajes: mensajes.length,
     texto: recortar(ultimo.getPlainBody(), MAX_LETRAS_TEXTO),
-    enlace: 'https://mail.google.com/mail/u/?authuser=' +
-            encodeURIComponent(Session.getActiveUser().getEmail()) + '#all/' + id,
+    enlace: enlaceAlHilo(hilo, primero),
     pdf: '',
     adjuntos: []
   };
@@ -111,6 +110,27 @@ function guardarHilo(hilo, carpeta) {
   /* La ficha se escribe la última: para el Gestor, un correo existe
      cuando existe su .json. Así nunca lee uno a medio guardar. */
   carpeta.createFile(id + '.json', JSON.stringify(ficha, null, 2), 'application/json');
+}
+
+/* ---------- el enlace que abre el correo en Gmail ----------
+
+   El identificador del hilo no vale para esto: la dirección
+   #all/<identificador> hace que Gmail conteste "la conversación que
+   has solicitado no se ha podido cargar".
+
+   Lo que sí abre siempre la conversación es buscarla por el
+   identificador que el propio correo lleva escrito en su cabecera, el
+   Message-ID, con el buscador de Gmail: #search/rfc822msgid:<id>.
+
+   Si un correo no trajera esa cabecera, se usa el de antes. */
+function enlaceAlHilo(hilo, primero) {
+  var quienSoy = 'https://mail.google.com/mail/u/?authuser=' +
+                 encodeURIComponent(Session.getActiveUser().getEmail());
+  try {
+    var cabecera = String(primero.getHeader('Message-ID') || '').replace(/[<>]/g, '').trim();
+    if (cabecera) return quienSoy + '#search/rfc822msgid%3A' + encodeURIComponent(cabecera);
+  } catch (e) { /* sin cabecera: se sigue con el del hilo */ }
+  return quienSoy + '#all/' + hilo.getId();
 }
 
 /* ---------- piezas ---------- */
