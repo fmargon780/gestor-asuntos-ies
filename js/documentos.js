@@ -307,71 +307,11 @@ var Documentos = (function () {
 
   /* ---------- crear un tipo sin salir del cuadro ----------
 
-     Lo que se quiere evitar es acabar con FACTURA, Facturas y
-     FACTURA-RECTIFICATIVA conviviendo en la lista. Para eso cada nombre
-     se reduce a su hueso: sin tildes, sin mayúsculas, sin espacios ni
-     guiones ni puntos, y sin la S del plural. Dos nombres con el mismo
-     hueso son el mismo tipo escrito de dos maneras. */
+     La comparación de nombres parecidos vive en util.js, porque la usan
+     también las listas de Ajustes: aquí solo se pinta el resultado. */
 
-  function hueso(texto) {
-    return String(texto || '')
-      .normalize('NFD').replace(/[̀-ͯ]/g, '')
-      .toLowerCase().replace(/[^a-z0-9]/g, '');
-  }
-
-  function huesoSinPlural(texto) {
-    return hueso(texto).replace(/e?s$/, '');
-  }
-
-  /* Cuántas letras hay que cambiar para pasar de una palabra a la otra.
-     Sirve para cazar la errata: FACTURA y FCATURA están a dos. */
-  function distancia(a, b) {
-    if (a === b) return 0;
-    if (!a.length) return b.length;
-    if (!b.length) return a.length;
-    var fila = [];
-    for (var j = 0; j <= b.length; j++) fila[j] = j;
-    for (var i = 1; i <= a.length; i++) {
-      var anterior = fila[0];
-      fila[0] = i;
-      for (var k = 1; k <= b.length; k++) {
-        var guardar = fila[k];
-        fila[k] = Math.min(
-          fila[k] + 1,
-          fila[k - 1] + 1,
-          anterior + (a.charAt(i - 1) === b.charAt(k - 1) ? 0 : 1)
-        );
-        anterior = guardar;
-      }
-    }
-    return fila[b.length];
-  }
-
-  /* Los tipos de la lista que se parecen al nombre que se está
-     escribiendo. 'igual' quiere decir que es el mismo escrito de otra
-     manera, y entonces no se crea nada: se usa el que ya está. */
   function parecidos(nombre, lista) {
-    var h = hueso(nombre);
-    var hp = huesoSinPlural(nombre);
-    if (!h) return [];
-    var salida = [];
-    (lista || []).forEach(function (t) {
-      var k = hueso(t);
-      var kp = huesoSinPlural(t);
-      if (!k) return;
-      var d = distancia(h, k);
-      var largo = Math.max(h.length, k.length);
-      var igual = (k === h) || (kp === hp);
-      var cerca = igual ||
-                  (largo >= 6 ? d <= 2 : d <= 1) ||
-                  (h.length >= 4 && k.length >= 4 && (k.indexOf(h) !== -1 || h.indexOf(k) !== -1));
-      if (cerca) salida.push({ tipo: t, igual: igual, distancia: d });
-    });
-    salida.sort(function (a, b) {
-      if (a.igual !== b.igual) return a.igual ? -1 : 1;
-      return a.distancia - b.distancia;
-    });
-    return salida;
+    return U.parecidos(nombre, lista);
   }
 
   function cerrarCuadroDeTipoNuevo() {
@@ -458,15 +398,15 @@ var Documentos = (function () {
 
     if (mismo) {
       crear.disabled = true;
-      decir('Ese tipo ya está en la lista, escrito así: ' + mismo.tipo + '.');
-      botonUsar(mismo.tipo);
+      decir('Ese tipo ya está en la lista, escrito así: ' + mismo.nombre + '.');
+      botonUsar(mismo.nombre);
       return;
     }
 
     crear.disabled = false;
     if (lista.length) {
       decir('Ojo, hay tipos que se le parecen. Si es el mismo, usa el que ya está:');
-      lista.slice(0, 4).forEach(function (p) { botonUsar(p.tipo); });
+      lista.slice(0, 4).forEach(function (p) { botonUsar(p.nombre); });
     } else {
       decir('Se creará ' + limpio + ', y queda en la lista del centro para todos.');
     }
