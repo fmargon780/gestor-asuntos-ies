@@ -7,12 +7,12 @@
    la tecla Escape.
 
    No toca las carpetas, ni los datos, ni los nombres: de eso se
-   sigue encargando app.js. Aquí solo se mira y se pulsa lo que ya
-   hay en la página, así que se puede leer y cambiar sin miedo a
-   estropear el trabajo de verdad.
+   sigue encargando la propia aplicación. Aquí solo se mira y se pulsa
+   lo que ya hay en la página, así que se puede leer y cambiar sin
+   miedo a estropear el trabajo de verdad.
 
-   Se carga ANTES que app.js, para que sus escuchas se enteren de las
-   cosas antes de que la pantalla cambie.
+   Se carga ANTES que el resto de la aplicación, para que sus escuchas
+   se enteren de las cosas antes de que la pantalla cambie.
    ============================================================ */
 (function () {
 
@@ -27,18 +27,7 @@
   }
 
   /* ==========================================================
-     1. LOS DOCUMENTOS SUELTOS EMPIEZAN PLEGADOS
-
-     La pantalla empieza por los asuntos, que es lo que se mira todos
-     los días. La cabecera de los documentos sueltos sigue diciendo
-     cuántos hay y si ha llegado alguno nuevo, y se despliega con un
-     clic. Quien la deje desplegada, la encuentra desplegada.
-     ========================================================== */
-
-  if (recordado('sueltos-plegados') === null) recordar('sueltos-plegados', 'si');
-
-  /* ==========================================================
-     2. BOTONES QUE NO ESTABAN EN LA PÁGINA
+     1. BOTONES QUE NO ESTABAN EN LA PÁGINA
 
      Se añaden desde aquí para no repetirlos en el html.
      ========================================================== */
@@ -132,7 +121,7 @@
   }
 
   /* ==========================================================
-     3. VOLVER
+     2. VOLVER
 
      Se apunta por dónde se va pasando mirando la propia pantalla, no
      los clics: así también cuentan los saltos que da la aplicación
@@ -186,7 +175,7 @@
   pantallaAhora = cualSeVe();
 
   /* ==========================================================
-     4. CANCELAR EL ASUNTO QUE SE ESTABA CREANDO
+     3. CANCELAR EL ASUNTO QUE SE ESTABA CREANDO
      ========================================================== */
 
   function cancelarNuevo() {
@@ -214,7 +203,7 @@
   }
 
   /* ==========================================================
-     5. VISTA COMPACTA DE LOS ASUNTOS ABIERTOS
+     4. VISTA COMPACTA DE LOS ASUNTOS ABIERTOS
 
      Cada asunto en una línea. El nombre de la carpeta ya lleva la
      fecha, el tipo y el tercero, así que con esa línea y la etiqueta
@@ -222,8 +211,14 @@
      fila se abre y enseña el pie y los botones.
      ========================================================== */
 
+  /* Esta clave se llamaba 'vista-abiertos', que es la que usa la
+     aplicación para recordar cuál de las tres tarjetas está elegida.
+     Aquí es otra cosa, así que tiene su propio nombre.
+
+     De partida, filas cómodas: es como se ha venido usando. Quien
+     quiera la de una línea, la pide con el botón. */
   function esCompacta() {
-    return recordado('vista-abiertos') !== 'comoda';
+    return recordado('vista-filas') === 'compacta';
   }
 
   function pintarVista() {
@@ -237,7 +232,7 @@
   }
 
   btnVista.onclick = function () {
-    recordar('vista-abiertos', esCompacta() ? 'comoda' : 'compacta');
+    recordar('vista-filas', esCompacta() ? 'comoda' : 'compacta');
     pintarVista();
   };
 
@@ -254,7 +249,7 @@
   }
 
   /* ==========================================================
-     6. LO QUE SE ESTÁ FILTRANDO
+     5. LO QUE SE ESTÁ FILTRANDO
 
      Una lista corta sin saber por qué es un susto. Cada filtro puesto
      se enseña con su aspa, con el recuento al lado, y hay un botón
@@ -281,18 +276,27 @@
   }
 
   function limpiarFiltros() {
-    var q = $('buscar-abiertos'), f = $('filtro-estado');
+    var q = $('buscar-abiertos'), f = $('filtro-estado'), p = $('filtro-plazo');
     if (f && f.value) { f.value = ''; avisarDelCambio(f); }
+    if (p && p.value) { p.value = ''; avisarDelCambio(p); }
     if (q && q.value) { q.value = ''; avisarDelCambio(q); }
   }
 
+  /* Lo que dice cada opción del desplegable de plazo, para escribirlo
+     igual en su etiqueta. */
+  function textoDelPlazo(sel) {
+    var op = sel.options[sel.selectedIndex];
+    return op ? op.textContent : sel.value;
+  }
+
   function pintarFiltros() {
-    var q = $('buscar-abiertos'), f = $('filtro-estado');
+    var q = $('buscar-abiertos'), f = $('filtro-estado'), p = $('filtro-plazo');
     if (!q || !f) return;
     var texto = q.value.trim();
     var estado = f.value;
+    var plazo = p ? p.value : '';
     barraFiltros.innerHTML = '';
-    if (!texto && !estado) { barraFiltros.classList.add('oculto'); return; }
+    if (!texto && !estado && !plazo) { barraFiltros.classList.add('oculto'); return; }
     barraFiltros.classList.remove('oculto');
 
     if (texto) {
@@ -309,6 +313,13 @@
         }));
     }
 
+    if (plazo) {
+      barraFiltros.appendChild(etiqueta('Plazo: ' + textoDelPlazo(p), function () {
+        p.value = '';
+        avisarDelCambio(p);
+      }));
+    }
+
     var cuantos = document.querySelectorAll('#lista-abiertos .tarjeta').length;
     var total = ($('cuenta-abiertos') && $('cuenta-abiertos').textContent.trim()) || '';
     var cuenta = document.createElement('span');
@@ -320,7 +331,7 @@
     limpiar.type = 'button';
     limpiar.className = 'boton boton-limpiar';
     limpiar.textContent = 'Limpiar todo';
-    limpiar.title = 'Quitar la búsqueda y el filtro de estado';
+    limpiar.title = 'Quitar la búsqueda y los filtros';
     limpiar.onclick = limpiarFiltros;
     barraFiltros.appendChild(limpiar);
   }
@@ -335,7 +346,7 @@
   }
 
   /* ==========================================================
-     7. LA TECLA ESCAPE
+     6. LA TECLA ESCAPE
 
      Con un cuadro abierto, lo cierra. Con el cursor en un buscador,
      lo vacía.
