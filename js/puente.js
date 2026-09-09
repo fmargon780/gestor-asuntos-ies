@@ -2,9 +2,9 @@
    puente.js — el puente para los módulos de fuera.
 
    Los módulos que se cuelgan de la aplicación (los avisos, los asuntos
-   que se repiten) no tocan App directamente. Miran y trabajan por
-   aquí, y así se pueden añadir módulos nuevos sin volver a abrir los
-   ficheros de las pantallas.
+   que se repiten, las guías) no tocan App directamente. Miran y
+   trabajan por aquí, y así se pueden añadir módulos nuevos sin volver
+   a abrir los ficheros de las pantallas.
    ============================================================ */
 
 window.Gestor = {
@@ -38,7 +38,12 @@ window.Gestor = {
 
   /* Funciones que se llaman cada vez que se repinta la lista de
      asuntos abiertos. Los módulos se apuntan aquí. */
-  alRefrescar: []
+  alRefrescar: [],
+
+  /* Botones que los módulos añaden a la tarjeta de cada asunto. Cada
+     función recibe el asunto y el modo, y devuelve un botón ya hecho,
+     o null si en ese asunto no pinta nada. */
+  botonesDeTarjeta: []
 };
 
 /* La aplicación llama a esto cada vez que repinta la lista. */
