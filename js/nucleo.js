@@ -52,7 +52,7 @@ App.SEGUNDOS_ENTRE_MIRADAS = 20;
    para saber de un vistazo si el navegador se ha quedado con una copia
    vieja de la página: si pone una fecha anterior a la del último
    cambio, hay que recargar con Ctrl+Mayús+R. */
-App.VERSION = '9-sep-2026 (7)';
+App.VERSION = '9-sep-2026 (8)';
 
 /* El atajo de siempre para coger un elemento de la página. Es global
    para todos los ficheros de la aplicación, y también cuelga de App
