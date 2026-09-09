@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="css/estilos.css">
 <link rel="stylesheet" href="css/plazos.css">
 <link rel="stylesheet" href="css/ajustes.css">
+<link rel="stylesheet" href="css/guias.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -314,6 +315,20 @@
 
       <details class="bloque-ajustes">
         <summary>
+          <span class="bloque-titulo">Guías de los tipos de asunto</span>
+          <span class="bloque-pie">Los pasos a dar en cada tipo, para ir marcándolos</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Un guión breve del procedimiento de cada tipo de asunto.
+         Los pasos van en el orden del trámite, y dentro de cada asunto salen con
+         una casilla para marcar lo que ya está hecho. Esta lista se comparte con
+         el resto de ordenadores del centro.</p>
+      <div id="tabla-guias" class="lista"></div>
+        </div>
+      </details>
+
+      <details class="bloque-ajustes">
+        <summary>
           <span class="bloque-titulo">Tipos de documento</span>
           <span class="bloque-pie">Los que salen al nombrar un documento dentro de un asunto</span>
         </summary>
@@ -420,6 +435,7 @@
 <script src="js/carpetas.js"></script>
 <script src="js/nombres.js"></script>
 <script src="js/plazos.js"></script>
+<script src="js/guias.js"></script>
 <script src="js/datos.js"></script>
 <script src="js/documentos.js"></script>
 
@@ -436,6 +452,7 @@
 <!-- Los módulos que se enganchan al puente. -->
 <script src="js/avisos.js"></script>
 <script src="js/recurrentes.js"></script>
+<script src="js/guias-enganche.js"></script>
 
 <!-- Y ahora sí, a arrancar. -->
 <script src="js/inicio.js"></script>
