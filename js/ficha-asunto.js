@@ -7,11 +7,11 @@
    todos los botones de siempre, sin volver a la lista.
 
    Este fichero no guarda nada por su cuenta: para cambiar el estado,
-   la vía, el plazo, el nombre o el cierre llama a lo que ya hace la
-   aplicación. Así no hay dos sitios que hagan lo mismo.
+   la vía, el plazo, el nombre o el archivado llama a lo que ya hace
+   la aplicación. Así no hay dos sitios que hagan lo mismo.
 
    Como aquí dentro está todo, la tarjeta de la lista se queda con el
-   desplegable del estado, "Copiar nombre" y "Cerrar". Esa poda
+   desplegable del estado, "Copiar nombre" y "Archivar". Esa poda
    también se hace aquí, un poco más abajo.
    ============================================================ */
 (function () {
@@ -46,10 +46,15 @@
      Y ya que dentro de la ficha están todos los botones, la tarjeta se
      queda con lo justo: el desplegable del estado, que es lo que más
      se toca y se hace de un clic sin entrar, copiar el nombre para
-     pegarlo en un correo, y cerrar el asunto cuando se termina. Lo
+     pegarlo en un correo, y archivar el asunto cuando se termina. Lo
      demás (vía, plazo, editar, guía, notas y documentos) se hace
      dentro. */
   var BOTONES_DE_LA_TARJETA = ['Copiar nombre', 'Cerrar', 'Reabrir'];
+
+  /* "Cerrar" se llama Archivar, que es lo que de verdad hace: llevar
+     la carpeta al ARCHIVO. El texto se cambia aquí, donde ya se está
+     tocando la tarjeta. */
+  var NOMBRES_NUEVOS = { 'Cerrar': 'Archivar' };
 
   (function () {
     var comoEra = App.tarjetaAsunto;
@@ -71,7 +76,11 @@
         Array.prototype.slice.call(acciones.children).forEach(function (h) {
           if (h.tagName === 'SELECT') return;            /* el estado se queda */
           var texto = (h.textContent || '').trim();
-          if (BOTONES_DE_LA_TARJETA.indexOf(texto) === -1) acciones.removeChild(h);
+          if (BOTONES_DE_LA_TARJETA.indexOf(texto) === -1) { acciones.removeChild(h); return; }
+          if (NOMBRES_NUEVOS[texto]) {
+            h.textContent = NOMBRES_NUEVOS[texto];
+            h.title = 'Llevar la carpeta al ARCHIVO';
+          }
         });
       }
 
@@ -218,7 +227,8 @@
     caja.appendChild(boton('Gestionar documentos', 'Nombrar y archivar los documentos de la carpeta',
       async function () { await App.verDocumentos(a); pintarDocumentos(a); }));
 
-    var cerrar = boton(abierto ? 'Cerrar el asunto' : 'Reabrir el asunto', '', async function () {
+    var cerrar = boton(abierto ? 'Archivar el asunto' : 'Reabrir el asunto',
+      abierto ? 'Llevar la carpeta al ARCHIVO' : '', async function () {
       if (abierto) await App.cerrarAsunto(a); else await App.reabrirAsunto(a);
       volverALaLista();
     });
