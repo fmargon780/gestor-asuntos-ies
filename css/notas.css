@@ -1,0 +1,30 @@
+/* ============================================================
+   notas.css — el aspecto del diario de cada asunto (js/notas.js).
+   ============================================================ */
+
+/* El recuadro para escribir, arriba del todo de la ventana. */
+.nota-nueva { margin-bottom: 16px; }
+.nota-nueva textarea {
+  font: inherit; font-size: 14px; resize: vertical; min-height: 68px;
+}
+.nota-botonera {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-top: 8px; flex-wrap: wrap;
+}
+.nota-aviso { color: var(--tinta-suave); font-size: 12px; }
+
+/* Las notas ya escritas, la más reciente arriba. */
+.notas-lista {
+  display: flex; flex-direction: column; gap: 8px;
+  max-height: 46vh; overflow-y: auto;
+}
+.nota-fila {
+  border: 1px solid var(--linea); border-left: 4px solid #c3d8ec;
+  border-radius: 8px; padding: 9px 13px; background: var(--papel);
+}
+.nota-cabeza {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12px; color: var(--tinta-suave); margin-bottom: 3px;
+}
+.nota-quien { font-weight: 600; color: var(--azul); }
+.nota-texto { font-size: 14px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
