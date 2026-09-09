@@ -36,3 +36,8 @@
    tarjetas, y solo aparece cuando hay algo que decir. */
 #panel-avisos { margin: 4px 0 18px; }
 .avisos-botones { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+/* ---------- los asuntos que se repiten ---------- */
+#panel-recurrentes { margin: 4px 0 18px; }
+.recurrentes-lista { margin: 8px 0 0; padding-left: 20px; font-size: 13px; }
+.recurrente-pie { flex: 1; font-size: 12px; }
