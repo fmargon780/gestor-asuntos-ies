@@ -3,8 +3,9 @@
 
    guias.js sabe pintar y escribir una guía, pero no sabe nada de la
    aplicación. Este fichero es el que la enchufa: guarda las guías en
-   _GESTOR/guias.json, pone el botón de cada tipo en Ajustes y el
-   botón "Guía" en cada asunto abierto.
+   _GESTOR/guias.json, pone el botón de cada tipo en Ajustes, la
+   enseña como recordatorio al crear un asunto y pone el botón "Guía"
+   en cada asunto abierto.
 
    Lo que se marca como hecho se guarda en la ficha del asunto, en
    asuntos.json, así que lo ve todo el que abra la aplicación.
@@ -90,6 +91,27 @@
     await window.Gestor.recargar();
   }
 
+  /* ---------- la guía como recordatorio, al crear el asunto ----------
+
+     Aquí sale sin casillas: todavía no hay asunto que marcar. Es para
+     ver de un vistazo en qué se está metiendo uno. */
+
+  function pintarGuiaNuevo() {
+    var caja = $('guia-nuevo');
+    if (!caja) return;
+    var elegido = document.querySelector('#tipos-lista .tipo-boton.elegido');
+    var tipo = elegido ? elegido.textContent.trim() : '';
+    var pasos = pasosDe(tipo);
+    if (!pasos.length) {
+      caja.className = 'oculto';
+      caja.innerHTML = '';
+      return;
+    }
+    caja.className = 'guia-caja';
+    caja.innerHTML = '<div class="guia-rotulo">Pasos de un asunto ' + U.escapar(tipo) + '</div>' +
+                     Guias.vista(pasos, [], false);
+  }
+
   /* ---------- la tabla de Ajustes ---------- */
 
   function pintarTabla() {
@@ -143,6 +165,7 @@
     try {
       await guardar();
       pintarTabla();
+      pintarGuiaNuevo();
       await window.Gestor.recargar();
       U.aviso(pasos.length
         ? 'Guía de ' + nombreTipo + ' guardada: ' + pasos.length + ' pasos.'
@@ -159,6 +182,7 @@
     yaLeido = true;
     await cargar();
     pintarTabla();
+    pintarGuiaNuevo();
     await window.Gestor.recargar();
   }
 
@@ -167,6 +191,14 @@
 
     /* El botón de cada tarjeta de asunto abierto. */
     window.Gestor.botonesDeTarjeta.push(botonDeTarjeta);
+
+    /* Al elegir el tipo en Nuevo asunto, se enseña su guía debajo. */
+    var lista = $('tipos-lista');
+    if (lista) {
+      lista.addEventListener('click', function () {
+        setTimeout(pintarGuiaNuevo, 0);
+      });
+    }
 
     window.Gestor.alRefrescar.push(function () {
       if (!yaLeido && window.Gestor.carpetaGestor()) arrancar();
