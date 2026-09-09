@@ -595,7 +595,7 @@
         var b = document.createElement('button');
         b.type = 'button';
         b.className = 'ficha-documento';
-        b.title = 'Abrirlo en otra pestaña';
+        b.title = 'Verlo al lado del programa';
         b.innerHTML = (ext ? '<span class="marca-ext">' + U.escapar(ext.toUpperCase()) + '</span>' : '') +
                       '<span>' + U.escapar(f.nombre) + '</span>';
         b.onclick = function () { abrirDocumento(f); };
@@ -607,8 +607,10 @@
     }
   }
 
-  /* Se abre en otra pestaña, igual que los documentos sueltos. */
+  /* Se abre en la columna de la derecha, al lado del programa, para
+     poder trabajar con el papel delante. */
   async function abrirDocumento(f) {
+    if (window.Visor) return window.Visor.abrir(f.handle, f.nombre);
     try {
       var fichero = await f.handle.getFile();
       var url = URL.createObjectURL(fichero);
