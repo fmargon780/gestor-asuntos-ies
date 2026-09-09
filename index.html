@@ -103,6 +103,7 @@
       </header>
 
       <div id="panel-avisos" class="oculto"></div>
+      <div id="panel-recurrentes" class="oculto"></div>
 
       <div class="paneles">
         <button type="button" class="panel" data-vista="clasificar">
@@ -305,6 +306,16 @@
       </div>
       <div id="tabla-tipos-documento" class="lista"></div>
 
+      <h3>Asuntos que se repiten</h3>
+      <p class="explica">Gestiones que vuelven cada mes, cada trimestre o cada curso.
+         Se apuntan aquí una vez y la aplicación avisa cuando toca. La carpeta no se crea
+         sola: se crea cuando pulses el botón del aviso. Esta lista se comparte con
+         el resto de ordenadores del centro.</p>
+      <div class="alta-tipo">
+        <button id="btn-anadir-recurrente" class="boton">+ Añadir uno</button>
+      </div>
+      <div id="tabla-recurrentes" class="lista"></div>
+
       <h3>Avisos de vencimiento</h3>
       <p class="explica">Al abrir la aplicación sale un aviso arriba con lo que ha vencido
          y lo que está a punto de vencer. Aquí eliges con cuánta antelación quieres el aviso.
@@ -355,5 +366,6 @@
 <script src="js/documentos.js"></script>
 <script src="js/app.js"></script>
 <script src="js/avisos.js"></script>
+<script src="js/recurrentes.js"></script>
 </body>
 </html>
