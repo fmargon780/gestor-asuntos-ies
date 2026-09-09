@@ -47,10 +47,11 @@ App.FICHERO_ESTADOS = 'estados.json';
 App.TITULO = 'Gestor de Asuntos';
 App.SEGUNDOS_ENTRE_MIRADAS = 20;
 
-/* La fecha de la última versión publicada. Sale abajo a la izquierda,
-   debajo del nombre. Sirve para saber de un vistazo si el navegador se
-   ha quedado con una copia vieja de la página: si aquí pone una fecha
-   anterior a la del último cambio, hay que recargar con Ctrl+Mayús+R. */
+/* La fecha de la última versión publicada. Sale en la pantalla de
+   entrada y, ya dentro, abajo a la izquierda debajo del nombre. Sirve
+   para saber de un vistazo si el navegador se ha quedado con una copia
+   vieja de la página: si pone una fecha anterior a la del último
+   cambio, hay que recargar con Ctrl+Mayús+R. */
 App.VERSION = '9-sep-2026';
 
 /* El atajo de siempre para coger un elemento de la página. Es global
@@ -75,7 +76,20 @@ App.arrancar = async function () {
   if (a) { App.E.abiertos = a; App.marcarCarpeta('estado-abiertos', a.name); }
   if (b) { App.E.archivo = b; App.marcarCarpeta('estado-archivo', b.name); }
   if (u) { App.E.usuario = u; $('campo-usuario').value = u; }
+  App.ponerVersion();
   App.revisarArranque();
+};
+
+/* La versión, también en la pantalla de entrada. Así se puede ver sin
+   entrar si el navegador se ha quedado con una copia vieja. */
+App.ponerVersion = function () {
+  var nota = document.querySelector('#paso-carpetas .nota');
+  if (!nota || nota.querySelector('.version')) return;
+  var v = document.createElement('span');
+  v.className = 'version suave';
+  v.textContent = 'Versión ' + App.VERSION;
+  nota.appendChild(document.createElement('br'));
+  nota.appendChild(v);
 };
 
 App.marcarCarpeta = function (id, nombre) {
