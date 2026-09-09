@@ -409,11 +409,17 @@ App.filaEstado = function (titulo, valor) {
   return d;
 };
 
+/* Al añadir a cualquiera de las tres listas se pasa la misma guardia:
+   si el nombre ya está escrito de otra manera no se crea, y si solo se
+   parece a otro se avisa antes. Estas listas las comparten los dos
+   ordenadores del centro, y dos nombres para la misma cosa ensucian el
+   archivo para siempre. */
+
 $('btn-anadir-tipo').onclick = async function () {
   var nombre = U.limpiarNombre($('nuevo-tipo').value).toUpperCase();
   if (!nombre) return;
-  var repetido = App.E.tipos.some(function (t) { return U.normalizar(t.tipo) === U.normalizar(nombre); });
-  if (repetido) { U.aviso('Ese tipo ya está en la lista.', 'malo'); return; }
+  var hay = App.E.tipos.map(function (t) { return t.tipo; });
+  if (!await U.dejaCrear(nombre, hay, 'tipo')) return;
   App.E.tipos.push({ tipo: nombre, categoria: $('nueva-categoria').value });
   await App.guardarTipos();
   $('nuevo-tipo').value = '';
@@ -424,8 +430,8 @@ $('btn-anadir-tipo').onclick = async function () {
 $('btn-anadir-estado').onclick = async function () {
   var nombre = U.limpiarNombre($('nuevo-estado').value).toUpperCase();
   if (!nombre) return;
-  var repetido = App.E.estados.some(function (e) { return U.normalizar(e.nombre) === U.normalizar(nombre); });
-  if (repetido) { U.aviso('Ese estado ya está en la lista.', 'malo'); return; }
+  var hay = App.E.estados.map(function (e) { return e.nombre; });
+  if (!await U.dejaCrear(nombre, hay, 'estado')) return;
   App.E.estados.push({ nombre: nombre, espera: false });
   await App.guardarEstados();
   $('nuevo-estado').value = '';
@@ -437,10 +443,7 @@ $('btn-anadir-estado').onclick = async function () {
 $('btn-anadir-tipo-doc').onclick = async function () {
   var nombre = U.limpiarNombre($('nuevo-tipo-doc').value).toUpperCase();
   if (!nombre) return;
-  var repetido = App.E.tiposDocumento.some(function (t) {
-    return U.normalizar(t) === U.normalizar(nombre);
-  });
-  if (repetido) { U.aviso('Ese tipo de documento ya está en la lista.', 'malo'); return; }
+  if (!await U.dejaCrear(nombre, App.E.tiposDocumento, 'tipo de documento')) return;
   App.E.tiposDocumento.push(nombre);
   await App.guardarTiposDocumento();
   $('nuevo-tipo-doc').value = '';
