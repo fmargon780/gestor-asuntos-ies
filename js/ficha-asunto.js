@@ -3,8 +3,9 @@
 
    Al pulsar el nombre de un asunto se entra aquí. En una sola
    pantalla está todo lo suyo: sus datos, el contacto del tercero, la
-   guía de su tipo con las casillas, sus notas y sus documentos. Y
-   todos los botones de siempre, sin volver a la lista.
+   guía de su tipo con las casillas, sus notas, sus documentos y los
+   demás asuntos de ese mismo tercero. Y todos los botones de
+   siempre, sin volver a la lista.
 
    Este fichero no guarda nada por su cuenta: para cambiar el estado,
    la vía, el plazo, el nombre o el archivado llama a lo que ya hace
@@ -144,6 +145,8 @@
           bloque('Documentos de la carpeta',
                  '<div id="ficha-documentos" class="explica">Leyendo…</div>', null,
                  '<span class="ficha-cuenta" id="ficha-cuenta-docs"></span>') +
+          bloque('Otros asuntos de este tercero',
+                 '<div id="ficha-otros" class="explica">Buscando…</div>') +
           bloque('Datos del asunto', datosDelAsunto(a, p)) +
           '<div id="ficha-contacto-caja"></div>' +
         '</div>' +
@@ -157,6 +160,7 @@
     pintarGuia(a, tipo, abierto);
     pintarContacto(a);
     pintarDocumentos(a);
+    pintarOtrosDelTercero(a);
   }
 
   function datosDelAsunto(a, p) {
@@ -509,6 +513,64 @@
       caja.innerHTML = contactoPlegado(persona, lista);
     } catch (e) {
       caja.innerHTML = contactoSuelto('No he podido leer el fichero de datos: ' + e.message);
+    }
+  }
+
+  /* ---------- los otros asuntos del mismo tercero ----------
+
+     Para ver de un vistazo si esto ya se gestionó. Los del mismo tipo
+     van marcados, que son los que de verdad pueden estar repetidos.
+     La búsqueda la hace duplicados.js. */
+
+  function nombreDelTercero(a) {
+    var f = a.ficha || {};
+    if (f.tercero) return f.tercero;
+    if (a.leido && a.leido.resto) return Nombres.terceroDeResto(a.leido.resto);
+    return '';
+  }
+
+  function listaDeOtros(titulo, nombres, tipo) {
+    if (!nombres.length) return '';
+    return '<div class="otros-grupo"><div class="otros-rotulo">' + U.escapar(titulo) + '</div>' +
+      nombres.slice(0, 12).map(function (n) {
+        var igual = tipo && window.Duplicados &&
+                    U.normalizar(window.Duplicados.tipoDeNombre(n)) === U.normalizar(tipo);
+        return '<div class="otros-asunto' + (igual ? ' otros-mismo-tipo' : '') + '">' +
+               U.escapar(n) + '</div>';
+      }).join('') +
+      (nombres.length > 12 ? '<p class="nota">Y ' + (nombres.length - 12) + ' más.</p>' : '') +
+      '</div>';
+  }
+
+  async function pintarOtrosDelTercero(a) {
+    var caja = $('ficha-otros');
+    if (!caja) return;
+    var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
+    var quien = nombreDelTercero(a);
+
+    if (!window.Duplicados || !categoria || !quien) {
+      caja.className = 'explica';
+      caja.textContent = 'No se sabe de qué tercero es este asunto, así que no se puede buscar.';
+      return;
+    }
+
+    try {
+      var todo = await window.Duplicados.delTercero(categoria, quien);
+      var fuera = function (n) { return n !== a.nombre; };
+      var abiertos = todo.abiertos.filter(fuera);
+      var archivados = todo.archivados.filter(fuera);
+
+      if (!abiertos.length && !archivados.length) {
+        caja.className = 'explica';
+        caja.textContent = 'Es el único asunto de ' + quien + '.';
+        return;
+      }
+      caja.className = 'otros-lista';
+      caja.innerHTML = listaDeOtros('Abiertos', abiertos, tipoDe(a)) +
+                       listaDeOtros('En el archivo', archivados, tipoDe(a));
+    } catch (e) {
+      caja.className = 'explica';
+      caja.textContent = 'No he podido mirar el archivo: ' + e.message;
     }
   }
 
