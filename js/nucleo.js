@@ -47,6 +47,12 @@ App.FICHERO_ESTADOS = 'estados.json';
 App.TITULO = 'Gestor de Asuntos';
 App.SEGUNDOS_ENTRE_MIRADAS = 20;
 
+/* La fecha de la última versión publicada. Sale abajo a la izquierda,
+   debajo del nombre. Sirve para saber de un vistazo si el navegador se
+   ha quedado con una copia vieja de la página: si aquí pone una fecha
+   anterior a la del último cambio, hay que recargar con Ctrl+Mayús+R. */
+App.VERSION = '9-sep-2026';
+
 /* El atajo de siempre para coger un elemento de la página. Es global
    para todos los ficheros de la aplicación, y también cuelga de App
    para que lo use el puente. */
@@ -139,7 +145,8 @@ $('btn-entrar').onclick = async function () {
 
     $('arranque').classList.add('oculto');
     $('aplicacion').classList.remove('oculto');
-    $('usuario-pie').textContent = App.E.usuario ? 'Sesión de ' + App.E.usuario : '';
+    $('usuario-pie').textContent = (App.E.usuario ? 'Sesión de ' + App.E.usuario + '  ·  ' : '') +
+                                   'versión ' + App.VERSION;
     App.E.vista = App.vistaGuardada();
     await App.verAbiertos();
     App.irVista(App.E.vista);

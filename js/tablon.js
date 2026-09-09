@@ -26,6 +26,7 @@
   var verHechas = false;
   var editando = '';        /* el id de la nota que se está cambiando */
   var colorElegido = 'amarillo';
+  var fallo = '';           /* lo último que ha ido mal al leer o escribir */
 
   function $(id) { return document.getElementById(id); }
 
@@ -140,7 +141,12 @@
     c.appendChild(cabecera(pendientes.length));
     c.appendChild(formulario(escrito, fechaPuesta));
 
-    if (!pendientes.length) {
+    if (fallo) {
+      var malo = document.createElement('div');
+      malo.className = 'tablon-vacio';
+      malo.textContent = 'No he podido leer las notas: ' + fallo;
+      c.appendChild(malo);
+    } else if (!pendientes.length) {
       var vacio = document.createElement('div');
       vacio.className = 'tablon-vacio';
       vacio.textContent = 'Sin notas. Lo que no es un asunto, aquí.';
@@ -357,12 +363,20 @@
 
   /* ---------- arranque ---------- */
 
+  /* La columna se pinta ANTES de leer el fichero. Si la lectura falla,
+     el tablón sigue estando ahí y lo dice, en vez de no aparecer y dejar
+     a uno mirando la pantalla sin saber qué ha pasado. */
   async function refrescar() {
     if (!window.Gestor || !window.Gestor.carpetaGestor()) return;
+    pintar();
     try {
       notas = await leer();
+      fallo = '';
       pintar();
-    } catch (e) { /* si el fichero no se puede leer, el tablón se queda como está */ }
+    } catch (e) {
+      fallo = e.message || 'no he podido leer las notas';
+      pintar();
+    }
   }
 
   function enganchar() {
