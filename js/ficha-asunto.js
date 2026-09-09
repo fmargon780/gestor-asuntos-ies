@@ -10,9 +10,9 @@
    la vía, el plazo, el nombre o el cierre llama a lo que ya hace la
    aplicación. Así no hay dos sitios que hagan lo mismo.
 
-   Como aquí dentro está todo, la tarjeta de la lista se queda solo
-   con "Copiar nombre" y "Cerrar". Esa poda también se hace aquí, un
-   poco más abajo.
+   Como aquí dentro está todo, la tarjeta de la lista se queda con el
+   desplegable del estado, "Copiar nombre" y "Cerrar". Esa poda
+   también se hace aquí, un poco más abajo.
    ============================================================ */
 (function () {
 
@@ -44,10 +44,11 @@
   /* El nombre del asunto, en la tarjeta de la lista, abre la ficha.
 
      Y ya que dentro de la ficha están todos los botones, la tarjeta se
-     queda solo con los dos que se usan sin entrar: copiar el nombre
-     para pegarlo en un correo, y cerrar el asunto cuando se termina.
-     Lo demás (estado, vía, plazo, editar, guía, notas y documentos) se
-     hace dentro. */
+     queda con lo justo: el desplegable del estado, que es lo que más
+     se toca y se hace de un clic sin entrar, copiar el nombre para
+     pegarlo en un correo, y cerrar el asunto cuando se termina. Lo
+     demás (vía, plazo, editar, guía, notas y documentos) se hace
+     dentro. */
   var BOTONES_DE_LA_TARJETA = ['Copiar nombre', 'Cerrar', 'Reabrir'];
 
   (function () {
@@ -68,6 +69,7 @@
       var acciones = div.querySelector('.acciones');
       if (acciones) {
         Array.prototype.slice.call(acciones.children).forEach(function (h) {
+          if (h.tagName === 'SELECT') return;            /* el estado se queda */
           var texto = (h.textContent || '').trim();
           if (BOTONES_DE_LA_TARJETA.indexOf(texto) === -1) acciones.removeChild(h);
         });
@@ -85,9 +87,9 @@
     return (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
   }
 
-  function bloque(titulo, dentro, id) {
+  function bloque(titulo, dentro, id, alLado) {
     return '<section class="ficha-bloque"' + (id ? ' id="' + id + '"' : '') + '>' +
-             '<h3 class="ficha-titulo">' + U.escapar(titulo) + '</h3>' +
+             '<h3 class="ficha-titulo">' + U.escapar(titulo) + (alLado || '') + '</h3>' +
              dentro +
            '</section>';
   }
@@ -130,9 +132,11 @@
           bloque('Notas', '<div id="ficha-notas"></div>') +
         '</div>' +
         '<div class="ficha-derecha">' +
+          bloque('Documentos de la carpeta',
+                 '<div id="ficha-documentos" class="explica">Leyendo…</div>', null,
+                 '<span class="ficha-cuenta" id="ficha-cuenta-docs"></span>') +
           bloque('Datos del asunto', datosDelAsunto(a, p)) +
-          bloque('Contacto del tercero', '<div id="ficha-contacto" class="explica">Buscando…</div>') +
-          bloque('Documentos de la carpeta', '<div id="ficha-documentos" class="explica">Leyendo…</div>') +
+          '<div id="ficha-contacto-caja"></div>' +
         '</div>' +
       '</div>';
 
@@ -191,8 +195,12 @@
       };
       caja.appendChild(sel);
 
-      caja.appendChild(boton(a.ficha.via ? 'Vía ✓' : 'Vía', 'Por dónde prefiere que le hablemos',
-        async function () { await App.editarVia(a); pintar(); }, !!a.ficha.via));
+      var v = Nombres.via(a.ficha.via);
+      var bvia = boton('', App.textoVia(a.ficha) || 'Por dónde prefiere que le hablemos',
+        async function () { await App.editarVia(a); pintar(); }, !!a.ficha.via);
+      bvia.innerHTML = dibujoVia(a.ficha.via) + '<span>' + U.escapar(v ? v.corto : 'Vía') + '</span>';
+      bvia.classList.add('boton-con-dibujo');
+      caja.appendChild(bvia);
 
       caja.appendChild(boton(p ? 'Plazo ✓' : 'Plazo', 'Poner o cambiar la fecha límite',
         async function () { await App.editarPlazo(a); pintar(); }, !!p));
@@ -216,6 +224,26 @@
     });
     cerrar.classList.add('boton-principal');
     caja.appendChild(cerrar);
+  }
+
+  /* ---------- el dibujo de la vía de comunicación ----------
+
+     Un botón que pone "Vía" no dice nada de un vistazo. Cada vía
+     lleva su dibujo: un teléfono, un sobre, una pantalla o una
+     persona. Sin vía puesta, el bocadillo de hablar. */
+  var DIBUJOS_VIA = {
+    TELEFONO: '<path d="M6.5 3.5h3l1.5 3.7-2 1.4a11 11 0 0 0 4.4 4.4l1.4-2 3.7 1.5v3a1.5 1.5 0 0 1-1.7 1.5C11.4 16.3 7.7 12.6 5 6.2A1.5 1.5 0 0 1 6.5 3.5z"/>',
+    CORREO: '<rect x="3" y="5.5" width="18" height="13" rx="1.6"/><path d="M3.6 6.4 12 12.6l8.4-6.2"/>',
+    IPASEN: '<rect x="6.5" y="2.8" width="11" height="18.4" rx="2"/><path d="M10.5 18.6h3"/>',
+    PRESENCIAL: '<circle cx="12" cy="8" r="3.4"/><path d="M5.5 20.2c.6-3.5 3.3-5.4 6.5-5.4s5.9 1.9 6.5 5.4"/>',
+    '': '<path d="M4 5.6A1.6 1.6 0 0 1 5.6 4h12.8A1.6 1.6 0 0 1 20 5.6v8.3a1.6 1.6 0 0 1-1.6 1.6H9.2L5 19.4v-3.9h-.4A.6.6 0 0 1 4 14.9z"/>'
+  };
+
+  function dibujoVia(clave) {
+    var d = DIBUJOS_VIA[clave || ''] || DIBUJOS_VIA[''];
+    return '<svg class="via-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+           'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+           d + '</svg>';
   }
 
   function boton(texto, ayuda, alPulsar, marcado) {
@@ -396,9 +424,40 @@
      identificación, así que si no aparece a la primera se prueba sin
      él. */
 
+  /* La ficha del alumnado trae muchas filas, y ocupaba media pantalla.
+     Aquí se enseña pequeña: el nombre y un par de datos de contacto.
+     Al pulsarla se abre entera. */
+  function contactoPlegado(persona, lista) {
+    var buenas = lista.filter(function (f) { return f && f.valor; });
+    var resumen = buenas.filter(function (f) {
+      return /tel|m[oó]vil|correo|email/i.test(f.titulo);
+    }).slice(0, 2);
+    if (!resumen.length) resumen = buenas.slice(0, 2);
+
+    return '<details class="ficha-bloque ficha-plegable">' +
+             '<summary>' +
+               '<span class="ficha-titulo">Contacto del tercero</span>' +
+               '<span class="ficha-resumen">' + U.escapar(persona.nombre) +
+                 (resumen.length
+                   ? ' · ' + U.escapar(resumen.map(function (f) { return f.valor; }).join(' · '))
+                   : '') +
+               '</span>' +
+             '</summary>' +
+             '<div class="ficha-plegable-cuerpo">' + filas(buenas) + '</div>' +
+           '</details>';
+  }
+
+  function contactoSuelto(texto) {
+    return '<section class="ficha-bloque">' +
+             '<h3 class="ficha-titulo">Contacto del tercero</h3>' +
+             '<p class="explica">' + U.escapar(texto) + '</p>' +
+           '</section>';
+  }
+
   async function pintarContacto(a) {
-    var caja = $('ficha-contacto');
+    var caja = $('ficha-contacto-caja');
     if (!caja) return;
+    caja.innerHTML = contactoSuelto('Buscando…');
     var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
     /* Si la carpeta la creó la aplicación, el tercero está en su ficha.
        Si se creó a mano, se saca del propio nombre: es lo que queda
@@ -406,8 +465,7 @@
     var quien = (a.ficha && a.ficha.tercero) || (a.leido && a.leido.resto) || '';
 
     if (!categoria || !quien || !App.E.datos) {
-      caja.className = 'explica';
-      caja.textContent = 'Este asunto no dice a qué tercero pertenece.';
+      caja.innerHTML = contactoSuelto('Este asunto no dice a qué tercero pertenece.');
       return;
     }
 
@@ -425,8 +483,7 @@
         if (corto) encontrados = Datos.buscar(fuente.lista, corto, 1);
       }
       if (!encontrados.length) {
-        caja.className = 'explica';
-        caja.textContent = quien + ' no aparece en el fichero de ' + categoria + '.';
+        caja.innerHTML = contactoSuelto(quien + ' no aparece en el fichero de ' + categoria + '.');
         return;
       }
 
@@ -439,12 +496,9 @@
           return { titulo: c, valor: persona.campos[c] };
         });
       }
-      caja.className = '';
-      caja.innerHTML = '<h4 class="ficha-persona-nombre">' + U.escapar(persona.nombre) + '</h4>' +
-                       filas(lista);
+      caja.innerHTML = contactoPlegado(persona, lista);
     } catch (e) {
-      caja.className = 'explica';
-      caja.textContent = 'No he podido leer el fichero de datos: ' + e.message;
+      caja.innerHTML = contactoSuelto('No he podido leer el fichero de datos: ' + e.message);
     }
   }
 
@@ -452,25 +506,44 @@
 
   async function pintarDocumentos(a) {
     var caja = $('ficha-documentos');
+    var cuenta = $('ficha-cuenta-docs');
     if (!caja) return;
     try {
       var lista = await Carpetas.ficheros(a.handle);
+      if (cuenta) cuenta.textContent = lista.length || '';
       if (!lista.length) {
         caja.className = 'explica';
         caja.textContent = 'La carpeta todavía está vacía.';
         return;
       }
       caja.className = 'ficha-documentos';
-      caja.innerHTML = lista.map(function (f) {
+      caja.innerHTML = '';
+      lista.forEach(function (f) {
         var ext = Nombres.extensionDe(f.nombre);
-        return '<div class="ficha-documento">' +
-                 (ext ? '<span class="marca-ext">' + U.escapar(ext.toUpperCase()) + '</span>' : '') +
-                 U.escapar(f.nombre) +
-               '</div>';
-      }).join('');
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'ficha-documento';
+        b.title = 'Abrirlo en otra pestaña';
+        b.innerHTML = (ext ? '<span class="marca-ext">' + U.escapar(ext.toUpperCase()) + '</span>' : '') +
+                      '<span>' + U.escapar(f.nombre) + '</span>';
+        b.onclick = function () { abrirDocumento(f); };
+        caja.appendChild(b);
+      });
     } catch (e) {
       caja.className = 'explica';
       caja.textContent = 'No he podido leer la carpeta: ' + e.message;
+    }
+  }
+
+  /* Se abre en otra pestaña, igual que los documentos sueltos. */
+  async function abrirDocumento(f) {
+    try {
+      var fichero = await f.handle.getFile();
+      var url = URL.createObjectURL(fichero);
+      window.open(url, '_blank');
+      setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+    } catch (e) {
+      U.aviso('No he podido abrirlo: ' + e.message, 'malo');
     }
   }
 
