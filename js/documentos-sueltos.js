@@ -1,5 +1,5 @@
 /* ============================================================
-   documentos-sueltos.js — lo que llega y lo que se cierra.
+   documentos-sueltos.js — lo que llega y lo que se archiva.
 
    Un fichero suelto en la carpeta de asuntos abiertos es trabajo que
    todavía no tiene carpeta: casi siempre, algo que ha dejado ahí el
@@ -7,7 +7,7 @@
    la aplicación abierta se marcan como nuevos.
 
    Aquí están también la vigilancia que mira cada poco si ha llegado
-   alguno, y el cierre y la reapertura de asuntos.
+   alguno, y el archivado y la reapertura de asuntos.
    ============================================================ */
 
 App.pintarSueltos = async function () {
@@ -187,7 +187,7 @@ App.actualizarTitulo = function () {
   document.title = n ? '(' + n + ') ' + App.TITULO : App.TITULO;
 };
 
-/* ---------- cerrar un asunto ---------- */
+/* ---------- archivar un asunto ---------- */
 
 App.cerrarAsunto = async function (a) {
   var categoria = a.ficha.categoria || a.leido.categoria || '';
@@ -212,13 +212,13 @@ App.cerrarAsunto = async function (a) {
     if (!tercero) { U.aviso('Hace falta el nombre de la carpeta del tercero.', 'malo'); return; }
   }
 
-  var confirmar = await U.preguntar('Cerrar el asunto',
+  var confirmar = await U.preguntar('Archivar el asunto',
     '<p>Se llevará la carpeta a:</p>' +
     '<div class="vista-previa"><div class="vista-nombre">' +
       U.escapar(App.E.archivo.name + ' / ' + categoria + ' / ' + tercero) +
     '</div></div>' +
     '<p class="nota">Se copia primero y se comprueba que ha llegado todo. ' +
-    'Si algo falla, la carpeta se queda donde está.</p>', 'Cerrar el asunto');
+    'Si algo falla, la carpeta se queda donde está.</p>', 'Archivar el asunto');
   if (!confirmar) return;
 
   try {
@@ -228,10 +228,10 @@ App.cerrarAsunto = async function (a) {
       estado: 'cerrado', categoria: categoria, tercero: tercero,
       cerradoEl: U.ahora(), cerradoPor: App.E.usuario, ficheros: n
     });
-    U.aviso('Asunto cerrado y archivado.', 'bueno');
+    U.aviso('Asunto archivado.', 'bueno');
     await App.verAbiertos();
   } catch (e) {
-    U.aviso('No se ha podido cerrar: ' + e.message, 'malo');
+    U.aviso('No se ha podido archivar: ' + e.message, 'malo');
   }
 };
 
