@@ -126,7 +126,15 @@ $('btn-entrar').onclick = async function () {
 
     Documentos.configurar({
       tipos: function () { return App.E.tiposDocumento; },
-      curso: function (fecha) { return U.cursoDeFecha(fecha); }
+      curso: function (fecha) { return U.cursoDeFecha(fecha); },
+      /* Para poder crear un tipo de documento desde el propio cuadro,
+         sin ir a Ajustes. Se guarda en _GESTOR, así que lo ve todo el
+         que abra la aplicación. */
+      crearTipo: async function (nombre) {
+        if (App.E.tiposDocumento.indexOf(nombre) === -1) App.E.tiposDocumento.push(nombre);
+        await App.guardarTiposDocumento();
+        return nombre;
+      }
     });
 
     $('arranque').classList.add('oculto');
