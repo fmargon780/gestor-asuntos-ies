@@ -1,0 +1,53 @@
+/* ============================================================
+   ajustes.css — los bloques plegables de la pantalla de Ajustes.
+
+   Antes todo salía desplegado, uno detrás de otro, y lo de más abajo
+   se acababa olvidando. Ahora se ven los ocho títulos de un vistazo y
+   cada uno se abre cuando hace falta.
+   ============================================================ */
+
+.bloque-ajustes {
+  border: 1px solid #dde3ea;
+  border-radius: 10px;
+  margin: 10px 0;
+  background: #fff;
+}
+
+.bloque-ajustes > summary {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  border-radius: 10px;
+}
+
+/* La flecha de siempre, dibujada a mano para que gire al abrir. */
+.bloque-ajustes > summary::-webkit-details-marker { display: none; }
+.bloque-ajustes > summary::before {
+  content: '';
+  width: 8px; height: 8px;
+  border-right: 2px solid #5d6b7a;
+  border-bottom: 2px solid #5d6b7a;
+  transform: rotate(-45deg);
+  transition: transform .15s;
+  flex: none;
+  position: relative; top: -2px;
+}
+.bloque-ajustes[open] > summary::before { transform: rotate(45deg); top: -4px; }
+
+.bloque-ajustes > summary:hover { background: #f4f7fa; }
+
+.bloque-titulo { font-size: 15px; font-weight: 600; }
+.bloque-pie { font-size: 12px; color: #5d6b7a; }
+
+.bloque-cuerpo { padding: 0 16px 16px; border-top: 1px solid #eef1f5; }
+.bloque-cuerpo > *:first-child { margin-top: 14px; }
+
+@media (max-width: 900px) {
+  .bloque-ajustes > summary { padding: 12px; }
+  .bloque-pie { width: 100%; }
+}
