@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="css/plazos.css">
 <link rel="stylesheet" href="css/ajustes.css">
 <link rel="stylesheet" href="css/guias.css">
+<link rel="stylesheet" href="css/usabilidad.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -227,6 +228,8 @@
           <p class="nota">El estado, la vía de comunicación y la fecha límite no salen en el nombre de la carpeta.
              Se guardan en la carpeta del centro, y los ve todo el que abra la aplicación.</p>
 
+          <div id="guia-nuevo" class="oculto"></div>
+
           <div class="vista-previa">
             <div class="vista-rotulo">Se creará esta carpeta</div>
             <div id="vista-nombre" class="vista-nombre"></div>
@@ -438,6 +441,10 @@
 <script src="js/guias.js"></script>
 <script src="js/datos.js"></script>
 <script src="js/documentos.js"></script>
+
+<!-- La comodidad de la pantalla. Va antes que la aplicación, para
+     enterarse de los cambios antes de que la pantalla se mueva. -->
+<script src="js/usabilidad.js"></script>
 
 <!-- La aplicación, repartida por pantallas. -->
 <script src="js/nucleo.js"></script>
