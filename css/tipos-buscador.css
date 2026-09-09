@@ -1,0 +1,12 @@
+/* ============================================================
+   tipos-buscador.css — el buscador que va encima de los tipos.
+   ============================================================ */
+
+.buscador-tipos {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin: 0 0 10px;
+}
+.buscador-tipos .campo { width: 280px; min-width: 0; }
+.buscador-tipos .boton { padding: 7px 12px; font-size: 13px; }
+
+#tipos-sin-nada { margin-top: 8px; }
