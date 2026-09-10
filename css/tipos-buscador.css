@@ -1,5 +1,6 @@
 /* ============================================================
-   tipos-buscador.css — el buscador que va encima de los tipos.
+   tipos-buscador.css — el buscador que va encima de los tipos, y la
+   marca de los resultados que hay que mirar dos veces.
    ============================================================ */
 
 .buscador-tipos {
@@ -16,7 +17,9 @@
    Un alumno que ya no está matriculado, o alguien del centro que ya
    cesó, salen marcados en naranja. Sus asuntos viejos siguen ahí, pero
    abrirle uno nuevo casi siempre es una equivocación, y en una lista de
-   veinte nombres iguales eso se pasa por alto. */
+   veinte nombres iguales eso se pasa por alto.
+
+   Quién pone la clase: App.claseDeResultado, en js/asuntos-nuevo.js. */
 .resultado-aviso {
   border-left: 4px solid var(--ambar-linea);
   background: #fff8ec;
