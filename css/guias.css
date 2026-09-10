@@ -89,6 +89,94 @@
 .paso-cuerpo-texto ul, .paso-cuerpo-texto ol { margin: 6px 0; padding-left: 20px; }
 .paso-cuerpo-texto a { color: var(--azul); }
 
+/* ---------- las preguntas con opciones ----------
+
+   Un paso puede ser una pregunta: se elige una opción y el trámite
+   sigue por los pasos de esa opción. Las dos ramas están pintadas
+   desde el principio; solo se ve la elegida. */
+
+.paso-lectura.paso-pregunta { border-left-color: var(--ambar-linea); }
+.paso-lectura.paso-pregunta.paso-hecho { border-left-color: #1e7a46; }
+/* En una pregunta el título no se tacha: hay que seguir leyendo qué se
+   preguntaba para entender la rama que hay debajo. */
+.paso-lectura.paso-pregunta.paso-hecho .paso-titulo-texto {
+  text-decoration: none;
+  opacity: 1;
+}
+
+.paso-marca-pregunta {
+  background: var(--ambar);
+  border: 1px solid var(--ambar-linea);
+  color: #8a6100;
+}
+
+.guia-opciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0 32px;
+}
+
+.guia-opcion {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--tinta);
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 20px;
+  padding: 7px 15px;
+  cursor: pointer;
+}
+.guia-opcion:hover { border-color: #b9c6d6; }
+.guia-opcion.elegida {
+  border-color: #1e7a46;
+  background: var(--verde);
+  box-shadow: 0 0 0 2px rgba(30, 122, 70, .15);
+}
+.guia-opcion-nota { font-size: 12px; color: var(--tinta-suave); }
+
+.guia-rama { display: none; margin: 10px 0 0 32px; }
+.guia-rama.rama-activa { display: block; }
+/* Los pasos de la rama van un poco más pequeños, para que se vea de un
+   vistazo que cuelgan de la pregunta. */
+.guia-rama .paso-lectura { padding: 8px 12px; }
+.guia-rama .paso-titulo-texto { font-size: 14px; }
+
+/* ---------- las opciones, al escribir la guía ---------- */
+
+.paso-es-pregunta-fila { margin-top: 10px; }
+
+.paso-opciones {
+  margin-top: 10px;
+  border-left: 3px solid var(--ambar-linea);
+  padding-left: 12px;
+}
+.paso-opciones .explica { margin-top: 0; }
+
+.opcion-editor {
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  background: var(--fondo);
+}
+.opcion-cabecera { display: flex; align-items: center; gap: 8px; }
+.opcion-cabecera .opcion-titulo { flex: 1; }
+.opcion-pasos { margin-top: 8px; }
+
+.subpaso-editor {
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  background: var(--papel);
+}
+.subpaso-editor .paso-cabecera { gap: 8px; }
+.subpaso-editor .subpaso-titulo { flex: 1; }
+.subpaso-cuerpo { min-height: 56px; }
+
 /* La guía dentro de la pantalla de Nuevo asunto. */
 .guia-caja {
   margin-top: 14px;
@@ -154,5 +242,3 @@
 }
 .paso-cuerpo ul, .paso-cuerpo ol { margin: 6px 0; padding-left: 20px; }
 .paso-cuerpo a { color: var(--azul); }
-
-/* publicado 10-sep-2026 13:15 */
