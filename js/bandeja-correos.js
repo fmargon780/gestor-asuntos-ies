@@ -224,6 +224,33 @@
     return String((ficha && ficha.estado) || '') === 'cerrado';
   }
 
+  /* ==========================================================
+     EL ENLACE QUE ABRE EL CORREO EN GMAIL
+
+     La primera versión del script guardaba la dirección con
+     #all/<identificador del hilo>, y esa no abre nada: Gmail contesta
+     "la conversación que has solicitado no se ha podido cargar". El
+     script ya guarda una búsqueda por el Message-ID, que sí funciona,
+     pero los correos recogidos antes se quedaron con la mala.
+
+     Así que cuando llega una de las malas se cambia aquí por una
+     búsqueda del asunto y del remitente. No abre la conversación de
+     golpe, pero la deja delante en la lista de resultados.
+     ========================================================== */
+
+  function enlaceAGmail(d) {
+    var enlace = String((d && d.enlace) || '');
+    if (enlace && enlace.indexOf('#all/') === -1) return enlace;
+
+    var asunto = sinElRe((d && d.asunto) || '').trim();
+    if (!asunto) return enlace;
+
+    var base = enlace.split('#')[0] || 'https://mail.google.com/mail/u/0/';
+    var busca = 'subject:"' + asunto.replace(/"/g, '') + '"';
+    if (d.de && d.de.correo) busca += ' from:' + d.de.correo;
+    return base + '#search/' + encodeURIComponent(busca);
+  }
+
   /* La carpeta de un asunto que ya existe. Si está archivado, hay que
      bajar por ARCHIVO / CATEGORÍA / TERCERO. */
   async function carpetaDelAsunto(nombre, ficha) {
@@ -249,7 +276,7 @@
         ((d.de && (d.de.nombre || d.de.correo)) || 'remitente desconocido') +
         ', recibida el ' + fechaLegible(d.fechaUltimo || d.fecha) + '.' +
         (reabierto ? '\nCon este correo se ha reabierto el asunto.' : '') +
-        (d.enlace ? '\nEn Gmail: ' + d.enlace : ''));
+        (d.enlace ? '\nEn Gmail: ' + enlaceAGmail(d) : ''));
     } catch (e) { /* la nota es lo menos importante */ }
     await borrarDeLaBandeja(item);
     U.aviso(metidos
@@ -437,7 +464,7 @@
       var ver = document.createElement('button');
       ver.className = 'boton';
       ver.textContent = 'Ver el correo';
-      ver.onclick = function () { window.open(d.enlace, '_blank'); };
+      ver.onclick = function () { window.open(enlaceAGmail(d), '_blank'); };
       acciones.appendChild(ver);
     }
 
@@ -585,7 +612,7 @@
         (d.de && d.de.correo && d.de.nombre ? ' <' + d.de.correo + '>' : '') +
         ', recibido el ' + fechaLegible(d.fecha) + '.' +
         '\nAsunto del correo: ' + (d.asunto || '(sin asunto)') +
-        (d.enlace ? '\nEn Gmail: ' + d.enlace : '');
+        (d.enlace ? '\nEn Gmail: ' + enlaceAGmail(d) : '');
       await window.Notas.anadir({ nombre: nombreAsunto, ficha: {} }, texto);
     } catch (e) { /* la nota es lo menos importante de todo esto */ }
 
