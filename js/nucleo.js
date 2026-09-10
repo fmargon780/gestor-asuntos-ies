@@ -54,7 +54,7 @@ App.SEGUNDOS_ENTRE_MIRADAS = 20;
    todavía, o el navegador se ha quedado con la página vieja.
 
    La hora es la de España, la del reloj de Francisco. */
-App.VERSION = '10-sep-2026 · 09:05';
+App.VERSION = '10-sep-2026 · 09:40';
 
 /* El atajo de siempre para coger un elemento de la página. Es global
    para todos los ficheros de la aplicación, y también cuelga de App
