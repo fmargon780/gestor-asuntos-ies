@@ -47,12 +47,14 @@ App.FICHERO_ESTADOS = 'estados.json';
 App.TITULO = 'Gestor de Asuntos';
 App.SEGUNDOS_ENTRE_MIRADAS = 20;
 
-/* La fecha de la última versión publicada. Sale en la pantalla de
-   entrada y, ya dentro, abajo a la izquierda debajo del nombre. Sirve
-   para saber de un vistazo si el navegador se ha quedado con una copia
-   vieja de la página: si pone una fecha anterior a la del último
-   cambio, hay que recargar con Ctrl+Mayús+R. */
-App.VERSION = '10-sep-2026';
+/* La fecha y la hora de la última versión publicada. Sale en la
+   pantalla de entrada y, ya dentro, abajo a la izquierda debajo del
+   nombre. Sirve para saber de un vistazo si se está mirando lo último:
+   si la hora no es la del último cambio, o Vercel no ha publicado
+   todavía, o el navegador se ha quedado con la página vieja.
+
+   La hora es la de España, la del reloj de Francisco. */
+App.VERSION = '10-sep-2026 · 05:50';
 
 /* El atajo de siempre para coger un elemento de la página. Es global
    para todos los ficheros de la aplicación, y también cuelga de App
