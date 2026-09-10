@@ -5,6 +5,9 @@
    una lista de pasos. Cada paso tiene un título corto y una
    explicación debajo, con negrita, viñetas y enlaces.
 
+   Un paso puede ser además una PREGUNTA con opciones: se elige una y
+   el trámite sigue por los pasos de esa opción.
+
    Los pasos van en el orden del trámite, como los estados: se suben
    y se bajan con las flechas.
 
@@ -12,8 +15,8 @@
    abiertos, así que los ve todo el que abra la aplicación.
 
    En cada asunto abierto la guía se enseña con casillas, para ir
-   marcando lo que ya está hecho. Lo marcado se guarda en la ficha
-   del asunto, en asuntos.json.
+   marcando lo que ya está hecho. Lo marcado y lo elegido se guardan en
+   la ficha del asunto, en asuntos.json.
    ============================================================ */
 var Guias = (function () {
 
@@ -87,17 +90,46 @@ var Guias = (function () {
     return d.textContent.replace(/\s+/g, '') !== '';
   }
 
-  /* Los pasos, tal y como se guardan: id, título y cuerpo. */
+  /* Los pasos, tal y como se guardan: id, título, cuerpo y, si el paso
+     es una pregunta, sus opciones.
+
+     Una PREGUNTA es un paso con `opciones`. Cada opción tiene su nombre
+     y su propia lista de pasos. Al elegir una dentro de un asunto solo
+     salen los pasos de esa opción; los de la otra ni se ven. Ejemplo
+     suyo: "¿Cómo hemos recibido la factura?" → en mano (sello, firma,
+     entregar a Fátima) o digitalmente (a la firma del director).
+
+     Las opciones no llevan opciones dentro: una bifurcación por paso
+     es lo que se entiende de un vistazo. */
+  function normalizarOpciones(lista) {
+    return (lista || []).map(function (o) {
+      return {
+        id: (o && o.id) || nuevoId(),
+        titulo: String((o && o.titulo) || ''),
+        pasos: normalizar((o && o.pasos) || []).map(function (sp) {
+          return { id: sp.id, titulo: sp.titulo, cuerpo: sp.cuerpo, opciones: [] };
+        })
+      };
+    }).filter(function (o) { return o.titulo || o.pasos.length; });
+  }
+
   function normalizar(lista) {
     return (lista || []).map(function (p) {
-      if (typeof p === 'string') return { id: nuevoId(), titulo: p, cuerpo: '' };
+      if (typeof p === 'string') {
+        return { id: nuevoId(), titulo: p, cuerpo: '', opciones: [] };
+      }
       return {
         id: (p && p.id) || nuevoId(),
         titulo: String((p && p.titulo) || ''),
-        cuerpo: limpiar((p && p.cuerpo) || '')
+        cuerpo: limpiar((p && p.cuerpo) || ''),
+        opciones: normalizarOpciones(p && p.opciones)
       };
-    }).filter(function (p) { return p.titulo || tieneTexto(p.cuerpo); });
+    }).filter(function (p) {
+      return p.titulo || tieneTexto(p.cuerpo) || p.opciones.length;
+    });
   }
+
+  function esPregunta(p) { return !!(p && p.opciones && p.opciones.length); }
 
   function cuantos(lista) { return (lista || []).length; }
 
@@ -108,42 +140,107 @@ var Guias = (function () {
   /* La guía en modo lectura. Sin casillas sirve de recordatorio
      (por ejemplo, al crear el asunto); con casillas, de lista de
      control dentro del asunto. */
-  function vista(lista, hechos, conCasillas) {
+  function vista(lista, hechos, conCasillas, elegidas) {
     var pasos = normalizar(lista);
     if (!pasos.length) return '';
     var marcados = hechos || [];
+    var elegido = elegidas || {};
     return '<ol class="guia-lectura">' + pasos.map(function (p, i) {
-      var hecho = marcados.indexOf(p.id) !== -1;
-      var casilla = conCasillas
-        ? '<input type="checkbox" class="paso-casilla" data-paso="' + U.escapar(p.id) + '"' +
-          (hecho ? ' checked' : '') + '>'
-        : '<span class="paso-numero">' + (i + 1) + '</span>';
-      /* Un paso marcado se pliega y se queda solo con su título tachado:
-         con cuatro pasos explicados, la guía se comía la pantalla. El
-         botoncito de la esquina lo vuelve a abrir para releerlo. Solo
-         tiene sentido donde hay casillas, que es dentro de un asunto. */
-      var conCuerpo = tieneTexto(p.cuerpo);
-      var verlo = (conCasillas && conCuerpo)
-        ? '<button type="button" class="paso-ver" ' +
-          'title="Ver o esconder la explicación de este paso">ver</button>'
-        : '';
-      return '<li class="paso-lectura' + (hecho ? ' paso-hecho' : '') + '">' +
-             '<label class="paso-linea">' + casilla +
-             '<span class="paso-titulo-texto">' + U.escapar(p.titulo || 'Paso ' + (i + 1)) + '</span>' +
-             '</label>' + verlo +
-             (conCuerpo ? '<div class="paso-cuerpo-texto">' + limpiar(p.cuerpo) + '</div>' : '') +
-             '</li>';
+      return unPaso(p, i, marcados, elegido, conCasillas);
     }).join('') + '</ol>';
   }
 
-  /* Los dos enganches del plegado. Van una sola vez sobre el documento
+  function unPaso(p, i, marcados, elegidas, conCasillas) {
+    var pregunta = esPregunta(p);
+    var cual = pregunta ? String(elegidas[p.id] || '') : '';
+    /* Una pregunta cuenta como hecha en cuanto se elige una opción. */
+    var hecho = pregunta ? !!cual : marcados.indexOf(p.id) !== -1;
+    var conCuerpo = tieneTexto(p.cuerpo);
+
+    var control;
+    if (!conCasillas) control = '<span class="paso-numero">' + (i + 1) + '</span>';
+    else if (pregunta) control = '<span class="paso-numero paso-marca-pregunta">?</span>';
+    else control = '<input type="checkbox" class="paso-casilla" data-paso="' +
+                   U.escapar(p.id) + '"' + (hecho ? ' checked' : '') + '>';
+
+    /* Un paso marcado se pliega y se queda solo con su título tachado:
+       con cuatro pasos explicados, la guía se comía la pantalla. El
+       botoncito de la esquina lo vuelve a abrir para releerlo. Solo
+       tiene sentido donde hay casillas, que es dentro de un asunto.
+       En una pregunta no se pliega: hay que seguir viendo qué se
+       preguntaba. */
+    var verlo = (conCasillas && conCuerpo && !pregunta)
+      ? '<button type="button" class="paso-ver" ' +
+        'title="Ver o esconder la explicación de este paso">ver</button>'
+      : '';
+
+    var titulo = '<span class="paso-titulo-texto">' +
+                 U.escapar(p.titulo || 'Paso ' + (i + 1)) + '</span>';
+    /* La pregunta no lleva <label>: no hay casilla que marcar, y con
+       label el clic en el título no haría nada. */
+    var cabecera = pregunta
+      ? '<div class="paso-linea">' + control + titulo + '</div>'
+      : '<label class="paso-linea">' + control + titulo + '</label>';
+
+    var ramas = '';
+    if (pregunta) {
+      /* Los botones de elegir, y debajo TODAS las ramas ya pintadas.
+         Solo se ve la elegida: así elegir es enseñar y esconder, sin
+         volver a pintar nada y sin perder lo que ya estuviera marcado
+         en la otra rama. */
+      ramas =
+        '<div class="guia-opciones">' + p.opciones.map(function (o) {
+          return '<button type="button" class="guia-opcion' +
+                 (o.id === cual ? ' elegida' : '') + '" data-paso="' + U.escapar(p.id) +
+                 '" data-opcion="' + U.escapar(o.id) + '">' +
+                 U.escapar(o.titulo || 'Opción') + '</button>';
+        }).join('') +
+        /* El aviso se pinta siempre y se enseña o se esconde: si solo se
+           pintara al haber respuesta, no aparecería al responder, que es
+           justo cuando hace falta. */
+        (conCasillas
+          ? '<span class="guia-opcion-nota' + (cual ? '' : ' oculto') +
+            '">Vuelve a pulsarla para cambiar la respuesta.</span>'
+          : '') +
+        '</div>' +
+        '<div class="guia-ramas">' + p.opciones.map(function (o) {
+          var dentro = o.pasos.length
+            ? vista(o.pasos, marcados, conCasillas, elegidas)
+            : '<p class="explica">Con elegir esta opción basta: no hay más pasos.</p>';
+          return '<div class="guia-rama' + (o.id === cual ? ' rama-activa' : '') +
+                 '" data-opcion="' + U.escapar(o.id) + '">' + dentro + '</div>';
+        }).join('') + '</div>';
+    }
+
+    return '<li class="paso-lectura' + (hecho ? ' paso-hecho' : '') +
+           (pregunta ? ' paso-pregunta' : '') + '">' +
+           cabecera + verlo +
+           (conCuerpo ? '<div class="paso-cuerpo-texto">' + limpiar(p.cuerpo) + '</div>' : '') +
+           ramas +
+           '</li>';
+  }
+
+  /* Quién se entera de que se ha elegido una opción, para guardarlo en
+     la ficha del asunto. Solo hay una guía en pantalla a la vez, así
+     que con un solo hueco basta; el cuadro de la guía se guarda el
+     anterior y lo devuelve al cerrarse. */
+  var alElegirOpcion = null;
+
+  function cuandoSeElige(fn) {
+    var antes = alElegirOpcion;
+    alElegirOpcion = fn || null;
+    return antes;
+  }
+
+  /* Los enganches de lo que se pulsa dentro de una guía: plegar un paso
+     hecho y elegir una opción. Van una sola vez sobre el documento
      entero, y no en cada sitio que pinta una guía: la guía sale en la
      ficha del asunto y en su propio cuadro, y así los dos se comportan
      igual sin repetir código.
 
      Con `closest` basta: el clic puede caer en el botón o en algo de
      dentro. */
-  function engancharElPlegado() {
+  function engancharLaGuia() {
     document.addEventListener('click', function (ev) {
       var b = ev.target && ev.target.closest ? ev.target.closest('.paso-ver') : null;
       if (!b) return;
@@ -151,6 +248,30 @@ var Guias = (function () {
       var li = b.closest('.paso-lectura');
       if (!li) return;
       b.textContent = li.classList.toggle('paso-abierto') ? 'esconder' : 'ver';
+    });
+
+    /* Elegir una opción de una pregunta. Se apaga la otra rama y se
+       enciende la elegida, sin volver a pintar nada. Volver a pulsar la
+       que ya estaba elegida deja la pregunta sin responder, que es como
+       se cambia de idea. */
+    document.addEventListener('click', function (ev) {
+      var b = ev.target && ev.target.closest ? ev.target.closest('.guia-opcion') : null;
+      if (!b) return;
+      ev.preventDefault();
+      var li = b.closest('.paso-lectura');
+      if (!li) return;
+      var nueva = b.classList.contains('elegida') ? '' : String(b.dataset.opcion || '');
+
+      Array.prototype.forEach.call(li.querySelectorAll(':scope > .guia-opciones .guia-opcion'),
+        function (x) { x.classList.toggle('elegida', !!nueva && x.dataset.opcion === nueva); });
+      Array.prototype.forEach.call(li.querySelectorAll(':scope > .guia-ramas > .guia-rama'),
+        function (r) { r.classList.toggle('rama-activa', !!nueva && r.dataset.opcion === nueva); });
+      li.classList.toggle('paso-hecho', !!nueva);
+
+      var nota = li.querySelector(':scope > .guia-opciones .guia-opcion-nota');
+      if (nota) nota.classList.toggle('oculto', !nueva);
+
+      if (alElegirOpcion) alElegirOpcion(String(b.dataset.paso || ''), nueva);
     });
 
     /* Al desmarcar, el paso se abre solo otra vez: así el botón no se
@@ -165,33 +286,58 @@ var Guias = (function () {
       if (b) b.textContent = 'ver';
     });
   }
-  engancharElPlegado();
+  engancharLaGuia();
 
-  function hechosDe(lista, hechos) {
+  /* Cuántos pasos hay y cuántos están hechos, contando solo la rama
+     elegida de cada pregunta: los pasos de la opción que no se ha
+     elegido no se hacen, así que tampoco se cuentan. La pregunta en sí
+     cuenta como un paso, hecho en cuanto se responde. */
+  function cuenta(lista, hechos, elegidas) {
     var pasos = normalizar(lista);
     var marcados = hechos || [];
-    var n = 0;
-    pasos.forEach(function (p) { if (marcados.indexOf(p.id) !== -1) n++; });
-    return n;
+    var elegido = elegidas || {};
+    var total = 0, n = 0;
+    pasos.forEach(function (p) {
+      total++;
+      if (esPregunta(p)) {
+        var cual = elegido[p.id];
+        if (!cual) return;
+        n++;
+        var rama = p.opciones.filter(function (o) { return o.id === cual; })[0];
+        if (!rama) return;
+        var c = cuenta(rama.pasos, marcados, elegido);
+        total += c.total;
+        n += c.hechos;
+        return;
+      }
+      if (marcados.indexOf(p.id) !== -1) n++;
+    });
+    return { hechos: n, total: total };
+  }
+
+  function hechosDe(lista, hechos, elegidas) {
+    return cuenta(lista, hechos, elegidas).hechos;
   }
 
   /* La guía de un asunto, en su propio cuadro y con casillas.
      'alMarcar' recibe la lista completa de pasos marcados cada vez
      que se toca una casilla, para que la guarde quien la abrió. */
-  async function abrir(titulo, lista, hechos, alMarcar) {
+  async function abrir(titulo, lista, hechos, alMarcar, elegidas, alElegir) {
     var marcados = (hechos || []).slice();
+    var elegido = Object.assign({}, elegidas || {});
     var pasos = normalizar(lista);
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-medio');
 
     var esperar = U.preguntar(titulo,
       '<p class="explica" id="guia-cuenta"></p>' +
-      '<div id="guia-cuerpo">' + vista(pasos, marcados, true) + '</div>',
+      '<div id="guia-cuerpo">' + vista(pasos, marcados, true, elegido) + '</div>',
       'Cerrar', true);
 
     function contar() {
+      var c = cuenta(pasos, marcados, elegido);
       $('guia-cuenta').textContent =
-        hechosDe(pasos, marcados) + ' de ' + pasos.length + ' pasos hechos. ' +
+        c.hechos + ' de ' + c.total + ' pasos hechos. ' +
         'Lo que marques aquí lo ve todo el que abra la aplicación.';
     }
     contar();
@@ -209,7 +355,18 @@ var Guias = (function () {
         };
       });
 
+    /* El hueco de las opciones se toma prestado mientras el cuadro está
+       abierto y se devuelve al cerrarlo, para no dejar sin él a la
+       ficha del asunto que hay debajo. */
+    var antes = cuandoSeElige(function (idPaso, idOpcion) {
+      if (idOpcion) elegido[idPaso] = idOpcion;
+      else delete elegido[idPaso];
+      contar();
+      if (alElegir) alElegir(Object.assign({}, elegido));
+    });
+
     await esperar;
+    cuandoSeElige(antes);
     cuadro.classList.remove('cuadro-medio');
     return marcados;
   }
@@ -309,14 +466,43 @@ var Guias = (function () {
 
     /* ---------- la lista de pasos ---------- */
 
+    /* Se lee todo lo escrito antes de repintar o de guardar. Ojo con los
+       selectores: los recuadros de las opciones están DENTRO del de su
+       paso, así que hay que pedir solo los hijos directos (`:scope >`).
+       Sin eso, el paso se leería a sí mismo y a sus opciones a la vez.
+
+       Los identificadores viajan en el `data-id` del propio recuadro,
+       no por su posición: si no, al mover o quitar una opción se
+       perdería lo que ya estuviera marcado en un asunto. */
     function recoger() {
-      Array.prototype.forEach.call(document.querySelectorAll('#guia-pasos .paso-editor'),
-        function (caja) {
-          var i = parseInt(caja.dataset.pos, 10);
-          if (isNaN(i) || !pasos[i]) return;
-          pasos[i].titulo = caja.querySelector('.paso-titulo').value.trim();
-          pasos[i].cuerpo = limpiar(caja.querySelector('.paso-cuerpo').innerHTML);
+      Array.prototype.forEach.call($('guia-pasos').children, function (caja) {
+        var i = parseInt(caja.dataset.pos, 10);
+        if (isNaN(i) || !pasos[i]) return;
+        pasos[i].titulo = caja.querySelector(':scope > .paso-cabecera .paso-titulo').value.trim();
+        pasos[i].cuerpo = limpiar(caja.querySelector(':scope > .paso-cuerpo').innerHTML);
+
+        var marca = caja.querySelector(':scope > .paso-es-pregunta-fila .paso-es-pregunta');
+        if (!marca || !marca.checked) { pasos[i].opciones = []; return; }
+
+        pasos[i].opciones = Array.prototype.slice.call(
+          caja.querySelectorAll(':scope > .paso-opciones > .opcion-editor')
+        ).map(function (oc) {
+          return {
+            id: oc.dataset.id || nuevoId(),
+            titulo: oc.querySelector(':scope > .opcion-cabecera > .opcion-titulo').value.trim(),
+            pasos: Array.prototype.slice.call(
+              oc.querySelectorAll(':scope > .opcion-pasos > .subpaso-editor')
+            ).map(function (sc) {
+              return {
+                id: sc.dataset.id || nuevoId(),
+                titulo: sc.querySelector(':scope > .paso-cabecera > .subpaso-titulo').value.trim(),
+                cuerpo: limpiar(sc.querySelector(':scope > .subpaso-cuerpo').innerHTML),
+                opciones: []
+              };
+            })
+          };
         });
+      });
     }
 
     function pintar() {
@@ -378,22 +564,139 @@ var Guias = (function () {
         d.querySelector('.paso-cabecera').appendChild(mandos);
 
         var cuerpo = d.querySelector('.paso-cuerpo');
-        cuerpo.onfocus = function () { editando = cuerpo; };
-        /* Al pegar desde Word o desde una web, solo el texto: así no se
-           cuela el formato de fuera. */
-        cuerpo.onpaste = function (ev) {
-          ev.preventDefault();
-          var t = (ev.clipboardData || window.clipboardData).getData('text/plain');
-          document.execCommand('insertText', false, t);
+        prepararRecuadro(cuerpo);
+
+        /* ---- la casilla de "esto es una pregunta" ---- */
+        var pregunta = esPregunta(p);
+        var fila = document.createElement('label');
+        fila.className = 'interruptor paso-es-pregunta-fila';
+        fila.innerHTML = '<input type="checkbox" class="paso-es-pregunta"' +
+          (pregunta ? ' checked' : '') + '>' +
+          '<span>Este paso es una pregunta: el trámite sigue por un camino o por otro</span>';
+        d.appendChild(fila);
+
+        fila.querySelector('.paso-es-pregunta').onchange = function () {
+          recoger();
+          if (this.checked && !pasos[i].opciones.length) {
+            pasos[i].opciones = [
+              { id: nuevoId(), titulo: '', pasos: [] },
+              { id: nuevoId(), titulo: '', pasos: [] }
+            ];
+          }
+          pintar();
         };
+
+        if (pregunta) d.appendChild(cajaDeOpciones(p, i));
 
         caja.appendChild(d);
       });
     }
 
+    /* Al pegar desde Word o desde una web, solo el texto: así no se
+       cuela el formato de fuera. */
+    function prepararRecuadro(cuerpo) {
+      cuerpo.onfocus = function () { editando = cuerpo; };
+      cuerpo.onpaste = function (ev) {
+        ev.preventDefault();
+        var t = (ev.clipboardData || window.clipboardData).getData('text/plain');
+        document.execCommand('insertText', false, t);
+      };
+    }
+
+    /* Las opciones de un paso-pregunta, cada una con sus propios pasos.
+       Todo lo que cambia la lista hace lo mismo: recoger lo escrito,
+       tocar el array y volver a pintar. */
+    function cajaDeOpciones(p, i) {
+      var caja = document.createElement('div');
+      caja.className = 'paso-opciones';
+
+      var explica = document.createElement('p');
+      explica.className = 'explica';
+      explica.textContent = 'Dentro del asunto se elige una opción, y solo salen los ' +
+                            'pasos de la elegida.';
+      caja.appendChild(explica);
+
+      p.opciones.forEach(function (o, j) {
+        var oc = document.createElement('div');
+        oc.className = 'opcion-editor';
+        oc.dataset.id = o.id;
+        oc.innerHTML =
+          '<div class="opcion-cabecera">' +
+            '<input class="campo opcion-titulo" value="' + U.escapar(o.titulo) + '" ' +
+            'placeholder="Nombre de la opción. Por ejemplo: la hemos recibido en mano">' +
+          '</div>' +
+          '<div class="opcion-pasos"></div>';
+
+        var quitar = document.createElement('button');
+        quitar.type = 'button';
+        quitar.className = 'boton boton-peligro';
+        quitar.textContent = 'Quitar la opción';
+        quitar.title = 'Quitar esta opción y sus pasos';
+        quitar.onclick = function () {
+          recoger();
+          pasos[i].opciones.splice(j, 1);
+          pintar();
+        };
+        oc.querySelector('.opcion-cabecera').appendChild(quitar);
+
+        var dentro = oc.querySelector('.opcion-pasos');
+        o.pasos.forEach(function (sp, k) {
+          var sc = document.createElement('div');
+          sc.className = 'subpaso-editor';
+          sc.dataset.id = sp.id;
+          sc.innerHTML =
+            '<div class="paso-cabecera">' +
+              '<input class="campo subpaso-titulo" value="' + U.escapar(sp.titulo) + '" ' +
+              'placeholder="Título corto del paso">' +
+            '</div>' +
+            '<div class="paso-cuerpo subpaso-cuerpo" contenteditable="true" ' +
+            'data-vacio="Explicación del paso">' + limpiar(sp.cuerpo) + '</div>';
+
+          var fuera = document.createElement('button');
+          fuera.type = 'button';
+          fuera.className = 'boton boton-peligro';
+          fuera.textContent = 'Quitar';
+          fuera.onclick = function () {
+            recoger();
+            pasos[i].opciones[j].pasos.splice(k, 1);
+            pintar();
+          };
+          sc.querySelector('.paso-cabecera').appendChild(fuera);
+          prepararRecuadro(sc.querySelector('.subpaso-cuerpo'));
+          dentro.appendChild(sc);
+        });
+
+        var mas = document.createElement('button');
+        mas.type = 'button';
+        mas.className = 'boton boton-ancho';
+        mas.textContent = '+ Añadir un paso a esta opción';
+        mas.onclick = function () {
+          recoger();
+          pasos[i].opciones[j].pasos.push({ id: nuevoId(), titulo: '', cuerpo: '', opciones: [] });
+          pintar();
+        };
+        oc.appendChild(mas);
+
+        caja.appendChild(oc);
+      });
+
+      var otra = document.createElement('button');
+      otra.type = 'button';
+      otra.className = 'boton boton-ancho';
+      otra.textContent = '+ Añadir otra opción';
+      otra.onclick = function () {
+        recoger();
+        pasos[i].opciones.push({ id: nuevoId(), titulo: '', pasos: [] });
+        pintar();
+      };
+      caja.appendChild(otra);
+
+      return caja;
+    }
+
     $('guia-anadir').onclick = function () {
       recoger();
-      pasos.push({ id: nuevoId(), titulo: '', cuerpo: '' });
+      pasos.push({ id: nuevoId(), titulo: '', cuerpo: '', opciones: [] });
       pintar();
       var cajas = document.querySelectorAll('#guia-pasos .paso-titulo');
       if (cajas.length) cajas[cajas.length - 1].focus();
@@ -413,7 +716,8 @@ var Guias = (function () {
 
   return {
     nuevoId: nuevoId, limpiar: limpiar, normalizar: normalizar,
-    cuantos: cuantos, vista: vista, hechosDe: hechosDe,
+    cuantos: cuantos, vista: vista, hechosDe: hechosDe, cuenta: cuenta,
+    esPregunta: esPregunta, cuandoSeElige: cuandoSeElige,
     abrir: abrir, editar: editar
   };
 })();
