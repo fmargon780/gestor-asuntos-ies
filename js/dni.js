@@ -1,8 +1,8 @@
 /* ============================================================
    dni.js — el DNI del alumnado, y el aviso de que falta.
 
-   Debajo del nombre de un alumno ya salen su grupo, su curso y su
-   número de identificación escolar. Aquí se le añade el DNI.
+   Debajo del nombre de un alumno ya salen su grupo y su curso. Aquí se
+   le añade el DNI, y se le deja buscar por él.
 
    Y algo más útil todavía: **cuando no consta y por edad ya debería
    tenerlo, se avisa**. En España el DNI es obligatorio a partir de los
@@ -20,10 +20,10 @@
    avisa de nada.** Mejor callar que dar por perdido un DNI que sí está,
    solo que no se ha descargado.
 
-   Este fichero no toca ninguna pantalla: envuelve dos funciones que ya
-   existen, `App.pieAlumno` y `Datos.destacadosAlumno`. Por eso el DNI
-   sale a la vez en el buscador de Nuevo asunto, en Personas y empresas
-   y en el contacto de la ficha de un asunto.
+   Este fichero no toca ninguna pantalla: envuelve tres funciones que ya
+   existen, `Datos.cargar`, `App.pieAlumno` y `Datos.destacadosAlumno`.
+   Por eso el DNI sale a la vez en el buscador de Nuevo asunto, en
+   Personas y empresas y en el contacto de la ficha de un asunto.
    ============================================================ */
 (function () {
 
@@ -104,9 +104,29 @@
     var comoEraCargar = Datos.cargar;
     Datos.cargar = async function (dir, categoria) {
       var r = await comoEraCargar(dir, categoria);
-      if (categoria === 'ALUMNADO' && r && r.cabecera) cabeceraAlumnado = r.cabecera;
+      if (categoria === 'ALUMNADO' && r) {
+        if (r.cabecera) cabeceraAlumnado = r.cabecera;
+        meterElDniEnLaBusqueda(r.lista);
+      }
       return r;
     };
+  }
+
+  /* El buscador compara con `p.busca`, que trae el nombre y el número
+     de identificación escolar. Aquí se le añade el DNI, para poder
+     buscar a alguien escribiendo su documento.
+
+     La lista viene de una caché y se carga muchas veces, así que cada
+     alumno se marca para no añadirlo dos veces. */
+  function meterElDniEnLaBusqueda(lista) {
+    (lista || []).forEach(function (p) {
+      if (!p || p.dniEnLaBusqueda) return;
+      var doc = documentoDe(p);
+      if (!doc) return;
+      p.busca = (p.busca || '') + ' ' + U.normalizar(doc) + ' ' +
+                U.normalizar(doc.replace(/[\s.\-\/]/g, ''));
+      p.dniEnLaBusqueda = true;
+    });
   }
 
   /* ---------- 1. la línea de debajo del nombre ----------
