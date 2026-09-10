@@ -118,14 +118,54 @@ var Guias = (function () {
         ? '<input type="checkbox" class="paso-casilla" data-paso="' + U.escapar(p.id) + '"' +
           (hecho ? ' checked' : '') + '>'
         : '<span class="paso-numero">' + (i + 1) + '</span>';
+      /* Un paso marcado se pliega y se queda solo con su título tachado:
+         con cuatro pasos explicados, la guía se comía la pantalla. El
+         botoncito de la esquina lo vuelve a abrir para releerlo. Solo
+         tiene sentido donde hay casillas, que es dentro de un asunto. */
+      var conCuerpo = tieneTexto(p.cuerpo);
+      var verlo = (conCasillas && conCuerpo)
+        ? '<button type="button" class="paso-ver" ' +
+          'title="Ver o esconder la explicación de este paso">ver</button>'
+        : '';
       return '<li class="paso-lectura' + (hecho ? ' paso-hecho' : '') + '">' +
              '<label class="paso-linea">' + casilla +
              '<span class="paso-titulo-texto">' + U.escapar(p.titulo || 'Paso ' + (i + 1)) + '</span>' +
-             '</label>' +
-             (tieneTexto(p.cuerpo) ? '<div class="paso-cuerpo-texto">' + limpiar(p.cuerpo) + '</div>' : '') +
+             '</label>' + verlo +
+             (conCuerpo ? '<div class="paso-cuerpo-texto">' + limpiar(p.cuerpo) + '</div>' : '') +
              '</li>';
     }).join('') + '</ol>';
   }
+
+  /* Los dos enganches del plegado. Van una sola vez sobre el documento
+     entero, y no en cada sitio que pinta una guía: la guía sale en la
+     ficha del asunto y en su propio cuadro, y así los dos se comportan
+     igual sin repetir código.
+
+     Con `closest` basta: el clic puede caer en el botón o en algo de
+     dentro. */
+  function engancharElPlegado() {
+    document.addEventListener('click', function (ev) {
+      var b = ev.target && ev.target.closest ? ev.target.closest('.paso-ver') : null;
+      if (!b) return;
+      ev.preventDefault();
+      var li = b.closest('.paso-lectura');
+      if (!li) return;
+      b.textContent = li.classList.toggle('paso-abierto') ? 'esconder' : 'ver';
+    });
+
+    /* Al desmarcar, el paso se abre solo otra vez: así el botón no se
+       queda diciendo "esconder" sobre un paso que ya está abierto. */
+    document.addEventListener('change', function (ev) {
+      var c = ev.target;
+      if (!c || !c.classList || !c.classList.contains('paso-casilla')) return;
+      var li = c.closest ? c.closest('.paso-lectura') : null;
+      if (!li) return;
+      li.classList.remove('paso-abierto');
+      var b = li.querySelector('.paso-ver');
+      if (b) b.textContent = 'ver';
+    });
+  }
+  engancharElPlegado();
 
   function hechosDe(lista, hechos) {
     var pasos = normalizar(lista);
