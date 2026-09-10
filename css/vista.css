@@ -64,9 +64,8 @@
 
 /* ---------- el tablón se quita de en medio ---------- */
 
-/* Mientras se está a lo suyo —leyendo un correo, buscando, o metido en
-   una de las tres tarjetas— el tablón estorba. Se esconde, y el botón
-   de la cabecera lo trae de vuelta. */
+/* El tablón se ve siempre; solo se esconde con un correo abierto al
+   lado, o cuando no cabe. Quién lo decide está en js/vista.js. */
 #pantalla-abiertos.con-tablon.sin-tablon { display: block; }
 #pantalla-abiertos.sin-tablon > #tablon { display: none; }
 
@@ -120,9 +119,11 @@
 
 /* ---------- la zona de trabajo, cuando se queda estrecha ---------- */
 
-/* Con el panel de lectura abierto el contenido baja de golpe a la mitad.
-   El tablón, que es lo accesorio, se va. */
-@container (max-width: 1080px) {
+/* El tablón se rinde solo cuando de verdad no cabe. Son 320 píxeles
+   más su separación: por debajo de 900 la lista de asuntos se quedaría
+   en nada. Estaba en 1080, y en el Chromebook con la barra abierta el
+   tablón desaparecía sin que se entendiera por qué. */
+@container (max-width: 900px) {
   #pantalla-abiertos.con-tablon { display: block; }
   #pantalla-abiertos.con-tablon > #tablon { display: none; }
 }

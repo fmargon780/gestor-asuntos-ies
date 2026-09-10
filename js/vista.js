@@ -7,11 +7,10 @@
       detrás del botón "Filtros". Sueltos en la barra se salían de
       línea y cada etiqueta acababa lejos de su campo.
 
-   2. El tablón de notas solo se ve cuando se está echando un vistazo
-      general. En cuanto se está a lo suyo —leyendo un correo, buscando,
-      o metido en una de las tres tarjetas— se quita solo. El botón
-      "Tablón" de la cabecera lo trae de vuelta cuando haga falta, y en
-      cuanto la situación cambia vuelve a mandar el automático.
+   2. El tablón de notas se ve siempre, salvo cuando hay un correo
+      abierto en el panel de la derecha y no cabe. El botón "Tablón"
+      de la cabecera lo esconde y lo trae de vuelta, pero al volver a
+      la pantalla de asuntos vuelve a salir: si no se ve, no se mira.
 
    El ancho lo lleva css/vista.css, que mide la zona de trabajo y no la
    ventana: por eso vale igual con el panel de lectura abierto.
@@ -70,15 +69,18 @@
   var escondiaAntes = null; /* lo que decía el automático la última vez */
   var boton = null;
 
-  /* El automático: cuándo estorba el tablón. */
+  /* El automático: cuándo estorba el tablón.
+
+     Palabras suyas (10-sep-2026): "por defecto, al entrar y al volver
+     a Asuntos abiertos, el tablón debe estar desplegado; si no, se me
+     olvidará mirarlo". Así que ahora solo se quita cuando de verdad no
+     cabe: con un correo abierto en el panel de la derecha.
+
+     Antes se quitaba también al elegir una de las tres tarjetas de
+     arriba, y como siempre hay una elegida, el tablón no salía nunca
+     solo. Había que pedirlo con el botón cada vez. */
   function estorba() {
-    if (document.body.classList.contains('con-lector')) return true;
-    var pantalla = $('pantalla-abiertos');
-    if (!pantalla) return false;
-    if (pantalla.querySelector('.panel.activo')) return true;
-    var q = $('buscar-abiertos');
-    if (q && q.value.trim()) return true;
-    return false;
+    return document.body.classList.contains('con-lector');
   }
 
   function pendientes() {
@@ -126,18 +128,27 @@
     var recargar = $('btn-recargar');
     if (recargar && recargar.parentNode) recargar.parentNode.insertBefore(boton, recargar);
 
-    /* Lo que cambia la situación: abrir un correo, elegir una tarjeta,
-       o ponerse a buscar. */
+    /* Lo que cambia la situación: abrir o cerrar un correo. */
     new MutationObserver(pintarTablon)
       .observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
-    pantalla.addEventListener('click', function (ev) {
-      if (ev.target.closest && ev.target.closest('.panel')) setTimeout(pintarTablon, 0);
-    });
+    /* Al volver a la pantalla de asuntos, el tablón vuelve a estar
+       desplegado aunque él lo hubiera escondido antes con el botón.
+       Es lo que hace que no se le olvide mirarlo.
 
-    if ($('buscar-abiertos')) {
-      $('buscar-abiertos').addEventListener('input', function () { setTimeout(pintarTablon, 0); });
-    }
+       Se mira solo si la pantalla ha pasado de escondida a la vista.
+       La clase de la pantalla también cambia cuando se esconde el
+       tablón, y sin esta comprobación el tablón se volvería a abrir
+       él solo en cuanto él lo cerrara. */
+    var seVeiaLaPantalla = !pantalla.classList.contains('oculto');
+    new MutationObserver(function () {
+      var seVe = !pantalla.classList.contains('oculto');
+      if (seVe === seVeiaLaPantalla) return;
+      seVeiaLaPantalla = seVe;
+      if (!seVe || manual === null) return;
+      manual = null;
+      pintarTablon();
+    }).observe(pantalla, { attributes: true, attributeFilter: ['class'] });
 
     /* El tablón se crea solo cuando la aplicación arranca, y se repinta
        cada vez que se apunta una nota: hay que mirarlo para la cuenta. */
