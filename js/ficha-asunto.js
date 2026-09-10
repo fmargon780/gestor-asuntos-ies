@@ -117,7 +117,6 @@
     var a = actual;
     var caja = $('ficha-asunto-cuerpo');
     if (!a || !caja) return;
-
     var abierto = (modoActual === 'abierto');
     var situacion = a.ficha.situacion || '';
     var p = abierto ? App.plazoDe(a) : null;
@@ -338,11 +337,44 @@
       pasos = Guias.normalizar((todo && tipo && todo[tipo]) || []);
     } catch (e) { pasos = []; }
 
+    /* El botón de escribir o cambiar la guía, aquí mismo. Es tramitando
+       un asunto cuando uno se da cuenta de qué pasos faltan, y hasta el
+       10-sep-2026 había que salir a Ajustes para apuntarlos.
+
+       Solo en los asuntos abiertos, y solo si el tipo se ha reconocido.
+       Lo guarda js/guias-enganche.js, que es quien lleva guias.json. */
+    function ponerBotonDeEscribir(texto) {
+      if (!abierto || !tipo || !window.GuiasDelCentro) return;
+      var fila = document.createElement('p');
+      fila.className = 'nota';
+
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'boton';
+      b.textContent = texto;
+      b.onclick = async function () {
+        b.disabled = true;
+        var hecho = await window.GuiasDelCentro.escribir(tipo);
+        b.disabled = false;
+        if (hecho) pintarGuia(a, tipo, abierto);
+      };
+      fila.appendChild(b);
+
+      var aviso = document.createElement('span');
+      aviso.className = 'suave';
+      aviso.style.marginLeft = '8px';
+      aviso.textContent = 'Vale para todos los asuntos ' + tipo + ', no solo para este.';
+      fila.appendChild(aviso);
+
+      caja.appendChild(fila);
+    }
+
     if (!pasos.length) {
       caja.className = 'explica';
       caja.innerHTML = tipo
-        ? 'El tipo ' + U.escapar(tipo) + ' todavía no tiene guía. Se escribe en Ajustes.'
+        ? 'El tipo ' + U.escapar(tipo) + ' todavía no tiene guía.'
         : 'Este asunto no tiene tipo reconocido, así que no hay guía que enseñar.';
+      ponerBotonDeEscribir('Escribir la guía de ' + tipo);
       return;
     }
 
@@ -357,6 +389,7 @@
         (abierto ? ' Lo que marques lo ve todo el que abra la aplicación.' : '');
     }
     contar();
+    ponerBotonDeEscribir('Cambiar la guía');
 
     if (!abierto) return;
 
