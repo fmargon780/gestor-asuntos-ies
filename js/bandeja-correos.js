@@ -103,6 +103,12 @@
         if (!/\.json$/i.test(n)) continue;
         var d = await Carpetas.leerJson(carpeta, n);
         if (!d || !d.id) continue;
+        /* Las fechas se dejan en AAAA-MM-DD, que es lo que entienden
+           U.aAaMmDd y fechaLegible. Si el script del correo escribiera
+           la hora también, el nombre del PDF saldría como
+           "260909T10:00:00.000Z CORREO.pdf". */
+        d.fecha = soloElDia(d.fecha);
+        d.fechaUltimo = soloElDia(d.fechaUltimo);
         salida.push({ fichero: n, datos: d });
       }
       salida.sort(function (a, b) {
@@ -300,14 +306,26 @@
       U.aviso('No encuentro la carpeta de ese asunto: ' + e.message, 'malo');
       return;
     }
+    /* Si ese mismo correo ya está apuntado en el asunto, no se repite
+       nada: ni la nota ni los ficheros. Antes salía dos veces la misma
+       nota y el PDF entraba otra vez como "CORREO (2).pdf". */
+    var yaEstaba = false;
+    try {
+      yaEstaba = await window.Notas.yaTieneCorreo({ nombre: elAsunto.nombre, ficha: {} }, d.id);
+    } catch (e) { /* si no se puede mirar, se sigue y se guarda */ }
+    if (yaEstaba) {
+      await borrarDeLaBandeja(item);
+      U.aviso('Ese correo ya estaba en ' + elAsunto.nombre + '. No lo he repetido.', 'bueno');
+      if (window.Gestor && window.Gestor.recargar) window.Gestor.recargar();
+      return;
+    }
+
     var metidos = await meterLosFicheros(d, destino);
     try {
+      var apunte = notaDelCorreo(d, 'Correo de',
+        reabierto ? '\nCon este correo se ha reabierto el asunto.' : '');
       await window.Notas.anadir({ nombre: elAsunto.nombre, ficha: {} },
-        'Respuesta por correo de ' +
-        ((d.de && (d.de.nombre || d.de.correo)) || 'remitente desconocido') +
-        ', recibida el ' + fechaLegible(d.fechaUltimo || d.fecha) + '.' +
-        (reabierto ? '\nCon este correo se ha reabierto el asunto.' : '') +
-        (d.enlace ? '\nEn Gmail: ' + enlaceAGmail(d) : ''));
+        apunte.texto, apunte.extra);
     } catch (e) { /* la nota es lo menos importante */ }
     await borrarDeLaBandeja(item);
     U.aviso(metidos
@@ -358,8 +376,14 @@
     return c;
   }
 
+  /* Se queda con el AAAA-MM-DD, venga la hora detrás o no. */
+  function soloElDia(iso) {
+    var t = String(iso || '');
+    return /^\d{4}-\d{2}-\d{2}/.test(t) ? t.slice(0, 10) : t;
+  }
+
   function fechaLegible(iso) {
-    var p = String(iso || '').split('-');
+    var p = soloElDia(iso).split('-');
     if (p.length !== 3) return '';
     return p[2] + '/' + p[1] + '/' + p[0];
   }
@@ -621,18 +645,58 @@
     return intento;
   }
 
+  /* Con qué nombre entra un adjunto en la carpeta del asunto.
+
+     Gmail los manda como venían: "1000082963.jpg",
+     "LITNAC2026050413001031751487.pdf". Dentro de la carpeta esos
+     nombres no dicen nada y se mezclan con los papeles del expediente.
+     Se les pone delante la fecha del correo y la palabra ADJUNTO, y se
+     les recorta el nombre de origen a lo que quepa. */
+  function nombreDeAdjunto(nombre, d) {
+    var limpio = sinElId(nombre, d.id);
+    var punto = limpio.lastIndexOf('.');
+    var tronco = punto > 0 ? limpio.slice(0, punto) : limpio;
+    var extension = punto > 0 ? limpio.slice(punto) : '';
+    tronco = tronco.replace(/[\\/:*?"<>|]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (tronco.length > 40) tronco = tronco.slice(0, 40).trim();
+    return U.aAaMmDd(soloElDia(d.fechaUltimo || d.fecha)) + ' ADJUNTO' +
+           (tronco ? ' ' + tronco : '') + extension;
+  }
+
+  /* La nota que deja un correo en el asunto.
+
+     Una línea con quién escribe y cuándo, y debajo el asunto del
+     correo. El enlace a Gmail NO se escribe en el texto: se guarda
+     aparte y la nota lo enseña como botón. Escrito, ocupaba cuatro
+     líneas de letra ilegible.
+
+     `correo` es el identificador del correo. Es lo que luego permite
+     saber que ese correo ya está en el asunto y no repetirlo. */
+  function notaDelCorreo(d, comoEmpieza, cola) {
+    var quien = (d.de && (d.de.nombre || d.de.correo)) || 'remitente desconocido';
+    return {
+      texto: comoEmpieza + ' ' + quien + ' · ' + fechaLegible(d.fechaUltimo || d.fecha) +
+             (d.asunto ? '\n' + d.asunto : '') + (cola || ''),
+      extra: {
+        correo: d.id,
+        enlace: d.enlace ? enlaceAGmail(d) : '',
+        enlaceTexto: 'Abrir en Gmail'
+      }
+    };
+  }
+
   async function meterLosFicheros(d, destino) {
     var metidos = 0;
     if (d.pdf) {
       try {
-        var comoPdf = await nombreLibre(destino, U.aAaMmDd(d.fechaUltimo || d.fecha) + ' CORREO.pdf');
+        var comoPdf = await nombreLibre(destino, U.aAaMmDd(soloElDia(d.fechaUltimo || d.fecha)) + ' CORREO.pdf');
         await copiarALaCarpeta(d.pdf, destino, comoPdf);
         metidos++;
       } catch (e) { U.aviso('El PDF del correo no ha podido entrar: ' + e.message, 'malo'); }
     }
     for (var i = 0; i < (d.adjuntos || []).length; i++) {
       try {
-        var suyo = await nombreLibre(destino, sinElId(d.adjuntos[i], d.id));
+        var suyo = await nombreLibre(destino, nombreDeAdjunto(d.adjuntos[i], d));
         await copiarALaCarpeta(d.adjuntos[i], destino, suyo);
         metidos++;
       } catch (e) { /* un adjunto que falle no puede parar lo demás */ }
@@ -646,13 +710,9 @@
     var metidos = await meterLosFicheros(d, destino);
 
     try {
-      var texto = 'Abierto desde un correo de ' +
-        ((d.de && (d.de.nombre || d.de.correo)) || 'remitente desconocido') +
-        (d.de && d.de.correo && d.de.nombre ? ' <' + d.de.correo + '>' : '') +
-        ', recibido el ' + fechaLegible(d.fecha) + '.' +
-        '\nAsunto del correo: ' + (d.asunto || '(sin asunto)') +
-        (d.enlace ? '\nEn Gmail: ' + enlaceAGmail(d) : '');
-      await window.Notas.anadir({ nombre: nombreAsunto, ficha: {} }, texto);
+      var apunte = notaDelCorreo(d, 'Asunto abierto con el correo de');
+      await window.Notas.anadir({ nombre: nombreAsunto, ficha: {} },
+        apunte.texto, apunte.extra);
     } catch (e) { /* la nota es lo menos importante de todo esto */ }
 
     await borrarDeLaBandeja(item);
