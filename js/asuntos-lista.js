@@ -281,7 +281,12 @@ App.tipoDeAsunto = function (a) {
   return a.leido.tipo || (a.ficha && a.ficha.tipo) || App.SIN_TIPO;
 };
 
-App.elegirTipo = function (tipo) {
+/* Ojo con el nombre: `App.elegirTipo` ya existe, y es el de elegir el
+   tipo al crear un asunto nuevo (js/asuntos-nuevo.js). Aquel fichero se
+   carga después que este, así que si se repitiera el nombre este se
+   perdería sin decir nada, y las tarjetas no harían nada al pulsarlas.
+   Pasó el 10-sep-2026. */
+App.filtrarPorTipo = function (tipo) {
   App.tipoElegido = (App.tipoElegido === tipo) ? '' : tipo;
   App.pintarAbiertos();
 };
@@ -346,7 +351,7 @@ App.tarjetaDeTipo = function (tipo, texto, cuantos, vencidos) {
     b.appendChild(v);
   }
 
-  b.onclick = function () { App.elegirTipo(tipo); };
+  b.onclick = function () { App.filtrarPorTipo(tipo); };
   return b;
 };
 
