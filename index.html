@@ -21,6 +21,7 @@
 <link rel="stylesheet" href="css/bandeja.css">
 <link rel="stylesheet" href="css/barra.css">
 <link rel="stylesheet" href="css/lector.css">
+<link rel="stylesheet" href="css/vista.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -92,28 +93,41 @@
         <h2>Asuntos abiertos</h2>
         <div class="acciones">
           <input id="buscar-abiertos" class="campo" placeholder="Buscar por nombre, tipo o tercero">
-          <label class="etiqueta-en-linea" for="filtro-estado">Estado</label>
-          <select id="filtro-estado" class="campo campo-estado">
-            <option value="">Todos los estados</option>
-          </select>
-          <label class="etiqueta-en-linea" for="filtro-plazo">Plazo</label>
-          <select id="filtro-plazo" class="campo">
-            <option value="">Todos los plazos</option>
-            <option value="vencidos">Solo los vencidos</option>
-            <option value="pronto">Vencidos y de esta semana</option>
-            <option value="conplazo">Solo los que tienen plazo</option>
-            <option value="sinplazo">Solo los que no tienen plazo</option>
-          </select>
-          <label class="etiqueta-en-linea" for="orden-abiertos">Ordenar por</label>
-          <select id="orden-abiertos" class="campo">
-            <option value="fecha-asc">Fecha · los más antiguos arriba</option>
-            <option value="fecha-desc">Fecha · los más recientes arriba</option>
-            <option value="limite">Fecha límite · lo que antes vence</option>
-            <option value="estado">Estado del asunto</option>
-            <option value="tipo">Tipo de asunto</option>
-            <option value="tercero">Tercero</option>
-          </select>
+          <button type="button" id="btn-filtros" class="boton" aria-expanded="false"
+                  aria-controls="filtros-abiertos">Filtros</button>
           <button id="btn-recargar" class="boton">Actualizar</button>
+        </div>
+
+        <!-- Los tres desplegables viven aquí, plegados. Sueltos en la barra
+             se salían de linea y las etiquetas acababan lejos de su campo. -->
+        <div id="filtros-abiertos" class="filtros oculto">
+          <label class="filtro">
+            <span class="filtro-rotulo">Estado</span>
+            <select id="filtro-estado" class="campo campo-estado">
+              <option value="">Todos los estados</option>
+            </select>
+          </label>
+          <label class="filtro">
+            <span class="filtro-rotulo">Plazo</span>
+            <select id="filtro-plazo" class="campo">
+              <option value="">Todos los plazos</option>
+              <option value="vencidos">Solo los vencidos</option>
+              <option value="pronto">Vencidos y de esta semana</option>
+              <option value="conplazo">Solo los que tienen plazo</option>
+              <option value="sinplazo">Solo los que no tienen plazo</option>
+            </select>
+          </label>
+          <label class="filtro">
+            <span class="filtro-rotulo">Ordenar por</span>
+            <select id="orden-abiertos" class="campo">
+              <option value="fecha-asc">Fecha · los más antiguos arriba</option>
+              <option value="fecha-desc">Fecha · los más recientes arriba</option>
+              <option value="limite">Fecha límite · lo que antes vence</option>
+              <option value="estado">Estado del asunto</option>
+              <option value="tipo">Tipo de asunto</option>
+              <option value="tercero">Tercero</option>
+            </select>
+          </label>
         </div>
       </header>
 
@@ -492,6 +506,7 @@
 <script src="js/lector.js"></script>
 <script src="js/bandeja-correos.js"></script>
 <script src="js/barra.js"></script>
+<script src="js/vista.js"></script>
 
 <!-- Y ahora sí, a arrancar. -->
 <script src="js/inicio.js"></script>
