@@ -248,9 +248,18 @@ App.piePersona = function (p) {
   return trozos.join('  ·  ');
 };
 
+/* Lo que se lee debajo del nombre de una empresa. El rótulo del negocio
+   va primero: cuando se ha buscado por él, es lo que explica por qué
+   sale esa razón social y no otra. */
+App.pieEmpresa = function (p) {
+  var rotulo = p.comercial || (p.campos && p.campos['Nombre comercial']) || '';
+  return [rotulo ? 'Rótulo: ' + rotulo : '', p.nif].filter(Boolean).join('  ·  ');
+};
+
 App.pieDe = function (p) {
   if (p.categoria === 'ALUMNADO') return App.pieAlumno(p);
   if (p.categoria === 'PERSONAL') return App.piePersona(p);
+  if (p.categoria === 'EMPRESAS') return App.pieEmpresa(p);
   return [p.documento, p.nif, p.referencia, p.campos['Puesto'] || ''].filter(Boolean).join('  ·  ');
 };
 
@@ -412,29 +421,55 @@ $('btn-crear').onclick = async function () {
 
 /* ---------- alta de un tercero que no está en la lista ---------- */
 
+/* La aclaración de cada categoría, encima de los campos. */
+App.ACLARA_ALTA = {
+  ALUMNADO: 'Para quien ha pedido plaza y todavía no está matriculado. Si ya ' +
+            'tiene Nº de identificación escolar, ponlo: así su carpeta se ' +
+            'llamará igual el día que se matricule.',
+  EMPRESAS: 'La razón social es el nombre fiscal, el que viene en las facturas. ' +
+            'El nombre comercial es el rótulo del negocio, cuando es distinto: ' +
+            'la papelería de un autónomo, por ejemplo. Se podrá buscar por los ' +
+            'dos, y en el nombre de la carpeta seguirá yendo la razón social.'
+};
+
+/* El cuadro de los datos de un tercero. Lo usan el alta y también el
+   botón de cambiarlos de js/archivo-personas.js: los campos son los
+   mismos, y así no hay dos cuadros que se puedan quedar distintos.
+
+   `valores` trae lo que ya se sabe; con el cuadro vacío es un alta.
+   Devuelve lo escrito, o null si se cancela. */
+App.cuadroDeTercero = async function (categoria, valores, titulo, botonar) {
+  var def = Datos.LISTAS[categoria];
+  if (!def) return null;
+  valores = valores || {};
+  var campos = def.cabecera.map(function (c) {
+    return '<label class="etiqueta">' + U.escapar(c) + '</label>' +
+           '<input class="campo alta-campo" data-campo="' + U.escapar(c) + '" value="' +
+           U.escapar(valores[c] || '') + '">';
+  }).join('');
+  var aclara = App.ACLARA_ALTA[categoria]
+    ? '<p class="explica">' + U.escapar(App.ACLARA_ALTA[categoria]) + '</p>'
+    : '';
+  var ok = await U.preguntar(titulo, aclara + campos, botonar || 'Guardar');
+  if (!ok) return null;
+  var puestos = {};
+  Array.prototype.forEach.call(document.querySelectorAll('.alta-campo'), function (i) {
+    puestos[i.dataset.campo] = i.value.trim();
+  });
+  if (!puestos[def.cabecera[0]]) { U.aviso('Hace falta al menos el nombre.', 'malo'); return null; }
+  return puestos;
+};
+
 App.altaTercero = async function (categoria, sugerencia) {
   var def = Datos.LISTAS[categoria];
   if (!def) return;
-  var campos = def.cabecera.map(function (c, i) {
-    return '<label class="etiqueta">' + U.escapar(c) + '</label>' +
-           '<input class="campo alta-campo" data-campo="' + U.escapar(c) + '" value="' +
-           (i === 0 ? U.escapar(sugerencia || '') : '') + '">';
-  }).join('');
   var titulo = categoria === 'ALUMNADO'
     ? 'Dar de alta un solicitante'
     : 'Dar de alta en ' + categoria;
-  var aclara = categoria === 'ALUMNADO'
-    ? '<p class="explica">Para quien ha pedido plaza y todavía no está ' +
-      'matriculado. Si ya tiene Nº de identificación escolar, ponlo: así su ' +
-      'carpeta se llamará igual el día que se matricule.</p>'
-    : '';
-  var ok = await U.preguntar(titulo, aclara + campos, 'Guardar');
-  if (!ok) return;
-  var valores = {};
-  Array.prototype.forEach.call(document.querySelectorAll('.alta-campo'), function (i) {
-    valores[i.dataset.campo] = i.value.trim();
-  });
-  if (!valores[def.cabecera[0]]) { U.aviso('Hace falta al menos el nombre.', 'malo'); return; }
+  var deEntrada = {};
+  deEntrada[def.cabecera[0]] = sugerencia || '';
+  var valores = await App.cuadroDeTercero(categoria, deEntrada, titulo);
+  if (!valores) return;
   await Datos.anadirALista(App.E.datos, categoria, valores);
   U.aviso('Dado de alta.', 'bueno');
   $('buscar-tercero').value = valores[def.cabecera[0]];
