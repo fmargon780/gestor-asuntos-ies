@@ -1,0 +1,106 @@
+/* ============================================================
+   barra.js — la barra azul de la izquierda, plegada.
+
+   La barra ocupa sitio todo el rato, y de lo que hay en ella solo se
+   usa una cosa muchas veces al día: crear un asunto nuevo. Así que la
+   barra nace plegada, y lo de crear pasa a un botón grande dentro de
+   la propia pantalla de asuntos abiertos.
+
+   Plegada queda una franja estrecha con el botón de las tres rayas.
+   Al pulsarlo se abre entera; al elegir una pantalla se vuelve a
+   plegar sola.
+
+   Cómo la dejó cada uno se recuerda en su navegador, así que si él
+   prefiere tenerla siempre abierta, la abre una vez y se queda.
+   ============================================================ */
+(function () {
+
+  var CLAVE = 'gestor-barra';       /* 'plegada' o 'abierta' */
+
+  function $(id) { return document.getElementById(id); }
+
+  function comoEstaba() {
+    try {
+      var v = window.localStorage.getItem(CLAVE);
+      return v === 'abierta' ? 'abierta' : 'plegada';
+    } catch (e) { return 'plegada'; }
+  }
+
+  function recordar(estado) {
+    try { window.localStorage.setItem(CLAVE, estado); } catch (e) {}
+  }
+
+  function aplicacion() { return $('aplicacion'); }
+
+  function poner(estado) {
+    var app = aplicacion();
+    if (!app) return;
+    app.classList.toggle('barra-plegada', estado === 'plegada');
+    var b = $('btn-barra');
+    if (b) b.title = estado === 'plegada' ? 'Abrir el menú' : 'Esconder el menú';
+  }
+
+  function estaPlegada() {
+    var app = aplicacion();
+    return !!(app && app.classList.contains('barra-plegada'));
+  }
+
+  function cambiar() {
+    var nuevo = estaPlegada() ? 'abierta' : 'plegada';
+    poner(nuevo);
+    recordar(nuevo);
+  }
+
+  /* ---------- el botón de las tres rayas ---------- */
+
+  function ponerElBoton() {
+    var barra = document.querySelector('#aplicacion .lateral');
+    if (!barra || $('btn-barra')) return;
+
+    var b = document.createElement('button');
+    b.id = 'btn-barra';
+    b.className = 'barra-boton';
+    b.type = 'button';
+    b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+      'stroke-width="1.8" stroke-linecap="round" aria-hidden="true">' +
+      '<path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>';
+    b.onclick = cambiar;
+    barra.insertBefore(b, barra.firstChild);
+
+    /* Al elegir una pantalla, la barra se pliega sola: se abrió para
+       eso. Si él la quiere fija, la deja abierta desde el botón. */
+    Array.prototype.forEach.call(barra.querySelectorAll('.pestana'), function (p) {
+      p.addEventListener('click', function () {
+        if (comoEstaba() === 'plegada') poner('plegada');
+      });
+    });
+  }
+
+  /* ---------- el botón grande de Nuevo asunto ---------- */
+
+  function ponerElDeNuevoAsunto() {
+    if ($('btn-nuevo-asunto')) return;
+    var cabecera = document.querySelector('#pantalla-abiertos .cabecera');
+    if (!cabecera) return;
+    var titulo = cabecera.querySelector('h2');
+    if (!titulo) return;
+
+    var b = document.createElement('button');
+    b.id = 'btn-nuevo-asunto';
+    b.type = 'button';
+    b.className = 'boton boton-principal boton-nuevo';
+    b.innerHTML = '<span class="boton-nuevo-mas">+</span><span>Nuevo asunto</span>';
+    b.onclick = function () { App.ir('nuevo'); };
+    titulo.parentNode.insertBefore(b, titulo.nextSibling);
+  }
+
+  function arrancar() {
+    ponerElBoton();
+    ponerElDeNuevoAsunto();
+    poner(comoEstaba());
+  }
+
+  arrancar();
+  if (!$('btn-barra')) document.addEventListener('DOMContentLoaded', arrancar);
+
+})();

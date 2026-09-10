@@ -1,0 +1,45 @@
+/* ============================================================
+   barra.css — la barra de la izquierda plegada, y el botón grande
+   de Nuevo asunto.
+   ============================================================ */
+
+/* El botón de las tres rayas, arriba del todo de la barra. */
+.barra-boton {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; padding: 0; margin: 0 0 6px;
+  background: transparent; color: #cfdcea;
+  border: 0; border-radius: 8px; cursor: pointer;
+}
+.barra-boton:hover { background: rgba(255,255,255,.10); color: #fff; }
+.barra-boton svg { width: 20px; height: 20px; }
+
+/* Plegada: solo se ve la franja con el botón. */
+#aplicacion.barra-plegada .lateral {
+  width: 52px; flex: 0 0 52px;
+  padding: 18px 8px;
+  overflow: hidden;
+}
+#aplicacion.barra-plegada .lateral .marca,
+#aplicacion.barra-plegada .lateral .pestana,
+#aplicacion.barra-plegada .lateral .usuario {
+  display: none;
+}
+
+/* Con la barra plegada, el contenido gana ese sitio. */
+#aplicacion.barra-plegada .contenido { max-width: 1360px; }
+
+/* ---------- el botón grande de Nuevo asunto ---------- */
+
+.boton-nuevo {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 15px; font-weight: 600;
+  padding: 11px 20px; border-radius: 10px;
+  margin-right: auto;                 /* pegado al título, no a los filtros */
+  box-shadow: 0 2px 6px rgba(31,78,121,.28);
+}
+.boton-nuevo:hover { box-shadow: 0 3px 10px rgba(31,78,121,.34); }
+.boton-nuevo-mas { font-size: 19px; line-height: 1; font-weight: 400; }
+
+/* En la cabecera, el título deja de comerse todo el ancho para que el
+   botón quede a su lado. */
+#pantalla-abiertos .cabecera h2 { margin-right: 16px; }

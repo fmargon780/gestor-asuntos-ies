@@ -1,0 +1,53 @@
+/* ============================================================
+   lector.css — el panel de la derecha para leer sin dejar de
+   trabajar en la aplicación.
+   ============================================================ */
+
+#lector {
+  position: fixed; top: 0; right: 0;
+  width: 46vw; min-width: 420px; height: 100vh;
+  background: var(--papel);
+  border-left: 1px solid var(--linea);
+  box-shadow: -10px 0 28px rgba(10,25,45,.12);
+  display: flex; flex-direction: column;
+  z-index: 40;
+}
+
+/* Mientras el panel está abierto, la aplicación se estrecha en vez de
+   quedar tapada: la idea es trabajar a la izquierda y leer a la
+   derecha. */
+body.con-lector #aplicacion { margin-right: 46vw; }
+body.con-lector .mensajes { right: calc(46vw + 20px); }
+
+.lector-cabecera {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px; border-bottom: 1px solid var(--linea);
+}
+.lector-texto { flex: 1; min-width: 0; }
+.lector-titulo {
+  font-weight: 600; font-size: 15px; line-height: 1.3;
+  word-break: break-word;
+}
+.lector-pie { color: var(--tinta-suave); font-size: 12.5px; margin-top: 3px; }
+.lector-botones { display: flex; gap: 6px; flex: 0 0 auto; }
+.lector-botones .boton { padding: 6px 12px; font-size: 13px; }
+
+.lector-cerrar {
+  flex: 0 0 auto;
+  width: 30px; height: 30px; padding: 0;
+  font-size: 15px; line-height: 1;
+  background: var(--papel); color: var(--tinta-suave);
+  border: 1px solid var(--linea); border-radius: 8px; cursor: pointer;
+}
+.lector-cerrar:hover { background: #f0f3f7; color: var(--tinta); }
+
+.lector-cuerpo { flex: 1; min-height: 0; background: #f4f6f9; }
+#lector-marco { display: block; width: 100%; height: 100%; border: 0; }
+
+/* En pantalla estrecha el panel se pone encima, a lo ancho: partir en
+   dos columnas de 500 píxeles no se lee bien. */
+@media (max-width: 1100px) {
+  #lector { width: 100vw; min-width: 0; }
+  body.con-lector #aplicacion { margin-right: 0; }
+  body.con-lector .mensajes { right: 20px; }
+}
