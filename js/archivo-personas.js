@@ -152,6 +152,66 @@ App.verFicha = function (p) {
     };
   }
   $('ver-sus-asuntos').onclick = function () { App.verAsuntosDeTercero(p); };
+
+  /* Y, si es de los que se dieron de alta a mano, el botón de cambiar
+     sus datos. */
+  if (App.sePuedeCambiarElTercero(p)) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'boton';
+    b.style.marginLeft = '8px';
+    b.id = 'cambiar-tercero';
+    b.textContent = 'Cambiar los datos';
+    b.onclick = function () { App.cambiarDatosDelTercero(p); };
+    $('ver-sus-asuntos').parentNode.appendChild(b);
+  }
+};
+
+/* ---------- cambiar los datos de un tercero ----------
+
+   Hasta el 10-sep-2026 un tercero se daba de alta y ya no se podía
+   tocar. En cuanto apareció el nombre comercial de las empresas eso
+   dejó de valer: las que ya estaban dadas de alta no tenían dónde
+   ponerlo, y la única salida habría sido abrir el CSV a mano. Justo lo
+   que no queremos.
+
+   **Solo los dados de alta a mano.** Lo que viene de Séneca no se toca
+   desde aquí: se corrige en Séneca y se vuelve a descargar el fichero,
+   o el cambio se perdería en la siguiente descarga. */
+
+App.sePuedeCambiarElTercero = function (p) {
+  if (!p || !p.categoria) return false;
+  if (!Datos.LISTAS[p.categoria]) return false;
+  return p.deSeneca !== true;
+};
+
+App.cambiarDatosDelTercero = async function (p) {
+  var def = Datos.LISTAS[p.categoria];
+  var nombreAntes = p.nombre;
+
+  var valores = {};
+  def.cabecera.forEach(function (c) { valores[c] = (p.campos && p.campos[c]) || ''; });
+  valores[def.cabecera[0]] = nombreAntes;
+
+  var puestos = await App.cuadroDeTercero(
+    p.categoria, valores, 'Cambiar los datos de ' + nombreAntes, 'Guardar los cambios');
+  if (!puestos) return;
+
+  try {
+    await Datos.guardarEnLista(App.E.datos, p.categoria, nombreAntes, puestos);
+  } catch (e) {
+    U.aviso('No he podido guardar el cambio: ' + e.message, 'malo');
+    return;
+  }
+
+  /* Cambiar el nombre no renombra las carpetas de sus asuntos: el
+     nombre de una carpeta es el rastro del día en que se creó. */
+  U.aviso(U.normalizar(puestos[def.cabecera[0]]) !== U.normalizar(nombreAntes)
+    ? 'Cambiado. Las carpetas de sus asuntos de antes conservan el nombre viejo.'
+    : 'Cambiado.', 'bueno');
+
+  Datos.olvidar(p.categoria);
+  App.pintarPersonas();
 };
 
 /* Todos los asuntos de una persona o empresa, los abiertos y los
