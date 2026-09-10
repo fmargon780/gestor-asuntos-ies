@@ -1,0 +1,92 @@
+/* ============================================================
+   vista.css — que la pantalla se vea bien tanto a lo ancho como
+   con el panel de lectura abierto a la derecha.
+
+   La idea: la zona de trabajo se mide A SÍ MISMA, no a la ventana.
+   Con `container-type` las reglas de abajo miran cuánto sitio le
+   queda de verdad al contenido. Así da igual por qué se ha quedado
+   estrecho —una ventana pequeña, o un correo abierto al lado—: la
+   pantalla se recoloca igual.
+   ============================================================ */
+
+.contenido { container-type: inline-size; }
+
+/* ---------- los filtros, plegados ---------- */
+
+/* Ocupan una línea entera de la cabecera, debajo del buscador. */
+.filtros {
+  flex: 1 0 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  padding: 14px 16px;
+  box-shadow: var(--sombra);
+}
+.filtro { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.filtro-rotulo { font-size: 12.5px; font-weight: 600; color: var(--tinta-suave); }
+.filtro .campo { width: 100%; }
+/* Los tres traen su ancho puesto de css/estilos.css, de cuando iban
+   sueltos en la barra. Aquí mandan la rejilla y su rótulo. */
+.filtros #filtro-estado,
+.filtros #filtro-plazo,
+.filtros #orden-abiertos { width: 100%; min-width: 0; }
+
+/* Que se lea entero lo que el buscador ofrece buscar. */
+.cabecera #buscar-abiertos { width: 300px; }
+
+/* El botón avisa cuando hay algo puesto, para que no se quede un
+   filtro escondido dentro del panel cerrado. */
+#btn-filtros.tiene-filtros {
+  border-color: var(--azul); color: var(--azul); font-weight: 600;
+}
+#btn-filtros.tiene-filtros::after {
+  content: ''; display: inline-block; margin-left: 7px;
+  width: 7px; height: 7px; border-radius: 50%; background: var(--azul);
+  vertical-align: middle;
+}
+
+/* ---------- el tablón se quita de en medio ---------- */
+
+/* Mientras se está a lo suyo —leyendo un correo, buscando, o metido en
+   una de las tres tarjetas— el tablón estorba. Se esconde, y el botón
+   de la cabecera lo trae de vuelta. */
+#pantalla-abiertos.con-tablon.sin-tablon { display: block; }
+#pantalla-abiertos.sin-tablon > #tablon { display: none; }
+
+#btn-tablon .cuenta-tablon {
+  display: inline-block; margin-left: 7px;
+  background: var(--ambar); border: 1px solid var(--ambar-linea); color: #8a6100;
+  border-radius: 20px; padding: 0 7px; font-size: 12px; font-weight: 700;
+}
+
+/* ---------- la zona de trabajo, cuando se queda estrecha ---------- */
+
+/* Con el panel de lectura abierto el contenido baja de golpe a la mitad.
+   El tablón, que es lo accesorio, se va. */
+@container (max-width: 1080px) {
+  #pantalla-abiertos.con-tablon { display: block; }
+  #pantalla-abiertos.con-tablon > #tablon { display: none; }
+}
+
+/* Las tres tarjetas de arriba se quedan en fila, pero sueltan la frase
+   que las explica: con poco sitio, esa frase es lo que las estruja. */
+@container (max-width: 1000px) {
+  .panel-pie { display: none; }
+  .panel { padding: 13px 14px; }
+}
+
+@container (max-width: 900px) {
+  .cabecera { align-items: flex-start; }
+  .cabecera .acciones { flex: 1 0 100%; justify-content: flex-start; }
+  .cabecera #buscar-abiertos { flex: 1 1 200px; width: auto; }
+  .dos-paneles, .dos-columnas { grid-template-columns: 1fr; }
+  .tarjeta .acciones { flex: 1 0 100%; margin-left: 0; }
+}
+
+@container (max-width: 620px) {
+  .paneles { grid-template-columns: 1fr; }
+  .filtros { grid-template-columns: 1fr; }
+}

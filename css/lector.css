@@ -1,11 +1,16 @@
 /* ============================================================
    lector.css — el panel de la derecha para leer sin dejar de
    trabajar en la aplicación.
+
+   El ancho lo manda --ancho-lector, que pone js/lector.js al
+   arrastrar el borde. Si todavía no se ha tocado, la mitad y poco.
    ============================================================ */
+
+:root { --ancho-lector: 46vw; }
 
 #lector {
   position: fixed; top: 0; right: 0;
-  width: 46vw; min-width: 420px; height: 100vh;
+  width: var(--ancho-lector); min-width: 380px; height: 100vh;
   background: var(--papel);
   border-left: 1px solid var(--linea);
   box-shadow: -10px 0 28px rgba(10,25,45,.12);
@@ -16,12 +21,30 @@
 /* Mientras el panel está abierto, la aplicación se estrecha en vez de
    quedar tapada: la idea es trabajar a la izquierda y leer a la
    derecha. */
-body.con-lector #aplicacion { margin-right: 46vw; }
-body.con-lector .mensajes { right: calc(46vw + 20px); }
+body.con-lector #aplicacion { margin-right: var(--ancho-lector); }
+body.con-lector .mensajes { right: calc(var(--ancho-lector) + 20px); }
+
+/* El borde que se arrastra. */
+.lector-tirador {
+  position: absolute; top: 0; left: -3px; bottom: 0;
+  width: 9px; cursor: col-resize; z-index: 2;
+  background: transparent;
+}
+.lector-tirador::before {
+  content: ''; position: absolute; top: 50%; left: 3px;
+  width: 3px; height: 42px; margin-top: -21px; border-radius: 3px;
+  background: var(--linea);
+}
+.lector-tirador:hover::before { background: var(--azul); }
+
+/* Mientras se arrastra, que no se seleccione medio programa ni se le
+   escapen los movimientos al documento de dentro. */
+body.estirando-lector { user-select: none; cursor: col-resize; }
+body.estirando-lector #lector-marco { pointer-events: none; }
 
 .lector-cabecera {
   display: flex; align-items: flex-start; gap: 10px;
-  padding: 12px 14px; border-bottom: 1px solid var(--linea);
+  padding: 12px 14px 12px 18px; border-bottom: 1px solid var(--linea);
 }
 .lector-texto { flex: 1; min-width: 0; }
 .lector-titulo {
@@ -48,6 +71,7 @@ body.con-lector .mensajes { right: calc(46vw + 20px); }
    dos columnas de 500 píxeles no se lee bien. */
 @media (max-width: 1100px) {
   #lector { width: 100vw; min-width: 0; }
+  .lector-tirador { display: none; }
   body.con-lector #aplicacion { margin-right: 0; }
   body.con-lector .mensajes { right: 20px; }
 }
