@@ -186,7 +186,8 @@ App.buscarTercero = async function () {
 
   encontrados.forEach(function (p) {
     var d = document.createElement('div');
-    d.className = 'resultado';
+    d.className = App.claseDeResultado(p);
+    if (p.id) d.dataset.nie = p.id;
     d.innerHTML = '<div>' + U.escapar(p.nombre) + '</div>' +
                   '<div class="resultado-pie">' + U.escapar(App.pieDe(p)) + '</div>';
     d.onclick = function () { App.fijarTercero(p); };
@@ -195,24 +196,38 @@ App.buscarTercero = async function () {
   caja.appendChild(App.botonAlta(texto));
 };
 
+/* La fila de un resultado se marca cuando abrirle un asunto casi
+   siempre es una equivocación: el alumno que ya no está matriculado y
+   la persona del centro que ya cesó. En una lista de veinte nombres
+   parecidos eso se pasa por alto. El color lo pone
+   css/tipos-buscador.css. */
+App.claseDeResultado = function (p) {
+  var fuera = (p.categoria === 'ALUMNADO' && !p.matriculado && !p.solicitante) ||
+              (p.categoria === 'PERSONAL' && p.enElCentro === false);
+  return 'resultado' + (fuera ? ' resultado-aviso' : '');
+};
+
 /* Lo que se lee debajo del nombre de un alumno, tanto en el buscador
    del formulario como en la pantalla de Personas. Si ya no está
    matriculado hay que decirlo: es la diferencia entre poner el grupo
-   bueno y poner uno de hace tres cursos. */
+   bueno y poner uno de hace tres cursos.
+
+   El Nº de identificación escolar NO se escribe aquí: al lado sale el
+   botón de copiarlo, que ya lo lleva escrito, y salía dos veces
+   seguidas. Lo pone js/copiar.js, que lo saca de data-nie. */
 App.pieAlumno = function (p) {
   if (p.matriculado) {
-    return [p.unidad, p.curso, p.id ? 'Nº ' + p.id : ''].filter(Boolean).join('  ·  ');
+    return [p.unidad, p.curso].filter(Boolean).join('  ·  ');
   }
   if (p.solicitante) {
     return ['Solicitante, todavía sin matricular',
-            p.id ? 'Nº ' + p.id : 'sin Nº de identificación escolar'].join('  ·  ');
+            p.id ? '' : 'sin Nº de identificación escolar'].filter(Boolean).join('  ·  ');
   }
   var trozos = ['No matriculado este curso'];
   if (p.anoUltima) {
     trozos.push('última matrícula: ' + U.cursoDeAno(p.anoUltima) +
                 (p.unidadUltima ? ' ' + p.unidadUltima : ''));
   }
-  if (p.id) trozos.push('Nº ' + p.id);
   return trozos.join('  ·  ');
 };
 
