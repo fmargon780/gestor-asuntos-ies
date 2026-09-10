@@ -164,9 +164,20 @@
 
   /* ---------- 3. las listas de resultados ----------
 
-     Debajo del nombre de cada alumno ya se lee "Nº 1139877". De ahí se
-     saca el número, así que esto vale igual en el buscador de un
-     asunto nuevo y en la pantalla de Personas. */
+     Cada fila trae el número en su `data-nie`, que se lo ponen
+     js/asuntos-nuevo.js y js/archivo-personas.js. Así el número se
+     escribe una sola vez, en el botón, y no dos.
+
+     Si un día una fila llegara sin `data-nie`, se busca en el texto de
+     debajo del nombre, que es como se hacía antes. */
+
+  function nieDeLaFila(fila) {
+    var puesto = fila.dataset ? String(fila.dataset.nie || '').trim() : '';
+    if (/^\d{5,}$/.test(puesto)) return puesto;
+    var pie = fila.querySelector('.resultado-pie');
+    var m = pie && (pie.textContent || '').match(/N[º°o]\s*(\d{5,})/);
+    return m ? m[1] : '';
+  }
 
   function ponerEnResultados(caja) {
     if (!caja) return;
@@ -174,9 +185,9 @@
       if (fila.querySelector('.boton-nie')) return;
       var pie = fila.querySelector('.resultado-pie');
       if (!pie) return;
-      var m = (pie.textContent || '').match(/N[º°o]\s*(\d{5,})/);
-      if (!m) return;
-      pie.appendChild(botonDeNie(m[1], true));
+      var nie = nieDeLaFila(fila);
+      if (!nie) return;
+      pie.appendChild(botonDeNie(nie, true));
     });
   }
 
