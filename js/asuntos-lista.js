@@ -1,7 +1,8 @@
 /* ============================================================
    asuntos-lista.js — la pantalla de asuntos abiertos.
 
-   Las tres tarjetas de arriba, el orden, los filtros y la tarjeta de
+   Las tres tarjetas de arriba, las tarjetas por tipo de asunto que
+   salen dentro de dos de ellas, el orden, los filtros y la tarjeta de
    cada asunto. También el estado, la vía de comunicación y la fecha
    límite, que son los tres datos que se cambian desde la propia
    tarjeta sin abrir nada.
@@ -242,6 +243,9 @@ App.irVista = function (cual) {
   App.E.vista = App.VISTAS.indexOf(cual) !== -1 ? cual : 'departamento';
   try { window.localStorage.setItem('vista-abiertos', App.E.vista); } catch (e) {}
 
+  /* Al cambiar de montón se empieza viendo todos los tipos. */
+  App.tipoElegido = '';
+
   Array.prototype.forEach.call(document.querySelectorAll('.panel'), function (b) {
     b.classList.toggle('activo', b.dataset.vista === App.E.vista);
   });
@@ -262,6 +266,119 @@ App.irVista = function (cual) {
 Array.prototype.forEach.call(document.querySelectorAll('.panel'), function (b) {
   b.onclick = function () { App.irVista(b.dataset.vista); };
 });
+
+/* ---------- los montones por tipo de asunto ----------
+
+   Dentro de "En el departamento" y de "A la espera de terceros", los
+   asuntos se agrupan además por su tipo: una tarjeta pequeña por tipo,
+   encima de la lista. Al pulsar una, la lista se queda solo con los de
+   ese tipo; al volver a pulsarla, vuelven a salir todos. */
+
+App.tipoElegido = '';
+App.SIN_TIPO = 'Sin tipo';
+
+App.tipoDeAsunto = function (a) {
+  return a.leido.tipo || (a.ficha && a.ficha.tipo) || App.SIN_TIPO;
+};
+
+App.elegirTipo = function (tipo) {
+  App.tipoElegido = (App.tipoElegido === tipo) ? '' : tipo;
+  App.pintarAbiertos();
+};
+
+/* La fila de tarjetas vive dentro de la zona de asuntos, justo encima
+   de la lista. Se crea la primera vez que hace falta. */
+App.cajaDeTipos = function () {
+  var caja = $('grupos-tipo');
+  if (caja) return caja;
+  var zona = $('zona-asuntos');
+  var lista = $('lista-abiertos');
+  if (!zona || !lista) return null;
+  caja = document.createElement('div');
+  caja.id = 'grupos-tipo';
+  caja.className = 'grupos-tipo oculto';
+  zona.insertBefore(caja, lista);
+  return caja;
+};
+
+/* Los montones, del más gordo al más flaco. A igualdad de asuntos, por
+   orden alfabético, para que no bailen de sitio. */
+App.montonesPorTipo = function (lista) {
+  var por = {};
+  lista.forEach(function (a) {
+    var t = App.tipoDeAsunto(a);
+    if (!por[t]) por[t] = { tipo: t, cuantos: 0, vencidos: 0 };
+    por[t].cuantos++;
+    var p = App.plazoDe(a);
+    if (p && p.dias <= 0) por[t].vencidos++;
+  });
+  return Object.keys(por).map(function (k) { return por[k]; })
+    .sort(function (a, b) {
+      if (a.cuantos !== b.cuantos) return b.cuantos - a.cuantos;
+      return a.tipo < b.tipo ? -1 : 1;
+    });
+};
+
+App.tarjetaDeTipo = function (tipo, texto, cuantos, vencidos) {
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'grupo' + (App.tipoElegido === tipo ? ' activo' : '');
+  b.dataset.tipo = tipo;
+  b.title = tipo
+    ? (App.tipoElegido === tipo ? 'Volver a ver todos los tipos'
+                                : 'Ver solo los asuntos de tipo ' + tipo)
+    : 'Ver todos los tipos';
+
+  var n = document.createElement('span');
+  n.className = 'grupo-nombre';
+  n.textContent = texto;
+  b.appendChild(n);
+
+  var c = document.createElement('span');
+  c.className = 'grupo-cuenta';
+  c.textContent = cuantos;
+  b.appendChild(c);
+
+  if (vencidos) {
+    var v = document.createElement('span');
+    v.className = 'grupo-vencidos';
+    v.textContent = vencidos + ' fuera de plazo';
+    b.appendChild(v);
+  }
+
+  b.onclick = function () { App.elegirTipo(tipo); };
+  return b;
+};
+
+/* `lista` son los asuntos del montón de arriba, ya pasados por el
+   buscador y los filtros, pero todavía sin quedarnos con un tipo. */
+App.pintarGruposTipo = function (lista) {
+  var caja = App.cajaDeTipos();
+  if (!caja) return;
+
+  var grupos = App.montonesPorTipo(lista);
+
+  /* Con un solo tipo, las tarjetas no dicen nada que no diga ya la
+     lista de abajo. En "Por clasificar" no hay asuntos, solo papeles. */
+  if (App.E.vista === 'clasificar' || grupos.length < 2) {
+    caja.classList.add('oculto');
+    caja.innerHTML = '';
+    return;
+  }
+
+  caja.innerHTML = '';
+  caja.classList.remove('oculto');
+
+  var rotulo = document.createElement('span');
+  rotulo.className = 'grupos-rotulo';
+  rotulo.textContent = 'Por tipo de asunto';
+  caja.appendChild(rotulo);
+
+  caja.appendChild(App.tarjetaDeTipo('', 'Todos', lista.length, 0));
+  grupos.forEach(function (g) {
+    caja.appendChild(App.tarjetaDeTipo(g.tipo, g.tipo, g.cuantos, g.vencidos));
+  });
+};
 
 /* Cuántos días lleva un asunto en el estado que tiene puesto. */
 App.diasEnEstado = function (a) {
@@ -315,7 +432,10 @@ App.pintarAbiertos = function () {
   $('orden-abiertos').value = orden;
   var filtro = $('filtro-estado').value;
   var plazo = $('filtro-plazo').value;
-  var lista = App.E.listaAbiertos.filter(function (a) {
+
+  /* Primero, el montón entero: lo que pasa el buscador y los filtros.
+     Sobre esto se cuentan las tarjetas de tipo. */
+  var monton = App.E.listaAbiertos.filter(function (a) {
     if (!App.deLaVista(a, App.E.vista)) return false;
     if (q && a.busca.indexOf(q) === -1) return false;
     if (!Plazos.pasaFiltro(a.ficha.limite || '', plazo)) return false;
@@ -323,6 +443,19 @@ App.pintarAbiertos = function () {
     if (filtro) return a.ficha.situacion === filtro;
     return true;
   });
+
+  /* Si el tipo elegido ya no está en el montón, se vuelve a todos: si
+     no, la lista se quedaría vacía sin que se vea por qué. */
+  if (App.tipoElegido && !monton.some(function (a) {
+    return App.tipoDeAsunto(a) === App.tipoElegido;
+  })) App.tipoElegido = '';
+
+  App.pintarGruposTipo(monton);
+
+  var lista = App.tipoElegido
+    ? monton.filter(function (a) { return App.tipoDeAsunto(a) === App.tipoElegido; })
+    : monton;
+
   lista.sort(App.ORDENES[orden]);
   if (rotulo) rotulo.textContent = lista.length;
   var caja = $('lista-abiertos');
@@ -351,6 +484,7 @@ App.ICONO_DOCUMENTO =
 
 App.textoVacio = function () {
   if (!App.E.listaAbiertos.length) return 'No hay asuntos abiertos. Crea el primero en "Nuevo asunto".';
+  if (App.tipoElegido) return 'No queda ningún asunto de tipo ' + App.tipoElegido + ' en este montón.';
   if ($('buscar-abiertos').value.trim() || $('filtro-estado').value || $('filtro-plazo').value) {
     return 'Ningún asunto coincide con lo que buscas.';
   }
