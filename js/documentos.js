@@ -168,11 +168,15 @@ var Documentos = (function () {
     var previo = leerNombre(opciones.nombreActual);
     var hoy = U.hoyIso();
     var fecha = previo.fecha || hoy;
-    var curso = previo.curso || ctx.curso(fecha);
-    /* Si el curso ya venía del nombre del fichero, es una elección hecha
-       y no se toca. Si es el calculado por defecto, se sigue recalculando
-       mientras el usuario no lo cambie a mano. */
-    var cursoDocAuto = previo.curso ? '' : curso;
+    /* El hueco de texto libre del nombre. Antes se llamaba "Año
+       académico" y se rellenaba solo con el curso que tocaba por la
+       fecha. Él lo usa para otras cosas —un número de expediente, una
+       referencia de la factura— y ese relleno automático estorbaba:
+       había que borrarlo cada vez. Desde el 10-sep-2026 se llama
+       **Texto adicional**, nace vacío y no depende de ningún otro
+       campo. Lo único que se conserva es lo que ya trajera el nombre
+       del propio fichero. */
+    var curso = previo.curso || '';
 
     caja.innerHTML =
       '<div class="doc-partido">' +
@@ -199,8 +203,9 @@ var Documentos = (function () {
           '<p class="nota">La que trae el documento, no la de hoy.</p>' +
         '</div>' +
         '<div>' +
-          '<label class="etiqueta">Año académico <span class="suave">(opcional)</span></label>' +
+          '<label class="etiqueta">Texto adicional <span class="suave">(opcional)</span></label>' +
           '<input id="doc-curso" class="campo" value="' + U.escapar(curso) + '">' +
+          '<p class="nota">Lo que quieras añadir al nombre: el curso, una referencia…</p>' +
         '</div>' +
       '</div>' +
 
@@ -269,14 +274,8 @@ var Documentos = (function () {
       c.oninput = refrescar;
       c.onchange = refrescar;
     });
-    $('doc-fecha').oninput = $('doc-fecha').onchange = function () {
-      var actual = $('doc-curso').value.trim();
-      if (!actual || actual === cursoDocAuto) {
-        cursoDocAuto = ctx.curso($('doc-fecha').value);
-        $('doc-curso').value = cursoDocAuto;
-      }
-      refrescar();
-    };
+    /* La fecha ya no toca el texto adicional: son dos campos
+       independientes, y escribir en uno no puede pisar el otro. */
     $('doc-hay-registro').onchange = function () {
       $('doc-registro').classList.toggle('oculto', !$('doc-hay-registro').checked);
       refrescar();
@@ -516,18 +515,24 @@ var Documentos = (function () {
     }
 
     var tipos = ctx.tipos().slice().sort(function (a, b) { return b.length - a.length; });
+    var seSabeElTipo = false;
     for (var i = 0; i < tipos.length; i++) {
       if (U.normalizar(resto).indexOf(U.normalizar(tipos[i])) === 0) {
         salida.tipo = tipos[i];
         resto = resto.slice(tipos[i].length).trim();
+        seSabeElTipo = true;
         break;
       }
     }
-    /* Solo se admite como año académico algo con forma de año académico:
-       26-27. Lo demás que quede en el nombre no es el año, y meterlo en
-       ese campo hacía que saliera un texto cualquiera donde no toca. */
-    var mCurso = resto.match(/\b(\d{2})\s*[-\/]\s*(\d{2})\b/);
-    salida.curso = mCurso ? mCurso[1] + '-' + mCurso[2] : '';
+    /* Lo que quede después del tipo es el texto adicional, sea lo que
+       sea: un curso, una referencia de la factura, un expediente. Antes
+       aquí solo se admitía algo con forma de año académico, porque el
+       campo se llamaba así; desde que es texto libre se recoge entero.
+
+       Eso sí, **solo si se ha reconocido el tipo**. Si no, lo que queda
+       es el propio tipo sin identificar, y meterlo aquí sacaría un texto
+       cualquiera donde no toca. */
+    salida.curso = seSabeElTipo ? resto.trim() : '';
     return salida;
   }
 
