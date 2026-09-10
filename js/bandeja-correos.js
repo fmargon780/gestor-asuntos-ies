@@ -251,6 +251,37 @@
     return base + '#search/' + encodeURIComponent(busca);
   }
 
+  /* Leer el correo sin salir de la aplicación.
+
+     Gmail no se deja meter dentro de otra página: Google lo prohíbe.
+     Pero el script guarda el hilo entero en PDF, y ese PDF sí se puede
+     enseñar. Sale en el panel de la derecha, con la aplicación a la
+     izquierda, igual que se hace con los documentos. */
+  async function leerElCorreo(d) {
+    if (!window.Lector) return;
+    if (!carpeta || !d.pdf) { U.aviso('Este correo no trae su PDF.', 'malo'); return; }
+    try {
+      var h = await carpeta.getFileHandle(d.pdf);
+      var fichero = await h.getFile();
+      var botones = [];
+      if (d.enlace) {
+        botones.push({
+          texto: 'Abrir en Gmail',
+          alPulsar: function () { window.open(enlaceAGmail(d), '_blank'); }
+        });
+      }
+      window.Lector.abrir({
+        titulo: d.asunto || 'Correo',
+        pie: [(d.de && (d.de.nombre || d.de.correo)) || '', fechaLegible(d.fecha)]
+             .filter(Boolean).join('  ·  '),
+        blob: fichero,
+        botones: botones
+      });
+    } catch (e) {
+      U.aviso('No he podido abrir el correo: ' + e.message, 'malo');
+    }
+  }
+
   /* La carpeta de un asunto que ya existe. Si está archivado, hay que
      bajar por ARCHIVO / CATEGORÍA / TERCERO. */
   async function carpetaDelAsunto(nombre, ficha) {
@@ -460,10 +491,18 @@
     crear.onclick = function () { llevarANuevo(item); };
     acciones.appendChild(crear);
 
+    if (d.pdf && window.Lector) {
+      var leer = document.createElement('button');
+      leer.className = 'boton';
+      leer.textContent = 'Leer el correo';
+      leer.onclick = function () { leerElCorreo(d); };
+      acciones.appendChild(leer);
+    }
+
     if (d.enlace) {
       var ver = document.createElement('button');
       ver.className = 'boton';
-      ver.textContent = 'Ver el correo';
+      ver.textContent = 'Abrir en Gmail';
       ver.onclick = function () { window.open(enlaceAGmail(d), '_blank'); };
       acciones.appendChild(ver);
     }
