@@ -48,6 +48,15 @@
 
 .ficha-documentos { display: flex; flex-direction: column; gap: 6px; }
 
+/* El rótulo que separa los papeles del expediente de lo que ha
+   llegado por correo. Solo sale cuando hay de las dos clases. */
+.ficha-grupo-docs {
+  font-size: 12px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--tinta-suave);
+  margin: 6px 0 0;
+}
+.ficha-grupo-docs:first-child { margin-top: 0; }
+
 @media (max-width: 1000px) {
   .ficha-columnas { grid-template-columns: 1fr; }
   .ficha-datos .ficha-dato { grid-template-columns: 1fr; gap: 0; }
@@ -74,6 +83,9 @@
   cursor: pointer; word-break: break-word;
 }
 .ficha-documentos .ficha-documento:hover { background: var(--azul-claro); border-color: var(--azul); }
+/* La etiqueta PDF o JPG no se parte en dos líneas cuando el nombre es
+   largo: se queda entera a la izquierda. */
+.ficha-documentos .marca-ext { flex: 0 0 auto; margin-right: 0; }
 
 /* La tarjeta del tercero viene pequeña: nombre y un par de datos.
    Al pulsarla se abre entera. */

@@ -574,7 +574,48 @@
     }
   }
 
-  /* ---------- los documentos que hay en la carpeta ---------- */
+  /* ---------- los documentos que hay en la carpeta ----------
+
+     Van en dos grupos: los papeles del expediente y lo que ha llegado
+     por correo. Mezclados, la solicitud se pierde entre hilos y
+     adjuntos, que son los que más se acumulan. */
+
+  /* Lo que la aplicación mete cuando entra un correo: el hilo en PDF
+     (CORREO, y HILO en las primeras versiones) y sus adjuntos. */
+  var DE_CORREO = /(^|[\s_-])(CORREO|HILO|ADJUNTO)([\s_.\-(]|$)/i;
+
+  function esDeCorreo(nombre) {
+    return DE_CORREO.test(String(nombre || ''));
+  }
+
+  /* El nombre empieza por la fecha, así que por orden alfabético
+     quedan en orden de antigüedad. */
+  function porNombre(a, b) {
+    return String(a.nombre).localeCompare(String(b.nombre), 'es');
+  }
+
+  function filaDeDocumento(f) {
+    var ext = Nombres.extensionDe(f.nombre);
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'ficha-documento';
+    b.title = 'Verlo al lado del programa';
+    b.innerHTML = (ext ? '<span class="marca-ext">' + U.escapar(ext.toUpperCase()) + '</span>' : '') +
+                  '<span>' + U.escapar(f.nombre) + '</span>';
+    b.onclick = function () { abrirDocumento(f); };
+    return b;
+  }
+
+  function grupoDeDocumentos(caja, titulo, ficheros, conRotulo) {
+    if (!ficheros.length) return;
+    if (conRotulo) {
+      var r = document.createElement('div');
+      r.className = 'ficha-grupo-docs';
+      r.textContent = titulo + '  (' + ficheros.length + ')';
+      caja.appendChild(r);
+    }
+    ficheros.sort(porNombre).forEach(function (f) { caja.appendChild(filaDeDocumento(f)); });
+  }
 
   async function pintarDocumentos(a) {
     var caja = $('ficha-documentos');
@@ -590,17 +631,14 @@
       }
       caja.className = 'ficha-documentos';
       caja.innerHTML = '';
-      lista.forEach(function (f) {
-        var ext = Nombres.extensionDe(f.nombre);
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'ficha-documento';
-        b.title = 'Verlo al lado del programa';
-        b.innerHTML = (ext ? '<span class="marca-ext">' + U.escapar(ext.toUpperCase()) + '</span>' : '') +
-                      '<span>' + U.escapar(f.nombre) + '</span>';
-        b.onclick = function () { abrirDocumento(f); };
-        caja.appendChild(b);
-      });
+
+      var correos = lista.filter(function (f) { return esDeCorreo(f.nombre); });
+      var expediente = lista.filter(function (f) { return !esDeCorreo(f.nombre); });
+
+      /* Con un solo grupo no hacen falta rótulos: sobran. */
+      var conRotulo = correos.length > 0 && expediente.length > 0;
+      grupoDeDocumentos(caja, 'Del expediente', expediente, conRotulo);
+      grupoDeDocumentos(caja, 'Llegados por correo', correos, conRotulo);
     } catch (e) {
       caja.className = 'explica';
       caja.textContent = 'No he podido leer la carpeta: ' + e.message;
