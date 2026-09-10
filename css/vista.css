@@ -11,6 +11,20 @@
 
 .contenido { container-type: inline-size; }
 
+/* ---------- el ancho de la pantalla ----------
+
+   La zona de trabajo ocupa todo el ancho que tenga el monitor. En el
+   Chromebook eso ya era todo; en el monitor del trabajo sobraba media
+   pantalla en blanco, porque el contenido tenía un tope de 1180
+   píxeles puesto en css/estilos.css. Aquí se le quita.
+
+   Lo que se lee seguido sí conserva un tope: el formulario de Nuevo
+   asunto y los textos de Ajustes. Una línea de mil quinientos píxeles
+   se lee mal. */
+.contenido { max-width: none; }
+#pantalla-nuevo .formulario { max-width: 940px; }
+#pantalla-ajustes { max-width: 1040px; }
+
 /* ---------- los filtros, plegados ---------- */
 
 /* Ocupan una línea entera de la cabecera, debajo del buscador. */
@@ -62,6 +76,48 @@
   border-radius: 20px; padding: 0 7px; font-size: 12px; font-weight: 700;
 }
 
+/* ---------- las tarjetas por tipo de asunto ----------
+
+   Una fila de tarjetas pequeñas entre las tres grandes y la lista:
+   una por cada tipo de asunto que haya en el montón. */
+
+.grupos-tipo {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  margin: -8px 0 18px;
+}
+
+.grupos-rotulo {
+  font-size: 13px; font-weight: 600; color: var(--tinta-suave);
+  margin-right: 4px;
+}
+
+.grupo {
+  display: flex; align-items: center; gap: 9px;
+  font: inherit; text-align: left; color: var(--tinta); cursor: pointer;
+  background: var(--papel); border: 1px solid var(--linea);
+  border-radius: var(--radio); padding: 8px 13px; box-shadow: var(--sombra);
+}
+.grupo:hover { border-color: #b9c6d6; }
+.grupo.activo {
+  border-color: var(--azul); box-shadow: 0 0 0 2px var(--azul-claro), var(--sombra);
+}
+
+.grupo-nombre { font-weight: 600; font-size: 14px; }
+
+.grupo-cuenta {
+  background: #eef1f5; border: 1px solid var(--linea); color: var(--tinta);
+  border-radius: 20px; padding: 1px 9px; font-size: 12.5px; font-weight: 700;
+}
+.grupo.activo .grupo-cuenta {
+  background: var(--azul-claro); border-color: #c3d8ec; color: var(--azul);
+}
+
+/* Lo que ya ha vencido se dice en la propia tarjeta: si no, habría que
+   entrar en el montón para enterarse. */
+.grupo-vencidos {
+  color: var(--rojo-linea); font-size: 12px; font-weight: 700;
+}
+
 /* ---------- la zona de trabajo, cuando se queda estrecha ---------- */
 
 /* Con el panel de lectura abierto el contenido baja de golpe a la mitad.
@@ -89,4 +145,7 @@
 @container (max-width: 620px) {
   .paneles { grid-template-columns: 1fr; }
   .filtros { grid-template-columns: 1fr; }
+  /* Las tarjetas por tipo, una debajo de otra: en fila no cabrían. */
+  .grupos-tipo { flex-direction: column; align-items: stretch; }
+  .grupo { justify-content: space-between; }
 }
