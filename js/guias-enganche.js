@@ -9,6 +9,12 @@
 
    Lo que se marca como hecho se guarda en la ficha del asunto, en
    asuntos.json, así que lo ve todo el que abra la aplicación.
+
+   Desde el 10-sep-2026 la guía también se escribe **desde la ficha de
+   un asunto**, sin ir a Ajustes: es ahí, tramitando, donde uno se da
+   cuenta de qué pasos faltan. Ese botón lo pone js/ficha-asunto.js y
+   llama aquí, a `window.GuiasDelCentro.escribir`, para que las guías se
+   sigan guardando en un solo sitio.
    ============================================================ */
 (function () {
 
@@ -155,9 +161,23 @@
     });
   }
 
+  /* Abre el cuadro de escribir la guía de un tipo y la guarda.
+     Devuelve true si se ha guardado algo, false si se ha cancelado o si
+     ha fallado.
+
+     **Se relee el fichero antes de abrir el cuadro.** El compañero puede
+     haber escrito otra guía desde el otro ordenador mientras tanto, y sin
+     releer se guardaría encima de la suya. Es la misma precaución que
+     toma App.anotar con asuntos.json. */
   async function escribirGuia(nombreTipo) {
+    if (!nombreTipo) return false;
+    try {
+      await cargar();
+      yaLeido = true;
+    } catch (e) { /* si no se puede releer, se sigue con lo que hay */ }
+
     var pasos = await Guias.editar(nombreTipo, pasosDe(nombreTipo));
-    if (pasos === null || pasos === false || pasos === undefined) return;
+    if (pasos === null || pasos === false || pasos === undefined) return false;
 
     if (pasos.length) guias[nombreTipo] = pasos;
     else delete guias[nombreTipo];
@@ -170,10 +190,21 @@
       U.aviso(pasos.length
         ? 'Guía de ' + nombreTipo + ' guardada: ' + pasos.length + ' pasos.'
         : nombreTipo + ' se queda sin guía.', 'bueno');
+      return true;
     } catch (e) {
       U.aviso('No he podido guardarla: ' + e.message, 'malo');
+      return false;
     }
   }
+
+  /* Lo que usa la ficha de un asunto para escribir la guía de su tipo
+     sin pasar por Ajustes. Las guías viven en un solo sitio, y es este
+     fichero el que las lleva: si la ficha escribiera por su cuenta, las
+     dos copias se quedarían distintas. */
+  window.GuiasDelCentro = {
+    escribir: escribirGuia,
+    pasosDe: function (tipo) { return pasosDe(tipo).slice(); }
+  };
 
   /* ---------- arranque ---------- */
 
