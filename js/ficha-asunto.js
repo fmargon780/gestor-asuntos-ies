@@ -379,13 +379,19 @@
     }
 
     var marcados = ((a.ficha && a.ficha.pasosHechos) || []).slice();
+    /* La opción elegida en cada paso-pregunta. Se guarda en la ficha del
+       asunto, igual que lo marcado, así que el compañero ve por dónde va
+       el trámite. */
+    var elegidas = Object.assign({}, (a.ficha && a.ficha.pasosElegidos) || {});
+
     caja.className = '';
     caja.innerHTML = '<p class="explica" id="ficha-guia-cuenta"></p>' +
-                     Guias.vista(pasos, marcados, abierto);
+                     Guias.vista(pasos, marcados, abierto, elegidas);
 
     function contar() {
+      var c = Guias.cuenta(pasos, marcados, elegidas);
       $('ficha-guia-cuenta').textContent =
-        Guias.hechosDe(pasos, marcados) + ' de ' + pasos.length + ' pasos hechos.' +
+        c.hechos + ' de ' + c.total + ' pasos hechos.' +
         (abierto ? ' Lo que marques lo ve todo el que abra la aplicación.' : '');
     }
     contar();
@@ -393,24 +399,37 @@
 
     if (!abierto) return;
 
+    async function guardar(datos) {
+      try {
+        await App.anotar(a.nombre, Object.assign({
+          pasosEl: U.ahora(),
+          pasosPor: App.E.usuario
+        }, datos));
+      } catch (e) {
+        U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+      }
+    }
+
     Array.prototype.forEach.call(caja.querySelectorAll('.paso-casilla'), function (c) {
-      c.onchange = async function () {
+      c.onchange = function () {
         var id = c.dataset.paso;
         var i = marcados.indexOf(id);
         if (c.checked && i === -1) marcados.push(id);
         if (!c.checked && i !== -1) marcados.splice(i, 1);
         c.closest('.paso-lectura').classList.toggle('paso-hecho', c.checked);
         contar();
-        try {
-          await App.anotar(a.nombre, {
-            pasosHechos: marcados.slice(),
-            pasosEl: U.ahora(),
-            pasosPor: App.E.usuario
-          });
-        } catch (e) {
-          U.aviso('No he podido guardar lo marcado: ' + e.message, 'malo');
-        }
+        guardar({ pasosHechos: marcados.slice() });
       };
+    });
+
+    /* Quién se entera de que se ha elegido una opción. El propio
+       js/guias.js ya ha enseñado la rama elegida: aquí solo se apunta y
+       se guarda. */
+    Guias.cuandoSeElige(function (idPaso, idOpcion) {
+      if (idOpcion) elegidas[idPaso] = idOpcion;
+      else delete elegidas[idPaso];
+      contar();
+      guardar({ pasosElegidos: Object.assign({}, elegidas) });
     });
   }
 
