@@ -457,11 +457,28 @@ var Datos = (function () {
                            'Teléfono de contacto', 'Correo de contacto'] },
     PERSONAL: { fichero: 'personal.csv',
                 cabecera: ['Nombre', 'Documento', 'Puesto', 'Teléfono', 'Correo'] },
+    /* El nombre comercial es el rótulo del negocio, que muchas veces no
+       tiene nada que ver con la razón social: "Papelería Pintor Palomo"
+       de un autónomo que se llama Adolfo González de León. Se busca por
+       los dos. En el nombre de la carpeta sigue mandando la razón
+       social, que es la que viene en las facturas. */
     EMPRESAS: { fichero: 'empresas.csv',
-                cabecera: ['Razón social', 'NIF', 'Contacto', 'Teléfono', 'Correo'] },
+                cabecera: ['Razón social', 'Nombre comercial', 'NIF',
+                           'Contacto', 'Teléfono', 'Correo'] },
     OTROS:    { fichero: 'otros.csv',
                 cabecera: ['Nombre', 'Referencia', 'Teléfono', 'Correo'] }
   };
+
+  /* El valor de una columna buscándola por su título en la cabecera del
+     propio fichero. Si ese título no está, se cae al sitio de reserva
+     que se le indique; con -1 devuelve cadena vacía. Así un fichero
+     viejo, con las columnas en otro orden, se sigue leyendo bien. */
+  function porTitulo(cab, fila, titulo, sitioDeReserva) {
+    var i = cab.indexOf(titulo);
+    if (i === -1) i = sitioDeReserva;
+    if (i < 0) return '';
+    return String(fila[i] === undefined ? '' : fila[i]).trim();
+  }
 
   async function cargarLista(dirDatos, categoria, clave) {
     clave = clave || categoria;
@@ -483,14 +500,24 @@ var Datos = (function () {
         }
         var nombre = String(fila[0] || '').trim();
         if (!nombre) continue;
+        /* La segunda columna se lee POR SU TÍTULO, no por su sitio. Los
+           ficheros escritos antes de que existiera el nombre comercial
+           tienen el NIF en la segunda columna; los nuevos, en la
+           tercera. Leerlo por el título vale para los dos. */
+        var doc = porTitulo(cab, fila, 'Documento', 1);
+        var nif = porTitulo(cab, fila, 'NIF', 1);
+        var ref = porTitulo(cab, fila, 'Referencia', 1);
+        var comercial = porTitulo(cab, fila, 'Nombre comercial', -1);
         lista.push({
           nombre: nombre,
-          documento: categoria === 'PERSONAL' ? String(fila[1] || '').trim() : '',
-          nif: categoria === 'EMPRESAS' ? String(fila[1] || '').trim() : '',
-          referencia: categoria === 'OTROS' ? String(fila[1] || '').trim() : '',
+          documento: categoria === 'PERSONAL' ? doc : '',
+          nif: categoria === 'EMPRESAS' ? nif : '',
+          referencia: categoria === 'OTROS' ? ref : '',
+          comercial: categoria === 'EMPRESAS' ? comercial : '',
           campos: campos, categoria: categoria, deSeneca: false,
           enElCentro: true, fechaCese: '', puesto: campos['Puesto'] || '',
-          busca: U.normalizar(nombre + ' ' + (fila[1] || '') + ' ' + (campos['Puesto'] || ''))
+          busca: U.normalizar([nombre, doc, nif, ref, comercial,
+                               campos['Puesto'] || ''].join(' '))
         });
       }
     }
@@ -509,6 +536,35 @@ var Datos = (function () {
       return def.cabecera.map(function (c) { return p.campos[c] || ''; });
     });
     filas.push(def.cabecera.map(function (c) { return valores[c] || ''; }));
+    filas.sort(function (a, b) { return U.normalizar(a[0]) < U.normalizar(b[0]) ? -1 : 1; });
+    await Carpetas.escribirTexto(dirDatos, def.fichero, aCsv(def.cabecera, filas));
+    delete CACHE[clave];
+    delete CACHE[categoria];
+    return cargar(dirDatos, categoria);
+  }
+
+  /* Cambia los datos de un tercero que ya está dado de alta a mano.
+     Se busca por el nombre que tenía antes, que es la primera columna
+     del fichero. Si no aparece, se añade como uno nuevo: así un cambio
+     nunca hace desaparecer a nadie.
+
+     Ojo: esto NO renombra las carpetas de sus asuntos. El nombre de una
+     carpeta es el rastro del día en que se creó. */
+  async function guardarEnLista(dirDatos, categoria, nombreAntes, valores) {
+    var def = LISTAS[categoria];
+    var clave = (categoria === 'PERSONAL' || categoria === 'ALUMNADO')
+      ? categoria + '_MANUAL' : categoria;
+    var actual = await cargarLista(dirDatos, categoria, clave);
+    var buscado = U.normalizar(nombreAntes || '');
+    var estaba = false;
+    var filas = actual.lista.map(function (p) {
+      if (!estaba && U.normalizar(p.nombre) === buscado) {
+        estaba = true;
+        return def.cabecera.map(function (c) { return valores[c] || ''; });
+      }
+      return def.cabecera.map(function (c) { return p.campos[c] || ''; });
+    });
+    if (!estaba) filas.push(def.cabecera.map(function (c) { return valores[c] || ''; }));
     filas.sort(function (a, b) { return U.normalizar(a[0]) < U.normalizar(b[0]) ? -1 : 1; });
     await Carpetas.escribirTexto(dirDatos, def.fichero, aCsv(def.cabecera, filas));
     delete CACHE[clave];
@@ -677,6 +733,7 @@ var Datos = (function () {
   return {
     aTabla: aTabla, aCsv: aCsv, cargar: cargar, anadirALista: anadirALista,
     buscar: buscar, olvidar: olvidar, LISTAS: LISTAS,
+    guardarEnLista: guardarEnLista,
     unidadesDistintas: unidadesDistintas, destacadosAlumno: destacadosAlumno,
     destacadosPersona: destacadosPersona, cursoDelFichero: cursoDelFichero
   };
