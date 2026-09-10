@@ -28,6 +28,19 @@
     return Array.isArray(n) ? n : [];
   }
 
+  /* Una nota puede traer un enlace: el correo del que salió, por
+     ejemplo. Se enseña como botón, nunca escrito dentro del texto.
+     Una dirección de Gmail ocupa cuatro líneas y no la lee nadie. */
+  function enlaceDeNota(n) {
+    var url = String((n && n.enlace) || '');
+    if (!/^https?:\/\//i.test(url)) return '';
+    return '<div class="nota-botones">' +
+             '<a class="boton nota-boton" target="_blank" rel="noopener" href="' +
+             U.escapar(url) + '">' +
+             U.escapar((n && n.enlaceTexto) || 'Abrir el enlace') + '</a>' +
+           '</div>';
+  }
+
   /* La fecha y la hora en que se escribió, en cristiano. */
   function cuando(iso) {
     var d = new Date(iso);
@@ -72,13 +85,20 @@
     return notasDe(a).slice();
   }
 
-  async function anadirNota(a, texto) {
+  /* `extra` es opcional. Sirve para que una nota lleve algo más que
+     su texto: el enlace al correo del que salió, y el identificador
+     de ese correo, que es lo que luego evita apuntarlo dos veces. */
+  async function anadirNota(a, texto, extra) {
     var lista = await notasFrescas(a);
-    lista.push({
+    var nota = {
       texto: texto,
       quien: window.Gestor.usuario() || '',
       cuando: U.ahora()
+    };
+    if (extra) Object.keys(extra).forEach(function (k) {
+      if (extra[k] !== undefined && extra[k] !== null && extra[k] !== '') nota[k] = extra[k];
     });
+    lista.push(nota);
     await window.Gestor.anotar(a.nombre, {
       notas: lista,
       notaEl: U.ahora(),
@@ -101,6 +121,7 @@
                  (n.quien ? '<span class="nota-quien">' + U.escapar(n.quien) + '</span>' : '') +
                '</div>' +
                '<div class="nota-texto">' + U.escapar(n.texto) + '</div>' +
+               enlaceDeNota(n) +
              '</div>';
     }).join('');
   }
@@ -181,12 +202,23 @@
 
      La ficha del asunto enseña las notas dentro de la pantalla, sin
      ventana. Para no escribir dos veces lo mismo, usa estas piezas. */
+
+  /* ¿Este asunto tiene ya apuntado este correo? Se mira en el fichero
+     compartido, no en lo que hay en memoria: el correo puede haberlo
+     guardado el compañero desde el otro ordenador. */
+  async function yaTieneCorreo(a, id) {
+    if (!id) return false;
+    var lista = await notasFrescas(a);
+    return lista.some(function (n) { return n && n.correo === id; });
+  }
+
   window.Notas = {
     de: notasDe,
     frescas: notasFrescas,
     anadir: anadirNota,
     pintar: pintarLista,
-    cuando: cuando
+    cuando: cuando,
+    yaTieneCorreo: yaTieneCorreo
   };
 
   /* ---------- arranque ---------- */

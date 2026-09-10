@@ -28,3 +28,12 @@
 }
 .nota-quien { font-weight: 600; color: var(--azul); }
 .nota-texto { font-size: 14px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+
+/* El botón de una nota que viene de un correo. El enlace de Gmail va
+   aquí, no escrito dentro del texto. */
+.nota-botones { margin-top: 8px; }
+.nota-boton {
+  display: inline-block; text-decoration: none; color: var(--azul);
+  border-color: #c3d8ec; font-size: 13px; padding: 5px 12px;
+}
+.nota-boton:hover { background: var(--azul-claro); }
