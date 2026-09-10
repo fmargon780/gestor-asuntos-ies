@@ -1,12 +1,15 @@
-/* Prueba en navegador de verdad de escribir la guía de un tipo desde
-   la ficha de un asunto, sin pasar por Ajustes.
+/* Prueba en navegador de verdad de la guía dentro de un asunto:
+   escribirla desde la ficha, sin pasar por Ajustes, y que un paso
+   marcado se pliegue.
 
    Lo que tiene que pasar:
      - en un asunto abierto cuyo tipo no tiene guía sale el botón de
        escribirla, y ya no se manda al usuario a Ajustes,
      - al escribirla se guarda en _GESTOR/guias.json,
      - la ficha se repinta sola con los pasos recién escritos,
-     - y entonces el botón pasa a ser "Cambiar la guía".
+     - y entonces el botón pasa a ser "Cambiar la guía",
+     - al marcar un paso, su explicación se esconde y el botón "ver"
+       la vuelve a abrir.
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
@@ -115,6 +118,40 @@ await comprobar('se apunta en la ficha del asunto',
     const clave = Object.keys(j.asuntos).filter(k => k.indexOf('MATRICULA') !== -1)[0];
     return (j.asuntos[clave].pasosHechos || []).length;
   }), 1);
+
+console.log('--- un paso hecho se pliega ---');
+/* Al segundo paso se le pone explicación; se marca y su cuerpo tiene
+   que esconderse, y volver con el botón "ver". */
+await pagina.evaluate(async () => {
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+  const f = await g.getFileHandle('guias.json');
+  const j = JSON.parse(await (await f.getFile()).text());
+  j.MATRICULA[1].cuerpo = '<p>Mirar el recibo del banco</p>';
+  const w = await f.createWritable();
+  await w.write(JSON.stringify(j));
+  await w.close();
+});
+await abrirLaFicha();
+const segundo = pagina.locator('#ficha-guia .paso-lectura').nth(1);
+await comprobar('antes de marcarlo, la explicación se ve',
+  segundo.locator('.paso-cuerpo-texto').isVisible(), true);
+await segundo.locator('.paso-casilla').check();
+await pagina.waitForTimeout(400);
+await comprobar('al marcarlo se pliega',
+  segundo.locator('.paso-cuerpo-texto').isVisible(), false);
+await comprobar('y el título sigue a la vista',
+  segundo.locator('.paso-titulo-texto').isVisible(), true);
+await comprobar('con el botón "ver" se vuelve a abrir',
+  segundo.locator('.paso-ver').click().then(() => segundo.locator('.paso-cuerpo-texto').isVisible()),
+  true);
+await comprobar('y el botón pasa a decir esconder',
+  segundo.locator('.paso-ver').textContent(), 'esconder');
+await segundo.locator('.paso-casilla').uncheck();
+await pagina.waitForTimeout(400);
+await comprobar('al desmarcarlo vuelve a verse entero',
+  segundo.locator('.paso-cuerpo-texto').isVisible(), true);
+await comprobar('y el botón se esconde',
+  segundo.locator('.paso-ver').isVisible(), false);
 
 console.log('--- en Ajustes se ve lo mismo ---');
 await pagina.evaluate(() => App.ir('ajustes'));
