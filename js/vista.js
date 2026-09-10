@@ -7,10 +7,10 @@
       detrás del botón "Filtros". Sueltos en la barra se salían de
       línea y cada etiqueta acababa lejos de su campo.
 
-   2. El tablón de notas se ve siempre, salvo cuando hay un correo
-      abierto en el panel de la derecha y no cabe. El botón "Tablón"
-      de la cabecera lo esconde y lo trae de vuelta, pero al volver a
-      la pantalla de asuntos vuelve a salir: si no se ve, no se mira.
+   2. El tablón de notas se ve siempre, salvo cuando hay algo abierto
+      en el panel de la derecha y no cabe. El botón "Tablón" de la
+      cabecera lo esconde y lo trae de vuelta, pero al volver a la
+      pantalla de asuntos vuelve a salir: si no se ve, no se mira.
 
    El ancho lo lleva css/vista.css, que mide la zona de trabajo y no la
    ventana: por eso vale igual con el panel de lectura abierto.
@@ -74,13 +74,23 @@
      Palabras suyas (10-sep-2026): "por defecto, al entrar y al volver
      a Asuntos abiertos, el tablón debe estar desplegado; si no, se me
      olvidará mirarlo". Así que ahora solo se quita cuando de verdad no
-     cabe: con un correo abierto en el panel de la derecha.
+     cabe: con algo abierto en el panel de la derecha.
+
+     Hay DOS paneles a la derecha, y los dos cuentan:
+       - `con-lector`, el de leer un correo (js/lector.js).
+       - `con-visor`, el de ver un documento (js/visor.js).
+     La primera versión solo miraba el del correo, y al abrir un
+     documento el tablón se quedaba puesto, estrujando la pantalla.
 
      Antes se quitaba también al elegir una de las tres tarjetas de
      arriba, y como siempre hay una elegida, el tablón no salía nunca
      solo. Había que pedirlo con el botón cada vez. */
+  var PANELES_DE_LA_DERECHA = ['con-lector', 'con-visor'];
+
   function estorba() {
-    return document.body.classList.contains('con-lector');
+    return PANELES_DE_LA_DERECHA.some(function (c) {
+      return document.body.classList.contains(c);
+    });
   }
 
   function pendientes() {
@@ -128,7 +138,8 @@
     var recargar = $('btn-recargar');
     if (recargar && recargar.parentNode) recargar.parentNode.insertBefore(boton, recargar);
 
-    /* Lo que cambia la situación: abrir o cerrar un correo. */
+    /* Lo que cambia la situación: abrir o cerrar un correo o un
+       documento en el panel de la derecha. */
     new MutationObserver(pintarTablon)
       .observe(document.body, { attributes: true, attributeFilter: ['class'] });
 

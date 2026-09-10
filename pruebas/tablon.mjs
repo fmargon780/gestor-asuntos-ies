@@ -2,7 +2,7 @@
 
    La regla, dicha por él: al entrar y al volver a Asuntos abiertos
    tiene que estar desplegado. Si no se ve, no se mira. Solo se quita
-   cuando hay un correo abierto al lado y no cabe.
+   cuando hay algo abierto en el panel de la derecha y no cabe.
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
@@ -13,7 +13,11 @@ const preparacion = fuente.slice(fuente.indexOf('const preparacion = `') + 'cons
                                  fuente.indexOf('`;\n\nconst DIRECCION'));
 
 const navegador = await chromium.launch();
-const pagina = await navegador.newPage({ viewport: { width: 1600, height: 950 } });
+/* El ancho del monitor del trabajo. Importa: en una pantalla más
+   estrecha el panel de la derecha ya deja la zona de trabajo por debajo
+   de 900 y el tablón se quita solo por CSS, así que el fallo de verdad
+   —que el visor de documentos no contaba— no se vería. */
+const pagina = await navegador.newPage({ viewport: { width: 1905, height: 950 } });
 const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
@@ -35,6 +39,9 @@ await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.evaluate(async () => {
   await window.__disco.abiertos.getDirectoryHandle('260901 MATRICULA 26-27 Pérez, Ana 1234', { create: true });
+  /* y un papel suelto, de los de "Por clasificar" */
+  window.__disco.abiertos._hijos.set('escaneo del director.pdf',
+    window.__disco.fich('escaneo del director.pdf', 'un papel'));
 });
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
@@ -76,6 +83,17 @@ await comprobar('se quita, que no cabe', seVeElTablon(), false);
 await pagina.evaluate(() => document.body.classList.remove('con-lector'));
 await pagina.waitForTimeout(300);
 await comprobar('al cerrar el correo, vuelve', seVeElTablon(), true);
+
+console.log('--- abriendo un documento sin clasificar ---');
+await pagina.click('.panel[data-vista="clasificar"]');
+await pagina.waitForTimeout(400);
+await comprobar('en Por clasificar el tablón se ve', seVeElTablon(), true);
+await pagina.getByRole('button', { name: 'Abrir', exact: true }).click();
+await pagina.waitForTimeout(600);
+await comprobar('con el documento al lado, se quita', seVeElTablon(), false);
+await pagina.click('#visor-cerrar').catch(() => {});
+await pagina.waitForTimeout(500);
+await comprobar('al cerrar el documento, vuelve', seVeElTablon(), true);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
