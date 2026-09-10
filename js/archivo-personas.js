@@ -81,7 +81,8 @@ App.buscarPersonas = function () {
   }
   lista.forEach(function (p) {
     var d = document.createElement('div');
-    d.className = 'resultado';
+    d.className = App.claseDeResultado(p);
+    if (p.id) d.dataset.nie = p.id;
     d.innerHTML = '<div>' + U.escapar(p.nombre) + '</div>' +
                   '<div class="resultado-pie">' + U.escapar(App.pieDe(p)) + '</div>';
     d.onclick = function () { App.verFicha(p); };
