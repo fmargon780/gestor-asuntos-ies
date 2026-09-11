@@ -40,3 +40,4 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 2 | `docs/REGISTRO-EN-UN-PASO.md` | HECHA | Ya estaba hecho antes de apuntarse aquí (PR #5, fusionada 11-sep-2026 05:01): botón Registrar sin nombrar dos veces, casilla "Pendiente de registro" y lectura sola del sello de Séneca en el PDF. Comprobado de nuevo el 11-sep-2026 |
 | 3 | `docs/CAMPOS-POR-TIPO.md` | EN CURSO | Empezada 11-sep-2026 · 10:20 (sesión programada) |
 | 4 | `docs/TERCEROS-RELACIONADOS.md` | EN CURSO | Empezada 11-sep-2026 · 10:24 |
+| 5 | `docs/NO-DUPLICAR-ASUNTOS.md` | PENDIENTE | Apuntada 11-sep-2026. Parada al crear un asunto que ya existe, con "Abrir el que ya existe", y franja para unir dos duplicados que ya están creados |
