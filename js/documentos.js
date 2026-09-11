@@ -93,11 +93,17 @@ var Documentos = (function () {
 
     if (lista.length) {
       html += '<div class="lista-documentos">' + lista.map(function (f, i) {
+        var pendiente = Registro.pendiente(asuntoActual, f.nombre);
+        var sinRegistro = !Registro.tieneRegistro(f.nombre);
         return '<div class="fila-documento">' +
                  '<span class="nombre-documento">' + U.escapar(f.nombre) + '</span>' +
+                 (pendiente ? '<span class="marca-sin-registrar">Sin registrar</span>' : '') +
                  '<button type="button" class="boton" data-copiar="' + i + '" ' +
                    'title="Copiar el nombre del documento, sin la extensión">Copiar nombre</button>' +
                  '<button type="button" class="boton" data-renombrar="' + i + '">Poner nombre</button>' +
+                 (sinRegistro ? '<button type="button" class="boton' + (pendiente ? ' boton-ambar' : '') +
+                   '" data-registrar="' + i + '" title="Dar registro de entrada o salida a este documento">' +
+                   'Registrar</button>' : '') +
                '</div>';
       }).join('') + '</div>';
     }
@@ -127,6 +133,13 @@ var Documentos = (function () {
       b.onclick = function () {
         var f = lista[Number(b.dataset.renombrar)];
         pintarFormulario({ modo: 'renombrar', nombreActual: f.nombre });
+      };
+    });
+
+    Array.prototype.forEach.call(caja.querySelectorAll('[data-registrar]'), function (b) {
+      b.onclick = async function () {
+        var f = lista[Number(b.dataset.registrar)];
+        await Registro.pintarEnContenedor(caja, asuntoActual, f.nombre, function () { pintarLista(); });
       };
     });
 
@@ -177,6 +190,10 @@ var Documentos = (function () {
        campo. Lo único que se conserva es lo que ya trajera el nombre
        del propio fichero. */
     var curso = previo.curso || '';
+    /* Solo se ofrece cuando ya está en la carpeta: un documento que se
+       acaba de añadir todavía no puede estar "pendiente" de nada. */
+    var pendienteInicial = opciones.modo === 'renombrar' &&
+      Registro.pendiente(asuntoActual, opciones.nombreActual);
 
     caja.innerHTML =
       '<div class="doc-partido">' +
@@ -215,6 +232,12 @@ var Documentos = (function () {
       '<label class="interruptor">' +
         '<input type="checkbox" id="doc-hay-registro"' + (previo.registro ? ' checked' : '') + '>' +
         '<span>Está registrado en Séneca</span>' +
+      '</label>' +
+
+      '<label class="interruptor' + (previo.registro ? ' oculto' : '') + '" id="doc-fila-pendiente">' +
+        '<input type="checkbox" id="doc-pendiente-registro"' +
+          (pendienteInicial ? ' checked' : '') + '>' +
+        '<span>Pendiente de registro</span>' +
       '</label>' +
 
       '<div id="doc-registro" class="' + (previo.registro ? '' : 'oculto') + '">' +
@@ -277,7 +300,9 @@ var Documentos = (function () {
     /* La fecha ya no toca el texto adicional: son dos campos
        independientes, y escribir en uno no puede pisar el otro. */
     $('doc-hay-registro').onchange = function () {
-      $('doc-registro').classList.toggle('oculto', !$('doc-hay-registro').checked);
+      var hay = $('doc-hay-registro').checked;
+      $('doc-registro').classList.toggle('oculto', !hay);
+      $('doc-fila-pendiente').classList.toggle('oculto', hay);
       refrescar();
     };
 
@@ -472,6 +497,24 @@ var Documentos = (function () {
     $('doc-guardar').disabled = nombre.length < 10;
   }
 
+  /* La lista de "pendientesRegistro" vive en la ficha del asunto, no
+     en el nombre del fichero. Un documento con registro nunca puede
+     estar pendiente: si se marca "Está registrado en Séneca" aquí
+     mismo, la casilla de pendiente queda oculta y no cuenta. Al
+     renombrar, si el documento seguía en la lista se actualiza al
+     nombre nuevo. */
+  async function actualizarPendiente(opciones, nombreNuevo) {
+    var marcado = !$('doc-hay-registro').checked &&
+      !!($('doc-pendiente-registro') && $('doc-pendiente-registro').checked);
+    var lista = (asuntoActual.ficha && asuntoActual.ficha.pendientesRegistro) || [];
+    var sinElAntiguo = lista.filter(function (n) { return n !== opciones.nombreActual; });
+    var final = marcado ? sinElAntiguo.concat([nombreNuevo]) : sinElAntiguo;
+    var igual = final.length === lista.length &&
+      final.slice().sort().join('\n') === lista.slice().sort().join('\n');
+    if (igual) return;
+    await App.anotar(asuntoActual.nombre, { pendientesRegistro: final });
+  }
+
   async function guardar(opciones) {
     var nombre = Nombres.montarDocumento(datosDelFormulario(opciones));
     if (!nombre) return;
@@ -491,6 +534,7 @@ var Documentos = (function () {
         await Carpetas.renombrarFichero(asuntoActual.handle, opciones.nombreActual, nombre);
         U.aviso('Documento renombrado.', 'bueno');
       }
+      await actualizarPendiente(opciones, nombre);
       soltarVisor();
       await pintarLista();
     } catch (e) {
