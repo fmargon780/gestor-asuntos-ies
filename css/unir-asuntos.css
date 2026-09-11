@@ -1,0 +1,132 @@
+/* ============================================================
+   unir-asuntos.css — la pantalla "Duplicados" (11-sep-2026,
+   "los duplicados, a su propia pantalla").
+
+   Antes de esto, los grupos que parecían el mismo asunto salían en
+   franjas amarillas encima de la lista de Asuntos abiertos. Ahora
+   tienen su propia pantalla, a la que se llega desde el aviso de una
+   línea que hay junto al botón "Tablón".
+   ============================================================ */
+
+#btn-duplicados {
+  white-space: nowrap;
+}
+
+#duplicados-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.grupo-duplicado {
+  border: 1px solid var(--ambar-linea);
+  background: var(--ambar);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.grupo-duplicado-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.grupo-duplicado-cabecera strong {
+  flex: 1;
+  min-width: 160px;
+}
+
+.grupo-columnas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.columna-duplicado {
+  background: #fff;
+  border: 1px solid var(--borde, #d7dee6);
+  border-radius: 8px;
+  padding: 12px;
+  min-width: 0;
+}
+
+.columna-nombre {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0 0 6px;
+  color: var(--azul);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  word-break: break-word;
+}
+
+.columna-nombre:hover {
+  color: #16385c;
+}
+
+.columna-datos {
+  font-size: 12.5px;
+  color: #5d6b7a;
+  margin-bottom: 10px;
+}
+
+.columna-rotulo {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  color: #8592a1;
+  margin: 10px 0 4px;
+}
+
+.columna-documentos, .columna-notas {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.columna-documento {
+  text-align: left;
+  background: var(--azul-claro, #e8f0f8);
+  border: 1px solid #c3d8ec;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12.5px;
+  cursor: pointer;
+  color: inherit;
+  word-break: break-word;
+}
+
+.columna-documento:hover {
+  border-color: var(--azul);
+}
+
+.columna-nota {
+  border-left: 3px solid #d7dee6;
+  padding: 2px 0 2px 8px;
+}
+
+.columna-nota-cabeza {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11.5px;
+  color: #8592a1;
+}
+
+.columna-nota-texto {
+  font-size: 12.5px;
+  white-space: pre-wrap;
+}
+
+@container (max-width: 900px) {
+  .grupo-columnas {
+    grid-template-columns: 1fr;
+  }
+}
