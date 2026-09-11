@@ -54,7 +54,7 @@ App.SEGUNDOS_ENTRE_MIRADAS = 20;
    todavía, o el navegador se ha quedado con la página vieja.
 
    La hora es la de España, la del reloj de Francisco. */
-App.VERSION = '10-sep-2026 · 13:55';
+App.VERSION = '11-sep-2026 · 05:00';
 
 /* El atajo de siempre para coger un elemento de la página. Es global
    para todos los ficheros de la aplicación, y también cuelga de App
@@ -141,6 +141,14 @@ $('btn-entrar').onclick = async function () {
 
     App.E.gestor = await Carpetas.crear(App.E.abiertos, App.CARPETA_GESTOR);
     App.E.datos = await Carpetas.crear(App.E.gestor, 'datos');
+
+    var rotos = await Copias.comprobarTodos(App.E.gestor);
+    if (rotos.length) {
+      App.avisoFicherosRotos(rotos);
+      return;
+    }
+    $('aviso-roto').classList.add('oculto');
+
     await App.cargarTipos();
     await App.cargarTiposDocumento();
     await App.cargarEstados();
@@ -173,6 +181,60 @@ $('btn-entrar').onclick = async function () {
 };
 
 /* ==========================================================
+   FICHEROS ROTOS, AL ENTRAR
+   ========================================================== */
+
+/* Si alguno de los ocho ficheros compartidos no se puede leer, no se
+   entra: se avisa en rojo, con un botón para restaurar la última copia
+   de cada uno. Ver js/copias.js. */
+App.avisoFicherosRotos = function (rotos) {
+  var caja = $('aviso-roto');
+  caja.classList.remove('oculto');
+  caja.innerHTML = '<strong>' +
+    (rotos.length === 1 ? 'Un fichero no se puede leer.' : rotos.length + ' ficheros no se pueden leer.') +
+    '</strong><p>Puede ser un corte a media escritura, o un conflicto de Dropbox mal resuelto ' +
+    'a mano. No se entra para no escribir encima de nada. Restaura la última copia de cada uno:</p>';
+
+  var lista = document.createElement('ul');
+  lista.className = 'lista-repetidos';
+  rotos.forEach(function (nombre) {
+    var li = document.createElement('li');
+    li.textContent = nombre + '  ';
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'boton';
+    b.textContent = 'Restaurar la última copia';
+    b.onclick = async function () {
+      b.disabled = true;
+      try {
+        var ok = await Copias.restaurar(App.E.gestor, nombre);
+        if (ok) {
+          U.aviso(nombre + ' restaurado.', 'bueno');
+          li.appendChild(document.createTextNode('  restaurado ✓'));
+          b.remove();
+        } else {
+          U.aviso('No hay ninguna copia de ' + nombre + ' todavía.', 'malo');
+          b.disabled = false;
+        }
+      } catch (e) {
+        U.aviso('No he podido restaurar ' + nombre + ': ' + e.message, 'malo');
+        b.disabled = false;
+      }
+    };
+    li.appendChild(b);
+    lista.appendChild(li);
+  });
+  caja.appendChild(lista);
+
+  var reintentar = document.createElement('button');
+  reintentar.type = 'button';
+  reintentar.className = 'boton boton-principal';
+  reintentar.textContent = 'Volver a intentar entrar';
+  reintentar.onclick = function () { $('btn-entrar').click(); };
+  caja.appendChild(reintentar);
+};
+
+/* ==========================================================
    CONFIGURACIÓN COMPARTIDA (_GESTOR)
    ========================================================== */
 
@@ -180,7 +242,7 @@ App.cargarTipos = async function () {
   var t = await Carpetas.leerJson(App.E.gestor, App.FICHERO_TIPOS);
   if (!t || !t.length) {
     t = Nombres.POR_DEFECTO.slice();
-    await Carpetas.guardarJson(App.E.gestor, App.FICHERO_TIPOS, t);
+    await Copias.guardar(App.E.gestor, App.FICHERO_TIPOS, t);
   }
   App.E.tipos = t;
 };
@@ -189,14 +251,14 @@ App.cargarTiposDocumento = async function () {
   var t = await Carpetas.leerJson(App.E.gestor, App.FICHERO_TIPOS_DOC);
   if (!t || !t.length) {
     t = Nombres.TIPOS_DOCUMENTO_POR_DEFECTO.slice();
-    await Carpetas.guardarJson(App.E.gestor, App.FICHERO_TIPOS_DOC, t);
+    await Copias.guardar(App.E.gestor, App.FICHERO_TIPOS_DOC, t);
   }
   App.E.tiposDocumento = t;
 };
 
 App.guardarTiposDocumento = async function () {
   App.E.tiposDocumento.sort();
-  await Carpetas.guardarJson(App.E.gestor, App.FICHERO_TIPOS_DOC, App.E.tiposDocumento);
+  await Copias.guardar(App.E.gestor, App.FICHERO_TIPOS_DOC, App.E.tiposDocumento);
 };
 
 /* Los estados de tramitación. Se guardan en el orden en que los pone
@@ -240,7 +302,7 @@ App.esDeEspera = function (nombre) {
 };
 
 App.guardarEstados = async function () {
-  await Carpetas.guardarJson(App.E.gestor, App.FICHERO_ESTADOS, App.E.estados);
+  await Copias.guardar(App.E.gestor, App.FICHERO_ESTADOS, App.E.estados);
 };
 
 App.guardarTipos = async function () {
@@ -248,7 +310,7 @@ App.guardarTipos = async function () {
     var ka = a.categoria + ' ' + a.tipo, kb = b.categoria + ' ' + b.tipo;
     return ka < kb ? -1 : (ka > kb ? 1 : 0);
   });
-  await Carpetas.guardarJson(App.E.gestor, App.FICHERO_TIPOS, App.E.tipos);
+  await Copias.guardar(App.E.gestor, App.FICHERO_TIPOS, App.E.tipos);
 };
 
 App.cargarRegistro = async function () {
@@ -262,7 +324,7 @@ App.anotar = async function (clave, datos) {
   await App.cargarRegistro();
   var antes = App.E.registro.asuntos[clave] || {};
   App.E.registro.asuntos[clave] = Object.assign(antes, datos);
-  await Carpetas.guardarJson(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
+  await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
   App.refrescarFichas();
 };
 

@@ -228,6 +228,60 @@ App.pintarAjustes = async function () {
   carp.innerHTML = '';
   carp.appendChild(App.filaEstado('Asuntos abiertos', App.E.abiertos.name));
   carp.appendChild(App.filaEstado('Archivo', App.E.archivo.name));
+
+  await App.pintarCopias();
+};
+
+/* ---------- el bloque de Copias de seguridad ---------- */
+
+App.pintarCopias = async function () {
+  var caja = $('tabla-copias');
+  if (!caja) return;
+  caja.innerHTML = '';
+
+  var todas;
+  try {
+    todas = await Copias.listarTodas(App.E.gestor);
+  } catch (e) {
+    caja.innerHTML = '<div class="vacio">No he podido leer las copias: ' + U.escapar(e.message) + '</div>';
+    return;
+  }
+
+  Copias.FICHEROS.forEach(function (nombre) {
+    var copias = todas[nombre] || [];
+    var f = document.createElement('div');
+    f.className = 'fila-tipo';
+
+    var ultima = copias.length ? copias[copias.length - 1] : null;
+    var pie = copias.length
+      ? copias.length + (copias.length === 1 ? ' copia' : ' copias') +
+        '  ·  la última, del ' + U.fechaLegible(ultima.fecha)
+      : 'Todavía sin ninguna copia';
+    f.innerHTML = '<span class="nombre-tipo">' + U.escapar(nombre) + '</span>' +
+                  '<span class="suave" style="flex:1">' + U.escapar(pie) + '</span>';
+
+    var restaurar = document.createElement('button');
+    restaurar.className = 'boton';
+    restaurar.textContent = 'Restaurar la última copia';
+    restaurar.disabled = !copias.length;
+    restaurar.onclick = async function () {
+      var ok = await U.preguntar('Restaurar ' + nombre,
+        '<p>Se cambia <strong>' + U.escapar(nombre) + '</strong> por su última copia' +
+        (ultima ? ', del ' + U.escapar(U.fechaLegible(ultima.fecha)) : '') + '.</p>' +
+        '<p class="nota">Lo que hay ahora se guarda también como copia, así que si es un ' +
+        'error se puede deshacer. Después se recarga la página.</p>', 'Restaurar');
+      if (!ok) return;
+      try {
+        await Copias.restaurar(App.E.gestor, nombre);
+        U.aviso(nombre + ' restaurado.', 'bueno');
+        location.reload();
+      } catch (e) {
+        U.aviso('No he podido restaurarlo: ' + e.message, 'malo');
+      }
+    };
+    f.appendChild(restaurar);
+    caja.appendChild(f);
+  });
 };
 
 /* ---------- los estados del asunto, en Ajustes ----------
@@ -358,7 +412,7 @@ App.renombrarEstado = async function (viejo) {
         n++;
       }
     });
-    await Carpetas.guardarJson(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
+    await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
     App.refrescarFichas();
 
     App.pintarAjustes();
@@ -388,7 +442,7 @@ App.quitarEstado = async function (nombre) {
       Object.keys(App.E.registro.asuntos).forEach(function (k) {
         if (App.E.registro.asuntos[k].situacion === nombre) App.E.registro.asuntos[k].situacion = '';
       });
-      await Carpetas.guardarJson(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
+      await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
       App.refrescarFichas();
     }
 

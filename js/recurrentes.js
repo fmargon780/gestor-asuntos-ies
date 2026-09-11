@@ -113,14 +113,19 @@
   async function cargar() {
     var g = window.Gestor.carpetaGestor();
     if (!g) return;
-    var leido = await Carpetas.leerJson(g, FICHERO);
-    lista = (leido && leido.length) ? leido : [];
+    try {
+      var leido = await Carpetas.leerJson(g, FICHERO);
+      lista = (leido && leido.length) ? leido : [];
+    } catch (e) {
+      lista = [];
+      U.aviso('No he podido leer los asuntos que se repiten: ' + e.message, 'malo');
+    }
   }
 
   async function guardar() {
     var g = window.Gestor.carpetaGestor();
     if (!g) return;
-    await Carpetas.guardarJson(g, FICHERO, lista);
+    await Copias.guardar(g, FICHERO, lista);
   }
 
   /* ---------- crear el asunto que toca ---------- */

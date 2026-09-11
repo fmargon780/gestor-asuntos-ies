@@ -66,19 +66,24 @@
   async function cargar() {
     var g = window.Gestor && window.Gestor.carpetaGestor();
     if (!g) { ajustes = normalizar(null); return; }
-    var leido = await Carpetas.leerJson(g, FICHERO);
-    if (!leido) {
+    try {
+      var leido = await Carpetas.leerJson(g, FICHERO);
+      if (!leido) {
+        ajustes = normalizar(POR_DEFECTO);
+        await guardar();
+      } else {
+        ajustes = normalizar(leido);
+      }
+    } catch (e) {
       ajustes = normalizar(POR_DEFECTO);
-      await guardar();
-    } else {
-      ajustes = normalizar(leido);
+      U.aviso('No he podido leer las épocas de frescura: ' + e.message, 'malo');
     }
   }
 
   async function guardar() {
     var g = window.Gestor && window.Gestor.carpetaGestor();
     if (!g) return;
-    await Carpetas.guardarJson(g, FICHERO, ajustes);
+    await Copias.guardar(g, FICHERO, ajustes);
   }
 
   /* ---------- la época en que estamos ----------

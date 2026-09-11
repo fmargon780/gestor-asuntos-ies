@@ -32,14 +32,19 @@
   async function cargar() {
     var g = window.Gestor.carpetaGestor();
     if (!g) return;
-    var leido = await Carpetas.leerJson(g, FICHERO);
-    guias = (leido && typeof leido === 'object') ? leido : {};
+    try {
+      var leido = await Carpetas.leerJson(g, FICHERO);
+      guias = (leido && typeof leido === 'object') ? leido : {};
+    } catch (e) {
+      guias = {};
+      U.aviso('No he podido leer las guías: ' + e.message, 'malo');
+    }
   }
 
   async function guardar() {
     var g = window.Gestor.carpetaGestor();
     if (!g) return;
-    await Carpetas.guardarJson(g, FICHERO, guias);
+    await Copias.guardar(g, FICHERO, guias);
   }
 
   /* ---------- el botón de cada asunto abierto ---------- */

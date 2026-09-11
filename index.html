@@ -37,6 +37,8 @@
          En otros navegadores no se puede dar acceso a una carpeta.</p>
     </div>
 
+    <div id="aviso-roto" class="aviso aviso-rojo oculto"></div>
+
     <div id="paso-carpetas">
       <p class="explica">Para empezar, señala las dos carpetas con las que trabajas.
          Solo hay que hacerlo una vez en cada ordenador.</p>
@@ -436,6 +438,21 @@
 
       <details class="bloque-ajustes">
         <summary>
+          <span class="bloque-titulo">Copias de seguridad</span>
+          <span class="bloque-pie">Una copia diaria de cada fichero compartido, por si alguno se estropea</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Antes de escribir cualquiera de los ficheros que se comparten con el
+         resto de ordenadores, la aplicación guarda una copia de cómo estaba, una vez al día.
+         Se guardan en <code>_GESTOR/copias</code> y se conservan las últimas 30 de cada uno.
+         Si algún fichero se estropea, al entrar la aplicación lo dice y ofrece restaurar la
+         última copia; aquí puedes restaurar cualquiera de las otras, por si hiciera falta.</p>
+      <div id="tabla-copias" class="lista"></div>
+        </div>
+      </details>
+
+      <details class="bloque-ajustes">
+        <summary>
           <span class="bloque-titulo">Carpetas de este ordenador</span>
           <span class="bloque-pie">Las dos carpetas señaladas aquí</span>
         </summary>
@@ -466,6 +483,7 @@
 <script src="js/util.js"></script>
 <script src="js/almacen.js"></script>
 <script src="js/carpetas.js"></script>
+<script src="js/copias.js"></script>
 <script src="js/nombres.js"></script>
 <script src="js/plazos.js"></script>
 <script src="js/guias.js"></script>

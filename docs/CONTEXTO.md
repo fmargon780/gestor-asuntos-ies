@@ -560,6 +560,7 @@ de `App` va después del fichero que lo define.
 | `js/util.js` | Utilidades comunes, y la comparación de nombres parecidos |
 | `js/almacen.js` | Guarda los ajustes en el navegador |
 | `js/carpetas.js` | Habla con el selector de carpetas del navegador. Lee y escribe los JSON |
+| `js/copias.js` | Copia de seguridad diaria de los ficheros de `_GESTOR`, y detección de fichero roto |
 | `js/nombres.js` | Monta los nombres de carpetas y documentos |
 | `js/plazos.js` | La fecha límite de los asuntos |
 | `js/guias.js` | Pintar y escribir una guía, con sus preguntas y opciones |
@@ -597,6 +598,7 @@ de `App` va después del fichero que lo define.
 | `js/dni.js` | El DNI del alumnado, el aviso de que falta y la búsqueda por DNI |
 | `js/inicio.js` | La última línea: `App.arrancar()` |
 | `pruebas/logica.mjs` | Pruebas de la lógica, sin navegador |
+| `pruebas/copias.mjs` | Prueba de las copias de seguridad y del fichero roto |
 | `pruebas/navegador.mjs` | Prueba de la aplicación entera. **Desfasada, hay que arreglarla** |
 | `pruebas/tipos.mjs` | Prueba de las tarjetas por tipo |
 | `pruebas/correos.mjs` | Prueba de lo que deja un correo dentro de un asunto |
@@ -625,6 +627,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `frescura.json` | Cada cuántos días avisar de que el RegAlum.csv está viejo |
 | `tablon.json` | Las notas rápidas del tablón, con su marca de privada |
 | `datos/*.csv` | Alumnado (Séneca), personal, empresas y otros |
+| `copias/*.json` | Copias de seguridad de los ocho ficheros de arriba, una por día, 30 como mucho de cada uno |
 
 **Los CSV van en `datos`, no en `_GESTOR`.** `js/rescate-datos.js` los baja solos al entrar.
 
@@ -636,9 +639,24 @@ Cada nota de `asuntos.json` es `{ texto, quien, cuando }`, y las de correo lleva
 misma carpeta: sin releer, el último en guardar borra lo del otro. Hoy lo hacen `asuntos.json`,
 `guias.json` y `tablon.json`; el plan de robustez lo extiende a todos.
 
-**Un fichero JSON que no se puede leer se trata hoy como si no existiera**, y el siguiente
-guardado lo escribe encima. Es el punto más grave del análisis del 11-sep-2026 y lo arregla el
-bloque 1 del plan de robustez.
+**Copias de seguridad y fichero roto** (11-sep-2026, bloque 1 del plan de robustez).
+`Carpetas.leerJson` ya no confunde "no existe" con "no se puede leer": si el fichero existe pero
+el JSON está roto, lanza un error `FicheroRoto` en vez de devolver `null`. Antes se trataba igual
+que si no existiera, y el siguiente guardado lo escribía encima: se perdía todo.
+
+- `js/copias.js` guarda, antes de escribir cualquiera de los ocho ficheros compartidos
+  (`asuntos.json`, `guias.json`, `tipos.json`, `estados.json`, `tipos-documento.json`,
+  `tablon.json`, `recurrentes.json`, `frescura.json`), una copia de cómo estaba justo antes,
+  en `_GESTOR/copias/<nombre>-AAMMDD.json`. Una copia por fichero y día; se conservan las
+  últimas 30 de cada uno.
+- Todo lo que escribe uno de esos ocho ficheros llama a `Copias.guardar` en vez de a
+  `Carpetas.guardarJson` directamente.
+- Al pulsar Entrar se comprueban los ocho ficheros (`Copias.comprobarTodos`). Si alguno está
+  roto, **no se entra**: sale un aviso en rojo con un botón para restaurar la última copia de
+  cada uno. El fichero roto se aparta como `<nombre>-roto-AAMMDD-HHMM.json` y no se borra nunca.
+- En Ajustes, el bloque **Copias de seguridad** enseña cuántas copias hay de cada fichero y deja
+  restaurar cualquiera a mano, por si hiciera falta sin que nada esté roto.
+- Se comprueba con `pruebas/copias.mjs`.
 
 ### Las columnas de cada CSV que mantiene la aplicación
 
