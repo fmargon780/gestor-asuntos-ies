@@ -295,7 +295,7 @@ var Carpetas = (function () {
   return {
     soportado: soportado, elegir: elegir, permiso: permiso,
     subcarpetas: subcarpetas, ficheros: ficheros, contenido: contenido, existe: existe,
-    crear: crear, bajar: bajar, mover: mover, renombrar: renombrar,
+    crear: crear, bajar: bajar, mover: mover, renombrar: renombrar, trasladar: trasladar,
     contarFicheros: contarFicheros,
     renombrarFichero: renombrarFichero, moverFichero: moverFichero,
     elegirFichero: elegirFichero, copiarFicheroEn: copiarFicheroEn,

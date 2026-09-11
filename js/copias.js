@@ -25,10 +25,11 @@ var Copias = (function () {
 
   /* Los ficheros compartidos que hay que proteger. `campos.json`
      (11-sep-2026, los campos de cada tipo de asunto) entró aquí igual
-     que los demás JSON de _GESTOR. */
+     que los demás JSON de _GESTOR. `papelera.json` (11-sep-2026, la
+     papelera) igual. */
   var FICHEROS = ['asuntos.json', 'guias.json', 'tipos.json', 'estados.json',
                    'tipos-documento.json', 'tablon.json', 'recurrentes.json', 'frescura.json',
-                   'campos.json'];
+                   'campos.json', 'papelera.json'];
 
   function dosDigitos(n) { return String(n).padStart(2, '0'); }
 
