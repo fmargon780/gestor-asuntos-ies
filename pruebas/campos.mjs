@@ -59,6 +59,25 @@ async function nombresDeAbiertos() {
   });
 }
 
+/* Pulsa "Crear el asunto". Varias comprobaciones de este fichero crean,
+   a propósito, un segundo asunto del mismo tercero y tipo el mismo día
+   (para probar un campo distinto, no para probar duplicados): la
+   parada al crear (docs/NO-DUPLICAR-ASUNTOS.md) lo nota y pregunta
+   antes de seguir. Aquí se sigue adelante con "Crear otro de todas
+   formas", que es la respuesta correcta cuando de verdad se quiere
+   otro asunto distinto. */
+async function crearAsunto() {
+  await pagina.click('#btn-crear');
+  await Promise.race([
+    pagina.waitForSelector('#pantalla-abiertos:not(.oculto)'),
+    pagina.waitForSelector('#capa:not(.oculto)')
+  ]);
+  if (await pagina.locator('#capa:not(.oculto)').isVisible().catch(() => false)) {
+    await pagina.click('#cuadro-aceptar');
+    await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+  }
+}
+
 /* ---------- arranque, con un RegAlum de mentira propio ---------- */
 
 await pagina.click('#btn-abiertos');
@@ -168,8 +187,7 @@ await comprobar('el nombre lleva los dos campos, en el orden de Ajustes',
   pagina.locator('#vista-nombre').textContent(),
   '260911 SANCION 1º Bach A Ciencias Ramos Vidal, Elena 1150001');
 
-await pagina.click('#btn-crear');
-await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+await crearAsunto();
 await comprobar('la carpeta se crea con ese nombre', nombresDeAbiertos(),
   ['260911 SANCION 1º Bach A Ciencias Ramos Vidal, Elena 1150001']);
 await comprobar('la ficha guarda los dos valores', leerJson('asuntos.json').then(j =>
@@ -204,8 +222,7 @@ await comprobar('el nombre ya no lleva la modalidad',
   pagina.locator('#vista-nombre').textContent(),
   '260911 SANCION 1º Bach A Ramos Vidal, Elena 1150001');
 
-await pagina.click('#btn-crear');
-await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+await crearAsunto();
 await comprobar('la carpeta se crea sin la modalidad en el nombre',
   nombresDeAbiertos().then(n => n.indexOf('260911 SANCION 1º Bach A Ramos Vidal, Elena 1150001') !== -1), true);
 await comprobar('pero el valor de la modalidad se ha guardado igual', leerJson('asuntos.json').then(j =>
@@ -236,8 +253,7 @@ await comprobar('el nombre no lleva doble espacio',
   pagina.locator('#vista-nombre').textContent(),
   '260912 SANCION 1º A Ferrer Nuño, Iker 1150002');
 
-await pagina.click('#btn-crear');
-await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+await crearAsunto();
 await comprobar('deja crear el asunto igual',
   nombresDeAbiertos().then(n => n.indexOf('260912 SANCION 1º A Ferrer Nuño, Iker 1150002') !== -1), true);
 
@@ -336,8 +352,7 @@ await comprobar('su valor entra en el nombre',
   pagina.locator('#vista-nombre').textContent(),
   '260914 SANCION 1º A 2º Ferrer Nuño, Iker 1150002');
 
-await pagina.click('#btn-crear');
-await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+await crearAsunto();
 await comprobar('la carpeta lleva el trimestre elegido',
   nombresDeAbiertos().then(n => n.indexOf('260914 SANCION 1º A 2º Ferrer Nuño, Iker 1150002') !== -1), true);
 
@@ -363,8 +378,7 @@ await pagina.waitForTimeout(150);
 await comprobar('el nombre se monta como siempre, sin ningún campo de más',
   pagina.locator('#vista-nombre').textContent(),
   '260915 MATRICULA Ramos Vidal, Elena 1150001');
-await pagina.click('#btn-crear');
-await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+await crearAsunto();
 await comprobar('se crea igual que antes de este cambio',
   nombresDeAbiertos().then(n => n.indexOf('260915 MATRICULA Ramos Vidal, Elena 1150001') !== -1), true);
 
