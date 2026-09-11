@@ -143,7 +143,7 @@ App.editarAsunto = async function (a) {
     var antes = App.E.registro.asuntos[a.nombre] || {};
     App.E.registro.asuntos[nombreNuevo] = Object.assign({}, antes, datos);
     delete App.E.registro.asuntos[a.nombre];
-    await Carpetas.guardarJson(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
+    await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
 
     await App.verAbiertos();
     U.aviso('Asunto editado. La carpeta ya se llama como querías.', 'bueno');

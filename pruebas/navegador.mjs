@@ -90,7 +90,7 @@ const preparacion = `
 
 const DIRECCION = process.env.DIRECCION || 'http://localhost:8123/index.html';
 
-const navegador = await chromium.launch();
+const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 const pagina = await navegador.newPage();
 const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
@@ -157,6 +157,12 @@ await pagina.evaluate(async () => {
 
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
+
+/* La barra de la izquierda nace plegada (10-sep-2026), y plegada las
+   pestanas no se ven. Se abre una vez, y como se recuerda en
+   localStorage, se queda abierta el resto de la prueba. */
+await pagina.click('#btn-barra');
+
 await comprobar('entra en la aplicación', pagina.locator('#lista-abiertos').isVisible(), true);
 await comprobar('la lista empieza vacía', pagina.locator('#lista-abiertos .vacio').count(), 1);
 
@@ -304,7 +310,7 @@ await pagina.click('.pestana[data-pantalla="abiertos"]');
 
 /* --- cerrar el asunto --- */
 await pagina.click('.pestana[data-pantalla="abiertos"]');
-await pagina.getByRole('button', { name: 'Cerrar', exact: true }).click();
+await pagina.getByRole('button', { name: 'Archivar', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('el cuadro dice a dónde va',
   pagina.locator('#cuadro-cuerpo .vista-nombre').textContent(),
@@ -385,6 +391,8 @@ await comprobar('se ha escrito el solicitantes.csv', pagina.evaluate(async () =>
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await comprobar('el orden por defecto es por fecha, los más antiguos arriba',
   pagina.locator('#orden-abiertos').inputValue(), 'fecha-asc');
+/* Los filtros nacen plegados (10-sep-2026): hay que abrirlos para tocarlos. */
+await pagina.click('#btn-filtros');
 await pagina.selectOption('#orden-abiertos', 'fecha-desc');
 await comprobar('se puede cambiar el orden',
   pagina.locator('#orden-abiertos').inputValue(), 'fecha-desc');
@@ -392,6 +400,12 @@ await pagina.selectOption('#orden-abiertos', 'fecha-asc');
 
 /* --- ajustes --- */
 await pagina.click('.pestana[data-pantalla="ajustes"]');
+/* Los bloques de Ajustes son <details> cerrados (9-sep-2026): se abren
+   todos de una vez, y como no se vuelven a crear, se quedan abiertos
+   el resto de la prueba. */
+await pagina.evaluate(() => {
+  document.querySelectorAll('#pantalla-ajustes details').forEach((d) => { d.open = true; });
+});
 await pagina.waitForSelector('#tabla-grupos .fila-tipo');
 await comprobar('la tabla de grupos lista solo las unidades de este curso',
   pagina.locator('#tabla-grupos .fila-tipo').count(), 3);
@@ -445,7 +459,11 @@ await pagina.fill('#campo-fecha', '2026-09-07');
 await pagina.click('#btn-crear');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 
-await pagina.getByRole('button', { name: 'Documentos', exact: true }).first().click();
+/* "Documentos" ya no está en la tarjeta (10-sep-2026): está dentro de
+   la ficha del asunto, en "Gestionar documentos". */
+await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await pagina.getByRole('button', { name: 'Gestionar documentos', exact: true }).click();
 await pagina.waitForSelector('#doc-anadir');
 await comprobar('la carpeta del asunto empieza sin documentos',
   pagina.locator('#doc-cuerpo .fila-documento').count(), 0);
@@ -456,6 +474,14 @@ await comprobar('el documento se ve al lado del formulario',
   pagina.locator('#doc-visor').count(), 1);
 await comprobar('y es un PDF, así que se enseña en un marco',
   pagina.evaluate(() => document.getElementById('doc-visor').tagName), 'IFRAME');
+
+/* El "Texto adicional" (antes, Año académico) nace vacío desde el
+   10-sep-2026 y no depende de la fecha: se escribe a mano. Y la fecha
+   de partida es la de HOY, no una fija, así que aquí se ponen las dos
+   a un valor conocido antes de comprobar el nombre. */
+await pagina.fill('#doc-fecha', '2026-09-07');
+await pagina.fill('#doc-curso', '26-27');
+await pagina.waitForTimeout(100);
 await comprobar('sin registro, el nombre sale sin código',
   pagina.locator('#doc-vista').textContent(), '260907 SOLICITUD 26-27.pdf');
 
@@ -484,8 +510,10 @@ await comprobar('el documento se ha guardado en la carpeta del asunto', pagina.e
 await comprobar('y el original sigue donde estaba',
   pagina.evaluate(() => window.__disco.externo.name), 'descarga sin nombre (3).pdf');
 
-/* renombrar el que ya está dentro */
-await pagina.click('#doc-cuerpo .fila-documento button');
+/* renombrar el que ya está dentro. Cada fila trae ahora dos botones
+   ("Copiar nombre" y "Poner nombre"), así que hay que elegir el que
+   abre el formulario. */
+await pagina.getByRole('button', { name: 'Poner nombre' }).click();
 await pagina.waitForSelector('#doc-vista');
 await comprobar('al renombrar se leen los datos del nombre que ya tenía',
   pagina.locator('#doc-vista').textContent(), '260902 26SA0087 CERTIFICADO 26-27.pdf');

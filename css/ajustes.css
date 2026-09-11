@@ -13,6 +13,13 @@
   background: #fff;
 }
 
+/* El aviso discreto en el botón de Ajustes de la barra, cuando hay
+   fichas sin carpeta. */
+.punto-ambar {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--ambar-linea); margin-left: 6px; vertical-align: middle;
+}
+
 .bloque-ajustes > summary {
   display: flex;
   align-items: baseline;

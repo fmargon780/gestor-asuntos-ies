@@ -1,8 +1,10 @@
 # Proyecto: Gestor de Asuntos / Expedientes — IES Fuente Lucena
 
 Documento de contexto. Léelo entero antes de proponer nada.
-Última actualización: 11 de septiembre de 2026 (copia en el repositorio, tabla de ficheros
-puesta al día y plan de robustez en `docs/PLAN-ROBUSTEZ-2026-09.md`).
+Última actualización: 11 de septiembre de 2026 (plan de robustez de
+`docs/PLAN-ROBUSTEZ-2026-09.md` hecho entero: copias de seguridad, conflictos de Dropbox,
+pruebas automáticas en GitHub Actions, fichas sin carpeta y nombres repetidos. Resumen para
+Francisco en `docs/CAMBIOS-2026-09.md`).
 
 **Este documento vive en dos sitios**: en el proyecto de Claude (`Contexto.md`) y aquí, en
 `docs/CONTEXTO.md` del repositorio. Se cambia en el mismo commit en que cambia el código.
@@ -206,10 +208,19 @@ Decisiones de diseño ya aprobadas:
   `js/via-contacto.js` ofrece como botones los teléfonos o correos que ya están en el CSV del
   tercero, para no escribirlos a mano.
 - **Fecha límite** (`js/plazos.js`). Opcional, va en la ficha de `asuntos.json`, nunca en el
-  nombre. Los días se cuentan naturales. Lo que vence sale en rojo en las tarjetas.
+  nombre: cambia mientras se tramita, y renombrar la carpeta cada vez sería pedir problemas.
+  Los días se cuentan **naturales**, de calendario, que es lo que trae el papel del trámite; si
+  en un caso hace falta contar días hábiles, se cambia la fecha a mano. Un plazo vencido, el de
+  hoy o el de mañana salen en rojo o ámbar en la tarjeta del asunto; el resto, en gris. Los
+  tipos de asunto pueden llevar unos días de plazo por defecto (en Ajustes), para que la fecha
+  límite de un asunto nuevo salga puesta sola.
 - **Asuntos recurrentes** (`js/recurrentes.js`, `_GESTOR/recurrentes.json`). Gestiones que
-  vuelven cada mes, trimestre o curso. Se apuntan una vez y la aplicación avisa cuando toca.
-  **Las carpetas no se crean solas**: hasta que no se pulsa el botón no se crea nada.
+  vuelven cada mes, cada tres meses o una vez al año: la misma factura del mismo proveedor, el
+  mismo parte. Se apuntan una vez, con el tipo, el tercero, cada cuánto y el día (y el mes, si
+  es anual), y la aplicación calcula sola cuándo toca la siguiente a partir de la última vez que
+  se creó. **Las carpetas no se crean solas**: sale un aviso arriba de "Asuntos abiertos" y
+  hasta que no se pulsa el botón no se crea nada, para no llenar el Dropbox de carpetas vacías
+  que nadie ha pedido.
 - **¿Esto no lo hicimos ya?** (`js/duplicados.js`). Antes de abrir un asunto se mira si ese
   tercero ya tuvo otro igual. Se mira barato: solo su carpeta del ARCHIVO y los abiertos.
 - **Buscador de tipos** (`js/tipos-buscador.js`). Con muchos tipos, tres letras filtran la
@@ -560,13 +571,17 @@ de `App` va después del fichero que lo define.
 | `js/util.js` | Utilidades comunes, y la comparación de nombres parecidos |
 | `js/almacen.js` | Guarda los ajustes en el navegador |
 | `js/carpetas.js` | Habla con el selector de carpetas del navegador. Lee y escribe los JSON |
+| `js/copias.js` | Copia de seguridad diaria de los ficheros de `_GESTOR`, y detección de fichero roto |
+| `js/conflictos.js` | Las copias en conflicto que deja Dropbox: fusión sola o aviso para elegir |
+| `js/fichas-huerfanas.js` | Fichas de `asuntos.json` cuya carpeta ya no está: enlazar o borrar |
 | `js/nombres.js` | Monta los nombres de carpetas y documentos |
 | `js/plazos.js` | La fecha límite de los asuntos |
 | `js/guias.js` | Pintar y escribir una guía, con sus preguntas y opciones |
 | `js/datos.js` | Lee los CSV; el nombre comercial y las columnas leídas por su título |
 | `js/documentos.js` | Nombra los documentos, con el texto adicional y los tipos sin duplicados |
 | `js/usabilidad.js` | Volver, Cancelar, etiquetas de filtros, vista compacta y Escape |
-| `js/nucleo.js` | El estado, el arranque, el cambio de pantalla y `App.VERSION` |
+| `js/nucleo.js` | El estado, el arranque y el cambio de pantalla |
+| `js/version.js` | `App.VERSION`, la fecha y hora de la última publicación |
 | `js/asuntos-lista.js` | Asuntos abiertos: las tres tarjetas, las tarjetas por tipo y la lista |
 | `js/asuntos-editar.js` | Editar un asunto abierto: renombra la carpeta y mueve su ficha |
 | `js/documentos-sueltos.js` | Los papeles sin asunto, **cerrar y reabrir**, y la vigilancia de la carpeta |
@@ -596,8 +611,15 @@ de `App` va después del fichero que lo define.
 | `js/vista.js` | Los filtros plegados y cuándo se ve el tablón |
 | `js/dni.js` | El DNI del alumnado, el aviso de que falta y la búsqueda por DNI |
 | `js/inicio.js` | La última línea: `App.arrancar()` |
+| `package.json` | Las dependencias de las pruebas (`playwright`, `jsdom`) y `npm test` |
+| `pruebas/ejecutar.mjs` | Levanta el servidor local y ejecuta todas las pruebas de esta carpeta |
+| `.github/workflows/pruebas.yml` | Ejecuta `npm test` en cada subida y cada pull request a `main` |
 | `pruebas/logica.mjs` | Pruebas de la lógica, sin navegador |
-| `pruebas/navegador.mjs` | Prueba de la aplicación entera. **Desfasada, hay que arreglarla** |
+| `pruebas/copias.mjs` | Prueba de las copias de seguridad y del fichero roto |
+| `pruebas/conflictos.mjs` | Prueba de las copias en conflicto de Dropbox |
+| `pruebas/huerfanas.mjs` | Prueba de las fichas sin carpeta |
+| `pruebas/nombres-app.mjs` | Falla si dos ficheros definen la misma función de `App` |
+| `pruebas/navegador.mjs` | Prueba de la aplicación entera |
 | `pruebas/tipos.mjs` | Prueba de las tarjetas por tipo |
 | `pruebas/correos.mjs` | Prueba de lo que deja un correo dentro de un asunto |
 | `pruebas/tablon.mjs` | Prueba de cuándo se ve el tablón (a 1905 píxeles) |
@@ -608,6 +630,7 @@ de `App` va después del fichero que lo define.
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO.md` | Este documento |
 | `docs/PLAN-ROBUSTEZ-2026-09.md` | El plan de robustez de septiembre de 2026 |
+| `docs/CAMBIOS-2026-09.md` | El resumen en llano del plan de robustez, para Francisco |
 | `README.md` | — |
 
 ### Lo que la aplicación guarda en `_GESTOR`
@@ -625,6 +648,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `frescura.json` | Cada cuántos días avisar de que el RegAlum.csv está viejo |
 | `tablon.json` | Las notas rápidas del tablón, con su marca de privada |
 | `datos/*.csv` | Alumnado (Séneca), personal, empresas y otros |
+| `copias/*.json` | Copias de seguridad de los ocho ficheros de arriba, una por día, 30 como mucho de cada uno |
 
 **Los CSV van en `datos`, no en `_GESTOR`.** `js/rescate-datos.js` los baja solos al entrar.
 
@@ -636,9 +660,99 @@ Cada nota de `asuntos.json` es `{ texto, quien, cuando }`, y las de correo lleva
 misma carpeta: sin releer, el último en guardar borra lo del otro. Hoy lo hacen `asuntos.json`,
 `guias.json` y `tablon.json`; el plan de robustez lo extiende a todos.
 
-**Un fichero JSON que no se puede leer se trata hoy como si no existiera**, y el siguiente
-guardado lo escribe encima. Es el punto más grave del análisis del 11-sep-2026 y lo arregla el
-bloque 1 del plan de robustez.
+**Copias de seguridad y fichero roto** (11-sep-2026, bloque 1 del plan de robustez).
+`Carpetas.leerJson` ya no confunde "no existe" con "no se puede leer": si el fichero existe pero
+el JSON está roto, lanza un error `FicheroRoto` en vez de devolver `null`. Antes se trataba igual
+que si no existiera, y el siguiente guardado lo escribía encima: se perdía todo.
+
+- `js/copias.js` guarda, antes de escribir cualquiera de los ocho ficheros compartidos
+  (`asuntos.json`, `guias.json`, `tipos.json`, `estados.json`, `tipos-documento.json`,
+  `tablon.json`, `recurrentes.json`, `frescura.json`), una copia de cómo estaba justo antes,
+  en `_GESTOR/copias/<nombre>-AAMMDD.json`. Una copia por fichero y día; se conservan las
+  últimas 30 de cada uno.
+- Todo lo que escribe uno de esos ocho ficheros llama a `Copias.guardar` en vez de a
+  `Carpetas.guardarJson` directamente.
+- Al pulsar Entrar se comprueban los ocho ficheros (`Copias.comprobarTodos`). Si alguno está
+  roto, **no se entra**: sale un aviso en rojo con un botón para restaurar la última copia de
+  cada uno. El fichero roto se aparta como `<nombre>-roto-AAMMDD-HHMM.json` y no se borra nunca.
+- En Ajustes, el bloque **Copias de seguridad** enseña cuántas copias hay de cada fichero y deja
+  restaurar cualquiera a mano, por si hiciera falta sin que nada esté roto.
+- Se comprueba con `pruebas/copias.mjs`.
+
+**Copias en conflicto de Dropbox, y releer siempre** (11-sep-2026, bloque 2 del plan de
+robustez). Si los dos ordenadores guardan casi a la vez, Dropbox no pisa nada: deja aparte un
+fichero como `asuntos (copia en conflicto de PC2 2026-09-11).json`. Antes nadie lo miraba, y el
+cambio del otro se perdía en la práctica.
+
+- `js/conflictos.js` busca esos ficheros al entrar y cada cinco minutos.
+- `asuntos.json` y `tablon.json` se fusionan solos, porque los dos ordenadores escriben ahí
+  todo el rato: se unen los asuntos (o las notas del tablón) por su clave, y dentro de cada uno
+  se unen las notas, los pasos hechos y los pasos elegidos, sin repetir nada.
+- Los demás (`tipos.json`, `estados.json`, `tipos-documento.json`, `guias.json`,
+  `recurrentes.json`, `frescura.json`) cambian mucho menos y no se fusionan solos: salen en el
+  bloque **Conflictos de Dropbox** de Ajustes, con dos botones para elegir con cuál de los dos
+  ordenadores quedarse. El que no se elige no se pierde: los dos se guardan en
+  `_GESTOR/copias` antes de decidir.
+- **Releer antes de escribir**, en todos los ficheros compartidos que faltaban: `recurrentes.js`
+  y los tres que mantiene `App` (`tipos.json`, `estados.json`, `tipos-documento.json`). Antes de
+  guardar se relee el fichero y se suma lo que el otro ordenador haya añadido y nosotros no
+  tengamos (`App.fusionarConDisco`). No se detectan sus borrados —si él quita algo y nosotros
+  todavía lo tenemos en memoria, volvería a aparecer—, pero eso es raro en estas listas: se
+  tocan pocas veces, y casi siempre para añadir. `asuntos.json` y `tablon.json` ya releían del
+  todo desde antes (`App.anotar`, `tablon.js`).
+- Se comprueba con `pruebas/conflictos.mjs`.
+
+**Pruebas automáticas en cada subida** (11-sep-2026, bloque 3 del plan de robustez).
+`package.json` trae `playwright` y `jsdom` como dependencias, y `npm test` (que ejecuta
+`pruebas/ejecutar.mjs`) levanta el servidor local y corre **todas** las pruebas de `pruebas/`
+una detrás de otra; falla si falla cualquiera. `.github/workflows/pruebas.yml` lo lanza en cada
+subida y en cada pull request a `main`, con Ubuntu, Node 20 y Chromium instalado por Playwright.
+
+- Las pruebas de navegador ya no llevan la ruta de Chromium escrita a fuego: leen
+  `process.env.CHROMIUM_PATH`, y si no está, Playwright usa el suyo (así funcionan igual en
+  local, donde hace falta apuntar al Chromium ya instalado, y en Actions, donde Playwright se
+  instala el suyo propio).
+- Arregladas las dos comprobaciones de `pruebas/logica.mjs` que daban por hecho que
+  "hoy" era el 07-sep-2026 (`U.edadDesde`, `U.yaPaso`): ahora se calculan a partir de la fecha
+  real, como ya hacía `dni.mjs`.
+- Arreglada `pruebas/navegador.mjs`, desfasada desde varios cambios de interfaz de estos días:
+  la barra y los filtros nacen plegados y hay que abrirlos antes de tocarlos; el botón "Cerrar"
+  de la tarjeta se llama "Archivar"; el botón "Documentos" ya no está en la tarjeta, está dentro
+  de la ficha del asunto ("Gestionar documentos"); cada documento de la lista lleva ahora dos
+  botones ("Copiar nombre" y "Poner nombre"); y el "Texto adicional" del nombre de un documento
+  ya no se rellena solo con el curso, así que la prueba lo escribe a mano.
+- Se añade `README.md` → cómo se ejecutan las pruebas.
+
+**Fichas sin carpeta** (11-sep-2026, bloque 4 del plan de robustez). La ficha de un asunto se
+busca por el nombre exacto de la carpeta. Si alguien renombra o mueve una carpeta a mano, por
+fuera de la aplicación (desde el explorador de archivos, no desde "Editar"), la ficha se queda
+huérfana: sigue en `asuntos.json`, pero no se ve en ningún lado.
+
+- En Ajustes, el bloque **Fichas sin carpeta** (`js/fichas-huerfanas.js`) calcula, al abrirlo,
+  qué claves de `asuntos.json` no tienen carpeta ni en abiertos ni en el archivo (si el archivo
+  no se ha leído todavía esta sesión, lo lee).
+- Cada huérfana se enseña con su estado y un resumen de sus notas, y dos botones: **Enlazar con
+  una carpeta** (con las carpetas de abiertos y archivo que no tienen ficha) y **Borrar la
+  ficha** (con confirmación; antes se guarda copia, como todo lo que toca `asuntos.json` desde
+  el bloque 1).
+- Un punto ámbar en el botón de Ajustes de la barra avisa de que hay huérfanas, sin tener que
+  entrar a mirar.
+- Se comprueba con `pruebas/huerfanas.mjs`.
+
+**Nombres repetidos y código muerto** (11-sep-2026, bloque 5 del plan de robustez).
+
+- `pruebas/nombres-app.mjs`, sin navegador: lee todos los `js/*.js`, busca las líneas
+  `App.algo = function` y falla si el mismo nombre se define en dos ficheros. Es justo lo que
+  pasó con `App.elegirTipo` el 10-sep-2026 (sección 5, "Las tarjetas por tipo de asunto"): se
+  perdió sin ningún error, y esta prueba lo habría avisado. Entra en `npm test`.
+- Quitado el botón "Guía n/m" de `js/guias-enganche.js` (`botonDeTarjeta`, `abrirGuiaDe`):
+  existía, pero `js/ficha-asunto.js` lo poda de la tarjeta desde el 10-sep-2026
+  (`BOTONES_DE_LA_TARJETA`) porque los pasos de la guía, con sus casillas, se ven y se marcan
+  dentro de la ficha del asunto. No se ha añadido a la lista blanca: la tarjeta se queda con lo
+  justo, a propósito.
+- `App.VERSION` sale de `js/nucleo.js` y pasa a `js/version.js`, cargado justo después. Así
+  cambiar la versión —que se hace en casi todos los commits— no obliga a resubir `nucleo.js`
+  entero, que es de los ficheros más grandes.
 
 ### Las columnas de cada CSV que mantiene la aplicación
 
@@ -723,9 +837,10 @@ Aparte, en `localStorage`: `gestor-barra`, `gestor-filtros` y `gestor-lector-anc
 
 ## 7. Qué falta por hacer
 
-**Primero, el plan de robustez** (`docs/PLAN-ROBUSTEZ-2026-09.md`, del análisis del
+**El plan de robustez está hecho** (`docs/PLAN-ROBUSTEZ-2026-09.md`, del análisis del
 11-sep-2026): copias de seguridad y fichero roto, copias en conflicto de Dropbox, pruebas
-automáticas en cada subida, fichas sin carpeta, nombres repetidos y documentación.
+automáticas en cada subida (GitHub Actions), fichas sin carpeta, nombres repetidos y esta misma
+documentación. El resumen para Francisco está en `docs/CAMBIOS-2026-09.md`.
 
 Después:
 
@@ -748,16 +863,18 @@ Después:
 12. Ver con el uso si el panel de la derecha se queda corto para leer: hoy el 46%.
 13. Ver con el uso si las tarjetas por tipo se quedan cortas: hoy son solo del tipo.
 14. Mirar si el tablón debería ensancharse: hoy son 320 píxeles fijos.
-15. **Arreglar `pruebas/navegador.mjs`** — en el plan de robustez, bloque 3.
-16. **Arreglar las dos comprobaciones de `pruebas/logica.mjs`** — plan de robustez, bloque 3.
-17. Las notas viejas de correo se quedan como están: son el rastro.
-18. Sacar `App.VERSION` a `js/version.js` — plan de robustez, bloque 5.
-19. Si el DNI no sale de nadie, **marcar la columna del documento al generar el RegAlum**.
-20. Ver con el uso si el aviso de "falta el DNI" conviene también en la tarjeta del asunto.
-21. **El botón "Guía n/m" de la tarjeta no llega a verse** — plan de robustez, bloque 5.
-22. Ver con el uso si el botón "Cambiar los datos" hace falta también en el buscador de Nuevo
+15. Las notas viejas de correo se quedan como están: son el rastro.
+16. Si el DNI no sale de nadie, **marcar la columna del documento al generar el RegAlum**.
+17. Ver con el uso si el aviso de "falta el DNI" conviene también en la tarjeta del asunto.
+18. Ver con el uso si el botón "Cambiar los datos" hace falta también en el buscador de Nuevo
     asunto.
-23. Ver con el uso si a las preguntas de la guía les hace falta algo más.
-24. **Cuando el uso lo pida** (análisis del 11-sep-2026): búsqueda dentro de las notas, cuentas
+19. Ver con el uso si a las preguntas de la guía les hace falta algo más.
+20. **Cuando el uso lo pida** (análisis del 11-sep-2026): búsqueda dentro de las notas, cuentas
     por tipo para la memoria de fin de curso, qué hacer con los asuntos vivos al cambiar de
     curso, y pasar el repositorio y Vercel a una cuenta del centro para el relevo.
+21. El plan de robustez dejó dos huecos a propósito, para no complicar de más: `App.guardarTipos`,
+    `App.guardarEstados`, `App.guardarTiposDocumento` y `recurrentes.js` releen el fichero antes
+    de guardar y suman lo que el otro ordenador haya añadido, pero no detectan sus **borrados**
+    (bloque 2). Y las copias en conflicto de `guias.json`, `recurrentes.json` y `frescura.json`
+    no se fusionan solas: avisan en Ajustes para elegir con cuál quedarse. Revisar si con el uso
+    hace falta algo más fino.

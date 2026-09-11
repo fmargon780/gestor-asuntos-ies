@@ -268,11 +268,24 @@ var Carpetas = (function () {
     return true;
   }
 
+  /* Distingue "no existe" de "no se puede leer". Si el fichero no está,
+     devuelve null: es lo normal la primera vez que arranca la
+     aplicación. Si el fichero está pero no se puede interpretar como
+     JSON, es que se ha estropeado (un corte a mitad de guardar, un
+     conflicto de Dropbox mal resuelto a mano), y entonces se lanza un
+     error con nombre FicheroRoto en vez de devolver null: devolver null
+     ahí haría que el siguiente guardado lo escribiera encima, y se
+     perdería todo. */
   async function leerJson(dir, nombre) {
     var t = await leerTexto(dir, nombre);
     if (t === null) return null;
     try { return JSON.parse(t); }
-    catch (e) { return null; }
+    catch (e) {
+      var error = new Error('El fichero ' + nombre + ' no se puede leer: ' + e.message);
+      error.name = 'FicheroRoto';
+      error.fichero = nombre;
+      throw error;
+    }
   }
 
   function guardarJson(dir, nombre, objeto) {

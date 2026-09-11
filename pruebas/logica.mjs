@@ -134,11 +134,19 @@ comprobar('el tercero propuesto al cerrar no lleva el año académico ni el grup
    'Cordero Navas, Lucía 1139877',
    'Papelería Sur, S.L. B12345678']);
 
-/* ---------- la edad ---------- */
-comprobar('edad de quien ya ha cumplido este año', U.edadDesde('14/03/2013'), 13);
-comprobar('edad de quien todavía no ha cumplido', U.edadDesde('27/11/2011'), 14);
-comprobar('cumple hoy mismo', U.edadDesde('07/09/2012'), 14);
-comprobar('cumple mañana', U.edadDesde('08/09/2012'), 13);
+/* ---------- la edad ----------
+   Las fechas se calculan a partir de HOY, no de un día fijo: fijas se
+   quedaban desfasadas y las pruebas empezaban a fallar solas al pasar
+   la fecha (pasó el 8-sep-2026 con U.edadDesde y U.yaPaso). */
+const hoyPrueba = new Date();
+function fechaHace(anios, diasDeMargen) {
+  const d = new Date(hoyPrueba.getFullYear() - anios, hoyPrueba.getMonth(), hoyPrueba.getDate() + (diasDeMargen || 0));
+  return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+}
+comprobar('edad de quien ya ha cumplido este año', U.edadDesde(fechaHace(13, -30)), 13);
+comprobar('edad de quien todavía no ha cumplido', U.edadDesde(fechaHace(15, 30)), 14);
+comprobar('cumple hoy mismo', U.edadDesde(fechaHace(14, 0)), 14);
+comprobar('cumple mañana', U.edadDesde(fechaHace(14, 1)), 13);
 comprobar('una fecha ilegible no da edad', U.edadDesde('no consta'), '');
 
 comprobar('curso académico de septiembre', U.cursoActual(), '26-27');
@@ -451,8 +459,8 @@ const fichaAntonia = Datos.destacadosPersona(antonia);
 comprobar('la ficha dice desde cuándo no está',
   fichaAntonia.destacados[1].valor.indexOf('su último curso aquí fue el 24-25') !== -1, true);
 
-comprobar('una fecha de ayer ya pasó', U.yaPaso('06/09/2026'), true);
-comprobar('la de hoy todavía no', U.yaPaso('07/09/2026'), false);
+comprobar('una fecha de ayer ya pasó', U.yaPaso(fechaHace(0, -1)), true);
+comprobar('la de hoy todavía no', U.yaPaso(fechaHace(0, 0)), false);
 comprobar('una fecha vacía no cuenta como pasada', U.yaPaso(''), false);
 
 /* ---------- crear, cerrar y reabrir ---------- */

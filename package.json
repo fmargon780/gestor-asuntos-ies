@@ -1,0 +1,13 @@
+{
+  "name": "gestor-asuntos-ies",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Gestor de asuntos y expedientes del IES Fuente Lucena",
+  "scripts": {
+    "test": "node pruebas/ejecutar.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.1",
+    "playwright": "^1.47.2"
+  }
+}

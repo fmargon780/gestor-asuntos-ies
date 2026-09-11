@@ -72,7 +72,7 @@
     try {
       var lista = await leer();
       lista = hacer(lista) || lista;
-      await Carpetas.guardarJson(g, FICHERO, { notas: lista });
+      await Copias.guardar(g, FICHERO, { notas: lista });
       notas = lista;
       pintar();
     } catch (e) {
