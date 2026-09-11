@@ -5,7 +5,7 @@ Documento de contexto. Léelo entero antes de proponer nada.
 `docs/PLAN-ROBUSTEZ-2026-09.md` hecho entero: copias de seguridad, conflictos de Dropbox,
 pruebas automáticas en GitHub Actions, fichas sin carpeta y nombres repetidos. Resumen para
 Francisco en `docs/CAMBIOS-2026-09.md`. Después, el mismo día: "Registrar un documento en un
-paso" y "Terceros relacionados con un asunto", sección 5).
+paso", "Terceros relacionados con un asunto" y "Que no se dupliquen los asuntos", sección 5).
 
 **Este documento vive en dos sitios**: en el proyecto de Claude (`Contexto.md`) y aquí, en
 `docs/CONTEXTO.md` del repositorio. Se cambia en el mismo commit en que cambia el código.
@@ -686,6 +686,40 @@ rellenos al crear el asunto.
 - Se comprueba con `pruebas/campos.mjs` (ocho escenarios más la edición), con capturas a 1905
   píxeles del bloque "Datos del asunto" y del cuadro de Campos de Ajustes.
 
+### Que no se dupliquen los asuntos (11-sep-2026)
+
+Caso real: dos carpetas de TRANSPORTE del mismo alumno, mismo curso académico, que solo se
+diferenciaban en el grupo (uno lo llevaba en el nombre y el otro no) — un aviso ámbar nunca las
+hubiera evitado, porque nunca impide crear nada.
+
+- **Al crear un asunto** (`js/duplicados.js`, el `onclick` de `btn-crear` envuelto), si ya hay un
+  asunto abierto o archivado del mismo tercero, mismo tipo y mismo año académico, se para del
+  todo: cuadro "Este asunto ya existe", con "Abrir el que ya existe" (a la ficha si está abierto,
+  o a su carpeta del ARCHIVO si está archivado) o "Crear otro de todas formas". El grupo y el
+  texto libre **no cuentan**: son justo lo que hizo que dos carpetas parecieran distintas a
+  simple vista. Si a alguno de los dos le falta el año académico, cuenta como coincidencia
+  (`Duplicados.coincideCurso`): más vale preguntar de más que dejar pasar un duplicado de verdad.
+  - Con varios candidatos abiertos, el de partida es el que se abrió más recientemente
+    (`Duplicados.candidatoMasReciente`).
+  - La comprobación nunca debe impedir crear un asunto por su cuenta: si algo falla al mirar, se
+    sigue como si no hubiera nada (todo envuelto en `try/catch`).
+- **Unir dos que ya existen** (`js/unir-asuntos.js`), para los creados antes de esta parada o a
+  mano: en Asuntos abiertos, cuando dos o más coinciden en tercero, tipo y curso, sale una franja
+  "Parecen el mismo asunto" encima de la lista, con un botón Unir. Se elige cuál se queda (de
+  partida, el de nombre más largo); los ficheros del otro se mueven a la carpeta que se queda,
+  las notas se juntan (con una nota de la unión al final), los pasos de la guía se copian del que
+  se queda si no tenía, y la carpeta que se va se borra. Si algún fichero choca de nombre entre
+  las dos carpetas, no se mueve ni se borra nada, y se avisa de cuáles.
+- Vive en `js/duplicados.js` (la parada al crear) y `js/unir-asuntos.js` (unir los que ya
+  existen), cargado justo después de `js/asuntos-lista.js`, que es quien define
+  `App.pintarAbiertos`.
+- Se comprueba con `pruebas/duplicados.mjs`: el caso real de TRANSPORTE para al crear; dos
+  MATRICULA del mismo alumno en cursos distintos NO paran; con varios candidatos, el de partida
+  es el abierto más reciente y "Abrir el que ya existe" lleva a su ficha; con un candidato
+  archivado, lleva a su carpeta del ARCHIVO; la franja "Parecen el mismo asunto" aparece y Unir
+  fusiona ficheros, notas y guía, y borra la carpeta que sobra; y un choque de nombres entre las
+  dos carpetas no mueve ni borra nada.
+
 ---
 
 ## 6. Cómo trabajamos el código  ← LÉELO ANTES DE TOCAR NADA
@@ -765,6 +799,7 @@ de `App` va después del fichero que lo define.
 | `js/nucleo.js` | El estado, el arranque y el cambio de pantalla |
 | `js/version.js` | `App.VERSION`, la fecha y hora de la última publicación |
 | `js/asuntos-lista.js` | Asuntos abiertos: las tres tarjetas, las tarjetas por tipo y la lista |
+| `js/unir-asuntos.js` | Une asuntos duplicados que ya existen: la franja "Parecen el mismo asunto" |
 | `js/asuntos-editar.js` | Editar un asunto abierto: renombra la carpeta y mueve su ficha |
 | `js/documentos-sueltos.js` | Los papeles sin asunto, **cerrar y reabrir**, y la vigilancia de la carpeta |
 | `js/asuntos-nuevo.js` | Crear un asunto, el cuadro de datos de un tercero y los pies |
@@ -816,6 +851,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/registro.mjs` | Prueba de registrar un documento en un paso, sin nombrarlo dos veces |
 | `pruebas/campos.mjs` | Prueba de los campos de cada tipo de asunto (ocho escenarios más editar) |
 | `pruebas/relacionados.mjs` | Prueba de los terceros relacionados con un asunto, y la nota al archivar |
+| `pruebas/duplicados.mjs` | Prueba de que no se dupliquen los asuntos, y de unir los que ya existen |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO.md` | Este documento |
 | `docs/PLAN-ROBUSTEZ-2026-09.md` | El plan de robustez de septiembre de 2026 |
