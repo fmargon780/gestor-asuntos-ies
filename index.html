@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="css/estilos.css">
 <link rel="stylesheet" href="css/plazos.css">
 <link rel="stylesheet" href="css/ajustes.css">
+<link rel="stylesheet" href="css/campos.css">
 <link rel="stylesheet" href="css/guias.css">
 <link rel="stylesheet" href="css/ficha-asunto.css">
 <link rel="stylesheet" href="css/notas.css">
@@ -23,7 +24,6 @@
 <link rel="stylesheet" href="css/lector.css">
 <link rel="stylesheet" href="css/vista.css">
 <link rel="stylesheet" href="css/registro.css">
-<link rel="stylesheet" href="css/relacionados.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -240,6 +240,11 @@
             </label>
           </div>
 
+          <div id="bloque-campos" class="oculto">
+            <label class="etiqueta">Datos del asunto</label>
+            <div id="campos-lista-nuevo" class="campos-lista"></div>
+          </div>
+
           <label class="etiqueta">Descripción corta <span class="suave">(opcional)</span></label>
           <input id="campo-descripcion" class="campo" placeholder="Por ejemplo: Cambio de optativa">
 
@@ -318,7 +323,9 @@
       <p class="explica">Esta lista la comparten todos los ordenadores del centro:
          se guarda en la carpeta <code>_GESTOR</code>, dentro de la carpeta de asuntos abiertos.
          La lista de partida es una propuesta; cámbiala a vuestro gusto.
-         Los días de plazo de cada tipo sirven para poner sola la fecha límite de los asuntos nuevos.</p>
+         Los días de plazo de cada tipo sirven para poner sola la fecha límite de los asuntos nuevos.
+         El botón "Campos" dice qué datos lleva cada tipo, y hace que salgan ya rellenos al crear
+         un asunto (ver más abajo, "Campos propios").</p>
       <div class="alta-tipo">
         <input id="nuevo-tipo" class="campo" placeholder="TIPO NUEVO" style="max-width:260px">
         <select id="nueva-categoria" class="campo" style="max-width:180px">
@@ -330,6 +337,28 @@
         <button id="btn-anadir-tipo" class="boton">Añadir</button>
       </div>
       <div id="tabla-tipos" class="lista"></div>
+        </div>
+      </details>
+
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Campos propios</span>
+          <span class="bloque-pie">Datos que no vienen en ningún fichero, como el trimestre</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Además de los datos que ya trae el alumnado, el personal y las empresas,
+         aquí puedes crear tus propios campos: texto libre o una lista cerrada de valores.
+         Un campo propio vale para cualquier tipo de asunto: se asocia desde el botón
+         "Campos" de la lista de tipos, ahí arriba.</p>
+      <div class="alta-tipo">
+        <input id="nuevo-propio" class="campo" placeholder="NOMBRE DEL CAMPO" style="max-width:260px">
+        <select id="nueva-clase-propio" class="campo" style="max-width:180px">
+          <option value="texto">Texto libre</option>
+          <option value="lista">Lista cerrada</option>
+        </select>
+        <button id="btn-anadir-propio" class="boton">Añadir</button>
+      </div>
+      <div id="tabla-propios" class="lista"></div>
         </div>
       </details>
 
@@ -490,6 +519,7 @@
 <script src="js/plazos.js"></script>
 <script src="js/guias.js"></script>
 <script src="js/datos.js"></script>
+<script src="js/campos.js"></script>
 <script src="js/documentos.js"></script>
 
 <!-- La comodidad de la pantalla. Va antes que la aplicación, para
@@ -519,7 +549,6 @@
 <script src="js/registro.js"></script>
 <script src="js/ficha-asunto.js"></script>
 <script src="js/duplicados.js"></script>
-<script src="js/relacionados.js"></script>
 <script src="js/visor.js"></script>
 <script src="js/tipos-buscador.js"></script>
 <script src="js/via-contacto.js"></script>
