@@ -113,6 +113,13 @@ App.pintarAjustes = async function () {
       etiquetaPlazo.appendChild(diasTexto);
       f.appendChild(etiquetaPlazo);
 
+      var campos = document.createElement('button');
+      campos.className = 'boton';
+      campos.textContent = 'Campos';
+      campos.title = 'Qué datos lleva este tipo de asunto, y cuáles van al nombre de la carpeta';
+      campos.onclick = function () { App.abrirCamposDeTipo(tipo); };
+      f.appendChild(campos);
+
       var editar = document.createElement('button');
       editar.className = 'boton';
       editar.textContent = 'Cambiar el nombre';
@@ -132,6 +139,7 @@ App.pintarAjustes = async function () {
   });
 
   App.pintarTablaEstados();
+  App.pintarCamposPropios();
 
   var estado = $('estado-datos');
   estado.innerHTML = '';
@@ -231,6 +239,336 @@ App.pintarAjustes = async function () {
 
   await App.pintarCopias();
   await App.pintarFichasHuerfanas();
+};
+
+/* ---------- los campos de un tipo de asunto ----------
+
+   Se abre en un cuadro ancho (misma clase que usa el visor de
+   documentos), porque una lista con el catálogo entero de columnas
+   del RegAlum no se puede leer en una columna estrecha.
+
+   Se relee `campos.json` justo al abrir, por si el compañero lo ha
+   cambiado desde el otro ordenador mientras tanto. */
+App.abrirCamposDeTipo = async function (tipo) {
+  var config = await Campos.leer(App.E.gestor);
+  App.E.campos = config;
+  var catalogo = await Campos.catalogoDeCategoria(App.E.datos, tipo.categoria, config);
+  var lista = (config.porTipo[tipo.tipo] || []).map(function (c) { return Object.assign({}, c); });
+
+  var cuadro = document.querySelector('#capa .cuadro');
+  cuadro.classList.add('cuadro-ancho');
+  var promesa = U.preguntar('Campos de ' + tipo.tipo, '<div id="campos-cuerpo"></div>', 'Guardar');
+  App.pintarCuadroDeCampos(lista, catalogo, tipo.categoria);
+  var ok = await promesa;
+  cuadro.classList.remove('cuadro-ancho');
+  if (!ok) return;
+
+  App.E.campos = await Campos.guardarConfigDeTipo(App.E.gestor, tipo.tipo, lista);
+  App.pintarAjustes();
+  U.aviso('Campos de ' + tipo.tipo + ' guardados.', 'bueno');
+};
+
+/* `lista` se muta en el sitio: al aceptar el cuadro, quien llamó lee
+   la misma variable. Así no hace falta ir sacando el estado del DOM. */
+App.pintarCuadroDeCampos = function (lista, catalogo, categoria) {
+  var caja = $('campos-cuerpo');
+  if (!caja) return;
+
+  function textoOrigen(c) {
+    return c.origen === 'fichero' ? 'del fichero' : (c.origen === 'calculado' ? 'calculado' : 'propio');
+  }
+
+  function catalogoDisponible(filtro) {
+    var usadas = {};
+    lista.forEach(function (c) { usadas[Campos.claveDeCampo(c)] = true; });
+    var q = U.normalizar(filtro || '');
+    return catalogo.filter(function (c) {
+      if (usadas[Campos.claveDeCampo(c)]) return false;
+      if (q && U.normalizar(c.nombre).indexOf(q) === -1) return false;
+      return true;
+    });
+  }
+
+  function pintar() {
+    var buscado = $('campos-buscar') ? $('campos-buscar').value : '';
+    caja.innerHTML =
+      '<p class="explica">Arriba, los campos ya puestos a este tipo, en el orden en que saldrán ' +
+      'en el formulario y en el nombre de la carpeta. Con las flechas se reordenan.</p>' +
+      '<div id="campos-puestos" class="lista"></div>' +
+      '<p class="explica" style="margin-top:18px">Campos disponibles en ' + U.escapar(categoria) +
+      ':</p>' +
+      '<input id="campos-buscar" class="campo" placeholder="Buscar un campo…" value="' +
+      U.escapar(buscado) + '">' +
+      '<div id="campos-catalogo" class="lista" style="margin-top:8px"></div>' +
+      '<div id="campos-propio-nuevo"></div>' +
+      '<button type="button" class="boton" id="campos-btn-propio" style="margin-top:8px">' +
+      '+ Crear un campo propio</button>';
+
+    pintarPuestos();
+    pintarCatalogo(buscado);
+    $('campos-buscar').oninput = function () { pintarCatalogo($('campos-buscar').value); };
+    $('campos-btn-propio').onclick = abrirFormularioPropio;
+  }
+
+  function pintarPuestos() {
+    var cont = $('campos-puestos');
+    cont.innerHTML = '';
+    if (!lista.length) {
+      cont.innerHTML = '<div class="vacio">Ningún campo puesto todavía.</div>';
+      return;
+    }
+    lista.forEach(function (c, i) {
+      var f = document.createElement('div');
+      f.className = 'fila-tipo';
+      f.innerHTML = '<span class="nombre-tipo">' + U.escapar(Campos.nombreDeCampo(c, App.E.campos)) +
+        '</span><span class="suave">' + textoOrigen(c) + '</span>';
+
+      var oblig = document.createElement('label');
+      oblig.className = 'interruptor interruptor-fila';
+      var cOblig = document.createElement('input');
+      cOblig.type = 'checkbox';
+      cOblig.checked = !!c.obligatorio;
+      cOblig.onchange = function () { c.obligatorio = cOblig.checked; };
+      oblig.appendChild(cOblig);
+      var tOblig = document.createElement('span');
+      tOblig.textContent = 'Obligatorio';
+      oblig.appendChild(tOblig);
+      f.appendChild(oblig);
+
+      var enNom = document.createElement('label');
+      enNom.className = 'interruptor interruptor-fila';
+      var cEnNom = document.createElement('input');
+      cEnNom.type = 'checkbox';
+      cEnNom.checked = c.enNombre !== false;
+      cEnNom.onchange = function () { c.enNombre = cEnNom.checked; };
+      enNom.appendChild(cEnNom);
+      var tEnNom = document.createElement('span');
+      tEnNom.textContent = 'Añadir al nombre';
+      enNom.appendChild(tEnNom);
+      f.appendChild(enNom);
+
+      var subir = document.createElement('button');
+      subir.type = 'button'; subir.className = 'boton'; subir.textContent = '▲';
+      subir.title = 'Subirlo un puesto'; subir.disabled = (i === 0);
+      subir.onclick = function () { mover(i, -1); };
+      f.appendChild(subir);
+
+      var bajar = document.createElement('button');
+      bajar.type = 'button'; bajar.className = 'boton'; bajar.textContent = '▼';
+      bajar.title = 'Bajarlo un puesto'; bajar.disabled = (i === lista.length - 1);
+      bajar.onclick = function () { mover(i, 1); };
+      f.appendChild(bajar);
+
+      var quitar = document.createElement('button');
+      quitar.type = 'button'; quitar.className = 'boton boton-peligro'; quitar.textContent = 'Quitar';
+      quitar.onclick = function () { lista.splice(i, 1); pintar(); };
+      f.appendChild(quitar);
+
+      cont.appendChild(f);
+    });
+  }
+
+  function mover(i, salto) {
+    var j = i + salto;
+    if (j < 0 || j >= lista.length) return;
+    var g = lista[i]; lista[i] = lista[j]; lista[j] = g;
+    pintarPuestos();
+  }
+
+  function pintarCatalogo(filtro) {
+    var cont = $('campos-catalogo');
+    var disponibles = catalogoDisponible(filtro);
+    if (!disponibles.length) {
+      cont.innerHTML = '<div class="vacio">Nada que añadir' + (filtro ? ' con ese texto' : '') + '.</div>';
+      return;
+    }
+    cont.innerHTML = '';
+    disponibles.slice(0, 80).forEach(function (c) {
+      var f = document.createElement('div');
+      f.className = 'fila-tipo';
+      f.innerHTML = '<span class="nombre-tipo">' + U.escapar(c.nombre) + '</span>' +
+        '<span class="suave">' + textoOrigen(c) + '</span>';
+      var anadir = document.createElement('button');
+      anadir.type = 'button'; anadir.className = 'boton'; anadir.textContent = 'Añadir';
+      anadir.onclick = function () {
+        var nuevo = { origen: c.origen, obligatorio: false, enNombre: false };
+        if (c.origen === 'fichero') nuevo.columna = c.columna; else nuevo.id = c.id;
+        lista.push(nuevo);
+        pintar();
+      };
+      f.appendChild(anadir);
+      cont.appendChild(f);
+    });
+  }
+
+  /* ---------- crear un campo propio sin salir de este cuadro ----------
+
+     Misma idea que crear un tipo de documento desde el cuadro de
+     nombrar un documento (js/documentos.js): unos campos se insertan
+     ahí mismo, en vez de abrir un segundo cuadro. Solo hay un
+     `U.preguntar` a la vez en toda la aplicación; abrir otro mientras
+     este espera le robaría los botones. */
+
+  function abrirFormularioPropio() {
+    if ($('campos-propio-form')) return;
+    var caja2 = $('campos-propio-nuevo');
+    var d = document.createElement('div');
+    d.id = 'campos-propio-form';
+    d.style.cssText = 'margin:8px 0;padding:10px 12px;border:1px solid #d7dee6;' +
+                      'border-radius:8px;background:#f7f9fb';
+    d.innerHTML =
+      '<label class="etiqueta">Nombre del campo</label>' +
+      '<input id="propio-nombre" class="campo" autocomplete="off" placeholder="Por ejemplo: Trimestre">' +
+      '<label class="etiqueta">Clase</label>' +
+      '<select id="propio-clase" class="campo">' +
+      '<option value="texto">Texto libre</option><option value="lista">Lista cerrada</option></select>' +
+      '<div id="propio-valores-caja" class="oculto">' +
+      '<label class="etiqueta">Valores, uno por línea</label>' +
+      '<textarea id="propio-valores" class="campo" rows="3"></textarea></div>' +
+      '<div id="propio-aviso" class="nota"></div>' +
+      '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">' +
+      '<button type="button" class="boton" id="propio-cancelar">Cancelar</button>' +
+      '<button type="button" class="boton boton-principal" id="propio-crear">Crear y añadir</button>' +
+      '</div>';
+    caja2.appendChild(d);
+
+    $('propio-clase').onchange = function () {
+      $('propio-valores-caja').classList.toggle('oculto', $('propio-clase').value !== 'lista');
+    };
+    $('propio-nombre').oninput = avisoPropio;
+    $('propio-cancelar').onclick = function () { d.remove(); };
+    $('propio-crear').onclick = crearPropio;
+    avisoPropio();
+    $('propio-nombre').focus();
+  }
+
+  function avisoPropio() {
+    var campo = $('propio-nombre');
+    var aviso = $('propio-aviso');
+    var crear = $('propio-crear');
+    if (!campo) return;
+    var nombre = campo.value.trim();
+    if (!nombre) {
+      crear.disabled = true;
+      aviso.textContent = 'Escribe el nombre del campo.';
+      return;
+    }
+    var nombresPropios = (App.E.campos.propios || []).map(function (p) { return p.nombre; });
+    var cerca = U.parecidos(nombre, nombresPropios);
+    var mismo = cerca.filter(function (p) { return p.igual; })[0];
+    if (mismo) {
+      crear.disabled = true;
+      aviso.textContent = 'Ya hay un campo propio así, escrito: ' + mismo.nombre + '.';
+      return;
+    }
+    crear.disabled = false;
+    aviso.textContent = cerca.length
+      ? 'Ojo, se parece a: ' + cerca.slice(0, 3).map(function (p) { return p.nombre; }).join(', ') + '.'
+      : 'Se creará como campo propio, vale para cualquier tipo de asunto.';
+  }
+
+  async function crearPropio() {
+    var nombre = $('propio-nombre').value.trim();
+    if (!nombre) return;
+    var clase = $('propio-clase').value === 'lista' ? 'lista' : 'texto';
+    var valores = clase === 'lista'
+      ? $('propio-valores').value.split('\n').map(function (v) { return v.trim(); }).filter(Boolean)
+      : [];
+    var nuevo = { id: 'p' + Date.now() + Math.floor(Math.random() * 1000),
+                  nombre: nombre, clase: clase, valores: valores };
+    try {
+      App.E.campos = await Campos.guardarPropios(App.E.gestor, function (propios) {
+        propios.push(nuevo);
+        return propios;
+      });
+      catalogo.push({ origen: 'propio', id: nuevo.id, nombre: nuevo.nombre,
+                       clase: nuevo.clase, valores: nuevo.valores });
+      lista.push({ origen: 'propio', id: nuevo.id, obligatorio: false, enNombre: false });
+      pintar();
+      U.aviso('Campo propio ' + nombre + ' creado.', 'bueno');
+    } catch (e) {
+      U.aviso('No he podido crearlo: ' + e.message, 'malo');
+    }
+  }
+
+  pintar();
+};
+
+/* ---------- el bloque de Campos propios ---------- */
+
+App.pintarCamposPropios = function () {
+  var caja = $('tabla-propios');
+  if (!caja) return;
+  caja.innerHTML = '';
+  var propios = (App.E.campos && App.E.campos.propios) || [];
+  if (!propios.length) {
+    caja.innerHTML = '<div class="vacio">Ningún campo propio todavía.</div>';
+    return;
+  }
+  propios.forEach(function (p) {
+    var f = document.createElement('div');
+    f.className = 'fila-tipo';
+    f.innerHTML = '<span class="nombre-tipo">' + U.escapar(p.nombre) + '</span>' +
+      '<span class="suave" style="flex:1">' +
+      (p.clase === 'lista' ? U.escapar(p.valores.join(', ')) : 'Texto libre') + '</span>';
+    var quitar = document.createElement('button');
+    quitar.className = 'boton boton-peligro';
+    quitar.textContent = 'Quitar';
+    quitar.onclick = async function () {
+      var enUso = Campos.tiposQueUsanPropio(App.E.campos, p.id);
+      var ok = await U.preguntar('Quitar el campo ' + p.nombre,
+        (enUso.length
+          ? '<p>Lo usan estos tipos: <strong>' + enUso.map(U.escapar).join(', ') + '</strong>.</p>' +
+            '<p class="nota">Se quita también de ellos. Los asuntos ya creados conservan el ' +
+            'valor que tengan guardado.</p>'
+          : '<p>No lo usa ningún tipo.</p>'), 'Quitar');
+      if (!ok) return;
+      try {
+        App.E.campos = await Campos.guardarPropios(App.E.gestor, function (lista) {
+          return lista.filter(function (x) { return x.id !== p.id; });
+        });
+        for (var i = 0; i < enUso.length; i++) {
+          var claveTipo = enUso[i];
+          var restante = (App.E.campos.porTipo[claveTipo] || []).filter(function (c) {
+            return !(c.origen === 'propio' && c.id === p.id);
+          });
+          App.E.campos = await Campos.guardarConfigDeTipo(App.E.gestor, claveTipo, restante);
+        }
+        App.pintarCamposPropios();
+        U.aviso('Campo propio quitado.', 'bueno');
+      } catch (e) {
+        U.aviso('No he podido quitarlo: ' + e.message, 'malo');
+      }
+    };
+    f.appendChild(quitar);
+    caja.appendChild(f);
+  });
+};
+
+$('btn-anadir-propio').onclick = async function () {
+  var nombre = $('nuevo-propio').value.trim();
+  if (!nombre) return;
+  var clase = $('nueva-clase-propio').value === 'lista' ? 'lista' : 'texto';
+  var hay = (App.E.campos.propios || []).map(function (p) { return p.nombre; });
+  if (!await U.dejaCrear(nombre, hay, 'campo propio')) return;
+
+  var valores = [];
+  if (clase === 'lista') {
+    var ok = await U.preguntar('Valores de ' + nombre,
+      '<label class="etiqueta">Uno por línea, en el orden en que quieras que salgan</label>' +
+      '<textarea id="propio-valores-alta" class="campo" rows="4"></textarea>', 'Guardar');
+    if (!ok) return;
+    valores = $('propio-valores-alta').value.split('\n').map(function (v) { return v.trim(); }).filter(Boolean);
+  }
+  var nuevo = { id: 'p' + Date.now() + Math.floor(Math.random() * 1000),
+                nombre: nombre, clase: clase, valores: valores };
+  App.E.campos = await Campos.guardarPropios(App.E.gestor, function (propios) {
+    propios.push(nuevo);
+    return propios;
+  });
+  $('nuevo-propio').value = '';
+  App.pintarCamposPropios();
+  U.aviso('Campo propio añadido.', 'bueno');
 };
 
 /* ---------- el bloque de Copias de seguridad ---------- */
