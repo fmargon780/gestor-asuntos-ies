@@ -36,5 +36,5 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 | Nº | Instrucción | Estado | Notas |
 |---|---|---|---|
-| 1 | `docs/PLAN-ROBUSTEZ-2026-09.md` | PENDIENTE | Copias de seguridad, conflictos de Dropbox, pruebas automáticas, fichas sin carpeta, nombres repetidos, documentación |
-| 2 | `docs/REGISTRO-EN-UN-PASO.md` | PENDIENTE | Registrar un documento sin nombrarlo dos veces; leer el sello de Séneca |
+| 1 | `docs/PLAN-ROBUSTEZ-2026-09.md` | HECHA | Ya estaba hecho antes de apuntarse aquí (PR #4, fusionada 11-sep-2026 03:50): copias de seguridad y fichero roto, conflictos de Dropbox, pruebas automáticas en GitHub Actions, fichas sin carpeta, nombres repetidos y documentación. Comprobado de nuevo el 11-sep-2026: ficheros y pruebas en el repo, versión publicada `11-sep-2026 · 05:33` |
+| 2 | `docs/REGISTRO-EN-UN-PASO.md` | HECHA | Ya estaba hecho antes de apuntarse aquí (PR #5, fusionada 11-sep-2026 05:01): botón Registrar sin nombrar dos veces, casilla "Pendiente de registro" y lectura sola del sello de Séneca en el PDF. Comprobado de nuevo el 11-sep-2026 |
