@@ -111,10 +111,11 @@ await pagina.click('.pestana[data-pantalla="ajustes"]');
 await pagina.evaluate(() => {
   document.querySelectorAll('#pantalla-ajustes details').forEach((d) => { d.open = true; });
 });
-await pagina.waitForSelector('#tabla-tipos .fila-tipo');
+await pagina.waitForSelector('#tabla-tipos .tarjeta-tipo');
 
-await pagina.locator('#tabla-tipos .fila-tipo').filter({ hasText: 'SANCION' })
-  .getByRole('button', { name: 'Campos', exact: true }).click();
+const tarjetaSancion1 = pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: 'SANCION' });
+await tarjetaSancion1.locator('.tarjeta-tipo-menu-btn').click();
+await tarjetaSancion1.getByRole('button', { name: 'Campos', exact: true }).click();
 await pagina.waitForSelector('#campos-cuerpo');
 await comprobar('el cuadro de Campos aprovecha el ancho',
   pagina.evaluate(() => document.querySelector('#capa .cuadro').classList.contains('cuadro-ancho')), true);
@@ -316,8 +317,9 @@ await comprobar('el campo propio queda en la lista',
   pagina.locator('#tabla-propios .fila-tipo').filter({ hasText: 'Trimestre' }).locator('.suave').textContent(),
   '1º, 2º, 3º');
 
-await pagina.locator('#tabla-tipos .fila-tipo').filter({ hasText: 'SANCION' })
-  .getByRole('button', { name: 'Campos', exact: true }).click();
+const tarjetaSancion2 = pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: 'SANCION' });
+await tarjetaSancion2.locator('.tarjeta-tipo-menu-btn').click();
+await tarjetaSancion2.getByRole('button', { name: 'Campos', exact: true }).click();
 await pagina.waitForSelector('#campos-cuerpo');
 await pagina.fill('#campos-buscar', 'trimestre');
 await pagina.locator('#campos-catalogo .fila-tipo').filter({ hasText: 'Trimestre' })
