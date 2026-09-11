@@ -640,3 +640,89 @@ App.altaTercero = async function (categoria, sugerencia) {
   $('buscar-tercero').value = valores[def.cabecera[0]];
   App.buscarTercero();
 };
+
+/* ---------- el buscador de terceros, reutilizable ----------
+
+   Lo mismo que hay dentro de "Nuevo asunto" (categoría + buscador +
+   resultados + alta), pero como una pieza que se puede montar en
+   cualquier otra pantalla: js/relacionados.js lo usa para elegir un
+   tercero relacionado, sin repetir la lógica de búsqueda.
+
+   `contenedor` es un elemento vacío donde se pinta todo.
+   `categoriaInicial` puede venir puesta, o null para empezar sin
+   categoría elegida.
+   `alElegir(categoria, persona, textoBuscado)` se llama cuando el
+   usuario pulsa un resultado (persona no es null) o pide dar de alta
+   uno nuevo (persona es null, y textoBuscado trae lo que había
+   escrito). El alta de verdad la hace quien llama, con
+   App.cuadroDeTercero: así aquí no se abren dos cuadros a la vez. */
+App.pintarBuscadorDeTercero = function (contenedor, categoriaInicial, alElegir) {
+  var estado = { categoria: categoriaInicial || null };
+
+  contenedor.innerHTML =
+    '<div class="categorias-mini" id="rel-categorias"></div>' +
+    '<div id="rel-buscador" class="oculto">' +
+      '<input id="rel-buscar" class="campo" placeholder="Escribe tres letras del nombre">' +
+      '<div id="rel-resultados" class="resultados"></div>' +
+    '</div>';
+
+  var cajaCategorias = contenedor.querySelector('#rel-categorias');
+  var cajaBuscador = contenedor.querySelector('#rel-buscador');
+  var campoBuscar = contenedor.querySelector('#rel-buscar');
+  var cajaResultados = contenedor.querySelector('#rel-resultados');
+
+  function pintarCategorias() {
+    cajaCategorias.innerHTML = '';
+    Nombres.CATEGORIAS.forEach(function (cat) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'categoria-mini-boton' + (estado.categoria === cat ? ' elegido' : '');
+      b.textContent = cat;
+      b.onclick = function () {
+        estado.categoria = cat;
+        pintarCategorias();
+        cajaBuscador.classList.remove('oculto');
+        campoBuscar.value = '';
+        cajaResultados.innerHTML = '';
+        campoBuscar.focus();
+      };
+      cajaCategorias.appendChild(b);
+    });
+  }
+
+  var temporizador = null;
+  async function buscar() {
+    var texto = campoBuscar.value;
+    if (U.normalizar(texto).length < 2) { cajaResultados.innerHTML = ''; return; }
+    cajaResultados.innerHTML = '<div class="explica">Buscando…</div>';
+    var fuente = await Datos.cargar(App.E.datos, estado.categoria);
+    var encontrados = Datos.buscar(fuente.lista, texto, 30);
+    cajaResultados.innerHTML = '';
+
+    encontrados.forEach(function (p) {
+      var d = document.createElement('div');
+      d.className = App.claseDeResultado(p);
+      d.innerHTML = '<div>' + U.escapar(p.nombre) + '</div>' +
+                    '<div class="resultado-pie">' + U.escapar(App.pieDe(p)) + '</div>';
+      d.onclick = function () { alElegir(estado.categoria, p, texto); };
+      cajaResultados.appendChild(d);
+    });
+
+    var alta = document.createElement('button');
+    alta.type = 'button';
+    alta.className = 'boton';
+    alta.style.marginTop = '6px';
+    alta.textContent = estado.categoria === 'ALUMNADO'
+      ? '+ Dar de alta un solicitante' : '+ Dar de alta uno nuevo';
+    alta.onclick = function () { alElegir(estado.categoria, null, texto); };
+    cajaResultados.appendChild(alta);
+  }
+
+  campoBuscar.oninput = function () {
+    clearTimeout(temporizador);
+    temporizador = setTimeout(buscar, 180);
+  };
+
+  pintarCategorias();
+  if (estado.categoria) cajaBuscador.classList.remove('oculto');
+};
