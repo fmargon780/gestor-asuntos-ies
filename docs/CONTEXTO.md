@@ -5,7 +5,7 @@ Documento de contexto. Léelo entero antes de proponer nada.
 `docs/PLAN-ROBUSTEZ-2026-09.md` hecho entero: copias de seguridad, conflictos de Dropbox,
 pruebas automáticas en GitHub Actions, fichas sin carpeta y nombres repetidos. Resumen para
 Francisco en `docs/CAMBIOS-2026-09.md`. Después, el mismo día: "Registrar un documento en un
-paso", sección 5).
+paso", sección 5, con la lectura sola del sello de Séneca dentro del PDF).
 
 **Este documento vive en dos sitios**: en el proyecto de Claude (`Contexto.md`) y aquí, en
 `docs/CONTEXTO.md` del repositorio. Se cambia en el mismo commit en que cambia el código.
@@ -538,10 +538,37 @@ nombrar dos veces y salir de la ficha.
   (`Registro.abrirCuadro`). **Solo hay un cuadro de diálogo en toda la aplicación**: abrir un
   segundo `U.preguntar` mientras el primero sigue esperando le roba los botones al de fuera, y
   el de fuera se queda colgado para siempre.
-- **Preparado para leer el número solo, más adelante.** `Registro.proponer({ anio, tipo, serie,
-  numero })` rellena las cuatro piezas del cuadro ya pintado. Hoy nadie la llama: hace falta un
-  PDF sellado real de Séneca para saber si el número va como texto dentro del PDF, y no hay
-  ninguno de muestra todavía. Cuando lo haya, un módulo nuevo lo leerá y llamará aquí.
+- `Registro.proponer({ anio, tipo, serie, numero })` rellena las cuatro piezas del cuadro ya
+  pintado; `tipo` es `E`/`S` (entrada o salida) y `serie` es `M`/`A` (manual o automática).
+- **Leer el número solo, del sello de Séneca dentro del PDF** (11-sep-2026, más tarde el mismo
+  día). Comprobado con un PDF real: el sello va como texto en la primera página, aunque el
+  documento sea un escaneado (imagen). El texto trae, tal cual:
+
+      2026/29700692/M000000000368ENTRADAFecha: 10/09/2026 13:03:02
+
+  `AÑO / CÓDIGO DEL CENTRO / SERIE + número con ceros por delante`, pegado a `ENTRADA` o
+  `SALIDA`, pegado a `Fecha: dd/mm/aaaa hh:mm:ss`. Ese ejemplo es el registro `26EM0368`.
+  - `js/registro-lector.js` lee el texto de la primera página con **pdf.js** (Mozilla), y lo
+    busca con `(\d{4})\s*\/\s*\d+\s*\/\s*([MA])\s*0*(\d+)\s*(ENTRADA|SALIDA)`, tolerante a
+    espacios y saltos de línea. Si el número tiene más de cuatro cifras, se deja entero (no se
+    recorta) y se avisa; si no, se rellena con ceros por delante hasta cuatro.
+  - Al elegir la copia sellada, si se encuentra el sello, el cuadro de Registrar sale ya
+    relleno, con una línea verde "Leído del sello de Séneca", y **el foco va directo al botón
+    de aceptar**: solo hay que confirmar. Si no se encuentra —no es un PDF, o no trae el
+    sello—, el cuadro sale vacío como siempre, con el foco en los cuatro dígitos.
+  - **Ojo con el foco**: `js/usabilidad.js` vigila cuándo se abre el cuadro (`#capa`) y pone el
+    cursor solo en su primer campo, con un `MutationObserver`. Ese observador se dispara
+    después del código que abre el cuadro, así que pisaría cualquier `.focus()` puesto ahí
+    mismo. El foco de Registrar se pone con `setTimeout(fn, 0)`, para que se aplique después.
+  - La fecha del sello no cambia la fecha `AAMMDD` del nombre, que es la del propio documento:
+    se guarda en la nota, `"Registrado 26EM0368 el 10/09/2026 · <documento>"`.
+  - **pdf.js va copiado en el repositorio**, en `js/lib/pdf.min.js` y `js/lib/pdf.worker.min.js`
+    (versión 3.11.174, la del `build/` de `pdfjs-dist` en npm — no la de `legacy/`, de sobra
+    para Chrome y Edge). No se carga de ninguna dirección externa, y solo se trae la primera
+    vez que se pulsa Registrar sobre un PDF, no al arrancar la aplicación.
+  - El PDF de muestra con el que se comprobó **no está en el repositorio**: lleva datos
+    personales. La prueba monta un PDF mínimo válido en su propio código, con el texto del
+    sello dentro, para no necesitar ninguno de verdad.
 - Se comprueba con `pruebas/registro.mjs`.
 
 ---
@@ -633,6 +660,8 @@ de `App` va después del fichero que lo define.
 | `js/guias-enganche.js` | Las guías dentro de la app, y `window.GuiasDelCentro` |
 | `js/notas.js` | Las notas de cada asunto, con su enlace y su botón |
 | `js/registro.js` | Registrar un documento en un paso, sin nombrarlo dos veces |
+| `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF |
+| `js/lib/pdf.min.js`, `js/lib/pdf.worker.min.js` | pdf.js (Mozilla) 3.11.174, copiado tal cual |
 | `js/ficha-asunto.js` | La pantalla de un asunto: guía, notas, documentos y contacto |
 | `js/duplicados.js` | ¿Esto no lo hicimos ya? Asuntos iguales del mismo tercero |
 | `js/visor.js` | El panel de la derecha para ver un documento (`con-visor`) |

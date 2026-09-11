@@ -14,6 +14,14 @@
 .boton-ambar { background: var(--ambar); border-color: var(--ambar-linea); color: #8a6100; }
 .boton-ambar:hover { background: #ffe9b8; }
 
+/* La línea verde de "Leído del sello de Séneca", cuando
+   js/registro-lector.js reconoce el sello dentro del PDF elegido. */
+.aviso-bueno {
+  background: var(--verde); border: 1px solid #a9d6bb; border-radius: 8px;
+  padding: 9px 12px; font-size: 13px; font-weight: 600; color: #1e7a46;
+  margin: 12px 0;
+}
+
 /* Cada documento de la ficha, con su botón de abrirlo y, si hace
    falta, la marca de pendiente y el botón de Registrar al lado.
 

@@ -62,6 +62,7 @@ var Registro = (function () {
       '<p class="explica">Se guardará una copia del fichero elegido junto al original, ' +
         'con el mismo nombre más el registro.<br>' +
         '<span class="suave">Original: ' + U.escapar(estado.nombreOriginal) + '</span></p>' +
+      '<div id="reg-sello"></div>' +
       '<div class="registro-campos">' +
         '<div>' +
           '<label class="etiqueta">Año</label>' +
@@ -118,16 +119,42 @@ var Registro = (function () {
       function (c) { c.oninput = refrescarVista; c.onchange = refrescarVista; }
     );
     refrescarVista();
-    if ($('reg-numero')) $('reg-numero').focus();
   }
 
-  /* ---------- preparado para leer el número solo, más adelante ----------
+  /* Si `js/registro-lector.js` ha leído el sello, se rellenan los
+     cuatro campos solos, sale una línea verde y el foco va directo al
+     botón de aceptar: Francisco solo tiene que confirmar. Si no hay
+     sello, el cuadro se queda como siempre, con el foco en el número.
 
-     Cuando se compruebe con un PDF sellado real de Séneca si el número
-     va como texto dentro del PDF, un módulo nuevo lo leerá y llamará
-     aquí para rellenar los cuatro campos sin que haya que escribirlos.
-     Hoy nadie la llama todavía: no hay un PDF de muestra con el que
-     comprobarlo. */
+     El foco se pone con un poco de retraso a propósito: js/usabilidad.js
+     vigila cuándo se abre el cuadro y pone el cursor solo en su primer
+     campo (aquí, el año), y si se pusiera aquí mismo esa vigilancia lo
+     pisaría justo después. */
+  function aplicarSelloYFoco(idBotonAceptar) {
+    var sello = estado.sello;
+    if (sello) {
+      proponer(sello);
+      var aviso = $('reg-sello');
+      if (aviso) {
+        aviso.className = 'aviso-bueno';
+        aviso.textContent = 'Leído del sello de Séneca.';
+      }
+      if (sello.numeroLargo) {
+        U.aviso('El número leído del sello tiene más de cuatro cifras: revísalo antes de guardar.', 'malo');
+      }
+    }
+    setTimeout(function () {
+      var elegido = sello ? $(idBotonAceptar) : $('reg-numero');
+      if (elegido) elegido.focus();
+    }, 0);
+  }
+
+  /* ---------- leer el número solo, del PDF sellado ----------
+
+     `js/registro-lector.js` rellena las cuatro piezas cuando reconoce
+     el sello de Séneca dentro del PDF elegido. Si el módulo no está
+     cargado, si el fichero no es un PDF o si no se encuentra el
+     sello, no rellena nada y el cuadro sale vacío, como siempre. */
   function proponer(datos) {
     datos = datos || {};
     if (datos.anio != null && $('reg-ano')) $('reg-ano').value = datos.anio;
@@ -159,9 +186,19 @@ var Registro = (function () {
       if (e.name !== 'AbortError') U.aviso('No he podido abrir ese fichero: ' + e.message, 'malo');
       return false;
     }
+
+    /* Mejor esfuerzo: si no se puede leer el sello, se sigue igual
+       que siempre, sin avisar de nada raro. */
+    var sello = null;
+    if (window.RegistroLector) {
+      try { sello = await RegistroLector.leerSello(await handle.getFile()); }
+      catch (e) { sello = null; }
+    }
+
     estado = {
       nombreOriginal: nombreDocumento, handle: handle,
-      previo: previo, extension: Nombres.extensionDe(handle.name)
+      previo: previo, extension: Nombres.extensionDe(handle.name),
+      sello: sello
     };
     return true;
   }
@@ -191,8 +228,10 @@ var Registro = (function () {
       }
       await Carpetas.copiarFicheroEn(asunto.handle, estado.handle, nombreNuevo);
       var codigo = (nombreNuevo.match(/^\d{6}\s+(\S+)/) || [])[1] || '';
+      var fechaSello = estado.sello && estado.sello.fecha ? ' el ' + estado.sello.fecha : '';
       await quitarDePendientes(asunto, estado.nombreOriginal);
-      await window.Notas.anadir(asunto, 'Registrado ' + codigo + ' · ' + estado.nombreOriginal);
+      await window.Notas.anadir(asunto,
+        'Registrado ' + codigo + fechaSello + ' · ' + estado.nombreOriginal);
       U.aviso('Documento registrado.', 'bueno');
       return nombreNuevo;
     } catch (e) {
@@ -216,6 +255,7 @@ var Registro = (function () {
         '<button type="button" class="boton boton-principal" id="reg-guardar">Registrar</button>' +
       '</div>';
     enganchar();
+    aplicarSelloYFoco('reg-guardar');
 
     $('reg-volver').onclick = function () { estado = null; if (alTerminar) alTerminar(); };
     $('reg-guardar').onclick = async function () {
@@ -235,6 +275,7 @@ var Registro = (function () {
 
     var promesa = U.preguntar('Registrar "' + nombreDocumento + '"', camposHtml(), 'Registrar');
     enganchar();
+    aplicarSelloYFoco('cuadro-aceptar');
     var ok = await promesa;
     if (!ok) { estado = null; return; }
     var bien = await guardar(asunto);

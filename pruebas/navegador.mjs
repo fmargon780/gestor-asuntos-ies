@@ -55,9 +55,9 @@ const preparacion = `
       async *entries() { for (const par of hijos) yield par; }
     };
   }
-  function fich(nombre, texto) {
+  function fich(nombre, texto, tipo) {
     const f = { kind: 'file', name: nombre, _texto: texto };
-    f.getFile = async () => new Blob([f._texto], { type: 'text/plain' });
+    f.getFile = async () => new Blob([f._texto], { type: tipo || 'text/plain' });
     f.createWritable = async () => ({
       async write(c) { f._texto = typeof c === 'string' ? c : await c.text(); },
       async close() {}
