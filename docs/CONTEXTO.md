@@ -598,10 +598,13 @@ de `App` va después del fichero que lo define.
 | `js/vista.js` | Los filtros plegados y cuándo se ve el tablón |
 | `js/dni.js` | El DNI del alumnado, el aviso de que falta y la búsqueda por DNI |
 | `js/inicio.js` | La última línea: `App.arrancar()` |
+| `package.json` | Las dependencias de las pruebas (`playwright`, `jsdom`) y `npm test` |
+| `pruebas/ejecutar.mjs` | Levanta el servidor local y ejecuta todas las pruebas de esta carpeta |
+| `.github/workflows/pruebas.yml` | Ejecuta `npm test` en cada subida y cada pull request a `main` |
 | `pruebas/logica.mjs` | Pruebas de la lógica, sin navegador |
 | `pruebas/copias.mjs` | Prueba de las copias de seguridad y del fichero roto |
 | `pruebas/conflictos.mjs` | Prueba de las copias en conflicto de Dropbox |
-| `pruebas/navegador.mjs` | Prueba de la aplicación entera. **Desfasada, hay que arreglarla** |
+| `pruebas/navegador.mjs` | Prueba de la aplicación entera |
 | `pruebas/tipos.mjs` | Prueba de las tarjetas por tipo |
 | `pruebas/correos.mjs` | Prueba de lo que deja un correo dentro de un asunto |
 | `pruebas/tablon.mjs` | Prueba de cuándo se ve el tablón (a 1905 píxeles) |
@@ -682,6 +685,27 @@ cambio del otro se perdía en la práctica.
   tocan pocas veces, y casi siempre para añadir. `asuntos.json` y `tablon.json` ya releían del
   todo desde antes (`App.anotar`, `tablon.js`).
 - Se comprueba con `pruebas/conflictos.mjs`.
+
+**Pruebas automáticas en cada subida** (11-sep-2026, bloque 3 del plan de robustez).
+`package.json` trae `playwright` y `jsdom` como dependencias, y `npm test` (que ejecuta
+`pruebas/ejecutar.mjs`) levanta el servidor local y corre **todas** las pruebas de `pruebas/`
+una detrás de otra; falla si falla cualquiera. `.github/workflows/pruebas.yml` lo lanza en cada
+subida y en cada pull request a `main`, con Ubuntu, Node 20 y Chromium instalado por Playwright.
+
+- Las pruebas de navegador ya no llevan la ruta de Chromium escrita a fuego: leen
+  `process.env.CHROMIUM_PATH`, y si no está, Playwright usa el suyo (así funcionan igual en
+  local, donde hace falta apuntar al Chromium ya instalado, y en Actions, donde Playwright se
+  instala el suyo propio).
+- Arregladas las dos comprobaciones de `pruebas/logica.mjs` que daban por hecho que
+  "hoy" era el 07-sep-2026 (`U.edadDesde`, `U.yaPaso`): ahora se calculan a partir de la fecha
+  real, como ya hacía `dni.mjs`.
+- Arreglada `pruebas/navegador.mjs`, desfasada desde varios cambios de interfaz de estos días:
+  la barra y los filtros nacen plegados y hay que abrirlos antes de tocarlos; el botón "Cerrar"
+  de la tarjeta se llama "Archivar"; el botón "Documentos" ya no está en la tarjeta, está dentro
+  de la ficha del asunto ("Gestionar documentos"); cada documento de la lista lleva ahora dos
+  botones ("Copiar nombre" y "Poner nombre"); y el "Texto adicional" del nombre de un documento
+  ya no se rellena solo con el curso, así que la prueba lo escribe a mano.
+- Se añade `README.md` → cómo se ejecutan las pruebas.
 
 ### Las columnas de cada CSV que mantiene la aplicación
 

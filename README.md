@@ -85,3 +85,14 @@ navegador, que no existe en Firefox, Safari ni en el móvil.
 - `pruebas/navegador.mjs` — la aplicación entera en Chromium: crear un asunto,
   cerrarlo, verlo en el archivo, reabrirlo, buscar una persona y comprobar la
   tabla de abreviaturas de grupo.
+
+### Cómo ejecutarlas
+
+    npm ci
+    npx playwright install --with-deps chromium   # solo la primera vez
+    npm test
+
+`npm test` levanta un servidor local con la aplicación y ejecuta todas las
+pruebas de `pruebas/` una detrás de otra; falla si falla cualquiera. En GitHub
+Actions (`.github/workflows/pruebas.yml`) se ejecuta igual en cada subida y en
+cada pull request a `main`.

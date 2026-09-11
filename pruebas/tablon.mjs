@@ -12,7 +12,7 @@ const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf
 const preparacion = fuente.slice(fuente.indexOf('const preparacion = `') + 'const preparacion = `'.length,
                                  fuente.indexOf('`;\n\nconst DIRECCION'));
 
-const navegador = await chromium.launch();
+const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 /* El ancho del monitor del trabajo. Importa: en una pantalla más
    estrecha el panel de la derecha ya deja la zona de trabajo por debajo
    de 900 y el tablón se quita solo por CSS, así que el fallo de verdad

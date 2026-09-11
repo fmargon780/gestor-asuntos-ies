@@ -16,7 +16,7 @@ const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf
 const preparacion = fuente.slice(fuente.indexOf('const preparacion = `') + 'const preparacion = `'.length,
                                  fuente.indexOf('`;\n\nconst DIRECCION'));
 
-const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM || '/opt/pw-browsers/chromium' });
+const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 const pagina = await navegador.newPage({ viewport: { width: 1600, height: 950 } });
 const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
