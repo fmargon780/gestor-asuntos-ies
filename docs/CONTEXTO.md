@@ -5,8 +5,9 @@ Documento de contexto. Léelo entero antes de proponer nada.
 `docs/PLAN-ROBUSTEZ-2026-09.md` hecho entero: copias de seguridad, conflictos de Dropbox,
 pruebas automáticas en GitHub Actions, fichas sin carpeta y nombres repetidos. Resumen para
 Francisco en `docs/CAMBIOS-2026-09.md`. Después, el mismo día: "Registrar un documento en un
-paso", "Terceros relacionados con un asunto", "Que no se dupliquen los asuntos" y "Ajustes
-ágiles: encontrar y crear tipos sin scroll", sección 5).
+paso", "Terceros relacionados con un asunto", "Que no se dupliquen los asuntos", "Ajustes
+ágiles: encontrar y crear tipos sin scroll", "La papelera: borrar sin miedo" y "Los duplicados, a
+su propia pantalla", sección 5).
 
 **Este documento vive en dos sitios**: en el proyecto de Claude (`Contexto.md`) y aquí, en
 `docs/CONTEXTO.md` del repositorio. Se cambia en el mismo commit en que cambia el código.
@@ -706,21 +707,59 @@ hubiera evitado, porque nunca impide crear nada.
   - La comprobación nunca debe impedir crear un asunto por su cuenta: si algo falla al mirar, se
     sigue como si no hubiera nada (todo envuelto en `try/catch`).
 - **Unir dos que ya existen** (`js/unir-asuntos.js`), para los creados antes de esta parada o a
-  mano: en Asuntos abiertos, cuando dos o más coinciden en tercero, tipo y curso, sale una franja
-  "Parecen el mismo asunto" encima de la lista, con un botón Unir. Se elige cuál se queda (de
-  partida, el de nombre más largo); los ficheros del otro se mueven a la carpeta que se queda,
-  las notas se juntan (con una nota de la unión al final), los pasos de la guía se copian del que
-  se queda si no tenía, y la carpeta que se va se borra. Si algún fichero choca de nombre entre
-  las dos carpetas, no se mueve ni se borra nada, y se avisa de cuáles.
+  mano: cuando dos o más coinciden en tercero, tipo y curso, se puede revisar y unir. Desde el
+  11-sep-2026 esto vive en su propia pantalla, ver "Los duplicados, a su propia pantalla" más
+  abajo. Se elige cuál se queda (de partida, el de nombre más largo); los ficheros del otro se
+  mueven a la carpeta que se queda, las notas se juntan (con una nota de la unión al final), los
+  pasos de la guía se copian del que se queda si no tenía, y la carpeta que se va se borra. Si
+  algún fichero choca de nombre entre las dos carpetas, no se mueve ni se borra nada, y se avisa
+  de cuáles.
 - Vive en `js/duplicados.js` (la parada al crear) y `js/unir-asuntos.js` (unir los que ya
   existen), cargado justo después de `js/asuntos-lista.js`, que es quien define
   `App.pintarAbiertos`.
 - Se comprueba con `pruebas/duplicados.mjs`: el caso real de TRANSPORTE para al crear; dos
   MATRICULA del mismo alumno en cursos distintos NO paran; con varios candidatos, el de partida
   es el abierto más reciente y "Abrir el que ya existe" lleva a su ficha; con un candidato
-  archivado, lleva a su carpeta del ARCHIVO; la franja "Parecen el mismo asunto" aparece y Unir
-  fusiona ficheros, notas y guía, y borra la carpeta que sobra; y un choque de nombres entre las
-  dos carpetas no mueve ni borra nada.
+  archivado, lleva a su carpeta del ARCHIVO; Unir fusiona ficheros, notas y guía, y borra la
+  carpeta que sobra; y un choque de nombres entre las dos carpetas no mueve ni borra nada. Los
+  escenarios de la pantalla propia de duplicados están en la sección siguiente.
+
+### Los duplicados, a su propia pantalla (11-sep-2026)
+
+Antes, cuando dos o más asuntos abiertos coincidían en tercero, tipo y curso, salía una franja
+amarilla "Parecen el mismo asunto" encima de la lista de Asuntos abiertos, con las columnas de
+cada grupo una debajo de otra: con varios grupos a la vez, ocupaba media pantalla antes de llegar
+a ver ningún asunto de verdad.
+
+- **Un aviso de una línea**, junto al botón Actualizar de Asuntos abiertos:
+  `⚠ N posible(s) duplicado(s) — Revisar`. Sin ningún duplicado no se ve nada (`#btn-duplicados`
+  queda oculto).
+- **Pantalla propia "Duplicados"**, a la que solo se llega pulsando ese aviso — no está en la
+  barra de la izquierda —, con su botón Volver. Cada grupo se enseña con sus asuntos en columnas,
+  una al lado de otra: el nombre de la carpeta (enlaza a su ficha), una línea con fecha de
+  apertura / estado / vía / fecha límite, sus documentos (se abren en el visor de la derecha de
+  siempre, `Visor.abrir`) y sus notas (las tres últimas, con "y N más" si hay más), con quién la
+  escribió y cuándo.
+- El botón **Unir** es el mismo de siempre, sin cambios en su lógica.
+- Botón nuevo **"No son el mismo"**: descarta ese grupo concreto, hasta que se diga lo contrario.
+  Se guarda por la firma exacta de los nombres del grupo (ordenados y unidos) en
+  `_GESTOR/no-duplicados.json`. Si más adelante se crea o cambia un asunto que amplía ese grupo,
+  la firma ya no coincide, y el aviso vuelve a salir solo, sin que nadie tenga que hacer nada.
+- Reversible desde Ajustes: bloque nuevo **"Duplicados descartados"**, con un botón "Volver a
+  avisar" en cada entrada.
+- Vive entero en `js/unir-asuntos.js` (estilos en `css/unir-asuntos.css`) y no toca `js/ajustes.js`
+  ni la barra de la izquierda: la pantalla y el bloque de Ajustes los crea el propio módulo
+  (`App.PANTALLAS.push`, y enganchado a Ajustes con `window.Gestor.alRefrescar`, igual que
+  `js/frescura.js` o `js/conflictos.js`).
+- `no-duplicados.json` entra en la lista de ficheros protegidos por copia de seguridad
+  (`js/copias.js`).
+- Se comprueba con `pruebas/duplicados.mjs`: ya no sale ninguna franja en Asuntos abiertos; el
+  aviso no se ve sin duplicados y dice cuántos hay cuando los hay; lleva a la pantalla propia;
+  cada columna enseña sus datos, documentos y solo las tres notas más recientes con "y N más";
+  Unir sigue funcionando igual desde la pantalla nueva; "No son el mismo" guarda el descarte (con
+  quién y cuándo) y el grupo deja de avisar; "Volver a avisar" en Ajustes lo deshace; y si al
+  grupo descartado se le suma un tercer asunto que coincide, la firma cambia y vuelve a avisar
+  solo.
 
 ### Ajustes ágiles: encontrar y crear tipos sin scroll (11-sep-2026)
 
@@ -931,7 +970,7 @@ de `App` va después del fichero que lo define.
 | `js/nucleo.js` | El estado, el arranque y el cambio de pantalla |
 | `js/version.js` | `App.VERSION`, la fecha y hora de la última publicación |
 | `js/asuntos-lista.js` | Asuntos abiertos: las tres tarjetas, las tarjetas por tipo y la lista |
-| `js/unir-asuntos.js` | Une asuntos duplicados que ya existen: la franja "Parecen el mismo asunto" |
+| `js/unir-asuntos.js` | Une asuntos duplicados que ya existen: aviso junto a Actualizar y pantalla propia "Duplicados" (`css/unir-asuntos.css`) |
 | `js/asuntos-editar.js` | Editar un asunto abierto: renombra la carpeta y mueve su ficha |
 | `js/documentos-sueltos.js` | Los papeles sin asunto, **cerrar y reabrir**, y la vigilancia de la carpeta |
 | `js/asuntos-nuevo.js` | Crear un asunto, el cuadro de datos de un tercero y los pies |
@@ -994,6 +1033,7 @@ de `App` va después del fichero que lo define.
 | `docs/CAMBIOS-2026-09.md` | El resumen en llano del plan de robustez, para Francisco |
 | `docs/CAMPOS-POR-TIPO.md` | El encargo de los campos de cada tipo de asunto (11-sep-2026) |
 | `docs/PAPELERA.md` | El encargo de borrar con papelera (11-sep-2026) |
+| `docs/UNIR-VER-DENTRO.md` | El encargo de la pantalla propia de duplicados (11-sep-2026) |
 | `README.md` | — |
 
 ### Lo que la aplicación guarda en `_GESTOR`
@@ -1012,9 +1052,10 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `tablon.json` | Las notas rápidas del tablón, con su marca de privada |
 | `campos.json` | Los campos propios y los campos configurados de cada tipo de asunto (11-sep-2026) |
 | `papelera.json` | El índice de la papelera: qué se ha borrado, de dónde y cuándo (11-sep-2026) |
+| `no-duplicados.json` | Grupos de posibles duplicados descartados con "No son el mismo", por la firma de sus nombres (11-sep-2026) |
 | `datos/*.csv` | Alumnado (Séneca), personal, empresas y otros |
 | `PAPELERA/` | Las carpetas y ficheros borrados, cada uno en su subcarpeta `AAMMDD-HHMM <nombre>` (11-sep-2026) |
-| `copias/*.json` | Copias de seguridad de los diez ficheros de arriba, una por día, 30 como mucho de cada uno |
+| `copias/*.json` | Copias de seguridad de los once ficheros de arriba, una por día, 30 como mucho de cada uno |
 
 **Los CSV van en `datos`, no en `_GESTOR`.** `js/rescate-datos.js` los baja solos al entrar.
 
@@ -1031,15 +1072,15 @@ misma carpeta: sin releer, el último en guardar borra lo del otro. Hoy lo hacen
 el JSON está roto, lanza un error `FicheroRoto` en vez de devolver `null`. Antes se trataba igual
 que si no existiera, y el siguiente guardado lo escribía encima: se perdía todo.
 
-- `js/copias.js` guarda, antes de escribir cualquiera de los diez ficheros compartidos
+- `js/copias.js` guarda, antes de escribir cualquiera de los once ficheros compartidos
   (`asuntos.json`, `guias.json`, `tipos.json`, `estados.json`, `tipos-documento.json`,
   `tablon.json`, `recurrentes.json`, `frescura.json`, `campos.json` desde el 11-sep-2026,
-  `papelera.json` desde el mismo día), una copia de cómo estaba justo antes, en
-  `_GESTOR/copias/<nombre>-AAMMDD.json`. Una copia por fichero y día; se conservan las últimas
-  30 de cada uno.
-- Todo lo que escribe uno de esos diez ficheros llama a `Copias.guardar` en vez de a
+  `papelera.json` desde el mismo día, `no-duplicados.json` también desde el mismo día), una
+  copia de cómo estaba justo antes, en `_GESTOR/copias/<nombre>-AAMMDD.json`. Una copia por
+  fichero y día; se conservan las últimas 30 de cada uno.
+- Todo lo que escribe uno de esos once ficheros llama a `Copias.guardar` en vez de a
   `Carpetas.guardarJson` directamente.
-- Al pulsar Entrar se comprueban los diez ficheros (`Copias.comprobarTodos`). Si alguno está
+- Al pulsar Entrar se comprueban los once ficheros (`Copias.comprobarTodos`). Si alguno está
   roto, **no se entra**: sale un aviso en rojo con un botón para restaurar la última copia de
   cada uno. El fichero roto se aparta como `<nombre>-roto-AAMMDD-HHMM.json` y no se borra nunca.
 - En Ajustes, el bloque **Copias de seguridad** enseña cuántas copias hay de cada fichero y deja
