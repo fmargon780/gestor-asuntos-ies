@@ -1,5 +1,6 @@
 /* Prueba en navegador de verdad de "que no se dupliquen los asuntos"
-   (docs/NO-DUPLICAR-ASUNTOS.md, 11-sep-2026).
+   (docs/NO-DUPLICAR-ASUNTOS.md, 11-sep-2026) y de "los duplicados, a
+   su propia pantalla" (docs/UNIR-VER-DENTRO.md, 11-sep-2026).
 
    Lo que tiene que pasar:
      - el caso real (dos carpetas de TRANSPORTE del mismo alumno, mismo
@@ -12,15 +13,21 @@
        nada nuevo;
      - con un candidato archivado, "Abrir el que ya existe" lleva a su
        carpeta en el ARCHIVO;
-     - en la lista de asuntos abiertos, dos que coinciden en tercero,
-       tipo y año académico sacan la franja "Parecen el mismo asunto",
-       con un botón Unir;
-     - unir de verdad: los ficheros de los dos aparecen juntos, las
-       notas se combinan (con la nota de la unión al final), los pasos
-       de la guía se copian si el que se queda no tenía, y la carpeta
-       que se va desaparece;
+     - ya no hay franja encima de la lista de asuntos abiertos: en su
+       lugar, un aviso de una sola línea junto al botón "Tablón", que
+       lleva a la pantalla de Duplicados;
+     - esa pantalla enseña cada grupo en columnas, con el nombre como
+       enlace a la ficha, sus documentos (se abren en el visor) y sus
+       últimas notas;
+     - "Unir" seguido desde ahí hace lo mismo de siempre: junta
+       ficheros y notas y borra el que sobra;
      - si hay un fichero con el mismo nombre en las dos carpetas, no se
-       mueve ni se borra nada, y se avisa de cuál choca.
+       mueve ni se borra nada, y desde ahí se puede descartar el grupo
+       con "No son el mismo";
+     - un grupo descartado deja de avisar, pero vuelve a avisar solo
+       si cambia quién lo forma (se crea un tercer asunto que encaja);
+     - en Ajustes, "Duplicados descartados" lista lo descartado y deja
+       "Volver a avisar".
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
@@ -68,6 +75,14 @@ async function darDeAltaAlumno(nombre, id) {
   await pagina.click('#resultados-tercero .resultado');
 }
 
+async function leerJson(nombre) {
+  return pagina.evaluate(async (n) => {
+    const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+    const h = await g.getFileHandle(n);
+    return JSON.parse(await (await h.getFile()).text());
+  }, nombre);
+}
+
 /* --- entrar --- */
 await pagina.click('#btn-abiertos');
 await pagina.click('#btn-archivo');
@@ -76,6 +91,9 @@ await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
 await pagina.click('#btn-barra');
+
+await comprobar('sin duplicados de partida, el aviso no se ve',
+  pagina.locator('#btn-duplicados').isHidden(), true);
 
 /* ============================================================
    1. EL CASO REAL: mismo tercero, tipo y curso, solo cambia el grupo
@@ -211,15 +229,29 @@ await comprobar('no se ha creado una cuarta carpeta abierta',
   nombresDeAbiertos().then(n => n.filter(x => x.indexOf('TRANSPORTE') !== -1).length), 2);
 
 /* ============================================================
-   5. LA FRANJA DE UNIR, Y UNIR DE VERDAD
+   5. EL AVISO JUNTO A "TABLÓN": YA NO HAY FRANJA
    ============================================================ */
-console.log('--- la franja "Parecen el mismo asunto", y unir ---');
+console.log('--- el aviso de una línea junto a Tablón, sin franja encima de la lista ---');
 
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.click('#btn-recargar');
+await pagina.waitForTimeout(300);
 
-/* Un documento distinto en cada carpeta, y una nota en cada una, para
-   comprobar que la unión de verdad los junta. */
+await comprobar('ya no existe ninguna franja encima de la lista',
+  pagina.locator('#franja-unir').count(), 0);
+await comprobar('el aviso se ve, con el grupo de TRANSPORTE',
+  pagina.locator('#btn-duplicados').isVisible(), true);
+await comprobar('dice cuántos posibles duplicados hay',
+  pagina.locator('#btn-duplicados').textContent(), '⚠ 1 posible duplicado — Revisar');
+
+/* ============================================================
+   6. LA PANTALLA DE DUPLICADOS: COLUMNAS, DOCUMENTOS Y NOTAS
+   ============================================================ */
+console.log('--- la pantalla de Duplicados: columnas, documentos y notas ---');
+
+/* Un documento distinto en cada carpeta, para comprobar que se abren
+   en el visor de siempre. Y varias notas en EXISTENTE, para comprobar
+   que solo salen las 3 últimas y el "y N más". */
 await pagina.evaluate(async (datos) => {
   const cE = await window.__disco.abiertos.getDirectoryHandle(datos.existente);
   cE._hijos.set('260904 SOLICITUD Transporte.pdf', window.__disco.fich('260904 SOLICITUD Transporte.pdf', 'a'));
@@ -229,7 +261,12 @@ await pagina.evaluate(async (datos) => {
 
 await pagina.evaluate(async (datos) => {
   await window.App.anotar(datos.existente, {
-    notas: [{ texto: 'Nota del primero', quien: 'Francisco', cuando: '2026-09-04T10:00:00.000Z' }]
+    notas: [
+      { texto: 'Nota 1', quien: 'Francisco', cuando: '2026-09-04T09:00:00.000Z' },
+      { texto: 'Nota 2', quien: 'Francisco', cuando: '2026-09-04T09:05:00.000Z' },
+      { texto: 'Nota 3', quien: 'Francisco', cuando: '2026-09-04T09:10:00.000Z' },
+      { texto: 'Nota 4', quien: 'Francisco', cuando: '2026-09-04T09:15:00.000Z' }
+    ]
   });
   await window.App.anotar(datos.nueva, {
     notas: [{ texto: 'Nota del segundo', quien: 'Francisco', cuando: '2026-09-05T10:00:00.000Z' }],
@@ -238,13 +275,54 @@ await pagina.evaluate(async (datos) => {
 }, { existente: EXISTENTE, nueva: NUEVA });
 
 await pagina.click('#btn-recargar');
-await pagina.waitForSelector('#franja-unir .franja-unir-fila');
-await comprobar('la franja avisa de los dos que se parecen',
-  pagina.locator('#franja-unir').textContent().then(t =>
-    t.indexOf('Parecen el mismo asunto') !== -1 && t.indexOf(EXISTENTE) !== -1 && t.indexOf(NUEVA) !== -1), true);
+await pagina.click('#btn-duplicados');
+await pagina.waitForSelector('#pantalla-duplicados:not(.oculto)');
+await comprobar('se sale de la pantalla de asuntos abiertos',
+  pagina.locator('#pantalla-abiertos').isHidden(), true);
+await comprobar('el grupo se ve con sus dos columnas',
+  pagina.locator('.columna-duplicado').count(), 2);
+await comprobar('el nombre de cada asunto sale como enlace',
+  pagina.locator('.columna-nombre').allTextContents(), [EXISTENTE, NUEVA]);
 
-await pagina.locator('#franja-unir .franja-unir-fila').filter({ hasText: EXISTENTE })
-  .getByRole('button', { name: 'Unir', exact: true }).click();
+const columnaExistente = pagina.locator('.columna-duplicado').filter({ hasText: EXISTENTE });
+await pagina.waitForFunction(() =>
+  document.querySelectorAll('.columna-documento').length >= 2);
+await comprobar('el documento de cada asunto sale en su columna',
+  columnaExistente.locator('.columna-documento').first().textContent(),
+  '260904 SOLICITUD Transporte.pdf');
+await comprobar('solo salen las 3 notas más recientes, la última primero',
+  columnaExistente.locator('.columna-nota-texto').allTextContents(),
+  ['Nota 4', 'Nota 3', 'Nota 2']);
+await comprobar('y avisa de cuántas quedan sin enseñar',
+  columnaExistente.locator('.columna-nota ~ p.nota').textContent(), 'y 1 más.');
+
+/* el documento se abre en el visor de siempre */
+await columnaExistente.locator('.columna-documento').first().click();
+await pagina.waitForTimeout(200);
+await comprobar('el documento se abre en el visor lateral',
+  pagina.evaluate(() => document.body.classList.contains('con-visor')), true);
+await comprobar('con el nombre del documento',
+  pagina.locator('#visor-nombre').textContent(), '260904 SOLICITUD Transporte.pdf');
+await pagina.click('#visor-cerrar');
+
+/* el nombre lleva a la ficha del asunto */
+await pagina.locator('.columna-nombre').filter({ hasText: NUEVA }).click();
+await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await comprobar('el nombre de la columna abre la ficha de ese asunto',
+  pagina.locator('.ficha-nombre').textContent(), NUEVA);
+await pagina.click('#ficha-volver');
+
+/* ============================================================
+   7. UNIR SIGUE FUNCIONANDO IGUAL, DESDE LA PANTALLA DE DUPLICADOS
+   ============================================================ */
+console.log('--- unir, desde la pantalla de Duplicados ---');
+
+await pagina.click('.pestana[data-pantalla="abiertos"]');
+await pagina.click('#btn-recargar');
+await pagina.click('#btn-duplicados');
+await pagina.waitForSelector('#pantalla-duplicados:not(.oculto)');
+
+await pagina.getByRole('button', { name: 'Unir', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('pregunta cuál se queda', pagina.locator('#cuadro-titulo').textContent(), '¿Cuál se queda?');
 await comprobar('de partida, el de nombre más largo',
@@ -279,7 +357,8 @@ await comprobar('las notas de los dos se combinan, y se apunta la unión', pagin
   const j = JSON.parse(await (await h.getFile()).text());
   const notas = (j.asuntos[nombre] && j.asuntos[nombre].notas) || [];
   return notas.map(n => n.texto);
-}, EXISTENTE), ['Nota del primero', 'Nota del segundo', 'Unido con la carpeta «' + NUEVA + '» el ' + fechaHoyTexto]);
+}, EXISTENTE), ['Nota 1', 'Nota 2', 'Nota 3', 'Nota 4', 'Nota del segundo',
+  'Unido con la carpeta «' + NUEVA + '» el ' + fechaHoyTexto]);
 
 await comprobar('los pasos hechos se copian del otro, porque este no tenía ninguno', pagina.evaluate(async (nombre) => {
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
@@ -288,15 +367,19 @@ await comprobar('los pasos hechos se copian del otro, porque este no tenía ning
   return (j.asuntos[nombre] && j.asuntos[nombre].pasosHechos) || [];
 }, EXISTENTE), ['paso-uno']);
 
-await pagina.click('#btn-recargar');
-await pagina.waitForTimeout(300);
-await comprobar('la franja desaparece tras unir',
-  pagina.locator('#franja-unir .franja-unir-fila').count(), 0);
+await comprobar('tras unir, la pantalla de Duplicados se queda al día, sin ese grupo',
+  pagina.locator('#duplicados-lista .vacio').textContent(),
+  'No hay ningún posible duplicado ahora mismo.');
+await comprobar('y el aviso de la cabecera se esconde',
+  pagina.locator('#btn-duplicados').isHidden(), true);
+
+await pagina.click('#dup-pantalla-volver');
+await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 
 /* ============================================================
-   6. UNIR CON FICHEROS QUE CHOCAN: no se mueve ni se borra nada
+   8. FICHERO QUE CHOCA, Y "NO SON EL MISMO"
    ============================================================ */
-console.log('--- unir con un fichero del mismo nombre en las dos carpetas ---');
+console.log('--- unir con un fichero del mismo nombre en las dos carpetas, y descartar el grupo ---');
 
 const SANC_A = '260906 SANCION 26-27 1ºA Choque, Pedro 9998887';
 const SANC_B = '260906 SANCION 26-27 Choque, Pedro 9998887';
@@ -308,9 +391,11 @@ await pagina.evaluate(async (datos) => {
 }, { a: SANC_A, b: SANC_B });
 
 await pagina.click('#btn-recargar');
-await pagina.waitForSelector('#franja-unir .franja-unir-fila');
-await pagina.locator('#franja-unir .franja-unir-fila').filter({ hasText: SANC_A })
-  .getByRole('button', { name: 'Unir', exact: true }).click();
+await pagina.waitForSelector('#btn-duplicados:not(.oculto)');
+await pagina.click('#btn-duplicados');
+await pagina.waitForSelector('#pantalla-duplicados:not(.oculto)');
+
+await pagina.getByRole('button', { name: 'Unir', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');   /* acepta "¿Cuál se queda?" con el de partida */
 await pagina.waitForSelector('#capa:not(.oculto)');
@@ -331,6 +416,67 @@ await comprobar('las dos carpetas siguen ahí, sin tocar', pagina.evaluate(async
   const nb = []; for await (const p of b.entries()) nb.push(p[0]);
   return [na, nb];
 }, { a: SANC_A, b: SANC_B }), [['mismo.pdf'], ['mismo.pdf']]);
+
+/* como no se ha podido unir, se descarta el grupo desde ahí mismo */
+await pagina.getByRole('button', { name: 'No son el mismo', exact: true }).click();
+await pagina.waitForTimeout(300);
+await comprobar('el grupo desaparece de la pantalla tras descartarlo',
+  pagina.locator('#duplicados-lista .vacio').textContent(),
+  'No hay ningún posible duplicado ahora mismo.');
+await comprobar('se guarda el descarte, con quién lo hizo y los dos nombres', leerJson('no-duplicados.json'),
+  { descartados: [{
+    firma: [SANC_A, SANC_B].sort().join(''),
+    nombres: [SANC_A, SANC_B].sort(),
+    el: await pagina.evaluate(async () => {
+      const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+      const h = await g.getFileHandle('no-duplicados.json');
+      const j = JSON.parse(await (await h.getFile()).text());
+      return j.descartados[0].el;
+    }),
+    por: 'Francisco'
+  }] });
+
+await pagina.click('#dup-pantalla-volver');
+await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+await comprobar('el aviso ya no sale: el único grupo estaba descartado',
+  pagina.locator('#btn-duplicados').isHidden(), true);
+
+/* ============================================================
+   9. EL GRUPO DESCARTADO VUELVE A AVISAR SI CAMBIA QUIÉN LO FORMA
+   ============================================================ */
+console.log('--- un tercer asunto que encaja hace que el grupo (ya distinto) vuelva a avisar ---');
+
+const SANC_C = '260907 SANCION 26-27 1ºB Choque, Pedro 9998887';
+await crearCarpeta(SANC_C);
+await pagina.click('#btn-recargar');
+await pagina.waitForTimeout(300);
+
+await comprobar('con un tercer miembro el grupo ya no es el que se descartó, y vuelve a avisar',
+  pagina.locator('#btn-duplicados').isVisible(), true);
+await pagina.click('#btn-duplicados');
+await pagina.waitForSelector('#pantalla-duplicados:not(.oculto)');
+await comprobar('el grupo sale con los tres asuntos',
+  pagina.locator('.columna-duplicado').count(), 3);
+
+await pagina.click('#dup-pantalla-volver');
+
+/* ============================================================
+   10. AJUSTES: "DUPLICADOS DESCARTADOS", Y "VOLVER A AVISAR"
+   ============================================================ */
+console.log('--- Ajustes: Duplicados descartados, y Volver a avisar ---');
+
+await pagina.click('.pestana[data-pantalla="ajustes"]');
+await pagina.waitForSelector('#bloque-duplicados-descartados');
+await pagina.evaluate(() => { document.getElementById('bloque-duplicados-descartados').open = true; });
+await comprobar('Ajustes lista el grupo descartado, con sus dos nombres',
+  pagina.locator('#tabla-duplicados-descartados').textContent()
+    .then(t => t.indexOf(SANC_A) !== -1 && t.indexOf(SANC_B) !== -1), true);
+
+await pagina.getByRole('button', { name: 'Volver a avisar', exact: true }).click();
+await pagina.waitForTimeout(300);
+await comprobar('ya no queda ningún descarte', leerJson('no-duplicados.json'), { descartados: [] });
+await comprobar('y Ajustes lo dice',
+  pagina.locator('#tabla-duplicados-descartados .vacio').textContent(), 'Ninguno.');
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
