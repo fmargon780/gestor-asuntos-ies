@@ -26,6 +26,7 @@
 <link rel="stylesheet" href="css/registro.css">
 <link rel="stylesheet" href="css/relacionados.css">
 <link rel="stylesheet" href="css/duplicados.css">
+<link rel="stylesheet" href="css/papelera.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -504,6 +505,17 @@
       <button id="btn-olvidar" class="boton">Volver a elegir las carpetas</button>
         </div>
       </details>
+
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Papelera</span>
+          <span class="bloque-pie">Lo borrado se guarda aquí hasta que tú lo quites</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <div id="aviso-papelera-vieja" class="aviso aviso-ambar oculto"></div>
+      <div id="tabla-papelera" class="lista"></div>
+        </div>
+      </details>
     </section>
 
   </main>
@@ -577,6 +589,7 @@
 <script src="js/barra.js"></script>
 <script src="js/vista.js"></script>
 <script src="js/dni.js"></script>
+<script src="js/papelera.js"></script>
 
 <!-- Y ahora sí, a arrancar. -->
 <script src="js/inicio.js"></script>
