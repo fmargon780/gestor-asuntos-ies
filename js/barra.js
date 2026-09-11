@@ -76,6 +76,34 @@
     });
   }
 
+  /* ---------- el icono de Ajustes, para cuando está plegada ----------
+
+     Plegada, la barra esconde todas las pestañas (css/barra.css) y solo
+     deja el botón de las tres rayas: para ir a Ajustes había que abrirla
+     primero. Este icono lleva directo, y solo se ve plegada (B3 de
+     docs/AJUSTES-AGIL.md). */
+
+  function ponerElBotonDeAjustes() {
+    var barra = document.querySelector('#aplicacion .lateral');
+    if (!barra || $('btn-barra-ajustes')) return;
+
+    var b = document.createElement('button');
+    b.id = 'btn-barra-ajustes';
+    b.className = 'barra-boton barra-boton-ajustes';
+    b.type = 'button';
+    b.title = 'Ajustes';
+    b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+      'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<circle cx="12" cy="12" r="3"/>' +
+      '<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>' +
+      '</svg>';
+    b.onclick = function () { App.ir('ajustes'); };
+
+    var btnRayas = $('btn-barra');
+    if (btnRayas && btnRayas.parentNode) btnRayas.parentNode.insertBefore(b, btnRayas.nextSibling);
+    else barra.insertBefore(b, barra.firstChild);
+  }
+
   /* ---------- el botón grande de Nuevo asunto ---------- */
 
   function ponerElDeNuevoAsunto() {
@@ -96,6 +124,7 @@
 
   function arrancar() {
     ponerElBoton();
+    ponerElBotonDeAjustes();
     ponerElDeNuevoAsunto();
     poner(comoEstaba());
   }

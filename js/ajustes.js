@@ -6,6 +6,176 @@
    que se repiten los pintan sus propios módulos.
    ============================================================ */
 
+/* ---------- Ajustes ágiles (11-sep-2026) ----------
+
+   Con muchos tipos, la lista entera de las cuatro categorías, una
+   detrás de otra, obligaba a un scroll casi infinito para ver qué
+   había ya y no duplicar. Ahora se ve una categoría cada vez, con
+   pestañas arriba y un buscador que sí mira en las cuatro (docs/
+   AJUSTES-AGIL.md).
+
+   `App.E.categoriaAjustes` es la categoría que se está viendo: la
+   misma que trae puesta el desplegable `#nueva-categoria`, así que
+   una nueva alta va siempre a la que se está mirando. Se recuerda en
+   `localStorage`, clave `gestor-ajustes-categoria`. */
+
+App.CLAVE_CATEGORIA_AJUSTES = 'gestor-ajustes-categoria';
+
+App.categoriaAjustesInicial = function () {
+  try {
+    var v = window.localStorage.getItem(App.CLAVE_CATEGORIA_AJUSTES);
+    return (v && Nombres.CATEGORIAS.indexOf(v) !== -1) ? v : Nombres.CATEGORIAS[0];
+  } catch (e) { return Nombres.CATEGORIAS[0]; }
+};
+App.E.categoriaAjustes = App.categoriaAjustesInicial();
+
+App.cambiarCategoriaAjustes = function (cat) {
+  if (Nombres.CATEGORIAS.indexOf(cat) === -1) return;
+  App.E.categoriaAjustes = cat;
+  try { window.localStorage.setItem(App.CLAVE_CATEGORIA_AJUSTES, cat); } catch (e) {}
+  $('nueva-categoria').value = cat;
+  $('buscar-tipos').value = '';
+  App.pintarTiposAjustes();
+};
+
+/* El botón "Verlo" del aviso de duplicado: cambia a la categoría del
+   tipo que ya existe y le da un destello, para encontrarlo sin
+   buscarlo a mano. */
+App.verTipoEnAjustes = function (tipo) {
+  App.cambiarCategoriaAjustes(tipo.categoria);
+  var tarjeta = document.querySelector('#tabla-tipos .tarjeta-tipo[data-tipo="' +
+    (window.CSS && CSS.escape ? CSS.escape(tipo.tipo) : tipo.tipo) + '"]');
+  if (!tarjeta) return;
+  tarjeta.scrollIntoView({ block: 'center' });
+  tarjeta.classList.remove('destello');
+  void tarjeta.offsetWidth; /* reinicia la animación si ya se había dado */
+  tarjeta.classList.add('destello');
+  setTimeout(function () { tarjeta.classList.remove('destello'); }, 1000);
+};
+
+/* ---------- el menú de los tres puntos, para las tarjetas de tipos,
+   estados y tipos de documento ----------
+
+   `opciones` es una lista de { texto, onclick, peligro }. Se cierra al
+   elegir una, al pulsar fuera o con Escape; nunca se dejan dos abiertos
+   a la vez. */
+App.botonMenuTarjeta = function (opciones) {
+  var envoltorio = document.createElement('div');
+  envoltorio.className = 'tarjeta-tipo-menu-envoltorio';
+
+  var boton = document.createElement('button');
+  boton.type = 'button';
+  boton.className = 'tarjeta-tipo-menu-btn';
+  boton.title = 'Más opciones';
+  boton.setAttribute('aria-haspopup', 'true');
+  boton.textContent = '⋮';
+  envoltorio.appendChild(boton);
+
+  var menu = null;
+  function cerrar() {
+    if (!menu) return;
+    menu.remove();
+    menu = null;
+    document.removeEventListener('mousedown', alPulsarFuera, true);
+    document.removeEventListener('keydown', alPulsarTecla, true);
+  }
+  function alPulsarFuera(e) { if (!envoltorio.contains(e.target)) cerrar(); }
+  function alPulsarTecla(e) { if (e.key === 'Escape') cerrar(); }
+
+  boton.onclick = function (e) {
+    e.stopPropagation();
+    if (menu) { cerrar(); return; }
+    menu = document.createElement('div');
+    menu.className = 'tarjeta-tipo-menu';
+    opciones.forEach(function (op) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = op.texto;
+      if (op.peligro) b.className = 'boton-peligro';
+      b.onclick = function (ev) { ev.stopPropagation(); cerrar(); op.onclick(); };
+      menu.appendChild(b);
+    });
+    envoltorio.appendChild(menu);
+    document.addEventListener('mousedown', alPulsarFuera, true);
+    document.addEventListener('keydown', alPulsarTecla, true);
+  };
+
+  return envoltorio;
+};
+
+/* ---------- el aviso en vivo al escribir un nombre nuevo (A4 y A7) ----------
+
+   Uno para tipos (que además dice de qué categoría es el que ya
+   existe, y ofrece "Verlo"), y uno más sencillo, igual para estados y
+   para tipos de documento. Mismo criterio de "igual" o "parecido" que
+   ya vive en `U.parecidos` / `U.dejaCrear` (js/util.js): no se inventa
+   una comparación nueva. */
+
+App.pintarAvisoNuevoTipo = function () {
+  var campo = $('nuevo-tipo'), aviso = $('aviso-nuevo-tipo'), boton = $('btn-anadir-tipo');
+  if (!campo || !aviso || !boton) return;
+  var nombre = U.limpiarNombre(campo.value).toUpperCase();
+  if (!nombre) { aviso.className = 'aviso-en-vivo'; aviso.innerHTML = ''; boton.disabled = false; return; }
+
+  var nombres = App.E.tipos.map(function (t) { return t.tipo; });
+  var cerca = U.parecidos(nombre, nombres);
+  var mismo = cerca.filter(function (p) { return p.igual; })[0];
+  if (mismo) {
+    var tipoExistente = App.E.tipos.filter(function (t) { return t.tipo === mismo.nombre; })[0];
+    aviso.className = 'aviso-en-vivo aviso-en-vivo-malo';
+    aviso.innerHTML = 'Ya existe: ' + U.escapar(mismo.nombre) + ', en ' + U.escapar(tipoExistente.categoria) +
+      '. <button type="button" class="enlace" id="aviso-nuevo-tipo-verlo">Verlo</button>';
+    boton.disabled = true;
+    $('aviso-nuevo-tipo-verlo').onclick = function () { App.verTipoEnAjustes(tipoExistente); };
+    return;
+  }
+  boton.disabled = false;
+  if (cerca.length) {
+    aviso.className = 'aviso-en-vivo aviso-en-vivo-ambar';
+    aviso.textContent = 'Se parece a: ' + cerca.slice(0, 3).map(function (p) {
+      var t = App.E.tipos.filter(function (x) { return x.tipo === p.nombre; })[0];
+      return p.nombre + (t ? ' (' + t.categoria + ')' : '');
+    }).join(', ');
+  } else {
+    aviso.className = 'aviso-en-vivo'; aviso.innerHTML = '';
+  }
+};
+
+/* Uno genérico para estados y tipos de documento: no llevan categoría,
+   así que el aviso es más corto. */
+App.pintarAvisoSimple = function (idCampo, idAviso, idBoton, listaDeNombres) {
+  var campo = $(idCampo), aviso = $(idAviso), boton = $(idBoton);
+  if (!campo || !aviso || !boton) return;
+  var nombre = U.limpiarNombre(campo.value).toUpperCase();
+  if (!nombre) { aviso.className = 'aviso-en-vivo'; aviso.innerHTML = ''; boton.disabled = false; return; }
+
+  var cerca = U.parecidos(nombre, listaDeNombres());
+  var mismo = cerca.filter(function (p) { return p.igual; })[0];
+  if (mismo) {
+    aviso.className = 'aviso-en-vivo aviso-en-vivo-malo';
+    aviso.textContent = 'Ya existe: ' + mismo.nombre;
+    boton.disabled = true;
+    return;
+  }
+  boton.disabled = false;
+  if (cerca.length) {
+    aviso.className = 'aviso-en-vivo aviso-en-vivo-ambar';
+    aviso.textContent = 'Se parece a: ' + cerca.slice(0, 3).map(function (p) { return p.nombre; }).join(', ');
+  } else {
+    aviso.className = 'aviso-en-vivo'; aviso.innerHTML = '';
+  }
+};
+
+$('nuevo-tipo').oninput = App.pintarAvisoNuevoTipo;
+$('nuevo-estado').oninput = function () {
+  App.pintarAvisoSimple('nuevo-estado', 'aviso-nuevo-estado', 'btn-anadir-estado',
+    function () { return App.E.estados.map(function (e) { return e.nombre; }); });
+};
+$('nuevo-tipo-doc').oninput = function () {
+  App.pintarAvisoSimple('nuevo-tipo-doc', 'aviso-nuevo-tipo-doc', 'btn-anadir-tipo-doc',
+    function () { return App.E.tiposDocumento; });
+};
+
 /* ---------- cambiarle el nombre a un tipo de asunto ----------
 
    Los asuntos ABIERTOS se renombran: son pocos y es el trabajo vivo.
@@ -70,74 +240,125 @@ App.renombrarTipo = async function (tipo) {
   }
 };
 
-App.pintarAjustes = async function () {
-  var caja = $('tabla-tipos');
-  caja.innerHTML = '';
-  Nombres.CATEGORIAS.forEach(function (cat) {
-    var deEsta = App.E.tipos.filter(function (t) { return t.categoria === cat; });
-    if (!deEsta.length) return;
-    var t = document.createElement('h4');
-    t.textContent = cat;
-    t.style.cssText = 'margin:16px 0 4px;font-size:13px;color:#5d6b7a';
-    caja.appendChild(t);
-    deEsta.forEach(function (tipo) {
-      var f = document.createElement('div');
-      f.className = 'fila-tipo';
-      f.innerHTML = '<span class="nombre-tipo">' + U.escapar(tipo.tipo) + '</span>' +
-        ((tipo.alias && tipo.alias.length)
-          ? '<span class="suave">antes: ' + U.escapar(tipo.alias.join(', ')) + '</span>' : '');
+/* La tarjeta de un tipo, en la rejilla. `mostrarCategoria` es para los
+   resultados del buscador (A3), que mezcla las cuatro categorías. */
+App.tarjetaTipoAjustes = function (tipo, mostrarCategoria) {
+  var f = document.createElement('div');
+  f.className = 'tarjeta-tipo';
+  f.dataset.tipo = tipo.tipo;
 
-      /* Los días de plazo de este tipo. En blanco, el tipo no pone
-         fecha límite y el asunto nace sin plazo. */
-      var etiquetaPlazo = document.createElement('label');
-      etiquetaPlazo.className = 'plazo-tipo';
-      var casilla = document.createElement('input');
-      casilla.type = 'number';
-      casilla.min = '0';
-      casilla.className = 'campo campo-plazo';
-      casilla.value = (tipo.plazo ? String(tipo.plazo) : '');
-      casilla.placeholder = '—';
-      casilla.title = 'Días de plazo para resolver este tipo de asunto. ' +
-                      'Déjalo en blanco si no tiene plazo.';
-      casilla.onchange = async function () {
-        var n = parseInt(casilla.value, 10);
-        if (!isNaN(n) && n > 0) tipo.plazo = n; else delete tipo.plazo;
-        await App.guardarTipos();
-        U.aviso(tipo.plazo ? tipo.tipo + ': ' + tipo.plazo + ' días de plazo.'
-                           : tipo.tipo + ' se queda sin plazo.', 'bueno');
-      };
-      etiquetaPlazo.appendChild(casilla);
-      var diasTexto = document.createElement('span');
-      diasTexto.className = 'suave';
-      diasTexto.textContent = 'días de plazo';
-      etiquetaPlazo.appendChild(diasTexto);
-      f.appendChild(etiquetaPlazo);
+  var linea1 = document.createElement('div');
+  linea1.className = 'tarjeta-tipo-linea';
+  linea1.innerHTML = '<span class="tarjeta-tipo-nombre">' + U.escapar(tipo.tipo) + '</span>' +
+    (mostrarCategoria ? '<span class="marca-categoria">' + U.escapar(tipo.categoria) + '</span>' : '') +
+    ((tipo.alias && tipo.alias.length)
+      ? '<span class="suave tarjeta-tipo-antes">antes: ' + U.escapar(tipo.alias.join(', ')) + '</span>' : '');
+  f.appendChild(linea1);
 
-      var campos = document.createElement('button');
-      campos.className = 'boton';
-      campos.textContent = 'Campos';
-      campos.title = 'Qué datos lleva este tipo de asunto, y cuáles van al nombre de la carpeta';
-      campos.onclick = function () { App.abrirCamposDeTipo(tipo); };
-      f.appendChild(campos);
+  /* Los días de plazo de este tipo. En blanco, el tipo no pone fecha
+     límite y el asunto nace sin plazo. */
+  var linea2 = document.createElement('div');
+  linea2.className = 'tarjeta-tipo-linea tarjeta-tipo-sub';
+  var etiquetaPlazo = document.createElement('label');
+  etiquetaPlazo.className = 'plazo-tipo';
+  var casilla = document.createElement('input');
+  casilla.type = 'number';
+  casilla.min = '0';
+  casilla.className = 'campo campo-plazo';
+  casilla.value = (tipo.plazo ? String(tipo.plazo) : '');
+  casilla.placeholder = '—';
+  casilla.title = 'Días de plazo para resolver este tipo de asunto. ' +
+                  'Déjalo en blanco si no tiene plazo.';
+  casilla.onchange = async function () {
+    var n = parseInt(casilla.value, 10);
+    if (!isNaN(n) && n > 0) tipo.plazo = n; else delete tipo.plazo;
+    await App.guardarTipos();
+    U.aviso(tipo.plazo ? tipo.tipo + ': ' + tipo.plazo + ' días de plazo.'
+                       : tipo.tipo + ' se queda sin plazo.', 'bueno');
+  };
+  etiquetaPlazo.appendChild(casilla);
+  var diasTexto = document.createElement('span');
+  diasTexto.className = 'suave';
+  diasTexto.textContent = 'días de plazo';
+  etiquetaPlazo.appendChild(diasTexto);
+  linea2.appendChild(etiquetaPlazo);
+  f.appendChild(linea2);
 
-      var editar = document.createElement('button');
-      editar.className = 'boton';
-      editar.textContent = 'Cambiar el nombre';
-      editar.onclick = function () { App.renombrarTipo(tipo); };
-      f.appendChild(editar);
-      var quitar = document.createElement('button');
-      quitar.className = 'boton boton-peligro';
-      quitar.textContent = 'Quitar';
-      quitar.onclick = async function () {
+  f.appendChild(App.botonMenuTarjeta([
+    { texto: 'Campos', onclick: function () { App.abrirCamposDeTipo(tipo); } },
+    { texto: 'Cambiar el nombre', onclick: function () { App.renombrarTipo(tipo); } },
+    { texto: 'Quitar', peligro: true, onclick: async function () {
+        var ok = await U.preguntar('Quitar el tipo',
+          '<p>Se quita <strong>' + U.escapar(tipo.tipo) + '</strong> de la lista.</p>', 'Quitar');
+        if (!ok) return;
         App.E.tipos = App.E.tipos.filter(function (x) { return x.tipo !== tipo.tipo; });
         await App.guardarTipos();
-        App.pintarAjustes();
-      };
-      f.appendChild(quitar);
-      caja.appendChild(f);
-    });
-  });
+        App.pintarTiposAjustes();
+      } }
+  ]));
 
+  return f;
+};
+
+/* Las cuatro pestañas de categoría, con la cuenta de cada una. Cambiar
+   de pestaña cambia también el desplegable de alta, y al revés: los
+   dos mandos van siempre de acuerdo (A2). */
+App.pintarPestanasTipos = function (apagadas) {
+  var cont = $('pestanas-tipos');
+  if (!cont) return;
+  cont.innerHTML = '';
+  Nombres.CATEGORIAS.forEach(function (cat) {
+    var n = App.E.tipos.filter(function (t) { return t.categoria === cat; }).length;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'pestana-categoria' + (!apagadas && cat === App.E.categoriaAjustes ? ' activa' : '');
+    b.innerHTML = U.escapar(cat) + ' <span class="pestana-cuenta">' + n + '</span>';
+    b.onclick = function () { App.cambiarCategoriaAjustes(cat); };
+    cont.appendChild(b);
+  });
+  cont.classList.toggle('apagadas', !!apagadas);
+};
+
+/* A1 (una sola categoría cada vez) y A3 (el buscador, que mira en las
+   cuatro). Con dos letras o más el buscador manda; con menos, manda la
+   categoría de la pestaña / del desplegable. */
+App.pintarTiposAjustes = function () {
+  var caja = $('tabla-tipos');
+  var info = $('tipos-buscando-info');
+  if (!caja) return;
+  $('nueva-categoria').value = App.E.categoriaAjustes;
+
+  var buscado = U.normalizar($('buscar-tipos').value || '');
+  var enBusqueda = buscado.length >= 2;
+  App.pintarPestanasTipos(enBusqueda);
+
+  var items;
+  if (enBusqueda) {
+    items = App.E.tipos.filter(function (t) { return U.normalizar(t.tipo).indexOf(buscado) !== -1; });
+    info.textContent = 'Buscando en todas las categorías · ' + items.length +
+      (items.length === 1 ? ' resultado' : ' resultados');
+    info.classList.remove('oculto');
+  } else {
+    items = App.E.tipos.filter(function (t) { return t.categoria === App.E.categoriaAjustes; });
+    info.classList.add('oculto');
+    info.textContent = '';
+  }
+
+  caja.innerHTML = '';
+  if (!items.length) {
+    caja.innerHTML = '<div class="vacio">' +
+      (enBusqueda ? 'Nada encontrado con ese texto.' : 'Todavía no hay ningún tipo en esta categoría.') +
+      '</div>';
+    return;
+  }
+  items.forEach(function (tipo) { caja.appendChild(App.tarjetaTipoAjustes(tipo, enBusqueda)); });
+};
+
+$('nueva-categoria').onchange = function () { App.cambiarCategoriaAjustes($('nueva-categoria').value); };
+$('buscar-tipos').oninput = function () { App.pintarTiposAjustes(); };
+
+App.pintarAjustes = async function () {
+  App.pintarTiposAjustes();
   App.pintarTablaEstados();
   App.pintarCamposPropios();
 
@@ -167,19 +388,27 @@ App.pintarAjustes = async function () {
 
   var tdoc = $('tabla-tipos-documento');
   tdoc.innerHTML = '';
+  if (!App.E.tiposDocumento.length) {
+    tdoc.innerHTML = '<div class="vacio">Todavía no hay ningún tipo de documento.</div>';
+  }
   App.E.tiposDocumento.forEach(function (nombre) {
     var f = document.createElement('div');
-    f.className = 'fila-tipo';
-    f.innerHTML = '<span class="nombre-tipo">' + U.escapar(nombre) + '</span>';
-    var quitar = document.createElement('button');
-    quitar.className = 'boton boton-peligro';
-    quitar.textContent = 'Quitar';
-    quitar.onclick = async function () {
-      App.E.tiposDocumento = App.E.tiposDocumento.filter(function (x) { return x !== nombre; });
-      await App.guardarTiposDocumento();
-      App.pintarAjustes();
-    };
-    f.appendChild(quitar);
+    f.className = 'tarjeta-tipo';
+    f.dataset.tipoDoc = nombre;
+    var linea = document.createElement('div');
+    linea.className = 'tarjeta-tipo-linea';
+    linea.innerHTML = '<span class="tarjeta-tipo-nombre">' + U.escapar(nombre) + '</span>';
+    f.appendChild(linea);
+    f.appendChild(App.botonMenuTarjeta([
+      { texto: 'Quitar', peligro: true, onclick: async function () {
+          var ok = await U.preguntar('Quitar el tipo de documento',
+            '<p>Se quita <strong>' + U.escapar(nombre) + '</strong> de la lista.</p>', 'Quitar');
+          if (!ok) return;
+          App.E.tiposDocumento = App.E.tiposDocumento.filter(function (x) { return x !== nombre; });
+          await App.guardarTiposDocumento();
+          App.pintarAjustes();
+        } }
+    ]));
     tdoc.appendChild(f);
   });
 
@@ -638,13 +867,23 @@ App.pintarTablaEstados = function () {
   App.E.estados.forEach(function (estado, i) {
     var nombre = estado.nombre;
     var f = document.createElement('div');
-    f.className = 'fila-tipo';
-    f.innerHTML = '<span class="marca-estado ' + App.colorEstado(nombre) + '">' +
-                  U.escapar(nombre) + '</span>' +
-                  '<span class="nombre-tipo suave">' + App.cuantosCon(nombre) + '</span>';
+    f.className = 'tarjeta-tipo';
+    f.dataset.estado = nombre;
 
-    /* Esta casilla es la que decide en cuál de las tres tarjetas de
-       arriba aparece el asunto. */
+    var linea1 = document.createElement('div');
+    linea1.className = 'tarjeta-tipo-linea';
+    linea1.innerHTML = '<span class="marca-estado ' + App.colorEstado(nombre) + '">' +
+                  U.escapar(nombre) + '</span>' +
+                  '<span class="suave">' + App.cuantosCon(nombre) + '</span>';
+    f.appendChild(linea1);
+
+    /* Estos no van al menú: se usan mucho y conviene tenerlos a la
+       vista. El orden del trámite no se toca con esto (A7): las
+       flechas siguen moviendo el sitio en la secuencia, no la columna
+       de la rejilla. */
+    var linea2 = document.createElement('div');
+    linea2.className = 'tarjeta-tipo-linea tarjeta-tipo-sub';
+
     var etiqueta = document.createElement('label');
     etiqueta.className = 'interruptor interruptor-fila';
     var casilla = document.createElement('input');
@@ -661,35 +900,32 @@ App.pintarTablaEstados = function () {
     texto.textContent = 'Depende de otros';
     texto.title = 'Con esto marcado, el asunto sale en "A la espera de terceros"';
     etiqueta.appendChild(texto);
-    f.appendChild(etiqueta);
+    linea2.appendChild(etiqueta);
 
     var subir = document.createElement('button');
+    subir.type = 'button';
     subir.className = 'boton';
     subir.textContent = '▲';
     subir.title = 'Subirlo un puesto';
     subir.disabled = (i === 0);
     subir.onclick = function () { App.moverEstado(i, -1); };
-    f.appendChild(subir);
+    linea2.appendChild(subir);
 
     var bajar = document.createElement('button');
+    bajar.type = 'button';
     bajar.className = 'boton';
     bajar.textContent = '▼';
     bajar.title = 'Bajarlo un puesto';
     bajar.disabled = (i === App.E.estados.length - 1);
     bajar.onclick = function () { App.moverEstado(i, 1); };
-    f.appendChild(bajar);
+    linea2.appendChild(bajar);
 
-    var editar = document.createElement('button');
-    editar.className = 'boton';
-    editar.textContent = 'Cambiar el nombre';
-    editar.onclick = function () { App.renombrarEstado(nombre); };
-    f.appendChild(editar);
+    f.appendChild(linea2);
 
-    var quitar = document.createElement('button');
-    quitar.className = 'boton boton-peligro';
-    quitar.textContent = 'Quitar';
-    quitar.onclick = function () { App.quitarEstado(nombre); };
-    f.appendChild(quitar);
+    f.appendChild(App.botonMenuTarjeta([
+      { texto: 'Cambiar el nombre', onclick: function () { App.renombrarEstado(nombre); } },
+      { texto: 'Quitar', peligro: true, onclick: function () { App.quitarEstado(nombre); } }
+    ]));
 
     caja.appendChild(f);
   });
@@ -816,6 +1052,7 @@ $('btn-anadir-tipo').onclick = async function () {
   App.E.tipos.push({ tipo: nombre, categoria: $('nueva-categoria').value });
   await App.guardarTipos();
   $('nuevo-tipo').value = '';
+  App.pintarAvisoNuevoTipo();
   App.pintarAjustes();
   U.aviso('Tipo añadido.', 'bueno');
 };
@@ -828,6 +1065,7 @@ $('btn-anadir-estado').onclick = async function () {
   App.E.estados.push({ nombre: nombre, espera: false });
   await App.guardarEstados();
   $('nuevo-estado').value = '';
+  $('nuevo-estado').oninput();
   App.pintarTablaEstados();
   App.pintarFiltroEstado();
   U.aviso('Estado añadido.', 'bueno');
@@ -840,6 +1078,7 @@ $('btn-anadir-tipo-doc').onclick = async function () {
   App.E.tiposDocumento.push(nombre);
   await App.guardarTiposDocumento();
   $('nuevo-tipo-doc').value = '';
+  $('nuevo-tipo-doc').oninput();
   App.pintarAjustes();
   U.aviso('Tipo de documento añadido.', 'bueno');
 };
