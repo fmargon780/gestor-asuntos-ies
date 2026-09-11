@@ -5,7 +5,8 @@ Documento de contexto. Léelo entero antes de proponer nada.
 `docs/PLAN-ROBUSTEZ-2026-09.md` hecho entero: copias de seguridad, conflictos de Dropbox,
 pruebas automáticas en GitHub Actions, fichas sin carpeta y nombres repetidos. Resumen para
 Francisco en `docs/CAMBIOS-2026-09.md`. Después, el mismo día: "Registrar un documento en un
-paso", "Terceros relacionados con un asunto" y "Que no se dupliquen los asuntos", sección 5).
+paso", "Terceros relacionados con un asunto", "Que no se dupliquen los asuntos" y "Ajustes
+ágiles: encontrar y crear tipos sin scroll", sección 5).
 
 **Este documento vive en dos sitios**: en el proyecto de Claude (`Contexto.md`) y aquí, en
 `docs/CONTEXTO.md` del repositorio. Se cambia en el mismo commit en que cambia el código.
@@ -474,7 +475,8 @@ sueltan la frase que las explica; bajo 900 se quita el tablón y la cabecera baj
 bajo 620 todo a una columna.
 
 El tope de 1180 píxeles de `css/estilos.css` se anula en `css/vista.css`. Conservan tope las
-dos pantallas que se leen seguidas: Nuevo asunto (940) y Ajustes (1040).
+dos pantallas que se leen seguidas: Nuevo asunto (940) y Ajustes (1600 desde el 11-sep-2026,
+antes 1040; ver la sección 5, "Ajustes ágiles").
 
 Con esto van los **filtros plegados**, también en `js/vista.js`: estado, plazo y orden se van a
 un panel que abre el botón **Filtros**. Se recuerda si se dejó abierto (`gestor-filtros`).
@@ -720,6 +722,83 @@ hubiera evitado, porque nunca impide crear nada.
   fusiona ficheros, notas y guía, y borra la carpeta que sobra; y un choque de nombres entre las
   dos carpetas no mueve ni borra nada.
 
+### Ajustes ágiles: encontrar y crear tipos sin scroll (11-sep-2026)
+
+Sus palabras: *"Aunque me pide que elija a qué tipo de tercero asociar el tipo de asunto, debajo
+me aparecen todos los tipos de asuntos empezando por el alumnado, de modo que tengo que hacer un
+scroll-down casi infinito para ver qué tipos existen y no duplicar."* Y del botón de Ajustes en la
+barra: *"no esté debajo del todo, porque si hay mucho desplegado, me tengo que desplazar mucho
+hacia abajo."*
+
+**A. El bloque "Tipos de asunto" de Ajustes** (`js/ajustes.js`, `css/ajustes.css`):
+
+- **Una sola categoría a la vez.** La lista de `#tabla-tipos` obedece al desplegable
+  `#nueva-categoria`: solo se ve la categoría elegida. Se recuerda en `localStorage`
+  (`gestor-ajustes-categoria`), de partida ALUMNADO. `App.E.categoriaAjustes` es el estado; la
+  cambia `App.cambiarCategoriaAjustes(cat)`, que pone de acuerdo el desplegable y las pestañas.
+- **Cuatro pestañas** (`App.pintarPestanasTipos`), ALUMNADO · PERSONAL · EMPRESAS · OTROS, con la
+  cuenta de cada una. Pulsar una pestaña o cambiar el desplegable hace lo mismo: los dos mandos
+  van siempre de acuerdo. Una categoría sin tipos sale igual, con un 0.
+- **Buscador cruzado** (`#buscar-tipos`), a la derecha de las pestañas. Con dos letras o más,
+  `App.pintarTiposAjustes` deja de mirar la pestaña y enseña las coincidencias de **las cuatro
+  categorías**, cada una con su categoría en una etiqueta (`.marca-categoria`, ya existía para
+  otra cosa). Mientras se busca, las pestañas se apagan (clase `.apagadas`) y arriba sale
+  "Buscando en todas las categorías · N resultados" (`#tipos-buscando-info`). Al vaciar el campo
+  vuelve la categoría marcada. Es justo lo que evita duplicar sin verlo: el tipo aparece aunque
+  esté colgado de otra categoría.
+- **Aviso en vivo al escribir un tipo nuevo** (`#aviso-nuevo-tipo`, `App.pintarAvisoNuevoTipo`,
+  con el `oninput` de `#nuevo-tipo`). Usa la misma guardia de siempre (`U.parecidos` /
+  `U.dejaCrear`, `js/util.js`), no una comparación nueva. Si el nombre ya existe (mismo hueso),
+  línea roja "Ya existe: X, en CATEGORIA", el botón Añadir se apaga, y un enlace "Verlo"
+  (`App.verTipoEnAjustes`) cambia a esa categoría y da un destello de un segundo a su tarjeta.
+  Si solo se parece, línea ámbar con los parecidos: es un aviso, no una prohibición, y el botón
+  sigue encendido. Lo mismo, más sencillo (sin categoría), para los estados (`#aviso-nuevo-estado`)
+  y los tipos de documento (`#aviso-nuevo-tipo-doc`), con `App.pintarAvisoSimple`.
+- **Rejilla de tarjetas, no filas.** `#tabla-tipos`, `#tabla-estados` y `#tabla-tipos-documento`
+  pasan de `.fila-tipo` (una fila de lado a lado) a `.rejilla-tipos` con tarjetas `.tarjeta-tipo`:
+  `display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr))`. Cada tarjeta lleva su
+  contenido y, arriba a la derecha, un botón de tres puntos (`App.botonMenuTarjeta`, genérico) con
+  el menú de esa fila: Campos / Cambiar el nombre / Quitar para los tipos, Cambiar el nombre /
+  Quitar para los estados (que siguen con sus flechas de orden fuera del menú, a la vista: el
+  orden del trámite no se toca, solo cambia el sitio en la rejilla, no la columna) y Quitar para
+  los tipos de documento. Quitar sigue pidiendo confirmación en los tres (antes tipos y tipos de
+  documento no la pedían).
+- **Ajustes aprovecha el ancho**: su tope sube de 1040 a 1600 píxeles (`css/vista.css`,
+  `#pantalla-ajustes`). Nuevo asunto conserva su 940. La cabecera y el cuerpo de los bloques
+  comparten el mismo relleno lateral (`#pantalla-ajustes > .cabecera { padding: 0 16px }`), y los
+  párrafos de explicación no pasan de 90 caracteres de ancho (`max-width: 90ch`).
+- **Igual, en pequeño, para Tipos de documento y Estados del asunto**: misma rejilla, mismo menú
+  de tres puntos, mismo aviso en vivo. Campos propios y Asuntos que se repiten no se han tocado.
+
+**B. Llegar a Ajustes sin bajar la página** (`index.html`, `css/estilos.css`, `css/barra.css`,
+`js/barra.js`):
+
+- **La barra de la izquierda se queda fija** (`position: fixed`, con su propio `overflow-y:auto`
+  por si algún día no cupiera). El contenido se desplaza con un `margin-left` (232px, o 52px con
+  la barra plegada) en vez de dejar que la barra se lleve sitio del flujo. Así su pie —y ahora
+  también Ajustes— se ven sin bajar del todo, aunque la pantalla sea larga.
+- **Ajustes sube a la lista de pestañas**, justo después de "Personas y empresas" y separado por
+  una línea fina (`.separador-lateral`). En `.lateral-pie` se quedan solo el nombre de quien ha
+  entrado y el botón Salir. `js/fichas-huerfanas.js` y `js/recurrentes.js` siguen encontrando el
+  botón por `.pestana[data-pantalla="ajustes"]`, así que no hizo falta tocarlos.
+- **Con la barra plegada, un icono de rueda dentada** (`#btn-barra-ajustes`, junto al de las tres
+  rayas, `js/barra.js`) lleva directo a Ajustes, sin tener que abrir la barra primero. Solo se ve
+  plegada (`css/barra.css`).
+
+**Un tropiezo del que aprender.** La primera versión de la rejilla llamó a la tarjeta de un tipo
+`App.tarjetaDeTipo`; ese nombre ya estaba cogido en `js/asuntos-lista.js` (las tarjetas por tipo
+de la lista de asuntos abiertos). Se detectó con `pruebas/nombres-app.mjs` antes de subir nada, y
+se renombró a `App.tarjetaTipoAjustes`. Sigue valiendo la regla de siempre: comprobar con un
+`grep` antes de colgar una función nueva de `App`.
+
+Se comprueba con `pruebas/ajustes-agil.mjs`, a 1905 píxeles: una categoría a la vez, la pestaña y
+el desplegable de acuerdo en los dos sentidos, el buscador encuentra en otra categoría con su
+etiqueta, el aviso en vivo (igual y parecido) en tipos, veinte tipos de prueba en al menos tres
+columnas, la pestaña Ajustes visible sin más scroll con la página larga, y el icono de la rueda
+dentada con la barra plegada. Hizo falta ajustar dos pasos de `pruebas/navegador.mjs` y
+`pruebas/campos.mjs` que abrían "Cambiar el nombre" o "Campos" con un clic directo sobre
+`.fila-tipo`: ahora pasan primero por el menú de los tres puntos de la tarjeta.
+
 ---
 
 ## 6. Cómo trabajamos el código  ← LÉELO ANTES DE TOCAR NADA
@@ -804,7 +883,7 @@ de `App` va después del fichero que lo define.
 | `js/documentos-sueltos.js` | Los papeles sin asunto, **cerrar y reabrir**, y la vigilancia de la carpeta |
 | `js/asuntos-nuevo.js` | Crear un asunto, el cuadro de datos de un tercero y los pies |
 | `js/archivo-personas.js` | Personas y empresas, el ARCHIVO, y **cambiar los datos de un tercero** |
-| `js/ajustes.js` | La pantalla de Ajustes: tipos, estados y tipos de documento |
+| `js/ajustes.js` | La pantalla de Ajustes: tipos (con pestañas, buscador y aviso en vivo), estados y tipos de documento |
 | `js/puente.js` | El enganche de los módulos que se añaden por fuera (`window.Gestor`) |
 | `js/avisos.js` | El aviso de lo que vence |
 | `js/frescura.js` | El aviso de que el RegAlum.csv está viejo, y sus épocas |
@@ -828,7 +907,7 @@ de `App` va después del fichero que lo define.
 | `js/traer-datos.js` | El botón de traer los CSV de Séneca desde donde estén |
 | `js/lector.js` | El panel de la derecha para leer, con su borde para estirarlo |
 | `js/bandeja-correos.js` | La bandeja de correos y lo que deja un correo dentro del asunto |
-| `js/barra.js` | La barra plegable y el botón grande de Nuevo asunto |
+| `js/barra.js` | La barra plegable, el botón grande de Nuevo asunto y el icono de Ajustes plegado |
 | `js/vista.js` | Los filtros plegados y cuándo se ve el tablón |
 | `js/dni.js` | El DNI del alumnado, el aviso de que falta y la búsqueda por DNI |
 | `js/inicio.js` | La última línea: `App.arrancar()` |
@@ -852,6 +931,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/campos.mjs` | Prueba de los campos de cada tipo de asunto (ocho escenarios más editar) |
 | `pruebas/relacionados.mjs` | Prueba de los terceros relacionados con un asunto, y la nota al archivar |
 | `pruebas/duplicados.mjs` | Prueba de que no se dupliquen los asuntos, y de unir los que ya existen |
+| `pruebas/ajustes-agil.mjs` | Prueba de las pestañas, el buscador cruzado, el aviso en vivo y la barra fija |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO.md` | Este documento |
 | `docs/PLAN-ROBUSTEZ-2026-09.md` | El plan de robustez de septiembre de 2026 |
