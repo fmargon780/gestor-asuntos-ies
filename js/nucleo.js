@@ -21,6 +21,7 @@ App.E = {
   tipos: [],
   tiposDocumento: [],
   estados: [],         /* estados de tramitación, compartidos en _GESTOR */
+  campos: { propios: [], porTipo: {} },   /* los campos de cada tipo de asunto, ver js/campos.js */
   registro: { asuntos: {} },
   listaAbiertos: [],
   vista: 'departamento',   /* cuál de las tres tarjetas está elegida */
@@ -43,13 +44,14 @@ App.FICHERO_TIPOS = 'tipos.json';
 App.FICHERO_TIPOS_DOC = 'tipos-documento.json';
 App.FICHERO_ASUNTOS = 'asuntos.json';
 App.FICHERO_ESTADOS = 'estados.json';
+App.FICHERO_CAMPOS = 'campos.json';
 
 App.TITULO = 'Gestor de Asuntos';
 App.SEGUNDOS_ENTRE_MIRADAS = 20;
 
 /* App.VERSION vive en js/version.js, cargado justo después de este
    fichero: así cambiar la versión no obliga a resubir nucleo.js
-   entero, que es de los que más tarda en publicarse. */
+   entero, que es de los ficheros más grandes. */
 
 /* El atajo de siempre para coger un elemento de la página. Es global
    para todos los ficheros de la aplicación, y también cuelga de App
@@ -147,6 +149,7 @@ $('btn-entrar').onclick = async function () {
     await App.cargarTipos();
     await App.cargarTiposDocumento();
     await App.cargarEstados();
+    await App.cargarCampos();
     await App.cargarRegistro();
 
     Documentos.configurar({
@@ -179,7 +182,7 @@ $('btn-entrar').onclick = async function () {
    FICHEROS ROTOS, AL ENTRAR
    ========================================================== */
 
-/* Si alguno de los ocho ficheros compartidos no se puede leer, no se
+/* Si alguno de los ficheros compartidos no se puede leer, no se
    entra: se avisa en rojo, con un botón para restaurar la última copia
    de cada uno. Ver js/copias.js. */
 App.avisoFicherosRotos = function (rotos) {
@@ -257,6 +260,16 @@ App.guardarTiposDocumento = async function () {
     App.FICHERO_TIPOS_DOC, App.E.tiposDocumento, function (x) { return x; });
   App.E.tiposDocumento.sort();
   await Copias.guardar(App.E.gestor, App.FICHERO_TIPOS_DOC, App.E.tiposDocumento);
+};
+
+/* Los campos de cada tipo de asunto (js/campos.js). No hace falta
+   fusionar con el disco al arrancar: se relee entero cada vez que se
+   necesita de verdad (al abrir el cuadro de Campos en Ajustes, o al
+   guardar), que es donde de verdad importa no pisar al otro
+   ordenador. Aquí solo se deja preparado para el resto de pantallas
+   (Nuevo asunto, Editar, la ficha del asunto), que lo leen de memoria. */
+App.cargarCampos = async function () {
+  App.E.campos = await Campos.leer(App.E.gestor);
 };
 
 /* Se relee el fichero justo antes de escribirlo, por si el compañero ha
