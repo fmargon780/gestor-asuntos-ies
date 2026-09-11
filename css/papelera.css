@@ -1,0 +1,26 @@
+/* ============================================================
+   papelera.css — el bloque de la papelera en Ajustes.
+
+   Cada fila reutiliza `.fila-tipo` (css/estilos.css) y el botón de
+   peligro ya existente (`.boton-peligro`): no hace falta inventar
+   nada para el aspecto del botón Borrar.
+   ============================================================ */
+
+.fila-papelera {
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.papelera-icono {
+  font-size: 18px;
+  line-height: 1.4;
+  flex: 0 0 auto;
+}
+
+#aviso-papelera-vieja {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+#aviso-papelera-vieja strong { display: inline; }
