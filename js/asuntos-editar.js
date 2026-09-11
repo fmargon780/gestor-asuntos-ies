@@ -27,10 +27,13 @@ App.piezasDelAsunto = function (a) {
     tipo: a.ficha.tipo || a.leido.tipo || '',
     curso: a.ficha.curso || '',
     grupo: a.ficha.grupo || '',
+    campos: (a.ficha.campos && typeof a.ficha.campos === 'object') ? a.ficha.campos : {},
     descripcion: a.ficha.descripcion || '',
     tercero: a.ficha.tercero || ''
   };
-  if (deFicha.tercero && Nombres.montar(deFicha) === a.nombre) return deFicha;
+  var comprobacion = Nombres.montar(Object.assign({}, deFicha,
+    { campos: App.valoresGuardadosParaNombre(deFicha.tipo, deFicha.campos) }));
+  if (deFicha.tercero && comprobacion === a.nombre) return deFicha;
 
   var resto = a.leido.resto || '';
   var mCurso = resto.match(/^(\d{2}[-\/]\d{2})\s+/);
@@ -45,13 +48,78 @@ App.piezasDelAsunto = function (a) {
     tipo: a.leido.tipo || '',
     curso: curso,
     grupo: grupo,
+    campos: deFicha.campos,
     descripcion: '',
     tercero: U.limpiarNombre(resto)
   };
 };
 
+/* Los valores ya guardados de un asunto (`ficha.campos`), en el orden
+   configurado para su tipo y solo los que están marcados "Añadir al
+   nombre". Sirve tanto para comprobar si el nombre de hoy cuadra con
+   lo guardado, como para volver a montarlo tras una edición. */
+App.valoresGuardadosParaNombre = function (tipo, camposGuardados) {
+  var config = (App.E.campos && App.E.campos.porTipo && App.E.campos.porTipo[tipo]) || [];
+  var guardados = camposGuardados || {};
+  return config
+    .map(function (cfg) { return guardados[Campos.claveDeCampo(cfg)]; })
+    .filter(function (g) { return g && g.enNombre && g.valor; })
+    .map(function (g) { return g.valor; });
+};
+
+/* Los campos del cuadro de editar: los mismos que tiene puestos el
+   tipo en Ajustes, rellenos con lo que se guardó (no se vuelve a
+   preguntar al tercero: si algo cambió desde entonces, se corrige a
+   mano, igual que el resto del formulario). Si al cambiar el tipo en
+   el propio cuadro hubiera otro juego de campos, aquí se sigue
+   enseñando el del tipo con el que se abrió: cambiar el tipo de un
+   asunto ya abierto es raro, y no merece la pena releer el catálogo
+   de otra categoría en mitad de la edición. */
+App.pintarCamposEditar = function (tipo, guardados) {
+  var config = (App.E.campos && App.E.campos.porTipo && App.E.campos.porTipo[tipo]) || [];
+  if (!config.length) return { html: '', items: [] };
+
+  var items = config.map(function (cfg) {
+    var clave = Campos.claveDeCampo(cfg);
+    var g = (guardados && guardados[clave]) || {};
+    /* Igual que al crear el asunto: la clase y los valores de un
+       campo propio de lista viven en `propios`, no en `porTipo`. */
+    var cfgParaPintar = cfg;
+    if (cfg.origen === 'propio') {
+      var p = Campos.propioDe(cfg.id, App.E.campos);
+      if (p) cfgParaPintar = Object.assign({}, cfg, { clase: p.clase, valores: p.valores });
+    }
+    return { cfg: cfgParaPintar, clave: clave, nombre: Campos.nombreDeCampo(cfg, App.E.campos),
+             valor: g.valor || '', enNombre: g.enNombre !== false };
+  });
+
+  var filas = items.map(function (it, i) {
+    var idBase = 'ed-campo-' + i;
+    var control = (it.cfg.origen === 'propio' && it.cfg.clase === 'lista')
+      ? '<select id="' + idBase + '" class="campo"><option value="">Sin elegir</option>' +
+        (it.cfg.valores || []).map(function (v) {
+          return '<option value="' + U.escapar(v) + '"' + (v === it.valor ? ' selected' : '') + '>' +
+                 U.escapar(v) + '</option>';
+        }).join('') + '</select>'
+      : '<input id="' + idBase + '" class="campo" value="' + U.escapar(it.valor) + '">';
+    return '<div class="campo-fila">' +
+      '<label class="etiqueta">' + U.escapar(it.nombre) + (it.cfg.obligatorio ? ' *' : '') + '</label>' +
+      control +
+      '<label class="interruptor interruptor-fila"><input type="checkbox" id="' + idBase + '-en"' +
+        (it.enNombre ? ' checked' : '') + '><span>Añadir al nombre</span></label>' +
+      '</div>';
+  }).join('');
+
+  return {
+    html: '<label class="etiqueta">Datos del asunto</label>' +
+          '<div id="ed-campos" class="campos-lista">' + filas + '</div>',
+    items: items
+  };
+};
+
 App.editarAsunto = async function (a) {
   var p = App.piezasDelAsunto(a);
+  var bloqueCampos = App.pintarCamposEditar(p.tipo, p.campos);
 
   var hayTipo = App.E.tipos.some(function (t) { return t.tipo === p.tipo; });
   var opciones = '';
@@ -69,6 +137,12 @@ App.editarAsunto = async function (a) {
       }).join('') + '</optgroup>';
   });
 
+  /* Con los campos del tipo de más, el cuadro puede quedarse más alto
+     que la pantalla: se deja bajar por dentro, para que el botón de
+     Guardar siga alcanzable. */
+  var cuadroEditar = document.querySelector('#capa .cuadro');
+  if (cuadroEditar) cuadroEditar.classList.add('cuadro-alto');
+
   var promesa = U.preguntar('Editar el asunto',
     '<p class="explica">Al guardar se le cambia el nombre a la carpeta. ' +
     'Se copia primero y se comprueba que ha llegado todo; si algo fallara, ' +
@@ -83,6 +157,7 @@ App.editarAsunto = async function (a) {
     '<select id="ed-tipo" class="campo">' + opciones + '</select>' +
     '<label class="etiqueta">Grupo <span class="suave">(opcional)</span></label>' +
     '<input id="ed-grupo" class="campo" value="' + U.escapar(p.grupo) + '" placeholder="1ºA">' +
+    bloqueCampos.html +
     '<label class="etiqueta">Descripción corta <span class="suave">(opcional)</span></label>' +
     '<input id="ed-descripcion" class="campo" value="' + U.escapar(p.descripcion) + '">' +
     '<label class="etiqueta">Tercero</label>' +
@@ -93,12 +168,31 @@ App.editarAsunto = async function (a) {
       '<div class="vista-ruta">Ahora se llama: ' + U.escapar(a.nombre) + '</div>' +
     '</div>', 'Guardar');
 
+  var itemsCampos = bloqueCampos.items;
+
+  function valorEditado(item, i) {
+    var el = $('ed-campo-' + i);
+    return el ? (el.value || '').trim() : '';
+  }
+  function enNombreEditado(i) {
+    var el = $('ed-campo-' + i + '-en');
+    return !!(el && el.checked);
+  }
+
+  function camposParaNombre() {
+    return itemsCampos
+      .map(function (item, i) { return { valor: valorEditado(item, i), enNombre: enNombreEditado(i) }; })
+      .filter(function (v) { return v.enNombre && v.valor; })
+      .map(function (v) { return v.valor; });
+  }
+
   function piezasDelCuadro() {
     return {
       fecha: $('ed-fecha').value,
       tipo: $('ed-tipo').value,
       curso: $('ed-curso').value.trim(),
       grupo: $('ed-grupo').value.trim(),
+      campos: camposParaNombre(),
       descripcion: $('ed-descripcion').value.trim(),
       tercero: $('ed-tercero').value.trim()
     };
@@ -108,19 +202,41 @@ App.editarAsunto = async function (a) {
 
   ['ed-fecha', 'ed-curso', 'ed-tipo', 'ed-grupo', 'ed-descripcion', 'ed-tercero']
     .forEach(function (id) { $(id).oninput = refrescar; $(id).onchange = refrescar; });
+  itemsCampos.forEach(function (item, i) {
+    var el = $('ed-campo-' + i);
+    var enEl = $('ed-campo-' + i + '-en');
+    if (el) { el.oninput = refrescar; el.onchange = refrescar; }
+    if (enEl) enEl.onchange = refrescar;
+  });
   refrescar();
 
   var ok = await promesa;
+  if (cuadroEditar) cuadroEditar.classList.remove('cuadro-alto');
   if (!ok) return;
+
+  /* Obligatorio quiere decir que el asunto no se guarda sin él, igual
+     que al crearlo. */
+  for (var i = 0; i < itemsCampos.length; i++) {
+    if (itemsCampos[i].cfg.obligatorio && !valorEditado(itemsCampos[i], i)) {
+      U.aviso('Hace falta rellenar "' + itemsCampos[i].nombre + '".', 'malo');
+      return;
+    }
+  }
 
   var d = piezasDelCuadro();
   if (!d.tercero) { U.aviso('Hace falta el tercero: va siempre al final del nombre.', 'malo'); return; }
   var nombreNuevo = Nombres.montar(d);
   if (!nombreNuevo || nombreNuevo.length < 8) { U.aviso('Ese nombre se queda demasiado corto.', 'malo'); return; }
 
+  var camposGuardados = {};
+  itemsCampos.forEach(function (item, i) {
+    camposGuardados[item.clave] = { valor: valorEditado(item, i), enNombre: enNombreEditado(i) };
+  });
+
   var datos = {
     tipo: d.tipo, categoria: Nombres.categoriaDeTipo(App.E.tipos, d.tipo),
     tercero: d.tercero, curso: d.curso, grupo: d.grupo, descripcion: d.descripcion,
+    campos: camposGuardados,
     editadoEl: U.ahora(), editadoPor: App.E.usuario
   };
 

@@ -141,6 +141,9 @@ App.elegirTipo = function (t) {
   $('buscar-tercero').value = '';
   $('resultados-tercero').innerHTML = '';
   $('tercero-elegido').classList.add('oculto');
+  App.E.nuevo.configCampos = [];
+  $('bloque-campos').classList.add('oculto');
+  $('campos-lista-nuevo').innerHTML = '';
   App.actualizarLimiteNuevo();
   $('buscar-tercero').focus();
 };
@@ -273,6 +276,139 @@ App.botonAlta = function (texto) {
   return b;
 };
 
+/* ---------- los campos del tipo, ya rellenos con el tercero ----------
+
+   Después de elegir el tipo y el tercero sale un bloque "Datos del
+   asunto" con los campos que ese tipo tenga puestos en Ajustes
+   (js/campos.js), en su mismo orden, ya rellenos con lo que se sepa
+   de este tercero: la unidad, el puesto, el curso calculado... Si el
+   dato viene vacío -la modalidad de un alumno de la ESO-, el campo
+   sale vacío y se puede escribir a mano: no es un error.
+
+   Cada uno lleva al lado su "Añadir al nombre", que nace como esté
+   puesto en Ajustes pero se puede cambiar aquí, solo para este asunto. */
+
+App.filaCampoNuevo = function (item) {
+  var cfg = item.cfg;
+  var fila = document.createElement('div');
+  fila.className = 'campo-fila';
+
+  var etiqueta = document.createElement('label');
+  etiqueta.className = 'etiqueta';
+  etiqueta.textContent = item.nombre + (cfg.obligatorio ? ' *' : '');
+  fila.appendChild(etiqueta);
+
+  var entrada;
+  if (cfg.origen === 'propio' && cfg.clase === 'lista') {
+    entrada = document.createElement('select');
+    entrada.className = 'campo';
+    entrada.innerHTML = '<option value="">Sin elegir</option>' +
+      (cfg.valores || []).map(function (v) {
+        return '<option value="' + U.escapar(v) + '">' + U.escapar(v) + '</option>';
+      }).join('');
+  } else {
+    entrada = document.createElement('input');
+    entrada.className = 'campo';
+    entrada.value = item.valorInicial || '';
+  }
+  entrada.oninput = App.refrescarVista;
+  entrada.onchange = App.refrescarVista;
+  fila.appendChild(entrada);
+
+  var interruptor = document.createElement('label');
+  interruptor.className = 'interruptor interruptor-fila';
+  var casilla = document.createElement('input');
+  casilla.type = 'checkbox';
+  casilla.checked = cfg.enNombre !== false;
+  casilla.onchange = App.refrescarVista;
+  interruptor.appendChild(casilla);
+  var span = document.createElement('span');
+  span.textContent = 'Añadir al nombre';
+  interruptor.appendChild(span);
+  fila.appendChild(interruptor);
+
+  item.entradaEl = entrada;
+  item.casillaEl = casilla;
+  return fila;
+};
+
+/* Se llama al fijar el tercero: hasta entonces no hay de quién sacar
+   los valores de partida. Un tipo sin campos puestos en Ajustes se
+   comporta exactamente igual que antes de este cambio: el bloque ni
+   siquiera se enseña. */
+App.pintarCamposDelTipo = function () {
+  var caja = $('bloque-campos');
+  var contenedor = $('campos-lista-nuevo');
+  var tipo = App.E.nuevo.tipo;
+  var persona = App.E.nuevo.tercero;
+  var lista = (App.E.campos && App.E.campos.porTipo && App.E.campos.porTipo[tipo]) || [];
+
+  if (!lista.length) {
+    caja.classList.add('oculto');
+    contenedor.innerHTML = '';
+    App.E.nuevo.configCampos = [];
+    return;
+  }
+
+  caja.classList.remove('oculto');
+  contenedor.innerHTML = '';
+  App.E.nuevo.configCampos = lista.map(function (cfg) {
+    /* `porTipo` no guarda la clase ni los valores de un campo propio
+       (solo su id): hay que mirarlos en `propios`, que es donde de
+       verdad viven y donde pueden cambiar. Sin esto, un campo propio
+       de lista siempre salía como texto libre. */
+    var cfgParaPintar = cfg;
+    if (cfg.origen === 'propio') {
+      var p = Campos.propioDe(cfg.id, App.E.campos);
+      if (p) cfgParaPintar = Object.assign({}, cfg, { clase: p.clase, valores: p.valores });
+    }
+    return {
+      cfg: cfgParaPintar,
+      clave: Campos.claveDeCampo(cfg),
+      nombre: Campos.nombreDeCampo(cfg, App.E.campos),
+      valorInicial: Campos.valorInicial(cfg, persona)
+    };
+  });
+  App.E.nuevo.configCampos.forEach(function (item) {
+    contenedor.appendChild(App.filaCampoNuevo(item));
+  });
+
+  /* Si el tipo ya trae la unidad o el curso calculado, el interruptor
+     viejo de "Añadir el grupo" se esconde: si no, el grupo saldría dos
+     veces en el nombre. */
+  if (Campos.usaUnidadOCurso(lista)) {
+    $('bloque-grupo').classList.add('oculto');
+    $('campo-grupo').checked = false;
+  }
+};
+
+/* Los valores tal y como están ahora mismo en la pantalla, uno por
+   campo configurado. Sirve tanto para la vista previa y la validación
+   como para lo que se guarda en la ficha del asunto. */
+App.valoresCamposActuales = function () {
+  return (App.E.nuevo.configCampos || []).map(function (item) {
+    var valor = (item.entradaEl ? item.entradaEl.value : '').trim();
+    var enNombre = !!(item.casillaEl && item.casillaEl.checked);
+    return { clave: item.clave, nombre: item.nombre, valor: valor,
+             enNombre: enNombre, obligatorio: !!item.cfg.obligatorio };
+  });
+};
+
+/* Antes de crear: si falta un campo obligatorio, no se crea, se dice
+   cuál es y se enfoca. */
+App.validarCamposObligatorios = function () {
+  var items = App.E.nuevo.configCampos || [];
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    if (item.cfg.obligatorio && !(item.entradaEl.value || '').trim()) {
+      U.aviso('Hace falta rellenar "' + item.nombre + '".', 'malo');
+      item.entradaEl.focus();
+      return false;
+    }
+  }
+  return true;
+};
+
 App.fijarTercero = function (p) {
   App.E.nuevo.tercero = p;
   var texto = App.textoTercero(p);
@@ -308,6 +444,8 @@ App.fijarTercero = function (p) {
       '<div class="resultado-pie">' + U.escapar(App.pieDe(p)) + '</div>';
   }
 
+  App.pintarCamposDelTipo();
+
   $('bloque-detalles').classList.remove('oculto');
   App.refrescarVista();
 };
@@ -336,11 +474,15 @@ $('campo-fecha').oninput = function () {
 $('campo-grupo').onchange = function () { App.refrescarVista(); };
 
 App.datosDelFormulario = function () {
+  var camposParaNombre = App.valoresCamposActuales()
+    .filter(function (v) { return v.enNombre && v.valor; })
+    .map(function (v) { return v.valor; });
   return {
     fecha: $('campo-fecha').value,
     tipo: App.E.nuevo.tipo || '',
     curso: $('campo-curso').value.trim(),
     grupo: $('campo-grupo').checked ? App.grupoDelTercero() : '',
+    campos: camposParaNombre,
     descripcion: $('campo-descripcion').value.trim(),
     tercero: App.E.nuevo.tercero ? App.textoTercero(App.E.nuevo.tercero) : ''
   };
@@ -356,19 +498,40 @@ App.refrescarVista = function () {
   $('btn-crear').disabled = !nombre || nombre.length < 8;
 };
 
+/* Las rutas muy largas dan problemas en un Dropbox sincronizado: se
+   avisa y se deja decidir, en vez de cortar el nombre a lo tonto. */
+App.LARGO_MAXIMO_NOMBRE = 180;
+
 $('btn-crear').onclick = async function () {
+  if (!App.validarCamposObligatorios()) return;
   var d = App.datosDelFormulario();
   var nombre = Nombres.montar(d);
   if (!nombre) return;
+
+  if (nombre.length > App.LARGO_MAXIMO_NOMBRE) {
+    var seguir = await U.preguntar('El nombre es muy largo',
+      '<p>Este nombre tiene ' + nombre.length + ' caracteres:</p>' +
+      '<p class="nota">' + U.escapar(nombre) + '</p>' +
+      '<p>Las rutas muy largas dan problemas en un Dropbox sincronizado.</p>', 'Crear igual');
+    if (!seguir) return;
+  }
+
   try {
     if (await Carpetas.existe(App.E.abiertos, nombre)) {
       U.aviso('Ya hay un asunto abierto con ese mismo nombre.', 'malo');
       return;
     }
     var carpeta = await Carpetas.crear(App.E.abiertos, nombre);
+
+    var camposParaGuardar = {};
+    App.valoresCamposActuales().forEach(function (v) {
+      camposParaGuardar[v.clave] = { valor: v.valor, enNombre: v.enNombre };
+    });
+
     await App.anotar(nombre, {
       estado: 'abierto', tipo: d.tipo, categoria: App.E.nuevo.categoria,
       tercero: d.tercero, curso: d.curso, grupo: d.grupo, descripcion: d.descripcion,
+      campos: camposParaGuardar,
       situacion: $('campo-estado').value,
       via: $('campo-via').value,
       viaDato: $('campo-via-dato').value.trim(),
@@ -377,7 +540,7 @@ $('btn-crear').onclick = async function () {
     });
 
     /* Si el asunto se ha empezado desde un documento suelto, ese
-       documento se mete ahora en la carpeta recén creada. */
+       documento se mete ahora en la carpeta recién creada. */
     var traido = App.E.pendiente;
     if (traido) {
       try {
@@ -393,7 +556,7 @@ $('btn-crear').onclick = async function () {
 
     U.aviso('Asunto creado.', 'bueno');
     navigator.clipboard.writeText(nombre).catch(function () {});
-    App.E.nuevo = { tipo: null, categoria: null, tercero: null };
+    App.E.nuevo = { tipo: null, categoria: null, tercero: null, configCampos: [] };
     $('campo-descripcion').value = '';
     $('campo-estado').value = App.E.estados.length ? App.E.estados[0].nombre : '';
     $('campo-via').value = '';
@@ -403,6 +566,8 @@ $('btn-crear').onclick = async function () {
     $('campo-grupo').checked = false;
     $('bloque-tipos').classList.add('oculto');
     $('bloque-grupo').classList.add('oculto');
+    $('bloque-campos').classList.add('oculto');
+    $('campos-lista-nuevo').innerHTML = '';
     $('bloque-tercero').classList.add('oculto');
     $('bloque-detalles').classList.add('oculto');
     await App.verAbiertos();
@@ -474,90 +639,4 @@ App.altaTercero = async function (categoria, sugerencia) {
   U.aviso('Dado de alta.', 'bueno');
   $('buscar-tercero').value = valores[def.cabecera[0]];
   App.buscarTercero();
-};
-
-/* ---------- el buscador de terceros, reutilizable ----------
-
-   Lo mismo que hay dentro de "Nuevo asunto" (categoría + buscador +
-   resultados + alta), pero como una pieza que se puede montar en
-   cualquier otra pantalla: js/relacionados.js lo usa para elegir un
-   tercero relacionado, sin repetir la lógica de búsqueda.
-
-   `contenedor` es un elemento vacío donde se pinta todo.
-   `categoriaInicial` puede venir puesta, o null para empezar sin
-   categoría elegida.
-   `alElegir(categoria, persona, textoBuscado)` se llama cuando el
-   usuario pulsa un resultado (persona no es null) o pide dar de alta
-   uno nuevo (persona es null, y textoBuscado trae lo que había
-   escrito). El alta de verdad la hace quien llama, con
-   App.cuadroDeTercero: así aquí no se abren dos cuadros a la vez. */
-App.pintarBuscadorDeTercero = function (contenedor, categoriaInicial, alElegir) {
-  var estado = { categoria: categoriaInicial || null };
-
-  contenedor.innerHTML =
-    '<div class="categorias-mini" id="rel-categorias"></div>' +
-    '<div id="rel-buscador" class="oculto">' +
-      '<input id="rel-buscar" class="campo" placeholder="Escribe tres letras del nombre">' +
-      '<div id="rel-resultados" class="resultados"></div>' +
-    '</div>';
-
-  var cajaCategorias = contenedor.querySelector('#rel-categorias');
-  var cajaBuscador = contenedor.querySelector('#rel-buscador');
-  var campoBuscar = contenedor.querySelector('#rel-buscar');
-  var cajaResultados = contenedor.querySelector('#rel-resultados');
-
-  function pintarCategorias() {
-    cajaCategorias.innerHTML = '';
-    Nombres.CATEGORIAS.forEach(function (cat) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'categoria-mini-boton' + (estado.categoria === cat ? ' elegido' : '');
-      b.textContent = cat;
-      b.onclick = function () {
-        estado.categoria = cat;
-        pintarCategorias();
-        cajaBuscador.classList.remove('oculto');
-        campoBuscar.value = '';
-        cajaResultados.innerHTML = '';
-        campoBuscar.focus();
-      };
-      cajaCategorias.appendChild(b);
-    });
-  }
-
-  var temporizador = null;
-  async function buscar() {
-    var texto = campoBuscar.value;
-    if (U.normalizar(texto).length < 2) { cajaResultados.innerHTML = ''; return; }
-    cajaResultados.innerHTML = '<div class="explica">Buscando…</div>';
-    var fuente = await Datos.cargar(App.E.datos, estado.categoria);
-    var encontrados = Datos.buscar(fuente.lista, texto, 30);
-    cajaResultados.innerHTML = '';
-
-    encontrados.forEach(function (p) {
-      var d = document.createElement('div');
-      d.className = App.claseDeResultado(p);
-      d.innerHTML = '<div>' + U.escapar(p.nombre) + '</div>' +
-                    '<div class="resultado-pie">' + U.escapar(App.pieDe(p)) + '</div>';
-      d.onclick = function () { alElegir(estado.categoria, p, texto); };
-      cajaResultados.appendChild(d);
-    });
-
-    var alta = document.createElement('button');
-    alta.type = 'button';
-    alta.className = 'boton';
-    alta.style.marginTop = '6px';
-    alta.textContent = estado.categoria === 'ALUMNADO'
-      ? '+ Dar de alta un solicitante' : '+ Dar de alta uno nuevo';
-    alta.onclick = function () { alElegir(estado.categoria, null, texto); };
-    cajaResultados.appendChild(alta);
-  }
-
-  campoBuscar.oninput = function () {
-    clearTimeout(temporizador);
-    temporizador = setTimeout(buscar, 180);
-  };
-
-  pintarCategorias();
-  if (estado.categoria) cajaBuscador.classList.remove('oculto');
 };
