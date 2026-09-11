@@ -1,8 +1,10 @@
 # Proyecto: Gestor de Asuntos / Expedientes — IES Fuente Lucena
 
 Documento de contexto. Léelo entero antes de proponer nada.
-Última actualización: 11 de septiembre de 2026 (copia en el repositorio, tabla de ficheros
-puesta al día y plan de robustez en `docs/PLAN-ROBUSTEZ-2026-09.md`).
+Última actualización: 11 de septiembre de 2026 (plan de robustez de
+`docs/PLAN-ROBUSTEZ-2026-09.md` hecho entero: copias de seguridad, conflictos de Dropbox,
+pruebas automáticas en GitHub Actions, fichas sin carpeta y nombres repetidos. Resumen para
+Francisco en `docs/CAMBIOS-2026-09.md`).
 
 **Este documento vive en dos sitios**: en el proyecto de Claude (`Contexto.md`) y aquí, en
 `docs/CONTEXTO.md` del repositorio. Se cambia en el mismo commit en que cambia el código.
@@ -206,10 +208,19 @@ Decisiones de diseño ya aprobadas:
   `js/via-contacto.js` ofrece como botones los teléfonos o correos que ya están en el CSV del
   tercero, para no escribirlos a mano.
 - **Fecha límite** (`js/plazos.js`). Opcional, va en la ficha de `asuntos.json`, nunca en el
-  nombre. Los días se cuentan naturales. Lo que vence sale en rojo en las tarjetas.
+  nombre: cambia mientras se tramita, y renombrar la carpeta cada vez sería pedir problemas.
+  Los días se cuentan **naturales**, de calendario, que es lo que trae el papel del trámite; si
+  en un caso hace falta contar días hábiles, se cambia la fecha a mano. Un plazo vencido, el de
+  hoy o el de mañana salen en rojo o ámbar en la tarjeta del asunto; el resto, en gris. Los
+  tipos de asunto pueden llevar unos días de plazo por defecto (en Ajustes), para que la fecha
+  límite de un asunto nuevo salga puesta sola.
 - **Asuntos recurrentes** (`js/recurrentes.js`, `_GESTOR/recurrentes.json`). Gestiones que
-  vuelven cada mes, trimestre o curso. Se apuntan una vez y la aplicación avisa cuando toca.
-  **Las carpetas no se crean solas**: hasta que no se pulsa el botón no se crea nada.
+  vuelven cada mes, cada tres meses o una vez al año: la misma factura del mismo proveedor, el
+  mismo parte. Se apuntan una vez, con el tipo, el tercero, cada cuánto y el día (y el mes, si
+  es anual), y la aplicación calcula sola cuándo toca la siguiente a partir de la última vez que
+  se creó. **Las carpetas no se crean solas**: sale un aviso arriba de "Asuntos abiertos" y
+  hasta que no se pulsa el botón no se crea nada, para no llenar el Dropbox de carpetas vacías
+  que nadie ha pedido.
 - **¿Esto no lo hicimos ya?** (`js/duplicados.js`). Antes de abrir un asunto se mira si ese
   tercero ya tuvo otro igual. Se mira barato: solo su carpeta del ARCHIVO y los abiertos.
 - **Buscador de tipos** (`js/tipos-buscador.js`). Con muchos tipos, tres letras filtran la
@@ -619,6 +630,7 @@ de `App` va después del fichero que lo define.
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO.md` | Este documento |
 | `docs/PLAN-ROBUSTEZ-2026-09.md` | El plan de robustez de septiembre de 2026 |
+| `docs/CAMBIOS-2026-09.md` | El resumen en llano del plan de robustez, para Francisco |
 | `README.md` | — |
 
 ### Lo que la aplicación guarda en `_GESTOR`
@@ -825,9 +837,10 @@ Aparte, en `localStorage`: `gestor-barra`, `gestor-filtros` y `gestor-lector-anc
 
 ## 7. Qué falta por hacer
 
-**Primero, el plan de robustez** (`docs/PLAN-ROBUSTEZ-2026-09.md`, del análisis del
+**El plan de robustez está hecho** (`docs/PLAN-ROBUSTEZ-2026-09.md`, del análisis del
 11-sep-2026): copias de seguridad y fichero roto, copias en conflicto de Dropbox, pruebas
-automáticas en cada subida, fichas sin carpeta, nombres repetidos y documentación.
+automáticas en cada subida (GitHub Actions), fichas sin carpeta, nombres repetidos y esta misma
+documentación. El resumen para Francisco está en `docs/CAMBIOS-2026-09.md`.
 
 Después:
 
@@ -850,16 +863,18 @@ Después:
 12. Ver con el uso si el panel de la derecha se queda corto para leer: hoy el 46%.
 13. Ver con el uso si las tarjetas por tipo se quedan cortas: hoy son solo del tipo.
 14. Mirar si el tablón debería ensancharse: hoy son 320 píxeles fijos.
-15. **Arreglar `pruebas/navegador.mjs`** — en el plan de robustez, bloque 3.
-16. **Arreglar las dos comprobaciones de `pruebas/logica.mjs`** — plan de robustez, bloque 3.
-17. Las notas viejas de correo se quedan como están: son el rastro.
-18. Sacar `App.VERSION` a `js/version.js` — plan de robustez, bloque 5.
-19. Si el DNI no sale de nadie, **marcar la columna del documento al generar el RegAlum**.
-20. Ver con el uso si el aviso de "falta el DNI" conviene también en la tarjeta del asunto.
-21. **El botón "Guía n/m" de la tarjeta no llega a verse** — plan de robustez, bloque 5.
-22. Ver con el uso si el botón "Cambiar los datos" hace falta también en el buscador de Nuevo
+15. Las notas viejas de correo se quedan como están: son el rastro.
+16. Si el DNI no sale de nadie, **marcar la columna del documento al generar el RegAlum**.
+17. Ver con el uso si el aviso de "falta el DNI" conviene también en la tarjeta del asunto.
+18. Ver con el uso si el botón "Cambiar los datos" hace falta también en el buscador de Nuevo
     asunto.
-23. Ver con el uso si a las preguntas de la guía les hace falta algo más.
-24. **Cuando el uso lo pida** (análisis del 11-sep-2026): búsqueda dentro de las notas, cuentas
+19. Ver con el uso si a las preguntas de la guía les hace falta algo más.
+20. **Cuando el uso lo pida** (análisis del 11-sep-2026): búsqueda dentro de las notas, cuentas
     por tipo para la memoria de fin de curso, qué hacer con los asuntos vivos al cambiar de
     curso, y pasar el repositorio y Vercel a una cuenta del centro para el relevo.
+21. El plan de robustez dejó dos huecos a propósito, para no complicar de más: `App.guardarTipos`,
+    `App.guardarEstados`, `App.guardarTiposDocumento` y `recurrentes.js` releen el fichero antes
+    de guardar y suman lo que el otro ordenador haya añadido, pero no detectan sus **borrados**
+    (bloque 2). Y las copias en conflicto de `guias.json`, `recurrentes.json` y `frescura.json`
+    no se fusionan solas: avisan en Ajustes para elegir con cuál quedarse. Revisar si con el uso
+    hace falta algo más fino.
