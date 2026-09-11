@@ -146,6 +146,8 @@
                  '<span class="ficha-cuenta" id="ficha-cuenta-docs"></span>') +
           bloque('Otros asuntos de este tercero',
                  '<div id="ficha-otros" class="explica">Buscando…</div>') +
+          bloque('Personas y entidades relacionadas',
+                 '<div id="ficha-relacionados" class="explica">Leyendo…</div>') +
           bloque('Datos del asunto', datosDelAsunto(a, p)) +
           '<div id="ficha-contacto-caja"></div>' +
         '</div>' +
@@ -160,6 +162,19 @@
     pintarContacto(a);
     pintarDocumentos(a);
     pintarOtrosDelTercero(a);
+    pintarRelacionados(a, abierto);
+  }
+
+  /* Los relacionados se pintan y se guardan enteramente en
+     js/relacionados.js: aquí solo se le da el hueco. Si por lo que
+     sea ese fichero no ha cargado, el hueco se queda con "Leyendo…"
+     y no rompe el resto de la ficha. */
+  function pintarRelacionados(a, abierto) {
+    var caja = $('ficha-relacionados');
+    if (!caja || !window.Relacionados) return;
+    window.Relacionados.pintarEnFicha(caja, a, abierto, function () {
+      pintarRelacionados(a, abierto);
+    });
   }
 
   function datosDelAsunto(a, p) {
