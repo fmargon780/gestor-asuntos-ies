@@ -57,13 +57,44 @@ partida. Solo se enseña si el documento **no** lleva número de registro.
 - En la tarjeta del asunto de la lista de abiertos **no** se añade nada: la tarjeta se queda con
   lo justo, a propósito (ver `BOTONES_DE_LA_TARJETA` en `docs/CONTEXTO.md`).
 
-### 3. Preparado para leer el número solo, más adelante
+### 3. Leer el número de registro solo, del PDF sellado
 
-Deja el cuadro del punto 1 con un hueco para rellenar el registro desde fuera: una función
-`Registro.proponer({ anio, tipo, serie, numero })` que rellena las cuatro piezas. Hoy nadie la
-llama. Cuando se compruebe con un PDF sellado real de Séneca si el número va como texto dentro
-del PDF, se añadirá un módulo que lo lea y llame a esa función. **No lo hagas ahora**: no hay
-todavía un PDF de muestra.
+Comprobado el 11-sep-2026 con un PDF real de Séneca: **el sello va como texto dentro del PDF**,
+en todas las páginas, aunque el documento sea un escaneado (imagen). El texto que se extrae de
+una página es, tal cual:
+
+    29700692 - Fuente Lucena
+    2026/29700692/M000000000368ENTRADAFecha: 10/09/2026 13:03:02
+
+Es decir: `AÑO/CÓDIGO DEL CENTRO/SERIE + número con ceros por delante`, pegado a `ENTRADA` o
+`SALIDA`, pegado a `Fecha: dd/mm/aaaa hh:mm:ss`. La serie es `M` (manual) o `A` (automática).
+Ese ejemplo corresponde al registro `26EM0368`.
+
+Hacer:
+
+- Módulo nuevo `js/registro-lector.js`. Al elegir el fichero sellado en el punto 1, si es un
+  PDF, lee el texto de la **primera página** y busca con una expresión regular tolerante a
+  espacios y saltos de línea:
+  `(\d{4})\s*\/\s*\d+\s*\/\s*([MA])\s*0*(\d+)\s*(ENTRADA|SALIDA)`.
+  Con eso rellena las cuatro piezas: año (dos últimas cifras), E/S, M/A y el número con cuatro
+  dígitos rellenados con ceros por delante. Si el número tiene más de cuatro cifras, se dejan
+  todas y se avisa.
+- El cuadro del punto 1 sale ya relleno, con una línea verde "Leído del sello de Séneca", y el
+  foco en el botón de aceptar. Francisco solo confirma. Si no se encuentra el sello, el cuadro
+  sale vacío como siempre, sin error, con el foco en los cuatro dígitos.
+- Para leer el texto del PDF usa **pdf.js** (Mozilla), **copiado dentro del repositorio** en
+  `js/lib/` (el fichero principal y el `worker`), con la versión apuntada en un comentario. No
+  cargarlo de una dirección externa: la aplicación no debe depender de que otro servidor esté
+  vivo. Solo se carga cuando se pulsa Registrar, no al arrancar.
+- `js/visor.js` ya enseña PDF en el panel de la derecha; mira cómo lo hace antes de añadir nada,
+  por si ya carga pdf.js o se puede compartir.
+- La fecha del sello (`Fecha: 10/09/2026`) **no** cambia la fecha `AAMMDD` del nombre: esa es la
+  del propio documento, como manda la regla de nombres. Se guarda en la nota del punto 1.5:
+  "Registrado 26EM0368 el 10/09/2026 · <documento>".
+- El PDF de muestra **no se sube al repositorio**: lleva datos personales. La prueba monta un
+  PDF mínimo en el propio código de la prueba, con ese texto de sello dentro, y comprueba que
+  el cuadro sale relleno con `26`, Entrada, Manual y `0368`. Otra prueba con `SALIDA` y serie
+  `A`. Otra con un PDF sin sello: el cuadro sale vacío.
 
 ## Pruebas
 
@@ -77,6 +108,6 @@ todavía un PDF de muestra.
 ## Documentación
 
 Apartado nuevo en `docs/CONTEXTO.md`, sección 5: "Registrar un documento en un paso", con qué
-hace, dónde vive, y el hueco `Registro.proponer` para más adelante. Añade `pendientesRegistro`
+hace, dónde vive, el formato del sello de Séneca y cómo se lee. Añade `pendientesRegistro`
 a la descripción de `asuntos.json`. Mensaje final a Francisco: tres frases, qué va a ver en la
 ficha de un asunto.
