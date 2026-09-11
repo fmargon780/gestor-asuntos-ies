@@ -552,9 +552,14 @@ await pagina.click('#btn-crear');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 
 await pagina.click('.pestana[data-pantalla="ajustes"]');
-await pagina.waitForSelector('#tabla-tipos .fila-tipo');
-await pagina.locator('#tabla-tipos .fila-tipo').filter({ hasText: 'SANCION' })
-  .getByRole('button', { name: 'Cambiar el nombre' }).click();
+/* Se busca por nombre en vez de fiarse de la categoría marcada: el
+   tipo EVACUACION de más arriba dejó Ajustes mirando OTROS, y el
+   buscador de docs/AJUSTES-AGIL.md es justo para esto. */
+await pagina.fill('#buscar-tipos', 'sancion');
+await pagina.waitForSelector('#tabla-tipos .tarjeta-tipo');
+const tarjetaSancion = pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: 'SANCION' });
+await tarjetaSancion.locator('.tarjeta-tipo-menu-btn').click();
+await tarjetaSancion.getByRole('button', { name: 'Cambiar el nombre' }).click();
 await pagina.waitForSelector('#tipo-nuevo-nombre');
 await pagina.fill('#tipo-nuevo-nombre', 'expediente disciplinario');
 await pagina.click('#cuadro-aceptar');
