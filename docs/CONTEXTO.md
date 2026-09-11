@@ -562,6 +562,7 @@ de `App` va después del fichero que lo define.
 | `js/carpetas.js` | Habla con el selector de carpetas del navegador. Lee y escribe los JSON |
 | `js/copias.js` | Copia de seguridad diaria de los ficheros de `_GESTOR`, y detección de fichero roto |
 | `js/conflictos.js` | Las copias en conflicto que deja Dropbox: fusión sola o aviso para elegir |
+| `js/fichas-huerfanas.js` | Fichas de `asuntos.json` cuya carpeta ya no está: enlazar o borrar |
 | `js/nombres.js` | Monta los nombres de carpetas y documentos |
 | `js/plazos.js` | La fecha límite de los asuntos |
 | `js/guias.js` | Pintar y escribir una guía, con sus preguntas y opciones |
@@ -604,6 +605,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/logica.mjs` | Pruebas de la lógica, sin navegador |
 | `pruebas/copias.mjs` | Prueba de las copias de seguridad y del fichero roto |
 | `pruebas/conflictos.mjs` | Prueba de las copias en conflicto de Dropbox |
+| `pruebas/huerfanas.mjs` | Prueba de las fichas sin carpeta |
 | `pruebas/navegador.mjs` | Prueba de la aplicación entera |
 | `pruebas/tipos.mjs` | Prueba de las tarjetas por tipo |
 | `pruebas/correos.mjs` | Prueba de lo que deja un correo dentro de un asunto |
@@ -706,6 +708,22 @@ subida y en cada pull request a `main`, con Ubuntu, Node 20 y Chromium instalado
   botones ("Copiar nombre" y "Poner nombre"); y el "Texto adicional" del nombre de un documento
   ya no se rellena solo con el curso, así que la prueba lo escribe a mano.
 - Se añade `README.md` → cómo se ejecutan las pruebas.
+
+**Fichas sin carpeta** (11-sep-2026, bloque 4 del plan de robustez). La ficha de un asunto se
+busca por el nombre exacto de la carpeta. Si alguien renombra o mueve una carpeta a mano, por
+fuera de la aplicación (desde el explorador de archivos, no desde "Editar"), la ficha se queda
+huérfana: sigue en `asuntos.json`, pero no se ve en ningún lado.
+
+- En Ajustes, el bloque **Fichas sin carpeta** (`js/fichas-huerfanas.js`) calcula, al abrirlo,
+  qué claves de `asuntos.json` no tienen carpeta ni en abiertos ni en el archivo (si el archivo
+  no se ha leído todavía esta sesión, lo lee).
+- Cada huérfana se enseña con su estado y un resumen de sus notas, y dos botones: **Enlazar con
+  una carpeta** (con las carpetas de abiertos y archivo que no tienen ficha) y **Borrar la
+  ficha** (con confirmación; antes se guarda copia, como todo lo que toca `asuntos.json` desde
+  el bloque 1).
+- Un punto ámbar en el botón de Ajustes de la barra avisa de que hay huérfanas, sin tener que
+  entrar a mirar.
+- Se comprueba con `pruebas/huerfanas.mjs`.
 
 ### Las columnas de cada CSV que mantiene la aplicación
 

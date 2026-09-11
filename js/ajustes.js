@@ -230,6 +230,7 @@ App.pintarAjustes = async function () {
   carp.appendChild(App.filaEstado('Archivo', App.E.archivo.name));
 
   await App.pintarCopias();
+  await App.pintarFichasHuerfanas();
 };
 
 /* ---------- el bloque de Copias de seguridad ---------- */
