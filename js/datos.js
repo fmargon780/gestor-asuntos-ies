@@ -480,17 +480,28 @@ var Datos = (function () {
     return String(fila[i] === undefined ? '' : fila[i]).trim();
   }
 
+  /* clave por defecto === categoria. Se usa otra ('ALUMNADO_MANUAL',
+     'PERSONAL_MANUAL') para las altas a mano de alumnado y personal,
+     que conviven con su fichero de Séneca sin pisarlo.
+
+     Desde el 11-sep-2026 se guarda también `cabecera`: la cabecera de
+     verdad del fichero (o la de fábrica, si el fichero todavía no
+     existe). La usa js/campos.js para ofrecer, en Ajustes, qué
+     columnas de personal.csv, empresas.csv u otros.csv se pueden
+     asociar a un tipo de asunto: se lee del fichero, no de una lista
+     escrita a mano en el código. */
   async function cargarLista(dirDatos, categoria, clave) {
     clave = clave || categoria;
     if (CACHE[clave]) return CACHE[clave];
     var def = LISTAS[categoria];
     var texto = await Carpetas.leerTexto(dirDatos, def.fichero);
     var lista = [];
+    var cab = def.cabecera;
     if (texto === null) {
       await Carpetas.escribirTexto(dirDatos, def.fichero, aCsv(def.cabecera, []));
     } else {
       var t = aTabla(texto);
-      var cab = t.filas.length ? t.filas[0].map(function (x) { return String(x).trim(); }) : def.cabecera;
+      cab = t.filas.length ? t.filas[0].map(function (x) { return String(x).trim(); }) : def.cabecera;
       for (var f = 1; f < t.filas.length; f++) {
         var fila = t.filas[f];
         var campos = {};
@@ -522,7 +533,7 @@ var Datos = (function () {
       }
     }
     lista.sort(function (a, b) { return U.normalizar(a.nombre) < U.normalizar(b.nombre) ? -1 : 1; });
-    CACHE[clave] = { lista: lista, fichero: def.fichero };
+    CACHE[clave] = { lista: lista, fichero: def.fichero, cabecera: cab };
     return CACHE[clave];
   }
 
