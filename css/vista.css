@@ -23,7 +23,10 @@
    se lee mal. */
 .contenido { max-width: none; }
 #pantalla-nuevo .formulario { max-width: 940px; }
-#pantalla-ajustes { max-width: 1040px; }
+/* Ajustes, más ancho que antes (11-sep-2026): con muchos tipos, 1040px
+   solo dejaba ver una o dos columnas de la rejilla. Nuevo asunto sigue
+   con su 940, que es texto seguido y se lee peor más ancho. */
+#pantalla-ajustes { max-width: 1600px; }
 
 /* ---------- los filtros, plegados ---------- */
 

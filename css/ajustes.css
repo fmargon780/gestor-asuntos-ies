@@ -58,3 +58,110 @@
   .bloque-ajustes > summary { padding: 12px; }
   .bloque-pie { width: 100%; }
 }
+
+/* ============================================================
+   Ajustes ágiles (11-sep-2026): encontrar y crear tipos sin scroll.
+   docs/AJUSTES-AGIL.md
+   ============================================================ */
+
+/* Ajustes aprovecha el ancho: el título de la cabecera y el cuerpo de
+   los bloques terminan en el mismo borde, con el mismo relleno lateral
+   que usa `.bloque-ajustes > summary` y `.bloque-cuerpo`. */
+#pantalla-ajustes > .cabecera { padding: 0 16px; }
+#pantalla-ajustes .explica { max-width: 90ch; }
+
+/* ---------- el aviso en vivo, al escribir un nombre nuevo ---------- */
+.aviso-en-vivo {
+  font-size: 13px;
+  margin: -4px 0 12px;
+  min-height: 18px;
+}
+.aviso-en-vivo:empty { margin: 0; min-height: 0; }
+.aviso-en-vivo-malo { color: var(--rojo-linea); font-weight: 600; }
+.aviso-en-vivo-ambar { color: #8a6100; font-weight: 600; }
+.aviso-en-vivo .enlace { font-size: inherit; font-weight: 600; margin-left: 4px; }
+
+/* ---------- pestañas de categoría + buscador ---------- */
+.tipos-cabecera {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.pestanas-categoria { display: flex; flex-wrap: wrap; gap: 6px; }
+.pestanas-categoria.apagadas { opacity: .4; pointer-events: none; }
+.pestana-categoria {
+  font: inherit; font-size: 13px; font-weight: 600;
+  background: var(--papel); color: var(--tinta-suave);
+  border: 1px solid var(--linea); border-radius: 20px;
+  padding: 7px 14px; cursor: pointer; display: flex; align-items: center; gap: 7px;
+}
+.pestana-categoria:hover { border-color: #b9c6d6; color: var(--tinta); }
+.pestana-categoria.activa {
+  background: var(--azul); border-color: var(--azul); color: #fff;
+}
+.pestana-cuenta {
+  background: #eef1f5; color: var(--tinta); border-radius: 20px;
+  padding: 1px 8px; font-size: 11.5px; font-weight: 700;
+}
+.pestana-categoria.activa .pestana-cuenta { background: rgba(255,255,255,.25); color: #fff; }
+
+.buscar-tipos { flex: 1 1 260px; max-width: 340px; }
+
+.tipos-buscando-info { margin: -4px 0 10px; font-size: 13px; }
+
+/* ---------- la rejilla de tarjetas: tipos, estados y tipos de documento ---------- */
+.rejilla-tipos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 10px;
+}
+.rejilla-tipos > .vacio { grid-column: 1 / -1; }
+
+.tarjeta-tipo {
+  position: relative;
+  background: var(--papel); border: 1px solid var(--linea); border-radius: 8px;
+  padding: 9px 40px 9px 14px;
+  min-height: 64px;
+  display: flex; flex-direction: column; justify-content: center; gap: 5px;
+}
+.tarjeta-tipo-linea {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.tarjeta-tipo-nombre { font-weight: 600; }
+.tarjeta-tipo-antes { font-size: 12px; }
+.tarjeta-tipo-sub { font-size: 12px; }
+.tarjeta-tipo .plazo-tipo { display: flex; align-items: center; gap: 6px; }
+.tarjeta-tipo .campo-plazo { width: 62px; }
+
+/* Se destella un instante al llegar desde "Verlo", en el aviso de
+   duplicado: así se ve cuál es, sin tener que buscarla en la rejilla. */
+.tarjeta-tipo.destello { animation: destelloTipo 1s ease-out; }
+@keyframes destelloTipo {
+  0% { background: var(--ambar); border-color: var(--ambar-linea); }
+  100% { background: var(--papel); border-color: var(--linea); }
+}
+
+/* ---------- el menú de los tres puntos ---------- */
+.tarjeta-tipo-menu-envoltorio { position: absolute; top: 6px; right: 4px; }
+.tarjeta-tipo-menu-btn {
+  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; line-height: 1; background: transparent; border: 0; border-radius: 6px;
+  color: var(--tinta-suave); cursor: pointer;
+}
+.tarjeta-tipo-menu-btn:hover { background: #eef1f5; color: var(--tinta); }
+.tarjeta-tipo-menu {
+  position: absolute; top: 30px; right: 0; z-index: 8;
+  background: var(--papel); border: 1px solid var(--linea); border-radius: 8px;
+  box-shadow: var(--sombra); min-width: 168px; padding: 4px;
+  display: flex; flex-direction: column;
+}
+.tarjeta-tipo-menu button {
+  font: inherit; font-size: 13.5px; text-align: left; background: none; border: 0;
+  border-radius: 6px; padding: 8px 10px; cursor: pointer; color: var(--tinta);
+}
+.tarjeta-tipo-menu button:hover { background: #f0f3f7; }
+.tarjeta-tipo-menu button.boton-peligro { color: var(--rojo-linea); }
+
+@media (max-width: 900px) {
+  .tipos-cabecera { flex-direction: column; align-items: stretch; }
+  .buscar-tipos { max-width: none; }
+}

@@ -82,12 +82,19 @@ code { background: #eef1f5; padding: 1px 5px; border-radius: 4px; font-size: 13p
 /* ---------- estructura ---------- */
 #aplicacion { display: flex; min-height: 100vh; }
 
+/* Fija en pantalla: con la página larga (Ajustes con los bloques
+   abiertos, por ejemplo) antes había que bajar del todo para ver su
+   pie. Ahora se queda quieta, con su propio scroll por si algún día
+   no cupiera entera. */
 .lateral {
+  position: fixed; top: 0; left: 0;
   width: 232px; flex: 0 0 232px;
+  height: 100vh; overflow-y: auto;
   background: #16324e; color: #cfdcea;
   display: flex; flex-direction: column; padding: 18px 12px;
 }
 .marca { color: #fff; font-weight: 600; font-size: 16px; padding: 6px 12px 18px; }
+.separador-lateral { height: 1px; background: rgba(255,255,255,.14); margin: 6px 4px 10px; }
 .pestana {
   display: flex; justify-content: space-between; align-items: center;
   font: inherit; font-size: 14px; text-align: left;
@@ -100,7 +107,9 @@ code { background: #eef1f5; padding: 1px 5px; border-radius: 4px; font-size: 13p
 .lateral-pie { margin-top: auto; }
 .usuario { padding: 10px 12px; font-size: 12px; color: #8fa6bd; }
 
-.contenido { flex: 1; padding: 26px 32px 60px; max-width: 1180px; }
+/* La barra ya no ocupa sitio en el flujo (está fija): el hueco se deja
+   con este margen, que barra.css cambia a 52px cuando está plegada. */
+.contenido { flex: 1; padding: 26px 32px 60px; max-width: 1180px; margin-left: 232px; }
 .cabecera {
   display: flex; align-items: center; justify-content: space-between;
   gap: 16px; flex-wrap: wrap; margin-bottom: 18px;

@@ -21,12 +21,19 @@
 }
 #aplicacion.barra-plegada .lateral .marca,
 #aplicacion.barra-plegada .lateral .pestana,
-#aplicacion.barra-plegada .lateral .usuario {
+#aplicacion.barra-plegada .lateral .usuario,
+#aplicacion.barra-plegada .lateral .separador-lateral {
   display: none;
 }
 
 /* Con la barra plegada, el contenido gana ese sitio. */
-#aplicacion.barra-plegada .contenido { max-width: 1360px; }
+#aplicacion.barra-plegada .contenido { max-width: 1360px; margin-left: 52px; }
+
+/* El icono de la rueda dentada: solo se ve con la barra plegada, para
+   llegar a Ajustes sin tener que abrirla primero. Cuando está abierta,
+   Ajustes ya está en la lista de pestañas. */
+.barra-boton-ajustes { display: none; margin-bottom: 10px; }
+#aplicacion.barra-plegada .barra-boton-ajustes { display: flex; }
 
 /* ---------- el botón grande de Nuevo asunto ---------- */
 
