@@ -2,13 +2,13 @@
    copias.js — copias de seguridad de los ficheros de _GESTOR, y el
    aviso cuando alguno está roto.
 
-   Antes de escribir cualquiera de los ocho ficheros compartidos se
+   Antes de escribir cualquiera de los ficheros compartidos se
    guarda la versión que había, una copia por fichero y día, en
    _GESTOR/copias. Si algún día un fichero se estropea —un corte de luz
    a mitad de guardar, un conflicto de Dropbox mal resuelto a mano—, la
    copia de ayer sigue ahí.
 
-   Todo lo que escribe alguno de esos ocho ficheros llama a
+   Todo lo que escribe alguno de esos ficheros llama a
    Copias.guardar en vez de a Carpetas.guardarJson directamente, para
    que la copia se haga siempre y no se le pueda olvidar a nadie.
 
@@ -23,9 +23,12 @@ var Copias = (function () {
   var CARPETA = 'copias';
   var MAXIMO = 30;
 
-  /* Los ocho ficheros compartidos que hay que proteger. */
+  /* Los ficheros compartidos que hay que proteger. `campos.json`
+     (11-sep-2026, los campos de cada tipo de asunto) entró aquí igual
+     que los demás JSON de _GESTOR. */
   var FICHEROS = ['asuntos.json', 'guias.json', 'tipos.json', 'estados.json',
-                   'tipos-documento.json', 'tablon.json', 'recurrentes.json', 'frescura.json'];
+                   'tipos-documento.json', 'tablon.json', 'recurrentes.json', 'frescura.json',
+                   'campos.json'];
 
   function dosDigitos(n) { return String(n).padStart(2, '0'); }
 
@@ -74,14 +77,14 @@ var Copias = (function () {
     await podar(carpeta, base);
   }
 
-  /* Lo que hay que llamar en vez de Carpetas.guardarJson para los ocho
+  /* Lo que hay que llamar en vez de Carpetas.guardarJson para los
      ficheros compartidos: guarda la copia del día y después escribe. */
   async function guardar(gestor, nombre, objeto) {
     await copiarSiHaceFalta(gestor, nombre);
     await Carpetas.guardarJson(gestor, nombre, objeto);
   }
 
-  /* Mira los ocho ficheros compartidos y dice cuáles están rotos (existen
+  /* Mira los ficheros compartidos y dice cuáles están rotos (existen
      pero no se pueden interpretar). Se llama justo al entrar, antes de
      leer nada más: así no se pisa un fichero roto sin que nadie se
      entere. */
@@ -129,7 +132,7 @@ var Copias = (function () {
     return true;
   }
 
-  /* Para el bloque de Ajustes: las copias de los ocho ficheros, listas
+  /* Para el bloque de Ajustes: las copias de los ficheros, listas
      para pintar una tabla. */
   async function listarTodas(gestor) {
     var salida = {};

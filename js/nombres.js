@@ -4,9 +4,18 @@
    El nombre es la ficha del asunto. Si siempre se monta igual,
    el archivo se puede leer entero años después sin más ayuda.
 
-       AAMMDD  TIPO  [AÑO ACADÉMICO]  [GRUPO]  [DESCRIPCIÓN]  TERCERO
+       AAMMDD  TIPO  [AÑO ACADÉMICO]  [GRUPO]  [CAMPOS]  [DESCRIPCIÓN]  TERCERO
 
    Ejemplo:  260907 MATRICULA 26-27 3ºA Cordero Navas, Lucía 1139877
+
+   Desde el 11-sep-2026, entre el grupo y la descripción pueden entrar
+   los campos que el tipo de asunto tenga configurados en Ajustes (ver
+   js/campos.js), en su mismo orden: unidad, modalidad, lo que sea.
+   Quien decide qué valores entran ahí es quien llama a `montar`; este
+   fichero solo los limpia y los coloca. El interruptor viejo del grupo
+   y los campos no suelen darse a la vez: si el tipo ya lleva la unidad
+   o el curso como campo, el interruptor del grupo se esconde (lo hace
+   js/asuntos-nuevo.js), para que no salga dos veces.
    ============================================================ */
 var Nombres = (function () {
 
@@ -59,13 +68,21 @@ var Nombres = (function () {
 
   /* Monta el nombre de la carpeta a partir de sus piezas.
      El tercero va siempre el último. El grupo, si se pide, va detrás
-     del año académico y delante de la descripción. */
+     del año académico y delante de los campos y de la descripción.
+     `datos.campos`, si viene, es una lista de valores ya elegidos
+     (los que el usuario ha marcado "Añadir al nombre" y que no están
+     vacíos), en el orden en que deben salir: aquí solo se limpian y
+     se colocan, uno detrás de otro. */
   function montar(datos) {
     var partes = [];
     partes.push(U.aAaMmDd(datos.fecha));
     partes.push(U.limpiarNombre(datos.tipo).toUpperCase());
     if (datos.curso) partes.push(U.limpiarNombre(datos.curso));
     if (datos.grupo) partes.push(U.limpiarNombre(datos.grupo));
+    (datos.campos || []).forEach(function (v) {
+      var limpio = U.limpiarNombre(v);
+      if (limpio) partes.push(limpio);
+    });
     if (datos.descripcion) partes.push(U.limpiarNombre(datos.descripcion));
     partes.push(U.limpiarNombre(datos.tercero));
     return U.limpiarNombre(partes.filter(function (p) { return p; }).join(' '));
