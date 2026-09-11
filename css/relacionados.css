@@ -1,0 +1,36 @@
+/* ============================================================
+   relacionados.css — el bloque de "Personas y entidades
+   relacionadas" en la ficha de un asunto, y el "Relacionado con"
+   en la ficha de una persona.
+   ============================================================ */
+
+.relacionado-fila {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 0; border-bottom: 1px solid #f0f3f7; font-size: 13px;
+}
+.relacionado-fila:last-of-type { border-bottom: 0; }
+.relacionado-fila span:nth-child(2) { flex: 1 1 auto; word-break: break-word; }
+.relacionado-fila .rel-quitar { padding: 4px 10px; font-size: 12px; }
+
+/* El mini-selector de categoría del buscador de terceros, cuando se
+   monta suelto (dentro del cuadro de "Añadir relacionado"), sin las
+   descripciones largas de la pantalla de Nuevo asunto. */
+.categorias-mini { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.categoria-mini-boton {
+  font: inherit; font-size: 13px; padding: 6px 12px;
+  border: 1px solid var(--linea); border-radius: 20px;
+  background: var(--papel); color: var(--tinta); cursor: pointer;
+}
+.categoria-mini-boton:hover { border-color: #b9c6d6; }
+.categoria-mini-boton.elegido {
+  border-color: var(--azul); background: var(--azul-claro); color: var(--azul); font-weight: 600;
+}
+
+/* La lista de casillas al archivar, para elegir a quién se le deja la
+   nota. */
+.rel-confirmar-lista { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.rel-fila-confirmar { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+
+/* El "Relacionado con" en la ficha de una persona. */
+.ficha-relacionado-de { margin-top: 14px; }
+.ficha-relacionado-de .resultado { margin-bottom: 6px; }
