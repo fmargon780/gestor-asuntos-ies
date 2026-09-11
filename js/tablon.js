@@ -396,16 +396,20 @@
       }));
     }
 
+    /* Desde el 11-sep-2026 esto pasa por la papelera, igual que lo
+       demás: se puede devolver desde Ajustes › Papelera. */
     botones.appendChild(boton('Borrar', async function () {
-      var ok = await U.preguntar('Borrar la nota',
-        '<p class="explica">' + U.escapar(n.texto) + '</p>' +
-        '<p class="nota">' + (n.privada
-          ? 'Es una nota tuya. No se puede recuperar.'
-          : 'Se borra para todos, y no se puede recuperar.') + '</p>', 'Borrar');
+      if (!window.Papelera) return;
+      var ok = await window.Papelera.preguntarBorrar(n.texto);
       if (!ok) return;
-      cambiar(function (lista) {
-        return lista.filter(function (x) { return x.id !== n.id; });
-      });
+      try {
+        await window.Papelera.mandarDato('nota-tablon', n.texto, null, n);
+        await cambiar(function (lista) {
+          return lista.filter(function (x) { return x.id !== n.id; });
+        });
+      } catch (e) {
+        U.aviso('No he podido mandarla a la papelera: ' + e.message, 'malo');
+      }
     }));
 
     d.appendChild(botones);

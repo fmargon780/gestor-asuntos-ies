@@ -104,6 +104,8 @@ var Documentos = (function () {
                  (sinRegistro ? '<button type="button" class="boton' + (pendiente ? ' boton-ambar' : '') +
                    '" data-registrar="' + i + '" title="Dar registro de entrada o salida a este documento">' +
                    'Registrar</button>' : '') +
+                 '<button type="button" class="boton boton-peligro" data-borrar="' + i +
+                   '" style="margin-left:auto">Borrar</button>' +
                '</div>';
       }).join('') + '</div>';
     }
@@ -140,6 +142,24 @@ var Documentos = (function () {
       b.onclick = async function () {
         var f = lista[Number(b.dataset.registrar)];
         await Registro.pintarEnContenedor(caja, asuntoActual, f.nombre, function () { pintarLista(); });
+      };
+    });
+
+    Array.prototype.forEach.call(caja.querySelectorAll('[data-borrar]'), function (b) {
+      b.onclick = async function () {
+        var f = lista[Number(b.dataset.borrar)];
+        if (!window.Papelera) return;
+        var ok = await window.Papelera.preguntarBorrar(f.nombre);
+        if (!ok) return;
+        b.disabled = true;
+        try {
+          await Papelera.mandarDocumentoDeAsunto(asuntoActual, f.nombre);
+          U.aviso('Documento mandado a la papelera.', 'bueno');
+          await pintarLista();
+        } catch (e) {
+          U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+          b.disabled = false;
+        }
       };
     });
 
