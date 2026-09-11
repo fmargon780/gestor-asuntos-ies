@@ -5,7 +5,7 @@ Documento de contexto. Léelo entero antes de proponer nada.
 `docs/PLAN-ROBUSTEZ-2026-09.md` hecho entero: copias de seguridad, conflictos de Dropbox,
 pruebas automáticas en GitHub Actions, fichas sin carpeta y nombres repetidos. Resumen para
 Francisco en `docs/CAMBIOS-2026-09.md`. Después, el mismo día: "Registrar un documento en un
-paso", sección 5, con la lectura sola del sello de Séneca dentro del PDF).
+paso" y "Terceros relacionados con un asunto", sección 5).
 
 **Este documento vive en dos sitios**: en el proyecto de Claude (`Contexto.md`) y aquí, en
 `docs/CONTEXTO.md` del repositorio. Se cambia en el mismo commit en que cambia el código.
@@ -571,6 +571,51 @@ nombrar dos veces y salir de la ficha.
     sello dentro, para no necesitar ninguno de verdad.
 - Se comprueba con `pruebas/registro.mjs`.
 
+### Terceros relacionados con un asunto (11-sep-2026)
+
+Un asunto puede afectar a más de una persona o entidad, además de su tercero principal: un
+expediente disciplinario donde hay dos alumnos implicados, una incidencia entre dos empresas.
+Antes de esto no había dónde apuntarlo, y no se podía saber, desde la ficha del otro implicado,
+que ese asunto también le afecta.
+
+- **Bloque "Personas y entidades relacionadas"**, en la ficha del asunto (`js/ficha-asunto.js`),
+  al lado de "Otros asuntos de este tercero". **Solo ahí**: la tarjeta de la lista no lleva nada
+  de esto, a propósito (ver `BOTONES_DE_LA_TARJETA` más arriba).
+- Se guarda en la propia ficha del asunto, en `asuntos.json`: `ficha.relacionados`, una lista de
+  `{ categoria, nombre }`. Los asuntos de antes no tienen ese campo, y no hace falta migrar nada:
+  una ficha sin `relacionados` simplemente no tiene ninguno.
+- **Para elegir o dar de alta el relacionado se reutiliza todo lo que ya existía**: el nombre se
+  monta con `App.textoTercero` (las mismas reglas de la sección 4), el alta de uno nuevo con
+  `App.cuadroDeTercero` y `Datos.anadirALista`, y no se repiten dos veces con nombre parecido
+  gracias a `U.parecidos`/`U.dejaCrear`, igual que los tipos o los estados. El propio buscador de
+  "Nuevo asunto" se ha sacado a una función reutilizable, `App.pintarBuscadorDeTercero`
+  (categoría + buscador + resultados + alta), en `js/asuntos-nuevo.js`, para no repetir esa
+  lógica en el módulo nuevo.
+- **Nunca se copia ningún documento del asunto.** Al archivar, si el asunto tiene relacionados,
+  se pregunta a cuáles de ellos avisar (todos marcados por defecto) y, en la carpeta de cada uno
+  dentro de ARCHIVO (se crea si no existe), se deja una carpeta `(RELACIONADO) <nombre del
+  asunto>` con un único fichero de texto, `DONDE ESTA ESTE ASUNTO.txt`, que dice dónde está el
+  asunto de verdad. Al reabrir el asunto, esa carpeta-nota se borra sola; **si alguien ha metido
+  algo más dentro, no se borra**, y se avisa para revisarla a mano.
+- Esas carpetas-nota viven al mismo nivel que un asunto de verdad (`ARCHIVO / categoría /
+  tercero / carpeta`), así que sin más se confundirían con asuntos archivados: `App.verArchivo`
+  y `Duplicados.delTercero` (usado por "Otros asuntos de este tercero") se envuelven para
+  quitarlas de en medio, por su nombre (`(RELACIONADO) `).
+- La ficha de la persona o empresa (`js/archivo-personas.js`, `App.verFicha`) enseña un bloque
+  "Relacionado con este asunto" cuando aparece como relacionada de alguno, esté el asunto abierto
+  o archivado, mirando directamente `App.E.registro.asuntos` (ya está en memoria).
+- Vive en `js/relacionados.js`, cargado después de `js/duplicados.js` (envuelve
+  `Duplicados.delTercero`) y de `js/archivo-personas.js` (envuelve `App.verFicha` y
+  `App.verArchivo`); no importa que cargue antes o después de `js/ficha-asunto.js`, porque a
+  `window.Relacionados` solo se le llama en tiempo de uso, no al cargar el fichero.
+- Se comprueba con `pruebas/relacionados.mjs`: sin relacionados no cambia nada, alta de dos
+  relacionados y su guardado en `asuntos.json`, el propio tercero no se puede añadir como
+  relacionado, ni el mismo relacionado dos veces (ni con un nombre casi igual), las notas al
+  archivar con su texto y su ruta, la carpeta del relacionado se crea si falta, al reabrir se
+  borran las dos notas pero la lista de relacionados sigue en la ficha, una nota con algo más
+  dentro no se borra y avisa, y la ficha de la persona enseña el asunto relacionado, abierto y
+  archivado.
+
 ---
 
 ## 6. Cómo trabajamos el código  ← LÉELO ANTES DE TOCAR NADA
@@ -664,6 +709,7 @@ de `App` va después del fichero que lo define.
 | `js/lib/pdf.min.js`, `js/lib/pdf.worker.min.js` | pdf.js (Mozilla) 3.11.174, copiado tal cual |
 | `js/ficha-asunto.js` | La pantalla de un asunto: guía, notas, documentos y contacto |
 | `js/duplicados.js` | ¿Esto no lo hicimos ya? Asuntos iguales del mismo tercero |
+| `js/relacionados.js` | Terceros relacionados con un asunto, y la nota al archivar |
 | `js/visor.js` | El panel de la derecha para ver un documento (`con-visor`) |
 | `js/tipos-buscador.js` | Buscar el tipo de asunto por letras, y los más usados arriba |
 | `js/via-contacto.js` | Los teléfonos y correos del tercero, como botones |
@@ -696,6 +742,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/guias.mjs` | Prueba de escribir la guía desde la ficha, y del plegado |
 | `pruebas/opciones.mjs` | Prueba de las preguntas con opciones, con el caso de la factura |
 | `pruebas/registro.mjs` | Prueba de registrar un documento en un paso, sin nombrarlo dos veces |
+| `pruebas/relacionados.mjs` | Prueba de los terceros relacionados con un asunto, y la nota al archivar |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO.md` | Este documento |
 | `docs/PLAN-ROBUSTEZ-2026-09.md` | El plan de robustez de septiembre de 2026 |
@@ -711,7 +758,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `tipos.json` | Tipos de asunto y su categoría |
 | `tipos-documento.json` | Tipos de documento |
 | `estados.json` | Estados de tramitación, en el orden del trámite |
-| `asuntos.json` | Ficha de cada asunto: quién lo abrió, estado, vía, notas, cierre, pasos, fecha límite, documentos pendientes de registro |
+| `asuntos.json` | Ficha de cada asunto: quién lo abrió, estado, vía, notas, cierre, pasos, fecha límite, documentos pendientes de registro, relacionados |
 | `guias.json` | Los pasos de cada tipo de asunto, con sus preguntas y opciones |
 | `recurrentes.json` | Los asuntos que se repiten y cuándo tocan |
 | `frescura.json` | Cada cuántos días avisar de que el RegAlum.csv está viejo |
