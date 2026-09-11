@@ -4,7 +4,8 @@ Documento de contexto. Léelo entero antes de proponer nada.
 Última actualización: 11 de septiembre de 2026 (plan de robustez de
 `docs/PLAN-ROBUSTEZ-2026-09.md` hecho entero: copias de seguridad, conflictos de Dropbox,
 pruebas automáticas en GitHub Actions, fichas sin carpeta y nombres repetidos. Resumen para
-Francisco en `docs/CAMBIOS-2026-09.md`).
+Francisco en `docs/CAMBIOS-2026-09.md`. Después, el mismo día: "Registrar un documento en un
+paso", sección 5, con la lectura sola del sello de Séneca dentro del PDF).
 
 **Este documento vive en dos sitios**: en el proyecto de Claude (`Contexto.md`) y aquí, en
 `docs/CONTEXTO.md` del repositorio. Se cambia en el mismo commit en que cambia el código.
@@ -506,6 +507,70 @@ abrir la ventana de redactar se apunta sola una nota (**una sola vez por cuadro*
 **Solo Séneca:** **no hay campo Para**, y hay **un solo botón que se va cambiando**:
 "1. Copiar el asunto" → "2. Ahora, copiar el texto" → "Copiado. Pégalo y envía".
 
+### Registrar un documento en un paso (11-sep-2026)
+
+Dar registro de entrada o salida a un documento era nombrarlo dos veces: se nombraba sin
+registro, había que salir de la ficha, añadir la copia sellada como si fuera otro documento y
+volver a escribir la fecha, el tipo y el texto adicional, ahora con el número de registro. Los
+dos ficheros hay que conservarlos (el original y el sellado), así que lo único que sobraba era
+nombrar dos veces y salir de la ficha.
+
+- **Botón Registrar**, en cada documento que todavía no lleve las cuatro piezas del registro en
+  su nombre: en la lista de "Gestionar documentos" y en la lista de la ficha del asunto. Al
+  pulsarlo se elige la copia sellada donde esté, y luego solo se pide **el número de registro**:
+  el resto del nombre (fecha, tipo, texto adicional) se lee del documento original, con
+  `Documentos.leerNombre`, igual que hace el cuadro de nombrar documentos. El nombre se monta
+  con `Nombres.montarDocumento`, la copia se guarda con `Carpetas.copiarFicheroEn`, el original
+  se queda como está, y se apunta una nota en el asunto: "Registrado 26EM1234 · <nombre del
+  documento>". Si ya hay un fichero con ese nombre, avisa y no lo sobrescribe.
+- **Casilla "Pendiente de registro"**, en el cuadro de nombrar un documento. Solo se enseña
+  cuando el documento no lleva registro. Lo marcado se guarda en la ficha del asunto, en
+  `_GESTOR/asuntos.json`, en una lista `pendientesRegistro` con los nombres de fichero. Un
+  documento pendiente lleva una marca ámbar "Sin registrar" al lado de su nombre, y su botón
+  Registrar sale destacado. Al registrarlo se quita solo de la lista; al renombrarlo desde
+  "Gestionar documentos", el nombre de la lista se actualiza con él.
+- **La tarjeta del asunto no lleva nada de esto**: se queda con lo justo, a propósito (ver
+  `BOTONES_DE_LA_TARJETA` más arriba).
+- Vive en `js/registro.js`, un módulo aparte porque lo usan dos sitios que no comparten cuadro:
+  "Gestionar documentos" (`js/documentos.js`) ya tiene su propio `U.preguntar` abierto, así que
+  ahí se pinta DENTRO de ese mismo cuadro (`Registro.pintarEnContenedor`); la ficha del asunto
+  (`js/ficha-asunto.js`) no tiene ningún cuadro abierto, así que ahí se abre uno nuevo
+  (`Registro.abrirCuadro`). **Solo hay un cuadro de diálogo en toda la aplicación**: abrir un
+  segundo `U.preguntar` mientras el primero sigue esperando le roba los botones al de fuera, y
+  el de fuera se queda colgado para siempre.
+- `Registro.proponer({ anio, tipo, serie, numero })` rellena las cuatro piezas del cuadro ya
+  pintado; `tipo` es `E`/`S` (entrada o salida) y `serie` es `M`/`A` (manual o automática).
+- **Leer el número solo, del sello de Séneca dentro del PDF** (11-sep-2026, más tarde el mismo
+  día). Comprobado con un PDF real: el sello va como texto en la primera página, aunque el
+  documento sea un escaneado (imagen). El texto trae, tal cual:
+
+      2026/29700692/M000000000368ENTRADAFecha: 10/09/2026 13:03:02
+
+  `AÑO / CÓDIGO DEL CENTRO / SERIE + número con ceros por delante`, pegado a `ENTRADA` o
+  `SALIDA`, pegado a `Fecha: dd/mm/aaaa hh:mm:ss`. Ese ejemplo es el registro `26EM0368`.
+  - `js/registro-lector.js` lee el texto de la primera página con **pdf.js** (Mozilla), y lo
+    busca con `(\d{4})\s*\/\s*\d+\s*\/\s*([MA])\s*0*(\d+)\s*(ENTRADA|SALIDA)`, tolerante a
+    espacios y saltos de línea. Si el número tiene más de cuatro cifras, se deja entero (no se
+    recorta) y se avisa; si no, se rellena con ceros por delante hasta cuatro.
+  - Al elegir la copia sellada, si se encuentra el sello, el cuadro de Registrar sale ya
+    relleno, con una línea verde "Leído del sello de Séneca", y **el foco va directo al botón
+    de aceptar**: solo hay que confirmar. Si no se encuentra —no es un PDF, o no trae el
+    sello—, el cuadro sale vacío como siempre, con el foco en los cuatro dígitos.
+  - **Ojo con el foco**: `js/usabilidad.js` vigila cuándo se abre el cuadro (`#capa`) y pone el
+    cursor solo en su primer campo, con un `MutationObserver`. Ese observador se dispara
+    después del código que abre el cuadro, así que pisaría cualquier `.focus()` puesto ahí
+    mismo. El foco de Registrar se pone con `setTimeout(fn, 0)`, para que se aplique después.
+  - La fecha del sello no cambia la fecha `AAMMDD` del nombre, que es la del propio documento:
+    se guarda en la nota, `"Registrado 26EM0368 el 10/09/2026 · <documento>"`.
+  - **pdf.js va copiado en el repositorio**, en `js/lib/pdf.min.js` y `js/lib/pdf.worker.min.js`
+    (versión 3.11.174, la del `build/` de `pdfjs-dist` en npm — no la de `legacy/`, de sobra
+    para Chrome y Edge). No se carga de ninguna dirección externa, y solo se trae la primera
+    vez que se pulsa Registrar sobre un PDF, no al arrancar la aplicación.
+  - El PDF de muestra con el que se comprobó **no está en el repositorio**: lleva datos
+    personales. La prueba monta un PDF mínimo válido en su propio código, con el texto del
+    sello dentro, para no necesitar ninguno de verdad.
+- Se comprueba con `pruebas/registro.mjs`.
+
 ---
 
 ## 6. Cómo trabajamos el código  ← LÉELO ANTES DE TOCAR NADA
@@ -594,6 +659,9 @@ de `App` va después del fichero que lo define.
 | `js/recurrentes.js` | Los asuntos que se repiten cada mes, trimestre o curso |
 | `js/guias-enganche.js` | Las guías dentro de la app, y `window.GuiasDelCentro` |
 | `js/notas.js` | Las notas de cada asunto, con su enlace y su botón |
+| `js/registro.js` | Registrar un documento en un paso, sin nombrarlo dos veces |
+| `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF |
+| `js/lib/pdf.min.js`, `js/lib/pdf.worker.min.js` | pdf.js (Mozilla) 3.11.174, copiado tal cual |
 | `js/ficha-asunto.js` | La pantalla de un asunto: guía, notas, documentos y contacto |
 | `js/duplicados.js` | ¿Esto no lo hicimos ya? Asuntos iguales del mismo tercero |
 | `js/visor.js` | El panel de la derecha para ver un documento (`con-visor`) |
@@ -627,6 +695,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/empresas.mjs` | Prueba del nombre comercial y de cambiar los datos de un tercero |
 | `pruebas/guias.mjs` | Prueba de escribir la guía desde la ficha, y del plegado |
 | `pruebas/opciones.mjs` | Prueba de las preguntas con opciones, con el caso de la factura |
+| `pruebas/registro.mjs` | Prueba de registrar un documento en un paso, sin nombrarlo dos veces |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO.md` | Este documento |
 | `docs/PLAN-ROBUSTEZ-2026-09.md` | El plan de robustez de septiembre de 2026 |
@@ -642,7 +711,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `tipos.json` | Tipos de asunto y su categoría |
 | `tipos-documento.json` | Tipos de documento |
 | `estados.json` | Estados de tramitación, en el orden del trámite |
-| `asuntos.json` | Ficha de cada asunto: quién lo abrió, estado, vía, notas, cierre, pasos, fecha límite |
+| `asuntos.json` | Ficha de cada asunto: quién lo abrió, estado, vía, notas, cierre, pasos, fecha límite, documentos pendientes de registro |
 | `guias.json` | Los pasos de cada tipo de asunto, con sus preguntas y opciones |
 | `recurrentes.json` | Los asuntos que se repiten y cuándo tocan |
 | `frescura.json` | Cada cuántos días avisar de que el RegAlum.csv está viejo |
@@ -653,8 +722,8 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 **Los CSV van en `datos`, no en `_GESTOR`.** `js/rescate-datos.js` los baja solos al entrar.
 
 Cada nota de `asuntos.json` es `{ texto, quien, cuando }`, y las de correo llevan además
-`correo`, `enlace` y `enlaceTexto`. La ficha de un asunto guarda también `pasosHechos` y
-`pasosElegidos`.
+`correo`, `enlace` y `enlaceTexto`. La ficha de un asunto guarda también `pasosHechos`,
+`pasosElegidos` y `pendientesRegistro` (los nombres de fichero que faltan por registrar).
 
 **Todo fichero compartido se relee justo antes de escribirlo.** Son dos ordenadores sobre la
 misma carpeta: sin releer, el último en guardar borra lo del otro. Hoy lo hacen `asuntos.json`,

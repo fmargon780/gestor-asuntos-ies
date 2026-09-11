@@ -646,7 +646,7 @@
     return String(a.nombre).localeCompare(String(b.nombre), 'es');
   }
 
-  function filaDeDocumento(f) {
+  function filaDeDocumento(f, a) {
     var ext = Nombres.extensionDe(f.nombre);
     var b = document.createElement('button');
     b.type = 'button';
@@ -655,10 +655,36 @@
     b.innerHTML = (ext ? '<span class="marca-ext">' + U.escapar(ext.toUpperCase()) + '</span>' : '') +
                   '<span>' + U.escapar(f.nombre) + '</span>';
     b.onclick = function () { abrirDocumento(f); };
-    return b;
+
+    if (!window.Registro || Registro.tieneRegistro(f.nombre)) return b;
+
+    var fila = document.createElement('div');
+    fila.className = 'ficha-documento-fila';
+    fila.appendChild(b);
+
+    var pendiente = Registro.pendiente(a, f.nombre);
+    if (pendiente) {
+      var marca = document.createElement('span');
+      marca.className = 'marca-sin-registrar';
+      marca.textContent = 'Sin registrar';
+      fila.appendChild(marca);
+    }
+
+    var reg = document.createElement('button');
+    reg.type = 'button';
+    reg.className = 'boton' + (pendiente ? ' boton-ambar' : '');
+    reg.title = 'Dar registro de entrada o salida a este documento';
+    reg.textContent = 'Registrar';
+    reg.onclick = async function () {
+      reg.disabled = true;
+      await Registro.abrirCuadro(a, f.nombre, function () { pintarDocumentos(a); });
+      reg.disabled = false;
+    };
+    fila.appendChild(reg);
+    return fila;
   }
 
-  function grupoDeDocumentos(caja, titulo, ficheros, conRotulo) {
+  function grupoDeDocumentos(caja, titulo, ficheros, conRotulo, a) {
     if (!ficheros.length) return;
     if (conRotulo) {
       var r = document.createElement('div');
@@ -666,7 +692,7 @@
       r.textContent = titulo + '  (' + ficheros.length + ')';
       caja.appendChild(r);
     }
-    ficheros.sort(porNombre).forEach(function (f) { caja.appendChild(filaDeDocumento(f)); });
+    ficheros.sort(porNombre).forEach(function (f) { caja.appendChild(filaDeDocumento(f, a)); });
   }
 
   async function pintarDocumentos(a) {
@@ -689,8 +715,8 @@
 
       /* Con un solo grupo no hacen falta rótulos: sobran. */
       var conRotulo = correos.length > 0 && expediente.length > 0;
-      grupoDeDocumentos(caja, 'Del expediente', expediente, conRotulo);
-      grupoDeDocumentos(caja, 'Llegados por correo', correos, conRotulo);
+      grupoDeDocumentos(caja, 'Del expediente', expediente, conRotulo, a);
+      grupoDeDocumentos(caja, 'Llegados por correo', correos, conRotulo, a);
     } catch (e) {
       caja.className = 'explica';
       caja.textContent = 'No he podido leer la carpeta: ' + e.message;

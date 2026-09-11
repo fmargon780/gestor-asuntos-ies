@@ -1,0 +1,34 @@
+/* ============================================================
+   registro.css — dar registro a un documento en un paso.
+   ============================================================ */
+
+/* La marca ámbar del documento pendiente de registro, y el botón
+   destacado que lo acompaña. Mismos tonos que el resto de avisos
+   ámbar de la aplicación. */
+.marca-sin-registrar {
+  display: inline-block; background: var(--ambar); border: 1px solid var(--ambar-linea);
+  color: #8a6100; border-radius: 20px; padding: 1px 9px; font-size: 12px; font-weight: 600;
+  white-space: nowrap;
+}
+
+.boton-ambar { background: var(--ambar); border-color: var(--ambar-linea); color: #8a6100; }
+.boton-ambar:hover { background: #ffe9b8; }
+
+/* La línea verde de "Leído del sello de Séneca", cuando
+   js/registro-lector.js reconoce el sello dentro del PDF elegido. */
+.aviso-bueno {
+  background: var(--verde); border: 1px solid #a9d6bb; border-radius: 8px;
+  padding: 9px 12px; font-size: 13px; font-weight: 600; color: #1e7a46;
+  margin: 12px 0;
+}
+
+/* Cada documento de la ficha, con su botón de abrirlo y, si hace
+   falta, la marca de pendiente y el botón de Registrar al lado.
+
+   js/copiar.js envuelve el botón del documento en su propia fila,
+   con el botón de "Copiar el nombre" al lado, así que aquí no se
+   apunta al botón directamente: se deja crecer a lo que sea que
+   quede primero, sea el botón solo o ya envuelto. */
+.ficha-documento-fila { display: flex; align-items: center; gap: 8px; }
+.ficha-documento-fila > :first-child { flex: 1 1 auto; min-width: 0; }
+.ficha-documento-fila .ficha-documento { width: auto; }
