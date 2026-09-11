@@ -48,8 +48,8 @@
      queda con lo justo: el desplegable del estado, que es lo que más
      se toca y se hace de un clic sin entrar, copiar el nombre para
      pegarlo en un correo, y archivar el asunto cuando se termina. Lo
-     demás (vía, plazo, editar, guía, notas y documentos) se hace
-     dentro. */
+     demás (vía, plazo, editar, guía, notas, documentos y los campos
+     del tipo) se hace dentro. */
   var BOTONES_DE_LA_TARJETA = ['Copiar nombre', 'Cerrar', 'Reabrir'];
 
   /* "Cerrar" se llama Archivar, que es lo que de verdad hace: llevar
@@ -146,8 +146,6 @@
                  '<span class="ficha-cuenta" id="ficha-cuenta-docs"></span>') +
           bloque('Otros asuntos de este tercero',
                  '<div id="ficha-otros" class="explica">Buscando…</div>') +
-          bloque('Personas y entidades relacionadas',
-                 '<div id="ficha-relacionados" class="explica">Leyendo…</div>') +
           bloque('Datos del asunto', datosDelAsunto(a, p)) +
           '<div id="ficha-contacto-caja"></div>' +
         '</div>' +
@@ -162,19 +160,33 @@
     pintarContacto(a);
     pintarDocumentos(a);
     pintarOtrosDelTercero(a);
-    pintarRelacionados(a, abierto);
   }
 
-  /* Los relacionados se pintan y se guardan enteramente en
-     js/relacionados.js: aquí solo se le da el hueco. Si por lo que
-     sea ese fichero no ha cargado, el hueco se queda con "Leyendo…"
-     y no rompe el resto de la ficha. */
-  function pintarRelacionados(a, abierto) {
-    var caja = $('ficha-relacionados');
-    if (!caja || !window.Relacionados) return;
-    window.Relacionados.pintarEnFicha(caja, a, abierto, function () {
-      pintarRelacionados(a, abierto);
+  /* Los campos configurados en Ajustes para el tipo de este asunto,
+     con el valor que se guardó al crearlo o al editarlo, uno por
+     línea. Solo los que traen valor: un campo vacío no se enseña. Se
+     enseñan en el orden de Ajustes; si alguno se guardó con una clave
+     que ya no está en la configuración de hoy (se quitó del tipo, o
+     se borró el campo propio), se enseña igual al final, con su clave
+     como título, para no perder el dato. */
+  function filasDeCampos(a) {
+    var guardados = (a.ficha && a.ficha.campos) || {};
+    var tipo = tipoDe(a);
+    var config = (App.E.campos && App.E.campos.porTipo && App.E.campos.porTipo[tipo]) || [];
+    var vistos = {};
+    var salida = [];
+    config.forEach(function (cfg) {
+      var clave = Campos.claveDeCampo(cfg);
+      vistos[clave] = true;
+      var g = guardados[clave];
+      if (g && g.valor) salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: g.valor });
     });
+    Object.keys(guardados).forEach(function (clave) {
+      if (vistos[clave]) return;
+      var g = guardados[clave];
+      if (g && g.valor) salida.push({ titulo: clave, valor: g.valor });
+    });
+    return salida;
   }
 
   function datosDelAsunto(a, p) {
@@ -185,13 +197,14 @@
       { titulo: 'Tercero', valor: f.tercero || a.leido.resto || '' },
       { titulo: 'Categoría', valor: f.categoria || a.leido.categoria || '' },
       { titulo: 'Año académico', valor: f.curso || a.leido.curso || '' },
-      { titulo: 'Descripción', valor: f.descripcion || '' },
+      { titulo: 'Descripción', valor: f.descripcion || '' }
+    ].concat(filasDeCampos(a)).concat([
       { titulo: 'Estado', valor: f.situacion || 'Sin estado' },
       { titulo: 'Vía de comunicación', valor: App.textoVia(f) },
       { titulo: 'Fecha límite', valor: p ? Plazos.legible(p.limite) + ' · ' + p.texto : '' },
       { titulo: 'Lo abrió', valor: f.abiertoPor || '' },
       { titulo: 'En el archivo', valor: a.ruta || '' }
-    ]);
+    ]));
   }
 
   /* ---------- la barra de botones ----------
