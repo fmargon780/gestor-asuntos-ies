@@ -569,7 +569,8 @@ de `App` va después del fichero que lo define.
 | `js/datos.js` | Lee los CSV; el nombre comercial y las columnas leídas por su título |
 | `js/documentos.js` | Nombra los documentos, con el texto adicional y los tipos sin duplicados |
 | `js/usabilidad.js` | Volver, Cancelar, etiquetas de filtros, vista compacta y Escape |
-| `js/nucleo.js` | El estado, el arranque, el cambio de pantalla y `App.VERSION` |
+| `js/nucleo.js` | El estado, el arranque y el cambio de pantalla |
+| `js/version.js` | `App.VERSION`, la fecha y hora de la última publicación |
 | `js/asuntos-lista.js` | Asuntos abiertos: las tres tarjetas, las tarjetas por tipo y la lista |
 | `js/asuntos-editar.js` | Editar un asunto abierto: renombra la carpeta y mueve su ficha |
 | `js/documentos-sueltos.js` | Los papeles sin asunto, **cerrar y reabrir**, y la vigilancia de la carpeta |
@@ -606,6 +607,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/copias.mjs` | Prueba de las copias de seguridad y del fichero roto |
 | `pruebas/conflictos.mjs` | Prueba de las copias en conflicto de Dropbox |
 | `pruebas/huerfanas.mjs` | Prueba de las fichas sin carpeta |
+| `pruebas/nombres-app.mjs` | Falla si dos ficheros definen la misma función de `App` |
 | `pruebas/navegador.mjs` | Prueba de la aplicación entera |
 | `pruebas/tipos.mjs` | Prueba de las tarjetas por tipo |
 | `pruebas/correos.mjs` | Prueba de lo que deja un correo dentro de un asunto |
@@ -724,6 +726,21 @@ huérfana: sigue en `asuntos.json`, pero no se ve en ningún lado.
 - Un punto ámbar en el botón de Ajustes de la barra avisa de que hay huérfanas, sin tener que
   entrar a mirar.
 - Se comprueba con `pruebas/huerfanas.mjs`.
+
+**Nombres repetidos y código muerto** (11-sep-2026, bloque 5 del plan de robustez).
+
+- `pruebas/nombres-app.mjs`, sin navegador: lee todos los `js/*.js`, busca las líneas
+  `App.algo = function` y falla si el mismo nombre se define en dos ficheros. Es justo lo que
+  pasó con `App.elegirTipo` el 10-sep-2026 (sección 5, "Las tarjetas por tipo de asunto"): se
+  perdió sin ningún error, y esta prueba lo habría avisado. Entra en `npm test`.
+- Quitado el botón "Guía n/m" de `js/guias-enganche.js` (`botonDeTarjeta`, `abrirGuiaDe`):
+  existía, pero `js/ficha-asunto.js` lo poda de la tarjeta desde el 10-sep-2026
+  (`BOTONES_DE_LA_TARJETA`) porque los pasos de la guía, con sus casillas, se ven y se marcan
+  dentro de la ficha del asunto. No se ha añadido a la lista blanca: la tarjeta se queda con lo
+  justo, a propósito.
+- `App.VERSION` sale de `js/nucleo.js` y pasa a `js/version.js`, cargado justo después. Así
+  cambiar la versión —que se hace en casi todos los commits— no obliga a resubir `nucleo.js`
+  entero, que es de los ficheros más grandes.
 
 ### Las columnas de cada CSV que mantiene la aplicación
 

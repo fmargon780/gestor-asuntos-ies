@@ -3,9 +3,10 @@
 
    guias.js sabe pintar y escribir una guía, pero no sabe nada de la
    aplicación. Este fichero es el que la enchufa: guarda las guías en
-   _GESTOR/guias.json, pone el botón de cada tipo en Ajustes, la
-   enseña como recordatorio al crear un asunto y pone el botón "Guía"
-   en cada asunto abierto.
+   _GESTOR/guias.json, pone el botón de cada tipo en Ajustes, y la
+   enseña como recordatorio al crear un asunto. Los pasos, ya con sus
+   casillas, se ven y se marcan dentro de la ficha del asunto
+   (js/ficha-asunto.js), no desde la tarjeta de la lista.
 
    Lo que se marca como hecho se guarda en la ficha del asunto, en
    asuntos.json, así que lo ve todo el que abra la aplicación.
@@ -45,61 +46,6 @@
     var g = window.Gestor.carpetaGestor();
     if (!g) return;
     await Copias.guardar(g, FICHERO, guias);
-  }
-
-  /* ---------- el botón de cada asunto abierto ---------- */
-
-  /* El tipo del asunto sale del nombre de la carpeta, y si no, de su
-     ficha: así también funciona en carpetas creadas a mano. */
-  function tipoDe(a) {
-    return (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
-  }
-
-  function botonDeTarjeta(a, modo) {
-    if (modo !== 'abierto') return null;
-    var pasos = pasosDe(tipoDe(a));
-    if (!pasos.length) return null;
-
-    var hechos = (a.ficha && a.ficha.pasosHechos) || [];
-    var cuantos = Guias.hechosDe(pasos, hechos);
-
-    var b = document.createElement('button');
-    b.className = 'boton' + (cuantos ? ' boton-marcado' : '');
-    b.textContent = 'Guía ' + cuantos + '/' + pasos.length;
-    b.title = 'Los pasos de un asunto de tipo ' + tipoDe(a) +
-              ', para ir marcando lo que ya está hecho';
-    b.onclick = function () { abrirGuiaDe(a); };
-    return b;
-  }
-
-  async function abrirGuiaDe(a) {
-    var tipo = tipoDe(a);
-    var pasos = pasosDe(tipo);
-    var hechos = (a.ficha && a.ficha.pasosHechos) || [];
-
-    /* Se guarda en cuanto se marca, no al cerrar: si el navegador se
-       cierra a media lista, lo marcado ya está a salvo. */
-    var ultimo = hechos.slice();
-    var guardando = false;
-
-    async function apuntar(marcados) {
-      ultimo = marcados;
-      if (guardando) return;
-      guardando = true;
-      try {
-        await window.Gestor.anotar(a.nombre, {
-          pasosHechos: ultimo,
-          pasosEl: U.ahora(),
-          pasosPor: window.Gestor.usuario()
-        });
-      } catch (e) {
-        U.aviso('No he podido guardar lo marcado: ' + e.message, 'malo');
-      }
-      guardando = false;
-    }
-
-    await Guias.abrir('Guía de ' + tipo, pasos, hechos, apuntar);
-    await window.Gestor.recargar();
   }
 
   /* ---------- la guía como recordatorio, al crear el asunto ----------
@@ -224,9 +170,6 @@
 
   function enganchar() {
     if (!window.Gestor) return;
-
-    /* El botón de cada tarjeta de asunto abierto. */
-    window.Gestor.botonesDeTarjeta.push(botonDeTarjeta);
 
     /* Al elegir el tipo en Nuevo asunto, se enseña su guía debajo. */
     var lista = $('tipos-lista');

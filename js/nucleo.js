@@ -47,14 +47,9 @@ App.FICHERO_ESTADOS = 'estados.json';
 App.TITULO = 'Gestor de Asuntos';
 App.SEGUNDOS_ENTRE_MIRADAS = 20;
 
-/* La fecha y la hora de la última versión publicada. Sale en la
-   pantalla de entrada y, ya dentro, abajo a la izquierda debajo del
-   nombre. Sirve para saber de un vistazo si se está mirando lo último:
-   si la hora no es la del último cambio, o Vercel no ha publicado
-   todavía, o el navegador se ha quedado con la página vieja.
-
-   La hora es la de España, la del reloj de Francisco. */
-App.VERSION = '11-sep-2026 · 05:33';
+/* App.VERSION vive en js/version.js, cargado justo después de este
+   fichero: así cambiar la versión no obliga a resubir nucleo.js
+   entero, que es de los que más tarda en publicarse. */
 
 /* El atajo de siempre para coger un elemento de la página. Es global
    para todos los ficheros de la aplicación, y también cuelga de App
