@@ -583,6 +583,30 @@ var Datos = (function () {
     return cargar(dirDatos, categoria);
   }
 
+  /* Quita a alguien de la lista de dados de alta a mano (papelera,
+     11-sep-2026). Se busca por su nombre, igual que guardarEnLista.
+     Solo tiene sentido para quien se dio de alta a mano: quitar a
+     alguien de Séneca de aquí no tendría ningún efecto, porque el
+     fichero de Séneca no lo escribe la aplicación. */
+  async function quitarDeLista(dirDatos, categoria, nombre) {
+    var def = LISTAS[categoria];
+    var clave = (categoria === 'PERSONAL' || categoria === 'ALUMNADO')
+      ? categoria + '_MANUAL' : categoria;
+    var actual = await cargarLista(dirDatos, categoria, clave);
+    var buscado = U.normalizar(nombre || '');
+    var quitado = null;
+    var filas = [];
+    actual.lista.forEach(function (p) {
+      if (!quitado && U.normalizar(p.nombre) === buscado) { quitado = p; return; }
+      filas.push(def.cabecera.map(function (c) { return p.campos[c] || ''; }));
+    });
+    if (!quitado) return null;
+    await Carpetas.escribirTexto(dirDatos, def.fichero, aCsv(def.cabecera, filas));
+    delete CACHE[clave];
+    delete CACHE[categoria];
+    return quitado;
+  }
+
   async function cargar(dirDatos, categoria) {
     if (categoria === 'ALUMNADO') return cargarAlumnado(dirDatos);
     if (categoria === 'PERSONAL') return cargarPersonal(dirDatos);
@@ -744,7 +768,7 @@ var Datos = (function () {
   return {
     aTabla: aTabla, aCsv: aCsv, cargar: cargar, anadirALista: anadirALista,
     buscar: buscar, olvidar: olvidar, LISTAS: LISTAS,
-    guardarEnLista: guardarEnLista,
+    guardarEnLista: guardarEnLista, quitarDeLista: quitarDeLista,
     unidadesDistintas: unidadesDistintas, destacadosAlumno: destacadosAlumno,
     destacadosPersona: destacadosPersona, cursoDelFichero: cursoDelFichero
   };
