@@ -280,6 +280,34 @@
     });
     cerrar.classList.add('boton-principal');
     caja.appendChild(cerrar);
+
+    /* Borrar el asunto entero, con papelera (11-sep-2026). Solo desde
+       aquí, y solo si está abierto: en el ARCHIVO no hay botón, y en la
+       tarjeta de la lista tampoco (BOTONES_DE_LA_TARJETA, más arriba). */
+    if (abierto && window.Papelera) {
+      var borrarAsunto = window.Papelera.botonBorrar(async function () {
+        var docs = [];
+        try { docs = await Carpetas.ficheros(a.handle); } catch (e) { docs = []; }
+        var ok = await window.Papelera.preguntarBorrar(a.nombre,
+          docs.length ? '<p class="nota">Se lleva ' + docs.length + ' documento' +
+            (docs.length === 1 ? '' : 's') + '.</p>' : '');
+        if (!ok) return;
+        if (docs.length) {
+          var seguro = await U.preguntar(a.nombre, '<p>¿Seguro?</p>', 'Sí, a la papelera');
+          if (!seguro) return;
+        }
+        borrarAsunto.disabled = true;
+        try {
+          await Papelera.mandarAsunto(a);
+          U.aviso('Asunto mandado a la papelera.', 'bueno');
+          volverALaLista();
+        } catch (e) {
+          U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+          borrarAsunto.disabled = false;
+        }
+      });
+      caja.appendChild(borrarAsunto);
+    }
   }
 
   /* ---------- el dibujo de la vía de comunicación ----------
@@ -699,31 +727,55 @@
                   '<span>' + U.escapar(f.nombre) + '</span>';
     b.onclick = function () { abrirDocumento(f); };
 
-    if (!window.Registro || Registro.tieneRegistro(f.nombre)) return b;
-
     var fila = document.createElement('div');
     fila.className = 'ficha-documento-fila';
     fila.appendChild(b);
 
-    var pendiente = Registro.pendiente(a, f.nombre);
-    if (pendiente) {
-      var marca = document.createElement('span');
-      marca.className = 'marca-sin-registrar';
-      marca.textContent = 'Sin registrar';
-      fila.appendChild(marca);
+    if (window.Registro && !Registro.tieneRegistro(f.nombre)) {
+      var pendiente = Registro.pendiente(a, f.nombre);
+      if (pendiente) {
+        var marca = document.createElement('span');
+        marca.className = 'marca-sin-registrar';
+        marca.textContent = 'Sin registrar';
+        fila.appendChild(marca);
+      }
+
+      var reg = document.createElement('button');
+      reg.type = 'button';
+      reg.className = 'boton' + (pendiente ? ' boton-ambar' : '');
+      reg.title = 'Dar registro de entrada o salida a este documento';
+      reg.textContent = 'Registrar';
+      reg.onclick = async function () {
+        reg.disabled = true;
+        await Registro.abrirCuadro(a, f.nombre, function () { pintarDocumentos(a); });
+        reg.disabled = false;
+      };
+      fila.appendChild(reg);
     }
 
-    var reg = document.createElement('button');
-    reg.type = 'button';
-    reg.className = 'boton' + (pendiente ? ' boton-ambar' : '');
-    reg.title = 'Dar registro de entrada o salida a este documento';
-    reg.textContent = 'Registrar';
-    reg.onclick = async function () {
-      reg.disabled = true;
-      await Registro.abrirCuadro(a, f.nombre, function () { pintarDocumentos(a); });
-      reg.disabled = false;
-    };
-    fila.appendChild(reg);
+    /* Borrar, con papelera (11-sep-2026): siempre el último, separado
+       de lo demás. */
+    if (window.Papelera) {
+      var borrar = window.Papelera.botonBorrar(async function () {
+        var ok = await window.Papelera.preguntarBorrar(f.nombre);
+        if (!ok) return;
+        borrar.disabled = true;
+        try {
+          await Papelera.mandarDocumentoDeAsunto(a, f.nombre);
+          U.aviso('Documento mandado a la papelera.', 'bueno');
+          pintarDocumentos(a);
+          if (window.Notas) {
+            a.ficha.notas = await window.Notas.frescas(a);
+            pintarNotas(a, modoActual === 'abierto');
+          }
+        } catch (e) {
+          U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+          borrar.disabled = false;
+        }
+      });
+      fila.appendChild(borrar);
+    }
+
     return fila;
   }
 
