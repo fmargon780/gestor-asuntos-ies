@@ -125,6 +125,7 @@
   async function guardar() {
     var g = window.Gestor.carpetaGestor();
     if (!g) return;
+    lista = await App.fusionarConDisco(FICHERO, lista, function (r) { return r.id; });
     await Copias.guardar(g, FICHERO, lista);
   }
 

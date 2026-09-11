@@ -1,0 +1,281 @@
+/* ============================================================
+   conflictos.js — las copias en conflicto que deja Dropbox.
+
+   Dropbox tarda segundos en sincronizar. Si los dos ordenadores del
+   centro guardan casi a la vez en el mismo fichero de _GESTOR, Dropbox
+   no se inventa nada: deja el fichero de uno como está y deja aparte
+   una "copia en conflicto" con el cambio del otro, con un nombre como
+
+     asuntos (copia en conflicto de PC2 2026-09-11).json
+     asuntos (PC2's conflicted copy 2026-09-11).json
+
+   Sin este módulo, esas copias se quedan ahí para siempre y nadie las
+   mira: el cambio del otro ordenador se pierde en la práctica.
+
+   Al entrar, y cada cinco minutos, se busca en _GESTOR algún fichero
+   con "conflicto" o "conflicted" en el nombre.
+
+   - `asuntos.json` y `tablon.json` se fusionan solos: son los dos
+     ficheros en los que los dos ordenadores escriben todo el rato, y
+     se sabe fusionar por clave (el nombre del asunto, o el id de la
+     nota) sin perder nada de ninguno de los dos.
+   - Los demás (tipos, estados, tipos de documento, guías, recurrentes,
+     frescura) se cambian mucho menos, y mezclarlos a ciegas es más
+     fácil que se note mal. Ahí se avisa en Ajustes y se deja elegir
+     con cuál de los dos quedarse; el que no se elija no se pierde,
+     porque los dos se guardan antes en _GESTOR/copias.
+   ============================================================ */
+(function () {
+
+  var CADA_MS = 5 * 60 * 1000;
+  var ultimaRevision = 0;
+  var pendientes = [];   /* { real, nombreConflicto } de los que no se fusionan solos */
+
+  function $(id) { return document.getElementById(id); }
+
+  /* "asuntos (copia en conflicto de PC2 2026-09-11).json"  ->  "asuntos.json"
+     "asuntos (PC2's conflicted copy 2026-09-11).json"      ->  "asuntos.json" */
+  function ficheroReal(nombreConflicto) {
+    var m = nombreConflicto.match(/^(.+?)\s*\([^)]*conflic[^)]*\)\.json$/i);
+    return m ? m[1].trim() + '.json' : '';
+  }
+
+  /* ---------- fusionar una ficha de asuntos.json ----------
+
+     Se queda con los campos sueltos de la que se haya tocado más tarde
+     (por la última nota, o por editadoEl/pasosEl), y con la UNIÓN de
+     notas, pasos hechos y pasos elegidos: así no desaparece nada de lo
+     que haya apuntado ninguno de los dos ordenadores. */
+  function ultimoCambio(f) {
+    var notas = (f && f.notas) || [];
+    var ultimaNota = notas.length ? notas[notas.length - 1].cuando : '';
+    return [f && f.editadoEl, f && f.pasosEl, ultimaNota].filter(Boolean).sort().pop() || '';
+  }
+
+  function fusionarFicha(a, b) {
+    a = a || {}; b = b || {};
+    var base = (ultimoCambio(a) >= ultimoCambio(b)) ? Object.assign({}, b, a) : Object.assign({}, a, b);
+
+    var vistas = {};
+    base.notas = (a.notas || []).concat(b.notas || []).filter(function (n) {
+      var k = (n.cuando || '') + '|' + (n.texto || '');
+      if (vistas[k]) return false;
+      vistas[k] = true;
+      return true;
+    });
+
+    var hechos = {};
+    (a.pasosHechos || []).concat(b.pasosHechos || []).forEach(function (id) { hechos[id] = true; });
+    base.pasosHechos = Object.keys(hechos);
+
+    base.pasosElegidos = Object.assign({}, a.pasosElegidos || {}, b.pasosElegidos || {});
+    return base;
+  }
+
+  async function archivarConflicto(g, nombreConflicto) {
+    var copias = await Carpetas.crear(g, 'copias');
+    await Carpetas.moverFichero(g, nombreConflicto, copias, nombreConflicto);
+  }
+
+  async function fusionarAsuntos(g, nombreConflicto) {
+    var real, conflicto;
+    try {
+      real = await Carpetas.leerJson(g, App.FICHERO_ASUNTOS);
+      conflicto = JSON.parse(await Carpetas.leerTexto(g, nombreConflicto));
+    } catch (e) { return false; }
+    if (!conflicto || typeof conflicto.asuntos !== 'object') return false;
+    var registroReal = (real && real.asuntos) ? real : { asuntos: {} };
+
+    var claves = {};
+    Object.keys(registroReal.asuntos).forEach(function (k) { claves[k] = true; });
+    Object.keys(conflicto.asuntos).forEach(function (k) { claves[k] = true; });
+
+    var fusion = { asuntos: {} };
+    Object.keys(claves).forEach(function (k) {
+      var a = registroReal.asuntos[k], b = conflicto.asuntos[k];
+      fusion.asuntos[k] = (a && b) ? fusionarFicha(a, b) : (a || b);
+    });
+
+    await Copias.guardar(g, App.FICHERO_ASUNTOS, fusion);
+    App.E.registro = fusion;
+    App.refrescarFichas();
+    await archivarConflicto(g, nombreConflicto);
+    return true;
+  }
+
+  /* ---------- fusionar el tablón: unión de notas por id ---------- */
+  async function fusionarTablon(g, nombreConflicto) {
+    var real, conflicto;
+    try {
+      real = await Carpetas.leerJson(g, 'tablon.json');
+      conflicto = JSON.parse(await Carpetas.leerTexto(g, nombreConflicto));
+    } catch (e) { return false; }
+    if (!conflicto || !Array.isArray(conflicto.notas)) return false;
+
+    function clave(n) { return n.id || ((n.texto || '') + '|' + (n.creado || '')); }
+    var mapa = {}, orden = [];
+    ((real && real.notas) || []).concat(conflicto.notas).forEach(function (n) {
+      var k = clave(n);
+      if (!mapa[k]) orden.push(k);
+      mapa[k] = mapa[k] ? Object.assign({}, mapa[k], n) : n;
+    });
+
+    await Copias.guardar(g, 'tablon.json', { notas: orden.map(function (k) { return mapa[k]; }) });
+    await archivarConflicto(g, nombreConflicto);
+    return true;
+  }
+
+  /* ---------- los ficheros que no se fusionan solos ---------- */
+
+  function yaPendiente(real, nombreConflicto) {
+    return pendientes.some(function (p) { return p.real === real && p.nombreConflicto === nombreConflicto; });
+  }
+
+  async function quedarseConEsteOrdenador(p) {
+    var g = window.Gestor.carpetaGestor();
+    try {
+      await archivarConflicto(g, p.nombreConflicto);
+      pendientes = pendientes.filter(function (x) { return x !== p; });
+      pintarBloque();
+      U.aviso('Se guarda el de este ordenador. El otro queda a salvo en _GESTOR/copias.', 'bueno');
+    } catch (e) {
+      U.aviso('No he podido resolverlo: ' + e.message, 'malo');
+    }
+  }
+
+  /* Los tres ficheros que App mantiene en memoria se recargan solos.
+     Los demás (guías, recurrentes, frescura) se leen justo al abrir su
+     propia pantalla, así que basta con avisar. */
+  async function refrescarTrasResolver(real) {
+    if (real === App.FICHERO_TIPOS) { await App.cargarTipos(); App.pintarAjustes(); }
+    else if (real === App.FICHERO_ESTADOS) {
+      await App.cargarEstados(); App.pintarFiltroEstado(); App.pintarAbiertos(); App.pintarAjustes();
+    } else if (real === App.FICHERO_TIPOS_DOC) { await App.cargarTiposDocumento(); App.pintarAjustes(); }
+    else { U.aviso('Guardado. Para verlo aquí, cierra sesión y vuelve a entrar.', 'bueno'); }
+  }
+
+  async function quedarseConElOtro(p) {
+    var g = window.Gestor.carpetaGestor();
+    try {
+      var contenido = JSON.parse(await Carpetas.leerTexto(g, p.nombreConflicto));
+      await Copias.guardar(g, p.real, contenido);
+      await archivarConflicto(g, p.nombreConflicto);
+      pendientes = pendientes.filter(function (x) { return x !== p; });
+      await refrescarTrasResolver(p.real);
+      pintarBloque();
+      U.aviso('Se guarda el del otro ordenador. El que había queda a salvo en _GESTOR/copias.', 'bueno');
+    } catch (e) {
+      U.aviso('No he podido resolverlo: ' + e.message, 'malo');
+    }
+  }
+
+  /* ---------- el bloque de Ajustes ---------- */
+
+  function bloqueDeAjustes() {
+    var ya = $('bloque-conflictos');
+    if (ya) return ya;
+    var pantalla = $('pantalla-ajustes');
+    if (!pantalla) return null;
+    var d = document.createElement('details');
+    d.className = 'bloque-ajustes';
+    d.id = 'bloque-conflictos';
+    d.innerHTML =
+      '<summary>' +
+        '<span class="bloque-titulo">Conflictos de Dropbox</span>' +
+        '<span class="bloque-pie" id="conflictos-pie">Cuando los dos ordenadores guardan casi a la vez</span>' +
+      '</summary>' +
+      '<div class="bloque-cuerpo">' +
+        '<p class="explica">Los cambios de <code>asuntos.json</code> y <code>tablon.json</code> se ' +
+        'unen solos, sin preguntar. Los de las demás listas —que cambian mucho menos— se avisan ' +
+        'aquí, para elegir con cuál de los dos ordenadores quedarse. El que no se elija no se ' +
+        'pierde: se guarda en <code>_GESTOR/copias</code>.</p>' +
+        '<div id="tabla-conflictos" class="lista"></div>' +
+      '</div>';
+    pantalla.appendChild(d);
+    return d;
+  }
+
+  function pintarBloque() {
+    bloqueDeAjustes();
+    var caja = $('tabla-conflictos');
+    var pie = $('conflictos-pie');
+    if (!caja) return;
+    if (pie) pie.textContent = pendientes.length
+      ? pendientes.length + (pendientes.length === 1 ? ' conflicto por resolver' : ' conflictos por resolver')
+      : 'Cuando los dos ordenadores guardan casi a la vez';
+    caja.innerHTML = '';
+    if (!pendientes.length) {
+      caja.innerHTML = '<div class="vacio">Sin conflictos pendientes.</div>';
+      return;
+    }
+    pendientes.forEach(function (p) {
+      var f = document.createElement('div');
+      f.className = 'fila-tipo';
+      f.innerHTML = '<span class="nombre-tipo">' + U.escapar(p.real) + '</span>' +
+        '<span class="suave" style="flex:1">' + U.escapar(p.nombreConflicto) + '</span>';
+      var esteOrdenador = document.createElement('button');
+      esteOrdenador.className = 'boton';
+      esteOrdenador.textContent = 'Quedarse con el de este ordenador';
+      esteOrdenador.onclick = function () { quedarseConEsteOrdenador(p); };
+      f.appendChild(esteOrdenador);
+      var otro = document.createElement('button');
+      otro.className = 'boton';
+      otro.textContent = 'Quedarse con el otro';
+      otro.onclick = function () { quedarseConElOtro(p); };
+      f.appendChild(otro);
+      caja.appendChild(f);
+    });
+  }
+
+  /* ---------- la revisión ---------- */
+
+  async function revisar() {
+    var g = window.Gestor && window.Gestor.carpetaGestor();
+    if (!g) return;
+    var ficheros;
+    try { ficheros = await Carpetas.ficheros(g); } catch (e) { return; }
+
+    for (var i = 0; i < ficheros.length; i++) {
+      var nombre = ficheros[i].nombre;
+      var real = ficheroReal(nombre);
+      if (!real || Copias.FICHEROS.indexOf(real) === -1) continue;
+
+      if (real === App.FICHERO_ASUNTOS) {
+        if (await fusionarAsuntos(g, nombre)) {
+          U.aviso('Se han unido los cambios de los dos ordenadores en ' + real + '.', '');
+        }
+        continue;
+      }
+      if (real === 'tablon.json') {
+        if (await fusionarTablon(g, nombre)) {
+          U.aviso('Se han unido los cambios de los dos ordenadores en ' + real + '.', '');
+        }
+        continue;
+      }
+      if (!yaPendiente(real, nombre)) pendientes.push({ real: real, nombreConflicto: nombre });
+    }
+    pintarBloque();
+  }
+
+  /* Para las pruebas, y por si algún día hace falta forzar una revisión
+     desde otro sitio (el botón "Actualizar", por ejemplo). */
+  window.Conflictos = { revisar: revisar, pendientes: function () { return pendientes.slice(); } };
+
+  function enganchar() {
+    if (!window.Gestor) return;
+    window.Gestor.alRefrescar.push(function () {
+      var g = window.Gestor.carpetaGestor();
+      if (!g) return;
+      var ahora = Date.now();
+      if (ultimaRevision && ahora - ultimaRevision < CADA_MS) return;
+      ultimaRevision = ahora;
+      revisar();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', enganchar);
+  } else {
+    enganchar();
+  }
+})();

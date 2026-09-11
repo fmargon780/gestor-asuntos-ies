@@ -561,6 +561,7 @@ de `App` va después del fichero que lo define.
 | `js/almacen.js` | Guarda los ajustes en el navegador |
 | `js/carpetas.js` | Habla con el selector de carpetas del navegador. Lee y escribe los JSON |
 | `js/copias.js` | Copia de seguridad diaria de los ficheros de `_GESTOR`, y detección de fichero roto |
+| `js/conflictos.js` | Las copias en conflicto que deja Dropbox: fusión sola o aviso para elegir |
 | `js/nombres.js` | Monta los nombres de carpetas y documentos |
 | `js/plazos.js` | La fecha límite de los asuntos |
 | `js/guias.js` | Pintar y escribir una guía, con sus preguntas y opciones |
@@ -599,6 +600,7 @@ de `App` va después del fichero que lo define.
 | `js/inicio.js` | La última línea: `App.arrancar()` |
 | `pruebas/logica.mjs` | Pruebas de la lógica, sin navegador |
 | `pruebas/copias.mjs` | Prueba de las copias de seguridad y del fichero roto |
+| `pruebas/conflictos.mjs` | Prueba de las copias en conflicto de Dropbox |
 | `pruebas/navegador.mjs` | Prueba de la aplicación entera. **Desfasada, hay que arreglarla** |
 | `pruebas/tipos.mjs` | Prueba de las tarjetas por tipo |
 | `pruebas/correos.mjs` | Prueba de lo que deja un correo dentro de un asunto |
@@ -657,6 +659,29 @@ que si no existiera, y el siguiente guardado lo escribía encima: se perdía tod
 - En Ajustes, el bloque **Copias de seguridad** enseña cuántas copias hay de cada fichero y deja
   restaurar cualquiera a mano, por si hiciera falta sin que nada esté roto.
 - Se comprueba con `pruebas/copias.mjs`.
+
+**Copias en conflicto de Dropbox, y releer siempre** (11-sep-2026, bloque 2 del plan de
+robustez). Si los dos ordenadores guardan casi a la vez, Dropbox no pisa nada: deja aparte un
+fichero como `asuntos (copia en conflicto de PC2 2026-09-11).json`. Antes nadie lo miraba, y el
+cambio del otro se perdía en la práctica.
+
+- `js/conflictos.js` busca esos ficheros al entrar y cada cinco minutos.
+- `asuntos.json` y `tablon.json` se fusionan solos, porque los dos ordenadores escriben ahí
+  todo el rato: se unen los asuntos (o las notas del tablón) por su clave, y dentro de cada uno
+  se unen las notas, los pasos hechos y los pasos elegidos, sin repetir nada.
+- Los demás (`tipos.json`, `estados.json`, `tipos-documento.json`, `guias.json`,
+  `recurrentes.json`, `frescura.json`) cambian mucho menos y no se fusionan solos: salen en el
+  bloque **Conflictos de Dropbox** de Ajustes, con dos botones para elegir con cuál de los dos
+  ordenadores quedarse. El que no se elige no se pierde: los dos se guardan en
+  `_GESTOR/copias` antes de decidir.
+- **Releer antes de escribir**, en todos los ficheros compartidos que faltaban: `recurrentes.js`
+  y los tres que mantiene `App` (`tipos.json`, `estados.json`, `tipos-documento.json`). Antes de
+  guardar se relee el fichero y se suma lo que el otro ordenador haya añadido y nosotros no
+  tengamos (`App.fusionarConDisco`). No se detectan sus borrados —si él quita algo y nosotros
+  todavía lo tenemos en memoria, volvería a aparecer—, pero eso es raro en estas listas: se
+  tocan pocas veces, y casi siempre para añadir. `asuntos.json` y `tablon.json` ya releían del
+  todo desde antes (`App.anotar`, `tablon.js`).
+- Se comprueba con `pruebas/conflictos.mjs`.
 
 ### Las columnas de cada CSV que mantiene la aplicación
 

@@ -54,7 +54,7 @@ App.SEGUNDOS_ENTRE_MIRADAS = 20;
    todavía, o el navegador se ha quedado con la página vieja.
 
    La hora es la de España, la del reloj de Francisco. */
-App.VERSION = '11-sep-2026 · 05:00';
+App.VERSION = '11-sep-2026 · 05:10';
 
 /* El atajo de siempre para coger un elemento de la página. Es global
    para todos los ficheros de la aplicación, y también cuelga de App
@@ -258,7 +258,28 @@ App.cargarTiposDocumento = async function () {
 
 App.guardarTiposDocumento = async function () {
   App.E.tiposDocumento.sort();
+  App.E.tiposDocumento = await App.fusionarConDisco(
+    App.FICHERO_TIPOS_DOC, App.E.tiposDocumento, function (x) { return x; });
+  App.E.tiposDocumento.sort();
   await Copias.guardar(App.E.gestor, App.FICHERO_TIPOS_DOC, App.E.tiposDocumento);
+};
+
+/* Se relee el fichero justo antes de escribirlo, por si el compañero ha
+   añadido algo desde el otro ordenador mientras tanto: lo que él tenga
+   y nosotros no, se suma a lo nuestro. No se detectan sus borrados
+   (si él ha quitado algo y nosotros todavía lo tenemos en memoria,
+   volvería a aparecer), pero eso es raro en estas listas: se tocan
+   pocas veces, casi siempre para añadir. 'clave' dice cómo se identifica
+   cada elemento de la lista. */
+App.fusionarConDisco = async function (fichero, listaLocal, clave) {
+  var disco;
+  try { disco = await Carpetas.leerJson(App.E.gestor, fichero); }
+  catch (e) { return listaLocal; }
+  if (!disco || !disco.length) return listaLocal;
+  var claves = {};
+  listaLocal.forEach(function (x) { claves[clave(x)] = true; });
+  var extra = disco.filter(function (x) { return !claves[clave(x)]; });
+  return listaLocal.concat(extra);
 };
 
 /* Los estados de tramitación. Se guardan en el orden en que los pone
@@ -302,10 +323,15 @@ App.esDeEspera = function (nombre) {
 };
 
 App.guardarEstados = async function () {
+  var fusion = await App.fusionarConDisco(
+    App.FICHERO_ESTADOS, App.E.estados, function (e) { return e.nombre; });
+  App.E.estados = App.normalizarEstados(fusion);
   await Copias.guardar(App.E.gestor, App.FICHERO_ESTADOS, App.E.estados);
 };
 
 App.guardarTipos = async function () {
+  App.E.tipos = await App.fusionarConDisco(
+    App.FICHERO_TIPOS, App.E.tipos, function (t) { return t.tipo; });
   App.E.tipos.sort(function (a, b) {
     var ka = a.categoria + ' ' + a.tipo, kb = b.categoria + ' ' + b.tipo;
     return ka < kb ? -1 : (ka > kb ? 1 : 0);
