@@ -1,0 +1,30 @@
+/* ============================================================
+   duplicados.css — el cuadro de "Este asunto ya existe" y la franja
+   de "Parecen el mismo asunto" (11-sep-2026).
+   ============================================================ */
+
+.dup-opcion {
+  display: block;
+  padding: 6px 2px;
+  cursor: pointer;
+}
+
+.dup-opcion input {
+  margin-right: 8px;
+}
+
+.dup-unico {
+  margin: 4px 0 10px;
+}
+
+.dup-botones {
+  margin-top: 14px;
+}
+
+.franja-unir-fila {
+  margin-bottom: 10px;
+}
+
+.franja-unir-fila .boton {
+  margin-top: 8px;
+}
