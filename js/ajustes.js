@@ -287,17 +287,63 @@ App.tarjetaTipoAjustes = function (tipo, mostrarCategoria) {
   f.appendChild(App.botonMenuTarjeta([
     { texto: 'Campos', onclick: function () { App.abrirCamposDeTipo(tipo); } },
     { texto: 'Cambiar el nombre', onclick: function () { App.renombrarTipo(tipo); } },
-    { texto: 'Quitar', peligro: true, onclick: async function () {
-        var ok = await U.preguntar('Quitar el tipo',
-          '<p>Se quita <strong>' + U.escapar(tipo.tipo) + '</strong> de la lista.</p>', 'Quitar');
-        if (!ok) return;
-        App.E.tipos = App.E.tipos.filter(function (x) { return x.tipo !== tipo.tipo; });
-        await App.guardarTipos();
-        App.pintarTiposAjustes();
-      } }
+    { texto: 'Borrar', peligro: true, onclick: function () { App.borrarTipo(tipo); } }
   ]));
 
   return f;
+};
+
+/* ---------- borrar un tipo de asunto, con papelera (11-sep-2026) ----------
+
+   No se borra si hay asuntos (abiertos o en `asuntos.json`) con este
+   tipo: se dice cuántos. Si no hay ninguno pero tiene guía escrita, se
+   avisa de que la guía se va con él, y se guarda para poder devolverla
+   junto con el tipo. */
+App.contarAsuntosConTipo = function (nombreTipo) {
+  var vistos = {};
+  (App.E.listaAbiertos || []).forEach(function (a) {
+    var t = (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo);
+    if (t === nombreTipo) vistos[a.nombre] = true;
+  });
+  Object.keys((App.E.registro && App.E.registro.asuntos) || {}).forEach(function (k) {
+    if (App.E.registro.asuntos[k].tipo === nombreTipo) vistos[k] = true;
+  });
+  return Object.keys(vistos).length;
+};
+
+App.borrarTipo = async function (tipo) {
+  var n = App.contarAsuntosConTipo(tipo.tipo);
+  if (n) {
+    await U.preguntar('No se puede borrar',
+      '<p>Hay ' + n + ' asunto' + (n === 1 ? '' : 's') + ' con el tipo <strong>' +
+      U.escapar(tipo.tipo) + '</strong>. No se puede borrar mientras tenga alguno.</p>', 'Vale', true);
+    return;
+  }
+
+  var guia = null;
+  try {
+    var guias = await Carpetas.leerJson(App.E.gestor, 'guias.json');
+    if (guias && guias[tipo.tipo] && guias[tipo.tipo].length) guia = guias[tipo.tipo];
+  } catch (e) { guia = null; }
+
+  var ok = await window.Papelera.preguntarBorrar(tipo.tipo,
+    guia ? '<p class="nota">Este tipo tiene guía escrita. Se va con él, guardada para poder devolverla.</p>' : '');
+  if (!ok) return;
+
+  try {
+    App.E.tipos = App.E.tipos.filter(function (x) { return x.tipo !== tipo.tipo; });
+    await App.guardarTipos();
+    if (guia) {
+      var guiasActual = (await Carpetas.leerJson(App.E.gestor, 'guias.json')) || {};
+      delete guiasActual[tipo.tipo];
+      await Copias.guardar(App.E.gestor, 'guias.json', guiasActual);
+    }
+    await window.Papelera.mandarDato('tipo', tipo.tipo, null, { tipo: tipo, guia: guia });
+    App.pintarTiposAjustes();
+    U.aviso('Tipo mandado a la papelera.', 'bueno');
+  } catch (e) {
+    U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+  }
 };
 
 /* Las cuatro pestañas de categoría, con la cuenta de cada una. Cambiar
@@ -400,14 +446,7 @@ App.pintarAjustes = async function () {
     linea.innerHTML = '<span class="tarjeta-tipo-nombre">' + U.escapar(nombre) + '</span>';
     f.appendChild(linea);
     f.appendChild(App.botonMenuTarjeta([
-      { texto: 'Quitar', peligro: true, onclick: async function () {
-          var ok = await U.preguntar('Quitar el tipo de documento',
-            '<p>Se quita <strong>' + U.escapar(nombre) + '</strong> de la lista.</p>', 'Quitar');
-          if (!ok) return;
-          App.E.tiposDocumento = App.E.tiposDocumento.filter(function (x) { return x !== nombre; });
-          await App.guardarTiposDocumento();
-          App.pintarAjustes();
-        } }
+      { texto: 'Borrar', peligro: true, onclick: function () { App.borrarTipoDocumento(nombre); } }
     ]));
     tdoc.appendChild(f);
   });
@@ -468,6 +507,28 @@ App.pintarAjustes = async function () {
 
   await App.pintarCopias();
   await App.pintarFichasHuerfanas();
+  if (typeof App.pintarPapelera === 'function') await App.pintarPapelera();
+};
+
+/* ---------- borrar un tipo de documento, con papelera (11-sep-2026) ----------
+
+   Se borra siempre: los documentos ya nombrados conservan su nombre,
+   esta lista solo sirve para nombrar los nuevos. */
+App.borrarTipoDocumento = async function (nombre) {
+  var ok = await window.Papelera.preguntarBorrar(nombre,
+    '<p class="nota">Los documentos ya nombrados conservan su nombre: ' +
+    'esta lista solo sirve para nombrar los nuevos.</p>');
+  if (!ok) return;
+  var pos = App.E.tiposDocumento.indexOf(nombre);
+  try {
+    App.E.tiposDocumento = App.E.tiposDocumento.filter(function (x) { return x !== nombre; });
+    await App.guardarTiposDocumento();
+    await window.Papelera.mandarDato('tipo-documento', nombre, null, { nombre: nombre, posicion: pos });
+    App.pintarAjustes();
+    U.aviso('Tipo de documento mandado a la papelera.', 'bueno');
+  } catch (e) {
+    U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+  }
 };
 
 /* ---------- los campos de un tipo de asunto ----------
@@ -636,7 +697,7 @@ App.pintarCuadroDeCampos = function (lista, catalogo, categoria) {
      nombrar un documento (js/documentos.js): unos campos se insertan
      ahí mismo, en vez de abrir un segundo cuadro. Solo hay un
      `U.preguntar` a la vez en toda la aplicación; abrir otro mientras
-     este espera le robaría los botones. */
+     este espera le robaría los botones al de fuera. */
 
   function abrirFormularioPropio() {
     if ($('campos-propio-form')) return;
@@ -740,38 +801,38 @@ App.pintarCamposPropios = function () {
     f.innerHTML = '<span class="nombre-tipo">' + U.escapar(p.nombre) + '</span>' +
       '<span class="suave" style="flex:1">' +
       (p.clase === 'lista' ? U.escapar(p.valores.join(', ')) : 'Texto libre') + '</span>';
-    var quitar = document.createElement('button');
-    quitar.className = 'boton boton-peligro';
-    quitar.textContent = 'Quitar';
-    quitar.onclick = async function () {
-      var enUso = Campos.tiposQueUsanPropio(App.E.campos, p.id);
-      var ok = await U.preguntar('Quitar el campo ' + p.nombre,
-        (enUso.length
-          ? '<p>Lo usan estos tipos: <strong>' + enUso.map(U.escapar).join(', ') + '</strong>.</p>' +
-            '<p class="nota">Se quita también de ellos. Los asuntos ya creados conservan el ' +
-            'valor que tengan guardado.</p>'
-          : '<p>No lo usa ningún tipo.</p>'), 'Quitar');
-      if (!ok) return;
-      try {
-        App.E.campos = await Campos.guardarPropios(App.E.gestor, function (lista) {
-          return lista.filter(function (x) { return x.id !== p.id; });
-        });
-        for (var i = 0; i < enUso.length; i++) {
-          var claveTipo = enUso[i];
-          var restante = (App.E.campos.porTipo[claveTipo] || []).filter(function (c) {
-            return !(c.origen === 'propio' && c.id === p.id);
-          });
-          App.E.campos = await Campos.guardarConfigDeTipo(App.E.gestor, claveTipo, restante);
-        }
-        App.pintarCamposPropios();
-        U.aviso('Campo propio quitado.', 'bueno');
-      } catch (e) {
-        U.aviso('No he podido quitarlo: ' + e.message, 'malo');
-      }
-    };
-    f.appendChild(quitar);
+    var borrar = document.createElement('button');
+    borrar.className = 'boton boton-peligro';
+    borrar.textContent = 'Borrar';
+    borrar.onclick = function () { App.borrarCampoPropio(p); };
+    f.appendChild(borrar);
     caja.appendChild(f);
   });
+};
+
+/* ---------- borrar un campo propio, con papelera (11-sep-2026) ----------
+
+   Si está asociado a algún tipo, no se borra: se dice a cuáles. */
+App.borrarCampoPropio = async function (p) {
+  var enUso = Campos.tiposQueUsanPropio(App.E.campos, p.id);
+  if (enUso.length) {
+    await U.preguntar('No se puede borrar',
+      '<p>Lo usan estos tipos: <strong>' + enUso.map(U.escapar).join(', ') + '</strong>.</p>' +
+      '<p class="nota">Quítalo primero de esos tipos, en "Campos".</p>', 'Vale', true);
+    return;
+  }
+  var ok = await window.Papelera.preguntarBorrar(p.nombre);
+  if (!ok) return;
+  try {
+    App.E.campos = await Campos.guardarPropios(App.E.gestor, function (lista) {
+      return lista.filter(function (x) { return x.id !== p.id; });
+    });
+    await window.Papelera.mandarDato('campo-propio', p.nombre, null, { propio: p });
+    App.pintarCamposPropios();
+    U.aviso('Campo propio mandado a la papelera.', 'bueno');
+  } catch (e) {
+    U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+  }
 };
 
 $('btn-anadir-propio').onclick = async function () {
@@ -924,7 +985,7 @@ App.pintarTablaEstados = function () {
 
     f.appendChild(App.botonMenuTarjeta([
       { texto: 'Cambiar el nombre', onclick: function () { App.renombrarEstado(nombre); } },
-      { texto: 'Quitar', peligro: true, onclick: function () { App.quitarEstado(nombre); } }
+      { texto: 'Borrar', peligro: true, onclick: function () { App.quitarEstado(nombre); } }
     ]));
 
     caja.appendChild(f);
@@ -999,34 +1060,34 @@ App.renombrarEstado = async function (viejo) {
   }
 };
 
+/* Borrar un estado, con papelera (11-sep-2026). Si algún asunto lo
+   tiene puesto, no se borra: se dice cuántos. */
 App.quitarEstado = async function (nombre) {
   var n = App.contarCon(nombre);
-  var ok = await U.preguntar('Quitar el estado',
-    '<p>Se quita <strong>' + U.escapar(nombre) + '</strong> de la lista.</p>' +
-    (n ? '<p class="nota">Hay ' + n + ' asunto' + (n === 1 ? '' : 's') +
-         ' en este estado. Se quedarán sin estado, y podrás ponerles otro.</p>'
-       : '<p class="nota">No hay ningún asunto en este estado.</p>'), 'Quitar');
+  if (n) {
+    await U.preguntar('No se puede borrar',
+      '<p>Hay ' + n + ' asunto' + (n === 1 ? '' : 's') + ' en el estado <strong>' +
+      U.escapar(nombre) + '</strong>. No se puede borrar mientras tenga alguno.</p>', 'Vale', true);
+    return;
+  }
+
+  var ok = await window.Papelera.preguntarBorrar(nombre);
   if (!ok) return;
 
   try {
+    var pos = -1;
+    for (var i = 0; i < App.E.estados.length; i++) { if (App.E.estados[i].nombre === nombre) { pos = i; break; } }
+    var estadoObjeto = pos !== -1 ? App.E.estados[pos] : { nombre: nombre, espera: false };
     App.E.estados = App.E.estados.filter(function (e) { return e.nombre !== nombre; });
     await App.guardarEstados();
-
-    if (n) {
-      await App.cargarRegistro();
-      Object.keys(App.E.registro.asuntos).forEach(function (k) {
-        if (App.E.registro.asuntos[k].situacion === nombre) App.E.registro.asuntos[k].situacion = '';
-      });
-      await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
-      App.refrescarFichas();
-    }
+    await window.Papelera.mandarDato('estado', nombre, null, { estado: estadoObjeto, posicion: pos });
 
     App.pintarAjustes();
     App.pintarFiltroEstado();
     App.pintarAbiertos();
-    U.aviso('Estado quitado.', 'bueno');
+    U.aviso('Estado mandado a la papelera.', 'bueno');
   } catch (e) {
-    U.aviso('No he podido quitarlo: ' + e.message, 'malo');
+    U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
   }
 };
 
