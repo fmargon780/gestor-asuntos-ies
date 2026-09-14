@@ -1105,5 +1105,8 @@ una línea cada una. El texto largo que tenían antes era:
     con "conflicted copy"); si la carpeta ya tiene ficha en `asuntos.json`, se respeta igual,
     aunque el nombre sea raro.
   Cambios quirúrgicos, sin tocar la arquitectura. Batería completa (`npm test`, 19 ficheros) en
-  verde, con `js/lib/pdf.worker.min.js` esta vez sí presente. Versión publicada
-  `14-sep-2026 · 16:36`.
+  verde, con `js/lib/pdf.worker.min.js` esta vez sí presente. Subido a `main`, versión
+  `14-sep-2026 · 16:36`; **esta sesión no ha podido comprobarlo con `curl` contra la web
+  publicada** (la red de esta sesión concreta no llega a `gestor-de-asuntos.vercel.app`: la
+  bloquea la política de salida de este contenedor, no algo del código). Queda pendiente de
+  confirmar en el navegador la próxima vez que se entre.
