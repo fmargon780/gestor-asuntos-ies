@@ -49,3 +49,10 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 7 | `docs/PAPELERA.md` | HECHA | Papelera compartida: nada se borra del todo a la primera. Versión publicada `11-sep-2026 · 16:20`. Detalle en `docs/HISTORIA.md` |
 | 8 | `docs/UNIR-VER-DENTRO.md` | HECHA | Pantalla propia "Duplicados", con "No son el mismo". Versión publicada `11-sep-2026 · 17:15`. Detalle en `docs/HISTORIA.md` |
 | 9 | `docs/REPARTO-CONTEXTO.md` | HECHA | Repartido `CONTEXTO.md` en `CONTEXTO-CORTO.md`, `CONTEXTO.md` y `HISTORIA.md`, y podada esta cola; no toca código ni publica nada nuevo. |
+| 10 | `docs/ARREGLOS-USO-2026-09-14.md` | PENDIENTE | Cuatro arreglos pequeños: salida y tecla Escape en todas las pantallas, copiar el nombre en orden normal desde el asunto, borrar documento en Sin Clasificar, y que las carpetas temporales de Drive no cuenten como asuntos. |
+
+## Lo que vendrá después
+
+`docs/PROXIMOS-ASUNTOS.md` guarda los nueve asuntos que Francisco dejó apuntados el 14-sep-2026.
+No se trabajan: cada uno se habla con él y se convierte en su propia instrucción antes de entrar
+en esta cola.
