@@ -14,7 +14,11 @@ App.verAbiertos = async function (yaLeido) {
   var hay = yaLeido || await Carpetas.contenido(App.E.abiertos);
 
   App.E.listaAbiertos = hay.carpetas
-    .filter(function (c) { return c.nombre.charAt(0) !== '_'; })
+    .filter(function (c) {
+      if (c.nombre.charAt(0) === '_') return false;
+      if (App.E.registro.asuntos[c.nombre]) return true;
+      return !Carpetas.esCarpetaTemporalDeSincronizacion(c.nombre);
+    })
     .map(function (c) {
       var leido = Nombres.leer(c.nombre, App.E.tipos);
       var ficha = App.E.registro.asuntos[c.nombre] || {};

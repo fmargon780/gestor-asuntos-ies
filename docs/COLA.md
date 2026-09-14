@@ -49,7 +49,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 7 | `docs/PAPELERA.md` | HECHA | Papelera compartida: nada se borra del todo a la primera. Versión publicada `11-sep-2026 · 16:20`. Detalle en `docs/HISTORIA.md` |
 | 8 | `docs/UNIR-VER-DENTRO.md` | HECHA | Pantalla propia "Duplicados", con "No son el mismo". Versión publicada `11-sep-2026 · 17:15`. Detalle en `docs/HISTORIA.md` |
 | 9 | `docs/REPARTO-CONTEXTO.md` | HECHA | Repartido `CONTEXTO.md` en `CONTEXTO-CORTO.md`, `CONTEXTO.md` y `HISTORIA.md`, y podada esta cola; no toca código ni publica nada nuevo. |
-| 10 | `docs/ARREGLOS-USO-2026-09-14.md` | PENDIENTE | Cuatro arreglos pequeños: salida y tecla Escape en todas las pantallas, copiar el nombre en orden normal desde el asunto, borrar documento en Sin Clasificar, y que las carpetas temporales de Drive no cuenten como asuntos. |
+| 10 | `docs/ARREGLOS-USO-2026-09-14.md` | HECHA | El 3 (borrar en Por clasificar) ya estaba hecho, de la papelera (fila 7). Escape y salida en toda pantalla, copiar el nombre de un relacionado en orden normal, y las carpetas temporales de Drive/Dropbox fuera de Asuntos abiertos. Versión publicada `14-sep-2026 · 16:36`. Detalle en `docs/HISTORIA.md`. |
 
 ## Lo que vendrá después
 

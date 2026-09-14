@@ -1076,3 +1076,34 @@ una línea cada una. El texto largo que tenían antes era:
   sello de Séneca de `pruebas/registro.mjs`, que en esta sesión tampoco se han podido comprobar
   por no tener aquí `js/lib/pdf.worker.min.js`; no se ha tocado ese fichero, sin relación con
   este cambio, mismo aviso que dejaron las filas 5 y 7.
+- **10 · `docs/ARREGLOS-USO-2026-09-14.md`**: Terminada 14-sep-2026 · 16:36. Cuatro arreglos
+  pequeños, acordados con Francisco por lo que le pasó a su compañero (se quedó atrapado en una
+  pantalla y tuvo que cerrar el navegador). El **3** (borrar un documento en Por clasificar) ya
+  estaba hecho desde la papelera (fila 7, `js/papelera.js`, `envolverSueltos`): solo se ha
+  comprobado. Los otros tres:
+  - **1 · Que de toda pantalla se pueda salir.** El Escape general de `js/usabilidad.js` no hacía
+    nada fuera del cuadro (`#capa`), un buscador o el lector de correos: en la ficha de un
+    asunto, en la pantalla Duplicados o en Ajustes/Archivo/Personas con historial, no pasaba
+    nada. Ahora, sin cuadro ni panel abierto, Escape hace lo mismo que el botón de salida de la
+    pantalla que se ve; en Nuevo asunto equivale a Cancelar, preguntando antes si hay algo
+    escrito. El visor de un documento (`js/visor.js`) no tenía Escape (solo el aspa): ahora
+    también se cierra con Escape, desde el mismo sitio, sin tocar `js/visor.js`. Dos cuadros
+    pequeños que ya ponían su propio Escape (el tipo de documento nuevo de `js/documentos.js`, el
+    menú de tres puntos de `js/ajustes.js`) se han tocado para que corten la propagación: si no,
+    el Escape general de aquí se disparaba también por detrás y cerraba de más (por ejemplo, todo
+    el cuadro de "Gestionar documentos" al salir solo del recuadro de crear un tipo).
+  - **2 · Copiar el nombre en orden normal.** Cada relacionado de la ficha del asunto lleva ahora
+    un botón "Copiar" (`js/relacionados.js`, `Relacionados.nombreEnOrdenNormal`) con el nombre
+    como se escribe a mano: de alumnado y personal quita el código final y da la vuelta a
+    "Apellidos, Nombre"; en empresas copia la razón social tal cual. No toca cómo se guarda el
+    nombre ni cómo se nombran las carpetas.
+  - **4 · Carpetas temporales de Drive/Dropbox.** `App.verAbiertos` (`js/asuntos-lista.js`) solo
+    descartaba las carpetas que empiezan por `_`: una carpeta temporal de sincronización
+    (`.tmp.driveupload`, `.dropbox`, `desktop.ini`...) se colaba como si fuera un asunto abierto
+    más. `Carpetas.esCarpetaTemporalDeSincronizacion` (`js/carpetas.js`), en un solo sitio,
+    descarta las que empiezan por `.` o `~` y las de siempre (`desktop.ini`, `Icon\r`, un nombre
+    con "conflicted copy"); si la carpeta ya tiene ficha en `asuntos.json`, se respeta igual,
+    aunque el nombre sea raro.
+  Cambios quirúrgicos, sin tocar la arquitectura. Batería completa (`npm test`, 19 ficheros) en
+  verde, con `js/lib/pdf.worker.min.js` esta vez sí presente. Versión publicada
+  `14-sep-2026 · 16:36`.

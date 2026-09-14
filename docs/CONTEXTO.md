@@ -99,6 +99,17 @@ borde izquierdo se arrastra; el ancho se recuerda (`gestor-lector-ancho`); doble
 **Comodidades de pantalla** (`js/usabilidad.js`): botón Volver, Cancelar, etiquetas de lo que se
 está filtrando, vista compacta y la tecla Escape. No toca datos.
 
+**Que de toda pantalla se pueda salir.** Con el cuadro (`#capa`) abierto, Escape lo cierra
+(cancela; si no lleva Cancelar, acepta). Con el visor de un documento abierto (`con-visor`),
+Escape lo cierra (el lector de correos vigila el suyo aparte, en `js/lector.js`). Si no hay nada
+de eso y el cursor no está en un buscador, Escape hace lo mismo que el botón de salida de la
+pantalla que se ve (`.boton-volver`, `#ficha-volver` o `#dup-pantalla-volver`); en Nuevo asunto
+equivale a Cancelar, y si hay algo escrito (descripción, tercero elegido o categoría marcada)
+pregunta antes de tirarlo. Todo esto vive en el Escape general de `js/usabilidad.js`. **Un cuadro
+pequeño que ponga su propio Escape** (el tipo de documento nuevo de `js/documentos.js`, el menú
+de tres puntos de `js/ajustes.js`) tiene que cortar la propagación (`ev.stopPropagation()`), o
+el Escape general de aquí se dispara también y hace algo de más.
+
 ### La ficha de un asunto
 
 Al pulsar el nombre de un asunto se entra en su ficha: sus datos, el contacto del tercero, la
@@ -319,6 +330,11 @@ Un asunto puede afectar a más de una persona o entidad, además de su tercero p
 - La ficha de la persona (`App.verFicha`, en `js/archivo-personas.js`) enseña un bloque
   "Relacionado con este asunto" cuando aparece como relacionada de alguno, mirando
   `App.E.registro.asuntos` directamente.
+- **Copiar el nombre en orden normal.** Cada relacionado lleva un botón "Copiar"
+  (`Relacionados.nombreEnOrdenNormal`) que copia su nombre tal como se escribe a mano, no como se
+  guarda: de alumnado y personal quita el código pegado al final (el Nº escolar o las cuatro
+  cifras del documento — siempre en mayúsculas, nunca como lleva un nombre de pila) y da la
+  vuelta a "Apellidos, Nombre"; en empresas copia la razón social tal cual, sin darle la vuelta.
 - Vive en `js/relacionados.js`, cargado después de `js/duplicados.js` (envuelve
   `Duplicados.delTercero`) y de `js/archivo-personas.js` (envuelve `App.verFicha` y
   `App.verArchivo`).
@@ -541,7 +557,7 @@ de `App` va después del fichero que lo define.
 | `css/copiar-nie.css` | Los estilos de `js/copiar.js` (nombre viejo del módulo) |
 | `js/util.js` | Utilidades comunes, y la comparación de nombres parecidos |
 | `js/almacen.js` | Guarda los ajustes en el navegador |
-| `js/carpetas.js` | Habla con el selector de carpetas del navegador. Lee y escribe los JSON |
+| `js/carpetas.js` | Habla con el selector de carpetas del navegador. Lee y escribe los JSON. `Carpetas.esCarpetaTemporalDeSincronizacion` descarta, en un solo sitio, las carpetas que dejan Dropbox y Drive al sincronizar |
 | `js/copias.js` | Copia de seguridad diaria de los ficheros de `_GESTOR`, y detección de fichero roto |
 | `js/conflictos.js` | Las copias en conflicto que deja Dropbox: fusión sola o aviso para elegir |
 | `js/fichas-huerfanas.js` | Fichas de `asuntos.json` cuya carpeta ya no está: enlazar o borrar |
@@ -555,7 +571,7 @@ de `App` va después del fichero que lo define.
 | `js/usabilidad.js` | Volver, Cancelar, etiquetas de filtros, vista compacta y Escape |
 | `js/nucleo.js` | El estado, el arranque y el cambio de pantalla |
 | `js/version.js` | `App.VERSION`, la fecha y hora de la última publicación |
-| `js/asuntos-lista.js` | Asuntos abiertos: las tres tarjetas, las tarjetas por tipo y la lista |
+| `js/asuntos-lista.js` | Asuntos abiertos: las tres tarjetas, las tarjetas por tipo y la lista. Al leer la carpeta, descarta las que parecen temporales de sincronización, salvo que ya tengan ficha en `asuntos.json` |
 | `js/unir-asuntos.js` | Une asuntos duplicados que ya existen: aviso junto a Actualizar y pantalla propia "Duplicados" (`css/unir-asuntos.css`) |
 | `js/asuntos-editar.js` | Editar un asunto abierto: renombra la carpeta y mueve su ficha |
 | `js/documentos-sueltos.js` | Los papeles sin asunto, cerrar y reabrir, y la vigilancia de la carpeta |

@@ -202,6 +202,24 @@
     }
   }
 
+  /* ¿Hay algo escrito en Nuevo asunto que se perdería al salir? Solo
+     se mira lo que de verdad cuesta volver a escribir. */
+  function hayCambiosSinGuardarEnNuevo() {
+    if ($('campo-descripcion') && $('campo-descripcion').value.trim()) return true;
+    if ($('tercero-elegido') && !$('tercero-elegido').classList.contains('oculto')) return true;
+    if (document.querySelector('.categoria-boton.elegido')) return true;
+    return false;
+  }
+
+  /* Escape en Nuevo asunto: si no hay nada escrito, sale sin más. Si
+     hay algo, pregunta antes de tirarlo (el mismo cuadro de siempre). */
+  function salirDeNuevoConEscape() {
+    if (!hayCambiosSinGuardarEnNuevo()) { cancelarNuevo(); return; }
+    U.preguntar('¿Salir sin guardar?',
+      '<p>Se perderá lo escrito en este asunto nuevo.</p>', 'Salir sin guardar')
+      .then(function (si) { if (si) cancelarNuevo(); });
+  }
+
   /* ==========================================================
      4. VISTA COMPACTA DE LOS ASUNTOS ABIERTOS
 
@@ -348,8 +366,11 @@
   /* ==========================================================
      6. LA TECLA ESCAPE
 
-     Con un cuadro abierto, lo cierra. Con el cursor en un buscador,
-     lo vacía.
+     Con un cuadro abierto, lo cierra. Con el visor de un documento
+     abierto, lo cierra (el lector de correos se cierra solo, en
+     js/lector.js). Con el cursor en un buscador, lo vacía. Si no hay
+     nada de eso, vuelve a la pantalla anterior, igual que el botón
+     «Volver» o «Cancelar» que ya tenga la pantalla a la vista.
      ========================================================== */
 
   document.addEventListener('keydown', function (ev) {
@@ -365,12 +386,33 @@
       return;
     }
 
+    /* El lector de correos vigila su propia tecla Escape. */
+    if (document.body.classList.contains('con-lector')) return;
+
+    if (document.body.classList.contains('con-visor')) {
+      ev.preventDefault();
+      if (window.Visor) Visor.cerrar();
+      return;
+    }
+
     var donde = document.activeElement;
     if (donde && donde.type === 'search' && donde.value) {
       ev.preventDefault();
       donde.value = '';
       avisarDelCambio(donde);
+      return;
     }
+
+    var pantallaVisible = document.querySelector('.pantalla:not(.oculto)');
+    if (!pantallaVisible) return;
+    if (pantallaVisible.id === 'pantalla-nuevo') {
+      ev.preventDefault();
+      salirDeNuevoConEscape();
+      return;
+    }
+    var salida = pantallaVisible.querySelector(
+      '.boton-volver:not(.oculto), #ficha-volver, #dup-pantalla-volver');
+    if (salida) { ev.preventDefault(); salida.click(); }
   });
 
   /* El cursor se pone solo en el primer campo del cuadro que se abre. */

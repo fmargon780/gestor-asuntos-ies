@@ -386,7 +386,7 @@ var Documentos = (function () {
     $('doc-tipo-nombre').oninput = pintarAvisoDeTipo;
     $('doc-tipo-nombre').onkeydown = function (ev) {
       if (ev.key === 'Enter') { ev.preventDefault(); crearYUsarTipo(); }
-      if (ev.key === 'Escape') { ev.preventDefault(); cerrarCuadroDeTipoNuevo(); }
+      if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); cerrarCuadroDeTipoNuevo(); }
     };
     $('doc-tipo-cancelar').onclick = cerrarCuadroDeTipoNuevo;
     $('doc-tipo-crear').onclick = crearYUsarTipo;

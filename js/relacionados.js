@@ -145,6 +145,70 @@ var Relacionados = (function () {
   }
 
   /* ==========================================================
+     COPIAR EL NOMBRE EN ORDEN NORMAL
+
+     Hasta que existan las plantillas, Francisco escribe los documentos
+     a mano y necesita el nombre tal como se escribe, no como se
+     guarda. De alumnado y personal se guarda «Apellidos, Nombre
+     <código>»: aquí se quita el código pegado al final (el Nº de
+     identificación escolar, o las cuatro cifras del documento del
+     personal — siempre en mayúsculas, nunca como lleva un nombre de
+     pila) y se da la vuelta a los apellidos y el nombre. En empresas
+     no hay nada que dar la vuelta: se copia la razón social tal cual.
+     ========================================================== */
+
+  function nombreEnOrdenNormal(r) {
+    var texto = String((r && r.nombre) || '').trim();
+    if (!texto || r.categoria === 'EMPRESAS' || r.categoria === 'OTROS') return texto;
+
+    var coma = texto.indexOf(',');
+    if (coma === -1) return texto;
+    var apellidos = texto.slice(0, coma).trim();
+    var palabras = texto.slice(coma + 1).trim().split(/\s+/);
+    var ultima = palabras[palabras.length - 1] || '';
+    if (palabras.length > 1 && /^[0-9A-Z]{4,}$/.test(ultima)) palabras.pop();
+
+    return (palabras.join(' ') + ' ' + apellidos).trim();
+  }
+
+  function copiarAlPortapapeles(texto) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(texto).then(function () { return true; })
+        .catch(function () { return copiarALaAntigua(texto); });
+    }
+    return Promise.resolve(copiarALaAntigua(texto));
+  }
+
+  function copiarALaAntigua(texto) {
+    try {
+      var c = document.createElement('textarea');
+      c.value = texto;
+      c.setAttribute('readonly', '');
+      c.style.cssText = 'position:fixed;top:-1000px;left:-1000px';
+      document.body.appendChild(c);
+      c.select();
+      var ok = document.execCommand('copy');
+      c.parentNode.removeChild(c);
+      return ok;
+    } catch (e) { return false; }
+  }
+
+  function copiarNombreDelRelacionado(r, boton) {
+    var texto = nombreEnOrdenNormal(r);
+    if (!texto) return;
+    copiarAlPortapapeles(texto).then(function (ok) {
+      if (!ok) { U.aviso('No he podido copiarlo. Es ' + texto + '.', 'malo'); return; }
+      var antes = boton.textContent;
+      boton.textContent = 'Copiado';
+      boton.classList.add('boton-marcado');
+      setTimeout(function () {
+        boton.textContent = antes;
+        boton.classList.remove('boton-marcado');
+      }, 1400);
+    });
+  }
+
+  /* ==========================================================
      PINTAR EL BLOQUE DE LA FICHA
      ========================================================== */
 
@@ -155,6 +219,8 @@ var Relacionados = (function () {
       return '<div class="relacionado-fila">' +
                '<span class="marca-tipo">' + U.escapar(r.categoria) + '</span>' +
                '<span>' + U.escapar(r.nombre) + '</span>' +
+               '<button type="button" class="boton rel-copiar" data-i="' + i + '" ' +
+                 'title="Copiar el nombre en orden normal, para pegarlo en un documento">Copiar</button>' +
                (abierto
                  ? '<button type="button" class="boton rel-quitar" data-i="' + i + '">Quitar</button>'
                  : '') +
@@ -168,6 +234,13 @@ var Relacionados = (function () {
         : (lista.length
             ? '<p class="nota">El asunto está archivado: la lista ya no se puede cambiar.</p>'
             : ''));
+
+    Array.prototype.forEach.call(caja.querySelectorAll('.rel-copiar'), function (b) {
+      b.onclick = function () {
+        var i = parseInt(b.dataset.i, 10);
+        if (lista[i]) copiarNombreDelRelacionado(lista[i], b);
+      };
+    });
 
     if (!abierto) return;
 

@@ -80,7 +80,7 @@ App.botonMenuTarjeta = function (opciones) {
     document.removeEventListener('keydown', alPulsarTecla, true);
   }
   function alPulsarFuera(e) { if (!envoltorio.contains(e.target)) cerrar(); }
-  function alPulsarTecla(e) { if (e.key === 'Escape') cerrar(); }
+  function alPulsarTecla(e) { if (e.key === 'Escape') { e.stopPropagation(); cerrar(); } }
 
   boton.onclick = function (e) {
     e.stopPropagation();

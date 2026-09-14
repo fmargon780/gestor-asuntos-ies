@@ -77,6 +77,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Papelera: nada se borra del todo a la primera.
 - Copias de seguridad diarias, detección de fichero roto, fusión de conflictos de Dropbox.
 - Pruebas automáticas en GitHub Actions en cada subida.
+- Escape y botón de salida en toda pantalla; copiar el nombre de un relacionado en orden normal;
+  carpetas temporales de Drive/Dropbox fuera de Asuntos abiertos.
 
 ## 6. Reglas de código que no se pueden olvidar
 

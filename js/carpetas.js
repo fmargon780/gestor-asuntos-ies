@@ -69,6 +69,25 @@ var Carpetas = (function () {
     return { carpetas: carpetas, ficheros: sueltos };
   }
 
+  /* Google Drive y Dropbox dejan carpetas propias al sincronizar, que
+     la aplicación estaba tomando por carpetas de asunto. Aquí, en un
+     solo sitio, para poder ampliar la lista sin buscarla por el
+     código: empiezan por un punto o una virgulilla (cubre .tmp,
+     .~lock, .dropbox, .driveupload, .tmp.driveupload,
+     .tmp.drivedownload y .DS_Store), o son de los nombres y trozos de
+     siempre. */
+  var NOMBRES_CARPETA_TEMPORAL = ['desktop.ini', 'icon\r'];
+
+  function esCarpetaTemporalDeSincronizacion(nombre) {
+    var n = String(nombre || '');
+    if (!n) return true;
+    var c = n.charAt(0);
+    if (c === '.' || c === '~') return true;
+    var min = n.toLowerCase();
+    if (NOMBRES_CARPETA_TEMPORAL.indexOf(min) !== -1) return true;
+    return min.indexOf('conflicted copy') !== -1;
+  }
+
   async function existe(dir, nombre) {
     try { await dir.getDirectoryHandle(nombre); return true; }
     catch (e) { return false; }
@@ -295,6 +314,7 @@ var Carpetas = (function () {
   return {
     soportado: soportado, elegir: elegir, permiso: permiso,
     subcarpetas: subcarpetas, ficheros: ficheros, contenido: contenido, existe: existe,
+    esCarpetaTemporalDeSincronizacion: esCarpetaTemporalDeSincronizacion,
     crear: crear, bajar: bajar, mover: mover, renombrar: renombrar, trasladar: trasladar,
     contarFicheros: contarFicheros,
     renombrarFichero: renombrarFichero, moverFichero: moverFichero,
