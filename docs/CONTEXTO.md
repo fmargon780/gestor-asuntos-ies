@@ -253,8 +253,10 @@ la lista de **hitos** que se trabaja: cada paso, vivo dentro de ese asunto, con 
   `#ficha-guia` (no hay ninguna función de `App` que envolver: `pintarGuia` es privada de
   `js/ficha-asunto.js`).
 - Vive en `js/hitos.js` y `js/hitos-archivo.js` (el modelo; se parte en dos para no pasar de las
-  400 líneas), `js/hitos-panel.js` (la ficha del asunto) y `js/hitos-ajustes.js` (el bloque
-  "Hitos" de Ajustes: responsables y días no lectivos).
+  400 líneas), `js/hitos-panel.js` y `js/hitos-panel-lista.js` (la ficha del asunto: el
+  repintado y el bloque de entrada en uno, cómo se pinta cada hito en el otro, hablándose por
+  `window.HitosPanel`) y `js/hitos-ajustes.js` (el bloque "Hitos" de Ajustes: responsables y
+  días no lectivos).
 
 Se comprueba con `pruebas/hitos.mjs`.
 
@@ -807,7 +809,8 @@ de `App` va después del fichero que lo define.
 | `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF |
 | `js/lib/pdf.min.js`, `js/lib/pdf.worker.min.js` | pdf.js (Mozilla) 3.11.174, copiado tal cual |
 | `js/ficha-asunto.js` | La pantalla de un asunto: guía, notas, documentos y contacto |
-| `js/hitos-panel.js` | Pinta los hitos en la ficha del asunto, envolviendo lo que pinta la guía |
+| `js/hitos-panel.js` | Pinta los hitos en la ficha del asunto, envolviendo lo que pinta la guía: el observador y el repintado |
+| `js/hitos-panel-lista.js` | La otra mitad del panel de hitos: la fila de cada hito, su cuerpo desplegado y el cambio de rama |
 | `js/duplicados.js` | ¿Esto no lo hicimos ya? Asuntos iguales del mismo tercero |
 | `js/relacionados.js` | Terceros relacionados con un asunto, y la nota al archivar |
 | `js/hitos-archivo.js` | La otra mitad del modelo de hitos: bifurcaciones, responsables de Ajustes y el `HISTORIAL DE TRAMITACION.txt` al archivar/reabrir |

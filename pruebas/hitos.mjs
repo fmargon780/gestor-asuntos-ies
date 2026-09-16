@@ -49,6 +49,35 @@ function aammdd(d) {
   return String(d.getFullYear()).slice(2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
 }
 
+/* ================= LA GUÍA DE PRUEBA =================
+
+   p1 -> p2 (con estado del asunto) -> p3 (decisión: "en mano" [p3a1,
+   p3a2] u "por email" [p3b]) -> p4 (responsable = el tercero, plazo
+   de 10 días hábiles desde que p2 se completa).
+
+   guías-enganche.js solo lee guias.json una vez, la primera vez que
+   la aplicación entra con la carpeta ya señalada (arrancar()); a
+   partir de ahí se queda con lo que tenía en memoria, aunque el
+   fichero cambie en el disco (igual que si el compañero editara la
+   guía desde el otro ordenador: hace falta volver a entrar para
+   verla). Por eso este fichero de mentira, y el RegAlum, se escriben
+   ANTES del primer #btn-entrar, no después. */
+const GUIA = [
+  { id: 'p1', titulo: 'Registrar la solicitud', cuerpo: '', opciones: [] },
+  { id: 'p2', titulo: 'Notificación', cuerpo: '', estadoAsunto: 'EN TRÁMITE', opciones: [] },
+  { id: 'p3', titulo: '¿Cómo se ha recibido la documentación?', cuerpo: '', opciones: [
+    { id: 'o1', titulo: 'En mano', pasos: [
+      { id: 'p3a1', titulo: 'Sellar la entrega', cuerpo: '' },
+      { id: 'p3a2', titulo: 'Archivar copia', cuerpo: '' }
+    ] },
+    { id: 'o2', titulo: 'Por email', pasos: [
+      { id: 'p3b', titulo: 'Guardar el correo', cuerpo: '' }
+    ] }
+  ] },
+  { id: 'p4', titulo: 'Firma del director', cuerpo: '', responsable: 'tercero',
+    plazo: { dias: 10, desde: 'p2' }, opciones: [] }
+];
+
 /* ================= ESCENARIO 10: hitos.json roto ================= */
 
 console.log('--- escenario 10: hitos.json roto no deja entrar ---');
@@ -56,6 +85,25 @@ await pagina.click('#btn-abiertos');
 await pagina.click('#btn-archivo');
 await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
+
+/* Un RegAlum de mentira con un alumno, para el responsable "papel" y
+   para crear el asunto. Se escribe aquí, junto con la guía, todo
+   antes del primer #btn-entrar (ver el porqué arriba). */
+await pagina.evaluate(async (guia) => {
+  const csv = [
+    'Alumno/a;Nº Id. Escolar;Curso;Unidad;Año de la matrícula;Estado Matrícula;Fecha de nacimiento',
+    'Aguilar Ponce, Marina;1140233;1º de E.S.O.;1º A;2026;Matriculada;14/03/2013'
+  ].join('\r\n') + '\r\n';
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
+  const d = await g.getDirectoryHandle('datos', { create: true });
+  const csvH = await d.getFileHandle('RegAlum.csv', { create: true });
+  const w1 = await csvH.createWritable(); await w1.write(csv); await w1.close();
+
+  const guiaH = await g.getFileHandle('guias.json', { create: true });
+  const w2 = await guiaH.createWritable();
+  await w2.write(JSON.stringify({ MATRICULA: guia }));
+  await w2.close();
+}, GUIA);
 
 const nombreCopia = 'hitos-' + aammdd(new Date()) + '.json';
 await pagina.evaluate(async (nombreCopia) => {
@@ -87,48 +135,6 @@ await pagina.getByRole('button', { name: 'Volver a intentar entrar' }).click();
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
 await comprobar('ahora sí entra', pagina.locator('#lista-abiertos').isVisible(), true);
 await pagina.click('#btn-barra');
-
-/* ================= LA GUÍA DE PRUEBA =================
-
-   p1 -> p2 (con estado del asunto) -> p3 (decisión: "en mano" [p3a1,
-   p3a2] u "por email" [p3b]) -> p4 (responsable = el tercero, plazo
-   de 10 días hábiles desde que p2 se completa). */
-
-const GUIA = [
-  { id: 'p1', titulo: 'Registrar la solicitud', cuerpo: '', opciones: [] },
-  { id: 'p2', titulo: 'Notificación', cuerpo: '', estadoAsunto: 'EN TRÁMITE', opciones: [] },
-  { id: 'p3', titulo: '¿Cómo se ha recibido la documentación?', cuerpo: '', opciones: [
-    { id: 'o1', titulo: 'En mano', pasos: [
-      { id: 'p3a1', titulo: 'Sellar la entrega', cuerpo: '' },
-      { id: 'p3a2', titulo: 'Archivar copia', cuerpo: '' }
-    ] },
-    { id: 'o2', titulo: 'Por email', pasos: [
-      { id: 'p3b', titulo: 'Guardar el correo', cuerpo: '' }
-    ] }
-  ] },
-  { id: 'p4', titulo: 'Firma del director', cuerpo: '', responsable: 'tercero',
-    plazo: { dias: 10, desde: 'p2' }, opciones: [] }
-];
-
-/* Un RegAlum de mentira con un alumno, para el responsable "papel" y
-   para crear el asunto. Seguido de la guía, todo ANTES de entrar de
-   nuevo (ya estamos dentro, así que solo hace falta escribirlo en el
-   disco: guías-enganche.js las lee solo una vez, al entrar). */
-await pagina.evaluate(async (guia) => {
-  const csv = [
-    'Alumno/a;Nº Id. Escolar;Curso;Unidad;Año de la matrícula;Estado Matrícula;Fecha de nacimiento',
-    'Aguilar Ponce, Marina;1140233;1º de E.S.O.;1º A;2026;Matriculada;14/03/2013'
-  ].join('\r\n') + '\r\n';
-  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
-  const d = await g.getDirectoryHandle('datos', { create: true });
-  const csvH = await d.getFileHandle('RegAlum.csv', { create: true });
-  const w1 = await csvH.createWritable(); await w1.write(csv); await w1.close();
-
-  const guiaH = await g.getFileHandle('guias.json', { create: true });
-  const w2 = await guiaH.createWritable();
-  await w2.write(JSON.stringify({ MATRICULA: guia }));
-  await w2.close();
-}, GUIA);
 
 /* ================= ESCENARIO 1: asunto nuevo, primer hito en curso ================= */
 
@@ -169,7 +175,7 @@ async function leerHitosDeDisco() {
   }, CLAVE);
 }
 
-await comprobar('el asunto ha nacido con hitos', leerHitosDeDisco().then(e => !!e && e.hitos.length), true);
+await comprobar('el asunto ha nacido con hitos', leerHitosDeDisco().then(e => !!(e && e.hitos.length)), true);
 
 await abrirFicha();
 await comprobar('salen los hitos de arriba (p1, p2, p3): p4 queda cortado por la decisión',
@@ -180,6 +186,8 @@ await comprobar('el primero está en curso',
 /* ================= ESCENARIO 2: asunto viejo, botón "Crear los hitos de la guía" ================= */
 
 console.log('--- escenario 2: un asunto viejo importa lo ya marcado ---');
+await pagina.click('#ficha-volver');
+await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 const CLAVE_VIEJA = '260601 MATRICULA Asunto Viejo, Nadie 0000';
 await pagina.evaluate(async (clave) => {
   await window.__disco.abiertos.getDirectoryHandle(clave, { create: true });
@@ -193,6 +201,11 @@ await pagina.evaluate(async (clave) => {
   const w = await f.createWritable();
   await w.write(JSON.stringify(j));
   await w.close();
+  /* #btn-recargar solo vuelve a leer la carpeta, no asuntos.json (eso
+     solo pasa al entrar, editar o desde ciertas pantallas): sin esto,
+     App.E.registro se quedaría con la copia vieja, sin pasosHechos ni
+     pasosElegidos. */
+  await App.cargarRegistro();
 }, CLAVE_VIEJA);
 await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(400);

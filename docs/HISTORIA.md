@@ -52,8 +52,20 @@ función privada de ese fichero, así que en vez de envolver una función de `Ap
 repinta entero.
 
 **Ficheros nuevos**: `js/hitos.js` y `js/hitos-archivo.js` (el modelo, partido en dos por las
-400 líneas), `js/hitos-panel.js` (la ficha), `js/hitos-ajustes.js` (el bloque "Hitos" de
-Ajustes: responsables y días no lectivos), `css/hitos.css` y `pruebas/hitos.mjs`.
+400 líneas), `js/hitos-panel.js` y `js/hitos-panel-lista.js` (la ficha, también partido en dos:
+el repintado en uno, la fila de cada hito en el otro, hablándose por `window.HitosPanel`),
+`js/hitos-ajustes.js` (el bloque "Hitos" de Ajustes: responsables y días no lectivos),
+`css/hitos.css` y `pruebas/hitos.mjs`.
+
+Al probar de verdad en un navegador (esta sesión sí tenía Chromium a mano, cosa que el trabajo
+inicial no pudo comprobar) salieron tres fallos reales, ya arreglados: `pasosDe(tipo)` de
+`js/guias-enganche.js` solo lee `guias.json` una vez, al entrar, así que la guía de prueba había
+que escribirla en el disco de mentira ANTES del primer "Entrar", no después; `App.verAbiertos`
+(el botón Actualizar) no relee `asuntos.json`, así que escribir a mano la ficha de un asunto
+viejo necesitaba también `App.cargarRegistro()`; y el `MutationObserver` de `js/hitos-panel.js`
+se disparaba con su propio repintado (mutaba el mismo `#ficha-guia` que vigilaba), lo que lo
+metía en un bucle sin fin en cuanto había que interactuar con un hito desplegado — se arregló
+desconectándolo mientras se repinta y reconectándolo al terminar.
 
 ## 16-sep-2026 — Un documento suelto puede entrar en un asunto que ya existe
 
