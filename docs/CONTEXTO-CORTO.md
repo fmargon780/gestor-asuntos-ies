@@ -79,6 +79,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   o archivado), con "Podrían encajar" por puntuación de parecido.
 - Mandar documentos de un asunto por correo: se marcan en el cuadro "Correo" y el script de Apps
   Script deja un borrador en Gmail (nunca envía), con tarjeta "Borrador en camino".
+- Plantillas de correo y de mensaje de Séneca, por tipo de asunto, con huecos que se rellenan
+  solos; la firma y el centro se editan en Ajustes.
 - Copias de seguridad diarias, detección de fichero roto, fusión de conflictos de Dropbox.
 - Pruebas automáticas en GitHub Actions en cada subida.
 - Escape y botón de salida en toda pantalla; copiar el nombre de un relacionado en orden normal;
@@ -117,8 +119,6 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Coordinar con él la lista de tipos de asunto y la de estados.
 - Poner en marcha el script de Gmail en `g.educaand.es` y señalar `GESTOR-BANDEJA` en Ajustes.
 - Ver si la bandeja de correo acierta con el tipo; si falla mucho, palabras clave por tipo.
-- Plantillas de correo y mensaje por tipo, con huecos que se rellenan solos (cuando el uso lo
-  pida), y sacar a ellas la firma que hoy va escrita a mano en `js/correo.js`.
 - Comprobar con Séneca si Comunicaciones acepta el largo del asunto que le damos.
 - Cuando tengan una cuenta de correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel lateral y del tablón, y si las tarjetas por tipo se quedan

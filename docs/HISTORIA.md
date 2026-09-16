@@ -1148,3 +1148,26 @@ una línea cada una. El texto largo que tenían antes era:
   envía; el disparador pasa de cinco minutos a uno. Pruebas nuevas en `pruebas/envios.mjs` (los
   seis escenarios del encargo), batería completa en verde. Igual que la fila 12: pendiente de que
   se fusione el pull request para que Vercel lo publique.
+- **14 · `docs/PLANTILLAS-DE-CORREO.md`**: Terminada 16-sep-2026 · 21:12, en la misma sesión y el
+  mismo pull request que las filas 12 y 13. Una plantilla es solo el cuerpo del medio: el saludo
+  y la firma los sigue poniendo `js/correo.js`, solo. Se crean en Ajustes pegadas a un tipo de
+  asunto y se guardan en `_GESTOR/plantillas.json` (`js/plantillas.js`, `window.Plantillas`),
+  compartido con el compañero; también saca de ahí la firma y el nombre del centro, que hasta hoy
+  estaban escritos a mano en `js/correo.js`. Los huecos entre llaves (`{nombre}`, `{grupo}`,
+  `{curso}`, `{tipo}`, `{hoy}`, `{limite}`, `{usuario}`, `{centro}`, y `{campo:LO QUE SEA}` para
+  un campo propio del tipo) se comparan sin mayúsculas ni acentos y nunca rompen nada: uno sin
+  dato se deja vacío y se avisa ("Faltan datos: …"), uno que no se reconoce se deja tal cual y
+  también avisa. El desplegable "Plantilla" sale en los dos cuadros (correo y Séneca), dentro de
+  su propio `#correo-comunes` para poder repintarse sin tocar el resto del cuadro; cambiar de
+  plantilla con algo escrito a mano pregunta antes, **en línea, dentro del propio cuadro**
+  (`#correo-plantilla-confirmar`), nunca con un segundo `U.preguntar`, porque solo hay un cuadro
+  de diálogo en toda la aplicación y ya está ocupado por el de Correo. En Séneca, copiar el texto
+  lo recorta a 4.000 letras si hace falta. El bloque de Ajustes vive entero en `js/plantillas.js`
+  (no ha hecho falta tocar `js/ajustes.js`): lista con buscador, alta y edición con botones para
+  insertar cada hueco y una vista previa en vivo, y un bloque aparte para la firma y el centro. El
+  borrado pasa por `Papelera.mandarDato`, pero `js/papelera.js` no sabe devolver la clase
+  `'plantilla'` (no estaba en el encargo): queda anotado en "Qué falta por hacer". Pruebas nuevas
+  en `pruebas/plantillas.mjs` (los siete escenarios del encargo), más una comprobación manual del
+  alta/edición/borrado en Ajustes (no pedida por las pruebas del encargo, pero es la parte que usa
+  Francisco a diario). Batería completa en verde (`npm test`, 22 ficheros). Con esta fila, la cola
+  se queda sin ninguna PENDIENTE: solo la fila 11 sigue EN CURSO, de otra sesión.
