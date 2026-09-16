@@ -5,6 +5,51 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 16-sep-2026 — El enganche que faltaba en el correo, de las plantillas
+
+Fila 14 de la cola (`docs/COLA.md`, `docs/PLANTILLAS-DE-CORREO.md`), que se había dado por
+`HECHA` estando solo a medias: `js/plantillas.js` ya existía entero y funcionaba —el fichero
+`_GESTOR/plantillas.json`, `Plantillas.rellenar` y el bloque "Plantillas de correo" de
+Ajustes—, pero **`js/correo.js` no lo usaba para nada**. Seguía con la constante `CENTRO`
+escrita a mano y sin ningún desplegable de plantilla, ni en el cuadro de Correo ni en el de
+Séneca. Por eso `pruebas/plantillas.mjs` llevaba días en rojo: no era, como se apuntó el
+16-sep-2026 en la entrada de "Qué me toca", "algo del entorno de pruebas" — era que faltaba el
+trabajo.
+
+Lo que se ha completado en `js/correo.js` (secciones 2.3 y 3 de
+`docs/PLANTILLAS-DE-CORREO.md`; no se ha tocado nada de `js/plantillas.js`):
+
+- `cuerpoDelCorreo(a, idPlantilla)` ya no la escribe a mano: si el tipo del asunto tiene alguna
+  plantilla, el medio sale de `Plantillas.rellenar(plantilla.texto, valores)`; la firma sale
+  siempre de `Plantillas.rellenar(datos.firma, valores)` —con o sin plantilla de por medio—, y
+  `Plantillas.cargar` ya resuelve sola el caso de que `plantillas.json` no exista todavía. Los
+  valores de los huecos los monta `valoresDePlantilla(a)`, nueva y privada del fichero: nombre
+  (`soloElNombre`), grupo y curso (`piezasDelNombre`), tipo, hoy, límite, usuario y centro, más
+  `campos` con los campos propios del asunto (`camposDelAsunto`, mirando `App.E.campos.porTipo`
+  como hace `filasDeCampos` en `js/ficha-asunto.js`).
+- **El desplegable "Plantilla"** (`#correo-plantilla`), encima del cuerpo, en los dos cuadros: lo
+  pinta `camposComunes`, que es la única función que ya compartían Correo y Séneca, así que no ha
+  hecho falta ningún contenedor `#correo-comunes` aparte. Con una sola plantilla del tipo, sale
+  puesta; con varias, sale la primera; sin ninguna, no se pinta nada. Al cambiar de plantilla
+  (`cambiarPlantilla`), si lo escrito coincide con lo último que puso el propio código se cambia
+  sin más; si no, se pregunta **en línea, dentro del propio cuadro** (`#correo-plantilla-confirmar`,
+  con "Seguir con lo escrito" / "Cambiar de todas formas"), nunca con un segundo `U.preguntar`:
+  solo puede haber un cuadro de diálogo abierto en toda la aplicación, y ese ya lo tiene el
+  cuadro de Correo.
+- El aviso ámbar de huecos sin datos (`#correo-faltan-datos`, "Faltan datos: …") sale con las
+  etiquetas en castellano de `Plantillas.HUECOS`, que ya venían así de `Plantillas.rellenar`.
+- En Séneca, al copiar el texto (paso 2 de `engancharSeneca`) se recorta a 4.000 letras si hace
+  falta, avisando en `#seneca-explica`.
+
+`index.html` ya cargaba `js/plantillas.js`... no lo cargaba en absoluto: se ha añadido, justo
+antes de `js/correo.js`.
+
+Los 7 escenarios de `pruebas/plantillas.mjs` pasan, y la batería completa (`npm test`, 24
+ficheros, `CHROMIUM_PATH` apuntando al Chromium ya instalado en el entorno) sale entera en
+verde, incluidos `pruebas/correos.mjs` y `pruebas/envios.mjs` (que también usan `js/correo.js`,
+para la bandeja de correos y los adjuntos): un asunto sin plantillas de su tipo sigue
+comportándose exactamente igual que antes de este cambio.
+
 ## 16-sep-2026 — Qué me toca
 
 Fila 16 de la cola (`docs/QUE-ME-TOCA.md`), depende de la fila 15 (hitos, ya `HECHA`).

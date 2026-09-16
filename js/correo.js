@@ -33,7 +33,9 @@
    ============================================================ */
 (function () {
 
-  var CENTRO = 'IES Fuente Lucena';
+  /* Solo como último recurso, si por lo que sea js/plantillas.js no ha
+     cargado: lo de siempre, tal cual estaba antes de las plantillas. */
+  var CENTRO_POR_DEFECTO = 'IES Fuente Lucena';
 
   var viendo = null;         /* el asunto que se está mirando */
   var modoDelAsunto = 'abierto';
@@ -44,6 +46,19 @@
   var personaActual = null;  /* la ficha del tercero, ya buscada en los CSV */
   var pasoSeneca = 0;        /* 0 el asunto, 1 el texto, 2 hecho */
   var algoCambiado = false;  /* al cerrar, la ficha se repinta si se ha tocado algo */
+
+  /* ---------- plantillas de correo (docs/PLANTILLAS-DE-CORREO.md) ----------
+
+     Se cargan una vez por apertura del cuadro, igual que `personaActual`.
+     `plantillaId` es la que está elegida en el desplegable ('' es "Sin
+     plantilla"). `cuerpoGeneradoPorCodigo` guarda el último texto que ha
+     puesto el propio código: si al cambiar de plantilla el cuadro no
+     coincide con eso, es que se ha escrito algo a mano, y hay que
+     preguntar antes de pisarlo. */
+  var plantillasDatos = null;    /* { firma, centro, lista }, de Plantillas.cargar */
+  var plantillasDelTipo = [];    /* las plantillas del tipo/categoría de este asunto */
+  var plantillaId = '';
+  var cuerpoGeneradoPorCodigo = '';
 
   function $(id) { return document.getElementById(id); }
 
@@ -58,6 +73,45 @@
     if (f.tercero) return f.tercero;
     if (l.resto) return Nombres.terceroDeResto(l.resto);
     return '';
+  }
+
+  function tipoDe(a) {
+    var f = a.ficha || {}, l = a.leido || {};
+    return l.tipo || f.tipo || '';
+  }
+
+  /* Los campos propios del asunto (los de js/campos.js), como
+     nombre -> valor, para que Plantillas.rellenar pueda resolver
+     {campo:LO QUE SEA}. Es lo mismo que hace `filasDeCampos` en
+     js/ficha-asunto.js, pero como objeto en vez de para pintar. */
+  function camposDelAsunto(a) {
+    if (!window.Campos) return {};
+    var guardados = (a.ficha && a.ficha.campos) || {};
+    var config = (App.E.campos && App.E.campos.porTipo && App.E.campos.porTipo[tipoDe(a)]) || [];
+    var salida = {};
+    config.forEach(function (cfg) {
+      var g = guardados[Campos.claveDeCampo(cfg)];
+      if (g && g.valor) salida[Campos.nombreDeCampo(cfg, App.E.campos)] = g.valor;
+    });
+    return salida;
+  }
+
+  /* Los valores para rellenar los huecos de una plantilla o de la
+     firma (docs/PLANTILLAS-DE-CORREO.md, 2.2). */
+  function valoresDePlantilla(a) {
+    var f = a.ficha || {};
+    var p = piezasDelNombre(a);
+    return {
+      nombre: soloElNombre(terceroDe(a)),
+      grupo: p.grupo,
+      curso: p.curso,
+      tipo: tipoDe(a),
+      hoy: U.fechaLegible(U.aAaMmDd(U.hoyIso())),
+      limite: f.limite ? U.fechaLegible(U.aAaMmDd(f.limite)) : '',
+      usuario: App.E.usuario || '',
+      centro: (plantillasDatos && plantillasDatos.centro) || CENTRO_POR_DEFECTO,
+      campos: camposDelAsunto(a)
+    };
   }
 
   /* El nombre de la persona, sin el número de identificación ni el NIF
@@ -125,7 +179,19 @@
     return trozos.filter(Boolean).join('  ·  ');
   }
 
-  function cuerpoDelCorreo(a, persona) {
+  /* El cuerpo del correo (o del mensaje de Séneca, que comparte el
+     mismo texto): el saludo, el medio y la firma. `idPlantilla` es la
+     plantilla elegida en el desplegable ('' es "Sin plantilla"); se
+     recibe aparte, y no se lee de `plantillaId`, para poder calcular
+     "cómo quedaría" con otra plantilla sin tocar todavía la elegida
+     de verdad (lo usa `cambiarPlantilla`, antes de preguntar).
+
+     Si el tipo no tiene ninguna plantilla, o se ha elegido "Sin
+     plantilla", el medio se queda en blanco, exactamente como antes
+     de docs/PLANTILLAS-DE-CORREO.md. La firma, en cambio, sale
+     siempre de `plantillas.json` (o de lo de siempre, si el fichero
+     no existe todavía: `Plantillas.cargar` ya lo resuelve). */
+  function cuerpoDelCorreo(a, idPlantilla) {
     var categoria = categoriaDe(a);
     var nombre = soloElNombre(terceroDe(a));
     var saludo;
@@ -136,9 +202,36 @@
     } else {
       saludo = 'Buenos días:';
     }
-    var firma = ['Un saludo.', App.E.usuario || '', CENTRO]
-      .filter(Boolean).join('\n');
-    return saludo + '\n\n\n\n' + firma;
+
+    if (!window.Plantillas) {
+      /* Nunca debería pasar (index.html carga plantillas.js antes que
+         correo.js), pero si pasara, que no rompa el cuadro. */
+      var firmaVieja = ['Un saludo.', App.E.usuario || '', CENTRO_POR_DEFECTO].filter(Boolean).join('\n');
+      return { texto: saludo + '\n\n\n\n' + firmaVieja, faltan: [] };
+    }
+
+    var valores = valoresDePlantilla(a);
+    var faltan = [];
+    var medio = '';
+    var plantilla = plantillasDelTipo.filter(function (p) { return p.id === idPlantilla; })[0];
+    if (plantilla) {
+      var rMedio = Plantillas.rellenar(plantilla.texto, valores);
+      medio = rMedio.texto;
+      faltan = faltan.concat(rMedio.faltan);
+    }
+
+    var firmaPlantilla = (plantillasDatos && plantillasDatos.firma) || Plantillas.POR_DEFECTO_FIRMA;
+    var rFirma = Plantillas.rellenar(firmaPlantilla, valores);
+    faltan = faltan.concat(rFirma.faltan);
+
+    var texto = plantilla
+      ? saludo + '\n\n' + medio + '\n\n' + rFirma.texto
+      : saludo + '\n\n\n\n' + rFirma.texto;
+
+    var vistos = {};
+    faltan = faltan.filter(function (x) { return x && !vistos[x] && (vistos[x] = true); });
+
+    return { texto: texto, faltan: faltan };
   }
 
   function paraDelCuadro() {
@@ -315,6 +408,13 @@
     var persona = null;
     try { persona = await buscarPersona(a); } catch (e) { persona = null; }
     personaActual = persona;
+
+    plantillasDatos = null;
+    try { if (window.Plantillas) plantillasDatos = await Plantillas.cargar(App.E.gestor); } catch (e) { plantillasDatos = null; }
+    plantillasDelTipo = (window.Plantillas && plantillasDatos)
+      ? Plantillas.deTipo(plantillasDatos, categoriaDe(a), tipoDe(a)) : [];
+    plantillaId = plantillasDelTipo.length ? plantillasDelTipo[0].id : '';
+
     pintarCuadro(a, persona);
     await esperar;
     /* Si se ha apuntado la nota o cambiado el estado, la ficha que hay
@@ -404,8 +504,32 @@
            '<p class="nota" id="seneca-explica">Pulsa, pega en Séneca, y vuelve a pulsar para el texto.</p>';
   }
 
+  /* El desplegable "Plantilla" (docs/PLANTILLAS-DE-CORREO.md, 2.3): si
+     el tipo no tiene ninguna, no se pinta nada. */
+  function desplegableDePlantilla() {
+    if (!plantillasDelTipo.length) return '';
+    return '<label class="etiqueta">Plantilla</label>' +
+      '<select id="correo-plantilla" class="campo">' +
+        '<option value="">Sin plantilla</option>' +
+        plantillasDelTipo.map(function (p) {
+          return '<option value="' + U.escapar(p.id) + '"' + (p.id === plantillaId ? ' selected' : '') + '>' +
+                   U.escapar(p.nombre) + '</option>';
+        }).join('') +
+      '</select>' +
+      '<div id="correo-plantilla-confirmar"></div>';
+  }
+
+  function htmlDeFaltan(faltan) {
+    return '<div id="correo-faltan-datos" class="' + (faltan.length ? 'aviso aviso-ambar' : 'oculto') + '">' +
+      (faltan.length ? 'Faltan datos: ' + U.escapar(faltan.join(', ')) : '') +
+    '</div>';
+  }
+
   /* Los dos campos que comparten los dos cuadros. */
   function camposComunes(a) {
+    var estado = cuerpoDelCorreo(a, plantillaId);
+    cuerpoGeneradoPorCodigo = estado.texto;
+
     return '<label class="etiqueta">Asunto</label>' +
       '<input id="correo-asunto" class="campo" value="' + U.escapar(asuntoDelCorreo(a)) + '">' +
       '<div class="correo-botones" style="margin-top:6px">' +
@@ -413,9 +537,12 @@
         '<button type="button" class="boton" id="correo-legible">Versión legible</button>' +
       '</div>' +
 
+      desplegableDePlantilla() +
+      htmlDeFaltan(estado.faltan) +
+
       '<label class="etiqueta">' + (porSeneca ? 'Texto del mensaje' : 'Cuerpo') + '</label>' +
       '<textarea id="correo-cuerpo-texto" class="campo" rows="9">' +
-        U.escapar(cuerpoDelCorreo(a, personaActual)) + '</textarea>';
+        U.escapar(estado.texto) + '</textarea>';
   }
 
   /* ---------- enganchar los botones ---------- */
@@ -437,6 +564,68 @@
       asuntoLargo = false; $('correo-asunto').value = asuntoDelCorreo(a); marcarBotonDelAsunto();
     };
     marcarBotonDelAsunto();
+
+    var select = $('correo-plantilla');
+    if (select) select.onchange = function () { cambiarPlantilla(a, select); };
+  }
+
+  function pintarFaltan(faltan) {
+    var sitio = $('correo-faltan-datos');
+    if (!sitio) return;
+    if (faltan.length) {
+      sitio.className = 'aviso aviso-ambar';
+      sitio.textContent = 'Faltan datos: ' + faltan.join(', ');
+    } else {
+      sitio.className = 'oculto';
+      sitio.textContent = '';
+    }
+  }
+
+  /* Deja puesta la plantilla `nuevoId`, con el cuerpo ya calculado en
+     `estado` (para no recalcularlo dos veces). */
+  function aplicarPlantilla(nuevoId, estado) {
+    plantillaId = nuevoId;
+    var texto = $('correo-cuerpo-texto');
+    if (texto) texto.value = estado.texto;
+    cuerpoGeneradoPorCodigo = estado.texto;
+    pintarFaltan(estado.faltan);
+  }
+
+  /* Al elegir otra plantilla del desplegable. Si lo que hay escrito en
+     el cuadro es justo lo que había puesto el código la última vez, se
+     cambia sin preguntar: no hay nada que perder. Si no, alguien lo ha
+     tocado a mano, y hay que preguntar antes (docs/PLANTILLAS-DE-CORREO.md,
+     2.3). Como ya hay un `U.preguntar` abierto con el propio cuadro de
+     correo —solo puede haber uno en toda la aplicación—, la pregunta se
+     pinta aquí mismo, dentro del cuadro, no en uno nuevo. */
+  function cambiarPlantilla(a, select) {
+    var nuevoId = select.value;
+    var estado = cuerpoDelCorreo(a, nuevoId);
+    var cuerpoActual = $('correo-cuerpo-texto') ? $('correo-cuerpo-texto').value : '';
+    var confirmar = $('correo-plantilla-confirmar');
+
+    if (cuerpoActual === cuerpoGeneradoPorCodigo) {
+      aplicarPlantilla(nuevoId, estado);
+      return;
+    }
+    if (!confirmar) { aplicarPlantilla(nuevoId, estado); return; }
+
+    confirmar.innerHTML =
+      '<div class="aviso aviso-ambar" style="margin-top:8px">' +
+        '<p>Si cambias de plantilla se perderá lo que has escrito a mano.</p>' +
+        '<div class="correo-botones" style="margin-top:6px">' +
+          '<button type="button" class="boton" id="correo-plantilla-seguir">Seguir con lo escrito</button>' +
+          '<button type="button" class="boton boton-principal" id="correo-plantilla-cambiar">Cambiar de todas formas</button>' +
+        '</div>' +
+      '</div>';
+    $('correo-plantilla-seguir').onclick = function () {
+      select.value = plantillaId;
+      confirmar.innerHTML = '';
+    };
+    $('correo-plantilla-cambiar').onclick = function () {
+      aplicarPlantilla(nuevoId, estado);
+      confirmar.innerHTML = '';
+    };
   }
 
   function engancharCorreo(a) {
@@ -479,11 +668,20 @@
         b.textContent = '2. Ahora, copiar el texto';
         explica.textContent = 'Asunto copiado. Pégalo en Séneca y vuelve a pulsar.';
       } else if (pasoSeneca === 1) {
-        copiarTexto($('correo-cuerpo-texto').value);
+        /* Séneca no admite más de 4.000 letras en el mensaje: se
+           recorta al pegarlo, y se avisa (docs/PLANTILLAS-DE-CORREO.md,
+           2.3). El texto que se queda escrito en el cuadro no se toca:
+           solo se recorta lo que se copia. */
+        var TOPE_SENECA = 4000;
+        var textoCompleto = $('correo-cuerpo-texto').value;
+        var recortado = textoCompleto.length > TOPE_SENECA;
+        copiarTexto(recortado ? textoCompleto.slice(0, TOPE_SENECA) : textoCompleto);
         pasoSeneca = 2;
         b.textContent = 'Copiado. Pégalo y envía';
         b.classList.remove('boton-principal');
-        explica.textContent = 'Texto copiado. Pégalo en Séneca y envía el mensaje.';
+        explica.textContent = recortado
+          ? 'Texto copiado (recortado a 4.000 letras). Pégalo en Séneca y envía el mensaje.'
+          : 'Texto copiado. Pégalo en Séneca y envía el mensaje.';
         apuntarElRastro(a);
       } else {
         pasoSeneca = 0;
