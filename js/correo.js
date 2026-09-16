@@ -60,6 +60,12 @@
   var plantillaId = '';
   var cuerpoGeneradoPorCodigo = '';
 
+  /* Los valores del asunto para rellenar huecos (docs/PLANTILLAS-DE-DOCUMENTO.md,
+     3.1): desde el 16-sep-2026 los monta Plantillas.valoresDeAsunto, una
+     sola vez por apertura del cuadro (igual que personaActual), en vez
+     de la vieja valoresDePlantilla() de aquí. */
+  var valoresActuales = null;
+
   function $(id) { return document.getElementById(id); }
 
   /* ---------- de dónde salen los datos ---------- */
@@ -78,40 +84,6 @@
   function tipoDe(a) {
     var f = a.ficha || {}, l = a.leido || {};
     return l.tipo || f.tipo || '';
-  }
-
-  /* Los campos propios del asunto (los de js/campos.js), como
-     nombre -> valor, para que Plantillas.rellenar pueda resolver
-     {campo:LO QUE SEA}. Es lo mismo que hace `filasDeCampos` en
-     js/ficha-asunto.js, pero como objeto en vez de para pintar. */
-  function camposDelAsunto(a) {
-    if (!window.Campos) return {};
-    var guardados = (a.ficha && a.ficha.campos) || {};
-    var config = (App.E.campos && App.E.campos.porTipo && App.E.campos.porTipo[tipoDe(a)]) || [];
-    var salida = {};
-    config.forEach(function (cfg) {
-      var g = guardados[Campos.claveDeCampo(cfg)];
-      if (g && g.valor) salida[Campos.nombreDeCampo(cfg, App.E.campos)] = g.valor;
-    });
-    return salida;
-  }
-
-  /* Los valores para rellenar los huecos de una plantilla o de la
-     firma (docs/PLANTILLAS-DE-CORREO.md, 2.2). */
-  function valoresDePlantilla(a) {
-    var f = a.ficha || {};
-    var p = piezasDelNombre(a);
-    return {
-      nombre: soloElNombre(terceroDe(a)),
-      grupo: p.grupo,
-      curso: p.curso,
-      tipo: tipoDe(a),
-      hoy: U.fechaLegible(U.aAaMmDd(U.hoyIso())),
-      limite: f.limite ? U.fechaLegible(U.aAaMmDd(f.limite)) : '',
-      usuario: App.E.usuario || '',
-      centro: (plantillasDatos && plantillasDatos.centro) || CENTRO_POR_DEFECTO,
-      campos: camposDelAsunto(a)
-    };
   }
 
   /* El nombre de la persona, sin el número de identificación ni el NIF
@@ -210,7 +182,7 @@
       return { texto: saludo + '\n\n\n\n' + firmaVieja, faltan: [] };
     }
 
-    var valores = valoresDePlantilla(a);
+    var valores = valoresActuales || {};
     var faltan = [];
     var medio = '';
     var plantilla = plantillasDelTipo.filter(function (p) { return p.id === idPlantilla; })[0];
@@ -414,6 +386,9 @@
     plantillasDelTipo = (window.Plantillas && plantillasDatos)
       ? Plantillas.deTipo(plantillasDatos, categoriaDe(a), tipoDe(a)) : [];
     plantillaId = plantillasDelTipo.length ? plantillasDelTipo[0].id : '';
+
+    valoresActuales = null;
+    try { if (window.Plantillas) valoresActuales = await Plantillas.valoresDeAsunto(a); } catch (e) { valoresActuales = null; }
 
     pintarCuadro(a, persona);
     await esperar;

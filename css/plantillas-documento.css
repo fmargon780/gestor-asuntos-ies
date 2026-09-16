@@ -1,0 +1,39 @@
+/* ============================================================
+   plantillas-documento.css — el bloque "Plantillas de documento" de
+   Ajustes y el botón "Generar documento" de la ficha del asunto
+   (docs/PLANTILLAS-DE-DOCUMENTO.md, 5).
+   ============================================================ */
+
+/* El botón de la ficha: mismo aspecto que "Correo" y "Mensaje Séneca",
+   sin nada especial que lo distinga (los tres son igual de normales). */
+.boton-generar-documento {}
+
+/* La lista de huecos, con su botón de copiar: uno por fila, con la
+   llave a la izquierda y el botón siempre a la derecha. */
+.rejilla-huecos {
+  display: grid;
+  gap: 4px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.pd-hueco-fila {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 10px;
+  border: 1px solid var(--linea); border-radius: 6px;
+  background: var(--papel);
+}
+.pd-hueco-fila code {
+  background: var(--fondo); border-radius: 4px; padding: 2px 6px;
+  font-size: 12px; white-space: nowrap;
+}
+.pd-hueco-fila span { flex: 1 1 auto; min-width: 0; font-size: 12px; }
+.pd-hueco-fila button { flex: 0 0 auto; }
+
+/* El cuadro de elegir plantilla, cuando el tipo tiene varias: una
+   lista de botones a todo lo ancho, uno debajo de otro. */
+.pd-elegir-opcion {
+  display: block; width: 100%; text-align: left;
+  margin-bottom: 6px;
+}

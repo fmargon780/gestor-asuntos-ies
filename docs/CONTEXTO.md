@@ -469,7 +469,92 @@ crean en Ajustes, pegadas a un tipo de asunto, y se guardan en `_GESTOR/plantill
   de ficheros del encargo): cae en su "No sé devolver esto." Si hace falta devolver una borrada,
   hay que copiarla a mano desde el bloque Papelera de Ajustes.
 
-Se comprueba con `pruebas/plantillas.mjs`.
+Se comprueba con `pruebas/plantillas.mjs`. El bloque de pantalla vive en `js/plantillas-ajustes.js`
+(se sacó de `js/plantillas.js` el 16-sep-2026, al crecer con el motor de las plantillas de
+documento, para no pasar de 450 líneas): usa la API pública de `Plantillas` (`cargar`, `guardar`,
+`deTipo`, `idNuevo`, `rellenar`, `HUECOS`...), no toca nada privado.
+
+### Plantillas de documento de Word
+
+El gemelo en papel de las de correo (16-sep-2026, `docs/PLANTILLAS-DE-DOCUMENTO.md`, fila 17 de
+`docs/COLA.md`): un botón **Generar documento** en la ficha de un asunto saca una copia de un
+`.docx` con los huecos rellenos, ya guardada en la carpeta del asunto, sin preguntar nada.
+
+- **El fichero**: mismo `_GESTOR/plantillas.json` que las de correo, con la clave de raíz nueva
+  `documentos`: `[{ id, categoria, tipo, nombre, fichero, tipoDocumento, texto }]`. Una misma
+  plantilla puede colgar de varios tipos, cada uno con su propia fila. `limpio()` la normaliza
+  como la `lista` de correo: un fichero viejo sin esa clave sigue cargando con `documentos: []`.
+  Junto a `firma` y `centro` se guardan cuatro claves de raíz más, editables en el mismo bloque de
+  Ajustes de "Plantillas de correo": `localidad`, `direccion`, `codigo`, `cargo` (del centro).
+- **Los `.docx` viven en `_GESTOR/PLANTILLAS`**, sin subcarpetas, dentro de la carpeta de asuntos
+  abiertos (`Carpetas.crear(App.E.gestor, 'PLANTILLAS')`, que la crea si no existe). Francisco los
+  sube a mano a esa carpeta de Dropbox; la aplicación nunca escribe ahí, solo lee y cuelga el
+  nombre del fichero de un tipo en Ajustes. No es ninguno de los doce ficheros compartidos: no
+  lleva copia de seguridad ni detección de fichero roto.
+- **`Plantillas.valoresDeAsunto(asunto)`** (`js/plantillas.js`), pública desde el 16-sep-2026:
+  hasta entonces era `valoresDePlantilla()`, privada de `js/correo.js`, y solo traía lo que hacía
+  falta para el correo. Ahora es async (el DNI, los tutores y el registro salen de ficheros) y
+  monta, con un solo argumento, todos los huecos del catálogo (`Plantillas.HUECOS`, ampliado):
+  `nombre`, `nombreNatural` (en orden normal, sin el código pegado), `grupo`, `curso`, `tipo`,
+  `referencia` (Nº escolar en alumnado, cuatro cifras del documento en personal, NIF en empresas,
+  el campo "Referencia" en otros), `dni` (solo alumnado, con `window.Dni.de`), `telefono`,
+  `correo`, `tutor1`/`tutor1telefono`/`tutor1correo`, `tutor2`/... (solo alumnado, buscando por el
+  título de la columna como `js/dni.js`, nunca por su posición ni desde `persona.campos` para
+  saber si existe), `descripcion`, `estado`, `registro` (el código `26EM1234` del documento más
+  reciente de la carpeta que ya lo lleve en el nombre, sin depender de `js/documentos.js`), `hoy`,
+  `hoyLargo` ("16 de septiembre de 2026"), `lugarYFecha` ("En Alhaurín el Grande, a..."), `limite`,
+  `usuario`, `centro`, `localidad`, `direccionCentro`, `codigoCentro`, `cargo` y `firma` (el texto
+  de la firma del centro, ya relleno con el resto de estos mismos valores). `js/correo.js` la
+  llama una vez por apertura del cuadro (como ya hacía con `personaActual`) y guarda el resultado
+  en `valoresActuales`; `cuerpoDelCorreo` lo usa en vez de tener su propia función.
+- **`js/docx.js`** (`window.Docx`, sin librerías ni CDN): un `.docx` es un ZIP, leído y escrito a
+  mano. `Docx.rellenar(bufferDocx, valores)` -> `{ blob, faltan }` (acepta `ArrayBuffer` o
+  `Uint8Array`). Lee el directorio central (buscado desde el final del fichero, que es el único
+  sitio fiable) y, por cada entrada: si no es `word/document.xml` ni `word/header*.xml` /
+  `word/footer*.xml`, la copia tal cual (cabecera local + bytes, sin descomprimir), y en el
+  directorio central copia también su entrada, solo parcheando el offset. Las que sí tocan se
+  descomprimen con `DecompressionStream('deflate-raw')` si hace falta (método 8; si ya vienen
+  "almacenadas", método 0, no hace falta), se reparan y sustituyen, y se escriben **sin comprimir**
+  (método 0): mismo tamaño comprimido que sin comprimir, y CRC-32 calculado a mano (tabla con el
+  polinomio `0xEDB88320`). No hace falta `CompressionStream` para nada.
+  - **La reparación de huecos partidos**: por cada `<w:p>...</w:p>`, se localizan sus `<w:t>` en
+    orden y, si un hueco (`{...}`) cruza de uno al siguiente, se mueven solo los caracteres que
+    forman el hueco hasta dejarlo entero en uno de ellos — nunca se funden todos los `<w:t>` del
+    párrafo en uno, que perdería la negrita o el subrayado de las palabras que no son parte de
+    ningún hueco. Hecho esto, cada `<w:t>` (toque o no un hueco) se decodifica de entidades XML, se
+    pasa por `Plantillas.rellenar`, y se vuelve a escapar (`&`, `<`, `>`; las comillas de un texto
+    normal no hace falta escaparlas). Un salto de línea en el valor sustituido se escribe
+    `</w:t><w:br/><w:t xml:space="preserve">`.
+  - Simplificación consciente: no contempla los "data descriptors" del ZIP (banderas con el
+    tamaño después de los datos, típico de escritores en flujo): un `.docx` de verdad, escrito por
+    Word, LibreOffice o cualquier librería que genere ficheros, siempre lleva el tamaño y el CRC
+    en la propia cabecera local.
+  - `Docx.leerEntradaDeTexto(bufferDocx, nombre)` (solo para depurar y para las pruebas): lee y
+    descomprime una entrada de texto ya generada, reutilizando el mismo lector.
+- **`js/plantillas-documento.js`**: el botón **Generar documento**, puesto en `#ficha-acciones`
+  con el mismo patrón que `js/correo.js` (se envuelve `App.abrirFicha` y se vigila la pantalla con
+  un `MutationObserver`). No sale si el tipo no tiene ninguna plantilla de documento; con una sola,
+  un clic y a generar; con varias, un cuadro para elegir (como `Relacionados.elegirTercero`: se
+  pinta dentro de `#capa`, sin `U.preguntar`, porque aquí se elige pulsando una de la lista, no
+  aceptando). Comprobar si el tipo tiene plantillas es async (hay que leer `plantillas.json`), así
+  que el botón puede salir un instante después que el resto de la ficha.
+  - **Al generar**: lee el `.docx` de `_GESTOR/PLANTILLAS` (si no está, avisa con su nombre y
+    para); `Plantillas.valoresDeAsunto(asunto)` + `Docx.rellenar`; monta el nombre con
+    `Nombres.montarDocumento` (`tipoDocumento` y `texto` de la plantilla, fecha de hoy, extensión
+    `.docx`; se vigila `App.LARGO_MAXIMO_NOMBRE`); si ya hay un fichero con ese nombre en la
+    carpeta, avisa y no lo pisa; si no, lo guarda (`getFileHandle`/`createWritable`, como
+    `Carpetas.escribirTexto` pero con un `Blob`) y deja una nota en el asunto con `Notas.anadir`
+    ("Generado &lt;nombre&gt;"); avisa de los huecos sin datos, sin impedir nada; y vuelve a
+    abrir la ficha para refrescar la lista de documentos.
+  - **En Ajustes**, bloque hermano **"Plantillas de documento"**: buscador, tarjetas por tipo,
+    alta/edición/borrado con `Papelera.botonBorrar` (clase `'plantilla-documento'`, que
+    `js/papelera.js` tampoco sabe devolver, igual que `'plantilla'`). En el alta se elige el
+    `.docx` de un desplegable con los que ya haya en `_GESTOR/PLANTILLAS` (Francisco los sube a
+    mano; el cuadro nunca escribe ahí), y se escriben el nombre visible, el tipo de documento y el
+    texto adicional. Debajo, la lista de `Plantillas.HUECOS` con un botón de copiar en cada uno.
+
+Se comprueba con `pruebas/plantillas-documento.mjs` (jsdom, sin navegador: construye un `.docx` de
+mentira a mano, con su propio escritor de ZIP, independiente del de `js/docx.js`).
 
 ### Registrar un documento en un paso
 
@@ -853,8 +938,11 @@ de `App` va después del fichero que lo define.
 | `js/via-contacto.js` | Los teléfonos y correos del tercero, como botones |
 | `js/tablon.js` | El tablón de notas rápidas, con las notas "Solo para mí" |
 | `js/copiar.js` | Los botones de copiar: el Nº escolar y el nombre del documento |
-| `js/plantillas.js` | Leer y guardar `plantillas.json`, rellenar los huecos, y el bloque "Plantillas de correo" de Ajustes |
+| `js/plantillas.js` | Leer y guardar `plantillas.json`, montar `Plantillas.valoresDeAsunto` y rellenar los huecos: el motor, sin pantalla |
+| `js/plantillas-ajustes.js` | El bloque "Plantillas de correo" de Ajustes (sacado de `js/plantillas.js`) |
 | `js/correo.js` | El correo y el mensaje de Séneca, con su rastro y sus plantillas |
+| `js/docx.js` | Rellenar los huecos de una plantilla de Word: ZIP y XML a mano, sin librerías (`window.Docx`) |
+| `js/plantillas-documento.js` | Botón "Generar documento" en la ficha, y el bloque "Plantillas de documento" de Ajustes (`css/plantillas-documento.css`) |
 | `js/salir.js` | El botón de Salir del pie de la barra |
 | `js/rescate-datos.js` | Recoge los CSV que se hayan quedado un piso más arriba |
 | `js/traer-datos.js` | El botón de traer los CSV de Séneca desde donde estén |
@@ -897,6 +985,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/plantillas.mjs` | Prueba de las plantillas: huecos, "Faltan datos", cambiar de plantilla, sin plantillas, y el recorte de Séneca |
 | `pruebas/hitos.mjs` | Prueba de los hitos de un asunto: crearlos, marcarlos, bifurcaciones, plazo, responsable y el historial al archivar |
 | `pruebas/que-me-toca.mjs` | Prueba de "Qué me toca": los tres bloques, el filtro por responsable, abrir la ficha con el hito desplegado y la cuenta de la barra |
+| `pruebas/plantillas-documento.mjs` | Prueba (jsdom, sin navegador) de las plantillas de documento: la reparación de huecos partidos, las cuatro clases de hueco, "faltan", el escapado XML, releer el ZIP de salida, el nombre del documento y un `plantillas.json` viejo |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |
@@ -915,6 +1004,7 @@ de `App` va después del fichero que lo define.
 | `docs/PLANTILLAS-DE-CORREO.md` | El encargo de las plantillas de correo y de mensaje por tipo |
 | `docs/HITOS.md` | El encargo de los hitos de un asunto |
 | `docs/QUE-ME-TOCA.md` | El encargo de la pantalla "Qué me toca" |
+| `docs/PLANTILLAS-DE-DOCUMENTO.md` | El encargo de las plantillas de documento de Word por tipo |
 | `README.md` | — |
 
 ### Lo que la aplicación guarda en `_GESTOR`
@@ -935,10 +1025,11 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `papelera.json` | El índice de la papelera: qué se ha borrado, de dónde y cuándo |
 | `no-duplicados.json` | Grupos de posibles duplicados descartados con "No son el mismo", por la firma de sus nombres |
 | `envios.json` | **Es una lista, no un objeto.** Los encargos vivos de "mandar documentos por correo": `{ id, asunto, para, creado }` |
-| `plantillas.json` | `{ firma, centro, lista: [{ id, tipo, categoria, nombre, texto }] }`, para el correo y el mensaje de Séneca |
+| `plantillas.json` | `{ firma, centro, localidad, direccion, codigo, cargo, lista: [{ id, tipo, categoria, nombre, texto }], documentos: [{ id, tipo, categoria, nombre, fichero, tipoDocumento, texto }] }`: `lista` para el correo y el mensaje de Séneca, `documentos` para las plantillas de Word |
 | `hitos.json` | `{ ajustes: { responsables, noLectivos }, porAsunto: { <clave>: { creados, hitos } } }`: los hitos vivos de cada asunto abierto (ver "Los hitos de un asunto") |
 | `datos/*.csv` | Alumnado (Séneca), personal, empresas y otros |
 | `PAPELERA/` | Las carpetas y ficheros borrados, cada uno en su subcarpeta `AAMMDD-HHMM <nombre>` |
+| `PLANTILLAS/` | Los `.docx` que Francisco sube a mano, colgados de un tipo desde Ajustes › Plantillas de documento. No lleva copia de seguridad: no es uno de los doce ficheros compartidos |
 | `copias/*.json` | Copias de seguridad de los doce ficheros de arriba, una por día, 30 como mucho de cada uno |
 
 **Los CSV van en `datos`, no en `_GESTOR`.** `js/rescate-datos.js` los baja solos al entrar.

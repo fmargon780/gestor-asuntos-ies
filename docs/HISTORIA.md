@@ -5,6 +5,56 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 16-sep-2026 — Plantillas de documento de Word
+
+Fila 17 de la cola (`docs/COLA.md`, `docs/PLANTILLAS-DE-DOCUMENTO.md`), el gemelo en papel de las
+plantillas de correo (fila 14, más abajo en este mismo diario): Francisco cuelga un `.docx` de un
+tipo de asunto en Ajustes, y el botón **Generar documento** de la ficha saca una copia con los
+huecos rellenos, ya guardada en la carpeta del asunto, sin preguntar nada.
+
+- **`Plantillas.valoresDeAsunto(asunto)`** (`js/plantillas.js`), pública: hasta hoy era
+  `valoresDePlantilla()`, privada de `js/correo.js`. Ahora es async —el DNI, los tutores y el
+  registro salen de ficheros— y amplía el catálogo de huecos (`Plantillas.HUECOS`) con
+  `nombreNatural`, `referencia` (según la categoría), `dni`, `telefono`, `correo`, los dos tutores
+  con su teléfono y correo (leídos por el título de la columna, como `js/dni.js`), `descripcion`,
+  `estado`, `registro`, `hoyLargo`, `lugarYFecha`, y los datos del centro (`localidad`,
+  `direccionCentro`, `codigoCentro`, `cargo`, y `firma` ya relleno). `js/correo.js` la llama una
+  vez por apertura del cuadro y ya no tiene su propia función.
+- `js/plantillas.js` pasó de 423 a más de 750 líneas con este motor, así que **el bloque de
+  Ajustes "Plantillas de correo" se sacó a `js/plantillas-ajustes.js`**, sin cambiar lo que hace
+  (usa la API pública de `Plantillas`, nada privado). El fichero se queda en unas 450 líneas, solo
+  con el motor.
+- **`js/docx.js` nuevo** (`window.Docx`, sin librerías ni CDN): lee y escribe un `.docx` (que es
+  un ZIP) a mano —directorio central buscado desde el final, cabeceras locales, CRC-32 con tabla
+  propia (polinomio `0xEDB88320`)—. Las entradas que no hacen falta tocar se copian tal cual; las
+  que sí (`word/document.xml`, `header*.xml`, `footer*.xml`) se descomprimen con
+  `DecompressionStream('deflate-raw')` si hace falta y se reescriben **sin comprimir** (método 0):
+  así no hace falta `CompressionStream` para nada. La parte delicada, y la primera que se probó:
+  Word reparte el texto de un párrafo en varias `<w:t>` (por ejemplo, una palabra suelta en
+  negrita), así que `{nombre}` puede llegar partido en dos o tres. Antes de sustituir, cada
+  `<w:p>` se repara moviendo solo los caracteres del hueco hasta dejarlo entero en una única
+  `<w:t>` — nunca fundiendo todas las de un párrafo en una, que perdería el formato de las
+  palabras que no son parte de ningún hueco.
+- **`js/plantillas-documento.js` nuevo**: el botón "Generar documento" en la ficha (mismo patrón
+  que `js/correo.js` con "Correo" y "Mensaje Séneca": se envuelve `App.abrirFicha`), que no sale
+  si el tipo no tiene plantillas, elige sola con una y pregunta con varias (como
+  `Relacionados.elegirTercero`, dentro de `#capa`, sin `U.preguntar`). Guarda sin pisar, deja nota
+  con `Notas.anadir`, avisa de los huecos sin datos y refresca la ficha. En Ajustes, bloque
+  hermano "Plantillas de documento": buscador, tarjetas, alta (con un desplegable de los `.docx`
+  que ya haya en `_GESTOR/PLANTILLAS`, que Francisco sube a mano), edición, borrado con
+  `Papelera.botonBorrar`, y la lista de huecos con un botón de copiar en cada uno.
+- **`plantillas.json` gana la clave `documentos`** y cuatro claves de raíz del centro
+  (`localidad`, `direccion`, `codigo`, `cargo`); `limpio()` las normaliza, así que un fichero
+  viejo sigue cargando igual. No es ningún fichero compartido nuevo: sigue siendo el mismo de
+  siempre, y los `.docx` de `_GESTOR/PLANTILLAS` tampoco cuentan como fichero compartido (no
+  llevan copia de seguridad).
+- Ocho escenarios en `pruebas/plantillas-documento.mjs`, con **jsdom** en vez de Playwright (no
+  hace falta un navegador de verdad para probar ZIP y XML a mano): construye un `.docx` de mentira
+  con su propio escritor de ZIP, independiente del de `js/docx.js` para no acabar probándose a sí
+  mismo, comprimiendo de verdad con `CompressionStream` como haría Word. El ZIP de salida se
+  comprobó además con `unzip -t` y `zipinfo`, herramientas de línea de comandos, no solo con el
+  lector propio.
+
 ## 16-sep-2026 — El enganche que faltaba en el correo, de las plantillas
 
 Fila 14 de la cola (`docs/COLA.md`, `docs/PLANTILLAS-DE-CORREO.md`), que se había dado por
