@@ -17,6 +17,10 @@ Francisco paga la cuota y se le agotó el 97% en tres días. Estas reglas no son
 
 - **Sube directamente a la rama `main`.** No abras una pull request y no crees una rama nueva.
   Una PR en borrador deja el trabajo sin publicar y obliga a otra intervención.
+  **Excepción**: si el propio entorno de ejecución (por ejemplo, Claude Code en la nube) obliga a
+  trabajar en una rama concreta y a abrir pull request, eso manda sobre esta regla; dilo claro en
+  el mensaje final, para que Francisco sepa que hace falta fusionar el pull request antes de que
+  Vercel publique nada.
 - **Cambios quirúrgicos.** No reescribas un fichero entero para cambiar unas líneas.
   La regla de "fichero entero, siempre" es para lo que se le enseña a Francisco, no para ti.
 - **Si tienes que tocar un fichero que pasa de unas 400 líneas, pártelo** en dos, por módulos.

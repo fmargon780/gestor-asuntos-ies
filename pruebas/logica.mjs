@@ -352,7 +352,12 @@ comprobar('quien ya está matriculado no se duplica',
 comprobar('y la ficha buena es la del RegAlum',
   S3.lista.find(x => x.nombre.indexOf('Aguilar') === 0).matriculado, true);
 
-/* ---------- personal del RelPerCen de Séneca ---------- */
+/* ---------- personal del RelPerCen de Séneca ----------
+
+   Las fechas de cese, igual que las de la edad de arriba, se calculan
+   a partir de HOY: fijas se quedaban desfasadas y la prueba empezaba a
+   fallar sola al pasar la fecha (pasó el 15-sep-2026 con una fecha de
+   cese escrita a mano). */
 Datos.olvidar();
 const datosPer = dirFalso('datos');
 /* Las dos fechas de cese van contadas desde HOY, no escritas a mano:

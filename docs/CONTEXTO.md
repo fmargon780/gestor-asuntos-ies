@@ -315,6 +315,82 @@ redactar se apunta sola una nota (una sola vez por cuadro). Solo Séneca: no hay
 solo botón que se va cambiando: "1. Copiar el asunto" → "2. Ahora, copiar el texto" → "Copiado.
 Pégalo y envía".
 
+### Mandar los documentos de un asunto por correo
+
+Gmail no deja que una página web le enganche ficheros. Bloque **"Documentos de este asunto"**
+(`js/correo-adjuntos.js`, `window.CorreoAdjuntos`), solo en el cuadro de Correo (nunca en el de
+Séneca): la lista de ficheros del asunto con una casilla cada uno (desmarcadas de partida) y el
+botón **"Preparar borrador con los documentos"**.
+
+- Al pulsar, se copian los documentos marcados a `GESTOR-BANDEJA` con el nombre `<id> -
+  <nombre original>` y, **el último**, el encargo `<id>.envio.json` (`para`, `asunto`, `cuerpo`,
+  `adjuntos`, `hilo` —de `hilos` en la ficha del asunto si lo tiene, si no cadena vacía— y
+  `asuntoCarpeta`). Si lo marcado suma más de **20 MB**, no se prepara nada y sale un aviso.
+- Se apunta también en `_GESTOR/envios.json` (una lista, no un objeto como los demás ficheros de
+  `_GESTOR`), para que la tarjeta **"Borrador en camino — \<asunto\>"** se vea aunque se cierre
+  el cuadro. Se relee antes de escribir, con `Copias.guardar`.
+- **La vigilancia y la tarjeta viven en `js/bandeja-correos.js`** (no en `js/correo-adjuntos.js`):
+  cada 15 segundos, y solo mientras haya algún encargo vivo, mira si ha aparecido `<id>.listo.json`
+  (pasa a botón "Abrir el borrador en Gmail") o `<id>.error.json` (aviso rojo con el motivo y
+  botón "Entendido"); pasados 3 minutos sin respuesta, aviso ámbar y botón "Dejarlo" (borra el
+  `.envio.json` y sus copias de la bandeja, y el encargo de `envios.json`). `window.Bandeja`
+  expone `carpeta()` (la misma carpeta de los correos recogidos) y `avisarEnvioNuevo()`, para que
+  la tarjeta no espere a la próxima vuelta de 15 segundos.
+- `js/bandeja-correos.js` **no lee un `.envio.json`, `.listo.json` ni `.error.json` como si fuera
+  un correo recogido**: se descartan antes de mirar el `.id` de dentro.
+- El rastro reutiliza `apuntarElRastro` de `js/correo.js`: si se ha preparado un borrador con
+  documentos en este cuadro, la nota añade "· con N documentos: …".
+- **Siempre borrador, nunca envío automático.** El script de Apps Script
+  (`apps-script/gestor-correos.gs`, `mandarBorradores()`) lo monta con `GmailApp.createDraft` o,
+  si el encargo trae `hilo`, con `createDraftReply`, y pasa a revisar cada **minuto** (antes,
+  cinco). El enlace que deja en `.listo.json` es siempre la lista de borradores
+  (`#drafts`), nunca uno construido con el identificador del borrador.
+
+Se comprueba con `pruebas/envios.mjs`.
+
+### Plantillas de correo y de mensaje de Séneca
+
+Una plantilla es **solo el cuerpo del medio**: el saludo y la despedida los sigue poniendo
+`js/correo.js`, solos. La misma plantilla sirve para el correo y para el mensaje de Séneca; se
+crean en Ajustes, pegadas a un tipo de asunto, y se guardan en `_GESTOR/plantillas.json`
+(`js/plantillas.js`, `window.Plantillas`), compartido con el compañero.
+
+- **El fichero**: `{ firma, centro, lista: [{ id, tipo, categoria, nombre, texto }] }`. `firma` y
+  `centro` sustituyen a lo que hasta el 16-sep-2026 estaba escrito a mano en `js/correo.js` (la
+  constante `CENTRO` y el `'Un saludo.'` de `cuerpoDelCorreo`); si el fichero no existe, sale eso
+  mismo de partida y se crea de verdad al primer guardado. **Se relee cada vez que se abre el
+  cuadro de Correo, sin caché entre aperturas**: es un fichero compartido, y releerlo una vez por
+  cuadro no cuesta nada.
+- **Los huecos**, entre llaves: `{nombre}` (el tercero sin su número ni su NIF), `{grupo}`,
+  `{curso}`, `{tipo}`, `{hoy}`, `{limite}`, `{usuario}` (`App.E.usuario`), `{centro}`, y
+  `{campo:LO QUE SEA}` para un campo propio del tipo (por su nombre, buscado con `Campos.
+  nombreDeCampo` sobre `App.E.campos.porTipo`). `Plantillas.rellenar(texto, valores)` los
+  sustituye: uno sin valor se deja **vacío** (nunca se escribe `{grupo}` en lo que le llega al
+  tercero) y se apunta en la lista de "faltan"; uno que no se reconozca se deja tal cual, también
+  apuntado, para que un hueco mal escrito no rompa nada. Las llaves se comparan con
+  `U.normalizar` (sin mayúsculas ni acentos), nunca al sustituir.
+- **En el cuadro de Correo y en el de Séneca** (los dos, `js/correo.js`): un desplegable
+  "Plantilla" encima del cuerpo, dentro de `camposComunes`/`interiorDeComunes`, en su propio
+  `#correo-comunes` para poder repintarse solo sin tocar el "Para" ni los documentos. Con una
+  plantilla, sale puesta; con varias, sale la primera; sin ninguna, el desplegable no se pinta y
+  el cuerpo sale como siempre. Encima del cuerpo, si falta algún dato, un aviso ámbar "Faltan
+  datos: …". **Cambiar de plantilla con algo escrito a mano pregunta antes de pisarlo — en línea,
+  dentro del propio cuadro (`#correo-plantilla-confirmar`), nunca con un segundo `U.preguntar`**:
+  solo hay un cuadro de diálogo en toda la aplicación, y este ya está ocupado por el de Correo.
+  En Séneca, al copiar el texto (paso 2 de `engancharSeneca`) se recorta a **4.000 letras** si
+  hace falta, avisando en una línea.
+- **En Ajustes**, bloque propio "Plantillas de correo" (vive entero en `js/plantillas.js`, no
+  toca `js/ajustes.js`, que ya pasa de 47 KB: se engancha solo con `window.Gestor.alRefrescar`,
+  igual que `js/bandeja-correos.js` y `js/unir-asuntos.js`). Lista con buscador cruzado, alta y
+  edición en un `U.preguntar` con botones para insertar cada hueco en el cursor y una vista previa
+  en vivo (con el primer asunto abierto de ese tipo, o datos de muestra si no hay ninguno).
+  Bloque aparte para la firma y el centro. **El borrado pasa por `Papelera.mandarDato` para dejar
+  rastro, pero `js/papelera.js` no sabe devolver la clase `'plantilla'`** (no estaba en la lista
+  de ficheros del encargo): cae en su "No sé devolver esto." Si hace falta devolver una borrada,
+  hay que copiarla a mano desde el bloque Papelera de Ajustes.
+
+Se comprueba con `pruebas/plantillas.mjs`.
+
 ### Registrar un documento en un paso
 
 Botón **Registrar**, en cada documento que aún no lleve las cuatro piezas del registro en su
@@ -670,8 +746,8 @@ de `App` va después del fichero que lo define.
 | `js/asuntos-lista.js` | Asuntos abiertos: las tres tarjetas, las tarjetas por tipo y la lista. Al leer la carpeta, descarta las que parecen temporales de sincronización, salvo que ya tengan ficha en `asuntos.json` |
 | `js/unir-asuntos.js` | Une asuntos duplicados que ya existen: aviso junto a Actualizar y pantalla propia "Duplicados" (`css/unir-asuntos.css`) |
 | `js/asuntos-editar.js` | Editar un asunto abierto: renombra la carpeta y mueve su ficha |
-| `js/documentos-sueltos.js` | Los papeles sin asunto, "Meter en un asunto", cerrar y reabrir, y la vigilancia de la carpeta |
 | `js/elegir-asunto.js` | El cuadro de escoger un asunto a mano, compartido por "Por clasificar" y por la bandeja de correos |
+| `js/documentos-sueltos.js` | Los papeles sin asunto, "Meter en un asunto", cerrar y reabrir, y la vigilancia de la carpeta |
 | `js/asuntos-nuevo.js` | Crear un asunto, el cuadro de datos de un tercero y los pies |
 | `js/archivo-personas.js` | Personas y empresas, el ARCHIVO, y cambiar los datos de un tercero |
 | `js/ajustes.js` | La pantalla de Ajustes: tipos (pestañas, buscador, aviso en vivo), estados y tipos de documento |
@@ -692,13 +768,15 @@ de `App` va después del fichero que lo define.
 | `js/via-contacto.js` | Los teléfonos y correos del tercero, como botones |
 | `js/tablon.js` | El tablón de notas rápidas, con las notas "Solo para mí" |
 | `js/copiar.js` | Los botones de copiar: el Nº escolar y el nombre del documento |
-| `js/correo.js` | El correo y el mensaje de Séneca, con su rastro |
+| `js/plantillas.js` | Leer y guardar `plantillas.json`, rellenar los huecos, y el bloque "Plantillas de correo" de Ajustes |
+| `js/correo.js` | El correo y el mensaje de Séneca, con su rastro y sus plantillas |
 | `js/salir.js` | El botón de Salir del pie de la barra |
 | `js/rescate-datos.js` | Recoge los CSV que se hayan quedado un piso más arriba |
 | `js/traer-datos.js` | El botón de traer los CSV de Séneca desde donde estén |
 | `js/lector.js` | El panel de la derecha para leer, con su borde para estirarlo |
-| `js/bandeja-correos.js` | La bandeja de correos, la huella del hilo y lo que deja un correo dentro del asunto |
+| `js/bandeja-correos.js` | La bandeja de correos, la huella del hilo, lo que deja un correo dentro del asunto, y la tarjeta "Borrador en camino" (`window.Bandeja`) |
 | `js/bandeja-enlace.js` | "Elegir asunto": llama al cuadro compartido, con la puntuación de parecido de un correo |
+| `js/correo-adjuntos.js` | El bloque "Documentos de este asunto" del cuadro de Correo, y el encargo `<id>.envio.json` |
 | `js/barra.js` | La barra plegable, el botón grande de Nuevo asunto y el icono de Ajustes plegado |
 | `js/vista.js` | Los filtros plegados y cuándo se ve el tablón |
 | `js/dni.js` | El DNI del alumnado, el aviso de que falta y la búsqueda por DNI |
@@ -728,6 +806,8 @@ de `App` va después del fichero que lo define.
 | `pruebas/ajustes-agil.mjs` | Prueba de las pestañas, el buscador cruzado, el aviso en vivo y la barra fija |
 | `pruebas/papelera.mjs` | Prueba de borrar con papelera, devolver y borrar del todo |
 | `pruebas/documentos-sueltos.mjs` | Prueba de "Meter en un asunto": un documento suelto a un asunto que ya existe |
+| `pruebas/envios.mjs` | Prueba de mandar documentos por correo: el encargo, el hilo, el límite de 20 MB, "listo" y "error" |
+| `pruebas/plantillas.mjs` | Prueba de las plantillas: huecos, "Faltan datos", cambiar de plantilla, sin plantillas, y el recorte de Séneca |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |
@@ -742,6 +822,8 @@ de `App` va después del fichero que lo define.
 | `docs/CORREOS-AL-ASUNTO.md` | El encargo de enlazar correos a un asunto y seguir el hilo |
 | `docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md` | El encargo de meter un documento suelto en un asunto que ya existe |
 | `docs/AHORRO-CUOTA.md` | Reglas para gastar menos cuota al trabajar la cola |
+| `docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md` | El encargo de adjuntar documentos del asunto a un borrador de Gmail |
+| `docs/PLANTILLAS-DE-CORREO.md` | El encargo de las plantillas de correo y de mensaje por tipo |
 | `README.md` | — |
 
 ### Lo que la aplicación guarda en `_GESTOR`
@@ -761,6 +843,8 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `campos.json` | Los campos propios y los campos configurados de cada tipo de asunto |
 | `papelera.json` | El índice de la papelera: qué se ha borrado, de dónde y cuándo |
 | `no-duplicados.json` | Grupos de posibles duplicados descartados con "No son el mismo", por la firma de sus nombres |
+| `envios.json` | **Es una lista, no un objeto.** Los encargos vivos de "mandar documentos por correo": `{ id, asunto, para, creado }` |
+| `plantillas.json` | `{ firma, centro, lista: [{ id, tipo, categoria, nombre, texto }] }`, para el correo y el mensaje de Séneca |
 | `datos/*.csv` | Alumnado (Séneca), personal, empresas y otros |
 | `PAPELERA/` | Las carpetas y ficheros borrados, cada uno en su subcarpeta `AAMMDD-HHMM <nombre>` |
 | `copias/*.json` | Copias de seguridad de los once ficheros de arriba, una por día, 30 como mucho de cada uno |
@@ -952,29 +1036,28 @@ Aparte, en `localStorage`: `gestor-barra`, `gestor-filtros`, `gestor-lector-anch
    que sigue los hilos ya enganchados (`seguidos.json`) y el que arregla el enlace a Gmail. Sin
    pegarlo, las respuestas no vuelven a la bandeja.
 5. Ver con el uso si la bandeja **acierta con el tipo**. Si falla mucho, palabras clave por tipo.
-6. **Plantillas de correo y de mensaje por tipo de asunto**, con huecos que se rellenan solos.
-   Hacerlo cuando el uso diga qué correos se repiten.
-7. Comprobar, con Séneca delante, si desde el perfil de administrativo la pantalla de
+6. Comprobar, con Séneca delante, si desde el perfil de administrativo la pantalla de
    Comunicaciones es la misma, y si el asunto admite el largo que le estamos dando.
-8. Pendiente de decidir: si el aviso de fichero viejo debe vigilar también el `RelPerCen`.
-9. **Cuando tengan una cuenta de correo común**, replantear la bandeja: una sola compartida.
-10. Descartado por ahora: un filtro de Gmail que etiquete **todo** el correo entrante.
-11. La firma del correo lleva el nombre y "IES Fuente Lucena" escritos a pelo en `js/correo.js`.
-    Sacarlos a Ajustes con las plantillas del punto 6.
-12. Ver con el uso si el panel de la derecha se queda corto para leer: hoy el 46%.
-13. Ver con el uso si las tarjetas por tipo se quedan cortas: hoy son solo del tipo.
-14. Mirar si el tablón debería ensancharse: hoy son 320 píxeles fijos.
-15. Las notas viejas de correo se quedan como están: son el rastro.
-16. Si el DNI no sale de nadie, **marcar la columna del documento al generar el RegAlum**.
-17. Ver con el uso si el aviso de "falta el DNI" conviene también en la tarjeta del asunto.
-18. Ver con el uso si el botón "Cambiar los datos" hace falta también en el buscador de Nuevo
+7. Pendiente de decidir: si el aviso de fichero viejo debe vigilar también el `RelPerCen`.
+8. **Cuando tengan una cuenta de correo común**, replantear la bandeja: una sola compartida.
+9. Descartado por ahora: un filtro de Gmail que etiquete **todo** el correo entrante.
+10. Ver con el uso si el panel de la derecha se queda corto para leer: hoy el 46%.
+11. Ver con el uso si las tarjetas por tipo se quedan cortas: hoy son solo del tipo.
+12. Mirar si el tablón debería ensancharse: hoy son 320 píxeles fijos.
+13. Las notas viejas de correo se quedan como están: son el rastro.
+14. Si el DNI no sale de nadie, **marcar la columna del documento al generar el RegAlum**.
+15. Ver con el uso si el aviso de "falta el DNI" conviene también en la tarjeta del asunto.
+16. Ver con el uso si el botón "Cambiar los datos" hace falta también en el buscador de Nuevo
     asunto.
-19. Ver con el uso si a las preguntas de la guía les hace falta algo más.
-20. **Cuando el uso lo pida**: búsqueda dentro de las notas, cuentas por tipo para la memoria de
+17. Ver con el uso si a las preguntas de la guía les hace falta algo más.
+18. **Cuando el uso lo pida**: búsqueda dentro de las notas, cuentas por tipo para la memoria de
     fin de curso, qué hacer con los asuntos vivos al cambiar de curso, y pasar el repositorio y
     Vercel a una cuenta del centro para el relevo.
-21. Los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no
+19. Los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no
     se fusionan entre ordenadores (solo las altas, ver "Copias en conflicto de Dropbox" arriba).
     Y las copias en conflicto de `guias.json`, `recurrentes.json` y `frescura.json` no se
     fusionan solas: avisan en Ajustes para elegir con cuál quedarse. Revisar si con el uso hace
     falta algo más fino.
+20. `js/papelera.js` no sabe devolver una plantilla de correo borrada (clase `'plantilla'`, no
+    estaba en el encargo de las plantillas): si hace falta, se copia a mano desde el bloque
+    Papelera de Ajustes.

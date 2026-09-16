@@ -28,8 +28,6 @@
    ============================================================ */
 (function () {
 
-  var CENTRO = 'IES Fuente Lucena';
-
   var viendo = null;         /* el asunto que se está mirando */
   var modoDelAsunto = 'abierto';
   var elegidos = {};         /* qué correos van marcados */
@@ -39,6 +37,12 @@
   var personaActual = null;  /* la ficha del tercero, ya buscada en los CSV */
   var pasoSeneca = 0;        /* 0 el asunto, 1 el texto, 2 hecho */
   var algoCambiado = false;  /* al cerrar, la ficha se repinta si se ha tocado algo */
+  var documentosAdjuntados = [];  /* los que ha llevado el último borrador preparado */
+
+  var plantillasDatos = null;   /* _GESTOR/plantillas.json, ya leído */
+  var plantillaElegida = '';    /* el id de la elegida en el desplegable, o '' (Sin plantilla) */
+  var textoProgramado = '';     /* lo último que ha escrito el propio cuadro, para saber si se ha tocado a mano */
+  var MAXIMO_LETRAS_SENECA = 4000;
 
   function $(id) { return document.getElementById(id); }
 
@@ -107,6 +111,43 @@
     return { curso: curso, grupo: grupo };
   }
 
+  function fechaLegibleDeIso(iso) {
+    return iso ? U.fechaLegible(U.aAaMmDd(iso)) : '';
+  }
+
+  /* Los campos propios del tipo de este asunto, por su nombre en
+     cristiano: es como los busca {campo:LO QUE SEA}. */
+  function camposDelAsunto(a) {
+    var salida = {};
+    if (!window.Campos || !App.E.campos) return salida;
+    var tipo = (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
+    var configurados = (App.E.campos.porTipo && App.E.campos.porTipo[tipo]) || [];
+    var guardados = (a.ficha && a.ficha.campos) || {};
+    configurados.forEach(function (c) {
+      var nombre = Campos.nombreDeCampo(c, App.E.campos);
+      var guardado = guardados[Campos.claveDeCampo(c)];
+      if (nombre && guardado && guardado.valor) salida[nombre] = guardado.valor;
+    });
+    return salida;
+  }
+
+  /* Lo que necesita Plantillas.rellenar para los huecos de un asunto. */
+  function valoresDePlantilla(a) {
+    var f = a.ficha || {};
+    var p = piezasDelNombre(a);
+    return {
+      nombre: soloElNombre(terceroDe(a)),
+      grupo: p.grupo,
+      curso: p.curso,
+      tipo: (a.leido && a.leido.tipo) || f.tipo || '',
+      hoy: fechaLegibleDeIso(U.hoyIso()),
+      limite: fechaLegibleDeIso(f.limite),
+      usuario: App.E.usuario || '',
+      centro: (plantillasDatos && plantillasDatos.centro) || Plantillas.POR_DEFECTO_CENTRO,
+      campos: camposDelAsunto(a)
+    };
+  }
+
   function asuntoDelCorreo(a) {
     if (asuntoLargo) return a.nombre;
     var f = a.ficha || {}, l = a.leido || {};
@@ -120,7 +161,18 @@
     return trozos.filter(Boolean).join('  ·  ');
   }
 
-  function cuerpoDelCorreo(a, persona) {
+  function textoDeLaFirma() {
+    var plantilla = (plantillasDatos && plantillasDatos.firma) || Plantillas.POR_DEFECTO_FIRMA;
+    return Plantillas.rellenar(plantilla, {
+      usuario: App.E.usuario || '',
+      centro: (plantillasDatos && plantillasDatos.centro) || Plantillas.POR_DEFECTO_CENTRO
+    }).texto;
+  }
+
+  /* El cuerpo entero: saludo, el medio (en blanco, o la plantilla
+     elegida con sus huecos ya rellenos) y la firma. Devuelve también
+     los huecos que se han quedado sin dato, para el aviso de arriba. */
+  function cuerpoDelMedio(a, idPlantilla) {
     var categoria = categoriaDe(a);
     var nombre = soloElNombre(terceroDe(a));
     var saludo;
@@ -131,9 +183,20 @@
     } else {
       saludo = 'Buenos días:';
     }
-    var firma = ['Un saludo.', App.E.usuario || '', CENTRO]
-      .filter(Boolean).join('\n');
-    return saludo + '\n\n\n\n' + firma;
+
+    var medio = '', faltan = [];
+    var plantilla = idPlantilla && plantillasDatos
+      ? plantillasDatos.lista.filter(function (p) { return p.id === idPlantilla; })[0]
+      : null;
+    if (plantilla) {
+      var r = Plantillas.rellenar(plantilla.texto, valoresDePlantilla(a));
+      medio = r.texto;
+      faltan = r.faltan;
+    }
+
+    var firma = textoDeLaFirma();
+    var texto = medio ? (saludo + '\n\n' + medio + '\n\n' + firma) : (saludo + '\n\n\n\n' + firma);
+    return { texto: texto, faltan: faltan };
   }
 
   function paraDelCuadro() {
@@ -192,7 +255,13 @@
       return 'Mensaje por Séneca a ' + (aQuien(viendo) || 'el tercero') + cola;
     }
     var para = paraDelCuadro();
-    return 'Correo ' + (para ? 'a ' + para : 'preparado') + cola;
+    var base = 'Correo ' + (para ? 'a ' + para : 'preparado') + cola;
+    if (documentosAdjuntados.length) {
+      base += ' · con ' + documentosAdjuntados.length +
+        ' documento' + (documentosAdjuntados.length === 1 ? '' : 's') +
+        ': ' + documentosAdjuntados.join(', ');
+    }
+    return base;
   }
 
   /* A quién se le va a escribir, dicho en palabras. En Séneca no hay
@@ -294,19 +363,22 @@
     asuntoLargo = !porSeneca;   /* en Séneca manda la versión legible: el nombre de la carpeta no cabe */
     yaApuntado = false;
     algoCambiado = false;
+    documentosAdjuntados = [];
+    plantillaElegida = '';
     var esperar = U.preguntar(porSeneca ? 'Mensaje por Séneca' : 'Correo de este asunto',
       '<div id="correo-caja"><p class="explica">Preparando…</p></div>', 'Cerrar', true);
     var persona = null;
     try { persona = await buscarPersona(a); } catch (e) { persona = null; }
     personaActual = persona;
-    pintarCuadro(a, persona);
+    try { plantillasDatos = await Plantillas.cargar(App.E.gestor); } catch (e) { plantillasDatos = null; }
+    await pintarCuadro(a, persona);
     await esperar;
     /* Si se ha apuntado la nota o cambiado el estado, la ficha que hay
        detrás se ha quedado vieja: se vuelve a abrir. */
     if (algoCambiado) App.abrirFicha(a, modoDelAsunto);
   }
 
-  function pintarCuadro(a, persona) {
+  async function pintarCuadro(a, persona) {
     var caja = $('correo-caja');
     if (!caja) return;
     var correos = correosDe(persona);
@@ -314,7 +386,14 @@
        los dos tutores. Quitar una casilla es más rápido que ponerla. */
     correos.forEach(function (c) { if (elegidos[c.dir] === undefined) elegidos[c.dir] = true; });
 
-    caja.innerHTML = porSeneca ? cuerpoDeSeneca(a) : cuerpoDeCorreo(a, correos);
+    /* Los documentos del asunto no van en el cuadro de Séneca: allí no
+       hay adjuntos. */
+    var bloqueAdjuntos = '';
+    if (!porSeneca && window.CorreoAdjuntos) {
+      try { bloqueAdjuntos = await CorreoAdjuntos.pintarBloque(a); } catch (e) { bloqueAdjuntos = ''; }
+    }
+
+    caja.innerHTML = porSeneca ? cuerpoDeSeneca(a) : cuerpoDeCorreo(a, correos, bloqueAdjuntos);
 
     if (porSeneca) {
       engancharComunes(a);
@@ -323,11 +402,17 @@
     }
     engancharComunes(a);
     engancharCorreo(a);
+    if (bloqueAdjuntos && window.CorreoAdjuntos) {
+      CorreoAdjuntos.enganchar(a, function (nombres) {
+        documentosAdjuntados = nombres;
+        apuntarElRastro(a);
+      });
+    }
   }
 
   /* ---------- el cuadro del correo ---------- */
 
-  function cuerpoDeCorreo(a, correos) {
+  function cuerpoDeCorreo(a, correos, bloqueAdjuntos) {
     return '<label class="etiqueta" style="margin-top:0">Para</label>' +
       (correos.length
         ? '<div id="correo-lista">' + correos.map(function (c) {
@@ -347,6 +432,8 @@
         'style="margin-top:8px">' +
 
       camposComunes(a) +
+
+      (bloqueAdjuntos || '') +
 
       '<div class="correo-botones" style="margin-top:14px">' +
         '<button type="button" class="boton" id="correo-copiar-para">Copiar Para</button>' +
@@ -383,8 +470,47 @@
            '<p class="nota" id="seneca-explica">Pulsa, pega en Séneca, y vuelve a pulsar para el texto.</p>';
   }
 
-  /* Los dos campos que comparten los dos cuadros. */
+  /* Las plantillas del tipo de este asunto. Con una sola, es la que
+     sale puesta; con ninguna, el desplegable no se pinta. */
+  function plantillasDelTipo(a) {
+    if (!plantillasDatos) return [];
+    var categoria = categoriaDe(a);
+    var tipo = (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
+    return Plantillas.deTipo(plantillasDatos, categoria, tipo);
+  }
+
+  /* Los dos campos que comparten los dos cuadros, con el desplegable
+     de plantilla encima del cuerpo. Va en su propio contenedor para
+     poder repintarse solo, sin tocar el resto del cuadro (el "Para",
+     los documentos…), cuando se cambia de plantilla. */
   function camposComunes(a) {
+    return '<div id="correo-comunes">' + interiorDeComunes(a) + '</div>';
+  }
+
+  function interiorDeComunes(a) {
+    var opciones = plantillasDelTipo(a);
+    /* Con una plantilla, sale puesta; con varias, sale la primera y el
+       desplegable deja cambiar. */
+    if (!plantillaElegida && opciones.length) plantillaElegida = opciones[0].id;
+    if (plantillaElegida && !opciones.some(function (p) { return p.id === plantillaElegida; })) {
+      plantillaElegida = '';
+    }
+
+    var cuerpo = cuerpoDelMedio(a, plantillaElegida);
+    textoProgramado = cuerpo.texto;
+
+    var desplegable = opciones.length
+      ? '<label class="etiqueta">Plantilla</label>' +
+        '<select id="correo-plantilla" class="campo">' +
+          '<option value="">Sin plantilla</option>' +
+          opciones.map(function (p) {
+            return '<option value="' + p.id + '"' + (p.id === plantillaElegida ? ' selected' : '') + '>' +
+              U.escapar(p.nombre) + '</option>';
+          }).join('') +
+        '</select>' +
+        '<div id="correo-plantilla-confirmar" class="oculto"></div>'
+      : '';
+
     return '<label class="etiqueta">Asunto</label>' +
       '<input id="correo-asunto" class="campo" value="' + U.escapar(asuntoDelCorreo(a)) + '">' +
       '<div class="correo-botones" style="margin-top:6px">' +
@@ -392,9 +518,14 @@
         '<button type="button" class="boton" id="correo-legible">Versión legible</button>' +
       '</div>' +
 
+      desplegable +
+
       '<label class="etiqueta">' + (porSeneca ? 'Texto del mensaje' : 'Cuerpo') + '</label>' +
-      '<textarea id="correo-cuerpo-texto" class="campo" rows="9">' +
-        U.escapar(cuerpoDelCorreo(a, personaActual)) + '</textarea>';
+      (cuerpo.faltan.length
+        ? '<p class="aviso aviso-ambar" id="correo-faltan-datos">Faltan datos: ' +
+          U.escapar(cuerpo.faltan.join(', ')) + '</p>'
+        : '') +
+      '<textarea id="correo-cuerpo-texto" class="campo" rows="9">' + U.escapar(cuerpo.texto) + '</textarea>';
   }
 
   /* ---------- enganchar los botones ---------- */
@@ -416,6 +547,47 @@
       asuntoLargo = false; $('correo-asunto').value = asuntoDelCorreo(a); marcarBotonDelAsunto();
     };
     marcarBotonDelAsunto();
+
+    var desplegable = $('correo-plantilla');
+    if (!desplegable) return;
+
+    /* Cambiar de plantilla reescribe el cuadro entero de "Documentos
+       de este asunto" para abajo no, solo #correo-comunes: no hay
+       segundo cuadro de diálogo (solo hay uno, #capa, y ya está
+       ocupado por este), así que la confirmación de "se pierde lo
+       escrito" va en línea, dentro del propio cuadro. */
+    desplegable.onchange = function () {
+      var elegida = this.value;
+      var escritoAMano = $('correo-cuerpo-texto').value !== textoProgramado;
+      if (!escritoAMano) { cambiarDePlantilla(a, elegida); return; }
+
+      var caja2 = $('correo-plantilla-confirmar');
+      caja2.className = 'aviso aviso-ambar';
+      caja2.innerHTML = '<p>Lo que hay escrito en el cuerpo se perderá.</p>';
+      var seguir = document.createElement('button');
+      seguir.type = 'button';
+      seguir.className = 'boton boton-principal';
+      seguir.textContent = 'Cambiar de todas formas';
+      seguir.onclick = function () { cambiarDePlantilla(a, elegida); };
+      var cancelar = document.createElement('button');
+      cancelar.type = 'button';
+      cancelar.className = 'boton';
+      cancelar.textContent = 'Seguir con lo escrito';
+      cancelar.style.marginLeft = '8px';
+      cancelar.onclick = function () {
+        desplegable.value = plantillaElegida;
+        caja2.className = 'oculto';
+        caja2.innerHTML = '';
+      };
+      caja2.appendChild(seguir);
+      caja2.appendChild(cancelar);
+    };
+  }
+
+  function cambiarDePlantilla(a, idElegida) {
+    plantillaElegida = idElegida;
+    $('correo-comunes').innerHTML = interiorDeComunes(a);
+    engancharComunes(a);
   }
 
   function engancharCorreo(a) {
@@ -444,11 +616,15 @@
         b.textContent = '2. Ahora, copiar el texto';
         explica.textContent = 'Asunto copiado. Pégalo en Séneca y vuelve a pulsar.';
       } else if (pasoSeneca === 1) {
-        copiarTexto($('correo-cuerpo-texto').value);
+        var texto = $('correo-cuerpo-texto').value;
+        var recortado = texto.length > MAXIMO_LETRAS_SENECA;
+        if (recortado) texto = texto.slice(0, MAXIMO_LETRAS_SENECA);
+        copiarTexto(texto);
         pasoSeneca = 2;
         b.textContent = 'Copiado. Pégalo y envía';
         b.classList.remove('boton-principal');
-        explica.textContent = 'Texto copiado. Pégalo en Séneca y envía el mensaje.';
+        explica.textContent = 'Texto copiado' + (recortado ? ', recortado a 4.000 letras' : '') +
+          '. Pégalo en Séneca y envía el mensaje.';
         apuntarElRastro(a);
       } else {
         pasoSeneca = 0;

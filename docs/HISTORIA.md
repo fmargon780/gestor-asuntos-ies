@@ -1193,3 +1193,70 @@ una línea cada una. El texto largo que tenían antes era:
   publicada** (la red de esta sesión concreta no llega a `gestor-de-asuntos.vercel.app`: la
   bloquea la política de salida de este contenedor, no algo del código). Queda pendiente de
   confirmar en el navegador la próxima vez que se entre.
+- **12 · `docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md`**: Terminada 16-sep-2026 · 20:40. Botón "Meter en
+  un asunto" en cada tarjeta de Por clasificar, para mandar un documento suelto a un asunto que
+  ya existe en vez de crear uno nuevo. La fila 11 de la cola (`docs/CORREOS-AL-ASUNTO.md`) seguía
+  **EN CURSO** de otra sesión al empezar esta (regla 6 de `docs/COLA.md`: se saltó y se cogió la
+  siguiente PENDIENTE), así que el elegidor de asuntos nace en su propio módulo,
+  `js/elegir-asunto.js` (`window.ElegirAsunto`), pensado para que la bandeja de correos lo
+  reutilice cuando esa fila se retome, en vez de duplicar el buscador y la puntuación. El cuadro
+  enseña "Podrían encajar" (como mucho cinco, más de 40 puntos) y la lista completa con buscador,
+  abiertos primero y archivados con su etiqueta. La puntuación de un documento suelto (en
+  `js/documentos-sueltos.js`) sale de las palabras del nombre del fichero, del nombre del
+  tercero, de si el asunto está abierto y de si se movió hace menos de 30 días. Al elegir un
+  asunto archivado, ofrece reabrirlo (con `App.reabrirAsunto`, que pide su propia confirmación) o
+  meterlo sin reabrir. Nada se pierde: nombre repetido en el destino o un traslado a medias dejan
+  el documento donde estaba, con aviso. Pruebas nuevas en `pruebas/documentos-sueltos.mjs` (seis
+  escenarios del encargo). De paso se arregló `pruebas/logica.mjs`: la fecha de cese del personal
+  estaba escrita a mano (`15/09/2026` y `06/09/2026`) y se quedó desfasada al llegar esa fecha,
+  igual que ya le pasó una vez a la edad (ver el comentario de "la edad" en ese mismo fichero);
+  ahora sale de `fechaHace(0, …)`, relativa a hoy (este arreglo de `pruebas/logica.mjs` sí se ha
+  conservado). Batería completa en verde (`npm test`, 20 ficheros) en esa rama.
+
+  **Corrección, al fusionar**: mientras esta sesión trabajaba en su rama, otra sesión en paralelo
+  hizo también la fila 12 directamente en `main`, sin verse la una a la otra, y con mejor diseño:
+  un solo `js/elegir-asunto.js` compartido desde el principio con la bandeja de correos
+  (`js/bandeja-enlace.js`), en vez de dos elegidores por separado. Al fusionar esta rama, todo lo
+  descrito arriba sobre `js/elegir-asunto.js` y `js/documentos-sueltos.js` (el propio y el de la
+  bandeja) se ha descartado a favor de lo que ya había en `main`; `pruebas/documentos-sueltos.mjs`
+  también se ha sustituido por la versión de la otra sesión. Lo único de esta entrada que ha
+  sobrevivido es el arreglo de las fechas de `pruebas/logica.mjs`.
+- **13 · `docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md`**: Terminada 16-sep-2026 · 20:57, en la misma
+  sesión y el mismo pull request que la fila 12. Gmail no deja que una página web adjunte
+  ficheros, así que la salida sigue siendo la carpeta `GESTOR-BANDEJA`: bloque nuevo "Documentos
+  de este asunto" en el cuadro de Correo (`js/correo-adjuntos.js`, solo ahí, nunca en el de
+  Séneca), con una casilla por documento (desmarcadas de partida) y un límite de 20 MB. Al
+  preparar, se copian los marcados a la bandeja con el nombre `<id> - <original>` y, el último,
+  el encargo `<id>.envio.json` (con el hilo del asunto si `hilos` ya existe, de la fila 11; si no,
+  cadena vacía y sale como correo nuevo, tal como preveía el propio encargo). Se apunta en
+  `_GESTOR/envios.json` (una lista, no un objeto) para que la tarjeta "Borrador en camino" se vea
+  aunque se cierre el cuadro; esa tarjeta y su vigilancia (cada 15 segundos, solo mientras haya
+  algún encargo vivo) viven en `js/bandeja-correos.js`, que también deja de leer los
+  `.envio.json`/`.listo.json`/`.error.json` como si fueran correos recogidos. El script de Apps
+  Script (`mandarBorradores()`, en `apps-script/gestor-correos.gs`) monta el borrador con
+  `GmailApp.createDraft` o, si hay hilo, `createDraftReply`, siempre como borrador, nunca lo
+  envía; el disparador pasa de cinco minutos a uno. Pruebas nuevas en `pruebas/envios.mjs` (los
+  seis escenarios del encargo), batería completa en verde.
+- **14 · `docs/PLANTILLAS-DE-CORREO.md`**: Terminada 16-sep-2026 · 21:12, en la misma sesión y el
+  mismo pull request que las filas 12 y 13. Una plantilla es solo el cuerpo del medio: el saludo
+  y la firma los sigue poniendo `js/correo.js`, solo. Se crean en Ajustes pegadas a un tipo de
+  asunto y se guardan en `_GESTOR/plantillas.json` (`js/plantillas.js`, `window.Plantillas`),
+  compartido con el compañero; también saca de ahí la firma y el nombre del centro, que hasta hoy
+  estaban escritos a mano en `js/correo.js`. Los huecos entre llaves (`{nombre}`, `{grupo}`,
+  `{curso}`, `{tipo}`, `{hoy}`, `{limite}`, `{usuario}`, `{centro}`, y `{campo:LO QUE SEA}` para
+  un campo propio del tipo) se comparan sin mayúsculas ni acentos y nunca rompen nada: uno sin
+  dato se deja vacío y se avisa ("Faltan datos: …"), uno que no se reconoce se deja tal cual y
+  también avisa. El desplegable "Plantilla" sale en los dos cuadros (correo y Séneca), dentro de
+  su propio `#correo-comunes` para poder repintarse sin tocar el resto del cuadro; cambiar de
+  plantilla con algo escrito a mano pregunta antes, **en línea, dentro del propio cuadro**
+  (`#correo-plantilla-confirmar`), nunca con un segundo `U.preguntar`, porque solo hay un cuadro
+  de diálogo en toda la aplicación y ya está ocupado por el de Correo. En Séneca, copiar el texto
+  lo recorta a 4.000 letras si hace falta. El bloque de Ajustes vive entero en `js/plantillas.js`
+  (no ha hecho falta tocar `js/ajustes.js`): lista con buscador, alta y edición con botones para
+  insertar cada hueco y una vista previa en vivo, y un bloque aparte para la firma y el centro. El
+  borrado pasa por `Papelera.mandarDato`, pero `js/papelera.js` no sabe devolver la clase
+  `'plantilla'` (no estaba en el encargo): queda anotado en "Qué falta por hacer". Pruebas nuevas
+  en `pruebas/plantillas.mjs` (los siete escenarios del encargo), más una comprobación manual del
+  alta/edición/borrado en Ajustes (no pedida por las pruebas del encargo, pero es la parte que usa
+  Francisco a diario). Batería completa en verde (`npm test`, 22 ficheros). Con esta fila, la cola
+  se queda sin ninguna PENDIENTE: solo la fila 11 sigue EN CURSO, de otra sesión.
