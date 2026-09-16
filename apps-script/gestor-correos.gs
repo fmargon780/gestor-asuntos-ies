@@ -12,13 +12,16 @@
 
    Qué hace, cada minuto:
 
-   1. Manda los borradores pendientes (ver más abajo, "mandar
-      documentos por correo").
-   2. Mira los correos que tengan la etiqueta GESTOR.
-   3. De cada uno guarda una ficha en la carpeta GESTOR-BANDEJA de
+   0. Antes que nada, mira si el Gestor ha dejado algún encargo de
+      borrador (`<id>.envio.json`) en GESTOR-BANDEJA. De cada uno monta
+      un BORRADOR en Gmail con sus documentos adjuntados —dentro del
+      hilo del asunto si lo tiene—, borra el encargo y contesta con
+      `<id>.listo.json`. Nunca envía nada: enviar, lo envía Francisco.
+   1. Mira los correos que tengan la etiqueta GESTOR.
+   2. De cada uno guarda una ficha en la carpeta GESTOR-BANDEJA de
       Drive: remitente, fecha, asunto, texto y direcciones.
-   4. Guarda también el hilo en PDF y sus documentos adjuntos.
-   5. Le quita la etiqueta GESTOR y le pone GESTOR/Hecho, para no
+   3. Guarda también el hilo en PDF y sus documentos adjuntos.
+   4. Le quita la etiqueta GESTOR y le pone GESTOR/Hecho, para no
       volver a recogerlo.
    5. Y después lee seguidos.json, que escribe el Gestor de Asuntos con
       los hilos que ya están enganchados a un asunto. De esos hilos ya
@@ -28,17 +31,6 @@
 
    El Gestor de Asuntos lee esa carpeta en js/bandeja-correos.js.
    Este script no crea carpetas de asuntos ni toca nada del centro.
-
-   16-sep-2026, "mandar documentos por correo"
-   (docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md): el Gestor no puede
-   adjuntar ficheros a un correo desde el navegador, así que deja en
-   esta misma carpeta una copia de cada documento marcado y un encargo,
-   <id>.envio.json. mandarBorradores() los recoge, antes de recoger
-   correos, y monta un BORRADOR en Gmail (nunca lo envía) con los
-   adjuntos, respondiendo dentro del hilo si el encargo trae uno. Deja
-   <id>.listo.json (con el enlace a los borradores) o <id>.error.json
-   (con el motivo), y borra el .envio.json y las copias: un encargo no
-   puede repetirse cada minuto para siempre.
    ============================================================ */
 
 var ETIQUETA = 'GESTOR';
@@ -48,7 +40,6 @@ var FICHERO_SEGUIDOS = 'seguidos.json';
 var MAX_POR_VUELTA = 20;
 var MAX_SEGUIDOS_POR_VUELTA = 40;
 var MAX_LETRAS_TEXTO = 6000;
-var MAX_ENCARGOS_POR_VUELTA = 20;
 
 /* ---------- lo que hay que ejecutar una sola vez ---------- */
 
@@ -72,11 +63,14 @@ function prepararTodo() {
 /* ---------- la vuelta de cada minuto ---------- */
 
 function recogerCorreos() {
-  mandarBorradores();
+  var carpeta = carpetaBandeja();
+
+  /* Lo primero, los borradores que ha encargado el Gestor: es lo que
+     tiene a alguien esperando delante de la pantalla. */
+  mandarBorradores(carpeta);
 
   var pendiente = etiqueta(ETIQUETA);
   var hecho = etiqueta(ETIQUETA_HECHO);
-  var carpeta = carpetaBandeja();
   var hilos = pendiente.getThreads(0, MAX_POR_VUELTA);
 
   for (var i = 0; i < hilos.length; i++) {
@@ -91,6 +85,131 @@ function recogerCorreos() {
   }
 
   seguirHilosConocidos(carpeta);
+}
+
+/* ---------- los borradores con documentos ----------
+
+   El Gestor de Asuntos no puede enganchar ficheros a un correo: Gmail
+   no deja. Lo que hace es dejar en GESTOR-BANDEJA una copia de cada
+   documento y, AL FINAL, el encargo:
+
+     <id>.envio.json
+     { id, creado, para, asunto, cuerpo, adjuntos: [...], hilo,
+       asuntoCarpeta }
+
+   Aquí se monta con eso un BORRADOR en Gmail. Si `hilo` trae algo y el
+   hilo todavía existe, el borrador es una respuesta dentro de esa misma
+   conversación; si no, uno nuevo. Nunca se envía: enviar, lo envía él.
+
+   Después se borran de la carpeta el encargo y sus copias, y se deja la
+   contestación: `<id>.listo.json` con el enlace a los borradores, o
+   `<id>.error.json` con el motivo en una línea. En los dos casos los
+   ficheros del encargo desaparecen: un encargo roto no puede repetirse
+   cada minuto para siempre.
+
+   Si no hay encargos, esto no hace nada y no se queja. */
+
+function mandarBorradores(carpeta) {
+  var encargos = ficherosDeEncargo(carpeta);
+  for (var i = 0; i < encargos.length; i++) {
+    var fichero = encargos[i];
+    var id = String(fichero.getName()).replace(/\.envio\.json$/, '');
+    var encargo = null;
+    try {
+      encargo = JSON.parse(fichero.getBlob().getDataAsString());
+    } catch (e) {
+      limpiarEncargo(carpeta, id);
+      contestar(carpeta, id + '.error.json',
+                { id: id, motivo: unaLinea('El encargo no se puede leer: ' + e.message) });
+      continue;
+    }
+    try {
+      crearBorrador(encargo, blobsDelEncargo(carpeta, encargo.adjuntos));
+      limpiarEncargo(carpeta, id);
+      contestar(carpeta, id + '.listo.json',
+                { id: id, hecho: ahora(), enlace: enlaceALosBorradores() });
+    } catch (e2) {
+      limpiarEncargo(carpeta, id);
+      contestar(carpeta, id + '.error.json', { id: id, motivo: unaLinea(e2.message) });
+    }
+  }
+}
+
+function ficherosDeEncargo(carpeta) {
+  var salida = [];
+  try {
+    var todos = carpeta.getFiles();
+    while (todos.hasNext()) {
+      var f = todos.next();
+      if (/\.envio\.json$/.test(f.getName())) salida.push(f);
+    }
+  } catch (e) {
+    Logger.log('No he podido mirar los encargos: ' + e.message);
+  }
+  return salida;
+}
+
+/* Los documentos del encargo, tal y como los dejó el Gestor. Al
+   adjuntarlos se les quita el "<id> - " de delante, que solo servía
+   para no mezclarlos con los de otro encargo. */
+function blobsDelEncargo(carpeta, nombres) {
+  var salida = [];
+  var lista = nombres || [];
+  for (var i = 0; i < lista.length; i++) {
+    var busca = carpeta.getFilesByName(lista[i]);
+    if (!busca.hasNext()) throw new Error('Falta el documento "' + lista[i] + '".');
+    var blob = busca.next().getBlob();
+    blob.setName(String(lista[i]).replace(/^envio-[0-9-]+ - /, ''));
+    salida.push(blob);
+  }
+  return salida;
+}
+
+function crearBorrador(encargo, adjuntos) {
+  var opciones = adjuntos.length ? { attachments: adjuntos } : {};
+  var cuerpo = String(encargo.cuerpo || '');
+
+  if (encargo.hilo) {
+    var hilo = null;
+    try { hilo = GmailApp.getThreadById(encargo.hilo); } catch (e) { hilo = null; }
+    if (hilo) return hilo.createDraftReply(cuerpo, opciones);
+  }
+  return GmailApp.createDraft(String(encargo.para || ''),
+                              String(encargo.asunto || ''), cuerpo, opciones);
+}
+
+/* El enlace es la lista de borradores, sin más: el recién hecho sale el
+   primero. NO se inventa una dirección con el identificador del
+   borrador: es exactamente el error que ya dio #all/<id de hilo>. */
+function enlaceALosBorradores() {
+  return 'https://mail.google.com/mail/u/?authuser=' +
+         encodeURIComponent(Session.getActiveUser().getEmail()) + '#drafts';
+}
+
+function limpiarEncargo(carpeta, id) {
+  try {
+    var todos = carpeta.getFiles();
+    var fuera = [];
+    while (todos.hasNext()) {
+      var f = todos.next();
+      var n = f.getName();
+      if (n === id + '.envio.json' || n.indexOf(id + ' - ') === 0) fuera.push(f);
+    }
+    for (var i = 0; i < fuera.length; i++) fuera[i].setTrashed(true);
+  } catch (e) { /* si no se puede limpiar, se sigue */ }
+}
+
+function contestar(carpeta, nombre, datos) {
+  try {
+    carpeta.createFile(nombre, JSON.stringify(datos, null, 2), 'application/json');
+  } catch (e) {
+    Logger.log('No he podido contestar con ' + nombre + ': ' + e.message);
+  }
+}
+
+function unaLinea(texto) {
+  var t = String(texto || 'No se sabe qué ha pasado.').replace(/\s+/g, ' ').trim();
+  return t.length > 200 ? t.slice(0, 200) + '…' : t;
 }
 
 /* ---------- los hilos que ya están enganchados a un asunto ----------
@@ -224,80 +343,6 @@ function guardarHilo(hilo, carpeta, respuestaDe) {
   /* La ficha se escribe la última: para el Gestor, un correo existe
      cuando existe su .json. Así nunca lee uno a medio guardar. */
   carpeta.createFile(id + '.json', JSON.stringify(ficha, null, 2), 'application/json');
-}
-
-/* ---------- mandar documentos por correo ----------
-
-   docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md, 16-sep-2026. El Gestor deja
-   en GESTOR-BANDEJA las copias de los documentos marcados y un
-   encargo, <id>.envio.json. Aquí se recogen, se monta el borrador (con
-   los adjuntos, que Gmail sí deja poner desde Apps Script) y nunca se
-   envía nada: siempre queda como borrador. */
-
-function mandarBorradores() {
-  var carpeta = carpetaBandeja();
-  var encontrados = carpeta.getFilesByType('application/json');
-  var encargos = [];
-  while (encontrados.hasNext()) {
-    var f = encontrados.next();
-    if (/\.envio\.json$/i.test(f.getName())) encargos.push(f);
-    if (encargos.length >= MAX_ENCARGOS_POR_VUELTA) break;
-  }
-  for (var i = 0; i < encargos.length; i++) {
-    mandarUnBorrador(encargos[i], carpeta);
-  }
-}
-
-function mandarUnBorrador(fichero, carpeta) {
-  var encargo = null;
-  try {
-    encargo = JSON.parse(fichero.getBlob().getDataAsString());
-    var adjuntos = [];
-    for (var i = 0; i < (encargo.adjuntos || []).length; i++) {
-      var buscados = carpeta.getFilesByName(encargo.adjuntos[i]);
-      if (buscados.hasNext()) adjuntos.push(buscados.next().getBlob());
-    }
-
-    var hilo = encargo.hilo ? GmailApp.getThreadById(encargo.hilo) : null;
-    if (hilo) {
-      hilo.createDraftReply(encargo.cuerpo || '', { attachments: adjuntos });
-    } else {
-      GmailApp.createDraft(encargo.para || '', encargo.asunto || '', encargo.cuerpo || '',
-        { attachments: adjuntos });
-    }
-
-    borrarFicherosDelEncargo(carpeta, encargo, fichero);
-    carpeta.createFile(encargo.id + '.listo.json',
-      JSON.stringify({ id: encargo.id, hecho: ahora(), enlace: enlaceABorradores() }, null, 2),
-      'application/json');
-  } catch (e) {
-    Logger.log('No he podido mandar el borrador de "' + fichero.getName() + '": ' + e.message);
-    if (encargo && encargo.id) {
-      try { borrarFicherosDelEncargo(carpeta, encargo, fichero); } catch (e2) { /* al menos que quede el aviso */ }
-      carpeta.createFile(encargo.id + '.error.json',
-        JSON.stringify({ id: encargo.id, motivo: String(e.message || e) }, null, 2),
-        'application/json');
-    }
-  }
-}
-
-/* Un encargo roto no puede repetirse cada minuto para siempre: se
-   borran sus copias y el propio .envio.json, haya salido bien o mal. */
-function borrarFicherosDelEncargo(carpeta, encargo, fichero) {
-  for (var i = 0; i < (encargo.adjuntos || []).length; i++) {
-    var buscados = carpeta.getFilesByName(encargo.adjuntos[i]);
-    while (buscados.hasNext()) buscados.next().setTrashed(true);
-  }
-  fichero.setTrashed(true);
-}
-
-/* La lista de borradores, sin más: el borrador recién hecho sale el
-   primero. No se inventa una dirección con el identificador del propio
-   borrador: es exactamente el error que ya dio #all/<id de hilo> y que
-   costó dos sesiones arreglar (ver enlaceAlHilo, más abajo). */
-function enlaceABorradores() {
-  return 'https://mail.google.com/mail/u/?authuser=' +
-    encodeURIComponent(Session.getActiveUser().getEmail()) + '#drafts';
 }
 
 /* ---------- el enlace que abre el correo en Gmail ----------
