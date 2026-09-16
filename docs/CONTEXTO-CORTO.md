@@ -67,7 +67,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Guías del procedimiento por tipo, con pasos, preguntas y opciones.
 - Panel lateral de lectura, y tablón de notas rápidas siempre visible.
 - Correo y mensaje de Séneca preparados; la app no envía nada.
-- Bandeja de correos de Gmail (etiqueta `GESTOR`) enlazada a un asunto o a uno nuevo.
+- Bandeja de correos de Gmail (etiqueta `GESTOR`): a un asunto nuevo, al que adivina, o al que
+  eliges a mano con "Elegir asunto". El hilo queda enganchado al asunto (`hilos` en
+  `asuntos.json`) y sus respuestas vuelven solas a la bandeja.
 - DNI del alumnado a la vista, con aviso si falta y ya tocaría tenerlo.
 - Registrar un documento en un paso, leyendo el sello de Séneca del PDF.
 - Terceros relacionados con un asunto, con nota (no copia) al archivar.
@@ -113,6 +115,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Coordinar con él la lista de tipos de asunto y la de estados.
 - Poner en marcha el script de Gmail en `g.educaand.es` y señalar `GESTOR-BANDEJA` en Ajustes.
 - Ver si la bandeja de correo acierta con el tipo; si falla mucho, palabras clave por tipo.
+- Pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs` (16-sep-2026):
+  sin eso no se siguen los hilos ya enganchados.
 - Plantillas de correo y mensaje por tipo, con huecos que se rellenan solos (cuando el uso lo
   pida), y sacar a ellas la firma que hoy va escrita a mano en `js/correo.js`.
 - Comprobar con Séneca si Comunicaciones acepta el largo del asunto que le damos.
