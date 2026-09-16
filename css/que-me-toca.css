@@ -1,0 +1,82 @@
+/* ============================================================
+   que-me-toca.css — la pantalla "Qué me toca" (16-sep-2026, fila 16).
+
+   .contenido ya no tiene tope de ancho (css/vista.css lo quita para
+   toda la aplicación), así que aquí no hace falta nada especial para
+   "aprovechar el ancho": basta con que las filas sean de ancho
+   completo, no columnas centradas.
+
+   Los colores del plazo son los de siempre: .marca-plazo,
+   .plazo-vencido, .plazo-cerca y .plazo-lejos vienen de
+   css/plazos.css y se reutilizan tal cual, sin redefinirlos aquí.
+   ============================================================ */
+
+#qmt-responsable { width: 200px; min-width: 0; }
+
+.qmt-bloque { margin-bottom: 26px; }
+.qmt-bloque:last-child { margin-bottom: 0; }
+
+.qmt-bloque-titulo,
+.qmt-sinfecha > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 10px;
+}
+.qmt-sinfecha > summary { cursor: pointer; }
+.qmt-sinfecha .qmt-lista { margin-top: 10px; }
+
+.qmt-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.qmt-fila {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-left: 4px solid var(--azul);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.qmt-fila:hover { border-color: #b9c6d6; }
+.qmt-fila.plazo-vencido { border-left-color: var(--rojo-linea); }
+.qmt-fila.plazo-cerca { border-left-color: var(--ambar-linea); }
+
+.qmt-fila-titulo {
+  font-weight: 600;
+  flex: 1 1 260px;
+  min-width: 0;
+  word-break: break-word;
+}
+.qmt-fila-asunto {
+  color: var(--tinta-suave);
+  font-size: 12.5px;
+  flex: 2 1 320px;
+  min-width: 0;
+  word-break: break-word;
+}
+.qmt-fila-tercero {
+  color: var(--tinta-suave);
+  font-size: 12.5px;
+  flex: 1 1 200px;
+  min-width: 0;
+  word-break: break-word;
+}
+.qmt-fila-espera {
+  font-size: 12.5px;
+  color: var(--tinta-suave);
+  flex: 0 0 auto;
+  white-space: nowrap;
+}

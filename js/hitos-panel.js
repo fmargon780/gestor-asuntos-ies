@@ -39,6 +39,12 @@
   var repintando = false;
   var pendiente = null;
 
+  /* La pantalla "Qué me toca" (fila 16) pide desplegar un hito
+     concreto justo al abrir esta ficha: guarda aquí el par (clave del
+     asunto, id del hito) y se aplica en el siguiente repintado, para
+     no depender de en qué orden se cargan los dos ficheros. */
+  var pendienteDesplegar = null;
+
   function $(id) { return document.getElementById(id); }
 
   function tipoDe(a) {
@@ -115,12 +121,31 @@
         caja.className = 'hitos-panel';
         caja.appendChild(HitosPanelLista.bloqueDeHitos(a, hitos, datos.ajustes, abierto));
         if (botonGuia) caja.appendChild(botonGuia);
+        aplicarDesplegarPendiente(caja, clave);
       } else {
         pintarBloqueDeEntrada(a, tipo, abierto, errorLectura);
       }
     } finally {
       repintando = false;
       asegurarObservador();
+    }
+  }
+
+  /* Busca la fila de ese hito entre las que se acaban de pintar,
+     quita 'oculto' a su cuerpo y hace scroll hasta ella. Si la ficha
+     que se ha abierto no es la que pidió el despliegue (clave
+     distinta), no hace nada: se queda pendiente por si toca luego. */
+  function aplicarDesplegarPendiente(caja, clave) {
+    if (!pendienteDesplegar || pendienteDesplegar.clave !== clave) return;
+    var idHito = pendienteDesplegar.idHito;
+    pendienteDesplegar = null;
+    var filas = caja.querySelectorAll('.hito');
+    for (var i = 0; i < filas.length; i++) {
+      if (filas[i].dataset.id !== idHito) continue;
+      var cuerpo = filas[i].querySelector('.hito-cuerpo');
+      if (cuerpo) cuerpo.classList.remove('oculto');
+      filas[i].scrollIntoView({ block: 'center' });
+      break;
     }
   }
 
@@ -243,6 +268,10 @@
     programarRepintado: function () { programarRepintado(); },
     pedirYAnadirHito: function (a) { pedirYAnadirHito(a); },
     observadorPausar: function () { if (observador) observador.disconnect(); },
-    observadorReanudar: function () { asegurarObservador(); }
+    observadorReanudar: function () { asegurarObservador(); },
+    /* Para "Qué me toca" (fila 16): llamar justo antes de App.abrirFicha(a, 'abierto'). */
+    desplegarAlAbrir: function (clave, idHito) {
+      pendienteDesplegar = (clave && idHito) ? { clave: clave, idHito: idHito } : null;
+    }
   };
 })();

@@ -5,6 +5,39 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 16-sep-2026 — Qué me toca
+
+Fila 16 de la cola (`docs/QUE-ME-TOCA.md`), depende de la fila 15 (hitos, ya `HECHA`).
+
+Los hitos de la fila 15 se veían dentro de cada asunto, uno a uno. Esta pantalla nueva los cruza
+todos: lee `Hitos.leer()` una vez y `window.Gestor.asuntos()`, y saca los hitos `pendiente` y
+`encurso` de todos los asuntos abiertos en tres bloques — "En tu tejado" (responsable `yo` o
+`companero`, con fecha límite, los vencidos arriba y en rojo, reutilizando tal cual
+`Plazos.de`/`.marca-plazo` de `css/plazos.css`, sin inventar otra escala de colores), "Esperando
+a otros" (cualquier otro responsable, con los días parado desde `desde`, los más parados arriba)
+y "Sin fecha" (plegado con `<details>`, para que no se pierda lo que no tiene fecha límite) — con
+filtro por responsable arriba (recordado en `localStorage`) y entrada propia en la barra de la
+izquierda, con la cuenta de vencidos al lado (sin número si no hay ninguno).
+
+Vive entera en `js/que-me-toca.js` (`css/que-me-toca.css`), con el mismo patrón que la pantalla
+"Duplicados" (`js/unir-asuntos.js`): `App.PANTALLAS.push`, la sección se crea a mano y no está en
+`index.html`. A diferencia de "Duplicados" sí tiene entrada en la barra (`js/barra.js`): como se
+añade después de cargada la página, el bucle de `js/nucleo.js` que pone el `onclick` de las
+pestañas ya existentes no la alcanza, así que se le pone a mano; el resaltado como "activa" sí
+sale solo, porque `App.ir` vuelve a mirar los `.pestana` que haya cada vez que se llama. Al
+pulsar una línea se abre la ficha del asunto con ese hito ya desplegado: enganche nuevo y pequeño
+en `js/hitos-panel.js` (`window.HitosPanel.desplegarAlAbrir(clave, idHito)`, guarda el par y lo
+aplica en el siguiente repintado de esa ficha, sin depender de en qué orden se hayan cargado los
+dos ficheros).
+
+Esta sesión sí tenía un Chromium a mano (con `CHROMIUM_PATH` apuntando a él, porque el que trae
+`playwright` de fábrica no coincidía de versión): los 7 escenarios de `pruebas/que-me-toca.mjs`
+pasan, y la batería completa (`npm test`, 24 ficheros) sale en verde salvo `pruebas/plantillas.mjs`,
+que ya fallaba antes de esta fila por algo del entorno de pruebas (un `locator.inputValue` que
+no llega a tiempo), sin relación con "Qué me toca" ni con los hitos.
+
+Ficheros nuevos: `js/que-me-toca.js`, `css/que-me-toca.css`, `pruebas/que-me-toca.mjs`.
+
 ## 16-sep-2026 — Los hitos de un asunto
 
 Fila 15 de la cola (`docs/HITOS.md`).

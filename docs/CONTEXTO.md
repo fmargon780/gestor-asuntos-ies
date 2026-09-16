@@ -260,6 +260,34 @@ la lista de **hitos** que se trabaja: cada paso, vivo dentro de ese asunto, con 
 
 Se comprueba con `pruebas/hitos.mjs`.
 
+### La pantalla "Qué me toca"
+
+Cruza los hitos `pendiente`/`encurso` de **todos los asuntos abiertos** (nunca archivados), para
+no tener que entrar en ellos uno a uno: lee `Hitos.leer()` una vez y `window.Gestor.asuntos()`, y
+cruza por la clave del asunto.
+
+- Tres bloques, en este orden: **"En tu tejado"** (responsable `yo`/`companero`, **con** fecha
+  límite, ordenados por `Plazos.diasHasta` — los vencidos arriba; el color es el de siempre,
+  reutilizando tal cual `Plazos.de`/`.marca-plazo` de `css/plazos.css`, sin inventar otra escala);
+  **"Esperando a otros"** (cualquier otro responsable, tenga fecha o no: se ordena por los días
+  parado desde `desde`, los más parados arriba); **"Sin fecha"**, plegado con `<details>` — el
+  resto: sin fecha límite, o sin un responsable que encaje en los dos bloques de arriba. Cada
+  hito visible sale en un solo bloque.
+- Cada línea lleva el título del hito, el nombre del asunto y su tercero. Al pulsarla, llama a
+  `window.HitosPanel.desplegarAlAbrir(clave, idHito)` —enganche nuevo y pequeño en
+  `js/hitos-panel.js`: guarda ese par y, en el siguiente repintado de esa ficha, quita `.oculto`
+  al `.hito-cuerpo` de ese hito y hace scroll hasta él— y luego `App.abrirFicha(a, 'abierto')`.
+- Filtro por responsable arriba (los de Ajustes › Hitos, no los papeles fijos), recordado en
+  `localStorage` (`gestor-que-me-toca-responsable`).
+- Entrada en la barra de la izquierda (`js/barra.js`, junto a las de siempre), con la cuenta de
+  hitos vencidos al lado; sin número si no hay ninguno.
+- Vive entera en `js/que-me-toca.js` (estilos en `css/que-me-toca.css`), con el mismo patrón que
+  la pantalla "Duplicados": `App.PANTALLAS.push`, la sección se crea a mano y no está en
+  `index.html`, enganchada a `window.Gestor.alRefrescar` para que la cuenta de la barra esté al
+  día aunque no se haya visitado la pantalla todavía.
+
+Se comprueba con `pruebas/que-me-toca.mjs`.
+
 ### La pantalla se mide a sí misma
 
 `css/vista.css` pone `container-type: inline-size` en `.contenido`: las reglas miran el ancho
@@ -804,6 +832,7 @@ de `App` va después del fichero que lo define.
 | `js/recurrentes.js` | Los asuntos que se repiten cada mes, trimestre o curso |
 | `js/guias-enganche.js` | Las guías dentro de la app, y `window.GuiasDelCentro` |
 | `js/hitos.js`, `js/hitos-archivo.js` | El modelo de los hitos de un asunto: leer/escribir `hitos.json`, crearlos desde la guía, marcarlos, bifurcaciones, responsables y el historial al archivar |
+| `js/que-me-toca.js` | Pantalla propia "Qué me toca": cruza los hitos pendientes y en curso de todos los asuntos abiertos, en tres bloques (`css/que-me-toca.css`) |
 | `js/notas.js` | Las notas de cada asunto, con su enlace y su botón |
 | `js/registro.js` | Registrar un documento en un paso, sin nombrarlo dos veces |
 | `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF |
@@ -862,6 +891,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/envios.mjs` | Prueba de mandar documentos por correo: el encargo, el hilo, el límite de 20 MB, "listo" y "error" |
 | `pruebas/plantillas.mjs` | Prueba de las plantillas: huecos, "Faltan datos", cambiar de plantilla, sin plantillas, y el recorte de Séneca |
 | `pruebas/hitos.mjs` | Prueba de los hitos de un asunto: crearlos, marcarlos, bifurcaciones, plazo, responsable y el historial al archivar |
+| `pruebas/que-me-toca.mjs` | Prueba de "Qué me toca": los tres bloques, el filtro por responsable, abrir la ficha con el hito desplegado y la cuenta de la barra |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |
@@ -879,6 +909,7 @@ de `App` va después del fichero que lo define.
 | `docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md` | El encargo de adjuntar documentos del asunto a un borrador de Gmail |
 | `docs/PLANTILLAS-DE-CORREO.md` | El encargo de las plantillas de correo y de mensaje por tipo |
 | `docs/HITOS.md` | El encargo de los hitos de un asunto |
+| `docs/QUE-ME-TOCA.md` | El encargo de la pantalla "Qué me toca" |
 | `README.md` | — |
 
 ### Lo que la aplicación guarda en `_GESTOR`
