@@ -25,6 +25,14 @@
    guardar el correo dentro de ese asunto en vez de crear otro. Si ese
    asunto ya estaba archivado, se ofrece reabrirlo.
 
+   Desde el 16-sep-2026 hay algo más fuerte que esa adivinación por
+   texto: la huella del hilo. Al guardar un correo en un asunto se
+   apunta el identificador de su hilo en la ficha del asunto, y a
+   partir de ahí ese hilo es suyo, se llame el asunto como se llame.
+   Y si nada encaja, el botón "Elegir asunto" deja escogerlo a mano de
+   la lista entera (js/bandeja-enlace.js). Nunca se guarda nada solo:
+   siempre hay que pulsar.
+
    La carpeta de la bandeja se señala una vez en Ajustes. Mientras no
    se señale, este módulo no enseña nada y la aplicación funciona como
    siempre.
@@ -36,6 +44,12 @@
 
   var CLAVE = 'bandeja';           /* dónde se recuerda la carpeta */
   var SEGUNDOS_ENTRE_MIRADAS = 90;
+
+  /* La lista de hilos que el recolector de Apps Script tiene que seguir
+     vigilando aunque ya no lleven la etiqueta GESTOR. La escribe esta
+     aplicación; el script solo la lee. Ver la sección "LA HUELLA DEL
+     HILO", más abajo. */
+  var FICHERO_SEGUIDOS = 'seguidos.json';
 
   var carpeta = null;
   var correos = [];
@@ -105,6 +119,7 @@
            (docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md) dejan sus propios
            .json en esta misma carpeta: no son correos que recoger. */
         if (/\.(envio|listo|error)\.json$/i.test(n)) continue;
+        if (n === FICHERO_SEGUIDOS) continue;   /* ese lo escribimos nosotros */
         var d = await Carpetas.leerJson(carpeta, n);
         if (!d || !d.id) continue;
         /* Las fechas se dejan en AAAA-MM-DD, que es lo que entienden
@@ -171,6 +186,28 @@
     return null;
   }
 
+  /* Todos los que tengan alguna de las direcciones del correo, no solo
+     el primero. Lo usa la puntuación de parecido de js/bandeja-enlace.js
+     para saber de quién es el correo sin volver a leer los CSV. */
+  async function personasDelCorreo(datos) {
+    var buscadas = (datos.correos || []).map(function (c) { return U.normalizar(c); });
+    if (datos.de && datos.de.correo) buscadas.push(U.normalizar(datos.de.correo));
+    if (!buscadas.length) return [];
+    var salida = [];
+    var categorias = ['ALUMNADO', 'PERSONAL', 'EMPRESAS', 'OTROS'];
+    for (var i = 0; i < categorias.length; i++) {
+      try {
+        var fuente = await Datos.cargar(App.E.datos, categorias[i]);
+        var lista = fuente.lista || [];
+        for (var j = 0; j < lista.length; j++) {
+          var uno = personaConEseCorreo([lista[j]], buscadas);
+          if (uno) salida.push(uno);
+        }
+      } catch (e) { /* si un CSV no está, se sigue con el siguiente */ }
+    }
+    return salida;
+  }
+
   /* El tipo se busca entre los del centro: si el nombre del tipo
      aparece escrito en el correo, ese es. Gana el más largo, para que
      "MATRICULA SOBREVENIDA" mande sobre "MATRICULA". */
@@ -235,6 +272,118 @@
   }
 
   /* ==========================================================
+     LA HUELLA DEL HILO
+
+     Adivinar el asunto por el texto solo funciona mientras el asunto
+     del correo siga llevando dentro el nombre de la carpeta. En cuanto
+     alguien cambia el asunto al contestar, o el hilo se lo empieza el
+     tercero, se pierde el rastro.
+
+     Así que cuando un correo entra en un asunto se apunta la huella de
+     su hilo en la ficha del asunto, dentro de _GESTOR/asuntos.json:
+
+       hilos: [ { id: '<id del hilo>', asunto: '<asunto limpio>', visto: 2 } ]
+
+     `visto` es cuántos mensajes tenía el hilo la última vez. Con eso el
+     recolector de Apps Script sabe si han llegado respuestas nuevas
+     (ver apps-script/gestor-correos.gs y `seguidos.json`).
+
+     La huella manda sobre la adivinación por texto: si el hilo ya es
+     conocido, da igual cómo venga escrito el asunto.
+
+     `hilos` es opcional. Los asuntos de antes de esto no lo tienen, y
+     todo sigue funcionando igual que siempre.
+     ========================================================== */
+
+  function asuntoDelHilo(id) {
+    if (!id) return null;
+    var registro = (App.E.registro && App.E.registro.asuntos) || {};
+    var nombres = Object.keys(registro);
+    for (var i = 0; i < nombres.length; i++) {
+      var ficha = registro[nombres[i]] || {};
+      var hilos = Array.isArray(ficha.hilos) ? ficha.hilos : [];
+      for (var h = 0; h < hilos.length; h++) {
+        if (hilos[h] && hilos[h].id === id) {
+          return { nombre: nombres[i], ficha: ficha, porHuella: true };
+        }
+      }
+    }
+    return null;
+  }
+
+  /* Primero la huella, después el texto. */
+  function asuntoDeEsteCorreo(d) {
+    if (!d) return null;
+    return asuntoDelHilo(d.id) || asuntoDelHilo(d.respuestaDe) || asuntoQueYaExiste(d);
+  }
+
+  function asuntoLimpioDelCorreo(d) {
+    return sinElRe((d && d.asunto) || '').trim().toLowerCase();
+  }
+
+  /* Apunta la huella en el asunto de destino y la quita de cualquier
+     otro que la tuviera: un asunto puede tener varios hilos, pero un
+     hilo pertenece a un solo asunto.
+
+     App.anotar relee asuntos.json antes de escribirlo y lo guarda con
+     Copias.guardar, así que no hace falta hacerlo aquí a mano. */
+  async function apuntarHuella(nombreAsunto, d) {
+    if (!d || !d.id || !nombreAsunto) return;
+    try {
+      await App.cargarRegistro();
+      var registro = App.E.registro.asuntos || {};
+      var otros = Object.keys(registro);
+      for (var i = 0; i < otros.length; i++) {
+        if (otros[i] === nombreAsunto) continue;
+        var suyos = registro[otros[i]] && registro[otros[i]].hilos;
+        if (!Array.isArray(suyos)) continue;
+        var quedan = suyos.filter(function (h) { return !h || h.id !== d.id; });
+        if (quedan.length !== suyos.length) await App.anotar(otros[i], { hilos: quedan });
+      }
+
+      await App.cargarRegistro();
+      var ficha = App.E.registro.asuntos[nombreAsunto] || {};
+      var hilos = Array.isArray(ficha.hilos) ? ficha.hilos.slice() : [];
+      var huella = {
+        id: d.id,
+        asunto: asuntoLimpioDelCorreo(d),
+        visto: parseInt(d.mensajes, 10) || 1
+      };
+      var sitio = -1;
+      hilos.forEach(function (h, n) { if (h && h.id === d.id) sitio = n; });
+      if (sitio === -1) hilos.push(huella); else hilos[sitio] = huella;
+      await App.anotar(nombreAsunto, { hilos: hilos });
+    } catch (e) {
+      U.aviso('El correo está guardado, pero no he podido apuntar el hilo: ' + e.message, 'malo');
+    }
+    await escribirSeguidos();
+  }
+
+  /* El fichero que lee el recolector de Apps Script. Se reescribe
+     entero cada vez que cambia alguna huella: es corto y así nunca se
+     queda a medias. Si no se puede escribir, el script sigue haciendo
+     lo de siempre con la etiqueta GESTOR. */
+  async function escribirSeguidos() {
+    if (!carpeta) return;
+    try {
+      var registro = (App.E.registro && App.E.registro.asuntos) || {};
+      var lista = [];
+      var vistos = {};
+      Object.keys(registro).forEach(function (nombre) {
+        var hilos = (registro[nombre] || {}).hilos;
+        if (!Array.isArray(hilos)) return;
+        hilos.forEach(function (h) {
+          if (!h || !h.id || vistos[h.id]) return;
+          vistos[h.id] = true;
+          lista.push({ id: h.id, visto: parseInt(h.visto, 10) || 1, asunto: h.asunto || '' });
+        });
+      });
+      await Carpetas.escribirTexto(carpeta, FICHERO_SEGUIDOS,
+        JSON.stringify({ hilos: lista }, null, 2));
+    } catch (e) { /* el script sigue con su trabajo normal sin quejarse */ }
+  }
+
+  /* ==========================================================
      EL ENLACE QUE ABRE EL CORREO EN GMAIL
 
      La primera versión del script guardaba la dirección con
@@ -269,9 +418,10 @@
      izquierda, igual que se hace con los documentos. */
   async function leerElCorreo(d) {
     if (!window.Lector) return;
-    if (!carpeta || !d.pdf) { U.aviso('Este correo no trae su PDF.', 'malo'); return; }
+    var elPdf = d.pdf || d.pdfMensaje;
+    if (!carpeta || !elPdf) { U.aviso('Este correo no trae su PDF.', 'malo'); return; }
     try {
-      var h = await carpeta.getFileHandle(d.pdf);
+      var h = await carpeta.getFileHandle(elPdf);
       var fichero = await h.getFile();
       var botones = [];
       if (d.enlace) {
@@ -318,19 +468,23 @@
       yaEstaba = await window.Notas.yaTieneCorreo({ nombre: elAsunto.nombre, ficha: {} }, d.id);
     } catch (e) { /* si no se puede mirar, se sigue y se guarda */ }
     if (yaEstaba) {
+      /* La huella sí se refresca: puede que el hilo traiga mensajes
+         nuevos aunque el correo ya estuviera apuntado. */
+      await apuntarHuella(elAsunto.nombre, d);
       await borrarDeLaBandeja(item);
       U.aviso('Ese correo ya estaba en ' + elAsunto.nombre + '. No lo he repetido.', 'bueno');
       if (window.Gestor && window.Gestor.recargar) window.Gestor.recargar();
       return;
     }
 
-    var metidos = await meterLosFicheros(d, destino);
+    var metidos = await meterLosFicheros(d, destino, elAsunto.nombre);
     try {
       var apunte = notaDelCorreo(d, 'Correo de',
         reabierto ? '\nCon este correo se ha reabierto el asunto.' : '');
       await window.Notas.anadir({ nombre: elAsunto.nombre, ficha: {} },
         apunte.texto, apunte.extra);
     } catch (e) { /* la nota es lo menos importante */ }
+    await apuntarHuella(elAsunto.nombre, d);
     await borrarDeLaBandeja(item);
     U.aviso(metidos
       ? 'Guardado en ' + elAsunto.nombre + '.'
@@ -460,12 +614,15 @@
       '<div class="tarjeta-texto">' +
         '<div class="tarjeta-nombre">' + U.escapar(d.asunto || '(sin asunto)') + '</div>' +
         '<div class="tarjeta-pie">' + U.escapar(pie) + '</div>' +
+        (d.enviado ? '<div class="tarjeta-pie correo-enviado">Lo enviaste tú</div>' : '') +
         '<div class="tarjeta-pie propuesta-correo"></div>' +
       '</div>';
 
-    /* Si el asunto del correo lleva dentro el nombre de un asunto que
-       ya existe, es una respuesta: no hay que crear nada nuevo. */
-    var yaEsta = asuntoQueYaExiste(d);
+    /* Primero la huella del hilo; si no la hay, se mira si el asunto
+       del correo lleva dentro el nombre de un asunto que ya existe. En
+       los dos casos es una respuesta: no hay que crear nada nuevo.
+       Nunca se guarda solo: siempre hay que pulsar. */
+    var yaEsta = asuntoDeEsteCorreo(d);
     var linea = div.querySelector('.propuesta-correo');
 
     if (yaEsta) {
@@ -513,13 +670,24 @@
       acciones.appendChild(guardar);
     }
 
+    /* Elegir a mano el asunto de destino, sea cual sea lo que haya
+       adivinado la tarjeta: la huella también se puede equivocar.
+       Lo de dentro está en js/bandeja-enlace.js. */
+    if (typeof App.elegirAsuntoDelCorreo === 'function') {
+      var elegir = document.createElement('button');
+      elegir.className = 'boton';
+      elegir.textContent = 'Elegir asunto';
+      elegir.onclick = function () { App.elegirAsuntoDelCorreo(item); };
+      acciones.appendChild(elegir);
+    }
+
     var crear = document.createElement('button');
     crear.className = 'boton' + (yaEsta ? '' : ' boton-principal');
     crear.textContent = yaEsta ? 'Crear uno nuevo' : 'Crear el asunto';
     crear.onclick = function () { llevarANuevo(item); };
     acciones.appendChild(crear);
 
-    if (d.pdf && window.Lector) {
+    if ((d.pdf || d.pdfMensaje) && window.Lector) {
       var leer = document.createElement('button');
       leer.className = 'boton';
       leer.textContent = 'Leer el correo';
@@ -689,12 +857,60 @@
     };
   }
 
-  async function meterLosFicheros(d, destino) {
+  /* El asunto del correo, recortado, para que el nombre del documento
+     diga de qué va sin ocupar la línea entera. Se corta por una
+     palabra, no por la mitad de una. */
+  function trozoDelAsunto(d) {
+    var t = U.limpiarNombre(sinElRe((d && d.asunto) || ''));
+    if (t.length > 40) {
+      t = t.slice(0, 40);
+      var espacio = t.lastIndexOf(' ');
+      if (espacio > 20) t = t.slice(0, espacio);
+    }
+    return t.replace(/[,;:.\-\s]+$/, '').trim();
+  }
+
+  /* El PDF del hilo entero se sustituye, no se acumula: si no, cada
+     respuesta dejaría otra copia del hilo completo dentro de la
+     carpeta. El anterior va a la papelera por el camino de siempre,
+     nunca se borra a pelo. */
+  async function apartarElHiloViejo(destino, nombreAsunto, trozo) {
+    if (!window.Papelera || !nombreAsunto) return;
+    var marca = ' HILO' + (trozo ? ' ' + trozo : '');
+    var lista = [];
+    try { lista = await Carpetas.ficheros(destino); } catch (e) { return; }
+    for (var i = 0; i < lista.length; i++) {
+      var n = lista[i].nombre;
+      if (!/^\d{6} HILO/.test(n)) continue;
+      if (n.indexOf(marca) !== 6) continue;
+      try {
+        await window.Papelera.mandarDocumentoDeAsunto(
+          { nombre: nombreAsunto, handle: destino }, n);
+      } catch (e) { /* si no se puede apartar, se queda y el nuevo entra al lado */ }
+    }
+  }
+
+  async function meterLosFicheros(d, destino, nombreAsunto) {
     var metidos = 0;
+    var dia = U.aAaMmDd(soloElDia(d.fechaUltimo || d.fecha));
+    var trozo = trozoDelAsunto(d);
+
+    /* El mensaje nuevo, él solo, cuando el recolector lo deja aparte.
+       Así cada correo es su propio documento dentro del asunto. */
+    if (d.pdfMensaje) {
+      try {
+        var comoCorreo = await nombreLibre(destino,
+          dia + ' CORREO' + (trozo ? ' ' + trozo : '') + '.pdf');
+        await copiarALaCarpeta(d.pdfMensaje, destino, comoCorreo);
+        metidos++;
+      } catch (e) { /* si no está, queda el hilo entero, que lo lleva dentro */ }
+    }
+
     if (d.pdf) {
       try {
-        var comoPdf = await nombreLibre(destino, U.aAaMmDd(soloElDia(d.fechaUltimo || d.fecha)) + ' CORREO.pdf');
-        await copiarALaCarpeta(d.pdf, destino, comoPdf);
+        var comoHilo = dia + ' HILO' + (trozo ? ' ' + trozo : '') + '.pdf';
+        await apartarElHiloViejo(destino, nombreAsunto, trozo);
+        await copiarALaCarpeta(d.pdf, destino, await nombreLibre(destino, comoHilo));
         metidos++;
       } catch (e) { U.aviso('El PDF del correo no ha podido entrar: ' + e.message, 'malo'); }
     }
@@ -711,7 +927,7 @@
   async function engancharCorreo(item, nombreAsunto) {
     var d = item.datos;
     var destino = await App.E.abiertos.getDirectoryHandle(nombreAsunto);
-    var metidos = await meterLosFicheros(d, destino);
+    var metidos = await meterLosFicheros(d, destino, nombreAsunto);
 
     try {
       var apunte = notaDelCorreo(d, 'Asunto abierto con el correo de');
@@ -719,6 +935,7 @@
         apunte.texto, apunte.extra);
     } catch (e) { /* la nota es lo menos importante de todo esto */ }
 
+    await apuntarHuella(nombreAsunto, d);
     await borrarDeLaBandeja(item);
     U.aviso(metidos
       ? 'Asunto creado con el correo dentro.'
@@ -729,6 +946,7 @@
     var d = item.datos;
     var fuera = [item.fichero];
     if (d.pdf) fuera.push(d.pdf);
+    if (d.pdfMensaje) fuera.push(d.pdfMensaje);
     (d.adjuntos || []).forEach(function (a) { fuera.push(a); });
     for (var i = 0; i < fuera.length; i++) {
       try { await carpeta.removeEntry(fuera[i]); } catch (e) { /* ya no estaba */ }
@@ -1036,7 +1254,32 @@
     engancharElBotonDeCrear();
     await mirar(true);
     await revisarEnvios(true);
+    await escribirSeguidos();
   }
+
+  /* ==========================================================
+     LO QUE USA js/bandeja-enlace.js
+
+     El elegidor de asuntos a mano vive en su propio fichero para que
+     este no siga creciendo. Necesita estas piezas de aquí; no se le
+     enseña nada más.
+     ========================================================== */
+
+  /* `window.Bandeja` lo usan dos ficheros aparte, para no seguir
+     engordando este: js/bandeja-enlace.js (el elegidor de asuntos a
+     mano de un correo) y js/correo-adjuntos.js (mandar documentos por
+     correo). A ninguno de los dos se le enseña nada más que esto. */
+  window.Bandeja = {
+    sinElRe: sinElRe,
+    estaArchivado: estaArchivado,
+    personasDelCorreo: personasDelCorreo,
+    guardarEnAsunto: guardarEnAsunto,
+    reabrirYGuardar: reabrirYGuardar,
+    asuntoDelHilo: asuntoDelHilo,
+    escribirSeguidos: escribirSeguidos,
+    carpeta: function () { return carpeta; },
+    avisarEnvioNuevo: function () { revisarEnvios(true); }
+  };
 
   var enganchado = false;
 
@@ -1049,14 +1292,6 @@
       revisarEnvios(false);
     });
   }
-
-  /* Lo que necesita js/correo-adjuntos.js: la misma carpeta, para dejar
-     ahí las copias y el encargo, y un aviso para que la tarjeta
-     "Borrador en camino" no espere a la próxima vuelta de 15 segundos. */
-  window.Bandeja = {
-    carpeta: function () { return carpeta; },
-    avisarEnvioNuevo: function () { revisarEnvios(true); }
-  };
 
   /* El puente ya está puesto cuando se carga este fichero. Por si algún
      día cambiara el orden, se reintenta al terminar la página. */

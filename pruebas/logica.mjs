@@ -360,13 +360,23 @@ comprobar('y la ficha buena es la del RegAlum',
    cese escrita a mano). */
 Datos.olvidar();
 const datosPer = dirFalso('datos');
-const ceseDentroDeUnosDias = fechaHace(0, 5);
-const ceseDeAyer = fechaHace(0, -1);
+/* Las dos fechas de cese van contadas desde HOY, no escritas a mano:
+   una que aún no ha llegado y otra que ya pasó. Escritas, la prueba se
+   ponía en rojo ella sola en cuanto el calendario las alcanzaba. */
+function enDias(cuantos) {
+  const d = new Date();
+  d.setDate(d.getDate() + cuantos);
+  return String(d.getDate()).padStart(2, '0') + '/' +
+         String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+}
+const CESA_PRONTO = enDias(10);
+const CESO_YA = enDias(-10);
+
 await Carpetas.escribirTexto(datosPer, 'RelPerCen.csv',
   '"Empleado/a","DNI/Pasaporte","Puesto","Fecha de toma de posesión","Fecha de cese","Teléfono","Móvil avisos de emergencia","Usuario IdEA","Cuenta Google/Microsoft"\r\n' +
   '"Aguado Ranea, Marcos Antonio","33357591R","Música P.E.S.","01/09/2011","","952276078","620177026","maguran591","maguran591@g.educaand.es"\r\n' +
-  '"Bonilla Cascado, Manuel","52561060B","Música P.E.S.","01/09/2003","' + ceseDentroDeUnosDias + '","952594821","606557122","mboncas060","mboncas060@g.educaand.es"\r\n' +
-  '"Sánchez Alegría, María José","07862312S","Dibujo P.E.S.","01/09/2005","' + ceseDeAyer + '","656633968","656633968","msanale312","msanale312@g.educaand.es"\r\n');
+  '"Bonilla Cascado, Manuel","52561060B","Música P.E.S.","01/09/2003","' + CESA_PRONTO + '","952594821","606557122","mboncas060","mboncas060@g.educaand.es"\r\n' +
+  '"Sánchez Alegría, María José","07862312S","Dibujo P.E.S.","01/09/2005","' + CESO_YA + '","656633968","656633968","msanale312","msanale312@g.educaand.es"\r\n');
 
 const P = await Datos.cargar(datosPer, 'PERSONAL');
 comprobar('lee las tres fichas del RelPerCen', P.lista.length, 3);
@@ -381,8 +391,8 @@ const manuel = P.lista.find(x => x.nombre.indexOf('Bonilla') === 0);
 comprobar('cesa dentro de unos días, así que todavía está', manuel.enElCentro, true);
 
 const mariaJose = P.lista.find(x => x.nombre.indexOf('Sánchez') === 0);
-comprobar('cesó ayer, ya no está en el centro', mariaJose.enElCentro, false);
-comprobar('y se guarda la fecha del cese', mariaJose.fechaCese, ceseDeAyer);
+comprobar('cesó hace días, ya no está en el centro', mariaJose.enElCentro, false);
+comprobar('y se guarda la fecha del cese', mariaJose.fechaCese, CESO_YA);
 comprobar('cuenta bien cuántos siguen en el centro', P.enElCentro, 2);
 
 comprobar('el nombre del tercero lleva los cuatro últimos caracteres',
