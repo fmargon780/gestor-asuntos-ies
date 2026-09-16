@@ -123,8 +123,6 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ver si la bandeja de correo acierta con el tipo; si falla mucho, palabras clave por tipo.
 - Pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs` (16-sep-2026):
   sin eso no se siguen los hilos ya enganchados, ni salen los borradores con documentos.
-- Hay dos elegidores de asunto sin unificar: `js/elegir-asunto.js` (Por clasificar) y
-  `js/bandeja-enlace.js` (la bandeja de correos). Ver sección 9 de `docs/CONTEXTO.md`.
 - Comprobar con Séneca si Comunicaciones acepta el largo del asunto que le damos.
 - Cuando tengan una cuenta de correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel lateral y del tablón, y si las tarjetas por tipo se quedan

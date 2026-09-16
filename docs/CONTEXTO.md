@@ -639,24 +639,26 @@ entre "Crear asunto con él" y "Borrar", para cuando el documento no es de un as
 de uno que ya está abierto o archivado.
 
 - **El cuadro de elegir asunto** (`js/elegir-asunto.js`, `window.ElegirAsunto`) es un módulo
-  aparte, pensado para que lo use también la bandeja de correos (fila 11 de `docs/COLA.md`, sigue
-  EN CURSO de otra sesión) cuando se retome: cada sitio trae su propia forma de puntuar el
-  parecido con `calcularPuntuacion(asunto)`; el módulo solo pone el cuadro, "Podrían encajar"
-  (como mucho cinco, más de 40 puntos, de mayor a menor), el buscador y la lista completa
-  (abiertos primero, archivados con la etiqueta "(Archivado)"). Relee el ARCHIVO entero
-  (`App.verArchivo`) cada vez que se abre, para no ofrecer algo que ya no está.
-- **La puntuación de un documento suelto** (en `js/documentos-sueltos.js`, con las palabras del
-  módulo compartido): +10 por cada palabra de cuatro letras o más del nombre del fichero (sin
-  extensión, sin la fecha AAMMDD y sin un código de registro de Séneca por delante) que aparezca
-  en el nombre del asunto; +40 si el nombre del tercero del asunto aparece en el nombre del
-  fichero; +15 si el asunto está abierto; +10 si se abrió, reabrió o archivó hace menos de 30
-  días.
-- **Al elegir un asunto abierto**: se mueve el fichero con `Carpetas.moverFichero` a su carpeta y
-  se abre a continuación el cuadro de ponerle nombre (`App.verDocumentos`), igual que al crear un
-  asunto desde un documento suelto.
+  compartido desde el principio con la bandeja de correos y su botón "Elegir asunto"
+  (`js/bandeja-enlace.js`): pone el cuadro entero (`elegir`), "Podrían encajar" (como mucho
+  cinco, más de `MINIMO` puntos, de mayor a menor, con `mejores`) y la lista completa con
+  buscador (abiertos primero, archivados con su etiqueta); también las piezas de puntuación que
+  usan los dos sitios (`puntosDeBase`, `puntosPorPalabras`, `terceroDentroDe`) y
+  `preguntarSiReabrir` para cuando lo elegido está archivado. Cada sitio calcula su propia
+  puntuación (un documento suelto solo tiene el nombre del fichero; un correo tiene remitente y
+  texto) y se la pasa ya hecha.
+- **La puntuación de un documento suelto** (`App.parecidoDelSuelto`, en
+  `js/documentos-sueltos.js`, con las piezas del módulo compartido): por palabras del nombre del
+  fichero de cuatro letras o más (sin extensión, sin la fecha AAMMDD de delante ni un código de
+  registro de Séneca) que aparezcan en el nombre del asunto, más si el tercero del asunto
+  aparece en el nombre del fichero, más los puntos de base (abierto, movido hace poco).
+- **Al elegir un asunto abierto**: `App.llevarSueltoA` mueve el fichero con
+  `Carpetas.moverFichero` a su carpeta y abre a continuación el cuadro de ponerle nombre
+  (`App.verDocumentos`), igual que al crear un asunto desde un documento suelto.
 - **Al elegir uno archivado**: `ElegirAsunto.preguntarSiReabrir` ofrece "Reabrir y meterlo aquí"
   (con `App.reabrirAsunto`, que pide su propia confirmación) o "Meterlo sin reabrir" (va a su
-  carpeta dentro del ARCHIVO). No se toca el estado de un asunto que ya estaba abierto.
+  carpeta dentro del ARCHIVO, con `ElegirAsunto.carpetaDelAsunto`). No se toca el estado de un
+  asunto que ya estaba abierto.
 - **Nada se pierde**: si ya hay un fichero con ese nombre en el destino, no se pisa nada y avisa;
   si el traslado falla a medias, el documento se queda en Por clasificar y avisa con el motivo.
   Respeta `App.LARGO_MAXIMO_NOMBRE` para la ruta de destino, igual que al crear un asunto.
@@ -741,7 +743,7 @@ de `App` va después del fichero que lo define.
 | `js/asuntos-lista.js` | Asuntos abiertos: las tres tarjetas, las tarjetas por tipo y la lista. Al leer la carpeta, descarta las que parecen temporales de sincronización, salvo que ya tengan ficha en `asuntos.json` |
 | `js/unir-asuntos.js` | Une asuntos duplicados que ya existen: aviso junto a Actualizar y pantalla propia "Duplicados" (`css/unir-asuntos.css`) |
 | `js/asuntos-editar.js` | Editar un asunto abierto: renombra la carpeta y mueve su ficha |
-| `js/elegir-asunto.js` | El cuadro de elegir un asunto ya existente: "Podrían encajar", buscador y lista completa (`css/elegir-asunto.css`) |
+| `js/elegir-asunto.js` | El cuadro de elegir un asunto ya existente, compartido por "Por clasificar" y por la bandeja de correos: "Podrían encajar", buscador y lista completa |
 | `js/documentos-sueltos.js` | Los papeles sin asunto, cerrar y reabrir, la vigilancia de la carpeta, y "Meter en un asunto" |
 | `js/asuntos-nuevo.js` | Crear un asunto, el cuadro de datos de un tercero y los pies |
 | `js/archivo-personas.js` | Personas y empresas, el ARCHIVO, y cambiar los datos de un tercero |
@@ -1057,9 +1059,3 @@ Aparte, en `localStorage`: `gestor-barra`, `gestor-filtros`, `gestor-lector-anch
 20. `js/papelera.js` no sabe devolver una plantilla de correo borrada (clase `'plantilla'`, no
     estaba en el encargo de las plantillas): si hace falta, se copia a mano desde el bloque
     Papelera de Ajustes.
-21. **Dos elegidores de asunto sin unificar.** La fila 11 (bandeja de correos) y la fila 12 (Por
-    clasificar) de `docs/COLA.md` se hicieron en dos sesiones a la vez, cada una sin ver la otra
-    terminada: `js/bandeja-enlace.js` trae su propio cuadro de "Elegir asunto" con su propia
-    puntuación, y `js/elegir-asunto.js` (`window.ElegirAsunto`) otro, pensado para compartirse
-    pero que nadie más usa todavía. Juntarlos en uno solo, sacando de cada sitio su forma de
-    puntuar el parecido, cuando toque tocar cualquiera de los dos.

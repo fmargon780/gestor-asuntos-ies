@@ -1,20 +1,12 @@
-/* Prueba en navegador de verdad de "meter un documento de Por
-   clasificar en un asunto ya creado" (docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md,
-   16-sep-2026, fila 12 de docs/COLA.md).
+/* Prueba en navegador de verdad de "Meter en un asunto": llevar un
+   documento suelto de "Por clasificar" a un asunto que ya existe.
 
-   Lo que tiene que pasar:
-     1. La tarjeta de un documento suelto trae "Meter en un asunto",
-        además de "Crear asunto con él" y "Borrar".
-     2. Elegir un asunto abierto mueve el fichero a su carpeta y lo
-        quita de la raíz.
-     3. Después del traslado se abre el cuadro de ponerle nombre.
-     4. Si ya existe un fichero con ese nombre en el destino, no se
-        pisa y el original sigue en la raíz.
-     5. Si el traslado falla, el documento sigue en la raíz y se avisa.
-     6. La puntuación de parecido pone primero el asunto cuyo tercero
-        aparece en el nombre del fichero.
+   Fila 12 de docs/COLA.md (docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md).
 
-   Reutiliza el disco de mentira de pruebas/navegador.mjs. */
+   Reutiliza el disco de mentira de pruebas/navegador.mjs. Ojo: ese
+   disco rechaza siempre el move() del navegador, así que el traslado
+   pasa por el camino de copiar, comprobar el tamaño y borrar, que es
+   el que se usa de verdad en las carpetas de Dropbox. */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
@@ -22,8 +14,11 @@ const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf
 const preparacion = fuente.slice(fuente.indexOf('const preparacion = `') + 'const preparacion = `'.length,
                                  fuente.indexOf('`;\n\nconst DIRECCION'));
 
+const ASUNTO = '260903 FLEXIBILIDAD 26-27 Pacheco Pérez, Mercedes 019G';
+const OTRO = '260910 PERMISO 26-27 Ordóñez Gil, Rafael 677B';
+
 const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
-const pagina = await navegador.newPage({ viewport: { width: 1500, height: 950 } });
+const pagina = await navegador.newPage({ viewport: { width: 1600, height: 950 } });
 const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
@@ -38,179 +33,184 @@ async function comprobar(titulo, promesa, esperado) {
   else console.log('bien   ' + titulo);
 }
 
-function nombresRaiz() {
-  return pagina.evaluate(async () => {
-    const nombres = [];
-    for await (const p of window.__disco.abiertos.entries()) {
-      if (p[1].kind === 'file') nombres.push(p[0]);
-    }
-    return nombres;
-  });
-}
-
-function nombresDeCarpeta(nombreAsunto) {
-  return pagina.evaluate(async (n) => {
-    const carpeta = await window.__disco.abiertos.getDirectoryHandle(n);
-    const nombres = [];
-    for await (const p of carpeta.entries()) nombres.push(p[0]);
-    return nombres;
-  }, nombreAsunto);
-}
-
-/* --- entrar --- */
 await pagina.click('#btn-abiertos');
 await pagina.click('#btn-archivo');
 await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 
-/* --- tres asuntos abiertos, con ficha completa, y un suelto ---
+/* Dos asuntos abiertos, y tres documentos sueltos en la raíz de
+   asuntos abiertos: lo que deja ahí el equipo directivo. */
+await pagina.evaluate(async ([nombre, otro]) => {
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
+  g._hijos.set('asuntos.json', window.__disco.fich('asuntos.json', JSON.stringify({
+    asuntos: {
+      [nombre]: { tercero: 'Pacheco Pérez, Mercedes 019G', categoria: 'PERSONAL',
+                  situacion: 'A LA ESPERA DEL TERCERO' },
+      [otro]: { tercero: 'Ordóñez Gil, Rafael 677B', categoria: 'PERSONAL',
+                situacion: 'EN EL DEPARTAMENTO' }
+    }
+  })));
+  await window.__disco.abiertos.getDirectoryHandle(nombre, { create: true });
+  await window.__disco.abiertos.getDirectoryHandle(otro, { create: true });
 
-   A: el tercero está literalmente dentro del nombre del fichero
-      suelto, además de dos palabras del propio nombre del asunto.
-   D: solo comparte una palabra con el fichero, y no el tercero: debe
-      quedar por detrás de A en "Podrían encajar".
-   B: no comparte nada con el fichero de la puntuación, y ya lleva un
-      documento dentro, para la prueba del nombre repetido. */
-await pagina.evaluate(async () => {
-  const abiertos = window.__disco.abiertos;
-  const ahora = new Date().toISOString();
-
-  async function crearAsunto(nombreCarpeta, ficha) {
-    await abiertos.getDirectoryHandle(nombreCarpeta, { create: true });
-    return ficha;
-  }
-
-  const registro = { asuntos: {} };
-  registro.asuntos['260910 CONTRATO 26-27 Limpiezas Andalucia SL'] = await crearAsunto(
-    '260910 CONTRATO 26-27 Limpiezas Andalucia SL',
-    { estado: 'abierto', tipo: 'CONTRATO', categoria: 'EMPRESAS', tercero: 'Limpiezas Andalucia SL', abiertoEl: ahora });
-  registro.asuntos['260908 CONTRATO 26-27 Limpiezas Sevilla SL'] = await crearAsunto(
-    '260908 CONTRATO 26-27 Limpiezas Sevilla SL',
-    { estado: 'abierto', tipo: 'CONTRATO', categoria: 'EMPRESAS', tercero: 'Limpiezas Sevilla SL', abiertoEl: ahora });
-  registro.asuntos['260901 FACTURA 26-27 Papeleria Ruiz SL'] = await crearAsunto(
-    '260901 FACTURA 26-27 Papeleria Ruiz SL',
-    { estado: 'abierto', tipo: 'FACTURA', categoria: 'EMPRESAS', tercero: 'Papeleria Ruiz SL', abiertoEl: '2026-01-01T00:00:00.000Z' });
-
-  const g = await abiertos.getDirectoryHandle('_GESTOR', { create: true });
-  const h = await g.getFileHandle('asuntos.json', { create: true });
-  const w = await h.createWritable();
-  await w.write(JSON.stringify(registro));
-  await w.close();
-
-  const carpetaB = await abiertos.getDirectoryHandle('260901 FACTURA 26-27 Papeleria Ruiz SL');
-  const informe = await carpetaB.getFileHandle('informe.pdf', { create: true });
-  const wi = await informe.createWritable();
-  await wi.write('el informe que ya estaba');
-  await wi.close();
-
-  const suelto = await abiertos.getFileHandle('Contrato Limpiezas Andalucia SL renovacion.pdf', { create: true });
-  const ws = await suelto.createWritable();
-  await ws.write('contenido del contrato');
-  await ws.close();
-});
+  const raiz = window.__disco.abiertos._hijos;
+  raiz.set('Escrito de Ordóñez Gil, Rafael.pdf',
+    window.__disco.fich('Escrito de Ordóñez Gil, Rafael.pdf', 'el escrito'));
+  raiz.set('Conciliación FL.pdf', window.__disco.fich('Conciliación FL.pdf', 'el impreso'));
+  raiz.set('Otro papel cualquiera.pdf',
+    window.__disco.fich('Otro papel cualquiera.pdf', 'un papel'));
+}, [ASUNTO, OTRO]);
 
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
+
 await pagina.click('.panel[data-vista="clasificar"]');
-await pagina.waitForSelector('#zona-clasificar:not(.oculto)');
+await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');
 
-const NOMBRE_A = '260910 CONTRATO 26-27 Limpiezas Andalucia SL';
-const NOMBRE_D = '260908 CONTRATO 26-27 Limpiezas Sevilla SL';
-const NOMBRE_B = '260901 FACTURA 26-27 Papeleria Ruiz SL';
-const SUELTO_1 = 'Contrato Limpiezas Andalucia SL renovacion.pdf';
+async function enLaRaiz() {
+  return pagina.evaluate(async () => {
+    const n = [];
+    for await (const p of window.__disco.abiertos.entries()) {
+      if (p[1].kind === 'file') n.push(p[0]);
+    }
+    return n.sort();
+  });
+}
+async function dentroDe(nombre) {
+  return pagina.evaluate(async (n) => {
+    const c = await window.__disco.abiertos.getDirectoryHandle(n);
+    const d = [];
+    for await (const p of c.entries()) d.push(p[0]);
+    return d.sort();
+  }, nombre);
+}
+function tarjetaDe(nombre) {
+  return pagina.locator('#lista-sueltos .tarjeta-suelto').filter({ hasText: nombre });
+}
+async function elUltimoAviso() {
+  return pagina.locator('#mensajes .mensaje').last().textContent();
+}
 
-/* --- prueba 1: los tres botones, más el que añade la papelera --- */
-const tarjeta1 = pagina.locator('.tarjeta-suelto', { hasText: SUELTO_1 });
-await comprobar('trae "Meter en un asunto"',
-  tarjeta1.getByRole('button', { name: 'Meter en un asunto' }).count(), 1);
-await comprobar('sigue trayendo "Crear asunto con él"',
-  tarjeta1.getByRole('button', { name: 'Crear asunto con él' }).count(), 1);
-await comprobar('sigue trayendo "Borrar"',
-  tarjeta1.getByRole('button', { name: 'Borrar' }).count(), 1);
+/* ============================================================
+   1. LA TARJETA TRAE EL BOTÓN NUEVO, Y NO PIERDE LOS DE ANTES
+   ============================================================ */
+await comprobar('1. los botones de una tarjeta de "Por clasificar"',
+  tarjetaDe('Conciliación FL.pdf').locator('.acciones .boton').allTextContents(),
+  ['Abrir', 'Crear asunto con él', 'Meter en un asunto', 'Borrar']);
 
-/* --- pruebas 2, 3 y 6: elegir un asunto abierto, en el orden correcto --- */
-await tarjeta1.getByRole('button', { name: 'Meter en un asunto' }).click();
-await pagina.waitForSelector('#capa:not(.oculto)');
-await pagina.waitForSelector('#ea-podrian .ea-fila');
+/* ============================================================
+   6. LA PUNTUACIÓN DE PARECIDO
+   ============================================================ */
+await comprobar('6. manda el asunto cuyo tercero sale en el nombre del fichero',
+  pagina.evaluate(() => {
+    const l = App.parecidoDelSuelto('Escrito de Ordóñez Gil, Rafael.pdf');
+    return l.length ? l[0].nombre : '';
+  }), OTRO);
 
-const podrian = await pagina.locator('#ea-podrian .ea-fila').allTextContents();
-await comprobar('"Podrían encajar" trae los dos candidatos que pasan el mínimo',
-  podrian.length, 2);
-await comprobar('el tercero que aparece en el nombre del fichero va primero',
-  podrian[0].indexOf('Limpiezas Andalucia') !== -1, true);
-await comprobar('el que solo comparte una palabra va detrás',
-  podrian[1].indexOf('Limpiezas Sevilla') !== -1, true);
+/* ============================================================
+   4. SI YA HAY UNO CON ESE NOMBRE EN EL DESTINO, NO SE PISA
+   ============================================================ */
+await pagina.evaluate(async (n) => {
+  const c = await window.__disco.abiertos.getDirectoryHandle(n);
+  c._hijos.set('Conciliación FL.pdf',
+    window.__disco.fich('Conciliación FL.pdf', 'el que ya estaba dentro'));
+}, OTRO);
 
-await pagina.locator('#ea-podrian .ea-fila', { hasText: 'Limpiezas Andalucia' }).click();
-await pagina.waitForSelector('#cuadro-titulo:has-text("' + NOMBRE_A + '")');
-await comprobar('se abre el cuadro de ponerle nombre, con el asunto elegido',
-  pagina.locator('#cuadro-titulo').textContent(), NOMBRE_A);
+await tarjetaDe('Conciliación FL.pdf').getByRole('button', { name: 'Meter en un asunto' }).click();
+await pagina.waitForSelector('#enlace-todos');
+await pagina.fill('#enlace-buscar', 'Ordóñez');
+await pagina.waitForTimeout(300);
+await pagina.click('#enlace-todos .enlace-asunto');
+await pagina.waitForTimeout(700);
 
-await comprobar('el documento ha entrado en la carpeta del asunto',
-  nombresDeCarpeta(NOMBRE_A).then(l => l.includes(SUELTO_1)), true);
-await comprobar('el documento ya no está en Por clasificar',
-  nombresRaiz().then(l => l.includes(SUELTO_1)), false);
-
-await pagina.click('#cuadro-aceptar');   /* "Cerrar" del cuadro de nombrar */
-await pagina.waitForSelector('#capa', { state: 'hidden' });
-
-/* --- prueba 4: ya hay un fichero con ese nombre en el destino --- */
-await pagina.evaluate(async () => {
-  const suelto = await window.__disco.abiertos.getFileHandle('informe.pdf', { create: true });
-  const w = await suelto.createWritable();
-  await w.write('otro informe, recién llegado');
-  await w.close();
-});
-await pagina.click('#btn-recargar');
-await pagina.waitForSelector('.tarjeta-suelto:has-text("informe.pdf")');
-
-const tarjeta2 = pagina.locator('.tarjeta-suelto', { hasText: 'informe.pdf' });
-await tarjeta2.getByRole('button', { name: 'Meter en un asunto' }).click();
-await pagina.waitForSelector('#capa:not(.oculto)');
-await pagina.fill('#ea-buscar', 'Papeleria Ruiz');
-await pagina.locator('#ea-todos .ea-fila', { hasText: NOMBRE_B }).click();
-await pagina.waitForSelector('.mensaje.malo:has-text("Ya hay un documento llamado")');
-
-await comprobar('el documento repetido sigue en Por clasificar',
-  nombresRaiz().then(l => l.includes('informe.pdf')), true);
-await comprobar('el documento de dentro del asunto no se ha pisado',
+await comprobar('4. avisa de que ya hay uno con ese nombre',
+  elUltimoAviso().then(t => t.indexOf('sigue en Por clasificar') !== -1), true);
+await comprobar('y el documento no se ha movido de la raíz',
+  enLaRaiz().then(l => l.indexOf('Conciliación FL.pdf') !== -1), true);
+await comprobar('ni se ha pisado el que ya estaba dentro',
   pagina.evaluate(async (n) => {
-    const carpeta = await window.__disco.abiertos.getDirectoryHandle(n);
-    const h = await carpeta.getFileHandle('informe.pdf');
+    const c = await window.__disco.abiertos.getDirectoryHandle(n);
+    const h = await c.getFileHandle('Conciliación FL.pdf');
     return (await (await h.getFile()).text());
-  }, NOMBRE_B),
-  'el informe que ya estaba');
+  }, OTRO), 'el que ya estaba dentro');
 
-/* --- prueba 5: el traslado falla a media copia --- */
-await pagina.evaluate(async () => {
-  const suelto = await window.__disco.abiertos.getFileHandle('prueba fallo.pdf', { create: true });
-  const w = await suelto.createWritable();
-  await w.write('esto no debería llegar a ningún sitio');
-  await w.close();
+/* ============================================================
+   5. SI EL TRASLADO FALLA, EL DOCUMENTO SE QUEDA DONDE ESTABA
+   ============================================================ */
+await pagina.evaluate(async (n) => {
+  const c = await window.__disco.abiertos.getDirectoryHandle(n);
+  const antes = c.getFileHandle.bind(c);
+  c._comoEra = antes;
+  c.getFileHandle = async function (nombre, o) {
+    if (o && o.create) throw new Error('el disco se ha puesto tonto');
+    return antes(nombre, o);
+  };
+}, OTRO);
 
-  /* Se rompe el destino a propósito: como si el disco fallara justo
-     al escribir la copia. */
-  const carpeta = await window.__disco.abiertos.getDirectoryHandle(
-    '260908 CONTRATO 26-27 Limpiezas Sevilla SL');
-  carpeta.getFileHandle = async () => { throw new Error('fallo de prueba, a propósito'); };
-});
-await pagina.click('#btn-recargar');
-await pagina.waitForSelector('.tarjeta-suelto:has-text("prueba fallo.pdf")');
+await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');
+await tarjetaDe('Otro papel cualquiera.pdf')
+  .getByRole('button', { name: 'Meter en un asunto' }).click();
+await pagina.waitForSelector('#enlace-todos');
+await pagina.fill('#enlace-buscar', 'Ordóñez');
+await pagina.waitForTimeout(300);
+await pagina.click('#enlace-todos .enlace-asunto');
+await pagina.waitForTimeout(700);
 
-const tarjeta3 = pagina.locator('.tarjeta-suelto', { hasText: 'prueba fallo.pdf' });
-await tarjeta3.getByRole('button', { name: 'Meter en un asunto' }).click();
-await pagina.waitForSelector('#capa:not(.oculto)');
-await pagina.fill('#ea-buscar', 'Limpiezas Sevilla');
-await pagina.locator('#ea-todos .ea-fila', { hasText: NOMBRE_D }).click();
-await pagina.waitForSelector('.mensaje.malo:has-text("no ha podido entrar")');
+await comprobar('5. si el traslado falla, se avisa',
+  elUltimoAviso(),
+  'El documento no ha podido entrar en el asunto. Sigue en Por clasificar.');
+await comprobar('y el documento sigue en la raíz',
+  enLaRaiz().then(l => l.indexOf('Otro papel cualquiera.pdf') !== -1), true);
+await comprobar('y no se ha abierto el cuadro de ponerle nombre',
+  pagina.locator('#doc-anadir').count(), 0);
 
-await comprobar('si el traslado falla, el documento sigue en Por clasificar',
-  nombresRaiz().then(l => l.includes('prueba fallo.pdf')), true);
+await pagina.evaluate(async (n) => {
+  const c = await window.__disco.abiertos.getDirectoryHandle(n);
+  c.getFileHandle = c._comoEra;
+}, OTRO);
 
-/* --- nada raro en la consola --- */
-await comprobar('sin errores de JavaScript', errores, []);
+/* ============================================================
+   2 y 3. ELEGIR UN ASUNTO ABIERTO: SE MUEVE Y SE ABRE EL CUADRO
+   ============================================================ */
+await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');
+await tarjetaDe('Escrito de Ordóñez Gil, Rafael.pdf')
+  .getByRole('button', { name: 'Meter en un asunto' }).click();
+await pagina.waitForSelector('#enlace-todos');
 
+/* El asunto de Ordóñez sale arriba, en "Podrían encajar": su tercero
+   está escrito en el nombre del fichero. */
+await comprobar('el asunto que encaja sale en "Podrían encajar"',
+  pagina.locator('#cuadro-cuerpo .enlace-bloque').first()
+    .locator('.enlace-asunto').first().getAttribute('data-nombre'), OTRO);
+
+await pagina.click('#cuadro-cuerpo .enlace-bloque .enlace-asunto');
+await pagina.waitForTimeout(900);
+
+await comprobar('2. el documento ha entrado en la carpeta del asunto',
+  dentroDe(OTRO), ['Conciliación FL.pdf', 'Escrito de Ordóñez Gil, Rafael.pdf'].sort());
+await comprobar('y ya no está en la raíz',
+  enLaRaiz().then(l => l.indexOf('Escrito de Ordóñez Gil, Rafael.pdf') !== -1), false);
+
+await pagina.waitForSelector('#doc-anadir');
+await comprobar('3. se abre el cuadro de ponerle nombre',
+  pagina.locator('#cuadro-titulo').textContent(), OTRO);
+await comprobar('y lista los documentos que hay ahora en la carpeta',
+  pagina.locator('#doc-cuerpo .nombre-documento').allTextContents()
+    .then(l => l.sort()),
+  ['Conciliación FL.pdf', 'Escrito de Ordóñez Gil, Rafael.pdf'].sort());
+await pagina.click('#cuadro-aceptar');
+await pagina.waitForTimeout(400);
+
+/* La tarjeta ha desaparecido de "Por clasificar". */
+await comprobar('la tarjeta se va de "Por clasificar"',
+  tarjetaDe('Escrito de Ordóñez Gil, Rafael.pdf').count(), 0);
+
+/* "Crear asunto con él" sigue estando, y sigue haciendo lo suyo. */
+await comprobar('"Crear asunto con él" sigue en su sitio',
+  tarjetaDe('Otro papel cualquiera.pdf')
+    .getByRole('button', { name: 'Crear asunto con él' }).count(), 1);
+
+if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
+console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 await navegador.close();
-console.log(fallos ? '\n' + fallos + ' prueba(s) fallida(s).' : '\nTodo bien.');
 process.exit(fallos ? 1 : 0);

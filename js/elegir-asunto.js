@@ -1,179 +1,303 @@
 /* ============================================================
-   elegir-asunto.js — el cuadro de elegir un asunto ya existente
-   (16-sep-2026, docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md).
+   elegir-asunto.js — el cuadro para escoger un asunto a mano.
 
-   Sirve para cuando hay un documento que hay que meter en un asunto
-   que ya existe, en vez de crear uno nuevo: hoy lo usa "Meter en un
-   asunto" de Por clasificar. Está pensado para que lo use también la
-   bandeja de correos (fila 11 de docs/COLA.md) cuando se retome: cada
-   sitio trae su propia forma de puntuar el parecido, y este módulo
-   solo pone el cuadro, el buscador y la lista.
+   Lo usan dos sitios distintos, y por eso vive aparte:
+
+     - La bandeja de correos (js/bandeja-enlace.js), con su botón
+       "Elegir asunto".
+     - "Por clasificar" (js/documentos-sueltos.js), con su botón
+       "Meter en un asunto".
+
+   El cuadro es siempre el mismo y tiene dos bloques:
+
+     - "Podrían encajar": como mucho cinco asuntos, los que más puntos
+       sacan. Si ninguno llega al mínimo, este bloque no se pinta. La
+       puntuación NO se calcula aquí: cada sitio sabe medir su propio
+       parecido (un correo tiene remitente y texto; un documento suelto
+       solo tiene el nombre del fichero) y le pasa la lista ya hecha.
+     - "Todos los asuntos": la lista entera con buscador, los abiertos
+       primero y los archivados después, con su etiqueta "Archivado".
+
+   Lo que sí es común está aquí abajo: la lista completa, el buscador,
+   el orden, las filas, el cuadro de "está archivado" y las piezas de
+   puntuación que las dos comparten (los trozos del nombre del tercero,
+   si el asunto se movió hace poco, y los puntos de base).
+
+   Solo hay un cuadro de diálogo en toda la aplicación (U.preguntar,
+   sobre #capa), así que aquí nunca se abre uno mientras otro espera:
+   el de elegir se cierra antes de abrir el de reabrir.
    ============================================================ */
-var ElegirAsunto = (function () {
+window.ElegirAsunto = (function () {
+
+  var MINIMO = 40;
+  var CUANTOS = 5;
+  var DIAS_RECIENTE = 30;
+  var CUANTOS_EN_LA_LISTA = 200;
 
   function $(id) { return document.getElementById(id); }
 
-  var MAXIMO_PODRIAN = 5;
-  var PUNTOS_MINIMOS = 40;
-  var MAXIMO_LISTA = 200;
-
-  /* El nombre del tercero de un asunto, ya sea abierto o archivado: el
-     de su ficha si lo tiene, y si no, el que se pueda leer del propio
-     nombre de la carpeta. */
-  function terceroDe(a) {
-    if (a.ficha && a.ficha.tercero) return a.ficha.tercero;
-    var leido = a.leido || Nombres.leer(a.nombre, App.E.tipos);
-    return Nombres.terceroDeResto(leido.resto || '');
+  function estaArchivado(ficha) {
+    return String((ficha && ficha.estado) || '') === 'cerrado';
   }
 
-  /* La fecha más reciente que se conoce del asunto: cuándo se abrió,
-     o cuándo se movió (reabierto o archivado) por última vez. */
-  function fechaDe(a) {
-    var f = a.ficha || {};
-    return f.reabiertoEl || f.cerradoEl || f.abiertoEl || '';
+  /* ==========================================================
+     LAS PIEZAS DE PUNTUACIÓN QUE COMPARTEN LOS DOS
+     ========================================================== */
+
+  /* "Pacheco Pérez, Mercedes 019G" -> apellidos y nombre por separado,
+     sin el código pegado al final (el Nº de identificación escolar, o
+     las cuatro cifras del documento del personal). */
+  function trozosDelTercero(tercero) {
+    var t = String(tercero || '').trim();
+    if (!t) return null;
+    var coma = t.indexOf(',');
+    if (coma === -1) return { apellidos: U.normalizar(t), nombre: '' };
+    var apellidos = U.normalizar(t.slice(0, coma));
+    var resto = t.slice(coma + 1).trim().split(/\s+/).filter(Boolean);
+    var ultima = resto[resto.length - 1] || '';
+    if (resto.length > 1 && /^[0-9A-Z]{4,}$/.test(ultima)) resto.pop();
+    return { apellidos: apellidos, nombre: U.normalizar(resto.join(' ')) };
   }
 
-  function creadoOMovidoHaceMenosDe30Dias(a) {
-    var iso = fechaDe(a);
-    if (!iso) return false;
-    var d = new Date(iso);
-    if (isNaN(d.getTime())) return false;
-    return (Date.now() - d.getTime()) < 30 * 86400000;
+  /* ¿El nombre del tercero del asunto está escrito dentro de este
+     texto? Apellidos y nombre, en cualquier orden. */
+  function terceroDentroDe(ficha, texto) {
+    var trozos = trozosDelTercero(ficha && ficha.tercero);
+    if (!trozos || !trozos.apellidos) return false;
+    if (texto.indexOf(trozos.apellidos) === -1) return false;
+    return !trozos.nombre || texto.indexOf(trozos.nombre) !== -1;
   }
 
-  /* Todos los asuntos, abiertos y archivados, en una sola lista con la
-     misma forma. El archivo se lee entero si todavía no se ha leído
-     (o se relee, para no ofrecer algo que ya no está). */
-  async function todosLosAsuntos() {
-    try { await App.verArchivo(); } catch (e) { /* se sigue solo con los abiertos */ }
-
-    var abiertos = (App.E.listaAbiertos || []).map(function (a) {
-      return { nombre: a.nombre, archivado: false, ficha: a.ficha, leido: a.leido, handle: a.handle };
-    });
-    var archivados = (App.E.listaArchivo || []).map(function (a) {
-      return { nombre: a.nombre, archivado: true, ficha: a.ficha, leido: a.leido, handle: a.handle, padre: a.padre };
-    });
-    return abiertos.concat(archivados);
-  }
-
-  /* ---------- palabras útiles de un texto ----------
-
-     Para la puntuación por palabras: de cuatro letras o más, sin las
-     que no dicen nada del tercero ni del tipo. */
-  var PALABRAS_VACIAS = ['para', 'sobre', 'desde', 'con', 'los', 'las', 'del',
-    'esta', 'este', 'estos', 'estas', 'entre', 'como', 'una', 'unos', 'unas'];
-
-  function palabrasUtilesDe(texto) {
-    return U.normalizar(texto).split(/[^a-z0-9]+/).filter(function (p) {
-      return p.length >= 4 && PALABRAS_VACIAS.indexOf(p) === -1;
-    });
-  }
-
-  /* ---------- el cuadro ---------- */
-
-  function filaDeAsunto(a, alElegir) {
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'boton ea-fila';
-    b.innerHTML = U.escapar(a.nombre) +
-      (a.archivado ? ' <span class="suave">(Archivado)</span>' : '');
-    b.onclick = function () { alElegir(a); };
-    return b;
-  }
-
-  /* Devuelve { accion: 'cancelar' } o { accion: 'elegido', asunto }.
-     `opciones.titulo` y `opciones.calcularPuntuacion(asunto)` los pone
-     quien llama; la puntuación depende de lo que se sepa (un correo,
-     un nombre de fichero…), así que no se calcula aquí. */
-  async function abrir(opciones) {
-    opciones = opciones || {};
-    var calcularPuntuacion = opciones.calcularPuntuacion || function () { return 0; };
-
-    var todos = await todosLosAsuntos();
-    var podrian = todos
-      .map(function (a) { return { asunto: a, puntos: calcularPuntuacion(a) }; })
-      .filter(function (p) { return p.puntos > PUNTOS_MINIMOS; })
-      .sort(function (a, b) { return b.puntos - a.puntos; })
-      .slice(0, MAXIMO_PODRIAN)
-      .map(function (p) { return p.asunto; });
-
-    var cuerpo =
-      '<div id="ea-podrian"></div>' +
-      '<label class="etiqueta">Todos los asuntos</label>' +
-      '<input type="text" id="ea-buscar" class="campo" placeholder="Buscar por nombre…">' +
-      '<div id="ea-todos" class="ea-lista"></div>';
-
-    var promesa = U.preguntar(opciones.titulo || 'Elegir asunto', cuerpo, 'Cancelar', false);
-    var aceptar = $('cuadro-aceptar');
-    if (aceptar) aceptar.classList.add('oculto');
-
-    var elegido = null;
-    function elegir(a) {
-      elegido = a;
-      var cancelar = $('cuadro-cancelar');
-      if (cancelar) cancelar.click();
+  /* Cuándo se creó o se movió por última vez. La fecha de creación va
+     delante del nombre de la carpeta, en AAMMDD; la del último
+     movimiento, en la ficha, cuando hay notas. */
+  function cuandoSeMovio(nombre, ficha) {
+    var cuando = 0;
+    var m = String(nombre || '').match(/^(\d{2})(\d{2})(\d{2})(\D|$)/);
+    if (m) {
+      var f = new Date(2000 + parseInt(m[1], 10), parseInt(m[2], 10) - 1, parseInt(m[3], 10));
+      if (!isNaN(f.getTime())) cuando = f.getTime();
     }
+    var nota = new Date((ficha && ficha.notaEl) || '');
+    if (!isNaN(nota.getTime()) && nota.getTime() > cuando) cuando = nota.getTime();
+    return cuando;
+  }
 
-    var cajaPodrian = $('ea-podrian');
-    if (podrian.length) {
-      cajaPodrian.innerHTML = '<label class="etiqueta">Podrían encajar</label>';
-      var envoltorio = document.createElement('div');
-      envoltorio.className = 'ea-lista';
-      podrian.forEach(function (a) { envoltorio.appendChild(filaDeAsunto(a, elegir)); });
-      cajaPodrian.appendChild(envoltorio);
-    }
+  function esReciente(nombre, ficha) {
+    var cuando = cuandoSeMovio(nombre, ficha);
+    if (!cuando) return false;
+    return (Date.now() - cuando) <= DIAS_RECIENTE * 86400000;
+  }
 
-    function pintarTodos() {
-      var q = U.normalizar($('ea-buscar').value);
-      var caja = $('ea-todos');
-      caja.innerHTML = '';
-      var lista = todos.filter(function (a) { return !q || U.normalizar(a.nombre).indexOf(q) !== -1; });
-      if (!lista.length) {
-        caja.innerHTML = '<div class="vacio">Nada coincide con lo que buscas.</div>';
-        return;
+  /* +15 si el asunto está abierto, +10 si se movió hace poco. Es lo
+     mismo para un correo que para un documento suelto. */
+  function puntosDeBase(nombre, ficha) {
+    var puntos = 0;
+    if (!estaArchivado(ficha)) puntos += 15;
+    if (esReciente(nombre, ficha)) puntos += 10;
+    return puntos;
+  }
+
+  /* +10 por cada palabra que esté dentro del nombre del asunto. */
+  function puntosPorPalabras(palabras, nombre) {
+    var enElNombre = U.normalizar(nombre);
+    var puntos = 0;
+    (palabras || []).forEach(function (p) {
+      if (p && enElNombre.indexOf(p) !== -1) puntos += 10;
+    });
+    return puntos;
+  }
+
+  /* Deja solo los que pasan del mínimo, de mayor a menor, y como mucho
+     cinco. Es el remate de las dos puntuaciones. */
+  function mejores(lista) {
+    return lista
+      .filter(function (x) { return x.puntos > MINIMO; })
+      .sort(function (a, b) {
+        if (b.puntos !== a.puntos) return b.puntos - a.puntos;
+        return a.nombre < b.nombre ? -1 : 1;
+      })
+      .slice(0, CUANTOS);
+  }
+
+  /* ==========================================================
+     LA LISTA COMPLETA
+     ========================================================== */
+
+  function todosLosAsuntos() {
+    var registro = (App.E.registro && App.E.registro.asuntos) || {};
+    var lista = Object.keys(registro).map(function (nombre) {
+      return { nombre: nombre, ficha: registro[nombre] || {} };
+    });
+    lista.sort(function (a, b) {
+      var ca = estaArchivado(a.ficha) ? 1 : 0;
+      var cb = estaArchivado(b.ficha) ? 1 : 0;
+      if (ca !== cb) return ca - cb;           /* abiertos primero */
+      return a.nombre < b.nombre ? -1 : 1;
+    });
+    return lista;
+  }
+
+  function filaDeAsunto(x, puntos) {
+    var pie = [
+      (x.ficha.tercero || ''),
+      (estaArchivado(x.ficha) ? 'Archivado' : 'Abierto')
+    ].filter(Boolean).join('  ·  ');
+    return '<button type="button" class="resultado enlace-asunto" data-nombre="' +
+             U.escapar(x.nombre) + '">' +
+             (estaArchivado(x.ficha)
+               ? '<span class="marca-tipo enlace-archivado">Archivado</span>' : '') +
+             U.escapar(x.nombre) +
+             '<span class="resultado-pie">' + U.escapar(pie) +
+             (puntos ? '  ·  ' + puntos + ' puntos' : '') + '</span>' +
+           '</button>';
+  }
+
+  /* ==========================================================
+     EL CUADRO
+
+     Se monta sobre #capa, igual que hace js/relacionados.js: se
+     esconde el botón de Aceptar, porque aquí se elige pulsando en la
+     fila, y Cancelar es el de siempre.
+
+     opciones = { titulo, cabecera (HTML), sugeridos: [{nombre, ficha,
+     puntos}] }. Devuelve {nombre, ficha} o null si se cancela.
+     ========================================================== */
+
+  function elegir(opciones) {
+    var o = opciones || {};
+    var sugeridos = o.sugeridos || [];
+
+    return new Promise(function (resolver) {
+      var resuelto = false;
+      function unaVez(v) { if (!resuelto) { resuelto = true; resolver(v); } }
+
+      var todos = todosLosAsuntos();
+      var capa = $('capa');
+      var cuadro = document.querySelector('#capa .cuadro');
+      if (cuadro) cuadro.classList.add('cuadro-medio');
+
+      $('cuadro-titulo').textContent = o.titulo || 'Elegir el asunto';
+      $('cuadro-cuerpo').innerHTML =
+        (o.cabecera || '') +
+        (sugeridos.length
+          ? '<div class="enlace-bloque"><div class="etiqueta">Podrían encajar</div>' +
+            '<div class="lista enlace-lista">' +
+            sugeridos.map(function (x) { return filaDeAsunto(x, x.puntos); }).join('') +
+            '</div></div>'
+          : '') +
+        '<div class="enlace-bloque"><div class="etiqueta">Todos los asuntos</div>' +
+        '<input id="enlace-buscar" class="campo" placeholder="Buscar por nombre o tercero">' +
+        '<div class="lista enlace-lista" id="enlace-todos"></div></div>';
+
+      $('cuadro-aceptar').classList.add('oculto');
+      capa.classList.remove('oculto');
+
+      function cerrar() {
+        capa.classList.add('oculto');
+        $('cuadro-aceptar').classList.remove('oculto');
+        $('cuadro-cancelar').onclick = null;
+        if (cuadro) cuadro.classList.remove('cuadro-medio');
       }
-      var abiertos = lista.filter(function (a) { return !a.archivado; });
-      var archivados = lista.filter(function (a) { return a.archivado; });
-      abiertos.concat(archivados).slice(0, MAXIMO_LISTA).forEach(function (a) {
-        caja.appendChild(filaDeAsunto(a, elegir));
-      });
-    }
-    $('ea-buscar').oninput = pintarTodos;
-    pintarTodos();
 
-    await promesa;
-    if (aceptar) aceptar.classList.remove('oculto');
+      $('cuadro-cancelar').onclick = function () { cerrar(); unaVez(null); };
 
-    if (!elegido) return { accion: 'cancelar' };
-    return { accion: 'elegido', asunto: elegido };
+      function engancharFilas(caja) {
+        Array.prototype.forEach.call(caja.querySelectorAll('.enlace-asunto'), function (b) {
+          b.onclick = function () {
+            var nombre = b.dataset.nombre;
+            cerrar();
+            unaVez({ nombre: nombre, ficha: (App.E.registro.asuntos || {})[nombre] || {} });
+          };
+        });
+      }
+
+      function pintarTodos() {
+        var busca = U.normalizar(($('enlace-buscar') || {}).value || '');
+        var caja = $('enlace-todos');
+        var vistos = todos.filter(function (x) {
+          if (!busca) return true;
+          return U.normalizar(x.nombre + ' ' + (x.ficha.tercero || '')).indexOf(busca) !== -1;
+        });
+        caja.innerHTML = vistos.length
+          ? vistos.slice(0, CUANTOS_EN_LA_LISTA).map(function (x) {
+              return filaDeAsunto(x, 0);
+            }).join('')
+          : '<div class="vacio">Ningún asunto con eso.</div>';
+        engancharFilas(caja);
+      }
+
+      engancharFilas($('cuadro-cuerpo'));
+      pintarTodos();
+      var buscador = $('enlace-buscar');
+      if (buscador) {
+        buscador.oninput = pintarTodos;
+        try { buscador.focus(); } catch (e) {}
+      }
+    });
   }
 
-  /* El cuadro de "reabrir o no" cuando lo elegido está en el ARCHIVO.
-     Devuelve 'reabrir', 'sin-reabrir' o null (canceló). */
-  async function preguntarSiReabrir(nombreAsunto) {
-    var cuerpo = '<p><strong>' + U.escapar(nombreAsunto) + '</strong> está archivado.</p>' +
-      '<div class="dup-botones">' +
-        '<button type="button" id="ea-reabrir" class="boton boton-principal">Reabrir y meterlo aquí</button>' +
-        '<button type="button" id="ea-sin-reabrir" class="boton">Meterlo sin reabrir</button>' +
-      '</div>';
-    var promesa = U.preguntar('Este asunto está archivado', cuerpo, 'Cancelar', false);
-    var aceptar = $('cuadro-aceptar');
-    if (aceptar) aceptar.classList.add('oculto');
+  /* El asunto elegido está archivado: se pregunta qué hacer con él.
+     Este cuadro se abre cuando el otro ya está cerrado, nunca encima.
 
-    var elegido = null;
-    $('ea-reabrir').onclick = function () { elegido = 'reabrir'; $('cuadro-cancelar').click(); };
-    $('ea-sin-reabrir').onclick = function () { elegido = 'sin-reabrir'; $('cuadro-cancelar').click(); };
+     opciones = { explica (HTML), reabrir: texto del botón principal,
+     sinReabrir: texto del otro }. Devuelve 'reabrir', 'guardar' o
+     null. */
+  function preguntarSiReabrir(elAsunto, opciones) {
+    var o = opciones || {};
 
-    await promesa;
-    if (aceptar) aceptar.classList.remove('oculto');
-    return elegido;
+    return new Promise(function (resolver) {
+      var resuelto = false;
+      function unaVez(v) { if (!resuelto) { resuelto = true; resolver(v); } }
+
+      var capa = $('capa');
+      $('cuadro-titulo').textContent = 'Ese asunto está archivado';
+      $('cuadro-cuerpo').innerHTML =
+        '<p class="explica">' + U.escapar(elAsunto.nombre) + '</p>' +
+        (o.explica || '') +
+        '<div class="alta-tipo">' +
+          '<button type="button" id="enlace-reabrir" class="boton boton-principal">' +
+            U.escapar(o.reabrir || 'Reabrir y guardar aquí') + '</button>' +
+          '<button type="button" id="enlace-sin-reabrir" class="boton">' +
+            U.escapar(o.sinReabrir || 'Guardar sin reabrir') + '</button>' +
+        '</div>';
+      $('cuadro-aceptar').classList.add('oculto');
+      capa.classList.remove('oculto');
+
+      function cerrar() {
+        capa.classList.add('oculto');
+        $('cuadro-aceptar').classList.remove('oculto');
+        $('cuadro-cancelar').onclick = null;
+      }
+
+      $('cuadro-cancelar').onclick = function () { cerrar(); unaVez(null); };
+      $('enlace-reabrir').onclick = function () { cerrar(); unaVez('reabrir'); };
+      $('enlace-sin-reabrir').onclick = function () { cerrar(); unaVez('guardar'); };
+    });
+  }
+
+  /* La carpeta donde vive un asunto: en asuntos abiertos, o dentro del
+     ARCHIVO, en su categoría y su tercero. */
+  async function carpetaDelAsunto(nombre, ficha) {
+    if (!estaArchivado(ficha)) return App.E.abiertos.getDirectoryHandle(nombre);
+    if (!App.E.archivo) throw new Error('No hay carpeta de ARCHIVO señalada.');
+    var dentro = await Carpetas.bajar(App.E.archivo, [ficha.categoria, ficha.tercero], false);
+    return dentro.getDirectoryHandle(nombre);
   }
 
   return {
-    abrir: abrir,
+    MINIMO: MINIMO, CUANTOS: CUANTOS, DIAS_RECIENTE: DIAS_RECIENTE,
+    estaArchivado: estaArchivado,
+    trozosDelTercero: trozosDelTercero,
+    terceroDentroDe: terceroDentroDe,
+    cuandoSeMovio: cuandoSeMovio,
+    esReciente: esReciente,
+    puntosDeBase: puntosDeBase,
+    puntosPorPalabras: puntosPorPalabras,
+    mejores: mejores,
+    todos: todosLosAsuntos,
+    elegir: elegir,
     preguntarSiReabrir: preguntarSiReabrir,
-    terceroDe: terceroDe,
-    creadoOMovidoHaceMenosDe30Dias: creadoOMovidoHaceMenosDe30Dias,
-    palabrasUtilesDe: palabrasUtilesDe
+    carpetaDelAsunto: carpetaDelAsunto
   };
 })();

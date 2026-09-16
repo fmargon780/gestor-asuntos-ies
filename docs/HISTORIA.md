@@ -1174,10 +1174,17 @@ una línea cada una. El texto largo que tenían antes era:
   escenarios del encargo). De paso se arregló `pruebas/logica.mjs`: la fecha de cese del personal
   estaba escrita a mano (`15/09/2026` y `06/09/2026`) y se quedó desfasada al llegar esa fecha,
   igual que ya le pasó una vez a la edad (ver el comentario de "la edad" en ese mismo fichero);
-  ahora sale de `fechaHace(0, …)`, relativa a hoy. Batería completa en verde (`npm test`, 20
-  ficheros). **Subido a una rama con pull request, no directamente a `main`**: el entorno de
-  ejecución de esta sesión (Claude Code en la nube) lo exige así, aunque `docs/CONTEXTO.md` diga
-  lo contrario; hace falta que alguien fusione el pull request para que Vercel lo publique.
+  ahora sale de `fechaHace(0, …)`, relativa a hoy (este arreglo de `pruebas/logica.mjs` sí se ha
+  conservado). Batería completa en verde (`npm test`, 20 ficheros) en esa rama.
+
+  **Corrección, al fusionar**: mientras esta sesión trabajaba en su rama, otra sesión en paralelo
+  hizo también la fila 12 directamente en `main`, sin verse la una a la otra, y con mejor diseño:
+  un solo `js/elegir-asunto.js` compartido desde el principio con la bandeja de correos
+  (`js/bandeja-enlace.js`), en vez de dos elegidores por separado. Al fusionar esta rama, todo lo
+  descrito arriba sobre `js/elegir-asunto.js` y `js/documentos-sueltos.js` (el propio y el de la
+  bandeja) se ha descartado a favor de lo que ya había en `main`; `pruebas/documentos-sueltos.mjs`
+  también se ha sustituido por la versión de la otra sesión. Lo único de esta entrada que ha
+  sobrevivido es el arreglo de las fechas de `pruebas/logica.mjs`.
 - **13 · `docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md`**: Terminada 16-sep-2026 · 20:57, en la misma
   sesión y el mismo pull request que la fila 12. Gmail no deja que una página web adjunte
   ficheros, así que la salida sigue siendo la carpeta `GESTOR-BANDEJA`: bloque nuevo "Documentos
@@ -1193,8 +1200,7 @@ una línea cada una. El texto largo que tenían antes era:
   Script (`mandarBorradores()`, en `apps-script/gestor-correos.gs`) monta el borrador con
   `GmailApp.createDraft` o, si hay hilo, `createDraftReply`, siempre como borrador, nunca lo
   envía; el disparador pasa de cinco minutos a uno. Pruebas nuevas en `pruebas/envios.mjs` (los
-  seis escenarios del encargo), batería completa en verde. Igual que la fila 12: pendiente de que
-  se fusione el pull request para que Vercel lo publique.
+  seis escenarios del encargo), batería completa en verde.
 - **14 · `docs/PLANTILLAS-DE-CORREO.md`**: Terminada 16-sep-2026 · 21:12, en la misma sesión y el
   mismo pull request que las filas 12 y 13. Una plantilla es solo el cuerpo del medio: el saludo
   y la firma los sigue poniendo `js/correo.js`, solo. Se crean en Ajustes pegadas a un tipo de
