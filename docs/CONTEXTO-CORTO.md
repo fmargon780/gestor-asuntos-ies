@@ -70,6 +70,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Bandeja de correos de Gmail (etiqueta `GESTOR`): a un asunto nuevo, al que adivina, o al que
   eliges a mano con "Elegir asunto". El hilo queda enganchado al asunto (`hilos` en
   `asuntos.json`) y sus respuestas vuelven solas a la bandeja.
+- "Por clasificar": cada documento suelto se abre, se borra, crea un asunto nuevo, o entra en un
+  asunto que ya existe con "Meter en un asunto". El cuadro de elegir asunto es el mismo de la
+  bandeja de correos (`js/elegir-asunto.js`).
 - DNI del alumnado a la vista, con aviso si falta y ya tocaría tenerlo.
 - Registrar un documento en un paso, leyendo el sello de Séneca del PDF.
 - Terceros relacionados con un asunto, con nota (no copia) al archivar.
@@ -77,8 +80,6 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ajustes ágiles: pestañas por categoría, buscador cruzado, aviso en vivo de nombres repetidos.
 - Campos propios por tipo de asunto, rellenos solos al crear.
 - Papelera: nada se borra del todo a la primera.
-- "Meter en un asunto" en Por clasificar: manda un documento suelto a un asunto ya creado (abierto
-  o archivado), con "Podrían encajar" por puntuación de parecido.
 - Mandar documentos de un asunto por correo: se marcan en el cuadro "Correo" y el script de Apps
   Script deja un borrador en Gmail (nunca envía), con tarjeta "Borrador en camino".
 - Plantillas de correo y de mensaje de Séneca, por tipo de asunto, con huecos que se rellenan

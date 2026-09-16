@@ -254,17 +254,16 @@ De cada correo, la tarjeta morada mira en este orden:
    ofrece guardarlo ahí.
 3. **Nada.** Entonces el botón principal es "Crear el asunto".
 
-En los tres casos hay además un botón **"Elegir asunto"** (`js/bandeja-enlace.js`), que abre un
-cuadro con "Podrían encajar" (como mucho cinco, por puntuación de parecido) y "Todos los
-asuntos" con buscador, abiertos primero y archivados después. Si el elegido está archivado se
-ofrece "Reabrir y guardar aquí" o "Guardar sin reabrir". **Nunca se guarda nada solo: siempre
-hay que pulsar.**
+En los tres casos hay además un botón **"Elegir asunto"** (`js/bandeja-enlace.js`), que abre el
+cuadro compartido de `js/elegir-asunto.js` (ver "El cuadro de elegir asunto", más abajo). Si el
+elegido está archivado se ofrece "Reabrir y guardar aquí" o "Guardar sin reabrir". **Nunca se
+guarda nada solo: siempre hay que pulsar.**
 
-La puntuación de parecido suma: +50 si una dirección del correo es la del tercero del asunto o
-de uno de sus relacionados, +40 si el nombre del tercero aparece escrito en el correo, +10 por
-cada palabra de cuatro letras o más del asunto del correo que esté en el nombre del asunto, +15
-si el asunto está abierto y +10 si se movió en los últimos 30 días. Se enseñan los que pasen de
-40 puntos.
+La puntuación de parecido de un correo suma: +50 si una dirección del correo es la del tercero
+del asunto o de uno de sus relacionados, +40 si el nombre del tercero aparece escrito en el
+correo, +10 por cada palabra de cuatro letras o más del asunto del correo que esté en el nombre
+del asunto, +15 si el asunto está abierto y +10 si se movió en los últimos 30 días. Se enseñan
+los que pasen de 40 puntos.
 
 #### `hilos`, en la ficha del asunto
 
@@ -591,6 +590,43 @@ separado por `.separador-lateral`; con la barra plegada, el icono de rueda denta
 
 Se comprueba con `pruebas/ajustes-agil.mjs`, a 1905 píxeles.
 
+### El cuadro de elegir asunto, y "Por clasificar"
+
+El cuadro para escoger un asunto a mano vive en **`js/elegir-asunto.js`** (`window.ElegirAsunto`)
+y lo usan dos sitios: la bandeja de correos ("Elegir asunto") y "Por clasificar" ("Meter en un
+asunto"). Se carga antes que `js/documentos-sueltos.js`, `js/bandeja-enlace.js` y
+`js/papelera.js`.
+
+- `elegir({titulo, cabecera, sugeridos})` monta el cuadro sobre `#capa`, con "Podrían encajar"
+  arriba (solo si hay) y "Todos los asuntos" debajo, con buscador (`#enlace-buscar`,
+  `#enlace-todos`), abiertos primero y archivados después con su etiqueta. Devuelve
+  `{nombre, ficha}` o `null`. **La puntuación no se calcula aquí**: cada sitio mide su propio
+  parecido y le pasa `sugeridos` ya hecho, porque de un correo se sabe mucho más que del nombre
+  de un fichero.
+- `preguntarSiReabrir(elAsunto, {explica, reabrir, sinReabrir})` es el cuadro de "Ese asunto
+  está archivado", con los textos de cada sitio. Se abre cuando el otro ya está cerrado.
+- Piezas comunes de puntuación: `trozosDelTercero`, `terceroDentroDe`, `puntosPorPalabras`,
+  `puntosDeBase` (+15 abierto, +10 movido en 30 días), `mejores` (los que pasan de 40 puntos,
+  como mucho cinco). Y `carpetaDelAsunto(nombre, ficha)`, que baja al ARCHIVO si está archivado.
+
+**"Meter en un asunto"** (`App.meterSueltoEnAsunto`, en `js/documentos-sueltos.js`) es el tercer
+botón de cada tarjeta de "Por clasificar", entre "Crear asunto con él" y "Borrar" (este último
+se lo pone `js/papelera.js` por envoltura). Su puntuación solo tiene el nombre del fichero: +10
+por cada palabra de cuatro letras o más (sin extensión, sin la fecha AAMMDD de delante y sin el
+código de registro) que esté en el nombre del asunto, +40 si el nombre del tercero del asunto
+sale en el nombre del fichero, +15 abierto y +10 movido hace poco.
+
+El traslado (`App.llevarSueltoA`) usa `Carpetas.moverFichero`, que copia, comprueba que la copia
+pesa lo mismo y solo entonces borra: en Dropbox el `move()` del navegador no vale. Si ya hay un
+fichero con ese nombre en el destino **no se pisa**; si la ruta pasa de
+`App.LARGO_MAXIMO_NOMBRE` (180) se avisa y se deja decidir; si el traslado falla, el documento
+sigue en "Por clasificar" y se dice con una línea. Si sale bien, se abre el cuadro de ponerle
+nombre (`App.verDocumentos`), igual que al crear un asunto con un documento. Si el asunto
+elegido está archivado se ofrece "Reabrir y meterlo aquí" (`App.reabrirAsunto`) o "Meterlo sin
+reabrir", y entonces el fichero va a la carpeta del asunto dentro del ARCHIVO.
+
+Se comprueba con `pruebas/documentos-sueltos.mjs`.
+
 ### La papelera
 
 Nada se borra de verdad a la primera: se manda a una papelera compartida, de la que se puede
@@ -631,39 +667,6 @@ devolver a su sitio.
   tocado el fichero directamente.
 
 Se comprueba con `pruebas/papelera.mjs`.
-
-### Meter un documento suelto en un asunto que ya existe
-
-Botón **"Meter en un asunto"** en cada tarjeta de "Por clasificar" (`js/documentos-sueltos.js`),
-entre "Crear asunto con él" y "Borrar", para cuando el documento no es de un asunto nuevo, sino
-de uno que ya está abierto o archivado.
-
-- **El cuadro de elegir asunto** (`js/elegir-asunto.js`, `window.ElegirAsunto`) es un módulo
-  compartido desde el principio con la bandeja de correos y su botón "Elegir asunto"
-  (`js/bandeja-enlace.js`): pone el cuadro entero (`elegir`), "Podrían encajar" (como mucho
-  cinco, más de `MINIMO` puntos, de mayor a menor, con `mejores`) y la lista completa con
-  buscador (abiertos primero, archivados con su etiqueta); también las piezas de puntuación que
-  usan los dos sitios (`puntosDeBase`, `puntosPorPalabras`, `terceroDentroDe`) y
-  `preguntarSiReabrir` para cuando lo elegido está archivado. Cada sitio calcula su propia
-  puntuación (un documento suelto solo tiene el nombre del fichero; un correo tiene remitente y
-  texto) y se la pasa ya hecha.
-- **La puntuación de un documento suelto** (`App.parecidoDelSuelto`, en
-  `js/documentos-sueltos.js`, con las piezas del módulo compartido): por palabras del nombre del
-  fichero de cuatro letras o más (sin extensión, sin la fecha AAMMDD de delante ni un código de
-  registro de Séneca) que aparezcan en el nombre del asunto, más si el tercero del asunto
-  aparece en el nombre del fichero, más los puntos de base (abierto, movido hace poco).
-- **Al elegir un asunto abierto**: `App.llevarSueltoA` mueve el fichero con
-  `Carpetas.moverFichero` a su carpeta y abre a continuación el cuadro de ponerle nombre
-  (`App.verDocumentos`), igual que al crear un asunto desde un documento suelto.
-- **Al elegir uno archivado**: `ElegirAsunto.preguntarSiReabrir` ofrece "Reabrir y meterlo aquí"
-  (con `App.reabrirAsunto`, que pide su propia confirmación) o "Meterlo sin reabrir" (va a su
-  carpeta dentro del ARCHIVO, con `ElegirAsunto.carpetaDelAsunto`). No se toca el estado de un
-  asunto que ya estaba abierto.
-- **Nada se pierde**: si ya hay un fichero con ese nombre en el destino, no se pisa nada y avisa;
-  si el traslado falla a medias, el documento se queda en Por clasificar y avisa con el motivo.
-  Respeta `App.LARGO_MAXIMO_NOMBRE` para la ruta de destino, igual que al crear un asunto.
-
-Se comprueba con `pruebas/documentos-sueltos.mjs`.
 
 ---
 
@@ -743,8 +746,8 @@ de `App` va después del fichero que lo define.
 | `js/asuntos-lista.js` | Asuntos abiertos: las tres tarjetas, las tarjetas por tipo y la lista. Al leer la carpeta, descarta las que parecen temporales de sincronización, salvo que ya tengan ficha en `asuntos.json` |
 | `js/unir-asuntos.js` | Une asuntos duplicados que ya existen: aviso junto a Actualizar y pantalla propia "Duplicados" (`css/unir-asuntos.css`) |
 | `js/asuntos-editar.js` | Editar un asunto abierto: renombra la carpeta y mueve su ficha |
-| `js/elegir-asunto.js` | El cuadro de elegir un asunto ya existente, compartido por "Por clasificar" y por la bandeja de correos: "Podrían encajar", buscador y lista completa |
-| `js/documentos-sueltos.js` | Los papeles sin asunto, cerrar y reabrir, la vigilancia de la carpeta, y "Meter en un asunto" |
+| `js/elegir-asunto.js` | El cuadro de escoger un asunto a mano, compartido por "Por clasificar" y por la bandeja de correos |
+| `js/documentos-sueltos.js` | Los papeles sin asunto, "Meter en un asunto", cerrar y reabrir, y la vigilancia de la carpeta |
 | `js/asuntos-nuevo.js` | Crear un asunto, el cuadro de datos de un tercero y los pies |
 | `js/archivo-personas.js` | Personas y empresas, el ARCHIVO, y cambiar los datos de un tercero |
 | `js/ajustes.js` | La pantalla de Ajustes: tipos (pestañas, buscador, aviso en vivo), estados y tipos de documento |
@@ -772,7 +775,7 @@ de `App` va después del fichero que lo define.
 | `js/traer-datos.js` | El botón de traer los CSV de Séneca desde donde estén |
 | `js/lector.js` | El panel de la derecha para leer, con su borde para estirarlo |
 | `js/bandeja-correos.js` | La bandeja de correos, la huella del hilo, lo que deja un correo dentro del asunto, y la tarjeta "Borrador en camino" (`window.Bandeja`) |
-| `js/bandeja-enlace.js` | "Elegir asunto": el cuadro para escogerlo a mano, y la puntuación de parecido |
+| `js/bandeja-enlace.js` | "Elegir asunto": llama al cuadro compartido, con la puntuación de parecido de un correo |
 | `js/correo-adjuntos.js` | El bloque "Documentos de este asunto" del cuadro de Correo, y el encargo `<id>.envio.json` |
 | `js/barra.js` | La barra plegable, el botón grande de Nuevo asunto y el icono de Ajustes plegado |
 | `js/vista.js` | Los filtros plegados y cuándo se ve el tablón |
@@ -802,7 +805,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/duplicados.mjs` | Prueba de que no se dupliquen los asuntos, y de unir los que ya existen |
 | `pruebas/ajustes-agil.mjs` | Prueba de las pestañas, el buscador cruzado, el aviso en vivo y la barra fija |
 | `pruebas/papelera.mjs` | Prueba de borrar con papelera, devolver y borrar del todo |
-| `pruebas/documentos-sueltos.mjs` | Prueba de "Meter en un asunto": elegir uno abierto, nombre repetido, traslado fallido y puntuación |
+| `pruebas/documentos-sueltos.mjs` | Prueba de "Meter en un asunto": un documento suelto a un asunto que ya existe |
 | `pruebas/envios.mjs` | Prueba de mandar documentos por correo: el encargo, el hilo, el límite de 20 MB, "listo" y "error" |
 | `pruebas/plantillas.mjs` | Prueba de las plantillas: huecos, "Faltan datos", cambiar de plantilla, sin plantillas, y el recorte de Séneca |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
@@ -817,11 +820,10 @@ de `App` va después del fichero que lo define.
 | `docs/UNIR-VER-DENTRO.md` | El encargo de la pantalla propia de duplicados |
 | `docs/REPARTO-CONTEXTO.md` | El encargo de repartir el contexto en tres documentos |
 | `docs/CORREOS-AL-ASUNTO.md` | El encargo de enlazar correos a un asunto y seguir el hilo |
+| `docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md` | El encargo de meter un documento suelto en un asunto que ya existe |
 | `docs/AHORRO-CUOTA.md` | Reglas para gastar menos cuota al trabajar la cola |
-| `docs/CORREOS-AL-ASUNTO.md` | El encargo de enlazar correos a un asunto ya creado (fila 11 de la cola, EN CURSO) |
-| `docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md` | El encargo de meter un documento de Por clasificar en un asunto ya creado |
-| `docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md` | El encargo de adjuntar documentos del asunto a un borrador de Gmail (pendiente) |
-| `docs/PLANTILLAS-DE-CORREO.md` | El encargo de las plantillas de correo y de mensaje por tipo (pendiente) |
+| `docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md` | El encargo de adjuntar documentos del asunto a un borrador de Gmail |
+| `docs/PLANTILLAS-DE-CORREO.md` | El encargo de las plantillas de correo y de mensaje por tipo |
 | `README.md` | — |
 
 ### Lo que la aplicación guarda en `_GESTOR`
