@@ -81,6 +81,12 @@ plantillas acabarán colgando también de los tipos de hito.
 Algunas instrucciones (`docs/HITOS.md` entre ellas) piden subir a `main` sin pull request. Esta
 sesión concreta de Claude Code (la de "en la nube", disparada desde GitHub) tiene forzado lo
 contrario: trabajar en una rama propia y abrir un pull request, sin permiso para tocar `main`
-directamente. Mientras se lance así, las filas de esta cola se suben con pull request; Francisco
-tiene que fusionarlo para que Vercel publique. Si se quiere volver a "directo a main", hay que
-lanzar la cola desde una sesión de Claude Code normal (terminal u ordenador), no desde la nube.
+directamente. Mientras se lance así, las filas de esta cola se suben con pull request. Si se
+quiere volver a "directo a main", hay que lanzar la cola desde una sesión de Claude Code normal
+(terminal u ordenador), no desde la nube.
+
+**Permiso permanente de Francisco (16-sep-2026): fusionar el pull request lo hace Claude Code
+solo**, sin esperar a que Francisco lo haga a mano. Antes de fusionar: la batería de pruebas
+(`npm test`) tiene que estar en verde, el PR sin conflictos con `main` (`mergeable_state: clean`)
+y sin ningún comentario de revisión pendiente de responder. Fusionado eso, Vercel publica solo:
+comprobar lo publicado con `curl` sigue haciendo falta después, no antes.

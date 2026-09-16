@@ -98,6 +98,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 ## 6. Reglas de código que no se pueden olvidar
 
 - El repositorio es la versión buena; Vercel publica solo. Un solo proyecto de Vercel.
+- **Permiso permanente de Francisco**: cuando el trabajo vaya por pull request (sesiones desde la
+  nube), Claude Code lo fusiona solo en cuanto esté en verde y sin conflictos. No hace falta
+  esperar a que Francisco lo haga a mano (ver la nota al final de `docs/COLA.md`).
 - **Comprobar siempre lo publicado con `curl`**, nunca dar la publicación por hecha.
 - Antes de colgar una función nueva de `App`, comprobar que el nombre no está ya cogido.
 - Solo hay un cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.
