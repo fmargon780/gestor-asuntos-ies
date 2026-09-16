@@ -53,9 +53,14 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 11 | `docs/CORREOS-AL-ASUNTO.md` | PENDIENTE | Elegir a mano el asunto de destino de un correo, con lista de "Podrían encajar"; huella del hilo en `asuntos.json`; el recolector de Apps Script sigue los hilos ya conocidos para que entren y salgan respuestas. Acordado con Francisco el 16-sep-2026. |
 | 12 | `docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md` | PENDIENTE | Botón "Meter en un asunto" en Por clasificar, para mandar un documento suelto a un asunto que ya existe. Comparte el elegidor de asuntos con la fila 11. Acordado con Francisco el 16-sep-2026. |
 | 13 | `docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md` | PENDIENTE | Mandar los documentos de un asunto por correo: se eligen con casillas en el cuadro "Correo", y el script de Apps Script deja un borrador en Gmail con todo adjuntado. Responde dentro del hilo si el asunto ya tiene uno. Necesita la huella del hilo de la fila 11. Acordado con Francisco el 16-sep-2026. |
+| 14 | `docs/PLANTILLAS-DE-CORREO.md` | PENDIENTE | Plantillas de texto por tipo de asunto, con huecos que se rellenan solos, para el correo y para el mensaje de Séneca. La firma y el nombre del centro salen del código y pasan a Ajustes. Acordado con Francisco el 16-sep-2026. |
 
 ## Lo que vendrá después
 
 `docs/PROXIMOS-ASUNTOS.md` guarda los nueve asuntos que Francisco dejó apuntados el 14-sep-2026.
 No se trabajan: cada uno se habla con él y se convierte en su propia instrucción antes de entrar
-en esta cola. Los puntos 5, 8 y 7 de esa lista ya son las filas 11, 12 y 13 de esta cola.
+en esta cola. Los puntos 5, 8, 7 y 6 de esa lista ya son las filas 11, 12, 13 y 14.
+
+El punto 1 (comprobación del CSV y copia auténtica) está hablado a medias: falta que Francisco
+mire, con un documento real, si el enlace de verificación del pie abre la copia auténtica sin
+pedir certificado ni captcha. Hasta entonces no se puede diseñar.
