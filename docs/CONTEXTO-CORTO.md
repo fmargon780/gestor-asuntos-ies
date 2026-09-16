@@ -77,6 +77,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Papelera: nada se borra del todo a la primera.
 - "Meter en un asunto" en Por clasificar: manda un documento suelto a un asunto ya creado (abierto
   o archivado), con "Podrían encajar" por puntuación de parecido.
+- Mandar documentos de un asunto por correo: se marcan en el cuadro "Correo" y el script de Apps
+  Script deja un borrador en Gmail (nunca envía), con tarjeta "Borrador en camino".
 - Copias de seguridad diarias, detección de fichero roto, fusión de conflictos de Dropbox.
 - Pruebas automáticas en GitHub Actions en cada subida.
 - Escape y botón de salida en toda pantalla; copiar el nombre de un relacionado en orden normal;

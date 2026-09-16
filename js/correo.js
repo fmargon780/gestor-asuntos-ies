@@ -39,6 +39,7 @@
   var personaActual = null;  /* la ficha del tercero, ya buscada en los CSV */
   var pasoSeneca = 0;        /* 0 el asunto, 1 el texto, 2 hecho */
   var algoCambiado = false;  /* al cerrar, la ficha se repinta si se ha tocado algo */
+  var documentosAdjuntados = [];  /* los que ha llevado el último borrador preparado */
 
   function $(id) { return document.getElementById(id); }
 
@@ -192,7 +193,13 @@
       return 'Mensaje por Séneca a ' + (aQuien(viendo) || 'el tercero') + cola;
     }
     var para = paraDelCuadro();
-    return 'Correo ' + (para ? 'a ' + para : 'preparado') + cola;
+    var base = 'Correo ' + (para ? 'a ' + para : 'preparado') + cola;
+    if (documentosAdjuntados.length) {
+      base += ' · con ' + documentosAdjuntados.length +
+        ' documento' + (documentosAdjuntados.length === 1 ? '' : 's') +
+        ': ' + documentosAdjuntados.join(', ');
+    }
+    return base;
   }
 
   /* A quién se le va a escribir, dicho en palabras. En Séneca no hay
@@ -294,19 +301,20 @@
     asuntoLargo = !porSeneca;   /* en Séneca manda la versión legible: el nombre de la carpeta no cabe */
     yaApuntado = false;
     algoCambiado = false;
+    documentosAdjuntados = [];
     var esperar = U.preguntar(porSeneca ? 'Mensaje por Séneca' : 'Correo de este asunto',
       '<div id="correo-caja"><p class="explica">Preparando…</p></div>', 'Cerrar', true);
     var persona = null;
     try { persona = await buscarPersona(a); } catch (e) { persona = null; }
     personaActual = persona;
-    pintarCuadro(a, persona);
+    await pintarCuadro(a, persona);
     await esperar;
     /* Si se ha apuntado la nota o cambiado el estado, la ficha que hay
        detrás se ha quedado vieja: se vuelve a abrir. */
     if (algoCambiado) App.abrirFicha(a, modoDelAsunto);
   }
 
-  function pintarCuadro(a, persona) {
+  async function pintarCuadro(a, persona) {
     var caja = $('correo-caja');
     if (!caja) return;
     var correos = correosDe(persona);
@@ -314,7 +322,14 @@
        los dos tutores. Quitar una casilla es más rápido que ponerla. */
     correos.forEach(function (c) { if (elegidos[c.dir] === undefined) elegidos[c.dir] = true; });
 
-    caja.innerHTML = porSeneca ? cuerpoDeSeneca(a) : cuerpoDeCorreo(a, correos);
+    /* Los documentos del asunto no van en el cuadro de Séneca: allí no
+       hay adjuntos. */
+    var bloqueAdjuntos = '';
+    if (!porSeneca && window.CorreoAdjuntos) {
+      try { bloqueAdjuntos = await CorreoAdjuntos.pintarBloque(a); } catch (e) { bloqueAdjuntos = ''; }
+    }
+
+    caja.innerHTML = porSeneca ? cuerpoDeSeneca(a) : cuerpoDeCorreo(a, correos, bloqueAdjuntos);
 
     if (porSeneca) {
       engancharComunes(a);
@@ -323,11 +338,17 @@
     }
     engancharComunes(a);
     engancharCorreo(a);
+    if (bloqueAdjuntos && window.CorreoAdjuntos) {
+      CorreoAdjuntos.enganchar(a, function (nombres) {
+        documentosAdjuntados = nombres;
+        apuntarElRastro(a);
+      });
+    }
   }
 
   /* ---------- el cuadro del correo ---------- */
 
-  function cuerpoDeCorreo(a, correos) {
+  function cuerpoDeCorreo(a, correos, bloqueAdjuntos) {
     return '<label class="etiqueta" style="margin-top:0">Para</label>' +
       (correos.length
         ? '<div id="correo-lista">' + correos.map(function (c) {
@@ -347,6 +368,8 @@
         'style="margin-top:8px">' +
 
       camposComunes(a) +
+
+      (bloqueAdjuntos || '') +
 
       '<div class="correo-botones" style="margin-top:14px">' +
         '<button type="button" class="boton" id="correo-copiar-para">Copiar Para</button>' +

@@ -1131,3 +1131,20 @@ una línea cada una. El texto largo que tenían antes era:
   ficheros). **Subido a una rama con pull request, no directamente a `main`**: el entorno de
   ejecución de esta sesión (Claude Code en la nube) lo exige así, aunque `docs/CONTEXTO.md` diga
   lo contrario; hace falta que alguien fusione el pull request para que Vercel lo publique.
+- **13 · `docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md`**: Terminada 16-sep-2026 · 20:57, en la misma
+  sesión y el mismo pull request que la fila 12. Gmail no deja que una página web adjunte
+  ficheros, así que la salida sigue siendo la carpeta `GESTOR-BANDEJA`: bloque nuevo "Documentos
+  de este asunto" en el cuadro de Correo (`js/correo-adjuntos.js`, solo ahí, nunca en el de
+  Séneca), con una casilla por documento (desmarcadas de partida) y un límite de 20 MB. Al
+  preparar, se copian los marcados a la bandeja con el nombre `<id> - <original>` y, el último,
+  el encargo `<id>.envio.json` (con el hilo del asunto si `hilos` ya existe, de la fila 11; si no,
+  cadena vacía y sale como correo nuevo, tal como preveía el propio encargo). Se apunta en
+  `_GESTOR/envios.json` (una lista, no un objeto) para que la tarjeta "Borrador en camino" se vea
+  aunque se cierre el cuadro; esa tarjeta y su vigilancia (cada 15 segundos, solo mientras haya
+  algún encargo vivo) viven en `js/bandeja-correos.js`, que también deja de leer los
+  `.envio.json`/`.listo.json`/`.error.json` como si fueran correos recogidos. El script de Apps
+  Script (`mandarBorradores()`, en `apps-script/gestor-correos.gs`) monta el borrador con
+  `GmailApp.createDraft` o, si hay hilo, `createDraftReply`, siempre como borrador, nunca lo
+  envía; el disparador pasa de cinco minutos a uno. Pruebas nuevas en `pruebas/envios.mjs` (los
+  seis escenarios del encargo), batería completa en verde. Igual que la fila 12: pendiente de que
+  se fusione el pull request para que Vercel lo publique.

@@ -256,6 +256,39 @@ redactar se apunta sola una nota (una sola vez por cuadro). Solo Séneca: no hay
 solo botón que se va cambiando: "1. Copiar el asunto" → "2. Ahora, copiar el texto" → "Copiado.
 Pégalo y envía".
 
+### Mandar los documentos de un asunto por correo
+
+Gmail no deja que una página web le enganche ficheros. Bloque **"Documentos de este asunto"**
+(`js/correo-adjuntos.js`, `window.CorreoAdjuntos`), solo en el cuadro de Correo (nunca en el de
+Séneca): la lista de ficheros del asunto con una casilla cada uno (desmarcadas de partida) y el
+botón **"Preparar borrador con los documentos"**.
+
+- Al pulsar, se copian los documentos marcados a `GESTOR-BANDEJA` con el nombre `<id> -
+  <nombre original>` y, **el último**, el encargo `<id>.envio.json` (`para`, `asunto`, `cuerpo`,
+  `adjuntos`, `hilo` —de `hilos` en la ficha del asunto si lo tiene, si no cadena vacía— y
+  `asuntoCarpeta`). Si lo marcado suma más de **20 MB**, no se prepara nada y sale un aviso.
+- Se apunta también en `_GESTOR/envios.json` (una lista, no un objeto como los demás ficheros de
+  `_GESTOR`), para que la tarjeta **"Borrador en camino — \<asunto\>"** se vea aunque se cierre
+  el cuadro. Se relee antes de escribir, con `Copias.guardar`.
+- **La vigilancia y la tarjeta viven en `js/bandeja-correos.js`** (no en `js/correo-adjuntos.js`):
+  cada 15 segundos, y solo mientras haya algún encargo vivo, mira si ha aparecido `<id>.listo.json`
+  (pasa a botón "Abrir el borrador en Gmail") o `<id>.error.json` (aviso rojo con el motivo y
+  botón "Entendido"); pasados 3 minutos sin respuesta, aviso ámbar y botón "Dejarlo" (borra el
+  `.envio.json` y sus copias de la bandeja, y el encargo de `envios.json`). `window.Bandeja`
+  expone `carpeta()` (la misma carpeta de los correos recogidos) y `avisarEnvioNuevo()`, para que
+  la tarjeta no espere a la próxima vuelta de 15 segundos.
+- `js/bandeja-correos.js` **no lee un `.envio.json`, `.listo.json` ni `.error.json` como si fuera
+  un correo recogido**: se descartan antes de mirar el `.id` de dentro.
+- El rastro reutiliza `apuntarElRastro` de `js/correo.js`: si se ha preparado un borrador con
+  documentos en este cuadro, la nota añade "· con N documentos: …".
+- **Siempre borrador, nunca envío automático.** El script de Apps Script
+  (`apps-script/gestor-correos.gs`, `mandarBorradores()`) lo monta con `GmailApp.createDraft` o,
+  si el encargo trae `hilo`, con `createDraftReply`, y pasa a revisar cada **minuto** (antes,
+  cinco). El enlace que deja en `.listo.json` es siempre la lista de borradores
+  (`#drafts`), nunca uno construido con el identificador del borrador.
+
+Se comprueba con `pruebas/envios.mjs`.
+
 ### Registrar un documento en un paso
 
 Botón **Registrar**, en cada documento que aún no lleve las cuatro piezas del registro en su
@@ -628,11 +661,12 @@ de `App` va después del fichero que lo define.
 | `js/tablon.js` | El tablón de notas rápidas, con las notas "Solo para mí" |
 | `js/copiar.js` | Los botones de copiar: el Nº escolar y el nombre del documento |
 | `js/correo.js` | El correo y el mensaje de Séneca, con su rastro |
+| `js/correo-adjuntos.js` | El bloque "Documentos de este asunto" del cuadro de Correo, y el encargo `<id>.envio.json` |
 | `js/salir.js` | El botón de Salir del pie de la barra |
 | `js/rescate-datos.js` | Recoge los CSV que se hayan quedado un piso más arriba |
 | `js/traer-datos.js` | El botón de traer los CSV de Séneca desde donde estén |
 | `js/lector.js` | El panel de la derecha para leer, con su borde para estirarlo |
-| `js/bandeja-correos.js` | La bandeja de correos y lo que deja un correo dentro del asunto |
+| `js/bandeja-correos.js` | La bandeja de correos, lo que deja un correo dentro del asunto, y la tarjeta "Borrador en camino" (`window.Bandeja`) |
 | `js/barra.js` | La barra plegable, el botón grande de Nuevo asunto y el icono de Ajustes plegado |
 | `js/vista.js` | Los filtros plegados y cuándo se ve el tablón |
 | `js/dni.js` | El DNI del alumnado, el aviso de que falta y la búsqueda por DNI |
@@ -662,6 +696,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/ajustes-agil.mjs` | Prueba de las pestañas, el buscador cruzado, el aviso en vivo y la barra fija |
 | `pruebas/papelera.mjs` | Prueba de borrar con papelera, devolver y borrar del todo |
 | `pruebas/documentos-sueltos.mjs` | Prueba de "Meter en un asunto": elegir uno abierto, nombre repetido, traslado fallido y puntuación |
+| `pruebas/envios.mjs` | Prueba de mandar documentos por correo: el encargo, el hilo, el límite de 20 MB, "listo" y "error" |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |
@@ -697,6 +732,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `campos.json` | Los campos propios y los campos configurados de cada tipo de asunto |
 | `papelera.json` | El índice de la papelera: qué se ha borrado, de dónde y cuándo |
 | `no-duplicados.json` | Grupos de posibles duplicados descartados con "No son el mismo", por la firma de sus nombres |
+| `envios.json` | **Es una lista, no un objeto.** Los encargos vivos de "mandar documentos por correo": `{ id, asunto, para, creado }` |
 | `datos/*.csv` | Alumnado (Séneca), personal, empresas y otros |
 | `PAPELERA/` | Las carpetas y ficheros borrados, cada uno en su subcarpeta `AAMMDD-HHMM <nombre>` |
 | `copias/*.json` | Copias de seguridad de los once ficheros de arriba, una por día, 30 como mucho de cada uno |
