@@ -16,15 +16,3 @@
 .correo-fila input { width: 16px; height: 16px; margin-top: 2px; flex: 0 0 auto; cursor: pointer; }
 
 .correo-botones { display: flex; gap: 8px; flex-wrap: wrap; }
-
-/* ---------- los documentos que se mandan (js/correo-adjuntos.js) ---------- */
-
-#correo-adjuntos .etiqueta { margin-top: 16px; }
-#correo-adjuntos .correo-fila strong { font-weight: 600; }
-#correo-adjuntos .aviso { margin: 10px 0 0; }
-
-/* La tarjeta del borrador en camino, encima de la bandeja de correos. */
-#envios-en-camino.envios { margin: 0 0 22px; }
-.envio-tarjeta { margin-bottom: 10px; }
-.envio-tarjeta .boton { margin-top: 10px; }
-.envio-esperando, .envio-listo { background: #f5f2fd; border: 1px solid #ddd4f5; }

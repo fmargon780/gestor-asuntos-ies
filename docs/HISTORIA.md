@@ -100,6 +100,17 @@ verde, incluidos `pruebas/correos.mjs` y `pruebas/envios.mjs` (que también usan
 para la bandeja de correos y los adjuntos): un asunto sin plantillas de su tipo sigue
 comportándose exactamente igual que antes de este cambio.
 
+**Corrección, al fusionar**: mientras esta sesión hacía este mismo arreglo en su rama, otra
+sesión en paralelo hizo también el suyo directamente sobre `main` (en el mismo pull request que
+las filas 12 y 13), sin verse la una a la otra, y con el diseño que de verdad pedía el encargo:
+`camposComunes`/`interiorDeComunes` con su propio contenedor `#correo-comunes`, tal y como sigue
+descrito en `docs/CONTEXTO.md`. Al fusionar esta rama se ha mantenido la de `main` —llegó antes—
+y se ha descartado todo lo de `js/correo.js` descrito arriba; lo único que ha sobrevivido de
+esta entrada es el diagnóstico (fila 14 se había dado por hecha sin estarlo) y la corrección de
+la entrada de "Qué me toca" sobre por qué fallaba `pruebas/plantillas.mjs`. Encima de la versión
+de `main` se ha aplicado, ya sí, el cambio de la fila 17: `valoresDePlantilla(a)` pasa a ser
+`Plantillas.valoresDeAsunto(asunto)`, pública y en `js/plantillas.js`.
+
 ## 16-sep-2026 — Qué me toca
 
 Fila 16 de la cola (`docs/QUE-ME-TOCA.md`), depende de la fila 15 (hitos, ya `HECHA`).

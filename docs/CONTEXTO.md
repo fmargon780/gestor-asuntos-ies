@@ -444,21 +444,16 @@ crean en Ajustes, pegadas a un tipo de asunto, y se guardan en `_GESTOR/plantill
   tercero) y se apunta en la lista de "faltan"; uno que no se reconozca se deja tal cual, también
   apuntado, para que un hueco mal escrito no rompa nada. Las llaves se comparan con
   `U.normalizar` (sin mayúsculas ni acentos), nunca al sustituir.
-- **En el cuadro de Correo y en el de Séneca** (los dos, `js/correo.js`, dentro de
-  `camposComunes`, que es lo único que las dos vistas comparten: no hace falta ningún
-  `#correo-comunes` aparte porque todo el bloque —desplegable, aviso y cuerpo— se repinta junto
-  cada vez que se abre el cuadro). Un desplegable **"Plantilla"** (`#correo-plantilla`,
-  `desplegableDePlantilla`) encima del cuerpo: con una sola plantilla del tipo, sale puesta; con
-  varias, sale la primera y se puede cambiar; sin ninguna, el desplegable no se pinta y el cuerpo
-  sale como siempre. Debajo, si `Plantillas.rellenar` deja algo en `faltan`, un aviso ámbar
-  `#correo-faltan-datos` ("Faltan datos: …", con las etiquetas de `Plantillas.HUECOS`, no las
-  claves en bruto). **Cambiar de plantilla** (`cambiarPlantilla`): si lo que hay escrito coincide
-  con lo último que puso el propio código (`cuerpoGeneradoPorCodigo`), se cambia sin preguntar;
-  si no, es que se ha tocado a mano, y se pregunta **en línea, dentro del propio cuadro**
-  (`#correo-plantilla-confirmar`, con "Seguir con lo escrito" / "Cambiar de todas formas"),
-  nunca con un segundo `U.preguntar`: solo hay un cuadro de diálogo en toda la aplicación, y este
-  ya está ocupado por el de Correo. En Séneca, al copiar el texto (paso 2 de `engancharSeneca`)
-  se recorta a **4.000 letras** si hace falta, avisando en `#seneca-explica`.
+- **En el cuadro de Correo y en el de Séneca** (los dos, `js/correo.js`): un desplegable
+  "Plantilla" encima del cuerpo, dentro de `camposComunes`/`interiorDeComunes`, en su propio
+  `#correo-comunes` para poder repintarse solo sin tocar el "Para" ni los documentos. Con una
+  plantilla, sale puesta; con varias, sale la primera; sin ninguna, el desplegable no se pinta y
+  el cuerpo sale como siempre. Encima del cuerpo, si falta algún dato, un aviso ámbar "Faltan
+  datos: …". **Cambiar de plantilla con algo escrito a mano pregunta antes de pisarlo — en línea,
+  dentro del propio cuadro (`#correo-plantilla-confirmar`), nunca con un segundo `U.preguntar`**:
+  solo hay un cuadro de diálogo en toda la aplicación, y este ya está ocupado por el de Correo.
+  En Séneca, al copiar el texto (paso 2 de `engancharSeneca`) se recorta a **4.000 letras** si
+  hace falta, avisando en una línea.
 - **En Ajustes**, bloque propio "Plantillas de correo" (vive entero en `js/plantillas.js`, no
   toca `js/ajustes.js`, que ya pasa de 47 KB: se engancha solo con `window.Gestor.alRefrescar`,
   igual que `js/bandeja-correos.js` y `js/unir-asuntos.js`). Lista con buscador cruzado, alta y
@@ -504,9 +499,10 @@ El gemelo en papel de las de correo (16-sep-2026, `docs/PLANTILLAS-DE-DOCUMENTO.
   reciente de la carpeta que ya lo lleve en el nombre, sin depender de `js/documentos.js`), `hoy`,
   `hoyLargo` ("16 de septiembre de 2026"), `lugarYFecha` ("En Alhaurín el Grande, a..."), `limite`,
   `usuario`, `centro`, `localidad`, `direccionCentro`, `codigoCentro`, `cargo` y `firma` (el texto
-  de la firma del centro, ya relleno con el resto de estos mismos valores). `js/correo.js` la
-  llama una vez por apertura del cuadro (como ya hacía con `personaActual`) y guarda el resultado
-  en `valoresActuales`; `cuerpoDelCorreo` lo usa en vez de tener su propia función.
+  de la firma del centro, ya relleno con el resto de estos mismos valores). `js/correo.js`
+  (`abrirCuadro`) la llama una vez por apertura del cuadro, junto a `Plantillas.cargar`, y guarda
+  el resultado en `valoresActuales`; `cuerpoDelMedio` y `textoDeLaFirma` lo usan en vez de tener
+  su propia función de valores (`valoresDePlantilla`/`camposDelAsunto`, que ya no existen).
 - **`js/docx.js`** (`window.Docx`, sin librerías ni CDN): un `.docx` es un ZIP, leído y escrito a
   mano. `Docx.rellenar(bufferDocx, valores)` -> `{ blob, faltan }` (acepta `ArrayBuffer` o
   `Uint8Array`). Lee el directorio central (buscado desde el final del fichero, que es el único
