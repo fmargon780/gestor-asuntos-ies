@@ -1110,3 +1110,24 @@ una línea cada una. El texto largo que tenían antes era:
   publicada** (la red de esta sesión concreta no llega a `gestor-de-asuntos.vercel.app`: la
   bloquea la política de salida de este contenedor, no algo del código). Queda pendiente de
   confirmar en el navegador la próxima vez que se entre.
+- **12 · `docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md`**: Terminada 16-sep-2026 · 20:40. Botón "Meter en
+  un asunto" en cada tarjeta de Por clasificar, para mandar un documento suelto a un asunto que
+  ya existe en vez de crear uno nuevo. La fila 11 de la cola (`docs/CORREOS-AL-ASUNTO.md`) seguía
+  **EN CURSO** de otra sesión al empezar esta (regla 6 de `docs/COLA.md`: se saltó y se cogió la
+  siguiente PENDIENTE), así que el elegidor de asuntos nace en su propio módulo,
+  `js/elegir-asunto.js` (`window.ElegirAsunto`), pensado para que la bandeja de correos lo
+  reutilice cuando esa fila se retome, en vez de duplicar el buscador y la puntuación. El cuadro
+  enseña "Podrían encajar" (como mucho cinco, más de 40 puntos) y la lista completa con buscador,
+  abiertos primero y archivados con su etiqueta. La puntuación de un documento suelto (en
+  `js/documentos-sueltos.js`) sale de las palabras del nombre del fichero, del nombre del
+  tercero, de si el asunto está abierto y de si se movió hace menos de 30 días. Al elegir un
+  asunto archivado, ofrece reabrirlo (con `App.reabrirAsunto`, que pide su propia confirmación) o
+  meterlo sin reabrir. Nada se pierde: nombre repetido en el destino o un traslado a medias dejan
+  el documento donde estaba, con aviso. Pruebas nuevas en `pruebas/documentos-sueltos.mjs` (seis
+  escenarios del encargo). De paso se arregló `pruebas/logica.mjs`: la fecha de cese del personal
+  estaba escrita a mano (`15/09/2026` y `06/09/2026`) y se quedó desfasada al llegar esa fecha,
+  igual que ya le pasó una vez a la edad (ver el comentario de "la edad" en ese mismo fichero);
+  ahora sale de `fechaHace(0, …)`, relativa a hoy. Batería completa en verde (`npm test`, 20
+  ficheros). **Subido a una rama con pull request, no directamente a `main`**: el entorno de
+  ejecución de esta sesión (Claude Code en la nube) lo exige así, aunque `docs/CONTEXTO.md` diga
+  lo contrario; hace falta que alguien fusione el pull request para que Vercel lo publique.

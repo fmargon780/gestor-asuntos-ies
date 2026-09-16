@@ -85,9 +85,117 @@ App.tarjetaSuelto = function (s, pie, esNuevo) {
   crear.onclick = function () { App.empezarAsuntoCon(s); };
   acciones.appendChild(crear);
 
+  var meter = document.createElement('button');
+  meter.className = 'boton';
+  meter.textContent = 'Meter en un asunto';
+  meter.title = 'Para cuando este documento es de un asunto que ya existe';
+  meter.onclick = function () { App.meterSueltoEnAsunto(s); };
+  acciones.appendChild(meter);
+
   div.appendChild(acciones);
   return div;
 };
+
+/* ---------- meter un documento suelto en un asunto que ya existe ----------
+
+   Las dos piezas que hacen falta ya existen y se usan juntas al crear
+   un asunto desde un documento suelto (js/asuntos-nuevo.js):
+   Carpetas.moverFichero y, justo después, App.verDocumentos para abrir
+   el cuadro de ponerle nombre. Aquí es igual, sin crear la carpeta. */
+(function () {
+
+  /* Lo único que se sabe de un documento suelto es el nombre de su
+     fichero: sin extensión, sin la fecha AAMMDD si la trae delante y
+     sin un código de registro de Séneca (26EM1234), que tampoco dicen
+     nada del asunto al que pertenece. */
+  function limpiarNombreDeSuelto(nombre) {
+    var sinExt = String(nombre || '').replace(/\.[A-Za-z0-9]{1,8}$/, '');
+    sinExt = sinExt.replace(/^\d{6}\s+/, '');
+    sinExt = sinExt.replace(/^\d{2}[ES][MA]\d{4,6}\s+/i, '');
+    return sinExt;
+  }
+
+  function puntuarAsuntoParaSuelto(nombreFichero, asunto) {
+    var limpio = limpiarNombreDeSuelto(nombreFichero);
+    var nombreAsuntoNorm = U.normalizar(asunto.nombre);
+    var puntos = 0;
+
+    ElegirAsunto.palabrasUtilesDe(limpio).forEach(function (p) {
+      if (nombreAsuntoNorm.indexOf(p) !== -1) puntos += 10;
+    });
+
+    var tercero = ElegirAsunto.terceroDe(asunto);
+    if (tercero && U.normalizar(limpio).indexOf(U.normalizar(tercero)) !== -1) puntos += 40;
+
+    if (!asunto.archivado) puntos += 15;
+    if (ElegirAsunto.creadoOMovidoHaceMenosDe30Dias(asunto)) puntos += 10;
+
+    return puntos;
+  }
+
+  /* Mueve el documento a la carpeta del asunto y abre el cuadro de
+     ponerle nombre. Si algo falla, el documento se queda en Por
+     clasificar: nunca se pierde. */
+  async function moverSueltoAAsunto(s, carpetaDestino, nombreAsunto) {
+    var ruta = nombreAsunto + '/' + s.nombre;
+    if (ruta.length > App.LARGO_MAXIMO_NOMBRE) {
+      var seguir = await U.preguntar('El nombre es muy largo',
+        '<p>La ruta de destino tendría ' + ruta.length + ' caracteres:</p>' +
+        '<p class="nota">' + U.escapar(ruta) + '</p>' +
+        '<p>Las rutas muy largas dan problemas en un Dropbox sincronizado.</p>', 'Meterlo igual');
+      if (!seguir) return;
+    }
+
+    try {
+      var yaEsta = await Carpetas.ficheros(carpetaDestino);
+      var repetido = yaEsta.some(function (f) { return f.nombre === s.nombre; });
+      if (repetido) {
+        U.aviso('Ya hay un documento llamado "' + s.nombre + '" en ese asunto. Sigue en Por clasificar.', 'malo');
+        return;
+      }
+
+      await Carpetas.moverFichero(App.E.abiertos, s.nombre, carpetaDestino);
+      delete App.E.reciales[s.nombre];
+      App.actualizarTitulo();
+      U.aviso('Documento metido en el asunto.', 'bueno');
+      await App.verAbiertos();
+
+      var recien = App.E.listaAbiertos.filter(function (a) { return a.nombre === nombreAsunto; })[0];
+      if (recien) await App.verDocumentos(recien);
+    } catch (e) {
+      U.aviso('El documento no ha podido entrar en el asunto. Sigue en Por clasificar: ' + e.message, 'malo');
+    }
+  }
+
+  App.meterSueltoEnAsunto = async function (s) {
+    var res = await ElegirAsunto.abrir({
+      titulo: 'Meter en un asunto',
+      calcularPuntuacion: function (a) { return puntuarAsuntoParaSuelto(s.nombre, a); }
+    });
+    if (res.accion !== 'elegido') return;
+    var asunto = res.asunto;
+
+    if (!asunto.archivado) {
+      await moverSueltoAAsunto(s, asunto.handle, asunto.nombre);
+      return;
+    }
+
+    var eleccion = await ElegirAsunto.preguntarSiReabrir(asunto.nombre);
+    if (!eleccion) return;
+
+    if (eleccion === 'sin-reabrir') {
+      await moverSueltoAAsunto(s, asunto.handle, asunto.nombre);
+      return;
+    }
+
+    await App.reabrirAsunto({ nombre: asunto.nombre, padre: asunto.padre });
+    var reabierto = await Carpetas.existe(App.E.abiertos, asunto.nombre);
+    if (!reabierto) return;   /* canceló el segundo aviso, o ha fallado */
+    var carpetaDestino = await App.E.abiertos.getDirectoryHandle(asunto.nombre);
+    await moverSueltoAAsunto(s, carpetaDestino, asunto.nombre);
+  };
+
+})();
 
 App.abrirSuelto = async function (s) {
   try {

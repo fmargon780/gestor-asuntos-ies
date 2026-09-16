@@ -496,6 +496,37 @@ devolver a su sitio.
 
 Se comprueba con `pruebas/papelera.mjs`.
 
+### Meter un documento suelto en un asunto que ya existe
+
+Botón **"Meter en un asunto"** en cada tarjeta de "Por clasificar" (`js/documentos-sueltos.js`),
+entre "Crear asunto con él" y "Borrar", para cuando el documento no es de un asunto nuevo, sino
+de uno que ya está abierto o archivado.
+
+- **El cuadro de elegir asunto** (`js/elegir-asunto.js`, `window.ElegirAsunto`) es un módulo
+  aparte, pensado para que lo use también la bandeja de correos (fila 11 de `docs/COLA.md`, sigue
+  EN CURSO de otra sesión) cuando se retome: cada sitio trae su propia forma de puntuar el
+  parecido con `calcularPuntuacion(asunto)`; el módulo solo pone el cuadro, "Podrían encajar"
+  (como mucho cinco, más de 40 puntos, de mayor a menor), el buscador y la lista completa
+  (abiertos primero, archivados con la etiqueta "(Archivado)"). Relee el ARCHIVO entero
+  (`App.verArchivo`) cada vez que se abre, para no ofrecer algo que ya no está.
+- **La puntuación de un documento suelto** (en `js/documentos-sueltos.js`, con las palabras del
+  módulo compartido): +10 por cada palabra de cuatro letras o más del nombre del fichero (sin
+  extensión, sin la fecha AAMMDD y sin un código de registro de Séneca por delante) que aparezca
+  en el nombre del asunto; +40 si el nombre del tercero del asunto aparece en el nombre del
+  fichero; +15 si el asunto está abierto; +10 si se abrió, reabrió o archivó hace menos de 30
+  días.
+- **Al elegir un asunto abierto**: se mueve el fichero con `Carpetas.moverFichero` a su carpeta y
+  se abre a continuación el cuadro de ponerle nombre (`App.verDocumentos`), igual que al crear un
+  asunto desde un documento suelto.
+- **Al elegir uno archivado**: `ElegirAsunto.preguntarSiReabrir` ofrece "Reabrir y meterlo aquí"
+  (con `App.reabrirAsunto`, que pide su propia confirmación) o "Meterlo sin reabrir" (va a su
+  carpeta dentro del ARCHIVO). No se toca el estado de un asunto que ya estaba abierto.
+- **Nada se pierde**: si ya hay un fichero con ese nombre en el destino, no se pisa nada y avisa;
+  si el traslado falla a medias, el documento se queda en Por clasificar y avisa con el motivo.
+  Respeta `App.LARGO_MAXIMO_NOMBRE` para la ruta de destino, igual que al crear un asunto.
+
+Se comprueba con `pruebas/documentos-sueltos.mjs`.
+
 ---
 
 ## 2. Cómo trabajamos el código ← LÉELO ANTES DE TOCAR NADA
@@ -574,7 +605,8 @@ de `App` va después del fichero que lo define.
 | `js/asuntos-lista.js` | Asuntos abiertos: las tres tarjetas, las tarjetas por tipo y la lista. Al leer la carpeta, descarta las que parecen temporales de sincronización, salvo que ya tengan ficha en `asuntos.json` |
 | `js/unir-asuntos.js` | Une asuntos duplicados que ya existen: aviso junto a Actualizar y pantalla propia "Duplicados" (`css/unir-asuntos.css`) |
 | `js/asuntos-editar.js` | Editar un asunto abierto: renombra la carpeta y mueve su ficha |
-| `js/documentos-sueltos.js` | Los papeles sin asunto, cerrar y reabrir, y la vigilancia de la carpeta |
+| `js/elegir-asunto.js` | El cuadro de elegir un asunto ya existente: "Podrían encajar", buscador y lista completa (`css/elegir-asunto.css`) |
+| `js/documentos-sueltos.js` | Los papeles sin asunto, cerrar y reabrir, la vigilancia de la carpeta, y "Meter en un asunto" |
 | `js/asuntos-nuevo.js` | Crear un asunto, el cuadro de datos de un tercero y los pies |
 | `js/archivo-personas.js` | Personas y empresas, el ARCHIVO, y cambiar los datos de un tercero |
 | `js/ajustes.js` | La pantalla de Ajustes: tipos (pestañas, buscador, aviso en vivo), estados y tipos de documento |
@@ -629,6 +661,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/duplicados.mjs` | Prueba de que no se dupliquen los asuntos, y de unir los que ya existen |
 | `pruebas/ajustes-agil.mjs` | Prueba de las pestañas, el buscador cruzado, el aviso en vivo y la barra fija |
 | `pruebas/papelera.mjs` | Prueba de borrar con papelera, devolver y borrar del todo |
+| `pruebas/documentos-sueltos.mjs` | Prueba de "Meter en un asunto": elegir uno abierto, nombre repetido, traslado fallido y puntuación |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |
@@ -641,6 +674,10 @@ de `App` va después del fichero que lo define.
 | `docs/UNIR-VER-DENTRO.md` | El encargo de la pantalla propia de duplicados |
 | `docs/REPARTO-CONTEXTO.md` | El encargo de repartir el contexto en tres documentos |
 | `docs/AHORRO-CUOTA.md` | Reglas para gastar menos cuota al trabajar la cola |
+| `docs/CORREOS-AL-ASUNTO.md` | El encargo de enlazar correos a un asunto ya creado (fila 11 de la cola, EN CURSO) |
+| `docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md` | El encargo de meter un documento de Por clasificar en un asunto ya creado |
+| `docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md` | El encargo de adjuntar documentos del asunto a un borrador de Gmail (pendiente) |
+| `docs/PLANTILLAS-DE-CORREO.md` | El encargo de las plantillas de correo y de mensaje por tipo (pendiente) |
 | `README.md` | — |
 
 ### Lo que la aplicación guarda en `_GESTOR`
