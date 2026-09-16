@@ -50,9 +50,10 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 8 | `docs/UNIR-VER-DENTRO.md` | HECHA | Pantalla propia "Duplicados", con "No son el mismo". Versión publicada `11-sep-2026 · 17:15`. Detalle en `docs/HISTORIA.md` |
 | 9 | `docs/REPARTO-CONTEXTO.md` | HECHA | Repartido `CONTEXTO.md` en `CONTEXTO-CORTO.md`, `CONTEXTO.md` y `HISTORIA.md`, y podada esta cola; no toca código ni publica nada nuevo. |
 | 10 | `docs/ARREGLOS-USO-2026-09-14.md` | HECHA | El 3 (borrar en Por clasificar) ya estaba hecho, de la papelera (fila 7). Escape y salida en toda pantalla, copiar el nombre de un relacionado en orden normal, y las carpetas temporales de Drive/Dropbox fuera de Asuntos abiertos. Subido a `main` (versión `14-sep-2026 · 16:36`); esta sesión no ha podido comprobarlo con `curl` (su red no llega a la web publicada) — falta confirmarlo en el navegador. Detalle en `docs/HISTORIA.md`. |
+| 11 | `docs/CORREOS-AL-ASUNTO.md` | PENDIENTE | Elegir a mano el asunto de destino de un correo, con lista de "Podrían encajar"; huella del hilo en `asuntos.json`; el recolector de Apps Script sigue los hilos ya conocidos para que entren y salgan respuestas. Acordado con Francisco el 16-sep-2026. |
 
 ## Lo que vendrá después
 
 `docs/PROXIMOS-ASUNTOS.md` guarda los nueve asuntos que Francisco dejó apuntados el 14-sep-2026.
 No se trabajan: cada uno se habla con él y se convierte en su propia instrucción antes de entrar
-en esta cola.
+en esta cola. El punto 5 de esa lista ya es la fila 11 de esta cola.
