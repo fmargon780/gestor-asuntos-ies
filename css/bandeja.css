@@ -16,3 +16,30 @@
 .tarjeta-correo .marca-tipo { background: #f0eafb; color: #5b3fa0; }
 
 #aviso-correo-pendiente .boton { margin-top: 10px; }
+
+/* ---------- elegir el asunto a mano (js/bandeja-enlace.js) ---------- */
+
+.correo-enviado { font-weight: 600; }
+
+.enlace-bloque { margin-top: 14px; }
+.enlace-bloque .etiqueta { margin: 0 0 6px; }
+
+.enlace-lista {
+  max-height: 210px;
+  overflow-y: auto;
+  border: 1px solid #dde3ea;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.enlace-lista .resultado {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.enlace-archivado { margin-right: 6px; }
