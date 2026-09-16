@@ -83,11 +83,17 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Mandar documentos de un asunto por correo: se marcan en el cuadro "Correo" y el script de Apps
   Script deja un borrador en Gmail (nunca envía), con tarjeta "Borrador en camino".
 - Plantillas de correo y de mensaje de Séneca, por tipo de asunto, con huecos que se rellenan
-  solos; la firma y el centro se editan en Ajustes.
+  solos; la firma y el centro (y localidad, dirección, código, cargo) se editan en Ajustes.
+- Plantillas de documento de Word por tipo de asunto: botón "Generar documento" en la ficha que
+  saca una copia ya rellena y guardada en la carpeta del asunto, sin preguntar nada.
 - Copias de seguridad diarias, detección de fichero roto, fusión de conflictos de Dropbox.
 - Pruebas automáticas en GitHub Actions en cada subida.
 - Escape y botón de salida en toda pantalla; copiar el nombre de un relacionado en orden normal;
   carpetas temporales de Drive/Dropbox fuera de Asuntos abiertos.
+- Hitos: la guía de un asunto abierto se trabaja como hitos vivos (estado, fecha límite,
+  responsable, notas y documentos), con bifurcaciones y un historial al archivar.
+- "Qué me toca": pantalla que cruza los hitos pendientes de todos los asuntos abiertos, en tres
+  bloques (en tu tejado, esperando a otros, sin fecha), con filtro por responsable.
 
 ## 6. Reglas de código que no se pueden olvidar
 

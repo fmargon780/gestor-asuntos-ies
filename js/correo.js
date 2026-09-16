@@ -40,6 +40,9 @@
   var documentosAdjuntados = [];  /* los que ha llevado el último borrador preparado */
 
   var plantillasDatos = null;   /* _GESTOR/plantillas.json, ya leído */
+  var valoresActuales = null;   /* Plantillas.valoresDeAsunto(a), calculado una vez por apertura
+                                    (fila 17 de la cola: es la fuente única de los huecos, para
+                                    que un documento de Word y un correo lean de un solo sitio) */
   var plantillaElegida = '';    /* el id de la elegida en el desplegable, o '' (Sin plantilla) */
   var textoProgramado = '';     /* lo último que ha escrito el propio cuadro, para saber si se ha tocado a mano */
   var MAXIMO_LETRAS_SENECA = 4000;
@@ -111,43 +114,6 @@
     return { curso: curso, grupo: grupo };
   }
 
-  function fechaLegibleDeIso(iso) {
-    return iso ? U.fechaLegible(U.aAaMmDd(iso)) : '';
-  }
-
-  /* Los campos propios del tipo de este asunto, por su nombre en
-     cristiano: es como los busca {campo:LO QUE SEA}. */
-  function camposDelAsunto(a) {
-    var salida = {};
-    if (!window.Campos || !App.E.campos) return salida;
-    var tipo = (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
-    var configurados = (App.E.campos.porTipo && App.E.campos.porTipo[tipo]) || [];
-    var guardados = (a.ficha && a.ficha.campos) || {};
-    configurados.forEach(function (c) {
-      var nombre = Campos.nombreDeCampo(c, App.E.campos);
-      var guardado = guardados[Campos.claveDeCampo(c)];
-      if (nombre && guardado && guardado.valor) salida[nombre] = guardado.valor;
-    });
-    return salida;
-  }
-
-  /* Lo que necesita Plantillas.rellenar para los huecos de un asunto. */
-  function valoresDePlantilla(a) {
-    var f = a.ficha || {};
-    var p = piezasDelNombre(a);
-    return {
-      nombre: soloElNombre(terceroDe(a)),
-      grupo: p.grupo,
-      curso: p.curso,
-      tipo: (a.leido && a.leido.tipo) || f.tipo || '',
-      hoy: fechaLegibleDeIso(U.hoyIso()),
-      limite: fechaLegibleDeIso(f.limite),
-      usuario: App.E.usuario || '',
-      centro: (plantillasDatos && plantillasDatos.centro) || Plantillas.POR_DEFECTO_CENTRO,
-      campos: camposDelAsunto(a)
-    };
-  }
-
   function asuntoDelCorreo(a) {
     if (asuntoLargo) return a.nombre;
     var f = a.ficha || {}, l = a.leido || {};
@@ -161,11 +127,15 @@
     return trozos.filter(Boolean).join('  ·  ');
   }
 
+  /* Desde la fila 17 de la cola, {firma} ya sale calculado dentro de
+     Plantillas.valoresDeAsunto (con sus propios huecos sustituidos):
+     un solo sitio que sepa cómo se monta. Si por lo que sea no se ha
+     podido calcular (fallo de red, cuadro recién abierto), se cae en
+     lo de siempre. */
   function textoDeLaFirma() {
-    var plantilla = (plantillasDatos && plantillasDatos.firma) || Plantillas.POR_DEFECTO_FIRMA;
-    return Plantillas.rellenar(plantilla, {
-      usuario: App.E.usuario || '',
-      centro: (plantillasDatos && plantillasDatos.centro) || Plantillas.POR_DEFECTO_CENTRO
+    if (valoresActuales && valoresActuales.firma) return valoresActuales.firma;
+    return Plantillas.rellenar(Plantillas.POR_DEFECTO_FIRMA, {
+      usuario: App.E.usuario || '', centro: Plantillas.POR_DEFECTO_CENTRO
     }).texto;
   }
 
@@ -189,7 +159,7 @@
       ? plantillasDatos.lista.filter(function (p) { return p.id === idPlantilla; })[0]
       : null;
     if (plantilla) {
-      var r = Plantillas.rellenar(plantilla.texto, valoresDePlantilla(a));
+      var r = Plantillas.rellenar(plantilla.texto, valoresActuales || {});
       medio = r.texto;
       faltan = r.faltan;
     }
@@ -371,6 +341,7 @@
     try { persona = await buscarPersona(a); } catch (e) { persona = null; }
     personaActual = persona;
     try { plantillasDatos = await Plantillas.cargar(App.E.gestor); } catch (e) { plantillasDatos = null; }
+    try { valoresActuales = await Plantillas.valoresDeAsunto(a); } catch (e) { valoresActuales = null; }
     await pintarCuadro(a, persona);
     await esperar;
     /* Si se ha apuntado la nota o cambiado el estado, la ficha que hay

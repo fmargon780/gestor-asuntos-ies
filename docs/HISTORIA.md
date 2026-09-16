@@ -5,6 +5,207 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 16-sep-2026 — Plantillas de documento de Word
+
+Fila 17 de la cola (`docs/COLA.md`, `docs/PLANTILLAS-DE-DOCUMENTO.md`), el gemelo en papel de las
+plantillas de correo (fila 14, más abajo en este mismo diario): Francisco cuelga un `.docx` de un
+tipo de asunto en Ajustes, y el botón **Generar documento** de la ficha saca una copia con los
+huecos rellenos, ya guardada en la carpeta del asunto, sin preguntar nada.
+
+- **`Plantillas.valoresDeAsunto(asunto)`** (`js/plantillas.js`), pública: hasta hoy era
+  `valoresDePlantilla()`, privada de `js/correo.js`. Ahora es async —el DNI, los tutores y el
+  registro salen de ficheros— y amplía el catálogo de huecos (`Plantillas.HUECOS`) con
+  `nombreNatural`, `referencia` (según la categoría), `dni`, `telefono`, `correo`, los dos tutores
+  con su teléfono y correo (leídos por el título de la columna, como `js/dni.js`), `descripcion`,
+  `estado`, `registro`, `hoyLargo`, `lugarYFecha`, y los datos del centro (`localidad`,
+  `direccionCentro`, `codigoCentro`, `cargo`, y `firma` ya relleno). `js/correo.js` la llama una
+  vez por apertura del cuadro y ya no tiene su propia función.
+- `js/plantillas.js` pasó de 423 a más de 750 líneas con este motor, así que **el bloque de
+  Ajustes "Plantillas de correo" se sacó a `js/plantillas-ajustes.js`**, sin cambiar lo que hace
+  (usa la API pública de `Plantillas`, nada privado). El fichero se queda en unas 450 líneas, solo
+  con el motor.
+- **`js/docx.js` nuevo** (`window.Docx`, sin librerías ni CDN): lee y escribe un `.docx` (que es
+  un ZIP) a mano —directorio central buscado desde el final, cabeceras locales, CRC-32 con tabla
+  propia (polinomio `0xEDB88320`)—. Las entradas que no hacen falta tocar se copian tal cual; las
+  que sí (`word/document.xml`, `header*.xml`, `footer*.xml`) se descomprimen con
+  `DecompressionStream('deflate-raw')` si hace falta y se reescriben **sin comprimir** (método 0):
+  así no hace falta `CompressionStream` para nada. La parte delicada, y la primera que se probó:
+  Word reparte el texto de un párrafo en varias `<w:t>` (por ejemplo, una palabra suelta en
+  negrita), así que `{nombre}` puede llegar partido en dos o tres. Antes de sustituir, cada
+  `<w:p>` se repara moviendo solo los caracteres del hueco hasta dejarlo entero en una única
+  `<w:t>` — nunca fundiendo todas las de un párrafo en una, que perdería el formato de las
+  palabras que no son parte de ningún hueco.
+- **`js/plantillas-documento.js` nuevo**: el botón "Generar documento" en la ficha (mismo patrón
+  que `js/correo.js` con "Correo" y "Mensaje Séneca": se envuelve `App.abrirFicha`), que no sale
+  si el tipo no tiene plantillas, elige sola con una y pregunta con varias (como
+  `Relacionados.elegirTercero`, dentro de `#capa`, sin `U.preguntar`). Guarda sin pisar, deja nota
+  con `Notas.anadir`, avisa de los huecos sin datos y refresca la ficha. En Ajustes, bloque
+  hermano "Plantillas de documento": buscador, tarjetas, alta (con un desplegable de los `.docx`
+  que ya haya en `_GESTOR/PLANTILLAS`, que Francisco sube a mano), edición, borrado con
+  `Papelera.botonBorrar`, y la lista de huecos con un botón de copiar en cada uno.
+- **`plantillas.json` gana la clave `documentos`** y cuatro claves de raíz del centro
+  (`localidad`, `direccion`, `codigo`, `cargo`); `limpio()` las normaliza, así que un fichero
+  viejo sigue cargando igual. No es ningún fichero compartido nuevo: sigue siendo el mismo de
+  siempre, y los `.docx` de `_GESTOR/PLANTILLAS` tampoco cuentan como fichero compartido (no
+  llevan copia de seguridad).
+- Ocho escenarios en `pruebas/plantillas-documento.mjs`, con **jsdom** en vez de Playwright (no
+  hace falta un navegador de verdad para probar ZIP y XML a mano): construye un `.docx` de mentira
+  con su propio escritor de ZIP, independiente del de `js/docx.js` para no acabar probándose a sí
+  mismo, comprimiendo de verdad con `CompressionStream` como haría Word. El ZIP de salida se
+  comprobó además con `unzip -t` y `zipinfo`, herramientas de línea de comandos, no solo con el
+  lector propio.
+
+## 16-sep-2026 — El enganche que faltaba en el correo, de las plantillas
+
+Fila 14 de la cola (`docs/COLA.md`, `docs/PLANTILLAS-DE-CORREO.md`), que se había dado por
+`HECHA` estando solo a medias: `js/plantillas.js` ya existía entero y funcionaba —el fichero
+`_GESTOR/plantillas.json`, `Plantillas.rellenar` y el bloque "Plantillas de correo" de
+Ajustes—, pero **`js/correo.js` no lo usaba para nada**. Seguía con la constante `CENTRO`
+escrita a mano y sin ningún desplegable de plantilla, ni en el cuadro de Correo ni en el de
+Séneca. Por eso `pruebas/plantillas.mjs` llevaba días en rojo: no era, como se apuntó el
+16-sep-2026 en la entrada de "Qué me toca", "algo del entorno de pruebas" — era que faltaba el
+trabajo.
+
+Lo que se ha completado en `js/correo.js` (secciones 2.3 y 3 de
+`docs/PLANTILLAS-DE-CORREO.md`; no se ha tocado nada de `js/plantillas.js`):
+
+- `cuerpoDelCorreo(a, idPlantilla)` ya no la escribe a mano: si el tipo del asunto tiene alguna
+  plantilla, el medio sale de `Plantillas.rellenar(plantilla.texto, valores)`; la firma sale
+  siempre de `Plantillas.rellenar(datos.firma, valores)` —con o sin plantilla de por medio—, y
+  `Plantillas.cargar` ya resuelve sola el caso de que `plantillas.json` no exista todavía. Los
+  valores de los huecos los monta `valoresDePlantilla(a)`, nueva y privada del fichero: nombre
+  (`soloElNombre`), grupo y curso (`piezasDelNombre`), tipo, hoy, límite, usuario y centro, más
+  `campos` con los campos propios del asunto (`camposDelAsunto`, mirando `App.E.campos.porTipo`
+  como hace `filasDeCampos` en `js/ficha-asunto.js`).
+- **El desplegable "Plantilla"** (`#correo-plantilla`), encima del cuerpo, en los dos cuadros: lo
+  pinta `camposComunes`, que es la única función que ya compartían Correo y Séneca, así que no ha
+  hecho falta ningún contenedor `#correo-comunes` aparte. Con una sola plantilla del tipo, sale
+  puesta; con varias, sale la primera; sin ninguna, no se pinta nada. Al cambiar de plantilla
+  (`cambiarPlantilla`), si lo escrito coincide con lo último que puso el propio código se cambia
+  sin más; si no, se pregunta **en línea, dentro del propio cuadro** (`#correo-plantilla-confirmar`,
+  con "Seguir con lo escrito" / "Cambiar de todas formas"), nunca con un segundo `U.preguntar`:
+  solo puede haber un cuadro de diálogo abierto en toda la aplicación, y ese ya lo tiene el
+  cuadro de Correo.
+- El aviso ámbar de huecos sin datos (`#correo-faltan-datos`, "Faltan datos: …") sale con las
+  etiquetas en castellano de `Plantillas.HUECOS`, que ya venían así de `Plantillas.rellenar`.
+- En Séneca, al copiar el texto (paso 2 de `engancharSeneca`) se recorta a 4.000 letras si hace
+  falta, avisando en `#seneca-explica`.
+
+`index.html` ya cargaba `js/plantillas.js`... no lo cargaba en absoluto: se ha añadido, justo
+antes de `js/correo.js`.
+
+Los 7 escenarios de `pruebas/plantillas.mjs` pasan, y la batería completa (`npm test`, 24
+ficheros, `CHROMIUM_PATH` apuntando al Chromium ya instalado en el entorno) sale entera en
+verde, incluidos `pruebas/correos.mjs` y `pruebas/envios.mjs` (que también usan `js/correo.js`,
+para la bandeja de correos y los adjuntos): un asunto sin plantillas de su tipo sigue
+comportándose exactamente igual que antes de este cambio.
+
+**Corrección, al fusionar**: mientras esta sesión hacía este mismo arreglo en su rama, otra
+sesión en paralelo hizo también el suyo directamente sobre `main` (en el mismo pull request que
+las filas 12 y 13), sin verse la una a la otra, y con el diseño que de verdad pedía el encargo:
+`camposComunes`/`interiorDeComunes` con su propio contenedor `#correo-comunes`, tal y como sigue
+descrito en `docs/CONTEXTO.md`. Al fusionar esta rama se ha mantenido la de `main` —llegó antes—
+y se ha descartado todo lo de `js/correo.js` descrito arriba; lo único que ha sobrevivido de
+esta entrada es el diagnóstico (fila 14 se había dado por hecha sin estarlo) y la corrección de
+la entrada de "Qué me toca" sobre por qué fallaba `pruebas/plantillas.mjs`. Encima de la versión
+de `main` se ha aplicado, ya sí, el cambio de la fila 17: `valoresDePlantilla(a)` pasa a ser
+`Plantillas.valoresDeAsunto(asunto)`, pública y en `js/plantillas.js`.
+
+## 16-sep-2026 — Qué me toca
+
+Fila 16 de la cola (`docs/QUE-ME-TOCA.md`), depende de la fila 15 (hitos, ya `HECHA`).
+
+Los hitos de la fila 15 se veían dentro de cada asunto, uno a uno. Esta pantalla nueva los cruza
+todos: lee `Hitos.leer()` una vez y `window.Gestor.asuntos()`, y saca los hitos `pendiente` y
+`encurso` de todos los asuntos abiertos en tres bloques — "En tu tejado" (responsable `yo` o
+`companero`, con fecha límite, los vencidos arriba y en rojo, reutilizando tal cual
+`Plazos.de`/`.marca-plazo` de `css/plazos.css`, sin inventar otra escala de colores), "Esperando
+a otros" (cualquier otro responsable, con los días parado desde `desde`, los más parados arriba)
+y "Sin fecha" (plegado con `<details>`, para que no se pierda lo que no tiene fecha límite) — con
+filtro por responsable arriba (recordado en `localStorage`) y entrada propia en la barra de la
+izquierda, con la cuenta de vencidos al lado (sin número si no hay ninguno).
+
+Vive entera en `js/que-me-toca.js` (`css/que-me-toca.css`), con el mismo patrón que la pantalla
+"Duplicados" (`js/unir-asuntos.js`): `App.PANTALLAS.push`, la sección se crea a mano y no está en
+`index.html`. A diferencia de "Duplicados" sí tiene entrada en la barra (`js/barra.js`): como se
+añade después de cargada la página, el bucle de `js/nucleo.js` que pone el `onclick` de las
+pestañas ya existentes no la alcanza, así que se le pone a mano; el resaltado como "activa" sí
+sale solo, porque `App.ir` vuelve a mirar los `.pestana` que haya cada vez que se llama. Al
+pulsar una línea se abre la ficha del asunto con ese hito ya desplegado: enganche nuevo y pequeño
+en `js/hitos-panel.js` (`window.HitosPanel.desplegarAlAbrir(clave, idHito)`, guarda el par y lo
+aplica en el siguiente repintado de esa ficha, sin depender de en qué orden se hayan cargado los
+dos ficheros).
+
+Esta sesión sí tenía un Chromium a mano (con `CHROMIUM_PATH` apuntando a él, porque el que trae
+`playwright` de fábrica no coincidía de versión): los 7 escenarios de `pruebas/que-me-toca.mjs`
+pasan, y la batería completa (`npm test`, 24 ficheros) sale en verde salvo `pruebas/plantillas.mjs`,
+que ya fallaba antes de esta fila por algo del entorno de pruebas (un `locator.inputValue` que
+no llega a tiempo), sin relación con "Qué me toca" ni con los hitos.
+
+Ficheros nuevos: `js/que-me-toca.js`, `css/que-me-toca.css`, `pruebas/que-me-toca.mjs`.
+
+## 16-sep-2026 — Los hitos de un asunto
+
+Fila 15 de la cola (`docs/HITOS.md`).
+
+Hasta hoy la guía de un tipo era texto que se leía y se marcaba con una casilla, igual para
+todos los asuntos de ese tipo. Desde hoy, dentro de un asunto abierto, esos mismos pasos se
+convierten en **hitos**: además de marcados o no, llevan estado (pendiente · en curso · hecho ·
+no aplica), fecha límite, responsable, notas y documentos apuntados.
+
+**Fichero nuevo, `_GESTOR/hitos.json`**, el duodécimo compartido: pasan de once a doce
+(`js/copias.js`, `js/conflictos.js`). No va en `asuntos.json` porque ese fichero se lee en toda
+pantalla y se escribe entero cada vez; `hitos.json` solo se lee al abrir un asunto, al archivarlo
+y (en la fila 16) en "Qué me toca".
+
+**De dónde salen.** Un asunto nuevo copia los pasos de la guía de su tipo al crearse (se envolvió
+`App.anotar`, mirando el `abiertoEl` que solo pone la creación, en vez de tocar
+`js/asuntos-nuevo.js` y `js/recurrentes.js`). Uno viejo no los recibe solo: sale el botón "Crear
+los hitos de la guía", que además importa `pasosHechos`/`pasosElegidos` (se quedan en
+`asuntos.json`, por si hay que volver atrás). El id del hito es el mismo que el del paso de la
+guía: así un plazo "desde tal paso" o un `pasosElegidos` viejo se traducen solos.
+
+**Bifurcaciones.** Un paso-pregunta se convierte en un hito de clase `decision`: mientras no se
+elige una opción, la lista se corta ahí (`Hitos.visibles`); al elegir, los hitos de la rama
+cuentan como si vinieran debajo. Cambiar de rama quita los hitos vacíos de la vieja y marca
+`noaplica` (plegados al final, `Hitos.huerfanos`) los que ya tenían notas o documentos.
+
+**Responsable, plazo y estado.** El cuadro de escribir la guía (`Guias.editar`) gana tres campos
+opcionales y plegados por paso: responsable por defecto (personas de Ajustes + los papeles fijos
+`tercero`/`tutor`/`relacionado`, que se resuelven solos con datos del asunto), estado del asunto
+(de `estados.json`) y plazo (días y desde qué paso). Los días se cuentan hábiles, descontando los
+no lectivos de Ajustes › Hitos (`Plazos.sumarDiasHabiles`, nombre propio para que lo reutilice la
+fila 16). El estado del asunto lo decide una sola función, `Hitos.estadoDelAsunto`, para poder
+cambiar el criterio sin tocar diez sitios si algún día el estado del asunto lo sustituye el
+propio hito en curso.
+
+**Al archivar**, los hitos salen de `hitos.json` y se escriben, ya dentro del ARCHIVO, como
+`HISTORIAL DE TRAMITACION.txt`: legible sin la aplicación, sin copiar ningún documento (mismo
+criterio que `DONDE ESTA ESTE ASUNTO.txt` de los relacionados). Al reabrir, si el fichero sigue
+ahí, los hitos vuelven a `hitos.json` y el fichero se borra.
+
+**En la ficha del asunto**, los hitos sustituyen a la lista de pasos, en el mismo sitio de
+siempre, envolviendo lo que pinta la guía sin tocar `js/ficha-asunto.js`: `pintarGuia` es una
+función privada de ese fichero, así que en vez de envolver una función de `App` se usó un
+`MutationObserver` sobre `#ficha-guia`, como ya sugería `docs/CONTEXTO.md` para un panel que se
+repinta entero.
+
+**Ficheros nuevos**: `js/hitos.js` y `js/hitos-archivo.js` (el modelo, partido en dos por las
+400 líneas), `js/hitos-panel.js` y `js/hitos-panel-lista.js` (la ficha, también partido en dos:
+el repintado en uno, la fila de cada hito en el otro, hablándose por `window.HitosPanel`),
+`js/hitos-ajustes.js` (el bloque "Hitos" de Ajustes: responsables y días no lectivos),
+`css/hitos.css` y `pruebas/hitos.mjs`.
+
+Al probar de verdad en un navegador (esta sesión sí tenía Chromium a mano, cosa que el trabajo
+inicial no pudo comprobar) salieron tres fallos reales, ya arreglados: `pasosDe(tipo)` de
+`js/guias-enganche.js` solo lee `guias.json` una vez, al entrar, así que la guía de prueba había
+que escribirla en el disco de mentira ANTES del primer "Entrar", no después; `App.verAbiertos`
+(el botón Actualizar) no relee `asuntos.json`, así que escribir a mano la ficha de un asunto
+viejo necesitaba también `App.cargarRegistro()`; y el `MutationObserver` de `js/hitos-panel.js`
+se disparaba con su propio repintado (mutaba el mismo `#ficha-guia` que vigilaba), lo que lo
+metía en un bucle sin fin en cuanto había que interactuar con un hito desplegado — se arregló
+desconectándolo mientras se repinta y reconectándolo al terminar.
+
 ## 16-sep-2026 — Un documento suelto puede entrar en un asunto que ya existe
 
 Fila 12 de la cola (`docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md`). Versión publicada

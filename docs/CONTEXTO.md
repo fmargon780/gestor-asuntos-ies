@@ -213,6 +213,81 @@ al elegir una, salen solo esos pasos, y la cuenta de arriba suma solo la rama el
 
 Se comprueba con `pruebas/guias.mjs` y `pruebas/opciones.mjs`.
 
+### Los hitos de un asunto
+
+Dentro de un asunto abierto, la guía deja de ser texto que se marca con una casilla y pasa a ser
+la lista de **hitos** que se trabaja: cada paso, vivo dentro de ese asunto, con estado (pendiente
+· en curso · hecho · no aplica), fecha límite, responsable, notas y documentos apuntados.
+
+- Viven en `_GESTOR/hitos.json` (el duodécimo fichero compartido), no en `asuntos.json`: se leen
+  solo al abrir un asunto, al archivarlo y en la pantalla "Qué me toca". Estructura:
+  `{ ajustes: { responsables, noLectivos }, porAsunto: { <clave del asunto>: { creados, hitos } } }`.
+- **Al crear un asunto**, si su tipo tiene guía, sus pasos se convierten en hitos solos (el id del
+  hito es el mismo que el del paso: `origenGuia`), y el primero queda en curso. Un asunto que ya
+  existía no los recibe solo: en el sitio de la guía sale el botón "Crear los hitos de la guía",
+  que además importa `pasosHechos`/`pasosElegidos` (que se quedan en `asuntos.json` tal cual).
+  Tocar los hitos de un asunto nunca cambia la guía del tipo.
+- **Bifurcaciones**: un paso-pregunta se convierte en un hito de clase `decision`. Mientras no se
+  elige una opción, la lista se corta ahí. Cambiar de rama quita los hitos vacíos de la vieja y
+  marca `noaplica` (plegados, al final) los que tenían notas o documentos.
+  `Hitos.visibles`/`Hitos.huerfanos` (`js/hitos.js`) son quienes saben qué se ve y qué se pliega.
+- **Un solo hito en curso a la vez**: al marcar uno hecho, el siguiente pendiente de la lista
+  visible pasa a "en curso" solo (`Hitos.recomputeEnCurso`).
+- **Responsable**: persona del centro (configurable en Ajustes › Hitos) o un papel fijo
+  (`tercero`, `tutor`, `relacionado`) que la aplicación resuelve sola con datos del asunto
+  (`Hitos.resolverResponsable`); sin resolver, se enseña en gris.
+- **Plazo**: un paso puede llevar "tantos días hábiles desde que se complete otro paso". Al
+  marcarlo hecho, `Plazos.sumarDiasHabiles` (días no lectivos de Ajustes › Hitos incluidos) pone
+  sola la fecha límite del siguiente, salvo que Francisco la haya tocado a mano.
+- **Estado del asunto**: un paso puede llevar apuntado un estado de `estados.json`; al pasar su
+  hito a "en curso", el asunto pasa solo a ese estado. La única función que lo decide es
+  `Hitos.estadoDelAsunto` (`js/hitos.js`), para poder cambiar el criterio sin tocar diez sitios.
+- **Al archivar**, los hitos salen de `hitos.json` y se escriben, dentro de la carpeta ya
+  archivada, como `HISTORIAL DE TRAMITACION.txt` (legible sin la aplicación, sin copiar ningún
+  documento; gemelo de `DONDE ESTA ESTE ASUNTO.txt` de `js/relacionados.js`). Si el asunto se
+  reabre y el fichero sigue ahí, los hitos se cargan de vuelta a `hitos.json` y el fichero se
+  borra.
+- Se escriben desde el mismo cuadro de la guía (`Guias.editar`, con tres campos nuevos y
+  opcionales por paso: responsable por defecto, estado del asunto y plazo) y se pintan en la
+  ficha del asunto **envolviendo** lo que hoy pinta la guía, con un `MutationObserver` sobre
+  `#ficha-guia` (no hay ninguna función de `App` que envolver: `pintarGuia` es privada de
+  `js/ficha-asunto.js`).
+- Vive en `js/hitos.js` y `js/hitos-archivo.js` (el modelo; se parte en dos para no pasar de las
+  400 líneas), `js/hitos-panel.js` y `js/hitos-panel-lista.js` (la ficha del asunto: el
+  repintado y el bloque de entrada en uno, cómo se pinta cada hito en el otro, hablándose por
+  `window.HitosPanel`) y `js/hitos-ajustes.js` (el bloque "Hitos" de Ajustes: responsables y
+  días no lectivos).
+
+Se comprueba con `pruebas/hitos.mjs`.
+
+### La pantalla "Qué me toca"
+
+Cruza los hitos `pendiente`/`encurso` de **todos los asuntos abiertos** (nunca archivados), para
+no tener que entrar en ellos uno a uno: lee `Hitos.leer()` una vez y `window.Gestor.asuntos()`, y
+cruza por la clave del asunto.
+
+- Tres bloques, en este orden: **"En tu tejado"** (responsable `yo`/`companero`, **con** fecha
+  límite, ordenados por `Plazos.diasHasta` — los vencidos arriba; el color es el de siempre,
+  reutilizando tal cual `Plazos.de`/`.marca-plazo` de `css/plazos.css`, sin inventar otra escala);
+  **"Esperando a otros"** (cualquier otro responsable, tenga fecha o no: se ordena por los días
+  parado desde `desde`, los más parados arriba); **"Sin fecha"**, plegado con `<details>` — el
+  resto: sin fecha límite, o sin un responsable que encaje en los dos bloques de arriba. Cada
+  hito visible sale en un solo bloque.
+- Cada línea lleva el título del hito, el nombre del asunto y su tercero. Al pulsarla, llama a
+  `window.HitosPanel.desplegarAlAbrir(clave, idHito)` —enganche nuevo y pequeño en
+  `js/hitos-panel.js`: guarda ese par y, en el siguiente repintado de esa ficha, quita `.oculto`
+  al `.hito-cuerpo` de ese hito y hace scroll hasta él— y luego `App.abrirFicha(a, 'abierto')`.
+- Filtro por responsable arriba (los de Ajustes › Hitos, no los papeles fijos), recordado en
+  `localStorage` (`gestor-que-me-toca-responsable`).
+- Entrada en la barra de la izquierda (`js/barra.js`, junto a las de siempre), con la cuenta de
+  hitos vencidos al lado; sin número si no hay ninguno.
+- Vive entera en `js/que-me-toca.js` (estilos en `css/que-me-toca.css`), con el mismo patrón que
+  la pantalla "Duplicados": `App.PANTALLAS.push`, la sección se crea a mano y no está en
+  `index.html`, enganchada a `window.Gestor.alRefrescar` para que la cuenta de la barra esté al
+  día aunque no se haya visitado la pantalla todavía.
+
+Se comprueba con `pruebas/que-me-toca.mjs`.
+
 ### La pantalla se mide a sí misma
 
 `css/vista.css` pone `container-type: inline-size` en `.contenido`: las reglas miran el ancho
@@ -389,7 +464,93 @@ crean en Ajustes, pegadas a un tipo de asunto, y se guardan en `_GESTOR/plantill
   de ficheros del encargo): cae en su "No sé devolver esto." Si hace falta devolver una borrada,
   hay que copiarla a mano desde el bloque Papelera de Ajustes.
 
-Se comprueba con `pruebas/plantillas.mjs`.
+Se comprueba con `pruebas/plantillas.mjs`. El bloque de pantalla vive en `js/plantillas-ajustes.js`
+(se sacó de `js/plantillas.js` el 16-sep-2026, al crecer con el motor de las plantillas de
+documento, para no pasar de 450 líneas): usa la API pública de `Plantillas` (`cargar`, `guardar`,
+`deTipo`, `idNuevo`, `rellenar`, `HUECOS`...), no toca nada privado.
+
+### Plantillas de documento de Word
+
+El gemelo en papel de las de correo (16-sep-2026, `docs/PLANTILLAS-DE-DOCUMENTO.md`, fila 17 de
+`docs/COLA.md`): un botón **Generar documento** en la ficha de un asunto saca una copia de un
+`.docx` con los huecos rellenos, ya guardada en la carpeta del asunto, sin preguntar nada.
+
+- **El fichero**: mismo `_GESTOR/plantillas.json` que las de correo, con la clave de raíz nueva
+  `documentos`: `[{ id, categoria, tipo, nombre, fichero, tipoDocumento, texto }]`. Una misma
+  plantilla puede colgar de varios tipos, cada uno con su propia fila. `limpio()` la normaliza
+  como la `lista` de correo: un fichero viejo sin esa clave sigue cargando con `documentos: []`.
+  Junto a `firma` y `centro` se guardan cuatro claves de raíz más, editables en el mismo bloque de
+  Ajustes de "Plantillas de correo": `localidad`, `direccion`, `codigo`, `cargo` (del centro).
+- **Los `.docx` viven en `_GESTOR/PLANTILLAS`**, sin subcarpetas, dentro de la carpeta de asuntos
+  abiertos (`Carpetas.crear(App.E.gestor, 'PLANTILLAS')`, que la crea si no existe). Francisco los
+  sube a mano a esa carpeta de Dropbox; la aplicación nunca escribe ahí, solo lee y cuelga el
+  nombre del fichero de un tipo en Ajustes. No es ninguno de los doce ficheros compartidos: no
+  lleva copia de seguridad ni detección de fichero roto.
+- **`Plantillas.valoresDeAsunto(asunto)`** (`js/plantillas.js`), pública desde el 16-sep-2026:
+  hasta entonces era `valoresDePlantilla()`, privada de `js/correo.js`, y solo traía lo que hacía
+  falta para el correo. Ahora es async (el DNI, los tutores y el registro salen de ficheros) y
+  monta, con un solo argumento, todos los huecos del catálogo (`Plantillas.HUECOS`, ampliado):
+  `nombre`, `nombreNatural` (en orden normal, sin el código pegado), `grupo`, `curso`, `tipo`,
+  `referencia` (Nº escolar en alumnado, cuatro cifras del documento en personal, NIF en empresas,
+  el campo "Referencia" en otros), `dni` (solo alumnado, con `window.Dni.de`), `telefono`,
+  `correo`, `tutor1`/`tutor1telefono`/`tutor1correo`, `tutor2`/... (solo alumnado, buscando por el
+  título de la columna como `js/dni.js`, nunca por su posición ni desde `persona.campos` para
+  saber si existe), `descripcion`, `estado`, `registro` (el código `26EM1234` del documento más
+  reciente de la carpeta que ya lo lleve en el nombre, sin depender de `js/documentos.js`), `hoy`,
+  `hoyLargo` ("16 de septiembre de 2026"), `lugarYFecha` ("En Alhaurín el Grande, a..."), `limite`,
+  `usuario`, `centro`, `localidad`, `direccionCentro`, `codigoCentro`, `cargo` y `firma` (el texto
+  de la firma del centro, ya relleno con el resto de estos mismos valores). `js/correo.js`
+  (`abrirCuadro`) la llama una vez por apertura del cuadro, junto a `Plantillas.cargar`, y guarda
+  el resultado en `valoresActuales`; `cuerpoDelMedio` y `textoDeLaFirma` lo usan en vez de tener
+  su propia función de valores (`valoresDePlantilla`/`camposDelAsunto`, que ya no existen).
+- **`js/docx.js`** (`window.Docx`, sin librerías ni CDN): un `.docx` es un ZIP, leído y escrito a
+  mano. `Docx.rellenar(bufferDocx, valores)` -> `{ blob, faltan }` (acepta `ArrayBuffer` o
+  `Uint8Array`). Lee el directorio central (buscado desde el final del fichero, que es el único
+  sitio fiable) y, por cada entrada: si no es `word/document.xml` ni `word/header*.xml` /
+  `word/footer*.xml`, la copia tal cual (cabecera local + bytes, sin descomprimir), y en el
+  directorio central copia también su entrada, solo parcheando el offset. Las que sí tocan se
+  descomprimen con `DecompressionStream('deflate-raw')` si hace falta (método 8; si ya vienen
+  "almacenadas", método 0, no hace falta), se reparan y sustituyen, y se escriben **sin comprimir**
+  (método 0): mismo tamaño comprimido que sin comprimir, y CRC-32 calculado a mano (tabla con el
+  polinomio `0xEDB88320`). No hace falta `CompressionStream` para nada.
+  - **La reparación de huecos partidos**: por cada `<w:p>...</w:p>`, se localizan sus `<w:t>` en
+    orden y, si un hueco (`{...}`) cruza de uno al siguiente, se mueven solo los caracteres que
+    forman el hueco hasta dejarlo entero en uno de ellos — nunca se funden todos los `<w:t>` del
+    párrafo en uno, que perdería la negrita o el subrayado de las palabras que no son parte de
+    ningún hueco. Hecho esto, cada `<w:t>` (toque o no un hueco) se decodifica de entidades XML, se
+    pasa por `Plantillas.rellenar`, y se vuelve a escapar (`&`, `<`, `>`; las comillas de un texto
+    normal no hace falta escaparlas). Un salto de línea en el valor sustituido se escribe
+    `</w:t><w:br/><w:t xml:space="preserve">`.
+  - Simplificación consciente: no contempla los "data descriptors" del ZIP (banderas con el
+    tamaño después de los datos, típico de escritores en flujo): un `.docx` de verdad, escrito por
+    Word, LibreOffice o cualquier librería que genere ficheros, siempre lleva el tamaño y el CRC
+    en la propia cabecera local.
+  - `Docx.leerEntradaDeTexto(bufferDocx, nombre)` (solo para depurar y para las pruebas): lee y
+    descomprime una entrada de texto ya generada, reutilizando el mismo lector.
+- **`js/plantillas-documento.js`**: el botón **Generar documento**, puesto en `#ficha-acciones`
+  con el mismo patrón que `js/correo.js` (se envuelve `App.abrirFicha` y se vigila la pantalla con
+  un `MutationObserver`). No sale si el tipo no tiene ninguna plantilla de documento; con una sola,
+  un clic y a generar; con varias, un cuadro para elegir (como `Relacionados.elegirTercero`: se
+  pinta dentro de `#capa`, sin `U.preguntar`, porque aquí se elige pulsando una de la lista, no
+  aceptando). Comprobar si el tipo tiene plantillas es async (hay que leer `plantillas.json`), así
+  que el botón puede salir un instante después que el resto de la ficha.
+  - **Al generar**: lee el `.docx` de `_GESTOR/PLANTILLAS` (si no está, avisa con su nombre y
+    para); `Plantillas.valoresDeAsunto(asunto)` + `Docx.rellenar`; monta el nombre con
+    `Nombres.montarDocumento` (`tipoDocumento` y `texto` de la plantilla, fecha de hoy, extensión
+    `.docx`; se vigila `App.LARGO_MAXIMO_NOMBRE`); si ya hay un fichero con ese nombre en la
+    carpeta, avisa y no lo pisa; si no, lo guarda (`getFileHandle`/`createWritable`, como
+    `Carpetas.escribirTexto` pero con un `Blob`) y deja una nota en el asunto con `Notas.anadir`
+    ("Generado &lt;nombre&gt;"); avisa de los huecos sin datos, sin impedir nada; y vuelve a
+    abrir la ficha para refrescar la lista de documentos.
+  - **En Ajustes**, bloque hermano **"Plantillas de documento"**: buscador, tarjetas por tipo,
+    alta/edición/borrado con `Papelera.botonBorrar` (clase `'plantilla-documento'`, que
+    `js/papelera.js` tampoco sabe devolver, igual que `'plantilla'`). En el alta se elige el
+    `.docx` de un desplegable con los que ya haya en `_GESTOR/PLANTILLAS` (Francisco los sube a
+    mano; el cuadro nunca escribe ahí), y se escriben el nombre visible, el tipo de documento y el
+    texto adicional. Debajo, la lista de `Plantillas.HUECOS` con un botón de copiar en cada uno.
+
+Se comprueba con `pruebas/plantillas-documento.mjs` (jsdom, sin navegador: construye un `.docx` de
+mentira a mano, con su propio escritor de ZIP, independiente del de `js/docx.js`).
 
 ### Registrar un documento en un paso
 
@@ -756,20 +917,28 @@ de `App` va después del fichero que lo define.
 | `js/frescura.js` | El aviso de que el RegAlum.csv está viejo, y sus épocas |
 | `js/recurrentes.js` | Los asuntos que se repiten cada mes, trimestre o curso |
 | `js/guias-enganche.js` | Las guías dentro de la app, y `window.GuiasDelCentro` |
+| `js/hitos.js`, `js/hitos-archivo.js` | El modelo de los hitos de un asunto: leer/escribir `hitos.json`, crearlos desde la guía, marcarlos, bifurcaciones, responsables y el historial al archivar |
+| `js/que-me-toca.js` | Pantalla propia "Qué me toca": cruza los hitos pendientes y en curso de todos los asuntos abiertos, en tres bloques (`css/que-me-toca.css`) |
 | `js/notas.js` | Las notas de cada asunto, con su enlace y su botón |
 | `js/registro.js` | Registrar un documento en un paso, sin nombrarlo dos veces |
 | `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF |
 | `js/lib/pdf.min.js`, `js/lib/pdf.worker.min.js` | pdf.js (Mozilla) 3.11.174, copiado tal cual |
 | `js/ficha-asunto.js` | La pantalla de un asunto: guía, notas, documentos y contacto |
+| `js/hitos-panel.js` | Pinta los hitos en la ficha del asunto, envolviendo lo que pinta la guía: el observador y el repintado |
+| `js/hitos-panel-lista.js` | La otra mitad del panel de hitos: la fila de cada hito, su cuerpo desplegado y el cambio de rama |
 | `js/duplicados.js` | ¿Esto no lo hicimos ya? Asuntos iguales del mismo tercero |
 | `js/relacionados.js` | Terceros relacionados con un asunto, y la nota al archivar |
+| `js/hitos-archivo.js` | La otra mitad del modelo de hitos: bifurcaciones, responsables de Ajustes y el `HISTORIAL DE TRAMITACION.txt` al archivar/reabrir |
 | `js/visor.js` | El panel de la derecha para ver un documento (`con-visor`) |
 | `js/tipos-buscador.js` | Buscar el tipo de asunto por letras, y los más usados arriba |
 | `js/via-contacto.js` | Los teléfonos y correos del tercero, como botones |
 | `js/tablon.js` | El tablón de notas rápidas, con las notas "Solo para mí" |
 | `js/copiar.js` | Los botones de copiar: el Nº escolar y el nombre del documento |
-| `js/plantillas.js` | Leer y guardar `plantillas.json`, rellenar los huecos, y el bloque "Plantillas de correo" de Ajustes |
+| `js/plantillas.js` | Leer y guardar `plantillas.json`, montar `Plantillas.valoresDeAsunto` y rellenar los huecos: el motor, sin pantalla |
+| `js/plantillas-ajustes.js` | El bloque "Plantillas de correo" de Ajustes (sacado de `js/plantillas.js`) |
 | `js/correo.js` | El correo y el mensaje de Séneca, con su rastro y sus plantillas |
+| `js/docx.js` | Rellenar los huecos de una plantilla de Word: ZIP y XML a mano, sin librerías (`window.Docx`) |
+| `js/plantillas-documento.js` | Botón "Generar documento" en la ficha, y el bloque "Plantillas de documento" de Ajustes (`css/plantillas-documento.css`) |
 | `js/salir.js` | El botón de Salir del pie de la barra |
 | `js/rescate-datos.js` | Recoge los CSV que se hayan quedado un piso más arriba |
 | `js/traer-datos.js` | El botón de traer los CSV de Séneca desde donde estén |
@@ -782,6 +951,8 @@ de `App` va después del fichero que lo define.
 | `js/dni.js` | El DNI del alumnado, el aviso de que falta y la búsqueda por DNI |
 | `js/papelera.js` | Borrar con papelera: mandar, devolver, borrar del todo y el bloque de Ajustes |
 | `css/papelera.css` | El bloque de la papelera en Ajustes, y su icono por clase |
+| `js/hitos-ajustes.js` | El bloque "Hitos" de Ajustes: responsables y días no lectivos |
+| `css/hitos.css` | El aspecto de la lista de hitos en la ficha del asunto, y del bloque de Ajustes |
 | `js/inicio.js` | La última línea: `App.arrancar()` |
 | `package.json` | Las dependencias de las pruebas (`playwright`, `jsdom`) y `npm test` |
 | `pruebas/ejecutar.mjs` | Levanta el servidor local y ejecuta todas las pruebas de esta carpeta |
@@ -808,6 +979,9 @@ de `App` va después del fichero que lo define.
 | `pruebas/documentos-sueltos.mjs` | Prueba de "Meter en un asunto": un documento suelto a un asunto que ya existe |
 | `pruebas/envios.mjs` | Prueba de mandar documentos por correo: el encargo, el hilo, el límite de 20 MB, "listo" y "error" |
 | `pruebas/plantillas.mjs` | Prueba de las plantillas: huecos, "Faltan datos", cambiar de plantilla, sin plantillas, y el recorte de Séneca |
+| `pruebas/hitos.mjs` | Prueba de los hitos de un asunto: crearlos, marcarlos, bifurcaciones, plazo, responsable y el historial al archivar |
+| `pruebas/que-me-toca.mjs` | Prueba de "Qué me toca": los tres bloques, el filtro por responsable, abrir la ficha con el hito desplegado y la cuenta de la barra |
+| `pruebas/plantillas-documento.mjs` | Prueba (jsdom, sin navegador) de las plantillas de documento: la reparación de huecos partidos, las cuatro clases de hueco, "faltan", el escapado XML, releer el ZIP de salida, el nombre del documento y un `plantillas.json` viejo |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |
@@ -824,6 +998,9 @@ de `App` va después del fichero que lo define.
 | `docs/AHORRO-CUOTA.md` | Reglas para gastar menos cuota al trabajar la cola |
 | `docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md` | El encargo de adjuntar documentos del asunto a un borrador de Gmail |
 | `docs/PLANTILLAS-DE-CORREO.md` | El encargo de las plantillas de correo y de mensaje por tipo |
+| `docs/HITOS.md` | El encargo de los hitos de un asunto |
+| `docs/QUE-ME-TOCA.md` | El encargo de la pantalla "Qué me toca" |
+| `docs/PLANTILLAS-DE-DOCUMENTO.md` | El encargo de las plantillas de documento de Word por tipo |
 | `README.md` | — |
 
 ### Lo que la aplicación guarda en `_GESTOR`
@@ -844,10 +1021,12 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `papelera.json` | El índice de la papelera: qué se ha borrado, de dónde y cuándo |
 | `no-duplicados.json` | Grupos de posibles duplicados descartados con "No son el mismo", por la firma de sus nombres |
 | `envios.json` | **Es una lista, no un objeto.** Los encargos vivos de "mandar documentos por correo": `{ id, asunto, para, creado }` |
-| `plantillas.json` | `{ firma, centro, lista: [{ id, tipo, categoria, nombre, texto }] }`, para el correo y el mensaje de Séneca |
+| `plantillas.json` | `{ firma, centro, localidad, direccion, codigo, cargo, lista: [{ id, tipo, categoria, nombre, texto }], documentos: [{ id, tipo, categoria, nombre, fichero, tipoDocumento, texto }] }`: `lista` para el correo y el mensaje de Séneca, `documentos` para las plantillas de Word |
+| `hitos.json` | `{ ajustes: { responsables, noLectivos }, porAsunto: { <clave>: { creados, hitos } } }`: los hitos vivos de cada asunto abierto (ver "Los hitos de un asunto") |
 | `datos/*.csv` | Alumnado (Séneca), personal, empresas y otros |
 | `PAPELERA/` | Las carpetas y ficheros borrados, cada uno en su subcarpeta `AAMMDD-HHMM <nombre>` |
-| `copias/*.json` | Copias de seguridad de los once ficheros de arriba, una por día, 30 como mucho de cada uno |
+| `PLANTILLAS/` | Los `.docx` que Francisco sube a mano, colgados de un tipo desde Ajustes › Plantillas de documento. No lleva copia de seguridad: no es uno de los doce ficheros compartidos |
+| `copias/*.json` | Copias de seguridad de los doce ficheros de arriba, una por día, 30 como mucho de cada uno |
 
 **Los CSV van en `datos`, no en `_GESTOR`.** `js/rescate-datos.js` los baja solos al entrar.
 
@@ -860,7 +1039,7 @@ Cada nota de `asuntos.json` es `{ texto, quien, cuando }`, y las de correo lleva
 la aplicación escribe `seguidos.json` para el recolector de Apps Script.
 
 **Todo fichero compartido se relee justo antes de escribirlo.** Son dos ordenadores sobre la
-misma carpeta: sin releer, el último en guardar borra lo del otro. Lo hacen los once ficheros de
+misma carpeta: sin releer, el último en guardar borra lo del otro. Lo hacen los doce ficheros de
 arriba.
 
 ### Copias de seguridad y fichero roto
@@ -869,12 +1048,12 @@ arriba.
 JSON está roto, lanza un error `FicheroRoto` en vez de devolver `null` (antes se trataba igual
 que si no existiera, y el siguiente guardado lo escribía encima, perdiendo todo).
 
-- `js/copias.js` guarda, antes de escribir cualquiera de los once ficheros compartidos, una
+- `js/copias.js` guarda, antes de escribir cualquiera de los doce ficheros compartidos, una
   copia de cómo estaba justo antes, en `_GESTOR/copias/<nombre>-AAMMDD.json`. Una copia por
   fichero y día; se conservan las últimas 30 de cada uno.
 - Todo lo que escribe uno de esos ficheros llama a `Copias.guardar` en vez de a
   `Carpetas.guardarJson` directamente.
-- Al pulsar Entrar se comprueban los once ficheros (`Copias.comprobarTodos`). Si alguno está
+- Al pulsar Entrar se comprueban los doce ficheros (`Copias.comprobarTodos`). Si alguno está
   roto, **no se entra**: sale un aviso en rojo con un botón para restaurar la última copia de
   cada uno. El fichero roto se aparta como `<nombre>-roto-AAMMDD-HHMM.json` y no se borra nunca.
 - En Ajustes, el bloque **Copias de seguridad** enseña cuántas copias hay de cada fichero y deja
@@ -888,9 +1067,10 @@ Si los dos ordenadores guardan casi a la vez, Dropbox no pisa nada: deja aparte 
 `asuntos (copia en conflicto de PC2 2026-09-11).json`.
 
 - `js/conflictos.js` busca esos ficheros al entrar y cada cinco minutos.
-- `asuntos.json` y `tablon.json` se fusionan solos: se unen los asuntos (o las notas del
-  tablón) por su clave, y dentro de cada uno se unen las notas, los pasos hechos y los pasos
-  elegidos, sin repetir nada.
+- `asuntos.json`, `tablon.json` y `hitos.json` se fusionan solos: se unen los asuntos (o las
+  notas del tablón) por su clave, y dentro de cada uno se unen las notas, los pasos hechos y los
+  pasos elegidos (`asuntos.json`), o los hitos por su id (`hitos.json`), sin repetir nada. En
+  `hitos.json`, dentro de `ajustes` solo se fusionan las altas de `responsables` y `noLectivos`.
 - Los demás (`tipos.json`, `estados.json`, `tipos-documento.json`, `guias.json`,
   `recurrentes.json`, `frescura.json`, `campos.json`) cambian mucho menos y no se fusionan
   solos: salen en el bloque **Conflictos de Dropbox** de Ajustes, con dos botones para elegir

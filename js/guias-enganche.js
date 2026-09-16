@@ -127,7 +127,21 @@
       yaLeido = true;
     } catch (e) { /* si no se puede releer, se sigue con lo que hay */ }
 
-    var pasos = await Guias.editar(nombreTipo, pasosDe(nombreTipo));
+    /* Las tres listas que necesitan los tres campos nuevos de cada
+       paso (16-sep-2026, hitos): las personas y los papeles de
+       Ajustes › Hitos, y los estados de tramitación. Si algo falla al
+       leerlas, los desplegables salen vacíos y el resto del cuadro
+       sigue funcionando igual. */
+    var opcionesResp = [];
+    try {
+      if (window.Hitos) {
+        var datosHitos = await window.Hitos.leer();
+        opcionesResp = datosHitos.ajustes.responsables.concat(window.Hitos.PAPELES);
+      }
+    } catch (e) { /* sin desplegable de responsable, pero se sigue */ }
+    var opcionesEstado = (App.E && App.E.estados) ? App.E.estados.map(function (e) { return e.nombre; }) : [];
+
+    var pasos = await Guias.editar(nombreTipo, pasosDe(nombreTipo), opcionesResp, opcionesEstado);
     if (pasos === null || pasos === false || pasos === undefined) return false;
 
     if (pasos.length) guias[nombreTipo] = pasos;

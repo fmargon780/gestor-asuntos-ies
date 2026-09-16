@@ -76,9 +76,41 @@ var Plazos = (function () {
     return true;
   }
 
+  /* ---------- días hábiles (16-sep-2026, hitos) ----------
+
+     Para el plazo de un hito (js/hitos.js): de lunes a viernes,
+     descontando además los días no lectivos que Francisco pega en
+     Ajustes › Hitos (una fecha AAAA-MM-DD por línea, en
+     _GESTOR/hitos.json). Con nombre propio para que lo reutilice
+     también la pantalla "Qué me toca" (fila 16 de la cola). */
+  function sumarDiasHabiles(iso, dias, noLectivos) {
+    var p = String(iso || '').split('-');
+    if (p.length !== 3) return '';
+    var n = parseInt(dias, 10);
+    if (isNaN(n) || n < 0) return '';
+    var d = new Date(+p[0], +p[1] - 1, +p[2]);
+    if (isNaN(d.getTime())) return '';
+    var festivos = {};
+    (noLectivos || []).forEach(function (f) { festivos[String(f)] = true; });
+    var contados = 0;
+    while (contados < n) {
+      d.setDate(d.getDate() + 1);
+      var diaSemana = d.getDay();
+      if (diaSemana === 0 || diaSemana === 6) continue;
+      var mm = String(d.getMonth() + 1).padStart(2, '0');
+      var dd = String(d.getDate()).padStart(2, '0');
+      if (festivos[d.getFullYear() + '-' + mm + '-' + dd]) continue;
+      contados++;
+    }
+    var m2 = String(d.getMonth() + 1).padStart(2, '0');
+    var d2 = String(d.getDate()).padStart(2, '0');
+    return d.getFullYear() + '-' + m2 + '-' + d2;
+  }
+
   return {
     DIAS_CERCA: DIAS_CERCA,
-    sumarDias: sumarDias, diasHasta: diasHasta, legible: legible,
+    sumarDias: sumarDias, sumarDiasHabiles: sumarDiasHabiles,
+    diasHasta: diasHasta, legible: legible,
     de: de, pasaFiltro: pasaFiltro
   };
 })();

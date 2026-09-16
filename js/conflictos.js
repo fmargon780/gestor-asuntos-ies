@@ -15,10 +15,10 @@
    Al entrar, y cada cinco minutos, se busca en _GESTOR algún fichero
    con "conflicto" o "conflicted" en el nombre.
 
-   - `asuntos.json` y `tablon.json` se fusionan solos: son los dos
-     ficheros en los que los dos ordenadores escriben todo el rato, y
-     se sabe fusionar por clave (el nombre del asunto, o el id de la
-     nota) sin perder nada de ninguno de los dos.
+   - `asuntos.json`, `tablon.json` y `hitos.json` se fusionan solos: son
+     los ficheros en los que los dos ordenadores escriben todo el rato,
+     y se sabe fusionar por clave (el nombre del asunto, el id de la
+     nota o el id del hito) sin perder nada de ninguno de los dos.
    - Los demás (tipos, estados, tipos de documento, guías, recurrentes,
      frescura) se cambian mucho menos, y mezclarlos a ciegas es más
      fácil que se note mal. Ahí se avisa en Ajustes y se deja elegir
@@ -99,6 +99,62 @@
     await Copias.guardar(g, App.FICHERO_ASUNTOS, fusion);
     App.E.registro = fusion;
     App.refrescarFichas();
+    await archivarConflicto(g, nombreConflicto);
+    return true;
+  }
+
+  /* ---------- fusionar hitos.json (16-sep-2026) ----------
+
+     Se unen los asuntos por su clave, y dentro de cada uno los hitos
+     por su id, sin repetir (si los dos ordenadores tocaron el MISMO
+     hito, se queda con el de este ordenador: no hay más remedio sin
+     complicar esto mucho más, y es un caso raro). En `ajustes` solo se
+     fusionan las ALTAS de `responsables` y `noLectivos`; los borrados
+     no se fusionan, igual que en el resto de listas de _GESTOR. */
+  function unirPorId(a, b) {
+    var vistos = {}, salida = [];
+    (a || []).concat(b || []).forEach(function (x) {
+      var id = x && x.id;
+      if (!id || vistos[id]) return;
+      vistos[id] = true;
+      salida.push(x);
+    });
+    return salida;
+  }
+
+  async function fusionarHitos(g, nombreConflicto) {
+    var real, conflicto;
+    try {
+      real = await Carpetas.leerJson(g, 'hitos.json');
+      conflicto = JSON.parse(await Carpetas.leerTexto(g, nombreConflicto));
+    } catch (e) { return false; }
+    if (!conflicto || typeof conflicto !== 'object') return false;
+    var base = (real && typeof real === 'object') ? real : {};
+    base.ajustes = base.ajustes || {};
+    base.porAsunto = base.porAsunto || {};
+    var confAjustes = conflicto.ajustes || {};
+    var confPorAsunto = conflicto.porAsunto || {};
+
+    base.ajustes.responsables = unirPorId(base.ajustes.responsables, confAjustes.responsables);
+    var noLectivos = {};
+    (base.ajustes.noLectivos || []).concat(confAjustes.noLectivos || []).forEach(function (f) { noLectivos[f] = true; });
+    base.ajustes.noLectivos = Object.keys(noLectivos).sort();
+
+    var claves = {};
+    Object.keys(base.porAsunto).forEach(function (k) { claves[k] = true; });
+    Object.keys(confPorAsunto).forEach(function (k) { claves[k] = true; });
+    claves = Object.keys(claves);
+    for (var i = 0; i < claves.length; i++) {
+      var clave = claves[i];
+      var a = base.porAsunto[clave], b = confPorAsunto[clave];
+      if (a && b) {
+        base.porAsunto[clave] = { creados: a.creados || b.creados, hitos: unirPorId(a.hitos, b.hitos) };
+      } else {
+        base.porAsunto[clave] = a || b;
+      }
+    }
+
+    await Copias.guardar(g, 'hitos.json', base);
     await archivarConflicto(g, nombreConflicto);
     return true;
   }
@@ -248,6 +304,12 @@
       }
       if (real === 'tablon.json') {
         if (await fusionarTablon(g, nombre)) {
+          U.aviso('Se han unido los cambios de los dos ordenadores en ' + real + '.', '');
+        }
+        continue;
+      }
+      if (real === 'hitos.json') {
+        if (await fusionarHitos(g, nombre)) {
           U.aviso('Se han unido los cambios de los dos ordenadores en ' + real + '.', '');
         }
         continue;

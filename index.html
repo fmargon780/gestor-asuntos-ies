@@ -28,6 +28,9 @@
 <link rel="stylesheet" href="css/duplicados.css">
 <link rel="stylesheet" href="css/unir-asuntos.css">
 <link rel="stylesheet" href="css/papelera.css">
+<link rel="stylesheet" href="css/hitos.css">
+<link rel="stylesheet" href="css/que-me-toca.css">
+<link rel="stylesheet" href="css/plantillas-documento.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -574,19 +577,46 @@
 <script src="js/conflictos.js"></script>
 <script src="js/recurrentes.js"></script>
 <script src="js/guias-enganche.js"></script>
+<!-- El modelo de los hitos de un asunto: después de js/guias.js y de
+     js/plazos.js (los usa), y después de js/puente.js (usa
+     window.Gestor). js/hitos-panel.js pinta los hitos dentro de la
+     ficha del asunto, así que va después de js/ficha-asunto.js.
+     js/hitos-archivo.js va después de js/relacionados.js: envuelve
+     App.cerrarAsunto/App.reabrirAsunto detrás de esa envoltura. -->
+<script src="js/hitos.js"></script>
+<!-- "Qué me toca" (fila 16): cruza los hitos de todos los asuntos
+     abiertos. Vive entera en su fichero, como "Duplicados"
+     (js/unir-asuntos.js); usa Hitos.leer/visibles y, en el click de
+     cada fila, window.HitosPanel.desplegarAlAbrir (definido más abajo,
+     en js/hitos-panel.js), así que el orden entre ambos no importa:
+     solo se llama dentro de un onclick, ya con todo cargado. -->
+<script src="js/que-me-toca.js"></script>
 <script src="js/notas.js"></script>
 <script src="js/registro-lector.js"></script>
 <script src="js/registro.js"></script>
 <script src="js/ficha-asunto.js"></script>
+<script src="js/hitos-panel.js"></script>
+<script src="js/hitos-panel-lista.js"></script>
 <script src="js/duplicados.js"></script>
 <script src="js/relacionados.js"></script>
+<script src="js/hitos-archivo.js"></script>
 <script src="js/visor.js"></script>
 <script src="js/tipos-buscador.js"></script>
 <script src="js/via-contacto.js"></script>
 <script src="js/tablon.js"></script>
 <script src="js/copiar.js"></script>
+<!-- js/plantillas.js va antes que js/correo.js: el cuadro de Correo usa
+     Plantillas.cargar/deTipo/rellenar/valoresDeAsunto para su desplegable
+     "Plantilla" (docs/PLANTILLAS-DE-CORREO.md, 2.3). -->
 <script src="js/plantillas.js"></script>
+<script src="js/plantillas-ajustes.js"></script>
 <script src="js/correo.js"></script>
+<!-- js/docx.js y js/plantillas-documento.js van después de js/correo.js
+     (docs/PLANTILLAS-DE-DOCUMENTO.md, 7): usan Plantillas.valoresDeAsunto
+     y, para el botón "Generar documento" de la ficha, el mismo enganche
+     de App.abrirFicha que ya usa js/correo.js. -->
+<script src="js/docx.js"></script>
+<script src="js/plantillas-documento.js"></script>
 <script src="js/salir.js"></script>
 <script src="js/rescate-datos.js"></script>
 <script src="js/traer-datos.js"></script>
@@ -598,6 +628,7 @@
 <script src="js/vista.js"></script>
 <script src="js/dni.js"></script>
 <script src="js/papelera.js"></script>
+<script src="js/hitos-ajustes.js"></script>
 
 <!-- Y ahora sí, a arrancar. -->
 <script src="js/inicio.js"></script>
