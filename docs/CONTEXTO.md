@@ -240,13 +240,73 @@ como `RegAlum.csv`; los de personal conservan su nombre.
 
 En Gmail, la etiqueta `GESTOR` en un correo lo pone a disposición: un script de Apps Script lo
 recoge cada 5 minutos y deja su ficha, el hilo en PDF y los adjuntos en la carpeta
-`GESTOR-BANDEJA` de Drive. La aplicación lee esa carpeta y propone tercero, tipo y fecha. Si es
-respuesta de un asunto ya existente, se ofrece guardarlo dentro; si estaba archivado, se ofrece
-reabrirlo. "Leer el correo" abre el PDF del hilo en el panel de la derecha. **Gmail no se deja
-meter dentro de otra página.** Cada usuario tiene su propia bandeja.
+`GESTOR-BANDEJA` de Drive. La aplicación lee esa carpeta y propone tercero, tipo y fecha.
+"Leer el correo" abre el PDF del hilo en el panel de la derecha. **Gmail no se deja meter dentro
+de otra página.** Cada usuario tiene su propia bandeja.
 
-El detalle entero está en `Correos-a-asuntos.md`, del proyecto de Claude. El script vive en
-`apps-script/gestor-correos.gs`, pero **Apps Script no se despliega desde aquí**.
+De cada correo, la tarjeta morada mira en este orden:
+
+1. **La huella del hilo.** Si el `id` del hilo ya está en el `hilos` de algún asunto, la tarjeta
+   dice "Respuesta de <asunto>" y su botón principal es "Guardar en ese asunto". La huella manda
+   sobre todo lo demás.
+2. **El texto del asunto.** Si el asunto del correo (sin `Re:`/`RV:`/`Fwd:`) lleva dentro el
+   nombre de un asunto de `asuntos.json`, con al menos 12 letras por los dos lados, también se
+   ofrece guardarlo ahí.
+3. **Nada.** Entonces el botón principal es "Crear el asunto".
+
+En los tres casos hay además un botón **"Elegir asunto"** (`js/bandeja-enlace.js`), que abre un
+cuadro con "Podrían encajar" (como mucho cinco, por puntuación de parecido) y "Todos los
+asuntos" con buscador, abiertos primero y archivados después. Si el elegido está archivado se
+ofrece "Reabrir y guardar aquí" o "Guardar sin reabrir". **Nunca se guarda nada solo: siempre
+hay que pulsar.**
+
+La puntuación de parecido suma: +50 si una dirección del correo es la del tercero del asunto o
+de uno de sus relacionados, +40 si el nombre del tercero aparece escrito en el correo, +10 por
+cada palabra de cuatro letras o más del asunto del correo que esté en el nombre del asunto, +15
+si el asunto está abierto y +10 si se movió en los últimos 30 días. Se enseñan los que pasen de
+40 puntos.
+
+#### `hilos`, en la ficha del asunto
+
+Al guardar un correo en un asunto —por el camino que sea— se apunta la huella en su ficha de
+`_GESTOR/asuntos.json`:
+
+    hilos: [ { id: "<id del hilo de Gmail>", asunto: "<asunto limpio, en minúsculas>", visto: 2 } ]
+
+`visto` es cuántos mensajes tenía el hilo al guardar. Si el `id` ya estaba, se actualiza `visto`
+en vez de añadir otra entrada. Un asunto puede tener varios hilos; un hilo pertenece a un solo
+asunto (al cambiarlo de asunto, el `id` se quita del viejo). `hilos` **es opcional**: los asuntos
+de antes del 16-sep-2026 no lo tienen y todo funciona igual. Se escribe con `App.anotar`, que
+relee el fichero antes y guarda con `Copias.guardar`.
+
+#### `seguidos.json`, para el recolector
+
+Cada vez que cambia una huella, la aplicación reescribe entero `seguidos.json` en la carpeta de
+la bandeja: `{ "hilos": [ { "id": ..., "visto": ..., "asunto": ... } ] }`. En cada pasada, el
+script de Apps Script hace lo de siempre con la etiqueta `GESTOR` y **después** lee ese fichero,
+abre cada hilo con `GmailApp.getThreadById` y, si tiene más mensajes que `visto`, lo recoge otra
+vez. Así vuelven a la bandeja las respuestas del tercero y también los correos que manda
+Francisco desde Gmail. Si el hilo ya no existe, se salta sin fallar; si `seguidos.json` no está o
+está roto, el script sigue con su trabajo normal.
+
+Esas fichas traen dos campos más: `respuestaDe` (el `id` del hilo) y `enviado: true` cuando el
+último mensaje lo mandó el propio usuario, que es lo que hace que la tarjeta diga "Lo enviaste
+tú".
+
+#### Qué entra en la carpeta del asunto
+
+- `AAMMDD CORREO <asunto recortado>.pdf` — el mensaje nuevo, él solo (campo `pdfMensaje`).
+- `AAMMDD HILO <asunto recortado>.pdf` — el hilo entero (campo `pdf`). **Se sustituye**: el
+  anterior del mismo hilo va a la papelera, no se acumulan copias del hilo completo.
+- `AAMMDD ADJUNTO <nombre>` — cada documento adjunto.
+
+En un hilo de un solo mensaje no hay `pdf`: ese PDF entra ya como `CORREO`. La ficha del asunto
+reconoce los tres por su nombre (`DE_CORREO`, en `js/ficha-asunto.js`) y los enseña en el grupo
+"Llegados por correo".
+
+El script vive en `apps-script/gestor-correos.gs`, pero **Apps Script no se despliega desde
+aquí**: Francisco lo pega a mano en `script.google.com` (las tres primeras líneas del fichero
+dicen cómo).
 
 ### El correo y la mensajería de Séneca
 
@@ -600,7 +660,8 @@ de `App` va después del fichero que lo define.
 | `js/rescate-datos.js` | Recoge los CSV que se hayan quedado un piso más arriba |
 | `js/traer-datos.js` | El botón de traer los CSV de Séneca desde donde estén |
 | `js/lector.js` | El panel de la derecha para leer, con su borde para estirarlo |
-| `js/bandeja-correos.js` | La bandeja de correos y lo que deja un correo dentro del asunto |
+| `js/bandeja-correos.js` | La bandeja de correos, la huella del hilo y lo que deja un correo dentro del asunto |
+| `js/bandeja-enlace.js` | "Elegir asunto": el cuadro para escogerlo a mano, y la puntuación de parecido |
 | `js/barra.js` | La barra plegable, el botón grande de Nuevo asunto y el icono de Ajustes plegado |
 | `js/vista.js` | Los filtros plegados y cuándo se ve el tablón |
 | `js/dni.js` | El DNI del alumnado, el aviso de que falta y la búsqueda por DNI |
@@ -617,7 +678,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/nombres-app.mjs` | Falla si dos ficheros definen la misma función de `App` |
 | `pruebas/navegador.mjs` | Prueba de la aplicación entera |
 | `pruebas/tipos.mjs` | Prueba de las tarjetas por tipo |
-| `pruebas/correos.mjs` | Prueba de lo que deja un correo dentro de un asunto |
+| `pruebas/correos.mjs` | Prueba de lo que deja un correo dentro de un asunto, de la huella del hilo y del elegidor |
 | `pruebas/tablon.mjs` | Prueba de cuándo se ve el tablón (a 1905 píxeles) |
 | `pruebas/dni.mjs` | Prueba del DNI, del aviso y de las tres mejoras del buscador |
 | `pruebas/empresas.mjs` | Prueba del nombre comercial y de cambiar los datos de un tercero |
@@ -640,6 +701,7 @@ de `App` va después del fichero que lo define.
 | `docs/PAPELERA.md` | El encargo de borrar con papelera |
 | `docs/UNIR-VER-DENTRO.md` | El encargo de la pantalla propia de duplicados |
 | `docs/REPARTO-CONTEXTO.md` | El encargo de repartir el contexto en tres documentos |
+| `docs/CORREOS-AL-ASUNTO.md` | El encargo de enlazar correos a un asunto y seguir el hilo |
 | `docs/AHORRO-CUOTA.md` | Reglas para gastar menos cuota al trabajar la cola |
 | `README.md` | — |
 
@@ -652,7 +714,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `tipos.json` | Tipos de asunto y su categoría |
 | `tipos-documento.json` | Tipos de documento |
 | `estados.json` | Estados de tramitación, en el orden del trámite |
-| `asuntos.json` | Ficha de cada asunto: quién lo abrió, estado, vía, notas, cierre, pasos, fecha límite, documentos pendientes de registro, relacionados, campos configurados del tipo |
+| `asuntos.json` | Ficha de cada asunto: quién lo abrió, estado, vía, notas, cierre, pasos, fecha límite, documentos pendientes de registro, relacionados, campos configurados del tipo, hilos de correo enganchados |
 | `guias.json` | Los pasos de cada tipo de asunto, con sus preguntas y opciones |
 | `recurrentes.json` | Los asuntos que se repiten y cuándo tocan |
 | `frescura.json` | Cada cuántos días avisar de que el RegAlum.csv está viejo |
@@ -668,7 +730,11 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 
 Cada nota de `asuntos.json` es `{ texto, quien, cuando }`, y las de correo llevan además
 `correo`, `enlace` y `enlaceTexto`. La ficha de un asunto guarda también `pasosHechos`,
-`pasosElegidos` y `pendientesRegistro` (los nombres de fichero que faltan por registrar).
+`pasosElegidos`, `pendientesRegistro` (los nombres de fichero que faltan por registrar) y
+`hilos` (los hilos de Gmail enganchados a ese asunto; ver "De un correo a un asunto").
+
+**La carpeta de la bandeja de correos no es de `_GESTOR`**: está en el Drive de cada uno, y ahí
+la aplicación escribe `seguidos.json` para el recolector de Apps Script.
 
 **Todo fichero compartido se relee justo antes de escribirlo.** Son dos ordenadores sobre la
 misma carpeta: sin releer, el último en guardar borra lo del otro. Lo hacen los once ficheros de
@@ -723,6 +789,9 @@ cualquiera. `.github/workflows/pruebas.yml` lo lanza en cada subida y en cada pu
 
 Las pruebas de navegador leen `process.env.CHROMIUM_PATH` (si no está, Playwright usa el suyo),
 para funcionar igual en local y en Actions.
+
+**Nada de fechas escritas a mano en una prueba.** Una fecha fija (un cese, un plazo) pone la
+prueba en rojo ella sola en cuanto el calendario la alcanza. Se cuentan desde hoy.
 
 ### Fichas sin carpeta
 
@@ -787,8 +856,8 @@ Aparte, en `localStorage`: `gestor-barra`, `gestor-filtros`, `gestor-lector-anch
 - **Ojo con los `MutationObserver` sobre la clase de un elemento que uno mismo cambia.**
 - **Ojo con el orden de los `<script>` de `index.html`.** `ficha-asunto.js` poda la tarjeta con
   su lista blanca, así que un módulo que quiera poner un botón ahí tiene que cargarse después.
-  `lector.js` va antes que `bandeja-correos.js`. `dni.js` va casi el último; `inicio.js`, el
-  último.
+  `lector.js` va antes que `bandeja-correos.js`, y `bandeja-enlace.js` después de los dos.
+  `dni.js` va casi el último; `inicio.js`, el último.
 - **Envolver una función que ya existe es la mejor manera de añadir algo a muchas pantallas a la
   vez** (hay más de 17 envolturas así). Condición: cargarse **después** del fichero que define lo
   que se envuelve. No siempre compensa: cuando lo que hay que cambiar está dentro de una función
@@ -840,7 +909,9 @@ Aparte, en `localStorage`: `gestor-barra`, `gestor-filtros`, `gestor-lector-anch
 2. Coordinar con el compañero la **lista de tipos de asunto**. Está aceptado empezar sin ella.
 3. Coordinar con él también la **lista de estados**.
 4. **Poner en marcha el script de Gmail** en la cuenta `g.educaand.es`, y señalar la carpeta
-   `GESTOR-BANDEJA` en Ajustes. **Pendiente además volver a pegar el script**.
+   `GESTOR-BANDEJA` en Ajustes. **Pendiente volver a pegar el script**: el del 16-sep-2026 es el
+   que sigue los hilos ya enganchados (`seguidos.json`) y el que arregla el enlace a Gmail. Sin
+   pegarlo, las respuestas no vuelven a la bandeja.
 5. Ver con el uso si la bandeja **acierta con el tipo**. Si falla mucho, palabras clave por tipo.
 6. **Plantillas de correo y de mensaje por tipo de asunto**, con huecos que se rellenan solos.
    Hacerlo cuando el uso diga qué correos se repiten.
