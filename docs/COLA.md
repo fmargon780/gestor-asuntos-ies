@@ -56,6 +56,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 14 | `docs/PLANTILLAS-DE-CORREO.md` | HECHA | Plantillas por tipo de asunto, con huecos que se rellenan solos, para el correo y para el mensaje de Séneca; desplegable en los dos cuadros, aviso de huecos sin datos, recorte a 4.000 letras en Séneca. Bloque propio en Ajustes, con alta, edición, borrado y vista previa; firma y centro editables, ya no escritos a mano en el código. Batería completa en verde. Detalle en `docs/HISTORIA.md`. |
 | 15 | `docs/HITOS.md` | PENDIENTE | Hitos dentro de cada asunto: los pasos de la guía pasan a ser hitos vivos, con estado, fecha, responsable, notas y documentos apuntados. Fichero nuevo `_GESTOR/hitos.json` (los compartidos pasan de once a doce); al archivar, el historial se escribe en la carpeta del asunto. Bifurcaciones como hito de decisión. Responsables configurables más papeles automáticos. Plazos en días hábiles. Acordado con Francisco el 16-sep-2026. |
 | 16 | `docs/QUE-ME-TOCA.md` | PENDIENTE | Pantalla nueva que cruza todos los asuntos abiertos: "En tu tejado", "Esperando a otros" (con días parados) y "Sin fecha", con filtro por responsable. Depende de la fila 15. Acordado con Francisco el 16-sep-2026. |
+| 17 | `docs/PLANTILLAS-DE-DOCUMENTO.md` | PENDIENTE | El gemelo en papel de la fila 14. Plantillas de Word colgadas de cada tipo de asunto, guardadas en `_GESTOR/PLANTILLAS`; botón "Generar documento" en la ficha del asunto, que saca una copia del Word con los huecos rellenos, ya guardada en la carpeta del asunto y con el nombre que mandan las reglas, sin preguntar nada. Módulos nuevos `js/docx.js` (ZIP y XML a mano, sin librerías) y `js/plantillas-documento.js`. **Reutiliza el motor de huecos de la fila 14**: misma sintaxis de una llave, misma función `Plantillas.rellenar`, mismo `plantillas.json` (clave nueva `documentos`). Amplía el catálogo de huecos y saca `valoresDePlantilla` de `js/correo.js` a `Plantillas.valoresDeAsunto`. No crea ningún fichero compartido nuevo. Acordado con Francisco el 16-sep-2026. |
 
 ## Lo que vendrá después
 
@@ -68,4 +69,6 @@ mire, con un documento real, si el enlace de verificación del pie abre la copia
 pedir certificado ni captcha. Hasta entonces no se puede diseñar.
 
 Cuando los hitos (fila 15) estén en uso, queda por hablar: si el estado del asunto desaparece y lo
-sustituye el hito en curso, y si un hito puede apuntar a su plantilla de correo (fila 14).
+sustituye el hito en curso, y si un hito puede apuntar a su plantilla de correo (fila 14) o a su
+plantilla de documento (fila 17). Esto último Francisco ya lo dio por hecho el 16-sep-2026: las
+plantillas acabarán colgando también de los tipos de hito.
