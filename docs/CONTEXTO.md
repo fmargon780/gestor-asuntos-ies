@@ -213,6 +213,51 @@ al elegir una, salen solo esos pasos, y la cuenta de arriba suma solo la rama el
 
 Se comprueba con `pruebas/guias.mjs` y `pruebas/opciones.mjs`.
 
+### Los hitos de un asunto
+
+Dentro de un asunto abierto, la guía deja de ser texto que se marca con una casilla y pasa a ser
+la lista de **hitos** que se trabaja: cada paso, vivo dentro de ese asunto, con estado (pendiente
+· en curso · hecho · no aplica), fecha límite, responsable, notas y documentos apuntados.
+
+- Viven en `_GESTOR/hitos.json` (el duodécimo fichero compartido), no en `asuntos.json`: se leen
+  solo al abrir un asunto, al archivarlo y en la pantalla "Qué me toca". Estructura:
+  `{ ajustes: { responsables, noLectivos }, porAsunto: { <clave del asunto>: { creados, hitos } } }`.
+- **Al crear un asunto**, si su tipo tiene guía, sus pasos se convierten en hitos solos (el id del
+  hito es el mismo que el del paso: `origenGuia`), y el primero queda en curso. Un asunto que ya
+  existía no los recibe solo: en el sitio de la guía sale el botón "Crear los hitos de la guía",
+  que además importa `pasosHechos`/`pasosElegidos` (que se quedan en `asuntos.json` tal cual).
+  Tocar los hitos de un asunto nunca cambia la guía del tipo.
+- **Bifurcaciones**: un paso-pregunta se convierte en un hito de clase `decision`. Mientras no se
+  elige una opción, la lista se corta ahí. Cambiar de rama quita los hitos vacíos de la vieja y
+  marca `noaplica` (plegados, al final) los que tenían notas o documentos.
+  `Hitos.visibles`/`Hitos.huerfanos` (`js/hitos.js`) son quienes saben qué se ve y qué se pliega.
+- **Un solo hito en curso a la vez**: al marcar uno hecho, el siguiente pendiente de la lista
+  visible pasa a "en curso" solo (`Hitos.recomputeEnCurso`).
+- **Responsable**: persona del centro (configurable en Ajustes › Hitos) o un papel fijo
+  (`tercero`, `tutor`, `relacionado`) que la aplicación resuelve sola con datos del asunto
+  (`Hitos.resolverResponsable`); sin resolver, se enseña en gris.
+- **Plazo**: un paso puede llevar "tantos días hábiles desde que se complete otro paso". Al
+  marcarlo hecho, `Plazos.sumarDiasHabiles` (días no lectivos de Ajustes › Hitos incluidos) pone
+  sola la fecha límite del siguiente, salvo que Francisco la haya tocado a mano.
+- **Estado del asunto**: un paso puede llevar apuntado un estado de `estados.json`; al pasar su
+  hito a "en curso", el asunto pasa solo a ese estado. La única función que lo decide es
+  `Hitos.estadoDelAsunto` (`js/hitos.js`), para poder cambiar el criterio sin tocar diez sitios.
+- **Al archivar**, los hitos salen de `hitos.json` y se escriben, dentro de la carpeta ya
+  archivada, como `HISTORIAL DE TRAMITACION.txt` (legible sin la aplicación, sin copiar ningún
+  documento; gemelo de `DONDE ESTA ESTE ASUNTO.txt` de `js/relacionados.js`). Si el asunto se
+  reabre y el fichero sigue ahí, los hitos se cargan de vuelta a `hitos.json` y el fichero se
+  borra.
+- Se escriben desde el mismo cuadro de la guía (`Guias.editar`, con tres campos nuevos y
+  opcionales por paso: responsable por defecto, estado del asunto y plazo) y se pintan en la
+  ficha del asunto **envolviendo** lo que hoy pinta la guía, con un `MutationObserver` sobre
+  `#ficha-guia` (no hay ninguna función de `App` que envolver: `pintarGuia` es privada de
+  `js/ficha-asunto.js`).
+- Vive en `js/hitos.js` y `js/hitos-archivo.js` (el modelo; se parte en dos para no pasar de las
+  400 líneas), `js/hitos-panel.js` (la ficha del asunto) y `js/hitos-ajustes.js` (el bloque
+  "Hitos" de Ajustes: responsables y días no lectivos).
+
+Se comprueba con `pruebas/hitos.mjs`.
+
 ### La pantalla se mide a sí misma
 
 `css/vista.css` pone `container-type: inline-size` en `.contenido`: las reglas miran el ancho
@@ -756,13 +801,16 @@ de `App` va después del fichero que lo define.
 | `js/frescura.js` | El aviso de que el RegAlum.csv está viejo, y sus épocas |
 | `js/recurrentes.js` | Los asuntos que se repiten cada mes, trimestre o curso |
 | `js/guias-enganche.js` | Las guías dentro de la app, y `window.GuiasDelCentro` |
+| `js/hitos.js`, `js/hitos-archivo.js` | El modelo de los hitos de un asunto: leer/escribir `hitos.json`, crearlos desde la guía, marcarlos, bifurcaciones, responsables y el historial al archivar |
 | `js/notas.js` | Las notas de cada asunto, con su enlace y su botón |
 | `js/registro.js` | Registrar un documento en un paso, sin nombrarlo dos veces |
 | `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF |
 | `js/lib/pdf.min.js`, `js/lib/pdf.worker.min.js` | pdf.js (Mozilla) 3.11.174, copiado tal cual |
 | `js/ficha-asunto.js` | La pantalla de un asunto: guía, notas, documentos y contacto |
+| `js/hitos-panel.js` | Pinta los hitos en la ficha del asunto, envolviendo lo que pinta la guía |
 | `js/duplicados.js` | ¿Esto no lo hicimos ya? Asuntos iguales del mismo tercero |
 | `js/relacionados.js` | Terceros relacionados con un asunto, y la nota al archivar |
+| `js/hitos-archivo.js` | La otra mitad del modelo de hitos: bifurcaciones, responsables de Ajustes y el `HISTORIAL DE TRAMITACION.txt` al archivar/reabrir |
 | `js/visor.js` | El panel de la derecha para ver un documento (`con-visor`) |
 | `js/tipos-buscador.js` | Buscar el tipo de asunto por letras, y los más usados arriba |
 | `js/via-contacto.js` | Los teléfonos y correos del tercero, como botones |
@@ -782,6 +830,8 @@ de `App` va después del fichero que lo define.
 | `js/dni.js` | El DNI del alumnado, el aviso de que falta y la búsqueda por DNI |
 | `js/papelera.js` | Borrar con papelera: mandar, devolver, borrar del todo y el bloque de Ajustes |
 | `css/papelera.css` | El bloque de la papelera en Ajustes, y su icono por clase |
+| `js/hitos-ajustes.js` | El bloque "Hitos" de Ajustes: responsables y días no lectivos |
+| `css/hitos.css` | El aspecto de la lista de hitos en la ficha del asunto, y del bloque de Ajustes |
 | `js/inicio.js` | La última línea: `App.arrancar()` |
 | `package.json` | Las dependencias de las pruebas (`playwright`, `jsdom`) y `npm test` |
 | `pruebas/ejecutar.mjs` | Levanta el servidor local y ejecuta todas las pruebas de esta carpeta |
@@ -808,6 +858,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/documentos-sueltos.mjs` | Prueba de "Meter en un asunto": un documento suelto a un asunto que ya existe |
 | `pruebas/envios.mjs` | Prueba de mandar documentos por correo: el encargo, el hilo, el límite de 20 MB, "listo" y "error" |
 | `pruebas/plantillas.mjs` | Prueba de las plantillas: huecos, "Faltan datos", cambiar de plantilla, sin plantillas, y el recorte de Séneca |
+| `pruebas/hitos.mjs` | Prueba de los hitos de un asunto: crearlos, marcarlos, bifurcaciones, plazo, responsable y el historial al archivar |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |
@@ -824,6 +875,7 @@ de `App` va después del fichero que lo define.
 | `docs/AHORRO-CUOTA.md` | Reglas para gastar menos cuota al trabajar la cola |
 | `docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md` | El encargo de adjuntar documentos del asunto a un borrador de Gmail |
 | `docs/PLANTILLAS-DE-CORREO.md` | El encargo de las plantillas de correo y de mensaje por tipo |
+| `docs/HITOS.md` | El encargo de los hitos de un asunto |
 | `README.md` | — |
 
 ### Lo que la aplicación guarda en `_GESTOR`
@@ -845,9 +897,10 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `no-duplicados.json` | Grupos de posibles duplicados descartados con "No son el mismo", por la firma de sus nombres |
 | `envios.json` | **Es una lista, no un objeto.** Los encargos vivos de "mandar documentos por correo": `{ id, asunto, para, creado }` |
 | `plantillas.json` | `{ firma, centro, lista: [{ id, tipo, categoria, nombre, texto }] }`, para el correo y el mensaje de Séneca |
+| `hitos.json` | `{ ajustes: { responsables, noLectivos }, porAsunto: { <clave>: { creados, hitos } } }`: los hitos vivos de cada asunto abierto (ver "Los hitos de un asunto") |
 | `datos/*.csv` | Alumnado (Séneca), personal, empresas y otros |
 | `PAPELERA/` | Las carpetas y ficheros borrados, cada uno en su subcarpeta `AAMMDD-HHMM <nombre>` |
-| `copias/*.json` | Copias de seguridad de los once ficheros de arriba, una por día, 30 como mucho de cada uno |
+| `copias/*.json` | Copias de seguridad de los doce ficheros de arriba, una por día, 30 como mucho de cada uno |
 
 **Los CSV van en `datos`, no en `_GESTOR`.** `js/rescate-datos.js` los baja solos al entrar.
 
@@ -860,7 +913,7 @@ Cada nota de `asuntos.json` es `{ texto, quien, cuando }`, y las de correo lleva
 la aplicación escribe `seguidos.json` para el recolector de Apps Script.
 
 **Todo fichero compartido se relee justo antes de escribirlo.** Son dos ordenadores sobre la
-misma carpeta: sin releer, el último en guardar borra lo del otro. Lo hacen los once ficheros de
+misma carpeta: sin releer, el último en guardar borra lo del otro. Lo hacen los doce ficheros de
 arriba.
 
 ### Copias de seguridad y fichero roto
@@ -869,12 +922,12 @@ arriba.
 JSON está roto, lanza un error `FicheroRoto` en vez de devolver `null` (antes se trataba igual
 que si no existiera, y el siguiente guardado lo escribía encima, perdiendo todo).
 
-- `js/copias.js` guarda, antes de escribir cualquiera de los once ficheros compartidos, una
+- `js/copias.js` guarda, antes de escribir cualquiera de los doce ficheros compartidos, una
   copia de cómo estaba justo antes, en `_GESTOR/copias/<nombre>-AAMMDD.json`. Una copia por
   fichero y día; se conservan las últimas 30 de cada uno.
 - Todo lo que escribe uno de esos ficheros llama a `Copias.guardar` en vez de a
   `Carpetas.guardarJson` directamente.
-- Al pulsar Entrar se comprueban los once ficheros (`Copias.comprobarTodos`). Si alguno está
+- Al pulsar Entrar se comprueban los doce ficheros (`Copias.comprobarTodos`). Si alguno está
   roto, **no se entra**: sale un aviso en rojo con un botón para restaurar la última copia de
   cada uno. El fichero roto se aparta como `<nombre>-roto-AAMMDD-HHMM.json` y no se borra nunca.
 - En Ajustes, el bloque **Copias de seguridad** enseña cuántas copias hay de cada fichero y deja
@@ -888,9 +941,10 @@ Si los dos ordenadores guardan casi a la vez, Dropbox no pisa nada: deja aparte 
 `asuntos (copia en conflicto de PC2 2026-09-11).json`.
 
 - `js/conflictos.js` busca esos ficheros al entrar y cada cinco minutos.
-- `asuntos.json` y `tablon.json` se fusionan solos: se unen los asuntos (o las notas del
-  tablón) por su clave, y dentro de cada uno se unen las notas, los pasos hechos y los pasos
-  elegidos, sin repetir nada.
+- `asuntos.json`, `tablon.json` y `hitos.json` se fusionan solos: se unen los asuntos (o las
+  notas del tablón) por su clave, y dentro de cada uno se unen las notas, los pasos hechos y los
+  pasos elegidos (`asuntos.json`), o los hitos por su id (`hitos.json`), sin repetir nada. En
+  `hitos.json`, dentro de `ajustes` solo se fusionan las altas de `responsables` y `noLectivos`.
 - Los demás (`tipos.json`, `estados.json`, `tipos-documento.json`, `guias.json`,
   `recurrentes.json`, `frescura.json`, `campos.json`) cambian mucho menos y no se fusionan
   solos: salen en el bloque **Conflictos de Dropbox** de Ajustes, con dos botones para elegir

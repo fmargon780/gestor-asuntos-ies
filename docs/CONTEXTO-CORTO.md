@@ -88,6 +88,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Pruebas automáticas en GitHub Actions en cada subida.
 - Escape y botón de salida en toda pantalla; copiar el nombre de un relacionado en orden normal;
   carpetas temporales de Drive/Dropbox fuera de Asuntos abiertos.
+- Hitos: la guía de un asunto abierto se trabaja como hitos vivos (estado, fecha límite,
+  responsable, notas y documentos), con bifurcaciones y un historial al archivar.
 
 ## 6. Reglas de código que no se pueden olvidar
 

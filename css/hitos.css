@@ -1,0 +1,101 @@
+/* ============================================================
+   hitos.css — los hitos dentro de la ficha de un asunto, y el
+   bloque "Hitos" de Ajustes (16-sep-2026).
+
+   La lista de hitos vive dentro de .ficha-bloque (css/ficha-asunto.css),
+   así que ya llega al mismo borde que el resto de la ficha: aquí no
+   hace falta ningún ancho especial para "aprovechar el ancho".
+   ============================================================ */
+
+.hitos-cuenta { margin-bottom: 10px; }
+
+.lista-hitos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hito {
+  border: 1px solid var(--linea);
+  border-left: 4px solid var(--azul);
+  border-radius: 8px;
+  background: var(--papel);
+  padding: 10px 14px;
+}
+.hito-hecho { border-left-color: #1e7a46; background: var(--verde); }
+.hito-hecho .hito-titulo { text-decoration: line-through; opacity: .75; }
+.hito-encurso { border-left-color: var(--ambar-linea); box-shadow: 0 0 0 2px rgba(224, 179, 74, .18); }
+.hito-noaplica { border-left-color: #b9c6d6; opacity: .7; }
+.hito-decision { border-left-color: var(--ambar-linea); }
+
+.hito-linea {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+.hito-casilla { width: 16px; height: 16px; flex: none; cursor: pointer; }
+.hito-titulo { font-weight: 600; flex: 1; word-break: break-word; }
+.hito-meta { display: flex; gap: 8px; align-items: center; flex: none; }
+.hito-fecha, .hito-resp {
+  font-size: 12px;
+  border-radius: 20px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+.hito-fecha { background: var(--azul-claro); color: var(--azul); border: 1px solid #c3d8ec; }
+.hito-resp { background: var(--fondo); color: var(--tinta-suave); border: 1px solid var(--linea); }
+.hito-resp-sinresolver { color: #9aa7b4; font-style: italic; }
+
+.hito-desplegar {
+  border: 0; background: none; font-size: 13px; color: var(--tinta-suave);
+  cursor: pointer; flex: none; padding: 2px 4px;
+}
+
+.hito-cuerpo {
+  margin: 10px 0 0 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hito-cuerpo.oculto { display: none; }
+.hito-cuerpo .etiqueta { margin: 4px 0 0; font-size: 12px; }
+.hito-explicacion { color: var(--tinta-suave); font-size: 14px; line-height: 1.5; }
+.hito-explicacion p { margin: 0 0 6px; }
+
+.hito-notas { display: flex; flex-direction: column; gap: 6px; }
+.hito-nota {
+  background: var(--fondo); border-radius: 8px; padding: 6px 10px; font-size: 13px;
+}
+.hito-nota-texto { min-height: 44px; }
+
+.hito-documentos { display: flex; flex-wrap: wrap; gap: 6px; }
+.hito-documento {
+  font-size: 12px; background: var(--fondo); border: 1px solid var(--linea);
+  border-radius: 20px; padding: 3px 6px 3px 10px; display: inline-flex; align-items: center; gap: 6px;
+}
+.hito-doc-quitar { border: 0; background: none; cursor: pointer; color: var(--tinta-suave); font-size: 11px; }
+
+.hito-botones { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 4px; }
+
+/* ---------- las bifurcaciones ---------- */
+
+.hito-marca-pregunta {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 11px; flex: none;
+  background: var(--ambar); border: 1px solid var(--ambar-linea); color: #8a6100;
+  font-size: 12px; font-weight: 700;
+}
+.hito-opciones { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0 26px; }
+.hito-opcion.elegida { border-color: #1e7a46; background: var(--verde); }
+
+.hitos-huerfanos { margin-top: 4px; }
+.hitos-huerfanos > summary { cursor: pointer; font-size: 13px; color: var(--tinta-suave); }
+.hitos-huerfanos .lista-hitos { margin-top: 8px; }
+.hitos-huerfanos .hito { opacity: .75; }
+
+/* ---------- el bloque "Hitos" de Ajustes ---------- */
+
+.hitos-subtitulo { margin: 16px 0 4px; font-size: 13px; color: var(--tinta-suave); }
+.hitos-subtitulo:first-child { margin-top: 0; }
+#hitos-no-lectivos { min-height: 110px; font-family: inherit; resize: vertical; }

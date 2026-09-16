@@ -5,6 +5,56 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 16-sep-2026 — Los hitos de un asunto
+
+Fila 15 de la cola (`docs/HITOS.md`).
+
+Hasta hoy la guía de un tipo era texto que se leía y se marcaba con una casilla, igual para
+todos los asuntos de ese tipo. Desde hoy, dentro de un asunto abierto, esos mismos pasos se
+convierten en **hitos**: además de marcados o no, llevan estado (pendiente · en curso · hecho ·
+no aplica), fecha límite, responsable, notas y documentos apuntados.
+
+**Fichero nuevo, `_GESTOR/hitos.json`**, el duodécimo compartido: pasan de once a doce
+(`js/copias.js`, `js/conflictos.js`). No va en `asuntos.json` porque ese fichero se lee en toda
+pantalla y se escribe entero cada vez; `hitos.json` solo se lee al abrir un asunto, al archivarlo
+y (en la fila 16) en "Qué me toca".
+
+**De dónde salen.** Un asunto nuevo copia los pasos de la guía de su tipo al crearse (se envolvió
+`App.anotar`, mirando el `abiertoEl` que solo pone la creación, en vez de tocar
+`js/asuntos-nuevo.js` y `js/recurrentes.js`). Uno viejo no los recibe solo: sale el botón "Crear
+los hitos de la guía", que además importa `pasosHechos`/`pasosElegidos` (se quedan en
+`asuntos.json`, por si hay que volver atrás). El id del hito es el mismo que el del paso de la
+guía: así un plazo "desde tal paso" o un `pasosElegidos` viejo se traducen solos.
+
+**Bifurcaciones.** Un paso-pregunta se convierte en un hito de clase `decision`: mientras no se
+elige una opción, la lista se corta ahí (`Hitos.visibles`); al elegir, los hitos de la rama
+cuentan como si vinieran debajo. Cambiar de rama quita los hitos vacíos de la vieja y marca
+`noaplica` (plegados al final, `Hitos.huerfanos`) los que ya tenían notas o documentos.
+
+**Responsable, plazo y estado.** El cuadro de escribir la guía (`Guias.editar`) gana tres campos
+opcionales y plegados por paso: responsable por defecto (personas de Ajustes + los papeles fijos
+`tercero`/`tutor`/`relacionado`, que se resuelven solos con datos del asunto), estado del asunto
+(de `estados.json`) y plazo (días y desde qué paso). Los días se cuentan hábiles, descontando los
+no lectivos de Ajustes › Hitos (`Plazos.sumarDiasHabiles`, nombre propio para que lo reutilice la
+fila 16). El estado del asunto lo decide una sola función, `Hitos.estadoDelAsunto`, para poder
+cambiar el criterio sin tocar diez sitios si algún día el estado del asunto lo sustituye el
+propio hito en curso.
+
+**Al archivar**, los hitos salen de `hitos.json` y se escriben, ya dentro del ARCHIVO, como
+`HISTORIAL DE TRAMITACION.txt`: legible sin la aplicación, sin copiar ningún documento (mismo
+criterio que `DONDE ESTA ESTE ASUNTO.txt` de los relacionados). Al reabrir, si el fichero sigue
+ahí, los hitos vuelven a `hitos.json` y el fichero se borra.
+
+**En la ficha del asunto**, los hitos sustituyen a la lista de pasos, en el mismo sitio de
+siempre, envolviendo lo que pinta la guía sin tocar `js/ficha-asunto.js`: `pintarGuia` es una
+función privada de ese fichero, así que en vez de envolver una función de `App` se usó un
+`MutationObserver` sobre `#ficha-guia`, como ya sugería `docs/CONTEXTO.md` para un panel que se
+repinta entero.
+
+**Ficheros nuevos**: `js/hitos.js` y `js/hitos-archivo.js` (el modelo, partido en dos por las
+400 líneas), `js/hitos-panel.js` (la ficha), `js/hitos-ajustes.js` (el bloque "Hitos" de
+Ajustes: responsables y días no lectivos), `css/hitos.css` y `pruebas/hitos.mjs`.
+
 ## 16-sep-2026 — Un documento suelto puede entrar en un asunto que ya existe
 
 Fila 12 de la cola (`docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md`). Versión publicada

@@ -28,6 +28,7 @@
 <link rel="stylesheet" href="css/duplicados.css">
 <link rel="stylesheet" href="css/unir-asuntos.css">
 <link rel="stylesheet" href="css/papelera.css">
+<link rel="stylesheet" href="css/hitos.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -574,12 +575,21 @@
 <script src="js/conflictos.js"></script>
 <script src="js/recurrentes.js"></script>
 <script src="js/guias-enganche.js"></script>
+<!-- El modelo de los hitos de un asunto: después de js/guias.js y de
+     js/plazos.js (los usa), y después de js/puente.js (usa
+     window.Gestor). js/hitos-panel.js pinta los hitos dentro de la
+     ficha del asunto, así que va después de js/ficha-asunto.js.
+     js/hitos-archivo.js va después de js/relacionados.js: envuelve
+     App.cerrarAsunto/App.reabrirAsunto detrás de esa envoltura. -->
+<script src="js/hitos.js"></script>
 <script src="js/notas.js"></script>
 <script src="js/registro-lector.js"></script>
 <script src="js/registro.js"></script>
 <script src="js/ficha-asunto.js"></script>
+<script src="js/hitos-panel.js"></script>
 <script src="js/duplicados.js"></script>
 <script src="js/relacionados.js"></script>
+<script src="js/hitos-archivo.js"></script>
 <script src="js/visor.js"></script>
 <script src="js/tipos-buscador.js"></script>
 <script src="js/via-contacto.js"></script>
@@ -597,6 +607,7 @@
 <script src="js/vista.js"></script>
 <script src="js/dni.js"></script>
 <script src="js/papelera.js"></script>
+<script src="js/hitos-ajustes.js"></script>
 
 <!-- Y ahora sí, a arrancar. -->
 <script src="js/inicio.js"></script>

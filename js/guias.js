@@ -113,17 +113,32 @@ var Guias = (function () {
     }).filter(function (o) { return o.titulo || o.pasos.length; });
   }
 
+  /* Los tres campos de hitos (16-sep-2026, docs/HITOS.md sección 11):
+     responsable por defecto, estado del asunto y plazo. Los tres son
+     opcionales y van plegados en el editor; una guía vieja que no los
+     traiga sigue funcionando igual, con los tres vacíos. Solo existen
+     en los pasos de arriba: normalizarOpciones los quita al bajar a
+     una opción (ver más abajo), que no los necesita todavía. */
+  function normalizarExtra(p) {
+    return {
+      responsable: String((p && p.responsable) || ''),
+      estadoAsunto: (p && p.estadoAsunto) || null,
+      plazo: (p && p.plazo && p.plazo.dias)
+        ? { dias: parseInt(p.plazo.dias, 10) || 0, desde: String(p.plazo.desde || '') } : null
+    };
+  }
+
   function normalizar(lista) {
     return (lista || []).map(function (p) {
       if (typeof p === 'string') {
-        return { id: nuevoId(), titulo: p, cuerpo: '', opciones: [] };
+        return Object.assign({ id: nuevoId(), titulo: p, cuerpo: '', opciones: [] }, normalizarExtra(null));
       }
-      return {
+      return Object.assign({
         id: (p && p.id) || nuevoId(),
         titulo: String((p && p.titulo) || ''),
         cuerpo: limpiar((p && p.cuerpo) || ''),
         opciones: normalizarOpciones(p && p.opciones)
-      };
+      }, normalizarExtra(p));
     }).filter(function (p) {
       return p.titulo || tieneTexto(p.cuerpo) || p.opciones.length;
     });
@@ -401,8 +416,15 @@ var Guias = (function () {
       '</div>';
   }
 
-  function editar(nombreTipo, lista) {
+  /* 'listaResponsables' es [{id,nombre}], personas de Ajustes más los
+     papeles fijos; 'listaEstados' es una lista de nombres de
+     estados.json. Las dos son opcionales: sin ellas, los desplegables
+     salen vacíos, pero el resto del cuadro funciona igual (una guía
+     vieja no tiene por qué dejar de escribirse). */
+  function editar(nombreTipo, lista, listaResponsables, listaEstados) {
     var pasos = normalizar(lista);
+    var opcionesResp = listaResponsables || [];
+    var opcionesEstado = listaEstados || [];
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-medio');
     editando = null;
@@ -464,6 +486,44 @@ var Guias = (function () {
       rangoGuardado = null;
     };
 
+    /* ---------- responsable, estado y plazo por defecto (sección 11) ----------
+
+       "Desde qué paso" solo puede ser OTRO paso de arriba (las
+       opciones no llevan estos campos todavía). Se reconstruye en
+       cada pintado, con los pasos tal y como están en ese momento. */
+    function pasoExtraHTML(p, i) {
+      var otros = pasos.filter(function (x, k) { return k !== i; });
+      return '<details class="paso-extra">' +
+        '<summary>Responsable, estado y plazo <span class="suave">(opcional)</span></summary>' +
+        '<div class="paso-extra-cuerpo">' +
+          '<label class="etiqueta">Responsable por defecto</label>' +
+          '<select class="campo paso-responsable"><option value="">(sin responsable)</option>' +
+          opcionesResp.map(function (r) {
+            return '<option value="' + U.escapar(r.id) + '"' + (r.id === p.responsable ? ' selected' : '') +
+              '>' + U.escapar(r.nombre) + '</option>';
+          }).join('') + '</select>' +
+          '<label class="etiqueta">Estado del asunto</label>' +
+          '<select class="campo paso-estado-asunto"><option value="">(ninguno)</option>' +
+          opcionesEstado.map(function (e) {
+            return '<option value="' + U.escapar(e) + '"' + (e === p.estadoAsunto ? ' selected' : '') +
+              '>' + U.escapar(e) + '</option>';
+          }).join('') + '</select>' +
+          '<label class="etiqueta">Plazo</label>' +
+          '<div class="paso-plazo-fila">' +
+            '<input type="number" min="1" class="campo paso-plazo-dias" placeholder="días" value="' +
+            (p.plazo ? p.plazo.dias : '') + '">' +
+            '<span class="suave">días desde</span>' +
+            '<select class="campo paso-plazo-desde"><option value="">(sin plazo)</option>' +
+            otros.map(function (o) {
+              return '<option value="' + U.escapar(o.id) + '"' +
+                (p.plazo && p.plazo.desde === o.id ? ' selected' : '') + '>' +
+                U.escapar(o.titulo || 'Paso sin título') + '</option>';
+            }).join('') + '</select>' +
+          '</div>' +
+        '</div>' +
+      '</details>';
+    }
+
     /* ---------- la lista de pasos ---------- */
 
     /* Se lee todo lo escrito antes de repintar o de guardar. Ojo con los
@@ -480,6 +540,18 @@ var Guias = (function () {
         if (isNaN(i) || !pasos[i]) return;
         pasos[i].titulo = caja.querySelector(':scope > .paso-cabecera .paso-titulo').value.trim();
         pasos[i].cuerpo = limpiar(caja.querySelector(':scope > .paso-cuerpo').innerHTML);
+
+        /* Los tres campos nuevos (16-sep-2026, hitos), siempre en los
+           mismos hijos directos, se lean o no lean las opciones. */
+        var respSel = caja.querySelector(':scope > .paso-extra .paso-responsable');
+        pasos[i].responsable = respSel ? respSel.value : '';
+        var estSel = caja.querySelector(':scope > .paso-extra .paso-estado-asunto');
+        pasos[i].estadoAsunto = (estSel && estSel.value) ? estSel.value : null;
+        var diasInp = caja.querySelector(':scope > .paso-extra .paso-plazo-dias');
+        var desdeSel = caja.querySelector(':scope > .paso-extra .paso-plazo-desde');
+        var dias = diasInp ? parseInt(diasInp.value, 10) : NaN;
+        pasos[i].plazo = (!isNaN(dias) && dias > 0 && desdeSel && desdeSel.value)
+          ? { dias: dias, desde: desdeSel.value } : null;
 
         var marca = caja.querySelector(':scope > .paso-es-pregunta-fila .paso-es-pregunta');
         if (!marca || !marca.checked) { pasos[i].opciones = []; return; }
@@ -565,6 +637,8 @@ var Guias = (function () {
 
         var cuerpo = d.querySelector('.paso-cuerpo');
         prepararRecuadro(cuerpo);
+
+        d.insertAdjacentHTML('beforeend', pasoExtraHTML(p, i));
 
         /* ---- la casilla de "esto es una pregunta" ---- */
         var pregunta = esPregunta(p);

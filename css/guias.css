@@ -243,4 +243,20 @@
 .paso-cuerpo ul, .paso-cuerpo ol { margin: 6px 0; padding-left: 20px; }
 .paso-cuerpo a { color: var(--azul); }
 
+/* ---------- responsable, estado y plazo por defecto (16-sep-2026, hitos) ---------- */
+
+.paso-extra {
+  margin-top: 10px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--fondo);
+}
+.paso-extra > summary { cursor: pointer; font-size: 13px; color: var(--tinta-suave); }
+.paso-extra-cuerpo { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.paso-extra-cuerpo .etiqueta { margin: 4px 0 0; font-size: 12px; }
+.paso-plazo-fila { display: flex; align-items: center; gap: 8px; }
+.paso-plazo-fila .paso-plazo-dias { max-width: 80px; }
+.paso-plazo-fila .paso-plazo-desde { flex: 1; }
+
 /* publicado 10-sep-2026 13:55 */
