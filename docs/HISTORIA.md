@@ -5,6 +5,42 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 16-sep-2026 — Un documento suelto puede entrar en un asunto que ya existe
+
+Fila 12 de la cola (`docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md`). Versión publicada
+`16-sep-2026 · 21:40`.
+
+"Por clasificar" tenía el mismo agujero que tenía la bandeja de correos antes de la fila 11: el
+único destino posible de un documento suelto era **un asunto nuevo**. Si el papel era de una
+gestión que ya existía, no había por dónde meterlo desde la aplicación; había que ir al
+explorador de archivos y arrastrarlo a mano.
+
+**"Meter en un asunto".** Botón nuevo en cada tarjeta de "Por clasificar", entre "Crear asunto
+con él" y "Borrar". Abre el cuadro de elegir asunto, y al elegir uno el fichero se lleva a su
+carpeta y se abre el cuadro de ponerle nombre: exactamente el camino de "Crear asunto con él",
+pero sin crear nada.
+
+**Un solo elegidor para los dos.** La fila 11 había dejado el cuadro de escoger asunto dentro de
+`js/bandeja-enlace.js`. Copiarlo habría sido tener dos buscadores y dos listas que mantener, así
+que se sacó a **`js/elegir-asunto.js`** y ahora lo usan los dos. Lo que sí es distinto en cada
+uno es la puntuación de "Podrían encajar", y por eso no se compartió: de un correo se sabe el
+remitente, el asunto y el texto; de un documento suelto solo se sabe el nombre del fichero. El
+cuadro recibe la lista de sugeridos ya puntuada, y el resto —lista completa, buscador, orden,
+filas, "está archivado"— es común. También son comunes las piezas que sí valían para los dos:
+los trozos del nombre del tercero, si el asunto se movió este mes, y el corte de 40 puntos.
+
+**Lo que no se pierde.** El traslado va por `Carpetas.moverFichero`, que copia, comprueba que la
+copia pesa lo mismo y solo entonces borra: en las carpetas de Dropbox el `move()` del navegador
+existe pero lo rechaza. Si ya hay un fichero con ese nombre en el destino no se pisa; si la ruta
+se pasa de 180 caracteres se avisa y se deja decidir; y si el traslado falla, el documento se
+queda en "Por clasificar" y se dice con una línea. Si el asunto elegido está archivado, se puede
+reabrir o meter el papel dentro del ARCHIVO sin tocar su estado.
+
+Se comprueba con `pruebas/documentos-sueltos.mjs` (15 comprobaciones). Se descartó, como ya
+estaba descartado, abrir la carpeta del asunto en el explorador del ordenador.
+
+---
+
 ## 16-sep-2026 — Los correos se enganchan al asunto, y el hilo se sigue
 
 Fila 11 de la cola (`docs/CORREOS-AL-ASUNTO.md`). Versión publicada `16-sep-2026 · 20:41`.
