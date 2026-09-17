@@ -165,7 +165,7 @@ var Documentos = (function () {
 
     $('doc-anadir').onclick = async function () {
       try {
-        var handle = await Carpetas.elegirFichero();
+        var handle = await Carpetas.elegirFichero(asuntoActual.handle);
         pintarFormulario({ modo: 'anadir', handle: handle, nombreActual: handle.name });
       } catch (e) {
         if (e.name !== 'AbortError') U.aviso('No he podido abrir ese fichero: ' + e.message, 'malo');
@@ -600,6 +600,14 @@ var Documentos = (function () {
     return salida;
   }
 
+  /* ¿Este nombre ya lo ha puesto la aplicación? Lo dice la fecha de
+     delante (AAMMDD): es lo que Séneca nunca escribe. Lo usa
+     js/registro-sellado.js (17-sep-2026, fila 20) para no leer el
+     sello de un PDF que ya está bien colocado. */
+  function pareceDeLaAplicacion(nombre) {
+    return !!leerNombre(nombre).fecha;
+  }
+
   return { configurar: configurar, abrir: abrir, leerNombre: leerNombre,
-           parecidos: parecidos };
+           parecidos: parecidos, pareceDeLaAplicacion: pareceDeLaAplicacion };
 })();

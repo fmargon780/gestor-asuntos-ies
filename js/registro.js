@@ -172,7 +172,7 @@ var Registro = (function () {
 
   /* ---------- elegir la copia sellada, y comprobar que se puede ---------- */
 
-  async function prepararEstado(nombreDocumento) {
+  async function prepararEstado(nombreDocumento, carpetaInicio) {
     var previo = Documentos.leerNombre(nombreDocumento);
     if (!previo.fecha || !previo.tipo) {
       U.aviso('Este documento no tiene fecha ni tipo reconocibles en su nombre: no sé qué ' +
@@ -181,7 +181,7 @@ var Registro = (function () {
     }
     var handle;
     try {
-      handle = await Carpetas.elegirFichero();
+      handle = await Carpetas.elegirFichero(carpetaInicio);
     } catch (e) {
       if (e.name !== 'AbortError') U.aviso('No he podido abrir ese fichero: ' + e.message, 'malo');
       return false;
@@ -230,8 +230,9 @@ var Registro = (function () {
       var codigo = (nombreNuevo.match(/^\d{6}\s+(\S+)/) || [])[1] || '';
       var fechaSello = estado.sello && estado.sello.fecha ? ' el ' + estado.sello.fecha : '';
       await quitarDePendientes(asunto, estado.nombreOriginal);
-      await window.Notas.anadir(asunto,
-        'Registrado ' + codigo + fechaSello + ' · ' + estado.nombreOriginal);
+      await window.Notas.sustituir(asunto,
+        'Registrado ' + codigo + fechaSello + ' · ' + estado.nombreOriginal,
+        'registroDeDocumento', estado.nombreOriginal);
       U.aviso('Documento registrado.', 'bueno');
       return nombreNuevo;
     } catch (e) {
@@ -247,7 +248,7 @@ var Registro = (function () {
      Registrar: no se abre un segundo U.preguntar, porque solo hay
      un cuadro de diálogo en toda la aplicación. */
   async function pintarEnContenedor(caja, asunto, nombreDocumento, alTerminar) {
-    if (!(await prepararEstado(nombreDocumento))) return;
+    if (!(await prepararEstado(nombreDocumento, asunto.handle))) return;
 
     caja.innerHTML = camposHtml() +
       '<div class="cuadro-botones">' +
@@ -271,7 +272,7 @@ var Registro = (function () {
      La ficha del asunto enseña sus documentos en la propia pantalla,
      sin ningún cuadro por delante, así que aquí sí se abre uno. */
   async function abrirCuadro(asunto, nombreDocumento, alTerminar) {
-    if (!(await prepararEstado(nombreDocumento))) return;
+    if (!(await prepararEstado(nombreDocumento, asunto.handle))) return;
 
     var promesa = U.preguntar('Registrar "' + nombreDocumento + '"', camposHtml(), 'Registrar');
     enganchar();

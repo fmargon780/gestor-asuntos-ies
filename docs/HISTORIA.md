@@ -5,6 +5,47 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — Registrar un papel sellado sin quedarse con dos
+
+Fila 20 de la cola (`docs/COLA.md`, `docs/REGISTRO-SIN-DUPLICAR.md`), punto 9 de
+`docs/PROXIMOS-ASUNTOS.md`. Contado por Francisco, el camino de siempre para un papel que ya
+había pasado por el registro de Séneca eran seis pasos: subir el documento sin registrar y
+dejar que la aplicación lo nombre; subirlo a Séneca y que le ponga el sello, devolviendo un PDF
+nuevo; bajar ese PDF sellado a la carpeta del asunto, donde queda como un documento más con el
+nombre que le pone Séneca; volver al documento **viejo** y pulsar Registrar; buscar en el
+explorador el PDF sellado que se acababa de bajar, señalarlo y confirmar; y por último borrar a
+mano ese PDF, porque la aplicación **generaba un tercer fichero** (el sellado con el nombre
+bueno) y el mismo papel quedaba dos veces con dos nombres distintos.
+
+El error de fondo era el orden: había que avisar primero (pulsar Registrar) y buscar el papel
+después, aunque ya estuviera en la propia carpeta. Se ha dado la vuelta: la ficha del asunto mira
+sola los PDF de su carpeta cuyo nombre no ha puesto la aplicación, les lee el sello y, si lo
+tienen, pregunta de qué documento es en vez de esperar a que Francisco avise. Al contestar, el
+PDF sellado se renombra en el sitio (no se genera nada nuevo) y el documento viejo se manda a la
+papelera. Detalle técnico completo en `docs/CONTEXTO.md`, sección "Un papel que ya trae el
+sello, sin duplicarlo".
+
+Dos quejas más de Francisco, resueltas de paso:
+
+- El sello se detectaba unas veces sí y otras no, con el mismo documento: era que
+  `js/registro-lector.js` solo leía la página 1 del PDF, y si el sello caía en otra página no
+  aparecía. Ahora se leen hasta 10, y además el texto se busca normalizado y, si hace falta, sin
+  ningún espacio (el sello de Séneca a veces viene pegado del todo a lo que sigue).
+- El explorador de "Abrir archivo" nunca se abría en la carpeta del asunto: `Carpetas.elegirFichero`
+  admite ahora una carpeta de inicio (`startIn`, del propio navegador), que le pasan sus llamadores
+  cuando la conocen.
+
+De paso, `js/notas.js` gana `Notas.sustituir`: como `Notas.anadir`, pero sustituye una nota
+anterior con la misma clave en vez de apilar otra debajo. Hacía falta para que registrar dos
+veces el mismo documento (por este camino nuevo o por el botón de siempre, que también lo usa ya)
+deje una sola nota de registro, no dos.
+
+Francisco probará esto con papeles de verdad y avisará si hay que ajustar algo: es la única fila
+de esta cola donde su prueba con casos reales hace falta de verdad, porque el PDF de muestra con
+el sello no se puede subir al repositorio (lleva datos personales).
+
+---
+
 ## 17-sep-2026 — El código de verificación del pie de un documento
 
 Fila 19 de la cola (`docs/COLA.md`, `docs/CSV-DEL-DOCUMENTO.md`), punto 1 de

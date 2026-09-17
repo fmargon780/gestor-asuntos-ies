@@ -242,9 +242,16 @@ var Carpetas = (function () {
   }
 
   /* Abre el cuadro de "Abrir archivo" de Windows para traer un documento
-     desde donde esté: Descargas, el escritorio, un pendrive. */
-  async function elegirFichero() {
-    var lista = await window.showOpenFilePicker({ multiple: false });
+     desde donde esté: Descargas, el escritorio, un pendrive.
+
+     `carpetaInicio`, si se conoce, es el manejador de la carpeta donde
+     se abre el explorador (17-sep-2026, fila 20): la del asunto cuando
+     se está en un asunto, y así. Sin ella, se abre donde el navegador
+     quiera, como siempre. */
+  async function elegirFichero(carpetaInicio) {
+    var opciones = { multiple: false };
+    if (carpetaInicio) opciones.startIn = carpetaInicio;
+    var lista = await window.showOpenFilePicker(opciones);
     return lista[0];
   }
 

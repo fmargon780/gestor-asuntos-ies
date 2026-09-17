@@ -648,8 +648,8 @@ nombre (en "Gestionar documentos" y en la ficha del asunto). Al pulsarlo se elig
 sellada, y solo se pide el número de registro: el resto del nombre (fecha, tipo, texto
 adicional) se lee del documento original (`Documentos.leerNombre`). El nombre se monta con
 `Nombres.montarDocumento`, la copia se guarda con `Carpetas.copiarFicheroEn`, el original se
-queda como está, y se anota una nota en el asunto ("Registrado 26EM1234 · <documento>"). Si ya
-hay un fichero con ese nombre, avisa y no lo sobrescribe.
+queda como está, y se anota una nota en el asunto con `Notas.sustituir` ("Registrado 26EM1234 ·
+<documento>"; ver más abajo). Si ya hay un fichero con ese nombre, avisa y no lo sobrescribe.
 
 Casilla "Pendiente de registro" en el cuadro de nombrar un documento (solo si aún no lleva
 registro); lo marcado se guarda en `pendientesRegistro`, en la ficha del asunto. Un pendiente
@@ -662,20 +662,61 @@ solo de la lista, y al renombrarlo desde "Gestionar documentos" se actualiza con
 (`Registro.abrirCuadro`). **Solo hay un cuadro de diálogo en toda la aplicación**: abrir un
 segundo `U.preguntar` mientras el primero espera le roba los botones al de fuera, que se queda
 colgado. `Registro.proponer({ anio, tipo, serie, numero })` rellena las cuatro piezas (`tipo` es
-E/S, `serie` es M/A).
+E/S, `serie` es M/A). El explorador de "Abrir archivo" (`Carpetas.elegirFichero`, más abajo) se
+abre ya en la carpeta del asunto.
 
-**Lectura del número del sello de Séneca, dentro del PDF.** El sello va como texto en la primera
-página, aunque el documento sea un escaneado, con este formato tal cual:
+### Un papel que ya trae el sello, sin duplicarlo (17-sep-2026, fila 20)
+
+`docs/REGISTRO-SIN-DUPLICAR.md`. Antes había que pulsar Registrar y buscar a mano el PDF sellado
+que ya estaba en la carpeta del asunto (bajado de Séneca), y al final quedaban dos ficheros del
+mismo papel con dos nombres. Ahora `js/registro-sellado.js` (`window.RegistroSellado`) le da la
+vuelta: mira la carpeta él solo y pregunta de qué documento es.
+
+- **Qué se mira**: al pintar la ficha (`pintarSellos`, en `js/ficha-asunto.js`), los PDF de la
+  carpeta cuyo nombre **no** lo ha puesto la aplicación (`Documentos.pareceDeLaAplicacion(nombre)`,
+  que mira si empieza por `AAMMDD `: es lo que Séneca nunca escribe). Cada uno se lee una sola vez
+  por ordenador: `RegistroSellado` guarda en `js/almacen.js` (de este ordenador, no en los
+  ficheros compartidos), por asunto, el nombre y el tamaño de cada PDF ya mirado y si tenía sello
+  o no (`pendientesDeLeer`/`pendientesDeResolver`, funciones sin efectos, probadas sueltas).
+- **El aviso**: si algún PDF trae sello sin resolver, sale arriba en la ficha (`#ficha-sellos`) un
+  aviso ámbar por cada uno, con el código y la fecha del sello, un desplegable con los documentos
+  ya nombrados del asunto (el más reciente primero) y un botón **No es un registro** (marca el
+  PDF como mirado, sin tocar nada; `RegistroSellado.marcarIgnorado`).
+- **Al elegir un documento** (`RegistroSellado.asociar`): el PDF sellado **se renombra**
+  (`Carpetas.renombrarFichero`) con el nombre que le toca —el mismo que calcula hoy el paso de
+  Registrar (`RegistroSellado.nombreParaSello`, misma fórmula que `registro.js`)—, el documento
+  viejo (el que se subió sin sellar) se manda a la papelera (`Papelera.mandarDocumentoDeAsunto`,
+  que además apunta su propia nota de "mandó a la papelera"), y se apunta la nota de registro con
+  `Notas.sustituir`. No se crea ningún fichero nuevo. Si el nombre nuevo ya existe en la carpeta,
+  avisa y no toca nada (`RegistroSellado.hayColision`).
+- **`Notas.sustituir(asunto, texto, campoClave, valorClave, extra)`** (nueva, `js/notas.js`): como
+  `Notas.anadir`, pero si ya hay una nota con ese mismo `campoClave`/`valorClave` la sustituye en
+  su sitio en vez de añadir otra debajo. El registro de un documento (aquí y en `js/registro.js`,
+  que también se ha pasado a esto) usa `campoClave: 'registroDeDocumento'`, `valorClave` el nombre
+  del documento original: registrar dos veces el mismo documento deja una sola nota, no dos.
+- **La ficha, mientras se resuelve**: `sel.onchange`/`noEs.onclick` usan `U.mientrasGuarda` (apaga
+  el control mientras dura) y repintan documentos, notas y el propio aviso al terminar.
+
+Se comprueba con `pruebas/registro-sin-duplicar.mjs` (sin PDF ni navegador, `vm` de Node como
+`pruebas/verificacion.mjs`: normalización del sello, sin sello, nombre ya puesto, ya mirado,
+nombre igual al de Registrar, colisión) y `pruebas/registro-sellado.mjs` (navegador de verdad:
+detecta solo, asocia y renombra, "No es un registro" no vuelve a preguntar).
+
+**Lectura del número del sello de Séneca, dentro del PDF.** El sello va como texto en el PDF,
+aunque el documento sea un escaneado, con este formato tal cual:
 
     2026/29700692/M000000000368ENTRADAFecha: 10/09/2026 13:03:02
 
 `AÑO / CÓDIGO DEL CENTRO / SERIE + número con ceros por delante`, pegado a `ENTRADA`/`SALIDA`,
 pegado a `Fecha: dd/mm/aaaa hh:mm:ss`.
 
-- `js/registro-lector.js` lee el texto de la primera página con **pdf.js** (Mozilla) y lo busca
-  con `(\d{4})\s*\/\s*\d+\s*\/\s*([MA])\s*0*(\d+)\s*(ENTRADA|SALIDA)`, tolerante a espacios y
-  saltos de línea. Si el número tiene más de cuatro cifras se deja entero y se avisa; si no, se
-  rellena con ceros por delante hasta cuatro.
+- `js/registro-lector.js` lee con **pdf.js** (Mozilla) **hasta 10 páginas**, parando en cuanto
+  aparece el sello (antes solo la página 1: era la causa de que se detectara unas veces sí y otras
+  no, según en qué página cayera). `buscarEnTexto(texto)` (sin efectos, probada suelta) prueba
+  primero con el texto normalizado (todo espacio, tabulador o salto de línea, en uno solo) y, si
+  así no aparece, otra vez sin ningún espacio: el sello a veces viene pegado del todo. Usa
+  `(\d{4})\s*\/\s*\d+\s*\/\s*([MA])\s*0*(\d+)\s*(ENTRADA|SALIDA)`. Si el número tiene más de
+  cuatro cifras se deja entero y se avisa; si no, se rellena con ceros por delante hasta cuatro.
 - Si se encuentra el sello, el cuadro de Registrar sale relleno, con una línea verde "Leído del
   sello de Séneca", y el foco va directo al botón de aceptar. Si no, el cuadro sale vacío, con el
   foco en los cuatro dígitos.
@@ -687,10 +728,18 @@ pegado a `Fecha: dd/mm/aaaa hh:mm:ss`.
   en la nota ("Registrado 26EM0368 el 10/09/2026 · <documento>").
 - **pdf.js va copiado en el repositorio**, en `js/lib/pdf.min.js` y `js/lib/pdf.worker.min.js`
   (versión 3.11.174, del `build/` de `pdfjs-dist`, no de `legacy/`). No se carga de ninguna
-  dirección externa, y solo se trae la primera vez que se pulsa Registrar sobre un PDF.
+  dirección externa, y solo se trae la primera vez que hace falta.
 
 Se comprueba con `pruebas/registro.mjs` (con un PDF mínimo montado por la propia prueba, con el
 texto del sello dentro: el PDF real con datos personales no está en el repositorio).
+
+### El explorador de ficheros, ya en la carpeta que toca (17-sep-2026, fila 20)
+
+`window.showOpenFilePicker` admite `startIn` con el manejador de una carpeta. `Carpetas.elegirFichero(carpetaInicio)`
+lo admite como argumento opcional; sin él, se abre donde el navegador quiera, como siempre.
+Lo pasan sus llamadores cuando conocen la carpeta: `js/documentos.js` y `js/registro.js` (la del
+asunto abierto) y `js/traer-datos.js` (la de `_GESTOR/datos`, aunque los CSV vengan de fuera: es
+la única carpeta de la aplicación que ese botón tiene a mano).
 
 ### El código de verificación del pie de un documento
 
@@ -1077,7 +1126,8 @@ de `App` va después del fichero que lo define.
 | `js/presencia.js` | No pisarse en un mismo asunto: la señal de `_GESTOR/presencia.json`, la vigilancia y la marca de la tarjeta de la lista |
 | `js/notas.js` | Las notas de cada asunto, con su enlace y su botón |
 | `js/registro.js` | Registrar un documento en un paso, sin nombrarlo dos veces |
-| `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF |
+| `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF (hasta 10 páginas) |
+| `js/registro-sellado.js` | Ver solo un PDF ya sellado en la carpeta del asunto, y colocarlo sin duplicarlo |
 | `js/verificacion.js` | El código de verificación del pie de un documento, y su dirección |
 | `js/lib/pdf.min.js`, `js/lib/pdf.worker.min.js` | pdf.js (Mozilla) 3.11.174, copiado tal cual |
 | `js/ficha-asunto.js` | La pantalla de un asunto: guía, notas, documentos y contacto |
