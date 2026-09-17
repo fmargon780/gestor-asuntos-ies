@@ -5,6 +5,28 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — Archivar cuando la carpeta ya existe en el destino
+
+Fila 32 de la cola (`docs/COLA.md`, `docs/ARCHIVAR-CARPETA-YA-EXISTE.md`), la primera de la lista
+porque le estaba bloqueando un asunto real ahora mismo: al archivar, Francisco recibía "Ya hay
+una carpeta llamada ... en el destino" y ya no podía volver a intentarlo nunca.
+
+La causa: `Carpetas.trasladar` crea la carpeta de destino y copia dentro; si la copia falla a
+mitad (Dropbox sincronizando, un fichero bloqueado), esa carpeta se quedaba a medias, sin nadie
+que la limpiara, y el siguiente intento se la encontraba y se paraba ahí, siempre. Ahora
+`trasladar` limpia el destino a medias si algo falla, y se añade `Carpetas.fusionarEn` para
+cuando el destino ya existe de verdad (de un archivado de antes de este arreglo): junta las dos
+carpetas sin perder nada (mismo nombre y tamaño, no se duplica; mismo nombre y distinto tamaño,
+se guarda al lado con "(2)"), y solo borra el origen si la comprobación final sale en verde.
+`App.cerrarAsunto`/`App.reabrirAsunto` avisan en el propio cuadro de confirmación cuando toca
+fusionar, con el mismo botón de siempre, sin preguntar nada más.
+
+De paso, `js/documentos-sueltos.js` (pasaba de 400 líneas) suelta esas dos funciones a
+`js/asuntos-archivar.js` nuevo, sin que `js/relacionados.js` ni `js/hitos-archivo.js` (que las
+envuelven) hayan tenido que tocarse. Prueba nueva `pruebas/archivar-fusion.mjs`, sin navegador,
+con los siete escenarios del encargo (comprobado que falla sin el arreglo). Batería completa en
+verde.
+
 ## 17-sep-2026 — El DNI del personal, a la vista
 
 Fila 29 de la cola (`docs/COLA.md`, `docs/DNI-DEL-PERSONAL.md`), acordada con Francisco el mismo

@@ -151,15 +151,122 @@ var Carpetas = (function () {
       throw new Error('Ya hay una carpeta llamada "' + nombreDestino + '" en el destino.');
     }
     var esperados = await contarFicheros(origen);
-    var destino = await padreDestino.getDirectoryHandle(nombreDestino, { create: true });
-    await copiarDentro(origen, destino);
-    var llegados = await contarFicheros(destino);
-    if (llegados !== esperados) {
-      throw new Error('La copia no ha salido completa (' + llegados + ' de ' + esperados +
-                      ' ficheros). No se ha borrado nada: la carpeta sigue donde estaba.');
+    /* La carpeta de destino es nuestra: la hemos creado nosotros justo
+       arriba, después de comprobar que no existía. Si algo falla a
+       partir de aquí (Dropbox sincronizando, un fichero bloqueado), se
+       limpia lo que se haya llegado a copiar: si no, el siguiente
+       intento se encuentra esa carpeta a medias y ya no puede archivar
+       nunca más (17-sep-2026, fila 32, un asunto real se quedó así). */
+    try {
+      var destino = await padreDestino.getDirectoryHandle(nombreDestino, { create: true });
+      await copiarDentro(origen, destino);
+      var llegados = await contarFicheros(destino);
+      if (llegados !== esperados) {
+        throw new Error('La copia no ha salido completa (' + llegados + ' de ' + esperados +
+                        ' ficheros). No se ha borrado nada: la carpeta sigue donde estaba.');
+      }
+    } catch (e) {
+      try { await padreDestino.removeEntry(nombreDestino, { recursive: true }); } catch (e2) { /* si no se puede limpiar, se lanza igual el error de arriba */ }
+      throw e;
     }
     await padreOrigen.removeEntry(nombre, { recursive: true });
     return esperados;
+  }
+
+  /* ---------- fusionar dos carpetas ----------
+
+     Para cuando el destino de un archivado (o de una reapertura) ya
+     existe: casi siempre, un archivado anterior que se quedó a medias
+     antes de este arreglo. `trasladar` sigue fallando si el destino
+     existe; solo esto junta las dos sin perder nada. */
+
+  async function existeFichero(dir, nombre) {
+    try { await dir.getFileHandle(nombre); return true; }
+    catch (e) { return false; }
+  }
+
+  async function copiarFicheroDentro(f, destino, nombre) {
+    var salida = await destino.getFileHandle(nombre, { create: true });
+    var w = await salida.createWritable();
+    await w.write(f);
+    await w.close();
+  }
+
+  /* El primer nombre libre con " (2)", " (3)"... antes de la extensión. */
+  async function nombreLibreConSufijo(dir, nombre) {
+    var punto = nombre.lastIndexOf('.');
+    var base = punto === -1 ? nombre : nombre.slice(0, punto);
+    var ext = punto === -1 ? '' : nombre.slice(punto);
+    var n = 2;
+    while (await existeFichero(dir, base + ' (' + n + ')' + ext)) n++;
+    return base + ' (' + n + ')' + ext;
+  }
+
+  /* Recorre `origen` y lo va dejando dentro de `destino`, entrando en
+     las subcarpetas que también existan allí. `rastro.verificar` se
+     usa después para comprobar que todo ha llegado de verdad. */
+  async function fusionarDentro(origen, destino, rastro) {
+    for await (var pareja of origen.entries()) {
+      var nombre = pareja[0], h = pareja[1];
+      if (h.kind === 'file') {
+        var f = await h.getFile();
+        if (await existeFichero(destino, nombre)) {
+          var existente = await (await destino.getFileHandle(nombre)).getFile();
+          if (existente.size === f.size) {
+            rastro.yaEstaban++;
+            rastro.verificar.push({ dir: destino, nombre: nombre, tamano: f.size });
+            continue;
+          }
+          var libre = await nombreLibreConSufijo(destino, nombre);
+          await copiarFicheroDentro(f, destino, libre);
+          rastro.conSufijo.push(libre);
+          rastro.verificar.push({ dir: destino, nombre: libre, tamano: f.size });
+        } else {
+          await copiarFicheroDentro(f, destino, nombre);
+          rastro.copiados++;
+          rastro.verificar.push({ dir: destino, nombre: nombre, tamano: f.size });
+        }
+      } else {
+        var sub = await destino.getDirectoryHandle(nombre, { create: true });
+        await fusionarDentro(h, sub, rastro);
+      }
+    }
+  }
+
+  /* Junta `nombre` (dentro de `padreOrigen`) con `nombreDestino`, que ya
+     existe dentro de `padreDestino`. Solo se borra el origen si, al
+     terminar, cada fichero suyo está de verdad en el destino (con su
+     nombre o con el sufijo) y con el mismo tamaño. */
+  async function fusionarEn(padreOrigen, nombre, padreDestino, nombreDestino) {
+    var origen = await padreOrigen.getDirectoryHandle(nombre);
+    var destino = await padreDestino.getDirectoryHandle(nombreDestino, { create: true });
+    var rastro = { copiados: 0, yaEstaban: 0, conSufijo: [], verificar: [] };
+    await fusionarDentro(origen, destino, rastro);
+
+    var faltan = 0;
+    for (var i = 0; i < rastro.verificar.length; i++) {
+      var v = rastro.verificar[i];
+      var ok = false;
+      try {
+        var ff = await (await v.dir.getFileHandle(v.nombre)).getFile();
+        ok = ff.size === v.tamano;
+      } catch (e) { ok = false; }
+      if (!ok) faltan++;
+    }
+    var total = rastro.verificar.length;
+    if (faltan > 0) {
+      throw new Error('La fusión no ha salido completa (' + (total - faltan) + ' de ' + total +
+                      ' ficheros). No se ha borrado nada del origen.');
+    }
+
+    /* No se envuelve en `Papelera` a propósito: viviría en el sentido
+       contrario (`js/papelera.js` ya depende de `js/carpetas.js`), y no
+       hay ninguna función pública ahí que valga para esto (`mandarAsunto`
+       es del registro de un asunto que se está BORRANDO, no de este
+       origen ya fusionado). Se borra igual que hace `trasladar` de
+       siempre, ya comprobado uno a uno. */
+    await padreOrigen.removeEntry(nombre, { recursive: true });
+    return { copiados: rastro.copiados, yaEstaban: rastro.yaEstaban, conSufijo: rastro.conSufijo };
   }
 
   function mover(padreOrigen, nombre, padreDestino) {
@@ -333,7 +440,7 @@ var Carpetas = (function () {
     subcarpetas: subcarpetas, ficheros: ficheros, contenido: contenido, existe: existe,
     esCarpetaTemporalDeSincronizacion: esCarpetaTemporalDeSincronizacion,
     crear: crear, bajar: bajar, mover: mover, renombrar: renombrar, trasladar: trasladar,
-    contarFicheros: contarFicheros,
+    fusionarEn: fusionarEn, contarFicheros: contarFicheros,
     renombrarFichero: renombrarFichero, moverFichero: moverFichero,
     elegirFichero: elegirFichero, copiarFicheroEn: copiarFicheroEn,
     leerTexto: leerTexto, escribirTexto: escribirTexto, escribirBytes: escribirBytes,

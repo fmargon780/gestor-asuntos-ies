@@ -1313,6 +1313,34 @@ devolver a su sitio.
 
 Se comprueba con `pruebas/papelera.mjs`.
 
+### Archivar cuando el destino ya existe
+
+Fila 32 de `docs/COLA.md`, 17-sep-2026: le bloqueó un asunto real. `Carpetas.trasladar` crea la
+carpeta de destino y copia dentro; si algo falla a mitad (Dropbox sincronizando, un fichero
+bloqueado), **ahora limpia esa carpeta a medias** antes de lanzar el error (`try/catch` alrededor
+de la creación, la copia y la comprobación de la cuenta) — antes se quedaba tal cual, y el
+siguiente intento de archivar ese asunto encontraba "ya hay una carpeta con ese nombre" y no
+podía salir de ahí nunca.
+
+Si el destino ya existe **de verdad** (un archivado de antes de este arreglo, que se quedó a
+medias), `Carpetas.fusionarEn(padreOrigen, nombre, padreDestino, nombreDestino)` junta las dos
+carpetas en vez de fallar: recorre el origen con sus subcarpetas, un fichero que no está en el
+destino se copia, uno que está con el mismo tamaño se da por copiado, y uno con distinto tamaño
+se copia al lado con `" (2)"`, `" (3)"`… antes de la extensión, sin pisar nunca nada. Solo si al
+final cada fichero del origen aparece de verdad en el destino (con su nombre o con el sufijo, y
+el mismo tamaño) se borra el origen, con `removeEntry` directo: no se envuelve en `js/papelera.js`
+porque viviría en el sentido contrario (`Papelera` ya depende de `Carpetas`) y no hay ahí ninguna
+función pública que valga (`mandarAsunto` es del registro de un asunto que se está borrando, no
+de un origen ya fusionado). `Carpetas.trasladar`/`mover`/`renombrar` **no cambian**: si el destino
+existe, siguen fallando; solo `App.cerrarAsunto` y `App.reabrirAsunto` (`js/asuntos-archivar.js`,
+sacado el mismo día de `js/documentos-sueltos.js` por pasar de 400 líneas) miran primero si el
+destino ya existe y, si es así, avisan en el propio cuadro de confirmación (mismo botón, sin
+preguntar nada más) y usan `fusionarEn`. `js/asuntos-archivar.js` va cargado justo después de
+`js/documentos-sueltos.js` y antes de `js/relacionados.js`/`js/hitos-archivo.js`, que envuelven
+esas dos funciones.
+
+Se comprueba con `pruebas/archivar-fusion.mjs`, sin navegador.
+
 ---
 
 ## 2. Cómo trabajamos el código ← LÉELO ANTES DE TOCAR NADA
