@@ -28,13 +28,19 @@ try {
 
 const comando = typeof datos.ignoreCommand === 'string' ? datos.ignoreCommand : '';
 comprobar('2. existe la clave ignoreCommand', comando.length > 0);
-comprobar('3. el comando menciona la rama main', comando.includes('main'));
-comprobar('4. el comando usa VERCEL_GIT_PREVIOUS_SHA como referencia', comando.includes('VERCEL_GIT_PREVIOUS_SHA'));
+
+/* Vercel exige ignoreCommand en 256 caracteres o menos, así que la receta
+   entera vive en scripts/vercel-ignore-build.sh y el JSON solo lo llama. */
+const script = comando.includes('vercel-ignore-build.sh')
+  ? fs.readFileSync(raiz + 'scripts/vercel-ignore-build.sh', 'utf8')
+  : comando;
+comprobar('3. el comando menciona la rama main', script.includes('main'));
+comprobar('4. el comando usa VERCEL_GIT_PREVIOUS_SHA como referencia', script.includes('VERCEL_GIT_PREVIOUS_SHA'));
 comprobar('5. el comando se salta docs, pruebas, .github y los .md',
-  comando.includes('docs') &&
-  comando.includes('pruebas') &&
-  comando.includes('.github') &&
-  comando.includes('*.md'));
+  script.includes('docs') &&
+  script.includes('pruebas') &&
+  script.includes('.github') &&
+  script.includes('*.md'));
 
 comprobar('6. sigue existiendo el bloque headers de siempre', Array.isArray(datos.headers) && datos.headers.length > 0);
 const cabecera = (datos.headers || []).find((h) => Array.isArray(h.headers) && h.headers.some((x) => x.key === 'Cache-Control'));
