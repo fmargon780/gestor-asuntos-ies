@@ -1527,6 +1527,32 @@ esas dos funciones.
 
 Se comprueba con `pruebas/archivar-fusion.mjs`, sin navegador.
 
+### Atascos al archivar: mensajes en castellano, temporales y ficheros que desaparecen
+
+Fila 44 de `docs/COLA.md`, 17-sep-2026: otro asunto real (JUSTIFICACION FALTAS PAS) se quedó
+atascado al archivar con un `NotFoundError` del navegador, en inglés, tal cual en pantalla.
+
+- **`U.mensajeDeError(e)`** (`js/util.js`), un solo sitio para traducir: `NotFoundError`,
+  `NotAllowedError`, `NoModificationAllowedError`/`InvalidStateError`, `QuotaExceededError` y
+  `AbortError` tienen su frase en castellano; cualquier otro error se enseña tal cual (los
+  nuestros ya están en castellano). `App.cerrarAsunto` y `App.reabrirAsunto` lo usan en su
+  `catch`: nunca más un mensaje del navegador en inglés en pantalla.
+- **`js/carpetas.js`**: `contarFicheros`, `copiarDentro` y `fusionarEn` se saltan todo lo que
+  `esCarpetaTemporalDeSincronizacion` reconozca (`.tmp`, `.driveupload`, `desktop.ini`…), así que
+  no se cuentan ni se copian y la comprobación "llegados === esperados" no falla por su culpa. Si
+  `getFile()` lanza `NotFoundError` a mitad de una copia (Dropbox sincronizando), se reintenta
+  una vez tras esperar 1s; si sigue sin estar, para con un error en castellano que dice el nombre
+  del fichero, sin borrar nada del origen.
+- **`js/asuntos-archivar.js`**: antes de tocar nada, `App.cerrarAsunto` mira si la carpeta sigue
+  en Asuntos abiertos. Si ya no está pero sí está en `ARCHIVO/categoría/tercero`, no copia nada:
+  pone la ficha al día (estado, ficheros contados en destino) y avisa en verde que ya estaba
+  archivada. Si no está en ninguno de los dos sitios, avisa en ámbar, en castellano, y pide
+  recargar. `App.reabrirAsunto` hace lo mismo al revés, y además recalcula `a.padre` (un
+  manejador guardado al pintar la pantalla ARCHIVO, que puede haber quedado viejo) con
+  `Carpetas.bajar` si ya no apunta a la carpeta.
+
+Se comprueba con `pruebas/archivar-atascos.mjs` (con navegador: 6 escenarios).
+
 ---
 
 ## 2. Cómo trabajamos el código ← LÉELO ANTES DE TOCAR NADA
