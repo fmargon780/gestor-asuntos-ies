@@ -71,32 +71,29 @@ App.cerrarAsunto = async function (a) {
   if (!confirmar) return;
 
   try {
-    /* 17-sep-2026, fila 44 (docs/ARCHIVAR-ATASCOS.md): antes de tocar
-       nada, mirar si la carpeta sigue de verdad en Asuntos abiertos.
-       Un intento anterior (de otro ordenador, o de esta misma sesión
-       hace un momento) puede haber terminado de archivarla ya, y
-       entonces la tarjeta de la lista se ha quedado vieja: intentar
-       archivar otra vez revienta con un NotFoundError en inglés al
-       buscar una carpeta que ya no está ahí. */
-    var sigueEnAbiertos = await Carpetas.existe(App.E.abiertos, a.nombre);
-    if (!sigueEnAbiertos) {
-      var destinoDelTercero = await Carpetas.bajar(App.E.archivo, [categoria, tercero], false)
-        .catch(function () { return null; });
-      var yaEstaArchivada = destinoDelTercero && await Carpetas.existe(destinoDelTercero, a.nombre);
-      if (yaEstaArchivada) {
-        var ficherosYaArchivados = await Carpetas.contarFicheros(
-          await destinoDelTercero.getDirectoryHandle(a.nombre));
+    /* La tarjeta de la lista puede llevar un rato pintada: si un
+       intento anterior llegó a completarse (o el otro ordenador la
+       movió), la carpeta ya no está en Asuntos abiertos y
+       `Carpetas.mover` revienta con un NotFoundError del navegador, en
+       inglés (17-sep-2026, fila 45). Se mira primero. */
+    if (!(await Carpetas.existe(App.E.abiertos, a.nombre))) {
+      var carpetaTerceroYa = null, yaArchivada = false;
+      try {
+        carpetaTerceroYa = await Carpetas.bajar(App.E.archivo, [categoria, tercero], false);
+        yaArchivada = await Carpetas.existe(carpetaTerceroYa, a.nombre);
+      } catch (e) { yaArchivada = false; }
+
+      if (yaArchivada) {
+        var totalFicherosYa = await Carpetas.contarFicheros(await carpetaTerceroYa.getDirectoryHandle(a.nombre));
         await App.anotar(a.nombre, {
           estado: 'cerrado', categoria: categoria, tercero: tercero,
-          cerradoEl: a.ficha.cerradoEl || U.ahora(),
-          cerradoPor: a.ficha.cerradoPor || App.E.usuario, ficheros: ficherosYaArchivados
+          cerradoEl: a.ficha.cerradoEl || U.ahora(), ficheros: totalFicherosYa
         });
         U.aviso('Este asunto ya estaba archivado. He puesto la lista al día.', 'bueno');
-        await App.verAbiertos();
-        return;
+      } else {
+        U.aviso('No encuentro la carpeta de este asunto ni en Asuntos abiertos ni en el archivo. ' +
+          'Puede que la haya movido o renombrado el otro ordenador. Pulsa Recargar y míralo.', 'ambar');
       }
-      U.aviso('No encuentro la carpeta de este asunto ni en Asuntos abiertos ni en el archivo. ' +
-        'Puede que la haya movido o renombrado el otro ordenador. Pulsa Recargar y míralo.');
       await App.verAbiertos();
       return;
     }
@@ -147,44 +144,47 @@ App.reabrirAsunto = async function (a) {
     'Reabrir');
   if (!confirmar) return;
   try {
-    /* 17-sep-2026, fila 44: `a.padre` es un manejador guardado de
-       cuando se pintó la pantalla ARCHIVO, y puede estar viejo (el
-       compañero ya reabrió el asunto, o lo movió). Si ya no sirve, se
-       recalcula con la categoría y el tercero de la ficha antes de
-       nada. */
-    var padre = a.padre;
-    var sigueEnElArchivo = padre && await Carpetas.existe(padre, a.nombre);
-    if (!sigueEnElArchivo) {
-      var ficha = a.ficha || {};
-      padre = ficha.categoria && ficha.tercero
-        ? await Carpetas.bajar(App.E.archivo, [ficha.categoria, ficha.tercero], false).catch(function () { return null; })
-        : null;
-      sigueEnElArchivo = padre && await Carpetas.existe(padre, a.nombre);
-    }
-
-    if (!sigueEnElArchivo) {
-      var yaEstaAbierto = await Carpetas.existe(App.E.abiertos, a.nombre);
-      if (yaEstaAbierto) {
+    /* `a.padre` es un manejador guardado de cuando se pintó la
+       pantalla ARCHIVO (o el correo, o Por clasificar), y puede estar
+       viejo: si el asunto se movió por el camino, `Carpetas.mover`
+       revienta con un NotFoundError del navegador, en inglés
+       (17-sep-2026, fila 45). Se comprueba y, si no sirve, se
+       recalcula con los datos de la ficha antes de tocar nada. */
+    var ficha = a.ficha || {};
+    var padreUsar = a.padre;
+    if (!padreUsar || !(await Carpetas.existe(padreUsar, a.nombre))) {
+      var recalculado = null;
+      if (ficha.categoria && ficha.tercero) {
+        try { recalculado = await Carpetas.bajar(App.E.archivo, [ficha.categoria, ficha.tercero], false); }
+        catch (e) { recalculado = null; }
+      }
+      if (recalculado && (await Carpetas.existe(recalculado, a.nombre))) {
+        padreUsar = recalculado;
+      } else if (await Carpetas.existe(App.E.abiertos, a.nombre)) {
+        /* Ya estaba reabierto: una reapertura anterior llegó a
+           completarse y la tarjeta se había quedado con datos viejos. */
         await App.anotar(a.nombre, {
-          estado: 'abierto', reabiertoEl: a.ficha.reabiertoEl || U.ahora(),
-          reabiertoPor: a.ficha.reabiertoPor || App.E.usuario
+          estado: 'abierto', reabiertoEl: ficha.reabiertoEl || U.ahora(),
+          reabiertoPor: ficha.reabiertoPor || App.E.usuario
         });
         U.aviso('Este asunto ya estaba reabierto. He puesto la lista al día.', 'bueno');
         await App.verAbiertos();
         await App.verArchivo();
         return;
+      } else {
+        U.aviso('No encuentro la carpeta de este asunto ni en Asuntos abiertos ni en el archivo. ' +
+          'Puede que la haya movido o renombrado el otro ordenador. Pulsa Recargar y míralo.', 'ambar');
+        await App.verAbiertos();
+        await App.verArchivo();
+        return;
       }
-      U.aviso('No encuentro la carpeta de este asunto ni en el archivo ni en Asuntos abiertos. ' +
-        'Puede que la haya movido o renombrado el otro ordenador. Pulsa Recargar y míralo.');
-      await App.verArchivo();
-      return;
     }
 
     var haciendoFusion = await Carpetas.existe(App.E.abiertos, a.nombre);
     var resultado = haciendoFusion
-      ? await Carpetas.fusionarEn(padre, a.nombre, App.E.abiertos, a.nombre)
+      ? await Carpetas.fusionarEn(padreUsar, a.nombre, App.E.abiertos, a.nombre)
       : { conSufijo: [] };
-    if (!haciendoFusion) await Carpetas.mover(padre, a.nombre, App.E.abiertos);
+    if (!haciendoFusion) await Carpetas.mover(padreUsar, a.nombre, App.E.abiertos);
     await App.anotar(a.nombre, { estado: 'abierto', reabiertoEl: U.ahora(), reabiertoPor: App.E.usuario });
     var mensaje = 'Asunto reabierto.';
     if (haciendoFusion) {

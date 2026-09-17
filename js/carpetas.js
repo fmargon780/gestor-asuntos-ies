@@ -112,24 +112,29 @@ var Carpetas = (function () {
 
   /* ---------- mover y renombrar carpetas ---------- */
 
-  function esperar(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function esperarMs(ms) {
+    return new Promise(function (r) { setTimeout(r, ms); });
+  }
 
-  /* Dropbox mueve y borra ficheros temporales mientras sincroniza, y a
-     veces uno que hace un momento estaba ahí desaparece justo cuando se
-     va a leer (17-sep-2026, fila 44, docs/ARCHIVAR-ATASCOS.md). Se
+  /* Dropbox mueve y borra ficheros temporales mientras sincroniza: un
+     `getFile()` puede pillar uno a medio camino y lanzar NotFoundError
+     aunque el fichero exista de verdad un instante después. Se
      reintenta una vez, tras esperar un segundo; si sigue sin estar, se
-     para con un error en castellano que dice el nombre del fichero, sin
-     haber borrado nada. */
-  async function leerFicheroConReintento(h, nombre) {
-    try { return await h.getFile(); }
-    catch (e) {
+     para con un error en castellano que dice el nombre del fichero
+     (17-sep-2026, fila 45: antes salía el NotFoundError del navegador,
+     en inglés). Lo usan `copiarDentro` y la fusión. */
+  async function leerFicheroParaCopiar(h, nombre) {
+    try {
+      return await h.getFile();
+    } catch (e) {
       if (e.name !== 'NotFoundError') throw e;
-      await esperar(1000);
-      try { return await h.getFile(); }
-      catch (e2) {
-        throw new Error('No he podido copiar "' + nombre + '": ha desaparecido a mitad de la ' +
-          'copia (seguramente Dropbox estaba sincronizando). No se ha borrado nada.');
-      }
+    }
+    await esperarMs(1000);
+    try {
+      return await h.getFile();
+    } catch (e2) {
+      throw new Error('No he podido copiar "' + nombre + '": ha desaparecido a mitad de la copia ' +
+        '(seguramente Dropbox estaba sincronizando). No se ha borrado nada.');
     }
   }
 
@@ -139,7 +144,7 @@ var Carpetas = (function () {
       var nombre = pareja[0], h = pareja[1];
       if (esCarpetaTemporalDeSincronizacion(nombre)) continue;
       if (h.kind === 'file') {
-        var f = await leerFicheroConReintento(h, nombre);
+        var f = await leerFicheroParaCopiar(h, nombre);
         var salida = await destino.getFileHandle(nombre, { create: true });
         var w = await salida.createWritable();
         await w.write(f);
@@ -153,11 +158,6 @@ var Carpetas = (function () {
     return copiados;
   }
 
-  /* Los ficheros y carpetas temporales de sincronización se saltan
-     también al contar (17-sep-2026, fila 44): si no, la cuenta de
-     origen y la de destino hablaban de cosas distintas, y la
-     comprobación "llegados !== esperados" de `trasladar` fallaba sin
-     motivo real. */
   async function contarFicheros(dir) {
     var n = 0;
     for await (var pareja of dir.entries()) {
@@ -238,7 +238,7 @@ var Carpetas = (function () {
       var nombre = pareja[0], h = pareja[1];
       if (esCarpetaTemporalDeSincronizacion(nombre)) continue;
       if (h.kind === 'file') {
-        var f = await leerFicheroConReintento(h, nombre);
+        var f = await leerFicheroParaCopiar(h, nombre);
         if (await existeFichero(destino, nombre)) {
           var existente = await (await destino.getFileHandle(nombre)).getFile();
           if (existente.size === f.size) {

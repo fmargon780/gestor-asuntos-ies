@@ -247,6 +247,31 @@ var U = (function () {
       'Añadirlo igualmente');
   }
 
+  /* Traduce al castellano los errores que lanza el navegador al tocar
+     el disco (17-sep-2026, fila 45): un NotFoundError en inglés no le
+     dice nada a quien lo lee. Un solo sitio para traducir, por
+     `e.name`; los errores nuestros ya están en castellano y se
+     devuelven tal cual. Los usan `App.cerrarAsunto` y
+     `App.reabrirAsunto` en su `catch`: nunca más un mensaje en inglés
+     en pantalla. */
+  function mensajeDeError(e) {
+    var nombre = e && e.name;
+    if (nombre === 'NotFoundError') {
+      return 'No encuentro la carpeta o el fichero. Puede que se haya movido o que lo esté ' +
+        'sincronizando Dropbox en este momento.';
+    }
+    if (nombre === 'NotAllowedError') {
+      return 'El navegador ha retirado el permiso sobre la carpeta. Vuelve a señalarla en Ajustes.';
+    }
+    if (nombre === 'NoModificationAllowedError' || nombre === 'InvalidStateError') {
+      return 'Hay un fichero en uso, seguramente abierto en otro programa o sincronizándose. ' +
+        'Espera un momento y vuelve a intentarlo.';
+    }
+    if (nombre === 'QuotaExceededError') return 'No queda sitio en el disco.';
+    if (nombre === 'AbortError') return 'La operación se ha interrumpido.';
+    return (e && e.message) || String(e);
+  }
+
   function escapar(v) {
     return String(v === null || v === undefined ? '' : v)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -384,33 +409,6 @@ var U = (function () {
     return salida;
   }
 
-  /* ---------- los errores del navegador, traducidos ----------
-
-     (17-sep-2026, fila 44 de la cola, docs/ARCHIVAR-ATASCOS.md.) Un
-     `DOMException` del navegador (al leer o escribir en el disco) trae
-     su explicación en inglés, y sin decir qué hacer. Un solo sitio
-     para traducir los que de verdad pueden salir aquí, por su
-     `e.name`; lo que no se reconozca se deja tal cual, porque los
-     errores propios de la aplicación ya están en castellano. */
-  var MENSAJES_DE_ERROR = {
-    NotFoundError: 'No encuentro la carpeta o el fichero. Puede que se haya movido o que lo ' +
-      'esté sincronizando Dropbox en este momento.',
-    NotAllowedError: 'El navegador ha retirado el permiso sobre la carpeta. Vuelve a señalarla ' +
-      'en Ajustes.',
-    NoModificationAllowedError: 'Hay un fichero en uso, seguramente abierto en otro programa o ' +
-      'sincronizándose. Espera un momento y vuelve a intentarlo.',
-    InvalidStateError: 'Hay un fichero en uso, seguramente abierto en otro programa o ' +
-      'sincronizándose. Espera un momento y vuelve a intentarlo.',
-    QuotaExceededError: 'No queda sitio en el disco.',
-    AbortError: 'La operación se ha interrumpido.'
-  };
-
-  function mensajeDeError(e) {
-    if (!e) return '';
-    var traducido = MENSAJES_DE_ERROR[e.name];
-    return traducido || e.message || String(e);
-  }
-
   /* ---------- el menú de tres puntos ----------
 
      (17-sep-2026, fila 36 de la cola, docs/FILAS-QUE-NO-SE-ESTRUJAN.md.)
@@ -512,9 +510,8 @@ var U = (function () {
     aAaMmDd: aAaMmDd, fechaLegible: fechaLegible, cursoActual: cursoActual,
     cursoDeFecha: cursoDeFecha, cursoDeAno: cursoDeAno, edadDesde: edadDesde,
     aFecha: aFecha, yaPaso: yaPaso,
-    ahora: ahora, aviso: aviso, preguntar: preguntar, escapar: escapar,
+    ahora: ahora, aviso: aviso, preguntar: preguntar, escapar: escapar, mensajeDeError: mensajeDeError,
     parecidos: parecidos, dejaCrear: dejaCrear, mientrasGuarda: mientrasGuarda,
-    conservandoLoEscrito: conservandoLoEscrito, menuDeAcciones: menuDeAcciones,
-    mensajeDeError: mensajeDeError
+    conservandoLoEscrito: conservandoLoEscrito, menuDeAcciones: menuDeAcciones
   };
 })();
