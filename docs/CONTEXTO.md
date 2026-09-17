@@ -1612,11 +1612,14 @@ El `?v=` es imprescindible: sin él se puede recibir una copia guardada.
   `vercel.json` gana un `ignoreCommand` que se salta la publicación (código 0) si la rama no es
   `main`, o si el cambio solo toca `docs/`, `pruebas/`, `.github/` o ficheros `.md` (comparando
   contra `VERCEL_GIT_PREVIOUS_SHA`, con `HEAD^` de respaldo la primera vez; ante cualquier duda,
-  publica). **Va como comando de `sh` normal, sin envolver en `bash -c`**: los ejemplos oficiales
-  de Vercel nunca lo envuelven, y un primer intento envolviéndolo en `bash -c '...'` acabó en
-  "Deployment failed" en vez del "rate limited" de siempre (17-sep-2026); comprobado luego a mano
-  con `sh -c` contra commits reales del repositorio, sin `bash`. Se comprueba con
-  `pruebas/vercel-ignorecommand.mjs`, sin navegador. Y la cola gana la regla 13: como máximo dos
+  publica). **`ignoreCommand` no puede pasar de 256 caracteres** (lo exige el `vercel.json` de
+  Vercel; lo dice el propio aviso de `vercel[bot]` cuando se pasa: "should NOT be longer than 256
+  characters"). Dos intentos anteriores se quedaron en 270 y 286 caracteres y publicaron sin
+  querer como "Deployment failed", sin comprobarlos contra Vercel de verdad (17-sep-2026); la
+  versión buena usa pathspecs cortos (`:!docs` en vez de `:(exclude)docs`) y no comprueba aparte
+  si la referencia existe (si `git diff` no puede resolverla, falla sola y publica): 196
+  caracteres. Se comprueba con `pruebas/vercel-ignorecommand.mjs` (incluye el límite de 256), sin
+  navegador. Y la cola gana la regla 13: como máximo dos
   subidas por fila (una para marcarla EN CURSO, otra al terminar, con todo junto).
 
 ### Ficheros del repositorio

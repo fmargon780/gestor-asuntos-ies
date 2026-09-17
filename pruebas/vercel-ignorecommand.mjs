@@ -27,6 +27,9 @@ comprobarQue('ignoreCommand excluye docs, pruebas, .github y los .md',
 comprobarQue('sigue el bloque headers de siempre',
   Array.isArray(json.headers) && json.headers.length > 0 &&
   json.headers[0].headers.some((h) => h.key === 'Cache-Control'));
+comprobarQue('ignoreCommand no pasa de 256 caracteres (lo exige Vercel)',
+  json.ignoreCommand.length <= 256,
+  'longitud: ' + json.ignoreCommand.length);
 
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 process.exit(fallos ? 1 : 0);

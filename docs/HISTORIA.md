@@ -2136,10 +2136,15 @@ una línea cada una. El texto largo que tenían antes era:
   `docs/CONTEXTO.md`, reconciliaciones con `main`...). `vercel.json` gana un `ignoreCommand` que se
   salta la publicación cuando la rama no es `main` o el cambio solo toca `docs/`, `pruebas/`,
   `.github/` o `.md`, comparando contra `VERCEL_GIT_PREVIOUS_SHA` (con `HEAD^` de respaldo la
-  primera vez). Un primer intento lo envolvía en `bash -c '...'`, como proponía el documento;
-  Vercel lo publicó como "Deployment failed" en vez del "rate limited" de siempre, así que se
-  cambió a un comando de `sh` normal (los ejemplos oficiales de Vercel nunca usan `bash -c`),
-  comprobado a mano con `sh -c` contra commits reales del repositorio. Prueba nueva
-  `pruebas/vercel-ignorecommand.mjs`. La cola gana la regla 13: como máximo dos subidas por fila,
-  para no repetir el mismo problema con las sesiones en paralelo. **Sin comprobar en el propio
-  Vercel**: el cupo diario seguía agotado al terminar; queda para el 18-sep-2026.
+  primera vez). Dos intentos publicaron sin querer como "Deployment failed", sin comprobarlos
+  contra Vercel de verdad: el primero envuelto en `bash -c '...'`, el segundo ya sin él, los dos
+  por encima de 256 caracteres — el límite real de `ignoreCommand`, que solo se vio al leer el
+  aviso de `vercel[bot]` en el pull request ("should NOT be longer than 256 characters"). La
+  versión buena usa pathspecs cortos (`:!docs`) y no comprueba aparte si la referencia existe (si
+  `git diff` no puede resolverla, falla sola y publica): 196 caracteres, comprobado a mano con
+  `sh -c` contra commits reales del repositorio (docs-only, con código, rama distinta de `main`, y
+  una referencia inexistente). Prueba nueva `pruebas/vercel-ignorecommand.mjs`, con el límite de
+  256 caracteres incluido para que esto no se repita. La cola gana la regla 13: como máximo dos
+  subidas por fila, para no repetir el mismo problema con las sesiones en paralelo. **Sin
+  comprobar con una publicación real de Vercel**: el cupo diario seguía agotado al terminar; queda
+  para el 18-sep-2026.
