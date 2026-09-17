@@ -90,6 +90,7 @@ $('btn-olvidar').onclick = async function () {
 
 App.pintarAjustesMantenimiento = async function () {
   App.pintarCarpetasDeEsteOrdenador();
+  if (window.SenecaAyudante) SenecaAyudante.insertarEnlace($('ayudante-seneca-ajustes'));
   await App.pintarCopias();
   if (typeof App.pintarFichasHuerfanas === 'function') await App.pintarFichasHuerfanas();
   if (typeof App.pintarPapelera === 'function') await App.pintarPapelera();

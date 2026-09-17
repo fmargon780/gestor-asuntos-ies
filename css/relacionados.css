@@ -63,6 +63,8 @@
 /* Un miembro de un grupo que ya no está en las listas: se ve, pero
    distinto, y nunca desaparece solo. */
 .marcado-chip-perdido { background: #f0f0f0; border-color: #d7d7d7; color: var(--tinta-suave); }
+/* Un usuario IdEA ya copiado con "Copiar el siguiente" (js/seneca-destinatarios.js). */
+.marcado-chip-copiado { background: #eaf7ea; border-color: #b9dfb9; }
 .marcado-quitar {
   border: 0; background: none; color: var(--tinta-suave); cursor: pointer;
   font-size: 15px; line-height: 1; padding: 0 3px;
