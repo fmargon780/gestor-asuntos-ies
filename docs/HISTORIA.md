@@ -748,3 +748,75 @@ reabrir o meter el papel dentro del ARCHIVO sin tocar su estado.
 
 Se comprueba con `pruebas/documentos-sueltos.mjs` (15 comprobaciones). Se descartó, como ya
 estaba descartado, abrir la carpeta del asunto en el explorador del ordenador.
+
+---
+
+## 16-sep-2026 — Los correos se enganchan al asunto, y el hilo se sigue
+
+Fila 11 de la cola (`docs/CORREOS-AL-ASUNTO.md`). Versión publicada `16-sep-2026 · 20:41`.
+
+La bandeja de correos tenía tres agujeros. Si no acertaba con el asunto de destino, la única
+salida era crear otro asunto nuevo, y acababan naciendo carpetas repetidas para la misma
+gestión. Al guardar un correo no quedaba ningún rastro del hilo, así que el siguiente correo
+empezaba de cero. Y el recolector de Apps Script le quitaba la etiqueta `GESTOR` al hilo, de
+modo que las respuestas posteriores no las recogía nadie.
+
+**La huella del hilo.** Al guardar un correo en un asunto se apunta ahora
+`hilos: [{ id, asunto, visto }]` en su ficha de `asuntos.json`. Esa huella manda sobre la
+adivinación por texto: da igual cómo venga escrito el asunto del correo, si el hilo ya es
+conocido la tarjeta dice "Respuesta de <asunto>". `hilos` es opcional, así que los asuntos de
+antes siguen funcionando igual. Un asunto puede tener varios hilos; un hilo, un solo asunto.
+
+**"Elegir asunto".** Botón nuevo en cada tarjeta morada, en `js/bandeja-enlace.js`. Abre un
+cuadro con "Podrían encajar" (cinco como mucho, por puntuación de parecido: la dirección del
+tercero vale 50 puntos, su nombre escrito en el correo 40, cada palabra compartida 10, estar
+abierto 15 y haberse movido este mes 10) y "Todos los asuntos" con buscador. Nunca se guarda
+nada solo: siempre hay que pulsar.
+
+Se partió `js/bandeja-correos.js`, que pasaba de 400 líneas: lo de elegir a mano y la
+puntuación se fueron al fichero nuevo.
+
+**`seguidos.json`.** La aplicación escribe en `GESTOR-BANDEJA` la lista de hilos enganchados con
+su `visto`. En cada pasada, el script de Apps Script hace lo de siempre con la etiqueta y
+después mira esos hilos con `GmailApp.getThreadById`: si han crecido, los recoge otra vez, con
+`respuestaDe` y con `enviado: true` cuando el último mensaje lo mandó el propio usuario (la
+tarjeta lo dice: "Lo enviaste tú"). Así vuelven a la bandeja tanto las respuestas del tercero
+como los correos que manda Francisco desde Gmail.
+
+**Los documentos.** El PDF del hilo entero pasa a llamarse `AAMMDD HILO <asunto>.pdf` y **se
+sustituye**: el anterior va a la papelera, para que no se acumule una copia del hilo completo
+por cada respuesta. El mensaje nuevo entra aparte, como `AAMMDD CORREO <asunto>.pdf`. Los
+adjuntos siguen igual. El script también borra ahora lo que quedara de una recogida anterior del
+mismo hilo: Drive admite dos ficheros con el mismo nombre y la aplicación no sabría cuál coger.
+
+**Apps Script sigue sin desplegarse desde el repositorio.** El fichero lleva en sus tres
+primeras líneas qué hay que hacer para actualizarlo. Va pegado también el arreglo del enlace a
+Gmail (`#search/rfc822msgid:<Message-ID>`), que seguía sin llevarse a la cuenta desde el
+9-sep-2026.
+
+De paso, `pruebas/logica.mjs` estaba en rojo por su cuenta: llevaba dos fechas de cese escritas
+a mano (15-sep-2026 y 6-sep-2026) que el calendario ya había alcanzado. Ahora se cuentan desde
+hoy. **Regla nueva: nada de fechas escritas a mano en una prueba.**
+
+## 12-sep-2026 — Reparto del contexto en tres documentos
+
+`docs/CONTEXTO.md` había crecido hasta 1291 líneas: leerlo entero, en cada conversación y en
+cada sesión de Claude Code, se había convertido en el mayor gasto de cuota del proyecto.
+`docs/COLA.md` tenía el mismo problema con las notas de las filas HECHAS.
+
+Se repartió en tres documentos:
+
+- `docs/CONTEXTO-CORTO.md` (nuevo, máximo 160 líneas): para **decidir**, se lee siempre.
+- `docs/CONTEXTO.md` (reescrito): para **programar**, solo lo que es verdad hoy, sin fechas ni
+  relatos.
+- `docs/HISTORIA.md` (este documento, nuevo): el diario completo, con fechas, para consultar el
+  porqué.
+
+También se podó `docs/COLA.md`: las notas de las filas HECHAS quedan en una sola línea cada
+una, con el detalle largo trasladado aquí (ver más abajo, "Notas largas de `COLA.md` antes de
+la poda").
+
+Instrucción: `docs/REPARTO-CONTEXTO.md`. No se tocó código ni se ejecutaron pruebas.
+
+A partir de ahora, cada instrucción de la cola debe anotar aquí lo que merezca recordarse, con
+su fecha, en vez de dejarlo crecer dentro de `CONTEXTO.md`.
