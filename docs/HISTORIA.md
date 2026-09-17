@@ -2146,3 +2146,28 @@ una línea cada una. El texto largo que tenían antes era:
   páginas/Borrar/Copiar estaban siempre a la vista: se han ajustado para abrir el menú antes de
   pulsarlos (o de comprobar que están, con `getByRole`, que no ve dentro de un `display:none`).
   Batería completa en verde.
+- **48 · `docs/NO-GASTAR-PUBLICACIONES.md`**: Terminada 17-sep-2026 · 19:24. Llegó fuera de orden
+  directa a `main` (commit `7757e33`), pidiendo ser la fila 44 (ya ocupada) y la primera de la
+  cola; esta sesión ya había terminado la fila 36 al verla, así que la cogió justo después. El
+  cupo del plan gratuito de Vercel (100 publicaciones al día) se agotó el 17-sep-2026 con `main`
+  recibiendo exactamente 100 commits ese día, más de la mitad sin tocar nada que se vea en la web
+  (`docs/COLA.md` y compañía), más cada push a una rama `claude/...` con pull request abierto
+  gastando su propia vista previa. `vercel.json` gana `ignoreCommand`, con la receta exacta del
+  encargo: se salta la publicación cuando la rama no es `main`, o cuando el cambio solo toca
+  `docs/`, `pruebas/`, `.github/` o ficheros `.md`, comparando contra `VERCEL_GIT_PREVIOUS_SHA`
+  (el commit de la última publicación buena; `HEAD^` sirve de respaldo solo la primera vez, antes
+  de que esa variable exista) para que un push con el código en un commit y los documentos en
+  otro no se salte la publicación del código. Ante cualquier duda, publica. Entra también la
+  regla 13 de `docs/COLA.md`: como mucho dos subidas por fila. Prueba nueva
+  `pruebas/vercel-ignore-command.mjs`, sin navegador (lee `vercel.json` y comprueba que
+  `ignoreCommand` existe, menciona `main` y `VERCEL_GIT_PREVIOUS_SHA`, y que el bloque `headers`
+  de siempre sigue igual); comprobado también a mano contra el propio historial de git de este
+  repositorio: un commit que solo toca `docs/` se salta, uno que toca `js/`/`css/` publica.
+  **No se ha podido comprobar en Vercel de verdad** (el punto 4 del encargo pedía ver un
+  despliegue saltado y uno publicado de verdad): el cupo agotado ese mismo día, mientras se
+  trabajaba esta fila, solo se recupera pasadas 24 horas — de hecho, el PR de la fila 36 (#28)
+  dio ahí mismo el aviso de Vercel `Resource is limited - try again in 24 hours`, confirmando el
+  problema que esta fila arregla. Queda para la próxima vez que se toque el límite: apuntar aquí
+  si las publicaciones saltadas también cuentan para el cupo de 100 (el propio encargo dice que
+  no está documentado). No se ha tocado `git.deploymentEnabled` ni ningún *deploy hook*: esa es
+  la salida si la regla 13 no bastara, y no hacía falta todavía.

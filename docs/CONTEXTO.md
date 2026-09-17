@@ -1547,6 +1547,16 @@ El `?v=` es imprescindible: sin él se puede recibir una copia guardada.
   prueba en navegador de `pruebas/`.
 - **El conector de Vercel no sirve para esto:** da 403 y 404.
 - `vercel.json` manda `Cache-Control: public, max-age=0, must-revalidate` para todo.
+- **El plan gratuito (Hobby) solo da 100 publicaciones al día** (fila 48, 17-sep-2026,
+  `docs/NO-GASTAR-PUBLICACIONES.md`): se agotaron una vez, con `main` recibiendo 100 commits en
+  un día, más de la mitad de ellos solo `docs/COLA.md` y compañía, y cada push a una rama
+  `claude/...` con pull request abierto gastando además su propia vista previa. `vercel.json`
+  gana `ignoreCommand`: se salta la publicación cuando la rama no es `main`, o cuando el cambio
+  solo toca `docs/`, `pruebas/`, `.github/` o ficheros `.md` (comparando contra
+  `VERCEL_GIT_PREVIOUS_SHA`, el commit de la última publicación buena, no siempre `HEAD^`: con
+  dos commits en el mismo push —código y luego documentos— comparar solo con `HEAD^` se saltaría
+  la publicación del código). Ante cualquier duda, publica. Y la regla 13 de `docs/COLA.md`: como
+  mucho dos subidas por fila. Prueba: `pruebas/vercel-ignore-command.mjs`.
 
 ### Ficheros del repositorio
 
