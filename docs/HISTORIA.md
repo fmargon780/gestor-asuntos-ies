@@ -5,6 +5,40 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — La bandeja de correos, dentro de "Por clasificar" y plegada
+
+Fila 27 de la cola (`docs/COLA.md`, `docs/CORREOS-DENTRO-DE-POR-CLASIFICAR.md`), detrás de la 26.
+No era una función nueva: la bandeja ya funcionaba, lo que molestaba a Francisco era que ocupara
+la parte de arriba de la pantalla todo el rato, siempre desplegada, se trabajara con ella o no.
+
+**Qué cambia.** La bandeja se ve solo dentro de "Por clasificar" (`#zona-clasificar`), encima de
+la lista de documentos sueltos, detrás de una barra "Correos sin clasificar (N)" que se pliega y
+despliega al pulsarla y que **siempre arranca plegada** al entrar en la vista, se dejara como se
+dejara la última vez (sin memoria en `localStorage`, a propósito, y sin `<details>`: el mismo
+patrón que el plegado de "Filtros"). El botón "Mirar ahora" se va dentro del bloque desplegado, y
+desaparece la cabecera "Correos por convertir en asunto" con su cuenta: la sustituye la barra. La
+lectura de correos sigue corriendo igual con el bloque plegado, y el número de la barra se
+actualiza aunque no se esté mirando esa vista.
+
+**Una trampa real, no solo teórica.** La caja de envíos (`#bandeja-envios`, "Borrador en camino")
+se anclaba con `$('bandeja-correos') || paneles.nextSibling`: al dejar `#bandeja-correos` de ser
+hermana de `.paneles` (ahora vive dentro de `#zona-clasificar`), esa línea habría intentado
+`insertBefore` sobre un nodo que ya no es hijo directo del mismo padre. Se fijó explícitamente a
+`paneles.nextSibling`, tal como pedía el encargo, y `pruebas/envios.mjs` lo confirma en verde.
+
+**El reparto de ficheros.** `js/bandeja-correos.js` bajaba de 1.478 líneas: la parte de pantalla
+(la barra, la caja, cada tarjeta, la línea de "ya guardado") pasa a `js/bandeja-pantalla.js`
+nuevo, hablándose con el de siempre por `window.Bandeja`, al que se le han añadido las piezas que
+le faltaban (leer el estado actual de `correos`, adivinar, guardar, mirar de nuevo, pedir permiso,
+las utilidades de fecha e icono) sin renombrar ni quitar nada de lo que ya usaban
+`js/bandeja-enlace.js` y `js/correo-adjuntos.js`.
+
+**Pruebas**: `pruebas/correos.mjs` y `pruebas/correo-dos-buzones.mjs` ajustan su ayudante
+`mirarLaBandeja()` para entrar en "Por clasificar" y desplegar la barra; se suma en
+`pruebas/correos.mjs` una prueba de que la barra arranca plegada con el número ya al día, y de que
+vuelve a plegarse sola al reentrar en la vista aunque se dejara abierta. `pruebas/envios.mjs` y
+`pruebas/refresco.mjs` no necesitaban cambios. Batería completa en verde.
+
 ## 17-sep-2026 — Los hitos son la guía, no un añadido
 
 Fila 26 de la cola (`docs/COLA.md`, `docs/HITOS-SON-LA-GUIA.md`). Corrige un malentendido de

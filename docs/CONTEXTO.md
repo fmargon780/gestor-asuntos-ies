@@ -389,6 +389,29 @@ recoge cada 5 minutos y deja su ficha, el hilo en PDF y los adjuntos en la carpe
 "Leer el correo" abre el PDF del hilo en el panel de la derecha. **Gmail no se deja meter dentro
 de otra página.** Cada usuario tiene su propia bandeja.
 
+**En pantalla** (desde el 17-sep-2026, fila 27, `docs/CORREOS-DENTRO-DE-POR-CLASIFICAR.md`) vive
+dentro de "Por clasificar" (`#zona-clasificar`, encima de `#lista-sueltos`), detrás de una barra
+plegable "Correos sin clasificar (N)" (`#btn-correos-sin-clasificar`/`#bandeja-correos`, ambos
+nacidos en `index.html`, ya no creados por JavaScript). Se despliega y se pliega al pulsarla, y
+**siempre arranca plegada** al entrar en la vista (`App.irVista`, en `js/asuntos-lista.js`; sin
+memoria en `localStorage`, a propósito, y sin `<details>`: mismo patrón que el plegado de
+"Filtros", `engancharFiltros()` en `js/vista.js`). La lectura de correos (`mirar()`, cada
+`SEGUNDOS_ENTRE_MIRADAS`) no sabe nada del plegado y sigue corriendo igual; el número de la barra
+se actualiza aunque no se esté mirando esa vista (a propósito, al contrario que `App.pintarSueltos`,
+que si sale antes de pintar la lista si la vista no es "clasificar"). La caja de envíos
+(`#bandeja-envios`, "Borrador en camino") se queda donde estaba, debajo de las tres tarjetas,
+anclada explícitamente a `paneles.nextSibling` (antes se anclaba a `$('bandeja-correos')` si
+existía; dejó de tener sentido al dejar `#bandeja-correos` de ser hermana de `.paneles`).
+
+Pintar la bandeja (la barra, la caja, cada tarjeta, la línea de "ya guardado") vive en
+`js/bandeja-pantalla.js`, separado de `js/bandeja-correos.js` (1.478 líneas) para no seguir
+engordándolo: se habla con `window.Bandeja` (leer los correos, adivinar, guardar, descartar...),
+al que se le han añadido las piezas que le faltaban (`correos`, `asuntoDeLaMatricula`,
+`asuntoDeEsteCorreo`, `proponer`, `llevarANuevo`, `leerElCorreo`, `enlaceAGmail`, `descartar`,
+`borrarDeLaBandeja`, `mirarDeNuevo`, `pedirPermiso`, `soloElDia`, `fechaLegible`,
+`fechaHoraLegible`, `sobre`), sin renombrar ni quitar las que ya usaban `js/bandeja-enlace.js` y
+`js/correo-adjuntos.js`.
+
 De cada correo, la tarjeta morada mira en este orden (17-sep-2026, fila 18, "Un mismo correo en
 dos buzones"):
 
@@ -1339,7 +1362,8 @@ de `App` va después del fichero que lo define.
 | `js/rescate-datos.js` | Recoge los CSV que se hayan quedado un piso más arriba |
 | `js/traer-datos.js` | El botón de traer los CSV de Séneca desde donde estén |
 | `js/lector.js` | El panel de la derecha para leer, con su borde para estirarlo |
-| `js/bandeja-correos.js` | La bandeja de correos, la huella del hilo, lo que deja un correo dentro del asunto, y la tarjeta "Borrador en camino" (`window.Bandeja`) |
+| `js/bandeja-correos.js` | La lógica de la bandeja de correos: leer, adivinar, guardar, la huella del hilo, lo que deja un correo dentro del asunto, y la tarjeta "Borrador en camino" (`window.Bandeja`) |
+| `js/bandeja-pantalla.js` | La bandeja de correos en pantalla: la barra plegable, la caja, cada tarjeta (separado de `js/bandeja-correos.js` en la fila 27) |
 | `js/bandeja-enlace.js` | "Elegir asunto": llama al cuadro compartido, con la puntuación de parecido de un correo |
 | `js/correo-adjuntos.js` | El bloque "Documentos de este asunto" del cuadro de Correo, y el encargo `<id>.envio.json` |
 | `js/barra.js` | La barra plegable, el botón grande de Nuevo asunto y el icono de Ajustes plegado |
@@ -1568,6 +1592,8 @@ Aparte, en `localStorage`: `gestor-barra`, `gestor-filtros`, `gestor-lector-anch
 - **Ojo con el orden de los `<script>` de `index.html`.** `ficha-asunto.js` poda la tarjeta con
   su lista blanca, así que un módulo que quiera poner un botón ahí tiene que cargarse después.
   `lector.js` va antes que `bandeja-correos.js`, y `bandeja-enlace.js` después de los dos.
+  `bandeja-pantalla.js` va justo después de `bandeja-correos.js` (necesita `window.Bandeja`) y
+  antes de `bandeja-enlace.js` y `correo-adjuntos.js`.
   `dni.js` va casi el último; `inicio.js`, el último.
 - **Envolver una función que ya existe es la mejor manera de añadir algo a muchas pantallas a la
   vez** (hay más de 17 envolturas así). Condición: cargarse **después** del fichero que define lo

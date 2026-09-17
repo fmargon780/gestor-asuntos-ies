@@ -116,6 +116,9 @@ async function limpiarBandejaDeCorreos() {
   });
 }
 
+/* Desde el 17-sep-2026 (fila 27) la bandeja vive dentro de "Por
+   clasificar" y plegada: hay que entrar en esa vista y desplegar la
+   barra para verla. */
 async function mirarLaBandeja() {
   await pagina.evaluate(() => App.ir('ajustes'));
   await pagina.waitForSelector('#bloque-bandeja');
@@ -123,6 +126,9 @@ async function mirarLaBandeja() {
   await pagina.click('#botones-bandeja .boton');
   await pagina.waitForTimeout(600);
   await pagina.evaluate(() => App.ir('abiertos'));
+  await pagina.click('.panel[data-vista="clasificar"]');
+  await pagina.waitForTimeout(200);
+  await pagina.click('#btn-correos-sin-clasificar');
   await pagina.waitForTimeout(700);
 }
 

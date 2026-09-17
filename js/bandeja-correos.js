@@ -60,6 +60,15 @@
 
   function $(id) { return document.getElementById(id); }
 
+  /* La bandeja en pantalla —la barra plegable, la caja, cada tarjeta—
+     vive en js/bandeja-pantalla.js (17-sep-2026, fila 27, para no
+     pasar de las 1.478 líneas aquí): se habla con ella por
+     window.BandejaPantalla.pintar(), llamado cada vez que `correos`
+     puede haber cambiado. */
+  function repintarPantalla() {
+    if (window.BandejaPantalla) window.BandejaPantalla.pintar();
+  }
+
   /* ==========================================================
      LA CARPETA
      ========================================================== */
@@ -88,7 +97,7 @@
     correos = [];
     try { await Almacen.guardar(CLAVE, null); } catch (e) {}
     pintarBloqueAjustes();
-    pintarBandeja();
+    repintarPantalla();
   }
 
   /* Chrome solo devuelve el permiso sin preguntar si ya lo tenía. Para
@@ -109,7 +118,7 @@
     if (!aLaFuerza && ahora - ultimaMirada < SEGUNDOS_ENTRE_MIRADAS * 1000) return;
     mirando = true;
     try {
-      if (!(await tienePermiso(false))) { correos = null; pintarBandeja(); return; }
+      if (!(await tienePermiso(false))) { correos = null; repintarPantalla(); return; }
       var lista = await Carpetas.ficheros(carpeta);
       var salida = [];
       for (var i = 0; i < lista.length; i++) {
@@ -136,10 +145,10 @@
       });
       correos = salida;
       ultimaMirada = ahora;
-      pintarBandeja();
+      repintarPantalla();
     } catch (e) {
       correos = null;
-      pintarBandeja();
+      repintarPantalla();
     }
     mirando = false;
   }
@@ -564,20 +573,13 @@
   }
 
   /* ==========================================================
-     LA BANDEJA EN PANTALLA
-     ========================================================== */
+     UTILIDADES DE FECHA Y DE ICONO
 
-  function caja() {
-    var c = $('bandeja-correos');
-    if (c) return c;
-    var paneles = document.querySelector('#pantalla-abiertos .paneles');
-    if (!paneles || !paneles.parentNode) return null;
-    c = document.createElement('div');
-    c.id = 'bandeja-correos';
-    c.className = 'oculto';
-    paneles.parentNode.insertBefore(c, paneles.nextSibling);
-    return c;
-  }
+     Las usa tanto lo de aquí abajo (notas, nombres de fichero) como
+     js/bandeja-pantalla.js, que pinta la bandeja en pantalla
+     (17-sep-2026, fila 27): por eso están expuestas en window.Bandeja,
+     más abajo, en vez de vivir allí.
+     ========================================================== */
 
   /* Se queda con el AAAA-MM-DD, venga la hora detrás o no. */
   function soloElDia(iso) {
@@ -606,237 +608,6 @@
       'stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">' +
       '<rect x="3" y="5.5" width="18" height="13" rx="1.5"/>' +
       '<path d="m3.6 6.4 8.4 6 8.4-6"/></svg>';
-  }
-
-  function pintarBandeja() {
-    var c = caja();
-    if (!c) return;
-    c.innerHTML = '';
-
-    if (!carpeta) { c.className = 'oculto'; return; }
-
-    if (correos === null) {
-      c.className = 'aviso aviso-ambar';
-      c.innerHTML = '<strong>La bandeja de correos necesita permiso otra vez.</strong>' +
-        '<p>El navegador pide el permiso de nuevo cada vez que se abre la aplicación.</p>';
-      var dar = document.createElement('button');
-      dar.className = 'boton boton-principal';
-      dar.textContent = 'Dar permiso a la bandeja';
-      dar.onclick = async function () {
-        if (await tienePermiso(true)) { ultimaMirada = 0; await mirar(true); }
-        else U.aviso('Sin permiso no puedo leer los correos.', 'malo');
-      };
-      c.appendChild(dar);
-      return;
-    }
-
-    if (!correos.length) { c.className = 'oculto'; return; }
-
-    c.className = 'bandeja';
-
-    /* Un correo que ya metió el compañero en un asunto (fila 18, "Un
-       mismo correo en dos buzones") no es un correo que atender: sale
-       aparte, en una línea gris, nunca mezclado con las tarjetas de
-       verdad. Se reconoce por matrícula, y solo si el hilo de este
-       correo (el propio o el de que responde) no es ya una huella
-       conocida: si lo es, es un correo de este mismo buzón y su
-       tarjeta sale normal. */
-    var normales = [];
-    var yaGuardados = [];
-    correos.forEach(function (item) {
-      var d = item.datos;
-      var porHilo = asuntoDelHilo(d.id) || asuntoDelHilo(d.respuestaDe);
-      var porMatricula = porHilo ? null : asuntoDeLaMatricula(d.matriculas);
-      if (porMatricula) yaGuardados.push({ item: item, encaje: porMatricula });
-      else normales.push(item);
-    });
-
-    var cabecera = document.createElement('div');
-    cabecera.className = 'rotulo-lista';
-    cabecera.innerHTML = '<span class="rotulo-icono rotulo-icono-correo">' + sobre() + '</span>' +
-      '<span>Correos por convertir en asunto</span>' +
-      '<span class="cuenta-lista">' + normales.length + '</span>';
-    var mirarYa = document.createElement('button');
-    mirarYa.className = 'boton';
-    mirarYa.style.marginLeft = 'auto';
-    mirarYa.textContent = 'Mirar ahora';
-    mirarYa.onclick = function () { ultimaMirada = 0; mirar(true); };
-    cabecera.appendChild(mirarYa);
-    c.appendChild(cabecera);
-
-    var lista = document.createElement('div');
-    lista.className = 'lista';
-    normales.forEach(function (item) { lista.appendChild(tarjeta(item)); });
-    c.appendChild(lista);
-
-    if (yaGuardados.length) {
-      var listaGris = document.createElement('div');
-      listaGris.className = 'lista lista-ya-guardados';
-      yaGuardados.forEach(function (g) { listaGris.appendChild(lineaYaGuardado(g.item, g.encaje)); });
-      c.appendChild(listaGris);
-    }
-  }
-
-  /* "Ya está en el asunto «...» · lo metió Juan el 17-sep-2026 · 09:14",
-     con "Abrir el asunto" (si sigue abierto) y "Quitar de mi bandeja"
-     (nunca por la papelera: son copias de trabajo, el correo de verdad
-     sigue en Gmail). */
-  function lineaYaGuardado(item, encaje) {
-    var huella = encaje.huella || {};
-    var archivado = estaArchivado(encaje.ficha);
-    var div = document.createElement('div');
-    div.className = 'linea-ya-guardado';
-
-    var frase = 'Ya está en el asunto «' + U.escapar(encaje.nombre) + '»';
-    if (huella.metidoPor) frase += ' · lo metió ' + U.escapar(huella.metidoPor);
-    if (huella.metidoEl) frase += ' el ' + U.escapar(fechaHoraLegible(huella.metidoEl));
-    if (archivado) frase += ' · <strong>asunto archivado</strong>';
-    div.innerHTML = '<span class="ya-guardado-texto">' + frase + '</span>';
-
-    var acciones = document.createElement('div');
-    acciones.className = 'acciones';
-    if (!archivado) {
-      var abrir = document.createElement('button');
-      abrir.className = 'boton';
-      abrir.textContent = 'Abrir el asunto';
-      abrir.onclick = function () { abrirAsuntoYaGuardado(encaje.nombre); };
-      acciones.appendChild(abrir);
-    }
-    var quitar = document.createElement('button');
-    quitar.className = 'boton';
-    quitar.textContent = 'Quitar de mi bandeja';
-    quitar.onclick = async function () {
-      var ok = await U.preguntar('Quitar de tu bandeja',
-        '<p>Se quita de tu bandeja. El correo de verdad sigue en Gmail, y el asunto sigue como ' +
-        'está.</p>', 'Quitar');
-      if (!ok) return;
-      await borrarDeLaBandeja(item);
-    };
-    acciones.appendChild(quitar);
-    div.appendChild(acciones);
-    return div;
-  }
-
-  function abrirAsuntoYaGuardado(nombreAsunto) {
-    var a = (App.E.listaAbiertos || []).filter(function (x) { return x.nombre === nombreAsunto; })[0];
-    if (!a) { U.aviso('No encuentro ese asunto entre los abiertos.', 'malo'); return; }
-    App.ir('abiertos');
-    App.abrirFicha(a, 'abierto');
-  }
-
-  function tarjeta(item) {
-    var d = item.datos;
-    var div = document.createElement('div');
-    div.className = 'tarjeta tarjeta-correo';
-
-    var de = (d.de && (d.de.nombre || d.de.correo)) || 'Remitente desconocido';
-    var pie = [de, fechaLegible(d.fecha),
-               d.mensajes > 1 ? d.mensajes + ' mensajes' : '',
-               (d.adjuntos && d.adjuntos.length)
-                 ? (d.adjuntos.length === 1 ? '1 documento' : d.adjuntos.length + ' documentos')
-                 : ''].filter(Boolean).join('  ·  ');
-
-    div.innerHTML = sobre() +
-      '<div class="tarjeta-texto">' +
-        '<div class="tarjeta-nombre">' + U.escapar(d.asunto || '(sin asunto)') + '</div>' +
-        '<div class="tarjeta-pie">' + U.escapar(pie) + '</div>' +
-        (d.enviado ? '<div class="tarjeta-pie correo-enviado">Lo enviaste tú</div>' : '') +
-        '<div class="tarjeta-pie propuesta-correo"></div>' +
-      '</div>';
-
-    /* Primero la huella del hilo; si no la hay, se mira si el asunto
-       del correo lleva dentro el nombre de un asunto que ya existe. En
-       los dos casos es una respuesta: no hay que crear nada nuevo.
-       Nunca se guarda solo: siempre hay que pulsar. */
-    var yaEsta = asuntoDeEsteCorreo(d);
-    var linea = div.querySelector('.propuesta-correo');
-
-    if (yaEsta) {
-      linea.innerHTML = '<span class="marca-tipo">Respuesta de</span>' +
-        U.escapar(yaEsta.nombre) +
-        (estaArchivado(yaEsta.ficha) ? '  ·  <strong>asunto archivado</strong>' : '');
-    } else {
-      /* La propuesta se calcula al pintar, sin esperar: primero sale la
-         tarjeta y un momento después lo que se ha reconocido. */
-      proponer(d).then(function (p) {
-        if (!linea) return;
-        if (!p.tercero && !p.tipo) {
-          linea.textContent = 'Sin reconocer: elegirás tú el tercero y el tipo.';
-          return;
-        }
-        var trozos = [];
-        if (p.tipo) trozos.push(p.tipo.tipo);
-        if (p.tercero) trozos.push(App.textoTercero(p.tercero));
-        linea.innerHTML = '<span class="marca-tipo">Propuesta</span>' + U.escapar(trozos.join('  ·  '));
-      }).catch(function () {});
-    }
-
-    var acciones = document.createElement('div');
-    acciones.className = 'acciones';
-
-    if (yaEsta && estaArchivado(yaEsta.ficha)) {
-      /* Si contestan a un asunto archivado, la gestión ha vuelto a
-         moverse: lo primero que se ofrece es reabrirlo. */
-      var reabrir = document.createElement('button');
-      reabrir.className = 'boton boton-principal';
-      reabrir.textContent = 'Reabrir y guardar aquí';
-      reabrir.onclick = function () { reabrirYGuardar(item, yaEsta); };
-      acciones.appendChild(reabrir);
-
-      var soloGuardar = document.createElement('button');
-      soloGuardar.className = 'boton';
-      soloGuardar.textContent = 'Guardar sin reabrir';
-      soloGuardar.onclick = function () { guardarEnAsunto(item, yaEsta); };
-      acciones.appendChild(soloGuardar);
-    } else if (yaEsta) {
-      var guardar = document.createElement('button');
-      guardar.className = 'boton boton-principal';
-      guardar.textContent = 'Guardar en ese asunto';
-      guardar.onclick = function () { guardarEnAsunto(item, yaEsta); };
-      acciones.appendChild(guardar);
-    }
-
-    /* Elegir a mano el asunto de destino, sea cual sea lo que haya
-       adivinado la tarjeta: la huella también se puede equivocar.
-       Lo de dentro está en js/bandeja-enlace.js. */
-    if (typeof App.elegirAsuntoDelCorreo === 'function') {
-      var elegir = document.createElement('button');
-      elegir.className = 'boton';
-      elegir.textContent = 'Elegir asunto';
-      elegir.onclick = function () { App.elegirAsuntoDelCorreo(item); };
-      acciones.appendChild(elegir);
-    }
-
-    var crear = document.createElement('button');
-    crear.className = 'boton' + (yaEsta ? '' : ' boton-principal');
-    crear.textContent = yaEsta ? 'Crear uno nuevo' : 'Crear el asunto';
-    crear.onclick = function () { llevarANuevo(item); };
-    acciones.appendChild(crear);
-
-    if ((d.pdf || d.pdfMensaje) && window.Lector) {
-      var leer = document.createElement('button');
-      leer.className = 'boton';
-      leer.textContent = 'Leer el correo';
-      leer.onclick = function () { leerElCorreo(d); };
-      acciones.appendChild(leer);
-    }
-
-    if (d.enlace) {
-      var ver = document.createElement('button');
-      ver.className = 'boton';
-      ver.textContent = 'Abrir en Gmail';
-      ver.onclick = function () { window.open(enlaceAGmail(d), '_blank'); };
-      acciones.appendChild(ver);
-    }
-
-    var fuera = document.createElement('button');
-    fuera.className = 'boton';
-    fuera.textContent = 'Descartar';
-    fuera.onclick = function () { descartar(item); };
-    acciones.appendChild(fuera);
-
-    div.appendChild(acciones);
-    return div;
   }
 
   /* ==========================================================
@@ -1079,7 +850,7 @@
     }
     correos = (correos || []).filter(function (x) { return x.fichero !== item.fichero; });
     if (pendiente && pendiente.fichero === item.fichero) { pendiente = null; pintarAvisoPendiente(); }
-    pintarBandeja();
+    repintarPantalla();
   }
 
   async function descartar(item) {
@@ -1321,7 +1092,11 @@
     c = document.createElement('div');
     c.id = 'bandeja-envios';
     c.className = 'oculto';
-    paneles.parentNode.insertBefore(c, $('bandeja-correos') || paneles.nextSibling);
+    /* Antes se anclaba a $('bandeja-correos') si existía: desde que
+       esa caja vive dentro de #zona-clasificar (fila 27, 17-sep-2026)
+       ya no es hermana de .paneles, así que insertBefore con ella
+       fallaría. Se fija explícitamente al siguiente hermano. */
+    paneles.parentNode.insertBefore(c, paneles.nextSibling);
     return c;
   }
 
@@ -1435,17 +1210,24 @@
   }
 
   /* ==========================================================
-     LO QUE USA js/bandeja-enlace.js
-
-     El elegidor de asuntos a mano vive en su propio fichero para que
-     este no siga creciendo. Necesita estas piezas de aquí; no se le
-     enseña nada más.
+     LO QUE USAN LOS DEMÁS FICHEROS DE LA BANDEJA
      ========================================================== */
 
-  /* `window.Bandeja` lo usan dos ficheros aparte, para no seguir
+  /* Pide el permiso otra vez y, si lo da, fuerza una mirada. Lo usa el
+     botón de "La bandeja de correos necesita permiso otra vez", en
+     js/bandeja-pantalla.js. Devuelve si ha quedado con permiso. */
+  async function pedirPermiso() {
+    if (!(await tienePermiso(true))) return false;
+    ultimaMirada = 0;
+    await mirar(true);
+    return true;
+  }
+
+  /* `window.Bandeja` lo usan tres ficheros aparte, para no seguir
      engordando este: js/bandeja-enlace.js (el elegidor de asuntos a
-     mano de un correo) y js/correo-adjuntos.js (mandar documentos por
-     correo). A ninguno de los dos se le enseña nada más que esto. */
+     mano de un correo), js/correo-adjuntos.js (mandar documentos por
+     correo) y js/bandeja-pantalla.js (la bandeja en pantalla,
+     17-sep-2026, fila 27). A ninguno se le enseña nada más que esto. */
   window.Bandeja = {
     sinElRe: sinElRe,
     estaArchivado: estaArchivado,
@@ -1455,7 +1237,23 @@
     asuntoDelHilo: asuntoDelHilo,
     escribirSeguidos: escribirSeguidos,
     carpeta: function () { return carpeta; },
-    avisarEnvioNuevo: function () { revisarEnvios(true); }
+    avisarEnvioNuevo: function () { revisarEnvios(true); },
+    /* Para js/bandeja-pantalla.js. */
+    correos: function () { return correos; },
+    asuntoDeLaMatricula: asuntoDeLaMatricula,
+    asuntoDeEsteCorreo: asuntoDeEsteCorreo,
+    proponer: proponer,
+    llevarANuevo: llevarANuevo,
+    leerElCorreo: leerElCorreo,
+    enlaceAGmail: enlaceAGmail,
+    descartar: descartar,
+    borrarDeLaBandeja: borrarDeLaBandeja,
+    mirarDeNuevo: function (aLaFuerza) { ultimaMirada = 0; return mirar(aLaFuerza !== false); },
+    pedirPermiso: pedirPermiso,
+    soloElDia: soloElDia,
+    fechaLegible: fechaLegible,
+    fechaHoraLegible: fechaHoraLegible,
+    sobre: sobre
   };
 
   var enganchado = false;

@@ -194,6 +194,18 @@
              carpeta propia. Aquí es donde aparece lo que os deja el equipo directivo.</p>
           <button id="btn-sueltos-visto" class="boton oculto">Ya los he visto</button>
         </div>
+
+        <!-- La bandeja de correos (js/bandeja-correos.js, js/bandeja-pantalla.js),
+             plegada detrás de esta barra y siempre arrancando así (fila 27,
+             17-sep-2026, docs/CORREOS-DENTRO-DE-POR-CLASIFICAR.md). Los dos
+             elementos nacen aquí, ya no los crea JavaScript. -->
+        <div id="correos-sin-clasificar" class="oculto">
+          <button type="button" id="btn-correos-sin-clasificar" class="boton" aria-expanded="false">
+            Correos sin clasificar (<span id="cuenta-correos-sin-clasificar">0</span>)
+          </button>
+          <div id="bandeja-correos" class="oculto"></div>
+        </div>
+
         <div id="lista-sueltos" class="lista"></div>
       </div>
 
@@ -650,6 +662,10 @@
 <script src="js/traer-datos.js"></script>
 <script src="js/lector.js"></script>
 <script src="js/bandeja-correos.js"></script>
+<!-- La bandeja en pantalla (fila 27, 17-sep-2026): necesita
+     window.Bandeja, así que va después de js/bandeja-correos.js, y
+     antes de js/bandeja-enlace.js y js/correo-adjuntos.js. -->
+<script src="js/bandeja-pantalla.js"></script>
 <script src="js/bandeja-enlace.js"></script>
 <script src="js/correo-adjuntos.js"></script>
 <script src="js/barra.js"></script>

@@ -256,6 +256,10 @@ App.irVista = function (cual) {
   var esClasificar = App.E.vista === 'clasificar';
   $('zona-clasificar').classList.toggle('oculto', !esClasificar);
   $('zona-asuntos').classList.toggle('oculto', esClasificar);
+  /* La bandeja de correos arranca siempre plegada al entrar aquí, se
+     dejara como se dejara la última vez (fila 27, 17-sep-2026): sin
+     memoria en localStorage, a propósito. */
+  if (esClasificar && window.BandejaPantalla) window.BandejaPantalla.plegar();
   /* Ordenar y filtrar por estado o por plazo solo tiene sentido con asuntos. */
   $('filtro-estado').parentNode.querySelectorAll('#filtro-estado, #filtro-plazo, #orden-abiertos')
     .forEach(function (el) { el.classList.toggle('oculto', esClasificar); });

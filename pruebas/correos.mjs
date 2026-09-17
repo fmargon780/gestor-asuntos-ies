@@ -110,7 +110,9 @@ async function dejarElCorreo(datos) {
 }
 
 /* La bandeja solo vuelve a mirar la carpeta cada 90 segundos. Volver a
-   señalarla en Ajustes la obliga a mirar ahora mismo. */
+   señalarla en Ajustes la obliga a mirar ahora mismo. Desde el 17-sep-
+   2026 (fila 27) la bandeja vive dentro de "Por clasificar" y plegada:
+   hay que entrar en esa vista y desplegar la barra para verla. */
 async function mirarLaBandeja() {
   await pagina.evaluate(() => App.ir('ajustes'));
   await pagina.waitForSelector('#bloque-bandeja');
@@ -118,6 +120,9 @@ async function mirarLaBandeja() {
   await pagina.click('#botones-bandeja .boton');
   await pagina.waitForTimeout(600);
   await pagina.evaluate(() => App.ir('abiertos'));
+  await pagina.click('.panel[data-vista="clasificar"]');
+  await pagina.waitForTimeout(200);
+  await pagina.click('#btn-correos-sin-clasificar');
   await pagina.waitForTimeout(700);
 }
 
@@ -149,7 +154,41 @@ await comprobar('el asunto de partida no tiene huella de hilo',
   fichaDelAsunto(ASUNTO).then(f => f.hilos === undefined), true);
 
 await dejarElCorreo(correoDeMentira());
-await mirarLaBandeja();
+
+/* --- fila 27, 17-sep-2026: la barra se actualiza aunque no se
+   despliegue, y al entrar en "Por clasificar" arranca siempre plegada
+   (docs/CORREOS-DENTRO-DE-POR-CLASIFICAR.md). --- */
+console.log('--- la barra de correos: plegada de partida, con el número al día ---');
+await pagina.evaluate(() => App.ir('ajustes'));
+await pagina.waitForSelector('#bloque-bandeja');
+await pagina.evaluate(() => { document.getElementById('bloque-bandeja').open = true; });
+await pagina.click('#botones-bandeja .boton');
+await pagina.waitForTimeout(600);
+await pagina.evaluate(() => App.ir('abiertos'));
+await pagina.click('.panel[data-vista="clasificar"]');
+await pagina.waitForTimeout(300);
+
+await comprobar('la barra ya dice "Correos sin clasificar (1)", sin desplegar nada',
+  pagina.locator('#btn-correos-sin-clasificar').textContent().then(t => t.replace(/\s+/g, ' ').trim()),
+  'Correos sin clasificar (1)');
+await comprobar('pero sigue plegada',
+  pagina.locator('#btn-correos-sin-clasificar').getAttribute('aria-expanded'), 'false');
+await comprobar('y la caja no se ve todavía',
+  pagina.locator('#bandeja-correos').isVisible(), false);
+
+await pagina.click('#btn-correos-sin-clasificar');
+await pagina.waitForTimeout(300);
+await comprobar('al pulsarla se despliega',
+  pagina.locator('#btn-correos-sin-clasificar').getAttribute('aria-expanded'), 'true');
+
+await pagina.click('.panel[data-vista="departamento"]');
+await pagina.waitForTimeout(200);
+await pagina.click('.panel[data-vista="clasificar"]');
+await pagina.waitForTimeout(200);
+await comprobar('al volver a entrar en la vista, se vuelve a plegar sola',
+  pagina.locator('#btn-correos-sin-clasificar').getAttribute('aria-expanded'), 'false');
+await pagina.click('#btn-correos-sin-clasificar');
+await pagina.waitForTimeout(300);
 
 await comprobar('el correo sale en la bandeja',
   pagina.locator('#bandeja-correos .tarjeta-correo').count(), 1);

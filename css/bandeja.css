@@ -1,11 +1,13 @@
-/* La bandeja de correos, arriba de los asuntos abiertos.
+/* La bandeja de correos, dentro de "Por clasificar" (fila 27,
+   17-sep-2026, docs/CORREOS-DENTRO-DE-POR-CLASIFICAR.md), plegada
+   detrás de una barra.
 
    Los correos no son ni asuntos ni documentos sueltos, así que llevan
    su propio color: sobre morado y franja morada. */
-#bandeja-correos.bandeja { margin: 0 0 26px; }
-#bandeja-correos .rotulo-lista { align-items: center; }
-.rotulo-icono-correo { display: inline-flex; color: #5b3fa0; }
-.rotulo-icono-correo svg { width: 20px; height: 20px; }
+#correos-sin-clasificar { margin-bottom: 18px; }
+#btn-correos-sin-clasificar.correos-sin-clasificar-vacio { color: var(--tinta-suave); }
+#bandeja-correos.bandeja { margin: 10px 0 0; }
+.bandeja-acciones-arriba { display: flex; justify-content: flex-end; margin-bottom: 10px; }
 
 .tarjeta-correo {
   border-left: 5px solid #5b3fa0;

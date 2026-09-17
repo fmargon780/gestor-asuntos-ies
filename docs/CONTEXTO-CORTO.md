@@ -67,12 +67,12 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Guías del procedimiento por tipo, con pasos, preguntas y opciones.
 - Panel lateral de lectura, y tablón de notas rápidas siempre visible.
 - Correo y mensaje de Séneca preparados; la app no envía nada.
-- Bandeja de correos de Gmail (etiqueta `GESTOR`): a un asunto nuevo, al que adivina, o al que
-  eliges a mano. El hilo queda enganchado (`hilos`, con la matrícula del mensaje para reconocerlo
-  también desde el otro buzón) y sus respuestas vuelven solas; lo del compañero sale en gris.
 - "Por clasificar": cada documento suelto se abre, se borra, crea un asunto nuevo, o entra en uno
-  que ya existe con "Meter en un asunto" (mismo cuadro que la bandeja de correos). El que se está
-  viendo queda marcado en la lista, con sus mismas acciones también dentro del visor.
+  que ya existe. El que se está viendo queda marcado en la lista, con sus mismas acciones también
+  dentro del visor. Encima, tras una barra "Correos sin clasificar (N)" que siempre arranca
+  plegada, vive la bandeja de Gmail (etiqueta `GESTOR`): a un asunto nuevo, adivinado o elegido a
+  mano, con el hilo enganchado (`hilos`, con la matrícula para reconocerlo desde el otro buzón
+  también); sus respuestas vuelven solas, y lo del compañero sale en gris.
 - DNI del alumnado a la vista, con aviso si falta y ya tocaría tenerlo.
 - Registrar un documento: si el PDF sellado ya está en la carpeta (bajado de Séneca), la ficha lo
   detecta sola y lo renombra al decir de qué documento es, sin tercer fichero y con el viejo a la
