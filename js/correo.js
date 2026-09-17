@@ -388,13 +388,29 @@
 
   /* A quién se le va a escribir, dicho en palabras. En Séneca no hay
      direcciones que enseñar: lo que ayuda es acordarse de a quién hay
-     que marcar en su lista. */
+     que marcar en su lista. Si el asunto trae "Lo pide" (17-sep-2026,
+     fila 28), manda ese nombre: es a quien hay que contestar, y puede
+     no ser el propio interesado. */
   function aQuien(a) {
+    var deLoPide = window.LoPide && a && a.ficha && a.ficha.loPide && a.ficha.loPide.nombre;
+    if (deLoPide) return deLoPide;
     var categoria = categoriaDe(a);
     var nombre = soloElNombre(terceroDe(a));
     if (!nombre) return '';
     if (categoria === 'ALUMNADO') return 'los tutores legales de ' + nombre;
     return nombre;
+  }
+
+  /* La línea gris de "Lo pidió...", encima de la lista de "Para"
+     (docs/LO-PIDE.md, 6). Cadena vacía en Séneca (no hay lista de
+     "Para" ahí) o si el asunto no tiene el dato. */
+  function avisoLoPideHtml(a) {
+    if (porSeneca || !window.LoPide) return '';
+    var d = a.ficha && a.ficha.loPide;
+    if (!d || !d.nombre) return '';
+    var texto = 'Lo pidió ' + d.nombre + (d.relacion ? ' (' + d.relacion + ')' : '') +
+      (d.fecha ? ', el ' + U.fechaLegible(U.aAaMmDd(d.fecha)) : '') + '.';
+    return '<p class="nota" style="margin-top:0">' + U.escapar(texto) + '</p>';
   }
 
   /* El estado que toca después de escribir a alguien de fuera. La lista
@@ -507,9 +523,20 @@
     var caja = $('correo-caja');
     if (!caja) return;
     var correos = correosDe(persona);
-    /* De partida van marcados todos: en el alumnado el correo suele ir a
-       los dos tutores. Quitar una casilla es más rápido que ponerla. */
-    correos.forEach(function (c) { if (elegidos[c.dir] === undefined) elegidos[c.dir] = true; });
+
+    /* De partida van marcados todos (en el alumnado el correo suele ir
+       a los dos tutores), salvo que el asunto diga quién lo pide y se
+       le conozca el correo: entonces manda ese, solo (docs/LO-PIDE.md,
+       6). La decisión, pura, vive en LoPide.elegirDestinatarios. */
+    var correoLoPide = (!porSeneca && window.LoPide) ? LoPide.correoDe(a.ficha) : '';
+    var otroInicial = '';
+    if (window.LoPide) {
+      var resultado = LoPide.elegirDestinatarios(correos, correoLoPide, elegidos);
+      elegidos = resultado.elegidos;
+      otroInicial = resultado.otro;
+    } else {
+      correos.forEach(function (c) { if (elegidos[c.dir] === undefined) elegidos[c.dir] = true; });
+    }
 
     /* Los documentos del asunto y los grupos (para la copia oculta) no
        van en el cuadro de Séneca: allí no hay adjuntos ni direcciones. */
@@ -524,7 +551,7 @@
 
     caja.innerHTML = porSeneca
       ? cuerpoDeSeneca(a)
-      : cuerpoDeCorreo(a, correos, bloqueAdjuntos, opcionesGrupo);
+      : cuerpoDeCorreo(a, correos, bloqueAdjuntos, opcionesGrupo, otroInicial);
 
     if (porSeneca) {
       engancharComunes(a);
@@ -543,8 +570,9 @@
 
   /* ---------- el cuadro del correo ---------- */
 
-  function cuerpoDeCorreo(a, correos, bloqueAdjuntos, opcionesGrupo) {
-    return '<label class="etiqueta" style="margin-top:0">Para</label>' +
+  function cuerpoDeCorreo(a, correos, bloqueAdjuntos, opcionesGrupo, otroInicial) {
+    return avisoLoPideHtml(a) +
+      '<label class="etiqueta" style="margin-top:0">Para</label>' +
       (correos.length
         ? '<div id="correo-lista">' + correos.map(function (c) {
             return '<label class="correo-fila">' +
@@ -559,8 +587,8 @@
             ? 'En el fichero de Séneca no hay ningún correo de ' + U.escapar(terceroDe(a)) + '.'
             : 'No he encontrado a ' + U.escapar(terceroDe(a)) + ' en los ficheros de datos.') +
           ' Escríbelo aquí abajo.</p>') +
-      '<input id="correo-otro" class="campo" placeholder="Otro correo, si hace falta" ' +
-        'style="margin-top:8px">' +
+      '<input id="correo-otro" class="campo" value="' + U.escapar(otroInicial || '') + '" ' +
+        'placeholder="Otro correo, si hace falta" style="margin-top:8px">' +
 
       (opcionesGrupo
         ? '<label class="etiqueta">Añadir un grupo</label>' +

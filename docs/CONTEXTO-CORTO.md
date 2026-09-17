@@ -75,8 +75,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   también); sus respuestas vuelven solas, y lo del compañero sale en gris.
 - DNI del alumnado a la vista, con aviso si falta y ya tocaría tenerlo.
 - Registrar un documento: si el PDF sellado ya está en la carpeta (bajado de Séneca), la ficha lo
-  detecta sola y lo renombra al decir de qué documento es, sin tercer fichero y con el viejo a la
-  papelera; el botón de siempre sigue, ya con el explorador abierto en la carpeta del asunto.
+  detecta sola, lo renombra y manda el viejo a la papelera; el botón de siempre sigue igual.
 - Terceros relacionados con un asunto, con nota (no copia) al archivar; "+ Añadir varios" señala
   de golpe (atajos de alumnado por unidad/nivel/enseñanza, grupos propios en `_GESTOR/grupos.json`
   desde Ajustes), y esos mismos grupos ponen los destinatarios de un correo, en copia oculta.
@@ -102,6 +101,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   "Tomar el mando"), con marca en la lista. Señal en `_GESTOR/presencia.json`, caduca a los 3 min.
 - Separar, Unir y Sacar páginas de un PDF, en la carpeta del asunto y en Por clasificar (con
   pdf-lib, `js/lib/pdf-lib.min.js`); miniaturas con pdf.js, tijeras entre páginas para Separar.
+- "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha (opcional), con el correo ya puesto al preparar el cuadro de Correo.
 
 ## 6. Reglas de código que no se pueden olvidar
 

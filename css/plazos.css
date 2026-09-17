@@ -17,6 +17,15 @@
 .plazo-cerca   { background: #fff4d6; color: #8a6100; border-color: #e6c377; }
 .plazo-lejos   { background: #eef1f5; color: #5d6b7a; border-color: #d7dde5; }
 
+/* "Lo pide", en la cabecera de la ficha (17-sep-2026, fila 28,
+   docs/LO-PIDE.md): mismo dibujo que .marca-estado/.marca-plazo, con
+   un color propio para distinguirla de un vistazo. */
+.marca-lopide {
+  display: inline-block; border-radius: 20px; padding: 2px 10px;
+  font-size: 12px; font-weight: 600; margin-right: 8px;
+  background: #f0eafb; color: #5b3fa0; border: 1px solid #d6c8f0;
+}
+
 /* La casilla de días de plazo de cada tipo, en Ajustes. */
 .plazo-tipo {
   display: flex; align-items: center; gap: 6px;

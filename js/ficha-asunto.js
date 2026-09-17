@@ -150,6 +150,8 @@
           (situacion ? '<span class="marca-estado ' + App.colorEstado(situacion) + '">' +
                        U.escapar(situacion) + '</span>' : '') +
           (p ? '<span class="marca-plazo ' + p.clase + '">' + U.escapar(p.texto) + '</span>' : '') +
+          (a.ficha.loPide && a.ficha.loPide.nombre
+            ? '<span class="marca-lopide">Lo pide: ' + U.escapar(a.ficha.loPide.nombre) + '</span>' : '') +
         '</div>' +
         '<h2 class="ficha-nombre">' + U.escapar(a.nombre) + '</h2>' +
       '</header>' +
@@ -408,10 +410,60 @@
     ].concat(filasDeCampos(a)).concat([
       { titulo: 'Estado', valor: f.situacion || 'Sin estado' },
       { titulo: 'Vía de comunicación', valor: App.textoVia(f) },
+      { titulo: 'Lo pide', valor: window.LoPide ? LoPide.texto(f) : '' },
       { titulo: 'Fecha límite', valor: p ? Plazos.legible(p.limite) + ' · ' + p.texto : '' },
       { titulo: 'Lo abrió', valor: f.abiertoPor || '' },
       { titulo: 'En el archivo', valor: a.ruta || '' }
     ]));
+  }
+
+  /* ---------- "Lo pide": quién ha pedido esta gestión ----------
+
+     17-sep-2026, fila 28, docs/LO-PIDE.md. Los controles y la lógica
+     de verdad viven en js/lo-pide.js; aquí solo se abre el cuadro, se
+     busca la persona del tercero (misma búsqueda que pintarContacto,
+     un poco más abajo) para ofrecer sus tutores, y se guarda con
+     App.anotar. */
+
+  async function personaDelTerceroLoPide(a) {
+    var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
+    var quien = nombreDelTercero(a);
+    if (!categoria || !quien || !App.E.datos) return null;
+    try {
+      var fuente = await Datos.cargar(App.E.datos, categoria);
+      var lista = Datos.buscar(fuente.lista, quien, 1);
+      if (!lista.length) lista = Datos.buscar(fuente.lista, quien.replace(/[\s\d]+$/, ''), 1);
+      return lista.length ? lista[0] : null;
+    } catch (e) { return null; }
+  }
+
+  async function abrirLoPide(a) {
+    var persona = await personaDelTerceroLoPide(a);
+    var tieneDato = !!(a.ficha.loPide && a.ficha.loPide.nombre);
+    var pieQuitar = tieneDato
+      ? '<button type="button" class="boton" id="lopide-quitar" style="margin-top:10px">Quitar el dato</button>'
+      : '';
+    var promesa = U.preguntar('Lo pide',
+      '<p class="explica">Quién ha pedido esta gestión, por qué vía y en qué fecha.</p>' +
+      '<div id="lopide-caja-ficha"></div>' + pieQuitar, 'Guardar');
+    var caja = $('lopide-caja-ficha');
+    var controles = LoPide.controles(caja, persona, a.ficha.loPide || null);
+
+    var quitado = false;
+    var btnQuitar = $('lopide-quitar');
+    if (btnQuitar) {
+      btnQuitar.onclick = function () { quitado = true; $('cuadro-cancelar').click(); };
+    }
+
+    var ok = await promesa;
+    if (quitado) {
+      /* `loPide: null`, no `undefined`: App.anotar hace Object.assign, y
+         undefined no borra nada (docs/LO-PIDE.md, 1). */
+      await App.anotar(a.nombre, { loPide: null });
+      return;
+    }
+    if (!ok) return;
+    await App.anotar(a.nombre, { loPide: controles.leer() });
   }
 
   /* ---------- la barra de botones ----------
@@ -457,6 +509,16 @@
           await U.mientrasGuarda(ev.currentTarget, function () { return App.editarPlazo(a); });
           pintar();
         }, !!p));
+
+      if (window.LoPide) {
+        var tieneLoPide = !!(a.ficha.loPide && a.ficha.loPide.nombre);
+        caja.appendChild(boton(tieneLoPide ? 'Lo pide ✓' : 'Lo pide',
+          'Quién ha pedido esta gestión, por qué vía y en qué fecha',
+          async function (ev) {
+            await U.mientrasGuarda(ev.currentTarget, function () { return abrirLoPide(a); });
+            pintar();
+          }, tieneLoPide));
+      }
 
       caja.appendChild(boton('Editar', 'Cambiar la fecha, el tipo, la descripción o el tercero',
         async function () { await App.editarAsunto(a); volverALaLista(); }));

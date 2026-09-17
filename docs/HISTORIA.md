@@ -5,6 +5,44 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — "Lo pide": quién ha pedido la gestión
+
+Fila 28 de la cola (`docs/COLA.md`, `docs/LO-PIDE.md`), acordada con Francisco el mismo día. Nace
+del problema real: se pide un certificado, pasan los días, y cuando está listo ya no se recuerda a
+quién hay que contestar (el padre, la madre, el propio alumno...).
+
+**Qué cambia.** Cada asunto puede guardar, si se quiere, quién lo pidió, por qué vía y en qué
+fecha: clave nueva y opcional `loPide` en `_GESTOR/asuntos.json`, con `nombre`, `categoria`,
+`relacion`, `correo`, `telefono`, `via`, `fecha` y `apuntadoPor`. Se apunta al crear el asunto
+(grupo "Lo pide (opcional)" en `js/asuntos-nuevo.js`) o después, con el botón "Lo pide" de la
+ficha (`js/ficha-asunto.js`), que también enseña una fila ("Lo pide", debajo de "Vía de
+comunicación") y una marca en la cabecera cuando hay dato. En el cuadro de Correo
+(`js/correo.js`), si se conoce el correo de quien lo pide, se marca su casilla sola (y se
+desmarcan las demás); si no está en la lista, va a "Otro correo"; y sale una línea gris "Lo pidió
+Fulano (relación), el día tal" encima de "Para". En Séneca, `aQuien` dice el nombre de quien lo
+pide en vez del de siempre. Cuatro huecos nuevos de plantilla (`js/plantillas.js`):
+`{quienlopide}`, `{quienlopiderelacion}`, `{quienlopidevia}`, `{quienlopidefecha}`.
+
+**Toda la lógica, en un módulo nuevo.** `js/lo-pide.js` (`window.LoPide`) para no engordar
+`js/asuntos-nuevo.js`, `js/ficha-asunto.js` ni `js/correo.js`: `LoPide.opciones(persona)` ofrece
+"El propio interesado", "Tutor legal 1/2" (solo alumnado, y solo si Séneca trae su nombre) y "Otra
+persona…"; `LoPide.controles(caja, persona, valorInicial)` pinta esos controles (con clases, nunca
+con id: el mismo módulo se monta a la vez en la pantalla de "Nuevo asunto", que queda en el
+documento aunque escondida, y en el cuadro de la ficha, y dos elementos con el mismo id habrían
+roto el segundo sitio); `LoPide.texto`/`LoPide.correoDe` leen el dato guardado. `datosDeTutor`
+(antes privada de `js/plantillas.js`) se sacó aquí, pública, porque `LoPide.opciones` también la
+necesita: `js/plantillas.js` ahora la llama en vez de tener su propia copia. La decisión de qué
+casilla marcar en el cuadro de Correo también se sacó como función pura, `LoPide.elegirDestinatarios`,
+para poder probarla sin cargar ese cuadro (no expone nada hacia fuera).
+
+**El parentesco real (padre, madre, abuela) queda fuera**, a propósito: el RegAlum no trae esa
+columna, así que la relación se enseña como "Tutor legal 1"/"Tutor legal 2", y solo con "Otra
+persona…" se escribe a mano. Ya estaba anotado en "Lo que vendrá después" de `docs/COLA.md`.
+
+Prueba nueva `pruebas/lo-pide.mjs`, sin navegador (jsdom), con los siete escenarios del encargo.
+Batería completa en verde. No se ha tocado `js/conflictos.js`, `js/asuntos-editar.js`,
+`js/papelera.js`, `js/asuntos-lista.js` ni `apps-script/gestor-correos.gs`.
+
 ## 17-sep-2026 — Las horas de `App.VERSION` iban por delante de la real
 
 Francisco avisó: siendo las 09:13 de verdad, la aplicación decía `17-sep-2026 · 18:20`. La causa

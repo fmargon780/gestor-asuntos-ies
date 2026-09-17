@@ -64,7 +64,13 @@ var Plantillas = (function () {
     { clave: 'direccionCentro', etiqueta: 'Dirección del centro' },
     { clave: 'codigoCentro', etiqueta: 'Código del centro' },
     { clave: 'cargo', etiqueta: 'Cargo de quien firma' },
-    { clave: 'firma', etiqueta: 'Firma completa, ya rellena' }
+    { clave: 'firma', etiqueta: 'Firma completa, ya rellena' },
+    /* "Lo pide" (17-sep-2026, fila 28, docs/LO-PIDE.md): quién ha
+       pedido esta gestión, si se ha apuntado. */
+    { clave: 'quienlopide', etiqueta: 'Quien lo pide' },
+    { clave: 'quienlopiderelacion', etiqueta: 'Quien lo pide: qué es del interesado' },
+    { clave: 'quienlopidevia', etiqueta: 'Quien lo pide: por dónde lo pidió' },
+    { clave: 'quienlopidefecha', etiqueta: 'Quien lo pide: fecha' }
   ];
 
   var cache = null;
@@ -278,30 +284,14 @@ var Plantillas = (function () {
     return '';
   }
 
-  /* {tutor1}/{tutor2} y sus teléfonos y correos: solo alumnado. Se
-     buscan las columnas que hablen de "tutor" y de ese número (o de
-     "primer"/"segundo"), y dentro de esas se separa el teléfono y el
-     correo del nombre por el título, igual que el resto de la
-     aplicación. Lo que Séneca no traiga se queda vacío. */
+  /* {tutor1}/{tutor2} y sus teléfonos y correos: solo alumnado. Desde
+     el 17-sep-2026 (fila 28, docs/LO-PIDE.md) vive en js/lo-pide.js
+     (`LoPide.opciones` también la necesita, para ofrecer "Tutor legal
+     1/2" en "Lo pide"): aquí solo se llama, con lo de siempre si el
+     módulo no ha cargado (por ejemplo, en una prueba que no lo carga). */
   function datosDeTutor(campos, numero) {
-    var reNumero = numero === 1
-      ? /tutor.*\b0*1\b|\b0*1\b.*tutor|primer\s*tutor/
-      : /tutor.*\b0*2\b|\b0*2\b.*tutor|segundo\s*tutor/;
-    var propios = {};
-    Object.keys(campos || {}).forEach(function (k) {
-      if (reNumero.test(U.normalizar(k))) propios[k] = campos[k];
-    });
-    /* De las columnas de ese tutor, la del nombre es la que no habla
-       de teléfono ni de correo. */
-    var claveNombre = Object.keys(propios).filter(function (k) {
-      var t = U.normalizar(k);
-      return !RE_TELEFONO.test(t) && !RE_CORREO.test(t);
-    })[0];
-    return {
-      nombre: claveNombre ? String(propios[claveNombre] || '').trim() : '',
-      telefono: primerValorQueParezca(propios, RE_TELEFONO),
-      correo: primerValorQueParezca(propios, RE_CORREO)
-    };
+    if (window.LoPide) return LoPide.datosDeTutor(campos, numero);
+    return { nombre: '', telefono: '', correo: '' };
   }
 
   /* El campo propio (js/campos.js) de un tipo de asunto, como nombre
@@ -418,6 +408,18 @@ var Plantillas = (function () {
       cargo: datosCentro.cargo || '',
       campos: camposDelAsuntoDe(a)
     };
+
+    /* {quienlopide} y compañía (17-sep-2026, fila 28, docs/LO-PIDE.md):
+       vacíos, como cualquier otro hueco, cuando el asunto no tiene el
+       dato; así salen en "Faltan datos" sin nada especial que hacer
+       aquí. */
+    var loPideDato = f.loPide || null;
+    valores.quienlopide = loPideDato ? (loPideDato.nombre || '') : '';
+    valores.quienlopiderelacion = loPideDato ? (loPideDato.relacion || '') : '';
+    var viaLoPide = (loPideDato && loPideDato.via && window.Nombres) ? Nombres.via(loPideDato.via) : null;
+    valores.quienlopidevia = viaLoPide ? viaLoPide.texto : '';
+    valores.quienlopidefecha = (loPideDato && loPideDato.fecha)
+      ? U.fechaLegible(U.aAaMmDd(loPideDato.fecha)) : '';
 
     if (categoria === 'ALUMNADO' && persona) {
       var t1 = datosDeTutor(persona.campos, 1);

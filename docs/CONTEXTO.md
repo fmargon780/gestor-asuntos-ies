@@ -525,6 +525,57 @@ redactar se apunta sola una nota (una sola vez por cuadro). Solo Séneca: no hay
 solo botón que se va cambiando: "1. Copiar el asunto" → "2. Ahora, copiar el texto" → "Copiado.
 Pégalo y envía".
 
+### "Lo pide": quién ha pedido la gestión (17-sep-2026, fila 28, docs/LO-PIDE.md)
+
+Cada asunto puede guardar, si se quiere, quién lo pidió, por qué vía y en qué fecha: el problema
+real es un certificado pedido hace días, ya listo, sin recordar a quién hay que contestar. Clave
+opcional `loPide` en la ficha del asunto (`_GESTOR/asuntos.json`), escrita con `App.anotar` (nunca
+con `Carpetas.guardarJson`), y `null` (no `undefined`) para vaciarla:
+
+    loPide: { nombre, categoria, relacion, correo, telefono, via, fecha, apuntadoPor }
+
+`categoria` es la del tercero elegido (`ALUMNADO`/`PERSONAL`/`EMPRESAS`/`OTROS`), vacía si se
+escribió a mano; `via` es la misma clave que usa el asunto (`Nombres.VIAS`); `fecha` es ISO
+(`AAAA-MM-DD`). **El parentesco real (padre, madre, abuela) no existe en los datos del centro**
+(el RegAlum no trae esa columna): las opciones de alumnado son "Tutor legal 1"/"Tutor legal 2", y
+solo con "Otra persona…" se escribe algo a mano.
+
+Toda la lógica vive en el módulo nuevo `js/lo-pide.js` (`window.LoPide`), para no engordar
+`js/asuntos-nuevo.js`, `js/ficha-asunto.js` ni `js/correo.js`:
+
+- `LoPide.opciones(persona)`: los candidatos, siempre "El propio interesado" y "Otra persona…",
+  más "Tutor legal 1/2" (solo alumnado, y solo si Séneca trae su nombre), con los datos de cada
+  uno (`nombre`, `correo`, `telefono`) ya resueltos.
+- `LoPide.datosDeTutor(campos, numero)`: sacada de `js/plantillas.js` (que ahora la llama en vez
+  de tener su propia copia), porque `LoPide.opciones` también la necesita.
+- `LoPide.controles(caja, persona, valorInicial)`: pinta el desplegable, los campos de "Otra
+  persona…" (solo visibles con esa opción), la vía y la fecha, **con clases, nunca con id**: este
+  mismo módulo se monta a la vez dentro de `#bloque-detalles` de "Nuevo asunto" (que queda en el
+  documento, aunque escondido, mientras dura la sesión) y dentro del cuadro de la ficha; dos
+  elementos con el mismo id habrían roto el segundo sitio que se pintara. Devuelve `{ leer() }`.
+- `LoPide.texto(ficha)`/`LoPide.correoDe(ficha)`: la línea legible ("María López (Tutor legal 1)
+  · por teléfono · 17-sep-2026") y la dirección de quien lo pide, o cadena vacía sin dato.
+- `LoPide.elegirDestinatarios(correos, correoLoPide, elegidosDeAntes)`: pura, sin DOM, para poder
+  probarse sin cargar el cuadro de Correo entero (que no expone nada hacia fuera): decide qué
+  casilla queda marcada.
+
+Dónde se engancha: grupo **"Lo pide (opcional)"** en `#bloque-detalles` de `js/asuntos-nuevo.js`
+(se repinta al cambiar de tercero con `App.fijarTercero`; `App.datosDelFormulario()` añade
+`loPide` solo si hay nombre). Fila **"Lo pide"** (debajo de "Vía de comunicación") y marca
+`.marca-lopide` en la cabecera de `js/ficha-asunto.js`, más un botón **"Lo pide"** en
+`pintarAcciones` (solo en asuntos abiertos, con "Quitar el dato" dentro del cuadro cuando ya hay
+uno; apagado en modo consulta, como el resto de controles que modifican, pero **no** en la lista
+`esControlDeSoloLectura`). En `js/correo.js`: si se conoce el correo de quien lo pide y está entre
+los de la lista, se marca esa casilla sola; si no está, va a "Otro correo" y ninguna casilla queda
+marcada; encima de "Para" sale una línea gris "Lo pidió Fulano (relación), el día tal."; `aQuien`
+(Séneca) devuelve su nombre en vez del de siempre. Cuatro huecos nuevos en `js/plantillas.js`
+(`{quienlopide}`, `{quienlopiderelacion}`, `{quienlopidevia}`, `{quienlopidefecha}`), vacíos como
+cualquier otro hueco cuando el asunto no tiene el dato.
+
+No toca `js/conflictos.js` (fusiona `loPide` como un campo más que gana el lado elegido, igual que
+hoy), `js/asuntos-editar.js`, `js/papelera.js`, `js/asuntos-lista.js` ni el script de Apps Script.
+Se comprueba con `pruebas/lo-pide.mjs`, sin navegador (jsdom).
+
 ### Mandar los documentos de un asunto por correo
 
 Gmail no deja que una página web le enganche ficheros. Bloque **"Documentos de este asunto"**
@@ -1324,6 +1375,7 @@ de `App` va después del fichero que lo define.
 | `js/asuntos-editar.js` | Editar un asunto abierto: renombra la carpeta y mueve su ficha |
 | `js/elegir-asunto.js` | El cuadro de escoger un asunto a mano, compartido por "Por clasificar" y por la bandeja de correos |
 | `js/documentos-sueltos.js` | Los papeles sin asunto, "Meter en un asunto", cerrar y reabrir, y la vigilancia de la carpeta |
+| `js/lo-pide.js` | Quién ha pedido la gestión: candidatos, controles, línea legible y qué casilla marcar en el correo |
 | `js/asuntos-nuevo.js` | Crear un asunto, el cuadro de datos de un tercero y los pies |
 | `js/archivo-personas.js` | Personas y empresas, el ARCHIVO, y cambiar los datos de un tercero |
 | `js/ajustes.js` | La pantalla de Ajustes: tipos (pestañas, buscador, aviso en vivo), estados y tipos de documento |
@@ -1405,6 +1457,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/hitos.mjs` | Prueba de los hitos de un asunto: crearlos, marcarlos, bifurcaciones, plazo, responsable y el historial al archivar |
 | `pruebas/que-me-toca.mjs` | Prueba de "Qué me toca": los tres bloques, el filtro por responsable, abrir la ficha con el hito desplegado y la cuenta de la barra |
 | `pruebas/plantillas-documento.mjs` | Prueba (jsdom, sin navegador) de las plantillas de documento: la reparación de huecos partidos, las cuatro clases de hueco, "faltan", el escapado XML, releer el ZIP de salida, el nombre del documento y un `plantillas.json` viejo |
+| `pruebas/lo-pide.mjs` | Prueba (jsdom, sin navegador) de "Lo pide": opciones y controles, la línea legible, qué casilla se marca en el correo, los cuatro huecos y "Quitar el dato" |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |
@@ -1435,7 +1488,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `tipos.json` | Tipos de asunto y su categoría |
 | `tipos-documento.json` | Tipos de documento |
 | `estados.json` | Estados de tramitación, en el orden del trámite |
-| `asuntos.json` | Ficha de cada asunto: quién lo abrió, estado, vía, notas, cierre, pasos, fecha límite, documentos pendientes de registro, relacionados, campos configurados del tipo, hilos de correo enganchados |
+| `asuntos.json` | Ficha de cada asunto: quién lo abrió, estado, vía, notas, cierre, pasos, fecha límite, documentos pendientes de registro, relacionados, campos configurados del tipo, hilos de correo enganchados, quién ha pedido la gestión (`loPide`) |
 | `guias.json` | Los pasos de cada tipo de asunto, con sus preguntas y opciones |
 | `recurrentes.json` | Los asuntos que se repiten y cuándo tocan |
 | `frescura.json` | Cada cuántos días avisar de que el RegAlum.csv está viejo |
