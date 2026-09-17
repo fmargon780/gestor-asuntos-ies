@@ -97,6 +97,7 @@ await pagina.evaluate(async () => {
   };
 });
 await pagina.evaluate(() => App.ir('ajustes'));
+await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
 await pagina.waitForSelector('#bloque-bandeja');
 await pagina.evaluate(() => { document.getElementById('bloque-bandeja').open = true; });
 await pagina.click('#botones-bandeja .boton');

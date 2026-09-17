@@ -5,6 +5,89 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — Ajustes: tres pestañas, y la pantalla propia de un tipo de asunto
+
+Fila 39 de la cola (`docs/COLA.md`, `docs/AJUSTES-POR-TIPO.md`), acordada con Francisco el
+17-sep-2026: Ajustes había crecido hasta ser inmanejable. Seis cosas colgaban de un tipo de
+asunto —campos, pasos de la guía, plantillas de correo, plantillas de Word, días de plazo y
+recurrencia— y cada una vivía en un bloque distinto de una pantalla larguísima; para dejar un
+tipo terminado hacía falta entrar y salir de seis sitios, y en ninguno se veía el tipo entero.
+
+Ajustes pasa a tener **tres pestañas** arriba: **Tipos de asunto** (lo de siempre, sin perder
+nada: pestañas de categoría, buscador cruzado, aviso en vivo de nombres repetidos, categoría
+recordada), **El centro** (las listas que valen para todos los tipos: estados de tramitación,
+tipos de documento, catálogo de campos propios, grupos de personas, responsables y días no
+lectivos de los hitos, ficheros de datos, cómo se abrevia cada grupo, y datos del centro y
+firma) y **Mantenimiento** (lo que no relaciona nada con nada: carpetas de este ordenador,
+bandeja de correo, aviso de RegAlum viejo, copias de seguridad, papelera, conflictos de Dropbox,
+duplicados descartados y fichas sin carpeta). Y pulsar la tarjeta de un tipo de asunto ya no
+abre un cuadro emergente: abre su **pantalla entera**, a dos columnas (una sola por debajo de
+1000px), con siete secciones **siempre desplegadas**, sin un solo `<details>` que abrir: Datos
+del tipo, Campos, Pasos del trámite, Plantillas de correo y de Séneca, Plantilla de documento de
+Word, Plazo y Se repite (recurrencia).
+
+Regla de la cola: mover y envolver lo que ya existe, no reescribir editores. Cada sección de la
+pantalla del tipo llama al mismo módulo que ya sabía pintar eso, dentro de su hueco en vez de
+como cuadro suelto: `js/campos.js` (la parte que pintaba `App.pintarCuadroDeCampos`, con el
+"Aceptar" del cuadro cambiado por un botón propio "Guardar campos", porque una pantalla entera
+no tiene un botón de aceptar común; y un aviso ámbar nuevo cuando un campo propio también está
+puesto en otros tipos, con `Campos.tiposQueUsanPropio`, que ya existía), `js/guias-enganche.js`
+(sin tocar ni una línea: ya exponía `GuiasDelCentro.escribir`/`pasosDe`, justo lo que hacía
+falta para una vista de solo lectura más un botón "Escribir/Cambiar la guía"), `js/plantillas-
+ajustes.js` y `js/plantillas-documento.js` (cada uno gana una función `pintarDeTipo(contenedor,
+tipo)` que filtra sus tarjetas por ese tipo, con el cuadro de alta preseleccionando ya el tipo y
+la categoría; los campos de "Datos del centro y firma" pasan de generarse por JavaScript a ser
+estáticos en `index.html`, y `plantillas-ajustes.js` se limita a rellenarlos y guardarlos) y
+`js/recurrentes.js` (la fila de un recurrente se saca a función compartida, `filaDeRecurrente`,
+y gana `pintarEnContenedor(contenedor, tipo)`, filtrada, más un `alta(tipoPreset, alGuardar)`
+que abre el alta con el tipo ya puesto). El menú de los tres puntos de la tarjeta se queda con
+Cambiar el nombre y Quitar; "Campos" desaparece de ahí, porque ya vive dentro de la pantalla.
+
+La pantalla del tipo se registra en `App.PANTALLAS`, igual que "asunto" (la ficha) o
+"que-me-toca": con eso, el botón "← Volver" y la tecla Escape los pone solos `js/usabilidad.js`,
+sin escribir una sola línea para ellos, porque su cabecera tiene la misma forma
+(`<header class="cabecera"><h2>...</h2></header>`) que todas las demás pantallas de la
+aplicación — el mismo mecanismo que ya usaban esas otras dos.
+
+`js/ajustes.js` (52 KB) se parte en cuatro: se queda con el marco (las tres pestañas, la lista de
+tipos de la primera y el buscador cruzado, unas 500 líneas) y nacen `js/ajustes-tipo.js` (la
+pantalla del tipo y sus siete secciones), `js/ajustes-centro.js` (la pestaña "El centro") y
+`js/ajustes-mantenimiento.js` (la pestaña "Mantenimiento"). Los ocho bloques que se enganchan
+solos a Ajustes (hitos, conflictos, fichas huérfanas, RegAlum viejo, bandeja de correo,
+duplicados descartados, y las dos plantillas) no se tocan por dentro: cambia solo el
+`id` del contenedor al que apuntan (`#ajustes-tab-centro` o `#ajustes-tab-mantenimiento` en vez
+de `#pantalla-ajustes`).
+
+**Dos trampas de verdad, encontradas probándolo en un navegador, no solo leyendo el código.**
+La primera: la sección Campos se pinta entera (con su `document.getElementById` de toda la
+vida) ANTES de colgarse del documento —se construye completa y solo después el orquestador la
+añade a su columna—, así que `document.getElementById` no encontraba nada dentro de un trozo de
+DOM todavía suelto; se resuelve sombreando, dentro de esa única función, un `$` local que busca
+con `cuerpo.querySelector` en vez del global. La segunda, más tonta y más reveladora de por qué
+"probarlo de verdad" no es opcional: al partir `js/ajustes.js`, el `onclick` de
+`#btn-anadir-tipo` (crear un tipo nuevo) se perdió por el camino —se movieron los de estados,
+tipos de documento, campos propios y grupos a `js/ajustes-centro.js`, y ese se quedó sin
+wire—; nada en la consola avisaba, el botón se veía y respondía al clic con normalidad, y solo
+`pruebas/navegador.mjs` lo pilló, fallando en "el tipo nuevo se guarda en mayúsculas". Devuelto
+a `js/ajustes.js`, que es donde sigue viviendo la pestaña de tipos.
+
+Pruebas: `pruebas/ajustes-agil.mjs` actualizada para las tres pestañas (el paso que antes
+contaba "once bloques en una sola lista larga" ahora cuenta los de la pestaña "Mantenimiento",
+que sigue siendo la más larga, para seguir probando que la barra queda fija con la página
+larga); nueva `pruebas/ajustes-por-tipo.mjs` (las tres pestañas cambian de contenido, la
+pantalla de un tipo trae sus siete secciones sin plegar en dos columnas, cambiar el Plazo y los
+Campos se guarda de verdad, volver a la lista no pierde la categoría ni el texto del buscador, y
+Escape hace lo mismo que el botón). Doce ficheros de prueba más, tocados solo porque el sitio de
+un bloque cambió, sin tocar la lógica que prueban: `pruebas/campos.mjs` (el flujo entero pasa de
+cuadro a pantalla del tipo, con capturas de pantalla actualizadas), `pruebas/guias.mjs`,
+`pruebas/plantillas-huecos.mjs`, `pruebas/conflictos.mjs`, `pruebas/duplicados.mjs`,
+`pruebas/grupos-navegador.mjs`, `pruebas/huerfanas.mjs`, `pruebas/hitos.mjs`,
+`pruebas/navegador.mjs`, `pruebas/papelera.mjs`, `pruebas/correo-dos-buzones.mjs`,
+`pruebas/correos.mjs` y `pruebas/envios.mjs`. Batería completa en verde, una sola pasada al
+final (50 ficheros de prueba). Versión publicada `App.VERSION`: `17-sep-2026 · 21:47`.
+
+---
+
 ## 17-sep-2026 — "Lo pide": el nombre del tutor legal, no un número
 
 Fila 38 de la cola (`docs/COLA.md`, `docs/LO-PIDE-NOMBRE-DEL-TUTOR.md`), apuntada por Francisco:

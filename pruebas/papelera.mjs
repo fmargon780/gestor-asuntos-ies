@@ -104,6 +104,8 @@ await comprobar('se apunta una nota en el asunto',
 console.log('--- 2. devolver el documento a su sitio ---');
 
 await pagina.click('.pestana[data-pantalla="ajustes"]');
+/* 17-sep-2026, fila 39: la Papelera vive en la pestaña "Mantenimiento". */
+await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
 await pagina.evaluate(() => {
   document.querySelectorAll('#pantalla-ajustes details').forEach((d) => { d.open = true; });
 });
@@ -201,6 +203,7 @@ await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(300);
 await pagina.click('.pestana[data-pantalla="ajustes"]');
+await pagina.evaluate(() => App.cambiarPestanaAjustes('tipos'));
 await pagina.fill('#buscar-tipos', 'matricula');
 await pagina.waitForSelector('#tabla-tipos .tarjeta-tipo');
 const tarjetaMatricula = pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: 'MATRICULA' });
@@ -222,6 +225,9 @@ await comprobar('MATRICULA sigue en la lista',
    ================================================================ */
 console.log('--- 6. un estado en uso no se borra ---');
 
+/* 17-sep-2026, fila 39: los Estados viven en la pestaña "El centro". */
+await pagina.evaluate(() => App.cambiarPestanaAjustes('centro'));
+await pagina.waitForSelector('#tabla-estados .tarjeta-tipo');
 const tarjetaPendiente = pagina.locator('#tabla-estados .tarjeta-tipo').filter({ hasText: 'PENDIENTE' });
 await tarjetaPendiente.locator('.tarjeta-tipo-menu-btn').click();
 await tarjetaPendiente.getByRole('button', { name: 'Borrar' }).click();
@@ -258,6 +264,7 @@ await pagina.evaluate(async () => {
   await window.__disco.abiertos.removeEntry(nombre, { recursive: true });
 });
 await pagina.click('.pestana[data-pantalla="ajustes"]');
+await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
 await pagina.waitForSelector('#tabla-papelera .fila-papelera');
 const fichaDoc = pagina.locator('#tabla-papelera .fila-papelera').filter({ hasText: 'SOLICITUD' });
 await fichaDoc.getByRole('button', { name: 'Devolver a su sitio' }).click();

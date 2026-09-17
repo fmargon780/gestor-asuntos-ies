@@ -466,6 +466,9 @@ await pagina.click('#dup-pantalla-volver');
 console.log('--- Ajustes: Duplicados descartados, y Volver a avisar ---');
 
 await pagina.click('.pestana[data-pantalla="ajustes"]');
+/* 17-sep-2026, fila 39: "Duplicados descartados" vive en la pestaña
+   "Mantenimiento". */
+await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
 await pagina.waitForSelector('#bloque-duplicados-descartados');
 await pagina.evaluate(() => { document.getElementById('bloque-duplicados-descartados').open = true; });
 await comprobar('Ajustes lista el grupo descartado, con sus dos nombres',

@@ -239,7 +239,66 @@
     caja.classList.remove('oculto');
   }
 
-  /* ---------- la tabla de Ajustes ---------- */
+  /* ---------- la tabla de Ajustes ----------
+
+     `filaDeRecurrente` es la misma fila tanto para esta tabla (que ya
+     no tiene sitio en el HTML, pero se deja funcionando por si algún
+     módulo la sigue llamando) como para la lista filtrada por tipo que
+     pinta la sección "Se repite" de la pantalla de un tipo (17-sep-
+     2026, fila 39, js/ajustes-tipo.js): una sola función, para no
+     acabar con dos filas que hacen lo mismo. `alRefrescar` son las
+     funciones a llamar después de parar/quitar uno, además de
+     `pintarPanel` (que siempre hay que refrescar). */
+
+  function filaDeRecurrente(r, alRefrescar) {
+    var f = document.createElement('div');
+    f.className = 'fila-tipo';
+
+    var cuando = proxima(r);
+    var pie = textoPeriodo(r.periodo) +
+      (r.periodo === 'anual' && r.mes ? ' en ' + MESES[parseInt(r.mes, 10) - 1] : '') +
+      ', día ' + (r.dia || 1) +
+      '  ·  siguiente: ' + (cuando ? Plazos.legible(fechaIso(cuando)) : '—') +
+      (r.ultima ? '  ·  última vez: ' + Plazos.legible(r.ultima) : '  ·  nunca creado');
+
+    f.innerHTML = '<span class="nombre-tipo">' +
+      U.escapar(r.tipo + '  ·  ' + r.tercero) + '</span>' +
+      '<span class="suave recurrente-pie">' + U.escapar(pie) + '</span>';
+
+    function refrescarTodo() {
+      pintarPanel();
+      (alRefrescar || []).forEach(function (fn) { fn(); });
+    }
+
+    var parar = document.createElement('button');
+    parar.className = 'boton' + (r.parado ? '' : ' boton-marcado');
+    parar.textContent = r.parado ? 'Parado' : 'Activo';
+    parar.title = r.parado ? 'Volver a activarlo' : 'Dejarlo en pausa sin borrarlo';
+    parar.onclick = async function () {
+      r.parado = !r.parado;
+      await guardar();
+      refrescarTodo();
+    };
+    f.appendChild(parar);
+
+    var quitar = document.createElement('button');
+    quitar.className = 'boton boton-peligro';
+    quitar.textContent = 'Quitar';
+    quitar.onclick = async function () {
+      var ok = await U.preguntar('Quitar el asunto recurrente',
+        '<p>Se quita <strong>' + U.escapar(r.tipo + ' · ' + r.tercero) + '</strong> ' +
+        'de la lista de los que se repiten.</p>' +
+        '<p class="nota">Las carpetas que ya se crearon no se tocan.</p>', 'Quitar');
+      if (!ok) return;
+      lista = lista.filter(function (x) { return x.id !== r.id; });
+      await guardar();
+      refrescarTodo();
+      U.aviso('Quitado de la lista.', 'bueno');
+    };
+    f.appendChild(quitar);
+
+    return f;
+  }
 
   function pintarTabla() {
     var caja = $('tabla-recurrentes');
@@ -249,58 +308,50 @@
       caja.innerHTML = '<div class="vacio">Todavía no hay ningún asunto recurrente.</div>';
       return;
     }
+    lista.forEach(function (r) { caja.appendChild(filaDeRecurrente(r, [pintarTabla])); });
+  }
 
-    lista.forEach(function (r) {
-      var f = document.createElement('div');
-      f.className = 'fila-tipo';
+  /* ---------- la sección "Se repite" de la pantalla de un tipo ----------
 
-      var cuando = proxima(r);
-      var pie = textoPeriodo(r.periodo) +
-        (r.periodo === 'anual' && r.mes ? ' en ' + MESES[parseInt(r.mes, 10) - 1] : '') +
-        ', día ' + (r.dia || 1) +
-        '  ·  siguiente: ' + (cuando ? Plazos.legible(fechaIso(cuando)) : '—') +
-        (r.ultima ? '  ·  última vez: ' + Plazos.legible(r.ultima) : '  ·  nunca creado');
+     Solo las filas de ESE tipo, más un botón para añadir uno nuevo ya
+     con el tipo puesto (17-sep-2026, fila 39). Varias filas si son
+     varios terceros, como pide la ficha del encargo. */
+  function pintarEnContenedor(contenedor, filtroTipo) {
+    if (!contenedor) return;
+    var deEsteTipo = lista.filter(function (r) { return r.tipo === filtroTipo; });
 
-      f.innerHTML = '<span class="nombre-tipo">' +
-        U.escapar(r.tipo + '  ·  ' + r.tercero) + '</span>' +
-        '<span class="suave recurrente-pie">' + U.escapar(pie) + '</span>';
+    var caja = document.createElement('div');
+    caja.className = 'lista';
+    if (!deEsteTipo.length) {
+      caja.innerHTML = '<div class="vacio">Todavía no se repite ningún asunto de este tipo.</div>';
+    } else {
+      deEsteTipo.forEach(function (r) {
+        caja.appendChild(filaDeRecurrente(r, [function () { pintarEnContenedor(contenedor, filtroTipo); }]));
+      });
+    }
 
-      var parar = document.createElement('button');
-      parar.className = 'boton' + (r.parado ? '' : ' boton-marcado');
-      parar.textContent = r.parado ? 'Parado' : 'Activo';
-      parar.title = r.parado ? 'Volver a activarlo' : 'Dejarlo en pausa sin borrarlo';
-      parar.onclick = async function () {
-        r.parado = !r.parado;
-        await guardar();
-        pintarTabla();
-        pintarPanel();
-      };
-      f.appendChild(parar);
+    var boton = document.createElement('button');
+    boton.type = 'button';
+    boton.className = 'boton';
+    boton.style.marginTop = '8px';
+    boton.textContent = '+ Añadir uno';
+    boton.onclick = function () {
+      alta(filtroTipo, function () { pintarEnContenedor(contenedor, filtroTipo); });
+    };
 
-      var quitar = document.createElement('button');
-      quitar.className = 'boton boton-peligro';
-      quitar.textContent = 'Quitar';
-      quitar.onclick = async function () {
-        var ok = await U.preguntar('Quitar el asunto recurrente',
-          '<p>Se quita <strong>' + U.escapar(r.tipo + ' · ' + r.tercero) + '</strong> ' +
-          'de la lista de los que se repiten.</p>' +
-          '<p class="nota">Las carpetas que ya se crearon no se tocan.</p>', 'Quitar');
-        if (!ok) return;
-        lista = lista.filter(function (x) { return x.id !== r.id; });
-        await guardar();
-        pintarTabla();
-        pintarPanel();
-        U.aviso('Quitado de la lista.', 'bueno');
-      };
-      f.appendChild(quitar);
-
-      caja.appendChild(f);
-    });
+    contenedor.innerHTML = '';
+    contenedor.appendChild(caja);
+    contenedor.appendChild(boton);
   }
 
   /* ---------- alta de un recurrente ---------- */
 
-  async function alta() {
+  /* `tipoPreset`: desde la sección "Se repite" de la pantalla de un
+     tipo (js/ajustes-tipo.js) se abre ya con ese tipo elegido, para no
+     tener que buscarlo en el desplegable. `alGuardar` se llama además
+     de `pintarTabla`/`pintarPanel` cuando se guarda, para que esa
+     sección se repinte con la fila nueva. */
+  async function alta(tipoPreset, alGuardar) {
     var tipos = window.Gestor.tipos();
     if (!tipos.length) {
       U.aviso('Primero hacen falta tipos de asunto, aquí mismo en Ajustes.', 'malo');
@@ -360,6 +411,10 @@
       }, U.hoyIso());
     }
 
+    if (tipoPreset && tipos.some(function (t) { return t.tipo === tipoPreset; })) {
+      $('rec-tipo').value = tipoPreset;
+    }
+
     ['rec-tipo', 'rec-tercero', 'rec-descripcion', 'rec-periodo']
       .forEach(function (id) { $(id).oninput = refrescar; $(id).onchange = refrescar; });
     refrescar();
@@ -390,6 +445,7 @@
     await guardar();
     pintarTabla();
     pintarPanel();
+    if (typeof alGuardar === 'function') alGuardar();
     U.aviso('Asunto recurrente guardado.', 'bueno');
   }
 
@@ -421,4 +477,11 @@
   } else {
     enganchar();
   }
+
+  /* Público, para la sección "Se repite" de la pantalla de un tipo
+     (17-sep-2026, fila 39, js/ajustes-tipo.js). */
+  window.Recurrentes = {
+    pintarEnContenedor: pintarEnContenedor,
+    alta: alta
+  };
 })();

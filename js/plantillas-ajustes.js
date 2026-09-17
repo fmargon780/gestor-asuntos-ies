@@ -1,18 +1,23 @@
 /* ============================================================
-   plantillas-ajustes.js — el bloque "Plantillas de correo" de
-   Ajustes (16-sep-2026, docs/PLANTILLAS-DE-CORREO.md).
+   plantillas-ajustes.js — las plantillas de correo (16-sep-2026,
+   docs/PLANTILLAS-DE-CORREO.md), y desde el 17-sep-2026 (fila 39,
+   docs/AJUSTES-POR-TIPO.md) también los datos del centro y la firma.
 
    Vivía dentro de js/plantillas.js hasta que ese fichero, al crecer
    con el motor de las plantillas de documento (fila 17 de
    docs/COLA.md, docs/PLANTILLAS-DE-DOCUMENTO.md), pasó de 450 líneas.
-   Se saca aquí sin cambiar lo que hace: solo pantalla, apoyada en la
+   Se sacó aquí sin cambiar lo que hace: solo pantalla, apoyada en la
    API pública de `window.Plantillas` (cargar, guardar, deTipo,
    idNuevo, rellenar, HUECOS...).
 
-   Se engancha solo, como js/bandeja-correos.js y js/unir-asuntos.js:
-   no toca js/ajustes.js, que ya pasa de 47 KB. El bloque "Plantillas
-   de documento" es hermano de este, y vive en
-   js/plantillas-documento.js.
+   Con la pantalla propia de un tipo de asunto (fila 39) esto dejó de
+   pintar un único bloque grande con TODAS las plantillas: ahora
+   `pintarDeTipo` pinta solo las de un tipo, dentro de su sección de
+   js/ajustes-tipo.js. El cuadro de alta/edición (`abrirCuadroDePlantilla`)
+   es el mismo de siempre, con un `tipoPreset` opcional para que se abra
+   ya con el tipo elegido. Los campos de "Datos del centro y firma" son
+   ahora estáticos en index.html, dentro de la pestaña "El centro"; este
+   fichero solo los rellena y guarda, ya no los construye.
    ============================================================ */
 (function () {
 
@@ -20,125 +25,22 @@
 
   var datosDeAjustes = null;   /* { firma, centro, lista } ya leído, para pintar sin esperar */
 
-  function bloqueDeAjustes() {
-    var ya = $('bloque-plantillas');
-    if (ya) return ya;
-    var pantalla = $('pantalla-ajustes');
-    if (!pantalla) return null;
-    var d = document.createElement('details');
-    d.className = 'bloque-ajustes';
-    d.id = 'bloque-plantillas';
-    d.innerHTML =
-      '<summary>' +
-        '<span class="bloque-titulo">Plantillas de correo</span>' +
-        '<span class="bloque-pie">Textos ya escritos para el correo y el mensaje de Séneca, por tipo de asunto</span>' +
-      '</summary>' +
-      '<div class="bloque-cuerpo">' +
-        '<p class="explica">Cada plantilla es solo el cuerpo del medio: el saludo y la firma se ' +
-        'ponen solos. Sirve igual para el correo y para el mensaje de Séneca. Los huecos entre ' +
-        'llaves, como <code>{nombre}</code>, se rellenan solos al abrir el cuadro.</p>' +
-        '<div class="alta-tipo">' +
-          '<input id="plantillas-buscar" class="campo" placeholder="Buscar por tipo o por nombre">' +
-          '<button type="button" class="boton boton-principal" id="plantillas-nueva">+ Nueva plantilla</button>' +
-        '</div>' +
-        '<div id="plantillas-lista" class="rejilla-tipos"></div>' +
-        '<hr>' +
-        '<p class="explica">Estos datos los usan también las plantillas de documento de Word, ' +
-        'en Ajustes › Plantillas de documento.</p>' +
-        '<label class="etiqueta">Firma</label>' +
-        '<textarea id="plantillas-firma" class="campo" rows="3"></textarea>' +
-        '<div class="dos-columnas">' +
-          '<div><label class="etiqueta">Nombre del centro</label>' +
-            '<input id="plantillas-centro" class="campo"></div>' +
-          '<div><label class="etiqueta">Cargo de quien firma</label>' +
-            '<input id="plantillas-cargo" class="campo" placeholder="Director, Secretario…"></div>' +
-        '</div>' +
-        '<div class="dos-columnas">' +
-          '<div><label class="etiqueta">Localidad</label>' +
-            '<input id="plantillas-localidad" class="campo"></div>' +
-          '<div><label class="etiqueta">Código del centro</label>' +
-            '<input id="plantillas-codigo" class="campo"></div>' +
-        '</div>' +
-        '<label class="etiqueta">Dirección del centro</label>' +
-        '<input id="plantillas-direccion" class="campo">' +
-        '<button type="button" class="boton" id="plantillas-guardar-firma">Guardar firma y centro</button>' +
-      '</div>';
-    pantalla.appendChild(d);
-
-    $('plantillas-buscar').oninput = pintarLista;
-    $('plantillas-nueva').onclick = function () { abrirCuadroDePlantilla(null); };
-    $('plantillas-guardar-firma').onclick = guardarFirma;
-    return d;
+  async function cargar() {
+    if (!App.E.gestor) return datosDeAjustes;
+    datosDeAjustes = await Plantillas.cargar(App.E.gestor);
+    return datosDeAjustes;
   }
 
-  async function pintarBloqueAjustes() {
-    if (!bloqueDeAjustes()) return;
-    if (!App.E.gestor) return;
-    datosDeAjustes = await Plantillas.cargar(App.E.gestor);
+  /* ---------- Datos del centro y firma ---------- */
+
+  function pintarFirmaYCentro() {
+    if (!datosDeAjustes || !$('plantillas-firma')) return;
     $('plantillas-firma').value = datosDeAjustes.firma;
     $('plantillas-centro').value = datosDeAjustes.centro;
     $('plantillas-localidad').value = datosDeAjustes.localidad;
     $('plantillas-direccion').value = datosDeAjustes.direccion;
     $('plantillas-codigo').value = datosDeAjustes.codigo;
     $('plantillas-cargo').value = datosDeAjustes.cargo;
-    pintarLista();
-  }
-
-  function pintarLista() {
-    var caja = $('plantillas-lista');
-    if (!caja || !datosDeAjustes) return;
-    var q = U.normalizar($('plantillas-buscar').value);
-    var lista = datosDeAjustes.lista.filter(function (p) {
-      return !q || U.normalizar(p.nombre + ' ' + p.tipo + ' ' + p.categoria).indexOf(q) !== -1;
-    }).slice().sort(function (a, b) {
-      return (a.tipo + a.nombre) < (b.tipo + b.nombre) ? -1 : 1;
-    });
-
-    caja.innerHTML = '';
-    if (!lista.length) {
-      caja.innerHTML = '<div class="vacio">' +
-        (datosDeAjustes.lista.length ? 'Nada coincide con lo que buscas.' : 'Todavía no hay ninguna plantilla.') +
-        '</div>';
-      return;
-    }
-    lista.forEach(function (p) { caja.appendChild(tarjetaDePlantilla(p)); });
-  }
-
-  function tarjetaDePlantilla(p) {
-    var div = document.createElement('div');
-    div.className = 'tarjeta-tipo';
-    div.innerHTML = '<div class="nombre-tipo">' + U.escapar(p.nombre) + '</div>' +
-      '<div class="suave">' + U.escapar(p.tipo) + '  ·  ' + U.escapar(p.categoria) + '</div>';
-
-    var acciones = document.createElement('div');
-    acciones.className = 'acciones';
-    acciones.style.marginTop = '8px';
-
-    var editar = document.createElement('button');
-    editar.type = 'button';
-    editar.className = 'boton';
-    editar.textContent = 'Editar';
-    editar.onclick = function () { abrirCuadroDePlantilla(p); };
-    acciones.appendChild(editar);
-
-    acciones.appendChild(Papelera.botonBorrar(async function () {
-      var ok = await Papelera.preguntarBorrar(p.nombre);
-      if (!ok) return;
-      try {
-        await Papelera.mandarDato('plantilla', p.nombre, { categoria: p.categoria, tipo: p.tipo }, { plantilla: p });
-        await Plantillas.guardar(App.E.gestor, function (actual) {
-          actual.lista = actual.lista.filter(function (x) { return x.id !== p.id; });
-          return actual;
-        });
-        U.aviso('Plantilla mandada a la papelera.', 'bueno');
-        await pintarBloqueAjustes();
-      } catch (e) {
-        U.aviso('No he podido borrarla: ' + e.message, 'malo');
-      }
-    }));
-
-    div.appendChild(acciones);
-    return div;
   }
 
   async function guardarFirma() {
@@ -149,7 +51,7 @@
     var codigo = $('plantillas-codigo').value.trim();
     var cargo = $('plantillas-cargo').value.trim();
     try {
-      await Plantillas.guardar(App.E.gestor, function (actual) {
+      datosDeAjustes = await Plantillas.guardar(App.E.gestor, function (actual) {
         actual.firma = firma;
         actual.centro = centro;
         actual.localidad = localidad;
@@ -164,10 +66,87 @@
     }
   }
 
+  if ($('plantillas-guardar-firma')) $('plantillas-guardar-firma').onclick = guardarFirma;
+
+  /* ---------- las plantillas de UN tipo (sección de js/ajustes-tipo.js) ---------- */
+
+  function tarjetaDePlantilla(p) {
+    var div = document.createElement('div');
+    div.className = 'tarjeta-tipo';
+    div.innerHTML = '<div class="nombre-tipo">' + U.escapar(p.nombre) + '</div>';
+
+    var acciones = document.createElement('div');
+    acciones.className = 'acciones';
+    acciones.style.marginTop = '8px';
+
+    var editar = document.createElement('button');
+    editar.type = 'button';
+    editar.className = 'boton';
+    editar.textContent = 'Editar';
+    editar.onclick = function () { abrirCuadroDePlantilla(p, null, refrescarSeccionActual); };
+    acciones.appendChild(editar);
+
+    acciones.appendChild(Papelera.botonBorrar(async function () {
+      var ok = await Papelera.preguntarBorrar(p.nombre);
+      if (!ok) return;
+      try {
+        await Papelera.mandarDato('plantilla', p.nombre, { categoria: p.categoria, tipo: p.tipo }, { plantilla: p });
+        await Plantillas.guardar(App.E.gestor, function (actual) {
+          actual.lista = actual.lista.filter(function (x) { return x.id !== p.id; });
+          return actual;
+        });
+        U.aviso('Plantilla mandada a la papelera.', 'bueno');
+        await cargar();
+        refrescarSeccionActual();
+      } catch (e) {
+        U.aviso('No he podido borrarla: ' + e.message, 'malo');
+      }
+    }));
+
+    div.appendChild(acciones);
+    return div;
+  }
+
+  var refrescarSeccionActual = function () {};   /* la sustituye pintarDeTipo mientras está abierta */
+
+  /* Pinta, dentro de `contenedor`, solo las plantillas de `tipo`. Se
+     llama desde la sección "Plantillas de correo y de Séneca" de la
+     pantalla de un tipo (js/ajustes-tipo.js). */
+  async function pintarDeTipo(contenedor, tipo) {
+    if (!contenedor) return;
+    await cargar();
+    refrescarSeccionActual = function () { pintarDeTipo(contenedor, tipo); };
+
+    var lista = (datosDeAjustes ? datosDeAjustes.lista : [])
+      .filter(function (p) { return p.tipo === tipo.tipo; })
+      .sort(function (a, b) { return a.nombre < b.nombre ? -1 : 1; });
+
+    contenedor.innerHTML =
+      '<p class="explica">Cada plantilla es solo el cuerpo del medio: el saludo y la firma se ' +
+      'ponen solos. Sirve igual para el correo y para el mensaje de Séneca. Los huecos entre ' +
+      'llaves, como <code>{nombre}</code>, se rellenan solos al abrir el cuadro.</p>' +
+      '<div id="tipo-plantillas-lista" class="rejilla-tipos"></div>' +
+      '<button type="button" class="boton boton-principal" id="tipo-plantillas-nueva" ' +
+      'style="margin-top:10px">+ Nueva plantilla</button>';
+
+    var caja = $('tipo-plantillas-lista');
+    if (!lista.length) {
+      caja.innerHTML = '<div class="vacio">Todavía no hay ninguna plantilla de correo para este tipo.</div>';
+    } else {
+      lista.forEach(function (p) { caja.appendChild(tarjetaDePlantilla(p)); });
+    }
+    $('tipo-plantillas-nueva').onclick = function () {
+      abrirCuadroDePlantilla(null, tipo, refrescarSeccionActual);
+    };
+  }
+
   /* ---------- el cuadro de alta / edición ----------
 
-     Un cuadro de U.preguntar corriente: la pantalla de Ajustes no es
-     ningún cuadro, así que no hay problema en abrir este. */
+     Un cuadro de U.preguntar corriente. `tipoPreset` (un objeto
+     { tipo, categoria }) preselecciona los dos desplegables cuando se
+     abre desde la pantalla de un tipo; `alGuardar` se llama, además
+     del aviso de siempre, cuando el guardado termina bien (para que
+     la sección que lo abrió se repinte). */
 
   function datosDeMuestra(categoria, tipo) {
     var real = (App.E.listaAbiertos || []).filter(function (a) {
@@ -207,14 +186,15 @@
     return (App.E.tipos || []).filter(function (t) { return t.categoria === categoria; });
   }
 
-  function abrirCuadroDePlantilla(existente) {
+  function abrirCuadroDePlantilla(existente, tipoPreset, alGuardar) {
     var categorias = Nombres.CATEGORIAS;
-    var categoriaInicial = (existente && existente.categoria) || categorias[0];
+    var categoriaInicial = (existente && existente.categoria) || (tipoPreset && tipoPreset.categoria) || categorias[0];
 
     function opcionesTipos(categoria) {
       return opcionesDeCategoria(categoria).map(function (t) {
-        return '<option value="' + U.escapar(t.tipo) + '"' +
-          (existente && existente.tipo === t.tipo ? ' selected' : '') + '>' + U.escapar(t.tipo) + '</option>';
+        var elegido = existente ? existente.tipo === t.tipo : (tipoPreset && tipoPreset.tipo === t.tipo);
+        return '<option value="' + U.escapar(t.tipo) + '"' + (elegido ? ' selected' : '') + '>' +
+          U.escapar(t.tipo) + '</option>';
       }).join('');
     }
 
@@ -289,7 +269,8 @@
           return actual;
         });
         U.aviso(existente ? 'Plantilla guardada.' : 'Plantilla creada.', 'bueno');
-        await pintarBloqueAjustes();
+        await cargar();
+        if (typeof alGuardar === 'function') alGuardar();
       } catch (e) {
         U.aviso('No he podido guardarlo: ' + e.message, 'malo');
       }
@@ -303,11 +284,18 @@
   function enganchar() {
     if (!window.Gestor) return;
     window.Gestor.alRefrescar.push(function () {
-      if (!$('pantalla-ajustes') || !App.E.gestor) return;
-      try { pintarBloqueAjustes(); } catch (e) { /* un bloque roto no puede tumbar la aplicación */ }
+      if (!App.E.gestor) return;
+      cargar().then(pintarFirmaYCentro).catch(function () { /* un bloque roto no puede tumbar la aplicación */ });
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enganchar);
   else enganchar();
+
+  /* Público, para js/ajustes-tipo.js. */
+  window.PlantillasAjustes = {
+    cargar: cargar,
+    pintarDeTipo: pintarDeTipo,
+    abrirCuadroDePlantilla: abrirCuadroDePlantilla
+  };
 
 })();

@@ -54,6 +54,9 @@ await pagina.evaluate(async () => {
 });
 
 await pagina.evaluate(() => App.ir('ajustes'));
+/* 17-sep-2026, fila 39: "Fichas sin carpeta" vive en la pestaña
+   "Mantenimiento". */
+await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
 await pagina.waitForTimeout(300);
 await pagina.evaluate(() => { document.getElementById('bloque-huerfanas').open = true; });
 await pagina.waitForTimeout(200);

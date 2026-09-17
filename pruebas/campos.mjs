@@ -105,20 +105,27 @@ await pagina.click('#btn-barra');
    1. Configurar SANCION con Unidad (obligatorio, al nombre) y
       Modalidad (opcional, al nombre), desde el cuadro de Ajustes.
    ================================================================ */
-console.log('--- 1. configurar los campos de SANCION, en Ajustes ---');
+console.log('--- 1. configurar los campos de SANCION, en su pantalla de Ajustes ---');
 
+/* Desde el 17-sep-2026 (fila 39, docs/AJUSTES-POR-TIPO.md) "Campos" ya
+   no es una entrada del menú de los tres puntos ni un cuadro aparte:
+   se pulsa la tarjeta del tipo, que abre su pantalla entera, y la
+   sección "Campos" ya está ahí, sin plegar. */
 await pagina.click('.pestana[data-pantalla="ajustes"]');
+await pagina.waitForSelector('#tabla-tipos .tarjeta-tipo');
+/* Los bloques de "El centro" y "Mantenimiento" son <details> cerrados:
+   se abren todos de una vez, y como no se vuelven a crear, se quedan
+   abiertos el resto de la prueba (igual que pruebas/navegador.mjs). */
 await pagina.evaluate(() => {
   document.querySelectorAll('#pantalla-ajustes details').forEach((d) => { d.open = true; });
 });
-await pagina.waitForSelector('#tabla-tipos .tarjeta-tipo');
 
 const tarjetaSancion1 = pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: 'SANCION' });
-await tarjetaSancion1.locator('.tarjeta-tipo-menu-btn').click();
-await tarjetaSancion1.getByRole('button', { name: 'Campos', exact: true }).click();
-await pagina.waitForSelector('#campos-cuerpo');
-await comprobar('el cuadro de Campos aprovecha el ancho',
-  pagina.evaluate(() => document.querySelector('#capa .cuadro').classList.contains('cuadro-ancho')), true);
+await tarjetaSancion1.locator('.tarjeta-tipo-nombre').click();
+await pagina.waitForSelector('#pantalla-tipo-asunto:not(.oculto)');
+await pagina.waitForSelector('#campos-puestos');
+await comprobar('la pantalla del tipo usa el ancho grande, no un cuadro estrecho',
+  pagina.evaluate(() => document.getElementById('pantalla-tipo-asunto').getBoundingClientRect().width > 900), true);
 
 await pagina.fill('#campos-buscar', 'unidad');
 await pagina.locator('#campos-catalogo .fila-tipo').filter({ hasText: 'Unidad' })
@@ -137,11 +144,11 @@ await filaUnidad.locator('label:has-text("Añadir al nombre") input').check();
 const filaModalidad = pagina.locator('#campos-puestos .fila-tipo').filter({ hasText: 'Modalidad' });
 await filaModalidad.locator('label:has-text("Añadir al nombre") input').check();
 
-await pagina.locator('#capa .cuadro').screenshot({
+await pagina.locator('.tipo-asunto-seccion').filter({ hasText: 'Campos' }).screenshot({
   path: path.join(CARPETA_CAPTURAS, 'campos-cuadro-ajustes.png')
 });
 
-await pagina.click('#cuadro-aceptar');
+await pagina.click('#campos-guardar');
 await pagina.waitForTimeout(300);
 
 await comprobar('campos.json guarda la configuración de SANCION', leerJson('campos.json').then(j => j.porTipo.SANCION), [
@@ -305,7 +312,10 @@ await comprobar('un espacio sobrante se limpia', pagina.evaluate(() => Campos.ca
    ================================================================ */
 console.log('--- 7. un campo propio de lista cerrada ---');
 
+/* El catálogo de campos propios vive en "El centro" desde la fila 39
+   (docs/AJUSTES-POR-TIPO.md). */
 await pagina.click('.pestana[data-pantalla="ajustes"]');
+await pagina.click('[data-ajustes-pestana="centro"]');
 await pagina.fill('#nuevo-propio', 'Trimestre');
 await pagina.selectOption('#nueva-clase-propio', 'lista');
 await pagina.click('#btn-anadir-propio');
@@ -317,16 +327,17 @@ await comprobar('el campo propio queda en la lista',
   pagina.locator('#tabla-propios .fila-tipo').filter({ hasText: 'Trimestre' }).locator('.suave').textContent(),
   '1º, 2º, 3º');
 
+await pagina.click('[data-ajustes-pestana="tipos"]');
 const tarjetaSancion2 = pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: 'SANCION' });
-await tarjetaSancion2.locator('.tarjeta-tipo-menu-btn').click();
-await tarjetaSancion2.getByRole('button', { name: 'Campos', exact: true }).click();
-await pagina.waitForSelector('#campos-cuerpo');
+await tarjetaSancion2.locator('.tarjeta-tipo-nombre').click();
+await pagina.waitForSelector('#pantalla-tipo-asunto:not(.oculto)');
+await pagina.waitForSelector('#campos-puestos');
 await pagina.fill('#campos-buscar', 'trimestre');
 await pagina.locator('#campos-catalogo .fila-tipo').filter({ hasText: 'Trimestre' })
   .getByRole('button', { name: 'Añadir' }).click();
 await pagina.locator('#campos-puestos .fila-tipo').filter({ hasText: 'Trimestre' })
   .locator('label:has-text("Añadir al nombre") input').check();
-await pagina.click('#cuadro-aceptar');
+await pagina.click('#campos-guardar');
 await pagina.waitForTimeout(200);
 
 await pagina.click('.pestana[data-pantalla="nuevo"]');

@@ -171,15 +171,24 @@ await comprobar('las tres primeras tarjetas están en la misma fila (al menos 3 
 
 /* ================================================================
    8. La pestaña Ajustes se ve sin desplazar la página, con los
-      once bloques abiertos: la barra se ha quedado fija (B1).
+      bloques abiertos: la barra se ha quedado fija (B1).
+
+   Desde el 17-sep-2026 (fila 39, docs/AJUSTES-POR-TIPO.md) los once
+   bloques de antes están repartidos en tres pestañas, así que para
+   una página larga de verdad hace falta estar en la que más lleva:
+   "Mantenimiento" (Avisos, Carpetas, Copias, Papelera, y los que se
+   enganchan solos: bandeja, RegAlum viejo, conflictos, duplicados
+   descartados, fichas huérfanas).
    ================================================================ */
 console.log('--- 8. la barra queda fija, aunque la página sea larga ---');
 
-/* Los once del encargo, más los que añaden otros módulos en tiempo de
-   uso (frescura, conflictos, fichas huérfanas, bandeja de correos):
-   al menos once, para que la página sea larga de verdad. */
-await comprobar('hay al menos once bloques de Ajustes, todos abiertos',
-  pagina.locator('#pantalla-ajustes details.bloque-ajustes').count().then(n => n >= 11), true);
+await pagina.click('[data-ajustes-pestana="mantenimiento"]');
+await pagina.waitForTimeout(150);
+await pagina.evaluate(() => {
+  document.querySelectorAll('#ajustes-tab-mantenimiento details').forEach((d) => { d.open = true; });
+});
+await comprobar('"Mantenimiento" trae al menos ocho bloques, todos abiertos',
+  pagina.locator('#ajustes-tab-mantenimiento details.bloque-ajustes').count().then(n => n >= 8), true);
 
 await pagina.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 await pagina.waitForTimeout(150);
