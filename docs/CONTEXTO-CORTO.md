@@ -87,12 +87,12 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   Script deja un borrador en Gmail (nunca envía), con tarjeta "Borrador en camino".
 - Plantillas de correo y de mensaje de Séneca, por tipo de asunto, con huecos que se rellenan
   solos; la firma y el centro (y localidad, dirección, código, cargo) se editan en Ajustes.
+- Al escribir una plantilla, el botón "Insertar hueco" abre un buscador y el hueco entra donde esté el cursor; ya no hay un muro de treinta botones tapando el formulario.
 - Plantillas de documento de Word por tipo de asunto: botón "Generar documento" en la ficha que
   saca una copia ya rellena y guardada en la carpeta del asunto, sin preguntar nada.
 - Copias de seguridad diarias, detección de fichero roto, fusión de conflictos de Dropbox.
 - Pruebas automáticas en GitHub Actions en cada subida.
-- Escape y botón de salida en toda pantalla; copiar el nombre de un relacionado en orden normal;
-  carpetas temporales de Drive/Dropbox fuera de Asuntos abiertos.
+- Escape y botón de salida en toda pantalla; copiar el nombre de un relacionado en orden normal; carpetas temporales de Drive/Dropbox fuera de Asuntos abiertos.
 - Hitos: los pasos de la guía SON los hitos de un asunto abierto (se crean solos al abrirlo, ya no
   hay guía con casillas aparte), con estado, fecha límite, responsable, bifurcaciones, documentos
   apuntados (botón "Apuntar un documento") e historial.
