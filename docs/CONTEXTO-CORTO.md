@@ -60,7 +60,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Categoría → tipo → tercero → nombre de carpeta, con vista previa.
 - Estado del asunto, vía de comunicación preferente y fecha límite.
 - Asuntos recurrentes, con aviso y creación manual.
-- Buscador de tipos y de terceros (alumnado, con DNI y Nº escolar).
+- Buscador de tipos y de terceros (alumnado, con DNI y Nº escolar). El del ARCHIVO tiene un índice guardado (`_GESTOR/indice-archivo.json`, botón "Reconstruir el índice") y busca por palabras sueltas en cualquier orden, también en los documentos, el registro de Séneca y la ficha (fila 44, 17-sep-2026).
 - Editar un asunto abierto (renombra su carpeta); no en el ARCHIVO.
 - Nombre comercial de empresas, aparte de la razón social.
 - Cambiar los datos de un tercero dado de alta a mano.

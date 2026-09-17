@@ -314,6 +314,7 @@
         <div class="acciones">
           <input id="buscar-archivo" class="campo" placeholder="Buscar en todo el archivo">
           <button id="btn-recargar-archivo" class="boton">Actualizar</button>
+          <button id="btn-reconstruir-indice" class="boton" title="Recorre el archivo entero una vez y guarda el índice de búsqueda">Reconstruir el índice</button>
         </div>
       </header>
       <p class="explica" id="explica-archivo">Pulsa Actualizar para leer el archivo. Puede tardar unos segundos la primera vez.</p>
@@ -605,6 +606,11 @@
 <script src="js/campos.js"></script>
 <script src="js/documentos.js"></script>
 <script src="js/grupos.js"></script>
+<!-- El índice guardado del ARCHIVO (fila 44, docs/BUSCADOR-ARCHIVO-INDICE.md).
+     Va después de js/nombres.js y js/carpetas.js (los usa) y antes de
+     js/asuntos-archivar.js y js/archivo-personas.js, que son quienes
+     lo llaman. -->
+<script src="js/archivo-indice.js"></script>
 
 <!-- La comodidad de la pantalla. Va antes que la aplicación, para
      enterarse de los cambios antes de que la pantalla se mueva. -->

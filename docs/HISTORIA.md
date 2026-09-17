@@ -5,6 +5,71 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — El índice guardado del ARCHIVO, y la búsqueda por palabras sueltas
+
+Fila 44 de la cola (`docs/COLA.md`, `docs/BUSCADOR-ARCHIVO-INDICE.md`), acordada con Francisco el
+17-sep-2026. Primera de tres instrucciones sobre el buscador del ARCHIVO; las otras dos (filtros
+por tipo y curso, y una sola caja que busque a la vez en abiertos y archivados) quedan sin diseñar.
+
+**El problema tenía cinco caras a la vez.** `App.verArchivo` recorría el archivo entero (categoría
+→ carpeta del tercero → carpeta del asunto) cada vez que se entraba, y `App.pintarArchivo` buscaba
+con `indexOf` sobre un solo texto (nombre de la carpeta, categoría y tercero, pegados). De ahí
+salían: palabras sueltas que no encontraban nada si no estaban seguidas y en ese orden; ni rastro
+del registro de Séneca ni del nombre de los documentos; nada de la ficha del asunto (estado, vía,
+quién lo pidió, campos propios, relacionados); los asuntos archivados a mano fuera de los tres
+niveles de siempre, invisibles; y todo lento, porque releía el disco entero cada vez.
+
+**Un índice guardado, `_GESTOR/indice-archivo.json`**, compartido entre los dos ordenadores.
+Módulo nuevo `js/archivo-indice.js` (`window.IndiceArchivo`): se lee y se escribe **directo con
+`Carpetas`, nunca con `Copias.guardar`**, exactamente el patrón de `js/presencia.js` — fuera de
+las copias de seguridad, de la papelera y de la fusión de conflictos de Dropbox, porque se puede
+rehacer entero en cualquier momento con el botón nuevo "Reconstruir el índice" (junto a
+"Actualizar"), y engordaría las copias diarias sin motivo real. Antes de escribir, se relee el
+disco y se fusiona por nombre de carpeta de asunto, como `Grupos.guardar`: lo que el compañero
+haya archivado desde el otro ordenador mientras tanto no se pierde (comprobado con un escenario
+propio, guardando una foto vieja después de que "el compañero" escribiera directo al fichero).
+
+**Nada de la ficha se copia al índice.** El estado, la vía y su dato, quién lo pidió, los
+relacionados y los campos propios se leen al buscar, de `App.E.registro.asuntos`, que ya está en
+memoria: un cambio en la ficha se nota al instante, sin reconstruir nada. El texto de búsqueda de
+cada asunto se calcula una sola vez al cargar el índice (no en cada tecleo); `App.pintarArchivo`
+deja el `indexOf` de siempre: normaliza lo escrito, lo parte en palabras, y un asunto sale si las
+tiene TODAS, en cualquier orden y en cualquiera de sus datos (nombre, categoría, tercero, ruta,
+tipo, curso, grupo, documentos, registros de Séneca, y los de la ficha).
+
+**Los asuntos descolocados** entran también en el índice, sin moverlos: una carpeta justo debajo
+de la categoría cuyo nombre `Nombres.leer` reconoce como asunto (tiene fecha y tipo) entra con
+`tercero: ''` y `sueltoEn: 'bajo la categoría'`; una que no lo parece se mira un nivel más adentro
+por si esconde uno (cuatro niveles o más), con `sueltoEn` a la ruta donde se encontró. Salen en los
+resultados como cualquier otro, con su ruta en el pie de la tarjeta (`App.tarjetaAsunto`, sin
+tocarla), y la línea de estado cuenta cuántos hay al final.
+
+**Los tres casos límite de la sección 6, cubiertos sin romper nada**: si el fichero no existe, está
+roto o es de otra `version`, `App.verArchivo` cae al mismo recorrido de disco de siempre
+(`IndiceArchivo.construir()`, sin guardar nada) y avisa "El índice no está hecho. Reconstruir el
+índice."; si un recuento barato (categorías y carpetas de tercero, un nivel, sin entrar en los
+asuntos) no cuadra con el `recuento` guardado, se enseña el índice igual y avisa "El índice puede
+no estar al día." — nunca se reconstruye sola; y al archivar (`App.cerrarAsunto`) se añade la
+entrada, al reabrir (`App.reabrirAsunto`) se quita, los dos después de que el traslado de la
+carpeta haya salido bien, sin romper nada si el índice todavía no existe. `App.reabrirAsunto` deja
+de llamar a `App.verArchivo` en sus tres salidas: con el índice al día, basta repintar
+`App.E.listaArchivo` en memoria.
+
+**Una trampa que no estaba en el encargo**: el índice no puede guardar manejadores de carpeta en un
+JSON, así que las tarjetas del ARCHIVO no traen `handle`. "Reabrir" no hizo falta tocarlo
+(`App.reabrirAsunto` ya sabía recalcular la carpeta desde la fila 45), pero "Documentos"
+(`App.verDocumentos`, en `js/asuntos-lista.js`, que no se toca) sí lo necesita de verdad: se
+envuelve en `js/archivo-personas.js`, y si falta el manejador se resuelve al vuelo con
+`IndiceArchivo.resolverHandle` justo antes de abrir, a partir de lo que el índice sabe (categoría,
+tercero, ruta, `sueltoEn`).
+
+Prueba nueva `pruebas/archivo-indice.mjs`, en navegador de verdad con el disco de mentira de
+`pruebas/navegador.mjs` (como `pruebas/archivar-atascos.mjs`), con los nueve escenarios de la
+sección 9 del documento. No se han tocado `js/asuntos-lista.js`, `js/datos.js`, `js/copias.js`,
+`js/papelera.js`, `js/conflictos.js` ni `apps-script/gestor-correos.gs`, como pedía el propio
+documento. Batería completa en verde, una sola pasada al final (54 ficheros de prueba). Versión
+publicada `App.VERSION`: `17-sep-2026 · 23:33`.
+
 ## 17-sep-2026 — Dar de alta un tercero desde el documento, y los aspirantes a plaza
 
 Fila 42 de la cola (`docs/COLA.md`, `docs/TERCEROS-NUEVOS-DESDE-EL-DOCUMENTO.md`), acordada con

@@ -1856,6 +1856,59 @@ traducirlo.
 Se comprueba con `pruebas/archivar-atascos.mjs`, en navegador de verdad (reutiliza el disco de
 mentira de `pruebas/navegador.mjs`), con los seis escenarios del documento.
 
+### El índice del ARCHIVO
+
+Fila 44 de `docs/COLA.md`, 17-sep-2026, `docs/BUSCADOR-ARCHIVO-INDICE.md`. Antes, `App.verArchivo`
+recorría el archivo entero (categoría → tercero → asunto) cada vez que se entraba, y buscaba con
+`indexOf` sobre un solo texto. Ahora hay un índice guardado, `_GESTOR/indice-archivo.json` (ver la
+tabla de ficheros), y la búsqueda es por palabras sueltas.
+
+- **`js/archivo-indice.js`** (`window.IndiceArchivo`) es el módulo del índice: se lee y se escribe
+  **directo con `Carpetas`, nunca con `Copias.guardar`**, igual que `js/presencia.js` — fuera de
+  las copias de seguridad, la papelera y la fusión de conflictos, porque se puede rehacer entero en
+  cualquier momento.
+  - `construir(onProgreso)` recorre el archivo entero una vez y devuelve el índice sin guardarlo
+    (`onProgreso(categoria, total)` por categoría, para la línea de estado). De paso detecta los
+    asuntos **descolocados**: una carpeta justo debajo de la categoría cuyo nombre parece un asunto
+    (`Nombres.leer` le saca fecha y tipo) entra con `tercero: ''` y `sueltoEn: 'bajo la categoría'`;
+    una que no parece asunto se mira un nivel más adentro por si esconde uno (cuatro niveles o
+    más), con `sueltoEn` a la ruta donde se encontró. No se mueve nada, solo se señala.
+  - `guardar(indice)` relee el disco y fusiona por nombre de carpeta antes de escribir, como
+    `Grupos.guardar`: lo que hubiera en disco y no esté en lo recién construido (el compañero
+    archivó algo desde el otro ordenador mientras tanto) se suma.
+  - `anadirEntrada(entrada)`/`quitarEntrada(nombre)` tocan una sola entrada sin reconstruir nada;
+    silenciosas si el índice todavía no existe.
+  - `recuentoActual()` es el recuento barato del punto 6.2: solo categorías y carpetas de tercero
+    (un nivel), para comparar con el `recuento` guardado sin recorrer los asuntos.
+  - `textoDeBusqueda(entrada, ficha)` junta lo del índice (nombre, categoría, tercero, ruta, tipo,
+    curso, grupo, documentos, registros de Séneca) con lo de la ficha en memoria
+    (`App.E.registro.asuntos`, nunca copiada al índice): estado, vía y su dato, quién lo pidió,
+    relacionados y campos propios. Normalizado una vez; así un cambio en la ficha se nota sin
+    reconstruir nada.
+  - `resolverHandle(entrada)` calcula el manejador real de una carpeta a partir de lo que el índice
+    sabe (categoría, tercero, ruta, `sueltoEn`): el índice no puede guardar manejadores en un JSON.
+- **`App.verArchivo`** (`js/archivo-personas.js`) lee el índice; si no existe, está roto o es de
+  otra versión, cae al mismo recorrido de disco de siempre (`IndiceArchivo.construir()`, sin
+  guardarlo) y avisa "El índice no está hecho. Reconstruir el índice."; si el recuento barato no
+  cuadra con el guardado, enseña el índice igual y avisa "El índice puede no estar al día." — nunca
+  se reconstruye sola. El botón **"Reconstruir el índice"**, junto a "Actualizar", llama a
+  `IndiceArchivo.construir()` + `guardar()`; si algo falla a mitad, no se escribe nada a medias.
+- **`App.pintarArchivo`** ya no usa `indexOf`: normaliza lo escrito, lo parte en palabras, y un
+  asunto sale si tiene TODAS en su `busca` (calculado una vez al cargar el índice, no en cada
+  tecleo). Sin resultados: "Ningún asunto archivado tiene todas esas palabras."
+- **`js/asuntos-archivar.js`** da de alta y de baja el índice sin reconstruirlo entero:
+  `App.cerrarAsunto` añade la entrada (con `actualizarIndiceAlArchivar`) justo después de que el
+  traslado haya salido bien, en los dos sitios donde puede acabar archivado (el normal y el "ya
+  estaba archivado"); `App.reabrirAsunto` la quita (`actualizarIndiceAlReabrir`) y **ya no llama a
+  `App.verArchivo`**: con el índice al día, basta repintar `App.E.listaArchivo` en memoria.
+- Las tarjetas del ARCHIVO no traen manejador de carpeta: `js/archivo-personas.js` envuelve
+  `App.verDocumentos` para resolverlo con `IndiceArchivo.resolverHandle` justo antes de abrirlo.
+  "Reabrir" no hace falta tocarlo: `App.reabrirAsunto` ya sabía recalcular la carpeta cuando
+  `a.padre` faltaba o estaba viejo (fila 45, más arriba).
+
+Se comprueba con `pruebas/archivo-indice.mjs`, en navegador de verdad con el disco de mentira de
+`pruebas/navegador.mjs`, con los nueve escenarios del documento.
+
 ---
 
 ## 2. Cómo trabajamos el código ← LÉELO ANTES DE TOCAR NADA
@@ -1951,7 +2004,8 @@ de `App` va después del fichero que lo define.
 | `js/documentos-sueltos-lector.js` | Envuelve `App.tarjetaSuelto` para proponer tipo/fecha/registro/tercero de cada PDF suelto, con el botón "Aceptar" (17-sep-2026, fila 41); si el documento de identidad no cuadra con nadie, el botón "Dar de alta" (fila 42) |
 | `js/lo-pide.js` | Quién ha pedido la gestión: candidatos, controles, línea legible y qué casilla marcar en el correo |
 | `js/asuntos-nuevo.js` | Crear un asunto, el cuadro de datos de un tercero y los pies |
-| `js/archivo-personas.js` | Personas y empresas, el ARCHIVO, y cambiar los datos de un tercero |
+| `js/archivo-personas.js` | Personas y empresas, cambiar los datos de un tercero, y la pantalla ARCHIVO: orquesta `js/archivo-indice.js` (lee el índice o cae al recorrido de disco), busca por palabras y resuelve el manejador de una carpeta al vuelo para "Documentos" (fila 44) |
+| `js/archivo-indice.js` | El índice guardado del ARCHIVO, `_GESTOR/indice-archivo.json` (`window.IndiceArchivo`, ver "El índice del ARCHIVO", fila 44) |
 | `js/ajustes.js` | El marco de Ajustes (17-sep-2026, fila 39): las tres pestañas, la lista de tipos (pestañas de categoría, buscador cruzado, aviso en vivo) y los ayudantes compartidos (`botonMenuTarjeta`, `filaEstado`, `construirCasillaPlazo`) |
 | `js/ajustes-tipo.js` | La pantalla propia de un tipo de asunto, con sus ocho secciones (17-sep-2026, fila 39) |
 | `js/ajustes-tipo-palabras-clave.js` | La sección "Palabras clave" de la pantalla de un tipo: `palabrasClave` en `tipos.json` (17-sep-2026, fila 41) |
@@ -2086,6 +2140,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `PAPELERA/` | Las carpetas y ficheros borrados, cada uno en su subcarpeta `AAMMDD-HHMM <nombre>` |
 | `PLANTILLAS/` | Los `.docx` que Francisco sube a mano, colgados de un tipo desde Ajustes › Plantillas de documento. No lleva copia de seguridad: no es uno de los trece ficheros compartidos |
 | `presencia.json` | `{ <clave del asunto>: { usuario, ultima } }`: quién tiene abierta la ficha de cada asunto, y desde cuándo. **A propósito, fuera de los trece**: no pasa por `Copias.guardar` (nada de copia de seguridad), no entra en `Papelera` ni en `Conflictos` (si dos versiones chocan, se quedan las dos entradas y punto). Se escribe y relee directo con `Carpetas` (ver "No pisarse en un mismo asunto") |
+| `indice-archivo.json` | `{ version, hechoEl, hechoPor, recuento: { CATEGORIA: nº de carpetas de tercero }, asuntos: [{ nombre, categoria, tercero, ruta, fecha, tipo, curso, grupo, documentos, registros, sueltoEn }] }`: el índice guardado del ARCHIVO (`js/archivo-indice.js`, ver "El índice del ARCHIVO"). **También fuera de los trece**, por el mismo motivo que `presencia.json`: se puede rehacer entero en cualquier momento con "Reconstruir el índice", así que no necesita copia de seguridad, papelera ni fusión de conflictos. Se escribe y relee directo con `Carpetas` |
 | `copias/*.json` | Copias de seguridad de los trece ficheros de arriba, una por día, 30 como mucho de cada uno |
 
 **Los CSV van en `datos`, no en `_GESTOR`.** `js/rescate-datos.js` los baja solos al entrar.
