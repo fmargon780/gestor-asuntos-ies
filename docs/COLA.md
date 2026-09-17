@@ -100,6 +100,8 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 39 | `docs/AJUSTES-POR-TIPO.md` | PENDIENTE | Acordado con Francisco el 17-sep-2026. Ajustes se parte en tres pestañas (Tipos de asunto · El centro · Mantenimiento) y cada tipo de asunto pasa a tener pantalla propia a dos columnas con sus campos, pasos, plantillas de correo y de Word, plazo y recurrencia dentro. `js/ajustes.js` (52 KB) se parte en `js/ajustes-tipo.js`, `js/ajustes-centro.js` y `js/ajustes-mantenimiento.js` |
 | 40 | `docs/SALTAR-A-OTRO-ASUNTO.md` | PENDIENTE | Acordado con Francisco el 17-sep-2026. Va después de la fila 37. El bloque "Otros asuntos de este tercero" de la ficha solo pinta texto: ahora cada línea se pulsa y abre la ficha de ese asunto (abierto, o del ARCHIVO montado a mano, sin recorrer el ARCHIVO entero), y en esa ficha sale arriba "← Volver a [asunto de partida]", que apunta siempre al de partida aunque se salte varias veces. Módulo nuevo `js/otros-del-tercero.js`, que se lleva el bloque de `js/ficha-asunto.js` (ya pasa de 400 líneas). |
 
+| 41 | `docs/REPASO-DE-LA-COLA-2026-09-17.md` | EN CURSO (17-sep-2026) | Papeleo de la cola: dos instrucciones sin fila (42 y 43), la cabecera de `ARCHIVAR-ATASCOS.md` y `docs/HISTORIA.md` a medio restaurar. No toca código ni publica versión nueva. |
+
 **Orden de trabajo:** quedan pendientes las filas 36, 37, 38, 39 y 40, en ese orden (la 37 va después de la 36: comparten pantalla; la 40 va después de la 37: tocan el mismo bloque de la ficha). Las filas 1 a 35 están hechas.
 
 **Sin fila todavía:** `docs/BUSCADOR-ARCHIVO-INDICE.md` (índice y búsqueda por palabras en el ARCHIVO)
