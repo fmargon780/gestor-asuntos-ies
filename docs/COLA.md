@@ -50,6 +50,10 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     `docs/CONTEXTO.md` y `docs/HISTORIA.md` en el mismo commit. Nada de un commit por fichero, ni
     de "completa el commit anterior": se prepara todo y se sube una vez. Ver
     `docs/NO-GASTAR-PUBLICACIONES.md`.
+14. **Nunca uses `$(cat fichero)` ni ninguna sustitución de shell como valor de `content` al
+    subir un fichero: el servidor no lo ejecuta, lo sube tal cual, como texto literal.** El
+    17-sep-2026 esto dejó `docs/COLA.md` en 35 bytes con el comando sin ejecutar. El contenido
+    tiene que ir escrito entero, de verdad, en el propio parámetro.
 
 ## Reglas para Francisco
 
