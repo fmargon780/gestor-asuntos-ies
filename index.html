@@ -533,6 +533,19 @@
         </div>
       </details>
 
+      <!-- El ayudante de Séneca (fila 47, docs/DESTINATARIOS-EN-SENECA.md):
+           un enlace-marcador que Francisco arrastra una vez a la barra de
+           marcadores. Lo pinta js/seneca-ayudante.js dentro de este hueco. -->
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">El ayudante de Séneca</span>
+          <span class="bloque-pie">Un marcador que mete los destinatarios en Séneca uno a uno</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <div id="ayudante-seneca-ajustes"></div>
+        </div>
+      </details>
+
       <details class="bloque-ajustes">
         <summary>
           <span class="bloque-titulo">Copias de seguridad</span>
@@ -606,6 +619,12 @@
 <script src="js/campos.js"></script>
 <script src="js/documentos.js"></script>
 <script src="js/grupos.js"></script>
+<!-- js/idea.js (fila 47, docs/DESTINATARIOS-EN-SENECA.md): el usuario
+     IdEA de una persona, leído por el título de columna del CSV, como
+     js/dni.js con el DNI. Va antes que js/correo.js, que lo usa para
+     el cuadro de Séneca; no depende de nada más, así que puede ir
+     aquí, junto a js/grupos.js. -->
+<script src="js/idea.js"></script>
 <!-- El índice guardado del ARCHIVO (fila 44, docs/BUSCADOR-ARCHIVO-INDICE.md).
      Va después de js/nombres.js y js/carpetas.js (los usa) y antes de
      js/asuntos-archivar.js y js/archivo-personas.js, que son quienes
@@ -712,6 +731,20 @@
 <script src="js/huecos-buscador.js"></script>
 <script src="js/plantillas-ajustes.js"></script>
 <script src="js/correo.js"></script>
+<!-- js/seneca-destinatarios.js (fila 47, docs/DESTINATARIOS-EN-SENECA.md):
+     la lista de usuarios IdEA del cuadro de Séneca, en chips. Va
+     después de js/correo.js: usa `window.CorreoGrupos`, que expone,
+     y js/correo.js solo llama a `window.SenecaDestinatarios` en
+     tiempo de ejecución (al abrir el cuadro), así que el orden entre
+     los dos no le afecta a esa parte, pero CorreoGrupos sí tiene que
+     existir ya cuando se elige un grupo. -->
+<script src="js/seneca-destinatarios.js"></script>
+<!-- js/seneca-ayudante.js (fila 47): genera el texto del enlace-marcador
+     y lo pinta, tanto en Ajustes (js/ajustes-mantenimiento.js) como en
+     el cuadro de Séneca (js/correo.js). No depende de ningún otro
+     módulo de la aplicación: solo de `window.U` para el aviso, si
+     está disponible. -->
+<script src="js/seneca-ayudante.js"></script>
 <!-- js/docx.js y js/plantillas-documento.js van después de js/correo.js
      (docs/PLANTILLAS-DE-DOCUMENTO.md, 7): usan Plantillas.valoresDeAsunto
      y, para el botón "Generar documento" de la ficha, el mismo enganche

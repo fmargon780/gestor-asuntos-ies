@@ -1303,6 +1303,61 @@ nunca en Para, para que una familia no vea el correo de las demás.
   `Session.getActiveUser().getEmail()` (Gmail no admite un borrador sin nadie en Para). **Hay que
   volver a pegar el script en `script.google.com`.**
 
+**En Séneca** (17-sep-2026, fila 47, `docs/DESTINATARIOS-EN-SENECA.md`): la mensajería de Séneca
+no usa correos, usa **usuarios IdEA**. Francisco lo comprobó en Séneca de verdad: pegar el valor
+con la arroba delante vale, pero hace falta esperar algo más de un segundo y lanzar la flecha
+abajo para que el sistema se quede con el destinatario elegido (detalle en `docs/HISTORIA.md`).
+
+- `js/idea.js` (`window.IdEA`), sin pantalla, calcado de `js/dni.js` (busca por el TÍTULO de la
+  columna, nunca por su posición): `IdEA.usuarioDe(persona)` vale con un título que lleve "idea"
+  o "usuario", nunca si lleva "clave"/"contraseña"/"pin"/"correo"; un título con
+  "tutor"/"padre"/"madre"/"responsable"/"familia" es el del tutor legal, aparte, en
+  `IdEA.usuarioDelTutor(persona, 1|2)` (mismo patrón que `LoPide.datosDeTutor` para distinguir
+  tutor 1 de tutor 2 por el título). El valor solo se acepta si parece un usuario (4-30
+  caracteres, sin espacios ni arroba; si la trae delante, se quita). `IdEA.usuariosDeGrupo(...)`
+  junta sin repetidos, como `combinarCorreosDeGrupo`. El usuario IdEA del alumnado y de los
+  tutores legales **todavía no se importa** (fichero aparte, pendiente de que a Francisco le
+  reactiven el perfil de Gestor de PASEN): el del profesorado y el PAS ya viene en su CSV.
+- `js/correo.js` expone `window.CorreoGrupos` (`opciones`/`miembrosDeOpcion`/`resolverMiembros`,
+  las mismas piezas privadas de "Añadir un grupo" de Correo) para no duplicarlas: el desplegable
+  del cuadro de Séneca es literalmente el mismo HTML que el de Correo, solo cambia lo que se hace
+  al elegir uno.
+- `js/seneca-destinatarios.js` (`window.SenecaDestinatarios`), aparte para no engordar
+  `js/correo.js`: al elegir un grupo, saca usuarios IdEA (`IdEA.usuariosDeGrupo`) en vez de
+  correos y los pinta en `#seneca-destinatarios` (chips con la arroba delante y su ×, la cuenta
+  arriba, "N sin usuario IdEA: …" cuando falte alguno). Estado en memoria (`destinatarios`,
+  `sinUsuario`, `copiados`), reiniciado en cada apertura del cuadro (`limpiar()`, llamado desde
+  `abrirCuadro`). Botón **"Copiar la lista"**: todos al portapapeles, uno por línea, con la
+  arroba (`textoDelaLista`). Botón **"Copiar el siguiente"**: copia solo el primero que quede sin
+  copiar (`siguienteSinCopiar`) y lo marca (clase `.marcado-chip-copiado`, `css/relacionados.css`)
+  sin quitarlo de la lista, para poder pegarlo a mano en Séneca uno detrás de otro.
+- `js/seneca-ayudante.js` (`window.SenecaAyudante`): el enlace-marcador que Francisco **arrastra
+  una vez a la barra de marcadores** (no se pulsa: pulsarlo en el propio gestor solo avisa de
+  eso). `textoDelMarcador()` monta el texto "javascript:…" a partir de un código de verdad
+  (`CODIGO_INTERNO`, legible, no minificado a mano) que se ejecuta dentro de la pestaña de Séneca:
+  lee el portapapeles (`navigator.clipboard.readText`), busca el campo (`document.activeElement`
+  si es un input de texto; si no, el primero visible de la página, mirando también dentro de los
+  `iframe` a los que se pueda entrar) y, por cada usuario, pone el valor con arroba, dispara
+  `input`/`keyup`, **espera 1.400 ms**, dispara `ArrowDown` y `Enter`, espera 400 ms más y sigue.
+  Pinta arriba a la derecha "Metiendo N de M" con un botón "Parar". Si no encuentra campo o el
+  portapapeles viene vacío, lo dice ahí mismo: "Haz clic dentro del campo de destinatarios y
+  vuelve a pulsar". `insertarEnlace(contenedor)` pinta el enlace y sus tres frases (arrastrar,
+  permiso del portapapeles la primera vez, usar "Copiar el siguiente" si no funciona); se llama
+  desde Ajustes (`js/ajustes-mantenimiento.js`, pestaña "Mantenimiento") y desde el propio cuadro
+  de Séneca. **El ayudante puede no funcionar** si Séneca ignora eventos que no vienen de un
+  teclado de verdad: por eso "Copiar el siguiente" es la red de seguridad, no depende de él.
+- No se manda ningún mensaje desde la aplicación (Séneca no lo permite), no se hace el filtro por
+  pantallas de Séneca (el de los clics, que es justo lo que se evita) y no se guarda ningún
+  usuario IdEA en `_GESTOR`: sale siempre de los CSV, como el DNI.
+
+Se comprueba con `pruebas/idea.mjs` (sin navegador: `usuarioDe` con títulos buenos y malos, con la
+arroba delante, con valores que no parecen un usuario, con las columnas de tutor;
+`usuariosDeGrupo` con repetidos y con gente sin usuario), `pruebas/seneca-destinatarios-
+navegador.mjs` (navegador de verdad: el desplegable sale en el cuadro de Séneca, elegir un grupo
+pinta los chips y la línea de sin-usuario, "Copiar el siguiente" avanza de uno en uno) y
+`pruebas/seneca-ayudante.mjs` (sin navegador: el texto del marcador se genera, empieza por
+"javascript:" y su código es JavaScript válido; contra Séneca de verdad lo prueba Francisco).
+
 Fuera de esta fila, a falta de datos que la aplicación no tiene: departamentos, tutorías y
 equipos educativos (`personal.csv` no guarda esa información).
 
@@ -2045,7 +2100,10 @@ de `App` va después del fichero que lo define.
 | `js/copiar.js` | Los botones de copiar: el Nº escolar y el nombre del documento |
 | `js/plantillas.js` | Leer y guardar `plantillas.json`, montar `Plantillas.valoresDeAsunto` y rellenar los huecos: el motor, sin pantalla |
 | `js/plantillas-ajustes.js` | Las plantillas de correo (sacado de `js/plantillas.js`); desde el 17-sep-2026 (fila 39) pinta solo las de un tipo dentro de su pantalla (`PlantillasAjustes.pintarDeTipo`) y los campos de Datos del centro y firma, en "El centro" |
-| `js/correo.js` | El correo y el mensaje de Séneca, con su rastro, sus plantillas y los grupos en copia oculta |
+| `js/correo.js` | El correo y el mensaje de Séneca, con su rastro, sus plantillas y los grupos en copia oculta; expone `window.CorreoGrupos` (fila 47) para que `js/seneca-destinatarios.js` reutilice el mismo desplegable |
+| `js/idea.js` | El usuario IdEA de una persona (y el de sus tutores legales), leído por el título de columna del CSV, como `js/dni.js` (fila 47) |
+| `js/seneca-destinatarios.js` | La lista de usuarios IdEA del cuadro de Séneca, en chips, con "Copiar la lista"/"Copiar el siguiente" (fila 47) |
+| `js/seneca-ayudante.js`, `css/relacionados.css` (`.marcado-chip-copiado`) | El enlace-marcador que pega los usuarios IdEA uno a uno en Séneca (fila 47) |
 | `js/docx.js` | Rellenar los huecos de una plantilla de Word: ZIP y XML a mano, sin librerías (`window.Docx`) |
 | `js/plantillas-documento.js` | Botón "Generar documento" en la ficha; desde el 17-sep-2026 (fila 39) pinta solo las plantillas de documento de un tipo dentro de su pantalla (`PlantillasDocumento.pintarDeTipo`, `css/plantillas-documento.css`) |
 | `js/salir.js` | El botón de Salir del pie de la barra |

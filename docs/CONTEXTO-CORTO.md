@@ -76,9 +76,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - "Datos y contacto" del tercero, en una sola línea (nombre, grupo o etiqueta de estado, edad, un teléfono y DNI, cada uno con su copiar) con botón "Ver todo"; los tutores legales de Séneca salen agrupados por persona, no columna a columna como antes (fila 37, 17-sep-2026). Cada línea de "Otros asuntos de este tercero" se pulsa y abre su ficha (uno del ARCHIVO, sin recorrerlo entero), con "← Volver a …" arriba para regresar al asunto de partida aunque se salte varias veces seguidas (fila 40, 17-sep-2026).
 - Registrar un documento: si el PDF sellado ya está en la carpeta (bajado de Séneca), la ficha lo
   detecta sola, lo renombra y manda el viejo a la papelera; el botón de siempre sigue igual.
-- Terceros relacionados con un asunto, con nota (no copia) al archivar; "+ Añadir varios" señala
-  de golpe (atajos de alumnado por unidad/nivel/enseñanza, grupos propios en `_GESTOR/grupos.json`
-  desde Ajustes), y esos mismos grupos ponen los destinatarios de un correo, en copia oculta.
+- Terceros relacionados con un asunto, con nota (no copia) al archivar; "+ Añadir varios" señala de golpe (atajos de alumnado por unidad/nivel/enseñanza, grupos propios en `_GESTOR/grupos.json` desde Ajustes), y esos mismos grupos ponen los destinatarios de un correo (copia oculta) y de un mensaje de Séneca (usuario IdEA, en chips, con "Copiar la lista"/"el siguiente" y un ayudante-marcador).
 - Parada al crear un asunto duplicado, y pantalla propia "Duplicados" para los ya existentes.
 - Ajustes tiene tres pestañas (Tipos de asunto · El centro · Mantenimiento). Pulsar una tarjeta de tipo abre su pantalla propia, entera y a dos columnas, con sus ocho secciones a la vista sin plegar: Datos del tipo, Campos, Pasos del trámite, Palabras clave, Plantillas de correo y de Séneca, Plantilla de documento de Word, Plazo y Se repite (fila 39, 17-sep-2026; Palabras clave, fila 41). Dentro, pestañas por categoría, buscador cruzado, aviso en vivo de nombres repetidos.
 - Campos propios por tipo de asunto, rellenos solos al crear.
@@ -152,6 +150,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Si el DNI no sale de nadie, marcar la columna del documento al generar el RegAlum.
 - Cuando el uso lo pida: búsqueda en notas, cuentas por tipo para la memoria de fin de curso, qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta del centro.
 - Los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no se fusionan entre ordenadores (solo las altas).
+- Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
 
 ## 9. Cuándo leer `CONTEXTO.md` entero
 

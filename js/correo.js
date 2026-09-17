@@ -293,6 +293,16 @@
     return partes.join('');
   }
 
+  /* Las mismas piezas de "Añadir un grupo" las necesita también el
+     cuadro de Séneca (fila 47, docs/DESTINATARIOS-EN-SENECA.md), que
+     vive en su propio fichero (js/seneca-destinatarios.js) para no
+     engordar más este. Se exponen sin tocar nada de lo de arriba. */
+  window.CorreoGrupos = {
+    opciones: opcionesDeGrupo,
+    miembrosDeOpcion: miembrosDeOpcionDeGrupo,
+    resolverMiembros: resolverMiembros
+  };
+
   function contenidoCco() {
     var direcciones = Object.keys(cco);
     if (!direcciones.length && !ccoSinCorreo.length) return '';
@@ -500,6 +510,7 @@
     ccoSinCorreo = [];
     porSeneca = !!deSeneca;
     pasoSeneca = 0;
+    if (window.SenecaDestinatarios) SenecaDestinatarios.limpiar();
     asuntoLargo = !porSeneca;   /* en Séneca manda la versión legible: el nombre de la carpeta no cabe */
     yaApuntado = false;
     algoCambiado = false;
@@ -538,24 +549,26 @@
       correos.forEach(function (c) { if (elegidos[c.dir] === undefined) elegidos[c.dir] = true; });
     }
 
-    /* Los documentos del asunto y los grupos (para la copia oculta) no
-       van en el cuadro de Séneca: allí no hay adjuntos ni direcciones. */
+    /* Los documentos del asunto no van en el cuadro de Séneca: allí no
+       hay adjuntos. El desplegable "Añadir un grupo" sí va en los dos
+       cuadros (fila 47, docs/DESTINATARIOS-EN-SENECA.md): en Correo
+       saca correos, en Séneca usuarios IdEA. */
     var bloqueAdjuntos = '';
     var opcionesGrupo = '';
-    if (!porSeneca) {
-      if (window.CorreoAdjuntos) {
-        try { bloqueAdjuntos = await CorreoAdjuntos.pintarBloque(a); } catch (e) { bloqueAdjuntos = ''; }
-      }
-      try { opcionesGrupo = await opcionesDeGrupo(); } catch (e) { opcionesGrupo = ''; }
+    if (!porSeneca && window.CorreoAdjuntos) {
+      try { bloqueAdjuntos = await CorreoAdjuntos.pintarBloque(a); } catch (e) { bloqueAdjuntos = ''; }
     }
+    try { opcionesGrupo = await opcionesDeGrupo(); } catch (e) { opcionesGrupo = ''; }
 
     caja.innerHTML = porSeneca
-      ? cuerpoDeSeneca(a)
+      ? cuerpoDeSeneca(a, opcionesGrupo)
       : cuerpoDeCorreo(a, correos, bloqueAdjuntos, opcionesGrupo, otroInicial);
 
     if (porSeneca) {
       engancharComunes(a);
       engancharSeneca(a);
+      if (window.SenecaDestinatarios) SenecaDestinatarios.enganchar();
+      if (window.SenecaAyudante) SenecaAyudante.insertarEnlace($('seneca-ayudante'));
       return;
     }
     engancharComunes(a);
@@ -621,19 +634,21 @@
      solo guarda una cosa a la vez, hay un solo botón que los va dando
      en el orden en que se pegan. */
 
-  function cuerpoDeSeneca(a) {
+  function cuerpoDeSeneca(a, opcionesGrupo) {
     var quien = aQuien(a);
     return '<div class="aviso aviso-ambar" style="margin:0 0 4px">' +
              '<strong>En Séneca: Utilidades → Comunicaciones.</strong>' +
              '<p>Los destinatarios se marcan allí, en su lista' +
              (quien ? ': <strong>' + U.escapar(quien) + '</strong>' : '') + '.</p>' +
            '</div>' +
+           (window.SenecaDestinatarios ? SenecaDestinatarios.bloqueHtml(opcionesGrupo) : '') +
            camposComunes(a) +
            '<div class="correo-botones" style="margin-top:14px">' +
              '<button type="button" class="boton boton-principal" id="seneca-paso" ' +
                'style="flex:1">1. Copiar el asunto</button>' +
            '</div>' +
-           '<p class="nota" id="seneca-explica">Pulsa, pega en Séneca, y vuelve a pulsar para el texto.</p>';
+           '<p class="nota" id="seneca-explica">Pulsa, pega en Séneca, y vuelve a pulsar para el texto.</p>' +
+           '<div id="seneca-ayudante" style="margin-top:14px"></div>';
   }
 
   /* Las plantillas del tipo de este asunto. Con una sola, es la que

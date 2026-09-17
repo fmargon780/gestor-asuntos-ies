@@ -5,6 +5,40 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — Los destinatarios de un mensaje de Séneca
+
+Fila 47 de la cola (`docs/COLA.md`, `docs/DESTINATARIOS-EN-SENECA.md`), acordada con Francisco el
+17-sep-2026. Viene de la fila 21 (`docs/GRUPOS-DE-PERSONAS.md`), que ya dejó los grupos poniendo
+los destinatarios de un correo en copia oculta: aquí se lleva lo mismo a la mensajería de Séneca,
+que no funciona con direcciones de correo sino con **usuarios IdEA**.
+
+**De dónde sale.** Francisco mandó a comprobar cómo se eligen los destinatarios en Séneca
+(Utilidades → Comunicaciones), y lo contó así:
+
+> "La mensajería de Séneca para poner el destinatario usa dos sistemas, o bien haces un filtro
+> dando varios clicks y con el riesgo de poder elegir a más personas de la cuenta, o haces una
+> búsqueda en el mismo campo en el que si escribes primero el símbolo @ y después sin espacio el
+> usuario IdEA de la persona, te ofrece la persona que dando a la flecha hacia abajo se queda
+> elegida."
+
+Y después, probando a pegar en vez de escribir:
+
+> "Si pego el valor con el @ en un segundo o un poco más sí reconoce el destinatario. Pero hay
+> que dar a la flecha hacia abajo para que el sistema coja ese destinatario."
+
+O sea: **pegar vale**, hace falta esperar algo más de un segundo, y hace falta una flecha abajo.
+Sobre eso se construyó todo: el botón "Copiar el siguiente" (pegar a mano, la red de seguridad de
+siempre) y el ayudante-marcador (`js/seneca-ayudante.js`), que espera 1.400 ms antes de lanzar
+`ArrowDown` y luego `Enter`, precisamente porque Séneca no reconoce el destinatario si se le da la
+flecha demasiado pronto.
+
+El usuario IdEA del profesorado y del PAS ya viene en el CSV de personal que la aplicación
+importa; el del alumnado y el de los tutores legales llegará en un fichero aparte, todavía sin
+ver, que Francisco podrá descargar cuando le reactiven el perfil de Gestor de PASEN. Por eso la
+fila se hizo entera ahora, aunque falte ese fichero: con el personal ya se podía usar y probar de
+verdad, y `IdEA.usuarioDe` lee cualquier columna de usuario que aparezca en el RegAlum el día que
+llegue, sin tocar nada más.
+
 ## 17-sep-2026 — El índice guardado del ARCHIVO, y la búsqueda por palabras sueltas
 
 Fila 44 de la cola (`docs/COLA.md`, `docs/BUSCADOR-ARCHIVO-INDICE.md`), acordada con Francisco el
