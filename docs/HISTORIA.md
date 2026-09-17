@@ -5,6 +5,81 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — La ficha del asunto, colocada de otra manera
+
+Fila 37 de la cola (`docs/COLA.md`, `docs/FICHA-DEL-ASUNTO-NUEVA.md`), acordada con Francisco en
+la misma conversación que la fila 36 y hecha justo después de ella. La izquierda pasa a ser lo que
+se trabaja de verdad (Hitos, y ahora también Documentos, que se muda desde la derecha); la derecha,
+lo que se consulta y se anota, con "Datos y contacto" la primera (antes era de las últimas cosas
+que se veían, al final de la columna), Otros asuntos, Relacionados, Datos del asunto y Notas, ahora
+la última: las notas del asunto se usan poco desde que casi todo se escribe como nota de un hito.
+
+**"Datos y contacto" pasa de una tabla de filas a una sola línea**: nombre, grupo (o una etiqueta
+de estado en su lugar — ámbar `NO MATRICULADO AA-AA` con "última matrícula" debajo, o azul
+`SOLICITANTE`), edad, un solo teléfono etiquetado (el del primer tutor si el alumno es menor de
+edad, el suyo si es mayor) y DNI, cada dato con su botón de copiar. Un botón "Ver todo" abre una
+ventana con el resto: identificación, matrícula, contacto del alumno, tutores legales, otros datos
+de la familia y el volcado plegado de siempre. Lo que no estaba resuelto hasta hoy: **los tutores
+legales de Séneca salen agrupados por persona**, en vez de una fila suelta por columna con los
+datos de los dos tutores mezclados. `Datos.tutoresDe(alumno)` (nueva, `js/datos.js`) lee el título
+de cada columna que ya reconocía `Datos.destacadosAlumno` (`/tutor|padre|madre|responsable|familia/`)
+y saca de ahí el número de tutor (un dígito, o "primer"/"segund" en cualquier parte del título) y
+la clase de dato (nombre, teléfonos, correos, documento, relación); una columna sin número
+reconocible no se pierde, cae en `.otros` del propio array que devuelve. `Datos.destacadosAlumno`
+se queda exactamente como estaba: la usan la pantalla de Personas y `js/asuntos-nuevo.js`, y
+tocarla se salía del encargo.
+
+Módulo nuevo `js/ficha-asunto.js` ya rondaba las 1.100 líneas, y el encargo pedía explícitamente
+no engordarlo más: toda la lógica de "Datos y contacto" (la línea y la ventana "Ver todo") vive en
+`js/ficha-tercero.js` nuevo, que se habla con la ficha solo por
+`window.FichaTercero.pintarLinea(caja, a)`, el mismo patrón que ya usaba `FichaDocumentos.pintar`.
+El resultado es que `js/ficha-asunto.js` no solo no engorda: baja, de 1.065 a 968 líneas, porque
+`pintarContacto`/`contactoPlegado`/`contactoSuelto` y el cuerpo entero de `pintarLasNotas`
+desaparecen, sustituidos por envoltorios de una línea que llaman a `js/ficha-tercero.js` y
+`js/notas.js`. Como `js/copiar.js` es privado a sus propias pantallas (nada colgado de `window`),
+`js/ficha-tercero.js` rehace en pequeño su mismo botón de copiar, sin tocar ese fichero. Tampoco
+hay botón "Escribirle" en las tarjetas de tutor: `js/correo.js` no expone ninguna función pública
+para abrir su cuadro con un destinatario ya puesto (`abrirCuadro` es privado a su propio IIFE), y
+el propio encargo preveía dejarlo fuera si eso pedía tocar ese fichero.
+
+**Las notas del asunto pasan a ser una caja de escribir directa**, al estilo del tablón: ya no hace
+falta pulsar "Añadir nota" antes de escribir. `Notas.pintarEnFicha` (`js/notas.js`) guarda sola,
+con `U.mientrasGuarda` y un retardo de un segundo desde la última tecla, nunca una escritura por
+pulsación; mientras se sigue escribiendo (aunque la ficha se repinte sola por debajo) el texto va a
+la MISMA nota, con `Notas.sustituir` y una clave de sesión (`borradorAbierto`); `App.abrirFicha`
+llama a `Notas.olvidarBorrador()` para que la próxima ficha que se abra empiece una nota nueva.
+
+**Trampa encontrada probándolo, que no estaba en el encargo**: el guardado automático cambia
+`a.ficha` por dentro sin que nadie más se entere, y eso dejaba atrasada la "huella" que decide si
+la ficha necesita repintarse de verdad (fila 34, `docs/NOTAS-DEL-ASUNTO-NO-SE-BORRAN.md`). El
+próximo repintado en segundo plano (cada pocos segundos, por `App.mirarLaCarpeta` o la vigilancia
+de presencia) se creía entonces que algo había cambiado DE VERDAD fuera de la ficha, y rehacía la
+ficha entera sin hacer falta — llevándose por delante, de paso, una nota de un hito que se
+estuviera escribiendo a la vez en otro campo. Lo cazaron `pruebas/notas-asunto-no-se-borran.mjs`
+(el escenario 4, ya existente) y, de rebote, también `pruebas/notas-no-se-borran.mjs`, una prueba
+casi idéntica que dejó otra sesión en paralelo ese mismo día para la fila 34. Se arregla pasando
+`apuntarHuella` (que `js/ficha-asunto.js` ya tenía) como cuarto argumento de `Notas.pintarEnFicha`,
+para volver a apuntar la huella justo después de cada guardado automático: así un cambio que ya se
+sabe de sobra no vuelve a disparar un repintado de más.
+
+**Al empezar esta fila, `docs/COLA.md` estaba corrupto en `origin/main`**: un commit de otra
+sesión, arreglando una tilde perdida de la fila 27 (regla 12 de la cola, comprobar el hash tras
+subir un fichero grande), subió literalmente el texto `$(cat /tmp/test-clone/docs/COLA.md)` en vez
+del contenido de verdad — la misma trampa de la regla 11 (nunca subir un texto de relleno), esta
+vez disparada al revés, intentando arreglar justo lo que esa regla avisa. Al fusionar `main` con
+esta rama se resolvió el conflicto quedándose con la versión buena de `docs/COLA.md`; en cuanto
+esta fila se fusione, `main` queda arreglado también.
+
+Prueba nueva `pruebas/ficha-tercero.mjs` (jsdom, sin navegador), con los 8 escenarios del encargo:
+`Tutor1`/`Tutor 2` y `Primer tutor`/`Segundo tutor`, una columna de familia sin número, un alumno
+sin tutores, el teléfono de un menor (el del tutor) y de un mayor (el suyo), y las etiquetas de
+matrícula (no matriculado, con su renglón de última matrícula, y solicitante, sin él). Escenario
+nuevo en `pruebas/notas-asunto-no-se-borran.mjs`: el orden de los bloques nuevo, y que la nota se
+guarda sola sin perder lo escrito. Batería completa en verde. Subido con pull request
+(fmargon780/gestor-asuntos-ies#29). Versión `App.VERSION`: `17-sep-2026 · 20:05`.
+
+---
+
 ## 17-sep-2026 — Archivar sin atascos: mensajes en castellano y carpetas movidas
 
 Fila 45 de la cola (`docs/COLA.md`, `docs/ARCHIVAR-ATASCOS.md`), escrita el mismo día pidiendo

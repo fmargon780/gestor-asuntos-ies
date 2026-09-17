@@ -936,6 +936,32 @@ vuelta: mira la carpeta él solo y pregunta de qué documento es.
   su sitio en vez de añadir otra debajo. El registro de un documento (aquí y en `js/registro.js`,
   que también se ha pasado a esto) usa `campoClave: 'registroDeDocumento'`, `valorClave` el nombre
   del documento original: registrar dos veces el mismo documento deja una sola nota, no dos.
+- **"Datos y contacto" y la caja de notas (fila 37, 17-sep-2026,
+  `docs/FICHA-DEL-ASUNTO-NUEVA.md`)**: la ficha queda izquierda Hitos y Documentos, derecha "Datos
+  y contacto" (primero), Otros asuntos, Relacionados, Datos del asunto y Notas (última);
+  `body.con-visor`/`body.con-lector`, o por debajo de 1000px, una sola columna en ese orden del
+  DOM. `Datos.tutoresDe(alumno)` (`js/datos.js`) agrupa los tutores legales de Séneca —hoy vienen
+  columna a columna y mezclados, tal como los vuelca `Datos.destacadosAlumno`— leyendo el título
+  de cada columna que case con `/tutor|padre|madre|responsable|familia/`: el número de tutor sale
+  de un dígito o de "primer"/"segund" en cualquier parte del título, y la clase de dato de la otra
+  mitad (nombre, teléfonos, correos, documento, relación; lo que no case va a `otros` de esa
+  tarjeta). Una columna de familia sin número reconocible no se pierde: cuelga de `.otros` del
+  propio array que devuelve (una propiedad más, aparte de sus índices), para "Otros datos de la
+  familia". `Datos.resumenDeTercero(persona, categoria)` monta los datos de la línea (nombre,
+  grupo o etiqueta de estado, edad, un solo teléfono etiquetado y documento); para un alumno menor
+  el teléfono es el del primer tutor ("Tutor legal 1", mismo texto que ya usa `js/lo-pide.js`
+  mientras Séneca no dé el parentesco de verdad), para un mayor de edad o para personal/empresas es
+  el propio. El aviso de DNI que falta lo sigue decidiendo `js/dni.js`, sin duplicar esa cuenta.
+  Todo esto se pinta desde `js/ficha-tercero.js` (`window.FichaTercero.pintarLinea(caja, a)`), que
+  no toca `js/copiar.js` (es privado a sus propias pantallas) y rehace en pequeño su mismo botón de
+  copiar. La caja de notas (`Notas.pintarEnFicha`, `js/notas.js`) ya no tiene botón "Añadir nota":
+  se escribe encima y se guarda sola, con `U.mientrasGuarda` y un retardo de un segundo desde la
+  última tecla (`sustituirNota` con una clave de sesión, `borradorAbierto`, para seguir metiendo
+  texto en la MISMA nota mientras la ficha se repinta sola por debajo; `App.abrirFicha` llama a
+  `Notas.olvidarBorrador()` para que la próxima ficha que se abra empiece una nota nueva). No hay
+  botón "Escribirle" en las tarjetas de tutor: `js/correo.js` no expone ninguna función pública
+  para abrir su cuadro con un destinatario puesto (su `abrirCuadro` es privado a su propio IIFE), y
+  tocar ese fichero se salía de esta fila.
 - **La ficha, mientras se resuelve**: `sel.onchange`/`noEs.onclick` usan `U.mientrasGuarda` (apaga
   el control mientras dura) y repintan documentos, notas y el propio aviso al terminar.
 
@@ -1583,7 +1609,7 @@ de `App` va después del fichero que lo define.
 | `js/nombres.js` | Monta los nombres de carpetas y documentos |
 | `js/plazos.js` | La fecha límite de los asuntos |
 | `js/guias.js` | Pintar y escribir una guía, con sus preguntas y opciones |
-| `js/datos.js` | Lee los CSV; el nombre comercial y las columnas leídas por su título |
+| `js/datos.js` | Lee los CSV; el nombre comercial y las columnas leídas por su título; `Datos.tutoresDe` agrupa los tutores legales por persona y `Datos.resumenDeTercero` monta la línea "Datos y contacto" |
 | `js/campos.js` | Los campos de cada tipo de asunto: catálogo, cálculo y guardado |
 | `css/campos.css` | Los estilos del bloque "Datos del asunto" y del cuadro de Campos |
 | `js/documentos.js` | Nombra los documentos, con el texto adicional y los tipos sin duplicados |
@@ -1607,7 +1633,7 @@ de `App` va después del fichero que lo define.
 | `js/hitos.js`, `js/hitos-archivo.js` | El modelo de los hitos de un asunto: leer/escribir `hitos.json`, crearlos desde la guía, marcarlos, bifurcaciones, responsables y el historial al archivar |
 | `js/que-me-toca.js` | Pantalla propia "Qué me toca": cruza los hitos pendientes y en curso de todos los asuntos abiertos, en tres bloques (`css/que-me-toca.css`) |
 | `js/presencia.js` | No pisarse en un mismo asunto: la señal de `_GESTOR/presencia.json`, la vigilancia y la marca de la tarjeta de la lista |
-| `js/notas.js` | Las notas de cada asunto, con su enlace y su botón |
+| `js/notas.js` | Las notas de cada asunto, con su enlace y su botón; `Notas.pintarEnFicha` es la caja de escribir directa de la ficha, con guardado automático (fila 37) |
 | `js/registro.js` | Registrar un documento en un paso, sin nombrarlo dos veces |
 | `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF (hasta 10 páginas) |
 | `js/registro-sellado.js` | Ver solo un PDF ya sellado en la carpeta del asunto, y colocarlo sin duplicarlo |
@@ -1615,8 +1641,9 @@ de `App` va después del fichero que lo define.
 | `js/pdf-separar-unir.js` | El cuadro de Separar, Unir y Sacar páginas: miniaturas con pdf.js, tijeras, casillas |
 | `js/verificacion.js` | El código de verificación del pie de un documento, y su dirección |
 | `js/lib/pdf.min.js`, `js/lib/pdf.worker.min.js` | pdf.js (Mozilla) 3.11.174, copiado tal cual |
-| `js/ficha-asunto.js` | La pantalla de un asunto: cabecera, acciones, notas, contacto y el enlace de escribir/cambiar la guía |
+| `js/ficha-asunto.js` | La pantalla de un asunto: cabecera, acciones, el bloque de hitos y documentos a la izquierda, "Datos y contacto"/otros asuntos/relacionados/notas a la derecha |
 | `js/ficha-documentos.js` | Los documentos de la carpeta, en la ficha del asunto (separado de `js/ficha-asunto.js` en la fila 26) |
+| `js/ficha-tercero.js`, `css/ficha-tercero.css` | "Datos y contacto" del tercero: la línea resumen y la ventana "Ver todo" con los tutores agrupados por persona (separado de `js/ficha-asunto.js` en la fila 37) |
 | `js/hitos-panel.js` | Pinta los hitos en la ficha del asunto (los pasos de la guía SON los hitos): el observador, el repintado y la creación automática |
 | `js/hitos-panel-lista.js` | La otra mitad del panel de hitos: la fila de cada hito, su cuerpo desplegado y el cambio de rama |
 | `js/duplicados.js` | ¿Esto no lo hicimos ya? Asuntos iguales del mismo tercero |

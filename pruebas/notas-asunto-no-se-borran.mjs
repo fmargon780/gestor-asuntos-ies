@@ -32,6 +32,10 @@ async function comprobar(titulo, promesa, esperado) {
   if (!ok) { fallos++; console.log('FALLA  ' + titulo + '\n   sale: ' + JSON.stringify(real) + '\n   debía: ' + JSON.stringify(esperado)); }
   else console.log('bien   ' + titulo);
 }
+function comprobarQue(titulo, condicion, detalle) {
+  if (!condicion) { fallos++; console.log('FALLA  ' + titulo + (detalle ? '\n   ' + detalle : '')); }
+  else console.log('bien   ' + titulo);
+}
 
 const NOMBRE_ASUNTO = '260911 COMPRA Proveedor de Prueba SL 12345678A';
 
@@ -171,6 +175,48 @@ await comprobar('6. y el foco y el cursor también',
     const c = document.getElementById('ficha-nota-texto');
     return [document.activeElement === c, c.selectionStart, c.selectionEnd];
   }), [true, 11, 11]);
+
+console.log('--- 7. la ficha nueva (fila 37, 17-sep-2026): orden de bloques y nota sin botón ---');
+/* docs/FICHA-DEL-ASUNTO-NUEVA.md, 1: izquierda Hitos y Documentos;
+   derecha Datos y contacto (la primera), Otros asuntos y Notas (la
+   última). */
+await comprobar('7. a la izquierda, primero Hitos y después Documentos',
+  pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-izquierda .ficha-titulo')).map((h) => {
+    /* El título de "Documentos" lleva pegada la cuenta de documentos
+       (`.ficha-cuenta`), dentro del mismo <h3>: se quita antes de leer
+       el texto, que si no sale "Documentos de la carpeta2". */
+    const cuenta = h.querySelector('.ficha-cuenta');
+    return (cuenta ? h.textContent.slice(0, -cuenta.textContent.length) : h.textContent).trim();
+  })),
+  ['Hitos', 'Documentos de la carpeta']);
+
+await comprobar('7. a la derecha, "Datos y contacto" es el primer bloque',
+  pagina.evaluate(() => {
+    const primero = document.querySelector('.ficha-derecha > *');
+    return primero && primero.id;
+  }), 'ficha-contacto-caja');
+
+await comprobar('7. y "Notas" es el último, después de "Otros asuntos"',
+  pagina.evaluate(() => {
+    const titulos = Array.from(document.querySelectorAll('.ficha-derecha .ficha-titulo')).map((h) => h.textContent);
+    return [titulos.indexOf('Otros asuntos de este tercero') < titulos.indexOf('Notas'),
+            titulos[titulos.length - 1]];
+  }), [true, 'Notas']);
+
+console.log('--- 8. la nota se guarda sola, sin "Añadir nota" ---');
+comprobarQue('8. ya no hay botón "Añadir nota"',
+  await pagina.evaluate(() => !document.getElementById('ficha-nota-anadir')));
+
+await pagina.fill('#ficha-nota-texto', 'Autoguardado sin pulsar nada');
+await comprobar('8. antes del segundo de espera, todavía no está en la lista',
+  pagina.evaluate(() => document.getElementById('ficha-notas-lista').textContent.indexOf('Autoguardado sin pulsar nada') !== -1),
+  false);
+await pagina.waitForTimeout(1400);
+await comprobar('8. pasado el segundo de espera, la nota ya está guardada y en la lista',
+  pagina.evaluate(() => document.getElementById('ficha-notas-lista').textContent.indexOf('Autoguardado sin pulsar nada') !== -1),
+  true);
+await comprobar('8. lo escrito sigue en la caja (no se limpia sola)',
+  pagina.inputValue('#ficha-nota-texto'), 'Autoguardado sin pulsar nada');
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
