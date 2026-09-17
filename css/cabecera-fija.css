@@ -1,0 +1,118 @@
+/* ============================================================
+   cabecera-fija.css — el aspecto de la cabecera que se queda pegada
+   arriba y se encoge al bajar (docs/CABECERA-QUE-SE-QUEDA.md).
+
+   El que se desplaza es la ventana, no ningún contenedor con overflow
+   (.lateral está fija, .contenido va en el flujo normal), así que
+   basta con position: sticky. El ancho lo sigue dando .contenido de
+   verdad —con el tablón, con con-visor o con-lector—, porque un
+   elemento en flujo normal, aunque sea sticky, mide como su padre.
+
+   Por eso los márgenes negativos son a mano (margin-left/right, no el
+   shorthand "margin"): un margin-bottom lo pone ya cada pantalla
+   (.cabecera en css/estilos.css, .ficha-cabecera en
+   css/ficha-asunto.css) y aquí no hay que tocarlo.
+
+   z-index 20: por debajo de los cuadros de diálogo (.capa, 50) y de
+   los mensajes (.mensajes, 60), que tienen que seguir viéndose por
+   encima siempre. ============================================================ */
+
+header.cabecera,
+header.ficha-cabecera {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--fondo);
+  margin-left: -32px;
+  margin-right: -32px;
+  padding-left: 32px;
+  padding-right: 32px;
+  transition: box-shadow .15s ease, padding .15s ease;
+}
+
+header.cabecera.encogida,
+header.ficha-cabecera.encogida {
+  box-shadow: 0 2px 8px rgba(10, 25, 45, .12);
+}
+
+/* El título se encoge (21px es el tamaño de siempre, css/estilos.css);
+   la transición es lo que hace que el cambio se note suave y no de
+   golpe, aunque el hueco que reserva la cabecera cambie con él. */
+header.cabecera h2 {
+  transition: font-size .15s ease;
+}
+header.cabecera.encogida h2 {
+  font-size: 17px;
+}
+
+/* Lo que desaparece al encogerse: los filtros desplegados (viven
+   dentro de la propia cabecera en Asuntos abiertos) y el párrafo de
+   explicación que viene justo debajo, cuando lo hay. */
+header.cabecera.encogida .filtros {
+  display: none;
+}
+header.cabecera.encogida + .explica {
+  display: none;
+}
+
+/* Sin padding vertical propio, ni en reposo ni encogida: añadir
+   padding aquí solo agrandaría la cabecera en vez de encogerla (el
+   hueco de arriba ya lo da .contenido). Lo que de verdad reduce el
+   alto es el margen de abajo, mucho más pequeño mientras está pegada
+   y encogida —16px o 32px de siempre, css/estilos.css y
+   css/ficha-asunto.css— y, en Asuntos abiertos y Archivo, esconder
+   los filtros y el párrafo de explicación de arriba. */
+header.cabecera.encogida,
+header.ficha-cabecera.encogida {
+  margin-bottom: 6px;
+}
+
+/* ---------- "Por clasificar": Viendo <documento> + Ir a su fila ----------
+
+   El bloque lo crea js/cabecera-fija.js (mirando la tarjeta marcada
+   .tarjeta-abierta); aquí solo se decide cuándo se ve: nunca con la
+   cabecera desplegada (ya está la tarjeta marcada en la lista de
+   abajo), solo cuando está encogida. */
+.cabecera-viendo {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--tinta-suave);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+}
+header.cabecera.encogida .cabecera-viendo {
+  display: flex;
+}
+.cabecera-viendo-nombre {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cabecera-viendo-ir {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  font-size: 12.5px;
+}
+
+/* A qué tarjeta se salta: que la cabecera pegada no la tape justo al
+   llegar (docs/CABECERA-QUE-SE-QUEDA.md, 3). */
+.tarjeta {
+  scroll-margin-top: 90px;
+}
+
+@media (max-width: 900px) {
+  header.cabecera,
+  header.ficha-cabecera {
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .cabecera-viendo {
+    max-width: 160px;
+  }
+}
