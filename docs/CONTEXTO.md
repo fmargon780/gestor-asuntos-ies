@@ -288,6 +288,56 @@ cruza por la clave del asunto.
 
 Se comprueba con `pruebas/que-me-toca.mjs`.
 
+### No pisarse en un mismo asunto
+
+(17-sep-2026, fila 24). La aplicación la usan dos personas sobre la misma carpeta de Dropbox.
+Nunca se deja a nadie fuera de un asunto: lo que cambia es que, si el otro ya está dentro, se
+entra en **modo consulta** (se ve todo, no se toca nada), con un aviso arriba y un botón "Tomar
+el mando" que siempre está ahí.
+
+- **`js/presencia.js`** (`window.Presencia`) es el modelo y la vigilancia. Vive en
+  `_GESTOR/presencia.json`: `{ <clave del asunto>: { usuario, ultima } }`. Se escribe y relee
+  **directo con `Carpetas`, nunca con `Copias.guardar`**: es un fichero fuera de los doce
+  protegidos, a propósito (ver "Lo que la aplicación guarda en `_GESTOR`"), porque se escribe muy
+  a menudo y es un dato que caduca solo (3 minutos sin renovarse).
+  - `vigilar(clave, onCambio)`: comprueba si `clave` está libre; si lo está, anuncia la propia
+    señal y la renueva cada 30 segundos; si no, se queda en modo consulta y relee cada 10
+    segundos, por si el otro sale. Un único `setInterval` hace las dos cosas (relee siempre;
+    renueva solo si ya han pasado los 30 segundos, o si acaba de dejar de estar libre): así se
+    cumplen los dos plazos del encargo sin dos temporizadores por ficha.
+  - `dejarDeVigilar()` quita la propia señal **solo si se tenía el mando** (nunca la de otro).
+  - `tomarElMando(clave)` pisa la señal del que estuviera antes.
+  - `ocupantePor(clave)` es una lectura sin await, contra una copia en memoria
+    (`refrescarCache()`) que se refresca sola cada 10 segundos, enganchada a
+    `App.vigilarLaCarpeta` (así no ha hecho falta tocar `js/nucleo.js` para arrancarla): la usa la
+    marca de la tarjeta de la lista.
+- **`js/ficha-asunto.js`** pinta el aviso (`#ficha-presencia`, reutilizando `.aviso.aviso-ambar`
+  de siempre) y apaga los controles. **Apagar no es "un botón más que tocar"**: se recorre
+  `#ficha-asunto-cuerpo` entero (`button, select, input, textarea`) y se apaga todo menos una
+  lista blanca de solo lectura (volver, abrir un documento, copiar un nombre, desplegar un hito,
+  el propio "Tomar el mando"). Así ni `js/hitos-panel-lista.js`, ni `js/correo.js`, ni
+  `js/plantillas-documento.js`, ni `js/relacionados.js` han tenido que tocarse para esto.
+  - **La mitad de la ficha se pinta sola, después de `pintar()`** (la guía, los documentos, los
+    hitos por su cuenta con su propio observador, "Generar documento" y "Correo" con un pequeño
+    retraso): aplicar el modo consulta una sola vez al final de `pintar()` se comería todo lo que
+    sale después. Por eso hay un `MutationObserver` propio sobre `#ficha-asunto-cuerpo` (mismo
+    patrón y mismo aviso de la sección de abajo), creado una sola vez (el contenedor no se
+    destruye entre una ficha y otra) y con el mismo retraso de 30&nbsp;ms que usa
+    `js/hitos-panel.js`.
+  - Solo se vigila la presencia en un asunto **abierto**: en el ARCHIVO no hay nada que tramitar.
+- **`js/asuntos-lista.js`** no se toca por dentro: `js/presencia.js` envuelve `App.tarjetaAsunto`
+  (mismo patrón que `js/puente.js`, `js/copiar.js` y el propio `js/ficha-asunto.js`) y le cuelga
+  `.marca-presencia` (una letra, con el nombre completo en el `title`) delante del nombre.
+- **`js/copias.js`, `js/papelera.js` y `js/conflictos.js` no se han tocado**: los tres trabajan
+  solo con los ficheros que tienen apuntados en su propia lista, y `presencia.json` nunca entra en
+  ninguna. Si dos ordenadores escriben casi a la vez, Dropbox deja aparte una copia en conflicto
+  como con cualquier otro fichero, pero nadie la mira ni se fusiona: la próxima señal (como mucho,
+  30 segundos después) la deja atrás sola.
+- Descartado, por ahora: una base de datos pequeña en internet para que el aviso fuera
+  instantáneo (ver `docs/COLA.md`, "Lo que vendrá después").
+
+Se comprueba con `pruebas/presencia.mjs`.
+
 ### La pantalla se mide a sí misma
 
 `css/vista.css` pone `container-type: inline-size` en `.contenido`: las reglas miran el ancho
@@ -953,6 +1003,7 @@ de `App` va después del fichero que lo define.
 | `js/guias-enganche.js` | Las guías dentro de la app, y `window.GuiasDelCentro` |
 | `js/hitos.js`, `js/hitos-archivo.js` | El modelo de los hitos de un asunto: leer/escribir `hitos.json`, crearlos desde la guía, marcarlos, bifurcaciones, responsables y el historial al archivar |
 | `js/que-me-toca.js` | Pantalla propia "Qué me toca": cruza los hitos pendientes y en curso de todos los asuntos abiertos, en tres bloques (`css/que-me-toca.css`) |
+| `js/presencia.js` | No pisarse en un mismo asunto: la señal de `_GESTOR/presencia.json`, la vigilancia y la marca de la tarjeta de la lista |
 | `js/notas.js` | Las notas de cada asunto, con su enlace y su botón |
 | `js/registro.js` | Registrar un documento en un paso, sin nombrarlo dos veces |
 | `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF |
@@ -1060,6 +1111,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `datos/*.csv` | Alumnado (Séneca), personal, empresas y otros |
 | `PAPELERA/` | Las carpetas y ficheros borrados, cada uno en su subcarpeta `AAMMDD-HHMM <nombre>` |
 | `PLANTILLAS/` | Los `.docx` que Francisco sube a mano, colgados de un tipo desde Ajustes › Plantillas de documento. No lleva copia de seguridad: no es uno de los doce ficheros compartidos |
+| `presencia.json` | `{ <clave del asunto>: { usuario, ultima } }`: quién tiene abierta la ficha de cada asunto, y desde cuándo. **A propósito, fuera de los doce**: no pasa por `Copias.guardar` (nada de copia de seguridad), no entra en `Papelera` ni en `Conflictos` (si dos versiones chocan, se quedan las dos entradas y punto). Se escribe y relee directo con `Carpetas` (ver "No pisarse en un mismo asunto") |
 | `copias/*.json` | Copias de seguridad de los doce ficheros de arriba, una por día, 30 como mucho de cada uno |
 
 **Los CSV van en `datos`, no en `_GESTOR`.** `js/rescate-datos.js` los baja solos al entrar.

@@ -95,6 +95,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   responsable, notas y documentos), con bifurcaciones y un historial al archivar.
 - "Qué me toca": pantalla que cruza los hitos pendientes de todos los asuntos abiertos, en tres
   bloques (en tu tejado, esperando a otros, sin fecha), con filtro por responsable.
+- No pisarse en un asunto: si el compañero ya está dentro, se entra en modo consulta (aviso y
+  "Tomar el mando"), con marca en la lista. Señal en `_GESTOR/presencia.json`, caduca a los 3 min.
 
 ## 6. Reglas de código que no se pueden olvidar
 

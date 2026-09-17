@@ -28,6 +28,17 @@
 }
 .ficha-izquierda, .ficha-derecha { display: flex; flex-direction: column; gap: 16px; }
 
+/* No pisarse en un mismo asunto (17-sep-2026, fila 24): el aviso de
+   que el compañero ya está dentro, con "Tomar el mando" a la derecha.
+   Los controles que apaga aplicarModoConsulta (js/ficha-asunto.js) ya
+   se ven apagados con el estilo de siempre de un botón deshabilitado:
+   no hace falta nada más aquí para eso. */
+.aviso-presencia {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+.boton-presencia-tomar { flex: 0 0 auto; }
+
 .ficha-bloque {
   background: var(--papel); border: 1px solid var(--linea);
   border-radius: var(--radio); padding: 16px 18px; box-shadow: var(--sombra);
