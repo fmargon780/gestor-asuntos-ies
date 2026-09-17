@@ -103,6 +103,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   pdf-lib, `js/lib/pdf-lib.min.js`); miniaturas con pdf.js, tijeras entre páginas para Separar.
 - "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha (opcional), con el correo ya puesto al preparar el cuadro de Correo.
 - Archivar o reabrir cuando el destino ya existe (de un intento a medias) fusiona las dos carpetas, sin perder nada.
+- Guardar un documento en un asunto se queda en su ficha (y la refresca sola); solo Editar, Archivar/Reabrir y Borrar vuelven a la lista.
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -148,8 +149,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ver con el uso: ancho del panel lateral y del tablón, y si las tarjetas por tipo se quedan cortas.
 - Si el DNI no sale de nadie, marcar la columna del documento al generar el RegAlum.
 - Cuando el uso lo pida: búsqueda en notas, cuentas por tipo para la memoria de fin de curso,
-  qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta
-  del centro para el relevo.
+  qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta del centro.
 - Los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no
   se fusionan entre ordenadores (solo las altas); revisar si con el uso hace falta algo más fino.
 

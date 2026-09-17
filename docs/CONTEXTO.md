@@ -124,6 +124,30 @@ tercero.
 (`BOTONES_DE_LA_TARJETA`). **Ojo con esto**: un módulo que añada un botón a la tarjeta con
 `window.Gestor.botonesDeTarjeta` **no se verá** si su texto no está en esa lista.
 
+**Guardar un documento nunca echa de la ficha a la lista** (fila 30, 17-sep-2026,
+`docs/QUEDARSE-EN-EL-ASUNTO.md`). `App.verAbiertos` (`js/asuntos-lista.js`) relee la carpeta
+entera y crea asuntos nuevos cada vez que se llama, y se llama sola —`App.mirarLaCarpeta`, cada
+`App.SEGUNDOS_ENTRE_MIRADAS`— sin que la ficha lo sepa: sin este arreglo, el asunto que tenía la
+ficha en la mano se quedaba con un objeto viejo, y la lista de documentos no se refrescaba sola.
+`js/ficha-asunto.js` envuelve `App.verAbiertos` (mismo patrón que las demás envolturas de este
+fichero) para, cada vez que se llama, reenganchar sola el asunto que tenga la ficha abierta —por
+su nombre, en la lista fresca— y repintarla en su sitio, con dos funciones públicas:
+
+- `App.fichaAbierta()` — el nombre del asunto que se ve de verdad en pantalla (comprueba que
+  `#pantalla-asunto` no esté oculta, no solo que `actual` siga puesto: si se ha cambiado de
+  pestaña sin pulsar "Volver", `actual` se queda con el asunto pero ya no hay ficha que reenganchar).
+- `App.reengancharFicha()` — la reenganche de verdad: si el asunto sigue en `App.E.listaAbiertos`,
+  lo vuelve a coger de ahí y repinta; si ya no está (se ha archivado o borrado desde el otro
+  ordenador), entonces sí vuelve a la lista, con un aviso de una línea. Solo actúa con la ficha de
+  verdad visible y con un asunto **abierto**: el ARCHIVO no lo vigila `App.mirarLaCarpeta`.
+
+Con esto, `App.verAbiertos` sirve para todas las formas de guardar un documento dentro de un
+asunto (registrar, nombrar, sello de Séneca, generar desde plantilla, separar/unir/sacar páginas,
+meter un suelto o un correo) sin que ninguna tenga que saber de la ficha: **Editar**,
+**Archivar/Reabrir** y **Borrar** siguen siendo los únicos que de verdad vuelven a la lista,
+llamando a `volverALaLista()` como hasta ahora. Se comprueba con
+`pruebas/quedarse-en-el-asunto.mjs`.
+
 ### Las tarjetas por tipo de asunto
 
 Dentro de "En el departamento" y de "A la espera de terceros", encima de la lista, sale una fila

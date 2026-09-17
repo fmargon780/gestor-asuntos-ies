@@ -5,6 +5,33 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — Quedarse en el asunto tras guardar un documento
+
+Fila 30 de la cola (`docs/COLA.md`, `docs/QUEDARSE-EN-EL-ASUNTO.md`): "Tras guardar un documento
+en un asunto, la aplicación nos expulsa fuera del asunto, a la lista de asuntos abiertos", con
+palabras de Francisco. La causa no estaba en ninguna de las siete acciones que guardan un
+documento (todas ya se quedaban en su sitio y refrescaban su propio trozo de la ficha), sino en
+que `App.verAbiertos` relee la carpeta entera y crea asuntos nuevos cada vez que se llama —y se
+llama sola, desde `App.mirarLaCarpeta`, cada `App.SEGUNDOS_ENTRE_MIRADAS`—: el asunto que tenía la
+ficha en la mano se quedaba con un objeto viejo, y su lista de documentos no se enteraba de lo que
+había llegado por el barrido automático (comprobado en vivo con un navegador de verdad: sin el
+arreglo, un documento guardado mientras la ficha estaba abierta no aparecía en `#ficha-documentos`
+hasta salir y volver a entrar).
+
+`js/ficha-asunto.js` envuelve `App.verAbiertos` (mismo patrón que sus demás envolturas) para que
+cualquier llamada —el barrido automático, el botón "Recargar", añadir un tipo que faltaba, meter
+un suelto o un correo en un asunto— reenganche sola el asunto de la ficha abierta, por su nombre,
+y la repinte en su sitio, con dos funciones públicas nuevas: `App.fichaAbierta()` (el nombre del
+asunto que se ve de verdad, comprobando el DOM, no solo una variable que se queda puesta al
+cambiar de pestaña sin pulsar "Volver") y `App.reengancharFicha()` (la reenganche, o vuelve a la
+lista con un aviso si el asunto ya no está en absoluto). `anadirTipo` (que ya hacía este apaño a
+mano) pasa a apoyarse en el mismo mecanismo, sin repetirlo. **Editar**, **Archivar/Reabrir** y
+**Borrar** siguen siendo los únicos que de verdad vuelven a la lista.
+
+Prueba nueva `pruebas/quedarse-en-el-asunto.mjs`, en navegador de verdad, con los cuatro
+escenarios del encargo (comprobado que falla sin el arreglo: sin `App.fichaAbierta`, y sin que el
+documento nuevo apareciera en la ficha). Batería completa en verde.
+
 ## 17-sep-2026 — Archivar cuando la carpeta ya existe en el destino
 
 Fila 32 de la cola (`docs/COLA.md`, `docs/ARCHIVAR-CARPETA-YA-EXISTE.md`), la primera de la lista
