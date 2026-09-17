@@ -711,10 +711,19 @@ Toda la lógica vive en el módulo nuevo `js/lo-pide.js` (`window.LoPide`), para
 `js/asuntos-nuevo.js`, `js/ficha-asunto.js` ni `js/correo.js`:
 
 - `LoPide.opciones(persona)`: los candidatos, siempre "El propio interesado" y "Otra persona…",
-  más "Tutor legal 1/2" (solo alumnado, y solo si Séneca trae su nombre), con los datos de cada
-  uno (`nombre`, `correo`, `telefono`) ya resueltos.
+  más "Tutor legal 1/2" (solo alumnado, y solo si Séneca trae su nombre, su teléfono o su correo;
+  sin nombre pero con alguno de los otros dos, la opción sale igual, a secas: "Tutor legal 1").
+  con los datos de cada uno (`nombre`, `correo`, `telefono`) ya resueltos.
 - `LoPide.datosDeTutor(campos, numero)`: sacada de `js/plantillas.js` (que ahora la llama en vez
-  de tener su propia copia), porque `LoPide.opciones` también la necesita.
+  de tener su propia copia), porque `LoPide.opciones` también la necesita. **El nombre, no un
+  número** (17-sep-2026, fila 38, `docs/LO-PIDE-NOMBRE-DEL-TUTOR.md`): antes se quedaba con la
+  primera columna del tutor que no fuera teléfono ni correo, y esa solía ser su documento.
+  `nombreDeTutor` descarta también documento/DNI/NIF/NIE/pasaporte, identificación, número/código,
+  parentesco/relación/sexo, fecha/nacimiento y domicilio/dirección/localidad/etc.; de lo que
+  queda, prefiere apellidos + nombre (`Apellidos, Nombre`, una sola coma; si apellidos ya trae
+  coma, se deja tal cual), luego solo uno de los dos, y si no hay ninguno, la primera columna que
+  quede, como antes. Red de seguridad: el valor tiene que traer alguna letra (`\p{L}`), o el
+  nombre se deja vacío — nunca vuelve a salir un número haciéndose pasar por una persona.
 - `LoPide.controles(caja, persona, valorInicial)`: pinta el desplegable, los campos de "Otra
   persona…" (solo visibles con esa opción), la vía y la fecha, **con clases, nunca con id**: este
   mismo módulo se monta a la vez dentro de `#bloque-detalles` de "Nuevo asunto" (que queda en el

@@ -223,5 +223,70 @@ comprobarQue('el módulo LoPide existe (si esto falla, falta js/lo-pide.js)', ty
   comprobar('7. LoPide.correoDe ya no enseña nada', LoPide.correoDe(despues), '');
 }
 
+/* ============================================================
+   8. El nombre del tutor, no un número (17-sep-2026, fila 38,
+   docs/LO-PIDE-NOMBRE-DEL-TUTOR.md): con documento, teléfono y correo
+   del tutor 1 a la vez, la columna del nombre gana, no la del número.
+   ============================================================ */
+{
+  const conDocumento = {
+    campos: {
+      'Nº identificación tutor 1': '12345678', 'Nombre tutor 1': 'María López Ruiz',
+      'Teléfono tutor 1': '600111222', 'Correo tutor 1': 'm@x.es'
+    }
+  };
+  comprobar('8. el nombre gana al número de identificación',
+    LoPide.datosDeTutor(conDocumento.campos, 1).nombre, 'María López Ruiz');
+}
+
+/* ---------- 8b. Apellidos y nombre en columnas distintas ---------- */
+{
+  const separado = { campos: { 'Apellidos tutor 1': 'López Ruiz', 'Nombre tutor 1': 'María' } };
+  comprobar('8b. apellidos y nombre se juntan con una coma',
+    LoPide.datosDeTutor(separado.campos, 1).nombre, 'López Ruiz, María');
+}
+
+/* ---------- 8c. Solo la columna del número: nombre vacío ---------- */
+{
+  const soloNumero = { campos: { 'DNI tutor 1': '12345678A' } };
+  comprobar('8c. solo el número, nombre vacío',
+    LoPide.datosDeTutor(soloNumero.campos, 1).nombre, '');
+}
+
+/* ---------- 8d. Ninguna columna del tutor 2: los tres campos vacíos, y la opción no aparece ---------- */
+{
+  const soloTutor1 = {
+    nombre: 'Ruiz Soto, Iker', categoria: 'ALUMNADO',
+    campos: { 'Nombre tutor 1': 'Ana Ruiz' }
+  };
+  const t2 = LoPide.datosDeTutor(soloTutor1.campos, 2);
+  comprobar('8d. sin columnas del tutor 2, los tres campos vacíos',
+    t2, { nombre: '', telefono: '', correo: '' });
+  comprobarQue('8d. la opción "Tutor legal 2" no aparece',
+    !LoPide.opciones(soloTutor1).some((o) => o.valor === 'tutor2'));
+}
+
+/* ---------- 8e. {tutor1} de js/plantillas.js sigue funcionando y ahora trae el nombre ---------- */
+{
+  comprobar('8e. plantillas: {tutor1} usa datosDeTutor, con el nombre',
+    LoPide.datosDeTutor({ 'Tutor 1 - Nombre': 'Carlos Vidal', 'Tutor 1 - DNI': '11112222B' }, 1).nombre,
+    'Carlos Vidal');
+}
+
+/* ---------- 8f. sin nombre pero con teléfono: la opción se ofrece igual, a secas ---------- */
+{
+  const soloTelefono = {
+    nombre: 'Soto Cano, Nora', categoria: 'ALUMNADO',
+    campos: { 'DNI tutor 1': '12345678A', 'Teléfono tutor 1': '600999888' }
+  };
+  const opcionesSoloTelefono = LoPide.opciones(soloTelefono);
+  const tutor1SinNombre = opcionesSoloTelefono.filter((o) => o.valor === 'tutor1')[0];
+  comprobarQue('8f. la opción se ofrece aunque no haya nombre', !!tutor1SinNombre);
+  comprobar('8f. el texto es "Tutor legal 1" a secas', tutor1SinNombre && tutor1SinNombre.texto, 'Tutor legal 1');
+  comprobar('8f. el teléfono se guarda igual', tutor1SinNombre && tutor1SinNombre.datos.telefono, '600999888');
+  comprobar('8f. la relación se queda vacía', tutor1SinNombre && tutor1SinNombre.datos.relacion, '');
+  comprobar('8f. el nombre guardado es "Tutor legal 1"', tutor1SinNombre && tutor1SinNombre.datos.nombre, 'Tutor legal 1');
+}
+
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 process.exit(fallos ? 1 : 0);
