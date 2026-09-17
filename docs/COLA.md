@@ -35,6 +35,14 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     contenido entero delante, no lo subas: bájalo antes. El 17-sep-2026 `docs/CONTEXTO.md` se
     quedó en `main` con la palabra `PLACEHOLDER_WILL_REPLACE` y nada más, y hubo que recuperarlo
     del historial de git. Después de subir, vuelve a bajar lo subido y compruébalo.
+12. **Algunas sesiones no pueden subir un fichero de más de unos 45-50 KB de una sola vez**:
+    la llamada que sube el contenido se corta sola sin avisar de ningún error, y el fichero queda
+    en `main` con solo el primer trozo. Pasó el 17-sep-2026 con `docs/HISTORIA.md` (ver la nota al
+    final de esta cola). **Antes de subir un fichero grande** (`docs/CONTEXTO.md`,
+    `docs/HISTORIA.md`), compruébalo después de subirlo (`get_file_contents` o
+    `git show origin/main:<ruta>`) y compara el tamaño con el de antes de escribirlo: si ha
+    quedado más corto de lo esperado, esa sesión no puede con este fichero de una vez, y hay que
+    dejarlo apuntado aquí en vez de reintentarlo mil veces.
 
 ## Reglas para Francisco
 
@@ -117,6 +125,20 @@ pisado sin querer el arreglo de otra (la fila 35 volvió a `PENDIENTE`, y esta m
 su versión rota, más de una vez) al subir el fichero entero sin haber vuelto a bajar `main`
 justo antes. Si esto se repite, hace falta que Francisco lance las sesiones de una en una, no en
 paralelo, mientras la cola esté tan activa.
+
+## Arreglado: `docs/HISTORIA.md` (se quedó a medias el 17-sep-2026 por la tarde)
+
+Una sesión que intentaba añadirle a `docs/HISTORIA.md` una entrada de la fila 33 no pudo escribir
+de una sola vez un fichero de más de unos 45-50 KB (regla 12 de esta cola): la llamada que sube el
+contenido se corta sola, sin ningún error, y deja el fichero con solo el primer trozo. Pasó dos
+veces seguidas: la primera dejó el fichero en 44 KB, la segunda en 48.766 bytes, muy lejos de sus
+138.402 bytes de verdad (658 líneas en vez de las que le tocaban).
+
+Se ha arreglado restaurando la versión completa que ya traía esta rama (con las entradas de las
+filas 33, 34 y 35 incluidas: al contrario de lo que decía una nota anterior aquí, sí merecía la
+pena contarlas, y ya estaban escritas desde antes de este percance). Comprobado con `wc -l`
+después de fusionar: 2.073 líneas, sin quedarse corto. `docs/CONTEXTO.md` no se vio afectado por
+este percance concreto: sigue entero, como dice la nota de arriba.
 
 ## Lo que vendrá después
 
