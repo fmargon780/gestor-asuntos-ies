@@ -178,21 +178,77 @@
     repintando = true;
     if (observador) observador.disconnect();
     try {
-      var nota = $('ficha-guia-nota');
-      if (nota && nota.parentNode === caja) nota.remove();
-      caja.innerHTML = '';
-      if (!errorLectura && hitos.length) {
-        caja.className = 'hitos-panel';
-        caja.appendChild(HitosPanelLista.bloqueDeHitos(a, hitos, datos.ajustes, abierto, nombresDeLaCarpeta));
-        aplicarDesplegarPendiente(caja, clave);
-      } else {
-        pintarVacio(caja, a, abierto, errorLectura);
-      }
-      if (nota) caja.appendChild(nota);
+      /* Todo el repintado va dentro de U.conservandoLoEscrito
+         (17-sep-2026, fila 34): la nota a medio escribir de un hito, el
+         foco y el cursor tienen que sobrevivir a un repaso automático
+         de la carpeta. Los campos del cuerpo de un hito no pueden
+         llevar id (hay uno por hito), así que la clave se la pone
+         `claveDeCampoDeHito`, aquí abajo.
+
+         Va DENTRO del try, con el observador desconectado: devolverle
+         el valor a un campo no puede disparar otro repintado (fila
+         31). Y el hito donde hubiera algo a medias se vuelve a
+         desplegar antes de devolver el foco: si no, el foco iría a
+         parar a un campo escondido. */
+      U.conservandoLoEscrito(caja, function () {
+        var desplegados = hitosAMedias(caja);
+        var nota = $('ficha-guia-nota');
+        if (nota && nota.parentNode === caja) nota.remove();
+        caja.innerHTML = '';
+        if (!errorLectura && hitos.length) {
+          caja.className = 'hitos-panel';
+          caja.appendChild(HitosPanelLista.bloqueDeHitos(a, hitos, datos.ajustes, abierto, nombresDeLaCarpeta));
+          volverADesplegar(caja, desplegados);
+          aplicarDesplegarPendiente(caja, clave);
+        } else {
+          pintarVacio(caja, a, abierto, errorLectura);
+        }
+        if (nota) caja.appendChild(nota);
+      }, claveDeCampoDeHito);
     } finally {
       repintando = false;
       asegurarObservador();
     }
+  }
+
+  /* La clave estable de un campo del cuerpo de un hito, para
+     U.conservandoLoEscrito: sale del `data-id` de su fila, que es lo
+     único que no cambia de un repintado al siguiente. Un campo que no
+     sea de los dos que se escriben a mano no se apunta. */
+  function claveDeCampoDeHito(el) {
+    var fila = el.closest ? el.closest('.hito') : null;
+    var id = fila && fila.dataset ? fila.dataset.id : '';
+    if (!id) return '';
+    if (el.classList.contains('hito-nota-texto')) return 'hito-nota-' + id;
+    if (el.classList.contains('hito-campo-fecha')) return 'hito-fecha-' + id;
+    return '';
+  }
+
+  /* Qué hitos tenían algo a medias antes del repintado, para volver a
+     abrirlos después (fila 34). Solo esos: uno con el foco dentro, o
+     con una nota empezada y sin guardar. Un hito que solo estuviera
+     abierto para mirarlo se cierra como siempre, que es lo que todo el
+     mundo espera de un repintado; devolver el foco a un cuerpo que se
+     ha vuelto a esconder no serviría de nada, y de ahí que haya que
+     abrirlo ANTES de que U.conservandoLoEscrito devuelva el suyo. */
+  function hitosAMedias(caja) {
+    var ids = [];
+    Array.prototype.forEach.call(caja.querySelectorAll('.hito'), function (fila) {
+      var cuerpo = fila.querySelector('.hito-cuerpo');
+      if (!cuerpo || cuerpo.classList.contains('oculto')) return;
+      var nota = fila.querySelector('.hito-nota-texto');
+      if ((nota && nota.value) || cuerpo.contains(document.activeElement)) ids.push(fila.dataset.id);
+    });
+    return ids;
+  }
+
+  function volverADesplegar(caja, ids) {
+    if (!ids.length) return;
+    Array.prototype.forEach.call(caja.querySelectorAll('.hito'), function (fila) {
+      if (ids.indexOf(fila.dataset.id) === -1) return;
+      var cuerpo = fila.querySelector('.hito-cuerpo');
+      if (cuerpo) cuerpo.classList.remove('oculto');
+    });
   }
 
   /* Busca la fila de ese hito entre las que se acaban de pintar,
