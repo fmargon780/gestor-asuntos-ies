@@ -5,6 +5,16 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — Las horas de `App.VERSION` iban por delante de la real
+
+Francisco avisó: siendo las 09:13 de verdad, la aplicación decía `17-sep-2026 · 18:20`. La causa
+no era código: `App.VERSION` es una línea que Claude Code escribe a mano cada vez que publica algo,
+y en esta sesión se había ido subiendo el número a ojo (12:10 → 16:40 → 18:20) sin mirar ningún
+reloj de verdad. El contenedor de esta sesión sí tiene la hora real de España
+(`TZ='Europe/Madrid' date` da la hora correcta); el fallo era no usarla. Corregido a la hora real
+(`09:15`) y dejada la receta exacta en un comentario de `js/version.js`, más el aviso en
+`docs/CONTEXTO.md` y en la regla 4 de `docs/COLA.md`, para que no se repita.
+
 ## 17-sep-2026 — La bandeja de correos, dentro de "Por clasificar" y plegada
 
 Fila 27 de la cola (`docs/COLA.md`, `docs/CORREOS-DENTRO-DE-POR-CLASIFICAR.md`), detrás de la 26.

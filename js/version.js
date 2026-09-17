@@ -12,5 +12,14 @@
    que cambiar la versión no obligue a resubir nucleo.js entero: es de
    los ficheros más grandes, y cada subida es una publicación de Vercel
    que hace cola con las demás.
+
+   OJO al escribir esta línea: coge la hora de verdad, nunca a ojo ni
+   sumando algo al valor de antes (17-sep-2026, aviso de Francisco: las
+   versiones estaban saliendo con horas por delante de la real). Antes
+   de cambiarla, en la terminal:
+
+       TZ='Europe/Madrid' date '+%d %m %Y %H:%M' | { read d m y hm; \
+         meses=(ene feb mar abr may jun jul ago sep oct nov dic); \
+         echo "$d-${meses[$((10#$m-1))]}-$y · $hm"; }
    ============================================================ */
-App.VERSION = '17-sep-2026 · 18:20';
+App.VERSION = '17-sep-2026 · 09:16';

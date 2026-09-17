@@ -13,7 +13,9 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
    los ficheros o funciones que pide). Si ya está hecha, márcala **HECHA** con una nota y pasa a
    la siguiente.
 4. Al terminar una, márcala **HECHA** con la fecha y la versión publicada, y sigue con la
-   siguiente PENDIENTE. No pares hasta que no quede ninguna.
+   siguiente PENDIENTE. No pares hasta que no quede ninguna. **La hora de `App.VERSION` sale del
+   reloj de verdad** (`TZ='Europe/Madrid' date`, receta exacta en `js/version.js`), nunca a ojo:
+   el 17-sep-2026 salieron versiones con horas por delante de la real.
 5. Si una instrucción no puede completarse, márcala **BLOQUEADA** con el motivo en una línea y
    sigue con la siguiente. Nunca dejes el repositorio con las pruebas en rojo.
 6. Si encuentras una instrucción **EN CURSO** de otra sesión y no eres tú quien la empezó,
