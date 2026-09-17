@@ -5,6 +5,56 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — Archivar sin atascos: mensajes en castellano y carpetas movidas
+
+Fila 45 de la cola (`docs/COLA.md`, `docs/ARCHIVAR-ATASCOS.md`), escrita el mismo día pidiendo
+ser la fila 33, pero ese número se lo llevó `TABLON-NO-SE-BORRA.md` y quedó fuera de la cola
+hasta ahora. Seguía habiendo un asunto real atascado incluso después de la fila 32: al pulsar
+Archivar salía "No se ha podido archivar: A requested file or directory could not be found at
+the time an operation was processed" — un `NotFoundError` del navegador, en inglés, porque
+`App.cerrarAsunto` enseñaba `e.message` tal cual.
+
+Antes de escribir nada, se comprobó qué quedaba pendiente de verdad: las filas 32, 33 y 34 ya
+habían tocado `js/carpetas.js`/`js/asuntos-archivar.js`, pero `U.mensajeDeError` no existía, la
+cuenta de ficheros no se saltaba los temporales de sincronización al copiar, y ni
+`App.cerrarAsunto` ni `App.reabrirAsunto` reconocían una carpeta que ya se había movido por otro
+camino (el otro ordenador, o un intento anterior que sí llegó a completarse).
+
+- `U.mensajeDeError(e)` nuevo (`js/util.js`): un solo sitio para traducir por `e.name`
+  (`NotFoundError`, `NotAllowedError`, `NoModificationAllowedError`/`InvalidStateError`,
+  `QuotaExceededError`, `AbortError`; cualquier otro, tal cual, porque los nuestros ya están en
+  castellano). Lo usan las dos funciones de `js/asuntos-archivar.js` en su `catch`.
+- `js/carpetas.js`: `contarFicheros`, `copiarDentro` y la fusión se saltan ahora todo lo que
+  `esCarpetaTemporalDeSincronizacion` reconozca (antes solo se usaba en otro sitio; ahora también
+  aquí, con ficheros y no solo carpetas), para que la cuenta de origen y la de destino hablen de
+  lo mismo. Y un `getFile()` que revienta con `NotFoundError` a mitad de copia (un fichero que
+  Dropbox está moviendo justo en ese instante) se reintenta una vez tras esperar un segundo
+  (`leerFicheroParaCopiar`); si sigue sin estar, el error dice su nombre, en castellano, y no se
+  borra nada.
+- `js/asuntos-archivar.js`: `App.cerrarAsunto` mira primero, dentro del `try`, si la carpeta
+  sigue en Asuntos abiertos. Si no está pero ya está en `ARCHIVO/categoría/tercero`, es que el
+  archivado ya se hizo por otro camino: no copia nada, pone la ficha al día y avisa en verde. Si
+  no está en ningún sitio, avisa en ámbar pidiendo pulsar Recargar, nunca con un mensaje del
+  navegador. `App.reabrirAsunto` hace lo mismo con `a.padre` (el manejador guardado al pintar la
+  pantalla ARCHIVO, que puede estar viejo): si no sirve, se recalcula con los datos de la ficha; si
+  tampoco aparece ahí pero ya está en Asuntos abiertos, se da por reabierto sin copiar nada.
+- Clase CSS nueva `.mensaje.ambar` en `css/estilos.css` (con `--ambar-linea`, que ya existía para
+  otras cosas): los avisos flotantes de `U.aviso` solo tenían `malo` y `bueno`.
+
+Prueba nueva `pruebas/archivar-atascos.mjs`, en navegador de verdad (reutiliza el disco de
+mentira de `pruebas/navegador.mjs`, como ya hace `pruebas/tablon-no-se-borra.mjs`), con los seis
+escenarios del documento; comprobado con `git stash` de los cuatro ficheros de código (sin tocar
+la prueba) que fallaba sin el arreglo. Batería completa en verde (44 ficheros).
+
+No se han partido `js/carpetas.js` (478 líneas) ni `js/util.js` (421 líneas), aunque pasan de las
+"unas 400" habituales: `js/carpetas.js` ya estaba en 449 antes de esta fila, y partir cualquiera
+de los dos habría obligado a tocar además cuatro ficheros de prueba que los cargan sueltos, sin
+más scripts (`pruebas/copias.mjs`, `pruebas/dni-personal.mjs`, `pruebas/logica.mjs`,
+`pruebas/plantillas-documento.mjs`), fuera del alcance de este documento. Queda anotado por si
+conviene una fila dedicada a partirlos.
+
+---
+
 ## 17-sep-2026 — Apuntar un documento a un hito
 
 Fila 31 de la cola (`docs/COLA.md`, `docs/APUNTAR-DOCUMENTO-A-HITO.md`), la mitad que le faltaba

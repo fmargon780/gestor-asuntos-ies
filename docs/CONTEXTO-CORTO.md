@@ -104,7 +104,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Separar, Unir y Sacar páginas de un PDF, en la carpeta del asunto y en Por clasificar (con
   pdf-lib, `js/lib/pdf-lib.min.js`); miniaturas con pdf.js, tijeras entre páginas para Separar.
 - "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha (opcional), con el correo ya puesto al preparar el cuadro de Correo.
-- Archivar o reabrir cuando el destino ya existe (de un intento a medias) fusiona las dos carpetas, sin perder nada.
+- Archivar o reabrir cuando el destino ya existe (de un intento a medias) fusiona las dos carpetas, sin perder nada; si la carpeta ya no está donde se esperaba pero se encuentra en el otro sitio, se da por hecho sin copiar nada y avisa en verde; si no aparece por ningún lado, avisa en ámbar pidiendo Recargar. Los errores del navegador (`NotFoundError` y compañía) salen siempre traducidos (`U.mensajeDeError`), y los temporales de sincronización (Dropbox, Drive) no se cuentan ni se copian (fila 45).
 - Guardar un documento en un asunto se queda en su ficha; solo Editar, Archivar/Reabrir y Borrar
   vuelven a la lista. La ficha solo se repinta si algo suyo ha cambiado de verdad (fila 34).
 
