@@ -105,7 +105,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   pdf-lib, `js/lib/pdf-lib.min.js`); miniaturas con pdf.js, tijeras entre páginas para Separar.
 - "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha (opcional), con el correo ya puesto al preparar el cuadro de Correo.
 - Archivar o reabrir cuando el destino ya existe (de un intento a medias) fusiona las dos carpetas, sin perder nada.
-- Guardar un documento en un asunto se queda en su ficha (y la refresca sola); solo Editar, Archivar/Reabrir y Borrar vuelven a la lista.
+- Guardar un documento en un asunto se queda en su ficha (y la refresca sola); solo Editar, Archivar/Reabrir y Borrar vuelven a la lista. El repintado automático (cada 20s, o la presencia cada 10s) nunca tira una nota a medio escribir, ni el foco ni el cursor: ni la del asunto ni la de un hito.
 
 ## 6. Reglas de código que no se pueden olvidar
 

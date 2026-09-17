@@ -5,6 +5,37 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — Las notas de un asunto no se borran mientras se escriben
+
+Fila 34 de la cola (`docs/COLA.md`, `docs/NOTAS-DEL-ASUNTO-NO-SE-BORRAN.md`), el mismo fallo de la
+fila 33 (el tablón) pero en el sitio que Francisco sufría de verdad: dentro de un asunto abierto.
+`App.reengancharFicha` (fila 30) repintaba la ficha entera cada vez que se llamaba —cada 20
+segundos, por `App.mirarLaCarpeta`, o antes por la vigilancia de presencia (fila 24)—, hubiera
+cambiado algo o no, y rehacía con `innerHTML` el `<textarea>` de la nota del asunto y el de la
+nota de un hito: bastaba con que el compañero dejara un papel suelto en cualquier sitio para que
+Francisco perdiera lo que llevaba escrito, el foco y el cursor.
+
+`U.conservandoLoEscrito(raiz, hacer, clavePara)` (`js/util.js`) apunta, antes de `hacer()`, el
+valor, el foco y el cursor de cada campo de escribir de `raiz` (por su `id`, o por la clave que dé
+`clavePara` para los campos sin id, como los de dentro de un hito), y se los devuelve después solo
+a los que hayan quedado vacíos. `js/ficha-asunto.js` pasa `pintar()` por esa ayuda y, de paso,
+dejó de repintar cuando no hace falta: `App.reengancharFicha` compara una huella de texto del
+asunto en dos mitades (ficha e hitos); si es igual a la de antes, la pantalla se queda quieta, y si
+solo cambian los hitos, se le pide el repintado al panel de hitos en vez de tirar la ficha entera
+(esto también quitó un fallo de paso: con la pantalla quieta, un botón ya pintado se quedaba
+apuntando al objeto viejo del asunto, así que ahora un asunto es un único objeto en toda la
+aplicación). `js/hitos-panel.js` mete su propio repintado dentro de la misma ayuda, con el
+`MutationObserver` desconectado mientras tanto (si no, devolver el valor dispararía otro
+repintado, fila 31) y volviendo a desplegar el hito a medias antes de devolver el foco.
+
+Esta sesión (en la nube) se encontró la fila ya **EN CURSO**, con el arreglo entero hecho y subido
+por una sesión anterior directamente a esta misma rama (que resultó ser, además, la misma que
+`main`): faltaban la prueba nueva y cerrar la fila. Se añadió `pruebas/notas-no-se-borran.mjs`, en
+navegador de verdad, con los cinco pasos del encargo (nota del asunto, nota de un hito, y que
+`App.reengancharFicha()` deje la pantalla quieta sin ningún cambio), comprobado que falla sin el
+arreglo (revirtiendo los tres ficheros tocados a la versión de antes de la fila, ejecutando la
+prueba, y devolviéndolos). Batería completa en verde, npm test con 41 ficheros.
+
 ## 17-sep-2026 — Apuntar un documento a un hito
 
 Fila 31 de la cola (`docs/COLA.md`, `docs/APUNTAR-DOCUMENTO-A-HITO.md`), la mitad que le faltaba

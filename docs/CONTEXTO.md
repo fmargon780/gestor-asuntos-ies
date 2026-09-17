@@ -148,6 +148,30 @@ meter un suelto o un correo) sin que ninguna tenga que saber de la ficha: **Edit
 llamando a `volverALaLista()` como hasta ahora. Se comprueba con
 `pruebas/quedarse-en-el-asunto.mjs`.
 
+**Las notas no se borran mientras se escriben** (17-sep-2026, fila 34,
+`docs/NOTAS-DEL-ASUNTO-NO-SE-BORRAN.md`). `App.reengancharFicha` repintaba la ficha entera en
+cada pasada, hubiera cambiado algo o no, y con ella el `<textarea>` de la nota del asunto y el de
+la nota de un hito; bastaba con que el compañero dejara un papel suelto para que se llevara por
+delante lo que Francisco estuviera escribiendo. Ahora:
+
+- `U.conservandoLoEscrito(raiz, hacer, clavePara)` (`js/util.js`): antes de `hacer()` (el
+  repintado), apunta valor, foco y cursor de cada campo de escribir de `raiz` (por su `id`, o por
+  la clave que dé `clavePara`); después, se los devuelve solo a los campos que hayan vuelto
+  **vacíos** (nunca pisa un valor que el repintado haya traído con contenido).
+- `js/ficha-asunto.js`: `pintar()` pasa por esa ayuda, y además **ya no repinta si no ha cambiado
+  nada**: `App.reengancharFicha` compara una huella de texto del asunto en dos mitades (ficha e
+  hitos, `huellaDe`); si son iguales, la pantalla se deja quieta; si solo cambian los hitos, se le
+  pide el repintado al panel de hitos en vez de rehacer la ficha entera. Un asunto pasa a ser un
+  solo objeto en toda la aplicación (los datos frescos se le meten dentro al que ya tiene la
+  ficha), para que los botones ya pintados no se queden apuntando a datos viejos.
+- `js/hitos-panel.js`: su `repintar()` va también dentro de `U.conservandoLoEscrito`, con el
+  `MutationObserver` desconectado mientras tanto (devolver un valor no puede disparar otro
+  repintado, fila 31) y volviendo a desplegar el hito que tuviera algo a medias antes de devolver
+  el foco.
+
+Se comprueba con `pruebas/notas-no-se-borran.mjs`, en navegador de verdad (comprobado que falla
+sin el arreglo).
+
 ### Las tarjetas por tipo de asunto
 
 Dentro de "En el departamento" y de "A la espera de terceros", encima de la lista, sale una fila
