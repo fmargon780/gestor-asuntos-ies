@@ -71,6 +71,36 @@ App.cerrarAsunto = async function (a) {
   if (!confirmar) return;
 
   try {
+    /* 17-sep-2026, fila 44 (docs/ARCHIVAR-ATASCOS.md): antes de tocar
+       nada, mirar si la carpeta sigue de verdad en Asuntos abiertos.
+       Un intento anterior (de otro ordenador, o de esta misma sesión
+       hace un momento) puede haber terminado de archivarla ya, y
+       entonces la tarjeta de la lista se ha quedado vieja: intentar
+       archivar otra vez revienta con un NotFoundError en inglés al
+       buscar una carpeta que ya no está ahí. */
+    var sigueEnAbiertos = await Carpetas.existe(App.E.abiertos, a.nombre);
+    if (!sigueEnAbiertos) {
+      var destinoDelTercero = await Carpetas.bajar(App.E.archivo, [categoria, tercero], false)
+        .catch(function () { return null; });
+      var yaEstaArchivada = destinoDelTercero && await Carpetas.existe(destinoDelTercero, a.nombre);
+      if (yaEstaArchivada) {
+        var ficherosYaArchivados = await Carpetas.contarFicheros(
+          await destinoDelTercero.getDirectoryHandle(a.nombre));
+        await App.anotar(a.nombre, {
+          estado: 'cerrado', categoria: categoria, tercero: tercero,
+          cerradoEl: a.ficha.cerradoEl || U.ahora(),
+          cerradoPor: a.ficha.cerradoPor || App.E.usuario, ficheros: ficherosYaArchivados
+        });
+        U.aviso('Este asunto ya estaba archivado. He puesto la lista al día.', 'bueno');
+        await App.verAbiertos();
+        return;
+      }
+      U.aviso('No encuentro la carpeta de este asunto ni en Asuntos abiertos ni en el archivo. ' +
+        'Puede que la haya movido o renombrado el otro ordenador. Pulsa Recargar y míralo.');
+      await App.verAbiertos();
+      return;
+    }
+
     var destino = await Carpetas.bajar(App.E.archivo, [categoria, tercero], true);
     var haciendoFusion = await Carpetas.existe(destino, a.nombre);
     var resultado = haciendoFusion
@@ -93,7 +123,7 @@ App.cerrarAsunto = async function (a) {
     U.aviso(mensaje, 'bueno');
     await App.verAbiertos();
   } catch (e) {
-    U.aviso('No se ha podido archivar: ' + e.message, 'malo');
+    U.aviso('No se ha podido archivar: ' + U.mensajeDeError(e), 'malo');
   }
 };
 
@@ -117,11 +147,44 @@ App.reabrirAsunto = async function (a) {
     'Reabrir');
   if (!confirmar) return;
   try {
+    /* 17-sep-2026, fila 44: `a.padre` es un manejador guardado de
+       cuando se pintó la pantalla ARCHIVO, y puede estar viejo (el
+       compañero ya reabrió el asunto, o lo movió). Si ya no sirve, se
+       recalcula con la categoría y el tercero de la ficha antes de
+       nada. */
+    var padre = a.padre;
+    var sigueEnElArchivo = padre && await Carpetas.existe(padre, a.nombre);
+    if (!sigueEnElArchivo) {
+      var ficha = a.ficha || {};
+      padre = ficha.categoria && ficha.tercero
+        ? await Carpetas.bajar(App.E.archivo, [ficha.categoria, ficha.tercero], false).catch(function () { return null; })
+        : null;
+      sigueEnElArchivo = padre && await Carpetas.existe(padre, a.nombre);
+    }
+
+    if (!sigueEnElArchivo) {
+      var yaEstaAbierto = await Carpetas.existe(App.E.abiertos, a.nombre);
+      if (yaEstaAbierto) {
+        await App.anotar(a.nombre, {
+          estado: 'abierto', reabiertoEl: a.ficha.reabiertoEl || U.ahora(),
+          reabiertoPor: a.ficha.reabiertoPor || App.E.usuario
+        });
+        U.aviso('Este asunto ya estaba reabierto. He puesto la lista al día.', 'bueno');
+        await App.verAbiertos();
+        await App.verArchivo();
+        return;
+      }
+      U.aviso('No encuentro la carpeta de este asunto ni en el archivo ni en Asuntos abiertos. ' +
+        'Puede que la haya movido o renombrado el otro ordenador. Pulsa Recargar y míralo.');
+      await App.verArchivo();
+      return;
+    }
+
     var haciendoFusion = await Carpetas.existe(App.E.abiertos, a.nombre);
     var resultado = haciendoFusion
-      ? await Carpetas.fusionarEn(a.padre, a.nombre, App.E.abiertos, a.nombre)
+      ? await Carpetas.fusionarEn(padre, a.nombre, App.E.abiertos, a.nombre)
       : { conSufijo: [] };
-    if (!haciendoFusion) await Carpetas.mover(a.padre, a.nombre, App.E.abiertos);
+    if (!haciendoFusion) await Carpetas.mover(padre, a.nombre, App.E.abiertos);
     await App.anotar(a.nombre, { estado: 'abierto', reabiertoEl: U.ahora(), reabiertoPor: App.E.usuario });
     var mensaje = 'Asunto reabierto.';
     if (haciendoFusion) {
@@ -135,6 +198,6 @@ App.reabrirAsunto = async function (a) {
     await App.verAbiertos();
     await App.verArchivo();
   } catch (e) {
-    U.aviso('No se ha podido reabrir: ' + e.message, 'malo');
+    U.aviso('No se ha podido reabrir: ' + U.mensajeDeError(e), 'malo');
   }
 };
