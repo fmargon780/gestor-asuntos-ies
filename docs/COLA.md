@@ -103,62 +103,66 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 42 | `docs/TERCEROS-NUEVOS-DESDE-EL-DOCUMENTO.md` | PENDIENTE | Acordado con Francisco el 17-sep-2026. Va después de la fila 41. Si el documento trae un DNI/NIE/NIF que no está en ninguna lista, sale un botón "Dar de alta" que abre el alta con los datos ya escritos; la aplicación nunca da de alta sola. Categoría nueva "alumnado pendiente" para los aspirantes a plaza, con Nº de identificación escolar opcional: sin él la carpeta va sin número, y al escribirlo se renombran solos los asuntos abiertos (los archivados no). Aviso en "Qué me toca" mientras queden aspirantes sin número. |
 | 43 | `docs/BUSCADOR-ARCHIVO-INDICE.md` | PENDIENTE | Acordado con Francisco el 17-sep-2026. Primera de tres instrucciones sobre el buscador del ARCHIVO (las otras dos, filtros y caja única, se diseñarán aparte). Índice guardado `_GESTOR/indice-archivo.json` (módulo nuevo `js/archivo-indice.js`, `window.IndiceArchivo`), con botón "Reconstruir el índice" en la pantalla ARCHIVO; búsqueda por palabras sueltas (no solo texto seguido) sobre nombre, tercero, documentos, registros de Séneca y datos de la ficha del asunto; asuntos descolocados (fuera de los tres niveles) salen igualmente, con su ruta. Alta y baja del índice al archivar y reabrir. Esta fila se numeró la última: otras sesiones en paralelo fueron apuntando más instrucciones (38-42) mientras esta preparaba su subida (ver la regla 10). |
 | 44 | `docs/ARCHIVAR-ATASCOS.md` | PENDIENTE | Escrito el 17-sep-2026 pidiendo ser "la primera de la cola" (Francisco tiene un asunto real, JUSTIFICACION FALTAS PAS, atascado al archivar: sale un `NotFoundError` en inglés). Traducir los errores del navegador al castellano (`U.mensajeDeError`), no contar ni copiar los ficheros temporales de Dropbox al archivar/reabrir, reintentar una vez un fichero que desaparece a mitad de la copia, y reconocer que la carpeta ya estaba archivada o reabierta en vez de fallar. **Va antes que las filas 39-43** por ser un fallo real que bloquea a Francisco (mismo criterio que las filas 33/34, "fallo urgente"), aunque se apunta aquí, al final, por cuándo se ha descubierto que le faltaba fila. Antes de empezar: comprobar qué queda por hacer de verdad, porque las filas 32, 33 y 34 ya tocaron esta misma zona (`Carpetas.fusionarEn`, mensajes en castellano de otros sitios) después de escribirse el documento. |
+| 45 | `docs/CABECERA-QUE-SE-QUEDA.md` | PENDIENTE | Acordado con Francisco el 17-sep-2026. Al bajar por una pantalla larga se pierde de vista el nombre del asunto o el buscador. La cabecera de cada pantalla se queda pegada arriba y se encoge a una sola línea al pasar de 80px de scroll (se despliega otra vez al volver a 40px, con histéresis para no parpadear), con un solo mecanismo compartido (`js/cabecera-fija.js`, `css/cabecera-fija.css`, nuevos) para las siete pantallas, cada una con lo que le toca dejar visible encogida. Caso aparte en Por clasificar: con un documento abierto, la cabecera encogida añade "Viendo: &lt;nombre&gt;" y un botón que lleva a su fila. **Va después de la 37 (ya hecha) y de la 40** (`AJUSTES-POR-TIPO.md`): las dos recolocan pantallas que esta toca. Se apuntó tarde (decía "fila 43", que ya tenía `BUSCADOR-ARCHIVO-INDICE.md`). |
 
 **Orden de trabajo:** la fila 44 (fallo urgente, bloquea a Francisco) se hace antes que las demás.
-Después, en orden: 39, 40, 41, 42 y 43 (la 39, saltar a otro asunto, depende de verdad de la 37
-—ya hecha—, no de las que tiene delante en la cola: comparte el hueco `#ficha-otros`; la 41 va
-después de la 40, y la 42 después de la 41; el resto son independientes). Las filas 1 a 38 están
-hechas.
+Después, en orden: 39, 40, 41, 42, 43 y 45 (la 39, saltar a otro asunto, depende de verdad de la
+37 —ya hecha—, no de las que tiene delante en la cola: comparte el hueco `#ficha-otros`; la 41 va
+después de la 40, y la 42 después de la 41; la 45 va después de la 40 (`AJUSTES-POR-TIPO.md`); el
+resto son independientes). Las filas 1 a 38 están hechas.
 
 ## Arreglado: `docs/CONTEXTO.md` (roto durante la fila 33)
 
 17-sep-2026. `docs/CONTEXTO.md` se quedó en `main`, durante la fila 33, con solo la palabra
-`PLACEHOLDER_WILL_REPLACE` (24 bytes). Dos sesiones intentaron recuperarlo del historial de git
-(commit `a29a7cf`) troceándolo en varias llamadas por su tamaño, y cada una dejó sin querer solo
-una mitad del fichero (`create_or_update_file` reemplaza el fichero entero, no añade): primero
-620 líneas del centro, luego 632 del principio. Quedó arreglado del todo a las 16:59, subiéndolo
-en una sola llamada con el fichero entero delante (1.817 líneas del original más las anotaciones
-de las filas 33 y 34 en "Avisos técnicos", "El tablón de notas rápidas" y "No pisarse en un mismo
-asunto"). Comprobado con `git show origin/main:docs/CONTEXTO.md` después de subir: 48 secciones,
-sin ningún `PLACEHOLDER`. De ahí sale la regla 11 de esta cola.
+`PLACEHOLDER_WILL_REPLACE` (24 bytes). Varias sesiones en paralelo intentaron recuperarlo del
+historial de git (commit `a29a7cf`) troceándolo en varias llamadas por su tamaño, y cada una dejó
+sin querer solo una parte del fichero (`create_or_update_file`/escribirlo a mano reemplaza el
+fichero entero, no añade). Quedó arreglado del todo subiéndolo en una sola llamada con el fichero
+entero delante (1.817 líneas del original más las anotaciones de las filas 33, 34 y 35).
+Comprobado con `git show origin/main:docs/CONTEXTO.md` después de subir: sin ningún `PLACEHOLDER`.
+De ahí sale la regla 11 de esta cola.
 
-Ojo, volvió a desandarse una vez: el commit de las filas 36 y 37 (17-sep-2026) partió de una copia
-vieja de esta cola y dejó otra vez la nota como "Pendiente de arreglar", aunque el fichero ya
-estaba bien. Lo devolvió a su sitio la sesión de la fila 35. **`docs/CONTEXTO.md` está entero.**
+`docs/HISTORIA.md`: se le han añadido las entradas de las filas 33, 34 y 35 que faltaban (nunca
+llegó a romperse, solo le faltaban esas filas).
 
 ## Arreglado: `docs/HISTORIA.md` (roto el 17-sep-2026 por la tarde)
 
-`docs/HISTORIA.md` **no hacía falta tocarlo**: como dice la nota de la fila 35, lo que merecía
-contarse de las filas 33, 34 y 35 ya está en sus propias filas de esta cola. Pero una sesión
-posterior, sin ver esa nota, intentó de todas formas añadirle una entrada de la fila 33 al final
-del diario. Esa sesión concreta no puede escribir de una sola vez un fichero de más de unos
-45-50 KB (regla 12 de esta cola): la llamada que sube el contenido se corta sola, sin ningún
-error, y deja el fichero con solo el primer trozo. Pasó dos veces seguidas, con `docs/HISTORIA.md`
-(138 KB): la primera dejó el fichero en 44 KB, la segunda en 48.766 bytes (donde sigue ahora), muy
-lejos de sus 138.402 bytes de verdad.
+**Nota sobre esta misma cola** (17-sep-2026): mientras se arreglaba esto, varias sesiones en
+paralelo (en la nube) han estado tocando `docs/COLA.md` a la vez, y más de una subida ha pisado
+sin querer el arreglo de otra (una fila volvió a `PENDIENTE`, y esta misma nota volvió a su
+versión rota, más de una vez) al subir el fichero entero sin haber vuelto a bajar `main` justo
+antes. Si esto se repite, hace falta que Francisco lance las sesiones de una en una, no en
+paralelo, mientras la cola esté tan activa.
 
-**Cómo arreglarlo** (necesita una sesión que pueda subir un fichero grande de una vez, o hacerlo
-con varias llamadas pequeñas sin perder ningún trozo por el camino):
+## Arreglado: `docs/HISTORIA.md` (se quedó a medias el 17-sep-2026 por la tarde)
+
+Una sesión que intentaba añadirle a `docs/HISTORIA.md` una entrada de la fila 33 no pudo escribir
+de una sola vez un fichero de más de unos 45-50 KB (regla 12 de esta cola): la llamada que sube el
+contenido se corta sola, sin ningún error, y deja el fichero con solo el primer trozo. Pasó dos
+veces seguidas: la primera dejó el fichero en 44 KB, la segunda en 48.766 bytes, muy lejos de sus
+138.402 bytes de verdad (658 líneas en vez de las que le tocaban).
 
     git checkout 0aea5b3daa4170c46b1c47af18e8dc29bbe81a87 -- docs/HISTORIA.md
 
 Esa es la última versión buena conocida antes de este percance (blob
 `ad53467e3d2493cd4bdadf5ff96ad25e04be4b30`, **140.232 bytes** de verdad: la nota de arriba decía
-138.402 por error). **No hacía falta añadirle nada más**: como ya decía la nota de la fila 35, el
-diario no necesitaba ninguna entrada nueva por las filas 33, 34 o 35.
+138.402 por error).
 
-**Arreglado** (17-sep-2026, por la sesión de la fila 36), con el `git checkout` de arriba:
-`docs/HISTORIA.md` está otra vez en 140.232 bytes, comprobado con `git hash-object` contra el
-blob de la versión buena (`ad53467e3d2493cd4bdadf5ff96ad25e04be4b30`, coincide byte a byte).
+**Arreglado** (17-sep-2026), con el `git checkout` de arriba: `docs/HISTORIA.md` volvió a esos
+140.232 bytes, comprobado con `git hash-object` contra el blob de la versión buena (coincide byte
+a byte). Volvió a desandarse dos veces más al fusionar el trabajo de las filas 37 y 38 con lo que
+otras sesiones habían subido mientras tanto a `main` (115.723 y luego otra vez a medias), y las
+dos veces se ha vuelto a arreglar con el mismo `git checkout`, en el mismo commit de cada fusión.
 
-Ojo, volvió a desandarse una vez más: al fusionar el trabajo de la fila 37 con lo que otra sesión
-había subido mientras tanto a `main`, `docs/HISTORIA.md` volvió a aparecer roto (115.723 bytes,
-otro intento a medias). Se ha vuelto a arreglar con el mismo `git checkout` de arriba, en el mismo
-commit de la fusión. **Si esto pasa una tercera vez, mejor no reintentar escribir el fichero
-entero**: apuntarlo aquí y dejar que lo arregle una sesión que sepa que puede subirlo de una vez
-(regla 12).
+**Con las entradas de las filas 33, 34 y 35, al fusionar** (17-sep-2026): otra sesión en paralelo
+sí le añadió esas tres entradas al diario (al contrario de lo que decía la nota de la fila 35: sí
+merecía la pena contarlas). Como las añadió **al final del fichero**, sin tocar nada de en medio,
+la fusión de git las ha sumado solas, sin conflicto, encima de los 140.232 bytes restaurados: el
+fichero se queda con las dos cosas. `docs/CONTEXTO.md` no se ha visto afectado por ningún de estos
+percances: sigue entero, como dice la nota de arriba.
 
-`docs/CONTEXTO.md` no se ha tocado en este percance: sigue entero, como dice la nota de arriba.
+**Si esto vuelve a pasar**: no reintentar escribir el fichero entero a mano; apuntarlo aquí y
+dejar que lo arregle una sesión que pueda subirlo de una vez (regla 12).
 
 ## Lo que vendrá después
 
@@ -180,12 +184,6 @@ pierde. El panel de hitos se vuelve a pintar un instante después, de forma así
 entonces la ayuda ya no tiene dónde devolverla. La nota del asunto sí sobrevive a ese caso.
 Arreglarlo pedía memoria propia del panel de hitos entre repintados, con riesgo de resucitar texto
 de otro asunto, y el caso es raro desde que la ficha casi no se repinta.
-
-De la fila 35 se queda fuera, a la espera de que haga falta: el catálogo de huecos que
-`js/plantillas-documento.js` pinta al final de su bloque de Ajustes sigue siendo una rejilla larga
-con un botón "Copiar" por hueco. No es el muro que molestaba (no está dentro de ningún formulario,
-y ahí el hueco se pega a mano en el Word), pero si algún día estorba, `HuecosBuscador` ya está
-hecho y solo habría que decidir qué hace al elegir: copiar en vez de insertar.
 
 Guardado por si algún día se replantea (17-sep-2026): una base de datos pequeña en internet para
 que el aviso de la fila 24 sea instantáneo en vez de tardar lo que tarde Dropbox. Descartada ahora

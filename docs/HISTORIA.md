@@ -5,6 +5,107 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — "Insertar hueco": un buscador en vez de un muro de botones
+
+Fila 35 de la cola (`docs/COLA.md`, `docs/HUECOS-INSERTAR.md`), acordada con Francisco el mismo
+día: al crear o editar una plantilla de correo en Ajustes, un botón por cada hueco disponible
+(más de treinta: nombre del tercero, grupo, año académico, DNI, teléfono de cada tutor...)
+ocupaba casi toda la pantalla y tapaba el nombre de la plantilla y el tipo de asunto, arriba del
+todo.
+
+Se sustituye por un solo botón, "Insertar hueco", que abre un cuadro pequeño y flotante junto al
+propio botón —no un segundo `U.preguntar`: el editor de la plantilla ya está usando el único
+cuadro de diálogo que hay— con un buscador (sin mayúsculas ni tildes), la lista de huecos que
+encajan (nombre en claro y, en gris, el código entre llaves), navegable con las flechas y Enter, y
+Escape que cierra sin insertar nada, con su propio `stopPropagation` para no disparar el Escape
+general de `js/usabilidad.js`. El hueco elegido entra donde estuviera el cursor del campo de
+texto, sustituyendo lo seleccionado si había algo, y si no se había tocado el campo todavía, al
+final.
+
+La ayuda es reutilizable: `U.engancharInsertarHueco(boton, campos, huecos, alInsertar)`, nueva en
+`js/util.js`, recibe una lista de campos (por si algún día hace falta más de uno) y recuerda cuál
+tuvo el foco por última vez, guardando también su cursor al perderlo (en el propio `blur`, porque
+al abrir el buscador el foco se va de todos). **El encargo daba por hecho un segundo campo, el
+"asunto del correo", que hoy no existe**: el editor de una plantilla solo tiene un campo con
+huecos (`#pl-texto`); el asunto del correo lo monta él solo `js/correo.js`, sin plantilla ni
+huecos. La ayuda queda lista para un segundo campo si se añade alguna vez, pero no se ha inventado
+ninguno para poder probarlo.
+
+Revisado también `js/plantillas-documento.js` (el editor de plantillas de Word), que tiene su
+propia lista de huecos (`#pd-huecos`): es una tabla de referencia con botón "Copiar", no un muro
+que inserte en el cursor de un campo (el documento se edita en Word, fuera de la aplicación), y
+vive en su propio bloque plegado sin tapar ningún formulario. No es el mismo fallo, y no se ha
+tocado; tampoco `js/plantillas.js`, que ya exponía `Plantillas.HUECOS` como `{clave, etiqueta}`.
+
+Prueba nueva `pruebas/plantillas-huecos.mjs`, en navegador de verdad: ya no existe el muro, el
+buscador filtra, el hueco entra en el sitio exacto del cursor o al final si no se había tocado el
+campo, Escape cierra sin insertar y sin propagarse, y la vista previa se actualiza sola.
+Comprobado que falla sin el arreglo (sin el botón, la prueba no encuentra `#pl-insertar-hueco`).
+Batería completa en verde.
+
+## 17-sep-2026 — El tablón y las notas de un asunto no se borran mientras se escriben
+
+Dos fallos urgentes, en el mismo sitio del código y con la misma causa, avisados por Francisco el
+mismo día (filas 33 y 34 de la cola, `docs/TABLON-NO-SE-BORRA.md` y
+`docs/NOTAS-DEL-ASUNTO-NO-SE-BORRAN.md`): un repintado automático de fondo rehacía con `innerHTML`
+un `<textarea>` a medio escribir, sin mirar si Francisco tenía el foco puesto ahí, y se llevaba por
+delante lo que llevaba escrito.
+
+**Fila 33, el tablón.** La vigilancia de presencia (fila 24, `js/presencia.js`) repintaba
+`App.pintarAbiertos()` cada 10 segundos, hubiera cambiado algo o no; como el tablón de notas
+rápidas vive dentro de `#pantalla-abiertos`, se llevaba por delante `#tablon-texto`.
+`Presencia.huella()` (claves y usuarios de la caché, en texto) deja que el intervalo solo repinte
+si de verdad cambia quién está dentro de algún asunto, con una segunda barrera que lo frena entero
+mientras el foco esté en cualquier `input`/`textarea`/`select`/`contenteditable`. En `js/tablon.js`,
+lo escrito en la nota nueva vive también en variables del módulo (`borrador`, `borradorFecha`, al
+día con `input`/`change`), no solo en el DOM, y `pintar()` devuelve el foco y el cursor
+(`selectionStart`/`selectionEnd`) al campo nuevo o al de una nota en edición. Prueba nueva
+`pruebas/tablon-no-se-borra.mjs`, comprobado que falla sin el arreglo.
+
+**Fila 34, dentro de un asunto: el mismo fallo donde Francisco lo sufría de verdad.** La ficha de
+un asunto se repintaba entera cada vez que se reenganchaba (`App.mirarLaCarpeta` →
+`App.verAbiertos` → `App.reengancharFicha`, fila 30), hubiera cambiado algo o no, y rehacía con
+`innerHTML` el `<textarea id="ficha-nota-texto">` de la nota del asunto y el
+`<textarea class="hito-nota-texto">` de la nota de un hito. No hacía falta esperar al reloj:
+bastaba con que el compañero dejara un papel suelto en "Por clasificar" para que la ficha abierta
+se rehiciera entera.
+
+- `U.conservandoLoEscrito(raiz, hacer, clavePara)`, nueva en `js/util.js`, reutilizada por las dos
+  filas: apunta valor, foco y cursor de cada `textarea`/`input` de escribir de `raiz` antes del
+  repintado, y se los devuelve a los que vuelvan a salir **vacíos** (nunca pisa un valor que el
+  repintado haya traído con contenido). La identidad de un campo es su `id`, o la clave que dé
+  `clavePara` para los que no pueden llevarlo (uno por hito).
+- `js/ficha-asunto.js`: `pintar()` y `pintarNotas()` pasan por esa ayuda. Y la otra mitad del
+  arreglo: **la ficha ya no se repinta si no ha cambiado nada**, comparando una huella de texto del
+  asunto partida en dos (ficha e hitos), para que un cambio solo de hitos le pida el repintado al
+  panel de hitos en vez de rehacer la ficha entera. Trampa encontrada probándolo, fuera del
+  encargo: con la pantalla quieta, los botones ya pintados se quedaban con el objeto viejo del
+  asunto, y "Archivar el asunto" volvía a preguntar "¿Dónde va esta carpeta?" con la categoría ya
+  puesta; se arregla metiendo los datos frescos DENTRO al objeto que la ficha ya tiene (un asunto
+  es un solo objeto en toda la aplicación).
+- `js/hitos-panel.js`: su repintado entero va dentro de la misma ayuda, con el `MutationObserver`
+  desconectado mientras tanto (devolver un valor no puede disparar otro repintado, fila 31) y
+  volviendo a desplegar el hito que tuviera algo a medias antes de devolver el foco.
+
+Prueba nueva `pruebas/notas-asunto-no-se-borran.mjs`, en navegador de verdad, comprobado que falla
+sin el arreglo. Batería completa en verde. La fila 33 se subió directo a `main`, sin pull request;
+la 34 también, en la misma sesión que además reparó `docs/CONTEXTO.md` (ver la entrada siguiente).
+
+## 17-sep-2026 — `docs/CONTEXTO.md` se quedó con un texto de relleno, y se ha recuperado
+
+Durante el trabajo de la fila 33, un intento de subir `docs/CONTEXTO.md` entero dejó el fichero en
+`main` con solo la palabra `PLACEHOLDER_WILL_REPLACE` (24 bytes) en vez de sus 1.817 líneas: la
+sesión estaba escribiendo el fichero a mano, de una vez, y algo se truncó a mitad. La siguiente
+sesión (la de la fila 34) lo notó, y varios intentos de recuperarlo con el mismo método (escribir
+el fichero entero a mano, en dos o tres partes por su tamaño) volvieron a dejarlo a medias más de
+una vez, con la cola apuntando cada tropiezo (de ahí la regla 11, nueva, al final de esta página).
+
+Se ha recuperado del todo con `git show a29a7cf:docs/CONTEXTO.md` (la última versión completa,
+antes del incidente) y, encima, se le han metido los dos cambios que faltaban: la descripción de
+`App.reengancharFicha` puesta al día con la fila 34 (huella en dos mitades; un asunto es un solo
+objeto) y `U.conservandoLoEscrito` añadido a "Avisos técnicos". Comprobado con `wc -l` que el
+fichero recuperado tiene sus 1.817 líneas de partida, más lo nuevo.
+
 ## 17-sep-2026 — Apuntar un documento a un hito
 
 Fila 31 de la cola (`docs/COLA.md`, `docs/APUNTAR-DOCUMENTO-A-HITO.md`), la mitad que le faltaba

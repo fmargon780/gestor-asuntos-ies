@@ -819,7 +819,7 @@ crean en Ajustes, pegadas a un tipo de asunto, y se guardan en `_GESTOR/plantill
 - **En Ajustes**, bloque propio "Plantillas de correo" (vive entero en `js/plantillas.js`, no
   toca `js/ajustes.js`, que ya pasa de 47 KB: se engancha solo con `window.Gestor.alRefrescar`,
   igual que `js/bandeja-correos.js` y `js/unir-asuntos.js`). Lista con buscador cruzado, alta y
-  edición en un `U.preguntar` con botones para insertar cada hueco en el cursor y una vista previa
+  edición en un `U.preguntar` con un botón "Insertar hueco" (ver más abajo) y una vista previa
   en vivo (con el primer asunto abierto de ese tipo, o datos de muestra si no hay ninguno).
   Bloque aparte para la firma y el centro. **El borrado pasa por `Papelera.mandarDato` para dejar
   rastro, pero `js/papelera.js` no sabe devolver la clase `'plantilla'`** (no estaba en la lista
@@ -830,6 +830,34 @@ Se comprueba con `pruebas/plantillas.mjs`. El bloque de pantalla vive en `js/pla
 (se sacó de `js/plantillas.js` el 16-sep-2026, al crecer con el motor de las plantillas de
 documento, para no pasar de 450 líneas): usa la API pública de `Plantillas` (`cargar`, `guardar`,
 `deTipo`, `idNuevo`, `rellenar`, `HUECOS`...), no toca nada privado.
+
+#### Insertar un hueco al escribir una plantilla (17-sep-2026, fila 35, docs/HUECOS-INSERTAR.md)
+
+El editor de una plantilla pintaba un botón por cada hueco de `Plantillas.HUECOS` (más de
+treinta), un muro que tapaba el resto del formulario. Ahora es un solo botón, "Insertar hueco",
+con un cuadro pequeño y flotante: buscador (sin mayúsculas ni tildes), lista navegable con flechas
+y Enter, y Escape que cierra sin insertar (con su propio `stopPropagation`, como piden las reglas
+de Escape de la sección "La ficha de un asunto").
+
+`js/huecos-buscador.js` (`window.HuecosBuscador`), fichero nuevo cargado antes de
+`js/plantillas-ajustes.js`, es la pieza reutilizable: `HuecosBuscador.montar({ boton, campos,
+huecos })` no pasa por `U.preguntar` (el editor de la plantilla ya está usando el único cuadro de
+diálogo que hay), sino que cuelga el buscador del `<body>` con `position:fixed`, por encima de
+`#capa` y por debajo de los mensajes, calculado a partir de dónde esté el botón (mismo patrón de
+cierre que `App.botonMenuTarjeta`: mousedown fuera o Escape, los dos en fase de captura). `campos`
+es la lista de textarea/input donde puede entrar un hueco, en el orden del formulario; se recuerda
+cuál tuvo el foco por última vez (guardando su cursor al perderlo, porque abrir el buscador se lo
+quita a todos) y ahí entra el hueco elegido, o al final del último campo de la lista si no se ha
+tocado ninguno todavía. Hoy solo se usa con un campo (`#pl-texto`): el editor no tiene ningún campo
+de "asunto del correo" con huecos (ese asunto lo monta solo `js/correo.js`), así que la parte de
+"recordar cuál de varios campos" queda lista pero sin un segundo campo real que la ejerza.
+
+`js/plantillas-documento.js` tiene su propia lista de huecos (`#pd-huecos`), pero es una tabla de
+referencia con botón "Copiar" (el documento se edita en Word, fuera de la aplicación: no hay
+ningún cursor de un `<textarea>` donde insertar), en su propio bloque plegado, sin tapar ningún
+formulario: no es el mismo muro, y no se ha tocado.
+
+Se comprueba con `pruebas/plantillas-huecos.mjs`, en navegador de verdad.
 
 ### Plantillas de documento de Word
 
