@@ -1,6 +1,9 @@
 /* Prueba en navegador de verdad de los hitos de un asunto (16-sep-2026,
-   docs/HITOS.md, sección 14). A 1905px, como pide el encargo. Nada de
-   fechas escritas a mano: el plazo se cuenta desde hoy.
+   docs/HITOS.md, sección 14; ajustada el 17-sep-2026, fila 26,
+   docs/HITOS-SON-LA-GUIA.md: ya no hace falta ningún botón para
+   crearlos, nacen solos al abrir la ficha). A 1905px, como pide el
+   encargo. Nada de fechas escritas a mano: el plazo se cuenta desde
+   hoy.
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
@@ -152,40 +155,36 @@ await pagina.waitForTimeout(400);
 
 const CLAVE = '260907 MATRICULA 26-27 Aguilar Ponce, Marina 1140233';
 
-async function abrirFicha() {
+async function abrirFicha(clave) {
   await pagina.evaluate((clave) => {
     const a = App.E.listaAbiertos.filter(x => x.nombre === clave)[0];
     App.abrirFicha(a, 'abierto');
-  }, CLAVE);
+  }, clave);
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-  await pagina.waitForFunction(() => {
-    const c = document.getElementById('ficha-guia');
-    const e = document.getElementById('hitos-entrada');
-    return (c && c.querySelector('.hito')) || (e && e.querySelector('button'));
-  });
+  await pagina.waitForFunction(() => document.querySelectorAll('#ficha-guia .hito').length > 0);
   await pagina.waitForTimeout(400);
 }
 
-async function leerHitosDeDisco() {
+async function leerHitosDeDisco(clave) {
   return pagina.evaluate(async (clave) => {
     const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
     const f = await g.getFileHandle('hitos.json');
     const j = JSON.parse(await (await f.getFile()).text());
     return (j.porAsunto && j.porAsunto[clave]) || null;
-  }, CLAVE);
+  }, clave);
 }
 
-await comprobar('el asunto ha nacido con hitos', leerHitosDeDisco().then(e => !!(e && e.hitos.length)), true);
+await comprobar('el asunto ha nacido con hitos', leerHitosDeDisco(CLAVE).then(e => !!(e && e.hitos.length)), true);
 
-await abrirFicha();
+await abrirFicha(CLAVE);
 await comprobar('salen los hitos de arriba (p1, p2, p3): p4 queda cortado por la decisión',
   pagina.locator('#ficha-guia .hito').count(), 3);
 await comprobar('el primero está en curso',
   pagina.locator('#ficha-guia .hito[data-id="p1"]').getAttribute('class').then(c => c.indexOf('hito-encurso') !== -1), true);
 
-/* ================= ESCENARIO 2: asunto viejo, botón "Crear los hitos de la guía" ================= */
+/* ================= ESCENARIO 2: asunto viejo, hitos automáticos ================= */
 
-console.log('--- escenario 2: un asunto viejo importa lo ya marcado ---');
+console.log('--- escenario 2: un asunto viejo crea sus hitos solo, importando lo ya marcado ---');
 await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 const CLAVE_VIEJA = '260601 MATRICULA Asunto Viejo, Nadie 0000';
@@ -210,28 +209,29 @@ await pagina.evaluate(async (clave) => {
 await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(400);
 
-await pagina.evaluate((clave) => {
-  const a = App.E.listaAbiertos.filter(x => x.nombre === clave)[0];
-  App.abrirFicha(a, 'abierto');
-}, CLAVE_VIEJA);
-await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-await pagina.waitForFunction(() => {
-  const e = document.getElementById('hitos-entrada');
-  return e && e.textContent.indexOf('Crear los hitos de la guía') !== -1;
-});
-await comprobar('sale el botón para crearlos desde la guía',
-  pagina.getByRole('button', { name: 'Crear los hitos de la guía' }).isVisible(), true);
-await comprobar('y la guía de siempre, con sus casillas, sigue exactamente igual debajo',
-  pagina.locator('#ficha-guia .paso-casilla').count(), 6);
+await abrirFicha(CLAVE_VIEJA);
 
-await pagina.getByRole('button', { name: 'Crear los hitos de la guía' }).click();
-await pagina.waitForTimeout(500);
+await comprobar('no sale ningún botón de "Crear los hitos": se han creado solos',
+  pagina.getByRole('button', { name: 'Crear los hitos de la guía' }).count(), 0);
+await comprobar('la guía ya no se ve como texto con casillas',
+  pagina.locator('#ficha-guia .paso-casilla').count(), 0);
 await comprobar('p1 nace hecho (venía en pasosHechos)',
   pagina.locator('#ficha-guia .hito[data-id="p1"]').getAttribute('class').then(c => c.indexOf('hito-hecho') !== -1), true);
 await comprobar('p3 nace con su rama ya elegida (o1, pasosElegidos)',
   pagina.locator('#ficha-guia .hito[data-id="p3a1"]').count(), 1);
 await comprobar('y p2, el siguiente pendiente, pasa a estar en curso',
   pagina.locator('#ficha-guia .hito[data-id="p2"]').getAttribute('class').then(c => c.indexOf('hito-encurso') !== -1), true);
+
+console.log('--- abrir la misma ficha dos veces seguidas no duplica los hitos ---');
+const antesDeReabrir = await leerHitosDeDisco(CLAVE_VIEJA);
+await pagina.click('#ficha-volver');
+await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+await abrirFicha(CLAVE_VIEJA);
+const despuesDeReabrir = await leerHitosDeDisco(CLAVE_VIEJA);
+await comprobar('sigue habiendo los mismos hitos, ni uno más',
+  despuesDeReabrir.hitos.length, antesDeReabrir.hitos.length);
+await comprobar('y con el mismo contenido exacto: no se han vuelto a crear',
+  JSON.stringify(despuesDeReabrir), JSON.stringify(antesDeReabrir));
 
 /* ================= AJUSTES › HITOS: un día no lectivo (para el escenario 7) ================= */
 
@@ -267,7 +267,7 @@ await comprobar('el día no lectivo se ha guardado en hitos.json', pagina.evalua
 
 console.log('--- escenario 3: marcar un hito hecho pone el siguiente en curso ---');
 await pagina.click('.pestana[data-pantalla="abiertos"]');
-await abrirFicha();
+await abrirFicha(CLAVE);
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-casilla').check();
 await pagina.waitForTimeout(500);
 await comprobar('p1 queda hecho',
@@ -297,7 +297,7 @@ await comprobar('aparecen los hitos de la rama elegida',
 await comprobar('y el que viene después de la decisión, p4, también',
   pagina.locator('#ficha-guia .hito[data-id="p4"]').count(), 1);
 await comprobar('el plazo de p4 (10 días hábiles desde p2, con un no lectivo por medio) es el correcto',
-  leerHitosDeDisco().then(e => (e.hitos.find(h => h.id === 'p4') || {}).fecha), esperado7);
+  leerHitosDeDisco(CLAVE).then(e => (e.hitos.find(h => h.id === 'p4') || {}).fecha), esperado7);
 
 console.log('--- escenario 8: el responsable "papel" se resuelve con el tercero ---');
 await comprobar('p4 enseña el tercero del asunto como responsable',
@@ -311,7 +311,7 @@ await pagina.fill('#ficha-guia .hito[data-id="p3a1"] .hito-nota-texto', 'Entrega
 await pagina.locator('#ficha-guia .hito[data-id="p3a1"] .hito-nota-anadir').click();
 await pagina.waitForTimeout(400);
 await comprobar('la nota se ha guardado',
-  leerHitosDeDisco().then(e => {
+  leerHitosDeDisco(CLAVE).then(e => {
     const h = e.hitos.find(x => x.id === 'p3').opciones.find(o => o.id === 'o1').hitos.find(x => x.id === 'p3a1');
     return h.notas.length;
   }), 1);

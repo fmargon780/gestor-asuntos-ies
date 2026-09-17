@@ -1,20 +1,23 @@
 /* Prueba en navegador de verdad de las preguntas con opciones dentro de
-   una guía.
+   una guía, después del cambio de diseño "los hitos son la guía"
+   (17-sep-2026, fila 26, docs/HITOS-SON-LA-GUIA.md): ya no se ven como
+   texto (`.guia-opcion`/`.guia-rama`), nacen como un hito de decisión.
 
    El caso es el suyo, el de la factura:
-     Comprobación de validez
      Registrar entrada
      ¿Cómo hemos recibido la factura?
         · En mano       -> sello y firma · entregarla a Fátima
         · Digitalmente  -> a la firma digital del director
 
    Lo que tiene que pasar:
-     - hasta elegir, no se ve ningún paso de ninguna rama,
-     - al elegir una, salen solo los suyos,
-     - la cuenta de pasos crece con la rama elegida,
-     - lo elegido se guarda en la ficha del asunto,
-     - se puede cambiar de respuesta, y se puede escribir todo esto
-       desde el cuadro de la guía sin tocar el fichero a mano. */
+     - se puede escribir la pregunta desde la ficha, con el mismo
+       cuadro de siempre (eso no cambia),
+     - hasta elegir, no se ve ningún hito de ninguna rama, y los dos
+       botones de la decisión están siempre a la vista (no hace falta
+       desplegar nada),
+     - al elegir una opción, salen solo sus hitos y la cuenta crece,
+     - se puede cambiar de rama (con el mismo "Cambiar de rama" que
+       usan los hitos normales), y se recuerda al volver a entrar. */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
@@ -63,7 +66,7 @@ const abrirLaFicha = async () => {
 
 console.log('--- escribiendo la pregunta desde la ficha ---');
 await abrirLaFicha();
-await pagina.locator('#ficha-guia button').first().click();
+await pagina.locator('#ficha-guia .nota button').click();
 await pagina.waitForSelector('#guia-anadir');
 
 /* Paso 1, normal. */
@@ -117,73 +120,63 @@ await comprobar('se ha guardado la pregunta con sus dos ramas',
         pasos: ['A la firma digital del director'] }
     ] });
 
-console.log('--- sin responder, no se ve ninguna rama ---');
-await pagina.waitForTimeout(400);
+console.log('--- la ficha se repinta: nace como hito de decisión ---');
+await pagina.waitForFunction(() => document.querySelectorAll('#ficha-guia .hito').length > 0);
+await pagina.waitForTimeout(300);
 const texto = () => pagina.locator('#ficha-guia').textContent();
-await comprobar('los dos botones están',
-  pagina.locator('#ficha-guia .guia-opcion').count(), 2);
-await comprobar('la rama de en mano está escondida',
-  pagina.locator('#ficha-guia .guia-rama').nth(0).isVisible(), false);
-await comprobar('la digital también',
-  pagina.locator('#ficha-guia .guia-rama').nth(1).isVisible(), false);
-await comprobar('y la cuenta es de 2 pasos',
-  texto().then(t => t.indexOf('0 de 2 pasos hechos') !== -1), true);
+
+console.log('--- sin responder, no se ve ninguna rama ---');
+await comprobar('salen el paso normal y la decisión, sin ramas todavía',
+  pagina.locator('#ficha-guia .hito').count(), 2);
+await comprobar('la decisión es un hito de clase decision',
+  pagina.locator('#ficha-guia .hito-decision').count(), 1);
+await comprobar('los dos botones de opción están siempre a la vista',
+  pagina.locator('#ficha-guia .hito-opcion').count(), 2);
+await comprobar('y la cuenta se corta en la decisión: 2 hitos',
+  texto().then(t => t.indexOf('0 de 2 hitos hechos') !== -1), true);
 
 console.log('--- eligiendo "en mano" ---');
-await pagina.locator('#ficha-guia .guia-opcion').nth(0).click();
+await pagina.getByRole('button', { name: 'La hemos recibido en mano', exact: true }).click();
 await pagina.waitForTimeout(600);
-await comprobar('sale su rama',
-  pagina.locator('#ficha-guia .guia-rama').nth(0).isVisible(), true);
-await comprobar('y la otra sigue escondida',
-  pagina.locator('#ficha-guia .guia-rama').nth(1).isVisible(), false);
-await comprobar('salen sus dos pasos',
-  texto().then(t => t.indexOf('Entregársela a Fátima') !== -1), true);
-await comprobar('la cuenta pasa a 4 pasos, uno hecho',
-  texto().then(t => t.indexOf('1 de 4 pasos hechos') !== -1), true);
-await comprobar('se ha guardado la respuesta en el asunto',
+await comprobar('salen sus dos hitos',
+  texto().then(t => t.indexOf('Ponerle el sello de recibido y la firma') !== -1 &&
+                     t.indexOf('Entregársela a Fátima') !== -1), true);
+await comprobar('la otra rama no aparece',
+  texto().then(t => t.indexOf('firma digital del director') !== -1), false);
+await comprobar('la cuenta pasa a 4 hitos',
+  texto().then(t => t.indexOf('0 de 4 hitos hechos') !== -1), true);
+await comprobar('se ha guardado la elección en hitos.json',
   pagina.evaluate(async () => {
     const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
-    const f = await g.getFileHandle('asuntos.json');
+    const f = await g.getFileHandle('hitos.json');
     const j = JSON.parse(await (await f.getFile()).text());
-    const clave = Object.keys(j.asuntos).filter(k => k.indexOf('COMPRA') !== -1)[0];
-    return Object.keys(j.asuntos[clave].pasosElegidos || {}).length;
-  }), 1);
+    const clave = Object.keys(j.porAsunto).filter(k => k.indexOf('COMPRA') !== -1)[0];
+    const decision = j.porAsunto[clave].hitos.find(h => h.clase === 'decision');
+    return !!decision.elegida;
+  }), true);
 
-console.log('--- marcando un paso de la rama ---');
-await pagina.locator('#ficha-guia .guia-rama').nth(0).locator('.paso-casilla').first().check();
+console.log('--- marcando un hito de la rama ---');
+await pagina.locator('#ficha-guia .hito', { hasText: 'Ponerle el sello de recibido y la firma' })
+  .locator('.hito-casilla').check();
 await pagina.waitForTimeout(600);
 await comprobar('la cuenta sube',
-  texto().then(t => t.indexOf('2 de 4 pasos hechos') !== -1), true);
+  texto().then(t => t.indexOf('1 de 4 hitos hechos') !== -1), true);
 
-console.log('--- cambiando de respuesta ---');
-await pagina.locator('#ficha-guia .guia-opcion').nth(1).click();
+console.log('--- cambiando de rama ---');
+await pagina.locator('#ficha-guia .hito-decision .hito-titulo').click();
+await pagina.locator('#ficha-guia .hito-decision .hito-cambiar-rama').click();
+await pagina.locator('#ficha-guia .hito-decision .hito-cuerpo .hito-opcion',
+  { hasText: 'Nos ha llegado digitalmente' }).click();
 await pagina.waitForTimeout(600);
 await comprobar('ahora se ve la rama digital',
-  pagina.locator('#ficha-guia .guia-rama').nth(1).isVisible(), true);
-await comprobar('y la de en mano se esconde',
-  pagina.locator('#ficha-guia .guia-rama').nth(0).isVisible(), false);
-await comprobar('la cuenta cuenta solo la rama elegida',
-  texto().then(t => t.indexOf('1 de 3 pasos hechos') !== -1), true);
-
-console.log('--- y se puede dejar sin responder ---');
-await pagina.locator('#ficha-guia .guia-opcion').nth(1).click();
-await pagina.waitForTimeout(600);
-await comprobar('las dos ramas se esconden',
-  pagina.locator('#ficha-guia .guia-rama').nth(1).isVisible(), false);
-await comprobar('y la cuenta vuelve a 2 pasos',
-  texto().then(t => t.indexOf('0 de 2 pasos hechos') !== -1), true);
+  texto().then(t => t.indexOf('A la firma digital del director') !== -1), true);
+await comprobar('y la de en mano ya no se ve',
+  texto().then(t => t.indexOf('Entregársela a Fátima') !== -1), false);
 
 console.log('--- al volver a entrar, se recuerda ---');
-await pagina.locator('#ficha-guia .guia-opcion').nth(0).click();
-await pagina.waitForTimeout(600);
 await abrirLaFicha();
-await comprobar('sigue elegida "en mano"',
-  pagina.locator('#ficha-guia .guia-opcion').nth(0).getAttribute('class'),
-  'guia-opcion elegida');
-await comprobar('con su rama a la vista',
-  pagina.locator('#ficha-guia .guia-rama').nth(0).isVisible(), true);
-await comprobar('y lo que estaba marcado sigue marcado',
-  texto().then(t => t.indexOf('2 de 4 pasos hechos') !== -1), true);
+await comprobar('sigue elegida la rama digital',
+  texto().then(t => t.indexOf('A la firma digital del director') !== -1), true);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
