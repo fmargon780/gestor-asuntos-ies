@@ -62,6 +62,51 @@
     App.ir(modoActual === 'archivado' ? 'archivo' : 'abiertos');
   }
 
+  /* Si la ficha se ve de verdad en pantalla (y no solo que `actual`
+     se ha quedado puesto porque no se pulsó "Volver" al cambiar de
+     pestaña). Un repintado AUTOMÁTICO —el que no ha pedido Francisco
+     pulsando un botón— consulta esto antes de tocar nada, y nunca
+     navega por su cuenta (fila 30, 17-sep-2026: guardar un documento
+     no debe echar de la ficha a la lista de asuntos). */
+  function fichaVisible() {
+    if (!actual) return false;
+    var pantalla = $('pantalla-asunto');
+    return !!pantalla && !pantalla.classList.contains('oculto');
+  }
+  App.fichaAbierta = function () { return fichaVisible() ? actual.nombre : ''; };
+
+  /* Cada vez que se relee la carpeta (App.verAbiertos, envuelta más
+     abajo), el asunto que tenía la ficha en la mano deja de ser el
+     mismo objeto. Aquí se vuelve a coger de la lista fresca, por su
+     nombre, y se repinta en su sitio: así un repaso automático de la
+     carpeta (`App.mirarLaCarpeta`) o guardar un documento dentro del
+     asunto nunca echan a Francisco a la lista, solo refrescan lo que
+     tienen delante. Si el asunto ya no está en absoluto (se ha
+     archivado o borrado desde el otro ordenador), entonces sí se
+     vuelve, con un aviso de una línea. */
+  App.reengancharFicha = function () {
+    if (!fichaVisible() || modoActual !== 'abierto') return;
+    var mismo = App.E.listaAbiertos.filter(function (x) { return x.nombre === actual.nombre; })[0];
+    if (mismo) { actual = mismo; pintar(); return; }
+    U.aviso('Este asunto ya no está en Asuntos abiertos: puede que se haya archivado o ' +
+      'borrado desde el otro ordenador.', 'malo');
+    volverALaLista();
+  };
+
+  /* App.verAbiertos (js/asuntos-lista.js) relee la carpeta entera y
+     crea asuntos nuevos cada vez: se envuelve aquí, en vez de tocar
+     ese fichero, para que cualquiera de sus llamadas —el barrido
+     automático, el botón "Recargar", meter un suelto o un correo en
+     un asunto, añadir un tipo que faltaba— reenganche sola la ficha
+     si hay una abierta, sin repetir el apaño en cada sitio. */
+  if (typeof App.verAbiertos === 'function') {
+    var comoEraVerAbiertos = App.verAbiertos;
+    App.verAbiertos = async function (yaLeido) {
+      await comoEraVerAbiertos(yaLeido);
+      App.reengancharFicha();
+    };
+  }
+
   /* El nombre del asunto, en la tarjeta de la lista, abre la ficha.
 
      Y ya que dentro de la ficha están todos los botones, la tarjeta se
@@ -647,12 +692,10 @@
     try {
       App.E.tipos.push({ tipo: nombre, categoria: categoria });
       await App.guardarTipos();
+      /* App.verAbiertos ya reengancha sola la ficha (más arriba en
+         este fichero): no hace falta repetir aquí el apaño de volver
+         a coger el asunto de la lista fresca. */
       await App.verAbiertos();
-      /* La carpeta se lee otra vez, así que hay que volver a coger el
-         asunto: el de antes ya no es el mismo objeto. */
-      var mismo = App.E.listaAbiertos.filter(function (x) { return x.nombre === actual.nombre; })[0];
-      if (mismo) actual = mismo;
-      pintar();
       U.aviso('Tipo ' + nombre + ' añadido a la lista.', 'bueno');
     } catch (e) {
       U.aviso('No he podido añadirlo: ' + e.message, 'malo');
