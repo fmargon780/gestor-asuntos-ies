@@ -134,6 +134,7 @@ App.elegirTipo = function (t) {
   App.pintarTipos();
   $('bloque-tercero').classList.remove('oculto');
   $('bloque-detalles').classList.add('oculto');
+  App.loPideNuevoControles = null;
   $('etiqueta-tercero').textContent = {
     ALUMNADO: 'Alumno o alumna', PERSONAL: 'Persona del centro',
     EMPRESAS: 'Empresa', OTROS: 'Con quién es el asunto'
@@ -445,9 +446,22 @@ App.fijarTercero = function (p) {
   }
 
   App.pintarCamposDelTipo();
+  App.pintarLoPideNuevo(p);
 
   $('bloque-detalles').classList.remove('oculto');
   App.refrescarVista();
+};
+
+/* "Lo pide (opcional)": quién ha pedido esta gestión, por qué vía y en
+   qué fecha (17-sep-2026, fila 28, docs/LO-PIDE.md). Toda la lógica de
+   los controles vive en js/lo-pide.js; aquí solo se monta, con el
+   tercero recién elegido, y se guarda lo que devuelva `leer()` en
+   `App.loPideNuevoControles`, para que `App.datosDelFormulario()` lo
+   lea. Se repinta cada vez que cambia el tercero. */
+App.loPideNuevoControles = null;
+App.pintarLoPideNuevo = function (persona) {
+  if (!window.LoPide) return;
+  App.loPideNuevoControles = LoPide.controles($('lopide-caja-nuevo'), persona, null);
 };
 
 App.grupoDelTercero = function () {
@@ -477,7 +491,8 @@ App.datosDelFormulario = function () {
   var camposParaNombre = App.valoresCamposActuales()
     .filter(function (v) { return v.enNombre && v.valor; })
     .map(function (v) { return v.valor; });
-  return {
+  var loPide = App.loPideNuevoControles ? App.loPideNuevoControles.leer() : null;
+  var d = {
     fecha: $('campo-fecha').value,
     tipo: App.E.nuevo.tipo || '',
     curso: $('campo-curso').value.trim(),
@@ -486,6 +501,10 @@ App.datosDelFormulario = function () {
     descripcion: $('campo-descripcion').value.trim(),
     tercero: App.E.nuevo.tercero ? App.textoTercero(App.E.nuevo.tercero) : ''
   };
+  /* Solo se añade la clave si hay nombre: dejarlo todo en blanco es
+     válido, y entonces el asunto nace sin `loPide` (docs/LO-PIDE.md, 3). */
+  if (loPide && loPide.nombre) d.loPide = loPide;
+  return d;
 };
 
 App.refrescarVista = function () {
@@ -528,7 +547,7 @@ $('btn-crear').onclick = async function () {
       camposParaGuardar[v.clave] = { valor: v.valor, enNombre: v.enNombre };
     });
 
-    await App.anotar(nombre, {
+    var datosNuevoAsunto = {
       estado: 'abierto', tipo: d.tipo, categoria: App.E.nuevo.categoria,
       tercero: d.tercero, curso: d.curso, grupo: d.grupo, descripcion: d.descripcion,
       campos: camposParaGuardar,
@@ -537,7 +556,9 @@ $('btn-crear').onclick = async function () {
       viaDato: $('campo-via-dato').value.trim(),
       limite: $('campo-limite').value,
       abiertoEl: U.ahora(), abiertoPor: App.E.usuario
-    });
+    };
+    if (d.loPide) datosNuevoAsunto.loPide = d.loPide;
+    await App.anotar(nombre, datosNuevoAsunto);
 
     /* Si el asunto se ha empezado desde un documento suelto, ese
        documento se mete ahora en la carpeta recién creada. */
@@ -564,6 +585,8 @@ $('btn-crear').onclick = async function () {
     $('campo-limite').value = '';
     App.limiteNuevoAuto = '';
     $('campo-grupo').checked = false;
+    App.loPideNuevoControles = null;
+    $('lopide-caja-nuevo').innerHTML = '';
     $('bloque-tipos').classList.add('oculto');
     $('bloque-grupo').classList.add('oculto');
     $('bloque-campos').classList.add('oculto');
