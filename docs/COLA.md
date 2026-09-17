@@ -28,11 +28,21 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
    `docs/CONTEXTO-CORTO.md` pase de 160 líneas.
 10. **Antes de subir nada, vuelve a bajar `main`.** Marcar la fila EN CURSO no basta: otra sesión
     puede haber fusionado su trabajo mientras tanto, y subir ficheros enteros sin releer pisa lo
-    suyo. Pasó el 16-sep-2026 con las filas 13 y 14.
+    suyo. Pasó el 16-sep-2026 con las filas 13 y 14, y otra vez el 17-sep-2026 con la fila 38,
+    apuntada mientras la sesión de la fila 35 preparaba su subida. **Vuelve a bajar `main` justo
+    antes de cada llamada que suba un fichero, no una sola vez al empezar el cierre.**
 11. **Nunca subas un fichero con un texto de relleno en vez de su contenido.** Si no tienes el
     contenido entero delante, no lo subas: bájalo antes. El 17-sep-2026 `docs/CONTEXTO.md` se
     quedó en `main` con la palabra `PLACEHOLDER_WILL_REPLACE` y nada más, y hubo que recuperarlo
     del historial de git. Después de subir, vuelve a bajar lo subido y compruébalo.
+12. **Algunas sesiones no pueden subir un fichero de más de unos 45-50 KB de una sola vez**:
+    la llamada que sube el contenido se corta sola sin avisar de ningún error, y el fichero queda
+    en `main` con solo el primer trozo. Pasó el 17-sep-2026 con `docs/HISTORIA.md` (ver la nota al
+    final de esta cola). **Antes de subir un fichero grande** (`docs/CONTEXTO.md`,
+    `docs/HISTORIA.md`), compruébalo después de subirlo (`get_file_contents` o
+    `git show origin/main:<ruta>`) y compara el tamaño con el de antes de escribirlo: si ha
+    quedado más corto de lo esperado, esa sesión no puede con este fichero de una vez, y hay que
+    dejarlo apuntado aquí en vez de reintentarlo mil veces.
 
 ## Reglas para Francisco
 
@@ -86,9 +96,14 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 35 | `docs/HUECOS-INSERTAR.md` | HECHA | Acordado con Francisco el 17-sep-2026. El muro de más de treinta botones de huecos del editor de plantillas de correo se sustituye por un solo botón "Insertar hueco" encima del cuadro de texto. Módulo nuevo `js/huecos-buscador.js` (`window.HuecosBuscador`): `montar({ boton, campos })` abre un cuadro flotante pequeño pegado al botón (`position:fixed`, colgado del `<body>`, por encima de la capa del cuadro y por debajo de los mensajes), con buscador arriba que filtra por nombre en claro y por código sin mayúsculas ni tildes (`U.normalizar`), flechas y Enter para elegir, Escape para cerrar y mousedown fuera; Escape y el pulsar fuera se vigilan **en fase de captura**, para no cerrar de paso el `U.preguntar` de la plantilla que hay debajo (es el único diálogo de la aplicación, y `js/usabilidad.js` lo cierra con Escape). Mismo patrón de apertura y cierre que `App.botonMenuTarjeta` de `js/ajustes.js`. El hueco entra donde estuviera el cursor, sustituyendo lo seleccionado si lo había, y al insertar se lanza un evento `input` para que la vista previa se repinte sola. Se recuerda el último campo que tuvo el foco y su `selectionStart`/`selectionEnd` (`focus`/`blur`/`keyup`/`mouseup`/`input`), porque al abrir el buscador el foco se va; sin foco previo, el hueco va al final del último campo de la lista, que es el cuadro de texto. Admite varios campos desde el principio, aunque hoy el formulario solo tenga uno: **la plantilla de correo no tiene campo "asunto"** (el asunto se escribe en el cuadro de Correo, no en la plantilla) y `plantillas.json` no cambia, así que la regla del "último que tuvo el foco" se prueba con dos campos montados en la propia página. **No se ha tocado `js/plantillas-documento.js`**: su rejilla `#pd-huecos` no es el mismo muro, es un catálogo de referencia con botones "Copiar" al final del bloque de Ajustes, para pegar a mano en el Word, y ahí no hay cuadro de texto donde insertar nada. Tampoco hay editor de plantillas de mensaje de Séneca: la misma plantilla de correo sirve para los dos. `Plantillas.HUECOS` ya era una lista de `{clave, etiqueta}`, así que `js/plantillas.js` no se toca. Estilos en `css/ajustes.css`. `js/plantillas-ajustes.js` se queda en 313 líneas, sin partir. Prueba nueva `pruebas/plantillas-huecos.mjs`, en navegador de verdad, con los cinco escenarios del encargo (comprobado que falla sin el arreglo). Batería completa en verde (956 comprobaciones, 43 ficheros). **De paso se ha devuelto a esta cola la nota "Arreglado: `docs/CONTEXTO.md`"**, que el commit de las filas 36 y 37 había dejado otra vez como "Pendiente de arreglar" partiendo de una copia vieja: `docs/CONTEXTO.md` está entero en `main` (1.863 líneas, 48 secciones, sin ningún PLACEHOLDER), comprobado con `git show origin/main:docs/CONTEXTO.md`. `docs/HISTORIA.md` no se ha tocado, por lo mismo que en las filas 33 y 34: lo que merecía contarse está en esta fila, y reescribir a mano un fichero de 138 KB es justo lo que rompió `docs/CONTEXTO.md`. Subido directo a `main`, sin pull request. Versión publicada `App.VERSION`: `17-sep-2026 · 17:18`. |
 | 36 | `docs/FILAS-QUE-NO-SE-ESTRUJAN.md` | HECHA | `css/filas.css` nuevo (enlazado el último de todos los `<link>`), con la regla de siempre: texto con un ancho mínimo, la fila envuelve a una segunda línea si no cabe, y con más de dos botones el resto entra en `U.menuDeAcciones` (`js/util.js`), un menú de tres puntos colgado de la propia fila —nunca de `<body>`— para que `aplicarModoConsulta` lo apague igual que a cualquier otro control. El fallo de verdad estaba en `css/registro.css` (`min-width:0` en el primer hijo de `.ficha-documento-fila`, sin `flex-wrap`); con el menú puesto, `js/ficha-documentos.js` deja a la vista solo el nombre y Registrar, y `js/documentos-sueltos.js` solo "Crear asunto con él" y "Meter en un asunto". Ha hecho falta tocar dos ficheros más de los que pedía la instrucción: `js/copiar.js` (ya no envuelve el botón del documento en una fila propia: mete "Copiar" en el menú) y `js/papelera.js` (mete "Borrar" en el menú en vez de colgarlo suelto). La barra se pliega sola al abrir el visor o el lector (`MutationObserver` sobre las clases de `<body>`) y vuelve a como estaba al cerrarlo; con la barra plegada, `.contenido` se queda sin el `max-width:1360px` que le ganaba por especificidad al `max-width:none` de `css/vista.css`. Revisadas también `.hito-linea` (min-width, sin menú: el título entero se pulsa para desplegar) y `.tarjeta`/`.acciones`, las listas de Ajustes y `.relacionado-fila`, que ya envolvían bien y no se han tocado. Se han actualizado seis pruebas existentes que pulsaban Abrir/Separar/Unir/Sacar páginas/Borrar directamente (ahora hay que abrir el menú primero): `pruebas/documento-a-la-vista.mjs`, `pruebas/documentos-sueltos.mjs`, `pruebas/papelera.mjs`, `pruebas/separar-unir-navegador.mjs` y `pruebas/tablon.mjs`. Prueba nueva `pruebas/filas-estrechas.mjs`, en navegador de verdad (comprobado que sus dos primeros escenarios fallan sin el arreglo de `css/filas.css`). Batería completa en verde (`npm test`). **Subido con pull request** (rama `claude/sweet-pasteur-xnhwu9`; esta sesión, "en la nube", no tiene permiso para tocar `main` directamente — ver la nota al final de esta cola). Versión `App.VERSION`: `17-sep-2026 · 18:09`. |
 | 37 | `docs/FICHA-DEL-ASUNTO-NUEVA.md` | PENDIENTE | Acordado con Francisco el 17-sep-2026, en la misma conversación que la fila 36; va después de ella. La ficha se recoloca: izquierda Hitos y Documentos, derecha Datos y contacto (la primera), Otros asuntos y Notas (estilo tablón, escribiendo directamente). "Datos y contacto" pasa a una sola línea con nombre, grupo, edad, un solo teléfono (el del primer tutor si el alumno es menor) y DNI, con etiqueta ámbar `NO MATRICULADO` o azul `SOLICITANTE` cuando toque. "Ver todo" abre una ventana por secciones con los **tutores agrupados por persona** (`Datos.tutoresDe` nueva: hoy Séneca los vuelca columna a columna y mezclados). Módulos nuevos `js/ficha-tercero.js` y `css/ficha-tercero.css` para no engordar `js/ficha-asunto.js`. |
-| 38 | `docs/BUSCADOR-ARCHIVO-INDICE.md` | PENDIENTE | Acordado con Francisco el 17-sep-2026. Primera de tres instrucciones sobre el buscador del ARCHIVO (las otras dos, filtros y caja única, se diseñarán aparte). Índice guardado `_GESTOR/indice-archivo.json` (módulo nuevo `js/archivo-indice.js`, `window.IndiceArchivo`), con botón "Reconstruir el índice" en la pantalla ARCHIVO; búsqueda por palabras sueltas (no solo texto seguido) sobre nombre, tercero, documentos, registros de Séneca y datos de la ficha del asunto; asuntos descolocados (fuera de los tres niveles) salen igualmente, con su ruta. Alta y baja del índice al archivar y reabrir. |
+| 38 | `docs/LO-PIDE-NOMBRE-DEL-TUTOR.md` | PENDIENTE | Apuntada 17-sep-2026. En "Lo pide", las opciones de tutor legal salen con un número en vez del nombre |
+| 39 | `docs/AJUSTES-POR-TIPO.md` | PENDIENTE | Acordado con Francisco el 17-sep-2026. Ajustes se parte en tres pestañas (Tipos de asunto · El centro · Mantenimiento) y cada tipo de asunto pasa a tener pantalla propia a dos columnas con sus campos, pasos, plantillas de correo y de Word, plazo y recurrencia dentro. `js/ajustes.js` (52 KB) se parte en `js/ajustes-tipo.js`, `js/ajustes-centro.js` y `js/ajustes-mantenimiento.js` |
+| 40 | `docs/SALTAR-A-OTRO-ASUNTO.md` | PENDIENTE | Apuntada por otra sesión el 17-sep-2026, sin fila (el fichero se subió a `main` pero la cola no se llegó a actualizar): saltar a otro asunto del mismo tercero y volver. |
+| 41 | `docs/BUSCADOR-ARCHIVO-INDICE.md` | PENDIENTE | Acordado con Francisco el 17-sep-2026. Primera de tres instrucciones sobre el buscador del ARCHIVO (las otras dos, filtros y caja única, se diseñarán aparte). Índice guardado `_GESTOR/indice-archivo.json` (módulo nuevo `js/archivo-indice.js`, `window.IndiceArchivo`), con botón "Reconstruir el índice" en la pantalla ARCHIVO; búsqueda por palabras sueltas (no solo texto seguido) sobre nombre, tercero, documentos, registros de Séneca y datos de la ficha del asunto; asuntos descolocados (fuera de los tres niveles) salen igualmente, con su ruta. Alta y baja del índice al archivar y reabrir. Esta fila se numeró después de las 38-40, que otras sesiones en paralelo habían apuntado mientras esta preparaba su subida (ver la regla 10). |
 
-**Orden de trabajo:** quedan pendientes las filas 37 y 38, en ese orden (la 37 va después de la 36: comparten pantalla; la 38 es independiente, añadida al final). Las filas 1 a 36 están hechas.
+**Orden de trabajo:** quedan pendientes las filas 37, 38, 39, 40 y 41, en ese orden (la 37 va
+después de la 36: comparten pantalla; el resto son independientes, en el orden en que se
+apuntaron). Las filas 1 a 36 están hechas.
 
 ## Arreglado: `docs/CONTEXTO.md` (roto durante la fila 33)
 
@@ -106,8 +121,32 @@ Ojo, volvió a desandarse una vez: el commit de las filas 36 y 37 (17-sep-2026) 
 vieja de esta cola y dejó otra vez la nota como "Pendiente de arreglar", aunque el fichero ya
 estaba bien. Lo devolvió a su sitio la sesión de la fila 35. **`docs/CONTEXTO.md` está entero.**
 
-`docs/HISTORIA.md` no ha hecho falta tocarlo: nunca llegó a romperse, y lo que merecía contarse de
-las filas 33, 34 y 35 ya está en sus propias filas de esta cola.
+## Arreglado: `docs/HISTORIA.md` (roto el 17-sep-2026 por la tarde)
+
+`docs/HISTORIA.md` **no hacía falta tocarlo**: como dice la nota de la fila 35, lo que merecía
+contarse de las filas 33, 34 y 35 ya está en sus propias filas de esta cola. Pero una sesión
+posterior, sin ver esa nota, intentó de todas formas añadirle una entrada de la fila 33 al final
+del diario. Esa sesión concreta no puede escribir de una sola vez un fichero de más de unos
+45-50 KB (regla 12 de esta cola): la llamada que sube el contenido se corta sola, sin ningún
+error, y deja el fichero con solo el primer trozo. Pasó dos veces seguidas, con `docs/HISTORIA.md`
+(138 KB): la primera dejó el fichero en 44 KB, la segunda en 48.766 bytes (donde sigue ahora), muy
+lejos de sus 138.402 bytes de verdad.
+
+**Cómo arreglarlo** (necesita una sesión que pueda subir un fichero grande de una vez, o hacerlo
+con varias llamadas pequeñas sin perder ningún trozo por el camino):
+
+    git checkout 0aea5b3daa4170c46b1c47af18e8dc29bbe81a87 -- docs/HISTORIA.md
+
+Esa es la última versión buena conocida antes de este percance (blob
+`ad53467e3d2493cd4bdadf5ff96ad25e04be4b30`, **140.232 bytes** de verdad: la nota de arriba decía
+138.402 por error). **No hacía falta añadirle nada más**: como ya decía la nota de la fila 35, el
+diario no necesitaba ninguna entrada nueva por las filas 33, 34 o 35.
+
+**Arreglado** (17-sep-2026, por la sesión de la fila 36), con el `git checkout` de arriba:
+`docs/HISTORIA.md` está otra vez en 140.232 bytes, comprobado con `git hash-object` contra el
+blob de la versión buena (`ad53467e3d2493cd4bdadf5ff96ad25e04be4b30`, coincide byte a byte).
+
+`docs/CONTEXTO.md` no se ha tocado en este percance: sigue entero, como dice la nota de arriba.
 
 ## Lo que vendrá después
 
