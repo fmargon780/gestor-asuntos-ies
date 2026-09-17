@@ -102,7 +102,9 @@
   function bloqueDeAjustes() {
     var ya = $('bloque-huerfanas');
     if (ya) return ya;
-    var pantalla = $('pantalla-ajustes');
+    /* 17-sep-2026, fila 39: este bloque vive en la pestaña
+       "Mantenimiento", no en la pantalla de Ajustes entera. */
+    var pantalla = $('ajustes-tab-mantenimiento');
     if (!pantalla) return null;
     var d = document.createElement('details');
     d.className = 'bloque-ajustes';

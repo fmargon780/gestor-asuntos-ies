@@ -36,7 +36,9 @@
   function bloqueDeAjustes() {
     var ya = $('bloque-hitos');
     if (ya) return ya;
-    var pantalla = $('pantalla-ajustes');
+    /* 17-sep-2026, fila 39: este bloque vive en la pestaña "El centro",
+       no en la pantalla de Ajustes entera. */
+    var pantalla = $('ajustes-tab-centro');
     if (!pantalla) return null;
     var d = document.createElement('details');
     d.className = 'bloque-ajustes';

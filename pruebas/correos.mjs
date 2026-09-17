@@ -115,6 +115,7 @@ async function dejarElCorreo(datos) {
    hay que entrar en esa vista y desplegar la barra para verla. */
 async function mirarLaBandeja() {
   await pagina.evaluate(() => App.ir('ajustes'));
+  await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
   await pagina.waitForSelector('#bloque-bandeja');
   await pagina.evaluate(() => { document.getElementById('bloque-bandeja').open = true; });
   await pagina.click('#botones-bandeja .boton');
@@ -160,6 +161,7 @@ await dejarElCorreo(correoDeMentira());
    (docs/CORREOS-DENTRO-DE-POR-CLASIFICAR.md). --- */
 console.log('--- la barra de correos: plegada de partida, con el número al día ---');
 await pagina.evaluate(() => App.ir('ajustes'));
+await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
 await pagina.waitForSelector('#bloque-bandeja');
 await pagina.evaluate(() => { document.getElementById('bloque-bandeja').open = true; });
 await pagina.click('#botones-bandeja .boton');

@@ -80,7 +80,11 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   de golpe (atajos de alumnado por unidad/nivel/enseñanza, grupos propios en `_GESTOR/grupos.json`
   desde Ajustes), y esos mismos grupos ponen los destinatarios de un correo, en copia oculta.
 - Parada al crear un asunto duplicado, y pantalla propia "Duplicados" para los ya existentes.
-- Ajustes ágiles: pestañas por categoría, buscador cruzado, aviso en vivo de nombres repetidos.
+- Ajustes tiene tres pestañas (Tipos de asunto · El centro · Mantenimiento). Pulsar una tarjeta de
+  tipo abre su pantalla propia, entera y a dos columnas, con sus siete secciones a la vista sin
+  plegar: Datos del tipo, Campos, Pasos del trámite, Plantillas de correo y de Séneca, Plantilla de
+  documento de Word, Plazo y Se repite (fila 39, 17-sep-2026). Dentro, pestañas por categoría,
+  buscador cruzado, aviso en vivo de nombres repetidos.
 - Campos propios por tipo de asunto, rellenos solos al crear.
 - Papelera: nada se borra del todo a la primera.
 - Mandar documentos de un asunto por correo: se marcan en el cuadro "Correo" y el script de Apps

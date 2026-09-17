@@ -412,7 +412,9 @@ await pagina.selectOption('#orden-abiertos', 'fecha-asc');
 await pagina.click('.pestana[data-pantalla="ajustes"]');
 /* Los bloques de Ajustes son <details> cerrados (9-sep-2026): se abren
    todos de una vez, y como no se vuelven a crear, se quedan abiertos
-   el resto de la prueba. */
+   el resto de la prueba. "Ficheros de datos" y "Cómo se abrevia cada
+   grupo" viven en la pestaña "El centro" (17-sep-2026, fila 39). */
+await pagina.evaluate(() => App.cambiarPestanaAjustes('centro'));
 await pagina.evaluate(() => {
   document.querySelectorAll('#pantalla-ajustes details').forEach((d) => { d.open = true; });
 });
@@ -439,6 +441,7 @@ await comprobar('y abrevia bien el de Bachillerato',
   pagina.locator('#tabla-grupos .fila-tipo').filter({ hasText: '1º Bach A' })
     .locator('.nombre-tipo').textContent(), '1ºBachA');
 
+await pagina.evaluate(() => App.cambiarPestanaAjustes('tipos'));
 await pagina.fill('#nuevo-tipo', 'evacuacion');
 await pagina.selectOption('#nueva-categoria', 'OTROS');
 await pagina.click('#btn-anadir-tipo');

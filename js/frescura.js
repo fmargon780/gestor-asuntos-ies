@@ -234,6 +234,9 @@
     b2.textContent = 'Cambiar cada cuánto se avisa';
     b2.onclick = function () {
       App.ir('ajustes');
+      /* 17-sep-2026, fila 39: este bloque vive en la pestaña
+         "Mantenimiento". */
+      if (typeof App.cambiarPestanaAjustes === 'function') App.cambiarPestanaAjustes('mantenimiento');
       var d = $('bloque-frescura');
       if (d) { d.open = true; d.scrollIntoView({ block: 'center' }); }
     };
@@ -250,7 +253,9 @@
   function bloqueDeAjustes() {
     var ya = $('bloque-frescura');
     if (ya) return ya;
-    var pantalla = $('pantalla-ajustes');
+    /* 17-sep-2026, fila 39: este bloque vive en la pestaña
+       "Mantenimiento", no en la pantalla de Ajustes entera. */
+    var pantalla = $('ajustes-tab-mantenimiento');
     if (!pantalla) return null;
 
     var d = document.createElement('details');

@@ -85,6 +85,9 @@ await pagina.click('#btn-barra');
 
 console.log('--- el grupo, con su miembro que ya no está, se ve en Ajustes ---');
 await pagina.click('.pestana[data-pantalla="ajustes"]');
+/* 17-sep-2026, fila 39: "Grupos de personas" vive en la pestaña "El
+   centro". */
+await pagina.evaluate(() => App.cambiarPestanaAjustes('centro'));
 await pagina.evaluate(() => {
   document.querySelectorAll('#pantalla-ajustes details').forEach((d) => { d.open = true; });
 });

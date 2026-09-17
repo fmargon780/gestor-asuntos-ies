@@ -247,53 +247,20 @@
   })();
 
   /* ==========================================================
-     EL BLOQUE "PLANTILLAS DE DOCUMENTO" DE AJUSTES
+     LA SECCIÓN "PLANTILLA DE DOCUMENTO DE WORD" DE LA PANTALLA DE UN
+     TIPO (17-sep-2026, fila 39, docs/AJUSTES-POR-TIPO.md)
 
-     Hermano del de correo (js/plantillas-ajustes.js): buscador, lista
-     de tarjetas, alta con el .docx elegido de entre los que ya estén
-     subidos a _GESTOR/PLANTILLAS, edición y borrado con Papelera.
+     Hermana de la de correo (js/plantillas-ajustes.js): buscador ya no
+     hace falta, porque solo se ven las de un tipo. Tarjetas, alta con
+     el .docx elegido de entre los que ya estén subidos a
+     _GESTOR/PLANTILLAS, edición y borrado con Papelera, y debajo el
+     catálogo de huecos con un botón de copiar en cada uno.
      ========================================================== */
 
   var datosDeAjustes = null;
+  var refrescarSeccionActual = function () {};
 
-  function bloqueDeAjustes() {
-    var ya = $('bloque-plantillas-documento');
-    if (ya) return ya;
-    var pantalla = $('pantalla-ajustes');
-    if (!pantalla) return null;
-
-    var d = document.createElement('details');
-    d.className = 'bloque-ajustes';
-    d.id = 'bloque-plantillas-documento';
-    d.innerHTML =
-      '<summary>' +
-        '<span class="bloque-titulo">Plantillas de documento</span>' +
-        '<span class="bloque-pie">Documentos de Word ya escritos, con huecos, por tipo de asunto</span>' +
-      '</summary>' +
-      '<div class="bloque-cuerpo">' +
-        '<p class="explica">Sube antes el .docx a Dropbox, dentro de la carpeta de asuntos ' +
-        'abiertos, en <code>_GESTOR/PLANTILLAS</code>. Aquí se cuelga de un tipo de asunto: el ' +
-        'botón "Generar documento" de la ficha saca una copia ya rellena, sin preguntar nada.</p>' +
-        '<div class="alta-tipo">' +
-          '<input id="pd-buscar" class="campo" placeholder="Buscar por tipo o por nombre">' +
-          '<button type="button" class="boton boton-principal" id="pd-nueva">+ Nueva plantilla</button>' +
-        '</div>' +
-        '<div id="pd-lista" class="rejilla-tipos"></div>' +
-        '<hr>' +
-        '<label class="etiqueta">Huecos que se pueden usar en el Word</label>' +
-        '<p class="nota">Cópialos y pégalos donde haga falta, escritos igual, entre llaves.</p>' +
-        '<div id="pd-huecos" class="rejilla-huecos"></div>' +
-      '</div>';
-    pantalla.appendChild(d);
-
-    $('pd-buscar').oninput = pintarLista;
-    $('pd-nueva').onclick = function () { abrirCuadroDePlantillaDoc(null); };
-    pintarHuecos();
-    return d;
-  }
-
-  function pintarHuecos() {
-    var caja = $('pd-huecos');
+  function pintarHuecos(caja) {
     if (!caja) return;
     caja.innerHTML = '';
     Plantillas.HUECOS.forEach(function (h) {
@@ -319,31 +286,38 @@
     }).catch(function () { /* nada que hacer si el navegador no deja */ });
   }
 
-  async function pintarBloqueAjustes() {
-    if (!bloqueDeAjustes()) return;
-    if (!App.E.gestor) return;
-    datosDeAjustes = await Plantillas.cargar(App.E.gestor);
-    pintarLista();
-  }
+  /* Pinta, dentro de `contenedor`, solo las plantillas de documento de
+     `tipo`. Se llama desde la sección "Plantilla de documento de Word"
+     de la pantalla de un tipo (js/ajustes-tipo.js). */
+  async function pintarDeTipo(contenedor, tipo) {
+    if (!contenedor) return;
+    if (App.E.gestor) datosDeAjustes = await Plantillas.cargar(App.E.gestor);
+    refrescarSeccionActual = function () { pintarDeTipo(contenedor, tipo); };
 
-  function pintarLista() {
-    var caja = $('pd-lista');
-    if (!caja || !datosDeAjustes) return;
-    var q = U.normalizar($('pd-buscar').value);
-    var lista = datosDeAjustes.documentos.filter(function (p) {
-      return !q || U.normalizar(p.nombre + ' ' + p.tipo + ' ' + p.categoria + ' ' + p.fichero).indexOf(q) !== -1;
-    }).slice().sort(function (a, b) {
-      return (a.tipo + a.nombre) < (b.tipo + b.nombre) ? -1 : 1;
-    });
+    var lista = (datosDeAjustes ? datosDeAjustes.documentos : [])
+      .filter(function (p) { return p.tipo === tipo.tipo; })
+      .sort(function (a, b) { return a.nombre < b.nombre ? -1 : 1; });
 
-    caja.innerHTML = '';
+    contenedor.innerHTML =
+      '<p class="explica">Sube antes el .docx a Dropbox, dentro de la carpeta de asuntos ' +
+      'abiertos, en <code>_GESTOR/PLANTILLAS</code>. Aquí se cuelga de este tipo: el botón ' +
+      '"Generar documento" de la ficha saca una copia ya rellena, sin preguntar nada.</p>' +
+      '<div id="tipo-pd-lista" class="rejilla-tipos"></div>' +
+      '<button type="button" class="boton boton-principal" id="tipo-pd-nueva" ' +
+      'style="margin-top:10px">+ Nueva plantilla</button>' +
+      '<hr>' +
+      '<label class="etiqueta">Huecos que se pueden usar en el Word</label>' +
+      '<p class="nota">Cópialos y pégalos donde haga falta, escritos igual, entre llaves.</p>' +
+      '<div id="tipo-pd-huecos" class="rejilla-huecos"></div>';
+
+    var caja = $('tipo-pd-lista');
     if (!lista.length) {
-      caja.innerHTML = '<div class="vacio">' +
-        (datosDeAjustes.documentos.length ? 'Nada coincide con lo que buscas.' : 'Todavía no hay ninguna plantilla de documento.') +
-        '</div>';
-      return;
+      caja.innerHTML = '<div class="vacio">Todavía no hay ninguna plantilla de documento para este tipo.</div>';
+    } else {
+      lista.forEach(function (p) { caja.appendChild(tarjetaDePlantillaDoc(p)); });
     }
-    lista.forEach(function (p) { caja.appendChild(tarjetaDePlantillaDoc(p)); });
+    $('tipo-pd-nueva').onclick = function () { abrirCuadroDePlantillaDoc(null, tipo, refrescarSeccionActual); };
+    pintarHuecos($('tipo-pd-huecos'));
   }
 
   function tarjetaDePlantillaDoc(p) {
@@ -361,7 +335,7 @@
     editar.type = 'button';
     editar.className = 'boton';
     editar.textContent = 'Editar';
-    editar.onclick = function () { abrirCuadroDePlantillaDoc(p); };
+    editar.onclick = function () { abrirCuadroDePlantillaDoc(p, null, refrescarSeccionActual); };
     acciones.appendChild(editar);
 
     acciones.appendChild(Papelera.botonBorrar(async function () {
@@ -375,7 +349,7 @@
           return actual;
         });
         U.aviso('Plantilla de documento mandada a la papelera.', 'bueno');
-        await pintarBloqueAjustes();
+        refrescarSeccionActual();
       } catch (e) {
         U.aviso('No he podido borrarla: ' + e.message, 'malo');
       }
@@ -402,15 +376,16 @@
     } catch (e) { return []; }
   }
 
-  async function abrirCuadroDePlantillaDoc(existente) {
+  async function abrirCuadroDePlantillaDoc(existente, tipoPreset, alGuardar) {
     var categorias = Nombres.CATEGORIAS;
-    var categoriaInicial = (existente && existente.categoria) || categorias[0];
+    var categoriaInicial = (existente && existente.categoria) || (tipoPreset && tipoPreset.categoria) || categorias[0];
     var ficheros = await ficherosDeWordDisponibles();
 
     function opcionesTipos(categoria) {
       return opcionesDeCategoria(categoria).map(function (t) {
-        return '<option value="' + U.escapar(t.tipo) + '"' +
-          (existente && existente.tipo === t.tipo ? ' selected' : '') + '>' + U.escapar(t.tipo) + '</option>';
+        var elegido = existente ? existente.tipo === t.tipo : (tipoPreset && tipoPreset.tipo === t.tipo);
+        return '<option value="' + U.escapar(t.tipo) + '"' + (elegido ? ' selected' : '') + '>' +
+          U.escapar(t.tipo) + '</option>';
       }).join('');
     }
 
@@ -486,7 +461,7 @@
         return actual;
       });
       U.aviso(existente ? 'Plantilla de documento guardada.' : 'Plantilla de documento creada.', 'bueno');
-      await pintarBloqueAjustes();
+      if (typeof alGuardar === 'function') alGuardar();
     } catch (e) {
       U.aviso('No he podido guardarlo: ' + e.message, 'malo');
     }
@@ -496,21 +471,17 @@
      ENGANCHE
      ========================================================== */
 
-  function enganchar() {
-    if (!window.Gestor) return;
-    window.Gestor.alRefrescar.push(function () {
-      if (!$('pantalla-ajustes') || !App.E.gestor) return;
-      try { pintarBloqueAjustes(); } catch (e) { /* un bloque roto no puede tumbar la aplicación */ }
-    });
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enganchar);
-  else enganchar();
+  /* Ya no hay ningún bloque global de Ajustes que mantener al día
+     (desde la fila 39, cada tipo pinta el suyo al abrirse): no hace
+     falta enganchar nada a `window.Gestor.alRefrescar`. */
 
-  /* Público solo para las pruebas (docs/PLANTILLAS-DE-DOCUMENTO.md, 8.7):
-     el resto de la generación no hace falta exponerlo, se dispara sola
-     desde el botón de la ficha. */
+  /* Público: `pintarDeTipo` y `abrirCuadroDePlantillaDoc` los usa
+     js/ajustes-tipo.js; `nombreDelDocumentoGenerado`, las pruebas
+     (docs/PLANTILLAS-DE-DOCUMENTO.md, 8.7). */
   window.PlantillasDocumento = {
-    nombreDelDocumentoGenerado: nombreDelDocumentoGenerado
+    nombreDelDocumentoGenerado: nombreDelDocumentoGenerado,
+    pintarDeTipo: pintarDeTipo,
+    abrirCuadroDePlantillaDoc: abrirCuadroDePlantillaDoc
   };
 
 })();

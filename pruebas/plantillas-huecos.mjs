@@ -58,18 +58,21 @@ await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
 await pagina.click('#btn-barra');
 
-/* --- Ajustes, con todos los bloques abiertos --- */
+/* --- Ajustes: desde el 17-sep-2026 (fila 39, docs/AJUSTES-POR-TIPO.md)
+   las plantillas de correo de un tipo viven en su propia pantalla, no
+   en un bloque suelto de Ajustes: se abre un tipo y se pulsa su
+   "+ Nueva plantilla". --- */
 await pagina.click('.pestana[data-pantalla="ajustes"]');
-await pagina.evaluate(() => {
-  document.querySelectorAll('#pantalla-ajustes details').forEach((d) => { d.open = true; });
-});
-await pagina.waitForSelector('#bloque-plantillas #plantillas-nueva');
+await pagina.waitForSelector('#tabla-tipos .tarjeta-tipo');
+await pagina.locator('#tabla-tipos .tarjeta-tipo').first().locator('.tarjeta-tipo-nombre').click();
+await pagina.waitForSelector('#pantalla-tipo-asunto:not(.oculto)');
+await pagina.waitForSelector('#tipo-plantillas-nueva');
 
 /* ========================================================
    1 · el muro ya no está; el botón sí
    ======================================================== */
 console.log('--- 1. el muro de botones se ha ido ---');
-await pagina.click('#plantillas-nueva');
+await pagina.click('#tipo-plantillas-nueva');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.waitForSelector('#pl-texto');
 

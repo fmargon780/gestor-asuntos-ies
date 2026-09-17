@@ -68,7 +68,63 @@
    los bloques terminan en el mismo borde, con el mismo relleno lateral
    que usa `.bloque-ajustes > summary` y `.bloque-cuerpo`. */
 #pantalla-ajustes > .cabecera { padding: 0 16px; }
-#pantalla-ajustes .explica { max-width: 90ch; }
+#pantalla-ajustes .explica, #pantalla-tipo-asunto .explica { max-width: 90ch; }
+
+/* ============================================================
+   Las tres pestañas de Ajustes (17-sep-2026, fila 39,
+   docs/AJUSTES-POR-TIPO.md): Tipos de asunto · El centro ·
+   Mantenimiento. Mismo lenguaje visual que .pestana-categoria, un
+   escalón más arriba. La pestaña abierta se recuerda en localStorage,
+   igual que la categoría (App.cambiarPestanaAjustes).
+   ============================================================ */
+.pestanas-ajustes {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 0 16px; margin-bottom: 16px;
+}
+.pestana-ajustes {
+  font: inherit; font-size: 14px; font-weight: 600;
+  background: var(--papel); color: var(--tinta-suave);
+  border: 1px solid var(--linea); border-radius: 20px;
+  padding: 8px 18px; cursor: pointer;
+}
+.pestana-ajustes:hover { border-color: #b9c6d6; color: var(--tinta); }
+.pestana-ajustes.activa { background: var(--azul); border-color: var(--azul); color: #fff; }
+
+.ajustes-tab { padding: 0 16px; }
+
+/* ============================================================
+   La pantalla propia de un tipo de asunto: dos columnas densas, una
+   sola por debajo de 1000px. Cada sección es un bloque igual que los
+   de Ajustes (mismo borde, mismo título), pero siempre desplegado:
+   nada que abrir ni cerrar, las siete se ven de una vez.
+   ============================================================ */
+#pantalla-tipo-asunto > .cabecera { padding: 0 16px; align-items: baseline; }
+
+.tipo-asunto-columnas {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  padding: 0 16px 40px;
+  align-items: start;
+}
+@media (max-width: 1000px) {
+  .tipo-asunto-columnas { grid-template-columns: 1fr; }
+}
+.tipo-asunto-columna { display: flex; flex-direction: column; gap: 16px; }
+
+.tipo-asunto-seccion {
+  border: 1px solid #dde3ea; border-radius: 10px; background: #fff;
+  padding: 14px 16px;
+}
+.tipo-asunto-seccion h3 {
+  margin: 0 0 4px; font-size: 15px; font-weight: 600;
+}
+.tipo-asunto-seccion .bloque-pie { display: block; margin-bottom: 10px; }
+.tipo-asunto-seccion .explica { margin-bottom: 10px; }
+
+/* El aviso ámbar de "también se usa en otros tipos" (Campos.
+   tiposQueUsanPropio), dentro de la sección Campos. */
+.aviso-compartido {
+  font-size: 12px; color: #8a6100; margin-top: 2px;
+}
 
 /* ---------- el aviso en vivo, al escribir un nombre nuevo ---------- */
 .aviso-en-vivo {
@@ -126,6 +182,13 @@
 .tarjeta-tipo-linea {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
+/* La tarjeta de un tipo de asunto se pulsa entera para abrir su
+   pantalla (17-sep-2026, fila 39): solo esta lleva el cursor de mano y
+   un resalte de foco, para no confundirla con las de estados o tipos
+   de documento, que no abren nada al pulsarlas. */
+.tarjeta-tipo-pulsable { cursor: pointer; }
+.tarjeta-tipo-pulsable:hover { border-color: #b9c6d6; }
+.tarjeta-tipo-pulsable:focus-visible { outline: 2px solid var(--azul); outline-offset: 1px; }
 .tarjeta-tipo-nombre { font-weight: 600; }
 .tarjeta-tipo-antes { font-size: 12px; }
 .tarjeta-tipo-sub { font-size: 12px; }

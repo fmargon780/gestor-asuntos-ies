@@ -270,6 +270,9 @@ const noLectivoLegible = String(noLectivo.getDate()).padStart(2, '0') + '/' +
   String(noLectivo.getMonth() + 1).padStart(2, '0') + '/' + noLectivo.getFullYear();
 
 await pagina.click('.pestana[data-pantalla="ajustes"]');
+/* 17-sep-2026, fila 39: el bloque "Hitos" vive en la pestaña "El
+   centro". */
+await pagina.evaluate(() => App.cambiarPestanaAjustes('centro'));
 await pagina.evaluate(() => {
   document.querySelectorAll('#pantalla-ajustes details').forEach((d) => { d.open = true; });
 });
