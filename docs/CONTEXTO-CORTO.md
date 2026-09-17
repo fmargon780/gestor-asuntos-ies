@@ -112,7 +112,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 6. Reglas de código que no se pueden olvidar
 
-- El repositorio es la versión buena; Vercel publica solo. Un solo proyecto de Vercel.
+- El repositorio es la versión buena; Vercel publica solo. Un solo proyecto de Vercel, plan gratuito (100 publicaciones al día). `vercel.json` tiene un `ignoreCommand` que se salta la publicación si la rama no es `main` o si el cambio solo toca `docs/`, `pruebas/`, `.github/` o `.md`; y la cola (regla 13) limita cada fila a dos subidas.
 - **Permiso permanente de Francisco**: cuando el trabajo vaya por pull request (sesiones desde la
   nube), Claude Code lo fusiona solo en cuanto esté en verde y sin conflictos. No hace falta
   esperar a que Francisco lo haga a mano (ver la nota al final de `docs/COLA.md`).

@@ -2130,3 +2130,11 @@ una línea cada una. El texto largo que tenían antes era:
   carpeta ya se archivó o reabrió por otro camino (pone la ficha al día sin copiar nada, en vez de
   reventar) o si ha desaparecido de los dos sitios (aviso en castellano, pide recargar). Prueba
   nueva `pruebas/archivar-atascos.mjs`, con navegador (6 escenarios). Batería completa en verde.
+- **48 · `docs/NO-GASTAR-PUBLICACIONES.md`**: Terminada 17-sep-2026. A media tarde de ese día
+  Vercel dejó de publicar: el plan gratuito solo da 100 publicaciones al día, y `main` recibió
+  exactamente 100 commits, más de la mitad sin tocar nada de lo que se ve en la web (`docs/COLA.md`,
+  `docs/CONTEXTO.md`, reconciliaciones con `main`...). `vercel.json` gana un `ignoreCommand` que se
+  salta la publicación cuando la rama no es `main` o el cambio solo toca `docs/`, `pruebas/`,
+  `.github/` o `.md`, comparando contra `VERCEL_GIT_PREVIOUS_SHA` (con `HEAD^` de respaldo la
+  primera vez). Prueba nueva `pruebas/vercel-ignorecommand.mjs`. La cola gana la regla 13: como
+  máximo dos subidas por fila, para no repetir el mismo problema con las sesiones en paralelo.

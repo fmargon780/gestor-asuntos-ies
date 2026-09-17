@@ -1606,6 +1606,15 @@ El `?v=` es imprescindible: sin él se puede recibir una copia guardada.
   prueba en navegador de `pruebas/`.
 - **El conector de Vercel no sirve para esto:** da 403 y 404.
 - `vercel.json` manda `Cache-Control: public, max-age=0, must-revalidate` para todo.
+- **El plan gratuito solo da 100 publicaciones al día** (`api-deployments-free-per-day`): se
+  agotaron el 17-sep-2026, con más de 100 commits a `main` ese día, y la web se quedó sin
+  actualizar hasta el siguiente (fila 48 de `docs/COLA.md`, `docs/NO-GASTAR-PUBLICACIONES.md`).
+  `vercel.json` gana un `ignoreCommand` que se salta la publicación (código 0) si la rama no es
+  `main`, o si el cambio solo toca `docs/`, `pruebas/`, `.github/` o ficheros `.md` (comparando
+  contra `VERCEL_GIT_PREVIOUS_SHA`, con `HEAD^` de respaldo la primera vez; ante cualquier duda,
+  publica). Se comprueba con `pruebas/vercel-ignorecommand.mjs`, sin navegador. Y la cola gana la
+  regla 13: como máximo dos subidas por fila (una para marcarla EN CURSO, otra al terminar, con
+  todo junto).
 
 ### Ficheros del repositorio
 
@@ -1615,7 +1624,7 @@ de `App` va después del fichero que lo define.
 | Fichero | Qué hace |
 |---|---|
 | `index.html` | La página |
-| `vercel.json` | Que el navegador no se quede con copias viejas |
+| `vercel.json` | Que el navegador no se quede con copias viejas; `ignoreCommand` para no gastar publicaciones en cambios que no tocan la web |
 | `css/estilos.css` | El aspecto general. Los demás `css/` van con su módulo del mismo nombre |
 | `css/vista.css` | El ancho de la pantalla, los filtros plegados y las tarjetas por tipo |
 | `css/guias.css` | La guía: pasos, plegado, preguntas y opciones |
