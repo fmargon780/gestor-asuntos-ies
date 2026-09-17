@@ -34,3 +34,46 @@
 /* El "Relacionado con" en la ficha de una persona. */
 .ficha-relacionado-de { margin-top: 14px; }
 .ficha-relacionado-de .resultado { margin-bottom: 6px; }
+
+/* Señalar varios terceros a la vez (17-sep-2026, fila 21,
+   docs/GRUPOS-DE-PERSONAS.md): cada resultado es una casilla en vez de
+   pulsarse directamente, y abajo queda fija la barra con la cuenta. */
+.resultado-marcable { padding: 0; }
+.resultado-marcable label {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; cursor: pointer;
+}
+.resultado-marcable input[type="checkbox"] { margin-top: 3px; flex: 0 0 auto; }
+
+.marcados-barra {
+  position: sticky; bottom: 0; margin-top: 10px; padding: 10px 12px;
+  background: var(--azul-claro); border: 1px solid #c3d8ec; border-radius: var(--radio);
+}
+.marcados-cabecera { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.marcados-cuenta { font-weight: 600; color: var(--azul); flex: 0 0 auto; }
+.marcados-cabecera .boton { flex: 0 0 auto; margin-left: auto; }
+.marcados-lista {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
+  max-height: 6.5em; overflow: auto;
+}
+.marcado-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--papel); border: 1px solid #c3d8ec; border-radius: 14px;
+  padding: 3px 6px 3px 10px; font-size: 12px;
+}
+/* Un miembro de un grupo que ya no está en las listas: se ve, pero
+   distinto, y nunca desaparece solo. */
+.marcado-chip-perdido { background: #f0f0f0; border-color: #d7d7d7; color: var(--tinta-suave); }
+.marcado-quitar {
+  border: 0; background: none; color: var(--tinta-suave); cursor: pointer;
+  font-size: 15px; line-height: 1; padding: 0 3px;
+}
+.marcado-quitar:hover { color: var(--rojo-fuerte, #a4302a); }
+
+/* Los atajos de alumnado (unidad, nivel, enseñanza) y el desplegable de
+   grupos propios, encima del buscador. */
+.atajos-grupo { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.atajo-fila { display: flex; align-items: center; gap: 8px; }
+.atajo-fila span { flex: 0 0 140px; font-size: 13px; color: var(--tinta-suave); }
+.atajo-fila select { flex: 1 1 auto; }
+.grupo-fila { margin-bottom: 12px; }
+.grupo-fila .etiqueta { display: block; margin-bottom: 4px; }

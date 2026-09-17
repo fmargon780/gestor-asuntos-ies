@@ -7,6 +7,13 @@
    hilo (docs/CORREO-EN-DOS-BUZONES.md, fila 18 de la cola). Si esta
    fecha no está en la copia pegada en script.google.com, está vieja.
 
+   17-sep-2026 (más tarde), fila 21, docs/GRUPOS-DE-PERSONAS.md: los
+   destinatarios que vienen de un grupo van en copia oculta (`cco` del
+   encargo), nunca en «Para». Si el correo no lleva a nadie en «Para»
+   pero sí lleva `cco`, se pone como «Para» la propia cuenta de quien
+   ejecuta el script: Gmail no admite un borrador sin nadie ahí, y es
+   lo que hace todo el mundo con un envío en copia oculta.
+
    ============================================================
    Gestor de Asuntos — recogida de correos
    Google Apps Script, en la cuenta g.educaand.es
@@ -310,12 +317,18 @@ function mandarUnBorrador(fichero, carpeta) {
       if (buscados.hasNext()) adjuntos.push(buscados.next().getBlob());
     }
 
+    var opciones = { attachments: adjuntos };
+    if (encargo.cco) opciones.bcc = encargo.cco;
+
     var hilo = encargo.hilo ? GmailApp.getThreadById(encargo.hilo) : null;
     if (hilo) {
-      hilo.createDraftReply(encargo.cuerpo || '', { attachments: adjuntos });
+      hilo.createDraftReply(encargo.cuerpo || '', opciones);
     } else {
-      GmailApp.createDraft(encargo.para || '', encargo.asunto || '', encargo.cuerpo || '',
-        { attachments: adjuntos });
+      /* Un grupo va siempre en copia oculta: si no hay nadie en "Para",
+         Gmail necesita igualmente alguien ahí, y se pone la propia
+         cuenta de quien ejecuta el script. */
+      var destinatario = encargo.para || (encargo.cco ? Session.getActiveUser().getEmail() : '');
+      GmailApp.createDraft(destinatario, encargo.asunto || '', encargo.cuerpo || '', opciones);
     }
 
     borrarFicherosDelEncargo(carpeta, encargo, fichero);

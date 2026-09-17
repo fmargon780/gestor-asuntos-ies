@@ -102,19 +102,19 @@ var Nombres = (function () {
          1º A          (ESO)            ->  1ºA
          2º Bach B     (Bachillerato)   ->  2ºBachB
          1º CFGM A     (FP)             ->  1ºFPA                       */
-  function grupoCompacto(unidad, curso) {
-    var texto = String(unidad || '').normalize('NFD').replace(/[̀-ͯ]/g, '');
-    var deCurso = String(curso || '').normalize('NFD').replace(/[̀-ͯ]/g, '');
-    var junto = (texto + ' ' + deCurso);
+  function sinTildes(v) { return String(v || '').normalize('NFD').replace(/[̀-ͯ]/g, ''); }
 
-    var etapa = '';
-    if (/bach/i.test(junto)) etapa = 'Bach';
-    else if (/\bfp\b|ciclo|c\.?f\.?g|formacion profesional/i.test(junto)) etapa = 'FP';
-    else if (/\bpmar\b|diversificacion/i.test(junto)) etapa = 'Div';
+  function etapaDe(texto) {
+    if (/bach/i.test(texto)) return 'Bach';
+    if (/\bfp\b|ciclo|c\.?f\.?g|formacion profesional/i.test(texto)) return 'FP';
+    if (/\bpmar\b|diversificacion/i.test(texto)) return 'Div';
+    return '';
+  }
 
-    /* Se quitan las palabras de la etapa para que no estorben al buscar
-       el nivel y la letra. */
-    var limpio = texto
+  /* Se quitan las palabras de la etapa para que no estorben al buscar el
+     nivel y la letra. */
+  function sinPalabrasDeEtapa(texto) {
+    return texto
       .replace(/\bde\b/gi, ' ')
       .replace(/e\.?\s?s\.?\s?o\.?/gi, ' ')
       .replace(/educacion secundaria obligatoria/gi, ' ')
@@ -123,6 +123,15 @@ var Nombres = (function () {
       .replace(/\bpmar\b|diversificacion/gi, ' ')
       .replace(/\s+/g, ' ')
       .trim();
+  }
+
+  function grupoCompacto(unidad, curso) {
+    var texto = sinTildes(unidad);
+    var deCurso = sinTildes(curso);
+    var junto = (texto + ' ' + deCurso);
+
+    var etapa = etapaDe(junto);
+    var limpio = sinPalabrasDeEtapa(texto);
 
     var nivel = limpio.match(/([1-6])/);
     var letra = limpio.match(/(?:^|[\s\-º.])([A-Za-z])\s*$/);
@@ -133,6 +142,27 @@ var Nombres = (function () {
     if (!nivel) return U.limpiarNombre(String(unidad || '')).replace(/\s+/g, '');
 
     return nivel[1] + 'º' + etapa + (letra ? letra[1].toUpperCase() : '');
+  }
+
+  /* El nivel y la enseñanza de una unidad, sueltos (17-sep-2026, fila 21,
+     docs/GRUPOS-DE-PERSONAS.md): hacen falta para los atajos de "toda una
+     unidad/nivel/enseñanza" al elegir grupos de alumnado. Reutiliza el
+     mismo análisis de texto que `grupoCompacto`, para no tener dos sitios
+     que entiendan "1º de E.S.O. A" de forma distinta. */
+  var ENSENANZA_DE_ETAPA = {
+    Bach: 'Bachillerato',
+    FP: 'Formación Profesional',
+    Div: 'PMAR',
+    '': 'E.S.O.'
+  };
+
+  function nivelYEnsenanza(unidad) {
+    var texto = sinTildes(unidad);
+    var etapa = etapaDe(texto);
+    var limpio = sinPalabrasDeEtapa(texto);
+    var nivel = limpio.match(/([1-6])/);
+    if (!nivel) return { nivel: '', ensenanza: '' };
+    return { nivel: nivel[1] + 'º', ensenanza: ENSENANZA_DE_ETAPA[etapa] };
   }
 
   /* Lee un nombre de carpeta y saca lo que puede: la fecha y el tipo.
@@ -317,7 +347,7 @@ var Nombres = (function () {
     POR_DEFECTO: POR_DEFECTO, CATEGORIAS: CATEGORIAS,
     ESTADOS_POR_DEFECTO: ESTADOS_POR_DEFECTO, VIAS: VIAS, via: via,
     montar: montar, leer: leer, categoriaDeTipo: categoriaDeTipo,
-    grupoCompacto: grupoCompacto,
+    grupoCompacto: grupoCompacto, nivelYEnsenanza: nivelYEnsenanza,
     TIPOS_DOCUMENTO_POR_DEFECTO: TIPOS_DOCUMENTO_POR_DEFECTO,
     codigoRegistro: codigoRegistro, montarDocumento: montarDocumento,
     extensionDe: extensionDe,

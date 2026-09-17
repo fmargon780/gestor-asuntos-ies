@@ -31,6 +31,8 @@
   var viendo = null;         /* el asunto que se está mirando */
   var modoDelAsunto = 'abierto';
   var elegidos = {};         /* qué correos van marcados */
+  var cco = {};              /* direcciones en copia oculta, de los grupos (fila 21, 17-sep-2026) */
+  var ccoSinCorreo = [];     /* nombres de miembros de un grupo sin ningún correo */
   var asuntoLargo = true;    /* true: nombre de la carpeta; false: versión legible */
   var yaApuntado = false;    /* la nota se escribe una vez por cuadro, no una por botón */
   var porSeneca = false;     /* true: el cuadro es el de la mensajería de Séneca */
@@ -179,6 +181,149 @@
     return lista.join(', ');
   }
 
+  function ccoDelCuadro() {
+    return Object.keys(cco).join(', ');
+  }
+
+  /* ---------- los grupos, para la copia oculta ----------
+
+     17-sep-2026, fila 21, docs/GRUPOS-DE-PERSONAS.md. Decisión de
+     Francisco: los destinatarios que vienen de un grupo van SIEMPRE en
+     copia oculta, nunca en Para, para que una familia no vea el correo
+     de las demás. */
+
+  /* De cada miembro se sacan TODOS los correos que tenga (un alumno
+     puede traer el de los dos tutores); sin efectos, se puede probar
+     sola. `persona` ya viene resuelta (o null si no se ha encontrado). */
+  function combinarCorreosDeGrupo(miembrosConPersona) {
+    var direcciones = [], vistos = {}, sinCorreo = [];
+    miembrosConPersona.forEach(function (m) {
+      var correos = correosDe(m.persona);
+      if (!correos.length) { sinCorreo.push(m.nombre); return; }
+      correos.forEach(function (c) {
+        var clave = c.dir.toLowerCase();
+        if (vistos[clave]) return;
+        vistos[clave] = true;
+        direcciones.push(c.dir);
+      });
+    });
+    return { direcciones: direcciones, sinCorreo: sinCorreo };
+  }
+
+  /* Busca la ficha de cada miembro que no la traiga ya puesta (los
+     atajos de alumnado la traen; los miembros de un grupo guardado,
+     no: solo se guarda { categoria, nombre }). Una sola lectura de
+     Datos.cargar por categoría, no una por miembro. */
+  async function resolverMiembros(miembros) {
+    var porCategoria = {};
+    miembros.forEach(function (m) {
+      if (!porCategoria[m.categoria]) porCategoria[m.categoria] = [];
+      porCategoria[m.categoria].push(m);
+    });
+    var resueltos = [];
+    for (var categoria in porCategoria) {
+      var fuente = null;
+      if (!porCategoria[categoria].every(function (m) { return m.persona; })) {
+        try { fuente = App.E.datos ? await Datos.cargar(App.E.datos, categoria) : null; }
+        catch (e) { fuente = null; }
+      }
+      porCategoria[categoria].forEach(function (m) {
+        var persona = m.persona ||
+          (fuente ? fuente.lista.filter(function (p) { return App.textoTercero(p) === m.nombre; })[0] : null);
+        resueltos.push({ nombre: m.nombre, persona: persona || null });
+      });
+    }
+    return resueltos;
+  }
+
+  /* Los mismos tres filtros de js/relacionados.js (Relacionados.filtrarPorUnidad
+     y compañía): ni el análisis de la unidad ni el filtro de matriculado
+     se repiten aquí. */
+  async function miembrosDeOpcionDeGrupo(valor) {
+    if (valor.indexOf('grupo:') === 0) {
+      var g = window.Grupos && Grupos.porId(valor.slice(6));
+      return g ? g.miembros.slice() : [];
+    }
+    if (!App.E.datos || !window.Relacionados) return [];
+    var fuente = await Datos.cargar(App.E.datos, 'ALUMNADO');
+    var lista;
+    if (valor.indexOf('unidad:') === 0) lista = Relacionados.filtrarPorUnidad(fuente.lista, valor.slice(7));
+    else if (valor.indexOf('nivel:') === 0) lista = Relacionados.filtrarPorNivel(fuente.lista, valor.slice(6));
+    else if (valor.indexOf('ensenanza:') === 0) lista = Relacionados.filtrarPorEnsenanza(fuente.lista, valor.slice(10));
+    else return [];
+    return lista.map(function (al) { return { categoria: 'ALUMNADO', nombre: App.textoTercero(al), persona: al }; });
+  }
+
+  /* Las opciones del desplegable "Añadir un grupo": los grupos propios
+     y, para el alumnado, los mismos atajos de unidad, nivel y
+     enseñanza de "Añadir varios" en js/relacionados.js. Cadena vacía
+     si no hay ni grupos ni alumnado cargado: entonces no sale el
+     desplegable. */
+  async function opcionesDeGrupo() {
+    var partes = [];
+    var grupos = (window.Grupos && Grupos.lista()) || [];
+    if (grupos.length) {
+      partes.push('<optgroup label="Grupos">' + grupos.map(function (g) {
+        return '<option value="grupo:' + U.escapar(g.id) + '">' + U.escapar(g.nombre) + '</option>';
+      }).join('') + '</optgroup>');
+    }
+    if (App.E.datos) {
+      try {
+        var fuente = await Datos.cargar(App.E.datos, 'ALUMNADO');
+        var unidades = Datos.unidadesDistintas(fuente.lista);
+        if (unidades.length) {
+          var niveles = {}, ensenanzas = {};
+          unidades.forEach(function (u) {
+            var p = Nombres.nivelYEnsenanza(u.unidad);
+            if (p.nivel) niveles[p.nivel] = true;
+            if (p.ensenanza) ensenanzas[p.ensenanza] = true;
+          });
+          partes.push('<optgroup label="Unidades">' + unidades.map(function (u) {
+            return '<option value="unidad:' + U.escapar(u.unidad) + '">' + U.escapar(u.unidad) + '</option>';
+          }).join('') + '</optgroup>');
+          partes.push('<optgroup label="Niveles">' + Object.keys(niveles).sort().map(function (n) {
+            return '<option value="nivel:' + U.escapar(n) + '">' + U.escapar(n) + '</option>';
+          }).join('') + '</optgroup>');
+          partes.push('<optgroup label="Enseñanzas">' + Object.keys(ensenanzas).sort().map(function (e) {
+            return '<option value="ensenanza:' + U.escapar(e) + '">' + U.escapar(e) + '</option>';
+          }).join('') + '</optgroup>');
+        }
+      } catch (e) { /* sin datos cargados, no pasa nada: el desplegable se queda sin esas opciones */ }
+    }
+    return partes.join('');
+  }
+
+  function contenidoCco() {
+    var direcciones = Object.keys(cco);
+    if (!direcciones.length && !ccoSinCorreo.length) return '';
+    return (direcciones.length
+      ? '<label class="etiqueta">Copia oculta <span class="suave">(' + direcciones.length + ')</span></label>' +
+        '<div class="marcados-lista">' + direcciones.map(function (d) {
+          return '<span class="marcado-chip">' + U.escapar(d) +
+            '<button type="button" class="cco-quitar" data-dir="' + U.escapar(d) + '" ' +
+            'title="Quitarlo de la copia oculta">×</button></span>';
+        }).join('') + '</div>'
+      : '') +
+      (ccoSinCorreo.length
+        ? '<p class="nota aviso-en-linea">' + ccoSinCorreo.length +
+          (ccoSinCorreo.length === 1 ? ' no tiene correo: ' : ' no tienen correo: ') +
+          U.escapar(ccoSinCorreo.join(', ')) + '</p>'
+        : '');
+  }
+
+  function engancharCco() {
+    Array.prototype.forEach.call(document.querySelectorAll('.cco-quitar'), function (b) {
+      b.onclick = function () { delete cco[b.dataset.dir]; refrescarCco(); };
+    });
+  }
+
+  function refrescarCco() {
+    var caja = $('correo-cco-caja');
+    if (!caja) return;
+    caja.innerHTML = contenidoCco();
+    engancharCco();
+  }
+
   /* ---------- copiar y abrir ---------- */
 
   function copiar(texto, boton) {
@@ -200,6 +345,7 @@
   function abrirGmail() {
     var url = 'https://mail.google.com/mail/?view=cm&fs=1' +
       '&to=' + encodeURIComponent(paraDelCuadro()) +
+      (ccoDelCuadro() ? '&bcc=' + encodeURIComponent(ccoDelCuadro()) : '') +
       '&su=' + encodeURIComponent($('correo-asunto').value) +
       '&body=' + encodeURIComponent($('correo-cuerpo-texto').value);
     window.open(url, '_blank');
@@ -208,7 +354,8 @@
   function abrirDelOrdenador() {
     var url = 'mailto:' + encodeURIComponent(paraDelCuadro()) +
       '?subject=' + encodeURIComponent($('correo-asunto').value) +
-      '&body=' + encodeURIComponent($('correo-cuerpo-texto').value);
+      '&body=' + encodeURIComponent($('correo-cuerpo-texto').value) +
+      (ccoDelCuadro() ? '&bcc=' + encodeURIComponent(ccoDelCuadro()) : '');
     window.location.href = url;
   }
 
@@ -226,6 +373,11 @@
     }
     var para = paraDelCuadro();
     var base = 'Correo ' + (para ? 'a ' + para : 'preparado') + cola;
+    var direccionesCco = Object.keys(cco);
+    if (direccionesCco.length) {
+      base += ' · en copia oculta a ' + direccionesCco.length +
+        (direccionesCco.length === 1 ? ' persona' : ' personas');
+    }
     if (documentosAdjuntados.length) {
       base += ' · con ' + documentosAdjuntados.length +
         ' documento' + (documentosAdjuntados.length === 1 ? '' : 's') +
@@ -328,6 +480,8 @@
   async function abrirCuadro(a, deSeneca) {
     viendo = a;
     elegidos = {};
+    cco = {};
+    ccoSinCorreo = [];
     porSeneca = !!deSeneca;
     pasoSeneca = 0;
     asuntoLargo = !porSeneca;   /* en Séneca manda la versión legible: el nombre de la carpeta no cabe */
@@ -357,14 +511,20 @@
        los dos tutores. Quitar una casilla es más rápido que ponerla. */
     correos.forEach(function (c) { if (elegidos[c.dir] === undefined) elegidos[c.dir] = true; });
 
-    /* Los documentos del asunto no van en el cuadro de Séneca: allí no
-       hay adjuntos. */
+    /* Los documentos del asunto y los grupos (para la copia oculta) no
+       van en el cuadro de Séneca: allí no hay adjuntos ni direcciones. */
     var bloqueAdjuntos = '';
-    if (!porSeneca && window.CorreoAdjuntos) {
-      try { bloqueAdjuntos = await CorreoAdjuntos.pintarBloque(a); } catch (e) { bloqueAdjuntos = ''; }
+    var opcionesGrupo = '';
+    if (!porSeneca) {
+      if (window.CorreoAdjuntos) {
+        try { bloqueAdjuntos = await CorreoAdjuntos.pintarBloque(a); } catch (e) { bloqueAdjuntos = ''; }
+      }
+      try { opcionesGrupo = await opcionesDeGrupo(); } catch (e) { opcionesGrupo = ''; }
     }
 
-    caja.innerHTML = porSeneca ? cuerpoDeSeneca(a) : cuerpoDeCorreo(a, correos, bloqueAdjuntos);
+    caja.innerHTML = porSeneca
+      ? cuerpoDeSeneca(a)
+      : cuerpoDeCorreo(a, correos, bloqueAdjuntos, opcionesGrupo);
 
     if (porSeneca) {
       engancharComunes(a);
@@ -383,7 +543,7 @@
 
   /* ---------- el cuadro del correo ---------- */
 
-  function cuerpoDeCorreo(a, correos, bloqueAdjuntos) {
+  function cuerpoDeCorreo(a, correos, bloqueAdjuntos, opcionesGrupo) {
     return '<label class="etiqueta" style="margin-top:0">Para</label>' +
       (correos.length
         ? '<div id="correo-lista">' + correos.map(function (c) {
@@ -401,6 +561,13 @@
           ' Escríbelo aquí abajo.</p>') +
       '<input id="correo-otro" class="campo" placeholder="Otro correo, si hace falta" ' +
         'style="margin-top:8px">' +
+
+      (opcionesGrupo
+        ? '<label class="etiqueta">Añadir un grupo</label>' +
+          '<select id="correo-grupo" class="campo"><option value="">Elige…</option>' +
+            opcionesGrupo + '</select>'
+        : '') +
+      '<div id="correo-cco-caja">' + contenidoCco() + '</div>' +
 
       camposComunes(a) +
 
@@ -562,6 +729,26 @@
   }
 
   function engancharCorreo(a) {
+    engancharCco();
+    var selectorGrupo = $('correo-grupo');
+    if (selectorGrupo) {
+      selectorGrupo.onchange = async function () {
+        var valor = selectorGrupo.value;
+        selectorGrupo.value = '';
+        if (!valor) return;
+        var miembros;
+        try { miembros = await miembrosDeOpcionDeGrupo(valor); } catch (e) { miembros = []; }
+        if (!miembros.length) return;
+        var resueltos = await resolverMiembros(miembros);
+        var resultado = combinarCorreosDeGrupo(resueltos);
+        resultado.direcciones.forEach(function (d) { cco[d] = true; });
+        resultado.sinCorreo.forEach(function (n) {
+          if (ccoSinCorreo.indexOf(n) === -1) ccoSinCorreo.push(n);
+        });
+        refrescarCco();
+      };
+    }
+
     $('correo-copiar-para').onclick = function () { copiar(paraDelCuadro(), this); };
     $('correo-copiar-asunto').onclick = function () { copiar($('correo-asunto').value, this); };
 

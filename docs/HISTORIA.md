@@ -5,6 +5,56 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — Grupos de personas
+
+Fila 21 de la cola (`docs/COLA.md`, `docs/GRUPOS-DE-PERSONAS.md`), punto 3 de
+`docs/PROXIMOS-ASUNTOS.md`. Lo pidió Francisco para los terceros relacionados —hoy, para
+relacionar a media clase con un asunto, hacían falta veinte vueltas al mismo cuadro, una persona
+cada vez—, pero en la conversación añadió: "no solo relacionar asuntos, pienso que estos grupos
+también serían útiles para enviar comunicaciones". De ahí que la misma pieza (señalar varios de
+golpe) sirva para dos cosas: relacionar en bloque y poner los destinatarios de un correo.
+
+Tres capas, de abajo arriba:
+
+1. **Señalar varios**, en el buscador de terceros de siempre (`App.pintarBuscadorDeTercero`,
+   `js/asuntos-nuevo.js`): un modo `multiple` opcional, sin tocar el modo de siempre que ya usan
+   "Nuevo asunto" y el "Añadir un relacionado" de toda la vida. Lo señalado vive fuera de la
+   búsqueda, así que cambiar de categoría o de texto no lo pierde; una barra fija con la cuenta y
+   el botón de añadir, con un × por cada señalado para poder quitarlo sin volver a buscarlo —
+   necesario porque un miembro de un grupo puede no salir en ningún resultado (ya no está en las
+   listas), y aun así hay que poder verlo y quitarlo.
+2. **Atajos de alumnado** (toda una unidad, todo un nivel, toda una enseñanza), construidos sobre
+   `Datos.unidadesDistintas` (ya existía, en Ajustes) y una pieza nueva, `Nombres.nivelYEnsenanza`,
+   que reutiliza el mismo análisis de texto que `Nombres.grupoCompacto` en vez de duplicarlo:
+   Séneca escribe "1º de E.S.O. A", y de ahí hay que sacar el nivel y la enseñanza sueltos. Solo
+   entra el alumnado matriculado este curso.
+3. **Grupos propios**, guardados con nombre en el decimotercer fichero compartido,
+   `_GESTOR/grupos.json` (`js/grupos.js`), con su bloque en Ajustes: crear, cambiar el nombre, ver
+   y cambiar los miembros (reutilizando el mismo buscador en modo `multiple`) y borrar por
+   papelera. Un miembro que ya no está en las listas —se ha ido, o se ha borrado a mano— se
+   conserva igual, marcado aparte en gris, hasta que se quita a mano: nunca se toca un grupo sin
+   que se lo manden.
+
+**La decisión de la copia oculta.** Los destinatarios de un grupo, en el cuadro de Correo, van
+**siempre en copia oculta**, nunca en "Para". Decisión de Francisco, 17-sep-2026: si un grupo
+mete a varias familias en el mismo correo y todas van en "Para" (o en copia visible), cada una ve
+la dirección de las demás — un problema de protección de datos evidente en un centro educativo.
+La copia oculta lo evita del todo, al precio de que el remitente (Francisco) tiene que ir en
+"Para" si no hay nadie más: así lo exige Gmail, y es lo que hace todo el mundo con un envío en
+copia oculta. Se ha resuelto en el propio `apps-script/gestor-correos.gs`, poniendo
+`Session.getActiveUser().getEmail()` cuando hace falta: la aplicación no necesita saber la
+dirección de correo de Francisco para nada.
+
+**Lo que se ha dejado fuera**, a falta de datos que la aplicación no tiene: departamentos,
+tutorías y equipos educativos. `personal.csv` (Séneca) solo trae nombre, documento, puesto,
+teléfono y correo — nada de a qué departamento pertenece nadie, ni quién tutoriza qué grupo. Eso
+se habla aparte el día que haga falta, y hasta entonces esos grupos se montan a mano como
+cualquier otro grupo propio.
+
+Detalle técnico completo en `docs/CONTEXTO.md`, sección "Grupos de personas".
+
+---
+
 ## 17-sep-2026 — Registrar un papel sellado sin quedarse con dos
 
 Fila 20 de la cola (`docs/COLA.md`, `docs/REGISTRO-SIN-DUPLICAR.md`), punto 9 de

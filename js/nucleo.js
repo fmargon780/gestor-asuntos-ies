@@ -150,6 +150,7 @@ $('btn-entrar').onclick = async function () {
     await App.cargarTiposDocumento();
     await App.cargarEstados();
     await App.cargarCampos();
+    if (window.Grupos) await Grupos.cargar();
     await App.cargarRegistro();
 
     Documentos.configurar({

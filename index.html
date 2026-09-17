@@ -428,6 +428,23 @@
 
       <details class="bloque-ajustes">
         <summary>
+          <span class="bloque-titulo">Grupos de personas</span>
+          <span class="bloque-pie">Listas con nombre para relacionar de golpe o mandar un correo a varios</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Un grupo es una lista de personas con un nombre: "equipo directivo",
+         "tutores de 1º"... Se monta una vez y se usa muchas, tanto para relacionar de golpe con
+         un asunto como para poner los destinatarios de un correo (siempre en copia oculta).
+         Esta lista se comparte con el resto de ordenadores del centro.</p>
+      <div class="alta-tipo">
+        <button id="btn-anadir-grupo" class="boton">+ Crear un grupo</button>
+      </div>
+      <div id="tabla-grupos-personas" class="lista"></div>
+        </div>
+      </details>
+
+      <details class="bloque-ajustes">
+        <summary>
           <span class="bloque-titulo">Asuntos que se repiten</span>
           <span class="bloque-pie">Gestiones que vuelven cada mes, trimestre o curso</span>
         </summary>
@@ -549,6 +566,7 @@
 <script src="js/datos.js"></script>
 <script src="js/campos.js"></script>
 <script src="js/documentos.js"></script>
+<script src="js/grupos.js"></script>
 
 <!-- La comodidad de la pantalla. Va antes que la aplicación, para
      enterarse de los cambios antes de que la pantalla se mueva. -->
