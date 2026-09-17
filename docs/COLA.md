@@ -143,6 +143,7 @@ contenido se corta sola, sin ningún error, y deja el fichero con solo el primer
 veces seguidas: la primera dejó el fichero en 44 KB, la segunda en 48.766 bytes, muy lejos de sus
 138.402 bytes de verdad (658 líneas en vez de las que le tocaban).
 
+
     git checkout 0aea5b3daa4170c46b1c47af18e8dc29bbe81a87 -- docs/HISTORIA.md
 
 Esa es la última versión buena conocida antes de este percance (blob
