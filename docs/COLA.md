@@ -91,11 +91,12 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 17-sep-2026. Durante la fila 33, un intento de subir `docs/CONTEXTO.md` entero (a mano, de una
 vez) lo dejó en `main` con solo la palabra `PLACEHOLDER_WILL_REPLACE` y nada más; varios intentos
-de arreglarlo con el mismo método volvieron a dejarlo a medias más de una vez. Se ha recuperado
-del todo con `git show a29a7cf:docs/CONTEXTO.md` (la última versión completa, comprobada con
-`wc -l`: sus 1.817 líneas de partida), con los dos cambios de la fila 34 metidos encima
-(`App.reengancharFicha` puesto al día, `U.conservandoLoEscrito` en "Avisos técnicos") y la sección
-nueva de la fila 35. Detalle en `docs/HISTORIA.md`.
+de arreglarlo con el mismo método (en más de una sesión en paralelo) volvieron a dejarlo a medias
+o incompleto más de una vez. Se ha recuperado del todo con `git show a29a7cf:docs/CONTEXTO.md`
+(la última versión completa, comprobada con `wc -l`: sus 1.817 líneas de partida), con los dos
+cambios de la fila 34 metidos encima (`App.reengancharFicha` puesto al día,
+`U.conservandoLoEscrito` en "Avisos técnicos") y la sección nueva de la fila 35. Detalle en
+`docs/HISTORIA.md`.
 
 ## Lo que vendrá después
 
