@@ -138,6 +138,7 @@ de una sola vez un fichero de más de unos 45-50 KB (regla 12 de esta cola): la 
 contenido se corta sola, sin ningún error, y deja el fichero con solo el primer trozo. Pasó dos
 veces seguidas: la primera dejó el fichero en 44 KB, la segunda en 48.766 bytes, muy lejos de sus
 138.402 bytes de verdad (658 líneas en vez de las que le tocaban).
+
 Se ha arreglado restaurando la versión completa que ya traía esta rama (con las entradas de las
 filas 33, 34 y 35 incluidas: al contrario de lo que decía una nota anterior aquí, sí merecía la
 pena contarlas, y ya estaban escritas desde antes de este percance). Comprobado con `wc -l`
