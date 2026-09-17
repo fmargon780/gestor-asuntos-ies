@@ -727,6 +727,8 @@ var Datos = (function () {
       filas.push({ titulo: titulo, valor: String(valor) });
     }
 
+    if (persona.documento) meter('DNI', persona.documento);
+
     if (persona.puesto) { meter('Puesto', persona.puesto); fuera['puesto'] = true; }
 
     if (persona.enElCentro) {
@@ -761,6 +763,14 @@ var Datos = (function () {
       if (!fuera[U.normalizar(claves[k])]) {
         resto.push({ titulo: claves[k], valor: persona.campos[claves[k]] });
       }
+    }
+    /* Que no se repita abajo: la misma comparación por valor que hace
+       js/dni.js con el alumnado, para que valga tanto para la columna
+       DNI/Pasaporte de Séneca como para Documento de personal.csv. */
+    if (persona.documento) {
+      resto = resto.filter(function (f) {
+        return String(f.valor).trim() !== persona.documento;
+      });
     }
     return { destacados: filas, resto: resto };
   }
