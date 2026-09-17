@@ -115,6 +115,28 @@ App.tarjetaSuelto = function (s, pie, esNuevo) {
   meter.onclick = function () { App.meterSueltoEnAsunto(s); };
   acciones.appendChild(meter);
 
+  /* Separar, Unir y Sacar páginas (17-sep-2026, fila 22,
+     docs/SEPARAR-Y-UNIR-PDF.md): solo para PDF, también aquí, para el
+     escaneo de golpe que trae papeles de varios asuntos a la vez. */
+  if (window.PdfSepararUnir && window.PdfHerramientas && PdfHerramientas.esPdf(s.nombre, '')) {
+    function botonPdfSuelto(texto, ayuda, accion) {
+      var boton = document.createElement('button');
+      boton.className = 'boton';
+      boton.title = ayuda;
+      boton.textContent = texto;
+      boton.onclick = function () {
+        accion({
+          modo: 'suelto', dir: App.E.abiertos, nombre: s.nombre, handle: s.handle,
+          alTerminar: function () { App.pintarSueltos(); }
+        });
+      };
+      return boton;
+    }
+    acciones.appendChild(botonPdfSuelto('Separar', 'Partirlo en varios documentos', PdfSepararUnir.separar));
+    acciones.appendChild(botonPdfSuelto('Unir', 'Juntarlo con otro PDF de Por clasificar', PdfSepararUnir.unir));
+    acciones.appendChild(botonPdfSuelto('Sacar páginas', 'Sacar una copia con solo algunas páginas', PdfSepararUnir.sacarPaginas));
+  }
+
   div.appendChild(acciones);
   return div;
 };

@@ -94,9 +94,12 @@ async function elUltimoAviso() {
 /* ============================================================
    1. LA TARJETA TRAE EL BOTÓN NUEVO, Y NO PIERDE LOS DE ANTES
    ============================================================ */
+/* Desde la fila 22 (docs/SEPARAR-Y-UNIR-PDF.md, 17-sep-2026), un PDF
+   lleva además Separar/Unir/Sacar páginas: se comprueban aparte en
+   pruebas/separar-unir-navegador.mjs, aquí solo que sigan estando. */
 await comprobar('1. los botones de una tarjeta de "Por clasificar"',
   tarjetaDe('Conciliación FL.pdf').locator('.acciones .boton').allTextContents(),
-  ['Abrir', 'Crear asunto con él', 'Meter en un asunto', 'Borrar']);
+  ['Abrir', 'Crear asunto con él', 'Meter en un asunto', 'Separar', 'Unir', 'Sacar páginas', 'Borrar']);
 
 /* ============================================================
    6. LA PUNTUACIÓN DE PARECIDO

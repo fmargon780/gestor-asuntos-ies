@@ -1085,6 +1085,78 @@ se cierra solo si el documento ya no está en "Por clasificar".
 
 Se comprueba con `pruebas/documento-a-la-vista.mjs`.
 
+### Separar, unir y sacar páginas de un PDF (17-sep-2026, fila 22, docs/SEPARAR-Y-UNIR-PDF.md)
+
+Tres acciones nuevas en el menú de cada PDF, tanto en la carpeta de un asunto
+(`js/ficha-asunto.js`) como en Por clasificar (`js/documentos-sueltos.js`, `App.tarjetaSuelto`):
+la misma máquina en los dos sitios, con botones sueltos (no un desplegable) para no romper el
+estilo de cada fila.
+
+- **`js/lib/pdf-lib.min.js`** (versión 1.17.1, build UMD del `dist/` de npm): la estructura
+  interna de un PDF no se puede tocar a mano como el `.docx` de la fila 17. Copiada en el
+  repositorio igual que pdf.js, cargada solo la primera vez que hace falta
+  (`PdfHerramientas.cargarPdfLib`, mismo truco que `js/registro-lector.js`), y expone
+  `window.PDFLib` como variable global (build UMD sin módulos).
+- **`js/pdf-herramientas.js`** (`window.PdfHerramientas`): solo sabe de bytes (`Uint8Array` dentro
+  y fuera), nunca toca el disco ni el DOM — así se prueba entero sin navegador. Las páginas se
+  copian tal cual (`copyPages`), sin volver a dibujarlas.
+  - `cortesATrozos(cortes, total)`: `cortes` son números de página (1 = la primera) después de
+    los cuales se corta; sin efectos, ya hace la cuenta de qué páginas (0-indexadas) va en cada
+    trozo. Sin ningún corte, da un solo trozo con el documento entero: quien llama lo trata como
+    "no hay nada que partir".
+  - `separar(bytes, cortes)`, `unir(listaDeBytes)`, `sacarPaginas(bytes, indices)`: usan
+    `PDFDocument.create/load/copyPages`. Un PDF protegido o roto lanza `PdfIlegible`, con un
+    mensaje en palabras llanas, no la excepción técnica de pdf-lib.
+  - `esPdf(nombre, tipo)` y `hayColision(nombresExistentes, nombreNuevo)`: los mismos guardias
+    de siempre (ver `Documentos.pareceDeLaAplicacion` y `RegistroSellado.hayColision`, filas 20 y
+    21), sueltos aquí para no acoplar este módulo a los otros.
+- **`js/pdf-separar-unir.js`** (`window.PdfSepararUnir`): la parte de pantalla. Un `contexto`
+  describe dónde está el fichero — `{ modo: 'asunto'|'suelto', dir, nombre, handle, asunto?,
+  alTerminar }` —, y las tres funciones (`separar`, `unir`, `sacarPaginas`) lo reciben.
+  - **Miniaturas con pdf.js**: `IntersectionObserver` por cada `<canvas>` de la rejilla
+    (`.pdf-rejilla`), para no pintar de golpe un PDF de cientos de páginas ("a medida que se
+    ven", como pide el documento).
+  - **Separar**: rejilla con una tijera (`.pdf-tijera`) entre cada dos páginas; el resumen de
+    arriba ("Van a salir N documentos: páginas...") se recalcula en cada clic con
+    `cortesATrozos`. Un PDF de una sola página avisa que no hay dónde cortar, en vez de ofrecer
+    una rejilla vacía de sentido.
+  - **Unir**: se parte del PDF pulsado (siempre el primero); lista de los demás PDF del mismo
+    sitio, con casilla, cuenta de páginas (`contarPaginas`, una lectura por candidato al abrir el
+    cuadro) y flechas para ordenar los señalados.
+  - **Sacar páginas**: la misma rejilla, con casillas en vez de tijeras. El original nunca se
+    toca ni se manda a la papelera.
+  - **El cuadro de poner nombre** (`abrirCuadroDeNombre`, compartido por las tres): los mismos
+    campos que "Añadir documento" (fecha, texto adicional, tipo, `Nombres.montarDocumento`), con
+    la miniatura de la primera página como referencia. El botón de cancelar se relabela
+    "Dejarlo" mientras dura (se restaura a "Cancelar" al salir). En un asunto, Separar lo abre una
+    vez por trozo, en secuencia: si se pulsa "Dejarlo" a mitad, lo ya guardado se queda y el
+    resto no se crea, con un aviso de cuántos han quedado a medias.
+  - **En Por clasificar** no se pregunta nada: Separar numera cada trozo (`nombre (i de N).pdf`),
+    Unir añade `(unido)` al nombre del primero, Sacar páginas añade `(paginas sacadas)`.
+  - **Nunca se pisa un fichero**: `hayColision` se comprueba antes de escribir, en el asunto y en
+    Por clasificar; si el nombre ya existe, se avisa en una línea y no se toca nada.
+  - **La papelera**: Separar y Unir mandan los originales (`Papelera.mandarDocumentoDeAsunto` o
+    `Papelera.mandarSuelto`, según el `contexto.modo`); Sacar páginas no manda nada, porque el
+    original no se toca.
+- **`Carpetas.escribirBytes(dir, nombre, bytes, tipo)`** (nueva, `js/carpetas.js`): como
+  `escribirTexto`, pero para bytes cualquiera. La usa este módulo para guardar el PDF resultante.
+- **Alcance de esta fila**: los tres botones solo salen en la ficha del asunto (no dentro del
+  cuadro "Gestionar documentos", que ya tiene bastantes botones por fila) y en las tarjetas de
+  Por clasificar. Un PDF de una sola página sí ofrece Unir y Sacar páginas (solo Separar avisa de
+  que no hay dónde cortar, y lo hace al abrir el cuadro, no escondiendo el botón: pintar el menú
+  de cada tarjeta ya sabiendo el número de páginas de cada PDF obligaría a abrirlos todos de
+  antemano).
+
+Se comprueba sin navegador con `pruebas/separar-unir.mjs` (con un PDF de prueba montado con la
+propia pdf-lib dentro del mismo contexto de `vm`, para no arrastrar problemas de `Array`/
+`Uint8Array` entre realms distintos) y con navegador de verdad con
+`pruebas/separar-unir-navegador.mjs` (miniaturas, tijeras, el cuadro de nombre en secuencia,
+Unir con dos sueltos, colisión de nombres). De paso, se ha corregido un fallo del disco de
+mentira compartido (`pruebas/navegador.mjs`): su `createWritable().write(...)` leía cualquier
+`Blob`/`File` con `.text()`, que decodifica como UTF-8 y cambia de tamaño un contenido binario de
+verdad (un PDF); ahora usa `.arrayBuffer()`, como hace el navegador de verdad. No cambia nada
+para el texto plano que ya usaban el resto de pruebas.
+
 ### La papelera
 
 Nada se borra de verdad a la primera: se manda a una papelera compartida, de la que se puede
@@ -1221,6 +1293,8 @@ de `App` va después del fichero que lo define.
 | `js/registro.js` | Registrar un documento en un paso, sin nombrarlo dos veces |
 | `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF (hasta 10 páginas) |
 | `js/registro-sellado.js` | Ver solo un PDF ya sellado en la carpeta del asunto, y colocarlo sin duplicarlo |
+| `js/pdf-herramientas.js` | Partir, unir y sacar páginas de un PDF con pdf-lib: solo bytes, sin disco ni DOM |
+| `js/pdf-separar-unir.js` | El cuadro de Separar, Unir y Sacar páginas: miniaturas con pdf.js, tijeras, casillas |
 | `js/verificacion.js` | El código de verificación del pie de un documento, y su dirección |
 | `js/lib/pdf.min.js`, `js/lib/pdf.worker.min.js` | pdf.js (Mozilla) 3.11.174, copiado tal cual |
 | `js/ficha-asunto.js` | La pantalla de un asunto: guía, notas, documentos y contacto |

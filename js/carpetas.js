@@ -294,6 +294,16 @@ var Carpetas = (function () {
     return true;
   }
 
+  /* Como escribirTexto, pero para bytes cualquiera: un PDF nuevo, por
+     ejemplo (17-sep-2026, fila 22, separar y unir PDF). */
+  async function escribirBytes(dir, nombre, bytes, tipo) {
+    var h = await dir.getFileHandle(nombre, { create: true });
+    var w = await h.createWritable();
+    await w.write(new Blob([bytes], { type: tipo || 'application/octet-stream' }));
+    await w.close();
+    return true;
+  }
+
   /* Distingue "no existe" de "no se puede leer". Si el fichero no está,
      devuelve null: es lo normal la primera vez que arranca la
      aplicación. Si el fichero está pero no se puede interpretar como
@@ -326,7 +336,7 @@ var Carpetas = (function () {
     contarFicheros: contarFicheros,
     renombrarFichero: renombrarFichero, moverFichero: moverFichero,
     elegirFichero: elegirFichero, copiarFicheroEn: copiarFicheroEn,
-    leerTexto: leerTexto, escribirTexto: escribirTexto,
+    leerTexto: leerTexto, escribirTexto: escribirTexto, escribirBytes: escribirBytes,
     leerJson: leerJson, guardarJson: guardarJson
   };
 })();
