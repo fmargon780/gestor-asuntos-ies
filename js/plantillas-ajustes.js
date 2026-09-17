@@ -231,8 +231,9 @@
       '</div>' +
       '<label class="etiqueta">Nombre de la plantilla</label>' +
       '<input id="pl-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '">' +
-      '<label class="etiqueta">Huecos</label>' +
-      '<div class="correo-botones" id="pl-huecos" style="flex-wrap:wrap"></div>' +
+      '<div class="hueco-insertar-fila">' +
+        '<button type="button" class="boton" id="pl-insertar-hueco">Insertar hueco</button>' +
+      '</div>' +
       '<label class="etiqueta">Texto</label>' +
       '<textarea id="pl-texto" class="campo" rows="7">' + U.escapar((existente && existente.texto) || '') + '</textarea>' +
       '<label class="etiqueta">Vista previa</label>' +
@@ -241,24 +242,7 @@
     var promesa = U.preguntar(existente ? 'Editar plantilla' : 'Nueva plantilla', cuerpo,
       existente ? 'Guardar' : 'Crear');
 
-    Plantillas.HUECOS.forEach(function (h) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'boton';
-      b.textContent = h.etiqueta;
-      b.onclick = function () { insertarHueco('{' + h.clave + '}'); };
-      $('pl-huecos').appendChild(b);
-    });
-
-    function insertarHueco(texto) {
-      var campo = $('pl-texto');
-      var inicio = campo.selectionStart || 0;
-      var fin = campo.selectionEnd || 0;
-      campo.value = campo.value.slice(0, inicio) + texto + campo.value.slice(fin);
-      campo.focus();
-      campo.selectionStart = campo.selectionEnd = inicio + texto.length;
-      pintarPrevia();
-    }
+    U.engancharInsertarHueco($('pl-insertar-hueco'), [$('pl-texto')], Plantillas.HUECOS, pintarPrevia);
 
     function pintarPrevia() {
       var muestra = datosDeMuestra($('pl-categoria').value, $('pl-tipo').value);

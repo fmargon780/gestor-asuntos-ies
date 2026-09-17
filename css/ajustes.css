@@ -165,3 +165,26 @@
   .tipos-cabecera { flex-direction: column; align-items: stretch; }
   .buscar-tipos { max-width: none; }
 }
+
+/* ---------- "Insertar hueco" (fila 35, docs/HUECOS-INSERTAR.md) ----------
+
+   Un botón y un buscador flotante, en vez del muro de un botón por
+   hueco de antes: con más de treinta huecos, ocupaba casi toda la
+   pantalla y tapaba el resto del formulario. */
+.hueco-insertar-fila { margin: 4px 0 10px; }
+.hueco-insertar-envoltorio { position: relative; display: inline-block; }
+.hueco-popover {
+  position: absolute; top: calc(100% + 4px); left: 0; z-index: 9;
+  background: var(--papel); border: 1px solid var(--linea); border-radius: 8px;
+  box-shadow: var(--sombra); width: 320px; max-width: 90vw; padding: 8px;
+}
+.hueco-popover-buscar { width: 100%; box-sizing: border-box; }
+.hueco-popover-lista { max-height: 260px; overflow-y: auto; margin-top: 6px; }
+.hueco-popover-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 7px 8px; border-radius: 6px; cursor: pointer; font-size: 13.5px;
+}
+.hueco-popover-item span { color: var(--tinta); }
+.hueco-popover-item code { color: var(--tinta-suave); font-size: 12px; white-space: nowrap; }
+.hueco-popover-item:hover, .hueco-popover-item.activo { background: #f0f3f7; }
+.hueco-popover-vacio { padding: 8px; color: var(--tinta-suave); font-size: 13.5px; }
