@@ -64,16 +64,17 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 19 | `docs/CSV-DEL-DOCUMENTO.md` | PENDIENTE | Acordado con Francisco el 17-sep-2026; es el punto 1 de `docs/PROXIMOS-ASUNTOS.md`, reducido a lo que se puede hacer. Al abrir un PDF en el visor, se lee el pie, se saca el código de verificación y la dirección que el propio documento imprima, y salen dos botones: "Copiar el código" y "Abrir la verificación". Sin descargas automáticas: se descartó traer la copia auténtica sola, porque esas páginas piden formulario y cada administración tiene la suya. No toca el script de Apps Script. |
 | 20 | `docs/REGISTRO-SIN-DUPLICAR.md` | PENDIENTE | Acordado con Francisco el 17-sep-2026; es el punto 9 de `docs/PROXIMOS-ASUNTOS.md`. Se da la vuelta al orden: la aplicación ve sola el PDF sellado que Francisco descarga a la carpeta del asunto, le lee el sello y le pregunta de qué documento es. Ese mismo fichero se renombra con su número de registro (no se genera una copia) y el documento sin sellar se va a la papelera. Además: todos los exploradores de carpetas se abren ya en la carpeta del asunto (`startIn`), y el sello se busca en todas las páginas y con el texto normalizado, que es lo que hacía que unas veces se detectara y otras no. No toca el script de Apps Script. |
 | 21 | `docs/GRUPOS-DE-PERSONAS.md` | PENDIENTE | Acordado con Francisco el 17-sep-2026; es el punto 3 de `docs/PROXIMOS-ASUNTOS.md`, y crece. Señalar varios terceros a la vez con casillas; atajos de alumnado por unidad, nivel y enseñanza; grupos propios guardados con nombre en un fichero compartido nuevo, `_GESTOR/grupos.json` (el decimotercero), manejados desde Ajustes y con borrado por papelera; y los mismos grupos sirven para poner los destinatarios de un correo, **siempre en copia oculta** por protección de datos. Fuera de esta fila, a falta de datos: departamentos, tutorías y equipos educativos. Toca `apps-script/gestor-correos.gs` (campo `cco`): si se hace en la misma vuelta que la fila 18, Francisco pega el script una sola vez al final. |
+| 22 | `docs/SEPARAR-Y-UNIR-PDF.md` | PENDIENTE | Acordado con Francisco el 17-sep-2026; es el punto 4 de `docs/PROXIMOS-ASUNTOS.md`, y con él la lista del 14-sep queda entera. Tres acciones nuevas en el menú de cada PDF, en la carpeta del asunto y también en Por clasificar: Separar (miniaturas con tijera entre páginas), Unir (varios PDF ordenados con flechas) y Sacar páginas (casillas, y el original no se toca). Los originales de separar y unir van a la papelera. Librería nueva `pdf-lib` copiada en `js/lib/` y cargada solo cuando hace falta, como pdf.js: un PDF no se puede partir a mano como se hizo con el `.docx`. No toca el script de Apps Script. |
 
 ## Lo que vendrá después
 
-`docs/PROXIMOS-ASUNTOS.md` guarda los nueve asuntos que Francisco dejó apuntados el 14-sep-2026.
-No se trabajan: cada uno se habla con él y se convierte en su propia instrucción antes de entrar
-en esta cola. Los puntos 5, 8, 7 y 6 de esa lista ya son las filas 11, 12, 13 y 14.
+Los nueve asuntos que Francisco dejó apuntados el 14-sep-2026 en `docs/PROXIMOS-ASUNTOS.md` están
+ya todos hablados y metidos en esta cola: el 1 es la fila 19, el 2 la 17, el 3 la 21, el 4 la 22,
+el 5 la 11, el 6 la 14, el 7 la 13, el 8 la 12 y el 9 la 20. Esa lista queda cerrada.
 
-El punto 1 (comprobación del CSV y copia auténtica) está hablado a medias: falta que Francisco
-mire, con un documento real, si el enlace de verificación del pie abre la copia auténtica sin
-pedir certificado ni captcha. Hasta entonces no se puede diseñar.
+De la fila 21 se quedaron fuera, por falta de datos y no por falta de código: los departamentos del
+personal, las tutorías y los equipos educativos. `personal.csv` no guarda nada de eso. Hay que
+hablar con Francisco qué se puede sacar de Séneca antes de diseñar nada.
 
 Cuando los hitos (fila 15) estén en uso, queda por hablar: si el estado del asunto desaparece y lo
 sustituye el hito en curso, y si un hito puede apuntar a su plantilla de correo (fila 14) o a su
