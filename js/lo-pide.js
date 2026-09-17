@@ -23,6 +23,21 @@ var LoPide = (function () {
   var RE_TELEFONO = /telefono|movil/;
   var RE_CORREO = /correo|e-?mail/;
 
+  /* Columnas que nunca son el nombre de una persona, aunque no sean ni
+     teléfono ni correo (docs/LO-PIDE-NOMBRE-DEL-TUTOR.md, 1): el
+     RegAlum del centro suele traer, junto al nombre del tutor, su
+     documento, su relación de parentesco, su fecha de nacimiento o su
+     domicilio, y la primera de esas columnas no es nunca el nombre. */
+  var RE_NO_ES_NOMBRE = /documento|dni|nif|nie|pasaporte|identificacion|identificador|ident|numero|num|nº|codigo|parentesco|relacion|sexo|fecha|nacimiento|domicilio|direccion|localidad|municipio|provincia|pais|nacionalidad|postal/;
+
+  var RE_APELLIDOS = /apellido/;
+  var RE_NOMBRE = /\bnombre\b/;
+
+  /* Al menos una letra (con acentos y ñ): la red de seguridad de
+     docs/LO-PIDE-NOMBRE-DEL-TUTOR.md, 3, para que un número suelto
+     nunca se cuele como si fuera un nombre. */
+  var RE_ALGUNA_LETRA = /\p{L}/u;
+
   /* El primer valor de `campos` cuyo título case con el patrón, leído
      por el título (como js/dni.js y js/plantillas.js). Copia mínima,
      a propósito: este módulo no depende del orden de carga de
@@ -40,7 +55,16 @@ var LoPide = (function () {
   /* {tutor1}/{tutor2} de js/plantillas.js hasta el 17-sep-2026: las
      columnas que hablan de "tutor" y de ese número (o de
      "primer"/"segundo"), separando dentro el teléfono y el correo del
-     nombre por el título. Lo que Séneca no traiga se queda vacío. */
+     nombre por el título. Lo que Séneca no traiga se queda vacío.
+
+     El nombre, por orden (docs/LO-PIDE-NOMBRE-DEL-TUTOR.md, 2), de las
+     columnas que sobrevivan a RE_TELEFONO, RE_CORREO y RE_NO_ES_NOMBRE:
+     1. Apellidos y Nombre en columnas distintas → "Apellidos, Nombre"
+        (si Apellidos ya trae una coma, se deja tal cual).
+     2. Solo Nombre → esa columna entera.
+     3. Solo Apellidos → esa columna entera.
+     4. Ninguna de las dos → la primera columna que quede, como antes.
+     Y, al final, la red de seguridad: sin ninguna letra, nombre vacío. */
   function datosDeTutor(campos, numero) {
     var reNumero = numero === 1
       ? /tutor.*\b0*1\b|\b0*1\b.*tutor|primer\s*tutor/
@@ -49,12 +73,29 @@ var LoPide = (function () {
     Object.keys(campos || {}).forEach(function (k) {
       if (reNumero.test(U.normalizar(k))) propios[k] = campos[k];
     });
-    var claveNombre = Object.keys(propios).filter(function (k) {
+    var supervivientes = Object.keys(propios).filter(function (k) {
       var t = U.normalizar(k);
-      return !RE_TELEFONO.test(t) && !RE_CORREO.test(t);
-    })[0];
+      return !RE_TELEFONO.test(t) && !RE_CORREO.test(t) && !RE_NO_ES_NOMBRE.test(t);
+    });
+    var claveApellidos = supervivientes.filter(function (k) { return RE_APELLIDOS.test(U.normalizar(k)); })[0];
+    var claveNombre = supervivientes.filter(function (k) { return RE_NOMBRE.test(U.normalizar(k)); })[0];
+    var valApellidos = claveApellidos ? String(propios[claveApellidos] || '').trim() : '';
+    var valNombre = claveNombre ? String(propios[claveNombre] || '').trim() : '';
+
+    var nombre;
+    if (claveApellidos && claveNombre && claveApellidos !== claveNombre && valApellidos && valNombre) {
+      nombre = valApellidos.indexOf(',') !== -1 ? valApellidos : (valApellidos + ', ' + valNombre);
+    } else if (valNombre) {
+      nombre = valNombre;
+    } else if (valApellidos) {
+      nombre = valApellidos;
+    } else {
+      nombre = supervivientes.length ? String(propios[supervivientes[0]] || '').trim() : '';
+    }
+    if (nombre && !RE_ALGUNA_LETRA.test(nombre)) nombre = '';
+
     return {
-      nombre: claveNombre ? String(propios[claveNombre] || '').trim() : '',
+      nombre: nombre,
       telefono: primerValorQueParezca(propios, RE_TELEFONO),
       correo: primerValorQueParezca(propios, RE_CORREO)
     };
@@ -83,12 +124,17 @@ var LoPide = (function () {
     if (categoria === 'ALUMNADO') {
       [1, 2].forEach(function (n) {
         var t = datosDeTutor(persona.campos, n);
-        if (!t.nombre) return;
+        /* Sin nombre pero con teléfono o correo, la opción no
+           desaparece (docs/LO-PIDE-NOMBRE-DEL-TUTOR.md, 4): se ofrece
+           a secas como "Tutor legal N", con relación vacía para que
+           LoPide.texto no la repita entre paréntesis. */
+        if (!t.nombre && !t.telefono && !t.correo) return;
+        var nombre = t.nombre || ('Tutor legal ' + n);
         lista.push({
           valor: 'tutor' + n,
-          texto: 'Tutor legal ' + n + ' · ' + t.nombre,
+          texto: 'Tutor legal ' + n + (t.nombre ? ' · ' + t.nombre : ''),
           datos: {
-            nombre: t.nombre, categoria: categoria, relacion: 'Tutor legal ' + n,
+            nombre: nombre, categoria: categoria, relacion: t.nombre ? ('Tutor legal ' + n) : '',
             correo: t.correo, telefono: t.telefono
           }
         });

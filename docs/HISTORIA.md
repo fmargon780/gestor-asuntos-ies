@@ -5,6 +5,39 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — "Lo pide": el nombre del tutor legal, no un número
+
+Fila 38 de la cola (`docs/COLA.md`, `docs/LO-PIDE-NOMBRE-DEL-TUTOR.md`), apuntada por Francisco:
+en el bloque "Lo pide" de un asunto de alumnado (Nuevo asunto y ficha), al desplegar "Quién lo
+pide" las opciones de tutor legal salían como `Tutor legal 1 · 12345678`, con un número en vez de
+un nombre. La causa estaba en `LoPide.datosDeTutor` (`js/lo-pide.js`, fila 28): cogía como nombre
+"la primera columna del tutor que no fuera teléfono ni correo", y en el RegAlum del centro esa
+primera columna suele ser el documento del tutor, no su nombre.
+
+Cambio quirúrgico, solo en cómo `datosDeTutor` elige la columna del nombre (teléfono, correo,
+opciones y guardado se quedan igual). Primero, una lista más larga de columnas que nunca son el
+nombre: además de teléfono y correo, documento/dni/nif/nie/pasaporte, identificación/identificador,
+número/num/nº/código, parentesco/relación/sexo, fecha/nacimiento y domicilio/dirección/localidad/
+municipio/provincia/país/nacionalidad/postal. Con las columnas que sobreviven, el nombre se arma
+por prioridad: Apellidos + Nombre si hay las dos columnas (una sola coma, salvo que Apellidos ya
+traiga una), si no la que haya de las dos, y si ninguna habla de nombre ni de apellidos, la primera
+que quede, como antes. Una red de seguridad cierra el círculo: el valor final tiene que traer al
+menos una letra (`\p{L}`, con acentos y ñ) o el nombre se queda vacío, para que un número suelto
+nunca vuelva a colarse como si fuera una persona.
+
+Y una mejora que no empeora lo de antes: si el RegAlum no trae el nombre del tutor pero sí su
+teléfono o su correo, la opción ya no desaparece del desplegable (antes sí, si `datosDeTutor` no
+sacaba nombre no se ofrecía nada); se sigue ofreciendo como "Tutor legal 1" (o 2) a secas, sin
+" · " detrás, guardando `relacion: ''` para que la línea de la ficha salga limpia ("Tutor legal 1 ·
+por teléfono · fecha", sin repetir "Tutor legal 1" entre paréntesis). `js/plantillas.js` no se ha
+tocado: `{tutor1}`/`{tutor2}` llaman a la misma `LoPide.datosDeTutor` y se benefician solos.
+
+Pruebas nuevas en `pruebas/lo-pide.mjs` (escenario "2b", junto a las demás de "Lo pide"), con los
+cuatro juegos de columnas de la sección "Pruebas" del encargo, más el caso de solo teléfono/correo
+y la comprobación de que `{tutor1}` de las plantillas trae el nombre. Batería completa en verde.
+Subido con pull request (fmargon780/gestor-asuntos-ies#30), junto con la fila 40. Versión publicada
+`App.VERSION`: `17-sep-2026 · 20:32`.
+
 ## 17-sep-2026 — La ficha del asunto, colocada de otra manera
 
 Fila 37 de la cola (`docs/COLA.md`, `docs/FICHA-DEL-ASUNTO-NUEVA.md`), acordada con Francisco en

@@ -664,7 +664,16 @@ Toda la lógica vive en el módulo nuevo `js/lo-pide.js` (`window.LoPide`), para
   más "Tutor legal 1/2" (solo alumnado, y solo si Séneca trae su nombre), con los datos de cada
   uno (`nombre`, `correo`, `telefono`) ya resueltos.
 - `LoPide.datosDeTutor(campos, numero)`: sacada de `js/plantillas.js` (que ahora la llama en vez
-  de tener su propia copia), porque `LoPide.opciones` también la necesita.
+  de tener su propia copia), porque `LoPide.opciones` también la necesita. El nombre no es "la
+  primera columna que no sea teléfono ni correo" (17-sep-2026, fila 38, docs/LO-PIDE-NOMBRE-DEL-
+  TUTOR.md: en el RegAlum del centro esa primera columna solía ser el documento del tutor, y salía
+  un número donde debía ir su nombre): descarta además las columnas de documento/identificación,
+  número/código, parentesco/relación/sexo, fecha/nacimiento y domicilio/dirección, y de las que
+  quedan arma el nombre por prioridad (Apellidos + Nombre si hay las dos columnas, si no la que
+  haya de las dos, si no la primera que sobreviva), con una red de seguridad: sin ninguna letra en
+  el resultado, nombre vacío. Sin nombre pero con teléfono o correo, la opción no desaparece: se
+  ofrece como "Tutor legal 1/2" a secas, con `relacion: ''` para no repetirlo en la línea de
+  `LoPide.texto`.
 - `LoPide.controles(caja, persona, valorInicial)`: pinta el desplegable, los campos de "Otra
   persona…" (solo visibles con esa opción), la vía y la fecha, **con clases, nunca con id**: este
   mismo módulo se monta a la vez dentro de `#bloque-detalles` de "Nuevo asunto" (que queda en el

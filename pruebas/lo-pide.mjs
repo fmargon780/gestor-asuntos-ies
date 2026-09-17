@@ -128,6 +128,92 @@ comprobarQue('el módulo LoPide existe (si esto falla, falta js/lo-pide.js)', ty
 }
 
 /* ============================================================
+   2b. LoPide.datosDeTutor, fila 38 de docs/COLA.md
+   (docs/LO-PIDE-NOMBRE-DEL-TUTOR.md): antes de este arreglo, la
+   primera columna del tutor que no fuera teléfono ni correo solía ser
+   su documento, no su nombre, y esa era la opción que se ofrecía en
+   "Quién lo pide". Los cuatro escenarios de la sección "Pruebas" del
+   documento, más comprobar que {tutor1} de js/plantillas.js sigue
+   trayendo el nombre (y no el número).
+   ============================================================ */
+{
+  /* Columnas con nombre: el documento, delante en el objeto, ya no se
+     cuela como nombre. */
+  const camposConNombre = {
+    'Nº identificación tutor 1': '12345678',
+    'Nombre tutor 1': 'María López Ruiz',
+    'Teléfono tutor 1': '600111222',
+    'Correo tutor 1': 'm@x.es'
+  };
+  comprobar('2b. con documento y nombre en columnas distintas, gana el nombre',
+    LoPide.datosDeTutor(camposConNombre, 1),
+    { nombre: 'María López Ruiz', telefono: '600111222', correo: 'm@x.es' });
+
+  /* Apellidos y nombre en columnas separadas: "Apellidos, Nombre". */
+  const camposApellidosYNombre = {
+    'Apellidos tutor 1': 'López Ruiz',
+    'Nombre tutor 1': 'María',
+    'Nº documento tutor 1': '12345678'
+  };
+  comprobar('2b. apellidos y nombre por separado, se juntan con una coma',
+    LoPide.datosDeTutor(camposApellidosYNombre, 1).nombre, 'López Ruiz, María');
+
+  /* Solo la columna del número: nombre vacío (la red de seguridad de
+     docs/LO-PIDE-NOMBRE-DEL-TUTOR.md, 3: sin ninguna letra, no hay
+     nombre). */
+  const soloNumero = { 'Nº documento tutor 1': '12345678' };
+  comprobar('2b. solo la columna del número, nombre vacío',
+    LoPide.datosDeTutor(soloNumero, 1).nombre, '');
+
+  /* Ninguna columna del tutor 2: los tres campos vacíos, y la opción
+     no aparece (ya cubierto arriba en el escenario 2, se repite aquí
+     junto a los demás por ser uno de los cuatro de la sección
+     "Pruebas" del documento). */
+  comprobar('2b. sin columnas del tutor 2, los tres campos vacíos',
+    LoPide.datosDeTutor(camposConNombre, 2),
+    { nombre: '', telefono: '', correo: '' });
+  const personaSinTutor2 = { nombre: 'Ana', categoria: 'ALUMNADO', campos: camposConNombre };
+  comprobarQue('2b. sin columnas del tutor 2, la opción no aparece',
+    !LoPide.opciones(personaSinTutor2).some((o) => o.valor === 'tutor2'));
+
+  /* Sin nombre pero con teléfono o correo, la opción se sigue
+     ofreciendo, a secas (docs/LO-PIDE-NOMBRE-DEL-TUTOR.md, 4). */
+  const soloTelefonoYCorreo = {
+    'Nº documento tutor 1': '12345678',
+    'Teléfono tutor 1': '600111222',
+    'Correo tutor 1': 'm@x.es'
+  };
+  const personaSoloContacto = { nombre: 'Ana', categoria: 'ALUMNADO', campos: soloTelefonoYCorreo };
+  const opcionesSoloContacto = LoPide.opciones(personaSoloContacto);
+  const tutor1SoloContacto = opcionesSoloContacto.filter((o) => o.valor === 'tutor1')[0];
+  comprobarQue('2b. sin nombre pero con teléfono/correo, la opción se ofrece', !!tutor1SoloContacto,
+    JSON.stringify(opcionesSoloContacto));
+  comprobar('2b. con el texto "Tutor legal 1" a secas', tutor1SoloContacto && tutor1SoloContacto.texto, 'Tutor legal 1');
+  comprobar('2b. guarda nombre "Tutor legal 1" y relación vacía',
+    tutor1SoloContacto && { nombre: tutor1SoloContacto.datos.nombre, relacion: tutor1SoloContacto.datos.relacion },
+    { nombre: 'Tutor legal 1', relacion: '' });
+
+  /* {tutor1} de js/plantillas.js sigue funcionando, y ahora trae el
+     nombre (antes del arreglo traía el número del documento).
+     Plantillas.valoresDeAsunto busca a la persona con window.Datos
+     (App.E.datos): se pone aquí un mínimo, solo para este escenario, y
+     se retira al final para no afectar a las pruebas 6 y 7 de abajo. */
+  win.App.E.datos = 'CUALQUIERA';
+  win.Datos = {
+    cargar: async function () { return { lista: [personaSinTutor2] }; },
+    buscar: function (lista) { return lista; }
+  };
+  const asuntoConTutor = {
+    ficha: { tercero: 'Pérez López, Ana 1234567', categoria: 'ALUMNADO', tipo: 'CERTIFICADO' },
+    leido: { tipo: 'CERTIFICADO', categoria: 'ALUMNADO', resto: 'Pérez López, Ana 1234567' }
+  };
+  const valoresTutor = await Plantillas.valoresDeAsunto(asuntoConTutor);
+  comprobar('2b. {tutor1} de las plantillas trae el nombre, no el número', valoresTutor.tutor1, 'María López Ruiz');
+  delete win.Datos;
+  delete win.App.E.datos;
+}
+
+/* ============================================================
    3. LoPide.texto monta la línea legible: nombre, relación, vía y
    fecha, contados desde hoy (nunca a mano).
    ============================================================ */
