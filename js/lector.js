@@ -23,8 +23,61 @@
 (function () {
 
   var url = '';        /* la dirección temporal del fichero que se está viendo */
+  var generacion = 0;  /* para no pintar los botones de verificación de un PDF que ya no se ve */
 
   function $(id) { return document.getElementById(id); }
+
+  /* ---------- el código de verificación del pie (17-sep-2026, fila 19) ----------
+
+     Se lee mientras el documento se está pintando, sin hacer esperar a
+     nadie: el panel sale igual de rápido, y estos botones aparecen un
+     instante después, cuando pdf.js haya terminado. Nada se guarda: es
+     un atajo para no teclear, no un dato del asunto. */
+
+  function copiarCodigo(boton, codigo) {
+    function copiado(ok) {
+      if (!ok) { U.aviso('No he podido copiarlo. Es ' + codigo + '.', 'malo'); return; }
+      var antes = boton.textContent;
+      boton.textContent = 'Copiado';
+      setTimeout(function () { boton.textContent = antes; }, 1400);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(codigo).then(function () { copiado(true); })
+        .catch(function () { copiado(false); });
+    } else {
+      copiado(false);
+    }
+  }
+
+  function anadirBotonesDeVerificacion(blob, caja) {
+    if (!window.Verificacion) return;
+    var miGeneracion = generacion;
+    Verificacion.leerDelFichero(blob).then(function (r) {
+      if (miGeneracion !== generacion || !r || !r.codigo) return;   /* se ha abierto otra cosa mientras tanto */
+
+      var copiar = document.createElement('button');
+      copiar.type = 'button';
+      copiar.className = 'boton';
+      copiar.textContent = 'Copiar el código';
+      copiar.onclick = function () { copiarCodigo(copiar, r.codigo); };
+      caja.appendChild(copiar);
+
+      var codigoVisto = document.createElement('span');
+      codigoVisto.className = 'lector-codigo-verificacion';
+      codigoVisto.textContent = r.codigo;
+      caja.appendChild(codigoVisto);
+
+      if (r.enlace) {
+        var abrir = document.createElement('a');
+        abrir.className = 'boton';
+        abrir.textContent = 'Abrir la verificación';
+        abrir.href = r.enlace;
+        abrir.target = '_blank';
+        abrir.rel = 'noopener';
+        caja.appendChild(abrir);
+      }
+    }).catch(function () {});
+  }
 
   /* ---------- el ancho, que se puede arrastrar ---------- */
 
@@ -120,6 +173,7 @@
   function abrir(opciones) {
     var o = opciones || {};
     var p = panel();
+    generacion++;
 
     ponerAncho(anchoGuardado(), false);
 
@@ -142,6 +196,7 @@
     if (o.blob) {
       url = URL.createObjectURL(o.blob);
       $('lector-marco').src = url;
+      anadirBotonesDeVerificacion(o.blob, caja);
     } else if (o.url) {
       $('lector-marco').src = o.url;
     }
