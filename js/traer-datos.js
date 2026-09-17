@@ -61,11 +61,19 @@
     return null;
   }
 
-  function elegirFicheros() {
-    return window.showOpenFilePicker({
+  /* `carpetaInicio` es la carpeta de datos, si ya se conoce
+     (17-sep-2026, fila 20): no es de donde vienen los CSV, pero es la
+     única carpeta de la aplicación que este botón tiene a mano, y
+     sirve igual para no empezar siempre en la misma carpeta de
+     Windows. Sin ella, se abre donde el navegador quiera, como
+     siempre. */
+  function elegirFicheros(carpetaInicio) {
+    var opciones = {
       multiple: true,
       types: [{ description: 'Ficheros CSV de Séneca', accept: { 'text/csv': ['.csv'] } }]
-    });
+    };
+    if (carpetaInicio) opciones.startIn = carpetaInicio;
+    return window.showOpenFilePicker(opciones);
   }
 
   /* Después de traer ficheros, lo leído antes ya no vale y el aviso de
@@ -89,7 +97,7 @@
 
     var elegidos;
     try {
-      elegidos = await elegirFicheros();
+      elegidos = await elegirFicheros(datos);
     } catch (e) {
       return;   /* ha cerrado el cuadro: no hay nada que decir */
     }

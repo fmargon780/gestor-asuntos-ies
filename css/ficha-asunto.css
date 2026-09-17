@@ -39,6 +39,15 @@
 }
 .boton-presencia-tomar { flex: 0 0 auto; }
 
+/* Un papel que ya trae el sello del registro (17-sep-2026, fila 20):
+   el desplegable de documentos y el botón de descartarlo, en línea. */
+.aviso-sello + .aviso-sello { margin-top: 10px; }
+.sello-fila {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px;
+}
+.sello-fila .sello-elegir { width: auto; min-width: 260px; flex: 1 1 260px; }
+.sello-fila .sello-no-es { flex: 0 0 auto; }
+
 .ficha-bloque {
   background: var(--papel); border: 1px solid var(--linea);
   border-radius: var(--radio); padding: 16px 18px; box-shadow: var(--sombra);

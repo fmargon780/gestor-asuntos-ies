@@ -68,17 +68,18 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Panel lateral de lectura, y tablón de notas rápidas siempre visible.
 - Correo y mensaje de Séneca preparados; la app no envía nada.
 - Bandeja de correos de Gmail (etiqueta `GESTOR`): a un asunto nuevo, al que adivina, o al que
-  eliges a mano con "Elegir asunto". El hilo queda enganchado al asunto (`hilos` en
-  `asuntos.json`, con la matrícula del mensaje —el Message-ID— para reconocerlo también desde el
-  otro buzón) y sus respuestas vuelven solas a la bandeja. Lo que ya metió el compañero sale como
-  línea gris, no como tarjeta.
+  eliges a mano con "Elegir asunto". El hilo queda enganchado al asunto (`hilos` en `asuntos.json`,
+  con la matrícula del mensaje —el Message-ID— para reconocerlo también desde el otro buzón) y sus
+  respuestas vuelven solas a la bandeja. Lo que ya metió el compañero sale como línea gris.
 - "Por clasificar": cada documento suelto se abre, se borra, crea un asunto nuevo, o entra en un
   asunto que ya existe con "Meter en un asunto" (mismo cuadro que la bandeja de correos,
   `js/elegir-asunto.js`). El que se está viendo queda marcado en la lista, con sus mismas
   acciones también dentro del panel del visor.
 - DNI del alumnado a la vista, con aviso si falta y ya tocaría tenerlo.
-- Registrar un documento en un paso, leyendo el sello de Séneca del PDF. Al leerlo en el panel de
-  la derecha, si trae código de verificación, botones para copiarlo y abrir la verificación.
+- Registrar un documento: si el PDF sellado ya está en la carpeta (bajado de Séneca), la ficha lo
+  detecta sola y lo renombra al decir de qué documento es, sin tercer fichero y con el viejo a la
+  papelera (`js/registro-sellado.js`); el botón de siempre sigue, ya con el explorador abierto en
+  la carpeta del asunto, y sigue leyendo el sello y el código de verificación del documento.
 - Terceros relacionados con un asunto, con nota (no copia) al archivar.
 - Parada al crear un asunto duplicado, y pantalla propia "Duplicados" para los ya existentes.
 - Ajustes ágiles: pestañas por categoría, buscador cruzado, aviso en vivo de nombres repetidos.

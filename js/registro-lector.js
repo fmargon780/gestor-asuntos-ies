@@ -17,11 +17,22 @@
    Usa pdf.js (Mozilla), copiado en js/lib/ (versión 3.11.174), y
    solo se carga la primera vez que hace falta: no al arrancar la
    aplicación.
+
+   El sello unas veces se detectaba y otras no, con el mismo
+   documento (queja de Francisco, fila 20 de docs/COLA.md,
+   17-sep-2026): solo se leía la página 1, y pdf.js puede partir el
+   mismo texto en trozos distintos según cómo se abra el PDF. Ahora se
+   leen hasta 10 páginas, parando en cuanto se encuentra el sello, y
+   el texto se busca dos veces: una vez normalizado (todo espacio
+   seguido se deja en uno solo) y, si así no aparece, otra vez sin
+   ningún espacio, porque el sello a veces viene pegado
+   (".../M000000000368ENTRADAFecha: ...").
    ============================================================ */
 var RegistroLector = (function () {
 
   var SELLO = /(\d{4})\s*\/\s*\d+\s*\/\s*([MA])\s*0*(\d+)\s*(ENTRADA|SALIDA)/;
   var FECHA_SELLO = /Fecha:\s*(\d{2}\/\d{2}\/\d{4})/;
+  var TOPE_PAGINAS = 10;
 
   var cargando = null;
 
@@ -54,6 +65,58 @@ var RegistroLector = (function () {
     return contenido.items.map(function (i) { return i.str; }).join(' ');
   }
 
+  /* Todos los espacios, tabuladores y saltos de línea, en uno solo. */
+  function normalizarEspacios(t) {
+    return String(t || '').replace(/\s+/g, ' ').trim();
+  }
+
+  /* Busca el sello en un texto ya extraído del PDF. Sin efectos ni
+     dependencias de pdf.js ni del navegador: se puede probar con
+     cualquier cadena (pruebas/registro-sin-duplicar.mjs). Se prueba
+     primero con el texto normalizado, y si no aparece, otra vez sin
+     ningún espacio. */
+  function buscarEnTexto(texto) {
+    var candidatos = [normalizarEspacios(texto)];
+    candidatos.push(candidatos[0].replace(/\s+/g, ''));
+
+    for (var i = 0; i < candidatos.length; i++) {
+      var t = candidatos[i];
+      var m = t.match(SELLO);
+      if (!m) continue;
+
+      var numero = m[3];                  /* ya sin los ceros de delante */
+      var numeroLargo = numero.length > 4;
+      var fecha = t.match(FECHA_SELLO);
+
+      return {
+        anio: m[1].slice(2),
+        serie: m[2],
+        tipo: m[4] === 'SALIDA' ? 'S' : 'E',
+        numero: numeroLargo ? numero : numero.padStart(4, '0'),
+        numeroLargo: numeroLargo,
+        fecha: fecha ? fecha[1] : ''
+      };
+    }
+    return null;
+  }
+
+  /* El texto de hasta `tope` páginas, parando en cuanto el sello
+     aparece: no hace falta leer las 10 si ya está en la primera. */
+  async function textoHastaElSello(fichero, tope) {
+    var pdfjsLib = await cargarPdfJs();
+    var buffer = await fichero.arrayBuffer();
+    var documento = await pdfjsLib.getDocument({ data: buffer }).promise;
+    var limite = Math.min(documento.numPages, tope || TOPE_PAGINAS);
+    var texto = '';
+    for (var n = 1; n <= limite; n++) {
+      var pagina = await documento.getPage(n);
+      var contenido = await pagina.getTextContent();
+      texto += contenido.items.map(function (i) { return i.str; }).join(' ') + ' ';
+      if (buscarEnTexto(texto)) break;
+    }
+    return texto;
+  }
+
   /* Lee el sello de un fichero. Devuelve null si no es un PDF, si no
      se puede leer, o si no se encuentra el sello: en cualquiera de
      esos casos el cuadro de Registrar sale vacío, como siempre, sin
@@ -64,22 +127,8 @@ var RegistroLector = (function () {
     if (!esPdf) return null;
 
     try {
-      var texto = await textoDePrimeraPagina(fichero);
-      var m = texto.match(SELLO);
-      if (!m) return null;
-
-      var numero = m[3];                    /* ya sin los ceros de delante */
-      var numeroLargo = numero.length > 4;
-      var fecha = texto.match(FECHA_SELLO);
-
-      return {
-        anio: m[1].slice(2),
-        serie: m[2],
-        tipo: m[4] === 'SALIDA' ? 'S' : 'E',
-        numero: numeroLargo ? numero : numero.padStart(4, '0'),
-        numeroLargo: numeroLargo,
-        fecha: fecha ? fecha[1] : ''
-      };
+      var texto = await textoHastaElSello(fichero, TOPE_PAGINAS);
+      return buscarEnTexto(texto);
     } catch (e) {
       return null;
     }
@@ -89,5 +138,8 @@ var RegistroLector = (function () {
      de verificación del pie de un documento se busca con la misma
      máquina que ya lee el sello de Séneca, sin cargar pdf.js dos veces
      ni duplicar cómo se saca el texto de una página. */
-  return { leerSello: leerSello, textoDePrimeraPagina: textoDePrimeraPagina };
+  return {
+    leerSello: leerSello, textoDePrimeraPagina: textoDePrimeraPagina,
+    buscarEnTexto: buscarEnTexto
+  };
 })();

@@ -107,6 +107,36 @@
     return lista;
   }
 
+  /* Como `anadirNota`, pero para las notas que van atadas a un mismo
+     hecho y no deben acumularse: el registro de un documento
+     (js/registro.js, js/registro-sellado.js). Si ya hay una nota con
+     ese mismo `campoClave`/`valorClave` (por ejemplo, el mismo
+     documento original), se sustituye en su sitio; si no, se añade al
+     final como cualquier otra. */
+  async function sustituirNota(a, texto, campoClave, valorClave, extra) {
+    var lista = await notasFrescas(a);
+    var nota = {
+      texto: texto,
+      quien: window.Gestor.usuario() || '',
+      cuando: U.ahora()
+    };
+    nota[campoClave] = valorClave;
+    if (extra) Object.keys(extra).forEach(function (k) {
+      if (extra[k] !== undefined && extra[k] !== null && extra[k] !== '') nota[k] = extra[k];
+    });
+    var indice = -1;
+    for (var i = 0; i < lista.length; i++) {
+      if (lista[i] && lista[i][campoClave] === valorClave) { indice = i; break; }
+    }
+    if (indice === -1) lista.push(nota); else lista[indice] = nota;
+    await window.Gestor.anotar(a.nombre, {
+      notas: lista,
+      notaEl: U.ahora(),
+      notaPor: window.Gestor.usuario() || ''
+    });
+    return lista;
+  }
+
   /* ---------- la ventana ---------- */
 
   function pintarLista(notas) {
@@ -216,6 +246,7 @@
     de: notasDe,
     frescas: notasFrescas,
     anadir: anadirNota,
+    sustituir: sustituirNota,
     pintar: pintarLista,
     cuando: cuando,
     yaTieneCorreo: yaTieneCorreo

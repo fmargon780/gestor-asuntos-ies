@@ -18,3 +18,4 @@ arreglos pequeños (`docs/ARREGLOS-USO-2026-09-14.md`) y el resto quedó apuntad
 7. Poder adjuntar a un correo los documentos de un asunto ya creado.
 8. Poder añadir un documento nuevo sin clasificar a un asunto ya creado.
 9. Registrar un documento que ya trae el sello del registro, sin tener que añadirlo dos veces.
+   **Hecho en la fila 20 de `docs/COLA.md` (17-sep-2026).**
