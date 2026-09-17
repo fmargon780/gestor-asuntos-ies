@@ -9,7 +9,44 @@
    Va cargado justo después de js/documentos-sueltos.js y antes de
    js/relacionados.js y de js/hitos-archivo.js, que envuelven las dos
    funciones de aquí.
-   ============================================================ */
+
+   Desde el 17-sep-2026 (fila 44, docs/BUSCADOR-ARCHIVO-INDICE.md),
+   aquí mismo se da de alta o de baja el asunto en el índice guardado
+   del ARCHIVO (`_GESTOR/indice-archivo.json`, `js/archivo-indice.js`),
+   sin reconstruirlo entero: al archivar se añade su entrada, al
+   reabrir se quita. Siempre DESPUÉS de que el traslado de la carpeta
+   haya salido bien, y en un `try/catch` aparte: el índice se puede
+   rehacer entero en cualquier momento con "Reconstruir el índice", así
+   que un fallo aquí no debe impedir que el archivado o la reapertura,
+   que sí han salido bien, se den por buenos. */
+
+/* Construye la entrada de una sola carpeta de asunto ya archivada y la
+   añade al índice. Silencioso a propósito: sin índice todavía, o si
+   algo falla al leer la carpeta, no pasa nada (queda para la próxima
+   reconstrucción). */
+async function actualizarIndiceAlArchivar(nombre, categoria, tercero, handle) {
+  if (!window.IndiceArchivo) return;
+  try {
+    var entrada = await IndiceArchivo.entradaDe(
+      handle, nombre, categoria, tercero, categoria + ' / ' + tercero, '', App.E.tipos);
+    await IndiceArchivo.anadirEntrada(entrada);
+  } catch (e) { /* el índice es prescindible: se puede reconstruir entero */ }
+}
+
+/* Quita del índice el asunto que se acaba de reabrir, y repinta la
+   pantalla ARCHIVO si estaba cargada en memoria (sin releer nada del
+   disco: "basta repintar", punto 6.3 del encargo). Si la pantalla
+   ARCHIVO no se había visitado todavía en esta sesión, `App.E.listaArchivo`
+   ni existe, y no hay nada que repintar. */
+async function actualizarIndiceAlReabrir(nombre) {
+  if (window.IndiceArchivo) {
+    try { await IndiceArchivo.quitarEntrada(nombre); } catch (e) { /* ver arriba */ }
+  }
+  if (Array.isArray(App.E.listaArchivo)) {
+    App.E.listaArchivo = App.E.listaArchivo.filter(function (a) { return a.nombre !== nombre; });
+    if (typeof App.pintarArchivo === 'function') App.pintarArchivo();
+  }
+}
 
 /* ---------- archivar un asunto ----------
 
@@ -84,11 +121,13 @@ App.cerrarAsunto = async function (a) {
       } catch (e) { yaArchivada = false; }
 
       if (yaArchivada) {
-        var totalFicherosYa = await Carpetas.contarFicheros(await carpetaTerceroYa.getDirectoryHandle(a.nombre));
+        var handleYaArchivada = await carpetaTerceroYa.getDirectoryHandle(a.nombre);
+        var totalFicherosYa = await Carpetas.contarFicheros(handleYaArchivada);
         await App.anotar(a.nombre, {
           estado: 'cerrado', categoria: categoria, tercero: tercero,
           cerradoEl: a.ficha.cerradoEl || U.ahora(), ficheros: totalFicherosYa
         });
+        await actualizarIndiceAlArchivar(a.nombre, categoria, tercero, handleYaArchivada);
         U.aviso('Este asunto ya estaba archivado. He puesto la lista al día.', 'bueno');
       } else {
         U.aviso('No encuentro la carpeta de este asunto ni en Asuntos abiertos ni en el archivo. ' +
@@ -104,11 +143,13 @@ App.cerrarAsunto = async function (a) {
       ? await Carpetas.fusionarEn(App.E.abiertos, a.nombre, destino, a.nombre)
       : { conSufijo: [] };
     if (!haciendoFusion) await Carpetas.mover(App.E.abiertos, a.nombre, destino);
-    var totalFicheros = await Carpetas.contarFicheros(await destino.getDirectoryHandle(a.nombre));
+    var handleArchivado = await destino.getDirectoryHandle(a.nombre);
+    var totalFicheros = await Carpetas.contarFicheros(handleArchivado);
     await App.anotar(a.nombre, {
       estado: 'cerrado', categoria: categoria, tercero: tercero,
       cerradoEl: U.ahora(), cerradoPor: App.E.usuario, ficheros: totalFicheros
     });
+    await actualizarIndiceAlArchivar(a.nombre, categoria, tercero, handleArchivado);
     var mensaje = 'Asunto archivado.';
     if (haciendoFusion) {
       mensaje = 'Asunto archivado. Se ha completado un archivado anterior que se había quedado a medias.';
@@ -169,13 +210,12 @@ App.reabrirAsunto = async function (a) {
         });
         U.aviso('Este asunto ya estaba reabierto. He puesto la lista al día.', 'bueno');
         await App.verAbiertos();
-        await App.verArchivo();
+        await actualizarIndiceAlReabrir(a.nombre);
         return;
       } else {
         U.aviso('No encuentro la carpeta de este asunto ni en Asuntos abiertos ni en el archivo. ' +
           'Puede que la haya movido o renombrado el otro ordenador. Pulsa Recargar y míralo.', 'ambar');
         await App.verAbiertos();
-        await App.verArchivo();
         return;
       }
     }
@@ -196,7 +236,7 @@ App.reabrirAsunto = async function (a) {
     }
     U.aviso(mensaje, 'bueno');
     await App.verAbiertos();
-    await App.verArchivo();
+    await actualizarIndiceAlReabrir(a.nombre);
   } catch (e) {
     U.aviso('No se ha podido reabrir: ' + U.mensajeDeError(e), 'malo');
   }

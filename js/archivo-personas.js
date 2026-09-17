@@ -9,38 +9,98 @@
    PANTALLA: ARCHIVO
    ========================================================== */
 
+/* El índice (`js/archivo-indice.js`) es quien recorre el disco: aquí
+   solo se orquesta. Si no hay índice usable (no existe, está roto o
+   es de otra versión), se cae al recorrido de disco de siempre —
+   `IndiceArchivo.construir()` hace el mismo trabajo, solo que sin
+   guardar nada — y se avisa. Si el índice existe pero un recuento
+   barato (categorías y carpetas de tercero) no cuadra con el suyo, se
+   enseña igual, con otro aviso: no se reconstruye sola nunca. */
 App.verArchivo = async function () {
   $('explica-archivo').textContent = 'Leyendo el archivo…';
-  var salida = [];
-  var categorias = await Carpetas.subcarpetas(App.E.archivo);
-  for (var i = 0; i < categorias.length; i++) {
-    var terceros = await Carpetas.subcarpetas(categorias[i].handle);
-    for (var j = 0; j < terceros.length; j++) {
-      var asuntos = await Carpetas.subcarpetas(terceros[j].handle);
-      for (var k = 0; k < asuntos.length; k++) {
-        salida.push({
-          nombre: asuntos[k].nombre, handle: asuntos[k].handle, padre: terceros[j].handle,
-          ruta: categorias[i].nombre + ' / ' + terceros[j].nombre,
-          leido: Nombres.leer(asuntos[k].nombre, App.E.tipos),
-          ficha: App.E.registro.asuntos[asuntos[k].nombre] || {},
-          busca: U.normalizar(asuntos[k].nombre + ' ' + categorias[i].nombre + ' ' + terceros[j].nombre)
-        });
+
+  var progreso = function (nombreCategoria, total) {
+    $('explica-archivo').textContent = 'Leyendo el archivo… ' + nombreCategoria + ' · ' + total + ' asuntos';
+  };
+
+  var resultado = await IndiceArchivo.leerDisco();
+  var usable, avisoIndice = '';
+  App.E.indiceSinHacer = false;
+
+  if (resultado.ok) {
+    usable = resultado.datos;
+    try {
+      var actual = await IndiceArchivo.recuentoActual();
+      if (!IndiceArchivo.recuentosIguales(actual, usable.recuento || {})) {
+        avisoIndice = 'El índice puede no estar al día. Reconstruir el índice.';
       }
-    }
+    } catch (e) { /* si falla la comprobación, se enseña el índice igual */ }
+  } else {
+    App.E.indiceSinHacer = true;
+    avisoIndice = 'El índice no está hecho. Reconstruir el índice.';
+    usable = await IndiceArchivo.construir(progreso);
   }
+
+  var descolocados = 0;
+  var salida = (usable.asuntos || []).map(function (e) {
+    if (e.sueltoEn) descolocados++;
+    var ficha = App.E.registro.asuntos[e.nombre] || {};
+    return {
+      nombre: e.nombre, handle: null, padre: null, ruta: e.ruta,
+      categoria: e.categoria, tercero: e.tercero, sueltoEn: e.sueltoEn || '',
+      leido: Nombres.leer(e.nombre, App.E.tipos), ficha: ficha,
+      busca: IndiceArchivo.textoDeBusqueda(e, ficha)
+    };
+  });
   salida.sort(function (a, b) { return a.nombre < b.nombre ? 1 : -1; });
   App.E.listaArchivo = salida;
-  $('explica-archivo').textContent = salida.length + ' asuntos archivados.';
+
+  var partes = [salida.length + ' asuntos archivados.'];
+  if (avisoIndice) partes.push(avisoIndice);
+  if (descolocados) {
+    partes.push('Hay ' + descolocados + ' asunto' + (descolocados === 1 ? '' : 's') +
+      ' colocado' + (descolocados === 1 ? '' : 's') + ' fuera de su sitio.');
+  }
+  $('explica-archivo').textContent = partes.join(' ');
   App.pintarArchivo();
 };
 
+/* Botón "Reconstruir el índice": recorre el archivo entero una vez
+   (con la línea de arriba avisando por dónde va, categoría a
+   categoría) y guarda lo encontrado. Si algo falla a mitad de camino
+   (permiso, Dropbox), no se escribe nada a medias: se avisa y se deja
+   el índice que hubiera. */
+App.reconstruirIndiceArchivo = async function () {
+  await U.mientrasGuarda($('btn-reconstruir-indice'), async function () {
+    try {
+      var indice = await IndiceArchivo.construir(function (nombreCategoria, total) {
+        $('explica-archivo').textContent = 'Leyendo el archivo… ' + nombreCategoria + ' · ' + total + ' asuntos';
+      });
+      await IndiceArchivo.guardar(indice);
+      U.aviso('Índice reconstruido.', 'bueno');
+      await App.verArchivo();
+    } catch (e) {
+      U.aviso('No se ha podido reconstruir el índice: ' + U.mensajeDeError(e), 'malo');
+    }
+  });
+};
+
+/* Ya no es `indexOf` sobre un solo texto: lo escrito se normaliza y
+   se parte en palabras, y un asunto sale si su texto de búsqueda (ya
+   calculado al cargar el índice) tiene TODAS, en cualquier orden. */
 App.pintarArchivo = function () {
-  var q = U.normalizar($('buscar-archivo').value);
-  var lista = App.E.listaArchivo.filter(function (a) { return !q || a.busca.indexOf(q) !== -1; });
+  var palabras = U.normalizar($('buscar-archivo').value).split(' ').filter(Boolean);
+  var lista = App.E.listaArchivo.filter(function (a) {
+    return palabras.every(function (p) { return a.busca.indexOf(p) !== -1; });
+  });
   var caja = $('lista-archivo');
   caja.innerHTML = '';
   if (!lista.length) {
-    caja.innerHTML = '<div class="vacio">Nada que mostrar.</div>';
+    var msg = palabras.length
+      ? 'Ningún asunto archivado tiene todas esas palabras.'
+      : 'Nada que mostrar.';
+    if (App.E.indiceSinHacer) msg += ' El índice no está hecho: pulsa "Reconstruir el índice".';
+    caja.innerHTML = '<div class="vacio">' + U.escapar(msg) + '</div>';
     return;
   }
   lista.slice(0, 300).forEach(function (a) { caja.appendChild(App.tarjetaAsunto(a, 'archivado')); });
@@ -52,8 +112,31 @@ App.pintarArchivo = function () {
   }
 };
 
+/* Las tarjetas del ARCHIVO no traen manejador de carpeta (el índice
+   no puede guardar uno): "Documentos" lo resuelve aquí, con lo que el
+   índice sí sabe, justo antes de abrirlo. "Reabrir" no hace falta
+   tocarlo: `App.reabrirAsunto` ya sabía recalcular la carpeta cuando
+   `a.padre` faltaba o estaba viejo (17-sep-2026, fila 45). */
+(function () {
+  var comoEra = App.verDocumentos;
+  App.verDocumentos = async function (a) {
+    if (!a.handle) {
+      var resuelto = await IndiceArchivo.resolverHandle(a);
+      if (!resuelto) {
+        U.aviso('No encuentro la carpeta de este asunto. Puede que se haya movido: pulsa ' +
+          'Actualizar o Reconstruir el índice.', 'ambar');
+        return;
+      }
+      a.handle = resuelto.handle;
+      a.padre = resuelto.padre;
+    }
+    return comoEra(a);
+  };
+})();
+
 $('buscar-archivo').oninput = function () { App.pintarArchivo(); };
 $('btn-recargar-archivo').onclick = function () { App.verArchivo(); };
+$('btn-reconstruir-indice').onclick = function () { App.reconstruirIndiceArchivo(); };
 
 /* ==========================================================
    PANTALLA: PERSONAS
