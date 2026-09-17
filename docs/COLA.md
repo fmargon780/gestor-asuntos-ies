@@ -28,7 +28,9 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
    `docs/CONTEXTO-CORTO.md` pase de 160 líneas.
 10. **Antes de subir nada, vuelve a bajar `main`.** Marcar la fila EN CURSO no basta: otra sesión
     puede haber fusionado su trabajo mientras tanto, y subir ficheros enteros sin releer pisa lo
-    suyo. Pasó el 16-sep-2026 con las filas 13 y 14.
+    suyo. Pasó el 16-sep-2026 con las filas 13 y 14, y otra vez el 17-sep-2026 con la fila 38,
+    apuntada mientras la sesión de la fila 35 preparaba su subida. **Vuelve a bajar `main` justo
+    antes de cada llamada que suba un fichero, no una sola vez al empezar el cierre.**
 11. **Nunca subas un fichero con un texto de relleno en vez de su contenido.** Si no tienes el
     contenido entero delante, no lo subas: bájalo antes. El 17-sep-2026 `docs/CONTEXTO.md` se
     quedó en `main` con la palabra `PLACEHOLDER_WILL_REPLACE` y nada más, y hubo que recuperarlo
@@ -90,6 +92,10 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 38 | `docs/LO-PIDE-NOMBRE-DEL-TUTOR.md` | PENDIENTE | Apuntada 17-sep-2026. En "Lo pide", las opciones de tutor legal salen con un número en vez del nombre |
 
 **Orden de trabajo:** quedan pendientes las filas 36, 37 y 38, en ese orden (la 37 va después de la 36: comparten pantalla). Las filas 1 a 35 están hechas.
+
+**Sin fila todavía:** `docs/BUSCADOR-ARCHIVO-INDICE.md` (índice y búsqueda por palabras en el ARCHIVO)
+se subió a `main` el 17-sep-2026 a las 17:34 sin apuntarse aquí. Quien la apunte, que le dé el
+número siguiente; esta sesión no se lo pone para no chocar con la conversación que lo escribió.
 
 ## Arreglado: `docs/CONTEXTO.md` (roto durante la fila 33)
 
