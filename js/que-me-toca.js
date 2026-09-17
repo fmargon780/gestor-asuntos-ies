@@ -195,6 +195,36 @@
     return b;
   }
 
+  /* ---------- el aviso de aspirantes sin Nº de identificación escolar ----------
+
+     17-sep-2026, fila 42, sección 5 de
+     docs/TERCEROS-NUEVOS-DESDE-EL-DOCUMENTO.md. Un aviso, no un hito: sin
+     fecha límite ni responsable, mientras queden aspirantes dados de
+     alta sin número. Se pulsa y lleva a Personas y empresas, en
+     Alumnado, donde salen marcados como "Solicitante". */
+  async function contarAspirantesSinNumero() {
+    try {
+      var datos = await Datos.cargar(App.E.datos, 'ALUMNADO');
+      return (datos.lista || []).filter(function (p) { return p.solicitante && !p.id; }).length;
+    } catch (e) { return 0; }
+  }
+
+  function bloqueAspirantes(n) {
+    if (!n) return null;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'qmt-fila qmt-aviso-aspirantes';
+    b.textContent = n + ' ' + (n === 1 ? 'aspirante' : 'aspirantes') +
+      ' sin Nº de identificación escolar';
+    b.onclick = function () {
+      if ($('filtro-personas')) $('filtro-personas').value = 'ALUMNADO';
+      if ($('buscar-personas')) $('buscar-personas').value = '';
+      App.ir('personas');
+      if (App.pintarPersonas) App.pintarPersonas();
+    };
+    return b;
+  }
+
   /* ---------- los tres bloques ---------- */
 
   function bloqueTejado(lista) {
@@ -267,8 +297,10 @@
     var filtro = leerFiltro();
     var items = filtro ? datos.items.filter(function (it) { return it.hito.responsable === filtro; }) : datos.items;
     var g = clasificar(items);
+    var nAspirantes = await contarAspirantesSinNumero();
 
-    var bloques = [bloqueTejado(g.tejado), bloqueOtros(g.otros, datos.ajustes), bloqueSinFecha(g.sinFecha)]
+    var bloques = [bloqueAspirantes(nAspirantes), bloqueTejado(g.tejado),
+                   bloqueOtros(g.otros, datos.ajustes), bloqueSinFecha(g.sinFecha)]
       .filter(function (b) { return b; });
 
     caja.innerHTML = '';

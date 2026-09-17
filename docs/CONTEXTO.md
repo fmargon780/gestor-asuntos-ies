@@ -278,6 +278,90 @@ cambia el nombre, las carpetas de sus asuntos de antes conservan el nombre viejo
 cuadro es uno solo para alta y cambio: `App.cuadroDeTercero`, en `js/asuntos-nuevo.js`, escribe
 `Datos.guardarEnLista`. Vive en `js/archivo-personas.js`, se comprueba con `pruebas/empresas.mjs`.
 
+### Aspirantes a plaza ("alumnado pendiente")
+
+17-sep-2026, fila 42, `docs/TERCEROS-NUEVOS-DESDE-EL-DOCUMENTO.md`. No es una categoría de tercero
+aparte: son alumnado dado de alta a mano (`p.solicitante === true`, en `js/datos.js`), la misma
+mecánica que ya existía desde antes de esta fila (`solicitantes.csv`, botón "+ Dar de alta un
+solicitante" en el buscador y en Personas). Lo que trae esta fila:
+
+- **Documento de identidad**, columna nueva de `solicitantes.csv` (antes solo tenía el Nº de
+  identificación escolar). Los dos son opcionales; `window.Dni.de` ya la reconoce sola, porque su
+  título contiene "documento" (la misma expresión regular de `js/dni.js` sirve para las dos).
+- **Reconocimiento por documento, no solo por Nº o por nombre**: `anadirSolicitantes` (en
+  `js/datos.js`) descarta un aspirante que ya está matriculado si su Nº de identificación escolar
+  coincide (como antes), si su nombre normalizado coincide (como antes), **o si su Documento de
+  identidad coincide con el de un matriculado del RegAlum** (comparado sin espacios ni guiones, en
+  mayúsculas, leyendo el documento del matriculado con `window.Dni.de`). Así no se duplica aunque
+  el aspirante escribiera su nombre de otra forma. No hay ningún aviso aparte: al recargar, sale ya
+  como matriculado y deja de contar como aspirante, sin más.
+- **La carpeta sin número**: ya lo hacía `Nombres.terceroAlumno` desde que existen los solicitantes
+  (si `alumno.id` está vacío, no añade nada: nunca inventa un número ni usa el DNI). Lo único nuevo
+  es la palabra "pendiente de número" en `App.pieAlumno` (`js/asuntos-nuevo.js`), donde antes decía
+  "sin Nº de identificación escolar".
+- **Al escribir el número más tarde** (botón "Cambiar los datos" en la ficha, categoría ALUMNADO,
+  solicitante, sin Nº antes y con Nº después): `App.cambiarDatosDelTercero`
+  (`js/archivo-personas.js`) llama a `App.renombrarAsuntosAbiertosDelTercero` (nueva en
+  `js/asuntos-editar.js`), que busca en `App.E.abiertos` las carpetas que terminan en el texto de
+  tercero de antes (`App.textoTercero`), enseña la lista con `U.preguntar` ("Adelante") y, si se
+  confirma, las renombra una a una con `Carpetas.renombrar` —el mismo camino que
+  `App.editarAsunto`— moviendo también su ficha en `App.E.registro.asuntos` a la clave nueva. Las
+  archivadas no se tocan: no se buscan en `App.E.archivo`, así que nunca entran en la lista.
+- **El aviso en "Qué me toca"** (`js/que-me-toca.js`): un bloque nuevo arriba del todo, "N
+  aspirante(s) sin Nº de identificación escolar", que cuenta `Datos.cargar(..., 'ALUMNADO').lista`
+  filtrando `solicitante && !id`. Se pulsa y lleva a Personas y empresas, categoría Alumnado (no
+  filtra solo los pendientes: el buscador ya los marca "Solicitante"). Sin fecha límite ni
+  responsable, como pide el encargo.
+
+Se comprueba con `pruebas/logica.mjs` (el documento de identidad y el reconocimiento por
+documento, sin navegador) y `pruebas/aspirantes-numero.mjs` (en navegador de verdad: alta sin
+número, dos asuntos —uno abierto y uno archivado—, el aviso de "Qué me toca", y que al escribir el
+número solo se renombra el abierto).
+
+### Dar de alta un tercero desconocido desde el documento
+
+17-sep-2026, fila 42, `docs/TERCEROS-NUEVOS-DESDE-EL-DOCUMENTO.md`. Va justo después de "Leer los
+documentos que entran en Por clasificar" (fila 41, más abajo en este mismo fichero): aquella hace
+que la aplicación proponga el tercero cuando lo reconoce; esta cubre el caso contrario, cuando el
+documento de identidad no cuadra con nadie.
+
+- **`LectorDocumentos.analizar`** (`js/lector-documentos.js`, sigue puro) gana
+  `terceroDesconocido: { categoria, nombre, documento } | null`. Se calcula así:
+  - Si ya hay un `tercero` claro, no se calcula nada: no tiene sentido proponer un alta de quien ya
+    se ha reconocido.
+  - Si hay exactamente UN documento de identidad de los encontrados que no está en ninguna de las
+    tres listas de `contexto` ("huérfano"), se busca un nombre o una razón social **cerca de él en
+    el propio texto** (una ventana de 120 caracteres a cada lado): una razón social por su forma
+    jurídica (`SUFIJOS_EMPRESA`: S.L., S.A., S.COOP., C.B., con o sin puntos) o, si no, dos a cuatro
+    palabras con la inicial en mayúscula, al estilo "García Pérez, Ana". Si hay más de un documento
+    huérfano a la vez, no se propone nada: no se sabe de cuál es el nombre.
+  - Si NO hay ningún documento de identidad en todo el texto, pero tampoco ningún tercero conocido
+    cuadra por nombre, se propone igual con el documento vacío, **solo** si aparece una razón
+    social con forma clara en algún sitio del texto (patrón exigente, para no disparar con
+    cualquier texto en mayúsculas).
+  - La categoría propuesta: un NIF siempre es EMPRESAS; un DNI o un NIE toma la categoría del tipo
+    ya propuesto (`elegirTipo`) si lo hay —así una solicitud de plaza propone ALUMNADO (aspirante)—
+    y si no, PERSONAL por defecto. Es solo el punto de partida: Francisco cambia la categoría en el
+    propio cuadro de alta antes de guardar, como pide el encargo.
+- **El botón, en `js/documentos-sueltos-lector.js`** (no se ha tocado `js/documentos-sueltos.js`,
+  el mismo patrón que la fila 41): debajo de la línea de la propuesta, en su propia línea, "Dar de
+  alta: nombre — documento" (`.boton-dar-de-alta`; sin documento si no se encontró ninguno). Nunca
+  sale a la vez que "Aceptar": uno solo se propone cuando NO hay tercero claro, el otro cuando SÍ
+  lo hay. Al pulsarlo abre `App.cuadroDeTercero` (el alta que ya existe, `js/asuntos-nuevo.js`) con
+  el nombre y el documento ya escritos (`COLUMNA_DOCUMENTO`: NIF para EMPRESAS, Documento para
+  PERSONAL, Documento de identidad para ALUMNADO); al guardar, `Datos.anadirALista` escribe el CSV
+  y la propuesta en memoria se actualiza sola con el tercero recién creado (`propuesta.tercero`,
+  buscándolo en la lista que devuelve la propia `anadirALista`) sin volver a leer el PDF: si el
+  tipo también estaba claro, "Aceptar" aparece solo, sin recargar la tarjeta.
+- La aplicación **nunca da de alta sola**: cancelar el cuadro no escribe nada.
+
+Se comprueba con `pruebas/lector-documentos.mjs` (4 escenarios nuevos: NIF desconocido con razón
+social, DNI de un tercero que ya existe sin proponer nada, DNI desconocido en una solicitud de
+plaza proponiendo ALUMNADO, y dos documentos huérfanos a la vez sin proponer nada) y con
+`pruebas/dar-de-alta-desde-documento.mjs` (en navegador de verdad, con un PDF de mentira: el botón
+sale con la razón social y el NIF, abre el alta con los datos escritos, no se da de alta hasta
+guardar, y la tarjeta se actualiza sola después).
+
 ### Las guías del procedimiento
 
 Cada tipo de asunto puede llevar una lista de pasos, con título y explicación (negrita, viñetas,
@@ -1861,10 +1945,10 @@ de `App` va después del fichero que lo define.
 | `js/version.js` | `App.VERSION`, la fecha y hora de la última publicación |
 | `js/asuntos-lista.js` | Asuntos abiertos: las tres tarjetas, las tarjetas por tipo y la lista. Al leer la carpeta, descarta las que parecen temporales de sincronización, salvo que ya tengan ficha en `asuntos.json` |
 | `js/unir-asuntos.js` | Une asuntos duplicados que ya existen: aviso junto a Actualizar y pantalla propia "Duplicados" (`css/unir-asuntos.css`) |
-| `js/asuntos-editar.js` | Editar un asunto abierto: renombra la carpeta y mueve su ficha |
+| `js/asuntos-editar.js` | Editar un asunto abierto: renombra la carpeta y mueve su ficha. También `App.renombrarAsuntosAbiertosDelTercero`, al llegar el Nº de identificación escolar de un aspirante (fila 42) |
 | `js/elegir-asunto.js` | El cuadro de escoger un asunto a mano, compartido por "Por clasificar" y por la bandeja de correos |
 | `js/documentos-sueltos.js` | Los papeles sin asunto, "Meter en un asunto", cerrar y reabrir, y la vigilancia de la carpeta |
-| `js/documentos-sueltos-lector.js` | Envuelve `App.tarjetaSuelto` para proponer tipo/fecha/registro/tercero de cada PDF suelto, con el botón "Aceptar" (17-sep-2026, fila 41) |
+| `js/documentos-sueltos-lector.js` | Envuelve `App.tarjetaSuelto` para proponer tipo/fecha/registro/tercero de cada PDF suelto, con el botón "Aceptar" (17-sep-2026, fila 41); si el documento de identidad no cuadra con nadie, el botón "Dar de alta" (fila 42) |
 | `js/lo-pide.js` | Quién ha pedido la gestión: candidatos, controles, línea legible y qué casilla marcar en el correo |
 | `js/asuntos-nuevo.js` | Crear un asunto, el cuadro de datos de un tercero y los pies |
 | `js/archivo-personas.js` | Personas y empresas, el ARCHIVO, y cambiar los datos de un tercero |
@@ -1879,12 +1963,12 @@ de `App` va después del fichero que lo define.
 | `js/recurrentes.js` | Los asuntos que se repiten cada mes, trimestre o curso; la sección "Se repite" de la pantalla de un tipo (`Recurrentes.pintarEnContenedor`, 17-sep-2026) |
 | `js/guias-enganche.js` | Las guías dentro de la app, y `window.GuiasDelCentro` |
 | `js/hitos.js`, `js/hitos-archivo.js` | El modelo de los hitos de un asunto: leer/escribir `hitos.json`, crearlos desde la guía, marcarlos, bifurcaciones, responsables y el historial al archivar |
-| `js/que-me-toca.js` | Pantalla propia "Qué me toca": cruza los hitos pendientes y en curso de todos los asuntos abiertos, en tres bloques (`css/que-me-toca.css`) |
+| `js/que-me-toca.js` | Pantalla propia "Qué me toca": cruza los hitos pendientes y en curso de todos los asuntos abiertos, en tres bloques (`css/que-me-toca.css`); arriba, el aviso de aspirantes sin Nº de identificación escolar (fila 42) |
 | `js/presencia.js` | No pisarse en un mismo asunto: la señal de `_GESTOR/presencia.json`, la vigilancia y la marca de la tarjeta de la lista |
 | `js/notas.js` | Las notas de cada asunto, con su enlace y su botón; `Notas.pintarEnFicha` es la caja de escribir directa de la ficha, con guardado automático (fila 37) |
 | `js/registro.js` | Registrar un documento en un paso, sin nombrarlo dos veces |
 | `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF (hasta 10 páginas); `textoDe` saca el texto de hasta 5 páginas sin buscar nada (17-sep-2026, fila 41) |
-| `js/lector-documentos.js` | `LectorDocumentos.analizar(texto, contexto)`, puro: propone tipo, fecha, documentos de identidad y tercero de un documento suelto (17-sep-2026, fila 41) |
+| `js/lector-documentos.js` | `LectorDocumentos.analizar(texto, contexto)`, puro: propone tipo, fecha, documentos de identidad y tercero de un documento suelto (17-sep-2026, fila 41); si un documento de identidad no cuadra con nadie, también `terceroDesconocido` (fila 42) |
 | `js/registro-sellado.js` | Ver solo un PDF ya sellado en la carpeta del asunto, y colocarlo sin duplicarlo |
 | `js/pdf-herramientas.js` | Partir, unir y sacar páginas de un PDF con pdf-lib: solo bytes, sin disco ni DOM |
 | `js/pdf-separar-unir.js` | El cuadro de Separar, Unir y Sacar páginas: miniaturas con pdf.js, tijeras, casillas |
@@ -2099,7 +2183,7 @@ cambiar la versión (casi todos los commits) no obliga a resubir `nucleo.js` ent
 
 | Fichero | Columnas |
 |---|---|
-| `solicitantes.csv` | Nombre · Nº Id. Escolar · Fecha de nacimiento · Teléfono de contacto · Correo de contacto |
+| `solicitantes.csv` | Nombre · **Documento de identidad** · Nº Id. Escolar · Fecha de nacimiento · Teléfono de contacto · Correo de contacto |
 | `personal.csv` | Nombre · Documento · Puesto · Teléfono · Correo |
 | `empresas.csv` | Razón social · **Nombre comercial** · NIF · Contacto · Teléfono · Correo |
 | `otros.csv` | Nombre · Referencia · Teléfono · Correo |

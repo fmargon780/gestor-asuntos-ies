@@ -262,21 +262,42 @@ var Datos = (function () {
 
      No se le ofrece grupo, porque todavía no tiene. Y si ya trae Nº de
      identificación escolar, se pone: así, el día que se matricule, su
-     carpeta del archivo ya se llama igual que la que montará el RegAlum. */
+     carpeta del archivo ya se llama igual que la que montará el RegAlum.
+
+     Si el aspirante trae Documento de identidad y ese mismo documento
+     aparece en un alumno matriculado del RegAlum (comparado por
+     `window.Dni.de`, sin espacios ni guiones, en mayúsculas), se da por
+     reconocido y no se añade como aspirante: no se duplica (17-sep-2026,
+     fila 42, docs/TERCEROS-NUEVOS-DESDE-EL-DOCUMENTO.md, sección 4). */
+  function limpiarDocumentoAlumno(v) {
+    return String(v === null || v === undefined ? '' : v).toUpperCase().replace(/[^0-9A-Z]/g, '');
+  }
+
+  function yaMatriculadoConDocumento(porId, documento) {
+    var claves = Object.keys(porId);
+    for (var i = 0; i < claves.length; i++) {
+      var doc = window.Dni && window.Dni.de ? limpiarDocumentoAlumno(window.Dni.de(porId[claves[i]])) : '';
+      if (doc && doc === documento) return true;
+    }
+    return false;
+  }
+
   async function anadirSolicitantes(dirDatos, lista, porId) {
     var manual = await cargarLista(dirDatos, 'ALUMNADO', 'ALUMNADO_MANUAL');
     var cuantos = 0;
     for (var i = 0; i < manual.lista.length; i++) {
       var p = manual.lista[i];
       var id = String(p.campos['Nº Id. Escolar'] || '').trim();
+      var documento = limpiarDocumentoAlumno(p.campos['Documento de identidad'] || '');
       var clave = id || U.normalizar(p.nombre);
-      if (porId && porId[clave]) continue;   /* ya está matriculado */
+      if (porId && porId[clave]) continue;   /* ya está matriculado, por Nº o por nombre */
+      if (porId && documento && yaMatriculadoConDocumento(porId, documento)) continue;
       lista.push({
-        nombre: p.nombre, id: id, ano: 0, categoria: 'ALUMNADO',
+        nombre: p.nombre, id: id, documento: documento, ano: 0, categoria: 'ALUMNADO',
         campos: p.campos, fechaNac: String(p.campos['Fecha de nacimiento'] || '').trim(),
         matriculado: false, solicitante: true, deSeneca: false,
         unidad: '', curso: '', anoUltima: 0, unidadUltima: '', cursoUltima: '',
-        busca: U.normalizar(p.nombre + ' ' + id)
+        busca: U.normalizar(p.nombre + ' ' + id + ' ' + documento)
       });
       cuantos++;
     }
@@ -452,9 +473,14 @@ var Datos = (function () {
   }
 
   var LISTAS = {
+    /* 'Documento de identidad' es del aspirante (17-sep-2026, fila 42):
+       así se puede reconocer cuando llegue a matricularse, aunque
+       todavía no tenga Nº de identificación escolar. Es opcional, igual
+       que el Nº: muchos aspirantes lo traen ya (vienen del sistema
+       educativo andaluz), los que no, lo tendrán al matricularse. */
     ALUMNADO: { fichero: 'solicitantes.csv',
-                cabecera: ['Nombre', 'Nº Id. Escolar', 'Fecha de nacimiento',
-                           'Teléfono de contacto', 'Correo de contacto'] },
+                cabecera: ['Nombre', 'Documento de identidad', 'Nº Id. Escolar',
+                           'Fecha de nacimiento', 'Teléfono de contacto', 'Correo de contacto'] },
     PERSONAL: { fichero: 'personal.csv',
                 cabecera: ['Nombre', 'Documento', 'Puesto', 'Teléfono', 'Correo'] },
     /* El nombre comercial es el rótulo del negocio, que muchas veces no

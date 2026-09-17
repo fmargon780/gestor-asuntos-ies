@@ -205,13 +205,32 @@ App.cambiarDatosDelTercero = async function (p) {
   }
 
   /* Cambiar el nombre no renombra las carpetas de sus asuntos: el
-     nombre de una carpeta es el rastro del día en que se creó. */
+     nombre de una carpeta es el rastro del día en que se creó.
+
+     La única excepción es el Nº de identificación escolar de un
+     aspirante (17-sep-2026, fila 42, sección 4): si antes no lo tenía y
+     ahora sí, sus asuntos ABIERTOS pasan a llamarse con el número, igual
+     que si se hubiera matriculado. Se pregunta antes con la lista de
+     carpetas (App.renombrarAsuntosAbiertosDelTercero, en
+     js/asuntos-editar.js), y las archivadas no se tocan. */
+  var esAspiranteConNumeroNuevo = p.categoria === 'ALUMNADO' && p.solicitante &&
+    !p.id && (puestos['Nº Id. Escolar'] || '').trim();
+
   U.aviso(U.normalizar(puestos[def.cabecera[0]]) !== U.normalizar(nombreAntes)
     ? 'Cambiado. Las carpetas de sus asuntos de antes conservan el nombre viejo.'
     : 'Cambiado.', 'bueno');
 
   Datos.olvidar(p.categoria);
   App.pintarPersonas();
+
+  if (esAspiranteConNumeroNuevo && App.renombrarAsuntosAbiertosDelTercero) {
+    var textoAntes = App.textoTercero({ categoria: 'ALUMNADO', nombre: nombreAntes, id: '' });
+    var textoDespues = App.textoTercero({
+      categoria: 'ALUMNADO', nombre: puestos[def.cabecera[0]] || nombreAntes,
+      id: (puestos['Nº Id. Escolar'] || '').trim()
+    });
+    await App.renombrarAsuntosAbiertosDelTercero('ALUMNADO', textoAntes, textoDespues);
+  }
 };
 
 /* Todos los asuntos de una persona o empresa, los abiertos y los

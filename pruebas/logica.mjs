@@ -5,7 +5,7 @@ import vm from 'node:vm';
 const raiz = new URL('../js/', import.meta.url).pathname;
 const contexto = { console, TextDecoder, Blob, window: {}, indexedDB: null };
 vm.createContext(contexto);
-for (const f of ['util.js', 'carpetas.js', 'nombres.js', 'datos.js']) {
+for (const f of ['util.js', 'carpetas.js', 'nombres.js', 'datos.js', 'dni.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 const { U, Carpetas, Nombres, Datos } = contexto;
@@ -351,6 +351,38 @@ comprobar('quien ya está matriculado no se duplica',
   S3.lista.filter(x => x.nombre.indexOf('Aguilar') === 0).length, 1);
 comprobar('y la ficha buena es la del RegAlum',
   S3.lista.find(x => x.nombre.indexOf('Aguilar') === 0).matriculado, true);
+
+/* Documento de identidad del aspirante (17-sep-2026, fila 42,
+   docs/TERCEROS-NUEVOS-DESDE-EL-DOCUMENTO.md): si su documento aparece
+   en el RegAlum, se reconoce como matriculado aunque el Nº escolar y el
+   nombre no cuadren (alguien pudo escribirlo distinto a mano). */
+Datos.olvidar();
+const datosDoc = dirFalso('datos');
+await Carpetas.escribirTexto(datosDoc, 'RegAlum.csv',
+  'Alumno/a;Nº Id. Escolar;Curso;Unidad;Año de la matrícula;Estado Matrícula;' +
+  'Fecha de nacimiento;DNI/Pasaporte\r\n' +
+  'Perez Soto, David;1160777;1º de E.S.O.;1º A;2026;Matriculado;12/06/2013;55566677Q\r\n');
+await Datos.anadirALista(datosDoc, 'ALUMNADO', {
+  'Nombre': 'David Perez S.', 'Documento de identidad': '55566677-Q',
+  'Nº Id. Escolar': '', 'Fecha de nacimiento': '12/06/2013'
+});
+const D1 = await Datos.cargar(datosDoc, 'ALUMNADO');
+comprobar('reconocido por el documento, no se duplica pese al nombre distinto',
+  D1.lista.length, 1);
+comprobar('y la ficha buena es la matriculada',
+  D1.lista[0].matriculado, true);
+
+/* Con un documento que NO está en el RegAlum, sí se suma como aspirante
+   normal, sin número: la carpeta va solo con el nombre. */
+await Datos.anadirALista(datosDoc, 'ALUMNADO', {
+  'Nombre': 'Otro Aspirante, Vera', 'Documento de identidad': '11223344B'
+});
+const D2 = await Datos.cargar(datosDoc, 'ALUMNADO');
+const vera = D2.lista.find(x => x.nombre.indexOf('Otro Aspirante') === 0);
+comprobar('con documento distinto, sí se suma', D2.lista.length, 2);
+comprobar('marcado como aspirante, pendiente de número', vera.solicitante && !vera.id, true);
+comprobar('la carpeta va solo con el nombre',
+  Nombres.terceroAlumno(vera), 'Otro Aspirante, Vera');
 
 /* ---------- personal del RelPerCen de Séneca ----------
 
