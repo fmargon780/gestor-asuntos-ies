@@ -165,6 +165,15 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 }
 .tarjeta-suelto .tarjeta-icono { color: #a1730a; }
 .tarjeta-suelto .tarjeta-nombre { font-weight: 500; }
+
+/* El documento que se está viendo en el panel de la derecha, marcado
+   en su tarjeta de la lista (17-sep-2026, fila 25): fondo y borde
+   distintos, para encontrarla sin buscar. */
+.tarjeta-abierta {
+  border-left-color: var(--azul);
+  background: var(--azul-claro);
+  box-shadow: 0 0 0 1px var(--azul), var(--sombra);
+}
 .marca-ext {
   display: inline-block; background: #f3ede1; color: #7a5c12;
   border: 1px solid #e3d6b8; border-radius: 5px;

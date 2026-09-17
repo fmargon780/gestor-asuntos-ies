@@ -22,11 +22,25 @@
   var panel = null;
   var cuerpo = null;
   var rotulo = null;
+  var acciones = null;
   var marcaZoom = null;
   var url = null;         /* la dirección temporal del documento */
   var clase = '';         /* 'pdf', 'imagen' o 'otro' */
   var nivel = 100;        /* el zoom, en porcentaje */
   var alAncho = true;     /* de partida, al ancho de la columna */
+
+  /* Quién ha abierto lo que se está viendo (17-sep-2026, fila 25): un
+     texto cualquiera que solo entiende quien lo puso (por ahora,
+     "suelto:<nombre>" desde "Por clasificar"). Sirve para que esa
+     pantalla sepa marcar la tarjeta que corresponde y cerrar el visor
+     solo si el documento deja de estar ahí, sin que este fichero sepa
+     nada de esa lista. */
+  var marcador = null;
+  var oyentes = [];
+
+  function avisar() {
+    oyentes.slice().forEach(function (fn) { try { fn(marcador); } catch (e) {} });
+  }
 
   function $(id) { return document.getElementById(id); }
 
@@ -67,11 +81,13 @@
           '<button type="button" class="boton" id="visor-cerrar" title="Cerrar el visor">✕</button>' +
         '</div>' +
       '</div>' +
+      '<div class="visor-acciones oculto" id="visor-acciones"></div>' +
       '<div class="visor-cuerpo" id="visor-cuerpo"></div>';
     document.body.appendChild(panel);
 
     cuerpo = $('visor-cuerpo');
     rotulo = $('visor-nombre');
+    acciones = $('visor-acciones');
     marcaZoom = $('visor-zoom');
 
     $('visor-cerrar').onclick = cerrar;
@@ -122,7 +138,37 @@
     if (url) { URL.revokeObjectURL(url); url = null; }
   }
 
-  async function abrir(handle, nombre) {
+  /* El nombre completo va siempre en el title; en la propia cabecera,
+     si no cabe entero, se corta por el medio (no por el final), para
+     que se siga viendo la extensión (17-sep-2026, fila 25). */
+  function ponerNombre(nombre) {
+    rotulo.textContent = nombre;
+    rotulo.title = nombre;
+    requestAnimationFrame(function () {
+      if (!rotulo || rotulo.title !== nombre) return;   /* ya se ha abierto otro */
+      if (rotulo.scrollWidth <= rotulo.clientWidth) return;
+      var ini = Math.ceil(nombre.length / 2);
+      var a = nombre.slice(0, ini), b = nombre.slice(ini);
+      while ((a.length + b.length) > 6 && rotulo.scrollWidth > rotulo.clientWidth) {
+        if (a.length >= b.length) a = a.slice(0, -1); else b = b.slice(1);
+        rotulo.textContent = a + '…' + b;
+      }
+    });
+  }
+
+  function pintarAcciones(botones) {
+    if (!acciones) return;
+    acciones.innerHTML = '';
+    if (botones) { acciones.appendChild(botones); acciones.classList.remove('oculto'); }
+    else acciones.classList.add('oculto');
+  }
+
+  /* 'opts.marcador' identifica lo que se abre (ver más arriba);
+     'opts.acciones' es un elemento con los botones propios de quien
+     abre, que se enseña debajo de la cabecera. Los dos son opcionales:
+     sin ellos, el visor se comporta exactamente como hasta hoy. */
+  async function abrir(handle, nombre, opts) {
+    opts = opts || {};
     construir();
     try {
       var fichero = await handle.getFile();
@@ -131,11 +177,13 @@
       clase = tipoDe(nombre || fichero.name, fichero);
       nivel = 100;
       alAncho = true;
-      rotulo.textContent = nombre || fichero.name;
-      rotulo.title = nombre || fichero.name;
+      ponerNombre(nombre || fichero.name);
+      pintarAcciones(opts.acciones || null);
       panel.classList.remove('oculto');
       document.body.classList.add('con-visor');
       pintarDocumento();
+      marcador = opts.marcador || null;
+      avisar();
 
       /* Lo que el navegador no sabe enseñar se abre fuera, como antes. */
       if (clase === 'otro') window.open(url, '_blank');
@@ -148,7 +196,9 @@
     if (panel) panel.classList.add('oculto');
     document.body.classList.remove('con-visor');
     if (cuerpo) cuerpo.innerHTML = '';
+    pintarAcciones(null);
     soltar();
+    if (marcador !== null) { marcador = null; avisar(); }
   }
 
   /* ---------- pintar y hacer zoom ---------- */
@@ -189,14 +239,22 @@
       'que le corresponda.</p>';
   }
 
-  window.Visor = { abrir: abrir, cerrar: cerrar };
+  window.Visor = {
+    abrir: abrir, cerrar: cerrar,
+    marcadorAbierto: function () { return marcador; },
+    alCambiar: function (fn) { oyentes.push(fn); }
+  };
 
   /* ---------- los documentos sueltos también se ven aquí ----------
 
      Se cambia la función de la aplicación, para no tener que tocar la
-     pantalla de los documentos por clasificar. */
+     pantalla de los documentos por clasificar. Las acciones (Crear
+     asunto con él, Meter en un asunto, Borrar) son las mismas de la
+     tarjeta, montadas por App.accionesDeSuelto (js/documentos-sueltos.js)
+     para no duplicar esa lógica aquí (17-sep-2026, fila 25). */
   App.abrirSuelto = function (s) {
-    return abrir(s.handle, s.nombre);
+    var acciones = App.accionesDeSuelto ? App.accionesDeSuelto(s) : null;
+    return abrir(s.handle, s.nombre, { marcador: 'suelto:' + s.nombre, acciones: acciones });
   };
 
 })();

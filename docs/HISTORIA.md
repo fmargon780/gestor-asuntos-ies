@@ -5,6 +5,30 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — "Por clasificar": el documento a la vista, marcado en la lista
+
+Fila 25 de la cola (`docs/COLA.md`, `docs/POR-CLASIFICAR-DOCUMENTO-A-LA-VISTA.md`): Francisco
+pedía saber, de un vistazo, cuál de la lista de la izquierda es el documento que se está viendo a
+la derecha, sin tener que adivinarlo por el nombre.
+
+- `js/visor.js` gana un `marcador` opcional (un texto libre que pone quien abre el documento) y
+  un aviso (`Visor.alCambiar`) cada vez que cambia, además de un hueco de acciones bajo la
+  cabecera (`opts.acciones`). Sin esos dos parámetros se comporta exactamente igual que antes, así
+  que `js/ficha-asunto.js` y `js/unir-asuntos.js` no han tenido que tocarse.
+- `js/documentos-sueltos.js` usa el marcador `'suelto:<nombre>'`: al cambiar, marca la tarjeta que
+  toca (`.tarjeta-abierta`) y le hace `scrollIntoView`; al repintar la lista entera, cada tarjeta
+  nace ya marcada si le toca. `App.accionesDeSuelto(s)` reutiliza `App.tarjetaSuelto` entero (con
+  el "Borrar" que le cuelga `js/papelera.js`) para no tener una segunda copia de los tres botones.
+  `App.pintarSueltos` cierra el visor solo si el marcador abierto ya no está en `App.E.sueltos`
+  (se apoya en que `App.verAbiertos` ya se llama tras crear, meter o borrar: no hizo falta tocar
+  esas tres acciones).
+- El nombre en la cabecera del panel se corta por el medio, no por el final, cuando no cabe: se
+  mide el ancho de verdad (`scrollWidth` contra `clientWidth`) y se van quitando caracteres del
+  lado más largo hasta que entra, con el `title` siempre con el nombre completo.
+- Prueba nueva `pruebas/documento-a-la-vista.mjs`, con la aplicación entera en un navegador de
+  verdad: abrir marca, abrir otro mueve la marca (nunca se acumula), cerrar la quita, y borrar
+  desde el propio panel hace desaparecer la tarjeta y cierra el visor solo.
+
 ## 17-sep-2026 — La pantalla no se repintaba sola tras guardar
 
 Fila 23 de la cola (`docs/COLA.md`, `docs/REFRESCO-DE-PANTALLA.md`), la primera de las que

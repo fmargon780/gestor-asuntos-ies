@@ -71,8 +71,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   eliges a mano con "Elegir asunto". El hilo queda enganchado al asunto (`hilos` en
   `asuntos.json`) y sus respuestas vuelven solas a la bandeja.
 - "Por clasificar": cada documento suelto se abre, se borra, crea un asunto nuevo, o entra en un
-  asunto que ya existe con "Meter en un asunto". El cuadro de elegir asunto es el mismo de la
-  bandeja de correos (`js/elegir-asunto.js`).
+  asunto que ya existe con "Meter en un asunto" (mismo cuadro que la bandeja de correos,
+  `js/elegir-asunto.js`). El que se está viendo queda marcado en la lista, con sus mismas
+  acciones también dentro del panel del visor.
 - DNI del alumnado a la vista, con aviso si falta y ya tocaría tenerlo.
 - Registrar un documento en un paso, leyendo el sello de Séneca del PDF.
 - Terceros relacionados con un asunto, con nota (no copia) al archivar.
