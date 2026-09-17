@@ -160,8 +160,7 @@ async function abrirFicha() {
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.waitForFunction(() => {
     const c = document.getElementById('ficha-guia');
-    const e = document.getElementById('hitos-entrada');
-    return (c && c.querySelector('.hito')) || (e && e.querySelector('button'));
+    return c && c.textContent.indexOf('Leyendo') === -1;
   });
   await pagina.waitForTimeout(400);
 }
@@ -183,9 +182,9 @@ await comprobar('salen los hitos de arriba (p1, p2, p3): p4 queda cortado por la
 await comprobar('el primero está en curso',
   pagina.locator('#ficha-guia .hito[data-id="p1"]').getAttribute('class').then(c => c.indexOf('hito-encurso') !== -1), true);
 
-/* ================= ESCENARIO 2: asunto viejo, botón "Crear los hitos de la guía" ================= */
+/* ================= ESCENARIO 2: asunto viejo, los hitos se crean solos ================= */
 
-console.log('--- escenario 2: un asunto viejo importa lo ya marcado ---');
+console.log('--- escenario 2: un asunto viejo crea sus hitos solo, importando lo ya marcado ---');
 await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 const CLAVE_VIEJA = '260601 MATRICULA Asunto Viejo, Nadie 0000';
@@ -210,28 +209,50 @@ await pagina.evaluate(async (clave) => {
 await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(400);
 
-await pagina.evaluate((clave) => {
-  const a = App.E.listaAbiertos.filter(x => x.nombre === clave)[0];
-  App.abrirFicha(a, 'abierto');
+const abrirFichaVieja = async () => {
+  await pagina.evaluate((clave) => {
+    const a = App.E.listaAbiertos.filter(x => x.nombre === clave)[0];
+    App.abrirFicha(a, 'abierto');
+  }, CLAVE_VIEJA);
+  await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+  await pagina.waitForFunction(() => {
+    const c = document.getElementById('ficha-guia');
+    return c && c.querySelector('.hito');
+  });
+  await pagina.waitForTimeout(400);
+};
+const leerHitosViejo = () => pagina.evaluate(async (clave) => {
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+  const f = await g.getFileHandle('hitos.json');
+  const j = JSON.parse(await (await f.getFile()).text());
+  return (j.porAsunto && j.porAsunto[clave]) || null;
 }, CLAVE_VIEJA);
-await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-await pagina.waitForFunction(() => {
-  const e = document.getElementById('hitos-entrada');
-  return e && e.textContent.indexOf('Crear los hitos de la guía') !== -1;
-});
-await comprobar('sale el botón para crearlos desde la guía',
-  pagina.getByRole('button', { name: 'Crear los hitos de la guía' }).isVisible(), true);
-await comprobar('y la guía de siempre, con sus casillas, sigue exactamente igual debajo',
-  pagina.locator('#ficha-guia .paso-casilla').count(), 6);
 
-await pagina.getByRole('button', { name: 'Crear los hitos de la guía' }).click();
-await pagina.waitForTimeout(500);
+/* Sin botón, sin preguntar: al abrir la ficha, los hitos se crean
+   solos a partir de la guía, importando lo que el asunto ya tenía
+   marcado. */
+await abrirFichaVieja();
+
 await comprobar('p1 nace hecho (venía en pasosHechos)',
   pagina.locator('#ficha-guia .hito[data-id="p1"]').getAttribute('class').then(c => c.indexOf('hito-hecho') !== -1), true);
 await comprobar('p3 nace con su rama ya elegida (o1, pasosElegidos)',
   pagina.locator('#ficha-guia .hito[data-id="p3a1"]').count(), 1);
 await comprobar('y p2, el siguiente pendiente, pasa a estar en curso',
   pagina.locator('#ficha-guia .hito[data-id="p2"]').getAttribute('class').then(c => c.indexOf('hito-encurso') !== -1), true);
+await comprobar('se han guardado en hitos.json',
+  leerHitosViejo().then(e => !!(e && e.hitos.length)), true);
+await comprobar('la nota de la guía dice "Cambiar la guía" (el tipo ya tenía guía escrita)',
+  pagina.locator('#ficha-guia-nota button').textContent(), 'Cambiar la guía');
+
+console.log('--- abrir la misma ficha otra vez no duplica los hitos ---');
+const hitosTrasCrear = await leerHitosViejo().then(e => e.hitos.length);
+await pagina.click('#ficha-volver');
+await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+await abrirFichaVieja();
+await comprobar('sigue habiendo los mismos hitos de primer nivel, no el doble',
+  leerHitosViejo().then(e => e.hitos.length), hitosTrasCrear);
+await comprobar('lo marcado sigue igual, no se ha vuelto a importar por encima',
+  pagina.locator('#ficha-guia .hito[data-id="p1"]').getAttribute('class').then(c => c.indexOf('hito-hecho') !== -1), true);
 
 /* ================= AJUSTES › HITOS: un día no lectivo (para el escenario 7) ================= */
 

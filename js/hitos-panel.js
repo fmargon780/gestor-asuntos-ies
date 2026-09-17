@@ -1,12 +1,18 @@
 /* ============================================================
-   hitos-panel.js — pinta los hitos en la ficha del asunto (16-sep-2026).
+   hitos-panel.js — pinta los hitos en la ficha del asunto (17-sep-2026).
 
-   js/ficha-asunto.js pinta la guía del tipo dentro de #ficha-guia,
-   dentro del bloque "Guía del procedimiento". Aquí se ENVUELVE eso,
-   sin tocar ese fichero: cuando el asunto tiene hitos, la lista de
-   hitos sustituye a la lista de pasos; el botón de "Escribir/Cambiar
-   la guía" que pone pintarGuia (siempre el último hijo, un <p
-   class="nota">) se conserva donde está.
+   Los pasos de la guía SON los hitos (docs/HITOS-SON-LA-GUIA.md): no
+   hay "la guía" por un lado y "los hitos" por otro. js/ficha-asunto.js
+   deja dentro de #ficha-guia, en el bloque "Hitos", solo un <p
+   class="nota" id="ficha-guia-nota"> con el botón de escribir o
+   cambiar la guía del tipo; todo lo demás de ese hueco —la lista de
+   hitos, o el aviso de que no hay ninguno todavía— lo pinta este
+   fichero, conservando esa nota donde esté.
+
+   Si el asunto está abierto y todavía no tiene hitos, y su tipo tiene
+   pasos de guía, se crean solos, importando lo que ya estuviera
+   marcado en pasosHechos/pasosElegidos (Hitos.crearDesdeGuiaImportando).
+   Sin botón, sin preguntar.
 
    pintarGuia es una función privada de ficha-asunto.js: no hay
    ninguna función de App que envolver para saber cuándo termina de
@@ -15,11 +21,10 @@
    entero. Se engancha a App.abrirFicha (esa sí es pública) para saber
    de qué asunto se trata y si está abierto o archivado.
 
-   Este fichero es la orquestación: el observador, el repintado y el
-   bloque de entrada para un asunto sin hitos todavía. Cómo se pinta
-   cada hito por dentro —la fila, el cuerpo desplegado, el cambio de
-   rama— vive en js/hitos-panel-lista.js, para no pasar de las 400
-   líneas aquí (misma regla que separó js/hitos.js de
+   Este fichero es la orquestación: el observador y el repintado. Cómo
+   se pinta cada hito por dentro —la fila, el cuerpo desplegado, el
+   cambio de rama— vive en js/hitos-panel-lista.js, para no pasar de
+   las 400 líneas aquí (misma regla que separó js/hitos.js de
    js/hitos-archivo.js). Los dos ficheros se hablan por
    window.HitosPanel: este expone programarRepintado, pedirYAnadirHito
    y observadorPausar/observadorReanudar (para el añadido a mano de
@@ -39,6 +44,13 @@
   var repintando = false;
   var pendiente = null;
 
+  /* Cerrojo por clave de asunto: repintar() es async y el observador
+     repinta cada 30 ms, así que dos pasadas podrían colarse antes de
+     que hitos.json quedara escrito y ambas verían "sin hitos todavía"
+     (sección "Trampas" de docs/HITOS-SON-LA-GUIA.md). Mientras la
+     clave esté aquí dentro, no se vuelve a intentar crear. */
+  var creandoDesdeGuia = {};
+
   /* La pantalla "Qué me toca" (fila 16) pide desplegar un hito
      concreto justo al abrir esta ficha: guarda aquí el par (clave del
      asunto, id del hito) y se aplica en el siguiente repintado, para
@@ -49,6 +61,13 @@
 
   function tipoDe(a) {
     return (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
+  }
+
+  /* El compañero tiene el mando (js/presencia.js): en "solo mirar" no
+     se escribe nada, así que tampoco se crean hitos solos. */
+  function enConsulta() {
+    var raiz = $('ficha-asunto-cuerpo');
+    return !!(raiz && raiz.classList.contains('ficha-consulta'));
   }
 
   (function envolverAbrirFicha() {
@@ -78,14 +97,44 @@
     pendiente = setTimeout(function () { pendiente = null; repintar(); }, 30);
   }
 
-  /* Mientras el asunto no tenga hitos, #ficha-guia NO SE TOCA: se deja
-     tal cual lo pinta js/ficha-asunto.js (con las casillas de
-     siempre, pasosHechos y pasosElegidos, exactamente como hasta
-     hoy). El botón de entrada ("Crear los hitos de la guía", o "+
-     Añadir el primer hito" si el tipo no tiene guía) sale en un
-     bloque propio y aparte, justo debajo. Solo cuando el asunto YA
-     tiene hitos se sustituye el contenido de #ficha-guia por la lista
-     de hitos, conservando el botón de escribir/cambiar la guía. */
+  /* modoActual/abierto reflejan cómo se abrió la ficha, no si el
+     asunto sigue abierto AHORA MISMO: archivarlo no vuelve a llamar a
+     App.abrirFicha, así que un repintado que se cuele mientras se
+     archiva (por ejemplo, por la vigilancia de presencia) vería
+     "abierto" aunque el asunto ya se esté cerrando. Se comprueba
+     también contra App.E.registro, que sí se actualiza al momento. */
+  function sigueAbiertoDeVerdad(clave) {
+    var asuntos = App.E && App.E.registro && App.E.registro.asuntos;
+    var ficha = asuntos && asuntos[clave];
+    /* Sin ficha en el registro no es "archivado": es un asunto que
+       todavía no ha pasado nunca por App.anotar (por ejemplo, recién
+       encontrado al escanear la carpeta). Solo bloquea un 'cerrado'
+       explícito, igual que hace el resto de la aplicación al leer
+       a.ficha (siempre con "|| {}"). */
+    return !ficha || ficha.estado !== 'cerrado';
+  }
+
+  /* Si el asunto está abierto, no tiene hitos todavía y su tipo tiene
+     pasos de guía, los crea importando lo ya marcado. Si la guía
+     todavía no se ha leído (GuiasDelCentro.pasosDe devuelve []), no
+     crea nada y no lo marca de ninguna forma: el próximo repintado
+     lo volverá a intentar solo. */
+  async function crearSiToca(a, clave, tipo, abierto) {
+    if (!abierto || enConsulta() || creandoDesdeGuia[clave] || !sigueAbiertoDeVerdad(clave)) return null;
+    var pasos = (window.GuiasDelCentro && window.GuiasDelCentro.pasosDe(tipo)) || [];
+    if (!pasos.length) return null;
+    creandoDesdeGuia[clave] = true;
+    try {
+      var hechos = (a.ficha && a.ficha.pasosHechos) || [];
+      var elegidos = (a.ficha && a.ficha.pasosElegidos) || {};
+      return await Hitos.crearDesdeGuiaImportando(clave, tipo, hechos, elegidos);
+    } catch (e) {
+      return null;   /* no crítico: se reintenta en el próximo repintado */
+    } finally {
+      delete creandoDesdeGuia[clave];
+    }
+  }
+
   async function repintar() {
     var a = actual;
     if (!a) return;
@@ -96,13 +145,18 @@
     var datos = null, entrada = null, errorLectura = null;
     try { datos = await Hitos.leer(); entrada = datos.porAsunto[clave] || null; }
     catch (e) { errorLectura = e; }
-
     if (actual !== a) return;   /* se ha cambiado de ficha mientras leíamos */
+
+    var hitos = entrada ? entrada.hitos : [];
+    if (!errorLectura && !hitos.length) {
+      var creados = await crearSiToca(a, clave, tipo, abierto);
+      if (actual !== a) return;
+      if (creados && creados.length) hitos = creados;
+    }
+
     var caja = $('ficha-guia');
     if (!caja) return;
     cajaObservada = caja;
-
-    var hitos = entrada ? entrada.hitos : [];
 
     /* Lo que se pinta aquí abajo muta el propio #ficha-guia, que es lo
        que vigila el MutationObserver: sin desconectarlo durante el
@@ -112,19 +166,17 @@
     repintando = true;
     if (observador) observador.disconnect();
     try {
+      var nota = $('ficha-guia-nota');
+      if (nota && nota.parentNode === caja) nota.remove();
+      caja.innerHTML = '';
       if (!errorLectura && hitos.length) {
-        quitarBloqueDeEntrada();
-        var botonGuia = (caja.lastElementChild && caja.lastElementChild.classList.contains('nota'))
-          ? caja.lastElementChild : null;
-        if (botonGuia) botonGuia.remove();
-        caja.innerHTML = '';
         caja.className = 'hitos-panel';
         caja.appendChild(HitosPanelLista.bloqueDeHitos(a, hitos, datos.ajustes, abierto));
-        if (botonGuia) caja.appendChild(botonGuia);
         aplicarDesplegarPendiente(caja, clave);
       } else {
-        pintarBloqueDeEntrada(a, tipo, abierto, errorLectura);
+        pintarVacio(caja, a, abierto, errorLectura);
       }
+      if (nota) caja.appendChild(nota);
     } finally {
       repintando = false;
       asegurarObservador();
@@ -149,98 +201,36 @@
     }
   }
 
-  /* ---------- el bloque de entrada, aparte de #ficha-guia ----------
+  /* ---------- sin hitos todavía ----------
 
-     Se cuelga justo debajo del bloque "Guía del procedimiento", como
-     hermano suyo dentro de .ficha-izquierda. Al no vivir dentro de
-     #ficha-guia, no interfiere para nada con lo que pinta
-     js/ficha-asunto.js ahí (importante: pruebas/guias.mjs abre una
-     ficha sin hitos y espera ver la guía de siempre, con sus
-     casillas). */
-
-  function bloqueDeEntrada() {
-    var ya = $('hitos-entrada');
-    if (ya) return ya;
-    var guiaBloque = caja0();
-    if (!guiaBloque || !guiaBloque.parentNode) return null;
-    var div = document.createElement('div');
-    div.id = 'hitos-entrada';
-    div.className = 'ficha-bloque';
-    guiaBloque.parentNode.insertBefore(div, guiaBloque.nextSibling);
-    return div;
-  }
-
-  function caja0() {
-    var c = $('ficha-guia');
-    return c ? c.closest('.ficha-bloque') : null;
-  }
-
-  function quitarBloqueDeEntrada() {
-    var d = $('hitos-entrada');
-    if (d) d.remove();
-  }
-
-  function pintarBloqueDeEntrada(a, tipo, abierto, errorLectura) {
-    var d = bloqueDeEntrada();
-    if (!d) return;
-    d.innerHTML = '<h3 class="ficha-titulo">Hitos</h3>';
+     Pasa por aquí un asunto archivado, uno con error de lectura, o uno
+     cuyo tipo no tiene guía (o cuya guía no ha terminado de cargar: el
+     próximo repintado lo reintenta, sin avisar de nada mientras
+     tanto). */
+  function pintarVacio(caja, a, abierto, errorLectura) {
+    caja.className = 'explica';
     if (errorLectura) {
-      var av = document.createElement('p');
-      av.className = 'explica';
-      av.textContent = 'No he podido leer los hitos: ' + errorLectura.message;
-      d.appendChild(av);
+      caja.textContent = 'No he podido leer los hitos: ' + errorLectura.message;
       return;
     }
     if (!abierto) {
-      d.remove();   /* archivado y sin hitos: no hay nada que ofrecer aquí */
+      caja.textContent = 'Este asunto no tiene hitos.';
       return;
     }
-    var pasosGuia = (window.GuiasDelCentro && tipo) ? window.GuiasDelCentro.pasosDe(tipo) : [];
-    d.appendChild(pasosGuia.length ? botonCrearDesdeGuia(a, tipo) : botonAnadirAMano(a));
-  }
-
-  /* ---------- el botón para asuntos viejos (sección 3.2) ---------- */
-
-  function botonCrearDesdeGuia(a, tipo) {
-    var caja = document.createElement('div');
-    var p = document.createElement('p');
-    p.className = 'explica';
-    p.textContent = 'Este asunto todavía se gobierna por la guía de siempre, más abajo.';
-    caja.appendChild(p);
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'boton boton-principal';
-    b.textContent = 'Crear los hitos de la guía';
-    b.onclick = async function () {
-      b.disabled = true;
-      try {
-        var hechos = (a.ficha && a.ficha.pasosHechos) || [];
-        var elegidos = (a.ficha && a.ficha.pasosElegidos) || {};
-        await Hitos.crearDesdeGuiaImportando(a.nombre, tipo, hechos, elegidos);
-        U.aviso('Hitos creados desde la guía.', 'bueno');
-        programarRepintado();
-      } catch (e) {
-        U.aviso('No he podido crear los hitos: ' + e.message, 'malo');
-        b.disabled = false;
-      }
-    };
-    caja.appendChild(b);
-    return caja;
-  }
-
-  function botonAnadirAMano(a) {
-    var caja = document.createElement('div');
     var p = document.createElement('p');
     p.className = 'explica';
     p.textContent = 'Este tipo no tiene guía. Puedes ir apuntando los hitos a mano.';
     caja.appendChild(p);
+    caja.appendChild(botonAnadirAMano(a));
+  }
+
+  function botonAnadirAMano(a) {
     var b = document.createElement('button');
     b.type = 'button';
-    b.className = 'boton';
+    b.className = 'boton boton-ancho';
     b.textContent = '+ Añadir el primer hito';
     b.onclick = function () { pedirYAnadirHito(a); };
-    caja.appendChild(b);
-    return caja;
+    return b;
   }
 
   async function pedirYAnadirHito(a) {

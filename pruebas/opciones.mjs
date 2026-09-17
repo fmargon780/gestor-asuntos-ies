@@ -1,20 +1,28 @@
 /* Prueba en navegador de verdad de las preguntas con opciones dentro de
-   una guía.
+   una guía, ahora que sus pasos son hitos (docs/HITOS-SON-LA-GUIA.md,
+   fila 26, 17-sep-2026): elegir una respuesta y cambiar de rama se
+   hacen sobre el hito de la pregunta, dentro de la lista de hitos, no
+   sobre un bloque de guía aparte con casillas.
 
    El caso es el suyo, el de la factura:
-     Comprobación de validez
      Registrar entrada
      ¿Cómo hemos recibido la factura?
         · En mano       -> sello y firma · entregarla a Fátima
         · Digitalmente  -> a la firma digital del director
 
    Lo que tiene que pasar:
-     - hasta elegir, no se ve ningún paso de ninguna rama,
-     - al elegir una, salen solo los suyos,
-     - la cuenta de pasos crece con la rama elegida,
-     - lo elegido se guarda en la ficha del asunto,
-     - se puede cambiar de respuesta, y se puede escribir todo esto
-       desde el cuadro de la guía sin tocar el fichero a mano. */
+     - se escribe la pregunta con sus ramas desde el cuadro de la
+       guía, sin tocar ningún fichero a mano (eso no cambia),
+     - los pasos de la guía se convierten solos en hitos, y hasta
+       elegir no se ve ningún hito de ninguna rama,
+     - al elegir, salen solo los suyos, la cuenta de hitos crece con
+       la rama elegida, y lo elegido se guarda en hitos.json (ya NO en
+       la ficha del asunto, como antes),
+     - marcar un hito de la rama se guarda igual que cualquier otro,
+     - al volver a entrar se recuerda todo, sin duplicar nada,
+     - y se puede cambiar de rama con "Cambiar de rama": lo marcado en
+       la rama vieja que no tenga notas ni documentos se descarta del
+       todo (docs/HITOS.md, sección de las bifurcaciones). */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
@@ -58,12 +66,21 @@ const abrirLaFicha = async () => {
     const c = document.getElementById('ficha-guia');
     return c && c.textContent.indexOf('Leyendo') === -1;
   });
-  await pagina.waitForTimeout(250);
+  await pagina.waitForTimeout(300);
 };
+const texto = () => pagina.locator('#ficha-guia').textContent();
+
+const leerHitosCompra = () => pagina.evaluate(async () => {
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+  const f = await g.getFileHandle('hitos.json');
+  const j = JSON.parse(await (await f.getFile()).text());
+  const clave = Object.keys(j.porAsunto).filter(k => k.indexOf('COMPRA') !== -1)[0];
+  return j.porAsunto[clave];
+});
 
 console.log('--- escribiendo la pregunta desde la ficha ---');
 await abrirLaFicha();
-await pagina.locator('#ficha-guia button').first().click();
+await pagina.locator('#ficha-guia-nota button').click();
 await pagina.waitForSelector('#guia-anadir');
 
 /* Paso 1, normal. */
@@ -98,7 +115,7 @@ await pagina.locator('.subpaso-titulo').nth(2).fill('A la firma digital del dire
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(900);
 
-await comprobar('se ha guardado la pregunta con sus dos ramas',
+await comprobar('se ha guardado la pregunta con sus dos ramas en guias.json',
   pagina.evaluate(async () => {
     const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
     const f = await g.getFileHandle('guias.json');
@@ -117,73 +134,91 @@ await comprobar('se ha guardado la pregunta con sus dos ramas',
         pasos: ['A la firma digital del director'] }
     ] });
 
-console.log('--- sin responder, no se ve ninguna rama ---');
-await pagina.waitForTimeout(400);
-const texto = () => pagina.locator('#ficha-guia').textContent();
-await comprobar('los dos botones están',
-  pagina.locator('#ficha-guia .guia-opcion').count(), 2);
-await comprobar('la rama de en mano está escondida',
-  pagina.locator('#ficha-guia .guia-rama').nth(0).isVisible(), false);
-await comprobar('la digital también',
-  pagina.locator('#ficha-guia .guia-rama').nth(1).isVisible(), false);
-await comprobar('y la cuenta es de 2 pasos',
-  texto().then(t => t.indexOf('0 de 2 pasos hechos') !== -1), true);
+console.log('--- se han creado los hitos solos; sin responder no se ve ninguna rama ---');
+await pagina.waitForTimeout(600);
+await comprobar('solo se ven los dos hitos de arriba',
+  pagina.locator('#ficha-guia .hito').count(), 2);
+await comprobar('el segundo es la pregunta, con sus dos opciones',
+  pagina.locator('#ficha-guia .hito-decision .hito-opcion').count(), 2);
+await comprobar('y la cuenta es de 2 hitos, ninguno hecho',
+  texto().then(t => t.indexOf('0 de 2 hitos hechos') !== -1), true);
 
 console.log('--- eligiendo "en mano" ---');
-await pagina.locator('#ficha-guia .guia-opcion').nth(0).click();
+await pagina.locator('#ficha-guia .hito-opcion', { hasText: 'La hemos recibido en mano' }).click();
 await pagina.waitForTimeout(600);
-await comprobar('sale su rama',
-  pagina.locator('#ficha-guia .guia-rama').nth(0).isVisible(), true);
-await comprobar('y la otra sigue escondida',
-  pagina.locator('#ficha-guia .guia-rama').nth(1).isVisible(), false);
-await comprobar('salen sus dos pasos',
+await comprobar('salen los cuatro hitos',
+  pagina.locator('#ficha-guia .hito').count(), 4);
+await comprobar('con los títulos de su rama',
   texto().then(t => t.indexOf('Entregársela a Fátima') !== -1), true);
-await comprobar('la cuenta pasa a 4 pasos, uno hecho',
-  texto().then(t => t.indexOf('1 de 4 pasos hechos') !== -1), true);
-await comprobar('se ha guardado la respuesta en el asunto',
+await comprobar('y no los de la otra',
+  texto().then(t => t.indexOf('firma digital') !== -1), false);
+await comprobar('la cuenta pasa a 4 hitos, uno hecho: la propia pregunta',
+  texto().then(t => t.indexOf('1 de 4 hitos hechos') !== -1), true);
+await comprobar('se ha guardado la respuesta en hitos.json',
+  leerHitosCompra().then(entrada => {
+    const decision = entrada.hitos[1];
+    const elegida = decision.opciones.filter(o => o.id === decision.elegida)[0];
+    return elegida && elegida.texto;
+  }), 'La hemos recibido en mano');
+await comprobar('y ya NO en asuntos.json (pasosElegidos ya no se usa para esto)',
   pagina.evaluate(async () => {
-    const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
-    const f = await g.getFileHandle('asuntos.json');
-    const j = JSON.parse(await (await f.getFile()).text());
-    const clave = Object.keys(j.asuntos).filter(k => k.indexOf('COMPRA') !== -1)[0];
-    return Object.keys(j.asuntos[clave].pasosElegidos || {}).length;
-  }), 1);
+    try {
+      const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+      const f = await g.getFileHandle('asuntos.json');
+      const j = JSON.parse(await (await f.getFile()).text());
+      const clave = Object.keys(j.asuntos || {}).filter(k => k.indexOf('COMPRA') !== -1)[0];
+      return Object.keys((clave && j.asuntos[clave].pasosElegidos) || {}).length;
+    } catch (e) {
+      return 0;   /* ni siquiera hace falta que exista la ficha del asunto */
+    }
+  }), 0);
 
-console.log('--- marcando un paso de la rama ---');
-await pagina.locator('#ficha-guia .guia-rama').nth(0).locator('.paso-casilla').first().check();
-await pagina.waitForTimeout(600);
-await comprobar('la cuenta sube',
-  texto().then(t => t.indexOf('2 de 4 pasos hechos') !== -1), true);
+console.log('--- marcando un hito de la rama ---');
+await pagina.locator('#ficha-guia .hito', { hasText: 'Ponerle el sello de recibido y la firma' })
+  .locator('.hito-casilla').check();
+await pagina.waitForTimeout(500);
+await comprobar('se apunta en hitos.json',
+  leerHitosCompra().then(entrada => {
+    const decision = entrada.hitos[1];
+    const rama = decision.opciones.filter(o => o.id === decision.elegida)[0];
+    const h = rama.hitos.filter(x => x.titulo === 'Ponerle el sello de recibido y la firma')[0];
+    return h.estado;
+  }), 'hecho');
+await comprobar('y la cuenta sube a 2 de 4',
+  texto().then(t => t.indexOf('2 de 4 hitos hechos') !== -1), true);
 
-console.log('--- cambiando de respuesta ---');
-await pagina.locator('#ficha-guia .guia-opcion').nth(1).click();
-await pagina.waitForTimeout(600);
-await comprobar('ahora se ve la rama digital',
-  pagina.locator('#ficha-guia .guia-rama').nth(1).isVisible(), true);
-await comprobar('y la de en mano se esconde',
-  pagina.locator('#ficha-guia .guia-rama').nth(0).isVisible(), false);
-await comprobar('la cuenta cuenta solo la rama elegida',
-  texto().then(t => t.indexOf('1 de 3 pasos hechos') !== -1), true);
-
-console.log('--- y se puede dejar sin responder ---');
-await pagina.locator('#ficha-guia .guia-opcion').nth(1).click();
-await pagina.waitForTimeout(600);
-await comprobar('las dos ramas se esconden',
-  pagina.locator('#ficha-guia .guia-rama').nth(1).isVisible(), false);
-await comprobar('y la cuenta vuelve a 2 pasos',
-  texto().then(t => t.indexOf('0 de 2 pasos hechos') !== -1), true);
-
-console.log('--- al volver a entrar, se recuerda ---');
-await pagina.locator('#ficha-guia .guia-opcion').nth(0).click();
-await pagina.waitForTimeout(600);
+console.log('--- al volver a entrar, se recuerda todo (y no se duplica) ---');
 await abrirLaFicha();
+await comprobar('sigue habiendo 4 hitos, no 8',
+  pagina.locator('#ficha-guia .hito').count(), 4);
 await comprobar('sigue elegida "en mano"',
-  pagina.locator('#ficha-guia .guia-opcion').nth(0).getAttribute('class'),
-  'guia-opcion elegida');
-await comprobar('con su rama a la vista',
-  pagina.locator('#ficha-guia .guia-rama').nth(0).isVisible(), true);
-await comprobar('y lo que estaba marcado sigue marcado',
-  texto().then(t => t.indexOf('2 de 4 pasos hechos') !== -1), true);
+  texto().then(t => t.indexOf('Entregársela a Fátima') !== -1), true);
+await comprobar('y lo marcado sigue marcado',
+  texto().then(t => t.indexOf('2 de 4 hitos hechos') !== -1), true);
+
+console.log('--- cambiando de rama ---');
+/* Hay que desplegar el cuerpo de la pregunta para ver "Cambiar de rama". */
+await pagina.locator('#ficha-guia .hito-decision .hito-titulo').click();
+await pagina.locator('#ficha-guia .hito-decision .hito-cambiar-rama').click();
+await pagina.waitForTimeout(200);
+await pagina.locator('#ficha-guia .hito-decision .hito-cuerpo .hito-opcion',
+  { hasText: 'Nos ha llegado digitalmente' }).click();
+await pagina.waitForTimeout(600);
+
+await comprobar('ahora salen los hitos de la rama digital',
+  texto().then(t => t.indexOf('A la firma digital del director') !== -1), true);
+await comprobar('y ya no los de la rama de en mano',
+  texto().then(t => t.indexOf('Entregársela a Fátima') !== -1), false);
+await comprobar('el hito marcado de la rama vieja, sin notas ni documentos, se descarta del todo',
+  texto().then(t => t.indexOf('Ponerle el sello') !== -1), false);
+await comprobar('la cuenta ahora es de 3, uno hecho: la pregunta',
+  texto().then(t => t.indexOf('1 de 3 hitos hechos') !== -1), true);
+await comprobar('se ha guardado el cambio en hitos.json',
+  leerHitosCompra().then(entrada => {
+    const decision = entrada.hitos[1];
+    const elegida = decision.opciones.filter(o => o.id === decision.elegida)[0];
+    return elegida && elegida.texto;
+  }), 'Nos ha llegado digitalmente');
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

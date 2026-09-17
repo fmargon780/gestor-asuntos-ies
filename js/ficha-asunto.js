@@ -159,7 +159,7 @@
       '<div class="ficha-acciones" id="ficha-acciones"></div>' +
       '<div class="ficha-columnas">' +
         '<div class="ficha-izquierda">' +
-          bloque('Guía del procedimiento', '<div id="ficha-guia" class="explica">Leyendo…</div>') +
+          bloque('Hitos', '<div id="ficha-guia" class="explica">Leyendo…</div>') +
           bloque('Notas', '<div id="ficha-notas"></div>') +
         '</div>' +
         '<div class="ficha-derecha">' +
@@ -597,111 +597,56 @@
     }
   }
 
-  /* ---------- la guía, con sus casillas ---------- */
+  /* ---------- el enlace de escribir o cambiar la guía ----------
 
-  async function pintarGuia(a, tipo, abierto) {
+     Los pasos de la guía SON los hitos (docs/HITOS-SON-LA-GUIA.md):
+     ya no se leen aquí como texto con casillas, eso lo pinta
+     js/hitos-panel.js dentro de este mismo #ficha-guia. Esta función
+     deja solo el <p class="nota" id="ficha-guia-nota"> del final, con
+     el botón de escribir o cambiar la guía del tipo; es tramitando un
+     asunto cuando uno se da cuenta de qué pasos faltan, y hasta el
+     10-sep-2026 había que salir a Ajustes para apuntarlos.
+
+     hitos-panel.js localiza esta nota por su id y la conserva al
+     repintar el resto de #ficha-guia. */
+  function pintarGuia(a, tipo, abierto) {
     var caja = $('ficha-guia');
     if (!caja) return;
-    var pasos = [];
-    try {
-      var todo = App.E.gestor ? await Carpetas.leerJson(App.E.gestor, 'guias.json') : null;
-      pasos = Guias.normalizar((todo && tipo && todo[tipo]) || []);
-    } catch (e) { pasos = []; }
+    /* Solo se toca la nota, nunca el resto de #ficha-guia: eso es de
+       js/hitos-panel.js, y puede que ya haya pintado ahí la lista de
+       hitos (por ejemplo, al volver a llamar desde el propio botón de
+       más abajo, después de escribir la guía). */
+    var anterior = $('ficha-guia-nota');
+    if (anterior && anterior.parentNode === caja) anterior.remove();
+    if (!abierto || !tipo || !window.GuiasDelCentro) return;
 
-    /* El botón de escribir o cambiar la guía, aquí mismo. Es tramitando
-       un asunto cuando uno se da cuenta de qué pasos faltan, y hasta el
-       10-sep-2026 había que salir a Ajustes para apuntarlos.
+    var pasos = window.GuiasDelCentro.pasosDe(tipo);
+    var fila = document.createElement('p');
+    fila.className = 'nota';
+    fila.id = 'ficha-guia-nota';
 
-       Solo en los asuntos abiertos, y solo si el tipo se ha reconocido.
-       Lo guarda js/guias-enganche.js, que es quien lleva guias.json. */
-    function ponerBotonDeEscribir(texto) {
-      if (!abierto || !tipo || !window.GuiasDelCentro) return;
-      var fila = document.createElement('p');
-      fila.className = 'nota';
-
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'boton';
-      b.textContent = texto;
-      b.onclick = async function () {
-        b.disabled = true;
-        var hecho = await window.GuiasDelCentro.escribir(tipo);
-        b.disabled = false;
-        if (hecho) pintarGuia(a, tipo, abierto);
-      };
-      fila.appendChild(b);
-
-      var aviso = document.createElement('span');
-      aviso.className = 'suave';
-      aviso.style.marginLeft = '8px';
-      aviso.textContent = 'Vale para todos los asuntos ' + tipo + ', no solo para este.';
-      fila.appendChild(aviso);
-
-      caja.appendChild(fila);
-    }
-
-    if (!pasos.length) {
-      caja.className = 'explica';
-      caja.innerHTML = tipo
-        ? 'El tipo ' + U.escapar(tipo) + ' todavía no tiene guía.'
-        : 'Este asunto no tiene tipo reconocido, así que no hay guía que enseñar.';
-      ponerBotonDeEscribir('Escribir la guía de ' + tipo);
-      return;
-    }
-
-    var marcados = ((a.ficha && a.ficha.pasosHechos) || []).slice();
-    /* La opción elegida en cada paso-pregunta. Se guarda en la ficha del
-       asunto, igual que lo marcado, así que el compañero ve por dónde va
-       el trámite. */
-    var elegidas = Object.assign({}, (a.ficha && a.ficha.pasosElegidos) || {});
-
-    caja.className = '';
-    caja.innerHTML = '<p class="explica" id="ficha-guia-cuenta"></p>' +
-                     Guias.vista(pasos, marcados, abierto, elegidas);
-
-    function contar() {
-      var c = Guias.cuenta(pasos, marcados, elegidas);
-      $('ficha-guia-cuenta').textContent =
-        c.hechos + ' de ' + c.total + ' pasos hechos.' +
-        (abierto ? ' Lo que marques lo ve todo el que abra la aplicación.' : '');
-    }
-    contar();
-    ponerBotonDeEscribir('Cambiar la guía');
-
-    if (!abierto) return;
-
-    async function guardar(datos) {
-      try {
-        await App.anotar(a.nombre, Object.assign({
-          pasosEl: U.ahora(),
-          pasosPor: App.E.usuario
-        }, datos));
-      } catch (e) {
-        U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'boton';
+    b.textContent = pasos.length ? 'Cambiar la guía' : ('Escribir la guía de ' + tipo);
+    b.onclick = async function () {
+      b.disabled = true;
+      var hecho = await window.GuiasDelCentro.escribir(tipo);
+      b.disabled = false;
+      if (hecho) {
+        pintarGuia(a, tipo, abierto);
+        if (window.HitosPanel) window.HitosPanel.programarRepintado();
       }
-    }
+    };
+    fila.appendChild(b);
 
-    Array.prototype.forEach.call(caja.querySelectorAll('.paso-casilla'), function (c) {
-      c.onchange = function () {
-        var id = c.dataset.paso;
-        var i = marcados.indexOf(id);
-        if (c.checked && i === -1) marcados.push(id);
-        if (!c.checked && i !== -1) marcados.splice(i, 1);
-        c.closest('.paso-lectura').classList.toggle('paso-hecho', c.checked);
-        contar();
-        guardar({ pasosHechos: marcados.slice() });
-      };
-    });
+    var aviso = document.createElement('span');
+    aviso.className = 'suave';
+    aviso.style.marginLeft = '8px';
+    aviso.textContent = 'Vale para todos los asuntos ' + tipo + ', no solo para este.';
+    fila.appendChild(aviso);
 
-    /* Quién se entera de que se ha elegido una opción. El propio
-       js/guias.js ya ha enseñado la rama elegida: aquí solo se apunta y
-       se guarda. */
-    Guias.cuandoSeElige(function (idPaso, idOpcion) {
-      if (idOpcion) elegidas[idPaso] = idOpcion;
-      else delete elegidas[idPaso];
-      contar();
-      guardar({ pasosElegidos: Object.assign({}, elegidas) });
-    });
+    caja.appendChild(fila);
   }
 
   /* ---------- las notas, escritas aquí mismo ---------- */
@@ -901,157 +846,21 @@
 
      Van en dos grupos: los papeles del expediente y lo que ha llegado
      por correo. Mezclados, la solicitud se pierde entre hilos y
-     adjuntos, que son los que más se acumulan. */
+     adjuntos, que son los que más se acumulan. Vive en
+     js/ficha-documentos.js (17-sep-2026, fila 26: se separa de aquí al
+     quitarle trabajo la fila "los hitos son la guía"); aquí solo el
+     puente, y el repintado de notas que puede hacer falta tras un
+     borrado (un documento con nota de registro, por ejemplo). */
 
-  /* Lo que la aplicación mete cuando entra un correo: el hilo en PDF
-     (CORREO, y HILO en las primeras versiones) y sus adjuntos. */
-  var DE_CORREO = /(^|[\s_-])(CORREO|HILO|ADJUNTO)([\s_.\-(]|$)/i;
-
-  function esDeCorreo(nombre) {
-    return DE_CORREO.test(String(nombre || ''));
+  async function repintarNotasTrasDocumento(a) {
+    if (!window.Notas) return;
+    a.ficha.notas = await window.Notas.frescas(a);
+    pintarNotas(a, modoActual === 'abierto');
   }
 
-  /* El nombre empieza por la fecha, así que por orden alfabético
-     quedan en orden de antigüedad. */
-  function porNombre(a, b) {
-    return String(a.nombre).localeCompare(String(b.nombre), 'es');
-  }
-
-  function filaDeDocumento(f, a) {
-    var ext = Nombres.extensionDe(f.nombre);
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'ficha-documento';
-    b.title = 'Verlo al lado del programa';
-    b.innerHTML = (ext ? '<span class="marca-ext">' + U.escapar(ext.toUpperCase()) + '</span>' : '') +
-                  '<span>' + U.escapar(f.nombre) + '</span>';
-    b.onclick = function () { abrirDocumento(f); };
-
-    var fila = document.createElement('div');
-    fila.className = 'ficha-documento-fila';
-    fila.appendChild(b);
-
-    if (window.Registro && !Registro.tieneRegistro(f.nombre)) {
-      var pendiente = Registro.pendiente(a, f.nombre);
-      if (pendiente) {
-        var marca = document.createElement('span');
-        marca.className = 'marca-sin-registrar';
-        marca.textContent = 'Sin registrar';
-        fila.appendChild(marca);
-      }
-
-      var reg = document.createElement('button');
-      reg.type = 'button';
-      reg.className = 'boton' + (pendiente ? ' boton-ambar' : '');
-      reg.title = 'Dar registro de entrada o salida a este documento';
-      reg.textContent = 'Registrar';
-      reg.onclick = async function () {
-        reg.disabled = true;
-        await Registro.abrirCuadro(a, f.nombre, function () { pintarDocumentos(a); });
-        reg.disabled = false;
-      };
-      fila.appendChild(reg);
-    }
-
-    /* Separar, Unir y Sacar páginas (17-sep-2026, fila 22,
-       docs/SEPARAR-Y-UNIR-PDF.md): solo para PDF. */
-    if (window.PdfSepararUnir && window.PdfHerramientas && PdfHerramientas.esPdf(f.nombre, '')) {
-      function botonPdf(texto, ayuda, accion) {
-        var boton = document.createElement('button');
-        boton.type = 'button';
-        boton.className = 'boton';
-        boton.title = ayuda;
-        boton.textContent = texto;
-        boton.onclick = function () {
-          accion({
-            modo: 'asunto', dir: a.handle, nombre: f.nombre, handle: f.handle, asunto: a,
-            alTerminar: function () { pintarDocumentos(a); }
-          });
-        };
-        return boton;
-      }
-      fila.appendChild(botonPdf('Separar', 'Partirlo en varios documentos', PdfSepararUnir.separar));
-      fila.appendChild(botonPdf('Unir', 'Juntarlo con otro PDF del asunto', PdfSepararUnir.unir));
-      fila.appendChild(botonPdf('Sacar páginas', 'Sacar una copia con solo algunas páginas', PdfSepararUnir.sacarPaginas));
-    }
-
-    /* Borrar, con papelera (11-sep-2026): siempre el último, separado
-       de lo demás. */
-    if (window.Papelera) {
-      var borrar = window.Papelera.botonBorrar(async function () {
-        var ok = await window.Papelera.preguntarBorrar(f.nombre);
-        if (!ok) return;
-        borrar.disabled = true;
-        try {
-          await Papelera.mandarDocumentoDeAsunto(a, f.nombre);
-          U.aviso('Documento mandado a la papelera.', 'bueno');
-          pintarDocumentos(a);
-          if (window.Notas) {
-            a.ficha.notas = await window.Notas.frescas(a);
-            pintarNotas(a, modoActual === 'abierto');
-          }
-        } catch (e) {
-          U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
-          borrar.disabled = false;
-        }
-      });
-      fila.appendChild(borrar);
-    }
-
-    return fila;
-  }
-
-  function grupoDeDocumentos(caja, titulo, ficheros, conRotulo, a) {
-    if (!ficheros.length) return;
-    if (conRotulo) {
-      var r = document.createElement('div');
-      r.className = 'ficha-grupo-docs';
-      r.textContent = titulo + '  (' + ficheros.length + ')';
-      caja.appendChild(r);
-    }
-    ficheros.sort(porNombre).forEach(function (f) { caja.appendChild(filaDeDocumento(f, a)); });
-  }
-
-  async function pintarDocumentos(a) {
-    var caja = $('ficha-documentos');
-    var cuenta = $('ficha-cuenta-docs');
-    if (!caja) return;
-    try {
-      var lista = await Carpetas.ficheros(a.handle);
-      if (cuenta) cuenta.textContent = lista.length || '';
-      if (!lista.length) {
-        caja.className = 'explica';
-        caja.textContent = 'La carpeta todavía está vacía.';
-        return;
-      }
-      caja.className = 'ficha-documentos';
-      caja.innerHTML = '';
-
-      var correos = lista.filter(function (f) { return esDeCorreo(f.nombre); });
-      var expediente = lista.filter(function (f) { return !esDeCorreo(f.nombre); });
-
-      /* Con un solo grupo no hacen falta rótulos: sobran. */
-      var conRotulo = correos.length > 0 && expediente.length > 0;
-      grupoDeDocumentos(caja, 'Del expediente', expediente, conRotulo, a);
-      grupoDeDocumentos(caja, 'Llegados por correo', correos, conRotulo, a);
-    } catch (e) {
-      caja.className = 'explica';
-      caja.textContent = 'No he podido leer la carpeta: ' + e.message;
-    }
-  }
-
-  /* Se abre en la columna de la derecha, al lado del programa, para
-     poder trabajar con el papel delante. */
-  async function abrirDocumento(f) {
-    if (window.Visor) return window.Visor.abrir(f.handle, f.nombre);
-    try {
-      var fichero = await f.handle.getFile();
-      var url = URL.createObjectURL(fichero);
-      window.open(url, '_blank');
-      setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
-    } catch (e) {
-      U.aviso('No he podido abrirlo: ' + e.message, 'malo');
-    }
+  function pintarDocumentos(a) {
+    if (!window.FichaDocumentos) return;
+    FichaDocumentos.pintar(a, function () { return repintarNotasTrasDocumento(a); });
   }
 
 })();

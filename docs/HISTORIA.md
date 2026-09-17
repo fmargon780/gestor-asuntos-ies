@@ -5,6 +5,45 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — Los hitos son la guía, no un añadido
+
+Fila 26 de la cola (`docs/COLA.md`, `docs/HITOS-SON-LA-GUIA.md`). Corrige un malentendido de
+diseño de la fila 15 (`docs/HITOS.md`): al ver el resultado en pantalla, Francisco dejó claro que
+nunca quiso dos cosas — la guía como texto con casillas por un lado, y los hitos por otro. Quiso
+una: los pasos de la guía SON los hitos.
+
+**Qué cambia.** Al abrir la ficha de un asunto abierto cuyo tipo tiene guía y que todavía no
+tiene hitos, estos se crean solos, importando lo que ya estuviera marcado en
+`pasosHechos`/`pasosElegidos` si el asunto ya existía desde antes. Sin botón, sin preguntar. La
+guía deja de pintarse como texto con casillas en la ficha: en su sitio queda la lista de hitos,
+bajo el título "Hitos" (antes "Guía del procedimiento"). Se conserva el enlace de escribir o
+cambiar la guía del tipo, al final del bloque. Desaparecen el botón "Crear los hitos de la guía"
+y el bloque `#hitos-entrada`: si el tipo no tiene guía, el bloque "Hitos" sale vacío con
+"+ Añadir el primer hito".
+
+**La trampa de la doble creación.** El observador de `js/hitos-panel.js` repinta cada 30 ms y
+crear los hitos es asíncrono (una lectura y una escritura); mirar solo si ya hay hitos no basta,
+porque dos repintados pueden colarse antes de que la escritura anterior termine. Se ha añadido un
+cerrojo por clave de asunto (`creandoDesdeGuia`). Al probarlo, salió una segunda carrera más sutil:
+`modoActual` (si la ficha se abrió como abierta o archivada) se queda **fijo** desde que se abrió
+la ficha, y archivar un asunto no vuelve a llamar a `App.abrirFicha`. Si algo repintaba la ficha
+(la vigilancia de presencia, por ejemplo) justo mientras se archivaba, después de que
+`hitos.json` ya se hubiera vaciado pero antes de salir de la pantalla, los hitos se recreaban
+solos sobre un asunto que se estaba cerrando. Se comprueba también contra `App.E.registro`, que sí
+se actualiza al momento, tratando "sin ficha en el registro todavía" (un asunto recién encontrado,
+nunca anotado) como abierto: solo un `estado: 'cerrado'` explícito bloquea la creación.
+
+**El reparto de ficheros.** `js/ficha-asunto.js` bajaba de 1.100 líneas al quitarle este cambio la
+guía-con-casillas, pero se ha aprovechado para partirlo: los documentos de la carpeta pasan a
+`js/ficha-documentos.js` (hablándose por `window.FichaDocumentos.pintar`), dejando en
+`js/ficha-asunto.js` solo la cabecera, las acciones, las notas, el contacto y el enlace de la
+guía.
+
+**Pruebas reescritas del todo**: `pruebas/guias.mjs` y `pruebas/opciones.mjs` ya no esperan
+`.paso-casilla`/`.guia-opcion`/`.guia-rama` dentro de la ficha, sino hitos; `pruebas/hitos.mjs`
+cambia su escenario 2 (ya no hay botón que pulsar) y suma una prueba de que abrir la misma ficha
+dos veces seguidas no duplica los hitos.
+
 ## 17-sep-2026 — Separar, unir y sacar páginas de un PDF
 
 Fila 22 de la cola (`docs/COLA.md`, `docs/SEPARAR-Y-UNIR-PDF.md`), punto 4 de
