@@ -96,7 +96,7 @@ var HitosPanelLista = (function () {
         Array.prototype.forEach.call(div.querySelectorAll('.hito-opcion'), function (b) {
           b.onclick = async function () {
             try {
-              await Hitos.elegirOpcion(a.nombre, h.id, b.dataset.opcion);
+              await U.mientrasGuarda(b, function () { return Hitos.elegirOpcion(a.nombre, h.id, b.dataset.opcion); });
               window.HitosPanel.programarRepintado();
             } catch (e) { U.aviso('No he podido guardarlo: ' + e.message, 'malo'); }
           };
@@ -129,8 +129,9 @@ var HitosPanelLista = (function () {
     if (casillaEl) {
       casillaEl.onclick = function (ev) { ev.stopPropagation(); };
       casillaEl.onchange = async function () {
+        var nuevoEstado = casillaEl.checked ? 'hecho' : 'pendiente';
         try {
-          await Hitos.marcar(a.nombre, h.id, casillaEl.checked ? 'hecho' : 'pendiente');
+          await U.mientrasGuarda(casillaEl, function () { return Hitos.marcar(a.nombre, h.id, nuevoEstado); });
           window.HitosPanel.programarRepintado();
         } catch (e) { U.aviso('No he podido guardarlo: ' + e.message, 'malo'); }
       };
@@ -192,12 +193,12 @@ var HitosPanelLista = (function () {
     if (!abierto) return;
     var resp = div.querySelector('.hito-campo-responsable');
     if (resp) resp.onchange = async function () {
-      await Hitos.guardarCampos(a.nombre, h.id, { responsable: resp.value });
+      await U.mientrasGuarda(resp, function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: resp.value }); });
       window.HitosPanel.programarRepintado();
     };
     var fecha = div.querySelector('.hito-campo-fecha');
     if (fecha) fecha.onchange = async function () {
-      await Hitos.guardarCampos(a.nombre, h.id, { fecha: fecha.value });
+      await U.mientrasGuarda(fecha, function () { return Hitos.guardarCampos(a.nombre, h.id, { fecha: fecha.value }); });
       window.HitosPanel.programarRepintado();
     };
     var notaBtn = div.querySelector('.hito-nota-anadir');
@@ -205,12 +206,12 @@ var HitosPanelLista = (function () {
       var ta = div.querySelector('.hito-nota-texto');
       var texto = (ta.value || '').trim();
       if (!texto) return;
-      await Hitos.anadirNota(a.nombre, h.id, texto);
+      await U.mientrasGuarda(notaBtn, function () { return Hitos.anadirNota(a.nombre, h.id, texto); });
       window.HitosPanel.programarRepintado();
     };
     Array.prototype.forEach.call(div.querySelectorAll('.hito-doc-quitar'), function (b) {
       b.onclick = async function () {
-        await Hitos.quitarDocumento(a.nombre, h.id, b.dataset.doc);
+        await U.mientrasGuarda(b, function () { return Hitos.quitarDocumento(a.nombre, h.id, b.dataset.doc); });
         window.HitosPanel.programarRepintado();
       };
     });
@@ -218,7 +219,7 @@ var HitosPanelLista = (function () {
     if (quitar) quitar.onclick = async function () {
       var ok = await U.preguntar('Quitar este hito', '<p><strong>' + U.escapar(h.titulo) + '</strong></p>', 'Quitar');
       if (!ok) return;
-      await Hitos.quitarHito(a.nombre, h.id);
+      await U.mientrasGuarda(quitar, function () { return Hitos.quitarHito(a.nombre, h.id); });
       window.HitosPanel.programarRepintado();
     };
     var cambiarRamaBtn = div.querySelector('.hito-cambiar-rama');
@@ -257,7 +258,7 @@ var HitosPanelLista = (function () {
           if (!ok) return;
         }
         try {
-          await Hitos.cambiarRama(a.nombre, h.id, b.dataset.opcion);
+          await U.mientrasGuarda(b, function () { return Hitos.cambiarRama(a.nombre, h.id, b.dataset.opcion); });
           window.HitosPanel.programarRepintado();
         } catch (e) { U.aviso('No he podido cambiar de rama: ' + e.message, 'malo'); }
       };

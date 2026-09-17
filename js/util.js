@@ -253,12 +253,35 @@ var U = (function () {
       .replace(/"/g, '&quot;');
   }
 
+  /* Deja un control (botón o desplegable) apagado mientras 'hacer' hace
+     su trabajo, y lo devuelve a como estaba al terminar, tanto si sale
+     bien como si falla. En un botón, además, el texto pasa a
+     "Guardando…" mientras tanto: así se ve que la aplicación está
+     haciendo algo y no se puede pulsar dos veces mientras se guarda
+     (17-sep-2026, fila 23 de la cola). 'hacer' puede devolver una
+     promesa o no devolver nada; el resultado se pasa tal cual. */
+  function mientrasGuarda(el, hacer) {
+    if (!el) return hacer();
+    var esBoton = el.tagName === 'BUTTON';
+    var textoDeAntes = esBoton ? el.textContent : null;
+    el.disabled = true;
+    if (esBoton) el.textContent = 'Guardando…';
+    function devolver() {
+      el.disabled = false;
+      if (esBoton) el.textContent = textoDeAntes;
+    }
+    return Promise.resolve().then(hacer).then(
+      function (v) { devolver(); return v; },
+      function (e) { devolver(); throw e; }
+    );
+  }
+
   return {
     normalizar: normalizar, limpiarNombre: limpiarNombre, hoyIso: hoyIso,
     aAaMmDd: aAaMmDd, fechaLegible: fechaLegible, cursoActual: cursoActual,
     cursoDeFecha: cursoDeFecha, cursoDeAno: cursoDeAno, edadDesde: edadDesde,
     aFecha: aFecha, yaPaso: yaPaso,
     ahora: ahora, aviso: aviso, preguntar: preguntar, escapar: escapar,
-    parecidos: parecidos, dejaCrear: dejaCrear
+    parecidos: parecidos, dejaCrear: dejaCrear, mientrasGuarda: mientrasGuarda
   };
 })();

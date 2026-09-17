@@ -245,20 +245,26 @@
                  '>' + U.escapar(e) + '</option>';
         }).join('');
       sel.onchange = async function () {
-        await App.ponerEstado(a, sel.value);
+        await U.mientrasGuarda(sel, function () { return App.ponerEstado(a, sel.value); });
         pintar();
       };
       caja.appendChild(sel);
 
       var v = Nombres.via(a.ficha.via);
       var bvia = boton('', App.textoVia(a.ficha) || 'Por dónde prefiere que le hablemos',
-        async function () { await App.editarVia(a); pintar(); }, !!a.ficha.via);
+        async function (ev) {
+          await U.mientrasGuarda(ev.currentTarget, function () { return App.editarVia(a); });
+          pintar();
+        }, !!a.ficha.via);
       bvia.innerHTML = dibujoVia(a.ficha.via) + '<span>' + U.escapar(v ? v.corto : 'Vía') + '</span>';
       bvia.classList.add('boton-con-dibujo');
       caja.appendChild(bvia);
 
       caja.appendChild(boton(p ? 'Plazo ✓' : 'Plazo', 'Poner o cambiar la fecha límite',
-        async function () { await App.editarPlazo(a); pintar(); }, !!p));
+        async function (ev) {
+          await U.mientrasGuarda(ev.currentTarget, function () { return App.editarPlazo(a); });
+          pintar();
+        }, !!p));
 
       caja.appendChild(boton('Editar', 'Cambiar la fecha, el tipo, la descripción o el tercero',
         async function () { await App.editarAsunto(a); volverALaLista(); }));
@@ -274,8 +280,10 @@
       async function () { await App.verDocumentos(a); pintarDocumentos(a); }));
 
     var cerrar = boton(abierto ? 'Archivar el asunto' : 'Reabrir el asunto',
-      abierto ? 'Llevar la carpeta al ARCHIVO' : '', async function () {
-      if (abierto) await App.cerrarAsunto(a); else await App.reabrirAsunto(a);
+      abierto ? 'Llevar la carpeta al ARCHIVO' : '', async function (ev) {
+      await U.mientrasGuarda(ev.currentTarget, function () {
+        return abierto ? App.cerrarAsunto(a) : App.reabrirAsunto(a);
+      });
       volverALaLista();
     });
     cerrar.classList.add('boton-principal');

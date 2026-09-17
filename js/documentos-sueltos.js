@@ -10,7 +10,24 @@
    alguno, y el archivado y la reapertura de asuntos.
    ============================================================ */
 
+/* El marcador con el que se abre un suelto en el visor (17-sep-2026,
+   fila 25): así se sabe, sin ambigüedad, cuál de la lista es. */
+function marcadorDeSuelto(nombre) { return 'suelto:' + nombre; }
+
+/* Si el documento que se está viendo ha dejado de estar en "Por
+   clasificar" (se ha creado un asunto con él, se ha metido en uno que
+   ya existía, o se ha borrado), el visor se cierra solo: no tiene
+   sentido seguir viendo ni sus botones ni su documento. */
+function cerrarVisorSiYaNoEsSuelto() {
+  if (!window.Visor) return;
+  var m = Visor.marcadorAbierto();
+  if (!m || m.indexOf('suelto:') !== 0) return;
+  var nombre = m.slice('suelto:'.length);
+  if (!App.E.sueltos.some(function (s) { return s.nombre === nombre; })) Visor.cerrar();
+}
+
 App.pintarSueltos = async function () {
+  cerrarVisorSiYaNoEsSuelto();
   var q = U.normalizar($('buscar-abiertos').value);
   var lista = App.E.sueltos.filter(function (s) {
     return !q || U.normalizar(s.nombre).indexOf(q) !== -1;
@@ -57,7 +74,10 @@ App.pintarSueltos = async function () {
 
 App.tarjetaSuelto = function (s, pie, esNuevo) {
   var div = document.createElement('div');
-  div.className = 'tarjeta tarjeta-suelto' + (esNuevo ? ' tarjeta-nueva' : '');
+  var abierta = window.Visor && Visor.marcadorAbierto() === marcadorDeSuelto(s.nombre);
+  div.className = 'tarjeta tarjeta-suelto' + (esNuevo ? ' tarjeta-nueva' : '') +
+                   (abierta ? ' tarjeta-abierta' : '');
+  div.dataset.suelto = s.nombre;
   var ext = Nombres.extensionDe(s.nombre);
   div.innerHTML = App.ICONO_DOCUMENTO +
     '<div class="tarjeta-texto">' +
@@ -406,3 +426,50 @@ App.reabrirAsunto = async function (a) {
     U.aviso('No se ha podido reabrir: ' + e.message, 'malo');
   }
 };
+
+/* ---------- las acciones, también dentro del panel del visor ----------
+
+   (17-sep-2026, fila 25). Mismos botones que la tarjeta, tal cual: se
+   construye la tarjeta entera (que ya trae "Borrar", puesto por
+   js/papelera.js envolviendo App.tarjetaSuelto) y se saca su bloque de
+   acciones, quitando "Abrir" porque ahí ya se está viendo. Así no hay
+   una segunda copia de la lógica de los botones. */
+App.accionesDeSuelto = function (s) {
+  var tarjeta = App.tarjetaSuelto(s, '', false);
+  var acciones = tarjeta.querySelector('.acciones');
+  if (!acciones) return null;
+  var abrir = Array.prototype.filter.call(acciones.children, function (b) {
+    return (b.textContent || '').trim() === 'Abrir';
+  })[0];
+  if (abrir) acciones.removeChild(abrir);
+  return acciones;
+};
+
+/* ---------- marcar en la lista el documento que se está viendo ----------
+
+   (17-sep-2026, fila 25). js/visor.js no sabe nada de esta lista: solo
+   avisa de qué marcador está abierto (o ninguno) cada vez que cambia.
+   Aquí se traduce eso a la tarjeta de verdad. */
+(function () {
+  function marcar(marcador) {
+    var caja = $('lista-sueltos');
+    if (!caja) return;
+    Array.prototype.forEach.call(caja.querySelectorAll('.tarjeta-abierta'), function (el) {
+      el.classList.remove('tarjeta-abierta');
+    });
+    if (!marcador || marcador.indexOf('suelto:') !== 0) return;
+    var nombre = marcador.slice('suelto:'.length);
+    var fila = Array.prototype.filter.call(caja.querySelectorAll('.tarjeta-suelto'), function (el) {
+      return el.dataset.suelto === nombre;
+    })[0];
+    if (!fila) return;
+    fila.classList.add('tarjeta-abierta');
+    fila.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  function enganchar() {
+    if (!window.Visor) return;
+    Visor.alCambiar(marcar);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enganchar);
+  else enganchar();
+})();

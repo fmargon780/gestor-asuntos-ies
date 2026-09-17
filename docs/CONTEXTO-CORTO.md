@@ -71,8 +71,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   eliges a mano con "Elegir asunto". El hilo queda enganchado al asunto (`hilos` en
   `asuntos.json`) y sus respuestas vuelven solas a la bandeja.
 - "Por clasificar": cada documento suelto se abre, se borra, crea un asunto nuevo, o entra en un
-  asunto que ya existe con "Meter en un asunto". El cuadro de elegir asunto es el mismo de la
-  bandeja de correos (`js/elegir-asunto.js`).
+  asunto que ya existe con "Meter en un asunto" (mismo cuadro que la bandeja de correos,
+  `js/elegir-asunto.js`). El que se está viendo queda marcado en la lista, con sus mismas
+  acciones también dentro del panel del visor.
 - DNI del alumnado a la vista, con aviso si falta y ya tocaría tenerlo.
 - Registrar un documento en un paso, leyendo el sello de Séneca del PDF.
 - Terceros relacionados con un asunto, con nota (no copia) al archivar.
@@ -107,6 +108,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ojo con `p.campos`: solo trae columnas con datos; para saber si una columna existe, mirar la
   cabecera del CSV.
 - Ojo con el orden de los `<script>` de `index.html`: importa para las envolturas.
+- Una acción que guarda y repinta: `await` hasta el final y usar `U.mientrasGuarda(control, fn)`
+  para apagar el botón o desplegable ("Guardando…") mientras tanto (fila 23, 17-sep-2026).
 - Al terminar una instrucción de la cola: actualizar este documento y `CONTEXTO.md`
   sustituyendo la línea vieja, y anotar en `HISTORIA.md` lo que merezca recordarse.
 

@@ -556,7 +556,9 @@ App.tarjetaAsunto = function (a, modo) {
         return '<option value="' + U.escapar(e) + '"' + (e === situacion ? ' selected' : '') +
                '>' + U.escapar(e) + '</option>';
       }).join('');
-    sel.onchange = function () { App.ponerEstado(a, sel.value); };
+    sel.onchange = async function () {
+      await U.mientrasGuarda(sel, function () { return App.ponerEstado(a, sel.value); });
+    };
     acciones.appendChild(sel);
 
     var bvia = document.createElement('button');
@@ -603,8 +605,10 @@ App.tarjetaAsunto = function (a, modo) {
   var principal = document.createElement('button');
   principal.className = 'boton boton-principal';
   principal.textContent = modo === 'abierto' ? 'Cerrar' : 'Reabrir';
-  principal.onclick = function () {
-    if (modo === 'abierto') App.cerrarAsunto(a); else App.reabrirAsunto(a);
+  principal.onclick = async function () {
+    await U.mientrasGuarda(principal, function () {
+      return modo === 'abierto' ? App.cerrarAsunto(a) : App.reabrirAsunto(a);
+    });
   };
   acciones.appendChild(principal);
 
