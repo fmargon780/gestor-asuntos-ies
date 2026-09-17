@@ -656,3 +656,95 @@ Ficheros nuevos: `js/que-me-toca.js`, `css/que-me-toca.css`, `pruebas/que-me-toc
 ## 16-sep-2026 — Los hitos de un asunto
 
 Fila 15 de la cola (`docs/HITOS.md`).
+
+Hasta hoy la guía de un tipo era texto que se leía y se marcaba con una casilla, igual para
+todos los asuntos de ese tipo. Desde hoy, dentro de un asunto abierto, esos mismos pasos se
+convierten en **hitos**: además de marcados o no, llevan estado (pendiente · en curso · hecho ·
+no aplica), fecha límite, responsable, notas y documentos apuntados.
+
+**Fichero nuevo, `_GESTOR/hitos.json`**, el duodécimo compartido: pasan de once a doce
+(`js/copias.js`, `js/conflictos.js`). No va en `asuntos.json` porque ese fichero se lee en toda
+pantalla y se escribe entero cada vez; `hitos.json` solo se lee al abrir un asunto, al archivarlo
+y (en la fila 16) en "Qué me toca".
+
+**De dónde salen.** Un asunto nuevo copia los pasos de la guía de su tipo al crearse (se envolvió
+`App.anotar`, mirando el `abiertoEl` que solo pone la creación, en vez de tocar
+`js/asuntos-nuevo.js` y `js/recurrentes.js`). Uno viejo no los recibe solo: sale el botón "Crear
+los hitos de la guía", que además importa `pasosHechos`/`pasosElegidos` (se quedan en
+`asuntos.json`, por si hay que volver atrás). El id del hito es el mismo que el del paso de la
+guía: así un plazo "desde tal paso" o un `pasosElegidos` viejo se traducen solos.
+
+**Bifurcaciones.** Un paso-pregunta se convierte en un hito de clase `decision`: mientras no se
+elige una opción, la lista se corta ahí (`Hitos.visibles`); al elegir, los hitos de la rama
+cuentan como si vinieran debajo. Cambiar de rama quita los hitos vacíos de la vieja y marca
+`noaplica` (plegados al final, `Hitos.huerfanos`) los que ya tenían notas o documentos.
+
+**Responsable, plazo y estado.** El cuadro de escribir la guía (`Guias.editar`) gana tres campos
+opcionales y plegados por paso: responsable por defecto (personas de Ajustes + los papeles fijos
+`tercero`/`tutor`/`relacionado`, que se resuelven solos con datos del asunto), estado del asunto
+(de `estados.json`) y plazo (días y desde qué paso). Los días se cuentan hábiles, descontando los
+no lectivos de Ajustes › Hitos (`Plazos.sumarDiasHabiles`, nombre propio para que lo reutilice la
+fila 16). El estado del asunto lo decide una sola función, `Hitos.estadoDelAsunto`, para poder
+cambiar el criterio sin tocar diez sitios si algún día el estado del asunto lo sustituye el
+propio hito en curso.
+
+**Al archivar**, los hitos salen de `hitos.json` y se escriben, ya dentro del ARCHIVO, como
+`HISTORIAL DE TRAMITACION.txt`: legible sin la aplicación, sin copiar ningún documento (mismo
+criterio que `DONDE ESTA ESTE ASUNTO.txt` de los relacionados). Al reabrir, si el fichero sigue
+ahí, los hitos vuelven a `hitos.json` y el fichero se borra.
+
+**En la ficha del asunto**, los hitos sustituyen a la lista de pasos, en el mismo sitio de
+siempre, envolviendo lo que pinta la guía sin tocar `js/ficha-asunto.js`: `pintarGuia` es una
+función privada de ese fichero, así que en vez de envolver una función de `App` se usó un
+`MutationObserver` sobre `#ficha-guia`, como ya sugería `docs/CONTEXTO.md` para un panel que se
+repinta entero.
+
+**Ficheros nuevos**: `js/hitos.js` y `js/hitos-archivo.js` (el modelo, partido en dos por las
+400 líneas), `js/hitos-panel.js` y `js/hitos-panel-lista.js` (la ficha, también partido en dos:
+el repintado en uno, la fila de cada hito en el otro, hablándose por `window.HitosPanel`),
+`js/hitos-ajustes.js` (el bloque "Hitos" de Ajustes: responsables y días no lectivos),
+`css/hitos.css` y `pruebas/hitos.mjs`.
+
+Al probar de verdad en un navegador (esta sesión sí tenía Chromium a mano, cosa que el trabajo
+inicial no pudo comprobar) salieron tres fallos reales, ya arreglados: `pasosDe(tipo)` de
+`js/guias-enganche.js` solo lee `guias.json` una vez, al entrar, así que la guía de prueba había
+que escribirla en el disco de mentira ANTES del primer "Entrar", no después; `App.verAbiertos`
+(el botón Actualizar) no relee `asuntos.json`, así que escribir a mano la ficha de un asunto
+viejo necesitaba también `App.cargarRegistro()`; y el `MutationObserver` de `js/hitos-panel.js`
+se disparaba con su propio repintado (mutaba el mismo `#ficha-guia` que vigilaba), lo que lo
+metía en un bucle sin fin en cuanto había que interactuar con un hito desplegado — se arregló
+desconectándolo mientras se repinta y reconectándolo al terminar.
+
+## 16-sep-2026 — Un documento suelto puede entrar en un asunto que ya existe
+
+Fila 12 de la cola (`docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md`). Versión publicada
+`16-sep-2026 · 21:40`.
+
+"Por clasificar" tenía el mismo agujero que tenía la bandeja de correos antes de la fila 11: el
+único destino posible de un documento suelto era **un asunto nuevo**. Si el papel era de una
+gestión que ya existía, no había por dónde meterlo desde la aplicación; había que ir al
+explorador de archivos y arrastrarlo a mano.
+
+**"Meter en un asunto".** Botón nuevo en cada tarjeta de "Por clasificar", entre "Crear asunto
+con él" y "Borrar". Abre el cuadro de elegir asunto, y al elegir uno el fichero se lleva a su
+carpeta y se abre el cuadro de ponerle nombre: exactamente el camino de "Crear asunto con él",
+pero sin crear nada.
+
+**Un solo elegidor para los dos.** La fila 11 había dejado el cuadro de escoger asunto dentro de
+`js/bandeja-enlace.js`. Copiarlo habría sido tener dos buscadores y dos listas que mantener, así
+que se sacó a **`js/elegir-asunto.js`** y ahora lo usan los dos. Lo que sí es distinto en cada
+uno es la puntuación de "Podrían encajar", y por eso no se compartió: de un correo se sabe el
+remitente, el asunto y el texto; de un documento suelto solo se sabe el nombre del fichero. El
+cuadro recibe la lista de sugeridos ya puntuada, y el resto —lista completa, buscador, orden,
+filas, "está archivado"— es común. También son comunes las piezas que sí valían para los dos:
+los trozos del nombre del tercero, si el asunto se movió este mes, y el corte de 40 puntos.
+
+**Lo que no se pierde.** El traslado va por `Carpetas.moverFichero`, que copia, comprueba que la
+copia pesa lo mismo y solo entonces borra: en las carpetas de Dropbox el `move()` del navegador
+existe pero lo rechaza. Si ya hay un fichero con ese nombre en el destino no se pisa; si la ruta
+se pasa de 180 caracteres se avisa y se deja decidir; y si el traslado falla, el documento se
+queda en "Por clasificar" y se dice con una línea. Si el asunto elegido está archivado, se puede
+reabrir o meter el papel dentro del ARCHIVO sin tocar su estado.
+
+Se comprueba con `pruebas/documentos-sueltos.mjs` (15 comprobaciones). Se descartó, como ya
+estaba descartado, abrir la carpeta del asunto en el explorador del ordenador.
