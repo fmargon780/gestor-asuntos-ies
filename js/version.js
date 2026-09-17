@@ -13,4 +13,4 @@
    los ficheros más grandes, y cada subida es una publicación de Vercel
    que hace cola con las demás.
    ============================================================ */
-App.VERSION = '17-sep-2026 · 04:23';
+App.VERSION = '17-sep-2026 · 04:45';

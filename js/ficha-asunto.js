@@ -20,6 +20,13 @@
   var actual = null;      /* el asunto que se está viendo */
   var modoActual = 'abierto';
 
+  /* Si el compañero ya está dentro de este asunto (17-sep-2026, fila
+     24): { usuario } mientras se está en modo consulta, o null si el
+     asunto está libre o el mando es de uno mismo. La vigilancia de
+     verdad —cuándo cambia, cada cuánto se relee— vive en
+     js/presencia.js; aquí solo se pinta lo que toca. */
+  var ocupacionActual = null;
+
   function $(id) { return document.getElementById(id); }
 
   /* La pantalla nueva entra en la lista de pantallas, para que al
@@ -33,12 +40,25 @@
   App.abrirFicha = function (a, modo) {
     actual = a;
     modoActual = modo || 'abierto';
+    ocupacionActual = null;
     App.ir('asunto');
     pintar();
+
+    /* Solo se vigila la presencia en un asunto abierto: en el ARCHIVO
+       no hay nada que tramitar, así que nadie puede "pisarse". */
+    if (!window.Presencia) return;
+    if (modoActual !== 'abierto') { Presencia.dejarDeVigilar(); return; }
+    Presencia.vigilar(a.nombre, function (cambio) {
+      if (actual !== a) return;   /* se ha cambiado de ficha mientras tanto */
+      ocupacionActual = cambio.modo === 'consulta' ? { usuario: cambio.usuario } : null;
+      pintarPresencia();
+      aplicarModoConsulta();
+    });
   };
 
   function volverALaLista() {
     actual = null;
+    if (window.Presencia) Presencia.dejarDeVigilar();
     App.ir(modoActual === 'archivado' ? 'archivo' : 'abiertos');
   }
 
@@ -133,6 +153,7 @@
         '</div>' +
         '<h2 class="ficha-nombre">' + U.escapar(a.nombre) + '</h2>' +
       '</header>' +
+      '<div id="ficha-presencia"></div>' +
       '<div id="ficha-aviso-tipo"></div>' +
       '<div class="ficha-acciones" id="ficha-acciones"></div>' +
       '<div class="ficha-columnas">' +
@@ -163,6 +184,95 @@
     pintarDocumentos(a);
     pintarOtrosDelTercero(a);
     pintarRelacionados(a, abierto);
+    pintarPresencia();
+    asegurarObservadorConsulta();
+    aplicarModoConsulta();
+  }
+
+  /* ---------- no pisarse en un mismo asunto (17-sep-2026, fila 24) ----------
+
+     El aviso, arriba del todo, y el botón de tomar el mando. Apagar
+     los controles que modifican es cosa de aplicarModoConsulta, un
+     poco más abajo: entre los dos no hace falta tocar nada de lo que
+     ya pinta cada bloque (guía, hitos, notas, correo, plantillas...). */
+
+  function pintarPresencia() {
+    var caja = $('ficha-presencia');
+    if (!caja) return;
+    if (!ocupacionActual) { caja.className = 'oculto'; caja.innerHTML = ''; return; }
+
+    caja.className = 'aviso aviso-ambar aviso-presencia';
+    var texto = document.createElement('div');
+    texto.innerHTML = '<strong>' + U.escapar(ocupacionActual.usuario) + ' está en este asunto ahora ' +
+      'mismo.</strong> Estás mirando, no puedes modificar.';
+    caja.appendChild(texto);
+
+    var tomar = document.createElement('button');
+    tomar.type = 'button';
+    tomar.className = 'boton boton-presencia-tomar';
+    tomar.textContent = 'Tomar el mando';
+    tomar.onclick = async function () {
+      var ok = await U.preguntar('Tomar el mando',
+        '<p>¿Seguro? ' + U.escapar(ocupacionActual.usuario) + ' podría estar escribiendo ahora ' +
+        'mismo.</p>', 'Tomar el mando');
+      if (!ok || !actual) return;
+      await Presencia.tomarElMando(actual.nombre);
+      ocupacionActual = null;
+      pintar();
+    };
+    caja.appendChild(tomar);
+  }
+
+  /* Apaga (o enciende) todo lo que modifica dentro de la ficha, sin
+     que este fichero, ni ningún otro, tenga que marcar uno a uno sus
+     propios botones: se recorre lo que haya pintado dentro de
+     #ficha-asunto-cuerpo ahora mismo, sea de quien sea. Lo que solo
+     lee (abrir un documento, volver, copiar un nombre, desplegar un
+     hito, tomar el mando) se queda siempre encendido. */
+  function esControlDeSoloLectura(el) {
+    if (el.id === 'ficha-volver') return true;
+    if (el.classList.contains('ficha-documento')) return true;
+    if (el.classList.contains('hito-desplegar')) return true;
+    if (el.classList.contains('boton-presencia-tomar')) return true;
+    var texto = (el.textContent || '').trim();
+    return texto === 'Copiar' || texto === 'Copiar nombre';
+  }
+
+  function aplicarModoConsulta() {
+    var raiz = $('ficha-asunto-cuerpo');
+    if (!raiz) return;
+    var enConsulta = !!ocupacionActual;
+    raiz.classList.toggle('ficha-consulta', enConsulta);
+    Array.prototype.forEach.call(raiz.querySelectorAll('button, select, input, textarea'), function (el) {
+      el.disabled = enConsulta && !esControlDeSoloLectura(el);
+    });
+  }
+
+  /* La mitad de la ficha se pinta sola, después de este `pintar()`:
+     la guía, los documentos, los relacionados son async, y los hitos
+     (js/hitos-panel.js), "Generar documento" y "Correo" se cuelgan por
+     su cuenta, con su propio MutationObserver o con un pequeño
+     retraso. Aplicar el modo consulta una sola vez, al final de
+     `pintar()`, se comería todo lo que sale después. Un observador
+     sobre el propio #ficha-asunto-cuerpo (el mismo patrón que
+     js/hitos-panel.js, con el mismo aviso de docs/CONTEXTO.md sobre
+     los MutationObserver) lo vuelve a aplicar cada vez que aparece
+     algo nuevo. Solo se observa una vez: el contenedor no se destruye
+     entre una ficha y otra, solo su contenido. */
+  var observadorConsulta = null;
+  var pendienteConsulta = null;
+
+  function programarModoConsulta() {
+    if (pendienteConsulta) clearTimeout(pendienteConsulta);
+    pendienteConsulta = setTimeout(function () { pendienteConsulta = null; aplicarModoConsulta(); }, 30);
+  }
+
+  function asegurarObservadorConsulta() {
+    if (observadorConsulta) return;
+    var raiz = $('ficha-asunto-cuerpo');
+    if (!raiz) return;
+    observadorConsulta = new MutationObserver(programarModoConsulta);
+    observadorConsulta.observe(raiz, { childList: true, subtree: true });
   }
 
   /* Los relacionados se pintan y se guardan enteramente en

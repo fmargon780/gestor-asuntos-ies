@@ -5,6 +5,43 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — No pisarse en un mismo asunto
+
+Fila 24 de la cola (`docs/COLA.md`, `docs/NO-PISARSE-EN-UN-ASUNTO.md`): la aplicación la usan
+Francisco y su compañero sobre la misma carpeta de Dropbox, y hasta hoy nada avisaba de que los
+dos estuvieran tocando el mismo asunto a la vez.
+
+- Módulo nuevo `js/presencia.js` (`window.Presencia`), fichero nuevo `_GESTOR/presencia.json`
+  (`{ <clave>: { usuario, ultima } }`). **A propósito fuera de los doce ficheros protegidos**: se
+  escribe cada 30 segundos y caduca sola a los 3 minutos, así que no necesita copia de seguridad,
+  papelera ni fusión de conflictos; se lee y escribe directo con `Carpetas`, nunca con
+  `Copias.guardar`. `js/copias.js`, `js/papelera.js` y `js/conflictos.js` no se han tocado: los
+  tres trabajan con listas propias de ficheros, y esta nunca entra en ninguna.
+- Al abrir la ficha de un asunto libre, se anuncia la propia señal y se renueva sola; al cerrarla,
+  se quita. Si ya está ocupado por otro, se entra en modo consulta: aviso arriba
+  ("Fulano está en este asunto ahora mismo. Estás mirando, no puedes modificar.") y botón "Tomar
+  el mando", con confirmación.
+- **Apagar los controles que modifican no ha tocado ningún otro módulo**: `js/ficha-asunto.js`
+  recorre `#ficha-asunto-cuerpo` entero y apaga todo (`button, select, input, textarea`) salvo una
+  lista blanca de solo lectura (volver, abrir un documento, copiar un nombre, desplegar un hito,
+  tomar el mando). Como media ficha se pinta sola después de `pintar()` (guía, documentos, hitos,
+  "Generar documento", "Correo"...), hace falta un `MutationObserver` propio sobre
+  `#ficha-asunto-cuerpo` que lo vuelva a aplicar cada vez que aparece algo nuevo, con el mismo
+  patrón (y el mismo aviso sobre estos observadores) que ya usa `js/hitos-panel.js`.
+- La marca en la tarjeta de "Asuntos abiertos" (una letra, el nombre completo en el `title`) la
+  cuelga `js/presencia.js` envolviendo `App.tarjetaAsunto`, sin tocar `js/asuntos-lista.js`. Una
+  copia en memoria de `presencia.json` se refresca sola cada 10 segundos, enganchada a
+  `App.vigilarLaCarpeta` (ya arranca sola al entrar, así que tampoco ha hecho falta tocar
+  `js/nucleo.js`).
+- Descartado, por ahora (lo pidió Francisco expresamente): una base de datos pequeña en internet
+  para que el aviso fuera instantáneo. Si se hace algún día, solo viajarían el identificador del
+  asunto y el nombre de quien lo abre, nunca datos de alumnado o personal, con servidor en la UE.
+- Prueba nueva `pruebas/presencia.mjs`: la "otra persona" se simula escribiendo directamente en
+  el disco de mentira (mismo truco que `pruebas/conflictos.mjs`), sin dos pestañas ni dos
+  navegadores. Cubre: señal propia al abrir y quitada al cerrar, modo consulta con otro dentro,
+  tomar el mando, señal caducada que no cuenta, la marca en la lista, y que el fichero queda
+  fuera de copias y papelera.
+
 ## 17-sep-2026 — "Por clasificar": el documento a la vista, marcado en la lista
 
 Fila 25 de la cola (`docs/COLA.md`, `docs/POR-CLASIFICAR-DOCUMENTO-A-LA-VISTA.md`): Francisco
