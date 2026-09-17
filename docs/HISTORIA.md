@@ -215,7 +215,7 @@ comunes. Como la aplicación reconocía un correo por el identificador de hilo d
 cada buzón—, un correo dirigido a los dos aparecía como dos correos sin relación: si uno lo
 guardaba, al otro le seguía saliendo como nuevo.
 
-- **La matrícula**: el `Message-ID` de la cabecera de un mensaje, el mismo en todos los buzones
+- **La matrícula**: el `Message-ID` de la cabecera de cada mensaje, el mismo en todos los buzones
   por los que pasa. El recolector ya lo leía para el enlace (`enlaceAlHilo`), pero no lo guardaba.
   Ahora sí: `matricula(mensaje)` nueva en `apps-script/gestor-correos.gs`, y `guardarHilo` apunta
   `matriculas` (todas las del hilo) y `matricula` (la del último mensaje) en la ficha.
@@ -287,7 +287,7 @@ dos estuvieran tocando el mismo asunto a la vez.
 ## 17-sep-2026 — "Por clasificar": el documento a la vista, marcado en la lista
 
 Fila 25 de la cola (`docs/COLA.md`, `docs/POR-CLASIFICAR-DOCUMENTO-A-LA-VISTA.md`): Francisco
-pedía saber, de un vistazo, cuál de la lista de la izquierda es el documento que se está viendo a
+pedia saber, de un vistazo, cuál de la lista de la izquierda es el documento que se está viendo a
 la derecha, sin tener que adivinarlo por el nombre.
 
 - `js/visor.js` gana un `marcador` opcional (un texto libre que pone quien abre el documento) y
@@ -655,3 +655,7 @@ nuevo debajo, así que dentro de este bloque va de lo más viejo a lo más nuevo
 resumida y sin fechas de todo esto vive ahora en `docs/CONTEXTO.md`; lo que sigue siendo cierto
 hoy, en `docs/CONTEXTO-CORTO.md`.
 
+**Este bloque continúa, sin cortar ni resumir nada, en `docs/HISTORIA-PARTE2.md`** (el propio
+bloque de cita y, después, las "Notas largas de `COLA.md` antes de la poda"): se separó a un
+fichero aparte el 17-sep-2026 (fila 26) solo por el tamaño del commit, sin tocar ni una palabra
+del contenido heredado.
