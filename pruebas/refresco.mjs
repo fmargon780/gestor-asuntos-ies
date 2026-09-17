@@ -73,10 +73,21 @@ console.log('--- 1) cambiar el estado de un asunto ---');
 await pagina.click('#lista-abiertos .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 const selEstado = pagina.locator('#ficha-acciones select.campo-estado');
-await selEstado.selectOption({ label: 'En el departamento' });
-/* Justo al elegir, mientras se guarda, el desplegable se apaga: así se
-   ve que la aplicación está haciendo algo. */
-await comprobar('el desplegable se apaga mientras guarda', selEstado.isDisabled(), true);
+/* El cambio y la comprobación de que el desplegable se apaga van en el
+   mismo 'evaluate': entre elegir la opción y mirar 'disabled' no puede
+   colarse ninguna otra vuelta al bucle de eventos, así que da igual lo
+   rápido que guarde el disco de mentira o lo que tarde el viaje de ida
+   y vuelta de Playwright. */
+const seApagaAlElegir = await pagina.evaluate(() => {
+  var sel = document.querySelector('#ficha-acciones select.campo-estado');
+  var opcion = Array.prototype.filter.call(sel.options, function (o) {
+    return o.textContent === 'En el departamento';
+  })[0];
+  sel.value = opcion.value;
+  sel.dispatchEvent(new Event('change', { bubbles: true }));
+  return sel.disabled;
+});
+await comprobar('el desplegable se apaga mientras guarda', seApagaAlElegir, true);
 await pagina.waitForTimeout(300);
 await comprobar('la ficha ya enseña el estado nuevo, sin recargar',
   pagina.locator('.ficha-marcas .marca-estado').textContent(), 'En el departamento');
@@ -92,8 +103,15 @@ await pagina.waitForSelector('.hito');
 await comprobar('empieza en 0 de 2', pagina.locator('.hitos-cuenta').textContent()
   .then(t => t.indexOf('0 de 2') !== -1), true);
 const casilla = pagina.locator('.hito-casilla').first();
-await casilla.dispatchEvent('click');
-await comprobar('la casilla se apaga mientras guarda', casilla.isDisabled(), true);
+/* Mismo motivo que arriba: marcar y comprobar 'disabled' en el mismo
+   'evaluate', sin ninguna vuelta al bucle de eventos por en medio. */
+const seApagaAlMarcar = await pagina.evaluate(() => {
+  var c = document.querySelector('.hito-casilla');
+  c.checked = true;
+  c.dispatchEvent(new Event('change', { bubbles: true }));
+  return c.disabled;
+});
+await comprobar('la casilla se apaga mientras guarda', seApagaAlMarcar, true);
 await pagina.waitForTimeout(300);
 await comprobar('la cuenta sube a 1 de 2, sin recargar', pagina.locator('.hitos-cuenta').textContent()
   .then(t => t.indexOf('1 de 2') !== -1), true);
