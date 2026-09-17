@@ -105,7 +105,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   pdf-lib, `js/lib/pdf-lib.min.js`); miniaturas con pdf.js, tijeras entre páginas para Separar.
 - "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha (opcional), con el correo ya puesto al preparar el cuadro de Correo.
 - Archivar o reabrir cuando el destino ya existe (de un intento a medias) fusiona las dos carpetas, sin perder nada.
-- Guardar un documento en un asunto se queda en su ficha (y la refresca sola); solo Editar, Archivar/Reabrir y Borrar vuelven a la lista.
+- Guardar un documento en un asunto se queda en su ficha; solo Editar, Archivar/Reabrir y Borrar
+  vuelven a la lista. La ficha solo se repinta si algo suyo ha cambiado de verdad (fila 34).
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -121,27 +122,26 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ojo con el orden de los `<script>` de `index.html`: importa para las envolturas.
 - Una acción que guarda y repinta: `await` hasta el final y usar `U.mientrasGuarda(control, fn)`
   para apagar el botón o desplegable ("Guardando…") mientras tanto (fila 23, 17-sep-2026).
+- Un bloque que se repinta solo nunca puede tirar lo que se está escribiendo, ni el foco, ni el
+  cursor: envolver el repintado en `U.conservandoLoEscrito(raiz, fn)` (filas 33 y 34, 17-sep-2026).
 - Al terminar una instrucción de la cola: actualizar este documento y `CONTEXTO.md`
   sustituyendo la línea vieja, y anotar en `HISTORIA.md` lo que merezca recordarse.
 
 ## 7. Descartado, no proponer otra vez
 
 - Publicar con el conector de Vercel sobre un proyecto ya existente (da 403), o crear otro "por si acaso".
-- Abrir la carpeta del asunto en el explorador de archivos del ordenador.
-- Opciones dentro de opciones en la guía del procedimiento.
+- Abrir la carpeta del asunto en el explorador de archivos, u opciones dentro de opciones en la guía.
 - Una hoja de Google Sheets como interfaz.
 - Enlazar un correo de Gmail con `#all/<id de hilo>` (es con `#search/rfc822msgid:<id>`).
 - Meter Gmail dentro de la aplicación, en un marco (Google no lo permite).
-- Esconder el tablón de notas para dejar sitio.
-- Sacar el DNI de la columna del tutor.
+- Esconder el tablón de notas para dejar sitio, o sacar el DNI de la columna del tutor.
 - Poner el nombre comercial en el nombre de la carpeta de un asunto de empresa.
 - Reescribir la arquitectura de módulos y envolturas.
 - Meter los campos de cada tipo en el nombre de los documentos (son del asunto, no del papel).
 
 ## 8. Qué falta
 
-- Avisar al compañero de la dirección nueva y de que debe volver a señalar sus carpetas.
-- Coordinar con él la lista de tipos de asunto y la de estados.
+- Avisar al compañero de la dirección nueva (debe volver a señalar sus carpetas) y coordinar con él la lista de tipos de asunto y la de estados.
 - Poner en marcha el script de Gmail en `g.educaand.es` y señalar `GESTOR-BANDEJA` en Ajustes.
 - Ver si la bandeja de correo acierta con el tipo; si falla mucho, palabras clave por tipo.
 - Pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs`: sin eso no se siguen los hilos por matrícula, ni la copia oculta de un grupo.
