@@ -2,10 +2,9 @@
    ficha-asunto.js — la pantalla de un asunto.
 
    Al pulsar el nombre de un asunto se entra aquí. En una sola
-   pantalla está todo lo suyo: sus datos, el contacto del tercero, la
-   guía de su tipo con las casillas, sus notas, sus documentos y los
-   demás asuntos de ese mismo tercero. Y todos los botones de
-   siempre, sin volver a la lista.
+   pantalla está todo lo suyo: sus datos, el contacto del tercero, sus
+   hitos, sus notas, sus documentos y los demás asuntos de ese mismo
+   tercero. Y todos los botones de siempre, sin volver a la lista.
 
    Este fichero no guarda nada por su cuenta: para cambiar el estado,
    la vía, el plazo, el nombre o el archivado llama a lo que ya hace
@@ -14,6 +13,12 @@
    Como aquí dentro está todo, la tarjeta de la lista se queda con el
    desplegable del estado, "Copiar nombre" y "Archivar". Esa poda
    también se hace aquí, un poco más abajo.
+
+   El contacto del tercero y sus otros asuntos viven en
+   js/ficha-contacto.js (sacados de aquí el 17-sep-2026, fila 26, para
+   no dejar crecer más este fichero); los hitos —lo que hoy pinta
+   #ficha-guia— viven enteros en js/hitos-panel.js y
+   js/hitos-panel-lista.js: este fichero solo deja el hueco.
    ============================================================ */
 (function () {
 
@@ -159,7 +164,7 @@
       '<div class="ficha-acciones" id="ficha-acciones"></div>' +
       '<div class="ficha-columnas">' +
         '<div class="ficha-izquierda">' +
-          bloque('Guía del procedimiento', '<div id="ficha-guia" class="explica">Leyendo…</div>') +
+          bloque('Hitos', '<div id="ficha-guia" class="explica">Leyendo…</div>') +
           bloque('Notas', '<div id="ficha-notas"></div>') +
         '</div>' +
         '<div class="ficha-derecha">' +
@@ -180,10 +185,9 @@
     pintarAcciones(a, abierto, p);
     pintarNotas(a, abierto);
     pintarAvisoDeTipo(a, tipo);
-    pintarGuia(a, tipo, abierto);
-    pintarContacto(a);
+    if (window.FichaContacto) window.FichaContacto.pintarContacto(a);
     pintarDocumentos(a);
-    pintarOtrosDelTercero(a);
+    if (window.FichaContacto) window.FichaContacto.pintarOtros(a);
     pintarRelacionados(a, abierto);
     pintarPresencia();
     pintarSellos(a);
@@ -191,12 +195,17 @@
     aplicarModoConsulta();
   }
 
+  /* Los hitos —lo que sale dentro de #ficha-guia— se pintan solos,
+     desde js/hitos-panel.js: envuelve App.abrirFicha (arriba) y vigila
+     #ficha-asunto-cuerpo con su propio MutationObserver, así que este
+     fichero no tiene que llamar a nada más para que aparezcan. */
+
   /* ---------- no pisarse en un mismo asunto (17-sep-2026, fila 24) ----------
 
      El aviso, arriba del todo, y el botón de tomar el mando. Apagar
      los controles que modifican es cosa de aplicarModoConsulta, un
      poco más abajo: entre los dos no hace falta tocar nada de lo que
-     ya pinta cada bloque (guía, hitos, notas, correo, plantillas...). */
+     ya pinta cada bloque (hitos, notas, correo, plantillas...). */
 
   function pintarPresencia() {
     var caja = $('ficha-presencia');
@@ -331,16 +340,16 @@
   }
 
   /* La mitad de la ficha se pinta sola, después de este `pintar()`:
-     la guía, los documentos, los relacionados son async, y los hitos
-     (js/hitos-panel.js), "Generar documento" y "Correo" se cuelgan por
-     su cuenta, con su propio MutationObserver o con un pequeño
-     retraso. Aplicar el modo consulta una sola vez, al final de
-     `pintar()`, se comería todo lo que sale después. Un observador
-     sobre el propio #ficha-asunto-cuerpo (el mismo patrón que
-     js/hitos-panel.js, con el mismo aviso de docs/CONTEXTO.md sobre
-     los MutationObserver) lo vuelve a aplicar cada vez que aparece
-     algo nuevo. Solo se observa una vez: el contenedor no se destruye
-     entre una ficha y otra, solo su contenido. */
+     los hitos, los documentos, los relacionados son async, y "Generar
+     documento" y "Correo" se cuelgan por su cuenta, con su propio
+     MutationObserver o con un pequeño retraso. Aplicar el modo
+     consulta una sola vez, al final de `pintar()`, se comería todo lo
+     que sale después. Un observador sobre el propio
+     #ficha-asunto-cuerpo (el mismo patrón que js/hitos-panel.js, con
+     el mismo aviso de docs/CONTEXTO.md sobre los MutationObserver) lo
+     vuelve a aplicar cada vez que aparece algo nuevo. Solo se observa
+     una vez: el contenedor no se destruye entre una ficha y otra,
+     solo su contenido. */
   var observadorConsulta = null;
   var pendienteConsulta = null;
 
@@ -597,113 +606,6 @@
     }
   }
 
-  /* ---------- la guía, con sus casillas ---------- */
-
-  async function pintarGuia(a, tipo, abierto) {
-    var caja = $('ficha-guia');
-    if (!caja) return;
-    var pasos = [];
-    try {
-      var todo = App.E.gestor ? await Carpetas.leerJson(App.E.gestor, 'guias.json') : null;
-      pasos = Guias.normalizar((todo && tipo && todo[tipo]) || []);
-    } catch (e) { pasos = []; }
-
-    /* El botón de escribir o cambiar la guía, aquí mismo. Es tramitando
-       un asunto cuando uno se da cuenta de qué pasos faltan, y hasta el
-       10-sep-2026 había que salir a Ajustes para apuntarlos.
-
-       Solo en los asuntos abiertos, y solo si el tipo se ha reconocido.
-       Lo guarda js/guias-enganche.js, que es quien lleva guias.json. */
-    function ponerBotonDeEscribir(texto) {
-      if (!abierto || !tipo || !window.GuiasDelCentro) return;
-      var fila = document.createElement('p');
-      fila.className = 'nota';
-
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'boton';
-      b.textContent = texto;
-      b.onclick = async function () {
-        b.disabled = true;
-        var hecho = await window.GuiasDelCentro.escribir(tipo);
-        b.disabled = false;
-        if (hecho) pintarGuia(a, tipo, abierto);
-      };
-      fila.appendChild(b);
-
-      var aviso = document.createElement('span');
-      aviso.className = 'suave';
-      aviso.style.marginLeft = '8px';
-      aviso.textContent = 'Vale para todos los asuntos ' + tipo + ', no solo para este.';
-      fila.appendChild(aviso);
-
-      caja.appendChild(fila);
-    }
-
-    if (!pasos.length) {
-      caja.className = 'explica';
-      caja.innerHTML = tipo
-        ? 'El tipo ' + U.escapar(tipo) + ' todavía no tiene guía.'
-        : 'Este asunto no tiene tipo reconocido, así que no hay guía que enseñar.';
-      ponerBotonDeEscribir('Escribir la guía de ' + tipo);
-      return;
-    }
-
-    var marcados = ((a.ficha && a.ficha.pasosHechos) || []).slice();
-    /* La opción elegida en cada paso-pregunta. Se guarda en la ficha del
-       asunto, igual que lo marcado, así que el compañero ve por dónde va
-       el trámite. */
-    var elegidas = Object.assign({}, (a.ficha && a.ficha.pasosElegidos) || {});
-
-    caja.className = '';
-    caja.innerHTML = '<p class="explica" id="ficha-guia-cuenta"></p>' +
-                     Guias.vista(pasos, marcados, abierto, elegidas);
-
-    function contar() {
-      var c = Guias.cuenta(pasos, marcados, elegidas);
-      $('ficha-guia-cuenta').textContent =
-        c.hechos + ' de ' + c.total + ' pasos hechos.' +
-        (abierto ? ' Lo que marques lo ve todo el que abra la aplicación.' : '');
-    }
-    contar();
-    ponerBotonDeEscribir('Cambiar la guía');
-
-    if (!abierto) return;
-
-    async function guardar(datos) {
-      try {
-        await App.anotar(a.nombre, Object.assign({
-          pasosEl: U.ahora(),
-          pasosPor: App.E.usuario
-        }, datos));
-      } catch (e) {
-        U.aviso('No he podido guardarlo: ' + e.message, 'malo');
-      }
-    }
-
-    Array.prototype.forEach.call(caja.querySelectorAll('.paso-casilla'), function (c) {
-      c.onchange = function () {
-        var id = c.dataset.paso;
-        var i = marcados.indexOf(id);
-        if (c.checked && i === -1) marcados.push(id);
-        if (!c.checked && i !== -1) marcados.splice(i, 1);
-        c.closest('.paso-lectura').classList.toggle('paso-hecho', c.checked);
-        contar();
-        guardar({ pasosHechos: marcados.slice() });
-      };
-    });
-
-    /* Quién se entera de que se ha elegido una opción. El propio
-       js/guias.js ya ha enseñado la rama elegida: aquí solo se apunta y
-       se guarda. */
-    Guias.cuandoSeElige(function (idPaso, idOpcion) {
-      if (idOpcion) elegidas[idPaso] = idOpcion;
-      else delete elegidas[idPaso];
-      contar();
-      guardar({ pasosElegidos: Object.assign({}, elegidas) });
-    });
-  }
-
   /* ---------- las notas, escritas aquí mismo ---------- */
 
   function pintarNotas(a, abierto) {
@@ -752,149 +654,6 @@
     campo.onkeydown = function (ev) {
       if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) { ev.preventDefault(); guardar(); }
     };
-  }
-
-  /* ---------- el contacto del tercero ----------
-
-     Se busca en el mismo fichero de datos que usa la pantalla de
-     Personas. El nombre del tercero lleva pegado el número de
-     identificación, así que si no aparece a la primera se prueba sin
-     él. */
-
-  /* La ficha del alumnado trae muchas filas, y ocupaba media pantalla.
-     Aquí se enseña pequeña: el nombre y un par de datos de contacto.
-     Al pulsarla se abre entera. */
-  function contactoPlegado(persona, lista) {
-    var buenas = lista.filter(function (f) { return f && f.valor; });
-    var resumen = buenas.filter(function (f) {
-      return /tel|m[oó]vil|correo|email/i.test(f.titulo);
-    }).slice(0, 2);
-    if (!resumen.length) resumen = buenas.slice(0, 2);
-
-    return '<details class="ficha-bloque ficha-plegable">' +
-             '<summary>' +
-               '<span class="ficha-titulo">Contacto del tercero</span>' +
-               '<span class="ficha-resumen">' + U.escapar(persona.nombre) +
-                 (resumen.length
-                   ? ' · ' + U.escapar(resumen.map(function (f) { return f.valor; }).join(' · '))
-                   : '') +
-               '</span>' +
-             '</summary>' +
-             '<div class="ficha-plegable-cuerpo">' + filas(buenas) + '</div>' +
-           '</details>';
-  }
-
-  function contactoSuelto(texto) {
-    return '<section class="ficha-bloque">' +
-             '<h3 class="ficha-titulo">Contacto del tercero</h3>' +
-             '<p class="explica">' + U.escapar(texto) + '</p>' +
-           '</section>';
-  }
-
-  async function pintarContacto(a) {
-    var caja = $('ficha-contacto-caja');
-    if (!caja) return;
-    caja.innerHTML = contactoSuelto('Buscando…');
-    var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
-    /* Si la carpeta la creó la aplicación, el tercero está en su ficha.
-       Si se creó a mano, se saca del propio nombre: es lo que queda
-       después del tipo. */
-    var quien = (a.ficha && a.ficha.tercero) || (a.leido && a.leido.resto) || '';
-
-    if (!categoria || !quien || !App.E.datos) {
-      caja.innerHTML = contactoSuelto('Este asunto no dice a qué tercero pertenece.');
-      return;
-    }
-
-    try {
-      var fuente = await Datos.cargar(App.E.datos, categoria);
-      var encontrados = Datos.buscar(fuente.lista, quien, 1);
-      /* El nombre suele llevar pegado el número de identificación o el
-         NIF, y a veces el año académico. Si así no aparece, se prueba
-         quitando lo de detrás. */
-      if (!encontrados.length) {
-        encontrados = Datos.buscar(fuente.lista, quien.replace(/[\s\d]+$/, ''), 1);
-      }
-      if (!encontrados.length) {
-        var corto = quien.replace(/\b\d{2}-\d{2}\b/, '').replace(/\s+\S*\d\S*\s*$/, '').trim();
-        if (corto) encontrados = Datos.buscar(fuente.lista, corto, 1);
-      }
-      if (!encontrados.length) {
-        caja.innerHTML = contactoSuelto(quien + ' no aparece en el fichero de ' + categoria + '.');
-        return;
-      }
-
-      var persona = encontrados[0];
-      var lista;
-      if (categoria === 'ALUMNADO') lista = Datos.destacadosAlumno(persona).destacados;
-      else if (categoria === 'PERSONAL') lista = Datos.destacadosPersona(persona).destacados;
-      else {
-        lista = Object.keys(persona.campos || {}).slice(0, 8).map(function (c) {
-          return { titulo: c, valor: persona.campos[c] };
-        });
-      }
-      caja.innerHTML = contactoPlegado(persona, lista);
-    } catch (e) {
-      caja.innerHTML = contactoSuelto('No he podido leer el fichero de datos: ' + e.message);
-    }
-  }
-
-  /* ---------- los otros asuntos del mismo tercero ----------
-
-     Para ver de un vistazo si esto ya se gestionó. Los del mismo tipo
-     van marcados, que son los que de verdad pueden estar repetidos.
-     La búsqueda la hace duplicados.js. */
-
-  function nombreDelTercero(a) {
-    var f = a.ficha || {};
-    if (f.tercero) return f.tercero;
-    if (a.leido && a.leido.resto) return Nombres.terceroDeResto(a.leido.resto);
-    return '';
-  }
-
-  function listaDeOtros(titulo, nombres, tipo) {
-    if (!nombres.length) return '';
-    return '<div class="otros-grupo"><div class="otros-rotulo">' + U.escapar(titulo) + '</div>' +
-      nombres.slice(0, 12).map(function (n) {
-        var igual = tipo && window.Duplicados &&
-                    U.normalizar(window.Duplicados.tipoDeNombre(n)) === U.normalizar(tipo);
-        return '<div class="otros-asunto' + (igual ? ' otros-mismo-tipo' : '') + '">' +
-               U.escapar(n) + '</div>';
-      }).join('') +
-      (nombres.length > 12 ? '<p class="nota">Y ' + (nombres.length - 12) + ' más.</p>' : '') +
-      '</div>';
-  }
-
-  async function pintarOtrosDelTercero(a) {
-    var caja = $('ficha-otros');
-    if (!caja) return;
-    var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
-    var quien = nombreDelTercero(a);
-
-    if (!window.Duplicados || !categoria || !quien) {
-      caja.className = 'explica';
-      caja.textContent = 'No se sabe de qué tercero es este asunto, así que no se puede buscar.';
-      return;
-    }
-
-    try {
-      var todo = await window.Duplicados.delTercero(categoria, quien);
-      var fuera = function (n) { return n !== a.nombre; };
-      var abiertos = todo.abiertos.filter(fuera);
-      var archivados = todo.archivados.filter(fuera);
-
-      if (!abiertos.length && !archivados.length) {
-        caja.className = 'explica';
-        caja.textContent = 'Es el único asunto de ' + quien + '.';
-        return;
-      }
-      caja.className = 'otros-lista';
-      caja.innerHTML = listaDeOtros('Abiertos', abiertos, tipoDe(a)) +
-                       listaDeOtros('En el archivo', archivados, tipoDe(a));
-    } catch (e) {
-      caja.className = 'explica';
-      caja.textContent = 'No he podido mirar el archivo: ' + e.message;
-    }
   }
 
   /* ---------- los documentos que hay en la carpeta ----------
