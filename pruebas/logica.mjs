@@ -402,9 +402,12 @@ comprobar('se puede buscar por la asignatura',
   Datos.buscar(P.lista, 'musica').length, 2);
 
 const fichaPer = Datos.destacadosPersona(mariaJose);
-comprobar('la ficha empieza por el puesto', fichaPer.destacados[0].titulo, 'Puesto');
+comprobar('la ficha empieza por el DNI', fichaPer.destacados[0], { titulo: 'DNI', valor: mariaJose.documento });
+comprobar('y sigue el puesto', fichaPer.destacados[1].titulo, 'Puesto');
 comprobar('y avisa de que ya no está',
-  fichaPer.destacados[1].valor.indexOf('Ya no está en el centro'), 0);
+  fichaPer.destacados[2].valor.indexOf('Ya no está en el centro'), 0);
+comprobar('el DNI no se repite abajo, en "resto"',
+  fichaPer.resto.some((f) => String(f.valor).trim() === mariaJose.documento), false);
 
 /* Quien se da de alta a mano se suma a los de Séneca. */
 await Datos.anadirALista(datosPer, 'PERSONAL',
@@ -474,7 +477,7 @@ comprobar('cuenta bien cuántos están hoy en el centro', V.enElCentro, 3);
 
 const fichaAntonia = Datos.destacadosPersona(antonia);
 comprobar('la ficha dice desde cuándo no está',
-  fichaAntonia.destacados[1].valor.indexOf('su último curso aquí fue el 24-25') !== -1, true);
+  fichaAntonia.destacados[2].valor.indexOf('su último curso aquí fue el 24-25') !== -1, true);
 
 comprobar('una fecha de ayer ya pasó', U.yaPaso(fechaHace(0, -1)), true);
 comprobar('la de hoy todavía no', U.yaPaso(fechaHace(0, 0)), false);

@@ -247,9 +247,10 @@ App.piePersona = function (p) {
       : (p.cursoUltimo ? ' (su último curso aquí: ' + p.cursoUltimo + ')' : '');
     trozos.push('Ya no está en el centro' + porque);
   }
-  if (p.documento) trozos.push(p.documento);
   if (!p.deSeneca) trozos.push('alta a mano');
-  return trozos.join('  ·  ');
+  var texto = trozos.join('  ·  ');
+  if (p.documento) texto += (texto ? '  ·  ' : '') + 'DNI ' + p.documento;
+  return texto;
 };
 
 /* Lo que se lee debajo del nombre de una empresa. El rótulo del negocio

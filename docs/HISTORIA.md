@@ -5,6 +5,20 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — El DNI del personal, a la vista
+
+Fila 29 de la cola (`docs/COLA.md`, `docs/DNI-DEL-PERSONAL.md`), acordada con Francisco el mismo
+día. El dato ya estaba (`persona.documento`, de la columna `DNI/Pasaporte` de Séneca o de
+`Documento` en `personal.csv`), pero `Datos.destacadosPersona` no lo subía a los destacados: caía
+en `resto`, escondido detrás de "Ver los demás datos del fichero". Ahora sale la primera fila de
+todas, por encima de `Puesto`, y ya no se repite abajo (misma comparación por valor que hace
+`js/dni.js` con el alumnado). En la línea de debajo del nombre (`App.piePersona`,
+`js/asuntos-nuevo.js`) ya se enseñaba el documento a secas, en medio de la línea; ahora sale
+etiquetado ("DNI ...") y al final, después de "alta a mano" si toca. Sin aviso por edad: eso es
+solo del alumnado, y `js/dni.js` no se ha tocado. Prueba nueva `pruebas/dni-personal.mjs`, sin
+navegador, más los casos que se han tenido que corregir en `pruebas/logica.mjs` (los índices de
+`destacados[]` se desplazan una posición al meter el DNI delante). Batería completa en verde.
+
 ## 17-sep-2026 — "Lo pide": quién ha pedido la gestión
 
 Fila 28 de la cola (`docs/COLA.md`, `docs/LO-PIDE.md`), acordada con Francisco el mismo día. Nace

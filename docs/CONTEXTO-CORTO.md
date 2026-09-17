@@ -73,7 +73,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   plegada, vive la bandeja de Gmail (etiqueta `GESTOR`): a un asunto nuevo, adivinado o elegido a
   mano, con el hilo enganchado (`hilos`, con la matrícula para reconocerlo desde el otro buzón
   también); sus respuestas vuelven solas, y lo del compañero sale en gris.
-- DNI del alumnado a la vista, con aviso si falta y ya tocaría tenerlo.
+- DNI del alumnado y del personal a la vista; en el alumnado, con aviso si falta y tocaría tenerlo.
 - Registrar un documento: si el PDF sellado ya está en la carpeta (bajado de Séneca), la ficha lo
   detecta sola, lo renombra y manda el viejo a la papelera; el botón de siempre sigue igual.
 - Terceros relacionados con un asunto, con nota (no copia) al archivar; "+ Añadir varios" señala

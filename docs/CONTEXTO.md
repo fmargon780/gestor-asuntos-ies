@@ -177,6 +177,24 @@ El buscador de alumnado busca también por DNI y por Nº de identificación esco
 está sale en naranja (`App.claseDeResultado`, en `js/asuntos-nuevo.js`); el Nº va solo en el
 botón (en el `data-nie` de la fila, que `js/copiar.js` lee de ahí).
 
+### El DNI del personal
+
+Fila 29 de `docs/COLA.md`, 17-sep-2026. El personal ya traía el documento (`persona.documento`,
+sacado de la columna `DNI/Pasaporte` de Séneca o de `Documento` en `personal.csv` para quien se
+dio de alta a mano): solo faltaba subirlo a la vista. A diferencia del alumnado, no lleva ningún
+aviso por edad ni por columna que falte: eso es solo de `js/dni.js`, que no se toca.
+
+- `Datos.destacadosPersona` (`js/datos.js`) mete una fila **`DNI`** la primera de todas, por
+  encima de `Puesto`, cuando `persona.documento` tenga algo; si no tiene, no hay fila ni aviso.
+  Para que no se repita abajo, se quita de `resto` la fila cuyo valor sea igual al documento
+  (misma comparación por valor que hace `js/dni.js` con el alumnado).
+- `App.piePersona` (`js/asuntos-nuevo.js`) añade `DNI <documento>` al final de la línea de
+  debajo del nombre, después de "alta a mano" si toca; antes ya enseñaba el documento a secas,
+  en medio de la línea.
+
+Se comprueba con `pruebas/dni-personal.mjs` (sin navegador, con un contexto de mentira que carga
+`js/datos.js` y `js/asuntos-nuevo.js`) y con los casos nuevos de `pruebas/logica.mjs`.
+
 ### El nombre comercial de las empresas
 
 Columna adicional en el alta. El buscador encuentra al proveedor por cualquiera de los dos
