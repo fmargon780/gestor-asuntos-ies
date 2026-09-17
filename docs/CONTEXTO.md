@@ -369,18 +369,30 @@ recoge cada 5 minutos y deja su ficha, el hilo en PDF y los adjuntos en la carpe
 "Leer el correo" abre el PDF del hilo en el panel de la derecha. **Gmail no se deja meter dentro
 de otra página.** Cada usuario tiene su propia bandeja.
 
-De cada correo, la tarjeta morada mira en este orden:
+De cada correo, la tarjeta morada mira en este orden (17-sep-2026, fila 18, "Un mismo correo en
+dos buzones"):
 
-1. **La huella del hilo.** Si el `id` del hilo ya está en el `hilos` de algún asunto, la tarjeta
-   dice "Respuesta de <asunto>" y su botón principal es "Guardar en ese asunto". La huella manda
-   sobre todo lo demás.
-2. **El texto del asunto.** Si el asunto del correo (sin `Re:`/`RV:`/`Fwd:`) lleva dentro el
+1. **La huella por identificador de hilo**, el propio o el del hilo al que responde
+   (`respuestaDe`). Si el `id` ya está en el `hilos` de algún asunto, la tarjeta dice "Respuesta
+   de <asunto>" y su botón principal es "Guardar en ese asunto". El identificador de hilo es de
+   cada buzón: solo puede coincidir en el buzón que enganchó el correo.
+2. **La huella por matrícula.** El `Message-ID` de un mensaje es el mismo en todos los buzones
+   por los que pasa (al contrario que el identificador de hilo), así que es lo único que permite
+   al buzón del compañero reconocer un correo que **el otro** ya guardó. Si alguna matrícula del
+   correo coincide con alguna matrícula de algún `hilos` y el identificador de hilo **no** ha
+   encajado en el paso 1, no es un correo que atender: en vez de tarjeta, sale una **línea
+   gris**, aparte, debajo de las tarjetas normales: "Ya está en el asunto «...» · lo metió Juan
+   el 17-sep-2026 · 09:14", con "Abrir el asunto" (si sigue abierto) y "Quitar de mi bandeja"
+   (borra los ficheros de esta bandeja, nunca por la papelera: el correo de verdad sigue en
+   Gmail). Si el correo les ha llegado a los dos y ninguno lo ha guardado todavía, los dos ven su
+   tarjeta normal: no hay ninguna coordinación inventada entre buzones.
+3. **El texto del asunto.** Si el asunto del correo (sin `Re:`/`RV:`/`Fwd:`) lleva dentro el
    nombre de un asunto de `asuntos.json`, con al menos 12 letras por los dos lados, también se
    ofrece guardarlo ahí.
-3. **Nada.** Entonces el botón principal es "Crear el asunto".
+4. **Nada.** Entonces el botón principal es "Crear el asunto".
 
-En los tres casos hay además un botón **"Elegir asunto"** (`js/bandeja-enlace.js`), que abre el
-cuadro compartido de `js/elegir-asunto.js` (ver "El cuadro de elegir asunto", más abajo). Si el
+En los casos 1, 3 y 4 hay además un botón **"Elegir asunto"** (`js/bandeja-enlace.js`), que abre
+el cuadro compartido de `js/elegir-asunto.js` (ver "El cuadro de elegir asunto", más abajo). Si el
 elegido está archivado se ofrece "Reabrir y guardar aquí" o "Guardar sin reabrir". **Nunca se
 guarda nada solo: siempre hay que pulsar.**
 
@@ -395,27 +407,46 @@ los que pasen de 40 puntos.
 Al guardar un correo en un asunto —por el camino que sea— se apunta la huella en su ficha de
 `_GESTOR/asuntos.json`:
 
-    hilos: [ { id: "<id del hilo de Gmail>", asunto: "<asunto limpio, en minúsculas>", visto: 2 } ]
+    hilos: [ { id: "<id del hilo de Gmail>", asunto: "<asunto limpio, en minúsculas>", visto: 2,
+               matriculas: [ "<message-id>", ... ], metidoPor: "<usuario>", metidoEl: "<ISO>" } ]
 
-`visto` es cuántos mensajes tenía el hilo al guardar. Si el `id` ya estaba, se actualiza `visto`
-en vez de añadir otra entrada. Un asunto puede tener varios hilos; un hilo pertenece a un solo
-asunto (al cambiarlo de asunto, el `id` se quita del viejo). `hilos` **es opcional**: los asuntos
-de antes del 16-sep-2026 no lo tienen y todo funciona igual. Se escribe con `App.anotar`, que
-relee el fichero antes y guarda con `Copias.guardar`.
+`visto` es cuántos mensajes tenía el hilo al guardar. `matriculas` son los `Message-ID` del
+correo que se guardó (las del correo, no acumuladas de guardados anteriores); `metidoPor` y
+`metidoEl` son quién lo guardó y cuándo, para la línea gris. Si el `id` ya estaba, se actualiza la
+huella entera en vez de añadir otra entrada. Un asunto puede tener varios hilos; un hilo pertenece
+a un solo asunto (al cambiarlo de asunto, el `id` se quita del viejo). `hilos` **es opcional**:
+los asuntos de antes del 16-sep-2026 no lo tienen; `matriculas`, `metidoPor` y `metidoEl` también
+lo son, para los hilos de antes del 17-sep-2026. Todo sigue funcionando igual sin ellos: no se
+saca línea gris, y en la propia línea no sale "lo metió undefined" ni nada por el estilo. Se
+escribe con `App.anotar`, que relee el fichero antes y guarda con `Copias.guardar`.
 
 #### `seguidos.json`, para el recolector
 
 Cada vez que cambia una huella, la aplicación reescribe entero `seguidos.json` en la carpeta de
-la bandeja: `{ "hilos": [ { "id": ..., "visto": ..., "asunto": ... } ] }`. En cada pasada, el
-script de Apps Script hace lo de siempre con la etiqueta `GESTOR` y **después** lee ese fichero,
-abre cada hilo con `GmailApp.getThreadById` y, si tiene más mensajes que `visto`, lo recoge otra
-vez. Así vuelven a la bandeja las respuestas del tercero y también los correos que manda
-Francisco desde Gmail. Si el hilo ya no existe, se salta sin fallar; si `seguidos.json` no está o
-está roto, el script sigue con su trabajo normal.
+la bandeja: `{ "hilos": [ { "id": ..., "visto": ..., "asunto": ..., "matriculas": [...] } ] }`.
+Las matrículas de todas las huellas que compartan identificador de hilo se juntan sin repetir
+(`js/bandeja-correos.js`, `escribirSeguidos`). En cada pasada, el script de Apps Script hace lo de
+siempre con la etiqueta `GESTOR` y **después** lee ese fichero y, para cada entrada, busca el
+hilo: primero por `GmailApp.getThreadById(id)` (el buzón que lo enganchó); si no sale, por
+matrícula, de la última a la primera, con `GmailApp.search('rfc822msgid:' + m)` (el buzón del
+compañero, que no tiene ese `id`). Si tiene más mensajes que lo visto **en este buzón**, lo
+recoge otra vez. Así vuelven a la bandeja las respuestas del tercero y también los correos que
+manda Francisco desde Gmail, en cualquiera de los dos buzones. Si el hilo no aparece en ninguno de
+los dos sitios, se salta sin ruido; si `seguidos.json` no está o está roto, el script sigue con su
+trabajo normal.
+
+**La cuenta de mensajes vistos es de cada buzón**, guardada en el propio proyecto de Apps Script
+(`PropertiesService.getScriptProperties()`, clave `'visto:' + <id local>`), nunca comparada
+directamente con el `visto` de `seguidos.json`: el mismo hilo puede tener un número de mensajes
+distinto en cada buzón (correos internos, borradores, reenvíos que no están en los dos sitios), y
+compararlo a ciegas haría que el hilo se recogiera cada minuto para siempre, o que no se recogiera
+nunca. Solo la primera vez que se sigue un hilo, sin cuenta propia todavía, se parte del `visto`
+compartido (o 1).
 
 Esas fichas traen dos campos más: `respuestaDe` (el `id` del hilo) y `enviado: true` cuando el
 último mensaje lo mandó el propio usuario, que es lo que hace que la tarjeta diga "Lo enviaste
-tú".
+tú". Y las matrículas de todos los mensajes del hilo: `matriculas` (sin repetir) y `matricula`
+(la del último mensaje, el que acaba de llegar).
 
 #### Qué entra en la carpeta del asunto
 
@@ -431,6 +462,14 @@ reconoce los tres por su nombre (`DE_CORREO`, en `js/ficha-asunto.js`) y los ens
 El script vive en `apps-script/gestor-correos.gs`, pero **Apps Script no se despliega desde
 aquí**: Francisco lo pega a mano en `script.google.com` (las tres primeras líneas del fichero
 dicen cómo).
+
+**"Último correo recogido"**, en el bloque de la bandeja de correos de Ajustes: la fecha del
+propio fichero más nuevo que haya en la carpeta (da igual que sea un `.json`, un PDF o un
+adjunto), no algo leído de dentro de ningún fichero. Nació el 17-sep-2026 al descubrirse que el
+recolector llevaba seis días dejando los correos en una `GESTOR-BANDEJA` distinta de la que leía
+la aplicación (el script solo busca en la raíz del Drive; alguien había movido la de verdad
+dentro de otra carpeta, y se creó una nueva sin avisar de nada). Con más de 3 días sin moverse,
+la línea pasa a avisar. Vive en `js/bandeja-correos.js`, `pintarUltimoCorreoRecogido`.
 
 ### El correo y la mensajería de Séneca
 

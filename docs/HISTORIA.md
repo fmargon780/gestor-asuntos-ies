@@ -5,6 +5,46 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — Un mismo correo en dos buzones
+
+Fila 18 de la cola (`docs/COLA.md`, `docs/CORREO-EN-DOS-BUZONES.md`). Francisco y su compañero
+tienen cada uno su buzón de Gmail, su recolector y su `GESTOR-BANDEJA`, pero los asuntos son
+comunes. Como la aplicación reconocía un correo por el identificador de hilo de Gmail —que es de
+cada buzón—, un correo dirigido a los dos aparecía como dos correos sin relación: si uno lo
+guardaba, al otro le seguía saliendo como nuevo.
+
+- **La matrícula**: el `Message-ID` de la cabecera de un mensaje, el mismo en todos los buzones
+  por los que pasa. El recolector ya lo leía para el enlace (`enlaceAlHilo`), pero no lo guardaba.
+  Ahora sí: `matricula(mensaje)` nueva en `apps-script/gestor-correos.gs`, y `guardarHilo` apunta
+  `matriculas` (todas las del hilo) y `matricula` (la del último mensaje) en la ficha.
+- `js/bandeja-correos.js`: `asuntoDeLaMatricula(matriculas)`, hermana de `asuntoDelHilo`.
+  `asuntoDeEsteCorreo` mira ahora, en orden: identificador de hilo propio, el de la respuesta,
+  matrícula, y solo entonces el texto. La huella (`hilos` en `asuntos.json`) gana `matriculas`,
+  `metidoPor` y `metidoEl`, los tres opcionales (los asuntos de antes no los tienen).
+- **La línea gris**: cuando un correo encaja por matrícula pero su propio identificador de hilo
+  no está en las huellas de ese asunto (o sea: es del compañero, no suyo), en vez de tarjeta sale
+  una línea aparte, debajo de las normales — "Ya está en el asunto «...» · lo metió Juan el
+  17-sep-2026 · 09:14" — con "Abrir el asunto" y "Quitar de mi bandeja" (esto último borra los
+  ficheros de esta bandeja sin pasar por la papelera: son copias de trabajo, el correo de verdad
+  sigue en Gmail).
+- **La trampa del `visto` compartido** (`apps-script/gestor-correos.gs`,
+  `seguirHilosConocidos`/`hiloDeSeguido`): un hilo puede tener un número de mensajes distinto en
+  cada buzón (correos internos, borradores, reenvíos que no están en los dos sitios), así que la
+  cuenta de mensajes vistos no puede compararse contra el `visto` que escribe el buzón que
+  enganchó el correo: se recogería cada minuto para siempre, o nunca. Se guarda aparte, por buzón,
+  en `PropertiesService.getScriptProperties()` del propio proyecto de Apps Script; el `visto`
+  compartido solo sirve de arranque la primera vez que se sigue un hilo.
+- De paso: se descubrió que el recolector llevaba **seis días** dejando los correos en una
+  `GESTOR-BANDEJA` distinta de la que leía la aplicación (alguien había movido la de verdad
+  dentro de otra carpeta; el script solo mira la raíz del Drive, no la encontró, y se creó una
+  nueva sin decir nada — la bandeja se veía simplemente vacía, sin ningún error). Arreglado por el
+  lado de la aplicación, que es donde se mira: en Ajustes, "Último correo recogido", con la fecha
+  del propio fichero más nuevo de la carpeta; con más de 3 días sin moverse, avisa.
+- Prueba nueva `pruebas/correo-dos-buzones.mjs`. `pruebas/correos.mjs` se ha tenido que tocar: sus
+  comprobaciones de `hilos` esperaban el objeto exacto, y ahora lleva los campos nuevos (se
+  proyectan solo los campos estables en la comparación, para no depender de la hora exacta de
+  `metidoEl`).
+
 ## 17-sep-2026 — No pisarse en un mismo asunto
 
 Fila 24 de la cola (`docs/COLA.md`, `docs/NO-PISARSE-EN-UN-ASUNTO.md`): la aplicación la usan

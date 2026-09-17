@@ -43,3 +43,20 @@
 }
 
 .enlace-archivado { margin-right: 6px; }
+
+/* ---------- "ya está en el asunto" (fila 18, un mismo correo en dos
+   buzones): una línea, no una tarjeta, para que no se confunda con lo
+   que sí hay que atender. ---------- */
+.lista-ya-guardados { margin-top: 10px; }
+.linea-ya-guardado {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+  padding: 7px 16px; color: var(--tinta-suave); font-size: 13px;
+  border-top: 1px dashed var(--linea);
+}
+.linea-ya-guardado:first-child { border-top: 0; }
+.linea-ya-guardado .acciones { flex: 0 0 auto; display: flex; gap: 6px; }
+.linea-ya-guardado .boton { padding: 4px 10px; font-size: 12px; }
+
+/* "Último correo recogido", cuando lleva demasiado sin moverse. */
+.aviso-en-linea { color: #8a6100; font-weight: 600; }
