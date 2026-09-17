@@ -85,5 +85,9 @@ var RegistroLector = (function () {
     }
   }
 
-  return { leerSello: leerSello };
+  /* Expuesta para js/verificacion.js (17-sep-2026, fila 19): el código
+     de verificación del pie de un documento se busca con la misma
+     máquina que ya lee el sello de Séneca, sin cargar pdf.js dos veces
+     ni duplicar cómo se saca el texto de una página. */
+  return { leerSello: leerSello, textoDePrimeraPagina: textoDePrimeraPagina };
 })();

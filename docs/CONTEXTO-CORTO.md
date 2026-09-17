@@ -77,7 +77,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   `js/elegir-asunto.js`). El que se está viendo queda marcado en la lista, con sus mismas
   acciones también dentro del panel del visor.
 - DNI del alumnado a la vista, con aviso si falta y ya tocaría tenerlo.
-- Registrar un documento en un paso, leyendo el sello de Séneca del PDF.
+- Registrar un documento en un paso, leyendo el sello de Séneca del PDF. Al leerlo en el panel de
+  la derecha, si trae código de verificación, botones para copiarlo y abrir la verificación.
 - Terceros relacionados con un asunto, con nota (no copia) al archivar.
 - Parada al crear un asunto duplicado, y pantalla propia "Duplicados" para los ya existentes.
 - Ajustes ágiles: pestañas por categoría, buscador cruzado, aviso en vivo de nombres repetidos.

@@ -5,6 +5,32 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — El código de verificación del pie de un documento
+
+Fila 19 de la cola (`docs/COLA.md`, `docs/CSV-DEL-DOCUMENTO.md`), punto 1 de
+`docs/PROXIMOS-ASUNTOS.md`, reducido a lo que de verdad se podía hacer: Francisco comprobó el
+16-sep-2026 que la página de verificación de un documento de Séneca no pide ni certificado ni
+captcha, solo el código. Lo único que pedía era no tener que teclearlo a mano.
+
+- **Descartado a propósito**: traer la copia auténtica sola (la página no se abre con una
+  dirección que lleve el código dentro, hay que rellenar su formulario, y cada administración
+  tiene el suyo) y poner nosotros la dirección de verificación (la pone el propio documento: así
+  vale para cualquier organismo, sin ninguna lista que mantener).
+- `js/verificacion.js` nuevo, reutilizando `RegistroLector.textoDePrimeraPagina`
+  (`js/registro-lector.js`, sacada de ahí para esto: la misma máquina que ya lee el sello de
+  Séneca, sin cargar pdf.js dos veces). Busca la etiqueta del código (CSV, CVE, "Código de
+  verificación"...) sin mayúsculas ni tildes, y una dirección `http(s)://` que contenga
+  `verifica`/`csv`/`cve`/`valida`/`cotejo`/`sede`, recortando la puntuación de la frase que suele
+  quedar pegada al final.
+- **En `js/lector.js`** (el panel de leer un correo): al abrir un PDF se lee el pie sin retrasar
+  el panel, y si aparece código y dirección salen "Copiar el código" (con el código en gris al
+  lado) y "Abrir la verificación". Solo se toca este panel, no `js/visor.js`: es donde se lee un
+  correo antes de archivarlo, que es cuando hace falta el atajo.
+- Nada se guarda: ni en `asuntos.json` ni en ningún fichero compartido. Es un botón para no
+  teclear, no un dato del asunto.
+- Prueba nueva `pruebas/verificacion.mjs`, sin PDF ni navegador (mismo patrón que
+  `pruebas/logica.mjs`, con `vm` de Node).
+
 ## 17-sep-2026 — Un mismo correo en dos buzones
 
 Fila 18 de la cola (`docs/COLA.md`, `docs/CORREO-EN-DOS-BUZONES.md`). Francisco y su compañero

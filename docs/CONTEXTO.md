@@ -692,6 +692,38 @@ pegado a `Fecha: dd/mm/aaaa hh:mm:ss`.
 Se comprueba con `pruebas/registro.mjs` (con un PDF mínimo montado por la propia prueba, con el
 texto del sello dentro: el PDF real con datos personales no está en el repositorio).
 
+### El código de verificación del pie de un documento
+
+(17-sep-2026, fila 19, docs/CSV-DEL-DOCUMENTO.md). Los documentos electrónicos de la
+administración llevan en el pie un código de verificación (CSV, CVE...) y la dirección donde se
+teclea para comprobar el documento. Aquí solo se lee, para no teclearlo a mano: **nunca se
+descarga nada de esa página** (cada administración tiene la suya, y su formulario no se abre con
+una dirección que lleve el código dentro) y **nada se guarda** en ningún fichero compartido.
+
+- `js/verificacion.js` (`window.Verificacion`), nuevo: `leerDelTexto(texto)` y
+  `leerDelFichero(fichero)`. Reutiliza `RegistroLector.textoDePrimeraPagina`, sacada de
+  `js/registro-lector.js` para esto (no se carga pdf.js dos veces ni se duplica cómo se saca el
+  texto de una página).
+- **El código**: se busca una etiqueta ("Código Seguro de Verificación (CSV)", "Código de
+  verificación", "CSV", "CVE"...), sin distinguir mayúsculas ni tildes, y se coge lo que venga
+  detrás —dos puntos, un guion o nada— hasta el primer carácter que no sea letra, número, o
+  `+ / = - _ .`, con ocho de esos caracteres como mínimo. El espacio no entra en ese conjunto, así
+  que el propio patrón para solo donde toca: no hace falta adivinar dónde acaba el código.
+- **La dirección**: cualquier `http(s)://` del texto cuya dirección contenga `verifica`, `csv`,
+  `cve`, `valida`, `cotejo` o `sede`; se coge la primera, recortando los puntos, comas, paréntesis
+  y comillas que suelan quedar pegados al final por venir dentro de una frase.
+- **En `js/lector.js`** (el panel de leer un correo, `con-lector`): al abrir un PDF
+  (`Lector.abrir({ blob, ... })`) se lee el pie en paralelo, sin retrasar el panel; si aparecen
+  código y dirección, salen debajo "Copiar el código" (con el código al lado, en gris) y "Abrir la
+  verificación" (`target="_blank"`, `rel="noopener"`); solo código, solo el primer botón; nada,
+  nada. Un número de generación descarta la lectura si se ha abierto otra cosa mientras tanto
+  (mismo problema, mismo remedio, que el `repintando`/`actual !== a` de otros paneles que se
+  repintan solos). **No toca `js/visor.js`**: por ahora, este atajo solo está donde se lee un
+  correo antes de archivarlo, que es cuando de verdad hace falta no teclear nada a mano.
+
+Se comprueba con `pruebas/verificacion.mjs`, sin PDF ni navegador (`leerDelTexto` no toca ninguno
+de los dos): mismo patrón que `pruebas/logica.mjs`, cargando el fichero con `vm` de Node.
+
 ### Terceros relacionados con un asunto
 
 Un asunto puede afectar a más de una persona o entidad, además de su tercero principal.
@@ -1046,6 +1078,7 @@ de `App` va después del fichero que lo define.
 | `js/notas.js` | Las notas de cada asunto, con su enlace y su botón |
 | `js/registro.js` | Registrar un documento en un paso, sin nombrarlo dos veces |
 | `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF |
+| `js/verificacion.js` | El código de verificación del pie de un documento, y su dirección |
 | `js/lib/pdf.min.js`, `js/lib/pdf.worker.min.js` | pdf.js (Mozilla) 3.11.174, copiado tal cual |
 | `js/ficha-asunto.js` | La pantalla de un asunto: guía, notas, documentos y contacto |
 | `js/hitos-panel.js` | Pinta los hitos en la ficha del asunto, envolviendo lo que pinta la guía: el observador y el repintado |

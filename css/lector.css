@@ -52,8 +52,15 @@ body.estirando-lector #lector-marco { pointer-events: none; }
   word-break: break-word;
 }
 .lector-pie { color: var(--tinta-suave); font-size: 12.5px; margin-top: 3px; }
-.lector-botones { display: flex; gap: 6px; flex: 0 0 auto; }
+.lector-botones { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; flex-wrap: wrap; }
 .lector-botones .boton { padding: 6px 12px; font-size: 13px; }
+
+/* El código de verificación (17-sep-2026, fila 19), al lado del botón
+   de copiarlo: para ver de un vistazo qué se ha copiado. */
+.lector-codigo-verificacion {
+  color: var(--tinta-suave); font-size: 12px; font-family: monospace;
+  word-break: break-all;
+}
 
 .lector-cerrar {
   flex: 0 0 auto;
