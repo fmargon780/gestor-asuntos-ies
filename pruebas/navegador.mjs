@@ -59,7 +59,17 @@ const preparacion = `
     const f = { kind: 'file', name: nombre, _texto: texto };
     f.getFile = async () => new Blob([f._texto], { type: tipo || 'text/plain' });
     f.createWritable = async () => ({
-      async write(c) { f._texto = typeof c === 'string' ? c : await c.text(); },
+      /* Un Blob o un File puede traer bytes de verdad (un PDF, por
+         ejemplo), no solo texto: leerlo con .text() los decodifica
+         como UTF-8 y, si no lo eran, los cambia de tamaño al volver a
+         codificarlos. Se guardan con .arrayBuffer(), como hace de
+         verdad la API del navegador. */
+      async write(c) {
+        if (typeof c === 'string') { f._texto = c; return; }
+        if (c && typeof c.arrayBuffer === 'function') { f._texto = new Uint8Array(await c.arrayBuffer()); return; }
+        if (c && c._texto !== undefined) { f._texto = c._texto; return; }
+        f._texto = c;
+      },
       async close() {}
     });
     /* Las carpetas del centro están en Dropbox, y ahí Chrome tiene

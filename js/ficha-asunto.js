@@ -953,6 +953,28 @@
       fila.appendChild(reg);
     }
 
+    /* Separar, Unir y Sacar páginas (17-sep-2026, fila 22,
+       docs/SEPARAR-Y-UNIR-PDF.md): solo para PDF. */
+    if (window.PdfSepararUnir && window.PdfHerramientas && PdfHerramientas.esPdf(f.nombre, '')) {
+      function botonPdf(texto, ayuda, accion) {
+        var boton = document.createElement('button');
+        boton.type = 'button';
+        boton.className = 'boton';
+        boton.title = ayuda;
+        boton.textContent = texto;
+        boton.onclick = function () {
+          accion({
+            modo: 'asunto', dir: a.handle, nombre: f.nombre, handle: f.handle, asunto: a,
+            alTerminar: function () { pintarDocumentos(a); }
+          });
+        };
+        return boton;
+      }
+      fila.appendChild(botonPdf('Separar', 'Partirlo en varios documentos', PdfSepararUnir.separar));
+      fila.appendChild(botonPdf('Unir', 'Juntarlo con otro PDF del asunto', PdfSepararUnir.unir));
+      fila.appendChild(botonPdf('Sacar páginas', 'Sacar una copia con solo algunas páginas', PdfSepararUnir.sacarPaginas));
+    }
+
     /* Borrar, con papelera (11-sep-2026): siempre el último, separado
        de lo demás. */
     if (window.Papelera) {

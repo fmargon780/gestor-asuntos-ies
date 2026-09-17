@@ -5,6 +5,51 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — Separar, unir y sacar páginas de un PDF
+
+Fila 22 de la cola (`docs/COLA.md`, `docs/SEPARAR-Y-UNIR-PDF.md`), punto 4 de
+`docs/PROXIMOS-ASUNTOS.md`. Con esta fila se termina la lista que Francisco dictó el
+14-sep-2026: no queda ningún punto suelto de aquella conversación.
+
+Contado por Francisco, tres casos de su trabajo normal: escanea varios papeles de una vez y le
+sale un solo PDF que hay que partir; un mismo documento le llega en varios ficheros que hay que
+juntar; y de un PDF largo solo le interesan una o dos páginas.
+
+**Por qué pdf-lib, y no a mano.** La fila 17 escribió los `.docx` a mano (ZIP y XML, sin
+librerías), porque un `.docx` es un ZIP con XML dentro y eso se puede hacer sin depender de
+nadie. Un PDF no: la tabla de objetos y las referencias cruzadas de su estructura interna no se
+pueden montar a mano sin escribir, en la práctica, un lector y un escritor de PDF enteros. Se ha
+copiado **pdf-lib** en `js/lib/`, igual que ya está copiada pdf.js, y cargada solo la primera vez
+que hace falta: no se trae de internet en caliente, tiene que funcionar con la red del centro.
+Las páginas se copian tal cual (`copyPages`), así que no se pierde calidad ni el sello de
+registro que llevaran dentro.
+
+**Dónde se hace.** Francisco pidió hacerlo con el papel ya vinculado al asunto, para que lo que
+salga siga vinculado. Pero un escaneo de golpe puede traer papeles de varios asuntos distintos, y
+si hubiera que vincular antes de partir no se podría repartir; por eso las tres acciones están
+también en Por clasificar, con la misma máquina (`js/pdf-herramientas.js` para los bytes,
+`js/pdf-separar-unir.js` para la pantalla) y solo cambia qué se hace con el resultado: en un
+asunto, el cuadro de ponerle nombre de siempre; en Por clasificar, un nombre automático
+(`(i de N)`, `(unido)`, `(paginas sacadas)`) sin preguntar nada.
+
+**Alcance decidido aquí**: los botones nuevos van en la ficha del asunto y en las tarjetas de Por
+clasificar, no dentro del cuadro "Gestionar documentos" (que ya tiene cuatro botones por fila).
+Y en vez de leer el número de páginas de cada PDF solo para decidir si el botón Separar se
+enseña o no (que obligaría a abrir todos los PDF de la carpeta de antemano, sea cual sea el
+tamaño), el botón siempre sale, y si el PDF tiene una sola página, el propio cuadro lo dice al
+abrirse.
+
+Al escribir la prueba en navegador se ha encontrado y arreglado un fallo del disco de mentira
+compartido por todas las pruebas (`pruebas/navegador.mjs`): `createWritable().write(...)` leía
+cualquier `Blob` o `File` con `.text()`, que decodifica el contenido como UTF-8; con un PDF de
+verdad (bytes binarios, no texto) eso cambia el tamaño al volver a codificarlo, y la
+comprobación de "la copia ha salido completa" (la misma que usan `Carpetas.renombrarFichero` y la
+papelera) fallaba en seco. Se ha cambiado a `.arrayBuffer()`, que es como lo hace de verdad el
+navegador; los PDF de prueba de filas anteriores, escritos como texto ASCII a propósito, no han
+notado el cambio.
+
+---
+
 ## 17-sep-2026 — Grupos de personas
 
 Fila 21 de la cola (`docs/COLA.md`, `docs/GRUPOS-DE-PERSONAS.md`), punto 3 de

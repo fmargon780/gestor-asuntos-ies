@@ -1,0 +1,47 @@
+/* ============================================================
+   pdf-separar-unir.css — el cuadro de Separar, Unir y Sacar páginas
+   (17-sep-2026, fila 22).
+   ============================================================ */
+
+/* La rejilla de miniaturas: aprovecha el ancho, sin huecos ni obligar
+   a bajar (pedido el 11-sep-2026, reutilizado aquí). */
+.pdf-rejilla {
+  display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px;
+  max-height: 60vh; overflow-y: auto; padding: 4px;
+}
+.pdf-pagina {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  border: 1px solid var(--linea); border-radius: 6px; padding: 4px; background: var(--papel);
+}
+.pdf-pagina canvas {
+  display: block; width: 130px; height: 168px; background: #f4f6f8;
+  border: 1px solid #e3e8ee; object-fit: contain;
+}
+.pdf-pagina-pie { font-size: 11px; color: var(--tinta-suave); }
+.pdf-pagina-pie label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+
+/* La tijera entre dos páginas: un botón fino, alto como las
+   miniaturas, que se pone en verde cuando el corte está señalado. */
+.pdf-tijera {
+  align-self: stretch; width: 26px; min-height: 168px;
+  border: 1px dashed #c3d0dc; border-radius: 6px; background: var(--papel);
+  color: var(--tinta-suave); cursor: pointer; font-size: 15px;
+}
+.pdf-tijera:hover { background: #f0f3f7; border-color: var(--azul); color: var(--azul); }
+.pdf-tijera.activa { background: var(--verde-claro, #e4f5e9); border-color: #4caf7d; border-style: solid; color: #2f7a52; }
+
+.pdf-miniatura-grande {
+  display: block; max-width: 100%; max-height: 320px; margin: 0 auto 12px;
+  border: 1px solid var(--linea); border-radius: 6px;
+}
+
+/* La lista de Unir: casilla, cuenta de páginas, posición y flechas. */
+.unir-fila {
+  display: flex; align-items: center; gap: 8px; padding: 6px 0;
+  border-bottom: 1px solid #f0f3f7; font-size: 13px;
+}
+.unir-fila:last-child { border-bottom: 0; }
+.unir-fila label { display: flex; align-items: center; gap: 8px; flex: 1 1 auto; min-width: 0; cursor: pointer; }
+.unir-fila label span:first-of-type { word-break: break-word; }
+.unir-orden { flex: 0 0 auto; width: 24px; text-align: center; font-weight: 600; color: var(--azul); }
+.unir-subir, .unir-bajar { flex: 0 0 auto; padding: 3px 8px; }

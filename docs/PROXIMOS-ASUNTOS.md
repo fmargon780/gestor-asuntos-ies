@@ -15,7 +15,9 @@ arreglos pequeños (`docs/ARREGLOS-USO-2026-09-14.md`) y el resto quedó apuntad
    de `docs/COLA.md` (17-sep-2026): señalar varios de golpe, atajos de alumnado por unidad/nivel/
    enseñanza, grupos propios guardados con nombre (también sirven para el correo, en copia
    oculta). Quedan fuera, a falta de datos: departamentos, tutorías y equipos educativos.**
-4. Revisar las opciones de separar y unir documentos desde el asunto.
+4. Revisar las opciones de separar y unir documentos desde el asunto. **Hecho en la fila 22 de
+   `docs/COLA.md` (17-sep-2026): Separar, Unir y Sacar páginas de un PDF, con pdf-lib. Con esto,
+   la lista dictada el 14-sep-2026 queda entera.**
 5. Poder añadir un correo nuevo a un asunto ya creado.
 6. Generador de plantillas de correos.
 7. Poder adjuntar a un correo los documentos de un asunto ya creado.

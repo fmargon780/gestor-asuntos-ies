@@ -100,6 +100,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   bloques (en tu tejado, esperando a otros, sin fecha), con filtro por responsable.
 - No pisarse en un asunto: si el compañero ya está dentro, se entra en modo consulta (aviso y
   "Tomar el mando"), con marca en la lista. Señal en `_GESTOR/presencia.json`, caduca a los 3 min.
+- Separar, Unir y Sacar páginas de un PDF, en la carpeta del asunto y en Por clasificar (con
+  pdf-lib, `js/lib/pdf-lib.min.js`); miniaturas con pdf.js, tijeras entre páginas para Separar.
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -140,12 +142,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Poner en marcha el script de Gmail en `g.educaand.es` y señalar `GESTOR-BANDEJA` en Ajustes.
 - Ver si la bandeja de correo acierta con el tipo; si falla mucho, palabras clave por tipo.
 - Pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs` (17-sep-2026):
-  sin eso no se siguen los hilos por matrícula, ni salen los borradores con documentos o con
-  copia oculta de un grupo.
+  sin eso no se siguen los hilos por matrícula, ni la copia oculta de un grupo.
 - Comprobar con Séneca si Comunicaciones acepta el largo del asunto que le damos.
 - Cuando tengan una cuenta de correo común, replantear la bandeja como una sola compartida.
-- Ver con el uso: ancho del panel lateral y del tablón, y si las tarjetas por tipo se quedan
-  cortas.
+- Ver con el uso: ancho del panel lateral y del tablón, y si las tarjetas por tipo se quedan cortas.
 - Si el DNI no sale de nadie, marcar la columna del documento al generar el RegAlum.
 - Cuando el uso lo pida: búsqueda en notas, cuentas por tipo para la memoria de fin de curso,
   qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta
