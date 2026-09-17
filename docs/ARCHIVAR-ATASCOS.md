@@ -3,8 +3,9 @@
 Acordado con Francisco el 17-sep-2026, poco después de publicar la fila 32. Sigue con un asunto
 real sin poder archivar.
 
-Apúntala tú en `docs/COLA.md` como **fila 43** (el número 33 ya lo lleva `TABLON-NO-SE-BORRA.md`,
-que se coló delante). Cámbiala a EN CURSO en tu primer commit, y márcala HECHA al terminar.
+Apúntala tú en `docs/COLA.md` como **fila 45** (el número 33 ya lo lleva `TABLON-NO-SE-BORRA.md`,
+que se coló delante, y los números 41-43 se los llevaron dos instrucciones más y el repaso de la
+cola del 17-sep-2026). Cámbiala a EN CURSO en tu primer commit, y márcala HECHA al terminar.
 
 **Antes de empezar, comprueba qué queda por hacer de verdad**: las filas 32, 33 y 34 tocaron esta
 misma zona (`js/carpetas.js`, `js/asuntos-archivar.js`, el archivado y el tablón) después de
