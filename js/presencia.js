@@ -190,10 +190,20 @@ var Presencia = (function () {
     return e.usuario;
   }
 
+  /* Una huella de quién está dentro de qué, ahora mismo, en la caché.
+     Sirve para saber si de verdad ha cambiado algo entre una lectura y
+     la siguiente (fila 33, 17-sep-2026): si nadie ha entrado ni salido
+     de ningún asunto, la huella sale igual. */
+  function huella() {
+    return Object.keys(cache).sort().map(function (clave) {
+      return clave + ':' + cache[clave].usuario;
+    }).join('|');
+  }
+
   return {
     FICHERO: FICHERO,
     vigilar: vigilar, dejarDeVigilar: dejarDeVigilar, tomarElMando: tomarElMando,
-    ocupantePor: ocupantePor, refrescarCache: refrescarCache
+    ocupantePor: ocupantePor, refrescarCache: refrescarCache, huella: huella
   };
 })();
 window.Presencia = Presencia;
@@ -202,21 +212,43 @@ window.Presencia = Presencia;
 
    Se apoya en App.vigilarLaCarpeta (js/documentos-sueltos.js), que ya
    se llama una vez al entrar: así no hace falta tocar js/nucleo.js
-   para arrancar nada. */
+   para arrancar nada.
+
+   Antes esto repintaba la lista cada 10 segundos, hubiera cambiado
+   algo o no, y sin mirar si alguien estaba escribiendo: se llevaba por
+   delante el tablón de notas a medio escribir (fila 33, 17-sep-2026).
+   Ahora solo repinta si la huella de quién está dentro de cada asunto
+   ha cambiado de verdad, y nunca mientras el foco esté en un campo. */
 (function () {
   if (typeof App === 'undefined' || typeof App.vigilarLaCarpeta !== 'function') return;
   var comoEra = App.vigilarLaCarpeta;
+  var ultimaHuella = null;
+
+  /* Si se está escribiendo en cualquier campo, esta vuelta no toca la
+     pantalla: ni el tablón, ni ningún otro formulario abierto. */
+  function escribiendoAhoraMismo() {
+    var el = document.activeElement;
+    if (!el) return false;
+    if (el.isContentEditable) return true;
+    var etiqueta = el.tagName ? el.tagName.toLowerCase() : '';
+    return etiqueta === 'input' || etiqueta === 'textarea' || etiqueta === 'select';
+  }
+
   App.vigilarLaCarpeta = function () {
     comoEra();
     Presencia.refrescarCache().then(function () {
+      ultimaHuella = Presencia.huella();
       if (typeof App.pintarAbiertos === 'function') App.pintarAbiertos();
     });
     setInterval(function () {
       Presencia.refrescarCache().then(function () {
         var pantalla = document.getElementById('pantalla-abiertos');
-        if (pantalla && !pantalla.classList.contains('oculto') && typeof App.pintarAbiertos === 'function') {
-          App.pintarAbiertos();
-        }
+        if (!pantalla || pantalla.classList.contains('oculto') || typeof App.pintarAbiertos !== 'function') return;
+        if (escribiendoAhoraMismo()) return;   /* se deja la huella sin actualizar: se repinta en la siguiente vuelta */
+        var huellaAhora = Presencia.huella();
+        if (huellaAhora === ultimaHuella) return;   /* nadie ha entrado ni salido de ningún asunto */
+        ultimaHuella = huellaAhora;
+        App.pintarAbiertos();
       });
     }, 10 * 1000);
   };

@@ -34,6 +34,13 @@
   var soloParaMi = false;   /* cómo nacerá la próxima nota */
   var fallo = '';           /* lo último que ha ido mal al leer o escribir */
 
+  /* Lo que se lleva escrito en la nota nueva, guardado aquí (no solo
+     en el DOM) para que sobreviva aunque algo de fuera destruya la
+     columna entera antes de que se pegue la nota (fila 33,
+     17-sep-2026). Se actualiza con cada tecla, no solo al repintar. */
+  var borrador = '';
+  var borradorFecha = '';
+
   function $(id) { return document.getElementById(id); }
 
   /* ---------- leer y escribir ---------- */
@@ -151,9 +158,24 @@
     var c = columna();
     if (!c) return;
 
-    /* Lo que se esté escribiendo no se pierde al repintar. */
-    var escrito = $('tablon-texto') ? $('tablon-texto').value : '';
-    var fechaPuesta = $('tablon-para') ? $('tablon-para').value : '';
+    /* Lo que se esté escribiendo no se pierde al repintar: si el campo
+       ya no está en el DOM (la columna se ha destruido por fuera),
+       se rellena del borrador guardado en estas variables. */
+    var campoTexto = $('tablon-texto');
+    var escrito = campoTexto ? campoTexto.value : borrador;
+    var campoFecha = $('tablon-para');
+    var fechaPuesta = campoFecha ? campoFecha.value : borradorFecha;
+
+    /* Tampoco se pierde el foco ni el cursor: ni del campo de la nota
+       nueva, ni del de una nota que se esté cambiando ahora mismo. */
+    var activo = document.activeElement;
+    var enNueva = activo === campoTexto;
+    var enEdicion = !enNueva && !!activo && activo.tagName === 'TEXTAREA' && c.contains(activo);
+    var cursorInicio = null, cursorFin = null;
+    if (enNueva || enEdicion) {
+      cursorInicio = activo.selectionStart;
+      cursorFin = activo.selectionEnd;
+    }
 
     /* Las notas privadas de otro no salen aquí. */
     var mias = notas.filter(laVeo);
@@ -188,6 +210,21 @@
       c.appendChild(ver);
       if (verHechas) {
         hechas.slice().reverse().forEach(function (n) { c.appendChild(papel(n)); });
+      }
+    }
+
+    /* Se devuelve el foco y el cursor a donde estaban. */
+    if (enNueva) {
+      var campoNuevo = $('tablon-texto');
+      if (campoNuevo) {
+        campoNuevo.focus();
+        try { campoNuevo.setSelectionRange(cursorInicio, cursorFin); } catch (e) {}
+      }
+    } else if (enEdicion) {
+      var editado = c.querySelector('.papel textarea.campo');
+      if (editado) {
+        editado.focus();
+        try { editado.setSelectionRange(cursorInicio, cursorFin); } catch (e) {}
       }
     }
   }
@@ -226,12 +263,19 @@
     var caja = document.createElement('div');
     caja.className = 'tablon-nueva';
 
+    /* Lo que haya ahora mismo pasa a ser el borrador: así, si algo de
+       fuera destruye la columna sin avisar, el próximo pintado parte
+       de aquí y no de un campo vacío (fila 33, 17-sep-2026). */
+    borrador = escrito;
+    borradorFecha = fechaPuesta;
+
     var texto = document.createElement('textarea');
     texto.id = 'tablon-texto';
     texto.className = 'campo';
     texto.rows = 2;
     texto.placeholder = 'Llamar a…, el director dice que…';
     texto.value = escrito;
+    texto.oninput = function () { borrador = texto.value; };
     caja.appendChild(texto);
 
     var fila = document.createElement('div');
@@ -255,6 +299,7 @@
     para.className = 'campo tablon-fecha';
     para.title = 'Para qué día es, si tiene día';
     para.value = fechaPuesta;
+    para.onchange = function () { borradorFecha = para.value; };
     fila.appendChild(para);
 
     caja.appendChild(fila);
@@ -285,6 +330,8 @@
     var privada = soloParaMi;
     campo.value = '';
     $('tablon-para').value = '';
+    borrador = '';
+    borradorFecha = '';
     cambiar(function (lista) {
       lista.push({
         id: 'n' + Date.now() + Math.floor(Math.random() * 1000),
