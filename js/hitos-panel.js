@@ -154,6 +154,18 @@
       if (creados && creados.length) hitos = creados;
     }
 
+    /* Los documentos apuntados a un hito (fila 31, 17-sep-2026) se
+       pintan sabiendo ya si el fichero sigue en la carpeta: se lee
+       aquí, una vez por repintado, antes de tocar el DOM. Corregirlo
+       después, a mano, chocaría con el observador de aquí abajo (cada
+       corrección se detectaría a sí misma como un cambio más). */
+    var nombresDeLaCarpeta = null;
+    if (!errorLectura && hitos.length) {
+      try { nombresDeLaCarpeta = (await Carpetas.ficheros(a.handle)).map(function (f) { return f.nombre; }); }
+      catch (e) { nombresDeLaCarpeta = null; }
+      if (actual !== a) return;
+    }
+
     var caja = $('ficha-guia');
     if (!caja) return;
     cajaObservada = caja;
@@ -171,7 +183,7 @@
       caja.innerHTML = '';
       if (!errorLectura && hitos.length) {
         caja.className = 'hitos-panel';
-        caja.appendChild(HitosPanelLista.bloqueDeHitos(a, hitos, datos.ajustes, abierto));
+        caja.appendChild(HitosPanelLista.bloqueDeHitos(a, hitos, datos.ajustes, abierto, nombresDeLaCarpeta));
         aplicarDesplegarPendiente(caja, clave);
       } else {
         pintarVacio(caja, a, abierto, errorLectura);

@@ -75,8 +75,19 @@
   border-radius: 20px; padding: 3px 6px 3px 10px; display: inline-flex; align-items: center; gap: 6px;
 }
 .hito-doc-quitar { border: 0; background: none; cursor: pointer; color: var(--tinta-suave); font-size: 11px; }
+.hito-doc-abrir {
+  border: 0; background: none; cursor: pointer; color: var(--tinta); font-size: 12px;
+  padding: 0; text-decoration: underline;
+}
+.hito-doc-abrir.hito-doc-falta { color: var(--tinta-suave); text-decoration: none; cursor: default; }
 
 .hito-botones { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 4px; }
+
+/* ---------- el cuadro de "Apuntar un documento" (fila 31, 17-sep-2026) ---------- */
+
+#hitosdoc-lista { display: flex; flex-direction: column; gap: 4px; max-height: 320px; overflow: auto; }
+.hitosdoc-fila { display: flex; align-items: center; gap: 8px; padding: 4px 2px; }
+.hitosdoc-fila-falta { color: var(--tinta-suave); }
 
 /* ---------- las bifurcaciones ---------- */
 
