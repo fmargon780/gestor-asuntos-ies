@@ -8,6 +8,20 @@
 
 .ficha-cabecera { margin-bottom: 16px; }
 .ficha-marcas { margin: 12px 0 4px; }
+
+/* La fila de "Volver a la lista" y, si se ha saltado desde otro asunto
+   (17-sep-2026, fila 40, docs/SALTAR-A-OTRO-ASUNTO.md), "← Volver a
+   [asunto de partida]" al lado. Una sola línea siempre: la cabecera no
+   crece ni se parte en dos alturas por un nombre de asunto largo. */
+.ficha-volver-fila {
+  display: flex; align-items: center; gap: 10px; flex-wrap: nowrap;
+  max-width: 100%;
+}
+#ficha-volver-origen { min-width: 0; flex: 1 1 auto; display: flex; }
+.boton-volver-origen {
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; flex: 0 1 auto;
+}
 .ficha-nombre {
   margin: 0; font-size: 20px; line-height: 1.35; word-break: break-word;
 }
@@ -141,12 +155,17 @@ body.con-lector .ficha-columnas {
   color: var(--tinta-suave);
 }
 .otros-asunto {
+  display: block; width: 100%; font: inherit;
   border: 1px solid var(--linea); border-radius: 8px; padding: 6px 10px;
-  font-size: 13px; word-break: break-word;
+  font-size: 13px; text-align: left; word-break: break-word;
+  background: var(--papel); color: var(--tinta); cursor: pointer;
 }
+.otros-asunto:hover { background: var(--azul-claro); border-color: var(--azul); }
+.otros-asunto:focus-visible { outline: 2px solid var(--azul); outline-offset: 1px; }
 .otros-mismo-tipo {
   background: var(--ambar); border-color: var(--ambar-linea); font-weight: 600;
 }
+.otros-mismo-tipo:hover { background: var(--ambar); border-color: var(--azul); }
 
 /* El aviso de que ese tercero ya tuvo un asunto así, al crear uno nuevo. */
 #aviso-duplicado { margin-top: 22px; }
