@@ -139,14 +139,24 @@ su nombre, en la lista fresca— y repintarla en su sitio, con dos funciones pú
 - `App.reengancharFicha()` — la reenganche de verdad: si el asunto sigue en `App.E.listaAbiertos`,
   lo vuelve a coger de ahí y repinta; si ya no está (se ha archivado o borrado desde el otro
   ordenador), entonces sí vuelve a la lista, con un aviso de una línea. Solo actúa con la ficha de
-  verdad visible y con un asunto **abierto**: el ARCHIVO no lo vigila `App.mirarLaCarpeta`. **Desde
-  el 17-sep-2026 (fila 34), no repinta si no ha cambiado nada de verdad**: compara una huella de
-  texto del asunto, en dos mitades (ficha e hitos); si son iguales, la pantalla se deja quieta, y
-  si solo cambian los hitos, se le pide el repintado al panel de hitos en vez de rehacer la ficha
-  entera. Y un asunto pasa a ser un solo objeto en toda la aplicación: los datos frescos se le
-  meten dentro al objeto que la ficha ya tiene en la mano (si no, con la pantalla quieta, los
-  botones ya pintados se quedaban apuntando a datos viejos: "Archivar el asunto" volvía a
-  preguntar "¿Dónde va esta carpeta?" con la categoría ya puesta).
+  verdad visible y con un asunto **abierto**: el ARCHIVO no lo vigila `App.mirarLaCarpeta`.
+
+**Repintar solo si algo ha cambiado de verdad** (fila 34, 17-sep-2026,
+`docs/NOTAS-DEL-ASUNTO-NO-SE-BORRAN.md`). Bastaba con que el compañero dejara un papel suelto en
+"Por clasificar" para que `App.reengancharFicha()` rehiciera la ficha entera con `innerHTML`,
+tirando por el camino cualquier nota a medio escribir. Ahora compara una huella de texto del
+asunto, partida en dos mitades —ficha e hitos—: si las dos son iguales, la pantalla se deja
+quieta; si solo cambian los hitos, le pide el repintado al panel de hitos en vez de rehacer la
+ficha entera. Y un asunto pasa a ser **un solo objeto** en toda la aplicación: los datos frescos
+se meten dentro del objeto que la ficha ya tiene en la mano (antes, con la pantalla quieta, los
+botones ya pintados se quedaban con el objeto viejo, y "Archivar el asunto" volvía a preguntar
+"¿Dónde va esta carpeta?" con la categoría ya puesta). Tanto `pintar()`/`pintarNotas()` de
+`js/ficha-asunto.js` como el repintado entero de `js/hitos-panel.js` pasan por
+`U.conservandoLoEscrito` (ver "Avisos técnicos"), para que una nota a medio escribir, el foco y
+el cursor sobrevivan a un repintado que sí haga falta. Límite conocido: si la ficha entera se
+repinta de verdad mientras se escribe la nota de un hito, esa nota puede perderse (el panel de
+hitos se repinta un instante después, de forma asíncrona); la nota del asunto no tiene ese
+problema. Se comprueba con `pruebas/notas-asunto-no-se-borran.mjs`.
 
 Con esto, `App.verAbiertos` sirve para todas las formas de guardar un documento dentro de un
 asunto (registrar, nombrar, sello de Séneca, generar desde plantilla, separar/unir/sacar páginas,
@@ -154,27 +164,6 @@ meter un suelto o un correo) sin que ninguna tenga que saber de la ficha: **Edit
 **Archivar/Reabrir** y **Borrar** siguen siendo los únicos que de verdad vuelven a la lista,
 llamando a `volverALaLista()` como hasta ahora. Se comprueba con
 `pruebas/quedarse-en-el-asunto.mjs`.
-
-**Las notas no se borran mientras se escriben** (17-sep-2026, fila 34,
-`docs/NOTAS-DEL-ASUNTO-NO-SE-BORRAN.md`). Antes de este arreglo, un repintado automático de la
-ficha (el de arriba, u otro más pequeño del panel de hitos) rehacía con `innerHTML` el `<textarea>`
-de la nota del asunto y el de la nota de un hito, hubiera cambiado algo o no: bastaba con que el
-compañero dejara un papel suelto en cualquier sitio para que Francisco perdiera lo que llevaba
-escrito, el foco y el cursor.
-
-- `U.conservandoLoEscrito(raiz, hacer, clavePara)` (`js/util.js`): antes de `hacer()` (el
-  repintado), apunta valor, foco y cursor de cada campo de escribir de `raiz` (por su `id`, o por
-  la clave que dé `clavePara` para los campos sin id, como los de dentro de un hito); después, se
-  los devuelve solo a los campos que hayan vuelto **vacíos** (nunca pisa un valor que el repintado
-  haya traído con contenido).
-- `js/ficha-asunto.js`: `pintar()` pasa por esa ayuda.
-- `js/hitos-panel.js`: su `repintar()` va también dentro de `U.conservandoLoEscrito`, con el
-  `MutationObserver` desconectado mientras tanto (devolver un valor no puede disparar otro
-  repintado, fila 31) y volviendo a desplegar el hito que tuviera algo a medias antes de devolver
-  el foco.
-
-Se comprueba con `pruebas/notas-asunto-no-se-borran.mjs`, en navegador de verdad (comprobado que
-falla sin el arreglo).
 
 ### Las tarjetas por tipo de asunto
 
@@ -418,6 +407,15 @@ el mando" que siempre está ahí.
     (`refrescarCache()`) que se refresca sola cada 10 segundos, enganchada a
     `App.vigilarLaCarpeta` (así no ha hecho falta tocar `js/nucleo.js` para arrancarla): la usa la
     marca de la tarjeta de la lista.
+  - **No repinta la lista mientras se escribe** (fila 33, 17-sep-2026,
+    `docs/TABLON-NO-SE-BORRA.md`): esa misma envoltura de `App.vigilarLaCarpeta` llamaba a
+    `App.pintarAbiertos()` cada 10 segundos pasara lo que pasara, y eso se llevaba por delante el
+    tablón de notas a medio escribir (vive dentro de `#pantalla-abiertos`). Ahora
+    `Presencia.huella()` da una foto de texto de quién está dentro de qué (claves y usuarios,
+    ordenados); el intervalo solo llama a `App.pintarAbiertos()` si esa huella ha cambiado de
+    verdad desde la última vez, y nunca si `document.activeElement` es un `input`, `textarea`,
+    `select` o algo `contenteditable` (esa vuelta se salta sin actualizar la huella guardada, para
+    que la siguiente vuelta sin escribir sí repinte).
 - **`js/ficha-asunto.js`** pinta el aviso (`#ficha-presencia`, reutilizando `.aviso.aviso-ambar`
   de siempre) y apaga los controles. **Apagar no es "un botón más que tocar"**: se recorre
   `#ficha-asunto-cuerpo` entero (`button, select, input, textarea`) y se apaga todo menos una
@@ -460,6 +458,15 @@ Columna a la derecha de asuntos abiertos, para lo que aún no es un asunto. Colo
 opcionalmente "para el día X". Botones: Hecha, Cambiar, A asunto y Borrar. Se guarda en
 `_GESTOR/tablon.json`. Las notas "Solo para mí" salen únicamente en el tablón de quien las
 escribió (no es un secreto: el fichero sigue en la carpeta compartida).
+
+**No se borra mientras se escribe** (fila 33, 17-sep-2026, `docs/TABLON-NO-SE-BORRA.md`): lo que
+se lleva escrito en la nota nueva vive también en variables del módulo (`borrador`,
+`borradorFecha`), no solo en el `<textarea id="tablon-texto">`: se actualizan con el evento
+`input` (y el `change` de la fecha), así que sobreviven aunque algo de fuera destruya la columna
+`#tablon` entera antes de que se pegue la nota. `pintar()` guarda, antes de reconstruir, si el
+foco estaba en ese campo o en el de una nota que se está cambiando (`editando`), junto con
+`selectionStart`/`selectionEnd`, y al terminar le devuelve el foco y el cursor al campo nuevo. Se
+comprueba con `pruebas/tablon-no-se-borra.mjs`.
 
 ### Los ficheros de datos, sin trabajo manual
 
@@ -1585,7 +1592,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/registro.mjs` | Prueba de registrar un documento en un paso, sin nombrarlo dos veces |
 | `pruebas/campos.mjs` | Prueba de los campos de cada tipo de asunto (ocho escenarios más editar) |
 | `pruebas/relacionados.mjs` | Prueba de los terceros relacionados con un asunto, y la nota al archivar |
-| `pruebas/duplicados.mjs` | Prueba de que no se dupliquen los asuntos, y de unir los que ya existen |
+| `pruebas/duplicados.mjs` | Prueba de que no se dupliquen los asuntos, y de unir los que ya existían |
 | `pruebas/ajustes-agil.mjs` | Prueba de las pestañas, el buscador cruzado, el aviso en vivo y la barra fija |
 | `pruebas/papelera.mjs` | Prueba de borrar con papelera, devolver y borrar del todo |
 | `pruebas/documentos-sueltos.mjs` | Prueba de "Meter en un asunto": un documento suelto a un asunto que ya existe |
@@ -1782,6 +1789,17 @@ Aparte, en `localStorage`: `gestor-barra`, `gestor-filtros`, `gestor-lector-anch
   vía, el plazo, archivar/reabrir (`js/ficha-asunto.js`, `js/asuntos-lista.js`) y en marcar,
   cambiar de rama, o tocar el responsable/fecha/notas/documentos de un hito
   (`js/hitos-panel-lista.js`). Se comprueba con `pruebas/refresco.mjs`.
+- **Un bloque que se repinta solo (sin que nadie lo pida) nunca puede tirar lo que se está
+  escribiendo, ni el foco, ni el cursor.** Envolver ese repintado en
+  `U.conservandoLoEscrito(raiz, fn, clavePara)` (`js/util.js`, 17-sep-2026, filas 33 y 34 de la
+  cola): apunta valor, foco y cursor de cada `textarea`/`input` de escribir de `raiz` antes de
+  repintar, y se los devuelve a los que vuelvan a salir **vacíos** después (nunca pisa un valor
+  que el propio repintado haya traído con contenido). La identidad de un campo es su `id`, un
+  `data-clave`, o la que pase quien llama (`clavePara`, para los campos que se repiten uno por
+  fila, como la nota de un hito). Usado en `js/ficha-asunto.js` y `js/hitos-panel.js` (fila 34);
+  el tablón (`js/tablon.js`, fila 33) resuelve el mismo problema con un mecanismo propio, anterior
+  a esta ayuda. Se comprueba con `pruebas/tablon-no-se-borra.mjs` y
+  `pruebas/notas-asunto-no-se-borran.mjs`.
 - **Ojo con el orden de los `<script>` de `index.html`.** `ficha-asunto.js` poda la tarjeta con
   su lista blanca, así que un módulo que quiera poner un botón ahí tiene que cargarse después.
   `lector.js` va antes que `bandeja-correos.js`, y `bandeja-enlace.js` después de los dos.
@@ -1792,11 +1810,6 @@ Aparte, en `localStorage`: `gestor-barra`, `gestor-filtros`, `gestor-lector-anch
   vez** (hay más de 17 envolturas así). Condición: cargarse **después** del fichero que define lo
   que se envuelve. No siempre compensa: cuando lo que hay que cambiar está dentro de una función
   privada, sale mejor tocar ese fichero directamente.
-- **Un bloque que se repinta solo nunca puede tirar lo que se está escribiendo, ni el foco, ni el
-  cursor.** Envolver el repintado en `U.conservandoLoEscrito(raiz, hacer, clavePara)` (`js/util.js`,
-  17-sep-2026, filas 33 y 34): guarda valor/foco/cursor de cada campo de escribir de `raiz` antes
-  de `hacer()`, y se los devuelve a los que vuelvan vacíos. Ya lo usan `js/tablon.js`,
-  `js/ficha-asunto.js` y `js/hitos-panel.js`.
 
 ### Cómo probar
 
