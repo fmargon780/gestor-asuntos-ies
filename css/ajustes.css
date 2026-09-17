@@ -77,9 +77,16 @@
    escalón más arriba. La pestaña abierta se recuerda en localStorage,
    igual que la categoría (App.cambiarPestanaAjustes).
    ============================================================ */
+/* La cabecera de Ajustes es solo el título (index.html); estas
+   pestañas se quedan pegadas justo debajo de ella, encogida o no
+   —"--cabecera-fija-alto" la pone js/cabecera-fija.js al medirla—,
+   para que "Tipos de asunto · El centro · Mantenimiento" no se pierda
+   al bajar (docs/CABECERA-QUE-SE-QUEDA.md, tabla del punto 2). */
 .pestanas-ajustes {
   display: flex; flex-wrap: wrap; gap: 6px;
-  padding: 0 16px; margin-bottom: 16px;
+  padding: 10px 16px 0; margin-bottom: 16px;
+  position: sticky; top: var(--cabecera-fija-alto, 0px); z-index: 19;
+  background: var(--fondo);
 }
 .pestana-ajustes {
   font: inherit; font-size: 14px; font-weight: 600;

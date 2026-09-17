@@ -5,6 +5,74 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 18-sep-2026 — La cabecera se queda arriba, y se encoge
+
+Fila 46 de la cola (`docs/COLA.md`, `docs/CABECERA-QUE-SE-QUEDA.md`), acordada con Francisco el
+17-sep-2026: la última fila pendiente, y con ella la cola queda entera. El aviso, con sus
+palabras: "Cuando navegamos hacia abajo en una vista, se suele perder la referencia superior. Esto
+es muy evidente cuando estamos trabajando en un asunto vivo." Al bajar por la ficha de un asunto
+largo, el nombre, el estado y el botón de volver se iban por arriba, y a partir de ahí se
+trabajaba a ciegas.
+
+**La solución: fijar la cabecera, pero encogida.** Fijarla entera se comía demasiado alto, así que
+se queda pegada arriba (`position: sticky`) y se reduce a una sola línea al pasar de 80px de
+scroll, con histéresis (no se despliega hasta bajar de 40px, para que no parpadee justo en el
+límite). Un único mecanismo (`js/cabecera-fija.js` + `css/cabecera-fija.css`) para las siete
+pantallas — ficha del asunto, asuntos abiertos (con "Por clasificar" dentro), archivo, personas y
+empresas, ajustes, qué me toca y duplicados; la papelera vive dentro de ajustes y usa su cabecera
+— en vez de siete parches sueltos.
+
+**El primer diseño de la CSS estaba mal, y la propia prueba lo dijo.** La primera idea, muy
+razonable sobre el papel, era: al encoger, quitar alto por un lado (título más pequeño) y añadir
+un poco de relleno vertical (`padding`) para que la cabecera pegada no tocara el borde de la
+ventana. Al medirlo con la prueba de navegador (mirando el alto real de la cabecera antes y
+después de encogerse) resultó que la cabecera **crecía en vez de encoger**: el `padding` nuevo
+pesaba más que lo que se ahorraba con el título más pequeño, sobre todo cuando el buscador y los
+botones de la cabecera ya iban en dos líneas por falta de sitio (con el tablón de notas puesto al
+lado, en una ventana no muy ancha — nada que ver con esta fila, pasa igual sin ella). El arreglo
+fue quitar ese `padding` y, en su lugar, reducir el margen de abajo de la cabecera (18px/16px de
+siempre → 6px encogida): lo que de verdad mueve el contenido de debajo no es el alto de la caja de
+la cabecera, es el hueco que reserva alrededor.
+
+**Medir "que no dé un salto" tampoco era tan directo como parecía.** La prueba original comparaba
+la posición de un elemento de referencia antes y después de bajar, esperando que se moviera
+exactamente "lo que se ha bajado, más lo que ha encogido la cabecera". El número nunca cuadraba
+así — resultó que Chrome tiene **scroll anchoring**: si algo por encima de lo visible cambia de
+alto a mitad de un scroll, el navegador ajusta `window.scrollY` por su cuenta para que el
+contenido visible no dé un salto. Es exactamente lo que se quería conseguir, hecho ya por el propio
+navegador. La prueba se corrigió para medir lo que de verdad importa: que el contenido se mueva
+justo lo que se ha pedido bajar y ni un píxel más, sin mirar el valor final de `scrollY` (que
+Chrome puede tocar por su cuenta, y eso no es ningún fallo).
+
+**El caso especial: "Por clasificar".** Con un documento abierto en el panel de la derecha, la
+cabecera encogida de Asuntos abiertos añade "Viendo: `<nombre>`" y un botón "Ir a su fila"
+(`scrollIntoView` a la tarjeta ya marcada `.tarjeta-abierta`, que pone `js/documentos-sueltos.js`).
+Lo hace `js/cabecera-fija.js` solo mirando esa tarjeta, sin tocar `js/documentos-sueltos.js` ni
+`js/visor.js`, tal y como pedía el documento.
+
+**Ajustes se queda con las pestañas visibles también.** Como su cabecera es solo el título
+"Ajustes" (`index.html`), las pestañas "Tipos de asunto · El centro · Mantenimiento"
+(`#pestanas-ajustes`) se dejaron pegadas por su cuenta, justo debajo, con una variable CSS
+(`--cabecera-fija-alto`) que `js/cabecera-fija.js` mide y actualiza en cada repintado con el alto
+real de la cabecera (encogida o no), para que no quede ni hueco ni solape entre las dos.
+
+**El repintado de la ficha no pierde el estado.** `js/ficha-asunto.js` rehace su
+`.ficha-cabecera` entera con `innerHTML` cada vez que pinta (por ejemplo, al cambiar el estado del
+asunto), por encima sigue `U.conservandoLoEscrito` como siempre. En vez de tocar ese fichero (que
+ya pasa de 400 líneas, como pedía el documento), `js/cabecera-fija.js` vigila con un único
+`MutationObserver` sobre `<main class="contenido">`: si el nodo de la cabecera cambia, vuelve a
+poner el estado encogido sin esperar al siguiente scroll. El mismo observador, mirando la clase
+`oculto` de las pantallas, se entera también de los cambios de pantalla, sin engancharse a
+`App.ir`.
+
+Comprobado que `js/barra.js` (línea ~139, `#pantalla-abiertos .cabecera`) sigue colgando el botón
+grande de "Nuevo asunto" sin problema. Prueba nueva `pruebas/cabecera-fija.mjs`, navegador de
+verdad, con los siete puntos del encargo. Batería completa en verde (59 ficheros de prueba), una
+sola pasada al final. Versión publicada `App.VERSION`: `18-sep-2026 · 00:31`. Con esta fila,
+`docs/COLA.md` queda entera: no queda ninguna fila pendiente.
+
+---
+
 ## 17-sep-2026 — Los destinatarios de un mensaje de Séneca
 
 Fila 47 de la cola (`docs/COLA.md`, `docs/DESTINATARIOS-EN-SENECA.md`), acordada con Francisco el

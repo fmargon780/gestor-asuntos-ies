@@ -562,6 +562,66 @@ columna. El tope de 1180px de `css/estilos.css` se anula en `css/vista.css`; con
 propio Nuevo asunto (940px) y Ajustes (1600px). Los filtros (estado, plazo, orden) van plegados
 en un panel que abre el botón "Filtros", recordado en `gestor-filtros`.
 
+### La cabecera se queda arriba, y se encoge (fila 46, 17/18-sep-2026)
+
+`js/cabecera-fija.js` (`window.CabeceraFija`) es un único mecanismo para las siete pantallas
+(ficha del asunto, asuntos abiertos —incluido "Por clasificar", misma pantalla—, archivo,
+personas y empresas, ajustes, qué me toca, duplicados; papelera vive dentro de ajustes y usa su
+cabecera). No sabe nada de ninguna pantalla en concreto:
+
+- Busca, dentro de `section.pantalla` sin la clase `oculto`, su `header.cabecera` o
+  `header.ficha-cabecera`, y le pone o quita la clase `encogida` según `window.scrollY`, con
+  histéresis (encoge a 80px, se despliega a 40px) para que no parpadee en el límite. Un
+  `requestAnimationFrame` agrupa los eventos de `scroll`/`resize`.
+- Un único `MutationObserver` sobre `<main class="contenido">` (`childList`+`subtree`+`class`)
+  cubre, sin engancharse a `App.ir` ni tocar `js/ficha-asunto.js`, dos cosas a la vez: que cambie
+  qué pantalla está visible (la clase `oculto`), y que una pantalla se repinte por dentro. La
+  ficha rehace su `.ficha-cabecera` entera con `innerHTML` en cada `pintar()` (por encima sigue
+  `U.conservandoLoEscrito`, sin tocar): el observador nota el `childList` nuevo y vuelve a poner
+  el estado encogido sin esperar al siguiente scroll, así que cambiar el estado del asunto (o
+  cualquier otro repintado) no lo pierde.
+- El ancho lo da la ventana normal: `.lateral` está fija y `.contenido` va en el flujo normal, así
+  que basta con `position: sticky; top: 0;` (sin ningún contenedor con `overflow`) para que la
+  cabecera pegada mida siempre como su padre de verdad — con el tablón (grid de
+  `#pantalla-abiertos.con-tablon`), con `con-visor` o con `con-lector` (`css/visor.css`,
+  `css/lector.css`, que cambian el padding/margin de `#aplicacion`), sin nada especial que
+  escribir para eso.
+- `css/cabecera-fija.css`: `margin-left/right: -32px` y `padding-left/right: 32px` (a mano, no el
+  shorthand `margin`, para no pisar el `margin-bottom` que ya ponía cada pantalla) para llegar de
+  borde a borde; en pantalla estrecha (900px) pasan a -16px/16px, como `.contenido` en
+  `css/estilos.css`. `z-index: 20`, por debajo de `.capa` (50) y `.mensajes` (60). Encogida: el
+  título baja de 21px a 17px, se esconden `.filtros` (dentro de la cabecera de Asuntos abiertos) y
+  el `.explica` que venga justo después de la cabecera, y el margen de abajo baja a 6px (reducir
+  el alto de la cabecera sola no basta si el hueco de debajo no se achica también: quien mueve el
+  contenido es ese margen, no un padding nuevo, que solo la agrandaría). `.tarjeta` lleva
+  `scroll-margin-top: 90px` para que la cabecera pegada no tape lo que se salta con
+  `scrollIntoView`.
+- `css/ficha-asunto.css`: `.ficha-cabecera.encogida` pasa a una sola fila (`display: flex`, con
+  `order` para no tocar el HTML que escribe `js/ficha-asunto.js`): volver, nombre (con
+  `text-overflow: ellipsis`, 16px), tipo/estado/plazo al final.
+- `css/ajustes.css`: `#pestanas-ajustes` (Tipos de asunto · El centro · Mantenimiento) es sticky
+  también, con `top: var(--cabecera-fija-alto, 0px)` — esa variable la mide y la pone
+  `js/cabecera-fija.js` en cada repintado (el alto real de la cabecera, encogida o no) sobre
+  `document.documentElement`, así las pestañas se quedan pegadas justo debajo sin hueco ni solape,
+  sea cual sea el estado de la cabecera.
+- Caso especial, "Por clasificar": con un documento abierto en el panel de la derecha
+  (`.tarjeta-abierta`, la pone `js/documentos-sueltos.js`, sin tocar ese fichero ni
+  `js/visor.js`), la cabecera encogida de `#pantalla-abiertos` añade un bloque `.cabecera-viendo`
+  ("Viendo: `<nombre>`" + botón "Ir a su fila", `scrollIntoView`) que crea `js/cabecera-fija.js`;
+  el CSS decide que solo se vea con `.encogida` (con la cabecera desplegada ya está la tarjeta
+  marcada en la lista).
+- **Comprobado que sigue funcionando**: `js/barra.js` (línea ~139) sigue encontrando
+  `#pantalla-abiertos .cabecera` para colgar el botón grande de "Nuevo asunto".
+- Prueba nueva `pruebas/cabecera-fija.mjs`, navegador de verdad: se ve entera al entrar, se encoge
+  a los 80px, la histéresis no la despliega hasta 40px, el contenido de debajo se mueve justo lo
+  que se ha pedido bajar (con **scroll anchoring** de Chrome de por medio: si el navegador ajusta
+  `window.scrollY` por su cuenta para que no se note el salto cuando la cabecera cambia de alto a
+  mitad del scroll, eso es la prueba de que no hay brinco, no un fallo — la prueba mide el
+  contenido movido, no el valor final de `scrollY`), cambiar de pantalla deja la anterior limpia y
+  la nueva funciona igual (incluidas las pestañas pegadas de Ajustes), el ancho sigue al de
+  `.contenido` con `con-lector`, el repintado de la ficha no pierde el estado encogido, el caso de
+  "Por clasificar", y que `js/barra.js` sigue encontrando su selector.
+
 ### El tablón de notas rápidas
 
 Columna a la derecha de asuntos abiertos, para lo que aún no es un asunto. Color, autor, fecha y
@@ -2116,6 +2176,8 @@ de `App` va después del fichero que lo define.
 | `js/correo-adjuntos.js` | El bloque "Documentos de este asunto" del cuadro de Correo, y el encargo `<id>.envio.json` |
 | `js/barra.js` | La barra plegable, el botón grande de Nuevo asunto y el icono de Ajustes plegado |
 | `js/vista.js` | Los filtros plegados y cuándo se ve el tablón |
+| `js/cabecera-fija.js` | La cabecera de la pantalla visible (`header.cabecera` o `header.ficha-cabecera`) se queda pegada arriba (`position: sticky`) y se encoge con el scroll, con histéresis; en "Por clasificar", con un documento abierto, añade "Viendo: …" e "Ir a su fila" (`window.CabeceraFija`) |
+| `css/cabecera-fija.css` | El aspecto de la cabecera pegada: fondo opaco de borde a borde, título más pequeño encogida, qué se esconde |
 | `js/dni.js` | El DNI del alumnado, el aviso de que falta y la búsqueda por DNI |
 | `js/papelera.js` | Borrar con papelera: mandar, devolver, borrar del todo y el bloque de Ajustes |
 | `css/papelera.css` | El bloque de la papelera en Ajustes, y su icono por clase |

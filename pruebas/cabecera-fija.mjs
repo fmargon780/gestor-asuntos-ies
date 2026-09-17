@@ -1,0 +1,292 @@
+/* Prueba en navegador de verdad de la cabecera que se queda pegada
+   arriba y se encoge al bajar (fila 46, docs/CABECERA-QUE-SE-QUEDA.md).
+
+   Comprueba: al entrar se ve entera; al bajar más de 80px se encoge
+   (con histéresis, no se despliega hasta menos de 40px); el contenido
+   de debajo no da un salto brusco al encogerse; al cambiar de
+   pantalla la cabecera anterior queda limpia y la nueva funciona
+   igual; el ancho sigue al de verdad de la zona de trabajo (con
+   con-lector); el repintado de la ficha no pierde el estado encogido;
+   en "Por clasificar", con un documento abierto, sale "Viendo: …" e
+   "Ir a su fila"; y que js/barra.js sigue encontrando
+   "#pantalla-abiertos .cabecera" para su botón de Nuevo asunto.
+
+   Reutiliza el disco de mentira de pruebas/navegador.mjs. */
+import { chromium } from 'playwright';
+import fs from 'fs';
+
+const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
+const preparacion = fuente.slice(fuente.indexOf('const preparacion = `') + 'const preparacion = `'.length,
+                                 fuente.indexOf('`;\n\nconst DIRECCION'));
+
+const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+/* Ancho del monitor del trabajo (como en pruebas/tablon.mjs, con el
+   mismo motivo): con el tablón puesto al lado, por debajo de cierto
+   ancho el buscador y los botones ya no caben en una sola línea con
+   el título y la cabecera sale más alta por eso —cosa de siempre,
+   nada que ver con esta fila—. Con sitio de sobra sí es una sola
+   línea, como la vería Francisco en el monitor del trabajo. */
+const pagina = await navegador.newPage({ viewport: { width: 1920, height: 600 } });
+const errores = [];
+pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
+pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
+await pagina.addInitScript(preparacion);
+await pagina.goto(process.env.DIRECCION || 'http://localhost:8123/index.html');
+
+let fallos = 0;
+async function comprobar(titulo, promesa, esperado) {
+  const real = await promesa;
+  const ok = JSON.stringify(real) === JSON.stringify(esperado);
+  if (!ok) { fallos++; console.log('FALLA  ' + titulo + '\n   sale: ' + JSON.stringify(real) + '\n   debía: ' + JSON.stringify(esperado)); }
+  else console.log('bien   ' + titulo);
+}
+async function comprobarQue(titulo, promesa) {
+  const real = await promesa;
+  if (!real) { fallos++; console.log('FALLA  ' + titulo); }
+  else console.log('bien   ' + titulo);
+}
+
+function encogidaDe(selector) {
+  return pagina.evaluate((s) => {
+    const el = document.querySelector(s);
+    return el ? el.classList.contains('encogida') : null;
+  }, selector);
+}
+function scroll(y) {
+  return pagina.evaluate((v) => window.scrollTo(0, v), y);
+}
+async function subirYEsperar(y) {
+  await scroll(y);
+  await pagina.waitForTimeout(200);
+}
+
+/* ---------- entrar, con 25 asuntos abiertos y un papel suelto ---------- */
+
+await pagina.click('#btn-abiertos');
+await pagina.click('#btn-archivo');
+await pagina.fill('#campo-usuario', 'Francisco');
+await pagina.waitForSelector('#btn-entrar:not([disabled])');
+
+await pagina.evaluate(async () => {
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
+  const asuntos = {};
+  for (let i = 0; i < 25; i++) {
+    const nombre = '2609' + String(10 + i).padStart(2, '0') +
+      ' PERMISO 26-27 Persona ' + String(i).padStart(2, '0') + ', Nombre ' + String(1000 + i);
+    asuntos[nombre] = {
+      tercero: 'Persona ' + String(i).padStart(2, '0') + ', Nombre',
+      categoria: 'PERSONAL', situacion: 'EN EL DEPARTAMENTO'
+    };
+  }
+  g._hijos.set('asuntos.json', window.__disco.fich('asuntos.json', JSON.stringify({ asuntos })));
+  for (const nombre of Object.keys(asuntos)) {
+    await window.__disco.abiertos.getDirectoryHandle(nombre, { create: true });
+  }
+  const raiz = window.__disco.abiertos._hijos;
+  raiz.set('Escrito sin clasificar.pdf', window.__disco.fich('Escrito sin clasificar.pdf', 'un papel'));
+  /* Rellenan la lista de "Por clasificar" para que también ahí haya
+     sitio de sobra para bajar más de 80px. */
+  for (let i = 0; i < 14; i++) {
+    raiz.set('Papel suelto ' + i + '.pdf', window.__disco.fich('Papel suelto ' + i + '.pdf', 'contenido'));
+  }
+});
+
+await pagina.click('#btn-entrar');
+await pagina.waitForSelector('#aplicacion:not(.oculto)');
+await pagina.click('#btn-barra'); /* la barra nace plegada; se abre para ver las pestañas */
+await pagina.waitForTimeout(300);
+
+console.log('=== 1. Asuntos abiertos: se ve entera, se encoge, se despliega ===');
+
+await comprobarQue('hay lista suficientemente larga para poder bajar más de 80px',
+  pagina.evaluate(() => document.documentElement.scrollHeight - window.innerHeight > 120));
+
+await comprobar('al entrar, la cabecera se ve entera (no encogida)',
+  encogidaDe('#pantalla-abiertos header.cabecera'), false);
+
+await subirYEsperar(200);
+await comprobar('al bajar 200px, se encoge', encogidaDe('#pantalla-abiertos header.cabecera'), true);
+
+console.log('--- que no dé un salto brusco al encogerse ---');
+/* Vuelve arriba del todo, mide dónde está el primer asunto de la
+   lista con la cabecera desplegada, baja 90px de golpe (cruzando el
+   umbral) y mide otra vez. Chrome tiene "scroll anchoring": si algo
+   por encima de lo visible cambia de alto mientras se hace scroll, el
+   navegador mismo corrige el scroll para que lo que se ve no salte —
+   por eso lo que hay que comprobar no es que nada se mueva (algo se
+   mueve siempre: se ha bajado 90px), sino que se mueve JUSTO esos
+   90px y ni uno más, señal de que el encogimiento no añade ningún
+   brinco por su cuenta. */
+await subirYEsperar(0);
+const alturaCabeceraAntes = await pagina.evaluate(() =>
+  document.querySelector('#pantalla-abiertos header.cabecera').getBoundingClientRect().height +
+  parseFloat(getComputedStyle(document.querySelector('#pantalla-abiertos header.cabecera')).marginBottom));
+const topAntes = await pagina.evaluate(() => document.querySelector('#lista-abiertos .tarjeta').getBoundingClientRect().top);
+
+await subirYEsperar(90);
+await pagina.waitForTimeout(300); /* deja terminar la transición CSS */
+const alturaCabeceraDespues = await pagina.evaluate(() =>
+  document.querySelector('#pantalla-abiertos header.cabecera').getBoundingClientRect().height +
+  parseFloat(getComputedStyle(document.querySelector('#pantalla-abiertos header.cabecera')).marginBottom));
+const topDespues = await pagina.evaluate(() => document.querySelector('#lista-abiertos .tarjeta').getBoundingClientRect().top);
+
+await comprobarQue('la cabecera de verdad ha encogido de alto (hueco reservado más pequeño)',
+  Promise.resolve(alturaCabeceraAntes - alturaCabeceraDespues > 5));
+/* Se ha pedido bajar 90px (window.scrollTo(0, 90)): lo que tiene que
+   cumplirse es que el contenido se mueva esos 90px pedidos y ni uno
+   más — da igual en qué valor exacto termine "window.scrollY" (Chrome
+   puede tocarlo por su cuenta, con "scroll anchoring", precisamente
+   para que no se note el salto cuando algo de arriba cambia de alto a
+   mitad del scroll: es la propia prueba de que no hay brinco). */
+await comprobarQue('el contenido de debajo se mueve justo lo que se ha pedido bajar, sin ningún brinco de más',
+  Promise.resolve(Math.abs((topAntes - topDespues) - 90) < 3));
+
+console.log('--- histéresis: no se despliega hasta bajar de 40px ---');
+await subirYEsperar(60);
+await comprobar('a 60px (entre 40 y 80) sigue encogida', encogidaDe('#pantalla-abiertos header.cabecera'), true);
+await subirYEsperar(45);
+await comprobar('a 45px todavía sigue encogida', encogidaDe('#pantalla-abiertos header.cabecera'), true);
+await subirYEsperar(20);
+await comprobar('a 20px (menos de 40) se despliega', encogidaDe('#pantalla-abiertos header.cabecera'), false);
+
+console.log('=== 2. js/barra.js sigue encontrando "#pantalla-abiertos .cabecera" ===');
+await comprobarQue('el botón grande de Nuevo asunto está puesto (lo pone barra.js dentro de la cabecera)',
+  pagina.evaluate(() => !!document.getElementById('btn-nuevo-asunto')));
+await comprobarQue('el selector que usa barra.js sigue encontrando la cabecera',
+  pagina.evaluate(() => !!document.querySelector('#pantalla-abiertos .cabecera')));
+
+console.log('=== 3. z-index por debajo de diálogos y mensajes ===');
+await comprobar('la cabecera lleva z-index 20 (menos que .capa 50 y .mensajes 60)',
+  pagina.evaluate(() => getComputedStyle(document.querySelector('#pantalla-abiertos header.cabecera')).zIndex), '20');
+
+console.log('=== 4. El archivo: el ancho sigue al de verdad, con con-lector ===');
+await pagina.evaluate(() => App.ir('archivo'));
+await pagina.waitForTimeout(200);
+const anchoNormal = await pagina.evaluate(() => [
+  document.querySelector('#pantalla-archivo header.cabecera').getBoundingClientRect().width,
+  document.querySelector('.contenido').getBoundingClientRect().width
+]);
+await comprobar('sin panel al lado, la cabecera mide igual que .contenido', anchoNormal[0], anchoNormal[1]);
+
+await pagina.evaluate(() => document.body.classList.add('con-lector'));
+await pagina.waitForTimeout(200);
+const anchoConLector = await pagina.evaluate(() => [
+  document.querySelector('#pantalla-archivo header.cabecera').getBoundingClientRect().width,
+  document.querySelector('.contenido').getBoundingClientRect().width
+]);
+await comprobar('con el panel de lectura abierto, la cabecera se estrecha igual que .contenido',
+  anchoConLector[0], anchoConLector[1]);
+await comprobarQue('y de verdad es más estrecha que antes (sigue el ancho real, no el de la ventana)',
+  Promise.resolve(anchoConLector[0] < anchoNormal[0]));
+await pagina.evaluate(() => document.body.classList.remove('con-lector'));
+
+console.log('=== 5. Cambiar de pantalla: la anterior queda limpia, la nueva funciona igual ===');
+await pagina.evaluate(() => App.ir('abiertos'));
+await subirYEsperar(200);
+await comprobar('en abiertos, vuelve a encogerse al bajar', encogidaDe('#pantalla-abiertos header.cabecera'), true);
+
+await pagina.evaluate(() => App.ir('ajustes'));
+await pagina.waitForTimeout(200);
+await comprobar('la cabecera de "abiertos", ya no visible, queda limpia (sin "encogida")',
+  encogidaDe('#pantalla-abiertos header.cabecera'), false);
+
+/* Ajustes tiene la rejilla de tipos en varias columnas: con el ancho
+   del monitor grande cabrían casi todos en pocas filas y no quedaría
+   sitio para bajar 80px. Una ventana más estrecha (siguen siendo
+   más de 900px, así que no entra el CSS de pantalla pequeña) da menos
+   columnas y más alto, sin que tenga nada que ver con esta fila. */
+await pagina.setViewportSize({ width: 1100, height: 600 });
+await pagina.waitForTimeout(200);
+await subirYEsperar(0);
+await comprobar('al entrar en Ajustes (arriba del todo), su cabecera no está encogida',
+  encogidaDe('#pantalla-ajustes header.cabecera'), false);
+await comprobarQue('hay sitio para bajar en Ajustes',
+  pagina.evaluate(() => document.documentElement.scrollHeight - window.innerHeight > 120));
+await subirYEsperar(200);
+await comprobar('Ajustes funciona igual: se encoge también al bajar',
+  encogidaDe('#pantalla-ajustes header.cabecera'), true);
+
+console.log('--- las pestañas de Ajustes se quedan pegadas justo debajo ---');
+const posicionPestanas = await pagina.evaluate(() => {
+  const cabecera = document.querySelector('#pantalla-ajustes header.cabecera');
+  const pestanas = document.getElementById('pestanas-ajustes');
+  return {
+    posicion: getComputedStyle(pestanas).position,
+    huecoEntreMedias: pestanas.getBoundingClientRect().top - cabecera.getBoundingClientRect().bottom
+  };
+});
+await comprobar('las pestañas de Ajustes son sticky', posicionPestanas.posicion, 'sticky');
+await comprobarQue('quedan pegadas justo debajo de la cabecera, sin hueco ni solape',
+  Promise.resolve(Math.abs(posicionPestanas.huecoEntreMedias) < 2));
+
+await subirYEsperar(0);
+
+console.log('=== 6. La ficha de un asunto: se encoge, y el repintado no pierde el estado ===');
+await pagina.evaluate(() => App.ir('abiertos'));
+await pagina.waitForTimeout(200);
+await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await pagina.waitForTimeout(300);
+
+await comprobarQue('la ficha tiene sitio de sobra para bajar más de 80px',
+  pagina.evaluate(() => document.documentElement.scrollHeight - window.innerHeight > 150));
+await comprobar('al entrar en la ficha, su cabecera se ve entera', encogidaDe('header.ficha-cabecera'), false);
+await subirYEsperar(200);
+await comprobar('al bajar, la cabecera de la ficha se encoge', encogidaDe('header.ficha-cabecera'), true);
+
+console.log('--- cambiar el estado repinta la ficha entera: no debe perder el "encogida" ---');
+await pagina.evaluate(() => {
+  const sel = document.querySelector('#ficha-acciones select.campo-estado');
+  const opcion = Array.prototype.filter.call(sel.options, (o) => o.textContent === 'A LA ESPERA DEL TERCERO')[0];
+  sel.value = opcion.value;
+  sel.dispatchEvent(new Event('change', { bubbles: true }));
+});
+await pagina.waitForTimeout(500);
+await comprobar('tras el repintado (nuevo <header> de verdad), sigue encogida sin haber vuelto a hacer scroll',
+  encogidaDe('header.ficha-cabecera'), true);
+await comprobar('y el repintado sí ha llegado (el estado nuevo se ve)',
+  pagina.locator('.ficha-marcas .marca-estado').textContent(), 'A LA ESPERA DEL TERCERO');
+
+await pagina.click('#ficha-volver');
+await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+await subirYEsperar(0);
+
+console.log('=== 7. "Por clasificar": Viendo… + Ir a su fila ===');
+await pagina.click('.panel[data-vista="clasificar"]');
+await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');
+await comprobar('sin nada abierto, la cabecera encogida no lleva "Viendo…"',
+  pagina.evaluate(() => !!document.querySelector('.cabecera-viendo-nombre')), false);
+
+await pagina.click('#lista-sueltos .fila-menu-btn');
+await pagina.locator('#lista-sueltos .fila-menu').getByRole('button', { name: 'Abrir', exact: true }).click();
+await pagina.waitForTimeout(600);
+await comprobarQue('el documento queda marcado como abierto en su tarjeta',
+  pagina.evaluate(() => !!document.querySelector('.tarjeta-abierta')));
+
+await subirYEsperar(200);
+await comprobar('encogida, con el documento abierto', encogidaDe('#pantalla-abiertos header.cabecera'), true);
+await comprobar('"Viendo: …" dice el nombre del documento abierto',
+  pagina.locator('.cabecera-viendo-nombre').textContent(), 'Viendo: Escrito sin clasificar.pdf');
+
+const antesDeIr = await pagina.evaluate(() => document.querySelector('.tarjeta-abierta').getBoundingClientRect().top);
+await pagina.click('.cabecera-viendo-ir');
+await pagina.waitForTimeout(600);
+const posicionTarjeta = await pagina.evaluate(() => {
+  const t = document.querySelector('.tarjeta-abierta').getBoundingClientRect();
+  const c = document.querySelector('#pantalla-abiertos header.cabecera').getBoundingClientRect();
+  return { top: t.top, debajoDeLaCabecera: t.top >= c.bottom - 1, dentroDeLaVentana: t.top < window.innerHeight };
+});
+await comprobarQue('"Ir a su fila" mueve el scroll (la tarjeta cambia de sitio en la ventana)',
+  Promise.resolve(Math.abs(posicionTarjeta.top - antesDeIr) > 5));
+await comprobarQue('"Ir a su fila" deja la tarjeta visible, no tapada por la cabecera pegada',
+  Promise.resolve(posicionTarjeta.debajoDeLaCabecera && posicionTarjeta.dentroDeLaVentana));
+
+await pagina.click('#visor-cerrar').catch(() => {});
+await pagina.waitForTimeout(300);
+await comprobar('al cerrar el documento, "Viendo…" desaparece',
+  pagina.evaluate(() => !!document.querySelector('.cabecera-viendo-nombre')), false);
+
+if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
+console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
+await navegador.close();
+process.exit(fallos ? 1 : 0);

@@ -9,6 +9,27 @@
 .ficha-cabecera { margin-bottom: 16px; }
 .ficha-marcas { margin: 12px 0 4px; }
 
+/* Encogida (css/cabecera-fija.css pone y quita la clase): todo en una
+   sola línea — volver, nombre (con puntos suspensivos si no cabe),
+   tipo, estado y plazo — docs/CABECERA-QUE-SE-QUEDA.md, tabla del
+   punto 2. El orden visual cambia con "order", sin tocar el HTML que
+   escribe js/ficha-asunto.js (el nombre va en medio, las marcas al
+   final). */
+.ficha-cabecera.encogida {
+  display: flex; align-items: center; gap: 12px; flex-wrap: nowrap;
+  margin-bottom: 0;
+}
+.ficha-cabecera.encogida .ficha-volver-fila { flex: 0 0 auto; order: 1; }
+.ficha-cabecera.encogida #ficha-volver-origen { display: none; }
+.ficha-cabecera.encogida .ficha-nombre {
+  order: 2; flex: 1 1 auto; min-width: 0; font-size: 16px; margin: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ficha-cabecera.encogida .ficha-marcas {
+  order: 3; flex: 0 0 auto; margin: 0; display: flex; gap: 6px;
+  white-space: nowrap; overflow: hidden;
+}
+
 /* La fila de "Volver a la lista" y, si se ha saltado desde otro asunto
    (17-sep-2026, fila 40, docs/SALTAR-A-OTRO-ASUNTO.md), "← Volver a
    [asunto de partida]" al lado. Una sola línea siempre: la cabecera no
