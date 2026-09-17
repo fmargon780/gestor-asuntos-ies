@@ -28,6 +28,14 @@ async function comprobar(titulo, promesa, esperado) {
   else console.log('bien   ' + titulo);
 }
 
+/* Desde la fila 36 (docs/FILAS-QUE-NO-SE-ESTRUJAN.md, 17-sep-2026),
+   "Borrar" de un documento vive detrás del menú de tres puntos
+   (U.menuDeAcciones): hay que abrirlo antes de poder pulsarlo. */
+async function borrarDelMenu(locatorFila) {
+  await locatorFila.locator('.fila-menu-btn').click();
+  await locatorFila.locator('.fila-menu').getByRole('button', { name: 'Borrar', exact: true }).click();
+}
+
 /* ---------- arranque ---------- */
 await pagina.click('#btn-abiertos');
 await pagina.click('#btn-archivo');
@@ -55,7 +63,7 @@ await pagina.waitForSelector('.ficha-documento');
 await comprobar('el documento se ve en la ficha',
   pagina.locator('.ficha-documento').count(), 1);
 
-await pagina.locator('#ficha-documentos').getByRole('button', { name: 'Borrar' }).click();
+await borrarDelMenu(pagina.locator('#ficha-documentos'));
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('el cuadro pregunta si mandar a la papelera',
   pagina.locator('#cuadro-titulo').textContent(), '¿Mandar a la papelera?');
@@ -238,8 +246,7 @@ await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(300);
 await pagina.locator('.tarjeta-asunto').filter({ hasText: 'MATRICULA' }).locator('.nombre-pulsable').click();
 await pagina.waitForSelector('.ficha-documento');
-await pagina.locator('.ficha-documento-fila').filter({ hasText: 'SOLICITUD' })
-  .getByRole('button', { name: 'Borrar' }).click();
+await borrarDelMenu(pagina.locator('.ficha-documento-fila').filter({ hasText: 'SOLICITUD' }));
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(300);
 
@@ -283,7 +290,7 @@ await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(300);
 await pagina.locator('.tarjeta-asunto').filter({ hasText: 'MATRICULA' }).locator('.nombre-pulsable').click();
 await pagina.waitForSelector('.ficha-documento');
-await pagina.locator('#ficha-documentos').getByRole('button', { name: 'Borrar' }).click();
+await borrarDelMenu(pagina.locator('#ficha-documentos'));
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(300);
 await pagina.evaluate(async () => {

@@ -2071,3 +2071,28 @@ una línea cada una. El texto largo que tenían antes era:
   alta/edición/borrado en Ajustes (no pedida por las pruebas del encargo, pero es la parte que usa
   Francisco a diario). Batería completa en verde (`npm test`, 22 ficheros). Con esta fila, la cola
   se queda sin ninguna PENDIENTE: solo la fila 11 sigue EN CURSO, de otra sesión.
+- **36 · `docs/FILAS-QUE-NO-SE-ESTRUJAN.md`**: Terminada 17-sep-2026 · 19:20, a partir de una
+  captura de Francisco: con el panel de la derecha abierto, el nombre de un documento se quedaba
+  a un carácter por renglón, porque `.ficha-documento-fila` no envolvía (`display:flex` sin
+  `flex-wrap`) y el nombre era el único que cedía. `css/filas.css` nuevo, enlazado el último de
+  todos en `index.html`: regla general de fila (texto con ancho mínimo, botones que bajan de línea
+  en vez de estrujarlo) aplicada a `.ficha-documento-fila`, `.relacionado-fila`, `.hito-linea` y
+  `.fila-tipo`; `.rejilla-tipos` y `#lista-personas` ya envolvían bien, sin tocar. `U.menuDeAcciones`
+  nueva en `js/util.js`: menú de tres puntos compartido, con los botones que recibe siempre en el
+  DOM (ocultos con `.oculto`) para que `aplicarModoConsulta` los alcance igual que a los demás, sin
+  ningún caso especial. En `js/ficha-documentos.js` solo quedan a la vista el nombre y "Registrar";
+  Copiar (que sigue añadiéndolo `js/copiar.js`, por envoltura, buscando el `.fila-menu` ya montado),
+  Separar, Unir, Sacar páginas y Borrar van al menú. En `js/documentos-sueltos.js` quedan a la vista
+  "Crear asunto con él" y "Meter en un asunto"; Abrir, Separar, Unir, Sacar páginas y Borrar (que
+  sigue añadiéndolo `js/papelera.js`) van al menú — `App.accionesDeSuelto` (fila 25) ahora busca
+  "Abrir" por su texto en cualquier profundidad. La barra azul (`js/barra.js`) se pliega sola al
+  aparecer `con-visor`/`con-lector` en `<body>` (un `MutationObserver`, sin tocar `localStorage`) y
+  vuelve a como estaba al desaparecer las dos; y pierde el tope de 1360px que tenía en
+  `css/barra.css` con la barra plegada, que dejaba franjas vacías en el monitor ancho del trabajo.
+  Prueba nueva `pruebas/filas-estrechas.mjs`, en navegador de verdad (comprobado que la 1 falla sin
+  `css/filas.css`: sin él, `flex-wrap` computado sale `nowrap` y el ancho mínimo del nombre, `0px`).
+  Media docena de pruebas ya existentes (`documentos-sueltos.mjs`, `documento-a-la-vista.mjs`,
+  `papelera.mjs`, `separar-unir-navegador.mjs`) daban por hecho que Abrir/Separar/Unir/Sacar
+  páginas/Borrar/Copiar estaban siempre a la vista: se han ajustado para abrir el menú antes de
+  pulsarlos (o de comprobar que están, con `getByRole`, que no ve dentro de un `display:none`).
+  Batería completa en verde.

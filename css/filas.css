@@ -1,0 +1,82 @@
+/* ============================================================
+   filas.css — que ninguna fila con texto y botones se aplaste.
+
+   Regla general (17-sep-2026, fila 36, docs/FILAS-QUE-NO-SE-ESTRUJAN.md),
+   a partir de una captura de Francisco: con el panel de la derecha
+   abierto, el nombre de un documento se quedaba en un carácter por
+   renglón, porque los botones no cedían nada y el texto era el único
+   que sí lo hacía.
+
+   1. El texto nunca se estruja: tiene un ancho mínimo por debajo del
+      cual ya no cede.
+   2. Si no cabe todo, los botones bajan a una segunda línea.
+   3. Una fila con más de dos botones deja a la vista los importantes
+      y mete el resto tras un botón de tres puntos (U.menuDeAcciones,
+      en js/util.js).
+
+   Enlazado el último de todos los <link> en index.html, para ganar a
+   las reglas de módulo que ya existen.
+   ============================================================ */
+
+/* ---------- los documentos de la ficha del asunto ---------- */
+
+.ficha-documento-fila {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+}
+.ficha-documento-fila > .ficha-documento {
+  flex: 1 1 260px; min-width: 240px;      /* no baja de aquí: nunca un carácter por línea */
+}
+.ficha-documento-fila > .boton,
+.ficha-documento-fila > .marca-sin-registrar { flex: 0 0 auto; }
+
+/* ---------- el menú de tres puntos de una fila (U.menuDeAcciones) ---------- */
+
+.fila-menu-envoltorio { position: relative; flex: 0 0 auto; }
+.fila-menu-btn {
+  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; line-height: 1; background: var(--papel); color: var(--tinta-suave);
+  border: 1px solid var(--linea); border-radius: 8px; cursor: pointer;
+}
+.fila-menu-btn:hover { background: #eef1f5; color: var(--tinta); }
+.fila-menu {
+  position: absolute; top: 36px; right: 0; z-index: 9;
+  background: var(--papel); border: 1px solid var(--linea); border-radius: 8px;
+  box-shadow: var(--sombra); min-width: 190px; padding: 4px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.fila-menu.oculto { display: none; }
+.fila-menu button {
+  width: 100%; text-align: left; justify-content: flex-start;
+  margin: 0 !important; border-color: transparent; background: none;
+}
+.fila-menu button:hover { background: #f0f3f7; border-color: transparent; }
+
+/* ---------- las tarjetas de "Por clasificar" y de asuntos abiertos ----------
+
+   Ya envuelven bien (.tarjeta trae flex-wrap y .tarjeta-texto un
+   ancho mínimo, css/estilos.css): lo único que hacía falta aquí era
+   recortar cuántos botones se ven a la vez, y eso lo hace ya
+   js/documentos-sueltos.js con U.menuDeAcciones. */
+
+/* ---------- los relacionados ---------- */
+
+.relacionado-fila { flex-wrap: wrap; }
+.relacionado-fila span:nth-child(2) { min-width: 160px; }
+
+/* ---------- los hitos ---------- */
+
+.hito-linea { flex-wrap: wrap; }
+.hito-titulo { min-width: 160px; }
+
+/* ---------- las listas de Ajustes (estados, tipos de documento,
+   campos propios, campos por defecto de la guía...) ---------- */
+
+.fila-tipo { flex-wrap: wrap; }
+.fila-tipo .nombre-tipo { min-width: 140px; }
+
+/* La rejilla de tipos de asunto (.rejilla-tipos, css/ajustes.css) ya
+   envuelve bien: cada tarjeta tiene un ancho mínimo propio
+   (minmax(300px, 1fr)) y su línea de datos ya lleva flex-wrap. */
+
+/* La lista de personas y empresas (#lista-personas) ya envuelve bien:
+   cada resultado es un bloque de texto normal, sin botones al lado. */

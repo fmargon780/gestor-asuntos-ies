@@ -107,6 +107,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Archivar o reabrir cuando el destino ya existe (de un intento a medias) fusiona las dos carpetas, sin perder nada.
 - Guardar un documento en un asunto se queda en su ficha; solo Editar, Archivar/Reabrir y Borrar
   vuelven a la lista. La ficha solo se repinta si algo suyo ha cambiado de verdad (fila 34).
+- Ninguna fila con texto y botones se aplasta (`css/filas.css`, `U.menuDeAcciones`). La barra azul
+  se pliega sola al abrir el visor o el lector, y sin ella no hay tope de ancho (fila 36).
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -117,8 +119,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - **Comprobar siempre lo publicado con `curl`**, nunca dar la publicación por hecha.
 - Antes de colgar una función nueva de `App`, comprobar que el nombre no está ya cogido.
 - Solo hay un cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.
-- Ojo con `p.campos`: solo trae columnas con datos; para saber si una columna existe, mirar la
-  cabecera del CSV.
+- Ojo con `p.campos`: solo trae columnas con datos; para saber si una columna existe, mirar la cabecera del CSV.
 - Ojo con el orden de los `<script>` de `index.html`: importa para las envolturas.
 - Una acción que guarda y repinta: `await` hasta el final y usar `U.mientrasGuarda(control, fn)`
   para apagar el botón o desplegable ("Guardando…") mientras tanto (fila 23, 17-sep-2026).
@@ -147,10 +148,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs`: sin eso no se siguen los hilos por matrícula, ni la copia oculta de un grupo.
 - Comprobar con Séneca si Comunicaciones acepta el largo del asunto que le damos.
 - Cuando tengan una cuenta de correo común, replantear la bandeja como una sola compartida.
-- Ver con el uso: ancho del panel lateral y del tablón, y si las tarjetas por tipo se quedan cortas.
+- Ver con el uso: ancho del panel lateral y del tablón.
 - Si el DNI no sale de nadie, marcar la columna del documento al generar el RegAlum.
-- Cuando el uso lo pida: búsqueda en notas, cuentas por tipo para la memoria de fin de curso,
-  qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta del centro.
+- Cuando el uso lo pida: búsqueda en notas, cuentas por tipo para la memoria de fin de curso, qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta del centro.
 - Los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no se fusionan entre ordenadores (solo las altas).
 
 ## 9. Cuándo leer `CONTEXTO.md` entero

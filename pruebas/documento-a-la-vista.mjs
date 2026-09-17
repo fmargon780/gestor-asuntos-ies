@@ -53,8 +53,16 @@ function tarjetaDe(nombre) {
   return pagina.locator('#lista-sueltos .tarjeta').filter({ hasText: nombre });
 }
 
+/* Desde la fila 36 (docs/FILAS-QUE-NO-SE-ESTRUJAN.md, 17-sep-2026),
+   "Abrir" y "Borrar" viven detrás del menú de tres puntos
+   (U.menuDeAcciones): hay que abrirlo antes de poder pulsarlos. */
+async function pulsarDelMenu(locatorFila, texto) {
+  await locatorFila.locator('.fila-menu-btn').click();
+  await locatorFila.locator('.fila-menu').getByRole('button', { name: texto, exact: true }).click();
+}
+
 console.log('--- abrir el primero ---');
-await tarjetaDe('260901 uno.pdf').getByRole('button', { name: 'Abrir' }).click();
+await pulsarDelMenu(tarjetaDe('260901 uno.pdf'), 'Abrir');
 await pagina.waitForSelector('#visor-lateral:not(.oculto)');
 await comprobar('el visor dice el nombre completo',
   pagina.locator('#visor-nombre').getAttribute('title'), '260901 uno.pdf');
@@ -66,13 +74,17 @@ await comprobar('las acciones del panel están: Crear asunto con él',
   pagina.locator('#visor-acciones').getByRole('button', { name: 'Crear asunto con él' }).count(), 1);
 await comprobar('y Meter en un asunto',
   pagina.locator('#visor-acciones').getByRole('button', { name: 'Meter en un asunto' }).count(), 1);
+/* "Borrar" vive detrás del menú de tres puntos (fila 36): mientras
+   está cerrado (display:none) no cuenta como accesible para
+   getByRole, así que hay que abrirlo para comprobar que está. */
+await pagina.locator('#visor-acciones .fila-menu-btn').click();
 await comprobar('y Borrar',
-  pagina.locator('#visor-acciones').getByRole('button', { name: 'Borrar' }).count(), 1);
+  pagina.locator('#visor-acciones .fila-menu').getByRole('button', { name: 'Borrar' }).count(), 1);
 await comprobar('pero no "Abrir" (ya se está viendo)',
   pagina.locator('#visor-acciones').getByRole('button', { name: 'Abrir', exact: true }).count(), 0);
 
 console.log('--- abrir el segundo: la marca se mueve, no se acumula ---');
-await tarjetaDe('260902 dos.pdf').getByRole('button', { name: 'Abrir' }).click();
+await pulsarDelMenu(tarjetaDe('260902 dos.pdf'), 'Abrir');
 await pagina.waitForTimeout(200);
 await comprobar('sigue habiendo solo una tarjeta marcada',
   pagina.locator('#lista-sueltos .tarjeta-abierta').count(), 1);
@@ -87,9 +99,9 @@ await comprobar('ninguna tarjeta queda marcada',
   pagina.locator('#lista-sueltos .tarjeta-abierta').count(), 0);
 
 console.log('--- borrar el que se está viendo, desde el propio panel ---');
-await tarjetaDe('260903 tres.pdf').getByRole('button', { name: 'Abrir' }).click();
+await pulsarDelMenu(tarjetaDe('260903 tres.pdf'), 'Abrir');
 await pagina.waitForSelector('#visor-lateral:not(.oculto)');
-await pagina.locator('#visor-acciones').getByRole('button', { name: 'Borrar' }).click();
+await pulsarDelMenu(pagina.locator('#visor-acciones'), 'Borrar');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
