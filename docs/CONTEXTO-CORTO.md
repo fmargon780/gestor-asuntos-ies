@@ -102,6 +102,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Separar, Unir y Sacar páginas de un PDF, en la carpeta del asunto y en Por clasificar (con
   pdf-lib, `js/lib/pdf-lib.min.js`); miniaturas con pdf.js, tijeras entre páginas para Separar.
 - "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha (opcional), con el correo ya puesto al preparar el cuadro de Correo.
+- Archivar o reabrir cuando el destino ya existe (de un intento a medias) fusiona las dos carpetas, sin perder nada.
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -141,8 +142,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Coordinar con él la lista de tipos de asunto y la de estados.
 - Poner en marcha el script de Gmail en `g.educaand.es` y señalar `GESTOR-BANDEJA` en Ajustes.
 - Ver si la bandeja de correo acierta con el tipo; si falla mucho, palabras clave por tipo.
-- Pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs` (17-sep-2026):
-  sin eso no se siguen los hilos por matrícula, ni la copia oculta de un grupo.
+- Pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs`: sin eso no se siguen los hilos por matrícula, ni la copia oculta de un grupo.
 - Comprobar con Séneca si Comunicaciones acepta el largo del asunto que le damos.
 - Cuando tengan una cuenta de correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel lateral y del tablón, y si las tarjetas por tipo se quedan cortas.
