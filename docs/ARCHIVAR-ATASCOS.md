@@ -3,8 +3,9 @@
 Acordado con Francisco el 17-sep-2026, poco después de publicar la fila 32. **Va la primera de
 la cola**: sigue con un asunto real sin poder archivar.
 
-Apúntala tú en `docs/COLA.md` como **fila 33**, con estado EN CURSO, en tu primer commit, y
-márcala HECHA al terminar. Va en la tabla justo debajo de la fila 32.
+Se apuntó tarde, como fila 44 de `docs/COLA.md` (ya con las filas 38-43 ocupadas por otras
+instrucciones apuntadas mientras esta se quedó sin fila), pero se trabaja antes que ellas por ser
+un fallo real que bloquea a Francisco: ver la nota "Orden de trabajo" de la cola.
 
 No leas el repositorio entero. Cambios quirúrgicos.
 
