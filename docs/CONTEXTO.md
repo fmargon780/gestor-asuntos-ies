@@ -112,8 +112,8 @@ el Escape general de aquí se dispara también y hace algo de más.
 
 ### La ficha de un asunto
 
-Al pulsar el nombre de un asunto se entra en su ficha: sus datos, el contacto del tercero, la
-guía de su tipo con las casillas, sus notas, sus documentos y los demás asuntos del mismo
+Al pulsar el nombre de un asunto se entra en su ficha: sus datos, el contacto del tercero, sus
+hitos (ver "Los hitos de un asunto"), sus notas, sus documentos y los demás asuntos del mismo
 tercero.
 
 **La tarjeta de la lista se queda con lo justo**: el desplegable del estado, "Copiar nombre" y
@@ -193,40 +193,57 @@ cuadro es uno solo para alta y cambio: `App.cuadroDeTercero`, en `js/asuntos-nue
 ### Las guías del procedimiento
 
 Cada tipo de asunto puede llevar una lista de pasos, con título y explicación (negrita, viñetas,
-enlaces), en el orden del trámite, guardados en `_GESTOR/guias.json`. Dentro de un asunto
-abierto los pasos salen con casilla; lo marcado se guarda en `pasosHechos`, lo elegido en
-`pasosElegidos`.
+enlaces), en el orden del trámite, guardados en `_GESTOR/guias.json`. Un paso puede ser una
+PREGUNTA con opciones, cada una con sus propios pasos.
 
-Se escriben desde Ajustes y desde la ficha de un asunto abierto. El botón lo pone
-`js/ficha-asunto.js`, pero quien guarda es `js/guias-enganche.js`, vía
-`window.GuiasDelCentro.escribir(tipo)`. El fichero se relee justo antes de abrir el cuadro.
+Es un catálogo de pasos, no un cuadro que se marca: dentro de un asunto abierto **ya no se lee
+como texto** (17-sep-2026, fila 26, `docs/HITOS-SON-LA-GUIA.md`), se trabaja como hitos (ver "Los
+hitos de un asunto", justo debajo). La guía tal cual, con sus casillas, solo se enseña como
+recordatorio al elegir el tipo en "Nuevo asunto" (`#guia-nuevo`, sin marcar nada) y dentro del
+propio cuadro de escribirla.
 
-Al marcar un paso, su explicación se pliega y queda el título tachado en verde; el enlace "ver"
-lo vuelve a abrir. Un paso puede ser una PREGUNTA con opciones, cada una con sus propios pasos;
-al elegir una, salen solo esos pasos, y la cuenta de arriba suma solo la rama elegida.
+Se escriben desde Ajustes y desde el bloque "Hitos" de la ficha de un asunto abierto (el
+`<p class="nota">` del final, "Escribir/Cambiar la guía"; lo pone `js/hitos-panel.js`, pero quien
+guarda sigue siendo `js/guias-enganche.js`, vía `window.GuiasDelCentro.escribir(tipo)`). El
+fichero se relee justo antes de abrir el cuadro.
 
 - Una bifurcación por paso (las opciones no llevan opciones dentro).
 - Las dos ramas se pintan desde el principio y solo se enseña la elegida.
 - Los identificadores viajan en el `data-id` del recuadro, no por su posición.
 - Al leer el cuadro de escribir la guía, pedir solo los hijos directos (`:scope >`).
-- `Guias.cuandoSeElige(fn)` es el único hueco que avisa de que se ha elegido una opción.
+- `Guias.cuandoSeElige(fn)` es el único hueco que avisa de que se ha elegido una opción: lo usa
+  el propio cuadro de escribirla, para pintar la rama elegida mientras se edita.
 
-Se comprueba con `pruebas/guias.mjs` y `pruebas/opciones.mjs`.
+Se comprueba con `pruebas/guias.mjs` y `pruebas/opciones.mjs` (que escriben una guía desde la
+ficha de un asunto y comprueban que nace como hitos: la guía en sí no tiene pantalla propia).
 
 ### Los hitos de un asunto
 
-Dentro de un asunto abierto, la guía deja de ser texto que se marca con una casilla y pasa a ser
-la lista de **hitos** que se trabaja: cada paso, vivo dentro de ese asunto, con estado (pendiente
-· en curso · hecho · no aplica), fecha límite, responsable, notas y documentos apuntados.
+Dentro de un asunto abierto, la guía **es** la lista de **hitos** que se trabaja: cada paso, vivo
+dentro de ese asunto, con estado (pendiente · en curso · hecho · no aplica), fecha límite,
+responsable, notas y documentos apuntados. Ya no hay "la guía" por un lado y "los hitos" por otro
+(17-sep-2026, fila 26, `docs/HITOS-SON-LA-GUIA.md`): el bloque se llama "Hitos", no "Guía del
+procedimiento".
 
 - Viven en `_GESTOR/hitos.json` (el duodécimo fichero compartido), no en `asuntos.json`: se leen
   solo al abrir un asunto, al archivarlo y en la pantalla "Qué me toca". Estructura:
   `{ ajustes: { responsables, noLectivos }, porAsunto: { <clave del asunto>: { creados, hitos } } }`.
-- **Al crear un asunto**, si su tipo tiene guía, sus pasos se convierten en hitos solos (el id del
-  hito es el mismo que el del paso: `origenGuia`), y el primero queda en curso. Un asunto que ya
-  existía no los recibe solo: en el sitio de la guía sale el botón "Crear los hitos de la guía",
-  que además importa `pasosHechos`/`pasosElegidos` (que se quedan en `asuntos.json` tal cual).
-  Tocar los hitos de un asunto nunca cambia la guía del tipo.
+- **Se crean solos, sin botón ni preguntar nada**, la primera vez que se abre la ficha de un
+  asunto abierto cuyo tipo tiene guía y que todavía no tiene hitos: vale igual para uno recién
+  creado que para uno que ya existía. El id del hito es el mismo que el del paso (`origenGuia`),
+  y lo que el asunto ya tuviera marcado (`pasosHechos`/`pasosElegidos` de `asuntos.json`, que se
+  quedan ahí tal cual) se importa al crearlos, con `Hitos.crearDesdeGuiaImportando`. El primero
+  queda en curso. Tocar los hitos de un asunto nunca cambia la guía del tipo.
+  - No se crean si el asunto está archivado, si el compañero tiene el mando (modo consulta,
+    `js/presencia.js`) o si la guía todavía no se ha leído (`GuiasDelCentro.pasosDe(tipo)` vacío
+    por no haber cargado `guias.json` todavía): en ese último caso se reintenta sola en el
+    repintado siguiente, sin marcar nunca el asunto como "ya probado".
+  - Candado por clave de asunto, en `js/hitos-panel.js` (`creandoParaClave`): el observador
+    repinta cada 30&nbsp;ms y `repintar()` es `async`, así que sin candado dos pasadas podrían
+    colarse antes de que `hitos.json` terminara de escribirse y crearlos dos veces.
+  - Si el tipo no tiene guía, el bloque "Hitos" sale vacío con "+ Añadir el primer hito"; si la
+    tiene, la lista de hitos termina siempre con "+ Añadir un hito" (`js/hitos-panel-lista.js`),
+    para un paso suelto que no viniera en la guía.
 - **Bifurcaciones**: un paso-pregunta se convierte en un hito de clase `decision`. Mientras no se
   elige una opción, la lista se corta ahí. Cambiar de rama quita los hitos vacíos de la vieja y
   marca `noaplica` (plegados, al final) los que tenían notas o documentos.
@@ -247,18 +264,17 @@ la lista de **hitos** que se trabaja: cada paso, vivo dentro de ese asunto, con 
   documento; gemelo de `DONDE ESTA ESTE ASUNTO.txt` de `js/relacionados.js`). Si el asunto se
   reabre y el fichero sigue ahí, los hitos se cargan de vuelta a `hitos.json` y el fichero se
   borra.
-- Se escriben desde el mismo cuadro de la guía (`Guias.editar`, con tres campos nuevos y
-  opcionales por paso: responsable por defecto, estado del asunto y plazo) y se pintan en la
-  ficha del asunto **envolviendo** lo que hoy pinta la guía, con un `MutationObserver` sobre
-  `#ficha-guia` (no hay ninguna función de `App` que envolver: `pintarGuia` es privada de
-  `js/ficha-asunto.js`).
+- Se pintan en la ficha del asunto con un `MutationObserver` sobre `#ficha-guia` (no hay ninguna
+  función de `App` que envolver ahí dentro), en el bloque titulado "Hitos" — que también pinta,
+  al final, el enlace de escribir o cambiar la guía del tipo.
 - Vive en `js/hitos.js` y `js/hitos-archivo.js` (el modelo; se parte en dos para no pasar de las
   400 líneas), `js/hitos-panel.js` y `js/hitos-panel-lista.js` (la ficha del asunto: el
-  repintado y el bloque de entrada en uno, cómo se pinta cada hito en el otro, hablándose por
-  `window.HitosPanel`) y `js/hitos-ajustes.js` (el bloque "Hitos" de Ajustes: responsables y
-  días no lectivos).
+  repintado, el candado de creación y el bloque vacío en uno, cómo se pinta cada hito en el otro,
+  hablándose por `window.HitosPanel`) y `js/hitos-ajustes.js` (el bloque "Hitos" de Ajustes:
+  responsables y días no lectivos).
 
-Se comprueba con `pruebas/hitos.mjs`.
+Se comprueba con `pruebas/hitos.mjs` (incluida la prueba de que abrir dos veces seguidas la misma
+ficha no duplica los hitos).
 
 ### La pantalla "Qué me toca"
 
@@ -376,7 +392,7 @@ dos buzones"):
    (`respuestaDe`). Si el `id` ya está en el `hilos` de algún asunto, la tarjeta dice "Respuesta
    de <asunto>" y su botón principal es "Guardar en ese asunto". El identificador de hilo es de
    cada buzón: solo puede coincidir en el buzón que enganchó el correo.
-2. **La huella por matrícula.** El `Message-ID` de un mensaje es el mismo en todos los buzones
+2. **La huella por matrícula.** El `Message-ID` de cada mensaje es el mismo en todos los buzones
    por los que pasa (al contrario que el identificador de hilo), así que es lo único que permite
    al buzón del compañero reconocer un correo que **el otro** ya guardó. Si alguna matrícula del
    correo coincide con alguna matrícula de algún `hilos` y el identificador de hilo **no** ha
@@ -1297,8 +1313,9 @@ de `App` va después del fichero que lo define.
 | `js/pdf-separar-unir.js` | El cuadro de Separar, Unir y Sacar páginas: miniaturas con pdf.js, tijeras, casillas |
 | `js/verificacion.js` | El código de verificación del pie de un documento, y su dirección |
 | `js/lib/pdf.min.js`, `js/lib/pdf.worker.min.js` | pdf.js (Mozilla) 3.11.174, copiado tal cual |
-| `js/ficha-asunto.js` | La pantalla de un asunto: guía, notas, documentos y contacto |
-| `js/hitos-panel.js` | Pinta los hitos en la ficha del asunto, envolviendo lo que pinta la guía: el observador y el repintado |
+| `js/ficha-asunto.js` | La pantalla de un asunto: cabecera, acciones, notas, documentos, sellos y modo consulta |
+| `js/ficha-contacto.js` | El contacto del tercero y sus otros asuntos, sacado de `js/ficha-asunto.js` (17-sep-2026, fila 26) |
+| `js/hitos-panel.js` | Pinta el bloque "Hitos" de la ficha del asunto: el observador, el repintado, crearlos solos desde la guía (con su candado) y el enlace de escribir/cambiar la guía |
 | `js/hitos-panel-lista.js` | La otra mitad del panel de hitos: la fila de cada hito, su cuerpo desplegado y el cambio de rama |
 | `js/duplicados.js` | ¿Esto no lo hicimos ya? Asuntos iguales del mismo tercero |
 | `js/relacionados.js` | Terceros relacionados con un asunto, la nota al archivar, "+ Añadir varios" y los atajos de alumnado |
@@ -1343,8 +1360,8 @@ de `App` va después del fichero que lo define.
 | `pruebas/tablon.mjs` | Prueba de cuándo se ve el tablón (a 1905 píxeles) |
 | `pruebas/dni.mjs` | Prueba del DNI, del aviso y de las tres mejoras del buscador |
 | `pruebas/empresas.mjs` | Prueba del nombre comercial y de cambiar los datos de un tercero |
-| `pruebas/guias.mjs` | Prueba de escribir la guía desde la ficha, y del plegado |
-| `pruebas/opciones.mjs` | Prueba de las preguntas con opciones, con el caso de la factura |
+| `pruebas/guias.mjs` | Prueba de escribir la guía desde la ficha, y de que sus pasos nacen solos como hitos |
+| `pruebas/opciones.mjs` | Prueba de las preguntas con opciones ya como hitos de decisión, con el caso de la factura |
 | `pruebas/registro.mjs` | Prueba de registrar un documento en un paso, sin nombrarlo dos veces |
 | `pruebas/campos.mjs` | Prueba de los campos de cada tipo de asunto (ocho escenarios más editar) |
 | `pruebas/relacionados.mjs` | Prueba de los terceros relacionados con un asunto, y la nota al archivar |
