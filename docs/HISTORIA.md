@@ -2136,5 +2136,10 @@ una línea cada una. El texto largo que tenían antes era:
   `docs/CONTEXTO.md`, reconciliaciones con `main`...). `vercel.json` gana un `ignoreCommand` que se
   salta la publicación cuando la rama no es `main` o el cambio solo toca `docs/`, `pruebas/`,
   `.github/` o `.md`, comparando contra `VERCEL_GIT_PREVIOUS_SHA` (con `HEAD^` de respaldo la
-  primera vez). Prueba nueva `pruebas/vercel-ignorecommand.mjs`. La cola gana la regla 13: como
-  máximo dos subidas por fila, para no repetir el mismo problema con las sesiones en paralelo.
+  primera vez). Un primer intento lo envolvía en `bash -c '...'`, como proponía el documento;
+  Vercel lo publicó como "Deployment failed" en vez del "rate limited" de siempre, así que se
+  cambió a un comando de `sh` normal (los ejemplos oficiales de Vercel nunca usan `bash -c`),
+  comprobado a mano con `sh -c` contra commits reales del repositorio. Prueba nueva
+  `pruebas/vercel-ignorecommand.mjs`. La cola gana la regla 13: como máximo dos subidas por fila,
+  para no repetir el mismo problema con las sesiones en paralelo. **Sin comprobar en el propio
+  Vercel**: el cupo diario seguía agotado al terminar; queda para el 18-sep-2026.

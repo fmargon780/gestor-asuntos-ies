@@ -1612,9 +1612,12 @@ El `?v=` es imprescindible: sin él se puede recibir una copia guardada.
   `vercel.json` gana un `ignoreCommand` que se salta la publicación (código 0) si la rama no es
   `main`, o si el cambio solo toca `docs/`, `pruebas/`, `.github/` o ficheros `.md` (comparando
   contra `VERCEL_GIT_PREVIOUS_SHA`, con `HEAD^` de respaldo la primera vez; ante cualquier duda,
-  publica). Se comprueba con `pruebas/vercel-ignorecommand.mjs`, sin navegador. Y la cola gana la
-  regla 13: como máximo dos subidas por fila (una para marcarla EN CURSO, otra al terminar, con
-  todo junto).
+  publica). **Va como comando de `sh` normal, sin envolver en `bash -c`**: los ejemplos oficiales
+  de Vercel nunca lo envuelven, y un primer intento envolviéndolo en `bash -c '...'` acabó en
+  "Deployment failed" en vez del "rate limited" de siempre (17-sep-2026); comprobado luego a mano
+  con `sh -c` contra commits reales del repositorio, sin `bash`. Se comprueba con
+  `pruebas/vercel-ignorecommand.mjs`, sin navegador. Y la cola gana la regla 13: como máximo dos
+  subidas por fila (una para marcarla EN CURSO, otra al terminar, con todo junto).
 
 ### Ficheros del repositorio
 
