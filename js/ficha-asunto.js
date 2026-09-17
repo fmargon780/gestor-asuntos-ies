@@ -65,6 +65,7 @@
   function volverALaLista() {
     actual = null;
     if (window.Presencia) Presencia.dejarDeVigilar();
+    if (window.OtrosDelTercero) OtrosDelTercero.olvidarOrigen();
     App.ir(modoActual === 'archivado' ? 'archivo' : 'abiertos');
   }
 
@@ -279,7 +280,10 @@
 
     caja.innerHTML =
       '<header class="ficha-cabecera">' +
-        '<button type="button" class="boton" id="ficha-volver">← Volver a la lista</button>' +
+        '<div class="ficha-volver-fila">' +
+          '<button type="button" class="boton" id="ficha-volver">← Volver a la lista</button>' +
+          '<div id="ficha-volver-origen"></div>' +
+        '</div>' +
         '<div class="ficha-marcas">' +
           (tipo ? '<span class="marca-tipo">' + U.escapar(tipo) + '</span>' : '') +
           (situacion ? '<span class="marca-estado ' + App.colorEstado(situacion) + '">' +
@@ -329,6 +333,7 @@
     pintarRelacionados(a, abierto);
     pintarPresencia();
     pintarSellos(a);
+    if (window.OtrosDelTercero) OtrosDelTercero.pintarVuelta($('ficha-volver-origen'), a);
     asegurarObservadorConsulta();
     aplicarModoConsulta();
   }
@@ -375,6 +380,7 @@
      hito, tomar el mando) se queda siempre encendido. */
   function esControlDeSoloLectura(el) {
     if (el.id === 'ficha-volver') return true;
+    if (el.id === 'ficha-volver-al-origen') return true;
     if (el.classList.contains('ficha-documento')) return true;
     if (el.classList.contains('hito-desplegar')) return true;
     if (el.classList.contains('boton-presencia-tomar')) return true;
@@ -892,49 +898,18 @@
     return '';
   }
 
-  function listaDeOtros(titulo, nombres, tipo) {
-    if (!nombres.length) return '';
-    return '<div class="otros-grupo"><div class="otros-rotulo">' + U.escapar(titulo) + '</div>' +
-      nombres.slice(0, 12).map(function (n) {
-        var igual = tipo && window.Duplicados &&
-                    U.normalizar(window.Duplicados.tipoDeNombre(n)) === U.normalizar(tipo);
-        return '<div class="otros-asunto' + (igual ? ' otros-mismo-tipo' : '') + '">' +
-               U.escapar(n) + '</div>';
-      }).join('') +
-      (nombres.length > 12 ? '<p class="nota">Y ' + (nombres.length - 12) + ' más.</p>' : '') +
-      '</div>';
-  }
-
-  async function pintarOtrosDelTercero(a) {
+  /* El bloque en sí, el salto a otro asunto del mismo tercero y la
+     vuelta al de partida viven en js/otros-del-tercero.js (17-sep-2026,
+     fila 40, docs/SALTAR-A-OTRO-ASUNTO.md), para no engordar más este
+     fichero. Aquí solo se cuelga el hueco, con la categoría, el
+     tercero y el tipo ya calculados; si el módulo no ha cargado, el
+     hueco se queda como está y la ficha no se rompe. */
+  function pintarOtrosDelTercero(a) {
     var caja = $('ficha-otros');
-    if (!caja) return;
+    if (!caja || !window.OtrosDelTercero) return;
     var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
-    var quien = nombreDelTercero(a);
-
-    if (!window.Duplicados || !categoria || !quien) {
-      caja.className = 'explica';
-      caja.textContent = 'No se sabe de qué tercero es este asunto, así que no se puede buscar.';
-      return;
-    }
-
-    try {
-      var todo = await window.Duplicados.delTercero(categoria, quien);
-      var fuera = function (n) { return n !== a.nombre; };
-      var abiertos = todo.abiertos.filter(fuera);
-      var archivados = todo.archivados.filter(fuera);
-
-      if (!abiertos.length && !archivados.length) {
-        caja.className = 'explica';
-        caja.textContent = 'Es el único asunto de ' + quien + '.';
-        return;
-      }
-      caja.className = 'otros-lista';
-      caja.innerHTML = listaDeOtros('Abiertos', abiertos, tipoDe(a)) +
-                       listaDeOtros('En el archivo', archivados, tipoDe(a));
-    } catch (e) {
-      caja.className = 'explica';
-      caja.textContent = 'No he podido mirar el archivo: ' + e.message;
-    }
+    OtrosDelTercero.pintarEnFicha(caja, a, modoActual,
+      { categoria: categoria, tercero: nombreDelTercero(a), tipo: tipoDe(a) });
   }
 
   /* ---------- los documentos que hay en la carpeta ----------

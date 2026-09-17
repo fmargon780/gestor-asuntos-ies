@@ -116,7 +116,12 @@
     tipoDeNombre: tipoDeNombre,
     cursoDeNombre: cursoDeNombre,
     cursoDe: cursoDe,
-    coincideCurso: coincideCurso
+    coincideCurso: coincideCurso,
+    /* Exportada para js/otros-del-tercero.js (fila 40, 17-sep-2026,
+       docs/SALTAR-A-OTRO-ASUNTO.md): monta a mano el objeto de un
+       asunto del ARCHIVO con una sola lectura de carpeta, sin recorrer
+       el ARCHIVO entero como App.verArchivo. */
+    carpetaDelTercero: carpetaDelTercero
   };
 
   /* ---------- el aviso al crear un asunto ----------

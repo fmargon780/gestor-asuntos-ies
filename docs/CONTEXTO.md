@@ -664,7 +664,16 @@ Toda la lógica vive en el módulo nuevo `js/lo-pide.js` (`window.LoPide`), para
   más "Tutor legal 1/2" (solo alumnado, y solo si Séneca trae su nombre), con los datos de cada
   uno (`nombre`, `correo`, `telefono`) ya resueltos.
 - `LoPide.datosDeTutor(campos, numero)`: sacada de `js/plantillas.js` (que ahora la llama en vez
-  de tener su propia copia), porque `LoPide.opciones` también la necesita.
+  de tener su propia copia), porque `LoPide.opciones` también la necesita. El nombre no es "la
+  primera columna que no sea teléfono ni correo" (17-sep-2026, fila 38, docs/LO-PIDE-NOMBRE-DEL-
+  TUTOR.md: en el RegAlum del centro esa primera columna solía ser el documento del tutor, y salía
+  un número donde debía ir su nombre): descarta además las columnas de documento/identificación,
+  número/código, parentesco/relación/sexo, fecha/nacimiento y domicilio/dirección, y de las que
+  quedan arma el nombre por prioridad (Apellidos + Nombre si hay las dos columnas, si no la que
+  haya de las dos, si no la primera que sobreviva), con una red de seguridad: sin ninguna letra en
+  el resultado, nombre vacío. Sin nombre pero con teléfono o correo, la opción no desaparece: se
+  ofrece como "Tutor legal 1/2" a secas, con `relacion: ''` para no repetirlo en la línea de
+  `LoPide.texto`.
 - `LoPide.controles(caja, persona, valorInicial)`: pinta el desplegable, los campos de "Otra
   persona…" (solo visibles con esa opción), la vía y la fecha, **con clases, nunca con id**: este
   mismo módulo se monta a la vez dentro de `#bloque-detalles` de "Nuevo asunto" (que queda en el
@@ -1000,6 +1009,56 @@ pegado a `Fecha: dd/mm/aaaa hh:mm:ss`.
 
 Se comprueba con `pruebas/registro.mjs` (con un PDF mínimo montado por la propia prueba, con el
 texto del sello dentro: el PDF real con datos personales no está en el repositorio).
+
+### Saltar a otro asunto del mismo tercero, y volver (17-sep-2026, fila 40, docs/SALTAR-A-OTRO-ASUNTO.md)
+
+El bloque "Otros asuntos de este tercero" (fila 37, arriba) ya no pinta solo texto: cada línea se
+pulsa y abre la ficha de ese asunto. Vive entero en `js/otros-del-tercero.js`
+(`window.OtrosDelTercero`), sacado tal cual de `js/ficha-asunto.js` (`listaDeOtros` y
+`pintarOtrosDelTercero`), mismo patrón que `js/relacionados.js`: la ficha solo cuelga el hueco
+(`#ficha-otros`) llamando a `OtrosDelTercero.pintarEnFicha(caja, a, modoActual, { categoria,
+tercero, tipo })`, con la categoría, el tercero (`nombreDelTercero(a)`, que se queda en
+`js/ficha-asunto.js` porque también la usa "Lo pide") y el tipo ya calculados allí.
+
+- **Cada línea es un `<button>`** (antes un `<div>`), con la misma marca `.otros-mismo-tipo` de
+  siempre. Al pulsarla:
+  - **Un asunto ABIERTO**: se busca por nombre en `App.E.listaAbiertos` y se llama a
+    `App.abrirFicha(a, 'abierto')`, igual que `irAlCandidatoAbierto` en `js/duplicados.js`.
+  - **Un asunto del ARCHIVO**: **nunca se llama a `App.verArchivo`** (recorre el ARCHIVO entero: la
+    operación más cara de la aplicación). Como aquí ya se sabe la categoría y el tercero, el objeto
+    se monta a mano, con una sola lectura de carpeta (función interna `montarArchivado`, igual que
+    hace `App.verArchivo` en `js/archivo-personas.js` para cada asunto suyo): si el nombre ya está
+    en `App.E.listaArchivo` se usa ese objeto tal cual; si no, `padre =
+    Duplicados.carpetaDelTercero(categoria, tercero)` (exportada para esto, una línea nueva en
+    `window.Duplicados`), `handle = padre.getDirectoryHandle(nombre)`, y el resto de campos
+    (`ruta`, `leido`, `ficha`, `busca`) igual que allí.
+  - Todo dentro de `try/catch`: si la carpeta ya no está o falla el permiso, un aviso de una línea
+    y no se salta a ningún sitio roto.
+- **El botón "← Volver a …"**: el módulo guarda `origen = { nombre, modo, categoria, tercero }` la
+  **primera vez** que se salta (con la categoría y el tercero del asunto de partida, para poder
+  reconstruirlo igual si también es del ARCHIVO); si ya hay origen guardado, no se sustituye, así
+  que saltando A → B → C el botón en C sigue diciendo "Volver a A", nunca "Volver a B". Se pinta
+  con `OtrosDelTercero.pintarVuelta($('ficha-volver-origen'), a)`, llamado al final de
+  `pintarLaFicha`; no sale en la ficha del propio asunto de partida, ni cuando no hay origen. El
+  nombre se recorta con CSS (`text-overflow: ellipsis`) para que la cabecera nunca crezca ni se
+  parta en dos alturas; el nombre entero va en el `title`.
+- **Se olvida el origen**: al pulsar el propio botón de vuelta (tras volver), al pulsar "Volver a
+  la lista" (`js/ficha-asunto.js` llama a `OtrosDelTercero.olvidarOrigen()`), y al abrir cualquier
+  ficha desde otro sitio (la lista, "Qué me toca", el aviso de duplicados, Por clasificar): el
+  módulo envuelve `App.abrirFicha` y borra el origen en cada llamada, salvo cuando la llamada la
+  hace el propio módulo (bandera interna `saltandoDesdeAqui`). La envoltura vive dentro del mismo
+  cierre del módulo (no aparte, como en otros ficheros), porque necesita ver esa bandera
+  directamente.
+- `esControlDeSoloLectura` (`js/ficha-asunto.js`) deja encendido `#ficha-volver-al-origen` en modo
+  consulta: solo navega, no modifica nada.
+- El `<script>` va después de `js/ficha-asunto.js` y de `js/duplicados.js` en `index.html`.
+
+Se comprueba con `pruebas/saltar-a-otro-asunto.mjs`, navegador de verdad, mismo montaje que
+`pruebas/quedarse-en-el-asunto.mjs`: las líneas salen como `<button>` pulsables; pulsar un asunto
+abierto abre su ficha; el botón de vuelta lleva el nombre de partida y devuelve con un clic;
+saltando A → B → C el botón en C sigue diciendo "Volver a A"; al salir por "Volver a la lista" y
+entrar en otro asunto desde la lista, el botón ya no sale; y un asunto del ARCHIVO se abre en modo
+solo lectura sin que `App.verArchivo` se llame ni una sola vez.
 
 ### El explorador de ficheros, ya en la carpeta que toca (17-sep-2026, fila 20)
 
@@ -1646,8 +1705,9 @@ de `App` va después del fichero que lo define.
 | `js/ficha-tercero.js`, `css/ficha-tercero.css` | "Datos y contacto" del tercero: la línea resumen y la ventana "Ver todo" con los tutores agrupados por persona (separado de `js/ficha-asunto.js` en la fila 37) |
 | `js/hitos-panel.js` | Pinta los hitos en la ficha del asunto (los pasos de la guía SON los hitos): el observador, el repintado y la creación automática |
 | `js/hitos-panel-lista.js` | La otra mitad del panel de hitos: la fila de cada hito, su cuerpo desplegado y el cambio de rama |
-| `js/duplicados.js` | ¿Esto no lo hicimos ya? Asuntos iguales del mismo tercero |
+| `js/duplicados.js` | ¿Esto no lo hicimos ya? Asuntos iguales del mismo tercero; exporta también `carpetaDelTercero` (fila 40) |
 | `js/relacionados.js` | Terceros relacionados con un asunto, la nota al archivar, "+ Añadir varios" y los atajos de alumnado |
+| `js/otros-del-tercero.js`, `css/ficha-asunto.css` | Bloque "Otros asuntos de este tercero" (separado de `js/ficha-asunto.js` en la fila 40): cada línea se pulsa y abre su ficha, y el botón "← Volver a …" que apunta siempre al asunto de partida |
 | `js/grupos.js` | Grupos propios de personas, guardados con nombre en `_GESTOR/grupos.json` |
 | `js/hitos-archivo.js` | La otra mitad del modelo de hitos: bifurcaciones, responsables de Ajustes y el `HISTORIAL DE TRAMITACION.txt` al archivar/reabrir |
 | `js/visor.js` | El panel de la derecha para ver un documento (`con-visor`); marcador y acciones opcionales para que quien lo abre sepa qué se está viendo |
