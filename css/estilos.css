@@ -365,6 +365,7 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 .mensaje { background: #16324e; color: #fff; padding: 12px 18px; border-radius: 8px; box-shadow: 0 8px 24px rgba(10,25,45,.3); max-width: 380px; font-size: 14px; }
 .mensaje.malo { background: var(--rojo-linea); }
 .mensaje.bueno { background: #1e7a46; }
+.mensaje.ambar { background: var(--ambar-linea); color: #3a2a00; }
 
 @media (max-width: 900px) {
   .dos-paneles, .dos-columnas { grid-template-columns: 1fr; }

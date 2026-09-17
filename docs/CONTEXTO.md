@@ -1442,6 +1442,41 @@ esas dos funciones.
 
 Se comprueba con `pruebas/archivar-fusion.mjs`, sin navegador.
 
+### Los atascos al archivar: mensajes en castellano y carpetas movidas
+
+Fila 45 de `docs/COLA.md`, 17-sep-2026: un asunto real seguía sin poder archivar después de la
+fila 32, con "No se ha podido archivar: A requested file or directory could not be found..." — un
+`NotFoundError` del navegador, en inglés, porque `App.cerrarAsunto` enseñaba `e.message` sin
+traducirlo.
+
+- **`U.mensajeDeError(e)`** (`js/util.js`), un solo sitio para traducir por `e.name`:
+  `NotFoundError`, `NotAllowedError`, `NoModificationAllowedError`/`InvalidStateError`,
+  `QuotaExceededError` y `AbortError` salen en castellano; cualquier otro (los nuestros) se
+  devuelve tal cual. Lo usan `App.cerrarAsunto` y `App.reabrirAsunto` en su `catch`.
+- **Los temporales de sincronización no cuentan ni se copian**: `Carpetas.contarFicheros`,
+  `copiarDentro` y `fusionarDentro` (`js/carpetas.js`) se saltan todo lo que
+  `esCarpetaTemporalDeSincronizacion` reconozca, para que la cuenta de origen y la de destino
+  hablen de lo mismo (antes, un `.tmp` o un `desktop.ini` de Dropbox podía descuadrar la
+  comprobación "llegados !== esperados" y deshacer un traslado sin motivo real).
+- **Un fichero que se esfuma a mitad de copia** (`leerFicheroParaCopiar`, usada por `copiarDentro`
+  y por la fusión): si `getFile()` lanza `NotFoundError`, se reintenta una vez tras esperar un
+  segundo; si sigue sin estar, el error dice su nombre, en castellano, y no se borra nada.
+- **La carpeta ya no está donde se esperaba**: `App.cerrarAsunto` mira primero, dentro del `try`,
+  si la carpeta sigue en Asuntos abiertos (`Carpetas.existe`). Si no está, pero sí está en
+  `ARCHIVO/categoría/tercero`, es que el archivado ya se hizo: no copia nada, pone la ficha al día
+  (estado, categoría, tercero, `cerradoEl` solo si no lo tenía, y los ficheros contados en el
+  destino) y avisa en verde. Si no está en ningún sitio, avisa en ámbar pidiendo pulsar Recargar
+  (clase CSS nueva `.mensaje.ambar` en `css/estilos.css`, con `--ambar-linea`; antes `U.aviso` solo
+  tenía `malo`/`bueno`). `App.reabrirAsunto` hace lo mismo con `a.padre` (el manejador de carpeta
+  guardado al pintar ARCHIVO, o al montarlo a mano desde el correo o Por clasificar, que puede
+  estar viejo): si `a.padre` no sirve, recalcula con
+  `Carpetas.bajar(App.E.archivo, [ficha.categoria, ficha.tercero], false)`; si tampoco aparece ahí
+  pero ya está en Asuntos abiertos, se da por reabierto sin copiar nada; si no aparece por ningún
+  lado, el mismo aviso ámbar.
+
+Se comprueba con `pruebas/archivar-atascos.mjs`, en navegador de verdad (reutiliza el disco de
+mentira de `pruebas/navegador.mjs`), con los seis escenarios del documento.
+
 ---
 
 ## 2. Cómo trabajamos el código ← LÉELO ANTES DE TOCAR NADA
@@ -1501,9 +1536,9 @@ de `App` va después del fichero que lo define.
 | `css/guias.css` | La guía: pasos, plegado, preguntas y opciones |
 | `css/tipos-buscador.css` | Las listas de resultados, y la marca naranja del que ya no está |
 | `css/copiar-nie.css` | Los estilos de `js/copiar.js` (nombre viejo del módulo) |
-| `js/util.js` | Utilidades comunes, y la comparación de nombres parecidos |
+| `js/util.js` | Utilidades comunes, y la comparación de nombres parecidos. `U.mensajeDeError(e)` traduce al castellano los errores del navegador (`NotFoundError` y compañía) |
 | `js/almacen.js` | Guarda los ajustes en el navegador |
-| `js/carpetas.js` | Habla con el selector de carpetas del navegador. Lee y escribe los JSON. `Carpetas.esCarpetaTemporalDeSincronizacion` descarta, en un solo sitio, las carpetas que dejan Dropbox y Drive al sincronizar |
+| `js/carpetas.js` | Habla con el selector de carpetas del navegador. Lee y escribe los JSON. `Carpetas.esCarpetaTemporalDeSincronizacion` descarta, en un solo sitio, las carpetas y ficheros que dejan Dropbox y Drive al sincronizar; `contarFicheros`/`copiarDentro`/la fusión los saltan, y un fichero que desaparece a mitad de copia se reintenta una vez |
 | `js/copias.js` | Copia de seguridad diaria de los ficheros de `_GESTOR`, y detección de fichero roto |
 | `js/conflictos.js` | Las copias en conflicto que deja Dropbox: fusión sola o aviso para elegir |
 | `js/fichas-huerfanas.js` | Fichas de `asuntos.json` cuya carpeta ya no está: enlazar o borrar |

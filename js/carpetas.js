@@ -112,12 +112,39 @@ var Carpetas = (function () {
 
   /* ---------- mover y renombrar carpetas ---------- */
 
+  function esperarMs(ms) {
+    return new Promise(function (r) { setTimeout(r, ms); });
+  }
+
+  /* Dropbox mueve y borra ficheros temporales mientras sincroniza: un
+     `getFile()` puede pillar uno a medio camino y lanzar NotFoundError
+     aunque el fichero exista de verdad un instante después. Se
+     reintenta una vez, tras esperar un segundo; si sigue sin estar, se
+     para con un error en castellano que dice el nombre del fichero
+     (17-sep-2026, fila 45: antes salía el NotFoundError del navegador,
+     en inglés). Lo usan `copiarDentro` y la fusión. */
+  async function leerFicheroParaCopiar(h, nombre) {
+    try {
+      return await h.getFile();
+    } catch (e) {
+      if (e.name !== 'NotFoundError') throw e;
+    }
+    await esperarMs(1000);
+    try {
+      return await h.getFile();
+    } catch (e2) {
+      throw new Error('No he podido copiar "' + nombre + '": ha desaparecido a mitad de la copia ' +
+        '(seguramente Dropbox estaba sincronizando). No se ha borrado nada.');
+    }
+  }
+
   async function copiarDentro(origen, destino) {
     var copiados = 0;
     for await (var pareja of origen.entries()) {
       var nombre = pareja[0], h = pareja[1];
+      if (esCarpetaTemporalDeSincronizacion(nombre)) continue;
       if (h.kind === 'file') {
-        var f = await h.getFile();
+        var f = await leerFicheroParaCopiar(h, nombre);
         var salida = await destino.getFileHandle(nombre, { create: true });
         var w = await salida.createWritable();
         await w.write(f);
@@ -134,6 +161,7 @@ var Carpetas = (function () {
   async function contarFicheros(dir) {
     var n = 0;
     for await (var pareja of dir.entries()) {
+      if (esCarpetaTemporalDeSincronizacion(pareja[0])) continue;
       if (pareja[1].kind === 'file') n++;
       else n += await contarFicheros(pareja[1]);
     }
@@ -208,8 +236,9 @@ var Carpetas = (function () {
   async function fusionarDentro(origen, destino, rastro) {
     for await (var pareja of origen.entries()) {
       var nombre = pareja[0], h = pareja[1];
+      if (esCarpetaTemporalDeSincronizacion(nombre)) continue;
       if (h.kind === 'file') {
-        var f = await h.getFile();
+        var f = await leerFicheroParaCopiar(h, nombre);
         if (await existeFichero(destino, nombre)) {
           var existente = await (await destino.getFileHandle(nombre)).getFile();
           if (existente.size === f.size) {
