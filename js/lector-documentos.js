@@ -31,7 +31,19 @@
        fecha:      'dd/mm/aaaa', o '' si no aparece ninguna
        documentos: [{ clase: 'DNI'|'NIE'|'NIF'|'ESCOLAR', valor }, ...]
        tercero:    { categoria, nombre, persona, por: 'documento'|'nombre' } | null
-       tipo:       { tipo, categoria } | null }
+       tipo:       { tipo, categoria } | null
+       terceroDesconocido: { categoria, nombre, documento } | null }
+
+   `terceroDesconocido` es lo nuevo de la fila 42
+   (docs/TERCEROS-NUEVOS-DESDE-EL-DOCUMENTO.md, 17-sep-2026): cuando el
+   documento trae un DNI/NIE/NIF que no cuadra con ningún tercero de
+   `contexto` (ni ya hay uno claro en `tercero`), se busca un nombre o
+   una razón social cerca de ese documento en el propio texto. Si
+   aparece, se propone darlo de alta (nunca se da de alta solo: quien
+   llama abre el alta ya existente con estos datos escritos). Si no hay
+   ningún documento de identidad en todo el texto pero sí una razón
+   social con forma clara (S.L., S.A., S.COOP., C.B.), se propone igual,
+   con el documento vacío, esperando.
    ============================================================ */
 var LectorDocumentos = (function () {
 
@@ -225,6 +237,87 @@ var LectorDocumentos = (function () {
     return null;
   }
 
+  /* ---------- 4b. el tercero desconocido (fila 42) ----------
+
+     Un documento de identidad que no está en ninguna de las tres listas
+     de `contexto`, con un nombre o una razón social cerca en el propio
+     texto: se propone darlo de alta. Nunca decide, nunca escribe nada:
+     solo lo encuentra. */
+
+  var SUFIJOS_EMPRESA = ['S\\.?\\s?L\\.?U?\\.?', 'S\\.?\\s?A\\.?U?\\.?', 'S\\.?\\s?COOP\\.?', 'C\\.?\\s?B\\.?'];
+
+  /* Una o varias palabras que empiezan por mayúscula (razón social o
+     nombre comercial, en mayúsculas o solo con la inicial) seguidas de
+     la forma jurídica: "Talleres Alhaurín, S.L.", "FONTANERÍA RUIZ S.L.U." */
+  var RE_RAZON_SOCIAL = new RegExp(
+    '((?:\\p{Lu}[\\p{L}0-9&\'’.-]*,?\\s+){1,6}(?:' + SUFIJOS_EMPRESA.join('|') + '))', 'u');
+
+  /* Dos a cuatro palabras en formato Nombre (mayúscula y luego
+     minúsculas), como suele venir escrito el nombre de una persona:
+     "García Pérez, Ana" o "Ana García Pérez". */
+  var RE_NOMBRE_PERSONA = /(?:\p{Lu}[\p{Ll}'’-]+,?\s+){1,3}\p{Lu}[\p{Ll}'’-]+/u;
+
+  /* El trozo de texto alrededor de donde aparece el documento, para no
+     buscar el nombre en todo el papel (una solicitud trae de todo:
+     sellos, otros nombres, direcciones). */
+  function ventanaAlrededorDe(texto, valor, radio) {
+    var i = texto.indexOf(valor);
+    if (i === -1) return '';
+    return texto.slice(Math.max(0, i - radio), Math.min(texto.length, i + valor.length + radio));
+  }
+
+  function nombreCercaDe(texto, valorDocumento) {
+    var ventana = ventanaAlrededorDe(texto, valorDocumento, 120);
+    if (!ventana) return '';
+    var mRazon = ventana.match(RE_RAZON_SOCIAL);
+    if (mRazon) return mRazon[1].replace(/\s+/g, ' ').trim();
+    var mNombre = ventana.match(RE_NOMBRE_PERSONA);
+    if (mNombre) return mNombre[0].replace(/\s+/g, ' ').trim();
+    return '';
+  }
+
+  /* Un NIF siempre es de empresa. Un DNI o un NIE, si el tipo que se ha
+     propuesto ya dice una categoría, se propone esa; si no, personal por
+     defecto (lo más frecuente en un papel del centro). Francisco puede
+     cambiar la categoría antes de guardar: esto solo es el punto de
+     partida. */
+  function categoriaDelDesconocido(clase, tipo) {
+    if (clase === 'NIF') return 'EMPRESAS';
+    if (tipo && tipo.categoria) return tipo.categoria;
+    return 'PERSONAL';
+  }
+
+  function elegirTerceroDesconocido(documentos, texto, contexto, terceroConocido, tipo) {
+    if (terceroConocido) return null;   /* ya hay uno claro: no hace falta dar de alta a nadie */
+
+    var candidatos = candidatosDe(contexto.alumnado, 'ALUMNADO')
+      .concat(candidatosDe(contexto.personal, 'PERSONAL'))
+      .concat(candidatosDe(contexto.empresas, 'EMPRESAS'));
+    var documentosConocidos = {};
+    candidatos.forEach(function (c) { if (c.documento) documentosConocidos[c.documento] = true; });
+
+    var huerfanos = documentos.filter(function (d) { return !documentosConocidos[d.valor]; });
+
+    if (huerfanos.length === 1) {
+      var d = huerfanos[0];
+      var nombre = nombreCercaDe(texto, d.valor);
+      if (!nombre) return null;
+      return { categoria: categoriaDelDesconocido(d.clase, tipo), nombre: nombre, documento: d.valor };
+    }
+    if (huerfanos.length > 1) return null;   /* varios sin cuadrar: no se sabe de cuál es el nombre */
+
+    /* Ningún documento de identidad en todo el texto: se propone solo si
+       aparece una razón social bien clara y ningún tercero conocido
+       cuadra por nombre. El hueco del documento se queda vacío. */
+    if (documentos.length) return null;
+    var textoNorm = normalizarTexto(texto);
+    var yaConocidoPorNombre = candidatos.some(function (c) { return nombreEnTexto(c.nombre, textoNorm); });
+    if (yaConocidoPorNombre) return null;
+    var mRazon = String(texto).match(RE_RAZON_SOCIAL);
+    if (!mRazon) return null;
+    return { categoria: 'EMPRESAS', nombre: mRazon[1].replace(/\s+/g, ' ').trim(), documento: '' };
+  }
+
   /* ---------- 5. el tipo de asunto ---------- */
 
   /* Cuántas de las palabras clave del tipo (más su propio nombre)
@@ -270,9 +363,10 @@ var LectorDocumentos = (function () {
     var documentos = documentosDelTexto(texto);
     var tercero = elegirTercero(documentos, texto, contexto);
     var tipo = elegirTipo(palabrasDe(texto), contexto.tipos);
+    var terceroDesconocido = elegirTerceroDesconocido(documentos, texto, contexto, tercero, tipo);
 
     return { registro: registro, fecha: fecha, documentos: documentos,
-             tercero: tercero, tipo: tipo };
+             tercero: tercero, tipo: tipo, terceroDesconocido: terceroDesconocido };
   }
 
   return { analizar: analizar };

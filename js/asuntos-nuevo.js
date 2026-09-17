@@ -225,7 +225,7 @@ App.pieAlumno = function (p) {
   }
   if (p.solicitante) {
     return ['Solicitante, todavía sin matricular',
-            p.id ? '' : 'sin Nº de identificación escolar'].filter(Boolean).join('  ·  ');
+            p.id ? '' : 'pendiente de número'].filter(Boolean).join('  ·  ');
   }
   var trozos = ['No matriculado este curso'];
   if (p.anoUltima) {

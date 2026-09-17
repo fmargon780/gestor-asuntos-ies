@@ -113,10 +113,61 @@ function comprobar(titulo, real, esperado) {
 {
   const vacio = LectorDocumentos.analizar('', {});
   comprobar('6. texto vacío: nada de registro, fecha, documentos, tercero ni tipo',
-    vacio, { registro: null, fecha: '', documentos: [], tercero: null, tipo: null });
+    vacio, { registro: null, fecha: '', documentos: [], tercero: null, tipo: null, terceroDesconocido: null });
   comprobar('6b. sin texto y sin contexto no revienta',
     LectorDocumentos.analizar(undefined, undefined),
-    { registro: null, fecha: '', documentos: [], tercero: null, tipo: null });
+    { registro: null, fecha: '', documentos: [], tercero: null, tipo: null, terceroDesconocido: null });
+}
+
+/* ---------- sección 8 de docs/TERCEROS-NUEVOS-DESDE-EL-DOCUMENTO.md
+   (17-sep-2026, fila 42) ---------- */
+
+/* 7. Un NIF desconocido, con la razón social al lado: sale la propuesta
+   de dar de alta, con la categoría EMPRESAS. */
+{
+  const r = LectorDocumentos.analizar(
+    'Se solicita presupuesto a Talleres Alhaurín, S.L. con NIF B29123456 ' +
+    'para el mantenimiento de la caldera de la calefacción.',
+    { tipos: [], alumnado: [], personal: [], empresas: [] });
+  comprobar('7. NIF desconocido: propone dar de alta con la razón social',
+    r.terceroDesconocido, { categoria: 'EMPRESAS', nombre: 'Talleres Alhaurín, S.L.', documento: 'B29123456' });
+}
+
+/* 8. El DNI de un tercero que YA existe: no sale ninguna propuesta de
+   alta (ya hay un tercero claro, es el mismo caso de la prueba 2). */
+{
+  const anaGarcia = { nombre: 'García Pérez, Ana' };
+  const contextoConAna = {
+    alumnado: [{ nombre: 'García Pérez, Ana', documento: '12345678Z', persona: anaGarcia }],
+    personal: [], empresas: [], tipos: []
+  };
+  const r = LectorDocumentos.analizar(
+    'Solicitud presentada, con documento nacional de identidad 12345678Z, sin más señas.',
+    contextoConAna);
+  comprobar('8. DNI de un tercero que ya existe: no sale el botón de alta', r.terceroDesconocido, null);
+}
+
+/* 9. Un DNI desconocido, en una solicitud de plaza: propone aspirante
+   (categoría ALUMNADO), porque el tipo que se acierta es de esa
+   categoría. */
+{
+  const r = LectorDocumentos.analizar(
+    'Solicitud de plaza. Nombre y apellidos: Nuevo Aspirante Lopez, con DNI 87654321X, ' +
+    'nacido el 4 de abril de 2012.',
+    { tipos: [{ tipo: 'SOLICITUD', categoria: 'ALUMNADO', palabrasClave: ['solicitud de plaza'] }],
+      alumnado: [], personal: [], empresas: [] });
+  comprobar('9. DNI desconocido en una solicitud de plaza: propone aspirante',
+    r.terceroDesconocido,
+    { categoria: 'ALUMNADO', nombre: 'Nuevo Aspirante Lopez', documento: '87654321X' });
+}
+
+/* 10. Dos documentos sin cuadrar a la vez: no se sabe de cuál es el
+   nombre, así que no se propone nada. */
+{
+  const r = LectorDocumentos.analizar(
+    'Documento que menciona a 12345678Z y también a 87654321X, ninguno conocido.',
+    { tipos: [], alumnado: [], personal: [], empresas: [] });
+  comprobar('10. dos documentos sin cuadrar a la vez: no se propone nada', r.terceroDesconocido, null);
 }
 
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

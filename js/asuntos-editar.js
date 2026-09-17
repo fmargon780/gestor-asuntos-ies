@@ -117,6 +117,54 @@ App.pintarCamposEditar = function (tipo, guardados) {
   };
 };
 
+/* ---------- cuando llega el Nº de identificación escolar de un aspirante ----------
+
+   17-sep-2026, fila 42, docs/TERCEROS-NUEVOS-DESDE-EL-DOCUMENTO.md,
+   sección 4. Un aspirante se pudo dar de alta sin Nº de identificación
+   escolar (carpeta con solo apellidos y nombre); cuando Francisco lo
+   escribe en su ficha, hay que renombrar solas las carpetas de sus
+   asuntos ABIERTOS. Las archivadas no se tocan: su nombre es el rastro
+   del día en que se cerraron.
+
+   Mismo camino que App.editarAsunto: Carpetas.renombrar y mover la
+   ficha de la clave vieja a la nueva en App.E.registro.asuntos. Antes de
+   tocar nada, enseña la lista y espera "Adelante" (U.preguntar). */
+App.renombrarAsuntosAbiertosDelTercero = async function (categoria, textoAntes, textoDespues) {
+  if (!textoAntes || !textoDespues || textoAntes === textoDespues) return;
+
+  var abiertas = await Carpetas.subcarpetas(App.E.abiertos);
+  var afectados = abiertas.filter(function (c) {
+    if (c.nombre.charAt(0) === '_') return false;
+    return c.nombre === textoAntes || c.nombre.slice(-(textoAntes.length + 1)) === ' ' + textoAntes;
+  });
+  if (!afectados.length) return;
+
+  var lista = afectados.map(function (c) { return '<li>' + U.escapar(c.nombre) + '</li>'; }).join('');
+  var ok = await U.preguntar('Renombrar las carpetas de sus asuntos abiertos',
+    '<p class="explica">Ya tiene Nº de identificación escolar. Se van a renombrar estas ' +
+    afectados.length + ' carpetas de asuntos abiertos suyos. Las archivadas no se tocan.</p>' +
+    '<ul>' + lista + '</ul>', 'Adelante');
+  if (!ok) return;
+
+  await App.cargarRegistro();
+  var renombrados = 0;
+  for (var i = 0; i < afectados.length; i++) {
+    var nombreViejo = afectados[i].nombre;
+    var nombreNuevo = nombreViejo.slice(0, nombreViejo.length - textoAntes.length) + textoDespues;
+    try {
+      if (await Carpetas.existe(App.E.abiertos, nombreNuevo)) continue;   /* ya está así, no se toca */
+      await Carpetas.renombrar(App.E.abiertos, nombreViejo, nombreNuevo);
+      var antes = App.E.registro.asuntos[nombreViejo] || {};
+      App.E.registro.asuntos[nombreNuevo] = Object.assign({}, antes, { tercero: textoDespues });
+      delete App.E.registro.asuntos[nombreViejo];
+      renombrados++;
+    } catch (e) { /* uno que falle no frena a los demás */ }
+  }
+  if (renombrados) await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
+  U.aviso(renombrados + ' carpeta' + (renombrados === 1 ? '' : 's') + ' renombrada' +
+    (renombrados === 1 ? '' : 's') + '.', 'bueno');
+};
+
 App.editarAsunto = async function (a) {
   var p = App.piezasDelAsunto(a);
   var bloqueCampos = App.pintarCamposEditar(p.tipo, p.campos);

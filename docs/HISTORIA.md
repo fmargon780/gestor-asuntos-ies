@@ -5,6 +5,66 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — Dar de alta un tercero desde el documento, y los aspirantes a plaza
+
+Fila 42 de la cola (`docs/COLA.md`, `docs/TERCEROS-NUEVOS-DESDE-EL-DOCUMENTO.md`), acordada con
+Francisco el 17-sep-2026, justo después de la fila 41. Aquella hace que la aplicación lea el
+documento y proponga el tercero cuando lo reconoce; faltaba el caso contrario: un DNI, NIE o NIF
+que no cuadra con nadie, y sobre todo los aspirantes a plaza, que no salen en `RegAlum.csv` porque
+todavía no son alumnado matriculado.
+
+**Lo primero, mirando el repositorio antes de escribir nada**: los aspirantes ya existían, con otro
+nombre. No hacía falta ninguna "categoría nueva de tercero, alumnado pendiente": `js/datos.js` ya
+tenía `p.solicitante`, `solicitantes.csv`, el botón "+ Dar de alta un solicitante" y el aviso
+"Solicitante, todavía sin matricular" en el buscador, desde antes de esta fila. Inventar una
+categoría aparte habría duplicado toda esa mecánica sin necesidad, así que se ha reutilizado y
+completado en vez de reescribirla — el propio encargo lo permitía ("si algún nombre de módulo no
+cuadra con lo que hay de verdad, usa el que sea, sin cambiar la arquitectura").
+
+Lo que faltaba de verdad, y lo que trae esta fila:
+
+- **`LectorDocumentos.analizar`** (`js/lector-documentos.js`) gana `terceroDesconocido`: cuando un
+  documento de identidad no cuadra con ninguno de los que ya conoce, busca un nombre o una razón
+  social cerca de él en el propio texto (una razón social por su forma jurídica —S.L., S.A.,
+  S.COOP., C.B.— o un nombre de persona por dos a cuatro palabras con inicial mayúscula). Si hay
+  más de un documento sin cuadrar a la vez, o ningún nombre cerca, no propone nada: mejor un hueco
+  que una equivocación. Categoría de partida: NIF siempre EMPRESAS; DNI o NIE, la del tipo ya
+  propuesto si lo hay (una solicitud de plaza propone ALUMNADO), si no PERSONAL.
+- El botón **"Dar de alta: nombre — documento"**, en `js/documentos-sueltos-lector.js` (sin tocar
+  `js/documentos-sueltos.js`), debajo de la línea de la propuesta. Abre `App.cuadroDeTercero`, el
+  alta que ya existe, con los datos ya escritos: la aplicación nunca da de alta sola. Guardado, la
+  tarjeta se actualiza sola con el tercero recién creado, sin volver a leer el PDF.
+- **`solicitantes.csv` gana la columna "Documento de identidad"**, opcional igual que el Nº de
+  identificación escolar. `anadirSolicitantes` (`js/datos.js`) ahora reconoce a un aspirante ya
+  matriculado también por ese documento (además de por Nº o por nombre, como ya hacía), comparando
+  con `window.Dni.de` del matriculado: si coincide, no se duplica, aunque el nombre se hubiera
+  escrito de otra forma.
+- **El renombrado al llegar el número**: `App.renombrarAsuntosAbiertosDelTercero`, nueva en
+  `js/asuntos-editar.js`, reutilizando `Carpetas.renombrar` igual que `App.editarAsunto`. Se
+  dispara desde `App.cambiarDatosDelTercero` (`js/archivo-personas.js`) cuando un aspirante que no
+  tenía Nº de identificación escolar lo recibe: enseña la lista de carpetas abiertas afectadas con
+  `U.preguntar` ("Adelante") y las renombra una a una; las archivadas no se tocan, porque nunca se
+  buscan.
+- **El aviso en "Qué me toca"** (`js/que-me-toca.js`): un bloque nuevo arriba del todo mientras
+  queden aspirantes sin número, sin fecha límite ni responsable (es un aviso, no un hito). Se pulsa
+  y lleva a Personas y empresas, en Alumnado.
+- La palabra que pedía el encargo, **"pendiente de número"**, sustituye a "sin Nº de identificación
+  escolar" en la línea de debajo del nombre del buscador (`App.pieAlumno`, `js/asuntos-nuevo.js`).
+
+Pruebas nuevas: 4 escenarios más en `pruebas/lector-documentos.mjs` (NIF desconocido con razón
+social, DNI de un tercero que ya existe sin proponer nada, DNI desconocido en una solicitud de
+plaza proponiendo ALUMNADO, dos documentos huérfanos a la vez sin proponer nada); tres escenarios
+más en `pruebas/logica.mjs` (documento de identidad del aspirante, reconocimiento por documento sin
+duplicar, y que con un documento distinto sí se suma sin número); `pruebas/aspirantes-numero.mjs`,
+nueva, en navegador de verdad (alta sin número, dos asuntos —uno abierto y uno archivado—, el aviso
+de "Qué me toca", y que al escribir el número solo se renombra el abierto); y
+`pruebas/dar-de-alta-desde-documento.mjs`, nueva, en navegador de verdad con un PDF de mentira (el
+botón sale con la razón social y el NIF, abre el alta con los datos escritos, no se da de alta
+hasta guardar, y la tarjeta se actualiza sola después). Batería completa en verde, una sola pasada
+al final. Con esto termina la cadena de "leer documentos" (filas 41 y 42).
+
+---
+
 ## 17-sep-2026 — Leer los documentos que entran en "Por clasificar"
 
 Fila 41 de la cola (`docs/COLA.md`, `docs/LEER-DOCUMENTOS-POR-CLASIFICAR.md`), acordada con
