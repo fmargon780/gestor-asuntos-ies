@@ -820,3 +820,218 @@ Instrucción: `docs/REPARTO-CONTEXTO.md`. No se tocó código ni se ejecutaron p
 
 A partir de ahora, cada instrucción de la cola debe anotar aquí lo que merezca recordarse, con
 su fecha, en vez de dejarlo crecer dentro de `CONTEXTO.md`.
+
+---
+
+## Diario heredado (todo lo anterior al 12-sep-2026)
+
+Lo que sigue es el contenido íntegro de `docs/CONTEXTO.md` tal como estaba antes del reparto de
+hoy, sin cambiar una palabra, conservado en su orden original (el documento crecía añadiendo lo
+nuevo debajo, así que dentro de este bloque va de lo más viejo a lo más nuevo). La versión
+resumida y sin fechas de todo esto vive ahora en `docs/CONTEXTO.md`; lo que sigue siendo cierto
+hoy, en `docs/CONTEXTO-CORTO.md`.
+
+> # Proyecto: Gestor de Asuntos / Expedientes — IES Fuente Lucena
+>
+> Documento de contexto. Léelo entero antes de proponer nada.
+> Última actualización: 11 de septiembre de 2026 (plan de robustez de
+> `docs/PLAN-ROBUSTEZ-2026-09.md` hecho entero: copias de seguridad, conflictos de Dropbox,
+> pruebas automáticas en GitHub Actions, fichas sin carpeta y nombres repetidos. Resumen para
+> Francisco en `docs/CAMBIOS-2026-09.md`. Después, el mismo día: "Registrar un documento en un
+> paso", "Terceros relacionados con un asunto", "Que no se dupliquen los asuntos", "Ajustes
+> ágiles: encontrar y crear tipos sin scroll" y "La papelera: borrar sin miedo" y "Los duplicados,
+> a su propia pantalla", sección 5).
+>
+> **Este documento vive en dos sitios**: en el proyecto de Claude (`Contexto.md`) y aquí, en
+> `docs/CONTEXTO.md` del repositorio. Se cambia en el mismo commit en que cambia el código.
+>
+> ---
+>
+> ## 0. LO PRIMERO: la dirección buena cambió el 10-sep-2026
+>
+>     https://gestor-de-asuntos.vercel.app
+>
+> **La antigua, `asuntos-ies.vercel.app`, ya no existe.** El proyecto de Vercel que la servía se
+> borró ese día. Si en algún sitio de este documento o de una conversación vieja aparece
+> `asuntos-ies`, está desfasado.
+>
+> Por qué cambió: había **cuatro proyectos de Vercel colgados del mismo repositorio**
+> (`asuntos-ies`, `gestor-de-asuntos`, `gestor-asuntos` y `gestor-asuntos-ies`). Cada subida al
+> repositorio disparaba cuatro publicaciones a la vez. Ese día `asuntos-ies` se quedó atrás: su
+> última publicación fue el commit `c220440` de las 10:32, y los cinco commits siguientes se
+> publicaron en `gestor-de-asuntos` pero **en `asuntos-ies` no**, sin ningún error y sin ningún
+> aviso.
+>
+> Se quedó el proyecto **`gestor-de-asuntos`**, que era el que estaba publicando bien, y se
+> borraron los otros tres. **Ahora hay un solo proyecto de Vercel. Que siga siendo así.**
+>
+> **Efecto secundario que hay que saber:** las dos carpetas señaladas y el nombre de usuario se
+> guardan en el navegador **atados a la dirección**. Al cambiar de dirección, la aplicación
+> arranca de cero y el botón Entrar sale apagado. **No es un fallo**: hay que volver a señalar
+> las dos carpetas y escribir el nombre, una vez en cada ordenador. Le pasó a él nada más
+> cambiar, y a su compañero le pasará igual.
+>
+> ---
+>
+> ## 1. Quién soy y cómo quiero trabajar
+>
+> Francisco, auxiliar administrativo del IES Fuente Lucena (Alhaurín el Grande, Málaga).
+> No soy programador. Yo propongo, pruebo y digo si el resultado se ajusta a lo que buscaba.
+> El diseño y la comprobación del código son tuyos.
+>
+> Cómo quiero que me escribas:
+>
+> - Pocas frases. Si escribes mucho, me pierdo.
+> - Una idea por frase. Sin jerga y sin dar por sabido lo anterior.
+> - Una sola pregunta o decisión por mensaje. Espera mi respuesta antes de seguir.
+> - Si hay que elegir, dame las opciones numeradas y marca la recomendada. Contesto con el número.
+> - No me pidas permiso para cambiar código: aplícalo.
+> - Verifica tú tu propio trabajo. Solo pídeme comprobar lo que solo yo puedo ver.
+> - Cuando me guíes por una interfaz, ve paso a paso y dime dónde está cada botón.
+>
+> **Nada de tareas manuales mías.** Si algo se puede hacer desde la aplicación, se hace desde
+> la aplicación. Copiar ficheros de una carpeta a otra a mano, o abrir un CSV para tocarlo, es
+> justo lo que no quiero. **Cada vez que se añade un dato nuevo, hay que preguntarse cómo lo
+> pone en los que ya estaban dados de alta**: si la respuesta es "editando el fichero a mano",
+> falta media función. Pasó con el nombre comercial el 10-sep-2026.
+>
+> **Y donde se usa una cosa, se cambia.** Si tramitando un asunto se ve que falta un paso en la
+> guía, la guía se escribe ahí, sin salir a Ajustes. Misma idea.
+>
+> Mi ordenador es un **Chromebook Plus**. Trabajo en el navegador, no en terminal.
+> En el trabajo uso un monitor bastante más ancho que el del Chromebook.
+>
+> **Ya no trabajo solo con esto: mi compañero administrativo también lo está usando**
+> (9-sep-2026). Todo lo que se guarda en `_GESTOR` lo ven los dos.
+>
+> ---
+>
+> ## 2. Qué es este proyecto, y qué NO es
+>
+> Este proyecto es **el gestor de asuntos del centro**: una aplicación web para crear,
+> nombrar y archivar las carpetas de cada gestión administrativa.
+>
+> **No es el proyecto de la base de datos de alumnado.** Ese es otro, con su propio
+> repositorio (`fmargon780/bd-alumnado-ies`), su propio contexto y su propio cuaderno de
+> Google Sheets. Si aparece aquí una duda sobre informes de tutores, PIL, repeticiones o
+> censo NEAE, es del otro proyecto y hay que llevarla allí.
+>
+> **Lo único que comparten los dos** es el fichero `RegAlum.csv` de Séneca, que aquí se usa
+> solo para consultar datos de contacto del alumnado y de sus tutores legales.
+>
+> ---
+>
+> ## 3. El problema que resuelve
+>
+> Por cada gestión administrativa creo una carpeta con nombre estructurado.
+>
+> - Mientras el asunto está abierto, la carpeta vive en una carpeta de **asuntos abiertos**.
+> - Al cerrarlo, la muevo al **ARCHIVO**.
+> - Si se reabre, vuelve a abiertos.
+>
+> Estructura del ARCHIVO: la raíz `ARCHIVO`, y dentro `ALUMNADO`, `EMPRESAS`, `PERSONAL` y
+> `OTROS`. Dentro de cada una, una carpeta por tercero. Dentro de cada tercero, las carpetas
+> de sus asuntos.
+>
+> Las carpetas viven en el **Dropbox del centro**, sincronizado en mi ordenador.
+>
+> ---
+>
+> ## 4. Las reglas de nombres ← ES LO IMPORTANTE DEL PROYECTO
+>
+> ### Carpeta de asunto
+>
+>     AAMMDD TIPO [AÑO ACADÉMICO] [texto libre] Tercero
+>
+> - `AAMMDD` = fecha de inicio del asunto.
+> - `TIPO` = el tipo de asunto en mayúsculas: MATRICULA, COMPRA, SANCION...
+> - El año académico, si procede.
+> - A veces un texto libre.
+> - **El tercero va siempre al final.**
+>
+> ### Cómo se escribe el tercero
+>
+> | Categoría | Formato |
+> |---|---|
+> | Alumnado | `Apellido1 Apellido2, Nombre` + número de identificación escolar |
+> | Personal | `Apellido1 Apellido2, Nombre` + los **4 últimos caracteres** del documento, con la letra: `12345678Z` → `678Z` |
+> | Empresas | **Razón social** + NIF |
+>
+> En las empresas manda **la razón social, no el nombre comercial**: es la que viene en las
+> facturas y la que hay que poder cruzar con la contabilidad. El rótulo del negocio se guarda
+> aparte y sirve para buscar (sección 5).
+>
+> ### Documento dentro de la carpeta
+>
+>     AAMMDD [REGISTRO] TIPO [TEXTO ADICIONAL].ext
+>
+> - `AAMMDD` es la fecha **del propio documento** (la que trae impresa la factura), no la
+>   del día en que se archiva.
+> - `TIPO` = FACTURA, CERTIFICADO, MATRICULA, SOLICITUD...
+> - **El último hueco es texto libre** (10-sep-2026). Antes se llamaba "Año académico" y se
+>   rellenaba solo con el curso; ver la sección 5.
+>
+> ### Lo que entra por correo
+>
+> El hilo del correo en PDF: `AAMMDD CORREO.pdf`, con la fecha del último mensaje.
+>
+> Los adjuntos: `AAMMDD ADJUNTO <el nombre que traían>.ext` (10-sep-2026, decidido por él).
+> Gmail los manda como venían —`1000082963.jpg`, `LITNAC2026050413001031751487.pdf`— y esos
+> nombres no dicen nada y se mezclaban con los papeles del expediente. El nombre de origen se
+> limpia y se recorta a 40 caracteres. Si el adjunto merece un nombre de verdad, se le pone
+> después desde "Gestionar documentos".
+>
+> ### El número de registro de Séneca
+>
+> Formato `26EM1234`:
+>
+> - `26` = el año. Se coge de la fecha del día en que se incluye el documento, y se puede cambiar.
+> - `E` = entrada · `S` = salida.
+> - `M` = serie manual · `A` = serie automática.
+> - `1234` = los cuatro dígitos del asiento.
+>
+> Hacen falta las cuatro piezas porque Séneca lleva dos series y el número se repite cada año.
+>
+> ### El grupo en el nombre de la carpeta
+>
+> Hay un interruptor para añadir el grupo del alumno. **Cuidado con Bachillerato:** en la ESO
+> el grupo se abrevia `1ºA`; en Bachillerato lleva la etapa, `1ºBachA`, para que no se
+> confunda con el `1ºA` de la ESO.
+>
+> ### Los campos del tipo, en el nombre (11-sep-2026)
+>
+> El hueco de texto libre se concreta así:
+>
+>     AAMMDD TIPO [AÑO ACADÉMICO] [GRUPO] [campos del tipo, en el orden de Ajustes] [descripción corta] Tercero
+>
+> - Solo entran los campos configurados en Ajustes con **"Añadir al nombre"** marcado y con
+>   valor. Uno vacío no deja hueco ni doble espacio.
+> - Si el tipo trae configurada la columna de la unidad o el campo calculado Curso, el
+>   interruptor viejo de "Añadir el grupo" se esconde solo: si no, el grupo saldría dos veces.
+> - Ver la sección 5, "Los campos de cada tipo de asunto".
+>
+> ### Lo que NO va en el nombre
+>
+> El estado del asunto y la vía de comunicación **no** entran en el nombre de la carpeta.
+> Cambian mientras se tramita, y renombrar carpetas en un Dropbox sincronizado cada vez que
+> algo avanza sería pedir problemas. Van en `_GESTOR/asuntos.json`, que está en la misma
+> carpeta compartida y lo lee cualquiera que abra la aplicación.
+>
+> ### Comunicaciones
+>
+> Guardo también copia en PDF de los hilos de correo o de Passen. El asunto del mensaje es
+> el nombre de la carpeta del asunto.
+>
+> ---
+>
+> ## 5. Cómo funciona la aplicación
+>
+> Es una **web publicada en Vercel** que trabaja sobre la carpeta de Dropbox **de mi propio
+> ordenador**, con el selector de carpetas del navegador (Chrome o Edge).
+>
+> - Sin cuenta de Dropbox, sin servidor y sin base de datos aparte.
+> - Los datos no salen del ordenador.
+>
+> **Por qué es así:** no tengo la contraseña de la cuenta común de Dropbox del centro, y no
+> sé si me la darían. Acabo de llegar y apenas me conocen. **El diseño no puede depender de
+> esa contraseña.**
