@@ -404,6 +404,16 @@ App.pintarTipoDeAsunto = async function () {
   col1.appendChild(construirSeccionPasos(tipo));
   col1.appendChild(construirSeccionPlazo(tipo));
 
+  /* Palabras clave (17-sep-2026, fila 41, docs/LEER-DOCUMENTOS-POR-
+     CLASIFICAR.md), sacada aparte en js/ajustes-tipo-palabras-clave.js
+     para no seguir engordando este fichero. */
+  if (window.PalabrasClaveTipo) {
+    var secPalabras = seccionDeTipo('Palabras clave',
+      'Para proponer este tipo al leer un documento suelto en "Por clasificar".');
+    col1.appendChild(secPalabras.sec);
+    PalabrasClaveTipo.pintarDeTipo(secPalabras.cuerpo, tipo);
+  }
+
   var secCorreo = seccionDeTipo('Plantillas de correo y de Séneca',
     'Las plantillas pegadas a este tipo, con su editor de huecos.');
   col2.appendChild(secCorreo.sec);

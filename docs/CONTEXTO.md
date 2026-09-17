@@ -1340,7 +1340,7 @@ tipo).
 "asunto" o "que-me-toca": botón "← Volver" y Escape los pone solos `js/usabilidad.js`, porque su
 `<header class="cabecera"><h2>` tiene la misma forma que las demás pantallas). Dos columnas
 (`#tipo-asunto-col-1`/`-2`, CSS `grid-template-columns: 1fr 1fr`, una sola por debajo de 1000px),
-con siete secciones **siempre desplegadas**, sin `<details>`, construidas enteras por
+con ocho secciones **siempre desplegadas**, sin `<details>`, construidas enteras por
 `App.pintarTipoDeAsunto()`:
 
 1. **Datos del tipo** — nombre, categoría, alias si los tiene, botón "Cambiar el nombre" que
@@ -1367,7 +1367,15 @@ con siete secciones **siempre desplegadas**, sin `<details>`, construidas entera
    debajo de las tarjetas.
 6. **Plazo** — `App.construirCasillaPlazo(tipo)`, la misma casilla que ya llevaba la tarjeta de
    la rejilla, sacada a función compartida para no duplicarla.
-7. **Se repite** — `Recurrentes.pintarEnContenedor(contenedor, tipo.tipo)` (nueva en
+7. **Palabras clave** (17-sep-2026, fila 41, docs/LEER-DOCUMENTOS-POR-CLASIFICAR.md) —
+   `PalabrasClaveTipo.pintarDeTipo(contenedor, tipo)`, nueva en `js/ajustes-tipo-palabras-clave.js`,
+   sacada aparte del mismo modo que Plantillas o Se repite, para no engordar `js/ajustes-tipo.js`
+   (429 líneas, ya por encima de las 400 antes de esta fila, mismo criterio que `js/ajustes.js` en
+   la fila 39). Una sola casilla de texto (`palabrasClave` en `tipos.json`, lista de textos, vacía
+   en los tipos que ya existían), palabras separadas por comas, con su propio botón "Guardar
+   palabras clave" (`App.guardarTipos`, la misma función de siempre). La usa
+   `js/lector-documentos.js` al proponer el tipo de un documento suelto.
+8. **Se repite** — `Recurrentes.pintarEnContenedor(contenedor, tipo.tipo)` (nueva en
    `js/recurrentes.js`): solo las filas de ESE tipo, más "+ Añadir uno" que abre `alta(tipoPreset,
    alGuardar)`, con el tipo ya puesto. `filaDeRecurrente` se sacó a función propia, compartida con
    la tabla vieja (que ya no tiene sitio en el HTML, pero sigue funcionando si algo la llama).
@@ -1437,7 +1445,7 @@ separado por `.separador-lateral`; con la barra plegada, el icono de rueda denta
 (`#btn-barra-ajustes`, `js/barra.js`) lleva directo a Ajustes.
 
 Se comprueba con `pruebas/ajustes-agil.mjs` (las tres pestañas, a 1905 píxeles) y
-`pruebas/ajustes-por-tipo.mjs` (la pantalla de un tipo: las siete secciones, cambiar Plazo y
+`pruebas/ajustes-por-tipo.mjs` (la pantalla de un tipo: las ocho secciones, cambiar Plazo y
 Campos, volver sin perder categoría ni buscador, Escape).
 
 ### El cuadro de elegir asunto, y "Por clasificar"
@@ -1510,6 +1518,83 @@ se cierra solo si el documento ya no está en "Por clasificar".
   hace falta tocar esas tres acciones para nada.
 
 Se comprueba con `pruebas/documento-a-la-vista.mjs`.
+
+### Leer los documentos que entran en "Por clasificar" (17-sep-2026, fila 41,
+### docs/LEER-DOCUMENTOS-POR-CLASIFICAR.md)
+
+Hasta ahora un documento suelto solo se podía abrir, borrar, o meter en un asunto (nuevo o ya
+existente): el tipo, la fecha, el registro y el tercero los escribía Francisco a mano. Ahora la
+aplicación lee el texto del PDF con pdf.js y **propone** lo que ha encontrado; nunca decide sola.
+Sin OCR (un escaneado sin texto se queda exactamente como hoy), sin ningún servicio de inteligencia
+artificial por internet, sin aprendizaje automático: el tipo se acierta contando coincidencias de
+palabras clave.
+
+- **Sacar el texto**: `RegistroLector.textoDe(fichero, topePaginas)` (nueva en
+  `js/registro-lector.js`, 5 páginas por defecto), que reutiliza `cargarPdfJs` tal cual —no carga
+  pdf.js dos veces ni copia cómo se saca el texto—. `textoHastaElSello` y `leerSello` no se tocan:
+  el sello sigue exactamente igual que antes de esta fila. Antes de cargar pdf.js, `textoDe` mira
+  los cinco primeros bytes del fichero (`fichero.slice(0,5).text()`) y solo sigue si son `%PDF-`:
+  un fichero con extensión `.pdf` que no lo sea de verdad (un adjunto renombrado a mano, o el de
+  mentira de las pruebas) ni se intenta abrir con pdf.js, así no hay avisos de su consola por
+  ficheros que no son PDF.
+- **El análisis, puro**: `js/lector-documentos.js` (`window.LectorDocumentos`), nuevo,
+  `analizar(texto, contexto)` — sin tocar el disco, ni la pantalla, ni pdf.js, así se prueba con
+  textos de mentira y listas fabricadas (`pruebas/lector-documentos.mjs`, cargado con `vm` igual
+  que `pruebas/registro-sin-duplicar.mjs`, junto con `registro-lector.js`).
+  - **Registro**: `RegistroLector.buscarEnTexto(texto)`, la misma función de siempre.
+  - **Fecha**: la del sello si la hay; si no, la primera `dd/mm/aaaa`, `dd-mm-aaaa` o "17 de
+    septiembre de 2026" del texto (con o sin tildes en el mes); si no aparece ninguna, se deja
+    vacía — **nunca** la fecha de hoy.
+  - **Documentos de identidad**: DNI (ocho cifras + letra) y NIE (X/Y/Z + siete cifras + letra),
+    los dos con la letra comprobada contra la tabla `TRWAGMYFPDXBNJZSQVHLCKE` (el NIE cambia antes
+    su X/Y/Z por 0/1/2); NIF de empresa (letra + siete cifras + control), sin comprobar el dígito
+    de control (no lo pedía el encargo, y cada letra tiene su propia fórmula); Nº de identificación
+    escolar, como cualquier tirada de 5 a 10 cifras sueltas (no tiene una forma fija que comprobar:
+    solo cuenta si coincide con un alumno de verdad al cotejar).
+  - **Tercero**: `contexto` trae tres listas ya montadas por quien llama (`alumnado`, `personal`,
+    `empresas`), cada una `{ nombre, documento, persona }` — `persona` es el objeto tal cual que
+    espera `App.fijarTercero`. Un documento que cuadra (comparado sin espacios ni guiones, en
+    mayúsculas) vale más que un nombre que cuadra: el nombre solo se prueba si ningún documento ha
+    coincidido, en las dos formas ("García Pérez, Ana" y "Ana García Pérez", por palabra entera). Si
+    cuadran dos terceros distintos (por documento, o si no por nombre), no se propone ninguno.
+  - **Tipo**: se cuentan, por palabras enteras (sin tildes ni mayúsculas, para que "baja" no
+    dispare con "trabaja"), cuántas de las `palabrasClave` del tipo (más su propio nombre) aparecen
+    en el texto; gana el que más tenga, y si empatan dos, no se propone ninguno.
+- **Palabras clave por tipo**: clave nueva `palabrasClave` (lista de textos) en `tipos.json`,
+  vacía en los tipos que ya existían, editable en la sección "Palabras clave" de la pantalla del
+  tipo (ver más arriba, "Ajustes: tres pestañas..."), en `js/ajustes-tipo-palabras-clave.js`.
+- **En "Por clasificar"**: `js/documentos-sueltos-lector.js`, nuevo, envuelve `App.tarjetaSuelto`
+  igual que `js/papelera.js` con el botón Borrar —no toca `js/documentos-sueltos.js` por dentro—.
+  Solo a los PDF (`PdfHerramientas.esPdf`, o la extensión si ese módulo no está), debajo del nombre:
+  mientras se lee, una línea gris "Leyendo el documento…"; al terminar, lo encontrado separado por
+  puntos (`26EM0368 · 10-sep-2026 · SOLICITUD · García Pérez, Ana`, con `Nombres.codigoRegistro`
+  para el código y los mismos meses abreviados que `App.VERSION`); si no hay nada que proponer, o
+  el fichero no se ha podido leer, la línea se quita entera y la tarjeta se queda exactamente como
+  antes de esta fila. Cuando hay tipo **y** tercero, el botón "Aceptar" sale pegado a esa misma
+  línea —no dentro de `.acciones`, que ya tiene su lista fija de botones comprobada en
+  `pruebas/documentos-sueltos.mjs`— y llama a `App.crearAsuntoConPropuesta`.
+  - **Solo se lee al abrir la pantalla**: `App.tarjetaSuelto` solo se llama con "Por clasificar" a
+    la vista (desde `App.pintarSueltos` y desde `App.accionesDeSuelto`, del panel del visor), nunca
+    al arrancar. Los ficheros se leen de uno en uno, con una cola en memoria (nunca en paralelo: la
+    pantalla no se bloquea), cacheados por nombre de fichero —volver a la lista no vuelve a leer
+    nada—; el contexto de `analizar` (tipos y las tres listas de terceros) se monta una sola vez
+    por pantalla, apoyándose en la caché propia de `Datos.cargar`.
+- **Crear el asunto de un clic**: `App.crearAsuntoConPropuesta(tipo, tercero, documentoSuelto)`
+  (nueva en `js/asuntos-nuevo.js`, unas quince líneas) reutiliza tal cual el mismo camino manual:
+  `App.E.pendiente` + `App.ir('nuevo')` + `App.elegirCategoria`/`elegirTipo`/`fijarTercero` (ya
+  existentes) + el mismo `$('btn-crear').onclick()` de siempre —con su aviso de asunto duplicado
+  (`js/duplicados.js`) funcionando igual—. `js/campos.js` no se ha tocado: los campos propios del
+  tipo ya se rellenan solos al fijar el tercero (`App.pintarCamposDelTipo`), sin nada nuevo que
+  hacer aquí.
+- `js/ajustes-tipo.js` (429 líneas) y `js/asuntos-nuevo.js` (en torno a 895) ya pasaban de las 400
+  líneas antes de esta fila —pantallas de un solo módulo, mismo criterio que se dejó para
+  `js/ajustes.js` en la fila 39—: el añadido de esta fila en cada uno es una veintena de líneas de
+  enganche a un módulo nuevo, sin repetir ninguna lógica, así que no se han partido.
+- Un documento que no sea PDF (Word, imagen, hoja de cálculo) ni se intenta leer.
+
+Se comprueba con `pruebas/lector-documentos.mjs` (los 6 escenarios de la instrucción, sin pdf.js ni
+navegador) y con la batería completa en verde (`pruebas/documentos-sueltos.mjs`,
+`pruebas/ajustes-por-tipo.mjs` actualizada a las ocho secciones).
 
 ### Separar, unir y sacar páginas de un PDF (17-sep-2026, fila 22, docs/SEPARAR-Y-UNIR-PDF.md)
 
@@ -1779,11 +1864,13 @@ de `App` va después del fichero que lo define.
 | `js/asuntos-editar.js` | Editar un asunto abierto: renombra la carpeta y mueve su ficha |
 | `js/elegir-asunto.js` | El cuadro de escoger un asunto a mano, compartido por "Por clasificar" y por la bandeja de correos |
 | `js/documentos-sueltos.js` | Los papeles sin asunto, "Meter en un asunto", cerrar y reabrir, y la vigilancia de la carpeta |
+| `js/documentos-sueltos-lector.js` | Envuelve `App.tarjetaSuelto` para proponer tipo/fecha/registro/tercero de cada PDF suelto, con el botón "Aceptar" (17-sep-2026, fila 41) |
 | `js/lo-pide.js` | Quién ha pedido la gestión: candidatos, controles, línea legible y qué casilla marcar en el correo |
 | `js/asuntos-nuevo.js` | Crear un asunto, el cuadro de datos de un tercero y los pies |
 | `js/archivo-personas.js` | Personas y empresas, el ARCHIVO, y cambiar los datos de un tercero |
 | `js/ajustes.js` | El marco de Ajustes (17-sep-2026, fila 39): las tres pestañas, la lista de tipos (pestañas de categoría, buscador cruzado, aviso en vivo) y los ayudantes compartidos (`botonMenuTarjeta`, `filaEstado`, `construirCasillaPlazo`) |
-| `js/ajustes-tipo.js` | La pantalla propia de un tipo de asunto, con sus siete secciones (17-sep-2026, fila 39) |
+| `js/ajustes-tipo.js` | La pantalla propia de un tipo de asunto, con sus ocho secciones (17-sep-2026, fila 39) |
+| `js/ajustes-tipo-palabras-clave.js` | La sección "Palabras clave" de la pantalla de un tipo: `palabrasClave` en `tipos.json` (17-sep-2026, fila 41) |
 | `js/ajustes-centro.js` | La pestaña "El centro" de Ajustes: estados, tipos de documento, campos propios, grupos, ficheros de datos, abreviatura de grupos (17-sep-2026, fila 39) |
 | `js/ajustes-mantenimiento.js` | La pestaña "Mantenimiento" de Ajustes: avisos de vencimiento, carpetas de este ordenador, copias y papelera (17-sep-2026, fila 39) |
 | `js/puente.js` | El enganche de los módulos que se añaden por fuera (`window.Gestor`) |
@@ -1796,7 +1883,8 @@ de `App` va después del fichero que lo define.
 | `js/presencia.js` | No pisarse en un mismo asunto: la señal de `_GESTOR/presencia.json`, la vigilancia y la marca de la tarjeta de la lista |
 | `js/notas.js` | Las notas de cada asunto, con su enlace y su botón; `Notas.pintarEnFicha` es la caja de escribir directa de la ficha, con guardado automático (fila 37) |
 | `js/registro.js` | Registrar un documento en un paso, sin nombrarlo dos veces |
-| `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF (hasta 10 páginas) |
+| `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF (hasta 10 páginas); `textoDe` saca el texto de hasta 5 páginas sin buscar nada (17-sep-2026, fila 41) |
+| `js/lector-documentos.js` | `LectorDocumentos.analizar(texto, contexto)`, puro: propone tipo, fecha, documentos de identidad y tercero de un documento suelto (17-sep-2026, fila 41) |
 | `js/registro-sellado.js` | Ver solo un PDF ya sellado en la carpeta del asunto, y colocarlo sin duplicarlo |
 | `js/pdf-herramientas.js` | Partir, unir y sacar páginas de un PDF con pdf-lib: solo bytes, sin disco ni DOM |
 | `js/pdf-separar-unir.js` | El cuadro de Separar, Unir y Sacar páginas: miniaturas con pdf.js, tijeras, casillas |
@@ -1861,6 +1949,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/ajustes-agil.mjs` | Prueba de las pestañas, el buscador cruzado, el aviso en vivo y la barra fija |
 | `pruebas/papelera.mjs` | Prueba de borrar con papelera, devolver y borrar del todo |
 | `pruebas/documentos-sueltos.mjs` | Prueba de "Meter en un asunto": un documento suelto a un asunto que ya existe |
+| `pruebas/lector-documentos.mjs` | `LectorDocumentos.analizar`, puro, sin pdf.js ni navegador: sello, DNI de un tercero, dos terceros o dos tipos empatados, DNI con la letra mal, texto vacío (17-sep-2026, fila 41) |
 | `pruebas/envios.mjs` | Prueba de mandar documentos por correo: el encargo, el hilo, el límite de 20 MB, "listo" y "error" |
 | `pruebas/plantillas.mjs` | Prueba de las plantillas: huecos, "Faltan datos", cambiar de plantilla, sin plantillas, y el recorte de Séneca |
 | `pruebas/hitos.mjs` | Prueba de los hitos de un asunto: crearlos, marcarlos, bifurcaciones, plazo, responsable y el historial al archivar |

@@ -5,6 +5,74 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — Leer los documentos que entran en "Por clasificar"
+
+Fila 41 de la cola (`docs/COLA.md`, `docs/LEER-DOCUMENTOS-POR-CLASIFICAR.md`), acordada con
+Francisco el 17-sep-2026, después de la fila 39 (la casilla de palabras clave vive en la pantalla
+propia de cada tipo). Hasta ahora, un documento suelto en "Por clasificar" solo se podía abrir,
+borrar, convertir en asunto nuevo o meter en uno que ya existiera: el tipo, la fecha, el registro
+de Séneca y el tercero los escribía Francisco a mano, documento a documento, aunque la mayoría son
+PDF de Séneca que traen todo eso escrito ya dentro.
+
+La aplicación lee ahora el texto del PDF con pdf.js (reutilizando `js/registro-lector.js`, que
+gana una función pública `textoDe`) y **propone** lo que ha encontrado; nunca decide sola. Se
+descartó de entrada, sin volver a discutirlo, cualquier servicio de inteligencia artificial por
+internet y cualquier OCR (un escaneado sin texto se queda exactamente como estaba). El tipo se
+acierta contando coincidencias de palabras clave escritas por Francisco —clave nueva
+`palabrasClave` en `tipos.json`, editable en la pantalla propia del tipo que creó la fila 39—, más
+el propio nombre del tipo; nada de aprendizaje automático.
+
+El análisis vive en un módulo nuevo y **puro**, `js/lector-documentos.js`
+(`LectorDocumentos.analizar(texto, contexto)`): sin tocar el disco, la pantalla ni pdf.js, así se
+prueba con textos y listas de mentira. Saca el registro (con la función ya hecha y probada
+`RegistroLector.buscarEnTexto`), la fecha del documento (la del sello si la hay; si no, la primera
+del texto en varios formatos; nunca la de hoy), los documentos de identidad que aparezcan (DNI y
+NIE con la letra comprobada por tabla; NIF de empresa; Nº de identificación escolar) y, cotejando
+esos documentos y los nombres contra las listas de alumnado, personal y empresas que ya tiene la
+aplicación, propone un tercero —un documento que cuadra vale más que un nombre que cuadra— y un
+tipo. **Si cuadran dos terceros distintos, o empatan dos tipos, no se propone ninguno**: mejor un
+hueco que un acierto a medias, y Francisco elige.
+
+En "Por clasificar", cada tarjeta de documento suelto enseña, debajo del nombre del fichero, una
+línea gris mientras se lee ("Leyendo el documento…", nunca bloquea la pantalla: se lee de uno en
+uno, en una cola de fondo, solo al abrir esa pantalla y nunca al arrancar) y, al terminar, lo
+encontrado separado por puntos (`26EM0368 · 10-sep-2026 · SOLICITUD · García Pérez, Ana`); lo que
+no se haya encontrado, no sale. Con tipo y tercero claros, un botón **"Aceptar"** crea el asunto de
+un clic, metiendo el documento dentro, **reutilizando tal cual el mismo camino que ya existía para
+crear un asunto nuevo** (`App.crearAsuntoConPropuesta` en `js/asuntos-nuevo.js`, quince líneas que
+llaman a las funciones de siempre y disparan el mismo botón "Crear", con su aviso de asunto
+duplicado intacto): no se ha escrito ningún camino nuevo. Módulo nuevo
+`js/documentos-sueltos-lector.js` envuelve `App.tarjetaSuelto` igual que ya hace `js/papelera.js`
+con el botón Borrar, sin tocar `js/documentos-sueltos.js` por dentro.
+
+Trampa encontrada al escribir las pruebas, que no estaba en el encargo: los ficheros de mentira que
+usan muchas pruebas de `pruebas/` llevan extensión `.pdf` pero no son un PDF de verdad por dentro
+(su contenido es texto plano). Pasárselos a pdf.js sin más habría hecho que, la primera vez que se
+abriera "Por clasificar" en cualquiera de esas pruebas, pdf.js intentara leerlos y avisara por
+consola de un PDF corrupto, tirando pruebas que no tienen nada que ver con esta fila. Se resolvió
+mirando los cinco primeros bytes del fichero antes de cargar pdf.js: un PDF de verdad siempre
+empieza por `%PDF-`; si no, `textoDe` devuelve cadena vacía sin más, sin avisar de nada.
+
+`js/ajustes-tipo.js` (429 líneas) y `js/asuntos-nuevo.js` (en torno a 895) ya pasaban de las 400
+líneas antes de esta fila —son pantallas de un solo módulo, el mismo criterio que se dejó para
+`js/ajustes.js` en la fila 39—, y lo que ha hecho falta añadir en cada uno es una veintena de
+líneas de enganche a un módulo nuevo (`js/ajustes-tipo-palabras-clave.js`), sin repetir ninguna
+lógica: no se han partido. `js/campos.js` no se ha tocado nada: el relleno de los campos propios
+del tipo ya ocurría solo, al fijar el tercero, desde antes de esta fila.
+
+Prueba nueva `pruebas/lector-documentos.mjs`, sin pdf.js ni navegador (los seis escenarios del
+encargo: sello completo, DNI de un alumno de la lista, dos alumnos distintos sin proponer ninguno,
+dos tipos empatados sin proponer tipo, un DNI con la letra mal descartado, un texto vacío sin
+romper nada). `pruebas/ajustes-por-tipo.mjs` ajustada: la pantalla de un tipo pasa de siete a ocho
+secciones. Batería completa en verde, una sola pasada al final (51 ficheros de prueba). Versión
+publicada `App.VERSION`: `17-sep-2026 · 22:13`.
+
+La parte de dar de alta terceros que todavía no existen (un DNI/NIE/NIF que no está en ninguna
+lista) queda para la fila siguiente de la cola, `docs/TERCEROS-NUEVOS-DESDE-EL-DOCUMENTO.md`: esta
+fila no la toca.
+
+---
+
 ## 17-sep-2026 — Ajustes: tres pestañas, y la pantalla propia de un tipo de asunto
 
 Fila 39 de la cola (`docs/COLA.md`, `docs/AJUSTES-POR-TIPO.md`), acordada con Francisco el

@@ -4,15 +4,15 @@
    Antes de este cambio, Ajustes era una sola pantalla larguísima con
    once bloques uno detrás de otro. Ahora tiene tres pestañas arriba
    (Tipos de asunto · El centro · Mantenimiento) y pulsar una tarjeta
-   de tipo abre su PANTALLA ENTERA, a dos columnas, con sus siete
-   secciones ya desplegadas: Datos del tipo, Campos, Pasos del trámite,
-   Plantillas de correo y de Séneca, Plantilla de documento de Word,
-   Plazo y Se repite.
+   de tipo abre su PANTALLA ENTERA, a dos columnas, con sus secciones
+   ya desplegadas: Datos del tipo, Campos, Pasos del trámite, Palabras
+   clave (17-sep-2026, fila 41), Plantillas de correo y de Séneca,
+   Plantilla de documento de Word, Plazo y Se repite.
 
    Lo que comprueba:
      1. Las tres pestañas de Ajustes existen y cambian de contenido.
-     2. Pulsar una tarjeta de tipo abre su pantalla entera, con las
-        siete secciones a la vista, sin plegar.
+     2. Pulsar una tarjeta de tipo abre su pantalla entera, con todas
+        las secciones a la vista, sin plegar.
      3. Cambiar algo en dos secciones (Plazo y Campos) lo guarda de
         verdad, en tipos.json y en campos.json.
      4. Volver a la lista (botón "← Volver", que pone solo js/
@@ -118,10 +118,10 @@ await comprobar('la categoría sale al lado',
 await comprobar('la pantalla de Ajustes ha quedado oculta detrás',
   pagina.locator('#pantalla-ajustes').isHidden(), true);
 
-const SECCIONES = ['Datos del tipo', 'Campos', 'Pasos del trámite',
+const SECCIONES = ['Datos del tipo', 'Campos', 'Pasos del trámite', 'Palabras clave',
   'Plantillas de correo y de Séneca', 'Plantilla de documento de Word', 'Plazo', 'Se repite'];
 await pagina.waitForTimeout(300);
-await comprobar('están las siete secciones, todas a la vista sin plegar (sin ningún <details>)',
+await comprobar('están las ocho secciones, todas a la vista sin plegar (sin ningún <details>)',
   pagina.locator('#tipo-asunto-cuerpo .tipo-asunto-seccion h3').allTextContents().then((titulos) => {
     const mismos = SECCIONES.every((s) => titulos.indexOf(s) !== -1);
     const sinDetails = titulos.length === SECCIONES.length;
