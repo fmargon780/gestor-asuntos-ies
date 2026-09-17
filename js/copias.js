@@ -28,10 +28,12 @@ var Copias = (function () {
      que los demás JSON de _GESTOR. `papelera.json` (11-sep-2026, la
      papelera) y `no-duplicados.json` (11-sep-2026, los duplicados
      descartados con "No son el mismo") también. `hitos.json`
-     (16-sep-2026, los hitos de cada asunto) es el duodécimo. */
+     (16-sep-2026, los hitos de cada asunto) es el duodécimo, y
+     `grupos.json` (17-sep-2026, los grupos propios de personas) el
+     decimotercero. */
   var FICHEROS = ['asuntos.json', 'guias.json', 'tipos.json', 'estados.json',
                    'tipos-documento.json', 'tablon.json', 'recurrentes.json', 'frescura.json',
-                   'campos.json', 'papelera.json', 'no-duplicados.json', 'hitos.json'];
+                   'campos.json', 'papelera.json', 'no-duplicados.json', 'hitos.json', 'grupos.json'];
 
   function dosDigitos(n) { return String(n).padStart(2, '0'); }
 

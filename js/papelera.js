@@ -192,6 +192,7 @@ var Papelera = (function () {
         case 'campo-propio': return await devolverCampoPropio(ficha);
         case 'tercero': return await devolverTercero(ficha);
         case 'nota-tablon': return await devolverNotaTablon(ficha);
+        case 'grupo': return await devolverGrupo(ficha);
         default: return { ok: false, motivo: 'No sé devolver esto.' };
       }
     } catch (e) {
@@ -321,6 +322,16 @@ var Papelera = (function () {
     return { ok: true };
   }
 
+  /* El propio grupo lo guarda js/grupos.js, que ya sabe leer y
+     escribir _GESTOR/grupos.json fusionando con el disco: aquí solo se
+     limpia el índice de la papelera cuando ha ido bien. */
+  async function devolverGrupo(ficha) {
+    if (!window.Grupos) return { ok: false, motivo: 'No se puede devolver un grupo ahora mismo.' };
+    var salida = await Grupos.devolver(ficha);
+    if (salida.ok) await quitarDeIndice(ficha.id);
+    return salida;
+  }
+
   async function devolverCampoPropio(ficha) {
     var propio = ficha.datos && ficha.datos.propio;
     if (!propio) return { ok: false, motivo: 'No tengo guardados sus datos.' };
@@ -393,7 +404,7 @@ var Papelera = (function () {
 
   var ICONOS = {
     documento: '📄', suelto: '📄', asunto: '📁', tipo: '📋', estado: '📋',
-    'tipo-documento': '📋', 'campo-propio': '📋', tercero: '📋', 'nota-tablon': '📋'
+    'tipo-documento': '📋', 'campo-propio': '📋', tercero: '📋', 'nota-tablon': '📋', grupo: '👥'
   };
 
   function deDonde(ficha) {
@@ -407,6 +418,7 @@ var Papelera = (function () {
     if (ficha.clase === 'tercero') return 'Persona o empresa' +
       ((ficha.origen && ficha.origen.categoria) ? ' (' + ficha.origen.categoria + ')' : '');
     if (ficha.clase === 'nota-tablon') return 'Nota del tablón';
+    if (ficha.clase === 'grupo') return 'Grupo de personas';
     return '';
   }
 

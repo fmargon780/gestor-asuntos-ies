@@ -297,7 +297,7 @@ el mando" que siempre está ahí.
 
 - **`js/presencia.js`** (`window.Presencia`) es el modelo y la vigilancia. Vive en
   `_GESTOR/presencia.json`: `{ <clave del asunto>: { usuario, ultima } }`. Se escribe y relee
-  **directo con `Carpetas`, nunca con `Copias.guardar`**: es un fichero fuera de los doce
+  **directo con `Carpetas`, nunca con `Copias.guardar`**: es un fichero fuera de los trece
   protegidos, a propósito (ver "Lo que la aplicación guarda en `_GESTOR`"), porque se escribe muy
   a menudo y es un dato que caduca solo (3 minutos sin renovarse).
   - `vigilar(clave, onCambio)`: comprueba si `clave` está libre; si lo está, anuncia la propia
@@ -573,7 +573,7 @@ El gemelo en papel de las de correo (16-sep-2026, `docs/PLANTILLAS-DE-DOCUMENTO.
 - **Los `.docx` viven en `_GESTOR/PLANTILLAS`**, sin subcarpetas, dentro de la carpeta de asuntos
   abiertos (`Carpetas.crear(App.E.gestor, 'PLANTILLAS')`, que la crea si no existe). Francisco los
   sube a mano a esa carpeta de Dropbox; la aplicación nunca escribe ahí, solo lee y cuelga el
-  nombre del fichero de un tipo en Ajustes. No es ninguno de los doce ficheros compartidos: no
+  nombre del fichero de un tipo en Ajustes. No es ninguno de los trece ficheros compartidos: no
   lleva copia de seguridad ni detección de fichero roto.
 - **`Plantillas.valoresDeAsunto(asunto)`** (`js/plantillas.js`), pública desde el 16-sep-2026:
   hasta entonces era `valoresDePlantilla()`, privada de `js/correo.js`, y solo traía lo que hacía
@@ -804,8 +804,101 @@ Un asunto puede afectar a más de una persona o entidad, además de su tercero p
 - Vive en `js/relacionados.js`, cargado después de `js/duplicados.js` (envuelve
   `Duplicados.delTercero`) y de `js/archivo-personas.js` (envuelve `App.verFicha` y
   `App.verArchivo`).
+- **"+ Añadir varios"** (17-sep-2026, fila 21): abre el mismo buscador en modo `multiple`, con los
+  atajos de alumnado y "Meter un grupo entero" encima (ver la sección siguiente). Añade con
+  `Relacionados.combinarRelacionados`, sin preguntar uno a uno.
 
-Se comprueba con `pruebas/relacionados.mjs`.
+Se comprueba con `pruebas/relacionados.mjs` (el modo de siempre) y con `pruebas/grupos.mjs` /
+`pruebas/grupos-navegador.mjs` (el modo `multiple` y los grupos).
+
+### Grupos de personas (17-sep-2026, fila 21, docs/GRUPOS-DE-PERSONAS.md)
+
+Señalar varios terceros a la vez, en vez de uno por vuelta al cuadro, y guardar listas con
+nombre ("equipo directivo", "tutores de 1º…") que sirven tanto para relacionar de golpe con un
+asunto como para poner los destinatarios de un correo.
+
+**El modo `multiple` de `App.pintarBuscadorDeTercero`** (`js/asuntos-nuevo.js`), opcional y sin
+tocar el modo de siempre:
+
+- `App.pintarBuscadorDeTercero(contenedor, categoriaInicial, alElegir, { multiple: true,
+  marcadosIniciales, alCambiarCategoria })`. Cada resultado lleva una casilla
+  (`.resultado-marcable`) en vez de pulsarse; `estado.marcados` (un objeto, clave
+  `categoria + '|' + nombre`, fuera de `buscar()`) sobrevive a cambiar de búsqueda y de
+  categoría. Devuelve `{ marcar(lista), marcados() }` para que quien llama pueda señalar desde
+  fuera (los atajos, un grupo entero); en el modo de siempre no devuelve nada.
+- La barra fija (`#rel-marcados-barra` / `.marcados-barra`) enseña la cuenta, el botón "Añadir los
+  N señalados" (llama a `alElegir` UNA VEZ, con la lista entera) y un chip por señalado con su ×
+  para quitarlo sin tener que volver a buscarlo — es la única forma de quitar uno que no salga
+  en ningún resultado (un miembro de un grupo que ya no está en las listas).
+- **Miembros perdidos**: si `marcadosIniciales` trae uno sin `persona` (los de un grupo guardado,
+  que solo llevan `{ categoria, nombre }`), se resuelve contra `Datos.cargar` de su categoría
+  (`resolverPerdidos`, una lectura por categoría, no una por miembro); si no aparece, se marca
+  `perdido: true` y el chip sale en gris (`.marcado-chip-perdido`) con su aviso, sin quitarse
+  solo. Los que traen `persona` (los atajos, ya resueltos) no se comprueban.
+- `App.textoTercero(p)` es el nombre canónico que se guarda (igual que el modo de siempre): un
+  miembro se identifica por `categoria + nombre`, nunca por el objeto `persona`.
+
+**Los atajos de alumnado** (`Nombres.nivelYEnsenanza(unidad)`, en `js/nombres.js`): reutiliza el
+mismo análisis de texto que `grupoCompacto` (`etapaDe`, `sinPalabrasDeEtapa`, sacadas a función
+para no duplicarlo), y devuelve `{ nivel: '1º', ensenanza: 'E.S.O.' }` (`Bachillerato`,
+`Formación Profesional` o `PMAR` cuando la etapa se escribe). Los tres filtros —unidad, nivel,
+enseñanza— viven en `js/relacionados.js` (`filtrarPorUnidad`, `filtrarPorNivel`,
+`filtrarPorEnsenanza`; exportados y sin efectos), y los reutiliza también `js/correo.js`: solo
+entra el alumnado `matriculado` de este curso (`Datos.unidadesDistintas` ya filtra por eso), y
+elegir un atajo solo señala, no añade nada todavía.
+
+**Grupos propios**, `js/grupos.js` (`window.Grupos`), decimotercer fichero compartido
+(`_GESTOR/grupos.json`, ver la tabla de ficheros): `{ grupos: [{ id, nombre, miembros: [{
+categoria, nombre }], creadoPor, creadoEl }] }`. `Grupos.guardar()` relee el disco y fusiona por
+`id` antes de escribir (como `App.fusionarConDisco`, pero para el fichero envuelto en `{ grupos:
+[...] }` en vez de una lista suelta). Bloque "Grupos de personas" en Ajustes (`js/ajustes.js`,
+`App.pintarGruposPersonas`), mismo aire que tipos/estados/tipos de documento: crear, cambiar el
+nombre, "Ver y cambiar los miembros" (abre el buscador en modo `multiple` con
+`marcadosIniciales: g.miembros`, y al pulsar "Añadir" **sustituye entera** la lista de miembros,
+no la suma: así también se puede QUITAR a alguien) y borrar por papelera
+(`Papelera.mandarDato('grupo', ...)`, con `devolverGrupo` en `js/papelera.js` delegando en
+`Grupos.devolver`).
+
+**En Relacionados**: "+ Añadir varios" (arriba) abre el buscador `multiple` con, encima, los tres
+atajos de alumnado (solo si la categoría elegida es ALUMNADO) y "Meter un grupo entero"
+(desplegable con los grupos de `Grupos.lista()`); elegir uno de los dos solo señala.
+`Relacionados.combinarRelacionados(actuales, categoriaPrincipal, terceroPrincipal, candidatos)`
+(sin efectos) decide qué entra: nunca el propio tercero del asunto, nunca un duplicado exacto
+(por `categoria` + nombre normalizado) de lo que ya había; sin preguntar uno a uno como
+`validarYAgregar` (con veinte señalados serían veinte cuadros). Un aviso final resume añadidos,
+ya-estaban y propio-tercero.
+
+**En Correo** (`js/correo.js`): desplegable "Añadir un grupo" (grupos propios + los mismos
+atajos de alumnado, con `<optgroup>`), solo en el cuadro de correo normal (no en el de Séneca).
+Decisión de Francisco, 17-sep-2026: los destinatarios de un grupo van **siempre en copia oculta**,
+nunca en Para, para que una familia no vea el correo de las demás.
+
+- `combinarCorreosDeGrupo(miembrosConPersona)` (sin efectos): de cada miembro saca TODOS sus
+  correos (`correosDe`, la misma máquina que ya usa "Para": busca la arroba en cualquier columna,
+  no por título), sin repetidos (por dirección en minúsculas); quien no tenga ninguno va aparte,
+  en `sinCorreo`.
+- `resolverMiembros(miembros)` busca la ficha de cada uno que no la traiga ya puesta (los atajos
+  sí, los de un grupo guardado no: solo llevan `{ categoria, nombre }`), una lectura de
+  `Datos.cargar` por categoría, no una por miembro.
+- La caja `#correo-cco-caja` pinta la cuenta, un chip por dirección (con su × — `js/correo.js`
+  guarda el estado en `cco`, un objeto tipo `Set`) y la línea "N no tienen correo: …" si hace
+  falta. `ccoDelCuadro()` es a `cco` lo que `paraDelCuadro()` es a "Para".
+- `abrirGmail()`/`abrirDelOrdenador()` añaden `&bcc=...` cuando hay copia oculta. Si el borrador
+  se prepara con documentos (`js/correo-adjuntos.js`, `.envio.json`), el campo nuevo `cco` viaja
+  igual que `para` (`ccoActual()`, misma técnica que `paraActual()`: se lee del propio DOM, de
+  los chips, para no exponer nada solo para esto).
+- **Apps Script** (`apps-script/gestor-correos.gs`, `mandarUnBorrador`): `opciones.bcc =
+  encargo.cco` cuando lo trae; si no hay nadie en "Para" pero sí hay `cco`, el destinatario es
+  `Session.getActiveUser().getEmail()` (Gmail no admite un borrador sin nadie en Para). **Hay que
+  volver a pegar el script en `script.google.com`.**
+
+Fuera de esta fila, a falta de datos que la aplicación no tiene: departamentos, tutorías y
+equipos educativos (`personal.csv` no guarda esa información).
+
+Se comprueba con `pruebas/grupos.mjs` (sin navegador: `nivelYEnsenanza`, los tres filtros,
+`combinarRelacionados`, `combinarCorreosDeGrupo`) y `pruebas/grupos-navegador.mjs` (navegador de
+verdad: un miembro perdido se conserva y se ve distinto, señalar no se pierde al cambiar de
+categoría ni de búsqueda, "Meter un grupo entero" en Relacionados, "Añadir un grupo" en Correo).
 
 ### Los campos de cada tipo de asunto
 
@@ -1134,7 +1227,8 @@ de `App` va después del fichero que lo define.
 | `js/hitos-panel.js` | Pinta los hitos en la ficha del asunto, envolviendo lo que pinta la guía: el observador y el repintado |
 | `js/hitos-panel-lista.js` | La otra mitad del panel de hitos: la fila de cada hito, su cuerpo desplegado y el cambio de rama |
 | `js/duplicados.js` | ¿Esto no lo hicimos ya? Asuntos iguales del mismo tercero |
-| `js/relacionados.js` | Terceros relacionados con un asunto, y la nota al archivar |
+| `js/relacionados.js` | Terceros relacionados con un asunto, la nota al archivar, "+ Añadir varios" y los atajos de alumnado |
+| `js/grupos.js` | Grupos propios de personas, guardados con nombre en `_GESTOR/grupos.json` |
 | `js/hitos-archivo.js` | La otra mitad del modelo de hitos: bifurcaciones, responsables de Ajustes y el `HISTORIAL DE TRAMITACION.txt` al archivar/reabrir |
 | `js/visor.js` | El panel de la derecha para ver un documento (`con-visor`); marcador y acciones opcionales para que quien lo abre sepa qué se está viendo |
 | `js/tipos-buscador.js` | Buscar el tipo de asunto por letras, y los más usados arriba |
@@ -1143,7 +1237,7 @@ de `App` va después del fichero que lo define.
 | `js/copiar.js` | Los botones de copiar: el Nº escolar y el nombre del documento |
 | `js/plantillas.js` | Leer y guardar `plantillas.json`, montar `Plantillas.valoresDeAsunto` y rellenar los huecos: el motor, sin pantalla |
 | `js/plantillas-ajustes.js` | El bloque "Plantillas de correo" de Ajustes (sacado de `js/plantillas.js`) |
-| `js/correo.js` | El correo y el mensaje de Séneca, con su rastro y sus plantillas |
+| `js/correo.js` | El correo y el mensaje de Séneca, con su rastro, sus plantillas y los grupos en copia oculta |
 | `js/docx.js` | Rellenar los huecos de una plantilla de Word: ZIP y XML a mano, sin librerías (`window.Docx`) |
 | `js/plantillas-documento.js` | Botón "Generar documento" en la ficha, y el bloque "Plantillas de documento" de Ajustes (`css/plantillas-documento.css`) |
 | `js/salir.js` | El botón de Salir del pie de la barra |
@@ -1230,11 +1324,12 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `envios.json` | **Es una lista, no un objeto.** Los encargos vivos de "mandar documentos por correo": `{ id, asunto, para, creado }` |
 | `plantillas.json` | `{ firma, centro, localidad, direccion, codigo, cargo, lista: [{ id, tipo, categoria, nombre, texto }], documentos: [{ id, tipo, categoria, nombre, fichero, tipoDocumento, texto }] }`: `lista` para el correo y el mensaje de Séneca, `documentos` para las plantillas de Word |
 | `hitos.json` | `{ ajustes: { responsables, noLectivos }, porAsunto: { <clave>: { creados, hitos } } }`: los hitos vivos de cada asunto abierto (ver "Los hitos de un asunto") |
+| `grupos.json` | `{ grupos: [{ id, nombre, miembros: [{ categoria, nombre }], creadoPor, creadoEl }] }`: los grupos propios de personas, gestionados en `js/grupos.js` (ver "Grupos de personas") |
 | `datos/*.csv` | Alumnado (Séneca), personal, empresas y otros |
 | `PAPELERA/` | Las carpetas y ficheros borrados, cada uno en su subcarpeta `AAMMDD-HHMM <nombre>` |
-| `PLANTILLAS/` | Los `.docx` que Francisco sube a mano, colgados de un tipo desde Ajustes › Plantillas de documento. No lleva copia de seguridad: no es uno de los doce ficheros compartidos |
-| `presencia.json` | `{ <clave del asunto>: { usuario, ultima } }`: quién tiene abierta la ficha de cada asunto, y desde cuándo. **A propósito, fuera de los doce**: no pasa por `Copias.guardar` (nada de copia de seguridad), no entra en `Papelera` ni en `Conflictos` (si dos versiones chocan, se quedan las dos entradas y punto). Se escribe y relee directo con `Carpetas` (ver "No pisarse en un mismo asunto") |
-| `copias/*.json` | Copias de seguridad de los doce ficheros de arriba, una por día, 30 como mucho de cada uno |
+| `PLANTILLAS/` | Los `.docx` que Francisco sube a mano, colgados de un tipo desde Ajustes › Plantillas de documento. No lleva copia de seguridad: no es uno de los trece ficheros compartidos |
+| `presencia.json` | `{ <clave del asunto>: { usuario, ultima } }`: quién tiene abierta la ficha de cada asunto, y desde cuándo. **A propósito, fuera de los trece**: no pasa por `Copias.guardar` (nada de copia de seguridad), no entra en `Papelera` ni en `Conflictos` (si dos versiones chocan, se quedan las dos entradas y punto). Se escribe y relee directo con `Carpetas` (ver "No pisarse en un mismo asunto") |
+| `copias/*.json` | Copias de seguridad de los trece ficheros de arriba, una por día, 30 como mucho de cada uno |
 
 **Los CSV van en `datos`, no en `_GESTOR`.** `js/rescate-datos.js` los baja solos al entrar.
 
@@ -1247,7 +1342,7 @@ Cada nota de `asuntos.json` es `{ texto, quien, cuando }`, y las de correo lleva
 la aplicación escribe `seguidos.json` para el recolector de Apps Script.
 
 **Todo fichero compartido se relee justo antes de escribirlo.** Son dos ordenadores sobre la
-misma carpeta: sin releer, el último en guardar borra lo del otro. Lo hacen los doce ficheros de
+misma carpeta: sin releer, el último en guardar borra lo del otro. Lo hacen los trece ficheros de
 arriba.
 
 ### Copias de seguridad y fichero roto
@@ -1256,12 +1351,12 @@ arriba.
 JSON está roto, lanza un error `FicheroRoto` en vez de devolver `null` (antes se trataba igual
 que si no existiera, y el siguiente guardado lo escribía encima, perdiendo todo).
 
-- `js/copias.js` guarda, antes de escribir cualquiera de los doce ficheros compartidos, una
+- `js/copias.js` guarda, antes de escribir cualquiera de los trece ficheros compartidos, una
   copia de cómo estaba justo antes, en `_GESTOR/copias/<nombre>-AAMMDD.json`. Una copia por
   fichero y día; se conservan las últimas 30 de cada uno.
 - Todo lo que escribe uno de esos ficheros llama a `Copias.guardar` en vez de a
   `Carpetas.guardarJson` directamente.
-- Al pulsar Entrar se comprueban los doce ficheros (`Copias.comprobarTodos`). Si alguno está
+- Al pulsar Entrar se comprueban los trece ficheros (`Copias.comprobarTodos`). Si alguno está
   roto, **no se entra**: sale un aviso en rojo con un botón para restaurar la última copia de
   cada uno. El fichero roto se aparta como `<nombre>-roto-AAMMDD-HHMM.json` y no se borra nunca.
 - En Ajustes, el bloque **Copias de seguridad** enseña cuántas copias hay de cada fichero y deja

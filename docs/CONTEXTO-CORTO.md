@@ -68,19 +68,18 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Panel lateral de lectura, y tablón de notas rápidas siempre visible.
 - Correo y mensaje de Séneca preparados; la app no envía nada.
 - Bandeja de correos de Gmail (etiqueta `GESTOR`): a un asunto nuevo, al que adivina, o al que
-  eliges a mano con "Elegir asunto". El hilo queda enganchado al asunto (`hilos` en `asuntos.json`,
-  con la matrícula del mensaje —el Message-ID— para reconocerlo también desde el otro buzón) y sus
-  respuestas vuelven solas a la bandeja. Lo que ya metió el compañero sale como línea gris.
-- "Por clasificar": cada documento suelto se abre, se borra, crea un asunto nuevo, o entra en un
-  asunto que ya existe con "Meter en un asunto" (mismo cuadro que la bandeja de correos,
-  `js/elegir-asunto.js`). El que se está viendo queda marcado en la lista, con sus mismas
-  acciones también dentro del panel del visor.
+  eliges a mano. El hilo queda enganchado (`hilos`, con la matrícula del mensaje para reconocerlo
+  también desde el otro buzón) y sus respuestas vuelven solas; lo del compañero sale en gris.
+- "Por clasificar": cada documento suelto se abre, se borra, crea un asunto nuevo, o entra en uno
+  que ya existe con "Meter en un asunto" (mismo cuadro que la bandeja de correos). El que se está
+  viendo queda marcado en la lista, con sus mismas acciones también dentro del visor.
 - DNI del alumnado a la vista, con aviso si falta y ya tocaría tenerlo.
 - Registrar un documento: si el PDF sellado ya está en la carpeta (bajado de Séneca), la ficha lo
   detecta sola y lo renombra al decir de qué documento es, sin tercer fichero y con el viejo a la
-  papelera (`js/registro-sellado.js`); el botón de siempre sigue, ya con el explorador abierto en
-  la carpeta del asunto, y sigue leyendo el sello y el código de verificación del documento.
-- Terceros relacionados con un asunto, con nota (no copia) al archivar.
+  papelera; el botón de siempre sigue, ya con el explorador abierto en la carpeta del asunto.
+- Terceros relacionados con un asunto, con nota (no copia) al archivar; "+ Añadir varios" señala
+  de golpe (atajos de alumnado por unidad/nivel/enseñanza, grupos propios en `_GESTOR/grupos.json`
+  desde Ajustes), y esos mismos grupos ponen los destinatarios de un correo, en copia oculta.
 - Parada al crear un asunto duplicado, y pantalla propia "Duplicados" para los ya existentes.
 - Ajustes ágiles: pestañas por categoría, buscador cruzado, aviso en vivo de nombres repetidos.
 - Campos propios por tipo de asunto, rellenos solos al crear.
@@ -140,8 +139,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Coordinar con él la lista de tipos de asunto y la de estados.
 - Poner en marcha el script de Gmail en `g.educaand.es` y señalar `GESTOR-BANDEJA` en Ajustes.
 - Ver si la bandeja de correo acierta con el tipo; si falla mucho, palabras clave por tipo.
-- Pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs` (16-sep-2026):
-  sin eso no se siguen los hilos ya enganchados, ni salen los borradores con documentos.
+- Pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs` (17-sep-2026):
+  sin eso no se siguen los hilos por matrícula, ni salen los borradores con documentos o con
+  copia oculta de un grupo.
 - Comprobar con Séneca si Comunicaciones acepta el largo del asunto que le damos.
 - Cuando tengan una cuenta de correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel lateral y del tablón, y si las tarjetas por tipo se quedan

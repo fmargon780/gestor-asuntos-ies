@@ -11,7 +11,10 @@ arreglos pequeños (`docs/ARREGLOS-USO-2026-09-14.md`) y el resto quedó apuntad
    (17-sep-2026), reducido a leer el código y abrir la verificación: la descarga automática de la
    copia auténtica se descartó a propósito (cada administración pide su propio formulario).**
 2. Generador de plantillas de documentos.
-3. En terceros relacionados, poder elegir grupos enteros según categorías.
+3. En terceros relacionados, poder elegir grupos enteros según categorías. **Hecho en la fila 21
+   de `docs/COLA.md` (17-sep-2026): señalar varios de golpe, atajos de alumnado por unidad/nivel/
+   enseñanza, grupos propios guardados con nombre (también sirven para el correo, en copia
+   oculta). Quedan fuera, a falta de datos: departamentos, tutorías y equipos educativos.**
 4. Revisar las opciones de separar y unir documentos desde el asunto.
 5. Poder añadir un correo nuevo a un asunto ya creado.
 6. Generador de plantillas de correos.

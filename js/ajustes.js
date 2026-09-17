@@ -407,6 +407,7 @@ App.pintarAjustes = async function () {
   App.pintarTiposAjustes();
   App.pintarTablaEstados();
   App.pintarCamposPropios();
+  App.pintarGruposPersonas();
 
   var estado = $('estado-datos');
   estado.innerHTML = '';
@@ -1143,6 +1144,125 @@ $('btn-anadir-tipo-doc').onclick = async function () {
   App.pintarAjustes();
   U.aviso('Tipo de documento añadido.', 'bueno');
 };
+
+/* ---------- Grupos de personas (17-sep-2026, fila 21,
+   docs/GRUPOS-DE-PERSONAS.md) ---------- */
+
+App.pintarGruposPersonas = function () {
+  var caja = $('tabla-grupos-personas');
+  if (!caja) return;
+  var grupos = ((window.Grupos && Grupos.lista()) || []).slice()
+    .sort(function (a, b) { return a.nombre < b.nombre ? -1 : (a.nombre > b.nombre ? 1 : 0); });
+  caja.innerHTML = '';
+  if (!grupos.length) {
+    caja.innerHTML = '<div class="vacio">Todavía no hay ningún grupo.</div>';
+    return;
+  }
+  grupos.forEach(function (g) {
+    var f = document.createElement('div');
+    f.className = 'tarjeta-tipo';
+    var linea = document.createElement('div');
+    linea.className = 'tarjeta-tipo-linea';
+    linea.innerHTML = '<span class="tarjeta-tipo-nombre">' + U.escapar(g.nombre) + '</span>' +
+      '<span class="suave"> · ' + g.miembros.length +
+      (g.miembros.length === 1 ? ' persona' : ' personas') + '</span>';
+    f.appendChild(linea);
+    f.appendChild(App.botonMenuTarjeta([
+      { texto: 'Ver y cambiar los miembros', onclick: function () { App.editarMiembrosDeGrupo(g); } },
+      { texto: 'Cambiar el nombre', onclick: function () { App.renombrarGrupo(g); } },
+      { texto: 'Borrar', peligro: true, onclick: function () { App.borrarGrupo(g); } }
+    ]));
+    caja.appendChild(f);
+  });
+};
+
+App.crearGrupo = async function () {
+  var ok = await U.preguntar('Crear un grupo',
+    '<label class="etiqueta">Nombre del grupo</label>' +
+    '<input id="grupo-nuevo-nombre" class="campo" placeholder="Equipo directivo">', 'Crear');
+  if (!ok) return;
+  var nombre = U.limpiarNombre($('grupo-nuevo-nombre').value);
+  if (!nombre) return;
+  var repetido = Grupos.lista().some(function (g) { return U.normalizar(g.nombre) === U.normalizar(nombre); });
+  if (repetido) { U.aviso('Ya hay un grupo con ese nombre.', 'malo'); return; }
+  var g = await Grupos.crear(nombre, []);
+  App.pintarGruposPersonas();
+  U.aviso('Grupo creado. Ahora añade sus miembros.', 'bueno');
+  await App.editarMiembrosDeGrupo(g);
+};
+
+App.renombrarGrupo = async function (g) {
+  var ok = await U.preguntar('Cambiar el nombre del grupo',
+    '<label class="etiqueta">Nombre nuevo</label>' +
+    '<input id="grupo-nuevo-nombre" class="campo" value="' + U.escapar(g.nombre) + '">', 'Cambiar');
+  if (!ok) return;
+  var nombreNuevo = U.limpiarNombre($('grupo-nuevo-nombre').value);
+  if (!nombreNuevo || nombreNuevo === g.nombre) return;
+  var repetido = Grupos.lista().some(function (x) {
+    return x !== g && U.normalizar(x.nombre) === U.normalizar(nombreNuevo);
+  });
+  if (repetido) { U.aviso('Ya hay otro grupo con ese nombre.', 'malo'); return; }
+  await Grupos.renombrar(g.id, nombreNuevo);
+  App.pintarGruposPersonas();
+  U.aviso('Nombre cambiado.', 'bueno');
+};
+
+App.borrarGrupo = async function (g) {
+  var ok = await window.Papelera.preguntarBorrar(g.nombre,
+    '<p class="nota">Los asuntos ya relacionados a través de este grupo no cambian: el grupo ' +
+    'solo sirve para elegir de golpe.</p>');
+  if (!ok) return;
+  try {
+    await Grupos.borrar(g.id);
+    App.pintarGruposPersonas();
+    U.aviso('Grupo mandado a la papelera.', 'bueno');
+  } catch (e) {
+    U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+  }
+};
+
+/* Los miembros se ven y se cambian con el mismo buscador de "señalar
+   varios" que usa Relacionados (App.pintarBuscadorDeTercero, en modo
+   `multiple`), ya con los de hoy señalados (`marcadosIniciales`). Al
+   pulsar "Añadir los N señalados" se guarda esa lista entera como los
+   miembros nuevos del grupo: no se suma a la de antes, porque desde
+   aquí también hay que poder QUITAR a alguien, y la barra de señalados
+   ya deja hacerlo con su × antes de guardar. Un miembro que ya no
+   aparezca en las listas actuales se queda igual en la barra (nunca se
+   pierde solo): solo desaparece si se quita a mano con la ×. */
+App.editarMiembrosDeGrupo = function (g) {
+  return new Promise(function (resolver) {
+    var capa = $('capa');
+    $('cuadro-titulo').textContent = 'Miembros de ' + g.nombre;
+    var cuerpo = $('cuadro-cuerpo');
+    cuerpo.innerHTML = '<div id="grupo-picker"></div>';
+    $('cuadro-aceptar').classList.add('oculto');
+    capa.classList.remove('oculto');
+
+    function cerrar() {
+      capa.classList.add('oculto');
+      $('cuadro-aceptar').classList.remove('oculto');
+      $('cuadro-cancelar').onclick = null;
+    }
+    $('cuadro-cancelar').onclick = function () { cerrar(); resolver(false); };
+
+    App.pintarBuscadorDeTercero($('grupo-picker'), null, async function (marcados) {
+      cerrar();
+      try {
+        await Grupos.ponerMiembros(g.id,
+          marcados.map(function (m) { return { categoria: m.categoria, nombre: m.nombre }; }));
+        App.pintarGruposPersonas();
+        U.aviso('Miembros guardados.', 'bueno');
+        resolver(true);
+      } catch (e) {
+        U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+        resolver(false);
+      }
+    }, { multiple: true, marcadosIniciales: g.miembros });
+  });
+};
+
+$('btn-anadir-grupo').onclick = function () { App.crearGrupo(); };
 
 $('btn-olvidar').onclick = async function () {
   var ok = await U.preguntar('Volver a elegir las carpetas',

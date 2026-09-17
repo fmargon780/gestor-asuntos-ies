@@ -119,6 +119,18 @@ var CorreoAdjuntos = (function () {
     return lista.join(', ');
   }
 
+  /* Igual que paraActual, para la copia oculta que dejan los grupos
+     (17-sep-2026, fila 21): se lee del propio DOM, de los mismos chips
+     que pinta js/correo.js, por la misma razón de no exponer nada solo
+     para esto. */
+  function ccoActual() {
+    var lista = [];
+    Array.prototype.forEach.call(document.querySelectorAll('.cco-quitar'), function (b) {
+      lista.push(b.dataset.dir);
+    });
+    return lista.join(', ');
+  }
+
   /* `_GESTOR/envios.json`: la lista de encargos vivos, para que se vea
      el "Borrador en camino" aunque se cierre el cuadro. Se relee antes
      de escribir: es un fichero compartido con el compañero. */
@@ -172,6 +184,7 @@ var CorreoAdjuntos = (function () {
         id: id,
         creado: new Date().toISOString().slice(0, 19),
         para: para,
+        cco: ccoActual(),
         asunto: $('correo-asunto') ? $('correo-asunto').value : '',
         cuerpo: $('correo-cuerpo-texto') ? $('correo-cuerpo-texto').value : '',
         adjuntos: adjuntosEnBandeja,
