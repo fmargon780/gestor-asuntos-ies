@@ -296,6 +296,19 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
   `Hitos.visibles`/`Hitos.huerfanos` (`js/hitos.js`) son quienes saben qué se ve y qué se pliega.
 - **Un solo hito en curso a la vez**: al marcar uno hecho, el siguiente pendiente de la lista
   visible pasa a "en curso" solo (`Hitos.recomputeEnCurso`).
+- **Documentos apuntados** (fila 31, 17-sep-2026, `docs/APUNTAR-DOCUMENTO-A-HITO.md`): el botón
+  "Apuntar un documento" abre `HitosDocumentos.abrir(a, h)` (`js/hitos-documentos.js`, nuevo), un
+  cuadro con casillas sobre `Carpetas.ficheros(a.handle)`; al aceptar llama a
+  `Hitos.anadirDocumento`/`quitarDocumento` y pide el repintado. Apuntar es solo señalar: nunca se
+  copia ni se mueve nada, y un documento puede estar apuntado en varios hitos. Cada nombre pasa a
+  ser pulsable (abre en el panel de la derecha, `window.Visor.abrir`), pidiendo su handle en el
+  momento de pulsar, no antes. Saber qué apuntado ya no está en la carpeta se lee **una sola vez
+  por repintado**, en `js/hitos-panel.js` antes de tocar el DOM (nunca corrigiéndolo después, a
+  mano: el `MutationObserver` de aquí abajo lo detectaría como un cambio más). Y nunca con el
+  atributo `disabled`: `js/ficha-asunto.js` reactiva solo, sin distinguir por qué, todo lo que
+  encuentre apagado dentro de `#ficha-asunto-cuerpo` en cuanto no hay nadie en modo consulta
+  (`aplicarModoConsulta`) — basta la clase `hito-doc-falta` (sin enganchar ningún `onclick`, y ya
+  en gris por CSS).
 - **Responsable**: persona del centro (configurable en Ajustes › Hitos) o un papel fijo
   (`tercero`, `tutor`, `relacionado`) que la aplicación resuelve sola con datos del asunto
   (`Hitos.resolverResponsable`); sin resolver, se enseña en gris.
@@ -320,8 +333,9 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
 - Vive en `js/hitos.js` y `js/hitos-archivo.js` (el modelo; se parte en dos para no pasar de las
   400 líneas), `js/hitos-panel.js` y `js/hitos-panel-lista.js` (la ficha del asunto: el
   observador, el repintado y la creación automática en uno, cómo se pinta cada hito en el otro,
-  hablándose por `window.HitosPanel`) y `js/hitos-ajustes.js` (el bloque "Hitos" de Ajustes:
-  responsables y días no lectivos).
+  hablándose por `window.HitosPanel`), `js/hitos-documentos.js` (el cuadro de apuntar un
+  documento) y `js/hitos-ajustes.js` (el bloque "Hitos" de Ajustes: responsables y días no
+  lectivos).
 
 Se comprueba con `pruebas/hitos.mjs`.
 

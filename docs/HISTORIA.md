@@ -5,6 +5,38 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — Apuntar un documento a un hito
+
+Fila 31 de la cola (`docs/COLA.md`, `docs/APUNTAR-DOCUMENTO-A-HITO.md`), la mitad que le faltaba
+a la fila 15: el modelo ya guardaba los documentos apuntados y la lista ya se pintaba con su ✕,
+pero no había ninguna forma de apuntar uno. Botón nuevo "Apuntar un documento" en el cuerpo
+desplegado de cada hito abierto, que abre `js/hitos-documentos.js` (nuevo, `window.HitosDocumentos`):
+un cuadro con casillas sobre los documentos de la carpeta del asunto; al aceptar, llama a
+`Hitos.anadirDocumento`/`quitarDocumento` (ya existían) y pide el repintado. El bloque de
+documentos pasa a pintarse siempre que el asunto está abierto, aunque no haya ninguno apuntado
+(antes solo salía si ya había uno, y por eso Francisco no encontraba por dónde empezar). Cada
+nombre es pulsable y abre el documento en el panel de la derecha.
+
+Dos trampas de verdad, encontradas probándolo en un navegador de verdad (no solo leyendo el
+código):
+
+- **Saber si un apuntado ya no está en la carpeta no se puede corregir después de pintar, a
+  mano.** La primera versión leía `Carpetas.ficheros` en un `.then()` tras el repintado y tocaba
+  el botón directamente; el `MutationObserver` de `js/hitos-panel.js` (vigila `#ficha-guia`)
+  detectaba esa propia corrección como un cambio más y volvía a repintar, sin parar. Arreglado
+  leyendo la carpeta **una vez por repintado**, en `js/hitos-panel.js`, antes de tocar el DOM, y
+  pintando ya bien "(ya no está)" en el HTML de la primera pasada.
+- **Nunca marcar ese botón con el atributo `disabled`.** `js/ficha-asunto.js`
+  (`aplicarModoConsulta`) reactiva solo, sin preguntar por qué estaba apagado, todo lo que
+  encuentre dentro de `#ficha-asunto-cuerpo` en cuanto no hay nadie en modo consulta: un botón
+  "ya no está" con `disabled` se quedaba reactivado unos 30 ms después de cada repintado, siempre.
+  Se resuelve sin ese atributo: solo la clase `hito-doc-falta` (en gris por CSS, sin engancharle
+  ningún `onclick`).
+
+Prueba nueva en `pruebas/hitos.mjs` (escenario 6, en navegador de verdad): apuntar, reabrir el
+cuadro (sale marcado), desmarcar (desaparece), y un apuntado que ya no está en la carpeta sale en
+gris con "(ya no está)", también dentro del propio cuadro de apuntar. Batería completa en verde.
+
 ## 17-sep-2026 — Quedarse en el asunto tras guardar un documento
 
 Fila 30 de la cola (`docs/COLA.md`, `docs/QUEDARSE-EN-EL-ASUNTO.md`): "Tras guardar un documento

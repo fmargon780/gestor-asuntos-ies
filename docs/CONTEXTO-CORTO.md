@@ -94,7 +94,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Escape y botón de salida en toda pantalla; copiar el nombre de un relacionado en orden normal;
   carpetas temporales de Drive/Dropbox fuera de Asuntos abiertos.
 - Hitos: los pasos de la guía SON los hitos de un asunto abierto (se crean solos al abrirlo, ya no
-  hay guía con casillas aparte), con estado, fecha límite, responsable, bifurcaciones e historial.
+  hay guía con casillas aparte), con estado, fecha límite, responsable, bifurcaciones, documentos
+  apuntados (botón "Apuntar un documento") e historial.
 - "Qué me toca": pantalla que cruza los hitos pendientes de todos los asuntos abiertos, en tres
   bloques (en tu tejado, esperando a otros, sin fecha), con filtro por responsable.
 - No pisarse en un asunto: si el compañero ya está dentro, se entra en modo consulta (aviso y
@@ -150,8 +151,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Si el DNI no sale de nadie, marcar la columna del documento al generar el RegAlum.
 - Cuando el uso lo pida: búsqueda en notas, cuentas por tipo para la memoria de fin de curso,
   qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta del centro.
-- Los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no
-  se fusionan entre ordenadores (solo las altas); revisar si con el uso hace falta algo más fino.
+- Los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no se fusionan entre ordenadores (solo las altas).
 
 ## 9. Cuándo leer `CONTEXTO.md` entero
 

@@ -354,6 +354,67 @@ await comprobar('el que tenía la nota se queda, marcado "no aplica"',
 await comprobar('la rama nueva aparece',
   pagina.locator('#ficha-guia .hito[data-id="p3b"]').count(), 1);
 
+/* ================= ESCENARIO 6: apuntar un documento a un hito (fila 31, 17-sep-2026) ================= */
+
+console.log('--- escenario 6: apuntar un documento a un hito ---');
+await pagina.evaluate(async (clave) => {
+  const carpeta = await window.__disco.abiertos.getDirectoryHandle(clave);
+  carpeta._hijos.set('260907 SOLICITUD Marina.pdf', window.__disco.fich('260907 SOLICITUD Marina.pdf', 'la solicitud'));
+  carpeta._hijos.set('260907 DNI Marina.pdf', window.__disco.fich('260907 DNI Marina.pdf', 'el dni'));
+}, CLAVE);
+
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
+await pagina.waitForSelector('#ficha-guia .hito[data-id="p1"] .hito-doc-apuntar');
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-doc-apuntar').click();
+await pagina.waitForSelector('#capa:not(.oculto)');
+await comprobar('salen los dos documentos de la carpeta, sin marcar',
+  pagina.locator('#hitosdoc-lista .hitosdoc-marca').count(), 2);
+await pagina.locator('#hitosdoc-lista .hitosdoc-fila', { hasText: 'SOLICITUD' }).locator('.hitosdoc-marca').check();
+await pagina.click('#cuadro-aceptar');
+await pagina.waitForTimeout(400);
+
+await comprobar('el documento aparece en el hito', pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-documento')
+  .textContent().then(t => t.indexOf('SOLICITUD') !== -1), true);
+await comprobar('y queda guardado en hitos.json',
+  leerHitosDeDisco().then(e => e.hitos.find(h => h.id === 'p1').documentos), ['260907 SOLICITUD Marina.pdf']);
+
+console.log('--- se vuelve a abrir el cuadro: sale marcado; se desmarca y desaparece ---');
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-doc-apuntar').click();
+await pagina.waitForSelector('#capa:not(.oculto)');
+await comprobar('sale marcado el que ya se apuntó',
+  pagina.locator('#hitosdoc-lista .hitosdoc-fila', { hasText: 'SOLICITUD' }).locator('.hitosdoc-marca').isChecked(), true);
+await pagina.locator('#hitosdoc-lista .hitosdoc-fila', { hasText: 'SOLICITUD' }).locator('.hitosdoc-marca').uncheck();
+await pagina.click('#cuadro-aceptar');
+await pagina.waitForTimeout(400);
+await comprobar('al desmarcarlo, desaparece del hito',
+  pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-documento').count(), 0);
+await comprobar('y ya no está en hitos.json',
+  leerHitosDeDisco().then(e => e.hitos.find(h => h.id === 'p1').documentos), []);
+
+console.log('--- un apuntado que ya no está en la carpeta sale en gris ---');
+await pagina.evaluate(async (clave) => {
+  await window.Hitos.anadirDocumento(clave, 'p1', '260907 DNI Marina.pdf');
+  const carpeta = await window.__disco.abiertos.getDirectoryHandle(clave);
+  carpeta._hijos.delete('260907 DNI Marina.pdf');
+  window.HitosPanel.programarRepintado();
+}, CLAVE);
+await pagina.waitForTimeout(400);
+await comprobar('el nombre sale con "(ya no está)", marcado en gris (nunca con `disabled`: eso lo ' +
+  'reactivaría solo aplicarModoConsulta, ajeno a esto)', pagina.evaluate(() => {
+  const b = document.querySelector('#ficha-guia .hito[data-id="p1"] .hito-doc-abrir');
+  return { texto: b.textContent, enGris: b.classList.contains('hito-doc-falta'), disabled: b.disabled };
+}), { texto: '260907 DNI Marina.pdf (ya no está)', enGris: true, disabled: false });
+
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-doc-apuntar').click();
+await pagina.waitForSelector('#capa:not(.oculto)');
+await comprobar('en el cuadro de apuntar también sale, marcado y con el mismo aviso',
+  pagina.locator('#hitosdoc-lista .hitosdoc-fila-falta').textContent().then(t => t.indexOf('ya no está') !== -1), true);
+await comprobar('marcado, para poder limpiarlo sin perderlo antes de decidir',
+  pagina.locator('#hitosdoc-lista .hitosdoc-fila-falta .hitosdoc-marca').isChecked(), true);
+await pagina.click('#cuadro-cancelar');
+
 /* ================= ESCENARIO 9: al archivar ================= */
 
 console.log('--- escenario 9: al archivar, historial de tramitación ---');

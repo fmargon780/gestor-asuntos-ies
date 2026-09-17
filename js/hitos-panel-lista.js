@@ -20,7 +20,7 @@ var HitosPanelLista = (function () {
     };
   }
 
-  function bloqueDeHitos(a, hitos, ajustes, abierto) {
+  function bloqueDeHitos(a, hitos, ajustes, abierto, nombresDeLaCarpeta) {
     var raiz = document.createElement('div');
 
     var c = Hitos.cuenta(hitos);
@@ -34,7 +34,7 @@ var HitosPanelLista = (function () {
     lista.className = 'lista-hitos';
     var visibles = Hitos.visibles(hitos);
     visibles.forEach(function (h) {
-      lista.appendChild(filaDeHito(a, hitos, h, ajustes, abierto));
+      lista.appendChild(filaDeHito(a, hitos, h, ajustes, abierto, nombresDeLaCarpeta));
     });
     raiz.appendChild(lista);
 
@@ -47,7 +47,7 @@ var HitosPanelLista = (function () {
         ' (no aplica, pero tenían notas o documentos)</summary>';
       var dentro = document.createElement('div');
       dentro.className = 'lista-hitos';
-      huerfanos.forEach(function (h) { dentro.appendChild(filaDeHito(a, hitos, h, ajustes, false)); });
+      huerfanos.forEach(function (h) { dentro.appendChild(filaDeHito(a, hitos, h, ajustes, false, nombresDeLaCarpeta)); });
       det.appendChild(dentro);
       raiz.appendChild(det);
     }
@@ -75,7 +75,7 @@ var HitosPanelLista = (function () {
     return trozos.join('');
   }
 
-  function filaDeHito(a, raiz, h, ajustes, abierto) {
+  function filaDeHito(a, raiz, h, ajustes, abierto, nombresDeLaCarpeta) {
     var contexto = contextoResponsable(a);
     var div = document.createElement('div');
     div.className = 'hito hito-' + h.estado + (h.clase === 'decision' ? ' hito-decision' : '');
@@ -123,7 +123,7 @@ var HitosPanelLista = (function () {
         '<span class="hito-meta">' + metaDeHito(h, ajustes, contexto) + '</span>' +
         '<button type="button" class="hito-desplegar" title="Ver más">▾</button>' +
       '</div>' +
-      '<div class="hito-cuerpo oculto">' + cuerpoDeHito(a, h, ajustes, contexto, abierto) + '</div>';
+      '<div class="hito-cuerpo oculto">' + cuerpoDeHito(a, h, ajustes, contexto, abierto, nombresDeLaCarpeta) + '</div>';
 
     var casillaEl = div.querySelector('.hito-casilla');
     if (casillaEl) {
@@ -145,7 +145,7 @@ var HitosPanelLista = (function () {
     return div;
   }
 
-  function cuerpoDeHito(a, h, ajustes, contexto, abierto) {
+  function cuerpoDeHito(a, h, ajustes, contexto, abierto, nombresDeLaCarpeta) {
     var trozos = [];
     if (h.cuerpo) trozos.push('<div class="hito-explicacion">' + h.cuerpo + '</div>');
 
@@ -172,12 +172,32 @@ var HitosPanelLista = (function () {
         '<button type="button" class="boton hito-nota-anadir">Añadir nota</button></div>');
     }
 
-    if ((h.documentos || []).length) {
-      trozos.push('<div class="hito-documentos">' + h.documentos.map(function (d) {
-        return '<span class="hito-documento">' + U.escapar(d) +
+    /* El bloque se pinta siempre que el asunto esté abierto, aunque no
+       haya ningún documento apuntado: si solo sale cuando ya hay uno,
+       nadie encuentra por dónde empezar a apuntar el primero
+       (17-sep-2026, fila 31). En el ARCHIVO, como hasta ahora, solo
+       sale si hay algo que enseñar. */
+    if (abierto || (h.documentos || []).length) {
+      trozos.push('<div class="hito-documentos">' + (h.documentos || []).map(function (d) {
+        /* Sin la carpeta de verdad (nombresDeLaCarpeta a null, por un
+           fallo de lectura), se enseña como si estuviera: mejor no
+           avisar de "ya no está" que avisar de algo que no es cierto. */
+        /* Nunca con el atributo `disabled`: js/ficha-asunto.js reactiva
+           solo, sin distinguir por qué, todo lo que encuentre apagado
+           dentro de #ficha-asunto-cuerpo en cuanto no hay nadie en
+           modo consulta (aplicarModoConsulta). Basta la clase: no se
+           engancha ningún onclick, y el CSS ya lo enseña en gris. */
+        var falta = nombresDeLaCarpeta && nombresDeLaCarpeta.indexOf(d) === -1;
+        return '<span class="hito-documento" data-doc="' + U.escapar(d) + '">' +
+          '<button type="button" class="hito-doc-abrir' + (falta ? ' hito-doc-falta' : '') + '"' +
+            ' data-doc="' + U.escapar(d) + '">' +
+            U.escapar(d) + (falta ? ' (ya no está)' : '') + '</button>' +
           (abierto ? ' <button type="button" class="hito-doc-quitar" data-doc="' + U.escapar(d) + '">✕</button>' : '') +
           '</span>';
       }).join('') + '</div>');
+      if (abierto) {
+        trozos.push('<button type="button" class="boton hito-doc-apuntar">Apuntar un documento</button>');
+      }
     }
 
     if (abierto) {
@@ -189,7 +209,44 @@ var HitosPanelLista = (function () {
     return trozos.join('');
   }
 
+  /* Ya se sabe, desde que se pintó el cuerpo, qué documentos siguen en
+     la carpeta (nombresDeLaCarpeta, leído una vez en js/hitos-panel.js
+     antes de repintar): aquí solo se cuelgan los onclick. Abrir uno
+     pide su handle en el momento de pulsarlo, no antes: así no hace
+     falta guardar nada más que el nombre, y no se toca el DOM después
+     de pintar (evita el problema de siempre con el observador de aquí
+     abajo, que vigila #ficha-asunto-cuerpo entero). */
+  function engancharDocumentos(div, a, h, abierto) {
+    var caja = div.querySelector('.hito-documentos');
+    if (caja) {
+      Array.prototype.forEach.call(caja.querySelectorAll('.hito-doc-abrir'), function (b) {
+        if (b.classList.contains('hito-doc-falta')) return;
+        b.onclick = async function () {
+          try {
+            var handle = await a.handle.getFileHandle(b.dataset.doc);
+            if (window.Visor) window.Visor.abrir(handle, b.dataset.doc);
+          } catch (e) { /* puede que ya no esté: el próximo repintado lo dirá */ }
+        };
+      });
+
+      if (abierto) {
+        Array.prototype.forEach.call(caja.querySelectorAll('.hito-doc-quitar'), function (b) {
+          b.onclick = async function () {
+            await U.mientrasGuarda(b, function () { return Hitos.quitarDocumento(a.nombre, h.id, b.dataset.doc); });
+            window.HitosPanel.programarRepintado();
+          };
+        });
+      }
+    }
+
+    var apuntarBtn = div.querySelector('.hito-doc-apuntar');
+    if (apuntarBtn) apuntarBtn.onclick = async function () {
+      await U.mientrasGuarda(apuntarBtn, function () { return HitosDocumentos.abrir(a, h); });
+    };
+  }
+
   function engancharCuerpo(div, a, h, abierto) {
+    engancharDocumentos(div, a, h, abierto);
     if (!abierto) return;
     var resp = div.querySelector('.hito-campo-responsable');
     if (resp) resp.onchange = async function () {
@@ -209,12 +266,6 @@ var HitosPanelLista = (function () {
       await U.mientrasGuarda(notaBtn, function () { return Hitos.anadirNota(a.nombre, h.id, texto); });
       window.HitosPanel.programarRepintado();
     };
-    Array.prototype.forEach.call(div.querySelectorAll('.hito-doc-quitar'), function (b) {
-      b.onclick = async function () {
-        await U.mientrasGuarda(b, function () { return Hitos.quitarDocumento(a.nombre, h.id, b.dataset.doc); });
-        window.HitosPanel.programarRepintado();
-      };
-    });
     var quitar = div.querySelector('.hito-quitar');
     if (quitar) quitar.onclick = async function () {
       var ok = await U.preguntar('Quitar este hito', '<p><strong>' + U.escapar(h.titulo) + '</strong></p>', 'Quitar');
