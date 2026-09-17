@@ -276,12 +276,121 @@ var U = (function () {
     );
   }
 
+  /* ---------- un repintado no puede tirar lo que se está escribiendo ----------
+
+     (17-sep-2026, filas 33 y 34 de la cola.) Media aplicación repinta
+     bloques enteros con innerHTML, y algunos de esos bloques se
+     repintan solos cada pocos segundos, sin que nadie los toque. Si
+     Francisco está a media nota cuando eso pasa, lo escrito
+     desaparece, y con él el foco y el cursor.
+
+     Se envuelve el repintado con esta ayuda: antes apunta lo que hay
+     escrito en cada campo de escribir de `raiz`, y después se lo
+     devuelve a los que hayan vuelto a salir Y ESTÉN VACÍOS (nunca se
+     pisa un valor que el propio repintado haya traído con contenido),
+     más el foco y la posición del cursor al que lo tenía.
+
+     La identidad de un campo es su `id`; si no tiene, su
+     `data-clave`. Y si tampoco, quien llama puede pasar un
+     `clavePara(campo)` propio que la saque de donde sepa: los hitos,
+     por ejemplo, la sacan del `data-id` de su fila
+     (`hito-nota-<id del hito>`), porque dentro de una misma ficha hay
+     un cuerpo de hito por hito y ninguno de sus campos puede llevar
+     id. Un campo del que no salga ninguna clave no se apunta: no
+     habría forma de reconocerlo después del repintado.
+
+     `hacer` puede devolver una promesa o no devolver nada; el
+     resultado se pasa tal cual, y si se cae, lo escrito se devuelve
+     igualmente antes de propagar el error. */
+
+  var TIPOS_DE_ESCRIBIR = {
+    text: 1, search: 1, email: 1, tel: 1, url: 1, number: 1, password: 1,
+    date: 1, 'datetime-local': 1, month: 1, time: 1, week: 1
+  };
+
+  function claveDelCampo(el, clavePara) {
+    if (el.id) return el.id;
+    var puesta = el.getAttribute('data-clave');
+    if (puesta) return puesta;
+    if (!clavePara) return '';
+    try { return clavePara(el) || ''; } catch (e) { return ''; }
+  }
+
+  function camposDeEscribir(raiz, clavePara) {
+    var buenos = [];
+    var todos;
+    try { todos = raiz.querySelectorAll('textarea, input'); } catch (e) { return buenos; }
+    Array.prototype.forEach.call(todos, function (el) {
+      if (el.tagName === 'INPUT' && !TIPOS_DE_ESCRIBIR[(el.type || 'text').toLowerCase()]) return;
+      if (!claveDelCampo(el, clavePara)) return;
+      buenos.push(el);
+    });
+    return buenos;
+  }
+
+  function conservandoLoEscrito(raiz, hacer, clavePara) {
+    if (!raiz) return hacer();
+
+    var apuntes = [];
+    var conFoco = document.activeElement;
+    camposDeEscribir(raiz, clavePara).forEach(function (el) {
+      var apunte = { clave: claveDelCampo(el, clavePara), valor: el.value, tenia: el === conFoco,
+                     inicio: null, fin: null };
+      if (apunte.tenia) {
+        /* selectionStart no existe en todos los tipos de campo (los de
+           fecha, por ejemplo, lo dan por error): sin cursor apuntado,
+           se devuelve solo el foco. */
+        try { apunte.inicio = el.selectionStart; apunte.fin = el.selectionEnd; } catch (e) { /* sin cursor */ }
+      }
+      apuntes.push(apunte);
+    });
+
+    function devolver() {
+      if (!apuntes.length) return;
+      var porClave = {};
+      camposDeEscribir(raiz, clavePara).forEach(function (el) {
+        var clave = claveDelCampo(el, clavePara);
+        if (!porClave[clave]) porClave[clave] = el;
+      });
+      var devolverElFocoA = null, apunteDelFoco = null;
+      apuntes.forEach(function (apunte) {
+        var el = porClave[apunte.clave];
+        if (!el) return;            /* ese campo ya no existe: no pasa nada */
+        if (apunte.valor && !el.value) {
+          try { el.value = apunte.valor; } catch (e) { /* no se ha podido: se deja como esté */ }
+        }
+        if (apunte.tenia) { devolverElFocoA = el; apunteDelFoco = apunte; }
+      });
+      if (!devolverElFocoA) return;
+      try {
+        devolverElFocoA.focus({ preventScroll: true });
+        if (apunteDelFoco.inicio !== null && devolverElFocoA.setSelectionRange) {
+          devolverElFocoA.setSelectionRange(apunteDelFoco.inicio, apunteDelFoco.fin);
+        }
+      } catch (e) { /* el campo ya no admite foco: se deja como esté */ }
+    }
+
+    var salida;
+    try { salida = hacer(); }
+    catch (e) { devolver(); throw e; }
+
+    if (salida && typeof salida.then === 'function') {
+      return salida.then(
+        function (v) { devolver(); return v; },
+        function (e) { devolver(); throw e; }
+      );
+    }
+    devolver();
+    return salida;
+  }
+
   return {
     normalizar: normalizar, limpiarNombre: limpiarNombre, hoyIso: hoyIso,
     aAaMmDd: aAaMmDd, fechaLegible: fechaLegible, cursoActual: cursoActual,
     cursoDeFecha: cursoDeFecha, cursoDeAno: cursoDeAno, edadDesde: edadDesde,
     aFecha: aFecha, yaPaso: yaPaso,
     ahora: ahora, aviso: aviso, preguntar: preguntar, escapar: escapar,
-    parecidos: parecidos, dejaCrear: dejaCrear, mientrasGuarda: mientrasGuarda
+    parecidos: parecidos, dejaCrear: dejaCrear, mientrasGuarda: mientrasGuarda,
+    conservandoLoEscrito: conservandoLoEscrito
   };
 })();
