@@ -2157,12 +2157,19 @@ una línea cada una. El texto largo que tenían antes era:
   `docs/`, `pruebas/`, `.github/` o ficheros `.md`, comparando contra `VERCEL_GIT_PREVIOUS_SHA`
   (el commit de la última publicación buena; `HEAD^` sirve de respaldo solo la primera vez, antes
   de que esa variable exista) para que un push con el código en un commit y los documentos en
-  otro no se salte la publicación del código. Ante cualquier duda, publica. Entra también la
-  regla 13 de `docs/COLA.md`: como mucho dos subidas por fila. Prueba nueva
-  `pruebas/vercel-ignore-command.mjs`, sin navegador (lee `vercel.json` y comprueba que
-  `ignoreCommand` existe, menciona `main` y `VERCEL_GIT_PREVIOUS_SHA`, y que el bloque `headers`
-  de siempre sigue igual); comprobado también a mano contra el propio historial de git de este
-  repositorio: un commit que solo toca `docs/` se salta, uno que toca `js/`/`css/` publica.
+  otro no se salte la publicación del código. Ante cualquier duda, publica. **Trampa encontrada
+  al publicar de verdad, no estaba en el encargo**: Vercel exige `ignoreCommand` en 256
+  caracteres o menos, y la receta tal cual pasaba de 296; el primer intento de esta fila lo
+  publicó igual (el PR de la fila 36, #28, avisó del error `ignoreCommand should NOT be longer
+  than 256 characters`). Arreglado sacando la receta entera a `scripts/vercel-ignore-build.sh`
+  (nuevo, con permiso de ejecución) y dejando `ignoreCommand` como un simple `bash
+  scripts/vercel-ignore-build.sh` (35 caracteres). Entra también la regla 13 de `docs/COLA.md`:
+  como mucho dos subidas por fila. Prueba nueva `pruebas/vercel-ignore-command.mjs`, sin
+  navegador (lee `vercel.json` y `scripts/vercel-ignore-build.sh`, y comprueba que
+  `ignoreCommand` existe, no pasa de 256 caracteres y llama al script, que el script menciona
+  `main` y `VERCEL_GIT_PREVIOUS_SHA`, y que el bloque `headers` de siempre sigue igual);
+  comprobado también a mano contra el propio historial de git de este repositorio: un commit que
+  solo toca `docs/` se salta, uno que toca `js/`/`css/` publica.
   **No se ha podido comprobar en Vercel de verdad** (el punto 4 del encargo pedía ver un
   despliegue saltado y uno publicado de verdad): el cupo agotado ese mismo día, mientras se
   trabajaba esta fila, solo se recupera pasadas 24 horas — de hecho, el PR de la fila 36 (#28)

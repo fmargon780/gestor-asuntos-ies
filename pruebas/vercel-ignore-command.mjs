@@ -3,8 +3,11 @@
    cupo gratuito de Vercel son 100 publicaciones al día, y se agotó ese
    mismo día con commits que solo tocaban docs/COLA.md y compañía.
 
-   Sin navegador: solo lee el JSON y mira que dice lo que tiene que
-   decir, y que el bloque headers de siempre sigue ahí. */
+   Sin navegador: lee el JSON y el script al que llama `ignoreCommand`
+   (Vercel exige ese campo en menos de 256 caracteres, así que la
+   receta entera vive en scripts/vercel-ignore-build.sh), y comprueba
+   que dicen lo que tienen que decir, y que el bloque headers de
+   siempre sigue ahí. */
 import fs from 'node:fs';
 
 let fallos = 0;
@@ -19,9 +22,14 @@ const texto = fs.readFileSync(raiz + 'vercel.json', 'utf8');
 const json = JSON.parse(texto);
 
 comprobar('1. existe ignoreCommand', typeof json.ignoreCommand === 'string' && json.ignoreCommand.length > 0, true);
-comprobar('2. menciona la rama main', json.ignoreCommand.indexOf('main') !== -1, true);
-comprobar('3. usa VERCEL_GIT_PREVIOUS_SHA como referencia',
-  json.ignoreCommand.indexOf('VERCEL_GIT_PREVIOUS_SHA') !== -1, true);
+comprobar('1b. ignoreCommand no pasa de 256 caracteres (límite de Vercel)',
+  json.ignoreCommand.length <= 256, true);
+
+const script = fs.readFileSync(raiz + 'scripts/vercel-ignore-build.sh', 'utf8');
+comprobar('1c. ignoreCommand llama a ese script', json.ignoreCommand.indexOf('vercel-ignore-build.sh') !== -1, true);
+comprobar('2. el script menciona la rama main', script.indexOf('main') !== -1, true);
+comprobar('3. el script usa VERCEL_GIT_PREVIOUS_SHA como referencia',
+  script.indexOf('VERCEL_GIT_PREVIOUS_SHA') !== -1, true);
 comprobar('4. sigue existiendo el bloque headers de siempre',
   Array.isArray(json.headers) && json.headers.length > 0, true);
 comprobar('5. y su Cache-Control de siempre',

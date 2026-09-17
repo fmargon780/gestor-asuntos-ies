@@ -1555,8 +1555,10 @@ El `?v=` es imprescindible: sin él se puede recibir una copia guardada.
   solo toca `docs/`, `pruebas/`, `.github/` o ficheros `.md` (comparando contra
   `VERCEL_GIT_PREVIOUS_SHA`, el commit de la última publicación buena, no siempre `HEAD^`: con
   dos commits en el mismo push —código y luego documentos— comparar solo con `HEAD^` se saltaría
-  la publicación del código). Ante cualquier duda, publica. Y la regla 13 de `docs/COLA.md`: como
-  mucho dos subidas por fila. Prueba: `pruebas/vercel-ignore-command.mjs`.
+  la publicación del código). Ante cualquier duda, publica. **`ignoreCommand` no puede pasar de
+  256 caracteres** (Vercel lo rechaza si se pasa: pasó la primera vez, con 296): la receta vive
+  en `scripts/vercel-ignore-build.sh`, y `ignoreCommand` solo lo llama. Y la regla 13 de
+  `docs/COLA.md`: como mucho dos subidas por fila. Prueba: `pruebas/vercel-ignore-command.mjs`.
 
 ### Ficheros del repositorio
 
