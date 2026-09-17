@@ -242,6 +242,100 @@
     return lista.some(function (n) { return n && n.correo === id; });
   }
 
+  /* ---------- la caja de escribir directa, en la ficha del asunto ----------
+
+     (17-sep-2026, fila 37, docs/FICHA-DEL-ASUNTO-NUEVA.md.) Antes había
+     que escribir y pulsar "Añadir nota"; ahora se escribe y se guarda
+     sola, como el tablón: un segundo después de la última tecla
+     (`U.mientrasGuarda` mientras se guarda), sin perder lo que se esté
+     escribiendo si la ficha se repinta por otro motivo mientras tanto
+     (quien llama envuelve esto en `U.conservandoLoEscrito`, igual que
+     ya hacía antes con el cuadro de botón). */
+  var ESPERA_GUARDADO = 1000;
+
+  /* El temporizador pendiente vive fuera de pintarBloqueFicha, no
+     dentro: la ficha entera puede repintarse (llega un documento, por
+     ejemplo) mientras el segundo de espera todavía corre, y ese
+     repintado crea un <textarea> nuevo. Sin esto, el temporizador
+     viejo seguiría apuntando al campo de antes —ya fuera del DOM,
+     pero vivo en memoria— y acabaría guardando su texto una segunda
+     vez, por su cuenta, cuando el campo nuevo ya hubiera guardado el
+     suyo. Solo hay una ficha abierta a la vez, así que basta con una
+     variable de módulo. */
+  var pendienteGuardado = null;
+
+  function pintarBloqueFicha(caja, a, abierto, alGuardar) {
+    if (pendienteGuardado) { clearTimeout(pendienteGuardado); pendienteGuardado = null; }
+    if (!caja) return;
+    var notas = notasDe(a);
+
+    caja.innerHTML =
+      (abierto
+        ? '<div class="nota-nueva">' +
+            '<textarea id="ficha-nota-texto" class="campo" rows="2" ' +
+              'placeholder="Qué ha pasado hoy en este asunto"></textarea>' +
+            '<span class="nota-aviso" id="ficha-nota-aviso">Las notas no se borran. ' +
+              'Se guarda sola, un segundo después de dejar de escribir.</span>' +
+          '</div>'
+        : '<p class="explica">Asunto archivado: las notas se leen, pero ya no se escriben.</p>') +
+      '<div id="ficha-notas-lista" class="notas-lista">' + pintarLista(notas) + '</div>';
+
+    if (!abierto) return;
+
+    var campo = $('ficha-nota-texto');
+
+    function programar() {
+      if (pendienteGuardado) clearTimeout(pendienteGuardado);
+      pendienteGuardado = setTimeout(function () { pendienteGuardado = null; guardar(); }, ESPERA_GUARDADO);
+    }
+
+    async function guardar() {
+      var texto = (campo.value || '').trim();
+      if (!texto) return;
+      await U.mientrasGuarda(campo, async function () {
+        var lista;
+        try {
+          lista = await anadirNota(a, texto);
+        } catch (e) {
+          U.aviso('No he podido guardar la nota: ' + e.message, 'malo');
+          return;
+        }
+        /* La ficha puede haberse repintado entera mientras se guardaba
+           (otro campo con el mismo id, ya no el de aquí): no se toca
+           nada que no sea de esta caja. */
+        if ($('ficha-nota-texto') !== campo) return;
+        campo.value = '';
+        var lst = $('ficha-notas-lista');
+        if (lst) lst.innerHTML = pintarLista(lista);
+        var aviso = $('ficha-nota-aviso');
+        if (aviso) {
+          aviso.textContent = lista.length === 1 ? '1 nota guardada.' : lista.length + ' notas guardadas.';
+        }
+        if (alGuardar) alGuardar();
+      });
+    }
+
+    campo.oninput = programar;
+    campo.onkeydown = function (ev) {
+      if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) {
+        ev.preventDefault();
+        if (pendienteGuardado) { clearTimeout(pendienteGuardado); pendienteGuardado = null; }
+        guardar();
+      }
+    };
+    /* Si queda algo escrito, el segundo de espera se pone en marcha
+       igual, para que ese texto no se quede sin guardar para siempre
+       si nadie vuelve a tocar el teclado. No se comprueba aquí mismo:
+       quien llama a pintarBloqueFicha es U.conservandoLoEscrito, y
+       todavía no ha restaurado el valor de antes del repintado (lo
+       hace con una asignación directa, justo después de que esta
+       función termine, sin disparar "input"). Un setTimeout(0) deja
+       pasar ese turno y comprueba ya con el valor de verdad. */
+    setTimeout(function () {
+      if ($('ficha-nota-texto') === campo && campo.value.trim()) programar();
+    }, 0);
+  }
+
   window.Notas = {
     de: notasDe,
     frescas: notasFrescas,
@@ -249,7 +343,8 @@
     sustituir: sustituirNota,
     pintar: pintarLista,
     cuando: cuando,
-    yaTieneCorreo: yaTieneCorreo
+    yaTieneCorreo: yaTieneCorreo,
+    pintarBloqueFicha: pintarBloqueFicha
   };
 
   /* ---------- arranque ---------- */

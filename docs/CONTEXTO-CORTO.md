@@ -79,8 +79,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Terceros relacionados con un asunto, con nota (no copia) al archivar; "+ Añadir varios" señala
   de golpe (atajos de alumnado por unidad/nivel/enseñanza, grupos propios en `_GESTOR/grupos.json`
   desde Ajustes), y esos mismos grupos ponen los destinatarios de un correo, en copia oculta.
-- Parada al crear un asunto duplicado, y pantalla propia "Duplicados" para los ya existentes.
-- Ajustes ágiles: pestañas por categoría, buscador cruzado, aviso en vivo de nombres repetidos.
+- Parada al crear un asunto duplicado, y pantalla propia "Duplicados" para los ya existentes; Ajustes ágiles: pestañas por categoría, buscador cruzado, aviso en vivo de nombres repetidos.
 - Campos propios por tipo de asunto, rellenos solos al crear.
 - Papelera: nada se borra del todo a la primera.
 - Mandar documentos de un asunto por correo: se marcan en el cuadro "Correo" y el script de Apps
@@ -90,12 +89,11 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Al escribir una plantilla, el botón "Insertar hueco" abre un buscador y el hueco entra donde esté el cursor; ya no hay un muro de treinta botones tapando el formulario.
 - Plantillas de documento de Word por tipo de asunto: botón "Generar documento" en la ficha que
   saca una copia ya rellena y guardada en la carpeta del asunto, sin preguntar nada.
-- Copias de seguridad diarias, detección de fichero roto, fusión de conflictos de Dropbox.
-- Pruebas automáticas en GitHub Actions en cada subida.
+- Copias de seguridad diarias, detección de fichero roto, fusión de conflictos de Dropbox; pruebas automáticas en GitHub Actions en cada subida.
 - Escape y botón de salida en toda pantalla; copiar el nombre de un relacionado en orden normal; carpetas temporales de Drive/Dropbox fuera de Asuntos abiertos.
 - Hitos: los pasos de la guía SON los hitos de un asunto abierto (se crean solos al abrirlo, ya no
   hay guía con casillas aparte), con estado, fecha límite, responsable, bifurcaciones, documentos
-  apuntados (botón "Apuntar un documento") e historial.
+  apuntados ("Apuntar un documento") e historial.
 - "Qué me toca": pantalla que cruza los hitos pendientes de todos los asuntos abiertos, en tres
   bloques (en tu tejado, esperando a otros, sin fecha), con filtro por responsable.
 - No pisarse en un asunto: si el compañero ya está dentro, se entra en modo consulta (aviso y
@@ -103,12 +101,14 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   su repintado de fondo solo toca la pantalla si cambia algo de verdad, y nunca mientras se escribe.
 - Separar, Unir y Sacar páginas de un PDF, en la carpeta del asunto y en Por clasificar (con
   pdf-lib, `js/lib/pdf-lib.min.js`); miniaturas con pdf.js, tijeras entre páginas para Separar.
-- "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha (opcional), con el correo ya puesto al preparar el cuadro de Correo.
-- Archivar o reabrir cuando el destino ya existe (de un intento a medias) fusiona las dos carpetas, sin perder nada.
+- "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha (opcional), con el correo ya puesto al preparar el cuadro de Correo; archivar o reabrir cuando el destino ya existe (de un intento a medias) fusiona las dos carpetas, sin perder nada.
 - Guardar un documento en un asunto se queda en su ficha; solo Editar, Archivar/Reabrir y Borrar
   vuelven a la lista. La ficha solo se repinta si algo suyo ha cambiado de verdad (fila 34).
 - Filas con texto y botones que no se estrujan: ancho mínimo, envuelven a una segunda línea, y con
   más de dos botones el resto entra en el menú de tres puntos (`U.menuDeAcciones`, fila 36).
+- Ficha del asunto: izquierda Hitos y Documentos, derecha "Datos y contacto" (línea resumen del
+  tercero con "Ver todo", `js/ficha-tercero.js`), Otros asuntos, Notas (se guardan solas, sin
+  botón) y Relacionados. Fila 37.
 
 ## 6. Reglas de código que no se pueden olvidar
 

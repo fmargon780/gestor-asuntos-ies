@@ -125,6 +125,43 @@ Al pulsar el nombre de un asunto se entra en su ficha: sus datos, el contacto de
 guía de su tipo con las casillas, sus notas, sus documentos y los demás asuntos del mismo
 tercero.
 
+**La disposición** (17-sep-2026, fila 37, `docs/FICHA-DEL-ASUNTO-NUEVA.md`). Dos columnas
+(`css/ficha-asunto.css`, `.ficha-columnas`, `1.4fr / 1fr`): a la izquierda lo que se trabaja
+—Hitos y Documentos de la carpeta, que llevan botones y necesitan la columna ancha—; a la
+derecha lo que se consulta y se anota —Datos y contacto (la primera), Otros asuntos de este
+tercero, Notas, Personas y entidades relacionadas y Datos del asunto—. Con el panel de la
+derecha abierto (`body.con-visor`/`body.con-lector`) o por debajo de 1000px, una sola columna:
+como cada mitad sale entera antes de pasar a la siguiente, el orden que queda es el de arriba.
+
+**"Datos y contacto"** (`js/ficha-tercero.js`, `css/ficha-tercero.css`) sustituye a la antigua
+tarjeta plegable de "Contacto del tercero": una sola línea —nombre, grupo o etiqueta de estado
+(`NO MATRICULADO 26-27` ámbar, `SOLICITANTE` azul, `YA NO ESTÁ` ámbar para personal, con un
+renglón pequeño debajo si hace falta), edad, un solo teléfono (el del primer tutor legal si el
+alumno es menor de edad, el suyo si es mayor o si no es alumnado) y DNI/NIF, cada dato copiable
+de un clic— y un botón **"Ver todo"** que abre una ventana (`U.preguntar`, `cuadro-medio`) a dos
+columnas con Identificación, Matrícula y grupo (o Situación en el centro), Contacto, Tutores
+legales agrupados por persona (`Datos.tutoresDe`, lee el título de cada columna de Séneca:
+`Tutor1 -`, `Primer tutor`... con el número pegado o no a la palabra), Otros datos de la familia
+sin tutor reconocible, y el volcado plegado de siempre. La lógica pura
+(`Datos.tutoresDe`/`Datos.resumenDeTercero`, `js/datos.js`) no toca ninguna pantalla, se prueba
+sin navegador en `pruebas/ficha-tercero.mjs`; la búsqueda del tercero (mismo `Datos.buscar` con
+las mismas reservas que antes) y el pintado viven en `js/ficha-tercero.js`, hablándose con
+`js/ficha-asunto.js` por `window.FichaTercero.pintarLinea(caja, a)`, igual que
+`window.FichaDocumentos.pintar`. No lleva botón "Escribirle" (pedía enganchar el cuadro de
+Correo con más de tres líneas): queda para cuando haga falta de verdad.
+
+**Las notas del asunto, sin botón** (fila 37, misma instrucción). El bloque "Notas" pasó a la
+derecha y se escribe encima: `window.Notas.pintarBloqueFicha(caja, a, abierto)`
+(`js/notas.js`) guarda sola, un segundo después de la última tecla (`U.mientrasGuarda` en el
+propio `<textarea>`, sin botón "Añadir nota"). El temporizador vive en una variable de módulo,
+no dentro de la función que pinta: si la ficha se repinta de verdad a media espera (llega un
+documento, por ejemplo), el temporizador viejo se cancela y el campo nuevo —con el texto que
+`U.conservandoLoEscrito` le ha restaurado, sin disparar `input`— arranca el suyo con un
+`setTimeout(0)` desde `pintarBloqueFicha`, para que ese texto no se quede sin guardar para
+siempre si nadie vuelve a tocar el teclado. Sin esto, un segundo temporizador residual guardaría
+la nota **dos veces**. Se comprueba con `pruebas/notas-asunto-no-se-borran.mjs` (escenarios 6 y
+7): un repintado de verdad a media frase no tira lo escrito, y pasado el segundo se guarda sola.
+
 **La tarjeta de la lista se queda con lo justo**: el desplegable del estado, "Copiar nombre" y
 "Archivar". `js/ficha-asunto.js` quita de la tarjeta cualquier otro botón, con una lista blanca
 (`BOTONES_DE_LA_TARJETA`). **Ojo con esto**: un módulo que añada un botón a la tarjeta con
