@@ -5,6 +5,36 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 17-sep-2026 — La pantalla no se repintaba sola tras guardar
+
+Fila 23 de la cola (`docs/COLA.md`, `docs/REFRESCO-DE-PANTALLA.md`), la primera de las que
+Francisco pidió el 17-sep-2026: cambiar el estado de un asunto, marcar un hito como hecho o
+archivar parecía no hacer nada hasta salir y volver a entrar, aunque el dato ya se había guardado
+bien.
+
+- **Buscada la causa de verdad**: cada acción ya hacía `await` hasta el final y ya llamaba a quien
+  pinta después (`App.anotar` relee el registro, guarda con `Copias.guardar` y llama a
+  `App.refrescarFichas()`; `App.ponerEstado`, `App.cerrarAsunto` y `Hitos.marcar` seguían la misma
+  regla). Se comprobó con `pruebas/navegador.mjs` (disco de mentira, escritura instantánea) que
+  las tres acciones YA refrescaban bien sin recargar: el fallo no está en la lógica de repintado,
+  sino en que **nada avisa de que se está guardando**. Con la carpeta de verdad en Dropbox, el
+  guardado tarda de forma perceptible; el botón o el desplegable se quedan pulsables, no cambian
+  de aspecto, y a Francisco le parece que la aplicación no ha hecho nada —cuando en realidad el
+  guardado sigue en marcha, y al volver a entrar (con el guardado ya terminado) lo ve bien—.
+- **El arreglo**: `U.mientrasGuarda(control, fn)` (`js/util.js`), nuevo. Apaga el control mientras
+  `fn` hace su trabajo asíncrono y lo devuelve a como estaba al terminar, guarde o falle; en un
+  botón, además, el texto pasa a "Guardando…". Puesto en el estado del asunto (ficha y tarjeta de
+  la lista), la vía, el plazo, archivar/reabrir (`js/ficha-asunto.js`, `js/asuntos-lista.js`), y en
+  marcar un hito, cambiar de rama, y tocar su responsable, fecha, notas o documentos
+  (`js/hitos-panel-lista.js`). Así se ve que la aplicación está trabajando y no se puede pulsar dos
+  veces mientras tanto (evita además una carrera si dos guardados del mismo asunto se solapan).
+- Prueba nueva `pruebas/refresco.mjs`, con la aplicación entera en un navegador de verdad: crea un
+  asunto de verdad (con categoría y tercero, no una carpeta suelta), y comprueba las tres acciones
+  —cambiar el estado, marcar un hito y archivar— sin recargar nada, más que el control usado se
+  apaga mientras guarda.
+- Las notas (`js/ficha-asunto.js`, `pintarNotas`) ya tenían su propio apagado del botón durante el
+  guardado, de antes: no se ha tocado, porque ya cumplía la regla.
+
 ## 16-sep-2026 — Plantillas de documento de Word
 
 Fila 17 de la cola (`docs/COLA.md`, `docs/PLANTILLAS-DE-DOCUMENTO.md`), el gemelo en papel de las

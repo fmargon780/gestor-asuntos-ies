@@ -107,6 +107,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ojo con `p.campos`: solo trae columnas con datos; para saber si una columna existe, mirar la
   cabecera del CSV.
 - Ojo con el orden de los `<script>` de `index.html`: importa para las envolturas.
+- Una acción que guarda y repinta: `await` hasta el final y usar `U.mientrasGuarda(control, fn)`
+  para apagar el botón o desplegable ("Guardando…") mientras tanto (fila 23, 17-sep-2026).
 - Al terminar una instrucción de la cola: actualizar este documento y `CONTEXTO.md`
   sustituyendo la línea vieja, y anotar en `HISTORIA.md` lo que merezca recordarse.
 

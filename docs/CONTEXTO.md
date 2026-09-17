@@ -1157,6 +1157,16 @@ Aparte, en `localStorage`: `gestor-barra`, `gestor-filtros`, `gestor-lector-anch
 - **`p.campos` solo trae las columnas que traen algo.** Para saber si una columna existe hay que
   mirar la cabecera del CSV (`Datos.cargarLista` la expone en `.cabecera`).
 - **Ojo con los `MutationObserver` sobre la clase de un elemento que uno mismo cambia.**
+- **Toda acción que guarda y repinta debe esperar (`await`) hasta el final antes de repintar.**
+  El fallo de siempre no es que falte el repintado, sino que nada avisa de que se está guardando:
+  con la carpeta en Dropbox, el guardado tarda, el control sigue pulsable y parece que no ha
+  pasado nada hasta salir y volver a entrar (cuando sí se había guardado). La regla:
+  `await U.mientrasGuarda(control, function () { return laAccionQueGuarda(); })` antes de repintar
+  (`js/util.js`, 17-sep-2026, fila 23 de la cola). Apaga el control y, si es un botón, pone
+  "Guardando…", y lo devuelve a como estaba, guarde o falle. Ya se usa en el estado del asunto, la
+  vía, el plazo, archivar/reabrir (`js/ficha-asunto.js`, `js/asuntos-lista.js`) y en marcar,
+  cambiar de rama, o tocar el responsable/fecha/notas/documentos de un hito
+  (`js/hitos-panel-lista.js`). Se comprueba con `pruebas/refresco.mjs`.
 - **Ojo con el orden de los `<script>` de `index.html`.** `ficha-asunto.js` poda la tarjeta con
   su lista blanca, así que un módulo que quiera poner un botón ahí tiene que cargarse después.
   `lector.js` va antes que `bandeja-correos.js`, y `bandeja-enlace.js` después de los dos.
