@@ -24,9 +24,16 @@ Hay un solo proyecto de Vercel y no se crea ninguno más. Tampoco se pasa a plan
 ### 1. Apuntar esta instrucción en la cola
 
 `docs/COLA.md` todavía no tiene esta fila: esta instrucción llegó por otro camino. Lo primero es
-añadirla a la tabla de la cola, **detrás de la fila 43 pero marcada como la primera que se hace**:
+añadirla a la tabla de la cola, al final de la tabla pero **marcada como la primera que se hace**.
+**El número sale de mirar la tabla: el primero que esté libre** (el 17-sep-2026 por la tarde ya
+estaban usados hasta el 47, así que probablemente sea el 48; no des por bueno este número sin
+mirar). En las notas de la fila, esto:
 
-    | 44 | `docs/NO-GASTAR-PUBLICACIONES.md` | EN CURSO (fecha) | **Va la primera de toda la cola**, antes de la fila 36. Acordado con Francisco el 17-sep-2026, el día que Vercel dejó de publicar por agotar el cupo del plan gratuito (100 publicaciones al día, `api-deployments-free-per-day`). `vercel.json` gana un `ignoreCommand` que se salta la publicación cuando la rama no es `main` o cuando el cambio solo toca `docs/`, `pruebas/`, `.github/` o ficheros `.md`. Y esta cola gana la regla 13: como máximo dos subidas por fila. |
+> **Va la primera de toda la cola**, antes de la fila 36. Acordado con Francisco el 17-sep-2026,
+> el día que Vercel dejó de publicar por agotar el cupo del plan gratuito (100 publicaciones al
+> día, `api-deployments-free-per-day`). `vercel.json` gana un `ignoreCommand` que se salta la
+> publicación cuando la rama no es `main` o cuando el cambio solo toca `docs/`, `pruebas/`,
+> `.github/` o ficheros `.md`. Y esta cola gana la regla 13: como máximo dos subidas por fila.
 
 Y añadir al final de las "Reglas para Claude Code" de esa misma cola:
 
