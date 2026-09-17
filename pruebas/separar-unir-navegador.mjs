@@ -110,13 +110,20 @@ console.log('--- los tres botones salen para un PDF ---');
 function filaDe(nombre) {
   return pagina.locator('.ficha-documento-fila').filter({ hasText: nombre });
 }
-await comprobar('Separar, Unir y Sacar páginas salen en la fila del documento',
-  filaDe(ESCANEO).locator('button').allTextContents().then(ts => ts.filter(t =>
+/* Separar, Unir, Sacar páginas y Borrar viven desde la fila 36
+   (docs/FILAS-QUE-NO-SE-ESTRUJAN.md) dentro del menú de tres puntos,
+   no sueltos en la fila: hay que abrirlo antes de poder pulsarlos. */
+async function abrirMenuDe(fila) {
+  await fila.locator('.menu-acciones .boton-menu').click();
+  return fila.locator('.menu-acciones-lista');
+}
+await comprobar('Separar, Unir y Sacar páginas salen en el menú del documento',
+  filaDe(ESCANEO).locator('.menu-acciones-lista button').allTextContents().then(ts => ts.filter(t =>
     ['Separar', 'Unir', 'Sacar páginas'].includes(t.trim()))),
   ['Separar', 'Unir', 'Sacar páginas']);
 
 console.log('--- Separar: dos cortes dan tres trozos, con nombre y a la papelera ---');
-await filaDe(ESCANEO).getByRole('button', { name: 'Separar', exact: true }).click();
+await (await abrirMenuDe(filaDe(ESCANEO))).getByRole('button', { name: 'Separar', exact: true }).click();
 await pagina.waitForSelector('.pdf-rejilla .pdf-pagina');
 await comprobar('salen las 6 miniaturas', pagina.locator('.pdf-rejilla .pdf-pagina').count(), 6);
 await comprobar('sin cortes, el resumen pide marcar una tijera',
@@ -173,7 +180,7 @@ await pagina.click('#lista-abiertos .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila');
 
-await filaDe(TROZO_2).getByRole('button', { name: 'Sacar páginas', exact: true }).click();
+await (await abrirMenuDe(filaDe(TROZO_2))).getByRole('button', { name: 'Sacar páginas', exact: true }).click();
 await pagina.waitForSelector('.pdf-rejilla .pdf-pagina');
 await pagina.check('.pdf-rejilla .pdf-pagina:nth-child(1) input[type="checkbox"]');
 await pagina.click('#cuadro-aceptar');   /* "Sacar páginas" */
@@ -203,7 +210,7 @@ await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');
 function tarjetaSueltaDe(nombre) {
   return pagina.locator('#lista-sueltos .tarjeta-suelto').filter({ hasText: nombre });
 }
-await tarjetaSueltaDe('primero.pdf').getByRole('button', { name: 'Unir', exact: true }).click();
+await (await abrirMenuDe(tarjetaSueltaDe('primero.pdf'))).getByRole('button', { name: 'Unir', exact: true }).click();
 await pagina.waitForSelector('#unir-lista .unir-fila');
 await comprobar('se ofrece el otro PDF suelto, con su cuenta de páginas',
   pagina.locator('#unir-lista .unir-fila').filter({ hasText: 'segundo.pdf' })
@@ -231,7 +238,7 @@ await dejarPdfSuelto('otro-mas.pdf', PDF_E);
 
 await pagina.click('#btn-recargar');
 await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');
-await tarjetaSueltaDe('choque.pdf').getByRole('button', { name: 'Unir', exact: true }).click();
+await (await abrirMenuDe(tarjetaSueltaDe('choque.pdf'))).getByRole('button', { name: 'Unir', exact: true }).click();
 await pagina.waitForSelector('#unir-lista .unir-fila');
 await pagina.locator('#unir-lista .unir-fila').filter({ hasText: 'otro-mas.pdf' })
   .locator('.unir-marca').check();

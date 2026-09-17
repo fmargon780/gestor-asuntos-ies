@@ -586,7 +586,7 @@ var Papelera = (function () {
       var div = comoEra(s, pie, esNuevo);
       var acciones = div.querySelector('.acciones');
       if (!acciones) return div;
-      acciones.appendChild(botonBorrar(async function () {
+      var borrar = botonBorrar(async function () {
         var ok = await preguntarBorrar(s.nombre);
         if (!ok) return;
         try {
@@ -596,7 +596,14 @@ var Papelera = (function () {
         } catch (e) {
           U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
         }
-      }));
+      });
+      /* Borrar entra en el menú de tres puntos, como Separar y Unir
+         (17-sep-2026, fila 36, docs/FILAS-QUE-NO-SE-ESTRUJAN.md). Sin
+         menú (una tarjeta que no lo llegara a montar), se deja como
+         antes: un botón más, suelto en las acciones. */
+      var menu = acciones.querySelector('.menu-acciones');
+      if (menu && menu.anadirAccion) { borrar.style.marginLeft = ''; menu.anadirAccion(borrar); }
+      else acciones.appendChild(borrar);
       return div;
     };
   })();

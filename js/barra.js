@@ -150,11 +150,38 @@
     titulo.parentNode.insertBefore(b, titulo.nextSibling);
   }
 
+  /* ---------- se pliega sola al abrir un documento ----------
+
+     (17-sep-2026, fila 36 de la cola, docs/FILAS-QUE-NO-SE-ESTRUJAN.md.)
+     Con la barra abierta y el panel de la derecha abierto (visor o
+     lector de correo), a la zona de trabajo no le queda casi nada.
+     Se vigila con un MutationObserver las clases de <body> (con-visor,
+     con-lector, que ponen js/visor.js y js/lector.js): al aparecer
+     cualquiera de las dos con la barra abierta, se pliega sin tocar lo
+     guardado en localStorage; al desaparecer las dos, vuelve a como
+     estaba. Si ya está plegada, no hace nada: no hay bucle posible. */
+  function ponerLaVigilanciaDelVisor() {
+    if (!window.MutationObserver) return;
+    var plegadaPorElVisor = false;
+    function repasar() {
+      var hayPanel = document.body.classList.contains('con-visor') ||
+                     document.body.classList.contains('con-lector');
+      if (hayPanel) {
+        if (!estaPlegada()) { poner('plegada'); plegadaPorElVisor = true; }
+      } else if (plegadaPorElVisor) {
+        plegadaPorElVisor = false;
+        poner(comoEstaba());
+      }
+    }
+    new MutationObserver(repasar).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  }
+
   function arrancar() {
     ponerElBoton();
     ponerElBotonDeAjustes();
     ponerLaEntradaDeQueMeToca();
     ponerElDeNuevoAsunto();
+    ponerLaVigilanciaDelVisor();
     poner(comoEstaba());
   }
 

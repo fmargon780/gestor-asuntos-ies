@@ -245,6 +245,13 @@
     return String(nombre || '').replace(/\.[A-Za-z0-9]{1,8}$/, '').trim();
   }
 
+  /* El botón "Copiar" ya no envuelve el botón del documento en una
+     fila propia (17-sep-2026, fila 36, docs/FILAS-QUE-NO-SE-ESTRUJAN.md):
+     ahora entra en el menú de tres puntos que ya monta
+     js/ficha-documentos.js para Separar/Unir/Sacar páginas/Borrar, el
+     primero de la lista. Así `.ficha-documento` se queda como hijo
+     directo de `.ficha-documento-fila`, que es lo que necesita
+     css/filas.css para que el nombre no se estruje. */
   function ponerEnDocumentos() {
     var caja = document.getElementById('ficha-documentos');
     if (!caja) return;
@@ -259,22 +266,16 @@
       var limpio = sinExtension(nombre);
       if (!limpio) return;
 
-      /* Los documentos van en columna, uno debajo de otro. Cada uno se
-         mete en una fila para que su botón de copiar quede al lado y no
-         debajo. */
-      var fila = document.createElement('div');
-      fila.style.cssText = 'display:flex;gap:6px;align-items:stretch';
-      b.parentNode.insertBefore(fila, b);
-      fila.appendChild(b);
-      b.style.flex = '1';
-      b.style.minWidth = '0';
-
-      fila.appendChild(boton({
+      var fila = b.closest ? b.closest('.ficha-documento-fila') : b.parentNode;
+      var menu = fila && fila.querySelector('.menu-acciones');
+      var copiar = boton({
         etiqueta: 'Copiar',
         texto: limpio,
         ayuda: 'Copiar el nombre del documento, sin la extensión',
         clase: 'boton-copiar-nombre'
-      }));
+      });
+      if (menu && menu.anadirAccion) menu.anadirAccion(copiar, true);
+      else if (fila) fila.appendChild(copiar);
     });
   }
 

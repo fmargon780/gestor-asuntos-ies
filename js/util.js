@@ -384,6 +384,102 @@ var U = (function () {
     return salida;
   }
 
+  /* ---------- el menú de tres puntos ----------
+
+     (17-sep-2026, fila 36 de la cola, docs/FILAS-QUE-NO-SE-ESTRUJAN.md.)
+     Una fila con más de dos botones deja a la vista los importantes y
+     mete el resto aquí dentro, para que la fila no se ensanche sin
+     límite. No es un cuadro de diálogo (U.preguntar sigue siendo el
+     único a la vez): es un desplegable pequeño, colgado dentro de la
+     propia fila (no de <body>, como el buscador de huecos), para que
+     `aplicarModoConsulta` (js/ficha-asunto.js) lo encuentre al
+     recorrer #ficha-asunto-cuerpo y apague el botón de tres puntos y
+     los botones de dentro igual que a cualquier otro.
+
+     Devuelve el elemento que hay que meter en la fila (un <span> que
+     envuelve el botón de tres puntos y la lista desplegable). Lleva
+     dos métodos colgados para quien necesite añadir o quitar botones
+     después de montarlo (p.ej. js/copiar.js, que pone su botón más
+     tarde, cuando ya ha pintado quien pinta primero):
+
+       envoltorio.anadirAccion(boton, alPrincipio)
+       envoltorio.quitarAccion(botonOTexto) */
+  function menuDeAcciones(botones, opciones) {
+    opciones = opciones || {};
+    var envoltorio = document.createElement('span');
+    envoltorio.className = 'menu-acciones';
+
+    var toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'boton boton-menu';
+    toggle.title = opciones.titulo || 'Más acciones';
+    toggle.setAttribute('aria-label', opciones.titulo || 'Más acciones');
+    toggle.textContent = '⋮';
+
+    var lista = document.createElement('div');
+    lista.className = 'menu-acciones-lista oculto';
+
+    function actualizarVisibilidad() {
+      envoltorio.classList.toggle('oculto', !lista.children.length);
+    }
+
+    (botones || []).forEach(function (b) { if (b) lista.appendChild(b); });
+
+    function cerrar() {
+      lista.classList.add('oculto');
+      document.removeEventListener('mousedown', alPulsarFuera, true);
+      document.removeEventListener('keydown', alPulsarTecla, true);
+    }
+    function abrir() {
+      lista.classList.remove('oculto');
+      document.addEventListener('mousedown', alPulsarFuera, true);
+      document.addEventListener('keydown', alPulsarTecla, true);
+    }
+    function alPulsarFuera(ev) {
+      if (envoltorio.contains(ev.target)) return;
+      cerrar();
+    }
+    function alPulsarTecla(ev) {
+      if (ev.key !== 'Escape') return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      cerrar();
+      toggle.focus();
+    }
+
+    toggle.onclick = function (ev) {
+      ev.stopPropagation();
+      if (lista.classList.contains('oculto')) abrir(); else cerrar();
+    };
+    /* Elegir cualquier botón de dentro cierra el menú, sin que cada
+       uno de ellos tenga que acordarse de hacerlo. */
+    lista.addEventListener('click', function (ev) {
+      if (ev.target && ev.target.tagName === 'BUTTON') cerrar();
+    }, true);
+
+    envoltorio.appendChild(toggle);
+    envoltorio.appendChild(lista);
+
+    envoltorio.anadirAccion = function (boton, alPrincipio) {
+      if (!boton) return;
+      if (alPrincipio && lista.firstChild) lista.insertBefore(boton, lista.firstChild);
+      else lista.appendChild(boton);
+      actualizarVisibilidad();
+    };
+    envoltorio.quitarAccion = function (botonOTexto) {
+      var el = (typeof botonOTexto === 'string')
+        ? Array.prototype.filter.call(lista.children, function (b) {
+            return (b.textContent || '').trim() === botonOTexto;
+          })[0]
+        : botonOTexto;
+      if (el && el.parentNode === lista) lista.removeChild(el);
+      actualizarVisibilidad();
+    };
+
+    actualizarVisibilidad();
+    return envoltorio;
+  }
+
   return {
     normalizar: normalizar, limpiarNombre: limpiarNombre, hoyIso: hoyIso,
     aAaMmDd: aAaMmDd, fechaLegible: fechaLegible, cursoActual: cursoActual,
@@ -391,6 +487,6 @@ var U = (function () {
     aFecha: aFecha, yaPaso: yaPaso,
     ahora: ahora, aviso: aviso, preguntar: preguntar, escapar: escapar,
     parecidos: parecidos, dejaCrear: dejaCrear, mientrasGuarda: mientrasGuarda,
-    conservandoLoEscrito: conservandoLoEscrito
+    conservandoLoEscrito: conservandoLoEscrito, menuDeAcciones: menuDeAcciones
   };
 })();

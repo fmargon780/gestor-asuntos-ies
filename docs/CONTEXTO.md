@@ -89,10 +89,16 @@ la página y vuelve a la pantalla de entrada, con las carpetas ya señaladas. Pi
 **La barra de la izquierda** (`js/barra.js`, `css/barra.css`). Se pliega y nace plegada; un
 botón de tres rayas la abre y la cierra; al elegir una pantalla se vuelve a plegar sola; se
 recuerda en `gestor-barra`. **Queda fija en pantalla** (`position:fixed`); el contenido se
-desplaza con `margin-left` (232px, o 52px plegada). Ajustes está en la lista de pestañas,
-separado por una línea (`.separador-lateral`); con la barra plegada, un icono de rueda dentada
-(`#btn-barra-ajustes`) lleva directo a Ajustes. El botón grande "+ Nuevo asunto" va en la
-cabecera de Asuntos abiertos, y lo pone el mismo fichero.
+desplaza con `margin-left` (232px, o 52px plegada), **sin tope de ancho** (17-sep-2026, fila 36
+de la cola): antes, con la barra plegada, `css/barra.css` le ponía a `.contenido` un
+`max-width:1360px` que ganaba por especificidad al `max-width:none` de `css/vista.css`, y en el
+monitor ancho del trabajo dejaba franjas vacías a los lados nada más arrancar. Ajustes está en
+la lista de pestañas, separado por una línea (`.separador-lateral`); con la barra plegada, un
+icono de rueda dentada (`#btn-barra-ajustes`) lleva directo a Ajustes. El botón grande "+ Nuevo
+asunto" va en la cabecera de Asuntos abiertos, y lo pone el mismo fichero. **Se pliega sola al
+abrir el visor o el lector** (`con-visor`/`con-lector` en `<body>`, vigilados con un
+`MutationObserver`) y vuelve a como estaba al cerrarlo, sin tocar lo guardado en
+`localStorage`; si ya estaba plegada, no hace nada.
 
 **El panel de lectura de la derecha** (`js/lector.js`). Se cierra con la equis o con Escape. El
 borde izquierdo se arrastra; el ancho se recuerda (`gestor-lector-ancho`); doble clic vuelve al
@@ -451,6 +457,39 @@ explicativa; bajo 900 se quita el tablón y la cabecera baja de línea; bajo 620
 columna. El tope de 1180px de `css/estilos.css` se anula en `css/vista.css`; conservan tope
 propio Nuevo asunto (940px) y Ajustes (1600px). Los filtros (estado, plazo, orden) van plegados
 en un panel que abre el botón "Filtros", recordado en `gestor-filtros`.
+
+### Filas que no se estrujan (`css/filas.css`)
+
+17-sep-2026, fila 36 de la cola, `docs/FILAS-QUE-NO-SE-ESTRUJAN.md`. La aplicación sabía
+recolocarse a nivel de pantalla (sección de arriba), pero no a nivel de fila: con el panel de
+la derecha abierto, el nombre de un documento se quedaba en un carácter por renglón. Regla
+general, enlazada la última de todos los `<link>` de `index.html` para ganar por cascada:
+
+1. El texto de una fila nunca baja de un ancho mínimo (`.ficha-documento-fila > .ficha-documento
+   { min-width: 240px }`, el caso que de verdad se rompía: `css/registro.css` ya ponía
+   `min-width:0` en el primer hijo).
+2. Si no cabe todo, los botones bajan a una segunda línea (`flex-wrap: wrap` en la fila).
+3. Con más de dos botones, los importantes se quedan a la vista y el resto entra en el menú de
+   tres puntos: `U.menuDeAcciones(botones, opciones)` (`js/util.js`), que devuelve un `<span
+   class="menu-acciones">` con el botón "⋮" y una lista desplegable colgando de la propia fila
+   (**nunca de `<body>`**, al contrario que `js/huecos-buscador.js`: así
+   `aplicarModoConsulta` la encuentra al recorrer `#ficha-asunto-cuerpo` y apaga tanto el "⋮"
+   como los botones de dentro, sin que ninguno de los dos ficheros se entere del otro). El
+   elemento devuelto lleva colgados `.anadirAccion(boton, alPrincipio)` y
+   `.quitarAccion(botonOTexto)`, para quien mete su botón más tarde: `js/copiar.js` (que ya no
+   envuelve el botón del documento en una fila propia: mete "Copiar" el primero del menú) y
+   `js/papelera.js` (que mete "Borrar" al final, en vez de colgarlo suelto de `.acciones`).
+   - En `js/ficha-documentos.js`: a la vista, el nombre y Registrar; en el menú, Copiar, Separar,
+     Unir, Sacar páginas y Borrar, ese orden.
+   - En `js/documentos-sueltos.js` (tarjetas de "Por clasificar", también dentro del visor vía
+     `App.accionesDeSuelto`): a la vista, Crear asunto con él y Meter en un asunto; en el menú,
+     Abrir, Separar, Unir, Sacar páginas y Borrar.
+   - `.hito-linea` (`css/hitos.css`) no lleva menú (el título entero se pulsa para desplegar el
+     hito), solo `flex-wrap` y un `min-width` en `.hito-titulo`.
+   - `.tarjeta`/`.acciones` (asuntos abiertos, `css/estilos.css`), las listas de Ajustes y
+     `.relacionado-fila` ya envolvían bien: no se han tocado.
+
+Se comprueba con `pruebas/filas-estrechas.mjs`.
 
 ### El tablón de notas rápidas
 

@@ -1,0 +1,86 @@
+/* ============================================================
+   filas.css — filas que no se estrujan (17-sep-2026, fila 36 de
+   docs/COLA.md, docs/FILAS-QUE-NO-SE-ESTRUJAN.md).
+
+   La regla general, para toda la aplicación:
+     1. El texto de una fila nunca baja de un ancho mínimo.
+     2. Si no cabe todo, los botones bajan a una segunda línea.
+     3. Con más de dos botones, los importantes se quedan a la vista y
+        el resto entra en el menú de tres puntos (U.menuDeAcciones,
+        js/util.js).
+
+   Se enlaza el último de todos los <link> de index.html, para ganar
+   por orden de cascada a las reglas de módulo que ya tocaban estas
+   mismas filas (con la misma especificidad, gana la que se lee la
+   última).
+   ============================================================ */
+
+/* ---------- los documentos de la ficha del asunto ----------
+
+   css/registro.css ya ponía display:flex en .ficha-documento-fila,
+   pero con min-width:0 en el primer hijo (para dejar sitio al botón
+   de Copiar, que antes envolvía aparte el nombre del documento). Sin
+   un ancho mínimo de verdad, y con word-break en el nombre
+   (css/ficha-asunto.css), el nombre acababa en un carácter por
+   renglón en cuanto faltaba sitio: el fallo que arregla esta fila.
+   Ahora js/copiar.js mete su botón en el menú de tres puntos en vez
+   de envolver, así que .ficha-documento se queda como hijo directo de
+   .ficha-documento-fila. */
+.ficha-documento-fila { flex-wrap: wrap; }
+.ficha-documento-fila > .ficha-documento { flex: 1 1 260px; min-width: 240px; }
+.ficha-documento-fila > .boton,
+.ficha-documento-fila > .menu-acciones,
+.ficha-documento-fila > .marca-sin-registrar { flex: 0 0 auto; }
+
+/* ---------- la cabecera de un hito ----------
+
+   Aquí no hay botones que mandar a un menú (el título entero es lo
+   que se pulsa para desplegar el hito), pero sin ancho mínimo el
+   título se estrujaba igual detrás de la fecha y el responsable
+   cuando el hito llevaba los dos. */
+.hito-linea { flex-wrap: wrap; }
+.hito-titulo { min-width: 180px; }
+
+/* ---------- el menú de tres puntos (U.menuDeAcciones) ----------
+
+   A propósito NO va colgado de <body>, como el buscador de huecos de
+   Ajustes (js/huecos-buscador.js): se queda colgando de la propia
+   fila, dentro de #ficha-asunto-cuerpo, para que aplicarModoConsulta
+   (js/ficha-asunto.js) lo encuentre al recorrer el DOM con su
+   querySelectorAll('button, select, input, textarea') y apague tanto
+   el botón de tres puntos como los botones de dentro en modo
+   consulta, sin que ninguno de los dos ficheros tenga que enterarse
+   del otro. */
+.menu-acciones { position: relative; display: inline-flex; flex: 0 0 auto; }
+.boton-menu {
+  width: 30px; height: 30px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; line-height: 1;
+}
+.menu-acciones-lista {
+  position: absolute; top: 34px; right: 0; z-index: 8;
+  background: var(--papel); border: 1px solid var(--linea); border-radius: 8px;
+  box-shadow: var(--sombra); min-width: 172px; padding: 4px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.menu-acciones-lista .boton {
+  text-align: left; width: 100%; border: 0; border-radius: 6px;
+  padding: 8px 10px; background: none;
+}
+.menu-acciones-lista .boton:hover { background: #f0f3f7; }
+.menu-acciones-lista .boton-peligro:hover { background: var(--rojo); }
+
+/* ---------- filas que ya envolvían bien: sin cambios ----------
+
+   .tarjeta y .acciones (css/estilos.css, las tarjetas de asuntos
+   abiertos y de "Por clasificar") ya llevaban flex-wrap en la fila y
+   un ancho mínimo de sobra en .tarjeta-texto (flex: 1 1 340px); con
+   el menú de arriba, sus acciones nunca pasan de tres elementos
+   visibles (dos botones y el menú), así que no hacía falta tocarlas.
+   Las listas de Ajustes (css/ajustes.css, la fila de cada tipo,
+   estado o campo propio) ya llevaban flex-wrap. .relacionado-fila
+   (css/relacionados.css) solo lleva un botón de quitar, así que no le
+   hace falta el menú, y su texto ya tiene flex: 1 1 auto.
+   #lista-personas / .resultado (css/estilos.css) es una fila pulsable
+   entera, sin botones sueltos que estrujar. Ninguna de esas cuatro se
+   toca aquí. */

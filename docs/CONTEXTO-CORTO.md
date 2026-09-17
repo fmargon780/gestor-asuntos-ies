@@ -107,6 +107,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Archivar o reabrir cuando el destino ya existe (de un intento a medias) fusiona las dos carpetas, sin perder nada.
 - Guardar un documento en un asunto se queda en su ficha; solo Editar, Archivar/Reabrir y Borrar
   vuelven a la lista. La ficha solo se repinta si algo suyo ha cambiado de verdad (fila 34).
+- Filas con texto y botones que no se estrujan: ancho mínimo, envuelven a una segunda línea, y con
+  más de dos botones el resto entra en el menú de tres puntos (`U.menuDeAcciones`, fila 36).
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -135,19 +137,17 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Enlazar un correo de Gmail con `#all/<id de hilo>` (es con `#search/rfc822msgid:<id>`).
 - Meter Gmail dentro de la aplicación, en un marco (Google no lo permite).
 - Esconder el tablón de notas para dejar sitio, o sacar el DNI de la columna del tutor.
-- Poner el nombre comercial en el nombre de la carpeta de un asunto de empresa.
-- Reescribir la arquitectura de módulos y envolturas.
+- Poner el nombre comercial en el nombre de la carpeta de un asunto de empresa; reescribir la arquitectura de módulos y envolturas.
 - Meter los campos de cada tipo en el nombre de los documentos (son del asunto, no del papel).
 
 ## 8. Qué falta
 
 - Avisar al compañero de la dirección nueva (debe volver a señalar sus carpetas) y coordinar con él la lista de tipos de asunto y la de estados.
-- Poner en marcha el script de Gmail en `g.educaand.es` y señalar `GESTOR-BANDEJA` en Ajustes.
-- Ver si la bandeja de correo acierta con el tipo; si falla mucho, palabras clave por tipo.
+- Poner en marcha el script de Gmail en `g.educaand.es` y señalar `GESTOR-BANDEJA` en Ajustes; ver
+  si la bandeja acierta con el tipo, y si falla mucho, palabras clave por tipo.
 - Pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs`: sin eso no se siguen los hilos por matrícula, ni la copia oculta de un grupo.
-- Comprobar con Séneca si Comunicaciones acepta el largo del asunto que le damos.
-- Cuando tengan una cuenta de correo común, replantear la bandeja como una sola compartida.
-- Ver con el uso: ancho del panel lateral y del tablón, y si las tarjetas por tipo se quedan cortas.
+- Comprobar con Séneca si Comunicaciones acepta el largo del asunto que le damos; cuando tengan
+  una cuenta de correo común, replantear la bandeja como una sola compartida.
 - Si el DNI no sale de nadie, marcar la columna del documento al generar el RegAlum.
 - Cuando el uso lo pida: búsqueda en notas, cuentas por tipo para la memoria de fin de curso,
   qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta del centro.
