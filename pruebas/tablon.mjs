@@ -88,7 +88,10 @@ console.log('--- abriendo un documento sin clasificar ---');
 await pagina.click('.panel[data-vista="clasificar"]');
 await pagina.waitForTimeout(400);
 await comprobar('en Por clasificar el tablón se ve', seVeElTablon(), true);
-await pagina.getByRole('button', { name: 'Abrir', exact: true }).click();
+/* "Abrir" vive detrás del menú de tres puntos (fila 36,
+   docs/FILAS-QUE-NO-SE-ESTRUJAN.md, 17-sep-2026): hay que abrirlo. */
+await pagina.click('#lista-sueltos .fila-menu-btn');
+await pagina.locator('#lista-sueltos .fila-menu').getByRole('button', { name: 'Abrir', exact: true }).click();
 await pagina.waitForTimeout(600);
 await comprobar('con el documento al lado, se quita', seVeElTablon(), false);
 await pagina.click('#visor-cerrar').catch(() => {});

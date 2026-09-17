@@ -2121,3 +2121,60 @@ una línea cada una. El texto largo que tenían antes era:
   alta/edición/borrado en Ajustes (no pedida por las pruebas del encargo, pero es la parte que usa
   Francisco a diario). Batería completa en verde (`npm test`, 22 ficheros). Con esta fila, la cola
   se queda sin ninguna PENDIENTE: solo la fila 11 sigue EN CURSO, de otra sesión.
+- **36 · `docs/FILAS-QUE-NO-SE-ESTRUJAN.md`**: Terminada 17-sep-2026 · 19:20, a partir de una
+  captura de Francisco: con el panel de la derecha abierto, el nombre de un documento se quedaba
+  a un carácter por renglón, porque `.ficha-documento-fila` no envolvía (`display:flex` sin
+  `flex-wrap`) y el nombre era el único que cedía. `css/filas.css` nuevo, enlazado el último de
+  todos en `index.html`: regla general de fila (texto con ancho mínimo, botones que bajan de línea
+  en vez de estrujarlo) aplicada a `.ficha-documento-fila`, `.relacionado-fila`, `.hito-linea` y
+  `.fila-tipo`; `.rejilla-tipos` y `#lista-personas` ya envolvían bien, sin tocar. `U.menuDeAcciones`
+  nueva en `js/util.js`: menú de tres puntos compartido, con los botones que recibe siempre en el
+  DOM (ocultos con `.oculto`) para que `aplicarModoConsulta` los alcance igual que a los demás, sin
+  ningún caso especial. En `js/ficha-documentos.js` solo quedan a la vista el nombre y "Registrar";
+  Copiar (que sigue añadiéndolo `js/copiar.js`, por envoltura, buscando el `.fila-menu` ya montado),
+  Separar, Unir, Sacar páginas y Borrar van al menú. En `js/documentos-sueltos.js` quedan a la vista
+  "Crear asunto con él" y "Meter en un asunto"; Abrir, Separar, Unir, Sacar páginas y Borrar (que
+  sigue añadiéndolo `js/papelera.js`) van al menú — `App.accionesDeSuelto` (fila 25) ahora busca
+  "Abrir" por su texto en cualquier profundidad. La barra azul (`js/barra.js`) se pliega sola al
+  aparecer `con-visor`/`con-lector` en `<body>` (un `MutationObserver`, sin tocar `localStorage`) y
+  vuelve a como estaba al desaparecer las dos; y pierde el tope de 1360px que tenía en
+  `css/barra.css` con la barra plegada, que dejaba franjas vacías en el monitor ancho del trabajo.
+  Prueba nueva `pruebas/filas-estrechas.mjs`, en navegador de verdad (comprobado que la 1 falla sin
+  `css/filas.css`: sin él, `flex-wrap` computado sale `nowrap` y el ancho mínimo del nombre, `0px`).
+  Media docena de pruebas ya existentes (`documentos-sueltos.mjs`, `documento-a-la-vista.mjs`,
+  `papelera.mjs`, `separar-unir-navegador.mjs`) daban por hecho que Abrir/Separar/Unir/Sacar
+  páginas/Borrar/Copiar estaban siempre a la vista: se han ajustado para abrir el menú antes de
+  pulsarlos (o de comprobar que están, con `getByRole`, que no ve dentro de un `display:none`).
+  Batería completa en verde.
+- **48 · `docs/NO-GASTAR-PUBLICACIONES.md`**: Terminada 17-sep-2026 · 19:24. Llegó fuera de orden
+  directa a `main` (commit `7757e33`), pidiendo ser la fila 44 (ya ocupada) y la primera de la
+  cola; esta sesión ya había terminado la fila 36 al verla, así que la cogió justo después. El
+  cupo del plan gratuito de Vercel (100 publicaciones al día) se agotó el 17-sep-2026 con `main`
+  recibiendo exactamente 100 commits ese día, más de la mitad sin tocar nada que se vea en la web
+  (`docs/COLA.md` y compañía), más cada push a una rama `claude/...` con pull request abierto
+  gastando su propia vista previa. `vercel.json` gana `ignoreCommand`, con la receta exacta del
+  encargo: se salta la publicación cuando la rama no es `main`, o cuando el cambio solo toca
+  `docs/`, `pruebas/`, `.github/` o ficheros `.md`, comparando contra `VERCEL_GIT_PREVIOUS_SHA`
+  (el commit de la última publicación buena; `HEAD^` sirve de respaldo solo la primera vez, antes
+  de que esa variable exista) para que un push con el código en un commit y los documentos en
+  otro no se salte la publicación del código. Ante cualquier duda, publica. **Trampa encontrada
+  al publicar de verdad, no estaba en el encargo**: Vercel exige `ignoreCommand` en 256
+  caracteres o menos, y la receta tal cual pasaba de 296; el primer intento de esta fila lo
+  publicó igual (el PR de la fila 36, #28, avisó del error `ignoreCommand should NOT be longer
+  than 256 characters`). Arreglado sacando la receta entera a `scripts/vercel-ignore-build.sh`
+  (nuevo, con permiso de ejecución) y dejando `ignoreCommand` como un simple `bash
+  scripts/vercel-ignore-build.sh` (35 caracteres). Entra también la regla 13 de `docs/COLA.md`:
+  como mucho dos subidas por fila. Prueba nueva `pruebas/vercel-ignore-command.mjs`, sin
+  navegador (lee `vercel.json` y `scripts/vercel-ignore-build.sh`, y comprueba que
+  `ignoreCommand` existe, no pasa de 256 caracteres y llama al script, que el script menciona
+  `main` y `VERCEL_GIT_PREVIOUS_SHA`, y que el bloque `headers` de siempre sigue igual);
+  comprobado también a mano contra el propio historial de git de este repositorio: un commit que
+  solo toca `docs/` se salta, uno que toca `js/`/`css/` publica.
+  **No se ha podido comprobar en Vercel de verdad** (el punto 4 del encargo pedía ver un
+  despliegue saltado y uno publicado de verdad): el cupo agotado ese mismo día, mientras se
+  trabajaba esta fila, solo se recupera pasadas 24 horas — de hecho, el PR de la fila 36 (#28)
+  dio ahí mismo el aviso de Vercel `Resource is limited - try again in 24 hours`, confirmando el
+  problema que esta fila arregla. Queda para la próxima vez que se toque el límite: apuntar aquí
+  si las publicaciones saltadas también cuentan para el cupo de 100 (el propio encargo dice que
+  no está documentado). No se ha tocado `git.deploymentEnabled` ni ningún *deploy hook*: esa es
+  la salida si la regla 13 no bastara, y no hacía falta todavía.

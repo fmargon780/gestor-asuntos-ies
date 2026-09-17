@@ -55,6 +55,13 @@ var FichaDocumentos = (function () {
     fila.className = 'ficha-documento-fila';
     fila.appendChild(b);
 
+    /* A la vista solo el nombre y "Registrar" (cuando sale): el resto
+       (Copiar —lo añade js/copiar.js, aparte—, Separar, Unir, Sacar
+       páginas y Borrar) va detrás del menú de tres puntos, para que el
+       nombre nunca se estruje (17-sep-2026, fila 36,
+       docs/FILAS-QUE-NO-SE-ESTRUJAN.md). */
+    var enMenu = [];
+
     if (window.Registro && !Registro.tieneRegistro(f.nombre)) {
       var pendiente = Registro.pendiente(a, f.nombre);
       if (pendiente) {
@@ -94,13 +101,12 @@ var FichaDocumentos = (function () {
         };
         return boton;
       }
-      fila.appendChild(botonPdf('Separar', 'Partirlo en varios documentos', PdfSepararUnir.separar));
-      fila.appendChild(botonPdf('Unir', 'Juntarlo con otro PDF del asunto', PdfSepararUnir.unir));
-      fila.appendChild(botonPdf('Sacar páginas', 'Sacar una copia con solo algunas páginas', PdfSepararUnir.sacarPaginas));
+      enMenu.push(botonPdf('Separar', 'Partirlo en varios documentos', PdfSepararUnir.separar));
+      enMenu.push(botonPdf('Unir', 'Juntarlo con otro PDF del asunto', PdfSepararUnir.unir));
+      enMenu.push(botonPdf('Sacar páginas', 'Sacar una copia con solo algunas páginas', PdfSepararUnir.sacarPaginas));
     }
 
-    /* Borrar, con papelera (11-sep-2026): siempre el último, separado
-       de lo demás. */
+    /* Borrar, con papelera (11-sep-2026): siempre el último del menú. */
     if (window.Papelera) {
       var borrar = window.Papelera.botonBorrar(async function () {
         var ok = await window.Papelera.preguntarBorrar(f.nombre);
@@ -116,8 +122,10 @@ var FichaDocumentos = (function () {
           borrar.disabled = false;
         }
       });
-      fila.appendChild(borrar);
+      enMenu.push(borrar);
     }
+
+    if (enMenu.length) fila.appendChild(U.menuDeAcciones(enMenu));
 
     return fila;
   }

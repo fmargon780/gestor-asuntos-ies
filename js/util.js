@@ -409,6 +409,76 @@ var U = (function () {
     return salida;
   }
 
+  /* ---------- el menú de tres puntos de una fila (17-sep-2026, fila 36,
+     docs/FILAS-QUE-NO-SE-ESTRUJAN.md) ----------
+
+     `botones` es una lista de elementos <button> ya montados, con su
+     propio onclick puesto (los mismos que hoy se cuelgan sueltos de la
+     fila). Se devuelve un envoltorio para colgar en la fila, con un
+     botón de tres puntos que despliega esos botones debajo, anclado a
+     él. Se cierra al elegir uno, al pulsar fuera y con Escape.
+
+     No abre ningún U.preguntar: es un desplegable propio, así que la
+     regla de "un solo cuadro a la vez" sigue intacta.
+
+     Los botones viven siempre en el documento (dentro del envoltorio,
+     ocultos con la clase "oculto" hasta que se abre), no solo cuando el
+     menú está desplegado: así aplicarModoConsulta (que recorre todo
+     #ficha-asunto-cuerpo con querySelectorAll) los alcanza y los apaga
+     igual que a los demás, estén el menú abierto o cerrado. Y así otra
+     pieza (js/copiar.js, con el botón "Copiar") puede seguir
+     añadiendo botones al menú después de montado, buscándolo por su
+     clase ("fila-menu"). */
+  function menuDeAcciones(botones) {
+    var envoltorio = document.createElement('div');
+    envoltorio.className = 'fila-menu-envoltorio';
+    if (!botones || !botones.length) return envoltorio;
+
+    var boton = document.createElement('button');
+    boton.type = 'button';
+    boton.className = 'fila-menu-btn';
+    boton.title = 'Más acciones';
+    boton.setAttribute('aria-haspopup', 'true');
+    boton.setAttribute('aria-expanded', 'false');
+    boton.textContent = '⋮';
+
+    var menu = document.createElement('div');
+    menu.className = 'fila-menu oculto';
+    botones.forEach(function (b) { menu.appendChild(b); });
+
+    function abierto() { return !menu.classList.contains('oculto'); }
+
+    function cerrar() {
+      if (!abierto()) return;
+      menu.classList.add('oculto');
+      boton.setAttribute('aria-expanded', 'false');
+      document.removeEventListener('mousedown', alPulsarFuera, true);
+      document.removeEventListener('keydown', alPulsarTecla, true);
+    }
+    function alPulsarFuera(e) { if (!envoltorio.contains(e.target)) cerrar(); }
+    function alPulsarTecla(e) { if (e.key === 'Escape') { e.stopPropagation(); cerrar(); } }
+
+    boton.onclick = function (e) {
+      e.stopPropagation();
+      if (abierto()) { cerrar(); return; }
+      menu.classList.remove('oculto');
+      boton.setAttribute('aria-expanded', 'true');
+      document.addEventListener('mousedown', alPulsarFuera, true);
+      document.addEventListener('keydown', alPulsarTecla, true);
+    };
+
+    /* Al elegir cualquiera de los botones del menú, se cierra: el click
+       ya ha disparado el onclick propio del botón (que puede seguir
+       siendo async) antes de llegar aquí, así que no se le quita nada. */
+    menu.addEventListener('click', function (e) {
+      if (e.target && e.target.closest && e.target.closest('button')) cerrar();
+    });
+
+    envoltorio.appendChild(boton);
+    envoltorio.appendChild(menu);
+    return envoltorio;
+  }
+
   return {
     normalizar: normalizar, limpiarNombre: limpiarNombre, hoyIso: hoyIso,
     aAaMmDd: aAaMmDd, fechaLegible: fechaLegible, cursoActual: cursoActual,
@@ -416,6 +486,6 @@ var U = (function () {
     aFecha: aFecha, yaPaso: yaPaso,
     ahora: ahora, aviso: aviso, preguntar: preguntar, escapar: escapar, mensajeDeError: mensajeDeError,
     parecidos: parecidos, dejaCrear: dejaCrear, mientrasGuarda: mientrasGuarda,
-    conservandoLoEscrito: conservandoLoEscrito
+    conservandoLoEscrito: conservandoLoEscrito, menuDeAcciones: menuDeAcciones
   };
 })();

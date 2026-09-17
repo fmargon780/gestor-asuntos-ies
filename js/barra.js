@@ -150,12 +150,43 @@
     titulo.parentNode.insertBefore(b, titulo.nextSibling);
   }
 
+  /* ---------- se pliega sola al abrir el visor o el lector ----------
+
+     (17-sep-2026, fila 36, docs/FILAS-QUE-NO-SE-ESTRUJAN.md). Con la
+     barra abierta y el panel de la derecha también abierto, la zona de
+     trabajo se queda en nada. `js/visor.js` y `js/lector.js` ponen y
+     quitan `con-visor`/`con-lector` en `<body>`; aquí solo se vigilan
+     esas dos clases, sin que ninguno de los dos sepa nada de la barra.
+
+     Sin tocar `localStorage`: es un plegado de paso, no un cambio de
+     lo que él prefiere. Al desaparecer las dos, vuelve a como estaba. */
+  function hayPanelAbierto() {
+    return document.body.classList.contains('con-visor') ||
+           document.body.classList.contains('con-lector');
+  }
+
+  function vigilarPaneles() {
+    if (!window.MutationObserver) return;
+    new MutationObserver(function () {
+      /* Si ya está como toca, no se toca nada: así no se dispara en
+         bucle (el propio poner() no cambia ninguna clase de <body>,
+         así que este observador no se llama a sí mismo, pero tampoco
+         hace falta trabajar de más en cada mutación ajena). */
+      if (hayPanelAbierto()) {
+        if (!estaPlegada()) poner('plegada');
+      } else if (estaPlegada() !== (comoEstaba() === 'plegada')) {
+        poner(comoEstaba());
+      }
+    }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  }
+
   function arrancar() {
     ponerElBoton();
     ponerElBotonDeAjustes();
     ponerLaEntradaDeQueMeToca();
     ponerElDeNuevoAsunto();
     poner(comoEstaba());
+    vigilarPaneles();
   }
 
   arrancar();

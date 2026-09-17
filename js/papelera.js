@@ -586,7 +586,7 @@ var Papelera = (function () {
       var div = comoEra(s, pie, esNuevo);
       var acciones = div.querySelector('.acciones');
       if (!acciones) return div;
-      acciones.appendChild(botonBorrar(async function () {
+      var borrar = botonBorrar(async function () {
         var ok = await preguntarBorrar(s.nombre);
         if (!ok) return;
         try {
@@ -596,7 +596,13 @@ var Papelera = (function () {
         } catch (e) {
           U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
         }
-      }));
+      });
+      /* Entra el último del menú de tres puntos que ya monta
+         js/documentos-sueltos.js (17-sep-2026, fila 36); sin menú (no
+         debería darse: "Abrir" siempre lo crea), se cae en la fila. */
+      var menu = acciones.querySelector('.fila-menu');
+      if (menu) menu.appendChild(borrar);
+      else acciones.appendChild(borrar);
       return div;
     };
   })();

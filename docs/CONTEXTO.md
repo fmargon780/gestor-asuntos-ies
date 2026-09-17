@@ -89,10 +89,36 @@ la página y vuelve a la pantalla de entrada, con las carpetas ya señaladas. Pi
 **La barra de la izquierda** (`js/barra.js`, `css/barra.css`). Se pliega y nace plegada; un
 botón de tres rayas la abre y la cierra; al elegir una pantalla se vuelve a plegar sola; se
 recuerda en `gestor-barra`. **Queda fija en pantalla** (`position:fixed`); el contenido se
-desplaza con `margin-left` (232px, o 52px plegada). Ajustes está en la lista de pestañas,
-separado por una línea (`.separador-lateral`); con la barra plegada, un icono de rueda dentada
-(`#btn-barra-ajustes`) lleva directo a Ajustes. El botón grande "+ Nuevo asunto" va en la
-cabecera de Asuntos abiertos, y lo pone el mismo fichero.
+desplaza con `margin-left` (232px, o 52px plegada, **sin tope de ancho**: quitado en la fila 36,
+17-sep-2026, porque dejaba franjas vacías en un monitor ancho). Ajustes está en la lista de
+pestañas, separado por una línea (`.separador-lateral`); con la barra plegada, un icono de rueda
+dentada (`#btn-barra-ajustes`) lleva directo a Ajustes. El botón grande "+ Nuevo asunto" va en la
+cabecera de Asuntos abiertos, y lo pone el mismo fichero. **Se pliega sola al abrir el visor o el
+lector** (un `MutationObserver` sobre las clases `con-visor`/`con-lector` de `<body>`, sin tocar
+`gestor-barra`) y vuelve a como estaba al cerrarlo.
+
+**Que ninguna fila se aplaste** (`css/filas.css`, fila 36, 17-sep-2026,
+`docs/FILAS-QUE-NO-SE-ESTRUJAN.md`). Antes, una fila con texto y varios botones en línea
+(`display:flex` sin `flex-wrap`) dejaba que el texto fuera el único que cediera: con el panel de
+la derecha abierto, o en una ventana estrecha, el nombre de un documento acababa a un carácter
+por renglón. `css/filas.css`, enlazado el último de todos en `index.html` para ganar a las reglas
+de módulo, pone la regla general: el texto de una fila tiene un ancho mínimo (nunca cede por
+debajo), y los botones bajan a una segunda línea antes que estrujarlo. Aplicado a
+`.ficha-documento-fila`, `.relacionado-fila`, `.hito-linea` y `.fila-tipo`; `.rejilla-tipos` y
+`#lista-personas` ya envolvían bien y no se han tocado. **`U.menuDeAcciones(botones)`**
+(`js/util.js`) es el menú de tres puntos compartido: recibe una lista de `<button>` ya montados y
+devuelve un envoltorio con un botón "⋮" que los despliega debajo, anclado a él (se cierra al
+elegir uno, al pulsar fuera o con Escape); los botones viven siempre en el DOM, ocultos con la
+clase `oculto`, así que `aplicarModoConsulta` (que recorre `#ficha-asunto-cuerpo` entero) los
+apaga igual que a los demás sin necesitar ningún caso especial. En `js/ficha-documentos.js`
+(`filaDeDocumento`) solo quedan a la vista el nombre y "Registrar" (cuando sale); Copiar (que lo
+sigue añadiendo `js/copiar.js`, por envoltura, buscando el `.fila-menu` ya montado), Separar,
+Unir, Sacar páginas y Borrar van al menú. En `js/documentos-sueltos.js` (`App.tarjetaSuelto`, las
+tarjetas de "Por clasificar") quedan a la vista "Crear asunto con él" y "Meter en un asunto";
+Abrir, Separar, Unir, Sacar páginas y Borrar (que lo sigue añadiendo `js/papelera.js`, por
+envoltura) van al menú — `App.accionesDeSuelto` (fila 25, reutilizado dentro del visor) busca
+"Abrir" por su texto en cualquier profundidad, ya no solo entre los hijos directos. Se comprueba
+con `pruebas/filas-estrechas.mjs`, en navegador de verdad.
 
 **El panel de lectura de la derecha** (`js/lector.js`). Se cierra con la equis o con Escape. El
 borde izquierdo se arrastra; el ancho se recuerda (`gestor-lector-ancho`); doble clic vuelve al
@@ -1521,6 +1547,18 @@ El `?v=` es imprescindible: sin él se puede recibir una copia guardada.
   prueba en navegador de `pruebas/`.
 - **El conector de Vercel no sirve para esto:** da 403 y 404.
 - `vercel.json` manda `Cache-Control: public, max-age=0, must-revalidate` para todo.
+- **El plan gratuito (Hobby) solo da 100 publicaciones al día** (fila 48, 17-sep-2026,
+  `docs/NO-GASTAR-PUBLICACIONES.md`): se agotaron una vez, con `main` recibiendo 100 commits en
+  un día, más de la mitad de ellos solo `docs/COLA.md` y compañía, y cada push a una rama
+  `claude/...` con pull request abierto gastando además su propia vista previa. `vercel.json`
+  gana `ignoreCommand`: se salta la publicación cuando la rama no es `main`, o cuando el cambio
+  solo toca `docs/`, `pruebas/`, `.github/` o ficheros `.md` (comparando contra
+  `VERCEL_GIT_PREVIOUS_SHA`, el commit de la última publicación buena, no siempre `HEAD^`: con
+  dos commits en el mismo push —código y luego documentos— comparar solo con `HEAD^` se saltaría
+  la publicación del código). Ante cualquier duda, publica. **`ignoreCommand` no puede pasar de
+  256 caracteres** (Vercel lo rechaza si se pasa: pasó la primera vez, con 296): la receta vive
+  en `scripts/vercel-ignore-build.sh`, y `ignoreCommand` solo lo llama. Y la regla 13 de
+  `docs/COLA.md`: como mucho dos subidas por fila. Prueba: `pruebas/vercel-ignore-command.mjs`.
 
 ### Ficheros del repositorio
 
