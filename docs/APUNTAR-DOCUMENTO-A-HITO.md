@@ -1,7 +1,7 @@
 # Apuntar un documento a un hito
 
 Acordado con Francisco el 17-sep-2026, después de crear sus primeros hitos y no encontrar la
-forma de asociarles un documento. Es la fila 30 de `docs/COLA.md`.
+forma de asociarles un documento. Es la fila 31 de `docs/COLA.md`.
 
 No es una función nueva: es la mitad que falta de la fila 15 (`docs/HITOS.md`, sección 5). El
 modelo ya guarda los documentos apuntados, la lista ya se pinta y el botón de quitar (✕) ya
@@ -104,5 +104,5 @@ Después, `npm test` entero una vez, y comprobar lo publicado con `curl`.
 - Actualiza `docs/CONTEXTO-CORTO.md` y `docs/CONTEXTO.md` **sustituyendo la línea vieja, no
   añadiendo una debajo** (la línea de hitos de la sección 5 gana los documentos apuntados).
 - Anota en `docs/HISTORIA.md` lo que merezca recordarse, con su fecha.
-- Marca la fila 30 de `docs/COLA.md` como HECHA, con la versión publicada.
+- Marca la fila 31 de `docs/COLA.md` como HECHA, con la versión publicada.
 - Mensaje final a Francisco: tres frases, qué va a ver en un hito y dónde está el botón.
