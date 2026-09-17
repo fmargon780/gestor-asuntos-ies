@@ -35,6 +35,14 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     contenido entero delante, no lo subas: bájalo antes. El 17-sep-2026 `docs/CONTEXTO.md` se
     quedó en `main` con la palabra `PLACEHOLDER_WILL_REPLACE` y nada más, y hubo que recuperarlo
     del historial de git. Después de subir, vuelve a bajar lo subido y compruébalo.
+12. **Algunas sesiones no pueden subir un fichero de más de unos 45-50 KB de una sola vez**:
+    la llamada que sube el contenido se corta sola sin avisar de ningún error, y el fichero queda
+    en `main` con solo el primer trozo. Pasó el 17-sep-2026 con `docs/HISTORIA.md` (ver la nota al
+    final de esta cola). **Antes de subir un fichero grande** (`docs/CONTEXTO.md`,
+    `docs/HISTORIA.md`), compruébalo después de subirlo (`get_file_contents` o
+    `git show origin/main:<ruta>`) y compara el tamaño con el de antes de escribirlo: si ha
+    quedado más corto de lo esperado, esa sesión no puede con este fichero de una vez, y hay que
+    dejarlo apuntado aquí en vez de reintentarlo mil veces.
 
 ## Reglas para Francisco
 
@@ -112,8 +120,29 @@ Ojo, volvió a desandarse una vez: el commit de las filas 36 y 37 (17-sep-2026) 
 vieja de esta cola y dejó otra vez la nota como "Pendiente de arreglar", aunque el fichero ya
 estaba bien. Lo devolvió a su sitio la sesión de la fila 35. **`docs/CONTEXTO.md` está entero.**
 
-`docs/HISTORIA.md` no ha hecho falta tocarlo: nunca llegó a romperse, y lo que merecía contarse de
-las filas 33, 34 y 35 ya está en sus propias filas de esta cola.
+## Pendiente de arreglar: `docs/HISTORIA.md` (roto el 17-sep-2026 por la tarde)
+
+`docs/HISTORIA.md` **no hacía falta tocarlo**: como dice la nota de la fila 35, lo que merecía
+contarse de las filas 33, 34 y 35 ya está en sus propias filas de esta cola. Pero una sesión
+posterior, sin ver esa nota, intentó de todas formas añadirle una entrada de la fila 33 al final
+del diario. Esa sesión concreta no puede escribir de una sola vez un fichero de más de unos
+45-50 KB (regla 12 de esta cola): la llamada que sube el contenido se corta sola, sin ningún
+error, y deja el fichero con solo el primer trozo. Pasó dos veces seguidas, con `docs/HISTORIA.md`
+(138 KB): la primera dejó el fichero en 44 KB, la segunda en 48.766 bytes (donde sigue ahora), muy
+lejos de sus 138.402 bytes de verdad.
+
+**Cómo arreglarlo** (necesita una sesión que pueda subir un fichero grande de una vez, o hacerlo
+con varias llamadas pequeñas sin perder ningún trozo por el camino):
+
+    git checkout 0aea5b3daa4170c46b1c47af18e8dc29bbe81a87 -- docs/HISTORIA.md
+
+Esa es la última versión buena conocida antes de este percance (blob
+`ad53467e3d2493cd4bdadf5ff96ad25e04be4b30`, 138.402 bytes). **No hace falta añadirle nada más**:
+como ya decía la nota de la fila 35, el diario no necesitaba ninguna entrada nueva por las filas
+33, 34 o 35. Después de restaurarlo, comprobar el tamaño (138.402 bytes) antes de darlo por
+bueno.
+
+`docs/CONTEXTO.md` no se ha tocado en este percance: sigue entero, como dice la nota de arriba.
 
 ## Lo que vendrá después
 
