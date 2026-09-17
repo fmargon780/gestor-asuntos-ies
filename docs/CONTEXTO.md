@@ -78,7 +78,10 @@ el resto del año, cada 30.
 **La versión, a la vista** (`App.VERSION`, en `js/version.js`). En la pantalla de entrada y,
 dentro, abajo a la izquierda. Se cambia cada vez que se publica algo que Francisco tenga que ver,
 con fecha y hora de España (`10-sep-2026 · 13:55`). Sirve también para comprobar que Vercel ha
-publicado de verdad (ver la sección 8).
+publicado de verdad (ver la sección 8). **La hora tiene que ser la real**, sacada del reloj
+(`TZ='Europe/Madrid' date`), nunca a ojo ni sumando algo a la de antes: el 17-sep-2026 Francisco
+avisó de que estaban saliendo versiones con horas por delante de la de verdad (comentario con la
+receta exacta en `js/version.js`).
 
 **Botón de Salir** (`js/salir.js`). Al pie de la barra de la izquierda. Cierra la sesión: recarga
 la página y vuelve a la pantalla de entrada, con las carpetas ya señaladas. Pide confirmación.
