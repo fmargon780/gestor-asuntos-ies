@@ -41,6 +41,7 @@
     actual = a;
     modoActual = modo || 'abierto';
     ocupacionActual = null;
+    huellaPintada = null;      /* ficha nueva: nada que comparar todavía */
     App.ir('asunto');
     pintar();
 
@@ -83,14 +84,87 @@
      asunto nunca echan a Francisco a la lista, solo refrescan lo que
      tienen delante. Si el asunto ya no está en absoluto (se ha
      archivado o borrado desde el otro ordenador), entonces sí se
-     vuelve, con un aviso de una línea. */
+     vuelve, con un aviso de una línea.
+
+     ...pero solo se repinta SI DE VERDAD HA CAMBIADO ALGO (17-sep-2026,
+     fila 34). Antes se repintaba en cada pasada: bastaba con que el
+     compañero dejara un papel suelto en "Por clasificar" para que la
+     ficha abierta se rehiciera entera y se llevara por delante la nota
+     a medio escribir. Ahora se compara una huella de texto del asunto
+     con la de lo que ya se está enseñando. */
+  var huellaPintada = null;
+
+  /* La huella va en dos mitades a propósito. Los hitos no los pinta
+     este fichero, sino js/hitos-panel.js dentro de #ficha-guia: si solo
+     han cambiado ellos, repintar la ficha entera sería tirar abajo
+     media pantalla para nada, y de paso se llevaría por delante la
+     nota de hito a medio escribir. Con las dos mitades separadas, un
+     cambio de hitos se le pide al panel de hitos, que ya sabe
+     conservar lo suyo. */
+  async function huellaDe(a) {
+    if (!a) return { ficha: '', hitos: '' };
+    var trozos = [a.nombre, JSON.stringify(a.leido || {}), JSON.stringify(a.ficha || {})];
+    try {
+      var ficheros = await Carpetas.ficheros(a.handle);
+      trozos.push(ficheros.map(function (f) { return f.nombre; }).join('|'));
+    } catch (e) { trozos.push('carpeta-ilegible'); }
+
+    var hitos;
+    try {
+      var datos = window.Hitos ? await window.Hitos.leer() : null;
+      var entrada = datos && datos.porAsunto[a.nombre];
+      hitos = JSON.stringify(entrada ? entrada.hitos : []);
+    } catch (e) { hitos = 'hitos-ilegibles'; }
+
+    return { ficha: trozos.join('\n'), hitos: hitos };
+  }
+
+  /* Después de pintar se apunta la huella de lo que ha quedado en
+     pantalla, para que la siguiente pasada tenga con qué comparar. */
+  function apuntarHuella() {
+    var a = actual;
+    return huellaDe(a).then(function (huella) { if (actual === a) huellaPintada = huella; });
+  }
+
   App.reengancharFicha = function () {
-    if (!fichaVisible() || modoActual !== 'abierto') return;
+    if (!fichaVisible() || modoActual !== 'abierto') return Promise.resolve();
     var mismo = App.E.listaAbiertos.filter(function (x) { return x.nombre === actual.nombre; })[0];
-    if (mismo) { actual = mismo; pintar(); return; }
-    U.aviso('Este asunto ya no está en Asuntos abiertos: puede que se haya archivado o ' +
-      'borrado desde el otro ordenador.', 'malo');
-    volverALaLista();
+    if (!mismo) {
+      U.aviso('Este asunto ya no está en Asuntos abiertos: puede que se haya archivado o ' +
+        'borrado desde el otro ordenador.', 'malo');
+      volverALaLista();
+      return Promise.resolve();
+    }
+    /* Los datos frescos se le meten DENTRO al objeto que la ficha ya
+       tiene en la mano, en vez de cambiarlo por el nuevo, y es ese el
+       que se queda en la lista. Los botones ya pintados se quedaron
+       con el objeto de su repintado: mientras la pantalla se deja
+       quieta (que desde la fila 34 es lo normal), cambiarlo por otro
+       los dejaría apuntando a datos viejos —Archivar, por ejemplo,
+       volvía a preguntar "¿Dónde va esta carpeta?" con la categoría ya
+       puesta—. Con esto, un asunto es un solo objeto en toda la
+       aplicación, y quien lo tenga cogido ve siempre lo último. */
+    if (mismo !== actual) {
+      actual.handle = mismo.handle;
+      actual.leido = mismo.leido;
+      actual.ficha = mismo.ficha;
+      actual.busca = mismo.busca;
+      App.E.listaAbiertos[App.E.listaAbiertos.indexOf(mismo)] = actual;
+    }
+
+    var elDeLaFicha = actual;
+    return huellaDe(elDeLaFicha).then(function (huella) {
+      if (actual !== elDeLaFicha || !fichaVisible()) return;
+      var antes = huellaPintada || { ficha: null, hitos: null };
+      huellaPintada = huella;
+      /* Nada ha cambiado: la pantalla se deja quieta. Esto es lo que
+         quita el temblor de cada 20 segundos. */
+      if (huella.ficha === antes.ficha && huella.hitos === antes.hitos) return;
+      if (huella.ficha !== antes.ficha) { pintar(); return; }
+      /* Solo han cambiado los hitos (el otro ordenador ha marcado uno,
+         por ejemplo): se repinta su panel, no la ficha entera. */
+      if (window.HitosPanel) window.HitosPanel.programarRepintado();
+    });
   };
 
   /* App.verAbiertos (js/asuntos-lista.js) relee la carpeta entera y
@@ -103,7 +177,7 @@
     var comoEraVerAbiertos = App.verAbiertos;
     App.verAbiertos = async function (yaLeido) {
       await comoEraVerAbiertos(yaLeido);
-      App.reengancharFicha();
+      await App.reengancharFicha();
     };
   }
 
@@ -178,7 +252,18 @@
     }).join('') + '</div>';
   }
 
+  /* La ficha entera se rehace con innerHTML, y con ella el campo de la
+     nota nueva: el repintado pasa por U.conservandoLoEscrito para que
+     lo que se esté escribiendo, el foco y el cursor sobrevivan
+     (17-sep-2026, fila 34). Y al terminar se apunta la huella de lo
+     que ha quedado en pantalla. */
   function pintar() {
+    var salida = U.conservandoLoEscrito($('ficha-asunto-cuerpo'), pintarLaFicha);
+    if (actual) apuntarHuella();
+    return salida;
+  }
+
+  function pintarLaFicha() {
     var a = actual;
     var caja = $('ficha-asunto-cuerpo');
     if (!a || !caja) return;
@@ -756,7 +841,16 @@
 
   /* ---------- las notas, escritas aquí mismo ---------- */
 
+  /* pintarNotas también se llama por su cuenta (al asociar un sello, al
+     borrar un documento con nota): pasa por la misma ayuda, para que
+     una nota a medio escribir no se pierda tampoco por ahí. */
   function pintarNotas(a, abierto) {
+    return U.conservandoLoEscrito($('ficha-notas'), function () {
+      return pintarLasNotas(a, abierto);
+    });
+  }
+
+  function pintarLasNotas(a, abierto) {
     var caja = $('ficha-notas');
     if (!caja || !window.Notas) return;
     var notas = window.Notas.de(a);
