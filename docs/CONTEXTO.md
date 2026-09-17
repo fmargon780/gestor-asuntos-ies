@@ -754,15 +754,18 @@ con un cuadro pequeño y flotante: buscador (sin mayúsculas ni tildes), lista n
 y Enter, y Escape que cierra sin insertar (con su propio `stopPropagation`, como piden las reglas
 de Escape de la sección "La ficha de un asunto").
 
-`U.engancharInsertarHueco(boton, campos, huecos, alInsertar)`, en `js/util.js`, es la ayuda
-reutilizable: no pasa por `U.preguntar` (el editor de la plantilla ya está usando el único cuadro
-de diálogo que hay), sino que crea su propio elemento flotante junto al botón. `campos` es la
-lista de textarea/input donde puede entrar un hueco; se recuerda cuál tuvo el foco por última vez
-(guardando su cursor al perderlo, en el `blur`, porque abrir el buscador se lo quita a todos) y
-ahí entra el hueco elegido, o al final del último campo de la lista si no se ha tocado ninguno
-todavía. Hoy solo se usa con un campo (`#pl-texto`): el editor no tiene ningún campo de "asunto
-del correo" con huecos (ese asunto lo monta solo `js/correo.js`), así que la parte de "recordar
-cuál de varios campos" queda lista pero sin un segundo campo real que la ejerza.
+`js/huecos-buscador.js` (`window.HuecosBuscador`), fichero nuevo cargado antes de
+`js/plantillas-ajustes.js`, es la pieza reutilizable: `HuecosBuscador.montar({ boton, campos,
+huecos })` no pasa por `U.preguntar` (el editor de la plantilla ya está usando el único cuadro de
+diálogo que hay), sino que cuelga el buscador del `<body>` con `position:fixed`, por encima de
+`#capa` y por debajo de los mensajes, calculado a partir de dónde esté el botón (mismo patrón de
+cierre que `App.botonMenuTarjeta`: mousedown fuera o Escape, los dos en fase de captura). `campos`
+es la lista de textarea/input donde puede entrar un hueco, en el orden del formulario; se recuerda
+cuál tuvo el foco por última vez (guardando su cursor al perderlo, porque abrir el buscador se lo
+quita a todos) y ahí entra el hueco elegido, o al final del último campo de la lista si no se ha
+tocado ninguno todavía. Hoy solo se usa con un campo (`#pl-texto`): el editor no tiene ningún campo
+de "asunto del correo" con huecos (ese asunto lo monta solo `js/correo.js`), así que la parte de
+"recordar cuál de varios campos" queda lista pero sin un segundo campo real que la ejerza.
 
 `js/plantillas-documento.js` tiene su propia lista de huecos (`#pd-huecos`), pero es una tabla de
 referencia con botón "Copiar" (el documento se edita en Word, fuera de la aplicación: no hay

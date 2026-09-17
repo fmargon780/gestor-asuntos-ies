@@ -384,112 +384,6 @@ var U = (function () {
     return salida;
   }
 
-  /* ============================================================
-     "Insertar hueco": un botón y un cuadro pequeño con buscador, en
-     vez de un muro de un botón por cada hueco (17-sep-2026, fila 35,
-     docs/HUECOS-INSERTAR.md). No pasa por `preguntar`: se abre encima
-     de sitios que ya están dentro del único cuadro de diálogo que hay
-     (el editor de una plantilla), así que es un elemento flotante
-     propio, con su propio Escape (parada aquí, sin disparar el Escape
-     general de `usabilidad.js`).
-
-     `campos` es la lista de textarea/input donde puede entrar un
-     hueco, en el orden en que se prueban por defecto. Se recuerda cuál
-     tuvo el foco la última vez (guardando también su cursor al
-     perderlo: al abrir el buscador el foco se va de todos) y ahí
-     entra el hueco elegido; si no se ha tocado ninguno todavía, entra
-     al final del último de la lista. `huecos` es `Plantillas.HUECOS`
-     (`{ clave, etiqueta }`); `alInsertar`, opcional, se llama después
-     de insertar (para repintar una vista previa, por ejemplo). */
-  function engancharInsertarHueco(boton, campos, huecos, alInsertar) {
-    if (!boton) return;
-    var ultimo = null;   /* { campo, inicio, fin } */
-    campos.forEach(function (campo) {
-      campo.addEventListener('blur', function () {
-        ultimo = { campo: campo, inicio: campo.selectionStart, fin: campo.selectionEnd };
-      });
-    });
-
-    var envoltorio = document.createElement('span');
-    envoltorio.className = 'hueco-insertar-envoltorio';
-    boton.parentNode.insertBefore(envoltorio, boton);
-    envoltorio.appendChild(boton);
-
-    var popover = null;
-    function cerrar() {
-      if (!popover) return;
-      popover.remove();
-      popover = null;
-      document.removeEventListener('mousedown', alPulsarFuera, true);
-      document.removeEventListener('keydown', alPulsarTecla, true);
-    }
-    function alPulsarFuera(ev) { if (!envoltorio.contains(ev.target)) cerrar(); }
-    function alPulsarTecla(ev) { if (ev.key === 'Escape') { ev.stopPropagation(); cerrar(); } }
-
-    function insertar(clave) {
-      var conFoco = ultimo && campos.indexOf(ultimo.campo) !== -1 ? ultimo : null;
-      var campo = conFoco ? conFoco.campo : campos[campos.length - 1];
-      var inicio = conFoco ? conFoco.inicio : campo.value.length;
-      var fin = conFoco ? conFoco.fin : campo.value.length;
-      var texto = '{' + clave + '}';
-      campo.value = campo.value.slice(0, inicio) + texto + campo.value.slice(fin);
-      cerrar();
-      campo.focus();
-      campo.selectionStart = campo.selectionEnd = inicio + texto.length;
-      ultimo = { campo: campo, inicio: campo.selectionStart, fin: campo.selectionEnd };
-      if (alInsertar) alInsertar();
-    }
-
-    boton.onclick = function (ev) {
-      ev.stopPropagation();
-      if (popover) { cerrar(); return; }
-
-      popover = document.createElement('div');
-      popover.className = 'hueco-popover';
-      popover.innerHTML =
-        '<input type="text" class="campo hueco-popover-buscar" placeholder="Buscar un hueco…">' +
-        '<div class="hueco-popover-lista"></div>';
-      envoltorio.appendChild(popover);
-
-      var buscar = popover.querySelector('.hueco-popover-buscar');
-      var lista = popover.querySelector('.hueco-popover-lista');
-      var filtrados = [];
-      var activo = 0;
-
-      function pintar() {
-        var q = normalizar(buscar.value);
-        filtrados = huecos.filter(function (h) {
-          return !q || normalizar(h.etiqueta + ' ' + h.clave).indexOf(q) !== -1;
-        });
-        if (activo >= filtrados.length) activo = filtrados.length - 1;
-        if (activo < 0) activo = 0;
-        lista.innerHTML = '';
-        if (!filtrados.length) {
-          lista.innerHTML = '<div class="hueco-popover-vacio">Nada encaja con eso.</div>';
-          return;
-        }
-        filtrados.forEach(function (h, i) {
-          var fila = document.createElement('div');
-          fila.className = 'hueco-popover-item' + (i === activo ? ' activo' : '');
-          fila.innerHTML = '<span>' + escapar(h.etiqueta) + '</span><code>{' + escapar(h.clave) + '}</code>';
-          fila.onmousedown = function (evf) { evf.preventDefault(); insertar(h.clave); };
-          lista.appendChild(fila);
-        });
-      }
-
-      buscar.oninput = pintar;
-      buscar.onkeydown = function (evt) {
-        if (evt.key === 'ArrowDown') { evt.preventDefault(); activo++; pintar(); }
-        else if (evt.key === 'ArrowUp') { evt.preventDefault(); activo--; pintar(); }
-        else if (evt.key === 'Enter') { evt.preventDefault(); if (filtrados[activo]) insertar(filtrados[activo].clave); }
-      };
-      pintar();
-      buscar.focus();
-      document.addEventListener('mousedown', alPulsarFuera, true);
-      document.addEventListener('keydown', alPulsarTecla, true);
-    };
-  }
-
   return {
     normalizar: normalizar, limpiarNombre: limpiarNombre, hoyIso: hoyIso,
     aAaMmDd: aAaMmDd, fechaLegible: fechaLegible, cursoActual: cursoActual,
@@ -497,6 +391,6 @@ var U = (function () {
     aFecha: aFecha, yaPaso: yaPaso,
     ahora: ahora, aviso: aviso, preguntar: preguntar, escapar: escapar,
     parecidos: parecidos, dejaCrear: dejaCrear, mientrasGuarda: mientrasGuarda,
-    conservandoLoEscrito: conservandoLoEscrito, engancharInsertarHueco: engancharInsertarHueco
+    conservandoLoEscrito: conservandoLoEscrito
   };
 })();

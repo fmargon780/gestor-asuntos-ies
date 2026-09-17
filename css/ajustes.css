@@ -166,25 +166,43 @@
   .buscar-tipos { max-width: none; }
 }
 
-/* ---------- "Insertar hueco" (fila 35, docs/HUECOS-INSERTAR.md) ----------
+/* ---------- el cuadro de "Insertar hueco" ----------
 
-   Un botón y un buscador flotante, en vez del muro de un botón por
-   hueco de antes: con más de treinta huecos, ocupaba casi toda la
-   pantalla y tapaba el resto del formulario. */
-.hueco-insertar-fila { margin: 4px 0 10px; }
-.hueco-insertar-envoltorio { position: relative; display: inline-block; }
-.hueco-popover {
-  position: absolute; top: calc(100% + 4px); left: 0; z-index: 9;
-  background: var(--papel); border: 1px solid var(--linea); border-radius: 8px;
-  box-shadow: var(--sombra); width: 320px; max-width: 90vw; padding: 8px;
+   17-sep-2026, docs/HUECOS-INSERTAR.md. Sustituye al muro de más de
+   treinta botones que se pintaba encima del texto de una plantilla.
+   Va colgado del <body>, con position:fixed, por encima de la capa
+   del cuadro de la plantilla (z-index 50) y por debajo de los
+   mensajes de abajo a la derecha (60). Quien lo pinta:
+   js/huecos-buscador.js. */
+.boton-hueco { padding: 5px 10px; font-size: 13px; }
+
+.etiqueta-con-boton {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap;
 }
-.hueco-popover-buscar { width: 100%; box-sizing: border-box; }
-.hueco-popover-lista { max-height: 260px; overflow-y: auto; margin-top: 6px; }
-.hueco-popover-item {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  padding: 7px 8px; border-radius: 6px; cursor: pointer; font-size: 13.5px;
+.etiqueta-con-boton .etiqueta { margin-bottom: 0; }
+
+.huecos-cuadro {
+  position: fixed; z-index: 55;
+  background: var(--papel); border: 1px solid var(--linea); border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(10,25,45,.25);
+  padding: 8px; display: flex; flex-direction: column; gap: 6px;
 }
-.hueco-popover-item span { color: var(--tinta); }
-.hueco-popover-item code { color: var(--tinta-suave); font-size: 12px; white-space: nowrap; }
-.hueco-popover-item:hover, .hueco-popover-item.activo { background: #f0f3f7; }
-.hueco-popover-vacio { padding: 8px; color: var(--tinta-suave); font-size: 13.5px; }
+.huecos-cuadro .huecos-buscar { width: 100%; }
+
+.huecos-lista {
+  max-height: 260px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.huecos-opcion {
+  font: inherit; text-align: left; background: none; border: 0;
+  border-radius: 6px; padding: 6px 8px; cursor: pointer; color: var(--tinta);
+  display: flex; flex-direction: column; gap: 1px;
+}
+.huecos-opcion:hover { background: #f0f3f7; }
+.huecos-opcion.elegido { background: var(--azul-claro); }
+.huecos-nombre { font-size: 14px; }
+.huecos-codigo { font-size: 12px; color: var(--tinta-suave); font-family: ui-monospace, Consolas, monospace; }
+
+.huecos-vacio { padding: 10px 8px; color: var(--tinta-suave); font-size: 13.5px; }
+.huecos-pie { margin: 0; padding: 0 4px 2px; font-size: 12px; color: var(--tinta-suave); }

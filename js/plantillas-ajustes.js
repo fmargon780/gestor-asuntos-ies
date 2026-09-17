@@ -231,10 +231,10 @@
       '</div>' +
       '<label class="etiqueta">Nombre de la plantilla</label>' +
       '<input id="pl-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '">' +
-      '<div class="hueco-insertar-fila">' +
-        '<button type="button" class="boton" id="pl-insertar-hueco">Insertar hueco</button>' +
+      '<div class="etiqueta-con-boton">' +
+        '<label class="etiqueta">Texto</label>' +
+        '<button type="button" class="boton boton-hueco" id="pl-insertar-hueco">Insertar hueco</button>' +
       '</div>' +
-      '<label class="etiqueta">Texto</label>' +
       '<textarea id="pl-texto" class="campo" rows="7">' + U.escapar((existente && existente.texto) || '') + '</textarea>' +
       '<label class="etiqueta">Vista previa</label>' +
       '<div class="vista-previa"><div class="vista-nombre" id="pl-previa"></div></div>';
@@ -242,7 +242,17 @@
     var promesa = U.preguntar(existente ? 'Editar plantilla' : 'Nueva plantilla', cuerpo,
       existente ? 'Guardar' : 'Crear');
 
-    U.engancharInsertarHueco($('pl-insertar-hueco'), [$('pl-texto')], Plantillas.HUECOS, pintarPrevia);
+    /* El catálogo de huecos ya no se pinta entero encima del texto:
+       un solo botón abre el buscador de js/huecos-buscador.js
+       (17-sep-2026, docs/HUECOS-INSERTAR.md). `campos` va en el orden
+       del formulario, y el hueco entra en el que tuviera el foco por
+       última vez; sin foco previo, al final del último, que es el
+       cuadro de texto. La vista previa se repinta sola, porque al
+       insertar se lanza un evento `input`. */
+    HuecosBuscador.montar({
+      boton: $('pl-insertar-hueco'),
+      campos: [$('pl-texto')]
+    });
 
     function pintarPrevia() {
       var muestra = datosDeMuestra($('pl-categoria').value, $('pl-tipo').value);
