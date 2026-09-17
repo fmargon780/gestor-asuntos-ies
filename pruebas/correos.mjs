@@ -193,8 +193,10 @@ await comprobar('y de qué correo viene', notas[0] && notas[0].correo, 'hilo-123
 
 /* --- 2 (primera mitad). Al guardar queda la huella del hilo --- */
 await comprobar('al guardar queda apuntada la huella del hilo',
-  fichaDelAsunto(ASUNTO).then(f => f.hilos),
-  [{ id: 'hilo-123', asunto: '260903 flexibilidad 26-27 pacheco pérez, mercedes 019g', visto: 2 }]);
+  fichaDelAsunto(ASUNTO).then(f => (f.hilos || []).map(h => ({ id: h.id, asunto: h.asunto, visto: h.visto, matriculas: h.matriculas }))),
+  [{ id: 'hilo-123', asunto: '260903 flexibilidad 26-27 pacheco pérez, mercedes 019g', visto: 2, matriculas: [] }]);
+await comprobar('y con quién la metió y cuándo (fila 18)',
+  fichaDelAsunto(ASUNTO).then(f => { const h = (f.hilos || [])[0] || {}; return h.metidoPor === 'Francisco' && !!h.metidoEl; }), true);
 await comprobar('y el hilo entra en seguidos.json',
   seguidos().then(s => s && s.hilos.map(h => [h.id, h.visto])), [['hilo-123', 2]]);
 
@@ -277,7 +279,7 @@ await comprobar('6. pintar la bandeja no escribe en asuntos.json',
 await pagina.getByRole('button', { name: 'Guardar en ese asunto' }).click();
 await pagina.waitForTimeout(1100);
 await comprobar('3. el hilo no se duplica: se actualiza `visto`',
-  fichaDelAsunto(ASUNTO).then(f => f.hilos),
+  fichaDelAsunto(ASUNTO).then(f => (f.hilos || []).map(h => ({ id: h.id, asunto: h.asunto, visto: h.visto }))),
   [{ id: 'hilo-123', asunto: 'papeleo varios', visto: 5 }]);
 await comprobar('y seguidos.json se reescribe con lo nuevo',
   seguidos().then(s => s && s.hilos.map(h => [h.id, h.visto])), [['hilo-123', 5]]);
@@ -333,7 +335,7 @@ await pagina.click('#enlace-todos .enlace-asunto');
 await pagina.waitForTimeout(1200);
 
 await comprobar('2. el asunto elegido a mano se queda con la huella',
-  fichaDelAsunto(OTRO).then(f => f.hilos),
+  fichaDelAsunto(OTRO).then(f => (f.hilos || []).map(h => ({ id: h.id, asunto: h.asunto, visto: h.visto }))),
   [{ id: 'hilo-999', asunto: 'un asunto que no se parece a nada de nada', visto: 1 }]);
 await comprobar('y los dos hilos están en seguidos.json',
   seguidos().then(s => s && s.hilos.map(h => h.id).sort()), ['hilo-123', 'hilo-999']);

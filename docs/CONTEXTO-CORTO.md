@@ -69,7 +69,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Correo y mensaje de Séneca preparados; la app no envía nada.
 - Bandeja de correos de Gmail (etiqueta `GESTOR`): a un asunto nuevo, al que adivina, o al que
   eliges a mano con "Elegir asunto". El hilo queda enganchado al asunto (`hilos` en
-  `asuntos.json`) y sus respuestas vuelven solas a la bandeja.
+  `asuntos.json`, con la matrícula del mensaje —el Message-ID— para reconocerlo también desde el
+  otro buzón) y sus respuestas vuelven solas a la bandeja. Lo que ya metió el compañero sale como
+  línea gris, no como tarjeta.
 - "Por clasificar": cada documento suelto se abre, se borra, crea un asunto nuevo, o entra en un
   asunto que ya existe con "Meter en un asunto" (mismo cuadro que la bandeja de correos,
   `js/elegir-asunto.js`). El que se está viendo queda marcado en la lista, con sus mismas

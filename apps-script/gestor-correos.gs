@@ -2,6 +2,11 @@
    "Gestor - Correos", borra todo el contenido del fichero de código y
    pega este entero. Guarda y ejecuta una vez prepararTodo().
 
+   17-sep-2026: guarda la matrícula (Message-ID) de cada mensaje, y
+   sigue los hilos también por matrícula, no solo por identificador de
+   hilo (docs/CORREO-EN-DOS-BUZONES.md, fila 18 de la cola). Si esta
+   fecha no está en la copia pegada en script.google.com, está vieja.
+
    ============================================================
    Gestor de Asuntos — recogida de correos
    Google Apps Script, en la cuenta g.educaand.es
@@ -117,16 +122,55 @@ function seguirHilosConocidos(carpeta) {
     var s = lista[i] || {};
     if (!s.id) continue;
     try {
-      var hilo = GmailApp.getThreadById(s.id);
-      if (!hilo) continue;                       /* hilo borrado: se salta */
+      var hilo = hiloDeSeguido(s);
+      if (!hilo) continue;                       /* no ha pasado por este buzón */
+      var idLocal = hilo.getId();
       var cuantosMensajes = hilo.getMessageCount();
-      var visto = parseInt(s.visto, 10) || 0;
+      var visto = vistoLocal(idLocal, s.visto);
       if (cuantosMensajes <= visto) continue;    /* nada nuevo */
       guardarHilo(hilo, carpeta, s.id);
+      guardarVistoLocal(idLocal, cuantosMensajes);
     } catch (e) {
       Logger.log('El hilo seguido ' + s.id + ' no se ha podido mirar: ' + e.message);
     }
   }
+}
+
+/* El identificador de hilo es de cada buzón: en el que enganchó el
+   correo vale tal cual, pero en el del compañero no existe. Ahí se
+   busca por matrícula (el Message-ID, el mismo en todos los buzones),
+   de la última a la primera: la más reciente es la que más
+   probablemente ha llegado también aquí. Si no aparece ninguna, este
+   correo no ha pasado por este buzón, y se salta sin ruido. */
+function hiloDeSeguido(s) {
+  var hilo = GmailApp.getThreadById(s.id);
+  if (hilo) return hilo;
+  var matriculas = s.matriculas || [];
+  for (var i = matriculas.length - 1; i >= 0; i--) {
+    if (!matriculas[i]) continue;
+    var encontrados = GmailApp.search('rfc822msgid:' + matriculas[i], 0, 1);
+    if (encontrados.length) return encontrados[0];
+  }
+  return null;
+}
+
+/* La cuenta de mensajes vistos es de cada buzón, no compartida: el
+   mismo hilo puede tener un número de mensajes distinto en cada uno
+   (correos internos, borradores, reenvíos que no están en los dos
+   sitios). Comparar con el 'visto' de seguidos.json (que escribe el
+   buzón que enganchó el correo) haría que el hilo se recogiera cada
+   minuto para siempre, o que no se recogiera nunca. Así que la cuenta
+   de este buzón se guarda aparte, en el propio proyecto de Apps
+   Script; solo la primera vez que se seguimos un hilo, sin cuenta
+   propia todavía, se parte del 'visto' compartido (o 1). */
+function vistoLocal(idLocal, vistoCompartido) {
+  var guardado = PropertiesService.getScriptProperties().getProperty('visto:' + idLocal);
+  if (guardado !== null) return parseInt(guardado, 10) || 0;
+  return parseInt(vistoCompartido, 10) || 1;
+}
+
+function guardarVistoLocal(idLocal, cuantosMensajes) {
+  PropertiesService.getScriptProperties().setProperty('visto:' + idLocal, String(cuantosMensajes));
 }
 
 function leerSeguidos(carpeta) {
@@ -170,6 +214,12 @@ function guardarHilo(hilo, carpeta, respuestaDe) {
 
   limpiarRestos(carpeta, id);
 
+  var matriculas = [];
+  for (var i = 0; i < mensajes.length; i++) {
+    var m = matricula(mensajes[i]);
+    if (m && matriculas.indexOf(m) === -1) matriculas.push(m);
+  }
+
   var ficha = {
     id: id,
     recogido: ahora(),
@@ -181,6 +231,8 @@ function guardarHilo(hilo, carpeta, respuestaDe) {
     mensajes: mensajes.length,
     texto: recortar(ultimo.getPlainBody(), MAX_LETRAS_TEXTO),
     enlace: enlaceAlHilo(hilo, primero),
+    matriculas: matriculas,
+    matricula: matricula(ultimo),
     pdf: '',
     pdfMensaje: '',
     adjuntos: []
@@ -371,6 +423,17 @@ function direccionesDelHilo(mensajes) {
 function recortar(texto, tope) {
   var t = String(texto || '').replace(/\r/g, '').trim();
   return t.length > tope ? t.slice(0, tope) + '…' : t;
+}
+
+/* El Message-ID de un mensaje, sin los signos `<` `>`: el mismo en
+   todos los buzones por los que pasa (docs/CORREO-EN-DOS-BUZONES.md).
+   Cadena vacía si el mensaje no lo trae. */
+function matricula(mensaje) {
+  try {
+    return String(mensaje.getHeader('Message-ID') || '').replace(/[<>]/g, '').trim().toLowerCase();
+  } catch (e) {
+    return '';
+  }
 }
 
 function escapar(v) {

@@ -282,18 +282,27 @@
      Así que cuando un correo entra en un asunto se apunta la huella de
      su hilo en la ficha del asunto, dentro de _GESTOR/asuntos.json:
 
-       hilos: [ { id: '<id del hilo>', asunto: '<asunto limpio>', visto: 2 } ]
+       hilos: [ { id: '<id del hilo>', asunto: '<asunto limpio>', visto: 2,
+                  matriculas: [ ... ], metidoPor: '...', metidoEl: '...' } ]
 
      `visto` es cuántos mensajes tenía el hilo la última vez. Con eso el
      recolector de Apps Script sabe si han llegado respuestas nuevas
      (ver apps-script/gestor-correos.gs y `seguidos.json`).
 
-     La huella manda sobre la adivinación por texto: si el hilo ya es
+     `matriculas` son los Message-ID del correo que se guardó (el mismo
+     en todos los buzones, al contrario que `id`, que es de cada uno):
+     con ellos el buzón del compañero reconoce que un correo suyo es el
+     mismo que este, aunque su identificador de hilo sea otro (fila 18,
+     "Un mismo correo en dos buzones"). `metidoPor` y `metidoEl` son
+     quién lo guardó y cuándo, para la línea gris de "ya está".
+
+     La huella por identificador de hilo manda sobre la de matrícula, y
+     las dos mandan sobre la adivinación por texto: si el hilo ya es
      conocido, da igual cómo venga escrito el asunto.
 
-     `hilos` es opcional. Los asuntos de antes de esto no lo tienen, y
-     todo sigue funcionando igual que siempre.
-     ========================================================== */
+     `hilos`, `matriculas`, `metidoPor` y `metidoEl` son opcionales. Los
+     asuntos de antes de esto no los tienen, y todo sigue funcionando
+     igual que siempre. */
 
   function asuntoDelHilo(id) {
     if (!id) return null;
@@ -304,17 +313,40 @@
       var hilos = Array.isArray(ficha.hilos) ? ficha.hilos : [];
       for (var h = 0; h < hilos.length; h++) {
         if (hilos[h] && hilos[h].id === id) {
-          return { nombre: nombres[i], ficha: ficha, porHuella: true };
+          return { nombre: nombres[i], ficha: ficha, huella: hilos[h], porHuella: true };
         }
       }
     }
     return null;
   }
 
-  /* Primero la huella, después el texto. */
+  /* Igual que asuntoDelHilo, pero buscando por matrícula: para cada
+     asunto, si alguna matrícula de sus hilos coincide con alguna de
+     las que trae el correo, ese es. */
+  function asuntoDeLaMatricula(matriculas) {
+    if (!matriculas || !matriculas.length) return null;
+    var registro = (App.E.registro && App.E.registro.asuntos) || {};
+    var nombres = Object.keys(registro);
+    for (var i = 0; i < nombres.length; i++) {
+      var ficha = registro[nombres[i]] || {};
+      var hilos = Array.isArray(ficha.hilos) ? ficha.hilos : [];
+      for (var h = 0; h < hilos.length; h++) {
+        var suyas = hilos[h] && hilos[h].matriculas;
+        if (!Array.isArray(suyas)) continue;
+        if (suyas.some(function (m) { return m && matriculas.indexOf(m) !== -1; })) {
+          return { nombre: nombres[i], ficha: ficha, huella: hilos[h], porHuella: true };
+        }
+      }
+    }
+    return null;
+  }
+
+  /* La huella por hilo (propio o del que se contesta), la huella por
+     matrícula, y solo entonces el texto. */
   function asuntoDeEsteCorreo(d) {
     if (!d) return null;
-    return asuntoDelHilo(d.id) || asuntoDelHilo(d.respuestaDe) || asuntoQueYaExiste(d);
+    return asuntoDelHilo(d.id) || asuntoDelHilo(d.respuestaDe) ||
+      asuntoDeLaMatricula(d.matriculas) || asuntoQueYaExiste(d);
   }
 
   function asuntoLimpioDelCorreo(d) {
@@ -347,7 +379,10 @@
       var huella = {
         id: d.id,
         asunto: asuntoLimpioDelCorreo(d),
-        visto: parseInt(d.mensajes, 10) || 1
+        visto: parseInt(d.mensajes, 10) || 1,
+        matriculas: Array.isArray(d.matriculas) ? d.matriculas.filter(Boolean) : [],
+        metidoPor: App.E.usuario,
+        metidoEl: U.ahora()
       };
       var sitio = -1;
       hilos.forEach(function (h, n) { if (h && h.id === d.id) sitio = n; });
@@ -362,21 +397,31 @@
   /* El fichero que lee el recolector de Apps Script. Se reescribe
      entero cada vez que cambia alguna huella: es corto y así nunca se
      queda a medias. Si no se puede escribir, el script sigue haciendo
-     lo de siempre con la etiqueta GESTOR. */
+     lo de siempre con la etiqueta GESTOR.
+
+     Las matrículas de todas las huellas que compartan identificador de
+     hilo se juntan sin repetir: así el recolector del otro buzón puede
+     encontrar el hilo local por cualquiera de ellas (ver
+     apps-script/gestor-correos.gs, hiloDeSeguido). */
   async function escribirSeguidos() {
     if (!carpeta) return;
     try {
       var registro = (App.E.registro && App.E.registro.asuntos) || {};
-      var lista = [];
-      var vistos = {};
+      var porId = {};
       Object.keys(registro).forEach(function (nombre) {
         var hilos = (registro[nombre] || {}).hilos;
         if (!Array.isArray(hilos)) return;
         hilos.forEach(function (h) {
-          if (!h || !h.id || vistos[h.id]) return;
-          vistos[h.id] = true;
-          lista.push({ id: h.id, visto: parseInt(h.visto, 10) || 1, asunto: h.asunto || '' });
+          if (!h || !h.id) return;
+          var e = porId[h.id] || (porId[h.id] = { visto: 0, asunto: '', matriculas: {} });
+          e.visto = parseInt(h.visto, 10) || e.visto || 1;
+          e.asunto = h.asunto || e.asunto;
+          (h.matriculas || []).forEach(function (m) { if (m) e.matriculas[m] = true; });
         });
+      });
+      var lista = Object.keys(porId).map(function (id) {
+        var e = porId[id];
+        return { id: id, visto: e.visto, asunto: e.asunto, matriculas: Object.keys(e.matriculas) };
       });
       await Carpetas.escribirTexto(carpeta, FICHERO_SEGUIDOS,
         JSON.stringify({ hilos: lista }, null, 2));
@@ -546,6 +591,16 @@
     return p[2] + '/' + p[1] + '/' + p[0];
   }
 
+  var MESES_CORTOS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+
+  /* "17-sep-2026 · 09:14", para "lo metió Juan el...". */
+  function fechaHoraLegible(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return String(d.getDate()).padStart(2, '0') + '-' + MESES_CORTOS[d.getMonth()] + '-' + d.getFullYear() +
+      ' · ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+
   function sobre() {
     return '<svg class="tarjeta-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
       'stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">' +
@@ -579,11 +634,28 @@
 
     c.className = 'bandeja';
 
+    /* Un correo que ya metió el compañero en un asunto (fila 18, "Un
+       mismo correo en dos buzones") no es un correo que atender: sale
+       aparte, en una línea gris, nunca mezclado con las tarjetas de
+       verdad. Se reconoce por matrícula, y solo si el hilo de este
+       correo (el propio o el de que responde) no es ya una huella
+       conocida: si lo es, es un correo de este mismo buzón y su
+       tarjeta sale normal. */
+    var normales = [];
+    var yaGuardados = [];
+    correos.forEach(function (item) {
+      var d = item.datos;
+      var porHilo = asuntoDelHilo(d.id) || asuntoDelHilo(d.respuestaDe);
+      var porMatricula = porHilo ? null : asuntoDeLaMatricula(d.matriculas);
+      if (porMatricula) yaGuardados.push({ item: item, encaje: porMatricula });
+      else normales.push(item);
+    });
+
     var cabecera = document.createElement('div');
     cabecera.className = 'rotulo-lista';
     cabecera.innerHTML = '<span class="rotulo-icono rotulo-icono-correo">' + sobre() + '</span>' +
       '<span>Correos por convertir en asunto</span>' +
-      '<span class="cuenta-lista">' + correos.length + '</span>';
+      '<span class="cuenta-lista">' + normales.length + '</span>';
     var mirarYa = document.createElement('button');
     mirarYa.className = 'boton';
     mirarYa.style.marginLeft = 'auto';
@@ -594,8 +666,62 @@
 
     var lista = document.createElement('div');
     lista.className = 'lista';
-    correos.forEach(function (item) { lista.appendChild(tarjeta(item)); });
+    normales.forEach(function (item) { lista.appendChild(tarjeta(item)); });
     c.appendChild(lista);
+
+    if (yaGuardados.length) {
+      var listaGris = document.createElement('div');
+      listaGris.className = 'lista lista-ya-guardados';
+      yaGuardados.forEach(function (g) { listaGris.appendChild(lineaYaGuardado(g.item, g.encaje)); });
+      c.appendChild(listaGris);
+    }
+  }
+
+  /* "Ya está en el asunto «...» · lo metió Juan el 17-sep-2026 · 09:14",
+     con "Abrir el asunto" (si sigue abierto) y "Quitar de mi bandeja"
+     (nunca por la papelera: son copias de trabajo, el correo de verdad
+     sigue en Gmail). */
+  function lineaYaGuardado(item, encaje) {
+    var huella = encaje.huella || {};
+    var archivado = estaArchivado(encaje.ficha);
+    var div = document.createElement('div');
+    div.className = 'linea-ya-guardado';
+
+    var frase = 'Ya está en el asunto «' + U.escapar(encaje.nombre) + '»';
+    if (huella.metidoPor) frase += ' · lo metió ' + U.escapar(huella.metidoPor);
+    if (huella.metidoEl) frase += ' el ' + U.escapar(fechaHoraLegible(huella.metidoEl));
+    if (archivado) frase += ' · <strong>asunto archivado</strong>';
+    div.innerHTML = '<span class="ya-guardado-texto">' + frase + '</span>';
+
+    var acciones = document.createElement('div');
+    acciones.className = 'acciones';
+    if (!archivado) {
+      var abrir = document.createElement('button');
+      abrir.className = 'boton';
+      abrir.textContent = 'Abrir el asunto';
+      abrir.onclick = function () { abrirAsuntoYaGuardado(encaje.nombre); };
+      acciones.appendChild(abrir);
+    }
+    var quitar = document.createElement('button');
+    quitar.className = 'boton';
+    quitar.textContent = 'Quitar de mi bandeja';
+    quitar.onclick = async function () {
+      var ok = await U.preguntar('Quitar de tu bandeja',
+        '<p>Se quita de tu bandeja. El correo de verdad sigue en Gmail, y el asunto sigue como ' +
+        'está.</p>', 'Quitar');
+      if (!ok) return;
+      await borrarDeLaBandeja(item);
+    };
+    acciones.appendChild(quitar);
+    div.appendChild(acciones);
+    return div;
+  }
+
+  function abrirAsuntoYaGuardado(nombreAsunto) {
+    var a = (App.E.listaAbiertos || []).filter(function (x) { return x.nombre === nombreAsunto; })[0];
+    if (!a) { U.aviso('No encuentro ese asunto entre los abiertos.', 'malo'); return; }
+    App.ir('abiertos');
+    App.abrirFicha(a, 'abierto');
   }
 
   function tarjeta(item) {
@@ -1037,7 +1163,9 @@
       '<span class="suave">' +
       (carpeta ? 'Los correos aparecen en la pantalla de asuntos abiertos.'
                : 'Mientras no la señales, esto no hace nada.') +
-      '</span></div>';
+      '</span></div>' +
+      (carpeta ? '<div class="fila-tipo" id="fila-ultimo-correo"><span class="suave">Mirando…</span></div>' : '');
+    if (carpeta) pintarUltimoCorreoRecogido();
 
     botones.innerHTML = '';
     var elegir = document.createElement('button');
@@ -1052,6 +1180,55 @@
       quitar.textContent = 'Dejar de usarla';
       quitar.onclick = olvidarCarpeta;
       botones.appendChild(quitar);
+    }
+  }
+
+  /* ---------- "último correo recogido" (fila 18, punto 4) ----------
+
+     El 17-sep-2026, montando la fila 18, se descubrió que el
+     recolector llevaba seis días dejando los correos en una carpeta
+     GESTOR-BANDEJA distinta de la que leía la aplicación (alguien
+     había movido la de verdad dentro de otra, y el script, que solo
+     busca en la raíz del Drive, se creó una nueva sin decir nada). En
+     pantalla no se veía ningún error: la bandeja estaba siempre vacía.
+
+     Se mira la fecha del propio fichero más nuevo de la carpeta (da
+     igual si es un .json, un PDF o un adjunto): si el recolector deja
+     de escribir aquí, esta fecha deja de moverse, aunque el .json de
+     cada correo se lea bien. Más de tres días, aviso. */
+  var DIAS_DE_AVISO_BANDEJA = 3;
+
+  async function ultimoFicheroRecogido() {
+    if (!carpeta) return null;
+    var lista;
+    try { lista = await Carpetas.ficheros(carpeta); } catch (e) { return null; }
+    var masNuevo = 0;
+    for (var i = 0; i < lista.length; i++) {
+      try {
+        var f = await lista[i].handle.getFile();
+        if (f.lastModified > masNuevo) masNuevo = f.lastModified;
+      } catch (e) { /* un fichero raro no debe tumbar esto */ }
+    }
+    return masNuevo || null;
+  }
+
+  async function pintarUltimoCorreoRecogido() {
+    var t = await ultimoFicheroRecogido();
+    var fila = $('fila-ultimo-correo');
+    if (!fila) return;   /* se ha repintado el bloque, o se ha cerrado Ajustes, mientras tanto */
+
+    if (!t) {
+      fila.innerHTML = '<span class="suave">Todavía no ha llegado ningún correo a esta carpeta.</span>';
+      return;
+    }
+    var dias = Math.floor((Date.now() - t) / (24 * 60 * 60 * 1000));
+    if (dias > DIAS_DE_AVISO_BANDEJA) {
+      fila.innerHTML = '<span class="aviso-en-linea">Último correo recogido: hace ' + dias + ' días. ' +
+        'Si esperabas correos, comprueba que el recolector está dejándolos en esta carpeta y no en ' +
+        'otra con el mismo nombre.</span>';
+    } else {
+      fila.innerHTML = '<span class="suave">Último correo recogido: ' +
+        U.escapar(fechaHoraLegible(new Date(t).toISOString())) + '</span>';
     }
   }
 
