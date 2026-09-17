@@ -22,15 +22,14 @@ general de `js/usabilidad.js`. El hueco elegido entra donde estuviera el cursor 
 texto, sustituyendo lo seleccionado si había algo, y si no se había tocado el campo todavía, al
 final.
 
-La pieza reutilizable es `js/huecos-buscador.js` (`window.HuecosBuscador`, nuevo, cargado antes de
-`js/plantillas-ajustes.js`): `HuecosBuscador.montar({boton, campos, huecos})` cuelga el buscador
-del `<body>` con `position:fixed`, calculado a partir de dónde esté el botón (mismo patrón de
-cierre que `App.botonMenuTarjeta`, en `js/ajustes.js`: mousedown fuera o Escape, los dos en fase de
-captura). `campos` es una lista, por si algún día hace falta más de uno, y se recuerda cuál tuvo el
-foco por última vez, guardando también su cursor al perderlo (porque al abrir el buscador el foco
-se va de todos). **El encargo daba por hecho un segundo campo, el "asunto del correo", que hoy no
-existe**: el editor de una plantilla solo tiene un campo con huecos (`#pl-texto`); el asunto del
-correo lo monta él solo `js/correo.js`, sin plantilla ni huecos.
+La ayuda es reutilizable: `U.engancharInsertarHueco(boton, campos, huecos, alInsertar)`, nueva en
+`js/util.js`, recibe una lista de campos (por si algún día hace falta más de uno) y recuerda cuál
+tuvo el foco por última vez, guardando también su cursor al perderlo (en el propio `blur`, porque
+al abrir el buscador el foco se va de todos). **El encargo daba por hecho un segundo campo, el
+"asunto del correo", que hoy no existe**: el editor de una plantilla solo tiene un campo con
+huecos (`#pl-texto`); el asunto del correo lo monta él solo `js/correo.js`, sin plantilla ni
+huecos. La ayuda queda lista para un segundo campo si se añade alguna vez, pero no se ha inventado
+ninguno para poder probarlo.
 
 Revisado también `js/plantillas-documento.js` (el editor de plantillas de Word), que tiene su
 propia lista de huecos (`#pd-huecos`): es una tabla de referencia con botón "Copiar", no un muro
@@ -40,15 +39,9 @@ tocado; tampoco `js/plantillas.js`, que ya exponía `Plantillas.HUECOS` como `{c
 
 Prueba nueva `pruebas/plantillas-huecos.mjs`, en navegador de verdad: ya no existe el muro, el
 buscador filtra, el hueco entra en el sitio exacto del cursor o al final si no se había tocado el
-campo, Escape cierra sin insertar y sin propagarse, y la vista previa se actualiza sola. Batería
-completa en verde.
-
-**Dos sesiones en paralelo hicieron esta misma fila a la vez**, sin saberlo: una con una ayuda
-`U.engancharInsertarHueco` en `js/util.js`, otra con el módulo `js/huecos-buscador.js` de arriba
-—llegado antes a `main`, en varios commits sueltos (el módulo, el enganche en
-`js/plantillas-ajustes.js`, la carga en `index.html` y las pruebas, cada pieza en su propia
-subida)—. Al fusionar se ha dejado la versión ya en `main` y se ha quitado
-`U.engancharInsertarHueco`, que se quedaba sin ningún sitio que la llamara.
+campo, Escape cierra sin insertar y sin propagarse, y la vista previa se actualiza sola.
+Comprobado que falla sin el arreglo (sin el botón, la prueba no encuentra `#pl-insertar-hueco`).
+Batería completa en verde.
 
 ## 17-sep-2026 — El tablón y las notas de un asunto no se borran mientras se escriben
 
