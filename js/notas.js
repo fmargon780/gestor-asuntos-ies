@@ -228,6 +228,121 @@
     await window.Gestor.recargar();
   }
 
+  /* ---------- la caja de escribir directa, en la ficha del asunto ----------
+
+     17-sep-2026, fila 37 (docs/FICHA-DEL-ASUNTO-NUEVA.md, 2). Antes
+     había que escribir y pulsar "Añadir nota"; ahora se escribe
+     encima y se guarda sola, al estilo del tablón (js/tablon.js): sin
+     botón, con un retardo de un segundo desde la última tecla
+     (`RETARDO_AUTOGUARDADO`), nunca una escritura por pulsación.
+
+     Mientras se sigue escribiendo (aunque la ficha se repinte sola
+     por en medio, fila 34) el texto se va guardando EN LA MISMA nota,
+     con `sustituirNota` y una clave de sesión (`borradorAbierto`, un
+     único borrador a la vez: solo hay una ficha abierta en pantalla).
+     Al volver a abrir cualquier ficha (`App.abrirFicha`, en
+     js/ficha-asunto.js) se llama a `olvidarBorrador()`: la próxima
+     vez que se escriba algo, nace una nota nueva. */
+
+  var RETARDO_AUTOGUARDADO = 1000;
+  var borradorAbierto = null;   /* { asunto, id } | null */
+  var pendienteAutoguardado = null;
+
+  function olvidarBorrador() {
+    borradorAbierto = null;
+    if (pendienteAutoguardado) { clearTimeout(pendienteAutoguardado); pendienteAutoguardado = null; }
+  }
+
+  function idDelBorrador(a) {
+    if (borradorAbierto && borradorAbierto.asunto === a.nombre) return borradorAbierto.id;
+    var id = 'b' + Date.now() + Math.floor(Math.random() * 1000);
+    borradorAbierto = { asunto: a.nombre, id: id };
+    return id;
+  }
+
+  /* `alGuardar`, si se pasa, se llama justo después de guardar de
+     verdad (`js/ficha-asunto.js` le pasa su `apuntarHuella`). Sin esto,
+     el guardado automático deja la huella de la ficha desactualizada
+     (`a.ficha.notas` cambia por dentro sin que nadie lo apunte), y el
+     próximo repintado en segundo plano (`App.reengancharFicha`, cada
+     pocos segundos) se cree que algo ha cambiado DE VERDAD y rehace la
+     ficha entera sin que haga falta, con el riesgo de llevarse por
+     delante una nota de un hito que se esté escribiendo a la vez en
+     otro campo. Apuntar la huella aquí evita ese repintado de más. */
+  async function guardarBorrador(a, campo, aviso, alGuardar) {
+    var texto = (campo.value || '').trim();
+    if (!texto) return;
+    var id = idDelBorrador(a);
+    try {
+      var lista = await U.mientrasGuarda(campo, function () {
+        return sustituirNota(a, texto, 'borrador', id);
+      });
+      var listaCaja = $('ficha-notas-lista');
+      if (listaCaja) listaCaja.innerHTML = pintarLista(lista);
+      if (aviso) {
+        aviso.textContent = lista.length === 1 ? '1 nota guardada.' : lista.length + ' notas guardadas.';
+      }
+      if (alGuardar) alGuardar();
+    } catch (e) {
+      if (aviso) aviso.textContent = 'No he podido guardar la nota: ' + e.message;
+    }
+  }
+
+  function pintarCajaAutoguardado(caja, a, abierto, alGuardar) {
+    var notas = notasDe(a);
+
+    caja.innerHTML =
+      (abierto
+        ? '<div class="nota-nueva">' +
+            '<textarea id="ficha-nota-texto" class="campo" rows="2" ' +
+              'placeholder="Qué ha pasado hoy en este asunto"></textarea>' +
+            '<span class="nota-aviso" id="ficha-nota-aviso">Las notas no se borran. Se guardan ' +
+              'solas, sin tener que pulsar nada.</span>' +
+          '</div>'
+        : '<p class="explica">Asunto archivado: las notas se leen, pero ya no se escriben.</p>') +
+      '<div id="ficha-notas-lista" class="notas-lista">' + pintarLista(notas) + '</div>';
+
+    if (!abierto) return;
+
+    var campo = $('ficha-nota-texto');
+    var aviso = $('ficha-nota-aviso');
+
+    function programar() {
+      if (pendienteAutoguardado) clearTimeout(pendienteAutoguardado);
+      pendienteAutoguardado = setTimeout(function () {
+        pendienteAutoguardado = null;
+        guardarBorrador(a, campo, aviso, alGuardar);
+      }, RETARDO_AUTOGUARDADO);
+    }
+
+    campo.oninput = programar;
+    campo.onblur = function () {
+      if (!pendienteAutoguardado) return;
+      clearTimeout(pendienteAutoguardado);
+      pendienteAutoguardado = null;
+      guardarBorrador(a, campo, aviso, alGuardar);
+    };
+    /* Control + Intro sigue guardando al momento, sin esperar al
+       segundo de retardo: la misma tecla que hacía "Añadir nota". */
+    campo.onkeydown = function (ev) {
+      if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) {
+        ev.preventDefault();
+        if (pendienteAutoguardado) { clearTimeout(pendienteAutoguardado); pendienteAutoguardado = null; }
+        guardarBorrador(a, campo, aviso, alGuardar);
+      }
+    };
+  }
+
+  /* La usa js/ficha-asunto.js (`pintarNotas`), envuelta ella misma en
+     `U.conservandoLoEscrito` para que lo que se esté escribiendo, el
+     foco y el cursor sobrevivan a un repintado (fila 34). `alGuardar`
+     es opcional: `App.abrirFicha` le pasa su `apuntarHuella` para que
+     el guardado automático no deje la huella de la ficha atrasada. */
+  function pintarEnFicha(caja, a, abierto, alGuardar) {
+    if (!caja) return;
+    return U.conservandoLoEscrito(caja, function () { return pintarCajaAutoguardado(caja, a, abierto, alGuardar); });
+  }
+
   /* ---------- lo que se deja a la vista ----------
 
      La ficha del asunto enseña las notas dentro de la pantalla, sin
@@ -249,7 +364,9 @@
     sustituir: sustituirNota,
     pintar: pintarLista,
     cuando: cuando,
-    yaTieneCorreo: yaTieneCorreo
+    yaTieneCorreo: yaTieneCorreo,
+    pintarEnFicha: pintarEnFicha,
+    olvidarBorrador: olvidarBorrador
   };
 
   /* ---------- arranque ---------- */

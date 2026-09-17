@@ -42,6 +42,11 @@
     modoActual = modo || 'abierto';
     ocupacionActual = null;
     huellaPintada = null;      /* ficha nueva: nada que comparar todavía */
+    /* Cada ficha que se abre empieza su propia nota, aunque sea la
+       misma que ya estaba abierta (fila 37, 17-sep-2026): la caja de
+       escribir directa de js/notas.js solo sigue metiendo texto en la
+       MISMA nota mientras la ficha se repinta sola por debajo. */
+    if (window.Notas) window.Notas.olvidarBorrador();
     App.ir('asunto');
     pintar();
 
@@ -289,21 +294,26 @@
       '<div id="ficha-sellos"></div>' +
       '<div id="ficha-aviso-tipo"></div>' +
       '<div class="ficha-acciones" id="ficha-acciones"></div>' +
+      /* Izquierda, lo que se trabaja; derecha, lo que se consulta y se
+         anota, con "Datos y contacto" la primera (fila 37, 17-sep-2026,
+         docs/FICHA-DEL-ASUNTO-NUEVA.md, 1): los documentos llevan
+         botones y necesitan la columna ancha, y las notas se usan poco
+         desde que casi todo se escribe como nota de un hito. */
       '<div class="ficha-columnas">' +
         '<div class="ficha-izquierda">' +
           bloque('Hitos', '<div id="ficha-guia" class="explica">Leyendo…</div>') +
-          bloque('Notas', '<div id="ficha-notas"></div>') +
-        '</div>' +
-        '<div class="ficha-derecha">' +
           bloque('Documentos de la carpeta',
                  '<div id="ficha-documentos" class="explica">Leyendo…</div>', null,
                  '<span class="ficha-cuenta" id="ficha-cuenta-docs"></span>') +
+        '</div>' +
+        '<div class="ficha-derecha">' +
+          '<div id="ficha-contacto-caja"></div>' +
           bloque('Otros asuntos de este tercero',
                  '<div id="ficha-otros" class="explica">Buscando…</div>') +
           bloque('Personas y entidades relacionadas',
                  '<div id="ficha-relacionados" class="explica">Leyendo…</div>') +
           bloque('Datos del asunto', datosDelAsunto(a, p)) +
-          '<div id="ficha-contacto-caja"></div>' +
+          bloque('Notas', '<div id="ficha-notas"></div>') +
         '</div>' +
       '</div>';
 
@@ -839,148 +849,34 @@
     caja.appendChild(fila);
   }
 
-  /* ---------- las notas, escritas aquí mismo ---------- */
+  /* ---------- las notas, escritas aquí mismo ----------
 
-  /* pintarNotas también se llama por su cuenta (al asociar un sello, al
-     borrar un documento con nota): pasa por la misma ayuda, para que
-     una nota a medio escribir no se pierda tampoco por ahí. */
+     La caja de escribir directa (guardado automático, sin botón) y su
+     lista viven en js/notas.js (`Notas.pintarEnFicha`, fila 37,
+     17-sep-2026): aquí solo se le da el hueco, como con los documentos
+     o los relacionados. Se llama también por su cuenta (al asociar un
+     sello, al borrar un documento con nota). */
   function pintarNotas(a, abierto) {
-    return U.conservandoLoEscrito($('ficha-notas'), function () {
-      return pintarLasNotas(a, abierto);
-    });
+    if (!window.Notas) return;
+    /* `apuntarHuella` como cuarto argumento: el guardado automático de
+       la nota cambia `a.ficha` por dentro (fila 37), y sin volver a
+       apuntar la huella aquí mismo el próximo repintado en segundo
+       plano se creería que algo ha cambiado de verdad y rehace la
+       ficha entera sin hacer falta. */
+    return window.Notas.pintarEnFicha($('ficha-notas'), a, abierto, apuntarHuella);
   }
 
-  function pintarLasNotas(a, abierto) {
-    var caja = $('ficha-notas');
-    if (!caja || !window.Notas) return;
-    var notas = window.Notas.de(a);
+  /* ---------- "Datos y contacto" del tercero ----------
 
-    caja.innerHTML =
-      (abierto
-        ? '<div class="nota-nueva">' +
-            '<textarea id="ficha-nota-texto" class="campo" rows="2" ' +
-              'placeholder="Qué ha pasado hoy en este asunto"></textarea>' +
-            '<div class="nota-botonera">' +
-              '<span class="nota-aviso" id="ficha-nota-aviso">Las notas no se borran.</span>' +
-              '<button type="button" id="ficha-nota-anadir" class="boton boton-principal">Añadir nota</button>' +
-            '</div>' +
-          '</div>'
-        : '<p class="explica">Asunto archivado: las notas se leen, pero ya no se escriben.</p>') +
-      '<div id="ficha-notas-lista" class="notas-lista">' + window.Notas.pintar(notas) + '</div>';
-
-    if (!abierto) return;
-
-    var campo = $('ficha-nota-texto');
-    var boton = $('ficha-nota-anadir');
-    var guardando = false;
-
-    async function guardar() {
-      var texto = (campo.value || '').trim();
-      if (!texto || guardando) return;
-      guardando = true;
-      boton.disabled = true;
-      try {
-        var lista = await window.Notas.anadir(a, texto);
-        campo.value = '';
-        $('ficha-notas-lista').innerHTML = window.Notas.pintar(lista);
-        $('ficha-nota-aviso').textContent = lista.length === 1
-          ? '1 nota guardada.' : lista.length + ' notas guardadas.';
-      } catch (e) {
-        U.aviso('No he podido guardar la nota: ' + e.message, 'malo');
-      }
-      boton.disabled = false;
-      guardando = false;
-    }
-
-    boton.onclick = guardar;
-    campo.onkeydown = function (ev) {
-      if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) { ev.preventDefault(); guardar(); }
-    };
-  }
-
-  /* ---------- el contacto del tercero ----------
-
-     Se busca en el mismo fichero de datos que usa la pantalla de
-     Personas. El nombre del tercero lleva pegado el número de
-     identificación, así que si no aparece a la primera se prueba sin
-     él. */
-
-  /* La ficha del alumnado trae muchas filas, y ocupaba media pantalla.
-     Aquí se enseña pequeña: el nombre y un par de datos de contacto.
-     Al pulsarla se abre entera. */
-  function contactoPlegado(persona, lista) {
-    var buenas = lista.filter(function (f) { return f && f.valor; });
-    var resumen = buenas.filter(function (f) {
-      return /tel|m[oó]vil|correo|email/i.test(f.titulo);
-    }).slice(0, 2);
-    if (!resumen.length) resumen = buenas.slice(0, 2);
-
-    return '<details class="ficha-bloque ficha-plegable">' +
-             '<summary>' +
-               '<span class="ficha-titulo">Contacto del tercero</span>' +
-               '<span class="ficha-resumen">' + U.escapar(persona.nombre) +
-                 (resumen.length
-                   ? ' · ' + U.escapar(resumen.map(function (f) { return f.valor; }).join(' · '))
-                   : '') +
-               '</span>' +
-             '</summary>' +
-             '<div class="ficha-plegable-cuerpo">' + filas(buenas) + '</div>' +
-           '</details>';
-  }
-
-  function contactoSuelto(texto) {
-    return '<section class="ficha-bloque">' +
-             '<h3 class="ficha-titulo">Contacto del tercero</h3>' +
-             '<p class="explica">' + U.escapar(texto) + '</p>' +
-           '</section>';
-  }
-
-  async function pintarContacto(a) {
-    var caja = $('ficha-contacto-caja');
-    if (!caja) return;
-    caja.innerHTML = contactoSuelto('Buscando…');
-    var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
-    /* Si la carpeta la creó la aplicación, el tercero está en su ficha.
-       Si se creó a mano, se saca del propio nombre: es lo que queda
-       después del tipo. */
-    var quien = (a.ficha && a.ficha.tercero) || (a.leido && a.leido.resto) || '';
-
-    if (!categoria || !quien || !App.E.datos) {
-      caja.innerHTML = contactoSuelto('Este asunto no dice a qué tercero pertenece.');
-      return;
-    }
-
-    try {
-      var fuente = await Datos.cargar(App.E.datos, categoria);
-      var encontrados = Datos.buscar(fuente.lista, quien, 1);
-      /* El nombre suele llevar pegado el número de identificación o el
-         NIF, y a veces el año académico. Si así no aparece, se prueba
-         quitando lo de detrás. */
-      if (!encontrados.length) {
-        encontrados = Datos.buscar(fuente.lista, quien.replace(/[\s\d]+$/, ''), 1);
-      }
-      if (!encontrados.length) {
-        var corto = quien.replace(/\b\d{2}-\d{2}\b/, '').replace(/\s+\S*\d\S*\s*$/, '').trim();
-        if (corto) encontrados = Datos.buscar(fuente.lista, corto, 1);
-      }
-      if (!encontrados.length) {
-        caja.innerHTML = contactoSuelto(quien + ' no aparece en el fichero de ' + categoria + '.');
-        return;
-      }
-
-      var persona = encontrados[0];
-      var lista;
-      if (categoria === 'ALUMNADO') lista = Datos.destacadosAlumno(persona).destacados;
-      else if (categoria === 'PERSONAL') lista = Datos.destacadosPersona(persona).destacados;
-      else {
-        lista = Object.keys(persona.campos || {}).slice(0, 8).map(function (c) {
-          return { titulo: c, valor: persona.campos[c] };
-        });
-      }
-      caja.innerHTML = contactoPlegado(persona, lista);
-    } catch (e) {
-      caja.innerHTML = contactoSuelto('No he podido leer el fichero de datos: ' + e.message);
-    }
+     La línea resumen y la ventana "Ver todo" viven en
+     js/ficha-tercero.js (fila 37, 17-sep-2026,
+     docs/FICHA-DEL-ASUNTO-NUEVA.md): busca al tercero en el mismo
+     fichero de datos que usa la pantalla de Personas, y se habla con
+     esta ficha solo por `FichaTercero.pintarLinea(caja, a)`, igual que
+     `FichaDocumentos.pintar`, para no engordar más este fichero. */
+  function pintarContacto(a) {
+    if (!window.FichaTercero) return;
+    return window.FichaTercero.pintarLinea($('ficha-contacto-caja'), a);
   }
 
   /* ---------- los otros asuntos del mismo tercero ----------

@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="css/campos.css">
 <link rel="stylesheet" href="css/guias.css">
 <link rel="stylesheet" href="css/ficha-asunto.css">
+<link rel="stylesheet" href="css/ficha-tercero.css">
 <link rel="stylesheet" href="css/notas.css">
 <link rel="stylesheet" href="css/visor.css">
 <link rel="stylesheet" href="css/tipos-buscador.css">
@@ -650,6 +651,14 @@
      fila "los hitos son la guía". Se habla con él por
      window.FichaDocumentos.pintar. -->
 <script src="js/ficha-documentos.js"></script>
+<!-- "Datos y contacto" del tercero, la línea resumen y la ventana "Ver
+     todo" (fila 37, 17-sep-2026): para no engordar js/ficha-asunto.js,
+     igual que js/ficha-documentos.js. Se habla con él por
+     window.FichaTercero.pintarLinea. Va después de js/datos.js y de
+     js/dni.js si estuviera antes, pero dni.js carga más abajo: llama a
+     window.Dni en tiempo de ejecución, no al cargar, así que el orden
+     entre los dos no importa. -->
+<script src="js/ficha-tercero.js"></script>
 <script src="js/hitos-panel.js"></script>
 <script src="js/hitos-panel-lista.js"></script>
 <!-- Apuntar un documento a un hito (fila 31, 17-sep-2026): el cuadro de

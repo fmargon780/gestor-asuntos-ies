@@ -775,11 +775,179 @@ var Datos = (function () {
     return { destacados: filas, resto: resto };
   }
 
+  /* ---------- los tutores legales, agrupados por persona (17-sep-2026,
+     fila 37, docs/FICHA-DEL-ASUNTO-NUEVA.md, 4.1) ----------
+
+     `destacadosAlumno`, arriba, vuelca cada columna de familia de
+     Séneca como una fila suelta, con el título tal cual: los datos de
+     los dos tutores salen mezclados, uno detrás de otro. Aquí se
+     agrupan por persona, leyendo el título de cada columna. */
+
+  /* El número de tutor que dice el título de una columna, dondequiera
+     que esté escrito: un dígito (Tutor1, Tutor 2) o la palabra
+     (Primer tutor, Segunda tutora). Null si no se puede saber. */
+  function numeroDeTitulo(titulo) {
+    var t = U.normalizar(titulo);
+    var digitos = t.match(/\d+/);
+    if (digitos) {
+      var n = parseInt(digitos[0], 10);
+      if (n === 1 || n === 2) return n;
+    }
+    if (/primer/.test(t)) return 1;
+    if (/segund/.test(t)) return 2;
+    return null;
+  }
+
+  /* La clase de dato que dice la otra mitad del título (ya normalizado). */
+  function claseDeTitulo(tituloNormalizado) {
+    if (/nombre|apellido/.test(tituloNormalizado)) return 'nombre';
+    if (/telefono|movil/.test(tituloNormalizado)) return 'telefonos';
+    if (/correo|e-?mail/.test(tituloNormalizado)) return 'correos';
+    if (/dni|documento|nif/.test(tituloNormalizado)) return 'documento';
+    if (/relacion|parentesco/.test(tituloNormalizado)) return 'relacion';
+    return 'otros';
+  }
+
+  /* Datos.tutoresDe(alumno) -> [ { numero, nombre, relacion, telefonos[],
+     correos[], documento, otros[] }, ... ], ordenados por número y solo
+     con los que traigan algo. Una columna de familia sin número
+     reconocible no se pierde: se cuelga de `.otros` del propio array
+     (una propiedad más, aparte de sus índices), para "Otros datos de la
+     familia" en la ventana "Ver todo" (js/ficha-tercero.js). */
+  function tutoresDe(alumno) {
+    var campos = (alumno && alumno.campos) || {};
+    var claves = Object.keys(campos);
+    var porNumero = {};
+    var sinNumero = [];
+
+    claves.forEach(function (clave) {
+      var t = U.normalizar(clave);
+      if (!/tutor|padre|madre|responsable|familia/.test(t)) return;
+      var valor = String(campos[clave] || '').trim();
+      if (!valor) return;
+
+      var numero = numeroDeTitulo(clave);
+      if (numero === null) { sinNumero.push({ titulo: clave, valor: valor }); return; }
+
+      if (!porNumero[numero]) {
+        porNumero[numero] = { numero: numero, nombre: '', relacion: '',
+                              telefonos: [], correos: [], documento: '', otros: [] };
+      }
+      var tutor = porNumero[numero];
+      var clase = claseDeTitulo(t);
+      if (clase === 'nombre') { if (!tutor.nombre) tutor.nombre = valor; else tutor.otros.push({ titulo: clave, valor: valor }); }
+      else if (clase === 'telefonos') tutor.telefonos.push(valor);
+      else if (clase === 'correos') tutor.correos.push(valor);
+      else if (clase === 'documento') { if (!tutor.documento) tutor.documento = valor; }
+      else if (clase === 'relacion') { if (!tutor.relacion) tutor.relacion = valor; }
+      else tutor.otros.push({ titulo: clave, valor: valor });
+    });
+
+    var salida = Object.keys(porNumero).map(function (k) { return parseInt(k, 10); })
+      .sort(function (a, b) { return a - b; })
+      .map(function (n) { return porNumero[n]; })
+      .filter(function (tutor) {
+        return tutor.nombre || tutor.relacion || tutor.telefonos.length ||
+               tutor.correos.length || tutor.documento || tutor.otros.length;
+      });
+    salida.otros = sinNumero;
+    return salida;
+  }
+
+  /* ---------- la línea resumen de "Datos y contacto" (17-sep-2026,
+     fila 37, 3) ---------- */
+
+  /* El teléfono propio de alguien (no el de un tutor): la primera
+     columna de teléfono o móvil que NO hable de tutores ni de familia. */
+  function telefonoPropio(persona) {
+    var campos = (persona && persona.campos) || {};
+    var claves = Object.keys(campos);
+    for (var i = 0; i < claves.length; i++) {
+      var t = U.normalizar(claves[i]);
+      if (/tutor|padre|madre|responsable|familia/.test(t)) continue;
+      if (!/telefono|movil/.test(t)) continue;
+      var valor = String(campos[claves[i]] || '').trim();
+      if (valor) return valor;
+    }
+    return '';
+  }
+
+  var EDAD_MAYORIA = 18;
+
+  /* Datos.resumenDeTercero(persona, categoria) -> los datos de la línea
+     "Datos y contacto": nombre, grupo o etiqueta de estado, edad, un
+     solo teléfono (etiquetado) y documento. Pura: no toca el DOM. El
+     aviso de DNI que falta lo sigue decidiendo `js/dni.js`
+     (`window.Dni`, si está cargado), sin duplicar esa cuenta aquí. */
+  function resumenDeTercero(persona, categoria) {
+    var r = { nombre: '', grupo: null, edad: '', telefono: null, documento: null };
+    if (!persona) return r;
+
+    if (categoria === 'ALUMNADO') {
+      r.nombre = persona.nombre || '';
+      var edad = U.edadDesde(persona.fechaNac);
+      if (edad !== '') r.edad = edad + ' años';
+
+      if (persona.matriculado) {
+        r.grupo = { texto: persona.unidad || persona.curso || '', clase: '' };
+      } else if (persona.solicitante) {
+        r.grupo = { texto: 'SOLICITANTE', clase: 'azul' };
+      } else {
+        var detalle = persona.anoUltima
+          ? 'última matrícula: ' + U.cursoDeAno(persona.anoUltima) +
+            (persona.unidadUltima ? ' · ' + persona.unidadUltima : '')
+          : '';
+        r.grupo = { texto: 'NO MATRICULADO ' + U.cursoActual(), clase: 'ambar', detalle: detalle };
+      }
+
+      var esMenor = edad !== '' && edad < EDAD_MAYORIA;
+      if (esMenor) {
+        var tutores = tutoresDe(persona);
+        var primero = tutores[0];
+        if (primero && primero.telefonos.length) {
+          r.telefono = { valor: primero.telefonos[0], etiqueta: 'Tutor legal ' + primero.numero };
+        }
+      } else {
+        var propio = telefonoPropio(persona);
+        if (propio) r.telefono = { valor: propio, etiqueta: '' };
+      }
+
+      var doc = window.Dni ? window.Dni.de(persona) : '';
+      var falta = window.Dni ? window.Dni.falta(persona) : false;
+      if (doc) r.documento = { valor: doc, falta: false };
+      else if (falta) r.documento = { valor: '', falta: true, edad: edad };
+    } else if (categoria === 'PERSONAL') {
+      r.nombre = persona.nombre || '';
+      if (persona.enElCentro) {
+        r.grupo = { texto: persona.puesto || '', clase: '' };
+      } else {
+        var detallePersonal = persona.cursoUltimo ? 'último curso aquí: ' + persona.cursoUltimo : '';
+        r.grupo = { texto: 'YA NO ESTÁ', clase: 'ambar', detalle: detallePersonal };
+      }
+      var telPersonal = telefonoPropio(persona);
+      if (telPersonal) r.telefono = { valor: telPersonal, etiqueta: '' };
+      if (persona.documento) r.documento = { valor: persona.documento, falta: false };
+    } else {
+      /* Empresas y otros: nombre, el nombre comercial o la referencia en
+         el sitio del grupo, un teléfono y el NIF o el documento. */
+      r.nombre = (categoria === 'EMPRESAS' ? persona.nombre : persona.nombre) || '';
+      var otro = (categoria === 'EMPRESAS' ? persona.comercial : persona.referencia) || '';
+      if (otro) r.grupo = { texto: otro, clase: '' };
+      var telOtro = telefonoPropio(persona);
+      if (telOtro) r.telefono = { valor: telOtro, etiqueta: '' };
+      var docOtro = (categoria === 'EMPRESAS' ? persona.nif : persona.documento) || '';
+      if (docOtro) r.documento = { valor: docOtro, falta: false };
+    }
+
+    return r;
+  }
+
   return {
     aTabla: aTabla, aCsv: aCsv, cargar: cargar, anadirALista: anadirALista,
     buscar: buscar, olvidar: olvidar, LISTAS: LISTAS,
     guardarEnLista: guardarEnLista, quitarDeLista: quitarDeLista,
     unidadesDistintas: unidadesDistintas, destacadosAlumno: destacadosAlumno,
-    destacadosPersona: destacadosPersona, cursoDelFichero: cursoDelFichero
+    destacadosPersona: destacadosPersona, cursoDelFichero: cursoDelFichero,
+    tutoresDe: tutoresDe, resumenDeTercero: resumenDeTercero
   };
 })();
