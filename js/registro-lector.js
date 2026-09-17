@@ -134,12 +134,47 @@ var RegistroLector = (function () {
     }
   }
 
+  /* El texto de hasta `tope` páginas (5 por defecto), sin buscar nada
+     dentro: la usa js/lector-documentos.js (17-sep-2026, fila 41,
+     docs/LEER-DOCUMENTOS-POR-CLASIFICAR.md) para proponer tipo, fecha,
+     registro y tercero de un documento suelto en "Por clasificar". Si
+     el fichero no es un PDF, o pdf.js falla, devuelve cadena vacía y
+     no avisa de nada raro: es exactamente lo que hace `leerSello` con
+     el sello, aquí sin buscar el sello ni pararse antes de tiempo. */
+  async function textoDe(fichero, topePaginas) {
+    var esPdf = (fichero && fichero.type === 'application/pdf') ||
+                /\.pdf$/i.test((fichero && fichero.name) || '');
+    if (!esPdf) return '';
+    try {
+      /* Un fichero con extensión .pdf pero que no lo sea de verdad (un
+         adjunto renombrado a mano, o el de mentira de las pruebas) no
+         se le pasa ni a pdf.js: el PDF de verdad siempre empieza por
+         "%PDF-". Así se evita cargar la librería, y sus avisos por
+         consola, para nada. */
+      var cabecera = await fichero.slice(0, 5).text();
+      if (cabecera !== '%PDF-') return '';
+      var pdfjsLib = await cargarPdfJs();
+      var buffer = await fichero.arrayBuffer();
+      var documento = await pdfjsLib.getDocument({ data: buffer }).promise;
+      var limite = Math.min(documento.numPages, topePaginas || 5);
+      var texto = '';
+      for (var n = 1; n <= limite; n++) {
+        var pagina = await documento.getPage(n);
+        var contenido = await pagina.getTextContent();
+        texto += contenido.items.map(function (i) { return i.str; }).join(' ') + ' ';
+      }
+      return texto;
+    } catch (e) {
+      return '';
+    }
+  }
+
   /* Expuesta para js/verificacion.js (17-sep-2026, fila 19): el código
      de verificación del pie de un documento se busca con la misma
      máquina que ya lee el sello de Séneca, sin cargar pdf.js dos veces
      ni duplicar cómo se saca el texto de una página. */
   return {
     leerSello: leerSello, textoDePrimeraPagina: textoDePrimeraPagina,
-    buscarEnTexto: buscarEnTexto
+    buscarEnTexto: buscarEnTexto, textoDe: textoDe
   };
 })();

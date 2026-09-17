@@ -72,7 +72,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   dentro del visor. Encima, tras una barra "Correos sin clasificar (N)" que siempre arranca
   plegada, vive la bandeja de Gmail (etiqueta `GESTOR`): a un asunto nuevo, adivinado o elegido a
   mano, con el hilo enganchado (`hilos`, con la matrícula para reconocerlo desde el otro buzón
-  también); sus respuestas vuelven solas, y lo del compañero sale en gris.
+  también); sus respuestas vuelven solas, y lo del compañero sale en gris. Cada tarjeta lee el PDF con pdf.js y **propone** (nunca decide) tipo, fecha, registro de Séneca y tercero, con palabras clave por tipo (`tipos.json`, editables en la pantalla del tipo); con tipo y tercero claros, "Aceptar" crea el asunto de un clic, reutilizando el mismo camino de "Crear asunto con él" (fila 41, 17-sep-2026).
 - "Datos y contacto" del tercero, en una sola línea (nombre, grupo o etiqueta de estado, edad, un teléfono y DNI, cada uno con su copiar) con botón "Ver todo"; los tutores legales de Séneca salen agrupados por persona, no columna a columna como antes (fila 37, 17-sep-2026). Cada línea de "Otros asuntos de este tercero" se pulsa y abre su ficha (uno del ARCHIVO, sin recorrerlo entero), con "← Volver a …" arriba para regresar al asunto de partida aunque se salte varias veces seguidas (fila 40, 17-sep-2026).
 - Registrar un documento: si el PDF sellado ya está en la carpeta (bajado de Séneca), la ficha lo
   detecta sola, lo renombra y manda el viejo a la papelera; el botón de siempre sigue igual.
@@ -80,11 +80,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   de golpe (atajos de alumnado por unidad/nivel/enseñanza, grupos propios en `_GESTOR/grupos.json`
   desde Ajustes), y esos mismos grupos ponen los destinatarios de un correo, en copia oculta.
 - Parada al crear un asunto duplicado, y pantalla propia "Duplicados" para los ya existentes.
-- Ajustes tiene tres pestañas (Tipos de asunto · El centro · Mantenimiento). Pulsar una tarjeta de
-  tipo abre su pantalla propia, entera y a dos columnas, con sus siete secciones a la vista sin
-  plegar: Datos del tipo, Campos, Pasos del trámite, Plantillas de correo y de Séneca, Plantilla de
-  documento de Word, Plazo y Se repite (fila 39, 17-sep-2026). Dentro, pestañas por categoría,
-  buscador cruzado, aviso en vivo de nombres repetidos.
+- Ajustes tiene tres pestañas (Tipos de asunto · El centro · Mantenimiento). Pulsar una tarjeta de tipo abre su pantalla propia, entera y a dos columnas, con sus ocho secciones a la vista sin plegar: Datos del tipo, Campos, Pasos del trámite, Palabras clave, Plantillas de correo y de Séneca, Plantilla de documento de Word, Plazo y Se repite (fila 39, 17-sep-2026; Palabras clave, fila 41). Dentro, pestañas por categoría, buscador cruzado, aviso en vivo de nombres repetidos.
 - Campos propios por tipo de asunto, rellenos solos al crear.
 - Papelera: nada se borra del todo a la primera.
 - Mandar documentos de un asunto por correo: se marcan en el cuadro "Correo" y el script de Apps

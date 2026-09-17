@@ -608,6 +608,26 @@ $('btn-crear').onclick = async function () {
   }
 };
 
+/* Crea un asunto entero de un tirón, reutilizando tal cual el mismo
+   camino manual (categoría → tipo → tercero → "Crear"), con el
+   documento ya enganchado en App.E.pendiente: lo usa el botón
+   "Aceptar" de "Por clasificar" (js/documentos-sueltos-lector.js,
+   17-sep-2026, fila 41, docs/LEER-DOCUMENTOS-POR-CLASIFICAR.md) para
+   la propuesta que ha leído del documento. No se escribe ningún otro
+   camino: se llama a los mismos App.elegirCategoria/elegirTipo/
+   fijarTercero de siempre y se dispara el mismo botón "Crear", con su
+   aviso de duplicado (js/duplicados.js) funcionando exactamente igual. */
+App.crearAsuntoConPropuesta = async function (tipo, tercero, documentoSuelto) {
+  App.E.pendiente = documentoSuelto;
+  delete App.E.reciales[documentoSuelto.nombre];
+  App.actualizarTitulo();
+  App.ir('nuevo');
+  App.elegirCategoria(tipo.categoria);
+  App.elegirTipo(tipo);
+  App.fijarTercero(tercero);
+  await $('btn-crear').onclick();
+};
+
 /* ---------- alta de un tercero que no está en la lista ---------- */
 
 /* La aclaración de cada categoría, encima de los campos. */
