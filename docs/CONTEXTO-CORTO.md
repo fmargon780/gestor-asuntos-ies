@@ -99,7 +99,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - "Qué me toca": pantalla que cruza los hitos pendientes de todos los asuntos abiertos, en tres
   bloques (en tu tejado, esperando a otros, sin fecha), con filtro por responsable.
 - No pisarse en un asunto: si el compañero ya está dentro, se entra en modo consulta (aviso y
-  "Tomar el mando"), con marca en la lista. Señal en `_GESTOR/presencia.json`, caduca a los 3 min.
+  "Tomar el mando"), con marca en la lista. Señal en `_GESTOR/presencia.json`, caduca a los 3 min;
+  su repintado de fondo solo toca la pantalla si cambia algo de verdad, y nunca mientras se escribe.
 - Separar, Unir y Sacar páginas de un PDF, en la carpeta del asunto y en Por clasificar (con
   pdf-lib, `js/lib/pdf-lib.min.js`); miniaturas con pdf.js, tijeras entre páginas para Separar.
 - "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha (opcional), con el correo ya puesto al preparar el cuadro de Correo.
@@ -125,8 +126,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 7. Descartado, no proponer otra vez
 
-- Publicar con el conector de Vercel sobre un proyecto ya existente (da 403).
-- Crear otro proyecto de Vercel "por si acaso".
+- Publicar con el conector de Vercel sobre un proyecto ya existente (da 403), o crear otro "por si acaso".
 - Abrir la carpeta del asunto en el explorador de archivos del ordenador.
 - Opciones dentro de opciones en la guía del procedimiento.
 - Una hoja de Google Sheets como interfaz.
