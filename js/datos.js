@@ -775,11 +775,163 @@ var Datos = (function () {
     return { destacados: filas, resto: resto };
   }
 
+  /* ============================================================
+     LOS TUTORES, AGRUPADOS POR PERSONA (17-sep-2026, fila 37,
+     docs/FICHA-DEL-ASUNTO-NUEVA.md)
+
+     Séneca vuelca cada columna de tutor como una fila suelta
+     ("Tutor1 - Teléfono", "Tutor 2 Móvil"...), con los datos de los
+     dos tutores mezclados. Aquí se agrupan por persona, leyendo el
+     título de cada columna, normalizado.
+     ============================================================ */
+
+  var CLASE_NOMBRE = /nombre|apellido/;
+  var CLASE_TELEFONO = /telefono|movil/;
+  var CLASE_CORREO = /correo|e-?mail/;
+  var CLASE_DOCUMENTO = /dni|documento|nif/;
+  var CLASE_RELACION = /relacion|parentesco/;
+  var ES_DE_FAMILIA = /tutor|padre|madre|responsable|familia/;
+
+  /* El número puede ir pegado a la palabra ("tutor1", sin espacio), así
+     que no vale un \b delante del dígito: se busca el dígito suelto,
+     esté donde esté, y si no hay, la palabra "primer(o)"/"segund(o/a)". */
+  function numeroDeTitulo(t) {
+    if (t.indexOf('2') !== -1 || /segund/.test(t)) return '2';
+    if (t.indexOf('1') !== -1 || /primer/.test(t)) return '1';
+    return '';
+  }
+
+  function claseDeTitulo(t) {
+    if (CLASE_NOMBRE.test(t)) return 'nombre';
+    if (CLASE_TELEFONO.test(t)) return 'telefonos';
+    if (CLASE_CORREO.test(t)) return 'correos';
+    if (CLASE_DOCUMENTO.test(t)) return 'documento';
+    if (CLASE_RELACION.test(t)) return 'relacion';
+    return 'otros';
+  }
+
+  /* [ { numero, nombre, relacion, telefonos[], correos[], documento,
+         otros[] }, ... ], ordenado por número, solo con quien tenga
+     algo. El array lleva además una propiedad `.otros`: las columnas
+     de familia que no traían un número reconocible (no se pierden,
+     pero tampoco se pueden meter en ninguna tarjeta). */
+  function tutoresDe(alumno) {
+    var campos = (alumno && alumno.campos) || {};
+    var porNumero = {};
+    var sinNumero = [];
+
+    Object.keys(campos).forEach(function (titulo) {
+      var valor = String(campos[titulo] === undefined || campos[titulo] === null ? '' : campos[titulo]).trim();
+      if (!valor) return;
+      var t = U.normalizar(titulo);
+      if (!ES_DE_FAMILIA.test(t)) return;
+
+      var numero = numeroDeTitulo(t);
+      if (!numero) { sinNumero.push({ titulo: titulo, valor: valor }); return; }
+
+      if (!porNumero[numero]) {
+        porNumero[numero] = { numero: numero, nombre: '', relacion: '', telefonos: [], correos: [], documento: '', otros: [] };
+      }
+      var tarjeta = porNumero[numero];
+      var clase = claseDeTitulo(t);
+      if (clase === 'nombre') tarjeta.nombre = tarjeta.nombre ? tarjeta.nombre + ' ' + valor : valor;
+      else if (clase === 'telefonos') tarjeta.telefonos.push(valor);
+      else if (clase === 'correos') tarjeta.correos.push(valor);
+      else if (clase === 'documento') tarjeta.documento = valor;
+      else if (clase === 'relacion') tarjeta.relacion = valor;
+      else tarjeta.otros.push({ titulo: titulo, valor: valor });
+    });
+
+    var tarjetas = Object.keys(porNumero).map(function (k) { return porNumero[k]; })
+      .sort(function (a, b) { return parseInt(a.numero, 10) - parseInt(b.numero, 10); });
+    tarjetas.otros = sinNumero;
+    return tarjetas;
+  }
+
+  /* El teléfono propio de alguien, sin contar los de tutores/familia
+     (para el alumnado, esos son de `tutoresDe`). El primero que
+     encuentre, por orden de columnas. */
+  function telefonoPropio(persona) {
+    var campos = (persona && persona.campos) || {};
+    var claves = Object.keys(campos);
+    for (var i = 0; i < claves.length; i++) {
+      var t = U.normalizar(claves[i]);
+      if (ES_DE_FAMILIA.test(t)) continue;
+      if (!CLASE_TELEFONO.test(t)) continue;
+      var v = String(campos[claves[i]] || '').trim();
+      if (v) return v;
+    }
+    return '';
+  }
+
+  var EDAD_MAYORIA = 18;
+
+  /* La línea resumen de "Datos y contacto" (17-sep-2026, fila 37,
+     docs/FICHA-DEL-ASUNTO-NUEVA.md), pura: nombre, la etiqueta de
+     grupo o de estado, la edad, un solo teléfono y el documento. La
+     pinta `window.FichaTercero.pintarLinea` (js/ficha-tercero.js). */
+  function resumenDeTercero(persona, categoria) {
+    if (!persona) return null;
+    var r = { nombre: persona.nombre || '', grupo: '', etiqueta: null, edad: '', telefono: null, dni: '' };
+
+    if (categoria === 'ALUMNADO') {
+      var edad = U.edadDesde(persona.fechaNac || '');
+      r.edad = edad;
+      if (persona.matriculado) {
+        r.grupo = [persona.unidad, persona.curso].filter(Boolean).join('  ·  ');
+      } else if (persona.solicitante) {
+        r.etiqueta = { texto: 'SOLICITANTE', clase: 'azul', sub: '' };
+      } else {
+        var ultima = persona.anoUltima
+          ? U.cursoDeAno(persona.anoUltima) + (persona.unidadUltima ? '  ·  ' + persona.unidadUltima : '')
+          : '';
+        r.etiqueta = {
+          texto: 'NO MATRICULADO ' + U.cursoActual(),
+          clase: 'ambar', sub: ultima ? 'última matrícula: ' + ultima : ''
+        };
+      }
+      if (edad !== '' && edad >= EDAD_MAYORIA) {
+        var propio = telefonoPropio(persona);
+        if (propio) r.telefono = { etiqueta: '', valor: propio };
+      } else {
+        var tutores = tutoresDe(persona);
+        var primero = tutores[0];
+        if (primero && primero.telefonos.length) {
+          r.telefono = { etiqueta: 'Tutor legal ' + primero.numero + ':', valor: primero.telefonos[0] };
+        }
+      }
+      r.dni = window.Dni ? window.Dni.de(persona) : '';
+      r.avisoDni = window.Dni ? window.Dni.falta(persona) : false;
+    } else if (categoria === 'PERSONAL') {
+      r.grupo = persona.puesto || '';
+      if (!persona.enElCentro) {
+        r.etiqueta = {
+          texto: 'YA NO ESTÁ', clase: 'ambar',
+          sub: persona.cursoUltimo ? 'último curso aquí: ' + persona.cursoUltimo : ''
+        };
+      }
+      var telP = telefonoPropio(persona);
+      if (telP) r.telefono = { etiqueta: '', valor: telP };
+      r.dni = persona.documento || '';
+    } else if (categoria === 'EMPRESAS') {
+      r.grupo = persona.comercial || (persona.campos && persona.campos['Nombre comercial']) || '';
+      var telE = telefonoPropio(persona);
+      if (telE) r.telefono = { etiqueta: '', valor: telE };
+      r.dni = persona.nif || '';
+    } else {
+      var telO = telefonoPropio(persona);
+      if (telO) r.telefono = { etiqueta: '', valor: telO };
+      r.dni = persona.documento || persona.nif || '';
+    }
+    return r;
+  }
+
   return {
     aTabla: aTabla, aCsv: aCsv, cargar: cargar, anadirALista: anadirALista,
     buscar: buscar, olvidar: olvidar, LISTAS: LISTAS,
     guardarEnLista: guardarEnLista, quitarDeLista: quitarDeLista,
     unidadesDistintas: unidadesDistintas, destacadosAlumno: destacadosAlumno,
-    destacadosPersona: destacadosPersona, cursoDelFichero: cursoDelFichero
+    destacadosPersona: destacadosPersona, cursoDelFichero: cursoDelFichero,
+    tutoresDe: tutoresDe, resumenDeTercero: resumenDeTercero
   };
 })();

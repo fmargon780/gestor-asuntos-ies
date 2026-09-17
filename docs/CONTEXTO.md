@@ -89,10 +89,16 @@ la página y vuelve a la pantalla de entrada, con las carpetas ya señaladas. Pi
 **La barra de la izquierda** (`js/barra.js`, `css/barra.css`). Se pliega y nace plegada; un
 botón de tres rayas la abre y la cierra; al elegir una pantalla se vuelve a plegar sola; se
 recuerda en `gestor-barra`. **Queda fija en pantalla** (`position:fixed`); el contenido se
-desplaza con `margin-left` (232px, o 52px plegada). Ajustes está en la lista de pestañas,
-separado por una línea (`.separador-lateral`); con la barra plegada, un icono de rueda dentada
-(`#btn-barra-ajustes`) lleva directo a Ajustes. El botón grande "+ Nuevo asunto" va en la
-cabecera de Asuntos abiertos, y lo pone el mismo fichero.
+desplaza con `margin-left` (232px, o 52px plegada), **sin tope de ancho** (17-sep-2026, fila 36
+de la cola): antes, con la barra plegada, `css/barra.css` le ponía a `.contenido` un
+`max-width:1360px` que ganaba por especificidad al `max-width:none` de `css/vista.css`, y en el
+monitor ancho del trabajo dejaba franjas vacías a los lados nada más arrancar. Ajustes está en
+la lista de pestañas, separado por una línea (`.separador-lateral`); con la barra plegada, un
+icono de rueda dentada (`#btn-barra-ajustes`) lleva directo a Ajustes. El botón grande "+ Nuevo
+asunto" va en la cabecera de Asuntos abiertos, y lo pone el mismo fichero. **Se pliega sola al
+abrir el visor o el lector** (`con-visor`/`con-lector` en `<body>`, vigilados con un
+`MutationObserver`) y vuelve a como estaba al cerrarlo, sin tocar lo guardado en
+`localStorage`; si ya estaba plegada, no hace nada.
 
 **El panel de lectura de la derecha** (`js/lector.js`). Se cierra con la equis o con Escape. El
 borde izquierdo se arrastra; el ancho se recuerda (`gestor-lector-ancho`); doble clic vuelve al
@@ -118,6 +124,43 @@ el Escape general de aquí se dispara también y hace algo de más.
 Al pulsar el nombre de un asunto se entra en su ficha: sus datos, el contacto del tercero, la
 guía de su tipo con las casillas, sus notas, sus documentos y los demás asuntos del mismo
 tercero.
+
+**La disposición** (17-sep-2026, fila 37, `docs/FICHA-DEL-ASUNTO-NUEVA.md`). Dos columnas
+(`css/ficha-asunto.css`, `.ficha-columnas`, `1.4fr / 1fr`): a la izquierda lo que se trabaja
+—Hitos y Documentos de la carpeta, que llevan botones y necesitan la columna ancha—; a la
+derecha lo que se consulta y se anota —Datos y contacto (la primera), Otros asuntos de este
+tercero, Notas, Personas y entidades relacionadas y Datos del asunto—. Con el panel de la
+derecha abierto (`body.con-visor`/`body.con-lector`) o por debajo de 1000px, una sola columna:
+como cada mitad sale entera antes de pasar a la siguiente, el orden que queda es el de arriba.
+
+**"Datos y contacto"** (`js/ficha-tercero.js`, `css/ficha-tercero.css`) sustituye a la antigua
+tarjeta plegable de "Contacto del tercero": una sola línea —nombre, grupo o etiqueta de estado
+(`NO MATRICULADO 26-27` ámbar, `SOLICITANTE` azul, `YA NO ESTÁ` ámbar para personal, con un
+renglón pequeño debajo si hace falta), edad, un solo teléfono (el del primer tutor legal si el
+alumno es menor de edad, el suyo si es mayor o si no es alumnado) y DNI/NIF, cada dato copiable
+de un clic— y un botón **"Ver todo"** que abre una ventana (`U.preguntar`, `cuadro-medio`) a dos
+columnas con Identificación, Matrícula y grupo (o Situación en el centro), Contacto, Tutores
+legales agrupados por persona (`Datos.tutoresDe`, lee el título de cada columna de Séneca:
+`Tutor1 -`, `Primer tutor`... con el número pegado o no a la palabra), Otros datos de la familia
+sin tutor reconocible, y el volcado plegado de siempre. La lógica pura
+(`Datos.tutoresDe`/`Datos.resumenDeTercero`, `js/datos.js`) no toca ninguna pantalla, se prueba
+sin navegador en `pruebas/ficha-tercero.mjs`; la búsqueda del tercero (mismo `Datos.buscar` con
+las mismas reservas que antes) y el pintado viven en `js/ficha-tercero.js`, hablándose con
+`js/ficha-asunto.js` por `window.FichaTercero.pintarLinea(caja, a)`, igual que
+`window.FichaDocumentos.pintar`. No lleva botón "Escribirle" (pedía enganchar el cuadro de
+Correo con más de tres líneas): queda para cuando haga falta de verdad.
+
+**Las notas del asunto, sin botón** (fila 37, misma instrucción). El bloque "Notas" pasó a la
+derecha y se escribe encima: `window.Notas.pintarBloqueFicha(caja, a, abierto)`
+(`js/notas.js`) guarda sola, un segundo después de la última tecla (`U.mientrasGuarda` en el
+propio `<textarea>`, sin botón "Añadir nota"). El temporizador vive en una variable de módulo,
+no dentro de la función que pinta: si la ficha se repinta de verdad a media espera (llega un
+documento, por ejemplo), el temporizador viejo se cancela y el campo nuevo —con el texto que
+`U.conservandoLoEscrito` le ha restaurado, sin disparar `input`— arranca el suyo con un
+`setTimeout(0)` desde `pintarBloqueFicha`, para que ese texto no se quede sin guardar para
+siempre si nadie vuelve a tocar el teclado. Sin esto, un segundo temporizador residual guardaría
+la nota **dos veces**. Se comprueba con `pruebas/notas-asunto-no-se-borran.mjs` (escenarios 6 y
+7): un repintado de verdad a media frase no tira lo escrito, y pasado el segundo se guarda sola.
 
 **La tarjeta de la lista se queda con lo justo**: el desplegable del estado, "Copiar nombre" y
 "Archivar". `js/ficha-asunto.js` quita de la tarjeta cualquier otro botón, con una lista blanca
@@ -452,6 +495,39 @@ columna. El tope de 1180px de `css/estilos.css` se anula en `css/vista.css`; con
 propio Nuevo asunto (940px) y Ajustes (1600px). Los filtros (estado, plazo, orden) van plegados
 en un panel que abre el botón "Filtros", recordado en `gestor-filtros`.
 
+### Filas que no se estrujan (`css/filas.css`)
+
+17-sep-2026, fila 36 de la cola, `docs/FILAS-QUE-NO-SE-ESTRUJAN.md`. La aplicación sabía
+recolocarse a nivel de pantalla (sección de arriba), pero no a nivel de fila: con el panel de
+la derecha abierto, el nombre de un documento se quedaba en un carácter por renglón. Regla
+general, enlazada la última de todos los `<link>` de `index.html` para ganar por cascada:
+
+1. El texto de una fila nunca baja de un ancho mínimo (`.ficha-documento-fila > .ficha-documento
+   { min-width: 240px }`, el caso que de verdad se rompía: `css/registro.css` ya ponía
+   `min-width:0` en el primer hijo).
+2. Si no cabe todo, los botones bajan a una segunda línea (`flex-wrap: wrap` en la fila).
+3. Con más de dos botones, los importantes se quedan a la vista y el resto entra en el menú de
+   tres puntos: `U.menuDeAcciones(botones, opciones)` (`js/util.js`), que devuelve un `<span
+   class="menu-acciones">` con el botón "⋮" y una lista desplegable colgando de la propia fila
+   (**nunca de `<body>`**, al contrario que `js/huecos-buscador.js`: así
+   `aplicarModoConsulta` la encuentra al recorrer `#ficha-asunto-cuerpo` y apaga tanto el "⋮"
+   como los botones de dentro, sin que ninguno de los dos ficheros se entere del otro). El
+   elemento devuelto lleva colgados `.anadirAccion(boton, alPrincipio)` y
+   `.quitarAccion(botonOTexto)`, para quien mete su botón más tarde: `js/copiar.js` (que ya no
+   envuelve el botón del documento en una fila propia: mete "Copiar" el primero del menú) y
+   `js/papelera.js` (que mete "Borrar" al final, en vez de colgarlo suelto de `.acciones`).
+   - En `js/ficha-documentos.js`: a la vista, el nombre y Registrar; en el menú, Copiar, Separar,
+     Unir, Sacar páginas y Borrar, ese orden.
+   - En `js/documentos-sueltos.js` (tarjetas de "Por clasificar", también dentro del visor vía
+     `App.accionesDeSuelto`): a la vista, Crear asunto con él y Meter en un asunto; en el menú,
+     Abrir, Separar, Unir, Sacar páginas y Borrar.
+   - `.hito-linea` (`css/hitos.css`) no lleva menú (el título entero se pulsa para desplegar el
+     hito), solo `flex-wrap` y un `min-width` en `.hito-titulo`.
+   - `.tarjeta`/`.acciones` (asuntos abiertos, `css/estilos.css`), las listas de Ajustes y
+     `.relacionado-fila` ya envolvían bien: no se han tocado.
+
+Se comprueba con `pruebas/filas-estrechas.mjs`.
+
 ### El tablón de notas rápidas
 
 Columna a la derecha de asuntos abiertos, para lo que aún no es un asunto. Color, autor, fecha y
@@ -635,10 +711,19 @@ Toda la lógica vive en el módulo nuevo `js/lo-pide.js` (`window.LoPide`), para
 `js/asuntos-nuevo.js`, `js/ficha-asunto.js` ni `js/correo.js`:
 
 - `LoPide.opciones(persona)`: los candidatos, siempre "El propio interesado" y "Otra persona…",
-  más "Tutor legal 1/2" (solo alumnado, y solo si Séneca trae su nombre), con los datos de cada
-  uno (`nombre`, `correo`, `telefono`) ya resueltos.
+  más "Tutor legal 1/2" (solo alumnado, y solo si Séneca trae su nombre, su teléfono o su correo;
+  sin nombre pero con alguno de los otros dos, la opción sale igual, a secas: "Tutor legal 1").
+  con los datos de cada uno (`nombre`, `correo`, `telefono`) ya resueltos.
 - `LoPide.datosDeTutor(campos, numero)`: sacada de `js/plantillas.js` (que ahora la llama en vez
-  de tener su propia copia), porque `LoPide.opciones` también la necesita.
+  de tener su propia copia), porque `LoPide.opciones` también la necesita. **El nombre, no un
+  número** (17-sep-2026, fila 38, `docs/LO-PIDE-NOMBRE-DEL-TUTOR.md`): antes se quedaba con la
+  primera columna del tutor que no fuera teléfono ni correo, y esa solía ser su documento.
+  `nombreDeTutor` descarta también documento/DNI/NIF/NIE/pasaporte, identificación, número/código,
+  parentesco/relación/sexo, fecha/nacimiento y domicilio/dirección/localidad/etc.; de lo que
+  queda, prefiere apellidos + nombre (`Apellidos, Nombre`, una sola coma; si apellidos ya trae
+  coma, se deja tal cual), luego solo uno de los dos, y si no hay ninguno, la primera columna que
+  quede, como antes. Red de seguridad: el valor tiene que traer alguna letra (`\p{L}`), o el
+  nombre se deja vacío — nunca vuelve a salir un número haciéndose pasar por una persona.
 - `LoPide.controles(caja, persona, valorInicial)`: pinta el desplegable, los campos de "Otra
   persona…" (solo visibles con esa opción), la vía y la fecha, **con clases, nunca con id**: este
   mismo módulo se monta a la vez dentro de `#bloque-detalles` de "Nuevo asunto" (que queda en el
@@ -1521,6 +1606,18 @@ El `?v=` es imprescindible: sin él se puede recibir una copia guardada.
   prueba en navegador de `pruebas/`.
 - **El conector de Vercel no sirve para esto:** da 403 y 404.
 - `vercel.json` manda `Cache-Control: public, max-age=0, must-revalidate` para todo.
+- **El plan gratuito solo da 100 publicaciones al día** (`api-deployments-free-per-day`): se
+  agotaron el 17-sep-2026, con más de 100 commits a `main` ese día, y la web se quedó sin
+  actualizar hasta el siguiente (fila 48 de `docs/COLA.md`, `docs/NO-GASTAR-PUBLICACIONES.md`).
+  `vercel.json` gana un `ignoreCommand` que se salta la publicación (código 0) si la rama no es
+  `main`, o si el cambio solo toca `docs/`, `pruebas/`, `.github/` o ficheros `.md` (comparando
+  contra `VERCEL_GIT_PREVIOUS_SHA`, con `HEAD^` de respaldo la primera vez; ante cualquier duda,
+  publica). **Va como comando de `sh` normal, sin envolver en `bash -c`**: los ejemplos oficiales
+  de Vercel nunca lo envuelven, y un primer intento envolviéndolo en `bash -c '...'` acabó en
+  "Deployment failed" en vez del "rate limited" de siempre (17-sep-2026); comprobado luego a mano
+  con `sh -c` contra commits reales del repositorio, sin `bash`. Se comprueba con
+  `pruebas/vercel-ignorecommand.mjs`, sin navegador. Y la cola gana la regla 13: como máximo dos
+  subidas por fila (una para marcarla EN CURSO, otra al terminar, con todo junto).
 
 ### Ficheros del repositorio
 
@@ -1530,7 +1627,7 @@ de `App` va después del fichero que lo define.
 | Fichero | Qué hace |
 |---|---|
 | `index.html` | La página |
-| `vercel.json` | Que el navegador no se quede con copias viejas |
+| `vercel.json` | Que el navegador no se quede con copias viejas; `ignoreCommand` para no gastar publicaciones en cambios que no tocan la web |
 | `css/estilos.css` | El aspecto general. Los demás `css/` van con su módulo del mismo nombre |
 | `css/vista.css` | El ancho de la pantalla, los filtros plegados y las tarjetas por tipo |
 | `css/guias.css` | La guía: pasos, plegado, preguntas y opciones |

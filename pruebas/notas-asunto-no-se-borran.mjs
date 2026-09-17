@@ -149,8 +149,18 @@ await comprobar('5. App.reengancharFicha no ha vuelto a pintar la ficha',
 console.log('--- 6. cuando sí cambia algo se repinta, y la nota sobrevive al repintado ---');
 /* Aquí la ficha se rehace de verdad (llega un documento a la carpeta
    DEL ASUNTO): es U.conservandoLoEscrito quien tiene que salvar la
-   nota, el foco y el cursor, no el atajo de no repintar. */
+   nota, el foco y el cursor, no el atajo de no repintar.
+
+   Se vuelve a escribir justo antes (17-sep-2026, fila 37,
+   docs/FICHA-DEL-ASUNTO-NUEVA.md): la caja se guarda sola al segundo
+   de dejar de escribir, y entre los pasos 1 y 5 ya ha pasado más de
+   un segundo desde la primera vez que se escribió, así que esa nota
+   ya se ha guardado sola (es lo que toca: docs/COLA.md pide comprobar
+   justo eso, más abajo). Lo que aquí se comprueba es que un repintado
+   de verdad, en mitad de escribir la SIGUIENTE nota, no la tira. */
 await pagina.click('#ficha-nota-texto');
+await pagina.fill('#ficha-nota-texto', '');
+await pagina.keyboard.type('El presupuesto llega mañana', { delay: 5 });
 await pagina.evaluate(() => document.getElementById('ficha-nota-texto').setSelectionRange(11, 11));
 await pagina.evaluate(async (asunto) => {
   const carpeta = await window.__disco.abiertos.getDirectoryHandle(asunto);
@@ -158,19 +168,24 @@ await pagina.evaluate(async (asunto) => {
     window.__disco.fich('260911 PRESUPUESTO Referencia 123.pdf', 'el presupuesto'));
   await window.App.verAbiertos();
 }, NOMBRE_ASUNTO);
-await pagina.waitForTimeout(300);
 await comprobar('6. un documento nuevo en la carpeta sí repinta la ficha',
   pagina.evaluate(() => window.__nodoNota !== document.getElementById('ficha-nota-texto')), true);
 await comprobar('6. y el documento nuevo se ve en la ficha',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento'))
     .some((b) => b.textContent.indexOf('PRESUPUESTO') !== -1)), true);
 await comprobar('6. lo escrito sobrevive a ese repintado de verdad',
-  pagina.inputValue('#ficha-nota-texto'), 'He llamado al proveedor y me devuelve la llamada');
+  pagina.inputValue('#ficha-nota-texto'), 'El presupuesto llega mañana');
 await comprobar('6. y el foco y el cursor también',
   pagina.evaluate(() => {
     const c = document.getElementById('ficha-nota-texto');
     return [document.activeElement === c, c.selectionStart, c.selectionEnd];
   }), [true, 11, 11]);
+
+console.log('--- 7. y un segundo después de dejar de escribir, se guarda sola ---');
+await pagina.waitForFunction(() => document.getElementById('ficha-nota-texto').value === '');
+await comprobar('7. las dos notas han quedado guardadas',
+  pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-notas-lista .nota-texto')).map((n) => n.textContent)),
+  ['El presupuesto llega mañana', 'He llamado al proveedor y me devuelve la llamada']);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

@@ -1,15 +1,14 @@
 # La cabecera se queda arriba, y se encoge
 
-Acordado con Francisco el 17-sep-2026. Es la **fila 43** de `docs/COLA.md`.
+Acordado con Francisco el 17-sep-2026.
 
-**Antes de nada**: si esta instrucción no está todavía en la tabla de `docs/COLA.md`, apúntala
-como fila 43 con estado PENDIENTE, con esta nota corta: "La cabecera de cada pantalla se queda
-pegada arriba y se encoge a una sola línea al bajar. Un solo mecanismo compartido para las siete
-pantallas."
+Se apuntó tarde, como **fila 45** de `docs/COLA.md` (ya con las filas 39-44 ocupadas por otras
+instrucciones apuntadas mientras esta se quedó sin fila; ver la nota "Orden de trabajo" de la
+cola). Este documento decía "fila 43", pero ese número ya lo tenía `docs/BUSCADOR-ARCHIVO-INDICE.md`.
 
-**Va después de la fila 37** (`FICHA-DEL-ASUNTO-NUEVA.md`) **y de la fila 39**
-(`AJUSTES-POR-TIPO.md`): las dos recolocan pantallas que aquí se tocan. Si alguna de las dos
-sigue PENDIENTE, salta esta y vuelve cuando estén hechas.
+**Va después de `FICHA-DEL-ASUNTO-NUEVA.md`** (ya hecha, era la fila 37) **y de
+`AJUSTES-POR-TIPO.md`** (fila 40 con la numeración de hoy): las dos recolocan pantallas que aquí
+se tocan. Si `AJUSTES-POR-TIPO.md` sigue pendiente, salta esta fila y vuelve cuando esté hecha.
 
 ## 1. El problema, con sus palabras
 

@@ -55,6 +55,15 @@ var FichaDocumentos = (function () {
     fila.className = 'ficha-documento-fila';
     fila.appendChild(b);
 
+    /* A la vista se quedan solo el nombre y Registrar (cuando sale).
+       Todo lo demás —Copiar (lo añade js/copiar.js más tarde), Separar,
+       Unir, Sacar páginas y Borrar— va dentro del menú de tres puntos
+       (17-sep-2026, fila 36, docs/FILAS-QUE-NO-SE-ESTRUJAN.md), para que
+       la fila no se ensanche sin límite. El menú se crea siempre, aunque
+       empiece vacío, para que js/copiar.js tenga siempre dónde meter su
+       botón. */
+    var accionesMenu = [];
+
     if (window.Registro && !Registro.tieneRegistro(f.nombre)) {
       var pendiente = Registro.pendiente(a, f.nombre);
       if (pendiente) {
@@ -94,13 +103,12 @@ var FichaDocumentos = (function () {
         };
         return boton;
       }
-      fila.appendChild(botonPdf('Separar', 'Partirlo en varios documentos', PdfSepararUnir.separar));
-      fila.appendChild(botonPdf('Unir', 'Juntarlo con otro PDF del asunto', PdfSepararUnir.unir));
-      fila.appendChild(botonPdf('Sacar páginas', 'Sacar una copia con solo algunas páginas', PdfSepararUnir.sacarPaginas));
+      accionesMenu.push(botonPdf('Separar', 'Partirlo en varios documentos', PdfSepararUnir.separar));
+      accionesMenu.push(botonPdf('Unir', 'Juntarlo con otro PDF del asunto', PdfSepararUnir.unir));
+      accionesMenu.push(botonPdf('Sacar páginas', 'Sacar una copia con solo algunas páginas', PdfSepararUnir.sacarPaginas));
     }
 
-    /* Borrar, con papelera (11-sep-2026): siempre el último, separado
-       de lo demás. */
+    /* Borrar, con papelera (11-sep-2026): siempre el último. */
     if (window.Papelera) {
       var borrar = window.Papelera.botonBorrar(async function () {
         var ok = await window.Papelera.preguntarBorrar(f.nombre);
@@ -116,8 +124,11 @@ var FichaDocumentos = (function () {
           borrar.disabled = false;
         }
       });
-      fila.appendChild(borrar);
+      borrar.style.marginLeft = '';
+      accionesMenu.push(borrar);
     }
+
+    fila.appendChild(U.menuDeAcciones(accionesMenu, { titulo: 'Más acciones con este documento' }));
 
     return fila;
   }

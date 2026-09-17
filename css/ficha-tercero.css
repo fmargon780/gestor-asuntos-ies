@@ -1,0 +1,53 @@
+/* ============================================================
+   ficha-tercero.css — "Datos y contacto" en una línea, y la ventana
+   "Ver todo" (17-sep-2026, fila 37, docs/FICHA-DEL-ASUNTO-NUEVA.md).
+   ============================================================ */
+
+.ficha-tercero-linea {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 0;
+  font-size: 14px;
+}
+.ft-nombre { font-weight: 600; }
+.ft-punto { color: var(--tinta-suave); margin: 0 8px; }
+.ficha-tercero-linea [data-copiar] { cursor: pointer; }
+.ficha-tercero-linea [data-copiar]:hover { color: var(--azul); text-decoration: underline; }
+
+.ft-etiqueta {
+  display: inline-block; border-radius: 20px; padding: 1px 10px;
+  font-size: 12px; font-weight: 700; letter-spacing: .02em;
+}
+.ft-etiqueta-ambar { background: var(--ambar); color: #8a6100; border: 1px solid var(--ambar-linea); }
+.ft-etiqueta-azul { background: var(--azul-claro); color: var(--azul); border: 1px solid #c3d8ec; }
+.ft-aviso-dni { color: #a4302a; font-weight: 600; }
+
+.ft-sub { color: var(--tinta-suave); font-size: 12.5px; margin-top: 3px; }
+
+.ft-ver-todo { margin-top: 10px; }
+
+/* La ventana "Ver todo": a dos columnas si hay sitio. */
+.ft-ventana {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px;
+  align-content: start;
+}
+.ft-seccion { min-width: 0; }
+.ft-seccion h4 {
+  margin: 14px 0 4px; font-size: 13px; text-transform: uppercase;
+  letter-spacing: .04em; color: var(--tinta-suave);
+}
+.ft-seccion:first-child h4 { margin-top: 0; }
+.ft-tutor { border: 1px solid var(--linea); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
+.ft-tutor h5 { margin: 0 0 6px; font-size: 13.5px; }
+.ft-resto { grid-column: 1 / -1; margin-top: 10px; }
+.ft-resto summary { cursor: pointer; color: var(--tinta-suave); font-size: 13px; }
+.ft-resto[open] summary { margin-bottom: 8px; }
+
+.ft-ventana [data-copiar] { cursor: pointer; }
+.ft-ventana [data-copiar]:hover { color: var(--azul); text-decoration: underline; }
+
+@container (max-width: 620px) {
+  .ft-ventana { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 700px) {
+  .ft-ventana { grid-template-columns: 1fr; }
+}

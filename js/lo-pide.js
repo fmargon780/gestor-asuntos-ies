@@ -23,6 +23,19 @@ var LoPide = (function () {
   var RE_TELEFONO = /telefono|movil/;
   var RE_CORREO = /correo|e-?mail/;
 
+  /* Columnas que nunca son el nombre de un tutor, aunque no sean
+     teléfono ni correo: documentos, identificadores, fechas y
+     domicilio (17-sep-2026, fila 38, docs/LO-PIDE-NOMBRE-DEL-TUTOR.md).
+     Antes, sin esta lista, la primera columna que quedaba era casi
+     siempre el documento del tutor, y salía un número en vez de un
+     nombre. */
+  var RE_NUNCA_NOMBRE = /documento|dni|nif|nie|pasaporte|identificacion|identificador|\bident\b|numero|\bnum\b|nº|codigo|parentesco|relacion|sexo|fecha|nacimiento|domicilio|direccion|localidad|municipio|provincia|pais|nacionalidad|postal/;
+
+  /* Al menos una letra de verdad (con acentos y ñ): un valor que sea
+     solo cifras no puede ser un nombre, aunque su columna se haya
+     colado por algún lado. */
+  var RE_ALGUNA_LETRA = /\p{L}/u;
+
   /* El primer valor de `campos` cuyo título case con el patrón, leído
      por el título (como js/dni.js y js/plantillas.js). Copia mínima,
      a propósito: este módulo no depende del orden de carga de
@@ -37,6 +50,40 @@ var LoPide = (function () {
     return '';
   }
 
+  /* De las columnas que puedan ser el nombre (ni teléfono, ni correo,
+     ni ninguna de RE_NUNCA_NOMBRE): apellidos + nombre si hay las dos,
+     solo una de las dos si hay una, o la primera que quede si ninguna
+     se reconoce como tal (como hasta el 17-sep-2026). */
+  function nombreDeTutor(propios) {
+    var deApellidos = null, deNombre = null, primera = null;
+    Object.keys(propios).forEach(function (k) {
+      var t = U.normalizar(k);
+      if (RE_TELEFONO.test(t) || RE_CORREO.test(t) || RE_NUNCA_NOMBRE.test(t)) return;
+      if (primera === null) primera = k;
+      if (deApellidos === null && /apellido/.test(t)) deApellidos = k;
+      else if (deNombre === null && /nombre/.test(t)) deNombre = k;
+    });
+
+    var nombre;
+    if (deApellidos !== null && deNombre !== null) {
+      var ape = String(propios[deApellidos] || '').trim();
+      var nom = String(propios[deNombre] || '').trim();
+      if (!ape) nombre = nom;
+      else if (!nom || ape.indexOf(',') !== -1) nombre = ape;
+      else nombre = ape + ', ' + nom;
+    } else if (deNombre !== null) {
+      nombre = String(propios[deNombre] || '').trim();
+    } else if (deApellidos !== null) {
+      nombre = String(propios[deApellidos] || '').trim();
+    } else if (primera !== null) {
+      nombre = String(propios[primera] || '').trim();
+    } else {
+      nombre = '';
+    }
+
+    return nombre && RE_ALGUNA_LETRA.test(nombre) ? nombre : '';
+  }
+
   /* {tutor1}/{tutor2} de js/plantillas.js hasta el 17-sep-2026: las
      columnas que hablan de "tutor" y de ese número (o de
      "primer"/"segundo"), separando dentro el teléfono y el correo del
@@ -49,12 +96,8 @@ var LoPide = (function () {
     Object.keys(campos || {}).forEach(function (k) {
       if (reNumero.test(U.normalizar(k))) propios[k] = campos[k];
     });
-    var claveNombre = Object.keys(propios).filter(function (k) {
-      var t = U.normalizar(k);
-      return !RE_TELEFONO.test(t) && !RE_CORREO.test(t);
-    })[0];
     return {
-      nombre: claveNombre ? String(propios[claveNombre] || '').trim() : '',
+      nombre: nombreDeTutor(propios),
       telefono: primerValorQueParezca(propios, RE_TELEFONO),
       correo: primerValorQueParezca(propios, RE_CORREO)
     };
@@ -83,12 +126,16 @@ var LoPide = (function () {
     if (categoria === 'ALUMNADO') {
       [1, 2].forEach(function (n) {
         var t = datosDeTutor(persona.campos, n);
-        if (!t.nombre) return;
+        /* Sin nombre pero con teléfono o correo, la opción se sigue
+           ofreciendo (17-sep-2026, fila 38): antes desaparecía sin
+           más, y era la única forma de apuntar a ese tutor. */
+        if (!t.nombre && !t.telefono && !t.correo) return;
         lista.push({
           valor: 'tutor' + n,
-          texto: 'Tutor legal ' + n + ' · ' + t.nombre,
+          texto: t.nombre ? 'Tutor legal ' + n + ' · ' + t.nombre : 'Tutor legal ' + n,
           datos: {
-            nombre: t.nombre, categoria: categoria, relacion: 'Tutor legal ' + n,
+            nombre: t.nombre || ('Tutor legal ' + n), categoria: categoria,
+            relacion: t.nombre ? 'Tutor legal ' + n : '',
             correo: t.correo, telefono: t.telefono
           }
         });

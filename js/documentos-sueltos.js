@@ -92,12 +92,20 @@ App.tarjetaSuelto = function (s, pie, esNuevo) {
   var acciones = document.createElement('div');
   acciones.className = 'acciones';
 
+  /* A la vista se quedan solo los dos botones importantes; el resto
+     —Abrir, Separar, Unir, Sacar páginas y Borrar (que lo añade
+     js/papelera.js por envoltura, más tarde)— va al menú de tres
+     puntos (17-sep-2026, fila 36, docs/FILAS-QUE-NO-SE-ESTRUJAN.md). El
+     menú se crea siempre, aunque empiece con un solo botón, para que
+     esa envoltura tenga siempre dónde meter Borrar. */
+  var accionesMenu = [];
+
   var ver = document.createElement('button');
   ver.className = 'boton';
   ver.textContent = 'Abrir';
   ver.title = 'Lo abre en otra pestaña para verlo';
   ver.onclick = function () { App.abrirSuelto(s); };
-  acciones.appendChild(ver);
+  accionesMenu.push(ver);
 
   var crear = document.createElement('button');
   crear.className = 'boton boton-principal';
@@ -106,8 +114,7 @@ App.tarjetaSuelto = function (s, pie, esNuevo) {
   acciones.appendChild(crear);
 
   /* Muchas veces el documento es de un asunto que ya existe. Este botón
-     lo lleva allí sin crear nada. Va antes que "Borrar", que se lo
-     añade js/papelera.js por envoltura. */
+     lo lleva allí sin crear nada. */
   var meter = document.createElement('button');
   meter.className = 'boton';
   meter.textContent = 'Meter en un asunto';
@@ -132,10 +139,12 @@ App.tarjetaSuelto = function (s, pie, esNuevo) {
       };
       return boton;
     }
-    acciones.appendChild(botonPdfSuelto('Separar', 'Partirlo en varios documentos', PdfSepararUnir.separar));
-    acciones.appendChild(botonPdfSuelto('Unir', 'Juntarlo con otro PDF de Por clasificar', PdfSepararUnir.unir));
-    acciones.appendChild(botonPdfSuelto('Sacar páginas', 'Sacar una copia con solo algunas páginas', PdfSepararUnir.sacarPaginas));
+    accionesMenu.push(botonPdfSuelto('Separar', 'Partirlo en varios documentos', PdfSepararUnir.separar));
+    accionesMenu.push(botonPdfSuelto('Unir', 'Juntarlo con otro PDF de Por clasificar', PdfSepararUnir.unir));
+    accionesMenu.push(botonPdfSuelto('Sacar páginas', 'Sacar una copia con solo algunas páginas', PdfSepararUnir.sacarPaginas));
   }
+
+  acciones.appendChild(U.menuDeAcciones(accionesMenu, { titulo: 'Más acciones con este documento' }));
 
   div.appendChild(acciones);
   return div;
@@ -394,10 +403,19 @@ App.accionesDeSuelto = function (s) {
   var tarjeta = App.tarjetaSuelto(s, '', false);
   var acciones = tarjeta.querySelector('.acciones');
   if (!acciones) return null;
-  var abrir = Array.prototype.filter.call(acciones.children, function (b) {
-    return (b.textContent || '').trim() === 'Abrir';
-  })[0];
-  if (abrir) acciones.removeChild(abrir);
+  /* "Abrir" no pinta nada aquí dentro: ya se está viendo el documento
+     en el propio panel. Vive dentro del menú de tres puntos desde la
+     fila 36 (docs/FILAS-QUE-NO-SE-ESTRUJAN.md); se quita por ahí,
+     con el mismo método que usa js/copiar.js para meter "Copiar". */
+  var menu = acciones.querySelector('.menu-acciones');
+  if (menu && menu.quitarAccion) {
+    menu.quitarAccion('Abrir');
+  } else {
+    var abrir = Array.prototype.filter.call(acciones.children, function (b) {
+      return (b.textContent || '').trim() === 'Abrir';
+    })[0];
+    if (abrir) acciones.removeChild(abrir);
+  }
   return acciones;
 };
 

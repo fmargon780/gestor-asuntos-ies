@@ -19,11 +19,12 @@
 }
 .ficha-acciones .campo-estado { width: auto; min-width: 180px; }
 
-/* Dos columnas: a la izquierda lo que se trabaja (guía y notas), a la
-   derecha lo que se consulta (documentos, otros asuntos, datos y
-   contacto). */
+/* Dos columnas (17-sep-2026, fila 37, docs/FICHA-DEL-ASUNTO-NUEVA.md):
+   a la izquierda lo que se trabaja (hitos y documentos, que llevan
+   botones y necesitan la columna ancha), a la derecha lo que se
+   consulta y se anota (datos y contacto, otros asuntos, notas). */
 .ficha-columnas {
-  display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
   gap: 20px; align-items: start;
 }
 .ficha-izquierda, .ficha-derecha { display: flex; flex-direction: column; gap: 16px; }
@@ -80,6 +81,15 @@
 @media (max-width: 1000px) {
   .ficha-columnas { grid-template-columns: 1fr; }
   .ficha-datos .ficha-dato { grid-template-columns: 1fr; gap: 0; }
+}
+/* Con el panel de la derecha abierto (visor o lector) tampoco cabe
+   una segunda columna, aunque la ventana sea ancha: el orden que
+   queda es el de siempre, Hitos y Documentos (de .ficha-izquierda)
+   primero, después Datos y contacto, Otros asuntos y Notas (de
+   .ficha-derecha), porque cada columna ya sale entera antes de pasar
+   a la siguiente. */
+body.con-visor .ficha-columnas, body.con-lector .ficha-columnas {
+  grid-template-columns: 1fr;
 }
 
 /* El botón de la vía lleva su dibujo: teléfono, sobre, pantalla o

@@ -2121,3 +2121,25 @@ una línea cada una. El texto largo que tenían antes era:
   alta/edición/borrado en Ajustes (no pedida por las pruebas del encargo, pero es la parte que usa
   Francisco a diario). Batería completa en verde (`npm test`, 22 ficheros). Con esta fila, la cola
   se queda sin ninguna PENDIENTE: solo la fila 11 sigue EN CURSO, de otra sesión.
+- **44 · `docs/ARCHIVAR-ATASCOS.md`**: Terminada 17-sep-2026 · 19:05. Otro asunto real
+  (JUSTIFICACION FALTAS PAS) se quedó atascado al archivar con un `NotFoundError` del navegador,
+  en inglés, tal cual en pantalla. `U.mensajeDeError` traduce esos errores (usada ya en el
+  `catch` de `App.cerrarAsunto`/`App.reabrirAsunto`); `Carpetas.js` deja de contar y copiar los
+  temporales de sincronización de Dropbox y reintenta una vez un fichero que se esfuma a mitad de
+  la copia; y `App.cerrarAsunto`/`App.reabrirAsunto` reconocen, antes de tocar nada, si la
+  carpeta ya se archivó o reabrió por otro camino (pone la ficha al día sin copiar nada, en vez de
+  reventar) o si ha desaparecido de los dos sitios (aviso en castellano, pide recargar). Prueba
+  nueva `pruebas/archivar-atascos.mjs`, con navegador (6 escenarios). Batería completa en verde.
+- **48 · `docs/NO-GASTAR-PUBLICACIONES.md`**: Terminada 17-sep-2026. A media tarde de ese día
+  Vercel dejó de publicar: el plan gratuito solo da 100 publicaciones al día, y `main` recibió
+  exactamente 100 commits, más de la mitad sin tocar nada de lo que se ve en la web (`docs/COLA.md`,
+  `docs/CONTEXTO.md`, reconciliaciones con `main`...). `vercel.json` gana un `ignoreCommand` que se
+  salta la publicación cuando la rama no es `main` o el cambio solo toca `docs/`, `pruebas/`,
+  `.github/` o `.md`, comparando contra `VERCEL_GIT_PREVIOUS_SHA` (con `HEAD^` de respaldo la
+  primera vez). Un primer intento lo envolvía en `bash -c '...'`, como proponía el documento;
+  Vercel lo publicó como "Deployment failed" en vez del "rate limited" de siempre, así que se
+  cambió a un comando de `sh` normal (los ejemplos oficiales de Vercel nunca usan `bash -c`),
+  comprobado a mano con `sh -c` contra commits reales del repositorio. Prueba nueva
+  `pruebas/vercel-ignorecommand.mjs`. La cola gana la regla 13: como máximo dos subidas por fila,
+  para no repetir el mismo problema con las sesiones en paralelo. **Sin comprobar en el propio
+  Vercel**: el cupo diario seguía agotado al terminar; queda para el 18-sep-2026.

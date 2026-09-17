@@ -26,8 +26,12 @@
   display: none;
 }
 
-/* Con la barra plegada, el contenido gana ese sitio. */
-#aplicacion.barra-plegada .contenido { max-width: 1360px; margin-left: 52px; }
+/* Con la barra plegada, el contenido gana ese sitio. Sin tope de
+   ancho (17-sep-2026, fila 36 de la cola): con uno de 1360px, que
+   ganaba por especificidad al max-width:none de css/vista.css, el
+   monitor ancho del trabajo se quedaba con franjas vacías a los
+   lados nada más arrancar, que es como nace la barra. */
+#aplicacion.barra-plegada .contenido { margin-left: 52px; }
 
 /* El icono de la rueda dentada: solo se ve con la barra plegada, para
    llegar a Ajustes sin tener que abrirla primero. Cuando está abierta,
