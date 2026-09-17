@@ -1670,3 +1670,303 @@ hoy, en `docs/CONTEXTO-CORTO.md`.
 > dentada con la barra plegada. Hizo falta ajustar dos pasos de `pruebas/navegador.mjs` y
 > `pruebas/campos.mjs` que abrían "Cambiar el nombre" o "Campos" con un clic directo sobre
 > `.fila-tipo`: ahora pasan primero por el menú de los tres puntos de la tarjeta.
+>
+> ### La papelera: borrar sin miedo (11-sep-2026)
+>
+> Hasta ahora no se podía borrar nada desde la aplicación. Desde hoy sí, pero **nada se borra de
+> verdad a la primera: se manda a una papelera** compartida, de la que se puede devolver a su
+> sitio. Por qué: las carpetas viven en el Dropbox del centro y las usan dos administrativos; un
+> borrado de verdad desaparecería también del ordenador del compañero, sin aviso y sin deshacer.
+> Encargo completo en `docs/PAPELERA.md`.
+>
+> - **Dónde hay botón Borrar, y dónde no**: documento dentro de un asunto (ficha del asunto y
+>   "Gestionar documentos"), documento suelto, un asunto **abierto** desde su ficha (nunca desde la
+>   tarjeta de la lista, ni en el ARCHIVO), tipo de asunto, estado, tipo de documento, campo propio
+>   y persona o empresa dada de alta a mano (nunca la que viene de Séneca). El botón se llama
+>   siempre **Borrar**, con el aspecto de botón de peligro (`.boton-peligro`, ya existía) y va el
+>   último de su fila. Los sitios que ya tenían un "Quitar" (tipos, estados, tipos de documento y
+>   campos propios en Ajustes; la nota del tablón) se han cambiado para que pasen por la papelera,
+>   en vez de duplicar el botón.
+> - **La papelera**: carpeta `_GESTOR/PAPELERA`, y su índice `_GESTOR/papelera.json` (una lista de
+>   fichas, la más nueva arriba). Lo que es un fichero o una carpeta se mueve dentro, en su propia
+>   subcarpeta `AAMMDD-HHMM <nombre>` (así dos borrados del mismo nombre no chocan), con
+>   `Carpetas.trasladar` / `Carpetas.moverFichero`: si la copia no sale completa, no se borra nada.
+>   Lo que no es un fichero (un tipo, un estado, una persona, una nota…) no tiene carpeta: su dato
+>   se guarda entero en la ficha del índice. `papelera.json` es un fichero compartido más: se relee
+>   antes de escribirlo y entra en las copias de seguridad de `js/copias.js` (ver más abajo).
+> - **Las comprobaciones antes de borrar**: un tipo de asunto no se borra si hay asuntos (abiertos
+>   o en `asuntos.json`) con ese tipo — se dice cuántos —, y si tiene guía escrita se avisa de que
+>   se va con él (guardada en la papelera, para poder devolverla junto con el tipo). Un estado no
+>   se borra si algún asunto lo tiene puesto. Un campo propio no se borra si está asociado a algún
+>   tipo — se dice a cuáles —. Un tipo de documento se borra siempre: los documentos ya nombrados
+>   conservan su nombre. Una persona o empresa no se borra si tiene asuntos, abiertos o archivados
+>   (se mira con `Duplicados.delTercero`), y solo se puede borrar si se dio de alta a mano.
+> - **El cuadro de confirmación**: uno solo, "¿Mandar a la papelera?", con el nombre en negrita y
+>   "Se podrá recuperar desde Ajustes › Papelera" en gris. Sin escribir nada para confirmar.
+>   Excepción: un asunto abierto con documentos dentro lleva un segundo cuadro, "¿Seguro?", después
+>   del primero — nunca los dos a la vez, que solo hay un `#capa`.
+> - **El bloque Papelera de Ajustes**, el último de todos: cada línea con qué era, el nombre, de
+>   dónde salía, quién y cuándo ("hace N días"), y dos botones, **Devolver a su sitio** y **Borrar
+>   del todo** (esta última pide su propia confirmación: "Esto sí lo quita de verdad. Dropbox aún
+>   lo guarda 30 días más en su propia papelera."). Si hay algo de más de 30 días, aviso ámbar con
+>   un botón para borrarlo todo de golpe. **La papelera no se vacía sola, nunca.**
+> - **Devolver a su sitio**: si el asunto de un documento ya no existe, se ofrece llevarlo a "Por
+>   clasificar" en vez de a su asunto. Si ya hay algo con ese nombre en el destino, no se pisa
+>   nada y se dice qué hay. Al devolver algo, sale de `papelera.json` y su subcarpeta (si tenía) se
+>   quita también.
+> - **El rastro**: al mandar un documento a la papelera desde un asunto, se apunta sola una nota en
+>   ese asunto (`Notas.anadir`); al devolverlo, otra nota. Un asunto entero no tiene dónde
+>   apuntarlo: el rastro es la propia ficha de `papelera.json`.
+> - Vive en `js/papelera.js` (`window.Papelera`), cargado después de `js/dni.js` y antes de
+>   `js/inicio.js`. Los sitios donde no había botón todavía (documento suelto, persona dada de alta
+>   a mano) lo llevan por **envoltura** (`App.tarjetaSuelto`, `App.verFicha`), como hace
+>   `js/dni.js`; donde el botón va dentro de una función privada (los documentos de un asunto, la
+>   ficha misma, la nota del tablón, las listas de Ajustes) se ha tocado el fichero directamente.
+> - Se comprueba con `pruebas/papelera.mjs`.
+>
+> ---
+>
+> ## 6. Cómo trabajamos el código ← LÉELO ANTES DE TOCAR NADA
+>
+> **El repositorio de GitHub es la versión buena.** Repositorio privado
+> `fmargon780/gestor-asuntos-ies`, rama `main`.
+>
+> 1. Tú escribes el código y lo subes al repositorio.
+> 2. Vercel publica solo, en la misma dirección.
+>
+> Dirección buena: **https://gestor-de-asuntos.vercel.app** — proyecto de Vercel
+> `gestor-de-asuntos`, equipo `team_gnCjBLTS8m8PNTFVUf7ST0uN`.
+>
+> **Un solo proyecto de Vercel. No crear más.** Ver la sección 0.
+>
+> **Nunca me pidas que edite líneas sueltas. Fichero entero, siempre.**
+>
+> ### Publicar: comprobarlo siempre, no darlo por hecho ← IMPORTANTE
+>
+> **Subir al repositorio no garantiza que Vercel publique.** Después de subir algo hay que
+> comprobar qué se está sirviendo:
+>
+>     curl -s "https://gestor-de-asuntos.vercel.app/js/nucleo.js?v=<algo distinto cada vez>"
+>     y mirar la línea App.VERSION
+>
+> El `?v=` es imprescindible: sin él se puede recibir una copia guardada.
+>
+> Lo aprendido el 10-sep-2026, en un día con veinte publicaciones:
+>
+> - **Comprobar la versión no basta: hay que comprobar cada fichero que se ha cambiado.** Un
+>   `curl` con `grep` de un nombre de función nuevo en cada fichero tocado es la comprobación.
+> - **Cada commit es una publicación, y van en cola.** Con la cuenta gratuita cuatro o cinco
+>   commits seguidos tardan **quince o veinte minutos**, y mientras tanto la web sirve una mezcla.
+>   **Conviene agrupar los ficheros en los menos commits posibles** y comprobar al final.
+> - **Una publicación de Vercel es del árbol entero.** Cuando la cola se atasca, **un commit
+>   trivial nuevo publica todo lo que hubiera pendiente**.
+> - **`curl -sI`** devuelve `x-vercel-cache` y `last-modified`. Si ese `last-modified` no se
+>   mueve en quince minutos, está atascado: entonces se fuerza. **Forzar más de dos veces no
+>   arregla nada.**
+> - **El panel de Vercel solo lo puede mirar él**, y hay que decirle exactamente qué mirar.
+>
+> **Comprobar que está publicado no es comprobar que funciona.** La comprobación de verdad es la
+> prueba en navegador de `pruebas/`.
+>
+> **El conector de Vercel no sirve para esto:** da 403 y 404.
+>
+> **`vercel.json`** manda `Cache-Control: public, max-age=0, must-revalidate` para todo.
+>
+> [Las tablas de ficheros del repositorio, de lo que guarda `_GESTOR`, de las columnas de cada
+> CSV y de las carpetas que se señalan en cada ordenador, y el resto de la sección 6 y de la
+> sección 7 ("Qué falta por hacer"), se mantienen ahora, ya sin fechas, dentro del propio
+> `docs/CONTEXTO.md`, que es donde se consultan para programar. No se repiten aquí para no
+> duplicar dos veces el mismo contenido casi literal.]
+
+---
+
+## Notas largas de `COLA.md` antes de la poda (12-sep-2026)
+
+Al podar `docs/COLA.md` el 12-sep-2026, las notas de las filas 1 a 8 (todas HECHA) se dejaron en
+una línea cada una. El texto largo que tenían antes era:
+
+- **1 · `docs/PLAN-ROBUSTEZ-2026-09.md`**: Ya estaba hecho antes de apuntarse aquí (PR #4,
+  fusionada 11-sep-2026 03:50): copias de seguridad y fichero roto, conflictos de Dropbox,
+  pruebas automáticas en GitHub Actions, fichas sin carpeta, nombres repetidos y documentación.
+  Comprobado de nuevo el 11-sep-2026: ficheros y pruebas en el repo, versión publicada
+  `11-sep-2026 · 05:33`.
+- **2 · `docs/REGISTRO-EN-UN-PASO.md`**: Ya estaba hecho antes de apuntarse aquí (PR #5, fusionada
+  11-sep-2026 05:01): botón Registrar sin nombrar dos veces, casilla "Pendiente de registro" y
+  lectura sola del sello de Séneca en el PDF. Comprobado de nuevo el 11-sep-2026.
+- **3 · `docs/CAMPOS-POR-TIPO.md`**: Terminada 11-sep-2026 · 11:59. Cada tipo de asunto puede
+  llevar sus propios campos (de fichero, calculados o propios), configurables en Ajustes con el
+  botón "Campos"; salen ya rellenos al crear el asunto, se pueden marcar obligatorios y añadir al
+  nombre en el orden elegido, se guardan con la ficha y se enseñan al editar y en la ficha del
+  asunto. `pruebas/campos.mjs`, los ocho escenarios del encargo más la edición, todas en verde.
+  Versión publicada `11-sep-2026 · 11:37`; con la corrección de la fila 4, la versión real en la
+  web es `11-sep-2026 · 12:00`.
+- **4 · `docs/TERCEROS-RELACIONADOS.md`**: Terminada 11-sep-2026 · 11:51. Lista de personas o
+  entidades relacionadas con un asunto, en el bloque "Personas y entidades relacionadas" de su
+  ficha. Al archivar se deja una nota (nunca una copia de documentos) en la carpeta de cada
+  relacionado, diciendo dónde está el asunto de verdad; al reabrir se borra sola, salvo que tenga
+  algo más dentro. Pruebas en `pruebas/relacionados.mjs`, todas en verde. La instrucción 3 subió a
+  la vez una versión completa de index.html, ficha-asunto.js y asuntos-nuevo.js basada en una
+  copia anterior a estos cambios, y los borró sin querer; se detectó por el número de versión y se
+  fusionaron ambos cambios en un commit aparte. Versión publicada, ya fusionada y comprobada en la
+  web: `11-sep-2026 · 12:00`.
+- **5 · `docs/NO-DUPLICAR-ASUNTOS.md`**: Terminada 11-sep-2026 · 13:22. Al pulsar "Crear el
+  asunto", si ya hay uno abierto o archivado del mismo tercero, mismo tipo y mismo año académico
+  (el grupo y el texto libre no cuentan), se para y sale "Este asunto ya existe": abrir el que
+  hay, o crear otro de todas formas. Para los que ya existían antes de esto (o se crearon a
+  mano), franja "Parecen el mismo asunto" en Asuntos abiertos, con un botón Unir que junta
+  ficheros y notas y borra el que sobra. Pruebas en `pruebas/duplicados.mjs`, los seis escenarios
+  del encargo, todas en verde; ajustada también `pruebas/campos.mjs`, que creaba a propósito un
+  segundo asunto igual el mismo día para otra cosa. Toda la batería en verde salvo los dos
+  escenarios de sello de Séneca de `pruebas/registro.mjs`, que en esta sesión no se han podido
+  comprobar por no tener aquí `js/lib/pdf.worker.min.js` (no se ha tocado ese fichero); sin
+  relación con este cambio. Versión publicada y comprobada en la web: `11-sep-2026 · 13:08`.
+- **6 · `docs/AJUSTES-AGIL.md`**: Terminada 11-sep-2026 · 14:58. Ajustes: una sola categoría a la
+  vez en "Tipos de asunto", con pestañas ALUMNADO/PERSONAL/EMPRESAS/OTROS de acuerdo con el
+  desplegable, buscador que mira en las cuatro categorías a la vez (con su etiqueta de categoría)
+  y aviso en vivo al escribir un nombre nuevo (rojo si ya existe, con "Verlo"; ámbar si solo se
+  parece), en tipos, estados y tipos de documento. Los tres pasan a una rejilla de tarjetas con
+  menú de tres puntos. Ajustes sube su tope a 1600px. La barra de la izquierda se queda fija en
+  pantalla, Ajustes sube a la lista de pestañas (separado por una línea) y, con la barra plegada,
+  un icono de rueda dentada lleva directo a Ajustes. Pruebas en `pruebas/ajustes-agil.mjs`, los
+  nueve escenarios del encargo, todas en verde; ajustados también dos pasos de
+  `pruebas/navegador.mjs` y `pruebas/campos.mjs` que abrían "Cambiar el nombre" o "Campos" con un
+  clic directo, ahora a través del menú de tres puntos. Batería completa (`npm test`, 21
+  ficheros) en verde, `js/lib/pdf.worker.min.js` incluido. Versión publicada `11-sep-2026 ·
+  14:58`.
+- **7 · `docs/PAPELERA.md`**: Terminada 11-sep-2026 · 16:20. Nada se borra de verdad a la primera:
+  se manda a `_GESTOR/PAPELERA`, con su ficha en `_GESTOR/papelera.json`. Botón Borrar (rojo
+  suave, siempre el último de su fila) en: documentos de un asunto (ficha y "Gestionar
+  documentos"), documentos sueltos, un asunto abierto desde su ficha (nunca desde la tarjeta ni
+  en el ARCHIVO), tipos de asunto, estados, tipos de documento, campos propios y personas o
+  empresas dadas de alta a mano. Los que ya tenían un "Quitar" (tipos, estados, tipos de
+  documento, campos propios en Ajustes; la nota del tablón) ahora pasan por la papelera en vez de
+  duplicar el botón, y llevan la comprobación que les faltaba: un tipo o un estado en uso, o un
+  campo propio asociado a algún tipo, ya no se pueden borrar (antes sí, sin avisar bien). Bloque
+  nuevo **Papelera** al final de Ajustes, con Devolver a su sitio y Borrar del todo (esta última
+  con su aviso de que es definitivo); si algo lleva más de 30 días, aviso ámbar para vaciar de
+  golpe lo viejo. La papelera nunca se vacía sola. Vive en `js/papelera.js`; se expone además
+  `Carpetas.trasladar` (ya existía por dentro, pero no se podía llamar desde fuera) y
+  `Datos.quitarDeLista`, que hacían falta para esto. Pruebas en `pruebas/papelera.mjs`, los once
+  escenarios del encargo, todas en verde. Batería completa (`npm test`, 23 ficheros) en verde
+  salvo los dos escenarios de sello de Séneca de `pruebas/registro.mjs`, que en esta sesión
+  tampoco se han podido comprobar por no tener aquí `js/lib/pdf.worker.min.js` (pesa más de 1 MB
+  y esta sesión no ha podido bajarlo; no se ha tocado ese fichero, sin relación con este cambio,
+  mismo aviso que dejó la fila 5). Versión publicada `11-sep-2026 · 16:20`.
+- **8 · `docs/UNIR-VER-DENTRO.md`**: Terminada 11-sep-2026 · 17:15. Quitada la franja amarilla
+  "Parecen el mismo asunto" de encima de la lista de Asuntos abiertos. En su lugar, un aviso de
+  una línea junto a Actualizar (`⚠ N posible(s) duplicado(s) — Revisar`, oculto si no hay
+  ninguno) que lleva a una pantalla propia **Duplicados** (fuera de la barra de la izquierda, con
+  su botón Volver): cada grupo en columnas, una por asunto, con el nombre como enlace a su ficha,
+  sus datos (fecha, estado, vía, plazo), sus documentos (abren en el visor lateral de siempre) y
+  sus notas (las tres últimas, con "y N más"). El botón Unir sigue igual. Botón nuevo "No son el
+  mismo" que descarta el grupo por la firma de sus nombres, en `_GESTOR/no-duplicados.json`; si
+  el grupo cambia de miembros (por ejemplo, un tercer asunto que encaja), la firma ya no coincide
+  y vuelve a avisar solo. Reversible desde Ajustes, bloque nuevo "Duplicados descartados" con
+  "Volver a avisar". Todo en `js/unir-asuntos.js` y `css/unir-asuntos.css`, sin tocar
+  `js/ajustes.js` ni la barra. Pruebas en `pruebas/duplicados.mjs` ampliada con los seis
+  escenarios nuevos del encargo (30 en total), todas en verde, comprobado también en rojo antes
+  del arreglo. Batería completa (`npm test`, 19 ficheros) en verde salvo los dos escenarios de
+  sello de Séneca de `pruebas/registro.mjs`, que en esta sesión tampoco se han podido comprobar
+  por no tener aquí `js/lib/pdf.worker.min.js`; no se ha tocado ese fichero, sin relación con
+  este cambio, mismo aviso que dejaron las filas 5 y 7.
+- **10 · `docs/ARREGLOS-USO-2026-09-14.md`**: Terminada 14-sep-2026 · 16:36. Cuatro arreglos
+  pequeños, acordados con Francisco por lo que le pasó a su compañero (se quedó atrapado en una
+  pantalla y tuvo que cerrar el navegador). El **3** (borrar un documento en Por clasificar) ya
+  estaba hecho desde la papelera (fila 7, `js/papelera.js`, `envolverSueltos`): solo se ha
+  comprobado. Los otros tres:
+  - **1 · Que de toda pantalla se pueda salir.** El Escape general de `js/usabilidad.js` no hacía
+    nada fuera del cuadro (`#capa`), un buscador o el lector de correos: en la ficha de un
+    asunto, en la pantalla Duplicados o en Ajustes/Archivo/Personas con historial, no pasaba
+    nada. Ahora, sin cuadro ni panel abierto, Escape hace lo mismo que el botón de salida de la
+    pantalla que se ve; en Nuevo asunto equivale a Cancelar, preguntando antes si hay algo
+    escrito. El visor de un documento (`js/visor.js`) no tenía Escape (solo el aspa): ahora
+    también se cierra con Escape, desde el mismo sitio, sin tocar `js/visor.js`. Dos cuadros
+    pequeños que ya ponían su propio Escape (el tipo de documento nuevo de `js/documentos.js`, el
+    menú de tres puntos de `js/ajustes.js`) se han tocado para que corten la propagación: si no,
+    el Escape general de aquí se disparaba también por detrás y cerraba de más (por ejemplo, todo
+    el cuadro de "Gestionar documentos" al salir solo del recuadro de crear un tipo).
+  - **2 · Copiar el nombre en orden normal.** Cada relacionado de la ficha del asunto lleva ahora
+    un botón "Copiar" (`js/relacionados.js`, `Relacionados.nombreEnOrdenNormal`) con el nombre
+    como se escribe a mano: de alumnado y personal quita el código final y da la vuelta a
+    "Apellidos, Nombre"; en empresas copia la razón social tal cual. No toca cómo se guarda el
+    nombre ni cómo se nombran las carpetas.
+  - **4 · Carpetas temporales de Drive/Dropbox.** `App.verAbiertos` (`js/asuntos-lista.js`) solo
+    descartaba las carpetas que empiezan por `_`: una carpeta temporal de sincronización
+    (`.tmp.driveupload`, `.dropbox`, `desktop.ini`...) se colaba como si fuera un asunto abierto
+    más. `Carpetas.esCarpetaTemporalDeSincronizacion` (`js/carpetas.js`), en un solo sitio,
+    descarta las que empiezan por `.` o `~` y las de siempre (`desktop.ini`, `Icon\r`, un nombre
+    con "conflicted copy"); si la carpeta ya tiene ficha en `asuntos.json`, se respeta igual,
+    aunque el nombre sea raro.
+  Cambios quirúrgicos, sin tocar la arquitectura. Batería completa (`npm test`, 19 ficheros) en
+  verde, con `js/lib/pdf.worker.min.js` esta vez sí presente. Subido a `main`, versión
+  `14-sep-2026 · 16:36`; **esta sesión no ha podido comprobarlo con `curl` contra la web
+  publicada** (la red de esta sesión concreta no llega a `gestor-de-asuntos.vercel.app`: la
+  bloquea la política de salida de este contenedor, no algo del código). Queda pendiente de
+  confirmar en el navegador la próxima vez que se entre.
+- **12 · `docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md`**: Terminada 16-sep-2026 · 20:40. Botón "Meter en
+  un asunto" en cada tarjeta de Por clasificar, para mandar un documento suelto a un asunto que
+  ya existe en vez de crear uno nuevo. La fila 11 de la cola (`docs/CORREOS-AL-ASUNTO.md`) seguía
+  **EN CURSO** de otra sesión al empezar esta (regla 6 de `docs/COLA.md`: se saltó y se cogió la
+  siguiente PENDIENTE), así que el elegidor de asuntos nace en su propio módulo,
+  `js/elegir-asunto.js` (`window.ElegirAsunto`), pensado para que la bandeja de correos lo
+  reutilice cuando esa fila se retome, en vez de duplicar el buscador y la puntuación. El cuadro
+  enseña "Podrían encajar" (como mucho cinco, más de 40 puntos) y la lista completa con buscador,
+  abiertos primero y archivados con su etiqueta. La puntuación de un documento suelto (en
+  `js/documentos-sueltos.js`) sale de las palabras del nombre del fichero, del nombre del
+  tercero, de si el asunto está abierto y de si se movió hace menos de 30 días. Al elegir un
+  asunto archivado, ofrece reabrirlo (con `App.reabrirAsunto`, que pide su propia confirmación) o
+  meterlo sin reabrir. Nada se pierde: nombre repetido en el destino o un traslado a medias dejan
+  el documento donde estaba, con aviso. Pruebas nuevas en `pruebas/documentos-sueltos.mjs` (seis
+  escenarios del encargo). De paso se arregló `pruebas/logica.mjs`: la fecha de cese del personal
+  estaba escrita a mano (`15/09/2026` y `06/09/2026`) y se quedó desfasada al llegar esa fecha,
+  igual que ya le pasó una vez a la edad (ver el comentario de "la edad" en ese mismo fichero);
+  ahora sale de `fechaHace(0, …)`, relativa a hoy (este arreglo de `pruebas/logica.mjs` sí se ha
+  conservado). Batería completa en verde (`npm test`, 20 ficheros) en esa rama.
+
+  **Corrección, al fusionar**: mientras esta sesión trabajaba en su rama, otra sesión en paralelo
+  hizo también la fila 12 directamente en `main`, sin verse la una a la otra, y con mejor diseño:
+  un solo `js/elegir-asunto.js` compartido desde el principio con la bandeja de correos
+  (`js/bandeja-enlace.js`), en vez de dos elegidores por separado. Al fusionar esta rama, todo lo
+  descrito arriba sobre `js/elegir-asunto.js` y `js/documentos-sueltos.js` (el propio y el de la
+  bandeja) se ha descartado a favor de lo que ya había en `main`; `pruebas/documentos-sueltos.mjs`
+  también se ha sustituido por la versión de la otra sesión. Lo único de esta entrada que ha
+  sobrevivido es el arreglo de las fechas de `pruebas/logica.mjs`.
+- **13 · `docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md`**: Terminada 16-sep-2026 · 20:57, en la misma
+  sesión y el mismo pull request que la fila 12. Gmail no deja que una página web adjunte
+  ficheros, así que la salida sigue siendo la carpeta `GESTOR-BANDEJA`: bloque nuevo "Documentos
+  de este asunto" en el cuadro de Correo (`js/correo-adjuntos.js`, solo ahí, nunca en el de
+  Séneca), con una casilla por documento (desmarcadas de partida) y un límite de 20 MB. Al
+  preparar, se copian los marcados a la bandeja con el nombre `<id> - <original>` y, el último,
+  el encargo `<id>.envio.json` (con el hilo del asunto si `hilos` ya existe, de la fila 11; si no,
+  cadena vacía y sale como correo nuevo, tal como preveía el propio encargo). Se apunta en
+  `_GESTOR/envios.json` (una lista, no un objeto) para que la tarjeta "Borrador en camino" se vea
+  aunque se cierre el cuadro; esa tarjeta y su vigilancia (cada 15 segundos, solo mientras haya
+  algún encargo vivo) viven en `js/bandeja-correos.js`, que también deja de leer los
+  `.envio.json`/`.listo.json`/`.error.json` como si fueran correos recogidos. El script de Apps
+  Script (`mandarBorradores()`, en `apps-script/gestor-correos.gs`) monta el borrador con
+  `GmailApp.createDraft` o, si hay hilo, `createDraftReply`, siempre como borrador, nunca lo
+  envía; el disparador pasa de cinco minutos a uno. Pruebas nuevas en `pruebas/envios.mjs` (los
+  seis escenarios del encargo), batería completa en verde.
+- **14 · `docs/PLANTILLAS-DE-CORREO.md`**: Terminada 16-sep-2026 · 21:12, en la misma sesión y el
+  mismo pull request que las filas 12 y 13. Una plantilla es solo el cuerpo del medio: el saludo
+  y la firma los sigue poniendo `js/correo.js`, solo. Se crean en Ajustes pegadas a un tipo de
+  asunto y se guardan en `_GESTOR/plantillas.json` (`js/plantillas.js`, `window.Plantillas`),
+  compartido con el compañero; también saca de ahí la firma y el nombre del centro, que hasta hoy
+  estaban escritos a mano en `js/correo.js`. Los huecos entre llaves (`{nombre}`, `{grupo}`,
+  `{curso}`, `{tipo}`, `{hoy}`, `{limite}`, `{usuario}`, `{centro}`, y `{campo:LO QUE SEA}` para
+  un campo propio del tipo) se comparan sin mayúsculas ni acentos y nunca rompen nada: uno sin
+  dato se deja vacío y se avisa ("Faltan datos: …"), uno que no se reconoce se deja tal cual y
+  también avisa. El desplegable "Plantilla" sale en los dos cuadros (correo y Séneca), dentro de
+  su propio `#correo-comunes` para poder repintarse sin tocar el resto del cuadro; cambiar de
+  plantilla con algo escrito a mano pregunta antes, **en línea, dentro del propio cuadro**
+  (`#correo-plantilla-confirmar`), nunca con un segundo `U.preguntar`, porque solo hay un cuadro
+  de diálogo en toda la aplicación y ya está ocupado por el de Correo. En Séneca, copiar el texto
+  lo recorta a 4.000 letras si hace falta. El bloque de Ajustes vive entero en `js/plantillas.js`
+  (no ha hecho falta tocar `js/ajustes.js`): lista con buscador, alta y edición con botones para
+  insertar cada hueco y una vista previa en vivo, y un bloque aparte para la firma y el centro. El
+  borrado pasa por `Papelera.mandarDato`, pero `js/papelera.js` no sabe devolver la clase
+  `'plantilla'` (no estaba en el encargo): queda anotado en "Qué falta por hacer". Pruebas nuevas
+  en `pruebas/plantillas.mjs` (los siete escenarios del encargo), más una comprobación manual del
+  alta/edición/borrado en Ajustes (no pedida por las pruebas del encargo, pero es la parte que usa
+  Francisco a diario). Batería completa en verde (`npm test`, 22 ficheros). Con esta fila, la cola
+  se queda sin ninguna PENDIENTE: solo la fila 11 sigue EN CURSO, de otra sesión.

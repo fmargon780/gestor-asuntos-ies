@@ -100,13 +100,20 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 39 | `docs/AJUSTES-POR-TIPO.md` | PENDIENTE | Acordado con Francisco el 17-sep-2026. Ajustes se parte en tres pestañas (Tipos de asunto · El centro · Mantenimiento) y cada tipo de asunto pasa a tener pantalla propia a dos columnas con sus campos, pasos, plantillas de correo y de Word, plazo y recurrencia dentro. `js/ajustes.js` (52 KB) se parte en `js/ajustes-tipo.js`, `js/ajustes-centro.js` y `js/ajustes-mantenimiento.js` |
 | 40 | `docs/SALTAR-A-OTRO-ASUNTO.md` | PENDIENTE | Acordado con Francisco el 17-sep-2026. Va después de la fila 37. El bloque "Otros asuntos de este tercero" de la ficha solo pinta texto: ahora cada línea se pulsa y abre la ficha de ese asunto (abierto, o del ARCHIVO montado a mano, sin recorrer el ARCHIVO entero), y en esa ficha sale arriba "← Volver a [asunto de partida]", que apunta siempre al de partida aunque se salte varias veces. Módulo nuevo `js/otros-del-tercero.js`, que se lleva el bloque de `js/ficha-asunto.js` (ya pasa de 400 líneas). |
 
-| 41 | `docs/REPASO-DE-LA-COLA-2026-09-17.md` | EN CURSO (17-sep-2026) | Papeleo de la cola: dos instrucciones sin fila (42 y 43), la cabecera de `ARCHIVAR-ATASCOS.md` y `docs/HISTORIA.md` a medio restaurar. No toca código ni publica versión nueva. |
+| 41 | `docs/REPASO-DE-LA-COLA-2026-09-17.md` | HECHA (17-sep-2026) | Papeleo de la cola: añadidas las filas 42 y 43 (y, al repasar la cola entera, también la 44 y la 45, dos instrucciones más subidas sin fila el mismo día). Arreglada la cabecera de `docs/ARCHIVAR-ATASCOS.md` (ya no dice "fila 33"). `docs/HISTORIA.md` restaurado del todo, 140.232 bytes comprobados. No toca código ni publica versión nueva. |
+| 42 | `docs/BUSCADOR-ARCHIVO-INDICE.md` | PENDIENTE | Se subió a `main` el 17-sep-2026 a las 17:34 sin fila propia. **No está hecha**: `js/archivo-indice.js` no existe. Índice guardado del ARCHIVO y búsqueda por palabras sueltas, en los nombres de los documentos, en el número de registro de Séneca y en la ficha del asunto. Es la primera de tres instrucciones sobre el buscador del ARCHIVO; las otras dos están sin diseñar. |
+| 43 | `docs/ARCHIVAR-ATASCOS.md` | PENDIENTE | Escrita el 17-sep-2026 pidiendo ser la fila 33, pero ese número se lo llevó `TABLON-NO-SE-BORRA.md` y la instrucción se quedó fuera de la cola. **No está hecha**: `U.mensajeDeError` no existe en `js/util.js`. Traducir al castellano los errores del navegador al archivar, no contar ni copiar los ficheros temporales de Dropbox, y reconocer que la carpeta ya estaba archivada o reabierta. Antes de empezar, comprueba qué queda por hacer de verdad: las filas 32, 33 y 34 tocaron esta misma zona después de escribirse el documento. |
+| 44 | `docs/LEER-DOCUMENTOS-POR-CLASIFICAR.md` | PENDIENTE | Se subió a `main` el 17-sep-2026 a las 18:22, junto con la fila 45, con el mensaje de que las filas irían "en el commit siguiente" — no llegaron a apuntarse, y esta sesión las ha encontrado al repasar la cola entera. **No está hecha**: `js/lector-documentos.js` no existe. Lee el texto del PDF (con pdf.js) y propone tipo, fecha, registro de Séneca y tercero en cada tarjeta de "Por clasificar", con botón "Aceptar" cuando tipo y tercero están claros. Depende de la fila 39 (`js/ajustes-tipo.js`) para la casilla de palabras clave, pero puede hacerse antes si esa fila aún no existe: la propia instrucción dice qué fichero usar en ese caso (`js/ajustes.js`). |
+| 45 | `docs/TERCEROS-NUEVOS-DESDE-EL-DOCUMENTO.md` | PENDIENTE | Igual que la 44: subida el 17-sep-2026 · 18:22 sin fila propia. **Va después de la 44, y no tiene sentido sin ella.** Cuando el documento trae un documento de identidad que no cuadra con ningún tercero conocido, propone darlo de alta (categoría nueva "aspirante" incluida) con el alta ya rellena, sin crear terceros solo. |
 
-**Orden de trabajo:** quedan pendientes las filas 36, 37, 38, 39 y 40, en ese orden (la 37 va después de la 36: comparten pantalla; la 40 va después de la 37: tocan el mismo bloque de la ficha). Las filas 1 a 35 están hechas.
-
-**Sin fila todavía:** `docs/BUSCADOR-ARCHIVO-INDICE.md` (índice y búsqueda por palabras en el ARCHIVO)
-se subió a `main` el 17-sep-2026 a las 17:34 sin apuntarse aquí. Quien la apunte, que le dé el
-número siguiente; esta sesión no se lo pone para no chocar con la conversación que lo escribió.
+**Orden de trabajo:** quedan pendientes las filas 41, 43, 36, 37, 40, 38, 39, 42, 44 y 45, en ese
+orden. La 41 (esta) va la primera por ser papeleo corto. La 43 va después por ser un fallo que
+Francisco sufre al archivar. La 37 va después de la 36 y la 40 después de la 37: comparten
+pantalla. La 42 no tenía prisa (nadie la reclamaba) y se deja después de la 39, con la que
+comparte zona de Ajustes. Las filas 44 y 45 son las últimas por ser las que se acaban de
+encontrar sin fila: la 44 antes que la 45, porque la 45 no tiene sentido sin ella; las dos pueden
+adelantarse si la fila 39 (de la que depende la casilla de palabras clave) aún no está hecha,
+usando `js/ajustes.js` como dice la propia instrucción. Las filas 1 a 35 están hechas.
 
 ## Arreglado: `docs/CONTEXTO.md` (roto durante la fila 33)
 
@@ -124,27 +131,24 @@ Ojo, volvió a desandarse una vez: el commit de las filas 36 y 37 (17-sep-2026) 
 vieja de esta cola y dejó otra vez la nota como "Pendiente de arreglar", aunque el fichero ya
 estaba bien. Lo devolvió a su sitio la sesión de la fila 35. **`docs/CONTEXTO.md` está entero.**
 
-## Pendiente de arreglar: `docs/HISTORIA.md` (roto el 17-sep-2026 por la tarde)
+## Arreglado: `docs/HISTORIA.md` (roto el 17-sep-2026 por la tarde)
 
 `docs/HISTORIA.md` **no hacía falta tocarlo**: como dice la nota de la fila 35, lo que merecía
 contarse de las filas 33, 34 y 35 ya está en sus propias filas de esta cola. Pero una sesión
 posterior, sin ver esa nota, intentó de todas formas añadirle una entrada de la fila 33 al final
-del diario. Esa sesión concreta no puede escribir de una sola vez un fichero de más de unos
-45-50 KB (regla 12 de esta cola): la llamada que sube el contenido se corta sola, sin ningún
-error, y deja el fichero con solo el primer trozo. Pasó dos veces seguidas, con `docs/HISTORIA.md`
-(138 KB): la primera dejó el fichero en 44 KB, la segunda en 48.766 bytes (donde sigue ahora), muy
-lejos de sus 138.402 bytes de verdad.
+del diario, y se quedó a medias por no poder subir de una vez un fichero de más de unos 45-50 KB
+(regla 12 de esta cola). Varias sesiones fueron restaurándolo poco a poco después (se ve en el
+historial de git: `docs/HISTORIA.md` fue subiendo de 44 KB a 48.766 bytes y, ya el 17-sep-2026 por
+la noche, hasta 115.723 bytes), sin llegar nunca a completarlo del todo.
 
-**Cómo arreglarlo** (necesita una sesión que pueda subir un fichero grande de una vez, o hacerlo
-con varias llamadas pequeñas sin perder ningún trozo por el camino):
+Quedó arreglado del todo en la fila 41 de esta cola (17-sep-2026), de un solo golpe:
 
     git checkout 0aea5b3daa4170c46b1c47af18e8dc29bbe81a87 -- docs/HISTORIA.md
 
-Esa es la última versión buena conocida antes de este percance (blob
-`ad53467e3d2493cd4bdadf5ff96ad25e04be4b30`, 138.402 bytes). **No hace falta añadirle nada más**:
-como ya decía la nota de la fila 35, el diario no necesitaba ninguna entrada nueva por las filas
-33, 34 o 35. Después de restaurarlo, comprobar el tamaño (138.402 bytes) antes de darlo por
-bueno.
+Antes de subirlo se comprobó que los 115.723 bytes que había eran un trozo exacto, byte a byte,
+del principio de esa versión buena (sin ninguna línea nueva de por medio), así que restaurarlo así
+no perdía nada. Tamaño final comprobado: **140.232 bytes**. No se le ha añadido ninguna entrada
+nueva por las filas 33, 34 o 35: como ya decía la nota de la fila 35, el diario no la necesitaba.
 
 `docs/CONTEXTO.md` no se ha tocado en este percance: sigue entero, como dice la nota de arriba.
 
