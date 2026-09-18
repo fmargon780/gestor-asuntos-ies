@@ -64,6 +64,24 @@ var Hitos = (function () {
     };
   }
 
+  /* "Lo que hay que reunir" (18-sep-2026, fila 59,
+     docs/REQUISITOS-DE-HITO.md): la misma casilla de la guía
+     (id/texto/clase/obligatorio), con el estado propio del hito
+     encima (hecho/valor/documento/quien/cuando, como en las notas). */
+  function normalizarRequisitoHito(r) {
+    return {
+      id: (r && r.id) || nuevoId(),
+      texto: String((r && r.texto) || ''),
+      clase: (r && r.clase) === 'documento' ? 'documento' : 'dato',
+      obligatorio: !!(r && r.obligatorio),
+      hecho: !!(r && r.hecho),
+      valor: String((r && r.valor) || ''),
+      documento: String((r && r.documento) || ''),
+      quien: String((r && r.quien) || ''),
+      cuando: String((r && r.cuando) || '')
+    };
+  }
+
   /* Un hito, tal y como se guarda. Recursivo: un hito de clase
      "decision" lleva sus opciones, cada una con su propia lista de
      hitos (nunca otra decisión dentro, igual que en la guía). */
@@ -85,6 +103,7 @@ var Hitos = (function () {
       estadoAsunto: (h && h.estadoAsunto) || null,
       notas: Array.isArray(h && h.notas) ? h.notas.map(normalizarNota) : [],
       documentos: Array.isArray(h && h.documentos) ? h.documentos.map(String) : [],
+      requisitos: Array.isArray(h && h.requisitos) ? h.requisitos.map(normalizarRequisitoHito) : [],
       plantilla: (h && h.plantilla) || null,   /* hueco sin uso, sección 9 */
       opciones: [], elegida: null
     };
@@ -229,6 +248,15 @@ var Hitos = (function () {
     return { hechos: hechos, total: vis.length };
   }
 
+  /* "Lo que hay que reunir" (fila 59, sección 6 del encargo): las
+     casillas obligatorias de un hito que siguen sin marcar. Vacía si
+     no hay ninguna, o si el hito no tiene requisitos. No cambia
+     `marcar`: es js/hitos-panel-lista.js quien llama a esto ANTES de
+     pasar un hito a "hecho", para avisar sin impedir nada. */
+  function faltanObligatorios(hito) {
+    return ((hito && hito.requisitos) || []).filter(function (r) { return r.obligatorio && !r.hecho; });
+  }
+
   /* ==========================================================
      EL ESTADO DEL ASUNTO (sección 8 del encargo)
 
@@ -282,6 +310,11 @@ var Hitos = (function () {
       clase: esDecision ? 'decision' : 'paso', estado: 'pendiente',
       responsable: p.responsable || '', estadoAsunto: p.estadoAsunto || null,
       plazo: (p.plazo && p.plazo.dias) ? { dias: p.plazo.dias, desde: p.plazo.desde || '' } : null,
+      /* Una pregunta no lleva requisitos propios (fila 59, sección 4.1
+         del encargo: el editor no se los deja poner); los de sus
+         opciones llegan solos, porque cada paso de dentro se convierte
+         en su propio hito, con los suyos. */
+      requisitos: esDecision ? [] : (p.requisitos || []),
       opciones: esDecision ? p.opciones.map(function (o) {
         return { id: o.id, texto: o.titulo, hitos: (o.pasos || []).map(pasoAHito) };
       }) : [],
@@ -395,6 +428,7 @@ var Hitos = (function () {
     nuevoId: nuevoId, normalizarHito: normalizarHito, normalizarAjustes: normalizarAjustes,
     leer: leer, cambiar: cambiar, hitosDe: hitosDe,
     buscar: buscar, visibles: visibles, huerfanos: huerfanos, cuenta: cuenta,
+    faltanObligatorios: faltanObligatorios,
     recomputeEnCurso: recomputeEnCurso, aplicarEstadoDelHito: aplicarEstadoDelHito,
     aplicarPlazosDependientes: aplicarPlazosDependientes, estadoDelAsunto: estadoDelAsunto,
     pasoAHito: pasoAHito, crearDesdeGuia: crearDesdeGuia,

@@ -5,6 +5,144 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 18-sep-2026 — Comunicar desde el hito
+
+Fila 60 de la cola (`docs/COLA.md`, `docs/COMUNICAR-DESDE-EL-HITO.md`): la plantilla de correo y de
+Séneca era del tipo de asunto entero, una sola para todo el trámite, aunque pedir un papel al
+principio y avisar de una resolución al final no se parecen en nada — y para comunicar algo de un
+hito había que subir a la cabecera de la ficha aunque el texto que tocaba estuviera ahí delante.
+
+- **En la guía**: cada paso (o subpaso, dentro de una opción) puede llevar su propio texto de
+  correo y/o de Séneca — asunto y cuerpo, cada uno con "Insertar hueco" —, en una sección plegable
+  "Comunicación de este paso" del editor, con dos pestañas (Correo/Mensaje de Séneca). Vive en
+  `js/guias-comunicacion.js` (nuevo), reutilizando el mismo campo de texto con hueco que ya tenía
+  el cuadro de una plantilla (`js/plantillas-ajustes.js`, sacado a una función aparte para eso: "no
+  escribas un editor nuevo"). La plantilla general del tipo no se toca: sigue siendo la que usa el
+  "Comunicar" de la cabecera.
+- **En el hito**: no se guarda ninguna copia del texto en `hitos.json` — se lee de la guía de su
+  tipo por `origenGuia` en el momento de pulsar el botón, así que si Francisco cambia el texto del
+  paso, los asuntos vivos usan el nuevo directamente. El botón "Comunicar" solo sale si su paso
+  tiene texto; con los dos canales, abre el mismo menú pequeño de la cabecera; con uno solo, va
+  directo. El destinatario se propone según el responsable del hito: el tutor legal (1, o el 2 si
+  el 1 no tiene datos) si es `tutor`; todos los relacionados con correo si es `relacionado`; el
+  tercero del asunto en cualquier otro caso. En Séneca no hay forma de marcar un usuario IdEA
+  concreto desde aquí: el cuadro se abre con la lista de siempre, sin bloquear el botón por eso.
+- **Reutilizado, no reinventado**: el cuadro de Correo/Séneca que abre "Comunicar" es el de
+  siempre (`js/correo.js`, `js/seneca-cuadro.js`, `js/correo-cuadro.js`), con el mensaje ya resuelto
+  puesto encima (mismo mecanismo que "Pedir lo que falta" de la fila 59: `abrirCuadro(a, deSeneca,
+  extra)`); y la constancia —una nota en el asunto y una línea en el historial del hito, una sola
+  vez— reutiliza el cerrojo `yaApuntado` que ya tenía `apuntarElRastro` desde antes de esta fila,
+  no uno nuevo. Todo lo propio del hito (leer la guía por `origenGuia`, resolver el destinatario)
+  vive en `js/hitos-comunicar.js` (nuevo), enganchado a `window.Hitos` como `js/hitos-archivo.js`
+  aunque no guarda nada en el hito.
+
+Simplificación anotada: con varios relacionados, se proponen todos los que tengan correo (unidos
+por comas, en "Otro correo"); no hay forma de elegir solo alguno desde aquí. Si hace falta más
+adelante, se retoca.
+
+Prueba nueva, sin navegador: `pruebas/comunicar-desde-hito.mjs` (sustituye `CorreoNucleo.abrirCuadro`
+por uno que solo apunta con qué se le ha llamado: abrir el cuadro de verdad monta un `U.preguntar`
+con el DOM entero, que no tiene sentido simular sin navegador).
+
+**Trampa encontrada probando en el navegador de verdad** (no la coge ninguna prueba sin navegador):
+"+ Añadir"/quitar/mover una fila de "Lo que hay que reunir" o escribir en "Comunicación de este
+paso" hace `recoger(); mutar; pintar()` del paso ENTERO (`js/guias.js`), que reconstruye el
+`<details>` desde cero — y un `<details>` recién creado nace cerrado, así que la sección se le
+cerraba sola a Francisco justo después de tocarla. `pintar()` ahora apunta, antes de vaciar
+`#guia-pasos`, qué `<details>` (de `.paso-extra`, `.paso-requisitos` o `.paso-comunicacion`, de un
+paso o de un subpaso) estaban abiertos, con la posición del paso más el id del subpaso como clave
+(`detallesAbiertos`/`restaurarAbierto`), y los vuelve a abrir al repintar. De paso arregla lo mismo
+que ya le pasaba a `.paso-extra` (responsable/estado/plazo), que tenía la misma trampa desde antes
+de esta fila.
+
+## 18-sep-2026 — Lo que hay que reunir en cada hito
+
+Fila 59 de la cola (`docs/COLA.md`, `docs/REQUISITOS-DE-HITO.md`): un hito dice qué hay que hacer,
+quién y para cuándo, pero no qué papeles hay que reunir o qué datos pedir; eso vivía en la cabeza
+de Francisco. Ahora cada paso del trámite de un tipo puede llevar una lista opcional de casillas
+("lo que hay que reunir"), cada una un **documento** o un **dato**, obligatoria o no.
+
+- **En la guía** (Ajustes › Tipos de asunto › un tipo › Pasos del trámite): dentro del editor de
+  cada paso, una sección plegable "Lo que hay que reunir" — texto libre, Documento/Dato,
+  Obligatorio, quitar y mover. Vive aparte, en `js/guias-requisitos.js` (nuevo), para no engordar
+  `js/guias.js`. Los pasos de dentro de una opción de una pregunta también pueden llevar su propia
+  lista; el paso-pregunta en sí, no (se resuelve eligiendo una opción, no con una casilla).
+- **En el hito**: al crearse desde la guía, cada paso copia sus requisitos, sin marcar. En la
+  ficha, debajo del cuerpo del hito y encima de sus documentos, un bloque con la cuenta de lo que
+  falta; marcar una de clase dato pide un valor pequeño (puede quedar en blanco), que se guarda al
+  salir del campo o con Intro; el de clase documento se marca **solo** al apuntar el documento que
+  corresponde (con una única casilla pendiente; con varias, se pregunta con cuál). Cada fila tiene
+  su menú de tres puntos (Editar el texto / Quitar de este asunto), y "+ Añadir algo que falte"
+  añade una casilla solo a este asunto, sin tocar la guía del tipo. Si el tipo gana requisitos
+  después de que el hito ya existiera, una línea discreta ofrece traerlos.
+- **No bloquea, avisa**: dar un hito por hecho con algo obligatorio sin reunir pregunta primero
+  (`Hitos.faltanObligatorios`); si Francisco sigue igual, se marca y se le apunta una nota
+  automática. Nunca se le impide avanzar.
+- **"Pedir lo que falta"**: un botón en el bloque, visible solo si queda algo sin marcar, abre el
+  mismo menú "Comunicar" de la cabecera de la ficha (Correo/Séneca) — no un camino nuevo — con la
+  lista de lo pendiente ya lista para pegar. Entra por un hueco de plantilla nuevo,
+  `{{LO QUE FALTA}}` (con dos llaves a propósito, para que se note que no es un dato del asunto
+  como los demás: se sustituye siempre, incluso por nada fuera de este camino, y nunca deja el
+  hueco escrito); sin ese hueco en la plantilla, o sin plantilla, el texto se añade al final. Todo
+  esto vive en `js/hitos-requisitos.js` (nuevo, modelo y pintura en un solo fichero, como pide el
+  encargo), enganchado a `window.Hitos` igual que `js/hitos-archivo.js`.
+
+Trampa evitada: nada de esto toca `Hitos.marcar` ni la firma de las funciones que ya existían —
+todo entra por fichero nuevo o por una llamada añadida donde tocaba (`js/hitos-documentos.js` al
+apuntar/quitar un documento, `js/hitos-panel-lista.js` antes de pasar a hecho, `js/correo.js` para
+reutilizar el menú "Comunicar" en vez de duplicarlo).
+
+Prueba nueva, sin navegador (con un disco de mentira en memoria, como `pruebas/logica.mjs`):
+`pruebas/requisitos-de-hito.mjs`.
+
+## 18-sep-2026 — Seis arreglos de uso diario
+
+Fila 58 de la cola (`docs/COLA.md`, `docs/AJUSTES-DE-USO-2026-09-18.md`), seis puntos sueltos
+pedidos por Francisco tras un día de uso real:
+
+1. **La fila de copiar de un gesto** (`js/ficha-nombre-acciones.js`, `ponerFilaDeCopiar`): debajo
+   del nombre del asunto, siempre a la vista y sin menú, cuatro botones — Asunto, NIE, Nombre y
+   DNI/CIF (CIF en empresas) — cada uno con el mismo copiado de siempre. "Copiar el nombre del
+   asunto" sale del menú de tres puntos (ya no hace falta). Nombre y DNI/CIF tardan (piden el
+   tercero) y se reservan `hidden` desde el primer pintado; "revelar" solo les quita `hidden`,
+   nunca añade un nodo nuevo — ver el punto 6.
+2. **"Preparar el documento" pasa a llamarse "Ajustar tamaño"**, en el botón y en el título del
+   cuadro; el mecanismo (fila 57) no cambia.
+3. **La caja de escribir una nota no guarda al teclear**, solo al pulsar Guardar o al perder el
+   foco; y si se sale de la ficha con algo sin guardar, avisa y ofrece "Guardar y salir"
+   (`Notas.confirmarSalirDeFicha`).
+4. **El documento sellado que sustituye a uno de Por clasificar ya no manda el original a la
+   papelera**: lo renombra a "… SIN SELLAR" y lo conserva en la carpeta (`js/registro-sellado.js`).
+5. **Cada documento de la ficha se puede asociar a un hito a mano** ("Asociar a un hito", con la
+   etiqueta del hito ya asociado a la vista), aparte de la asociación automática al "Apuntar un
+   documento" de un hito que ya existía.
+6. **El cuadro de Correo se reparte en dos columnas**, como el de Séneca (fila 53): se saca su
+   cuerpo propio a `js/correo-cuadro.js` (nuevo, mismo patrón que `js/seneca-cuadro.js`),
+   `js/correo.js` se queda con la lógica compartida y con abrir/pintar el cuadro correcto.
+
+**Dos carreras de datos de verdad, encontradas al pasar la batería completa** (no eran fallos de
+las pruebas, sino del código):
+
+- El botón "Nombre"/"DNI-CIF" del punto 1, al revelarse tarde, mutaba `#ficha-asunto-cuerpo`; el
+  `MutationObserver` de `js/hitos-panel.js` escuchaba con `{childList:true, subtree:true}` y
+  repintaba el panel de hitos por esa mutación ajena, colapsando un hito que el usuario tenía
+  desplegado a medio escribir. Arreglado por dos lados: el patrón `hidden` del punto 1 (evita la
+  mutación) y estrechar el observador a `{childList:true}` sin `subtree` (cada acción que de
+  verdad cambia un hito ya llama a `HitosPanel.programarRepintado()` por su cuenta, comprobado a
+  mano en `js/hitos-panel-lista.js`, `js/hitos-documentos.js` y `js/ficha-asunto.js`).
+- Al salir de la ficha con una nota sin guardar (punto 3), el cuadro de aviso enfoca su primer
+  campo y eso dispara un guardado por `blur` de la nota A LA VEZ que el "Guardar y salir" explícito
+  del propio aviso. Con el cerrojo antiguo (un booleano) el segundo guardado veía el cerrojo
+  puesto y se rendía sin esperar al primero, así que se podía salir antes de que el guardado
+  llegase a disco. Arreglado cambiando `guardarBorrador` a una cola de promesas encadenadas:
+  esperar cualquier guardado espera ahora a toda la cola, incluido uno disparado a la vez.
+
+Pruebas: `pruebas/copiar-fila.mjs` y `pruebas/asociar-documento-a-hito.mjs` (nuevas),
+`pruebas/notas-asunto-no-se-borran.mjs` y `pruebas/cabecera-del-asunto.mjs` (revisadas a fondo);
+de paso se corrigió `pruebas/plantillas.mjs`, que apuntaba a ids del cuadro de Séneca de antes de
+la fila 53 (ya señalado como pendiente en una revisión anterior, y bloqueaba tener la batería en
+verde para esta fila).
+
 ## 18-sep-2026 — Hueco para el sello de Séneca y la firma del director
 
 Fila 57 de la cola (`docs/COLA.md`, `docs/HUECO-PARA-SELLO-Y-FIRMA.md`), acordada con Francisco el

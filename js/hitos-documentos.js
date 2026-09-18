@@ -62,8 +62,23 @@ var HitosDocumentos = (function () {
     var quitados = apuntadosDeAntes.filter(function (n) { return marcados.indexOf(n) === -1; });
 
     try {
-      for (var i = 0; i < anadidos.length; i++) await Hitos.anadirDocumento(a.nombre, h.id, anadidos[i]);
-      for (var j = 0; j < quitados.length; j++) await Hitos.quitarDocumento(a.nombre, h.id, quitados[j]);
+      for (var i = 0; i < anadidos.length; i++) {
+        await Hitos.anadirDocumento(a.nombre, h.id, anadidos[i]);
+        /* Marca sola la única casilla de "lo que hay que reunir" que
+           sea de clase documento y siga sin marcar (18-sep-2026, fila
+           59, sección 5 del encargo); con varias, pregunta con cuál se
+           corresponde. No crítico: si falla, el documento ya ha
+           quedado apuntado igual. */
+        if (window.HitosRequisitos) {
+          try { await HitosRequisitos.marcarPorDocumento(a.nombre, h.id, anadidos[i]); } catch (e2) { /* no crítico */ }
+        }
+      }
+      for (var j = 0; j < quitados.length; j++) {
+        await Hitos.quitarDocumento(a.nombre, h.id, quitados[j]);
+        if (window.HitosRequisitos) {
+          try { await HitosRequisitos.desmarcarPorDocumento(a.nombre, h.id, quitados[j]); } catch (e2) { /* no crítico */ }
+        }
+      }
     } catch (e) {
       U.aviso('No he podido guardarlo: ' + e.message, 'malo');
       return;

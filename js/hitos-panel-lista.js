@@ -130,8 +130,25 @@ var HitosPanelLista = (function () {
       casillaEl.onclick = function (ev) { ev.stopPropagation(); };
       casillaEl.onchange = async function () {
         var nuevoEstado = casillaEl.checked ? 'hecho' : 'pendiente';
+        /* No se impide nunca, solo se avisa (18-sep-2026, fila 59,
+           sección 6 del encargo): si quedan casillas obligatorias sin
+           reunir y Francisco sigue igualmente, el hito se marca y se le
+           apunta una nota automática. */
+        var faltan = (nuevoEstado === 'hecho' && window.Hitos.faltanObligatorios)
+          ? Hitos.faltanObligatorios(h) : [];
+        if (faltan.length) {
+          var ok = await U.preguntar('Dar este hito por hecho',
+            '<p class="explica">Faltan ' + faltan.length + (faltan.length === 1 ? ' cosa' : ' cosas') +
+            ' por reunir: ' + U.escapar(faltan.map(function (r) { return r.texto; }).join(', ')) + '.</p>' +
+            '<p class="explica">¿Lo das por hecho igualmente?</p>', 'Darlo por hecho');
+          if (!ok) { casillaEl.checked = false; return; }
+        }
         try {
           await U.mientrasGuarda(casillaEl, function () { return Hitos.marcar(a.nombre, h.id, nuevoEstado); });
+          if (faltan.length) {
+            await Hitos.anadirNota(a.nombre, h.id, 'Dado por hecho con ' + faltan.length +
+              (faltan.length === 1 ? ' cosa sin reunir.' : ' cosas sin reunir.'));
+          }
           window.HitosPanel.programarRepintado();
         } catch (e) { U.aviso('No he podido guardarlo: ' + e.message, 'malo'); }
       };
@@ -172,6 +189,17 @@ var HitosPanelLista = (function () {
         '<button type="button" class="boton hito-nota-anadir">Añadir nota</button></div>');
     }
 
+    /* "Lo que hay que reunir" (18-sep-2026, fila 59,
+       docs/REQUISITOS-DE-HITO.md): debajo del cuerpo del hito y encima
+       de sus documentos apuntados. Solo con el asunto abierto: un
+       asunto archivado no deja tocar nada más de un hito tampoco. Sin
+       ninguna casilla (y sin nada que traer de la guía), el bloque no
+       se pinta: "+ Añadir algo que falte" va entonces con el resto de
+       botones del hito, más abajo. */
+    var htmlRequisitos = (abierto && window.HitosRequisitos)
+      ? HitosRequisitos.bloqueDeRequisitos(a, h) : '';
+    if (htmlRequisitos) trozos.push(htmlRequisitos);
+
     /* El bloque se pinta siempre que el asunto esté abierto, aunque no
        haya ningún documento apuntado: si solo sale cuando ya hay uno,
        nadie encuentra por dónde empezar a apuntar el primero
@@ -203,6 +231,9 @@ var HitosPanelLista = (function () {
     if (abierto) {
       trozos.push('<div class="hito-botones">' +
         (h.clase === 'decision' ? '<button type="button" class="boton hito-cambiar-rama">Cambiar de rama</button>' : '') +
+        (!htmlRequisitos && window.HitosRequisitos
+          ? '<button type="button" class="boton hito-requisitos-anadir-suelto">+ Añadir algo que falte</button>' : '') +
+        (window.HitosComunicar ? HitosComunicar.botonHTML(a, h) : '') +
         '<button type="button" class="boton boton-peligro hito-quitar">Quitar este hito</button></div>');
     }
 
@@ -248,6 +279,12 @@ var HitosPanelLista = (function () {
   function engancharCuerpo(div, a, h, abierto) {
     engancharDocumentos(div, a, h, abierto);
     if (!abierto) return;
+    if (window.HitosRequisitos) HitosRequisitos.engancharBloque(div, a, h);
+    var anadirSuelto = div.querySelector('.hito-requisitos-anadir-suelto');
+    if (anadirSuelto && window.HitosRequisitos) {
+      anadirSuelto.onclick = function () { HitosRequisitos.anadir(a, h); };
+    }
+    if (window.HitosComunicar) HitosComunicar.engancharBoton(div, a, h);
     var resp = div.querySelector('.hito-campo-responsable');
     if (resp) resp.onchange = async function () {
       await U.mientrasGuarda(resp, function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: resp.value }); });

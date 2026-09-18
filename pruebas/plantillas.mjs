@@ -207,13 +207,18 @@ await abrirFichaDe(CON_PLANTILLA);
 await pagina.click('.boton-comunicar');
 await pagina.getByRole('button', { name: 'Mensaje de Séneca', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
-await pagina.waitForSelector('#correo-cuerpo-texto');
+/* El cuadro de Séneca es el de js/seneca-cuadro.js desde la fila 53
+   (18-sep-2026, docs/SENECA-CUADRO-ANCHO.md): el texto va en
+   #seneca-cuerpo-texto (no en #correo-asunto/#correo-cuerpo-texto,
+   que ya no existen ahí), y los dos pasos son botones propios, no
+   #seneca-paso. */
+await pagina.waitForSelector('#seneca-cuerpo-texto');
 
 const textoLargo = 'x'.repeat(5000);
-await pagina.fill('#correo-cuerpo-texto', textoLargo);
-await pagina.click('#seneca-paso');       /* 1. copiar el asunto */
-await pagina.click('#seneca-paso');       /* 2. copiar el texto, recortado */
-await pagina.waitForSelector('#seneca-explica:has-text("recortado a 4.000 letras")');
+await pagina.fill('#seneca-cuerpo-texto', textoLargo);
+await pagina.click('#seneca-copiar-asunto');   /* 1. copiar el asunto */
+await pagina.click('#seneca-copiar-texto');    /* 2. copiar el texto, recortado */
+await pagina.waitForSelector('.mensaje.ambar:has-text("recortado a 4.000 letras")');
 
 await comprobar('lo copiado no pasa de 4.000 letras',
   pagina.evaluate(() => navigator.clipboard.readText()).then(t => t.length),

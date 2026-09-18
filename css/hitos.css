@@ -83,6 +83,53 @@
 
 .hito-botones { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 4px; }
 
+/* ---------- "lo que hay que reunir" (18-sep-2026, fila 59) ---------- */
+
+.hito-requisitos {
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--fondo);
+}
+.hito-requisitos-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--tinta-suave);
+  margin-bottom: 6px;
+}
+.hito-requisitos-lista { display: flex; flex-direction: column; gap: 4px; }
+
+.hito-requisito-fila {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 2px;
+}
+.hito-requisito-casilla { width: 16px; height: 16px; flex: none; cursor: pointer; }
+.hito-requisito-texto { flex: 1; font-size: 14px; }
+.hito-requisito-obligatorio { font-weight: 600; }
+.hito-requisito-punto {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--ambar-linea);
+  margin-right: 6px;
+}
+.hito-requisito-hecha .hito-requisito-texto { text-decoration: line-through; opacity: .75; }
+.hito-requisito-valor { font-size: 12px; color: var(--tinta-suave); }
+.boton-copiar-chico { padding: 1px 8px; font-size: 11px; }
+.hito-requisito-valor-campo { flex-basis: 100%; margin-top: 4px; }
+.hito-requisito-menu-boton {
+  border: 0; background: none; cursor: pointer; color: var(--tinta-suave);
+  font-size: 15px; padding: 2px 6px; flex: none;
+}
+
+.hito-requisitos-traer { font-size: 13px; color: var(--tinta-suave); }
+
 /* ---------- el cuadro de "Apuntar un documento" (fila 31, 17-sep-2026) ---------- */
 
 #hitosdoc-lista { display: flex; flex-direction: column; gap: 4px; max-height: 320px; overflow: auto; }

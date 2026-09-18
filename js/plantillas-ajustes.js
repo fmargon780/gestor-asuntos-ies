@@ -186,6 +186,27 @@
     return (App.E.tipos || []).filter(function (t) { return t.categoria === categoria; });
   }
 
+  /* Un campo de texto con su botón "Insertar hueco" (18-sep-2026, fila
+     60, docs/COMUNICAR-DESDE-EL-HITO.md, 4): lo que hasta hoy solo
+     montaba el cuadro de una plantilla, ahora también lo usa la
+     sección "Comunicación de este paso" del editor de un paso de la
+     guía (js/guias-comunicacion.js), con sus propios ids. `otrosCampos`
+     son campos adicionales (por ejemplo, el de asunto) que también
+     pueden recibir el hueco desde el mismo botón. */
+  function campoDeTextoHTML(idTexto, idBoton, etiqueta, valor, filas) {
+    return '<div class="etiqueta-con-boton">' +
+      '<label class="etiqueta">' + U.escapar(etiqueta) + '</label>' +
+      '<button type="button" class="boton boton-hueco" id="' + idBoton + '">Insertar hueco</button>' +
+      '</div>' +
+      '<textarea id="' + idTexto + '" class="campo" rows="' + (filas || 7) + '">' + U.escapar(valor || '') + '</textarea>';
+  }
+
+  function engancharCampoDeTexto(idTexto, idBoton, otrosCampos) {
+    var boton = $(idBoton), campo = $(idTexto);
+    if (!boton || !campo) return;
+    HuecosBuscador.montar({ boton: boton, campos: (otrosCampos || []).concat([campo]) });
+  }
+
   function abrirCuadroDePlantilla(existente, tipoPreset, alGuardar) {
     var categorias = Nombres.CATEGORIAS;
     var categoriaInicial = (existente && existente.categoria) || (tipoPreset && tipoPreset.categoria) || categorias[0];
@@ -211,11 +232,7 @@
       '</div>' +
       '<label class="etiqueta">Nombre de la plantilla</label>' +
       '<input id="pl-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '">' +
-      '<div class="etiqueta-con-boton">' +
-        '<label class="etiqueta">Texto</label>' +
-        '<button type="button" class="boton boton-hueco" id="pl-insertar-hueco">Insertar hueco</button>' +
-      '</div>' +
-      '<textarea id="pl-texto" class="campo" rows="7">' + U.escapar((existente && existente.texto) || '') + '</textarea>' +
+      campoDeTextoHTML('pl-texto', 'pl-insertar-hueco', 'Texto', (existente && existente.texto) || '', 7) +
       '<label class="etiqueta">Vista previa</label>' +
       '<div class="vista-previa"><div class="vista-nombre" id="pl-previa"></div></div>';
 
@@ -229,10 +246,7 @@
        última vez; sin foco previo, al final del último, que es el
        cuadro de texto. La vista previa se repinta sola, porque al
        insertar se lanza un evento `input`. */
-    HuecosBuscador.montar({
-      boton: $('pl-insertar-hueco'),
-      campos: [$('pl-texto')]
-    });
+    engancharCampoDeTexto('pl-texto', 'pl-insertar-hueco', []);
 
     function pintarPrevia() {
       var muestra = datosDeMuestra($('pl-categoria').value, $('pl-tipo').value);
@@ -295,7 +309,11 @@
   window.PlantillasAjustes = {
     cargar: cargar,
     pintarDeTipo: pintarDeTipo,
-    abrirCuadroDePlantilla: abrirCuadroDePlantilla
+    abrirCuadroDePlantilla: abrirCuadroDePlantilla,
+    /* Para "Comunicación de este paso" (js/guias-comunicacion.js, fila
+       60): el mismo campo de texto con "Insertar hueco" de aquí. */
+    campoDeTextoHTML: campoDeTextoHTML,
+    engancharCampoDeTexto: engancharCampoDeTexto
   };
 
 })();

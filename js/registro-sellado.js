@@ -136,12 +136,39 @@ var RegistroSellado = (function () {
     return nombresExistentes.indexOf(nombreNuevo) !== -1;
   }
 
+  /* El nombre del original, con " SIN SELLAR" al final, antes de la
+     extensión (18-sep-2026, fila 58, docs/AJUSTES-DE-USO-2026-09-18.md,
+     4). Sin efectos: se puede probar sola. */
+  function nombreSinSellar(nombreOriginal) {
+    var ext = Nombres.extensionDe(nombreOriginal);
+    var base = ext ? nombreOriginal.slice(0, -(ext.length + 1)) : nombreOriginal;
+    return base + ' SIN SELLAR' + (ext ? '.' + ext : '');
+  }
+
+  /* El nombre pedido, o el primero libre con " (2)", " (3)"... si ya
+     está entre `nombresExistentes` (mismo criterio que
+     `Carpetas.nombreLibreConSufijo`, que solo mira el disco: aquí ya
+     se tiene la lista en memoria, así que no hace falta releerlo). */
+  function nombreLibreEntre(nombresExistentes, nombreDeseado) {
+    if (nombresExistentes.indexOf(nombreDeseado) === -1) return nombreDeseado;
+    var punto = nombreDeseado.lastIndexOf('.');
+    var base = punto === -1 ? nombreDeseado : nombreDeseado.slice(0, punto);
+    var ext = punto === -1 ? '' : nombreDeseado.slice(punto);
+    var n = 2;
+    while (nombresExistentes.indexOf(base + ' (' + n + ')' + ext) !== -1) n++;
+    return base + ' (' + n + ')' + ext;
+  }
+
   /* ---------- asociar el sello a un documento ----------
 
-     Renombra el PDF sellado con el nombre que le toca, manda el
-     documento viejo (el que se subió sin sellar) a la papelera, y
-     apunta la nota de registro, sustituyendo la anterior si la había
-     (js/notas.js, sustituir). No se crea ningún fichero nuevo. */
+     Renombra el PDF sellado con el nombre que le toca y apunta la
+     nota de registro, sustituyendo la anterior si la había (js/
+     notas.js, sustituir). El documento original **ya no va a la
+     papelera** (fila 58, 4): se queda en la misma carpeta, renombrado
+     con "SIN SELLAR" al final, por si hay que repetir el registro sin
+     volver a escanear. Si ese nombre ya existe, se numera "(2)", como
+     en el resto de la aplicación. No se crea ningún fichero nuevo de
+     verdad: solo se renombran los dos que ya había. */
   async function asociar(asunto, nombrePdf, nombreDocumentoOriginal, sello) {
     var nombreNuevo = nombreParaSello(nombreDocumentoOriginal, sello);
     if (!nombreNuevo) {
@@ -160,15 +187,18 @@ var RegistroSellado = (function () {
       }
 
       await Carpetas.renombrarFichero(asunto.handle, nombrePdf, nombreNuevo);
-      await Papelera.mandarDocumentoDeAsunto(asunto, nombreDocumentoOriginal);
+
+      var nombreConservado = nombreLibreEntre(nombres.concat([nombreNuevo]), nombreSinSellar(nombreDocumentoOriginal));
+      await Carpetas.renombrarFichero(asunto.handle, nombreDocumentoOriginal, nombreConservado);
 
       var codigo = (nombreNuevo.match(/^\d{6}\s+(\S+)/) || [])[1] || '';
       var fechaSello = sello.fecha ? ' el ' + sello.fecha : '';
       await window.Notas.sustituir(asunto,
-        'Registrado ' + codigo + fechaSello + ' · ' + nombreDocumentoOriginal,
+        'Registrado ' + codigo + fechaSello + ' · ' + nombreDocumentoOriginal +
+        '. Se conserva el original sin sellar.',
         'registroDeDocumento', nombreDocumentoOriginal);
 
-      U.aviso('Documento registrado.', 'bueno');
+      U.aviso('Documento registrado. El original sin sellar se conserva en la carpeta.', 'bueno');
       return true;
     } catch (e) {
       U.aviso('No he podido colocarlo: ' + e.message, 'malo');
@@ -181,6 +211,8 @@ var RegistroSellado = (function () {
     marcarIgnorado: marcarIgnorado,
     asociar: asociar,
     nombreParaSello: nombreParaSello,
+    nombreSinSellar: nombreSinSellar,
+    nombreLibreEntre: nombreLibreEntre,
     hayColision: hayColision,
     pendientesDeLeer: pendientesDeLeer,
     pendientesDeResolver: pendientesDeResolver

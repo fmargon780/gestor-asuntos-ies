@@ -259,4 +259,49 @@
 .paso-plazo-fila .paso-plazo-dias { max-width: 80px; }
 .paso-plazo-fila .paso-plazo-desde { flex: 1; }
 
+/* ---------- "lo que hay que reunir" (18-sep-2026, fila 59) ---------- */
+
+.paso-requisitos {
+  margin-top: 10px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--fondo);
+}
+.paso-requisitos > summary { cursor: pointer; font-size: 13px; color: var(--tinta-suave); }
+.requisitos-lista { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+
+.requisito-fila {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: var(--papel);
+}
+.requisito-fila .requisito-texto { flex: 1; min-width: 140px; }
+.requisito-clase { display: flex; gap: 10px; font-size: 13px; color: var(--tinta-suave); }
+.requisito-clase label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+.requisito-obligatorio-fila { margin: 0; font-size: 13px; }
+.requisito-mandos { display: flex; gap: 4px; margin-left: auto; }
+.requisito-mandos .boton { padding: 4px 8px; }
+
+/* ---------- "comunicación de este paso" (18-sep-2026, fila 60) ---------- */
+
+.paso-comunicacion {
+  margin-top: 10px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--fondo);
+}
+.paso-comunicacion > summary { cursor: pointer; font-size: 13px; color: var(--tinta-suave); }
+.paso-comunicacion-pestanas { display: flex; gap: 6px; margin-top: 8px; }
+.paso-comunicacion-pestana.activa { border-color: #1e7a46; background: var(--verde); }
+.paso-comunicacion-panel { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.paso-comunicacion-panel.oculto { display: none; }
+.paso-comunicacion-panel .etiqueta { margin: 4px 0 0; font-size: 12px; }
+
 /* publicado 10-sep-2026 13:55 */

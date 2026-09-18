@@ -213,20 +213,62 @@ await comprobar('7. y "Notas" va antes que los bloques plegados (Otros asuntos, 
             titulos.indexOf('Notas') < titulos.indexOf('Personas y entidades relacionadas')];
   }), [true, true]);
 
-console.log('--- 8. la nota se guarda sola, sin "Añadir nota" ---');
-comprobarQue('8. ya no hay botón "Añadir nota"',
-  await pagina.evaluate(() => !document.getElementById('ficha-nota-anadir')));
-
-await pagina.fill('#ficha-nota-texto', 'Autoguardado sin pulsar nada');
-await comprobar('8. antes del segundo de espera, todavía no está en la lista',
-  pagina.evaluate(() => document.getElementById('ficha-notas-lista').textContent.indexOf('Autoguardado sin pulsar nada') !== -1),
-  false);
+console.log('--- 8. la nota ya no se guarda sola mientras se escribe (fila 58) ---');
+await pagina.fill('#ficha-nota-texto', 'No se guarda mientras se escribe');
 await pagina.waitForTimeout(1400);
-await comprobar('8. pasado el segundo de espera, la nota ya está guardada y en la lista',
-  pagina.evaluate(() => document.getElementById('ficha-notas-lista').textContent.indexOf('Autoguardado sin pulsar nada') !== -1),
+await comprobar('8. pasado más de un segundo, sigue sin estar en la lista',
+  pagina.evaluate(() => document.getElementById('ficha-notas-lista').textContent.indexOf('No se guarda mientras se escribe') !== -1),
+  false);
+
+await pagina.click('#ficha-nota-guardar');
+await pagina.waitForFunction(() =>
+  document.getElementById('ficha-notas-lista').textContent.indexOf('No se guarda mientras se escribe') !== -1);
+await comprobar('8. al pulsar "Guardar" sí queda guardada',
+  pagina.evaluate(() => document.getElementById('ficha-notas-lista').textContent.indexOf('No se guarda mientras se escribe') !== -1),
   true);
 await comprobar('8. lo escrito sigue en la caja (no se limpia sola)',
-  pagina.inputValue('#ficha-nota-texto'), 'Autoguardado sin pulsar nada');
+  pagina.inputValue('#ficha-nota-texto'), 'No se guarda mientras se escribe');
+
+console.log('--- 9. perder el foco con algo escrito también guarda ---');
+await pagina.fill('#ficha-nota-texto', 'Se guarda al salir del recuadro');
+await pagina.evaluate(() => document.getElementById('ficha-nota-texto').blur());
+await pagina.waitForFunction(() =>
+  document.getElementById('ficha-notas-lista').textContent.indexOf('Se guarda al salir del recuadro') !== -1);
+await comprobar('9. al perder el foco con texto, se guarda sola',
+  pagina.evaluate(() => document.getElementById('ficha-notas-lista').textContent.indexOf('Se guarda al salir del recuadro') !== -1),
+  true);
+
+console.log('--- 10. salir de la ficha con una nota sin guardar avisa ---');
+/* Un clic de verdad en "Volver" ya deja la nota guardada solo con
+   perder el foco (punto 9): el aviso de este punto se ve de verdad
+   con Escape, que pulsa el mismo botón por dentro (js/usabilidad.js)
+   sin que el campo llegue a perder el foco antes (no hay blur real,
+   solo el evento "click" sintético). */
+await pagina.fill('#ficha-nota-texto', 'Nota sin guardar de verdad');
+await pagina.keyboard.press('Escape');
+await pagina.waitForSelector('#capa:not(.oculto)');
+await comprobar('10. el aviso es el que toca',
+  pagina.locator('#cuadro-titulo').textContent(), 'Tienes una nota sin guardar');
+await comprobar('10. sigue en la ficha, no se ha ido a la lista',
+  pagina.evaluate(() => !document.getElementById('pantalla-asunto').classList.contains('oculto')), true);
+await pagina.click('#cuadro-aceptar');
+/* "#capa" se oculta al momento, en el propio clic (U.preguntar,
+   js/util.js): eso NO quiere decir que el guardado ya haya terminado.
+   Con la nota disparada también por el foco perdido al abrirse este
+   mismo aviso (punto 9), "Guardar y salir" espera a ese guardado
+   antes de volver a la lista (js/notas.js, `guardarBorrador`
+   encadenada) — lo que hay que esperar de verdad es la pantalla de
+   destino, no el cuadro. */
+await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+await comprobar('10. "Guardar y salir" ha guardado la nota en el fichero compartido',
+  pagina.evaluate(async (asunto) => {
+    const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+    const h = await g.getFileHandle('asuntos.json');
+    const j = JSON.parse(await (await h.getFile()).text());
+    const notas = (j.asuntos[asunto] && j.asuntos[asunto].notas) || [];
+    return notas.some((n) => n.texto === 'Nota sin guardar de verdad');
+  }, NOMBRE_ASUNTO),
+  true);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

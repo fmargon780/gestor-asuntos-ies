@@ -361,7 +361,18 @@
     if (window.FichaPlegables) FichaPlegables.reponer(a.nombre, caja);
     ultimoPintado = a.nombre;
 
-    $('ficha-volver').onclick = volverALaLista;
+    /* Antes de volver a la lista, si queda una nota sin guardar en la
+       caja de la ficha, avisa (18-sep-2026, fila 58,
+       docs/AJUSTES-DE-USO-2026-09-18.md, 3): esto es lo que pulsa
+       tanto el botón como Escape (js/usabilidad.js, que pulsa este
+       mismo `#ficha-volver`). Solo aquí, no en `volverALaLista()`:
+       esa función también la llama sola `App.reengancharFicha` cuando
+       el asunto ya no está en la lista, y ahí no tiene sentido
+       preguntar nada. */
+    $('ficha-volver').onclick = async function () {
+      if (window.Notas && !(await Notas.confirmarSalirDeFicha())) return;
+      volverALaLista();
+    };
 
     pintarAcciones(a, abierto);
     pintarNotas(a, abierto);
@@ -430,8 +441,12 @@
        el nombre— sigue funcionando; las otras dos se apagan solas, ya
        dentro del menú, por texto (más abajo en este mismo método). */
     if (el.classList.contains('ficha-nombre-menu-boton')) return true;
+    /* La fila de copiar de un gesto (18-sep-2026, fila 58,
+       docs/AJUSTES-DE-USO-2026-09-18.md, 1): copiar no cambia nada del
+       asunto, así que sigue activa en consulta. */
+    if (el.classList.contains('boton-copiar-fila')) return true;
     var texto = (el.textContent || '').trim();
-    return texto === 'Copiar' || texto === 'Copiar el nombre del asunto';
+    return texto === 'Copiar';
   }
 
   function aplicarModoConsulta() {
