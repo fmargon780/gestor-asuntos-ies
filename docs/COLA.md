@@ -127,9 +127,10 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 50 | `docs/CABECERA-NO-TIEMBLA.md` | PENDIENTE |
 | 51 | `docs/FICHA-DISPOSICION.md` | PENDIENTE |
 | 52 | `docs/CABECERA-DEL-ASUNTO.md` | PENDIENTE |
+| 53 | `docs/SENECA-CUADRO-ANCHO.md` | PENDIENTE |
 
-**Orden de trabajo:** están PENDIENTES la 49, la 50, la 51 y la 52, en ese orden. Las filas 1 a 48
-están HECHAS. **La 52 va después de la 51**: las dos tocan la cabecera de la ficha.
+**Orden de trabajo:** están PENDIENTES la 49, la 50, la 51, la 52 y la 53, en ese orden. Las filas
+1 a 48 están HECHAS. **La 52 va después de la 51**: las dos tocan la cabecera de la ficha.
 
 **Fila 49, en una línea** (18-sep-2026, acordada con Francisco): la bandeja de correos lee por
 dentro los PDF adjuntos de cada correo (hasta 3 adjuntos, 5 páginas) con el lector que ya existe
@@ -164,6 +165,17 @@ y el vencimiento se ve escrito ("Vence el 25-sep · quedan 7 días"), pulsable p
 barra termina en el mismo borde que el título, con "Archivar el asunto" a la derecha. Detalle en
 `docs/CABECERA-DEL-ASUNTO.md`. **Va después de la fila 51.** Sube directamente a `main`, sin
 petición de cambios.
+
+**Fila 53, en una línea** (18-sep-2026, acordada con Francisco mirando una captura del cuadro de
+Mensaje de Séneca): ese cuadro se rehace para que se vea entero. Todo lo de Séneca sale de
+`js/correo.js` (38 KB) a un fichero propio, `js/seneca-cuadro.js` con `css/seneca.css`; el cuadro
+pasa a ocupar el ancho (hasta 1100 px) en dos columnas a partir de 900 px, con destinatarios y
+asunto a la izquierda y el texto del mensaje a la derecha; el asunto deja de ser una línea cortada
+y se lee entero, con su cuenta de caracteres; si el tipo no tiene plantilla de Séneca, un aviso en
+vez del hueco vacío; el botón que cambiaba de significado se parte en dos botones numerados ("1.
+Copiar el asunto" y "2. Copiar el texto"); y los cuatro párrafos del ayudante se pliegan en un
+desplegable. Ningún cambio de funcionamiento. Detalle en `docs/SENECA-CUADRO-ANCHO.md`. Sube
+directamente a `main`, sin petición de cambios.
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
