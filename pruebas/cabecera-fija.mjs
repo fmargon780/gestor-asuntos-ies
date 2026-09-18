@@ -187,16 +187,27 @@ await subirYEsperar(0);
 
 console.log('=== 1c. Fila 50: el candado de 400 ms bloquea el cambio contrario ===');
 /* Se maneja aquí `window.scrollY` y `CabeceraFija.evaluar()` a mano,
-   en vez de `subirYEsperar` (que ya espera lo bastante para no toparse
-   nunca con el candado): así se controla el tiempo exacto entre los
-   dos cambios, para probar el candado de verdad. */
+   en vez de `subirYEsperar`: así se controla el tiempo exacto entre
+   los dos cambios, para probar el candado de verdad. Los dos primeros
+   cambios (el que se admite y el contrario que hay que bloquear) se
+   hacen dentro de un mismo `pagina.evaluate()`, uno detrás de otro sin
+   ningún `await` de por medio: entre los dos pasan microsegundos de
+   verdad, no lo que tarde el viaje de ida y vuelta hasta el
+   navegador (que en una máquina de CI cargada puede acercarse él solo
+   a los 400 ms y dejar la prueba en flaky). */
 await subirYEsperar(200); /* encogida, y ya ha pasado de sobra el candado de la prueba anterior */
-await pagina.evaluate(() => { window.scrollTo(0, 0); window.CabeceraFija.evaluar(); });
-await comprobar('primer cambio: se despliega', encogidaDe('#pantalla-abiertos header.cabecera'), false);
-
-await pagina.evaluate(() => { window.scrollTo(0, 300); window.CabeceraFija.evaluar(); });
-await comprobar('el cambio contrario, a los pocos milisegundos, queda bloqueado por el candado',
-  encogidaDe('#pantalla-abiertos header.cabecera'), false);
+const dosCambiosSeguidos = await pagina.evaluate(() => {
+  window.scrollTo(0, 0);
+  window.CabeceraFija.evaluar();
+  const trasElPrimero = document.querySelector('#pantalla-abiertos header.cabecera').classList.contains('encogida');
+  window.scrollTo(0, 300);
+  window.CabeceraFija.evaluar();
+  const trasElContrario = document.querySelector('#pantalla-abiertos header.cabecera').classList.contains('encogida');
+  return { trasElPrimero, trasElContrario };
+});
+await comprobar('primer cambio: se despliega', Promise.resolve(dosCambiosSeguidos.trasElPrimero), false);
+await comprobar('el cambio contrario, a los pocos microsegundos, queda bloqueado por el candado',
+  Promise.resolve(dosCambiosSeguidos.trasElContrario), false);
 
 await pagina.waitForTimeout(450);
 await pagina.evaluate(() => { window.CabeceraFija.evaluar(); });
