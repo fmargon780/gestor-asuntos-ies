@@ -128,9 +128,26 @@
 .tipo-asunto-seccion .explica { margin-bottom: 10px; }
 
 /* El aviso ámbar de "también se usa en otros tipos" (Campos.
-   tiposQueUsanPropio), dentro de la sección Campos. */
+   tiposQueUsanPropio / tiposQueUsanCalculado), dentro de la sección
+   Campos. */
 .aviso-compartido {
   font-size: 12px; color: #8a6100; margin-top: 2px;
+}
+
+/* ---------- el panel de "+ Añadir campo" (fila 56, 18-sep-2026,
+   docs/CAMPOS-CATALOGO-Y-CALCULADOS.md), js/campos-catalogo.js y
+   js/campos-calculados-editor.js ---------- */
+.campos-catalogo-rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 8px;
+}
+.campos-propio-form, .campos-calc-form {
+  margin: 8px 0; padding: 10px 12px;
+  border: 1px solid #d7dee6; border-radius: 8px; background: #f7f9fb;
+}
+.campos-calc-categorias {
+  display: flex; flex-wrap: wrap; gap: 10px 16px; margin-bottom: 8px;
 }
 
 /* ---------- el aviso en vivo, al escribir un nombre nuevo ---------- */
