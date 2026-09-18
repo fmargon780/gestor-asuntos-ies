@@ -1,1 +1,829 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestor de Asuntos</title>
+<link rel="stylesheet" href="css/estilos.css">
+<link rel="stylesheet" href="css/plazos.css">
+<link rel="stylesheet" href="css/ajustes.css">
+<link rel="stylesheet" href="css/campos.css">
+<link rel="stylesheet" href="css/guias.css">
+<link rel="stylesheet" href="css/ficha-asunto.css">
+<link rel="stylesheet" href="css/ficha-tercero.css">
+<link rel="stylesheet" href="css/notas.css">
+<link rel="stylesheet" href="css/visor.css">
+<link rel="stylesheet" href="css/tipos-buscador.css">
+<link rel="stylesheet" href="css/via-contacto.css">
+<link rel="stylesheet" href="css/usabilidad.css">
+<link rel="stylesheet" href="css/copiar-nie.css">
+<link rel="stylesheet" href="css/tablon.css">
+<link rel="stylesheet" href="css/correo.css">
+<link rel="stylesheet" href="css/seneca.css">
+<link rel="stylesheet" href="css/salir.css">
+<link rel="stylesheet" href="css/bandeja.css">
+<link rel="stylesheet" href="css/barra.css">
+<link rel="stylesheet" href="css/lector.css">
+<link rel="stylesheet" href="css/vista.css">
+<link rel="stylesheet" href="css/registro.css">
+<link rel="stylesheet" href="css/relacionados.css">
+<link rel="stylesheet" href="css/duplicados.css">
+<link rel="stylesheet" href="css/unir-asuntos.css">
+<link rel="stylesheet" href="css/papelera.css">
+<link rel="stylesheet" href="css/hitos.css">
+<link rel="stylesheet" href="css/que-me-toca.css">
+<link rel="stylesheet" href="css/plantillas-documento.css">
+<link rel="stylesheet" href="css/pdf-separar-unir.css">
+<link rel="stylesheet" href="css/filas.css">
+<link rel="stylesheet" href="css/cabecera-fija.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<section id="arranque" class="arranque">
+  <div class="arranque-caja">
+    <h1>Gestor de Asuntos</h1>
+    <p class="lema">Expedientes y asuntos del centro, sobre vuestras carpetas de siempre.</p>
+
+    <div id="aviso-navegador" class="aviso aviso-rojo oculto">
+      <strong>Este navegador no sirve.</strong>
+      <p>La aplicación necesita Google Chrome o Microsoft Edge en un ordenador.
+         En otros navegadores no se puede dar acceso a una carpeta.</p>
+    </div>
+
+    <div id="aviso-roto" class="aviso aviso-rojo oculto"></div>
+
+    <div id="paso-carpetas">
+      <p class="explica">Para empezar, señala las dos carpetas con las que trabajas.
+         Solo hay que hacerlo una vez en cada ordenador.</p>
+
+      <div class="carpeta-fila">
+        <div>
+          <div class="carpeta-rotulo">1. Carpeta de asuntos abiertos</div>
+          <div class="carpeta-estado" id="estado-abiertos">Sin señalar</div>
+        </div>
+        <button id="btn-abiertos" class="boton">Elegir carpeta</button>
+      </div>
+
+      <div class="carpeta-fila">
+        <div>
+          <div class="carpeta-rotulo">2. Carpeta ARCHIVO</div>
+          <div class="carpeta-estado" id="estado-archivo">Sin señalar</div>
+        </div>
+        <button id="btn-archivo" class="boton">Elegir carpeta</button>
+      </div>
+
+      <div class="carpeta-fila">
+        <div>
+          <div class="carpeta-rotulo">3. ¿Quién eres?</div>
+          <div class="carpeta-estado">Se anota en el registro de cada asunto.</div>
+        </div>
+        <input id="campo-usuario" class="campo" placeholder="Tu nombre" style="max-width:220px">
+      </div>
+
+      <button id="btn-entrar" class="boton boton-principal boton-ancho" disabled>Entrar</button>
+      <p class="nota">Nada de lo que hagas aquí sale de este ordenador.
+         La aplicación trabaja directamente sobre tus carpetas.</p>
+    </div>
+  </div>
+</section>
+
+<div id="aplicacion" class="oculto">
+
+  <nav class="lateral">
+    <div class="marca">Gestor de Asuntos</div>
+    <button class="pestana activa" data-pantalla="abiertos"><span>Asuntos abiertos</span><span class="cuenta" id="cuenta-abiertos"></span></button>
+    <button class="pestana" data-pantalla="nuevo"><span>Nuevo asunto</span></button>
+    <button class="pestana" data-pantalla="archivo"><span>Archivo</span></button>
+    <button class="pestana" data-pantalla="personas"><span>Personas y empresas</span></button>
+    <div class="separador-lateral"></div>
+    <button class="pestana" data-pantalla="ajustes"><span>Ajustes</span></button>
+    <div class="lateral-pie">
+      <div class="usuario" id="usuario-pie"></div>
+    </div>
+  </nav>
+
+  <main class="contenido">
+
+    <section id="pantalla-abiertos" class="pantalla">
+      <header class="cabecera">
+        <h2>Asuntos abiertos</h2>
+        <div class="acciones">
+          <input id="buscar-abiertos" class="campo" placeholder="Buscar por nombre, tipo o tercero">
+          <button type="button" id="btn-filtros" class="boton" aria-expanded="false"
+                  aria-controls="filtros-abiertos">Filtros</button>
+          <button id="btn-recargar" class="boton">Actualizar</button>
+        </div>
+
+        <!-- Los tres desplegables viven aquí, plegados. Sueltos en la barra
+             se salían de linea y las etiquetas acababan lejos de su campo. -->
+        <div id="filtros-abiertos" class="filtros oculto">
+          <label class="filtro">
+            <span class="filtro-rotulo">Estado</span>
+            <select id="filtro-estado" class="campo campo-estado">
+              <option value="">Todos los estados</option>
+            </select>
+          </label>
+          <label class="filtro">
+            <span class="filtro-rotulo">Plazo</span>
+            <select id="filtro-plazo" class="campo">
+              <option value="">Todos los plazos</option>
+              <option value="vencidos">Solo los vencidos</option>
+              <option value="pronto">Vencidos y de esta semana</option>
+              <option value="conplazo">Solo los que tienen plazo</option>
+              <option value="sinplazo">Solo los que no tienen plazo</option>
+            </select>
+          </label>
+          <label class="filtro">
+            <span class="filtro-rotulo">Ordenar por</span>
+            <select id="orden-abiertos" class="campo">
+              <option value="fecha-asc">Fecha · los más antiguos arriba</option>
+              <option value="fecha-desc">Fecha · los más recientes arriba</option>
+              <option value="limite">Fecha límite · lo que antes vence</option>
+              <option value="estado">Estado del asunto</option>
+              <option value="tipo">Tipo de asunto</option>
+              <option value="tercero">Tercero</option>
+            </select>
+          </label>
+        </div>
+      </header>
+
+      <div id="panel-avisos" class="oculto"></div>
+      <div id="panel-recurrentes" class="oculto"></div>
+
+      <div class="paneles">
+        <button type="button" class="panel" data-vista="clasificar">
+          <svg class="panel-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
+            <path d="M13.8 3H7A1.5 1.5 0 0 0 5.5 4.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.7z"/>
+            <path d="M13.8 3v4.7h4.7"/>
+          </svg>
+          <span class="panel-texto">
+            <span class="panel-nombre">Por clasificar</span>
+            <span class="panel-pie">Documentos que todavía no tienen asunto</span>
+          </span>
+          <span class="panel-cuenta" id="cuenta-clasificar">0</span>
+          <span class="marca-nueva oculto" id="nuevos-sueltos"></span>
+        </button>
+
+        <button type="button" class="panel" data-vista="departamento">
+          <svg class="panel-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.2l2 2.6h8.8A1.5 1.5 0 0 1 21 9.1v9A1.5 1.5 0 0 1 19.5 19.6h-15A1.5 1.5 0 0 1 3 18.1z"/>
+          </svg>
+          <span class="panel-texto">
+            <span class="panel-nombre">En el departamento</span>
+            <span class="panel-pie">Asuntos que nos toca mover a nosotros</span>
+          </span>
+          <span class="panel-cuenta" id="cuenta-departamento">0</span>
+        </button>
+
+        <button type="button" class="panel" data-vista="espera">
+          <svg class="panel-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="8.5"/>
+            <path d="M12 7.3V12l3 1.8"/>
+          </svg>
+          <span class="panel-texto">
+            <span class="panel-nombre">A la espera de terceros</span>
+            <span class="panel-pie">Lo nuestro está hecho; falta que conteste otro</span>
+          </span>
+          <span class="panel-cuenta" id="cuenta-espera">0</span>
+        </button>
+      </div>
+
+      <div id="zona-clasificar" class="oculto">
+        <div class="sueltos-cabecera">
+          <p class="explica">Documentos sueltos en la carpeta de asuntos abiertos, todavía sin
+             carpeta propia. Aquí es donde aparece lo que os deja el equipo directivo.</p>
+          <button id="btn-sueltos-visto" class="boton oculto">Ya los he visto</button>
+        </div>
+
+        <!-- La bandeja de correos (js/bandeja-correos.js, js/bandeja-pantalla.js),
+             plegada detrás de esta barra y siempre arrancando así (fila 27,
+             17-sep-2026, docs/CORREOS-DENTRO-DE-POR-CLASIFICAR.md). Los dos
+             elementos nacen aquí, ya no los crea JavaScript. -->
+        <div id="correos-sin-clasificar" class="oculto">
+          <button type="button" id="btn-correos-sin-clasificar" class="boton" aria-expanded="false">
+            Correos sin clasificar (<span id="cuenta-correos-sin-clasificar">0</span>)
+          </button>
+          <div id="bandeja-correos" class="oculto"></div>
+        </div>
+
+        <div id="lista-sueltos" class="lista"></div>
+      </div>
+
+      <div id="zona-asuntos">
+        <div id="lista-abiertos" class="lista"></div>
+      </div>
+    </section>
+
+    <section id="pantalla-asunto" class="pantalla oculto">
+      <div id="ficha-asunto-cuerpo"></div>
+    </section>
+
+    <section id="pantalla-nuevo" class="pantalla oculto">
+      <header class="cabecera"><h2>Nuevo asunto</h2></header>
+
+      <div id="aviso-pendiente" class="aviso aviso-ambar oculto"></div>
+
+      <div class="formulario">
+        <label class="etiqueta">¿De qué es el asunto?</label>
+        <div class="categorias" id="categorias-lista"></div>
+
+        <div id="bloque-tipos" class="oculto">
+          <label class="etiqueta">Tipo de asunto</label>
+          <div class="tipos" id="tipos-lista"></div>
+          <p class="nota">¿Falta un tipo? Los tipos se añaden en
+             <button type="button" class="enlace" id="ir-a-ajustes">Ajustes</button>,
+             para que la lista se mantenga ordenada y no se llene de nombres repetidos.</p>
+        </div>
+
+        <div id="bloque-tercero" class="oculto">
+          <label class="etiqueta" id="etiqueta-tercero">Tercero</label>
+          <input id="buscar-tercero" class="campo" placeholder="Escribe tres letras del nombre">
+          <div id="resultados-tercero" class="resultados"></div>
+          <div id="tercero-elegido" class="elegido oculto"></div>
+        </div>
+
+        <div id="bloque-detalles" class="oculto">
+          <div class="dos-columnas">
+            <div>
+              <label class="etiqueta">Fecha de inicio</label>
+              <input id="campo-fecha" type="date" class="campo">
+            </div>
+            <div>
+              <label class="etiqueta">Año académico <span class="suave">(opcional)</span></label>
+              <input id="campo-curso" class="campo" placeholder="26-27">
+            </div>
+          </div>
+
+          <div id="bloque-grupo" class="oculto">
+            <label class="interruptor">
+              <input type="checkbox" id="campo-grupo">
+              <span>Añadir el grupo al nombre <strong id="grupo-vista"></strong></span>
+            </label>
+          </div>
+
+          <div id="bloque-campos" class="oculto">
+            <label class="etiqueta">Datos del asunto</label>
+            <div id="campos-lista-nuevo" class="campos-lista"></div>
+          </div>
+
+          <label class="etiqueta">Descripción corta <span class="suave">(opcional)</span></label>
+          <input id="campo-descripcion" class="campo" placeholder="Por ejemplo: Cambio de optativa">
+
+          <div class="dos-columnas">
+            <div>
+              <label class="etiqueta">Estado</label>
+              <select id="campo-estado" class="campo"></select>
+            </div>
+            <div>
+              <label class="etiqueta">Vía de comunicación <span class="suave">(opcional)</span></label>
+              <select id="campo-via" class="campo"></select>
+            </div>
+          </div>
+          <input id="campo-via-dato" class="campo" placeholder="Teléfono, correo o aclaración, si lo ha dado">
+
+          <label class="etiqueta">Fecha límite <span class="suave">(opcional)</span></label>
+          <input id="campo-limite" type="date" class="campo">
+          <p id="nota-limite" class="nota oculto"></p>
+
+          <p class="nota">El estado, la vía de comunicación y la fecha límite no salen en el nombre de la carpeta.
+             Se guardan en la carpeta del centro, y los ve todo el que abra la aplicación.</p>
+
+          <div id="grupo-lopide">
+            <label class="etiqueta">Lo pide <span class="suave">(opcional)</span></label>
+            <div id="lopide-caja-nuevo"></div>
+          </div>
+
+          <div id="guia-nuevo" class="oculto"></div>
+
+          <div class="vista-previa">
+            <div class="vista-rotulo">Se creará esta carpeta</div>
+            <div id="vista-nombre" class="vista-nombre"></div>
+            <div id="vista-ruta" class="vista-ruta"></div>
+          </div>
+
+          <button id="btn-crear" class="boton boton-principal boton-ancho">Crear el asunto</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="pantalla-archivo" class="pantalla oculto">
+      <header class="cabecera">
+        <h2>Archivo</h2>
+        <div class="acciones">
+          <input id="buscar-archivo" class="campo" placeholder="Buscar en todo el archivo">
+          <button id="btn-recargar-archivo" class="boton">Actualizar</button>
+          <button id="btn-reconstruir-indice" class="boton" title="Recorre el archivo entero una vez y guarda el índice de búsqueda">Reconstruir el índice</button>
+        </div>
+      </header>
+      <p class="explica" id="explica-archivo">Pulsa Actualizar para leer el archivo. Puede tardar unos segundos la primera vez.</p>
+      <div id="lista-archivo" class="lista"></div>
+    </section>
+
+    <section id="pantalla-personas" class="pantalla oculto">
+      <header class="cabecera">
+        <h2>Personas y empresas</h2>
+        <div class="acciones">
+          <select id="filtro-personas" class="campo">
+            <option value="ALUMNADO">Alumnado</option>
+            <option value="PERSONAL">Personal</option>
+            <option value="EMPRESAS">Empresas</option>
+            <option value="OTROS">Otros</option>
+          </select>
+          <input id="buscar-personas" class="campo" placeholder="Escribe un nombre">
+        </div>
+      </header>
+      <div class="dos-paneles">
+        <div id="lista-personas" class="lista"></div>
+        <div id="ficha-persona" class="ficha"><p class="explica">Elige a alguien de la lista para ver su ficha.</p></div>
+      </div>
+    </section>
+
+    <section id="pantalla-ajustes" class="pantalla oculto">
+      <header class="cabecera"><h2>Ajustes</h2></header>
+
+      <div id="pestanas-ajustes" class="pestanas-ajustes" role="tablist">
+        <button type="button" class="pestana-ajustes activa" data-ajustes-pestana="tipos">Tipos de asunto</button>
+        <button type="button" class="pestana-ajustes" data-ajustes-pestana="centro">El centro</button>
+        <button type="button" class="pestana-ajustes" data-ajustes-pestana="mantenimiento">Mantenimiento</button>
+      </div>
+
+      <div id="ajustes-tab-tipos" class="ajustes-tab">
+      <p class="explica">Esta lista la comparten todos los ordenadores del centro:
+         se guarda en la carpeta <code>_GESTOR</code>, dentro de la carpeta de asuntos abiertos.
+         La lista de partida es una propuesta; cámbiala a vuestro gusto.
+         Los días de plazo de cada tipo sirven para poner sola la fecha límite de los asuntos nuevos.
+         Pulsa una tarjeta para entrar en todo lo suyo: campos, pasos, plantillas, plazo y recurrencia.</p>
+      <div class="alta-tipo">
+        <input id="nuevo-tipo" class="campo" placeholder="TIPO NUEVO" style="max-width:260px">
+        <select id="nueva-categoria" class="campo" style="max-width:180px">
+          <option value="ALUMNADO">ALUMNADO</option>
+          <option value="PERSONAL">PERSONAL</option>
+          <option value="EMPRESAS">EMPRESAS</option>
+          <option value="OTROS">OTROS</option>
+        </select>
+        <button id="btn-anadir-tipo" class="boton">Añadir</button>
+      </div>
+      <div id="aviso-nuevo-tipo" class="aviso-en-vivo"></div>
+      <div class="tipos-cabecera">
+        <div id="pestanas-tipos" class="pestanas-categoria" role="tablist"></div>
+        <input id="buscar-tipos" class="campo buscar-tipos"
+               placeholder="Buscar un tipo en todas las categorías">
+      </div>
+      <div id="tipos-buscando-info" class="suave tipos-buscando-info oculto"></div>
+      <div id="tabla-tipos" class="rejilla-tipos"></div>
+      </div>
+
+      <div id="ajustes-tab-centro" class="ajustes-tab oculto">
+
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Estados del asunto</span>
+          <span class="bloque-pie">Por dónde va la tramitación, en el orden del trámite</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Dicen por dónde va cada gestión: pendiente, enviado a la firma, resuelto…
+         También se comparten con el resto de ordenadores. Van en el orden del trámite,
+         no por orden alfabético: con las flechas los subes y los bajas.</p>
+      <div class="alta-tipo">
+        <input id="nuevo-estado" class="campo" placeholder="ESTADO NUEVO" style="max-width:260px">
+        <button id="btn-anadir-estado" class="boton">Añadir</button>
+      </div>
+      <div id="aviso-nuevo-estado" class="aviso-en-vivo"></div>
+      <div id="tabla-estados" class="rejilla-tipos"></div>
+        </div>
+      </details>
+
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Tipos de documento</span>
+          <span class="bloque-pie">Los que salen al nombrar un documento dentro de un asunto</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Son los que salen al poner nombre a un documento dentro de
+         la carpeta de un asunto. También se comparten entre los ordenadores.</p>
+      <div class="alta-tipo">
+        <input id="nuevo-tipo-doc" class="campo" placeholder="TIPO NUEVO" style="max-width:260px">
+        <button id="btn-anadir-tipo-doc" class="boton">Añadir</button>
+      </div>
+      <div id="aviso-nuevo-tipo-doc" class="aviso-en-vivo"></div>
+      <div id="tabla-tipos-documento" class="rejilla-tipos"></div>
+        </div>
+      </details>
+
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Campos propios</span>
+          <span class="bloque-pie">Datos que no vienen en ningún fichero, como el trimestre</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Además de los datos que ya trae el alumnado, el personal y las empresas,
+         aquí puedes crear tus propios campos: texto libre o una lista cerrada de valores.
+         Un campo propio vale para cualquier tipo de asunto: se asocia desde la pantalla
+         de cada tipo, en la pestaña "Tipos de asunto".</p>
+      <div class="alta-tipo">
+        <input id="nuevo-propio" class="campo" placeholder="NOMBRE DEL CAMPO" style="max-width:260px">
+        <select id="nueva-clase-propio" class="campo" style="max-width:180px">
+          <option value="texto">Texto libre</option>
+          <option value="lista">Lista cerrada</option>
+        </select>
+        <button id="btn-anadir-propio" class="boton">Añadir</button>
+      </div>
+      <div id="tabla-propios" class="lista"></div>
+        </div>
+      </details>
+
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Grupos de personas</span>
+          <span class="bloque-pie">Listas con nombre para relacionar de golpe o mandar un correo a varios</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Un grupo es una lista de personas con un nombre: "equipo directivo",
+         "tutores de 1º"... Se monta una vez y se usa muchas, tanto para relacionar de golpe con
+         un asunto como para poner los destinatarios de un correo (siempre en copia oculta).
+         Esta lista se comparte con el resto de ordenadores del centro.</p>
+      <div class="alta-tipo">
+        <button id="btn-anadir-grupo" class="boton">+ Crear un grupo</button>
+      </div>
+      <div id="tabla-grupos-personas" class="lista"></div>
+        </div>
+      </details>
+
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Ficheros de datos</span>
+          <span class="bloque-pie">Qué CSV hay cargados y qué columnas se reconocen</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Van en <code>_GESTOR/datos</code>, dentro de la carpeta de asuntos abiertos.</p>
+      <div id="estado-datos" class="lista"></div>
+        </div>
+      </details>
+
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Cómo se abrevia cada grupo</span>
+          <span class="bloque-pie">Cómo queda escrito el grupo del alumno en el nombre</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Cuando pides que el nombre del asunto lleve el grupo del alumno,
+         se escribe abreviado. Aquí tienes, grupo por grupo, lo que trae Séneca y lo que
+         escribe la aplicación. Si alguno no te cuadra, dímelo.</p>
+      <div id="tabla-grupos" class="lista"></div>
+        </div>
+      </details>
+
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Datos del centro y firma</span>
+          <span class="bloque-pie">Lo que rellena los huecos de correos y documentos</span>
+        </summary>
+        <div class="bloque-cuerpo" id="centro-firma-cuerpo">
+      <label class="etiqueta">Firma</label>
+      <textarea id="plantillas-firma" class="campo" rows="3"></textarea>
+      <div class="dos-columnas">
+        <div><label class="etiqueta">Nombre del centro</label>
+          <input id="plantillas-centro" class="campo"></div>
+        <div><label class="etiqueta">Cargo de quien firma</label>
+          <input id="plantillas-cargo" class="campo" placeholder="Director, Secretario…"></div>
+      </div>
+      <div class="dos-columnas">
+        <div><label class="etiqueta">Localidad</label>
+          <input id="plantillas-localidad" class="campo"></div>
+        <div><label class="etiqueta">Código del centro</label>
+          <input id="plantillas-codigo" class="campo"></div>
+      </div>
+      <label class="etiqueta">Dirección del centro</label>
+      <input id="plantillas-direccion" class="campo">
+      <button type="button" class="boton" id="plantillas-guardar-firma">Guardar firma y centro</button>
+        </div>
+      </details>
+
+      </div>
+
+      <div id="ajustes-tab-mantenimiento" class="ajustes-tab oculto">
+
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Avisos de vencimiento</span>
+          <span class="bloque-pie">Con cuánta antelación avisar de lo que vence</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Al abrir la aplicación sale un aviso arriba con lo que ha vencido
+         y lo que está a punto de vencer. Aquí eliges con cuánta antelación quieres el aviso.
+         Esto es solo de este ordenador.</p>
+      <div class="alta-tipo">
+        <label class="etiqueta-en-linea" for="avisos-dias">Avisar con</label>
+        <input id="avisos-dias" type="number" min="0" class="campo campo-plazo">
+        <span class="suave">días de antelación</span>
+      </div>
+        </div>
+      </details>
+
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Carpetas de este ordenador</span>
+          <span class="bloque-pie">Las dos carpetas señaladas aquí</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <div id="estado-carpetas" class="lista"></div>
+      <button id="btn-olvidar" class="boton">Volver a elegir las carpetas</button>
+        </div>
+      </details>
+
+      <!-- El ayudante de Séneca (fila 47, docs/DESTINATARIOS-EN-SENECA.md):
+           un enlace-marcador que Francisco arrastra una vez a la barra de
+           marcadores. Lo pinta js/seneca-ayudante.js dentro de este hueco. -->
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">El ayudante de Séneca</span>
+          <span class="bloque-pie">Un marcador que mete los destinatarios en Séneca uno a uno</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <div id="ayudante-seneca-ajustes"></div>
+        </div>
+      </details>
+
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Copias de seguridad</span>
+          <span class="bloque-pie">Una copia diaria de cada fichero compartido, por si alguno se estropea</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Antes de escribir cualquiera de los ficheros que se comparten con el
+         resto de ordenadores, la aplicación guarda una copia de cómo estaba, una vez al día.
+         Se guardan en <code>_GESTOR/copias</code> y se conservan las últimas 30 de cada uno.
+         Si algún fichero se estropea, al entrar la aplicación lo dice y ofrece restaurar la
+         última copia; aquí puedes restaurar cualquiera de las otras, por si hiciera falta.</p>
+      <div id="tabla-copias" class="lista"></div>
+        </div>
+      </details>
+
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Papelera</span>
+          <span class="bloque-pie">Lo borrado se guarda aquí hasta que tú lo quites</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <div id="aviso-papelera-vieja" class="aviso aviso-ambar oculto"></div>
+      <div id="tabla-papelera" class="lista"></div>
+        </div>
+      </details>
+
+      </div>
+    </section>
+
+    <!-- La pantalla propia de un tipo de asunto (17-sep-2026, fila 39,
+         docs/AJUSTES-POR-TIPO.md): pantalla entera, no cuadro emergente,
+         con las siete secciones del tipo a la vista. La pinta entera
+         js/ajustes-tipo.js, dentro de las dos columnas de aquí abajo. -->
+    <section id="pantalla-tipo-asunto" class="pantalla oculto">
+      <header class="cabecera">
+        <h2 id="tipo-asunto-nombre"></h2>
+        <span class="marca-categoria" id="tipo-asunto-categoria"></span>
+      </header>
+      <div id="tipo-asunto-cuerpo" class="tipo-asunto-columnas">
+        <div class="tipo-asunto-columna" id="tipo-asunto-col-1"></div>
+        <div class="tipo-asunto-columna" id="tipo-asunto-col-2"></div>
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+<div id="capa" class="capa oculto">
+  <div class="cuadro">
+    <h3 id="cuadro-titulo"></h3>
+    <div id="cuadro-cuerpo"></div>
+    <div class="cuadro-botones">
+      <button id="cuadro-cancelar" class="boton">Cancelar</button>
+      <button id="cuadro-aceptar" class="boton boton-principal">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<div id="mensajes" class="mensajes"></div>
+
+<!-- Piezas sueltas: cada una hace su trabajo y no sabe de las demás. -->
+<script src="js/util.js"></script>
+<script src="js/almacen.js"></script>
+<script src="js/carpetas.js"></script>
+<script src="js/copias.js"></script>
+<script src="js/nombres.js"></script>
+<script src="js/plazos.js"></script>
+<script src="js/guias.js"></script>
+<script src="js/datos.js"></script>
+<script src="js/campos.js"></script>
+<script src="js/documentos.js"></script>
+<script src="js/grupos.js"></script>
+<!-- js/idea.js (fila 47, docs/DESTINATARIOS-EN-SENECA.md): el usuario
+     IdEA de una persona, leído por el título de columna del CSV, como
+     js/dni.js con el DNI. Va antes que js/correo.js, que lo usa para
+     el cuadro de Séneca; no depende de nada más, así que puede ir
+     aquí, junto a js/grupos.js. -->
+<script src="js/idea.js"></script>
+<!-- El índice guardado del ARCHIVO (fila 44, docs/BUSCADOR-ARCHIVO-INDICE.md).
+     Va después de js/nombres.js y js/carpetas.js (los usa) y antes de
+     js/asuntos-archivar.js y js/archivo-personas.js, que son quienes
+     lo llaman. -->
+<script src="js/archivo-indice.js"></script>
+
+<!-- La comodidad de la pantalla. Va antes que la aplicación, para
+     enterarse de los cambios antes de que la pantalla se mueva. -->
+<script src="js/usabilidad.js"></script>
+
+<!-- La aplicación, repartida por pantallas. -->
+<script src="js/nucleo.js"></script>
+<script src="js/version.js"></script>
+<script src="js/asuntos-lista.js"></script>
+<script src="js/unir-asuntos.js"></script>
+<script src="js/asuntos-editar.js"></script>
+<!-- El cuadro de elegir asunto, compartido por "Por clasificar" y por la
+     bandeja de correos. Va antes que sus dos usuarios, y antes que
+     js/papelera.js, que envuelve la tarjeta del documento suelto. -->
+<script src="js/elegir-asunto.js"></script>
+<script src="js/documentos-sueltos.js"></script>
+<!-- Archivar y reabrir un asunto, sacado de documentos-sueltos.js el
+     17-sep-2026 (fila 32). Va antes que js/relacionados.js y
+     js/hitos-archivo.js, que envuelven App.cerrarAsunto/App.reabrirAsunto. -->
+<script src="js/asuntos-archivar.js"></script>
+<!-- js/lo-pide.js (fila 28): quién ha pedido la gestión. Va antes que
+     js/asuntos-nuevo.js (pinta su grupo "Lo pide") y que js/plantillas.js
+     (usa LoPide.datosDeTutor). -->
+<script src="js/lo-pide.js"></script>
+<script src="js/asuntos-nuevo.js"></script>
+<script src="js/archivo-personas.js"></script>
+<script src="js/ajustes.js"></script>
+<script src="js/fichas-huerfanas.js"></script>
+<script src="js/puente.js"></script>
+
+<!-- Los módulos que se enganchan al puente. -->
+<script src="js/avisos.js"></script>
+<script src="js/frescura.js"></script>
+<script src="js/conflictos.js"></script>
+<script src="js/recurrentes.js"></script>
+<script src="js/guias-enganche.js"></script>
+<!-- El modelo de los hitos de un asunto: después de js/guias.js y de
+     js/plazos.js (los usa), y después de js/puente.js (usa
+     window.Gestor). js/hitos-panel.js pinta los hitos dentro de la
+     ficha del asunto, así que va después de js/ficha-asunto.js.
+     js/hitos-archivo.js va después de js/relacionados.js: envuelve
+     App.cerrarAsunto/App.reabrirAsunto detrás de esa envoltura. -->
+<script src="js/hitos.js"></script>
+<!-- "Qué me toca" (fila 16): cruza los hitos de todos los asuntos
+     abiertos. Vive entera en su fichero, como "Duplicados"
+     (js/unir-asuntos.js); usa Hitos.leer/visibles y, en el click de
+     cada fila, window.HitosPanel.desplegarAlAbrir (definido más abajo,
+     en js/hitos-panel.js), así que el orden entre ambos no importa:
+     solo se llama dentro de un onclick, ya con todo cargado. -->
+<script src="js/que-me-toca.js"></script>
+<script src="js/notas.js"></script>
+<script src="js/registro-lector.js"></script>
+<script src="js/lector-documentos.js"></script>
+<script src="js/contexto-documentos.js"></script>
+<script src="js/documentos-sueltos-lector.js"></script>
+<script src="js/verificacion.js"></script>
+<script src="js/registro.js"></script>
+<script src="js/registro-sellado.js"></script>
+<script src="js/pdf-herramientas.js"></script>
+<script src="js/pdf-separar-unir.js"></script>
+<script src="js/ficha-asunto.js"></script>
+<!-- El menú pequeño reutilizable de la cabecera (fila 52, 18-sep-2026,
+     docs/CABECERA-DEL-ASUNTO.md): lo usan los tres puntos del nombre
+     (js/ficha-nombre-acciones.js, justo debajo) y "Comunicar"
+     (js/correo.js, más abajo). -->
+<script src="js/ficha-menus.js"></script>
+<!-- El menú de tres puntos del nombre del asunto (fila 52, 18-sep-2026):
+     Editar, Copiar el nombre y Borrar, que antes vivían sueltos en la
+     barra de acciones. Va después de js/ficha-asunto.js (envuelve
+     App.abrirFicha) y de js/ficha-menus.js (usa FichaMenus.montar). -->
+<script src="js/ficha-nombre-acciones.js"></script>
+<!-- Los dos bloques plegables de la ficha (fila 51, 18-sep-2026): montar
+     el <details>, escribir el resumen, guardar y reponer el
+     abierto/cerrado entre un repintado y otro. Va justo después de
+     js/ficha-asunto.js, que es quien lo llama. -->
+<script src="js/ficha-plegables.js"></script>
+<!-- Los documentos de la carpeta del asunto, separado de
+     js/ficha-asunto.js el 17-sep-2026 (fila 26) al quitarle trabajo la
+     fila "los hitos son la guía". Se habla con él por
+     window.FichaDocumentos.pintar. -->
+<script src="js/ficha-documentos.js"></script>
+<!-- "Datos y contacto" del tercero, la línea resumen y la ventana "Ver
+     todo" (fila 37, 17-sep-2026): para no engordar js/ficha-asunto.js,
+     igual que js/ficha-documentos.js. Se habla con él por
+     window.FichaTercero.pintarLinea. Va después de js/datos.js y de
+     js/dni.js si estuviera antes, pero dni.js carga más abajo: llama a
+     window.Dni en tiempo de ejecución, no al cargar, así que el orden
+     entre los dos no importa. -->
+<script src="js/ficha-tercero.js"></script>
+<script src="js/hitos-panel.js"></script>
+<script src="js/hitos-panel-lista.js"></script>
+<!-- Apuntar un documento a un hito (fila 31, 17-sep-2026): el cuadro de
+     elegir, con casillas. Lo usa el botón que pone js/hitos-panel-lista.js. -->
+<script src="js/hitos-documentos.js"></script>
+<script src="js/duplicados.js"></script>
+<script src="js/relacionados.js"></script>
+<!-- Saltar a otro asunto del mismo tercero, y volver (fila 40,
+     17-sep-2026): se lleva el bloque "Otros asuntos de este tercero"
+     de js/ficha-asunto.js. Va después de js/ficha-asunto.js (cuelga el
+     hueco #ficha-otros) y de js/duplicados.js (usa
+     Duplicados.delTercero/carpetaDelTercero/tipoDeNombre). -->
+<script src="js/otros-del-tercero.js"></script>
+<script src="js/hitos-archivo.js"></script>
+<script src="js/visor.js"></script>
+<script src="js/tipos-buscador.js"></script>
+<script src="js/via-contacto.js"></script>
+<script src="js/tablon.js"></script>
+<script src="js/copiar.js"></script>
+<!-- js/plantillas.js va antes que js/correo.js: el cuadro de Correo usa
+     Plantillas.cargar/deTipo/rellenar/valoresDeAsunto para su desplegable
+     "Plantilla" (docs/PLANTILLAS-DE-CORREO.md, 2.3). -->
+<script src="js/plantillas.js"></script>
+<!-- js/huecos-buscador.js va antes que quien lo use: el botón "Insertar
+     hueco" del editor de plantillas (docs/HUECOS-INSERTAR.md, fila 35). -->
+<script src="js/huecos-buscador.js"></script>
+<script src="js/plantillas-ajustes.js"></script>
+<script src="js/correo.js"></script>
+<!-- js/seneca-destinatarios.js (fila 47, docs/DESTINATARIOS-EN-SENECA.md):
+     la lista de usuarios IdEA del cuadro de Séneca, en chips. Va
+     después de js/correo.js: usa `window.CorreoGrupos`, que expone,
+     y js/correo.js solo llama a `window.SenecaDestinatarios` en
+     tiempo de ejecución (al abrir el cuadro), así que el orden entre
+     los dos no le afecta a esa parte, pero CorreoGrupos sí tiene que
+     existir ya cuando se elige un grupo. -->
+<script src="js/seneca-destinatarios.js"></script>
+<!-- js/seneca-cuadro.js (fila 53, 18-sep-2026, docs/SENECA-CUADRO-ANCHO.md):
+     el cuadro de "Mensaje de Séneca", sacado de js/correo.js. Va
+     después de js/correo.js y de js/seneca-destinatarios.js: usa
+     `window.CorreoNucleo` y `window.SenecaDestinatarios`, los dos ya
+     definidos en tiempo de carga. El orden con js/seneca-ayudante.js
+     no importa: a ese solo lo llama en tiempo de ejecución. -->
+<script src="js/seneca-cuadro.js"></script>
+<!-- js/seneca-ayudante.js (fila 47): genera el texto del enlace-marcador
+     y lo pinta, tanto en Ajustes (js/ajustes-mantenimiento.js) como en
+     el cuadro de Séneca (js/seneca-cuadro.js). No depende de ningún
+     otro módulo de la aplicación: solo de `window.U` para el aviso, si
+     está disponible. -->
+<script src="js/seneca-ayudante.js"></script>
+<!-- js/docx.js y js/plantillas-documento.js van después de js/correo.js
+     (docs/PLANTILLAS-DE-DOCUMENTO.md, 7): usan Plantillas.valoresDeAsunto
+     y, para el botón "Generar documento" de la ficha, el mismo enganche
+     de App.abrirFicha que ya usa js/correo.js. -->
+<script src="js/docx.js"></script>
+<script src="js/plantillas-documento.js"></script>
+<script src="js/salir.js"></script>
+<script src="js/rescate-datos.js"></script>
+<script src="js/traer-datos.js"></script>
+<script src="js/lector.js"></script>
+<script src="js/bandeja-correos.js"></script>
+<!-- La bandeja en pantalla (fila 27, 17-sep-2026): necesita
+     window.Bandeja, así que va después de js/bandeja-correos.js, y
+     antes de js/bandeja-enlace.js y js/correo-adjuntos.js. -->
+<script src="js/bandeja-pantalla.js"></script>
+<!-- Lee por dentro los adjuntos PDF de un correo (18-sep-2026, fila 49,
+     docs/ADJUNTOS-DE-CORREO-POR-DENTRO.md): necesita
+     window.RegistroLector, window.LectorDocumentos, window.Bandeja y
+     el gancho de js/bandeja-pantalla.js, así que va después de los
+     tres. -->
+<script src="js/bandeja-adjuntos-lector.js"></script>
+<script src="js/bandeja-enlace.js"></script>
+<script src="js/correo-adjuntos.js"></script>
+<script src="js/barra.js"></script>
+<script src="js/vista.js"></script>
+<script src="js/cabecera-fija.js"></script>
+<script src="js/dni.js"></script>
+<script src="js/presencia.js"></script>
+<script src="js/papelera.js"></script>
+<script src="js/hitos-ajustes.js"></script>
+
+<!-- Ajustes por tipo (17-sep-2026, fila 39, docs/AJUSTES-POR-TIPO.md):
+     js/ajustes.js se quedó solo con el marco (las tres pestañas, la
+     lista de tipos y el buscador cruzado); estos tres van después de
+     todos los módulos que envuelven (campos, guías, plantillas de
+     correo y de documento, recurrentes, grupos, hitos, conflictos,
+     copias, papelera, huérfanas, frescura, bandeja, duplicados
+     descartados), para que sus funciones ya existan cuando el tipo o
+     "El centro" o "Mantenimiento" se pintan por primera vez. -->
+<!-- Campos calculados y el panel de "+ Añadir campo" (fila 56,
+     18-sep-2026, docs/CAMPOS-CATALOGO-Y-CALCULADOS.md): van después de
+     js/campos.js (que ya cargó mucho más arriba) y antes de
+     js/ajustes-tipo.js, que los llama al pintar la sección Campos.
+     js/campos-calculo.js no depende de nada de aquí abajo (solo de
+     U y Nombres, ya cargados); los otros dos sí llaman a App.E. -->
+<script src="js/campos-calculo.js"></script>
+<script src="js/campos-catalogo.js"></script>
+<script src="js/campos-calculados-editor.js"></script>
+<script src="js/ajustes-tipo.js"></script>
+<script src="js/ajustes-tipo-palabras-clave.js"></script>
+<script src="js/ajustes-centro.js"></script>
+<script src="js/ajustes-mantenimiento.js"></script>
+
+<!-- Y ahora sí, a arrancar. -->
+<script src="js/inicio.js"></script>
+</body>
+</html>
