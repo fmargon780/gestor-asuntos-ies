@@ -12,7 +12,9 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 ## Reglas para Claude Code
 
 1. Lee antes `docs/CONTEXTO.md`.
-2. Coge la primera instrucción con estado **PENDIENTE**. Cámbiala a **EN CURSO** con la fecha y
+2. Coge la primera instrucción con estado **PENDIENTE**, leyendo la tabla **de arriba abajo**. Ojo:
+   desde el 18-sep-2026 la tabla está en orden de trabajo, no de número, así que la primera
+   PENDIENTE no tiene por qué ser la del número más bajo. Cámbiala a **EN CURSO** con la fecha y
    sube ese cambio en el primer commit del trabajo. Así, si otra sesión abre esta cola, sabe que
    ya hay alguien con ella y no la repite.
 3. Antes de empezar una instrucción, comprueba si ya está hecha por otro camino (mira si existen
@@ -137,9 +139,9 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 60 | `docs/COMUNICAR-DESDE-EL-HITO.md` | HECHA (18-sep-2026 · 20:36) |
 | 61 | `docs/GUARDAR-SIN-PISAR.md` | PENDIENTE |
 | 62 | `docs/RENOMBRAR-SIN-PERDER-HITOS.md` | PENDIENTE |
+| 65 | `docs/DOCUMENTOS-QUE-QUEPAN.md` | PENDIENTE |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | PENDIENTE |
 | 64 | `docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md` | PENDIENTE |
-| 65 | `docs/DOCUMENTOS-QUE-QUEPAN.md` | PENDIENTE |
 | 66 | `docs/CONTACTO-GUARDADO-EN-LA-FICHA.md` | PENDIENTE |
 | 67 | `docs/LAS-CUENTAS-Y-LOS-DATOS.md` | PENDIENTE |
 | 68 | `docs/AVISOS-QUE-FALTAN.md` | PENDIENTE |
@@ -154,18 +156,40 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 salen del informe crítico del 18-sep-2026 (`docs/INFORME-CRITICO-2026-09-18.md`). Francisco ha
 pedido tenerlas todas desarrolladas antes de seguir añadiendo cosas nuevas a la aplicación.
 
-**Se hacen en orden de número, con tres excepciones que hay que respetar:**
+**El orden de trabajo NO es el de los números.** La tabla de arriba está puesta **en el orden en que
+hay que hacerlas**, de arriba abajo, y por eso la 65 aparece entre la 62 y la 63. Los números no se
+han cambiado porque los catorce documentos y el informe se citan entre sí por número. Coge siempre
+la primera PENDIENTE **de arriba abajo en la tabla**, no la del número más bajo.
+
+El orden, escrito otra vez para que no haya duda:
+
+    61 · 62 · 65 · 63 · 64 · 66 · 67 · 68 · 69 · 70 · 71 · 72 · 73 · 74
+
+Por qué está así:
 
 - La **61** y la **62** van primero de todo, sean cuales sean las prisas: son los dos fallos que
   pueden costar datos mientras tanto.
-- La **68** (parte de fichas huérfanas), la **73** y la **74** salen mejor **después de la 64**,
-  porque las tres dependen de dónde viva la ficha de un asunto archivado. Cada documento lo dice.
+- La **65** va la tercera (18-sep-2026, decidido con Francisco al preparar la cola para sesiones con
+  un modelo más pequeño). Parte `docs/CONTEXTO.md` y corta `docs/HISTORIA.md`, y hasta que eso esté
+  hecho **cada fila siguiente arrastra medio megabyte de documentación** que hay que leer y
+  reescribir. Hacerla pronto abarata y hace más seguras las once que vienen detrás. Además cambia
+  las reglas 8 y 13: **a partir de la 65, la documentación puede ir en una subida aparte**, y son
+  tres subidas por fila en vez de dos.
+- La **68** (la parte de fichas huérfanas), la **73** y la **74** van **después de la 64**, porque
+  las tres dependen de dónde viva la ficha de un asunto archivado. Cada documento lo explica.
 - La **71** es la menos urgente de todas. Si otra fila ya está tocando esos ficheros, se aprovecha;
-  si no, va la última.
+  si no, se queda donde está.
 
 **Ninguna de estas catorce se sube junto con otra.** Cada una, su subida.
 
+**Aviso sobre la 64:** es la más delicada de las catorce. Toca ocho ficheros, hay que revisar a mano
+cada sitio que lee la ficha de un asunto archivado, y si sale mal, sale mal en los datos.
+**Conviene hacerla en una sesión con el modelo grande**, no con uno pequeño. Si la sesión que llegue
+a ella no lo es, mejor saltarla, seguir con la 66 y dejar la 64 apuntada.
+
 ### Las catorce, en una línea cada una
+
+(Aquí van por número, para poder buscarlas. **El orden de trabajo es el de la tabla de arriba.**)
 
 **61 · Guardar sin pisar al compañero.** Mandar un asunto a la papelera y devolverlo son los dos
 únicos sitios que escriben `asuntos.json` entero sin releerlo antes; con la copia en memoria vieja
