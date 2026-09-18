@@ -353,14 +353,29 @@ App.cargarRegistro = async function () {
   App.E.registro = (r && r.asuntos) ? r : { asuntos: {} };
 };
 
+/* La única forma correcta de escribir el registro entero (fila 61,
+   docs/GUARDAR-SIN-PISAR.md): vuelve a leer el fichero del disco,
+   deja que 'cambiar' mute lo que haga falta sobre esa copia fresca,
+   guarda y repinta. Es el mismo patrón que ya usa Hitos.cambiar en
+   js/hitos.js. Cualquier sitio que necesite escribir el registro
+   entero pasa por aquí: nunca App.E.registro directo ni
+   Copias.guardar(..., App.FICHERO_ASUNTOS, ...) fuera de este
+   fichero (salvo js/conflictos.js, que fusiona una copia en
+   conflicto que ya se acaba de leer). */
+App.guardarRegistroFresco = async function (cambiar) {
+  await App.cargarRegistro();
+  await cambiar(App.E.registro);
+  await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
+  App.refrescarFichas();
+};
+
 /* Se relee antes de escribir, por si el compañero ha tocado algo
    desde el otro ordenador mientras tanto. */
 App.anotar = async function (clave, datos) {
-  await App.cargarRegistro();
-  var antes = App.E.registro.asuntos[clave] || {};
-  App.E.registro.asuntos[clave] = Object.assign(antes, datos);
-  await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
-  App.refrescarFichas();
+  await App.guardarRegistroFresco(function (registro) {
+    var antes = registro.asuntos[clave] || {};
+    registro.asuntos[clave] = Object.assign(antes, datos);
+  });
 };
 
 /* Al releer el registro, las tarjetas ya pintadas se quedan con la

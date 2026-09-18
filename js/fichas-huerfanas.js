@@ -64,13 +64,15 @@
 
     var destino = $('huerfana-destino').value;
     try {
-      await App.cargarRegistro();
-      var ficha = App.E.registro.asuntos[clave];
-      if (!ficha) { U.aviso('Esa ficha ya no está: puede que el compañero la haya tocado.', 'malo'); return; }
-      App.E.registro.asuntos[destino] = ficha;
-      delete App.E.registro.asuntos[clave];
-      await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
-      App.refrescarFichas();
+      var encontrada = false;
+      await App.guardarRegistroFresco(function (registro) {
+        var ficha = registro.asuntos[clave];
+        if (!ficha) return;
+        encontrada = true;
+        registro.asuntos[destino] = ficha;
+        delete registro.asuntos[clave];
+      });
+      if (!encontrada) { U.aviso('Esa ficha ya no está: puede que el compañero la haya tocado.', 'malo'); return; }
       U.aviso('Ficha enlazada con ' + destino + '.', 'bueno');
       await App.pintarAjustes();
     } catch (e) {
@@ -86,10 +88,9 @@
       '_GESTOR/copias, así que se puede recuperar a mano si hiciera falta.</p>', 'Borrar');
     if (!ok) return;
     try {
-      await App.cargarRegistro();
-      delete App.E.registro.asuntos[clave];
-      await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
-      App.refrescarFichas();
+      await App.guardarRegistroFresco(function (registro) {
+        delete registro.asuntos[clave];
+      });
       U.aviso('Ficha borrada.', 'bueno');
       await App.pintarAjustes();
     } catch (e) {

@@ -146,21 +146,21 @@ App.renombrarAsuntosAbiertosDelTercero = async function (categoria, textoAntes, 
     '<ul>' + lista + '</ul>', 'Adelante');
   if (!ok) return;
 
-  await App.cargarRegistro();
   var renombrados = 0;
-  for (var i = 0; i < afectados.length; i++) {
-    var nombreViejo = afectados[i].nombre;
-    var nombreNuevo = nombreViejo.slice(0, nombreViejo.length - textoAntes.length) + textoDespues;
-    try {
-      if (await Carpetas.existe(App.E.abiertos, nombreNuevo)) continue;   /* ya está así, no se toca */
-      await Carpetas.renombrar(App.E.abiertos, nombreViejo, nombreNuevo);
-      var antes = App.E.registro.asuntos[nombreViejo] || {};
-      App.E.registro.asuntos[nombreNuevo] = Object.assign({}, antes, { tercero: textoDespues });
-      delete App.E.registro.asuntos[nombreViejo];
-      renombrados++;
-    } catch (e) { /* uno que falle no frena a los demás */ }
-  }
-  if (renombrados) await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
+  await App.guardarRegistroFresco(async function (registro) {
+    for (var i = 0; i < afectados.length; i++) {
+      var nombreViejo = afectados[i].nombre;
+      var nombreNuevo = nombreViejo.slice(0, nombreViejo.length - textoAntes.length) + textoDespues;
+      try {
+        if (await Carpetas.existe(App.E.abiertos, nombreNuevo)) continue;   /* ya está así, no se toca */
+        await Carpetas.renombrar(App.E.abiertos, nombreViejo, nombreNuevo);
+        var antes = registro.asuntos[nombreViejo] || {};
+        registro.asuntos[nombreNuevo] = Object.assign({}, antes, { tercero: textoDespues });
+        delete registro.asuntos[nombreViejo];
+        renombrados++;
+      } catch (e) { /* uno que falle no frena a los demás */ }
+    }
+  });
   U.aviso(renombrados + ' carpeta' + (renombrados === 1 ? '' : 's') + ' renombrada' +
     (renombrados === 1 ? '' : 's') + '.', 'bueno');
 };
@@ -303,11 +303,11 @@ App.editarAsunto = async function (a) {
 
     /* La ficha viaja con la carpeta: se copia a la clave nueva y se
        borra la vieja, para no dejar dos fichas del mismo asunto. */
-    await App.cargarRegistro();
-    var antes = App.E.registro.asuntos[a.nombre] || {};
-    App.E.registro.asuntos[nombreNuevo] = Object.assign({}, antes, datos);
-    delete App.E.registro.asuntos[a.nombre];
-    await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
+    await App.guardarRegistroFresco(function (registro) {
+      var antes = registro.asuntos[a.nombre] || {};
+      registro.asuntos[nombreNuevo] = Object.assign({}, antes, datos);
+      delete registro.asuntos[a.nombre];
+    });
 
     await App.verAbiertos();
     U.aviso('Asunto editado. La carpeta ya se llama como querías.', 'bueno');

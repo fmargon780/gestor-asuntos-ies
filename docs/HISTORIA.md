@@ -3040,3 +3040,43 @@ una línea cada una. El texto largo que tenían antes era:
     "Comunicar", por "Documentos ▾", por el valor del propio `<select>` o por
     `.ficha-nombre-texto` en vez del `<h2>` completo (que ahora también lleva el icono y el
     menú).
+
+## 19-sep-2026 — Fila 61: guardar sin pisar al compañero
+
+Arreglo del fallo grave 1 del informe crítico (`docs/INFORME-CRITICO-2026-09-18.md`, 2.2):
+`js/papelera.js` tenía los dos únicos sitios que escribían `asuntos.json` entero sin releerlo
+antes: `mandarAsunto` (borrar un asunto abierto) y `devolverAsunto` (sacarlo de la papelera). Con
+la copia en memoria de este ordenador desactualizada durante horas (la pantalla de abiertos nunca
+la refresca sola), borrar o devolver un asunto podía escribir encima de notas, estados o plazos
+que el compañero hubiera guardado desde el otro ordenador, sin aviso ni error.
+
+**El arreglo**: `App.guardarRegistroFresco(cambiar)`, nueva en `js/nucleo.js`, junto a `App.anotar`
+(que ahora se apoya en ella). Relee `asuntos.json` del disco, deja que `cambiar(registro)` mute lo
+que haga falta sobre esa copia recién leída, guarda con `Copias.guardar` y repinta con
+`App.refrescarFichas()`. Es el mismo patrón que ya usaba `Hitos.cambiar` en `js/hitos.js`.
+
+`mandarAsunto` y `devolverAsunto` pasan ahora por ahí, con la relectura pegada al momento de
+escribir (después de mover la carpeta, no al principio de la función, porque el traslado puede
+tardar segundos). `mandarAsunto` tenía además una segunda trampa: guardaba en la papelera la ficha
+vieja que traía el objeto `a` en vez de releer la fresca de `App.E.registro` — con eso, al devolver
+el asunto se habría perdido lo mismo por el otro lado. Se corrigió cogiendo la ficha de la copia
+recién releída antes de archivarla.
+
+Los otros ocho sitios que escriben el registro entero (`js/unir-asuntos.js`,
+`js/fichas-huerfanas.js` ×2, `js/ajustes-centro.js`, `js/asuntos-editar.js` ×2, y el propio
+`App.anotar`) ya releían antes de escribir, así que pasarlos por `guardarRegistroFresco` no les
+cambia el comportamiento; solo cierra la puerta a que alguien añada un tercer sitio que escriba
+directo. `js/conflictos.js` se queda como estaba a propósito: fusiona una copia en conflicto de
+Dropbox que ya se acaba de leer dos líneas antes.
+
+**La prueba** (`pruebas/guardar-sin-pisar.mjs`) es la primera de la cola que carga `nucleo.js` y
+`papelera.js` de verdad en un contexto `vm` sin navegador, ampliando el patrón de
+`pruebas/archivar-fusion.mjs`: hace falta un `document` de mentira mínimo (solo
+`getElementById`/`querySelectorAll`, porque `nucleo.js` engancha `onclick` a unos pocos botones al
+cargarse) y un `window` que sea el propio contexto (`window === global`, como en un navegador de
+verdad), con un `Gestor` de mentira encima de `App.E` en vez de cargar `js/puente.js` entero. Monta
+dos asuntos, A y B; simula al compañero escribiendo notas nuevas directamente en el fichero del
+disco (sin pasar por `App.E.registro`) mientras este ordenador tiene la copia vieja en memoria; y
+comprueba que mandar A a la papelera y devolverlo no se llevan por delante lo que el compañero
+había guardado en B, ni archivan una versión vieja de la ficha de A. Comprobado a mano que la
+prueba falla sin el arreglo (revirtiendo `js/nucleo.js` y `js/papelera.js`) y pasa con él.
