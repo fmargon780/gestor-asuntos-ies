@@ -127,7 +127,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 50 | `docs/CABECERA-NO-TIEMBLA.md` | HECHA (18-sep-2026) |
 | 51 | `docs/FICHA-DISPOSICION.md` | HECHA (18-sep-2026) |
 | 52 | `docs/CABECERA-DEL-ASUNTO.md` | HECHA (18-sep-2026) |
-| 53 | `docs/SENECA-CUADRO-ANCHO.md` | PENDIENTE |
+| 53 | `docs/SENECA-CUADRO-ANCHO.md` | EN CURSO (18-sep-2026) |
 | 54 | `docs/AYUDANTE-SENECA-FIABLE.md` | PENDIENTE |
 | 55 | `docs/ASUNTO-SIN-ELECCION.md` | PENDIENTE |
 | 56 | `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md` | PENDIENTE |
