@@ -95,18 +95,21 @@ async function elUltimoAviso() {
    1. LA TARJETA TRAE EL BOTÓN NUEVO, Y NO PIERDE LOS DE ANTES
    ============================================================ */
 /* Desde la fila 22 (docs/SEPARAR-Y-UNIR-PDF.md, 17-sep-2026), un PDF
-   lleva además Separar/Unir/Sacar páginas: se comprueban aparte en
-   pruebas/separar-unir-navegador.mjs, aquí solo que sigan estando.
+   lleva además Separar/Unir/Sacar páginas (y desde la fila 57,
+   docs/HUECO-PARA-SELLO-Y-FIRMA.md, 18-sep-2026, también Preparar el
+   documento): se comprueban aparte en pruebas/separar-unir-
+   navegador.mjs, aquí solo que sigan estando.
 
    Desde la fila 36 (docs/FILAS-QUE-NO-SE-ESTRUJAN.md, 17-sep-2026), a
    la vista solo quedan "Crear asunto con él" y "Meter en un asunto":
-   el resto (Abrir, Separar, Unir, Sacar páginas y Borrar) vive dentro
-   del menú de tres puntos (U.menuDeAcciones), que este selector
-   también alcanza (".acciones .boton" no distingue profundidad), en
-   ese orden. */
+   el resto (Abrir, Separar, Unir, Sacar páginas, Preparar el
+   documento y Borrar) vive dentro del menú de tres puntos
+   (U.menuDeAcciones), que este selector también alcanza
+   (".acciones .boton" no distingue profundidad), en ese orden. */
 await comprobar('1. los botones de una tarjeta de "Por clasificar"',
   tarjetaDe('Conciliación FL.pdf').locator('.acciones .boton').allTextContents(),
-  ['Crear asunto con él', 'Meter en un asunto', 'Abrir', 'Separar', 'Unir', 'Sacar páginas', 'Borrar']);
+  ['Crear asunto con él', 'Meter en un asunto', 'Abrir', 'Separar', 'Unir', 'Sacar páginas',
+    'Preparar el documento', 'Borrar']);
 
 /* ============================================================
    6. LA PUNTUACIÓN DE PARECIDO
