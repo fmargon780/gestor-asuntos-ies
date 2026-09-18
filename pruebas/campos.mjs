@@ -405,7 +405,10 @@ const NOMBRE_ORIGINAL = '260911 SANCION 1º Bach A Ciencias Ramos Vidal, Elena 1
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.locator('.tarjeta').filter({ hasText: NOMBRE_ORIGINAL }).locator('.nombre-pulsable').click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-await pagina.getByRole('button', { name: 'Editar', exact: true }).click();
+/* "Editar" vive ahora en el menú de tres puntos del nombre (18-sep-2026,
+   fila 52, docs/CABECERA-DEL-ASUNTO.md). */
+await pagina.click('.ficha-nombre-menu-boton');
+await pagina.getByRole('button', { name: 'Editar el asunto', exact: true }).click();
 await pagina.waitForSelector('#ed-campos');
 
 await comprobar('el cuadro de editar trae los mismos campos, con lo guardado',

@@ -151,7 +151,10 @@ async function abrirCorreoDe(nombreAsunto) {
   await pagina.waitForTimeout(200);
   await pagina.locator('.tarjeta-nombre', { hasText: nombreAsunto }).click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-  await pagina.click('.boton-correo');
+  /* "Correo" vive ahora dentro de "Comunicar" (18-sep-2026, fila 52,
+     docs/CABECERA-DEL-ASUNTO.md). */
+  await pagina.click('.boton-comunicar');
+  await pagina.getByRole('button', { name: 'Correo electrónico', exact: true }).click();
   await pagina.waitForSelector('#capa:not(.oculto)');
   await pagina.waitForSelector('#adjuntos-lista .correo-fila');
 }

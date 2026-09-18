@@ -99,7 +99,10 @@ await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await pagina.click('#lista-abiertos .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 
-await pagina.getByRole('button', { name: 'Mensaje Séneca', exact: true }).click();
+/* "Mensaje Séneca" vive ahora dentro de "Comunicar" (18-sep-2026, fila 52,
+   docs/CABECERA-DEL-ASUNTO.md). */
+await pagina.getByRole('button', { name: 'Comunicar', exact: true }).click();
+await pagina.getByRole('button', { name: 'Mensaje de Séneca', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.waitForSelector('#seneca-destinatarios', { state: 'attached' });
 

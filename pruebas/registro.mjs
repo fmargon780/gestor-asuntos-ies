@@ -156,7 +156,10 @@ await comprobar('el original, sin registro en su nombre, lo sigue pudiendo lleva
   filaDeDocumento(FACTURA), { pendiente: false, registrar: true });
 
 console.log('--- un documento con la casilla "Pendiente de registro" ---');
-await pagina.getByRole('button', { name: 'Gestionar documentos', exact: true }).click();
+/* "Gestionar documentos" pasó a llamarse "Documentos ▾" y vive en la
+   cabecera del propio bloque (18-sep-2026, fila 52,
+   docs/CABECERA-DEL-ASUNTO.md, 11). */
+await pagina.click('.ficha-documentos-gestionar');
 await pagina.waitForSelector('#doc-anadir');
 await pagina.click('#doc-anadir');
 await pagina.waitForSelector('#doc-vista');

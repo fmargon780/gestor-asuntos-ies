@@ -184,7 +184,7 @@ await comprobar('de partida se elige el abierto más reciente',
 
 await pagina.click('#dup-abrir');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-await comprobar('lleva a la ficha del asunto elegido', pagina.locator('.ficha-nombre').textContent(), NUEVA);
+await comprobar('lleva a la ficha del asunto elegido', pagina.locator('.ficha-nombre-texto').textContent(), NUEVA);
 await comprobar('no se ha creado una tercera carpeta',
   nombresDeAbiertos().then(n => n.filter(x => x.indexOf('TRANSPORTE') !== -1).length), 2);
 
@@ -309,7 +309,7 @@ await pagina.click('#visor-cerrar');
 await pagina.locator('.columna-nombre').filter({ hasText: NUEVA }).click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await comprobar('el nombre de la columna abre la ficha de ese asunto',
-  pagina.locator('.ficha-nombre').textContent(), NUEVA);
+  pagina.locator('.ficha-nombre-texto').textContent(), NUEVA);
 await pagina.click('#ficha-volver');
 
 /* ============================================================

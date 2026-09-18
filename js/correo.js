@@ -860,25 +860,32 @@
       poner();
     };
 
+    /* "Correo" y "Mensaje Séneca" se juntan en un solo botón,
+       "Comunicar" (18-sep-2026, fila 52, docs/CABECERA-DEL-ASUNTO.md,
+       9): mismo menú pequeño que los tres puntos del nombre
+       (js/ficha-menus.js). Entra ANTES del botón de Archivar/Reabrir
+       (`.boton-principal`, siempre el último de la barra): este
+       fichero pinta por su cuenta, en un `MutationObserver` que puede
+       saltar después de que js/ficha-asunto.js ya haya puesto ese
+       botón, así que no basta con `appendChild`. */
     function poner() {
       if (!actual) return;
       var caja = $('ficha-acciones');
-      if (!caja || caja.querySelector('.boton-correo')) return;
+      if (!caja || caja.querySelector('.boton-comunicar')) return;
+
       var b = document.createElement('button');
       b.type = 'button';
-      b.className = 'boton boton-correo';
-      b.textContent = 'Correo';
-      b.title = 'Preparar el correo de este asunto: a quién va, el asunto y el cuerpo';
-      b.onclick = function () { abrirCuadro(actual, false); };
-      caja.appendChild(b);
+      b.className = 'boton boton-comunicar';
+      b.textContent = 'Comunicar';
+      b.title = 'Escribir un correo o un mensaje de Séneca de este asunto';
 
-      var s = document.createElement('button');
-      s.type = 'button';
-      s.className = 'boton boton-seneca';
-      s.textContent = 'Mensaje Séneca';
-      s.title = 'Preparar el asunto y el texto para la mensajería de Séneca';
-      s.onclick = function () { abrirCuadro(actual, true); };
-      caja.appendChild(s);
+      var principal = caja.querySelector('.boton-principal');
+      if (principal) caja.insertBefore(b, principal); else caja.appendChild(b);
+
+      FichaMenus.montar(b, [
+        { texto: 'Correo electrónico', alPulsar: function () { abrirCuadro(actual, false); } },
+        { texto: 'Mensaje de Séneca', alPulsar: function () { abrirCuadro(actual, true); } }
+      ]);
     }
 
     var pantalla = $('pantalla-asunto');

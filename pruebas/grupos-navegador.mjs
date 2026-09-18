@@ -188,7 +188,10 @@ await comprobar('los dos miembros del grupo quedan relacionados con el asunto', 
 }), ['Aguilar Ponce, Marina 1140233', 'Bermúdez Ortiz, Álvaro 1140501'].sort());
 
 console.log('--- "Añadir un grupo" en Correo mete los correos en Copia oculta ---');
-await pagina.getByRole('button', { name: 'Correo', exact: true }).click();
+/* "Correo" vive ahora dentro de "Comunicar" (18-sep-2026, fila 52,
+   docs/CABECERA-DEL-ASUNTO.md). */
+await pagina.getByRole('button', { name: 'Comunicar', exact: true }).click();
+await pagina.getByRole('button', { name: 'Correo electrónico', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.waitForSelector('#correo-grupo');
 await pagina.selectOption('#correo-grupo', { label: 'Grupo de prueba' });

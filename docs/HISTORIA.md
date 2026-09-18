@@ -2773,3 +2773,68 @@ una línea cada una. El texto largo que tenían antes era:
     situación inicial ("EN EL DEPARTAMENTO" no es uno de ellos) solo se enseña como opción del
     desplegable mientras sea el valor actual; en cuanto se cambia a otro estado, desaparece de la
     lista y ya no se puede volver a él desde el propio desplegable.
+  - **Regresión encontrada tras fusionar la fila**: `pruebas/notas-asunto-no-se-borran.mjs` seguía
+    comprobando el reparto de columnas de la fila 37, que esta fila cambió a propósito
+    (Documentos pasa a su propio tramo central; Notas va antes que los plegables, no después). No
+    era el fallo "de siempre" de ese fichero (uno de foco al desplegar un hito, ya conocido y
+    documentado en la fila 49): era un cambio real sin actualizar. Corregido en un commit aparte
+    sobre la misma PR (#39), antes de fusionarla.
+- **52 · `docs/CABECERA-DEL-ASUNTO.md`**: Terminada 18-sep-2026 · 05:51. Los doce botones de la
+  cabecera de un asunto (todos con el mismo peso, en dos filas) pasan a cinco, agrupados por el
+  momento del trámite en vez de por el orden en que se fueron añadiendo. Ningún funcionamiento
+  distinto: solo dónde vive cada acción y con quién va agrupada.
+  - `#ficha-acciones` queda en `[estado] · [vencimiento] · El encargo · Comunicar ·
+    Archivar/Reabrir`, con `.boton-principal` pegado al borde derecho (`margin-left: auto`).
+  - El desplegable de estado toma el color de fondo/texto de `App.colorEstado(situacion)`
+    (`estado-0`…`estado-5`), sin CSS nuevo: `.estado-N` y `.campo` tienen la misma especificidad
+    de una clase, y `.estado-N` va después en `css/estilos.css`, así que gana.
+  - `Plazos.etiquetaVencimiento(limite)` (nueva, `js/plazos.js`), aparte de `Plazos.de` (que
+    sigue igual para avisos/"Qué me toca"/la tarjeta de la lista, con su propio significado de
+    "vencido" que incluye "vence hoy"): "Vence el D-mmm · quedan N días" / "Vence hoy" / "Venció
+    hace N días" / "Sin plazo", con un umbral de ámbar propio (2 días, no los 7 de `DIAS_CERCA`).
+    Sustituye al botón "Plazo" y a `.marca-plazo`, quitada de la cabecera.
+  - **"El encargo"**: un solo botón que abre "Lo pide" de siempre (`abrirLoPide`,
+    `js/ficha-asunto.js`) con la vía de comunicación (`a.ficha.via`/`viaDato`, antes su propio
+    botón vía `App.editarVia`) dentro, como un campo más. `LoPide.controles` gana un 4º parámetro
+    `viaInicial` y devuelve además `leerVia()` (siempre `{via, dato}`, nunca `null`, a diferencia
+    de `leer()`): las dos preguntas se guardan en un solo `App.anotar`, pero no dependen la una de
+    la otra. Ninguna clave cambia de sitio en `asuntos.json`. `App.editarVia` no se toca (sigue
+    usándolo la tarjeta de la lista); `js/via-contacto.js` envuelve también `LoPide.controles`
+    para poner ahí las mismas sugerencias de teléfono/correo. Resumen de una línea debajo del
+    botón (`relación · por vía`) cuando hay algo que enseñar.
+  - **"Comunicar"**: `js/correo.js` deja de montar "Correo" y "Mensaje Séneca" sueltos y monta un
+    botón con un menú de dos opciones (`FichaMenus.montar`), insertado con `insertBefore` antes de
+    `.boton-principal` (no `appendChild`: si no, podía acabar después de "Archivar" según el orden
+    de llegada de los `MutationObserver`).
+  - **El menú de tres puntos del nombre** (`js/ficha-nombre-acciones.js`, nuevo): Editar, Copiar
+    el nombre del asunto, y (con papelera) Borrar en rojo — las dos últimas cosas solo si el
+    asunto está abierto. El icono de copiar el número del tercero (`js/copiar.js`) se muda de la
+    barra al propio `<h2>`. "Documentos ▾" (antes "Gestionar documentos") se muda a la cabecera
+    del bloque de documentos (`js/ficha-documentos.js`), también con la carpeta vacía.
+  - **`js/ficha-menus.js`** (nuevo): el menú pequeño reutilizable (abrir, cerrar con Escape/al
+    pulsar fuera, uno solo a la vez) de los tres puntos y "Comunicar". **Trampa real**: sin
+    `ev.stopPropagation()` en el manejador de Escape (en captura), cerrar el menú con esa tecla se
+    llevaba por delante la ficha entera, porque `js/usabilidad.js` también escucha Escape sobre
+    todo el documento y, sin ningún `#capa` abierto, pulsa `#ficha-volver` — mismo cuidado que ya
+    tomaba `js/huecos-buscador.js` por el mismo motivo. Se depuró con un script aparte que abría
+    la ficha, pulsaba los tres puntos y miraba `getBoundingClientRect()` del icono de copiar
+    (salía con todo en cero: el nodo real seguía existiendo pero la pantalla ya era la lista de
+    abiertos, prueba de que se había navegado fuera).
+  - El nombre pasa a `<h2 class="ficha-nombre"><span class="ficha-nombre-texto">…</span></h2>`:
+    solo ese `<span>` lleva la elipsis con la cabecera encogida, nunca el `<h2>` entero, para que
+    el icono de copiar y los tres puntos (hermanos del `<span>`) no se recorten con un nombre
+    largo.
+  - `esControlDeSoloLectura` gana el disparador de los tres puntos (para que el menú se pueda
+    abrir en modo consulta) y el texto nuevo `'Copiar el nombre del asunto'`.
+  - Prueba nueva `pruebas/cabecera-del-asunto.mjs`, en navegador de verdad, con los 11 escenarios
+    del encargo. **Trampa de la prueba**: los cuadros de Correo, Séneca y Documentos abren con
+    `sinCancelar` (el botón de aceptar queda como "Cerrar"); en una pantalla corta ese botón podía
+    quedar fuera de la parte visible del cuadro y el `click` de Playwright no lo alcanzaba —se
+    cierran con la tecla Escape en la prueba, que además comprueba de paso que no rompe nada.
+  - **Regresión encontrada al pasar la batería completa**: trece ficheros de prueba interactuaban
+    directamente con los botones viejos ("Editar", "Correo", "Mensaje Séneca", "Gestionar
+    documentos", "Borrar" en la ficha) o comprobaban `.ficha-marcas .marca-estado`/`.ficha-nombre`
+    entero como texto plano. Se corrigieron todos para pasar por el menú de tres puntos, por
+    "Comunicar", por "Documentos ▾", por el valor del propio `<select>` o por
+    `.ficha-nombre-texto` en vez del `<h2>` completo (que ahora también lleva el icono y el
+    menú).

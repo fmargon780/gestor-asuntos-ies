@@ -692,6 +692,16 @@
 <script src="js/pdf-herramientas.js"></script>
 <script src="js/pdf-separar-unir.js"></script>
 <script src="js/ficha-asunto.js"></script>
+<!-- El menú pequeño reutilizable de la cabecera (fila 52, 18-sep-2026,
+     docs/CABECERA-DEL-ASUNTO.md): lo usan los tres puntos del nombre
+     (js/ficha-nombre-acciones.js, justo debajo) y "Comunicar"
+     (js/correo.js, más abajo). -->
+<script src="js/ficha-menus.js"></script>
+<!-- El menú de tres puntos del nombre del asunto (fila 52, 18-sep-2026):
+     Editar, Copiar el nombre y Borrar, que antes vivían sueltos en la
+     barra de acciones. Va después de js/ficha-asunto.js (envuelve
+     App.abrirFicha) y de js/ficha-menus.js (usa FichaMenus.montar). -->
+<script src="js/ficha-nombre-acciones.js"></script>
 <!-- Los dos bloques plegables de la ficha (fila 51, 18-sep-2026): montar
      el <details>, escribir el resumen, guardar y reponer el
      abierto/cerrado entre un repintado y otro. Va justo después de

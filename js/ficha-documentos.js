@@ -141,6 +141,26 @@ var FichaDocumentos = (function () {
     ficheros.sort(porNombre).forEach(function (f) { caja.appendChild(filaDeDocumento(f, a)); });
   }
 
+  /* "Documentos ▾", en la cabecera del bloque (18-sep-2026, fila 52,
+     docs/CABECERA-DEL-ASUNTO.md, 11): lo que antes era "Gestionar
+     documentos" en la barra de la ficha, exactamente igual, solo que
+     al lado del título de este bloque, también con la carpeta vacía.
+     Se pinta una sola vez por bloque: `pintar()` se llama en cada
+     repintado de la lista de documentos, pero el título del bloque
+     (`<h3>`) no se rehace, así que basta con no duplicar el botón. */
+  function ponerBotonGestionar(bloqueEl, a) {
+    if (!bloqueEl) return;
+    var titulo = bloqueEl.querySelector('.ficha-titulo');
+    if (!titulo || titulo.querySelector('.ficha-documentos-gestionar')) return;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'boton ficha-documentos-gestionar';
+    b.textContent = 'Documentos ▾';
+    b.title = 'Nombrar y archivar los documentos de la carpeta';
+    b.onclick = async function () { await App.verDocumentos(a); pintar(a); };
+    titulo.appendChild(b);
+  }
+
   async function pintar(a) {
     var caja = $('ficha-documentos');
     var cuenta = $('ficha-cuenta-docs');
@@ -152,6 +172,7 @@ var FichaDocumentos = (function () {
          (18-sep-2026, fila 51, docs/FICHA-DISPOSICION.md, 8). */
       var bloqueEl = caja.closest('.ficha-bloque');
       if (bloqueEl) bloqueEl.classList.toggle('vacio', !lista.length);
+      ponerBotonGestionar(bloqueEl, a);
       if (!lista.length) {
         caja.className = 'explica';
         caja.textContent = 'La carpeta todavía está vacía.';

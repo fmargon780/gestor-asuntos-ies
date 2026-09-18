@@ -473,10 +473,11 @@ await pagina.click('#btn-crear');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 
 /* "Documentos" ya no está en la tarjeta (10-sep-2026): está dentro de
-   la ficha del asunto, en "Gestionar documentos". */
+   la ficha del asunto, en "Documentos ▾" (antes "Gestionar documentos",
+   movido a la cabecera del propio bloque en la fila 52, 18-sep-2026). */
 await pagina.click('#lista-abiertos .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-await pagina.getByRole('button', { name: 'Gestionar documentos', exact: true }).click();
+await pagina.click('.ficha-documentos-gestionar');
 await pagina.waitForSelector('#doc-anadir');
 await comprobar('la carpeta del asunto empieza sin documentos',
   pagina.locator('#doc-cuerpo .fila-documento').count(), 0);

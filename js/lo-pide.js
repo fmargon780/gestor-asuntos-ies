@@ -154,10 +154,20 @@ var LoPide = (function () {
      el documento romperían el segundo sitio que se pintara.
 
      `valorInicial` es el `loPide` ya guardado (o null/undefined, para
-     empezar en blanco). Devuelve `{ leer() }`. */
-  function controles(caja, persona, valorInicial) {
+     empezar en blanco). `viaInicial` es `{via, viaDato}`, la vía de
+     comunicación de siempre del asunto (`a.ficha.via`/`viaDato`,
+     18-sep-2026, fila 52, docs/CABECERA-DEL-ASUNTO.md, 7): el mismo
+     dato que hasta ahora se apuntaba aparte, en el cuadro de "Vía"
+     (js/asuntos-lista.js `App.editarVia`), se pregunta aquí una sola
+     vez porque los dos —quién lo pide y por dónde— son del mismo
+     momento. Devuelve `{ leer(), leerVia() }`: `leer()` sigue
+     devolviendo `null` sin "quién" (igual que siempre); `leerVia()` da
+     `{via, dato}` pase lo que pase, para guardarlos en `a.ficha.via` /
+     `viaDato` aunque no se haya elegido "quién lo pide". */
+  function controles(caja, persona, valorInicial, viaInicial) {
     var lista = opciones(persona);
     var v = valorInicial || null;
+    var via0 = viaInicial || {};
 
     var inicial = '';
     if (v && v.nombre) {
@@ -185,13 +195,15 @@ var LoPide = (function () {
         '<label class="etiqueta">Correo, si lo tienes</label>' +
         '<input class="campo lopide-otro-correo" value="' + U.escapar(esOtro ? (v.correo || '') : '') + '">' +
       '</div>' +
-      '<label class="etiqueta">Por dónde lo pidió</label>' +
+      '<label class="etiqueta">Por qué vía</label>' +
       '<select class="campo lopide-via"><option value="">Sin indicar</option>' +
         Nombres.VIAS.map(function (via) {
-          return '<option value="' + via.clave + '"' + ((v && v.via) === via.clave ? ' selected' : '') +
+          return '<option value="' + via.clave + '"' + ((via0.via || (v && v.via) || '') === via.clave ? ' selected' : '') +
             '>' + U.escapar(via.texto) + '</option>';
         }).join('') +
       '</select>' +
+      '<input class="campo lopide-via-dato" value="' + U.escapar(via0.viaDato || '') + '" ' +
+      'placeholder="Teléfono, correo o aclaración (opcional)">' +
       '<label class="etiqueta">Fecha</label>' +
       '<input type="date" class="campo lopide-fecha" value="' + U.escapar((v && v.fecha) || U.hoyIso()) + '">';
 
@@ -205,10 +217,20 @@ var LoPide = (function () {
       return (window.App && App.E && App.E.usuario) || '';
     }
 
+    /* La vía de comunicación de siempre (`a.ficha.via`/`viaDato`), pase
+       lo que pase con "quién lo pide": las dos preguntas van en el
+       mismo cuadro, pero no dependen la una de la otra. */
+    function leerVia() {
+      return {
+        via: caja.querySelector('.lopide-via').value,
+        dato: caja.querySelector('.lopide-via-dato').value.trim()
+      };
+    }
+
     function leer() {
       var valor = selQuien.value;
       if (!valor) return null;
-      var viaElegida = caja.querySelector('.lopide-via').value;
+      var viaElegida = leerVia().via;
       var fecha = caja.querySelector('.lopide-fecha').value || U.hoyIso();
 
       if (valor === 'otro') {
@@ -240,7 +262,7 @@ var LoPide = (function () {
       };
     }
 
-    return { leer: leer };
+    return { leer: leer, leerVia: leerVia };
   }
 
   var MESES_CORTOS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
