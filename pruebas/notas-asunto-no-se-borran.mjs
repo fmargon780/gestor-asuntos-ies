@@ -176,19 +176,26 @@ await comprobar('6. y el foco y el cursor también',
     return [document.activeElement === c, c.selectionStart, c.selectionEnd];
   }), [true, 11, 11]);
 
-console.log('--- 7. la ficha nueva (fila 37, 17-sep-2026): orden de bloques y nota sin botón ---');
-/* docs/FICHA-DEL-ASUNTO-NUEVA.md, 1: izquierda Hitos y Documentos;
-   derecha Datos y contacto (la primera), Otros asuntos y Notas (la
-   última). */
-await comprobar('7. a la izquierda, primero Hitos y después Documentos',
-  pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-izquierda .ficha-titulo')).map((h) => {
+console.log('--- 7. la ficha nueva (fila 51, 18-sep-2026): orden de bloques y nota sin botón ---');
+/* docs/FICHA-DISPOSICION.md, 6: tres columnas — izquierda Hitos; centro
+   Documentos (hueco ancho); derecha Datos y contacto (el primero),
+   después Notas, y plegados al final "Otros asuntos" y "Relacionados"
+   (lo que casi nunca se mira). Sustituye a la comprobación de la fila
+   37 (docs/FICHA-DEL-ASUNTO-NUEVA.md), que daba por hecho el reparto
+   de columnas anterior. */
+await comprobar('7. a la izquierda, solo Hitos',
+  pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-izquierda .ficha-titulo')).map((h) => h.textContent.trim())),
+  ['Hitos']);
+
+await comprobar('7. en el centro, Documentos de la carpeta',
+  pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-centro .ficha-titulo')).map((h) => {
     /* El título de "Documentos" lleva pegada la cuenta de documentos
        (`.ficha-cuenta`), dentro del mismo <h3>: se quita antes de leer
        el texto, que si no sale "Documentos de la carpeta2". */
     const cuenta = h.querySelector('.ficha-cuenta');
     return (cuenta ? h.textContent.slice(0, -cuenta.textContent.length) : h.textContent).trim();
   })),
-  ['Hitos', 'Documentos de la carpeta']);
+  ['Documentos de la carpeta']);
 
 await comprobar('7. a la derecha, "Datos y contacto" es el primer bloque',
   pagina.evaluate(() => {
@@ -196,12 +203,12 @@ await comprobar('7. a la derecha, "Datos y contacto" es el primer bloque',
     return primero && primero.id;
   }), 'ficha-contacto-caja');
 
-await comprobar('7. y "Notas" es el último, después de "Otros asuntos"',
+await comprobar('7. y "Notas" va antes que los bloques plegados (Otros asuntos, Relacionados)',
   pagina.evaluate(() => {
     const titulos = Array.from(document.querySelectorAll('.ficha-derecha .ficha-titulo')).map((h) => h.textContent);
-    return [titulos.indexOf('Otros asuntos de este tercero') < titulos.indexOf('Notas'),
-            titulos[titulos.length - 1]];
-  }), [true, 'Notas']);
+    return [titulos.indexOf('Notas') < titulos.indexOf('Otros asuntos de este tercero'),
+            titulos.indexOf('Notas') < titulos.indexOf('Personas y entidades relacionadas')];
+  }), [true, true]);
 
 console.log('--- 8. la nota se guarda sola, sin "Añadir nota" ---');
 comprobarQue('8. ya no hay botón "Añadir nota"',
