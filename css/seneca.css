@@ -1,0 +1,100 @@
+/* ============================================================
+   seneca.css — el cuadro de "Mensaje de Séneca" (fila 53, 18-sep-2026,
+   docs/SENECA-CUADRO-ANCHO.md). Ocupa el ancho del cuadro (hasta
+   1100px) y reparte Asunto/destinatarios a la izquierda y el texto del
+   mensaje a la derecha, para que el asunto se lea entero.
+   ============================================================ */
+
+/* El cuadro compartido (#capa .cuadro) se ensancha mientras está
+   abierto este, igual que ya hacen documentos.js/ficha-tercero.js con
+   .cuadro-ancho (js/documentos.js), pero con un tope menor: aquí no
+   hace falta todo el ancho de un visor de documentos. */
+.cuadro-seneca {
+  max-width: min(1100px, 96vw);
+}
+
+.seneca-aviso-arriba {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border-left: 4px solid var(--ambar-linea);
+  background: var(--ambar);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.seneca-aviso-arriba strong { font-weight: 600; }
+
+.seneca-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 20px;
+  margin-top: 12px;
+}
+@media (max-width: 900px) {
+  .seneca-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.seneca-col-izq, .seneca-col-der {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* El asunto: crece con lo que se escribe, entre 2 y 5 renglones,
+   sin barra de desplazamiento (docs/SENECA-CUADRO-ANCHO.md, 3.2). */
+#seneca-asunto {
+  resize: none;
+  overflow: hidden;
+  font-family: inherit;
+  line-height: 1.4;
+}
+.seneca-asunto-pie {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.seneca-caracteres {
+  color: var(--tinta-suave);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.boton-chico {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+/* El texto del mensaje ocupa todo el alto de su columna. */
+.seneca-col-der textarea#seneca-cuerpo-texto {
+  flex: 1;
+  min-height: 280px; /* aprox. 14 renglones */
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.seneca-pasos {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.seneca-pasos .boton { flex: 1 1 220px; }
+
+.seneca-ayudante-caja { margin-top: 14px; }
+.seneca-ayudante-caja details.seneca-explica-detalles {
+  margin-top: 8px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 6px 12px;
+}
+.seneca-ayudante-caja details.seneca-explica-detalles summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--tinta-suave);
+  padding: 4px 0;
+}
+.seneca-ayudante-caja details.seneca-explica-detalles[open] summary { margin-bottom: 6px; }

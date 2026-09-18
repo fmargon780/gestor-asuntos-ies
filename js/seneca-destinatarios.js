@@ -93,9 +93,14 @@ var SenecaDestinatarios = (function () {
           opcionesGrupo + '</select>'
       : '') +
       '<div id="seneca-destinatarios">' + contenido() + '</div>' +
+      /* Botones pequeños (fila 53, 18-sep-2026, docs/SENECA-CUADRO-ANCHO.md):
+         desde que el cuadro va en dos columnas, estos dos caen en la
+         columna izquierda, más estrecha que el cuadro entero de antes,
+         junto a los destinatarios y el Asunto: boton-chico deja sitio
+         a los dos en la misma línea sin envolver tan pronto. */
       '<div class="correo-botones" style="margin-top:8px">' +
-        '<button type="button" class="boton" id="seneca-copiar-lista">Copiar la lista</button>' +
-        '<button type="button" class="boton" id="seneca-copiar-siguiente">Copiar el siguiente</button>' +
+        '<button type="button" class="boton boton-chico" id="seneca-copiar-lista">Copiar la lista</button>' +
+        '<button type="button" class="boton boton-chico" id="seneca-copiar-siguiente">Copiar el siguiente</button>' +
       '</div>';
   }
 
