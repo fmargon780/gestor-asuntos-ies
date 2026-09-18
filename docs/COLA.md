@@ -128,9 +128,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 51 | `docs/FICHA-DISPOSICION.md` | PENDIENTE |
 | 52 | `docs/CABECERA-DEL-ASUNTO.md` | PENDIENTE |
 | 53 | `docs/SENECA-CUADRO-ANCHO.md` | PENDIENTE |
+| 54 | `docs/AYUDANTE-SENECA-FIABLE.md` | PENDIENTE |
 
-**Orden de trabajo:** están PENDIENTES la 49, la 50, la 51, la 52 y la 53, en ese orden. Las filas
-1 a 48 están HECHAS. **La 52 va después de la 51**: las dos tocan la cabecera de la ficha.
+**Orden de trabajo:** están PENDIENTES la 49, la 50, la 51, la 52, la 53 y la 54, en ese orden. Las
+filas 1 a 48 están HECHAS. **La 52 va después de la 51**: las dos tocan la cabecera de la ficha.
+La 54 toca solo `js/seneca-ayudante.js`, así que no se pisa con la 53.
 
 **Fila 49, en una línea** (18-sep-2026, acordada con Francisco): la bandeja de correos lee por
 dentro los PDF adjuntos de cada correo (hasta 3 adjuntos, 5 páginas) con el lector que ya existe
@@ -177,6 +179,16 @@ Copiar el asunto" y "2. Copiar el texto"); y los cuatro párrafos del ayudante s
 desplegable. Ningún cambio de funcionamiento. Detalle en `docs/SENECA-CUADRO-ANCHO.md`. Sube
 directamente a `main`, sin petición de cambios.
 
+**Fila 54, en una línea** (18-sep-2026, acordada con Francisco después de probar el ayudante en
+Séneca de verdad con cuatro profesores: solo entró uno bien): el ayudante de `js/seneca-ayudante.js`
+deja de fiarlo todo a un reloj fijo de 1400 ms. Ahora espera a que aparezca la sugerencia de Séneca
+(hasta 5 s, mirando cada 150 ms si hay un elemento visible con ese usuario), separa la flecha abajo
+del Intro con 350 ms, comprueba que la persona ha entrado de verdad (el campo se vacía, hasta
+2,5 s), reintenta una vez más despacio si no, y al final dice por su nombre quién no ha entrado,
+con un botón "Copiar los que faltan". Solo se toca `js/seneca-ayudante.js`; ni los chips ni
+`js/seneca-destinatarios.js` cambian. Detalle en `docs/AYUDANTE-SENECA-FIABLE.md`. Sube
+directamente a `main`, sin petición de cambios.
+
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
 - De la fila 21: departamentos del personal, tutorías y equipos educativos. `personal.csv` no
@@ -196,6 +208,10 @@ directamente a `main`, sin petición de cambios.
   (fila 17). Esto último Francisco ya lo dio por hecho el 16-sep-2026.
 - Los nueve asuntos de `docs/PROXIMOS-ASUNTOS.md` (14-sep-2026) están todos metidos en la cola:
   esa lista queda cerrada.
+- De la fila 54 (18-sep-2026): para un grupo de destinatarios que se repite todos los meses, lo
+  suyo es crearlo una vez en el gestor de contactos del propio Séneca. El ayudante es para listas
+  de un día. Si algún día se ve que casi todas las listas son fijas, habrá que replantear si el
+  ayudante merece seguir existiendo.
 
 ## Nota sobre "sube directamente a main"
 
