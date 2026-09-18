@@ -135,10 +135,98 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 58 | `docs/AJUSTES-DE-USO-2026-09-18.md` | HECHA (18-sep-2026 · 19:26) |
 | 59 | `docs/REQUISITOS-DE-HITO.md` | HECHA (18-sep-2026 · 20:04) |
 | 60 | `docs/COMUNICAR-DESDE-EL-HITO.md` | HECHA (18-sep-2026 · 20:36) |
+| 61 | `docs/GUARDAR-SIN-PISAR.md` | PENDIENTE |
+| 62 | `docs/RENOMBRAR-SIN-PERDER-HITOS.md` | PENDIENTE |
+| 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | PENDIENTE |
+| 64 | `docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md` | PENDIENTE |
+| 65 | `docs/DOCUMENTOS-QUE-QUEPAN.md` | PENDIENTE |
+| 66 | `docs/CONTACTO-GUARDADO-EN-LA-FICHA.md` | PENDIENTE |
+| 67 | `docs/LAS-CUENTAS-Y-LOS-DATOS.md` | PENDIENTE |
+| 68 | `docs/AVISOS-QUE-FALTAN.md` | PENDIENTE |
+| 69 | `docs/PRUEBAS-QUE-FALTAN.md` | PENDIENTE |
+| 70 | `docs/ENVOLTURAS-COMPROBADAS.md` | PENDIENTE |
+| 71 | `docs/COSAS-REPETIDAS.md` | PENDIENTE |
+| 72 | `docs/DETALLES-DE-MANTENIMIENTO.md` | PENDIENTE |
+| 73 | `docs/BUSCAR-EN-LAS-NOTAS.md` | PENDIENTE |
+| 74 | `docs/CUENTAS-DE-FIN-DE-CURSO.md` | PENDIENTE |
 
-**Orden de trabajo:** las filas PENDIENTES son la 58, la 59 y la 60, en ese orden. La 60 va después
-de la 59: las dos tocan el editor de un paso del trámite y el panel de hitos. Las filas 1 a 57 están
-HECHAS.
+**Orden de trabajo:** las filas 1 a 60 están HECHAS. Las PENDIENTES son de la **61 a la 74**, que
+salen del informe crítico del 18-sep-2026 (`docs/INFORME-CRITICO-2026-09-18.md`). Francisco ha
+pedido tenerlas todas desarrolladas antes de seguir añadiendo cosas nuevas a la aplicación.
+
+**Se hacen en orden de número, con tres excepciones que hay que respetar:**
+
+- La **61** y la **62** van primero de todo, sean cuales sean las prisas: son los dos fallos que
+  pueden costar datos mientras tanto.
+- La **68** (parte de fichas huérfanas), la **73** y la **74** salen mejor **después de la 64**,
+  porque las tres dependen de dónde viva la ficha de un asunto archivado. Cada documento lo dice.
+- La **71** es la menos urgente de todas. Si otra fila ya está tocando esos ficheros, se aprovecha;
+  si no, va la última.
+
+**Ninguna de estas catorce se sube junto con otra.** Cada una, su subida.
+
+### Las catorce, en una línea cada una
+
+**61 · Guardar sin pisar al compañero.** Mandar un asunto a la papelera y devolverlo son los dos
+únicos sitios que escriben `asuntos.json` entero sin releerlo antes; con la copia en memoria vieja
+se puede borrar una mañana de trabajo del compañero, sin aviso. Se arreglan los dos y se cierra la
+puerta con una función única de guardado fresco. **Medio día. GRAVE, va primero.**
+
+**62 · Renombrar un asunto sin perder sus hitos.** `hitos.json` se indexa por el nombre de la
+carpeta y no viaja cuando el nombre cambia; los hitos se recrean desde la guía y la pérdida es
+silenciosa (fechas, responsables, historial, documentos apuntados, lo reunido). Un solo sitio que
+renombre, y que pasen por él los cuatro caminos. **Un día. GRAVE.**
+
+**63 · Publicar solo la aplicación.** Vercel publica el repositorio entero, `docs/` incluida.
+Primero comprobarlo con `curl`; si se confirma, un `.vercelignore`. **Medio día.**
+
+**64 · La ficha de un asunto archivado, en su propia carpeta.** `asuntos.json` no se limpia nunca y
+se reescribe entero 50-150 veces al día: 0,6 MB hoy, 9 MB en tres cursos. Se copia el patrón que ya
+funciona con el historial de hitos al archivar. **De dos a cuatro días. Es la fila que más rinde, y
+conviene hacerla antes de que el fichero pase de 3 MB.**
+
+**65 · Documentos que quepan en una subida.** `CONTEXTO.md` (244 KB) e `HISTORIA.md` (226 KB) ya no
+caben, y de ahí salieron las tres averías de ficheros del 17-sep. Se parte el primero por módulos,
+se corta el segundo por fecha, y se cambian las reglas 8 y 13 para que la documentación pueda ir en
+una subida aparte. **Medio día.**
+
+**66 · El contacto del tercero, guardado en la ficha.** En septiembre de 2027 el alumnado que se va
+desaparece del RegAlum y sus asuntos abiertos se quedan sin teléfono, correo ni tutores. Se guarda
+una foto del contacto al crear el asunto, y se usa solo si el CSV ya no trae a la persona. **Un
+día, y hay que pulsar su botón de relleno antes de que acabe este curso.**
+
+**67 · Las cuentas y los datos, por escrito.** Dos papeles, sin código: uno para el relevo (dónde
+vive cada cosa y cómo se publica) y otro para dirección (qué datos personales crea la aplicación,
+qué sale del centro y cuánto se guarda). Y poner a una segunda persona como colaboradora del
+repositorio. **Una hora.**
+
+**68 · Los avisos que faltan.** Las fichas huérfanas no avisan, los asuntos dormidos no salen por
+ningún lado, y la papelera no insiste. **Un día.**
+
+**69 · Las pruebas que faltan.** No hay ninguna que edite el nombre de un asunto, que una dos
+asuntos ni que toque los recurrentes; nada prueba Dropbox de verdad y nadie prueba el script de
+Google. Se escriben las que faltan y se deja una lista de lo que solo puede comprobar Francisco a
+mano. **Un día.**
+
+**70 · Las envolturas, comprobadas al arrancar.** De 17 sitios el 11-sep a 38 hoy, en 23 ficheros,
+con 103 `<script>` en orden fijo y fallos silenciosos. No se reescribe nada (sigue descartado): se
+apuntan, y si al arrancar falta alguna, se avisa. **Un día.**
+
+**71 · Las cosas repetidas, a la caja común.** 12 formas de copiar al portapapeles, 5 de inventar un
+identificador, 4 de escribir una fecha corta. **Medio día. La menos urgente.**
+
+**72 · Cinco detalles de mantenimiento.** La versión sacada del reloj y no a mano; el nombre de
+usuario de una lista; que los borrados de tipos y estados se fusionen entre ordenadores; caducidad
+en las copias de seguridad; y mirar si pdf.js (congelado en una versión de 2023) tiene avisos de
+seguridad. **Un día los cinco, independientes.**
+
+**73 · Buscar dentro de las notas.** Hoy se busca por nombre, documentos y registro, pero no por lo
+escrito en las notas, que es donde está la memoria de cada gestión. **Un día, mejor después de la
+64.**
+
+**74 · Cuentas por tipo, para la memoria de fin de curso.** Una pantalla que cuente asuntos por
+tipo, por mes y por quién los pidió, sacándolo del índice del ARCHIVO, con un botón para copiar la
+tabla. **Dos días, antes de junio de 2027.**
 
 **Fila 58, en una línea** (18-sep-2026, acordada con Francisco tras usar la aplicación con trabajo
 real): seis arreglos de uso diario, independientes entre sí. (1) Cuatro botones de copiar siempre
@@ -307,6 +395,40 @@ la API.
   del tercero.
 - De la fila 60 (18-sep-2026): con el uso se verá si el historial de comunicaciones conviene verlo
   junto, en un sitio solo del asunto, en vez de repartido hito por hito.
+- **Del informe del 18-sep-2026: los tres botones de comunicar.** En la misma ficha hay
+  "Comunicar" en la cabecera (plantilla del tipo), "Comunicar" en un hito (texto de ese paso) y
+  "Pedir lo que falta" en un hito. Por dentro están bien: los tres abren el mismo cuadro y no hay
+  código duplicado. Desde la pantalla, tres botones parecidos van a confundir. **No se toca hasta
+  que Francisco haya usado los hitos un mes**: entonces se decide si "Pedir lo que falta" pasa a ser
+  una opción dentro de "Comunicar". Por eso no es una fila de la cola.
+- **Del informe del 18-sep-2026: la papelera, ¿se vacía sola?** Hoy avisa a los 30 días pero no
+  borra nada sin que alguien pulse. Para datos de menores, un borrado que nunca ocurre no es lo
+  ideal. **Hay que preguntárselo a Francisco antes de hacer esa parte de la fila 68**, y apuntar lo
+  que decida.
+- **Del informe del 18-sep-2026: la ficha del asunto.** Se ha rehecho tres veces en cuatro días
+  (filas 51, 52 y 58). Va a necesitar una cuarta pasada cuando los hitos lleven un mes en uso. No se
+  adelanta nada: se espera al uso real.
+
+## Descartado, no proponer otra vez (del informe del 18-sep-2026)
+
+- **Un servidor.** Ni en internet ni dentro del centro, mientras sean dos o tres personas. En
+  internet rompería el límite de no sacar datos personales. Dentro del centro lo respetaría, pero
+  cambia "un fichero que crece" por "una máquina que nadie administra en agosto". Además, las cuatro
+  cosas que un servidor resolvería —aviso instantáneo, cierre de verdad, buscar sin cargar nada
+  entero, copias automáticas— o no son problema hoy, o ya están resueltas (el índice del ARCHIVO,
+  las copias diarias), o las arregla la fila 64. **Se replantea solo si algún día entran cinco o
+  seis personas de varios departamentos a la vez; y entonces, una máquina en el centro, nunca en la
+  nube.**
+- **Una base de datos del navegador** en vez de los ficheros del Dropbox. Rompería el modelo: los
+  datos vivirían dentro de un ordenador, el compañero no los vería, un borrado de datos del
+  navegador se lo llevaría todo, y se perdería lo mejor del diseño de hoy, que es poder abrir la
+  carpeta y ver el trabajo sin la aplicación.
+- **Guardar los cambios uno detrás de otro** (un registro de apuntes en vez de reescribir el
+  fichero). Es la solución correcta para diez personas escribiendo a la vez. Con dos, dos semanas de
+  trabajo y fallos que tardan meses en aparecer. La fila 64 da casi el mismo beneficio por mucho
+  menos.
+- **Un fichero por asunto abierto.** La pantalla de abiertos tendría que abrir cien ficheros
+  pequeños en una carpeta de Dropbox, que puede ser más lento que lo de hoy, no menos.
 
 ## Nota sobre "sube directamente a main"
 
