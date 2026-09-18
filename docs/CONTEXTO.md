@@ -562,7 +562,8 @@ columna. El tope de 1180px de `css/estilos.css` se anula en `css/vista.css`; con
 propio Nuevo asunto (940px) y Ajustes (1600px). Los filtros (estado, plazo, orden) van plegados
 en un panel que abre el botón "Filtros", recordado en `gestor-filtros`.
 
-### La cabecera se queda arriba, y se encoge (fila 46, 17/18-sep-2026)
+### La cabecera se queda arriba, y se encoge (fila 46, 17/18-sep-2026; sin temblor, fila 50,
+### 18-sep-2026, docs/CABECERA-NO-TIEMBLA.md)
 
 `js/cabecera-fija.js` (`window.CabeceraFija`) es un único mecanismo para las siete pantallas
 (ficha del asunto, asuntos abiertos —incluido "Por clasificar", misma pantalla—, archivo,
@@ -571,8 +572,32 @@ cabecera). No sabe nada de ninguna pantalla en concreto:
 
 - Busca, dentro de `section.pantalla` sin la clase `oculto`, su `header.cabecera` o
   `header.ficha-cabecera`, y le pone o quita la clase `encogida` según `window.scrollY`, con
-  histéresis (encoge a 80px, se despliega a 40px) para que no parpadee en el límite. Un
-  `requestAnimationFrame` agrupa los eventos de `scroll`/`resize`.
+  histéresis (encoge a 120px, se despliega a 24px, antes 80/40 — fila 50) para que no parpadee en
+  el límite. Un `requestAnimationFrame` agrupa los eventos de `scroll`/`resize`.
+- **El temblor de la fila 50**: en una pantalla cuyo contenido apenas pasa del alto de la ventana,
+  encogerse le quita alto de golpe al documento entero; el navegador recorta `window.scrollY` al
+  nuevo máximo, ese valor cae por debajo del umbral de despliegue, la cabecera se despliega, la
+  página vuelve a crecer, el gesto empuja otra vez por encima del umbral de encoger: bucle. Tres
+  arreglos, el primero de fondo:
+  1. **Compensar el alto perdido**: por pantalla (`section.pantalla`, `WeakMap`), se guarda el
+     alto del documento (`document.documentElement.scrollHeight`) con la cabecera desplegada —
+     forzándola desplegada un instante si hace falta, sin que se note: leer `scrollHeight` fuerza
+     el cálculo, no el pintado—. Al encogerse, si esa pantalla es corta (ese alto guardado es
+     menor que `window.innerHeight + 400`), se calcula cuánto alto se ha perdido de verdad y se le
+     devuelve a `main.contenido` con la variable `--cabecera-compensa` (`margin-bottom`,
+     `css/cabecera-fija.css`); en una pantalla larga, o con la cabecera desplegada, vale `0px`. Se
+     vuelve a medir al cambiar de pantalla y al cambiar el tamaño de la ventana (`alturaPorPantalla`
+     se tira entera y se remide sola, pantalla a pantalla).
+  2. Los dos umbrales se separan más (120/24): el salto de alto ya no puede ser mayor que la
+     distancia entre los dos.
+  3. **Un candado de 400 ms**: después de cada cambio de verdad (desplegada↔encogida) no se admite
+     el cambio contrario hasta que pasen 400 ms; un cambio en el mismo sentido no cuenta y no se
+     bloquea. **El candado no se arma en dos casos**, para no bloquear el primer scroll de verdad
+     que venga después: al cambiar de pantalla (`pantallaNueva`, siempre empieza desplegada,
+     alineada con el scroll que ya hubiera) y al cambiar el tamaño de la ventana (`aplicar(true)`,
+     porque un redimensionado puede mover `window.scrollY` por su cuenta —el "scroll anchoring" de
+     Chrome, para que la vista no salte cuando la rejilla de Ajustes cambia de alto al reflotar con
+     menos columnas—: ese movimiento no lo ha pedido nadie).
 - Un único `MutationObserver` sobre `<main class="contenido">` (`childList`+`subtree`+`class`)
   cubre, sin engancharse a `App.ir` ni tocar `js/ficha-asunto.js`, dos cosas a la vez: que cambie
   qué pantalla está visible (la clase `oculto`), y que una pantalla se repinte por dentro. La
@@ -612,15 +637,23 @@ cabecera). No sabe nada de ninguna pantalla en concreto:
   marcada en la lista).
 - **Comprobado que sigue funcionando**: `js/barra.js` (línea ~139) sigue encontrando
   `#pantalla-abiertos .cabecera` para colgar el botón grande de "Nuevo asunto".
-- Prueba nueva `pruebas/cabecera-fija.mjs`, navegador de verdad: se ve entera al entrar, se encoge
-  a los 80px, la histéresis no la despliega hasta 40px, el contenido de debajo se mueve justo lo
-  que se ha pedido bajar (con **scroll anchoring** de Chrome de por medio: si el navegador ajusta
+- `css/cabecera-fija.css`: la transición de `header.cabecera`/`header.ficha-cabecera` gana
+  `margin-bottom .15s ease` (junto a la de `box-shadow` y `padding` de siempre), para que el
+  encogido no se note como un salto seco (fila 50).
+- Prueba `pruebas/cabecera-fija.mjs`, navegador de verdad: se ve entera al entrar, se encoge a los
+  120px, la histéresis no la despliega hasta 24px, el contenido de debajo se mueve justo lo que se
+  ha pedido bajar (con **scroll anchoring** de Chrome de por medio: si el navegador ajusta
   `window.scrollY` por su cuenta para que no se note el salto cuando la cabecera cambia de alto a
   mitad del scroll, eso es la prueba de que no hay brinco, no un fallo — la prueba mide el
   contenido movido, no el valor final de `scrollY`), cambiar de pantalla deja la anterior limpia y
   la nueva funciona igual (incluidas las pestañas pegadas de Ajustes), el ancho sigue al de
   `.contenido` con `con-lector`, el repintado de la ficha no pierde el estado encogido, el caso de
-  "Por clasificar", y que `js/barra.js` sigue encontrando su selector.
+  "Por clasificar", y que `js/barra.js` sigue encontrando su selector. Fila 50, dos casos más: en
+  una pantalla corta (se calcula el alto de sobra que hace falta y se recorta la ventana a esa
+  medida, en vez de fiarlo a un tamaño de pantalla concreto) cruzar el umbral no deja el estado
+  temblando; y el candado de 400 ms, manejado a mano con `window.CabeceraFija.evaluar()` para
+  controlar el tiempo exacto entre los dos cambios, bloquea el cambio contrario justo después de
+  otro y lo deja pasar una vez cumplido el plazo.
 
 ### El tablón de notas rápidas
 

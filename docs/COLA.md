@@ -124,7 +124,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 47 | `docs/DESTINATARIOS-EN-SENECA.md` | HECHA (17-sep-2026) |
 | 48 | `docs/NO-GASTAR-PUBLICACIONES.md` | HECHA (17-sep-2026) |
 | 49 | `docs/ADJUNTOS-DE-CORREO-POR-DENTRO.md` | HECHA (18-sep-2026) |
-| 50 | `docs/CABECERA-NO-TIEMBLA.md` | PENDIENTE |
+| 50 | `docs/CABECERA-NO-TIEMBLA.md` | HECHA (18-sep-2026) |
 | 51 | `docs/FICHA-DISPOSICION.md` | PENDIENTE |
 | 52 | `docs/CABECERA-DEL-ASUNTO.md` | PENDIENTE |
 | 53 | `docs/SENECA-CUADRO-ANCHO.md` | PENDIENTE |
@@ -132,18 +132,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 55 | `docs/ASUNTO-SIN-ELECCION.md` | PENDIENTE |
 | 56 | `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md` | PENDIENTE |
 
-**Orden de trabajo:** están PENDIENTES la 50, la 51, la 52, la 53, la 54, la 55 y la 56, en ese
-orden. Las filas 1 a 49 están HECHAS. **La 52 va después de la 51**: las dos tocan la cabecera de
-la ficha. La 54 toca solo `js/seneca-ayudante.js`, así que no se pisa con la 53. **La 55 va después
-de la 53**, porque la 53 mueve el cuadro de Séneca a un fichero nuevo. La 56 no se pisa con ninguna
-de las demás: solo toca los campos y la pantalla de un tipo de asunto.
-
-**Fila 50, en una línea** (18-sep-2026, hablada con Francisco): la cabecera pegada de la fila 46
-tiembla muy deprisa en un punto del principio del desplazamiento, justo antes de encogerse. Al
-encogerse pierde alto, el documento se acorta, el navegador recorta `scrollY` por debajo del
-umbral de despliegue, y el ciclo se repite. Se arregla compensando el alto perdido, separando los
-umbrales (120 y 24) y con un candado de 400 ms entre cambios contrarios. Sube directamente a
-`main`, sin petición de cambios.
+**Orden de trabajo:** están PENDIENTES la 51, la 52, la 53, la 54, la 55 y la 56, en ese orden. Las
+filas 1 a 50 están HECHAS. **La 52 va después de la 51**: las dos tocan la cabecera de la ficha.
+La 54 toca solo `js/seneca-ayudante.js`, así que no se pisa con la 53. **La 55 va después de la
+53**, porque la 53 mueve el cuadro de Séneca a un fichero nuevo. La 56 no se pisa con ninguna de
+las demás: solo toca los campos y la pantalla de un tipo de asunto.
 
 **Fila 51, en una línea** (18-sep-2026, acordada con Francisco, escrita como fila 49 antes de que
 ese número y el 50 se ocuparan): la ficha de un asunto se recoloca, solo disposición y ningún

@@ -27,7 +27,18 @@ header.ficha-cabecera {
   margin-right: -32px;
   padding-left: 32px;
   padding-right: 32px;
-  transition: box-shadow .15s ease, padding .15s ease;
+  transition: box-shadow .15s ease, padding .15s ease, margin-bottom .15s ease;
+}
+
+/* Fila 50, docs/CABECERA-NO-TIEMBLA.md: en una pantalla corta, encoger
+   la cabecera le quita alto de golpe al documento entero, y eso puede
+   hacer temblar el scroll justo al cruzar el umbral (recorta scrollY,
+   cae por debajo del umbral de despliegue, se despliega, vuelve a
+   crecer, vuelta a empezar). js/cabecera-fija.js calcula cuánto alto
+   se ha perdido y lo devuelve aquí; en una pantalla larga, o con la
+   cabecera desplegada, vale 0px y no añade ningún hueco de más. */
+main.contenido {
+  margin-bottom: var(--cabecera-compensa, 0px);
 }
 
 header.cabecera.encogida,
