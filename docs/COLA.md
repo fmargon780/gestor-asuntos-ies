@@ -193,6 +193,47 @@ abajo por defecto) y cada tipo de asunto dice si lleva sello y si lleva firma. F
 `docs/HUECO-PARA-SELLO-Y-FIRMA.md`. **Va después de la fila 56.** Sube directamente a `main`, sin
 petición de cambios.
 
+## Nota de esta sesión (18-sep-2026, mañana): docs/CONTEXTO.md y docs/HISTORIA.md sin actualizar
+
+El código, las pruebas y `docs/CONTEXTO-CORTO.md` de las filas 53-56 ya están en `main` y
+comprobados en producción (`App.VERSION = '18-sep-2026 · 07:54'`, `js/campos-catalogo.js` y
+`js/campos-calculados-editor.js` responden 200 en `https://gestor-de-asuntos.vercel.app`). Pero
+esta sesión **no ha podido subir** `docs/CONTEXTO.md` (225 KB) ni `docs/HISTORIA.md` (217 KB) con
+las secciones de esas filas: son demasiado grandes para volver a escribirlos enteros a mano dentro
+de una sola llamada sin riesgo de un error de transcripción (regla 12 de más arriba, llevada al
+límite: aquí no se trata de que la subida se corte sola, sino de que retipear 225 KB o 217 KB de
+un tirón, sin `git push` disponible en esta sesión —el proxy de git rechaza este repositorio desde
+`bash`—, es demasiado riesgo para un fichero de referencia). Se ha preferido dejarlo apuntado aquí,
+como pide la regla 12, en vez de forzarlo.
+
+**Qué le falta a `docs/CONTEXTO.md`**: la sección "El correo y la mensajería de Séneca" con el
+cuadro de Séneca en dos columnas (fila 53), el ayudante fiable (fila 54) y el asunto sin elección
+(fila 55); la sección "Los campos de cada tipo de asunto" con el panel de tres pestañas y los
+campos calculados (fila 56); las filas correspondientes de "Ficheros del repositorio"
+(`js/seneca-cuadro.js`, `css/seneca.css`, `js/campos-calculo.js`, `js/campos-catalogo.js`,
+`js/campos-calculados-editor.js`, `js/ajustes-tipo.js` actualizado).
+
+**Qué le falta a `docs/HISTORIA.md`**: una entrada nueva, fechada 18-sep-2026, "Filas 53 a 56:
+Séneca ancho, el ayudante fiable, el asunto sin elección y los campos calculados", con una
+subsección "Lo que costó de verdad" documentando los bugs que las propias pruebas cazaron antes de
+llegar a producción: `js/campos-calculo.js` usando `window.U`/`window.Nombres` en vez de las
+variables sueltas (rompía en el contexto `vm` de las pruebas, donde `window` es un objeto de
+mentira aparte, no el global de verdad); un `toLocaleString('es')` que en este entorno de pruebas
+no ponía el punto de los millares y hubo que formatear a mano con una expresión regular; la
+pestaña Calculados sin enseñar "Curso" antes de guardar nada (había que fusionar también
+`Campos.RECETA_CURSO_DE_FABRICA`, no solo `App.E.campos.calculados`); y
+`borrarPropio`/`borrarCalculado` guardando de más (persistían de golpe cambios sin guardar del
+propio tipo —orden, obligatorio— al borrar un campo propio o calculado usado en otro tipo).
+
+**Para la próxima sesión que la coja**: `docs/CONTEXTO.md` y `docs/HISTORIA.md` en el propio
+repositorio (`git clone` o `git pull`) ya tienen, en teoría, el contenido final correcto si se
+parte del último commit de código de esta sesión — pero esta sesión trabajó sobre una copia local
+del contenedor que puede haberse quedado desincronizada de `main` a medio camino (ver el aviso de
+`docs/COLA.md` sobre sesiones en paralelo), así que **no dar nada por hecho: comparar con cuidado**
+contra lo que de verdad dice `main` antes de sustituir. Si esa sesión tiene `git push` de verdad
+(terminal u ordenador de Francisco, no esta nube), es mucho más simple que ir fichero a fichero con
+la API.
+
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
 - De la fila 21: departamentos del personal, tutorías y equipos educativos. `personal.csv` no
