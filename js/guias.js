@@ -107,7 +107,10 @@ var Guias = (function () {
         id: (o && o.id) || nuevoId(),
         titulo: String((o && o.titulo) || ''),
         pasos: normalizar((o && o.pasos) || []).map(function (sp) {
-          return { id: sp.id, titulo: sp.titulo, cuerpo: sp.cuerpo, opciones: [], requisitos: sp.requisitos };
+          return {
+            id: sp.id, titulo: sp.titulo, cuerpo: sp.cuerpo, opciones: [],
+            requisitos: sp.requisitos, comunicacion: sp.comunicacion
+          };
         })
       };
     }).filter(function (o) { return o.titulo || o.pasos.length; });
@@ -131,14 +134,16 @@ var Guias = (function () {
   function normalizar(lista) {
     return (lista || []).map(function (p) {
       if (typeof p === 'string') {
-        return Object.assign({ id: nuevoId(), titulo: p, cuerpo: '', opciones: [], requisitos: [] }, normalizarExtra(null));
+        return Object.assign({ id: nuevoId(), titulo: p, cuerpo: '', opciones: [], requisitos: [],
+          comunicacion: normalizarComunicacion(null) }, normalizarExtra(null));
       }
       return Object.assign({
         id: (p && p.id) || nuevoId(),
         titulo: String((p && p.titulo) || ''),
         cuerpo: limpiar((p && p.cuerpo) || ''),
         opciones: normalizarOpciones(p && p.opciones),
-        requisitos: normalizarRequisitos(p && p.requisitos)
+        requisitos: normalizarRequisitos(p && p.requisitos),
+        comunicacion: normalizarComunicacion(p && p.comunicacion)
       }, normalizarExtra(p));
     }).filter(function (p) {
       return p.titulo || tieneTexto(p.cuerpo) || p.opciones.length;
@@ -164,6 +169,19 @@ var Guias = (function () {
   function normalizarRequisitos(lista) {
     return (Array.isArray(lista) ? lista : []).map(normalizarRequisito)
       .filter(function (r) { return r.texto; });
+  }
+
+  /* "Comunicación de este paso" (18-sep-2026, fila 60,
+     docs/COMUNICAR-DESDE-EL-HITO.md): un texto propio, para correo o
+     para Séneca (o los dos), aparte de la plantilla general del tipo.
+     Un canal cuenta como "con texto" solo si tiene cuerpo (sección 3:
+     "vacía si el cuerpo está en blanco, aunque haya asunto"). */
+  function normalizarCanalComunicacion(c) {
+    return { asunto: String((c && c.asunto) || ''), cuerpo: String((c && c.cuerpo) || '') };
+  }
+
+  function normalizarComunicacion(c) {
+    return { correo: normalizarCanalComunicacion(c && c.correo), seneca: normalizarCanalComunicacion(c && c.seneca) };
   }
 
   function cuantos(lista) { return (lista || []).length; }
@@ -449,6 +467,10 @@ var Guias = (function () {
     cuadro.classList.add('cuadro-medio');
     editando = null;
     rangoGuardado = null;
+    /* Qué `<details>` estaban abiertos antes del último pintar(): lo lee
+       `restaurarAbierto`, más abajo, y lo usan tanto `pintar()` como
+       `cajaDeOpciones()` (fila 60, ver la nota junto a detallesAbiertos). */
+    var abiertos = {};
 
     var esperar = U.preguntar('Guía de ' + nombreTipo,
       '<p class="explica">Los pasos que hay que dar en un asunto de este tipo. ' +
@@ -581,6 +603,12 @@ var Guias = (function () {
           pasos[i].requisitos = GuiasRequisitos.leer(caja);
         }
 
+        /* "Comunicación de este paso" (18-sep-2026, fila 60): mismo
+           criterio que arriba, solo en los pasos que no son pregunta. */
+        if (window.GuiasComunicacion && caja.querySelector(':scope > .paso-comunicacion')) {
+          pasos[i].comunicacion = GuiasComunicacion.leer(caja, pasos[i].id);
+        }
+
         var marca = caja.querySelector(':scope > .paso-es-pregunta-fila .paso-es-pregunta');
         if (!marca || !marca.checked) { pasos[i].opciones = []; return; }
 
@@ -598,7 +626,8 @@ var Guias = (function () {
                 titulo: sc.querySelector(':scope > .paso-cabecera > .subpaso-titulo').value.trim(),
                 cuerpo: limpiar(sc.querySelector(':scope > .subpaso-cuerpo').innerHTML),
                 opciones: [],
-                requisitos: window.GuiasRequisitos ? GuiasRequisitos.leer(sc) : []
+                requisitos: window.GuiasRequisitos ? GuiasRequisitos.leer(sc) : [],
+                comunicacion: window.GuiasComunicacion ? GuiasComunicacion.leer(sc, sc.dataset.id) : null
               };
             })
           };
@@ -606,8 +635,36 @@ var Guias = (function () {
       });
     }
 
+    /* Qué secciones plegables (paso-extra, "Lo que hay que reunir",
+       "Comunicación de este paso", de un paso o de un subpaso) estaban
+       abiertas antes de repintar (18-sep-2026, fila 60: sin esto, "+
+       Añadir"/quitar/mover una fila de cualquiera de las dos hace
+       recoger()+pintar() del paso entero, que reconstruye el `<details>`
+       desde cero y se cierra solo, llevándose por delante la fila que
+       Francisco acaba de tocar). La clave es la posición del paso de
+       arriba (estable dentro de un mismo repintado: nada más reordena
+       los pasos aquí) más el id del subpaso, si lo hay. */
+    function detallesAbiertos(caja) {
+      var abiertos = {};
+      Array.prototype.forEach.call(caja.querySelectorAll('details[open]'), function (det) {
+        var pasoEditor = det.closest('.paso-editor');
+        var subEditor = det.closest('.subpaso-editor');
+        var clave = (pasoEditor ? pasoEditor.dataset.pos : '') + '|' +
+          (subEditor ? subEditor.dataset.id : '') + '|' + det.className;
+        abiertos[clave] = true;
+      });
+      return abiertos;
+    }
+
+    function restaurarAbierto(det, abiertos, pos, idSubpaso) {
+      if (!det) return;
+      var clave = pos + '|' + (idSubpaso || '') + '|' + det.className;
+      if (abiertos[clave]) det.open = true;
+    }
+
     function pintar() {
       var caja = $('guia-pasos');
+      abiertos = detallesAbiertos(caja);
       caja.innerHTML = '';
       editando = null;
       if (!pasos.length) {
@@ -668,6 +725,7 @@ var Guias = (function () {
         prepararRecuadro(cuerpo);
 
         d.insertAdjacentHTML('beforeend', pasoExtraHTML(p, i));
+        restaurarAbierto(d.querySelector(':scope > .paso-extra'), abiertos, i, '');
 
         /* "Lo que hay que reunir" (18-sep-2026, fila 59,
            docs/REQUISITOS-DE-HITO.md): solo en los pasos que no son
@@ -677,11 +735,24 @@ var Guias = (function () {
         var pregunta = esPregunta(p);
         if (!pregunta && window.GuiasRequisitos) {
           d.insertAdjacentHTML('beforeend', GuiasRequisitos.bloqueHTML(p.requisitos));
+          restaurarAbierto(d.querySelector(':scope > .paso-requisitos'), abiertos, i, '');
           GuiasRequisitos.enganchar(d, function (mutador) {
             recoger();
             mutador(pasos[i].requisitos);
             pintar();
           });
+        }
+
+        /* "Comunicación de este paso" (18-sep-2026, fila 60,
+           docs/COMUNICAR-DESDE-EL-HITO.md): mismo criterio, solo en los
+           pasos que no son pregunta. A diferencia del bloque de arriba,
+           son solo campos de texto: no hace falta recoger()+pintar() en
+           cada tecla, basta con leerlos en recoger() como el título o
+           el cuerpo del paso. */
+        if (!pregunta && window.GuiasComunicacion) {
+          d.insertAdjacentHTML('beforeend', GuiasComunicacion.bloqueHTML(p.id, p.comunicacion));
+          restaurarAbierto(d.querySelector(':scope > .paso-comunicacion'), abiertos, i, '');
+          GuiasComunicacion.enganchar(d, p.id);
         }
 
         /* ---- la casilla de "esto es una pregunta" ---- */
@@ -783,11 +854,17 @@ var Guias = (function () {
 
           if (window.GuiasRequisitos) {
             sc.insertAdjacentHTML('beforeend', GuiasRequisitos.bloqueHTML(sp.requisitos));
+            restaurarAbierto(sc.querySelector(':scope > .paso-requisitos'), abiertos, i, sp.id);
             GuiasRequisitos.enganchar(sc, function (mutador) {
               recoger();
               mutador(pasos[i].opciones[j].pasos[k].requisitos);
               pintar();
             });
+          }
+          if (window.GuiasComunicacion) {
+            sc.insertAdjacentHTML('beforeend', GuiasComunicacion.bloqueHTML(sp.id, sp.comunicacion));
+            restaurarAbierto(sc.querySelector(':scope > .paso-comunicacion'), abiertos, i, sp.id);
+            GuiasComunicacion.enganchar(sc, sp.id);
           }
 
           dentro.appendChild(sc);
@@ -799,7 +876,8 @@ var Guias = (function () {
         mas.textContent = '+ Añadir un paso a esta opción';
         mas.onclick = function () {
           recoger();
-          pasos[i].opciones[j].pasos.push({ id: nuevoId(), titulo: '', cuerpo: '', opciones: [], requisitos: [] });
+          pasos[i].opciones[j].pasos.push({ id: nuevoId(), titulo: '', cuerpo: '', opciones: [], requisitos: [],
+            comunicacion: null });
           pintar();
         };
         oc.appendChild(mas);
@@ -845,7 +923,7 @@ var Guias = (function () {
     nuevoId: nuevoId, limpiar: limpiar, normalizar: normalizar,
     cuantos: cuantos, vista: vista, hechosDe: hechosDe, cuenta: cuenta,
     esPregunta: esPregunta, cuandoSeElige: cuandoSeElige,
-    normalizarRequisitos: normalizarRequisitos,
+    normalizarRequisitos: normalizarRequisitos, normalizarComunicacion: normalizarComunicacion,
     abrir: abrir, editar: editar
   };
 })();

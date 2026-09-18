@@ -561,6 +561,27 @@ cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegi
   imperativo del resto del editor: cada `+ Añadir`/quitar/mover fila hace `recoger(); mutar el
   array; pintar();`. `js/guias.js` solo llama a las dos funciones, y en `recoger()` copia lo leído a
   `pasos[i].requisitos` (o al del subpaso que toque).
+- **"Comunicación de este paso"** (18-sep-2026, fila 60, `docs/COMUNICAR-DESDE-EL-HITO.md`): un
+  paso (o un subpaso; nunca un paso-pregunta, mismo criterio que arriba) puede llevar su propio
+  texto de correo y/o de Séneca, aparte de la plantilla general del tipo —
+  `comunicacion: { correo: {asunto, cuerpo}, seneca: {asunto, cuerpo} }` —, normalizado por
+  `Guias.normalizarComunicacion` (un canal "vacío" es el que tiene el cuerpo en blanco, aunque
+  tenga asunto). **En `hitos.json` no se guarda copia**: el hito lo lee de la guía de su tipo por
+  `origenGuia` en el momento de pulsar "Comunicar" (así, si Francisco cambia el texto del paso, los
+  asuntos vivos usan el nuevo). `js/guias-comunicacion.js` (nuevo) pinta la sección plegable, con
+  dos pestañas (Correo/Séneca) y, en cada una, asunto + el mismo campo de texto con "Insertar
+  hueco" que ya montaba el cuadro de una plantilla (`PlantillasAjustes.campoDeTextoHTML`/
+  `engancharCampoDeTexto`, sacados de `js/plantillas-ajustes.js` para reutilizarlos aquí sin
+  escribir un segundo editor). A diferencia de `js/guias-requisitos.js`, son solo campos de texto:
+  no hace falta `recoger();mutar;pintar()` en cada tecla, `GuiasComunicacion.leer(caja, idPaso)` los
+  lee en el propio `recoger()` del paso, como el título o el cuerpo.
+- **Un `<details>` recién repintado nace cerrado** (18-sep-2026, fila 60, encontrado en el navegador
+  de verdad): "+ Añadir"/quitar/mover una fila de `.paso-requisitos`, o cualquier tecla que dispare
+  un `recoger();mutar;pintar()` del paso, reconstruye `#guia-pasos` entero y con él el `<details>`
+  de `.paso-extra`/`.paso-requisitos`/`.paso-comunicacion`, que se cerraba solo justo después de
+  tocarlo. `pintar()` apunta, antes de vaciar la caja, qué `<details>` estaban abiertos
+  (`detallesAbiertos`, clave: posición del paso + id del subpaso + su clase) y los vuelve a abrir
+  al repintar (`restaurarAbierto`, llamado tanto desde `pintar()` como desde `cajaDeOpciones()`).
 
 Se comprueba con `pruebas/guias.mjs` y `pruebas/opciones.mjs`.
 
@@ -676,6 +697,37 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
     blanco; vale igual para el cuadro de Correo (`js/correo-cuadro.js`) y el de Séneca
     (`js/seneca-cuadro.js`), sin tocar ninguno de los dos: los dos ya llaman a
     `CorreoNucleo.cuerpoDelMedio`.
+- **"Comunicar" desde un hito** (18-sep-2026, fila 60, `docs/COMUNICAR-DESDE-EL-HITO.md`): botón
+  propio del hito, aparte del "Comunicar" de la cabecera de la ficha, que solo sale si su paso de
+  origen tiene "Comunicación de este paso" (ver la sección de guías, más arriba). Vive entero en
+  `js/hitos-comunicar.js` (nuevo, enganchado a `window.Hitos` como `js/hitos-archivo.js`, aunque no
+  añade ningún método al modelo: nada de esto se guarda en el hito).
+  - `HitosComunicar.canalesDe(a, hito)` (síncrona: lee la guía en memoria, `GuiasDelCentro.pasosDe`,
+    por `origenGuia`) dice qué canales tienen texto. Con uno, el botón abre ese cuadro directo; con
+    los dos, abre el mismo menú pequeño "Comunicar" (`js/ficha-menus.js`) que la cabecera.
+  - **El destinatario** (`resolverDestinatario`): si el responsable del hito es el papel `tutor`,
+    el tutor legal 1 (o el 2, si el 1 no tiene nombre ni correo — `LoPide.datosDeTutor`); si es
+    `relacionado`, todos los relacionados con correo (comas, para que
+    `LoPide.elegirDestinatarios` —ya usada por "Lo pide"— los vuelque enteros en "Otro correo": no
+    va a estar entre las direcciones de la ficha del tercero, que es de OTRA persona); en cualquier
+    otro caso (responsable de la casa, o sin responsable), el tercero del asunto. En Séneca no hay
+    forma de marcar un usuario IdEA concreto desde aquí: el cuadro se abre con la lista de siempre,
+    sin marcar nada por su cuenta (nunca se bloquea el botón por eso).
+  - **El mensaje ya resuelto**: `Plantillas.rellenar(mensaje.asunto/cuerpo, Plantillas.valoresDeAsunto(a))`,
+    los mismos huecos de siempre. `js/correo.js` gana `asuntoListoActual`/`medioListoActual`
+    (`extra.asuntoListo`/`medioListo` de `abrirCuadro`, ver fila 59): con ellos puestos,
+    `asuntoDelCorreo`/`cuerpoDelMedio` los usan tal cual, sin pasar por el desplegable de
+    plantillas del tipo ni por el hueco `{{LO QUE FALTA}}` (eso es de la plantilla general).
+    `correoPreferenteActual` (`extra.correoPreferente`) hace lo mismo que ya hacía "Lo pide" con
+    `correoLoPide`: `js/correo-cuadro.js` la prueba primero (`CorreoNucleo.destinatarioPreferente()`).
+  - **La constancia** (sección 5.3): una nota en el asunto y una línea en el historial del hito, una
+    sola vez. En vez de un camino nuevo, se reutiliza el existente: `comunicarHitoActual`
+    (`extra.comunicarHito`, con `claveAsunto`/`idHito`/`nombreDestinatario`) hace que
+    `textoDeLaNota()` devuelva `CorreoNucleo.textoDeComunicarHito(nombre, esSeneca)` ("Comunicado a
+    &lt;nombre&gt; por correo/Séneca · fecha"), y `apuntarElRastro()` —el mismo cerrojo `yaApuntado`
+    de siempre, "una vez por cuadro"— además de la nota, llama a `Hitos.anadirNota` con el mismo
+    texto. `aQuien(a)` (usada por el aviso de arriba del cuadro de Séneca) también mira primero
+    `comunicarHitoActual.nombreDestinatario`.
 - **Responsable**: persona del centro (configurable en Ajustes › Hitos) o un papel fijo
   (`tercero`, `tutor`, `relacionado`) que la aplicación resuelve sola con datos del asunto
   (`Hitos.resolverResponsable`); sin resolver, se enseña en gris.
@@ -704,7 +756,8 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
   documento), `js/hitos-requisitos.js` (fila 59: "lo que hay que reunir", modelo y pintura en uno)
   y `js/hitos-ajustes.js` (el bloque "Hitos" de Ajustes: responsables y días no lectivos).
 
-Se comprueba con `pruebas/hitos.mjs` y, sin navegador, `pruebas/requisitos-de-hito.mjs`.
+Se comprueba con `pruebas/hitos.mjs` y, sin navegador, `pruebas/requisitos-de-hito.mjs` y
+`pruebas/comunicar-desde-hito.mjs`.
 
 ### La pantalla "Qué me toca"
 
@@ -2565,8 +2618,9 @@ de `App` va después del fichero que lo define.
 | `js/fichas-huerfanas.js` | Fichas de `asuntos.json` cuya carpeta ya no está: enlazar o borrar |
 | `js/nombres.js` | Monta los nombres de carpetas y documentos |
 | `js/plazos.js` | La fecha límite de los asuntos |
-| `js/guias.js` | Pintar y escribir una guía, con sus preguntas y opciones; en el editor de cada paso llama a `js/guias-requisitos.js` para "lo que hay que reunir" (fila 59) |
+| `js/guias.js` | Pintar y escribir una guía, con sus preguntas y opciones; en el editor de cada paso llama a `js/guias-requisitos.js` para "lo que hay que reunir" (fila 59) y a `js/guias-comunicacion.js` para su comunicación propia (fila 60) |
 | `js/guias-requisitos.js` | La sección "Lo que hay que reunir" del editor de un paso (`GuiasRequisitos.bloqueHTML`/`leer`/`enganchar`, fila 59, aparte de `js/guias.js` para no engordarlo) |
+| `js/guias-comunicacion.js` | La sección "Comunicación de este paso" del editor de un paso (`GuiasComunicacion.bloqueHTML`/`leer`/`enganchar`, fila 60, aparte de `js/guias.js`); reutiliza el campo de texto con "Insertar hueco" de `js/plantillas-ajustes.js` |
 | `js/datos.js` | Lee los CSV; el nombre comercial y las columnas leídas por su título; `Datos.tutoresDe` agrupa los tutores legales por persona y `Datos.resumenDeTercero` monta la línea "Datos y contacto" |
 | `js/campos.js` | Los campos de cada tipo de asunto: catálogo, cálculo y guardado |
 | `css/campos.css` | Los estilos del bloque "Datos del asunto" y del cuadro de Campos |
@@ -2624,15 +2678,16 @@ de `App` va después del fichero que lo define.
 | `js/grupos.js` | Grupos propios de personas, guardados con nombre en `_GESTOR/grupos.json` |
 | `js/hitos-archivo.js` | La otra mitad del modelo de hitos: bifurcaciones, responsables de Ajustes y el `HISTORIAL DE TRAMITACION.txt` al archivar/reabrir |
 | `js/hitos-requisitos.js` | "Lo que hay que reunir" de un hito, enganchado a `window.Hitos` como `js/hitos-archivo.js`: marcar/escribir/añadir/quitar/editar/traer una casilla, y también la pintura del bloque dentro de la ficha y "Pedir lo que falta" (fila 59) |
+| `js/hitos-comunicar.js` | El botón "Comunicar" propio de un hito (fila 60): lee la comunicación de su paso de origen, resuelve el destinatario y los huecos, abre el cuadro de Correo/Séneca ya relleno (vía `CorreoNucleo`) y pinta el botón en la ficha. No añade nada a `window.Hitos`: nada de esto se guarda en el hito |
 | `js/visor.js` | El panel de la derecha para ver un documento (`con-visor`); marcador y acciones opcionales para que quien lo abre sepa qué se está viendo |
 | `js/tipos-buscador.js` | Buscar el tipo de asunto por letras, y los más usados arriba |
 | `js/via-contacto.js` | Los teléfonos y correos del tercero, como botones |
 | `js/tablon.js` | El tablón de notas rápidas, con las notas "Solo para mí" |
 | `js/copiar.js` | Los botones de copiar: el nombre del documento en la ficha, y `Copiar.boton`/`nieDeAsunto`/`categoriaDe`/`copiar` expuestos en `window.Copiar` para la fila de copiar de un gesto (`js/ficha-nombre-acciones.js`, fila 58) |
 | `js/plantillas.js` | Leer y guardar `plantillas.json`, montar `Plantillas.valoresDeAsunto` y rellenar los huecos: el motor, sin pantalla. El hueco `{{LO QUE FALTA}}`, con doble llave, se sustituye aparte y siempre (`tieneLoQueFalta`, fila 59) |
-| `js/plantillas-ajustes.js` | Las plantillas de correo (sacado de `js/plantillas.js`); desde el 17-sep-2026 (fila 39) pinta solo las de un tipo dentro de su pantalla (`PlantillasAjustes.pintarDeTipo`) y los campos de Datos del centro y firma, en "El centro" |
-| `js/correo.js` | El correo y el mensaje de Séneca: la lógica compartida (rastro, plantillas, grupos en copia oculta) y quién abre y pinta el cuadro (`abrirCuadro`/`pintarCuadro`, que desde la fila 58 delegan el cuerpo propio de cada cuadro en `js/seneca-cuadro.js`/`js/correo-cuadro.js`); expone `window.CorreoGrupos` (fila 47) para que `js/seneca-destinatarios.js` reutilice el mismo desplegable, y `CorreoNucleo.montarBotonComunicar` (fila 59) para que "Pedir lo que falta" de un hito reutilice el mismo menú "Comunicar" |
-| `js/correo-cuadro.js`, `css/correo.css` (`.cuadro-correo`, `.correo-grid`) | El cuerpo propio del cuadro de Correo (separado de `js/correo.js` en la fila 58): destinatario, asunto, mensaje, documentos adjuntos y CCO, en dos columnas |
+| `js/plantillas-ajustes.js` | Las plantillas de correo (sacado de `js/plantillas.js`); desde el 17-sep-2026 (fila 39) pinta solo las de un tipo dentro de su pantalla (`PlantillasAjustes.pintarDeTipo`) y los campos de Datos del centro y firma, en "El centro"; `campoDeTextoHTML`/`engancharCampoDeTexto` (fila 60), el campo de texto con "Insertar hueco" del cuadro de una plantilla, reutilizado por `js/guias-comunicacion.js` |
+| `js/correo.js` | El correo y el mensaje de Séneca: la lógica compartida (rastro, plantillas, grupos en copia oculta) y quién abre y pinta el cuadro (`abrirCuadro`/`pintarCuadro`, que desde la fila 58 delegan el cuerpo propio de cada cuadro en `js/seneca-cuadro.js`/`js/correo-cuadro.js`); expone `window.CorreoGrupos` (fila 47) para que `js/seneca-destinatarios.js` reutilice el mismo desplegable, `CorreoNucleo.montarBotonComunicar` (fila 59) para que "Pedir lo que falta" de un hito reutilice el mismo menú "Comunicar", y `asuntoListoActual`/`medioListoActual`/`correoPreferenteActual`/`comunicarHitoActual` (fila 60) para que "Comunicar" de un hito abra el cuadro ya con su propio mensaje resuelto y deje la constancia una vez |
+| `js/correo-cuadro.js`, `css/correo.css` (`.cuadro-correo`, `.correo-grid`) | El cuerpo propio del cuadro de Correo (separado de `js/correo.js` en la fila 58): destinatario, asunto, mensaje, documentos adjuntos y CCO, en dos columnas; la dirección preferente de un hito (fila 60) tiene prioridad sobre la de "Lo pide" |
 | `js/idea.js` | El usuario IdEA de una persona (y el de sus tutores legales), leído por el título de columna del CSV, como `js/dni.js` (fila 47) |
 | `js/seneca-destinatarios.js` | La lista de usuarios IdEA del cuadro de Séneca, en chips, con "Copiar la lista"/"Copiar el siguiente" (fila 47) |
 | `js/seneca-ayudante.js`, `css/relacionados.css` (`.marcado-chip-copiado`) | El enlace-marcador que pega los usuarios IdEA uno a uno en Séneca (fila 47) |

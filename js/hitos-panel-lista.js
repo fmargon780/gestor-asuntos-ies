@@ -233,6 +233,7 @@ var HitosPanelLista = (function () {
         (h.clase === 'decision' ? '<button type="button" class="boton hito-cambiar-rama">Cambiar de rama</button>' : '') +
         (!htmlRequisitos && window.HitosRequisitos
           ? '<button type="button" class="boton hito-requisitos-anadir-suelto">+ Añadir algo que falte</button>' : '') +
+        (window.HitosComunicar ? HitosComunicar.botonHTML(a, h) : '') +
         '<button type="button" class="boton boton-peligro hito-quitar">Quitar este hito</button></div>');
     }
 
@@ -283,6 +284,7 @@ var HitosPanelLista = (function () {
     if (anadirSuelto && window.HitosRequisitos) {
       anadirSuelto.onclick = function () { HitosRequisitos.anadir(a, h); };
     }
+    if (window.HitosComunicar) HitosComunicar.engancharBoton(div, a, h);
     var resp = div.querySelector('.hito-campo-responsable');
     if (resp) resp.onchange = async function () {
       await U.mientrasGuarda(resp, function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: resp.value }); });

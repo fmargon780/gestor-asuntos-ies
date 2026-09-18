@@ -55,6 +55,20 @@
      apertura. Ver cuerpoDelMedio, más abajo. */
   var loQueFaltaActual = '';
 
+  /* "Comunicar" desde un hito (18-sep-2026, fila 60,
+     docs/COMUNICAR-DESDE-EL-HITO.md): cuando el cuadro se abre desde
+     el botón de un hito, js/hitos-comunicar.js ya trae el asunto y el
+     cuerpo del mensaje resueltos (con sus huecos sustituidos) y, si lo
+     sabe, una dirección preferente; el cuadro los enseña tal cual, sin
+     pasar por el desplegable de plantillas del tipo. `comunicarHitoActual`
+     guarda a quién se ha creído que se escribe y qué hito lo pidió, para
+     la constancia que deja `apuntarElRastro` (sección 5.3: una nota en
+     el asunto y una línea en el historial del hito, una sola vez). */
+  var asuntoListoActual = '';
+  var medioListoActual = '';
+  var correoPreferenteActual = '';
+  var comunicarHitoActual = null;
+
   function $(id) { return document.getElementById(id); }
 
   /* ---------- de dónde salen los datos ---------- */
@@ -99,7 +113,7 @@
      función que la fabricaba (`piezasDelNombre`, que ya no tiene para
      qué usarse) y el estado que guardaba cuál estaba elegida. */
   function asuntoDelCorreo(a) {
-    return a.nombre;
+    return asuntoListoActual || a.nombre;
   }
 
   /* Desde la fila 17 de la cola, {firma} ya sale calculado dentro de
@@ -130,23 +144,32 @@
     }
 
     var medio = '', faltan = [];
-    var plantilla = idPlantilla && plantillasDatos
-      ? plantillasDatos.lista.filter(function (p) { return p.id === idPlantilla; })[0]
-      : null;
-    if (plantilla) {
-      var valoresConLoQueFalta = Object.assign({}, valoresActuales || {}, { loQueFalta: loQueFaltaActual });
-      var r = Plantillas.rellenar(plantilla.texto, valoresConLoQueFalta);
-      medio = r.texto;
-      faltan = r.faltan;
-    }
 
-    /* Si "Pedir lo que falta" trae texto y la plantilla (o la falta de
-       plantilla) no llevaba el hueco {{LO QUE FALTA}} de todas formas,
-       se añade al final, separado por una línea en blanco (sección 7
-       del encargo): el hueco, cuando existe en la plantilla, ya lo ha
-       metido Plantillas.rellenar en su sitio. */
-    if (loQueFaltaActual && !(plantilla && Plantillas.tieneLoQueFalta(plantilla.texto))) {
-      medio = medio ? (medio + '\n\n' + loQueFaltaActual) : loQueFaltaActual;
+    /* "Comunicar" desde un hito (fila 60): el medio ya viene resuelto,
+       sin pasar por ninguna plantilla del tipo ni por el hueco
+       {{LO QUE FALTA}} (ese es cosa de la fila 59, para la plantilla
+       general; aquí el texto es el propio del paso). */
+    if (medioListoActual) {
+      medio = medioListoActual;
+    } else {
+      var plantilla = idPlantilla && plantillasDatos
+        ? plantillasDatos.lista.filter(function (p) { return p.id === idPlantilla; })[0]
+        : null;
+      if (plantilla) {
+        var valoresConLoQueFalta = Object.assign({}, valoresActuales || {}, { loQueFalta: loQueFaltaActual });
+        var r = Plantillas.rellenar(plantilla.texto, valoresConLoQueFalta);
+        medio = r.texto;
+        faltan = r.faltan;
+      }
+
+      /* Si "Pedir lo que falta" trae texto y la plantilla (o la falta de
+         plantilla) no llevaba el hueco {{LO QUE FALTA}} de todas formas,
+         se añade al final, separado por una línea en blanco (sección 7
+         del encargo): el hueco, cuando existe en la plantilla, ya lo ha
+         metido Plantillas.rellenar en su sitio. */
+      if (loQueFaltaActual && !(plantilla && Plantillas.tieneLoQueFalta(plantilla.texto))) {
+        medio = medio ? (medio + '\n\n' + loQueFaltaActual) : loQueFaltaActual;
+      }
     }
 
     var firma = textoDeLaFirma();
@@ -264,7 +287,19 @@
      "Para" y la copia oculta salen de js/correo-cuadro.js (fila 58, que
      ahora es dueño de esos dos datos), a través de `window.CorreoCuadro`. */
 
+  /* "Comunicar" desde un hito (fila 60, sección 5.3 del encargo): la
+     misma línea sirve para la nota del asunto y para el historial del
+     hito (ver apuntarElRastro, más abajo). Pura, para poder probarla
+     sin abrir ningún cuadro (`CorreoNucleo.textoDeComunicarHito`). */
+  function textoDeComunicarHito(nombreDestinatario, esSeneca) {
+    return 'Comunicado a ' + (nombreDestinatario || 'el tercero') + ' por ' +
+      (esSeneca ? 'Séneca' : 'correo') + ' · ' + U.fechaLegible(U.aAaMmDd(U.hoyIso()));
+  }
+
   function textoDeLaNota() {
+    if (comunicarHitoActual) {
+      return textoDeComunicarHito(comunicarHitoActual.nombreDestinatario, porSeneca);
+    }
     /* En Séneca el campo del asunto es #seneca-asunto (js/seneca-cuadro.js,
        fila 53): #correo-asunto ya no existe en ese cuadro. */
     var campoAsunto = $('correo-asunto') || $('seneca-asunto');
@@ -296,6 +331,7 @@
      fila 28), manda ese nombre: es a quien hay que contestar, y puede
      no ser el propio interesado. */
   function aQuien(a) {
+    if (comunicarHitoActual && comunicarHitoActual.nombreDestinatario) return comunicarHitoActual.nombreDestinatario;
     var deLoPide = window.LoPide && a && a.ficha && a.ficha.loPide && a.ficha.loPide.nombre;
     if (deLoPide) return deLoPide;
     var categoria = categoriaDe(a);
@@ -334,7 +370,17 @@
       return;
     }
     try {
-      await window.Notas.anadir(a, textoDeLaNota());
+      var texto = textoDeLaNota();
+      await window.Notas.anadir(a, texto);
+      /* "Comunicar" desde un hito (fila 60, sección 5.3): la misma
+         línea, además, en el historial del propio hito. No crítico: si
+         falla, el mensaje ya se ha preparado y la nota ya ha quedado. */
+      if (comunicarHitoActual && window.Hitos && typeof Hitos.anadirNota === 'function') {
+        try {
+          await Hitos.anadirNota(comunicarHitoActual.claveAsunto, comunicarHitoActual.idHito, texto);
+          if (window.HitosPanel) window.HitosPanel.programarRepintado();
+        } catch (e) { /* no crítico */ }
+      }
       algoCambiado = true;
       pintarRastro(a, 'Apuntado en las notas del asunto.');
     } catch (e) {
@@ -394,6 +440,10 @@
     viendo = a;
     porSeneca = !!deSeneca;
     loQueFaltaActual = (extra && extra.loQueFalta) || '';
+    asuntoListoActual = (extra && extra.asuntoListo) || '';
+    medioListoActual = (extra && extra.medioListo) || '';
+    correoPreferenteActual = (extra && extra.correoPreferente) || '';
+    comunicarHitoActual = (extra && extra.comunicarHito) || null;
     if (window.SenecaDestinatarios) SenecaDestinatarios.limpiar();
     yaApuntado = false;
     algoCambiado = false;
@@ -488,6 +538,15 @@
     cuerpoDelMedio: cuerpoDelMedio,
     apuntarElRastro: apuntarElRastro,
     MAXIMO_LETRAS_SENECA: MAXIMO_LETRAS_SENECA,
+    /* Abrir un cuadro directamente, sin pasar por el menú "Comunicar":
+       lo usa js/hitos-comunicar.js (fila 60) cuando el paso del hito
+       solo tiene texto para un canal. */
+    abrirCuadro: abrirCuadro,
+    /* La dirección que haya propuesto un hito para este cuadro (fila
+       60), si la hay: js/correo-cuadro.js la usa igual que ya usaba la
+       de "Lo pide" (LoPide.correoDe). */
+    destinatarioPreferente: function () { return correoPreferenteActual; },
+    textoDeComunicarHito: textoDeComunicarHito,
     /* Monta sobre `boton` el mismo menú pequeño "Comunicar" (Correo /
        Séneca) que lleva la cabecera de la ficha, sin duplicar ese
        camino (fila 59, sección 7 del encargo). */

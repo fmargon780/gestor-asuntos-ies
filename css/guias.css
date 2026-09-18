@@ -288,4 +288,20 @@
 .requisito-mandos { display: flex; gap: 4px; margin-left: auto; }
 .requisito-mandos .boton { padding: 4px 8px; }
 
+/* ---------- "comunicación de este paso" (18-sep-2026, fila 60) ---------- */
+
+.paso-comunicacion {
+  margin-top: 10px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--fondo);
+}
+.paso-comunicacion > summary { cursor: pointer; font-size: 13px; color: var(--tinta-suave); }
+.paso-comunicacion-pestanas { display: flex; gap: 6px; margin-top: 8px; }
+.paso-comunicacion-pestana.activa { border-color: #1e7a46; background: var(--verde); }
+.paso-comunicacion-panel { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.paso-comunicacion-panel.oculto { display: none; }
+.paso-comunicacion-panel .etiqueta { margin: 4px 0 0; font-size: 12px; }
+
 /* publicado 10-sep-2026 13:55 */

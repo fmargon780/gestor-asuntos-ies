@@ -5,6 +5,56 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 18-sep-2026 — Comunicar desde el hito
+
+Fila 60 de la cola (`docs/COLA.md`, `docs/COMUNICAR-DESDE-EL-HITO.md`): la plantilla de correo y de
+Séneca era del tipo de asunto entero, una sola para todo el trámite, aunque pedir un papel al
+principio y avisar de una resolución al final no se parecen en nada — y para comunicar algo de un
+hito había que subir a la cabecera de la ficha aunque el texto que tocaba estuviera ahí delante.
+
+- **En la guía**: cada paso (o subpaso, dentro de una opción) puede llevar su propio texto de
+  correo y/o de Séneca — asunto y cuerpo, cada uno con "Insertar hueco" —, en una sección plegable
+  "Comunicación de este paso" del editor, con dos pestañas (Correo/Mensaje de Séneca). Vive en
+  `js/guias-comunicacion.js` (nuevo), reutilizando el mismo campo de texto con hueco que ya tenía
+  el cuadro de una plantilla (`js/plantillas-ajustes.js`, sacado a una función aparte para eso: "no
+  escribas un editor nuevo"). La plantilla general del tipo no se toca: sigue siendo la que usa el
+  "Comunicar" de la cabecera.
+- **En el hito**: no se guarda ninguna copia del texto en `hitos.json` — se lee de la guía de su
+  tipo por `origenGuia` en el momento de pulsar el botón, así que si Francisco cambia el texto del
+  paso, los asuntos vivos usan el nuevo directamente. El botón "Comunicar" solo sale si su paso
+  tiene texto; con los dos canales, abre el mismo menú pequeño de la cabecera; con uno solo, va
+  directo. El destinatario se propone según el responsable del hito: el tutor legal (1, o el 2 si
+  el 1 no tiene datos) si es `tutor`; todos los relacionados con correo si es `relacionado`; el
+  tercero del asunto en cualquier otro caso. En Séneca no hay forma de marcar un usuario IdEA
+  concreto desde aquí: el cuadro se abre con la lista de siempre, sin bloquear el botón por eso.
+- **Reutilizado, no reinventado**: el cuadro de Correo/Séneca que abre "Comunicar" es el de
+  siempre (`js/correo.js`, `js/seneca-cuadro.js`, `js/correo-cuadro.js`), con el mensaje ya resuelto
+  puesto encima (mismo mecanismo que "Pedir lo que falta" de la fila 59: `abrirCuadro(a, deSeneca,
+  extra)`); y la constancia —una nota en el asunto y una línea en el historial del hito, una sola
+  vez— reutiliza el cerrojo `yaApuntado` que ya tenía `apuntarElRastro` desde antes de esta fila,
+  no uno nuevo. Todo lo propio del hito (leer la guía por `origenGuia`, resolver el destinatario)
+  vive en `js/hitos-comunicar.js` (nuevo), enganchado a `window.Hitos` como `js/hitos-archivo.js`
+  aunque no guarda nada en el hito.
+
+Simplificación anotada: con varios relacionados, se proponen todos los que tengan correo (unidos
+por comas, en "Otro correo"); no hay forma de elegir solo alguno desde aquí. Si hace falta más
+adelante, se retoca.
+
+Prueba nueva, sin navegador: `pruebas/comunicar-desde-hito.mjs` (sustituye `CorreoNucleo.abrirCuadro`
+por uno que solo apunta con qué se le ha llamado: abrir el cuadro de verdad monta un `U.preguntar`
+con el DOM entero, que no tiene sentido simular sin navegador).
+
+**Trampa encontrada probando en el navegador de verdad** (no la coge ninguna prueba sin navegador):
+"+ Añadir"/quitar/mover una fila de "Lo que hay que reunir" o escribir en "Comunicación de este
+paso" hace `recoger(); mutar; pintar()` del paso ENTERO (`js/guias.js`), que reconstruye el
+`<details>` desde cero — y un `<details>` recién creado nace cerrado, así que la sección se le
+cerraba sola a Francisco justo después de tocarla. `pintar()` ahora apunta, antes de vaciar
+`#guia-pasos`, qué `<details>` (de `.paso-extra`, `.paso-requisitos` o `.paso-comunicacion`, de un
+paso o de un subpaso) estaban abiertos, con la posición del paso más el id del subpaso como clave
+(`detallesAbiertos`/`restaurarAbierto`), y los vuelve a abrir al repintar. De paso arregla lo mismo
+que ya le pasaba a `.paso-extra` (responsable/estado/plazo), que tenía la misma trampa desde antes
+de esta fila.
+
 ## 18-sep-2026 — Lo que hay que reunir en cada hito
 
 Fila 59 de la cola (`docs/COLA.md`, `docs/REQUISITOS-DE-HITO.md`): un hito dice qué hay que hacer,

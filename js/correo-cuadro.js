@@ -181,7 +181,11 @@ var CorreoCuadro = (function () {
     plantillaElegida = '';
 
     var correos = correosDe(persona);
-    var correoLoPide = window.LoPide ? LoPide.correoDe(a.ficha) : '';
+    /* Un hito con "Comunicar" (fila 60, docs/COMUNICAR-DESDE-EL-HITO.md,
+       5.1) puede proponer una dirección propia (o varias, separadas
+       por coma): tiene prioridad sobre la de "Lo pide". */
+    var correoLoPide = (n().destinatarioPreferente && n().destinatarioPreferente()) ||
+      (window.LoPide ? LoPide.correoDe(a.ficha) : '');
     var otroInicial = '';
     if (window.LoPide) {
       var resultado = LoPide.elegirDestinatarios(correos, correoLoPide, elegidos);
