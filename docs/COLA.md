@@ -131,22 +131,13 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 54 | `docs/AYUDANTE-SENECA-FIABLE.md` | PENDIENTE |
 | 55 | `docs/ASUNTO-SIN-ELECCION.md` | PENDIENTE |
 | 56 | `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md` | PENDIENTE |
+| 57 | `docs/HUECO-PARA-SELLO-Y-FIRMA.md` | PENDIENTE |
 
-**Orden de trabajo:** están PENDIENTES la 53, la 54, la 55 y la 56, en ese orden. Las filas 1 a 52
-están HECHAS. La 54 toca solo `js/seneca-ayudante.js`, así que no se pisa con la 53. **La 55 va
-después de la 53**, porque la 53 mueve el cuadro de Séneca a un fichero nuevo. La 56 no se pisa
-con ninguna de las demás: solo toca los campos y la pantalla de un tipo de asunto.
-
-**Fila 52, en una línea** (18-sep-2026, acordada con Francisco mirando la cabecera de un asunto de
-CERT. MATRICULA): los doce botones de la cabecera se agrupan por el momento del trámite en que se
-usan y bajan a cinco. Editar y Borrar se van a un menú de tres puntos en el nombre, que también
-copia el nombre del asunto; el número del tercero se copia desde el propio nombre; Vía entra
-dentro de Lo pide, que pasa a llamarse "El encargo"; Correo y Mensaje de Séneca se juntan en
-"Comunicar"; "Gestionar documentos" baja al bloque de Documentos; el botón "Plazo" deja de existir
-y el vencimiento se ve escrito ("Vence el 25-sep · quedan 7 días"), pulsable para cambiarlo; y la
-barra termina en el mismo borde que el título, con "Archivar el asunto" a la derecha. Detalle en
-`docs/CABECERA-DEL-ASUNTO.md`. **Va después de la fila 51.** Sube directamente a `main`, sin
-petición de cambios.
+**Orden de trabajo:** están PENDIENTES la 53, la 54, la 55, la 56 y la 57, en ese orden. Las filas
+1 a 52 están HECHAS. La 54 toca solo `js/seneca-ayudante.js`, así que no se pisa con la 53. **La 55
+va después de la 53**, porque la 53 mueve el cuadro de Séneca a un fichero nuevo. La 56 no se pisa
+con ninguna de las demás: solo toca los campos y la pantalla de un tipo de asunto. **La 57 va
+después de la 56**, porque las dos tocan `js/ajustes-tipo.js`.
 
 **Fila 53, en una línea** (18-sep-2026, acordada con Francisco mirando una captura del cuadro de
 Mensaje de Séneca): ese cuadro se rehace para que se vea entero. Todo lo de Séneca sale de
@@ -188,6 +179,19 @@ función de siempre como respaldo para que ningún nombre de carpeta cambie. Fic
 `pruebas/campos-calculo.test.js`. Detalle en `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md`. Sube
 directamente a `main`, sin petición de cambios.
 
+**Fila 57, en una línea** (18-sep-2026, acordada con Francisco): el sello que Séneca pinta al
+registrar a mano (banda estrecha arriba, a la derecha si es entrada y a la izquierda si es salida,
+en todas las páginas) a veces pisa texto del documento, y lo mismo pasa abajo con la banda de firma
+del director. Botón nuevo **Preparar el documento**, junto a Separar, Unir y Sacar páginas, que
+encoge el contenido de todas las páginas de un PDF y lo recoloca para dejar libres la banda de
+arriba y la de abajo. Solo encoge, nunca agranda; si las bandas ya están libres no toca nada y lo
+dice; no cambia el tamaño de la hoja; y si el PDF ya está firmado avisa de que hacerle hueco
+invalidaría la firma. Las dos medidas se configuran en Ajustes → El centro (1,5 cm arriba y 2,5 cm
+abajo por defecto) y cada tipo de asunto dice si lleva sello y si lleva firma. Ficheros nuevos:
+`js/pdf-margenes.js`, `js/preparar-documento.js` y `pruebas/margenes-pdf.mjs`. Detalle en
+`docs/HUECO-PARA-SELLO-Y-FIRMA.md`. **Va después de la fila 56.** Sube directamente a `main`, sin
+petición de cambios.
+
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
 - De la fila 21: departamentos del personal, tutorías y equipos educativos. `personal.csv` no
@@ -211,6 +215,13 @@ directamente a `main`, sin petición de cambios.
   suyo es crearlo una vez en el gestor de contactos del propio Séneca. El ayudante es para listas
   de un día. Si algún día se ve que casi todas las listas son fijas, habrá que replantear si el
   ayudante merece seguir existiendo.
+- De la fila 57 (18-sep-2026): hay que comprobar con un documento de verdad qué pasa cuando Séneca
+  sella un PDF que ya viene firmado digitalmente. Es posible que el visor avise de que el documento
+  se modificó después de firmarse. Eso no depende de la aplicación. Si ocurre, habrá que decidir el
+  orden bueno (firmar después de registrar) y dejarlo escrito en la guía del tipo.
+- De la fila 57: las medidas de 1,5 cm y 2,5 cm son una estimación. Francisco no tenía la medida
+  real de las bandas de Séneca ni de la de AutoFirma. Cuando pruebe el botón con un documento
+  registrado de verdad, ajustará las dos medidas en Ajustes → El centro.
 
 ## Nota sobre "sube directamente a main"
 
