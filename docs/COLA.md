@@ -125,8 +125,9 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 48 | `docs/NO-GASTAR-PUBLICACIONES.md` | HECHA (17-sep-2026) |
 | 49 | `docs/ADJUNTOS-DE-CORREO-POR-DENTRO.md` | PENDIENTE |
 | 50 | `docs/CABECERA-NO-TIEMBLA.md` | PENDIENTE |
+| 51 | `docs/FICHA-DISPOSICION.md` | PENDIENTE |
 
-**Orden de trabajo:** están PENDIENTES la 49 y la 50, en ese orden. Las filas 1 a 48 están HECHAS.
+**Orden de trabajo:** están PENDIENTES la 49, la 50 y la 51, en ese orden. Las filas 1 a 48 están HECHAS.
 
 **Fila 49, en una línea** (18-sep-2026, acordada con Francisco): la bandeja de correos lee por
 dentro los PDF adjuntos de cada correo (hasta 3 adjuntos, 5 páginas) con el lector que ya existe
@@ -141,6 +142,15 @@ encogerse pierde alto, el documento se acorta, el navegador recorta `scrollY` po
 umbral de despliegue, y el ciclo se repite. Se arregla compensando el alto perdido, separando los
 umbrales (120 y 24) y con un candado de 400 ms entre cambios contrarios. Sube directamente a
 `main`, sin petición de cambios.
+
+**Fila 51, en una línea** (18-sep-2026, acordada con Francisco, escrita como fila 49 antes de que
+ese número y el 50 se ocuparan): la ficha de un asunto se recoloca, solo disposición y ningún
+cambio de funcionamiento. La cabecera gana una línea gris que se esconde al encogerse, "Datos del
+asunto" se desmonta y queda solo "Datos del trámite" (que no se pinta si está vacío), las Notas
+suben justo bajo "Datos y contacto", "Otros asuntos de este tercero" y "Personas y entidades
+relacionadas" pasan a `<details>` plegados con su cuenta, los documentos se van a una tercera
+columna con rejilla de tres tramos, y un bloque vacío ocupa una línea en vez de una tarjeta.
+Detalle en `docs/FICHA-DISPOSICION.md`. Sube directamente a `main`, sin petición de cambios.
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
