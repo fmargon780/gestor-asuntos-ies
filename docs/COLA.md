@@ -130,11 +130,13 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 53 | `docs/SENECA-CUADRO-ANCHO.md` | PENDIENTE |
 | 54 | `docs/AYUDANTE-SENECA-FIABLE.md` | PENDIENTE |
 | 55 | `docs/ASUNTO-SIN-ELECCION.md` | PENDIENTE |
+| 56 | `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md` | PENDIENTE |
 
-**Orden de trabajo:** están PENDIENTES la 49, la 50, la 51, la 52, la 53, la 54 y la 55, en ese
-orden. Las filas 1 a 48 están HECHAS. **La 52 va después de la 51**: las dos tocan la cabecera de
-la ficha. La 54 toca solo `js/seneca-ayudante.js`, así que no se pisa con la 53. **La 55 va después
-de la 53**, porque la 53 mueve el cuadro de Séneca a un fichero nuevo.
+**Orden de trabajo:** están PENDIENTES la 49, la 50, la 51, la 52, la 53, la 54, la 55 y la 56, en
+ese orden. Las filas 1 a 48 están HECHAS. **La 52 va después de la 51**: las dos tocan la cabecera
+de la ficha. La 54 toca solo `js/seneca-ayudante.js`, así que no se pisa con la 53. **La 55 va
+después de la 53**, porque la 53 mueve el cuadro de Séneca a un fichero nuevo. La 56 no se pisa con
+ninguna de las demás: solo toca los campos y la pantalla de un tipo de asunto.
 
 **Fila 49, en una línea** (18-sep-2026, acordada con Francisco): la bandeja de correos lee por
 dentro los PDF adjuntos de cada correo (hasta 3 adjuntos, 5 páginas) con el lector que ya existe
@@ -197,6 +199,18 @@ y en el de Mensaje de Séneca. El asunto del mensaje es siempre el nombre de la 
 porque es lo que permite reconocer el hilo después; el campo sigue viéndose y pudiéndose editar a
 mano. Se borra el código de la versión legible. Detalle en `docs/ASUNTO-SIN-ELECCION.md`. **Va
 después de la fila 53.** Sube directamente a `main`, sin petición de cambios.
+
+**Fila 56, en una línea** (18-sep-2026, acordada con Francisco): la sección Campos de la pantalla
+de un tipo deja de enseñar el catálogo entero desplegado. Se queda solo con los campos que el tipo
+ya tiene y un botón "+ Añadir campo", que abre un panel con tres pestañas (De la ficha · Míos ·
+Calculados) y buscador. Y Francisco puede crear campos calculados: eliges el campo de origen, una
+de seis operaciones (quitar los últimos caracteres, quitar los primeros, partir por un signo, tabla
+de equivalencias, juntar dos campos, sacar un dato de una fecha) y ves el resultado con una persona
+de verdad antes de guardar. El calculado "Curso" pasa a ser una receta más en `campos.json`, con la
+función de siempre como respaldo para que ningún nombre de carpeta cambie. Ficheros nuevos:
+`js/campos-calculo.js`, `js/campos-catalogo.js`, `js/campos-calculados-editor.js` y
+`pruebas/campos-calculo.test.js`. Detalle en `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md`. Sube
+directamente a `main`, sin petición de cambios.
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
