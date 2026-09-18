@@ -137,7 +137,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 58 | `docs/AJUSTES-DE-USO-2026-09-18.md` | HECHA (18-sep-2026 · 19:26) |
 | 59 | `docs/REQUISITOS-DE-HITO.md` | HECHA (18-sep-2026 · 20:04) |
 | 60 | `docs/COMUNICAR-DESDE-EL-HITO.md` | HECHA (18-sep-2026 · 20:36) |
-| 61 | `docs/GUARDAR-SIN-PISAR.md` | PENDIENTE |
+| 61 | `docs/GUARDAR-SIN-PISAR.md` | EN CURSO (19-sep-2026) |
 | 62 | `docs/RENOMBRAR-SIN-PERDER-HITOS.md` | PENDIENTE |
 | 65 | `docs/DOCUMENTOS-QUE-QUEPAN.md` | PENDIENTE |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | PENDIENTE |
