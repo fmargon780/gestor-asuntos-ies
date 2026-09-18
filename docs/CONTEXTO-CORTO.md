@@ -15,9 +15,18 @@ Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
 
 ## 1. Lo básico
 
-- Dirección publicada: **https://gestor-de-asuntos.vercel.app**
+- Dirección publicada: **https://asuntos.fmargon.com** (dominio propio, 18-sep-2026). Es la que
+  usan Francisco y su compañero: **la red del IES bloquea todo lo que esté en `vercel.app`**
+  (`ERR_CONNECTION_TIMED_OUT`). La dirección de Vercel `https://gestor-de-asuntos.vercel.app`
+  sigue viva y sirve para comprobar lo publicado con `curl` desde fuera del centro.
+- El dominio `fmargon.com` está comprado en la misma cuenta de Vercel; otras apps irán en otros
+  subdominios (`informes.fmargon.com`, etc.).
 - Repositorio: `fmargon780/gestor-asuntos-ies`, rama `main`, privado.
 - **Un solo proyecto de Vercel** (`gestor-de-asuntos`). No crear otro.
+- **Cada dirección es un sitio distinto para el navegador**: los permisos de carpetas y la
+  identidad se guardan por dirección, así que al pasar a la nueva hay que volver a señalar las
+  dos carpetas (y la bandeja de correos) e identificarse otra vez. Los ajustes del centro no se
+  pierden: viven en `_GESTOR`, dentro del Dropbox.
 
 ## 2. Quién es Francisco, y cómo escribirle
 
@@ -130,6 +139,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 ## 7. Descartado, no proponer otra vez
 
 - Publicar con el conector de Vercel sobre un proyecto ya existente (da 403), o crear otro "por si acaso".
+- Pedir al coordinador TIC que desbloquee `vercel.app` en la red del centro: se resolvió antes con
+  el dominio propio (18-sep-2026).
 - Abrir la carpeta del asunto en el explorador de archivos, u opciones dentro de opciones en la guía.
 - Una hoja de Google Sheets como interfaz.
 - Enlazar un correo de Gmail con `#all/<id de hilo>` (es con `#search/rfc822msgid:<id>`).
@@ -141,7 +152,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 8. Qué falta
 
-- Avisar al compañero de la dirección nueva (debe volver a señalar sus carpetas) y coordinar con él la lista de tipos de asunto y la de estados.
+- El compañero tiene que entrar en `https://asuntos.fmargon.com` y volver a señalar sus carpetas
+  (el navegador no las hereda de la dirección vieja). Y coordinar con él la lista de tipos de
+  asunto y la de estados.
 - Poner en marcha el script de Gmail en `g.educaand.es` y señalar `GESTOR-BANDEJA` en Ajustes.
 - Ver si la bandeja de correo acierta con el tipo; si falla mucho, palabras clave por tipo.
 - Pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs`: sin eso no se siguen los hilos por matrícula, ni la copia oculta de un grupo.
@@ -152,6 +165,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Cuando el uso lo pida: búsqueda en notas, cuentas por tipo para la memoria de fin de curso, qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta del centro.
 - Los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no se fusionan entre ordenadores (solo las altas).
 - Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
+- Cambiar la dirección vieja por `https://asuntos.fmargon.com` en `docs/CONTEXTO.md` y en donde
+  más aparezca (no urgente: la vieja sigue respondiendo fuera del centro).
 
 ## 9. Cuándo leer `CONTEXTO.md` entero
 
