@@ -368,7 +368,7 @@ App.pintarCamposDelTipo = function () {
       cfg: cfgParaPintar,
       clave: Campos.claveDeCampo(cfg),
       nombre: Campos.nombreDeCampo(cfg, App.E.campos),
-      valorInicial: Campos.valorInicial(cfg, persona)
+      valorInicial: Campos.valorInicial(cfg, persona, App.E.campos)
     };
   });
   App.E.nuevo.configCampos.forEach(function (item) {
@@ -378,7 +378,7 @@ App.pintarCamposDelTipo = function () {
   /* Si el tipo ya trae la unidad o el curso calculado, el interruptor
      viejo de "Añadir el grupo" se esconde: si no, el grupo saldría dos
      veces en el nombre. */
-  if (Campos.usaUnidadOCurso(lista)) {
+  if (Campos.usaUnidadOCurso(lista, App.E.campos)) {
     $('bloque-grupo').classList.add('oculto');
     $('campo-grupo').checked = false;
   }
