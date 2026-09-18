@@ -1,6 +1,6 @@
 # La cabecera pegada no puede temblar al encogerse
 
-Fila 49 de `docs/COLA.md`. Escrita el 18-sep-2026 con Francisco.
+Fila 50 de `docs/COLA.md`. Escrita el 18-sep-2026 con Francisco.
 Arregla un defecto de la fila 46 (`docs/CABECERA-QUE-SE-QUEDA.md`), que sigue siendo válida en
 todo lo demás.
 
@@ -81,7 +81,7 @@ suave en vez de seco.
   umbral no deja el estado oscilando (tras encogerse, sigue encogida); (b) con el candado puesto,
   un cambio contrario dentro de los 400 ms no se aplica.
 - `js/version.js` — versión nueva, con la hora de `TZ='Europe/Madrid' date`.
-- `docs/COLA.md` (fila 49 a HECHA), `docs/CONTEXTO-CORTO.md`, `docs/CONTEXTO.md`,
+- `docs/COLA.md` (fila 50 a HECHA), `docs/CONTEXTO-CORTO.md`, `docs/CONTEXTO.md`,
   `docs/HISTORIA.md`.
 
 ## 6. Cómo comprobarlo
