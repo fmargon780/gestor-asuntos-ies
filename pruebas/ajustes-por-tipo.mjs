@@ -149,7 +149,14 @@ await pagina.waitForTimeout(300);
 await comprobar('el plazo de COMPRA se guarda en tipos.json',
   leerJson('tipos.json').then((t) => t.filter((x) => x.tipo === 'COMPRA')[0].plazo), 12);
 
-await pagina.locator('#campos-catalogo .fila-tipo').first().getByRole('button', { name: 'Añadir' }).click();
+/* Fila 56, 18-sep-2026, docs/CAMPOS-CATALOGO-Y-CALCULADOS.md: el
+   catálogo ya no está desplegado en la sección, se abre con
+   "+ Añadir campo" (pestaña "De la ficha", la que sale de partida). */
+await pagina.click('#campos-btn-anadir');
+await pagina.waitForSelector('#campos-catalogo-ficha-lista .fila-tipo');
+await pagina.locator('#campos-catalogo-ficha-lista .fila-tipo').first().getByRole('button', { name: 'Añadir' }).click();
+await pagina.click('#campos-catalogo-volver');
+await pagina.waitForSelector('#campos-puestos');
 await comprobar('el campo elegido pasa a la lista de puestos',
   pagina.locator('#campos-puestos .fila-tipo').count(), 1);
 await pagina.click('#campos-guardar');
