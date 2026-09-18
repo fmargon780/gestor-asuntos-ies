@@ -85,11 +85,38 @@ function construirSeccionDatos(tipo) {
 
 /* ---------- 2. Campos ----------
 
-   Es la lógica que antes vivía en `App.pintarCuadroDeCampos`, dentro
-   de un `U.preguntar`. Aquí se pinta igual, pero el "Aceptar" del
-   cuadro se sustituye por un botón "Guardar campos" propio de la
-   sección: `lista` se sigue mutando en el sitio y solo se escribe en
-   `campos.json` al pulsarlo. */
+   Fila 56, 18-sep-2026, docs/CAMPOS-CATALOGO-Y-CALCULADOS.md: el
+   catálogo entero (antes desplegado aquí mismo, con el buscador y el
+   formulario de campo propio) se ha ido a js/campos-catalogo.js, que
+   pinta un panel de tres pestañas donde estaba la sección al pulsar
+   "+ Añadir campo". Aquí solo queda la lista de campos ya puestos
+   (con sus casillas, las flechas de orden y Quitar), ese botón y
+   "Guardar campos": `lista` se sigue mutando en el sitio y solo se
+   escribe en `campos.json` al pulsar ese botón. */
+
+/* Si se han añadido (o quitado, al borrar un propio/calculado que
+   este tipo tuviera puesto) campos sin guardar, avisa antes de volver
+   a la lista de tipos (sección 3 del encargo). Variable del fichero,
+   no de la función: `construirSeccionCampos` se vuelve a llamar
+   entera cada vez que se abre la pantalla de un tipo, y el botón
+   "← Volver" de la cabecera (que pone js/usabilidad.js, siempre el
+   mismo nodo del DOM) solo se puede envolver una vez. */
+var camposSinGuardar = false;
+
+function envolverVolverDeTipo() {
+  var volver = document.querySelector('#pantalla-tipo-asunto .boton-volver');
+  if (!volver || volver.dataset.avisaCampos) return;
+  volver.dataset.avisaCampos = '1';
+  var original = volver.onclick;
+  volver.onclick = function (ev) {
+    if (!camposSinGuardar) { if (original) original(ev); return; }
+    ev.preventDefault();
+    U.preguntar('Salir sin guardar',
+      '<p>Has añadido campos y no los has guardado. ¿Salir sin guardarlos?</p>', 'Salir sin guardarlos')
+      .then(function (ok) { if (ok) { camposSinGuardar = false; if (original) original(ev); } });
+  };
+}
+
 async function construirSeccionCampos(tipo) {
   var b = seccionDeTipo('Campos',
     'Los campos de este tipo, en el orden en que saldrán en el formulario y en el nombre de la carpeta.');
@@ -103,43 +130,23 @@ async function construirSeccionCampos(tipo) {
      solo dentro de `cuerpo`, ya esté colgado o no. */
   function $(id) { return cuerpo.querySelector('#' + id); }
 
-  var catalogo = await Campos.catalogoDeCategoria(App.E.datos, tipo.categoria, App.E.campos);
   var lista = ((App.E.campos.porTipo || {})[tipo.tipo] || []).map(function (c) { return Object.assign({}, c); });
+  camposSinGuardar = false;
+  envolverVolverDeTipo();
 
   function textoOrigen(c) {
     return c.origen === 'fichero' ? 'del fichero' : (c.origen === 'calculado' ? 'calculado' : 'propio');
   }
 
-  function catalogoDisponible(filtro) {
-    var usadas = {};
-    lista.forEach(function (c) { usadas[Campos.claveDeCampo(c)] = true; });
-    var q = U.normalizar(filtro || '');
-    return catalogo.filter(function (c) {
-      if (usadas[Campos.claveDeCampo(c)]) return false;
-      if (q && U.normalizar(c.nombre).indexOf(q) === -1) return false;
-      return true;
-    });
-  }
-
-  function pintar() {
-    var buscado = $('campos-buscar') ? $('campos-buscar').value : '';
+  function pintarListado() {
     cuerpo.innerHTML =
       '<div id="campos-puestos" class="lista"></div>' +
-      '<button type="button" class="boton boton-principal" id="campos-guardar" ' +
-      'style="margin-top:10px">Guardar campos</button>' +
-      '<p class="explica" style="margin-top:18px">Campos disponibles en ' + U.escapar(tipo.categoria) +
-      ':</p>' +
-      '<input id="campos-buscar" class="campo" placeholder="Buscar un campo…" value="' +
-      U.escapar(buscado) + '">' +
-      '<div id="campos-catalogo" class="lista" style="margin-top:8px"></div>' +
-      '<div id="campos-propio-nuevo"></div>' +
-      '<button type="button" class="boton" id="campos-btn-propio" style="margin-top:8px">' +
-      '+ Crear un campo propio</button>';
-
+      '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">' +
+      '<button type="button" class="boton" id="campos-btn-anadir">+ Añadir campo</button>' +
+      '<button type="button" class="boton boton-principal" id="campos-guardar">Guardar campos</button>' +
+      '</div>';
     pintarPuestos();
-    pintarCatalogo(buscado);
-    $('campos-buscar').oninput = function () { pintarCatalogo($('campos-buscar').value); };
-    $('campos-btn-propio').onclick = abrirFormularioPropio;
+    $('campos-btn-anadir').onclick = abrirCatalogo;
     $('campos-guardar').onclick = guardarCampos;
   }
 
@@ -163,7 +170,7 @@ async function construirSeccionCampos(tipo) {
       var cOblig = document.createElement('input');
       cOblig.type = 'checkbox';
       cOblig.checked = !!c.obligatorio;
-      cOblig.onchange = function () { c.obligatorio = cOblig.checked; };
+      cOblig.onchange = function () { c.obligatorio = cOblig.checked; camposSinGuardar = true; };
       oblig.appendChild(cOblig);
       var tOblig = document.createElement('span');
       tOblig.textContent = 'Obligatorio';
@@ -175,7 +182,7 @@ async function construirSeccionCampos(tipo) {
       var cEnNom = document.createElement('input');
       cEnNom.type = 'checkbox';
       cEnNom.checked = c.enNombre !== false;
-      cEnNom.onchange = function () { c.enNombre = cEnNom.checked; };
+      cEnNom.onchange = function () { c.enNombre = cEnNom.checked; camposSinGuardar = true; };
       enNom.appendChild(cEnNom);
       var tEnNom = document.createElement('span');
       tEnNom.textContent = 'Añadir al nombre';
@@ -196,24 +203,24 @@ async function construirSeccionCampos(tipo) {
 
       var quitar = document.createElement('button');
       quitar.type = 'button'; quitar.className = 'boton boton-peligro'; quitar.textContent = 'Quitar';
-      quitar.onclick = function () { lista.splice(i, 1); pintar(); };
+      quitar.onclick = function () { lista.splice(i, 1); camposSinGuardar = true; pintarPuestos(); };
       f.appendChild(quitar);
 
       envoltorio.appendChild(f);
 
       /* Lo que se comparte, avisa (17-sep-2026, docs/AJUSTES-POR-TIPO.md):
-         un campo propio puede estar puesto en otros tipos también. No
-         bloquea nada, solo informa. */
-      if (c.origen === 'propio') {
-        var otros = Campos.tiposQueUsanPropio(App.E.campos, c.id)
-          .filter(function (t) { return t !== tipo.tipo; });
-        if (otros.length) {
-          var aviso = document.createElement('div');
-          aviso.className = 'aviso-compartido';
-          aviso.textContent = 'También se usa en ' + otros.length +
-            (otros.length === 1 ? ' tipo más: ' : ' tipos más: ') + otros.join(', ');
-          envoltorio.appendChild(aviso);
-        }
+         un campo propio o calculado puede estar puesto en otros tipos
+         también. No bloquea nada, solo informa. */
+      var otros = c.origen === 'propio' ? Campos.tiposQueUsanPropio(App.E.campos, c.id)
+        : c.origen === 'calculado' ? Campos.tiposQueUsanCalculado(App.E.campos, c.id)
+        : [];
+      otros = otros.filter(function (t) { return t !== tipo.tipo; });
+      if (otros.length) {
+        var aviso = document.createElement('div');
+        aviso.className = 'aviso-compartido';
+        aviso.textContent = 'También se usa en ' + otros.length +
+          (otros.length === 1 ? ' tipo más: ' : ' tipos más: ') + otros.join(', ');
+        envoltorio.appendChild(aviso);
       }
 
       cont.appendChild(envoltorio);
@@ -224,129 +231,30 @@ async function construirSeccionCampos(tipo) {
     var j = i + salto;
     if (j < 0 || j >= lista.length) return;
     var g = lista[i]; lista[i] = lista[j]; lista[j] = g;
+    camposSinGuardar = true;
     pintarPuestos();
   }
 
-  function pintarCatalogo(filtro) {
-    var cont = $('campos-catalogo');
-    var disponibles = catalogoDisponible(filtro);
-    if (!disponibles.length) {
-      cont.innerHTML = '<div class="vacio">Nada que añadir' + (filtro ? ' con ese texto' : '') + '.</div>';
-      return;
-    }
-    cont.innerHTML = '';
-    disponibles.slice(0, 80).forEach(function (c) {
-      var f = document.createElement('div');
-      f.className = 'fila-tipo';
-      f.innerHTML = '<span class="nombre-tipo">' + U.escapar(c.nombre) + '</span>' +
-        '<span class="suave">' + textoOrigen(c) + '</span>';
-      var anadir = document.createElement('button');
-      anadir.type = 'button'; anadir.className = 'boton'; anadir.textContent = 'Añadir';
-      anadir.onclick = function () {
-        var nuevo = { origen: c.origen, obligatorio: false, enNombre: false };
-        if (c.origen === 'fichero') nuevo.columna = c.columna; else nuevo.id = c.id;
-        lista.push(nuevo);
-        pintar();
-      };
-      f.appendChild(anadir);
-      cont.appendChild(f);
+  function abrirCatalogo() {
+    cuerpo.innerHTML = '';
+    if (!window.CamposCatalogo) { pintarListado(); return; }
+    CamposCatalogo.abrir(cuerpo, tipo, lista, {
+      onCambio: function () { camposSinGuardar = true; },
+      onVolver: pintarListado
     });
-  }
-
-  /* ---------- crear un campo propio sin salir de esta pantalla ---------- */
-
-  function abrirFormularioPropio() {
-    if ($('campos-propio-form')) return;
-    var caja2 = $('campos-propio-nuevo');
-    var d = document.createElement('div');
-    d.id = 'campos-propio-form';
-    d.style.cssText = 'margin:8px 0;padding:10px 12px;border:1px solid #d7dee6;' +
-                      'border-radius:8px;background:#f7f9fb';
-    d.innerHTML =
-      '<label class="etiqueta">Nombre del campo</label>' +
-      '<input id="propio-nombre" class="campo" autocomplete="off" placeholder="Por ejemplo: Trimestre">' +
-      '<label class="etiqueta">Clase</label>' +
-      '<select id="propio-clase" class="campo">' +
-      '<option value="texto">Texto libre</option><option value="lista">Lista cerrada</option></select>' +
-      '<div id="propio-valores-caja" class="oculto">' +
-      '<label class="etiqueta">Valores, uno por línea</label>' +
-      '<textarea id="propio-valores" class="campo" rows="3"></textarea></div>' +
-      '<div id="propio-aviso" class="nota"></div>' +
-      '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">' +
-      '<button type="button" class="boton" id="propio-cancelar">Cancelar</button>' +
-      '<button type="button" class="boton boton-principal" id="propio-crear">Crear y añadir</button>' +
-      '</div>';
-    caja2.appendChild(d);
-
-    $('propio-clase').onchange = function () {
-      $('propio-valores-caja').classList.toggle('oculto', $('propio-clase').value !== 'lista');
-    };
-    $('propio-nombre').oninput = avisoPropio;
-    $('propio-cancelar').onclick = function () { d.remove(); };
-    $('propio-crear').onclick = crearPropio;
-    avisoPropio();
-    $('propio-nombre').focus();
-  }
-
-  function avisoPropio() {
-    var campo = $('propio-nombre');
-    var aviso = $('propio-aviso');
-    var crear = $('propio-crear');
-    if (!campo) return;
-    var nombre = campo.value.trim();
-    if (!nombre) {
-      crear.disabled = true;
-      aviso.textContent = 'Escribe el nombre del campo.';
-      return;
-    }
-    var nombresPropios = (App.E.campos.propios || []).map(function (p) { return p.nombre; });
-    var cerca = U.parecidos(nombre, nombresPropios);
-    var mismo = cerca.filter(function (p) { return p.igual; })[0];
-    if (mismo) {
-      crear.disabled = true;
-      aviso.textContent = 'Ya hay un campo propio así, escrito: ' + mismo.nombre + '.';
-      return;
-    }
-    crear.disabled = false;
-    aviso.textContent = cerca.length
-      ? 'Ojo, se parece a: ' + cerca.slice(0, 3).map(function (p) { return p.nombre; }).join(', ') + '.'
-      : 'Se creará como campo propio, vale para cualquier tipo de asunto.';
-  }
-
-  async function crearPropio() {
-    var nombre = $('propio-nombre').value.trim();
-    if (!nombre) return;
-    var clase = $('propio-clase').value === 'lista' ? 'lista' : 'texto';
-    var valores = clase === 'lista'
-      ? $('propio-valores').value.split('\n').map(function (v) { return v.trim(); }).filter(Boolean)
-      : [];
-    var nuevo = { id: 'p' + Date.now() + Math.floor(Math.random() * 1000),
-                  nombre: nombre, clase: clase, valores: valores };
-    try {
-      App.E.campos = await Campos.guardarPropios(App.E.gestor, function (propios) {
-        propios.push(nuevo);
-        return propios;
-      });
-      catalogo.push({ origen: 'propio', id: nuevo.id, nombre: nuevo.nombre,
-                       clase: nuevo.clase, valores: nuevo.valores });
-      lista.push({ origen: 'propio', id: nuevo.id, obligatorio: false, enNombre: false });
-      pintar();
-      U.aviso('Campo propio ' + nombre + ' creado.', 'bueno');
-    } catch (e) {
-      U.aviso('No he podido crearlo: ' + e.message, 'malo');
-    }
   }
 
   async function guardarCampos() {
     try {
       App.E.campos = await Campos.guardarConfigDeTipo(App.E.gestor, tipo.tipo, lista);
+      camposSinGuardar = false;
       U.aviso('Campos de ' + tipo.tipo + ' guardados.', 'bueno');
     } catch (e) {
       U.aviso('No he podido guardarlos: ' + e.message, 'malo');
     }
   }
 
-  pintar();
+  pintarListado();
   return b.sec;
 }
 
