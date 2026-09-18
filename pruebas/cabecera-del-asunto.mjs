@@ -109,9 +109,12 @@ await comprobar('2. ya no hay ningún botón de los viejos',
 console.log('--- 3. el menú de tres puntos ---');
 await pagina.click('.ficha-nombre-menu-boton');
 await pagina.waitForTimeout(100);
-await comprobar('3. las tres opciones, en orden',
+/* "Copiar el nombre del asunto" ya no vive aquí desde la fila 58
+   (docs/AJUSTES-DE-USO-2026-09-18.md, 1): es el botón "Asunto" de la
+   fila de copiar, siempre a la vista (punto 4 de esta misma prueba). */
+await comprobar('3. las dos opciones, en orden',
   pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents(),
-  ['Editar el asunto', 'Copiar el nombre del asunto', 'Borrar el asunto']);
+  ['Editar el asunto', 'Borrar el asunto']);
 await comprobarQue('3. "Borrar el asunto" se ve en rojo',
   pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion'))
     .some((b) => b.textContent.trim() === 'Borrar el asunto' && b.classList.contains('ficha-menu-peligro'))));
@@ -122,21 +125,31 @@ await comprobarQue('3. Escape lo cierra, sin echar de la ficha',
     !!document.getElementById('pantalla-asunto') && !document.getElementById('pantalla-asunto').classList.contains('oculto')));
 
 /* ============================================================
-   4. EL ICONO DE COPIAR EL NÚMERO
-   ============================================================ */
-console.log('--- 4. el icono de copiar el número ---');
-await comprobar('4. sale en un asunto de alumnado con número',
-  pagina.locator('.ficha-nombre .boton-nie').count(), 1);
-await pagina.click('.ficha-nombre .boton-nie');
+   4. LA FILA DE COPIAR DE UN GESTO (fila 58, docs/AJUSTES-DE-USO-
+   2026-09-18.md, 1): reemplaza al icono de copiar el número que antes
+   vivía pegado al `<h2>`. Los cuatro botones (Asunto, Nombre, NIE,
+   DNI/CIF), con datos de verdad, se comprueban aparte en
+   pruebas/copiar-fila.mjs; aquí solo el "Asunto", siempre presente, y
+   el "NIE", que no depende de ningún fichero de datos (sale del
+   propio nombre de la carpeta). */
+console.log('--- 4. la fila de copiar de un gesto ---');
+await comprobar('4. el botón "Asunto" siempre sale',
+  pagina.locator('.ficha-copiar-fila .boton-copiar-fila', { hasText: 'Asunto' }).count(), 1);
+await comprobar('4. el "NIE" sale en un asunto de alumnado con número',
+  pagina.locator('.ficha-copiar-fila .boton-copiar-fila', { hasText: 'NIE' }).count(), 1);
+await pagina.click('.ficha-copiar-fila .boton-copiar-fila:has-text("NIE")');
 await pagina.waitForFunction(() => {
-  const b = document.querySelector('.ficha-nombre .boton-nie');
-  return b && b.textContent.trim() === 'Copiado';
+  const b = Array.from(document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila'))
+    .find((x) => x.textContent.trim() === 'Copiado');
+  return !!b;
 });
 await comprobar('4. copia de verdad el número, sin el nombre',
   pagina.evaluate(() => navigator.clipboard.readText()), '1140233');
 
 await abrirFicha(MINIMO);
-await comprobar('4. no sale en un asunto que no es de alumnado',
+await comprobar('4. el "NIE" no sale en un asunto que no es de alumnado',
+  pagina.locator('.ficha-copiar-fila .boton-copiar-fila', { hasText: 'NIE' }).count(), 0);
+await comprobar('4. el icono viejo pegado al nombre ha desaparecido',
   pagina.locator('.ficha-nombre .boton-nie').count(), 0);
 
 await abrirFicha(RICO);
@@ -268,10 +281,18 @@ await comprobar('10. "Editar el asunto" está apagado',
   pagina.getByRole('button', { name: 'Editar el asunto', exact: true }).isDisabled(), true);
 await comprobar('10. "Borrar el asunto" está apagado',
   pagina.getByRole('button', { name: 'Borrar el asunto', exact: true }).isDisabled(), true);
-await comprobar('10. "Copiar el nombre del asunto" sigue activo',
-  pagina.getByRole('button', { name: 'Copiar el nombre del asunto', exact: true }).isDisabled(), false);
-await pagina.getByRole('button', { name: 'Copiar el nombre del asunto', exact: true }).click();
-await pagina.waitForSelector('.mensaje.bueno');
+/* "Copiar el nombre del asunto" ya no vive en el menú (fila 58): el
+   botón "Asunto" de la fila de copiar es el que sigue activo en
+   consulta (`esControlDeSoloLectura`, js/ficha-asunto.js). */
+await pagina.keyboard.press('Escape');
+await comprobar('10. el botón "Asunto" sigue activo en consulta',
+  pagina.locator('.ficha-copiar-fila .boton-copiar-fila', { hasText: 'Asunto' }).isDisabled(), false);
+await pagina.click('.ficha-copiar-fila .boton-copiar-fila:has-text("Asunto")');
+await pagina.waitForFunction(() => {
+  const b = Array.from(document.querySelectorAll('.ficha-copiar-fila .boton-copiar-fila'))
+    .find((x) => x.textContent.trim() === 'Copiado');
+  return !!b;
+});
 await comprobar('10. copiar de verdad funciona en consulta: el nombre entero, en el portapapeles',
   pagina.evaluate(() => navigator.clipboard.readText()), RICO);
 
@@ -283,10 +304,13 @@ await pagina.evaluate(() => window.scrollTo(0, 400));
 await pagina.waitForTimeout(500);
 await comprobarQue('11. la cabecera está encogida',
   pagina.evaluate(() => document.querySelector('.ficha-cabecera').classList.contains('encogida')));
-await comprobarQue('11. el icono de copiar sigue visible',
+/* La fila de copiar se esconde con la cabecera encogida (fila 58,
+   igual que la línea gris de debajo del nombre): no hay sitio, y el
+   nombre ya lleva los tres puntos. */
+await comprobarQue('11. la fila de copiar se esconde, sin sitio en la cabecera encogida',
   pagina.evaluate(() => {
-    const b = document.querySelector('.ficha-nombre .boton-nie');
-    return !!b && b.getBoundingClientRect().width > 0;
+    const b = document.querySelector('.ficha-copiar-fila');
+    return !!b && getComputedStyle(b).display === 'none';
   }));
 await comprobarQue('11. los tres puntos siguen visibles',
   pagina.evaluate(() => {

@@ -133,35 +133,21 @@
   (function () {
     var comoEra = App.abrirFicha;
     if (typeof comoEra !== 'function') return;
-    var viendo = null;
 
+    /* El número del alumno ya no se pone aquí, pegado al `<h2>`: desde
+       la fila 58 (docs/AJUSTES-DE-USO-2026-09-18.md, 1) vive en la fila
+       de botones de copiar de un gesto (js/ficha-nombre-acciones.js),
+       para no tener dos caminos. Este envoltorio se queda solo con los
+       documentos, que siguen llegando tarde (cuando termina de leer la
+       carpeta). */
     App.abrirFicha = function (a, modo) {
-      viendo = a;
       comoEra(a, modo);
-      repasar();
-    };
-
-    /* El número va dentro del `<h2>` con el nombre, pegado al texto
-       (18-sep-2026, fila 52, docs/CABECERA-DEL-ASUNTO.md, 5): antes
-       vivía suelto en la barra de acciones. La versión "chica", como
-       en las listas de resultados, para no ensanchar el nombre. */
-    function ponerNie() {
-      if (!viendo) return;
-      var caja = document.querySelector('.ficha-nombre');
-      if (!caja || caja.querySelector('.boton-nie')) return;
-      var nie = nieDeAsunto(viendo);
-      if (!nie) return;
-      caja.appendChild(botonDeNie(nie, true));
-    }
-
-    function repasar() {
-      ponerNie();
       ponerEnDocumentos();
-    }
+    };
 
     var pantalla = document.getElementById('pantalla-asunto');
     if (pantalla && window.MutationObserver) {
-      new MutationObserver(function () { repasar(); })
+      new MutationObserver(function () { ponerEnDocumentos(); })
         .observe(pantalla, { childList: true, subtree: true });
     }
   })();
@@ -294,5 +280,16 @@
       envoltorio.appendChild(copiar);
     });
   }
+
+  /* Expuesto para js/ficha-nombre-acciones.js (18-sep-2026, fila 58,
+     docs/AJUSTES-DE-USO-2026-09-18.md, 1): la fila de botones de copiar
+     de un gesto reutiliza `boton()` (el mismo copiado con aviso "Copiado"
+     de aquí), `nieDeAsunto()` (el número, sacado del nombre de la
+     carpeta, sin tener que leer el fichero de datos) y `categoriaDe()`
+     (para saber sin esperar a ningún fichero si el botón del documento
+     se llama DNI o CIF). `copiar()`, el copiado a secas, la usa esa
+     misma fila para los dos botones que solo se pueden rellenar del
+     todo cuando responde el fichero de datos. */
+  window.Copiar = { boton: boton, nieDeAsunto: nieDeAsunto, categoriaDe: categoriaDe, copiar: copiar };
 
 })();

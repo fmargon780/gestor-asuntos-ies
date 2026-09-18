@@ -141,7 +141,7 @@ var PrepararDocumento = (function () {
     var bytes = new Uint8Array(await fichero.arrayBuffer());
 
     if (PdfMargenes.pareceFirmado(bytes)) {
-      var sigue = await U.preguntar('Preparar "' + contexto.nombre + '"',
+      var sigue = await U.preguntar('Ajustar tamaño: "' + contexto.nombre + '"',
         '<p class="explica">Este PDF ya está firmado digitalmente. Si le hago hueco ahora, la ' +
         'firma dejará de valer. Lo suyo es hacer el hueco antes de firmar. ¿Sigo de todas ' +
         'formas?</p>', 'Seguir de todas formas');
@@ -189,7 +189,7 @@ var PrepararDocumento = (function () {
 
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-ancho');
-    var promesa = U.preguntar('Preparar "' + contexto.nombre + '"', cuerpo, 'Preparar');
+    var promesa = U.preguntar('Ajustar tamaño: "' + contexto.nombre + '"', cuerpo, 'Preparar');
 
     var escalaPrevia = await renderizarEnCanvas(primera, $('preparar-canvas'), 500);
 

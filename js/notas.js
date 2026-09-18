@@ -230,11 +230,17 @@
 
   /* ---------- la caja de escribir directa, en la ficha del asunto ----------
 
-     17-sep-2026, fila 37 (docs/FICHA-DEL-ASUNTO-NUEVA.md, 2). Antes
-     había que escribir y pulsar "Añadir nota"; ahora se escribe
-     encima y se guarda sola, al estilo del tablón (js/tablon.js): sin
-     botón, con un retardo de un segundo desde la última tecla
-     (`RETARDO_AUTOGUARDADO`), nunca una escritura por pulsación.
+     17-sep-2026, fila 37 (docs/FICHA-DEL-ASUNTO-NUEVA.md, 2): se
+     escribe encima de la lista, sin ventana aparte, al estilo del
+     tablón (js/tablon.js). Hasta la fila 58 (18-sep-2026,
+     docs/AJUSTES-DE-USO-2026-09-18.md, 3) se guardaba sola cada
+     segundo desde la última tecla: Francisco veía la nota guardada
+     antes de terminar la frase. Ahora **no** se guarda mientras se
+     escribe: solo al pulsar *Guardar*, o al salir del recuadro
+     (perder el foco) si hay algo escrito. Si se intenta salir de la
+     ficha con texto sin guardar, `confirmarSalirDeFicha` avisa antes
+     de tirarlo (la usa `$('ficha-volver').onclick`, en
+     js/ficha-asunto.js).
 
      Mientras se sigue escribiendo (aunque la ficha se repinte sola
      por en medio, fila 34) el texto se va guardando EN LA MISMA nota,
@@ -244,60 +250,86 @@
      js/ficha-asunto.js) se llama a `olvidarBorrador()`: la próxima
      vez que se escriba algo, nace una nota nueva. */
 
-  var RETARDO_AUTOGUARDADO = 1000;
-  var borradorAbierto = null;   /* { asunto, id } | null */
-  var pendienteAutoguardado = null;
+  var borradorAbierto = null;        /* { asunto, id } | null */
+  var borradorUltimoGuardado = '';   /* lo que ya quedó guardado del borrador actual */
+  var guardandoBorrador = null;      /* la promesa del guardado en marcha, o null */
+  var cajaAsuntoActual = null;       /* el asunto de la caja de la ficha, mientras esté abierto */
 
   function olvidarBorrador() {
     borradorAbierto = null;
-    if (pendienteAutoguardado) { clearTimeout(pendienteAutoguardado); pendienteAutoguardado = null; }
+    borradorUltimoGuardado = '';
+    guardandoBorrador = null;
   }
 
   function idDelBorrador(a) {
     if (borradorAbierto && borradorAbierto.asunto === a.nombre) return borradorAbierto.id;
     var id = 'b' + Date.now() + Math.floor(Math.random() * 1000);
     borradorAbierto = { asunto: a.nombre, id: id };
+    borradorUltimoGuardado = '';
     return id;
   }
 
   /* `alGuardar`, si se pasa, se llama justo después de guardar de
      verdad (`js/ficha-asunto.js` le pasa su `apuntarHuella`). Sin esto,
-     el guardado automático deja la huella de la ficha desactualizada
+     guardar la nota deja la huella de la ficha desactualizada
      (`a.ficha.notas` cambia por dentro sin que nadie lo apunte), y el
      próximo repintado en segundo plano (`App.reengancharFicha`, cada
      pocos segundos) se cree que algo ha cambiado DE VERDAD y rehace la
      ficha entera sin que haga falta, con el riesgo de llevarse por
      delante una nota de un hito que se esté escribiendo a la vez en
-     otro campo. Apuntar la huella aquí evita ese repintado de más. */
-  async function guardarBorrador(a, campo, aviso, alGuardar) {
-    var texto = (campo.value || '').trim();
-    if (!texto) return;
-    var id = idDelBorrador(a);
-    try {
-      var lista = await U.mientrasGuarda(campo, function () {
-        return sustituirNota(a, texto, 'borrador', id);
-      });
-      var listaCaja = $('ficha-notas-lista');
-      if (listaCaja) listaCaja.innerHTML = pintarLista(lista);
-      if (aviso) {
-        aviso.textContent = lista.length === 1 ? '1 nota guardada.' : lista.length + ' notas guardadas.';
-      }
-      if (alGuardar) alGuardar();
-    } catch (e) {
-      if (aviso) aviso.textContent = 'No he podido guardar la nota: ' + e.message;
-    }
+     otro campo. Apuntar la huella aquí evita ese repintado de más.
+
+     Encadenada, no con un simple "si ya hay uno en marcha, no hagas
+     nada" (18-sep-2026, fila 58): abrir el aviso de "Tienes una nota
+     sin guardar" (`confirmarSalirDeFicha`, más abajo) le quita el foco
+     al campo —el propio cuadro pone el cursor en su primer campo—, así
+     que el `onblur` de aquí abajo dispara su propio guardado justo
+     antes de que se pulse "Guardar y salir". Con un simple booleano,
+     esa segunda llamada se encontraba el guardado del blur a medias y
+     se saltaba entera, sin esperar a que terminara: `volverALaLista()`
+     podía llegar a llamarse con el guardado de verdad todavía en el
+     aire. Encadenar la promesa hace que cualquiera que la espere
+     (`await guardarBorrador(...)`) espere de verdad a que el disco
+     quede escrito, venga la llamada de donde venga. */
+  function guardarBorrador(a, campo, aviso, alGuardar) {
+    var previo = guardandoBorrador || Promise.resolve();
+    var propia = previo.then(function () {
+      var texto = (campo.value || '').trim();
+      if (!texto || texto === borradorUltimoGuardado) return;
+      var id = idDelBorrador(a);
+      return U.mientrasGuarda(campo, function () { return sustituirNota(a, texto, 'borrador', id); })
+        .then(function (lista) {
+          borradorUltimoGuardado = texto;
+          var listaCaja = $('ficha-notas-lista');
+          if (listaCaja) listaCaja.innerHTML = pintarLista(lista);
+          if (aviso) {
+            aviso.textContent = lista.length === 1 ? '1 nota guardada.' : lista.length + ' notas guardadas.';
+          }
+          if (alGuardar) alGuardar();
+        })
+        .catch(function (e) {
+          if (aviso) aviso.textContent = 'No he podido guardar la nota: ' + e.message;
+        });
+    });
+    guardandoBorrador = propia;
+    propia.then(function () { if (guardandoBorrador === propia) guardandoBorrador = null; });
+    return propia;
   }
 
-  function pintarCajaAutoguardado(caja, a, abierto, alGuardar) {
+  function pintarCajaDeNota(caja, a, abierto, alGuardar) {
     var notas = notasDe(a);
+    cajaAsuntoActual = abierto ? a : null;
 
     caja.innerHTML =
       (abierto
         ? '<div class="nota-nueva">' +
             '<textarea id="ficha-nota-texto" class="campo" rows="2" ' +
               'placeholder="Qué ha pasado hoy en este asunto"></textarea>' +
-            '<span class="nota-aviso" id="ficha-nota-aviso">Las notas no se borran. Se guardan ' +
-              'solas, sin tener que pulsar nada.</span>' +
+            '<div class="nota-botonera">' +
+              '<span class="nota-aviso" id="ficha-nota-aviso">Se guarda al pulsar Guardar, o al ' +
+                'salir del recuadro si hay algo escrito.</span>' +
+              '<button type="button" id="ficha-nota-guardar" class="boton boton-principal">Guardar</button>' +
+            '</div>' +
           '</div>'
         : '<p class="explica">Asunto archivado: las notas se leen, pero ya no se escriben.</p>') +
       '<div id="ficha-notas-lista" class="notas-lista">' + pintarLista(notas) + '</div>';
@@ -307,27 +339,17 @@
     var campo = $('ficha-nota-texto');
     var aviso = $('ficha-nota-aviso');
 
-    function programar() {
-      if (pendienteAutoguardado) clearTimeout(pendienteAutoguardado);
-      pendienteAutoguardado = setTimeout(function () {
-        pendienteAutoguardado = null;
-        guardarBorrador(a, campo, aviso, alGuardar);
-      }, RETARDO_AUTOGUARDADO);
-    }
+    $('ficha-nota-guardar').onclick = function () { guardarBorrador(a, campo, aviso, alGuardar); };
 
-    campo.oninput = programar;
+    /* Perder el foco guarda, si hay algo escrito: es el único disparador
+       además del botón, desde la fila 58. */
     campo.onblur = function () {
-      if (!pendienteAutoguardado) return;
-      clearTimeout(pendienteAutoguardado);
-      pendienteAutoguardado = null;
-      guardarBorrador(a, campo, aviso, alGuardar);
+      if ((campo.value || '').trim()) guardarBorrador(a, campo, aviso, alGuardar);
     };
-    /* Control + Intro sigue guardando al momento, sin esperar al
-       segundo de retardo: la misma tecla que hacía "Añadir nota". */
+    /* Control + Intro sigue guardando al momento, como antes. */
     campo.onkeydown = function (ev) {
       if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) {
         ev.preventDefault();
-        if (pendienteAutoguardado) { clearTimeout(pendienteAutoguardado); pendienteAutoguardado = null; }
         guardarBorrador(a, campo, aviso, alGuardar);
       }
     };
@@ -337,10 +359,32 @@
      `U.conservandoLoEscrito` para que lo que se esté escribiendo, el
      foco y el cursor sobrevivan a un repintado (fila 34). `alGuardar`
      es opcional: `App.abrirFicha` le pasa su `apuntarHuella` para que
-     el guardado automático no deje la huella de la ficha atrasada. */
+     guardar la nota no deje la huella de la ficha atrasada. */
   function pintarEnFicha(caja, a, abierto, alGuardar) {
     if (!caja) return;
-    return U.conservandoLoEscrito(caja, function () { return pintarCajaAutoguardado(caja, a, abierto, alGuardar); });
+    return U.conservandoLoEscrito(caja, function () { return pintarCajaDeNota(caja, a, abierto, alGuardar); });
+  }
+
+  /* ---------- salir de la ficha con una nota sin guardar ----------
+
+     18-sep-2026, fila 58 (docs/AJUSTES-DE-USO-2026-09-18.md, 3):
+     `js/ficha-asunto.js` la llama antes de volver a la lista (botón
+     "← Volver" y Escape, que pulsa ese mismo botón). Sin nada
+     pendiente, resuelve enseguida y no interrumpe nada. */
+  async function confirmarSalirDeFicha() {
+    var campo = $('ficha-nota-texto');
+    if (!campo || !cajaAsuntoActual) return true;
+    var texto = (campo.value || '').trim();
+    if (!texto || texto === borradorUltimoGuardado) return true;
+
+    var cancelar = $('cuadro-cancelar');
+    if (cancelar) cancelar.textContent = 'Salir sin guardar';
+    var guardarYSalir = await U.preguntar('Tienes una nota sin guardar',
+      '<p class="explica">Hay texto sin guardar en la nota de este asunto.</p>', 'Guardar y salir');
+    if (cancelar) cancelar.textContent = 'Cancelar';
+
+    if (guardarYSalir) await guardarBorrador(cajaAsuntoActual, campo, $('ficha-nota-aviso'), null);
+    return true;
   }
 
   /* ---------- lo que se deja a la vista ----------
@@ -366,7 +410,8 @@
     cuando: cuando,
     yaTieneCorreo: yaTieneCorreo,
     pintarEnFicha: pintarEnFicha,
-    olvidarBorrador: olvidarBorrador
+    olvidarBorrador: olvidarBorrador,
+    confirmarSalirDeFicha: confirmarSalirDeFicha
   };
 
   /* ---------- arranque ---------- */

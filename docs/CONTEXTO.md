@@ -289,22 +289,33 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   `MutationObserver` que ya usaba), inserta el botón con `caja.insertBefore(b, principal)` antes
   de `.boton-principal`, no con `appendChild`: si no, "Comunicar" podría acabar después de
   "Archivar" según el orden de llegada de los observadores.
-- **El menú de tres puntos del `<h2 class="ficha-nombre">`** (`js/ficha-nombre-acciones.js`,
-  nuevo): envuelve `App.abrirFicha` igual que `js/copiar.js`, con su propio
+- **El menú de tres puntos del `<h2 class="ficha-nombre">`** (`js/ficha-nombre-acciones.js`):
+  envuelve `App.abrirFicha` igual que `js/copiar.js`, con su propio
   `MutationObserver` sobre `#pantalla-asunto` para sobrevivir a cada repintado con `innerHTML`.
   Opciones: "Editar el asunto" y, con `window.Papelera`, una raya y "Borrar el asunto" en rojo
   (`.ficha-menu-peligro`) — las dos solo si `abierto` (no existen en el ARCHIVO, igual que antes
-  no existían los botones); "Copiar el nombre del asunto" siempre (copia `a.nombre`, la carpeta
-  entera: se comprobó que eso es lo que copiaba de verdad el viejo "Copiar nombre", así que el
-  texto del menú es correcto tal cual). Las dos primeras llaman a `App.volverALaLista()`, ahora
-  **expuesta** desde `js/ficha-asunto.js` (antes privada) para que este fichero nuevo pueda
-  volver a la lista igual que hacían los botones de siempre.
-- **El icono de copiar el número del tercero** (`.boton-nie`, `js/copiar.js`) se muda de
-  `#ficha-acciones` al `<h2 class="ficha-nombre">` (`ponerNie()` cambia de sitio dónde busca y
-  dónde inserta: `document.querySelector('.ficha-nombre')` + `appendChild`, versión "chica" como
-  en las listas de resultados). No estaba en la lista de ficheros a tocar de
-  docs/CABECERA-DEL-ASUNTO.md, pero la propia fila lo pide (tabla del punto 4): cambio mínimo,
-  sin tocar la lógica de copiar.
+  no existían los botones). Sin ninguna opción (ARCHIVO), el botón "⋯" ni se pone. "Copiar el
+  nombre del asunto" ya no vive aquí desde la fila 58 (18-sep-2026,
+  docs/AJUSTES-DE-USO-2026-09-18.md, 1): es el botón "Asunto" de la fila de copiar de un gesto,
+  ver más abajo. Las dos opciones llaman a `App.volverALaLista()`, expuesta desde
+  `js/ficha-asunto.js` para que este fichero pueda volver a la lista igual que hacían los
+  botones de siempre.
+- **La fila de copiar de un gesto** (18-sep-2026, fila 58, `js/ficha-nombre-acciones.js`,
+  `ponerFilaDeCopiar`): debajo del `<h2>`, siempre a la vista, sin menú — Asunto, NIE, Nombre y
+  DNI/CIF, en ese orden; un botón sin dato no se pone. Sustituye al icono `.boton-nie` que antes
+  vivía pegado al `<h2>` (quitado de `js/copiar.js`) y a "Copiar el nombre del asunto" del menú
+  de tres puntos. Reutiliza `Copiar.boton` (el mismo copiado con aviso "Copiado" de siempre,
+  ahora expuesto en `window.Copiar` junto con `nieDeAsunto`, `categoriaDe` y `copiar`); "Asunto"
+  y "NIE" salen al momento (el número sale del propio nombre de la carpeta, sin fichero de
+  datos); "Nombre" y DNI/CIF (el botón se llama CIF en empresas, `Copiar.categoriaDe(a)`) piden
+  `FichaTercero.datosBasicos(a)`, que tarda. Esos dos se reservan **ocultos** (`hidden`) desde el
+  primer pintado y "revelar" solo les cambia `hidden` y a qué copia el clic, nunca añade un nodo
+  nuevo: añadirlo tarde es una mutación dentro de `#ficha-asunto-cuerpo`, y antes de esta fila
+  `js/hitos-panel.js` vigilaba esa caja entera (ver más abajo), así que ese repintado de sobra le
+  podía cerrar a Francisco un hito que acababa de desplegar para mirarlo. Se esconde entera con
+  la cabecera encogida (`.ficha-cabecera.encogida .ficha-copiar-fila`), igual que la línea gris.
+  Se comprueba con `pruebas/copiar-fila.mjs` (los cuatro botones, con RegAlum/RelPerCen/empresas
+  de mentira) y con los puntos 3 y 4 de `pruebas/cabecera-del-asunto.mjs`.
 - **`js/ficha-menus.js`** (nuevo): el menú pequeño reutilizable —abrir, cerrar con Escape (en
   captura, con `stopPropagation`) y al pulsar fuera, uno solo a la vez— que usan los tres puntos
   y "Comunicar". Muy parecido a `U.menuDeAcciones` (`js/util.js`), pero fichero aparte porque la
@@ -313,13 +324,12 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   `js/usabilidad.js` también escucha Escape en el documento (fuera de captura) y, sin ningún
   `#capa` abierto, pulsa `#ficha-volver` — el mismo cuidado que ya toma `js/huecos-buscador.js`
   por el mismo motivo.
-- **`esControlDeSoloLectura`** (`js/ficha-asunto.js`) gana dos casos: el disparador de los tres
-  puntos (`.ficha-nombre-menu-boton`, para que el menú se pueda abrir en modo consulta: dentro,
-  "Copiar el nombre del asunto" sigue funcionando y "Editar"/"Borrar" salen apagados solos, por
-  ser botones normales sin marcar) y el texto `'Copiar el nombre del asunto'` (sustituye a
-  `'Copiar nombre'`, retirado). "Comunicar" no se marca como de solo lectura: ya se apagaba
-  entero en consulta antes de esta fila (ninguna de sus dos acciones estaba en la lista blanca),
-  así que sigue igual, apagado el botón entero.
+- **`esControlDeSoloLectura`** (`js/ficha-asunto.js`) deja activos en modo consulta el disparador
+  de los tres puntos (`.ficha-nombre-menu-boton`: dentro, "Editar"/"Borrar" salen apagados solos,
+  por ser botones normales sin marcar) y la clase `.boton-copiar-fila` (fila 58: copiar no
+  cambia nada del asunto). "Comunicar" no se marca como de solo lectura: ya se apagaba entero en
+  consulta antes de esta fila (ninguna de sus dos acciones estaba en la lista blanca), así que
+  sigue igual, apagado el botón entero.
 - **"Documentos ▾"** (`js/ficha-documentos.js`, `ponerBotonGestionar(bloqueEl, a)`): mismo
   `App.verDocumentos(a)` de siempre, ahora en la cabecera del propio bloque, al lado del título;
   se pinta también con la carpeta vacía (antes del primer `return` de `pintar(a)`), comprobando
@@ -327,12 +337,13 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   `#ficha-documentos` por dentro).
 - **El `<h2>` con la cabecera encogida**: el nombre pasa a `<span class="ficha-nombre-texto">`
   dentro del `<h2>`; solo ese `<span>` lleva `overflow: hidden; text-overflow: ellipsis;` con la
-  cabecera encogida, nunca el `<h2>` entero, para que el icono de copiar y los tres puntos
-  —hermanos del `<span>`, no dentro de él— no se recorten con un nombre largo
-  (`.ficha-cabecera.encogida .ficha-nombre` pasa a `display: flex`).
+  cabecera encogida, nunca el `<h2>` entero, para que los tres puntos —hermano del `<span>`, no
+  dentro de él— no se recorten con un nombre largo (`.ficha-cabecera.encogida .ficha-nombre`
+  pasa a `display: flex`).
 - Se comprueba con `pruebas/cabecera-del-asunto.mjs` (11 escenarios): la barra con sus cinco
-  elementos y sin ninguno de los viejos, el menú de tres puntos y que Escape no echa de la ficha,
-  el icono según lleve o no número, la etiqueta de vencimiento pulsable y sus textos/colores
+  elementos y sin ninguno de los viejos, el menú de tres puntos (ahora de dos opciones) y que
+  Escape no echa de la ficha, el "NIE" de la fila de copiar según lleve o no número, la etiqueta
+  de vencimiento pulsable y sus textos/colores
   (probados llamando a `Plazos.etiquetaVencimiento` directamente, con fechas relativas a `hoy`,
   sin depender de qué día se ejecute la prueba), "Comunicar" con sus dos cuadros, "El encargo"
   guardando los dos datos de una vez, "Documentos ▾" también con la carpeta vacía, modo consulta,
@@ -586,6 +597,28 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
   encuentre apagado dentro de `#ficha-asunto-cuerpo` en cuanto no hay nadie en modo consulta
   (`aplicarModoConsulta`) — basta la clase `hito-doc-falta` (sin enganchar ningún `onclick`, y ya
   en gris por CSS).
+- **Asociar desde el documento** (18-sep-2026, fila 58, docs/AJUSTES-DE-USO-2026-09-18.md, 6):
+  además de "Apuntar un documento" desde el hito, cada fila de `js/ficha-documentos.js` lleva un
+  botón **Asociar a un hito**, con el menú pequeño de `js/ficha-menus.js` (los hitos visibles del
+  asunto y "Ninguno" para soltarlo, con un "✓" delante del que ya esté elegido). Solo sale si el
+  asunto tiene hitos. Elegir uno quita el documento del hito anterior (si tenía) y lo pone en el
+  nuevo — mismo dato de siempre (`Hitos.anadirDocumento`/`quitarDocumento`), ningún sitio nuevo
+  donde guardarlo. El documento ya asociado enseña el nombre del hito en pequeño, debajo del suyo
+  (un `<div>`, nunca un tercer `<span>`: `js/copiar.js` coge el ÚLTIMO `<span>` del botón para
+  saber qué nombre copiar). `FichaDocumentos.pintar` calcula el mapa documento → hito una vez por
+  repintado (`Hitos.hitosDe` + `Hitos.visibles`), igual que ya hacía `js/hitos-panel.js` con lo
+  suyo.
+- **El `MutationObserver` de `js/hitos-panel.js` no baja al árbol entero** (18-sep-2026, fila 58):
+  antes vigilaba `#ficha-asunto-cuerpo` con `subtree: true`, así que CUALQUIER mutación en
+  cualquier otro bloque de la ficha —la fila de copiar de un gesto rellenando "Nombre" en cuanto
+  responde el fichero de datos, la lista de documentos repintándose, "Datos y contacto"…— disparaba
+  este mismo repintado de sobra, y podía cerrarle a Francisco un hito que acababa de desplegar para
+  mirarlo, sin haber tocado nada todavía (`hitosAMedias`, más abajo en el mismo fichero, solo
+  guarda un hito a medias si tiene el foco o una nota sin guardar: uno abierto sin más se cierra en
+  cualquier repintado). Ahora solo `{ childList: true }`, sin `subtree`: basta para detectar un
+  repintado ENTERO de la ficha (`pintarLaFicha` rehace de un golpe los hijos directos de
+  `#ficha-asunto-cuerpo`), que es lo único que de verdad hace falta captar aquí — cualquier cambio
+  que sí toque a los hitos por su cuenta ya llama a `HitosPanel.programarRepintado()` él mismo.
 - **Responsable**: persona del centro (configurable en Ajustes › Hitos) o un papel fijo
   (`tercero`, `tutor`, `relacionado`) que la aplicación resuelve sola con datos del asunto
   (`Hitos.resolverResponsable`); sin resolver, se enseña en gris.
@@ -963,11 +996,46 @@ la línea pasa a avisar. Vive en `js/bandeja-correos.js`, `pintarUltimoCorreoRec
 
 ### El correo y la mensajería de Séneca
 
-Botones "Correo" y "Mensaje Séneca" en la ficha del asunto (`js/correo.js`). La aplicación **no
-envía nada**: prepara los campos y los deja listos. Al copiar el texto o abrir la ventana de
-redactar se apunta sola una nota (una sola vez por cuadro). Solo Séneca: no hay campo Para, y un
-solo botón que se va cambiando: "1. Copiar el asunto" → "2. Ahora, copiar el texto" → "Copiado.
-Pégalo y envía".
+Un solo botón "Comunicar" en la cabecera de la ficha (fila 52) abre "Correo electrónico" o
+"Mensaje de Séneca" (`js/correo.js`, `abrirCuadro(a, deSeneca)`). La aplicación **no envía
+nada**: prepara los campos y los deja listos. Al copiar el texto o abrir la ventana de redactar
+se apunta sola una nota (una sola vez por cuadro).
+
+Los dos cuadros viven cada uno en su propio fichero, sacados de `js/correo.js` (que llegó a pasar
+de las 800 líneas) para que se vean enteros: mismo ancho hasta 1100px y dos columnas a partir de
+900px. `js/correo.js` se queda solo con lo que comparten los dos —el asunto y el cuerpo con su
+plantilla, a quién se escribe en palabras, el rastro que se apunta en las notas— expuesto en
+`window.CorreoNucleo`; `abrirCuadro`/`pintarCuadro` deciden cuál tocaba y preparan lo común
+(persona, plantillas, valores) antes de llamar al que sea.
+
+- **`js/seneca-cuadro.js`** (fila 53, 18-sep-2026, docs/SENECA-CUADRO-ANCHO.md): izquierda,
+  destinatarios (`js/seneca-destinatarios.js`) y el asunto (un `<textarea>` que crece entre 2 y 5
+  renglones, con su cuenta de caracteres); derecha, la plantilla y el texto del mensaje. Sin
+  campo "Para": en Séneca los destinatarios se marcan en la propia lista de Séneca, y lo que
+  ayuda es acordarse de a quién (`CorreoNucleo.aQuien`). Dos botones numerados, cada uno copia
+  siempre lo suyo, se pulsen en el orden que se pulsen: "1. Copiar el asunto" y "2. Copiar el
+  texto" (recorta a `MAXIMO_LETRAS_SENECA`, 4000, con aviso). El ayudante de instalación
+  (`js/seneca-ayudante.js`) sale siempre a la vista; su explicación, plegada en un `<details>`.
+- **`js/correo-cuadro.js`** (fila 58, 18-sep-2026, docs/AJUSTES-DE-USO-2026-09-18.md, 5): el
+  problema que resolvía era que el cuadro salía muy alto y estrecho, y la lista de "Documentos de
+  este asunto" (`js/correo-adjuntos.js`, que ya la pintaba desplegada, con casilla y tamaño) se
+  quedaba fuera de la pantalla. Izquierda: "Para" (con casillas, "Otro correo", "Añadir un
+  grupo", la copia oculta) y el asunto, y debajo los documentos que se adjuntan; derecha, la
+  plantilla y el cuerpo. `.cuadro-correo` (`css/correo.css`) fija la cabecera y la botonera: solo
+  `#cuadro-cuerpo` se desplaza (`flex: 1 1 auto; overflow-y: auto`), igual de acotado en alto que
+  `.cuadro-ancho`, para que el título y "Abrir en Gmail"/"Abrir en el correo del ordenador" nunca
+  se salgan de la pantalla. Este fichero pasa a ser dueño de "Para" (`elegidos`), la copia oculta
+  de los grupos (`cco`/`ccoSinCorreo`) y los últimos documentos adjuntados, reiniciados en cada
+  `cuerpoHtml()` (mismo patrón que `SenecaCuadro`); `window.CorreoCuadro` expone `paraDelCuadro`,
+  `ccoDirecciones` y `documentosAdjuntados` para que `textoDeLaNota` (en `js/correo.js`) arme el
+  rastro. `js/correo-adjuntos.js` no cambia nada de por dentro: sigue pintando la lista desplegada
+  y leyendo "Para"/la copia oculta directamente del DOM (`paraActual`/`ccoActual`), como siempre.
+
+Se comprueba con `pruebas/seneca-cuadro-ancho.mjs` (Séneca) y con `pruebas/asunto-sin-eleccion.mjs`,
+`pruebas/plantillas.mjs`, `pruebas/envios.mjs` y `pruebas/grupos-navegador.mjs` (Correo: los dos
+cuadros comparten los mismos ids de siempre —`#correo-asunto`, `#correo-cuerpo-texto`,
+`#correo-plantilla`, `#correo-otro`, `#correo-grupo`, `#correo-cco-caja`, `#adjuntos-lista`—, así
+que ninguna de esas pruebas tuvo que cambiar de selectores, solo de disposición).
 
 ### "Lo pide": quién ha pedido la gestión (17-sep-2026, fila 28, docs/LO-PIDE.md)
 
@@ -1270,11 +1338,16 @@ vuelta: mira la carpeta él solo y pregunta de qué documento es.
   PDF como mirado, sin tocar nada; `RegistroSellado.marcarIgnorado`).
 - **Al elegir un documento** (`RegistroSellado.asociar`): el PDF sellado **se renombra**
   (`Carpetas.renombrarFichero`) con el nombre que le toca —el mismo que calcula hoy el paso de
-  Registrar (`RegistroSellado.nombreParaSello`, misma fórmula que `registro.js`)—, el documento
-  viejo (el que se subió sin sellar) se manda a la papelera (`Papelera.mandarDocumentoDeAsunto`,
-  que además apunta su propia nota de "mandó a la papelera"), y se apunta la nota de registro con
-  `Notas.sustituir`. No se crea ningún fichero nuevo. Si el nombre nuevo ya existe en la carpeta,
-  avisa y no toca nada (`RegistroSellado.hayColision`).
+  Registrar (`RegistroSellado.nombreParaSello`, misma fórmula que `registro.js`)—, y se apunta la
+  nota de registro con `Notas.sustituir`. No se crea ningún fichero nuevo. Si el nombre nuevo ya
+  existe en la carpeta, avisa y no toca nada (`RegistroSellado.hayColision`). **El documento
+  original ya no va a la papelera** (18-sep-2026, fila 58, docs/AJUSTES-DE-USO-2026-09-18.md, 4:
+  antes de eso, si el registro salía mal había que volver a escanear): se queda en la misma
+  carpeta, también renombrado, con "SIN SELLAR" al final del nombre, antes de la extensión
+  (`RegistroSellado.nombreSinSellar`); si ese nombre ya existiera, se numera "(2)", "(3)"…
+  (`RegistroSellado.nombreLibreEntre`, sobre la lista ya leída, sin volver a tocar el disco). En
+  la lista de documentos de la ficha (`js/ficha-documentos.js`) el que lleva "SIN SELLAR" sale en
+  gris claro (`.ficha-documento-sinsellar`), para no confundirlo con el sellado.
 - **`Notas.sustituir(asunto, texto, campoClave, valorClave, extra)`** (nueva, `js/notas.js`): como
   `Notas.anadir`, pero si ya hay una nota con ese mismo `campoClave`/`valorClave` la sustituye en
   su sitio en vez de añadir otra debajo. El registro de un documento (aquí y en `js/registro.js`,
@@ -1298,14 +1371,21 @@ vuelta: mira la carpeta él solo y pregunta de qué documento es.
   el propio. El aviso de DNI que falta lo sigue decidiendo `js/dni.js`, sin duplicar esa cuenta.
   Todo esto se pinta desde `js/ficha-tercero.js` (`window.FichaTercero.pintarLinea(caja, a)`), que
   no toca `js/copiar.js` (es privado a sus propias pantallas) y rehace en pequeño su mismo botón de
-  copiar. La caja de notas (`Notas.pintarEnFicha`, `js/notas.js`) ya no tiene botón "Añadir nota":
-  se escribe encima y se guarda sola, con `U.mientrasGuarda` y un retardo de un segundo desde la
-  última tecla (`sustituirNota` con una clave de sesión, `borradorAbierto`, para seguir metiendo
-  texto en la MISMA nota mientras la ficha se repinta sola por debajo; `App.abrirFicha` llama a
-  `Notas.olvidarBorrador()` para que la próxima ficha que se abra empiece una nota nueva). No hay
-  botón "Escribirle" en las tarjetas de tutor: `js/correo.js` no expone ninguna función pública
-  para abrir su cuadro con un destinatario puesto (su `abrirCuadro` es privado a su propio IIFE), y
-  tocar ese fichero se salía de esta fila.
+  copiar. La caja de notas (`Notas.pintarEnFicha`, `js/notas.js`) lleva botón **Guardar**: hasta la
+  fila 58 (18-sep-2026, docs/AJUSTES-DE-USO-2026-09-18.md, 3) se guardaba sola con un retardo de un
+  segundo desde la última tecla, y Francisco veía la nota guardada antes de terminar la frase. Ahora
+  **no** se guarda mientras se escribe: solo al pulsar Guardar, o al perder el foco el recuadro si
+  hay algo escrito (`guardarBorrador`, encadenada por promesa —no un simple booleano— para que dos
+  disparos casi a la vez, por ejemplo perder el foco justo al abrirse el aviso de abajo, no se
+  pisen ni se salten uno al otro sin esperar). Sigue metiendo el texto en la MISMA nota mientras la
+  ficha se repinta sola por debajo (`sustituirNota` con una clave de sesión, `borradorAbierto`;
+  `App.abrirFicha` llama a `Notas.olvidarBorrador()` para que la próxima ficha que se abra empiece
+  una nota nueva). Si se intenta salir de la ficha (botón "← Volver" o Escape) con texto sin
+  guardar, `Notas.confirmarSalirDeFicha()` avisa antes: "Tienes una nota sin guardar", con
+  *Guardar y salir* (espera al guardado, después vuelve) / *Salir sin guardar* (se pierde lo
+  escrito). No hay botón "Escribirle" en las tarjetas de tutor: `js/correo.js` no expone ninguna
+  función pública para abrir su cuadro con un destinatario puesto (su `abrirCuadro` es privado a su
+  propio IIFE), y tocar ese fichero se salía de esta fila.
 - **La ficha, mientras se resuelve**: `sel.onchange`/`noEs.onclick` usan `U.mientrasGuarda` (apaga
   el control mientras dura) y repintan documentos, notas y el propio aviso al terminar.
 
@@ -2116,11 +2196,13 @@ docs/HUECO-PARA-SELLO-Y-FIRMA.md)
 
 Séneca pinta su sello de registro en una banda estrecha arriba de cada página (a la derecha si es
 entrada, a la izquierda si es salida), y la firma digital del director deja una banda al pie. Si el
-documento tiene texto ahí, queda pisado. Botón nuevo **Preparar el documento**, junto a Separar,
-Unir y Sacar páginas (en la ficha de un asunto y en Por clasificar): encoge el contenido de todas
-las páginas y lo recoloca para dejar libres las dos bandas, de lado a lado de la hoja (vale igual
-para entrada que para salida, sin tener que elegir). **El orden importa**: preparar, luego firmar,
-luego registrar en Séneca; un PDF ya firmado no se debe tocar sin invalidar la firma.
+documento tiene texto ahí, queda pisado. Botón **Ajustar tamaño** (llamado "Preparar el
+documento" hasta la fila 58, 18-sep-2026, docs/AJUSTES-DE-USO-2026-09-18.md, 2: solo cambió el
+texto que se ve, ni el fichero ni la función), junto a Separar, Unir y Sacar páginas (en la ficha
+de un asunto y en Por clasificar): encoge el contenido de todas las páginas y lo recoloca para
+dejar libres las dos bandas, de lado a lado de la hoja (vale igual para entrada que para salida,
+sin tener que elegir). **El orden importa**: ajustar el tamaño, luego firmar, luego registrar en
+Séneca; un PDF ya firmado no se debe tocar sin invalidar la firma.
 
 - **`js/pdf-margenes.js`** (`window.PdfMargenes`): solo bytes, sin disco ni DOM, igual que
   `js/pdf-herramientas.js` (usa `PdfHerramientas.cargarPdfLib`, sin tocar ese fichero).
@@ -2459,24 +2541,24 @@ de `App` va después del fichero que lo define.
 | `js/hitos.js`, `js/hitos-archivo.js` | El modelo de los hitos de un asunto: leer/escribir `hitos.json`, crearlos desde la guía, marcarlos, bifurcaciones, responsables y el historial al archivar |
 | `js/que-me-toca.js` | Pantalla propia "Qué me toca": cruza los hitos pendientes y en curso de todos los asuntos abiertos, en tres bloques (`css/que-me-toca.css`); arriba, el aviso de aspirantes sin Nº de identificación escolar (fila 42) |
 | `js/presencia.js` | No pisarse en un mismo asunto: la señal de `_GESTOR/presencia.json`, la vigilancia y la marca de la tarjeta de la lista |
-| `js/notas.js` | Las notas de cada asunto, con su enlace y su botón; `Notas.pintarEnFicha` es la caja de escribir directa de la ficha, con guardado automático (fila 37) |
+| `js/notas.js` | Las notas de cada asunto, con su enlace y su botón; `Notas.pintarEnFicha` es la caja de escribir directa de la ficha, con botón Guardar (se guarda al pulsarlo o al perder el foco, nunca al teclear, fila 58); `confirmarSalirDeFicha` avisa si se sale con algo sin guardar |
 | `js/registro.js` | Registrar un documento en un paso, sin nombrarlo dos veces |
 | `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF (hasta 10 páginas); `textoDe` saca el texto de hasta 5 páginas sin buscar nada (17-sep-2026, fila 41) |
 | `js/lector-documentos.js` | `LectorDocumentos.analizar(texto, contexto)`, puro: propone tipo, fecha, documentos de identidad y tercero de un documento suelto (17-sep-2026, fila 41); si un documento de identidad no cuadra con nadie, también `terceroDesconocido` (fila 42) |
 | `js/registro-sellado.js` | Ver solo un PDF ya sellado en la carpeta del asunto, y colocarlo sin duplicarlo |
 | `js/pdf-herramientas.js` | Partir, unir y sacar páginas de un PDF con pdf-lib: solo bytes, sin disco ni DOM |
-| `js/pdf-margenes.js` | La cuenta y el PDF nuevo de "Preparar el documento": solo bytes, sin disco ni DOM (18-sep-2026, fila 57) |
-| `js/preparar-documento.js` | El cuadro de "Preparar el documento": vista previa con pdf.js, bandas ocupadas o libres, y el guardado con papelera (18-sep-2026, fila 57) |
+| `js/pdf-margenes.js` | La cuenta y el PDF nuevo de "Ajustar tamaño" (llamado "Preparar el documento" hasta la fila 58): solo bytes, sin disco ni DOM (18-sep-2026, fila 57) |
+| `js/preparar-documento.js` | El cuadro de "Ajustar tamaño": vista previa con pdf.js, bandas ocupadas o libres, y el guardado con papelera (18-sep-2026, fila 57; el nombre del botón cambió en la fila 58) |
 | `js/pdf-separar-unir.js` | El cuadro de Separar, Unir y Sacar páginas: miniaturas con pdf.js, tijeras, casillas |
 | `js/verificacion.js` | El código de verificación del pie de un documento, y su dirección |
 | `js/lib/pdf.min.js`, `js/lib/pdf.worker.min.js` | pdf.js (Mozilla) 3.11.174, copiado tal cual |
 | `js/ficha-asunto.js` | La pantalla de un asunto: cabecera (con la línea gris del subtítulo, fila 51; barra de 5 acciones y el `<h2>` con sus dos añadidos, fila 52), Hitos a la izquierda, Documentos en el centro, "Datos y contacto"/Notas/los dos plegables/Datos del trámite a la derecha |
 | `js/ficha-menus.js` | El menú pequeño reutilizable de la cabecera (abrir, cerrar con Escape/al pulsar fuera, uno solo a la vez): lo usan los tres puntos del nombre y "Comunicar" (18-sep-2026, fila 52) |
-| `js/ficha-nombre-acciones.js` | El menú de tres puntos del `<h2>` del nombre del asunto: Editar, Copiar el nombre del asunto, Borrar (18-sep-2026, fila 52) |
+| `js/ficha-nombre-acciones.js` | El menú de tres puntos del `<h2>` del nombre del asunto (Editar, Borrar, fila 52) y, debajo, la fila de copiar de un gesto (Asunto, NIE, Nombre, DNI/CIF, fila 58) |
 | `js/ficha-plegables.js` | Los dos bloques plegables de la ficha ("Otros asuntos de este tercero", "Personas y entidades relacionadas"): montar el `<details>`, el resumen con la cuenta, guardar y reponer el abierto/cerrado entre un repintado y otro (18-sep-2026, fila 51) |
-| `js/ficha-documentos.js` | Los documentos de la carpeta, en la ficha del asunto (separado de `js/ficha-asunto.js` en la fila 26); pone la clase `vacio` al bloque cuando no hay ninguno (fila 51); botón "Documentos ▾" en la cabecera del bloque (fila 52) |
+| `js/ficha-documentos.js` | Los documentos de la carpeta, en la ficha del asunto (separado de `js/ficha-asunto.js` en la fila 26); pone la clase `vacio` al bloque cuando no hay ninguno (fila 51); botón "Documentos ▾" en la cabecera del bloque (fila 52); el original "SIN SELLAR" en gris y "Asociar a un hito" en cada fila (fila 58) |
 | `js/ficha-tercero.js`, `css/ficha-tercero.css` | "Datos y contacto" del tercero: la línea resumen y la ventana "Ver todo" con los tutores agrupados por persona (separado de `js/ficha-asunto.js` en la fila 37) |
-| `js/hitos-panel.js` | Pinta los hitos en la ficha del asunto (los pasos de la guía SON los hitos): el observador, el repintado y la creación automática |
+| `js/hitos-panel.js` | Pinta los hitos en la ficha del asunto (los pasos de la guía SON los hitos): el observador (solo `childList` sobre `#ficha-asunto-cuerpo`, sin `subtree`, desde la fila 58), el repintado y la creación automática |
 | `js/hitos-panel-lista.js` | La otra mitad del panel de hitos: la fila de cada hito, su cuerpo desplegado y el cambio de rama |
 | `js/duplicados.js` | ¿Esto no lo hicimos ya? Asuntos iguales del mismo tercero; exporta también `carpetaDelTercero` (fila 40) |
 | `js/relacionados.js` | Terceros relacionados con un asunto, la nota al archivar, "+ Añadir varios" y los atajos de alumnado |
@@ -2487,10 +2569,11 @@ de `App` va después del fichero que lo define.
 | `js/tipos-buscador.js` | Buscar el tipo de asunto por letras, y los más usados arriba |
 | `js/via-contacto.js` | Los teléfonos y correos del tercero, como botones |
 | `js/tablon.js` | El tablón de notas rápidas, con las notas "Solo para mí" |
-| `js/copiar.js` | Los botones de copiar: el Nº escolar y el nombre del documento |
+| `js/copiar.js` | Los botones de copiar: el nombre del documento en la ficha, y `Copiar.boton`/`nieDeAsunto`/`categoriaDe`/`copiar` expuestos en `window.Copiar` para la fila de copiar de un gesto (`js/ficha-nombre-acciones.js`, fila 58) |
 | `js/plantillas.js` | Leer y guardar `plantillas.json`, montar `Plantillas.valoresDeAsunto` y rellenar los huecos: el motor, sin pantalla |
 | `js/plantillas-ajustes.js` | Las plantillas de correo (sacado de `js/plantillas.js`); desde el 17-sep-2026 (fila 39) pinta solo las de un tipo dentro de su pantalla (`PlantillasAjustes.pintarDeTipo`) y los campos de Datos del centro y firma, en "El centro" |
-| `js/correo.js` | El correo y el mensaje de Séneca, con su rastro, sus plantillas y los grupos en copia oculta; expone `window.CorreoGrupos` (fila 47) para que `js/seneca-destinatarios.js` reutilice el mismo desplegable |
+| `js/correo.js` | El correo y el mensaje de Séneca: la lógica compartida (rastro, plantillas, grupos en copia oculta) y quién abre y pinta el cuadro (`abrirCuadro`/`pintarCuadro`, que desde la fila 58 delegan el cuerpo propio de cada cuadro en `js/seneca-cuadro.js`/`js/correo-cuadro.js`); expone `window.CorreoGrupos` (fila 47) para que `js/seneca-destinatarios.js` reutilice el mismo desplegable |
+| `js/correo-cuadro.js`, `css/correo.css` (`.cuadro-correo`, `.correo-grid`) | El cuerpo propio del cuadro de Correo (separado de `js/correo.js` en la fila 58): destinatario, asunto, mensaje, documentos adjuntos y CCO, en dos columnas |
 | `js/idea.js` | El usuario IdEA de una persona (y el de sus tutores legales), leído por el título de columna del CSV, como `js/dni.js` (fila 47) |
 | `js/seneca-destinatarios.js` | La lista de usuarios IdEA del cuadro de Séneca, en chips, con "Copiar la lista"/"Copiar el siguiente" (fila 47) |
 | `js/seneca-ayudante.js`, `css/relacionados.css` (`.marcado-chip-copiado`) | El enlace-marcador que pega los usuarios IdEA uno a uno en Séneca (fila 47) |

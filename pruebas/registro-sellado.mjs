@@ -107,18 +107,22 @@ console.log('--- se elige el documento del que es el registro ---');
 await pagina.selectOption('.sello-elegir', ORIGINAL);
 await pagina.waitForTimeout(500);
 
-await comprobar('el PDF sellado se ha renombrado, y el original ya no está',
+/* Desde la fila 58 (18-sep-2026, docs/AJUSTES-DE-USO-2026-09-18.md, 4)
+   el original ya no va a la papelera: se queda en la carpeta,
+   renombrado con "SIN SELLAR" al final. */
+const SIN_SELLAR = '260911 SOLICITUD Prueba del sello SIN SELLAR.pdf';
+await comprobar('el PDF sellado se ha renombrado, y el original se conserva como SIN SELLAR',
   pagina.evaluate(async (asunto) => {
     const carpeta = await window.__disco.abiertos.getDirectoryHandle(asunto);
     const nombres = [];
     for await (const p of carpeta.entries()) nombres.push(p[0]);
     return nombres.sort();
   }, NOMBRE_ASUNTO),
-  ['260911 26EM0368 SOLICITUD Prueba del sello.pdf'].sort());
+  ['260911 26EM0368 SOLICITUD Prueba del sello.pdf', SIN_SELLAR].sort());
 
 await comprobar('el aviso ha desaparecido', pagina.locator('.aviso-sello').count(), 0);
 
-await comprobar('se apunta la nota del registro, sustituyendo si hiciera falta',
+await comprobar('se apunta la nota del registro, sin ninguna de mandarlo a la papelera',
   pagina.evaluate(async (asunto) => {
     const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
     const h = await g.getFileHandle('asuntos.json');
@@ -126,8 +130,10 @@ await comprobar('se apunta la nota del registro, sustituyendo si hiciera falta',
     const notas = (j.asuntos[asunto] && j.asuntos[asunto].notas) || [];
     return notas.map(n => n.texto).sort();
   }, NOMBRE_ASUNTO),
-  ['Francisco mandó a la papelera: ' + ORIGINAL,
-   'Registrado 26EM0368 el 10/09/2026 · ' + ORIGINAL].sort());
+  ['Registrado 26EM0368 el 10/09/2026 · ' + ORIGINAL + '. Se conserva el original sin sellar.'].sort());
+
+await comprobar('el documento SIN SELLAR sale en gris, debajo del sellado',
+  pagina.locator('.ficha-documento-sinsellar').count(), 1);
 
 console.log('--- "No es un registro" descarta el aviso y no vuelve a preguntar ---');
 const OTRO_SELLADO = '29700777 - Otro papel.pdf';

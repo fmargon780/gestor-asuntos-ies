@@ -5,6 +5,54 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 18-sep-2026 — Seis arreglos de uso diario
+
+Fila 58 de la cola (`docs/COLA.md`, `docs/AJUSTES-DE-USO-2026-09-18.md`), seis puntos sueltos
+pedidos por Francisco tras un día de uso real:
+
+1. **La fila de copiar de un gesto** (`js/ficha-nombre-acciones.js`, `ponerFilaDeCopiar`): debajo
+   del nombre del asunto, siempre a la vista y sin menú, cuatro botones — Asunto, NIE, Nombre y
+   DNI/CIF (CIF en empresas) — cada uno con el mismo copiado de siempre. "Copiar el nombre del
+   asunto" sale del menú de tres puntos (ya no hace falta). Nombre y DNI/CIF tardan (piden el
+   tercero) y se reservan `hidden` desde el primer pintado; "revelar" solo les quita `hidden`,
+   nunca añade un nodo nuevo — ver el punto 6.
+2. **"Preparar el documento" pasa a llamarse "Ajustar tamaño"**, en el botón y en el título del
+   cuadro; el mecanismo (fila 57) no cambia.
+3. **La caja de escribir una nota no guarda al teclear**, solo al pulsar Guardar o al perder el
+   foco; y si se sale de la ficha con algo sin guardar, avisa y ofrece "Guardar y salir"
+   (`Notas.confirmarSalirDeFicha`).
+4. **El documento sellado que sustituye a uno de Por clasificar ya no manda el original a la
+   papelera**: lo renombra a "… SIN SELLAR" y lo conserva en la carpeta (`js/registro-sellado.js`).
+5. **Cada documento de la ficha se puede asociar a un hito a mano** ("Asociar a un hito", con la
+   etiqueta del hito ya asociado a la vista), aparte de la asociación automática al "Apuntar un
+   documento" de un hito que ya existía.
+6. **El cuadro de Correo se reparte en dos columnas**, como el de Séneca (fila 53): se saca su
+   cuerpo propio a `js/correo-cuadro.js` (nuevo, mismo patrón que `js/seneca-cuadro.js`),
+   `js/correo.js` se queda con la lógica compartida y con abrir/pintar el cuadro correcto.
+
+**Dos carreras de datos de verdad, encontradas al pasar la batería completa** (no eran fallos de
+las pruebas, sino del código):
+
+- El botón "Nombre"/"DNI-CIF" del punto 1, al revelarse tarde, mutaba `#ficha-asunto-cuerpo`; el
+  `MutationObserver` de `js/hitos-panel.js` escuchaba con `{childList:true, subtree:true}` y
+  repintaba el panel de hitos por esa mutación ajena, colapsando un hito que el usuario tenía
+  desplegado a medio escribir. Arreglado por dos lados: el patrón `hidden` del punto 1 (evita la
+  mutación) y estrechar el observador a `{childList:true}` sin `subtree` (cada acción que de
+  verdad cambia un hito ya llama a `HitosPanel.programarRepintado()` por su cuenta, comprobado a
+  mano en `js/hitos-panel-lista.js`, `js/hitos-documentos.js` y `js/ficha-asunto.js`).
+- Al salir de la ficha con una nota sin guardar (punto 3), el cuadro de aviso enfoca su primer
+  campo y eso dispara un guardado por `blur` de la nota A LA VEZ que el "Guardar y salir" explícito
+  del propio aviso. Con el cerrojo antiguo (un booleano) el segundo guardado veía el cerrojo
+  puesto y se rendía sin esperar al primero, así que se podía salir antes de que el guardado
+  llegase a disco. Arreglado cambiando `guardarBorrador` a una cola de promesas encadenadas:
+  esperar cualquier guardado espera ahora a toda la cola, incluido uno disparado a la vez.
+
+Pruebas: `pruebas/copiar-fila.mjs` y `pruebas/asociar-documento-a-hito.mjs` (nuevas),
+`pruebas/notas-asunto-no-se-borran.mjs` y `pruebas/cabecera-del-asunto.mjs` (revisadas a fondo);
+de paso se corrigió `pruebas/plantillas.mjs`, que apuntaba a ids del cuadro de Séneca de antes de
+la fila 53 (ya señalado como pendiente en una revisión anterior, y bloqueaba tener la batería en
+verde para esta fila).
+
 ## 18-sep-2026 — Hueco para el sello de Séneca y la firma del director
 
 Fila 57 de la cola (`docs/COLA.md`, `docs/HUECO-PARA-SELLO-Y-FIRMA.md`), acordada con Francisco el

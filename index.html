@@ -504,15 +504,15 @@
       </details>
 
       <!-- Fila 57, 18-sep-2026, docs/HUECO-PARA-SELLO-Y-FIRMA.md: las
-           dos medidas que usa "Preparar el documento". Las lee y las
-           guarda js/ajustes-centro.js. -->
+           dos medidas que usa "Ajustar tamaño" (antes "Preparar el
+           documento", fila 58). Las lee y las guarda js/ajustes-centro.js. -->
       <details class="bloque-ajustes">
         <summary>
           <span class="bloque-titulo">Sello y firma en el papel</span>
           <span class="bloque-pie">Cuánto hueco dejar libre para el sello de Séneca y para la firma</span>
         </summary>
         <div class="bloque-cuerpo">
-      <p class="explica">El botón "Preparar el documento" encoge un PDF para dejar libres estas dos
+      <p class="explica">El botón "Ajustar tamaño" encoge un PDF para dejar libres estas dos
          bandas, de lado a lado de la hoja. Cada tipo de asunto dice si lleva sello, si lleva firma,
          o las dos cosas (en su propia pantalla, dentro de "Datos del tipo").</p>
       <div class="dos-columnas">
@@ -817,6 +817,15 @@
 <script src="js/bandeja-adjuntos-lector.js"></script>
 <script src="js/bandeja-enlace.js"></script>
 <script src="js/correo-adjuntos.js"></script>
+<!-- js/correo-cuadro.js (fila 58, 18-sep-2026,
+     docs/AJUSTES-DE-USO-2026-09-18.md, 5): el cuadro de "Correo
+     electrónico", sacado de js/correo.js igual que se hizo con Séneca
+     en la fila 53. Va después de js/correo.js (usa
+     `window.CorreoNucleo`), js/plantillas.js/js/plantillas-ajustes.js
+     (Plantillas.*, para el desplegable "Plantilla") y
+     js/correo-adjuntos.js (CorreoAdjuntos.enganchar, para adjuntar
+     documentos), los tres ya definidos en tiempo de carga. -->
+<script src="js/correo-cuadro.js"></script>
 <script src="js/barra.js"></script>
 <script src="js/vista.js"></script>
 <script src="js/cabecera-fija.js"></script>

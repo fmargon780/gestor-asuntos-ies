@@ -349,6 +349,19 @@
     if (cuadro) cuadro.classList.remove('cuadro-ancho');
   }
 
-  window.FichaTercero = { pintarLinea: pintarLinea };
+  /* Expuesta para js/ficha-nombre-acciones.js (18-sep-2026, fila 58,
+     docs/AJUSTES-DE-USO-2026-09-18.md, 1): los botones "Nombre" y
+     "DNI"/"CIF" de la fila de copiar necesitan el mismo tercero que ya
+     busca `pintarLinea`, sin inventar otra búsqueda. `Datos.cargar`
+     guarda en caché el fichero leído, así que buscarlo dos veces no
+     vuelve a leer el CSV. */
+  async function datosBasicos(a) {
+    var r = await buscarPersona(a);
+    if (!r.persona) return { categoria: r.categoria, persona: null, resumen: null };
+    return { categoria: r.categoria, persona: r.persona,
+             resumen: Datos.resumenDeTercero(r.persona, r.categoria) };
+  }
+
+  window.FichaTercero = { pintarLinea: pintarLinea, datosBasicos: datosBasicos };
 
 })();

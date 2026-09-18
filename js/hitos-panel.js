@@ -81,6 +81,24 @@
     };
   })();
 
+  /* Sin `subtree` (18-sep-2026, fila 58, docs/AJUSTES-DE-USO-2026-09-18.md):
+     lo único que hace falta detectar aquí es un repintado ENTERO de la
+     ficha (`pintarLaFicha`, js/ficha-asunto.js, que rehace de un
+     golpe los hijos directos de `#ficha-asunto-cuerpo`, `#ficha-guia`
+     entre ellos); eso ya lo capta `childList` sin bajar al resto del
+     árbol. Cualquier cambio que sí toque a los hitos por su cuenta
+     —marcar, notas, responsable, fecha, apuntar un documento, cambiar
+     de rama, escribir la guía— ya llama a `programarRepintado()` él
+     mismo (búscalo en js/hitos-panel-lista.js, js/hitos-documentos.js
+     y js/ficha-asunto.js). Con `subtree: true` cualquier mutación en
+     cualquier otro bloque de la ficha —los botones de copiar de un
+     gesto rellenando "Nombre" en cuanto responde el fichero de datos,
+     fila 58, 1; la lista de documentos repintándose; "Datos y
+     contacto"…— disparaba este mismo repintado de sobra, y podía
+     cerrar un hito que Francisco acababa de desplegar para mirarlo,
+     sin haber tocado nada todavía (`hitosAMedias`, aquí abajo, solo
+     guarda un hito a medias si tiene el foco o una nota sin guardar:
+     uno abierto sin más se cierra en cualquier repintado). */
   function asegurarObservador() {
     var raiz = $('ficha-asunto-cuerpo');
     if (!raiz) return;
@@ -89,7 +107,7 @@
       if (repintando) return;
       programarRepintado();
     });
-    observador.observe(raiz, { childList: true, subtree: true });
+    observador.observe(raiz, { childList: true });
   }
 
   function programarRepintado() {

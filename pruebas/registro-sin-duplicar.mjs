@@ -4,8 +4,8 @@
    cargan tal cual en un contexto de Node con `vm`.
 
    Lo que necesita un PDF de verdad o el disco (leer el sello dentro
-   del fichero, renombrar, mandar a la papelera) no se prueba aquí:
-   se comprueba a mano, como dice el propio documento. */
+   del fichero, renombrar los dos ficheros) no se prueba aquí: se
+   comprueba a mano, como dice el propio documento. */
 import fs from 'node:fs';
 import vm from 'node:vm';
 
@@ -83,6 +83,26 @@ comprobar('6. hay colisión cuando el nombre ya existe en la carpeta',
 comprobar('6b. sin colisión cuando el nombre no está',
   RegistroSellado.hayColision(['260907 SOLICITUD 26-27.pdf'], '260907 26EM0368 SOLICITUD 26-27.pdf'),
   false);
+
+/* 7. Fila 58 (18-sep-2026, docs/AJUSTES-DE-USO-2026-09-18.md, 4): el
+   original conservado, y su numeración si ya hubiera uno igual. */
+comprobar('7a. "SIN SELLAR" va antes de la extensión',
+  RegistroSellado.nombreSinSellar('260907 SOLICITUD 26-27.pdf'),
+  '260907 SOLICITUD 26-27 SIN SELLAR.pdf');
+comprobar('7b. sin extensión, se pega al final tal cual',
+  RegistroSellado.nombreSinSellar('SOLICITUD 26-27'), 'SOLICITUD 26-27 SIN SELLAR');
+comprobar('7c. sin colisión, el nombre pedido se queda igual',
+  RegistroSellado.nombreLibreEntre(['otro.pdf'], '260907 SOLICITUD 26-27 SIN SELLAR.pdf'),
+  '260907 SOLICITUD 26-27 SIN SELLAR.pdf');
+comprobar('7d. con colisión, se numera "(2)"',
+  RegistroSellado.nombreLibreEntre(
+    ['260907 SOLICITUD 26-27 SIN SELLAR.pdf'], '260907 SOLICITUD 26-27 SIN SELLAR.pdf'),
+  '260907 SOLICITUD 26-27 SIN SELLAR (2).pdf');
+comprobar('7e. con "(2)" también ocupado, salta al "(3)"',
+  RegistroSellado.nombreLibreEntre(
+    ['260907 SOLICITUD 26-27 SIN SELLAR.pdf', '260907 SOLICITUD 26-27 SIN SELLAR (2).pdf'],
+    '260907 SOLICITUD 26-27 SIN SELLAR.pdf'),
+  '260907 SOLICITUD 26-27 SIN SELLAR (3).pdf');
 
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 process.exit(fallos ? 1 : 0);

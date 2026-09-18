@@ -69,6 +69,16 @@
    fila 52, docs/CABECERA-DEL-ASUNTO.md, 5): siguen dentro del `<h2>`,
    así que se ven igual con la cabecera encogida. */
 .ficha-nombre .boton-nie { margin-left: 8px; }
+
+/* La fila de copiar de un gesto (18-sep-2026, fila 58,
+   docs/AJUSTES-DE-USO-2026-09-18.md, 1): Asunto, Nombre, NIE y DNI/CIF,
+   siempre a la vista bajo el nombre, sin menú. Discreta: botones
+   pequeños en una sola línea que envuelve antes que desaparecer. Se
+   esconde con la cabecera encogida, igual que la línea gris de debajo
+   (menos sitio, y el nombre ya lleva los tres puntos). */
+.ficha-copiar-fila { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 0; }
+.ficha-cabecera.encogida .ficha-copiar-fila { display: none; }
+.boton-copiar-fila { padding: 3px 10px; font-size: 12px; }
 .ficha-nombre-menu-boton {
   display: inline-flex; align-items: center; justify-content: center;
   width: 28px; height: 28px; margin-left: 6px; padding: 0; vertical-align: middle;
@@ -252,6 +262,21 @@ body.con-lector .ficha-izquierda, body.con-lector .ficha-centro, body.con-lector
   cursor: pointer; word-break: break-word;
 }
 .ficha-documentos .ficha-documento:hover { background: var(--azul-claro); border-color: var(--azul); }
+/* El original sin sellar que se conserva al registrar (18-sep-2026,
+   fila 58, docs/AJUSTES-DE-USO-2026-09-18.md, 4): en gris claro, para
+   que no se confunda con el sellado. */
+.ficha-documentos .ficha-documento-sinsellar { color: var(--tinta-suave); background: #f7f8fa; }
+
+/* El hito al que está asociado un documento (18-sep-2026, fila 58, 6):
+   en pequeño, debajo del nombre. `flex-basis: 100%` lo manda a su
+   propia línea dentro de la fila del botón (`.ficha-documento` es
+   flex), sin tocar el nombre ni el icono de la extensión. */
+.ficha-documento-hito {
+  flex-basis: 100%;
+  font-size: 11px;
+  color: var(--tinta-suave);
+  margin-top: 2px;
+}
 /* La etiqueta PDF o JPG no se parte en dos líneas cuando el nombre es
    largo: se queda entera a la izquierda. */
 .ficha-documentos .marca-ext { flex: 0 0 auto; margin-right: 0; }
