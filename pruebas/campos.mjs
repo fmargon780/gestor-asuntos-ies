@@ -127,12 +127,19 @@ await pagina.waitForSelector('#campos-puestos');
 await comprobar('la pantalla del tipo usa el ancho grande, no un cuadro estrecho',
   pagina.evaluate(() => document.getElementById('pantalla-tipo-asunto').getBoundingClientRect().width > 900), true);
 
-await pagina.fill('#campos-buscar', 'unidad');
-await pagina.locator('#campos-catalogo .fila-tipo').filter({ hasText: 'Unidad' })
+/* Fila 56, 18-sep-2026, docs/CAMPOS-CATALOGO-Y-CALCULADOS.md: el
+   catálogo ya no está desplegado en la propia sección, se abre con
+   "+ Añadir campo" (pestaña "De la ficha", la que sale de partida). */
+await pagina.click('#campos-btn-anadir');
+await pagina.waitForSelector('#campos-catalogo-buscar');
+await pagina.fill('#campos-catalogo-buscar', 'unidad');
+await pagina.locator('#campos-catalogo-ficha-lista .fila-tipo').filter({ hasText: 'Unidad' })
   .getByRole('button', { name: 'Añadir' }).click();
-await pagina.fill('#campos-buscar', 'modalidad');
-await pagina.locator('#campos-catalogo .fila-tipo').filter({ hasText: 'Modalidad' })
+await pagina.fill('#campos-catalogo-buscar', 'modalidad');
+await pagina.locator('#campos-catalogo-ficha-lista .fila-tipo').filter({ hasText: 'Modalidad' })
   .getByRole('button', { name: 'Añadir' }).click();
+await pagina.click('#campos-catalogo-volver');
+await pagina.waitForSelector('#campos-puestos');
 
 await comprobar('los dos campos quedan puestos, en orden',
   pagina.locator('#campos-puestos .fila-tipo .nombre-tipo').allTextContents(),
@@ -332,9 +339,13 @@ const tarjetaSancion2 = pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ ha
 await tarjetaSancion2.locator('.tarjeta-tipo-nombre').click();
 await pagina.waitForSelector('#pantalla-tipo-asunto:not(.oculto)');
 await pagina.waitForSelector('#campos-puestos');
-await pagina.fill('#campos-buscar', 'trimestre');
-await pagina.locator('#campos-catalogo .fila-tipo').filter({ hasText: 'Trimestre' })
+await pagina.click('#campos-btn-anadir');
+await pagina.waitForSelector('.pestana-categoria[data-pestana="mios"]');
+await pagina.click('.pestana-categoria[data-pestana="mios"]');
+await pagina.locator('#campos-mios-lista .fila-tipo').filter({ hasText: 'Trimestre' })
   .getByRole('button', { name: 'Añadir' }).click();
+await pagina.click('#campos-catalogo-volver');
+await pagina.waitForSelector('#campos-puestos');
 await pagina.locator('#campos-puestos .fila-tipo').filter({ hasText: 'Trimestre' })
   .locator('label:has-text("Añadir al nombre") input').check();
 await pagina.click('#campos-guardar');
