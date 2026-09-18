@@ -2708,3 +2708,32 @@ una línea cada una. El texto largo que tenían antes era:
     cuando el panel de hitos se repinta, "element is not visible" tras varios reintentos): falla
     igual en el commit de partida de esta sesión (`bb53ee9`, antes de tocar nada de la fila 49),
     así que no es de esta fila. Queda apuntado por si se repite en otra sesión.
+- **50 · `docs/CABECERA-NO-TIEMBLA.md`**: Terminada 18-sep-2026 · 04:06. Arregla un defecto de la
+  fila 46: en una pantalla cuyo contenido apenas pasa del alto de la ventana, al cruzar el umbral
+  de encoger la cabecera perdía alto de golpe, el navegador recortaba `window.scrollY` al nuevo
+  máximo, ese valor caía por debajo del umbral de despliegue, la cabecera se desplegaba, la página
+  volvía a crecer, y el gesto empujaba otra vez por encima del umbral de encoger: temblor. Tres
+  arreglos en `js/cabecera-fija.js`: (1) de fondo, se guarda por pantalla el alto del documento con
+  la cabecera desplegada y, si esa pantalla es corta (menos que el alto de la ventana + 400px), se
+  le devuelve a `main.contenido` el alto perdido con la variable `--cabecera-compensa`
+  (`css/cabecera-fija.css`); (2) los umbrales de la histéresis se separan más, de 80/40 a 120/24;
+  (3) un candado de 400 ms entre un cambio y el contrario.
+  - **Dos trampas encontradas al escribir las pruebas nuevas, no estaban previstas**: la primera,
+    el candado se armaba también en la realineación que hace una pantalla nueva con el scroll que
+    ya hubiera (p.ej. al cambiar de "Asuntos abiertos" a "Ajustes" estando bajado, Ajustes nace ya
+    encogida para no dar un salto), y ese armado bloqueaba luego el primer scroll de verdad del
+    usuario en la pantalla nueva; arreglado sin armar el candado en ese caso (la pantalla nueva
+    "se alinea", no "cambia"). La segunda, la misma idea pero al cambiar el tamaño de la ventana:
+    redimensionarla puede mover `window.scrollY` por su cuenta —el "scroll anchoring" de Chrome,
+    para que la vista no salte cuando la rejilla de Ajustes cambia de alto al reflotar con menos
+    columnas—, y ese movimiento tampoco lo ha pedido nadie; `aplicar()` gana un parámetro
+    `realineacion` que también evita armar el candado ahí. Las dos se encontraron con la prueba
+    nueva de "cambiar el tamaño de la ventana" (la ya existente de Ajustes, fila 46), que se ponía
+    en rojo con el candado recién puesto: sin esas pruebas end-to-end, ninguna de las dos trampas
+    se habría visto escribiendo solo la lógica.
+  - Prueba: `pruebas/cabecera-fija.mjs` gana dos casos (en una pantalla corta —calculada al vuelo,
+    recortando la ventana a 200px más que el alto real del contenido, no a un tamaño de pantalla
+    fijo— cruzar el umbral no deja el estado temblando; el candado, manejado a mano con
+    `window.CabeceraFija.evaluar()`, bloquea el cambio contrario y lo deja pasar pasados los 400
+    ms) y ajusta los umbrales de las pruebas ya existentes (80/40 → 120/24, con las mismas
+    comprobaciones).

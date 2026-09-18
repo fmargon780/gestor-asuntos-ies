@@ -105,7 +105,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Archivar o reabrir cuando el destino ya existe (de un intento a medias) fusiona las dos carpetas, sin perder nada; si la carpeta ya no está donde se esperaba pero se encuentra en el otro sitio, se da por hecho sin copiar nada y avisa en verde; si no aparece por ningún lado, avisa en ámbar pidiendo Recargar. Los errores del navegador (`NotFoundError` y compañía) salen siempre traducidos (`U.mensajeDeError`), y los temporales de sincronización (Dropbox, Drive) no se cuentan ni se copian (fila 45).
 - Guardar un documento en un asunto se queda en su ficha; solo Editar, Archivar/Reabrir y Borrar
   vuelven a la lista. La ficha solo se repinta si algo suyo ha cambiado de verdad (fila 34).
-- La cabecera de cada pantalla se queda pegada arriba al bajar y se encoge a una sola línea, con histéresis: un solo mecanismo compartido (`js/cabecera-fija.js` + `css/cabecera-fija.css`) para las siete pantallas (papelera usa la de Ajustes). En "Por clasificar", con un documento abierto, la cabecera encogida añade "Viendo: <documento>" e "Ir a su fila" (fila 46).
+- La cabecera de cada pantalla se queda pegada arriba al bajar y se encoge a una sola línea, con histéresis (120/24px): un solo mecanismo compartido (`js/cabecera-fija.js` + `css/cabecera-fija.css`) para las siete pantallas (papelera usa la de Ajustes), sin temblor en pantallas cortas (compensa el alto perdido, candado de 400 ms; fila 50). En "Por clasificar", con un documento abierto, la cabecera encogida añade "Viendo: <documento>" e "Ir a su fila" (fila 46).
 
 ## 6. Reglas de código que no se pueden olvidar
 

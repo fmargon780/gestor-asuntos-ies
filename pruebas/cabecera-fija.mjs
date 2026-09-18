@@ -1,8 +1,9 @@
 /* Prueba en navegador de verdad de la cabecera que se queda pegada
-   arriba y se encoge al bajar (fila 46, docs/CABECERA-QUE-SE-QUEDA.md).
+   arriba y se encoge al bajar (fila 46, docs/CABECERA-QUE-SE-QUEDA.md;
+   sin temblor, fila 50, docs/CABECERA-NO-TIEMBLA.md).
 
-   Comprueba: al entrar se ve entera; al bajar más de 80px se encoge
-   (con histéresis, no se despliega hasta menos de 40px); el contenido
+   Comprueba: al entrar se ve entera; al bajar más de 120px se encoge
+   (con histéresis, no se despliega hasta menos de 24px); el contenido
    de debajo no da un salto brusco al encogerse; al cambiar de
    pantalla la cabecera anterior queda limpia y la nueva funciona
    igual; el ancho sigue al de verdad de la zona de trabajo (con
@@ -10,6 +11,9 @@
    en "Por clasificar", con un documento abierto, sale "Viendo: …" e
    "Ir a su fila"; y que js/barra.js sigue encontrando
    "#pantalla-abiertos .cabecera" para su botón de Nuevo asunto.
+   Fila 50: en una pantalla corta, cruzar el umbral no deja el estado
+   oscilando; y el candado de 400 ms bloquea el cambio contrario justo
+   después de otro.
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
@@ -55,9 +59,12 @@ function encogidaDe(selector) {
 function scroll(y) {
   return pagina.evaluate((v) => window.scrollTo(0, v), y);
 }
+/* 450 ms, no 200: más que el candado de 400 ms de la fila 50, para que
+   una prueba que quiere ver un cambio de verdad nunca lo pille bloqueado
+   por el cambio anterior. */
 async function subirYEsperar(y) {
   await scroll(y);
-  await pagina.waitForTimeout(200);
+  await pagina.waitForTimeout(450);
 }
 
 /* ---------- entrar, con 25 asuntos abiertos y un papel suelto ---------- */
@@ -109,21 +116,21 @@ await comprobar('al bajar 200px, se encoge', encogidaDe('#pantalla-abiertos head
 
 console.log('--- que no dé un salto brusco al encogerse ---');
 /* Vuelve arriba del todo, mide dónde está el primer asunto de la
-   lista con la cabecera desplegada, baja 90px de golpe (cruzando el
-   umbral) y mide otra vez. Chrome tiene "scroll anchoring": si algo
-   por encima de lo visible cambia de alto mientras se hace scroll, el
-   navegador mismo corrige el scroll para que lo que se ve no salte —
-   por eso lo que hay que comprobar no es que nada se mueva (algo se
-   mueve siempre: se ha bajado 90px), sino que se mueve JUSTO esos
-   90px y ni uno más, señal de que el encogimiento no añade ningún
-   brinco por su cuenta. */
+   lista con la cabecera desplegada, baja 150px de golpe (cruzando el
+   umbral de 120) y mide otra vez. Chrome tiene "scroll anchoring": si
+   algo por encima de lo visible cambia de alto mientras se hace
+   scroll, el navegador mismo corrige el scroll para que lo que se ve
+   no salte — por eso lo que hay que comprobar no es que nada se mueva
+   (algo se mueve siempre: se ha bajado 150px), sino que se mueve
+   JUSTO esos 150px y ni uno más, señal de que el encogimiento no
+   añade ningún brinco por su cuenta. */
 await subirYEsperar(0);
 const alturaCabeceraAntes = await pagina.evaluate(() =>
   document.querySelector('#pantalla-abiertos header.cabecera').getBoundingClientRect().height +
   parseFloat(getComputedStyle(document.querySelector('#pantalla-abiertos header.cabecera')).marginBottom));
 const topAntes = await pagina.evaluate(() => document.querySelector('#lista-abiertos .tarjeta').getBoundingClientRect().top);
 
-await subirYEsperar(90);
+await subirYEsperar(150);
 await pagina.waitForTimeout(300); /* deja terminar la transición CSS */
 const alturaCabeceraDespues = await pagina.evaluate(() =>
   document.querySelector('#pantalla-abiertos header.cabecera').getBoundingClientRect().height +
@@ -132,22 +139,71 @@ const topDespues = await pagina.evaluate(() => document.querySelector('#lista-ab
 
 await comprobarQue('la cabecera de verdad ha encogido de alto (hueco reservado más pequeño)',
   Promise.resolve(alturaCabeceraAntes - alturaCabeceraDespues > 5));
-/* Se ha pedido bajar 90px (window.scrollTo(0, 90)): lo que tiene que
-   cumplirse es que el contenido se mueva esos 90px pedidos y ni uno
+/* Se ha pedido bajar 150px (window.scrollTo(0, 150)): lo que tiene que
+   cumplirse es que el contenido se mueva esos 150px pedidos y ni uno
    más — da igual en qué valor exacto termine "window.scrollY" (Chrome
    puede tocarlo por su cuenta, con "scroll anchoring", precisamente
    para que no se note el salto cuando algo de arriba cambia de alto a
    mitad del scroll: es la propia prueba de que no hay brinco). */
 await comprobarQue('el contenido de debajo se mueve justo lo que se ha pedido bajar, sin ningún brinco de más',
-  Promise.resolve(Math.abs((topAntes - topDespues) - 90) < 3));
+  Promise.resolve(Math.abs((topAntes - topDespues) - 150) < 3));
 
-console.log('--- histéresis: no se despliega hasta bajar de 40px ---');
-await subirYEsperar(60);
-await comprobar('a 60px (entre 40 y 80) sigue encogida', encogidaDe('#pantalla-abiertos header.cabecera'), true);
-await subirYEsperar(45);
-await comprobar('a 45px todavía sigue encogida', encogidaDe('#pantalla-abiertos header.cabecera'), true);
+console.log('--- histéresis: no se despliega hasta bajar de 24px ---');
+await subirYEsperar(100);
+await comprobar('a 100px (entre 24 y 120) sigue encogida', encogidaDe('#pantalla-abiertos header.cabecera'), true);
+await subirYEsperar(30);
+await comprobar('a 30px todavía sigue encogida', encogidaDe('#pantalla-abiertos header.cabecera'), true);
 await subirYEsperar(20);
-await comprobar('a 20px (menos de 40) se despliega', encogidaDe('#pantalla-abiertos header.cabecera'), false);
+await comprobar('a 20px (menos de 24) se despliega', encogidaDe('#pantalla-abiertos header.cabecera'), false);
+
+console.log('=== 1b. Fila 50: en una pantalla corta, cruzar el umbral no deja temblando ===');
+/* Se mide el alto de verdad de esta misma lista de 25 asuntos (2217px
+   con la ventana de 600 de alto: de sobra más que la ventana, así que
+   la medida no la contamina el propio tamaño de la ventana) y se
+   encoge la ventana justo a 200px menos que ese alto: así sobran 200px
+   para bajar, más que el umbral de encoger (120) y menos que el margen
+   de "pantalla corta" (400), justo el caso del defecto. */
+const altoAbiertos = await pagina.evaluate(() => document.documentElement.scrollHeight);
+await pagina.setViewportSize({ width: 1920, height: Math.round(altoAbiertos - 200) });
+await subirYEsperar(0);
+await comprobar('con la ventana recortada, al entrar la cabecera está desplegada',
+  encogidaDe('#pantalla-abiertos header.cabecera'), false);
+
+await subirYEsperar(150);
+await comprobar('al cruzar el umbral (150 > 120), se encoge',
+  encogidaDe('#pantalla-abiertos header.cabecera'), true);
+/* Si temblara, en algún momento de este medio segundo se habría vuelto
+   a desplegar sola (y quizá vuelto a encoger): se comprueba más de una
+   vez, no solo justo después de cruzar el umbral. */
+await pagina.waitForTimeout(300);
+await comprobar('un instante después, sigue encogida: no ha temblado',
+  encogidaDe('#pantalla-abiertos header.cabecera'), true);
+await pagina.waitForTimeout(300);
+await comprobar('y otro instante más tarde, también',
+  encogidaDe('#pantalla-abiertos header.cabecera'), true);
+
+await pagina.setViewportSize({ width: 1920, height: 600 });
+await subirYEsperar(0);
+
+console.log('=== 1c. Fila 50: el candado de 400 ms bloquea el cambio contrario ===');
+/* Se maneja aquí `window.scrollY` y `CabeceraFija.evaluar()` a mano,
+   en vez de `subirYEsperar` (que ya espera lo bastante para no toparse
+   nunca con el candado): así se controla el tiempo exacto entre los
+   dos cambios, para probar el candado de verdad. */
+await subirYEsperar(200); /* encogida, y ya ha pasado de sobra el candado de la prueba anterior */
+await pagina.evaluate(() => { window.scrollTo(0, 0); window.CabeceraFija.evaluar(); });
+await comprobar('primer cambio: se despliega', encogidaDe('#pantalla-abiertos header.cabecera'), false);
+
+await pagina.evaluate(() => { window.scrollTo(0, 300); window.CabeceraFija.evaluar(); });
+await comprobar('el cambio contrario, a los pocos milisegundos, queda bloqueado por el candado',
+  encogidaDe('#pantalla-abiertos header.cabecera'), false);
+
+await pagina.waitForTimeout(450);
+await pagina.evaluate(() => { window.CabeceraFija.evaluar(); });
+await comprobar('pasados los 400 ms del candado, el mismo cambio ya se aplica',
+  encogidaDe('#pantalla-abiertos header.cabecera'), true);
+
+await subirYEsperar(0);
 
 console.log('=== 2. js/barra.js sigue encontrando "#pantalla-abiertos .cabecera" ===');
 await comprobarQue('el botón grande de Nuevo asunto está puesto (lo pone barra.js dentro de la cabecera)',
