@@ -127,57 +127,58 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 50 | `docs/CABECERA-NO-TIEMBLA.md` | HECHA (18-sep-2026) |
 | 51 | `docs/FICHA-DISPOSICION.md` | HECHA (18-sep-2026) |
 | 52 | `docs/CABECERA-DEL-ASUNTO.md` | HECHA (18-sep-2026) |
-| 53 | `docs/SENECA-CUADRO-ANCHO.md` | EN CURSO (18-sep-2026) |
-| 54 | `docs/AYUDANTE-SENECA-FIABLE.md` | PENDIENTE |
-| 55 | `docs/ASUNTO-SIN-ELECCION.md` | PENDIENTE |
-| 56 | `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md` | PENDIENTE |
+| 53 | `docs/SENECA-CUADRO-ANCHO.md` | HECHA (18-sep-2026 · 07:22) |
+| 54 | `docs/AYUDANTE-SENECA-FIABLE.md` | HECHA (18-sep-2026 · 07:22) |
+| 55 | `docs/ASUNTO-SIN-ELECCION.md` | HECHA (18-sep-2026 · 07:22) |
+| 56 | `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md` | HECHA (18-sep-2026 · 07:22) |
 | 57 | `docs/HUECO-PARA-SELLO-Y-FIRMA.md` | PENDIENTE |
 
-**Orden de trabajo:** están PENDIENTES la 53, la 54, la 55, la 56 y la 57, en ese orden. Las filas
-1 a 52 están HECHAS. La 54 toca solo `js/seneca-ayudante.js`, así que no se pisa con la 53. **La 55
-va después de la 53**, porque la 53 mueve el cuadro de Séneca a un fichero nuevo. La 56 no se pisa
-con ninguna de las demás: solo toca los campos y la pantalla de un tipo de asunto. **La 57 va
-después de la 56**, porque las dos tocan `js/ajustes-tipo.js`.
+**Orden de trabajo:** queda PENDIENTE solo la 57. Las filas 1 a 56 están HECHAS.
 
-**Fila 53, en una línea** (18-sep-2026, acordada con Francisco mirando una captura del cuadro de
-Mensaje de Séneca): ese cuadro se rehace para que se vea entero. Todo lo de Séneca sale de
-`js/correo.js` (38 KB) a un fichero propio, `js/seneca-cuadro.js` con `css/seneca.css`; el cuadro
-pasa a ocupar el ancho (hasta 1100 px) en dos columnas a partir de 900 px, con destinatarios y
-asunto a la izquierda y el texto del mensaje a la derecha; el asunto deja de ser una línea cortada
-y se lee entero, con su cuenta de caracteres; si el tipo no tiene plantilla de Séneca, un aviso en
-vez del hueco vacío; el botón que cambiaba de significado se parte en dos botones numerados ("1.
-Copiar el asunto" y "2. Copiar el texto"); y los cuatro párrafos del ayudante se pliegan en un
-desplegable. Ningún cambio de funcionamiento. Detalle en `docs/SENECA-CUADRO-ANCHO.md`. Sube
-directamente a `main`, sin petición de cambios.
+**Fila 52, en una línea** (18-sep-2026, acordada con Francisco mirando la cabecera de un asunto de
+CERT. MATRICULA): los doce botones de la cabecera se agrupan por el momento del trámite en que se
+usan y bajan a cinco. Detalle en `docs/CABECERA-DEL-ASUNTO.md`.
 
-**Fila 54, en una línea** (18-sep-2026, acordada con Francisco después de probar el ayudante en
-Séneca de verdad con cuatro profesores: solo entró uno bien): el ayudante de `js/seneca-ayudante.js`
-deja de fiarlo todo a un reloj fijo de 1400 ms. Ahora espera a que aparezca la sugerencia de Séneca
-(hasta 5 s, mirando cada 150 ms si hay un elemento visible con ese usuario), separa la flecha abajo
-del Intro con 350 ms, comprueba que la persona ha entrado de verdad (el campo se vacía, hasta
-2,5 s), reintenta una vez más despacio si no, y al final dice por su nombre quién no ha entrado,
-con un botón "Copiar los que faltan". Solo se toca `js/seneca-ayudante.js`; ni los chips ni
-`js/seneca-destinatarios.js` cambian. Detalle en `docs/AYUDANTE-SENECA-FIABLE.md`. Sube
-directamente a `main`, sin petición de cambios.
+**Fila 53, en una línea** (18-sep-2026, HECHA): el cuadro de Mensaje de Séneca se rehizo para que
+se vea entero. Todo lo de Séneca salió de `js/correo.js` (38 KB) a `js/seneca-cuadro.js` +
+`css/seneca.css`; el cuadro ocupa el ancho (hasta 1100 px) en dos columnas a partir de 900 px, con
+destinatarios y asunto a la izquierda y el texto del mensaje a la derecha; el asunto es ahora un
+`<textarea>` que crece, con su cuenta de caracteres; sin plantilla de Séneca para el tipo, un aviso
+en vez del hueco vacío; dos botones numerados ("1. Copiar el asunto" y "2. Copiar el texto") en vez
+del botón único que cambiaba de significado; y la explicación del ayudante se pliega en un
+`<details>`. Ningún cambio de funcionamiento. Lo compartido con Correo se expone en
+`window.CorreoNucleo`. Detalle en `docs/SENECA-CUADRO-ANCHO.md`; diario en `docs/HISTORIA.md`.
+Comprobado con `pruebas/seneca-cuadro-ancho.mjs`.
 
-**Fila 55, en una línea** (18-sep-2026, acordada con Francisco): desaparecen los dos botones
-"Nombre de la carpeta" / "Versión legible" que hay debajo del campo Asunto, en el cuadro de Correo
-y en el de Mensaje de Séneca. El asunto del mensaje es siempre el nombre de la carpeta del asunto,
-porque es lo que permite reconocer el hilo después; el campo sigue viéndose y pudiéndose editar a
-mano. Se borra el código de la versión legible. Detalle en `docs/ASUNTO-SIN-ELECCION.md`. **Va
-después de la fila 53.** Sube directamente a `main`, sin petición de cambios.
+**Fila 54, en una línea** (18-sep-2026, HECHA): el ayudante de `js/seneca-ayudante.js` ya no fía
+todo a un reloj fijo de 1400 ms. Ahora espera a que aparezca la sugerencia de Séneca (hasta 5 s,
+mirando cada 150 ms, también en `iframe`), separa la flecha abajo del Intro con 350 ms, comprueba
+hasta 2,5 s que el campo se ha vaciado de verdad, reintenta una vez más despacio (7 s) si no, y al
+terminar con fallos dice por su nombre quién no ha entrado, con un botón "Copiar los que faltan".
+Solo se tocó `js/seneca-ayudante.js`. Detalle en `docs/AYUDANTE-SENECA-FIABLE.md`. Comprobado con
+`pruebas/seneca-ayudante.mjs` (sin navegador: no se puede probar contra Séneca de verdad desde
+aquí, eso lo comprueba Francisco).
 
-**Fila 56, en una línea** (18-sep-2026, acordada con Francisco): la sección Campos de la pantalla
-de un tipo deja de enseñar el catálogo entero desplegado. Se queda solo con los campos que el tipo
-ya tiene y un botón "+ Añadir campo", que abre un panel con tres pestañas (De la ficha · Míos ·
-Calculados) y buscador. Y Francisco puede crear campos calculados: eliges el campo de origen, una
-de seis operaciones (quitar los últimos caracteres, quitar los primeros, partir por un signo, tabla
-de equivalencias, juntar dos campos, sacar un dato de una fecha) y ves el resultado con una persona
-de verdad antes de guardar. El calculado "Curso" pasa a ser una receta más en `campos.json`, con la
-función de siempre como respaldo para que ningún nombre de carpeta cambie. Ficheros nuevos:
-`js/campos-calculo.js`, `js/campos-catalogo.js`, `js/campos-calculados-editor.js` y
-`pruebas/campos-calculo.test.js`. Detalle en `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md`. Sube
-directamente a `main`, sin petición de cambios.
+**Fila 55, en una línea** (18-sep-2026, HECHA): desaparecieron los dos botones "Nombre de la
+carpeta" / "Versión legible" de debajo del campo Asunto, en Correo y en Séneca. El asunto del
+mensaje es siempre el nombre de la carpeta (`asuntoDelCorreo(a)`, ya sin el parámetro `largo`); el
+campo se sigue viendo y editando a mano. Detalle en `docs/ASUNTO-SIN-ELECCION.md`. Comprobado con
+`pruebas/asunto-sin-eleccion.mjs`.
+
+**Fila 56, en una línea** (18-sep-2026, HECHA): la sección Campos de la pantalla de un tipo ya no
+enseña el catálogo entero desplegado. Se queda con los campos puestos y un botón "+ Añadir campo"
+que abre un panel de tres pestañas (De la ficha · Míos · Calculados) en `js/campos-catalogo.js`
+(nuevo, dentro de la propia sección, no un cuadro emergente). Francisco puede crear campos
+calculados (`js/campos-calculo.js`, el motor; `js/campos-calculados-editor.js`, el formulario con
+vista previa) con seis operaciones, encadenables hasta 3 saltos. El calculado "Curso" pasa a ser
+una receta más en `campos.json`, migrada sola la primera vez que se lee el fichero si ya existía,
+con la función de siempre como respaldo mientras tanto. Si se añaden campos sin guardar, la
+pantalla avisa al salir. Detalle en `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md`; lo que costó de más
+(bugs cazados por las propias pruebas, antes de subir) en `docs/HISTORIA.md`. **La prueba del
+motor se guardó como `pruebas/campos-calculo.mjs`, no `campos-calculo.test.js`** como decía el
+encargo: `pruebas/ejecutar.mjs` solo recoge ficheros `*.mjs`, así que con ese nombre no se habría
+ejecutado nunca con `npm test`. Comprobado también con `pruebas/campos-catalogo.mjs`, y con
+`pruebas/campos.mjs` y `pruebas/ajustes-por-tipo.mjs` (actualizadas al panel nuevo).
 
 **Fila 57, en una línea** (18-sep-2026, acordada con Francisco): el sello que Séneca pinta al
 registrar a mano (banda estrecha arriba, a la derecha si es entrada y a la izquierda si es salida,
