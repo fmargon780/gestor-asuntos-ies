@@ -503,6 +503,28 @@
         </div>
       </details>
 
+      <!-- Fila 57, 18-sep-2026, docs/HUECO-PARA-SELLO-Y-FIRMA.md: las
+           dos medidas que usa "Preparar el documento". Las lee y las
+           guarda js/ajustes-centro.js. -->
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Sello y firma en el papel</span>
+          <span class="bloque-pie">Cuánto hueco dejar libre para el sello de Séneca y para la firma</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">El botón "Preparar el documento" encoge un PDF para dejar libres estas dos
+         bandas, de lado a lado de la hoja. Cada tipo de asunto dice si lleva sello, si lleva firma,
+         o las dos cosas (en su propia pantalla, dentro de "Datos del tipo").</p>
+      <div class="dos-columnas">
+        <div><label class="etiqueta">Banda para el sello de registro (arriba)</label>
+          <input id="margen-sello" type="number" min="0" max="6" step="0.1" class="campo campo-plazo"></div>
+        <div><label class="etiqueta">Banda para la firma (abajo)</label>
+          <input id="margen-firma" type="number" min="0" max="6" step="0.1" class="campo campo-plazo"></div>
+      </div>
+      <p class="nota">En centímetros, con un decimal. Entre 0 y 6 cm cada una.</p>
+        </div>
+      </details>
+
       </div>
 
       <div id="ajustes-tab-mantenimiento" class="ajustes-tab oculto">
@@ -691,6 +713,8 @@
 <script src="js/registro.js"></script>
 <script src="js/registro-sellado.js"></script>
 <script src="js/pdf-herramientas.js"></script>
+<script src="js/pdf-margenes.js"></script>
+<script src="js/preparar-documento.js"></script>
 <script src="js/pdf-separar-unir.js"></script>
 <script src="js/ficha-asunto.js"></script>
 <!-- El menú pequeño reutilizable de la cabecera (fila 52, 18-sep-2026,

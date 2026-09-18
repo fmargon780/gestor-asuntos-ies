@@ -2111,6 +2111,85 @@ mentira compartido (`pruebas/navegador.mjs`): su `createWritable().write(...)` l
 verdad (un PDF); ahora usa `.arrayBuffer()`, como hace el navegador de verdad. No cambia nada
 para el texto plano que ya usaban el resto de pruebas.
 
+### Hueco para el sello de Séneca y la firma del director (18-sep-2026, fila 57,
+docs/HUECO-PARA-SELLO-Y-FIRMA.md)
+
+Séneca pinta su sello de registro en una banda estrecha arriba de cada página (a la derecha si es
+entrada, a la izquierda si es salida), y la firma digital del director deja una banda al pie. Si el
+documento tiene texto ahí, queda pisado. Botón nuevo **Preparar el documento**, junto a Separar,
+Unir y Sacar páginas (en la ficha de un asunto y en Por clasificar): encoge el contenido de todas
+las páginas y lo recoloca para dejar libres las dos bandas, de lado a lado de la hoja (vale igual
+para entrada que para salida, sin tener que elegir). **El orden importa**: preparar, luego firmar,
+luego registrar en Séneca; un PDF ya firmado no se debe tocar sin invalidar la firma.
+
+- **`js/pdf-margenes.js`** (`window.PdfMargenes`): solo bytes, sin disco ni DOM, igual que
+  `js/pdf-herramientas.js` (usa `PdfHerramientas.cargarPdfLib`, sin tocar ese fichero).
+  - `calcularEncaje(ancho, alto, huecoArriba, huecoAbajo)` (todo en puntos PDF, 1 cm = 28,3465 pt,
+    `PdfMargenes.CM_EN_PT`): la escala nunca pasa de 1 (nunca agranda) ni es negativa; `cabe` es
+    falso cuando los dos huecos juntos pasan de la mitad del alto de la página.
+  - `conHueco(bytes, huecoArribaCm, huecoAbajoCm)`: primero calcula el encaje de TODAS las páginas
+    y, si alguna no cabe, no escribe nada (ni las que sí cabían) y lanza un error `HuecoNoCabe`. No
+    cambia el tamaño de ninguna hoja, ni siquiera si son de tamaños distintos en el mismo PDF.
+  - **Páginas giradas**: la escala y el hueco se calculan sobre el tamaño VISIBLE de la página
+    (`getSize()` de pdf-lib no tiene en cuenta el `/Rotate`, así que se calcula a mano,
+    `anguloDePagina`/`tamanoVisible`), pero el contenido se dibuja en el sistema de coordenadas
+    CRUDO de la página, sin deshacerle el giro: la hoja nueva se crea con el mismo tamaño crudo y
+    el mismo `/Rotate` que la original (`embedPage` no tiene en cuenta el giro: su `width`/`height`
+    son los del `MediaBox` crudo), y solo cambia dónde y a qué escala se dibuja el contenido dentro
+    de ese sistema. `posicionCruda(angulo, anchoCrudo, altoCrudo, encaje)` trae, para cada uno de
+    los cuatro giros, la esquina cruda que corresponde a la esquina visible ya calculada (la cuenta
+    completa, deducida a mano y comprobada con dos métodos distintos, está en el comentario de
+    cabecera del fichero). Así no hace falta averiguar cómo compone `drawPage` su propio parámetro
+    `rotate`.
+  - `pareceFirmado(bytes)`: busca en los propios bytes `/ByteRange` o `/Type /Sig` (con o sin
+    espacio), sin interpretar la estructura entera del PDF. Con cualquiera de las dos, ya cuenta.
+  - **Aviso conocido**: `embedPage` (pdf-lib) no arrastra los enlaces ni las anotaciones de la
+    página original. Para los documentos que se registran esto no importa (son papeles para
+    sellar).
+- **`js/preparar-documento.js`** (`window.PrepararDocumento.abrir(contexto)`): mismo `contexto` que
+  `PdfSepararUnir.separar/unir/sacarPaginas` (`{ modo, dir, nombre, handle, asunto?, alTerminar }`).
+  - **Si el PDF ya trae firma digital** (`PdfMargenes.pareceFirmado`): pregunta con el texto exacto
+    del encargo antes de seguir; si Francisco dice que no, no se toca nada.
+  - **Saber si ya hay sitio**: con pdf.js (cargado en caliente, mismo truco que
+    `js/pdf-separar-unir.js`), cada página se pinta en un `<canvas>` desechado (nunca se cuelga de
+    la pantalla) a 700 px de ancho — pdf.js ya aplica el giro de la página al pintar, así que aquí
+    no hace falta pensar en `/Rotate`. Un píxel cuenta como "hay algo" si su luminosidad baja de
+    200 (sobre 255); una banda está ocupada si más del 0,3 % de sus píxeles cuentan. Basta con que
+    una sola página tenga una banda ocupada para que haga falta preparar el documento entero. Si
+    las dos bandas están libres en todas las páginas, no se abre ningún cuadro: se avisa en verde
+    ("Este documento ya tiene sitio...") y no se escribe nada.
+  - **El cuadro** (un solo `U.preguntar`, `cuadro-ancho`): la primera página pintada con pdf.js, con
+    las dos bandas marcadas encima (`.preparar-banda-arriba`/`abajo`, semitransparentes,
+    `css/pdf-separar-unir.css`); una línea de texto con el porcentaje de encogido y los centímetros
+    libres; dos casillas ("Hueco para el sello de registro", "Hueco para la firma"), marcadas de
+    partida según lo que diga el tipo del asunto (`tipo.llevaSello`/`llevaFirma`; sin tipo —en Por
+    clasificar—, sello sí y firma no); al cambiar una casilla se recalculan solas la vista y la
+    línea de texto, sin volver a pintar el PDF.
+  - **Al aceptar**: `PdfMargenes.conHueco`; si alguna página no tiene sitio, se avisa con el mismo
+    mensaje del encargo y no se toca nada. Si todo va bien, el original va primero a la papelera
+    (`Papelera.mandarDocumentoDeAsunto`/`mandarSuelto`, según `contexto.modo`) y luego se escribe el
+    nuevo con el mismo nombre (`Carpetas.escribirBytes`), en ese orden para que no choquen dos
+    ficheros iguales en la carpeta.
+- **Lo configurable**:
+  - **Ajustes → El centro** (`js/ajustes-centro.js`, bloque "Sello y firma en el papel", campos
+    estáticos `#margen-sello`/`#margen-firma` en `index.html`): las dos medidas, en centímetros con
+    un decimal, entre 0 y 6 cm cada una (por defecto 1,5 y 2,5). Se guardan en
+    `_GESTOR/margenes-pdf.json` (`App.margenesPdfLeer`/el guardado del propio fichero); son solo
+    dos números, así que no hace falta fusionar con el disco, igual que "Datos del centro y firma".
+  - **La pantalla de un tipo de asunto** (`js/ajustes-tipo.js`, sección "Datos del tipo"): dos
+    interruptores, `tipo.llevaSello` (por defecto sí) y `tipo.llevaFirma` (por defecto no), guardados
+    directamente en `tipos.json` con `App.guardarTipos()`. Un tipo sin esos campos se comporta con
+    los valores por defecto: nada que migrar. El ayudante compartido,
+    `App.construirInterruptorDeTipo(tipo, campo, porDefecto, texto, ayuda)`, vive en `js/ajustes.js`,
+    junto a `App.construirCasillaPlazo`.
+
+Se comprueba sin navegador con `pruebas/margenes-pdf.mjs` (mismo montaje con `vm` que
+`pruebas/separar-unir.mjs`): `calcularEncaje` en varios casos (A4 con huecos normales, sin huecos,
+huecos absurdos, página pequeña), `conHueco` conservando páginas y tamaños —con dos hojas de
+tamaño distinto y una tercera girada 90°, comprobando que su tamaño crudo y su giro sobreviven—,
+que una página sin sitio no escribe nada, y `pareceFirmado`. La parte de pantalla
+(`js/preparar-documento.js`) no tiene prueba de navegador propia todavía.
+
 ### La papelera
 
 Nada se borra de verdad a la primera: se manda a una papelera compartida, de la que se puede
@@ -2386,6 +2465,8 @@ de `App` va después del fichero que lo define.
 | `js/lector-documentos.js` | `LectorDocumentos.analizar(texto, contexto)`, puro: propone tipo, fecha, documentos de identidad y tercero de un documento suelto (17-sep-2026, fila 41); si un documento de identidad no cuadra con nadie, también `terceroDesconocido` (fila 42) |
 | `js/registro-sellado.js` | Ver solo un PDF ya sellado en la carpeta del asunto, y colocarlo sin duplicarlo |
 | `js/pdf-herramientas.js` | Partir, unir y sacar páginas de un PDF con pdf-lib: solo bytes, sin disco ni DOM |
+| `js/pdf-margenes.js` | La cuenta y el PDF nuevo de "Preparar el documento": solo bytes, sin disco ni DOM (18-sep-2026, fila 57) |
+| `js/preparar-documento.js` | El cuadro de "Preparar el documento": vista previa con pdf.js, bandas ocupadas o libres, y el guardado con papelera (18-sep-2026, fila 57) |
 | `js/pdf-separar-unir.js` | El cuadro de Separar, Unir y Sacar páginas: miniaturas con pdf.js, tijeras, casillas |
 | `js/verificacion.js` | El código de verificación del pie de un documento, y su dirección |
 | `js/lib/pdf.min.js`, `js/lib/pdf.worker.min.js` | pdf.js (Mozilla) 3.11.174, copiado tal cual |
