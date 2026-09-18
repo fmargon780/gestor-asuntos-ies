@@ -53,41 +53,13 @@
   /* El contexto de analizar() (los tipos y las tres listas de
      terceros) se monta una sola vez por pantalla: App.E.tipos ya está
      en memoria, y Datos.cargar tiene su propia caché (js/datos.js), así
-     que volver a pedirlo no vuelve a tocar el disco. */
+     que volver a pedirlo no vuelve a tocar el disco. Cómo se montan
+     esas listas vive en js/contexto-documentos.js (18-sep-2026, fila
+     49): lo usa también js/bandeja-adjuntos-lector.js, para no
+     escribirlo dos veces. */
   function contexto() {
-    if (!contextoPromesa) contextoPromesa = construirContexto();
+    if (!contextoPromesa) contextoPromesa = ContextoDocumentos.delCentro();
     return contextoPromesa;
-  }
-
-  /* El DNI del alumnado no vive en un campo propio (js/dni.js lo saca
-     de las columnas del CSV): se cotejan los dos, DNI y Nº de
-     identificación escolar, por si el documento trae uno solo de los
-     dos. Las dos entradas apuntan a la misma `persona`: si las dos
-     coinciden a la vez, LectorDocumentos.analizar las cuenta como un
-     único tercero (agrupa por nombre), no como dos. */
-  function entradasDeAlumno(p) {
-    var dni = (window.Dni && Dni.de(p)) || '';
-    var escolar = p.id || '';
-    var entradas = [{ nombre: p.nombre, documento: dni || escolar, persona: p }];
-    if (dni && escolar && dni !== escolar) entradas.push({ nombre: p.nombre, documento: escolar, persona: p });
-    return entradas;
-  }
-
-  async function construirContexto() {
-    var alumnado = [], personal = [], empresas = [];
-    try {
-      var a = await Datos.cargar(App.E.datos, 'ALUMNADO');
-      a.lista.forEach(function (p) { alumnado = alumnado.concat(entradasDeAlumno(p)); });
-    } catch (e) { /* sin RegAlum.csv, se sigue sin alumnado */ }
-    try {
-      var pe = await Datos.cargar(App.E.datos, 'PERSONAL');
-      personal = pe.lista.map(function (p) { return { nombre: p.nombre, documento: p.documento, persona: p }; });
-    } catch (e) { /* sin personal.csv, se sigue sin personal */ }
-    try {
-      var em = await Datos.cargar(App.E.datos, 'EMPRESAS');
-      empresas = em.lista.map(function (p) { return { nombre: p.nombre, documento: p.nif, persona: p }; });
-    } catch (e) { /* sin empresas.csv, se sigue sin empresas */ }
-    return { tipos: App.E.tipos, alumnado: alumnado, personal: personal, empresas: empresas };
   }
 
   /* La línea de lo encontrado, separada por puntos. Lo que no se haya

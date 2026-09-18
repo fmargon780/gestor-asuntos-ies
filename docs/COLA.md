@@ -123,7 +123,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 46 | `docs/CABECERA-QUE-SE-QUEDA.md` | HECHA (18-sep-2026) |
 | 47 | `docs/DESTINATARIOS-EN-SENECA.md` | HECHA (17-sep-2026) |
 | 48 | `docs/NO-GASTAR-PUBLICACIONES.md` | HECHA (17-sep-2026) |
-| 49 | `docs/ADJUNTOS-DE-CORREO-POR-DENTRO.md` | PENDIENTE |
+| 49 | `docs/ADJUNTOS-DE-CORREO-POR-DENTRO.md` | HECHA (18-sep-2026) |
 | 50 | `docs/CABECERA-NO-TIEMBLA.md` | PENDIENTE |
 | 51 | `docs/FICHA-DISPOSICION.md` | PENDIENTE |
 | 52 | `docs/CABECERA-DEL-ASUNTO.md` | PENDIENTE |
@@ -132,18 +132,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 55 | `docs/ASUNTO-SIN-ELECCION.md` | PENDIENTE |
 | 56 | `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md` | PENDIENTE |
 
-**Orden de trabajo:** están PENDIENTES la 49, la 50, la 51, la 52, la 53, la 54, la 55 y la 56, en
-ese orden. Las filas 1 a 48 están HECHAS. **La 52 va después de la 51**: las dos tocan la cabecera
-de la ficha. La 54 toca solo `js/seneca-ayudante.js`, así que no se pisa con la 53. **La 55 va
-después de la 53**, porque la 53 mueve el cuadro de Séneca a un fichero nuevo. La 56 no se pisa con
-ninguna de las demás: solo toca los campos y la pantalla de un tipo de asunto.
-
-**Fila 49, en una línea** (18-sep-2026, acordada con Francisco): la bandeja de correos lee por
-dentro los PDF adjuntos de cada correo (hasta 3 adjuntos, 5 páginas) con el lector que ya existe
-de la fila 41, y **completa** la propuesta: lo que dice el correo manda, el PDF solo rellena los
-huecos (tercero y tipo), y aporta el registro de Séneca y la fecha del documento, que el correo no
-trae. Línea nueva en la tarjeta del correo, debajo de la propuesta de hoy. No se toca
-`apps-script/gestor-correos.gs`.
+**Orden de trabajo:** están PENDIENTES la 50, la 51, la 52, la 53, la 54, la 55 y la 56, en ese
+orden. Las filas 1 a 49 están HECHAS. **La 52 va después de la 51**: las dos tocan la cabecera de
+la ficha. La 54 toca solo `js/seneca-ayudante.js`, así que no se pisa con la 53. **La 55 va después
+de la 53**, porque la 53 mueve el cuadro de Séneca a un fichero nuevo. La 56 no se pisa con ninguna
+de las demás: solo toca los campos y la pantalla de un tipo de asunto.
 
 **Fila 50, en una línea** (18-sep-2026, hablada con Francisco): la cabecera pegada de la fila 46
 tiembla muy deprisa en un punto del principio del desplazamiento, justo antes de encogerse. Al

@@ -208,6 +208,7 @@ var BandejaPantalla = (function () {
         '<div class="tarjeta-pie">' + U.escapar(pie) + '</div>' +
         (d.enviado ? '<div class="tarjeta-pie correo-enviado">Lo enviaste tú</div>' : '') +
         '<div class="tarjeta-pie propuesta-correo"></div>' +
+        '<div class="tarjeta-pie tarjeta-adjuntos-correo oculto" data-adjuntos-de="' + U.escapar(d.id) + '"></div>' +
       '</div>';
 
     /* Primero la huella del hilo; si no la hay, se mira si el asunto
@@ -235,6 +236,14 @@ var BandejaPantalla = (function () {
         if (p.tercero) trozos.push(App.textoTercero(p.tercero));
         linea.innerHTML = '<span class="marca-tipo">Propuesta</span>' + U.escapar(trozos.join('  ·  '));
       }).catch(function () {});
+    }
+
+    /* La línea de lo que aporten los adjuntos PDF del correo (fila 49,
+       18-sep-2026, docs/ADJUNTOS-DE-CORREO-POR-DENTRO.md): solo se lee
+       con la barra desplegada, nunca con ella plegada ni al arrancar. */
+    if (window.BandejaAdjuntosLector) {
+      var lineaAdjuntos = div.querySelector('.tarjeta-adjuntos-correo');
+      if (lineaAdjuntos) window.BandejaAdjuntosLector.pintarEn(item, lineaAdjuntos, plegado);
     }
 
     var acciones = document.createElement('div');

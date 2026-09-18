@@ -684,6 +684,7 @@
 <script src="js/notas.js"></script>
 <script src="js/registro-lector.js"></script>
 <script src="js/lector-documentos.js"></script>
+<script src="js/contexto-documentos.js"></script>
 <script src="js/documentos-sueltos-lector.js"></script>
 <script src="js/verificacion.js"></script>
 <script src="js/registro.js"></script>
@@ -761,6 +762,12 @@
      window.Bandeja, así que va después de js/bandeja-correos.js, y
      antes de js/bandeja-enlace.js y js/correo-adjuntos.js. -->
 <script src="js/bandeja-pantalla.js"></script>
+<!-- Lee por dentro los adjuntos PDF de un correo (18-sep-2026, fila 49,
+     docs/ADJUNTOS-DE-CORREO-POR-DENTRO.md): necesita
+     window.RegistroLector, window.LectorDocumentos, window.Bandeja y
+     el gancho de js/bandeja-pantalla.js, así que va después de los
+     tres. -->
+<script src="js/bandeja-adjuntos-lector.js"></script>
 <script src="js/bandeja-enlace.js"></script>
 <script src="js/correo-adjuntos.js"></script>
 <script src="js/barra.js"></script>
