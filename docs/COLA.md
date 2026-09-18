@@ -126,8 +126,10 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 49 | `docs/ADJUNTOS-DE-CORREO-POR-DENTRO.md` | PENDIENTE |
 | 50 | `docs/CABECERA-NO-TIEMBLA.md` | PENDIENTE |
 | 51 | `docs/FICHA-DISPOSICION.md` | PENDIENTE |
+| 52 | `docs/CABECERA-DEL-ASUNTO.md` | PENDIENTE |
 
-**Orden de trabajo:** están PENDIENTES la 49, la 50 y la 51, en ese orden. Las filas 1 a 48 están HECHAS.
+**Orden de trabajo:** están PENDIENTES la 49, la 50, la 51 y la 52, en ese orden. Las filas 1 a 48
+están HECHAS. **La 52 va después de la 51**: las dos tocan la cabecera de la ficha.
 
 **Fila 49, en una línea** (18-sep-2026, acordada con Francisco): la bandeja de correos lee por
 dentro los PDF adjuntos de cada correo (hasta 3 adjuntos, 5 páginas) con el lector que ya existe
@@ -151,6 +153,17 @@ suben justo bajo "Datos y contacto", "Otros asuntos de este tercero" y "Personas
 relacionadas" pasan a `<details>` plegados con su cuenta, los documentos se van a una tercera
 columna con rejilla de tres tramos, y un bloque vacío ocupa una línea en vez de una tarjeta.
 Detalle en `docs/FICHA-DISPOSICION.md`. Sube directamente a `main`, sin petición de cambios.
+
+**Fila 52, en una línea** (18-sep-2026, acordada con Francisco mirando la cabecera de un asunto de
+CERT. MATRICULA): los doce botones de la cabecera se agrupan por el momento del trámite en que se
+usan y bajan a cinco. Editar y Borrar se van a un menú de tres puntos en el nombre, que también
+copia el nombre del asunto; el número del tercero se copia desde el propio nombre; Vía entra
+dentro de Lo pide, que pasa a llamarse "El encargo"; Correo y Mensaje de Séneca se juntan en
+"Comunicar"; "Gestionar documentos" baja al bloque de Documentos; el botón "Plazo" deja de existir
+y el vencimiento se ve escrito ("Vence el 25-sep · quedan 7 días"), pulsable para cambiarlo; y la
+barra termina en el mismo borde que el título, con "Archivar el asunto" a la derecha. Detalle en
+`docs/CABECERA-DEL-ASUNTO.md`. **Va después de la fila 51.** Sube directamente a `main`, sin
+petición de cambios.
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
