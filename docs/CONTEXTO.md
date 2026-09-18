@@ -191,6 +191,56 @@ meter un suelto o un correo) sin que ninguna tenga que saber de la ficha: **Edit
 llamando a `volverALaLista()` como hasta ahora. Se comprueba con
 `pruebas/quedarse-en-el-asunto.mjs`.
 
+**La disposición de la ficha** (18-sep-2026, fila 51, docs/FICHA-DISPOSICION.md): cambio de
+disposición, ningún funcionamiento distinto. La regla: arriba a la izquierda lo que hay que
+hacer, arriba a la derecha lo que hay que saber, lo que casi nunca se mira plegado con su número
+al lado.
+
+- **La línea gris de la cabecera** (`.ficha-subtitulo`, dentro de `<header class="ficha-cabecera">`,
+  justo debajo de `<h2 class="ficha-nombre">`): `subtituloDeFicha(a)` en `js/ficha-asunto.js` junta,
+  separados por ` · `, lo que no se repite en ningún otro sitio de la pantalla — Abierto el
+  (`U.fechaLegible(a.leido.fecha)`), Categoría, Año académico, Descripción y Lo abrió—; lo vacío no
+  deja ni el separador ni un hueco. Se esconde entera con la cabecera encogida
+  (`.ficha-cabecera.encogida .ficha-subtitulo { display: none; }`, `css/ficha-asunto.css`): no
+  entra en el reparto por `order` de la fila 46, solo desaparece.
+- **Tres columnas** (`.ficha-columnas`, `css/ficha-asunto.css`, mobile-first con `@media
+  (min-width: …)`, al contrario que el resto del fichero que usa `max-width`): izquierda, Hitos;
+  centro (`.ficha-centro`, nueva), Documentos de la carpeta; derecha, Datos y contacto → Notas →
+  los dos plegables → Datos del trámite (si tiene algo que decir). Por debajo de 1000px, una sola
+  columna en el orden del HTML; de 1000 a 1499px, dos (el centro debajo de la izquierda,
+  `grid-row`); de 1500px en adelante, las tres a la vez. Con `body.con-visor`/`body.con-lector` se
+  fuerza una columna con `grid-column/row: auto` en los tres tramos —si no, un tramo pediría una
+  columna o una fila que ya no existe con una sola columna, y el sitio le saldría mal.
+- **"Datos del asunto" se desmonta y pasa a llamarse "Datos del trámite"**: `datosDelAsunto(a)`
+  (ya no lleva `p`, la fecha límite se quitó) solo deja los campos propios del tipo
+  (`filasDeCampos`), Vía de comunicación, Lo pide y En el archivo — el resto ya se ve en la
+  cabecera, en sus marcas o en "Datos y contacto". **Sin ninguna fila, devuelve `null` y el bloque
+  entero no se pinta**, ni el título ni la tarjeta (antes `filas()` pintaba "Nada que enseñar
+  aquí."; `filasHtml()`, nueva, es la parte de `filas()` que solo dibuja, reutilizada aquí y por
+  `filas()` para los sitios que sí quieren ese aviso).
+- **Los dos bloques plegables** (`js/ficha-plegables.js`, `window.FichaPlegables`, nuevo, pequeño
+  a propósito para no engordar `js/ficha-asunto.js`, que ya pasaba de las 400 líneas desde antes):
+  "Otros asuntos de este tercero" y "Personas y entidades relacionadas" usan el
+  `<details class="ficha-bloque ficha-plegable">` que ya estaba en `css/ficha-asunto.css` (líneas
+  158-168 de antes de esta fila) sin que nadie lo usara. `FichaPlegables.bloque(id, titulo,
+  idDentro, textoDeEntrada)` monta el molde; `estadoActual(raiz)`/`reponer(raiz, estado)` guardan
+  qué `<details>` estaba abierto antes de que `pintarLaFicha()` rehaga el `innerHTML` entero y lo
+  reabren después (mismo patrón que `volverADesplegar` de `js/hitos-panel.js`); cerrados de
+  partida, sin nada guardado. `FichaPlegables.ponResumen(caja, texto, vacio)` la llama quien pinta
+  el contenido (`js/otros-del-tercero.js`, `js/relacionados.js`) en cuanto sabe la cuenta, aunque
+  el bloque siga cerrado: "1 asunto"/"3 asuntos"/"ninguno todavía", "2 personas"/"nadie todavía";
+  con la cuenta a cero, `.ficha-plegable-vacio` deja el título en gris suave y sin negrita.
+- **Un bloque vacío ocupa una línea, no una tarjeta**: `.ficha-bloque.vacio` (`css/ficha-asunto.css`)
+  pone el título y el aviso en una sola línea, con menos padding. Hoy solo lo pone
+  `js/ficha-documentos.js` cuando la carpeta no tiene ningún documento
+  (`caja.closest('.ficha-bloque').classList.toggle('vacio', !lista.length)`).
+- Se comprueba con `pruebas/ficha-disposicion.mjs`, en navegador de verdad: el orden de
+  `.ficha-derecha`, que `#ficha-notas` vaya antes que `#ficha-otros`, el contenido de la línea
+  gris, que "Datos del asunto" no exista, "Datos del trámite" con y sin campos propios, los dos
+  plegables (cerrados de partida, el resumen con la cuenta aunque estén cerrados, y que sobreviven
+  a un repintado forzado cambiando el estado), el bloque de Documentos vacío, y la rejilla a
+  1600px (tres columnas), 1200px (dos, el centro debajo) y con `body.con-lector` (una).
+
 ### Las tarjetas por tipo de asunto
 
 Dentro de "En el departamento" y de "A la espera de terceros", encima de la lista, sale una fila
@@ -2231,8 +2281,9 @@ de `App` va después del fichero que lo define.
 | `js/pdf-separar-unir.js` | El cuadro de Separar, Unir y Sacar páginas: miniaturas con pdf.js, tijeras, casillas |
 | `js/verificacion.js` | El código de verificación del pie de un documento, y su dirección |
 | `js/lib/pdf.min.js`, `js/lib/pdf.worker.min.js` | pdf.js (Mozilla) 3.11.174, copiado tal cual |
-| `js/ficha-asunto.js` | La pantalla de un asunto: cabecera, acciones, el bloque de hitos y documentos a la izquierda, "Datos y contacto"/otros asuntos/relacionados/notas a la derecha |
-| `js/ficha-documentos.js` | Los documentos de la carpeta, en la ficha del asunto (separado de `js/ficha-asunto.js` en la fila 26) |
+| `js/ficha-asunto.js` | La pantalla de un asunto: cabecera (con la línea gris del subtítulo, fila 51), acciones, Hitos a la izquierda, Documentos en el centro, "Datos y contacto"/Notas/los dos plegables/Datos del trámite a la derecha |
+| `js/ficha-plegables.js` | Los dos bloques plegables de la ficha ("Otros asuntos de este tercero", "Personas y entidades relacionadas"): montar el `<details>`, el resumen con la cuenta, guardar y reponer el abierto/cerrado entre un repintado y otro (18-sep-2026, fila 51) |
+| `js/ficha-documentos.js` | Los documentos de la carpeta, en la ficha del asunto (separado de `js/ficha-asunto.js` en la fila 26); pone la clase `vacio` al bloque cuando no hay ninguno (fila 51) |
 | `js/ficha-tercero.js`, `css/ficha-tercero.css` | "Datos y contacto" del tercero: la línea resumen y la ventana "Ver todo" con los tutores agrupados por persona (separado de `js/ficha-asunto.js` en la fila 37) |
 | `js/hitos-panel.js` | Pinta los hitos en la ficha del asunto (los pasos de la guía SON los hitos): el observador, el repintado y la creación automática |
 | `js/hitos-panel-lista.js` | La otra mitad del panel de hitos: la fila de cada hito, su cuerpo desplegado y el cambio de rama |

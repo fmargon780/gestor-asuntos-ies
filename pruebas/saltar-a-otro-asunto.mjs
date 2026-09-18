@@ -86,8 +86,18 @@ function botonVuelta() {
   return pagina.locator('#ficha-volver-al-origen');
 }
 
+/* "Otros asuntos de este tercero" vive plegado (fila 51, 18-sep-2026,
+   docs/FICHA-DISPOSICION.md), cerrado de partida en cada asunto que se
+   ve por primera vez: hay que desplegarlo antes de poder pulsar nada
+   de dentro. */
+async function abrirOtrosAsuntos() {
+  await pagina.click('#ficha-plegable-otros > summary');
+  await pagina.waitForTimeout(100);
+}
+
 console.log('--- 1. el bloque pinta las líneas como pulsables ---');
 await abrirDesdeLaLista(A);
+await abrirOtrosAsuntos();
 await pagina.waitForSelector('#ficha-otros .otros-asunto');
 await comprobar('1. hay líneas pulsables (elementos <button>) en el bloque',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-otros .otros-asunto'))
@@ -116,6 +126,7 @@ console.log('--- 4. saltando A → B → C, en C el botón sigue diciendo "Volve
 await otrosBoton(B).click();
 await pagina.waitForSelector('#ficha-volver-al-origen');
 await comprobar('4. (de paso) en B, tras el segundo salto, sigue diciendo A', botonVuelta().textContent(), '← Volver a ' + A);
+await abrirOtrosAsuntos();
 await otrosBoton(C).click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await comprobar('4. se ha saltado a C', fichaAbierta(), C);

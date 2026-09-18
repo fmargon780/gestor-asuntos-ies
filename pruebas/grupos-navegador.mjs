@@ -166,6 +166,9 @@ async function crearAsunto(categoriaIndice, botonTipo, buscarTexto) {
 await crearAsunto(2, 'PERMISO', 'aguado');
 await pagina.click('#lista-abiertos .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+/* "Personas y entidades relacionadas" vive plegada (fila 51,
+   18-sep-2026, docs/FICHA-DISPOSICION.md). */
+await pagina.click('#ficha-plegable-relacionados > summary');
 await pagina.waitForSelector('#rel-anadir-varios');
 
 await pagina.click('#rel-anadir-varios');

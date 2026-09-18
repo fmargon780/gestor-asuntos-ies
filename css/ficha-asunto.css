@@ -9,6 +9,13 @@
 .ficha-cabecera { margin-bottom: 16px; }
 .ficha-marcas { margin: 12px 0 4px; }
 
+/* La línea gris bajo el nombre (18-sep-2026, fila 51,
+   docs/FICHA-DISPOSICION.md, 4): lo que antes repetía "Datos del
+   asunto". Se esconde entera con la cabecera encogida: no entra en el
+   reparto por "order" de ahí abajo, solo desaparece. */
+.ficha-subtitulo { margin: 4px 0 0; font-size: 13px; color: var(--tinta-suave); }
+.ficha-cabecera.encogida .ficha-subtitulo { display: none; }
+
 /* Encogida (css/cabecera-fija.css pone y quita la clase): todo en una
    sola línea — volver, nombre (con puntos suspensivos si no cabe),
    tipo, estado y plazo — docs/CABECERA-QUE-SE-QUEDA.md, tabla del
@@ -54,16 +61,32 @@
 }
 .ficha-acciones .campo-estado { width: auto; min-width: 180px; }
 
-/* Dos columnas: a la izquierda lo que se trabaja (hitos y documentos),
-   a la derecha lo que se consulta y se anota (datos y contacto,
-   primero; otros asuntos; notas). La izquierda va algo más ancha: los
-   documentos llevan botones (17-sep-2026, fila 37,
-   docs/FICHA-DEL-ASUNTO-NUEVA.md). */
+/* Tres tramos (18-sep-2026, fila 51, docs/FICHA-DISPOSICION.md, 7):
+   izquierda lo que hay que hacer (Hitos), centro los documentos
+   (llevan botones, hueco propio), derecha lo que hay que saber (Datos
+   y contacto primero) y lo que casi nunca se mira, plegado. Por
+   debajo de 1000px, una sola columna en el orden del HTML (izquierda,
+   centro, derecha); de 1000 a 1499px, dos columnas con el centro
+   debajo de la izquierda; de 1500px en adelante, las tres a la vez —
+   así en el monitor ancho del trabajo no queda ningún hueco vacío. */
 .ficha-columnas {
-  display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  display: grid; grid-template-columns: 1fr;
   gap: 20px; align-items: start;
 }
-.ficha-izquierda, .ficha-derecha { display: flex; flex-direction: column; gap: 16px; }
+.ficha-izquierda, .ficha-centro, .ficha-derecha { display: flex; flex-direction: column; gap: 16px; }
+
+@media (min-width: 1000px) {
+  .ficha-columnas { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
+  .ficha-izquierda { grid-column: 1; grid-row: 1; }
+  .ficha-centro { grid-column: 1; grid-row: 2; }
+  .ficha-derecha { grid-column: 2; grid-row: 1 / span 2; }
+}
+@media (min-width: 1500px) {
+  .ficha-columnas { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(320px, 1fr); }
+  .ficha-izquierda { grid-column: 1; grid-row: 1; }
+  .ficha-centro { grid-column: 2; grid-row: 1; }
+  .ficha-derecha { grid-column: 3; grid-row: 1; }
+}
 
 /* No pisarse en un mismo asunto (17-sep-2026, fila 24): el aviso de
    que el compañero ya está dentro, con "Tomar el mando" a la derecha.
@@ -90,6 +113,16 @@
   border-radius: var(--radio); padding: 16px 18px; box-shadow: var(--sombra);
 }
 .ficha-titulo { margin: 0 0 10px; font-size: 15px; }
+
+/* Un bloque vacío no gasta una tarjeta entera (18-sep-2026, fila 51,
+   docs/FICHA-DISPOSICION.md, 8): título y aviso en una sola línea, con
+   menos padding. Hoy solo lo pone "Documentos de la carpeta"
+   (js/ficha-documentos.js) cuando la carpeta no tiene nada. */
+.ficha-bloque.vacio {
+  padding: 10px 18px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+}
+.ficha-bloque.vacio .ficha-titulo { margin: 0; }
+.ficha-bloque.vacio .explica { font-size: 13px; color: var(--tinta-suave); }
 .ficha-bloque .explica { margin: 0; }
 
 .ficha-datos { display: flex; flex-direction: column; }
@@ -116,15 +149,21 @@
 
 /* Con el panel de la derecha abierto se estrecha el hueco de la ficha
    tanto como bajar de 1000px (fila 37, 17-sep-2026): una sola columna,
-   en el mismo orden del DOM (Hitos, Documentos, Datos y contacto,
-   Otros asuntos, Notas). */
+   en el orden del HTML (Hitos, Documentos, Datos y contacto y lo
+   plegado). Los `grid-column`/`grid-row` de los tramos de arriba son
+   de un ancho de sobra (1000/1500px): sin quitarlos aquí, un tramo
+   pediría una columna o una fila que ya no existe con una sola
+   columna, y el sitio le saldría mal (fila 51, 18-sep-2026). */
 body.con-visor .ficha-columnas,
 body.con-lector .ficha-columnas {
   grid-template-columns: 1fr;
 }
+body.con-visor .ficha-izquierda, body.con-visor .ficha-centro, body.con-visor .ficha-derecha,
+body.con-lector .ficha-izquierda, body.con-lector .ficha-centro, body.con-lector .ficha-derecha {
+  grid-column: auto; grid-row: auto;
+}
 
 @media (max-width: 1000px) {
-  .ficha-columnas { grid-template-columns: 1fr; }
   .ficha-datos .ficha-dato { grid-template-columns: 1fr; gap: 0; }
 }
 
@@ -166,6 +205,11 @@ body.con-lector .ficha-columnas {
 .ficha-resumen { color: var(--tinta-suave); font-size: 13px; }
 .ficha-plegable[open] > summary { border-bottom: 1px solid var(--linea); border-radius: 0; }
 .ficha-plegable-cuerpo { padding: 12px 18px 16px; }
+
+/* Con la cuenta a cero, el título se queda en gris suave y sin
+   negrita: no hay nada urgente que mirar ahí dentro (18-sep-2026,
+   fila 51, docs/FICHA-DISPOSICION.md, 6). */
+.ficha-plegable-vacio > summary .ficha-titulo { font-weight: 400; color: var(--tinta-suave); }
 
 /* Los otros asuntos del mismo tercero. Los del mismo tipo van
    marcados: son los que de verdad pueden estar repetidos. */

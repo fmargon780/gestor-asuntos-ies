@@ -125,27 +125,18 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 48 | `docs/NO-GASTAR-PUBLICACIONES.md` | HECHA (17-sep-2026) |
 | 49 | `docs/ADJUNTOS-DE-CORREO-POR-DENTRO.md` | HECHA (18-sep-2026) |
 | 50 | `docs/CABECERA-NO-TIEMBLA.md` | HECHA (18-sep-2026) |
-| 51 | `docs/FICHA-DISPOSICION.md` | PENDIENTE |
+| 51 | `docs/FICHA-DISPOSICION.md` | HECHA (18-sep-2026) |
 | 52 | `docs/CABECERA-DEL-ASUNTO.md` | PENDIENTE |
 | 53 | `docs/SENECA-CUADRO-ANCHO.md` | PENDIENTE |
 | 54 | `docs/AYUDANTE-SENECA-FIABLE.md` | PENDIENTE |
 | 55 | `docs/ASUNTO-SIN-ELECCION.md` | PENDIENTE |
 | 56 | `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md` | PENDIENTE |
 
-**Orden de trabajo:** están PENDIENTES la 51, la 52, la 53, la 54, la 55 y la 56, en ese orden. Las
-filas 1 a 50 están HECHAS. **La 52 va después de la 51**: las dos tocan la cabecera de la ficha.
-La 54 toca solo `js/seneca-ayudante.js`, así que no se pisa con la 53. **La 55 va después de la
-53**, porque la 53 mueve el cuadro de Séneca a un fichero nuevo. La 56 no se pisa con ninguna de
-las demás: solo toca los campos y la pantalla de un tipo de asunto.
-
-**Fila 51, en una línea** (18-sep-2026, acordada con Francisco, escrita como fila 49 antes de que
-ese número y el 50 se ocuparan): la ficha de un asunto se recoloca, solo disposición y ningún
-cambio de funcionamiento. La cabecera gana una línea gris que se esconde al encogerse, "Datos del
-asunto" se desmonta y queda solo "Datos del trámite" (que no se pinta si está vacío), las Notas
-suben justo bajo "Datos y contacto", "Otros asuntos de este tercero" y "Personas y entidades
-relacionadas" pasan a `<details>` plegados con su cuenta, los documentos se van a una tercera
-columna con rejilla de tres tramos, y un bloque vacío ocupa una línea en vez de una tarjeta.
-Detalle en `docs/FICHA-DISPOSICION.md`. Sube directamente a `main`, sin petición de cambios.
+**Orden de trabajo:** están PENDIENTES la 52, la 53, la 54, la 55 y la 56, en ese orden. Las filas
+1 a 51 están HECHAS. **La 52 va después de la 51**: las dos tocan la cabecera de la ficha. La 54
+toca solo `js/seneca-ayudante.js`, así que no se pisa con la 53. **La 55 va después de la 53**,
+porque la 53 mueve el cuadro de Séneca a un fichero nuevo. La 56 no se pisa con ninguna de las
+demás: solo toca los campos y la pantalla de un tipo de asunto.
 
 **Fila 52, en una línea** (18-sep-2026, acordada con Francisco mirando la cabecera de un asunto de
 CERT. MATRICULA): los doce botones de la cabecera se agrupan por el momento del trámite en que se

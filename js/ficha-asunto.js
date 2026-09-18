@@ -20,6 +20,13 @@
   var actual = null;      /* el asunto que se está viendo */
   var modoActual = 'abierto';
 
+  /* El nombre del asunto que había en pantalla la ÚLTIMA vez que se
+     rehizo el innerHTML: hace falta por separado de `actual`, porque
+     al saltar a otro asunto `actual` ya vale el nuevo antes de pintar
+     (18-sep-2026, fila 51: para no confundir el abierto/cerrado de
+     los dos plegables de uno con el del otro). */
+  var ultimoPintado = null;
+
   /* Si el compañero ya está dentro de este asunto (17-sep-2026, fila
      24): { usuario } mientras se está en modo consulta, o null si el
      asunto está libre o el mando es de uno mismo. La vigilancia de
@@ -249,13 +256,30 @@
            '</section>';
   }
 
-  function filas(lista) {
-    var buenas = lista.filter(function (f) { return f && f.valor; });
-    if (!buenas.length) return '<p class="explica">Nada que enseñar aquí.</p>';
+  function filasHtml(buenas) {
     return '<div class="ficha-datos">' + buenas.map(function (f) {
       return '<div class="ficha-dato"><span>' + U.escapar(f.titulo) + '</span>' +
              '<span>' + U.escapar(f.valor) + '</span></div>';
     }).join('') + '</div>';
+  }
+
+  /* La línea gris bajo el nombre (18-sep-2026, fila 51,
+     docs/FICHA-DISPOSICION.md, 4): lo suelto que antes vivía en "Datos
+     del asunto" y no se repite en ningún otro sitio de la pantalla.
+     Lo que esté vacío no deja ni el separador ni un hueco. Se esconde
+     entera con la cabecera encogida (css/ficha-asunto.css). */
+  function subtituloDeFicha(a) {
+    var f = a.ficha || {};
+    var trozos = [
+      a.leido.fecha ? 'Abierto el ' + U.fechaLegible(a.leido.fecha) : '',
+      f.categoria || a.leido.categoria || '',
+      f.curso || a.leido.curso || '',
+      f.descripcion || '',
+      f.abiertoPor || ''
+    ].filter(Boolean);
+    if (!trozos.length) return '';
+    return '<p class="ficha-subtitulo">' +
+      trozos.map(function (t) { return U.escapar(t); }).join(' · ') + '</p>';
   }
 
   /* La ficha entera se rehace con innerHTML, y con ella el campo de la
@@ -277,6 +301,14 @@
     var situacion = a.ficha.situacion || '';
     var p = abierto ? App.plazoDe(a) : null;
     var tipo = tipoDe(a);
+    var tramite = datosDelAsunto(a);
+    /* Los dos plegables se rehacen enteros con el resto de la ficha:
+       se guarda qué tenía abierto el asunto que HABÍA en pantalla
+       hasta ahora (18-sep-2026, fila 51), y se repone después lo que
+       tuviera guardado el asunto que se pasa a ver (el mismo, en un
+       repintado, u otro tras saltar: `ultimoPintado` es justo la
+       diferencia entre los dos). */
+    if (window.FichaPlegables) FichaPlegables.recordar(ultimoPintado, caja);
 
     caja.innerHTML =
       '<header class="ficha-cabecera">' +
@@ -293,33 +325,40 @@
             ? '<span class="marca-lopide">Lo pide: ' + U.escapar(a.ficha.loPide.nombre) + '</span>' : '') +
         '</div>' +
         '<h2 class="ficha-nombre">' + U.escapar(a.nombre) + '</h2>' +
+        subtituloDeFicha(a) +
       '</header>' +
       '<div id="ficha-presencia"></div>' +
       '<div id="ficha-sellos"></div>' +
       '<div id="ficha-aviso-tipo"></div>' +
       '<div class="ficha-acciones" id="ficha-acciones"></div>' +
-      /* Izquierda, lo que se trabaja; derecha, lo que se consulta y se
-         anota, con "Datos y contacto" la primera (fila 37, 17-sep-2026,
-         docs/FICHA-DEL-ASUNTO-NUEVA.md, 1): los documentos llevan
-         botones y necesitan la columna ancha, y las notas se usan poco
-         desde que casi todo se escribe como nota de un hito. */
+      /* Tres columnas (18-sep-2026, fila 51, docs/FICHA-DISPOSICION.md):
+         a la izquierda lo que hay que hacer (Hitos); en el centro los
+         documentos (llevan botones, hueco ancho); a la derecha lo que
+         hay que saber (Datos y contacto primero) y, plegado, lo que
+         casi nunca se mira. En pantallas que no dan para tres tramos,
+         css/ficha-asunto.css pone el centro debajo de la izquierda. */
       '<div class="ficha-columnas">' +
         '<div class="ficha-izquierda">' +
           bloque('Hitos', '<div id="ficha-guia" class="explica">Leyendo…</div>') +
+        '</div>' +
+        '<div class="ficha-centro">' +
           bloque('Documentos de la carpeta',
                  '<div id="ficha-documentos" class="explica">Leyendo…</div>', null,
                  '<span class="ficha-cuenta" id="ficha-cuenta-docs"></span>') +
         '</div>' +
         '<div class="ficha-derecha">' +
           '<div id="ficha-contacto-caja"></div>' +
-          bloque('Otros asuntos de este tercero',
-                 '<div id="ficha-otros" class="explica">Buscando…</div>') +
-          bloque('Personas y entidades relacionadas',
-                 '<div id="ficha-relacionados" class="explica">Leyendo…</div>') +
-          bloque('Datos del asunto', datosDelAsunto(a, p)) +
           bloque('Notas', '<div id="ficha-notas"></div>') +
+          FichaPlegables.bloque('ficha-plegable-otros', 'Otros asuntos de este tercero',
+                                 'ficha-otros', 'Buscando…') +
+          FichaPlegables.bloque('ficha-plegable-relacionados', 'Personas y entidades relacionadas',
+                                 'ficha-relacionados', 'Leyendo…') +
+          (tramite ? bloque('Datos del trámite', tramite) : '') +
         '</div>' +
       '</div>';
+
+    if (window.FichaPlegables) FichaPlegables.reponer(a.nombre, caja);
+    ultimoPintado = a.nombre;
 
     $('ficha-volver').onclick = volverALaLista;
 
@@ -544,23 +583,20 @@
     return salida;
   }
 
-  function datosDelAsunto(a, p) {
+  /* "Datos del trámite" (18-sep-2026, fila 51, docs/FICHA-DISPOSICION.md,
+     5): ya no repite nada que se vea en otro sitio de la pantalla
+     (cabecera, marcas, "Datos y contacto", la línea gris de arriba).
+     Solo quedan los campos propios del tipo, la vía, "Lo pide" y en
+     qué carpeta del ARCHIVO está. Sin ninguna fila, devuelve null: el
+     bloque entero no se pinta, ni el título ni la tarjeta. */
+  function datosDelAsunto(a) {
     var f = a.ficha || {};
-    return filas([
-      { titulo: 'Abierto el', valor: a.leido.fecha ? U.fechaLegible(a.leido.fecha) : '' },
-      { titulo: 'Tipo', valor: tipoDe(a) },
-      { titulo: 'Tercero', valor: f.tercero || a.leido.resto || '' },
-      { titulo: 'Categoría', valor: f.categoria || a.leido.categoria || '' },
-      { titulo: 'Año académico', valor: f.curso || a.leido.curso || '' },
-      { titulo: 'Descripción', valor: f.descripcion || '' }
-    ].concat(filasDeCampos(a)).concat([
-      { titulo: 'Estado', valor: f.situacion || 'Sin estado' },
+    var buenas = filasDeCampos(a).concat([
       { titulo: 'Vía de comunicación', valor: App.textoVia(f) },
       { titulo: 'Lo pide', valor: window.LoPide ? LoPide.texto(f) : '' },
-      { titulo: 'Fecha límite', valor: p ? Plazos.legible(p.limite) + ' · ' + p.texto : '' },
-      { titulo: 'Lo abrió', valor: f.abiertoPor || '' },
       { titulo: 'En el archivo', valor: a.ruta || '' }
-    ]));
+    ]).filter(function (x) { return x && x.valor; });
+    return buenas.length ? filasHtml(buenas) : null;
   }
 
   /* ---------- "Lo pide": quién ha pedido esta gestión ----------
