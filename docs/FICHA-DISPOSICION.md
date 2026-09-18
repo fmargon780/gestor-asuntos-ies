@@ -1,6 +1,7 @@
 # Poner en orden la ficha de un asunto
 
-Fila 49 de `docs/COLA.md`. Acordado con Francisco el 18-sep-2026, mirando una captura de la
+Fila 51 de `docs/COLA.md` (se escribió como fila 49; ese número y el 50 se los llevaron otras dos
+instrucciones del mismo día). Acordado con Francisco el 18-sep-2026, mirando una captura de la
 ficha de un asunto de MATRICULA.
 
 Es un cambio **de disposición**, no de funcionamiento. Ninguna función cambia de comportamiento:
