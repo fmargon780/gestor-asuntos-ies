@@ -134,8 +134,10 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 57 | `docs/HUECO-PARA-SELLO-Y-FIRMA.md` | HECHA (18-sep-2026 · 09:46) |
 | 58 | `docs/AJUSTES-DE-USO-2026-09-18.md` | PENDIENTE |
 | 59 | `docs/REQUISITOS-DE-HITO.md` | PENDIENTE |
+| 60 | `docs/COMUNICAR-DESDE-EL-HITO.md` | PENDIENTE |
 
-**Orden de trabajo:** las filas PENDIENTES son la 58 y la 59, en ese orden. Las filas 1 a 57 están
+**Orden de trabajo:** las filas PENDIENTES son la 58, la 59 y la 60, en ese orden. La 60 va después
+de la 59: las dos tocan el editor de un paso del trámite y el panel de hitos. Las filas 1 a 57 están
 HECHAS.
 
 **Fila 58, en una línea** (18-sep-2026, acordada con Francisco tras usar la aplicación con trabajo
@@ -160,6 +162,15 @@ que falta** en el hito: mete las casillas sin marcar como lista dentro del corre
 Séneca, con un hueco nuevo `{{LO QUE FALTA}}`. Ficheros nuevos: `js/hitos-requisitos.js`,
 `js/guias-requisitos.js`, `pruebas/requisitos-de-hito.mjs`. Detalle en
 `docs/REQUISITOS-DE-HITO.md`. Sube directamente a `main`, sin petición de cambios.
+
+**Fila 60, en una línea** (18-sep-2026, acordada con Francisco): cada paso del trámite puede llevar
+**su propio texto de comunicación**, de correo y de Séneca, escrito en la pantalla del tipo; el hito
+enseña entonces un botón **Comunicar** que abre el cuadro de siempre ya relleno, con el destinatario
+propuesto por el responsable del hito (tercero, tutor o relacionado; si es alguien del centro, el
+tercero del asunto). Al preparar el mensaje queda una línea en el historial del hito y una nota en
+el asunto, una sola vez. La plantilla general del tipo no se toca. Ficheros nuevos:
+`js/guias-comunicacion.js`, `js/hitos-comunicar.js`, `pruebas/comunicar-desde-hito.mjs`. Detalle en
+`docs/COMUNICAR-DESDE-EL-HITO.md`. Sube directamente a `main`, sin petición de cambios.
 
 **Fila 52, en una línea** (18-sep-2026, acordada con Francisco mirando la cabecera de un asunto de
 CERT. MATRICULA): los doce botones de la cabecera se agrupan por el momento del trámite en que se
@@ -276,8 +287,8 @@ la API.
   solo viajarían el identificador del asunto y el nombre de quien lo abre, nunca el nombre de la
   carpeta ni dato alguno de alumnado o personal, y con servidor en la Unión Europea.
 - Cuando los hitos (fila 15) estén en uso: si el estado del asunto desaparece y lo sustituye el
-  hito en curso, y si un hito puede apuntar a su plantilla de correo (fila 14) o de documento
-  (fila 17). Esto último Francisco ya lo dio por hecho el 16-sep-2026.
+  hito en curso. Lo de que un hito apunte a su plantilla de correo lo resuelve la fila 60; queda
+  pendiente lo mismo con la plantilla de documento (fila 17).
 - Los nueve asuntos de `docs/PROXIMOS-ASUNTOS.md` (14-sep-2026) están todos metidos en la cola:
   esa lista queda cerrada.
 - De la fila 54 (18-sep-2026): para un grupo de destinatarios que se repite todos los meses, lo
@@ -294,6 +305,8 @@ la API.
 - De la fila 59 (18-sep-2026): con el uso se verá si conviene que "Qué me toca" cuente también lo
   que falta por reunir, y si la casilla de un dato debería poder rellenarse sola desde la ficha
   del tercero.
+- De la fila 60 (18-sep-2026): con el uso se verá si el historial de comunicaciones conviene verlo
+  junto, en un sitio solo del asunto, en vez de repartido hito por hito.
 
 ## Nota sobre "sube directamente a main"
 
