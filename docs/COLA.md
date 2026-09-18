@@ -132,7 +132,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 55 | `docs/ASUNTO-SIN-ELECCION.md` | HECHA (18-sep-2026 · 07:22) |
 | 56 | `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md` | HECHA (18-sep-2026 · 07:22) |
 | 57 | `docs/HUECO-PARA-SELLO-Y-FIRMA.md` | HECHA (18-sep-2026 · 09:46) |
-| 58 | `docs/AJUSTES-DE-USO-2026-09-18.md` | PENDIENTE |
+| 58 | `docs/AJUSTES-DE-USO-2026-09-18.md` | EN CURSO (18-sep-2026 · 17:50) |
 | 59 | `docs/REQUISITOS-DE-HITO.md` | PENDIENTE |
 | 60 | `docs/COMUNICAR-DESDE-EL-HITO.md` | PENDIENTE |
 
