@@ -49,6 +49,12 @@
                                     que un documento de Word y un correo lean de un solo sitio) */
   var MAXIMO_LETRAS_SENECA = 4000;
 
+  /* "Pedir lo que falta" (18-sep-2026, fila 59, docs/REQUISITOS-DE-HITO.md,
+     sección 7): el texto de las casillas sin marcar de un hito, cuando
+     el cuadro se abre desde ese botón; vacío en cualquier otra
+     apertura. Ver cuerpoDelMedio, más abajo. */
+  var loQueFaltaActual = '';
+
   function $(id) { return document.getElementById(id); }
 
   /* ---------- de dónde salen los datos ---------- */
@@ -128,9 +134,19 @@
       ? plantillasDatos.lista.filter(function (p) { return p.id === idPlantilla; })[0]
       : null;
     if (plantilla) {
-      var r = Plantillas.rellenar(plantilla.texto, valoresActuales || {});
+      var valoresConLoQueFalta = Object.assign({}, valoresActuales || {}, { loQueFalta: loQueFaltaActual });
+      var r = Plantillas.rellenar(plantilla.texto, valoresConLoQueFalta);
       medio = r.texto;
       faltan = r.faltan;
+    }
+
+    /* Si "Pedir lo que falta" trae texto y la plantilla (o la falta de
+       plantilla) no llevaba el hueco {{LO QUE FALTA}} de todas formas,
+       se añade al final, separado por una línea en blanco (sección 7
+       del encargo): el hueco, cuando existe en la plantilla, ya lo ha
+       metido Plantillas.rellenar en su sitio. */
+    if (loQueFaltaActual && !(plantilla && Plantillas.tieneLoQueFalta(plantilla.texto))) {
+      medio = medio ? (medio + '\n\n' + loQueFaltaActual) : loQueFaltaActual;
     }
 
     var firma = textoDeLaFirma();
@@ -374,9 +390,10 @@
      se decide cuál tocaba, se prepara lo que los dos necesitan
      (persona, plantillas, valores) y se llama al que toque. */
 
-  async function abrirCuadro(a, deSeneca) {
+  async function abrirCuadro(a, deSeneca, extra) {
     viendo = a;
     porSeneca = !!deSeneca;
+    loQueFaltaActual = (extra && extra.loQueFalta) || '';
     if (window.SenecaDestinatarios) SenecaDestinatarios.limpiar();
     yaApuntado = false;
     algoCambiado = false;
@@ -450,6 +467,17 @@
      sacar el asunto, el cuerpo (con su plantilla) y el "a quién", y el
      rastro que se apunta en las notas del asunto. Se expone tal cual,
      sin copiar nada de esto en ninguno de los dos ficheros. */
+  /* Las dos opciones del menú "Comunicar" (Correo electrónico / Mensaje
+     de Séneca), reutilizadas tal cual por el botón "Pedir lo que falta"
+     de un hito (js/hitos-requisitos.js, fila 59): `extra` es lo mismo
+     que recibe abrirCuadro, con `loQueFalta` cuando toca. */
+  function opcionesComunicar(a, extra) {
+    return [
+      { texto: 'Correo electrónico', alPulsar: function () { abrirCuadro(a, false, extra); } },
+      { texto: 'Mensaje de Séneca', alPulsar: function () { abrirCuadro(a, true, extra); } }
+    ];
+  }
+
   window.CorreoNucleo = {
     categoriaDe: categoriaDe,
     terceroDe: terceroDe,
@@ -459,7 +487,13 @@
     plantillasDelTipo: plantillasDelTipo,
     cuerpoDelMedio: cuerpoDelMedio,
     apuntarElRastro: apuntarElRastro,
-    MAXIMO_LETRAS_SENECA: MAXIMO_LETRAS_SENECA
+    MAXIMO_LETRAS_SENECA: MAXIMO_LETRAS_SENECA,
+    /* Monta sobre `boton` el mismo menú pequeño "Comunicar" (Correo /
+       Séneca) que lleva la cabecera de la ficha, sin duplicar ese
+       camino (fila 59, sección 7 del encargo). */
+    montarBotonComunicar: function (boton, a, extra) {
+      if (window.FichaMenus) FichaMenus.montar(boton, opcionesComunicar(a, extra));
+    }
   };
 
   /* ---------- los botones dentro de la ficha del asunto ---------- */
@@ -498,10 +532,7 @@
       var principal = caja.querySelector('.boton-principal');
       if (principal) caja.insertBefore(b, principal); else caja.appendChild(b);
 
-      FichaMenus.montar(b, [
-        { texto: 'Correo electrónico', alPulsar: function () { abrirCuadro(actual, false); } },
-        { texto: 'Mensaje de Séneca', alPulsar: function () { abrirCuadro(actual, true); } }
-      ]);
+      FichaMenus.montar(b, opcionesComunicar(actual));
     }
 
     var pantalla = $('pantalla-asunto');

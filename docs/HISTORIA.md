@@ -5,6 +5,46 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 18-sep-2026 — Lo que hay que reunir en cada hito
+
+Fila 59 de la cola (`docs/COLA.md`, `docs/REQUISITOS-DE-HITO.md`): un hito dice qué hay que hacer,
+quién y para cuándo, pero no qué papeles hay que reunir o qué datos pedir; eso vivía en la cabeza
+de Francisco. Ahora cada paso del trámite de un tipo puede llevar una lista opcional de casillas
+("lo que hay que reunir"), cada una un **documento** o un **dato**, obligatoria o no.
+
+- **En la guía** (Ajustes › Tipos de asunto › un tipo › Pasos del trámite): dentro del editor de
+  cada paso, una sección plegable "Lo que hay que reunir" — texto libre, Documento/Dato,
+  Obligatorio, quitar y mover. Vive aparte, en `js/guias-requisitos.js` (nuevo), para no engordar
+  `js/guias.js`. Los pasos de dentro de una opción de una pregunta también pueden llevar su propia
+  lista; el paso-pregunta en sí, no (se resuelve eligiendo una opción, no con una casilla).
+- **En el hito**: al crearse desde la guía, cada paso copia sus requisitos, sin marcar. En la
+  ficha, debajo del cuerpo del hito y encima de sus documentos, un bloque con la cuenta de lo que
+  falta; marcar una de clase dato pide un valor pequeño (puede quedar en blanco), que se guarda al
+  salir del campo o con Intro; el de clase documento se marca **solo** al apuntar el documento que
+  corresponde (con una única casilla pendiente; con varias, se pregunta con cuál). Cada fila tiene
+  su menú de tres puntos (Editar el texto / Quitar de este asunto), y "+ Añadir algo que falte"
+  añade una casilla solo a este asunto, sin tocar la guía del tipo. Si el tipo gana requisitos
+  después de que el hito ya existiera, una línea discreta ofrece traerlos.
+- **No bloquea, avisa**: dar un hito por hecho con algo obligatorio sin reunir pregunta primero
+  (`Hitos.faltanObligatorios`); si Francisco sigue igual, se marca y se le apunta una nota
+  automática. Nunca se le impide avanzar.
+- **"Pedir lo que falta"**: un botón en el bloque, visible solo si queda algo sin marcar, abre el
+  mismo menú "Comunicar" de la cabecera de la ficha (Correo/Séneca) — no un camino nuevo — con la
+  lista de lo pendiente ya lista para pegar. Entra por un hueco de plantilla nuevo,
+  `{{LO QUE FALTA}}` (con dos llaves a propósito, para que se note que no es un dato del asunto
+  como los demás: se sustituye siempre, incluso por nada fuera de este camino, y nunca deja el
+  hueco escrito); sin ese hueco en la plantilla, o sin plantilla, el texto se añade al final. Todo
+  esto vive en `js/hitos-requisitos.js` (nuevo, modelo y pintura en un solo fichero, como pide el
+  encargo), enganchado a `window.Hitos` igual que `js/hitos-archivo.js`.
+
+Trampa evitada: nada de esto toca `Hitos.marcar` ni la firma de las funciones que ya existían —
+todo entra por fichero nuevo o por una llamada añadida donde tocaba (`js/hitos-documentos.js` al
+apuntar/quitar un documento, `js/hitos-panel-lista.js` antes de pasar a hecho, `js/correo.js` para
+reutilizar el menú "Comunicar" en vez de duplicarlo).
+
+Prueba nueva, sin navegador (con un disco de mentira en memoria, como `pruebas/logica.mjs`):
+`pruebas/requisitos-de-hito.mjs`.
+
 ## 18-sep-2026 — Seis arreglos de uso diario
 
 Fila 58 de la cola (`docs/COLA.md`, `docs/AJUSTES-DE-USO-2026-09-18.md`), seis puntos sueltos

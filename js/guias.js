@@ -107,7 +107,7 @@ var Guias = (function () {
         id: (o && o.id) || nuevoId(),
         titulo: String((o && o.titulo) || ''),
         pasos: normalizar((o && o.pasos) || []).map(function (sp) {
-          return { id: sp.id, titulo: sp.titulo, cuerpo: sp.cuerpo, opciones: [] };
+          return { id: sp.id, titulo: sp.titulo, cuerpo: sp.cuerpo, opciones: [], requisitos: sp.requisitos };
         })
       };
     }).filter(function (o) { return o.titulo || o.pasos.length; });
@@ -131,13 +131,14 @@ var Guias = (function () {
   function normalizar(lista) {
     return (lista || []).map(function (p) {
       if (typeof p === 'string') {
-        return Object.assign({ id: nuevoId(), titulo: p, cuerpo: '', opciones: [] }, normalizarExtra(null));
+        return Object.assign({ id: nuevoId(), titulo: p, cuerpo: '', opciones: [], requisitos: [] }, normalizarExtra(null));
       }
       return Object.assign({
         id: (p && p.id) || nuevoId(),
         titulo: String((p && p.titulo) || ''),
         cuerpo: limpiar((p && p.cuerpo) || ''),
-        opciones: normalizarOpciones(p && p.opciones)
+        opciones: normalizarOpciones(p && p.opciones),
+        requisitos: normalizarRequisitos(p && p.requisitos)
       }, normalizarExtra(p));
     }).filter(function (p) {
       return p.titulo || tieneTexto(p.cuerpo) || p.opciones.length;
@@ -145,6 +146,25 @@ var Guias = (function () {
   }
 
   function esPregunta(p) { return !!(p && p.opciones && p.opciones.length); }
+
+  /* "Lo que hay que reunir" de un paso (18-sep-2026, fila 59,
+     docs/REQUISITOS-DE-HITO.md): una lista opcional de casillas, cada
+     una un documento o un dato. Cualquier `clase` que no sea
+     'documento' se normaliza a 'dato'. Un requisito sin texto no
+     sobrevive: es el mismo criterio que un paso sin título. */
+  function normalizarRequisito(r) {
+    return {
+      id: (r && r.id) || nuevoId(),
+      texto: String((r && r.texto) || ''),
+      clase: (r && r.clase) === 'documento' ? 'documento' : 'dato',
+      obligatorio: !!(r && r.obligatorio)
+    };
+  }
+
+  function normalizarRequisitos(lista) {
+    return (Array.isArray(lista) ? lista : []).map(normalizarRequisito)
+      .filter(function (r) { return r.texto; });
+  }
 
   function cuantos(lista) { return (lista || []).length; }
 
@@ -553,6 +573,14 @@ var Guias = (function () {
         pasos[i].plazo = (!isNaN(dias) && dias > 0 && desdeSel && desdeSel.value)
           ? { dias: dias, desde: desdeSel.value } : null;
 
+        /* "Lo que hay que reunir" (18-sep-2026, fila 59): solo en los
+           pasos que no son pregunta (ver pintar()), así que un paso que
+           SÍ lo sea se queda con lo que ya tuviera (vacío, si nunca lo
+           tuvo). */
+        if (window.GuiasRequisitos && caja.querySelector(':scope > .paso-requisitos')) {
+          pasos[i].requisitos = GuiasRequisitos.leer(caja);
+        }
+
         var marca = caja.querySelector(':scope > .paso-es-pregunta-fila .paso-es-pregunta');
         if (!marca || !marca.checked) { pasos[i].opciones = []; return; }
 
@@ -569,7 +597,8 @@ var Guias = (function () {
                 id: sc.dataset.id || nuevoId(),
                 titulo: sc.querySelector(':scope > .paso-cabecera > .subpaso-titulo').value.trim(),
                 cuerpo: limpiar(sc.querySelector(':scope > .subpaso-cuerpo').innerHTML),
-                opciones: []
+                opciones: [],
+                requisitos: window.GuiasRequisitos ? GuiasRequisitos.leer(sc) : []
               };
             })
           };
@@ -640,8 +669,22 @@ var Guias = (function () {
 
         d.insertAdjacentHTML('beforeend', pasoExtraHTML(p, i));
 
-        /* ---- la casilla de "esto es una pregunta" ---- */
+        /* "Lo que hay que reunir" (18-sep-2026, fila 59,
+           docs/REQUISITOS-DE-HITO.md): solo en los pasos que no son
+           pregunta. Una pregunta no se "da por hecha" con una casilla:
+           se resuelve eligiendo una opción, y son SUS pasos (más abajo,
+           cajaDeOpciones) los que pueden llevar requisitos. */
         var pregunta = esPregunta(p);
+        if (!pregunta && window.GuiasRequisitos) {
+          d.insertAdjacentHTML('beforeend', GuiasRequisitos.bloqueHTML(p.requisitos));
+          GuiasRequisitos.enganchar(d, function (mutador) {
+            recoger();
+            mutador(pasos[i].requisitos);
+            pintar();
+          });
+        }
+
+        /* ---- la casilla de "esto es una pregunta" ---- */
         var fila = document.createElement('label');
         fila.className = 'interruptor paso-es-pregunta-fila';
         fila.innerHTML = '<input type="checkbox" class="paso-es-pregunta"' +
@@ -737,6 +780,16 @@ var Guias = (function () {
           };
           sc.querySelector('.paso-cabecera').appendChild(fuera);
           prepararRecuadro(sc.querySelector('.subpaso-cuerpo'));
+
+          if (window.GuiasRequisitos) {
+            sc.insertAdjacentHTML('beforeend', GuiasRequisitos.bloqueHTML(sp.requisitos));
+            GuiasRequisitos.enganchar(sc, function (mutador) {
+              recoger();
+              mutador(pasos[i].opciones[j].pasos[k].requisitos);
+              pintar();
+            });
+          }
+
           dentro.appendChild(sc);
         });
 
@@ -746,7 +799,7 @@ var Guias = (function () {
         mas.textContent = '+ Añadir un paso a esta opción';
         mas.onclick = function () {
           recoger();
-          pasos[i].opciones[j].pasos.push({ id: nuevoId(), titulo: '', cuerpo: '', opciones: [] });
+          pasos[i].opciones[j].pasos.push({ id: nuevoId(), titulo: '', cuerpo: '', opciones: [], requisitos: [] });
           pintar();
         };
         oc.appendChild(mas);
@@ -792,6 +845,7 @@ var Guias = (function () {
     nuevoId: nuevoId, limpiar: limpiar, normalizar: normalizar,
     cuantos: cuantos, vista: vista, hechosDe: hechosDe, cuenta: cuenta,
     esPregunta: esPregunta, cuandoSeElige: cuandoSeElige,
+    normalizarRequisitos: normalizarRequisitos,
     abrir: abrir, editar: editar
   };
 })();

@@ -70,7 +70,18 @@ var Plantillas = (function () {
     { clave: 'quienlopide', etiqueta: 'Quien lo pide' },
     { clave: 'quienlopiderelacion', etiqueta: 'Quien lo pide: qué es del interesado' },
     { clave: 'quienlopidevia', etiqueta: 'Quien lo pide: por dónde lo pidió' },
-    { clave: 'quienlopidefecha', etiqueta: 'Quien lo pide: fecha' }
+    { clave: 'quienlopidefecha', etiqueta: 'Quien lo pide: fecha' },
+    /* "Pedir lo que falta" (18-sep-2026, fila 59, docs/REQUISITOS-DE-HITO.md,
+       sección 7): un hueco distinto, con doble llave a propósito, para
+       que se note que no es un dato del asunto como los demás, sino un
+       bloque de varias líneas que solo tiene texto cuando se abre el
+       cuadro de Correo o de Séneca desde el botón "Pedir lo que falta"
+       de un hito. Fuera de ese camino se sustituye por nada, nunca se
+       deja escrito: ver `tieneLoQueFalta` y `rellenar`, más abajo. Su
+       `clave` lleva ya las llaves para que el botón "Insertar hueco"
+       (js/huecos-buscador.js, que lee este mismo catálogo) meta el
+       texto exacto sin tocar ese fichero. */
+    { clave: '{LO QUE FALTA}', etiqueta: 'Lo que hay que reunir, sin marcar (desde un hito)' }
   ];
 
   var cache = null;
@@ -168,10 +179,27 @@ var Plantillas = (function () {
      hay dato, nunca dejado tal cual). */
   var CONOCIDOS = HUECOS.map(function (h) { return h.clave; });
 
+  /* `{{LO QUE FALTA}}` (18-sep-2026, fila 59, sección 7 del encargo):
+     va con dos llaves a propósito, para poder sustituirlo ANTES que el
+     resto (con una sola pasada de regex nunca se distinguiría de un
+     hueco corriente que se llamase "LO QUE FALTA"), y para poder
+     sustituirlo siempre —incluso por nada, cuando `valores.loQueFalta`
+     no llega— sin que cuente como un dato que falta. */
+  function reLoQueFalta(conG) {
+    return new RegExp('\\{\\{\\s*LO QUE FALTA\\s*\\}\\}', 'i' + (conG ? 'g' : ''));
+  }
+
+  function tieneLoQueFalta(texto) {
+    return reLoQueFalta(false).test(String(texto || ''));
+  }
+
   function rellenar(texto, valores) {
     valores = valores || {};
+    var conLoQueFalta = String(texto || '').replace(reLoQueFalta(true), function () {
+      return valores.loQueFalta || '';
+    });
     var faltan = [];
-    var salida = String(texto || '').replace(/\{([^{}]+)\}/g, function (todo, dentro) {
+    var salida = conLoQueFalta.replace(/\{([^{}]+)\}/g, function (todo, dentro) {
       var clave = dentro.trim();
       if (/^campo\s*:/i.test(clave)) {
         var nombreCampo = clave.replace(/^campo\s*:/i, '').trim();
@@ -439,7 +467,7 @@ var Plantillas = (function () {
     ARCHIVO: ARCHIVO, HUECOS: HUECOS,
     POR_DEFECTO_FIRMA: POR_DEFECTO_FIRMA, POR_DEFECTO_CENTRO: POR_DEFECTO_CENTRO,
     cargar: cargar, olvidar: olvidar, guardar: guardar,
-    deTipo: deTipo, idNuevo: idNuevo, rellenar: rellenar,
+    deTipo: deTipo, idNuevo: idNuevo, rellenar: rellenar, tieneLoQueFalta: tieneLoQueFalta,
     documentosDeTipo: documentosDeTipo, idNuevoDocumento: idNuevoDocumento,
     valoresDeAsunto: valoresDeAsunto
   };

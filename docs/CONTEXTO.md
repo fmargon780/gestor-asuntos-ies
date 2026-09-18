@@ -549,6 +549,18 @@ cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegi
 - `Guias.vista(pasos, [], false)` sigue sirviendo de recordatorio sin casillas al crear un asunto
   (`#guia-nuevo`, `js/guias-enganche.js`): es el único sitio, aparte del propio cuadro de editar,
   que todavía la pinta. `Guias.cuandoSeElige` ya no tiene quien la llame.
+- **"Lo que hay que reunir"** (18-sep-2026, fila 59, `docs/REQUISITOS-DE-HITO.md`): un paso (o un
+  subpaso, dentro de una opción de una pregunta) puede llevar una lista opcional de casillas —
+  `requisitos: [{ id, texto, clase: 'documento'|'dato', obligatorio }]` —, normalizada por
+  `Guias.normalizarRequisitos` (cualquier `clase` que no sea `'documento'` se convierte en `'dato'`;
+  una fila sin texto no sobrevive). Nunca en un paso-pregunta: se resuelve eligiendo una opción, no
+  con una casilla, y son sus subpasos quienes pueden llevar requisitos propios.
+  `js/guias-requisitos.js` (nuevo, aparte para no engordar más `js/guias.js`) pinta la sección
+  plegable **"Lo que hay que reunir"** dentro del editor de cada paso/subpaso
+  (`GuiasRequisitos.bloqueHTML`) y la lee de vuelta (`GuiasRequisitos.leer`), con el mismo patrón
+  imperativo del resto del editor: cada `+ Añadir`/quitar/mover fila hace `recoger(); mutar el
+  array; pintar();`. `js/guias.js` solo llama a las dos funciones, y en `recoger()` copia lo leído a
+  `pasos[i].requisitos` (o al del subpaso que toque).
 
 Se comprueba con `pruebas/guias.mjs` y `pruebas/opciones.mjs`.
 
@@ -619,6 +631,51 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
   repintado ENTERO de la ficha (`pintarLaFicha` rehace de un golpe los hijos directos de
   `#ficha-asunto-cuerpo`), que es lo único que de verdad hace falta captar aquí — cualquier cambio
   que sí toque a los hitos por su cuenta ya llama a `HitosPanel.programarRepintado()` él mismo.
+- **"Lo que hay que reunir"** (18-sep-2026, fila 59, `docs/REQUISITOS-DE-HITO.md`): cada hito trae
+  `requisitos`, copiados de los del paso de la guía al crearse (`Hitos.pasoAHito`), con el estado
+  propio del hito encima: `{ id, texto, clase, obligatorio, hecho, valor, documento, quien,
+  cuando }` (`normalizarRequisitoHito`, `js/hitos.js`). `js/hitos-requisitos.js` (nuevo, enganchado
+  a `window.Hitos` como `js/hitos-archivo.js`) trae el resto:
+  - El modelo: `Hitos.marcarRequisito`/`escribirValorRequisito`/`editarTextoRequisito` (edita una
+    casilla ya existente), `Hitos.anadirRequisito`/`quitarRequisito` ("+ Añadir algo que falte":
+    solo a este asunto, la guía del tipo no se toca) y `Hitos.traerRequisitos` (sección 4.3: si un
+    hito no tiene ninguna y su paso de origen, `origenGuia`, sí las tiene ahora, una línea discreta
+    ofrece traerlas sin marcar; nunca se hace solo).
+  - `Hitos.faltanObligatorios(hito)` (`js/hitos.js`): las casillas obligatorias sin marcar. No
+    cambia `Hitos.marcar`: es `js/hitos-panel-lista.js` quien la llama justo antes de pasar un hito
+    a `hecho`, y si devuelve algo, `U.preguntar` avisa (nunca bloquea) y, si Francisco sigue, se le
+    apunta una nota automática ("Dado por hecho con N cosas sin reunir.").
+  - La pintura del bloque dentro del cuerpo de un hito (`HitosRequisitos.bloqueDeRequisitos`/
+    `engancharBloque`, llamadas desde `js/hitos-panel-lista.js`, debajo de la explicación y encima
+    de los documentos apuntados): una casilla por fila, el texto en negrita con un punto ámbar si es
+    obligatoria y sigue sin marcar, y el valor o el documento en gris cuando ya está marcada (con
+    `Copiar.boton` para el valor). Marcar una de clase `dato` abre un campo pequeño para el valor
+    (puede quedar vacío), que se guarda al perder el foco o con Intro; al desmarcar, el valor se
+    conserva y solo deja de contar. El menú de tres puntos de cada fila (`js/ficha-menus.js`) trae
+    Editar el texto/Quitar de este asunto. Sin ninguna casilla, el bloque no se pinta: "+ Añadir
+    algo que falte" va entonces suelto, con el resto de botones del hito.
+  - **Marcar el documento sin marcarlo a mano** (sección 5): `js/hitos-documentos.js`, al apuntar o
+    quitar un documento de un hito, llama a `HitosRequisitos.marcarPorDocumento`/
+    `desmarcarPorDocumento`. Con una sola casilla de clase `documento` sin marcar, se marca sola con
+    el nombre del fichero; con varias, un `U.preguntar` pequeño pregunta con cuál se corresponde
+    (o "Ninguna"); sin ninguna, no pasa nada. No crítico: si falla, el documento ya ha quedado
+    apuntado igual.
+  - **"Pedir lo que falta"** (sección 7): botón en la cabecera del bloque, visible solo si queda
+    algo sin marcar, que abre EL MISMO menú "Comunicar" de la cabecera de la ficha
+    (`CorreoNucleo.montarBotonComunicar`, nuevo en `js/correo.js`, monta `FichaMenus` con las dos
+    opciones de siempre —`abrirCuadro(a, false/true, extra)`, con `extra.loQueFalta`—: no duplica
+    ese camino). El texto (`HitosRequisitos.textoLoQueFalta`, cabecera "Falta por aportar:" y una
+    línea por casilla sin marcar, de las dos clases, en su orden) entra por el hueco de plantilla
+    `{{LO QUE FALTA}}` (con dos llaves a propósito: `Plantillas.tieneLoQueFalta`/`rellenar`,
+    `js/plantillas.js`, lo sustituye en una pasada aparte, ANTES que el resto de huecos, y siempre
+    —incluso por nada, fuera de este camino— para que nunca cuente como un dato que falta; en el
+    catálogo `Plantillas.HUECOS` su `clave` lleva ya las llaves, `'{LO QUE FALTA}'`, así que el
+    botón "Insertar hueco" y el catálogo de `js/plantillas-documento.js` meten el texto exacto sin
+    tocar ninguno de los dos). Si la plantilla no lleva ese hueco, o el tipo no tiene plantilla,
+    `CorreoNucleo.cuerpoDelMedio` (`js/correo.js`) lo añade al final, separado por una línea en
+    blanco; vale igual para el cuadro de Correo (`js/correo-cuadro.js`) y el de Séneca
+    (`js/seneca-cuadro.js`), sin tocar ninguno de los dos: los dos ya llaman a
+    `CorreoNucleo.cuerpoDelMedio`.
 - **Responsable**: persona del centro (configurable en Ajustes › Hitos) o un papel fijo
   (`tercero`, `tutor`, `relacionado`) que la aplicación resuelve sola con datos del asunto
   (`Hitos.resolverResponsable`); sin resolver, se enseña en gris.
@@ -644,10 +701,10 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
   400 líneas), `js/hitos-panel.js` y `js/hitos-panel-lista.js` (la ficha del asunto: el
   observador, el repintado y la creación automática en uno, cómo se pinta cada hito en el otro,
   hablándose por `window.HitosPanel`), `js/hitos-documentos.js` (el cuadro de apuntar un
-  documento) y `js/hitos-ajustes.js` (el bloque "Hitos" de Ajustes: responsables y días no
-  lectivos).
+  documento), `js/hitos-requisitos.js` (fila 59: "lo que hay que reunir", modelo y pintura en uno)
+  y `js/hitos-ajustes.js` (el bloque "Hitos" de Ajustes: responsables y días no lectivos).
 
-Se comprueba con `pruebas/hitos.mjs`.
+Se comprueba con `pruebas/hitos.mjs` y, sin navegador, `pruebas/requisitos-de-hito.mjs`.
 
 ### La pantalla "Qué me toca"
 
@@ -2508,7 +2565,8 @@ de `App` va después del fichero que lo define.
 | `js/fichas-huerfanas.js` | Fichas de `asuntos.json` cuya carpeta ya no está: enlazar o borrar |
 | `js/nombres.js` | Monta los nombres de carpetas y documentos |
 | `js/plazos.js` | La fecha límite de los asuntos |
-| `js/guias.js` | Pintar y escribir una guía, con sus preguntas y opciones |
+| `js/guias.js` | Pintar y escribir una guía, con sus preguntas y opciones; en el editor de cada paso llama a `js/guias-requisitos.js` para "lo que hay que reunir" (fila 59) |
+| `js/guias-requisitos.js` | La sección "Lo que hay que reunir" del editor de un paso (`GuiasRequisitos.bloqueHTML`/`leer`/`enganchar`, fila 59, aparte de `js/guias.js` para no engordarlo) |
 | `js/datos.js` | Lee los CSV; el nombre comercial y las columnas leídas por su título; `Datos.tutoresDe` agrupa los tutores legales por persona y `Datos.resumenDeTercero` monta la línea "Datos y contacto" |
 | `js/campos.js` | Los campos de cada tipo de asunto: catálogo, cálculo y guardado |
 | `css/campos.css` | Los estilos del bloque "Datos del asunto" y del cuadro de Campos |
@@ -2538,7 +2596,7 @@ de `App` va después del fichero que lo define.
 | `js/frescura.js` | El aviso de que el RegAlum.csv está viejo, y sus épocas |
 | `js/recurrentes.js` | Los asuntos que se repiten cada mes, trimestre o curso; la sección "Se repite" de la pantalla de un tipo (`Recurrentes.pintarEnContenedor`, 17-sep-2026) |
 | `js/guias-enganche.js` | Las guías dentro de la app, y `window.GuiasDelCentro` |
-| `js/hitos.js`, `js/hitos-archivo.js` | El modelo de los hitos de un asunto: leer/escribir `hitos.json`, crearlos desde la guía, marcarlos, bifurcaciones, responsables y el historial al archivar |
+| `js/hitos.js`, `js/hitos-archivo.js` | El modelo de los hitos de un asunto: leer/escribir `hitos.json`, crearlos desde la guía, marcarlos, bifurcaciones, responsables y el historial al archivar; `js/hitos.js` trae también `requisitos` y `faltanObligatorios` (fila 59) |
 | `js/que-me-toca.js` | Pantalla propia "Qué me toca": cruza los hitos pendientes y en curso de todos los asuntos abiertos, en tres bloques (`css/que-me-toca.css`); arriba, el aviso de aspirantes sin Nº de identificación escolar (fila 42) |
 | `js/presencia.js` | No pisarse en un mismo asunto: la señal de `_GESTOR/presencia.json`, la vigilancia y la marca de la tarjeta de la lista |
 | `js/notas.js` | Las notas de cada asunto, con su enlace y su botón; `Notas.pintarEnFicha` es la caja de escribir directa de la ficha, con botón Guardar (se guarda al pulsarlo o al perder el foco, nunca al teclear, fila 58); `confirmarSalirDeFicha` avisa si se sale con algo sin guardar |
@@ -2559,20 +2617,21 @@ de `App` va después del fichero que lo define.
 | `js/ficha-documentos.js` | Los documentos de la carpeta, en la ficha del asunto (separado de `js/ficha-asunto.js` en la fila 26); pone la clase `vacio` al bloque cuando no hay ninguno (fila 51); botón "Documentos ▾" en la cabecera del bloque (fila 52); el original "SIN SELLAR" en gris y "Asociar a un hito" en cada fila (fila 58) |
 | `js/ficha-tercero.js`, `css/ficha-tercero.css` | "Datos y contacto" del tercero: la línea resumen y la ventana "Ver todo" con los tutores agrupados por persona (separado de `js/ficha-asunto.js` en la fila 37) |
 | `js/hitos-panel.js` | Pinta los hitos en la ficha del asunto (los pasos de la guía SON los hitos): el observador (solo `childList` sobre `#ficha-asunto-cuerpo`, sin `subtree`, desde la fila 58), el repintado y la creación automática |
-| `js/hitos-panel-lista.js` | La otra mitad del panel de hitos: la fila de cada hito, su cuerpo desplegado y el cambio de rama |
+| `js/hitos-panel-lista.js` | La otra mitad del panel de hitos: la fila de cada hito, su cuerpo desplegado, el cambio de rama, "lo que hay que reunir" (llama a `js/hitos-requisitos.js`, fila 59) y la guarda antes de pasar un hito a hecho |
 | `js/duplicados.js` | ¿Esto no lo hicimos ya? Asuntos iguales del mismo tercero; exporta también `carpetaDelTercero` (fila 40) |
 | `js/relacionados.js` | Terceros relacionados con un asunto, la nota al archivar, "+ Añadir varios" y los atajos de alumnado |
 | `js/otros-del-tercero.js`, `css/ficha-asunto.css` | Bloque "Otros asuntos de este tercero" (separado de `js/ficha-asunto.js` en la fila 40): cada línea se pulsa y abre su ficha, y el botón "← Volver a …" que apunta siempre al asunto de partida |
 | `js/grupos.js` | Grupos propios de personas, guardados con nombre en `_GESTOR/grupos.json` |
 | `js/hitos-archivo.js` | La otra mitad del modelo de hitos: bifurcaciones, responsables de Ajustes y el `HISTORIAL DE TRAMITACION.txt` al archivar/reabrir |
+| `js/hitos-requisitos.js` | "Lo que hay que reunir" de un hito, enganchado a `window.Hitos` como `js/hitos-archivo.js`: marcar/escribir/añadir/quitar/editar/traer una casilla, y también la pintura del bloque dentro de la ficha y "Pedir lo que falta" (fila 59) |
 | `js/visor.js` | El panel de la derecha para ver un documento (`con-visor`); marcador y acciones opcionales para que quien lo abre sepa qué se está viendo |
 | `js/tipos-buscador.js` | Buscar el tipo de asunto por letras, y los más usados arriba |
 | `js/via-contacto.js` | Los teléfonos y correos del tercero, como botones |
 | `js/tablon.js` | El tablón de notas rápidas, con las notas "Solo para mí" |
 | `js/copiar.js` | Los botones de copiar: el nombre del documento en la ficha, y `Copiar.boton`/`nieDeAsunto`/`categoriaDe`/`copiar` expuestos en `window.Copiar` para la fila de copiar de un gesto (`js/ficha-nombre-acciones.js`, fila 58) |
-| `js/plantillas.js` | Leer y guardar `plantillas.json`, montar `Plantillas.valoresDeAsunto` y rellenar los huecos: el motor, sin pantalla |
+| `js/plantillas.js` | Leer y guardar `plantillas.json`, montar `Plantillas.valoresDeAsunto` y rellenar los huecos: el motor, sin pantalla. El hueco `{{LO QUE FALTA}}`, con doble llave, se sustituye aparte y siempre (`tieneLoQueFalta`, fila 59) |
 | `js/plantillas-ajustes.js` | Las plantillas de correo (sacado de `js/plantillas.js`); desde el 17-sep-2026 (fila 39) pinta solo las de un tipo dentro de su pantalla (`PlantillasAjustes.pintarDeTipo`) y los campos de Datos del centro y firma, en "El centro" |
-| `js/correo.js` | El correo y el mensaje de Séneca: la lógica compartida (rastro, plantillas, grupos en copia oculta) y quién abre y pinta el cuadro (`abrirCuadro`/`pintarCuadro`, que desde la fila 58 delegan el cuerpo propio de cada cuadro en `js/seneca-cuadro.js`/`js/correo-cuadro.js`); expone `window.CorreoGrupos` (fila 47) para que `js/seneca-destinatarios.js` reutilice el mismo desplegable |
+| `js/correo.js` | El correo y el mensaje de Séneca: la lógica compartida (rastro, plantillas, grupos en copia oculta) y quién abre y pinta el cuadro (`abrirCuadro`/`pintarCuadro`, que desde la fila 58 delegan el cuerpo propio de cada cuadro en `js/seneca-cuadro.js`/`js/correo-cuadro.js`); expone `window.CorreoGrupos` (fila 47) para que `js/seneca-destinatarios.js` reutilice el mismo desplegable, y `CorreoNucleo.montarBotonComunicar` (fila 59) para que "Pedir lo que falta" de un hito reutilice el mismo menú "Comunicar" |
 | `js/correo-cuadro.js`, `css/correo.css` (`.cuadro-correo`, `.correo-grid`) | El cuerpo propio del cuadro de Correo (separado de `js/correo.js` en la fila 58): destinatario, asunto, mensaje, documentos adjuntos y CCO, en dos columnas |
 | `js/idea.js` | El usuario IdEA de una persona (y el de sus tutores legales), leído por el título de columna del CSV, como `js/dni.js` (fila 47) |
 | `js/seneca-destinatarios.js` | La lista de usuarios IdEA del cuadro de Séneca, en chips, con "Copiar la lista"/"Copiar el siguiente" (fila 47) |

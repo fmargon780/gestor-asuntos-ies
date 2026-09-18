@@ -101,7 +101,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Escape y botón de salida en toda pantalla; copiar el nombre de un relacionado en orden normal; carpetas temporales de Drive/Dropbox fuera de Asuntos abiertos.
 - Hitos: los pasos de la guía SON los hitos de un asunto abierto (se crean solos al abrirlo, ya no
   hay guía con casillas aparte), con estado, fecha límite, responsable, bifurcaciones, documentos
-  apuntados (botón "Apuntar un documento") e historial.
+  apuntados (botón "Apuntar un documento") e historial. Cada paso puede llevar "lo que hay que
+  reunir" (documento o dato, obligatorio opcional), como casillas del hito; "Pedir lo que falta" lo
+  mete en el correo o Séneca; darlo por hecho con algo obligatorio sin reunir avisa, no lo impide.
 - "Qué me toca": pantalla que cruza los hitos pendientes de todos los asuntos abiertos, en tres
   bloques (en tu tejado, esperando a otros, sin fecha), con filtro por responsable.
 - No pisarse en un asunto: si el compañero ya está dentro, se entra en modo consulta (aviso y
