@@ -2664,3 +2664,47 @@ una línea cada una. El texto largo que tenían antes era:
   si las publicaciones saltadas también cuentan para el cupo de 100 (el propio encargo dice que
   no está documentado). No se ha tocado `git.deploymentEnabled` ni ningún *deploy hook*: esa es
   la salida si la regla 13 no bastara, y no hacía falta todavía.
+- **49 · `docs/ADJUNTOS-DE-CORREO-POR-DENTRO.md`**: Terminada 18-sep-2026 · 03:27. La bandeja de
+  correos (fila 27) proponía tercero y tipo mirando solo el texto del correo; el dato bueno —DNI,
+  registro de Séneca, fecha del documento, la palabra que marca el tipo— suele estar dentro del
+  PDF adjunto, no en las dos líneas del mensaje. Ahora la bandeja lee también esos adjuntos y
+  **completa** la propuesta sin pisarla: manda siempre lo que ya haya adivinado el correo
+  (`Bandeja.proponer`, sin tocar), el PDF solo rellena el tercero o el tipo cuando el correo no
+  los encuentra, y aporta el registro y la fecha del documento, que el correo nunca trae. Hermana
+  de la fila 41 (`LEER-DOCUMENTOS-POR-CLASIFICAR.md`): reutiliza `LectorDocumentos.analizar` tal
+  cual, sin escribir otro lector.
+  - `js/contexto-documentos.js` (nuevo): `ContextoDocumentos.delCentro()`, las tres listas de
+    terceros y los tipos, sacada de `js/documentos-sueltos-lector.js` (que ahora la llama en vez
+    de montarlas por su cuenta) para que la use también el módulo de esta fila, sin duplicar
+    `Datos.cargar`/`window.Dni`.
+  - `js/bandeja-adjuntos-lector.js` (nuevo): la cola de uno en uno (nunca en paralelo), la caché
+    por identificador de correo, la lectura de como mucho 3 adjuntos PDF por correo (nunca `pdf`
+    ni `pdfMensaje`) a 5 páginas cada uno, la mezcla del punto 2 del encargo, y la línea "Del
+    documento: …" en la tarjeta. El gancho en `js/bandeja-pantalla.js` es mínimo, dentro de
+    `tarjeta(item)` (no está exportada): solo se lee con la barra desplegada.
+  - **Trampa encontrada al probar, no estaba prevista**: `js/bandeja-pantalla.js` rehace la
+    bandeja entera con `c.innerHTML = ''` en cada `pintar()`, así que la línea recién creada de
+    una tarjeta puede no estar todavía enganchada al documento cuando le toca aplicarle un
+    resultado ya en caché; buscarla con `document.querySelectorAll` en ese instante no la
+    encuentra, y se queda con el hueco vacío puesto (oculto por CSS, pero seguía contando como
+    una fila más: así falló primero `pruebas/bandeja-adjuntos.mjs`, casos 2, 4 y 7). Arreglado
+    aplicando el resultado en caché directamente sobre el elemento recién creado que ya se tiene
+    en la mano, y dejando la búsqueda por `document.querySelectorAll` solo para cuando termina de
+    leerse de verdad (para entonces la tarjeta ya lleva un rato montada del todo).
+  - Completar la pantalla de "Nuevo asunto" (`window.Bandeja.llevarANuevo`, envuelta como
+    propiedad del objeto, sin tocar `js/bandeja-correos.js`) solo cuando el correo no dejó tercero
+    **ni** tipo puestos: `App.elegirTipo`/`App.elegirCategoria` reinician lo que venga detrás en
+    su propio orden, así que completar solo uno de los dos cuando el correo ya dejó el otro
+    puesto lo borraría. En ese caso el dato del PDF se queda solo en la línea de la tarjeta.
+  - Prueba nueva `pruebas/bandeja-adjuntos.mjs`, en navegador de verdad con un PDF real montado a
+    mano (mismo `pdfConTexto` que `pruebas/dar-de-alta-desde-documento.mjs`, copiado sin atar los
+    dos ficheros entre sí): los 7 casos del encargo, más "Descartar" sin romper nada.
+  - **Aviso, sin tocar en esta fila**: al entrar en este trabajo, `node_modules` no estaba
+    instalado en la sesión (`npm test` fallaba con `Cannot find package 'playwright'`) y el
+    Chromium empaquetado por Playwright no coincidía con el de `/opt/pw-browsers` (`npm install`
+    trae la versión 1194, y hacía falta pasar `CHROMIUM_PATH=/opt/pw-browsers/chromium` a `npm
+    test`, como ya preveían los propios ficheros de prueba). Y `pruebas/notas-asunto-no-se-borran.mjs`
+    sigue en rojo en este contenedor concreto (un clic sobre `.hito-nota-texto` que llega justo
+    cuando el panel de hitos se repinta, "element is not visible" tras varios reintentos): falla
+    igual en el commit de partida de esta sesión (`bb53ee9`, antes de tocar nada de la fila 49),
+    así que no es de esta fila. Queda apuntado por si se repite en otra sesión.

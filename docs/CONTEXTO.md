@@ -1777,7 +1777,10 @@ palabras clave.
     al arrancar. Los ficheros se leen de uno en uno, con una cola en memoria (nunca en paralelo: la
     pantalla no se bloquea), cacheados por nombre de fichero —volver a la lista no vuelve a leer
     nada—; el contexto de `analizar` (tipos y las tres listas de terceros) se monta una sola vez
-    por pantalla, apoyándose en la caché propia de `Datos.cargar`.
+    por pantalla. Cómo se montan esas tres listas vive en `js/contexto-documentos.js`
+    (`ContextoDocumentos.delCentro()`, 18-sep-2026, fila 49, sacada de aquí para que
+    `js/bandeja-adjuntos-lector.js` la use también sin escribirla dos veces), apoyándose en la
+    caché propia de `Datos.cargar`.
 - **Crear el asunto de un clic**: `App.crearAsuntoConPropuesta(tipo, tercero, documentoSuelto)`
   (nueva en `js/asuntos-nuevo.js`, unas quince líneas) reutiliza tal cual el mismo camino manual:
   `App.E.pendiente` + `App.ir('nuevo')` + `App.elegirCategoria`/`elegirTipo`/`fijarTercero` (ya
@@ -1794,6 +1797,56 @@ palabras clave.
 Se comprueba con `pruebas/lector-documentos.mjs` (los 6 escenarios de la instrucción, sin pdf.js ni
 navegador) y con la batería completa en verde (`pruebas/documentos-sueltos.mjs`,
 `pruebas/ajustes-por-tipo.mjs` actualizada a las ocho secciones).
+
+### Leer los adjuntos de un correo de la bandeja (18-sep-2026, fila 49,
+### docs/ADJUNTOS-DE-CORREO-POR-DENTRO.md)
+
+Hermana de la sección de arriba: en vez de un documento suelto, los adjuntos PDF de un correo de la
+bandeja. **Manda siempre lo que ya haya adivinado el correo** (`Bandeja.proponer`, sin tocar): el
+PDF solo rellena el tercero o el tipo cuando el correo no los encuentra, y aporta el registro de
+Séneca y la fecha del propio documento, que el correo nunca trae. Si el PDF encuentra un tercero
+distinto del que encontró el correo, gana el del correo sin avisar de nada.
+
+- `js/bandeja-adjuntos-lector.js`, nuevo, hermano de `js/documentos-sueltos-lector.js`: misma cola
+  de uno en uno (nunca en paralelo), misma caché en memoria por identificador de correo mientras
+  dure la pantalla, mismo `LectorDocumentos.analizar` y el mismo `ContextoDocumentos.delCentro()`
+  (ver arriba). Lee como mucho los 3 primeros adjuntos que sean PDF de cada correo (nunca `pdf` ni
+  `pdfMensaje`, el PDF del hilo entero: ahí no hay nada que el correo no tenga ya), 5 páginas cada
+  uno, con `carpeta.getFileHandle(nombre)` + `.getFile()` + `RegistroLector.textoDe`; si hay
+  varios, se juntan los análisis (gana el primero que traiga cada dato). Un adjunto que falle no
+  para a los demás: mejor esfuerzo, sin avisar de nada.
+- **El gancho, mínimo, dentro de `tarjeta(item)`** (`js/bandeja-pantalla.js`, no está exportada):
+  una línea `.tarjeta-adjuntos-correo` más, con `data-adjuntos-de="<id>"`, y una llamada a
+  `BandejaAdjuntosLector.pintarEn(item, laLinea, plegado)`. Con la barra plegada no hace nada; al
+  desplegarla, si el correo no tiene PDF adjuntos la línea se quita sin más, si no dice "Leyendo
+  los documentos…" y encola la lectura. Al terminar: si hay algo nuevo, "Del documento: 26EM0368 ·
+  10-sep-2026 · SOLICITUD · García Pérez, Ana" (mismo estilo que la propuesta de arriba); si no hay
+  nada que el correo no tuviera ya, la línea se quita entera.
+  - **Ojo con la carrera del repintado**: `js/bandeja-pantalla.js` rehace la bandeja entera
+    (`c.innerHTML = ''`) en cada `pintar()`, así que la línea recién creada de una tarjeta puede
+    todavía no estar enganchada al documento cuando le toca aplicarle un resultado ya en caché
+    (`resultados.hasOwnProperty(id)`): buscarla con `document.querySelectorAll` en ese momento no
+    la encontraría, y se quedaría con el hueco vacío puesto (aunque oculto por CSS, seguiría
+    contando como una fila más). Por eso `pintarEn` aplica el resultado en caché directamente sobre
+    el elemento que le pasan (`aplicar(el, r)`), y solo busca por `data-adjuntos-de` en el documento
+    (`actualizarLinea`, vía `lineasDe`) cuando termina de leerse de verdad: para entonces la tarjeta
+    ya lleva un buen rato montada del todo.
+- **Completar la pantalla de "Nuevo asunto"**: se envuelve `window.Bandeja.llevarANuevo` (una
+  propiedad del objeto, así que no hace falta tocar `js/bandeja-correos.js`), no la función de
+  dentro. Solo se completa si, después de que el correo haya hecho lo suyo, `App.E.nuevo.tercero`
+  **y** `App.E.nuevo.tipo` siguen los dos vacíos: `App.elegirTipo`/`App.elegirCategoria` reinician
+  lo que venga detrás en su propio orden (categoría → tipo → tercero, el mismo que ya usa
+  `llevarANuevo`), así que tocar cualquiera de los dos cuando el correo ya dejó algo puesto lo
+  borraría. Con eso a medias, el dato del PDF se queda solo en la línea de la tarjeta, para que
+  Francisco lo escriba él si hace falta.
+- No se toca `apps-script/gestor-correos.gs`, ni `Bandeja.proponer`, ni `llevarANuevo` por dentro,
+  ni `js/documentos-sueltos.js`.
+
+Se comprueba con `pruebas/bandeja-adjuntos.mjs` (en navegador de verdad, PDF real montado a mano
+como en `pruebas/dar-de-alta-desde-documento.mjs`): sin tercero en el correo, el PDF lo completa;
+con tercero ya reconocido, el PDF no lo pisa aunque traiga uno distinto; sin tipo, el PDF lo trae
+por sus palabras clave; con tipo ya puesto, el PDF no lo pisa; sin adjuntos, sin PDF entre los
+adjuntos, y con uno que no se puede leer, la tarjeta se queda exactamente como antes de esta fila.
 
 ### Separar, unir y sacar páginas de un PDF (17-sep-2026, fila 22, docs/SEPARAR-Y-UNIR-PDF.md)
 
@@ -2117,6 +2170,8 @@ de `App` va después del fichero que lo define.
 | `js/elegir-asunto.js` | El cuadro de escoger un asunto a mano, compartido por "Por clasificar" y por la bandeja de correos |
 | `js/documentos-sueltos.js` | Los papeles sin asunto, "Meter en un asunto", cerrar y reabrir, y la vigilancia de la carpeta |
 | `js/documentos-sueltos-lector.js` | Envuelve `App.tarjetaSuelto` para proponer tipo/fecha/registro/tercero de cada PDF suelto, con el botón "Aceptar" (17-sep-2026, fila 41); si el documento de identidad no cuadra con nadie, el botón "Dar de alta" (fila 42) |
+| `js/contexto-documentos.js` | `ContextoDocumentos.delCentro()`: las tres listas de terceros y los tipos con los que `LectorDocumentos.analizar` coteja, sacada de `documentos-sueltos-lector.js` para que la use también la fila siguiente (18-sep-2026, fila 49) |
+| `js/bandeja-adjuntos-lector.js` | Lee los adjuntos PDF de un correo de la bandeja y completa el hueco de tercero o tipo que deja `Bandeja.proponer`, con el registro y la fecha del documento en una línea aparte; envuelve `window.Bandeja.llevarANuevo` (18-sep-2026, fila 49) |
 | `js/lo-pide.js` | Quién ha pedido la gestión: candidatos, controles, línea legible y qué casilla marcar en el correo |
 | `js/asuntos-nuevo.js` | Crear un asunto, el cuadro de datos de un tercero y los pies |
 | `js/archivo-personas.js` | Personas y empresas, cambiar los datos de un tercero, y la pantalla ARCHIVO: orquesta `js/archivo-indice.js` (lee el índice o cae al recorrido de disco), busca por palabras y resuelve el manejador de una carpeta al vuelo para "Documentos" (fila 44) |
