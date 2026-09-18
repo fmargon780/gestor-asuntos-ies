@@ -108,8 +108,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - No pisarse en un asunto: si el compañero ya está dentro, se entra en modo consulta (aviso y
   "Tomar el mando"), con marca en la lista. Señal en `_GESTOR/presencia.json`, caduca a los 3 min;
   su repintado de fondo solo toca la pantalla si cambia algo de verdad, y nunca mientras se escribe.
-- Separar, Unir y Sacar páginas de un PDF, en la carpeta del asunto y en Por clasificar (con
-  pdf-lib, `js/lib/pdf-lib.min.js`); miniaturas con pdf.js, tijeras entre páginas para Separar.
+- Separar, Unir, Sacar páginas y **Preparar el documento** de un PDF, en la carpeta del asunto y en Por clasificar (con pdf-lib, `js/lib/pdf-lib.min.js`); miniaturas con pdf.js, tijeras entre páginas para Separar. "Preparar el documento" encoge las páginas para dejar libre la banda del sello de Séneca (arriba) y la de la firma del director (abajo), según lo que diga el tipo del asunto y las medidas de Ajustes → El centro; si ya hay sitio, no toca nada (fila 57, 18-sep-2026).
 - "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha (opcional), con el correo ya puesto al preparar el cuadro de Correo. Las opciones de "Tutor legal 1/2" muestran su nombre de verdad (`LoPide.datosDeTutor` descarta documento/identificación/parentesco/fecha/domicilio y arma el nombre por Apellidos + Nombre, nunca un número; fila 38).
 - Archivar o reabrir cuando el destino ya existe (de un intento a medias) fusiona las dos carpetas, sin perder nada; si la carpeta ya no está donde se esperaba pero se encuentra en el otro sitio, se da por hecho sin copiar nada y avisa en verde; si no aparece por ningún lado, avisa en ámbar pidiendo Recargar. Los errores del navegador (`NotFoundError` y compañía) salen siempre traducidos (`U.mensajeDeError`), y los temporales de sincronización (Dropbox, Drive) no se cuentan ni se copian (fila 45).
 - Guardar un documento en un asunto se queda en su ficha; solo Editar, Archivar/Reabrir y Borrar
@@ -124,11 +123,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   esperar a que Francisco lo haga a mano (ver la nota al final de `docs/COLA.md`).
 - **Comprobar siempre lo publicado con `curl`**, nunca dar la publicación por hecha.
 - Vercel publica como máximo 100 veces al día (plan gratuito): `vercel.json` tiene un `ignoreCommand` que se salta los commits que solo tocan `docs/`, `pruebas/`, `.github/` o `.md`, y la cola tiene la regla 13 (como máximo dos subidas por fila, fila 48, 17-sep-2026).
-- Antes de colgar una función nueva de `App`, comprobar que el nombre no está ya cogido.
-- Solo hay un cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.
-- Ojo con `p.campos`: solo trae columnas con datos; para saber si una columna existe, mirar la
-  cabecera del CSV.
-- Ojo con el orden de los `<script>` de `index.html`: importa para las envolturas.
+- Antes de colgar una función nueva de `App`, comprobar que el nombre no está ya cogido. Solo hay un cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.
+- Ojo con `p.campos`: solo trae columnas con datos; para saber si una columna existe, mirar la cabecera del CSV. Ojo también con el orden de los `<script>` de `index.html`: importa para las envolturas.
 - Una acción que guarda y repinta: `await` hasta el final y usar `U.mientrasGuarda(control, fn)`
   para apagar el botón o desplegable ("Guardando…") mientras tanto (fila 23, 17-sep-2026).
 - Un bloque que se repinta solo nunca puede tirar lo que se está escribiendo, ni el foco, ni el
@@ -138,35 +134,23 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 7. Descartado, no proponer otra vez
 
-- Publicar con el conector de Vercel sobre un proyecto ya existente (da 403), o crear otro "por si acaso".
-- Pedir al coordinador TIC que desbloquee `vercel.app` en la red del centro: se resolvió antes con
-  el dominio propio (18-sep-2026).
-- Abrir la carpeta del asunto en el explorador de archivos, u opciones dentro de opciones en la guía.
-- Una hoja de Google Sheets como interfaz.
-- Enlazar un correo de Gmail con `#all/<id de hilo>` (es con `#search/rfc822msgid:<id>`).
-- Meter Gmail dentro de la aplicación, en un marco (Google no lo permite).
-- Esconder el tablón de notas para dejar sitio, o sacar el DNI de la columna del tutor.
-- Poner el nombre comercial en el nombre de la carpeta de un asunto de empresa.
-- Reescribir la arquitectura de módulos y envolturas.
-- Meter los campos de cada tipo en el nombre de los documentos (son del asunto, no del papel).
+- Publicar con el conector de Vercel sobre un proyecto ya existente (da 403), crear otro "por si acaso", o pedir al coordinador TIC que desbloquee `vercel.app` (se resolvió con el dominio propio, 18-sep-2026).
+- Abrir la carpeta del asunto en el explorador de archivos, opciones dentro de opciones en la guía, o una hoja de Google Sheets como interfaz.
+- Enlazar un correo de Gmail con `#all/<id de hilo>` (es con `#search/rfc822msgid:<id>`), o meter Gmail dentro de la aplicación en un marco (Google no lo permite).
+- Esconder el tablón de notas, sacar el DNI de la columna del tutor, o poner el nombre comercial en el nombre de la carpeta de un asunto de empresa.
+- Reescribir la arquitectura de módulos y envolturas, o meter los campos de cada tipo en el nombre de los documentos (son del asunto, no del papel).
 
 ## 8. Qué falta
 
-- El compañero tiene que entrar en `https://asuntos.fmargon.com` y volver a señalar sus carpetas
-  (el navegador no las hereda de la dirección vieja). Y coordinar con él la lista de tipos de
-  asunto y la de estados.
-- Poner en marcha el script de Gmail en `g.educaand.es` y señalar `GESTOR-BANDEJA` en Ajustes.
-- Ver si la bandeja de correo acierta con el tipo; si falla mucho, palabras clave por tipo.
-- Pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs`: sin eso no se siguen los hilos por matrícula, ni la copia oculta de un grupo.
-- Comprobar con Séneca si Comunicaciones acepta el largo del asunto que le damos.
+- El compañero tiene que entrar en `https://asuntos.fmargon.com`, volver a señalar sus carpetas (el navegador no las hereda de la dirección vieja), y coordinar la lista de tipos de asunto y estados.
+- Poner en marcha el script de Gmail en `g.educaand.es`, señalar `GESTOR-BANDEJA` en Ajustes, y pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs` (sin eso no se siguen los hilos por matrícula, ni la copia oculta de un grupo).
+- Ver si la bandeja de correo acierta con el tipo (si falla mucho, palabras clave por tipo), y comprobar con Séneca si Comunicaciones acepta el largo del asunto que le damos.
 - Cuando tengan una cuenta de correo común, replantear la bandeja como una sola compartida.
-- Ver con el uso: ancho del panel lateral y del tablón, y si las tarjetas por tipo se quedan cortas.
+- Ver con el uso: ancho del panel lateral y del tablón, si las tarjetas por tipo se quedan cortas, y si el aviso de "falta el DNI" conviene también en la tarjeta del asunto.
 - Si el DNI no sale de nadie, marcar la columna del documento al generar el RegAlum.
-- Cuando el uso lo pida: búsqueda en notas, cuentas por tipo para la memoria de fin de curso, qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta del centro.
-- Los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no se fusionan entre ordenadores (solo las altas).
-- Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
-- Cambiar la dirección vieja por `https://asuntos.fmargon.com` en `docs/CONTEXTO.md` y en donde
-  más aparezca (no urgente: la vieja sigue respondiendo fuera del centro).
+- Comprobar con un documento de verdad "Preparar el documento" (fila 57): si Séneca avisa de que invalida la firma al sellar uno ya preparado, y ajustar en Ajustes las dos medidas por defecto (1,5 y 2,5 cm) con la banda real del sello y de AutoFirma.
+- Cuando el uso lo pida: búsqueda en notas, cuentas por tipo para la memoria de fin de curso, qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta del centro. Los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no se fusionan entre ordenadores (solo las altas).
+- Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN. Cambiar la dirección vieja por `https://asuntos.fmargon.com` en `docs/CONTEXTO.md` y donde más aparezca (no urgente: la vieja sigue respondiendo fuera del centro).
 
 ## 9. Cuándo leer `CONTEXTO.md` entero
 

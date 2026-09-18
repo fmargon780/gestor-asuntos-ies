@@ -80,6 +80,20 @@ function construirSeccionDatos(tipo) {
   cambiar.textContent = 'Cambiar el nombre';
   cambiar.onclick = function () { App.renombrarTipo(tipo); };
   b.cuerpo.appendChild(cambiar);
+
+  /* Fila 57, 18-sep-2026, docs/HUECO-PARA-SELLO-Y-FIRMA.md: si este
+     tipo lleva el sello de registro de Séneca y/o la firma digital
+     del director, para "Preparar el documento". Un tipo sin estos
+     campos en tipos.json se comporta como si llevara sello y no
+     llevara firma: no hace falta migrar nada. */
+  var interruptores = document.createElement('div');
+  interruptores.style.marginTop = '10px';
+  interruptores.appendChild(App.construirInterruptorDeTipo(tipo, 'llevaSello', true,
+    'Lleva el sello de registro de Séneca', 'Deja libre la banda de arriba al preparar el documento.'));
+  interruptores.appendChild(App.construirInterruptorDeTipo(tipo, 'llevaFirma', false,
+    'Lleva la firma digital del director', 'Deja libre la banda de abajo al preparar el documento.'));
+  b.cuerpo.appendChild(interruptores);
+
   return b.sec;
 }
 

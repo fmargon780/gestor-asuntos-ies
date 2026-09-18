@@ -196,6 +196,30 @@ App.construirCasillaPlazo = function (tipo, conTexto) {
   return etiqueta;
 };
 
+/* Un interruptor sí/no guardado directamente como un campo del propio
+   tipo (fila 57, 18-sep-2026, docs/HUECO-PARA-SELLO-Y-FIRMA.md: usado
+   por "llevaSello" y "llevaFirma", en la sección "Datos del tipo" de
+   js/ajustes-tipo.js). Un tipo sin ese campo en tipos.json se comporta
+   con 'porDefecto': nada que migrar. */
+App.construirInterruptorDeTipo = function (tipo, campo, porDefecto, texto, ayuda) {
+  var etiqueta = document.createElement('label');
+  etiqueta.className = 'interruptor interruptor-fila';
+  var casilla = document.createElement('input');
+  casilla.type = 'checkbox';
+  casilla.checked = (tipo[campo] === undefined) ? porDefecto : !!tipo[campo];
+  if (ayuda) casilla.title = ayuda;
+  casilla.onchange = async function () {
+    tipo[campo] = casilla.checked;
+    await App.guardarTipos();
+  };
+  etiqueta.appendChild(casilla);
+  var span = document.createElement('span');
+  span.textContent = texto;
+  if (ayuda) span.title = ayuda;
+  etiqueta.appendChild(span);
+  return etiqueta;
+};
+
 /* ---------- el aviso en vivo al escribir un nombre nuevo (A4 y A7) ----------
 
    Uno para tipos (que además dice de qué categoría es el que ya

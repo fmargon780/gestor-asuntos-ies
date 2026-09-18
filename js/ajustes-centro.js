@@ -558,6 +558,65 @@ App.pintarFicherosDeDatos = async function () {
   }
 };
 
+/* ---------- Sello y firma en el papel (18-sep-2026, fila 57,
+   docs/HUECO-PARA-SELLO-Y-FIRMA.md) ----------
+
+   Las dos medidas que usa "Preparar el documento" (js/preparar-
+   documento.js): cuánto hueco dejar arriba (para el sello de registro
+   de Séneca) y abajo (para la firma digital del director). Se guardan
+   en _GESTOR/margenes-pdf.json, para todo el centro. Son solo dos
+   números, así que no hace falta fusionar con el disco como las
+   listas: el último que guarda, manda (mismo criterio que "Datos del
+   centro y firma", aquí arriba). */
+
+var FICHERO_MARGENES_PDF = 'margenes-pdf.json';
+App.MARGENES_PDF_POR_DEFECTO = { arribaCm: 1.5, abajoCm: 2.5 };
+
+function limpiarMargenCm(v, porDefecto) {
+  var n = parseFloat(String(v === undefined || v === null ? '' : v).replace(',', '.'));
+  if (isNaN(n) || n < 0 || n > 6) return porDefecto;
+  return Math.round(n * 10) / 10;
+}
+
+/* La usa también js/preparar-documento.js al abrir el cuadro: relee el
+   fichero cada vez (como campos.json), para no pisar lo que haya
+   cambiado el compañero desde otro ordenador. */
+App.margenesPdfLeer = async function () {
+  if (!App.E.gestor) return App.MARGENES_PDF_POR_DEFECTO;
+  var leido = null;
+  try { leido = await Carpetas.leerJson(App.E.gestor, FICHERO_MARGENES_PDF); }
+  catch (e) { leido = null; }
+  return {
+    arribaCm: limpiarMargenCm(leido && leido.arribaCm, App.MARGENES_PDF_POR_DEFECTO.arribaCm),
+    abajoCm: limpiarMargenCm(leido && leido.abajoCm, App.MARGENES_PDF_POR_DEFECTO.abajoCm)
+  };
+};
+
+App.pintarMargenesPdf = async function () {
+  if (!$('margen-sello')) return;
+  var m = await App.margenesPdfLeer();
+  $('margen-sello').value = m.arribaCm;
+  $('margen-firma').value = m.abajoCm;
+};
+
+async function guardarMargenesPdf() {
+  var valores = {
+    arribaCm: limpiarMargenCm($('margen-sello').value, App.MARGENES_PDF_POR_DEFECTO.arribaCm),
+    abajoCm: limpiarMargenCm($('margen-firma').value, App.MARGENES_PDF_POR_DEFECTO.abajoCm)
+  };
+  $('margen-sello').value = valores.arribaCm;
+  $('margen-firma').value = valores.abajoCm;
+  try {
+    await Copias.guardar(App.E.gestor, FICHERO_MARGENES_PDF, valores);
+    U.aviso('Medidas guardadas.', 'bueno');
+  } catch (e) {
+    U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+  }
+}
+
+if ($('margen-sello')) $('margen-sello').onchange = guardarMargenesPdf;
+if ($('margen-firma')) $('margen-firma').onchange = guardarMargenesPdf;
+
 /* ---------- el orquestador de esta pestaña ---------- */
 
 App.pintarAjustesCentro = async function () {
@@ -565,5 +624,6 @@ App.pintarAjustesCentro = async function () {
   App.pintarTiposDeDocumento();
   App.pintarCamposPropios();
   App.pintarGruposPersonas();
+  await App.pintarMargenesPdf();
   await App.pintarFicherosDeDatos();
 };

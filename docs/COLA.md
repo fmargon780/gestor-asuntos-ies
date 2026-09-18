@@ -131,9 +131,9 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 54 | `docs/AYUDANTE-SENECA-FIABLE.md` | HECHA (18-sep-2026 · 07:22) |
 | 55 | `docs/ASUNTO-SIN-ELECCION.md` | HECHA (18-sep-2026 · 07:22) |
 | 56 | `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md` | HECHA (18-sep-2026 · 07:22) |
-| 57 | `docs/HUECO-PARA-SELLO-Y-FIRMA.md` | PENDIENTE |
+| 57 | `docs/HUECO-PARA-SELLO-Y-FIRMA.md` | HECHA (18-sep-2026 · 09:46) |
 
-**Orden de trabajo:** queda PENDIENTE solo la 57. Las filas 1 a 56 están HECHAS.
+**Orden de trabajo:** no queda ninguna fila PENDIENTE. Las filas 1 a 57 están HECHAS.
 
 **Fila 52, en una línea** (18-sep-2026, acordada con Francisco mirando la cabecera de un asunto de
 CERT. MATRICULA): los doce botones de la cabecera se agrupan por el momento del trámite en que se
@@ -192,6 +192,20 @@ abajo por defecto) y cada tipo de asunto dice si lleva sello y si lleva firma. F
 `js/pdf-margenes.js`, `js/preparar-documento.js` y `pruebas/margenes-pdf.mjs`. Detalle en
 `docs/HUECO-PARA-SELLO-Y-FIRMA.md`. **Va después de la fila 56.** Sube directamente a `main`, sin
 petición de cambios.
+
+**Fila 57, en una línea** (18-sep-2026, HECHA): botón nuevo **Preparar el documento**, junto a
+Separar, Unir y Sacar páginas (en la ficha de un asunto y en Por clasificar), que encoge todas las
+páginas de un PDF para dejar libre la banda del sello de registro de Séneca (arriba) y la de la
+firma del director (abajo), de lado a lado de la hoja. Nunca agranda, nunca cambia el tamaño de la
+hoja, respeta las páginas giradas, y si ya hay sitio no toca nada (lo comprueba pintando cada
+página con pdf.js y mirando los píxeles de las dos bandas). Si el PDF ya está firmado
+digitalmente, pregunta antes de seguir. Las dos medidas (1,5 cm arriba, 2,5 cm abajo por defecto)
+se configuran en Ajustes → El centro; cada tipo de asunto dice si lleva sello y si lleva firma, en
+su propia pantalla. Ficheros nuevos: `js/pdf-margenes.js` (la cuenta y el PDF nuevo, con pdf-lib,
+sin DOM, como `js/pdf-herramientas.js`), `js/preparar-documento.js` (el cuadro) y
+`pruebas/margenes-pdf.mjs`. Detalle en `docs/HUECO-PARA-SELLO-Y-FIRMA.md`; diario en
+`docs/HISTORIA.md`. Sesión en la nube: subido con pull request, no directo a `main` (ver la nota
+de más abajo).
 
 ## Nota de esta sesión (18-sep-2026, mañana): docs/CONTEXTO.md y docs/HISTORIA.md sin actualizar
 

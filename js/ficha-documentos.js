@@ -104,6 +104,11 @@ var FichaDocumentos = (function () {
       enMenu.push(botonPdf('Separar', 'Partirlo en varios documentos', PdfSepararUnir.separar));
       enMenu.push(botonPdf('Unir', 'Juntarlo con otro PDF del asunto', PdfSepararUnir.unir));
       enMenu.push(botonPdf('Sacar páginas', 'Sacar una copia con solo algunas páginas', PdfSepararUnir.sacarPaginas));
+      /* Fila 57, 18-sep-2026, docs/HUECO-PARA-SELLO-Y-FIRMA.md. */
+      if (window.PrepararDocumento) {
+        enMenu.push(botonPdf('Preparar el documento',
+          'Deja hueco arriba para el sello de Séneca y abajo para la firma', PrepararDocumento.abrir));
+      }
     }
 
     /* Borrar, con papelera (11-sep-2026): siempre el último del menú. */

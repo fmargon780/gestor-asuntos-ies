@@ -5,6 +5,70 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 18-sep-2026 — Hueco para el sello de Séneca y la firma del director
+
+Fila 57 de la cola (`docs/COLA.md`, `docs/HUECO-PARA-SELLO-Y-FIRMA.md`), acordada con Francisco el
+18-sep-2026 mirando la cabecera de un asunto de CERT. MATRICULA. El sello que Séneca pinta al
+registrar a mano (banda estrecha arriba, a la derecha si es entrada y a la izquierda si es salida)
+a veces pisa texto del documento; lo mismo pasa abajo con la banda de firma digital del director.
+Botón nuevo **Preparar el documento**, junto a Separar, Unir y Sacar páginas: encoge el contenido
+de todas las páginas y lo recoloca para dejar libres las dos bandas, de lado a lado de la hoja.
+
+**La cuenta, en `js/pdf-margenes.js`** (sin DOM, como `js/pdf-herramientas.js`): `calcularEncaje`
+hace la regla de tres del encargo (escala nunca mayor que 1, ni negativa; `cabe` falso si los dos
+huecos juntos pasan de la mitad del alto); `conHueco` valida TODAS las páginas antes de escribir
+nada (si una no cabe, no se toca ni una).
+
+**Lo que costó de verdad: las páginas giradas.** `getSize()` de pdf-lib no tiene en cuenta el
+`/Rotate` de la página (se comprobó leyendo el propio bundle minificado,
+`js/lib/pdf-lib.min.js`: `getSize` lee el `MediaBox` a secas), y `embedPage` tampoco — su
+`width`/`height` también salen del `MediaBox` crudo. Así que la escala y el hueco se calculan
+sobre el tamaño VISIBLE (con ancho y alto intercambiados si el giro es de 90° o 270°), pero el
+contenido se sigue dibujando en el sistema de coordenadas CRUDO de la página, sin deshacerle el
+giro: la hoja nueva se crea con el mismo tamaño crudo y el mismo `/Rotate` que la original, y solo
+cambia dónde y a qué escala se dibuja el contenido dentro de ese sistema. Así no hace falta saber
+cómo compone `drawPage` su propio parámetro `rotate` (con su propio pivote y su propio sentido de
+giro, que no coincide con el de `/Rotate`): el visor ya sabe rotar una página entera, y basta con
+que el contenido encogido caiga en el sitio correcto de esa página sin rotar mentalmente nada. La
+fórmula que traduce la esquina visible ya calculada a la esquina cruda donde dibujar
+(`posicionCruda`, un caso por cada uno de los cuatro giros) se dedujo a mano, dos veces por
+caminos distintos para el caso de 90° (una vez pensando en la hoja de papel física que se gira, y
+otra resolviendo las cuatro esquinas del rectángulo de contenido con álgebra), y las dos
+coincidieron. Se comprueba en la prueba con una tercera página girada 90° dentro del mismo PDF:
+`conHueco` tiene que conservar su tamaño crudo y su giro tal cual (no hay forma barata de
+comprobar en Node, sin `canvas`, que el contenido cae exactamente en el píxel correcto; eso
+tendrá que verlo Francisco con un documento girado de verdad).
+
+**Saber si ya hay sitio, sin abrir el cuadro para nada**: con pdf.js (que sí aplica el giro solo al
+pintar en un `<canvas>`), se renderiza cada página a 700px de ancho y se mira si más del 0,3% de
+los píxeles de cada banda están por debajo de 200 de luminosidad. Si las dos bandas están libres en
+todas las páginas, ni se abre el cuadro: un aviso verde y ya. Esto hace que el botón sea seguro de
+pulsar "por si acaso": en un documento ya con sitio, no pasa nada.
+
+**Lo configurable**: las dos medidas (1,5 cm arriba, 2,5 cm abajo por defecto) en Ajustes → El
+centro, guardadas en `_GESTOR/margenes-pdf.json` (son solo dos números, sin fusión con el disco,
+igual que "Datos del centro y firma"); y `tipo.llevaSello`/`tipo.llevaFirma`, dos interruptores en
+`tipos.json` con un ayudante compartido nuevo (`App.construirInterruptorDeTipo`, en `js/ajustes.js`,
+junto a `App.construirCasillaPlazo`), por defecto sí y no respectivamente, así que ningún tipo
+existente necesita migración.
+
+**Ficheros nuevos**: `js/pdf-margenes.js`, `js/preparar-documento.js`, `pruebas/margenes-pdf.mjs`.
+El botón se cuelga desde `js/ficha-documentos.js` y `js/documentos-sueltos.js` (no desde
+`js/pdf-separar-unir.js`, como decía el encargo: ahí es donde de verdad viven los otros tres
+—Separar, Unir, Sacar páginas—, cada uno con su propio `enMenu.push(...)`, así que el nuevo se
+cuelga igual, al lado). Se cambiaron también `js/ajustes-centro.js`, `js/ajustes-tipo.js`,
+`js/ajustes.js`, `index.html` y `css/pdf-separar-unir.css`, para lo configurable, la vista previa y
+el sitio del botón.
+
+**Sesión en la nube**: sin `git push` de verdad ni permiso para tocar `main` directamente (ver la
+nota de `docs/COLA.md` sobre "sube directamente a main"), así que esta fila se subió con pull
+request en vez de directa, aunque el encargo pedía lo segundo.
+
+Comprobado con `pruebas/margenes-pdf.mjs` (`calcularEncaje` en varios casos, `conHueco`
+conservando páginas/tamaños/giro, una página sin sitio que no escribe nada, `pareceFirmado`).
+
+---
+
 ## 18-sep-2026 — La cabecera se queda arriba, y se encoge
 
 Fila 46 de la cola (`docs/COLA.md`, `docs/CABECERA-QUE-SE-QUEDA.md`), acordada con Francisco el

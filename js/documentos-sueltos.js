@@ -141,6 +141,11 @@ App.tarjetaSuelto = function (s, pie, esNuevo) {
     enMenu.push(botonPdfSuelto('Separar', 'Partirlo en varios documentos', PdfSepararUnir.separar));
     enMenu.push(botonPdfSuelto('Unir', 'Juntarlo con otro PDF de Por clasificar', PdfSepararUnir.unir));
     enMenu.push(botonPdfSuelto('Sacar páginas', 'Sacar una copia con solo algunas páginas', PdfSepararUnir.sacarPaginas));
+    /* Fila 57, 18-sep-2026, docs/HUECO-PARA-SELLO-Y-FIRMA.md. */
+    if (window.PrepararDocumento) {
+      enMenu.push(botonPdfSuelto('Preparar el documento',
+        'Deja hueco arriba para el sello de Séneca y abajo para la firma', PrepararDocumento.abrir));
+    }
   }
 
   /* Siempre hay al menos "Abrir": el menú existe siempre, así
