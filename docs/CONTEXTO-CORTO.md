@@ -66,7 +66,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Cambiar los datos de un tercero dado de alta a mano.
 - Guías del procedimiento por tipo, con pasos, preguntas y opciones.
 - Panel lateral de lectura, y tablón de notas rápidas siempre visible.
-- Correo y mensaje de Séneca preparados; la app no envía nada.
+- Correo y mensaje de Séneca preparados; la app no envía nada. El cuadro de Séneca va en dos columnas y ocupa el ancho (hasta 1100px), con el asunto entero (siempre el nombre de la carpeta, sin elegir una versión legible, fila 55) y su cuenta de caracteres, y dos botones numerados para copiar (fila 53, 18-sep-2026). El ayudante de Séneca comprueba de verdad que cada destinatario ha entrado (espera su sugerencia, reintenta una vez), y al final dice por su nombre quién no ha entrado (fila 54).
 - "Por clasificar": cada documento suelto se abre, se borra, crea un asunto nuevo, o entra en uno
   que ya existe. El que se está viendo queda marcado en la lista, con sus mismas acciones también
   dentro del visor. Encima, tras una barra "Correos sin clasificar (N)" que siempre arranca
@@ -79,7 +79,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Terceros relacionados con un asunto, con nota (no copia) al archivar; "+ Añadir varios" señala de golpe (atajos de alumnado por unidad/nivel/enseñanza, grupos propios en `_GESTOR/grupos.json` desde Ajustes), y esos mismos grupos ponen los destinatarios de un correo (copia oculta) y de un mensaje de Séneca (usuario IdEA, en chips, con "Copiar la lista"/"el siguiente" y un ayudante-marcador).
 - Parada al crear un asunto duplicado, y pantalla propia "Duplicados" para los ya existentes.
 - Ajustes tiene tres pestañas (Tipos de asunto · El centro · Mantenimiento). Pulsar una tarjeta de tipo abre su pantalla propia, entera y a dos columnas, con sus ocho secciones a la vista sin plegar: Datos del tipo, Campos, Pasos del trámite, Palabras clave, Plantillas de correo y de Séneca, Plantilla de documento de Word, Plazo y Se repite (fila 39, 17-sep-2026; Palabras clave, fila 41). Dentro, pestañas por categoría, buscador cruzado, aviso en vivo de nombres repetidos.
-- Campos propios por tipo de asunto, rellenos solos al crear.
+- Campos propios por tipo de asunto, rellenos solos al crear. La sección Campos de un tipo se queda corta (solo los campos ya puestos) con un botón "+ Añadir campo" que abre un panel de tres pestañas (De la ficha · Míos · Calculados); Francisco puede crear campos calculados con seis operaciones (quitar caracteres, partir, tabla de equivalencias, juntar dos campos, sacar un dato de una fecha) y vista previa con una persona de verdad (fila 56, 18-sep-2026).
 - Papelera: nada se borra del todo a la primera.
 - Mandar documentos de un asunto por correo: se marcan en el cuadro "Correo" y el script de Apps
   Script deja un borrador en Gmail (nunca envía), con tarjeta "Borrador en camino".
