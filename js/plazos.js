@@ -107,10 +107,49 @@ var Plazos = (function () {
     return d.getFullYear() + '-' + m2 + '-' + d2;
   }
 
+  /* ---------- la etiqueta de vencimiento de la cabecera (18-sep-2026,
+     fila 52, docs/CABECERA-DEL-ASUNTO.md, 8) ----------
+
+     Sustituye al botón "Plazo" y a la marca `.marca-plazo`: aquí el
+     dato se ve sin pulsar nada. Con un umbral propio (2 días, no los 7
+     de DIAS_CERCA de arriba: ese es el de los avisos y los filtros, y
+     aquí Francisco pidió uno más corto) y sus propios textos, para no
+     tocar `de()`, que ya usan `js/avisos.js`, `js/que-me-toca.js` y
+     `js/asuntos-lista.js` con su propio significado de "vencido"
+     (que a día de hoy incluye "vence hoy", y aquí no). */
+  var DIAS_AMBAR_VENCIMIENTO = 2;
+  var MESES_CORTOS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+
+  /* "25-sep", sin año: la fecha ya es de este curso o del que viene,
+     nunca de hace años, así que el año sobra en una etiqueta tan
+     corta. */
+  function fechaCortaSinAno(iso) {
+    var p = String(iso || '').split('-');
+    if (p.length !== 3) return '';
+    var mes = parseInt(p[1], 10);
+    if (!mes || mes < 1 || mes > 12) return '';
+    return String(parseInt(p[2], 10)) + '-' + MESES_CORTOS[mes - 1];
+  }
+
+  /* { texto, clase } de la etiqueta. `clase` es '' para el color
+     normal (sin nada especial que resaltar). */
+  function etiquetaVencimiento(limite) {
+    var dias = diasHasta(limite);
+    if (dias === null) return { texto: 'Sin plazo', clase: 'vencimiento-sin' };
+    if (dias < 0) {
+      var vencido = -dias;
+      return { texto: 'Venció hace ' + vencido + ' día' + (vencido === 1 ? '' : 's'), clase: 'vencimiento-vencido' };
+    }
+    if (dias === 0) return { texto: 'Vence hoy', clase: 'vencimiento-cerca' };
+    var texto = 'Vence el ' + fechaCortaSinAno(limite) + ' · quedan ' + dias + ' día' + (dias === 1 ? '' : 's');
+    return { texto: texto, clase: dias <= DIAS_AMBAR_VENCIMIENTO ? 'vencimiento-cerca' : '' };
+  }
+
   return {
     DIAS_CERCA: DIAS_CERCA,
     sumarDias: sumarDias, sumarDiasHabiles: sumarDiasHabiles,
     diasHasta: diasHasta, legible: legible,
-    de: de, pasaFiltro: pasaFiltro
+    de: de, pasaFiltro: pasaFiltro,
+    etiquetaVencimiento: etiquetaVencimiento
   };
 })();

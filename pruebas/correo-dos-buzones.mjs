@@ -244,8 +244,11 @@ await comprobar('sale la línea gris', pagina.locator('.linea-ya-guardado').coun
 
 await pagina.locator('.linea-ya-guardado').getByRole('button', { name: 'Abrir el asunto' }).click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+/* El nombre va en su propio <span> dentro del <h2> (18-sep-2026, fila
+   52, docs/CABECERA-DEL-ASUNTO.md): el icono de copiar y los tres
+   puntos van al lado, dentro del mismo <h2>. */
 await comprobar('abre la ficha del asunto de verdad',
-  pagina.locator('.ficha-nombre').textContent(), A);
+  pagina.locator('.ficha-nombre-texto').textContent(), A);
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(300);
 

@@ -90,7 +90,7 @@ const seApagaAlElegir = await pagina.evaluate(() => {
 await comprobar('el desplegable se apaga mientras guarda', seApagaAlElegir, true);
 await pagina.waitForTimeout(300);
 await comprobar('la ficha ya enseña el estado nuevo, sin recargar',
-  pagina.locator('.ficha-marcas .marca-estado').textContent(), 'En el departamento');
+  pagina.locator('#ficha-acciones select.campo-estado').inputValue(), 'En el departamento');
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(200);
 await comprobar('la tarjeta de la lista también, sin recargar',

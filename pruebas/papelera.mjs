@@ -150,7 +150,10 @@ await pagina.waitForTimeout(400);
 await pagina.locator('.tarjeta-asunto').filter({ hasText: 'BECA' }).locator('.nombre-pulsable').click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 
-await pagina.locator('#ficha-acciones').getByRole('button', { name: 'Borrar' }).click();
+/* "Borrar" vive ahora en el menú de tres puntos del nombre (18-sep-2026,
+   fila 52, docs/CABECERA-DEL-ASUNTO.md). */
+await pagina.click('.ficha-nombre-menu-boton');
+await pagina.getByRole('button', { name: 'Borrar el asunto', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('avisa de que se lleva los documentos',
   pagina.locator('#cuadro-cuerpo').textContent().then(t => t.indexOf('Se lleva 3 documentos') !== -1), true);

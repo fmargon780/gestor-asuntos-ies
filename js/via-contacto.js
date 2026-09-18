@@ -163,4 +163,32 @@
     };
   })();
 
+  /* ---------- dentro de "El encargo" (18-sep-2026, fila 52,
+     docs/CABECERA-DEL-ASUNTO.md, 7) ----------
+
+     La vía pasa a preguntarse dentro del cuadro de "Lo pide"
+     (js/lo-pide.js), con el mismo campo de teléfono/correo de antes:
+     se envuelve `LoPide.controles`, que es el único sitio por el que
+     pasan los dos cuadros que lo usan (la ficha del asunto es el único
+     que trae `persona`, así que las sugerencias solo salen ahí). */
+  (function () {
+    var comoEra = window.LoPide && LoPide.controles;
+    if (typeof comoEra !== 'function') return;
+
+    LoPide.controles = function (caja, persona, valorInicial, viaInicial) {
+      var r = comoEra(caja, persona, valorInicial, viaInicial);
+      var selVia = caja.querySelector('.lopide-via');
+      var campoDato = caja.querySelector('.lopide-via-dato');
+      if (selVia && campoDato && persona) {
+        var sug = cajaDebajo(campoDato, 'via-sugerencias-lopide');
+        var categoria = persona.categoria || '';
+        var quien = persona.nombre || '';
+        function mirar() { refrescar(sug, campoDato, categoria, quien, selVia.value); }
+        selVia.addEventListener('change', mirar);
+        mirar();
+      }
+      return r;
+    };
+  })();
+
 })();

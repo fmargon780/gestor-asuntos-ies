@@ -85,7 +85,10 @@ async function abrirFichaDe(nombreAsunto) {
 
 async function abrirCorreoDe(nombreAsunto) {
   await abrirFichaDe(nombreAsunto);
-  await pagina.click('.boton-correo');
+  /* "Correo" vive ahora dentro de "Comunicar" (18-sep-2026, fila 52,
+     docs/CABECERA-DEL-ASUNTO.md). */
+  await pagina.click('.boton-comunicar');
+  await pagina.getByRole('button', { name: 'Correo electrónico', exact: true }).click();
   await pagina.waitForSelector('#capa:not(.oculto)');
   await pagina.waitForSelector('#correo-cuerpo-texto');
 }
@@ -199,7 +202,10 @@ await cerrarCuadro();
    7 · en Séneca, más de 4.000 letras se recorta al copiar
    ======================================================== */
 await abrirFichaDe(CON_PLANTILLA);
-await pagina.click('.boton-seneca');
+/* "Mensaje Séneca" vive ahora dentro de "Comunicar" (18-sep-2026, fila 52,
+   docs/CABECERA-DEL-ASUNTO.md). */
+await pagina.click('.boton-comunicar');
+await pagina.getByRole('button', { name: 'Mensaje de Séneca', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.waitForSelector('#correo-cuerpo-texto');
 

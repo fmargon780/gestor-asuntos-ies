@@ -141,13 +141,17 @@
       repasar();
     };
 
+    /* El número va dentro del `<h2>` con el nombre, pegado al texto
+       (18-sep-2026, fila 52, docs/CABECERA-DEL-ASUNTO.md, 5): antes
+       vivía suelto en la barra de acciones. La versión "chica", como
+       en las listas de resultados, para no ensanchar el nombre. */
     function ponerNie() {
       if (!viendo) return;
-      var caja = document.getElementById('ficha-acciones');
+      var caja = document.querySelector('.ficha-nombre');
       if (!caja || caja.querySelector('.boton-nie')) return;
       var nie = nieDeAsunto(viendo);
       if (!nie) return;
-      caja.insertBefore(botonDeNie(nie), caja.firstChild);
+      caja.appendChild(botonDeNie(nie, true));
     }
 
     function repasar() {

@@ -189,11 +189,14 @@ await comprobar('7. a la izquierda, solo Hitos',
 
 await comprobar('7. en el centro, Documentos de la carpeta',
   pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-centro .ficha-titulo')).map((h) => {
-    /* El título de "Documentos" lleva pegada la cuenta de documentos
-       (`.ficha-cuenta`), dentro del mismo <h3>: se quita antes de leer
-       el texto, que si no sale "Documentos de la carpeta2". */
-    const cuenta = h.querySelector('.ficha-cuenta');
-    return (cuenta ? h.textContent.slice(0, -cuenta.textContent.length) : h.textContent).trim();
+    /* El título de "Documentos" lleva pegados la cuenta (`.ficha-cuenta`)
+       y, desde la fila 52 (18-sep-2026), el botón "Documentos ▾"
+       (`.ficha-documentos-gestionar`), dentro del mismo <h3>: se
+       quitan los dos de una copia antes de leer el texto, que si no
+       sale "Documentos de la carpeta2Documentos ▾". */
+    const copia = h.cloneNode(true);
+    copia.querySelectorAll('.ficha-cuenta, .ficha-documentos-gestionar').forEach((el) => el.remove());
+    return copia.textContent.trim();
   })),
   ['Documentos de la carpeta']);
 

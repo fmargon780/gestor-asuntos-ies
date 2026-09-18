@@ -312,7 +312,7 @@ await pagina.waitForTimeout(500);
 await comprobar('tras el repintado (nuevo <header> de verdad), sigue encogida sin haber vuelto a hacer scroll',
   encogidaDe('header.ficha-cabecera'), true);
 await comprobar('y el repintado sí ha llegado (el estado nuevo se ve)',
-  pagina.locator('.ficha-marcas .marca-estado').textContent(), 'A LA ESPERA DEL TERCERO');
+  pagina.locator('#ficha-acciones select.campo-estado').inputValue(), 'A LA ESPERA DEL TERCERO');
 
 await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');

@@ -76,6 +76,12 @@
     App.ir(modoActual === 'archivado' ? 'archivo' : 'abiertos');
   }
 
+  /* Expuesta para js/ficha-nombre-acciones.js (18-sep-2026, fila 52):
+     "Editar el asunto" y "Borrar el asunto" viven ahora en el menú de
+     tres puntos del nombre, en su propio fichero, y necesitan volver a
+     la lista exactamente igual que hacían los botones de siempre. */
+  App.volverALaLista = volverALaLista;
+
   /* Si la ficha se ve de verdad en pantalla (y no solo que `actual`
      se ha quedado puesto porque no se pulsó "Volver" al cambiar de
      pestaña). Un repintado AUTOMÁTICO —el que no ha pedido Francisco
@@ -298,8 +304,6 @@
     var caja = $('ficha-asunto-cuerpo');
     if (!a || !caja) return;
     var abierto = (modoActual === 'abierto');
-    var situacion = a.ficha.situacion || '';
-    var p = abierto ? App.plazoDe(a) : null;
     var tipo = tipoDe(a);
     var tramite = datosDelAsunto(a);
     /* Los dos plegables se rehacen enteros con el resto de la ficha:
@@ -318,13 +322,10 @@
         '</div>' +
         '<div class="ficha-marcas">' +
           (tipo ? '<span class="marca-tipo">' + U.escapar(tipo) + '</span>' : '') +
-          (situacion ? '<span class="marca-estado ' + App.colorEstado(situacion) + '">' +
-                       U.escapar(situacion) + '</span>' : '') +
-          (p ? '<span class="marca-plazo ' + p.clase + '">' + U.escapar(p.texto) + '</span>' : '') +
           (a.ficha.loPide && a.ficha.loPide.nombre
             ? '<span class="marca-lopide">Lo pide: ' + U.escapar(a.ficha.loPide.nombre) + '</span>' : '') +
         '</div>' +
-        '<h2 class="ficha-nombre">' + U.escapar(a.nombre) + '</h2>' +
+        '<h2 class="ficha-nombre"><span class="ficha-nombre-texto">' + U.escapar(a.nombre) + '</span></h2>' +
         subtituloDeFicha(a) +
       '</header>' +
       '<div id="ficha-presencia"></div>' +
@@ -362,7 +363,7 @@
 
     $('ficha-volver').onclick = volverALaLista;
 
-    pintarAcciones(a, abierto, p);
+    pintarAcciones(a, abierto);
     pintarNotas(a, abierto);
     pintarAvisoDeTipo(a, tipo);
     pintarGuia(a, tipo, abierto);
@@ -423,8 +424,14 @@
     if (el.classList.contains('ficha-documento')) return true;
     if (el.classList.contains('hito-desplegar')) return true;
     if (el.classList.contains('boton-presencia-tomar')) return true;
+    /* El disparador de los tres puntos del nombre (18-sep-2026, fila
+       52, docs/CABECERA-DEL-ASUNTO.md, 5): en modo consulta el menú se
+       tiene que poder abrir igual, porque una de sus opciones —copiar
+       el nombre— sigue funcionando; las otras dos se apagan solas, ya
+       dentro del menú, por texto (más abajo en este mismo método). */
+    if (el.classList.contains('ficha-nombre-menu-boton')) return true;
     var texto = (el.textContent || '').trim();
-    return texto === 'Copiar' || texto === 'Copiar nombre';
+    return texto === 'Copiar' || texto === 'Copiar el nombre del asunto';
   }
 
   function aplicarModoConsulta() {
@@ -619,17 +626,26 @@
     } catch (e) { return null; }
   }
 
+  /* "El encargo" (18-sep-2026, fila 52, docs/CABECERA-DEL-ASUNTO.md, 7):
+     el mismo cuadro de "Lo pide" de siempre, con la vía de comunicación
+     (antes su propio botón, `App.editarVia`) metida dentro como un
+     campo más. Se guardan los dos con el mismo `App.anotar`, en una
+     sola pasada, pero sin depender el uno del otro: la vía se guarda
+     aunque no se haya elegido "quién lo pide", y viceversa. Ninguno de
+     los dos cambia de sitio en `asuntos.json` (`loPide` y
+     `via`/`viaDato` siguen siendo las mismas claves de siempre). */
   async function abrirLoPide(a) {
     var persona = await personaDelTerceroLoPide(a);
     var tieneDato = !!(a.ficha.loPide && a.ficha.loPide.nombre);
     var pieQuitar = tieneDato
       ? '<button type="button" class="boton" id="lopide-quitar" style="margin-top:10px">Quitar el dato</button>'
       : '';
-    var promesa = U.preguntar('Lo pide',
+    var promesa = U.preguntar('El encargo',
       '<p class="explica">Quién ha pedido esta gestión, por qué vía y en qué fecha.</p>' +
       '<div id="lopide-caja-ficha"></div>' + pieQuitar, 'Guardar');
     var caja = $('lopide-caja-ficha');
-    var controles = LoPide.controles(caja, persona, a.ficha.loPide || null);
+    var controles = LoPide.controles(caja, persona, a.ficha.loPide || null,
+      { via: a.ficha.via || '', viaDato: a.ficha.viaDato || '' });
 
     var quitado = false;
     var btnQuitar = $('lopide-quitar');
@@ -640,12 +656,17 @@
     var ok = await promesa;
     if (quitado) {
       /* `loPide: null`, no `undefined`: App.anotar hace Object.assign, y
-         undefined no borra nada (docs/LO-PIDE.md, 1). */
+         undefined no borra nada (docs/LO-PIDE.md, 1). La vía no se
+         toca: "Quitar el dato" es solo de "Lo pide". */
       await App.anotar(a.nombre, { loPide: null });
       return;
     }
     if (!ok) return;
-    await App.anotar(a.nombre, { loPide: controles.leer() });
+    var via = controles.leerVia();
+    await App.anotar(a.nombre, {
+      loPide: controles.leer(),
+      via: via.via, viaDato: via.dato, viaEl: U.ahora(), viaPor: App.E.usuario
+    });
   }
 
   /* ---------- la barra de botones ----------
@@ -654,15 +675,35 @@
      ficha, y los que mueven o renombran la carpeta devuelven a la
      lista, porque el asunto ya no se llama igual. */
 
-  function pintarAcciones(a, abierto, p) {
+  /* El resumen de una línea bajo "El encargo" (18-sep-2026, fila 52,
+     docs/CABECERA-DEL-ASUNTO.md, 7): "Tutor legal 1 · por correo".
+     Cadena vacía si el asunto no tiene ni quién lo pide ni vía, y
+     entonces el botón "va solo", sin la línea de debajo. */
+  function resumenDelEncargo(a) {
+    var d = a.ficha.loPide || null;
+    var trozos = [];
+    if (d && d.nombre) trozos.push(d.relacion || d.nombre);
+    var v = d && d.via && Nombres.via(d.via);
+    if (v) trozos.push('por ' + v.corto.toLowerCase());
+    return trozos.join(' · ');
+  }
+
+  /* La barra de acciones queda en cinco elementos y nada más
+     (18-sep-2026, fila 52, docs/CABECERA-DEL-ASUNTO.md, 3): el
+     desplegable de estado, el vencimiento, "El encargo", "Comunicar"
+     (lo añade js/correo.js) y "Archivar"/"Reabrir". "Editar", "Borrar"
+     y "Copiar nombre" viven en el menú de tres puntos del nombre
+     (js/ficha-nombre-acciones.js); "Gestionar documentos", en la
+     cabecera del bloque de documentos (js/ficha-documentos.js). */
+  function pintarAcciones(a, abierto) {
     var caja = $('ficha-acciones');
     caja.innerHTML = '';
 
     if (abierto) {
       var sel = document.createElement('select');
-      sel.className = 'campo campo-estado';
-      sel.title = 'Estado del asunto';
       var situacion = a.ficha.situacion || '';
+      sel.className = 'campo campo-estado' + (situacion ? ' ' + App.colorEstado(situacion) : '');
+      sel.title = 'Estado del asunto';
       var lista = App.E.estados.map(function (e) { return e.nombre; });
       if (situacion && lista.indexOf(situacion) === -1) lista.push(situacion);
       sel.innerHTML = '<option value="">Sin estado</option>' +
@@ -676,45 +717,41 @@
       };
       caja.appendChild(sel);
 
-      var v = Nombres.via(a.ficha.via);
-      var bvia = boton('', App.textoVia(a.ficha) || 'Por dónde prefiere que le hablemos',
-        async function (ev) {
-          await U.mientrasGuarda(ev.currentTarget, function () { return App.editarVia(a); });
-          pintar();
-        }, !!a.ficha.via);
-      bvia.innerHTML = dibujoVia(a.ficha.via) + '<span>' + U.escapar(v ? v.corto : 'Vía') + '</span>';
-      bvia.classList.add('boton-con-dibujo');
-      caja.appendChild(bvia);
-
-      caja.appendChild(boton(p ? 'Plazo ✓' : 'Plazo', 'Poner o cambiar la fecha límite',
-        async function (ev) {
-          await U.mientrasGuarda(ev.currentTarget, function () { return App.editarPlazo(a); });
-          pintar();
-        }, !!p));
+      var et = Plazos.etiquetaVencimiento(a.ficha.limite);
+      var bplazo = document.createElement('button');
+      bplazo.type = 'button';
+      bplazo.className = 'boton-vencimiento' + (et.clase ? ' ' + et.clase : '');
+      bplazo.textContent = et.texto;
+      bplazo.title = 'Poner o cambiar la fecha límite';
+      bplazo.onclick = async function (ev) {
+        await U.mientrasGuarda(ev.currentTarget, function () { return App.editarPlazo(a); });
+        pintar();
+      };
+      caja.appendChild(bplazo);
 
       if (window.LoPide) {
-        var tieneLoPide = !!(a.ficha.loPide && a.ficha.loPide.nombre);
-        caja.appendChild(boton(tieneLoPide ? 'Lo pide ✓' : 'Lo pide',
+        var envoltorioEncargo = document.createElement('div');
+        envoltorioEncargo.className = 'ficha-encargo';
+        var tieneEncargo = !!((a.ficha.loPide && a.ficha.loPide.nombre) || a.ficha.via);
+        envoltorioEncargo.appendChild(boton('El encargo',
           'Quién ha pedido esta gestión, por qué vía y en qué fecha',
           async function (ev) {
             await U.mientrasGuarda(ev.currentTarget, function () { return abrirLoPide(a); });
             pintar();
-          }, tieneLoPide));
+          }, tieneEncargo));
+        var resumen = resumenDelEncargo(a);
+        if (resumen) {
+          var spanResumen = document.createElement('span');
+          spanResumen.className = 'ficha-encargo-resumen';
+          spanResumen.textContent = resumen;
+          envoltorioEncargo.appendChild(spanResumen);
+        }
+        caja.appendChild(envoltorioEncargo);
       }
-
-      caja.appendChild(boton('Editar', 'Cambiar la fecha, el tipo, la descripción o el tercero',
-        async function () { await App.editarAsunto(a); volverALaLista(); }));
     }
 
-    caja.appendChild(boton('Copiar nombre', 'Para pegarlo como asunto del correo', function () {
-      navigator.clipboard.writeText(a.nombre).then(function () {
-        U.aviso('Nombre copiado.', 'bueno');
-      });
-    }));
-
-    caja.appendChild(boton('Gestionar documentos', 'Nombrar y archivar los documentos de la carpeta',
-      async function () { await App.verDocumentos(a); pintarDocumentos(a); }));
-
+    /* "Comunicar" (js/correo.js) entra aquí, y "Archivar"/"Reabrir" se
+       queda el último, pegado al borde derecho. */
     var cerrar = boton(abierto ? 'Archivar el asunto' : 'Reabrir el asunto',
       abierto ? 'Llevar la carpeta al ARCHIVO' : '', async function (ev) {
       await U.mientrasGuarda(ev.currentTarget, function () {
@@ -724,54 +761,6 @@
     });
     cerrar.classList.add('boton-principal');
     caja.appendChild(cerrar);
-
-    /* Borrar el asunto entero, con papelera (11-sep-2026). Solo desde
-       aquí, y solo si está abierto: en el ARCHIVO no hay botón, y en la
-       tarjeta de la lista tampoco (BOTONES_DE_LA_TARJETA, más arriba). */
-    if (abierto && window.Papelera) {
-      var borrarAsunto = window.Papelera.botonBorrar(async function () {
-        var docs = [];
-        try { docs = await Carpetas.ficheros(a.handle); } catch (e) { docs = []; }
-        var ok = await window.Papelera.preguntarBorrar(a.nombre,
-          docs.length ? '<p class="nota">Se lleva ' + docs.length + ' documento' +
-            (docs.length === 1 ? '' : 's') + '.</p>' : '');
-        if (!ok) return;
-        if (docs.length) {
-          var seguro = await U.preguntar(a.nombre, '<p>¿Seguro?</p>', 'Sí, a la papelera');
-          if (!seguro) return;
-        }
-        borrarAsunto.disabled = true;
-        try {
-          await Papelera.mandarAsunto(a);
-          U.aviso('Asunto mandado a la papelera.', 'bueno');
-          volverALaLista();
-        } catch (e) {
-          U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
-          borrarAsunto.disabled = false;
-        }
-      });
-      caja.appendChild(borrarAsunto);
-    }
-  }
-
-  /* ---------- el dibujo de la vía de comunicación ----------
-
-     Un botón que pone "Vía" no dice nada de un vistazo. Cada vía
-     lleva su dibujo: un teléfono, un sobre, una pantalla o una
-     persona. Sin vía puesta, el bocadillo de hablar. */
-  var DIBUJOS_VIA = {
-    TELEFONO: '<path d="M6.5 3.5h3l1.5 3.7-2 1.4a11 11 0 0 0 4.4 4.4l1.4-2 3.7 1.5v3a1.5 1.5 0 0 1-1.7 1.5C11.4 16.3 7.7 12.6 5 6.2A1.5 1.5 0 0 1 6.5 3.5z"/>',
-    CORREO: '<rect x="3" y="5.5" width="18" height="13" rx="1.6"/><path d="M3.6 6.4 12 12.6l8.4-6.2"/>',
-    IPASEN: '<rect x="6.5" y="2.8" width="11" height="18.4" rx="2"/><path d="M10.5 18.6h3"/>',
-    PRESENCIAL: '<circle cx="12" cy="8" r="3.4"/><path d="M5.5 20.2c.6-3.5 3.3-5.4 6.5-5.4s5.9 1.9 6.5 5.4"/>',
-    '': '<path d="M4 5.6A1.6 1.6 0 0 1 5.6 4h12.8A1.6 1.6 0 0 1 20 5.6v8.3a1.6 1.6 0 0 1-1.6 1.6H9.2L5 19.4v-3.9h-.4A.6.6 0 0 1 4 14.9z"/>'
-  };
-
-  function dibujoVia(clave) {
-    var d = DIBUJOS_VIA[clave || ''] || DIBUJOS_VIA[''];
-    return '<svg class="via-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-           'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-           d + '</svg>';
   }
 
   function boton(texto, ayuda, alPulsar, marcado) {

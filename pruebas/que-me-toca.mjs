@@ -217,7 +217,7 @@ await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForFunction(() => document.querySelector('#ficha-guia .hito[data-id="h1"]'));
 await pagina.waitForTimeout(300);
 await comprobar('la ficha abierta es la del asunto de h1',
-  pagina.locator('.ficha-nombre').textContent(), CLAVE_TEJADO);
+  pagina.locator('.ficha-nombre-texto').textContent(), CLAVE_TEJADO);
 await comprobar('el cuerpo de h1 ya está desplegado, sin esperar a que se pulse',
   pagina.locator('#ficha-guia .hito[data-id="h1"] .hito-cuerpo').getAttribute('class')
     .then(c => c.indexOf('oculto') === -1), true);

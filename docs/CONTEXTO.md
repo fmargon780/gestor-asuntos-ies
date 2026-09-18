@@ -32,7 +32,10 @@ Se guarda en `_GESTOR/estados.json`. La casilla "Depende de otros" decide en cu�
 tarjetas de arriba sale el asunto.
 
 **Vía de comunicación preferente.** Es del asunto, no del tercero. `js/via-contacto.js` ofrece
-como botones los teléfonos o correos que ya están en el CSV del tercero.
+como botones los teléfonos o correos que ya están en el CSV del tercero, tanto en
+`App.editarVia` (el cuadro de siempre, que sigue usando la tarjeta de la lista) como, desde el
+18-sep-2026 (fila 52), dentro del cuadro "El encargo" de la ficha del asunto
+(`LoPide.controles`).
 
 **Fecha límite** (`js/plazos.js`). Opcional, en la ficha de `asuntos.json`, nunca en el nombre.
 Los días se cuentan naturales; si hace falta contar días hábiles, se cambia la fecha a mano. Un
@@ -240,6 +243,103 @@ al lado.
   plegables (cerrados de partida, el resumen con la cuenta aunque estén cerrados, y que sobreviven
   a un repintado forzado cambiando el estado), el bloque de Documentos vacío, y la rejilla a
   1600px (tres columnas), 1200px (dos, el centro debajo) y con `body.con-lector` (una).
+
+**La cabecera de la ficha, agrupada por el trámite** (18-sep-2026, fila 52,
+docs/CABECERA-DEL-ASUNTO.md): cambio de disposición y de agrupación, ninguna acción desaparece ni
+cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
+
+- **`#ficha-acciones` queda en cinco elementos**, siempre en este orden: el desplegable de
+  estado, la etiqueta de vencimiento, "El encargo", "Comunicar" (lo añade `js/correo.js`, ver
+  abajo) y "Archivar"/"Reabrir" (`.boton-principal`, con `margin-left: auto` en
+  `css/ficha-asunto.css` para pegarlo al borde derecho). `pintarAcciones(a, abierto)` perdió el
+  parámetro `p` (la fecha límite ya no hace falta ahí: la etiqueta se calcula sola).
+- **El estado, con su color**: el `<select class="campo campo-estado">` lleva además la clase
+  `App.colorEstado(situacion)` (`estado-0`…`estado-5`, `estado-x`) cuando hay situación puesta.
+  Funciona sin CSS nuevo: `.estado-N` (css/estilos.css) y `.campo` tienen la misma especificidad
+  de una sola clase, y `.estado-N` va declarada después en el propio fichero, así que gana en el
+  fondo y el color sin tocar nada de `.campo`.
+- **La etiqueta de vencimiento** (`Plazos.etiquetaVencimiento(limite)`, nueva, `js/plazos.js`):
+  sustituye al botón "Plazo" y a `.marca-plazo` (quitada de la cabecera). Devuelve
+  `{texto, clase}`; `clase` es `''` (normal), `vencimiento-cerca` (ámbar: hoy o quedan ≤2 días —
+  **umbral propio, no `DIAS_CERCA` (7) de `Plazos.de`**, que sigue igual para
+  `js/avisos.js`/`js/que-me-toca.js`/la tarjeta de la lista, incluida su regla de que "vence hoy"
+  cuenta como vencido allí, no aquí), `vencimiento-vencido` (rojo) o `vencimiento-sin` (sin
+  fecha). Texto: "Vence el D-mmm · quedan N días" / "Vence hoy" / "Venció hace N días" / "Sin
+  plazo" (`fechaCortaSinAno`, propia de este fichero, sin año). Se pinta con
+  `<button class="boton-vencimiento ...">` (`css/ficha-asunto.css`); al pulsarla abre el mismo
+  `App.editarPlazo(a)` de siempre.
+- **"El encargo"**: un solo botón que abre el cuadro de "Lo pide" de siempre
+  (`abrirLoPide(a)`, sigue en `js/ficha-asunto.js`) con la vía de comunicación
+  (`a.ficha.via`/`viaDato`, antes su propio botón vía `App.editarVia`) metida dentro como un
+  campo más. `LoPide.controles(caja, persona, valorInicial, viaInicial)` gana un 4º parámetro
+  `viaInicial = {via, viaDato}` y devuelve además `leerVia()` (`{via, dato}`, nunca `null`, a
+  diferencia de `leer()` que sigue devolviendo `null` sin "quién"): las dos preguntas
+  —quién lo pide y por dónde— se guardan juntas en un solo `App.anotar`, pero no dependen la una
+  de la otra (se puede guardar la vía sin haber elegido "quién lo pide"). Ninguna de las dos
+  cambia de sitio en `asuntos.json` (`loPide` y `via`/`viaDato`/`viaEl`/`viaPor`, igual que
+  siempre); `App.editarVia` sigue tal cual, sigue usándolo la tarjeta de la lista
+  (`js/asuntos-lista.js`). `js/via-contacto.js` envuelve `LoPide.controles` (además de
+  `App.editarVia`, que no se toca) para poner las sugerencias de teléfono/correo también en el
+  campo `.lopide-via-dato` del cuadro nuevo, solo si `controles()` recibe `persona`. El botón
+  muestra debajo, en gris (`.ficha-encargo-resumen`), `relación · por vía` cuando hay algo que
+  enseñar (`resumenDelEncargo(a)`, en `js/ficha-asunto.js`); "va solo" si no hay nada.
+- **"Comunicar"**: `js/correo.js` deja de montar dos botones ("Correo", "Mensaje Séneca") y monta
+  uno (`.boton-comunicar`) con `FichaMenus.montar(b, [...])` (dos opciones, mismas llamadas a
+  `abrirCuadro(a, false/true)` de siempre). Como este fichero pinta por su cuenta (mismo patrón de
+  `MutationObserver` que ya usaba), inserta el botón con `caja.insertBefore(b, principal)` antes
+  de `.boton-principal`, no con `appendChild`: si no, "Comunicar" podría acabar después de
+  "Archivar" según el orden de llegada de los observadores.
+- **El menú de tres puntos del `<h2 class="ficha-nombre">`** (`js/ficha-nombre-acciones.js`,
+  nuevo): envuelve `App.abrirFicha` igual que `js/copiar.js`, con su propio
+  `MutationObserver` sobre `#pantalla-asunto` para sobrevivir a cada repintado con `innerHTML`.
+  Opciones: "Editar el asunto" y, con `window.Papelera`, una raya y "Borrar el asunto" en rojo
+  (`.ficha-menu-peligro`) — las dos solo si `abierto` (no existen en el ARCHIVO, igual que antes
+  no existían los botones); "Copiar el nombre del asunto" siempre (copia `a.nombre`, la carpeta
+  entera: se comprobó que eso es lo que copiaba de verdad el viejo "Copiar nombre", así que el
+  texto del menú es correcto tal cual). Las dos primeras llaman a `App.volverALaLista()`, ahora
+  **expuesta** desde `js/ficha-asunto.js` (antes privada) para que este fichero nuevo pueda
+  volver a la lista igual que hacían los botones de siempre.
+- **El icono de copiar el número del tercero** (`.boton-nie`, `js/copiar.js`) se muda de
+  `#ficha-acciones` al `<h2 class="ficha-nombre">` (`ponerNie()` cambia de sitio dónde busca y
+  dónde inserta: `document.querySelector('.ficha-nombre')` + `appendChild`, versión "chica" como
+  en las listas de resultados). No estaba en la lista de ficheros a tocar de
+  docs/CABECERA-DEL-ASUNTO.md, pero la propia fila lo pide (tabla del punto 4): cambio mínimo,
+  sin tocar la lógica de copiar.
+- **`js/ficha-menus.js`** (nuevo): el menú pequeño reutilizable —abrir, cerrar con Escape (en
+  captura, con `stopPropagation`) y al pulsar fuera, uno solo a la vez— que usan los tres puntos
+  y "Comunicar". Muy parecido a `U.menuDeAcciones` (`js/util.js`), pero fichero aparte porque la
+  fila lo pedía así (14). **Trampa real**: sin `stopPropagation` en el manejador de Escape,
+  cerrar el menú con esa tecla se llevaba por delante la ficha entera, porque
+  `js/usabilidad.js` también escucha Escape en el documento (fuera de captura) y, sin ningún
+  `#capa` abierto, pulsa `#ficha-volver` — el mismo cuidado que ya toma `js/huecos-buscador.js`
+  por el mismo motivo.
+- **`esControlDeSoloLectura`** (`js/ficha-asunto.js`) gana dos casos: el disparador de los tres
+  puntos (`.ficha-nombre-menu-boton`, para que el menú se pueda abrir en modo consulta: dentro,
+  "Copiar el nombre del asunto" sigue funcionando y "Editar"/"Borrar" salen apagados solos, por
+  ser botones normales sin marcar) y el texto `'Copiar el nombre del asunto'` (sustituye a
+  `'Copiar nombre'`, retirado). "Comunicar" no se marca como de solo lectura: ya se apagaba
+  entero en consulta antes de esta fila (ninguna de sus dos acciones estaba en la lista blanca),
+  así que sigue igual, apagado el botón entero.
+- **"Documentos ▾"** (`js/ficha-documentos.js`, `ponerBotonGestionar(bloqueEl, a)`): mismo
+  `App.verDocumentos(a)` de siempre, ahora en la cabecera del propio bloque, al lado del título;
+  se pinta también con la carpeta vacía (antes del primer `return` de `pintar(a)`), comprobando
+  que no exista ya (el título no se rehace en cada repintado de la lista de documentos, solo
+  `#ficha-documentos` por dentro).
+- **El `<h2>` con la cabecera encogida**: el nombre pasa a `<span class="ficha-nombre-texto">`
+  dentro del `<h2>`; solo ese `<span>` lleva `overflow: hidden; text-overflow: ellipsis;` con la
+  cabecera encogida, nunca el `<h2>` entero, para que el icono de copiar y los tres puntos
+  —hermanos del `<span>`, no dentro de él— no se recorten con un nombre largo
+  (`.ficha-cabecera.encogida .ficha-nombre` pasa a `display: flex`).
+- Se comprueba con `pruebas/cabecera-del-asunto.mjs` (11 escenarios): la barra con sus cinco
+  elementos y sin ninguno de los viejos, el menú de tres puntos y que Escape no echa de la ficha,
+  el icono según lleve o no número, la etiqueta de vencimiento pulsable y sus textos/colores
+  (probados llamando a `Plazos.etiquetaVencimiento` directamente, con fechas relativas a `hoy`,
+  sin depender de qué día se ejecute la prueba), "Comunicar" con sus dos cuadros, "El encargo"
+  guardando los dos datos de una vez, "Documentos ▾" también con la carpeta vacía, modo consulta,
+  y la cabecera encogida. Los cuadros de Correo/Séneca/Documentos se cierran con Escape en la
+  prueba, no pulsando `#cuadro-cancelar`/`#cuadro-aceptar`: los tres abren con `sinCancelar`
+  (el botón queda oculto) y, en pantallas cortas, el de aceptar puede quedar fuera de la parte
+  visible del cuadro.
 
 ### Las tarjetas por tipo de asunto
 
@@ -901,11 +1001,16 @@ Toda la lógica vive en el módulo nuevo `js/lo-pide.js` (`window.LoPide`), para
   el resultado, nombre vacío. Sin nombre pero con teléfono o correo, la opción no desaparece: se
   ofrece como "Tutor legal 1/2" a secas, con `relacion: ''` para no repetirlo en la línea de
   `LoPide.texto`.
-- `LoPide.controles(caja, persona, valorInicial)`: pinta el desplegable, los campos de "Otra
-  persona…" (solo visibles con esa opción), la vía y la fecha, **con clases, nunca con id**: este
-  mismo módulo se monta a la vez dentro de `#bloque-detalles` de "Nuevo asunto" (que queda en el
-  documento, aunque escondido, mientras dura la sesión) y dentro del cuadro de la ficha; dos
-  elementos con el mismo id habrían roto el segundo sitio que se pintara. Devuelve `{ leer() }`.
+- `LoPide.controles(caja, persona, valorInicial, viaInicial)`: pinta el desplegable, los campos
+  de "Otra persona…" (solo visibles con esa opción), la vía (desplegable `.lopide-via` +
+  `.lopide-via-dato`, el mismo par que `a.ficha.via`/`viaDato`) y la fecha, **con clases, nunca
+  con id**: este mismo módulo se monta a la vez dentro de `#bloque-detalles` de "Nuevo asunto"
+  (que queda en el documento, aunque escondido, mientras dura la sesión) y dentro del cuadro de
+  la ficha; dos elementos con el mismo id habrían roto el segundo sitio que se pintara. `viaInicial`
+  (`{via, viaDato}`, 18-sep-2026, fila 52, docs/CABECERA-DEL-ASUNTO.md) es opcional, para cuando
+  quien llama también quiere preguntar la vía de comunicación del asunto en el mismo cuadro.
+  Devuelve `{ leer(), leerVia() }`: `leer()` sigue devolviendo `null` sin "quién" puesto;
+  `leerVia()` da `{via, dato}` siempre, aunque no se haya elegido "quién lo pide".
 - `LoPide.texto(ficha)`/`LoPide.correoDe(ficha)`: la línea legible ("María López (Tutor legal 1)
   · por teléfono · 17-sep-2026") y la dirección de quien lo pide, o cadena vacía sin dato.
 - `LoPide.elegirDestinatarios(correos, correoLoPide, elegidosDeAntes)`: pura, sin DOM, para poder
@@ -915,10 +1020,13 @@ Toda la lógica vive en el módulo nuevo `js/lo-pide.js` (`window.LoPide`), para
 Dónde se engancha: grupo **"Lo pide (opcional)"** en `#bloque-detalles` de `js/asuntos-nuevo.js`
 (se repinta al cambiar de tercero con `App.fijarTercero`; `App.datosDelFormulario()` añade
 `loPide` solo si hay nombre). Fila **"Lo pide"** (debajo de "Vía de comunicación") y marca
-`.marca-lopide` en la cabecera de `js/ficha-asunto.js`, más un botón **"Lo pide"** en
-`pintarAcciones` (solo en asuntos abiertos, con "Quitar el dato" dentro del cuadro cuando ya hay
-uno; apagado en modo consulta, como el resto de controles que modifican, pero **no** en la lista
-`esControlDeSoloLectura`). En `js/correo.js`: si se conoce el correo de quien lo pide y está entre
+`.marca-lopide` en la cabecera de `js/ficha-asunto.js` (esta marca **no** se ha quitado en la
+fila 52: solo se quitaron `.marca-estado` y `.marca-plazo`). El botón, en asuntos abiertos, es
+desde la fila 52 (18-sep-2026) **"El encargo"**, que abre el mismo cuadro de siempre
+(`abrirLoPide(a)`) con la vía de comunicación metida dentro (ver la sección de la cabecera, más
+arriba); "Quitar el dato" sigue dentro del cuadro cuando ya hay uno, y solo quita `loPide`, nunca
+la vía. Apagado en modo consulta, como el resto de controles que modifican, pero **no** en la
+lista `esControlDeSoloLectura`. En `js/correo.js`: si se conoce el correo de quien lo pide y está entre
 los de la lista, se marca esa casilla sola; si no está, va a "Otro correo" y ninguna casilla queda
 marcada; encima de "Para" sale una línea gris "Lo pidió Fulano (relación), el día tal."; `aQuien`
 (Séneca) devuelve su nombre en vez del de siempre. Cuatro huecos nuevos en `js/plantillas.js`
@@ -2281,9 +2389,11 @@ de `App` va después del fichero que lo define.
 | `js/pdf-separar-unir.js` | El cuadro de Separar, Unir y Sacar páginas: miniaturas con pdf.js, tijeras, casillas |
 | `js/verificacion.js` | El código de verificación del pie de un documento, y su dirección |
 | `js/lib/pdf.min.js`, `js/lib/pdf.worker.min.js` | pdf.js (Mozilla) 3.11.174, copiado tal cual |
-| `js/ficha-asunto.js` | La pantalla de un asunto: cabecera (con la línea gris del subtítulo, fila 51), acciones, Hitos a la izquierda, Documentos en el centro, "Datos y contacto"/Notas/los dos plegables/Datos del trámite a la derecha |
+| `js/ficha-asunto.js` | La pantalla de un asunto: cabecera (con la línea gris del subtítulo, fila 51; barra de 5 acciones y el `<h2>` con sus dos añadidos, fila 52), Hitos a la izquierda, Documentos en el centro, "Datos y contacto"/Notas/los dos plegables/Datos del trámite a la derecha |
+| `js/ficha-menus.js` | El menú pequeño reutilizable de la cabecera (abrir, cerrar con Escape/al pulsar fuera, uno solo a la vez): lo usan los tres puntos del nombre y "Comunicar" (18-sep-2026, fila 52) |
+| `js/ficha-nombre-acciones.js` | El menú de tres puntos del `<h2>` del nombre del asunto: Editar, Copiar el nombre del asunto, Borrar (18-sep-2026, fila 52) |
 | `js/ficha-plegables.js` | Los dos bloques plegables de la ficha ("Otros asuntos de este tercero", "Personas y entidades relacionadas"): montar el `<details>`, el resumen con la cuenta, guardar y reponer el abierto/cerrado entre un repintado y otro (18-sep-2026, fila 51) |
-| `js/ficha-documentos.js` | Los documentos de la carpeta, en la ficha del asunto (separado de `js/ficha-asunto.js` en la fila 26); pone la clase `vacio` al bloque cuando no hay ninguno (fila 51) |
+| `js/ficha-documentos.js` | Los documentos de la carpeta, en la ficha del asunto (separado de `js/ficha-asunto.js` en la fila 26); pone la clase `vacio` al bloque cuando no hay ninguno (fila 51); botón "Documentos ▾" en la cabecera del bloque (fila 52) |
 | `js/ficha-tercero.js`, `css/ficha-tercero.css` | "Datos y contacto" del tercero: la línea resumen y la ventana "Ver todo" con los tutores agrupados por persona (separado de `js/ficha-asunto.js` en la fila 37) |
 | `js/hitos-panel.js` | Pinta los hitos en la ficha del asunto (los pasos de la guía SON los hitos): el observador, el repintado y la creación automática |
 | `js/hitos-panel-lista.js` | La otra mitad del panel de hitos: la fila de cada hito, su cuerpo desplegado y el cambio de rama |
