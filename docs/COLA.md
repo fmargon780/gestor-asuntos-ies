@@ -129,10 +129,12 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 52 | `docs/CABECERA-DEL-ASUNTO.md` | PENDIENTE |
 | 53 | `docs/SENECA-CUADRO-ANCHO.md` | PENDIENTE |
 | 54 | `docs/AYUDANTE-SENECA-FIABLE.md` | PENDIENTE |
+| 55 | `docs/ASUNTO-SIN-ELECCION.md` | PENDIENTE |
 
-**Orden de trabajo:** están PENDIENTES la 49, la 50, la 51, la 52, la 53 y la 54, en ese orden. Las
-filas 1 a 48 están HECHAS. **La 52 va después de la 51**: las dos tocan la cabecera de la ficha.
-La 54 toca solo `js/seneca-ayudante.js`, así que no se pisa con la 53.
+**Orden de trabajo:** están PENDIENTES la 49, la 50, la 51, la 52, la 53, la 54 y la 55, en ese
+orden. Las filas 1 a 48 están HECHAS. **La 52 va después de la 51**: las dos tocan la cabecera de
+la ficha. La 54 toca solo `js/seneca-ayudante.js`, así que no se pisa con la 53. **La 55 va después
+de la 53**, porque la 53 mueve el cuadro de Séneca a un fichero nuevo.
 
 **Fila 49, en una línea** (18-sep-2026, acordada con Francisco): la bandeja de correos lee por
 dentro los PDF adjuntos de cada correo (hasta 3 adjuntos, 5 páginas) con el lector que ya existe
@@ -188,6 +190,13 @@ del Intro con 350 ms, comprueba que la persona ha entrado de verdad (el campo se
 con un botón "Copiar los que faltan". Solo se toca `js/seneca-ayudante.js`; ni los chips ni
 `js/seneca-destinatarios.js` cambian. Detalle en `docs/AYUDANTE-SENECA-FIABLE.md`. Sube
 directamente a `main`, sin petición de cambios.
+
+**Fila 55, en una línea** (18-sep-2026, acordada con Francisco): desaparecen los dos botones
+"Nombre de la carpeta" / "Versión legible" que hay debajo del campo Asunto, en el cuadro de Correo
+y en el de Mensaje de Séneca. El asunto del mensaje es siempre el nombre de la carpeta del asunto,
+porque es lo que permite reconocer el hilo después; el campo sigue viéndose y pudiéndose editar a
+mano. Se borra el código de la versión legible. Detalle en `docs/ASUNTO-SIN-ELECCION.md`. **Va
+después de la fila 53.** Sube directamente a `main`, sin petición de cambios.
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
