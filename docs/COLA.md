@@ -133,8 +133,10 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 56 | `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md` | HECHA (18-sep-2026 · 07:22) |
 | 57 | `docs/HUECO-PARA-SELLO-Y-FIRMA.md` | HECHA (18-sep-2026 · 09:46) |
 | 58 | `docs/AJUSTES-DE-USO-2026-09-18.md` | PENDIENTE |
+| 59 | `docs/REQUISITOS-DE-HITO.md` | PENDIENTE |
 
-**Orden de trabajo:** la única fila PENDIENTE es la 58. Las filas 1 a 57 están HECHAS.
+**Orden de trabajo:** las filas PENDIENTES son la 58 y la 59, en ese orden. Las filas 1 a 57 están
+HECHAS.
 
 **Fila 58, en una línea** (18-sep-2026, acordada con Francisco tras usar la aplicación con trabajo
 real): seis arreglos de uso diario, independientes entre sí. (1) Cuatro botones de copiar siempre
@@ -148,6 +150,16 @@ botones fijos) para que se vea la lista de documentos del asunto que ya existe y
 pantalla. (6) Asociar un documento a un hito también desde la lista de documentos, y cada hito
 enseña debajo los suyos. Detalle en `docs/AJUSTES-DE-USO-2026-09-18.md`. Sube directamente a
 `main`, sin petición de cambios.
+
+**Fila 59, en una línea** (18-sep-2026, acordada con Francisco): cada paso del trámite de un tipo
+puede llevar una lista de **lo que hay que reunir**, y esa lista llega a su hito como casillas.
+Cada casilla es un documento o un dato, y puede ser obligatoria. La del documento se marca sola al
+apuntar ese documento al hito; la del dato se marca a mano y deja escribir el valor. Si al dar un
+hito por hecho quedan obligatorias sin marcar, avisa (no lo impide) y deja nota. Botón **Pedir lo
+que falta** en el hito: mete las casillas sin marcar como lista dentro del correo o del mensaje de
+Séneca, con un hueco nuevo `{{LO QUE FALTA}}`. Ficheros nuevos: `js/hitos-requisitos.js`,
+`js/guias-requisitos.js`, `pruebas/requisitos-de-hito.mjs`. Detalle en
+`docs/REQUISITOS-DE-HITO.md`. Sube directamente a `main`, sin petición de cambios.
 
 **Fila 52, en una línea** (18-sep-2026, acordada con Francisco mirando la cabecera de un asunto de
 CERT. MATRICULA): los doce botones de la cabecera se agrupan por el momento del trámite en que se
@@ -279,6 +291,9 @@ la API.
 - De la fila 57: las medidas de 1,5 cm y 2,5 cm son una estimación. Francisco no tenía la medida
   real de las bandas de Séneca ni de la de AutoFirma. Cuando pruebe el botón con un documento
   registrado de verdad, ajustará las dos medidas en Ajustes → El centro.
+- De la fila 59 (18-sep-2026): con el uso se verá si conviene que "Qué me toca" cuente también lo
+  que falta por reunir, y si la casilla de un dato debería poder rellenarse sola desde la ficha
+  del tercero.
 
 ## Nota sobre "sube directamente a main"
 
