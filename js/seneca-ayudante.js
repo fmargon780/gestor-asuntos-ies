@@ -153,14 +153,7 @@
     return 'javascript:' + CODIGO_INTERNO;
   }
 
-  /* Pinta, dentro de `contenedor`, el enlace-marcador con sus tres
-     frases (arrastrar, permiso del portapapeles, red de seguridad).
-     Se puede llamar varias veces sobre el mismo contenedor (Ajustes
-     se repinta al cambiar de pestaña): no duplica nada. */
-  function insertarEnlace(contenedor) {
-    if (!contenedor) return;
-    contenedor.innerHTML = '';
-
+  function enlaceMarcador() {
     var enlace = document.createElement('a');
     enlace.className = 'boton boton-principal';
     enlace.href = textoDelMarcador();
@@ -171,25 +164,62 @@
       ev.preventDefault();
       if (window.U) U.aviso('Este enlace se arrastra a la barra de marcadores: no se pulsa.', 'malo');
     };
+    return enlace;
+  }
 
-    var explica = document.createElement('p');
-    explica.className = 'nota';
-    explica.style.marginTop = '8px';
-    explica.innerHTML =
-      'Arrastra este enlace, sin soltarlo, hasta la barra de marcadores del navegador. ' +
+  function explicacionHtml() {
+    return 'Arrastra este enlace, sin soltarlo, hasta la barra de marcadores del navegador. ' +
       'Se hace <strong>una sola vez</strong>.<br>' +
       'La primera vez que lo uses en Séneca, el navegador pedirá permiso para leer el ' +
       'portapapeles: dale a Permitir.<br>' +
       'Si alguna vez no hace nada, usa "Copiar el siguiente" y pégalo a mano: es la manera ' +
       'de siempre, y no depende de este ayudante.';
+  }
 
-    contenedor.appendChild(enlace);
+  /* Pinta, dentro de `contenedor`, el enlace-marcador con sus tres
+     frases (arrastrar, permiso del portapapeles, red de seguridad).
+     Se puede llamar varias veces sobre el mismo contenedor (Ajustes
+     se repinta al cambiar de pestaña): no duplica nada. */
+  function insertarEnlace(contenedor) {
+    if (!contenedor) return;
+    contenedor.innerHTML = '';
+
+    var explica = document.createElement('p');
+    explica.className = 'nota';
+    explica.style.marginTop = '8px';
+    explica.innerHTML = explicacionHtml();
+
+    contenedor.appendChild(enlaceMarcador());
     contenedor.appendChild(explica);
+  }
+
+  /* La misma pareja (enlace + explicación), pero con la explicación
+     dentro de un `<details>` cerrado de partida y el enlace fuera, a
+     la vista (18-sep-2026, fila 53, docs/SENECA-CUADRO-ANCHO.md, 3.5):
+     los cuatro párrafos de siempre se leen una vez en la vida, y no
+     deberían ocupar más alto que el propio cuadro de Séneca. El texto
+     no cambia, solo dónde vive. */
+  function pintarPlegado(contenedor) {
+    if (!contenedor) return;
+    contenedor.innerHTML = '';
+    contenedor.appendChild(enlaceMarcador());
+
+    var detalle = document.createElement('details');
+    detalle.className = 'seneca-ayudante-detalle';
+    var resumen = document.createElement('summary');
+    resumen.textContent = '¿Cómo se instala el ayudante de Séneca? (se hace una sola vez)';
+    var explica = document.createElement('p');
+    explica.className = 'nota';
+    explica.innerHTML = explicacionHtml();
+    detalle.appendChild(resumen);
+    detalle.appendChild(explica);
+    contenedor.appendChild(detalle);
   }
 
   window.SenecaAyudante = {
     textoDelMarcador: textoDelMarcador,
-    insertarEnlace: insertarEnlace
+    insertarEnlace: insertarEnlace,
+    pintarPlegado: pintarPlegado
   };
 
 })();

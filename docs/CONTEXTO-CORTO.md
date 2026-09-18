@@ -66,7 +66,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Cambiar los datos de un tercero dado de alta a mano.
 - Guías del procedimiento por tipo, con pasos, preguntas y opciones.
 - Panel lateral de lectura, y tablón de notas rápidas siempre visible.
-- Correo y mensaje de Séneca preparados; la app no envía nada.
+- Correo y mensaje de Séneca preparados; la app no envía nada. El cuadro de Séneca es ancho y a dos columnas (`js/seneca-cuadro.js`, fila 53, 18-sep-2026), con el asunto entero (sin cortarse, con su cuenta de caracteres), aviso si el tipo no tiene plantilla, dos botones numerados que copian cada uno lo suyo, y el ayudante-marcador plegado.
 - "Por clasificar": cada documento suelto se abre, se borra, crea un asunto nuevo, o entra en uno
   que ya existe. El que se está viendo queda marcado en la lista, con sus mismas acciones también
   dentro del visor. Encima, tras una barra "Correos sin clasificar (N)" que siempre arranca

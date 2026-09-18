@@ -963,11 +963,35 @@ la línea pasa a avisar. Vive en `js/bandeja-correos.js`, `pintarUltimoCorreoRec
 
 ### El correo y la mensajería de Séneca
 
-Botones "Correo" y "Mensaje Séneca" en la ficha del asunto (`js/correo.js`). La aplicación **no
-envía nada**: prepara los campos y los deja listos. Al copiar el texto o abrir la ventana de
-redactar se apunta sola una nota (una sola vez por cuadro). Solo Séneca: no hay campo Para, y un
-solo botón que se va cambiando: "1. Copiar el asunto" → "2. Ahora, copiar el texto" → "Copiado.
-Pégalo y envía".
+"Correo electrónico" y "Mensaje de Séneca", dentro de "Comunicar" en la ficha del asunto (fila
+52). La aplicación **no envía nada**: prepara los campos y los deja listos. Al copiar el texto o
+abrir la ventana de redactar se apunta sola una nota (una sola vez por cuadro).
+
+**Dos ficheros, uno por cuadro** (18-sep-2026, fila 53, docs/SENECA-CUADRO-ANCHO.md): antes
+compartían cuadro dentro de `js/correo.js`; Séneca no tiene "Para" (el destinatario se marca en
+la propia lista de Séneca, Utilidades → Comunicaciones, no se escribe) y su disposición es
+distinta del todo, así que se separó a `js/seneca-cuadro.js` (`window.SenecaCuadro.abrir(a,
+modo)`), ancho (hasta 1100px, `.cuadro-seneca`, `css/seneca.css`) y a dos columnas desde 900px:
+izquierda el aviso, "Añadir un grupo", los destinatarios (`js/seneca-destinatarios.js`) y el
+Asunto (un `<textarea>` que crece con su contenido, sin barra de desplazamiento, con su cuenta de
+caracteres y los botones "Nombre de la carpeta"/"Versión legible" en pequeño, `.boton-chico`);
+derecha el Texto del mensaje, con la plantilla de siempre (o, sin ninguna para el tipo, un aviso
+con un enlace a `App.abrirTipoDeAsunto(tipo)` en vez del hueco mudo de antes). Abajo, cruzando las
+dos columnas, dos botones —"1. Copiar el asunto" y "2. Copiar el texto"— que copian **cada uno lo
+suyo, siempre**, en el orden que se pulsen (ya no es un solo botón que cambia de texto): el que
+toca se destaca con `.boton-principal`, puesto y quitado a mano; "Copiado" 1,4 s en el propio
+botón, mismo aviso que `js/copiar.js`. El ayudante-marcador (`js/seneca-ayudante.js`,
+`SenecaAyudante.pintarPlegado(contenedor)`, nueva, junto a la de siempre `insertarEnlace` que
+sigue usando Ajustes) queda con el enlace a la vista y sus cuatro párrafos dentro de un
+`<details>` cerrado.
+
+Lo que los dos cuadros necesitan igual —de qué categoría es el tercero, su nombre sin el número,
+el asunto en sus dos versiones, el cuerpo con la plantilla rellena (`cuerpoDelMedio`, ahora pura:
+`plantillasDatos`/`valoresActuales` entran como parámetros, no como variables del cuadro), a
+quién se escribe en palabras (`aQuien`) y el estado de espera del centro (`estadoDeEspera`)— lo
+expone `js/correo.js` como `window.CorreoComun`, igual que ya exponía `window.CorreoGrupos` para
+el desplegable "Añadir un grupo" (que ambos cuadros siguen usando). `js/correo.js` se queda solo
+con el cuadro de Correo: `abrirCuadro(a)` perdió el parámetro `deSeneca`.
 
 ### "Lo pide": quién ha pedido la gestión (17-sep-2026, fila 28, docs/LO-PIDE.md)
 
@@ -1029,7 +1053,8 @@ la vía. Apagado en modo consulta, como el resto de controles que modifican, per
 lista `esControlDeSoloLectura`. En `js/correo.js`: si se conoce el correo de quien lo pide y está entre
 los de la lista, se marca esa casilla sola; si no está, va a "Otro correo" y ninguna casilla queda
 marcada; encima de "Para" sale una línea gris "Lo pidió Fulano (relación), el día tal."; `aQuien`
-(Séneca) devuelve su nombre en vez del de siempre. Cuatro huecos nuevos en `js/plantillas.js`
+(expuesta en `window.CorreoComun`, la usa `js/seneca-cuadro.js`) devuelve su nombre en vez del de
+siempre. Cuatro huecos nuevos en `js/plantillas.js`
 (`{quienlopide}`, `{quienlopiderelacion}`, `{quienlopidevia}`, `{quienlopidefecha}`), vacíos como
 cualquier otro hueco cuando el asunto no tiene el dato.
 
@@ -2409,10 +2434,11 @@ de `App` va después del fichero que lo define.
 | `js/copiar.js` | Los botones de copiar: el Nº escolar y el nombre del documento |
 | `js/plantillas.js` | Leer y guardar `plantillas.json`, montar `Plantillas.valoresDeAsunto` y rellenar los huecos: el motor, sin pantalla |
 | `js/plantillas-ajustes.js` | Las plantillas de correo (sacado de `js/plantillas.js`); desde el 17-sep-2026 (fila 39) pinta solo las de un tipo dentro de su pantalla (`PlantillasAjustes.pintarDeTipo`) y los campos de Datos del centro y firma, en "El centro" |
-| `js/correo.js` | El correo y el mensaje de Séneca, con su rastro, sus plantillas y los grupos en copia oculta; expone `window.CorreoGrupos` (fila 47) para que `js/seneca-destinatarios.js` reutilice el mismo desplegable |
+| `js/correo.js` | El cuadro de Correo, con su rastro, sus plantillas y los grupos en copia oculta; expone `window.CorreoGrupos` (fila 47) y `window.CorreoComun` (fila 53) para que `js/seneca-destinatarios.js` y `js/seneca-cuadro.js` reutilicen lo compartido |
+| `js/seneca-cuadro.js`, `css/seneca.css` | El cuadro de "Mensaje de Séneca", ancho y a dos columnas (`window.SenecaCuadro.abrir(a, modo)`), separado de `js/correo.js` (18-sep-2026, fila 53) |
 | `js/idea.js` | El usuario IdEA de una persona (y el de sus tutores legales), leído por el título de columna del CSV, como `js/dni.js` (fila 47) |
 | `js/seneca-destinatarios.js` | La lista de usuarios IdEA del cuadro de Séneca, en chips, con "Copiar la lista"/"Copiar el siguiente" (fila 47) |
-| `js/seneca-ayudante.js`, `css/relacionados.css` (`.marcado-chip-copiado`) | El enlace-marcador que pega los usuarios IdEA uno a uno en Séneca (fila 47) |
+| `js/seneca-ayudante.js`, `css/relacionados.css` (`.marcado-chip-copiado`) | El enlace-marcador que pega los usuarios IdEA uno a uno en Séneca (fila 47); `pintarPlegado` (fila 53) lo pinta con la explicación dentro de un `<details>` cerrado |
 | `js/docx.js` | Rellenar los huecos de una plantilla de Word: ZIP y XML a mano, sin librerías (`window.Docx`) |
 | `js/plantillas-documento.js` | Botón "Generar documento" en la ficha; desde el 17-sep-2026 (fila 39) pinta solo las plantillas de documento de un tipo dentro de su pantalla (`PlantillasDocumento.pintarDeTipo`, `css/plantillas-documento.css`) |
 | `js/salir.js` | El botón de Salir del pie de la barra |

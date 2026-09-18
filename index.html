@@ -35,6 +35,7 @@
 <link rel="stylesheet" href="css/pdf-separar-unir.css">
 <link rel="stylesheet" href="css/filas.css">
 <link rel="stylesheet" href="css/cabecera-fija.css">
+<link rel="stylesheet" href="css/seneca.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -758,10 +759,17 @@
 <script src="js/seneca-destinatarios.js"></script>
 <!-- js/seneca-ayudante.js (fila 47): genera el texto del enlace-marcador
      y lo pinta, tanto en Ajustes (js/ajustes-mantenimiento.js) como en
-     el cuadro de Séneca (js/correo.js). No depende de ningún otro
-     módulo de la aplicación: solo de `window.U` para el aviso, si
-     está disponible. -->
+     el cuadro de Séneca (js/seneca-cuadro.js, fila 53). No depende de
+     ningún otro módulo de la aplicación: solo de `window.U` para el
+     aviso, si está disponible. -->
 <script src="js/seneca-ayudante.js"></script>
+<!-- js/seneca-cuadro.js (fila 53, 18-sep-2026, docs/SENECA-CUADRO-
+     ANCHO.md): el cuadro de "Mensaje de Séneca", que antes vivía
+     dentro de js/correo.js. Va después de js/correo.js (usa
+     `window.CorreoComun` y `window.CorreoGrupos`, que expone),
+     js/seneca-destinatarios.js y js/seneca-ayudante.js (los llama al
+     pintar el cuadro). -->
+<script src="js/seneca-cuadro.js"></script>
 <!-- js/docx.js y js/plantillas-documento.js van después de js/correo.js
      (docs/PLANTILLAS-DE-DOCUMENTO.md, 7): usan Plantillas.valoresDeAsunto
      y, para el botón "Generar documento" de la ficha, el mismo enganche

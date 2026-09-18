@@ -20,12 +20,18 @@
    el botón para dejar el asunto a la espera del tercero y el
    recordatorio de guardar el PDF del hilo en la carpeta.
 
-   El mismo cuadro sirve para la MENSAJERÍA DE SÉNECA, con un cambio:
-   allí el destinatario no se escribe, se elige de las listas del propio
-   Séneca (Utilidades → Comunicaciones). Así que no hay "Para": solo el
-   asunto y el texto, y un botón que los va dando de uno en uno, en el
-   orden en que hay que pegarlos.
-   ============================================================ */
+   La MENSAJERÍA DE SÉNECA vive en su propio fichero,
+   `js/seneca-cuadro.js` (18-sep-2026, fila 53,
+   docs/SENECA-CUADRO-ANCHO.md): allí el destinatario no se escribe, se
+   elige de las listas del propio Séneca, así que su cuadro es distinto
+   del todo (ni "Para", ni destinatarios, disposición propia). Lo que
+   los dos cuadros necesitan igual —de qué categoría es el tercero, el
+   nombre sin el número pegado, el asunto en sus dos versiones, el
+   cuerpo con la plantilla ya rellena, a quién se le escribe en
+   palabras, y el estado de espera del centro— se expone aquí, puro
+   (sin tocar el DOM ni depender de las variables de este cuadro), como
+   `window.CorreoComun`, igual que ya se exponía `window.CorreoGrupos`
+   para el desplegable "Añadir un grupo". */
 (function () {
 
   var viendo = null;         /* el asunto que se está mirando */
@@ -35,9 +41,7 @@
   var ccoSinCorreo = [];     /* nombres de miembros de un grupo sin ningún correo */
   var asuntoLargo = true;    /* true: nombre de la carpeta; false: versión legible */
   var yaApuntado = false;    /* la nota se escribe una vez por cuadro, no una por botón */
-  var porSeneca = false;     /* true: el cuadro es el de la mensajería de Séneca */
   var personaActual = null;  /* la ficha del tercero, ya buscada en los CSV */
-  var pasoSeneca = 0;        /* 0 el asunto, 1 el texto, 2 hecho */
   var algoCambiado = false;  /* al cerrar, la ficha se repinta si se ha tocado algo */
   var documentosAdjuntados = [];  /* los que ha llevado el último borrador preparado */
 
@@ -47,7 +51,6 @@
                                     que un documento de Word y un correo lean de un solo sitio) */
   var plantillaElegida = '';    /* el id de la elegida en el desplegable, o '' (Sin plantilla) */
   var textoProgramado = '';     /* lo último que ha escrito el propio cuadro, para saber si se ha tocado a mano */
-  var MAXIMO_LETRAS_SENECA = 4000;
 
   function $(id) { return document.getElementById(id); }
 
@@ -116,8 +119,8 @@
     return { curso: curso, grupo: grupo };
   }
 
-  function asuntoDelCorreo(a) {
-    if (asuntoLargo) return a.nombre;
+  function asuntoDelCorreo(a, largo) {
+    if (largo) return a.nombre;
     var f = a.ficha || {}, l = a.leido || {};
     var p = piezasDelNombre(a);
     var trozos = [
@@ -134,7 +137,7 @@
      un solo sitio que sepa cómo se monta. Si por lo que sea no se ha
      podido calcular (fallo de red, cuadro recién abierto), se cae en
      lo de siempre. */
-  function textoDeLaFirma() {
+  function textoDeLaFirma(valoresActuales) {
     if (valoresActuales && valoresActuales.firma) return valoresActuales.firma;
     return Plantillas.rellenar(Plantillas.POR_DEFECTO_FIRMA, {
       usuario: App.E.usuario || '', centro: Plantillas.POR_DEFECTO_CENTRO
@@ -143,8 +146,11 @@
 
   /* El cuerpo entero: saludo, el medio (en blanco, o la plantilla
      elegida con sus huecos ya rellenos) y la firma. Devuelve también
-     los huecos que se han quedado sin dato, para el aviso de arriba. */
-  function cuerpoDelMedio(a, idPlantilla) {
+     los huecos que se han quedado sin dato, para el aviso de arriba.
+     Pura (fila 53, 18-sep-2026): `plantillasDatos`/`valoresActuales`
+     entran como parámetros, no como variables del cuadro, para que
+     `js/seneca-cuadro.js` la use igual con los suyos propios. */
+  function cuerpoDelMedio(a, idPlantilla, plantillasDatos, valoresActuales) {
     var categoria = categoriaDe(a);
     var nombre = soloElNombre(terceroDe(a));
     var saludo;
@@ -166,7 +172,7 @@
       faltan = r.faltan;
     }
 
-    var firma = textoDeLaFirma();
+    var firma = textoDeLaFirma(valoresActuales);
     var texto = medio ? (saludo + '\n\n' + medio + '\n\n' + firma) : (saludo + '\n\n\n\n' + firma);
     return { texto: texto, faltan: faltan };
   }
@@ -378,9 +384,6 @@
   function textoDeLaNota() {
     var asunto = $('correo-asunto') ? $('correo-asunto').value : '';
     var cola = asunto ? ' — asunto: "' + asunto + '"' : '';
-    if (porSeneca) {
-      return 'Mensaje por Séneca a ' + (aQuien(viendo) || 'el tercero') + cola;
-    }
     var para = paraDelCuadro();
     var base = 'Correo ' + (para ? 'a ' + para : 'preparado') + cola;
     var direccionesCco = Object.keys(cco);
@@ -412,10 +415,9 @@
   }
 
   /* La línea gris de "Lo pidió...", encima de la lista de "Para"
-     (docs/LO-PIDE.md, 6). Cadena vacía en Séneca (no hay lista de
-     "Para" ahí) o si el asunto no tiene el dato. */
+     (docs/LO-PIDE.md, 6). Cadena vacía si el asunto no tiene el dato. */
   function avisoLoPideHtml(a) {
-    if (porSeneca || !window.LoPide) return '';
+    if (!window.LoPide) return '';
     var d = a.ficha && a.ficha.loPide;
     if (!d || !d.nombre) return '';
     var texto = 'Lo pidió ' + d.nombre + (d.relacion ? ' (' + d.relacion + ')' : '') +
@@ -503,20 +505,17 @@
 
   /* ---------- el cuadro ---------- */
 
-  async function abrirCuadro(a, deSeneca) {
+  async function abrirCuadro(a) {
     viendo = a;
     elegidos = {};
     cco = {};
     ccoSinCorreo = [];
-    porSeneca = !!deSeneca;
-    pasoSeneca = 0;
-    if (window.SenecaDestinatarios) SenecaDestinatarios.limpiar();
-    asuntoLargo = !porSeneca;   /* en Séneca manda la versión legible: el nombre de la carpeta no cabe */
+    asuntoLargo = true;
     yaApuntado = false;
     algoCambiado = false;
     documentosAdjuntados = [];
     plantillaElegida = '';
-    var esperar = U.preguntar(porSeneca ? 'Mensaje por Séneca' : 'Correo de este asunto',
+    var esperar = U.preguntar('Correo de este asunto',
       '<div id="correo-caja"><p class="explica">Preparando…</p></div>', 'Cerrar', true);
     var persona = null;
     try { persona = await buscarPersona(a); } catch (e) { persona = null; }
@@ -539,7 +538,7 @@
        a los dos tutores), salvo que el asunto diga quién lo pide y se
        le conozca el correo: entonces manda ese, solo (docs/LO-PIDE.md,
        6). La decisión, pura, vive en LoPide.elegirDestinatarios. */
-    var correoLoPide = (!porSeneca && window.LoPide) ? LoPide.correoDe(a.ficha) : '';
+    var correoLoPide = window.LoPide ? LoPide.correoDe(a.ficha) : '';
     var otroInicial = '';
     if (window.LoPide) {
       var resultado = LoPide.elegirDestinatarios(correos, correoLoPide, elegidos);
@@ -549,28 +548,15 @@
       correos.forEach(function (c) { if (elegidos[c.dir] === undefined) elegidos[c.dir] = true; });
     }
 
-    /* Los documentos del asunto no van en el cuadro de Séneca: allí no
-       hay adjuntos. El desplegable "Añadir un grupo" sí va en los dos
-       cuadros (fila 47, docs/DESTINATARIOS-EN-SENECA.md): en Correo
-       saca correos, en Séneca usuarios IdEA. */
     var bloqueAdjuntos = '';
     var opcionesGrupo = '';
-    if (!porSeneca && window.CorreoAdjuntos) {
+    if (window.CorreoAdjuntos) {
       try { bloqueAdjuntos = await CorreoAdjuntos.pintarBloque(a); } catch (e) { bloqueAdjuntos = ''; }
     }
     try { opcionesGrupo = await opcionesDeGrupo(); } catch (e) { opcionesGrupo = ''; }
 
-    caja.innerHTML = porSeneca
-      ? cuerpoDeSeneca(a, opcionesGrupo)
-      : cuerpoDeCorreo(a, correos, bloqueAdjuntos, opcionesGrupo, otroInicial);
+    caja.innerHTML = cuerpoDeCorreo(a, correos, bloqueAdjuntos, opcionesGrupo, otroInicial);
 
-    if (porSeneca) {
-      engancharComunes(a);
-      engancharSeneca(a);
-      if (window.SenecaDestinatarios) SenecaDestinatarios.enganchar();
-      if (window.SenecaAyudante) SenecaAyudante.insertarEnlace($('seneca-ayudante'));
-      return;
-    }
     engancharComunes(a);
     engancharCorreo(a);
     if (bloqueAdjuntos && window.CorreoAdjuntos) {
@@ -626,50 +612,26 @@
       '<p class="nota">Se abre la ventana de redactar con todo puesto. Enviar, lo envías tú.</p>';
   }
 
-  /* ---------- el cuadro de Séneca ----------
-
-     Aquí no hay "Para": en Séneca los destinatarios se marcan en su
-     propia lista. Lo que se recuerda es a quién hay que marcar. Y como
-     el asunto y el texto son dos casillas distintas, y el portapapeles
-     solo guarda una cosa a la vez, hay un solo botón que los va dando
-     en el orden en que se pegan. */
-
-  function cuerpoDeSeneca(a, opcionesGrupo) {
-    var quien = aQuien(a);
-    return '<div class="aviso aviso-ambar" style="margin:0 0 4px">' +
-             '<strong>En Séneca: Utilidades → Comunicaciones.</strong>' +
-             '<p>Los destinatarios se marcan allí, en su lista' +
-             (quien ? ': <strong>' + U.escapar(quien) + '</strong>' : '') + '.</p>' +
-           '</div>' +
-           (window.SenecaDestinatarios ? SenecaDestinatarios.bloqueHtml(opcionesGrupo) : '') +
-           camposComunes(a) +
-           '<div class="correo-botones" style="margin-top:14px">' +
-             '<button type="button" class="boton boton-principal" id="seneca-paso" ' +
-               'style="flex:1">1. Copiar el asunto</button>' +
-           '</div>' +
-           '<p class="nota" id="seneca-explica">Pulsa, pega en Séneca, y vuelve a pulsar para el texto.</p>' +
-           '<div id="seneca-ayudante" style="margin-top:14px"></div>';
-  }
-
   /* Las plantillas del tipo de este asunto. Con una sola, es la que
-     sale puesta; con ninguna, el desplegable no se pinta. */
-  function plantillasDelTipo(a) {
+     sale puesta; con ninguna, el desplegable no se pinta. Pura (fila
+     53): `plantillasDatos` entra como parámetro. */
+  function plantillasDelTipo(a, plantillasDatos) {
     if (!plantillasDatos) return [];
     var categoria = categoriaDe(a);
     var tipo = (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
     return Plantillas.deTipo(plantillasDatos, categoria, tipo);
   }
 
-  /* Los dos campos que comparten los dos cuadros, con el desplegable
-     de plantilla encima del cuerpo. Va en su propio contenedor para
-     poder repintarse solo, sin tocar el resto del cuadro (el "Para",
-     los documentos…), cuando se cambia de plantilla. */
+  /* El desplegable de plantilla, el asunto y el cuerpo. Va en su
+     propio contenedor para poder repintarse solo, sin tocar el resto
+     del cuadro (el "Para", los documentos…), cuando se cambia de
+     plantilla. */
   function camposComunes(a) {
     return '<div id="correo-comunes">' + interiorDeComunes(a) + '</div>';
   }
 
   function interiorDeComunes(a) {
-    var opciones = plantillasDelTipo(a);
+    var opciones = plantillasDelTipo(a, plantillasDatos);
     /* Con una plantilla, sale puesta; con varias, sale la primera y el
        desplegable deja cambiar. */
     if (!plantillaElegida && opciones.length) plantillaElegida = opciones[0].id;
@@ -677,7 +639,7 @@
       plantillaElegida = '';
     }
 
-    var cuerpo = cuerpoDelMedio(a, plantillaElegida);
+    var cuerpo = cuerpoDelMedio(a, plantillaElegida, plantillasDatos, valoresActuales);
     textoProgramado = cuerpo.texto;
 
     var desplegable = opciones.length
@@ -693,7 +655,7 @@
       : '';
 
     return '<label class="etiqueta">Asunto</label>' +
-      '<input id="correo-asunto" class="campo" value="' + U.escapar(asuntoDelCorreo(a)) + '">' +
+      '<input id="correo-asunto" class="campo" value="' + U.escapar(asuntoDelCorreo(a, asuntoLargo)) + '">' +
       '<div class="correo-botones" style="margin-top:6px">' +
         '<button type="button" class="boton" id="correo-nombre-carpeta">Nombre de la carpeta</button>' +
         '<button type="button" class="boton" id="correo-legible">Versión legible</button>' +
@@ -701,7 +663,7 @@
 
       desplegable +
 
-      '<label class="etiqueta">' + (porSeneca ? 'Texto del mensaje' : 'Cuerpo') + '</label>' +
+      '<label class="etiqueta">Cuerpo</label>' +
       (cuerpo.faltan.length
         ? '<p class="aviso aviso-ambar" id="correo-faltan-datos">Faltan datos: ' +
           U.escapar(cuerpo.faltan.join(', ')) + '</p>'
@@ -722,10 +684,10 @@
       $('correo-legible').classList.toggle('boton-marcado', !asuntoLargo);
     }
     $('correo-nombre-carpeta').onclick = function () {
-      asuntoLargo = true; $('correo-asunto').value = asuntoDelCorreo(a); marcarBotonDelAsunto();
+      asuntoLargo = true; $('correo-asunto').value = asuntoDelCorreo(a, asuntoLargo); marcarBotonDelAsunto();
     };
     $('correo-legible').onclick = function () {
-      asuntoLargo = false; $('correo-asunto').value = asuntoDelCorreo(a); marcarBotonDelAsunto();
+      asuntoLargo = false; $('correo-asunto').value = asuntoDelCorreo(a, asuntoLargo); marcarBotonDelAsunto();
     };
     marcarBotonDelAsunto();
 
@@ -805,46 +767,22 @@
     $('correo-ordenador').onclick = function () { abrirDelOrdenador(); apuntarElRastro(a); };
   }
 
-  /* El botón que se va cambiando solo. Un gesto por casilla, que es el
-     mínimo que deja el portapapeles. */
-  function engancharSeneca(a) {
-    var b = $('seneca-paso');
-    var explica = $('seneca-explica');
-    b.onclick = function () {
-      if (pasoSeneca === 0) {
-        copiarTexto($('correo-asunto').value);
-        pasoSeneca = 1;
-        b.textContent = '2. Ahora, copiar el texto';
-        explica.textContent = 'Asunto copiado. Pégalo en Séneca y vuelve a pulsar.';
-      } else if (pasoSeneca === 1) {
-        var texto = $('correo-cuerpo-texto').value;
-        var recortado = texto.length > MAXIMO_LETRAS_SENECA;
-        if (recortado) texto = texto.slice(0, MAXIMO_LETRAS_SENECA);
-        copiarTexto(texto);
-        pasoSeneca = 2;
-        b.textContent = 'Copiado. Pégalo y envía';
-        b.classList.remove('boton-principal');
-        explica.textContent = 'Texto copiado' + (recortado ? ', recortado a 4.000 letras' : '') +
-          '. Pégalo en Séneca y envía el mensaje.';
-        apuntarElRastro(a);
-      } else {
-        pasoSeneca = 0;
-        b.textContent = '1. Copiar el asunto';
-        b.classList.add('boton-principal');
-        explica.textContent = 'Pulsa, pega en Séneca, y vuelve a pulsar para el texto.';
-      }
-    };
-  }
-
-  /* Copiar sin tocar el botón: el de Séneca cambia de texto por su cuenta. */
-  function copiarTexto(texto) {
-    if (!texto) { U.aviso('Ahí no hay nada que copiar.', 'malo'); return; }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(texto).catch(function () {
-        U.aviso('No he podido copiarlo.', 'malo');
-      });
-    }
-  }
+  /* Lo que necesita igual `js/seneca-cuadro.js` (fila 53, 18-sep-2026,
+     docs/SENECA-CUADRO-ANCHO.md), puro: no depende de las variables de
+     este cuadro ni toca el DOM. Mismo patrón que `window.CorreoGrupos`,
+     ya expuesto más arriba. */
+  window.CorreoComun = {
+    categoriaDe: categoriaDe,
+    terceroDe: terceroDe,
+    soloElNombre: soloElNombre,
+    piezasDelNombre: piezasDelNombre,
+    asuntoDelCorreo: asuntoDelCorreo,
+    textoDeLaFirma: textoDeLaFirma,
+    cuerpoDelMedio: cuerpoDelMedio,
+    plantillasDelTipo: plantillasDelTipo,
+    aQuien: aQuien,
+    estadoDeEspera: estadoDeEspera
+  };
 
   /* ---------- los botones dentro de la ficha del asunto ---------- */
 
@@ -883,8 +821,10 @@
       if (principal) caja.insertBefore(b, principal); else caja.appendChild(b);
 
       FichaMenus.montar(b, [
-        { texto: 'Correo electrónico', alPulsar: function () { abrirCuadro(actual, false); } },
-        { texto: 'Mensaje de Séneca', alPulsar: function () { abrirCuadro(actual, true); } }
+        { texto: 'Correo electrónico', alPulsar: function () { abrirCuadro(actual); } },
+        { texto: 'Mensaje de Séneca', alPulsar: function () {
+            if (window.SenecaCuadro) SenecaCuadro.abrir(actual, modoDelAsunto);
+          } }
       ]);
     }
 

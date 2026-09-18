@@ -2838,3 +2838,46 @@ una línea cada una. El texto largo que tenían antes era:
     "Comunicar", por "Documentos ▾", por el valor del propio `<select>` o por
     `.ficha-nombre-texto` en vez del `<h2>` completo (que ahora también lleva el icono y el
     menú).
+- **53 · `docs/SENECA-CUADRO-ANCHO.md`**: Terminada 18-sep-2026 · 06:15. El cuadro de "Mensaje de
+  Séneca" iba en una sola columna estrecha con hueco libre a los lados, el asunto se cortaba en un
+  `input` de una línea, un tipo sin plantilla de Séneca dejaba un hueco mudo entre el saludo y la
+  firma, cuatro párrafos del ayudante ocupaban más que la propia herramienta, y seis botones
+  sueltos sin jerarquía no decían cuál era el primer paso. Cambio de disposición, ningún
+  funcionamiento distinto.
+  - `js/seneca-cuadro.js` (nuevo, `window.SenecaCuadro.abrir(a, modo)`): el cuadro de Séneca sale
+    de `js/correo.js`, que se queda solo con el de Correo (`abrirCuadro(a)` pierde el parámetro
+    `deSeneca`). Ancho hasta 1100px (`.cuadro-seneca`, `css/seneca.css`, mismo patrón que
+    `.cuadro-medio` de `css/guias.css`) y a dos columnas desde 900px: izquierda el aviso (ahora
+    una sola línea con fondo suave y borde izquierdo, no el bloque de color de antes), "Añadir un
+    grupo", los destinatarios y el Asunto; derecha el Texto del mensaje, ocupando toda la columna.
+  - El Asunto pasa de `<input>` a `<textarea>` que crece con su contenido (recalculando
+    `scrollHeight` al pintarlo y al escribir), sin barra de desplazamiento, con "N caracteres" en
+    gris debajo y "Nombre de la carpeta"/"Versión legible" como botones pequeños (`.boton-chico`,
+    nueva, reutilizable) en la misma línea.
+  - Sin plantilla de mensaje de Séneca para el tipo, un aviso con un enlace que cierra el cuadro y
+    lleva a `App.abrirTipoDeAsunto(tipo)`, en vez del hueco vacío de antes.
+  - Los pasos pasan de un botón que cambia de texto a dos botones separados, uno al lado del
+    otro, que copian **cada uno lo suyo, siempre**, se pulsen en el orden que se pulsen; el que
+    toca se destaca con `.boton-principal` (el 1 al abrir, el 2 en cuanto se copia el asunto);
+    "Copiado" 1,4 s en el propio botón, mismo aviso que `js/copiar.js`. El aviso de "recortado a
+    4.000 letras" pasa de una frase fija a `U.aviso(...)`, porque la frase de debajo desaparece
+    con dos botones numerados.
+  - `js/seneca-ayudante.js` gana `pintarPlegado(contenedor)`: el enlace de instalar a la vista y
+    los cuatro párrafos de siempre, sin cambiar el texto, dentro de un `<details>` cerrado
+    ("¿Cómo se instala el ayudante de Séneca? (se hace una sola vez)"). `insertarEnlace` (Ajustes)
+    no se toca.
+  - **Lo compartido entre los dos cuadros se expone puro**: `categoriaDe`, `terceroDe`,
+    `soloElNombre`, `piezasDelNombre`, `asuntoDelCorreo` (gana un parámetro `largo` explícito, ya
+    no lee una variable del cuadro), `textoDeLaFirma`, `cuerpoDelMedio` y `plantillasDelTipo`
+    (los tres ganan `plantillasDatos`/`valoresActuales` como parámetros), `aQuien` y
+    `estadoDeEspera` — como `window.CorreoComun`, mismo patrón que ya usaba `window.CorreoGrupos`
+    para el desplegable "Añadir un grupo" (que los dos cuadros siguen compartiendo). El rastro que
+    queda en el asunto (`apuntarElRastro`/`pintarRastro`) se copia en el fichero nuevo, adaptado a
+    sus propios ids: no vale la pena parametrizarlo por lo poco que cambia entre los dos.
+  - Prueba nueva `pruebas/seneca-cuadro.mjs`, en navegador de verdad, con los 6 escenarios del
+    encargo. **Ocho pruebas ya existentes corregidas**: `pruebas/plantillas.mjs` (escenario 7,
+    ids nuevos y los dos botones numerados) y `pruebas/seneca-destinatarios-navegador.mjs` (ya
+    quedó lista al fusionar la fila 52) siguen en verde. **Trampa encontrada al escribir la
+    prueba nueva**: en Séneca la versión legible del asunto sigue siendo la que sale de partida
+    (`asuntoLargo` arranca en `false`, igual que antes de esta fila) — la primera versión de la
+    prueba daba por hecho que salía el nombre entero de la carpeta, y fallaba.

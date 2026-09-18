@@ -5,8 +5,8 @@
 
    Vive aparte de js/correo.js, como js/lo-pide.js o
    js/correo-adjuntos.js, para no engordarlo más. Solo se usa dentro
-   del cuadro de Séneca (`js/correo.js` lo llama si existe); el
-   cuadro de Correo no lo toca.
+   del cuadro de Séneca (`js/seneca-cuadro.js`, fila 53, 18-sep-2026,
+   lo llama si existe); el cuadro de Correo no lo toca.
 
    Reutiliza, expuestas por js/correo.js como `window.CorreoGrupos`,
    las mismas piezas del desplegable "Añadir un grupo" (grupos
@@ -18,7 +18,7 @@
    el siguiente"— se guarda aquí, y se lee del propio DOM cuando hace
    falta escribirlo (mismo estilo que `cco` en js/correo.js). Se
    reinicia cada vez que se abre el cuadro (`limpiar()`, llamado desde
-   `abrirCuadro` en js/correo.js).
+   `abrir` en js/seneca-cuadro.js).
    ============================================================ */
 var SenecaDestinatarios = (function () {
 
