@@ -132,8 +132,22 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 55 | `docs/ASUNTO-SIN-ELECCION.md` | HECHA (18-sep-2026 · 07:22) |
 | 56 | `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md` | HECHA (18-sep-2026 · 07:22) |
 | 57 | `docs/HUECO-PARA-SELLO-Y-FIRMA.md` | HECHA (18-sep-2026 · 09:46) |
+| 58 | `docs/AJUSTES-DE-USO-2026-09-18.md` | PENDIENTE |
 
-**Orden de trabajo:** no queda ninguna fila PENDIENTE. Las filas 1 a 57 están HECHAS.
+**Orden de trabajo:** la única fila PENDIENTE es la 58. Las filas 1 a 57 están HECHAS.
+
+**Fila 58, en una línea** (18-sep-2026, acordada con Francisco tras usar la aplicación con trabajo
+real): seis arreglos de uso diario, independientes entre sí. (1) Cuatro botones de copiar siempre
+visibles bajo el nombre del asunto —Asunto, Nombre (`Apellido1 Apellido2, Nombre`), NIE y DNI o
+CIF—, fuera del menú de tres puntos. (2) "Preparar el documento" pasa a llamarse **Ajustar
+tamaño**. (3) Las notas dejan de guardarse solas mientras se escribe: solo al pulsar Guardar o al
+salir del recuadro, con aviso si se sale con texto sin guardar. (4) Al registrar, el original sin
+sellar ya no va a la papelera: se queda en la carpeta con `SIN SELLAR` al final del nombre. (5) El
+cuadro de Correo se rehace como el de Séneca (ancho hasta 1100 px, dos columnas, cabecera y
+botones fijos) para que se vea la lista de documentos del asunto que ya existe y hoy queda fuera de
+pantalla. (6) Asociar un documento a un hito también desde la lista de documentos, y cada hito
+enseña debajo los suyos. Detalle en `docs/AJUSTES-DE-USO-2026-09-18.md`. Sube directamente a
+`main`, sin petición de cambios.
 
 **Fila 52, en una línea** (18-sep-2026, acordada con Francisco mirando la cabecera de un asunto de
 CERT. MATRICULA): los doce botones de la cabecera se agrupan por el momento del trámite en que se
@@ -180,19 +194,6 @@ encargo: `pruebas/ejecutar.mjs` solo recoge ficheros `*.mjs`, así que con ese n
 ejecutado nunca con `npm test`. Comprobado también con `pruebas/campos-catalogo.mjs`, y con
 `pruebas/campos.mjs` y `pruebas/ajustes-por-tipo.mjs` (actualizadas al panel nuevo).
 
-**Fila 57, en una línea** (18-sep-2026, acordada con Francisco): el sello que Séneca pinta al
-registrar a mano (banda estrecha arriba, a la derecha si es entrada y a la izquierda si es salida,
-en todas las páginas) a veces pisa texto del documento, y lo mismo pasa abajo con la banda de firma
-del director. Botón nuevo **Preparar el documento**, junto a Separar, Unir y Sacar páginas, que
-encoge el contenido de todas las páginas de un PDF y lo recoloca para dejar libres la banda de
-arriba y la de abajo. Solo encoge, nunca agranda; si las bandas ya están libres no toca nada y lo
-dice; no cambia el tamaño de la hoja; y si el PDF ya está firmado avisa de que hacerle hueco
-invalidaría la firma. Las dos medidas se configuran en Ajustes → El centro (1,5 cm arriba y 2,5 cm
-abajo por defecto) y cada tipo de asunto dice si lleva sello y si lleva firma. Ficheros nuevos:
-`js/pdf-margenes.js`, `js/preparar-documento.js` y `pruebas/margenes-pdf.mjs`. Detalle en
-`docs/HUECO-PARA-SELLO-Y-FIRMA.md`. **Va después de la fila 56.** Sube directamente a `main`, sin
-petición de cambios.
-
 **Fila 57, en una línea** (18-sep-2026, HECHA): botón nuevo **Preparar el documento**, junto a
 Separar, Unir y Sacar páginas (en la ficha de un asunto y en Por clasificar), que encoge todas las
 páginas de un PDF para dejar libre la banda del sello de registro de Séneca (arriba) y la de la
@@ -205,7 +206,7 @@ su propia pantalla. Ficheros nuevos: `js/pdf-margenes.js` (la cuenta y el PDF nu
 sin DOM, como `js/pdf-herramientas.js`), `js/preparar-documento.js` (el cuadro) y
 `pruebas/margenes-pdf.mjs`. Detalle en `docs/HUECO-PARA-SELLO-Y-FIRMA.md`; diario en
 `docs/HISTORIA.md`. Sesión en la nube: subido con pull request, no directo a `main` (ver la nota
-de más abajo).
+de más abajo). **Su botón se llama "Ajustar tamaño" desde la fila 58.**
 
 ## Nota de esta sesión (18-sep-2026, mañana): docs/CONTEXTO.md y docs/HISTORIA.md sin actualizar
 
