@@ -115,6 +115,10 @@ const nombreAsuntoA = await pagina.evaluate(async () => {
 
 await pagina.click('#lista-abiertos .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+/* "Personas y entidades relacionadas" vive plegada (fila 51,
+   18-sep-2026, docs/FICHA-DISPOSICION.md): hay que desplegarla antes
+   de poder pulsar nada de dentro. */
+await pagina.click('#ficha-plegable-relacionados > summary');
 await pagina.waitForSelector('#ficha-relacionados #rel-anadir');
 
 async function anadirRelacionadoBuscando(categoria, textoBuscar) {

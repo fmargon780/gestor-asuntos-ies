@@ -148,6 +148,10 @@ var FichaDocumentos = (function () {
     try {
       var lista = await Carpetas.ficheros(a.handle);
       if (cuenta) cuenta.textContent = lista.length || '';
+      /* Un bloque vacío ocupa una sola línea, no una tarjeta entera
+         (18-sep-2026, fila 51, docs/FICHA-DISPOSICION.md, 8). */
+      var bloqueEl = caja.closest('.ficha-bloque');
+      if (bloqueEl) bloqueEl.classList.toggle('vacio', !lista.length);
       if (!lista.length) {
         caja.className = 'explica';
         caja.textContent = 'La carpeta todavía está vacía.';

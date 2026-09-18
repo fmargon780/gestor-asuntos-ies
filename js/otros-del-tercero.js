@@ -63,6 +63,15 @@ var OtrosDelTercero = (function () {
      'abierto' o 'archivado'; `datos` trae la categoria, el tercero
      (`nombreDelTercero(a)`, que se queda en js/ficha-asunto.js porque
      también la usa "Lo pide") y el tipo, ya calculados allí. */
+  /* "1 asunto" / "3 asuntos" / "ninguno todavía" (18-sep-2026, fila
+     51): el resumen del plegable, escrito en cuanto se sabe la cuenta
+     aunque el bloque siga cerrado. */
+  function resumenDeOtros(caja, n) {
+    if (!window.FichaPlegables) return;
+    var texto = n ? n + (n === 1 ? ' asunto' : ' asuntos') : 'ninguno todavía';
+    FichaPlegables.ponResumen(caja, texto, !n);
+  }
+
   async function pintarEnFicha(caja, a, modoActual, datos) {
     if (!caja) return;
     var categoria = datos.categoria;
@@ -72,6 +81,7 @@ var OtrosDelTercero = (function () {
     if (!window.Duplicados || !categoria || !quien) {
       caja.className = 'explica';
       caja.textContent = 'No se sabe de qué tercero es este asunto, así que no se puede buscar.';
+      resumenDeOtros(caja, 0);
       return;
     }
 
@@ -86,11 +96,13 @@ var OtrosDelTercero = (function () {
       if (!abiertos.length && !archivados.length) {
         caja.className = 'explica';
         caja.textContent = 'Es el único asunto de ' + quien + '.';
+        resumenDeOtros(caja, 0);
         return;
       }
       caja.className = 'otros-lista';
       caja.innerHTML = listaDeOtros('Abiertos', abiertos, tipo, false) +
                        listaDeOtros('En el archivo', archivados, tipo, true);
+      resumenDeOtros(caja, abiertos.length + archivados.length);
 
       Array.prototype.forEach.call(caja.querySelectorAll('.otros-asunto'), function (b) {
         b.onclick = function () {
@@ -100,6 +112,7 @@ var OtrosDelTercero = (function () {
     } catch (e) {
       caja.className = 'explica';
       caja.textContent = 'No he podido mirar el archivo: ' + e.message;
+      resumenDeOtros(caja, 0);
     }
   }
 

@@ -425,6 +425,14 @@ var Relacionados = (function () {
   function pintarEnFicha(caja, a, abierto, alCambiar) {
     var lista = (a.ficha && a.ficha.relacionados) || [];
 
+    /* "2 personas" / "nadie todavía" (18-sep-2026, fila 51): el
+       resumen del plegable, se sepa desde el primer momento (la
+       cuenta ya está en `a.ficha`, sin esperar a nada). */
+    if (window.FichaPlegables) {
+      var n = lista.length;
+      FichaPlegables.ponResumen(caja, n ? n + (n === 1 ? ' persona' : ' personas') : 'nadie todavía', !n);
+    }
+
     var filas = lista.map(function (r, i) {
       return '<div class="relacionado-fila">' +
                '<span class="marca-tipo">' + U.escapar(r.categoria) + '</span>' +

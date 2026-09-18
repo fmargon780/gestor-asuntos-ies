@@ -2737,3 +2737,39 @@ una línea cada una. El texto largo que tenían antes era:
     `window.CabeceraFija.evaluar()`, bloquea el cambio contrario y lo deja pasar pasados los 400
     ms) y ajusta los umbrales de las pruebas ya existentes (80/40 → 120/24, con las mismas
     comprobaciones).
+  - **Aviso posterior**: esa misma prueba del candado salió flaky en CI (GitHub Actions), aunque
+    en local pasaba siempre: los dos `pagina.evaluate()` seguidos que hacían el cambio y el
+    contrario dejaban demasiado tiempo real entre uno y otro en una máquina más cargada,
+    acercándose a los 400 ms del propio candado y dejando pasar el cambio que debía bloquearse.
+    Arreglado metiendo los dos cambios dentro de un mismo `evaluate()`, sin ningún `await` de por
+    medio (microsegundos de verdad, no el viaje de ida y vuelta al navegador).
+- **51 · `docs/FICHA-DISPOSICION.md`**: Terminada 18-sep-2026 · 04:30. Cambio de disposición de la
+  ficha de un asunto, ningún funcionamiento distinto: "Datos del asunto" repetía la cabecera y
+  "Datos y contacto", las Notas quedaban fuera de la pantalla, y sobraba medio panel en el monitor
+  ancho. Regla nueva: arriba a la izquierda lo que hay que hacer (Hitos), arriba a la derecha lo
+  que hay que saber (Datos y contacto primero), lo que casi nunca se mira, plegado con su número.
+  - Cabecera con una línea gris nueva (`.ficha-subtitulo`) con lo suelto que no se repite en
+    ningún otro sitio; se esconde con la cabecera encogida.
+  - Rejilla de tres tramos (`css/ficha-asunto.css`, `@media (min-width: …)`, al revés que el resto
+    del fichero): Hitos, Documentos (columna nueva, `.ficha-centro`) y Datos y contacto/Notas/lo
+    plegado/Datos del trámite. Una columna por debajo de 1000px, dos de 1000 a 1499 (el centro
+    debajo de la izquierda), tres desde 1500px. Con el visor o el lector abiertos, una columna con
+    `grid-column/row: auto` en los tres tramos (si no, un tramo pedía una columna o una fila que ya
+    no existía, y el sitio salía mal).
+  - "Datos del asunto" pasa a llamarse "Datos del trámite" y se recorta a lo que no se ve en
+    ningún otro lado (campos propios, Vía, Lo pide, En el archivo); sin ninguna fila, el bloque no
+    se pinta en absoluto (antes decía "Nada que enseñar aquí.").
+  - `js/ficha-plegables.js` (nuevo, pequeño a propósito): "Otros asuntos de este tercero" y
+    "Personas y entidades relacionadas" pasan a `<details class="ficha-bloque ficha-plegable">`
+    (el molde ya estaba en el CSS desde antes, sin que nadie lo usara), cerrados de partida, con
+    su cuenta en el resumen ("1 asunto"/"ninguno todavía", "2 personas"/"nadie todavía") aunque
+    sigan cerrados, y sobreviven a que `pintarLaFicha()` rehaga el `innerHTML` entero (mismo
+    patrón que `volverADesplegar` de `js/hitos-panel.js`).
+  - Un bloque vacío (hoy solo Documentos, sin ningún fichero) ocupa una línea, no una tarjeta
+    (`.ficha-bloque.vacio`).
+  - Prueba nueva `pruebas/ficha-disposicion.mjs`, en navegador de verdad, con los 8 escenarios del
+    encargo. **Trampa encontrada al escribirla**: los estados de prueba tienen que ser de la lista
+    por defecto de verdad (`ESTADOS_POR_DEFECTO` en `js/nombres.js`) — un nombre inventado para la
+    situación inicial ("EN EL DEPARTAMENTO" no es uno de ellos) solo se enseña como opción del
+    desplegable mientras sea el valor actual; en cuanto se cambia a otro estado, desaparece de la
+    lista y ya no se puede volver a él desde el propio desplegable.
