@@ -134,7 +134,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 57 | `docs/HUECO-PARA-SELLO-Y-FIRMA.md` | HECHA (18-sep-2026 · 09:46) |
 | 58 | `docs/AJUSTES-DE-USO-2026-09-18.md` | HECHA (18-sep-2026 · 19:26) |
 | 59 | `docs/REQUISITOS-DE-HITO.md` | HECHA (18-sep-2026 · 20:04) |
-| 60 | `docs/COMUNICAR-DESDE-EL-HITO.md` | PENDIENTE |
+| 60 | `docs/COMUNICAR-DESDE-EL-HITO.md` | EN CURSO (18-sep-2026 · 20:10) |
 
 **Orden de trabajo:** las filas PENDIENTES son la 58, la 59 y la 60, en ese orden. La 60 va después
 de la 59: las dos tocan el editor de un paso del trámite y el panel de hitos. Las filas 1 a 57 están
