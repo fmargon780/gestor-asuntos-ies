@@ -187,5 +187,5 @@ una línea a si vamos por buen camino.
 
 ---
 
-**Estado de este encargo: PENDIENTE.** Márcalo HECHA con la fecha dentro de este mismo fichero
-cuando el informe esté subido.
+**Estado de este encargo: HECHA (18-sep-2026).** El informe está en
+`docs/INFORME-CRITICO-2026-09-18.md`.
