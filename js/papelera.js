@@ -639,7 +639,7 @@ var Papelera = (function () {
     return b;
   }
 
-  U.envolver('App.tarjetaSuelto', window.App, 'tarjetaSuelto', 'js/papelera.js', function (comoEra) {
+  U.envolver(App, 'App.tarjetaSuelto', 'papelera.js', function (comoEra) {
     return function (s, pie, esNuevo) {
       var div = comoEra(s, pie, esNuevo);
       var acciones = div.querySelector('.acciones');
@@ -665,7 +665,7 @@ var Papelera = (function () {
     };
   });
 
-  U.envolver('App.verFicha', window.App, 'verFicha', 'js/papelera.js', function (comoEra) {
+  U.envolver(App, 'App.verFicha', 'papelera.js', function (comoEra) {
     return function (p) {
       comoEra(p);
       if (!App.sePuedeCambiarElTercero || !App.sePuedeCambiarElTercero(p)) return;
