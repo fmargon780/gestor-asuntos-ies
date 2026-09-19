@@ -10,7 +10,13 @@
    para esta prueba). El cuadro "¿Cuál se queda?" (`U.preguntar` +
    `document.querySelector('input[name="unir-cual"]:checked')`) se
    finge aceptado y con el primero marcado, que es como queda
-   `elegirQuienSeQueda` con el radio de índice 0. */
+   `elegirQuienSeQueda` con el radio de índice 0.
+
+   Fila 75 (docs/HUECOS-ENCONTRADOS-FILA-69.md, 1): un documento con
+   el mismo nombre en las dos carpetas ya no para la unión entera —
+   entra con " (2)", " (3)"..., igual que ya hace Carpetas.fusionarEn
+   al archivar sobre un destino que ya existe. La sección 3 de esta
+   prueba comprueba ese comportamiento nuevo. */
 import fs from 'node:fs';
 import vm from 'node:vm';
 
@@ -208,14 +214,13 @@ comprobar('los hitos de las dos se juntan en la que se queda',
 comprobar('la entrada de hitos de la que se va desaparece', !!hitosTrasUnir.porAsunto[NOMBRE_B], false);
 
 /* ================================================================
-   3. Un documento con el mismo nombre en las dos: la unión de hoy NO
-   lo renombra con " (2)" (a pesar de que así lo describe el encargo):
-   para todo entero antes de mover nada, sin tocar ni una carpeta, y
-   avisa de que hay que renombrar a mano. Se comprueba el
-   comportamiento de verdad, no el que describe el papel; la
-   diferencia queda apuntada como fila nueva en docs/COLA.md.
+   3. Un documento con el mismo nombre en las dos (fila 75): ya NO se
+   para la unión entera. El de la carpeta que se va entra con " (2)"
+   (o el primer número libre), y se avisa de cuántos se han renombrado
+   así. Nada se pierde: los dos documentos quedan en la carpeta que se
+   queda, cada uno con su nombre.
    ================================================================ */
-console.log('--- 3. nombres que chocan: no se mueve nada, se avisa ---');
+console.log('--- 3. nombres que chocan: se renombra con "(2)", no se para nada ---');
 
 const NOMBRE_C = '260902 MATRICULA 26-27 Otro Ejemplo, Sara 5555';
 const NOMBRE_D = '260902 MATRICULA 26-27 Otro Ejemplo, Sara 6666';
@@ -232,22 +237,26 @@ await escribirAsuntos({
 });
 await App.cargarRegistro();
 
-const avisosAntes = avisos.length;
 await UnirAsuntos.unirAsuntos([
   { nombre: NOMBRE_C, handle: carpetaC },
   { nombre: NOMBRE_D, handle: carpetaD }
 ]);
 
 const trasChoque = await leerAsuntos();
-comprobarVerdad('con nombres que chocan, las dos fichas siguen ahí',
-  trasChoque.asuntos[NOMBRE_C] && trasChoque.asuntos[NOMBRE_D]);
-const ficherosC = (await Carpetas.ficheros(carpetaC)).map(function (f) { return f.nombre; });
-comprobar('nada se ha movido a la carpeta que se iba a quedar', ficherosC, ['mismo-nombre.pdf']);
+comprobar('con nombres que chocan, la unión sigue adelante: solo queda la que se queda',
+  [!!trasChoque.asuntos[NOMBRE_C], !!trasChoque.asuntos[NOMBRE_D]], [true, false]);
+const ficherosC = (await Carpetas.ficheros(carpetaC)).map(function (f) { return f.nombre; }).sort();
+comprobar('los dos documentos quedan en la carpeta que se queda, el segundo con "(2)"',
+  ficherosC, ['mismo-nombre (2).pdf', 'mismo-nombre.pdf'].sort());
+const textoOriginal = (await (await carpetaC.getFileHandle('mismo-nombre.pdf')).getFile())._texto;
+const textoRenombrado = (await (await carpetaC.getFileHandle('mismo-nombre (2).pdf')).getFile())._texto;
+comprobar('el que ya estaba (de C) se queda con su nombre de siempre', textoOriginal, 'de C');
+comprobar('el que venía chocando (de D) es el que se lleva el sufijo', textoRenombrado, 'de D');
 let carpetaDSigueAhi = true;
 try { await abiertos.getDirectoryHandle(NOMBRE_D); } catch (e) { carpetaDSigueAhi = false; }
-comprobarVerdad('la otra carpeta tampoco se ha borrado', carpetaDSigueAhi);
-comprobar('no ha aparecido ningún aviso nuevo (el choque lo dice U.preguntar, no U.aviso)',
-  avisos.length, avisosAntes);
+comprobar('la otra carpeta sí desaparece: la unión ha terminado', carpetaDSigueAhi, false);
+comprobarVerdad('se avisa de que un documento se ha tenido que renombrar',
+  avisos.some(function (a) { return a.clase === 'bueno' && /1 documento/.test(a.texto) && /"\(N\)"/.test(a.texto); }));
 
 /* ================================================================
    7. Si la copia de un documento falla a medias, no se borra nada

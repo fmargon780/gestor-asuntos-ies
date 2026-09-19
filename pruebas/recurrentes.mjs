@@ -8,12 +8,13 @@
    `_cargar`/`_pendientes`/`_crearLosQueTocan` expuestos en
    `window.Recurrentes` solo para esta prueba).
 
-   NOTA sobre el encargo: pide comprobar también "Ocultar por hoy",
-   pero `js/recurrentes.js` no tiene ese botón — solo "Crear" y "Ver
-   la lista en Ajustes" (`pintarPanel`, líneas 199-240). Es un hueco
-   entre lo que pide el papel y lo que hay, no algo que se pueda
-   arreglar en una línea evidente: se deja fuera de esta prueba y
-   queda anotado en `docs/HUECOS-ENCONTRADOS-FILA-69.md`. */
+   Fila 75 (docs/HUECOS-ENCONTRADOS-FILA-69.md, 2): "Ocultar por hoy"
+   ya existe en el panel de recurrentes, con el mismo patrón que
+   js/avisos.js (una clave de localStorage con la fecha de hoy). Como
+   este contexto vm no trae localStorage de verdad, la sección 4 le
+   pone uno de mentira (un Map en memoria) solo para poder comprobar
+   `_cerradoHoy`/`_cerrarPorHoy`, expuestos aquí igual que los demás
+   `_` de esta prueba. */
 import fs from 'node:fs';
 import vm from 'node:vm';
 
@@ -26,6 +27,18 @@ function elementoFalso() {
     style: {}
   };
 }
+
+/* localStorage de mentira: lo bastante para getItem/setItem, que es
+   todo lo que usan avisos.js y recurrentes.js. */
+function almacenFalso() {
+  const datos = new Map();
+  return {
+    getItem(k) { return datos.has(k) ? datos.get(k) : null; },
+    setItem(k, v) { datos.set(k, String(v)); },
+    removeItem(k) { datos.delete(k); }
+  };
+}
+
 const contexto = {
   console, TextDecoder, Blob, indexedDB: null,
   document: {
@@ -39,6 +52,7 @@ const contexto = {
 };
 contexto.window = contexto;
 contexto.addEventListener = function () {};
+contexto.localStorage = almacenFalso();
 vm.createContext(contexto);
 for (const f of ['util.js', 'carpetas.js', 'copias.js', 'nucleo.js', 'nombres.js', 'plazos.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
@@ -177,6 +191,27 @@ comprobar('el que se acaba de crear ya no está entre los pendientes',
 const recurrentesTrasCrear = JSON.parse(await Carpetas.leerTexto(gestor, 'recurrentes.json'));
 const r1TrasCrear = recurrentesTrasCrear.filter(function (r) { return r.id === 'r1'; })[0];
 comprobar('el recurrente guarda la fecha de hoy como última vez', r1TrasCrear.ultima, hace(0));
+
+/* ================================================================
+   4. "Ocultar por hoy" (fila 75): oculta el panel el resto del día,
+   sin depender de si hay o no recurrentes pendientes, y no afecta a
+   los cálculos de qué toca crear.
+   ================================================================ */
+console.log('--- 4. ocultar por hoy ---');
+
+comprobar('antes de ocultar, no está marcado como cerrado hoy', Recurrentes._cerradoHoy(), false);
+Recurrentes._cerrarPorHoy();
+comprobar('tras pulsar "Ocultar por hoy", queda marcado como cerrado hoy', Recurrentes._cerradoHoy(), true);
+
+/* Se crea un tercer recurrente pendiente: sigue contando como
+   pendiente para "Crear los que tocan" aunque el panel esté oculto.
+   Ocultar por hoy solo esconde el aviso, nunca cambia qué toca. */
+const recurrentesConTercero = JSON.parse(await Carpetas.leerTexto(gestor, 'recurrentes.json'));
+recurrentesConTercero.push({ id: 'r3', tipo: 'FACTURA', categoria: 'EMPRESAS', tercero: 'Proveedor Tres, SL', periodo: 'mensual', dia: 1, ultima: hace(40), parado: false });
+await Carpetas.escribirTexto(gestor, 'recurrentes.json', JSON.stringify(recurrentesConTercero));
+await Recurrentes._cargar();
+comprobar('con el panel oculto, el recurrente que toca sigue contando como pendiente',
+  Recurrentes._pendientes().map(function (r) { return r.id; }), ['r3']);
 
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 process.exit(fallos ? 1 : 0);
