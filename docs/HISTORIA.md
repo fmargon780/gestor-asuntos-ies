@@ -5,6 +5,41 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 19-sep-2026 — Fila 74: cuentas de fin de curso
+
+`docs/CUENTAS-DE-FIN-DE-CURSO.md`, informe crítico 4.4. La memoria de fin de curso siempre pedía
+"cuántos certificados de matrícula hemos hecho este curso" y la única respuesta era contar
+carpetas a mano. Pantalla nueva, **"Cuentas"**, con su botón en la barra junto al de "Qué me toca".
+
+**De dónde salen los números, sin recorrer el ARCHIVO.** Los abiertos, de
+`window.Gestor.asuntos()`; los archivados, del índice guardado (`js/archivo-indice.js`, el mismo
+de la fila 44). Si el índice no está hecho, la pantalla lo dice y remite a ARCHIVO →
+"Reconstruir el índice", sin enseñar números a medias: exactamente lo que pedía el documento.
+
+**Las cuatro cuentas.** Una tabla categoría → tipo → cuántos/abiertos/archivados (un tipo que no
+encaja con ningún tipo de Ajustes se cuenta aparte, en "Sin clasificar", sin perderse), con botón
+"Copiar la tabla" (separado por tabuladores, para pegar en un documento o una hoja de cálculo);
+por mes; por quién lo pidió (familia, alumnado, centro o empresa, según `ficha.loPide`); y cuánto
+se tarda de media en tramitar un asunto archivado. Un desplegable arriba filtra por curso
+académico, calculado de la **fecha de apertura** del asunto (no del año académico opcional que
+algunos tipos llevan en el nombre: muchos, como los de EMPRESAS, no lo llevan nunca).
+
+**El índice del ARCHIVO crece de nuevo** (`VERSION` 2 → 3, fila 73 la había dejado en 2): cada
+entrada guarda ahora también si su tipo se reconoció, la categoría y relación de quien lo pidió,
+y las fechas de apertura y cierre. Un índice viejo se reconstruye solo, como siempre.
+`cursoYGrupoDeResto` (antes privada de `js/archivo-indice.js`) se saca a `js/nombres.js`: hacía
+falta también para los asuntos abiertos, que no pasan por el índice.
+
+**Un fallo encontrado y corregido en el camino**: el desplegable de curso volvía él solo al curso
+actual en cuanto se elegía "Todos", porque repintaba sus opciones (y su valor por defecto) en
+cada repintado de la pantalla, no solo la primera vez. Ahora el desplegable solo se rellena una
+vez, al entrar.
+
+Prueba nueva, `pruebas/cuentas.mjs`, sin navegador: la cuenta por tipo exacta, "Sin clasificar"
+sin perder ninguno, los cursos que de verdad hay, por mes, por quién lo pidió, cuánto se tarda, y
+que "Copiar la tabla" deje tantas líneas como filas. Comprobado también a mano en un navegador de
+verdad, con datos abiertos y archivados de varios cursos.
+
 ## 19-sep-2026 — Fila 73: buscar en las notas
 
 `docs/BUSCAR-EN-LAS-NOTAS.md`. Hasta ahora el buscador (Asuntos abiertos y ARCHIVO) solo miraba

@@ -447,3 +447,18 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
   white-space: nowrap;
 }
 #orden-abiertos { width: auto; }
+
+/* La pantalla "Cuentas" (fila 74, docs/CUENTAS-DE-FIN-DE-CURSO.md):
+   una tabla sencilla, nada de gráficos (lo que pide el encargo). */
+.cuentas-tabla {
+  border-collapse: collapse; width: 100%; max-width: 640px; margin: 10px 0 22px;
+  font-size: 14px;
+}
+.cuentas-tabla th, .cuentas-tabla td {
+  border-bottom: 1px solid var(--linea); padding: 6px 10px; text-align: left;
+}
+.cuentas-tabla th { color: var(--tinta-suave); font-weight: 600; }
+.cuentas-tabla td:not(:first-child):not(:nth-child(2)) { text-align: right; }
+.cuentas-total td { font-weight: 700; border-top: 2px solid var(--linea); border-bottom: none; }
+.cuentas-tabla-pequena { max-width: 320px; }
+.cuentas-subtitulo { margin: 0 0 4px; font-size: 15px; }

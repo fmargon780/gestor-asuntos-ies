@@ -37,9 +37,13 @@ var IndiceArchivo = (function () {
 
   var FICHERO = 'indice-archivo.json';
   /* 2 (19-sep-2026, fila 73, docs/BUSCAR-EN-LAS-NOTAS.md): las
-     entradas ahora llevan también el texto de las notas, así que un
-     índice de la 1 se queda sin ellas y hay que reconstruirlo. */
-  var VERSION = 2;
+     entradas ahora llevan también el texto de las notas.
+     3 (19-sep-2026, fila 74, docs/CUENTAS-DE-FIN-DE-CURSO.md): además
+     llevan si el tipo se ha reconocido, quién lo pidió (categoría y
+     relación, para la pantalla "Cuentas") y las fechas de apertura y
+     cierre. Cada subida de VERSION deja sin ellas a un índice viejo,
+     que se reconstruye solo. */
+  var VERSION = 3;
 
   function gestor() { return window.App && App.E && App.E.gestor; }
 
@@ -116,27 +120,6 @@ var IndiceArchivo = (function () {
   }
 
   /* ==========================================================
-     LEER EL AÑO ACADÉMICO Y EL GRUPO DEL NOMBRE DE LA CARPETA
-
-     Mismos patrones que ya usa `Nombres.terceroDeResto` para
-     quitarlos del principio del resto (aquí se capturan en vez de
-     quitarse). Lo que no se reconozca se deja en blanco: nada se
-     inventa.
-     ========================================================== */
-  var RE_CURSO_RESTO = /^(\d{2}[-\/]\d{2})\s+/;
-  var RE_GRUPO_RESTO = /^(\d[ºo°](?:Bach|FP|Div)?[A-Za-z]?)\s+/i;
-
-  function cursoYGrupoDeResto(resto) {
-    var t = String(resto || '');
-    var curso = '', grupo = '';
-    var m1 = t.match(RE_CURSO_RESTO);
-    if (m1) { curso = m1[1]; t = t.slice(m1[0].length); }
-    var m2 = t.match(RE_GRUPO_RESTO);
-    if (m2) grupo = m2[1];
-    return { curso: curso, grupo: grupo };
-  }
-
-  /* ==========================================================
      LOS DOCUMENTOS DE LA CARPETA Y SUS REGISTROS DE SÉNECA
      ========================================================== */
 
@@ -202,7 +185,7 @@ var IndiceArchivo = (function () {
      carpeta. */
   async function entradaDe(handle, nombre, categoria, tercero, ruta, sueltoEn, tipos, fichaConocida) {
     var leido = Nombres.leer(nombre, tipos);
-    var cursoGrupo = cursoYGrupoDeResto(leido.resto);
+    var cursoGrupo = Nombres.cursoYGrupoDeResto(leido.resto);
     var documentos = await nombresDeDocumentos(handle);
     var ficha = fichaConocida;
     if (ficha === undefined && window.FichaArchivo) {
@@ -211,12 +194,20 @@ var IndiceArchivo = (function () {
     ficha = ficha || {};
     return {
       nombre: nombre, categoria: categoria, tercero: tercero, ruta: ruta,
-      fecha: leido.fecha || '', tipo: leido.tipo || '',
+      fecha: leido.fecha || '', tipo: leido.tipo || '', reconocido: !!leido.reconocido,
       curso: cursoGrupo.curso, grupo: cursoGrupo.grupo,
       documentos: documentos, registros: registrosDeNombres(documentos),
       sueltoEn: sueltoEn || '',
       situacion: ficha.situacion || '', via: ficha.via || '', viaDato: ficha.viaDato || '',
       loPideNombre: (ficha.loPide && ficha.loPide.nombre) || '',
+      /* Fila 74, docs/CUENTAS-DE-FIN-DE-CURSO.md: categoría y relación
+         de quien lo pidió (para agrupar "familia"/"alumnado"/"centro"/
+         "empresa" en Cuentas.js, sin guardar su nombre otra vez: ya
+         está en loPideNombre, arriba), y las fechas de apertura y
+         cierre del asunto (para "cuánto se tarda"). */
+      loPideCategoria: (ficha.loPide && ficha.loPide.categoria) || '',
+      loPideRelacion: (ficha.loPide && ficha.loPide.relacion) || '',
+      abiertoEl: ficha.abiertoEl || '', cerradoEl: ficha.cerradoEl || '',
       relacionados: relacionadosDeFicha(ficha), camposTexto: camposDeFicha(ficha),
       /* Fila 73, docs/BUSCAR-EN-LAS-NOTAS.md: el texto de las notas,
          recortado (Notas.textoParaBuscar ya lo recorta a 2.000

@@ -132,6 +132,31 @@
     referencia.parentNode.insertBefore(b, referencia.nextSibling);
   }
 
+  /* ---------- la entrada de "Cuentas" (fila 74) ----------
+
+     Igual que la de "Qué me toca", justo detrás de ella: un botón
+     .pestana más, añadido a mano porque tampoco está en el
+     index.html de partida. */
+
+  function ponerLaEntradaDeCuentas() {
+    if ($('pestana-cuentas')) return;
+    var referencia = $('pestana-que-me-toca') ||
+      document.querySelector('.pestana[data-pantalla="personas"]');
+    if (!referencia || !referencia.parentNode) return;
+
+    var b = document.createElement('button');
+    b.id = 'pestana-cuentas';
+    b.className = 'pestana';
+    b.type = 'button';
+    b.dataset.pantalla = 'cuentas';
+    b.innerHTML = '<span>Cuentas</span>';
+    b.onclick = function () { if (window.Cuentas) window.Cuentas.abrir(); };
+    b.addEventListener('click', function () {
+      if (comoEstaba() === 'plegada') poner('plegada');
+    });
+    referencia.parentNode.insertBefore(b, referencia.nextSibling);
+  }
+
   /* ---------- el botón grande de Nuevo asunto ---------- */
 
   function ponerElDeNuevoAsunto() {
@@ -184,6 +209,7 @@
     ponerElBoton();
     ponerElBotonDeAjustes();
     ponerLaEntradaDeQueMeToca();
+    ponerLaEntradaDeCuentas();
     ponerElDeNuevoAsunto();
     poner(comoEstaba());
     vigilarPaneles();

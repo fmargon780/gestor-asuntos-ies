@@ -1,6 +1,6 @@
-# Las guías del procedimiento, los hitos de un asunto y "Qué me toca"
+# Las guías del procedimiento, los hitos de un asunto, "Qué me toca" y "Cuentas"
 
-Documento hijo de `docs/CONTEXTO.md` (fila 65, `docs/DOCUMENTOS-QUE-QUEPAN.md`, 19-sep-2026). Actualízalo al tocar las guías, los hitos de un asunto o la pantalla "Qué me toca". El índice general, las reglas de código comunes y la tabla de ficheros del repositorio están en el propio `docs/CONTEXTO.md`.
+Documento hijo de `docs/CONTEXTO.md` (fila 65, `docs/DOCUMENTOS-QUE-QUEPAN.md`, 19-sep-2026). Actualízalo al tocar las guías, los hitos de un asunto o las pantallas "Qué me toca"/"Cuentas". El índice general, las reglas de código comunes y la tabla de ficheros del repositorio están en el propio `docs/CONTEXTO.md`.
 
 ---
 
@@ -279,4 +279,44 @@ pantalla. Cada línea lleva un botón **Abrir** y uno **Ocultar por 30 días**, 
 `ficha.dormidoOcultoHasta` (vía `App.anotar`) y lo saca de la lista hasta esa fecha. Vive en
 `js/que-me-toca.js` junto a los demás bloques (`reunirDormidos`, `bloqueDormidos`,
 `App.diasDormido`/`App.guardarDiasDormido`/`App.pintarDiasDormido`), no en un fichero aparte.
+
+### La pantalla "Cuentas"
+
+19-sep-2026, fila 74, `docs/CUENTAS-DE-FIN-DE-CURSO.md`: las cuentas para la memoria de fin de
+curso. Mismo patrón que "Qué me toca" (`App.PANTALLAS.push`, sección creada a mano, no está en
+`index.html`, entrada propia en `js/barra.js` justo detrás de la de "Qué me toca"), pero vive en
+su propio fichero, `js/cuentas.js`: no cruza hitos, cruza **categoría/tipo, mes, quién lo pidió y
+cuánto se tarda** de todos los asuntos, abiertos y archivados.
+
+- **De dónde salen los números**: nunca se recorre el ARCHIVO. Los abiertos, de
+  `window.Gestor.asuntos()`; los archivados, de `IndiceArchivo.leerDisco()` (el mismo índice de
+  "El índice del ARCHIVO", en `docs/contexto/ASUNTOS.md`). Si el índice no está hecho o es de
+  otra versión, la pantalla lo dice y remite a ARCHIVO → "Reconstruir el índice": **no** lo
+  reconstruye ella sola ni enseña números a medias.
+- **El curso académico** de un asunto sale de su **fecha de apertura** (septiembre a diciembre,
+  el curso que empieza; enero a agosto, el que empezó el año anterior — `U.cursoDeFecha`), no del
+  año académico opcional que algunos tipos llevan en el nombre: muchos tipos (EMPRESAS, por
+  ejemplo) nunca lo llevan, y así ningún asunto se queda fuera de todos los cursos. Un
+  desplegable arriba elige el curso (por defecto, el actual si aparece en la lista; "Todos" lo
+  quita); solo enseña los cursos que de verdad hay.
+- **Categoría → tipo → cuántos, abiertos, archivados**: un asunto cuyo nombre no encaja con
+  ningún tipo de Ajustes (`leido.reconocido` falso) se cuenta aparte, en "Sin clasificar", nunca
+  se pierde. Ordenada por categoría y, dentro, de más a menos; fila de Total al final. Botón
+  **"Copiar la tabla"** (`U.copiar`) la deja en el portapapeles separada por tabuladores, lista
+  para pegar en un documento o una hoja de cálculo.
+- **Por mes**: cuántos asuntos se abrieron cada mes del curso elegido, de la fecha del nombre de
+  la carpeta.
+- **Por quién lo pidió**: agrupa `ficha.loPide` (`js/lo-pide.js`) en Familia (su `relacion`
+  empieza por "Tutor legal"), Alumnado, Centro o Empresa (según `loPide.categoria`); sin
+  "Quién lo pide" apuntado, va aparte en "Sin apuntar", no se cuenta como si fuera de nadie.
+- **Cuánto se tarda**: solo de los archivados con `abiertoEl` y `cerradoEl` (los de antes de
+  llevar esos dos datos no entran: no se inventa una duración). Media y el que más tardó, en días.
+- El índice del ARCHIVO guarda, desde esta fila (`VERSION` 2 → 3), `reconocido`, `loPideCategoria`,
+  `loPideRelacion`, `abiertoEl` y `cerradoEl` de cada entrada (antes solo `loPideNombre`, para
+  buscar). `Nombres.cursoYGrupoDeResto` (antes privada de `js/archivo-indice.js`, ahora en
+  `js/nombres.js`) hacía falta también para los abiertos, que no pasan por el índice.
+
+Toda la cuenta (`_entradaAbierta`, `_entradaArchivada`, `_porTipo`, `_porMes`, `_porQuienLoPide`,
+`_tiempoDeTramite`, `_textoParaCopiar`) es pura, sin DOM ni disco: se comprueba sin navegador en
+`pruebas/cuentas.mjs`.
 

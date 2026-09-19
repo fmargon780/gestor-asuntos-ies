@@ -97,8 +97,8 @@ for (const f of ['util.js', 'archivo-indice.js']) {
 }
 const { IndiceArchivo } = ctxIndice;
 
-comprobarCierto('la versión del índice ha subido a la 2 (fila 73)', IndiceArchivo.VERSION === 2,
-  'VERSION: ' + IndiceArchivo.VERSION);
+comprobarCierto('la versión del índice ha subido de la 1 (fila 73 la dejó en 2, luego la 74)',
+  IndiceArchivo.VERSION >= 2, 'VERSION: ' + IndiceArchivo.VERSION);
 
 const entradaConNota = { nombre: '260919 SOLICITUD Ruiz, Marta', categoria: 'ALUMNADO', tercero: 'Ruiz, Marta',
   notas: 'pidio informacion sobre matricula' };

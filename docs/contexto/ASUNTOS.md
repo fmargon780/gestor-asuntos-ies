@@ -480,8 +480,11 @@ tabla de ficheros), y la búsqueda es por palabras sueltas.
     2.000 caracteres por `Notas.textoParaBuscar`, ver "Notas" más abajo) y `textoDeBusqueda` lo
     incluye salvo que se llame con `conNotas` a `false` (así `App.pintarArchivo` puede calcular,
     aparte, un texto sin notas para saber si una coincidencia viene de una nota). Ese cambio subió
-    `VERSION` de `IndiceArchivo` de 1 a 2, así que un índice guardado con la versión vieja se
-    reconstruye solo (mismo aviso "El índice no está hecho" de siempre). Normalizado una vez.
+    `VERSION` de `IndiceArchivo` de 1 a 2, y la fila 74 (`docs/CUENTAS-DE-FIN-DE-CURSO.md`, ver
+    "La pantalla Cuentas" en `docs/contexto/HITOS-Y-GUIAS.md`) la subió a 3 al añadir
+    `reconocido`, `loPideCategoria`, `loPideRelacion`, `abiertoEl` y `cerradoEl` a cada entrada:
+    cada subida de `VERSION` deja sin esos campos a un índice guardado con la versión vieja, que
+    se reconstruye solo (mismo aviso "El índice no está hecho" de siempre). Normalizado una vez.
   - `resolverHandle(entrada)` calcula el manejador real de una carpeta a partir de lo que el índice
     sabe (categoría, tercero, ruta, `sueltoEn`): el índice no puede guardar manejadores en un JSON.
 - **`App.verArchivo`** (`js/archivo-personas.js`) lee el índice; si no existe, está roto o es de
