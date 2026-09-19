@@ -5,6 +5,35 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 19-sep-2026 — Fila 75: los dos huecos que dejó la fila 69
+
+`docs/HUECOS-ENCONTRADOS-FILA-69.md`. Al escribir las pruebas de unir asuntos y de recurrentes
+(fila 69) aparecieron dos sitios donde el código no hacía lo que describía el encargo original; se
+dejaron sin tocar entonces (no eran arreglos de una línea) y se resuelven aquí.
+
+**1. Unir con un documento del mismo nombre en las dos carpetas.** Antes, `js/unir-asuntos.js`
+paraba la unión entera y pedía renombrar a mano desde "Gestionar documentos". Ahora el documento
+que viene de la carpeta que se va entra con " (2)", " (3)"... — el mismo patrón que ya usa
+`Carpetas.fusionarEn` al archivar sobre un destino que ya existe. `Carpetas.existeFichero` y
+`Carpetas.nombreLibreConSufijo` (ya existían, solo para uso interno de `fusionarEn`) se exportan
+también para este segundo uso. Nada se pierde ni se para: al terminar se avisa de cuántos
+documentos se han tenido que renombrar así. `pruebas/unir-asuntos.mjs` (sin navegador) y
+`pruebas/duplicados.mjs` (navegador de verdad) comprueban el comportamiento nuevo; la sección de
+`duplicados.mjs` que antes comprobaba el bloqueo se ha rehecho para comprobar el renombrado, y la
+prueba de "No son el mismo" se ha movido a un grupo sin choque de ficheros, porque ya no depende de
+uno.
+
+**2. "Ocultar por hoy" en los asuntos recurrentes.** El panel de recurrentes pendientes
+(`js/recurrentes.js`, `pintarPanel`) no tenía ese botón, aunque el encargo de avisos (fila 68) lo
+daba por hecho junto a "Crear" y "Ver la lista en Ajustes". Se añade con el mismo patrón que ya usa
+`js/avisos.js`: una clave de `localStorage` con la fecha de hoy, de este ordenador. No cambia qué
+toca crear (`_pendientes` sigue igual): solo esconde el aviso el resto del día.
+`pruebas/recurrentes.mjs` lo comprueba con un `localStorage` de mentira en el contexto `vm`.
+
+Versión publicada `App.VERSION`: `19-sep-2026 · 15:55`.
+
+---
+
 ## 19-sep-2026 — Fila 74: cuentas de fin de curso
 
 `docs/CUENTAS-DE-FIN-DE-CURSO.md`, informe crítico 4.4. La memoria de fin de curso siempre pedía
@@ -31,7 +60,7 @@ y las fechas de apertura y cierre. Un índice viejo se reconstruye solo, como si
 falta también para los asuntos abiertos, que no pasan por el índice.
 
 **Un fallo encontrado y corregido en el camino**: el desplegable de curso volvía él solo al curso
-actual en cuanto se elegía "Todos", porque repintaba sus opciones (y su valor por defecto) en
+actual en cuanto se elegía "Todos", porque repintába sus opciones (y su valor por defecto) en
 cada repintado de la pantalla, no solo la primera vez. Ahora el desplegable solo se rellena una
 vez, al entrar.
 
@@ -201,7 +230,7 @@ apuntándolo en `js/envolturas-esperadas.js`.
 Se comprueba con `pruebas/envolturas.mjs`, en navegador de verdad (hace falta la aplicación
 entera cargada, con las 42 envolturas de verdad, sin necesidad de "entrar" eligiendo carpetas:
 `U.envolver` actúa al cargar cada `<script>`, no al usar la aplicación): al arrancar no sale
-ningún aviso; quitando una a mano de la lista de aplicadas, sale el aviso rojo con su fichero y su
+ingún aviso; quitando una a mano de la lista de aplicadas, sale el aviso rojo con su fichero y su
 nombre, y se oculta otra vez al restaurarla; envolver una función que no existe no revienta, no
 devuelve nada y queda apuntada como fallo; y el número de `U.envolver(...)` que hay de verdad en
 `js/` coincide exactamente con la lista de `envolturas-esperadas.js` (la comprobación más útil de
@@ -269,7 +298,7 @@ nuevo, que solo se llama para este aviso). Sin botón para quitarlo sin decidir:
 bloque de Ajustes de siempre.
 
 **Lo que NO se ha hecho, a propósito**: si la papelera debería vaciarse ella sola a los N días es
-una decisión de Francisco, no de quien programe, y el propio encargo pide preguntársela antes de
+una decisión de Francisco, no de quien programe, y el propio encargo pide preguntarsela antes de
 tocar esa parte. Esta sesión no pregunta nada (instrucción de la cola), así que se queda sin
 hacer: solo el aviso más insistente, nunca el borrado automático. Apuntado en `docs/CONTEXTO-
 CORTO.md`, sección "Qué falta", para que Francisco lo decida cuando lea esto.
@@ -427,7 +456,7 @@ se enseña siempre; localizar la carpeta de cada uno (para el botón de mover de
 al desplegar el bloque `<details>`, no cada vez que se pinta la pestaña. Los que no encuentran su
 carpeta se cuentan aparte y no se tocan. No se hace nada en silencio al arrancar.
 
-**La prueba** (`pruebas/ficha-del-archivo.mjs`), sin navegador, amplía el patrón de
+**La prueba** (`pruebas/ficha-del-archivo.mjs`), sin navegador, amplia el patrón de
 `pruebas/renombrar-asunto.mjs` cargando también `js/asuntos-archivar.js` y `js/ficha-archivo.js`
 de verdad en el contexto `vm` — esta es la primera prueba de la cola que ejercita el
 `App.cerrarAsunto`/`App.reabrirAsunto` reales sin navegador: los dos cuadros de confirmación que
@@ -493,7 +522,7 @@ fila, la tercera sin gastar publicación de Vercel porque solo toca `docs/`). La
 añaden que un documento de más de 40.000 caracteres se parte, no se reescribe con cuidado.
 
 **`docs/CONTEXTO-CORTO.md` podado**: el tope pasa de 160 líneas a **14.000 caracteres** (un tope
-de líneas no protegía de nada si las líneas podían medir lo que quisieran: la sección "Qué está
+de líneas no protege de nada si las líneas podían medir lo que quisieran: la sección "Qué está
 hecho" tenía líneas de más de 1.300 caracteres). Esa sección se reescribió a una línea por cosa,
 sin números de fila ni fechas (quedan en `HISTORIA.md` y en el documento de cada fila); de
 18.861 caracteres el documento entero baja a 13.093.
@@ -581,7 +610,7 @@ cuenta las entradas de `hitos.json` que ya no corresponden a ningún asunto abie
 —rastro de renombrados de antes de este arreglo— y deja borrarlas con confirmación, sin adivinar
 a qué asunto pertenecían.
 
-**La prueba** (`pruebas/renombrar-asunto.mjs`), sin navegador, amplía el patrón de
+**La prueba** (`pruebas/renombrar-asunto.mjs`), sin navegador, amplia el patrón de
 `pruebas/guardar-sin-pisar.mjs` cargando también `js/conflictos.js`, `js/presencia.js` y
 `js/hitos.js` en el contexto `vm`. Prueba `AsuntoRenombrar` directamente (mover, fusionar en un
 destino que ya tenía hitos, unir dos asuntos, enlazar una huérfana, borrar y devolver desde la
