@@ -130,7 +130,7 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   plazo" (`fechaCortaSinAno`, propia de este fichero, sin año). Se pinta con
   `<button class="boton-vencimiento ...">` (`css/ficha-asunto.css`); al pulsarla abre el mismo
   `App.editarPlazo(a)` de siempre.
-- **"El encargo"**: un solo botón que abre el cuadro de "Lo pide" de siempre
+- **"El encargo"**: un solo botón que abre el mismo cuadro de "Lo pide" de siempre
   (`abrirLoPide(a)`, sigue en `js/ficha-asunto.js`) con la vía de comunicación
   (`a.ficha.via`/`viaDato`, antes su propio botón vía `App.editarVia`) metida dentro como un
   campo más. `LoPide.controles(caja, persona, valorInicial, viaInicial)` gana un 4º parámetro
@@ -139,7 +139,7 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   —quién lo pide y por dónde— se guardan juntas en un solo `App.anotar`, pero no dependen la una
   de la otra (se puede guardar la vía sin haber elegido "quién lo pide"). Ninguna de las dos
   cambia de sitio en `asuntos.json` (`loPide` y `via`/`viaDato`/`viaEl`/`viaPor`, igual que
-  siempre); `App.editarVia` sigue tal cual, sigue usándolo la tarjeta de la lista
+  siempre); `App.editarVia` sigue tal cual, sigue usandolo la tarjeta de la lista
   (`js/asuntos-lista.js`). `js/via-contacto.js` envuelve `LoPide.controles` (además de
   `App.editarVia`, que no se toca) para poner las sugerencias de teléfono/correo también en el
   campo `.lopide-via-dato` del cuadro nuevo, solo si `controles()` recibe `persona`. El botón
@@ -306,8 +306,12 @@ Se comprueba con `pruebas/lo-pide.mjs`, sin navegador (jsdom).
   más abajo): se elige cuál se queda (de partida, el de nombre más largo); los ficheros del otro
   se mueven a la carpeta que se queda, las notas se juntan (con una nota de la unión al final),
   los pasos de la guía se copian del que se queda si no tenía, y la carpeta que se va se borra.
-  Si algún fichero choca de nombre entre las dos carpetas, no se mueve ni se borra nada, y avisa
-  de cuáles.
+  Si algún fichero choca de nombre entre las dos carpetas (fila 75,
+  docs/HUECOS-ENCONTRADOS-FILA-69.md, 1: hasta esa fila esto paraba la unión entera y pedía
+  renombrar a mano), el que viene de la carpeta que se va entra con " (2)", " (3)"... —el mismo
+  patrón que ya usa `Carpetas.fusionarEn` al archivar sobre un destino que ya existe—, y al
+  terminar se avisa de cuántos documentos se han tenido que renombrar así. Nada se pierde ni se
+  para.
 - Vive en `js/duplicados.js` (la parada al crear) y `js/unir-asuntos.js` (unir), cargado justo
   después de `js/asuntos-lista.js` (define `App.pintarAbiertos`).
 
@@ -410,6 +414,12 @@ destino ya existe y, si es así, avisan en el propio cuadro de confirmación (mi
 preguntar nada más) y usan `fusionarEn`. `js/asuntos-archivar.js` va cargado justo después de
 `js/documentos-sueltos.js` y antes de `js/relacionados.js`/`js/hitos-archivo.js`, que envuelven
 esas dos funciones.
+
+**`Carpetas.existeFichero`/`Carpetas.nombreLibreConSufijo`** (usadas internamente por
+`fusionarEn` desde siempre) se exportan también desde la fila 75
+(docs/HUECOS-ENCONTRADOS-FILA-69.md, 1): `js/unir-asuntos.js` las reutiliza para el mismo
+renombrado con sufijo cuando un documento choca de nombre al unir dos asuntos (ver "Que no se
+dupliquen los asuntos", más arriba), en vez de tener su propia copia de la misma cuenta.
 
 Se comprueba con `pruebas/archivar-fusion.mjs`, sin navegador.
 
@@ -556,4 +566,3 @@ siempre en Ajustes → Mantenimiento; antes solo se veía entrando a propósito 
 envolver `App.verAbiertos`, no en cada tecla del buscador.
 
 ---
-
