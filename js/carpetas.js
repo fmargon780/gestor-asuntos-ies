@@ -470,6 +470,7 @@ var Carpetas = (function () {
     esCarpetaTemporalDeSincronizacion: esCarpetaTemporalDeSincronizacion,
     crear: crear, bajar: bajar, mover: mover, renombrar: renombrar, trasladar: trasladar,
     fusionarEn: fusionarEn, contarFicheros: contarFicheros,
+    existeFichero: existeFichero, nombreLibreConSufijo: nombreLibreConSufijo,
     renombrarFichero: renombrarFichero, moverFichero: moverFichero,
     elegirFichero: elegirFichero, copiarFicheroEn: copiarFicheroEn,
     leerTexto: leerTexto, escribirTexto: escribirTexto, escribirBytes: escribirBytes,
