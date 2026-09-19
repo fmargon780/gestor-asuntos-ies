@@ -5,6 +5,34 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 19-sep-2026 — Fila 69: las pruebas que faltan
+
+`docs/PRUEBAS-QUE-FALTAN.md`, parte 3.2 del informe crítico. Punto de partida: 70 ficheros de
+prueba, 1.478 comprobaciones, todo en verde — y aun así, `js/unir-asuntos.js` (615 líneas) y
+`js/recurrentes.js` (487 líneas) no los probaba nadie.
+
+- **`pruebas/unir-asuntos.mjs`** (nuevo): la unión de verdad (`window.UnirAsuntos.unirAsuntos`,
+  exportado solo para esta prueba), sin navegador, con el disco de mentira. Dos asuntos con notas,
+  pasos hechos, hitos y documentos se unen bien; la carpeta que se va desaparece de disco y del
+  registro; y si falla la copia de un documento, no se borra nada del origen.
+- **`pruebas/recurrentes.mjs`** (nuevo): avisa cuando toca, no avisa dos veces del mismo (la
+  próxima fecha queda en el futuro tras crearlo), y crear desde el aviso monta la carpeta y la
+  ficha bien.
+- **`docs/COMPROBAR-A-MANO.md`** (nuevo): la lista de lo que solo se puede comprobar entrando de
+  verdad (Séneca, Dropbox sincronizando, el script de Google, la red del IES), para repasar antes
+  de una publicación importante.
+- El script de Google (`apps-script/gestor-correos.gs`) se deja sin probar, tal como permite el
+  encargo ("si esto se complica, se deja y se apunta"): sacar sus partes puras a funciones
+  probables habría significado tocar el fichero de verdad sin poder ejecutarlo contra Gmail para
+  comprobar que el cambio no rompe nada.
+
+**Dos huecos entre lo que pedía el papel y lo que hace el código de verdad**, encontrados al
+escribir las pruebas y explicados en `docs/HUECOS-ENCONTRADOS-FILA-69.md` (apuntados como fila 75,
+no urgente, en vez de tocarlos aquí sin permiso): unir dos asuntos con un documento del mismo
+nombre no lo renombra con " (2)", para la unión entera y avisa; y el aviso de los asuntos
+recurrentes no tiene ningún botón "Ocultar por hoy" (ese botón es de `js/avisos.js`, los plazos,
+un aviso distinto). Las pruebas nuevas comprueban el comportamiento de verdad, no el del papel.
+
 ## 19-sep-2026 — Fila 68: los avisos que faltan
 
 Tres cosas que la aplicación ya sabía pero no decía (`docs/AVISOS-QUE-FALTAN.md`, del informe
