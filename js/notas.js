@@ -28,6 +28,58 @@
     return Array.isArray(n) ? n : [];
   }
 
+  /* ---------- buscar dentro de las notas (19-sep-2026, fila 73,
+     docs/BUSCAR-EN-LAS-NOTAS.md) ---------- */
+
+  var TOPE_TEXTO_BUSQUEDA = 2000;
+
+  /* El texto de todas las notas de un asunto, unido y recortado: lo
+     que hace falta para meter en el "busca" de la tarjeta (abierto) o
+     en el índice (archivado). Una nota de 50.000 caracteres no debe
+     poder reventar nada: se recorta aquí, antes de guardar o buscar. */
+  function textoParaBuscar(ficha) {
+    var texto = notasDe({ ficha: ficha }).map(function (n) { return (n && n.texto) || ''; }).join(' ');
+    return texto.length > TOPE_TEXTO_BUSQUEDA ? texto.slice(0, TOPE_TEXTO_BUSQUEDA) : texto;
+  }
+
+  /* Un trozo del texto de las notas alrededor de la primera palabra de
+     `palabras` (ya normalizadas) que aparezca en él, para enseñar por
+     qué ha salido el asunto en la búsqueda cuando ha sido solo por una
+     nota (punto 2.3 del encargo). Devuelve { antes, palabra, despues }
+     (sin escapar: quien pinta decide cómo), o null si ninguna
+     palabra aparece en el texto. */
+  function fragmentoDeBusqueda(texto, palabras) {
+    if (!texto || !palabras || !palabras.length) return null;
+    var trozos = String(texto).split(/\s+/).filter(Boolean);
+    for (var i = 0; i < trozos.length; i++) {
+      var normal = U.normalizar(trozos[i]);
+      var coincide = palabras.some(function (p) { return normal.indexOf(p) !== -1; });
+      if (!coincide) continue;
+      var desde = Math.max(0, i - 6);
+      var hasta = Math.min(trozos.length, i + 7);
+      return {
+        antes: (desde > 0 ? '… ' : '') + trozos.slice(desde, i).join(' '),
+        palabra: trozos[i],
+        despues: trozos.slice(i + 1, hasta).join(' ') + (hasta < trozos.length ? ' …' : '')
+      };
+    }
+    return null;
+  }
+
+  /* Si el asunto ha salido en la búsqueda SOLO por una nota (ninguna
+     palabra buscada está en `buscaSinNotas`), el trocito de la nota
+     donde aparece; si no, null. Puro, sin DOM: lo llama
+     App.fragmentoDeNota (js/asuntos-lista.js), que le pasa lo que ya
+     tiene calculado el asunto. */
+  function fragmentoSiSoloEnNota(busca, buscaSinNotas, notasTexto, palabras) {
+    if (!palabras || !palabras.length) return null;
+    var soloEnNota = palabras.some(function (p) {
+      return (busca || '').indexOf(p) !== -1 && (buscaSinNotas || '').indexOf(p) === -1;
+    });
+    if (!soloEnNota) return null;
+    return fragmentoDeBusqueda(notasTexto || '', palabras);
+  }
+
   /* Una nota puede traer un enlace: el correo del que salió, por
      ejemplo. Se enseña como botón, nunca escrito dentro del texto.
      Una dirección de Gmail ocupa cuatro líneas y no la lee nadie. */
@@ -411,7 +463,10 @@
     yaTieneCorreo: yaTieneCorreo,
     pintarEnFicha: pintarEnFicha,
     olvidarBorrador: olvidarBorrador,
-    confirmarSalirDeFicha: confirmarSalirDeFicha
+    confirmarSalirDeFicha: confirmarSalirDeFicha,
+    textoParaBuscar: textoParaBuscar,
+    fragmentoDeBusqueda: fragmentoDeBusqueda,
+    fragmentoSiSoloEnNota: fragmentoSiSoloEnNota
   };
 
   /* ---------- arranque ---------- */

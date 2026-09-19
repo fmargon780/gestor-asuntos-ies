@@ -22,8 +22,15 @@ App.verAbiertos = async function (yaLeido) {
     .map(function (c) {
       var leido = Nombres.leer(c.nombre, App.E.tipos);
       var ficha = App.E.registro.asuntos[c.nombre] || {};
+      /* Las notas entran en la búsqueda (fila 73,
+         docs/BUSCAR-EN-LAS-NOTAS.md): buscaSinNotas se queda aparte
+         para saber, al buscar, si una palabra solo aparece por una
+         nota (y entonces enseñar el trocito de la nota, punto 2.3). */
+      var buscaSinNotas = U.normalizar(c.nombre);
+      var notasTexto = window.Notas ? Notas.textoParaBuscar(ficha) : '';
       return { nombre: c.nombre, handle: c.handle, leido: leido, ficha: ficha,
-               busca: U.normalizar(c.nombre) };
+               buscaSinNotas: buscaSinNotas, notasTexto: notasTexto,
+               busca: U.normalizar(c.nombre + ' ' + notasTexto) };
     });
 
   App.E.sueltos = hay.ficheros.filter(function (f) { return App.esDocumentoDeTrabajo(f.nombre); });
@@ -439,7 +446,10 @@ App.ordenElegido = function () {
 
 App.pintarAbiertos = function () {
   App.pintarCuentas();
-  var q = U.normalizar($('buscar-abiertos').value);
+  /* Varias palabras sueltas, en cualquier orden (fila 73,
+     docs/BUSCAR-EN-LAS-NOTAS.md, punto 2.1): mismo criterio que ya
+     usa el buscador del ARCHIVO (App.pintarArchivo). */
+  var palabras = U.normalizar($('buscar-abiertos').value).split(' ').filter(Boolean);
   var rotulo = $('cuenta-lista-abiertos');
   var orden = App.ordenElegido();
   $('orden-abiertos').value = orden;
@@ -450,7 +460,7 @@ App.pintarAbiertos = function () {
      Sobre esto se cuentan las tarjetas de tipo. */
   var monton = App.E.listaAbiertos.filter(function (a) {
     if (!App.deLaVista(a, App.E.vista)) return false;
-    if (q && a.busca.indexOf(q) === -1) return false;
+    if (palabras.length && !palabras.every(function (p) { return a.busca.indexOf(p) !== -1; })) return false;
     if (!Plazos.pasaFiltro(a.ficha.limite || '', plazo)) return false;
     if (filtro === '__sin__') return !a.ficha.situacion;
     if (filtro) return a.ficha.situacion === filtro;
@@ -478,8 +488,23 @@ App.pintarAbiertos = function () {
     App.avisarALosModulos();
     return;
   }
-  lista.forEach(function (a) { caja.appendChild(App.tarjetaAsunto(a, 'abierto')); });
+  lista.forEach(function (a) {
+    a._fragmento = App.fragmentoDeNota(a, palabras);
+    caja.appendChild(App.tarjetaAsunto(a, 'abierto'));
+  });
   App.avisarALosModulos();
+};
+
+/* Si el asunto ha salido en la búsqueda SOLO por una nota (ninguna de
+   las palabras buscadas está en `buscaSinNotas`), el trocito de la
+   nota donde aparece, para enseñar por qué ha salido (fila 73,
+   docs/BUSCAR-EN-LAS-NOTAS.md, punto 2.3). null si no hay búsqueda, o
+   si ya se explica solo (el nombre, el tercero...). Vale tanto para
+   asuntos abiertos como archivados: los dos traen `busca`,
+   `buscaSinNotas` y `notasTexto`. */
+App.fragmentoDeNota = function (a, palabras) {
+  if (!window.Notas) return null;
+  return Notas.fragmentoSiSoloEnNota(a.busca, a.buscaSinNotas, a.notasTexto, palabras);
 };
 
 /* Dos dibujos para que se vea de un golpe qué es cada fila:
@@ -530,6 +555,15 @@ App.tarjetaAsunto = function (a, modo) {
   var p = (modo === 'abierto') ? App.plazoDe(a) : null;
   if (p) pie.push('Fecha límite ' + Plazos.legible(p.limite));
 
+  /* Si ha salido en la búsqueda solo por una nota, el trocito donde
+     está la palabra, con ella marcada (fila 73, punto 2.3): si no,
+     Francisco ve el asunto en los resultados y no sabe por qué. */
+  var fragmento = a._fragmento;
+  var notaEncontrada = fragmento
+    ? '<div class="tarjeta-nota-encontrada">' + U.escapar(fragmento.antes) +
+      ' <mark>' + U.escapar(fragmento.palabra) + '</mark> ' + U.escapar(fragmento.despues) + '</div>'
+    : '';
+
   div.innerHTML = App.ICONO_CARPETA +
     '<div class="tarjeta-texto">' +
       '<div class="tarjeta-nombre">' +
@@ -541,6 +575,7 @@ App.tarjetaAsunto = function (a, modo) {
       '</div>' +
       '<div class="tarjeta-pie' + (esperaLarga ? ' pie-aviso' : '') + '">' +
         U.escapar(pie.join('  ·  ')) + '</div>' +
+      notaEncontrada +
     '</div>';
 
   var acciones = document.createElement('div');
