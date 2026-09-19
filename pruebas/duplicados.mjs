@@ -21,11 +21,14 @@
        últimas notas;
      - "Unir" seguido desde ahí hace lo mismo de siempre: junta
        ficheros y notas y borra el que sobra;
-     - si hay un fichero con el mismo nombre en las dos carpetas, no se
-       mueve ni se borra nada, y desde ahí se puede descartar el grupo
-       con "No son el mismo";
-     - un grupo descartado deja de avisar, pero vuelve a avisar solo
-       si cambia quién lo forma (se crea un tercer asunto que encaja);
+     - si hay un fichero con el mismo nombre en las dos carpetas, la
+       unión sigue adelante: el que venía en la carpeta que se va
+       entra con "(2)" al final, y no se pierde ni se borra nada
+       (fila 75, docs/HUECOS-ENCONTRADOS-FILA-69.md, 1);
+     - "No son el mismo" descarta un grupo aunque no choque ningún
+       fichero, y un grupo descartado deja de avisar, pero vuelve a
+       avisar solo si cambia quién lo forma (se crea un tercer asunto
+       que encaja);
      - en Ajustes, "Duplicados descartados" lista lo descartado y deja
        "Volver a avisar".
 
@@ -377,9 +380,10 @@ await pagina.click('#dup-pantalla-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 
 /* ============================================================
-   8. FICHERO QUE CHOCA, Y "NO SON EL MISMO"
+   8. FICHERO QUE CHOCA: YA NO PARA LA UNIÓN, SE RENOMBRA CON "(2)"
+   (fila 75, docs/HUECOS-ENCONTRADOS-FILA-69.md, 1)
    ============================================================ */
-console.log('--- unir con un fichero del mismo nombre en las dos carpetas, y descartar el grupo ---');
+console.log('--- unir con un fichero del mismo nombre en las dos carpetas: se renombra, no se para ---');
 
 const SANC_A = '260906 SANCION 26-27 1ºA Choque, Pedro 9998887';
 const SANC_B = '260906 SANCION 26-27 Choque, Pedro 9998887';
@@ -397,27 +401,64 @@ await pagina.waitForSelector('#pantalla-duplicados:not(.oculto)');
 
 await pagina.getByRole('button', { name: 'Unir', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
-await pagina.click('#cuadro-aceptar');   /* acepta "¿Cuál se queda?" con el de partida */
-await pagina.waitForSelector('#capa:not(.oculto)');
-await comprobar('avisa de que no se puede unir todavía',
-  pagina.locator('#cuadro-titulo').textContent(), 'No se puede unir todavía');
-await comprobar('dice cuál fichero choca',
-  pagina.locator('#cuadro-cuerpo').textContent().then(t => t.indexOf('mismo.pdf') !== -1), true);
-await comprobar('este cuadro no lleva botón de cancelar',
-  pagina.locator('#cuadro-cancelar').isHidden(), true);
+await comprobar('de partida, el de nombre más largo (con el grupo)',
+  pagina.evaluate(() => {
+    const m = document.querySelector('input[name="unir-cual"]:checked');
+    return m ? m.closest('.dup-opcion').textContent.trim() : null;
+  }), SANC_A);
+await pagina.click('#cuadro-aceptar');   /* acepta "¿Cuál se queda?" con el de partida (SANC_A) */
+await pagina.waitForTimeout(500);
 
-await pagina.click('#cuadro-aceptar');   /* "Entendido" */
-await pagina.waitForTimeout(300);
+await comprobar('ya no aparece ningún cuadro de bloqueo: la unión ha terminado sola',
+  pagina.locator('#capa').isHidden(), true);
 
-await comprobar('las dos carpetas siguen ahí, sin tocar', pagina.evaluate(async (datos) => {
-  const a = await window.__disco.abiertos.getDirectoryHandle(datos.a);
-  const b = await window.__disco.abiertos.getDirectoryHandle(datos.b);
-  const na = []; for await (const p of a.entries()) na.push(p[0]);
-  const nb = []; for await (const p of b.entries()) nb.push(p[0]);
-  return [na, nb];
-}, { a: SANC_A, b: SANC_B }), [['mismo.pdf'], ['mismo.pdf']]);
+await comprobar('las dos carpetas quedan en una sola: la que se va desaparece', pagina.evaluate(async (datos) => {
+  const nombres = [];
+  for await (const p of window.__disco.abiertos.entries()) nombres.push(p[0]);
+  return [nombres.indexOf(datos.a) !== -1, nombres.indexOf(datos.b) !== -1];
+}, { a: SANC_A, b: SANC_B }), [true, false]);
 
-/* como no se ha podido unir, se descarta el grupo desde ahí mismo */
+await comprobar('los dos ficheros quedan en la carpeta que se queda, el segundo con "(2)"',
+  pagina.evaluate(async (nombre) => {
+    const carpeta = await window.__disco.abiertos.getDirectoryHandle(nombre);
+    const dentro = [];
+    for await (const p of carpeta.entries()) dentro.push(p[0]);
+    return dentro.sort();
+  }, SANC_A), ['mismo (2).pdf', 'mismo.pdf'].sort());
+
+await comprobar('el que ya estaba (de SANC_A) conserva su nombre y su contenido', pagina.evaluate(async (nombre) => {
+  const carpeta = await window.__disco.abiertos.getDirectoryHandle(nombre);
+  const h = await carpeta.getFileHandle('mismo.pdf');
+  return (await (await h.getFile()).text());
+}, SANC_A), 'contenido A');
+
+await comprobar('el que venía chocando (de SANC_B) es el que lleva el sufijo', pagina.evaluate(async (nombre) => {
+  const carpeta = await window.__disco.abiertos.getDirectoryHandle(nombre);
+  const h = await carpeta.getFileHandle('mismo (2).pdf');
+  return (await (await h.getFile()).text());
+}, SANC_A), 'contenido B');
+
+await comprobar('tras la unión, ya no queda ningún posible duplicado',
+  pagina.locator('#duplicados-lista .vacio').textContent(),
+  'No hay ningún posible duplicado ahora mismo.');
+
+await pagina.click('#dup-pantalla-volver');
+await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+
+/* ============================================================
+   9. "NO SON EL MISMO": DESCARTA UN GRUPO SIN NECESIDAD DE CHOQUE
+   ============================================================ */
+console.log('--- "No son el mismo" descarta el grupo, sin que haga falta ningún fichero repetido ---');
+
+const DESC_A = '260908 BECA 26-27 1ºC Distinto, Marta 1112223';
+const DESC_B = '260908 BECA 26-27 Distinto, Marta 1112223';
+await crearCarpeta(DESC_A);
+await crearCarpeta(DESC_B);
+await pagina.click('#btn-recargar');
+await pagina.waitForSelector('#btn-duplicados:not(.oculto)');
+await pagina.click('#btn-duplicados');
+await pagina.waitForSelector('#pantalla-duplicados:not(.oculto)');
+
 await pagina.getByRole('button', { name: 'No son el mismo', exact: true }).click();
 await pagina.waitForTimeout(300);
 await comprobar('el grupo desaparece de la pantalla tras descartarlo',
@@ -425,8 +466,8 @@ await comprobar('el grupo desaparece de la pantalla tras descartarlo',
   'No hay ningún posible duplicado ahora mismo.');
 await comprobar('se guarda el descarte, con quién lo hizo y los dos nombres', leerJson('no-duplicados.json'),
   { descartados: [{
-    firma: [SANC_A, SANC_B].sort().join(''),
-    nombres: [SANC_A, SANC_B].sort(),
+    firma: [DESC_A, DESC_B].sort().join(''),
+    nombres: [DESC_A, DESC_B].sort(),
     el: await pagina.evaluate(async () => {
       const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
       const h = await g.getFileHandle('no-duplicados.json');
@@ -442,12 +483,12 @@ await comprobar('el aviso ya no sale: el único grupo estaba descartado',
   pagina.locator('#btn-duplicados').isHidden(), true);
 
 /* ============================================================
-   9. EL GRUPO DESCARTADO VUELVE A AVISAR SI CAMBIA QUIÉN LO FORMA
+   10. EL GRUPO DESCARTADO VUELVE A AVISAR SI CAMBIA QUIÉN LO FORMA
    ============================================================ */
 console.log('--- un tercer asunto que encaja hace que el grupo (ya distinto) vuelva a avisar ---');
 
-const SANC_C = '260907 SANCION 26-27 1ºB Choque, Pedro 9998887';
-await crearCarpeta(SANC_C);
+const DESC_C = '260909 BECA 26-27 1ºD Distinto, Marta 1112223';
+await crearCarpeta(DESC_C);
 await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(300);
 
@@ -461,7 +502,7 @@ await comprobar('el grupo sale con los tres asuntos',
 await pagina.click('#dup-pantalla-volver');
 
 /* ============================================================
-   10. AJUSTES: "DUPLICADOS DESCARTADOS", Y "VOLVER A AVISAR"
+   11. AJUSTES: "DUPLICADOS DESCARTADOS", Y "VOLVER A AVISAR"
    ============================================================ */
 console.log('--- Ajustes: Duplicados descartados, y Volver a avisar ---');
 
@@ -473,7 +514,7 @@ await pagina.waitForSelector('#bloque-duplicados-descartados');
 await pagina.evaluate(() => { document.getElementById('bloque-duplicados-descartados').open = true; });
 await comprobar('Ajustes lista el grupo descartado, con sus dos nombres',
   pagina.locator('#tabla-duplicados-descartados').textContent()
-    .then(t => t.indexOf(SANC_A) !== -1 && t.indexOf(SANC_B) !== -1), true);
+    .then(t => t.indexOf(DESC_A) !== -1 && t.indexOf(DESC_B) !== -1), true);
 
 await pagina.getByRole('button', { name: 'Volver a avisar', exact: true }).click();
 await pagina.waitForTimeout(300);
