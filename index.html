@@ -53,6 +53,10 @@
 
     <div id="aviso-roto" class="aviso aviso-rojo oculto"></div>
 
+    <!-- Fila 70, docs/ENVOLTURAS-COMPROBADAS.md: no impide entrar
+         (nunca deshabilita "Entrar"), solo avisa. -->
+    <div id="aviso-envolturas" class="aviso aviso-rojo oculto"></div>
+
     <div id="paso-carpetas">
       <p class="explica">Para empezar, señala las dos carpetas con las que trabajas.
          Solo hay que hacerlo una vez en cada ordenador.</p>
@@ -899,11 +903,10 @@
 <!-- Y ahora sí, a arrancar. -->
 <script src="js/inicio.js"></script>
 
-<!-- Fila 70 (docs/ENVOLTURAS-COMPROBADAS.md): tiene que ser el ÚLTIMO
-     <script> de todos. Para cuando se ejecuta, todos los U.envolver()
-     del resto de la aplicación ya han corrido: compara lo que se ha
-     apuntado de verdad con la lista de lo que tiene que estar, y avisa
-     en la pantalla de entrada si falta alguna. -->
+<!-- Fila 70, docs/ENVOLTURAS-COMPROBADAS.md: EL ÚLTIMO de todos los
+     <script>, sin excepción. Cuando este fichero se ejecuta, todos los
+     demás ya han corrido de arriba abajo, y U.envolturasAplicadas() /
+     U.envolturasFallidas() tienen ya la foto completa. -->
 <script src="js/envolturas-esperadas.js"></script>
 </body>
 </html>
