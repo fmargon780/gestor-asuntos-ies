@@ -136,7 +136,7 @@
 
     /* Al cambiar de tercero o de tipo se repinta la vista previa: es
        buen momento para repasar también las sugerencias. */
-    U.envolver('App.refrescarVista', window.App, 'refrescarVista', 'js/via-contacto.js', function (comoEra) {
+    U.envolver(App, 'App.refrescarVista', 'via-contacto.js', function (comoEra) {
       return function () {
         comoEra();
         try { mirar(); } catch (e) { /* nunca estorba */ }
@@ -149,7 +149,7 @@
      El cuadro lo monta la aplicación; aquí solo se le añaden los
      botones cuando ya está en pantalla. */
 
-  U.envolver('App.editarVia', window.App, 'editarVia', 'js/via-contacto.js', function (comoEra) {
+  U.envolver(App, 'App.editarVia', 'via-contacto.js', function (comoEra) {
     return function (a) {
       var promesa = comoEra(a);
       setTimeout(function () {
@@ -179,7 +179,7 @@
      se envuelve `LoPide.controles`, que es el único sitio por el que
      pasan los dos cuadros que lo usan (la ficha del asunto es el único
      que trae `persona`, así que las sugerencias solo salen ahí). */
-  U.envolver('LoPide.controles', window.LoPide, 'controles', 'js/via-contacto.js', function (comoEra) {
+  U.envolver(window.LoPide, 'LoPide.controles', 'via-contacto.js', function (comoEra) {
     return function (caja, persona, valorInicial, viaInicial) {
       var r = comoEra(caja, persona, valorInicial, viaInicial);
       var selVia = caja.querySelector('.lopide-via');

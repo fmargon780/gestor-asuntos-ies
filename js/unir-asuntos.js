@@ -43,7 +43,7 @@
 (function () {
 
   var FICHERO_DESCARTES = 'no-duplicados.json';
-  var SEPARADOR_FIRMA = '';
+  var SEPARADOR_FIRMA = '';
 
   function $(id) { return document.getElementById(id); }
 
@@ -192,7 +192,7 @@
     b.classList.remove('oculto');
   }
 
-  U.envolver('App.pintarAbiertos', window.App, 'pintarAbiertos', 'js/unir-asuntos.js', function (comoEra) {
+  U.envolver(App, 'App.pintarAbiertos', 'unir-asuntos.js', function (comoEra) {
     return function () {
       comoEra();
       try { pintarAviso(); } catch (e) { /* el aviso nunca estorba */ }
