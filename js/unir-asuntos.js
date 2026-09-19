@@ -612,4 +612,8 @@
     else enganchar();
   })();
 
+  /* Para pruebas/unir-asuntos.mjs (fila 69, docs/PRUEBAS-QUE-FALTAN.md,
+     2.2): la unión de verdad, sin fingir un segundo camino aparte. */
+  window.UnirAsuntos = { unirAsuntos: unirAsuntos };
+
 })();

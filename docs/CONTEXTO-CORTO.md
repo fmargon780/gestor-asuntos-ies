@@ -170,6 +170,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Pulsar, antes de junio de 2027, "Guardar el contacto de los asuntos abiertos" (Ajustes → Mantenimiento, fila 66).
 - Fila 67: añadir un colaborador en GitHub y Vercel, y copiar `docs/LAS-CUENTAS.md` al Dropbox.
 - Decisión de Francisco (fila 68, sin preguntar todavía): ¿debe la papelera vaciarse ella sola a los N días? Mientras no se decida, solo el aviso más insistente, nunca el borrado solo.
+- Antes de una publicación importante, repasar `docs/COMPROBAR-A-MANO.md` (lo que ninguna prueba cubre).
 
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero
 

@@ -1,0 +1,38 @@
+# Comprobar a mano
+
+Fila 69 de la cola (`docs/PRUEBAS-QUE-FALTAN.md`, 3). Lo que ninguna prueba automática cubre, y
+Francisco tiene que mirar antes de dar por buena una publicación importante. En forma de lista,
+para ir tachando.
+
+---
+
+- [ ] **El ayudante de Séneca, contra Séneca de verdad.** Pulsarlo dentro de un mensaje de Séneca
+      de verdad, con una lista de destinatarios copiada. Ver: que los destinatarios entran uno a
+      uno, y que al final dice bien quién se ha quedado sin entrar (si alguno).
+- [ ] **El largo del asunto de un correo o mensaje de Séneca.** Mandar uno con el asunto más
+      largo que prepara la aplicación (con curso, tipo y tercero largos) y comprobar que
+      Comunicaciones de Séneca lo acepta entero, sin cortarlo.
+- [ ] **"Ajustar tamaño" con un documento registrado de verdad.** Comprobar que la banda de arriba
+      (sello de registro de Séneca) y la de abajo (firma de AutoFirma) quedan libres de texto. Y
+      qué pasa si se ajusta el tamaño de un PDF que ya venía firmado digitalmente: si la firma se
+      invalida al tocarlo.
+- [ ] **Un archivado con Dropbox sincronizando de verdad**, no con el disco de mentira de las
+      pruebas: que la carpeta llega entera al otro ordenador, con todos sus documentos.
+- [ ] **Los dos ordenadores guardando a la vez en el mismo asunto.** Que sale el aviso de "el
+      compañero está dentro" en el segundo, y que si Dropbox deja una copia en conflicto, se
+      fusiona sola (`js/conflictos.js`) la próxima vez que se entra.
+- [ ] **El script de Google, con un correo de verdad.** Que recoge uno con adjuntos, deja su ficha
+      en `GESTOR-BANDEJA`, y que al mandar documentos de un asunto por correo el borrador sale
+      bien en Gmail.
+- [ ] **La aplicación desde la red del IES.** Entrar en `https://asuntos.fmargon.com` desde un
+      ordenador del centro (no desde casa): que carga y que `vercel.app` sigue bloqueado, para
+      confirmar que hace falta el dominio propio.
+
+## Por qué esta lista y no una prueba automática
+
+Todas las pruebas de navegador de este repositorio sustituyen el acceso a carpetas por uno de
+mentira en memoria (`pruebas/navegador.mjs` y los discos de mentira de cada fichero de prueba).
+Eso prueba bien **cómo reacciona** la aplicación a un fichero que falta, a una copia a medias o a
+un permiso perdido — pero no prueba que Dropbox, Séneca o Google **de verdad** se comporten como
+se espera. Eso solo se ve entrando de verdad, y por eso esta lista existe: no para sustituir las
+pruebas automáticas, sino para cubrir justo lo que ellas no pueden.

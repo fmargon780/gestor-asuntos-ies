@@ -482,6 +482,10 @@
      (17-sep-2026, fila 39, js/ajustes-tipo.js). */
   window.Recurrentes = {
     pintarEnContenedor: pintarEnContenedor,
-    alta: alta
+    alta: alta,
+    /* para pruebas/recurrentes.mjs (fila 69, docs/PRUEBAS-QUE-FALTAN.md, 2.3) */
+    _cargar: cargar,
+    _pendientes: pendientes,
+    _crearLosQueTocan: crearLosQueTocan
   };
 })();
