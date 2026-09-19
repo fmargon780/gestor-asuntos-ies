@@ -872,26 +872,27 @@
     var boton = $('btn-crear');
     if (!boton || boton.dataset.conCorreo) return;
     boton.dataset.conCorreo = 'si';
-    var comoEra = boton.onclick;
-    boton.onclick = async function () {
-      var item = pendiente;
-      var nombre = '';
-      var existiaAntes = true;
-      if (item && App.E.nuevo.tipo && App.E.nuevo.tercero) {
+    U.envolver('btn-crear.onclick', boton, 'onclick', 'js/bandeja-correos.js', function (comoEra) {
+      return async function () {
+        var item = pendiente;
+        var nombre = '';
+        var existiaAntes = true;
+        if (item && App.E.nuevo.tipo && App.E.nuevo.tercero) {
+          try {
+            nombre = Nombres.montar(App.datosDelFormulario());
+            existiaAntes = nombre ? await Carpetas.existe(App.E.abiertos, nombre) : true;
+          } catch (e) { nombre = ''; }
+        }
+        await comoEra.apply(this, arguments);
+        if (!item || !nombre || existiaAntes) return;
         try {
-          nombre = Nombres.montar(App.datosDelFormulario());
-          existiaAntes = nombre ? await Carpetas.existe(App.E.abiertos, nombre) : true;
-        } catch (e) { nombre = ''; }
-      }
-      await comoEra.apply(this, arguments);
-      if (!item || !nombre || existiaAntes) return;
-      try {
-        if (!(await Carpetas.existe(App.E.abiertos, nombre))) return;
-        await engancharCorreo(item, nombre);
-      } catch (e) {
-        U.aviso('El asunto está creado, pero el correo no ha podido entrar: ' + e.message, 'malo');
-      }
-    };
+          if (!(await Carpetas.existe(App.E.abiertos, nombre))) return;
+          await engancharCorreo(item, nombre);
+        } catch (e) {
+          U.aviso('El asunto está creado, pero el correo no ha podido entrar: ' + e.message, 'malo');
+        }
+      };
+    });
   }
 
   /* ==========================================================

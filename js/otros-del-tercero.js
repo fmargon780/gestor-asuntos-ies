@@ -227,13 +227,12 @@ var OtrosDelTercero = (function () {
      origen, para que el botón de vuelta no sobreviva a una navegación
      de verdad. Va aquí dentro, no en una envoltura aparte, porque
      necesita ver `saltandoDesdeAqui` directamente. */
-  if (typeof App.abrirFicha === 'function') {
-    var comoEra = App.abrirFicha;
-    App.abrirFicha = function (a, modo) {
+  U.envolver('App.abrirFicha', window.App, 'abrirFicha', 'js/otros-del-tercero.js', function (comoEra) {
+    return function (a, modo) {
       if (!saltandoDesdeAqui) origen = null;
       return comoEra(a, modo);
     };
-  }
+  });
 
   return {
     pintarEnFicha: pintarEnFicha,

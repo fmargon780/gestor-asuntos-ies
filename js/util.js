@@ -3,6 +3,48 @@
    ============================================================ */
 var U = (function () {
 
+  /* ---------- envolver, apuntado (19-sep-2026, fila 70,
+     docs/ENVOLTURAS-COMPROBADAS.md) ----------
+
+     La aplicación está construida "envolviendo" funciones: un fichero
+     se guarda la que había y la sustituye por una suya que llama a la
+     vieja por dentro (`var comoEra = App.loQueSea; App.loQueSea =
+     function () { ...; return comoEra(); };`). Funciona, pero el
+     orden de los `<script>` de index.html importa —un fichero que
+     envuelve tiene que cargarse después del que define la función— y
+     si se cuela en el sitio equivocado, la envoltura no se aplica **sin
+     que salte ningún error**: la función simplemente hace menos de lo
+     que debería.
+
+     `U.envolver` no cambia la mecánica (sigue siendo la misma
+     envoltura de siempre), solo la apunta: comprueba que la función de
+     verdad existe antes de tocarla, y si no, lo deja anotado como
+     fallo en vez de reventar o fallar en silencio. `js/envolturas-
+     esperadas.js` (cargado el último de todos) compara esta lista con
+     las que tienen que estar. */
+  var ENVOLTURAS_APLICADAS = [];
+  var ENVOLTURAS_FALLIDAS = [];
+
+  /* `etiqueta`: texto para las listas y el aviso, tal cual "App.abrirFicha"
+     o "window.Gestor.alRefrescar". `objeto`/`propiedad`: dónde vive de
+     verdad la función a envolver. `fichero`: el que hace la envoltura
+     (no el que define la función), para poder decir "revisa este
+     fichero" si falla. `fabricaNueva(comoEra)` recibe la función vieja
+     y devuelve la nueva, exactamente como hacía antes el cuerpo entre
+     `var comoEra = ...` y la reasignación. */
+  function envolver(etiqueta, objeto, propiedad, fichero, fabricaNueva) {
+    var comoEra = objeto ? objeto[propiedad] : undefined;
+    if (typeof comoEra !== 'function') {
+      ENVOLTURAS_FALLIDAS.push({ etiqueta: etiqueta, fichero: fichero });
+      return;
+    }
+    objeto[propiedad] = fabricaNueva(comoEra);
+    ENVOLTURAS_APLICADAS.push({ etiqueta: etiqueta, fichero: fichero });
+  }
+
+  function envolturasAplicadas() { return ENVOLTURAS_APLICADAS.slice(); }
+  function envolturasFallidas() { return ENVOLTURAS_FALLIDAS.slice(); }
+
   /* Quita tildes, sobra de espacios y mayúsculas. Sirve para comparar y buscar. */
   function normalizar(v) {
     return String(v === null || v === undefined ? '' : v)
@@ -486,6 +528,7 @@ var U = (function () {
     aFecha: aFecha, yaPaso: yaPaso,
     ahora: ahora, aviso: aviso, preguntar: preguntar, escapar: escapar, mensajeDeError: mensajeDeError,
     parecidos: parecidos, dejaCrear: dejaCrear, mientrasGuarda: mientrasGuarda,
-    conservandoLoEscrito: conservandoLoEscrito, menuDeAcciones: menuDeAcciones
+    conservandoLoEscrito: conservandoLoEscrito, menuDeAcciones: menuDeAcciones,
+    envolver: envolver, envolturasAplicadas: envolturasAplicadas, envolturasFallidas: envolturasFallidas
   };
 })();

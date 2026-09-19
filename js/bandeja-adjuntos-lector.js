@@ -241,24 +241,25 @@
   function engancharLlevarANuevo() {
     if (!window.Bandeja || typeof window.Bandeja.llevarANuevo !== 'function') return;
     if (window.Bandeja.llevarANuevo.__conAdjuntos) return;
-    var comoEra = window.Bandeja.llevarANuevo;
-    var nueva = async function (item) {
-      await comoEra(item);
-      var r;
-      try { r = await completado(item); } catch (e) { r = null; }
-      if (!r || (!r.tercero && !r.tipo)) return;
-      if (App.E.nuevo.tercero || App.E.nuevo.tipo) return;   /* el correo ya dejó algo puesto */
-      try {
-        if (r.tipo) App.elegirTipo(r.tipo);
-        else if (r.tercero) App.elegirCategoria(r.tercero.categoria);
-        if (r.tercero) App.fijarTercero(r.tercero);
-        App.actualizarCursoNuevo();
-        App.actualizarLimiteNuevo();
-        App.refrescarVista();
-      } catch (e) { /* la pantalla se queda tal como la dejó el correo */ }
-    };
-    nueva.__conAdjuntos = true;
-    window.Bandeja.llevarANuevo = nueva;
+    U.envolver('window.Bandeja.llevarANuevo', window.Bandeja, 'llevarANuevo', 'js/bandeja-adjuntos-lector.js', function (comoEra) {
+      var nueva = async function (item) {
+        await comoEra(item);
+        var r;
+        try { r = await completado(item); } catch (e) { r = null; }
+        if (!r || (!r.tercero && !r.tipo)) return;
+        if (App.E.nuevo.tercero || App.E.nuevo.tipo) return;   /* el correo ya dejó algo puesto */
+        try {
+          if (r.tipo) App.elegirTipo(r.tipo);
+          else if (r.tercero) App.elegirCategoria(r.tercero.categoria);
+          if (r.tercero) App.fijarTercero(r.tercero);
+          App.actualizarCursoNuevo();
+          App.actualizarLimiteNuevo();
+          App.refrescarVista();
+        } catch (e) { /* la pantalla se queda tal como la dejó el correo */ }
+      };
+      nueva.__conAdjuntos = true;
+      return nueva;
+    });
   }
   engancharLlevarANuevo();
 

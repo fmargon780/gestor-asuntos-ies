@@ -5,6 +5,42 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 19-sep-2026 — Fila 70: las envolturas, comprobadas al arrancar
+
+`docs/ENVOLTURAS-COMPROBADAS.md`, informe crítico 2.5: la aplicación está construida
+"envolviendo" funciones (`var comoEra = App.loQueSea; App.loQueSea = function () { ...; return
+comoEra(); };`), y eso descansa en que `index.html` cargue cada fichero en el orden justo. Si uno
+se cuela en el sitio equivocado, la envoltura no se aplica **sin que salte ningún error**: la
+función simplemente hace menos de lo que debería, y se descubre semanas después. El 11-sep-2026
+había 17 sitios así; hoy, 42, en 25 ficheros.
+
+**`U.envolver(etiqueta, objeto, propiedad, fichero, fabricaNueva)`** (js/util.js), nuevo: la misma
+mecánica de siempre —guarda la vieja, pone la nueva—, pero comprobando primero que la función de
+verdad existe. Si no, lo apunta como fallo en vez de fallar en silencio o reventar; si sí, lo
+apunta como aplicado. Los 42 sitios de la aplicación se han pasado por ella, uno a uno, sin
+cambiar lo que hacen (la batería completa de `npm test`, 72 ficheros de prueba, sigue en verde:
+es la red de seguridad de esta fila, tal como pedía el encargo).
+
+**`js/envolturas-esperadas.js`** (nuevo, `window.EnvolturasEsperadas`), el **último** `<script>`
+de `index.html`: trae la lista de las 42 que tienen que estar y la compara con
+`U.envolturasAplicadas()`. Si falta alguna, aviso rojo en la pantalla de entrada, con el nombre de
+cuál y qué fichero revisar; no impide entrar. La comprobación no es instantánea: se espera 1,5s y
+se repite en cada `alRefrescar`, porque una envoltura (la de `js/bandeja-correos.js`) no se aplica
+hasta después de entrar, cuando ya hay carpetas señaladas. También hay un bloque nuevo en Ajustes
+→ Mantenimiento con las 42 y su estado.
+
+**Nueva regla de código** (`docs/CONTEXTO-CORTO.md`, sección 6, y `docs/CONTEXTO.md`): un módulo
+nuevo **no envuelve**. Se engancha por un punto previsto (`window.Gestor.alRefrescar` y los que
+haya) o se le añade uno. Envolver solo si no hay más remedio, y entonces con `U.envolver`,
+apuntándolo en `js/envolturas-esperadas.js`.
+
+Se comprueba con `pruebas/envolturas.mjs`, en navegador de verdad (hace falta la aplicación
+entera cargada, con las 42 envolturas de verdad): al arrancar no sale ningún aviso; quitando una a
+mano de la lista de aplicadas, sale el aviso rojo con su nombre; envolver algo que no existe no
+revienta; y el número de `U.envolver(...)` que hay de verdad en `js/` coincide con la lista de
+`envolturas-esperadas.js` (la comprobación más útil de las cuatro: salta sola si alguien añade una
+envoltura y se olvida de apuntarla).
+
 ## 19-sep-2026 — Fila 69: las pruebas que faltan
 
 `docs/PRUEBAS-QUE-FALTAN.md`, parte 3.2 del informe crítico. Punto de partida: 70 ficheros de

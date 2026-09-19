@@ -127,9 +127,8 @@ App.pintarArchivo = function () {
    índice sí sabe, justo antes de abrirlo. "Reabrir" no hace falta
    tocarlo: `App.reabrirAsunto` ya sabía recalcular la carpeta cuando
    `a.padre` faltaba o estaba viejo (17-sep-2026, fila 45). */
-(function () {
-  var comoEra = App.verDocumentos;
-  App.verDocumentos = async function (a) {
+U.envolver('App.verDocumentos', window.App, 'verDocumentos', 'js/archivo-personas.js', function (comoEra) {
+  return async function (a) {
     if (!a.handle) {
       var resuelto = await IndiceArchivo.resolverHandle(a);
       if (!resuelto) {
@@ -142,7 +141,7 @@ App.pintarArchivo = function () {
     }
     return comoEra(a);
   };
-})();
+});
 
 $('buscar-archivo').oninput = function () { App.pintarArchivo(); };
 $('btn-recargar-archivo').onclick = function () { App.verArchivo(); };

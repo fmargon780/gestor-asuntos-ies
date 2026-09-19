@@ -70,16 +70,15 @@
     return !!(raiz && raiz.classList.contains('ficha-consulta'));
   }
 
-  (function envolverAbrirFicha() {
-    var comoEra = App.abrirFicha;
-    App.abrirFicha = function (a, modo) {
+  U.envolver('App.abrirFicha', window.App, 'abrirFicha', 'js/hitos-panel.js', function (comoEra) {
+    return function (a, modo) {
       actual = a;
       modoActual = modo || 'abierto';
       comoEra(a, modo);
       asegurarObservador();
       programarRepintado();
     };
-  })();
+  });
 
   /* Sin `subtree` (18-sep-2026, fila 58, docs/AJUSTES-DE-USO-2026-09-18.md):
      lo único que hace falta detectar aquí es un repintado ENTERO de la

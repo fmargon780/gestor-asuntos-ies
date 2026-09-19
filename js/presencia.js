@@ -245,8 +245,6 @@ window.Presencia = Presencia;
    Ahora solo repinta si la huella de quién está dentro de cada asunto
    ha cambiado de verdad, y nunca mientras el foco esté en un campo. */
 (function () {
-  if (typeof App === 'undefined' || typeof App.vigilarLaCarpeta !== 'function') return;
-  var comoEra = App.vigilarLaCarpeta;
   var ultimaHuella = null;
 
   /* Si se está escribiendo en cualquier campo, esta vuelta no toca la
@@ -259,33 +257,33 @@ window.Presencia = Presencia;
     return etiqueta === 'input' || etiqueta === 'textarea' || etiqueta === 'select';
   }
 
-  App.vigilarLaCarpeta = function () {
-    comoEra();
-    Presencia.refrescarCache().then(function () {
-      ultimaHuella = Presencia.huella();
-      if (typeof App.pintarAbiertos === 'function') App.pintarAbiertos();
-    });
-    setInterval(function () {
+  U.envolver('App.vigilarLaCarpeta', window.App, 'vigilarLaCarpeta', 'js/presencia.js', function (comoEra) {
+    return function () {
+      comoEra();
       Presencia.refrescarCache().then(function () {
-        var pantalla = document.getElementById('pantalla-abiertos');
-        if (!pantalla || pantalla.classList.contains('oculto') || typeof App.pintarAbiertos !== 'function') return;
-        if (escribiendoAhoraMismo()) return;   /* se deja la huella sin actualizar: se repinta en la siguiente vuelta */
-        var huellaAhora = Presencia.huella();
-        if (huellaAhora === ultimaHuella) return;   /* nadie ha entrado ni salido de ningún asunto */
-        ultimaHuella = huellaAhora;
-        App.pintarAbiertos();
+        ultimaHuella = Presencia.huella();
+        if (typeof App.pintarAbiertos === 'function') App.pintarAbiertos();
       });
-    }, 10 * 1000);
-  };
+      setInterval(function () {
+        Presencia.refrescarCache().then(function () {
+          var pantalla = document.getElementById('pantalla-abiertos');
+          if (!pantalla || pantalla.classList.contains('oculto') || typeof App.pintarAbiertos !== 'function') return;
+          if (escribiendoAhoraMismo()) return;   /* se deja la huella sin actualizar: se repinta en la siguiente vuelta */
+          var huellaAhora = Presencia.huella();
+          if (huellaAhora === ultimaHuella) return;   /* nadie ha entrado ni salido de ningún asunto */
+          ultimaHuella = huellaAhora;
+          App.pintarAbiertos();
+        });
+      }, 10 * 1000);
+    };
+  });
 })();
 
 /* ---------- la marca pequeña en la tarjeta de "Asuntos abiertos" ----------
 
    Solo en abierto: en el ARCHIVO nadie está "dentro" de nada. */
-(function () {
-  if (typeof App === 'undefined' || typeof App.tarjetaAsunto !== 'function') return;
-  var comoEra = App.tarjetaAsunto;
-  App.tarjetaAsunto = function (a, modo) {
+U.envolver('App.tarjetaAsunto', window.App, 'tarjetaAsunto', 'js/presencia.js', function (comoEra) {
+  return function (a, modo) {
     var div = comoEra(a, modo);
     if (modo !== 'abierto') return div;
     var quien = Presencia.ocupantePor(a.nombre);
@@ -299,7 +297,7 @@ window.Presencia = Presencia;
     nombre.insertBefore(marca, nombre.firstChild);
     return div;
   };
-})();
+});
 
 /* ---------- soltar la señal al cerrar la pestaña o salir ----------
 

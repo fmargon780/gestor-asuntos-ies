@@ -119,14 +119,13 @@
     try { await pintarPapeleraVieja(); } catch (e) { /* idem */ }
   }
 
-  (function envolverVerAbiertos() {
-    var comoEra = App.verAbiertos;
-    App.verAbiertos = async function (yaLeido) {
+  U.envolver('App.verAbiertos', window.App, 'verAbiertos', 'js/avisos-que-faltan.js', function (comoEra) {
+    return async function (yaLeido) {
       var r = await comoEra(yaLeido);
       pintarTodo();
       return r;
     };
-  })();
+  });
 
   window.AvisosQueFaltan = {
     /* para las pruebas */

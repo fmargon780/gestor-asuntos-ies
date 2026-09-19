@@ -411,17 +411,15 @@ var Hitos = (function () {
      con 'abiertoEl' y 'tipo', y esa es la única marca fiable de "esto
      acaba de nacer". Si algo falla creando los hitos, el asunto ya
      está creado: no se tumba nada por esto. */
-  (function envolverCreacion() {
-    if (typeof App === 'undefined' || typeof App.anotar !== 'function') return;
-    var comoEra = App.anotar;
-    App.anotar = async function (clave, datos) {
+  U.envolver('App.anotar', window.App, 'anotar', 'js/hitos.js', function (comoEra) {
+    return async function (clave, datos) {
       var esCreacion = !!(datos && datos.abiertoEl && datos.tipo);
       await comoEra(clave, datos);
       if (esCreacion) {
         try { await crearDesdeGuia(clave, datos.tipo); } catch (e) { /* no crítico */ }
       }
     };
-  })();
+  });
 
   return {
     FICHERO: FICHERO, RESPONSABLES_DEFECTO: RESPONSABLES_DEFECTO, PAPELES: PAPELES,

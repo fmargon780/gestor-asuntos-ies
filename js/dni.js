@@ -100,9 +100,8 @@
      columnas tal y como venían. Es lo único que dice si Séneca sacó o
      no la columna del documento. */
 
-  if (typeof Datos !== 'undefined' && typeof Datos.cargar === 'function') {
-    var comoEraCargar = Datos.cargar;
-    Datos.cargar = async function (dir, categoria) {
+  U.envolver('Datos.cargar', window.Datos, 'cargar', 'js/dni.js', function (comoEraCargar) {
+    return async function (dir, categoria) {
       var r = await comoEraCargar(dir, categoria);
       if (categoria === 'ALUMNADO' && r) {
         if (r.cabecera) cabeceraAlumnado = r.cabecera;
@@ -110,7 +109,7 @@
       }
       return r;
     };
-  }
+  });
 
   /* El buscador compara con `p.busca`, que trae el nombre y el número
      de identificación escolar. Aquí se le añade el DNI, para poder
@@ -134,25 +133,23 @@
      La pinta `App.pieAlumno`, en js/asuntos-nuevo.js, y la usan el
      buscador de Nuevo asunto y la lista de Personas y empresas. */
 
-  if (typeof App !== 'undefined' && typeof App.pieAlumno === 'function') {
-    var comoEraElPie = App.pieAlumno;
-    App.pieAlumno = function (p) {
+  U.envolver('App.pieAlumno', window.App, 'pieAlumno', 'js/dni.js', function (comoEraElPie) {
+    return function (p) {
       var texto = comoEraElPie(p);
       var doc = documentoDe(p);
       if (doc) return texto + '  ·  DNI ' + doc;
       if (faltaElDni(p)) return texto + '  ·  ' + textoDeAviso(p);
       return texto;
     };
-  }
+  });
 
   /* ---------- 2. la ficha del alumno ----------
 
      La monta `Datos.destacadosAlumno`. El DNI entra justo detrás de la
      edad, que es el dato con el que se lee. */
 
-  if (typeof Datos !== 'undefined' && typeof Datos.destacadosAlumno === 'function') {
-    var comoEraLaFicha = Datos.destacadosAlumno;
-    Datos.destacadosAlumno = function (alumno) {
+  U.envolver('Datos.destacadosAlumno', window.Datos, 'destacadosAlumno', 'js/dni.js', function (comoEraLaFicha) {
+    return function (alumno) {
       var r = comoEraLaFicha(alumno);
       var fila = null;
 
@@ -177,7 +174,7 @@
       });
       return r;
     };
-  }
+  });
 
   /* Para que lo puedan usar otros módulos y las pruebas. */
   window.Dni = {

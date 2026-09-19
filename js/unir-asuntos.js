@@ -192,14 +192,12 @@
     b.classList.remove('oculto');
   }
 
-  (function () {
-    if (typeof App.pintarAbiertos !== 'function') return;
-    var comoEra = App.pintarAbiertos;
-    App.pintarAbiertos = function () {
+  U.envolver('App.pintarAbiertos', window.App, 'pintarAbiertos', 'js/unir-asuntos.js', function (comoEra) {
+    return function () {
       comoEra();
       try { pintarAviso(); } catch (e) { /* el aviso nunca estorba */ }
     };
-  })();
+  });
 
   /* Al abrir o cerrar sesión, cambiar de asunto, etc. el aviso también
      debe repasarse: se engancha al refresco general de los módulos,

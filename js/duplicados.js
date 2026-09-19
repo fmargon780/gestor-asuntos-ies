@@ -196,13 +196,12 @@
 
   /* Se envuelve la función que repinta la vista previa, para no tener
      que tocar la pantalla de Nuevo asunto. */
-  (function () {
-    var comoEra = App.refrescarVista;
-    App.refrescarVista = function () {
+  U.envolver('App.refrescarVista', window.App, 'refrescarVista', 'js/duplicados.js', function (comoEra) {
+    return function () {
       comoEra();
       try { mirarSiYaExiste(); } catch (e) { /* el aviso nunca estorba */ }
     };
-  })();
+  });
 
   /* ============================================================
      LA PARADA AL CREAR (11-sep-2026, "que no se dupliquen los asuntos")

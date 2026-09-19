@@ -136,11 +136,12 @@
 
     /* Al cambiar de tercero o de tipo se repinta la vista previa: es
        buen momento para repasar también las sugerencias. */
-    var comoEra = App.refrescarVista;
-    App.refrescarVista = function () {
-      comoEra();
-      try { mirar(); } catch (e) { /* nunca estorba */ }
-    };
+    U.envolver('App.refrescarVista', window.App, 'refrescarVista', 'js/via-contacto.js', function (comoEra) {
+      return function () {
+        comoEra();
+        try { mirar(); } catch (e) { /* nunca estorba */ }
+      };
+    });
   })();
 
   /* ---------- en el cuadro de la vía de un asunto ya creado ----------
@@ -148,9 +149,8 @@
      El cuadro lo monta la aplicación; aquí solo se le añaden los
      botones cuando ya está en pantalla. */
 
-  (function () {
-    var comoEra = App.editarVia;
-    App.editarVia = function (a) {
+  U.envolver('App.editarVia', window.App, 'editarVia', 'js/via-contacto.js', function (comoEra) {
+    return function (a) {
       var promesa = comoEra(a);
       setTimeout(function () {
         var select = $('via-clave');
@@ -169,7 +169,7 @@
       }, 0);
       return promesa;
     };
-  })();
+  });
 
   /* ---------- dentro de "El encargo" (18-sep-2026, fila 52,
      docs/CABECERA-DEL-ASUNTO.md, 7) ----------
@@ -179,11 +179,8 @@
      se envuelve `LoPide.controles`, que es el único sitio por el que
      pasan los dos cuadros que lo usan (la ficha del asunto es el único
      que trae `persona`, así que las sugerencias solo salen ahí). */
-  (function () {
-    var comoEra = window.LoPide && LoPide.controles;
-    if (typeof comoEra !== 'function') return;
-
-    LoPide.controles = function (caja, persona, valorInicial, viaInicial) {
+  U.envolver('LoPide.controles', window.LoPide, 'controles', 'js/via-contacto.js', function (comoEra) {
+    return function (caja, persona, valorInicial, viaInicial) {
       var r = comoEra(caja, persona, valorInicial, viaInicial);
       var selVia = caja.querySelector('.lopide-via');
       var campoDato = caja.querySelector('.lopide-via-dato');
@@ -197,6 +194,6 @@
       }
       return r;
     };
-  })();
+  });
 
 })();

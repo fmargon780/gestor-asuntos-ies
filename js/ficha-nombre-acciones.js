@@ -15,18 +15,17 @@
    cada vez que la ficha se rehace entera. */
 (function () {
 
-  var comoEra = App.abrirFicha;
-  if (typeof comoEra !== 'function') return;
-
   var viendo = null;
   var modoDelAsunto = 'abierto';
 
-  App.abrirFicha = function (a, modo) {
-    viendo = a;
-    modoDelAsunto = modo || 'abierto';
-    comoEra(a, modo);
-    poner();
-  };
+  U.envolver('App.abrirFicha', window.App, 'abrirFicha', 'js/ficha-nombre-acciones.js', function (comoEra) {
+    return function (a, modo) {
+      viendo = a;
+      modoDelAsunto = modo || 'abierto';
+      comoEra(a, modo);
+      poner();
+    };
+  });
 
   async function borrarAsunto() {
     if (!window.Papelera || !viendo) return;

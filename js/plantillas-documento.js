@@ -208,17 +208,17 @@
      ========================================================== */
 
   (function () {
-    var comoEra = App.abrirFicha;
-    if (typeof comoEra !== 'function') return;
     var actual = null;
     var modoActual = 'abierto';
 
-    App.abrirFicha = function (a, modo) {
-      actual = a;
-      modoActual = modo || 'abierto';
-      comoEra(a, modo);
-      ponerBoton(a);
-    };
+    U.envolver('App.abrirFicha', window.App, 'abrirFicha', 'js/plantillas-documento.js', function (comoEra) {
+      return function (a, modo) {
+        actual = a;
+        modoActual = modo || 'abierto';
+        comoEra(a, modo);
+        ponerBoton(a);
+      };
+    });
 
     async function ponerBoton(asunto) {
       var lista = await plantillasDelAsunto(asunto);
