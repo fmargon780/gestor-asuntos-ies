@@ -419,7 +419,7 @@ esas dos funciones.
 `fusionarEn` desde siempre) se exportan también desde la fila 75
 (docs/HUECOS-ENCONTRADOS-FILA-69.md, 1): `js/unir-asuntos.js` las reutiliza para el mismo
 renombrado con sufijo cuando un documento choca de nombre al unir dos asuntos (ver "Que no se
-duplique los asuntos", más arriba), en vez de tener su propia copia de la misma cuenta.
+dupliquen los asuntos", más arriba), en vez de tener su propia copia de la misma cuenta.
 
 Se comprueba con `pruebas/archivar-fusion.mjs`, sin navegador.
 
