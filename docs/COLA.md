@@ -143,7 +143,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esta sesión |
 | 64 | `docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md` | HECHA (19-sep-2026) |
 | 66 | `docs/CONTACTO-GUARDADO-EN-LA-FICHA.md` | HECHA (19-sep-2026) |
-| 67 | `docs/LAS-CUENTAS-Y-LOS-DATOS.md` | PENDIENTE |
+| 67 | `docs/LAS-CUENTAS-Y-LOS-DATOS.md` | HECHA (19-sep-2026) |
 | 68 | `docs/AVISOS-QUE-FALTAN.md` | PENDIENTE |
 | 69 | `docs/PRUEBAS-QUE-FALTAN.md` | PENDIENTE |
 | 70 | `docs/ENVOLTURAS-COMPROBADAS.md` | PENDIENTE |
