@@ -76,7 +76,7 @@
 
   /* Se cuela justo antes de que la aplicación lea su configuración.
      Un fallo aquí no puede impedir entrar. */
-  U.envolver('App.cargarTipos', window.App, 'cargarTipos', 'js/rescate-datos.js', function (comoEra) {
+  U.envolver(App, 'App.cargarTipos', 'rescate-datos.js', function (comoEra) {
     return async function () {
       try { await rescatar(); } catch (e) { /* seguimos entrando */ }
       return comoEra.apply(this, arguments);

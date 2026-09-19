@@ -136,7 +136,7 @@
   /* Cada vez que la aplicación repinta los tipos se vuelve a ordenar y
      a filtrar. Al cambiar de categoría se limpia lo buscado, que si no
      se queda una lista vacía sin saber por qué. */
-  U.envolver('App.pintarTipos', window.App, 'pintarTipos', 'js/tipos-buscador.js', function (comoEra) {
+  U.envolver(App, 'App.pintarTipos', 'tipos-buscador.js', function (comoEra) {
     return function () {
       comoEra();
       preparar();
