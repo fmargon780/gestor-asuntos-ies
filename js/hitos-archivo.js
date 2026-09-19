@@ -318,7 +318,7 @@
     } catch (e) { return null; }
   }
 
-  U.envolver('App.cerrarAsunto', window.App, 'cerrarAsunto', 'js/hitos-archivo.js', function (comoEra) {
+  U.envolver(window.App, 'App.cerrarAsunto', 'hitos-archivo.js', function (comoEra) {
     return async function (a) {
       var clave = a.nombre;
       await comoEra(a);
@@ -343,7 +343,7 @@
     return datos.porAsunto[clave] || null;
   }
 
-  U.envolver('App.reabrirAsunto', window.App, 'reabrirAsunto', 'js/hitos-archivo.js', function (comoEra) {
+  U.envolver(window.App, 'App.reabrirAsunto', 'hitos-archivo.js', function (comoEra) {
     return async function (a) {
       var clave = a.nombre;
       var textoPrevio = null;

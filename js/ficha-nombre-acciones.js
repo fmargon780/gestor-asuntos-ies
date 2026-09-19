@@ -18,7 +18,7 @@
   var viendo = null;
   var modoDelAsunto = 'abierto';
 
-  U.envolver('App.abrirFicha', window.App, 'abrirFicha', 'js/ficha-nombre-acciones.js', function (comoEra) {
+  var nueva = U.envolver(App, 'App.abrirFicha', 'ficha-nombre-acciones.js', function (comoEra) {
     return function (a, modo) {
       viendo = a;
       modoDelAsunto = modo || 'abierto';
@@ -26,6 +26,7 @@
       poner();
     };
   });
+  if (!nueva) return;
 
   async function borrarAsunto() {
     if (!window.Papelera || !viendo) return;
