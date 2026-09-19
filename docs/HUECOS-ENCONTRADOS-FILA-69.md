@@ -1,5 +1,14 @@
 # Huecos encontrados al escribir las pruebas de la fila 69
 
+> **Resuelto en la fila 75 (19-sep-2026).** Los dos huecos de más abajo ya están cerrados: el
+> renombrado automático con " (2)" al unir con un fichero repetido, y el botón "Ocultar por hoy"
+> en los asuntos recurrentes. El detalle de cómo se hizo cada uno está en `docs/HISTORIA.md`
+> (entrada "Fila 75: los dos huecos que dejó la fila 69") y en `docs/contexto/ASUNTOS.md` (para el
+> primero). El texto original de este documento se deja tal cual, debajo, como registro de qué
+> pedía el encargo de la fila 69 y por qué se dejaron estos dos huecos sin tocar entonces.
+
+---
+
 `docs/PRUEBAS-QUE-FALTAN.md` (fila 69) pide escribir pruebas para `js/unir-asuntos.js` y
 `js/recurrentes.js` sin tocar el código de producción, salvo si el fallo es de una línea y
 evidente. Al escribir esas pruebas (`pruebas/unir-asuntos.mjs`, `pruebas/recurrentes.mjs`)
@@ -34,3 +43,7 @@ evidente dentro de esta fila. Se deja apuntado como posible fila nueva.
 Las pruebas nuevas comprueban el comportamiento **de verdad** de cada fichero, no el que describía
 el papel: `pruebas/unir-asuntos.mjs` comprueba que un choque de nombres para la unión entera sin
 mover nada, y `pruebas/recurrentes.mjs` no incluye ningún escenario de "Ocultar por hoy".
+
+*(Esta última sección describe el estado ANTES de la fila 75: desde entonces, `unir-asuntos.mjs`
+comprueba el renombrado automático y `recurrentes.mjs` sí prueba "Ocultar por hoy", con un
+`localStorage` de mentira.)*
