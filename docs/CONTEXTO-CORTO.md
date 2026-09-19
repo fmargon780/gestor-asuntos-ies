@@ -107,8 +107,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Hitos: los pasos de la guía son los hitos de un asunto abierto, con estado, fecha límite,
   responsable, bifurcaciones, documentos apuntados e historial; cada paso puede llevar "lo que
   hay que reunir" y su propio texto de correo/Séneca ("Comunicar").
-- "Qué me toca": hitos pendientes de todos los asuntos abiertos, con filtro por responsable, más
-  un bloque "Dormidos" (asuntos sin novedades en N días, configurable en Ajustes → El centro).
+- "Qué me toca": hitos pendientes de todos los asuntos abiertos, con filtro por responsable y un
+  bloque "Dormidos" (asuntos sin novedades en N días). "Cuentas": asuntos por tipo, mes y quién
+  los pidió.
 - Avisos de "fichas sin carpeta" y de la papelera vieja también en Asuntos abiertos, no solo
   entrando a propósito en Ajustes.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".

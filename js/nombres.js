@@ -219,6 +219,25 @@ var Nombres = (function () {
     return U.limpiarNombre(t);
   }
 
+  /* Lo mismo que quita terceroDeResto, pero capturándolo en vez de
+     descartarlo: el año académico y el grupo que vengan delante del
+     tercero, si vienen. Lo que no se reconozca se deja en blanco, nada
+     se inventa. Estaba duplicada en js/archivo-indice.js (fila 44); se
+     saca aquí en la fila 74 (docs/CUENTAS-DE-FIN-DE-CURSO.md) porque
+     también hace falta para los asuntos ABIERTOS, que no pasan por el
+     índice del archivo. */
+  var RE_CURSO_RESTO = /^(\d{2}[-\/]\d{2})\s+/;
+  var RE_GRUPO_RESTO = /^(\d[ºo°](?:Bach|FP|Div)?[A-Za-z]?)\s+/i;
+  function cursoYGrupoDeResto(resto) {
+    var t = String(resto || '');
+    var curso = '', grupo = '';
+    var m1 = t.match(RE_CURSO_RESTO);
+    if (m1) { curso = m1[1]; t = t.slice(m1[0].length); }
+    var m2 = t.match(RE_GRUPO_RESTO);
+    if (m2) grupo = m2[1];
+    return { curso: curso, grupo: grupo };
+  }
+
   /* Del personal se ponen los CUATRO ÚLTIMOS CARACTERES del documento,
      con la letra incluida: 12345678Z -> 678Z, X1234567L -> 567L.
      Lo pidió Francisco el 7-sep-2026: con la letra el dato identifica
@@ -352,6 +371,7 @@ var Nombres = (function () {
     codigoRegistro: codigoRegistro, montarDocumento: montarDocumento,
     extensionDe: extensionDe,
     terceroAlumno: terceroAlumno, terceroDeResto: terceroDeResto,
+    cursoYGrupoDeResto: cursoYGrupoDeResto,
     terceroPersonal: terceroPersonal, terceroEmpresa: terceroEmpresa
   };
 })();
