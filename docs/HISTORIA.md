@@ -5,6 +5,47 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 19-sep-2026 — Fila 66: el contacto del tercero, guardado en la ficha
+
+Problema de septiembre de 2027, no de hoy (`docs/CONTACTO-GUARDADO-EN-LA-FICHA.md`, del informe
+crítico, parte 4.8): cuando se baje el `RegAlum.csv` del curso siguiente, el alumnado que ya no
+esté en el centro desaparece del fichero, y un asunto suyo que siguiera abierto se quedaría sin
+teléfono, sin correo y sin tutores legales, con la carpeta ahí pero sin forma de contactar. Igual
+con el personal que se traslada.
+
+**`js/datos.js` gana `Datos.fotoDeContacto(persona, categoria)`** (guarda, de una persona ya
+encontrada en el CSV, solo lo que de verdad se mira: nombre, documento, Nº de identificación
+escolar, grupo/curso, fecha de nacimiento, puesto, y de sus `campos` solo las columnas de
+tutor/familia, teléfono, correo, domicilio, cuenta o documento —los mismos patrones que ya usaban
+`destacadosAlumno`/`tutoresDe`/`telefonoPropio`/`js/dni.js` para encontrarlas por el título—, más
+de qué fichero y de qué fecha) **y `Datos.personaDesdeFoto(contacto, categoria)`** (el camino de
+vuelta: una "persona" con la misma forma que el CSV, para que toda la pintura de siempre la acepte
+sin saber de dónde ha salido, marcada con `.foto = true`).
+
+`js/ficha-tercero.js` (`buscarPersona`) y `js/via-contacto.js` (`filasDeContacto`, en el cuadro de
+la vía de un asunto ya existente) siguen ahora la cascada del encargo: 1) el CSV de hoy, que manda
+si está; 2) si no, `ficha.contacto`; 3) si tampoco, sin datos, como siempre. Los buscadores de alta
+no la llevan a propósito: ahí interesa el CSV de verdad, nunca una foto vieja. Cuando la persona
+viene de una foto, la ficha avisa con una línea gris ("Datos guardados el ... ; esta persona ya no
+está en RegAlum.csv").
+
+La foto se guarda sola al crear un asunto (`js/asuntos-nuevo.js`, si se cogió un tercero del CSV o
+se acaba de dar de alta). Para los asuntos de antes de esta fila, botón nuevo **"Guardar el
+contacto de los asuntos abiertos"** en Ajustes → Mantenimiento (`js/contacto-migracion.js`, mismo
+patrón que "Poner en orden las fichas del ARCHIVO" de la fila 64): recorre los abiertos sin
+`contacto`, busca a cada tercero en el CSV de hoy y rellena el que encuentra. **Hay que pulsarlo
+antes de que acabe este curso**: después de septiembre de 2027 ya no habrá de dónde sacarlo.
+
+De paso, 2.4 del encargo: `solicitantes.csv` ganó la columna **"Curso de alta"** (la rellena sola
+`Datos.anadirALista` con el curso de hoy si no se escribe), y Ajustes → Centro ofrece un botón para
+apartar (nunca borrar) a `solicitantes-anteriores.csv` los que sean de un curso distinto del de
+hoy.
+
+Se comprueba con `pruebas/contacto-guardado.mjs` (sin navegador, seis bloques): crear guarda la
+foto; con el tercero en el CSV manda siempre el CSV, hasta si cambia un dato; sin el tercero en el
+CSV manda la foto con su fecha; sin foto y sin CSV, sin datos y sin romperse; el botón de rellenar
+cuenta y guarda bien sin tocar lo que no debe; y apartar solicitantes de cursos anteriores.
+
 ## 19-sep-2026 — Fila 64: la ficha de un asunto archivado, en su propia carpeta
 
 La fila más importante del informe crítico (`docs/INFORME-CRITICO-2026-09-18.md`, 1.1 y 1.3):

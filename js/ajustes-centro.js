@@ -535,6 +535,7 @@ App.pintarFicherosDeDatos = async function () {
       estado.appendChild(App.filaEstado('solicitantes.csv',
         alumnado.solicitantes + ' dados de alta a mano, todavía sin matricular'));
     }
+    await App.pintarSolicitantesAnteriores(estado);
   }
   var personal = await Datos.cargar(App.E.datos, 'PERSONAL');
   if (!personal.ficheros.length) {
@@ -555,6 +556,49 @@ App.pintarFicherosDeDatos = async function () {
     var l = await Datos.cargar(App.E.datos, cat);
     estado.appendChild(App.filaEstado(Datos.LISTAS[cat].fichero, l.lista.length + ' fichas'));
   }
+};
+
+/* ---------- solicitantes de cursos anteriores (19-sep-2026, fila 66,
+   docs/CONTACTO-GUARDADO-EN-LA-FICHA.md, 2.4) ----------
+
+   `solicitantes.csv` no se limpia solo: arrastraría a todos los
+   aspirantes de todos los cursos. Aquí se dice cuántos son de un curso
+   que no es el de hoy, y se dejan apartar (no borrar) a
+   `solicitantes-anteriores.csv`. */
+App.pintarSolicitantesAnteriores = async function (estado) {
+  var anteriores = await Datos.contarSolicitantesAnteriores(App.E.datos);
+  if (!anteriores) return;
+
+  var fila = document.createElement('div');
+  fila.className = 'fila-tipo';
+  var texto = document.createElement('span');
+  texto.className = 'nombre-tipo';
+  texto.textContent = 'Solicitantes de cursos anteriores';
+  var accion = document.createElement('span');
+  accion.className = 'suave';
+  accion.appendChild(document.createTextNode(
+    anteriores + (anteriores === 1 ? ' de otro curso' : ' de otros cursos') + '  '));
+
+  var boton = document.createElement('button');
+  boton.type = 'button';
+  boton.className = 'boton';
+  boton.textContent = 'Apartar a solicitantes-anteriores.csv';
+  boton.onclick = async function () {
+    var ok = await U.preguntar('Apartar solicitantes de cursos anteriores',
+      '<p>Se van a mover ' + anteriores + (anteriores === 1 ? ' solicitante' : ' solicitantes') +
+      ' a <code>solicitantes-anteriores.csv</code>. No se borran, solo se apartan.</p>', 'Adelante');
+    if (!ok) return;
+    await U.mientrasGuarda(boton, async function () {
+      var n = await Datos.apartarSolicitantesAnteriores(App.E.datos);
+      U.aviso(n + (n === 1 ? ' solicitante apartado.' : ' solicitantes apartados.'), 'bueno');
+      App.pintarFicherosDeDatos();
+    });
+  };
+  accion.appendChild(boton);
+
+  fila.appendChild(texto);
+  fila.appendChild(accion);
+  estado.appendChild(fila);
 };
 
 /* ---------- Sello y firma en el papel (18-sep-2026, fila 57,

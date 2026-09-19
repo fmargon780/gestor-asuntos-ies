@@ -21,34 +21,46 @@
 
      La misma cascada de siempre: el nombre suele llevar pegado el
      número de identificación o el NIF, y a veces el año académico. */
+  /* El orden de la fila 66 (docs/CONTACTO-GUARDADO-EN-LA-FICHA.md, 2.2):
+     1) el CSV, como siempre, que es el dato más fresco; 2) si no está,
+     `ficha.contacto`, la foto guardada al crear el asunto; 3) si
+     tampoco hay eso, sin datos, como hasta ahora. */
   async function buscarPersona(a) {
     var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
     var quien = (a.ficha && a.ficha.tercero) || (a.leido && a.leido.resto) || '';
+    var contacto = a.ficha && a.ficha.contacto;
 
-    if (!categoria || !quien || !App.E.datos) {
+    if (!categoria || !quien) {
       return { categoria: categoria, persona: null,
                aviso: 'Este asunto no dice a qué tercero pertenece.' };
     }
 
-    try {
-      var fuente = await Datos.cargar(App.E.datos, categoria);
-      var encontrados = Datos.buscar(fuente.lista, quien, 1);
-      if (!encontrados.length) {
-        encontrados = Datos.buscar(fuente.lista, quien.replace(/[\s\d]+$/, ''), 1);
+    if (App.E.datos) {
+      try {
+        var fuente = await Datos.cargar(App.E.datos, categoria);
+        var encontrados = Datos.buscar(fuente.lista, quien, 1);
+        if (!encontrados.length) {
+          encontrados = Datos.buscar(fuente.lista, quien.replace(/[\s\d]+$/, ''), 1);
+        }
+        if (!encontrados.length) {
+          var corto = quien.replace(/\b\d{2}-\d{2}\b/, '').replace(/\s+\S*\d\S*\s*$/, '').trim();
+          if (corto) encontrados = Datos.buscar(fuente.lista, corto, 1);
+        }
+        if (encontrados.length) return { categoria: categoria, persona: encontrados[0] };
+      } catch (e) {
+        if (!contacto) {
+          return { categoria: categoria, persona: null,
+                   aviso: 'No he podido leer el fichero de datos: ' + e.message };
+        }
       }
-      if (!encontrados.length) {
-        var corto = quien.replace(/\b\d{2}-\d{2}\b/, '').replace(/\s+\S*\d\S*\s*$/, '').trim();
-        if (corto) encontrados = Datos.buscar(fuente.lista, corto, 1);
-      }
-      if (!encontrados.length) {
-        return { categoria: categoria, persona: null,
-                 aviso: quien + ' no aparece en el fichero de ' + categoria + '.' };
-      }
-      return { categoria: categoria, persona: encontrados[0] };
-    } catch (e) {
-      return { categoria: categoria, persona: null,
-               aviso: 'No he podido leer el fichero de datos: ' + e.message };
     }
+
+    if (contacto) {
+      return { categoria: categoria, persona: Datos.personaDesdeFoto(contacto, categoria) };
+    }
+
+    return { categoria: categoria, persona: null,
+             aviso: quien + ' no aparece en el fichero de ' + categoria + '.' };
   }
 
   /* ---------- copiar al pulsar ----------
@@ -125,6 +137,26 @@
            '</section>';
   }
 
+  var MESES_LARGOS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
+                       'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+  /* AAAA-MM-DD -> "5 de septiembre de 2026", para el aviso de que los
+     datos son una foto guardada, no de hoy. */
+  function fechaLargaDeIso(iso) {
+    var p = String(iso || '').split('-');
+    if (p.length !== 3) return iso || '';
+    var y = parseInt(p[0], 10), m = parseInt(p[1], 10), d = parseInt(p[2], 10);
+    if (!y || !m || !d || m < 1 || m > 12) return iso || '';
+    return d + ' de ' + MESES_LARGOS[m - 1] + ' de ' + y;
+  }
+
+  function avisoDeFotoHtml(persona) {
+    if (!persona || !persona.foto) return '';
+    return '<p class="tercero-detalle">Datos guardados el ' +
+      U.escapar(fechaLargaDeIso(persona.fotoFecha)) +
+      '; esta persona ya no está en ' + U.escapar(persona.fotoFichero || 'el fichero') + '.</p>';
+  }
+
   function montarLinea(caja, persona, categoria, resumen) {
     caja.innerHTML =
       '<section class="ficha-bloque">' +
@@ -143,6 +175,7 @@
         '</div>' +
         (resumen.grupo && resumen.grupo.detalle
           ? '<p class="tercero-detalle">' + U.escapar(resumen.grupo.detalle) + '</p>' : '') +
+        avisoDeFotoHtml(persona) +
       '</section>';
 
     var huecoTel = document.getElementById('tercero-telefono-hueco');
@@ -362,6 +395,11 @@
              resumen: Datos.resumenDeTercero(r.persona, r.categoria) };
   }
 
-  window.FichaTercero = { pintarLinea: pintarLinea, datosBasicos: datosBasicos };
+  window.FichaTercero = {
+    pintarLinea: pintarLinea, datosBasicos: datosBasicos,
+    /* para las pruebas: la cascada CSV -> ficha.contacto -> nada, sin
+       tener que montar un DOM entero para leer el resultado. */
+    _buscarPersona: buscarPersona
+  };
 
 })();

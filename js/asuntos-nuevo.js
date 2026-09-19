@@ -559,6 +559,13 @@ $('btn-crear').onclick = async function () {
       abiertoEl: U.ahora(), abiertoPor: App.E.usuario
     };
     if (d.loPide) datosNuevoAsunto.loPide = d.loPide;
+    /* La foto del contacto (fila 66, docs/CONTACTO-GUARDADO-EN-LA-
+       FICHA.md): se guarda solo si el tercero se ha cogido del CSV
+       (App.E.nuevo.tercero), nunca para uno dado de alta a mano sin
+       ese paso. Sirve para el día en que ya no esté en el fichero. */
+    if (App.E.nuevo.tercero) {
+      datosNuevoAsunto.contacto = Datos.fotoDeContacto(App.E.nuevo.tercero, App.E.nuevo.categoria);
+    }
     await App.anotar(nombre, datosNuevoAsunto);
 
     /* Si el asunto se ha empezado desde un documento suelto, ese

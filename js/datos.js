@@ -480,7 +480,8 @@ var Datos = (function () {
        educativo andaluz), los que no, lo tendrán al matricularse. */
     ALUMNADO: { fichero: 'solicitantes.csv',
                 cabecera: ['Nombre', 'Documento de identidad', 'Nº Id. Escolar',
-                           'Fecha de nacimiento', 'Teléfono de contacto', 'Correo de contacto'] },
+                           'Fecha de nacimiento', 'Teléfono de contacto', 'Correo de contacto',
+                           'Curso de alta'] },
     PERSONAL: { fichero: 'personal.csv',
                 cabecera: ['Nombre', 'Documento', 'Puesto', 'Teléfono', 'Correo'] },
     /* El nombre comercial es el rótulo del negocio, que muchas veces no
@@ -563,9 +564,15 @@ var Datos = (function () {
     return CACHE[clave];
   }
 
-  /* Da de alta un tercero nuevo y lo escribe en su CSV. */
+  /* Da de alta un tercero nuevo y lo escribe en su CSV. Un solicitante
+     (categoría ALUMNADO) se marca con el curso de hoy, aunque quien lo
+     dé de alta no lo escriba: así se puede saber más adelante de qué
+     curso es, sin preguntárselo a nadie (fila 66, 2.4). */
   async function anadirALista(dirDatos, categoria, valores) {
     var def = LISTAS[categoria];
+    if (categoria === 'ALUMNADO' && !valores['Curso de alta']) {
+      valores = Object.assign({}, valores, { 'Curso de alta': U.cursoActual() });
+    }
     var clave = (categoria === 'PERSONAL' || categoria === 'ALUMNADO')
       ? categoria + '_MANUAL' : categoria;
     var actual = await cargarLista(dirDatos, categoria, clave);
@@ -968,12 +975,130 @@ var Datos = (function () {
     return r;
   }
 
+  /* ---------- la foto del contacto, para cuando el tercero ya no está
+     en el CSV (19-sep-2026, fila 66, docs/CONTACTO-GUARDADO-EN-LA-
+     FICHA.md) ----------
+
+     Solo las columnas que de verdad se miran: las mismas que ya buscan
+     por título `destacadosAlumno`, `destacadosPersona`, `tutoresDe`,
+     `telefonoPropio` y `js/dni.js` (tutor/familia, teléfono, correo,
+     domicilio, cuenta y documento de identidad). Nada de columnas que
+     no se consultan nunca, y nada del CSV entero. */
+  var CAMPO_UTIL = /tutor|padre|madre|responsable|familia|telefono|movil|correo|e-?mail|domicilio|direccion|localidad|cuenta|dni\b|nif\b|nie\b|documento|identidad|pasaporte/;
+
+  function ficheroDeCategoria(categoria) {
+    if (categoria === 'ALUMNADO') return 'RegAlum.csv';
+    if (categoria === 'PERSONAL') return 'RelPerCen.csv';
+    return String(categoria || '') + '.csv';
+  }
+
+  /* Datos.fotoDeContacto(persona, categoria) -> un bloque pequeño para
+     guardar en `ficha.contacto` al crear un asunto: lo justo para
+     poder seguir trabajando el día que esta persona ya no esté en el
+     fichero de Séneca. */
+  function fotoDeContacto(persona, categoria) {
+    if (!persona) return null;
+    var origen = persona.campos || {};
+    var campos = {};
+    Object.keys(origen).forEach(function (clave) {
+      if (CAMPO_UTIL.test(U.normalizar(clave))) campos[clave] = origen[clave];
+    });
+    return {
+      nombre: persona.nombre || '',
+      documento: persona.documento || '',
+      id: persona.id || '',
+      unidad: persona.unidad || '',
+      curso: persona.curso || '',
+      fechaNac: persona.fechaNac || '',
+      puesto: persona.puesto || '',
+      cursoUltimo: persona.cursoUltimo || '',
+      comercial: persona.comercial || '',
+      referencia: persona.referencia || '',
+      nif: persona.nif || '',
+      campos: campos,
+      fichero: ficheroDeCategoria(categoria),
+      fecha: U.hoyIso()
+    };
+  }
+
+  /* Datos.personaDesdeFoto(contacto, categoria) -> una "persona" como
+     las que devuelve el CSV, pero hecha con lo guardado en
+     `ficha.contacto`. Vale para las mismas funciones de siempre
+     (`destacadosAlumno`, `tutoresDe`, `resumenDeTercero`,
+     `telefonoPropio`, `window.Dni`), así que la ventana "Ver todo" no
+     necesita saber de dónde ha salido. Lleva `.foto = true` para que
+     quien la pinte pueda avisar de que son datos guardados, no de hoy. */
+  function personaDesdeFoto(contacto, categoria) {
+    if (!contacto) return null;
+    return {
+      nombre: contacto.nombre || '', documento: contacto.documento || '',
+      id: contacto.id || '', unidad: contacto.unidad || '', curso: contacto.curso || '',
+      fechaNac: contacto.fechaNac || '', matriculado: false, solicitante: false,
+      anoUltima: 0, unidadUltima: '', cursoUltima: '',
+      puesto: contacto.puesto || '', enElCentro: false, esteCurso: false,
+      cursoUltimo: contacto.cursoUltimo || '', cursos: [],
+      comercial: contacto.comercial || '', referencia: contacto.referencia || '',
+      nif: contacto.nif || '', campos: contacto.campos || {}, categoria: categoria,
+      foto: true, fotoFecha: contacto.fecha || '', fotoFichero: contacto.fichero || ''
+    };
+  }
+
+  /* ---------- los solicitantes de cursos anteriores (fila 66, 2.4)
+     ----------
+
+     `solicitantes.csv` no se limpia nunca solo: arrastraría a todos los
+     aspirantes de todos los cursos. Se apartan (no se borran) a
+     `solicitantes-anteriores.csv` los que se dieron de alta en un curso
+     que no es el de hoy. */
+  var FICHERO_SOLICITANTES_ANTERIORES = 'solicitantes-anteriores.csv';
+
+  function esDeCursoAnterior(campos) {
+    var curso = String((campos && campos['Curso de alta']) || '').trim();
+    return curso !== '' && curso !== U.cursoActual();
+  }
+
+  async function contarSolicitantesAnteriores(dirDatos) {
+    var actual = await cargarLista(dirDatos, 'ALUMNADO', 'ALUMNADO_MANUAL');
+    return actual.lista.filter(function (p) { return esDeCursoAnterior(p.campos); }).length;
+  }
+
+  async function apartarSolicitantesAnteriores(dirDatos) {
+    var def = LISTAS.ALUMNADO;
+    var clave = 'ALUMNADO_MANUAL';
+    var actual = await cargarLista(dirDatos, 'ALUMNADO', clave);
+    var quedan = [], apartados = [];
+    actual.lista.forEach(function (p) {
+      (esDeCursoAnterior(p.campos) ? apartados : quedan).push(p);
+    });
+    if (!apartados.length) return 0;
+
+    var filasQuedan = quedan.map(function (p) {
+      return def.cabecera.map(function (c) { return p.campos[c] || ''; });
+    });
+    await Carpetas.escribirTexto(dirDatos, def.fichero, aCsv(def.cabecera, filasQuedan));
+
+    var textoAnteriores = await Carpetas.leerTexto(dirDatos, FICHERO_SOLICITANTES_ANTERIORES);
+    var filasAnteriores = textoAnteriores ? aTabla(textoAnteriores).filas.slice(1) : [];
+    apartados.forEach(function (p) {
+      filasAnteriores.push(def.cabecera.map(function (c) { return p.campos[c] || ''; }));
+    });
+    await Carpetas.escribirTexto(dirDatos, FICHERO_SOLICITANTES_ANTERIORES,
+      aCsv(def.cabecera, filasAnteriores));
+
+    delete CACHE[clave];
+    delete CACHE.ALUMNADO;
+    return apartados.length;
+  }
+
   return {
     aTabla: aTabla, aCsv: aCsv, cargar: cargar, anadirALista: anadirALista,
     buscar: buscar, olvidar: olvidar, LISTAS: LISTAS,
     guardarEnLista: guardarEnLista, quitarDeLista: quitarDeLista,
     unidadesDistintas: unidadesDistintas, destacadosAlumno: destacadosAlumno,
     destacadosPersona: destacadosPersona, cursoDelFichero: cursoDelFichero,
-    tutoresDe: tutoresDe, resumenDeTercero: resumenDeTercero
+    tutoresDe: tutoresDe, resumenDeTercero: resumenDeTercero,
+    fotoDeContacto: fotoDeContacto, personaDesdeFoto: personaDesdeFoto,
+    contarSolicitantesAnteriores: contarSolicitantesAnteriores,
+    apartarSolicitantesAnteriores: apartarSolicitantesAnteriores
   };
 })();

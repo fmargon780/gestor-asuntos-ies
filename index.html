@@ -768,6 +768,12 @@
      IndiceArchivo.resolverHandle para completar una tarjeta del ARCHIVO
      que no trae manejador de carpeta). -->
 <script src="js/ficha-archivo.js"></script>
+<!-- Fila 66 (docs/CONTACTO-GUARDADO-EN-LA-FICHA.md): el botón de
+     Ajustes → Mantenimiento que rellena `ficha.contacto` en los
+     asuntos abiertos que todavía no lo tienen. Usa Datos.fotoDeContacto
+     y App.guardarRegistroFresco, así que va después de js/datos.js y
+     de js/nucleo.js (los dos cargan mucho antes). -->
+<script src="js/contacto-migracion.js"></script>
 <script src="js/hitos-requisitos.js"></script>
 <script src="js/visor.js"></script>
 <script src="js/tipos-buscador.js"></script>
