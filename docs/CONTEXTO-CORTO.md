@@ -1,17 +1,19 @@
 # Contexto corto — léelo siempre
 
 Se lee en toda conversación y en cada sesión de Claude Code. Es para **decidir**, no para
-programar: para eso está `docs/CONTEXTO.md`. El porqué de las cosas y el diario están en
-`docs/HISTORIA.md`. **Máximo 160 líneas.**
+programar: para eso está `docs/CONTEXTO.md` y sus hijos en `docs/contexto/`. El porqué de las
+cosas y el diario están en `docs/HISTORIA.md`. **Máximo 14.000 caracteres** (fila 65, 19-sep-2026:
+antes el tope era de líneas, y se esquivaba escribiendo párrafos enteros en una sola línea).
 
 ## 0. La regla que no se puede olvidar
 
 Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
 
-- Actualizar este documento y `docs/CONTEXTO.md` **sustituyendo la línea vieja, no añadiendo
-  una debajo**. Si algo deja de ser verdad, se borra.
+- Actualizar este documento y `docs/CONTEXTO.md` (o el hijo de `docs/contexto/` que toque)
+  **sustituyendo la línea vieja, no añadiendo una debajo**. Si algo deja de ser verdad, se borra.
 - Añadir a `docs/HISTORIA.md` lo que merezca recordarse, con su fecha.
-- No dejar que este documento pase de 160 líneas.
+- No dejar que este documento pase de 14.000 caracteres. La sección 5 es una línea por cosa, sin
+  números de fila ni fechas: el detalle vive en `HISTORIA.md` y en el documento de cada fila.
 
 ## 1. Lo básico
 
@@ -66,53 +68,59 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 5. Qué está hecho
 
+(Una línea por cosa. El cómo y el porqué de cada una están en `docs/contexto/` y en `HISTORIA.md`.)
+
 - Categoría → tipo → tercero → nombre de carpeta, con vista previa.
 - Estado del asunto, vía de comunicación preferente y fecha límite.
 - Asuntos recurrentes, con aviso y creación manual.
-- Buscador de tipos y de terceros (alumnado, con DNI y Nº escolar). El del ARCHIVO tiene un índice guardado (`_GESTOR/indice-archivo.json`, botón "Reconstruir el índice") y busca por palabras sueltas en cualquier orden, también en los documentos, el registro de Séneca y la ficha (fila 44, 17-sep-2026).
-- Editar un asunto abierto (renombra su carpeta); no en el ARCHIVO.
-- Nombre comercial de empresas, aparte de la razón social.
-- Cambiar los datos de un tercero dado de alta a mano.
+- Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
+  sueltas también en documentos, registro de Séneca y ficha.
+- Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
+- Nombre comercial de empresas, aparte de la razón social; cambiar los datos de un tercero dado
+  de alta a mano.
 - Guías del procedimiento por tipo, con pasos, preguntas y opciones.
 - Panel lateral de lectura, y tablón de notas rápidas siempre visible.
-- Correo y mensaje de Séneca preparados; la app no envía nada. El cuadro de Séneca va en dos columnas y ocupa el ancho (hasta 1100px), con el asunto entero (siempre el nombre de la carpeta, sin elegir una versión legible, fila 55) y su cuenta de caracteres, y dos botones numerados para copiar (fila 53, 18-sep-2026). El ayudante de Séneca comprueba de verdad que cada destinatario ha entrado (espera su sugerencia, reintenta una vez), y al final dice por su nombre quién no ha entrado (fila 54).
-- "Por clasificar": cada documento suelto se abre, se borra, crea un asunto nuevo, o entra en uno
-  que ya existe. El que se está viendo queda marcado en la lista, con sus mismas acciones también
-  dentro del visor. Encima, tras una barra "Correos sin clasificar (N)" que siempre arranca
-  plegada, vive la bandeja de Gmail (etiqueta `GESTOR`): a un asunto nuevo, adivinado o elegido a
-  mano, con el hilo enganchado (`hilos`, con la matrícula para reconocerlo desde el otro buzón
-  también); sus respuestas vuelven solas, y lo del compañero sale en gris. Cada tarjeta lee el PDF con pdf.js y **propone** (nunca decide) tipo, fecha, registro de Séneca y tercero, con palabras clave por tipo (`tipos.json`, editables en la pantalla del tipo); con tipo y tercero claros, "Aceptar" crea el asunto de un clic, reutilizando el mismo camino de "Crear asunto con él" (fila 41, 17-sep-2026). Si un documento de identidad no cuadra con nadie, sale además "Dar de alta: nombre — documento", que abre el alta ya existente con los datos escritos, nunca sola (fila 42, 17-sep-2026). Aspirantes a plaza: se dan de alta a mano en Personas (categoría Alumnado, "solicitante") con Nº de identificación escolar opcional; sin número la carpeta va solo con el nombre y "Qué me toca" avisa mientras queden pendientes; al escribirlo se renombran solas las carpetas de sus asuntos abiertos (los archivados no), y si aparece luego en RegAlum.csv con el mismo documento no se duplica. Con la barra desplegada, cada correo lee también sus adjuntos PDF (hasta 3, 5 páginas) y completa el hueco de tercero o tipo si el propio correo no los encontró, con el registro y la fecha del documento en una línea aparte ("Del documento: …"); manda siempre lo que ya dijo el correo (fila 49, 18-sep-2026).
-- "Datos y contacto" del tercero, en una sola línea (nombre, grupo o etiqueta de estado, edad, un teléfono y DNI, cada uno con su copiar) con botón "Ver todo"; los tutores legales de Séneca salen agrupados por persona, no columna a columna como antes (fila 37, 17-sep-2026). Cada línea de "Otros asuntos de este tercero" se pulsa y abre su ficha (uno del ARCHIVO, sin recorrerlo entero), con "← Volver a …" arriba para regresar al asunto de partida aunque se salte varias veces seguidas (fila 40, 17-sep-2026). La ficha del asunto va a tres columnas (Hitos · Documentos · Datos y contacto/Notas/lo plegado), con una línea gris bajo el nombre y "Otros asuntos"/"Relacionados" plegados con su cuenta (fila 51, 18-sep-2026). Su cabecera, agrupada por el momento del trámite (fila 52, 18-sep-2026): la barra queda en cinco cosas — estado (con su color), vencimiento (sustituye a "Plazo"), "El encargo" (quién lo pide y por qué vía, de una vez, con resumen debajo), "Comunicar" (Correo + Séneca, en un menú) y "Archivar"/"Reabrir"; el `<h2>` del nombre lleva, debajo, la fila de copiar de un gesto (Asunto, NIE, Nombre, DNI/CIF, sin menú, fila 58) y un menú de tres puntos (Editar, Borrar), con `js/ficha-menus.js` como menú pequeño reutilizable.
-- Registrar un documento: si el PDF sellado ya está en la carpeta (bajado de Séneca), la ficha lo detecta sola, lo renombra y conserva el original como "SIN SELLAR" en vez de mandarlo a la papelera; cada documento puede además "Asociar a un hito" a mano (fila 58, 18-sep-2026).
-- Terceros relacionados con un asunto, con nota (no copia) al archivar; "+ Añadir varios" señala de golpe (atajos de alumnado por unidad/nivel/enseñanza, grupos propios en `_GESTOR/grupos.json` desde Ajustes), y esos mismos grupos ponen los destinatarios de un correo (copia oculta) y de un mensaje de Séneca (usuario IdEA, en chips, con "Copiar la lista"/"el siguiente" y un ayudante-marcador).
-- Parada al crear un asunto duplicado, y pantalla propia "Duplicados" para los ya existentes.
-- Ajustes tiene tres pestañas (Tipos de asunto · El centro · Mantenimiento). Pulsar una tarjeta de tipo abre su pantalla propia, entera y a dos columnas, con sus ocho secciones a la vista sin plegar: Datos del tipo, Campos, Pasos del trámite, Palabras clave, Plantillas de correo y de Séneca, Plantilla de documento de Word, Plazo y Se repite (fila 39, 17-sep-2026; Palabras clave, fila 41). Dentro, pestañas por categoría, buscador cruzado, aviso en vivo de nombres repetidos.
-- Campos propios por tipo de asunto, rellenos solos al crear. La sección Campos de un tipo se queda corta (solo los campos ya puestos) con un botón "+ Añadir campo" que abre un panel de tres pestañas (De la ficha · Míos · Calculados); Francisco puede crear campos calculados con seis operaciones (quitar caracteres, partir, tabla de equivalencias, juntar dos campos, sacar un dato de una fecha) y vista previa con una persona de verdad (fila 56, 18-sep-2026).
+- Correo y mensaje de Séneca preparados (la app nunca envía nada), en un cuadro ancho de dos
+  columnas con el asunto completo y su cuenta de caracteres; el ayudante de Séneca comprueba de
+  verdad quién ha entrado y dice por su nombre quién falta.
+- "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; encima
+  vive la bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y sus adjuntos y propone tipo,
+  fecha, registro y tercero sin decidir por su cuenta.
+- Aspirantes a plaza dados de alta sin Nº de identificación escolar: al escribirlo, se renombran
+  solas las carpetas de sus asuntos abiertos.
+- Ficha del tercero con "Datos y contacto" en una línea, cada dato con su copiar; ficha del
+  asunto a tres columnas, con cabecera agrupada por el momento del trámite y menú de tres puntos.
+- Registrar un documento detecta el PDF ya sellado, lo renombra y guarda el original como
+  "SIN SELLAR"; cada documento se puede asociar a un hito.
+- Terceros relacionados con un asunto, con altas por grupo (unidad, nivel, grupo propio), que
+  también sirven de destinatarios de un correo o de un mensaje de Séneca.
+- Parada al crear un asunto duplicado, y pantalla propia "Duplicados".
+- Ajustes con tres pestañas; pantalla propia de cada tipo, con sus ocho secciones a la vista.
+- Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
 - Papelera: nada se borra del todo a la primera.
-- Mandar documentos de un asunto por correo: se marcan en el cuadro "Correo" y el script de Apps
-  Script deja un borrador en Gmail (nunca envía), con tarjeta "Borrador en camino".
-- Plantillas de correo y de mensaje de Séneca, por tipo de asunto, con huecos que se rellenan
-  solos; la firma y el centro (y localidad, dirección, código, cargo) se editan en Ajustes.
-- Al escribir una plantilla, el botón "Insertar hueco" abre un buscador y el hueco entra donde esté el cursor; ya no hay un muro de treinta botones tapando el formulario.
-- Plantillas de documento de Word por tipo de asunto: botón "Generar documento" en la ficha que
-  saca una copia ya rellena y guardada en la carpeta del asunto, sin preguntar nada.
+- Mandar documentos de un asunto por correo, con un borrador que deja Apps Script en Gmail.
+- Plantillas de correo, de mensaje de Séneca y de documento de Word por tipo de asunto, con
+  huecos que se rellenan solos.
 - Copias de seguridad diarias, detección de fichero roto, fusión de conflictos de Dropbox.
 - Pruebas automáticas en GitHub Actions en cada subida.
-- Escape y botón de salida en toda pantalla; copiar el nombre de un relacionado en orden normal; carpetas temporales de Drive/Dropbox fuera de Asuntos abiertos.
-- Hitos: los pasos de la guía SON los hitos de un asunto abierto (se crean solos al abrirlo, ya no
-  hay guía con casillas aparte), con estado, fecha límite, responsable, bifurcaciones, documentos
-  apuntados e historial. Un paso puede llevar además "lo que hay que reunir" (casillas de
-  documento/dato, con "Pedir lo que falta") y su propio texto de correo/Séneca ("Comunicar", con
-  destinatario propuesto y constancia una vez), aparte de la plantilla del tipo (filas 59-60).
-- "Qué me toca": pantalla que cruza los hitos pendientes de todos los asuntos abiertos, en tres
-  bloques (en tu tejado, esperando a otros, sin fecha), con filtro por responsable.
-- No pisarse en un asunto: si el compañero ya está dentro, se entra en modo consulta (aviso y "Tomar el mando"), con marca en la lista. Señal en `_GESTOR/presencia.json`, caduca a los 3 min; su repintado de fondo solo toca la pantalla si cambia algo de verdad, y nunca mientras se escribe.
-- Separar, Unir, Sacar páginas y **Ajustar tamaño** (llamado "Preparar el documento" hasta la fila 58) de un PDF, en la carpeta del asunto y en Por clasificar (con pdf-lib, `js/lib/pdf-lib.min.js`); miniaturas con pdf.js, tijeras entre páginas para Separar. "Ajustar tamaño" encoge las páginas para dejar libre la banda del sello de Séneca (arriba) y la de la firma del director (abajo), según lo que diga el tipo del asunto y las medidas de Ajustes → El centro; si ya hay sitio, no toca nada (fila 57, 18-sep-2026).
-- "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha (opcional), con el correo ya puesto al preparar el cuadro de Correo. Las opciones de "Tutor legal 1/2" muestran su nombre de verdad (`LoPide.datosDeTutor` descarta documento/identificación/parentesco/fecha/domicilio y arma el nombre por Apellidos + Nombre, nunca un número; fila 38).
-- Archivar o reabrir cuando el destino ya existe (de un intento a medias) fusiona las dos carpetas, sin perder nada; si la carpeta ya no está donde se esperaba pero se encuentra en el otro sitio, se da por hecho sin copiar nada y avisa en verde; si no aparece por ningún lado, avisa en ámbar pidiendo Recargar. Los errores del navegador (`NotFoundError` y compañía) salen siempre traducidos (`U.mensajeDeError`), y los temporales de sincronización (Dropbox, Drive) no se cuentan ni se copian (fila 45).
-- Guardar un documento en un asunto se queda en su ficha; solo Editar, Archivar/Reabrir y Borrar
-  vuelven a la lista. La ficha solo se repinta si algo suyo ha cambiado de verdad (fila 34).
-- La cabecera de cada pantalla se queda pegada arriba al bajar y se encoge a una sola línea, con histéresis (120/24px): un solo mecanismo compartido (`js/cabecera-fija.js` + `css/cabecera-fija.css`) para las siete pantallas (papelera usa la de Ajustes), sin temblor en pantallas cortas (compensa el alto perdido, candado de 400 ms; fila 50). En "Por clasificar", con un documento abierto, la cabecera encogida añade "Viendo: <documento>" e "Ir a su fila" (fila 46).
+- Escape y botón de salida en toda pantalla.
+- Hitos: los pasos de la guía son los hitos de un asunto abierto, con estado, fecha límite,
+  responsable, bifurcaciones, documentos apuntados e historial; cada paso puede llevar "lo que
+  hay que reunir" y su propio texto de correo/Séneca ("Comunicar").
+- "Qué me toca": hitos pendientes de todos los asuntos abiertos, en tres bloques, con filtro por
+  responsable.
+- No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
+- Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF, en la carpeta del asunto y en Por
+  clasificar; Ajustar tamaño deja libre la banda del sello de Séneca y de la firma del director.
+- "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha, con el correo ya puesto al
+  preparar el cuadro de Correo.
+- Archivar o reabrir cuando el destino ya existe fusiona las dos carpetas sin perder nada; los
+  errores del navegador salen siempre traducidos al castellano.
+- Guardar un documento en un asunto se queda en su ficha; la ficha solo se repinta si algo suyo
+  ha cambiado de verdad.
+- Cabecera de cada pantalla fija al bajar, y encogida a una sola línea sin temblar.
+- Renombrar, unir o borrar un asunto mueve también sus hitos y su señal de presencia; el registro
+  de asuntos siempre relee del disco antes de escribir, para no pisar al compañero.
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -150,10 +158,12 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ver si la bandeja de correo acierta con el tipo (si falla mucho, palabras clave por tipo), y comprobar con Séneca si Comunicaciones acepta el largo del asunto que le damos. Cuando tengan una cuenta de correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel lateral y del tablón, si las tarjetas por tipo se quedan cortas, y si el aviso de "falta el DNI" conviene también en la tarjeta del asunto; si el DNI no sale de nadie, marcar la columna del documento al generar el RegAlum.
 - Comprobar con un documento de verdad "Ajustar tamaño" (fila 57): si Séneca avisa de que invalida la firma al sellar uno ya preparado, y ajustar en Ajustes las dos medidas por defecto (1,5 y 2,5 cm) con la banda real del sello y de AutoFirma. Cuando el uso lo pida: qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta del centro (los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no se fusionan entre ordenadores, solo las altas).
-- Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN. Cambiar la dirección vieja por `https://asuntos.fmargon.com` en `docs/CONTEXTO.md` y donde más aparezca (no urgente: la vieja sigue respondiendo fuera del centro).
+- Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
 
-## 9. Cuándo leer `CONTEXTO.md` entero
+## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero
 
-Antes de tocar código: para ver cómo funciona un módulo por dentro, las tablas de ficheros,
-`_GESTOR` y columnas de CSV, las trampas técnicas, o para escribir su regla al terminar una
-instrucción de la cola.
+Antes de tocar código: `docs/CONTEXTO.md` tiene el índice, las reglas comunes y la tabla de
+ficheros; cada zona (asuntos, personas, documentos, correo y Séneca, hitos y guías, campos y
+tipos, pantalla) vive en su propio hijo dentro de `docs/contexto/`, por debajo de 40.000
+caracteres cada uno. Se lee el hijo que toque para ver cómo funciona un módulo por dentro, o para
+escribir su regla al terminar una instrucción de la cola.
