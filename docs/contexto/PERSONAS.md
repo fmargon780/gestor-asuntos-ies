@@ -99,6 +99,16 @@ documento, sin navegador) y `pruebas/aspirantes-numero.mjs` (en navegador de ver
 número, dos asuntos —uno abierto y uno archivado—, el aviso de "Qué me toca", y que al escribir el
 número solo se renombra el abierto).
 
+**Curso de alta y limpieza (19-sep-2026, fila 66, `docs/CONTACTO-GUARDADO-EN-LA-FICHA.md`, 2.4).**
+`solicitantes.csv` no se limpiaba nunca solo: arrastraba a los aspirantes de todos los cursos.
+`Datos.LISTAS.ALUMNADO.cabecera` tiene ahora una columna más, **"Curso de alta"**, que
+`Datos.anadirALista` rellena sola con `U.cursoActual()` cuando quien da de alta no la escribe (sale
+como un campo más del cuadro de alta, editable igual que los demás). En Ajustes → Centro,
+`App.pintarSolicitantesAnteriores` cuenta con `Datos.contarSolicitantesAnteriores` cuántos son de
+un curso que no es el de hoy y ofrece un botón que llama a `Datos.apartarSolicitantesAnteriores`:
+mueve esas filas a `solicitantes-anteriores.csv` y las quita de `solicitantes.csv`. **Aparta, no
+borra.**
+
 ### Dar de alta un tercero desconocido desde el documento
 
 17-sep-2026, fila 42, `docs/TERCEROS-NUEVOS-DESDE-EL-DOCUMENTO.md`. Va justo después de "Leer los
@@ -381,4 +391,53 @@ Se comprueba con `pruebas/grupos.mjs` (sin navegador: `nivelYEnsenanza`, los tre
 `combinarRelacionados`, `combinarCorreosDeGrupo`) y `pruebas/grupos-navegador.mjs` (navegador de
 verdad: un miembro perdido se conserva y se ve distinto, señalar no se pierde al cambiar de
 categoría ni de búsqueda, "Meter un grupo entero" en Relacionados, "Añadir un grupo" en Correo).
+
+### La foto del contacto en la ficha (19-sep-2026, fila 66, `docs/CONTACTO-GUARDADO-EN-LA-FICHA.md`)
+
+El problema es de septiembre de 2027, no de hoy: cuando se descargue el `RegAlum.csv` del curso
+siguiente, el alumnado que ya no esté en el centro desaparece del fichero, y un asunto suyo que
+siguiera abierto se quedaría sin teléfono, sin correo y sin tutores legales. Lo mismo con el
+personal que se traslada.
+
+**`ficha.contacto`**, un bloque pequeño y opcional dentro de la ficha de un asunto (nunca de uno
+archivado: su ficha vive en su propia carpeta desde la fila 64, y viaja entera con ella). Lo crean
+dos funciones nuevas de `js/datos.js`:
+
+- `Datos.fotoDeContacto(persona, categoria)` — de una persona ya encontrada en el CSV, guarda solo
+  lo que de verdad se mira: nombre, documento, Nº de identificación escolar, grupo/curso, fecha de
+  nacimiento, puesto, y de `persona.campos` **solo** las columnas de tutor/familia, teléfono,
+  móvil, correo, domicilio, cuenta o documento de identidad (`CAMPO_UTIL`, la misma lista de
+  patrones que ya usan `destacadosAlumno`, `tutoresDe`, `telefonoPropio` y `js/dni.js` para
+  encontrar esas columnas por el título). Nunca el CSV entero. Añade `fichero` (`RegAlum.csv` /
+  `RelPerCen.csv` / `<categoría>.csv`) y `fecha` (`U.hoyIso()`, de hoy).
+- `Datos.personaDesdeFoto(contacto, categoria)` — el camino de vuelta: reconstruye una "persona"
+  con la misma forma que devuelve el CSV (mismos nombres de campo), para que
+  `destacadosAlumno`/`destacadosPersona`/`tutoresDe`/`telefonoPropio`/`resumenDeTercero` y
+  `window.Dni` la acepten sin saber de dónde ha salido. Lleva `.foto = true`, `.fotoFecha` y
+  `.fotoFichero` para que quien la pinte pueda avisar de que son datos guardados, no de hoy.
+
+**El orden al buscar a un tercero, en `js/ficha-tercero.js` (`buscarPersona`) y en
+`js/via-contacto.js` (`filasDeContacto`, solo en el cuadro de la vía de un asunto que ya existe):**
+1) el CSV de hoy, como siempre —manda si está—; 2) si no está, `ficha.contacto` con
+`Datos.personaDesdeFoto`; 3) si tampoco hay eso, sin datos, como antes de esta fila. Los
+buscadores de alta (`asuntos-nuevo.js`, `relacionados.js`, etc.) **no** llevan este camino: ahí se
+busca en el CSV a propósito, para no dar de alta a nadie con datos viejos.
+
+`js/ficha-tercero.js` pinta, cuando la persona viene de una foto, una línea gris debajo de "Datos
+y contacto": "Datos guardados el 5 de septiembre de 2026; esta persona ya no está en
+RegAlum.csv." (`avisoDeFotoHtml`).
+
+**Cuándo se guarda la foto**: `js/asuntos-nuevo.js`, al crear el asunto, si `App.E.nuevo.tercero`
+tiene algo (se cogió del CSV o se acaba de dar de alta): `datosNuevoAsunto.contacto =
+Datos.fotoDeContacto(...)`. Los asuntos de antes de esta fila no la tienen: `js/contacto-
+migracion.js` añade el botón "Guardar el contacto de los asuntos abiertos" en Ajustes →
+Mantenimiento (mismo patrón que "Poner en orden las fichas del ARCHIVO", fila 64: un número barato
+al pintar la pestaña, el trabajo de verdad solo al desplegar o pulsar), que recorre los abiertos
+sin `contacto`, busca a cada tercero en el CSV y rellena el que encuentra, sin tocar el que ya
+tenía foto. **Hay que pulsarlo antes de que acabe este curso.**
+
+Se comprueba con `pruebas/contacto-guardado.mjs` (sin navegador): crear guarda la foto; con el
+tercero en el CSV manda el CSV, incluso si cambia un dato; sin el tercero en el CSV manda la foto,
+con su fecha y su fichero; sin foto y sin CSV, sin datos y sin romperse; el botón de rellenar
+cuenta y guarda bien, sin tocar los que ya tenían foto ni los cerrados.
 

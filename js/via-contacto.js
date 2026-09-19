@@ -26,25 +26,32 @@
   /* Las filas de contacto de un tercero, con su rótulo: "Tutor 1 ·
      Teléfono", "Correo de contacto"... Se leen del mismo fichero que
      usa la pantalla de Personas. */
-  async function filasDeContacto(categoria, quien) {
-    if (!categoria || !quien || !App.E.datos) return [];
-    try {
-      var fuente = await Datos.cargar(App.E.datos, categoria);
-      var encontrados = Datos.buscar(fuente.lista, quien, 1);
-      if (!encontrados.length) {
-        encontrados = Datos.buscar(fuente.lista, quien.replace(/[\s\d]+$/, ''), 1);
-      }
-      if (!encontrados.length) return [];
-
-      var persona = encontrados[0];
-      if (categoria === 'ALUMNADO') return Datos.destacadosAlumno(persona).destacados;
-      if (categoria === 'PERSONAL') return Datos.destacadosPersona(persona).destacados;
-      return Object.keys(persona.campos || {}).map(function (c) {
-        return { titulo: c, valor: persona.campos[c] };
-      });
-    } catch (e) {
-      return [];
+  /* `contacto` es la foto guardada en `ficha.contacto` (fila 66,
+     docs/CONTACTO-GUARDADO-EN-LA-FICHA.md): si el tercero ya no está
+     en el CSV, se usa esa foto en vez de quedarse sin nada. Solo lo
+     tiene el cuadro de la vía de un asunto que ya existe; al crear uno
+     nuevo o en "Lo pide" todavía no hay foto que mirar. */
+  async function filasDeContacto(categoria, quien, contacto) {
+    if (!categoria || !quien) return [];
+    var persona = null;
+    if (App.E.datos) {
+      try {
+        var fuente = await Datos.cargar(App.E.datos, categoria);
+        var encontrados = Datos.buscar(fuente.lista, quien, 1);
+        if (!encontrados.length) {
+          encontrados = Datos.buscar(fuente.lista, quien.replace(/[\s\d]+$/, ''), 1);
+        }
+        if (encontrados.length) persona = encontrados[0];
+      } catch (e) { persona = null; }
     }
+    if (!persona && contacto) persona = Datos.personaDesdeFoto(contacto, categoria);
+    if (!persona) return [];
+
+    if (categoria === 'ALUMNADO') return Datos.destacadosAlumno(persona).destacados;
+    if (categoria === 'PERSONAL') return Datos.destacadosPersona(persona).destacados;
+    return Object.keys(persona.campos || {}).map(function (c) {
+      return { titulo: c, valor: persona.campos[c] };
+    });
   }
 
   /* Las que valen para la vía elegida. */
@@ -87,14 +94,14 @@
     });
   }
 
-  async function refrescar(caja, campoDato, categoria, quien, via) {
+  async function refrescar(caja, campoDato, categoria, quien, via, contacto) {
     if (!caja || !campoDato) return;
     if (!via || (via !== 'TELEFONO' && via !== 'CORREO')) {
       caja.innerHTML = '';
       caja.classList.add('oculto');
       return;
     }
-    var filas = await filasDeContacto(categoria, quien);
+    var filas = await filasDeContacto(categoria, quien, contacto);
     pintarBotones(caja, paraLaVia(filas, via), campoDato);
   }
 
@@ -154,8 +161,9 @@
         var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
         var quien = (a.ficha && a.ficha.tercero) ||
                     (a.leido && a.leido.resto ? Nombres.terceroDeResto(a.leido.resto) : '');
+        var contacto = a.ficha && a.ficha.contacto;
 
-        function mirar() { refrescar(caja, campoDato, categoria, quien, select.value); }
+        function mirar() { refrescar(caja, campoDato, categoria, quien, select.value, contacto); }
         select.addEventListener('change', mirar);
         mirar();
       }, 0);
