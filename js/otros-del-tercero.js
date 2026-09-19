@@ -227,7 +227,7 @@ var OtrosDelTercero = (function () {
      origen, para que el botón de vuelta no sobreviva a una navegación
      de verdad. Va aquí dentro, no en una envoltura aparte, porque
      necesita ver `saltandoDesdeAqui` directamente. */
-  U.envolver('App.abrirFicha', window.App, 'abrirFicha', 'js/otros-del-tercero.js', function (comoEra) {
+  U.envolver(App, 'App.abrirFicha', 'otros-del-tercero.js', function (comoEra) {
     return function (a, modo) {
       if (!saltandoDesdeAqui) origen = null;
       return comoEra(a, modo);
