@@ -70,7 +70,7 @@
     return !!(raiz && raiz.classList.contains('ficha-consulta'));
   }
 
-  U.envolver('App.abrirFicha', window.App, 'abrirFicha', 'js/hitos-panel.js', function (comoEra) {
+  U.envolver(App, 'App.abrirFicha', 'hitos-panel.js', function (comoEra) {
     return function (a, modo) {
       actual = a;
       modoActual = modo || 'abierto';

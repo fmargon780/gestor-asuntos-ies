@@ -411,7 +411,7 @@ var Hitos = (function () {
      con 'abiertoEl' y 'tipo', y esa es la única marca fiable de "esto
      acaba de nacer". Si algo falla creando los hitos, el asunto ya
      está creado: no se tumba nada por esto. */
-  U.envolver('App.anotar', window.App, 'anotar', 'js/hitos.js', function (comoEra) {
+  U.envolver(window.App, 'App.anotar', 'hitos.js', function (comoEra) {
     return async function (clave, datos) {
       var esCreacion = !!(datos && datos.abiertoEl && datos.tipo);
       await comoEra(clave, datos);
