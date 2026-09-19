@@ -560,7 +560,7 @@
   (function () {
     var actual = null;
 
-    U.envolver('App.abrirFicha', window.App, 'abrirFicha', 'js/correo.js', function (comoEra) {
+    var nueva = U.envolver(App, 'App.abrirFicha', 'correo.js', function (comoEra) {
       return function (a, modo) {
         actual = a;
         modoDelAsunto = modo || 'abierto';
@@ -568,6 +568,7 @@
         poner();
       };
     });
+    if (!nueva) return;
 
     /* "Correo" y "Mensaje Séneca" se juntan en un solo botón,
        "Comunicar" (18-sep-2026, fila 52, docs/CABECERA-DEL-ASUNTO.md,

@@ -119,7 +119,7 @@
     try { await pintarPapeleraVieja(); } catch (e) { /* idem */ }
   }
 
-  U.envolver('App.verAbiertos', window.App, 'verAbiertos', 'js/avisos-que-faltan.js', function (comoEra) {
+  U.envolver(App, 'App.verAbiertos', 'avisos-que-faltan.js', function (comoEra) {
     return async function (yaLeido) {
       var r = await comoEra(yaLeido);
       pintarTodo();

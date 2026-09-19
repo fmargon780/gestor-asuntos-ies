@@ -109,7 +109,7 @@
 
   /* ---------- 1. la tarjeta de cada asunto ---------- */
 
-  U.envolver('App.tarjetaAsunto', window.App, 'tarjetaAsunto', 'js/copiar.js', function (comoEra) {
+  U.envolver(App, 'App.tarjetaAsunto', 'copiar.js', function (comoEra) {
     return function (a, modo) {
       var div = comoEra(a, modo);
       var nie = nieDeAsunto(a);
@@ -136,12 +136,13 @@
        para no tener dos caminos. Este envoltorio se queda solo con los
        documentos, que siguen llegando tarde (cuando termina de leer la
        carpeta). */
-    U.envolver('App.abrirFicha', window.App, 'abrirFicha', 'js/copiar.js', function (comoEra) {
+    var nueva = U.envolver(App, 'App.abrirFicha', 'copiar.js', function (comoEra) {
       return function (a, modo) {
         comoEra(a, modo);
         ponerEnDocumentos();
       };
     });
+    if (!nueva) return;
 
     var pantalla = document.getElementById('pantalla-asunto');
     if (pantalla && window.MutationObserver) {
@@ -179,14 +180,14 @@
     });
   }
 
-  U.envolver('App.buscarPersonas', window.App, 'buscarPersonas', 'js/copiar.js', function (comoEra) {
+  U.envolver(App, 'App.buscarPersonas', 'copiar.js', function (comoEra) {
     return function () {
       var r = comoEra.apply(this, arguments);
       ponerEnResultados(document.getElementById('lista-personas'));
       return r;
     };
   });
-  U.envolver('App.buscarTercero', window.App, 'buscarTercero', 'js/copiar.js', function (comoEra) {
+  U.envolver(App, 'App.buscarTercero', 'copiar.js', function (comoEra) {
     return function () {
       var r = comoEra.apply(this, arguments);
       Promise.resolve(r).then(function () {
@@ -198,7 +199,7 @@
 
   /* ---------- 4. la ficha del alumno, en Personas ---------- */
 
-  U.envolver('App.verFicha', window.App, 'verFicha', 'js/copiar.js', function (comoEra) {
+  U.envolver(App, 'App.verFicha', 'copiar.js', function (comoEra) {
     return function (p) {
       var r = comoEra.apply(this, arguments);
       if (!p || p.categoria !== 'ALUMNADO' || !p.id) return r;

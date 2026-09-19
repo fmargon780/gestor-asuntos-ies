@@ -239,9 +239,8 @@
      tipo, tercero, fecha, descripción) antes de que esto se ejecute.
      No se toca js/bandeja-correos.js. */
   function engancharLlevarANuevo() {
-    if (!window.Bandeja || typeof window.Bandeja.llevarANuevo !== 'function') return;
-    if (window.Bandeja.llevarANuevo.__conAdjuntos) return;
-    U.envolver('window.Bandeja.llevarANuevo', window.Bandeja, 'llevarANuevo', 'js/bandeja-adjuntos-lector.js', function (comoEra) {
+    if (window.Bandeja && window.Bandeja.llevarANuevo && window.Bandeja.llevarANuevo.__conAdjuntos) return;
+    U.envolver(window.Bandeja, 'window.Bandeja.llevarANuevo', 'bandeja-adjuntos-lector.js', function (comoEra) {
       var nueva = async function (item) {
         await comoEra(item);
         var r;
