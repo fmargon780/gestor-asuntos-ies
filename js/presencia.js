@@ -257,7 +257,7 @@ window.Presencia = Presencia;
     return etiqueta === 'input' || etiqueta === 'textarea' || etiqueta === 'select';
   }
 
-  U.envolver('App.vigilarLaCarpeta', window.App, 'vigilarLaCarpeta', 'js/presencia.js', function (comoEra) {
+  U.envolver(window.App, 'App.vigilarLaCarpeta', 'presencia.js', function (comoEra) {
     return function () {
       comoEra();
       Presencia.refrescarCache().then(function () {
@@ -282,22 +282,24 @@ window.Presencia = Presencia;
 /* ---------- la marca pequeña en la tarjeta de "Asuntos abiertos" ----------
 
    Solo en abierto: en el ARCHIVO nadie está "dentro" de nada. */
-U.envolver('App.tarjetaAsunto', window.App, 'tarjetaAsunto', 'js/presencia.js', function (comoEra) {
-  return function (a, modo) {
-    var div = comoEra(a, modo);
-    if (modo !== 'abierto') return div;
-    var quien = Presencia.ocupantePor(a.nombre);
-    if (!quien) return div;
-    var nombre = div.querySelector('.tarjeta-nombre');
-    if (!nombre) return div;
-    var marca = document.createElement('span');
-    marca.className = 'marca-presencia';
-    marca.title = quien + ' está dentro de este asunto ahora mismo';
-    marca.textContent = quien.charAt(0).toUpperCase();
-    nombre.insertBefore(marca, nombre.firstChild);
-    return div;
-  };
-});
+(function () {
+  U.envolver(window.App, 'App.tarjetaAsunto', 'presencia.js', function (comoEra) {
+    return function (a, modo) {
+      var div = comoEra(a, modo);
+      if (modo !== 'abierto') return div;
+      var quien = Presencia.ocupantePor(a.nombre);
+      if (!quien) return div;
+      var nombre = div.querySelector('.tarjeta-nombre');
+      if (!nombre) return div;
+      var marca = document.createElement('span');
+      marca.className = 'marca-presencia';
+      marca.title = quien + ' está dentro de este asunto ahora mismo';
+      marca.textContent = quien.charAt(0).toUpperCase();
+      nombre.insertBefore(marca, nombre.firstChild);
+      return div;
+    };
+  });
+})();
 
 /* ---------- soltar la señal al cerrar la pestaña o salir ----------
 

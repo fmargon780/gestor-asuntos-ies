@@ -211,7 +211,7 @@
     var actual = null;
     var modoActual = 'abierto';
 
-    U.envolver('App.abrirFicha', window.App, 'abrirFicha', 'js/plantillas-documento.js', function (comoEra) {
+    var nueva = U.envolver(App, 'App.abrirFicha', 'plantillas-documento.js', function (comoEra) {
       return function (a, modo) {
         actual = a;
         modoActual = modo || 'abierto';
@@ -219,6 +219,7 @@
         ponerBoton(a);
       };
     });
+    if (!nueva) return;
 
     async function ponerBoton(asunto) {
       var lista = await plantillasDelAsunto(asunto);
