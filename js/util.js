@@ -3,47 +3,72 @@
    ============================================================ */
 var U = (function () {
 
-  /* ---------- envolver, apuntado (19-sep-2026, fila 70,
-     docs/ENVOLTURAS-COMPROBADAS.md) ----------
+  /* ---------- envolver (19-sep-2026, fila 70, docs/ENVOLTURAS-COMPROBADAS.md) ----------
 
-     La aplicación está construida "envolviendo" funciones: un fichero
-     se guarda la que había y la sustituye por una suya que llama a la
-     vieja por dentro (`var comoEra = App.loQueSea; App.loQueSea =
-     function () { ...; return comoEra(); };`). Funciona, pero el
-     orden de los `<script>` de index.html importa —un fichero que
-     envuelve tiene que cargarse después del que define la función— y
-     si se cuela en el sitio equivocado, la envoltura no se aplica **sin
-     que salte ningún error**: la función simplemente hace menos de lo
-     que debería.
+     La aplicación se construye "envolviendo" funciones: un fichero
+     guarda la que había y la sustituye por otra suya que llama a la
+     vieja por dentro. Eso solo funciona si el fichero que envuelve se
+     carga DESPUÉS del que define la función, y hasta ahora, si el
+     orden fallaba, la envoltura no se aplicaba y no salía ningún
+     aviso.
 
-     `U.envolver` no cambia la mecánica (sigue siendo la misma
-     envoltura de siempre), solo la apunta: comprueba que la función de
-     verdad existe antes de tocarla, y si no, lo deja anotado como
-     fallo en vez de reventar o fallar en silencio. `js/envolturas-
-     esperadas.js` (cargado el último de todos) compara esta lista con
-     las que tienen que estar. */
-  var ENVOLTURAS_APLICADAS = [];
-  var ENVOLTURAS_FALLIDAS = [];
+     U.envolver(objeto, nombre, fichero, hacerNueva) hace lo mismo de
+     siempre, pero apuntado:
+       - objeto: el objeto que tiene la función (App, Datos, un
+         elemento del DOM...).
+       - nombre: el nombre completo, para que se lea en la lista
+         ("App.abrirFicha", "Datos.cargar", "boton(#btn-crear).onclick").
+         Solo se usa el trozo después del último punto para buscar la
+         función de verdad en el objeto.
+       - fichero: el fichero que envuelve (su propio nombre, a mano:
+         no hay manera fiable de adivinarlo en todos los sitios donde
+         esto se usa, incluidas las pruebas sin navegador).
+       - hacerNueva(comoEra): recibe la función de antes y devuelve la
+         nueva. Si no la devuelve (porque `comoEra` no era una función,
+         o porque `hacerNueva` falla), la envoltura queda como fallo,
+         apuntado, y NO SE TOCA `objeto[nombre]`: exactamente lo mismo
+         que pasaba antes en silencio, solo que ahora queda dicho.
 
-  /* `etiqueta`: texto para las listas y el aviso, tal cual "App.abrirFicha"
-     o "window.Gestor.alRefrescar". `objeto`/`propiedad`: dónde vive de
-     verdad la función a envolver. `fichero`: el que hace la envoltura
-     (no el que define la función), para poder decir "revisa este
-     fichero" si falla. `fabricaNueva(comoEra)` recibe la función vieja
-     y devuelve la nueva, exactamente como hacía antes el cuerpo entre
-     `var comoEra = ...` y la reasignación. */
-  function envolver(etiqueta, objeto, propiedad, fichero, fabricaNueva) {
-    var comoEra = objeto ? objeto[propiedad] : undefined;
+     Ver `js/envolturas-esperadas.js` (se carga el último de todos) y
+     Ajustes → Mantenimiento para la lista completa. */
+  var _envolturasAplicadas = [];
+  var _envolturasFallidas = [];
+
+  function envolver(objeto, nombre, fichero, hacerNueva) {
+    var prop = String(nombre || '').slice(String(nombre || '').lastIndexOf('.') + 1);
+    var comoEra = (objeto && prop) ? objeto[prop] : undefined;
     if (typeof comoEra !== 'function') {
-      ENVOLTURAS_FALLIDAS.push({ etiqueta: etiqueta, fichero: fichero });
-      return;
+      _envolturasFallidas.push({
+        nombre: nombre, fichero: fichero,
+        motivo: 'no existe "' + prop + '" en el objeto, o no es una función'
+      });
+      return undefined;
     }
-    objeto[propiedad] = fabricaNueva(comoEra);
-    ENVOLTURAS_APLICADAS.push({ etiqueta: etiqueta, fichero: fichero });
+    var nueva;
+    try {
+      nueva = hacerNueva(comoEra);
+    } catch (e) {
+      _envolturasFallidas.push({
+        nombre: nombre, fichero: fichero,
+        motivo: 'al construir la envoltura ha saltado un error: ' + ((e && e.message) || e)
+      });
+      return undefined;
+    }
+    if (typeof nueva !== 'function') {
+      _envolturasFallidas.push({
+        nombre: nombre, fichero: fichero,
+        motivo: 'lo que se iba a poner en su lugar no es una función'
+      });
+      return undefined;
+    }
+    objeto[prop] = nueva;
+    _envolturasAplicadas.push({ nombre: nombre, fichero: fichero });
+    return nueva;
   }
 
-  function envolturasAplicadas() { return ENVOLTURAS_APLICADAS.slice(); }
-  function envolturasFallidas() { return ENVOLTURAS_FALLIDAS.slice(); }
+  /* Copias, para que nadie de fuera pueda tocar las listas de verdad. */
+  function envolturasAplicadas() { return _envolturasAplicadas.slice(); }
+  function envolturasFallidas() { return _envolturasFallidas.slice(); }
 
   /* Quita tildes, sobra de espacios y mayúsculas. Sirve para comparar y buscar. */
   function normalizar(v) {

@@ -1,135 +1,140 @@
 /* ============================================================
-   envolturas-esperadas.js — la lista de las envolturas que tienen
-   que existir (19-sep-2026, fila 70, docs/ENVOLTURAS-COMPROBADAS.md).
+   envolturas-esperadas.js — la lista de las envolturas que debe
+   haber, y el aviso si falta alguna (19-sep-2026, fila 70,
+   docs/ENVOLTURAS-COMPROBADAS.md).
 
-   La aplicación está construida "envolviendo" funciones (`U.envolver`,
-   en js/util.js): un fichero se guarda la que había y la sustituye por
-   una suya que llama a la vieja por dentro. Eso descansa en que
-   index.html cargue cada fichero en el orden justo: uno que envuelve
-   tiene que ir después del que define la función, y si se cuela en el
-   sitio equivocado, la envoltura no se aplica **sin que salte ningún
-   error**.
+   Se carga EL ÚLTIMO de todos los <script> de index.html, después
+   incluso de js/inicio.js: cuando este fichero se ejecuta, todos los
+   demás ya han corrido de arriba abajo (`U.envolver` se llama al
+   cargar cada fichero, no al usarlo), así que U.envolturasAplicadas()
+   y U.envolturasFallidas() ya tienen la foto completa y no hace falta
+   esperar a nada más.
 
-   Este fichero va **el último de todos** en index.html: para cuando se
-   ejecuta, ya han corrido todos los `U.envolver` que hay. Aquí se
-   compara la lista de abajo (lo que tiene que estar) con
-   `U.envolturasAplicadas()` (lo que se ha apuntado de verdad). Si
-   falta alguna, sale un aviso rojo en la pantalla de entrada, diciendo
-   cuáles: no impide entrar (una envoltura de menos casi nunca es
-   motivo para no poder trabajar), pero avisa el mismo día en vez de
-   dos semanas después.
+   No impide entrar: una envoltura de menos casi nunca es motivo para
+   no poder trabajar (sección 3.2 del encargo). Solo avisa, en rojo,
+   en la propia pantalla de entrada, y dentro de Ajustes →
+   Mantenimiento con la lista completa.
 
-   REGLA (docs/CONTEXTO-CORTO.md, sección 6): un módulo nuevo no
-   envuelve. Se engancha por un punto previsto (`window.Gestor.
-   alRefrescar` y los que haya) o se le añade uno. Envolver solo si no
-   hay más remedio, y entonces con `U.envolver`, apuntándolo aquí. */
-var EnvolturasEsperadas = (function () {
+   Regla nueva para no crecer más sin apuntarlo aquí (sección 3.3):
+   un módulo nuevo NO envuelve. Se engancha por un punto previsto
+   (`window.Gestor.alRefrescar` y los que haya) o se le añade uno.
+   Envolver solo si no hay más remedio, y entonces con `U.envolver` y
+   apuntándolo AQUÍ, en esta misma lista. */
+(function () {
 
-  var LISTA = [
-    { etiqueta: 'App.cerrarAsunto', fichero: 'js/hitos-archivo.js' },
-    { etiqueta: 'App.reabrirAsunto', fichero: 'js/hitos-archivo.js' },
-    { etiqueta: 'App.cerrarAsunto', fichero: 'js/relacionados.js' },
-    { etiqueta: 'App.reabrirAsunto', fichero: 'js/relacionados.js' },
-    { etiqueta: 'App.verArchivo', fichero: 'js/relacionados.js' },
-    { etiqueta: 'window.Duplicados.delTercero', fichero: 'js/relacionados.js' },
-    { etiqueta: 'App.verFicha', fichero: 'js/relacionados.js' },
-    { etiqueta: 'App.cerrarAsunto', fichero: 'js/ficha-archivo.js' },
-    { etiqueta: 'App.reabrirAsunto', fichero: 'js/ficha-archivo.js' },
-    { etiqueta: 'window.Bandeja.llevarANuevo', fichero: 'js/bandeja-adjuntos-lector.js' },
-    { etiqueta: 'App.verAbiertos', fichero: 'js/avisos-que-faltan.js' },
-    { etiqueta: 'App.tarjetaSuelto', fichero: 'js/documentos-sueltos-lector.js' },
-    { etiqueta: 'App.cargarTipos', fichero: 'js/rescate-datos.js' },
-    { etiqueta: 'App.abrirFicha', fichero: 'js/ficha-nombre-acciones.js' },
-    { etiqueta: 'App.abrirFicha', fichero: 'js/hitos-panel.js' },
-    { etiqueta: 'App.pintarTipos', fichero: 'js/tipos-buscador.js' },
-    { etiqueta: 'App.abrirFicha', fichero: 'js/correo.js' },
-    { etiqueta: 'App.abrirFicha', fichero: 'js/otros-del-tercero.js' },
-    { etiqueta: 'App.refrescarVista', fichero: 'js/via-contacto.js' },
-    { etiqueta: 'App.editarVia', fichero: 'js/via-contacto.js' },
-    { etiqueta: 'LoPide.controles', fichero: 'js/via-contacto.js' },
-    { etiqueta: 'Datos.cargar', fichero: 'js/dni.js' },
-    { etiqueta: 'App.pieAlumno', fichero: 'js/dni.js' },
-    { etiqueta: 'Datos.destacadosAlumno', fichero: 'js/dni.js' },
-    { etiqueta: 'App.verAbiertos', fichero: 'js/ficha-asunto.js' },
-    { etiqueta: 'App.tarjetaAsunto', fichero: 'js/ficha-asunto.js' },
-    { etiqueta: 'App.anotar', fichero: 'js/hitos.js' },
-    { etiqueta: 'App.pintarAbiertos', fichero: 'js/unir-asuntos.js' },
-    { etiqueta: 'App.vigilarLaCarpeta', fichero: 'js/presencia.js' },
-    { etiqueta: 'App.tarjetaAsunto', fichero: 'js/presencia.js' },
-    { etiqueta: 'btn-crear.onclick', fichero: 'js/bandeja-correos.js' },
-    { etiqueta: 'App.tarjetaAsunto', fichero: 'js/puente.js' },
-    { etiqueta: 'App.tarjetaSuelto', fichero: 'js/papelera.js' },
-    { etiqueta: 'App.verFicha', fichero: 'js/papelera.js' },
-    { etiqueta: 'App.refrescarVista', fichero: 'js/duplicados.js' },
-    { etiqueta: 'App.tarjetaAsunto', fichero: 'js/copiar.js' },
-    { etiqueta: 'App.abrirFicha', fichero: 'js/copiar.js' },
-    { etiqueta: 'App.buscarPersonas', fichero: 'js/copiar.js' },
-    { etiqueta: 'App.buscarTercero', fichero: 'js/copiar.js' },
-    { etiqueta: 'App.verFicha', fichero: 'js/copiar.js' },
-    { etiqueta: 'App.verDocumentos', fichero: 'js/archivo-personas.js' },
-    { etiqueta: 'App.abrirFicha', fichero: 'js/plantillas-documento.js' }
+  /* Las 42 envolturas de hoy. `fichero` es el nombre del propio
+     fichero que envuelve (sin "js/" delante, como lo pasa cada
+     llamada a U.envolver); `nombre`, el mismo texto que se lee en
+     Ajustes → Mantenimiento. */
+  var ESPERADAS = [
+    { fichero: 'archivo-personas.js', nombre: 'App.verDocumentos' },
+    { fichero: 'avisos-que-faltan.js', nombre: 'App.verAbiertos' },
+    { fichero: 'bandeja-adjuntos-lector.js', nombre: 'window.Bandeja.llevarANuevo' },
+    { fichero: 'copiar.js', nombre: 'App.tarjetaAsunto' },
+    { fichero: 'copiar.js', nombre: 'App.abrirFicha' },
+    { fichero: 'copiar.js', nombre: 'App.buscarPersonas' },
+    { fichero: 'copiar.js', nombre: 'App.buscarTercero' },
+    { fichero: 'copiar.js', nombre: 'App.verFicha' },
+    { fichero: 'correo.js', nombre: 'App.abrirFicha' },
+    { fichero: 'dni.js', nombre: 'Datos.cargar' },
+    { fichero: 'dni.js', nombre: 'App.pieAlumno' },
+    { fichero: 'dni.js', nombre: 'Datos.destacadosAlumno' },
+    { fichero: 'documentos-sueltos-lector.js', nombre: 'App.tarjetaSuelto' },
+    { fichero: 'duplicados.js', nombre: 'App.refrescarVista' },
+    { fichero: 'duplicados.js', nombre: 'boton(#btn-crear).onclick' },
+    { fichero: 'ficha-archivo.js', nombre: 'App.cerrarAsunto' },
+    { fichero: 'ficha-archivo.js', nombre: 'App.reabrirAsunto' },
+    { fichero: 'ficha-asunto.js', nombre: 'App.verAbiertos' },
+    { fichero: 'ficha-asunto.js', nombre: 'App.tarjetaAsunto' },
+    { fichero: 'ficha-nombre-acciones.js', nombre: 'App.abrirFicha' },
+    { fichero: 'hitos-archivo.js', nombre: 'App.cerrarAsunto' },
+    { fichero: 'hitos-archivo.js', nombre: 'App.reabrirAsunto' },
+    { fichero: 'hitos-panel.js', nombre: 'App.abrirFicha' },
+    { fichero: 'hitos.js', nombre: 'App.anotar' },
+    { fichero: 'otros-del-tercero.js', nombre: 'App.abrirFicha' },
+    { fichero: 'papelera.js', nombre: 'App.tarjetaSuelto' },
+    { fichero: 'papelera.js', nombre: 'App.verFicha' },
+    { fichero: 'plantillas-documento.js', nombre: 'App.abrirFicha' },
+    { fichero: 'presencia.js', nombre: 'App.vigilarLaCarpeta' },
+    { fichero: 'presencia.js', nombre: 'App.tarjetaAsunto' },
+    { fichero: 'puente.js', nombre: 'App.tarjetaAsunto' },
+    { fichero: 'relacionados.js', nombre: 'App.cerrarAsunto' },
+    { fichero: 'relacionados.js', nombre: 'App.reabrirAsunto' },
+    { fichero: 'relacionados.js', nombre: 'App.verArchivo' },
+    { fichero: 'relacionados.js', nombre: 'window.Duplicados.delTercero' },
+    { fichero: 'relacionados.js', nombre: 'App.verFicha' },
+    { fichero: 'rescate-datos.js', nombre: 'App.cargarTipos' },
+    { fichero: 'tipos-buscador.js', nombre: 'App.pintarTipos' },
+    { fichero: 'unir-asuntos.js', nombre: 'App.pintarAbiertos' },
+    { fichero: 'via-contacto.js', nombre: 'App.refrescarVista' },
+    { fichero: 'via-contacto.js', nombre: 'App.editarVia' },
+    { fichero: 'via-contacto.js', nombre: 'LoPide.controles' }
   ];
 
-  function clave(e) { return e.etiqueta + ' (' + e.fichero + ')'; }
+  function clave(e) { return e.fichero + ' :: ' + e.nombre; }
 
-  /* Las que tenían que aplicarse y no se han apuntado: el fallo que
-     este fichero existe para no dejar pasar en silencio. */
-  function faltantes() {
-    var vistas = {};
-    U.envolturasAplicadas().forEach(function (e) { vistas[clave(e)] = true; });
-    return LISTA.filter(function (e) { return !vistas[clave(e)]; });
-  }
+  /* Compara la lista de arriba con lo que U.envolver ha apuntado de
+     verdad. Devuelve las que faltan (con el motivo, si se sabe), las
+     que sobran (aplicadas pero no apuntadas aquí: alguien se ha
+     olvidado de añadirlas a esta lista) y las dos listas de U tal
+     cual, por si hace falta el detalle completo. */
+  function comprobar() {
+    var aplicadas = (window.U && U.envolturasAplicadas) ? U.envolturasAplicadas() : [];
+    var fallidas = (window.U && U.envolturasFallidas) ? U.envolturasFallidas() : [];
 
-  /* Las que se han apuntado de verdad pero no están en esta lista:
-     alguien ha añadido una envoltura y se ha olvidado de apuntarla
-     aquí (o de quitarla de aquí al borrarla). */
-  function deMas() {
-    var esperadas = {};
-    LISTA.forEach(function (e) { esperadas[clave(e)] = true; });
-    return U.envolturasAplicadas().filter(function (e) { return !esperadas[clave(e)]; });
-  }
+    var aplicadasPorClave = {};
+    aplicadas.forEach(function (a) { aplicadasPorClave[clave(a)] = true; });
+    var fallidasPorClave = {};
+    fallidas.forEach(function (f) { fallidasPorClave[clave(f)] = f.motivo; });
 
-  /* Las que han fallado al aplicarse (la función que tenían que
-     envolver no existía): U.envolver ya las apunta como fallo, aquí
-     solo se cuentan las que además estaban en esta lista. */
-  function fallidasEsperadas() {
-    var esperadas = {};
-    LISTA.forEach(function (e) { esperadas[clave(e)] = true; });
-    return U.envolturasFallidas().filter(function (e) { return esperadas[clave(e)]; });
-  }
-
-  /* ---------- el aviso en la pantalla de entrada ---------- */
-
-  function pintarAviso() {
-    var faltan = faltantes().concat(fallidasEsperadas());
-    var contenedor = document.getElementById('paso-carpetas');
-    if (!contenedor) return;
-
-    var ya = document.getElementById('aviso-envolturas');
-    if (ya) ya.parentNode.removeChild(ya);
-    if (!faltan.length) return;
-
-    var vistas = {};
-    var unicas = faltan.filter(function (e) {
-      var k = clave(e);
-      if (vistas[k]) return false;
-      vistas[k] = true;
-      return true;
+    var faltan = [];
+    ESPERADAS.forEach(function (e) {
+      if (aplicadasPorClave[clave(e)]) return;
+      faltan.push({
+        fichero: e.fichero,
+        nombre: e.nombre,
+        motivo: fallidasPorClave[clave(e)] || 'no se ha llegado a aplicar (puede que el fichero ni se haya cargado)'
+      });
     });
 
-    var d = document.createElement('div');
-    d.id = 'aviso-envolturas';
-    d.className = 'aviso aviso-rojo';
-    d.innerHTML = '<strong>Falta' + (unicas.length === 1 ? '' : 'n') + ' ' + unicas.length +
-      ' envoltura' + (unicas.length === 1 ? '' : 's') + ' de la aplicación.</strong>' +
-      '<p>Avisa antes de seguir trabajando: alguna función no está haciendo todo lo que debería.</p>' +
-      '<ul>' + unicas.map(function (e) {
-        return '<li>' + U.escapar(e.etiqueta) + ' — revisa ' + U.escapar(e.fichero) + '</li>';
-      }).join('') + '</ul>';
-    contenedor.appendChild(d);
+    var esperadasPorClave = {};
+    ESPERADAS.forEach(function (e) { esperadasPorClave[clave(e)] = true; });
+    var sobran = aplicadas.filter(function (a) { return !esperadasPorClave[clave(a)]; });
+
+    return { esperadas: ESPERADAS, aplicadas: aplicadas, fallidas: fallidas, faltan: faltan, sobran: sobran };
   }
 
-  /* ---------- el bloque de Ajustes → Mantenimiento ---------- */
+  /* ---------- el aviso rojo de la pantalla de entrada ---------- */
+
+  function avisar() {
+    var r = comprobar();
+    var caja = document.getElementById('aviso-envolturas');
+    if (!caja) return;
+    if (!r.faltan.length) { caja.classList.add('oculto'); caja.innerHTML = ''; return; }
+
+    caja.classList.remove('oculto');
+    var U2 = window.U;
+    var escapar = (U2 && U2.escapar) ? U2.escapar : function (v) { return String(v); };
+    caja.innerHTML = '<strong>' +
+      (r.faltan.length === 1 ? 'Una envoltura no se ha aplicado.' : r.faltan.length + ' envolturas no se han aplicado.') +
+      '</strong>' +
+      '<p>Puede que algún botón o algún aviso haga menos de lo que debería. Se puede entrar y ' +
+      'seguir trabajando igual: avisa a quien lleve el código antes de que se olvide.</p>' +
+      '<ul class="lista-repetidos">' +
+      r.faltan.map(function (f) {
+        return '<li>' + escapar(f.fichero) + ' → ' + escapar(f.nombre) +
+               '<div class="suave">' + escapar(f.motivo) + '</div></li>';
+      }).join('') +
+      '</ul>';
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', avisar);
+  } else {
+    avisar();
+  }
+
+  /* ---------- Ajustes → Mantenimiento: la lista completa ---------- */
 
   function $(id) { return document.getElementById(id); }
 
@@ -143,69 +148,54 @@ var EnvolturasEsperadas = (function () {
     d.id = 'bloque-envolturas';
     d.innerHTML =
       '<summary>' +
-        '<span class="bloque-titulo">Las envolturas de la aplicación</span>' +
+        '<span class="bloque-titulo">Envolturas de la aplicación</span>' +
         '<span class="bloque-pie" id="envolturas-pie"></span>' +
       '</summary>' +
       '<div class="bloque-cuerpo">' +
-        '<p class="explica">La aplicación está hecha de módulos que se enganchan unos a otros ' +
-        '"envolviendo" funciones. El orden de los ficheros en <code>index.html</code> importa: si ' +
-        'uno se carga en el sitio equivocado, la envoltura no se aplica, y aquí sale marcada como ' +
-        'fallo en vez de perderse en silencio.</p>' +
-        '<div id="tabla-envolturas" class="lista"></div>' +
+        '<p class="explica">La aplicación se construye "envolviendo" funciones de unos ficheros ' +
+        'con otros, y eso depende del orden en que se cargan (docs/ENVOLTURAS-COMPROBADAS.md). ' +
+        'Esta lista es la comprobación de que todas las envolturas que debe haber se han ' +
+        'aplicado de verdad.</p>' +
+        '<div id="envolturas-cuerpo"></div>' +
       '</div>';
     pantalla.appendChild(d);
     return d;
   }
 
   App.pintarEnvolturas = function () {
-    bloqueDeAjustes();
-    var faltan = faltantes().concat(fallidasEsperadas());
-    var pie = $('envolturas-pie');
-    if (pie) pie.textContent = faltan.length
-      ? faltan.length + (faltan.length === 1 ? ' envoltura que falta' : ' envolturas que faltan')
-      : 'Las ' + LISTA.length + ' están aplicadas';
+    var d = bloqueDeAjustes();
+    if (!d) return;
+    var r = comprobar();
+    var U2 = window.U;
+    var escapar = (U2 && U2.escapar) ? U2.escapar : function (v) { return String(v); };
 
-    var caja = $('tabla-envolturas');
-    if (!caja) return;
-    caja.innerHTML = '';
-    var faltantesClaves = {};
-    faltan.forEach(function (e) { faltantesClaves[clave(e)] = true; });
+    $('envolturas-pie').textContent = r.faltan.length
+      ? r.faltan.length + ' de ' + r.esperadas.length + ' sin aplicar'
+      : 'las ' + r.esperadas.length + ' aplicadas';
 
-    LISTA.forEach(function (e) {
-      var falta = !!faltantesClaves[clave(e)];
-      var f = document.createElement('div');
-      f.className = 'fila-tipo';
-      f.innerHTML = '<span class="nombre-tipo">' + U.escapar(e.etiqueta) + '</span>' +
-        '<span class="suave" style="flex:1">' + U.escapar(e.fichero) + '</span>' +
-        '<span class="' + (falta ? 'tercero-falta-dni' : 'suave') + '">' +
-        (falta ? 'FALTA' : 'Aplicada') + '</span>';
-      caja.appendChild(f);
+    var cuerpo = $('envolturas-cuerpo');
+    cuerpo.innerHTML = '';
+    r.esperadas.forEach(function (e) {
+      var falta = r.faltan.filter(function (f) { return f.fichero === e.fichero && f.nombre === e.nombre; })[0];
+      var fila = document.createElement('div');
+      fila.className = 'fila-tipo';
+      fila.innerHTML =
+        '<span class="nombre-tipo">' + (falta ? '✗' : '✓') + '</span>' +
+        '<span class="suave" style="flex:1">' + escapar(e.fichero) + ' → ' + escapar(e.nombre) +
+        (falta ? '  —  ' + escapar(falta.motivo) : '') + '</span>';
+      cuerpo.appendChild(fila);
     });
-
-    var deMasLista = deMas();
-    if (deMasLista.length) {
-      var aviso = document.createElement('div');
-      aviso.className = 'explica';
-      aviso.textContent = deMasLista.length + ' envoltura' + (deMasLista.length === 1 ? '' : 's') +
-        ' aplicada' + (deMasLista.length === 1 ? '' : 's') + ' de más, sin apuntar en esta lista: ' +
-        deMasLista.map(clave).join(', ');
-      caja.appendChild(aviso);
+    if (r.sobran.length) {
+      var aviso = document.createElement('p');
+      aviso.className = 'aviso aviso-ambar';
+      aviso.textContent = r.sobran.length + ' envoltura' + (r.sobran.length === 1 ? '' : 's') +
+        ' aplicada' + (r.sobran.length === 1 ? '' : 's') + ' que no está' +
+        (r.sobran.length === 1 ? '' : 'n') + ' en esta lista: falta apuntarla' +
+        (r.sobran.length === 1 ? '' : 's') + ' en js/envolturas-esperadas.js.';
+      cuerpo.appendChild(aviso);
     }
   };
 
-  /* No se comprueba en el instante: alguna envoltura (la de
-     js/bandeja-correos.js, por ejemplo) no se aplica hasta después de
-     entrar, cuando ya hay carpetas señaladas (`arrancar()`, enganchada
-     a `window.Gestor.alRefrescar`, que se dispara tras el primer
-     `App.verAbiertos()`). Un segundo y medio es tiempo de sobra para
-     que el arranque de verdad haya terminado, y sigue siendo "el
-     mismo día", que es lo único que pide el encargo. */
-  setTimeout(pintarAviso, 1500);
-  if (window.Gestor) window.Gestor.alRefrescar.push(pintarAviso);
-
-  return {
-    LISTA: LISTA, faltantes: faltantes, deMas: deMas, fallidasEsperadas: fallidasEsperadas,
-    pintarAviso: pintarAviso
-  };
+  /* Para las pruebas y para Ajustes → Mantenimiento. */
+  window.EnvolturasEsperadas = { LISTA: ESPERADAS, comprobar: comprobar, avisar: avisar };
 })();
-window.EnvolturasEsperadas = EnvolturasEsperadas;
