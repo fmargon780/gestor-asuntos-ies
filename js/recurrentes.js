@@ -16,6 +16,28 @@
 
   var FICHERO = 'recurrentes.json';
 
+  /* "Ocultar por hoy" (fila 75, docs/HUECOS-ENCONTRADOS-FILA-69.md, 2:
+     el hueco que dejó la fila 69 entre lo que pedía el encargo de
+     avisos y lo que tenía de verdad este panel). Mismo patrón que
+     js/avisos.js: una clave de localStorage con la fecha de hoy, de
+     este ordenador, comprobada antes de pintar el panel. No cambia
+     nada de qué toca crear: solo esconde el aviso el resto del día. */
+  var CLAVE_CERRADO = 'recurrentes-cerrado-el';
+
+  function hoyParaCerrar() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') +
+           '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function cerradoHoy() {
+    try { return window.localStorage.getItem(CLAVE_CERRADO) === hoyParaCerrar(); } catch (e) { return false; }
+  }
+
+  function cerrarPorHoy() {
+    try { window.localStorage.setItem(CLAVE_CERRADO, hoyParaCerrar()); } catch (e) {}
+  }
+
   /* Cada cuánto vuelve un asunto. El día se guarda aparte. */
   var PERIODOS = [
     { clave: 'mensual',    texto: 'Cada mes' },
@@ -202,7 +224,7 @@
     var caja = $('panel-recurrentes');
     if (!caja) return;
     var toca = pendientes();
-    if (!toca.length) {
+    if (!toca.length || cerradoHoy()) {
       caja.classList.add('oculto');
       caja.innerHTML = '';
       return;
@@ -234,6 +256,12 @@
       if (pestana) pestana.click();
     };
     botones.appendChild(ver);
+
+    var ocultar = document.createElement('button');
+    ocultar.className = 'boton';
+    ocultar.textContent = 'Ocultar por hoy';
+    ocultar.onclick = function () { cerrarPorHoy(); pintarPanel(); };
+    botones.appendChild(ocultar);
 
     caja.appendChild(botones);
     caja.classList.remove('oculto');
@@ -483,9 +511,12 @@
   window.Recurrentes = {
     pintarEnContenedor: pintarEnContenedor,
     alta: alta,
-    /* para pruebas/recurrentes.mjs (fila 69, docs/PRUEBAS-QUE-FALTAN.md, 2.3) */
+    /* para pruebas/recurrentes.mjs (fila 69, docs/PRUEBAS-QUE-FALTAN.md, 2.3;
+       fila 75, docs/HUECOS-ENCONTRADOS-FILA-69.md, 2) */
     _cargar: cargar,
     _pendientes: pendientes,
-    _crearLosQueTocan: crearLosQueTocan
+    _crearLosQueTocan: crearLosQueTocan,
+    _cerradoHoy: cerradoHoy,
+    _cerrarPorHoy: cerrarPorHoy
   };
 })();

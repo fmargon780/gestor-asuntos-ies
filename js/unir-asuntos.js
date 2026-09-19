@@ -43,7 +43,7 @@
 (function () {
 
   var FICHERO_DESCARTES = 'no-duplicados.json';
-  var SEPARADOR_FIRMA = '';
+  var SEPARADOR_FIRMA = '';
 
   function $(id) { return document.getElementById(id); }
 
@@ -428,12 +428,6 @@
     return ordenado[indice] || ordenado[0];
   }
 
-  async function nombresQueChocan(seQueda, seVa) {
-    var deQueda = (await Carpetas.ficheros(seQueda.handle)).map(function (f) { return f.nombre; });
-    var deVa = (await Carpetas.ficheros(seVa.handle)).map(function (f) { return f.nombre; });
-    return deVa.filter(function (n) { return deQueda.indexOf(n) !== -1; });
-  }
-
   function fechaDeHoy() {
     var d = new Date();
     return String(d.getDate()).padStart(2, '0') + '/' +
@@ -472,42 +466,46 @@
     await AsuntoRenombrar.fusionar(seQueda.nombre, seVa.nombre);
   }
 
+  /* Un documento con el mismo nombre en las dos carpetas ya no para la
+     unión (fila 75, docs/HUECOS-ENCONTRADOS-FILA-69.md, 1: el hueco
+     que dejó la fila 69 entre lo que decía el encargo y lo que hacía
+     de verdad el código): entra con " (2)", " (3)"..., el mismo
+     patrón que ya usa Carpetas.fusionarEn al archivar sobre un
+     destino que ya existe. Se apunta cada renombrado, para avisar al
+     terminar de cuáles conviene revisar a mano. */
+  async function moverConNombreLibre(seVa, nombreFichero, seQueda, renombrados) {
+    var destino = seQueda.handle;
+    var nombreFinal = nombreFichero;
+    if (await Carpetas.existeFichero(destino, nombreFichero)) {
+      nombreFinal = await Carpetas.nombreLibreConSufijo(destino, nombreFichero);
+      renombrados.push({ de: nombreFichero, a: nombreFinal, deAsunto: seVa.nombre });
+    }
+    await Carpetas.moverFichero(seVa.handle, nombreFichero, destino, nombreFinal);
+  }
+
   async function unirAsuntos(grupo) {
     var seQueda = await elegirQuienSeQueda(grupo);
     if (!seQueda) return;
     var demas = grupo.filter(function (a) { return a.nombre !== seQueda.nombre; });
 
     try {
-      /* Nada a medias: si algún fichero choca con cualquiera de los
-         demás, se para todo antes de mover el primero. */
-      for (var i = 0; i < demas.length; i++) {
-        var chocan = await nombresQueChocan(seQueda, demas[i]);
-        if (chocan.length) {
-          await U.preguntar('No se puede unir todavía',
-            '<p>Hay ficheros con el mismo nombre en ' + U.escapar(demas[i].nombre) +
-            ' y en ' + U.escapar(seQueda.nombre) + ':</p>' +
-            '<ul class="lista-repetidos">' +
-              chocan.map(function (n) { return '<li>' + U.escapar(n) + '</li>'; }).join('') +
-            '</ul>' +
-            '<p class="nota">Cambia el nombre de alguno desde "Gestionar documentos" y ' +
-            'vuelve a intentarlo. No se ha movido ni borrado nada.</p>',
-            'Entendido', true);
-          return;
-        }
-      }
-
       var fechaTexto = fechaDeHoy();
+      var renombrados = [];
       for (var j = 0; j < demas.length; j++) {
         var seVa = demas[j];
         var ficheros = await Carpetas.ficheros(seVa.handle);
         for (var k = 0; k < ficheros.length; k++) {
-          await Carpetas.moverFichero(seVa.handle, ficheros[k].nombre, seQueda.handle);
+          await moverConNombreLibre(seVa, ficheros[k].nombre, seQueda, renombrados);
         }
         await fusionarFicha(seQueda, seVa, fechaTexto);
         await App.E.abiertos.removeEntry(seVa.nombre);
       }
 
-      U.aviso('Asuntos unidos.', 'bueno');
+      U.aviso(renombrados.length
+        ? 'Asuntos unidos. ' + renombrados.length + (renombrados.length === 1
+            ? ' documento tenía el nombre repetido: se ha guardado con "(N)" al final.'
+            : ' documentos tenían el nombre repetido: se han guardado con "(N)" al final.')
+        : 'Asuntos unidos.', 'bueno');
       await App.verAbiertos();
       /* Si se ha unido desde la pantalla de Duplicados, se sigue
          viendo esa pantalla con la lista al día: no se saca a nadie
