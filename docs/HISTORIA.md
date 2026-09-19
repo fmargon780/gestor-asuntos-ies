@@ -5,6 +5,17 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 19-sep-2026 — Fila 63: bloqueada, sin salida a internet
+
+`docs/PUBLICAR-SOLO-LA-APP.md` pide comprobar con `curl` qué sirve de verdad
+`https://gestor-de-asuntos.vercel.app` (si `docs/`, `pruebas/` y el resto del repositorio se
+publican junto con la aplicación) antes de tocar nada. Esta sesión no tiene salida a redes
+generales: el proxy de la organización rechaza la conexión (`CONNECT tunnel failed, response
+403`, confirmado también contra `www.google.com`, no solo contra Vercel). El propio encargo pide
+explícitamente no adivinar en este caso y marcar la fila bloqueada en vez de aplicar el
+`.vercelignore` sin comprobar antes si hace falta de verdad. Queda pendiente de una sesión con
+salida a internet (o de que Francisco lo compruebe él mismo y lo apunte aquí).
+
 ## 19-sep-2026 — Fila 65: documentos que quepan en una subida
 
 Arregla el método, no el código (`docs/DOCUMENTOS-QUE-QUEPAN.md`, partes 3.3 y 3.4 del informe
