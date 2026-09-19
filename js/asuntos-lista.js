@@ -594,8 +594,8 @@ App.tarjetaAsunto = function (a, modo) {
   copiar.textContent = 'Copiar nombre';
   copiar.title = 'Para pegarlo como asunto del correo';
   copiar.onclick = function () {
-    navigator.clipboard.writeText(a.nombre).then(function () {
-      U.aviso('Nombre copiado.', 'bueno');
+    U.copiar(a.nombre).then(function (ok) {
+      if (ok) U.aviso('Nombre copiado.', 'bueno');
     });
   };
   acciones.appendChild(copiar);

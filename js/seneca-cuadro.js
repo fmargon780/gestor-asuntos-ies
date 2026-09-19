@@ -201,7 +201,7 @@ var SenecaCuadro = (function () {
     var botonTexto = $('seneca-copiar-texto');
 
     botonAsunto.onclick = function () {
-      copiarTexto($('seneca-asunto').value, botonAsunto, '1. Copiar el asunto');
+      copiarTexto($('seneca-asunto').value, botonAsunto);
       if (!copiadoElAsunto) {
         copiadoElAsunto = true;
         botonAsunto.classList.remove('boton-principal');
@@ -214,7 +214,7 @@ var SenecaCuadro = (function () {
       var maximo = n().MAXIMO_LETRAS_SENECA || 4000;
       var recortado = texto.length > maximo;
       if (recortado) texto = texto.slice(0, maximo);
-      copiarTexto(texto, botonTexto, '2. Copiar el texto');
+      copiarTexto(texto, botonTexto);
       /* toLocaleString depende de que el navegador traiga los datos de
          formato en español: no siempre está, así que el separador de
          millar se escribe a mano, como ya hacía el aviso de antes. */
@@ -223,18 +223,9 @@ var SenecaCuadro = (function () {
     };
   }
 
-  function copiarTexto(texto, boton, etiquetaNormal) {
+  function copiarTexto(texto, boton) {
     if (!texto) { U.aviso('Ahí no hay nada que copiar.', 'malo'); return; }
-    if (!navigator.clipboard || !navigator.clipboard.writeText) {
-      U.aviso('Este navegador no deja copiar solo.', 'malo');
-      return;
-    }
-    navigator.clipboard.writeText(texto).then(function () {
-      boton.textContent = 'Copiado';
-      setTimeout(function () { boton.textContent = etiquetaNormal; }, 1400);
-    }).catch(function () {
-      U.aviso('No he podido copiarlo.', 'malo');
-    });
+    U.copiar(texto, boton);
   }
 
   return {

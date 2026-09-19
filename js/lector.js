@@ -35,18 +35,7 @@
      un atajo para no teclear, no un dato del asunto. */
 
   function copiarCodigo(boton, codigo) {
-    function copiado(ok) {
-      if (!ok) { U.aviso('No he podido copiarlo. Es ' + codigo + '.', 'malo'); return; }
-      var antes = boton.textContent;
-      boton.textContent = 'Copiado';
-      setTimeout(function () { boton.textContent = antes; }, 1400);
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(codigo).then(function () { copiado(true); })
-        .catch(function () { copiado(false); });
-    } else {
-      copiado(false);
-    }
+    U.copiar(codigo, boton, { avisoFallo: 'No he podido copiarlo. Es ' + codigo + '.' });
   }
 
   function anadirBotonesDeVerificacion(blob, caja) {

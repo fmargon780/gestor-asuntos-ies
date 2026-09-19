@@ -22,27 +22,12 @@
      COPIAR, Y EL BOTÓN DE COPIAR
      ========================================================== */
 
+  /* La copia a secas, sin botón: la usa js/ficha-nombre-acciones.js
+     (`Copiar.copiar`), que se encarga ella sola del aviso y del botón.
+     Por eso lleva `sinAviso`: si avisara aquí también, saldrían dos
+     avisos con el fallo. */
   function copiar(texto) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(texto).then(function () { return true; })
-        .catch(function () { return aLaAntigua(texto); });
-    }
-    return Promise.resolve(aLaAntigua(texto));
-  }
-
-  /* Por si el navegador no deja usar el portapapeles nuevo. */
-  function aLaAntigua(texto) {
-    try {
-      var c = document.createElement('textarea');
-      c.value = texto;
-      c.setAttribute('readonly', '');
-      c.style.cssText = 'position:fixed;top:-1000px;left:-1000px';
-      document.body.appendChild(c);
-      c.select();
-      var ok = document.execCommand('copy');
-      c.parentNode.removeChild(c);
-      return ok;
-    } catch (e) { return false; }
+    return U.copiar(texto, null, { sinAviso: true });
   }
 
   function boton(opciones) {
@@ -54,16 +39,7 @@
     b.onclick = function (ev) {
       ev.stopPropagation();
       ev.preventDefault();
-      copiar(opciones.texto).then(function (ok) {
-        if (!ok) { U.aviso('No he podido copiarlo. Es ' + opciones.texto + '.', 'malo'); return; }
-        var antes = b.textContent;
-        b.textContent = 'Copiado';
-        b.classList.add('boton-marcado');
-        setTimeout(function () {
-          b.textContent = antes;
-          b.classList.remove('boton-marcado');
-        }, 1400);
-      });
+      U.copiar(opciones.texto, b, { avisoFallo: 'No he podido copiarlo. Es ' + opciones.texto + '.' });
     };
     return b;
   }

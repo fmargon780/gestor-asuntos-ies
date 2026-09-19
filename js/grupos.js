@@ -29,9 +29,7 @@ var Grupos = (function () {
   var FICHERO = 'grupos.json';
   var lista = [];
 
-  function nuevoId() {
-    return 'g' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-  }
+  function nuevoId() { return U.nuevoId('g'); }
 
   async function cargar() {
     var leido = null;

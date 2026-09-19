@@ -18,7 +18,7 @@ de `App` va después del fichero que lo define.
 | `css/guias.css` | La guía: pasos, plegado, preguntas y opciones |
 | `css/tipos-buscador.css` | Las listas de resultados, y la marca naranja del que ya no está |
 | `css/copiar-nie.css` | Los estilos de `js/copiar.js` (nombre viejo del módulo) |
-| `js/util.js` | Utilidades comunes, y la comparación de nombres parecidos. `U.mensajeDeError(e)` traduce al castellano los errores del navegador (`NotFoundError` y compañía). `U.envolver`/`U.envolturasAplicadas`/`U.envolturasFallidas` (fila 70) apuntan las envolturas de la aplicación |
+| `js/util.js` | Utilidades comunes, y la comparación de nombres parecidos. `U.mensajeDeError(e)` traduce al castellano los errores del navegador (`NotFoundError` y compañía). `U.envolver`/`U.envolturasAplicadas`/`U.envolturasFallidas` (fila 70) apuntan las envolturas de la aplicación. `U.copiar`/`U.nuevoId`/`U.fechaCorta` (fila 71) son la caja común de copiar al portapapeles, crear identificadores e imprimir fechas cortas |
 | `js/almacen.js` | Guarda los ajustes en el navegador |
 | `js/carpetas.js` | Habla con el selector de carpetas del navegador. Lee y escribe los JSON. `Carpetas.esCarpetaTemporalDeSincronizacion` descarta, en un solo sitio, las carpetas y ficheros que dejan Dropbox y Drive al sincronizar; `contarFicheros`/`copiarDentro`/la fusión los saltan, y un fichero que desaparece a mitad de copia se reintenta una vez |
 | `js/copias.js` | Copia de seguridad diaria de los ficheros de `_GESTOR`, y detección de fichero roto |

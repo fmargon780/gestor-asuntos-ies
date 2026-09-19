@@ -121,13 +121,7 @@ var Documentos = (function () {
       b.onclick = function () {
         var f = lista[Number(b.dataset.copiar)];
         var sinExtension = String(f.nombre).replace(/\.[A-Za-z0-9]{1,8}$/, '');
-        navigator.clipboard.writeText(sinExtension).then(function () {
-          var antes = b.textContent;
-          b.textContent = 'Copiado';
-          setTimeout(function () { b.textContent = antes; }, 1400);
-        }).catch(function () {
-          U.aviso('No he podido copiarlo.', 'malo');
-        });
+        U.copiar(sinExtension, b);
       };
     });
 

@@ -279,12 +279,7 @@
   }
 
   function copiarHueco(texto, boton) {
-    if (!navigator.clipboard || !navigator.clipboard.writeText) return;
-    navigator.clipboard.writeText(texto).then(function () {
-      var antes = boton.textContent;
-      boton.textContent = 'Copiado';
-      setTimeout(function () { boton.textContent = antes; }, 1400);
-    }).catch(function () { /* nada que hacer si el navegador no deja */ });
+    U.copiar(texto, boton);
   }
 
   /* Pinta, dentro de `contenedor`, solo las plantillas de documento de
