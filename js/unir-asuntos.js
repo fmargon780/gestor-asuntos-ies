@@ -443,31 +443,30 @@
   }
 
   async function fusionarFicha(seQueda, seVa, fechaTexto) {
-    await App.cargarRegistro();
-    var fichaQueda = App.E.registro.asuntos[seQueda.nombre] || {};
-    var fichaVa = App.E.registro.asuntos[seVa.nombre] || {};
+    await App.guardarRegistroFresco(function (registro) {
+      var fichaQueda = registro.asuntos[seQueda.nombre] || {};
+      var fichaVa = registro.asuntos[seVa.nombre] || {};
 
-    var notas = (Array.isArray(fichaQueda.notas) ? fichaQueda.notas.slice() : [])
-      .concat(Array.isArray(fichaVa.notas) ? fichaVa.notas.slice() : [])
-      .sort(function (x, y) { return String(x.cuando || '').localeCompare(String(y.cuando || '')); });
+      var notas = (Array.isArray(fichaQueda.notas) ? fichaQueda.notas.slice() : [])
+        .concat(Array.isArray(fichaVa.notas) ? fichaVa.notas.slice() : [])
+        .sort(function (x, y) { return String(x.cuando || '').localeCompare(String(y.cuando || '')); });
 
-    var pasosHechos = (fichaQueda.pasosHechos && fichaQueda.pasosHechos.length)
-      ? fichaQueda.pasosHechos : (fichaVa.pasosHechos || []);
-    var pasosElegidos = (fichaQueda.pasosElegidos && Object.keys(fichaQueda.pasosElegidos).length)
-      ? fichaQueda.pasosElegidos : (fichaVa.pasosElegidos || {});
+      var pasosHechos = (fichaQueda.pasosHechos && fichaQueda.pasosHechos.length)
+        ? fichaQueda.pasosHechos : (fichaVa.pasosHechos || []);
+      var pasosElegidos = (fichaQueda.pasosElegidos && Object.keys(fichaQueda.pasosElegidos).length)
+        ? fichaQueda.pasosElegidos : (fichaVa.pasosElegidos || {});
 
-    notas.push({
-      texto: 'Unido con la carpeta «' + seVa.nombre + '» el ' + fechaTexto,
-      quien: App.E.usuario || '',
-      cuando: U.ahora()
+      notas.push({
+        texto: 'Unido con la carpeta «' + seVa.nombre + '» el ' + fechaTexto,
+        quien: App.E.usuario || '',
+        cuando: U.ahora()
+      });
+
+      registro.asuntos[seQueda.nombre] = Object.assign({}, fichaQueda, {
+        notas: notas, pasosHechos: pasosHechos, pasosElegidos: pasosElegidos
+      });
+      delete registro.asuntos[seVa.nombre];
     });
-
-    App.E.registro.asuntos[seQueda.nombre] = Object.assign({}, fichaQueda, {
-      notas: notas, pasosHechos: pasosHechos, pasosElegidos: pasosElegidos
-    });
-    delete App.E.registro.asuntos[seVa.nombre];
-
-    await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
   }
 
   async function unirAsuntos(grupo) {

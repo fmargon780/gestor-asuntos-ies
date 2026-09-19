@@ -126,13 +126,28 @@ var Papelera = (function () {
 
   /* ---------- borrar un asunto abierto ---------- */
 
+  /* Fila 61 (docs/GUARDAR-SIN-PISAR.md): la carpeta se traslada
+     primero, y solo entonces se relee asuntos.json, lo más pegado
+     posible al momento de escribir. La ficha que se guarda en la
+     papelera es la fresca (App.E.registro, ya releído), no la que
+     traía 'a' desde antes de mover la carpeta: si no, se archivaría
+     una versión vieja y se perdería lo mismo al devolverla. */
   async function mandarAsunto(a) {
-    var datos = JSON.parse(JSON.stringify(a.ficha || {}));
-    await mandarCarpeta(App.E.abiertos, a.nombre, 'asunto', datos);
-    if (App.E.registro && App.E.registro.asuntos) {
-      delete App.E.registro.asuntos[a.nombre];
-      await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
-    }
+    var pap = await carpetaPapelera();
+    var nombreSub = marcaDeTiempo() + ' ' + a.nombre;
+    await Carpetas.trasladar(App.E.abiertos, a.nombre, pap, nombreSub);
+
+    await App.cargarRegistro();
+    var fresca = (App.E.registro.asuntos && App.E.registro.asuntos[a.nombre]) || a.ficha || {};
+    var ficha = {
+      id: nuevoId(), clase: 'asunto', nombre: a.nombre, carpeta: nombreSub,
+      origen: null, datos: JSON.parse(JSON.stringify(fresca)), quien: quienSoy(), cuando: U.ahora()
+    };
+    await cambiar(function (l) { l.unshift(ficha); return l; });
+
+    await App.guardarRegistroFresco(function (registro) {
+      if (registro.asuntos) delete registro.asuntos[a.nombre];
+    });
   }
 
   /* ---------- borrar un documento (de un asunto o suelto) ---------- */
@@ -272,9 +287,10 @@ var Papelera = (function () {
     }
     var pap = await carpetaPapelera();
     await Carpetas.trasladar(pap, ficha.carpeta, App.E.abiertos, ficha.nombre);
-    if (!App.E.registro.asuntos) App.E.registro.asuntos = {};
-    App.E.registro.asuntos[ficha.nombre] = ficha.datos || {};
-    await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
+    await App.guardarRegistroFresco(function (registro) {
+      if (!registro.asuntos) registro.asuntos = {};
+      registro.asuntos[ficha.nombre] = ficha.datos || {};
+    });
     await quitarDeIndice(ficha.id);
     return { ok: true };
   }

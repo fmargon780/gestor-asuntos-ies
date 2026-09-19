@@ -147,16 +147,15 @@ App.renombrarEstado = async function (viejo) {
     App.E.estados.forEach(function (e) { if (e.nombre === viejo) e.nombre = nuevo; });
     await App.guardarEstados();
 
-    await App.cargarRegistro();
     var n = 0;
-    Object.keys(App.E.registro.asuntos).forEach(function (k) {
-      if (App.E.registro.asuntos[k].situacion === viejo) {
-        App.E.registro.asuntos[k].situacion = nuevo;
-        n++;
-      }
+    await App.guardarRegistroFresco(function (registro) {
+      Object.keys(registro.asuntos).forEach(function (k) {
+        if (registro.asuntos[k].situacion === viejo) {
+          registro.asuntos[k].situacion = nuevo;
+          n++;
+        }
+      });
     });
-    await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
-    App.refrescarFichas();
 
     App.pintarTablaEstados();
     App.pintarFiltroEstado();

@@ -132,6 +132,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   cursor: envolver el repintado en `U.conservandoLoEscrito(raiz, fn)` (filas 33 y 34, 17-sep-2026).
 - Al terminar una instrucción de la cola: actualizar este documento y `CONTEXTO.md`
   sustituyendo la línea vieja, y anotar en `HISTORIA.md` lo que merezca recordarse.
+- El registro de asuntos (`asuntos.json`) solo se escribe entero por `App.anotar` o por
+  `App.guardarRegistroFresco`, nunca directo con `Copias.guardar` (fila 61, 19-sep-2026).
 
 ## 7. Descartado, no proponer otra vez
 
@@ -145,12 +147,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 - El compañero tiene que entrar en `https://asuntos.fmargon.com`, volver a señalar sus carpetas (el navegador no las hereda de la dirección vieja), y coordinar la lista de tipos de asunto y estados.
 - Poner en marcha el script de Gmail en `g.educaand.es`, señalar `GESTOR-BANDEJA` en Ajustes, y pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs` (sin eso no se siguen los hilos por matrícula, ni la copia oculta de un grupo).
-- Ver si la bandeja de correo acierta con el tipo (si falla mucho, palabras clave por tipo), y comprobar con Séneca si Comunicaciones acepta el largo del asunto que le damos.
-- Cuando tengan una cuenta de correo común, replantear la bandeja como una sola compartida.
-- Ver con el uso: ancho del panel lateral y del tablón, si las tarjetas por tipo se quedan cortas, y si el aviso de "falta el DNI" conviene también en la tarjeta del asunto.
-- Si el DNI no sale de nadie, marcar la columna del documento al generar el RegAlum.
+- Ver si la bandeja de correo acierta con el tipo (si falla mucho, palabras clave por tipo), y comprobar con Séneca si Comunicaciones acepta el largo del asunto que le damos. Cuando tengan una cuenta de correo común, replantear la bandeja como una sola compartida.
+- Ver con el uso: ancho del panel lateral y del tablón, si las tarjetas por tipo se quedan cortas, y si el aviso de "falta el DNI" conviene también en la tarjeta del asunto; si el DNI no sale de nadie, marcar la columna del documento al generar el RegAlum.
 - Comprobar con un documento de verdad "Preparar el documento" (fila 57): si Séneca avisa de que invalida la firma al sellar uno ya preparado, y ajustar en Ajustes las dos medidas por defecto (1,5 y 2,5 cm) con la banda real del sello y de AutoFirma.
-- Cuando el uso lo pida: búsqueda en notas, cuentas por tipo para la memoria de fin de curso, qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta del centro. Los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no se fusionan entre ordenadores (solo las altas).
+- Cuando el uso lo pida: qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta del centro (los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no se fusionan entre ordenadores, solo las altas).
 - Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN. Cambiar la dirección vieja por `https://asuntos.fmargon.com` en `docs/CONTEXTO.md` y donde más aparezca (no urgente: la vieja sigue respondiendo fuera del centro).
 
 ## 9. Cuándo leer `CONTEXTO.md` entero
