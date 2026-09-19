@@ -399,6 +399,23 @@
 
       <details class="bloque-ajustes">
         <summary>
+          <span class="bloque-titulo">Asuntos dormidos</span>
+          <span class="bloque-pie">A partir de cuántos días sin novedades avisar, en "Qué me toca"</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Un asunto abierto en el que no se ha escrito una nota, ni se ha cambiado
+         de estado, ni se ha editado la ficha en todos estos días sale en el bloque "Dormidos" de
+         "Qué me toca". Es de todo el centro: vale igual en los dos ordenadores.</p>
+      <div class="alta-tipo">
+        <label class="etiqueta-en-linea" for="dias-dormido">Avisar a partir de</label>
+        <input id="dias-dormido" type="number" min="1" class="campo campo-plazo">
+        <span class="suave">días</span>
+      </div>
+        </div>
+      </details>
+
+      <details class="bloque-ajustes">
+        <summary>
           <span class="bloque-titulo">Tipos de documento</span>
           <span class="bloque-pie">Los que salen al nombrar un documento dentro de un asunto</span>
         </summary>
@@ -585,7 +602,7 @@
         </div>
       </details>
 
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-papelera">
         <summary>
           <span class="bloque-titulo">Papelera</span>
           <span class="bloque-pie">Lo borrado se guarda aquí hasta que tú lo quites</span>
@@ -850,6 +867,11 @@
 <script src="js/presencia.js"></script>
 <script src="js/asunto-renombrar.js"></script>
 <script src="js/papelera.js"></script>
+<!-- Fila 68 (docs/AVISOS-QUE-FALTAN.md), 1 y 3: va después de
+     js/papelera.js (Papelera.leer/_diasDesde/DIAS_AVISO/tamanoDeViejas)
+     y de js/archivo-indice.js (window.IndiceArchivo), y envuelve
+     App.verAbiertos, ya definido en js/asuntos-lista.js. -->
+<script src="js/avisos-que-faltan.js"></script>
 <script src="js/hitos-ajustes.js"></script>
 
 <!-- Ajustes por tipo (17-sep-2026, fila 39, docs/AJUSTES-POR-TIPO.md):

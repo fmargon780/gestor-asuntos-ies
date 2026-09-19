@@ -669,4 +669,5 @@ App.pintarAjustesCentro = async function () {
   App.pintarGruposPersonas();
   await App.pintarMargenesPdf();
   await App.pintarFicherosDeDatos();
+  if (typeof App.pintarDiasDormido === 'function') App.pintarDiasDormido();
 };

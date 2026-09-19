@@ -12,16 +12,33 @@
   function $(id) { return document.getElementById(id); }
 
   /* Las claves de asuntos.json cuya carpeta no está ni en abiertos ni
-     en el archivo. Si el archivo todavía no se ha leído esta sesión,
-     se lee ahora: es la única manera de saber si de verdad falta. */
-  async function calcular() {
-    if (!App.E.listaArchivo.length) await App.verArchivo();
+     en el archivo.
 
+     Hasta la fila 68 (docs/AVISOS-QUE-FALTAN.md, 1) esto forzaba un
+     recorrido entero del ARCHIVO si no se había leído ya esta sesión
+     (`App.verArchivo()`), solo para poder pintar un número. Ahora se
+     usa el índice guardado (`_GESTOR/indice-archivo.json`), que ya
+     tiene el nombre de cada carpeta archivada y no cuesta nada; si el
+     índice no está hecho, se aprovecha el ARCHIVO si ya se ha leído
+     por otro motivo, pero nunca se fuerza esa lectura desde aquí. Sin
+     ninguna de las dos cosas, un asunto cerrado no se puede comprobar
+     todavía: mejor no acusarlo de huérfano por error. */
+  async function calcular() {
     var hayCarpeta = {};
     App.E.listaAbiertos.forEach(function (a) { hayCarpeta[a.nombre] = true; });
-    App.E.listaArchivo.forEach(function (a) { hayCarpeta[a.nombre] = true; });
 
-    return Object.keys(App.E.registro.asuntos).filter(function (k) { return !hayCarpeta[k]; });
+    var indice = window.IndiceArchivo ? await IndiceArchivo.leerDisco() : { ok: false };
+    if (indice.ok) {
+      indice.datos.asuntos.forEach(function (e) { hayCarpeta[e.nombre] = true; });
+    } else if (App.E.listaArchivo.length) {
+      App.E.listaArchivo.forEach(function (a) { hayCarpeta[a.nombre] = true; });
+    }
+
+    var claves = Object.keys(App.E.registro.asuntos).filter(function (k) { return !hayCarpeta[k]; });
+    if (!indice.ok && !App.E.listaArchivo.length) {
+      claves = claves.filter(function (k) { return App.E.registro.asuntos[k].estado !== 'cerrado'; });
+    }
+    return claves;
   }
 
   /* Las carpetas ABIERTAS que no tienen ficha: son las candidatas
@@ -182,4 +199,8 @@
       caja.appendChild(f);
     });
   };
+
+  /* Para js/avisos-que-faltan.js (fila 68, 1): la misma cuenta, sin
+     duplicar la lógica. */
+  window.FichasHuerfanas = { calcular: calcular };
 })();

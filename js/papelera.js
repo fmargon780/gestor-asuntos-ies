@@ -409,6 +409,41 @@ var Papelera = (function () {
     await quitarDeIndice(ficha.id);
   }
 
+  /* ---------- cuánto ocupa (fila 68, docs/AVISOS-QUE-FALTAN.md, 3) ----------
+
+     Solo se llama para el aviso de lo viejo, nunca al pintar la lista
+     entera: recorrer cada carpeta cuesta. */
+  async function tamanoDeCarpeta(handle) {
+    var total = 0;
+    for await (var par of handle.entries()) {
+      var h = par[1];
+      if (h.kind === 'file') {
+        try { total += (await h.getFile()).size; } catch (e) { /* seguimos */ }
+      } else if (h.kind === 'directory') {
+        total += await tamanoDeCarpeta(h);
+      }
+    }
+    return total;
+  }
+
+  /* Cuánto ocupan en total, en bytes, las cosas de `viejas` (una lista
+     de fichas de la papelera, como las que devuelve `leer()` filtradas
+     por `_diasDesde`). Lo que no tenga carpeta (un tipo, un estado…)
+     no ocupa nada aparte: solo cuenta el propio índice. */
+  async function tamanoDeViejas(viejas) {
+    var pap;
+    try { pap = await carpetaPapelera(); } catch (e) { return 0; }
+    var total = 0;
+    for (var i = 0; i < viejas.length; i++) {
+      if (!viejas[i].carpeta) continue;
+      try {
+        var h = await pap.getDirectoryHandle(viejas[i].carpeta);
+        total += await tamanoDeCarpeta(h);
+      } catch (e) { /* puede que ya no esté */ }
+    }
+    return total;
+  }
+
   /* ---------- cuánto hace ----------
 
      En lenguaje llano, para la pantalla de la papelera. */
@@ -670,7 +705,7 @@ var Papelera = (function () {
   })();
 
   return {
-    FICHERO: FICHERO, CARPETA: CARPETA,
+    FICHERO: FICHERO, CARPETA: CARPETA, DIAS_AVISO: DIAS_AVISO,
     leer: leer,
     mandarDocumentoDeAsunto: mandarDocumentoDeAsunto,
     mandarSuelto: mandarSuelto,
@@ -681,6 +716,7 @@ var Papelera = (function () {
     preguntarBorrar: preguntarBorrar,
     botonBorrar: botonBorrar,
     haceCuanto: haceCuanto,
+    tamanoDeViejas: tamanoDeViejas,
     /* para las pruebas */
     _diasDesde: diasDesde
   };

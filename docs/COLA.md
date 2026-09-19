@@ -144,7 +144,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 64 | `docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md` | HECHA (19-sep-2026) |
 | 66 | `docs/CONTACTO-GUARDADO-EN-LA-FICHA.md` | HECHA (19-sep-2026) |
 | 67 | `docs/LAS-CUENTAS-Y-LOS-DATOS.md` | HECHA (19-sep-2026) |
-| 68 | `docs/AVISOS-QUE-FALTAN.md` | PENDIENTE |
+| 68 | `docs/AVISOS-QUE-FALTAN.md` | HECHA (19-sep-2026): partes 1 y 3 hechas; falta si la papelera debe vaciarse sola (decisión de Francisco, sin preguntar) |
 | 69 | `docs/PRUEBAS-QUE-FALTAN.md` | PENDIENTE |
 | 70 | `docs/ENVOLTURAS-COMPROBADAS.md` | PENDIENTE |
 | 71 | `docs/COSAS-REPETIDAS.md` | PENDIENTE |

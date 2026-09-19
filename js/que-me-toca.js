@@ -195,6 +195,125 @@
     return b;
   }
 
+  /* ---------- los asuntos dormidos (19-sep-2026, fila 68,
+     docs/AVISOS-QUE-FALTAN.md, 2) ----------
+
+     "No ha pasado nada" = ni nota, ni cambio de estado, ni edición de
+     la ficha, tomando la fecha más reciente de `notaEl`, `situacionEl`
+     y `editadoEl` (o `abiertoEl` si el asunto no ha tenido ninguna
+     de las anteriores todavía). El encargo pide explícitamente NO
+     mirar el documento más nuevo de la carpeta: costaría un recorrido
+     del disco por cada asunto, solo para pintar esta pantalla. */
+  var DIAS_DORMIDO_POR_DEFECTO = 60;
+
+  App.diasDormido = function () {
+    var n = App.E.registro.ajustesAvisos && App.E.registro.ajustesAvisos.diasDormido;
+    return (typeof n === 'number' && n > 0) ? n : DIAS_DORMIDO_POR_DEFECTO;
+  };
+
+  App.guardarDiasDormido = async function (n) {
+    await App.guardarRegistroFresco(function (registro) {
+      registro.ajustesAvisos = registro.ajustesAvisos || {};
+      registro.ajustesAvisos.diasDormido = n;
+    });
+  };
+
+  /* El campo de Ajustes → El centro. Lo llama App.pintarAjustesCentro
+     (js/ajustes-centro.js). */
+  App.pintarDiasDormido = function () {
+    var campo = $('dias-dormido');
+    if (!campo) return;
+    campo.value = String(App.diasDormido());
+    campo.onchange = async function () {
+      var n = parseInt(campo.value, 10);
+      if (isNaN(n) || n < 1) { campo.value = String(App.diasDormido()); return; }
+      try {
+        await App.guardarDiasDormido(n);
+        U.aviso('Avisará de los dormidos a partir de ' + n + ' días.', 'bueno');
+      } catch (e) {
+        U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+      }
+    };
+  };
+
+  function ultimaActividad(ficha) {
+    return [ficha.notaEl, ficha.situacionEl, ficha.editadoEl, ficha.abiertoEl]
+      .filter(Boolean).sort().pop() || '';
+  }
+
+  function diasDesdeIso(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return 0;
+    return Math.floor((Date.now() - d.getTime()) / 86400000);
+  }
+
+  /* Los abiertos sin novedades desde hace `App.diasDormido()` días o
+     más, sin los que se han ocultado a propósito y todavía no toca
+     volver a avisar de ellos (`ficha.dormidoOcultoHasta`). */
+  function reunirDormidos() {
+    var umbral = App.diasDormido();
+    var hoy = U.hoyIso();
+    var asuntos = window.Gestor ? window.Gestor.asuntos() : [];
+    var salida = [];
+    asuntos.forEach(function (a) {
+      var f = a.ficha || {};
+      if (f.dormidoOcultoHasta && f.dormidoOcultoHasta > hoy) return;
+      var ultima = ultimaActividad(f);
+      if (!ultima) return;
+      var dias = diasDesdeIso(ultima);
+      if (dias >= umbral) salida.push({ asunto: a, dias: dias });
+    });
+    salida.sort(function (a, b) { return b.dias - a.dias; });
+    return salida;
+  }
+
+  function bloqueDormidos(lista) {
+    if (!lista.length) return null;
+    var d = document.createElement('div');
+    d.className = 'qmt-bloque qmt-bloque-dormidos';
+    d.innerHTML = '<h3 class="qmt-bloque-titulo">Dormidos ' +
+      '<span class="cuenta-lista">' + lista.length + '</span></h3>';
+    var caja = document.createElement('div');
+    caja.className = 'qmt-lista';
+    lista.forEach(function (it) {
+      var a = it.asunto;
+      var tercero = terceroDe(a);
+      var fila = document.createElement('div');
+      fila.className = 'qmt-fila qmt-fila-dormido';
+      fila.style.cursor = 'default';
+      fila.innerHTML =
+        '<span class="qmt-fila-titulo">' + U.escapar(a.nombre) + '</span>' +
+        (tercero ? '<span class="qmt-fila-tercero">' + U.escapar(tercero) + '</span>' : '') +
+        '<span class="qmt-fila-espera">Sin novedades desde hace ' + it.dias + ' días</span>';
+
+      var abrir = document.createElement('button');
+      abrir.type = 'button';
+      abrir.className = 'boton';
+      abrir.textContent = 'Abrir';
+      abrir.onclick = function () { App.abrirFicha(a, 'abierto'); };
+      fila.appendChild(abrir);
+
+      var ocultar = document.createElement('button');
+      ocultar.type = 'button';
+      ocultar.className = 'boton';
+      ocultar.textContent = 'Ocultar por 30 días';
+      ocultar.onclick = async function () {
+        var hasta = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+        try {
+          await App.anotar(a.nombre, { dormidoOcultoHasta: hasta });
+          pintar();
+        } catch (e) {
+          U.aviso('No he podido ocultarlo: ' + e.message, 'malo');
+        }
+      };
+      fila.appendChild(ocultar);
+
+      caja.appendChild(fila);
+    });
+    d.appendChild(caja);
+    return d;
+  }
+
   /* ---------- el aviso de aspirantes sin Nº de identificación escolar ----------
 
      17-sep-2026, fila 42, sección 5 de
@@ -300,7 +419,8 @@
     var nAspirantes = await contarAspirantesSinNumero();
 
     var bloques = [bloqueAspirantes(nAspirantes), bloqueTejado(g.tejado),
-                   bloqueOtros(g.otros, datos.ajustes), bloqueSinFecha(g.sinFecha)]
+                   bloqueOtros(g.otros, datos.ajustes), bloqueDormidos(reunirDormidos()),
+                   bloqueSinFecha(g.sinFecha)]
       .filter(function (b) { return b; });
 
     caja.innerHTML = '';
@@ -327,6 +447,10 @@
     else enganchar();
   })();
 
-  window.QueMeToca = { abrir: abrir };
+  window.QueMeToca = {
+    abrir: abrir,
+    /* para las pruebas */
+    _reunirDormidos: reunirDormidos
+  };
 
 })();

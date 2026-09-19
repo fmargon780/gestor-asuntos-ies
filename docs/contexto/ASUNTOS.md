@@ -363,7 +363,16 @@ devolver a su sitio.
 - **Bloque Papelera de Ajustes** (el último): qué era, nombre, de dónde salía, quién y cuándo
   ("hace N días"), y botones **Devolver a su sitio** / **Borrar del todo** (con su propia
   confirmación). Aviso ámbar si algo lleva más de 30 días, con botón para borrarlo todo de
-  golpe. **La papelera no se vacía sola, nunca.**
+  golpe. **La papelera no se vacía sola, nunca**: es una decisión de Francisco (fila 68,
+  docs/AVISOS-QUE-FALTAN.md, 3), preguntada y todavía sin decidir; mientras tanto solo se ha
+  hecho el aviso más insistente, nunca el borrado solo.
+- **El mismo aviso, también en "Asuntos abiertos"** (19-sep-2026, fila 68, 3): antes solo se veía
+  entrando a propósito en Ajustes. `js/avisos-que-faltan.js` pinta una línea junto a
+  `#panel-avisos`/`#panel-frescura` con cuántas cosas son y cuánto ocupan de verdad en disco
+  (`Papelera.tamanoDeViejas`, que solo se llama aquí, nunca al pintar la lista entera de la
+  papelera). Sin botón para quitarlo sin decidir: lleva a Ajustes → Mantenimiento, al mismo
+  bloque de siempre. Se repinta al envolver `App.verAbiertos` (no en cada tecla del buscador,
+  que llama a `window.Gestor.alRefrescar` mucho más a menudo y esto cuesta disco).
 - **Devolver a su sitio**: si el asunto de un documento ya no existe, se ofrece "Por
   clasificar". Si ya hay algo con ese nombre en el destino, no se pisa nada.
 - **El rastro**: al mandar/devolver un documento desde un asunto, se anota una nota
@@ -512,6 +521,18 @@ más de 17 MB. Se copia el patrón de `js/hitos-archivo.js` con el historial de 
 
 Prueba: `pruebas/ficha-del-archivo.mjs`, sin navegador, con `js/asuntos-archivar.js` y
 `js/ficha-archivo.js` de verdad en un `vm`.
+
+### Fichas sin carpeta (huérfanas), y su aviso en la pantalla principal
+
+19-sep-2026, fila 68, `docs/AVISOS-QUE-FALTAN.md`, 1. `window.FichasHuerfanas.calcular()`
+ya no fuerza un recorrido entero del ARCHIVO cuando no se ha leído esta sesión
+(`App.verArchivo()`, como hacía hasta esta fila): usa el índice guardado
+(`IndiceArchivo.leerDisco()`) si existe, o el ARCHIVO si ya se ha leído por otro motivo; sin
+ninguna de las dos cosas, un **cerrado** no se comprueba y no se acusa de huérfano por error (un
+**abierto** sin carpeta sí, siempre). `js/avisos-que-faltan.js` pinta con este mismo cálculo una
+línea junto a `#panel-avisos`/`#panel-frescura` en "Asuntos abiertos" que lleva al bloque de
+siempre en Ajustes → Mantenimiento; antes solo se veía entrando a propósito ahí. Se repinta al
+envolver `App.verAbiertos`, no en cada tecla del buscador.
 
 ---
 

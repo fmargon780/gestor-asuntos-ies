@@ -246,13 +246,13 @@ Cruza los hitos `pendiente`/`encurso` de **todos los asuntos abiertos** (nunca a
 no tener que entrar en ellos uno a uno: lee `Hitos.leer()` una vez y `window.Gestor.asuntos()`, y
 cruza por la clave del asunto.
 
-- Tres bloques, en este orden: **"En tu tejado"** (responsable `yo`/`companero`, **con** fecha
+- Bloques, en este orden: **"En tu tejado"** (responsable `yo`/`companero`, **con** fecha
   límite, ordenados por `Plazos.diasHasta` — los vencidos arriba; el color es el de siempre,
   reutilizando tal cual `Plazos.de`/`.marca-plazo` de `css/plazos.css`, sin inventar otra escala);
   **"Esperando a otros"** (cualquier otro responsable, tenga fecha o no: se ordena por los días
-  parado desde `desde`, los más parados arriba); **"Sin fecha"**, plegado con `<details>` — el
-  resto: sin fecha límite, o sin un responsable que encaje en los dos bloques de arriba. Cada
-  hito visible sale en un solo bloque.
+  parado desde `desde`, los más parados arriba); **"Dormidos"** (19-sep-2026, fila 68, ver
+  abajo); **"Sin fecha"**, plegado con `<details>` — el resto: sin fecha límite, o sin un
+  responsable que encaje en los dos bloques de arriba. Cada hito visible sale en un solo bloque.
 - Cada línea lleva el título del hito, el nombre del asunto y su tercero. Al pulsarla, llama a
   `window.HitosPanel.desplegarAlAbrir(clave, idHito)` —enganche nuevo y pequeño en
   `js/hitos-panel.js`: guarda ese par y, en el siguiente repintado de esa ficha, quita `.oculto`
@@ -267,4 +267,16 @@ cruza por la clave del asunto.
   día aunque no se haya visitado la pantalla todavía.
 
 Se comprueba con `pruebas/que-me-toca.mjs`.
+
+**El bloque "Dormidos"** (19-sep-2026, fila 68, `docs/AVISOS-QUE-FALTAN.md`, 2): a diferencia de
+los otros tres, no cruza hitos, sino **asuntos abiertos** enteros sin novedades desde hace
+`App.diasDormido()` días (60 por defecto; campo "Asuntos dormidos" en Ajustes → El centro,
+`registro.ajustesAvisos.diasDormido`, compartido entre los dos ordenadores). "Sin novedades" es,
+a propósito, barato: la fecha más reciente de `ficha.notaEl`, `ficha.situacionEl` y
+`ficha.editadoEl` (o `ficha.abiertoEl` si no hay ninguna de las tres). **No** mira el documento
+más nuevo de la carpeta: costaría un recorrido del disco por asunto solo para pintar esta
+pantalla. Cada línea lleva un botón **Abrir** y uno **Ocultar por 30 días**, que guarda
+`ficha.dormidoOcultoHasta` (vía `App.anotar`) y lo saca de la lista hasta esa fecha. Vive en
+`js/que-me-toca.js` junto a los demás bloques (`reunirDormidos`, `bloqueDormidos`,
+`App.diasDormido`/`App.guardarDiasDormido`/`App.pintarDiasDormido`), no en un fichero aparte.
 
