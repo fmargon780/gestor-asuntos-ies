@@ -6,7 +6,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 > **18-sep-2026: esta cola se ha compactado.** Había llegado a 90 KB, casi todo notas largas de
 > filas ya HECHAS, y ningún cambio cabía ya en una sola subida (regla 12). Ahora la tabla guarda
 > solo número, documento y estado. El detalle de cada fila hecha sigue en `docs/HISTORIA.md` y en
-> el historial de git (versión anterior: el commit anterior a este en `docs/COLA.md`). **Mantenla
+> el historial de git (versión anterior: el commit anterior a este en `docs/COLA.md`). **Manténla
 > así**: las notas largas van a `docs/HISTORIA.md`, no aquí.
 
 ## Reglas para Claude Code
@@ -151,7 +151,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 72 | `docs/DETALLES-DE-MANTENIMIENTO.md` | HECHA (19-sep-2026): puntos 2, 4 y 5. Los puntos 1 y 3 se complicaron y pasan a las filas 76 y 77 (regla del propio documento: "si alguna se complica, se deja para otra fila") |
 | 73 | `docs/BUSCAR-EN-LAS-NOTAS.md` | HECHA (19-sep-2026) |
 | 74 | `docs/CUENTAS-DE-FIN-DE-CURSO.md` | HECHA (19-sep-2026) |
-| 75 | `docs/HUECOS-ENCONTRADOS-FILA-69.md` | EN CURSO (19-sep-2026) |
+| 75 | `docs/HUECOS-ENCONTRADOS-FILA-69.md` | HECHA (19-sep-2026 · 15:55): tres subidas, no dos (nota más abajo) |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | PENDIENTE (no urgente: separada de la fila 72) |
 | 77 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 3 (los borrados que se fusionen) | PENDIENTE (no urgente: separada de la fila 72) |
 | 78 | Repartir `docs/contexto/ASUNTOS.md` (ha pasado los 40 KB del objetivo de la fila 65) | PENDIENTE (no urgente: se puede seguir editando, solo cuesta un poco más) |
@@ -231,7 +231,7 @@ qué sale del centro y cuánto se guarda). Y poner a una segunda persona como co
 repositorio. **Una hora.**
 
 **68 · Los avisos que faltan.** Las fichas huérfanas no avisan, los asuntos dormidos no salen por
-ningún lado, y la papelera no insiste. **Un día.**
+ingún lado, y la papelera no insiste. **Un día.**
 
 **69 · Las pruebas que faltan.** No hay ninguna que edite el nombre de un asunto, que una dos
 asuntos ni que toque los recurrentes; nada prueba Dropbox de verdad y nadie prueba el script de
@@ -390,6 +390,15 @@ contra lo que de verdad dice `main` antes de sustituir. Si esa sesión tiene `gi
 (terminal u ordenador de Francisco, no esta nube), es mucho más simple que ir fichero a fichero con
 la API.
 
+## Nota de esta sesión (19-sep-2026): fila 75 con tres subidas, no dos
+
+La fila 75 no es una de las catorce de la fila 65 (esas sí tienen permitida una tercera subida
+para documentación). La segunda subida de esta fila llevó por error solo `js/version.js`, en vez
+de los once ficheros previstos: un fallo al montar la llamada de subida, no un límite de tamaño.
+Se completó con una tercera subida, con el resto de ficheros y esta nota. Las dos últimas subidas
+tocan código de la aplicación, así que las dos disparan una publicación de Vercel de todas formas;
+no se ha gastado ninguna publicación sin motivo.
+
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
 - De la fila 21: departamentos del personal, tutorías y equipos educativos. `personal.csv` no
@@ -433,7 +442,7 @@ la API.
   una opción dentro de "Comunicar". Por eso no es una fila de la cola.
 - **Del informe del 18-sep-2026: la papelera, ¿se vacía sola?** Hoy avisa a los 30 días pero no
   borra nada sin que alguien pulse. Para datos de menores, un borrado que nunca ocurre no es lo
-  ideal. **Hay que preguntárselo a Francisco antes de hacer esa parte de la fila 68**, y apuntar lo
+  ideal. **Hay que preguntarselo a Francisco antes de hacer esa parte de la fila 68**, y apuntar lo
   que decida.
 - **Del informe del 18-sep-2026: la ficha del asunto.** Se ha rehecho tres veces en cuatro días
   (filas 51, 52 y 58). Va a necesitar una cuarta pasada cuando los hitos lleven un mes en uso. No se
