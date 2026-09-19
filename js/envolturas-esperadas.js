@@ -22,7 +22,7 @@
    apuntándolo AQUÍ, en esta misma lista. */
 (function () {
 
-  /* Las 42 envolturas de hoy. `fichero` es el nombre del propio
+  /* Las envolturas de hoy. `fichero` es el nombre del propio
      fichero que envuelve (sin "js/" delante, como lo pasa cada
      llamada a U.envolver); `nombre`, el mismo texto que se lee en
      Ajustes → Mantenimiento. */

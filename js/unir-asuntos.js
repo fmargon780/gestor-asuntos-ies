@@ -43,7 +43,7 @@
 (function () {
 
   var FICHERO_DESCARTES = 'no-duplicados.json';
-  var SEPARADOR_FIRMA = '';
+  var SEPARADOR_FIRMA = '';
 
   function $(id) { return document.getElementById(id); }
 
