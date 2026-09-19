@@ -60,7 +60,7 @@ y las fechas de apertura y cierre. Un índice viejo se reconstruye solo, como si
 falta también para los asuntos abiertos, que no pasan por el índice.
 
 **Un fallo encontrado y corregido en el camino**: el desplegable de curso volvía él solo al curso
-actual en cuanto se elegía "Todos", porque repintába sus opciones (y su valor por defecto) en
+actual en cuanto se elegía "Todos", porque repintaba sus opciones (y su valor por defecto) en
 cada repintado de la pantalla, no solo la primera vez. Ahora el desplegable solo se rellena una
 vez, al entrar.
 
@@ -230,7 +230,7 @@ apuntándolo en `js/envolturas-esperadas.js`.
 Se comprueba con `pruebas/envolturas.mjs`, en navegador de verdad (hace falta la aplicación
 entera cargada, con las 42 envolturas de verdad, sin necesidad de "entrar" eligiendo carpetas:
 `U.envolver` actúa al cargar cada `<script>`, no al usar la aplicación): al arrancar no sale
-ingún aviso; quitando una a mano de la lista de aplicadas, sale el aviso rojo con su fichero y su
+ningún aviso; quitando una a mano de la lista de aplicadas, sale el aviso rojo con su fichero y su
 nombre, y se oculta otra vez al restaurarla; envolver una función que no existe no revienta, no
 devuelve nada y queda apuntada como fallo; y el número de `U.envolver(...)` que hay de verdad en
 `js/` coincide exactamente con la lista de `envolturas-esperadas.js` (la comprobación más útil de
@@ -298,7 +298,7 @@ nuevo, que solo se llama para este aviso). Sin botón para quitarlo sin decidir:
 bloque de Ajustes de siempre.
 
 **Lo que NO se ha hecho, a propósito**: si la papelera debería vaciarse ella sola a los N días es
-una decisión de Francisco, no de quien programe, y el propio encargo pide preguntarsela antes de
+una decisión de Francisco, no de quien programe, y el propio encargo pide preguntársela antes de
 tocar esa parte. Esta sesión no pregunta nada (instrucción de la cola), así que se queda sin
 hacer: solo el aviso más insistente, nunca el borrado automático. Apuntado en `docs/CONTEXTO-
 CORTO.md`, sección "Qué falta", para que Francisco lo decida cuando lea esto.
@@ -456,7 +456,7 @@ se enseña siempre; localizar la carpeta de cada uno (para el botón de mover de
 al desplegar el bloque `<details>`, no cada vez que se pinta la pestaña. Los que no encuentran su
 carpeta se cuentan aparte y no se tocan. No se hace nada en silencio al arrancar.
 
-**La prueba** (`pruebas/ficha-del-archivo.mjs`), sin navegador, amplia el patrón de
+**La prueba** (`pruebas/ficha-del-archivo.mjs`), sin navegador, amplía el patrón de
 `pruebas/renombrar-asunto.mjs` cargando también `js/asuntos-archivar.js` y `js/ficha-archivo.js`
 de verdad en el contexto `vm` — esta es la primera prueba de la cola que ejercita el
 `App.cerrarAsunto`/`App.reabrirAsunto` reales sin navegador: los dos cuadros de confirmación que
@@ -522,7 +522,7 @@ fila, la tercera sin gastar publicación de Vercel porque solo toca `docs/`). La
 añaden que un documento de más de 40.000 caracteres se parte, no se reescribe con cuidado.
 
 **`docs/CONTEXTO-CORTO.md` podado**: el tope pasa de 160 líneas a **14.000 caracteres** (un tope
-de líneas no protege de nada si las líneas podían medir lo que quisieran: la sección "Qué está
+de líneas no protegía de nada si las líneas podían medir lo que quisieran: la sección "Qué está
 hecho" tenía líneas de más de 1.300 caracteres). Esa sección se reescribió a una línea por cosa,
 sin números de fila ni fechas (quedan en `HISTORIA.md` y en el documento de cada fila); de
 18.861 caracteres el documento entero baja a 13.093.
@@ -610,7 +610,7 @@ cuenta las entradas de `hitos.json` que ya no corresponden a ningún asunto abie
 —rastro de renombrados de antes de este arreglo— y deja borrarlas con confirmación, sin adivinar
 a qué asunto pertenecían.
 
-**La prueba** (`pruebas/renombrar-asunto.mjs`), sin navegador, amplia el patrón de
+**La prueba** (`pruebas/renombrar-asunto.mjs`), sin navegador, amplía el patrón de
 `pruebas/guardar-sin-pisar.mjs` cargando también `js/conflictos.js`, `js/presencia.js` y
 `js/hitos.js` en el contexto `vm`. Prueba `AsuntoRenombrar` directamente (mover, fusionar en un
 destino que ya tenía hitos, unir dos asuntos, enlazar una huérfana, borrar y devolver desde la
