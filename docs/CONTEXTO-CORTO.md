@@ -107,8 +107,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Hitos: los pasos de la guía son los hitos de un asunto abierto, con estado, fecha límite,
   responsable, bifurcaciones, documentos apuntados e historial; cada paso puede llevar "lo que
   hay que reunir" y su propio texto de correo/Séneca ("Comunicar").
-- "Qué me toca": hitos pendientes de todos los asuntos abiertos, en tres bloques, con filtro por
-  responsable.
+- "Qué me toca": hitos pendientes de todos los asuntos abiertos, con filtro por responsable, más
+  un bloque "Dormidos" (asuntos sin novedades en N días, configurable en Ajustes → El centro).
+- Avisos de "fichas sin carpeta" y de la papelera vieja también en Asuntos abiertos, no solo
+  entrando a propósito en Ajustes.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
 - Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF, en la carpeta del asunto y en Por
   clasificar; Ajustar tamaño deja libre la banda del sello de Séneca y de la firma del director.
@@ -160,13 +162,14 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 - El compañero tiene que entrar en `https://asuntos.fmargon.com`, volver a señalar sus carpetas (el navegador no las hereda de la dirección vieja), y coordinar la lista de tipos de asunto y estados.
 - Poner en marcha el script de Gmail en `g.educaand.es`, señalar `GESTOR-BANDEJA` en Ajustes, y pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs` (sin eso no se siguen los hilos por matrícula, ni la copia oculta de un grupo).
-- Ver si la bandeja de correo acierta con el tipo (si falla mucho, palabras clave por tipo), y comprobar con Séneca si Comunicaciones acepta el largo del asunto que le damos. Cuando tengan una cuenta de correo común, replantear la bandeja como una sola compartida.
-- Ver con el uso: ancho del panel lateral y del tablón, si las tarjetas por tipo se quedan cortas, y si el aviso de "falta el DNI" conviene también en la tarjeta del asunto; si el DNI no sale de nadie, marcar la columna del documento al generar el RegAlum.
-- Comprobar con un documento de verdad "Ajustar tamaño" (fila 57): si Séneca avisa de que invalida la firma al sellar uno ya preparado, y ajustar en Ajustes las dos medidas por defecto (1,5 y 2,5 cm) con la banda real del sello y de AutoFirma. Cuando el uso lo pida: qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta del centro (los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no se fusionan entre ordenadores, solo las altas).
+- Ver si la bandeja de correo acierta con el tipo, y si Comunicaciones de Séneca acepta el largo del asunto. Con una cuenta de correo común, replantear la bandeja como una sola compartida.
+- Ver con el uso: ancho del panel lateral y del tablón, tarjetas por tipo cortas, aviso de "falta el DNI" también en la tarjeta.
+- Comprobar "Ajustar tamaño" (fila 57) con un documento de verdad y las dos medidas por defecto. Qué hacer con los asuntos vivos al cambiar de curso; pasar repositorio y Vercel a una cuenta del centro.
 - Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
 - Pulsar, cuando pueda, "Poner en orden las fichas del ARCHIVO" (Ajustes → Mantenimiento, fila 64): mueve a su carpeta la ficha de los asuntos archivados antes de esa fila, para que `asuntos.json` deje de crecer con ellos.
 - Pulsar, antes de junio de 2027, "Guardar el contacto de los asuntos abiertos" (Ajustes → Mantenimiento, fila 66).
 - Fila 67: añadir un colaborador en GitHub y Vercel, y copiar `docs/LAS-CUENTAS.md` al Dropbox.
+- Decisión de Francisco (fila 68, sin preguntar todavía): ¿debe la papelera vaciarse ella sola a los N días? Mientras no se decida, solo el aviso más insistente, nunca el borrado solo.
 
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero
 

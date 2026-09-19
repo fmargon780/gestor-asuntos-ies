@@ -5,6 +5,49 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 19-sep-2026 — Fila 68: los avisos que faltan
+
+Tres cosas que la aplicación ya sabía pero no decía (`docs/AVISOS-QUE-FALTAN.md`, del informe
+crítico, partes 2.3 y 4). Independientes entre sí.
+
+**1. Fichas huérfanas, avisadas de verdad.** `js/fichas-huerfanas.js` ya encontraba las fichas de
+`asuntos.json` sin carpeta, pero solo se veía entrando a propósito en Ajustes → Mantenimiento. De
+paso, `calcular()` forzaba un recorrido entero del ARCHIVO (`App.verArchivo()`) si no se había
+leído ya esta sesión, solo para poder pintar un número. Ahora usa el índice guardado
+(`IndiceArchivo.leerDisco()`) si existe, y solo si no existe mira el ARCHIVO ya leído por otro
+motivo, sin forzar nunca esa lectura; sin ninguna de las dos cosas, un asunto **cerrado** no se
+comprueba y no se acusa de huérfano por error. `js/avisos-que-faltan.js` (nuevo) pinta con este
+mismo cálculo una línea junto al aviso de plazos en "Asuntos abiertos".
+
+**2. El bloque "Dormidos" en "Qué me toca".** Nada avisaba de un asunto abierto sin una nota desde
+hace meses: los tres bloques de esa pantalla cruzan hitos, no asuntos enteros. Bloque nuevo,
+`js/que-me-toca.js`, con los abiertos sin novedades desde hace `App.diasDormido()` días (60 por
+defecto, campo nuevo en Ajustes → El centro, `registro.ajustesAvisos.diasDormido`, de todo el
+centro). "Sin novedades" se calcula solo con lo que ya trae la ficha (`notaEl`, `situacionEl`,
+`editadoEl`), a propósito: mirar el documento más nuevo de cada carpeta costaría un recorrido del
+disco por asunto. Botón "Ocultar por 30 días" por si un asunto de verdad está esperando a algo de
+fuera (`ficha.dormidoOcultoHasta`).
+
+**3. La papelera vieja, avisada también en la pantalla principal.** El aviso de más de 30 días ya
+existía dentro de la papelera de Ajustes; ahora sale también junto al aviso de plazos en "Asuntos
+abiertos", con cuántas cosas son y cuánto ocupan de verdad en disco (`Papelera.tamanoDeViejas`,
+nuevo, que solo se llama para este aviso). Sin botón para quitarlo sin decidir: lleva al mismo
+bloque de Ajustes de siempre.
+
+**Lo que NO se ha hecho, a propósito**: si la papelera debería vaciarse ella sola a los N días es
+una decisión de Francisco, no de quien programe, y el propio encargo pide preguntársela antes de
+tocar esa parte. Esta sesión no pregunta nada (instrucción de la cola), así que se queda sin
+hacer: solo el aviso más insistente, nunca el borrado automático. Apuntado en `docs/CONTEXTO-
+CORTO.md`, sección "Qué falta", para que Francisco lo decida cuando lea esto.
+
+Los dos avisos nuevos de la pantalla principal se repintan al envolver `App.verAbiertos` (que solo
+se llama al entrar, al pulsar "Actualizar" y tras crear/cerrar un asunto), nunca en cada tecla del
+buscador (`window.Gestor.alRefrescar`, que se dispara mucho más a menudo): las dos comprobaciones
+cuestan algo de disco.
+
+Prueba nueva, `pruebas/avisos-que-faltan.mjs`, sin navegador, con los cinco escenarios del
+encargo.
+
 ## 19-sep-2026 — Fila 67: las cuentas y los datos, por escrito
 
 Fila que no toca código (`docs/LAS-CUENTAS-Y-LOS-DATOS.md`, partes 1.2 y 4.12 del informe crítico):
