@@ -258,32 +258,33 @@
     return /\.pdf$/i.test(nombre || '');
   }
 
-  var comoEra = App.tarjetaSuelto;
-  App.tarjetaSuelto = function (s, pie, esNuevo) {
-    var div = comoEra(s, pie, esNuevo);
-    if (!esPdf(s.nombre)) return div;   /* Word, imagen, hoja de cálculo... ni se intenta leer */
+  U.envolver('App.tarjetaSuelto', window.App, 'tarjetaSuelto', 'js/documentos-sueltos-lector.js', function (comoEra) {
+    return function (s, pie, esNuevo) {
+      var div = comoEra(s, pie, esNuevo);
+      if (!esPdf(s.nombre)) return div;   /* Word, imagen, hoja de cálculo... ni se intenta leer */
 
-    var contenedorTexto = div.querySelector('.tarjeta-texto');
-    if (!contenedorTexto) return div;
+      var contenedorTexto = div.querySelector('.tarjeta-texto');
+      if (!contenedorTexto) return div;
 
-    if (resultados.hasOwnProperty(s.nombre)) {
-      var propuesta = resultados[s.nombre];
-      var hayAlgo = textoDeLaPropuesta(propuesta) || (propuesta && propuesta.terceroDesconocido);
-      if (!hayAlgo) return div;   /* nada que proponer: tarjeta como siempre */
-      var grupo = document.createElement('div');
-      grupo.className = 'tarjeta-propuesta';
-      grupo.dataset.propuestaDe = s.nombre;
-      contenedorTexto.appendChild(grupo);
-      rellenarLinea(grupo, s, propuesta);
+      if (resultados.hasOwnProperty(s.nombre)) {
+        var propuesta = resultados[s.nombre];
+        var hayAlgo = textoDeLaPropuesta(propuesta) || (propuesta && propuesta.terceroDesconocido);
+        if (!hayAlgo) return div;   /* nada que proponer: tarjeta como siempre */
+        var grupo = document.createElement('div');
+        grupo.className = 'tarjeta-propuesta';
+        grupo.dataset.propuestaDe = s.nombre;
+        contenedorTexto.appendChild(grupo);
+        rellenarLinea(grupo, s, propuesta);
+        return div;
+      }
+
+      var leyendo = document.createElement('div');
+      leyendo.className = 'tarjeta-pie tarjeta-propuesta';
+      leyendo.dataset.propuestaDe = s.nombre;
+      leyendo.textContent = 'Leyendo el documento…';
+      contenedorTexto.appendChild(leyendo);
+      encolar(s.nombre);
       return div;
-    }
-
-    var leyendo = document.createElement('div');
-    leyendo.className = 'tarjeta-pie tarjeta-propuesta';
-    leyendo.dataset.propuestaDe = s.nombre;
-    leyendo.textContent = 'Leyendo el documento…';
-    contenedorTexto.appendChild(leyendo);
-    encolar(s.nombre);
-    return div;
-  };
+    };
+  });
 })();

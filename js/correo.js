@@ -558,16 +558,16 @@
   /* ---------- los botones dentro de la ficha del asunto ---------- */
 
   (function () {
-    var comoEra = App.abrirFicha;
-    if (typeof comoEra !== 'function') return;
     var actual = null;
 
-    App.abrirFicha = function (a, modo) {
-      actual = a;
-      modoDelAsunto = modo || 'abierto';
-      comoEra(a, modo);
-      poner();
-    };
+    U.envolver('App.abrirFicha', window.App, 'abrirFicha', 'js/correo.js', function (comoEra) {
+      return function (a, modo) {
+        actual = a;
+        modoDelAsunto = modo || 'abierto';
+        comoEra(a, modo);
+        poner();
+      };
+    });
 
     /* "Correo" y "Mensaje Séneca" se juntan en un solo botón,
        "Comunicar" (18-sep-2026, fila 52, docs/CABECERA-DEL-ASUNTO.md,

@@ -355,11 +355,18 @@ Aparte, en `localStorage`: `gestor-barra`, `gestor-filtros`, `gestor-lector-anch
   `lector.js` va antes que `bandeja-correos.js`, y `bandeja-enlace.js` después de los dos.
   `bandeja-pantalla.js` va justo después de `bandeja-correos.js` (necesita `window.Bandeja`) y
   antes de `bandeja-enlace.js` y `correo-adjuntos.js`.
-  `dni.js` va casi el último; `inicio.js`, el último.
-- **Envolver una función que ya existe es la mejor manera de añadir algo a muchas pantallas a la
-  vez** (hay más de 17 envolturas así). Condición: cargarse **después** del fichero que define lo
-  que se envuelve. No siempre compensa: cuando lo que hay que cambiar está dentro de una función
-  privada, sale mejor tocar ese fichero directamente.
+  `dni.js` va casi el último; `inicio.js`, el penúltimo; `envolturas-esperadas.js` (fila 70), el
+  último de todos.
+- **Un módulo nuevo no envuelve** (regla desde la fila 70, 19-sep-2026,
+  `docs/ENVOLTURAS-COMPROBADAS.md`): se engancha por un punto previsto (`window.Gestor.
+  alRefrescar` y los que haya) o se le añade uno. Envolver una función que ya existe sigue siendo
+  la mejor manera de añadir algo a muchas pantallas a la vez cuando no hay más remedio (42
+  envolturas así), pero **con `U.envolver(etiqueta, objeto, propiedad, fichero, fabricaNueva)`**,
+  nunca a mano con `var comoEra = ...`: si la función no existe (orden de `<script>` equivocado),
+  `U.envolver` lo apunta como fallo en vez de fallar en silencio, y `js/envolturas-esperadas.js`
+  (el último `<script>`) avisa en rojo en la entrada si falta alguna de las esperadas. Toda
+  envoltura nueva se apunta también ahí. No siempre compensa: cuando lo que hay que cambiar está
+  dentro de una función privada, sale mejor tocar ese fichero directamente.
 
 ### Cómo probar
 

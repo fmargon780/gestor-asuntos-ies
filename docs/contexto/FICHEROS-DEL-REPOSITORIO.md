@@ -18,7 +18,7 @@ de `App` va después del fichero que lo define.
 | `css/guias.css` | La guía: pasos, plegado, preguntas y opciones |
 | `css/tipos-buscador.css` | Las listas de resultados, y la marca naranja del que ya no está |
 | `css/copiar-nie.css` | Los estilos de `js/copiar.js` (nombre viejo del módulo) |
-| `js/util.js` | Utilidades comunes, y la comparación de nombres parecidos. `U.mensajeDeError(e)` traduce al castellano los errores del navegador (`NotFoundError` y compañía) |
+| `js/util.js` | Utilidades comunes, y la comparación de nombres parecidos. `U.mensajeDeError(e)` traduce al castellano los errores del navegador (`NotFoundError` y compañía). `U.envolver`/`U.envolturasAplicadas`/`U.envolturasFallidas` (fila 70) apuntan las envolturas de la aplicación |
 | `js/almacen.js` | Guarda los ajustes en el navegador |
 | `js/carpetas.js` | Habla con el selector de carpetas del navegador. Lee y escribe los JSON. `Carpetas.esCarpetaTemporalDeSincronizacion` descarta, en un solo sitio, las carpetas y ficheros que dejan Dropbox y Drive al sincronizar; `contarFicheros`/`copiarDentro`/la fusión los saltan, y un fichero que desaparece a mitad de copia se reintenta una vez |
 | `js/copias.js` | Copia de seguridad diaria de los ficheros de `_GESTOR`, y detección de fichero roto |
@@ -122,6 +122,7 @@ de `App` va después del fichero que lo define.
 | `js/hitos-ajustes.js` | El bloque "Hitos" de Ajustes: responsables y días no lectivos |
 | `css/hitos.css` | El aspecto de la lista de hitos en la ficha del asunto, y del bloque de Ajustes |
 | `js/inicio.js` | La última línea: `App.arrancar()` |
+| `js/envolturas-esperadas.js` | El **último** `<script>` de todos (fila 70): compara `U.envolturasAplicadas()` con la lista de las 42 que tienen que estar, y avisa en rojo en la pantalla de entrada si falta alguna (`window.EnvolturasEsperadas`) |
 | `package.json` | Las dependencias de las pruebas (`playwright`, `jsdom`) y `npm test` |
 | `pruebas/ejecutar.mjs` | Levanta el servidor local y ejecuta todas las pruebas de esta carpeta |
 | `.github/workflows/pruebas.yml` | Ejecuta `npm test` en cada subida y cada pull request a `main` |

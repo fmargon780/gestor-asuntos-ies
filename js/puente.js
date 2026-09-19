@@ -49,9 +49,8 @@ window.Gestor = {
 /* Los botones de los módulos se cuelan en la tarjeta sin que el
    fichero de la lista tenga que saber nada de ellos: aquí se envuelve
    la función que la pinta y se le añaden antes de "Copiar nombre". */
-(function () {
-  var comoEra = App.tarjetaAsunto;
-  App.tarjetaAsunto = function (a, modo) {
+U.envolver('App.tarjetaAsunto', window.App, 'tarjetaAsunto', 'js/puente.js', function (comoEra) {
+  return function (a, modo) {
     var div = comoEra(a, modo);
     var acciones = div.querySelector('.acciones');
     if (!acciones) return div;
@@ -63,7 +62,7 @@ window.Gestor = {
     });
     return div;
   };
-})();
+});
 
 /* La aplicación llama a esto cada vez que repinta la lista. */
 App.avisarALosModulos = function () {

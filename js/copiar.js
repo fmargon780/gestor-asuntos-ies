@@ -109,9 +109,8 @@
 
   /* ---------- 1. la tarjeta de cada asunto ---------- */
 
-  (function () {
-    var comoEra = App.tarjetaAsunto;
-    App.tarjetaAsunto = function (a, modo) {
+  U.envolver('App.tarjetaAsunto', window.App, 'tarjetaAsunto', 'js/copiar.js', function (comoEra) {
+    return function (a, modo) {
       var div = comoEra(a, modo);
       var nie = nieDeAsunto(a);
       var acciones = div.querySelector('.acciones');
@@ -120,7 +119,7 @@
       }
       return div;
     };
-  })();
+  });
 
   /* ---------- 2. la ficha del asunto ----------
 
@@ -131,19 +130,18 @@
      se termina de leer la carpeta. */
 
   (function () {
-    var comoEra = App.abrirFicha;
-    if (typeof comoEra !== 'function') return;
-
     /* El número del alumno ya no se pone aquí, pegado al `<h2>`: desde
        la fila 58 (docs/AJUSTES-DE-USO-2026-09-18.md, 1) vive en la fila
        de botones de copiar de un gesto (js/ficha-nombre-acciones.js),
        para no tener dos caminos. Este envoltorio se queda solo con los
        documentos, que siguen llegando tarde (cuando termina de leer la
        carpeta). */
-    App.abrirFicha = function (a, modo) {
-      comoEra(a, modo);
-      ponerEnDocumentos();
-    };
+    U.envolver('App.abrirFicha', window.App, 'abrirFicha', 'js/copiar.js', function (comoEra) {
+      return function (a, modo) {
+        comoEra(a, modo);
+        ponerEnDocumentos();
+      };
+    });
 
     var pantalla = document.getElementById('pantalla-asunto');
     if (pantalla && window.MutationObserver) {
@@ -181,33 +179,27 @@
     });
   }
 
-  (function () {
-    var comoEra = App.buscarPersonas;
-    if (typeof comoEra === 'function') {
-      App.buscarPersonas = function () {
-        var r = comoEra.apply(this, arguments);
-        ponerEnResultados(document.getElementById('lista-personas'));
-        return r;
-      };
-    }
-    var comoEra2 = App.buscarTercero;
-    if (typeof comoEra2 === 'function') {
-      App.buscarTercero = function () {
-        var r = comoEra2.apply(this, arguments);
-        Promise.resolve(r).then(function () {
-          ponerEnResultados(document.getElementById('resultados-tercero'));
-        });
-        return r;
-      };
-    }
-  })();
+  U.envolver('App.buscarPersonas', window.App, 'buscarPersonas', 'js/copiar.js', function (comoEra) {
+    return function () {
+      var r = comoEra.apply(this, arguments);
+      ponerEnResultados(document.getElementById('lista-personas'));
+      return r;
+    };
+  });
+  U.envolver('App.buscarTercero', window.App, 'buscarTercero', 'js/copiar.js', function (comoEra) {
+    return function () {
+      var r = comoEra.apply(this, arguments);
+      Promise.resolve(r).then(function () {
+        ponerEnResultados(document.getElementById('resultados-tercero'));
+      });
+      return r;
+    };
+  });
 
   /* ---------- 4. la ficha del alumno, en Personas ---------- */
 
-  (function () {
-    var comoEra = App.verFicha;
-    if (typeof comoEra !== 'function') return;
-    App.verFicha = function (p) {
+  U.envolver('App.verFicha', window.App, 'verFicha', 'js/copiar.js', function (comoEra) {
+    return function (p) {
       var r = comoEra.apply(this, arguments);
       if (!p || p.categoria !== 'ALUMNADO' || !p.id) return r;
       var caja = document.getElementById('ficha-persona');
@@ -220,7 +212,7 @@
       else caja.insertBefore(fila, caja.firstChild);
       return r;
     };
-  })();
+  });
 
   /* ==========================================================
      EL NOMBRE DEL DOCUMENTO, SIN LA EXTENSIÓN

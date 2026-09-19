@@ -76,10 +76,11 @@
 
   /* Se cuela justo antes de que la aplicación lea su configuración.
      Un fallo aquí no puede impedir entrar. */
-  var comoEra = App.cargarTipos;
-  App.cargarTipos = async function () {
-    try { await rescatar(); } catch (e) { /* seguimos entrando */ }
-    return comoEra.apply(this, arguments);
-  };
+  U.envolver('App.cargarTipos', window.App, 'cargarTipos', 'js/rescate-datos.js', function (comoEra) {
+    return async function () {
+      try { await rescatar(); } catch (e) { /* seguimos entrando */ }
+      return comoEra.apply(this, arguments);
+    };
+  });
 
 })();

@@ -639,10 +639,8 @@ var Papelera = (function () {
     return b;
   }
 
-  (function envolverSueltos() {
-    if (typeof App.tarjetaSuelto !== 'function') return;
-    var comoEra = App.tarjetaSuelto;
-    App.tarjetaSuelto = function (s, pie, esNuevo) {
+  U.envolver('App.tarjetaSuelto', window.App, 'tarjetaSuelto', 'js/papelera.js', function (comoEra) {
+    return function (s, pie, esNuevo) {
       var div = comoEra(s, pie, esNuevo);
       var acciones = div.querySelector('.acciones');
       if (!acciones) return div;
@@ -665,12 +663,10 @@ var Papelera = (function () {
       else acciones.appendChild(borrar);
       return div;
     };
-  })();
+  });
 
-  (function envolverFichaDePersona() {
-    if (typeof App.verFicha !== 'function') return;
-    var comoEra = App.verFicha;
-    App.verFicha = function (p) {
+  U.envolver('App.verFicha', window.App, 'verFicha', 'js/papelera.js', function (comoEra) {
+    return function (p) {
       comoEra(p);
       if (!App.sePuedeCambiarElTercero || !App.sePuedeCambiarElTercero(p)) return;
       var botones = $('ver-sus-asuntos');
@@ -702,7 +698,7 @@ var Papelera = (function () {
         }
       }));
     };
-  })();
+  });
 
   return {
     FICHERO: FICHERO, CARPETA: CARPETA, DIAS_AVISO: DIAS_AVISO,

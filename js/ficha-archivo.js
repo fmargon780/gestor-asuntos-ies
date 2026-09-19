@@ -95,10 +95,8 @@ var FichaArchivo = (function () {
      tocar ninguna de esas dos funciones.
      ========================================================== */
 
-  (function envolverCerrar() {
-    if (typeof App === 'undefined' || typeof App.cerrarAsunto !== 'function') return;
-    var comoEra = App.cerrarAsunto;
-    App.cerrarAsunto = async function (a) {
+  U.envolver('App.cerrarAsunto', window.App, 'cerrarAsunto', 'js/ficha-archivo.js', function (comoEra) {
+    return async function (a) {
       var clave = a.nombre;
       await comoEra(a);
       var ficha = App.E.registro.asuntos[clave];
@@ -115,12 +113,10 @@ var FichaArchivo = (function () {
           e.message, 'malo');
       }
     };
-  })();
+  });
 
-  (function envolverReabrir() {
-    if (typeof App === 'undefined' || typeof App.reabrirAsunto !== 'function') return;
-    var comoEra = App.reabrirAsunto;
-    App.reabrirAsunto = async function (a) {
+  U.envolver('App.reabrirAsunto', window.App, 'reabrirAsunto', 'js/ficha-archivo.js', function (comoEra) {
+    return async function (a) {
       /* Se lee (o se completa, si a.handle no venía puesto) ANTES de
          llamar a lo de siempre: en cuanto la carpeta se mueva, el
          manejador viejo de 'a.handle' deja de servir. */
@@ -143,7 +139,7 @@ var FichaArchivo = (function () {
           'carpeta: ' + e.message, 'malo');
       }
     };
-  })();
+  });
 
   /* ==========================================================
      LA CONVERSIÓN DE LO QUE YA HAY (sección 3.4 del encargo)

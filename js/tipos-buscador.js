@@ -136,9 +136,8 @@
   /* Cada vez que la aplicación repinta los tipos se vuelve a ordenar y
      a filtrar. Al cambiar de categoría se limpia lo buscado, que si no
      se queda una lista vacía sin saber por qué. */
-  (function () {
-    var comoEra = App.pintarTipos;
-    App.pintarTipos = function () {
+  U.envolver('App.pintarTipos', window.App, 'pintarTipos', 'js/tipos-buscador.js', function (comoEra) {
+    return function () {
       comoEra();
       preparar();
       if (App.E.nuevo.categoria !== categoriaAnterior) {
@@ -148,6 +147,6 @@
       }
       aplicar();
     };
-  })();
+  });
 
 })();

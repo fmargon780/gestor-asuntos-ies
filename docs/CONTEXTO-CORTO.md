@@ -138,7 +138,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - **Comprobar siempre lo publicado con `curl`**, nunca dar la publicación por hecha.
 - Vercel publica como máximo 100 veces al día (plan gratuito): `vercel.json` tiene un `ignoreCommand` que se salta los commits que solo tocan `docs/`, `pruebas/`, `.github/` o `.md`, y la cola tiene la regla 13 (como máximo dos subidas por fila, fila 48, 17-sep-2026).
 - Antes de colgar una función nueva de `App`, comprobar que el nombre no está ya cogido. Solo hay un cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.
-- Ojo con `p.campos`: solo trae columnas con datos; para saber si una columna existe, mirar la cabecera del CSV. Ojo también con el orden de los `<script>` de `index.html`: importa para las envolturas.
+- Ojo con `p.campos`: solo trae columnas con datos; para saber si una columna existe, mirar la cabecera del CSV.
+- Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o se le añade uno. Si no hay más remedio, con `U.envolver`, apuntándolo en `js/envolturas-esperadas.js` (fila 70).
 - Una acción que guarda y repinta: `await` hasta el final y usar `U.mientrasGuarda(control, fn)`
   para apagar el botón o desplegable ("Guardando…") mientras tanto (fila 23, 17-sep-2026).
 - Un bloque que se repinta solo nunca puede tirar lo que se está escribiendo, ni el foco, ni el
@@ -162,9 +163,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 - El compañero tiene que entrar en `https://asuntos.fmargon.com`, volver a señalar sus carpetas (el navegador no las hereda de la dirección vieja), y coordinar la lista de tipos de asunto y estados.
 - Poner en marcha el script de Gmail en `g.educaand.es`, señalar `GESTOR-BANDEJA` en Ajustes, y pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs` (sin eso no se siguen los hilos por matrícula, ni la copia oculta de un grupo).
-- Ver si la bandeja de correo acierta con el tipo, y si Comunicaciones de Séneca acepta el largo del asunto. Con una cuenta de correo común, replantear la bandeja como una sola compartida.
-- Ver con el uso: ancho del panel lateral y del tablón, tarjetas por tipo cortas, aviso de "falta el DNI" también en la tarjeta.
-- Comprobar "Ajustar tamaño" (fila 57) con un documento de verdad y las dos medidas por defecto. Qué hacer con los asuntos vivos al cambiar de curso; pasar repositorio y Vercel a una cuenta del centro.
+- Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja como una sola compartida.
+- Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI" en la tarjeta.
+- Comprobar "Ajustar tamaño" (fila 57) con un documento real. Qué hacer con asuntos vivos al cambiar de curso; pasar repositorio y Vercel a una cuenta del centro.
 - Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
 - Pulsar, cuando pueda, "Poner en orden las fichas del ARCHIVO" (Ajustes → Mantenimiento, fila 64): mueve a su carpeta la ficha de los asuntos archivados antes de esa fila, para que `asuntos.json` deje de crecer con ellos.
 - Pulsar, antes de junio de 2027, "Guardar el contacto de los asuntos abiertos" (Ajustes → Mantenimiento, fila 66).

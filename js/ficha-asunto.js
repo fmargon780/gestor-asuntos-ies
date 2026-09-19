@@ -192,13 +192,12 @@
      automático, el botón "Recargar", meter un suelto o un correo en
      un asunto, añadir un tipo que faltaba— reenganche sola la ficha
      si hay una abierta, sin repetir el apaño en cada sitio. */
-  if (typeof App.verAbiertos === 'function') {
-    var comoEraVerAbiertos = App.verAbiertos;
-    App.verAbiertos = async function (yaLeido) {
+  U.envolver('App.verAbiertos', window.App, 'verAbiertos', 'js/ficha-asunto.js', function (comoEraVerAbiertos) {
+    return async function (yaLeido) {
       await comoEraVerAbiertos(yaLeido);
       await App.reengancharFicha();
     };
-  }
+  });
 
   /* El nombre del asunto, en la tarjeta de la lista, abre la ficha.
 
@@ -215,9 +214,8 @@
      tocando la tarjeta. */
   var NOMBRES_NUEVOS = { 'Cerrar': 'Archivar' };
 
-  (function () {
-    var comoEra = App.tarjetaAsunto;
-    App.tarjetaAsunto = function (a, modo) {
+  U.envolver('App.tarjetaAsunto', window.App, 'tarjetaAsunto', 'js/ficha-asunto.js', function (comoEra) {
+    return function (a, modo) {
       var div = comoEra(a, modo);
 
       var nombre = div.querySelector('.tarjeta-nombre');
@@ -250,7 +248,7 @@
 
       return div;
     };
-  })();
+  });
 
   /* ==========================================================
      PINTAR LA FICHA

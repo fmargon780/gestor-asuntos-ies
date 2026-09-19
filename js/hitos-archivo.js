@@ -318,10 +318,8 @@
     } catch (e) { return null; }
   }
 
-  (function envolverCerrar() {
-    if (typeof App === 'undefined' || typeof App.cerrarAsunto !== 'function') return;
-    var comoEra = App.cerrarAsunto;
-    App.cerrarAsunto = async function (a) {
+  U.envolver('App.cerrarAsunto', window.App, 'cerrarAsunto', 'js/hitos-archivo.js', function (comoEra) {
+    return async function (a) {
       var clave = a.nombre;
       await comoEra(a);
       var ficha = App.E.registro.asuntos[clave] || {};
@@ -338,17 +336,15 @@
         U.aviso('El asunto se ha archivado, pero no he podido guardar el historial de hitos: ' + e.message, 'malo');
       }
     };
-  })();
+  });
 
   async function hitosDeConCreados(clave) {
     var datos = await Hitos.leer();
     return datos.porAsunto[clave] || null;
   }
 
-  (function envolverReabrir() {
-    if (typeof App === 'undefined' || typeof App.reabrirAsunto !== 'function') return;
-    var comoEra = App.reabrirAsunto;
-    App.reabrirAsunto = async function (a) {
+  U.envolver('App.reabrirAsunto', window.App, 'reabrirAsunto', 'js/hitos-archivo.js', function (comoEra) {
+    return async function (a) {
       var clave = a.nombre;
       var textoPrevio = null;
       try { textoPrevio = await Carpetas.leerTexto(a.handle, NOMBRE_HISTORIAL); } catch (e) { textoPrevio = null; }
@@ -369,7 +365,7 @@
         U.aviso('Los hitos se han recuperado, pero no he podido borrar el historial viejo: ' + e.message, 'malo');
       }
     };
-  })();
+  });
 
   Object.assign(Hitos, {
     anadirHito: anadirHito, quitarHito: quitarHito, mover: mover,
