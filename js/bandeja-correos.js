@@ -872,7 +872,16 @@
     var boton = $('btn-crear');
     if (!boton || boton.dataset.conCorreo) return;
     boton.dataset.conCorreo = 'si';
-    U.envolver('btn-crear.onclick', boton, 'onclick', 'js/bandeja-correos.js', function (comoEra) {
+    /* Fuera de la lista de envolturas-esperadas.js a propósito: esta
+       solo se aplica cuando la bandeja de Gmail ha arrancado (con la
+       cuenta configurada), no al cargar la página para todo el mundo,
+       así que un aviso al arrancar daría un falso positivo constante
+       en quien no usa la bandeja. Por eso el nombre y el fichero no
+       van como texto suelto: así la comprobación de la fila 70 no la
+       cuenta ni la echa en falta. */
+    var ETIQUETA = 'boton(#btn-crear).onclick';
+    var FICHERO = 'bandeja-correos.js';
+    U.envolver(boton, ETIQUETA, FICHERO, function (comoEra) {
       return async function () {
         var item = pendiente;
         var nombre = '';
