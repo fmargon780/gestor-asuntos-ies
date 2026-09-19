@@ -407,7 +407,14 @@ App.tarjetaTipoAjustes = function (tipo, mostrarCategoria) {
    tipo: se dice cuántos. Si no hay ninguno pero tiene guía escrita, se
    avisa de que la guía se va con él, y se guarda para poder devolverla
    junto con el tipo. */
-App.contarAsuntosConTipo = function (nombreTipo) {
+/* Fila 64 (docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md): la ficha de un
+   asunto archivado ya no está en App.E.registro.asuntos, así que para
+   no borrar un tipo que siguen usando cientos de asuntos ya
+   archivados se mira también el índice del ARCHIVO (una lectura de un
+   fichero, no un recorrido del disco). Sin índice hecho, se cuentan
+   solo abiertos: no es peor que antes de esta fila para quien no lo
+   tenga construido. */
+App.contarAsuntosConTipo = async function (nombreTipo) {
   var vistos = {};
   (App.E.listaAbiertos || []).forEach(function (a) {
     var t = (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo);
@@ -416,11 +423,21 @@ App.contarAsuntosConTipo = function (nombreTipo) {
   Object.keys((App.E.registro && App.E.registro.asuntos) || {}).forEach(function (k) {
     if (App.E.registro.asuntos[k].tipo === nombreTipo) vistos[k] = true;
   });
+  if (window.IndiceArchivo) {
+    try {
+      var resultado = await IndiceArchivo.leerDisco();
+      if (resultado.ok) {
+        resultado.datos.asuntos.forEach(function (e) {
+          if (e.tipo === nombreTipo) vistos[e.nombre] = true;
+        });
+      }
+    } catch (e) { /* sin índice usable, se cuenta solo lo de memoria */ }
+  }
   return Object.keys(vistos).length;
 };
 
 App.borrarTipo = async function (tipo) {
-  var n = App.contarAsuntosConTipo(tipo.tipo);
+  var n = await App.contarAsuntosConTipo(tipo.tipo);
   if (n) {
     await U.preguntar('No se puede borrar',
       '<p>Hay ' + n + ' asunto' + (n === 1 ? '' : 's') + ' con el tipo <strong>' +

@@ -224,8 +224,13 @@
       if (nombre) {
         nombre.classList.add('nombre-pulsable');
         nombre.title = 'Abrir la ficha de este asunto';
-        nombre.onclick = function (ev) {
+        nombre.onclick = async function (ev) {
           ev.stopPropagation();
+          /* Fila 64: la tarjeta del ARCHIVO solo trae lo poco que
+             guarda el índice (situacion, via, categoria, tercero). Antes
+             de abrir la ficha de verdad, se completa con lo que haya en
+             _ficha.json, dentro de la propia carpeta. */
+          if (modo === 'archivado' && window.FichaArchivo) await FichaArchivo.completar(a);
           App.abrirFicha(a, modo);
         };
       }

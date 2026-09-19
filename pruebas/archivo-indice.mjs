@@ -88,18 +88,21 @@ await pagina.evaluate(async ([n1, n2, n3, n4]) => {
 
   await crearAsunto('ALUMNADO', 'Perez Perez, Ana 1234567', n1,
     ['250915 26EM1234 SOLICITUD.pdf', '250915 INFORME CURSO 2025.pdf']);
-  await crearAsunto('ALUMNADO', 'Otro Tercero 7654321', n2, ['250801 CERTIFICADO.pdf']);
+  var asuntoN2 = await crearAsunto('ALUMNADO', 'Otro Tercero 7654321', n2, ['250801 CERTIFICADO.pdf']);
   await crearAsunto('PERSONAL', 'Ruiz Soto, Pedro 1112', n3, ['250601 CONTRATO.pdf']);
   /* escenario 6: un asunto colocado directamente bajo la categoría */
   await crearAsunto('ALUMNADO', '', n4, ['250501 BECA.pdf']);
 
   /* escenario 4: un relacionado que solo vive en la ficha, no en el
-     nombre de la carpeta. Se apunta ANTES de la primera lectura, como
-     haría la aplicación de verdad al archivar con relacionados. */
-  window.App.E.registro.asuntos[n2] = {
+     nombre de la carpeta. Desde la fila 64
+     (docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md) la ficha de un archivado
+     vive en su propia carpeta, así que se deja como dejaría la
+     aplicación de verdad al archivar con relacionados: _ficha.json
+     dentro de la carpeta, nada en asuntos.json. */
+  await window.FichaArchivo.escribir(asuntoN2, {
     estado: 'cerrado', categoria: 'ALUMNADO', tercero: 'Otro Tercero 7654321',
     relacionados: [{ categoria: 'PERSONAL', nombre: 'Gomez Ruiz, Maria 5556' }]
-  };
+  });
 }, [NOMBRE_1, NOMBRE_2, NOMBRE_3, NOMBRE_SUELTO]);
 
 await pagina.click('#btn-barra');
@@ -194,7 +197,12 @@ await comprobar('5. archivar añade la entrada al índice, sin perder las que ya
   nombresIndiceDeDisco(), [NOMBRE_2, NOMBRE_3, NOMBRE_5, NOMBRE_SUELTO, NOMBRE_1].sort());
 
 await pagina.evaluate(([nombre]) => {
-  window.__a5b = { nombre: nombre, padre: null, ficha: window.App.E.registro.asuntos[nombre] };
+  /* Fila 64: tras archivar, la ficha ya no está en
+     App.E.registro.asuntos (vive en _ficha.json, dentro de la propia
+     carpeta). Se reutiliza la misma categoría/tercero con la que se
+     archivó, como haría la aplicación de verdad (la tarjeta del
+     ARCHIVO los trae siempre, tomados del índice). */
+  window.__a5b = { nombre: nombre, padre: null, ficha: window.__a5.ficha };
 }, [NOMBRE_5]);
 const r5reabrir = await pasarPorElCuadro('reabrirAsunto', '__a5b', '__r5reabrir');
 await comprobar('5. reabrirAsunto no lanza ningún error', r5reabrir.ok, true);

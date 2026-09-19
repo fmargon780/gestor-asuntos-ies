@@ -72,9 +72,18 @@ const r1 = await pasarPorElCuadro('cerrarAsunto', '__a1', '__r1');
 await comprobar('1. no lanza ningún error', r1.ok, true);
 await comprobar('1. avisa en verde de que ya estaba archivado',
   pagina.locator('.mensaje.bueno').filter({ hasText: 'Este asunto ya estaba archivado' }).count(), 1);
+/* Fila 64 (docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md): la ficha de un
+   asunto archivado ya no se queda en asuntos.json, ni siquiera en este
+   camino de "ya estaba archivado" (js/ficha-archivo.js la baja a
+   _ficha.json en cuanto ve el estado "cerrado"). Se lee de ahí. */
+await comprobar('1. ya no queda en asuntos.json', pagina.evaluate(() =>
+  !!window.App.E.registro.asuntos['260101 MATRICULA 26-27 Perez Gomez, Juan 1234567']), false);
 await comprobar('1. la ficha queda cerrada, con la categoría, el tercero y los ficheros contados',
-  pagina.evaluate(() => {
-    var f = window.App.E.registro.asuntos['260101 MATRICULA 26-27 Perez Gomez, Juan 1234567'];
+  pagina.evaluate(async () => {
+    const cat = await window.__disco.archivo.getDirectoryHandle('ALUMNADO');
+    const ter = await cat.getDirectoryHandle('Perez Gomez, Juan 1234567');
+    const asunto = await ter.getDirectoryHandle('260101 MATRICULA 26-27 Perez Gomez, Juan 1234567');
+    const f = await window.FichaArchivo.leer(asunto);
     return { estado: f.estado, categoria: f.categoria, tercero: f.tercero, ficheros: f.ficheros };
   }), { estado: 'cerrado', categoria: 'ALUMNADO', tercero: 'Perez Gomez, Juan 1234567', ficheros: 1 });
 

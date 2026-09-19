@@ -24,15 +24,15 @@
     return Object.keys(App.E.registro.asuntos).filter(function (k) { return !hayCarpeta[k]; });
   }
 
-  /* Las carpetas (abiertas o archivadas) que no tienen ficha: son las
-     candidatas para enlazar una huérfana con ellas. */
+  /* Las carpetas ABIERTAS que no tienen ficha: son las candidatas
+     para enlazar una huérfana con ellas. Desde la fila 64
+     (docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md) las carpetas archivadas
+     ya no cuentan: su ficha vive en su propia _ficha.json, así que no
+     tener entrada en asuntos.json es lo normal, no una huérfana. */
   function carpetasSinFicha() {
     var salida = [];
     App.E.listaAbiertos.forEach(function (a) {
       if (!App.E.registro.asuntos[a.nombre]) salida.push({ nombre: a.nombre, donde: 'Abiertos' });
-    });
-    App.E.listaArchivo.forEach(function (a) {
-      if (!App.E.registro.asuntos[a.nombre]) salida.push({ nombre: a.nombre, donde: 'Archivo: ' + a.ruta });
     });
     return salida;
   }

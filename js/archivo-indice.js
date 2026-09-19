@@ -19,16 +19,19 @@
    se fusiona: el compañero puede haber archivado o reabierto un
    asunto desde el otro ordenador mientras tanto.
 
-   Lo que NO guarda: nada de la ficha del asunto (`_GESTOR/asuntos.json`).
-   El estado, la vía, quién lo pidió, los relacionados y los campos
-   propios se leen en el momento de buscar, de `App.E.registro.asuntos`,
-   que ya está en memoria (`textoDeBusqueda`, más abajo): así un cambio
-   en la ficha se nota al instante y sin reconstruir nada.
+   Hasta la fila 64 no guardaba nada de la ficha del asunto: el estado,
+   la vía, quién lo pidió, los relacionados y los campos propios se
+   leían al buscar, de `App.E.registro.asuntos`. Desde que la ficha de
+   un archivado vive en su propia carpeta (`_ficha.json`,
+   js/ficha-archivo.js) y ya no está en `asuntos.json`, esos pocos
+   campos se guardan aquí mismo, en cada entrada (`entradaDe`, más
+   abajo): tomados de la ficha en memoria al archivar, o releídos de
+   `_ficha.json` al reconstruir el índice entero.
 
    Va cargado después de `js/carpetas.js`, `js/nombres.js` y
    `js/nucleo.js` (usa `App.E`), y antes de `js/asuntos-archivar.js`
-   (alta y baja al archivar/reabrir) y de `js/archivo-personas.js`
-   (la pantalla).
+   (alta y baja al archivar/reabrir), de `js/archivo-personas.js`
+   (la pantalla) y de `js/ficha-archivo.js`.
    ============================================================ */
 var IndiceArchivo = (function () {
 
@@ -172,19 +175,46 @@ var IndiceArchivo = (function () {
      UNA ENTRADA DEL ÍNDICE
      ========================================================== */
 
+  /* Lo poco de la ficha que hace falta para pintar la tarjeta y para
+     buscar (fila 64, docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md): desde
+     que la ficha de un archivado vive en su propia carpeta
+     (`_ficha.json`) y no en `asuntos.json`, se guarda aquí, tomada de
+     la ficha en el momento de archivar o releída de `_ficha.json` al
+     reconstruir el índice. */
+  function camposDeFicha(ficha) {
+    var campos = (ficha && ficha.campos) || {};
+    return Object.keys(campos).map(function (c) { return campos[c] && campos[c].valor; })
+      .filter(Boolean).join(' ');
+  }
+
+  function relacionadosDeFicha(ficha) {
+    return ((ficha && ficha.relacionados) || []).filter(function (r) { return r && r.nombre; });
+  }
+
   /* `handle` es la carpeta del asunto ya localizada; `sueltoEn` es ''
      para un asunto en su sitio, o el texto del punto 5 del encargo
-     para uno descolocado. */
-  async function entradaDe(handle, nombre, categoria, tercero, ruta, sueltoEn, tipos) {
+     para uno descolocado. `fichaConocida` es la ficha en memoria, si
+     ya se tiene (al archivar); si no se pasa (al reconstruir el
+     índice desde cero), se intenta leer `_ficha.json` de la propia
+     carpeta. */
+  async function entradaDe(handle, nombre, categoria, tercero, ruta, sueltoEn, tipos, fichaConocida) {
     var leido = Nombres.leer(nombre, tipos);
     var cursoGrupo = cursoYGrupoDeResto(leido.resto);
     var documentos = await nombresDeDocumentos(handle);
+    var ficha = fichaConocida;
+    if (ficha === undefined && window.FichaArchivo) {
+      try { ficha = await FichaArchivo.leer(handle); } catch (e) { ficha = null; }
+    }
+    ficha = ficha || {};
     return {
       nombre: nombre, categoria: categoria, tercero: tercero, ruta: ruta,
       fecha: leido.fecha || '', tipo: leido.tipo || '',
       curso: cursoGrupo.curso, grupo: cursoGrupo.grupo,
       documentos: documentos, registros: registrosDeNombres(documentos),
-      sueltoEn: sueltoEn || ''
+      sueltoEn: sueltoEn || '',
+      situacion: ficha.situacion || '', via: ficha.via || '', viaDato: ficha.viaDato || '',
+      loPideNombre: (ficha.loPide && ficha.loPide.nombre) || '',
+      relacionados: relacionadosDeFicha(ficha), camposTexto: camposDeFicha(ficha)
     };
   }
 
@@ -315,28 +345,21 @@ var IndiceArchivo = (function () {
      EL TEXTO DE BÚSQUEDA DE UNA ENTRADA (punto 7 del encargo)
      ========================================================== */
 
-  /* Junta lo del índice con lo de la ficha en memoria
-     (`App.E.registro.asuntos`), y lo normaliza una sola vez. */
-  function textoDeBusqueda(entrada, ficha) {
-    ficha = ficha || {};
+  /* Junta lo del índice (que desde la fila 64 ya trae lo poco que hace
+     falta de la ficha, ver entradaDe) y lo normaliza una sola vez. */
+  function textoDeBusqueda(entrada) {
     var partes = [
       entrada.nombre, entrada.categoria, entrada.tercero, entrada.ruta,
       entrada.tipo, entrada.curso, entrada.grupo
     ].concat(entrada.documentos || []).concat(entrada.registros || []);
 
-    partes.push(ficha.situacion || '');
-    if (ficha.via) {
-      var v = window.Nombres && Nombres.via(ficha.via);
-      partes.push(v ? v.texto : ficha.via);
+    partes.push(entrada.situacion || '');
+    if (entrada.via) {
+      var v = window.Nombres && Nombres.via(entrada.via);
+      partes.push(v ? v.texto : entrada.via);
     }
-    partes.push(ficha.viaDato || '');
-    if (ficha.loPide && ficha.loPide.nombre) partes.push(ficha.loPide.nombre);
-    (ficha.relacionados || []).forEach(function (r) { if (r && r.nombre) partes.push(r.nombre); });
-    var campos = ficha.campos || {};
-    Object.keys(campos).forEach(function (clave) {
-      var v = campos[clave] && campos[clave].valor;
-      if (v) partes.push(v);
-    });
+    partes.push(entrada.viaDato || '', entrada.loPideNombre || '', entrada.camposTexto || '');
+    (entrada.relacionados || []).forEach(function (r) { if (r && r.nombre) partes.push(r.nombre); });
 
     return U.normalizar(partes.join(' '));
   }

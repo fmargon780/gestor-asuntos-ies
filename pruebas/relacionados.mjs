@@ -275,7 +275,13 @@ await comprobar('en la nota no hay ningún documento del asunto: solo el fichero
   ['DONDE ESTA ESTE ASUNTO.txt']);
 
 /* 9a) La ficha de Aguado Ranea, con el asunto ya archivado, dice que
-   está relacionado con él. */
+   está relacionado con él. Desde la fila 64
+   (docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md) la ficha de un archivado ya
+   no vive en asuntos.json, así que este cruce mira el índice del
+   ARCHIVO: hace falta que esté construido (aquí, como lo estaría en
+   cuanto alguien entra en la pantalla ARCHIVO y pulsa "Reconstruir",
+   o si ya lo estaba de antes). */
+await pagina.evaluate(async () => { await window.App.reconstruirIndiceArchivo(); });
 await pagina.click('.pestana[data-pantalla="personas"]');
 await pagina.selectOption('#filtro-personas', 'PERSONAL');
 await pagina.waitForTimeout(250);

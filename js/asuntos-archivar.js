@@ -27,8 +27,14 @@
 async function actualizarIndiceAlArchivar(nombre, categoria, tercero, handle) {
   if (!window.IndiceArchivo) return;
   try {
+    /* La ficha todavía está en App.E.registro.asuntos en este punto:
+       js/ficha-archivo.js (fila 64) no la baja a su carpeta hasta
+       después, envolviendo App.cerrarAsunto por fuera de esto. Se
+       pasa aquí para que el índice guarde ya los pocos campos que
+       hacen falta para pintar la tarjeta y para buscar. */
+    var ficha = (App.E.registro.asuntos && App.E.registro.asuntos[nombre]) || {};
     var entrada = await IndiceArchivo.entradaDe(
-      handle, nombre, categoria, tercero, categoria + ' / ' + tercero, '', App.E.tipos);
+      handle, nombre, categoria, tercero, categoria + ' / ' + tercero, '', App.E.tipos, ficha);
     await IndiceArchivo.anadirEntrada(entrada);
   } catch (e) { /* el índice es prescindible: se puede reconstruir entero */ }
 }

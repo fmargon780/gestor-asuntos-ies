@@ -44,12 +44,22 @@ App.verArchivo = async function () {
   var descolocados = 0;
   var salida = (usable.asuntos || []).map(function (e) {
     if (e.sueltoEn) descolocados++;
-    var ficha = App.E.registro.asuntos[e.nombre] || {};
+    /* Fila 64 (docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md): la ficha de
+       un archivado ya no está en App.E.registro.asuntos, así que se
+       arma con lo poco que el propio índice guarda (categoria y
+       tercero hacen falta para que App.reabrirAsunto sepa localizar
+       la carpeta sin tener que resolver el manejador antes). Si se
+       necesita la ficha entera (al abrir la ficha de verdad), se
+       completa con FichaArchivo.completar. */
+    var ficha = {
+      situacion: e.situacion || '', via: e.via || '', viaDato: e.viaDato || '',
+      categoria: e.categoria || '', tercero: e.tercero || ''
+    };
     return {
       nombre: e.nombre, handle: null, padre: null, ruta: e.ruta,
       categoria: e.categoria, tercero: e.tercero, sueltoEn: e.sueltoEn || '',
       leido: Nombres.leer(e.nombre, App.E.tipos), ficha: ficha,
-      busca: IndiceArchivo.textoDeBusqueda(e, ficha)
+      busca: IndiceArchivo.textoDeBusqueda(e)
     };
   });
   salida.sort(function (a, b) { return a.nombre < b.nombre ? 1 : -1; });
@@ -337,7 +347,7 @@ App.verAsuntosDeTercero = async function (p) {
     var ter = await cat.getDirectoryHandle(texto);
     var cerradas = await Carpetas.subcarpetas(ter);
     cerradas.forEach(function (c) {
-      salida.push({ nombre: c.nombre, donde: 'Archivado' });
+      salida.push({ nombre: c.nombre, donde: 'Archivado', handle: c.handle });
     });
   } catch (e) { /* todavía no tiene carpeta en el archivo */ }
 
@@ -347,9 +357,14 @@ App.verAsuntosDeTercero = async function (p) {
     caja.innerHTML = '<div class="vacio">Todavía no hay ningún asunto suyo.</div>';
     return;
   }
-  caja.innerHTML = salida.map(function (a) {
+  /* Fila 64: la ficha de uno archivado ya no está en
+     App.E.registro.asuntos, hay que leer su _ficha.json (se tiene el
+     manejador de la propia carpeta, así que sale barato). */
+  var filas = await Promise.all(salida.map(async function (a) {
     var leido = Nombres.leer(a.nombre, App.E.tipos);
-    var ficha = App.E.registro.asuntos[a.nombre] || {};
+    var ficha = a.donde === 'Abierto'
+      ? (App.E.registro.asuntos[a.nombre] || {})
+      : ((window.FichaArchivo && await FichaArchivo.leer(a.handle)) || {});
     var situacion = ficha.situacion || '';
     return '<div class="resultado"><div>' +
            (leido.tipo ? '<span class="marca-tipo">' + U.escapar(leido.tipo) + '</span>' : '') +
@@ -358,7 +373,8 @@ App.verAsuntosDeTercero = async function (p) {
            U.escapar(a.nombre) + '</div>' +
            '<div class="resultado-pie">' + a.donde +
            (leido.fecha ? '  ·  ' + U.fechaLegible(leido.fecha) : '') + '</div></div>';
-  }).join('');
+  }));
+  caja.innerHTML = filas.join('');
 };
 
 $('filtro-personas').onchange = function () { App.pintarPersonas(); };
