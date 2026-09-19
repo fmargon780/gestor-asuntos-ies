@@ -668,7 +668,7 @@ window.Relacionados = Relacionados;
    vez de tocarlas: así, si el asunto no tiene relacionados, todo sigue
    exactamente igual que antes. */
 
-U.envolver('App.cerrarAsunto', window.App, 'cerrarAsunto', 'js/relacionados.js', function (comoEra) {
+U.envolver(App, 'App.cerrarAsunto', 'relacionados.js', function (comoEra) {
   return async function (a) {
     var relacionados = (a.ficha && a.ficha.relacionados) || [];
     var marcarEstos = [];
@@ -684,7 +684,7 @@ U.envolver('App.cerrarAsunto', window.App, 'cerrarAsunto', 'js/relacionados.js',
   };
 });
 
-U.envolver('App.reabrirAsunto', window.App, 'reabrirAsunto', 'js/relacionados.js', function (comoEra) {
+U.envolver(App, 'App.reabrirAsunto', 'relacionados.js', function (comoEra) {
   return async function (a) {
     var relacionados = (a.ficha && a.ficha.relacionados) || [];
     await comoEra(a);
@@ -707,7 +707,7 @@ function esNotaDeRelacionado(nombre) {
   return String(nombre || '').indexOf('(RELACIONADO) ') === 0;
 }
 
-U.envolver('App.verArchivo', window.App, 'verArchivo', 'js/relacionados.js', function (comoEra) {
+U.envolver(App, 'App.verArchivo', 'relacionados.js', function (comoEra) {
   return async function () {
     await comoEra();
     App.E.listaArchivo = App.E.listaArchivo.filter(function (a) {
@@ -717,51 +717,49 @@ U.envolver('App.verArchivo', window.App, 'verArchivo', 'js/relacionados.js', fun
   };
 });
 
-if (window.Duplicados) {
-  U.envolver('window.Duplicados.delTercero', window.Duplicados, 'delTercero', 'js/relacionados.js', function (comoEra) {
-    return async function (categoria, tercero) {
-      var salida = await comoEra(categoria, tercero);
-      salida.archivados = (salida.archivados || []).filter(function (n) {
-        return !esNotaDeRelacionado(n);
-      });
-      return salida;
-    };
-  });
-}
+U.envolver(window.Duplicados, 'window.Duplicados.delTercero', 'relacionados.js', function (comoEra) {
+  return async function (categoria, tercero) {
+    var salida = await comoEra(categoria, tercero);
+    salida.archivados = (salida.archivados || []).filter(function (n) {
+      return !esNotaDeRelacionado(n);
+    });
+    return salida;
+  };
+});
 
 /* ---------- engancharse a la ficha de la persona ---------- */
 
 (function () {
   function $(id) { return document.getElementById(id); }
-  U.envolver('App.verFicha', window.App, 'verFicha', 'js/relacionados.js', function (comoEra) {
+  U.envolver(App, 'App.verFicha', 'relacionados.js', function (comoEra) {
     return function (p) {
-      comoEra(p);
-      var caja = $('ficha-persona');
-      if (!caja) return;
-      var nombre = App.textoTercero(p);
-      /* asuntosDondeEsRelacionado es async desde la fila 64 (mira
-         también el índice del ARCHIVO): se pinta cuando responda, si la
-         pantalla de la persona sigue en pie (isConnected). Si mientras
-         tanto se ha abierto otra persona, esto ya no es perfecto (el
-         bloque podría llegar tarde y colgarse de la ficha nueva), pero
-         es solo un texto de consulta, nada que se guarde ni se pueda
-         estropear: el mismo riesgo que ya asume el nombre del tercero en
-         js/ficha-nombre-acciones.js. */
-      Relacionados.asuntosDondeEsRelacionado(p.categoria, nombre).then(function (asuntos) {
-        if (!asuntos.length || !caja.isConnected) return;
+    comoEra(p);
+    var caja = $('ficha-persona');
+    if (!caja) return;
+    var nombre = App.textoTercero(p);
+    /* asuntosDondeEsRelacionado es async desde la fila 64 (mira
+       también el índice del ARCHIVO): se pinta cuando responda, si la
+       pantalla de la persona sigue en pie (isConnected). Si mientras
+       tanto se ha abierto otra persona, esto ya no es perfecto (el
+       bloque podría llegar tarde y colgarse de la ficha nueva), pero
+       es solo un texto de consulta, nada que se guarde ni se pueda
+       estropear: el mismo riesgo que ya asume el nombre del tercero en
+       js/ficha-nombre-acciones.js. */
+    Relacionados.asuntosDondeEsRelacionado(p.categoria, nombre).then(function (asuntos) {
+      if (!asuntos.length || !caja.isConnected) return;
 
-        var bloque = document.createElement('div');
-        bloque.className = 'ficha-relacionado-de';
-        bloque.innerHTML = '<p class="nota"><strong>' +
-          (asuntos.length === 1 ? 'Relacionado con este asunto:' : 'Relacionado con estos asuntos:') +
-          '</strong></p>' +
-          asuntos.map(function (x) {
-            return '<div class="resultado">' + U.escapar(x.nombre) +
-                   '<div class="resultado-pie">' + (x.archivado ? 'Archivado' : 'Abierto') +
-                   '</div></div>';
-          }).join('');
-        caja.appendChild(bloque);
-      });
+      var bloque = document.createElement('div');
+      bloque.className = 'ficha-relacionado-de';
+      bloque.innerHTML = '<p class="nota"><strong>' +
+        (asuntos.length === 1 ? 'Relacionado con este asunto:' : 'Relacionado con estos asuntos:') +
+        '</strong></p>' +
+        asuntos.map(function (x) {
+          return '<div class="resultado">' + U.escapar(x.nombre) +
+                 '<div class="resultado-pie">' + (x.archivado ? 'Archivado' : 'Abierto') +
+                 '</div></div>';
+        }).join('');
+      caja.appendChild(bloque);
+    });
     };
   });
 })();

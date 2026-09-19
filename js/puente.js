@@ -49,7 +49,7 @@ window.Gestor = {
 /* Los botones de los módulos se cuelan en la tarjeta sin que el
    fichero de la lista tenga que saber nada de ellos: aquí se envuelve
    la función que la pinta y se le añaden antes de "Copiar nombre". */
-U.envolver('App.tarjetaAsunto', window.App, 'tarjetaAsunto', 'js/puente.js', function (comoEra) {
+U.envolver(App, 'App.tarjetaAsunto', 'puente.js', function (comoEra) {
   return function (a, modo) {
     var div = comoEra(a, modo);
     var acciones = div.querySelector('.acciones');
