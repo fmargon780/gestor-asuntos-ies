@@ -27,7 +27,7 @@ Todo vive en el Dropbox del centro. Nada de esto sale de ahí salvo lo que se ex
   documentos, hasta que alguien los borre del todo a mano (avisa a los 30 días, pero no se vacía
   sola).
 - Copias de seguridad: hasta 30 fotos guardadas de cada uno de estos ficheros, por si alguno se
-  estropea.
+  estropea, y nunca de más de 90 días (configurable en Ajustes → El centro).
 
 **Dentro de `_GESTOR/datos`:**
 

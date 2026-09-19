@@ -148,10 +148,12 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 69 | `docs/PRUEBAS-QUE-FALTAN.md` | HECHA (19-sep-2026) |
 | 70 | `docs/ENVOLTURAS-COMPROBADAS.md` | HECHA (19-sep-2026) |
 | 71 | `docs/COSAS-REPETIDAS.md` | HECHA (19-sep-2026) |
-| 72 | `docs/DETALLES-DE-MANTENIMIENTO.md` | PENDIENTE |
+| 72 | `docs/DETALLES-DE-MANTENIMIENTO.md` | HECHA (19-sep-2026): puntos 2, 4 y 5. Los puntos 1 y 3 se complicaron y pasan a las filas 76 y 77 (regla del propio documento: "si alguna se complica, se deja para otra fila") |
 | 73 | `docs/BUSCAR-EN-LAS-NOTAS.md` | PENDIENTE |
 | 74 | `docs/CUENTAS-DE-FIN-DE-CURSO.md` | PENDIENTE |
 | 75 | `docs/HUECOS-ENCONTRADOS-FILA-69.md` | PENDIENTE (no urgente: dos mejoras pequeñas, ver el documento) |
+| 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | PENDIENTE (no urgente: separada de la fila 72) |
+| 77 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 3 (los borrados que se fusionen) | PENDIENTE (no urgente: separada de la fila 72) |
 
 **Orden de trabajo:** las filas 1 a 60 están HECHAS. Las PENDIENTES son de la **61 a la 74**, que
 salen del informe crítico del 18-sep-2026 (`docs/INFORME-CRITICO-2026-09-18.md`). Francisco ha

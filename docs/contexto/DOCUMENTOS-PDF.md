@@ -19,7 +19,7 @@ El gemelo en papel de las de correo (16-sep-2026, `docs/PLANTILLAS-DE-DOCUMENTO.
 - **Los `.docx` viven en `_GESTOR/PLANTILLAS`**, sin subcarpetas, dentro de la carpeta de asuntos
   abiertos (`Carpetas.crear(App.E.gestor, 'PLANTILLAS')`, que la crea si no existe). Francisco los
   sube a mano a esa carpeta de Dropbox; la aplicación nunca escribe ahí, solo lee y cuelga el
-  nombre del fichero de un tipo en Ajustes. No es ninguno de los trece ficheros compartidos: no
+  nombre del fichero de un tipo en Ajustes. No es ninguno de los catorce ficheros compartidos: no
   lleva copia de seguridad ni detección de fichero roto.
 - **`Plantillas.valoresDeAsunto(asunto)`** (`js/plantillas.js`), pública desde el 16-sep-2026:
   hasta entonces era `valoresDePlantilla()`, privada de `js/correo.js`, y solo traía lo que hacía
@@ -186,9 +186,13 @@ pegado a `Fecha: dd/mm/aaaa hh:mm:ss`.
   con `setTimeout(fn, 0)`.
 - La fecha del sello no cambia la fecha `AAMMDD` del nombre (la del propio documento); se guarda
   en la nota ("Registrado 26EM0368 el 10/09/2026 · <documento>").
-- **pdf.js va copiado en el repositorio**, en `js/lib/pdf.min.js` y `js/lib/pdf.worker.min.js`
-  (versión 3.11.174, del `build/` de `pdfjs-dist`, no de `legacy/`). No se carga de ninguna
-  dirección externa, y solo se trae la primera vez que hace falta.
+- **pdf.js va copiado en el repositorio**, en `js/lib/pdf.min.mjs` y `js/lib/pdf.worker.min.mjs`
+  (versión 4.2.67, del `build/` de `pdfjs-dist`, no de `legacy/`; sube desde la 3.11.174 en la fila
+  72, docs/DETALLES-DE-MANTENIMIENTO.md, punto 5, que tenía el CVE-2024-4367). No se carga de
+  ninguna dirección externa, y solo se trae la primera vez que hace falta. Desde la 4.x pdf.js solo
+  se distribuye como módulo, así que los tres sitios que lo cargan (`js/registro-lector.js`,
+  `js/pdf-separar-unir.js`, `js/preparar-documento.js`) usan `import()` en vez de una etiqueta
+  `<script>`.
 
 Se comprueba con `pruebas/registro.mjs` (con un PDF mínimo montado por la propia prueba, con el
 texto del sello dentro: el PDF real con datos personales no está en el repositorio).

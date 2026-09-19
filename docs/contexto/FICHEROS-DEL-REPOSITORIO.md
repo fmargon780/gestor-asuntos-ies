@@ -21,7 +21,8 @@ de `App` va después del fichero que lo define.
 | `js/util.js` | Utilidades comunes, y la comparación de nombres parecidos. `U.mensajeDeError(e)` traduce al castellano los errores del navegador (`NotFoundError` y compañía). `U.envolver`/`U.envolturasAplicadas`/`U.envolturasFallidas` (fila 70) apuntan las envolturas de la aplicación. `U.copiar`/`U.nuevoId`/`U.fechaCorta` (fila 71) son la caja común de copiar al portapapeles, crear identificadores e imprimir fechas cortas |
 | `js/almacen.js` | Guarda los ajustes en el navegador |
 | `js/carpetas.js` | Habla con el selector de carpetas del navegador. Lee y escribe los JSON. `Carpetas.esCarpetaTemporalDeSincronizacion` descarta, en un solo sitio, las carpetas y ficheros que dejan Dropbox y Drive al sincronizar; `contarFicheros`/`copiarDentro`/la fusión los saltan, y un fichero que desaparece a mitad de copia se reintenta una vez |
-| `js/copias.js` | Copia de seguridad diaria de los ficheros de `_GESTOR`, y detección de fichero roto |
+| `js/copias.js` | Copia de seguridad diaria de los ficheros de `_GESTOR`, y detección de fichero roto. Se borran solas las de más de 90 días (configurable), aunque no lleguen a 30 (fila 72) |
+| `js/usuarios.js` | La lista de nombres de quien entra (`_GESTOR/usuarios.json`), para el desplegable de la pantalla de entrada (fila 72) |
 | `js/conflictos.js` | Las copias en conflicto que deja Dropbox: fusión sola o aviso para elegir |
 | `js/fichas-huerfanas.js` | Fichas de `asuntos.json` cuya carpeta ya no está: enlazar o borrar |
 | `js/nombres.js` | Monta los nombres de carpetas y documentos |
@@ -71,7 +72,7 @@ de `App` va después del fichero que lo define.
 | `js/preparar-documento.js` | El cuadro de "Ajustar tamaño": vista previa con pdf.js, bandas ocupadas o libres, y el guardado con papelera (18-sep-2026, fila 57; el nombre del botón cambió en la fila 58) |
 | `js/pdf-separar-unir.js` | El cuadro de Separar, Unir y Sacar páginas: miniaturas con pdf.js, tijeras, casillas |
 | `js/verificacion.js` | El código de verificación del pie de un documento, y su dirección |
-| `js/lib/pdf.min.js`, `js/lib/pdf.worker.min.js` | pdf.js (Mozilla) 3.11.174, copiado tal cual |
+| `js/lib/pdf.min.mjs`, `js/lib/pdf.worker.min.mjs` | pdf.js (Mozilla) 4.2.67, copiado tal cual (fila 72: sube desde la 3.11.174, con el CVE-2024-4367 arreglado). Se carga con `import()`, no con `<script>`: la 4.x ya no trae el script suelto de antes |
 | `js/ficha-asunto.js` | La pantalla de un asunto: cabecera (con la línea gris del subtítulo, fila 51; barra de 5 acciones y el `<h2>` con sus dos añadidos, fila 52), Hitos a la izquierda, Documentos en el centro, "Datos y contacto"/Notas/los dos plegables/Datos del trámite a la derecha |
 | `js/ficha-menus.js` | El menú pequeño reutilizable de la cabecera (abrir, cerrar con Escape/al pulsar fuera, uno solo a la vez): lo usan los tres puntos del nombre y "Comunicar" (18-sep-2026, fila 52) |
 | `js/ficha-nombre-acciones.js` | El menú de tres puntos del `<h2>` del nombre del asunto (Editar, Borrar, fila 52) y, debajo, la fila de copiar de un gesto (Asunto, NIE, Nombre, DNI/CIF, fila 58) |

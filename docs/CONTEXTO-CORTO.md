@@ -17,10 +17,9 @@ Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
 
 ## 1. Lo básico
 
-- Dirección publicada: **https://asuntos.fmargon.com** (dominio propio, 18-sep-2026). Es la que
-  usan Francisco y su compañero: **la red del IES bloquea todo lo que esté en `vercel.app`**
-  (`ERR_CONNECTION_TIMED_OUT`). La dirección de Vercel `https://gestor-de-asuntos.vercel.app`
-  sigue viva y sirve para comprobar lo publicado con `curl` desde fuera del centro.
+- Dirección publicada: **https://asuntos.fmargon.com** (dominio propio, 18-sep-2026): **la red
+  del IES bloquea `vercel.app`** (`ERR_CONNECTION_TIMED_OUT`). `https://gestor-de-asuntos.vercel.app`
+  sigue viva, para comprobar lo publicado con `curl` desde fuera del centro.
 - El dominio `fmargon.com` está comprado en la misma cuenta de Vercel; otras apps irán en otros
   subdominios (`informes.fmargon.com`, etc.).
 - Repositorio: `fmargon780/gestor-asuntos-ies`, rama `main`, privado.
@@ -101,7 +100,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Mandar documentos de un asunto por correo, con un borrador que deja Apps Script en Gmail.
 - Plantillas de correo, de mensaje de Séneca y de documento de Word por tipo de asunto, con
   huecos que se rellenan solos.
-- Copias de seguridad diarias, detección de fichero roto, fusión de conflictos de Dropbox.
+- Copias diarias (caducan a los 90 días, configurable), detección de fichero roto, fusión de
+  conflictos de Dropbox. Entrada: desplegable con los nombres ya usados.
 - Pruebas automáticas en GitHub Actions en cada subida.
 - Escape y botón de salida en toda pantalla.
 - Hitos: los pasos de la guía son los hitos de un asunto abierto, con estado, fecha límite,

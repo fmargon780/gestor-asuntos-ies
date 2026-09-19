@@ -7,6 +7,8 @@
    - Copias.guardar guarda una copia del contenido de ANTES, una vez
      al día, antes de escribir encima.
    - Se conservan como mucho 30 copias de cada fichero.
+   - Las copias de más de 90 días (por defecto, fila 72) se borran aunque
+     no se hayan llegado a las 30.
    - Copias.comprobarTodos encuentra los ficheros rotos.
    - Copias.restaurar aparta el roto y trae la última copia. */
 import fs from 'node:fs';
@@ -69,6 +71,15 @@ function ficheroFalso(nombre, texto) {
   };
 }
 
+/* AAMMDD de hace `n` días, con el mismo formato que llevan los nombres
+   de las copias. */
+function aammddHaceNDias(n) {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  const dos = (x) => String(x).padStart(2, '0');
+  return String(d.getFullYear()).slice(2) + dos(d.getMonth() + 1) + dos(d.getDate());
+}
+
 let fallos = 0;
 function comprobar(titulo, real, esperado) {
   const ok = JSON.stringify(real) === JSON.stringify(esperado);
@@ -112,13 +123,29 @@ comprobar('pero el fichero sí lleva el contenido nuevo',
 /* ---------- como mucho 30 copias ---------- */
 const copiasCarpeta = await gestor.getDirectoryHandle('copias');
 for (let i = 1; i <= 35; i++) {
-  const dia = String(100 + i).slice(1);   /* 01, 02, ... 35 (vale para la prueba) */
-  await Carpetas.escribirTexto(copiasCarpeta, 'estados-2601' + dia + '.json', '[]');
+  /* De hace i días (no fechas fijas de enero): así ninguna de las 35 le
+     coge la caducidad, que la prueba siguiente comprueba por su cuenta,
+     y esta se queda solo con lo que probaba de partida: el número. */
+  await Carpetas.escribirTexto(copiasCarpeta, 'estados-' + aammddHaceNDias(i) + '.json', '[]');
 }
 comprobar('de partida hay 35 copias de mentira', (await Copias.listar(gestor, 'estados.json')).length, 35);
 await Carpetas.guardarJson(gestor, 'estados.json', ['PENDIENTE']);
 await Copias.guardar(gestor, 'estados.json', ['PENDIENTE', 'RESUELTO']);
 comprobar('se podan hasta quedar 30', (await Copias.listar(gestor, 'estados.json')).length, 30);
+
+/* ---------- caducidad: se borran aunque no lleguen a 30 (fila 72,
+   docs/DETALLES-DE-MANTENIMIENTO.md, punto 4) ---------- */
+await Carpetas.escribirTexto(copiasCarpeta, 'recurrentes-' + aammddHaceNDias(100) + '.json', '[]');
+await Carpetas.escribirTexto(copiasCarpeta, 'recurrentes-' + aammddHaceNDias(10) + '.json', '[]');
+comprobar('de partida hay dos copias de mentira, ninguna cerca de las 30',
+  (await Copias.listar(gestor, 'recurrentes.json')).length, 2);
+await Carpetas.guardarJson(gestor, 'recurrentes.json', []);
+await Copias.guardar(gestor, 'recurrentes.json', [{ tipo: 'MATRICULA' }]);
+const trasCaducidad = await Copias.listar(gestor, 'recurrentes.json');
+comprobar('la de hace 100 días (más de los 90 por defecto) se ha borrado',
+  trasCaducidad.some((c) => c.fecha === aammddHaceNDias(100)), false);
+comprobar('la de hace 10 días, dentro de los 90, sigue ahí',
+  trasCaducidad.some((c) => c.fecha === aammddHaceNDias(10)), true);
 
 /* ---------- comprobarTodos ---------- */
 comprobar('comprobarTodos encuentra el guias.json roto',

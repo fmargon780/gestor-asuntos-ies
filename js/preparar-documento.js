@@ -20,20 +20,20 @@ var PrepararDocumento = (function () {
 
   /* ---------- pdf.js, para la vista previa y la comprobación de bandas ----------
      Mismo truco que js/pdf-separar-unir.js: si otro módulo ya lo ha
-     cargado, no se vuelve a traer. */
+     cargado, no se vuelve a traer. Desde la 4.2.67 (fila 72,
+     docs/DETALLES-DE-MANTENIMIENTO.md, punto 5), con `import()`, que
+     es como se trae ahora: pdf.js ya no se distribuye como script
+     suelto. */
   var cargandoPdfJs = null;
   function cargarPdfJs() {
     if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
     if (cargandoPdfJs) return cargandoPdfJs;
-    cargandoPdfJs = new Promise(function (resolver, rechazar) {
-      var script = document.createElement('script');
-      script.src = 'js/lib/pdf.min.js';
-      script.onload = function () {
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'js/lib/pdf.worker.min.js';
-        resolver(window.pdfjsLib);
-      };
-      script.onerror = function () { rechazar(new Error('No se ha podido cargar pdf.js.')); };
-      document.head.appendChild(script);
+    cargandoPdfJs = import('./lib/pdf.min.mjs').then(function (modulo) {
+      window.pdfjsLib = modulo;
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'js/lib/pdf.worker.min.mjs';
+      return window.pdfjsLib;
+    }, function () {
+      throw new Error('No se ha podido cargar pdf.js.');
     });
     return cargandoPdfJs;
   }

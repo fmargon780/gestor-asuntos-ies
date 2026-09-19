@@ -14,9 +14,18 @@
    delante, pegado a ENTRADA o SALIDA, pegado a la fecha y hora del
    sello. Ese ejemplo es el registro 26EM0368.
 
-   Usa pdf.js (Mozilla), copiado en js/lib/ (versión 3.11.174), y
-   solo se carga la primera vez que hace falta: no al arrancar la
-   aplicación.
+   Usa pdf.js (Mozilla), copiado en js/lib/ (versión 4.2.67, fila 72,
+   docs/DETALLES-DE-MANTENIMIENTO.md, punto 5: la 3.11.174 de antes
+   tenía un fallo de seguridad real, CVE-2024-4367, arreglado en la
+   4.2.67), y solo se carga la primera vez que hace falta: no al
+   arrancar la aplicación.
+
+   Desde la 4.x, pdf.js solo se distribuye como módulo (.mjs): ya no
+   hay un `pdf.min.js` de toda la vida que ponga `window.pdfjsLib` con
+   una simple etiqueta `<script>`. Por eso `cargarPdfJs()` usa
+   `import()`, que sí funciona desde un script normal (no hace falta
+   que este fichero sea un módulo), y es quien pone `window.pdfjsLib`
+   a mano al terminar.
 
    El sello unas veces se detectaba y otras no, con el mismo
    documento (queja de Francisco, fila 20 de docs/COLA.md,
@@ -41,15 +50,16 @@ var RegistroLector = (function () {
   function cargarPdfJs() {
     if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
     if (cargando) return cargando;
-    cargando = new Promise(function (resolver, rechazar) {
-      var script = document.createElement('script');
-      script.src = 'js/lib/pdf.min.js';
-      script.onload = function () {
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'js/lib/pdf.worker.min.js';
-        resolver(window.pdfjsLib);
-      };
-      script.onerror = function () { rechazar(new Error('No se ha podido cargar pdf.js.')); };
-      document.head.appendChild(script);
+    /* Ruta relativa a ESTE fichero (js/registro-lector.js), no a la
+       página: al contrario que un `script.src` (que se resuelve
+       contra la página), un `import()` dinámico dentro de un script
+       normal toma como base la URL del propio script que lo llama. */
+    cargando = import('./lib/pdf.min.mjs').then(function (modulo) {
+      window.pdfjsLib = modulo;
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'js/lib/pdf.worker.min.mjs';
+      return window.pdfjsLib;
+    }, function () {
+      throw new Error('No se ha podido cargar pdf.js.');
     });
     return cargando;
   }

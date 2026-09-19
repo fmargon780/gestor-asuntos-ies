@@ -9,6 +9,15 @@ se deja para otra fila.
 
 ## 1. La versión, sacada del reloj y no escrita a mano
 
+> **19-sep-2026: separado a la fila 76.** No se hizo en la fila 72 porque las dos formas de
+> hacerlo tienen un riesgo real que esta sesión no podía comprobar de verdad: un paso de GitHub
+> Actions que comprometa `js/version.js` puede acabar en un bucle de commits o duplicar
+> publicaciones de Vercel (justo lo que la regla 13 de la cola quiere evitar), y generar
+> `js/version.js` en el momento de publicar necesita tocar `vercel.json` con un `buildCommand`
+> nuevo (hoy no hay ninguno: la web se sirve tal cual, sin construir nada) que solo se puede
+> probar de verdad publicando en el Vercel real, cosa que esta sesión no puede hacer. Mejor
+> dejarlo pendiente que arriesgar la cuota o romper la publicación entera a ciegas.
+
 ### Qué pasa hoy
 
 `js/version.js` tiene la fecha y la hora escritas a mano:
@@ -58,6 +67,16 @@ Si un día se escribe "Francsico", queda así para siempre en esos apuntes. Y "F
 - **No** tocar los nombres ya escritos en las notas. Eso es historia y no se reescribe.
 
 ## 3. Los borrados de las listas, que se fusionen entre ordenadores
+
+> **19-sep-2026: separado a la fila 77.** Al mirarlo de cerca, "respeta el borrado si es más
+> nuevo que el alta del otro lado" necesita saber cuándo se dio de alta cada elemento, y hoy
+> ninguno de los cuatro ficheros lo guarda (`tipos.json` es solo `{tipo, categoria}`, sin fecha).
+> Sin eso, un borrado y un alta hecha en el otro ordenador después no se pueden distinguir de un
+> borrado y una alta vieja que todavía no había llegado. La forma de resolverlo sin fechas por
+> elemento (una alta a mano siempre "gana" a un borrado antiguo, por ser un gesto explícito y
+> posterior) toca los cuatro ficheros, sus altas y bajas, y la pantalla de Ajustes de cada uno:
+> más para hacer de una sentada de lo que le tocaba a esta fila, que es cinco cosas pequeñas e
+> independientes. Mejor como fila propia.
 
 ### Qué pasa hoy
 

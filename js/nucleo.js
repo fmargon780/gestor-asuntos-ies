@@ -77,6 +77,63 @@ App.arrancar = async function () {
   if (u) { App.E.usuario = u; $('campo-usuario').value = u; }
   App.ponerVersion();
   App.revisarArranque();
+  App.pintarListaUsuarios();
+};
+
+/* ---------- la lista de nombres de quien entra (19-sep-2026, fila 72,
+   docs/DETALLES-DE-MANTENIMIENTO.md, punto 2) ----------
+
+   Un desplegable con los nombres ya usados, más "Otro…" para escribir
+   uno nuevo. Si la lista está vacía (primera vez, o sin permiso
+   todavía sobre la carpeta), no se pinta nada y el campo de texto se
+   comporta exactamente como hasta ahora. El campo de texto sigue
+   siendo la fuente de verdad que lee btn-entrar: el desplegable solo
+   le escribe el valor elegido y se aparta. */
+App.pintarListaUsuarios = async function () {
+  var lista = $('campo-usuario-lista');
+  var campo = $('campo-usuario');
+  if (!lista || !campo || !App.E.abiertos) return;
+  var tienePermiso = await Carpetas.permiso(App.E.abiertos, false);
+  if (!tienePermiso) return;
+
+  var gestor;
+  try { gestor = await Carpetas.crear(App.E.abiertos, App.CARPETA_GESTOR); }
+  catch (e) { return; }
+  var nombres = await Usuarios.cargar(gestor);
+  if (!nombres.length) return;
+
+  lista.innerHTML = '';
+  nombres.forEach(function (n) {
+    var op = document.createElement('option');
+    op.value = n;
+    op.textContent = n;
+    lista.appendChild(op);
+  });
+  var otro = document.createElement('option');
+  otro.value = '';
+  otro.textContent = 'Otro…';
+  lista.appendChild(otro);
+
+  var actual = campo.value.trim();
+  if (actual && nombres.indexOf(actual) !== -1) {
+    lista.value = actual;
+    campo.classList.add('oculto');
+  } else {
+    lista.value = '';
+    campo.classList.remove('oculto');
+  }
+  lista.classList.remove('oculto');
+
+  lista.onchange = function () {
+    if (lista.value) {
+      campo.value = lista.value;
+      campo.classList.add('oculto');
+    } else {
+      campo.value = '';
+      campo.classList.remove('oculto');
+      campo.focus();
+    }
+  };
 };
 
 /* La versión, también en la pantalla de entrada. Así se puede ver sin
@@ -117,8 +174,9 @@ App.pedirCarpeta = async function (cual, idCuadro, idEstado) {
   }
 };
 
-$('btn-abiertos').onclick = function () {
-  App.pedirCarpeta('abiertos', 'gestor-abiertos', 'estado-abiertos');
+$('btn-abiertos').onclick = async function () {
+  await App.pedirCarpeta('abiertos', 'gestor-abiertos', 'estado-abiertos');
+  App.pintarListaUsuarios();
 };
 
 $('btn-archivo').onclick = function () {
@@ -145,6 +203,13 @@ $('btn-entrar').onclick = async function () {
       return;
     }
     $('aviso-roto').classList.add('oculto');
+
+    /* Después de comprobarTodos, nunca antes ni en paralelo: si esto
+       escribiera a la vez que comprobarTodos lee, podría pillar
+       usuarios.json a medio escribir y darlo por roto (pasó de
+       verdad, fila 72). Se espera, para no dejarlo escribiendo de
+       fondo mientras ya se está leyendo el resto de ficheros. */
+    if (window.Usuarios) await Usuarios.anadirSiHaceFalta(App.E.gestor, App.E.usuario);
 
     await App.cargarTipos();
     await App.cargarTiposDocumento();
