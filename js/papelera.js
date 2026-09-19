@@ -139,9 +139,15 @@ var Papelera = (function () {
 
     await App.cargarRegistro();
     var fresca = (App.E.registro.asuntos && App.E.registro.asuntos[a.nombre]) || a.ficha || {};
+    /* Los hitos viajan dentro de la ficha de la papelera (fila 62,
+       docs/RENOMBRAR-SIN-PERDER-HITOS.md): si no, se quedarían para
+       siempre en hitos.json bajo un nombre que ya no existe, y al
+       devolver el asunto no habría manera de recuperarlos. */
+    var hitosGuardados = window.AsuntoRenombrar ? await AsuntoRenombrar.quitar(a.nombre) : null;
     var ficha = {
       id: nuevoId(), clase: 'asunto', nombre: a.nombre, carpeta: nombreSub,
-      origen: null, datos: JSON.parse(JSON.stringify(fresca)), quien: quienSoy(), cuando: U.ahora()
+      origen: null, datos: JSON.parse(JSON.stringify(fresca)), hitos: hitosGuardados,
+      quien: quienSoy(), cuando: U.ahora()
     };
     await cambiar(function (l) { l.unshift(ficha); return l; });
 
@@ -291,6 +297,9 @@ var Papelera = (function () {
       if (!registro.asuntos) registro.asuntos = {};
       registro.asuntos[ficha.nombre] = ficha.datos || {};
     });
+    /* Los hitos vuelven con el asunto (fila 62,
+       docs/RENOMBRAR-SIN-PERDER-HITOS.md). */
+    if (ficha.hitos && window.AsuntoRenombrar) await AsuntoRenombrar.restaurar(ficha.nombre, ficha.hitos);
     await quitarDeIndice(ficha.id);
     return { ok: true };
   }

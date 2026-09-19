@@ -93,5 +93,6 @@ App.pintarAjustesMantenimiento = async function () {
   if (window.SenecaAyudante) SenecaAyudante.insertarEnlace($('ayudante-seneca-ajustes'));
   await App.pintarCopias();
   if (typeof App.pintarFichasHuerfanas === 'function') await App.pintarFichasHuerfanas();
+  if (typeof App.pintarHitosHuerfanos === 'function') await App.pintarHitosHuerfanos();
   if (typeof App.pintarPapelera === 'function') await App.pintarPapelera();
 };
