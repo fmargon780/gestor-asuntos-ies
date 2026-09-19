@@ -12,22 +12,41 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 comoEra(); };`), y eso descansa en que `index.html` cargue cada fichero en el orden justo. Si uno
 se cuela en el sitio equivocado, la envoltura no se aplica **sin que salte ningún error**: la
 función simplemente hace menos de lo que debería, y se descubre semanas después. El 11-sep-2026
-había 17 sitios así; hoy, 42, en 25 ficheros.
+había 17 sitios así; hoy, 42, en 24 ficheros.
 
-**`U.envolver(etiqueta, objeto, propiedad, fichero, fabricaNueva)`** (js/util.js), nuevo: la misma
-mecánica de siempre —guarda la vieja, pone la nueva—, pero comprobando primero que la función de
-verdad existe. Si no, lo apunta como fallo en vez de fallar en silencio o reventar; si sí, lo
-apunta como aplicado. Los 42 sitios de la aplicación se han pasado por ella, uno a uno, sin
-cambiar lo que hacen (la batería completa de `npm test`, 72 ficheros de prueba, sigue en verde:
-es la red de seguridad de esta fila, tal como pedía el encargo).
+**`U.envolver(objeto, nombre, fichero, hacerNueva)`** (js/util.js), nuevo: la misma mecánica de
+siempre —guarda la vieja, pone la nueva—, pero comprobando primero que `objeto[nombre]` (la
+última palabra tras el punto: `App.abrirFicha` mira `App['abrirFicha']`) existe y es una función.
+Si no, lo apunta como fallo (con el motivo) en vez de fallar en silencio o reventar; si la nueva
+función tampoco sale bien construida, también se apunta como fallo. Si todo va bien, guarda la
+vieja, pone la nueva y lo apunta como aplicado, con el nombre y el fichero. Los 42 sitios de la
+aplicación se han pasado por ella, uno a uno, sin cambiar lo que hacían.
+
+**Encontrar los 42 de verdad costó más que convertirlos**: un primer repaso con `grep` solo
+encontraba lo que ya se sabía (38, la cifra de este mismo documento antes de hoy, ya desfasada
+tras las filas 66-69). Hubo que mirar fichero a fichero y, para los casos dudosos, comprobar con
+el árbol de sintaxis si la envoltura se aplica **de verdad al cargar la página** o solo la primera
+vez que se abre una pantalla que casi nunca se usa. Dos casos así se han dejado fuera a propósito,
+porque avisar de ellos sería una falsa alarma constante: `js/ajustes-tipo.js` (envuelve un botón
+"Volver" que no existe hasta que se abre la pantalla de un tipo) y `js/bandeja-correos.js`
+(envuelve el botón "Crear el asunto" de la bandeja de correos, que no existe hasta que hay
+carpetas señaladas y la bandeja arranca).
+
+**Dos cambios de comportamiento, a propósito, y documentados aquí para que no se confundan con un
+error**: primero, algunos sitios envolvían una función aunque no existiera de verdad (por ejemplo
+si el orden de `<script>` fallaba), y ahora `U.envolver` lo rechaza y lo apunta como fallo en vez
+de dejar pasar una envoltura rota en silencio —es justo la mejora que pide esta fila—. Segundo,
+unos pocos ficheros miraban `typeof App !== 'undefined'` para no reventar si `App` todavía no
+existía; como `U.envolver` ya hace esa comprobación por su cuenta, esos ficheros pasan a mirar
+`window.App`/`window.Datos` (acceder a una propiedad de `window` nunca revienta, exista o no),
+y se ha quitado la comprobación manual que sobraba.
 
 **`js/envolturas-esperadas.js`** (nuevo, `window.EnvolturasEsperadas`), el **último** `<script>`
 de `index.html`: trae la lista de las 42 que tienen que estar y la compara con
-`U.envolturasAplicadas()`. Si falta alguna, aviso rojo en la pantalla de entrada, con el nombre de
-cuál y qué fichero revisar; no impide entrar. La comprobación no es instantánea: se espera 1,5s y
-se repite en cada `alRefrescar`, porque una envoltura (la de `js/bandeja-correos.js`) no se aplica
-hasta después de entrar, cuando ya hay carpetas señaladas. También hay un bloque nuevo en Ajustes
-→ Mantenimiento con las 42 y su estado.
+`U.envolturasAplicadas()` y `U.envolturasFallidas()`. Si falta alguna, aviso rojo en la pantalla
+de entrada (`#aviso-envolturas`), diciendo el fichero y la función de cada una; no impide entrar.
+También hay un bloque nuevo en Ajustes → Mantenimiento (`App.pintarEnvolturas`) con las 42 y su
+estado, con el mismo aspecto que los demás bloques de esa pestaña.
 
 **Nueva regla de código** (`docs/CONTEXTO-CORTO.md`, sección 6, y `docs/CONTEXTO.md`): un módulo
 nuevo **no envuelve**. Se engancha por un punto previsto (`window.Gestor.alRefrescar` y los que
@@ -35,11 +54,17 @@ haya) o se le añade uno. Envolver solo si no hay más remedio, y entonces con `
 apuntándolo en `js/envolturas-esperadas.js`.
 
 Se comprueba con `pruebas/envolturas.mjs`, en navegador de verdad (hace falta la aplicación
-entera cargada, con las 42 envolturas de verdad): al arrancar no sale ningún aviso; quitando una a
-mano de la lista de aplicadas, sale el aviso rojo con su nombre; envolver algo que no existe no
-revienta; y el número de `U.envolver(...)` que hay de verdad en `js/` coincide con la lista de
-`envolturas-esperadas.js` (la comprobación más útil de las cuatro: salta sola si alguien añade una
-envoltura y se olvida de apuntarla).
+entera cargada, con las 42 envolturas de verdad, sin necesidad de "entrar" eligiendo carpetas:
+`U.envolver` actúa al cargar cada `<script>`, no al usar la aplicación): al arrancar no sale
+ningún aviso; quitando una a mano de la lista de aplicadas, sale el aviso rojo con su fichero y su
+nombre, y se oculta otra vez al restaurarla; envolver una función que no existe no revienta, no
+devuelve nada y queda apuntada como fallo; y el número de `U.envolver(...)` que hay de verdad en
+`js/` coincide exactamente con la lista de `envolturas-esperadas.js` (la comprobación más útil de
+las cuatro: salta sola si alguien añade una envoltura y se olvida de apuntarla, sin depender de
+que quien lo haga se acuerde de tocar también la lista). `npm test` entero, 87 ficheros de
+prueba, sigue en verde: es la red de seguridad de esta fila, tal como pedía el encargo, porque se
+han tocado 24 ficheros y lo que hay que demostrar es que nada cambia de comportamiento (salvo los
+dos cambios de arriba, buscados a propósito).
 
 ## 19-sep-2026 — Fila 69: las pruebas que faltan
 
