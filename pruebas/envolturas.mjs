@@ -1,125 +1,153 @@
-/* Prueba de la fila 70 (docs/ENVOLTURAS-COMPROBADAS.md): las
-   envolturas de la aplicación, apuntadas y comprobadas al arrancar.
+/* Prueba de la fila 70 (19-sep-2026, docs/ENVOLTURAS-COMPROBADAS.md):
+   la alarma de las envolturas que faltan por aplicar.
 
-   En navegador de verdad (hace falta cargar index.html entera, con
-   los 103 ficheros de programa en su orden real): reutiliza el disco
-   de mentira de pruebas/navegador.mjs, igual que pruebas/tipos.mjs. */
+   No hace falta "entrar" (elegir carpetas): U.envolver se llama al
+   CARGAR cada fichero, no al usar la aplicación, así que la
+   comprobación ya está hecha en cuanto la página termina de cargar
+   los 108 <script>, antes de que nadie toque nada.
+
+   Sin disco de mentira: esta prueba no toca carpetas ni ficheros, solo
+   mira lo que ha apuntado U.envolver al cargar la página de verdad. */
 import { chromium } from 'playwright';
 import fs from 'fs';
-
-const fuente = fs.readFileSync(new URL('./navegador.mjs', import.meta.url), 'utf8');
-const preparacion = fuente.slice(fuente.indexOf('const preparacion = `') + 'const preparacion = `'.length,
-                                 fuente.indexOf('`;\n\nconst DIRECCION'));
+import { fileURLToPath } from 'node:url';
 
 const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
-const pagina = await navegador.newPage({ viewport: { width: 1600, height: 900 } });
+const pagina = await navegador.newPage();
 const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
-await pagina.addInitScript(preparacion);
 await pagina.goto(process.env.DIRECCION || 'http://localhost:8123/index.html');
+await pagina.waitForFunction(() => window.EnvolturasEsperadas && window.U);
 
 let fallos = 0;
-async function comprobar(titulo, promesa, esperado) {
-  const real = await promesa;
+function comprobar(titulo, real, esperado) {
   const ok = JSON.stringify(real) === JSON.stringify(esperado);
   if (!ok) { fallos++; console.log('FALLA  ' + titulo + '\n   sale: ' + JSON.stringify(real) + '\n   debía: ' + JSON.stringify(esperado)); }
   else console.log('bien   ' + titulo);
 }
-function comprobarSincrono(titulo, real, esperado) {
-  const ok = JSON.stringify(real) === JSON.stringify(esperado);
-  if (!ok) { fallos++; console.log('FALLA  ' + titulo + '\n   sale: ' + JSON.stringify(real) + '\n   debía: ' + JSON.stringify(esperado)); }
+function comprobarQue(titulo, real) {
+  if (!real) { fallos++; console.log('FALLA  ' + titulo); }
   else console.log('bien   ' + titulo);
 }
 
-await pagina.click('#btn-abiertos');
-await pagina.click('#btn-archivo');
-await pagina.fill('#campo-usuario', 'Francisco');
-await pagina.waitForSelector('#btn-entrar:not([disabled])');
-await pagina.click('#btn-entrar');
-await pagina.waitForSelector('#aplicacion:not(.oculto)');
-/* Alguna envoltura (js/bandeja-correos.js) no se aplica hasta que el
-   arranque de verdad ha terminado; envolturas-esperadas.js espera 1,5s
-   antes de comprobar por primera vez, así que aquí se espera un poco
-   más antes de dar por bueno el resultado. */
-await pagina.waitForTimeout(1800);
-
-/* ================================================================
+/* ============================================================
    1. Al arrancar, las envolturas esperadas están todas aplicadas y
-   no sale ningún aviso.
-   ================================================================ */
-console.log('--- 1. al arrancar, todas aplicadas, sin aviso ---');
+      no sale ningún aviso.
+   ============================================================ */
+console.log('--- al arrancar ---');
 
-await comprobar('ninguna falta', pagina.evaluate(() => window.EnvolturasEsperadas.faltantes().length), 0);
-await comprobar('ninguna fallida', pagina.evaluate(() => window.EnvolturasEsperadas.fallidasEsperadas().length), 0);
-await comprobar('no sale el aviso rojo', pagina.locator('#aviso-envolturas').count(), 0);
+const r1 = await pagina.evaluate(() => window.EnvolturasEsperadas.comprobar());
+comprobar('no falta ninguna envoltura esperada', r1.faltan, []);
+comprobarQue('hay al menos 40 envolturas aplicadas (la lista completa)', r1.aplicadas.length >= 40);
 
-/* ================================================================
+const ocultoAlEmpezar = await pagina.evaluate(() =>
+  document.getElementById('aviso-envolturas').classList.contains('oculto'));
+comprobarQue('el aviso rojo de la pantalla de entrada está oculto', ocultoAlEmpezar);
+
+/* ============================================================
    2. Si se quita a mano una de la lista de aplicadas, sale el aviso
-   rojo y dice cuál falta.
-   ================================================================ */
-console.log('--- 2. quitando una a mano, sale el aviso ---');
+      rojo y dice cuál falta. Se finge quitando la respuesta de
+      U.envolturasAplicadas (sin tocar el registro de verdad, para no
+      desmontar el resto de la aplicación) y se vuelve a llamar a
+      EnvolturasEsperadas.avisar().
+   ============================================================ */
+console.log('\n--- si falta una ---');
 
-await pagina.evaluate(() => {
-  window.__envolturasOriginal = window.U.envolturasAplicadas;
+const r2 = await pagina.evaluate(() => {
+  const original = window.U.envolturasAplicadas;
+  const unaCualquiera = window.EnvolturasEsperadas.LISTA[0];
   window.U.envolturasAplicadas = function () {
-    return window.__envolturasOriginal().filter(function (e) {
-      return !(e.etiqueta === 'App.abrirFicha' && e.fichero === 'js/correo.js');
+    return original().filter(function (a) {
+      return !(a.fichero === unaCualquiera.fichero && a.nombre === unaCualquiera.nombre);
     });
   };
-  window.EnvolturasEsperadas.pintarAviso();
+  window.EnvolturasEsperadas.avisar();
+  const caja = document.getElementById('aviso-envolturas');
+  const salida = {
+    visible: !caja.classList.contains('oculto'),
+    dice: caja.textContent.indexOf(unaCualquiera.fichero) !== -1 &&
+          caja.textContent.indexOf(unaCualquiera.nombre) !== -1
+  };
+  /* se deja como estaba, para no estropear el resto de la prueba */
+  window.U.envolturasAplicadas = original;
+  window.EnvolturasEsperadas.avisar();
+  return salida;
 });
+comprobarQue('el aviso rojo aparece', r2.visible);
+comprobarQue('dice el fichero y el nombre de la que falta', r2.dice);
 
-await comprobar('ahora sí sale el aviso rojo', pagina.locator('#aviso-envolturas').count(), 1);
-await comprobar('el aviso es rojo', pagina.locator('#aviso-envolturas').getAttribute('class'), 'aviso aviso-rojo');
-await comprobar('dice cuál falta', pagina.locator('#aviso-envolturas').innerText().then(t => t.indexOf('App.abrirFicha') !== -1 && t.indexOf('js/correo.js') !== -1), true);
+const ocultoOtraVez = await pagina.evaluate(() =>
+  document.getElementById('aviso-envolturas').classList.contains('oculto'));
+comprobarQue('y se vuelve a ocultar al restaurar', ocultoOtraVez);
 
-/* Se deshace el parche, para no dejar el resto de la prueba con el
-   aviso puesto (recargar la página no vale aquí: el disco y el
-   almacén de mentira de pruebas/navegador.mjs viven dentro del propio
-   `addInitScript`, que se vuelve a ejecutar desde cero en cada
-   navegación, así que un reload perdería las carpetas ya señaladas). */
-await pagina.evaluate(() => {
-  window.U.envolturasAplicadas = window.__envolturasOriginal;
-  window.EnvolturasEsperadas.pintarAviso();
-});
-await comprobar('al deshacer el parche, el aviso desaparece', pagina.locator('#aviso-envolturas').count(), 0);
-
-/* ================================================================
+/* ============================================================
    3. Envolver una función que no existe queda apuntado como fallo,
-   no revienta la carga.
-   ================================================================ */
-console.log('--- 3. envolver algo que no existe no revienta ---');
+      no revienta la carga.
+   ============================================================ */
+console.log('\n--- envolver algo que no existe ---');
 
-await comprobar('no revienta y se apunta como fallo', pagina.evaluate(() => {
-  var antes = window.U.envolturasFallidas().length;
-  var reventado = false;
+const r3 = await pagina.evaluate(() => {
+  const antesFallidas = window.U.envolturasFallidas().length;
+  let lanzo = false;
+  let resultado;
   try {
-    window.U.envolver('Cosa.inventada', {}, 'inventada', 'js/no-existe.js', function (comoEra) { return comoEra; });
-  } catch (e) { reventado = true; }
-  var despues = window.U.envolturasFallidas();
-  return { reventado: reventado, subioEnUno: despues.length === antes + 1, ultima: despues[despues.length - 1] };
-}), { reventado: false, subioEnUno: true, ultima: { etiqueta: 'Cosa.inventada', fichero: 'js/no-existe.js' } });
-
-/* ================================================================
-   4. La cuenta de js/envolturas-esperadas.js coincide con los
-   U.envolver que hay de verdad en js/. La más útil de las cuatro:
-   salta sola si alguien añade una envoltura y se olvida de apuntarla.
-   ================================================================ */
-console.log('--- 4. la lista coincide con los U.envolver que hay en js/ ---');
-
-const ficheros = fs.readdirSync(new URL('../js/', import.meta.url))
-  .filter(function (n) { return n.endsWith('.js') && n !== 'envolturas-esperadas.js'; });
-let enElCodigo = 0;
-ficheros.forEach(function (n) {
-  const texto = fs.readFileSync(new URL('../js/' + n, import.meta.url), 'utf8');
-  const m = texto.match(/U\.envolver\(/g);
-  enElCodigo += m ? m.length : 0;
+    resultado = window.U.envolver({}, 'App.noExisteDeVerdad', 'prueba-envolturas.js', function (comoEra) {
+      return function () { return comoEra(); };
+    });
+  } catch (e) { lanzo = true; }
+  const despuesFallidas = window.U.envolturasFallidas();
+  return {
+    lanzo: lanzo,
+    devolvioUndefined: resultado === undefined,
+    seApunto: despuesFallidas.length === antesFallidas + 1,
+    laUltima: despuesFallidas[despuesFallidas.length - 1]
+  };
 });
-const listaEsperada = await pagina.evaluate(() => window.EnvolturasEsperadas.LISTA.length);
-comprobarSincrono('el número de U.envolver(...) en js/ coincide con LISTA', listaEsperada, enElCodigo);
+comprobarQue('no lanza ninguna excepción', !r3.lanzo);
+comprobarQue('no devuelve ninguna función', r3.devolvioUndefined);
+comprobarQue('queda una fallida más', r3.seApunto);
+comprobar('con el fichero y el nombre correctos', r3.laUltima && { fichero: r3.laUltima.fichero, nombre: r3.laUltima.nombre },
+  { fichero: 'prueba-envolturas.js', nombre: 'App.noExisteDeVerdad' });
 
-if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
+/* La aplicación sigue viva después de esto: se puede seguir usando. */
+comprobarQue('la aplicación sigue respondiendo después del fallo',
+  await pagina.evaluate(() => typeof App.ir === 'function'));
+
+/* ============================================================
+   4. La cuenta de envolturas-esperadas.js coincide con los
+      U.envolver que hay en js/. Esta es la más útil de las cuatro:
+      salta sola cuando alguien añade una envoltura y se olvida de
+      apuntarla. Comprobación de fuente, sin navegador.
+   ============================================================ */
+console.log('\n--- la lista coincide con el código ---');
+
+const raiz = fileURLToPath(new URL('../js/', import.meta.url));
+const ficheros = fs.readdirSync(raiz).filter(function (f) { return f.endsWith('.js') && f !== 'util.js'; });
+let sitiosDeVerdad = 0;
+const enElCodigoNoEnLaLista = [];
+const listaDeVerdad = await pagina.evaluate(() => window.EnvolturasEsperadas.LISTA);
+const enLaListaClave = {};
+listaDeVerdad.forEach(function (e) { enLaListaClave[e.fichero + ' :: ' + e.nombre] = true; });
+
+ficheros.forEach(function (f) {
+  const texto = fs.readFileSync(raiz + f, 'utf8');
+  const re = /U\.envolver\(\s*[^,]+,\s*'([^']+)'\s*,\s*'([^']+)'/g;
+  let m;
+  while ((m = re.exec(texto))) {
+    sitiosDeVerdad++;
+    const nombre = m[1];
+    const fichero = m[2];
+    if (!enLaListaClave[fichero + ' :: ' + nombre]) {
+      enElCodigoNoEnLaLista.push(fichero + ' → ' + nombre);
+    }
+  }
+});
+
+comprobar('el número de U.envolver(...) en js/ coincide con la lista', sitiosDeVerdad, listaDeVerdad.length);
+comprobar('y no hay ninguna en el código que falte en la lista', enElCodigoNoEnLaLista, []);
+
+if (errores.length) { fallos++; console.log('\nERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 await navegador.close();
 process.exit(fallos ? 1 : 0);
