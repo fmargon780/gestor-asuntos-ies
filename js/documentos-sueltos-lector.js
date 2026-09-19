@@ -258,7 +258,7 @@
     return /\.pdf$/i.test(nombre || '');
   }
 
-  U.envolver('App.tarjetaSuelto', window.App, 'tarjetaSuelto', 'js/documentos-sueltos-lector.js', function (comoEra) {
+  U.envolver(App, 'App.tarjetaSuelto', 'documentos-sueltos-lector.js', function (comoEra) {
     return function (s, pie, esNuevo) {
       var div = comoEra(s, pie, esNuevo);
       if (!esPdf(s.nombre)) return div;   /* Word, imagen, hoja de cálculo... ni se intenta leer */

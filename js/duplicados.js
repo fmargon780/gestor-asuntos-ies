@@ -196,7 +196,7 @@
 
   /* Se envuelve la función que repinta la vista previa, para no tener
      que tocar la pantalla de Nuevo asunto. */
-  U.envolver('App.refrescarVista', window.App, 'refrescarVista', 'js/duplicados.js', function (comoEra) {
+  U.envolver(App, 'App.refrescarVista', 'duplicados.js', function (comoEra) {
     return function () {
       comoEra();
       try { mirarSiYaExiste(); } catch (e) { /* el aviso nunca estorba */ }
@@ -327,11 +327,8 @@
      decide crear otro de todas formas. La comprobación nunca debe
      impedir crear un asunto por su cuenta: si algo falla al mirar, se
      sigue como si no hubiera nada. */
-  (function () {
-    var boton = $('btn-crear');
-    if (!boton) return;
-    var creaOriginal = boton.onclick;
-    boton.onclick = async function (ev) {
+  U.envolver($('btn-crear'), 'boton(#btn-crear).onclick', 'duplicados.js', function (creaOriginal) {
+    return async function (ev) {
       try {
         var d = App.datosDelFormulario();
         var candidatos = await comprobarAntesDeCrear(
@@ -347,8 +344,8 @@
           /* res.accion === 'crear': se sigue como si no hubiera aviso. */
         }
       } catch (e) { /* la comprobación nunca debe impedir crear */ }
-      return creaOriginal ? creaOriginal.call(this, ev) : undefined;
+      return creaOriginal.call(this, ev);
     };
-  })();
+  });
 
 })();

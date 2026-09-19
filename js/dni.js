@@ -94,15 +94,15 @@
     return 'FALTA EL DNI (' + edadDe(alumno) + ' años, ya debería tenerlo)';
   }
 
-  /* ---------- 0. quedarse con la cabecera del RegAlum ----------
+  /* ---------- 0. quedárse con la cabecera del RegAlum ----------
 
      Datos.cargar devuelve, además de la lista, los títulos de las
      columnas tal y como venían. Es lo único que dice si Séneca sacó o
      no la columna del documento. */
 
-  U.envolver('Datos.cargar', window.Datos, 'cargar', 'js/dni.js', function (comoEraCargar) {
+  U.envolver(window.Datos, 'Datos.cargar', 'dni.js', function (comoEra) {
     return async function (dir, categoria) {
-      var r = await comoEraCargar(dir, categoria);
+      var r = await comoEra(dir, categoria);
       if (categoria === 'ALUMNADO' && r) {
         if (r.cabecera) cabeceraAlumnado = r.cabecera;
         meterElDniEnLaBusqueda(r.lista);
@@ -133,9 +133,9 @@
      La pinta `App.pieAlumno`, en js/asuntos-nuevo.js, y la usan el
      buscador de Nuevo asunto y la lista de Personas y empresas. */
 
-  U.envolver('App.pieAlumno', window.App, 'pieAlumno', 'js/dni.js', function (comoEraElPie) {
+  U.envolver(window.App, 'App.pieAlumno', 'dni.js', function (comoEra) {
     return function (p) {
-      var texto = comoEraElPie(p);
+      var texto = comoEra(p);
       var doc = documentoDe(p);
       if (doc) return texto + '  ·  DNI ' + doc;
       if (faltaElDni(p)) return texto + '  ·  ' + textoDeAviso(p);
@@ -148,9 +148,9 @@
      La monta `Datos.destacadosAlumno`. El DNI entra justo detrás de la
      edad, que es el dato con el que se lee. */
 
-  U.envolver('Datos.destacadosAlumno', window.Datos, 'destacadosAlumno', 'js/dni.js', function (comoEraLaFicha) {
+  U.envolver(window.Datos, 'Datos.destacadosAlumno', 'dni.js', function (comoEra) {
     return function (alumno) {
-      var r = comoEraLaFicha(alumno);
+      var r = comoEra(alumno);
       var fila = null;
 
       var doc = documentoDe(alumno);
