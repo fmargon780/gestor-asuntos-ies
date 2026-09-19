@@ -109,6 +109,24 @@ var U = (function () {
     return aammdd.slice(4, 6) + '/' + aammdd.slice(2, 4) + '/20' + aammdd.slice(0, 2);
   }
 
+  var MESES_FECHA_CORTA = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+
+  /* "dd/mm/aaaa" -> "10-sep-2026" (fila 71, docs/COSAS-REPETIDAS.md, 2.3:
+     lo escribían igual js/bandeja-adjuntos-lector.js y
+     js/documentos-sueltos-lector.js). Cadena vacía si no se entiende.
+
+     `js/hitos-archivo.js` y `js/lo-pide.js` tienen cada uno su propio
+     `fechaCorta`: no escriben la fecha igual (formatos de entrada
+     distintos, y el de hitos-archivo ni siquiera pone el mes en
+     letra), así que se quedan como estaban en vez de forzarlos aquí. */
+  function fechaCorta(ddmmaaaa) {
+    var m = String(ddmmaaaa || '').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (!m) return '';
+    var mes = MESES_FECHA_CORTA[parseInt(m[2], 10) - 1];
+    if (!mes) return '';
+    return m[1] + '-' + mes + '-' + m[3];
+  }
+
   /* El año académico al que pertenece una fecha (AAAA-MM-DD). De
      septiembre a diciembre, el que empieza; de enero a agosto, el que
      empezó el año anterior. */
@@ -546,14 +564,88 @@ var U = (function () {
     return envoltorio;
   }
 
+  /* ==========================================================
+     COPIAR AL PORTAPAPELES (fila 71, docs/COSAS-REPETIDAS.md)
+
+     Doce sitios lo hacían cada uno a su manera: unos solo con
+     navigator.clipboard, otros con una reserva por si el navegador no
+     lo deja, y la mitad sin avisar cuando fallaba. Queda uno solo.
+     ========================================================== */
+
+  function copiarALaAntigua(texto) {
+    try {
+      var c = document.createElement('textarea');
+      c.value = texto;
+      c.setAttribute('readonly', '');
+      c.style.cssText = 'position:fixed;top:-1000px;left:-1000px';
+      document.body.appendChild(c);
+      c.select();
+      var ok = document.execCommand('copy');
+      c.parentNode.removeChild(c);
+      return ok;
+    } catch (e) { return false; }
+  }
+
+  /* Copia `texto` al portapapeles. Si se le pasa `boton`, al terminar
+     le pone "Copiado" (con el aviso azul de boton-marcado) y lo
+     devuelve a su texto de antes al cabo de 1.400 ms. Si el navegador
+     no deja copiar, avisa con U.aviso en vez de quedarse callado.
+
+     `opciones.avisoFallo` cambia el mensaje del aviso; `opciones.sinAviso`
+     lo calla del todo, para cuando quien llama ya avisa por su cuenta
+     (así lo usa `Copiar.copiar`, en js/copiar.js, que no lleva botón).
+
+     Devuelve una promesa que se cumple con true o false. */
+  function copiar(texto, boton, opciones) {
+    opciones = opciones || {};
+    function marcar(ok) {
+      if (!ok) {
+        if (!opciones.sinAviso) aviso(opciones.avisoFallo || 'No he podido copiarlo.', 'malo');
+        return false;
+      }
+      if (boton) {
+        var antes = boton.textContent;
+        boton.textContent = 'Copiado';
+        boton.classList.add('boton-marcado');
+        setTimeout(function () {
+          boton.textContent = antes;
+          boton.classList.remove('boton-marcado');
+        }, 1400);
+      }
+      return true;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(texto).then(function () { return marcar(true); })
+        .catch(function () { return marcar(copiarALaAntigua(texto)); });
+    }
+    return Promise.resolve(marcar(copiarALaAntigua(texto)));
+  }
+
+  /* ==========================================================
+     IDENTIFICADORES NUEVOS (fila 71, docs/COSAS-REPETIDAS.md)
+
+     La forma que ya usaban grupos, hitos, guías y sus requisitos: la
+     letra o letras del módulo, más la hora en base 36, más unas
+     cuantas letras al azar. `js/papelera.js` genera los suyos de otra
+     manera (con cifras, no en base 36) y se queda como está: no es de
+     los cinco que compartían esta forma, es un formato propio.
+
+     La parte al azar lleva más letras que la de cada sitio por
+     separado (tres, antes): con solo tres, muchos creados en el mismo
+     milisegundo (una lista entera, de golpe) sí llegaban a chocar. */
+  function nuevoId(prefijo) {
+    return prefijo + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+  }
+
   return {
     normalizar: normalizar, limpiarNombre: limpiarNombre, hoyIso: hoyIso,
-    aAaMmDd: aAaMmDd, fechaLegible: fechaLegible, cursoActual: cursoActual,
+    aAaMmDd: aAaMmDd, fechaLegible: fechaLegible, fechaCorta: fechaCorta, cursoActual: cursoActual,
     cursoDeFecha: cursoDeFecha, cursoDeAno: cursoDeAno, edadDesde: edadDesde,
     aFecha: aFecha, yaPaso: yaPaso,
     ahora: ahora, aviso: aviso, preguntar: preguntar, escapar: escapar, mensajeDeError: mensajeDeError,
     parecidos: parecidos, dejaCrear: dejaCrear, mientrasGuarda: mientrasGuarda,
     conservandoLoEscrito: conservandoLoEscrito, menuDeAcciones: menuDeAcciones,
-    envolver: envolver, envolturasAplicadas: envolturasAplicadas, envolturasFallidas: envolturasFallidas
+    envolver: envolver, envolturasAplicadas: envolturasAplicadas, envolturasFallidas: envolturasFallidas,
+    copiar: copiar, nuevoId: nuevoId
   };
 })();

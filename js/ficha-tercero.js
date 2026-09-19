@@ -65,31 +65,10 @@
 
   /* ---------- copiar al pulsar ----------
 
-     js/copiar.js hace justo esto, pero es privado a sus propias
-     pantallas (nada colgado de `window`): se rehace aquí en pequeño,
-     sin tocar ese fichero. */
-  function copiarTexto(texto) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(texto).then(function () { return true; })
-        .catch(function () { return copiarALaAntigua(texto); });
-    }
-    return Promise.resolve(copiarALaAntigua(texto));
-  }
-
-  function copiarALaAntigua(texto) {
-    try {
-      var c = document.createElement('textarea');
-      c.value = texto;
-      c.setAttribute('readonly', '');
-      c.style.cssText = 'position:fixed;top:-1000px;left:-1000px';
-      document.body.appendChild(c);
-      c.select();
-      var ok = document.execCommand('copy');
-      c.parentNode.removeChild(c);
-      return ok;
-    } catch (e) { return false; }
-  }
-
+     El botón es solo el icono ⧉, sin texto que cambiar: en vez del
+     "Copiado" de U.copiar, se marca con la clase "copiado" 1.200 ms,
+     como ya hacía. El copiado en sí (con su reserva y su aviso si
+     falla) sí viene de U.copiar (fila 71, docs/COSAS-REPETIDAS.md). */
   function botonCopiar(texto, titulo) {
     var b = document.createElement('button');
     b.type = 'button';
@@ -99,8 +78,8 @@
     b.onclick = function (ev) {
       ev.stopPropagation();
       ev.preventDefault();
-      copiarTexto(texto).then(function (ok) {
-        if (!ok) { U.aviso('No he podido copiarlo. Es ' + texto + '.', 'malo'); return; }
+      U.copiar(texto, null, { avisoFallo: 'No he podido copiarlo. Es ' + texto + '.' }).then(function (ok) {
+        if (!ok) return;
         b.classList.add('copiado');
         setTimeout(function () { b.classList.remove('copiado'); }, 1200);
       });

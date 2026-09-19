@@ -270,7 +270,9 @@ var LoPide = (function () {
   /* "17-sep-2026", a partir de una fecha ISO (AAAA-MM-DD, sin hora):
      por texto, sin `new Date()`, para no depender de la zona horaria
      del navegador (el mismo motivo por el que U.aAaMmDd/U.fechaLegible
-     tampoco usan Date). */
+     tampoco usan Date). Distinta a propósito de U.fechaCorta (fila 71,
+     docs/COSAS-REPETIDAS.md, 2.3): esa espera "dd/mm/aaaa", y aquí la
+     fecha llega en ISO. */
   function fechaCorta(iso) {
     var p = String(iso || '').split('-');
     if (p.length !== 3) return '';

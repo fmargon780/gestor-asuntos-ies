@@ -46,9 +46,7 @@ var Hitos = (function () {
     { id: 'relacionado', nombre: 'Un relacionado', clase: 'papel' }
   ];
 
-  function nuevoId() {
-    return 'h' + Date.now().toString(36) + Math.floor(Math.random() * 46656).toString(36);
-  }
+  function nuevoId() { return U.nuevoId('h'); }
 
   function gestor() { return window.Gestor && window.Gestor.carpetaGestor(); }
 

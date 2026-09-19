@@ -27,9 +27,7 @@
    ============================================================ */
 var GuiasRequisitos = (function () {
 
-  function nuevoId() {
-    return 'r' + Date.now().toString(36) + Math.floor(Math.random() * 46656).toString(36);
-  }
+  function nuevoId() { return U.nuevoId('r'); }
 
   function filaHTML(r) {
     var nombreRadio = 'req-clase-' + U.escapar(r.id);

@@ -5,6 +5,36 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 19-sep-2026 — Fila 71: las cosas repetidas, a la caja común
+
+`docs/COSAS-REPETIDAS.md`, informe crítico 3.1. Fila de limpieza, la menos urgente de la cola:
+ninguna pantalla cambia, la prueba principal es que `npm test` siga entero en verde.
+
+Cuatro utilidades nuevas en `js/util.js`:
+
+- **`U.copiar(texto, boton, opciones)`**: copia al portapapeles (con reserva por si el navegador
+  no deja usar el portapapeles nuevo), pone "Copiado" en el botón 1.400 ms si se le pasa uno, y
+  **avisa si falla**, algo que hoy no hacían casi ninguno de los doce sitios que copiaban cada uno
+  a su manera. Pasan los doce: `asuntos-lista`, `asuntos-nuevo`, `copiar`, `correo-cuadro`,
+  `documentos`, `ficha-tercero`, `lector`, `plantillas-documento`, `relacionados`, `seneca-cuadro`
+  y `seneca-destinatarios` (adaptado: "Copiar el siguiente" no vuelve a su texto, avanza por la
+  lista de chips). `js/seneca-ayudante.js` se queda como estaba: su copiado vive dentro del texto
+  del marcador de Séneca, donde no existe `U`.
+- **`U.nuevoId(prefijo)`**: la letra del módulo, la hora en base 36 y unas letras al azar. Pasan
+  `grupos`, `guias`, `guias-requisitos` e `hitos`. La parte al azar lleva más letras que antes (de
+  tres a ocho): con solo tres, una lista entera creada de golpe en el mismo milisegundo sí llegaba
+  a chocar (lo detectó la prueba nueva, con diez mil tiradas). `js/papelera.js` se queda con el
+  suyo: no va en base 36, es un formato propio, no de los cinco que compartían este.
+- **`U.fechaCorta(fecha)`**: "dd/mm/aaaa" → "10-sep-2026". Solo escribían la fecha igual
+  `bandeja-adjuntos-lector` y `documentos-sueltos-lector`; `hitos-archivo` (deja la fecha en ISO,
+  sin mes en letra) y `lo-pide` (espera la fecha en ISO, no en dd/mm/aaaa) se quedan con el suyo,
+  con un comentario que dice por qué.
+- El buscador de elementos por su nombre (39 copias) se deja como recomendaba el informe: no
+  aporta lo suficiente para tocar 39 sitios.
+
+Prueba nueva, `pruebas/utilidades-comunes.mjs`, sin navegador (disco y portapapeles de mentira,
+mismo estilo que `pruebas/logica.mjs`).
+
 ## 19-sep-2026 — Fila 70: las envolturas, comprobadas al arrancar
 
 `docs/ENVOLTURAS-COMPROBADAS.md`, informe crítico 2.5: la aplicación está construida

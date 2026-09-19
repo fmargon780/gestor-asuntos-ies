@@ -22,9 +22,7 @@ var Guias = (function () {
 
   function $(id) { return document.getElementById(id); }
 
-  function nuevoId() {
-    return 'p' + Date.now().toString(36) + Math.floor(Math.random() * 46656).toString(36);
-  }
+  function nuevoId() { return U.nuevoId('p'); }
 
   /* ==========================================================
      LIMPIEZA DEL TEXTO CON FORMATO

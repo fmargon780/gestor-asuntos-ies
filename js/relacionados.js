@@ -381,41 +381,10 @@ var Relacionados = (function () {
     return (palabras.join(' ') + ' ' + apellidos).trim();
   }
 
-  function copiarAlPortapapeles(texto) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(texto).then(function () { return true; })
-        .catch(function () { return copiarALaAntigua(texto); });
-    }
-    return Promise.resolve(copiarALaAntigua(texto));
-  }
-
-  function copiarALaAntigua(texto) {
-    try {
-      var c = document.createElement('textarea');
-      c.value = texto;
-      c.setAttribute('readonly', '');
-      c.style.cssText = 'position:fixed;top:-1000px;left:-1000px';
-      document.body.appendChild(c);
-      c.select();
-      var ok = document.execCommand('copy');
-      c.parentNode.removeChild(c);
-      return ok;
-    } catch (e) { return false; }
-  }
-
   function copiarNombreDelRelacionado(r, boton) {
     var texto = nombreEnOrdenNormal(r);
     if (!texto) return;
-    copiarAlPortapapeles(texto).then(function (ok) {
-      if (!ok) { U.aviso('No he podido copiarlo. Es ' + texto + '.', 'malo'); return; }
-      var antes = boton.textContent;
-      boton.textContent = 'Copiado';
-      boton.classList.add('boton-marcado');
-      setTimeout(function () {
-        boton.textContent = antes;
-        boton.classList.remove('boton-marcado');
-      }, 1400);
-    });
+    U.copiar(texto, boton, { avisoFallo: 'No he podido copiarlo. Es ' + texto + '.' });
   }
 
   /* ==========================================================

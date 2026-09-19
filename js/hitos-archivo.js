@@ -260,6 +260,10 @@
 
   var ROTULOS_ESTADO = { pendiente: 'PENDIENTE', encurso: 'EN CURSO', hecho: 'HECHO', noaplica: 'NO APLICA' };
 
+  /* Distinta a propósito de U.fechaCorta (fila 71, docs/COSAS-
+     REPETIDAS.md, 2.3): esta ni pone el mes en letra, se queda con la
+     fecha ISO tal cual llega. No escribe la fecha igual que las otras
+     tres, así que se deja como estaba. */
   function fechaCorta(iso) {
     return String(iso || '').slice(0, 10);
   }

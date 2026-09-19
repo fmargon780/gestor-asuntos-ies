@@ -43,6 +43,9 @@ var Papelera = (function () {
            '-' + dos(d.getHours()) + dos(d.getMinutes());
   }
 
+  /* Distinto a propósito de U.nuevoId (fila 71, docs/COSAS-REPETIDAS.md):
+     este no va en base 36, va con cifras sueltas. No es de los cinco
+     que compartían la misma forma, así que se queda como estaba. */
   function nuevoId() {
     return 'b' + Date.now() + Math.floor(Math.random() * 1000);
   }

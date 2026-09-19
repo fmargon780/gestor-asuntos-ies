@@ -106,15 +106,12 @@ var SenecaDestinatarios = (function () {
 
   /* ---------- copiar ---------- */
 
+  /* Sin botón: aquí lo que avanza es la lista de chips marcados como
+     "Ya copiado" (fila 71, docs/COSAS-REPETIDAS.md, 2.1 — "Copiar el
+     siguiente" no vuelve a su texto de antes, avanza al siguiente). */
   function copiarTexto(texto) {
     if (!texto) { if (window.U) U.aviso('Ahí no hay nada que copiar.', 'malo'); return; }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(texto).catch(function () {
-        if (window.U) U.aviso('No he podido copiarlo.', 'malo');
-      });
-    } else if (window.U) {
-      U.aviso('Este navegador no deja copiar solo.', 'malo');
-    }
+    if (window.U) U.copiar(texto);
   }
 
   /* Todos, uno por línea, con la arroba delante: lo que lee el

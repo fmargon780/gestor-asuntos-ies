@@ -135,18 +135,7 @@ var CorreoCuadro = (function () {
 
   function copiar(texto, boton) {
     if (!texto) { U.aviso('Ahí no hay nada que copiar.', 'malo'); return; }
-    var antes = boton.textContent;
-    function bien() {
-      boton.textContent = 'Copiado';
-      setTimeout(function () { boton.textContent = antes; }, 1400);
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(texto).then(bien).catch(function () {
-        U.aviso('No he podido copiarlo.', 'malo');
-      });
-    } else {
-      U.aviso('Este navegador no deja copiar solo.', 'malo');
-    }
+    U.copiar(texto, boton);
   }
 
   function abrirGmail() {

@@ -65,18 +65,6 @@
     }).slice(0, MAX_ADJUNTOS);
   }
 
-  var MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-
-  /* "dd/mm/aaaa" -> "10-sep-2026", el mismo estilo que
-     js/documentos-sueltos-lector.js. Cadena vacía si no se entiende. */
-  function fechaCorta(ddmmaaaa) {
-    var m = String(ddmmaaaa || '').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-    if (!m) return '';
-    var mes = MESES[parseInt(m[2], 10) - 1];
-    if (!mes) return '';
-    return m[1] + '-' + mes + '-' + m[3];
-  }
-
   /* Si hay varios adjuntos, se juntan los análisis: gana el primero
      que traiga cada dato. */
   function juntarAnalisis(lista) {
@@ -124,7 +112,7 @@
       });
       if (codigo) trozos.push(codigo);
     }
-    var fecha = fechaCorta(delPdf.fecha);
+    var fecha = U.fechaCorta(delPdf.fecha);
     if (fecha) trozos.push(fecha);
     if (tipo) trozos.push(tipo.tipo);
     if (tercero) trozos.push((window.App && App.textoTercero) ? App.textoTercero(tercero) : tercero.nombre);

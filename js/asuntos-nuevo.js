@@ -584,7 +584,7 @@ $('btn-crear').onclick = async function () {
     }
 
     U.aviso('Asunto creado.', 'bueno');
-    navigator.clipboard.writeText(nombre).catch(function () {});
+    U.copiar(nombre);
     App.E.nuevo = { tipo: null, categoria: null, tercero: null, configCampos: [] };
     $('campo-descripcion').value = '';
     $('campo-estado').value = App.E.estados.length ? App.E.estados[0].nombre : '';

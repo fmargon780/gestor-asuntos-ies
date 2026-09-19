@@ -30,18 +30,6 @@
   if (typeof App.tarjetaSuelto !== 'function') return;
   if (typeof LectorDocumentos === 'undefined' || typeof RegistroLector === 'undefined') return;
 
-  var MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-
-  /* "dd/mm/aaaa" -> "10-sep-2026", el mismo estilo que App.VERSION.
-     Cadena vacía si no se entiende. */
-  function fechaCorta(ddmmaaaa) {
-    var m = String(ddmmaaaa || '').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-    if (!m) return '';
-    var mes = MESES[parseInt(m[2], 10) - 1];
-    if (!mes) return '';
-    return m[1] + '-' + mes + '-' + m[3];
-  }
-
   /* nombre del fichero -> lo que ha devuelto analizar(), o null si no
      había nada que proponer (o el fichero no se ha podido leer). */
   var resultados = {};
@@ -74,7 +62,7 @@
       });
       if (codigo) trozos.push(codigo);
     }
-    var fecha = fechaCorta(propuesta.fecha);
+    var fecha = U.fechaCorta(propuesta.fecha);
     if (fecha) trozos.push(fecha);
     if (propuesta.tipo) trozos.push(propuesta.tipo.tipo);
     if (propuesta.tercero) trozos.push(propuesta.tercero.nombre);
