@@ -130,18 +130,26 @@ var OtrosDelTercero = (function () {
      ese mismo objeto, tal cual. */
   async function montarArchivado(nombre, categoria, tercero) {
     var existente = (App.E.listaArchivo || []).filter(function (x) { return x.nombre === nombre; })[0];
-    if (existente) return existente;
+    if (existente) {
+      if (window.FichaArchivo) await FichaArchivo.completar(existente);
+      return existente;
+    }
 
     var padre = await window.Duplicados.carpetaDelTercero(categoria, tercero);
     if (!padre) return null;
     var handle = await padre.getDirectoryHandle(nombre);
-    return {
+    var objeto = {
       nombre: nombre, handle: handle, padre: padre,
       ruta: categoria + ' / ' + tercero,
       leido: Nombres.leer(nombre, App.E.tipos),
-      ficha: (App.E.registro.asuntos && App.E.registro.asuntos[nombre]) || {},
+      /* Fila 64 (docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md): la ficha de
+         un archivado ya no vive en App.E.registro.asuntos, se lee de
+         su propia carpeta, que ya se tiene aquí mismo. */
+      ficha: {},
       busca: U.normalizar(nombre + ' ' + categoria + ' ' + tercero)
     };
+    if (window.FichaArchivo) await FichaArchivo.completar(objeto);
+    return objeto;
   }
 
   /* Llama a App.abrirFicha marcando que la llamada es de este módulo,

@@ -606,21 +606,37 @@ var Relacionados = (function () {
      "RELACIONADO CON": lo que se ve en la ficha de la persona
      ========================================================== */
 
-  /* Todos los asuntos (abiertos o archivados) que tengan a esta
-     persona como relacionada. Se mira directamente en
-     App.E.registro.asuntos, que ya está en memoria: no hace falta
-     leer nada del disco. */
-  function asuntosDondeEsRelacionado(categoria, nombre) {
+  /* Todos los asuntos, abiertos o archivados, que tengan a esta
+     persona como relacionada. Los abiertos se miran directamente en
+     App.E.registro.asuntos, que ya está en memoria; los archivados,
+     desde la fila 64 (docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md), ya no
+     tienen ficha ahí, así que se buscan en el índice del ARCHIVO
+     (js/archivo-indice.js), que guarda sus relacionados desde esa
+     misma fila. Sin índice hecho, se enseñan solo los abiertos: no es
+     peor que antes de la fila 64 para quien no lo tenga construido. */
+  async function asuntosDondeEsRelacionado(categoria, nombre) {
     var buscado = U.normalizar(nombre);
     var salida = [];
+    var esDeEsta = function (r) { return r && r.categoria === categoria && U.normalizar(r.nombre) === buscado; };
+
     Object.keys(App.E.registro.asuntos).forEach(function (clave) {
       var ficha = App.E.registro.asuntos[clave] || {};
-      var lista = ficha.relacionados || [];
-      var esta = lista.some(function (r) {
-        return r.categoria === categoria && U.normalizar(r.nombre) === buscado;
-      });
-      if (esta) salida.push({ nombre: clave, ficha: ficha });
+      if ((ficha.relacionados || []).some(esDeEsta)) {
+        salida.push({ nombre: clave, archivado: false });
+      }
     });
+
+    if (window.IndiceArchivo) {
+      try {
+        var resultado = await IndiceArchivo.leerDisco();
+        if (resultado.ok) {
+          resultado.datos.asuntos.forEach(function (e) {
+            if ((e.relacionados || []).some(esDeEsta)) salida.push({ nombre: e.nombre, archivado: true });
+          });
+        }
+      } catch (e) { /* sin índice usable, se queda con los abiertos */ }
+    }
+
     salida.sort(function (x, y) { return x.nombre < y.nombre ? -1 : 1; });
     return salida;
   }
@@ -726,20 +742,28 @@ function esNotaDeRelacionado(nombre) {
     var caja = $('ficha-persona');
     if (!caja) return;
     var nombre = App.textoTercero(p);
-    var asuntos = Relacionados.asuntosDondeEsRelacionado(p.categoria, nombre);
-    if (!asuntos.length) return;
+    /* asuntosDondeEsRelacionado es async desde la fila 64 (mira
+       también el índice del ARCHIVO): se pinta cuando responda, si la
+       pantalla de la persona sigue en pie (isConnected). Si mientras
+       tanto se ha abierto otra persona, esto ya no es perfecto (el
+       bloque podría llegar tarde y colgarse de la ficha nueva), pero
+       es solo un texto de consulta, nada que se guarde ni se pueda
+       estropear: el mismo riesgo que ya asume el nombre del tercero en
+       js/ficha-nombre-acciones.js. */
+    Relacionados.asuntosDondeEsRelacionado(p.categoria, nombre).then(function (asuntos) {
+      if (!asuntos.length || !caja.isConnected) return;
 
-    var bloque = document.createElement('div');
-    bloque.className = 'ficha-relacionado-de';
-    bloque.innerHTML = '<p class="nota"><strong>' +
-      (asuntos.length === 1 ? 'Relacionado con este asunto:' : 'Relacionado con estos asuntos:') +
-      '</strong></p>' +
-      asuntos.map(function (x) {
-        return '<div class="resultado">' + U.escapar(x.nombre) +
-               '<div class="resultado-pie">' +
-               (x.ficha.estado === 'cerrado' ? 'Archivado' : 'Abierto') +
-               '</div></div>';
-      }).join('');
-    caja.appendChild(bloque);
+      var bloque = document.createElement('div');
+      bloque.className = 'ficha-relacionado-de';
+      bloque.innerHTML = '<p class="nota"><strong>' +
+        (asuntos.length === 1 ? 'Relacionado con este asunto:' : 'Relacionado con estos asuntos:') +
+        '</strong></p>' +
+        asuntos.map(function (x) {
+          return '<div class="resultado">' + U.escapar(x.nombre) +
+                 '<div class="resultado-pie">' + (x.archivado ? 'Archivado' : 'Abierto') +
+                 '</div></div>';
+        }).join('');
+      caja.appendChild(bloque);
+    });
   };
 })();

@@ -463,11 +463,10 @@ tabla de ficheros), y la búsqueda es por palabras sueltas.
     silenciosas si el índice todavía no existe.
   - `recuentoActual()` es el recuento barato del punto 6.2: solo categorías y carpetas de tercero
     (un nivel), para comparar con el `recuento` guardado sin recorrer los asuntos.
-  - `textoDeBusqueda(entrada, ficha)` junta lo del índice (nombre, categoría, tercero, ruta, tipo,
-    curso, grupo, documentos, registros de Séneca) con lo de la ficha en memoria
-    (`App.E.registro.asuntos`, nunca copiada al índice): estado, vía y su dato, quién lo pidió,
-    relacionados y campos propios. Normalizado una vez; así un cambio en la ficha se nota sin
-    reconstruir nada.
+  - `textoDeBusqueda(entrada)` junta lo del índice (nombre, categoría, tercero, ruta, tipo, curso,
+    grupo, documentos, registros de Séneca) con los pocos campos de la ficha que la propia entrada
+    ya guarda desde la fila 64 (ver más abajo): situación, vía y su dato, quién lo pidió,
+    relacionados y campos propios. Normalizado una vez.
   - `resolverHandle(entrada)` calcula el manejador real de una carpeta a partir de lo que el índice
     sabe (categoría, tercero, ruta, `sueltoEn`): el índice no puede guardar manejadores en un JSON.
 - **`App.verArchivo`** (`js/archivo-personas.js`) lee el índice; si no existe, está roto o es de
@@ -491,6 +490,28 @@ tabla de ficheros), y la búsqueda es por palabras sueltas.
 
 Se comprueba con `pruebas/archivo-indice.mjs`, en navegador de verdad con el disco de mentira de
 `pruebas/navegador.mjs`, con los nueve escenarios del documento.
+
+### La ficha de un asunto archivado, en su propia carpeta
+
+Fila 64, 19-sep-2026, `docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md`. Antes, `asuntos.json` guardaba
+también la ficha de los archivados y se reescribía entero 50-150 veces al día: a los cinco cursos,
+más de 17 MB. Se copia el patrón de `js/hitos-archivo.js` con el historial de hitos.
+
+- **`js/ficha-archivo.js`** (`window.FichaArchivo`) envuelve `App.cerrarAsunto`/`App.reabrirAsunto`
+  por fuera de todo (después de `js/hitos-archivo.js`): al archivar, baja la ficha a `_ficha.json`
+  dentro de la propia carpeta (el guion bajo, para que no cuente como documento) y borra la clave de
+  `asuntos.json`; al reabrir, la lee de vuelta, la funde con lo que ponga `App.anotar` y borra el
+  fichero. Un archivado de antes de esta fila, sin `_ficha.json`, se reabre con ficha vacía.
+  `FichaArchivo.completar(a)` resuelve el manejador y sustituye `a.ficha` por la de verdad: lo usan
+  `js/otros-del-tercero.js` y el clic de una tarjeta del ARCHIVO en `js/ficha-asunto.js`.
+- El índice (`entradaDe`, arriba) guarda ya los pocos campos de ficha que hacen falta para pintar y
+  buscar, sin `asuntos.json`. `js/fichas-huerfanas.js` ya no cuenta un archivado como "sin ficha".
+  Renombrar un estado y contar asuntos de un tipo miran los abiertos en memoria más el índice.
+- **"Poner en orden las fichas del ARCHIVO"** (Ajustes → Mantenimiento) mueve a su carpeta la ficha
+  de cada archivado que siga en `asuntos.json`, de antes de esta fila. No se hace sola al arrancar.
+
+Prueba: `pruebas/ficha-del-archivo.mjs`, sin navegador, con `js/asuntos-archivar.js` y
+`js/ficha-archivo.js` de verdad en un `vm`.
 
 ---
 

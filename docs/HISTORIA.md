@@ -5,6 +5,105 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 19-sep-2026 — Fila 64: la ficha de un asunto archivado, en su propia carpeta
+
+La fila más importante del informe crítico (`docs/INFORME-CRITICO-2026-09-18.md`, 1.1 y 1.3):
+`_GESTOR/asuntos.json` llevaba dentro la ficha de todos los asuntos de la vida del centro,
+abiertos y archivados, y se reescribía entero entre 50 y 150 veces al día. A los cinco cursos,
+más de 17 MB, con lo que eso significa para Dropbox sincronizando entre dos ordenadores.
+
+**El arreglo copia el patrón que ya usaba `js/hitos-archivo.js` con el historial de hitos, tal
+como pedía el encargo** ("copiar el patrón, no inventar otro"): `js/ficha-archivo.js`
+(`window.FichaArchivo`), nuevo, envuelve `App.cerrarAsunto`/`App.reabrirAsunto`
+(`js/asuntos-archivar.js`) por fuera de todo lo demás —va después de `js/hitos-archivo.js` en
+`index.html`, así que entra en juego cuando los hitos ya se han movido—. Al archivar, en cuanto
+ve `estado === 'cerrado'`, escribe la ficha entera en `_ficha.json` dentro de la propia carpeta
+ya archivada y borra la clave de `asuntos.json` con `App.guardarRegistroFresco`. Al reabrir, lee
+`_ficha.json` de la carpeta ANTES de que `App.reabrirAsunto` la mueva (en cuanto se mueve, el
+manejador viejo deja de servir), deja que la reapertura ponga `estado`/`reabiertoEl`/`reabiertoPor`,
+funde encima la ficha guardada (`Object.assign({}, guardada, actual)`, para que esos tres campos
+frescos ganen) y borra el fichero de la carpeta, ya de vuelta en abiertos. Un asunto archivado
+antes de esta fila no tiene `_ficha.json`: se reabre con ficha vacía, exactamente como pedía el
+encargo, sin ningún caso especial.
+
+**Los ocho sitios que leían la ficha de un archivado desde `asuntos.json`, repasados uno a uno**
+(sección 3.3 del encargo, más algunos que no estaban en la lista y aparecieron al buscar
+`App.E.registro.asuntos` por todo `js/`):
+
+- **`js/archivo-indice.js`**: `entradaDe` guarda ya en cada entrada del índice los pocos campos
+  de la ficha que hacían falta para pintar la tarjeta y para buscar (situación, vía, su dato,
+  quién lo pidió, relacionados —ahora estructurados, no solo texto—, y los campos propios como
+  texto), tomados de la ficha en memoria al archivar (`actualizarIndiceAlArchivar`, en
+  `js/asuntos-archivar.js`, que ahora se la pasa) o releídos de `_ficha.json` al reconstruir el
+  índice entero. `textoDeBusqueda` ya no recibe una `ficha` aparte: usa la propia entrada.
+- **`js/archivo-personas.js`**: `App.verArchivo` monta la ficha de cada tarjeta con esos mismos
+  campos del índice (más `categoria`/`tercero`, que `App.reabrirAsunto` necesita para recalcular
+  la carpeta si el manejador se ha quedado viejo); `App.verAsuntosDeTercero` lee `_ficha.json` de
+  cada carpeta archivada (ya tiene el manejador de `Carpetas.subcarpetas`) en vez de mirar el
+  registro.
+- **`js/ficha-asunto.js`**: el clic en el nombre de una tarjeta del ARCHIVO llama ahora a
+  `FichaArchivo.completar(a)` (resuelve el manejador si hacía falta, con
+  `IndiceArchivo.resolverHandle`, y sustituye `a.ficha` por la de verdad) antes de
+  `App.abrirFicha`: la ficha detallada pinta de forma síncrona con `a.ficha`, así que tiene que
+  llegar ya completa.
+- **`js/otros-del-tercero.js`**: `montarArchivado` hace lo mismo con `FichaArchivo.completar` en
+  vez de leer `App.E.registro.asuntos`.
+- **`js/fichas-huerfanas.js`**: `carpetasSinFicha` ya no cuenta las carpetas del ARCHIVO: no
+  tener entrada en `asuntos.json` es lo normal para un archivado, no una huérfana.
+- **`js/papelera.js`**: revisado, no hace falta tocarlo — el ARCHIVO no tiene ningún botón
+  Borrar (`js/ficha-nombre-acciones.js` solo ofrece "Borrar el asunto" en modo abierto), así que
+  nunca llega a leer la ficha de un archivado.
+- **`js/unir-asuntos.js`** y **`js/asuntos-archivar.js`**: revisados, operan sobre la ficha del
+  asunto que se está archivando/uniendo AHORA MISMO (todavía en `asuntos.json` en ese momento),
+  no sobre la de uno ya archivado: no hacía falta tocarlos, salvo pasarle la ficha a
+  `actualizarIndiceAlArchivar` (arriba).
+- **`js/relacionados.js`**: `asuntosDondeEsRelacionado` (usado en la ficha de una persona, "está
+  relacionado con estos asuntos") pasa a ser async y mira también el índice del ARCHIVO
+  (`IndiceArchivo.leerDisco`), que ahora guarda los relacionados de cada entrada; sin índice
+  hecho, se enseñan solo los abiertos, igual que antes de esta fila para quien no lo tenga
+  construido. `App.verFicha` pinta el bloque cuando la promesa responde.
+- **`js/ajustes.js`**: `App.contarAsuntosConTipo` (bloquea borrar un tipo si algún asunto lo
+  usa) pasa a ser async y mira también el índice, para no dejar borrar un tipo que siguen usando
+  cientos de asuntos ya archivados.
+- **`js/hitos-panel.js`**: `sigueAbiertoDeVerdad` (evita repintar hitos de un asunto que se
+  acaba de archivar mientras se estaba viendo) ya no puede fiarse de "sin ficha en el registro
+  = recién encontrado": ahora también puede significar "archivado del todo". Se mira si sigue en
+  `App.E.listaAbiertos`.
+
+**Aceptado a propósito, sin arreglar**: renombrar un estado y contar cuántos asuntos usan un
+tipo ya no cuentan el histórico completo de archivados sin índice construido (antes sí, porque
+la ficha vivía siempre en memoria); con el índice hecho, sí se cuentan. La cuenta del "buscador
+de tipos" (badges de la pantalla Nuevo asunto) pasa a contar solo abiertos, lo que de hecho es
+más útil (uso activo, no histórico). Ninguno de los dos pierde datos: son cuentas, no fichas.
+
+**La conversión de lo que ya hay** (sección 3.4): botón "Poner en orden las fichas del ARCHIVO"
+en Ajustes → Mantenimiento, dentro del propio `js/ficha-archivo.js`. El número de pendientes
+(cuántos asuntos con `estado: 'cerrado'` siguen en `asuntos.json`) se calcula sin tocar disco, y
+se enseña siempre; localizar la carpeta de cada uno (para el botón de mover de verdad) solo pasa
+al desplegar el bloque `<details>`, no cada vez que se pinta la pestaña. Los que no encuentran su
+carpeta se cuentan aparte y no se tocan. No se hace nada en silencio al arrancar.
+
+**La prueba** (`pruebas/ficha-del-archivo.mjs`), sin navegador, amplía el patrón de
+`pruebas/renombrar-asunto.mjs` cargando también `js/asuntos-archivar.js` y `js/ficha-archivo.js`
+de verdad en el contexto `vm` — esta es la primera prueba de la cola que ejercita el
+`App.cerrarAsunto`/`App.reabrirAsunto` reales sin navegador: los dos cuadros de confirmación que
+abren (`U.preguntar`) se sustituyen por un `async () => true` después de cargar `util.js`, y
+`U.aviso`/`App.verAbiertos` por no-ops, ya que aquí no se prueba la interfaz. Comprueba el viaje
+completo de una ficha "rica" (notas, campos, lo pide, relacionados) al archivar y al reabrir, la
+compatibilidad con un archivado sin `_ficha.json`, `FichaArchivo.completar` y el botón de
+conversión. Comprobado a mano que falla (6 comprobaciones) si se desactiva el envoltorio de
+archivar, y pasa entero con el arreglo puesto.
+
+**Regresiones cazadas por la batería completa, arregladas en las propias pruebas** (no en el
+código: eran las pruebas las que asumían el comportamiento viejo): `pruebas/archivar-atascos.mjs`
+(el camino "ya estaba archivado" también mueve la ficha ahora, se lee de `_ficha.json`);
+`pruebas/archivo-indice.mjs` (el escenario de un relacionado "que solo vive en la ficha" se monta
+con `FichaArchivo.escribir` en la carpeta en vez de inyectarlo en `asuntos.json`, y el de
+"archivar añade la entrada al índice; reabrir la quita" reutiliza la ficha que ya tenía a mano en
+vez de leerla del registro, que ya no la tiene); `pruebas/relacionados.mjs` (la ficha de un
+tercero relacionado con un asunto archivado ahora depende del índice, así que la prueba
+reconstruye el índice antes de comprobarlo, como haría Francisco en el uso real).
+
 ## 19-sep-2026 — Fila 63: bloqueada, sin salida a internet
 
 `docs/PUBLICAR-SOLO-LA-APP.md` pide comprobar con `curl` qué sirve de verdad

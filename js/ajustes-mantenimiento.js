@@ -94,5 +94,6 @@ App.pintarAjustesMantenimiento = async function () {
   await App.pintarCopias();
   if (typeof App.pintarFichasHuerfanas === 'function') await App.pintarFichasHuerfanas();
   if (typeof App.pintarHitosHuerfanos === 'function') await App.pintarHitosHuerfanos();
+  if (typeof App.pintarFichasDelArchivo === 'function') await App.pintarFichasDelArchivo();
   if (typeof App.pintarPapelera === 'function') await App.pintarPapelera();
 };

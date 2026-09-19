@@ -124,12 +124,14 @@
   function sigueAbiertoDeVerdad(clave) {
     var asuntos = App.E && App.E.registro && App.E.registro.asuntos;
     var ficha = asuntos && asuntos[clave];
-    /* Sin ficha en el registro no es "archivado": es un asunto que
-       todavía no ha pasado nunca por App.anotar (por ejemplo, recién
-       encontrado al escanear la carpeta). Solo bloquea un 'cerrado'
-       explícito, igual que hace el resto de la aplicación al leer
-       a.ficha (siempre con "|| {}"). */
-    return !ficha || ficha.estado !== 'cerrado';
+    if (ficha) return ficha.estado !== 'cerrado';
+    /* Fila 64 (docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md): desde que un
+       asunto archivado se borra de App.E.registro.asuntos (su ficha
+       pasa a vivir en su propia carpeta), "sin ficha en el registro"
+       ya no distingue "recién encontrado, nunca pasó por App.anotar"
+       de "archivado del todo". Se mira si sigue en la lista de
+       abiertos en memoria: si tampoco está ahí, se da por archivado. */
+    return (App.E.listaAbiertos || []).some(function (a) { return a.nombre === clave; });
   }
 
   /* Si el asunto está abierto, no tiene hitos todavía y su tipo tiene

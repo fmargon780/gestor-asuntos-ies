@@ -121,6 +121,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Cabecera de cada pantalla fija al bajar, y encogida a una sola línea sin temblar.
 - Renombrar, unir o borrar un asunto mueve también sus hitos y su señal de presencia; el registro
   de asuntos siempre relee del disco antes de escribir, para no pisar al compañero.
+- Al archivar, la ficha del asunto baja a su propia carpeta (no se queda en `asuntos.json` para
+  siempre); al reabrir, vuelve. Botón "Poner en orden las fichas del ARCHIVO" en Ajustes →
+  Mantenimiento para los archivados de antes de este cambio.
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -159,6 +162,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ver con el uso: ancho del panel lateral y del tablón, si las tarjetas por tipo se quedan cortas, y si el aviso de "falta el DNI" conviene también en la tarjeta del asunto; si el DNI no sale de nadie, marcar la columna del documento al generar el RegAlum.
 - Comprobar con un documento de verdad "Ajustar tamaño" (fila 57): si Séneca avisa de que invalida la firma al sellar uno ya preparado, y ajustar en Ajustes las dos medidas por defecto (1,5 y 2,5 cm) con la banda real del sello y de AutoFirma. Cuando el uso lo pida: qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta del centro (los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no se fusionan entre ordenadores, solo las altas).
 - Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
+- Pulsar, cuando pueda, "Poner en orden las fichas del ARCHIVO" (Ajustes → Mantenimiento, fila 64): mueve a su carpeta la ficha de los asuntos archivados antes de esa fila, para que `asuntos.json` deje de crecer con ellos.
 
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero
 
