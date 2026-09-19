@@ -3080,3 +3080,54 @@ disco (sin pasar por `App.E.registro`) mientras este ordenador tiene la copia vi
 comprueba que mandar A a la papelera y devolverlo no se llevan por delante lo que el compañero
 había guardado en B, ni archivan una versión vieja de la ficha de A. Comprobado a mano que la
 prueba falla sin el arreglo (revirtiendo `js/nucleo.js` y `js/papelera.js`) y pasa con él.
+
+## 19-sep-2026 — Fila 62: renombrar un asunto sin perder sus hitos
+
+Arreglo del fallo grave 2 del informe crítico (`docs/INFORME-CRITICO-2026-09-18.md`, 2.3): el
+nombre de la carpeta de un asunto es la clave con la que se guardan tres cosas, en tres ficheros
+distintos (`asuntos.json`, `hitos.json` y `presencia.json`). Renombrar un asunto solo movía la
+ficha; los hitos (fecha límite, responsable, historial, documentos apuntados, lo reunido) se
+quedaban bajo el nombre viejo, y como `crearSiToca` (`js/hitos-panel.js`) ve que el asunto "no
+tiene hitos" y los vuelve a crear desde la guía, la pérdida no daba ningún error: solo salían
+hitos en blanco donde antes había un historial.
+
+**El arreglo**: `js/asunto-renombrar.js` (nuevo), con `AsuntoRenombrar.mover(claveVieja,
+claveNueva, datosExtra)` como único sitio que mueve la ficha, los hitos y la señal de presencia a
+la vez. Si el destino ya tenía hitos (unir dos asuntos, o enlazar una huérfana con una carpeta que
+ya los tenía), se fusionan por identificador en vez de pisarse, reutilizando
+`Conflictos.unirPorId` (ahora exportado en `window.Conflictos`, antes solo interno de
+`js/conflictos.js`) — el mismo problema que fusionar una copia en conflicto de Dropbox.
+`AsuntoRenombrar.fusionar(claveQueda, claveVa)` cubre el caso de unir asuntos (la ficha la sigue
+fundiendo `js/unir-asuntos.js` con sus propias reglas de notas/pasosHechos/pasosElegidos; aquí
+solo se mueven hitos y presencia). `AsuntoRenombrar.quitar(clave)` y `.restaurar(clave, hitos)`
+cubren el borrado y la devolución desde la papelera: los hitos viajan ahora dentro de la propia
+ficha de `papelera.json` (campo `hitos`, junto a `datos`).
+
+Los cuatro caminos que renombran un asunto y el quinto que lo borra pasan todos por ahí:
+`App.editarAsunto` y `App.renombrarAsuntosAbiertosDelTercero` (`js/asuntos-editar.js`),
+`fusionarFicha` (`js/unir-asuntos.js`), `enlazar` (`js/fichas-huerfanas.js`) y `mandarAsunto`/
+`devolverAsunto` (`js/papelera.js`). Ninguno vuelve a tocar `App.E.registro.asuntos`, `Hitos` o
+`Presencia` por su cuenta para esto. De paso, `App.renombrarAsuntosAbiertosDelTercero` se
+simplificó: ya no hace falta envolver el bucle en `App.guardarRegistroFresco` a mano, porque cada
+llamada a `AsuntoRenombrar.mover` relee y guarda fresco por su cuenta.
+
+`js/presencia.js` gana `mover(claveVieja, claveNueva)` y `borrarClave(clave)`, hermanas de la
+`quitar(clave)` que ya existía (esa solo quita la señal propia; las nuevas mueven o quitan
+cualquiera, para el renombrado y el borrado). Nuevo también un bloque de Ajustes → Mantenimiento,
+"Hitos huérfanos" (`App.pintarHitosHuerfanos`, dentro del propio `js/asunto-renombrar.js`), que
+cuenta las entradas de `hitos.json` que ya no corresponden a ningún asunto abierto ni archivado
+—rastro de renombrados de antes de este arreglo— y deja borrarlas con confirmación, sin adivinar
+a qué asunto pertenecían.
+
+**La prueba** (`pruebas/renombrar-asunto.mjs`), sin navegador, amplía el patrón de
+`pruebas/guardar-sin-pisar.mjs` cargando también `js/conflictos.js`, `js/presencia.js` y
+`js/hitos.js` en el contexto `vm`. Prueba `AsuntoRenombrar` directamente (mover, fusionar en un
+destino que ya tenía hitos, unir dos asuntos, enlazar una huérfana, borrar y devolver desde la
+papelera, mover la señal de presencia, y detectar hitos huérfanos) con un hito "rico" que lleva
+las seis cosas que el informe decía que se perdían. Los cuatro caminos de la aplicación en sí
+(`App.editarAsunto` y compañía) no se prueban de extremo a extremo sin navegador porque todos
+abren antes un `U.preguntar`, que necesita un DOM de verdad para contestar; la batería completa de
+Playwright (`huerfanas.mjs`, `papelera.mjs`) sigue en verde tras el cambio, confirmando que los
+envoltorios finos sobre `AsuntoRenombrar` no rompieron nada del camino ya cubierto. Comprobado a
+mano que la prueba falla (7 comprobaciones) si se desactiva la migración de hitos y presencia
+dentro de `AsuntoRenombrar.mover`, y pasa entera con el arreglo puesto.

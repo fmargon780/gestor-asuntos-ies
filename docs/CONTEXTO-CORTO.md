@@ -106,9 +106,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   destinatario propuesto y constancia una vez), aparte de la plantilla del tipo (filas 59-60).
 - "Qué me toca": pantalla que cruza los hitos pendientes de todos los asuntos abiertos, en tres
   bloques (en tu tejado, esperando a otros, sin fecha), con filtro por responsable.
-- No pisarse en un asunto: si el compañero ya está dentro, se entra en modo consulta (aviso y
-  "Tomar el mando"), con marca en la lista. Señal en `_GESTOR/presencia.json`, caduca a los 3 min;
-  su repintado de fondo solo toca la pantalla si cambia algo de verdad, y nunca mientras se escribe.
+- No pisarse en un asunto: si el compañero ya está dentro, se entra en modo consulta (aviso y "Tomar el mando"), con marca en la lista. Señal en `_GESTOR/presencia.json`, caduca a los 3 min; su repintado de fondo solo toca la pantalla si cambia algo de verdad, y nunca mientras se escribe.
 - Separar, Unir, Sacar páginas y **Ajustar tamaño** (llamado "Preparar el documento" hasta la fila 58) de un PDF, en la carpeta del asunto y en Por clasificar (con pdf-lib, `js/lib/pdf-lib.min.js`); miniaturas con pdf.js, tijeras entre páginas para Separar. "Ajustar tamaño" encoge las páginas para dejar libre la banda del sello de Séneca (arriba) y la de la firma del director (abajo), según lo que diga el tipo del asunto y las medidas de Ajustes → El centro; si ya hay sitio, no toca nada (fila 57, 18-sep-2026).
 - "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha (opcional), con el correo ya puesto al preparar el cuadro de Correo. Las opciones de "Tutor legal 1/2" muestran su nombre de verdad (`LoPide.datosDeTutor` descarta documento/identificación/parentesco/fecha/domicilio y arma el nombre por Apellidos + Nombre, nunca un número; fila 38).
 - Archivar o reabrir cuando el destino ya existe (de un intento a medias) fusiona las dos carpetas, sin perder nada; si la carpeta ya no está donde se esperaba pero se encuentra en el otro sitio, se da por hecho sin copiar nada y avisa en verde; si no aparece por ningún lado, avisa en ámbar pidiendo Recargar. Los errores del navegador (`NotFoundError` y compañía) salen siempre traducidos (`U.mensajeDeError`), y los temporales de sincronización (Dropbox, Drive) no se cuentan ni se copian (fila 45).
@@ -134,6 +132,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   sustituyendo la línea vieja, y anotar en `HISTORIA.md` lo que merezca recordarse.
 - El registro de asuntos (`asuntos.json`) solo se escribe entero por `App.anotar` o por
   `App.guardarRegistroFresco`, nunca directo con `Copias.guardar` (fila 61, 19-sep-2026).
+- Renombrar, unir o borrar un asunto (su clave cambia o desaparece) solo por `AsuntoRenombrar`
+  (`js/asunto-renombrar.js`): mueve a la vez la ficha, sus hitos y su señal de presencia (fila 62).
 
 ## 7. Descartado, no proponer otra vez
 
@@ -149,8 +149,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Poner en marcha el script de Gmail en `g.educaand.es`, señalar `GESTOR-BANDEJA` en Ajustes, y pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs` (sin eso no se siguen los hilos por matrícula, ni la copia oculta de un grupo).
 - Ver si la bandeja de correo acierta con el tipo (si falla mucho, palabras clave por tipo), y comprobar con Séneca si Comunicaciones acepta el largo del asunto que le damos. Cuando tengan una cuenta de correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel lateral y del tablón, si las tarjetas por tipo se quedan cortas, y si el aviso de "falta el DNI" conviene también en la tarjeta del asunto; si el DNI no sale de nadie, marcar la columna del documento al generar el RegAlum.
-- Comprobar con un documento de verdad "Preparar el documento" (fila 57): si Séneca avisa de que invalida la firma al sellar uno ya preparado, y ajustar en Ajustes las dos medidas por defecto (1,5 y 2,5 cm) con la banda real del sello y de AutoFirma.
-- Cuando el uso lo pida: qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta del centro (los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no se fusionan entre ordenadores, solo las altas).
+- Comprobar con un documento de verdad "Ajustar tamaño" (fila 57): si Séneca avisa de que invalida la firma al sellar uno ya preparado, y ajustar en Ajustes las dos medidas por defecto (1,5 y 2,5 cm) con la banda real del sello y de AutoFirma. Cuando el uso lo pida: qué hacer con los asuntos vivos al cambiar de curso, pasar repositorio y Vercel a una cuenta del centro (los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no se fusionan entre ordenadores, solo las altas).
 - Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN. Cambiar la dirección vieja por `https://asuntos.fmargon.com` en `docs/CONTEXTO.md` y donde más aparezca (no urgente: la vieja sigue respondiendo fuera del centro).
 
 ## 9. Cuándo leer `CONTEXTO.md` entero

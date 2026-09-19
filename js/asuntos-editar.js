@@ -147,20 +147,16 @@ App.renombrarAsuntosAbiertosDelTercero = async function (categoria, textoAntes, 
   if (!ok) return;
 
   var renombrados = 0;
-  await App.guardarRegistroFresco(async function (registro) {
-    for (var i = 0; i < afectados.length; i++) {
-      var nombreViejo = afectados[i].nombre;
-      var nombreNuevo = nombreViejo.slice(0, nombreViejo.length - textoAntes.length) + textoDespues;
-      try {
-        if (await Carpetas.existe(App.E.abiertos, nombreNuevo)) continue;   /* ya está así, no se toca */
-        await Carpetas.renombrar(App.E.abiertos, nombreViejo, nombreNuevo);
-        var antes = registro.asuntos[nombreViejo] || {};
-        registro.asuntos[nombreNuevo] = Object.assign({}, antes, { tercero: textoDespues });
-        delete registro.asuntos[nombreViejo];
-        renombrados++;
-      } catch (e) { /* uno que falle no frena a los demás */ }
-    }
-  });
+  for (var i = 0; i < afectados.length; i++) {
+    var nombreViejo = afectados[i].nombre;
+    var nombreNuevo = nombreViejo.slice(0, nombreViejo.length - textoAntes.length) + textoDespues;
+    try {
+      if (await Carpetas.existe(App.E.abiertos, nombreNuevo)) continue;   /* ya está así, no se toca */
+      await Carpetas.renombrar(App.E.abiertos, nombreViejo, nombreNuevo);
+      await AsuntoRenombrar.mover(nombreViejo, nombreNuevo, { tercero: textoDespues });
+      renombrados++;
+    } catch (e) { /* uno que falle no frena a los demás */ }
+  }
   U.aviso(renombrados + ' carpeta' + (renombrados === 1 ? '' : 's') + ' renombrada' +
     (renombrados === 1 ? '' : 's') + '.', 'bueno');
 };
@@ -301,13 +297,11 @@ App.editarAsunto = async function (a) {
     }
     await Carpetas.renombrar(App.E.abiertos, a.nombre, nombreNuevo);
 
-    /* La ficha viaja con la carpeta: se copia a la clave nueva y se
-       borra la vieja, para no dejar dos fichas del mismo asunto. */
-    await App.guardarRegistroFresco(function (registro) {
-      var antes = registro.asuntos[a.nombre] || {};
-      registro.asuntos[nombreNuevo] = Object.assign({}, antes, datos);
-      delete registro.asuntos[a.nombre];
-    });
+    /* La ficha viaja con la carpeta, y con ella sus hitos y la señal
+       de presencia si la hubiera (fila 62, docs/RENOMBRAR-SIN-PERDER-HITOS.md):
+       AsuntoRenombrar.mover es el único sitio que mueve las tres cosas
+       a la vez. */
+    await AsuntoRenombrar.mover(a.nombre, nombreNuevo, datos);
 
     await App.verAbiertos();
     U.aviso('Asunto editado. La carpeta ya se llama como querías.', 'bueno');

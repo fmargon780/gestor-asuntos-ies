@@ -92,6 +92,30 @@ var Presencia = (function () {
     }
   }
 
+  /* Fila 62 (docs/RENOMBRAR-SIN-PERDER-HITOS.md): cuando un asunto
+     cambia de clave (se renombra, se une con otro, se borra), la señal
+     de quién está dentro tiene que viajar con él. Se relee justo antes
+     de escribir, como todo lo de aquí. */
+  async function mover(claveVieja, claveNueva) {
+    if (claveVieja === claveNueva) return;
+    var mapa = limpiar(await leer());
+    if (mapa[claveVieja]) {
+      mapa[claveNueva] = mapa[claveVieja];
+      delete mapa[claveVieja];
+      await escribir(mapa);
+    }
+  }
+
+  /* Al borrar el asunto del todo (mandado a la papelera): la señal no
+     tiene ya ningún sitio adonde viajar. */
+  async function borrarClave(clave) {
+    var mapa = limpiar(await leer());
+    if (mapa[clave]) {
+      delete mapa[clave];
+      await escribir(mapa);
+    }
+  }
+
   /* Quién tiene 'clave' ahora mismo, si no es uno mismo. Null si está
      libre, caducada, o es la propia señal. */
   async function quienEstaDentro(clave) {
@@ -203,7 +227,8 @@ var Presencia = (function () {
   return {
     FICHERO: FICHERO,
     vigilar: vigilar, dejarDeVigilar: dejarDeVigilar, tomarElMando: tomarElMando,
-    ocupantePor: ocupantePor, refrescarCache: refrescarCache, huella: huella
+    ocupantePor: ocupantePor, refrescarCache: refrescarCache, huella: huella,
+    mover: mover, borrarClave: borrarClave
   };
 })();
 window.Presencia = Presencia;

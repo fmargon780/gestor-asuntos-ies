@@ -64,15 +64,15 @@
 
     var destino = $('huerfana-destino').value;
     try {
-      var encontrada = false;
-      await App.guardarRegistroFresco(function (registro) {
-        var ficha = registro.asuntos[clave];
-        if (!ficha) return;
-        encontrada = true;
-        registro.asuntos[destino] = ficha;
-        delete registro.asuntos[clave];
-      });
-      if (!encontrada) { U.aviso('Esa ficha ya no está: puede que el compañero la haya tocado.', 'malo'); return; }
+      await App.cargarRegistro();
+      if (!App.E.registro.asuntos[clave]) {
+        U.aviso('Esa ficha ya no está: puede que el compañero la haya tocado.', 'malo');
+        return;
+      }
+      /* La ficha pasa a la carpeta nueva, y con ella sus hitos y su
+         señal de presencia si la hubiera (fila 62,
+         docs/RENOMBRAR-SIN-PERDER-HITOS.md). */
+      await AsuntoRenombrar.mover(clave, destino, {});
       U.aviso('Ficha enlazada con ' + destino + '.', 'bueno');
       await App.pintarAjustes();
     } catch (e) {

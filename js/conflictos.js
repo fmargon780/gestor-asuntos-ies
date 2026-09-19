@@ -322,8 +322,13 @@
   }
 
   /* Para las pruebas, y por si algún día hace falta forzar una revisión
-     desde otro sitio (el botón "Actualizar", por ejemplo). */
-  window.Conflictos = { revisar: revisar, pendientes: function () { return pendientes.slice(); } };
+     desde otro sitio (el botón "Actualizar", por ejemplo). unirPorId
+     se reutiliza también en js/asunto-renombrar.js (fila 62): fusionar
+     dos listas de hitos por su identificador es el mismo problema que
+     fusionar una copia en conflicto. */
+  window.Conflictos = {
+    revisar: revisar, pendientes: function () { return pendientes.slice(); }, unirPorId: unirPorId
+  };
 
   function enganchar() {
     if (!window.Gestor) return;

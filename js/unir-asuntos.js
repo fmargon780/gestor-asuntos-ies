@@ -467,6 +467,11 @@
       });
       delete registro.asuntos[seVa.nombre];
     });
+
+    /* Los hitos y la señal de presencia de "seVa" viajan con él: se
+       fusionan con los de "seQueda", sin perder ninguno (fila 62,
+       docs/RENOMBRAR-SIN-PERDER-HITOS.md). */
+    await AsuntoRenombrar.fusionar(seQueda.nombre, seVa.nombre);
   }
 
   async function unirAsuntos(grupo) {
