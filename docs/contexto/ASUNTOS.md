@@ -130,7 +130,7 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   plazo" (`fechaCortaSinAno`, propia de este fichero, sin año). Se pinta con
   `<button class="boton-vencimiento ...">` (`css/ficha-asunto.css`); al pulsarla abre el mismo
   `App.editarPlazo(a)` de siempre.
-- **"El encargo"**: un solo botón que abre el mismo cuadro de "Lo pide" de siempre
+- **"El encargo"**: un solo botón que abre el cuadro de "Lo pide" de siempre
   (`abrirLoPide(a)`, sigue en `js/ficha-asunto.js`) con la vía de comunicación
   (`a.ficha.via`/`viaDato`, antes su propio botón vía `App.editarVia`) metida dentro como un
   campo más. `LoPide.controles(caja, persona, valorInicial, viaInicial)` gana un 4º parámetro
@@ -139,7 +139,7 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   —quién lo pide y por dónde— se guardan juntas en un solo `App.anotar`, pero no dependen la una
   de la otra (se puede guardar la vía sin haber elegido "quién lo pide"). Ninguna de las dos
   cambia de sitio en `asuntos.json` (`loPide` y `via`/`viaDato`/`viaEl`/`viaPor`, igual que
-  siempre); `App.editarVia` sigue tal cual, sigue usandolo la tarjeta de la lista
+  siempre); `App.editarVia` sigue tal cual, sigue usándolo la tarjeta de la lista
   (`js/asuntos-lista.js`). `js/via-contacto.js` envuelve `LoPide.controles` (además de
   `App.editarVia`, que no se toca) para poner las sugerencias de teléfono/correo también en el
   campo `.lopide-via-dato` del cuadro nuevo, solo si `controles()` recibe `persona`. El botón
@@ -419,7 +419,7 @@ esas dos funciones.
 `fusionarEn` desde siempre) se exportan también desde la fila 75
 (docs/HUECOS-ENCONTRADOS-FILA-69.md, 1): `js/unir-asuntos.js` las reutiliza para el mismo
 renombrado con sufijo cuando un documento choca de nombre al unir dos asuntos (ver "Que no se
-dupliquen los asuntos", más arriba), en vez de tener su propia copia de la misma cuenta.
+duplique los asuntos", más arriba), en vez de tener su propia copia de la misma cuenta.
 
 Se comprueba con `pruebas/archivar-fusion.mjs`, sin navegador.
 

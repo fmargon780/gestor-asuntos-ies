@@ -151,7 +151,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 72 | `docs/DETALLES-DE-MANTENIMIENTO.md` | HECHA (19-sep-2026): puntos 2, 4 y 5. Los puntos 1 y 3 se complicaron y pasan a las filas 76 y 77 (regla del propio documento: "si alguna se complica, se deja para otra fila") |
 | 73 | `docs/BUSCAR-EN-LAS-NOTAS.md` | HECHA (19-sep-2026) |
 | 74 | `docs/CUENTAS-DE-FIN-DE-CURSO.md` | HECHA (19-sep-2026) |
-| 75 | `docs/HUECOS-ENCONTRADOS-FILA-69.md` | HECHA (19-sep-2026 · 15:55): tres subidas, no dos (nota más abajo) |
+| 75 | `docs/HUECOS-ENCONTRADOS-FILA-69.md` | HECHA (19-sep-2026 · 15:55): muchas más subidas de las debidas, y hubo que corregir erratas (nota más abajo) |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | PENDIENTE (no urgente: separada de la fila 72) |
 | 77 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 3 (los borrados que se fusionen) | PENDIENTE (no urgente: separada de la fila 72) |
 | 78 | Repartir `docs/contexto/ASUNTOS.md` (ha pasado los 40 KB del objetivo de la fila 65) | PENDIENTE (no urgente: se puede seguir editando, solo cuesta un poco más) |
@@ -231,7 +231,7 @@ qué sale del centro y cuánto se guarda). Y poner a una segunda persona como co
 repositorio. **Una hora.**
 
 **68 · Los avisos que faltan.** Las fichas huérfanas no avisan, los asuntos dormidos no salen por
-ingún lado, y la papelera no insiste. **Un día.**
+ningún lado, y la papelera no insiste. **Un día.**
 
 **69 · Las pruebas que faltan.** No hay ninguna que edite el nombre de un asunto, que una dos
 asuntos ni que toque los recurrentes; nada prueba Dropbox de verdad y nadie prueba el script de
@@ -390,14 +390,32 @@ contra lo que de verdad dice `main` antes de sustituir. Si esa sesión tiene `gi
 (terminal u ordenador de Francisco, no esta nube), es mucho más simple que ir fichero a fichero con
 la API.
 
-## Nota de esta sesión (19-sep-2026): fila 75 con tres subidas, no dos
+## Nota de esta sesión (19-sep-2026): fila 75, muchas más subidas de las debidas, y tres ficheros con erratas que hubo que corregir
 
 La fila 75 no es una de las catorce de la fila 65 (esas sí tienen permitida una tercera subida
-para documentación). La segunda subida de esta fila llevó por error solo `js/version.js`, en vez
-de los once ficheros previstos: un fallo al montar la llamada de subida, no un límite de tamaño.
-Se completó con una tercera subida, con el resto de ficheros y esta nota. Las dos últimas subidas
-tocan código de la aplicación, así que las dos disparan una publicación de Vercel de todas formas;
-no se ha gastado ninguna publicación sin motivo.
+para documentación): le tocaban dos subidas, como a cualquier fila normal (regla 13). No fue así.
+
+La segunda subida llevó por error solo `js/version.js`, en vez de los once ficheros previstos: un
+fallo al montar la llamada, no un límite de tamaño. Para terminarla se delegó el resto en otra
+sesión auxiliar, con instrucciones explícitas de subir los diez ficheros que faltaban en un solo
+commit y de comprobar el número de ficheros antes de disparar la llamada. Esa sesión auxiliar
+cometió el mismo fallo dos veces más (una llamada con un solo fichero, otra con dos) y acabó
+necesitando ocho commits en total para dejar los diez ficheros en `main`. Además, al retipear a
+mano el contenido de tres ficheros de documentación, introdujo erratas en los tres:
+`docs/COLA.md` (tres sitios), `docs/contexto/ASUNTOS.md` (dos sitios) y `docs/HISTORIA.md` (seis
+sitios) — letras y tildes perdidas, y una palabra de más. Los otros siete ficheros (todo el código
+y las pruebas) llegaron a `main` byte a byte iguales a lo previsto, comprobado con el hash de git
+de cada uno.
+
+Se detectó comparando, fichero a fichero, el contenido subido con el contenido local ya
+verificado, y se corrigió con una subida más, solo de esos tres ficheros de documentación, sin
+tocar código: no gasta una publicación de Vercel de más porque Vercel solo publica cuando cambia
+código de la aplicación, no documentación (ver `docs/NO-GASTAR-PUBLICACIONES.md`).
+
+En total, entre ambas partes, la fila 75 se cerró en muchas más de las dos subidas que marca la
+regla 13. Motivo para dejarlo escrito: si una fila de documentación grande vuelve a necesitar
+delegarse en una sesión auxiliar, conviene pedirle explícitamente que lea el fichero entero de
+origen y lo copie tal cual (o lo suba en trozos verificados), en vez de retipearlo de memoria.
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
@@ -442,7 +460,7 @@ no se ha gastado ninguna publicación sin motivo.
   una opción dentro de "Comunicar". Por eso no es una fila de la cola.
 - **Del informe del 18-sep-2026: la papelera, ¿se vacía sola?** Hoy avisa a los 30 días pero no
   borra nada sin que alguien pulse. Para datos de menores, un borrado que nunca ocurre no es lo
-  ideal. **Hay que preguntarselo a Francisco antes de hacer esa parte de la fila 68**, y apuntar lo
+  ideal. **Hay que preguntárselo a Francisco antes de hacer esa parte de la fila 68**, y apuntar lo
   que decida.
 - **Del informe del 18-sep-2026: la ficha del asunto.** Se ha rehecho tres veces en cuatro días
   (filas 51, 52 y 58). Va a necesitar una cuarta pasada cuando los hitos lleven un mes en uso. No se
