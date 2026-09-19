@@ -5,6 +5,38 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 19-sep-2026 — Fila 73: buscar en las notas
+
+`docs/BUSCAR-EN-LAS-NOTAS.md`. Hasta ahora el buscador (Asuntos abiertos y ARCHIVO) solo miraba
+nombre, categoría, tercero, tipo, curso, grupo, documentos y registros de Séneca: si lo que se
+recordaba de un asunto estaba escrito en una nota, no aparecía.
+
+**Las notas entran en la búsqueda.** `js/notas.js` gana `textoParaBuscar(ficha)` (junta el texto
+de todas las notas del asunto y lo recorta a 2.000 caracteres, para que una nota gigante no
+ralentice nada). En Asuntos abiertos (`js/asuntos-lista.js`, `App.verAbiertos`) ese texto se suma
+al de siempre. En el ARCHIVO, el índice guardado (`js/archivo-indice.js`) pasa a llevar también
+las notas de cada entrada; eso sube su `VERSION` de 1 a 2, así que un índice viejo se reconstruye
+solo, con el aviso de siempre.
+
+**De paso, un fallo real:** `App.pintarAbiertos` comparaba la frase escrita entera con `indexOf`,
+sin partirla en palabras — buscar "Pérez empadronamiento" no encontraba nada aunque las dos
+palabras estuvieran, una en el nombre y otra en una nota, porque nunca aparecen juntas y en ese
+orden. `App.pintarArchivo` ya lo hacía bien (palabra a palabra, en cualquier orden); se ha
+igualado el buscador de Asuntos abiertos al mismo criterio, que además era parte de lo que pedía
+esta fila.
+
+**Por qué ha salido, a la vista.** Cuando la única razón de que un asunto aparezca es una nota, la
+tarjeta enseña ahora un trocito de esa nota con la palabra buscada resaltada
+(`.tarjeta-nota-encontrada`, `App.fragmentoDeNota`); si el asunto ya se explicaba por el nombre u
+otro campo, no se enseña nada de más. La comparación es `busca` (todo, incluidas notas) contra
+`buscaSinNotas` (todo menos notas), palabra a palabra: si una palabra buscada está en el primero
+pero no en el segundo, vino de una nota.
+
+Prueba nueva sin navegador, `pruebas/buscar-en-notas.mjs` (once comprobaciones: nota que aparece,
+dos palabras en cualquier orden, con y sin tildes, cuándo se enseña fragmento y cuándo no, recorte
+de una nota de 50.000 caracteres, y la subida de `VERSION` del índice). Comprobado también a mano
+en un navegador de verdad, en Asuntos abiertos y en el ARCHIVO.
+
 ## 19-sep-2026 — Fila 72: cinco detalles de mantenimiento (tres hechos, dos separados)
 
 `docs/DETALLES-DE-MANTENIMIENTO.md`, informe crítico 2.8 y 4. Cinco cosas pequeñas e

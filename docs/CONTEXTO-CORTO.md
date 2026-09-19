@@ -73,7 +73,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Estado del asunto, vía de comunicación preferente y fecha límite.
 - Asuntos recurrentes, con aviso y creación manual.
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
-  sueltas también en documentos, registro de Séneca y ficha.
+  sueltas también en documentos, registro de Séneca, ficha y notas.
 - Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
 - Nombre comercial de empresas, aparte de la razón social; cambiar los datos de un tercero dado
   de alta a mano.

@@ -36,7 +36,10 @@
 var IndiceArchivo = (function () {
 
   var FICHERO = 'indice-archivo.json';
-  var VERSION = 1;
+  /* 2 (19-sep-2026, fila 73, docs/BUSCAR-EN-LAS-NOTAS.md): las
+     entradas ahora llevan también el texto de las notas, así que un
+     índice de la 1 se queda sin ellas y hay que reconstruirlo. */
+  var VERSION = 2;
 
   function gestor() { return window.App && App.E && App.E.gestor; }
 
@@ -214,7 +217,12 @@ var IndiceArchivo = (function () {
       sueltoEn: sueltoEn || '',
       situacion: ficha.situacion || '', via: ficha.via || '', viaDato: ficha.viaDato || '',
       loPideNombre: (ficha.loPide && ficha.loPide.nombre) || '',
-      relacionados: relacionadosDeFicha(ficha), camposTexto: camposDeFicha(ficha)
+      relacionados: relacionadosDeFicha(ficha), camposTexto: camposDeFicha(ficha),
+      /* Fila 73, docs/BUSCAR-EN-LAS-NOTAS.md: el texto de las notas,
+         recortado (Notas.textoParaBuscar ya lo recorta a 2.000
+         caracteres), para poder buscar dentro de ellas sin tener que
+         abrir la carpeta. */
+      notas: window.Notas ? Notas.textoParaBuscar(ficha) : ''
     };
   }
 
@@ -346,8 +354,11 @@ var IndiceArchivo = (function () {
      ========================================================== */
 
   /* Junta lo del índice (que desde la fila 64 ya trae lo poco que hace
-     falta de la ficha, ver entradaDe) y lo normaliza una sola vez. */
-  function textoDeBusqueda(entrada) {
+     falta de la ficha, ver entradaDe) y lo normaliza una sola vez.
+     `conNotas` a false se queda fuera el texto de las notas: lo usa
+     `App.fragmentoDeNota` (fila 73) para saber si una palabra buscada
+     solo aparece por una nota, no por el resto de la ficha. */
+  function textoDeBusqueda(entrada, conNotas) {
     var partes = [
       entrada.nombre, entrada.categoria, entrada.tercero, entrada.ruta,
       entrada.tipo, entrada.curso, entrada.grupo
@@ -359,6 +370,7 @@ var IndiceArchivo = (function () {
       partes.push(v ? v.texto : entrada.via);
     }
     partes.push(entrada.viaDato || '', entrada.loPideNombre || '', entrada.camposTexto || '');
+    if (conNotas !== false) partes.push(entrada.notas || '');
     (entrada.relacionados || []).forEach(function (r) { if (r && r.nombre) partes.push(r.nombre); });
 
     return U.normalizar(partes.join(' '));

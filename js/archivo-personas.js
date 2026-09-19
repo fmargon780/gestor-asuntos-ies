@@ -59,7 +59,12 @@ App.verArchivo = async function () {
       nombre: e.nombre, handle: null, padre: null, ruta: e.ruta,
       categoria: e.categoria, tercero: e.tercero, sueltoEn: e.sueltoEn || '',
       leido: Nombres.leer(e.nombre, App.E.tipos), ficha: ficha,
-      busca: IndiceArchivo.textoDeBusqueda(e)
+      /* Fila 73, docs/BUSCAR-EN-LAS-NOTAS.md: busca lleva las notas,
+         buscaSinNotas no, para saber si una palabra ha salido solo
+         por una nota (App.fragmentoDeNota). */
+      busca: IndiceArchivo.textoDeBusqueda(e),
+      buscaSinNotas: IndiceArchivo.textoDeBusqueda(e, false),
+      notasTexto: e.notas || ''
     };
   });
   salida.sort(function (a, b) { return a.nombre < b.nombre ? 1 : -1; });
@@ -113,7 +118,10 @@ App.pintarArchivo = function () {
     caja.innerHTML = '<div class="vacio">' + U.escapar(msg) + '</div>';
     return;
   }
-  lista.slice(0, 300).forEach(function (a) { caja.appendChild(App.tarjetaAsunto(a, 'archivado')); });
+  lista.slice(0, 300).forEach(function (a) {
+    a._fragmento = App.fragmentoDeNota(a, palabras);
+    caja.appendChild(App.tarjetaAsunto(a, 'archivado'));
+  });
   if (lista.length > 300) {
     var mas = document.createElement('div');
     mas.className = 'explica';

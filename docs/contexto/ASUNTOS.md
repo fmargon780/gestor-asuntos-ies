@@ -472,10 +472,16 @@ tabla de ficheros), y la búsqueda es por palabras sueltas.
     silenciosas si el índice todavía no existe.
   - `recuentoActual()` es el recuento barato del punto 6.2: solo categorías y carpetas de tercero
     (un nivel), para comparar con el `recuento` guardado sin recorrer los asuntos.
-  - `textoDeBusqueda(entrada)` junta lo del índice (nombre, categoría, tercero, ruta, tipo, curso,
-    grupo, documentos, registros de Séneca) con los pocos campos de la ficha que la propia entrada
-    ya guarda desde la fila 64 (ver más abajo): situación, vía y su dato, quién lo pidió,
-    relacionados y campos propios. Normalizado una vez.
+  - `textoDeBusqueda(entrada, conNotas)` junta lo del índice (nombre, categoría, tercero, ruta,
+    tipo, curso, grupo, documentos, registros de Séneca) con los pocos campos de la ficha que la
+    propia entrada ya guarda desde la fila 64 (ver más abajo): situación, vía y su dato, quién lo
+    pidió, relacionados y campos propios. Desde la fila 73 (`docs/BUSCAR-EN-LAS-NOTAS.md`,
+    19-sep-2026) la entrada también guarda `notas` (el texto de las notas del asunto, recortado a
+    2.000 caracteres por `Notas.textoParaBuscar`, ver "Notas" más abajo) y `textoDeBusqueda` lo
+    incluye salvo que se llame con `conNotas` a `false` (así `App.pintarArchivo` puede calcular,
+    aparte, un texto sin notas para saber si una coincidencia viene de una nota). Ese cambio subió
+    `VERSION` de `IndiceArchivo` de 1 a 2, así que un índice guardado con la versión vieja se
+    reconstruye solo (mismo aviso "El índice no está hecho" de siempre). Normalizado una vez.
   - `resolverHandle(entrada)` calcula el manejador real de una carpeta a partir de lo que el índice
     sabe (categoría, tercero, ruta, `sueltoEn`): el índice no puede guardar manejadores en un JSON.
 - **`App.verArchivo`** (`js/archivo-personas.js`) lee el índice; si no existe, está roto o es de
@@ -486,7 +492,19 @@ tabla de ficheros), y la búsqueda es por palabras sueltas.
   `IndiceArchivo.construir()` + `guardar()`; si algo falla a mitad, no se escribe nada a medias.
 - **`App.pintarArchivo`** ya no usa `indexOf`: normaliza lo escrito, lo parte en palabras, y un
   asunto sale si tiene TODAS en su `busca` (calculado una vez al cargar el índice, no en cada
-  tecleo). Sin resultados: "Ningún asunto archivado tiene todas esas palabras."
+  tecleo). Sin resultados: "Ningún asunto archivado tiene todas esas palabras." Desde la fila 73,
+  `App.verArchivo` guarda también `buscaSinNotas` (con `textoDeBusqueda(entrada, false)`) y
+  `notasTexto`; con eso, `App.pintarArchivo` calcula para cada resultado
+  `a._fragmento = App.fragmentoDeNota(a, palabras)`, y `App.tarjetaAsunto` enseña ese trocito de la
+  nota (con la palabra buscada resaltada) SOLO cuando la coincidencia venía de una nota y no del
+  resto de campos — así se ve "por qué" ha salido ese asunto. Igual en Asuntos abiertos
+  (`js/asuntos-lista.js`, `App.verAbiertos`/`App.pintarAbiertos`), que de paso pasó a buscar
+  palabra a palabra en cualquier orden (antes comparaba la frase entera con `indexOf`, sin contar
+  las notas). La lógica de qué trocito enseñar vive en `js/notas.js`: `textoParaBuscar(ficha)`
+  junta y recorta a 2.000 caracteres el texto de las notas de un asunto; `fragmentoDeBusqueda`
+  saca la ventana de palabras alrededor de la que coincide; `fragmentoSiSoloEnNota` decide si hace
+  falta enseñar fragmento (compara `busca` contra `buscaSinNotas` palabra a palabra). Se comprueba
+  sin navegador en `pruebas/buscar-en-notas.mjs`.
 - **`js/asuntos-archivar.js`** da de alta y de baja el índice sin reconstruirlo entero:
   `App.cerrarAsunto` añade la entrada (con `actualizarIndiceAlArchivar`) justo después de que el
   traslado haya salido bien, en los dos sitios donde puede acabar archivado (el normal y el "ya
