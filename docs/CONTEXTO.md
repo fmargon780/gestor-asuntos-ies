@@ -361,7 +361,7 @@ Aparte, en `localStorage`: `gestor-barra`, `gestor-filtros`, `gestor-lector-anch
   `docs/ENVOLTURAS-COMPROBADAS.md`): se engancha por un punto previsto (`window.Gestor.
   alRefrescar` y los que haya) o se le añade uno. Envolver una función que ya existe sigue siendo
   la mejor manera de añadir algo a muchas pantallas a la vez cuando no hay más remedio (42
-  envolturas así), pero **con `U.envolver(etiqueta, objeto, propiedad, fichero, fabricaNueva)`**,
+  envolturas así), pero **con `U.envolver(objeto, nombre, fichero, hacerNueva)`**,
   nunca a mano con `var comoEra = ...`: si la función no existe (orden de `<script>` equivocado),
   `U.envolver` lo apunta como fallo en vez de fallar en silencio, y `js/envolturas-esperadas.js`
   (el último `<script>`) avisa en rojo en la entrada si falta alguna de las esperadas. Toda
