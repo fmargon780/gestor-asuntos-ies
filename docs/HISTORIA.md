@@ -5,6 +5,54 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 19-sep-2026 — Fila 72: cinco detalles de mantenimiento (tres hechos, dos separados)
+
+`docs/DETALLES-DE-MANTENIMIENTO.md`, informe crítico 2.8 y 4. Cinco cosas pequeñas e
+independientes; tres se hicieron, dos se complicaron y pasan a las filas 76 y 77 (regla propia
+del documento).
+
+**Punto 2, el nombre de quien entra, de una lista.** `js/usuarios.js` (nuevo) guarda
+`_GESTOR/usuarios.json` (`{ nombres: [...] }`), un fichero compartido más (el decimocuarto,
+`js/copias.js`). La pantalla de entrada pinta un desplegable con los nombres ya usados más
+"Otro…" en cuanto la carpeta de asuntos abiertos tiene permiso concedido (`App.pintarListaUsuarios`,
+llamado tras elegir la carpeta y al recordar una de antes); si la lista está vacía, el campo de
+texto de siempre, sin cambios. Comparación exacta a propósito: "Francisco" y "francisco" quedan
+como dos nombres, nunca se unifican solos, y nunca se tocan los nombres ya escritos en notas e
+historiales. **Fallo real encontrado y corregido en el camino**: registrar el nombre nuevo
+(`Usuarios.anadirSiHaceFalta`) se lanzaba sin esperar, a la vez que `Copias.comprobarTodos`
+leía los catorce ficheros al entrar; la lectura podía pillar `usuarios.json` a medio escribir y
+darlo por roto, bloqueando la entrada. Se espera ahora, y se hace después de comprobarTodos, no
+antes ni en paralelo.
+
+**Punto 4, las copias de seguridad, con caducidad.** `js/copias.js`: además de quedarse con las
+últimas 30, `podar()` borra las de más de 90 días (nuevo campo `Ajustes → El centro`,
+`App.diasCaducidadCopias`/`guardarDiasCaducidadCopias`/`pintarDiasCaducidadCopias`, mismo patrón
+que `App.diasDormido()`), aunque no lleguen a las 30. `js/copias.js` no puede llamar a `App`
+directamente (se carga antes que `js/nucleo.js`): lee el ajuste con `window.App && ...`, nunca
+`App` a secas.
+
+**Punto 5, pdf.js al día.** La 3.11.174 vendida tenía el CVE-2024-4367 (ejecución de JavaScript
+arbitrario al abrir un PDF con una fuente manipulada), arreglado en la 4.2.67. Sube a esa
+versión (`js/lib/pdf.min.mjs`/`pdf.worker.min.mjs`, del `build/` de `pdfjs-dist`, no de
+`legacy/`). Desde la 4.x pdf.js solo se distribuye como módulo: los tres sitios que lo cargan
+(`js/registro-lector.js`, `js/pdf-separar-unir.js`, `js/preparar-documento.js`) pasan de una
+etiqueta `<script>` a `import()` (que, en un script normal, toma como base la URL del propio
+script que lo llama, no la de la página: gotcha real encontrado al hacerlo). `pdf-lib` ya está en
+su última versión (1.17.1, sin mantenimiento activo hace más de un año), sin avisos de
+seguridad: se deja como está y se apunta en `docs/COMPROBAR-A-MANO.md` mirarlo una vez al año.
+Prueba nueva, `pruebas/registro-lector-navegador.mjs`: un PDF de verdad (montado con pdf-lib), en
+un navegador de verdad, leído con la pdf.js nueva.
+
+**Puntos 1 y 3, separados.** El 1 (la versión sacada del reloj por un paso de GitHub Actions o al
+publicar) y el 3 (que los borrados de listas se fusionen entre ordenadores) se complicaron más de
+lo que le tocaba a esta fila: el 1 arriesga un bucle de publicaciones de Vercel que esta sesión no
+puede probar de verdad; el 3 necesita una fecha de alta por elemento que hoy ninguno de los cuatro
+ficheros guarda. Pasan a las filas 76 y 77, con la razón anotada en el propio
+`docs/DETALLES-DE-MANTENIMIENTO.md`.
+
+`npm test` entero en verde varias veces (dos regresiones reales se detectaron y arreglaron por el
+camino, arriba).
+
 ## 19-sep-2026 — Fila 71: las cosas repetidas, a la caja común
 
 `docs/COSAS-REPETIDAS.md`, informe crítico 3.1. Fila de limpieza, la menos urgente de la cola:

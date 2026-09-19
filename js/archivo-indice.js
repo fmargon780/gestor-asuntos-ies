@@ -13,7 +13,7 @@
    entra en las copias de seguridad, ni en la papelera, ni en la
    fusión de conflictos de Dropbox: se puede rehacer entero en
    cualquier momento con "Reconstruir el índice", así que no hace
-   falta protegerlo como a los trece ficheros de verdad.
+   falta protegerlo como a los catorce ficheros de verdad.
 
    Antes de escribir, como hace `Grupos.guardar`, se relee el disco y
    se fusiona: el compañero puede haber archivado o reabierto un

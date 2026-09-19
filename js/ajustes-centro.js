@@ -660,6 +660,42 @@ async function guardarMargenesPdf() {
 if ($('margen-sello')) $('margen-sello').onchange = guardarMargenesPdf;
 if ($('margen-firma')) $('margen-firma').onchange = guardarMargenesPdf;
 
+/* ---------- caducidad de las copias de seguridad (19-sep-2026, fila 72,
+   docs/DETALLES-DE-MANTENIMIENTO.md, punto 4) ----------
+
+   Mismo patrón que App.diasDormido()/App.guardarDiasDormido() en
+   js/que-me-toca.js. js/copias.js lee este mismo valor directamente de
+   App.E.registro.ajustesAvisos para podar las copias; aquí solo está el
+   campo de Ajustes y el guardado. */
+
+App.diasCaducidadCopias = function () {
+  var n = App.E.registro.ajustesAvisos && App.E.registro.ajustesAvisos.diasCaducidadCopias;
+  return (typeof n === 'number' && n > 0) ? n : 90;
+};
+
+App.guardarDiasCaducidadCopias = async function (n) {
+  await App.guardarRegistroFresco(function (registro) {
+    registro.ajustesAvisos = registro.ajustesAvisos || {};
+    registro.ajustesAvisos.diasCaducidadCopias = n;
+  });
+};
+
+App.pintarDiasCaducidadCopias = function () {
+  var campo = $('dias-caducidad-copias');
+  if (!campo) return;
+  campo.value = String(App.diasCaducidadCopias());
+  campo.onchange = async function () {
+    var n = parseInt(campo.value, 10);
+    if (isNaN(n) || n < 1) { campo.value = String(App.diasCaducidadCopias()); return; }
+    try {
+      await App.guardarDiasCaducidadCopias(n);
+      U.aviso('Las copias de más de ' + n + ' días se irán borrando solas.', 'bueno');
+    } catch (e) {
+      U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+    }
+  };
+};
+
 /* ---------- el orquestador de esta pestaña ---------- */
 
 App.pintarAjustesCentro = async function () {
@@ -670,4 +706,5 @@ App.pintarAjustesCentro = async function () {
   await App.pintarMargenesPdf();
   await App.pintarFicherosDeDatos();
   if (typeof App.pintarDiasDormido === 'function') App.pintarDiasDormido();
+  App.pintarDiasCaducidadCopias();
 };

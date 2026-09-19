@@ -23,17 +23,44 @@ var Copias = (function () {
   var CARPETA = 'copias';
   var MAXIMO = 30;
 
+  /* Caducidad de las copias (fila 72, docs/DETALLES-DE-MANTENIMIENTO.md,
+     punto 4), configurable en Ajustes → El centro (App.pintarDiasCaducidadCopias,
+     en js/ajustes-centro.js). Se lee mirando directamente App.E.registro en
+     vez de que cada uno de los muchos sitios que llaman a Copias.guardar
+     tenga que pasarla como parámetro: misma idea que App.diasDormido() en
+     js/que-me-toca.js. Con `window.App` (nunca `App` a secas): este fichero
+     se carga antes que js/nucleo.js, que es quien declara `App`. */
+  var DIAS_CADUCIDAD_POR_DEFECTO = 90;
+  function diasCaducidad() {
+    var n = window.App && App.E && App.E.registro && App.E.registro.ajustesAvisos &&
+            App.E.registro.ajustesAvisos.diasCaducidadCopias;
+    return (typeof n === 'number' && n > 0) ? n : DIAS_CADUCIDAD_POR_DEFECTO;
+  }
+
+  /* Días desde una fecha AAMMDD (la que llevan los nombres de las copias)
+     hasta hoy. */
+  function diasDesde(aammdd) {
+    var fecha = new Date(2000 + parseInt(aammdd.slice(0, 2), 10),
+                          parseInt(aammdd.slice(2, 4), 10) - 1,
+                          parseInt(aammdd.slice(4, 6), 10));
+    var hoy = new Date();
+    hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+    return Math.round((hoy - fecha) / 86400000);
+  }
+
   /* Los ficheros compartidos que hay que proteger. `campos.json`
      (11-sep-2026, los campos de cada tipo de asunto) entró aquí igual
      que los demás JSON de _GESTOR. `papelera.json` (11-sep-2026, la
      papelera) y `no-duplicados.json` (11-sep-2026, los duplicados
      descartados con "No son el mismo") también. `hitos.json`
-     (16-sep-2026, los hitos de cada asunto) es el duodécimo, y
+     (16-sep-2026, los hitos de cada asunto) es el duodécimo,
      `grupos.json` (17-sep-2026, los grupos propios de personas) el
-     decimotercero. */
+     decimotercero, y `usuarios.json` (19-sep-2026, fila 72, la lista
+     de nombres de quien entra) el decimocuarto. */
   var FICHEROS = ['asuntos.json', 'guias.json', 'tipos.json', 'estados.json',
                    'tipos-documento.json', 'tablon.json', 'recurrentes.json', 'frescura.json',
-                   'campos.json', 'papelera.json', 'no-duplicados.json', 'hitos.json', 'grupos.json'];
+                   'campos.json', 'papelera.json', 'no-duplicados.json', 'hitos.json', 'grupos.json',
+                   'usuarios.json'];
 
   function dosDigitos(n) { return String(n).padStart(2, '0'); }
 
@@ -55,13 +82,26 @@ var Copias = (function () {
     return Carpetas.crear(gestor, CARPETA);
   }
 
-  /* Se queda solo con las últimas MAXIMO copias de un fichero (las
-     "-roto-" no cuentan para el recuento y nunca se borran solas). */
+  /* Se queda solo con las últimas MAXIMO copias de un fichero, y además
+     quita las que ya hayan pasado de la caducidad (aunque no se hayan
+     llegado a MAXIMO): fila 72, docs/DETALLES-DE-MANTENIMIENTO.md, punto
+     4. Las "-roto-" no cuentan para ninguna de las dos cosas y nunca se
+     borran solas. */
   async function podar(carpeta, base) {
     var todas = (await Carpetas.ficheros(carpeta))
       .map(function (f) { return f.nombre; })
       .filter(function (n) { return n.indexOf(base + '-') === 0 && n.indexOf(base + '-roto-') !== 0; })
       .sort();
+
+    var limite = diasCaducidad();
+    for (var i = todas.length - 1; i >= 0; i--) {
+      var m = todas[i].match(/-(\d{6})\.json$/);
+      if (!m || diasDesde(m[1]) <= limite) continue;
+      var caducada = todas[i];
+      todas.splice(i, 1);
+      try { await carpeta.removeEntry(caducada); } catch (e) { /* no pasa nada si ya no está */ }
+    }
+
     while (todas.length > MAXIMO) {
       var quitar = todas.shift();
       try { await carpeta.removeEntry(quitar); } catch (e) { /* no pasa nada si ya no está */ }

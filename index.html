@@ -82,6 +82,7 @@
           <div class="carpeta-rotulo">3. ¿Quién eres?</div>
           <div class="carpeta-estado">Se anota en el registro de cada asunto.</div>
         </div>
+        <select id="campo-usuario-lista" class="campo oculto" style="max-width:220px"></select>
         <input id="campo-usuario" class="campo" placeholder="Tu nombre" style="max-width:220px">
       </div>
 
@@ -420,6 +421,23 @@
 
       <details class="bloque-ajustes">
         <summary>
+          <span class="bloque-titulo">Caducidad de las copias de seguridad</span>
+          <span class="bloque-pie">A partir de cuántos días se borran solas, aunque no lleguen a 30</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">La aplicación guarda hasta 30 copias de cada fichero compartido (una por
+         día). Además de ese número, las copias más viejas que esto se borran solas, aunque no se
+         hayan llegado a las 30: la lista completa está en Ajustes → Mantenimiento.</p>
+      <div class="alta-tipo">
+        <label class="etiqueta-en-linea" for="dias-caducidad-copias">Borrar las de más de</label>
+        <input id="dias-caducidad-copias" type="number" min="1" class="campo campo-plazo">
+        <span class="suave">días</span>
+      </div>
+        </div>
+      </details>
+
+      <details class="bloque-ajustes">
+        <summary>
           <span class="bloque-titulo">Tipos de documento</span>
           <span class="bloque-pie">Los que salen al nombrar un documento dentro de un asunto</span>
         </summary>
@@ -599,9 +617,11 @@
         <div class="bloque-cuerpo">
       <p class="explica">Antes de escribir cualquiera de los ficheros que se comparten con el
          resto de ordenadores, la aplicación guarda una copia de cómo estaba, una vez al día.
-         Se guardan en <code>_GESTOR/copias</code> y se conservan las últimas 30 de cada uno.
-         Si algún fichero se estropea, al entrar la aplicación lo dice y ofrece restaurar la
-         última copia; aquí puedes restaurar cualquiera de las otras, por si hiciera falta.</p>
+         Se guardan en <code>_GESTOR/copias</code>: como mucho las últimas 30 de cada uno, y las
+         que pasen de la caducidad (configurable en Ajustes → El centro, 90 días por defecto) se
+         borran aunque no se hayan llegado a las 30. Si algún fichero se estropea, al entrar la
+         aplicación lo dice y ofrece restaurar la última copia; aquí puedes restaurar cualquiera
+         de las otras, por si hiciera falta.</p>
       <div id="tabla-copias" class="lista"></div>
         </div>
       </details>
@@ -657,6 +677,7 @@
 <script src="js/almacen.js"></script>
 <script src="js/carpetas.js"></script>
 <script src="js/copias.js"></script>
+<script src="js/usuarios.js"></script>
 <script src="js/nombres.js"></script>
 <script src="js/plazos.js"></script>
 <script src="js/guias.js"></script>

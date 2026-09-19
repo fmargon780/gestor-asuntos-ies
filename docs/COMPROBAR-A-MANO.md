@@ -27,6 +27,16 @@ para ir tachando.
 - [ ] **La aplicación desde la red del IES.** Entrar en `https://asuntos.fmargon.com` desde un
       ordenador del centro (no desde casa): que carga y que `vercel.app` sigue bloqueado, para
       confirmar que hace falta el dominio propio.
+- [ ] **Las librerías de PDF, una vez al año** (fila 72, docs/DETALLES-DE-MANTENIMIENTO.md, punto
+      5). `pdf.js` (`js/lib/pdf.min.mjs`) va por la 4.2.67; `pdf-lib` (`js/lib/pdf-lib.min.js`) por
+      la 1.17.1, la última que hay (sin mantenimiento activo desde hace más de un año, según
+      npm). Mirar si ha salido una versión nueva con avisos de seguridad de por medio, y si los
+      hay, cambiarla y probar a fondo: leer el sello de un PDF registrado
+      (`pruebas/registro-lector-navegador.mjs`), las miniaturas de separar/unir
+      (`pruebas/separar-unir-navegador.mjs`) y "Ajustar tamaño" (a mano, más arriba en esta
+      lista). Solo pdf.js va como módulo (`import()`); si algún día pdf-lib hiciera lo mismo, el
+      cambio de `<script>` a `import()` en `js/pdf-herramientas.js` sería igual que el que ya se
+      hizo para pdf.js.
 
 ## Por qué esta lista y no una prueba automática
 
