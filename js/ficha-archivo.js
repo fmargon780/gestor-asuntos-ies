@@ -95,7 +95,7 @@ var FichaArchivo = (function () {
      tocar ninguna de esas dos funciones.
      ========================================================== */
 
-  U.envolver('App.cerrarAsunto', window.App, 'cerrarAsunto', 'js/ficha-archivo.js', function (comoEra) {
+  U.envolver(window.App, 'App.cerrarAsunto', 'ficha-archivo.js', function (comoEra) {
     return async function (a) {
       var clave = a.nombre;
       await comoEra(a);
@@ -115,7 +115,7 @@ var FichaArchivo = (function () {
     };
   });
 
-  U.envolver('App.reabrirAsunto', window.App, 'reabrirAsunto', 'js/ficha-archivo.js', function (comoEra) {
+  U.envolver(window.App, 'App.reabrirAsunto', 'ficha-archivo.js', function (comoEra) {
     return async function (a) {
       /* Se lee (o se completa, si a.handle no venía puesto) ANTES de
          llamar a lo de siempre: en cuanto la carpeta se mueva, el

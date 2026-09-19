@@ -192,9 +192,9 @@
      automático, el botón "Recargar", meter un suelto o un correo en
      un asunto, añadir un tipo que faltaba— reenganche sola la ficha
      si hay una abierta, sin repetir el apaño en cada sitio. */
-  U.envolver('App.verAbiertos', window.App, 'verAbiertos', 'js/ficha-asunto.js', function (comoEraVerAbiertos) {
+  U.envolver(App, 'App.verAbiertos', 'ficha-asunto.js', function (comoEra) {
     return async function (yaLeido) {
-      await comoEraVerAbiertos(yaLeido);
+      await comoEra(yaLeido);
       await App.reengancharFicha();
     };
   });
@@ -214,7 +214,7 @@
      tocando la tarjeta. */
   var NOMBRES_NUEVOS = { 'Cerrar': 'Archivar' };
 
-  U.envolver('App.tarjetaAsunto', window.App, 'tarjetaAsunto', 'js/ficha-asunto.js', function (comoEra) {
+  U.envolver(App, 'App.tarjetaAsunto', 'ficha-asunto.js', function (comoEra) {
     return function (a, modo) {
       var div = comoEra(a, modo);
 
