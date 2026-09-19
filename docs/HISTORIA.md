@@ -5,6 +5,32 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 19-sep-2026 — Fila 67: las cuentas y los datos, por escrito
+
+Fila que no toca código (`docs/LAS-CUENTAS-Y-LOS-DATOS.md`, partes 1.2 y 4.12 del informe crítico):
+todo el proyecto cuelga hoy de las cuentas personales de Francisco, y nadie ha escrito en una
+página qué datos maneja la aplicación ni adónde van.
+
+Dos documentos nuevos, pensados para dejarse también en el Dropbox del centro (no solo en el
+repositorio, que no le sirve de nada a quien no sea Francisco):
+
+- **`docs/LAS-CUENTAS.md`**, para el relevo: dónde vive cada cosa, cómo se publica un cambio, qué
+  hacer si la web o el correo dejan de funcionar, qué no hay que hacer nunca, y a quién llamar.
+  Los datos del repositorio y de Vercel se han comprobado de verdad con las herramientas de esta
+  sesión, no a ojo: proyecto de Vercel `gestor-de-asuntos` (cuenta `fjmarmolejoglez@gmail.com`),
+  dominio `fmargon.com` con renovación automática activada y caducidad el 18-sep-2027, y **hoy
+  Francisco es el único colaborador**, tanto en GitHub como en Vercel.
+- **`docs/LOS-DATOS-DEL-CENTRO.md`**, para dirección: qué ficheros con datos personales crea la
+  aplicación y qué llevan, qué sale del centro y qué no (la lista tal cual del informe crítico,
+  1.2), y cuánto tiempo se guarda cada cosa. Termina con lo único que queda por decidir: si la
+  papelera debería vaciarse sola.
+
+**Lo que sigue pendiente, y no se puede hacer desde esta sesión**: poner a una segunda persona del
+centro como colaboradora en el repositorio y en el proyecto de Vercel (lo tiene que hacer Francisco
+desde la web, con su propia cuenta), y llevar una copia de los dos documentos al Dropbox del centro
+(esta sesión no tiene acceso a esa carpeta, solo al repositorio). Apuntado en `docs/CONTEXTO-
+CORTO.md`, sección "Qué falta".
+
 ## 19-sep-2026 — Fila 66: el contacto del tercero, guardado en la ficha
 
 Problema de septiembre de 2027, no de hoy (`docs/CONTACTO-GUARDADO-EN-LA-FICHA.md`, del informe

@@ -124,9 +124,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Al archivar, la ficha del asunto baja a su propia carpeta (no se queda en `asuntos.json` para
   siempre); al reabrir, vuelve. Botón "Poner en orden las fichas del ARCHIVO" en Ajustes →
   Mantenimiento para los archivados de antes de este cambio.
-- Ficha del asunto: foto del contacto del tercero al crearla (teléfonos, correos, tutores); si esa
-  persona sale del CSV, la sigue enseñando con el aviso de la fecha. Botón para rellenar los
-  asuntos de antes, en Ajustes → Mantenimiento.
+- Ficha del asunto: foto del contacto del tercero al crearla; si sale del CSV, la sigue enseñando
+  con aviso de fecha. Botón para rellenar los asuntos de antes, en Ajustes → Mantenimiento.
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -167,6 +166,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
 - Pulsar, cuando pueda, "Poner en orden las fichas del ARCHIVO" (Ajustes → Mantenimiento, fila 64): mueve a su carpeta la ficha de los asuntos archivados antes de esa fila, para que `asuntos.json` deje de crecer con ellos.
 - Pulsar, antes de junio de 2027, "Guardar el contacto de los asuntos abiertos" (Ajustes → Mantenimiento, fila 66).
+- Fila 67: añadir un colaborador en GitHub y Vercel, y copiar `docs/LAS-CUENTAS.md` al Dropbox.
 
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero
 
