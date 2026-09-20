@@ -160,12 +160,15 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 81 | `docs/FIRMANTES-Y-MEMBRETE.md` | HECHA (20-sep-2026) |
 | 82 | `docs/FORMULARIOS-OFICIALES.md` | HECHA (20-sep-2026) |
 | 83 | `docs/PLANTILLAS-DEL-CENTRO.md` | HECHA (20-sep-2026): doce plantillas (ocho de documento, cuatro de correo), una muestra representativa de las tres categorías, no las cincuenta y tantas de la biblioteca de golpe — decisión tomada para no sacrificar calidad por cantidad. Detalle en `docs/HISTORIA.md` |
+| 84 | `docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md` | PENDIENTE |
 
 **Orden de trabajo:** todas las filas de 1 a 83 están HECHAS, salvo la 63 y la 76, BLOQUEADAS (una
 sesión sin salida a internet, la otra por el riesgo de tocar el mecanismo de publicación sin
-Francisco delante). **No queda ninguna fila PENDIENTE** (20-sep-2026, tras las filas 81, 82 y 83).
-Cuando se apunte una fila nueva, esta nota se sustituye por la que toque: no hay que mantener el
-repaso de las filas ya hechas más que en `docs/HISTORIA.md`.
+Francisco delante). Queda la fila **84** (20-sep-2026, apuntada por Francisco mientras esta misma
+sesión trabajaba en la 81-83, siguiendo su propia regla de no lanzar otra sesión mientras hay una
+en marcha: queda para la próxima vez que se pegue la línea de lanzar). Cuando se apunte una fila
+nueva, esta nota se sustituye por la que toque: no hay que mantener el repaso de las filas ya
+hechas más que en `docs/HISTORIA.md`.
 
 **El orden de trabajo NO es el de los números.** La tabla de arriba está puesta **en el orden en que
 hay que hacerlas**, de arriba abajo, y por eso la 65 aparece entre la 62 y la 63. Los números no se
