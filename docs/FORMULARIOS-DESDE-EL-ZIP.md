@@ -1,61 +1,43 @@
-# Sacar los once PDF de `formularios.zip` y cerrar la fila 85
+# Los once PDF oficiales ya están en `formularios/`
 
-**20-sep-2026.** Esto cierra la fila 85 de `docs/COLA.md`, que llevaba BLOQUEADA porque
-ninguna sesión de Claude Code tenía salida a internet para descargar los PDF oficiales.
+**20-sep-2026.** Esto cierra lo que pedía la fila 85 de `docs/COLA.md`, que llevaba
+BLOQUEADA desde las filas 63 y 84 por el mismo motivo: ninguna sesión de Claude Code de las
+que trabajan esta cola tiene salida a internet, y estos impresos hay que bajarlos de la web
+de la Junta de Andalucía.
 
-**Ya no hace falta internet.** Los once PDF están descargados, comprobados y dentro del
-propio repositorio, en un fichero comprimido en la raíz: `formularios.zip`. Lo subió
-Francisco a mano desde la web de GitHub el 20-sep-2026. Solo hay que descomprimirlo.
+**Los once PDF están en `formularios/`, comprobados uno a uno.** No hay que descargarlos
+otra vez, ni hay que volver a intentarlo desde ninguna sesión.
 
-## AVISO IMPORTANTE, LÉELO ANTES DE TOCAR NADA
+## Qué queda por hacer (es texto, se puede hacer desde cualquier sesión)
 
-Un PDF es un fichero binario. **Las herramientas `push_files` y `create_or_update_file` de la
-interfaz de GitHub solo admiten texto**: si les pasas el contenido de un PDF, lo que sube no
-es el PDF, sino una ristra de caracteres rotos con el mismo nombre. El fichero parece estar
-ahí y no abre en ningún visor. Eso es mucho peor que no subirlo, porque nadie se da cuenta
-hasta que alguien intenta usar el formulario.
+1. **Corregir dos direcciones en `datos/formularios.json`.** Las entradas `O11:VI` y
+   `O11:VII` (las dos que llevan clave `f`, es decir, las que tienen PDF descargable) tienen
+   hoy en su clave `u` esta dirección:
 
-Por eso, **los once PDF solo se pueden meter en el repositorio de una de estas dos maneras**:
+       https://www.juntadeandalucia.es/boja/2011/132/1
 
-- con `git push` de verdad, desde una sesión que lo tenga; o
-- subiéndolos Francisco a mano desde la web de GitHub, arrastrándolos a **Add file → Upload
-  files**.
+   **No es un PDF: es una página web** con el texto de la disposición. Quien la use para
+   descargar se baja una página HTML con la extensión `.pdf`, que ningún visor abre. Esto
+   importa de verdad, porque la vigilancia diaria de normativa usa la clave `u` para
+   sustituir el PDF cuando cambia el enlace (ver `docs/IMPRESOS-QUE-CAMBIAN.md`): tal como
+   está, el primer refresco automático machacaría el PDF bueno con una página web.
 
-**Comprueba primero si tienes `git push`.** Prueba con `git push --dry-run` contra este
-repositorio:
+   La dirección buena del PDF de esa misma disposición es:
 
-- **Si funciona**: sigue con los pasos de abajo, todos.
-- **Si no funciona** (sale un 403, o "access denied by the git proxy", o "git push está
-  bloqueado"): **para aquí**. No intentes subir los PDF de ninguna otra forma. Haz solo los
-  pasos 4 y 5 de abajo, que son texto y sí se pueden hacer, deja `formularios.zip` donde
-  está sin borrarlo, y deja la fila 85 BLOQUEADA con este motivo en una línea: *"los PDF
-  están en formularios.zip dentro del repositorio, pero esta sesión no tiene git push y los
-  binarios no se pueden subir con la interfaz de GitHub; los saca la primera sesión que
-  tenga git push, o Francisco a mano"*.
+       https://www.juntadeandalucia.es/boja/2011/132/d1.pdf
 
-## Lo que hay que hacer
+   **Cambiar la clave `u` solo en `O11:VI` y en `O11:VII`.** Las entradas `O11:I`, `O11:II`,
+   `O11:III` y `O11:IV` también apuntan a esa página web, pero esas son `"via":"protocolo"`:
+   no tienen PDF que descargar y su enlace es para leer el texto, así que **se quedan como
+   están**. Las otras nueve direcciones del fichero son correctas y no se tocan.
 
-1. Descomprimir `formularios.zip` en la raíz del repositorio. Dentro trae ya una carpeta
-   llamada `formularios`, así que los PDF quedan en `formularios/` sin mover nada.
-2. Comprobar que están los once ficheros y que cada uno mide lo que pone la tabla de abajo.
-   Si alguno no cuadra, parar y dejar la fila 85 BLOQUEADA con el motivo.
-3. **Borrar `formularios.zip`** de la raíz. No tiene que quedarse: son 6,6 MB duplicados y
-   Vercel publica la raíz entera, así que el zip quedaría descargable desde internet. Esto
-   se hace **solo si los once PDF han subido bien**, nunca antes.
-4. Corregir una dirección equivocada en `datos/formularios.json` (ver más abajo).
-5. Marcar la fila 85 de `docs/COLA.md` como HECHA con la fecha, y apuntar la línea que toque
-   en `docs/HISTORIA.md`.
+2. **Marcar la fila 85 de `docs/COLA.md` como HECHA (20-sep-2026)** y apuntar la línea que
+   toque en `docs/HISTORIA.md`.
 
-No hay que tocar nada de código ni ninguna prueba. Es solo mover ficheros.
+## Los once ficheros, para comprobarlos
 
-**Después de subir los PDF, compruébalos uno a uno**: baja cada uno del repositorio y mira
-que el tamaño coincide con la tabla y que empieza por `%PDF`. Si alguno no coincide, bórralo
-y deja la fila 85 BLOQUEADA: más vale ninguno que uno roto.
-
-## Los once ficheros
-
-El tamaño es en bytes, y el segundo número es el identificador de git de cada fichero
-(`git hash-object <fichero>`), por si se quiere comprobar que han llegado byte a byte.
+El tamaño es en bytes; el segundo número es el identificador de git de cada fichero
+(`git hash-object <fichero>`). Todos coinciden con los del original descargado de la Junta.
 
 | Fichero | Bytes | git hash-object |
 |---|---|---|
@@ -72,10 +54,10 @@ El tamaño es en bytes, y el segundo número es el identificador de git de cada 
 | `formularios/O11-VII.pdf` | 747544 | 8799a536ec35ffd0dd0baa0259ba403607072de0 |
 
 `O-I.pdf` y `O-II.pdf` son el mismo documento con dos nombres, y lo mismo pasa con
-`O11-VI.pdf` y `O11-VII.pdf`. Por eso se repiten el tamaño y el identificador. Es correcto,
-y es lo que pedía la fila 85.
+`O11-VI.pdf` y `O11-VII.pdf`. Por eso se repiten tamaño e identificador. Es correcto, y es
+lo que pedía la fila 85.
 
-Qué es cada uno, comprobado abriéndolos uno a uno:
+Qué es cada uno, comprobado abriéndolos:
 
 - `O-I` y `O-II`: la Orden de escolarización publicada en el BOJA extraordinario 503 de 2020.
 - `O-III` a `O-IX`: los Anexos III, IV, V, VI, VII, VIII y IX de esa misma Orden, cada uno en
@@ -83,31 +65,27 @@ Qué es cada uno, comprobado abriéndolos uno a uno:
 - `O11-VI` y `O11-VII`: la Orden de 20 de junio de 2011, de promoción de la convivencia
   (BOJA núm. 132, de 7 de julio de 2011).
 
-## La dirección que hay que corregir en `datos/formularios.json`
+## Cómo llegaron ahí, para no repetir el rodeo
 
-Las entradas de `O11-VI.pdf` y `O11-VII.pdf` tienen hoy esta dirección en su clave `u`:
+La sesión de Cowork del 20-sep-2026 sí tenía internet: bajó los once, los abrió y comprobó
+que eran los correctos. Pero **no podía subirlos**: un PDF es un fichero binario, y las
+herramientas de la interfaz de GitHub (`push_files`, `create_or_update_file`) solo admiten
+texto. Si se les pasa el contenido de un PDF, lo que sube no es el PDF, sino una ristra de
+caracteres rotos con el mismo nombre: parece estar y no abre en ningún visor.
 
-    https://www.juntadeandalucia.es/boja/2011/132/1
+Así que los subió Francisco a mano, desde el navegador. Se intentó de tres maneras y solo
+funcionó la tercera, que es la que hay que recordar:
 
-**Esa dirección no es un PDF: es una página web** con el texto de la disposición. Quien la
-use para descargar se baja una página HTML con la extensión `.pdf`, que ningún visor abre.
-La dirección buena del PDF de esa misma disposición es:
+1. Arrastrar el `.zip` a **Add file → Upload files**: sube el zip, no su contenido. No sirve.
+2. Arrastrar los PDF sueltos a esa misma página: caen en la raíz del repositorio, no en la
+   carpeta. Hubo que borrarlos después, uno a uno.
+3. **Abrir directamente `https://github.com/<usuario>/<repositorio>/upload/main/<carpeta>`**
+   y arrastrar ahí los ficheros sueltos. Esa página sube dentro de esa carpeta, la cree o no
+   de antemano. Es la forma buena, y no hace falta pelearse con carpetas en el Chromebook.
 
-    https://www.juntadeandalucia.es/boja/2011/132/d1.pdf
+**Regla para la próxima vez que haya que meter un fichero binario en el repositorio** (un
+PDF, una imagen, una fuente): no lo intente ninguna sesión que solo tenga la interfaz de
+GitHub. O lo sube Francisco con el método 3, o lo sube una sesión con `git push` de verdad.
 
-Sustituir la clave `u` de esas dos entradas por la segunda. Las otras nueve direcciones del
-fichero están bien y no se tocan. **Esta corrección es texto, así que se puede hacer siempre**,
-tenga o no la sesión `git push`.
-
-## Dónde estaba el atasco, para que no se repita
-
-La fila 85 se bloqueó tres veces (filas 63, 84 y 85) por lo mismo: las sesiones de Claude
-Code que trabajan esta cola no tienen salida a internet, y estos PDF hay que bajarlos de la
-web de la Junta. La sesión de Cowork del 20-sep-2026 sí tenía internet, los bajó y los
-comprobó, pero no podía subir ficheros binarios al repositorio: para eso hace falta `git
-push`, y esa sesión solo tenía la interfaz de GitHub, que únicamente admite texto.
-
-De ahí el rodeo del fichero comprimido: Francisco lo subió a mano desde el navegador, y así
-los PDF entran en el repositorio sin que ninguna sesión necesite internet. **Si algún día hay
-que volver a meter ficheros binarios en el repositorio, este es el camino corto**: que los
-suba Francisco desde la web, ya con la carpeta y los nombres buenos, sin pasar por un zip.
+Los borrados de la raíz y del zip se hicieron en una rama aparte y se fusionaron de una vez,
+para no gastar doce publicaciones de Vercel (`docs/NO-GASTAR-PUBLICACIONES.md`).
