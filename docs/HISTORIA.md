@@ -5,6 +5,63 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 20-sep-2026 — Fila 84: el impreso, con los datos del centro ya puestos
+
+`docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md`. Última de las cuatro filas acordadas de golpe el
+20-sep-2026 (81 a 84): la 81 y la 82-83 las completó otra sesión en paralelo (PR #63, fusionada a
+`main` mientras esta sesión hacía su propia fila 81 sin saberlo — se descartó esa duplicada, PR
+#64, cerrada sin fusionar, y se sincronizó la rama con `main` antes de seguir).
+
+**La regla que no se toca sin volver a hablarlo, escrita para que nadie la deshaga sin saberlo:**
+un impreso oficial preparado con "Preparar para el tercero" rellena SOLO los datos del centro y el
+año académico, nunca los de la persona (nombre, documento, domicilio, teléfono, tutores…), aunque
+la aplicación los tenga. Es a propósito, decisión de Francisco: así, al recibir el impreso de
+vuelta, se ve si algún dato de la persona ha cambiado desde la última vez. Un impreso que llega ya
+relleno del todo no sirve para comprobar nada de eso. Queda anotado en "Descartado" de
+`docs/CONTEXTO-CORTO.md`.
+
+**Sin salida a internet para copiar los PDF de verdad**, como ya le pasó a la fila 63 (19-sep-2026):
+el catálogo (`datos/formularios.json`, de la fila 82) ya trae la clave `f` con el nombre del PDF en
+las once entradas de vía `descarga`/`centro`, pero la carpeta `formularios/` se queda vacía. Todo
+lo demás —el mapa de casillas, `proponerMapa`, `rellenarPdf`, la pantalla de Ajustes y el botón—
+está hecho y probado con PDF de mentira montados con la propia pdf-lib (que es, además, más fiable
+que probar contra un PDF real de la Junta que puede cambiar de un día para otro). El mecanismo
+funciona en cuanto se copien los once PDF, uno a uno, sin tocar ni una línea de código: la lista de
+cuáles faltan queda en `docs/COLA.md`. Es exactamente el caso que el propio encargo preveía.
+
+**Por qué `proponerMapa` mira "código" antes que "centro".** La regla de la tabla dice "centro,
+denominación, instituto (y no código)": una casilla llamada "código del centro" contiene la
+palabra "centro", así que si la regla de `{{CENTRO}}` se mirase primero, ganaría por error. El
+orden de las comprobaciones es la propia regla, no un detalle de implementación: primero "código"
+(-> `{{CODIGO CENTRO}}`), luego "domicilio/dirección junto a centro" (-> `{{DIRECCION CENTRO}}`,
+que también contendría "centro"), y solo entonces "centro" a secas.
+
+**Por qué el botón cuelga de un atributo (`data-clave-formulario`) y no envuelve nada nuevo.**
+`js/formularios.js` (fila 82) ya pinta la lista de un hito y la línea "Formularios" de la ficha; en
+vez de que `js/formularios-rellenar.js` reimplemente esa pintura o envuelva las funciones que la
+hacen, `js/formularios.js` gana un atributo `data-clave-formulario` en cada chip (dos líneas de
+cambio, ya en `main` gracias a la fila 82). `js/formularios-rellenar.js` solo necesita saber qué
+asunto está abierto (lo consigue envolviendo `App.abrirFicha`, como el resto de módulos que
+cuelgan un botón de la ficha) y vigilar la ficha con un `MutationObserver` para colgar el botón en
+cuanto aparezca un chip nuevo, sin tocar el fichero de la fila 82 más que en ese punto previsto.
+
+**Un fallo de coordinación con la sesión de la PR #63, para que quede escrito.** Esta sesión hizo
+su propia fila 81 completa (cargos, membrete, `Docx.ponerImagen`) sin saber que otra sesión, en
+paralelo, la estaba haciendo también — las dos partieron del mismo `docs/COLA-NUEVAS-2026-09-20.md`
+casi a la vez. Se detectó a tiempo (Francisco avisó de que había "otra conversación corriendo") y
+se resolvió sin pisar nada: la PR duplicada se cerró sin fusionar, y la rama se sincronizó con
+`main` (`git checkout origin/main -- .` más `git rm` de los dos ficheros de Ajustes que la otra
+sesión no había separado igual) antes de seguir con la única fila que quedaba. Motivo para
+dejarlo escrito: cuando dos sesiones parten del mismo documento de instrucciones nuevas casi a la
+vez, conviene comprobar pronto (antes de escribir mucho código) si alguna ya está en marcha.
+
+Ficheros nuevos: `js/formularios-rellenar.js`, `pruebas/formularios-rellenar.mjs`. Tocados:
+`datos/formularios.json` (clave `f`), `js/formularios.js` (`data-clave-formulario`),
+`js/plantillas.js` (`provincia`), `js/plantillas-ajustes.js` e `index.html` (el campo Provincia),
+`js/copias.js` (`formularios-campos.json`, decimoctavo fichero compartido),
+`js/ajustes-centro.js` (engancha "Impresos oficiales"), `js/envolturas-esperadas.js`. Batería
+completa en verde (86 ficheros de prueba), una sola pasada al final.
+
 ## 20-sep-2026 — Fila 83: las plantillas de documento y de correo del centro
 
 `docs/PLANTILLAS-DEL-CENTRO.md`. Las filas 14 y 17 montaron la máquina de plantillas de correo y
