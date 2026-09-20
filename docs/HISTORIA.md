@@ -5,6 +5,65 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 20-sep-2026 — Fila 77: los borrados que se fusionan
+
+`docs/DETALLES-DE-MANTENIMIENTO.md`, punto 3, separado de la fila 72 el 19-sep-2026 al ver que
+resolverlo de verdad ("respeta el borrado si es más nuevo que el alta del otro lado") necesitaba
+una fecha de alta por elemento que ninguno de los cuatro ficheros guarda hoy.
+
+**El fallo de siempre.** Borrar un tipo de asunto, un estado, un tipo de documento o un asunto
+recurrente era solo quitarlo del array en memoria. `App.fusionarConDisco` (`js/nucleo.js`) solo
+suma lo que el disco tenga de más, nunca quita nada: si el compañero tenía la misma lista cargada
+desde antes del borrado, la próxima vez que guardaba algo suyo sin relación (activar un
+interruptor, cambiar un plazo) el elemento borrado volvía, porque su copia en memoria todavía lo
+traía.
+
+**La solución, sin fechas de alta por elemento.** Fichero nuevo, `js/borrados-fusion.js`, con un
+`_GESTOR/borrados-listas.json` de solo `{ tipos, estados, tiposDocumento, recurrentes }`, cada uno
+un array de `{ clave, borradoEl }`. Borrar llama a `Borrados.marcar` (apunta la clave, sin quitar
+nada más de lo que ya se quitaba); dar de alta a mano, o devolver desde la papelera, llama a
+`Borrados.revivir` (quita la marca: un gesto explícito y posterior gana siempre a un borrado
+viejo, sin necesitar saber cuándo se dio de alta cada cosa). Cada `guardarX()` —
+`App.guardarTipos`, `App.guardarEstados`, `App.guardarTiposDocumento` y el `guardar()` de
+`js/recurrentes.js` — pasa lo que sale de `fusionarConDisco` por `Borrados.filtrarActivos`, que
+quita cualquier clave que siga marcada: así el borrado se respeta aunque el otro ordenador todavía
+lo tenga en memoria. Los recurrentes no necesitan `revivir` en su alta: su id siempre es nuevo
+(`'r' + Date.now()`), nunca reutiliza uno ya borrado.
+
+`borrados-listas.json` entra en `Copias.FICHEROS` (decimoquinto fichero compartido, con sus
+propias copias de seguridad) y, por estar ahí, en el bloque genérico de "Conflictos de Dropbox"
+que ya avisa y deja elegir cuando dos ordenadores lo tocan casi a la vez (no hizo falta tocar
+`js/conflictos.js`: la lista de ficheros que vigila es la de `Copias.FICHEROS`).
+
+**Dónde se llama a `Borrados.marcar`/`revivir`.** Borrar: `App.borrarTipo` (`js/ajustes.js`),
+`App.quitarEstado` y `App.borrarTipoDocumento` (`js/ajustes-centro.js`), y el botón "Quitar" de un
+recurrente (`js/recurrentes.js`). Alta o revivir: el botón "+ Añadir" de tipos y de tipos de
+documento (`js/ajustes.js`, `js/ajustes-centro.js`), "Añadir ... a la lista" desde la ficha del
+asunto (`js/ficha-asunto.js`), crear un tipo de documento al vuelo desde el propio cuadro
+(`js/nucleo.js`, `Documentos.configurar.crearTipo`), y las tres devoluciones desde la papelera
+(`devolverTipo`, `devolverEstado`, `devolverTipoDocumento` en `js/papelera.js`).
+
+**Ajustes → Mantenimiento** enseña un bloque nuevo, "Borrados que se fusionan"
+(`App.pintarBorradosFusion`, en el propio `js/borrados-fusion.js`, enganchado en
+`App.pintarAjustesMantenimiento` con el mismo "si existe la función, se llama" que ya usan las
+fichas huérfanas): cuántos borrados hay de cada una de las cuatro listas, y un botón para quitar
+del todo, sin vuelta atrás, los de hace más de 90 días. Los borrados no se ven en ningún otro
+sitio.
+
+Prueba nueva, `pruebas/borrados-que-se-fusionan.mjs` (sin navegador, disco de mentira en un
+contexto `vm`, el mismo patrón que `pruebas/copias.mjs`): reproduce el escenario completo del
+documento con dos "ordenadores" (dos variables sobre el mismo disco) para tipos, estados y tipos
+de documento — el borrado no reaparece con la memoria vieja del otro, y un alta a mano después del
+borrado sí entra — más las funciones sueltas de `Borrados` (incluido `recurrentes`) y la caducidad
+a los 90 días. Comprobado que falla sin el arreglo (quitando solo los cambios de `js/nucleo.js`,
+las nueve comprobaciones que dependen de la fusión fallan) antes de darla por buena.
+`pruebas/recurrentes.mjs` pasó a cargar también `js/borrados-fusion.js`, que su `guardar()` ya
+necesita. Batería completa en verde (85 ficheros de prueba), una sola pasada al final.
+
+Versión publicada `App.VERSION`: `20-sep-2026 · 06:53`.
+
+---
+
 ## 19-sep-2026 — Fila 75: los dos huecos que dejó la fila 69
 
 `docs/HUECOS-ENCONTRADOS-FILA-69.md`. Al escribir las pruebas de unir asuntos y de recurrentes
