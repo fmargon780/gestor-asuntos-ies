@@ -3,11 +3,10 @@
 Aquí se apuntan, en orden, las instrucciones pendientes. Cada una es un documento de `docs/`.
 Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente, de arriba abajo.
 
-> **18-sep-2026: esta cola se ha compactado.** Había llegado a 90 KB, casi todo notas largas de
-> filas ya HECHAS, y ningún cambio cabía ya en una sola subida (regla 12). Ahora la tabla guarda
-> solo número, documento y estado. El detalle de cada fila hecha sigue en `docs/HISTORIA.md` y en
-> el historial de git (versión anterior: el commit anterior a este en `docs/COLA.md`). **Manténla
-> así**: las notas largas van a `docs/HISTORIA.md`, no aquí.
+> **Este documento se compacta cuando crece.** Se hizo el 18-sep-2026 (había llegado a 90 KB) y
+> otra vez el 20-sep-2026 (45 KB). La tabla guarda solo número, documento y estado; **las notas
+> largas van a `docs/HISTORIA.md`, no aquí**. El detalle de cada fila HECHA está en
+> `docs/HISTORIA.md`, en el documento de la propia fila y en el historial de git.
 
 ## Reglas para Claude Code
 
@@ -30,10 +29,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
    sáltala y coge la siguiente PENDIENTE.
 7. No preguntes nada a Francisco. Al final, un mensaje corto: qué instrucciones has hecho, la
    versión publicada, y qué va a ver distinto en pantalla.
-8. Al terminar cualquier instrucción: actualiza `docs/CONTEXTO-CORTO.md` y `docs/CONTEXTO.md`
-   **sustituyendo la línea vieja, no añadiendo una debajo**. Si algo deja de ser verdad, se borra.
+8. Al terminar cualquier instrucción: actualiza `docs/CONTEXTO-CORTO.md` y `docs/CONTEXTO.md` (o
+   el hijo de `docs/contexto/` que toque) **sustituyendo la línea vieja, no añadiendo una debajo**.
+   Si algo deja de ser verdad, se borra.
 9. Añade a `docs/HISTORIA.md` lo que merezca recordarse, con su fecha. No dejes que
-   `docs/CONTEXTO-CORTO.md` pase de 160 líneas.
+   `docs/CONTEXTO-CORTO.md` pase de 14.000 caracteres.
 10. **Antes de subir nada, vuelve a bajar `main`.** Marcar la fila EN CURSO no basta: otra sesión
     puede haber fusionado su trabajo mientras tanto, y subir ficheros enteros sin releer pisa lo
     suyo. Pasó el 16-sep-2026 con las filas 13 y 14, y el 17-sep-2026 con la fila 38 y con
@@ -56,11 +56,22 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     una sola al terminar, con el código, las pruebas, `docs/COLA.md`, `docs/CONTEXTO-CORTO.md`,
     `docs/CONTEXTO.md` y `docs/HISTORIA.md` en el mismo commit. Nada de un commit por fichero, ni
     de "completa el commit anterior": se prepara todo y se sube una vez. Ver
-    `docs/NO-GASTAR-PUBLICACIONES.md`.
+    `docs/NO-GASTAR-PUBLICACIONES.md`. (Desde la fila 65, la documentación puede ir en una subida
+    aparte: tres por fila en vez de dos.)
 14. **Nunca uses `$(cat fichero)` ni ninguna sustitución de shell como valor de `content` al
     subir un fichero: el servidor no lo ejecuta, lo sube tal cual, como texto literal.** El
     17-sep-2026 esto dejó `docs/COLA.md` en 35 bytes con el comando sin ejecutar. El contenido
     tiene que ir escrito entero, de verdad, en el propio parámetro.
+15. **`push_files` con muchos ficheros grandes en una sola llamada es donde más falla el volcado
+    del contenido.** El 20-sep-2026, en la fila 77, una llamada de doce ficheros dejó seis con la
+    palabra `PLACEHOLDER` en vez del contenido, y `js/nucleo.js` con `PLACEHOLDER` es la
+    aplicación entera sin arrancar, publicada. Para una fila con más de cuatro o cinco ficheros de
+    código, súbelos con `create_or_update_file` uno a uno (o en dos o tres llamadas de
+    `push_files` más pequeñas), comprobando el tamaño de cada uno nada más subirlo.
+16. **Si delegas una fila de documentación en una sesión auxiliar**, pídele explícitamente que lea
+    el fichero entero de origen y lo copie tal cual, o que lo suba en trozos verificados. El
+    19-sep-2026 una sesión auxiliar retipeó tres ficheros de memoria e introdujo erratas en los
+    tres (`docs/COLA.md`, `docs/contexto/ASUNTOS.md`, `docs/HISTORIA.md`).
 
 ## Reglas para Francisco
 
@@ -75,409 +86,21 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
+Las filas 1 a 62, 64 a 75 y 77 a 84 están **HECHAS**. Sus documentos siguen en `docs/`, y el
+detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
+
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 1 | `docs/PLAN-ROBUSTEZ-2026-09.md` | HECHA |
-| 2 | `docs/REGISTRO-EN-UN-PASO.md` | HECHA |
-| 3 | `docs/CAMPOS-POR-TIPO.md` | HECHA |
-| 4 | `docs/TERCEROS-RELACIONADOS.md` | HECHA |
-| 5 | `docs/NO-DUPLICAR-ASUNTOS.md` | HECHA |
-| 6 | `docs/AJUSTES-AGIL.md` | HECHA |
-| 7 | `docs/PAPELERA.md` | HECHA |
-| 8 | `docs/UNIR-VER-DENTRO.md` | HECHA |
-| 9 | `docs/REPARTO-CONTEXTO.md` | HECHA |
-| 10 | `docs/ARREGLOS-USO-2026-09-14.md` | HECHA |
-| 11 | `docs/CORREOS-AL-ASUNTO.md` | HECHA |
-| 12 | `docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md` | HECHA |
-| 13 | `docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md` | HECHA |
-| 14 | `docs/PLANTILLAS-DE-CORREO.md` | HECHA |
-| 15 | `docs/HITOS.md` | HECHA |
-| 16 | `docs/QUE-ME-TOCA.md` | HECHA |
-| 17 | `docs/PLANTILLAS-DE-DOCUMENTO.md` | HECHA |
-| 18 | `docs/CORREO-EN-DOS-BUZONES.md` | HECHA |
-| 19 | `docs/CSV-DEL-DOCUMENTO.md` | HECHA |
-| 20 | `docs/REGISTRO-SIN-DUPLICAR.md` | HECHA |
-| 21 | `docs/GRUPOS-DE-PERSONAS.md` | HECHA |
-| 22 | `docs/SEPARAR-Y-UNIR-PDF.md` | HECHA |
-| 23 | `docs/REFRESCO-DE-PANTALLA.md` | HECHA |
-| 24 | `docs/NO-PISARSE-EN-UN-ASUNTO.md` | HECHA |
-| 25 | `docs/POR-CLASIFICAR-DOCUMENTO-A-LA-VISTA.md` | HECHA |
-| 26 | `docs/HITOS-SON-LA-GUIA.md` | HECHA |
-| 27 | `docs/CORREOS-DENTRO-DE-POR-CLASIFICAR.md` | HECHA |
-| 28 | `docs/LO-PIDE.md` | HECHA |
-| 29 | `docs/DNI-DEL-PERSONAL.md` | HECHA |
-| 30 | `docs/QUEDARSE-EN-EL-ASUNTO.md` | HECHA |
-| 31 | `docs/APUNTAR-DOCUMENTO-A-HITO.md` | HECHA |
-| 32 | `docs/ARCHIVAR-CARPETA-YA-EXISTE.md` | HECHA |
-| 33 | `docs/TABLON-NO-SE-BORRA.md` | HECHA |
-| 34 | `docs/NOTAS-DEL-ASUNTO-NO-SE-BORRAN.md` | HECHA |
-| 35 | `docs/HUECOS-INSERTAR.md` | HECHA |
-| 36 | `docs/FILAS-QUE-NO-SE-ESTRUJAN.md` | HECHA |
-| 37 | `docs/FICHA-DEL-ASUNTO-NUEVA.md` | HECHA (17-sep-2026) |
-| 38 | `docs/LO-PIDE-NOMBRE-DEL-TUTOR.md` | HECHA (17-sep-2026) |
-| 39 | `docs/AJUSTES-POR-TIPO.md` | HECHA (17-sep-2026) |
-| 40 | `docs/SALTAR-A-OTRO-ASUNTO.md` | HECHA (17-sep-2026) |
-| 41 | `docs/LEER-DOCUMENTOS-POR-CLASIFICAR.md` | HECHA (17-sep-2026) |
-| 42 | `docs/TERCEROS-NUEVOS-DESDE-EL-DOCUMENTO.md` | HECHA (17-sep-2026) |
-| 43 | `docs/REPASO-DE-LA-COLA-2026-09-17.md` | HECHA (17-sep-2026) |
-| 44 | `docs/BUSCADOR-ARCHIVO-INDICE.md` | HECHA (17-sep-2026) |
-| 45 | `docs/ARCHIVAR-ATASCOS.md` | HECHA (17-sep-2026) |
-| 46 | `docs/CABECERA-QUE-SE-QUEDA.md` | HECHA (18-sep-2026) |
-| 47 | `docs/DESTINATARIOS-EN-SENECA.md` | HECHA (17-sep-2026) |
-| 48 | `docs/NO-GASTAR-PUBLICACIONES.md` | HECHA (17-sep-2026) |
-| 49 | `docs/ADJUNTOS-DE-CORREO-POR-DENTRO.md` | HECHA (18-sep-2026) |
-| 50 | `docs/CABECERA-NO-TIEMBLA.md` | HECHA (18-sep-2026) |
-| 51 | `docs/FICHA-DISPOSICION.md` | HECHA (18-sep-2026) |
-| 52 | `docs/CABECERA-DEL-ASUNTO.md` | HECHA (18-sep-2026) |
-| 53 | `docs/SENECA-CUADRO-ANCHO.md` | HECHA (18-sep-2026 · 07:22) |
-| 54 | `docs/AYUDANTE-SENECA-FIABLE.md` | HECHA (18-sep-2026 · 07:22) |
-| 55 | `docs/ASUNTO-SIN-ELECCION.md` | HECHA (18-sep-2026 · 07:22) |
-| 56 | `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md` | HECHA (18-sep-2026 · 07:22) |
-| 57 | `docs/HUECO-PARA-SELLO-Y-FIRMA.md` | HECHA (18-sep-2026 · 09:46) |
-| 58 | `docs/AJUSTES-DE-USO-2026-09-18.md` | HECHA (18-sep-2026 · 19:26) |
-| 59 | `docs/REQUISITOS-DE-HITO.md` | HECHA (18-sep-2026 · 20:04) |
-| 60 | `docs/COMUNICAR-DESDE-EL-HITO.md` | HECHA (18-sep-2026 · 20:36) |
-| 61 | `docs/GUARDAR-SIN-PISAR.md` | HECHA (19-sep-2026) |
-| 62 | `docs/RENOMBRAR-SIN-PERDER-HITOS.md` | HECHA (19-sep-2026) |
-| 65 | `docs/DOCUMENTOS-QUE-QUEPAN.md` | HECHA (19-sep-2026) |
-| 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esta sesión |
-| 64 | `docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md` | HECHA (19-sep-2026) |
-| 66 | `docs/CONTACTO-GUARDADO-EN-LA-FICHA.md` | HECHA (19-sep-2026) |
-| 67 | `docs/LAS-CUENTAS-Y-LOS-DATOS.md` | HECHA (19-sep-2026) |
-| 68 | `docs/AVISOS-QUE-FALTAN.md` | HECHA (19-sep-2026): partes 1 y 3 hechas; falta si la papelera debe vaciarse sola (decisión de Francisco, sin preguntar) |
-| 69 | `docs/PRUEBAS-QUE-FALTAN.md` | HECHA (19-sep-2026) |
-| 70 | `docs/ENVOLTURAS-COMPROBADAS.md` | HECHA (19-sep-2026) |
-| 71 | `docs/COSAS-REPETIDAS.md` | HECHA (19-sep-2026) |
-| 72 | `docs/DETALLES-DE-MANTENIMIENTO.md` | HECHA (19-sep-2026): puntos 2, 4 y 5. Los puntos 1 y 3 se complicaron y pasan a las filas 76 y 77 (regla del propio documento: "si alguna se complica, se deja para otra fila") |
-| 73 | `docs/BUSCAR-EN-LAS-NOTAS.md` | HECHA (19-sep-2026) |
-| 74 | `docs/CUENTAS-DE-FIN-DE-CURSO.md` | HECHA (19-sep-2026) |
-| 75 | `docs/HUECOS-ENCONTRADOS-FILA-69.md` | HECHA (19-sep-2026 · 15:55): muchas más subidas de las debidas, y hubo que corregir erratas (nota más abajo) |
-| 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1, cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante. |
-| 77 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 3 (los borrados que se fusionen) | HECHA (20-sep-2026 · 06:53) |
-| 78 | Repartir `docs/contexto/ASUNTOS.md` (ha pasado los 40 KB del objetivo de la fila 65) | HECHA (20-sep-2026 · 08:44) |
-| 79 | `docs/BIBLIOTECA-DE-HITOS.md` | HECHA (20-sep-2026 · 09:32) |
-| 80 | `docs/CARGAR-BIBLIOTECA.md` | HECHA (20-sep-2026 · 09:32) |
-| 81 | `docs/FIRMANTES-Y-MEMBRETE.md` | HECHA (20-sep-2026) |
-| 82 | `docs/FORMULARIOS-OFICIALES.md` | HECHA (20-sep-2026) |
-| 83 | `docs/PLANTILLAS-DEL-CENTRO.md` | HECHA (20-sep-2026): doce plantillas (ocho de documento, cuatro de correo), una muestra representativa de las tres categorías, no las cincuenta y tantas de la biblioteca de golpe — decisión tomada para no sacrificar calidad por cantidad. Detalle en `docs/HISTORIA.md` |
-| 84 | `docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md` | HECHA (20-sep-2026): sin salida a internet en esta sesión (como la fila 63), así que `formularios/` se queda sin los once PDF; el resto del mecanismo (mapa de casillas, propuesta automática, "Preparar para el tercero") está hecho y probado con PDF de mentira. Ver la fila 85 |
 | 85 | Corregir 2 direcciones en `datos/formularios.json` y cerrar la fila | PENDIENTE (20-sep-2026): los once PDF ya están en `formularios/`, comprobados uno a uno y subidos a mano por Francisco (detalle completo en `docs/FORMULARIOS-DESDE-EL-ZIP.md`, con la tabla de tamaños para verificarlos). Solo queda: 1) en `datos/formularios.json`, cambiar la clave `u` de las entradas `O11:VI` y `O11:VII` (las únicas dos con clave `f`, es decir, con PDF descargable) de `https://www.juntadeandalucia.es/boja/2011/132/1` (una página web, no un PDF) a `https://www.juntadeandalucia.es/boja/2011/132/d1.pdf` (el PDF de verdad); las entradas `O11:I`, `O11:II`, `O11:III` y `O11:IV` (`via:"protocolo"`) se quedan como están, y las otras nueve direcciones del fichero no se tocan. 2) Marcar esta fila HECHA con la fecha, y añadir la línea que toque en `docs/HISTORIA.md`. No tocar ningún otro fichero de código ni ninguna prueba. |
+| 86 | `docs/PULSAR-PARA-ABRIR-Y-AVISO-OCULTABLE.md` | PENDIENTE (20-sep-2026): dos cosas pequeñas e independientes, en una sola fila para gastar una sola tanda de subidas. (1) Pulsar sobre la tarjeta de un documento lo abre en el visor de la derecha, en "Por clasificar" y en cualquier otra lista de documentos de la aplicación; los botones de la fila siguen haciendo lo suyo. (2) El aviso de fichas sin carpeta gana una ✕ que lo calla 7 días, salvo que aparezcan más fichas. Detalle completo, con la tabla de sitios que hay que comprobar, en `docs/PULSAR-PARA-ABRIR-Y-AVISO-OCULTABLE.md` |
+| 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
+| 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
-**Orden de trabajo:** todas las filas de 1 a 84 están HECHAS, salvo la 63 y la 76, BLOQUEADAS (la
-63 por una sesión sin salida a internet; la 76 por el riesgo de tocar el mecanismo de publicación
-sin Francisco delante). **La fila 85 está PENDIENTE** (20-sep-2026): los PDF ya están, solo falta
-corregir dos direcciones en un fichero de texto y cerrar la fila; detalle completo en
-`docs/FORMULARIOS-DESDE-EL-ZIP.md`. Cuando se resuelva, esta nota se sustituye por la que toque: no
-hay que mantener el repaso de las filas ya hechas más que en `docs/HISTORIA.md`.
+**Orden de trabajo: la 85 primero, después la 86.** La 63 y la 76 siguen BLOQUEADAS y no se
+retoman sin que Francisco lo diga. La tabla está en orden de trabajo, no de número: coge siempre
+la primera PENDIENTE **de arriba abajo**.
 
-**El orden de trabajo NO es el de los números.** La tabla de arriba está puesta **en el orden en que
-hay que hacerlas**, de arriba abajo, y por eso la 65 aparece entre la 62 y la 63. Los números no se
-han cambiado porque los catorce documentos y el informe se citan entre sí por número. Coge siempre
-la primera PENDIENTE **de arriba abajo en la tabla**, no la del número más bajo.
-
-El orden, escrito otra vez para que no haya duda:
-
-    61 · 62 · 65 · 63 · 64 · 66 · 67 · 68 · 69 · 70 · 71 · 72 · 73 · 74
-
-Por qué está así:
-
-- La **61** y la **62** van primero de todo, sean cuales sean las prisas: son los dos fallos que
-  pueden costar datos mientras tanto.
-- La **65** va la tercera (18-sep-2026, decidido con Francisco al preparar la cola para sesiones con
-  un modelo más pequeño). Parte `docs/CONTEXTO.md` y corta `docs/HISTORIA.md`, y hasta que eso esté
-  hecho **cada fila siguiente arrastra medio megabyte de documentación** que hay que leer y
-  reescribir. Hacerla pronto abarata y hace más seguras las once que vienen detrás. Además cambia
-  las reglas 8 y 13: **a partir de la 65, la documentación puede ir en una subida aparte**, y son
-  tres subidas por fila en vez de dos.
-- La **68** (la parte de fichas huérfanas), la **73** y la **74** van **después de la 64**, porque
-  las tres dependen de dónde viva la ficha de un asunto archivado. Cada documento lo explica.
-- La **71** es la menos urgente de todas. Si otra fila ya está tocando esos ficheros, se aprovecha;
-  si no, se queda donde está.
-
-**Ninguna de estas catorce se sube junto con otra.** Cada una, su subida.
-
-**Aviso sobre la 64:** es la más delicada de las catorce. Toca ocho ficheros, hay que revisar a mano
-cada sitio que lee la ficha de un asunto archivado, y si sale mal, sale mal en los datos.
-**Conviene hacerla en una sesión con el modelo grande**, no con uno pequeño. Si la sesión que llegue
-a ella no lo es, mejor saltarla, seguir con la 66 y dejar la 64 apuntada.
-
-### Las catorce, en una línea cada una
-
-(Aquí van por número, para poder buscarlas. **El orden de trabajo es el de la tabla de arriba.**)
-
-**61 · Guardar sin pisar al compañero.** Mandar un asunto a la papelera y devolverlo son los dos
-únicos sitios que escriben `asuntos.json` entero sin releerlo antes; con la copia en memoria vieja
-se puede borrar una mañana de trabajo del compañero, sin aviso. Se arreglan los dos y se cierra la
-puerta con una función única de guardado fresco. **Medio día. GRAVE, va primero.**
-
-**62 · Renombrar un asunto sin perder sus hitos.** `hitos.json` se indexa por el nombre de la
-carpeta y no viaja cuando el nombre cambia; los hitos se recrean desde la guía y la pérdida es
-silenciosa (fechas, responsables, historial, documentos apuntados, lo reunido). Un solo sitio que
-renombre, y que pasen por él los cuatro caminos. **Un día. GRAVE.**
-
-**63 · Publicar solo la aplicación.** Vercel publica el repositorio entero, `docs/` incluida.
-Primero comprobarlo con `curl`; si se confirma, un `.vercelignore`. **Medio día.**
-
-**64 · La ficha de un asunto archivado, en su propia carpeta.** `asuntos.json` no se limpia nunca y
-se reescribe entero 50-150 veces al día: 0,6 MB hoy, 9 MB en tres cursos. Se copia el patrón que ya
-funciona con el historial de hitos al archivar. **De dos a cuatro días. Es la fila que más rinde, y
-conviene hacerla antes de que el fichero pase de 3 MB.**
-
-**65 · Documentos que quepan en una subida.** `CONTEXTO.md` (244 KB) e `HISTORIA.md` (226 KB) ya no
-caben, y de ahí salieron las tres averías de ficheros del 17-sep. Se parte el primero por módulos,
-se corta el segundo por fecha, y se cambian las reglas 8 y 13 para que la documentación pueda ir en
-una subida aparte. **Medio día.**
-
-**66 · El contacto del tercero, guardado en la ficha.** En septiembre de 2027 el alumnado que se va
-desaparece del RegAlum y sus asuntos abiertos se quedan sin teléfono, correo ni tutores. Se guarda
-una foto del contacto al crear el asunto, y se usa solo si el CSV ya no trae a la persona. **Un
-día, y hay que pulsar su botón de relleno antes de que acabe este curso.**
-
-**67 · Las cuentas y los datos, por escrito.** Dos papeles, sin código: uno para el relevo (dónde
-vive cada cosa y cómo se publica) y otro para dirección (qué datos personales crea la aplicación,
-qué sale del centro y cuánto se guarda). Y poner a una segunda persona como colaboradora del
-repositorio. **Una hora.**
-
-**68 · Los avisos que faltan.** Las fichas huérfanas no avisan, los asuntos dormidos no salen por
-ningún lado, y la papelera no insiste. **Un día.**
-
-**69 · Las pruebas que faltan.** No hay ninguna que edite el nombre de un asunto, que una dos
-asuntos ni que toque los recurrentes; nada prueba Dropbox de verdad y nadie prueba el script de
-Google. Se escriben las que faltan y se deja una lista de lo que solo puede comprobar Francisco a
-mano. **Un día.**
-
-**70 · Las envolturas, comprobadas al arrancar.** De 17 sitios el 11-sep a 38 hoy, en 23 ficheros,
-con 103 `<script>` en orden fijo y fallos silenciosos. No se reescribe nada (sigue descartado): se
-apuntan, y si al arrancar falta alguna, se avisa. **Un día.**
-
-**71 · Las cosas repetidas, a la caja común.** 12 formas de copiar al portapapeles, 5 de inventar un
-identificador, 4 de escribir una fecha corta. **Medio día. La menos urgente.**
-
-**72 · Cinco detalles de mantenimiento.** La versión sacada del reloj y no a mano; el nombre de
-usuario de una lista; que los borrados de tipos y estados se fusionen entre ordenadores; caducidad
-en las copias de seguridad; y mirar si pdf.js (congelado en una versión de 2023) tiene avisos de
-seguridad. **Un día los cinco, independientes.**
-
-**73 · Buscar dentro de las notas.** Hoy se busca por nombre, documentos y registro, pero no por lo
-escrito en las notas, que es donde está la memoria de cada gestión. **Un día, mejor después de la
-64.**
-
-**74 · Cuentas por tipo, para la memoria de fin de curso.** Una pantalla que cuente asuntos por
-tipo, por mes y por quién los pidió, sacándolo del índice del ARCHIVO, con un botón para copiar la
-tabla. **Dos días, antes de junio de 2027.**
-
-**Fila 58, en una línea** (18-sep-2026, acordada con Francisco tras usar la aplicación con trabajo
-real): seis arreglos de uso diario, independientes entre sí. (1) Cuatro botones de copiar siempre
-visibles bajo el nombre del asunto —Asunto, Nombre (`Apellido1 Apellido2, Nombre`), NIE y DNI o
-CIF—, fuera del menú de tres puntos. (2) "Preparar el documento" pasa a llamarse **Ajustar
-tamaño**. (3) Las notas dejan de guardarse solas mientras se escribe: solo al pulsar Guardar o al
-salir del recuadro, con aviso si se sale con texto sin guardar. (4) Al registrar, el original sin
-sellar ya no va a la papelera: se queda en la carpeta con `SIN SELLAR` al final del nombre. (5) El
-cuadro de Correo se rehace como el de Séneca (ancho hasta 1100 px, dos columnas, cabecera y
-botones fijos) para que se vea la lista de documentos del asunto que ya existe y hoy queda fuera de
-pantalla. (6) Asociar un documento a un hito también desde la lista de documentos, y cada hito
-enseña debajo los suyos. Detalle en `docs/AJUSTES-DE-USO-2026-09-18.md`. Sube directamente a
-`main`, sin petición de cambios.
-
-**Fila 59, en una línea** (18-sep-2026, acordada con Francisco): cada paso del trámite de un tipo
-puede llevar una lista de **lo que hay que reunir**, y esa lista llega a su hito como casillas.
-Cada casilla es un documento o un dato, y puede ser obligatoria. La del documento se marca sola al
-apuntar ese documento al hito; la del dato se marca a mano y deja escribir el valor. Si al dar un
-hito por hecho quedan obligatorias sin marcar, avisa (no lo impide) y deja nota. Botón **Pedir lo
-que falta** en el hito: mete las casillas sin marcar como lista dentro del correo o del mensaje de
-Séneca, con un hueco nuevo `{{LO QUE FALTA}}`. Ficheros nuevos: `js/hitos-requisitos.js`,
-`js/guias-requisitos.js`, `pruebas/requisitos-de-hito.mjs`. Detalle en
-`docs/REQUISITOS-DE-HITO.md`. Sube directamente a `main`, sin petición de cambios.
-
-**Fila 60, en una línea** (18-sep-2026, acordada con Francisco): cada paso del trámite puede llevar
-**su propio texto de comunicación**, de correo y de Séneca, escrito en la pantalla del tipo; el hito
-enseña entonces un botón **Comunicar** que abre el cuadro de siempre ya relleno, con el destinatario
-propuesto por el responsable del hito (tercero, tutor o relacionado; si es alguien del centro, el
-tercero del asunto). Al preparar el mensaje queda una línea en el historial del hito y una nota en
-el asunto, una sola vez. La plantilla general del tipo no se toca. Ficheros nuevos:
-`js/guias-comunicacion.js`, `js/hitos-comunicar.js`, `pruebas/comunicar-desde-hito.mjs`. Detalle en
-`docs/COMUNICAR-DESDE-EL-HITO.md`. Sube directamente a `main`, sin petición de cambios.
-
-**Fila 52, en una línea** (18-sep-2026, acordada con Francisco mirando la cabecera de un asunto de
-CERT. MATRICULA): los doce botones de la cabecera se agrupan por el momento del trámite en que se
-usan y bajan a cinco. Detalle en `docs/CABECERA-DEL-ASUNTO.md`.
-
-**Fila 53, en una línea** (18-sep-2026, HECHA): el cuadro de Mensaje de Séneca se rehizo para que
-se vea entero. Todo lo de Séneca salió de `js/correo.js` (38 KB) a `js/seneca-cuadro.js` +
-`css/seneca.css`; el cuadro ocupa el ancho (hasta 1100 px) en dos columnas a partir de 900 px, con
-destinatarios y asunto a la izquierda y el texto del mensaje a la derecha; el asunto es ahora un
-`<textarea>` que crece, con su cuenta de caracteres; sin plantilla de Séneca para el tipo, un aviso
-en vez del hueco vacío; dos botones numerados ("1. Copiar el asunto" y "2. Copiar el texto") en vez
-del botón único que cambiaba de significado; y la explicación del ayudante se pliega en un
-`<details>`. Ningún cambio de funcionamiento. Lo compartido con Correo se expone en
-`window.CorreoNucleo`. Detalle en `docs/SENECA-CUADRO-ANCHO.md`; diario en `docs/HISTORIA.md`.
-Comprobado con `pruebas/seneca-cuadro-ancho.mjs`.
-
-**Fila 54, en una línea** (18-sep-2026, HECHA): el ayudante de `js/seneca-ayudante.js` ya no fía
-todo a un reloj fijo de 1400 ms. Ahora espera a que aparezca la sugerencia de Séneca (hasta 5 s,
-mirando cada 150 ms, también en `iframe`), separa la flecha abajo del Intro con 350 ms, comprueba
-hasta 2,5 s que el campo se ha vaciado de verdad, reintenta una vez más despacio (7 s) si no, y al
-terminar con fallos dice por su nombre quién no ha entrado, con un botón "Copiar los que faltan".
-Solo se tocó `js/seneca-ayudante.js`. Detalle en `docs/AYUDANTE-SENECA-FIABLE.md`. Comprobado con
-`pruebas/seneca-ayudante.mjs` (sin navegador: no se puede probar contra Séneca de verdad desde
-aquí, eso lo comprueba Francisco).
-
-**Fila 55, en una línea** (18-sep-2026, HECHA): desaparecieron los dos botones "Nombre de la
-carpeta" / "Versión legible" de debajo del campo Asunto, en Correo y en Séneca. El asunto del
-mensaje es siempre el nombre de la carpeta (`asuntoDelCorreo(a)`, ya sin el parámetro `largo`); el
-campo se sigue viendo y editando a mano. Detalle en `docs/ASUNTO-SIN-ELECCION.md`. Comprobado con
-`pruebas/asunto-sin-eleccion.mjs`.
-
-**Fila 56, en una línea** (18-sep-2026, HECHA): la sección Campos de la pantalla de un tipo ya no
-enseña el catálogo entero desplegado. Se queda con los campos puestos y un botón "+ Añadir campo"
-que abre un panel de tres pestañas (De la ficha · Míos · Calculados) en `js/campos-catalogo.js`
-(nuevo, dentro de la propia sección, no un cuadro emergente). Francisco puede crear campos
-calculados (`js/campos-calculo.js`, el motor; `js/campos-calculados-editor.js`, el formulario con
-vista previa) con seis operaciones, encadenables hasta 3 saltos. El calculado "Curso" pasa a ser
-una receta más en `campos.json`, migrada sola la primera vez que se lee el fichero si ya existía,
-con la función de siempre como respaldo mientras tanto. Si se añaden campos sin guardar, la
-pantalla avisa al salir. Detalle en `docs/CAMPOS-CATALOGO-Y-CALCULADOS.md`; lo que costó de más
-(bugs cazados por las propias pruebas, antes de subir) en `docs/HISTORIA.md`. **La prueba del
-motor se guardó como `pruebas/campos-calculo.mjs`, no `campos-calculo.test.js`** como decía el
-encargo: `pruebas/ejecutar.mjs` solo recoge ficheros `*.mjs`, así que con ese nombre no se habría
-ejecutado nunca con `npm test`. Comprobado también con `pruebas/campos-catalogo.mjs`, y con
-`pruebas/campos.mjs` y `pruebas/ajustes-por-tipo.mjs` (actualizadas al panel nuevo).
-
-**Fila 57, en una línea** (18-sep-2026, HECHA): botón nuevo **Preparar el documento**, junto a
-Separar, Unir y Sacar páginas (en la ficha de un asunto y en Por clasificar), que encoge todas las
-páginas de un PDF para dejar libre la banda del sello de registro de Séneca (arriba) y la de la
-firma del director (abajo), de lado a lado de la hoja. Nunca agranda, nunca cambia el tamaño de la
-hoja, respeta las páginas giradas, y si ya hay sitio no toca nada (lo comprueba pintando cada
-página con pdf.js y mirando los píxeles de las dos bandas). Si el PDF ya está firmado
-digitalmente, pregunta antes de seguir. Las dos medidas (1,5 cm arriba, 2,5 cm abajo por defecto)
-se configuran en Ajustes → El centro; cada tipo de asunto dice si lleva sello y si lleva firma, en
-su propia pantalla. Ficheros nuevos: `js/pdf-margenes.js` (la cuenta y el PDF nuevo, con pdf-lib,
-sin DOM, como `js/pdf-herramientas.js`), `js/preparar-documento.js` (el cuadro) y
-`pruebas/margenes-pdf.mjs`. Detalle en `docs/HUECO-PARA-SELLO-Y-FIRMA.md`; diario en
-`docs/HISTORIA.md`. Sesión en la nube: subido con pull request, no directo a `main` (ver la nota
-de más abajo). **Su botón se llama "Ajustar tamaño" desde la fila 58.**
-
-**Fila 79, en una línea** (20-sep-2026, acordada con Francisco): **la biblioteca de hitos del
-centro**. Hoy los pasos del trámite se escriben a mano en cada Tipo de Asunto y no se reutiliza
-nada, aunque muchos se repitan con el mismo responsable, el mismo plazo, la misma lista de lo que
-hay que reunir y el mismo texto de correo. Se crea un fichero compartido nuevo,
-`_GESTOR/hitos-biblioteca.json`, con **hitos modelo**: al escribir la guía de un tipo se puede
-traer uno de la biblioteca en vez de escribirlo, y entra como **copia**. Al guardar un paso traído
-que ha cambiado, la aplicación pregunta si el cambio es solo para ese tipo o sube también a la
-biblioteca; si sube, los demás tipos que lo usan **no se cambian solos**: les sale un aviso que
-enseña el cambio campo a campo (antes → después) y deja decidir. Los asuntos ya abiertos no se
-enteran de nada. **Ampliada el 20-sep-2026, la misma tarde**, con tres cosas más y un arreglo:
-cada hito puede marcarse como **"Solo informativo"** (se ve, con su plazo y su normativa, pero no
-sale en "Qué me toca" ni cuenta como pendiente, y se enciende con un clic cuando el equipo
-directivo entre en la aplicación); cada hito puede llevar su **normativa**, con la cita, el bloque
-y la clave del precepto, y un enlace que se monta con una dirección base configurable en Ajustes;
-cada Tipo de Asunto gana un **nombre corto**, que es el que entra en el nombre de la carpeta, para
-que el nombre que se ve en pantalla pueda ser largo y claro; y se arregla que **renombrar un tipo
-haga resucitar el nombre viejo** como tipo fantasma (es lo que le pasó a Francisco con ANULACIÓN y
-con DTMA). Ficheros nuevos: `js/hitos-biblioteca.js`, `js/guias-biblioteca.js`,
-`js/hitos-normativa.js`, `pruebas/biblioteca-de-hitos.mjs`, `pruebas/nombre-corto-de-tipo.mjs`.
-Detalle en `docs/BIBLIOTECA-DE-HITOS.md`; diario, con lo que costó de más, en `docs/HISTORIA.md`.
-**HECHA (20-sep-2026).** Sesión en la nube: subida con pull request, no directo a `main` (ver la
-nota de más abajo).
-
-**Fila 80, en una línea** (20-sep-2026, acordada con Francisco tras repasar con él sus 55 Tipos de
-Asunto uno a uno): **cargar el contenido de la biblioteca**. La 79 construye la herramienta; esta
-la llena. Da de alta los Tipos de Asunto que faltan, pone el nombre corto a los que ya existen y
-crea los hitos modelo y las guías de cada tipo, con su responsable, su plazo, lo que hay que
-reunir, lo que se comunica y su normativa citada. El contenido está escrito en tres documentos:
-`docs/contenido/BIBLIOTECA-ALUMNADO.md`, `docs/contenido/BIBLIOTECA-PERSONAL.md` y
-`docs/contenido/BIBLIOTECA-EMPRESAS-Y-OTROS.md`. Se carga con un botón de Ajustes →
-Mantenimiento, **"Cargar la biblioteca del centro"**, que fusiona y no pisa nada ya escrito.
-Detalle en `docs/CARGAR-BIBLIOTECA.md`; diario en `docs/HISTORIA.md`. **HECHA (20-sep-2026).**
-Sesión en la nube: subida con pull request, no directo a `main`.
-
-## Nota de esta sesión (18-sep-2026, mañana): docs/CONTEXTO.md y docs/HISTORIA.md sin actualizar
-
-El código, las pruebas y `docs/CONTEXTO-CORTO.md` de las filas 53-56 ya están en `main` y
-comprobados en producción (`App.VERSION = '18-sep-2026 · 07:54'`, `js/campos-catalogo.js` y
-`js/campos-calculados-editor.js` responden 200 en `https://gestor-de-asuntos.vercel.app`). Pero
-esta sesión **no ha podido subir** `docs/CONTEXTO.md` (225 KB) ni `docs/HISTORIA.md` (217 KB) con
-las secciones de esas filas: son demasiado grandes para volver a escribirlos enteros a mano dentro
-de una sola llamada sin riesgo de un error de transcripción (regla 12 de más arriba, llevada al
-límite: aquí no se trata de que la subida se corte sola, sino de que retipear 225 KB o 217 KB de
-un tirón, sin `git push` disponible en esta sesión —el proxy de git rechaza este repositorio desde
-`bash`—, es demasiado riesgo para un fichero de referencia). Se ha preferido dejarlo apuntado aquí,
-como pide la regla 12, en vez de forzarlo.
-
-**Qué le falta a `docs/CONTEXTO.md`**: la sección "El correo y la mensajería de Séneca" con el
-cuadro de Séneca en dos columnas (fila 53), el ayudante fiable (fila 54) y el asunto sin elección
-(fila 55); la sección "Los campos de cada tipo de asunto" con el panel de tres pestañas y los
-campos calculados (fila 56); las filas correspondientes de "Ficheros del repositorio"
-(`js/seneca-cuadro.js`, `css/seneca.css`, `js/campos-calculo.js`, `js/campos-catalogo.js`,
-`js/campos-calculados-editor.js`, `js/ajustes-tipo.js` actualizado).
-
-**Qué le falta a `docs/HISTORIA.md`**: una entrada nueva, fechada 18-sep-2026, "Filas 53 a 56:
-Séneca ancho, el ayudante fiable, el asunto sin elección y los campos calculados", con una
-subsección "Lo que costó de verdad" documentando los bugs que las propias pruebas cazaron antes de
-llegar a producción: `js/campos-calculo.js` usando `window.U`/`window.Nombres` en vez de las
-variables sueltas (rompía en el contexto `vm` de las pruebas, donde `window` es un objeto de
-mentira aparte, no el global de verdad); un `toLocaleString('es')` que en este entorno de pruebas
-no ponía el punto de los millares y hubo que formatear a mano con una expresión regular; la
-pestaña Calculados sin enseñar "Curso" antes de guardar nada (había que fusionar también
-`Campos.RECETA_CURSO_DE_FABRICA`, no solo `App.E.campos.calculados`); y
-`borrarPropio`/`borrarCalculado` guardando de más (persistían de golpe cambios sin guardar del
-propio tipo —orden, obligatorio— al borrar un campo propio o calculado usado en otro tipo).
-
-**Para la próxima sesión que la coja**: `docs/CONTEXTO.md` y `docs/HISTORIA.md` en el propio
-repositorio (`git clone` o `git pull`) ya tienen, en teoría, el contenido final correcto si se
-parte del último commit de código de esta sesión — pero esta sesión trabajó sobre una copia local
-del contenedor que puede haberse quedado desincronizada de `main` a medio camino (ver el aviso de
-`docs/COLA.md` sobre sesiones en paralelo), así que **no dar nada por hecho: comparar con cuidado**
-contra lo que de verdad dice `main` antes de sustituir. Si esa sesión tiene `git push` de verdad
-(terminal u ordenador de Francisco, no esta nube), es mucho más simple que ir fichero a fichero con
-la API.
-
-## Nota de esta sesión (19-sep-2026): fila 75, muchas más subidas de las debidas, y tres ficheros con erratas que hubo que corregir
-
-La fila 75 no es una de las catorce de la fila 65 (esas sí tienen permitida una tercera subida
-para documentación): le tocaban dos subidas, como a cualquier fila normal (regla 13). No fue así.
-
-La segunda subida llevó por error solo `js/version.js`, en vez de los once ficheros previstos: un
-fallo al montar la llamada, no un límite de tamaño. Para terminarla se delegó el resto en otra
-sesión auxiliar, con instrucciones explícitas de subir los diez ficheros que faltaban en un solo
-commit y de comprobar el número de ficheros antes de disparar la llamada. Esa sesión auxiliar
-cometió el mismo fallo dos veces más (una llamada con un solo fichero, otra con dos) y acabó
-necesitando ocho commits en total para dejar los diez ficheros en `main`. Además, al retipear a
-mano el contenido de tres ficheros de documentación, introdujo erratas en los tres:
-`docs/COLA.md` (tres sitios), `docs/contexto/ASUNTOS.md` (dos sitios) y `docs/HISTORIA.md` (seis
-sitios) — letras y tildes perdidas, y una palabra de más. Los otros siete ficheros (todo el código
-y las pruebas) llegaron a `main` byte a byte iguales a lo previsto, comprobado con el hash de git
-de cada uno.
-
-Se detectó comparando, fichero a fichero, el contenido subido con el contenido local ya
-verificado, y se corrigió con una subida más, solo de esos tres ficheros de documentación, sin
-tocar código: no gasta una publicación de Vercel de más porque Vercel solo publica cuando cambia
-código de la aplicación, no documentación (ver `docs/NO-GASTAR-PUBLICACIONES.md`).
-
-En total, entre ambas partes, la fila 75 se cerró en muchas más de las dos subidas que marca la
-regla 13. Motivo para dejarlo escrito: si una fila de documentación grande vuelve a necesitar
-delegarse en una sesión auxiliar, conviene pedirle explícitamente que lea el fichero entero de
-origen y lo copie tal cual (o lo suba en trozos verificados), en vez de retipearlo de memoria.
-
-## Nota de esta sesión (20-sep-2026): fila 77, seis ficheros con PLACEHOLDER en el commit de código
-
-Al subir el código de la fila 77 en un solo commit con `push_files` (doce ficheros), la llamada
-salió con solo dos ficheros de contenido real (`index.html` y, en el intento siguiente, los seis
-primeros de la lista) y **la palabra `PLACEHOLDER` en vez del contenido** en los otros seis:
-`js/ficha-asunto.js`, `js/nucleo.js`, `js/papelera.js`, `js/recurrentes.js`, `js/version.js`,
-`pruebas/borrados-que-se-fusionan.mjs` y `pruebas/recurrentes.mjs` (siete, en dos intentos: el
-primero llevó solo `index.html`, exactamente el mismo fallo que ya avisa la nota de la fila 75).
-Esto dejó `main` roto de verdad unos minutos: `js/nucleo.js` con `PLACEHOLDER` es la aplicación
-entera sin arrancar, y Vercel lo publicó.
-
-Se detectó al momento (regla 12: comprobar cada fichero grande después de subirlo) y se corrigió
-fichero a fichero con `create_or_update_file`, comparando el tamaño de cada uno contra el original
-antes de darlo por bueno, y comprobando al final con un `git clone` fresco y `npm test` completo
-que `main` no tenía ningún `PLACEHOLDER` y las 85 pruebas pasaban. Motivo para dejarlo escrito:
-**`push_files` con muchos ficheros grandes en una sola llamada es donde más falla el volcado del
-contenido.** Para una fila con más de cuatro o cinco ficheros de código, mejor subirlos con
-`create_or_update_file` uno a uno (o en dos o tres llamadas de `push_files` más pequeñas),
-comprobando el tamaño de cada uno nada más subirlo, en vez de una única llamada con todos.
+**Ninguna fila se sube junto con otra.** Cada una, su subida.
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
@@ -528,8 +151,8 @@ comprobando el tamaño de cada uno nada más subirlo, en vez de una única llama
   una opción dentro de "Comunicar". Por eso no es una fila de la cola.
 - **Del informe del 18-sep-2026: la papelera, ¿se vacía sola?** Hoy avisa a los 30 días pero no
   borra nada sin que alguien pulse. Para datos de menores, un borrado que nunca ocurre no es lo
-  ideal. **Hay que preguntárselo a Francisco antes de hacer esa parte de la fila 68**, y apuntar lo
-  que decida.
+  ideal. **Hay que preguntárselo a Francisco**, y apuntar lo que decida. Es la parte que quedó sin
+  hacer de la fila 68.
 - **Del informe del 18-sep-2026: la ficha del asunto.** Se ha rehecho tres veces en cuatro días
   (filas 51, 52 y 58). Va a necesitar una cuarta pasada cuando los hitos lleven un mes en uso. No se
   adelanta nada: se espera al uso real.
@@ -541,7 +164,7 @@ comprobando el tamaño de cada uno nada más subirlo, en vez de una única llama
   cambia "un fichero que crece" por "una máquina que nadie administra en agosto". Además, las cuatro
   cosas que un servidor resolvería —aviso instantáneo, cierre de verdad, buscar sin cargar nada
   entero, copias automáticas— o no son problema hoy, o ya están resueltas (el índice del ARCHIVO,
-  las copias diarias), o las arregla la fila 64. **Se replantea solo si algún día entran cinco o
+  las copias diarias), o las arregló la fila 64. **Se replantea solo si algún día entran cinco o
   seis personas de varios departamentos a la vez; y entonces, una máquina en el centro, nunca en la
   nube.**
 - **Una base de datos del navegador** en vez de los ficheros del Dropbox. Rompería el modelo: los
@@ -550,7 +173,7 @@ comprobando el tamaño de cada uno nada más subirlo, en vez de una única llama
   carpeta y ver el trabajo sin la aplicación.
 - **Guardar los cambios uno detrás de otro** (un registro de apuntes en vez de reescribir el
   fichero). Es la solución correcta para diez personas escribiendo a la vez. Con dos, dos semanas de
-  trabajo y fallos que tardan meses en aparecer. La fila 64 da casi el mismo beneficio por mucho
+  trabajo y fallos que tardan meses en aparecer. La fila 64 dio casi el mismo beneficio por mucho
   menos.
 - **Un fichero por asunto abierto.** La pantalla de abiertos tendría que abrir cien ficheros
   pequeños en una carpeta de Dropbox, que puede ser más lento que lo de hoy, no menos.
@@ -575,3 +198,22 @@ otra (una fila volvió a PENDIENTE varias veces). Mientras la cola esté muy act
 las sesiones de una en una. El detalle de aquel día, y de los ficheros que se rompieron y se
 recuperaron (`docs/CONTEXTO.md` con un `PLACEHOLDER`, `docs/HISTORIA.md` truncado a la mitad),
 está en `docs/HISTORIA.md`; de ahí salieron las reglas 10, 11, 12 y 14.
+
+## Nota para la próxima sesión: docs/CONTEXTO.md y docs/HISTORIA.md de las filas 53-56
+
+El código, las pruebas y `docs/CONTEXTO-CORTO.md` de las filas 53-56 están en `main` y comprobados
+en producción, pero la sesión del 18-sep-2026 (mañana) **no pudo subir** las secciones
+correspondientes de `docs/CONTEXTO.md` ni de `docs/HISTORIA.md` (225 y 217 KB: demasiado para
+retipear de un tirón sin `git push`). Puede que falten todavía.
+
+- A `docs/CONTEXTO.md`: el cuadro de Séneca en dos columnas (fila 53), el ayudante fiable (54), el
+  asunto sin elección (55), el panel de campos de tres pestañas y los campos calculados (56), y
+  las filas correspondientes de "Ficheros del repositorio" (`js/seneca-cuadro.js`,
+  `css/seneca.css`, `js/campos-calculo.js`, `js/campos-catalogo.js`,
+  `js/campos-calculados-editor.js`, `js/ajustes-tipo.js`).
+- A `docs/HISTORIA.md`: la entrada del 18-sep-2026 de esas cuatro filas, con su "Lo que costó de
+  verdad" (los bugs que las propias pruebas cazaron antes de producción).
+
+Compruébalo contra lo que de verdad dice `main` antes de sustituir nada. Si la sesión tiene
+`git push` de verdad (terminal u ordenador de Francisco), es mucho más simple que ir fichero a
+fichero con la API.
