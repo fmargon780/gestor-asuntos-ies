@@ -21,7 +21,13 @@
         (documento y una entrada no tocada, verbatim).
      7. El nombre del documento generado sale de Nombres.montarDocumento.
      8. Un plantillas.json viejo, sin `documentos` ni los campos nuevos
-        del centro, sigue cargando. */
+        del centro, sigue cargando.
+     9. (20-sep-2026, fila 81, docs/FIRMANTES-Y-MEMBRETE.md) `{{MEMBRETE}}`
+        y `{{FIRMANTE}}`/`{{TRATAMIENTO FIRMANTE}}`: `Docx.ponerImagen`
+        deja la imagen dentro del ZIP (con su relación y su entrada en
+        Content Types, creadas de cero, sin `.rels` de partida) y quita
+        el hueco del membrete; `Plantillas.valoresDeAsunto` resuelve el
+        firmante con el ocupante del cargo en la fecha del documento. */
 import { JSDOM } from 'jsdom';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -311,6 +317,49 @@ function documentoXml(cuerpoParrafos) {
   comprobar('8. código por defecto', datos.codigo, '');
   comprobar('8. cargo por defecto', datos.cargo, '');
   comprobar('8. lo que ya traía sigue como estaba', datos.centro, 'IES de antes');
+}
+
+/* ============================================================
+   9. {{MEMBRETE}} y {{FIRMANTE}}/{{TRATAMIENTO FIRMANTE}}.
+   ============================================================ */
+{
+  /* Cargos.enFecha real no hace falta aquí (ya tiene su propia prueba,
+     pruebas/cargos.mjs): se sustituye por un doble que devuelve el
+     mismo ocupante para cualquier fecha, solo para comprobar el
+     enganche entre Plantillas.valoresDeAsunto y Docx. */
+  win.Cargos = { enFecha: async (id) => id === 'direccion' ? { persona: 'Ana Ana', tratamiento: 'El Director', nombre: 'Dirección' } : null };
+
+  const parrafoMembrete = '<w:p><w:r><w:t>{{MEMBRETE}}</w:t></w:r></w:p>';
+  const parrafoFirma = '<w:p><w:r><w:t>Fdo.: {{FIRMANTE}} ({{TRATAMIENTO FIRMANTE}})</w:t></w:r></w:p>';
+  const zipOriginal = await construirZipDePrueba([
+    { nombre: '[Content_Types].xml', texto: CONTENT_TYPES, comprimir: false },
+    { nombre: 'word/document.xml', texto: documentoXml(parrafoMembrete + parrafoFirma), comprimir: true }
+  ]);
+
+  const pngDeMentira = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]);
+  const conImagen = await Docx.ponerImagen(zipOriginal, 'MEMBRETE', pngDeMentira, 400, 100);
+
+  const nombresTrasImagen = Docx.leerDirectorioCentral(conImagen).map((e) => e.nombre);
+  comprobarQue('9. la imagen queda dentro del ZIP', nombresTrasImagen.includes('word/media/membrete.png'), nombresTrasImagen.join(', '));
+  comprobarQue('9. su relación queda creada de cero', nombresTrasImagen.includes('word/_rels/document.xml.rels'), nombresTrasImagen.join(', '));
+
+  const xmlConImagen = await Docx.leerEntradaDeTexto(conImagen, 'word/document.xml');
+  comprobarQue('9. el hueco {{MEMBRETE}} se sustituye por un dibujo', !xmlConImagen.includes('MEMBRETE') && xmlConImagen.includes('<w:drawing>'), xmlConImagen);
+
+  const contentTypesConImagen = await Docx.leerEntradaDeTexto(conImagen, '[Content_Types].xml');
+  comprobarQue('9. Content Types gana el png', contentTypesConImagen.includes('Extension="png"'), contentTypesConImagen);
+
+  const relsConImagen = await Docx.leerEntradaDeTexto(conImagen, 'word/_rels/document.xml.rels');
+  comprobarQue('9. la relación apunta a media/membrete.png', relsConImagen.includes('Target="media/membrete.png"'), relsConImagen);
+
+  const valores = await Plantillas.valoresDeAsunto({}, { plantilla: { firmante: 'direccion' }, fecha: '2026-09-20' });
+  comprobar('9. el firmante sale del cargo, en la fecha del documento', valores.firmante, 'Ana Ana');
+  comprobar('9. el tratamiento del firmante también', valores['tratamiento firmante'], 'El Director');
+
+  const rFinal = await Docx.rellenar(conImagen, valores);
+  const xmlFinal9 = await Docx.leerEntradaDeTexto(await rFinal.blob.arrayBuffer(), 'word/document.xml');
+  comprobarQue('9. la firma sale rellena, sin llaves sueltas',
+    xmlFinal9.includes('Fdo.: Ana Ana (El Director)') && !xmlFinal9.includes('{'), xmlFinal9);
 }
 
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

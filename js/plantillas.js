@@ -32,6 +32,12 @@ var Plantillas = (function () {
      de normativa del centro, para montar el enlace de una referencia.
      Vacía, las citas se ven sin enlace y no se rompe nada. */
   var POR_DEFECTO_NORMATIVA = 'https://normativa-escolarizacion.vercel.app';
+  /* La caja del nombre de la Consejería sobre la imagen del membrete
+     (20-sep-2026, fila 81, docs/FIRMANTES-Y-MEMBRETE.md): todo en
+     porcentaje del ancho o del alto de la imagen, para que valga igual
+     si el membrete se cambia por otro de distinto tamaño. La usa
+     js/membrete.js. */
+  var POR_DEFECTO_MEMBRETE_CAJA = { x: 10.3, y: 43.2, ancho: 20.7, alto: 10.0 };
 
   /* Los huecos que se conocen, con el nombre en cristiano que se
      enseña en Ajustes y en el aviso de "Faltan datos". `{campo:LO QUE
@@ -85,7 +91,21 @@ var Plantillas = (function () {
        `clave` lleva ya las llaves para que el botón "Insertar hueco"
        (js/huecos-buscador.js, que lee este mismo catálogo) meta el
        texto exacto sin tocar ese fichero. */
-    { clave: '{LO QUE FALTA}', etiqueta: 'Lo que hay que reunir, sin marcar (desde un hito)' }
+    { clave: '{LO QUE FALTA}', etiqueta: 'Lo que hay que reunir, sin marcar (desde un hito)' },
+    /* Los firmantes y el membrete (20-sep-2026, fila 81,
+       docs/FIRMANTES-Y-MEMBRETE.md): con doble llave, como {{LO QUE
+       FALTA}}, porque se resuelven aparte (`resolverHuecosDobles`, más
+       abajo) antes de que la sustitución normal los vea; así un
+       nombre con espacio ("CARGO FIRMANTE") no deja restos de llave
+       suelta. {{MEMBRETE}} no está en este catálogo: no es un dato de
+       texto, lo consume `Docx.ponerImagen` antes de llegar aquí. */
+    { clave: 'firmante', etiqueta: 'Quien firma el documento (según el cargo, en su fecha)' },
+    { clave: 'cargo firmante', etiqueta: 'El cargo de quien firma' },
+    { clave: 'tratamiento firmante', etiqueta: 'El tratamiento de quien firma ("El Director")' },
+    { clave: 'visto bueno', etiqueta: 'Quien da el visto bueno' },
+    { clave: 'cargo visto bueno', etiqueta: 'El cargo del visto bueno' },
+    { clave: 'tratamiento visto bueno', etiqueta: 'El tratamiento del visto bueno' },
+    { clave: 'consejeria', etiqueta: 'El nombre de la Consejería, para el membrete' }
   ];
 
   var cache = null;
@@ -100,6 +120,12 @@ var Plantillas = (function () {
       codigo: l.codigo || '',
       cargo: l.cargo || '',
       direccionNormativa: (typeof l.direccionNormativa === 'string') ? l.direccionNormativa : POR_DEFECTO_NORMATIVA,
+      /* El membrete (20-sep-2026, fila 81): la imagen vive en
+         _GESTOR/PLANTILLAS/membrete.png (ver js/membrete.js), aquí
+         solo el nombre de la Consejería y dónde escribirlo encima. */
+      consejeria: l.consejeria || '',
+      membreteCaja: (l.membreteCaja && typeof l.membreteCaja === 'object')
+        ? Object.assign({}, POR_DEFECTO_MEMBRETE_CAJA, l.membreteCaja) : Object.assign({}, POR_DEFECTO_MEMBRETE_CAJA),
       lista: Array.isArray(l.lista) ? l.lista : [],
       /* Plantillas de documento de Word (docs/PLANTILLAS-DE-DOCUMENTO.md,
          3.4): { id, categoria, tipo, nombre, fichero, tipoDocumento,
@@ -198,25 +224,49 @@ var Plantillas = (function () {
     return reLoQueFalta(false).test(String(texto || ''));
   }
 
+  /* Resuelve un hueco ya reconocido (o "{campo:...}"), y apunta en
+     `faltan` si no hay dato. Común a la llave sencilla y a la doble
+     (`resolverHuecosDobles`, más abajo). */
+  function resolverUnHueco(clave, valores, faltan) {
+    if (/^campo\s*:/i.test(clave)) {
+      var nombreCampo = clave.replace(/^campo\s*:/i, '').trim();
+      var valorCampo = buscarCampo(valores.campos, nombreCampo);
+      if (!valorCampo) faltan.push(nombreCampo);
+      return { encontrado: true, valor: valorCampo || '' };
+    }
+    var real = CONOCIDOS.filter(function (c) { return U.normalizar(c) === U.normalizar(clave); })[0];
+    if (!real) return { encontrado: false, valor: '' };
+    var valor = valores[real] || '';
+    if (!valor) faltan.push(nombreDeHueco(real));
+    return { encontrado: true, valor: valor };
+  }
+
+  /* {{FIRMANTE}}, {{CARGO FIRMANTE}}, {{CONSEJERIA}}... (20-sep-2026,
+     fila 81) y, más adelante, {{FORMULARIOS}} (fila 82): con doble
+     llave, resueltos ANTES de la llave sencilla. Así un nombre con
+     espacio ("CARGO FIRMANTE") no deja las llaves de fuera sueltas en
+     el papel: si no se reconoce, se deja tal cual (por si algún día
+     queda una llave doble sin resolver, como {{MEMBRETE}} si se
+     escribiera en un sitio que no sea `word/document.xml`). */
+  function resolverHuecosDobles(texto, valores, faltan) {
+    return String(texto || '').replace(/\{\{([^{}]+)\}\}/g, function (todo, dentro) {
+      var r = resolverUnHueco(dentro.trim(), valores, faltan);
+      return r.encontrado ? r.valor : todo;
+    });
+  }
+
   function rellenar(texto, valores) {
     valores = valores || {};
     var conLoQueFalta = String(texto || '').replace(reLoQueFalta(true), function () {
       return valores.loQueFalta || '';
     });
     var faltan = [];
-    var salida = conLoQueFalta.replace(/\{([^{}]+)\}/g, function (todo, dentro) {
+    var conDobles = resolverHuecosDobles(conLoQueFalta, valores, faltan);
+    var salida = conDobles.replace(/\{([^{}]+)\}/g, function (todo, dentro) {
       var clave = dentro.trim();
-      if (/^campo\s*:/i.test(clave)) {
-        var nombreCampo = clave.replace(/^campo\s*:/i, '').trim();
-        var valorCampo = buscarCampo(valores.campos, nombreCampo);
-        if (!valorCampo) faltan.push(nombreCampo);
-        return valorCampo || '';
-      }
-      var real = CONOCIDOS.filter(function (c) { return U.normalizar(c) === U.normalizar(clave); })[0];
-      if (!real) { faltan.push(clave); return todo; }
-      var valor = valores[real] || '';
-      if (!valor) faltan.push(nombreDeHueco(real));
-      return valor;
+      var r = resolverUnHueco(clave, valores, faltan);
+      if (!r.encontrado) { faltan.push(clave); return todo; }
+      return r.valor;
     });
     return { texto: salida, faltan: faltan };
   }
@@ -403,7 +453,8 @@ var Plantillas = (function () {
      como lo trae `App.E.listaAbiertos`/`App.E.listaArchivo` (con
      `.ficha`, `.leido` y, si tiene carpeta, `.handle`). Async porque
      el DNI, los tutores y el registro salen de ficheros. */
-  async function valoresDeAsunto(asunto) {
+  async function valoresDeAsunto(asunto, opciones) {
+    var op = opciones || {};
     var a = asunto || {};
     var categoria = categoriaDelAsunto(a);
     var terceroTexto = terceroDelAsunto(a);
@@ -439,8 +490,38 @@ var Plantillas = (function () {
       direccionCentro: datosCentro.direccion || '',
       codigoCentro: datosCentro.codigo || '',
       cargo: datosCentro.cargo || '',
+      consejeria: datosCentro.consejeria || '',
       campos: camposDelAsuntoDe(a)
     };
+
+    /* {{FIRMANTE}} y compañía (20-sep-2026, fila 81): quien ocupaba el
+       cargo firmante/de visto bueno de la PLANTILLA en la fecha del
+       documento (la de hoy, salvo que `opciones.fecha` diga otra).
+       `opciones.plantilla` es la fila de `documentos[]` que se está
+       generando; sin ella (por ejemplo, para el correo, que no lleva
+       firmante), estos huecos se quedan vacíos, como cualquier otro
+       dato que falte. */
+    var fechaDelDocumento = op.fecha || U.hoyIso();
+    valores.firmante = ''; valores['cargo firmante'] = ''; valores['tratamiento firmante'] = '';
+    valores['visto bueno'] = ''; valores['cargo visto bueno'] = ''; valores['tratamiento visto bueno'] = '';
+    if (op.plantilla && window.Cargos) {
+      if (op.plantilla.firmante) {
+        var firmante = await Cargos.enFecha(op.plantilla.firmante, fechaDelDocumento);
+        if (firmante) {
+          valores.firmante = firmante.persona;
+          valores['cargo firmante'] = firmante.nombre;
+          valores['tratamiento firmante'] = firmante.tratamiento;
+        }
+      }
+      if (op.plantilla.vistoBueno) {
+        var vistoBueno = await Cargos.enFecha(op.plantilla.vistoBueno, fechaDelDocumento);
+        if (vistoBueno) {
+          valores['visto bueno'] = vistoBueno.persona;
+          valores['cargo visto bueno'] = vistoBueno.nombre;
+          valores['tratamiento visto bueno'] = vistoBueno.tratamiento;
+        }
+      }
+    }
 
     /* {quienlopide} y compañía (17-sep-2026, fila 28, docs/LO-PIDE.md):
        vacíos, como cualquier otro hueco, cuando el asunto no tiene el
@@ -471,7 +552,7 @@ var Plantillas = (function () {
   var API = {
     ARCHIVO: ARCHIVO, HUECOS: HUECOS,
     POR_DEFECTO_FIRMA: POR_DEFECTO_FIRMA, POR_DEFECTO_CENTRO: POR_DEFECTO_CENTRO,
-    POR_DEFECTO_NORMATIVA: POR_DEFECTO_NORMATIVA,
+    POR_DEFECTO_NORMATIVA: POR_DEFECTO_NORMATIVA, POR_DEFECTO_MEMBRETE_CAJA: POR_DEFECTO_MEMBRETE_CAJA,
     cargar: cargar, olvidar: olvidar, guardar: guardar,
     deTipo: deTipo, idNuevo: idNuevo, rellenar: rellenar, tieneLoQueFalta: tieneLoQueFalta,
     documentosDeTipo: documentosDeTipo, idNuevoDocumento: idNuevoDocumento,

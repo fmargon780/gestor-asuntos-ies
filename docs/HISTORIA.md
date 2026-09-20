@@ -5,6 +5,62 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 20-sep-2026 — Fila 81: los firmantes del centro y el membrete
+
+`docs/FIRMANTES-Y-MEMBRETE.md`. Un documento generado salía sin membrete y con una firma fija
+escrita a mano en `plantillas.json`. Dos problemas de fondo: las personas que ocupan un cargo
+cambian, y un documento antiguo debería seguir diciendo quién firmaba entonces; y el membrete
+llevaba el nombre de la Consejería dentro de la imagen, así que un cambio de nombre obligaba a
+rehacer la imagen entera.
+
+**Los cargos, con fechas.** `_GESTOR/cargos.json` (decimoséptimo fichero compartido) guarda, por
+cargo, quién lo ha ocupado y desde/hasta cuándo (`hasta` vacío = sigue). `js/cargos.js`
+(`Cargos.enFecha`) resuelve por texto `AAAA-MM-DD`, sin `Date`, para no arrastrar líos de huso
+horario ni depender de que la sesión y el reloj del sistema coincidan de un día para otro. Sin
+fichero, nace con seis cargos de fábrica sin ningún ocupante: Dirección, Vicedirección, Jefatura de
+Estudios, Secretaría, Administración, Orientación. La pantalla (`Cargos.pintarEnAjustes`) vive en
+el mismo fichero que el modelo, como ya hacía `js/recurrentes.js`: separar en un "-ajustes.js" no
+lo pedía el encargo y habría sido una fila más para nada.
+
+**Quién firma cada plantilla.** Cada fila de `documentos[]` en `plantillas.json` gana `firmante`
+y `vistoBueno` (el `id` de un cargo). Los huecos nuevos (`{{FIRMANTE}}`, `{{CARGO FIRMANTE}}`,
+`{{TRATAMIENTO FIRMANTE}}` y su pareja de visto bueno, más `{{CONSEJERIA}}`) van con **doble
+llave**, resueltos aparte de los huecos normales de una sola llave, antes de que
+`Plantillas.rellenar` los vea: con una sola llave, `{CARGO FIRMANTE}` funciona igual de bien
+mientras el texto no lleve nada raro alrededor, pero deja las dos llaves de fuera sueltas en el
+papel en cuanto el hueco viene escrito `{{...}}` (que es como pide escribirlo la fila 83, para que
+no se confunda con un dato de asunto corriente) — así que `Plantillas.rellenar` gana un paso previo
+genérico para cualquier hueco reconocido entre llave doble, no solo para `{{LO QUE FALTA}}` como
+hasta ahora.
+
+**El membrete, sin el nombre de la Consejería dentro.** La imagen (PNG/JPG) se sube una vez, en
+Ajustes → El centro → Membrete, a `_GESTOR/PLANTILLAS/membrete.png`: la única vez que la aplicación
+escribe en esa carpeta (el resto de `PLANTILLAS/` sigue siendo de Francisco). El nombre de la
+Consejería se escribe ENCIMA al generar (`js/membrete.js`, `Membrete.montar`), con un `<canvas>` y
+`createImageBitmap`, según una caja en % del ancho/alto de la imagen (así vale igual si la imagen
+cambia de tamaño). `Membrete.medir` (sin efectos, con las pruebas de siempre) decide el tamaño de
+letra —bajándolo hasta un mínimo del 55 % si no cabe— y, si ni así cabe, parte el texto en dos
+líneas por el espacio más parejo; como no hay canvas en las pruebas, el ancho se estima con un
+factor medio de letra de palo seco, que basta para decidir "cabe"/"no cabe" sin arrastrar la
+máquina de pintar a un contexto sin DOM. La vista previa de Ajustes, en vivo, usa `Membrete.dibujar`
+sobre la imagen y los valores TODAVÍA SIN GUARDAR del formulario: así se ve el resultado de cambiar
+un número sin tener que guardar primero para comprobarlo.
+
+**Meter la imagen en el `.docx`.** `Docx.ponerImagen` (nuevo en `js/docx.js`) busca el párrafo
+`{{MEMBRETE}}` en `word/document.xml` y en cada `word/headerN.xml` (con la misma reparación de
+huecos partidos entre varios `<w:t>` que ya usa `rellenar`, para que un corrector ortográfico de
+Word no rompa la detección) y lo sustituye por un párrafo con un `<w:drawing>` en línea, a 17 cm de
+ancho. Añade la imagen al ZIP, la relación que le toque —creando el `.rels` de cero si el `.docx`
+no traía ninguno— y el tipo `png` a `[Content_Types].xml` si falta. Se aplica ANTES de `rellenar`,
+porque busca el hueco en el XML tal cual viene de la plantilla, no en el texto ya sustituido.
+
+Comprobado con `pruebas/cargos.mjs` (fechas contadas desde hoy, nunca escritas a mano),
+`pruebas/membrete.mjs` (solo `medir`, que es la parte sin efectos) y un escenario nuevo de
+`pruebas/plantillas-documento.mjs` que construye un `.docx` de mentira con `{{MEMBRETE}}` y
+`{{FIRMANTE}}`/`{{TRATAMIENTO FIRMANTE}}`, comprueba con Python `zipfile` (lector independiente del
+propio de `js/docx.js`) que el ZIP de salida es válido, y que el firmante sale del cargo en la
+fecha del documento. Batería completa en verde, una sola pasada al final.
+
 ## 20-sep-2026 — Fila 80: cargar el contenido de la biblioteca
 
 `docs/CARGAR-BIBLIOTECA.md`. Con la herramienta de la fila 79 ya hecha, esta fila la llena con el

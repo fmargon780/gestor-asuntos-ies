@@ -715,4 +715,7 @@ App.pintarAjustesCentro = async function () {
   await App.pintarFicherosDeDatos();
   if (typeof App.pintarDiasDormido === 'function') App.pintarDiasDormido();
   App.pintarDiasCaducidadCopias();
+  /* 20-sep-2026, fila 81, docs/FIRMANTES-Y-MEMBRETE.md. */
+  if (window.Cargos && Cargos.pintarEnAjustes) await Cargos.pintarEnAjustes();
+  if (window.Membrete && Membrete.pintarEnAjustes) await Membrete.pintarEnAjustes();
 };
