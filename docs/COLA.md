@@ -157,7 +157,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 78 | Repartir `docs/contexto/ASUNTOS.md` (ha pasado los 40 KB del objetivo de la fila 65) | HECHA (20-sep-2026 · 08:44) |
 | 79 | `docs/BIBLIOTECA-DE-HITOS.md` | HECHA (20-sep-2026 · 09:32) |
 | 80 | `docs/CARGAR-BIBLIOTECA.md` | HECHA (20-sep-2026 · 09:32) |
-| 81 | `docs/FIRMANTES-Y-MEMBRETE.md` | EN CURSO (20-sep-2026) |
+| 81 | `docs/FIRMANTES-Y-MEMBRETE.md` | HECHA (20-sep-2026 · 11:37) |
 | 82 | `docs/FORMULARIOS-OFICIALES.md` | PENDIENTE |
 | 83 | `docs/PLANTILLAS-DEL-CENTRO.md` | PENDIENTE |
 | 84 | `docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md` | PENDIENTE |

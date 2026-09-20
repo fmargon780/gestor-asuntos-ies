@@ -98,8 +98,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
 - Papelera: nada se borra del todo a la primera.
 - Mandar documentos de un asunto por correo, con un borrador que deja Apps Script en Gmail.
-- Plantillas de correo, de mensaje de Séneca y de documento de Word por tipo de asunto, con
-  huecos que se rellenan solos.
+- Plantillas de correo, de mensaje de Séneca y de documento de Word por tipo, con huecos que se
+  rellenan solos; el de Word ya lleva membrete y la firma del cargo vigente en su fecha.
 - Copias diarias (caducan a los 90 días, configurable), detección de fichero roto, fusión de
   conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un tipo, estado, tipo de
   documento o recurrente borrado ya no reaparece por memoria vieja del otro ordenador.
@@ -140,7 +140,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   nube), Claude Code lo fusiona solo en cuanto esté en verde y sin conflictos. No hace falta
   esperar a que Francisco lo haga a mano (ver la nota al final de `docs/COLA.md`).
 - **Comprobar siempre lo publicado con `curl`**, nunca darla por hecha.
-- Vercel publica como máximo 100 veces al día (plan gratuito): `vercel.json` tiene un `ignoreCommand` que se salta los commits que solo tocan `docs/`, `pruebas/`, `.github/` o `.md`, y la cola tiene la regla 13 (como máximo dos subidas por fila).
+- Vercel publica máximo 100 veces al día: `vercel.json` tiene un `ignoreCommand` que se salta los commits que solo tocan `docs/`, `pruebas/`, `.github/` o `.md`, y la cola tiene la regla 13 (máximo dos subidas por fila).
 - Antes de colgar una función nueva de `App`, comprobar que el nombre no está ya cogido. Solo hay un cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.
 - Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV.
 - Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o se le añade uno. Si no hay más remedio, con `U.envolver`, apuntándolo en `js/envolturas-esperadas.js`.
@@ -171,7 +171,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI" en la tarjeta.
 - Comprobar "Ajustar tamaño" con un documento real. Qué hacer con asuntos vivos al cambiar de curso; pasar repositorio y Vercel a una cuenta del centro.
 - Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
-- Pulsar, cuando pueda, "Poner en orden las fichas del ARCHIVO" (Ajustes → Mantenimiento, fila 64): mueve a su carpeta la ficha de los asuntos archivados antes de esa fila, para que `asuntos.json` deje de crecer con ellos.
+- Pulsar, cuando pueda, "Poner en orden las fichas del ARCHIVO" (Ajustes → Mantenimiento, fila 64): mueve a su carpeta la ficha de los archivados de antes, para aligerar `asuntos.json`.
 - Pulsar, antes de junio de 2027, "Guardar el contacto de los asuntos abiertos" (Ajustes → Mantenimiento, fila 66).
 - Fila 67: añadir un colaborador en GitHub y Vercel, y copiar `docs/LAS-CUENTAS.md` al Dropbox.
 - Decisión de Francisco: ¿debe la papelera vaciarse ella sola a los N días? Mientras no se decida, solo el aviso más insistente, nunca el borrado solo.

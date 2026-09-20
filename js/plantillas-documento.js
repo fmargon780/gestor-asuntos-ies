@@ -104,10 +104,24 @@
       return;
     }
 
-    var valores = await Plantillas.valoresDeAsunto(asunto);
+    var fechaDocumento = U.hoyIso();
+    var valores = await Plantillas.valoresDeAsunto(asunto, { fecha: fechaDocumento, plantilla: plantillaDoc });
+
+    /* Fila 81, 20-sep-2026, docs/FIRMANTES-Y-MEMBRETE.md, parte 3: el
+       membrete se mete ANTES de rellenar los huecos (Docx.ponerImagen
+       nunca toca {{MEMBRETE}} a través de Plantillas.rellenar, así que
+       ese hueco no hace falta añadirlo a Plantillas.HUECOS). Sin
+       imagen guardada, Membrete.montar() devuelve null y el documento
+       sigue igual que hasta hoy. */
+    var conMembrete = buffer;
+    try {
+      var membrete = await Membrete.montar();
+      if (membrete) conMembrete = await Docx.ponerImagen(buffer, 'MEMBRETE', membrete.bytes, membrete.ancho, membrete.alto);
+    } catch (e) { /* sin membrete, el documento se genera igual */ }
+
     var resultado;
     try {
-      resultado = await Docx.rellenar(buffer, valores);
+      resultado = await Docx.rellenar(conMembrete, valores);
     } catch (e) {
       U.aviso('No he podido rellenar el documento: ' + e.message, 'malo');
       return;
@@ -297,7 +311,10 @@
     contenedor.innerHTML =
       '<p class="explica">Sube antes el .docx a Dropbox, dentro de la carpeta de asuntos ' +
       'abiertos, en <code>_GESTOR/PLANTILLAS</code>. Aquí se cuelga de este tipo: el botón ' +
-      '"Generar documento" de la ficha saca una copia ya rellena, sin preguntar nada.</p>' +
+      '"Generar documento" de la ficha saca una copia ya rellena, sin preguntar nada. Si el ' +
+      '.docx trae el hueco <code>{{MEMBRETE}}</code> (con doble llave, en su propio párrafo), ' +
+      'se sustituye por la imagen de Ajustes → El centro → Membrete; "Quién firma" y "Visto ' +
+      'bueno" deciden quién ocupa el cargo firmante en la fecha del documento.</p>' +
       '<div id="tipo-pd-lista" class="rejilla-tipos"></div>' +
       '<button type="button" class="boton boton-principal" id="tipo-pd-nueva" ' +
       'style="margin-top:10px">+ Nueva plantilla</button>' +
@@ -376,6 +393,18 @@
     var categorias = Nombres.CATEGORIAS;
     var categoriaInicial = (existente && existente.categoria) || (tipoPreset && tipoPreset.categoria) || categorias[0];
     var ficheros = await ficherosDeWordDisponibles();
+    /* Fila 81, 20-sep-2026, docs/FIRMANTES-Y-MEMBRETE.md, parte 2:
+       quién firma y quién da el visto bueno, de entre los cargos del
+       centro. */
+    var datosCargos = App.E.gestor ? await Cargos.cargar(App.E.gestor) : { cargos: [] };
+    var cargosOrdenados = Cargos.ordenados(datosCargos);
+
+    function opcionesCargos(idElegido) {
+      return '<option value="">(ninguno)</option>' + cargosOrdenados.map(function (c) {
+        return '<option value="' + U.escapar(c.id) + '"' + (c.id === idElegido ? ' selected' : '') + '>' +
+          U.escapar(c.nombre) + '</option>';
+      }).join('');
+    }
 
     function opcionesTipos(categoria) {
       return opcionesDeCategoria(categoria).map(function (t) {
@@ -418,7 +447,13 @@
           '<input id="pd-texto" class="campo" value="' + U.escapar((existente && existente.texto) || '') + '"></div>' +
       '</div>' +
       '<p class="nota">Con esas dos piezas y la fecha de hoy se monta el nombre del documento ' +
-      'generado (js/nombres.js).</p>';
+      'generado (js/nombres.js).</p>' +
+      '<div class="dos-columnas">' +
+        '<div><label class="etiqueta">Quién firma</label>' +
+          '<select id="pd-firmante" class="campo">' + opcionesCargos((existente && existente.firmante) || '') + '</select></div>' +
+        '<div><label class="etiqueta">Visto bueno <span class="suave">(opcional)</span></label>' +
+          '<select id="pd-visto-bueno" class="campo">' + opcionesCargos((existente && existente.vistoBueno) || '') + '</select></div>' +
+      '</div>';
 
     var promesa = U.preguntar(existente ? 'Editar plantilla de documento' : 'Nueva plantilla de documento',
       cuerpo, existente ? 'Guardar' : 'Crear');
@@ -436,6 +471,8 @@
     var fichero = $('pd-fichero').value;
     var tipoDocumento = $('pd-tipo-doc').value.trim();
     var texto = $('pd-texto').value.trim();
+    var firmante = $('pd-firmante').value;
+    var vistoBueno = $('pd-visto-bueno').value;
 
     if (!nombre || !tipo || !fichero || !tipoDocumento) {
       U.aviso('Hace falta el nombre, el tipo, el fichero y el tipo de documento.', 'malo');
@@ -448,11 +485,13 @@
           var i = actual.documentos.findIndex(function (x) { return x.id === existente.id; });
           if (i !== -1) {
             actual.documentos[i] = { id: existente.id, tipo: tipo, categoria: categoria, nombre: nombre,
-              fichero: fichero, tipoDocumento: tipoDocumento, texto: texto };
+              fichero: fichero, tipoDocumento: tipoDocumento, texto: texto,
+              firmante: firmante, vistoBueno: vistoBueno };
           }
         } else {
           actual.documentos.push({ id: Plantillas.idNuevoDocumento(), tipo: tipo, categoria: categoria,
-            nombre: nombre, fichero: fichero, tipoDocumento: tipoDocumento, texto: texto });
+            nombre: nombre, fichero: fichero, tipoDocumento: tipoDocumento, texto: texto,
+            firmante: firmante, vistoBueno: vistoBueno });
         }
         return actual;
       });

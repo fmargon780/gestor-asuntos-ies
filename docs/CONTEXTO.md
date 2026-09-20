@@ -191,17 +191,18 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `papelera.json` | El índice de la papelera: qué se ha borrado, de dónde y cuándo |
 | `no-duplicados.json` | Grupos de posibles duplicados descartados con "No son el mismo", por la firma de sus nombres |
 | `envios.json` | **Es una lista, no un objeto.** Los encargos vivos de "mandar documentos por correo": `{ id, asunto, para, creado }` |
-| `plantillas.json` | `{ firma, centro, localidad, direccion, codigo, cargo, lista: [{ id, tipo, categoria, nombre, texto }], documentos: [{ id, tipo, categoria, nombre, fichero, tipoDocumento, texto }] }`: `lista` para el correo y el mensaje de Séneca, `documentos` para las plantillas de Word |
+| `plantillas.json` | `{ firma, centro, localidad, direccion, codigo, cargo, consejeria, membreteCaja: { x, y, ancho, alto }, lista: [{ id, tipo, categoria, nombre, texto }], documentos: [{ id, tipo, categoria, nombre, fichero, tipoDocumento, texto, firmante, vistoBueno }] }`: `lista` para el correo y el mensaje de Séneca, `documentos` para las plantillas de Word. `consejeria` y `membreteCaja` son de la fila 81 (el nombre de la Consejería y dónde va, ver "El membrete"); `firmante`/`vistoBueno` (también fila 81) son el `id` de un cargo de `cargos.json`, o vacío |
+| `cargos.json` | `{ cargos: [{ id, nombre, orden, tratamiento, ocupantes: [{ id, persona, desde, hasta }] }] }`: los cargos del centro (Dirección, Jefatura de Estudios…) y quién los ha ocupado, con fechas (20-sep-2026, fila 81, docs/FIRMANTES-Y-MEMBRETE.md, ver "Los cargos del centro") |
 | `hitos.json` | `{ ajustes: { responsables, noLectivos }, porAsunto: { <clave>: { creados, hitos } } }`: los hitos vivos de cada asunto abierto (ver "Los hitos de un asunto") |
 | `grupos.json` | `{ grupos: [{ id, nombre, miembros: [{ categoria, nombre }], creadoPor, creadoEl }] }`: los grupos propios de personas, gestionados en `js/grupos.js` (ver "Grupos de personas") |
 | `usuarios.json` | `{ nombres: [...] }`: los nombres ya usados para entrar, para el desplegable de la pantalla de entrada (`js/usuarios.js`, fila 72). Comparación exacta a propósito: "Francisco" y "francisco" quedan como dos nombres |
 | `borrados-listas.json` | `{ tipos, estados, tiposDocumento, recurrentes }`: cada uno, un array de `{ clave, borradoEl }` con lo borrado de esa lista (`js/borrados-fusion.js`, fila 77). No se enseña en ningún sitio salvo Ajustes → Mantenimiento (cuántos hay y quitarlos pasados 90 días) |
 | `datos/*.csv` | Alumnado (Séneca), personal, empresas y otros |
 | `PAPELERA/` | Las carpetas y ficheros borrados, cada uno en su subcarpeta `AAMMDD-HHMM <nombre>` |
-| `PLANTILLAS/` | Los `.docx` que Francisco sube a mano, colgados de un tipo desde Ajustes › Plantillas de documento. No lleva copia de seguridad: no es uno de los catorce ficheros compartidos |
-| `presencia.json` | `{ <clave del asunto>: { usuario, ultima } }`: quién tiene abierta la ficha de cada asunto, y desde cuándo. **A propósito, fuera de los catorce**: no pasa por `Copias.guardar` (nada de copia de seguridad), no entra en `Papelera` ni en `Conflictos` (si dos versiones chocan, se quedan las dos entradas y punto). Se escribe y relee directo con `Carpetas` (ver "No pisarse en un mismo asunto") |
-| `indice-archivo.json` | `{ version, hechoEl, hechoPor, recuento: { CATEGORIA: nº de carpetas de tercero }, asuntos: [{ nombre, categoria, tercero, ruta, fecha, tipo, curso, grupo, documentos, registros, sueltoEn }] }`: el índice guardado del ARCHIVO (`js/archivo-indice.js`, ver "El índice del ARCHIVO"). **También fuera de los catorce**, por el mismo motivo que `presencia.json`: se puede rehacer entero en cualquier momento con "Reconstruir el índice", así que no necesita copia de seguridad, papelera ni fusión de conflictos. Se escribe y relee directo con `Carpetas` |
-| `copias/*.json` | Copias de seguridad de los catorce ficheros de arriba, una por día, 30 como mucho de cada uno |
+| `PLANTILLAS/` | Los `.docx` que Francisco sube a mano, colgados de un tipo desde Ajustes › Plantillas de documento. No lleva copia de seguridad: no es uno de los diecisiete ficheros compartidos |
+| `presencia.json` | `{ <clave del asunto>: { usuario, ultima } }`: quién tiene abierta la ficha de cada asunto, y desde cuándo. **A propósito, fuera de los diecisiete**: no pasa por `Copias.guardar` (nada de copia de seguridad), no entra en `Papelera` ni en `Conflictos` (si dos versiones chocan, se quedan las dos entradas y punto). Se escribe y relee directo con `Carpetas` (ver "No pisarse en un mismo asunto") |
+| `indice-archivo.json` | `{ version, hechoEl, hechoPor, recuento: { CATEGORIA: nº de carpetas de tercero }, asuntos: [{ nombre, categoria, tercero, ruta, fecha, tipo, curso, grupo, documentos, registros, sueltoEn }] }`: el índice guardado del ARCHIVO (`js/archivo-indice.js`, ver "El índice del ARCHIVO"). **También fuera de los diecisiete**, por el mismo motivo que `presencia.json`: se puede rehacer entero en cualquier momento con "Reconstruir el índice", así que no necesita copia de seguridad, papelera ni fusión de conflictos. Se escribe y relee directo con `Carpetas` |
+| `copias/*.json` | Copias de seguridad de los diecisiete ficheros de arriba, una por día, 30 como mucho de cada uno |
 
 **Los CSV van en `datos`, no en `_GESTOR`.** `js/rescate-datos.js` los baja solos al entrar.
 
@@ -214,7 +215,7 @@ Cada nota de `asuntos.json` es `{ texto, quien, cuando }`, y las de correo lleva
 la aplicación escribe `seguidos.json` para el recolector de Apps Script.
 
 **Todo fichero compartido se relee justo antes de escribirlo.** Son dos ordenadores sobre la
-misma carpeta: sin releer, el último en guardar borra lo del otro. Lo hacen los catorce ficheros de
+misma carpeta: sin releer, el último en guardar borra lo del otro. Lo hacen los diecisiete ficheros de
 arriba.
 
 ### Copias de seguridad y fichero roto
@@ -223,12 +224,12 @@ arriba.
 JSON está roto, lanza un error `FicheroRoto` en vez de devolver `null` (antes se trataba igual
 que si no existiera, y el siguiente guardado lo escribía encima, perdiendo todo).
 
-- `js/copias.js` guarda, antes de escribir cualquiera de los catorce ficheros compartidos, una
+- `js/copias.js` guarda, antes de escribir cualquiera de los diecisiete ficheros compartidos, una
   copia de cómo estaba justo antes, en `_GESTOR/copias/<nombre>-AAMMDD.json`. Una copia por
   fichero y día; se conservan las últimas 30 de cada uno.
 - Todo lo que escribe uno de esos ficheros llama a `Copias.guardar` en vez de a
   `Carpetas.guardarJson` directamente.
-- Al pulsar Entrar se comprueban los catorce ficheros (`Copias.comprobarTodos`). Si alguno está
+- Al pulsar Entrar se comprueban los diecisiete ficheros (`Copias.comprobarTodos`). Si alguno está
   roto, **no se entra**: sale un aviso en rojo con un botón para restaurar la última copia de
   cada uno. El fichero roto se aparta como `<nombre>-roto-AAMMDD-HHMM.json` y no se borra nunca.
 - En Ajustes, el bloque **Copias de seguridad** enseña cuántas copias hay de cada fichero y deja

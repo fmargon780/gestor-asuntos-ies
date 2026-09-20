@@ -5,6 +5,67 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 20-sep-2026 — Fila 81: los firmantes del centro y el membrete
+
+`docs/FIRMANTES-Y-MEMBRETE.md`, acordada con Francisco tras las filas 79 y 80, junto con las
+filas 82, 83 y 84 (apuntadas de golpe en `docs/COLA-NUEVAS-2026-09-20.md` y trasladadas a
+`docs/COLA.md`). Resuelve los dos huecos que quedaban en un documento generado: salía sin
+membrete, y la firma era un texto fijo que había que corregir a mano cada vez que cambiaba el
+equipo directivo, sin que los documentos antiguos dijeran quién firmaba entonces.
+
+**Los cargos, con fechas.** `_GESTOR/cargos.json` (decimoséptimo fichero compartido) guarda, por
+cargo, quién lo ha ocupado y desde/hasta cuándo. `js/cargos.js` separa a propósito la parte que
+lee y escribe disco de la parte que decide quién está vigente: `Cargos.enFecha(datos, idCargo,
+fecha)` es una función sin efectos, que recibe los datos ya cargados y nunca toca el disco — así
+se puede probar sin navegador y sin depender de la fecha de hoy en la prueba misma (todas las
+fechas de `pruebas/cargos.mjs` se cuentan desde `U.hoyIso()`, nunca escritas a mano). Con dos
+ocupantes cuyas fechas se tocan sin solaparse ni dejar hueco, `enFecha` siempre encuentra al que
+tocaba; con un hueco entre el cese de uno y el alta del siguiente, devuelve `null` a propósito
+(nadie ocupaba el cargo esos días) en vez de inventarse un firmante.
+
+**El membrete, sin rehacer la imagen.** `js/membrete.js` separa igual la cuenta (`Membrete.medir`,
+sin efectos: tamaño de letra y si hace falta partir en dos líneas) de lo que sí necesita
+navegador (`Membrete.montar`, que pinta con `canvas`). La cuenta de `medir` no usa `canvas` ni
+`measureText` de verdad: usa una anchura media de letra (0,56 del tamaño, para Arial/Helvetica),
+suficiente para decidir si el texto cabe sin tener que pintar nada — así la función se puede
+probar sin navegador, que es lo que hace `pruebas/membrete.mjs`.
+
+**Meter una imagen en un `.docx` a mano fue la parte más delicada.** `js/docx.js` ya sabía leer y
+reescribir un ZIP sin librerías (fila 17); `Docx.ponerImagen` amplía eso para además AÑADIR una
+entrada nueva que no existía (`word/media/membrete.png`) y remendar tres piezas más del paquete:
+la relación en el `_rels` que le toque (creándolo desde cero si el documento no traía ninguno,
+con un `Id` de un espacio de nombres propio, `rIdMembrete1`, para no chocar nunca con los `rId`
+que ya use Word), `[Content_Types].xml` (declarar la extensión `png` si no estaba) y el párrafo
+del hueco `{{MEMBRETE}}`, sustituido entero por un `<w:drawing>` en línea. Ese último dibujo
+declara TODOS los espacios de nombres que necesita (`wp`, `a`, `pic`, `r`) directamente en el
+propio fragmento en vez de fiarse de que la raíz del documento ya los traiga: los `.docx` mínimos
+que montará `scripts/hacer-plantillas.mjs` (fila 83) solo declaran `w`, así que sin esto el
+membrete se habría roto en las plantillas nuevas del centro y habría funcionado por casualidad en
+las que suba Francisco a mano desde Word de verdad.
+
+**Por qué `{{MEMBRETE}}` no es un hueco de `Plantillas.HUECOS` como los demás.** Lleva doble
+llave, como `{{LO QUE FALTA}}` (fila 59), y a propósito: `Docx.ponerImagen` se aplica ANTES de
+`Docx.rellenar`, así que ese hueco nunca llega a pasar por `Plantillas.rellenar`. Meterlo en el
+catálogo de huecos de una sola llave habría hecho que, si algún día faltase la imagen, el hueco se
+sustituyera por texto vacío y desapareciera del documento sin dejar rastro de qué faltaba; tal
+como está, sin imagen guardada `Membrete.montar()` devuelve `null` y el párrafo se queda tal cual
+en el documento, a la vista.
+
+**La prueba de verdad (escenario 9 de `pruebas/plantillas-documento.mjs`) junta las dos partes**:
+mete la imagen con `Docx.ponerImagen`, comprueba que el ZIP resultante trae la entrada nueva, su
+relación y el tipo de contenido, y después rellena ESE MISMO documento (ya con el dibujo dentro)
+con `Docx.rellenar`, comprobando que `{FIRMANTE}` sale con quien ocupaba el cargo hace 200 días
+(fecha del documento), no con quien lo ocupa hoy — las dos personas del cargo de prueba se crean
+con fechas relativas a hoy, nunca escritas a mano.
+
+Ficheros nuevos: `js/cargos.js`, `js/membrete.js`, `js/cargos-ajustes.js`, `js/membrete-ajustes.js`,
+`pruebas/cargos.mjs`, `pruebas/membrete.mjs`. Tocados: `js/plantillas.js` (`consejeria`,
+`membreteCaja`, los siete huecos nuevos, `valoresDeAsunto(asunto, opciones)`), `js/docx.js`
+(`Docx.ponerImagen`), `js/plantillas-documento.js` (mete el membrete al generar, y "Quién
+firma"/"Visto bueno" en el alta de una plantilla), `js/copias.js` (`cargos.json`, decimoséptimo),
+`js/ajustes-centro.js` (engancha los dos bloques nuevos) e `index.html` (los dos bloques y los
+seis `<script>`). Batería completa en verde, una sola pasada al final.
+
 ## 20-sep-2026 — Fila 80: cargar el contenido de la biblioteca
 
 `docs/CARGAR-BIBLIOTECA.md`. Con la herramienta de la fila 79 ya hecha, esta fila la llena con el

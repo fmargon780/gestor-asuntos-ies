@@ -547,6 +547,67 @@
         </div>
       </details>
 
+      <!-- Fila 81, 20-sep-2026, docs/FIRMANTES-Y-MEMBRETE.md, parte 3:
+           el membrete deja de ser una imagen fija con el nombre de la
+           Consejería dentro; la imagen se sube una vez, sin ese
+           nombre, y se escribe encima con lo que diga aquí. Lo pinta y
+           lo guarda js/membrete-ajustes.js. -->
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Membrete</span>
+          <span class="bloque-pie">La imagen de arriba de la página, con el nombre de la Consejería escrito encima</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Sube la imagen del membrete <strong>sin el nombre de la Consejería</strong>:
+         ese nombre se escribe encima con lo que pongas aquí debajo, así que cuando la Consejería
+         cambie de nombre basta con corregir esta línea, sin rehacer la imagen.</p>
+      <label class="etiqueta">Imagen del membrete (PNG o JPG)</label>
+      <input type="file" id="membrete-elegir-imagen" accept="image/png,image/jpeg" class="campo">
+      <div id="membrete-estado-imagen" class="suave" style="margin:6px 0"></div>
+      <label class="etiqueta">Nombre de la Consejería</label>
+      <input id="plantillas-consejeria" class="campo" placeholder="Consejería de Desarrollo Educativo y Formación Profesional">
+      <details style="margin-top:8px">
+        <summary>Dónde va el nombre de la Consejería</summary>
+        <div class="bloque-cuerpo">
+        <p class="nota">Los cuatro números son porcentajes del ancho o del alto de la imagen: así
+           la misma caja vale aunque la imagen se cambie por otra de distinto tamaño.</p>
+        <div class="dos-columnas">
+          <div><label class="etiqueta">Borde izquierdo (% del ancho)</label>
+            <input id="membrete-caja-x" type="number" step="0.1" class="campo"></div>
+          <div><label class="etiqueta">Línea base (% del alto)</label>
+            <input id="membrete-caja-y" type="number" step="0.1" class="campo"></div>
+        </div>
+        <div class="dos-columnas">
+          <div><label class="etiqueta">Ancho máximo del texto (% del ancho)</label>
+            <input id="membrete-caja-ancho" type="number" step="0.1" class="campo"></div>
+          <div><label class="etiqueta">Altura máxima de la letra (% del alto)</label>
+            <input id="membrete-caja-alto" type="number" step="0.1" class="campo"></div>
+        </div>
+        </div>
+      </details>
+      <button type="button" class="boton" id="membrete-guardar" style="margin-top:8px">Guardar membrete</button>
+      <label class="etiqueta" style="margin-top:10px">Vista previa</label>
+      <div id="membrete-vista-previa" class="vista-previa"></div>
+        </div>
+      </details>
+
+      <!-- Fila 81, 20-sep-2026, docs/FIRMANTES-Y-MEMBRETE.md, parte 1:
+           quién ocupa cada cargo del centro, con fechas. Lo pinta y lo
+           guarda js/cargos-ajustes.js. -->
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Cargos del centro</span>
+          <span class="bloque-pie">Quién ocupa cada cargo, para firmar los documentos que le tocan</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Un documento generado lo firma quien ocupaba el cargo <strong>en la fecha
+         del propio documento</strong>, no quien lo ocupa hoy. Al cambiar de persona, cierra al
+         ocupante anterior y añade el nuevo: los documentos antiguos siguen diciendo quién firmaba
+         entonces.</p>
+      <div id="tabla-cargos" class="lista"></div>
+        </div>
+      </details>
+
       <!-- Fila 57, 18-sep-2026, docs/HUECO-PARA-SELLO-Y-FIRMA.md: las
            dos medidas que usa "Ajustar tamaño" (antes "Preparar el
            documento", fila 58). Las lee y las guarda js/ajustes-centro.js. -->
@@ -703,6 +764,11 @@
 <script src="js/almacen.js"></script>
 <script src="js/carpetas.js"></script>
 <script src="js/copias.js"></script>
+<!-- js/cargos.js (fila 81, 20-sep-2026, docs/FIRMANTES-Y-MEMBRETE.md):
+     los cargos del centro y quién los ocupa, con fechas. Va después de
+     js/copias.js (usa Copias.guardar) y antes de js/plantillas.js, que
+     usa Cargos.enFecha para el hueco {FIRMANTE}. -->
+<script src="js/cargos.js"></script>
 <script src="js/usuarios.js"></script>
 <script src="js/nombres.js"></script>
 <script src="js/plazos.js"></script>
@@ -894,6 +960,11 @@
      (docs/PLANTILLAS-DE-DOCUMENTO.md, 7): usan Plantillas.valoresDeAsunto
      y, para el botón "Generar documento" de la ficha, el mismo enganche
      de App.abrirFicha que ya usa js/correo.js. -->
+<!-- js/membrete.js (fila 81): monta la imagen del membrete con el
+     nombre de la Consejería escrito encima. Va después de js/plantillas.js
+     (lee membreteCaja/consejeria) y antes de js/plantillas-documento.js,
+     que lo llama al generar. -->
+<script src="js/membrete.js"></script>
 <script src="js/docx.js"></script>
 <script src="js/plantillas-documento.js"></script>
 <script src="js/salir.js"></script>
@@ -956,6 +1027,11 @@
 <script src="js/ajustes-tipo.js"></script>
 <script src="js/ajustes-tipo-palabras-clave.js"></script>
 <script src="js/ajustes-centro.js"></script>
+<!-- Fila 81, 20-sep-2026, docs/FIRMANTES-Y-MEMBRETE.md: los bloques
+     "Cargos del centro" y "Membrete" de Ajustes → El centro. Van
+     después de js/ajustes-centro.js: App.pintarAjustesCentro los llama. -->
+<script src="js/cargos-ajustes.js"></script>
+<script src="js/membrete-ajustes.js"></script>
 <script src="js/ajustes-mantenimiento.js"></script>
 <!-- Fila 80, 20-sep-2026, docs/CARGAR-BIBLIOTECA.md: el botón que
      carga el contenido de la biblioteca del centro, en Mantenimiento. -->

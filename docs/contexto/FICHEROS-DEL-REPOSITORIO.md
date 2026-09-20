@@ -22,6 +22,7 @@ de `App` va después del fichero que lo define.
 | `js/almacen.js` | Guarda los ajustes en el navegador |
 | `js/carpetas.js` | Habla con el selector de carpetas del navegador. Lee y escribe los JSON. `Carpetas.esCarpetaTemporalDeSincronizacion` descarta, en un solo sitio, las carpetas y ficheros que dejan Dropbox y Drive al sincronizar; `contarFicheros`/`copiarDentro`/la fusión los saltan, y un fichero que desaparece a mitad de copia se reintenta una vez |
 | `js/copias.js` | Copia de seguridad diaria de los ficheros de `_GESTOR`, y detección de fichero roto. Se borran solas las de más de 90 días (configurable), aunque no lleguen a 30 (fila 72) |
+| `js/cargos.js` | Los cargos del centro y quién los ocupa, con fechas (`_GESTOR/cargos.json`, `window.Cargos`, fila 81) |
 | `js/usuarios.js` | La lista de nombres de quien entra (`_GESTOR/usuarios.json`), para el desplegable de la pantalla de entrada (fila 72) |
 | `js/borrados-fusion.js` | `_GESTOR/borrados-listas.json`: los borrados de tipos, estados, tipos de documento y recurrentes, marcados en vez de quitados del todo, para que no reaparezcan solos al fusionar con el otro ordenador (fila 77). El bloque de Ajustes → Mantenimiento que dice cuántos hay y deja quitarlos pasados 90 días vive en el mismo fichero |
 | `js/conflictos.js` | Las copias en conflicto que deja Dropbox: fusión sola o aviso para elegir |
@@ -57,6 +58,8 @@ de `App` va después del fichero que lo define.
 | `js/ajustes-tipo.js` | La pantalla propia de un tipo de asunto, con sus ocho secciones (17-sep-2026, fila 39) |
 | `js/ajustes-tipo-palabras-clave.js` | La sección "Palabras clave" de la pantalla de un tipo: `palabrasClave` en `tipos.json` (17-sep-2026, fila 41) |
 | `js/ajustes-centro.js` | La pestaña "El centro" de Ajustes: estados, tipos de documento, campos propios, grupos, ficheros de datos, abreviatura de grupos (17-sep-2026, fila 39) |
+| `js/cargos-ajustes.js` | El bloque "Cargos del centro" de Ajustes → El centro: tarjeta por cargo, ocupante vigente, avisos de solape, añadir/cerrar (fila 81) |
+| `js/membrete-ajustes.js` | El bloque "Membrete" de Ajustes → El centro: subir la imagen, el nombre de la Consejería, la caja en porcentaje y la vista previa en vivo (fila 81) |
 | `js/ajustes-mantenimiento.js` | La pestaña "Mantenimiento" de Ajustes: avisos de vencimiento, carpetas de este ordenador, copias y papelera (17-sep-2026, fila 39) |
 | `js/cargar-biblioteca.js` | El botón "Cargar la biblioteca del centro" (fila 80, 20-sep-2026), en Ajustes → Mantenimiento: lee `datos-biblioteca/biblioteca-centro.json` con `fetch` y lo fusiona con `tipos.json`, `campos.json`, `hitos-biblioteca.json` y `guias.json`, sin pisar nada ya escrito |
 | `herramientas/cargar-biblioteca.mjs` | Programa de una sola vez (fila 80): lee `docs/contenido/BIBLIOTECA-*.md` y genera `datos-biblioteca/biblioteca-centro.json`. Se ejecuta a mano con Node cuando el contenido cambie; no lo carga `index.html` |
@@ -111,8 +114,9 @@ de `App` va después del fichero que lo define.
 | `js/idea.js` | El usuario IdEA de una persona (y el de sus tutores legales), leído por el título de columna del CSV, como `js/dni.js` (fila 47) |
 | `js/seneca-destinatarios.js` | La lista de usuarios IdEA del cuadro de Séneca, en chips, con "Copiar la lista"/"Copiar el siguiente" (fila 47) |
 | `js/seneca-ayudante.js`, `css/relacionados.css` (`.marcado-chip-copiado`) | El enlace-marcador que pega los usuarios IdEA uno a uno en Séneca (fila 47) |
-| `js/docx.js` | Rellenar los huecos de una plantilla de Word: ZIP y XML a mano, sin librerías (`window.Docx`) |
-| `js/plantillas-documento.js` | Botón "Generar documento" en la ficha; desde el 17-sep-2026 (fila 39) pinta solo las plantillas de documento de un tipo dentro de su pantalla (`PlantillasDocumento.pintarDeTipo`, `css/plantillas-documento.css`) |
+| `js/membrete.js` | Monta el membrete: la imagen de `_GESTOR/PLANTILLAS/membrete.png` con el nombre de la Consejería escrito encima (`window.Membrete`, `medir` sin efectos, `montar` con canvas, fila 81) |
+| `js/docx.js` | Rellenar los huecos de una plantilla de Word: ZIP y XML a mano, sin librerías (`window.Docx`). Desde la fila 81, también `Docx.ponerImagen` (mete el membrete en el sitio de `{{MEMBRETE}}`) |
+| `js/plantillas-documento.js` | Botón "Generar documento" en la ficha; desde el 17-sep-2026 (fila 39) pinta solo las plantillas de documento de un tipo dentro de su pantalla (`PlantillasDocumento.pintarDeTipo`, `css/plantillas-documento.css`). Desde la fila 81, mete el membrete y pasa la fecha/plantilla a `Plantillas.valoresDeAsunto` para el firmante |
 | `js/salir.js` | El botón de Salir del pie de la barra |
 | `js/rescate-datos.js` | Recoge los CSV que se hayan quedado un piso más arriba |
 | `js/traer-datos.js` | El botón de traer los CSV de Séneca desde donde estén |
@@ -161,7 +165,9 @@ de `App` va después del fichero que lo define.
 | `pruebas/hitos.mjs` | Prueba de los hitos de un asunto: crearlos, marcarlos, bifurcaciones, plazo, responsable y el historial al archivar |
 | `pruebas/que-me-toca.mjs` | Prueba de "Qué me toca": los tres bloques, el filtro por responsable, abrir la ficha con el hito desplegado y la cuenta de la barra |
 | `pruebas/cuentas.mjs` | Prueba de "Cuentas" (fila 74), sin navegador: cuentas por tipo (con "Sin clasificar"), cursos disponibles, por mes, por quién lo pidió, cuánto se tarda y el texto para "Copiar la tabla" |
-| `pruebas/plantillas-documento.mjs` | Prueba (jsdom, sin navegador) de las plantillas de documento: la reparación de huecos partidos, las cuatro clases de hueco, "faltan", el escapado XML, releer el ZIP de salida, el nombre del documento y un `plantillas.json` viejo |
+| `pruebas/plantillas-documento.mjs` | Prueba (jsdom, sin navegador) de las plantillas de documento: la reparación de huecos partidos, las cuatro clases de hueco, "faltan", el escapado XML, releer el ZIP de salida, el nombre del documento, un `plantillas.json` viejo y, desde la fila 81, `{{MEMBRETE}}` + `{FIRMANTE}` juntos (la imagen dentro del ZIP, el firmante según la fecha del documento) |
+| `pruebas/cargos.mjs` | Prueba (sin navegador) de `Cargos.enFecha`/`vigente`/`solapes`: ocupante único, cadena de dos, fecha anterior a todos, hueco entre cese y alta, un solape, sin solape, cargo sin ocupantes, cargo desconocido (fila 81) |
+| `pruebas/membrete.mjs` | Prueba (sin navegador) de `Membrete.medir`: nombre corto (una línea, tamaño máximo), largo (dos líneas), intermedio (una línea, tamaño reducido) y texto vacío (fila 81) |
 | `pruebas/lo-pide.mjs` | Prueba (jsdom, sin navegador) de "Lo pide": opciones y controles, la línea legible, qué casilla se marca en el correo, los cuatro huecos y "Quitar el dato" |
 | `pruebas/biblioteca-de-hitos.mjs` | Prueba (jsdom, sin navegador) de la biblioteca de hitos (fila 79): crear un modelo y traerlo a dos tipos, "solo aquí"/"subir también", el aviso en el otro tipo y "Dejarlo como está", borrar un modelo, un paso-pregunta, si un hito nace informativo, y el enlace de una referencia de normativa |
 | `pruebas/nombre-corto-de-tipo.mjs` | Prueba (sin navegador) del nombre corto de un tipo (fila 79, apartado 4.9): el nombre de la carpeta, que `Nombres.leer` lo reconozca, y que cambiarlo no toque los asuntos ya creados |
