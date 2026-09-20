@@ -194,6 +194,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `hitos.json` | `{ ajustes: { responsables, noLectivos }, porAsunto: { <clave>: { creados, hitos } } }`: los hitos vivos de cada asunto abierto (ver "Los hitos de un asunto") |
 | `grupos.json` | `{ grupos: [{ id, nombre, miembros: [{ categoria, nombre }], creadoPor, creadoEl }] }`: los grupos propios de personas, gestionados en `js/grupos.js` (ver "Grupos de personas") |
 | `usuarios.json` | `{ nombres: [...] }`: los nombres ya usados para entrar, para el desplegable de la pantalla de entrada (`js/usuarios.js`, fila 72). Comparación exacta a propósito: "Francisco" y "francisco" quedan como dos nombres |
+| `borrados-listas.json` | `{ tipos, estados, tiposDocumento, recurrentes }`: cada uno, un array de `{ clave, borradoEl }` con lo borrado de esa lista (`js/borrados-fusion.js`, fila 77). No se enseña en ningún sitio salvo Ajustes → Mantenimiento (cuántos hay y quitarlos pasados 90 días) |
 | `datos/*.csv` | Alumnado (Séneca), personal, empresas y otros |
 | `PAPELERA/` | Las carpetas y ficheros borrados, cada uno en su subcarpeta `AAMMDD-HHMM <nombre>` |
 | `PLANTILLAS/` | Los `.docx` que Francisco sube a mano, colgados de un tipo desde Ajustes › Plantillas de documento. No lleva copia de seguridad: no es uno de los catorce ficheros compartidos |
@@ -251,8 +252,14 @@ Si los dos ordenadores guardan casi a la vez, Dropbox no pisa nada: deja aparte 
   en `_GESTOR/copias` antes de decidir.
 - **Releer antes de escribir**, en todos los ficheros compartidos: antes de guardar se relee el
   fichero y se suma lo que el otro ordenador haya añadido y nosotros no tengamos
-  (`App.fusionarConDisco`). **No se detectan los borrados** del otro ordenador (aviso vigente,
-  ver `CONTEXTO-CORTO.md`, sección 8).
+  (`App.fusionarConDisco`). Por sí sola, no detecta los borrados del otro ordenador. Para tipos,
+  estados, tipos de documento y recurrentes (fila 77, 20-sep-2026, `js/borrados-fusion.js`) eso ya
+  no importa: borrar marca la clave en `_GESTOR/borrados-listas.json` en vez de solo quitarla de
+  la lista, y cada `guardarX()` (`App.guardarTipos`, `App.guardarEstados`,
+  `App.guardarTiposDocumento`, el `guardar()` de `js/recurrentes.js`) quita de lo fusionado
+  cualquier clave que siga marcada, así que el borrado se respeta aunque el otro ordenador todavía
+  tenga el elemento en memoria. Dar de alta a mano (o devolver desde la papelera) quita la marca:
+  un alta explícita gana siempre a un borrado viejo, sin necesitar saber fechas de alta.
 
 Se comprueba con `pruebas/conflictos.mjs`.
 
@@ -436,11 +443,11 @@ Aparte, en `localStorage`: `gestor-barra`, `gestor-filtros`, `gestor-lector-anch
 18. **Cuando el uso lo pida**: búsqueda dentro de las notas, cuentas por tipo para la memoria de
     fin de curso, qué hacer con los asuntos vivos al cambiar de curso, y pasar el repositorio y
     Vercel a una cuenta del centro para el relevo.
-19. Los borrados en `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` no
-    se fusionan entre ordenadores (solo las altas, ver "Copias en conflicto de Dropbox" arriba).
-    Y las copias en conflicto de `guias.json`, `recurrentes.json` y `frescura.json` no se
-    fusionan solas: avisan en Ajustes para elegir con cuál quedarse. Revisar si con el uso hace
-    falta algo más fino.
+19. Las copias en conflicto de `guias.json`, `recurrentes.json` y `frescura.json` (las que deja
+    Dropbox si los dos ordenadores guardan casi a la vez) no se fusionan solas: avisan en Ajustes
+    para elegir con cuál quedarse. Revisar si con el uso hace falta algo más fino. (Los borrados de
+    `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` sí se fusionan ya,
+    desde la fila 77, 20-sep-2026: ver "Copias en conflicto de Dropbox" arriba.)
 20. `js/papelera.js` no sabe devolver una plantilla de correo borrada (clase `'plantilla'`, no
     estaba en el encargo de las plantillas): si hace falta, se copia a mano desde el bloque
     Papelera de Ajustes.
