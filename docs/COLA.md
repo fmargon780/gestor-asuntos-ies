@@ -161,14 +161,13 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 82 | `docs/FORMULARIOS-OFICIALES.md` | HECHA (20-sep-2026) |
 | 83 | `docs/PLANTILLAS-DEL-CENTRO.md` | HECHA (20-sep-2026): doce plantillas (ocho de documento, cuatro de correo), una muestra representativa de las tres categorías, no las cincuenta y tantas de la biblioteca de golpe — decisión tomada para no sacrificar calidad por cantidad. Detalle en `docs/HISTORIA.md` |
 | 84 | `docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md` | HECHA (20-sep-2026): sin salida a internet en esta sesión (como la fila 63), así que `formularios/` se queda sin los once PDF; el resto del mecanismo (mapa de casillas, propuesta automática, "Preparar para el tercero") está hecho y probado con PDF de mentira. Ver la fila 85 |
-| 85 | Copiar a `formularios/` los once PDF en blanco que faltan | PENDIENTE (20-sep-2026): `datos/formularios.json` ya trae la clave `f` con el nombre de fichero que le toca a cada uno. Copiar tal cual, sin tocar nada de código, de: `O-I.pdf`, `O-II.pdf`, `O-III.pdf`, `O-IV.pdf`, `O-V.pdf`, `O-VI.pdf`, `O-VII.pdf`, `O-VIII.pdf`, `O-IX.pdf`, `O11-VI.pdf`, `O11-VII.pdf` (las direcciones de origen, en `datos/formularios.json`, clave `u` de cada entrada) |
+| 85 | Copiar a `formularios/` los once PDF en blanco que faltan | BLOQUEADA (20-sep-2026): sin salida a internet desde esta sesión (mismo motivo que las filas 63 y 84). `datos/formularios.json` ya trae la clave `f` con el nombre de fichero que le toca a cada uno. Copiar tal cual, sin tocar nada de código, de: `O-I.pdf`, `O-II.pdf`, `O-III.pdf`, `O-IV.pdf`, `O-V.pdf`, `O-VI.pdf`, `O-VII.pdf`, `O-VIII.pdf`, `O-IX.pdf`, `O11-VI.pdf`, `O11-VII.pdf` (las direcciones de origen, en `datos/formularios.json`, clave `u` de cada entrada) |
 
-**Orden de trabajo:** todas las filas de 1 a 84 están HECHAS, salvo la 63 y la 76, BLOQUEADAS (una
-sesión sin salida a internet, la otra por el riesgo de tocar el mecanismo de publicación sin
-Francisco delante). Queda la fila **85** (20-sep-2026): copiar a mano los once PDF que la fila 84
-no pudo bajar, sin salida a internet en esa sesión — como la 63. Cuando se apunte una fila nueva,
-esta nota se sustituye por la que toque: no hay que mantener el repaso de las filas ya hechas más
-que en `docs/HISTORIA.md`.
+**Orden de trabajo:** todas las filas de 1 a 85 están HECHAS, salvo la 63, la 76 y la 85,
+BLOQUEADAS (la 63 y la 85 por sesiones sin salida a internet; la 76 por el riesgo de tocar el
+mecanismo de publicación sin Francisco delante). **No queda ninguna fila PENDIENTE.** Cuando se
+apunte una fila nueva, esta nota se sustituye por la que toque: no hay que mantener el repaso de
+las filas ya hechas más que en `docs/HISTORIA.md`.
 
 **El orden de trabajo NO es el de los números.** La tabla de arriba está puesta **en el orden en que
 hay que hacerlas**, de arriba abajo, y por eso la 65 aparece entre la 62 y la 63. Los números no se
