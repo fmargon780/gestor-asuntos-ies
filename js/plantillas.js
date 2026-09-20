@@ -28,6 +28,10 @@ var Plantillas = (function () {
   var ARCHIVO = 'plantillas.json';
   var POR_DEFECTO_FIRMA = 'Un saludo.\n{usuario}\n{centro}';
   var POR_DEFECTO_CENTRO = 'IES Fuente Lucena';
+  /* 20-sep-2026, fila 79, apartado 4.7: la dirección base del sistema
+     de normativa del centro, para montar el enlace de una referencia.
+     Vacía, las citas se ven sin enlace y no se rompe nada. */
+  var POR_DEFECTO_NORMATIVA = 'https://normativa-escolarizacion.vercel.app';
 
   /* Los huecos que se conocen, con el nombre en cristiano que se
      enseña en Ajustes y en el aviso de "Faltan datos". `{campo:LO QUE
@@ -95,6 +99,7 @@ var Plantillas = (function () {
       direccion: l.direccion || '',
       codigo: l.codigo || '',
       cargo: l.cargo || '',
+      direccionNormativa: (typeof l.direccionNormativa === 'string') ? l.direccionNormativa : POR_DEFECTO_NORMATIVA,
       lista: Array.isArray(l.lista) ? l.lista : [],
       /* Plantillas de documento de Word (docs/PLANTILLAS-DE-DOCUMENTO.md,
          3.4): { id, categoria, tipo, nombre, fichero, tipoDocumento,
@@ -466,6 +471,7 @@ var Plantillas = (function () {
   var API = {
     ARCHIVO: ARCHIVO, HUECOS: HUECOS,
     POR_DEFECTO_FIRMA: POR_DEFECTO_FIRMA, POR_DEFECTO_CENTRO: POR_DEFECTO_CENTRO,
+    POR_DEFECTO_NORMATIVA: POR_DEFECTO_NORMATIVA,
     cargar: cargar, olvidar: olvidar, guardar: guardar,
     deTipo: deTipo, idNuevo: idNuevo, rellenar: rellenar, tieneLoQueFalta: tieneLoQueFalta,
     documentosDeTipo: documentosDeTipo, idNuevoDocumento: idNuevoDocumento,

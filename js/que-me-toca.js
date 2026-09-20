@@ -70,6 +70,9 @@
       if (!entrada || !entrada.hitos.length) return;
       Hitos.visibles(entrada.hitos).forEach(function (h) {
         if (h.estado !== 'pendiente' && h.estado !== 'encurso') return;
+        /* 20-sep-2026, fila 79, apartado 4.6: un hito solo informativo
+           no reclama trabajo, así que no sale aquí. */
+        if (h.soloInformativo) return;
         items.push({ asunto: a, hito: h });
       });
     });

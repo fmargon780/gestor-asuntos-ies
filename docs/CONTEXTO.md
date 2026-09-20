@@ -15,7 +15,8 @@ que cambie algo general).
 
 | Documento | Qué lleva |
 |---|---|
-| `docs/contexto/ASUNTOS.md` | Crear, editar, archivar/reabrir, unir, duplicados y papelera de un asunto |
+| `docs/contexto/ASUNTOS.md` | Crear, editar, la ficha, "Lo pide" y duplicados de un asunto |
+| `docs/contexto/ASUNTOS-ARCHIVO.md` | Papelera, archivar/reabrir, atascos, índice del ARCHIVO y fichas huérfanas (partido de `ASUNTOS.md` en la fila 78) |
 | `docs/contexto/PERSONAS.md` | Terceros, RegAlum, personal, empresas, grupos, DNI y la ficha del tercero |
 | `docs/contexto/DOCUMENTOS.md` | El nombre y el registro de un documento, el código de verificación, "Por clasificar" |
 | `docs/contexto/DOCUMENTOS-PDF.md` | Generar el documento de Word, separar/unir un PDF y ajustar su tamaño |

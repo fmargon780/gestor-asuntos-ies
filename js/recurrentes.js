@@ -163,9 +163,15 @@
      crea, el tipo, el año académico si el recurrente lo lleva, el texto
      libre y el tercero al final. */
   function nombreDe(r, fecha) {
+    /* El nombre corto del tipo (20-sep-2026, fila 79, apartado 4.9):
+       `r.tipo` se queda con el nombre de siempre (es el que guarda el
+       propio recurrente y el que se usa luego para crear el asunto,
+       vía App.crearAsuntoDesdeRecurrente más abajo); solo el nombre de
+       la carpeta pasa por Nombres.tipoParaCarpeta. */
+    var tipoObj = (window.App && App.E && App.E.tipos || []).filter(function (t) { return t.tipo === r.tipo; })[0];
     return Nombres.montar({
       fecha: fecha,
-      tipo: r.tipo,
+      tipo: tipoObj ? Nombres.tipoParaCarpeta(tipoObj) : r.tipo,
       curso: r.curso || U.cursoDeFecha(fecha),
       grupo: '',
       descripcion: r.descripcion || '',

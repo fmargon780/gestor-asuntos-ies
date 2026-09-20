@@ -5,6 +5,144 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 20-sep-2026 — Fila 80: cargar el contenido de la biblioteca
+
+`docs/CARGAR-BIBLIOTECA.md`. Con la herramienta de la fila 79 ya hecha, esta fila la llena con el
+contenido que Francisco y Claude prepararon en otra conversación (`docs/contenido/BIBLIOTECA-
+ALUMNADO.md`, `-PERSONAL.md` y `-EMPRESAS-Y-OTROS.md`, cerca de 55 tipos de asunto de un IES
+andaluz).
+
+**Cómo se carga.** `herramientas/cargar-biblioteca.mjs` (Node, se ejecuta a mano cuando el
+contenido cambie) lee los tres documentos y escribe `datos-biblioteca/biblioteca-centro.json`, un
+dato estático más de la aplicación (como `js/lib/pdf.min.mjs`). `js/cargar-biblioteca.js` es el
+botón nuevo en Ajustes → Mantenimiento, "Cargar la biblioteca del centro": lo lee con `fetch` y lo
+fusiona con `tipos.json`, `campos.json`, `hitos-biblioteca.json` y `guias.json` — nunca pisa nada
+ya escrito, y se puede pulsar más de una vez sin duplicar.
+
+**Decisiones del programa que carga el contenido, para que quede escrito por qué:**
+
+- El tramo de "plazo" de cada línea del documento (casi siempre una frase — "el mismo día", "antes
+  de imponer nada, sin excepción" — no un número) **no** se convierte al campo `plazo` de la
+  aplicación (una fecha calculada, `{dias, desde}`): eso habría rellenado casi todos los plazos con
+  una interpretación mía, exactamente lo que la regla 3 del encargo prohíbe ("los plazos que el
+  documento deja vacíos, se dejan vacíos"). Se deja como parte de la explicación del hito. Lo mismo
+  con "comunica:" (a quién se avisa, no la plantilla del correo: esa se escribe con el uso).
+- **Un hito que se repite se guarda una sola vez**: se deduplica por título + responsable exactos.
+  Con 69 tipos y cerca de 300 líneas de hito, sin esto la biblioteca habría nacido con decenas de
+  copias de "Grabar en Séneca". Dos hitos con el mismo título pero distinto responsable sí son dos
+  modelos: de verdad los hace gente distinta.
+- **"Mismos hitos que X."** (SUMINISTRO, OBRA y CONTRATO MENOR, en EMPRESAS, dicen literalmente que
+  tienen los mismos diez pasos que COMPRA): en vez de repetirlos, esos tipos apuntan a la misma
+  lista de modelos ya creada para COMPRA. Es el mismo mecanismo de la fila 79, ya en el contenido
+  de partida.
+- Dos campos (`Colectivo`, en PERSONAL; `Objeto`, en EMPRESAS) son de lista cerrada, pero sus
+  valores están explicados en la prosa de cada documento, no en la propia línea "Campos:": se
+  dejan a mano en el programa (`CAMPOS_LISTA_CONOCIDOS`), más fiable que adivinar una enumeración
+  dentro de un párrafo.
+- `CONTRATO MENOR` es, según la prosa del documento, "el tipo que hoy se llama CONTRATO": una
+  frase así no se intenta parsear sola, va a mano en `RENOMBRES_ESPECIALES`.
+
+**Lo que no ha resuelto solo, y queda a la vista de Francisco:** con la regla de arriba de que el
+segmento sin prefijo después del responsable es "el plazo" y no una explicación, unas pocas líneas
+del documento (el propio responsable escrito como una frase, del tipo "el mismo día" o "según cuál
+sea") acaban guardadas tal cual en el campo `responsable` del modelo. No es un dato perdido ni un
+error de guardado: se ve rarísimo como una insignia corta, pero está todo el texto. Se corrige a
+mano, en dos clics, desde Ajustes → El centro → Biblioteca de hitos → Editar el modelo (el mismo
+editor de un paso que ya existía).
+
+Comprobado con `pruebas/cargar-biblioteca.mjs` (jsdom, un contenido pequeño inventado para la
+prueba, no el real): altas, renombrados con nombre corto, modelos compartidos entre dos tipos,
+campos propios, una guía ya escrita a mano que no se toca, y que cargarlo dos veces no duplica
+nada. El contenido real se ha comprobado a mano mirando la salida de
+`node herramientas/cargar-biblioteca.mjs` (69 tipos, 296 modelos, 69 guías, 21 tipos con campos
+propios) y revisando varios tipos completos contra el documento de origen.
+
+## 20-sep-2026 — Fila 79: la biblioteca de hitos del centro
+
+`docs/BIBLIOTECA-DE-HITOS.md`. Hasta hoy la guía de un tipo se escribía a mano, paso por paso, sin
+reutilizar nada entre tipos casi idénticos. Se construye una **biblioteca de hitos del centro**:
+una colección de hitos modelo, guardada una sola vez en `_GESTOR/hitos-biblioteca.json` (el
+decimosexto fichero compartido), que se trae a la guía de un tipo como copia.
+
+**Lo que ve Francisco**, con detalle en `docs/contexto/HITOS-Y-GUIAS.md` (sección nueva) y
+`docs/contexto/CAMPOS-Y-TIPOS.md`: "+ Traer de la biblioteca" y "Guardar en la biblioteca" en el
+cuadro de la guía; el aviso ámbar de un paso desactualizado en la pantalla de un tipo, con "Ver el
+cambio"; un hito puede marcarse "Solo informativo" (se ve, no reclama trabajo) y llevar su
+normativa citada, con enlace al sistema de normativa del centro; un Tipo de Asunto puede llevar un
+nombre corto para el nombre de la carpeta; el bloque "Biblioteca de hitos" en Ajustes → El centro.
+
+**El truco de "solo hay un cuadro de diálogo".** Toda la aplicación tiene una sola regla de oro
+para `U.preguntar`: nunca dos a la vez. "Traer de la biblioteca" y "Guardar en la biblioteca"
+pasan mientras el cuadro de la guía SIGUE ABIERTO, así que no pueden abrir un segundo
+`U.preguntar`: se resuelven con un panel dentro del propio cuadro, con el mismo patrón que ya
+usaba "guia-enlace-fila". En cambio, la revisión automática al pulsar Guardar
+(`GuiasBiblioteca.revisarAlGuardar`) se dispara DESPUÉS de que `U.preguntar` haya cerrado `#capa`
+al resolver su promesa: ahí sí se puede volver a abrir un cuadro, uno por paso cambiado. Las dos
+mitades del mismo problema, resueltas de dos formas distintas porque el momento en que se disparan
+es distinto.
+
+**Qué cuenta como cambio, y qué no.** `HitosBiblioteca.diferencias` compara un paso con su modelo
+por: título, explicación, responsable, estado del asunto, plazo, requisitos, comunicación y
+normativa. `soloInformativo` queda fuera a propósito (es una decisión de cada tipo, no del
+modelo). El aviso en los DEMÁS tipos (apartado 4.4) no compara contenido en directo: compara
+`origenBiblioteca.revision` contra la del modelo. Así, "Solo en este tipo" y "Dejarlo como está"
+pueden silenciar el aviso para siempre (marcando `divergido: true`, o subiendo la `revision`
+apuntada) aunque el contenido del paso siga siendo distinto del modelo — es la propia decisión de
+Francisco de que esa copia es suya, no un olvido que haya que seguir recordándole.
+
+**El arreglo suelto del apartado 9: el tipo renombrado que resucitaba.** `App.renombrarTipo`
+cambiaba el nombre y guardaba, pero nunca marcaba el nombre viejo como borrado en
+`js/borrados-fusion.js` (fila 77): `App.fusionarConDisco` veía el nombre viejo como algo que el
+otro ordenador tenía de más, y lo devolvía a la vida como tipo fantasma en cuanto alguien guardara
+cualquier otra cosa con su copia vieja en memoria — exactamente lo que le pasó a Francisco con
+ANULACIÓN/ANULACIÓN MATRÍCULA y con DTMA. Mismo arreglo en `App.renombrarEstado`
+(`js/ajustes-centro.js`); los tipos de documento no tienen función de renombrar, así que no
+aplica. De paso, `App.borrarTipo` ya no cuenta como "en uso" un tipo cuyo nombre figura como alias
+de otro tipo vivo: sin eso, un tipo fantasma no se podía borrar nunca, porque las carpetas
+archivadas con su nombre viejo se le seguían adjudicando a él.
+
+**Lo que se ha dejado fuera, a propósito, de esta fila:**
+
+- El `?v=` de caché en los `<script>` de `index.html` (para que una publicación nueva llegue
+  siempre, aunque el navegador tenga una copia vieja): el propio encargo lo marca como "aparte, y
+  conviene", no como parte de la fila. Tocar el mecanismo de carga de TODA la aplicación sin que
+  Francisco esté delante para comprobarlo es más riesgo del que compensa aquí; queda para otra
+  fila si hace falta de verdad.
+- Los tres buscadores (Ajustes, Nuevo asunto, ARCHIVO) buscan hoy por el nombre de siempre y por
+  los alias; no se ha extendido explícitamente la búsqueda por el nombre corto en los dos primeros
+  (el del ARCHIVO sí lo encuentra, porque pasa por `Nombres.leer`, ya arreglado). No es un fallo
+  conocido, solo una comprobación que no ha dado tiempo a hacer a fondo.
+- No se ha escrito una prueba de navegador nueva para la interfaz de la fila (el panel de "traer",
+  los paneles en línea, el aviso ámbar): las pruebas de esta fila son todas de lógica pura
+  (`pruebas/biblioteca-de-hitos.mjs`, `pruebas/nombre-corto-de-tipo.mjs`), más una escena nueva en
+  `pruebas/borrados-que-se-fusionan.mjs` para el apartado 9. Es la misma cobertura que ya tienen
+  `js/campos-catalogo.js` o `js/hitos-requisitos.js`: bien probados por dentro, sin foto de
+  Playwright de la pantalla entera.
+
+Ficheros nuevos: `js/hitos-biblioteca.js`, `js/hitos-normativa.js`, `js/guias-biblioteca.js`,
+`pruebas/biblioteca-de-hitos.mjs`, `pruebas/nombre-corto-de-tipo.mjs`. Tocados, lo mínimo:
+`js/guias.js` (ya rondaba las 900 líneas: los botones nuevos y la casilla llaman a los ficheros de
+arriba, la lógica no vive aquí), `js/hitos.js`, `js/hitos-archivo.js`, `js/hitos-panel-lista.js`,
+`js/que-me-toca.js`, `js/nombres.js` (y los siete sitios que montan un nombre de carpeta:
+`js/asuntos-nuevo.js`, `js/asuntos-editar.js`, `js/recurrentes.js`, `js/bandeja-correos.js`),
+`js/ajustes-tipo.js`, `js/ajustes.js`, `js/ajustes-centro.js`, `js/plantillas.js`,
+`js/plantillas-ajustes.js`, `js/copias.js`, `js/guias-enganche.js` (gana `guardarPasos`, para
+escribir una guía sin reabrir el editor), `index.html` (los `<script>` nuevos y el campo de
+dirección del sistema de normativa), `css/guias.css`, `css/hitos.css`.
+
+## 20-sep-2026 — Fila 78: repartir docs/contexto/ASUNTOS.md
+
+`docs/contexto/ASUNTOS.md` había llegado a 44,9 KB, por encima del objetivo de 40 KB de la fila 65
+(`docs/DOCUMENTOS-QUE-QUEPAN.md`). Se partió por el medio, moviendo texto tal cual, sin resumir ni
+reescribir nada: `docs/contexto/ASUNTOS.md` se queda con crear, editar, la ficha de un asunto
+abierto, "Lo pide" y los duplicados (27,4 KB); el nuevo `docs/contexto/ASUNTOS-ARCHIVO.md` se lleva
+la papelera, archivar/reabrir, los atascos al archivar, el índice del ARCHIVO, la ficha de un
+asunto archivado y las fichas huérfanas (18,3 KB). Se actualizó el índice de `docs/CONTEXTO.md` con
+la fila nueva, y la única referencia cruzada que apuntaba al contenido movido
+(`docs/contexto/HITOS-Y-GUIAS.md`, la pantalla Cuentas citando "El índice del ARCHIVO"). Ninguna
+prueba automática cubre esto: se comprobó a mano que la suma de los dos trozos coincide con el
+original y que ningún documento vivo pasa ya de 40 KB.
+
 ## 20-sep-2026 — Fila 77: los borrados que se fusionan
 
 `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 3, separado de la fila 72 el 19-sep-2026 al ver que

@@ -538,6 +538,11 @@
       </div>
       <label class="etiqueta">Dirección del centro</label>
       <input id="plantillas-direccion" class="campo">
+      <!-- Fila 79, 20-sep-2026, docs/BIBLIOTECA-DE-HITOS.md, apartado 4.7:
+           el enlace de una referencia de normativa de un hito se monta
+           contra esta dirección. Vacío, las citas se ven sin enlace. -->
+      <label class="etiqueta">Dirección del sistema de normativa</label>
+      <input id="plantillas-direccion-normativa" class="campo" placeholder="https://normativa-escolarizacion.vercel.app">
       <button type="button" class="boton" id="plantillas-guardar-firma">Guardar firma y centro</button>
         </div>
       </details>
@@ -704,6 +709,11 @@
 <script src="js/guias.js"></script>
 <script src="js/guias-requisitos.js"></script>
 <script src="js/guias-comunicacion.js"></script>
+<!-- Fila 79, 20-sep-2026, docs/BIBLIOTECA-DE-HITOS.md: la biblioteca de
+     hitos del centro, después de js/guias.js y sus dos ayudantes. -->
+<script src="js/hitos-biblioteca.js"></script>
+<script src="js/hitos-normativa.js"></script>
+<script src="js/guias-biblioteca.js"></script>
 <script src="js/datos.js"></script>
 <script src="js/campos.js"></script>
 <script src="js/documentos.js"></script>
@@ -947,6 +957,9 @@
 <script src="js/ajustes-tipo-palabras-clave.js"></script>
 <script src="js/ajustes-centro.js"></script>
 <script src="js/ajustes-mantenimiento.js"></script>
+<!-- Fila 80, 20-sep-2026, docs/CARGAR-BIBLIOTECA.md: el botón que
+     carga el contenido de la biblioteca del centro, en Mantenimiento. -->
+<script src="js/cargar-biblioteca.js"></script>
 
 <!-- Y ahora sí, a arrancar. -->
 <script src="js/inicio.js"></script>

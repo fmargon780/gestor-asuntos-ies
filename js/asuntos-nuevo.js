@@ -488,6 +488,18 @@ $('campo-fecha').oninput = function () {
 });
 $('campo-grupo').onchange = function () { App.refrescarVista(); };
 
+/* El nombre de la carpeta lleva el nombre corto del tipo si lo tiene
+   (20-sep-2026, fila 79, apartado 4.9): `d.tipo` no se toca, porque
+   también alimenta `datosNuevoAsunto.tipo`, que tiene que quedarse
+   con el nombre de siempre (lo buscan por él la guía del tipo, las
+   cuentas de asuntos con ese tipo...). Solo el nombre que se monta
+   pasa por Nombres.tipoParaCarpeta. */
+function nombreDeCarpetaPropuesto(d) {
+  var tipo = App.E.tipos.filter(function (t) { return t.tipo === d.tipo; })[0];
+  var copia = Object.assign({}, d, { tipo: tipo ? Nombres.tipoParaCarpeta(tipo) : d.tipo });
+  return Nombres.montar(copia);
+}
+
 App.datosDelFormulario = function () {
   var camposParaNombre = App.valoresCamposActuales()
     .filter(function (v) { return v.enNombre && v.valor; })
@@ -511,7 +523,7 @@ App.datosDelFormulario = function () {
 App.refrescarVista = function () {
   if (!App.E.nuevo.tipo || !App.E.nuevo.tercero) return;
   var d = App.datosDelFormulario();
-  var nombre = Nombres.montar(d);
+  var nombre = nombreDeCarpetaPropuesto(d);
   $('vista-nombre').textContent = nombre;
   $('vista-ruta').textContent = 'En ' + App.E.abiertos.name +
     '. Al cerrarlo irá a ' + App.E.archivo.name + ' / ' + App.E.nuevo.categoria + ' / ' + d.tercero;
@@ -525,7 +537,7 @@ App.LARGO_MAXIMO_NOMBRE = 180;
 $('btn-crear').onclick = async function () {
   if (!App.validarCamposObligatorios()) return;
   var d = App.datosDelFormulario();
-  var nombre = Nombres.montar(d);
+  var nombre = nombreDeCarpetaPropuesto(d);
   if (!nombre) return;
 
   if (nombre.length > App.LARGO_MAXIMO_NOMBRE) {

@@ -66,6 +66,67 @@ cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegi
 
 Se comprueba con `pruebas/guias.mjs` y `pruebas/opciones.mjs`.
 
+### La biblioteca de hitos del centro (20-sep-2026, fila 79, docs/BIBLIOTECA-DE-HITOS.md)
+
+Muchos pasos se repiten entre tipos de asunto casi idénticos ("Registrar de salida en Séneca",
+"Comunicar a la familia"...). La biblioteca guarda cada uno **una sola vez**, en
+`_GESTOR/hitos-biblioteca.json` (el decimosexto fichero compartido), y se trae a la guía de un tipo
+como **copia**.
+
+- **Traer uno** (`js/guias-biblioteca.js`, `GuiasBiblioteca.engancharPanelTraer`): en el cuadro de
+  la guía, junto a "Añadir un paso", el botón "+ Traer de la biblioteca" abre un panel **dentro del
+  propio cuadro** (nunca un segundo `U.preguntar`). El paso insertado (`HitosBiblioteca.modeloAPaso`)
+  lleva `origenBiblioteca: { id, revision, divergido }`, que lo distingue de uno escrito a mano.
+- **Guardar en la biblioteca** (`GuiasBiblioteca.botonHTML`/`engancharBoton`): junto a los mandos de
+  cada paso. Si el paso no viene de la biblioteca, pide un nombre y crea un modelo con `revision: 1`.
+  Si viene de la biblioteca y ha cambiado, ofrece "Solo en este tipo" (el paso queda `divergido:
+  true` y no vuelve a avisar de ese cambio) o "Subir también" (sube la `revision` del modelo). Los
+  dos casos usan un panel en línea, con el mismo patrón que `guia-enlace-fila`: el cuadro de la guía
+  sigue abierto, así que no cabe un segundo `U.preguntar`.
+- **Al pulsar Guardar de la guía** (`GuiasBiblioteca.revisarAlGuardar`, llamado desde
+  `Guias.editar`): esto SÍ ocurre después de que `U.preguntar` haya cerrado `#capa`, así que aquí sí
+  se abre un `U.preguntar` por cada paso cambiado (uno detrás de otro, nunca dos a la vez), con la
+  misma pregunta de arriba.
+- **El aviso en los demás tipos** (`GuiasBiblioteca.pasosDesactualizados`/`abrirComparacion`, llamado
+  desde `js/ajustes-tipo.js`, sección "Pasos del trámite"): una línea `.aviso-compartido` por paso
+  con `origenBiblioteca.revision` por detrás de la del modelo, con "Ver el cambio" (comparación campo
+  a campo, `GuiasBiblioteca.comparacionHTML`) y las opciones "Traer el cambio" (conserva la marca
+  `soloInformativo` del tipo, nunca la pisa el modelo) / "Dejarlo como está" (calla el aviso sin
+  tocar el paso). Se escribe con `GuiasDelCentro.guardarPasos(tipo, pasos)`, sin reabrir el editor.
+- **La comparación** siempre por los mismos campos (`HitosBiblioteca.diferencias`): título,
+  explicación, responsable, estado del asunto, plazo, requisitos, comunicación y normativa.
+  **`soloInformativo` no cuenta como cambio**: es una decisión de cada tipo, no del modelo.
+- **Solo informativo** (apartado 4.6): campo `soloInformativo` en un paso de guía, un modelo y un
+  hito. Se ve en gris con la etiqueta "Informativo", no sale en "Qué me toca" ni en "Dormidos", no
+  cuenta como pendiente. Se enciende/apaga con un clic: la casilla del editor del paso, o "Pedírmelo
+  a mí"/"Dejarlo solo informativo" en los botones del propio hito (`Hitos.guardarCampos`, afecta solo
+  a ese hito de ese asunto). Al traer un modelo, nace marcado si su responsable no es el que
+  Francisco tenga configurado como Administración (`HitosBiblioteca.naceSoloInformativo`); sin poder
+  determinarlo, nace sin marcar.
+- **Normativa** (apartado 4.7, `js/hitos-normativa.js`): campo `normativa`, lista de
+  `{ cita, bloque, clave, url }`. Con `bloque`+`clave`, el enlace se monta contra el sistema de
+  normativa del centro (`HitosBiblioteca.enlaceDeNormativa`, dirección base en Ajustes → El centro,
+  `_GESTOR/plantillas.json`, campo `direccionNormativa`); con solo `url`, usa esa; sin nada, la cita
+  se ve como texto. Se ve igual en un hito y en la vista de solo lectura de los pasos de un tipo
+  (`Guias.vista`). `HitosNormativa.refrescar()` mantiene la dirección base en caché, actualizada por
+  `window.Gestor.alRefrescar`.
+- **El bloque de Ajustes → El centro** (`GuiasBiblioteca.pintarAjustes`, colgado solo de
+  `#ajustes-tab-centro`): lista de modelos, crear uno desde cero, editarlo (reutiliza `Guias.editar`
+  con una lista de un solo paso) y borrarlo (avisa, sin bloquear, de en qué tipos está en uso;
+  `HitosBiblioteca.tiposQueUsan`).
+- **Nombre corto del tipo** (apartado 4.9, `Nombres.tipoParaCarpeta(tipo)`): campo `nombreCorto` en
+  `tipos.json`. Entra en el nombre de la carpeta y del asunto en vez del nombre de siempre; vacío, se
+  usa el nombre de siempre. Se escribe en la sección "Datos del tipo" de `js/ajustes-tipo.js`, con
+  aviso (ámbar si pasa de 16 caracteres; rojo si otro tipo ya lo usa, por `U.parecidos`).
+  `Nombres.leer` reconoce también el nombre corto en una carpeta ya creada (no es un alias: es el
+  nombre que se usa desde ahora). Cambiarlo no toca ninguna carpeta ya creada.
+- **No entra en esta fila**: los pasos-pregunta no se guardan en la biblioteca
+  (`HitosBiblioteca.esPasoValido`); las plantillas de correo y de Séneca de un paso no se cargan
+  (se escriben con el uso).
+
+Se comprueba con `pruebas/biblioteca-de-hitos.mjs` y `pruebas/nombre-corto-de-tipo.mjs`, sin
+navegador.
+
 ### Los hitos de un asunto
 
 Dentro de un asunto abierto, la guía **es** la lista de **hitos** que se trabaja: cada paso, vivo
@@ -290,7 +351,7 @@ cuánto se tarda** de todos los asuntos, abiertos y archivados.
 
 - **De dónde salen los números**: nunca se recorre el ARCHIVO. Los abiertos, de
   `window.Gestor.asuntos()`; los archivados, de `IndiceArchivo.leerDisco()` (el mismo índice de
-  "El índice del ARCHIVO", en `docs/contexto/ASUNTOS.md`). Si el índice no está hecho o es de
+  "El índice del ARCHIVO", en `docs/contexto/ASUNTOS-ARCHIVO.md`). Si el índice no está hecho o es de
   otra versión, la pantalla lo dice y remite a ARCHIVO → "Reconstruir el índice": **no** lo
   reconstruye ella sola ni enseña números a medias.
 - **El curso académico** de un asunto sale de su **fecha de apertura** (septiembre a diciembre,

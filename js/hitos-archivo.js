@@ -102,6 +102,10 @@
       if ('titulo' in cambios) h.titulo = String(cambios.titulo || '');
       if ('responsable' in cambios) h.responsable = String(cambios.responsable || '');
       if ('fecha' in cambios) { h.fecha = String(cambios.fecha || ''); h.fechaManual = !!cambios.fecha; }
+      /* 20-sep-2026, fila 79, apartado 4.6: "Pedírmelo a mí" / "Dejarlo
+         solo informativo", del menú del propio hito. Afecta solo a este
+         hito de este asunto, nunca a la guía del tipo. */
+      if ('soloInformativo' in cambios) h.soloInformativo = !!cambios.soloInformativo;
     });
   }
 

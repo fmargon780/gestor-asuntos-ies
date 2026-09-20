@@ -125,8 +125,39 @@ var Guias = (function () {
       responsable: String((p && p.responsable) || ''),
       estadoAsunto: (p && p.estadoAsunto) || null,
       plazo: (p && p.plazo && p.plazo.dias)
-        ? { dias: parseInt(p.plazo.dias, 10) || 0, desde: String(p.plazo.desde || '') } : null
+        ? { dias: parseInt(p.plazo.dias, 10) || 0, desde: String(p.plazo.desde || '') } : null,
+      /* 20-sep-2026, fila 79, apartados 4.6, 4.7 y 4.1
+         (docs/BIBLIOTECA-DE-HITOS.md): igual que lo de arriba, solo
+         existen en los pasos de arriba, nunca en una opción. */
+      soloInformativo: !!(p && p.soloInformativo),
+      normativa: normalizarNormativa(p && p.normativa),
+      origenBiblioteca: (p && p.origenBiblioteca && p.origenBiblioteca.id)
+        ? { id: p.origenBiblioteca.id, revision: parseInt(p.origenBiblioteca.revision, 10) || 1,
+            divergido: !!p.origenBiblioteca.divergido }
+        : null
     };
+  }
+
+  /* "Normativa" de un paso (18-sep-2026 → 20-sep-2026, fila 79, apartado
+     4.7): una lista de referencias, cada una con su cita (lo único
+     obligatorio), y opcionalmente el bloque y la clave del sistema de
+     normativa del centro, o un enlace propio. La clave se guarda
+     siempre con guion, nunca con espacio (si Francisco escribe uno, se
+     convierte al guardar, sin avisar). Sin cita, la referencia no
+     sobrevive: mismo criterio que un requisito sin texto. */
+  function normalizarReferenciaNormativa(r) {
+    return {
+      id: (r && r.id) || nuevoId(),
+      cita: String((r && r.cita) || ''),
+      bloque: String((r && r.bloque) || ''),
+      clave: String((r && r.clave) || '').trim().replace(/\s+/g, '-'),
+      url: String((r && r.url) || '')
+    };
+  }
+
+  function normalizarNormativa(lista) {
+    return (Array.isArray(lista) ? lista : []).map(normalizarReferenciaNormativa)
+      .filter(function (r) { return r.cita; });
   }
 
   function normalizar(lista) {
@@ -226,7 +257,8 @@ var Guias = (function () {
       : '';
 
     var titulo = '<span class="paso-titulo-texto">' +
-                 U.escapar(p.titulo || 'Paso ' + (i + 1)) + '</span>';
+                 U.escapar(p.titulo || 'Paso ' + (i + 1)) +
+                 (p.soloInformativo ? ' <span class="suave">(informativo)</span>' : '') + '</span>';
     /* La pregunta no lleva <label>: no hay casilla que marcar, y con
        label el clic en el título no haría nada. */
     var cabecera = pregunta
@@ -267,6 +299,7 @@ var Guias = (function () {
            (pregunta ? ' paso-pregunta' : '') + '">' +
            cabecera + verlo +
            (conCuerpo ? '<div class="paso-cuerpo-texto">' + limpiar(p.cuerpo) + '</div>' : '') +
+           (window.HitosNormativa ? HitosNormativa.listaHTML(p.normativa) : '') +
            ramas +
            '</li>';
   }
@@ -476,8 +509,22 @@ var Guias = (function () {
       'para ir marcando lo que ya está hecho.</p>' +
       BARRA() +
       '<div id="guia-pasos"></div>' +
-      '<button type="button" class="boton boton-ancho" id="guia-anadir">Añadir un paso</button>',
+      '<div class="guia-anadir-fila">' +
+        '<button type="button" class="boton boton-ancho" id="guia-anadir">Añadir un paso</button>' +
+        (window.GuiasBiblioteca
+          ? '<button type="button" class="boton boton-ancho" id="guia-traer-biblioteca">+ Traer de la biblioteca</button>' +
+            GuiasBiblioteca.panelTraerHTML()
+          : '') +
+      '</div>',
       'Guardar');
+
+    if (window.GuiasBiblioteca) {
+      GuiasBiblioteca.engancharPanelTraer(cuadro, $('guia-traer-biblioteca'), function (modelo) {
+        recoger();
+        pasos.push(HitosBiblioteca.modeloAPaso(modelo));
+        pintar();
+      });
+    }
 
     /* ---------- la barra de formato ---------- */
 
@@ -605,6 +652,14 @@ var Guias = (function () {
            criterio que arriba, solo en los pasos que no son pregunta. */
         if (window.GuiasComunicacion && caja.querySelector(':scope > .paso-comunicacion')) {
           pasos[i].comunicacion = GuiasComunicacion.leer(caja, pasos[i].id);
+        }
+
+        /* "Solo informativo" y "Normativa" (20-sep-2026, fila 79): igual,
+           solo en los pasos que no son pregunta. */
+        var soloInfEl = caja.querySelector(':scope > .paso-solo-informativo-fila .paso-solo-informativo');
+        if (soloInfEl) pasos[i].soloInformativo = soloInfEl.checked;
+        if (window.HitosNormativa && caja.querySelector(':scope > .paso-normativa')) {
+          pasos[i].normativa = HitosNormativa.leer(caja);
         }
 
         var marca = caja.querySelector(':scope > .paso-es-pregunta-fila .paso-es-pregunta');
@@ -751,6 +806,60 @@ var Guias = (function () {
           d.insertAdjacentHTML('beforeend', GuiasComunicacion.bloqueHTML(p.id, p.comunicacion));
           restaurarAbierto(d.querySelector(':scope > .paso-comunicacion'), abiertos, i, '');
           GuiasComunicacion.enganchar(d, p.id);
+        }
+
+        /* "Solo informativo" y "Normativa" (20-sep-2026, fila 79,
+           apartados 4.6 y 4.7): mismo criterio que arriba, solo en los
+           pasos que no son pregunta. */
+        if (!pregunta) {
+          var filaInf = document.createElement('label');
+          filaInf.className = 'interruptor paso-solo-informativo-fila';
+          filaInf.innerHTML = '<input type="checkbox" class="paso-solo-informativo"' +
+            (p.soloInformativo ? ' checked' : '') + '>' +
+            '<span>Solo informativo: se ve, pero no reclama trabajo</span>';
+          d.appendChild(filaInf);
+
+          if (window.HitosNormativa) {
+            d.insertAdjacentHTML('beforeend', HitosNormativa.bloqueHTML(p.normativa));
+            restaurarAbierto(d.querySelector(':scope > .paso-normativa'), abiertos, i, '');
+            HitosNormativa.enganchar(d, function (mutador) {
+              recoger();
+              mutador(pasos[i].normativa);
+              pintar();
+            });
+          }
+
+          /* "Guardar en la biblioteca" (apartados 4.2 y 4.3): junto al
+             resto de los mandos del paso. Sin nada que subir (paso al
+             día con su modelo), el botón no se pinta. */
+          if (window.GuiasBiblioteca && window.HitosBiblioteca) {
+            (function (indice) {
+              HitosBiblioteca.leer().then(function (biblioteca) {
+                /* Puede que ya se haya vuelto a pintar (otra tecla, otro
+                   paso movido) mientras se leía la biblioteca: `d` ya
+                   no estaría en el documento, y tocarlo no serviría de
+                   nada (o peor, duplicaría el botón en el sitio viejo). */
+                if (!d.isConnected) return;
+                var pasoActual = pasos[indice];
+                if (!pasoActual || pasoActual.opciones.length) return;   /* se ha vuelto pregunta mientras leíamos */
+                var modelo = pasoActual.origenBiblioteca ? HitosBiblioteca.buscar(biblioteca, pasoActual.origenBiblioteca.id) : null;
+                var diffs = modelo ? HitosBiblioteca.diferencias(pasoActual, modelo) : [];
+                /* Ya viene de la biblioteca: el botón solo sale si ha
+                   cambiado y Francisco todavía no ha decidido "Solo en
+                   este tipo" para este mismo cambio (apartado 4.2). */
+                if (pasoActual.origenBiblioteca &&
+                    (!modelo || pasoActual.origenBiblioteca.divergido || !diffs.length)) return;
+                var mandosDelPaso = d.querySelector('.paso-mandos');
+                if (!mandosDelPaso) return;
+                mandosDelPaso.insertAdjacentHTML('beforeend', GuiasBiblioteca.botonHTML());
+                GuiasBiblioteca.engancharBoton(d, pasoActual, modelo, diffs, function (origenNuevo) {
+                  recoger();
+                  pasos[indice].origenBiblioteca = origenNuevo;
+                  pintar();
+                });
+              }).catch(function () { /* sin biblioteca legible, el botón simplemente no sale */ });
+            })(i);
+          }
         }
 
         /* ---- la casilla de "esto es una pregunta" ---- */
@@ -907,12 +1016,18 @@ var Guias = (function () {
 
     pintar();
 
-    return esperar.then(function (ok) {
+    return esperar.then(async function (ok) {
       if (ok) recoger();
       cuadro.classList.remove('cuadro-medio');
       editando = null;
       rangoGuardado = null;
       if (!ok) return null;
+      /* Apartado 4.3: el cuadro de la guía ya está cerrado (U.preguntar
+         ha resuelto y ocultado #capa), así que aquí sí se puede volver
+         a abrir un cuadro, uno por cada paso cambiado. */
+      if (window.GuiasBiblioteca) {
+        try { await GuiasBiblioteca.revisarAlGuardar(pasos); } catch (e) { /* no crítico: se guarda igual */ }
+      }
       return normalizar(pasos);
     });
   }
@@ -922,6 +1037,7 @@ var Guias = (function () {
     cuantos: cuantos, vista: vista, hechosDe: hechosDe, cuenta: cuenta,
     esPregunta: esPregunta, cuandoSeElige: cuandoSeElige,
     normalizarRequisitos: normalizarRequisitos, normalizarComunicacion: normalizarComunicacion,
+    normalizarNormativa: normalizarNormativa,
     abrir: abrir, editar: editar
   };
 })();

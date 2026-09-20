@@ -78,7 +78,8 @@ var HitosPanelLista = (function () {
   function filaDeHito(a, raiz, h, ajustes, abierto, nombresDeLaCarpeta) {
     var contexto = contextoResponsable(a);
     var div = document.createElement('div');
-    div.className = 'hito hito-' + h.estado + (h.clase === 'decision' ? ' hito-decision' : '');
+    div.className = 'hito hito-' + h.estado + (h.clase === 'decision' ? ' hito-decision' : '') +
+      (h.soloInformativo ? ' hito-informativo' : '');
     div.dataset.id = h.id;
 
     if (h.clase === 'decision' && !h.elegida) {
@@ -119,6 +120,7 @@ var HitosPanelLista = (function () {
         casilla +
         '<span class="hito-titulo">' + U.escapar(h.titulo) +
           (h.clase === 'decision' ? ' <span class="suave">— ' + U.escapar(elegidaTxt) + '</span>' : '') +
+          (h.soloInformativo ? ' <span class="etiqueta-informativo">Informativo</span>' : '') +
         '</span>' +
         '<span class="hito-meta">' + metaDeHito(h, ajustes, contexto) + '</span>' +
         '<button type="button" class="hito-desplegar" title="Ver más">▾</button>' +
@@ -165,6 +167,7 @@ var HitosPanelLista = (function () {
   function cuerpoDeHito(a, h, ajustes, contexto, abierto, nombresDeLaCarpeta) {
     var trozos = [];
     if (h.cuerpo) trozos.push('<div class="hito-explicacion">' + h.cuerpo + '</div>');
+    if (window.HitosNormativa) trozos.push(HitosNormativa.listaHTML(h.normativa));
 
     if (abierto) {
       var opciones = ajustes.responsables.concat(Hitos.PAPELES);
@@ -234,6 +237,8 @@ var HitosPanelLista = (function () {
         (!htmlRequisitos && window.HitosRequisitos
           ? '<button type="button" class="boton hito-requisitos-anadir-suelto">+ Añadir algo que falte</button>' : '') +
         (window.HitosComunicar ? HitosComunicar.botonHTML(a, h) : '') +
+        '<button type="button" class="boton hito-solo-informativo">' +
+          (h.soloInformativo ? 'Pedírmelo a mí' : 'Dejarlo solo informativo') + '</button>' +
         '<button type="button" class="boton boton-peligro hito-quitar">Quitar este hito</button></div>');
     }
 
@@ -312,6 +317,13 @@ var HitosPanelLista = (function () {
     };
     var cambiarRamaBtn = div.querySelector('.hito-cambiar-rama');
     if (cambiarRamaBtn) cambiarRamaBtn.onclick = function () { mostrarOpcionesDeRama(div, a, h); };
+    var soloInfBtn = div.querySelector('.hito-solo-informativo');
+    if (soloInfBtn) soloInfBtn.onclick = async function () {
+      await U.mientrasGuarda(soloInfBtn, function () {
+        return Hitos.guardarCampos(a.nombre, h.id, { soloInformativo: !h.soloInformativo });
+      });
+      window.HitosPanel.programarRepintado();
+    };
   }
 
   function mostrarOpcionesDeRama(div, a, h) {

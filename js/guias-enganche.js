@@ -162,13 +162,28 @@
     }
   }
 
+  /* Guarda una lista de pasos ya decidida, sin abrir el cuadro de
+     editar (20-sep-2026, fila 79, apartado 4.4): lo usa "Ver el
+     cambio", que ya ha hecho su propia pregunta (Traer el cambio /
+     Dejarlo como está) y solo necesita que el resultado quede escrito.
+     Se relee antes de escribir, como escribirGuia. */
+  async function guardarPasos(nombreTipo, pasosNuevos) {
+    try { await cargar(); } catch (e) { /* se sigue con lo que hay */ }
+    if (pasosNuevos.length) guias[nombreTipo] = pasosNuevos; else delete guias[nombreTipo];
+    await guardar();
+    pintarTabla();
+    pintarGuiaNuevo();
+    await window.Gestor.recargar();
+  }
+
   /* Lo que usa la ficha de un asunto para escribir la guía de su tipo
      sin pasar por Ajustes. Las guías viven en un solo sitio, y es este
      fichero el que las lleva: si la ficha escribiera por su cuenta, las
      dos copias se quedarían distintas. */
   window.GuiasDelCentro = {
     escribir: escribirGuia,
-    pasosDe: function (tipo) { return pasosDe(tipo).slice(); }
+    pasosDe: function (tipo) { return pasosDe(tipo).slice(); },
+    guardarPasos: guardarPasos
   };
 
   /* ---------- arranque ---------- */

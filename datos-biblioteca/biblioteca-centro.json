@@ -1,0 +1,5581 @@
+{
+  "version": 1,
+  "tipos": [
+    {
+      "nombreCorto": "ABSENTISMO",
+      "nombreLargo": "Absentismo escolar",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "CORRECCION",
+      "nombreLargo": "Corrección por conducta contraria a la convivencia",
+      "categoria": "ALUMNADO",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "SANCION",
+      "nombreLargo": "Medida disciplinaria por conducta gravemente perjudicial",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "CAMBIO CENTRO",
+      "nombreLargo": "Expediente de cambio de centro docente",
+      "categoria": "ALUMNADO",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "PROTOCOLO",
+      "nombreLargo": "Protocolo de actuación",
+      "categoria": "ALUMNADO",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "AULA CONVIVENCIA",
+      "nombreLargo": "Atención en el aula de convivencia",
+      "categoria": "ALUMNADO",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "COMPROMISO",
+      "nombreLargo": "Compromiso educativo o de convivencia",
+      "categoria": "ALUMNADO",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "MEDIACION",
+      "nombreLargo": "Mediación escolar",
+      "categoria": "ALUMNADO",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "NEAE",
+      "nombreLargo": "Evaluación psicopedagógica y alumnado NEAE",
+      "categoria": "ALUMNADO",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "MATRICULA",
+      "nombreLargo": "Matrícula del alumnado",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "CAMBIO OPTATIVA",
+      "nombreLargo": "Cambio de materia optativa",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "CAMBIO DE GRUPO",
+      "nombreLargo": "Cambio de grupo",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "ANULACIÓN MATRÍCULA",
+      "nombreLargo": "Anulación de matrícula",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "BAJA",
+      "nombreLargo": "Baja del alumnado",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "ADMISION",
+      "nombreLargo": "Admisión del alumnado",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "TRASLADO",
+      "nombreLargo": "Traslado de expediente, salida",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "EXPTE. ACADEMICO ESO",
+      "nombreLargo": "Apertura de expediente académico de ESO",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "EXP. ACADEMICO BACH",
+      "nombreLargo": "Apertura de expediente académico de Bachillerato",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "TRASLADO MATR VIVA",
+      "nombreLargo": "Autorización de traslado de matrícula en Bachillerato",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "CERTIFICADO",
+      "nombreLargo": "Certificación académica",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "CERT. MATRICULA",
+      "nombreLargo": "Certificación de matrículas en Séneca",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "TITULO",
+      "nombreLargo": "Expedición de título académico",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "RECLAMACION",
+      "nombreLargo": "Reclamación de calificaciones",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "DOCUMENTACION",
+      "nombreLargo": "Entrega de documentación del expediente",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "BECA",
+      "nombreLargo": "Beca o ayuda al estudio",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "SEGURO ESCOLAR",
+      "nombreLargo": "Seguro escolar",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "ACCIDENTE",
+      "nombreLargo": "Accidente de alumnado",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "TRANSPORTE",
+      "nombreLargo": "Transporte escolar",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "CONVALIDACION",
+      "nombreLargo": "Convalidación o exención",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "IPASEN",
+      "nombreLargo": "Alta y gestión de iPasen",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "SITUACIÓN FAMILIAR",
+      "nombreLargo": "Cambio en la situación familiar",
+      "categoria": "ALUMNADO",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "ACCESO A DATOS",
+      "nombreLargo": "Solicitud de acceso a datos personales",
+      "categoria": "ALUMNADO",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "PERMISO",
+      "nombreLargo": "Solicitud de permiso",
+      "categoria": "PERSONAL",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "LICENCIA",
+      "nombreLargo": "Solicitud de licencia",
+      "categoria": "PERSONAL",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "BAJA MEDICA",
+      "nombreLargo": "Incapacidad temporal",
+      "categoria": "PERSONAL",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "AUSENCIA",
+      "nombreLargo": "Justificación de una ausencia",
+      "categoria": "PERSONAL",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "ESTADILLO",
+      "nombreLargo": "Estadillo mensual de ausencias",
+      "categoria": "PERSONAL",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "SUSTITUCION",
+      "nombreLargo": "Petición de sustitución",
+      "categoria": "PERSONAL",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "TOMA POSESION",
+      "nombreLargo": "Toma de posesión",
+      "categoria": "PERSONAL",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "CESE",
+      "nombreLargo": "Cese",
+      "categoria": "PERSONAL",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "DATOS PERSONAL INTERINO",
+      "nombreLargo": "Alta y actualización de datos",
+      "categoria": "PERSONAL",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "CERTIFICADO PERSONAL",
+      "nombreLargo": "Certificado a petición del personal",
+      "categoria": "PERSONAL",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "NOMINA",
+      "nombreLargo": "Incidencias de nómina",
+      "categoria": "PERSONAL",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "COM. PRODUCTIVIDAD",
+      "nombreLargo": "Complemento de productividad",
+      "categoria": "PERSONAL",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "FLEXIBILIDAD",
+      "nombreLargo": "Flexibilidad horaria",
+      "categoria": "PERSONAL",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "FORMACION",
+      "nombreLargo": "Formación y perfeccionamiento",
+      "categoria": "PERSONAL",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "DESEMPEÑO FUNCIONES",
+      "nombreLargo": "Desempeño de funciones",
+      "categoria": "PERSONAL",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "INSUFICIENCIA HORARIA",
+      "nombreLargo": "Insuficiencia de horario y reubicación",
+      "categoria": "PERSONAL",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "COMPRA",
+      "nombreLargo": "Compra de bienes o servicios",
+      "categoria": "EMPRESAS",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "SUMINISTRO",
+      "nombreLargo": "Contrato menor de suministro",
+      "categoria": "EMPRESAS",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "OBRA",
+      "nombreLargo": "Contrato menor de obra",
+      "categoria": "EMPRESAS",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "CONTRATO",
+      "nombreLargo": "Expediente de contrato menor",
+      "categoria": "EMPRESAS",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "MANTENIMIENTO",
+      "nombreLargo": "Contrato de mantenimiento",
+      "categoria": "EMPRESAS",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "GARANTIA",
+      "nombreLargo": "Garantía de un bien o servicio",
+      "categoria": "EMPRESAS",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "PRESUPUESTO",
+      "nombreLargo": "Presupuesto del centro",
+      "categoria": "OTROS",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "CUENTA DE GESTION",
+      "nombreLargo": "Cuenta de gestión y cierre del ejercicio",
+      "categoria": "OTROS",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "RETENCIONES",
+      "nombreLargo": "Retenciones y obligaciones fiscales",
+      "categoria": "OTROS",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "INVENTARIO",
+      "nombreLargo": "Inventario del centro",
+      "categoria": "OTROS",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "GRATUIDAD LIBROS",
+      "nombreLargo": "Programa de gratuidad de libros de texto",
+      "categoria": "OTROS",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "ELECCIONES CONSEJO ESCOLAR",
+      "nombreLargo": "Elecciones al Consejo Escolar",
+      "categoria": "OTROS",
+      "nuevo": true
+    },
+    {
+      "nombreCorto": "CONSEJO ESCOLAR",
+      "nombreLargo": "Sesión del Consejo Escolar",
+      "categoria": "OTROS",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "CORRESPONDENCIA",
+      "nombreLargo": "Correspondencia de entrada o de salida",
+      "categoria": "OTROS",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "SUBVENCION",
+      "nombreLargo": "Subvención",
+      "categoria": "OTROS",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "ACTIVIDAD EXTRAESCOLAR",
+      "nombreLargo": "Actividad complementaria o extraescolar",
+      "categoria": "OTROS",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "INSPECCION",
+      "nombreLargo": "Actuación del Servicio de Inspección",
+      "categoria": "OTROS",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "CONVENIO",
+      "nombreLargo": "Convenio con una entidad",
+      "categoria": "OTROS",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "PROYECTO",
+      "nombreLargo": "Proyecto o programa educativo",
+      "categoria": "OTROS",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "COMUNICADO",
+      "nombreLargo": "Comunicado",
+      "categoria": "OTROS",
+      "nuevo": false
+    },
+    {
+      "nombreCorto": "PARADA TTE. ESCOLAR",
+      "nombreLargo": "Parada de transporte escolar",
+      "categoria": "OTROS",
+      "nuevo": false
+    }
+  ],
+  "camposPorTipo": {
+    "Protocolo de actuación": [
+      {
+        "nombre": "Protocolo",
+        "clase": "lista",
+        "valores": [
+          "acoso escolar",
+          "maltrato infantil",
+          "violencia de género",
+          "agresión al profesorado",
+          "identidad de género"
+        ]
+      }
+    ],
+    "Compromiso educativo o de convivencia": [
+      {
+        "nombre": "Clase de compromiso",
+        "clase": "lista",
+        "valores": [
+          "educativo",
+          "de convivencia"
+        ]
+      }
+    ],
+    "Beca o ayuda al estudio": [
+      {
+        "nombre": "Convocatoria",
+        "clase": "texto",
+        "valores": []
+      }
+    ],
+    "Solicitud de permiso": [
+      {
+        "nombre": "Colectivo",
+        "clase": "lista",
+        "valores": [
+          "Personal docente",
+          "Personal funcionario de administración general",
+          "Personal laboral"
+        ]
+      }
+    ],
+    "Solicitud de licencia": [
+      {
+        "nombre": "Colectivo",
+        "clase": "lista",
+        "valores": [
+          "Personal docente",
+          "Personal funcionario de administración general",
+          "Personal laboral"
+        ]
+      }
+    ],
+    "Incapacidad temporal": [
+      {
+        "nombre": "Colectivo",
+        "clase": "lista",
+        "valores": [
+          "Personal docente",
+          "Personal funcionario de administración general",
+          "Personal laboral"
+        ]
+      }
+    ],
+    "Justificación de una ausencia": [
+      {
+        "nombre": "Colectivo",
+        "clase": "lista",
+        "valores": [
+          "Personal docente",
+          "Personal funcionario de administración general",
+          "Personal laboral"
+        ]
+      }
+    ],
+    "Petición de sustitución": [
+      {
+        "nombre": "Colectivo",
+        "clase": "lista",
+        "valores": [
+          "Personal docente",
+          "Personal funcionario de administración general",
+          "Personal laboral"
+        ]
+      }
+    ],
+    "Toma de posesión": [
+      {
+        "nombre": "Colectivo",
+        "clase": "lista",
+        "valores": [
+          "Personal docente",
+          "Personal funcionario de administración general",
+          "Personal laboral"
+        ]
+      }
+    ],
+    "Cese": [
+      {
+        "nombre": "Colectivo",
+        "clase": "lista",
+        "valores": [
+          "Personal docente",
+          "Personal funcionario de administración general",
+          "Personal laboral"
+        ]
+      }
+    ],
+    "Certificado a petición del personal": [
+      {
+        "nombre": "Colectivo",
+        "clase": "lista",
+        "valores": [
+          "Personal docente",
+          "Personal funcionario de administración general",
+          "Personal laboral"
+        ]
+      }
+    ],
+    "Flexibilidad horaria": [
+      {
+        "nombre": "Colectivo",
+        "clase": "lista",
+        "valores": [
+          "Personal docente",
+          "Personal funcionario de administración general",
+          "Personal laboral"
+        ]
+      }
+    ],
+    "Formación y perfeccionamiento": [
+      {
+        "nombre": "Colectivo",
+        "clase": "lista",
+        "valores": [
+          "Personal docente",
+          "Personal funcionario de administración general",
+          "Personal laboral"
+        ]
+      }
+    ],
+    "Desempeño de funciones": [
+      {
+        "nombre": "Colectivo",
+        "clase": "lista",
+        "valores": [
+          "Personal docente",
+          "Personal funcionario de administración general",
+          "Personal laboral"
+        ]
+      }
+    ],
+    "Compra de bienes o servicios": [
+      {
+        "nombre": "Objeto",
+        "clase": "lista",
+        "valores": [
+          "obra",
+          "suministro",
+          "servicio"
+        ]
+      },
+      {
+        "nombre": "Importe sin IVA",
+        "clase": "texto",
+        "valores": []
+      }
+    ],
+    "Contrato menor de suministro": [
+      {
+        "nombre": "Objeto",
+        "clase": "lista",
+        "valores": [
+          "obra",
+          "suministro",
+          "servicio"
+        ]
+      },
+      {
+        "nombre": "Importe sin IVA",
+        "clase": "texto",
+        "valores": []
+      }
+    ],
+    "Contrato menor de obra": [
+      {
+        "nombre": "Objeto",
+        "clase": "lista",
+        "valores": [
+          "obra",
+          "suministro",
+          "servicio"
+        ]
+      },
+      {
+        "nombre": "Importe sin IVA",
+        "clase": "texto",
+        "valores": []
+      }
+    ],
+    "Expediente de contrato menor": [
+      {
+        "nombre": "Objeto",
+        "clase": "lista",
+        "valores": [
+          "obra",
+          "suministro",
+          "servicio"
+        ]
+      },
+      {
+        "nombre": "Importe sin IVA",
+        "clase": "texto",
+        "valores": []
+      }
+    ],
+    "Contrato de mantenimiento": [
+      {
+        "nombre": "Objeto",
+        "clase": "lista",
+        "valores": [
+          "obra",
+          "suministro",
+          "servicio"
+        ]
+      },
+      {
+        "nombre": "Importe sin IVA",
+        "clase": "texto",
+        "valores": []
+      }
+    ],
+    "Garantía de un bien o servicio": [
+      {
+        "nombre": "Objeto",
+        "clase": "lista",
+        "valores": [
+          "obra",
+          "suministro",
+          "servicio"
+        ]
+      },
+      {
+        "nombre": "Importe sin IVA",
+        "clase": "texto",
+        "valores": []
+      }
+    ],
+    "Subvención": [
+      {
+        "nombre": "Convocatoria",
+        "clase": "texto",
+        "valores": []
+      }
+    ]
+  },
+  "modelos": [
+    {
+      "id": "b1",
+      "nombre": "Detectar el absentismo",
+      "titulo": "Detectar el absentismo",
+      "explicacion": "Al llegar a 25 horas de clase sin justificar en un mes. Se comunica a Jefatura de Estudios.",
+      "responsable": "Tutoría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "parte de faltas del mes en Séneca",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 19 de septiembre de 2005, Plan Integral de Absentismo",
+          "bloque": "",
+          "clave": "",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b2",
+      "nombre": "Entrevista con la familia",
+      "titulo": "Entrevista con la familia",
+      "explicacion": "En los días siguientes a la detección. Se comunica a familia, por iPasen y por carta.",
+      "responsable": "Tutoría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "citación con acuse de recibo",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "acta de la entrevista",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b3",
+      "nombre": "Citación formal de Jefatura",
+      "titulo": "Citación formal de Jefatura",
+      "explicacion": "Si continúa faltando. Se comunica a familia, advirtiendo de la derivación.",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "carta con acuse de recibo",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "compromiso de asistencia firmado",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b4",
+      "nombre": "Derivación a los Servicios Sociales",
+      "titulo": "Derivación a los Servicios Sociales",
+      "explicacion": "Al agotar el mes de actuaciones del centro. Se comunica a Ayuntamiento, con copia a la familia.",
+      "responsable": "Dirección",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "informe de absentismo",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "registro de faltas",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r2",
+          "texto": "actuaciones realizadas",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b5",
+      "nombre": "Remisión al Equipo Técnico de Absentismo",
+      "titulo": "Remisión al Equipo Técnico de Absentismo",
+      "explicacion": "Si persiste. Se comunica a Equipo Técnico y Servicio de Inspección.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b6",
+      "nombre": "Grabar el seguimiento en Séneca",
+      "titulo": "Grabar el seguimiento en Séneca",
+      "explicacion": "",
+      "responsable": "Administración",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b7",
+      "nombre": "Recoger el parte de incidencia",
+      "titulo": "Recoger el parte de incidencia",
+      "explicacion": "El mismo día. Se comunica a Jefatura de Estudios.",
+      "responsable": "Tutoría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "parte del profesorado",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 11.2, presunción de veracidad",
+          "bloque": "convivencia",
+          "clave": "ROC-11.2",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b8",
+      "nombre": "Audiencia al alumno o alumna",
+      "titulo": "Audiencia al alumno o alumna",
+      "explicacion": "Antes de imponer nada, sin excepción.",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "acta de audiencia firmada",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 40.1",
+          "bloque": "convivencia",
+          "clave": "ROC-40.1",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b9",
+      "nombre": "Oír al profesorado o a la tutoría",
+      "titulo": "Oír al profesorado o a la tutoría",
+      "explicacion": "Solo si la corrección son tareas o una suspensión.",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 40.1",
+          "bloque": "convivencia",
+          "clave": "ROC-40.1",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b10",
+      "nombre": "Audiencia a la familia",
+      "titulo": "Audiencia a la familia",
+      "explicacion": "Solo si es suspensión de asistencia al centro y el alumnado es menor.",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 40.1",
+          "bloque": "convivencia",
+          "clave": "ROC-40.1",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b11",
+      "nombre": "Imponer la corrección",
+      "titulo": "Imponer la corrección",
+      "explicacion": "Amonestación oral, cualquier profesor; apercibimiento por escrito, el tutor; tareas y suspensión de determinadas clases hasta 3 días lectivos, jefatura de estudios; suspensión de asistencia al centro hasta 3 días lectivos y con carácter excepcional, el director.",
+      "responsable": "según cuál sea",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, arts. 35 y 36",
+          "bloque": "convivencia",
+          "clave": "ROC-35",
+          "url": ""
+        },
+        {
+          "id": "n1",
+          "cita": "Decreto 327/2010, art. 36",
+          "bloque": "convivencia",
+          "clave": "ROC-36",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b12",
+      "nombre": "Determinar las actividades formativas",
+      "titulo": "Determinar las actividades formativas",
+      "explicacion": "Antes del primer día de suspensión.",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 35.2",
+          "bloque": "convivencia",
+          "clave": "ROC-35.2",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b13",
+      "nombre": "Comunicar a la familia y dejar constancia escrita",
+      "titulo": "Comunicar a la familia y dejar constancia escrita",
+      "explicacion": "Siempre. Se comunica a familia, por iPasen y por carta.",
+      "responsable": "Tutoría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 40.3",
+          "bloque": "convivencia",
+          "clave": "ROC-40.3",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b14",
+      "nombre": "Dar cuenta a la comisión de convivencia",
+      "titulo": "Dar cuenta a la comisión de convivencia",
+      "explicacion": "Solo si fue suspensión de asistencia al centro.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 36.2.d)",
+          "bloque": "convivencia",
+          "clave": "ROC-36.2.d)",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b15",
+      "nombre": "Plazo de reclamación",
+      "titulo": "Plazo de reclamación",
+      "explicacion": "2 días lectivos desde la comunicación, ante quien la impuso.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 41.1",
+          "bloque": "convivencia",
+          "clave": "ROC-41.1",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b16",
+      "nombre": "Grabar en Séneca",
+      "titulo": "Grabar en Séneca",
+      "explicacion": "Máximo 30 días hábiles desde que ocurrió.",
+      "responsable": "Administración",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 20 de junio de 2011, art. 12.3",
+          "bloque": "convivencia",
+          "clave": "O11-12.3",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b17",
+      "nombre": "Informe de los hechos",
+      "titulo": "Informe de los hechos",
+      "explicacion": "",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "partes",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "declaraciones",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r2",
+          "texto": "antecedentes del curso",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b18",
+      "nombre": "Audiencia al alumno o alumna",
+      "titulo": "Audiencia al alumno o alumna",
+      "explicacion": "Siempre.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 40.1",
+          "bloque": "convivencia",
+          "clave": "ROC-40.1",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b19",
+      "nombre": "Audiencia a la familia si es menor",
+      "titulo": "Audiencia a la familia si es menor",
+      "explicacion": "En todas las medidas salvo el cambio de centro.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 40.1",
+          "bloque": "convivencia",
+          "clave": "ROC-40.1",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b20",
+      "nombre": "Resolución del director",
+      "titulo": "Resolución del director",
+      "explicacion": "Extraescolares hasta un mes; determinadas clases, más de 3 días lectivos y menos de dos semanas; asistencia al centro, más de 3 días lectivos y menos de un mes.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 38.1",
+          "bloque": "convivencia",
+          "clave": "ROC-38.1",
+          "url": ""
+        },
+        {
+          "id": "n1",
+          "cita": "Decreto 327/2010, art. 39",
+          "bloque": "convivencia",
+          "clave": "ROC-39",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b21",
+      "nombre": "Notificar a la familia con constancia escrita",
+      "titulo": "Notificar a la familia con constancia escrita",
+      "explicacion": "La medida es inmediatamente ejecutiva.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 40.2",
+          "bloque": "convivencia",
+          "clave": "ROC-40.2",
+          "url": ""
+        },
+        {
+          "id": "n1",
+          "cita": "Decreto 327/2010, art. 40.3",
+          "bloque": "convivencia",
+          "clave": "ROC-40.3",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b22",
+      "nombre": "Traslado a la comisión de convivencia",
+      "titulo": "Traslado a la comisión de convivencia",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 39",
+          "bloque": "convivencia",
+          "clave": "ROC-39",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b23",
+      "nombre": "Revisión por el Consejo Escolar, si la familia la pide",
+      "titulo": "Revisión por el Consejo Escolar, si la familia la pide",
+      "explicacion": "Sesión extraordinaria en 2 días lectivos como máximo desde la solicitud, convocada con 48 horas de antelación.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 41.2",
+          "bloque": "convivencia",
+          "clave": "ROC-41.2",
+          "url": ""
+        },
+        {
+          "id": "n1",
+          "cita": "Decreto 327/2010, art. 52.3",
+          "bloque": "convivencia",
+          "clave": "ROC-52.3",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b24",
+      "nombre": "Período de información previa",
+      "titulo": "Período de información previa",
+      "explicacion": "Sin plazo.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 42",
+          "bloque": "convivencia",
+          "clave": "ROC-42",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b25",
+      "nombre": "Acuerdo de iniciación",
+      "titulo": "Acuerdo de iniciación",
+      "explicacion": "2 días desde que se conoce la conducta.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 42",
+          "bloque": "convivencia",
+          "clave": "ROC-42",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b26",
+      "nombre": "Nombrar instructor, que ha de ser profesor del centro",
+      "titulo": "Nombrar instructor, que ha de ser profesor del centro",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 43.1",
+          "bloque": "convivencia",
+          "clave": "ROC-43.1",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b27",
+      "nombre": "Notificación fehaciente al alumnado y a la familia",
+      "titulo": "Notificación fehaciente al alumnado y a la familia",
+      "explicacion": "Con las conductas imputadas y el nombre del instructor; 2 días lectivos para alegaciones.",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "acuse de recibo",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 43.2",
+          "bloque": "convivencia",
+          "clave": "ROC-43.2",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b28",
+      "nombre": "Comunicar el inicio al Servicio de Inspección",
+      "titulo": "Comunicar el inicio al Servicio de Inspección",
+      "explicacion": "Y mantenerlo informado hasta la resolución.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 43.3",
+          "bloque": "convivencia",
+          "clave": "ROC-43.3",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b29",
+      "nombre": "Medida provisional, si procede",
+      "titulo": "Medida provisional, si procede",
+      "explicacion": "Suspensión de asistencia de más de 3 días lectivos y menos de un mes.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 45",
+          "bloque": "convivencia",
+          "clave": "ROC-45",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b30",
+      "nombre": "Vista del expediente",
+      "titulo": "Vista del expediente",
+      "explicacion": "Diciendo qué sanción podrá imponerse; 3 días lectivos para alegaciones.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 43.4",
+          "bloque": "convivencia",
+          "clave": "ROC-43.4",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b31",
+      "nombre": "Resolución",
+      "titulo": "Resolución",
+      "explicacion": "20 días desde la iniciación, ampliables otros 20; con hechos probados, atenuantes y agravantes, medida y fecha de efectos.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 46.1",
+          "bloque": "convivencia",
+          "clave": "ROC-46.1",
+          "url": ""
+        },
+        {
+          "id": "n1",
+          "cita": "Decreto 327/2010, art. 46.2",
+          "bloque": "convivencia",
+          "clave": "ROC-46.2",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b32",
+      "nombre": "Notificar la resolución",
+      "titulo": "Notificar la resolución",
+      "explicacion": "Cabe recurso de alzada en un mes ante la Delegación Territorial, que resuelve en tres meses.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 47",
+          "bloque": "convivencia",
+          "clave": "ROC-47",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b33",
+      "nombre": "Comunicación a la dirección",
+      "titulo": "Comunicación a la dirección",
+      "explicacion": "El mismo día.",
+      "responsable": "quien lo detecta",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b34",
+      "nombre": "Reunión de actuaciones inmediatas",
+      "titulo": "Reunión de actuaciones inmediatas",
+      "explicacion": "Con la tutoría y la orientación.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 20 de junio de 2011, anexos",
+          "bloque": "convivencia",
+          "clave": "O11-Anexo",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b35",
+      "nombre": "Registrar el protocolo en el módulo de Séneca",
+      "titulo": "Registrar el protocolo en el módulo de Séneca",
+      "explicacion": "Es un registro distinto del de incidencias, y los dos son obligatorios.",
+      "responsable": "Administración",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 31 de agosto de 2026, art. 27",
+          "bloque": "convivencia",
+          "clave": "O26-27",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b36",
+      "nombre": "Medidas de urgencia",
+      "titulo": "Medidas de urgencia",
+      "explicacion": "Protección de la persona afectada y medidas cautelares.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b37",
+      "nombre": "Informe de la dirección tras recoger la información",
+      "titulo": "Informe de la dirección tras recoger la información",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b38",
+      "nombre": "Traslado a la comisión de convivencia y al Servicio de Inspección",
+      "titulo": "Traslado a la comisión de convivencia y al Servicio de Inspección",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b39",
+      "nombre": "Documentos propios de cada protocolo",
+      "titulo": "Documentos propios de cada protocolo",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "Hoja de Detección y Notificación del SIMIA en maltrato, conservando el centro el primer ejemplar",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "parte de lesiones",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r2",
+          "texto": "denuncia a Fiscalía de Menores en agresión al profesorado",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b40",
+      "nombre": "Propuesta de derivación",
+      "titulo": "Propuesta de derivación",
+      "explicacion": "Solo cabe para quien ya tiene impuesta una corrección o medida que le priva de ir a clase.",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 25.1",
+          "bloque": "convivencia",
+          "clave": "ROC-25.1",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b41",
+      "nombre": "Audiencia a la familia",
+      "titulo": "Audiencia a la familia",
+      "explicacion": "Obligatoria antes de resolver.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 25.2",
+          "bloque": "convivencia",
+          "clave": "ROC-25.2",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b42",
+      "nombre": "Sesiones de reflexión",
+      "titulo": "Sesiones de reflexión",
+      "explicacion": "A la llegada y al terminar.",
+      "responsable": "Orientación",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b43",
+      "nombre": "Registrar la asistencia en Séneca",
+      "titulo": "Registrar la asistencia en Séneca",
+      "explicacion": "",
+      "responsable": "Administración",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 20 de junio de 2011, art. 12.1",
+          "bloque": "convivencia",
+          "clave": "O11-12.1",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b44",
+      "nombre": "Proponerlo a la familia",
+      "titulo": "Proponerlo a la familia",
+      "explicacion": "",
+      "responsable": "Tutoría",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b45",
+      "nombre": "Suscribirlo por escrito",
+      "titulo": "Suscribirlo por escrito",
+      "explicacion": "",
+      "responsable": "Tutoría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "modelo del Anexo V o del Anexo VI",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "medidas concretas",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r2",
+          "texto": "fecha y cauces de evaluación",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r3",
+          "texto": "mención escrita de que puede modificarse si se incumple",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 20 de junio de 2011, art. 20.3",
+          "bloque": "convivencia",
+          "clave": "O11-20.3",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b46",
+      "nombre": "Trasladarlo a la dirección",
+      "titulo": "Trasladarlo a la dirección",
+      "explicacion": "",
+      "responsable": "Tutoría",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 20 de junio de 2011, art. 20.4",
+          "bloque": "convivencia",
+          "clave": "O11-20.4",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b47",
+      "nombre": "Comunicarlo al Consejo Escolar",
+      "titulo": "Comunicarlo al Consejo Escolar",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 20 de junio de 2011, art. 20.4",
+          "bloque": "convivencia",
+          "clave": "O11-20.4",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b48",
+      "nombre": "Seguimiento",
+      "titulo": "Seguimiento",
+      "explicacion": "Propone medidas si se incumple.",
+      "responsable": "Consejo Escolar",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 51.f)",
+          "bloque": "convivencia",
+          "clave": "ROC-51.f)",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b49",
+      "nombre": "Derivar el caso",
+      "titulo": "Derivar el caso",
+      "explicacion": "La mediación es voluntaria.",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 20 de junio de 2011, art. 13.5.a)",
+          "bloque": "convivencia",
+          "clave": "O11-13.5.a)",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b50",
+      "nombre": "Designar a las personas mediadoras",
+      "titulo": "Designar a las personas mediadoras",
+      "explicacion": "Con la aceptación de las partes.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 20 de junio de 2011, art. 13.7",
+          "bloque": "convivencia",
+          "clave": "O11-13.7",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b51",
+      "nombre": "Sesión de mediación",
+      "titulo": "Sesión de mediación",
+      "explicacion": "",
+      "responsable": "equipo de mediación",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b52",
+      "nombre": "Acuerdo por escrito",
+      "titulo": "Acuerdo por escrito",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "aceptación de las condiciones por todas las partes",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "compromisos asumidos",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r2",
+          "texto": "plazo para cumplirlos",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 20 de junio de 2011, art. 13.9",
+          "bloque": "convivencia",
+          "clave": "O11-13.9",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b53",
+      "nombre": "Comunicarlo",
+      "titulo": "Comunicarlo",
+      "explicacion": "Se comunica a comisión de convivencia, tutoría y familias.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 20 de junio de 2011, art. 13.3",
+          "bloque": "convivencia",
+          "clave": "O11-13.3",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b54",
+      "nombre": "Detección y solicitud de evaluación",
+      "titulo": "Detección y solicitud de evaluación",
+      "explicacion": "",
+      "responsable": "Tutoría",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b55",
+      "nombre": "Evaluación psicopedagógica",
+      "titulo": "Evaluación psicopedagógica",
+      "explicacion": "",
+      "responsable": "Orientación",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b56",
+      "nombre": "Informe de evaluación psicopedagógica",
+      "titulo": "Informe de evaluación psicopedagógica",
+      "explicacion": "Se graba en Séneca.",
+      "responsable": "Orientación",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b57",
+      "nombre": "Dictamen de escolarización, si procede",
+      "titulo": "Dictamen de escolarización, si procede",
+      "explicacion": "Con informe de Inspección.",
+      "responsable": "Orientación",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b58",
+      "nombre": "Comunicar a la familia",
+      "titulo": "Comunicar a la familia",
+      "explicacion": "",
+      "responsable": "Orientación",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b59",
+      "nombre": "Grabar el censo en Séneca",
+      "titulo": "Grabar el censo en Séneca",
+      "explicacion": "",
+      "responsable": "Administración",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b60",
+      "nombre": "Abrir el plazo de matrícula",
+      "titulo": "Abrir el plazo de matrícula",
+      "explicacion": "Del 1 al 10 de julio.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 20 de febrero de 2020, art. 27.3",
+          "bloque": "matricula",
+          "clave": "O20-27.3",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b61",
+      "nombre": "Recoger el impreso y sus anexos",
+      "titulo": "Recoger el impreso y sus anexos",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "impreso de matrícula",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "cuestionario de fondos europeos",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r2",
+          "texto": "consentimiento de imagen y voz, que firma el propio alumnado si tiene 14 años o más",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r3",
+          "texto": "cuestionario de contexto solo en 1.º de ESO",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r4",
+          "texto": "Anexo III si tiene transporte",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r5",
+          "texto": "solicitud de Religión solo en la primera matrícula",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucciones de 23 de junio de 2026",
+          "bloque": "matricula",
+          "clave": "IB-Tercera",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b62",
+      "nombre": "Comprobar la plaza",
+      "titulo": "Comprobar la plaza",
+      "explicacion": "Que la solicitud de admisión que la sostiene es la última registrada en plazo.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 31 de agosto de 2026, art. 22.Uno",
+          "bloque": "matricula",
+          "clave": "O26-22.Uno",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b63",
+      "nombre": "Matrícula provisional del pendiente de extraordinarias",
+      "titulo": "Matrícula provisional del pendiente de extraordinarias",
+      "explicacion": "Se graba solo el curso, sin materias, con la leyenda del Anexo VIII.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucciones de 23 de junio de 2026",
+          "bloque": "matricula",
+          "clave": "IB-Primera",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b64",
+      "nombre": "Matricular en el curso definitivo",
+      "titulo": "Matricular en el curso definitivo",
+      "explicacion": "Antes del 9 de septiembre.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 20 de febrero de 2020, art. 27.3",
+          "bloque": "matricula",
+          "clave": "O20-27.3",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b65",
+      "nombre": "Hacer constar en Séneca que están todas",
+      "titulo": "Hacer constar en Séneca que están todas",
+      "explicacion": "2 días hábiles desde que acaba cada periodo.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 20 de febrero de 2020, art. 27.6",
+          "bloque": "matricula",
+          "clave": "O20-27.6",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b66",
+      "nombre": "Custodiar el cuestionario de fondos europeos",
+      "titulo": "Custodiar el cuestionario de fondos europeos",
+      "explicacion": "Cinco años desde el 31 de diciembre del ejercicio en que acaba el curso.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucciones de 23 de junio de 2026",
+          "bloque": "matricula",
+          "clave": "IB-Tercera",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b67",
+      "nombre": "Recoger la solicitud",
+      "titulo": "Recoger la solicitud",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "solicitud firmada por la familia o por el alumnado mayor de edad",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b68",
+      "nombre": "Informe de Jefatura de Estudios",
+      "titulo": "Informe de Jefatura de Estudios",
+      "explicacion": "Disponibilidad de grupo y de horario.",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b69",
+      "nombre": "Resolver",
+      "titulo": "Resolver",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b70",
+      "nombre": "Modificar la matrícula en Séneca",
+      "titulo": "Modificar la matrícula en Séneca",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b71",
+      "nombre": "Comunicar a la familia y a la tutoría",
+      "titulo": "Comunicar a la familia y a la tutoría",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b72",
+      "nombre": "Recoger la solicitud o la propuesta",
+      "titulo": "Recoger la solicitud o la propuesta",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b73",
+      "nombre": "Valorar la petición",
+      "titulo": "Valorar la petición",
+      "explicacion": "",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "informe de la tutoría",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b74",
+      "nombre": "Resolver",
+      "titulo": "Resolver",
+      "explicacion": "",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b75",
+      "nombre": "Modificar el grupo en Séneca",
+      "titulo": "Modificar el grupo en Séneca",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b76",
+      "nombre": "Comunicar a la familia, a las dos tutorías y al equipo docente",
+      "titulo": "Comunicar a la familia, a las dos tutorías y al equipo docente",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b77",
+      "nombre": "Anular en Séneca",
+      "titulo": "Anular en Séneca",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b78",
+      "nombre": "Archivar el expediente",
+      "titulo": "Archivar el expediente",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b79",
+      "nombre": "Registrar el motivo de la baja",
+      "titulo": "Registrar el motivo de la baja",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b80",
+      "nombre": "Dar la baja en Séneca",
+      "titulo": "Dar la baja en Séneca",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b81",
+      "nombre": "Anotar en el expediente académico",
+      "titulo": "Anotar en el expediente académico",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b82",
+      "nombre": "Comunicar a la tutoría",
+      "titulo": "Comunicar a la tutoría",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b83",
+      "nombre": "Recoger la solicitud en plazo",
+      "titulo": "Recoger la solicitud en plazo",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "solicitud",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "documentación acreditativa de los criterios alegados",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 21/2020",
+          "bloque": "escolarizacion",
+          "clave": "D-43",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b84",
+      "nombre": "Grabar en Séneca",
+      "titulo": "Grabar en Séneca",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b85",
+      "nombre": "Baremación y publicación de listas",
+      "titulo": "Baremación y publicación de listas",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b86",
+      "nombre": "Atender alegaciones y recursos",
+      "titulo": "Atender alegaciones y recursos",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b87",
+      "nombre": "Publicar la adjudicación",
+      "titulo": "Publicar la adjudicación",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b88",
+      "nombre": "Enlazar con la matrícula",
+      "titulo": "Enlazar con la matrícula",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b89",
+      "nombre": "Recibir la petición del centro de destino",
+      "titulo": "Recibir la petición del centro de destino",
+      "explicacion": "Nada se envía de oficio.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 25.3",
+          "bloque": "matricula",
+          "clave": "OESO-25.3",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b90",
+      "nombre": "Pedir el informe personal por traslado a la tutoría",
+      "titulo": "Pedir el informe personal por traslado a la tutoría",
+      "explicacion": "Lo redacta ella con la información del equipo docente.",
+      "responsable": "Tutoría",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 25.2",
+          "bloque": "matricula",
+          "clave": "OESO-25.2",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b91",
+      "nombre": "Remitir los dos documentos",
+      "titulo": "Remitir los dos documentos",
+      "explicacion": "10 días hábiles, plazo del Plan de Centro; la norma no fija ninguno. Se comunica a centro de destino.",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "informe personal por traslado",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "copia del historial académico",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r2",
+          "texto": "firma del director acreditando que concuerdan con el expediente",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 25.3",
+          "bloque": "matricula",
+          "clave": "OESO-25.3",
+          "url": ""
+        },
+        {
+          "id": "n1",
+          "cita": "Orden de evaluación de Bachillerato, art. 27.3",
+          "bloque": "matricula",
+          "clave": "OBAC-27.3",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b92",
+      "nombre": "Anotar el traslado en el expediente",
+      "titulo": "Anotar el traslado en el expediente",
+      "explicacion": "Apartado TRASLADO DE CENTRO, con fecha, centro de destino y la casilla de curso empezado.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b93",
+      "nombre": "Matricular provisionalmente",
+      "titulo": "Matricular provisionalmente",
+      "explicacion": "La matrícula existe, pero todavía no es definitiva.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b94",
+      "nombre": "Pedir los documentos al centro de origen",
+      "titulo": "Pedir los documentos al centro de origen",
+      "explicacion": "Informe personal por traslado y copia del historial.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b95",
+      "nombre": "La matrícula pasa a definitiva",
+      "titulo": "La matrícula pasa a definitiva",
+      "explicacion": "Al recibir los dos documentos y bien cumplimentados.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 25.3",
+          "bloque": "matricula",
+          "clave": "OESO-25.3",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b96",
+      "nombre": "Abrir el expediente académico",
+      "titulo": "Abrir el expediente académico",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b97",
+      "nombre": "Autorización en el primer trimestre",
+      "titulo": "Autorización en el primer trimestre",
+      "explicacion": "La da el director y la comunica al órgano territorial provincial.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 20 de febrero de 2020, disposición adicional tercera",
+          "bloque": "matricula",
+          "clave": "O20-DAtercera",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b98",
+      "nombre": "Autorización en el segundo trimestre",
+      "titulo": "Autorización en el segundo trimestre",
+      "explicacion": "",
+      "responsable": "órgano territorial provincial si es dentro de la provincia, o Dirección General si es entre provincias; en ambos casos con informe preceptivo de Inspección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 20 de febrero de 2020, disposición adicional tercera",
+          "bloque": "matricula",
+          "clave": "O20-DAtercera",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b99",
+      "nombre": "Traslados desde otra comunidad autónoma",
+      "titulo": "Traslados desde otra comunidad autónoma",
+      "explicacion": "",
+      "responsable": "Dirección General",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b100",
+      "nombre": "Comunicar la resolución",
+      "titulo": "Comunicar la resolución",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b101",
+      "nombre": "Recibir la solicitud",
+      "titulo": "Recibir la solicitud",
+      "explicacion": "La pide el alumnado mayor de edad o quien ejerza la tutela legal.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 77.d)",
+          "bloque": "convivencia",
+          "clave": "ROC-77.d)",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b102",
+      "nombre": "Expedir la certificación de estudios cursados",
+      "titulo": "Expedir la certificación de estudios cursados",
+      "explicacion": "Anexo X en ESO, Anexo VIII en Bachillerato.",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "datos de Séneca comprobados",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 20.1",
+          "bloque": "matricula",
+          "clave": "OESO-20.1",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b103",
+      "nombre": "Firmar y visar",
+      "titulo": "Firmar y visar",
+      "explicacion": "",
+      "responsable": "Secretaría firma, Dirección visa",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b104",
+      "nombre": "Entregar y dejar constancia",
+      "titulo": "Entregar y dejar constancia",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b105",
+      "nombre": "Certificar las matrículas",
+      "titulo": "Certificar las matrículas",
+      "explicacion": "Del 1 al 14 de julio y del 1 al 9 de septiembre en los IES.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucciones de 23 de junio de 2026",
+          "bloque": "matricula",
+          "clave": "IB-Octava",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b106",
+      "nombre": "Certificar el alumnado de Religión",
+      "titulo": "Certificar el alumnado de Religión",
+      "explicacion": "Pantalla \"Religión en Centros de Secundaria\", del 14 al 16 de julio.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucciones de 23 de junio de 2026",
+          "bloque": "matricula",
+          "clave": "IB-Novena",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b107",
+      "nombre": "Entregar el modelo de solicitud",
+      "titulo": "Entregar el modelo de solicitud",
+      "explicacion": "Modelo normalizado, procedimiento 2188, en la Secretaría Virtual.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Resolución de 2022, modelo de solicitud de título",
+          "bloque": "matricula",
+          "clave": "RES22-Primero",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b108",
+      "nombre": "Pago previo de la tasa",
+      "titulo": "Pago previo de la tasa",
+      "explicacion": "Modelo 046 con su número de validación; sin pago no se tramita.",
+      "responsable": "el interesado",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Real Decreto 1850/2009, art. 3.1",
+          "bloque": "matricula",
+          "clave": "RD1850-3.1",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b109",
+      "nombre": "Comprobar exenciones y bonificaciones",
+      "titulo": "Comprobar exenciones y bonificaciones",
+      "explicacion": "Exentos: familia numerosa de categoría especial, víctimas del terrorismo, víctimas de violencia de género o doméstica, discapacidad del 33 % o más, y personas beneficiarias del ingreso mínimo vital o de la Renta Mínima; bonificación del 50 % en familia numerosa general y del 10 % por medios electrónicos.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Ley 10/2021, art. 119",
+          "bloque": "matricula",
+          "clave": "TASA-119",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b110",
+      "nombre": "Comprobar requisitos y proponer la expedición",
+      "titulo": "Comprobar requisitos y proponer la expedición",
+      "explicacion": "No cabe proponer sin requisitos cumplidos y tasa abonada.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Real Decreto 1850/2009, art. 3.2",
+          "bloque": "matricula",
+          "clave": "RD1850-3.2",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b111",
+      "nombre": "Certificación supletoria provisional, si la pide",
+      "titulo": "Certificación supletoria provisional, si la pide",
+      "explicacion": "Sustituye al título y tiene su mismo valor; no se expide de oficio.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Real Decreto 1850/2009, art. 3.4",
+          "bloque": "matricula",
+          "clave": "RD1850-3.4",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b112",
+      "nombre": "Anotar la entrega en el libro-registro del centro",
+      "titulo": "Anotar la entrega en el libro-registro del centro",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b113",
+      "nombre": "Aclaraciones previas",
+      "titulo": "Aclaraciones previas",
+      "explicacion": "Sin plazo en la norma: lo fija el Proyecto educativo; es paso obligatorio antes de la revisión.",
+      "responsable": "Tutoría",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 27",
+          "bloque": "evaluacion",
+          "clave": "OESO-27",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b114",
+      "nombre": "Registrar la solicitud de revisión",
+      "titulo": "Registrar la solicitud de revisión",
+      "explicacion": "2 días hábiles desde el boletín o desde la fecha de publicación que el centro haya fijado.",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "solicitud por escrito con las alegaciones",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "fecha exacta de entrada",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 28.2",
+          "bloque": "evaluacion",
+          "clave": "OESO-28.2",
+          "url": ""
+        },
+        {
+          "id": "n1",
+          "cita": "Orden de evaluación de Bachillerato, art. 29.2",
+          "bloque": "evaluacion",
+          "clave": "OBAC-29.2",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b115",
+      "nombre": "Dar traslado a Jefatura de Estudios",
+      "titulo": "Dar traslado a Jefatura de Estudios",
+      "explicacion": "Inmediato.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 28.3",
+          "bloque": "evaluacion",
+          "clave": "OESO-28.3",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b116",
+      "nombre": "Informe del departamento",
+      "titulo": "Informe del departamento",
+      "explicacion": "El primer día hábil siguiente al fin del plazo de solicitud.",
+      "responsable": "Jefatura de departamento",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 28.4",
+          "bloque": "evaluacion",
+          "clave": "OESO-28.4",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b117",
+      "nombre": "Reunión extraordinaria del equipo docente, si se discute promoción o titulación",
+      "titulo": "Reunión extraordinaria del equipo docente, si se discute promoción o titulación",
+      "explicacion": "2 días hábiles desde el fin del plazo de solicitud.",
+      "responsable": "Tutoría",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 28.7",
+          "bloque": "evaluacion",
+          "clave": "OESO-28.7",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b118",
+      "nombre": "Comunicar la resolución del centro",
+      "titulo": "Comunicar la resolución del centro",
+      "explicacion": "Máximo 4 días hábiles desde la entrada de la solicitud.",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 28.9",
+          "bloque": "evaluacion",
+          "clave": "OESO-28.9",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b119",
+      "nombre": "Diligencia en los documentos",
+      "titulo": "Diligencia en los documentos",
+      "explicacion": "En el acta y, en su caso, en el expediente y en el historial; la firma la secretaría y la visa la dirección.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 28.10",
+          "bloque": "evaluacion",
+          "clave": "OESO-28.10",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b120",
+      "nombre": "Registrar la reclamación a la Delegación",
+      "titulo": "Registrar la reclamación a la Delegación",
+      "explicacion": "2 días hábiles desde la comunicación del centro.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 29.2",
+          "bloque": "evaluacion",
+          "clave": "OESO-29.2",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b121",
+      "nombre": "Remitir el expediente a la Delegación Territorial",
+      "titulo": "Remitir el expediente a la Delegación Territorial",
+      "explicacion": "Máximo 3 días hábiles.",
+      "responsable": "Dirección",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "informe del departamento",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "acta de la sesión extraordinaria",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r2",
+          "texto": "datos del proceso de evaluación",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 29.2",
+          "bloque": "evaluacion",
+          "clave": "OESO-29.2",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b122",
+      "nombre": "Informe de la Comisión Técnica Provincial",
+      "titulo": "Informe de la Comisión Técnica Provincial",
+      "explicacion": "",
+      "responsable": "15 días hábiles desde su constitución",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 29.5",
+          "bloque": "evaluacion",
+          "clave": "OESO-29.5",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b123",
+      "nombre": "Recibir la resolución del Delegado",
+      "titulo": "Recibir la resolución del Delegado",
+      "explicacion": "15 días hábiles desde la entrada del informe; se comunica al centro en 2 días; pone fin a la vía administrativa.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 29.6",
+          "bloque": "evaluacion",
+          "clave": "OESO-29.6",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b124",
+      "nombre": "Corregir los documentos si se estima",
+      "titulo": "Corregir los documentos si se estima",
+      "explicacion": "Diligencia de la secretaría visada por la dirección; si cambia la titulación, revisar la propuesta de título y la nota media.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de evaluación de ESO, art. 29.8",
+          "bloque": "evaluacion",
+          "clave": "OESO-29.8",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b125",
+      "nombre": "Entrevista previa con la tutoría y con el profesorado de la materia",
+      "titulo": "Entrevista previa con la tutoría y con el profesorado de la materia",
+      "explicacion": "Requisito del centro para la copia de un examen.",
+      "responsable": "Tutoría",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b126",
+      "nombre": "Preparar la copia",
+      "titulo": "Preparar la copia",
+      "explicacion": "Con la leyenda de prohibición de difusión a terceras personas.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b127",
+      "nombre": "Entregar en mano",
+      "titulo": "Entregar en mano",
+      "explicacion": "7 días hábiles, plazo del Plan de Centro.",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b128",
+      "nombre": "Publicar la convocatoria en el centro",
+      "titulo": "Publicar la convocatoria en el centro",
+      "explicacion": "Los plazos los fija cada convocatoria.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b129",
+      "nombre": "Recoger las solicitudes",
+      "titulo": "Recoger las solicitudes",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "solicitud",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "documentación que pida la convocatoria",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b130",
+      "nombre": "Grabar y remitir",
+      "titulo": "Grabar y remitir",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b131",
+      "nombre": "Certificar matrícula y datos académicos",
+      "titulo": "Certificar matrícula y datos académicos",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b132",
+      "nombre": "Comunicar la resolución a las familias",
+      "titulo": "Comunicar la resolución a las familias",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b133",
+      "nombre": "Comprobar la cobertura",
+      "titulo": "Comprobar la cobertura",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b134",
+      "nombre": "Reunir la documentación",
+      "titulo": "Reunir la documentación",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b135",
+      "nombre": "Tramitar la prestación",
+      "titulo": "Tramitar la prestación",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b136",
+      "nombre": "Comunicar a la familia",
+      "titulo": "Comunicar a la familia",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b137",
+      "nombre": "Atención inmediata y aviso a la familia",
+      "titulo": "Atención inmediata y aviso a la familia",
+      "explicacion": "El mismo día.",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b138",
+      "nombre": "Parte de accidente",
+      "titulo": "Parte de accidente",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "relato de los hechos",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "testigos",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r2",
+          "texto": "parte médico si lo hay",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b139",
+      "nombre": "Comunicar a la aseguradora o al seguro escolar",
+      "titulo": "Comunicar a la aseguradora o al seguro escolar",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b140",
+      "nombre": "Informe al Servicio de Inspección, si la gravedad lo exige",
+      "titulo": "Informe al Servicio de Inspección, si la gravedad lo exige",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b141",
+      "nombre": "Archivar",
+      "titulo": "Archivar",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b142",
+      "nombre": "Recoger el Anexo III con la matrícula",
+      "titulo": "Recoger el Anexo III con la matrícula",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucciones de 23 de junio de 2026",
+          "bloque": "matricula",
+          "clave": "IB-Sexta",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b143",
+      "nombre": "Validar el derecho en Séneca",
+      "titulo": "Validar el derecho en Séneca",
+      "explicacion": "Tras consolidar la matrícula, diciendo sí o no y el motivo cuando es no.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 287/2009, art. 10",
+          "bloque": "becas",
+          "clave": "D287-10",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b144",
+      "nombre": "Resolver o remitir, según el supuesto",
+      "titulo": "Resolver o remitir, según el supuesto",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b145",
+      "nombre": "Anotar en el expediente y en Séneca",
+      "titulo": "Anotar en el expediente y en Séneca",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b146",
+      "nombre": "Comprobar los datos en Séneca",
+      "titulo": "Comprobar los datos en Séneca",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b147",
+      "nombre": "Dar de alta o corregir",
+      "titulo": "Dar de alta o corregir",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b148",
+      "nombre": "Entregar las claves",
+      "titulo": "Entregar las claves",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b149",
+      "nombre": "Comprobar que la familia accede",
+      "titulo": "Comprobar que la familia accede",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b150",
+      "nombre": "Recoger la documentación",
+      "titulo": "Recoger la documentación",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "resolución judicial o documento que acredite el cambio",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b151",
+      "nombre": "Actualizar los datos en Séneca",
+      "titulo": "Actualizar los datos en Séneca",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b152",
+      "nombre": "Comunicar a la tutoría lo que deba saber",
+      "titulo": "Comunicar a la tutoría lo que deba saber",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b153",
+      "nombre": "Archivar con acceso restringido",
+      "titulo": "Archivar con acceso restringido",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b154",
+      "nombre": "Registrar la solicitud",
+      "titulo": "Registrar la solicitud",
+      "explicacion": "Con la fecha exacta de entrada.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b155",
+      "nombre": "Comprobar quién la pide",
+      "titulo": "Comprobar quién la pide",
+      "explicacion": "El propio interesado, o quien acredite la representación.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b156",
+      "nombre": "Preparar la respuesta",
+      "titulo": "Preparar la respuesta",
+      "explicacion": "Con el visto bueno de la dirección.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b157",
+      "nombre": "Responder",
+      "titulo": "Responder",
+      "explicacion": "Un mes desde la entrada, prorrogable dos meses más avisando dentro del primer mes.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Reglamento General de Protección de Datos, art. 12",
+          "bloque": "datos",
+          "clave": "RGPD-12",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b158",
+      "nombre": "Archivar la respuesta",
+      "titulo": "Archivar la respuesta",
+      "explicacion": "Hay que poder acreditar que se contestó y cuándo.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b159",
+      "nombre": "Comprobar la documentación",
+      "titulo": "Comprobar la documentación",
+      "explicacion": "Lo que se exige cambia con cada permiso.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b160",
+      "nombre": "Resolver o remitir a quien firma",
+      "titulo": "Resolver o remitir a quien firma",
+      "explicacion": "",
+      "responsable": "Dirección o Delegación Territorial, según el permiso",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b161",
+      "nombre": "Informe de la dirección",
+      "titulo": "Informe de la dirección",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b162",
+      "nombre": "Remitir a la Delegación Territorial",
+      "titulo": "Remitir a la Delegación Territorial",
+      "explicacion": "La licencia la concede la Delegación, no el centro.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b163",
+      "nombre": "Recibir y comunicar la resolución",
+      "titulo": "Recibir y comunicar la resolución",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b164",
+      "nombre": "Aviso de la persona",
+      "titulo": "Aviso de la persona",
+      "explicacion": "Se comunica a Dirección y Secretaría.",
+      "responsable": "el mismo día",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b165",
+      "nombre": "Recibir el parte de baja",
+      "titulo": "Recibir el parte de baja",
+      "explicacion": "Si es funcionario docente de carrera va por MUFACE; si es interino, laboral o funcionario no adscrito, por el Régimen General.",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "parte de baja",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b166",
+      "nombre": "Remitir el parte a la Delegación Territorial",
+      "titulo": "Remitir el parte a la Delegación Territorial",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b167",
+      "nombre": "Partes de confirmación",
+      "titulo": "Partes de confirmación",
+      "explicacion": "Mientras dure la baja.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b168",
+      "nombre": "Parte de alta",
+      "titulo": "Parte de alta",
+      "explicacion": "Remitir igual que los anteriores.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b169",
+      "nombre": "Concesión de la licencia",
+      "titulo": "Concesión de la licencia",
+      "explicacion": "La incapacidad temporal no es una ausencia: es una licencia que concede la Delegación.",
+      "responsable": "Delegación Territorial",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b170",
+      "nombre": "Pedir sustitución, si procede",
+      "titulo": "Pedir sustitución, si procede",
+      "explicacion": "Se abre como asunto aparte.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b171",
+      "nombre": "Ausencia prevista",
+      "titulo": "Ausencia prevista",
+      "explicacion": "",
+      "responsable": "la persona avisa antes y presenta el justificante",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "solicitud o aviso previo",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "justificante",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b172",
+      "nombre": "Ausencia imprevista",
+      "titulo": "Ausencia imprevista",
+      "explicacion": "",
+      "responsable": "aviso inmediato y justificante después",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "justificante",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b173",
+      "nombre": "Comprobar el justificante",
+      "titulo": "Comprobar el justificante",
+      "explicacion": "No todo vale como justificante.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b174",
+      "nombre": "Registro diario",
+      "titulo": "Registro diario",
+      "explicacion": "Módulo de control de presencia de Séneca.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b175",
+      "nombre": "Requerimiento si no se justifica",
+      "titulo": "Requerimiento si no se justifica",
+      "explicacion": "Por escrito y con constancia. Se comunica a la persona interesada.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b176",
+      "nombre": "Consecuencia si sigue sin justificarse",
+      "titulo": "Consecuencia si sigue sin justificarse",
+      "explicacion": "",
+      "responsable": "deducción de haberes y, en su caso, efecto disciplinario, previo paso por la Comisión Provincial de Valoración de Faltas de Asistencia",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b177",
+      "nombre": "Cerrar el mes en Séneca",
+      "titulo": "Cerrar el mes en Séneca",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b178",
+      "nombre": "Generar el estadillo mensual",
+      "titulo": "Generar el estadillo mensual",
+      "explicacion": "Hasta el día 5 del mes siguiente; vale para los tres colectivos.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b179",
+      "nombre": "Firma de la dirección",
+      "titulo": "Firma de la dirección",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b180",
+      "nombre": "Publicar o remitir según proceda",
+      "titulo": "Publicar o remitir según proceda",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b181",
+      "nombre": "Comprobar el presupuesto de jornadas",
+      "titulo": "Comprobar el presupuesto de jornadas",
+      "explicacion": "El centro tiene un cupo anual.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b182",
+      "nombre": "Decidir si procede pedirla",
+      "titulo": "Decidir si procede pedirla",
+      "explicacion": "No puede sustituirse a quien está ausente sin justificar.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b183",
+      "nombre": "Pedirla por Séneca",
+      "titulo": "Pedirla por Séneca",
+      "explicacion": "Entra en la convocatoria telemática, que es semanal.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 8 de septiembre de 2010, de sustituciones",
+          "bloque": "",
+          "clave": "",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b184",
+      "nombre": "Atender el grupo mientras no llega",
+      "titulo": "Atender el grupo mientras no llega",
+      "explicacion": "",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b185",
+      "nombre": "Toma de posesión de la persona sustituta",
+      "titulo": "Toma de posesión de la persona sustituta",
+      "explicacion": "Se abre como asunto aparte.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b186",
+      "nombre": "Recibir la credencial o el nombramiento",
+      "titulo": "Recibir la credencial o el nombramiento",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "credencial o nombramiento",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b187",
+      "nombre": "Firmar la toma de posesión",
+      "titulo": "Firmar la toma de posesión",
+      "explicacion": "Con la fecha exacta, que es la que cuenta para la nómina.",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "diligencia firmada por la persona y por la dirección",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b188",
+      "nombre": "Alta de datos",
+      "titulo": "Alta de datos",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "cuenta corriente",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "datos de IRPF",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r2",
+          "texto": "situación familiar",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r3",
+          "texto": "correo del centro",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b189",
+      "nombre": "Entregar horario y documentación del centro",
+      "titulo": "Entregar horario y documentación del centro",
+      "explicacion": "",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b190",
+      "nombre": "Documento de cese con su fecha",
+      "titulo": "Documento de cese con su fecha",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b191",
+      "nombre": "Comunicar a la Delegación Territorial",
+      "titulo": "Comunicar a la Delegación Territorial",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b192",
+      "nombre": "Cerrar lo pendiente",
+      "titulo": "Cerrar lo pendiente",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "llaves",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "material",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r2",
+          "texto": "claves",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r3",
+          "texto": "correo del centro",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b193",
+      "nombre": "Certificado de servicios, si lo pide",
+      "titulo": "Certificado de servicios, si lo pide",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b194",
+      "nombre": "Recoger los datos",
+      "titulo": "Recoger los datos",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "documento de identidad",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "cuenta corriente",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r2",
+          "texto": "datos de IRPF",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r3",
+          "texto": "situación familiar",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b195",
+      "nombre": "Comprobar que la nómina los recoge",
+      "titulo": "Comprobar que la nómina los recoge",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b196",
+      "nombre": "Expedir el certificado",
+      "titulo": "Expedir el certificado",
+      "explicacion": "Firma la secretaría, visa la dirección.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b197",
+      "nombre": "Recoger las incidencias del mes",
+      "titulo": "Recoger las incidencias del mes",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b198",
+      "nombre": "Comprobar altas, bajas y variaciones",
+      "titulo": "Comprobar altas, bajas y variaciones",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b199",
+      "nombre": "Grabar y remitir antes del cierre",
+      "titulo": "Grabar y remitir antes del cierre",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b200",
+      "nombre": "Comprobar la nómina publicada",
+      "titulo": "Comprobar la nómina publicada",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b201",
+      "nombre": "Propuesta",
+      "titulo": "Propuesta",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b202",
+      "nombre": "Comprobar los datos",
+      "titulo": "Comprobar los datos",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b203",
+      "nombre": "Comunicar la resolución a la persona interesada",
+      "titulo": "Comunicar la resolución a la persona interesada",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b204",
+      "nombre": "Comunicar y grabar el horario",
+      "titulo": "Comunicar y grabar el horario",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b205",
+      "nombre": "Tramitar el permiso, si hace falta",
+      "titulo": "Tramitar el permiso, si hace falta",
+      "explicacion": "Se enlaza con PERMISO.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b206",
+      "nombre": "Recoger el certificado al terminar",
+      "titulo": "Recoger el certificado al terminar",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "certificado de aprovechamiento",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b207",
+      "nombre": "Archivar en el expediente",
+      "titulo": "Archivar en el expediente",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b208",
+      "nombre": "Designación",
+      "titulo": "Designación",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b209",
+      "nombre": "Comunicar a la persona interesada",
+      "titulo": "Comunicar a la persona interesada",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "escrito de designación firmado",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b210",
+      "nombre": "Plantilla de funcionamiento en Séneca",
+      "titulo": "Plantilla de funcionamiento en Séneca",
+      "explicacion": "Disponible a partir de finales de junio.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucción 8/2026",
+          "bloque": "",
+          "clave": "",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b211",
+      "nombre": "Convocar la reunión",
+      "titulo": "Convocar la reunión",
+      "explicacion": "Con 48 horas de antelación como mínimo.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucción 8/2026",
+          "bloque": "",
+          "clave": "",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b212",
+      "nombre": "Celebrar la reunión",
+      "titulo": "Celebrar la reunión",
+      "explicacion": "Asisten la dirección, la jefatura de estudios y la secretaría, además del personal afectado.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b213",
+      "nombre": "Grabar datos, generar el acta y dejarla firmada",
+      "titulo": "Grabar datos, generar el acta y dejarla firmada",
+      "explicacion": "En 24 horas, firmando primero la dirección.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucción 8/2026",
+          "bloque": "",
+          "clave": "",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b214",
+      "nombre": "Visado del Servicio de Inspección",
+      "titulo": "Visado del Servicio de Inspección",
+      "explicacion": "",
+      "responsable": "las actas se cargan solas en SIRhUS",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b215",
+      "nombre": "Recoger la petición",
+      "titulo": "Recoger la petición",
+      "explicacion": "Del departamento o de la dirección.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b216",
+      "nombre": "Comprobar el crédito",
+      "titulo": "Comprobar el crédito",
+      "explicacion": "Si es material inventariable, el techo es el 10 % del crédito anual de gastos de funcionamiento, con informe previo de la Delegación y aprobación del Consejo Escolar; el material bibliográfico no computa.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 10 de mayo de 2006, art. 3.2.b)",
+          "bloque": "economica",
+          "clave": "O2006-3.2.b)",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b217",
+      "nombre": "Calcular el valor estimado, sin IVA",
+      "titulo": "Calcular el valor estimado, sin IVA",
+      "explicacion": "Es el hito que más se falla.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Ley 9/2017, art. 118.1",
+          "bloque": "economica",
+          "clave": "LCSP-118.1",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b218",
+      "nombre": "Comprobar el umbral",
+      "titulo": "Comprobar el umbral",
+      "explicacion": "40.000 € en obras y 15.000 € en suministros y servicios; por encima ya no es contrato menor y no lo tramita el centro.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Ley 9/2017, art. 118.1",
+          "bloque": "economica",
+          "clave": "LCSP-118.1",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b219",
+      "nombre": "Informe de necesidad",
+      "titulo": "Informe de necesidad",
+      "explicacion": "Por qué hace falta y por qué no se está fraccionando.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Ley 9/2017, art. 118",
+          "bloque": "economica",
+          "clave": "LCSP-118",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b220",
+      "nombre": "Aprobar el gasto",
+      "titulo": "Aprobar el gasto",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b221",
+      "nombre": "Pedido al proveedor",
+      "titulo": "Pedido al proveedor",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "pedido",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b222",
+      "nombre": "Recepción y conformidad",
+      "titulo": "Recepción y conformidad",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "albarán firmado",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b223",
+      "nombre": "Registrar la factura",
+      "titulo": "Registrar la factura",
+      "explicacion": "Factura simplificada solo hasta 400 € con IVA; desde 5.000 € impuestos incluidos, la de papel no vale.",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "factura completa",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Real Decreto 1619/2012, art. 4.1.a)",
+          "bloque": "economica",
+          "clave": "RD1619-4.1.a)",
+          "url": ""
+        },
+        {
+          "id": "n1",
+          "cita": "Decreto 75/2016, art. 2.4",
+          "bloque": "economica",
+          "clave": "D75-2.4",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b224",
+      "nombre": "Pagar",
+      "titulo": "Pagar",
+      "explicacion": "30 días naturales de plazo general y 20 en determinadas obligaciones educativas.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Ley 3/2004, art. 4",
+          "bloque": "economica",
+          "clave": "L3-4",
+          "url": ""
+        },
+        {
+          "id": "n1",
+          "cita": "Decreto 5/2017, art. 4.2",
+          "bloque": "economica",
+          "clave": "D5-4.2",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b225",
+      "nombre": "Alta en inventario, si procede",
+      "titulo": "Alta en inventario, si procede",
+      "explicacion": "Obligatoria desde 300,50 € con IVA de valor unitario.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucción 1/2021",
+          "bloque": "economica",
+          "clave": "I1-2021",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b226",
+      "nombre": "Archivar el justificante",
+      "titulo": "Archivar el justificante",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b227",
+      "nombre": "Contrato o encargo",
+      "titulo": "Contrato o encargo",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "contrato o encargo con objeto, duración y precio sin IVA",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b228",
+      "nombre": "Calendario de revisiones",
+      "titulo": "Calendario de revisiones",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b229",
+      "nombre": "Parte de cada revisión",
+      "titulo": "Parte de cada revisión",
+      "explicacion": "Cada parte, un documento del asunto.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b230",
+      "nombre": "Factura y pago",
+      "titulo": "Factura y pago",
+      "explicacion": "30 días naturales, o 20 en obligaciones educativas.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Ley 3/2004, art. 4",
+          "bloque": "economica",
+          "clave": "L3-4",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b231",
+      "nombre": "Aviso antes del vencimiento",
+      "titulo": "Aviso antes del vencimiento",
+      "explicacion": "Para decidir si se renueva.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b232",
+      "nombre": "Anotar el inicio de la garantía",
+      "titulo": "Anotar el inicio de la garantía",
+      "explicacion": "Fecha de la factura o del acta de recepción.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b233",
+      "nombre": "Guardar los papeles",
+      "titulo": "Guardar los papeles",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "factura",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "documento de garantía",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b234",
+      "nombre": "Fecha límite del asunto",
+      "titulo": "Fecha límite del asunto",
+      "explicacion": "El fin de la garantía.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b235",
+      "nombre": "Aviso antes de que venza",
+      "titulo": "Aviso antes de que venza",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b236",
+      "nombre": "Reclamación al proveedor, si hay incidencia",
+      "titulo": "Reclamación al proveedor, si hay incidencia",
+      "explicacion": "Por escrito y con acuse de recibo.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b237",
+      "nombre": "Recibir la comunicación del crédito asignado",
+      "titulo": "Recibir la comunicación del crédito asignado",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b238",
+      "nombre": "Elaborar el proyecto",
+      "titulo": "Elaborar el proyecto",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "estado de ingresos",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "estado de gastos",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r2",
+          "texto": "Anexos I, II y III",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 10 de mayo de 2006",
+          "bloque": "economica",
+          "clave": "O2006-4",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b239",
+      "nombre": "Comprobar el equilibrio e incorporar el remanente",
+      "titulo": "Comprobar el equilibrio e incorporar el remanente",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b240",
+      "nombre": "Aprobarlo en Consejo Escolar",
+      "titulo": "Aprobarlo en Consejo Escolar",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b241",
+      "nombre": "Registrarlo en Séneca",
+      "titulo": "Registrarlo en Séneca",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b242",
+      "nombre": "Modificaciones durante el año",
+      "titulo": "Modificaciones durante el año",
+      "explicacion": "Documentadas; lo finalista no se mueve nunca.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b243",
+      "nombre": "Cerrar el ejercicio",
+      "titulo": "Cerrar el ejercicio",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b244",
+      "nombre": "Montar la cuenta de gestión",
+      "titulo": "Montar la cuenta de gestión",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "anexos de la Orden de 10 de mayo de 2006",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b245",
+      "nombre": "Aprobarla en Consejo Escolar",
+      "titulo": "Aprobarla en Consejo Escolar",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b246",
+      "nombre": "Remitirla",
+      "titulo": "Remitirla",
+      "explicacion": "Tope: 30 de octubre.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Orden de 10 de mayo de 2006, art. 15.3",
+          "bloque": "economica",
+          "clave": "O2006-15.3",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b247",
+      "nombre": "Modelo 095",
+      "titulo": "Modelo 095",
+      "explicacion": "Cada trimestre.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b248",
+      "nombre": "Modelo 190",
+      "titulo": "Modelo 190",
+      "explicacion": "Resumen anual.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b249",
+      "nombre": "Declaración de operaciones con terceros",
+      "titulo": "Declaración de operaciones con terceros",
+      "explicacion": "Anual, por Séneca; el centro remite todas las operaciones del ejercicio, superen o no los 3.005,06 €.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b250",
+      "nombre": "Alta de cada bien",
+      "titulo": "Alta de cada bien",
+      "explicacion": "Obligatoria desde 300,50 € con IVA de valor unitario; por debajo, potestativa.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucción 1/2021",
+          "bloque": "economica",
+          "clave": "I1-2021",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b251",
+      "nombre": "Bajas",
+      "titulo": "Bajas",
+      "explicacion": "Con su motivo.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b252",
+      "nombre": "Cierre anual",
+      "titulo": "Cierre anual",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b253",
+      "nombre": "Comprobar el remanente del curso anterior",
+      "titulo": "Comprobar el remanente del curso anterior",
+      "explicacion": "Se incorpora como primera partida de la dotación del curso siguiente.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucciones de gratuidad de 9 de junio de 2026",
+          "bloque": "",
+          "clave": "",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b254",
+      "nombre": "Reutilización y reposición",
+      "titulo": "Reutilización y reposición",
+      "explicacion": "En 2026/2027 no hay cheque-libro en ESO: se mantienen los libros y solo hay reposición, con tasa del 8 % en 1.º, 2.º y 3.º y del 5 % en 4.º.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucciones de gratuidad de 9 de junio de 2026",
+          "bloque": "",
+          "clave": "",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b255",
+      "nombre": "Dotación específica de NEAE",
+      "titulo": "Dotación específica de NEAE",
+      "explicacion": "147 € por alumno con material adaptado.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucciones de gratuidad de 9 de junio de 2026",
+          "bloque": "",
+          "clave": "",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b256",
+      "nombre": "Cheque-libro electrónico, donde lo haya",
+      "titulo": "Cheque-libro electrónico, donde lo haya",
+      "explicacion": "Va por el Punto de Recogida Electrónico; hay que comprobar en Séneca si la librería ha registrado la aceptación leyendo el código QR, y si no, lo registra el centro.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b257",
+      "nombre": "Estado de gastos en Séneca",
+      "titulo": "Estado de gastos en Séneca",
+      "explicacion": "Antes del 31 de octubre de 2026.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucciones de gratuidad de 9 de junio de 2026",
+          "bloque": "",
+          "clave": "",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b258",
+      "nombre": "Solicitud de aumento de cuantía, si hace falta",
+      "titulo": "Solicitud de aumento de cuantía, si hace falta",
+      "explicacion": "Anexo VI con memoria motivada, antes del 31 de mayo de 2027.",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucciones de gratuidad de 9 de junio de 2026",
+          "bloque": "",
+          "clave": "",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b259",
+      "nombre": "Justificación",
+      "titulo": "Justificación",
+      "explicacion": "Anexo XI en Séneca, con fecha cierta del 30 de junio de 2027.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Instrucciones de gratuidad de 9 de junio de 2026",
+          "bloque": "",
+          "clave": "",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b260",
+      "nombre": "Constituir la Junta Electoral",
+      "titulo": "Constituir la Junta Electoral",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b261",
+      "nombre": "Publicar el censo",
+      "titulo": "Publicar el censo",
+      "explicacion": "Y resolver las reclamaciones.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b262",
+      "nombre": "Recoger candidaturas",
+      "titulo": "Recoger candidaturas",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b263",
+      "nombre": "Proclamar candidaturas",
+      "titulo": "Proclamar candidaturas",
+      "explicacion": "",
+      "responsable": "Junta Electoral",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b264",
+      "nombre": "Votación por sectores",
+      "titulo": "Votación por sectores",
+      "explicacion": "Profesorado, familias, alumnado y personal de administración y servicios.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b265",
+      "nombre": "Actas de escrutinio",
+      "titulo": "Actas de escrutinio",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b266",
+      "nombre": "Constitución del nuevo Consejo Escolar",
+      "titulo": "Constitución del nuevo Consejo Escolar",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b267",
+      "nombre": "Grabar el resultado en Séneca",
+      "titulo": "Grabar el resultado en Séneca",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b268",
+      "nombre": "Convocatoria",
+      "titulo": "Convocatoria",
+      "explicacion": "La extraordinaria, con 48 horas de antelación como mínimo.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [
+        {
+          "id": "n0",
+          "cita": "Decreto 327/2010, art. 52.3",
+          "bloque": "convivencia",
+          "clave": "ROC-52.3",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "id": "b269",
+      "nombre": "Orden del día y documentación",
+      "titulo": "Orden del día y documentación",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b270",
+      "nombre": "Celebración de la sesión",
+      "titulo": "Celebración de la sesión",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b271",
+      "nombre": "Acta",
+      "titulo": "Acta",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b272",
+      "nombre": "Comunicar los acuerdos",
+      "titulo": "Comunicar los acuerdos",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b273",
+      "nombre": "Registrar",
+      "titulo": "Registrar",
+      "explicacion": "Con su número y su fecha.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b274",
+      "nombre": "Repartir o remitir",
+      "titulo": "Repartir o remitir",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b275",
+      "nombre": "Publicar o recibir la convocatoria",
+      "titulo": "Publicar o recibir la convocatoria",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b276",
+      "nombre": "Presentar la solicitud en plazo",
+      "titulo": "Presentar la solicitud en plazo",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "solicitud",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "documentación de la convocatoria",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b277",
+      "nombre": "Recibir la resolución",
+      "titulo": "Recibir la resolución",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b278",
+      "nombre": "Ejecutar el gasto",
+      "titulo": "Ejecutar el gasto",
+      "explicacion": "Lo finalista no se puede mover a otra finalidad.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b279",
+      "nombre": "Justificar",
+      "titulo": "Justificar",
+      "explicacion": "Es donde se pierden las subvenciones.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b280",
+      "nombre": "Propuesta del departamento",
+      "titulo": "Propuesta del departamento",
+      "explicacion": "",
+      "responsable": "Jefatura de Estudios",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b281",
+      "nombre": "Aprobación del Consejo Escolar",
+      "titulo": "Aprobación del Consejo Escolar",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b282",
+      "nombre": "Autorizaciones de las familias",
+      "titulo": "Autorizaciones de las familias",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "autorización firmada de cada alumno",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b283",
+      "nombre": "Cobro y control de ingresos, si lo hay",
+      "titulo": "Cobro y control de ingresos, si lo hay",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b284",
+      "nombre": "Liquidación al volver",
+      "titulo": "Liquidación al volver",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "facturas",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "justificantes de gasto",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b285",
+      "nombre": "Registrar el requerimiento o la visita",
+      "titulo": "Registrar el requerimiento o la visita",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b286",
+      "nombre": "Preparar la respuesta",
+      "titulo": "Preparar la respuesta",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b287",
+      "nombre": "Remitir en plazo",
+      "titulo": "Remitir en plazo",
+      "explicacion": "El plazo lo fija el propio requerimiento.",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b288",
+      "nombre": "Negociar el texto",
+      "titulo": "Negociar el texto",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b289",
+      "nombre": "Aprobación que corresponda",
+      "titulo": "Aprobación que corresponda",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b290",
+      "nombre": "Firma",
+      "titulo": "Firma",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "convenio firmado",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b291",
+      "nombre": "Desarrollo del proyecto",
+      "titulo": "Desarrollo del proyecto",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b292",
+      "nombre": "Memoria final",
+      "titulo": "Memoria final",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [
+        {
+          "id": "r0",
+          "texto": "memoria",
+          "clase": "documento",
+          "obligatorio": false
+        },
+        {
+          "id": "r1",
+          "texto": "justificación del gasto si lo hubo",
+          "clase": "documento",
+          "obligatorio": false
+        }
+      ],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b293",
+      "nombre": "Redactar el comunicado",
+      "titulo": "Redactar el comunicado",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b294",
+      "nombre": "Difundir",
+      "titulo": "Difundir",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    },
+    {
+      "id": "b295",
+      "nombre": "Informe del centro",
+      "titulo": "Informe del centro",
+      "explicacion": "",
+      "responsable": "Dirección",
+      "requisitos": [],
+      "soloInformativo": true,
+      "normativa": []
+    },
+    {
+      "id": "b296",
+      "nombre": "Comunicar la resolución a la familia",
+      "titulo": "Comunicar la resolución a la familia",
+      "explicacion": "",
+      "responsable": "Secretaría",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": []
+    }
+  ],
+  "guiasPorTipo": {
+    "Absentismo escolar": [
+      "b1",
+      "b2",
+      "b3",
+      "b4",
+      "b5",
+      "b6"
+    ],
+    "Corrección por conducta contraria a la convivencia": [
+      "b7",
+      "b8",
+      "b9",
+      "b10",
+      "b11",
+      "b12",
+      "b13",
+      "b14",
+      "b15",
+      "b16"
+    ],
+    "Medida disciplinaria por conducta gravemente perjudicial": [
+      "b17",
+      "b18",
+      "b19",
+      "b20",
+      "b12",
+      "b21",
+      "b22",
+      "b15",
+      "b23",
+      "b16"
+    ],
+    "Expediente de cambio de centro docente": [
+      "b24",
+      "b25",
+      "b26",
+      "b27",
+      "b28",
+      "b29",
+      "b30",
+      "b31",
+      "b32",
+      "b16"
+    ],
+    "Protocolo de actuación": [
+      "b33",
+      "b34",
+      "b35",
+      "b36",
+      "b37",
+      "b38",
+      "b39"
+    ],
+    "Atención en el aula de convivencia": [
+      "b40",
+      "b41",
+      "b20",
+      "b12",
+      "b42",
+      "b43"
+    ],
+    "Compromiso educativo o de convivencia": [
+      "b44",
+      "b45",
+      "b46",
+      "b47",
+      "b48"
+    ],
+    "Mediación escolar": [
+      "b49",
+      "b50",
+      "b51",
+      "b52",
+      "b53"
+    ],
+    "Evaluación psicopedagógica y alumnado NEAE": [
+      "b54",
+      "b55",
+      "b56",
+      "b57",
+      "b58",
+      "b59"
+    ],
+    "Matrícula del alumnado": [
+      "b60",
+      "b61",
+      "b62",
+      "b63",
+      "b64",
+      "b65",
+      "b66"
+    ],
+    "Cambio de materia optativa": [
+      "b67",
+      "b68",
+      "b69",
+      "b70",
+      "b71"
+    ],
+    "Cambio de grupo": [
+      "b72",
+      "b73",
+      "b74",
+      "b75",
+      "b76"
+    ],
+    "Anulación de matrícula": [
+      "b67",
+      "b69",
+      "b77",
+      "b71",
+      "b78"
+    ],
+    "Baja del alumnado": [
+      "b79",
+      "b80",
+      "b81",
+      "b82"
+    ],
+    "Admisión del alumnado": [
+      "b83",
+      "b84",
+      "b85",
+      "b86",
+      "b87",
+      "b88"
+    ],
+    "Traslado de expediente, salida": [
+      "b89",
+      "b90",
+      "b91",
+      "b92"
+    ],
+    "Apertura de expediente académico de ESO": [
+      "b93",
+      "b94",
+      "b95",
+      "b96"
+    ],
+    "Apertura de expediente académico de Bachillerato": [
+      "b93",
+      "b94",
+      "b95",
+      "b96"
+    ],
+    "Autorización de traslado de matrícula en Bachillerato": [
+      "b67",
+      "b97",
+      "b98",
+      "b99",
+      "b100"
+    ],
+    "Certificación académica": [
+      "b101",
+      "b102",
+      "b103",
+      "b104"
+    ],
+    "Certificación de matrículas en Séneca": [
+      "b105",
+      "b106"
+    ],
+    "Expedición de título académico": [
+      "b107",
+      "b108",
+      "b109",
+      "b110",
+      "b111",
+      "b112"
+    ],
+    "Reclamación de calificaciones": [
+      "b113",
+      "b114",
+      "b115",
+      "b116",
+      "b117",
+      "b118",
+      "b119",
+      "b120",
+      "b121",
+      "b122",
+      "b123",
+      "b124"
+    ],
+    "Entrega de documentación del expediente": [
+      "b67",
+      "b125",
+      "b126",
+      "b127"
+    ],
+    "Beca o ayuda al estudio": [
+      "b128",
+      "b129",
+      "b130",
+      "b131",
+      "b132"
+    ],
+    "Seguro escolar": [
+      "b133",
+      "b134",
+      "b135",
+      "b136"
+    ],
+    "Accidente de alumnado": [
+      "b137",
+      "b138",
+      "b139",
+      "b140",
+      "b141"
+    ],
+    "Transporte escolar": [
+      "b142",
+      "b143",
+      "b136"
+    ],
+    "Convalidación o exención": [
+      "b67",
+      "b116",
+      "b144",
+      "b145",
+      "b71"
+    ],
+    "Alta y gestión de iPasen": [
+      "b146",
+      "b147",
+      "b148",
+      "b149"
+    ],
+    "Cambio en la situación familiar": [
+      "b150",
+      "b151",
+      "b152",
+      "b153"
+    ],
+    "Solicitud de acceso a datos personales": [
+      "b154",
+      "b155",
+      "b156",
+      "b157",
+      "b158"
+    ],
+    "Solicitud de permiso": [
+      "b67",
+      "b159",
+      "b160",
+      "b100",
+      "b84",
+      "b141"
+    ],
+    "Solicitud de licencia": [
+      "b67",
+      "b161",
+      "b162",
+      "b163",
+      "b84"
+    ],
+    "Incapacidad temporal": [
+      "b164",
+      "b165",
+      "b166",
+      "b167",
+      "b168",
+      "b169",
+      "b170",
+      "b84"
+    ],
+    "Justificación de una ausencia": [
+      "b171",
+      "b172",
+      "b173",
+      "b174",
+      "b175",
+      "b176"
+    ],
+    "Estadillo mensual de ausencias": [
+      "b177",
+      "b178",
+      "b179",
+      "b180"
+    ],
+    "Petición de sustitución": [
+      "b181",
+      "b182",
+      "b183",
+      "b184",
+      "b185"
+    ],
+    "Toma de posesión": [
+      "b186",
+      "b187",
+      "b84",
+      "b188",
+      "b189"
+    ],
+    "Cese": [
+      "b190",
+      "b84",
+      "b191",
+      "b192",
+      "b193"
+    ],
+    "Alta y actualización de datos": [
+      "b194",
+      "b84",
+      "b195",
+      "b141"
+    ],
+    "Certificado a petición del personal": [
+      "b67",
+      "b146",
+      "b196",
+      "b104"
+    ],
+    "Incidencias de nómina": [
+      "b197",
+      "b198",
+      "b199",
+      "b200"
+    ],
+    "Complemento de productividad": [
+      "b201",
+      "b202",
+      "b162",
+      "b203"
+    ],
+    "Flexibilidad horaria": [
+      "b67",
+      "b161",
+      "b144",
+      "b204"
+    ],
+    "Formación y perfeccionamiento": [
+      "b67",
+      "b205",
+      "b100",
+      "b206",
+      "b207"
+    ],
+    "Desempeño de funciones": [
+      "b208",
+      "b209",
+      "b84",
+      "b141"
+    ],
+    "Insuficiencia de horario y reubicación": [
+      "b210",
+      "b211",
+      "b212",
+      "b213",
+      "b214"
+    ],
+    "Compra de bienes o servicios": [
+      "b215",
+      "b216",
+      "b217",
+      "b218",
+      "b219",
+      "b220",
+      "b221",
+      "b222",
+      "b223",
+      "b224",
+      "b225",
+      "b226"
+    ],
+    "Contrato menor de suministro": [
+      "b215",
+      "b216",
+      "b217",
+      "b218",
+      "b219",
+      "b220",
+      "b221",
+      "b222",
+      "b223",
+      "b224",
+      "b225",
+      "b226"
+    ],
+    "Contrato menor de obra": [
+      "b215",
+      "b216",
+      "b217",
+      "b218",
+      "b219",
+      "b220",
+      "b221",
+      "b222",
+      "b223",
+      "b224",
+      "b225",
+      "b226"
+    ],
+    "Expediente de contrato menor": [
+      "b215",
+      "b216",
+      "b217",
+      "b218",
+      "b219",
+      "b220",
+      "b221",
+      "b222",
+      "b223",
+      "b224",
+      "b225",
+      "b226"
+    ],
+    "Contrato de mantenimiento": [
+      "b227",
+      "b228",
+      "b229",
+      "b230",
+      "b231"
+    ],
+    "Garantía de un bien o servicio": [
+      "b232",
+      "b233",
+      "b234",
+      "b235",
+      "b236"
+    ],
+    "Presupuesto del centro": [
+      "b237",
+      "b238",
+      "b239",
+      "b240",
+      "b241",
+      "b242"
+    ],
+    "Cuenta de gestión y cierre del ejercicio": [
+      "b243",
+      "b244",
+      "b245",
+      "b246"
+    ],
+    "Retenciones y obligaciones fiscales": [
+      "b247",
+      "b248",
+      "b249"
+    ],
+    "Inventario del centro": [
+      "b250",
+      "b251",
+      "b252"
+    ],
+    "Programa de gratuidad de libros de texto": [
+      "b253",
+      "b254",
+      "b255",
+      "b256",
+      "b257",
+      "b258",
+      "b259"
+    ],
+    "Elecciones al Consejo Escolar": [
+      "b260",
+      "b261",
+      "b262",
+      "b263",
+      "b264",
+      "b265",
+      "b266",
+      "b267"
+    ],
+    "Sesión del Consejo Escolar": [
+      "b268",
+      "b269",
+      "b270",
+      "b271",
+      "b272"
+    ],
+    "Correspondencia de entrada o de salida": [
+      "b273",
+      "b274",
+      "b141"
+    ],
+    "Subvención": [
+      "b275",
+      "b276",
+      "b277",
+      "b278",
+      "b279"
+    ],
+    "Actividad complementaria o extraescolar": [
+      "b280",
+      "b281",
+      "b282",
+      "b283",
+      "b284"
+    ],
+    "Actuación del Servicio de Inspección": [
+      "b285",
+      "b286",
+      "b134",
+      "b287",
+      "b141"
+    ],
+    "Convenio con una entidad": [
+      "b288",
+      "b289",
+      "b290",
+      "b234",
+      "b235"
+    ],
+    "Proyecto o programa educativo": [
+      "b276",
+      "b277",
+      "b291",
+      "b292"
+    ],
+    "Comunicado": [
+      "b293",
+      "b294",
+      "b141"
+    ],
+    "Parada de transporte escolar": [
+      "b67",
+      "b295",
+      "b162",
+      "b296"
+    ]
+  }
+}
