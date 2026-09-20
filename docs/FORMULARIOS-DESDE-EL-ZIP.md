@@ -7,6 +7,32 @@ ninguna sesión de Claude Code tenía salida a internet para descargar los PDF o
 propio repositorio, en un fichero comprimido en la raíz: `formularios.zip`. Lo subió
 Francisco a mano desde la web de GitHub el 20-sep-2026. Solo hay que descomprimirlo.
 
+## AVISO IMPORTANTE, LÉELO ANTES DE TOCAR NADA
+
+Un PDF es un fichero binario. **Las herramientas `push_files` y `create_or_update_file` de la
+interfaz de GitHub solo admiten texto**: si les pasas el contenido de un PDF, lo que sube no
+es el PDF, sino una ristra de caracteres rotos con el mismo nombre. El fichero parece estar
+ahí y no abre en ningún visor. Eso es mucho peor que no subirlo, porque nadie se da cuenta
+hasta que alguien intenta usar el formulario.
+
+Por eso, **los once PDF solo se pueden meter en el repositorio de una de estas dos maneras**:
+
+- con `git push` de verdad, desde una sesión que lo tenga; o
+- subiéndolos Francisco a mano desde la web de GitHub, arrastrándolos a **Add file → Upload
+  files**.
+
+**Comprueba primero si tienes `git push`.** Prueba con `git push --dry-run` contra este
+repositorio:
+
+- **Si funciona**: sigue con los pasos de abajo, todos.
+- **Si no funciona** (sale un 403, o "access denied by the git proxy", o "git push está
+  bloqueado"): **para aquí**. No intentes subir los PDF de ninguna otra forma. Haz solo los
+  pasos 4 y 5 de abajo, que son texto y sí se pueden hacer, deja `formularios.zip` donde
+  está sin borrarlo, y deja la fila 85 BLOQUEADA con este motivo en una línea: *"los PDF
+  están en formularios.zip dentro del repositorio, pero esta sesión no tiene git push y los
+  binarios no se pueden subir con la interfaz de GitHub; los saca la primera sesión que
+  tenga git push, o Francisco a mano"*.
+
 ## Lo que hay que hacer
 
 1. Descomprimir `formularios.zip` en la raíz del repositorio. Dentro trae ya una carpeta
@@ -14,12 +40,17 @@ Francisco a mano desde la web de GitHub el 20-sep-2026. Solo hay que descomprimi
 2. Comprobar que están los once ficheros y que cada uno mide lo que pone la tabla de abajo.
    Si alguno no cuadra, parar y dejar la fila 85 BLOQUEADA con el motivo.
 3. **Borrar `formularios.zip`** de la raíz. No tiene que quedarse: son 6,6 MB duplicados y
-   Vercel publica la raíz entera, así que el zip quedaría descargable desde internet.
+   Vercel publica la raíz entera, así que el zip quedaría descargable desde internet. Esto
+   se hace **solo si los once PDF han subido bien**, nunca antes.
 4. Corregir una dirección equivocada en `datos/formularios.json` (ver más abajo).
 5. Marcar la fila 85 de `docs/COLA.md` como HECHA con la fecha, y apuntar la línea que toque
    en `docs/HISTORIA.md`.
 
 No hay que tocar nada de código ni ninguna prueba. Es solo mover ficheros.
+
+**Después de subir los PDF, compruébalos uno a uno**: baja cada uno del repositorio y mira
+que el tamaño coincide con la tabla y que empieza por `%PDF`. Si alguno no coincide, bórralo
+y deja la fila 85 BLOQUEADA: más vale ninguno que uno roto.
 
 ## Los once ficheros
 
@@ -65,7 +96,8 @@ La dirección buena del PDF de esa misma disposición es:
     https://www.juntadeandalucia.es/boja/2011/132/d1.pdf
 
 Sustituir la clave `u` de esas dos entradas por la segunda. Las otras nueve direcciones del
-fichero están bien y no se tocan.
+fichero están bien y no se tocan. **Esta corrección es texto, así que se puede hacer siempre**,
+tenga o no la sesión `git push`.
 
 ## Dónde estaba el atasco, para que no se repita
 
@@ -76,6 +108,6 @@ comprobó, pero no podía subir ficheros binarios al repositorio: para eso hace 
 push`, y esa sesión solo tenía la interfaz de GitHub, que únicamente admite texto.
 
 De ahí el rodeo del fichero comprimido: Francisco lo subió a mano desde el navegador, y así
-los PDF entran en el repositorio sin que ninguna sesión necesite ni internet ni `git push`.
-**Si algún día hay que volver a meter ficheros binarios en el repositorio, este es el camino
-corto**, y no hace falta volver a intentar descargarlos desde una sesión que no puede.
+los PDF entran en el repositorio sin que ninguna sesión necesite internet. **Si algún día hay
+que volver a meter ficheros binarios en el repositorio, este es el camino corto**: que los
+suba Francisco desde la web, ya con la carpeta y los nombres buenos, sin pasar por un zip.
