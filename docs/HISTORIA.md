@@ -5,6 +5,17 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 20-sep-2026 — Fila 85: bloqueada, sin salida a internet
+
+`docs/COLA.md` pedía copiar a `formularios/` los once PDF en blanco que la fila 84 no pudo bajar
+(`O-I.pdf` a `O-IX.pdf`, `O11-VI.pdf`, `O11-VII.pdf`, con sus direcciones de origen ya en
+`datos/formularios.json`). Esta sesión probó dos caminos —`curl` directo y `WebFetch`— contra
+`www.juntadeandalucia.es`, y los dos devolvieron el mismo rechazo del proxy de la organización
+(`CONNECT tunnel failed, response 403` / `EGRESS_BLOCKED`): sin salida a internet, exactamente el
+mismo motivo que ya bloqueó las filas 63 y 84. No queda ninguna fila PENDIENTE en `docs/COLA.md`;
+queda esta, apuntada, para la próxima sesión con salida a internet general (o para que Francisco
+copie los once PDF a mano en la carpeta `formularios/` del repositorio).
+
 ## 20-sep-2026 — Fila 84: el impreso, con los datos del centro ya puestos
 
 `docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md`. Última de las cuatro filas acordadas de golpe el
