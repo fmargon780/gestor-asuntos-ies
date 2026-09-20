@@ -112,7 +112,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   cargar los tipos y guías ya preparados para el instituto.
 - "Qué me toca": hitos pendientes de todos los asuntos abiertos, con filtro por responsable y un
   bloque "Dormidos" (asuntos sin novedades en N días). "Cuentas": asuntos por tipo, mes y quién
-  los pidió.
+  los pidió. "Formularios": catálogo de impresos oficiales, buscable, con su vía; un hito o un
+  tipo puede llevar los suyos.
 - Avisos de "fichas sin carpeta" y de la papelera vieja también en Asuntos abiertos, no solo
   entrando a propósito en Ajustes.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
@@ -141,9 +142,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   esperar a que Francisco lo haga a mano (ver la nota al final de `docs/COLA.md`).
 - **Comprobar siempre lo publicado con `curl`**, nunca darla por hecha.
 - Vercel publica máximo 100 veces/día (gratuito): `vercel.json` salta los commits que solo tocan `docs/`, `pruebas/`, `.github/` o `.md`; regla 13: máximo dos subidas por fila.
-- Antes de colgar una función nueva de `App`, comprobar que el nombre no está cogido. Solo hay un cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.
+- Antes de colgar una función nueva de `App`, comprobar que el nombre no está cogido. Un solo cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.
 - Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV.
-- Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o se le añade uno. Si no hay remedio, con `U.envolver`, apuntado en `js/envolturas-esperadas.js`.
+- Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o uno nuevo. Sin remedio, con `U.envolver`, apuntado en `js/envolturas-esperadas.js`.
 - Una acción que guarda y repinta: `await` hasta el final y usar `U.mientrasGuarda(control, fn)`
   para apagar el botón o desplegable ("Guardando…") mientras tanto (fila 23, 17-sep-2026).
 - Un bloque que se repinta solo nunca puede tirar lo que se está escribiendo, ni el foco, ni el
@@ -169,13 +170,12 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Poner en marcha el script de Gmail (`g.educaand.es`): señalar `GESTOR-BANDEJA` en Ajustes y pegar `apps-script/gestor-correos.gs` en `script.google.com`.
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI" en la tarjeta.
-- Comprobar "Ajustar tamaño" con un documento real. Qué hacer con asuntos vivos al cambiar de curso; pasar repositorio y Vercel a una cuenta del centro.
-- Ajustes → El centro → Membrete/Cargos: imagen, Consejería, quién ocupa cada cargo (fila 81).
+- Comprobar "Ajustar tamaño" con un documento real; asuntos vivos al cambiar de curso; repositorio y Vercel a una cuenta del centro; Ajustes → Membrete/Cargos: imagen, Consejería, ocupantes (fila 81).
 - Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
-- Pulsar "Poner en orden las fichas del ARCHIVO" (Ajustes → Mantenimiento, fila 64): mueve a su carpeta la ficha de los archivados antes de esa fila, para que `asuntos.json` no siga creciendo.
+- Pulsar "Poner en orden las fichas del ARCHIVO" (Mantenimiento, fila 64): mueve a su carpeta la ficha de los archivados antes de esa fila, para que `asuntos.json` no siga creciendo.
 - Pulsar, antes de junio de 2027, "Guardar el contacto de los asuntos abiertos" (Ajustes → Mantenimiento, fila 66).
-- Fila 67: colaborador en GitHub/Vercel; copiar `LAS-CUENTAS.md` al Dropbox.
-- Decisión de Francisco: ¿la papelera se vacía sola a los N días? Mientras no se decida, solo el aviso más insistente, nunca el borrado solo.
+- Fila 67: colaborador en GitHub/Vercel; copiar `LAS-CUENTAS.md`.
+- Decisión: ¿la papelera se vacía sola a los N días? Mientras no se decida, solo el aviso más insistente, nunca el borrado solo.
 - Antes de una publicación importante, repasar `docs/COMPROBAR-A-MANO.md` (lo que ninguna prueba cubre).
 
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero

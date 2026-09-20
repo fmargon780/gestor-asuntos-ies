@@ -266,7 +266,12 @@
   }
 
   function filasHtml(buenas) {
-    return '<div class="ficha-datos">' + buenas.map(function (f) {
+    /* `id`: js/formularios.js (fila 82) cuelga ahí su propia fila
+       "Formularios", async, solo cuando de verdad hay alguno. Nunca se
+       pinta un hueco vacío aquí: eso rompería el recuento exacto de
+       `.ficha-dato` de pruebas/ficha-disposicion.mjs cuando el asunto
+       no tiene ninguno. */
+    return '<div class="ficha-datos" id="ficha-datos-tramite">' + buenas.map(function (f) {
       return '<div class="ficha-dato"><span>' + U.escapar(f.titulo) + '</span>' +
              '<span>' + U.escapar(f.valor) + '</span></div>';
     }).join('') + '</div>';
@@ -621,7 +626,16 @@
       { titulo: 'Lo pide', valor: window.LoPide ? LoPide.texto(f) : '' },
       { titulo: 'En el archivo', valor: a.ruta || '' }
     ]).filter(function (x) { return x && x.valor; });
-    return buenas.length ? filasHtml(buenas) : null;
+    /* "Formularios" (20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md):
+       se rellena aparte, después de pintar (js/formularios.js, que
+       envuelve App.abrirFicha), porque hace falta leer los hitos del
+       asunto, que es async. Nace oculta: si no hay ninguno, se queda
+       así, sin que nada la muestre. */
+    if (!buenas.length) return null;
+    var extraFormularios = window.Formularios
+      ? '<div class="ficha-dato oculto" id="ficha-formularios-fila">' +
+        '<span>Formularios</span><span id="ficha-formularios-valor"></span></div>' : '';
+    return filasHtml(buenas, extraFormularios);
   }
 
   /* ---------- "Lo pide": quién ha pedido esta gestión ----------

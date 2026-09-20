@@ -31,6 +31,7 @@
 <link rel="stylesheet" href="css/unir-asuntos.css">
 <link rel="stylesheet" href="css/papelera.css">
 <link rel="stylesheet" href="css/hitos.css">
+<link rel="stylesheet" href="css/formularios.css">
 <link rel="stylesheet" href="css/que-me-toca.css">
 <link rel="stylesheet" href="css/plantillas-documento.css">
 <link rel="stylesheet" href="css/pdf-separar-unir.css">
@@ -959,6 +960,12 @@
      de App.abrirFicha que ya usa js/correo.js. -->
 <script src="js/docx.js"></script>
 <script src="js/plantillas-documento.js"></script>
+<!-- js/formularios.js (fila 82, 20-sep-2026, docs/FORMULARIOS-OFICIALES.md):
+     va después de js/ficha-asunto.js (envuelve App.abrirFicha, que se
+     define ahí) y de js/hitos-panel-lista.js (Formularios.listaHTML
+     se llama desde su cuerpoDeHito, en tiempo de ejecución, así que el
+     orden entre los dos no importa de verdad, pero van juntos). -->
+<script src="js/formularios.js"></script>
 <script src="js/salir.js"></script>
 <script src="js/rescate-datos.js"></script>
 <script src="js/traer-datos.js"></script>

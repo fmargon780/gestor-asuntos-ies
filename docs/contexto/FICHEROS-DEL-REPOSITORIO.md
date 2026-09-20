@@ -115,6 +115,8 @@ de `App` va después del fichero que lo define.
 | `js/seneca-ayudante.js`, `css/relacionados.css` (`.marcado-chip-copiado`) | El enlace-marcador que pega los usuarios IdEA uno a uno en Séneca (fila 47) |
 | `js/docx.js` | Rellenar los huecos de una plantilla de Word: ZIP y XML a mano, sin librerías (`window.Docx`). Desde la fila 81, también `Docx.ponerImagen` para meter el membrete antes de rellenar |
 | `js/plantillas-documento.js` | Botón "Generar documento" en la ficha; desde el 17-sep-2026 (fila 39) pinta solo las plantillas de documento de un tipo dentro de su pantalla (`PlantillasDocumento.pintarDeTipo`, `css/plantillas-documento.css`); desde la fila 81, el alta/edición gana "Quien firma"/"Visto bueno", y al generar mete el membrete antes de rellenar |
+| `js/formularios.js`, `css/formularios.css` | El catálogo de formularios oficiales (`window.Formularios`, fila 82): cargar/buscar/etiquetaDeVia, el editor embebido en el paso de guía y en "Datos del tipo", la lista de solo lectura de un hito, la línea "Formularios" de la ficha (envuelve `App.abrirFicha`), la pantalla propia y el botón "Actualizar el catálogo" de Ajustes → Mantenimiento |
+| `datos/formularios.json` | El catálogo de formularios oficiales, copiado de `fmargon780/normativa-escolarizacion` (fila 82) |
 | `js/salir.js` | El botón de Salir del pie de la barra |
 | `js/rescate-datos.js` | Recoge los CSV que se hayan quedado un piso más arriba |
 | `js/traer-datos.js` | El botón de traer los CSV de Séneca desde donde estén |
@@ -170,6 +172,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/cargar-biblioteca.mjs` | Prueba (jsdom, sin navegador) del botón "Cargar la biblioteca del centro" (fila 80): altas, renombrados con nombre corto, modelos compartidos entre dos tipos, campos propios, una guía ya escrita a mano que no se toca, y que cargarla dos veces no duplica nada |
 | `pruebas/cargos.mjs` | Prueba (jsdom, sin navegador, fechas contadas desde hoy) de los cargos del centro (fila 81): ocupante único, dos en cadena, fecha anterior a todos, hueco entre dos, un solape, un cargo sin ocupantes |
 | `pruebas/membrete.mjs` | Prueba (sin navegador) de `Membrete.medir` (fila 81): nombre corto (una línea, tamaño máximo), intermedio (una línea, tamaño reducido), largo (dos líneas parejas) y largo sin espacios (no hay dónde partir) |
+| `pruebas/formularios.mjs` | Prueba (sin navegador) de `Formularios.buscar`/`etiquetaDeVia` (fila 82): por nombre y por norma, con tildes y sin ellas, texto vacío, las cuatro vías y una desconocida, un formulario sin `u` |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |

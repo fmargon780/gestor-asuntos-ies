@@ -158,15 +158,14 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 79 | `docs/BIBLIOTECA-DE-HITOS.md` | HECHA (20-sep-2026 · 09:32) |
 | 80 | `docs/CARGAR-BIBLIOTECA.md` | HECHA (20-sep-2026 · 09:32) |
 | 81 | `docs/FIRMANTES-Y-MEMBRETE.md` | HECHA (20-sep-2026) |
-| 82 | `docs/FORMULARIOS-OFICIALES.md` | EN CURSO (20-sep-2026) |
-| 83 | `docs/PLANTILLAS-DEL-CENTRO.md` | PENDIENTE |
+| 82 | `docs/FORMULARIOS-OFICIALES.md` | HECHA (20-sep-2026) |
+| 83 | `docs/PLANTILLAS-DEL-CENTRO.md` | EN CURSO (20-sep-2026) |
 
-**Orden de trabajo:** todas las filas de 1 a 81 están HECHAS, salvo la 63 y la 76, BLOQUEADAS (una
+**Orden de trabajo:** todas las filas de 1 a 82 están HECHAS, salvo la 63 y la 76, BLOQUEADAS (una
 sesión sin salida a internet, la otra por el riesgo de tocar el mecanismo de publicación sin
-Francisco delante). Quedan las filas **82 y 83**, en ese orden (20-sep-2026,
-`docs/COLA-NUEVAS-2026-09-20.md`): la 83 usa lo que montan la 81 y la 82, así que va la última.
-Cuando se apunte una fila nueva, esta nota se sustituye por la que toque: no hay que mantener el
-repaso de las filas ya hechas más que en `docs/HISTORIA.md`.
+Francisco delante). Queda la fila **83** (20-sep-2026, `docs/COLA-NUEVAS-2026-09-20.md`): usa lo que
+montan la 81 y la 82. Cuando se apunte una fila nueva, esta nota se sustituye por la que toque: no
+hay que mantener el repaso de las filas ya hechas más que en `docs/HISTORIA.md`.
 
 **El orden de trabajo NO es el de los números.** La tabla de arriba está puesta **en el orden en que
 hay que hacerlas**, de arriba abajo, y por eso la 65 aparece entre la 62 y la 63. Los números no se

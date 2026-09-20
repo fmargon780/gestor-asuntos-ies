@@ -5,6 +5,43 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 20-sep-2026 — Fila 82: los formularios oficiales, a un clic
+
+`docs/FORMULARIOS-OFICIALES.md`. El catálogo de 29 impresos del trámite de escolarización y
+convivencia ya estaba escrito, en otro repositorio (`fmargon780/normativa-escolarizacion`,
+`datos/formularios.json`): esta fila lo trae aquí, tal cual (`get_file_contents`, sin tocar nada),
+y lo cuelga de los sitios donde de verdad hace falta un impreso — un hito, un tipo de asunto, la
+ficha del asunto — en vez de salir a buscarlo.
+
+**Se copia, no se lee en vivo.** La red del centro bloquea direcciones que no hacen falta, y la
+aplicación trabaja sobre ficheros del ordenador: depender de otra web para pintar una pantalla
+habría sido frágil. `js/formularios.js` lo lee con `fetch` relativo del propio sitio, una sola vez
+por sesión; el botón "Actualizar el catálogo" (Ajustes → Mantenimiento) fuerza a releerlo, para
+cuando se publique una versión de la aplicación con más formularios.
+
+**Dónde se elige.** Un paso de guía (y, copiado, un hito modelo de la biblioteca y un hito vivo)
+gana `formularios: [clave, ...]`, con el mismo criterio que la normativa de la fila 79: solo en el
+paso de arriba, nunca en una opción. El buscador con casillas se pinta DENTRO del mismo `<details>`
+de normativa —`HitosNormativa.bloqueHTML` gana un segundo argumento, `formulariosHTML`, en vez de
+crear un `<details>` hermano— para no alargar más la pantalla del paso, tal y como pedía el
+encargo. Un tipo de asunto también gana su propia lista, en "Datos del tipo", para lo que no
+depende de ningún paso concreto.
+
+**Dónde se ven.** En el cuerpo de un hito vivo, igual que la normativa: un enlace con aspecto de
+botón para los de vía "descarga"/"centro" (hay un impreso real que bajar), un aviso —con su nota,
+si la tiene— para "protocolo"/"seneca" (no hay nada que descargar, y no debía parecer que sí). En
+la ficha del asunto, una línea nueva "Formularios" dentro de "Datos del trámite", con los de todos
+los hitos VISIBLES del asunto (la rama en curso, sin repetir) más los del tipo; como hace falta leer
+los hitos —async— y `datosDelAsunto` es síncrona, se pinta un hueco vacío y `js/formularios.js` lo
+rellena después, envolviendo `App.abrirFicha` (mismo patrón que ya usan `js/correo.js` y
+`js/plantillas-documento.js`). Y una pantalla propia "Formularios", con su entrada en la barra
+lateral junto a "Qué me toca" y "Cuentas": el catálogo entero, buscable, agrupado por norma, para
+cuando hace falta un impreso sin tener un asunto delante.
+
+Comprobado con `pruebas/formularios.mjs` (sin navegador: solo las dos funciones puras, `buscar` y
+`etiquetaDeVia`) y `pruebas/nombres-app.mjs` (ningún nombre de `App` repetido). Batería completa en
+verde, una sola pasada al final.
+
 ## 20-sep-2026 — Fila 81: los firmantes del centro y el membrete
 
 `docs/FIRMANTES-Y-MEMBRETE.md`. Un documento generado salía sin membrete y con una firma fija

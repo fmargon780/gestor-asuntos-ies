@@ -179,7 +179,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 
 | Fichero | Qué es |
 |---|---|
-| `tipos.json` | Tipos de asunto y su categoría |
+| `tipos.json` | Tipos de asunto y su categoría. `formularios` (fila 82): claves del catálogo de `datos/formularios.json` que aplican a cualquier asunto de ese tipo, sin depender de ningún paso |
 | `tipos-documento.json` | Tipos de documento |
 | `estados.json` | Estados de tramitación, en el orden del trámite |
 | `asuntos.json` | Ficha de cada asunto: quién lo abrió, estado, vía, notas, cierre, pasos, fecha límite, documentos pendientes de registro, relacionados, campos configurados del tipo, hilos de correo enganchados, quién ha pedido la gestión (`loPide`) |
