@@ -1,8 +1,8 @@
 # La biblioteca de hitos del centro
 
 Fila 79 de `docs/COLA.md`. Acordada con Francisco el 20-sep-2026.
-**Ampliada el 20-sep-2026** con los apartados 4.6, 4.7 y 4.8 (hitos solo informativos y
-normativa del hito), acordados con Francisco en la misma conversación.
+**Ampliada el 20-sep-2026** con los apartados 4.6 a 4.9 (hitos solo informativos, normativa del
+hito y nombre corto del tipo de asunto), acordados con Francisco en la misma conversación.
 
 **Sube directamente a `main`, sin abrir ninguna petición de cambios.** Cambios quirúrgicos, no
 reescribas ficheros enteros. No leas el repositorio entero: con `docs/CONTEXTO.md`,
@@ -39,11 +39,13 @@ Las cuatro decisiones que Francisco ya ha tomado, y que no se replantean:
 4. **Los asuntos ya abiertos no se enteran de nada.** Sus hitos siguen como estaban. Un trámite
    empezado no cambia de reglas a mitad. Los asuntos nuevos sí nacen con la guía actualizada.
 
-Y dos decisiones más, del 20-sep-2026, que se desarrollan en los apartados 4.6 a 4.8:
+Y tres decisiones más, del 20-sep-2026, que se desarrollan en los apartados 4.6 a 4.9:
 
 5. **Un hito puede estar marcado como "Solo informativo".** Se ve, pero no reclama trabajo.
 6. **Un hito puede llevar su normativa**, con enlace al artículo en el sistema de normativa del
    centro.
+7. **Un Tipo de Asunto puede tener un nombre corto**, que es el que entra en el nombre de la
+   carpeta.
 
 Lo que NO entra en esta fila: los pasos-pregunta (las bifurcaciones) no se guardan en la
 biblioteca. Un modelo es siempre un paso normal. Si Francisco intenta guardar un paso-pregunta en
@@ -91,6 +93,8 @@ fila 61). Entra en las copias de seguridad diarias como los demás.
 - Un paso de guía traído de la biblioteca gana un campo nuevo en `guias.json`:
   `origenBiblioteca: { id, revision }`. Un paso escrito a mano no lo lleva, y sigue funcionando
   exactamente como hoy.
+
+El nombre corto del apartado 4.9 **no** vive aquí: es del Tipo de Asunto, y va en `tipos.json`.
 
 ## 4. Lo que ve Francisco
 
@@ -273,6 +277,49 @@ Nada, como en el resto de la fila. Sus hitos no ganan `soloInformativo` ni `norm
 retroactiva: un hito sin esos campos se comporta como un hito normal y sin normativa. Al leer,
 trata la ausencia del campo como `soloInformativo: false` y `normativa: []`.
 
+### 4.9 El nombre corto del Tipo de Asunto (20-sep-2026)
+
+**El porqué.** La biblioteca va a traer Tipos de Asunto con nombres completos y claros
+("Corrección por conducta contraria a la convivencia"), pero el nombre del tipo entra tal cual en
+el nombre de la carpeta del asunto, y las carpetas tienen que seguir siendo cortas. Hoy
+Francisco resuelve eso abreviando el nombre del tipo, y pierde la claridad en pantalla.
+
+**Qué es.** Un campo nuevo en cada Tipo de Asunto, dentro de `tipos.json`: `nombreCorto` (texto,
+vacío por defecto).
+
+- El **nombre** (el de siempre) es el que se ve en pantalla, en la rejilla de Ajustes, en el
+  desplegable de crear un asunto, en la ficha del asunto y en la biblioteca.
+- El **nombre corto** es el que entra en el **nombre de la carpeta** del asunto, en el sitio donde
+  hoy entra el nombre del tipo (`AAMMDD TIPO [...] Tercero`), y también en el nombre de los
+  documentos (`AAMMDD [REGISTRO] TIPO [...].ext`).
+- **Si está vacío, se usa el nombre de siempre.** Ningún tipo de los que ya existen cambia de
+  comportamiento, y ninguna carpeta ya creada se toca.
+
+**Reglas:**
+
+- Se escribe en la sección 1 "Datos del tipo" de la pantalla de un Tipo de Asunto
+  (`js/ajustes-tipo.js`), debajo del nombre, con su ayuda en una línea: "Lo que entra en el nombre
+  de la carpeta. Si lo dejas vacío, se usa el nombre de arriba."
+- Se normaliza igual que el nombre del tipo lo esté hoy (mayúsculas y sin acentos, si así se hace
+  hoy en `js/nombres.js`; no cambies esa regla, solo el texto del que parte).
+- **Aviso, no bloqueo**, si pasa de 16 caracteres: una línea ámbar diciendo cuántos lleva.
+- **Guardia de duplicados**: dos tipos no pueden acabar con el mismo nombre corto efectivo (el
+  suyo, o el nombre si está vacío). Pasa por el mismo aviso en vivo que ya tiene el nombre del
+  tipo (`U.parecidos` / `U.dejaCrear`, `App.pintarAvisoNuevoTipo`): si ya existe, línea roja y no
+  deja guardar; si solo se parece, línea ámbar y deja.
+- **Cambiar el nombre corto NO renombra las carpetas ya creadas.** Solo afecta a los asuntos que
+  se creen a partir de ese momento. Dilo en la propia pantalla, en la misma línea de ayuda.
+- **El buscador encuentra por los dos nombres** y por los alias que el tipo ya guarda: el buscador
+  cruzado de Ajustes (`#buscar-tipos`), el buscador de tipos al crear un asunto y el buscador del
+  ARCHIVO.
+- La **vista previa** del nombre de la carpeta, al crear y al editar un asunto, enseña ya el
+  nombre corto: es la comprobación que hará Francisco.
+
+**Una función, un solo sitio.** Todo el que hoy mete el nombre del tipo en un nombre de carpeta o
+de documento tiene que pasar por una función nueva, `Nombres.tipoParaCarpeta(tipo)`, que devuelve
+el nombre corto si lo hay y el nombre si no. Busca **todos** los sitios que hoy usan `tipo.tipo`
+para construir un nombre y hazlos pasar por ella; no la dupliques.
+
 ## 5. Qué se toca de los hitos, y qué no
 
 De la versión original de este documento decía "no se toca nada de `js/hitos*.js`". Con los
@@ -292,8 +339,8 @@ apartados 4.6 y 4.7 eso cambia, y solo en lo imprescindible:
 **No se toca:** `js/hitos-requisitos.js`, `js/hitos-comunicar.js`, `js/hitos-documentos.js`.
 `hitos.json` gana dos campos y ninguno es obligatorio.
 
-**Sigue valiendo:** un tipo sin ningún paso traído de la biblioteca, y sin marcas ni normativa, se
-comporta exactamente igual que hoy. Los asuntos ya creados, igual que hoy.
+**Sigue valiendo:** un tipo sin ningún paso traído de la biblioteca, sin marcas, sin normativa y
+sin nombre corto se comporta exactamente igual que hoy. Los asuntos ya creados, igual que hoy.
 
 ## 6. Los ficheros
 
@@ -319,18 +366,27 @@ Nuevos:
   la marca del tipo; que el enlace se monta bien con bloque y clave, que con solo `url` usa la
   `url`, que sin nada no hay enlace, y que con la dirección base vacía tampoco; y que un espacio
   en la clave se guarda como guion.
+- `pruebas/nombre-corto-de-tipo.mjs` — sin navegador, para el apartado 4.9: que un tipo sin nombre
+  corto da el mismo nombre de carpeta que hoy; que con nombre corto lo usa en la carpeta y en el
+  nombre de un documento; que el nombre largo sigue saliendo en pantalla; que dos tipos no pueden
+  acabar con el mismo nombre corto efectivo; y que cambiar el nombre corto no toca los asuntos ya
+  creados.
 
 Se tocan, lo mínimo:
 
 - `js/guias.js` — enganchar los botones nuevos, la casilla "Solo informativo", el bloque de
   normativa y la pregunta al aceptar. Toda la lógica va en los ficheros nuevos: `js/guias.js` solo
   llama. **Ya está cerca de su tope**: no lo engordes.
-- `js/ajustes-tipo.js` — la línea ámbar de la sección 3.
+- `js/ajustes-tipo.js` — la línea ámbar de la sección 3, y el campo de nombre corto en la
+  sección 1.
 - `js/ajustes-centro.js` — colgar el bloque nuevo y el campo de la dirección base, nada más.
+- `js/nombres.js` — la función `Nombres.tipoParaCarpeta(tipo)` del apartado 4.9, y los sitios que
+  hoy meten `tipo.tipo` en un nombre.
 - Los cuatro sitios de hitos que dice el apartado 5.
 - `index.html` — los `<script>` nuevos, en el orden que toca (después de `js/guias.js`).
 - `docs/CONTEXTO-CORTO.md`, `docs/CONTEXTO.md`, `docs/contexto/HITOS-Y-GUIAS.md`,
-  `docs/contexto/FICHEROS-DEL-REPOSITORIO.md`, `docs/HISTORIA.md`, `docs/COLA.md`.
+  `docs/contexto/CAMPOS-Y-TIPOS.md`, `docs/contexto/FICHEROS-DEL-REPOSITORIO.md`,
+  `docs/HISTORIA.md`, `docs/COLA.md`.
 
 Cualquier fichero que se acerque a las 400 líneas, se parte.
 
@@ -338,7 +394,8 @@ Cualquier fichero que se acerque a las 400 líneas, se parte.
 
 `npm test` en verde, subida a `main`, comprobar lo publicado con `curl`, y marcar la fila 79 como
 HECHA. Un mensaje corto a Francisco: qué va a ver distinto en la pantalla de un Tipo de Asunto, en
-la ficha de un asunto y en Ajustes → El centro.
+la ficha de un asunto y en Ajustes → El centro, y que el nombre corto solo afecta a los asuntos
+nuevos.
 
 ## 8. Lo que viene después (no es de esta fila)
 
