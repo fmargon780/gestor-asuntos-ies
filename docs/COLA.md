@@ -152,8 +152,8 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 73 | `docs/BUSCAR-EN-LAS-NOTAS.md` | HECHA (19-sep-2026) |
 | 74 | `docs/CUENTAS-DE-FIN-DE-CURSO.md` | HECHA (19-sep-2026) |
 | 75 | `docs/HUECOS-ENCONTRADOS-FILA-69.md` | HECHA (19-sep-2026 · 15:55): muchas más subidas de las debidas, y hubo que corregir erratas (nota más abajo) |
-| 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | PENDIENTE (no urgente: separada de la fila 72) |
-| 77 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 3 (los borrados que se fusionen) | PENDIENTE (no urgente: separada de la fila 72) |
+| 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1, cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante. |
+| 77 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 3 (los borrados que se fusionen) | EN CURSO (20-sep-2026) |
 | 78 | Repartir `docs/contexto/ASUNTOS.md` (ha pasado los 40 KB del objetivo de la fila 65) | PENDIENTE (no urgente: se puede seguir editando, solo cuesta un poco más) |
 
 **Orden de trabajo:** las filas 1 a 74 están HECHAS (las del informe crítico del 18-sep-2026,
