@@ -8,11 +8,11 @@ cola).
 ## Qué hacer con este documento
 
 1. Abre `docs/COLA.md`.
-2. Añade estas tres filas al final de la tabla, en este orden.
+2. Añade estas cuatro filas al final de la tabla, en este orden.
 3. Sustituye la nota que dice "**No queda ninguna fila PENDIENTE**" por una que diga que quedan
-   las filas 81, 82 y 83, en ese orden.
+   las filas 81, 82, 83 y 84, en ese orden.
 4. Borra este documento (`docs/COLA-NUEVAS-2026-09-20.md`) en la misma subida.
-5. Haz las tres filas, en orden, siguiendo las reglas de siempre de la cola.
+5. Haz las cuatro filas, en orden, siguiendo las reglas de siempre de la cola.
 
 ## Las filas
 
@@ -21,11 +21,14 @@ cola).
 | 81 | `docs/FIRMANTES-Y-MEMBRETE.md` | PENDIENTE |
 | 82 | `docs/FORMULARIOS-OFICIALES.md` | PENDIENTE |
 | 83 | `docs/PLANTILLAS-DEL-CENTRO.md` | PENDIENTE |
+| 84 | `docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md` | PENDIENTE |
 
-**El orden importa.** La 83 usa lo que montan la 81 y la 82, así que va la última. La 81 y la 82
-son independientes entre sí.
+**El orden importa.** La 82 va antes que la 83 y que la 84, porque las dos usan su catálogo de
+formularios. La 83 usa además los cargos y el membrete de la 81. La 81 y la 82 son
+independientes entre sí. La 84 puede hacerse antes que la 83 si conviene, pero nunca antes que
+la 82.
 
-## Las tres, en una línea cada una
+## Las cuatro, en una línea cada una
 
 **81 · Los firmantes del centro y el membrete.** Cada cargo del centro (Dirección, Jefatura de
 Estudios, Secretaría…) lleva la lista de quién lo ha ocupado, con fecha de inicio y de cese, en
@@ -51,6 +54,13 @@ en `plantillas/` del repositorio como texto, un script las convierte en `.docx`,
 Ajustes → Mantenimiento las carga en `_GESTOR/PLANTILLAS` sin que nadie suba nada a mano.
 Ficheros nuevos: `plantillas/`, `scripts/hacer-plantillas.mjs`,
 `pruebas/plantillas-del-centro.mjs`.
+
+**84 · El impreso, con los datos del centro ya puestos.** Antes de imprimir un impreso oficial o
+de mandárselo a una familia, a un trabajador o a una empresa, un botón lo prepara: escribe en él
+**solo los datos del centro y el año académico**, y lo guarda en la carpeta del asunto listo para
+adjuntar. Los datos de la persona los sigue escribiendo ella, **a propósito**, para poder
+comprobar al recibir el impreso si alguno ha cambiado. Ficheros nuevos:
+`js/formularios-rellenar.js`, `formularios/`, `pruebas/formularios-rellenar.mjs`.
 
 ## Una cosa que Francisco tiene que hacer, una sola vez
 
