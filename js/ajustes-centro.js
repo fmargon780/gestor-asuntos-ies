@@ -185,6 +185,7 @@ App.quitarEstado = async function (nombre) {
     for (var i = 0; i < App.E.estados.length; i++) { if (App.E.estados[i].nombre === nombre) { pos = i; break; } }
     var estadoObjeto = pos !== -1 ? App.E.estados[pos] : { nombre: nombre, espera: false };
     App.E.estados = App.E.estados.filter(function (e) { return e.nombre !== nombre; });
+    await Borrados.marcar(App.E.gestor, 'estados', nombre);
     await App.guardarEstados();
     await window.Papelera.mandarDato('estado', nombre, null, { estado: estadoObjeto, posicion: pos });
 
@@ -207,6 +208,7 @@ $('btn-anadir-estado').onclick = async function () {
   if (!nombre) return;
   var hay = App.E.estados.map(function (e) { return e.nombre; });
   if (!await U.dejaCrear(nombre, hay, 'estado')) return;
+  await Borrados.revivir(App.E.gestor, 'estados', nombre);
   App.E.estados.push({ nombre: nombre, espera: false });
   await App.guardarEstados();
   $('nuevo-estado').value = '';
@@ -251,6 +253,7 @@ App.borrarTipoDocumento = async function (nombre) {
   var pos = App.E.tiposDocumento.indexOf(nombre);
   try {
     App.E.tiposDocumento = App.E.tiposDocumento.filter(function (x) { return x !== nombre; });
+    await Borrados.marcar(App.E.gestor, 'tiposDocumento', nombre);
     await App.guardarTiposDocumento();
     await window.Papelera.mandarDato('tipo-documento', nombre, null, { nombre: nombre, posicion: pos });
     App.pintarTiposDeDocumento();
@@ -269,6 +272,7 @@ $('btn-anadir-tipo-doc').onclick = async function () {
   var nombre = U.limpiarNombre($('nuevo-tipo-doc').value).toUpperCase();
   if (!nombre) return;
   if (!await U.dejaCrear(nombre, App.E.tiposDocumento, 'tipo de documento')) return;
+  await Borrados.revivir(App.E.gestor, 'tiposDocumento', nombre);
   App.E.tiposDocumento.push(nombre);
   await App.guardarTiposDocumento();
   $('nuevo-tipo-doc').value = '';

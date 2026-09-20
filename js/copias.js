@@ -56,11 +56,15 @@ var Copias = (function () {
      (16-sep-2026, los hitos de cada asunto) es el duodécimo,
      `grupos.json` (17-sep-2026, los grupos propios de personas) el
      decimotercero, y `usuarios.json` (19-sep-2026, fila 72, la lista
-     de nombres de quien entra) el decimocuarto. */
+     de nombres de quien entra) el decimocuarto. `borrados-listas.json`
+     (20-sep-2026, fila 77, docs/DETALLES-DE-MANTENIMIENTO.md, punto 3:
+     los borrados de tipos, estados, tipos de documento y recurrentes
+     que se fusionan entre ordenadores, ver js/borrados-fusion.js) es
+     el decimoquinto. */
   var FICHEROS = ['asuntos.json', 'guias.json', 'tipos.json', 'estados.json',
                    'tipos-documento.json', 'tablon.json', 'recurrentes.json', 'frescura.json',
                    'campos.json', 'papelera.json', 'no-duplicados.json', 'hitos.json', 'grupos.json',
-                   'usuarios.json'];
+                   'usuarios.json', 'borrados-listas.json'];
 
   function dosDigitos(n) { return String(n).padStart(2, '0'); }
 

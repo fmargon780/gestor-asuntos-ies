@@ -457,6 +457,7 @@ App.borrarTipo = async function (tipo) {
 
   try {
     App.E.tipos = App.E.tipos.filter(function (x) { return x.tipo !== tipo.tipo; });
+    await Borrados.marcar(App.E.gestor, 'tipos', tipo.tipo);
     await App.guardarTipos();
     if (guia) {
       var guiasActual = (await Carpetas.leerJson(App.E.gestor, 'guias.json')) || {};
@@ -539,6 +540,7 @@ $('btn-anadir-tipo').onclick = async function () {
   if (!nombre) return;
   var hay = App.E.tipos.map(function (t) { return t.tipo; });
   if (!await U.dejaCrear(nombre, hay, 'tipo')) return;
+  await Borrados.revivir(App.E.gestor, 'tipos', nombre);
   App.E.tipos.push({ tipo: nombre, categoria: $('nueva-categoria').value });
   await App.guardarTipos();
   $('nuevo-tipo').value = '';
