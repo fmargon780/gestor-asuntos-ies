@@ -41,6 +41,8 @@
     $('plantillas-direccion').value = datosDeAjustes.direccion;
     $('plantillas-codigo').value = datosDeAjustes.codigo;
     $('plantillas-cargo').value = datosDeAjustes.cargo;
+    /* 20-sep-2026, fila 84: para el hueco {{PROVINCIA}} de un impreso. */
+    if ($('plantillas-provincia')) $('plantillas-provincia').value = datosDeAjustes.provincia;
     /* 20-sep-2026, fila 79, apartado 4.7. */
     if ($('plantillas-direccion-normativa')) {
       $('plantillas-direccion-normativa').value = datosDeAjustes.direccionNormativa;
@@ -55,6 +57,7 @@
     var direccion = $('plantillas-direccion').value.trim();
     var codigo = $('plantillas-codigo').value.trim();
     var cargo = $('plantillas-cargo').value.trim();
+    var provincia = $('plantillas-provincia') ? $('plantillas-provincia').value.trim() : datosDeAjustes.provincia;
     var direccionNormativa = $('plantillas-direccion-normativa')
       ? $('plantillas-direccion-normativa').value.trim().replace(/\/$/, '')
       : datosDeAjustes.direccionNormativa;
@@ -66,6 +69,7 @@
         actual.direccion = direccion;
         actual.codigo = codigo;
         actual.cargo = cargo;
+        actual.provincia = provincia;
         actual.direccionNormativa = direccionNormativa;
         return actual;
       });

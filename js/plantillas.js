@@ -123,6 +123,11 @@ var Plantillas = (function () {
       localidad: l.localidad || '',
       direccion: l.direccion || '',
       codigo: l.codigo || '',
+      /* 20-sep-2026, fila 84, docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md:
+         para el hueco {{PROVINCIA}} de un impreso oficial. Solo se usa
+         ahí (no entra en Plantillas.HUECOS: los impresos rellenan
+         casillas de PDF por su nombre, no huecos de texto). */
+      provincia: l.provincia || '',
       cargo: l.cargo || '',
       direccionNormativa: (typeof l.direccionNormativa === 'string') ? l.direccionNormativa : POR_DEFECTO_NORMATIVA,
       /* El membrete (20-sep-2026, fila 81): la imagen vive en

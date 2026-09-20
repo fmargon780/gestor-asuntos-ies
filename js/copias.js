@@ -64,11 +64,14 @@ var Copias = (function () {
      biblioteca de hitos del centro, ver js/hitos-biblioteca.js) es el
      decimosexto. `cargos.json` (20-sep-2026, fila 81, los cargos del
      centro y quién los ha ocupado, ver js/cargos.js) es el
-     decimoséptimo. */
+     decimoséptimo. `formularios-campos.json` (20-sep-2026, fila 84,
+     qué casilla de cada impreso recibe qué dato del centro, ver
+     js/formularios-rellenar.js) es el decimoctavo. */
   var FICHEROS = ['asuntos.json', 'guias.json', 'tipos.json', 'estados.json',
                    'tipos-documento.json', 'tablon.json', 'recurrentes.json', 'frescura.json',
                    'campos.json', 'papelera.json', 'no-duplicados.json', 'hitos.json', 'grupos.json',
-                   'usuarios.json', 'borrados-listas.json', 'hitos-biblioteca.json', 'cargos.json'];
+                   'usuarios.json', 'borrados-listas.json', 'hitos-biblioteca.json', 'cargos.json',
+                   'formularios-campos.json'];
 
   function dosDigitos(n) { return String(n).padStart(2, '0'); }
 

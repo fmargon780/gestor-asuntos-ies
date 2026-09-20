@@ -718,4 +718,6 @@ App.pintarAjustesCentro = async function () {
   /* 20-sep-2026, fila 81, docs/FIRMANTES-Y-MEMBRETE.md. */
   if (window.Cargos && Cargos.pintarEnAjustes) await Cargos.pintarEnAjustes();
   if (window.Membrete && Membrete.pintarEnAjustes) await Membrete.pintarEnAjustes();
+  /* 20-sep-2026, fila 84, docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md. */
+  if (window.FormulariosRellenar) await FormulariosRellenar.pintarPantallaImpresos();
 };

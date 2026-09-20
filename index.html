@@ -537,6 +537,10 @@
         <div><label class="etiqueta">Código del centro</label>
           <input id="plantillas-codigo" class="campo"></div>
       </div>
+      <!-- Fila 84, 20-sep-2026, docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md:
+           para el hueco {{PROVINCIA}} de un impreso oficial. -->
+      <label class="etiqueta">Provincia</label>
+      <input id="plantillas-provincia" class="campo">
       <label class="etiqueta">Dirección del centro</label>
       <input id="plantillas-direccion" class="campo">
       <!-- Fila 79, 20-sep-2026, docs/BIBLIOTECA-DE-HITOS.md, apartado 4.7:
@@ -620,6 +624,24 @@
           <input id="margen-firma" type="number" min="0" max="6" step="0.1" class="campo campo-plazo"></div>
       </div>
       <p class="nota">En centímetros, con un decimal. Entre 0 y 6 cm cada una.</p>
+        </div>
+      </details>
+
+      <!-- Fila 84, 20-sep-2026, docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md:
+           el mapa de casillas de cada impreso con PDF. Lo pinta y lo
+           guarda js/formularios-rellenar.js. -->
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Impresos oficiales</span>
+          <span class="bloque-pie">Qué casilla de cada PDF recibe qué dato del centro</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Solo se rellenan los datos del centro y el año académico: los de la
+         persona los sigue escribiendo ella, a propósito, para poder comprobar al recibir el
+         impreso si alguno ha cambiado. Al pulsar "Leer las casillas del PDF" la primera vez, la
+         aplicación propone sola un hueco para cada casilla, mirando su nombre; confírmalo o
+         cámbialo aquí.</p>
+      <div id="tabla-impresos-oficiales" class="lista"></div>
         </div>
       </details>
 
@@ -966,6 +988,11 @@
      se llama desde su cuerpoDeHito, en tiempo de ejecución, así que el
      orden entre los dos no importa de verdad, pero van juntos). -->
 <script src="js/formularios.js"></script>
+<!-- js/formularios-rellenar.js (fila 84, 20-sep-2026,
+     docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md): va después de
+     js/formularios.js (el botón cuelga de `data-clave-formulario`,
+     que pinta ese fichero) y de js/pdf-herramientas.js (pdf-lib). -->
+<script src="js/formularios-rellenar.js"></script>
 <script src="js/salir.js"></script>
 <script src="js/rescate-datos.js"></script>
 <script src="js/traer-datos.js"></script>

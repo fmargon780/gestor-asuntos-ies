@@ -413,3 +413,68 @@ tamaño distinto y una tercera girada 90°, comprobando que su tamaño crudo y s
 que una página sin sitio no escribe nada, y `pareceFirmado`. La parte de pantalla
 (`js/preparar-documento.js`) no tiene prueba de navegador propia todavía.
 
+### El impreso, con los datos del centro ya puestos (20-sep-2026, fila 84,
+docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md)
+
+La regla que manda: **solo se rellenan los datos del centro y el año académico. Nunca los de la
+persona** (nombre, documento, domicilio, teléfono, tutores…), aunque la aplicación los tenga:
+a propósito, decisión de Francisco, para que al recibir el impreso de vuelta se vea si algún dato
+suyo ha cambiado. Un impreso ya relleno del todo no sirve para comprobar nada. Rellenar también los de la persona
+está descartado a propósito (`docs/CONTEXTO-CORTO.md`, sección 7).
+
+- **Los PDF en blanco**: carpeta `formularios/` del repositorio (no `_GESTOR`), uno por cada
+  entrada del catálogo de la fila 82 cuya vía sea `descarga` o `centro`. El nombre es la clave del
+  catálogo con los dos puntos cambiados por un guion (`O:III` -> `O-III.pdf`). `datos/formularios.json`
+  gana en esas entradas una clave `f` con ese nombre; las de vía `protocolo`/`seneca` no llevan
+  ninguna. **Esta sesión no tenía salida a internet** para bajarlos de la Junta de Andalucía: el
+  campo `f` está puesto en las once entradas que hacen falta, pero `formularios/` se queda vacía.
+  El mecanismo entero funciona igual en cuanto se copien los PDF, uno a uno, sin tocar código: la
+  lista de los que faltan queda en `docs/COLA.md`.
+- **Los siete huecos permitidos, y ninguno más**: `{{CENTRO}}`, `{{CODIGO CENTRO}}`,
+  `{{DIRECCION CENTRO}}`, `{{LOCALIDAD}}`, `{{PROVINCIA}}` (clave nueva de `plantillas.json`, con
+  su campo en Ajustes → El centro → Datos del centro y firma), `{{CURSO}}` (el mismo `curso` de
+  `Plantillas.valoresDeAsunto`) y `{{HOY}}`. Ningún dato de persona entra aquí: el desplegable de
+  la pantalla de configuración solo ofrece estos siete.
+- **`_GESTOR/formularios-campos.json`** (el decimoctavo fichero compartido): `{ "<clave del
+  catálogo>": { "<nombre de la casilla>": "{{HUECO}}" } }`. Una casilla que no esté en el mapa se
+  queda en blanco.
+- **`js/formularios-rellenar.js`** (`window.FormulariosRellenar`), con pdf-lib (`js/pdf-herramientas.js`,
+  `PdfHerramientas.cargarPdfLib`):
+  - `proponerMapa(nombresDeCasillas)`, **sin efectos** (es lo que se prueba sin navegador): mira el
+    nombre de cada casilla, sin mayúsculas ni tildes, con siete reglas en orden (`codigo` antes que
+    `centro`, para no confundir "código del centro" con el nombre del centro; "domicilio/dirección
+    junto a centro" antes que `centro` a secas; luego `localidad`/`municipio`, `provincia`,
+    `curso` + `escolar`/`academico` o "año académico", y por último `fecha`). Una casilla que no
+    case con ninguna regla no entra en el mapa propuesto.
+  - `rellenarPdf(bytesPdf, mapa, valores)`: con `PDFDocument.load` + `getForm().getFields()`,
+    rellena (`campo.setText`) **solo** las casillas del mapa que tengan valor, las deja en solo
+    lectura (`campo.enableReadOnly()`) y no toca las demás; **nunca aplana el formulario**
+    (`flatten()`). Si el PDF no trae formulario, o `getFields()` sale vacío, devuelve
+    `rellenable: false` y los bytes tal cual, sin inventarse nada.
+  - **Ajustes → El centro → "Impresos oficiales"**: una tarjeta por impreso con PDF (`f`), con su
+    estado ("Sin configurar" / "N casillas puestas") y un botón **"Leer las casillas del PDF"**
+    dentro de su `<details>` (a propósito no se lee solo al desplegar: varias pruebas de
+    navegador despliegan TODOS los `<details>` de Ajustes, y una petición de red por su cuenta les
+    ensuciaría el conteo de errores de consola). Al pulsarlo, lee el PDF (fetch relativo a
+    `formularios/`) y pinta sus casillas con un desplegable de los siete huecos; la primera vez
+    propone sola con `proponerMapa`, y cada cambio se guarda al momento. Un PDF que no se
+    encuentra (o sin casillas) se avisa en gris, sin romper nada.
+  - **El botón "Preparar para el tercero"**: cuelga de `data-clave-formulario`, un atributo que
+    `js/formularios.js` ya deja en la lista de solo lectura de un hito y en la línea "Formularios"
+    de la ficha (fila 82) para no tener que envolver nada de ese fichero. Al pulsarlo: lee el PDF,
+    lo rellena con los siete valores del asunto (`Plantillas.valoresDeAsunto` + `provincia` de
+    `plantillas.json`), lo guarda en la carpeta con el nombre de siempre
+    (`Nombres.montarDocumento`, tipo de documento `IMPRESO`, sin pisar si ya existe), deja una nota
+    con `Notas.anadir` y refresca la ficha. Un PDF sin casillas rellenables se guarda igual, en
+    blanco, con un aviso.
+  - Sabe qué asunto está abierto envolviendo `App.abrirFicha` (`js/envolturas-esperadas.js`),
+    como `js/formularios.js`/`js/correo.js`, y vigila la ficha con un `MutationObserver`.
+
+Se comprueba con `pruebas/formularios-rellenar.mjs` (sin navegador, con `vm`, como
+`pruebas/separar-unir.mjs`: los objetos de pdf-lib no cruzan bien entre "realms" distintos, así que
+cada PDF de prueba se monta y se resuelve entero dentro del propio contexto): las siete reglas de
+`proponerMapa` (con variantes de mayúsculas y tildes) y que una casilla sin regla no propone nada;
+que `rellenarPdf` solo cambia las casillas del mapa, con sus valores, y deja las demás
+escribiéndose; que las rellenadas quedan en solo lectura; y que un PDF sin formulario no rompe
+nada y devuelve el aviso.
+

@@ -98,22 +98,20 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Papelera: nada se borra del todo a la primera.
 - Mandar documentos de un asunto por correo, con un borrador que deja Apps Script en Gmail.
 - Plantillas de correo y de documento de Word por tipo de asunto, con huecos que se rellenan
-  solos; el centro ya tiene sus textos escritos (`plantillas/` del repositorio) y se cargan con
-  un botón (Ajustes → Mantenimiento). El documento sale con membrete y con la firma de quien
-  ocupaba el cargo firmante en la fecha del documento.
+  solos; el centro ya tiene sus textos (`plantillas/`), cargados con un botón en Mantenimiento.
+  El documento sale con membrete y con la firma de quien ocupaba el cargo, en su fecha.
 - Copias diarias (caducan a los 90 días, configurable), detección de fichero roto, fusión de
-  conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un tipo, estado, tipo de
-  documento o recurrente borrado ya no reaparece por memoria vieja del otro ordenador.
+  conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un borrado (tipo, estado,
+  tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en GitHub Actions en cada subida.
 - Escape y salida en toda pantalla.
-- Hitos: los pasos de la guía son los hitos de un asunto abierto, con estado, fecha límite,
-  responsable, bifurcaciones, documentos, historial, "lo que hay que reunir" y "Comunicar".
-  Biblioteca de hitos del centro: pasos modelo reutilizables entre tipos, con normativa citada y
-  marca "solo informativo"; nombre corto de un tipo para la carpeta. Botón en Mantenimiento para
-  cargar los tipos y guías ya preparados para el instituto.
-- "Qué me toca": hitos pendientes de todos los asuntos abiertos, con filtro por responsable y un
-  bloque "Dormidos" (asuntos sin novedades en N días). "Cuentas": asuntos por tipo, mes y quién
-  los pidió. "Formularios": catálogo de impresos oficiales, buscable; un hito o tipo lleva los suyos.
+- Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo, responsable,
+  bifurcaciones, documentos, historial, "lo que hay que reunir" y "Comunicar". Biblioteca de
+  hitos del centro: modelos reutilizables entre tipos, con normativa y marca "solo informativo";
+  nombre corto de un tipo. Botón en Mantenimiento para cargar los tipos y guías del instituto.
+- "Qué me toca": hitos pendientes, filtro por responsable, bloque "Dormidos" (sin novedades en N
+  días). "Cuentas": asuntos por tipo, mes y quién los pidió. "Formularios": catálogo buscable de
+  impresos; "Preparar para el tercero" rellena en el PDF solo los datos del centro.
 - Avisos de "fichas sin carpeta" y de la papelera vieja también en Asuntos abiertos, no solo
   entrando a propósito en Ajustes.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
@@ -163,6 +161,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Enlazar un correo con `#all/<id de hilo>` (es `#search/rfc822msgid:<id>`), o meter Gmail en un marco (Google no lo permite).
 - Esconder el tablón de notas, sacar el DNI de la columna del tutor, o poner el nombre comercial en el nombre de la carpeta de un asunto de empresa.
 - Reescribir la arquitectura de módulos y envolturas, o meter los campos de cada tipo en el nombre de los documentos (son del asunto, no del papel).
+- Rellenar los datos de la PERSONA en un impreso: no, a propósito, para ver si algo cambió (fila 84).
 
 ## 8. Qué falta
 
@@ -170,7 +169,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Poner en marcha el script de Gmail (`g.educaand.es`): señalar `GESTOR-BANDEJA` en Ajustes y pegar `apps-script/gestor-correos.gs` en `script.google.com`.
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI" en la tarjeta.
-- Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; repositorio/Vercel a una cuenta del centro; Ajustes → Membrete/Cargos: imagen, Consejería, ocupantes (fila 81).
+- Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: membrete, Consejería, cargos (fila 81) y Provincia (fila 84).
+- Copiar a `formularios/` los 11 PDF que faltan (sin internet aquí): lista en `COLA.md`.
 - Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
 - Pulsar "Poner en orden las fichas del ARCHIVO" (Mantenimiento, fila 64): mueve a su carpeta la ficha de los archivados antes de esa fila, para que `asuntos.json` no siga creciendo.
 - Pulsar, antes de junio de 2027, "Guardar el contacto de los asuntos abiertos" (Ajustes → Mantenimiento, fila 66).

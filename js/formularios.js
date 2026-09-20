@@ -198,7 +198,13 @@ var Formularios = (function () {
         (!esImpreso && f.u ? ' — <a href="' + U.escapar(f.u) + '" target="_blank" rel="noopener">ver</a>' : '') +
         '</span>';
     var nota = f.nota ? '<div class="formularios-nota suave">' + U.escapar(f.nota) + '</div>' : '';
-    return '<div class="formularios-fila-lectura">' + cabecera + nota + '</div>';
+    /* `data-clave-formulario` (20-sep-2026, fila 84,
+       docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md): el punto donde
+       js/formularios-rellenar.js cuelga el botón "Preparar para el
+       tercero" de los que tienen PDF (`f.f`), sin tener que envolver
+       nada de este fichero. */
+    return '<div class="formularios-fila-lectura" data-clave-formulario="' + U.escapar(clave) + '">' +
+      cabecera + nota + '</div>';
   }
 
   function listaHTML(claves, titulo) {
@@ -262,10 +268,13 @@ var Formularios = (function () {
       var f = cache[c];
       if (!f) return '';
       var e = etiquetaDeVia(f.via);
-      return f.u
+      var chip = f.u
         ? '<a class="formularios-chip ' + e.clase + '" href="' + U.escapar(f.u) +
           '" target="_blank" rel="noopener">' + U.escapar(f.n) + '</a>'
         : '<span class="formularios-chip ' + e.clase + '">' + U.escapar(f.n) + '</span>';
+      /* Ver la nota de filaListaHTML: mismo punto para el botón
+         "Preparar para el tercero" (fila 84). */
+      return '<span data-clave-formulario="' + U.escapar(c) + '">' + chip + '</span>';
     }).filter(Boolean).join(' ');
     fila.classList.remove('oculto');
   }
