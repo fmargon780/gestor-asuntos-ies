@@ -28,7 +28,10 @@ de `App` va después del fichero que lo define.
 | `js/fichas-huerfanas.js` | Fichas de `asuntos.json` cuya carpeta ya no está: enlazar o borrar |
 | `js/nombres.js` | Monta los nombres de carpetas y documentos |
 | `js/plazos.js` | La fecha límite de los asuntos |
-| `js/guias.js` | Pintar y escribir una guía, con sus preguntas y opciones; en el editor de cada paso llama a `js/guias-requisitos.js` para "lo que hay que reunir" (fila 59) y a `js/guias-comunicacion.js` para su comunicación propia (fila 60) |
+| `js/guias.js` | Pintar y escribir una guía, con sus preguntas y opciones; en el editor de cada paso llama a `js/guias-requisitos.js` para "lo que hay que reunir" (fila 59), a `js/guias-comunicacion.js` para su comunicación propia (fila 60), a `js/hitos-normativa.js` para "Normativa" y a `js/guias-biblioteca.js` para traer/guardar en la biblioteca (fila 79) |
+| `js/hitos-biblioteca.js` | El modelo de la biblioteca de hitos del centro (fila 79, 20-sep-2026): leer/escribir `_GESTOR/hitos-biblioteca.json`, crear/editar/borrar un modelo, comparar un paso con el suyo, y las funciones puras de si un hito nace "solo informativo" y del enlace de una referencia de normativa |
+| `js/hitos-normativa.js` | El bloque "Normativa" de un paso o de un hito (fila 79): el editor de referencias y la lista de solo lectura, con la dirección base del sistema de normativa en caché |
+| `js/guias-biblioteca.js` | La pintura de la biblioteca de hitos (fila 79): el panel "+ Traer de la biblioteca", "Guardar en la biblioteca" de cada paso, la comparación campo a campo, el aviso de los demás tipos y el bloque de Ajustes → El centro |
 | `js/guias-requisitos.js` | La sección "Lo que hay que reunir" del editor de un paso (`GuiasRequisitos.bloqueHTML`/`leer`/`enganchar`, fila 59, aparte de `js/guias.js` para no engordarlo) |
 | `js/guias-comunicacion.js` | La sección "Comunicación de este paso" del editor de un paso (`GuiasComunicacion.bloqueHTML`/`leer`/`enganchar`, fila 60, aparte de `js/guias.js`); reutiliza el campo de texto con "Insertar hueco" de `js/plantillas-ajustes.js` |
 | `js/datos.js` | Lee los CSV; el nombre comercial y las columnas leídas por su título; `Datos.tutoresDe` agrupa los tutores legales por persona y `Datos.resumenDeTercero` monta la línea "Datos y contacto" |
@@ -55,6 +58,9 @@ de `App` va después del fichero que lo define.
 | `js/ajustes-tipo-palabras-clave.js` | La sección "Palabras clave" de la pantalla de un tipo: `palabrasClave` en `tipos.json` (17-sep-2026, fila 41) |
 | `js/ajustes-centro.js` | La pestaña "El centro" de Ajustes: estados, tipos de documento, campos propios, grupos, ficheros de datos, abreviatura de grupos (17-sep-2026, fila 39) |
 | `js/ajustes-mantenimiento.js` | La pestaña "Mantenimiento" de Ajustes: avisos de vencimiento, carpetas de este ordenador, copias y papelera (17-sep-2026, fila 39) |
+| `js/cargar-biblioteca.js` | El botón "Cargar la biblioteca del centro" (fila 80, 20-sep-2026), en Ajustes → Mantenimiento: lee `datos-biblioteca/biblioteca-centro.json` con `fetch` y lo fusiona con `tipos.json`, `campos.json`, `hitos-biblioteca.json` y `guias.json`, sin pisar nada ya escrito |
+| `herramientas/cargar-biblioteca.mjs` | Programa de una sola vez (fila 80): lee `docs/contenido/BIBLIOTECA-*.md` y genera `datos-biblioteca/biblioteca-centro.json`. Se ejecuta a mano con Node cuando el contenido cambie; no lo carga `index.html` |
+| `datos-biblioteca/biblioteca-centro.json` | El contenido generado de la biblioteca del centro (fila 80): tipos, campos y hitos modelo, listo para que `js/cargar-biblioteca.js` lo fusione |
 | `js/puente.js` | El enganche de los módulos que se añaden por fuera (`window.Gestor`) |
 | `js/avisos.js` | El aviso de lo que vence |
 | `js/frescura.js` | El aviso de que el RegAlum.csv está viejo, y sus épocas |
@@ -157,6 +163,9 @@ de `App` va después del fichero que lo define.
 | `pruebas/cuentas.mjs` | Prueba de "Cuentas" (fila 74), sin navegador: cuentas por tipo (con "Sin clasificar"), cursos disponibles, por mes, por quién lo pidió, cuánto se tarda y el texto para "Copiar la tabla" |
 | `pruebas/plantillas-documento.mjs` | Prueba (jsdom, sin navegador) de las plantillas de documento: la reparación de huecos partidos, las cuatro clases de hueco, "faltan", el escapado XML, releer el ZIP de salida, el nombre del documento y un `plantillas.json` viejo |
 | `pruebas/lo-pide.mjs` | Prueba (jsdom, sin navegador) de "Lo pide": opciones y controles, la línea legible, qué casilla se marca en el correo, los cuatro huecos y "Quitar el dato" |
+| `pruebas/biblioteca-de-hitos.mjs` | Prueba (jsdom, sin navegador) de la biblioteca de hitos (fila 79): crear un modelo y traerlo a dos tipos, "solo aquí"/"subir también", el aviso en el otro tipo y "Dejarlo como está", borrar un modelo, un paso-pregunta, si un hito nace informativo, y el enlace de una referencia de normativa |
+| `pruebas/nombre-corto-de-tipo.mjs` | Prueba (sin navegador) del nombre corto de un tipo (fila 79, apartado 4.9): el nombre de la carpeta, que `Nombres.leer` lo reconozca, y que cambiarlo no toque los asuntos ya creados |
+| `pruebas/cargar-biblioteca.mjs` | Prueba (jsdom, sin navegador) del botón "Cargar la biblioteca del centro" (fila 80): altas, renombrados con nombre corto, modelos compartidos entre dos tipos, campos propios, una guía ya escrita a mano que no se toca, y que cargarla dos veces no duplica nada |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |

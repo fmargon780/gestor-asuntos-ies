@@ -888,7 +888,7 @@
         var existiaAntes = true;
         if (item && App.E.nuevo.tipo && App.E.nuevo.tercero) {
           try {
-            nombre = Nombres.montar(App.datosDelFormulario());
+            nombre = nombreDeCarpetaPropuesto(App.datosDelFormulario());
             existiaAntes = nombre ? await Carpetas.existe(App.E.abiertos, nombre) : true;
           } catch (e) { nombre = ''; }
         }

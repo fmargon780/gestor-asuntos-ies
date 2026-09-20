@@ -154,15 +154,15 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 75 | `docs/HUECOS-ENCONTRADOS-FILA-69.md` | HECHA (19-sep-2026 · 15:55): muchas más subidas de las debidas, y hubo que corregir erratas (nota más abajo) |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1, cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante. |
 | 77 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 3 (los borrados que se fusionen) | HECHA (20-sep-2026 · 06:53) |
-| 78 | Repartir `docs/contexto/ASUNTOS.md` (ha pasado los 40 KB del objetivo de la fila 65) | PENDIENTE (no urgente: se puede seguir editando, solo cuesta un poco más) |
-| 79 | `docs/BIBLIOTECA-DE-HITOS.md` | PENDIENTE (20-sep-2026, acordada con Francisco) |
-| 80 | `docs/CARGAR-BIBLIOTECA.md` | PENDIENTE (20-sep-2026, acordada con Francisco). **Va después de la 79**: si la 79 no está HECHA, déjala BLOQUEADA y sigue con otra. |
+| 78 | Repartir `docs/contexto/ASUNTOS.md` (ha pasado los 40 KB del objetivo de la fila 65) | HECHA (20-sep-2026 · 08:44) |
+| 79 | `docs/BIBLIOTECA-DE-HITOS.md` | HECHA (20-sep-2026 · 09:32) |
+| 80 | `docs/CARGAR-BIBLIOTECA.md` | HECHA (20-sep-2026 · 09:32) |
 
-**Orden de trabajo:** las filas 1 a 74 están HECHAS (las del informe crítico del 18-sep-2026,
-`docs/INFORME-CRITICO-2026-09-18.md`, que Francisco pidió tener todas desarrolladas antes de
-seguir añadiendo cosas nuevas). Las PENDIENTES que quedan (75 a 78) son huecos pequeños que
-salieron por el camino, todas marcadas "no urgente": no hace falta encadenarlas sin parar, se
-cogen cuando toque.
+**Orden de trabajo:** todas las filas de 1 a 80 están HECHAS, salvo la 63 y la 76, BLOQUEADAS (una
+sesión sin salida a internet, la otra por el riesgo de tocar el mecanismo de publicación sin
+Francisco delante). **No queda ninguna fila PENDIENTE** (20-sep-2026, tras las filas 78, 79 y 80).
+Cuando se apunte una fila nueva, esta nota se sustituye por la que toque: no hay que mantener el
+repaso de las filas ya hechas más que en `docs/HISTORIA.md`.
 
 **El orden de trabajo NO es el de los números.** La tabla de arriba está puesta **en el orden en que
 hay que hacerlas**, de arriba abajo, y por eso la 65 aparece entre la 62 y la 63. Los números no se
@@ -370,7 +370,9 @@ que el nombre que se ve en pantalla pueda ser largo y claro; y se arregla que **
 haga resucitar el nombre viejo** como tipo fantasma (es lo que le pasó a Francisco con ANULACIÓN y
 con DTMA). Ficheros nuevos: `js/hitos-biblioteca.js`, `js/guias-biblioteca.js`,
 `js/hitos-normativa.js`, `pruebas/biblioteca-de-hitos.mjs`, `pruebas/nombre-corto-de-tipo.mjs`.
-Detalle en `docs/BIBLIOTECA-DE-HITOS.md`. Sube directamente a `main`, sin petición de cambios.
+Detalle en `docs/BIBLIOTECA-DE-HITOS.md`; diario, con lo que costó de más, en `docs/HISTORIA.md`.
+**HECHA (20-sep-2026).** Sesión en la nube: subida con pull request, no directo a `main` (ver la
+nota de más abajo).
 
 **Fila 80, en una línea** (20-sep-2026, acordada con Francisco tras repasar con él sus 55 Tipos de
 Asunto uno a uno): **cargar el contenido de la biblioteca**. La 79 construye la herramienta; esta
@@ -380,8 +382,8 @@ reunir, lo que se comunica y su normativa citada. El contenido está escrito en 
 `docs/contenido/BIBLIOTECA-ALUMNADO.md`, `docs/contenido/BIBLIOTECA-PERSONAL.md` y
 `docs/contenido/BIBLIOTECA-EMPRESAS-Y-OTROS.md`. Se carga con un botón de Ajustes →
 Mantenimiento, **"Cargar la biblioteca del centro"**, que fusiona y no pisa nada ya escrito.
-Detalle en `docs/CARGAR-BIBLIOTECA.md`. **Va después de la 79.** Sube directamente a `main`, sin
-petición de cambios.
+Detalle en `docs/CARGAR-BIBLIOTECA.md`; diario en `docs/HISTORIA.md`. **HECHA (20-sep-2026).**
+Sesión en la nube: subida con pull request, no directo a `main`.
 
 ## Nota de esta sesión (18-sep-2026, mañana): docs/CONTEXTO.md y docs/HISTORIA.md sin actualizar
 

@@ -60,11 +60,13 @@ var Copias = (function () {
      (20-sep-2026, fila 77, docs/DETALLES-DE-MANTENIMIENTO.md, punto 3:
      los borrados de tipos, estados, tipos de documento y recurrentes
      que se fusionan entre ordenadores, ver js/borrados-fusion.js) es
-     el decimoquinto. */
+     el decimoquinto. `hitos-biblioteca.json` (20-sep-2026, fila 79, la
+     biblioteca de hitos del centro, ver js/hitos-biblioteca.js) es el
+     decimosexto. */
   var FICHEROS = ['asuntos.json', 'guias.json', 'tipos.json', 'estados.json',
                    'tipos-documento.json', 'tablon.json', 'recurrentes.json', 'frescura.json',
                    'campos.json', 'papelera.json', 'no-duplicados.json', 'hitos.json', 'grupos.json',
-                   'usuarios.json', 'borrados-listas.json'];
+                   'usuarios.json', 'borrados-listas.json', 'hitos-biblioteca.json'];
 
   function dosDigitos(n) { return String(n).padStart(2, '0'); }
 

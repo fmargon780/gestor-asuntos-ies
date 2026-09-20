@@ -66,6 +66,17 @@ var Nombres = (function () {
 
   var CATEGORIAS = ['ALUMNADO', 'PERSONAL', 'EMPRESAS', 'OTROS'];
 
+  /* El nombre corto de un tipo (20-sep-2026, fila 79, apartado 4.9,
+     docs/BIBLIOTECA-DE-HITOS.md): lo que entra en el nombre de la
+     carpeta y de los documentos. Vacío, se usa el nombre de siempre.
+     Cambiar el nombre corto no toca las carpetas ya creadas: solo
+     afecta a lo que se monta a partir de ahora. Un solo sitio: todo lo
+     que hoy mete `tipo.tipo` en un nombre de carpeta o de documento
+     pasa por aquí. */
+  function tipoParaCarpeta(tipo) {
+    return (tipo && tipo.nombreCorto) ? tipo.nombreCorto : ((tipo && tipo.tipo) || '');
+  }
+
   /* Monta el nombre de la carpeta a partir de sus piezas.
      El tercero va siempre el último. El grupo, si se pide, va detrás
      del año académico y delante de los campos y de la descripción.
@@ -181,6 +192,14 @@ var Nombres = (function () {
     var candidatos = [];
     (tipos || []).forEach(function (t) {
       candidatos.push({ texto: t.tipo, tipo: t.tipo, categoria: t.categoria });
+      /* El nombre corto (20-sep-2026, fila 79, apartado 4.9): las carpetas
+         nuevas de este tipo llevan el nombre corto, no el nombre de
+         siempre, así que hay que reconocerlo igual para no dejar la
+         carpeta como "no reconocida". No cuenta como alias: no es un
+         nombre viejo, es el que se usa a partir de ahora. */
+      if (t.nombreCorto && t.nombreCorto !== t.tipo) {
+        candidatos.push({ texto: t.nombreCorto, tipo: t.tipo, categoria: t.categoria });
+      }
       (t.alias || []).forEach(function (viejo) {
         candidatos.push({ texto: viejo, tipo: t.tipo, categoria: t.categoria, porAlias: true });
       });
@@ -365,7 +384,7 @@ var Nombres = (function () {
   return {
     POR_DEFECTO: POR_DEFECTO, CATEGORIAS: CATEGORIAS,
     ESTADOS_POR_DEFECTO: ESTADOS_POR_DEFECTO, VIAS: VIAS, via: via,
-    montar: montar, leer: leer, categoriaDeTipo: categoriaDeTipo,
+    montar: montar, leer: leer, categoriaDeTipo: categoriaDeTipo, tipoParaCarpeta: tipoParaCarpeta,
     grupoCompacto: grupoCompacto, nivelYEnsenanza: nivelYEnsenanza,
     TIPOS_DOCUMENTO_POR_DEFECTO: TIPOS_DOCUMENTO_POR_DEFECTO,
     codigoRegistro: codigoRegistro, montarDocumento: montarDocumento,

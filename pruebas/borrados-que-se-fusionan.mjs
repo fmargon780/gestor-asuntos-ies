@@ -44,14 +44,23 @@ const raiz = new URL('../js/', import.meta.url).pathname;
 function elementoFalso() {
   return {
     classList: { add() {}, remove() {}, toggle() {} },
-    appendChild() {}, addEventListener() {}, querySelector() { return null; },
+    appendChild() {}, addEventListener() {}, querySelector() { return null; }, remove() {},
     style: {}
   };
 }
+/* Un registro por id, para que un campo de un cuadro (`$('tipo-nuevo-
+   nombre')`, sección 6, apartado 9) se pueda "escribir" a mano antes
+   de llamar a la función, con U.preguntar sustituido más abajo: el
+   mismo elemento se devuelve siempre que se pida ese mismo id. */
+const elementosPorId = new Map();
+function elementoPara(id) {
+  if (!elementosPorId.has(id)) elementosPorId.set(id, Object.assign(elementoFalso(), { value: '' }));
+  return elementosPorId.get(id);
+}
 const contexto = {
-  console, TextDecoder, Blob, indexedDB: null,
+  console, TextDecoder, Blob, indexedDB: null, setTimeout, clearTimeout,
   document: {
-    getElementById: elementoFalso,
+    getElementById: elementoPara,
     querySelector: function () { return null; },
     querySelectorAll: function () { return []; },
     createElement: elementoFalso,
@@ -62,10 +71,12 @@ const contexto = {
 contexto.window = contexto;
 contexto.addEventListener = function () {};
 vm.createContext(contexto);
-for (const f of ['util.js', 'carpetas.js', 'copias.js', 'nombres.js', 'nucleo.js', 'borrados-fusion.js']) {
+for (const f of ['util.js', 'carpetas.js', 'copias.js', 'nombres.js', 'nucleo.js', 'borrados-fusion.js', 'ajustes.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
-const { App, Borrados } = contexto;
+const { App, Borrados, U } = contexto;
+contexto.U.preguntar = async function () { return true; };
+App.verAbiertos = async function () {};
 
 /* ---------- disco de mentira, igual que en pruebas/copias.mjs ---------- */
 function dirFalso(nombre) {
@@ -252,6 +263,41 @@ await Borrados.purgarViejas(gestor, 'recurrentes');
 const conteoTrasPurgarViejo = await Borrados.contar(gestor);
 comprobar('recurrentes: purgarViejas quita el de hace 100 días y deja el reciente (r1)',
   conteoTrasPurgarViejo.recurrentes, { total: 1, viejas: 0 });
+
+/* ---------- 6. Fila 79, apartado 9: un tipo renombrado no resucita como fantasma ----------
+
+   Encontrado el 20-sep-2026: App.renombrarTipo cambiaba el nombre y
+   guardaba, pero no marcaba el nombre viejo como borrado, así que
+   fusionarConDisco lo devolvía a la vida como tipo aparte en cuanto el
+   otro ordenador guardara cualquier otra cosa con su copia vieja en
+   memoria. Mismo escenario que el punto 1, pero con un renombrado en
+   vez de un borrado. */
+
+/* El disco ya trae BECA y MATRICULA de las secciones de arriba: se
+   añade ANULACION a esa misma lista, como haría un alta cualquiera. */
+App.E.tipos.push({ tipo: 'ANULACION', categoria: 'ALUMNADO' });
+await App.guardarTipos();
+let tiposPC2Renombrado = JSON.parse(JSON.stringify(App.E.tipos));
+
+App.E.listaAbiertos = [];   /* sin asuntos abiertos con este tipo: no hay carpetas que tocar */
+const tipoAnulacion = App.E.tipos.filter((t) => t.tipo === 'ANULACION')[0];
+elementoPara('tipo-nuevo-nombre').value = 'ANULACION MATRICULA';
+await App.renombrarTipo(tipoAnulacion);
+comprobar('renombrar: el tipo pasa a llamarse ANULACION MATRICULA, con el nombre viejo de alias',
+  App.E.tipos.map((t) => ({ tipo: t.tipo, alias: t.alias || undefined })).sort((a, b) => a.tipo < b.tipo ? -1 : 1),
+  [{ tipo: 'ANULACION MATRICULA', alias: ['ANULACION'] }, { tipo: 'BECA', alias: undefined },
+    { tipo: 'MATRICULA', alias: undefined }]);
+
+/* PC2, sin enterarse del renombrado, guarda algo suyo con su copia
+   vieja (todavía "ANULACION", sin alias) en memoria. */
+App.E.tipos = tiposPC2Renombrado;
+await App.guardarTipos();
+comprobar('renombrar: "ANULACION" no resucita como tipo fantasma tras el guardado de PC2',
+  App.E.tipos.map((t) => t.tipo).sort(), ['ANULACION MATRICULA', 'BECA', 'MATRICULA']);
+
+const conteoTiposTrasRenombrar = await Borrados.contar(gestor);
+comprobar('renombrar: el nombre viejo queda marcado como borrado',
+  conteoTiposTrasRenombrar.tipos.total, 1);
 
 console.log('');
 if (fallos) {

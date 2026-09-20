@@ -17,6 +17,17 @@
    del propio nombre: el año académico y el grupo se reconocen por su
    forma, y todo lo demás se deja en el tercero, para no partir por la
    mitad algo que no se sabe partir. */
+/* El nombre de la carpeta lleva el nombre corto del tipo si lo tiene
+   (20-sep-2026, fila 79, apartado 4.9): las piezas guardadas (`p.tipo`,
+   `datos.tipo`) se quedan con el nombre de siempre, que es el que hay
+   que buscar en la guía y en las cuentas por tipo; solo el nombre que
+   se monta pasa por Nombres.tipoParaCarpeta. */
+function nombreConTipoCorto(d) {
+  var tipo = App.E.tipos.filter(function (t) { return t.tipo === d.tipo; })[0];
+  var copia = Object.assign({}, d, { tipo: tipo ? Nombres.tipoParaCarpeta(tipo) : d.tipo });
+  return Nombres.montar(copia);
+}
+
 App.piezasDelAsunto = function (a) {
   var fecha = /^\d{6}$/.test(a.leido.fecha)
     ? '20' + a.leido.fecha.slice(0, 2) + '-' + a.leido.fecha.slice(2, 4) + '-' + a.leido.fecha.slice(4, 6)
@@ -31,7 +42,7 @@ App.piezasDelAsunto = function (a) {
     descripcion: a.ficha.descripcion || '',
     tercero: a.ficha.tercero || ''
   };
-  var comprobacion = Nombres.montar(Object.assign({}, deFicha,
+  var comprobacion = nombreConTipoCorto(Object.assign({}, deFicha,
     { campos: App.valoresGuardadosParaNombre(deFicha.tipo, deFicha.campos) }));
   if (deFicha.tercero && comprobacion === a.nombre) return deFicha;
 
@@ -242,7 +253,7 @@ App.editarAsunto = async function (a) {
     };
   }
 
-  function refrescar() { $('ed-vista').textContent = Nombres.montar(piezasDelCuadro()); }
+  function refrescar() { $('ed-vista').textContent = nombreConTipoCorto(piezasDelCuadro()); }
 
   ['ed-fecha', 'ed-curso', 'ed-tipo', 'ed-grupo', 'ed-descripcion', 'ed-tercero']
     .forEach(function (id) { $(id).oninput = refrescar; $(id).onchange = refrescar; });
@@ -269,7 +280,7 @@ App.editarAsunto = async function (a) {
 
   var d = piezasDelCuadro();
   if (!d.tercero) { U.aviso('Hace falta el tercero: va siempre al final del nombre.', 'malo'); return; }
-  var nombreNuevo = Nombres.montar(d);
+  var nombreNuevo = nombreConTipoCorto(d);
   if (!nombreNuevo || nombreNuevo.length < 8) { U.aviso('Ese nombre se queda demasiado corto.', 'malo'); return; }
 
   var camposGuardados = {};

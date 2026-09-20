@@ -41,6 +41,11 @@
     $('plantillas-direccion').value = datosDeAjustes.direccion;
     $('plantillas-codigo').value = datosDeAjustes.codigo;
     $('plantillas-cargo').value = datosDeAjustes.cargo;
+    /* 20-sep-2026, fila 79, apartado 4.7. */
+    if ($('plantillas-direccion-normativa')) {
+      $('plantillas-direccion-normativa').value = datosDeAjustes.direccionNormativa;
+    }
+    if (window.HitosNormativa) HitosNormativa.refrescar();
   }
 
   async function guardarFirma() {
@@ -50,6 +55,9 @@
     var direccion = $('plantillas-direccion').value.trim();
     var codigo = $('plantillas-codigo').value.trim();
     var cargo = $('plantillas-cargo').value.trim();
+    var direccionNormativa = $('plantillas-direccion-normativa')
+      ? $('plantillas-direccion-normativa').value.trim().replace(/\/$/, '')
+      : datosDeAjustes.direccionNormativa;
     try {
       datosDeAjustes = await Plantillas.guardar(App.E.gestor, function (actual) {
         actual.firma = firma;
@@ -58,8 +66,10 @@
         actual.direccion = direccion;
         actual.codigo = codigo;
         actual.cargo = cargo;
+        actual.direccionNormativa = direccionNormativa;
         return actual;
       });
+      if (window.HitosNormativa) HitosNormativa.refrescar();
       U.aviso('Firma y centro guardados.', 'bueno');
     } catch (e) {
       U.aviso('No he podido guardarlo: ' + e.message, 'malo');

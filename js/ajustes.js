@@ -337,6 +337,16 @@ App.renombrarTipo = async function (tipo) {
   tipo.alias = tipo.alias || [];
   if (tipo.alias.indexOf(nombreViejo) === -1) tipo.alias.push(nombreViejo);
   tipo.tipo = nombreNuevo;
+
+  /* 20-sep-2026, fila 79, apartado 9: sin esto, App.fusionarConDisco
+     veía el nombre viejo como algo que el otro ordenador tiene de más
+     y lo devolvía a la vida como tipo fantasma en cuanto alguien
+     guardara cualquier otra cosa (mismo mecanismo de la fila 77). Se
+     revive el nombre nuevo por si alguna vez se borró él mismo: si no,
+     renombrar a un nombre que se borró en el pasado lo haría
+     desaparecer al guardar. */
+  await Borrados.marcar(App.E.gestor, 'tipos', nombreViejo);
+  await Borrados.revivir(App.E.gestor, 'tipos', nombreNuevo);
   await App.guardarTipos();
 
   await App.verAbiertos();
@@ -437,7 +447,16 @@ App.contarAsuntosConTipo = async function (nombreTipo) {
 };
 
 App.borrarTipo = async function (tipo) {
-  var n = await App.contarAsuntosConTipo(tipo.tipo);
+  /* 20-sep-2026, fila 79, apartado 9: mientras un tipo fantasma (el
+     nombre viejo de otro ya renombrado) siga existiendo, las carpetas
+     ya archivadas con ese nombre se le siguen adjudicando a él, y el
+     guardián de "no se puede borrar un tipo con asuntos" lo bloquearía
+     para siempre. Esas carpetas se seguirán reconociendo igual, por el
+     alias, así que no hace falta contarlas aquí. */
+  var esAliasDeOtro = App.E.tipos.some(function (t) {
+    return t !== tipo && (t.alias || []).indexOf(tipo.tipo) !== -1;
+  });
+  var n = esAliasDeOtro ? 0 : await App.contarAsuntosConTipo(tipo.tipo);
   if (n) {
     await U.preguntar('No se puede borrar',
       '<p>Hay ' + n + ' asunto' + (n === 1 ? '' : 's') + ' con el tipo <strong>' +

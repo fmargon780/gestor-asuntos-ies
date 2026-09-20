@@ -106,8 +106,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Pruebas automáticas en GitHub Actions en cada subida.
 - Escape y salida en toda pantalla.
 - Hitos: los pasos de la guía son los hitos de un asunto abierto, con estado, fecha límite,
-  responsable, bifurcaciones, documentos e historial; cada paso puede llevar "lo que
-  hay que reunir" y su propio texto de correo/Séneca ("Comunicar").
+  responsable, bifurcaciones, documentos, historial, "lo que hay que reunir" y "Comunicar".
+  Biblioteca de hitos del centro: pasos modelo reutilizables entre tipos, con normativa citada y
+  marca "solo informativo"; nombre corto de un tipo para la carpeta. Botón en Mantenimiento para
+  cargar los tipos y guías ya preparados para el instituto.
 - "Qué me toca": hitos pendientes de todos los asuntos abiertos, con filtro por responsable y un
   bloque "Dormidos" (asuntos sin novedades en N días). "Cuentas": asuntos por tipo, mes y quién
   los pidió.
@@ -155,24 +157,24 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 7. Descartado, no proponer otra vez
 
-- Publicar con el conector de Vercel sobre un proyecto ya existente (da 403), crear otro "por si acaso", o pedir al coordinador TIC que desbloquee `vercel.app` (se resolvió con el dominio propio, 18-sep-2026).
+- Publicar con el conector de Vercel sobre un proyecto ya existente (da 403), o crear otro "por si acaso". `vercel.app` bloqueado en el centro: resuelto con el dominio propio.
 - Abrir la carpeta del asunto en el explorador de archivos, opciones dentro de opciones en la guía, o una hoja de Google Sheets como interfaz.
-- Enlazar un correo de Gmail con `#all/<id de hilo>` (es con `#search/rfc822msgid:<id>`), o meter Gmail dentro de la aplicación en un marco (Google no lo permite).
+- Enlazar un correo con `#all/<id de hilo>` (es `#search/rfc822msgid:<id>`), o meter Gmail en un marco (Google no lo permite).
 - Esconder el tablón de notas, sacar el DNI de la columna del tutor, o poner el nombre comercial en el nombre de la carpeta de un asunto de empresa.
 - Reescribir la arquitectura de módulos y envolturas, o meter los campos de cada tipo en el nombre de los documentos (son del asunto, no del papel).
 
 ## 8. Qué falta
 
 - El compañero tiene que entrar en `https://asuntos.fmargon.com`, volver a señalar sus carpetas (el navegador no las hereda de la dirección vieja), y coordinar la lista de tipos de asunto y estados.
-- Poner en marcha el script de Gmail en `g.educaand.es`, señalar `GESTOR-BANDEJA` en Ajustes, y pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs` (sin eso no se siguen los hilos por matrícula, ni la copia oculta de un grupo).
+- Poner en marcha el script de Gmail en `g.educaand.es`, señalar `GESTOR-BANDEJA` en Ajustes, y pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs`.
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI" en la tarjeta.
-- Comprobar "Ajustar tamaño" (fila 57) con un documento real. Qué hacer con asuntos vivos al cambiar de curso; pasar repositorio y Vercel a una cuenta del centro.
+- Comprobar "Ajustar tamaño" con un documento real. Qué hacer con asuntos vivos al cambiar de curso; pasar repositorio y Vercel a una cuenta del centro.
 - Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
 - Pulsar, cuando pueda, "Poner en orden las fichas del ARCHIVO" (Ajustes → Mantenimiento, fila 64): mueve a su carpeta la ficha de los asuntos archivados antes de esa fila, para que `asuntos.json` deje de crecer con ellos.
 - Pulsar, antes de junio de 2027, "Guardar el contacto de los asuntos abiertos" (Ajustes → Mantenimiento, fila 66).
 - Fila 67: añadir un colaborador en GitHub y Vercel, y copiar `docs/LAS-CUENTAS.md` al Dropbox.
-- Decisión de Francisco (fila 68, sin preguntar todavía): ¿debe la papelera vaciarse ella sola a los N días? Mientras no se decida, solo el aviso más insistente, nunca el borrado solo.
+- Decisión de Francisco: ¿debe la papelera vaciarse ella sola a los N días? Mientras no se decida, solo el aviso más insistente, nunca el borrado solo.
 - Antes de una publicación importante, repasar `docs/COMPROBAR-A-MANO.md` (lo que ninguna prueba cubre).
 
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero

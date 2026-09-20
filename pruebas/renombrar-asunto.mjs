@@ -128,7 +128,7 @@ function hitoRico(id, extra) {
     documentos: ['260901 SOLICITUD.pdf'],
     requisitos: [{ id: 'r1', texto: 'DNI', clase: 'documento', obligatorio: true, hecho: true,
                    valor: '', documento: '260901 DNI.pdf', quien: 'Francisco', cuando: '2026-09-01T10:05:00.000Z' }],
-    plantilla: null, opciones: [], elegida: null
+    plantilla: null, soloInformativo: false, normativa: [], opciones: [], elegida: null
   }, extra || {});
 }
 

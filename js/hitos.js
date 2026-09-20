@@ -103,6 +103,13 @@ var Hitos = (function () {
       documentos: Array.isArray(h && h.documentos) ? h.documentos.map(String) : [],
       requisitos: Array.isArray(h && h.requisitos) ? h.requisitos.map(normalizarRequisitoHito) : [],
       plantilla: (h && h.plantilla) || null,   /* hueco sin uso, sección 9 */
+      /* 20-sep-2026, fila 79, apartados 4.6 y 4.7: un hito sin estos dos
+         campos (todos los que ya existían antes de esta fila) se
+         comporta como uno normal y sin normativa. Solo existen en el
+         hito de arriba, nunca en el de una opción (igual que en su paso
+         de guía). */
+      soloInformativo: !!(h && h.soloInformativo),
+      normativa: (window.Guias ? Guias.normalizarNormativa(h && h.normativa) : []),
       opciones: [], elegida: null
     };
     if (esDecision) {
@@ -313,6 +320,10 @@ var Hitos = (function () {
          opciones llegan solos, porque cada paso de dentro se convierte
          en su propio hito, con los suyos. */
       requisitos: esDecision ? [] : (p.requisitos || []),
+      /* Una pregunta tampoco lleva estos dos (fila 79, apartados 4.6 y
+         4.7): igual que los requisitos, son de los pasos de arriba. */
+      soloInformativo: esDecision ? false : !!p.soloInformativo,
+      normativa: esDecision ? [] : (p.normativa || []),
       opciones: esDecision ? p.opciones.map(function (o) {
         return { id: o.id, texto: o.titulo, hitos: (o.pasos || []).map(pasoAHito) };
       }) : [],

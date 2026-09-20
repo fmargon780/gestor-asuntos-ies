@@ -77,7 +77,10 @@ con ocho secciones **siempre desplegadas**, sin `<details>`, construidas enteras
 
 1. **Datos del tipo** — nombre, categoría, alias si los tiene, botón "Cambiar el nombre" que
    llama a `App.renombrarTipo` (la misma función de siempre) y repinta la pantalla si el tipo
-   abierto es el que cambió.
+   abierto es el que cambió. Debajo, el **nombre corto** (20-sep-2026, fila 79, apartado 4.9,
+   `Nombres.tipoParaCarpeta`): lo que entra en el nombre de la carpeta de los asuntos nuevos en
+   vez del nombre de arriba; vacío, se comporta como hoy. Aviso ámbar si pasa de 16 caracteres,
+   rojo si otro tipo ya lo usa (`U.parecidos`). Cambiarlo no toca ninguna carpeta ya creada.
 2. **Campos** — es la lógica que antes vivía en `App.pintarCuadroDeCampos`, dentro de un
    `U.preguntar`; ahora se pinta en `App.construirSeccionCampos` con el `$` global sombreado por
    uno que busca dentro de su propio `cuerpo` (la sección se pinta ANTES de colgarse del
@@ -89,7 +92,10 @@ con ocho secciones **siempre desplegadas**, sin `<details>`, construidas enteras
 3. **Pasos del trámite** — vista de solo lectura con `Guias.vista(GuiasDelCentro.pasosDe(tipo),
    [], false)` y un botón "Escribir la guía"/"Cambiar la guía" que llama a
    `GuiasDelCentro.escribir(tipo.tipo)` (ya existía, sin tocar `js/guias-enganche.js`); al
-   resolver, se repinta solo esta sección.
+   resolver, se repinta solo esta sección. Debajo, un aviso ámbar por cada paso que venga de la
+   biblioteca de hitos y se haya quedado atrás (20-sep-2026, fila 79, apartado 4.4,
+   `GuiasBiblioteca.pasosDesactualizados`), con "Ver el cambio" (ver
+   `docs/contexto/HITOS-Y-GUIAS.md`).
 4. **Plantillas de correo y de Séneca** — `PlantillasAjustes.pintarDeTipo(contenedor, tipo)`
    (nueva en `js/plantillas-ajustes.js`): tarjetas filtradas por `p.tipo === tipo.tipo` y un
    botón "+ Nueva plantilla" (`#tipo-plantillas-nueva`) que abre el mismo cuadro de siempre

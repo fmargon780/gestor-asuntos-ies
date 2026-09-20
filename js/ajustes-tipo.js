@@ -81,6 +81,62 @@ function construirSeccionDatos(tipo) {
   cambiar.onclick = function () { App.renombrarTipo(tipo); };
   b.cuerpo.appendChild(cambiar);
 
+  /* El nombre corto (20-sep-2026, fila 79, apartado 4.9): lo que entra
+     en el nombre de la carpeta de los asuntos nuevos y de la ficha en
+     construcción; vacío, se usa el nombre de arriba, igual que hoy.
+     Cambiarlo no toca ninguna carpeta ya creada. */
+  var filaCorto = document.createElement('div');
+  filaCorto.style.marginTop = '10px';
+  filaCorto.innerHTML =
+    '<label class="etiqueta">Nombre corto <span class="suave">(para el nombre de la carpeta)</span></label>' +
+    '<input class="campo tipo-nombre-corto" placeholder="Igual que el nombre de arriba">' +
+    '<div class="aviso-en-vivo" id="tipo-nombre-corto-aviso"></div>' +
+    '<p class="nota">Lo que entra en el nombre de la carpeta y de los asuntos que se creen a partir ' +
+    'de ahora. Si lo dejas vacío, se usa el nombre de arriba. Cambiarlo no toca ninguna carpeta ya creada.</p>';
+  b.cuerpo.appendChild(filaCorto);
+  var campoCorto = filaCorto.querySelector('.tipo-nombre-corto');
+  var avisoCorto = filaCorto.querySelector('#tipo-nombre-corto-aviso');
+  campoCorto.value = tipo.nombreCorto || '';
+
+  function efectivoDe(t) { return t.nombreCorto || t.tipo; }
+
+  function pintarAvisoCorto() {
+    var texto = U.limpiarNombre(campoCorto.value).toUpperCase();
+    avisoCorto.innerHTML = '';
+    avisoCorto.className = 'aviso-en-vivo';
+    if (!texto) return;
+    if (texto.length > 16) {
+      avisoCorto.className = 'aviso-en-vivo aviso-en-vivo-ambar';
+      avisoCorto.textContent = 'Lleva ' + texto.length + ' caracteres: para una carpeta corta, conviene menos.';
+    }
+    var otros = App.E.tipos.filter(function (t) { return t !== tipo; }).map(efectivoDe);
+    var cerca = U.parecidos(texto, otros);
+    var mismo = cerca.filter(function (p) { return p.igual; })[0];
+    if (mismo) {
+      avisoCorto.className = 'aviso-en-vivo aviso-en-vivo-malo';
+      avisoCorto.textContent = 'Ya lo usa otro tipo: ' + mismo.nombre + '.';
+    } else if (cerca.length) {
+      avisoCorto.className = 'aviso-en-vivo aviso-en-vivo-ambar';
+      avisoCorto.textContent = 'Se parece a: ' + cerca.slice(0, 3).map(function (p) { return p.nombre; }).join(', ');
+    }
+  }
+  pintarAvisoCorto();
+  campoCorto.oninput = pintarAvisoCorto;
+  campoCorto.onchange = async function () {
+    var texto = U.limpiarNombre(campoCorto.value).toUpperCase();
+    if (texto === (tipo.nombreCorto || '')) return;
+    var otros = App.E.tipos.filter(function (t) { return t !== tipo; }).map(efectivoDe);
+    if (texto && otros.some(function (o) { return U.normalizar(o) === U.normalizar(texto); })) {
+      U.aviso('Ya lo usa otro tipo: no puede repetirse.', 'malo');
+      campoCorto.value = tipo.nombreCorto || '';
+      pintarAvisoCorto();
+      return;
+    }
+    tipo.nombreCorto = texto;
+    await App.guardarTipos();
+    U.aviso('Nombre corto guardado.', 'bueno');
+  };
+
   /* Fila 57, 18-sep-2026, docs/HUECO-PARA-SELLO-Y-FIRMA.md: si este
      tipo lleva el sello de registro de Séneca y/o la firma digital
      del director, para "Preparar el documento". Un tipo sin estos
@@ -277,6 +333,31 @@ async function construirSeccionCampos(tipo) {
 function construirSeccionPasos(tipo) {
   var b = seccionDeTipo('Pasos del trámite', 'La guía del tipo, con sus preguntas y bifurcaciones.');
 
+  /* El aviso de la biblioteca (20-sep-2026, fila 79, apartado 4.4):
+     misma clase .aviso-compartido que ya usan los campos compartidos,
+     un aviso por paso desactualizado. */
+  async function pintarAvisosBiblioteca(pasos) {
+    if (!window.GuiasBiblioteca) return;
+    var desactualizados;
+    try { desactualizados = await GuiasBiblioteca.pasosDesactualizados(pasos); }
+    catch (e) { return; }
+    if (!desactualizados.length) return;
+    desactualizados.forEach(function (entrada) {
+      var aviso = document.createElement('div');
+      aviso.className = 'aviso-compartido';
+      aviso.innerHTML = '"' + U.escapar(entrada.modelo.nombre) + '" ha cambiado en la biblioteca. ' +
+        '<button type="button" class="enlace">Ver el cambio</button>';
+      aviso.querySelector('button').onclick = async function () {
+        await GuiasBiblioteca.abrirComparacion(entrada);
+        try {
+          await GuiasDelCentro.guardarPasos(tipo.tipo, pasos);
+        } catch (e2) { U.aviso('No he podido guardarlo: ' + e2.message, 'malo'); }
+        repintar();
+      };
+      b.cuerpo.appendChild(aviso);
+    });
+  }
+
   function repintar() {
     var pasos = (window.GuiasDelCentro && GuiasDelCentro.pasosDe(tipo.tipo)) || [];
     b.cuerpo.innerHTML = pasos.length
@@ -293,6 +374,7 @@ function construirSeccionPasos(tipo) {
       if (ok) repintar();
     };
     b.cuerpo.appendChild(boton);
+    pintarAvisosBiblioteca(pasos);
   }
   repintar();
   return b.sec;

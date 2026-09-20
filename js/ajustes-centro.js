@@ -145,6 +145,10 @@ App.renombrarEstado = async function (viejo) {
 
   try {
     App.E.estados.forEach(function (e) { if (e.nombre === viejo) e.nombre = nuevo; });
+    /* 20-sep-2026, fila 79, apartado 9: mismo arreglo que App.renombrarTipo
+       (js/ajustes.js) para que el nombre viejo no resucite solo. */
+    await Borrados.marcar(App.E.gestor, 'estados', viejo);
+    await Borrados.revivir(App.E.gestor, 'estados', nuevo);
     await App.guardarEstados();
 
     var n = 0;
