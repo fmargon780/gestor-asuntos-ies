@@ -153,7 +153,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 74 | `docs/CUENTAS-DE-FIN-DE-CURSO.md` | HECHA (19-sep-2026) |
 | 75 | `docs/HUECOS-ENCONTRADOS-FILA-69.md` | HECHA (19-sep-2026 · 15:55): muchas más subidas de las debidas, y hubo que corregir erratas (nota más abajo) |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1, cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante. |
-| 77 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 3 (los borrados que se fusionen) | EN CURSO (20-sep-2026) |
+| 77 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 3 (los borrados que se fusionen) | HECHA (20-sep-2026 · 06:53) |
 | 78 | Repartir `docs/contexto/ASUNTOS.md` (ha pasado los 40 KB del objetivo de la fila 65) | PENDIENTE (no urgente: se puede seguir editando, solo cuesta un poco más) |
 | 79 | `docs/BIBLIOTECA-DE-HITOS.md` | PENDIENTE (20-sep-2026, acordada con Francisco) |
 
@@ -430,6 +430,26 @@ En total, entre ambas partes, la fila 75 se cerró en muchas más de las dos sub
 regla 13. Motivo para dejarlo escrito: si una fila de documentación grande vuelve a necesitar
 delegarse en una sesión auxiliar, conviene pedirle explícitamente que lea el fichero entero de
 origen y lo copie tal cual (o lo suba en trozos verificados), en vez de retipearlo de memoria.
+
+## Nota de esta sesión (20-sep-2026): fila 77, seis ficheros con PLACEHOLDER en el commit de código
+
+Al subir el código de la fila 77 en un solo commit con `push_files` (doce ficheros), la llamada
+salió con solo dos ficheros de contenido real (`index.html` y, en el intento siguiente, los seis
+primeros de la lista) y **la palabra `PLACEHOLDER` en vez del contenido** en los otros seis:
+`js/ficha-asunto.js`, `js/nucleo.js`, `js/papelera.js`, `js/recurrentes.js`, `js/version.js`,
+`pruebas/borrados-que-se-fusionan.mjs` y `pruebas/recurrentes.mjs` (siete, en dos intentos: el
+primero llevó solo `index.html`, exactamente el mismo fallo que ya avisa la nota de la fila 75).
+Esto dejó `main` roto de verdad unos minutos: `js/nucleo.js` con `PLACEHOLDER` es la aplicación
+entera sin arrancar, y Vercel lo publicó.
+
+Se detectó al momento (regla 12: comprobar cada fichero grande después de subirlo) y se corrigió
+fichero a fichero con `create_or_update_file`, comparando el tamaño de cada uno contra el original
+antes de darlo por bueno, y comprobando al final con un `git clone` fresco y `npm test` completo
+que `main` no tenía ningún `PLACEHOLDER` y las 85 pruebas pasaban. Motivo para dejarlo escrito:
+**`push_files` con muchos ficheros grandes en una sola llamada es donde más falla el volcado del
+contenido.** Para una fila con más de cuatro o cinco ficheros de código, mejor subirlos con
+`create_or_update_file` uno a uno (o en dos o tres llamadas de `push_files` más pequeñas),
+comprobando el tamaño de cada uno nada más subirlo, en vez de una única llamada con todos.
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
