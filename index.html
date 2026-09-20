@@ -626,6 +626,27 @@
         </div>
       </details>
 
+      <!-- fila 77, docs/DETALLES-DE-MANTENIMIENTO.md, punto 3: los
+           tipos, estados, tipos de documento y recurrentes que se
+           borran ya no desaparecen del todo (así el otro ordenador no
+           los resucita); se quedan aquí, fuera de la vista, hasta que
+           se quiten del todo pasados 90 días. Lo pinta
+           js/borrados-fusion.js. -->
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Borrados que se fusionan</span>
+          <span class="bloque-pie">Tipos, estados y recurrentes borrados, para que no reaparezcan solos</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Al borrar un tipo de asunto, un estado, un tipo de documento o un
+         asunto recurrente, la aplicación se acuerda de que se borró, en vez de olvidarlo del
+         todo: así, si el otro ordenador todavía lo tenía cargado, no lo trae de vuelta la
+         próxima vez que guarde algo suyo. El recuerdo no se ve en ningún otro sitio; aquí puedes
+         ver cuántos hay y quitar del todo, sin vuelta atrás, los de hace más de 90 días.</p>
+      <div id="tabla-borrados-fusion" class="lista"></div>
+        </div>
+      </details>
+
       <details class="bloque-ajustes" id="bloque-papelera">
         <summary>
           <span class="bloque-titulo">Papelera</span>
@@ -705,6 +726,7 @@
 
 <!-- La aplicación, repartida por pantallas. -->
 <script src="js/nucleo.js"></script>
+<script src="js/borrados-fusion.js"></script>
 <script src="js/version.js"></script>
 <script src="js/asuntos-lista.js"></script>
 <script src="js/unir-asuntos.js"></script>
