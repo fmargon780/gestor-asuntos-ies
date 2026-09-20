@@ -155,6 +155,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1, cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante. |
 | 77 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 3 (los borrados que se fusionen) | EN CURSO (20-sep-2026) |
 | 78 | Repartir `docs/contexto/ASUNTOS.md` (ha pasado los 40 KB del objetivo de la fila 65) | PENDIENTE (no urgente: se puede seguir editando, solo cuesta un poco más) |
+| 79 | `docs/BIBLIOTECA-DE-HITOS.md` | PENDIENTE (20-sep-2026, acordada con Francisco) |
 
 **Orden de trabajo:** las filas 1 a 74 están HECHAS (las del informe crítico del 18-sep-2026,
 `docs/INFORME-CRITICO-2026-09-18.md`, que Francisco pidió tener todas desarrolladas antes de
@@ -349,6 +350,19 @@ sin DOM, como `js/pdf-herramientas.js`), `js/preparar-documento.js` (el cuadro) 
 `docs/HISTORIA.md`. Sesión en la nube: subido con pull request, no directo a `main` (ver la nota
 de más abajo). **Su botón se llama "Ajustar tamaño" desde la fila 58.**
 
+**Fila 79, en una línea** (20-sep-2026, acordada con Francisco): **la biblioteca de hitos del
+centro**. Hoy los pasos del trámite se escriben a mano en cada Tipo de Asunto y no se reutiliza
+nada, aunque muchos se repitan con el mismo responsable, el mismo plazo, la misma lista de lo que
+hay que reunir y el mismo texto de correo. Se crea un fichero compartido nuevo,
+`_GESTOR/hitos-biblioteca.json`, con **hitos modelo**: al escribir la guía de un tipo se puede
+traer uno de la biblioteca en vez de escribirlo, y entra como **copia**. Al guardar un paso traído
+que ha cambiado, la aplicación pregunta si el cambio es solo para ese tipo o sube también a la
+biblioteca; si sube, los demás tipos que lo usan **no se cambian solos**: les sale un aviso que
+enseña el cambio campo a campo (antes → después) y deja decidir. Los asuntos ya abiertos no se
+enteran de nada. Ficheros nuevos: `js/hitos-biblioteca.js`, `js/guias-biblioteca.js`,
+`pruebas/biblioteca-de-hitos.mjs`. Detalle en `docs/BIBLIOTECA-DE-HITOS.md`. Sube directamente a
+`main`, sin petición de cambios.
+
 ## Nota de esta sesión (18-sep-2026, mañana): docs/CONTEXTO.md y docs/HISTORIA.md sin actualizar
 
 El código, las pruebas y `docs/CONTEXTO-CORTO.md` de las filas 53-56 ya están en `main` y
@@ -452,6 +466,12 @@ origen y lo copie tal cual (o lo suba en trozos verificados), en vez de retipear
   del tercero.
 - De la fila 60 (18-sep-2026): con el uso se verá si el historial de comunicaciones conviene verlo
   junto, en un sitio solo del asunto, en vez de repartido hito por hito.
+- De la fila 79 (20-sep-2026): Francisco quiere que Claude investigue y proponga **los Tipos de
+  Asunto más comunes de la secretaría de un IES andaluz** (Secundaria y Bachillerato, modalidades
+  de Ciencias y Tecnología y de Humanidades y Ciencias Sociales) **y los hitos modelo de cada
+  uno**, para dejar la biblioteca ya poblada. Se acordó hacerlo **después** de la fila 79 y en una
+  conversación aparte: es trabajo de contenido, no de programación, y hay que contrastarlo tipo
+  por tipo con él.
 - **Del informe del 18-sep-2026: los tres botones de comunicar.** En la misma ficha hay
   "Comunicar" en la cabecera (plantilla del tipo), "Comunicar" en un hito (texto de ese paso) y
   "Pedir lo que falta" en un hito. Por dentro están bien: los tres abren el mismo cuadro y no hay
