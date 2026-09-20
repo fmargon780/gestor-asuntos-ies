@@ -2,7 +2,8 @@
 
 Fila 79 de `docs/COLA.md`. Acordada con Francisco el 20-sep-2026.
 **Ampliada el 20-sep-2026** con los apartados 4.6 a 4.9 (hitos solo informativos, normativa del
-hito y nombre corto del tipo de asunto), acordados con Francisco en la misma conversación.
+hito y nombre corto del tipo de asunto) y con el apartado 9 (un arreglo suelto, el tipo renombrado
+que resucita), acordados con Francisco en la misma conversación.
 
 **Sube directamente a `main`, sin abrir ninguna petición de cambios.** Cambios quirúrgicos, no
 reescribas ficheros enteros. No leas el repositorio entero: con `docs/CONTEXTO.md`,
@@ -382,6 +383,7 @@ Se tocan, lo mínimo:
 - `js/ajustes-centro.js` — colgar el bloque nuevo y el campo de la dirección base, nada más.
 - `js/nombres.js` — la función `Nombres.tipoParaCarpeta(tipo)` del apartado 4.9, y los sitios que
   hoy meten `tipo.tipo` en un nombre.
+- `js/ajustes.js` — solo lo del apartado 9.
 - Los cuatro sitios de hitos que dice el apartado 5.
 - `index.html` — los `<script>` nuevos, en el orden que toca (después de `js/guias.js`).
 - `docs/CONTEXTO-CORTO.md`, `docs/CONTEXTO.md`, `docs/contexto/HITOS-Y-GUIAS.md`,
@@ -403,3 +405,39 @@ Francisco y Claude están montando el **contenido** de la biblioteca en una conv
 Tipos de Asunto habituales de la secretaría de un IES andaluz y los hitos modelo de cada uno, con
 su normativa. Eso se carga cuando esta fila esté hecha. No inventes contenido aquí: esta fila es
 solo la herramienta.
+
+## 9. Un arreglo suelto que va en esta misma fila: el tipo renombrado resucita
+
+Encontrado el 20-sep-2026, mirando el caso real de Francisco: en ALUMNADO tiene a la vez
+`ANULACIÓN` y `ANULACIÓN MATRÍCULA`, y esta última muestra "antes: ANULACIÓN". Son el mismo tipo
+por duplicado.
+
+**La causa.** `App.renombrarTipo` (`js/ajustes.js`) cambia el nombre y guarda, pero **no marca el
+nombre viejo como borrado**. Como el `tipos.json` del disco todavía tiene la entrada vieja,
+`App.fusionarConDisco` la ve como algo que el otro ordenador tiene de más y la vuelve a meter.
+Resultado: cada vez que se renombra un tipo, el nombre viejo vuelve a nacer como tipo aparte.
+
+**El arreglo, en `App.renombrarTipo`**, justo antes de guardar:
+
+- marcar el nombre viejo como borrado en la lista de borrados compartida
+  (`js/borrados-fusion.js`, el mismo mecanismo de la fila 77),
+- y quitar de esa lista el nombre nuevo, por si alguna vez se borró: si no, renombrar a un nombre
+  que se borró en el pasado haría desaparecer el tipo al guardar.
+
+Haz lo mismo, si aplica, al renombrar un **estado** o un **tipo de documento**: son las otras dos
+listas con la misma fusión.
+
+**Y un segundo efecto, que hay que comprobar antes de tocar nada.** Mientras el tipo fantasma
+existe, las carpetas ya archivadas que se llaman `... ANULACIÓN ...` se le adjudican a él, así que
+el guardián de "no se puede borrar un tipo con asuntos" puede estar impidiendo borrarlo. Si es el
+caso: **no bloquees el borrado cuando el nombre del tipo que se borra figura como `alias` de otro
+tipo vivo**, porque esas carpetas se seguirán reconociendo por el alias (`Nombres.leer`,
+`js/nombres.js`, ya lo hace).
+
+Prueba nueva siguiendo el patrón de `pruebas/borrados-que-se-fusionan.mjs`: renombrar un tipo, y
+comprobar que tras la fusión con el disco el nombre viejo **no** vuelve a aparecer.
+
+**Aparte, y conviene:** `index.html` carga los `js/` sin ningún `?v=`, así que el navegador de
+Francisco puede seguir con el código del día anterior aunque Vercel ya haya publicado. Añade a cada
+`<script>` un `?v=` con la versión de `App.VERSION`, o el mecanismo equivalente más simple, para
+que una publicación nueva llegue siempre.
