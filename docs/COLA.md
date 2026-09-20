@@ -157,18 +157,18 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 78 | Repartir `docs/contexto/ASUNTOS.md` (ha pasado los 40 KB del objetivo de la fila 65) | HECHA (20-sep-2026 · 08:44) |
 | 79 | `docs/BIBLIOTECA-DE-HITOS.md` | HECHA (20-sep-2026 · 09:32) |
 | 80 | `docs/CARGAR-BIBLIOTECA.md` | HECHA (20-sep-2026 · 09:32) |
-| 81 | `docs/FIRMANTES-Y-MEMBRETE.md` | HECHA (20-sep-2026 · 11:37) |
-| 82 | `docs/FORMULARIOS-OFICIALES.md` | PENDIENTE |
-| 83 | `docs/PLANTILLAS-DEL-CENTRO.md` | PENDIENTE |
+| 81 | `docs/FIRMANTES-Y-MEMBRETE.md` | HECHA (20-sep-2026) |
+| 82 | `docs/FORMULARIOS-OFICIALES.md` | HECHA (20-sep-2026) |
+| 83 | `docs/PLANTILLAS-DEL-CENTRO.md` | HECHA (20-sep-2026): doce plantillas (ocho de documento, cuatro de correo), una muestra representativa de las tres categorías, no las cincuenta y tantas de la biblioteca de golpe — decisión tomada para no sacrificar calidad por cantidad. Detalle en `docs/HISTORIA.md` |
 | 84 | `docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md` | PENDIENTE |
 
-**Orden de trabajo:** todas las filas de 1 a 80 están HECHAS, salvo la 63 y la 76, BLOQUEADAS (una
+**Orden de trabajo:** todas las filas de 1 a 83 están HECHAS, salvo la 63 y la 76, BLOQUEADAS (una
 sesión sin salida a internet, la otra por el riesgo de tocar el mecanismo de publicación sin
-Francisco delante). Quedan las filas **81, 82, 83 y 84**, en ese orden (acordadas con Francisco el
-20-sep-2026, `docs/COLA-NUEVAS-2026-09-20.md`, ya borrado tras apuntarlas aquí): la 82 va antes que
-la 83 y la 84 porque las dos usan su catálogo de formularios; la 83 usa además los cargos y el
-membrete de la 81; la 81 y la 82 son independientes entre sí; la 84 puede hacerse antes que la 83
-si conviene, pero nunca antes que la 82.
+Francisco delante). Queda la fila **84** (20-sep-2026, apuntada por Francisco mientras esta misma
+sesión trabajaba en la 81-83, siguiendo su propia regla de no lanzar otra sesión mientras hay una
+en marcha: queda para la próxima vez que se pegue la línea de lanzar). Cuando se apunte una fila
+nueva, esta nota se sustituye por la que toque: no hay que mantener el repaso de las filas ya
+hechas más que en `docs/HISTORIA.md`.
 
 **El orden de trabajo NO es el de los números.** La tabla de arriba está puesta **en el orden en que
 hay que hacerlas**, de arriba abajo, y por eso la 65 aparece entre la 62 y la 63. Los números no se

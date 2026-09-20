@@ -384,9 +384,13 @@ var Carpetas = (function () {
      se abre el explorador (17-sep-2026, fila 20): la del asunto cuando
      se está en un asunto, y así. Sin ella, se abre donde el navegador
      quiera, como siempre. */
-  async function elegirFichero(carpetaInicio) {
+  async function elegirFichero(carpetaInicio, tipos) {
     var opciones = { multiple: false };
     if (carpetaInicio) opciones.startIn = carpetaInicio;
+    /* 20-sep-2026, fila 81: para elegir la imagen del membrete, sin
+       mezclarla con cualquier fichero (`tipos` es el `types` de
+       showOpenFilePicker, por ejemplo para PNG/JPG). */
+    if (tipos) opciones.types = tipos;
     var lista = await window.showOpenFilePicker(opciones);
     return lista[0];
   }

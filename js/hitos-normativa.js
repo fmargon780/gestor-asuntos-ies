@@ -81,12 +81,18 @@ var HitosNormativa = (function () {
       '</div>';
   }
 
-  function bloqueHTML(normativa) {
+  /* `formulariosHTML` (20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md):
+     el buscador de formularios de `js/formularios.js` se pinta DENTRO
+     de este mismo `<details>`, junto a la normativa, para no alargar
+     más la pantalla del paso. Se pasa ya montado (o `''`, sin
+     `js/formularios.js` cargado) para no acoplar este fichero a ese. */
+  function bloqueHTML(normativa, formulariosHTML) {
     var lista = normativa || [];
     return '<details class="paso-normativa">' +
       '<summary>Normativa' + (lista.length ? ' (' + lista.length + ')' : '') + '</summary>' +
       '<div class="normativa-lista">' + lista.map(filaEditorHTML).join('') + '</div>' +
       '<button type="button" class="boton boton-ancho normativa-anadir">+ Añadir referencia</button>' +
+      (formulariosHTML || '') +
       '</details>';
   }
 

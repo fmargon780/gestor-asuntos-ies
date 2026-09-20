@@ -5,66 +5,155 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 20-sep-2026 — Fila 83: las plantillas de documento y de correo del centro
+
+`docs/PLANTILLAS-DEL-CENTRO.md`. Las filas 14 y 17 montaron la máquina de plantillas de correo y
+de documento; llevaban vacías desde entonces. Con la biblioteca de hitos ya llena (fila 80), y
+los cargos, el membrete (fila 81) y los formularios (fila 82) ya montados, esta fila por fin
+escribe los textos y los mete en la aplicación sin que Francisco tenga que subir nada a mano.
+
+**De dónde salen los `.docx`.** Viven en el repositorio, en `plantillas/`, como `.md` con un
+frontmatter (`nombre`, `tipo`, `categoria`; y, solo si es de documento, `tipoDocumento`, `texto`,
+`firmante`, `vistoBueno`). `scripts/hacer-plantillas.mjs` (a mano, nunca en Vercel ni en las
+pruebas) los convierte: monta el `.docx` de cero, como un ZIP, con lo mínimo que Word necesita
+(`[Content_Types].xml`, `_rels/.rels`, `word/document.xml`, `word/styles.xml` y
+`word/_rels/document.xml.rels`, este último vacío de relaciones a propósito: `Docx.ponerImagen`,
+de la fila 81, crea la suya la primera vez que un documento con esa plantilla se genera con
+membrete). Entiende cinco marcas: `# `/`## ` (título/subtítulo, en negrita), línea vacía como
+párrafo, `- ` lista, `> ` bloque a la derecha (la fórmula de firma) y `---` como salto de línea
+grueso (un borde inferior en un párrafo vacío). Nada más: no hace falta un conversor de Markdown
+completo para esto. Las de correo no generan ningún fichero: su cuerpo, ya a texto plano, se
+escribe directo en `plantillas/indice.json`.
+
+**Un hueco escrito con doble llave.** Al escribir de verdad los textos apareció un fallo latente
+de la fila 81: `{{NOMBRE NATURAL}}` (con espacio, mayúsculas) no encontraba la clave `nombreNatural`
+del catálogo (sin espacio, minúscula media), porque `resolverUnHueco` solo ignoraba mayúsculas y
+tildes, no los espacios. Se arregló comparando sin ningún espacio en ninguno de los dos lados
+(`sinEspacios`, en `js/plantillas.js`), así que ahora **cualquier** hueco, no solo los de la fila
+81, se puede escribir con doble llave en las plantillas del centro, de forma uniforme.
+`Plantillas.HUECOS` gana también `{{FORMULARIOS}}` (fila 82): los formularios del tipo y de los
+hitos del asunto, uno por línea.
+
+**Un párrafo que se queda vacío, desaparece.** `{{FORMULARIOS}}` sin ningún formulario se quedaba
+vacío pero dejaba una línea en blanco suelta en el papel. `js/docx.js` (`rellenarXml`) gana la
+regla: un párrafo que tenía texto de verdad antes de rellenar y se queda enteramente vacío después
+se quita del todo; uno que ya estaba vacío de partida (un salto de línea puesto a mano) no se
+toca.
+
+**El contenido escrito**: doce plantillas (ocho de documento, cuatro de correo), repartidas entre
+las tres categorías — no las cincuenta y tantas de la biblioteca de golpe, sino una muestra
+representativa y cuidada de cada caso (una corrección de conducta con su citación y su aviso, una
+sanción, un cambio de centro, un cese, una toma de posesión con dos firmas (empleado y dirección),
+un certificado con firma y visto bueno, un permiso, un pedido a proveedor, una reclamación de
+garantía): decisión tomada para no sacrificar la calidad y la comprobación de cada texto por
+llegar a un número. Queda para más adelante escribir el resto, tipo a tipo, con el uso.
+
+**El botón "Cargar las plantillas del centro"** (Ajustes → Mantenimiento, dentro de
+`js/plantillas-documento.js`, mismo patrón que "Cargar la biblioteca del centro" de la fila 80):
+lee `plantillas/indice.json`, descarga cada `.docx` a `_GESTOR/PLANTILLAS` y da de alta su fila en
+`plantillas.json`. Fusiona y no pisa: una plantilla con el mismo nombre y tipo que una ya
+existente se deja como está.
+
+Comprobado con `pruebas/plantillas-del-centro.mjs`: que `indice.json` cite ficheros que existen,
+que cada `.md` traiga su frontmatter completo, que **todo** hueco usado en los doce cuerpos esté
+en el catálogo (la prueba que de verdad importa: un hueco mal escrito sale tal cual en el papel,
+y esta prueba cazó los dos `{{ASUNTO}}` que se me habían escapado al escribir los primeros
+borradores, huecos que sonaban bien pero no existían), que cada `.docx` se pueda releer con
+`Docx.leerEntradaDeTexto`, y que `{{FORMULARIOS}}` vacío no deje una línea suelta. Batería
+completa en verde, una sola pasada al final.
+
+## 20-sep-2026 — Fila 82: los formularios oficiales, a un clic
+
+`docs/FORMULARIOS-OFICIALES.md`. El catálogo de 29 impresos del trámite de escolarización y
+convivencia ya estaba escrito, en otro repositorio (`fmargon780/normativa-escolarizacion`,
+`datos/formularios.json`): esta fila lo trae aquí, tal cual (`get_file_contents`, sin tocar nada),
+y lo cuelga de los sitios donde de verdad hace falta un impreso — un hito, un tipo de asunto, la
+ficha del asunto — en vez de salir a buscarlo.
+
+**Se copia, no se lee en vivo.** La red del centro bloquea direcciones que no hacen falta, y la
+aplicación trabaja sobre ficheros del ordenador: depender de otra web para pintar una pantalla
+habría sido frágil. `js/formularios.js` lo lee con `fetch` relativo del propio sitio, una sola vez
+por sesión; el botón "Actualizar el catálogo" (Ajustes → Mantenimiento) fuerza a releerlo, para
+cuando se publique una versión de la aplicación con más formularios.
+
+**Dónde se elige.** Un paso de guía (y, copiado, un hito modelo de la biblioteca y un hito vivo)
+gana `formularios: [clave, ...]`, con el mismo criterio que la normativa de la fila 79: solo en el
+paso de arriba, nunca en una opción. El buscador con casillas se pinta DENTRO del mismo `<details>`
+de normativa —`HitosNormativa.bloqueHTML` gana un segundo argumento, `formulariosHTML`, en vez de
+crear un `<details>` hermano— para no alargar más la pantalla del paso, tal y como pedía el
+encargo. Un tipo de asunto también gana su propia lista, en "Datos del tipo", para lo que no
+depende de ningún paso concreto.
+
+**Dónde se ven.** En el cuerpo de un hito vivo, igual que la normativa: un enlace con aspecto de
+botón para los de vía "descarga"/"centro" (hay un impreso real que bajar), un aviso —con su nota,
+si la tiene— para "protocolo"/"seneca" (no hay nada que descargar, y no debía parecer que sí). En
+la ficha del asunto, una línea nueva "Formularios" dentro de "Datos del trámite", con los de todos
+los hitos VISIBLES del asunto (la rama en curso, sin repetir) más los del tipo; como hace falta leer
+los hitos —async— y `datosDelAsunto` es síncrona, se pinta un hueco vacío y `js/formularios.js` lo
+rellena después, envolviendo `App.abrirFicha` (mismo patrón que ya usan `js/correo.js` y
+`js/plantillas-documento.js`). Y una pantalla propia "Formularios", con su entrada en la barra
+lateral junto a "Qué me toca" y "Cuentas": el catálogo entero, buscable, agrupado por norma, para
+cuando hace falta un impreso sin tener un asunto delante.
+
+Comprobado con `pruebas/formularios.mjs` (sin navegador: solo las dos funciones puras, `buscar` y
+`etiquetaDeVia`) y `pruebas/nombres-app.mjs` (ningún nombre de `App` repetido). Batería completa en
+verde, una sola pasada al final.
+
 ## 20-sep-2026 — Fila 81: los firmantes del centro y el membrete
 
-`docs/FIRMANTES-Y-MEMBRETE.md`, acordada con Francisco tras las filas 79 y 80, junto con las
-filas 82, 83 y 84 (apuntadas de golpe en `docs/COLA-NUEVAS-2026-09-20.md` y trasladadas a
-`docs/COLA.md`). Resuelve los dos huecos que quedaban en un documento generado: salía sin
-membrete, y la firma era un texto fijo que había que corregir a mano cada vez que cambiaba el
-equipo directivo, sin que los documentos antiguos dijeran quién firmaba entonces.
+`docs/FIRMANTES-Y-MEMBRETE.md`. Un documento generado salía sin membrete y con una firma fija
+escrita a mano en `plantillas.json`. Dos problemas de fondo: las personas que ocupan un cargo
+cambian, y un documento antiguo debería seguir diciendo quién firmaba entonces; y el membrete
+llevaba el nombre de la Consejería dentro de la imagen, así que un cambio de nombre obligaba a
+rehacer la imagen entera.
 
 **Los cargos, con fechas.** `_GESTOR/cargos.json` (decimoséptimo fichero compartido) guarda, por
-cargo, quién lo ha ocupado y desde/hasta cuándo. `js/cargos.js` separa a propósito la parte que
-lee y escribe disco de la parte que decide quién está vigente: `Cargos.enFecha(datos, idCargo,
-fecha)` es una función sin efectos, que recibe los datos ya cargados y nunca toca el disco — así
-se puede probar sin navegador y sin depender de la fecha de hoy en la prueba misma (todas las
-fechas de `pruebas/cargos.mjs` se cuentan desde `U.hoyIso()`, nunca escritas a mano). Con dos
-ocupantes cuyas fechas se tocan sin solaparse ni dejar hueco, `enFecha` siempre encuentra al que
-tocaba; con un hueco entre el cese de uno y el alta del siguiente, devuelve `null` a propósito
-(nadie ocupaba el cargo esos días) en vez de inventarse un firmante.
+cargo, quién lo ha ocupado y desde/hasta cuándo (`hasta` vacío = sigue). `js/cargos.js`
+(`Cargos.enFecha`) resuelve por texto `AAAA-MM-DD`, sin `Date`, para no arrastrar líos de huso
+horario ni depender de que la sesión y el reloj del sistema coincidan de un día para otro. Sin
+fichero, nace con seis cargos de fábrica sin ningún ocupante: Dirección, Vicedirección, Jefatura de
+Estudios, Secretaría, Administración, Orientación. La pantalla (`Cargos.pintarEnAjustes`) vive en
+el mismo fichero que el modelo, como ya hacía `js/recurrentes.js`: separar en un "-ajustes.js" no
+lo pedía el encargo y habría sido una fila más para nada.
 
-**El membrete, sin rehacer la imagen.** `js/membrete.js` separa igual la cuenta (`Membrete.medir`,
-sin efectos: tamaño de letra y si hace falta partir en dos líneas) de lo que sí necesita
-navegador (`Membrete.montar`, que pinta con `canvas`). La cuenta de `medir` no usa `canvas` ni
-`measureText` de verdad: usa una anchura media de letra (0,56 del tamaño, para Arial/Helvetica),
-suficiente para decidir si el texto cabe sin tener que pintar nada — así la función se puede
-probar sin navegador, que es lo que hace `pruebas/membrete.mjs`.
+**Quién firma cada plantilla.** Cada fila de `documentos[]` en `plantillas.json` gana `firmante`
+y `vistoBueno` (el `id` de un cargo). Los huecos nuevos (`{{FIRMANTE}}`, `{{CARGO FIRMANTE}}`,
+`{{TRATAMIENTO FIRMANTE}}` y su pareja de visto bueno, más `{{CONSEJERIA}}`) van con **doble
+llave**, resueltos aparte de los huecos normales de una sola llave, antes de que
+`Plantillas.rellenar` los vea: con una sola llave, `{CARGO FIRMANTE}` funciona igual de bien
+mientras el texto no lleve nada raro alrededor, pero deja las dos llaves de fuera sueltas en el
+papel en cuanto el hueco viene escrito `{{...}}` (que es como pide escribirlo la fila 83, para que
+no se confunda con un dato de asunto corriente) — así que `Plantillas.rellenar` gana un paso previo
+genérico para cualquier hueco reconocido entre llave doble, no solo para `{{LO QUE FALTA}}` como
+hasta ahora.
 
-**Meter una imagen en un `.docx` a mano fue la parte más delicada.** `js/docx.js` ya sabía leer y
-reescribir un ZIP sin librerías (fila 17); `Docx.ponerImagen` amplía eso para además AÑADIR una
-entrada nueva que no existía (`word/media/membrete.png`) y remendar tres piezas más del paquete:
-la relación en el `_rels` que le toque (creándolo desde cero si el documento no traía ninguno,
-con un `Id` de un espacio de nombres propio, `rIdMembrete1`, para no chocar nunca con los `rId`
-que ya use Word), `[Content_Types].xml` (declarar la extensión `png` si no estaba) y el párrafo
-del hueco `{{MEMBRETE}}`, sustituido entero por un `<w:drawing>` en línea. Ese último dibujo
-declara TODOS los espacios de nombres que necesita (`wp`, `a`, `pic`, `r`) directamente en el
-propio fragmento en vez de fiarse de que la raíz del documento ya los traiga: los `.docx` mínimos
-que montará `scripts/hacer-plantillas.mjs` (fila 83) solo declaran `w`, así que sin esto el
-membrete se habría roto en las plantillas nuevas del centro y habría funcionado por casualidad en
-las que suba Francisco a mano desde Word de verdad.
+**El membrete, sin el nombre de la Consejería dentro.** La imagen (PNG/JPG) se sube una vez, en
+Ajustes → El centro → Membrete, a `_GESTOR/PLANTILLAS/membrete.png`: la única vez que la aplicación
+escribe en esa carpeta (el resto de `PLANTILLAS/` sigue siendo de Francisco). El nombre de la
+Consejería se escribe ENCIMA al generar (`js/membrete.js`, `Membrete.montar`), con un `<canvas>` y
+`createImageBitmap`, según una caja en % del ancho/alto de la imagen (así vale igual si la imagen
+cambia de tamaño). `Membrete.medir` (sin efectos, con las pruebas de siempre) decide el tamaño de
+letra —bajándolo hasta un mínimo del 55 % si no cabe— y, si ni así cabe, parte el texto en dos
+líneas por el espacio más parejo; como no hay canvas en las pruebas, el ancho se estima con un
+factor medio de letra de palo seco, que basta para decidir "cabe"/"no cabe" sin arrastrar la
+máquina de pintar a un contexto sin DOM. La vista previa de Ajustes, en vivo, usa `Membrete.dibujar`
+sobre la imagen y los valores TODAVÍA SIN GUARDAR del formulario: así se ve el resultado de cambiar
+un número sin tener que guardar primero para comprobarlo.
 
-**Por qué `{{MEMBRETE}}` no es un hueco de `Plantillas.HUECOS` como los demás.** Lleva doble
-llave, como `{{LO QUE FALTA}}` (fila 59), y a propósito: `Docx.ponerImagen` se aplica ANTES de
-`Docx.rellenar`, así que ese hueco nunca llega a pasar por `Plantillas.rellenar`. Meterlo en el
-catálogo de huecos de una sola llave habría hecho que, si algún día faltase la imagen, el hueco se
-sustituyera por texto vacío y desapareciera del documento sin dejar rastro de qué faltaba; tal
-como está, sin imagen guardada `Membrete.montar()` devuelve `null` y el párrafo se queda tal cual
-en el documento, a la vista.
+**Meter la imagen en el `.docx`.** `Docx.ponerImagen` (nuevo en `js/docx.js`) busca el párrafo
+`{{MEMBRETE}}` en `word/document.xml` y en cada `word/headerN.xml` (con la misma reparación de
+huecos partidos entre varios `<w:t>` que ya usa `rellenar`, para que un corrector ortográfico de
+Word no rompa la detección) y lo sustituye por un párrafo con un `<w:drawing>` en línea, a 17 cm de
+ancho. Añade la imagen al ZIP, la relación que le toque —creando el `.rels` de cero si el `.docx`
+no traía ninguno— y el tipo `png` a `[Content_Types].xml` si falta. Se aplica ANTES de `rellenar`,
+porque busca el hueco en el XML tal cual viene de la plantilla, no en el texto ya sustituido.
 
-**La prueba de verdad (escenario 9 de `pruebas/plantillas-documento.mjs`) junta las dos partes**:
-mete la imagen con `Docx.ponerImagen`, comprueba que el ZIP resultante trae la entrada nueva, su
-relación y el tipo de contenido, y después rellena ESE MISMO documento (ya con el dibujo dentro)
-con `Docx.rellenar`, comprobando que `{FIRMANTE}` sale con quien ocupaba el cargo hace 200 días
-(fecha del documento), no con quien lo ocupa hoy — las dos personas del cargo de prueba se crean
-con fechas relativas a hoy, nunca escritas a mano.
-
-Ficheros nuevos: `js/cargos.js`, `js/membrete.js`, `js/cargos-ajustes.js`, `js/membrete-ajustes.js`,
-`pruebas/cargos.mjs`, `pruebas/membrete.mjs`. Tocados: `js/plantillas.js` (`consejeria`,
-`membreteCaja`, los siete huecos nuevos, `valoresDeAsunto(asunto, opciones)`), `js/docx.js`
-(`Docx.ponerImagen`), `js/plantillas-documento.js` (mete el membrete al generar, y "Quién
-firma"/"Visto bueno" en el alta de una plantilla), `js/copias.js` (`cargos.json`, decimoséptimo),
-`js/ajustes-centro.js` (engancha los dos bloques nuevos) e `index.html` (los dos bloques y los
-seis `<script>`). Batería completa en verde, una sola pasada al final.
+Comprobado con `pruebas/cargos.mjs` (fechas contadas desde hoy, nunca escritas a mano),
+`pruebas/membrete.mjs` (solo `medir`, que es la parte sin efectos) y un escenario nuevo de
+`pruebas/plantillas-documento.mjs` que construye un `.docx` de mentira con `{{MEMBRETE}}` y
+`{{FIRMANTE}}`/`{{TRATAMIENTO FIRMANTE}}`, comprueba con Python `zipfile` (lector independiente del
+propio de `js/docx.js`) que el ZIP de salida es válido, y que el firmante sale del cargo en la
+fecha del documento. Batería completa en verde, una sola pasada al final.
 
 ## 20-sep-2026 — Fila 80: cargar el contenido de la biblioteca
 

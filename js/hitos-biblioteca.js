@@ -85,6 +85,8 @@ var HitosBiblioteca = (function () {
       comunicacion: window.Guias ? Guias.normalizarComunicacion(m && m.comunicacion) : null,
       soloInformativo: !!(m && m.soloInformativo),
       normativa: window.Guias ? Guias.normalizarNormativa(m && m.normativa) : [],
+      /* 20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md. */
+      formularios: Array.isArray(m && m.formularios) ? m.formularios.map(String) : [],
       creadoEl: String((m && m.creadoEl) || U.hoyIso()),
       actualizadoEl: String((m && m.actualizadoEl) || U.hoyIso()),
       actualizadoPor: String((m && m.actualizadoPor) || '')
@@ -141,6 +143,7 @@ var HitosBiblioteca = (function () {
       responsable: paso.responsable, estadoAsunto: paso.estadoAsunto, plazo: paso.plazo,
       requisitos: paso.requisitos, comunicacion: paso.comunicacion,
       soloInformativo: paso.soloInformativo, normativa: paso.normativa,
+      formularios: paso.formularios,
       actualizadoPor: usuario || ''
     });
   }
@@ -157,6 +160,7 @@ var HitosBiblioteca = (function () {
       comunicacion: modelo.comunicacion ? Object.assign({}, modelo.comunicacion) : null,
       soloInformativo: modelo.soloInformativo,
       normativa: (modelo.normativa || []).map(function (n) { return Object.assign({}, n); }),
+      formularios: (modelo.formularios || []).slice(),
       origenBiblioteca: { id: modelo.id, revision: modelo.revision, divergido: false }
     };
   }

@@ -168,6 +168,7 @@ var HitosPanelLista = (function () {
     var trozos = [];
     if (h.cuerpo) trozos.push('<div class="hito-explicacion">' + h.cuerpo + '</div>');
     if (window.HitosNormativa) trozos.push(HitosNormativa.listaHTML(h.normativa));
+    if (window.Formularios) trozos.push(Formularios.listaHTML(h.formularios));
 
     if (abierto) {
       var opciones = ajustes.responsables.concat(Hitos.PAPELES);

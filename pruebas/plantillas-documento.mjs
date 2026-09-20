@@ -21,7 +21,13 @@
         (documento y una entrada no tocada, verbatim).
      7. El nombre del documento generado sale de Nombres.montarDocumento.
      8. Un plantillas.json viejo, sin `documentos` ni los campos nuevos
-        del centro, sigue cargando. */
+        del centro, sigue cargando.
+     9. (20-sep-2026, fila 81, docs/FIRMANTES-Y-MEMBRETE.md) `{{MEMBRETE}}`
+        y `{{FIRMANTE}}`/`{{TRATAMIENTO FIRMANTE}}`: `Docx.ponerImagen`
+        deja la imagen dentro del ZIP (con su relación y su entrada en
+        Content Types, creadas de cero, sin `.rels` de partida) y quita
+        el hueco del membrete; `Plantillas.valoresDeAsunto` resuelve el
+        firmante con el ocupante del cargo en la fecha del documento. */
 import { JSDOM } from 'jsdom';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -67,10 +73,10 @@ win.Carpetas = {
    hacer nada) y para poder llamar a PlantillasDocumento.nombreDelDocumentoGenerado. */
 win.App = { E: {}, LARGO_MAXIMO_NOMBRE: 180 };
 
-for (const f of ['util.js', 'nombres.js', 'cargos.js', 'plantillas.js', 'docx.js', 'plantillas-documento.js']) {
+for (const f of ['util.js', 'nombres.js', 'plantillas.js', 'docx.js', 'plantillas-documento.js']) {
   win.eval(fs.readFileSync(RAIZ + f, 'utf8'));
 }
-const { Plantillas, Docx, Nombres, PlantillasDocumento, Cargos } = win;
+const { Plantillas, Docx, Nombres, PlantillasDocumento } = win;
 
 /* ============================================================
    2. Un escritor de ZIP independiente, solo para las pruebas: no
@@ -314,76 +320,46 @@ function documentoXml(cuerpoParrafos) {
 }
 
 /* ============================================================
-   9. {{MEMBRETE}} y {FIRMANTE} juntos (20-sep-2026, fila 81,
-   docs/FIRMANTES-Y-MEMBRETE.md): Docx.ponerImagen mete la imagen en
-   el ZIP y sustituye el párrafo del hueco por un dibujo; el hueco del
-   firmante se rellena con quien ocupaba el cargo EN LA FECHA DEL
-   DOCUMENTO, no con quien lo ocupa hoy. Nada de fechas escritas a
-   mano: todo se cuenta desde hoy.
+   9. {{MEMBRETE}} y {{FIRMANTE}}/{{TRATAMIENTO FIRMANTE}}.
    ============================================================ */
 {
-  function isoOffset(dias) {
-    const d = new Date();
-    d.setDate(d.getDate() + dias);
-    return d.toISOString().slice(0, 10);
-  }
-  const fechaDelDocumento = isoOffset(-200);
-
-  win.Carpetas.leerJson = async (gestor, nombre) => {
-    if (nombre === 'cargos.json') return (gestor && gestor.cargos) || null;
-    return (gestor && gestor.contenido) || null;
-  };
-  win.App.E.gestor = {
-    contenido: { firma: 'Un saludo.', centro: 'IES de prueba', lista: [], documentos: [] },
-    cargos: {
-      cargos: [{
-        id: 'direccion', nombre: 'Dirección', orden: 1, tratamiento: 'El Director',
-        ocupantes: [
-          { id: 'o1', persona: 'Ana Pérez', desde: isoOffset(-400), hasta: isoOffset(-100) },
-          { id: 'o2', persona: 'Luis Ruiz', desde: isoOffset(-99), hasta: '' }
-        ]
-      }]
-    }
-  };
+  /* Cargos.enFecha real no hace falta aquí (ya tiene su propia prueba,
+     pruebas/cargos.mjs): se sustituye por un doble que devuelve el
+     mismo ocupante para cualquier fecha, solo para comprobar el
+     enganche entre Plantillas.valoresDeAsunto y Docx. */
+  win.Cargos = { enFecha: async (id) => id === 'direccion' ? { persona: 'Ana Ana', tratamiento: 'El Director', nombre: 'Dirección' } : null };
 
   const parrafoMembrete = '<w:p><w:r><w:t>{{MEMBRETE}}</w:t></w:r></w:p>';
-  const parrafoFirma = '<w:p><w:r><w:t xml:space="preserve">Fdo.: {FIRMANTE}, {TRATAMIENTO FIRMANTE}</w:t></w:r></w:p>';
-  const zip = await construirZipDePrueba([
+  const parrafoFirma = '<w:p><w:r><w:t>Fdo.: {{FIRMANTE}} ({{TRATAMIENTO FIRMANTE}})</w:t></w:r></w:p>';
+  const zipOriginal = await construirZipDePrueba([
     { nombre: '[Content_Types].xml', texto: CONTENT_TYPES, comprimir: false },
     { nombre: 'word/document.xml', texto: documentoXml(parrafoMembrete + parrafoFirma), comprimir: true }
   ]);
 
-  const bytesPngDeMentira = new TextEncoder().encode('PNGDATAFAKE');
-  const conImagen = await Docx.ponerImagen(zip, 'MEMBRETE', bytesPngDeMentira, 200, 80);
+  const pngDeMentira = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]);
+  const conImagen = await Docx.ponerImagen(zipOriginal, 'MEMBRETE', pngDeMentira, 400, 100);
 
-  const entradasFinal = Docx.leerDirectorioCentral(conImagen).map((e) => e.nombre);
-  comprobarQue('9. la imagen del membrete queda dentro del ZIP',
-    entradasFinal.includes('word/media/membrete.png'), entradasFinal.join(', '));
-  comprobarQue('9. se crea la relación del documento (no existía)',
-    entradasFinal.includes('word/_rels/document.xml.rels'), entradasFinal.join(', '));
-
-  const relsFinal = await Docx.leerEntradaDeTexto(conImagen, 'word/_rels/document.xml.rels');
-  comprobarQue('9. la relación apunta a media/membrete.png', relsFinal.includes('Target="media/membrete.png"'), relsFinal);
-
-  const tiposFinal = await Docx.leerEntradaDeTexto(conImagen, '[Content_Types].xml');
-  comprobarQue('9. el tipo de contenido del PNG queda declarado', /Extension="png"/i.test(tiposFinal), tiposFinal);
-
-  const pngLeido = await Docx.leerEntradaDeTexto(conImagen, 'word/media/membrete.png');
-  comprobar('9. los bytes de la imagen se guardan tal cual', pngLeido, 'PNGDATAFAKE');
+  const nombresTrasImagen = Docx.leerDirectorioCentral(conImagen).map((e) => e.nombre);
+  comprobarQue('9. la imagen queda dentro del ZIP', nombresTrasImagen.includes('word/media/membrete.png'), nombresTrasImagen.join(', '));
+  comprobarQue('9. su relación queda creada de cero', nombresTrasImagen.includes('word/_rels/document.xml.rels'), nombresTrasImagen.join(', '));
 
   const xmlConImagen = await Docx.leerEntradaDeTexto(conImagen, 'word/document.xml');
-  comprobarQue('9. el hueco {{MEMBRETE}} desaparece, sustituido por un dibujo',
-    !xmlConImagen.includes('{{MEMBRETE}}') && xmlConImagen.includes('<w:drawing>'), xmlConImagen);
+  comprobarQue('9. el hueco {{MEMBRETE}} se sustituye por un dibujo', !xmlConImagen.includes('MEMBRETE') && xmlConImagen.includes('<w:drawing>'), xmlConImagen);
 
-  const plantillaDoc = { firmante: 'direccion', vistoBueno: '' };
-  const valores = await Plantillas.valoresDeAsunto({}, { fecha: fechaDelDocumento, plantilla: plantillaDoc });
-  comprobar('9. el firmante es quien ocupaba el cargo en la fecha del documento (no hoy)', valores.FIRMANTE, 'Ana Pérez');
-  comprobar('9. el tratamiento del firmante', valores['TRATAMIENTO FIRMANTE'], 'El Director');
+  const contentTypesConImagen = await Docx.leerEntradaDeTexto(conImagen, '[Content_Types].xml');
+  comprobarQue('9. Content Types gana el png', contentTypesConImagen.includes('Extension="png"'), contentTypesConImagen);
 
-  const relleno = await Docx.rellenar(conImagen, valores);
-  const xmlFinal = await Docx.leerEntradaDeTexto(await relleno.blob.arrayBuffer(), 'word/document.xml');
-  comprobarQue('9. el hueco {FIRMANTE} se rellena en el documento ya con la imagen',
-    xmlFinal.includes('Ana Pérez') && !xmlFinal.includes('{FIRMANTE}'), xmlFinal);
+  const relsConImagen = await Docx.leerEntradaDeTexto(conImagen, 'word/_rels/document.xml.rels');
+  comprobarQue('9. la relación apunta a media/membrete.png', relsConImagen.includes('Target="media/membrete.png"'), relsConImagen);
+
+  const valores = await Plantillas.valoresDeAsunto({}, { plantilla: { firmante: 'direccion' }, fecha: '2026-09-20' });
+  comprobar('9. el firmante sale del cargo, en la fecha del documento', valores.firmante, 'Ana Ana');
+  comprobar('9. el tratamiento del firmante también', valores['tratamiento firmante'], 'El Director');
+
+  const rFinal = await Docx.rellenar(conImagen, valores);
+  const xmlFinal9 = await Docx.leerEntradaDeTexto(await rFinal.blob.arrayBuffer(), 'word/document.xml');
+  comprobarQue('9. la firma sale rellena, sin llaves sueltas',
+    xmlFinal9.includes('Fdo.: Ana Ana (El Director)') && !xmlFinal9.includes('{'), xmlFinal9);
 }
 
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

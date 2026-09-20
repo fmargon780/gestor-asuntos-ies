@@ -179,7 +179,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 
 | Fichero | Qué es |
 |---|---|
-| `tipos.json` | Tipos de asunto y su categoría |
+| `tipos.json` | Tipos de asunto y su categoría. `formularios` (fila 82): claves del catálogo de `datos/formularios.json` que aplican a cualquier asunto de ese tipo, sin depender de ningún paso |
 | `tipos-documento.json` | Tipos de documento |
 | `estados.json` | Estados de tramitación, en el orden del trámite |
 | `asuntos.json` | Ficha de cada asunto: quién lo abrió, estado, vía, notas, cierre, pasos, fecha límite, documentos pendientes de registro, relacionados, campos configurados del tipo, hilos de correo enganchados, quién ha pedido la gestión (`loPide`) |
@@ -191,15 +191,15 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `papelera.json` | El índice de la papelera: qué se ha borrado, de dónde y cuándo |
 | `no-duplicados.json` | Grupos de posibles duplicados descartados con "No son el mismo", por la firma de sus nombres |
 | `envios.json` | **Es una lista, no un objeto.** Los encargos vivos de "mandar documentos por correo": `{ id, asunto, para, creado }` |
-| `plantillas.json` | `{ firma, centro, localidad, direccion, codigo, cargo, consejeria, membreteCaja: { x, y, ancho, alto }, lista: [{ id, tipo, categoria, nombre, texto }], documentos: [{ id, tipo, categoria, nombre, fichero, tipoDocumento, texto, firmante, vistoBueno }] }`: `lista` para el correo y el mensaje de Séneca, `documentos` para las plantillas de Word. `consejeria` y `membreteCaja` son de la fila 81 (el nombre de la Consejería y dónde va, ver "El membrete"); `firmante`/`vistoBueno` (también fila 81) son el `id` de un cargo de `cargos.json`, o vacío |
-| `cargos.json` | `{ cargos: [{ id, nombre, orden, tratamiento, ocupantes: [{ id, persona, desde, hasta }] }] }`: los cargos del centro (Dirección, Jefatura de Estudios…) y quién los ha ocupado, con fechas (20-sep-2026, fila 81, docs/FIRMANTES-Y-MEMBRETE.md, ver "Los cargos del centro") |
+| `plantillas.json` | `{ firma, centro, localidad, direccion, codigo, cargo, consejeria, membreteCaja: {x,y,ancho,alto}, lista: [{ id, tipo, categoria, nombre, texto }], documentos: [{ id, tipo, categoria, nombre, fichero, tipoDocumento, texto, firmante, vistoBueno }] }`: `lista` para el correo y el mensaje de Séneca, `documentos` para las plantillas de Word. `consejeria` y `membreteCaja` son del membrete (fila 81); `firmante`/`vistoBueno` de cada plantilla de documento son el `id` de un cargo de `cargos.json` |
+| `cargos.json` | `{ cargos: [{ id, nombre, orden, tratamiento, ocupantes: [{ id, persona, desde, hasta }] }] }`: los cargos del centro (Dirección, Secretaría…) y quién los ha ocupado, con fechas (`js/cargos.js`, fila 81, docs/FIRMANTES-Y-MEMBRETE.md). Al generar un documento, la firma la pone quien ocupaba el cargo en la fecha del documento |
 | `hitos.json` | `{ ajustes: { responsables, noLectivos }, porAsunto: { <clave>: { creados, hitos } } }`: los hitos vivos de cada asunto abierto (ver "Los hitos de un asunto") |
 | `grupos.json` | `{ grupos: [{ id, nombre, miembros: [{ categoria, nombre }], creadoPor, creadoEl }] }`: los grupos propios de personas, gestionados en `js/grupos.js` (ver "Grupos de personas") |
 | `usuarios.json` | `{ nombres: [...] }`: los nombres ya usados para entrar, para el desplegable de la pantalla de entrada (`js/usuarios.js`, fila 72). Comparación exacta a propósito: "Francisco" y "francisco" quedan como dos nombres |
 | `borrados-listas.json` | `{ tipos, estados, tiposDocumento, recurrentes }`: cada uno, un array de `{ clave, borradoEl }` con lo borrado de esa lista (`js/borrados-fusion.js`, fila 77). No se enseña en ningún sitio salvo Ajustes → Mantenimiento (cuántos hay y quitarlos pasados 90 días) |
 | `datos/*.csv` | Alumnado (Séneca), personal, empresas y otros |
 | `PAPELERA/` | Las carpetas y ficheros borrados, cada uno en su subcarpeta `AAMMDD-HHMM <nombre>` |
-| `PLANTILLAS/` | Los `.docx` que Francisco sube a mano, colgados de un tipo desde Ajustes › Plantillas de documento. No lleva copia de seguridad: no es uno de los diecisiete ficheros compartidos |
+| `PLANTILLAS/` | Los `.docx` que Francisco sube a mano, colgados de un tipo desde Ajustes › Plantillas de documento. También `membrete.png` (fila 81), y los `.docx` del centro que trae solo el botón "Cargar las plantillas del centro" (fila 83, `plantillas/` del repositorio): las dos son las únicas veces que la propia aplicación escribe ahí. No lleva copia de seguridad: no es uno de los diecisiete ficheros compartidos |
 | `presencia.json` | `{ <clave del asunto>: { usuario, ultima } }`: quién tiene abierta la ficha de cada asunto, y desde cuándo. **A propósito, fuera de los diecisiete**: no pasa por `Copias.guardar` (nada de copia de seguridad), no entra en `Papelera` ni en `Conflictos` (si dos versiones chocan, se quedan las dos entradas y punto). Se escribe y relee directo con `Carpetas` (ver "No pisarse en un mismo asunto") |
 | `indice-archivo.json` | `{ version, hechoEl, hechoPor, recuento: { CATEGORIA: nº de carpetas de tercero }, asuntos: [{ nombre, categoria, tercero, ruta, fecha, tipo, curso, grupo, documentos, registros, sueltoEn }] }`: el índice guardado del ARCHIVO (`js/archivo-indice.js`, ver "El índice del ARCHIVO"). **También fuera de los diecisiete**, por el mismo motivo que `presencia.json`: se puede rehacer entero en cualquier momento con "Reconstruir el índice", así que no necesita copia de seguridad, papelera ni fusión de conflictos. Se escribe y relee directo con `Carpetas` |
 | `copias/*.json` | Copias de seguridad de los diecisiete ficheros de arriba, una por día, 30 como mucho de cada uno |
@@ -248,8 +248,8 @@ Si los dos ordenadores guardan casi a la vez, Dropbox no pisa nada: deja aparte 
   pasos elegidos (`asuntos.json`), o los hitos por su id (`hitos.json`), sin repetir nada. En
   `hitos.json`, dentro de `ajustes` solo se fusionan las altas de `responsables` y `noLectivos`.
 - Los demás (`tipos.json`, `estados.json`, `tipos-documento.json`, `guias.json`,
-  `recurrentes.json`, `frescura.json`, `campos.json`) cambian mucho menos y no se fusionan
-  solos: salen en el bloque **Conflictos de Dropbox** de Ajustes, con dos botones para elegir
+  `recurrentes.json`, `frescura.json`, `campos.json`, `cargos.json`) cambian mucho menos y no se
+  fusionan solos: salen en el bloque **Conflictos de Dropbox** de Ajustes, con dos botones para elegir
   con cuál de los dos ordenadores quedarse. El que no se elige no se pierde: los dos se guardan
   en `_GESTOR/copias` antes de decidir.
 - **Releer antes de escribir**, en todos los ficheros compartidos: antes de guardar se relee el

@@ -120,12 +120,50 @@ como **copia**.
   aviso (ámbar si pasa de 16 caracteres; rojo si otro tipo ya lo usa, por `U.parecidos`).
   `Nombres.leer` reconoce también el nombre corto en una carpeta ya creada (no es un alias: es el
   nombre que se usa desde ahora). Cambiarlo no toca ninguna carpeta ya creada.
+- **Formularios oficiales** (20-sep-2026, fila 82, `docs/FORMULARIOS-OFICIALES.md`): campo
+  `formularios`, lista de claves del catálogo (ver la sección de más abajo). Mismo criterio que
+  normativa: solo en el paso de arriba, nunca en una opción; se copia igual, sin cambios, a los
+  hitos modelo de la biblioteca y a los hitos vivos.
 - **No entra en esta fila**: los pasos-pregunta no se guardan en la biblioteca
   (`HitosBiblioteca.esPasoValido`); las plantillas de correo y de Séneca de un paso no se cargan
   (se escriben con el uso).
 
 Se comprueba con `pruebas/biblioteca-de-hitos.mjs` y `pruebas/nombre-corto-de-tipo.mjs`, sin
 navegador.
+
+### El catálogo de formularios oficiales (20-sep-2026, fila 82, `docs/FORMULARIOS-OFICIALES.md`)
+
+Cuando un trámite pide un impreso oficial, la aplicación ya sabe si se descarga, lo emite el
+centro, es un protocolo sin impreso, o se genera en Séneca, sin salir a buscarlo.
+
+- **`datos/formularios.json`**: copia tal cual, sin leer nada en vivo, del catálogo de
+  `fmargon780/normativa-escolarizacion` (`datos/formularios.json`, 29 entradas). Cada clave:
+  `{ n, norma, via, u, nota }`, con `via` en `descarga`/`centro`/`protocolo`/`seneca`.
+- **`js/formularios.js`** (`window.Formularios`): `cargar()` lo lee con `fetch` relativo, una sola
+  vez por sesión (`actualizar()` fuerza a releerlo: botón **Ajustes → Mantenimiento → Formularios
+  oficiales → Actualizar el catálogo**, porque el fichero viaja con la propia aplicación y solo
+  cambia al publicarse una versión nueva). `buscar(catalogo, texto)` y `etiquetaDeVia(via)` son sin
+  efectos (`etiquetaDeVia` de una vía desconocida se trata como `protocolo`: nunca como un botón de
+  descarga que no lleva a ningún impreso).
+- **Dónde se elige**: `formularios: [clave, ...]` en un paso de guía (junto a `normativa`, mismo
+  criterio de "solo en el paso de arriba"), y en `tipos.json` (clave `formularios` del propio tipo,
+  para lo que no depende de ningún paso). El buscador con casillas (`Formularios.bloqueEmbebidoHTML`/
+  `leerEditor`/`engancharEmbebido`) se pinta DENTRO del mismo `<details>` de normativa
+  (`HitosNormativa.bloqueHTML` gana un segundo argumento, `formulariosHTML`, para no alargar más la
+  pantalla del paso); en "Datos del tipo" (`js/ajustes-tipo.js`), aparte, con guardado automático en
+  cada casilla (`Formularios.pintarEditorAsync`).
+- **Dónde se ven**: en el cuerpo de un hito vivo (`js/hitos-panel-lista.js`, `Formularios.listaHTML`,
+  igual que la normativa: un enlace con aspecto de botón para `descarga`/`centro`; un aviso, con su
+  `nota` si la tiene, para `protocolo`/`seneca`, que no tienen impreso que descargar) y en la vista
+  de solo lectura de los pasos de un tipo (`Guias.vista`). En la ficha del asunto, dentro de "Datos
+  del trámite", una línea **"Formularios"** con los de todos los hitos VISIBLES del asunto (la rama
+  en curso, sin repetir) más los del tipo (`Formularios.clavesDelAsunto`, `Formularios.pintarEnFicha`,
+  que envuelve `App.abrirFicha` porque necesita leer los hitos, que es async); sin ninguno, la línea
+  no se pinta. Y una pantalla propia **"Formularios"** (entrada en la barra lateral, junto a "Qué me
+  toca" y "Cuentas"): el catálogo entero, buscable, agrupado por norma.
+
+Se comprueba con `pruebas/formularios.mjs` (sin navegador: solo `buscar` y `etiquetaDeVia`, las dos
+funciones puras).
 
 ### Los hitos de un asunto
 

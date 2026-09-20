@@ -20,8 +20,7 @@ Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
 - Dirección publicada: **https://asuntos.fmargon.com** (dominio propio, 18-sep-2026): **la red
   del IES bloquea `vercel.app`** (`ERR_CONNECTION_TIMED_OUT`). `https://gestor-de-asuntos.vercel.app`
   sigue viva, para comprobar lo publicado con `curl` desde fuera del centro.
-- El dominio `fmargon.com` está comprado en la misma cuenta de Vercel; otras apps irán en otros
-  subdominios (`informes.fmargon.com`, etc.).
+- El dominio `fmargon.com` está comprado en la cuenta de Vercel; otras apps irán en subdominios.
 - Repositorio: `fmargon780/gestor-asuntos-ies`, rama `main`, privado.
 - **Un solo proyecto de Vercel** (`gestor-de-asuntos`). No crear otro.
 - **Cada dirección es un sitio distinto para el navegador**: los permisos de carpetas y la
@@ -98,8 +97,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
 - Papelera: nada se borra del todo a la primera.
 - Mandar documentos de un asunto por correo, con un borrador que deja Apps Script en Gmail.
-- Plantillas de correo, de mensaje de Séneca y de documento de Word por tipo, con huecos que se
-  rellenan solos; el de Word ya lleva membrete y la firma del cargo vigente en su fecha.
+- Plantillas de correo y de documento de Word por tipo de asunto, con huecos que se rellenan
+  solos; el centro ya tiene sus textos escritos (`plantillas/` del repositorio) y se cargan con
+  un botón (Ajustes → Mantenimiento). El documento sale con membrete y con la firma de quien
+  ocupaba el cargo firmante en la fecha del documento.
 - Copias diarias (caducan a los 90 días, configurable), detección de fichero roto, fusión de
   conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un tipo, estado, tipo de
   documento o recurrente borrado ya no reaparece por memoria vieja del otro ordenador.
@@ -112,7 +113,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   cargar los tipos y guías ya preparados para el instituto.
 - "Qué me toca": hitos pendientes de todos los asuntos abiertos, con filtro por responsable y un
   bloque "Dormidos" (asuntos sin novedades en N días). "Cuentas": asuntos por tipo, mes y quién
-  los pidió.
+  los pidió. "Formularios": catálogo de impresos oficiales, buscable; un hito o tipo lleva los suyos.
 - Avisos de "fichas sin carpeta" y de la papelera vieja también en Asuntos abiertos, no solo
   entrando a propósito en Ajustes.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
@@ -140,10 +141,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   nube), Claude Code lo fusiona solo en cuanto esté en verde y sin conflictos. No hace falta
   esperar a que Francisco lo haga a mano (ver la nota al final de `docs/COLA.md`).
 - **Comprobar siempre lo publicado con `curl`**, nunca darla por hecha.
-- Vercel publica máximo 100 veces al día: `vercel.json` tiene un `ignoreCommand` que se salta los commits que solo tocan `docs/`, `pruebas/`, `.github/` o `.md`, y la cola tiene la regla 13 (máximo dos subidas por fila).
-- Antes de colgar una función nueva de `App`, comprobar que el nombre no está ya cogido. Solo hay un cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.
+- Vercel publica máximo 100 veces/día (gratuito): `vercel.json` salta los commits que solo tocan `docs/`, `pruebas/`, `.github/` o `.md`; regla 13: máximo dos subidas por fila.
+- Antes de colgar una función nueva de `App`, comprobar que el nombre no está cogido. Un solo cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.
 - Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV.
-- Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o se le añade uno. Si no hay más remedio, con `U.envolver`, apuntándolo en `js/envolturas-esperadas.js`.
+- Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o uno nuevo. Sin remedio, con `U.envolver`, apuntado en `js/envolturas-esperadas.js`.
 - Una acción que guarda y repinta: `await` hasta el final y usar `U.mientrasGuarda(control, fn)`
   para apagar el botón o desplegable ("Guardando…") mientras tanto (fila 23, 17-sep-2026).
 - Un bloque que se repinta solo nunca puede tirar lo que se está escribiendo, ni el foco, ni el
@@ -157,7 +158,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 7. Descartado, no proponer otra vez
 
-- Publicar con el conector de Vercel sobre un proyecto ya existente (da 403), o crear otro "por si acaso". `vercel.app` bloqueado en el centro: resuelto con el dominio propio.
+- Conector de Vercel sobre un proyecto existente (da 403), o crear otro "por si acaso". `vercel.app` bloqueado en el centro: resuelto con el dominio propio.
 - Abrir la carpeta del asunto en el explorador de archivos, opciones dentro de opciones en la guía, o una hoja de Google Sheets como interfaz.
 - Enlazar un correo con `#all/<id de hilo>` (es `#search/rfc822msgid:<id>`), o meter Gmail en un marco (Google no lo permite).
 - Esconder el tablón de notas, sacar el DNI de la columna del tutor, o poner el nombre comercial en el nombre de la carpeta de un asunto de empresa.
@@ -165,16 +166,16 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 8. Qué falta
 
-- El compañero tiene que entrar en `https://asuntos.fmargon.com`, volver a señalar sus carpetas (el navegador no las hereda de la dirección vieja), y coordinar la lista de tipos de asunto y estados.
-- Poner en marcha el script de Gmail en `g.educaand.es`, señalar `GESTOR-BANDEJA` en Ajustes, y pegar en `script.google.com` la versión nueva de `apps-script/gestor-correos.gs`.
+- El compañero: entrar en `https://asuntos.fmargon.com`, volver a señalar sus carpetas (no se heredan de la dirección vieja), y coordinar tipos de asunto y estados.
+- Poner en marcha el script de Gmail (`g.educaand.es`): señalar `GESTOR-BANDEJA` en Ajustes y pegar `apps-script/gestor-correos.gs` en `script.google.com`.
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI" en la tarjeta.
-- Comprobar "Ajustar tamaño" con un documento real. Qué hacer con asuntos vivos al cambiar de curso; pasar repositorio y Vercel a una cuenta del centro.
+- Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; repositorio/Vercel a una cuenta del centro; Ajustes → Membrete/Cargos: imagen, Consejería, ocupantes (fila 81).
 - Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
-- Pulsar, cuando pueda, "Poner en orden las fichas del ARCHIVO" (Ajustes → Mantenimiento, fila 64): mueve a su carpeta la ficha de los archivados de antes, para aligerar `asuntos.json`.
+- Pulsar "Poner en orden las fichas del ARCHIVO" (Mantenimiento, fila 64): mueve a su carpeta la ficha de los archivados antes de esa fila, para que `asuntos.json` no siga creciendo.
 - Pulsar, antes de junio de 2027, "Guardar el contacto de los asuntos abiertos" (Ajustes → Mantenimiento, fila 66).
-- Fila 67: añadir un colaborador en GitHub y Vercel, y copiar `docs/LAS-CUENTAS.md` al Dropbox.
-- Decisión de Francisco: ¿debe la papelera vaciarse ella sola a los N días? Mientras no se decida, solo el aviso más insistente, nunca el borrado solo.
+- Fila 67: colaborador en GitHub/Vercel; copiar `LAS-CUENTAS.md`
+- Decisión: ¿la papelera se vacía sola a los N días? Sin decidir, solo el aviso más insistente.
 - Antes de una publicación importante, repasar `docs/COMPROBAR-A-MANO.md` (lo que ninguna prueba cubre).
 
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero

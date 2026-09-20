@@ -310,10 +310,184 @@ var Docx = (function () {
     return salida;
   }
 
+  /* Un párrafo que tenía texto de verdad (un hueco, casi siempre) y se
+     queda enteramente vacío al rellenar —{{FORMULARIOS}} sin ninguno,
+     fila 83, docs/PLANTILLAS-DEL-CENTRO.md, parte 3— desaparece del
+     todo, en vez de dejar una línea en blanco suelta en el papel. Un
+     párrafo que YA estaba vacío de partida (un salto de línea puesto
+     a mano) no se toca: solo se quita el que se ha vaciado AL
+     rellenar. */
+  function textoPlanoDeXml(xml) {
+    return xml.replace(/<[^>]*>/g, '').trim();
+  }
+
   function rellenarXml(textoXml, valores, faltanTotal) {
     return textoXml.replace(RE_PARRAFO, function (parrafo) {
-      return repararYRellenarParrafo(parrafo, valores, faltanTotal);
+      var teniaTexto = !!textoPlanoDeXml(parrafo);
+      var relleno = repararYRellenarParrafo(parrafo, valores, faltanTotal);
+      if (teniaTexto && !textoPlanoDeXml(relleno)) return '';
+      return relleno;
     });
+  }
+
+  /* ---------- meter una imagen en el hueco del membrete (20-sep-2026,
+     fila 81, docs/FIRMANTES-Y-MEMBRETE.md) ---------- */
+
+  var RE_OBJETIVO_IMAGEN = /^word\/(document\.xml|header\d*\.xml)$/i;
+  var CM_EN_EMU = 360000;
+
+  function huecoDobleRegex(nombreHueco) {
+    var escapado = nombreHueco.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp('\\{\\{\\s*' + escapado + '\\s*\\}\\}', 'i');
+  }
+
+  function textoPlanoDeParrafo(xmlParrafo) {
+    return extraerTextos(xmlParrafo).map(function (s) { return decodificarEntidades(s.texto); }).join('');
+  }
+
+  function parrafoDeImagen(rId, cx, cy) {
+    return '<w:p><w:r><w:drawing>' +
+      '<wp:inline xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" distT="0" distB="0" distL="0" distR="0">' +
+        '<wp:extent cx="' + cx + '" cy="' + cy + '"/>' +
+        '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
+        '<wp:docPr id="1" name="Membrete"/>' +
+        '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">' +
+          '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+            '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+              '<pic:nvPicPr><pic:cNvPr id="0" name="Membrete"/><pic:cNvPicPr/></pic:nvPicPr>' +
+              '<pic:blipFill><a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="' + rId + '"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>' +
+              '<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + cx + '" cy="' + cy + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>' +
+            '</pic:pic>' +
+          '</a:graphicData>' +
+        '</a:graphic>' +
+      '</wp:inline>' +
+    '</w:drawing></w:r></w:p>';
+  }
+
+  /* Sustituye, en `textoXml`, cada `<w:p>` cuyo texto (ya reparado de
+     huecos partidos entre varios `<w:t>`, como en `rellenar`) sea
+     `{{nombreHueco}}` por un párrafo con la imagen. Puede no haber
+     ninguno: `encontrado` lo dice. */
+  function reemplazarParrafoConImagen(textoXml, nombreHueco, rId, cx, cy) {
+    var regexHueco = huecoDobleRegex(nombreHueco);
+    var encontrado = false;
+    var salida = textoXml.replace(RE_PARRAFO, function (parrafo) {
+      if (!regexHueco.test(textoPlanoDeParrafo(parrafo))) return parrafo;
+      encontrado = true;
+      return parrafoDeImagen(rId, cx, cy);
+    });
+    return { texto: salida, encontrado: encontrado };
+  }
+
+  function idRelacionLibre(textoRels) {
+    var usados = {}, m;
+    var re = /Id="([^"]+)"/g;
+    while ((m = re.exec(textoRels))) usados[m[1]] = true;
+    var n = 1;
+    while (usados['rIdMembrete' + n]) n++;
+    return 'rIdMembrete' + n;
+  }
+
+  function anadirRelacionImagen(textoRels, rId) {
+    var relacion = '<Relationship Id="' + rId + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/membrete.png"/>';
+    return textoRels.replace('</Relationships>', relacion + '</Relationships>');
+  }
+
+  var RELS_VACIO = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n' +
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>';
+
+  /* `bytesPng` es la imagen ya montada (`Membrete.montar`), y
+     `anchoPx`/`altoPx` su tamaño, para calcular el alto en proporción
+     a un ancho fijo de 17 cm (el ancho útil de un A4 con márgenes
+     normales). Se aplica ANTES de `rellenar`, y devuelve otro buffer
+     (`Uint8Array`), no un `Blob`: `rellenar` acepta los dos. Si el
+     hueco `{{nombreHueco}}` no está en ningún `document.xml` ni
+     `headerN.xml`, no toca nada. */
+  async function ponerImagen(bufferDocx, nombreHueco, bytesPng, anchoPx, altoPx) {
+    var bytes = bufferDocx instanceof Uint8Array ? bufferDocx : new Uint8Array(bufferDocx);
+    var entradas = leerDirectorioCentral(bytes);
+    var porNombre = {};
+    entradas.forEach(function (e) { porNombre[e.nombre] = e; });
+
+    var cx = Math.round(17 * CM_EN_EMU);
+    var cy = Math.round(cx * ((altoPx || 1) / (anchoPx || 1)));
+
+    var objetivos = entradas.filter(function (e) { return RE_OBJETIVO_IMAGEN.test(e.nombre); });
+    var cambios = {};    /* nombre de entrada ya existente -> texto nuevo */
+    var nuevas = [];     /* [{ nombre, texto }] entradas que no existían (los .rels) */
+    var tocoAlguno = false;
+
+    for (var i = 0; i < objetivos.length; i++) {
+      var e = objetivos[i];
+      var texto = new TextDecoder('utf-8').decode(await datosDeEntrada(bytes, e));
+
+      var nombreRels = e.nombre.replace(/^word\//, 'word/_rels/') + '.rels';
+      var entradaRels = porNombre[nombreRels];
+      var textoRels = entradaRels
+        ? new TextDecoder('utf-8').decode(await datosDeEntrada(bytes, entradaRels))
+        : RELS_VACIO;
+
+      var rId = idRelacionLibre(textoRels);
+      var resultado = reemplazarParrafoConImagen(texto, nombreHueco, rId, cx, cy);
+      if (!resultado.encontrado) continue;
+
+      tocoAlguno = true;
+      cambios[e.nombre] = resultado.texto;
+      var textoRelsNuevo = anadirRelacionImagen(textoRels, rId);
+      if (entradaRels) cambios[nombreRels] = textoRelsNuevo;
+      else nuevas.push({ nombre: nombreRels, texto: textoRelsNuevo });
+    }
+
+    if (!tocoAlguno) return bytes;
+
+    var entradaTipos = porNombre['[Content_Types].xml'];
+    if (entradaTipos) {
+      var textoTipos = new TextDecoder('utf-8').decode(await datosDeEntrada(bytes, entradaTipos));
+      if (!/Extension="png"/i.test(textoTipos)) {
+        cambios['[Content_Types].xml'] = textoTipos.replace(/(<Types[^>]*>)/,
+          '$1<Default Extension="png" ContentType="image/png"/>');
+      }
+    }
+
+    var datosImagen = bytesPng instanceof Uint8Array ? bytesPng : new Uint8Array(bytesPng);
+    var partes = [], entradasCentrales = [], offsetActual = 0;
+
+    function escribirEntradaNueva(nombre, contenido) {
+      var datosBytes = typeof contenido === 'string' ? new TextEncoder().encode(contenido) : contenido;
+      var crc = crc32(datosBytes);
+      var nombreBytes = new TextEncoder().encode(nombre);
+      var local = cabeceraLocal({ crc: crc, tam: datosBytes.length, nombreBytes: nombreBytes, tiempoDos: 0, fechaDos: 0 });
+      partes.push(local, datosBytes);
+      entradasCentrales.push(entradaCentral({
+        crc: crc, tam: datosBytes.length, nombreBytes: nombreBytes, tiempoDos: 0, fechaDos: 0,
+        atributosExternos: 0, offset: offsetActual
+      }));
+      offsetActual += local.length + datosBytes.length;
+    }
+
+    for (var j = 0; j < entradas.length; j++) {
+      var ent = entradas[j];
+      if (Object.prototype.hasOwnProperty.call(cambios, ent.nombre)) {
+        escribirEntradaNueva(ent.nombre, cambios[ent.nombre]);
+        continue;
+      }
+      var inicioLocal = inicioDeDatos(bytes, ent.offsetLocal);
+      var tramo = bytes.subarray(ent.offsetLocal, inicioLocal + ent.compTam);
+      partes.push(tramo);
+      var cdCopia = bytes.slice(ent.cdInicio, ent.cdFin);
+      escribirU32(cdCopia, 42, offsetActual);
+      entradasCentrales.push(cdCopia);
+      offsetActual += tramo.length;
+    }
+
+    nuevas.forEach(function (n) { escribirEntradaNueva(n.nombre, n.texto); });
+    escribirEntradaNueva('word/media/membrete.png', datosImagen);
+
+    var totalEntradas = entradas.length + nuevas.length + 1;
+    var inicioDirectorio = offsetActual;
+    var directorioCentral = concatenar(entradasCentrales);
+    var eocd = finDeDirectorio(totalEntradas, directorioCentral.length, inicioDirectorio);
+    return concatenar(partes.concat([directorioCentral, eocd]));
   }
 
   /* ---------- la función pública ---------- */
@@ -381,203 +555,6 @@ var Docx = (function () {
       }),
       faltan: faltanUnicos
     };
-  }
-
-  /* ---------- meter una imagen en el sitio del hueco {{...}} ----------
-     (20-sep-2026, fila 81, docs/FIRMANTES-Y-MEMBRETE.md, parte 3)
-
-     `Docx.ponerImagen(bufferDocx, nombreHueco, bytesPng, anchoPx,
-     altoPx)`: busca el párrafo que trae {{nombreHueco}} (en
-     word/document.xml y en cada header/footer), lo sustituye entero
-     por un dibujo en línea que apunta a la imagen, y añade la imagen,
-     su relación y su tipo de contenido al ZIP. Si el hueco no está en
-     ningún sitio, no toca nada y devuelve los bytes tal cual. Se
-     aplica ANTES de Docx.rellenar: ese hueco nunca pasa por
-     Plantillas.rellenar, así que no hace falta añadirlo a
-     Plantillas.HUECOS. */
-
-  var ANCHO_MEMBRETE_EMU = 6120000;   /* 17 cm, el ancho útil de un A4 con márgenes normales */
-
-  var RELS_VACIO = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n' +
-    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>';
-
-  function nombreDeRelsDe(nombreParte) {
-    var barra = nombreParte.lastIndexOf('/');
-    return nombreParte.slice(0, barra) + '/_rels/' + nombreParte.slice(barra + 1) + '.rels';
-  }
-
-  function siguienteIdMembrete(xmlRels) {
-    var maximo = 0, m, re = /Id="rIdMembrete(\d+)"/g;
-    while ((m = re.exec(xmlRels))) maximo = Math.max(maximo, parseInt(m[1], 10));
-    return 'rIdMembrete' + (maximo + 1);
-  }
-
-  function anadirRelacionDeImagen(xmlRels, rId) {
-    var relacion = '<Relationship Id="' + rId + '" Type="http://schemas.openxmlformats.org/' +
-      'officeDocument/2006/relationships/image" Target="media/membrete.png"/>';
-    return xmlRels.replace('</Relationships>', relacion + '</Relationships>');
-  }
-
-  /* El párrafo que sustituye al que traía el hueco: un dibujo en línea
-     con todos los espacios de nombres que necesita declarados en el
-     propio fragmento, para que valga aunque el documento original no
-     los traiga ya declarados en su raíz (los .docx mínimos que monta
-     scripts/hacer-plantillas.mjs, fila 83, solo declaran `w`). */
-  function parrafoDeImagen(rId, cx, cy) {
-    var NS_A = 'http://schemas.openxmlformats.org/drawingml/2006/main';
-    return '<w:p><w:r><w:drawing>' +
-      '<wp:inline xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" ' +
-      'distB="0" distT="0" distL="0" distR="0">' +
-      '<wp:extent cx="' + cx + '" cy="' + cy + '"/>' +
-      '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
-      '<wp:docPr id="1" name="Membrete"/>' +
-      '<wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="' + NS_A + '" noChangeAspect="1"/></wp:cNvGraphicFramePr>' +
-      '<a:graphic xmlns:a="' + NS_A + '">' +
-      '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
-      '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
-      '<pic:nvPicPr><pic:cNvPr id="0" name="Membrete"/><pic:cNvPicPr/></pic:nvPicPr>' +
-      '<pic:blipFill><a:blip xmlns:a="' + NS_A + '" ' +
-      'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="' + rId + '"/>' +
-      '<a:stretch xmlns:a="' + NS_A + '"><a:fillRect/></a:stretch></pic:blipFill>' +
-      '<pic:spPr><a:xfrm xmlns:a="' + NS_A + '"><a:off x="0" y="0"/><a:ext cx="' + cx + '" cy="' + cy + '"/></a:xfrm>' +
-      '<a:prstGeom xmlns:a="' + NS_A + '" prst="rect"><a:avLst/></a:prstGeom></pic:spPr>' +
-      '</pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>';
-  }
-
-  function parrafoTraeHueco(xmlParrafo, huecoEnMayusculas) {
-    var segmentos = extraerTextos(xmlParrafo);
-    var conjunto = segmentos.map(function (s) { return decodificarEntidades(s.texto); }).join('');
-    return conjunto.toUpperCase().indexOf(huecoEnMayusculas) !== -1;
-  }
-
-  async function ponerImagen(bufferDocx, nombreHueco, bytesPng, anchoPx, altoPx) {
-    var bytes = bufferDocx instanceof Uint8Array ? bufferDocx : new Uint8Array(bufferDocx);
-    var entradas = leerDirectorioCentral(bytes);
-    var hueco = ('{{' + nombreHueco + '}}').toUpperCase();
-
-    var cx = ANCHO_MEMBRETE_EMU;
-    var cy = Math.max(1, Math.round(cx * ((altoPx || 1) / (anchoPx || 1))));
-
-    /* 1. Qué partes (document.xml, headerN.xml, footerN.xml) traen el hueco. */
-    var partes = [];
-    for (var i = 0; i < entradas.length; i++) {
-      var e = entradas[i];
-      if (!RE_ENTRADA_A_TOCAR.test(e.nombre)) continue;
-      var textoOriginal = new TextDecoder('utf-8').decode(await datosDeEntrada(bytes, e));
-      if (textoOriginal.toUpperCase().indexOf(hueco) === -1) continue;
-      partes.push({ entrada: e, xmlOriginal: textoOriginal });
-    }
-    if (!partes.length) return bytes;   /* el documento no trae el hueco: no se toca nada */
-
-    /* 2. La relación de imagen que le toca a cada parte, en su propio .rels. */
-    var relsPorNombre = {};
-    partes.forEach(function (parte) {
-      parte.nombreRels = nombreDeRelsDe(parte.entrada.nombre);
-      if (!relsPorNombre[parte.nombreRels]) relsPorNombre[parte.nombreRels] = { existia: false };
-    });
-    for (var nombreRels in relsPorNombre) {
-      var entradaRels = entradas.filter(function (x) { return x.nombre === nombreRels; })[0];
-      var info = relsPorNombre[nombreRels];
-      info.existia = !!entradaRels;
-      var textoRels = entradaRels
-        ? new TextDecoder('utf-8').decode(await datosDeEntrada(bytes, entradaRels))
-        : RELS_VACIO;
-      info.rId = siguienteIdMembrete(textoRels);
-      info.textoNuevo = anadirRelacionDeImagen(textoRels, info.rId);
-    }
-
-    /* 3. El párrafo del hueco, sustituido por el dibujo, en cada parte. */
-    partes.forEach(function (parte) {
-      var rId = relsPorNombre[parte.nombreRels].rId;
-      parte.xmlNuevo = parte.xmlOriginal.replace(RE_PARRAFO, function (p) {
-        return parrafoTraeHueco(p, hueco) ? parrafoDeImagen(rId, cx, cy) : p;
-      });
-    });
-
-    /* 4. [Content_Types].xml: el PNG, si no estaba ya declarado. */
-    var entradaTipos = entradas.filter(function (e) { return e.nombre === '[Content_Types].xml'; })[0];
-    var tiposNuevo = null;
-    if (entradaTipos) {
-      var textoTipos = new TextDecoder('utf-8').decode(await datosDeEntrada(bytes, entradaTipos));
-      if (!/Extension="png"/i.test(textoTipos)) {
-        tiposNuevo = textoTipos.replace('</Types>', '<Default Extension="png" ContentType="image/png"/></Types>');
-      }
-    }
-
-    /* 5. Volver a montar el ZIP: mismo patrón que rellenar(), más las
-       entradas de rels/imagen que no existían todavía. */
-    var xmlPorEntrada = {};
-    partes.forEach(function (p) { xmlPorEntrada[p.entrada.nombre] = p.xmlNuevo; });
-
-    var salidaPartes = [];
-    var entradasCentrales = [];
-    var offsetActual = 0;
-    var totalEntradas = 0;
-
-    function copiarTalCual(e) {
-      var inicioLocal = inicioDeDatos(bytes, e.offsetLocal);
-      var tramo = bytes.subarray(e.offsetLocal, inicioLocal + e.compTam);
-      salidaPartes.push(tramo);
-      var cdCopia = bytes.slice(e.cdInicio, e.cdFin);
-      escribirU32(cdCopia, 42, offsetActual);
-      entradasCentrales.push(cdCopia);
-      offsetActual += tramo.length;
-    }
-
-    function escribirTexto(nombre, texto, atributosExternos, tiempoDos, fechaDos) {
-      var datosNuevos = new TextEncoder().encode(texto);
-      var crcNuevo = crc32(datosNuevos);
-      var nombreBytes = new TextEncoder().encode(nombre);
-      var local = cabeceraLocal({ crc: crcNuevo, tam: datosNuevos.length, nombreBytes: nombreBytes, tiempoDos: tiempoDos, fechaDos: fechaDos });
-      salidaPartes.push(local, datosNuevos);
-      entradasCentrales.push(entradaCentral({
-        crc: crcNuevo, tam: datosNuevos.length, nombreBytes: nombreBytes,
-        tiempoDos: tiempoDos, fechaDos: fechaDos, atributosExternos: atributosExternos, offset: offsetActual
-      }));
-      offsetActual += local.length + datosNuevos.length;
-    }
-
-    function escribirBinario(nombre, contenido) {
-      var crcNuevo = crc32(contenido);
-      var nombreBytes = new TextEncoder().encode(nombre);
-      var local = cabeceraLocal({ crc: crcNuevo, tam: contenido.length, nombreBytes: nombreBytes, tiempoDos: 0, fechaDos: 0 });
-      salidaPartes.push(local, contenido);
-      entradasCentrales.push(entradaCentral({
-        crc: crcNuevo, tam: contenido.length, nombreBytes: nombreBytes,
-        tiempoDos: 0, fechaDos: 0, atributosExternos: 0, offset: offsetActual
-      }));
-      offsetActual += local.length + contenido.length;
-    }
-
-    for (var j = 0; j < entradas.length; j++) {
-      var entrada = entradas[j];
-      if (xmlPorEntrada.hasOwnProperty(entrada.nombre)) {
-        escribirTexto(entrada.nombre, xmlPorEntrada[entrada.nombre], entrada.atributosExternos, entrada.tiempoDos, entrada.fechaDos);
-      } else if (relsPorNombre[entrada.nombre] && relsPorNombre[entrada.nombre].existia) {
-        escribirTexto(entrada.nombre, relsPorNombre[entrada.nombre].textoNuevo, entrada.atributosExternos, entrada.tiempoDos, entrada.fechaDos);
-      } else if (entrada.nombre === '[Content_Types].xml' && tiposNuevo !== null) {
-        escribirTexto(entrada.nombre, tiposNuevo, entrada.atributosExternos, entrada.tiempoDos, entrada.fechaDos);
-      } else {
-        copiarTalCual(entrada);
-      }
-      totalEntradas++;
-    }
-
-    Object.keys(relsPorNombre).forEach(function (nombreRels) {
-      if (!relsPorNombre[nombreRels].existia) {
-        escribirTexto(nombreRels, relsPorNombre[nombreRels].textoNuevo, 0, 0, 0);
-        totalEntradas++;
-      }
-    });
-
-    var bytesImagen = bytesPng instanceof Uint8Array ? bytesPng : new Uint8Array(bytesPng);
-    escribirBinario('word/media/membrete.png', bytesImagen);
-    totalEntradas++;
-
-    var inicioDirectorio = offsetActual;
-    var directorioCentral = concatenar(entradasCentrales);
-    var eocd = finDeDirectorio(totalEntradas, directorioCentral.length, inicioDirectorio);
-    return concatenar(salidaPartes.concat([directorioCentral, eocd]));
   }
 
   /* Lee una entrada de texto de un .docx ya generado (por ejemplo,
