@@ -101,11 +101,12 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Plantillas de correo, de mensaje de Séneca y de documento de Word por tipo de asunto, con
   huecos que se rellenan solos.
 - Copias diarias (caducan a los 90 días, configurable), detección de fichero roto, fusión de
-  conflictos de Dropbox. Entrada: desplegable con los nombres ya usados.
+  conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un tipo, estado, tipo de
+  documento o recurrente borrado ya no reaparece por memoria vieja del otro ordenador.
 - Pruebas automáticas en GitHub Actions en cada subida.
-- Escape y botón de salida en toda pantalla.
+- Escape y salida en toda pantalla.
 - Hitos: los pasos de la guía son los hitos de un asunto abierto, con estado, fecha límite,
-  responsable, bifurcaciones, documentos apuntados e historial; cada paso puede llevar "lo que
+  responsable, bifurcaciones, documentos e historial; cada paso puede llevar "lo que
   hay que reunir" y su propio texto de correo/Séneca ("Comunicar").
 - "Qué me toca": hitos pendientes de todos los asuntos abiertos, con filtro por responsable y un
   bloque "Dormidos" (asuntos sin novedades en N días). "Cuentas": asuntos por tipo, mes y quién
@@ -136,11 +137,11 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - **Permiso permanente de Francisco**: cuando el trabajo vaya por pull request (sesiones desde la
   nube), Claude Code lo fusiona solo en cuanto esté en verde y sin conflictos. No hace falta
   esperar a que Francisco lo haga a mano (ver la nota al final de `docs/COLA.md`).
-- **Comprobar siempre lo publicado con `curl`**, nunca dar la publicación por hecha.
-- Vercel publica como máximo 100 veces al día (plan gratuito): `vercel.json` tiene un `ignoreCommand` que se salta los commits que solo tocan `docs/`, `pruebas/`, `.github/` o `.md`, y la cola tiene la regla 13 (como máximo dos subidas por fila, fila 48, 17-sep-2026).
+- **Comprobar siempre lo publicado con `curl`**, nunca darla por hecha.
+- Vercel publica como máximo 100 veces al día (plan gratuito): `vercel.json` tiene un `ignoreCommand` que se salta los commits que solo tocan `docs/`, `pruebas/`, `.github/` o `.md`, y la cola tiene la regla 13 (como máximo dos subidas por fila).
 - Antes de colgar una función nueva de `App`, comprobar que el nombre no está ya cogido. Solo hay un cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.
-- Ojo con `p.campos`: solo trae columnas con datos; para saber si una columna existe, mirar la cabecera del CSV.
-- Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o se le añade uno. Si no hay más remedio, con `U.envolver`, apuntándolo en `js/envolturas-esperadas.js` (fila 70).
+- Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV.
+- Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o se le añade uno. Si no hay más remedio, con `U.envolver`, apuntándolo en `js/envolturas-esperadas.js`.
 - Una acción que guarda y repinta: `await` hasta el final y usar `U.mientrasGuarda(control, fn)`
   para apagar el botón o desplegable ("Guardando…") mientras tanto (fila 23, 17-sep-2026).
 - Un bloque que se repinta solo nunca puede tirar lo que se está escribiendo, ni el foco, ni el
@@ -148,9 +149,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Al terminar una instrucción de la cola: actualizar este documento y `CONTEXTO.md`
   sustituyendo la línea vieja, y anotar en `HISTORIA.md` lo que merezca recordarse.
 - El registro de asuntos (`asuntos.json`) solo se escribe entero por `App.anotar` o por
-  `App.guardarRegistroFresco`, nunca directo con `Copias.guardar` (fila 61, 19-sep-2026).
+  `App.guardarRegistroFresco`, nunca directo con `Copias.guardar`.
 - Renombrar, unir o borrar un asunto (su clave cambia o desaparece) solo por `AsuntoRenombrar`
-  (`js/asunto-renombrar.js`): mueve a la vez la ficha, sus hitos y su señal de presencia (fila 62).
+  (`js/asunto-renombrar.js`): mueve a la vez la ficha, sus hitos y su señal de presencia.
 
 ## 7. Descartado, no proponer otra vez
 
