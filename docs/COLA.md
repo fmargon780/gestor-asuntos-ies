@@ -156,6 +156,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 | 77 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 3 (los borrados que se fusionen) | HECHA (20-sep-2026 · 06:53) |
 | 78 | Repartir `docs/contexto/ASUNTOS.md` (ha pasado los 40 KB del objetivo de la fila 65) | PENDIENTE (no urgente: se puede seguir editando, solo cuesta un poco más) |
 | 79 | `docs/BIBLIOTECA-DE-HITOS.md` | PENDIENTE (20-sep-2026, acordada con Francisco) |
+| 80 | `docs/CARGAR-BIBLIOTECA.md` | PENDIENTE (20-sep-2026, acordada con Francisco). **Va después de la 79**: si la 79 no está HECHA, déjala BLOQUEADA y sigue con otra. |
 
 **Orden de trabajo:** las filas 1 a 74 están HECHAS (las del informe crítico del 18-sep-2026,
 `docs/INFORME-CRITICO-2026-09-18.md`, que Francisco pidió tener todas desarrolladas antes de
@@ -359,9 +360,28 @@ traer uno de la biblioteca en vez de escribirlo, y entra como **copia**. Al guar
 que ha cambiado, la aplicación pregunta si el cambio es solo para ese tipo o sube también a la
 biblioteca; si sube, los demás tipos que lo usan **no se cambian solos**: les sale un aviso que
 enseña el cambio campo a campo (antes → después) y deja decidir. Los asuntos ya abiertos no se
-enteran de nada. Ficheros nuevos: `js/hitos-biblioteca.js`, `js/guias-biblioteca.js`,
-`pruebas/biblioteca-de-hitos.mjs`. Detalle en `docs/BIBLIOTECA-DE-HITOS.md`. Sube directamente a
-`main`, sin petición de cambios.
+enteran de nada. **Ampliada el 20-sep-2026, la misma tarde**, con tres cosas más y un arreglo:
+cada hito puede marcarse como **"Solo informativo"** (se ve, con su plazo y su normativa, pero no
+sale en "Qué me toca" ni cuenta como pendiente, y se enciende con un clic cuando el equipo
+directivo entre en la aplicación); cada hito puede llevar su **normativa**, con la cita, el bloque
+y la clave del precepto, y un enlace que se monta con una dirección base configurable en Ajustes;
+cada Tipo de Asunto gana un **nombre corto**, que es el que entra en el nombre de la carpeta, para
+que el nombre que se ve en pantalla pueda ser largo y claro; y se arregla que **renombrar un tipo
+haga resucitar el nombre viejo** como tipo fantasma (es lo que le pasó a Francisco con ANULACIÓN y
+con DTMA). Ficheros nuevos: `js/hitos-biblioteca.js`, `js/guias-biblioteca.js`,
+`js/hitos-normativa.js`, `pruebas/biblioteca-de-hitos.mjs`, `pruebas/nombre-corto-de-tipo.mjs`.
+Detalle en `docs/BIBLIOTECA-DE-HITOS.md`. Sube directamente a `main`, sin petición de cambios.
+
+**Fila 80, en una línea** (20-sep-2026, acordada con Francisco tras repasar con él sus 55 Tipos de
+Asunto uno a uno): **cargar el contenido de la biblioteca**. La 79 construye la herramienta; esta
+la llena. Da de alta los Tipos de Asunto que faltan, pone el nombre corto a los que ya existen y
+crea los hitos modelo y las guías de cada tipo, con su responsable, su plazo, lo que hay que
+reunir, lo que se comunica y su normativa citada. El contenido está escrito en tres documentos:
+`docs/contenido/BIBLIOTECA-ALUMNADO.md`, `docs/contenido/BIBLIOTECA-PERSONAL.md` y
+`docs/contenido/BIBLIOTECA-EMPRESAS-Y-OTROS.md`. Se carga con un botón de Ajustes →
+Mantenimiento, **"Cargar la biblioteca del centro"**, que fusiona y no pisa nada ya escrito.
+Detalle en `docs/CARGAR-BIBLIOTECA.md`. **Va después de la 79.** Sube directamente a `main`, sin
+petición de cambios.
 
 ## Nota de esta sesión (18-sep-2026, mañana): docs/CONTEXTO.md y docs/HISTORIA.md sin actualizar
 
@@ -486,12 +506,12 @@ comprobando el tamaño de cada uno nada más subirlo, en vez de una única llama
   del tercero.
 - De la fila 60 (18-sep-2026): con el uso se verá si el historial de comunicaciones conviene verlo
   junto, en un sitio solo del asunto, en vez de repartido hito por hito.
-- De la fila 79 (20-sep-2026): Francisco quiere que Claude investigue y proponga **los Tipos de
-  Asunto más comunes de la secretaría de un IES andaluz** (Secundaria y Bachillerato, modalidades
-  de Ciencias y Tecnología y de Humanidades y Ciencias Sociales) **y los hitos modelo de cada
-  uno**, para dejar la biblioteca ya poblada. Se acordó hacerlo **después** de la fila 79 y en una
-  conversación aparte: es trabajo de contenido, no de programación, y hay que contrastarlo tipo
-  por tipo con él.
+- De las filas 79 y 80 (20-sep-2026): el contenido de la biblioteca ya está escrito y cerrado con
+  Francisco. Lo que queda para más adelante, y no es fila: (a) que la vigilancia diaria del BOJA
+  del repositorio `fmargon780/normativa-escolarizacion` deje sola una instrucción en esta cola
+  cuando cambie un artículo citado por un hito; (b) las plantillas de correo y de Séneca de cada
+  tipo, que se escribirán con el uso, no de golpe; y (c) revisar el contenido tipo por tipo
+  conforme Francisco los vaya trabajando de verdad, que es cuando verá si algo sobra o falta.
 - **Del informe del 18-sep-2026: los tres botones de comunicar.** En la misma ficha hay
   "Comunicar" en la cabecera (plantilla del tipo), "Comunicar" en un hito (texto de ese paso) y
   "Pedir lo que falta" en un hito. Por dentro están bien: los tres abren el mismo cuadro y no hay
