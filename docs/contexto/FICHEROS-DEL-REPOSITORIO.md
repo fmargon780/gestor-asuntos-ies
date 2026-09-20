@@ -23,6 +23,7 @@ de `App` va después del fichero que lo define.
 | `js/carpetas.js` | Habla con el selector de carpetas del navegador. Lee y escribe los JSON. `Carpetas.esCarpetaTemporalDeSincronizacion` descarta, en un solo sitio, las carpetas y ficheros que dejan Dropbox y Drive al sincronizar; `contarFicheros`/`copiarDentro`/la fusión los saltan, y un fichero que desaparece a mitad de copia se reintenta una vez |
 | `js/copias.js` | Copia de seguridad diaria de los ficheros de `_GESTOR`, y detección de fichero roto. Se borran solas las de más de 90 días (configurable), aunque no lleguen a 30 (fila 72) |
 | `js/usuarios.js` | La lista de nombres de quien entra (`_GESTOR/usuarios.json`), para el desplegable de la pantalla de entrada (fila 72) |
+| `js/borrados-fusion.js` | `_GESTOR/borrados-listas.json`: los borrados de tipos, estados, tipos de documento y recurrentes, marcados en vez de quitados del todo, para que no reaparezcan solos al fusionar con el otro ordenador (fila 77). El bloque de Ajustes → Mantenimiento que dice cuántos hay y deja quitarlos pasados 90 días vive en el mismo fichero |
 | `js/conflictos.js` | Las copias en conflicto que deja Dropbox: fusión sola o aviso para elegir |
 | `js/fichas-huerfanas.js` | Fichas de `asuntos.json` cuya carpeta ya no está: enlazar o borrar |
 | `js/nombres.js` | Monta los nombres de carpetas y documentos |
@@ -176,4 +177,3 @@ de `App` va después del fichero que lo define.
 | `docs/QUE-ME-TOCA.md` | El encargo de la pantalla "Qué me toca" |
 | `docs/PLANTILLAS-DE-DOCUMENTO.md` | El encargo de las plantillas de documento de Word por tipo |
 | `README.md` | — |
-
