@@ -5,6 +5,63 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 20-sep-2026 — Fila 83: las plantillas de documento y de correo del centro
+
+`docs/PLANTILLAS-DEL-CENTRO.md`. Las filas 14 y 17 montaron la máquina de plantillas de correo y
+de documento; llevaban vacías desde entonces. Con la biblioteca de hitos ya llena (fila 80), y
+los cargos, el membrete (fila 81) y los formularios (fila 82) ya montados, esta fila por fin
+escribe los textos y los mete en la aplicación sin que Francisco tenga que subir nada a mano.
+
+**De dónde salen los `.docx`.** Viven en el repositorio, en `plantillas/`, como `.md` con un
+frontmatter (`nombre`, `tipo`, `categoria`; y, solo si es de documento, `tipoDocumento`, `texto`,
+`firmante`, `vistoBueno`). `scripts/hacer-plantillas.mjs` (a mano, nunca en Vercel ni en las
+pruebas) los convierte: monta el `.docx` de cero, como un ZIP, con lo mínimo que Word necesita
+(`[Content_Types].xml`, `_rels/.rels`, `word/document.xml`, `word/styles.xml` y
+`word/_rels/document.xml.rels`, este último vacío de relaciones a propósito: `Docx.ponerImagen`,
+de la fila 81, crea la suya la primera vez que un documento con esa plantilla se genera con
+membrete). Entiende cinco marcas: `# `/`## ` (título/subtítulo, en negrita), línea vacía como
+párrafo, `- ` lista, `> ` bloque a la derecha (la fórmula de firma) y `---` como salto de línea
+grueso (un borde inferior en un párrafo vacío). Nada más: no hace falta un conversor de Markdown
+completo para esto. Las de correo no generan ningún fichero: su cuerpo, ya a texto plano, se
+escribe directo en `plantillas/indice.json`.
+
+**Un hueco escrito con doble llave.** Al escribir de verdad los textos apareció un fallo latente
+de la fila 81: `{{NOMBRE NATURAL}}` (con espacio, mayúsculas) no encontraba la clave `nombreNatural`
+del catálogo (sin espacio, minúscula media), porque `resolverUnHueco` solo ignoraba mayúsculas y
+tildes, no los espacios. Se arregló comparando sin ningún espacio en ninguno de los dos lados
+(`sinEspacios`, en `js/plantillas.js`), así que ahora **cualquier** hueco, no solo los de la fila
+81, se puede escribir con doble llave en las plantillas del centro, de forma uniforme.
+`Plantillas.HUECOS` gana también `{{FORMULARIOS}}` (fila 82): los formularios del tipo y de los
+hitos del asunto, uno por línea.
+
+**Un párrafo que se queda vacío, desaparece.** `{{FORMULARIOS}}` sin ningún formulario se quedaba
+vacío pero dejaba una línea en blanco suelta en el papel. `js/docx.js` (`rellenarXml`) gana la
+regla: un párrafo que tenía texto de verdad antes de rellenar y se queda enteramente vacío después
+se quita del todo; uno que ya estaba vacío de partida (un salto de línea puesto a mano) no se
+toca.
+
+**El contenido escrito**: doce plantillas (ocho de documento, cuatro de correo), repartidas entre
+las tres categorías — no las cincuenta y tantas de la biblioteca de golpe, sino una muestra
+representativa y cuidada de cada caso (una corrección de conducta con su citación y su aviso, una
+sanción, un cambio de centro, un cese, una toma de posesión con dos firmas (empleado y dirección),
+un certificado con firma y visto bueno, un permiso, un pedido a proveedor, una reclamación de
+garantía): decisión tomada para no sacrificar la calidad y la comprobación de cada texto por
+llegar a un número. Queda para más adelante escribir el resto, tipo a tipo, con el uso.
+
+**El botón "Cargar las plantillas del centro"** (Ajustes → Mantenimiento, dentro de
+`js/plantillas-documento.js`, mismo patrón que "Cargar la biblioteca del centro" de la fila 80):
+lee `plantillas/indice.json`, descarga cada `.docx` a `_GESTOR/PLANTILLAS` y da de alta su fila en
+`plantillas.json`. Fusiona y no pisa: una plantilla con el mismo nombre y tipo que una ya
+existente se deja como está.
+
+Comprobado con `pruebas/plantillas-del-centro.mjs`: que `indice.json` cite ficheros que existen,
+que cada `.md` traiga su frontmatter completo, que **todo** hueco usado en los doce cuerpos esté
+en el catálogo (la prueba que de verdad importa: un hueco mal escrito sale tal cual en el papel,
+y esta prueba cazó los dos `{{ASUNTO}}` que se me habían escapado al escribir los primeros
+borradores, huecos que sonaban bien pero no existían), que cada `.docx` se pueda releer con
+`Docx.leerEntradaDeTexto`, y que `{{FORMULARIOS}}` vacío no deje una línea suelta. Batería
+completa en verde, una sola pasada al final.
+
 ## 20-sep-2026 — Fila 82: los formularios oficiales, a un clic
 
 `docs/FORMULARIOS-OFICIALES.md`. El catálogo de 29 impresos del trámite de escolarización y

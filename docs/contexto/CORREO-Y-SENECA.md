@@ -273,6 +273,37 @@ Se comprueba con `pruebas/plantillas.mjs`. El bloque de pantalla vive en `js/pla
 documento, para no pasar de 450 líneas): usa la API pública de `Plantillas` (`cargar`, `guardar`,
 `deTipo`, `idNuevo`, `rellenar`, `HUECOS`...), no toca nada privado.
 
+### Las plantillas de correo y de documento del centro, ya escritas (20-sep-2026, fila 83,
+docs/PLANTILLAS-DEL-CENTRO.md)
+
+Los textos ya no salen en blanco: el centro tiene sus propias plantillas escritas, en el
+repositorio, y se cargan con un botón, sin que Francisco tenga que escribir ni subir nada a
+mano.
+
+- **`plantillas/*.md`**: cada plantilla, como texto, con un frontmatter (`nombre`, `tipo`,
+  `categoria`; y, solo si es de documento, `tipoDocumento`, `texto`, `firmante`, `vistoBueno`).
+  `scripts/hacer-plantillas.mjs` (se ejecuta a mano, nunca en Vercel ni en las pruebas) convierte
+  cada una en su `.docx` (montado a mano, como un ZIP, con lo mínimo que Word necesita) y escribe
+  `plantillas/indice.json`, la lista de todas con sus datos.
+- **Huecos, con doble llave**: `Plantillas.rellenar` gana un paso previo genérico
+  (`resolverHuecosDobles`, fila 81) que resuelve cualquier hueco reconocido escrito `{{ASÍ}}`,
+  no solo los de una sola llave: así `{{NOMBRE NATURAL}}` encuentra la clave `nombreNatural` del
+  catálogo (la comparación ignora espacios además de mayúsculas y tildes), sin tener que escribir
+  el mismo hueco de dos formas. `{{FORMULARIOS}}` (fila 83) es el último: los formularios del tipo
+  y de los hitos del asunto (fila 82), uno por línea, con su nombre y su dirección si la tiene.
+  **Un párrafo que solo tenía un hueco y se queda vacío al rellenar desaparece del todo**
+  (`js/docx.js`, `rellenarXml`), en vez de dejar una línea en blanco suelta en el papel.
+- **"Cargar las plantillas del centro"** (Ajustes → Mantenimiento, dentro de
+  `js/plantillas-documento.js`, mismo patrón que "Cargar la biblioteca del centro" de la fila 80):
+  lee `plantillas/indice.json`, descarga cada `.docx` y lo escribe en `_GESTOR/PLANTILLAS`, y da
+  de alta su fila en `plantillas.json` (`documentos` o `lista`, según su `clase`). Fusiona y no
+  pisa: una plantilla con el mismo nombre y tipo que una ya existente se deja como está.
+
+Se comprueba con `pruebas/plantillas-del-centro.mjs`: que `indice.json` cite ficheros que
+existen, que cada `.md` traiga su frontmatter completo, que todo hueco usado en los cuerpos esté
+en el catálogo (la prueba que de verdad importa: un hueco mal escrito sale tal cual en el papel),
+que cada `.docx` se pueda releer, y que `{{FORMULARIOS}}` vacío no deje una línea suelta.
+
 #### Insertar un hueco al escribir una plantilla (17-sep-2026, fila 35, docs/HUECOS-INSERTAR.md)
 
 El editor de una plantilla pintaba un botón por cada hueco de `Plantillas.HUECOS` (más de

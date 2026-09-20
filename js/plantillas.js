@@ -105,7 +105,12 @@ var Plantillas = (function () {
     { clave: 'visto bueno', etiqueta: 'Quien da el visto bueno' },
     { clave: 'cargo visto bueno', etiqueta: 'El cargo del visto bueno' },
     { clave: 'tratamiento visto bueno', etiqueta: 'El tratamiento del visto bueno' },
-    { clave: 'consejeria', etiqueta: 'El nombre de la Consejería, para el membrete' }
+    { clave: 'consejeria', etiqueta: 'El nombre de la Consejería, para el membrete' },
+    /* 20-sep-2026, fila 83, docs/PLANTILLAS-DEL-CENTRO.md, parte 3:
+       los formularios oficiales del tipo y de los hitos del asunto
+       (fila 82), uno por línea. Doble llave, como el resto de este
+       grupo. */
+    { clave: 'formularios', etiqueta: 'Los formularios oficiales del tipo y de sus hitos, uno por línea' }
   ];
 
   var cache = null;
@@ -234,7 +239,13 @@ var Plantillas = (function () {
       if (!valorCampo) faltan.push(nombreCampo);
       return { encontrado: true, valor: valorCampo || '' };
     }
-    var real = CONOCIDOS.filter(function (c) { return U.normalizar(c) === U.normalizar(clave); })[0];
+    /* Sin espacios en ninguno de los dos lados: así "{{NOMBRE NATURAL}}"
+       (20-sep-2026, fila 83, la forma en la que se escriben los huecos
+       en las plantillas del centro, con doble llave y en mayúsculas
+       sueltas) encuentra la clave `nombreNatural` del catálogo, sin
+       tener que mantener dos formas del mismo nombre. */
+    function sinEspacios(t) { return U.normalizar(t).replace(/\s+/g, ''); }
+    var real = CONOCIDOS.filter(function (c) { return sinEspacios(c) === sinEspacios(clave); })[0];
     if (!real) return { encontrado: false, valor: '' };
     var valor = valores[real] || '';
     if (!valor) faltan.push(nombreDeHueco(real));
@@ -493,6 +504,24 @@ var Plantillas = (function () {
       consejeria: datosCentro.consejeria || '',
       campos: camposDelAsuntoDe(a)
     };
+
+    /* {{FORMULARIOS}} (20-sep-2026, fila 83, docs/PLANTILLAS-DEL-CENTRO.md,
+       parte 3): los del tipo y de los hitos del asunto (fila 82), uno
+       por línea, con su nombre y su dirección si la tiene. Sin
+       ninguno, el hueco se queda vacío (nunca una línea suelta). */
+    if (window.Formularios) {
+      try {
+        var clavesFormularios = await Formularios.clavesDelAsunto(a);
+        var catalogoFormularios = await Formularios.cargar();
+        valores.formularios = clavesFormularios.map(function (c) {
+          var ficha = catalogoFormularios[c];
+          if (!ficha) return '';
+          return ficha.u ? (ficha.n + ' — ' + ficha.u) : ficha.n;
+        }).filter(Boolean).join('\n');
+      } catch (e) { valores.formularios = ''; }
+    } else {
+      valores.formularios = '';
+    }
 
     /* {{FIRMANTE}} y compañía (20-sep-2026, fila 81): quien ocupaba el
        cargo firmante/de visto bueno de la PLANTILLA en la fecha del

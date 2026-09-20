@@ -97,9 +97,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
 - Papelera: nada se borra del todo a la primera.
 - Mandar documentos de un asunto por correo, con un borrador que deja Apps Script en Gmail.
-- Plantillas de correo, de mensaje de Séneca y de documento de Word por tipo de asunto, con
-  huecos que se rellenan solos. El documento sale con membrete (el nombre de la Consejería se
-  escribe encima) y con la firma de quien ocupaba el cargo firmante en la fecha del documento.
+- Plantillas de correo y de documento de Word por tipo de asunto, con huecos que se rellenan
+  solos; el centro ya tiene sus textos escritos (`plantillas/` del repositorio) y se cargan con
+  un botón (Ajustes → Mantenimiento). El documento sale con membrete y con la firma de quien
+  ocupaba el cargo firmante en la fecha del documento.
 - Copias diarias (caducan a los 90 días, configurable), detección de fichero roto, fusión de
   conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un tipo, estado, tipo de
   documento o recurrente borrado ya no reaparece por memoria vieja del otro ordenador.
@@ -112,8 +113,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   cargar los tipos y guías ya preparados para el instituto.
 - "Qué me toca": hitos pendientes de todos los asuntos abiertos, con filtro por responsable y un
   bloque "Dormidos" (asuntos sin novedades en N días). "Cuentas": asuntos por tipo, mes y quién
-  los pidió. "Formularios": catálogo de impresos oficiales, buscable, con su vía; un hito o un
-  tipo puede llevar los suyos.
+  los pidió. "Formularios": catálogo de impresos oficiales, buscable; un hito o tipo lleva los suyos.
 - Avisos de "fichas sin carpeta" y de la papelera vieja también en Asuntos abiertos, no solo
   entrando a propósito en Ajustes.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
@@ -170,12 +170,12 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Poner en marcha el script de Gmail (`g.educaand.es`): señalar `GESTOR-BANDEJA` en Ajustes y pegar `apps-script/gestor-correos.gs` en `script.google.com`.
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI" en la tarjeta.
-- Comprobar "Ajustar tamaño" con un documento real; asuntos vivos al cambiar de curso; repositorio y Vercel a una cuenta del centro; Ajustes → Membrete/Cargos: imagen, Consejería, ocupantes (fila 81).
+- Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; repositorio/Vercel a una cuenta del centro; Ajustes → Membrete/Cargos: imagen, Consejería, ocupantes (fila 81).
 - Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
 - Pulsar "Poner en orden las fichas del ARCHIVO" (Mantenimiento, fila 64): mueve a su carpeta la ficha de los archivados antes de esa fila, para que `asuntos.json` no siga creciendo.
 - Pulsar, antes de junio de 2027, "Guardar el contacto de los asuntos abiertos" (Ajustes → Mantenimiento, fila 66).
-- Fila 67: colaborador en GitHub/Vercel; copiar `LAS-CUENTAS.md`.
-- Decisión: ¿la papelera se vacía sola a los N días? Mientras no se decida, solo el aviso más insistente, nunca el borrado solo.
+- Fila 67: colaborador en GitHub/Vercel; copiar `LAS-CUENTAS.md`
+- Decisión: ¿la papelera se vacía sola a los N días? Sin decidir, solo el aviso más insistente.
 - Antes de una publicación importante, repasar `docs/COMPROBAR-A-MANO.md` (lo que ninguna prueba cubre).
 
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero

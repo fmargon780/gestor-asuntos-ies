@@ -310,9 +310,23 @@ var Docx = (function () {
     return salida;
   }
 
+  /* Un párrafo que tenía texto de verdad (un hueco, casi siempre) y se
+     queda enteramente vacío al rellenar —{{FORMULARIOS}} sin ninguno,
+     fila 83, docs/PLANTILLAS-DEL-CENTRO.md, parte 3— desaparece del
+     todo, en vez de dejar una línea en blanco suelta en el papel. Un
+     párrafo que YA estaba vacío de partida (un salto de línea puesto
+     a mano) no se toca: solo se quita el que se ha vaciado AL
+     rellenar. */
+  function textoPlanoDeXml(xml) {
+    return xml.replace(/<[^>]*>/g, '').trim();
+  }
+
   function rellenarXml(textoXml, valores, faltanTotal) {
     return textoXml.replace(RE_PARRAFO, function (parrafo) {
-      return repararYRellenarParrafo(parrafo, valores, faltanTotal);
+      var teniaTexto = !!textoPlanoDeXml(parrafo);
+      var relleno = repararYRellenarParrafo(parrafo, valores, faltanTotal);
+      if (teniaTexto && !textoPlanoDeXml(relleno)) return '';
+      return relleno;
     });
   }
 
