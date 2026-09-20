@@ -1,0 +1,118 @@
+[
+  {
+    "nombre": "Comunicación de baja",
+    "categoria": "ALUMNADO",
+    "tipo": "BAJA",
+    "clase": "correo",
+    "cuerpo": "Buenos días:\n\nLe confirmamos que hemos tramitado la baja de {{NOMBRE NATURAL}} en este centro, con fecha\n{{HOY}}.\n\nSi necesita cualquier documento del expediente, puede solicitarlo en Secretaría.\n\nUn saludo.\n{{CENTRO}}"
+  },
+  {
+    "nombre": "Acuerdo de iniciación de expediente de cambio de centro",
+    "categoria": "ALUMNADO",
+    "tipo": "CAMBIO CENTRO",
+    "clase": "documento",
+    "fichero": "acuerdo-iniciacion-cambio-centro.docx",
+    "tipoDocumento": "ACUERDO",
+    "texto": "iniciacion",
+    "firmante": "direccion",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Certificado a petición del personal",
+    "categoria": "PERSONAL",
+    "tipo": "CERTIFICADO PERSONAL",
+    "clase": "documento",
+    "fichero": "certificado-personal.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "servicios",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Certificación académica",
+    "categoria": "ALUMNADO",
+    "tipo": "CERTIFICADO",
+    "clase": "documento",
+    "fichero": "certificacion-academica.docx",
+    "tipoDocumento": "CERTIFICACION",
+    "texto": "academica",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Diligencia de cese",
+    "categoria": "PERSONAL",
+    "tipo": "CESE",
+    "clase": "documento",
+    "fichero": "diligencia-cese.docx",
+    "tipoDocumento": "DILIGENCIA",
+    "texto": "cese",
+    "firmante": "direccion",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Pedido al proveedor",
+    "categoria": "EMPRESAS",
+    "tipo": "COMPRA",
+    "clase": "documento",
+    "fichero": "pedido-proveedor.docx",
+    "tipoDocumento": "PEDIDO",
+    "texto": "proveedor",
+    "firmante": "secretaria",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Aviso de citación",
+    "categoria": "ALUMNADO",
+    "tipo": "CORRECCION",
+    "clase": "correo",
+    "cuerpo": "Buenos días:\n\nLe informamos de que se ha iniciado un procedimiento de corrección de conducta a\n{{NOMBRE NATURAL}}, del grupo {{GRUPO}}, y se le cita a una audiencia en el centro.\n\nAdjuntamos la citación con el día, la hora y el lugar exactos.\n\nPuede responder a este correo para cualquier aclaración.\n\nUn saludo.\n{{CENTRO}}"
+  },
+  {
+    "nombre": "Citación a audiencia",
+    "categoria": "ALUMNADO",
+    "tipo": "CORRECCION",
+    "clase": "documento",
+    "fichero": "citacion-audiencia.docx",
+    "tipoDocumento": "CITACION",
+    "texto": "audiencia",
+    "firmante": "jefatura-estudios",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Reclamación al proveedor",
+    "categoria": "EMPRESAS",
+    "tipo": "GARANTIA",
+    "clase": "correo",
+    "cuerpo": "Buenos días, {{NOMBRE}}:\n\nLe escribimos para comunicarle una incidencia con {campo:Objeto}, suministrado a este centro,\nque se encuentra todavía en garantía.\n\nLe rogamos nos indique cómo proceder para su reparación o sustitución.\n\nQuedamos a la espera de su respuesta.\n\nUn saludo.\n{{CENTRO}}"
+  },
+  {
+    "nombre": "Comunicación de la resolución del permiso",
+    "categoria": "PERSONAL",
+    "tipo": "PERMISO",
+    "clase": "correo",
+    "cuerpo": "Buenos días, {{NOMBRE}}:\n\nLe comunicamos que su solicitud de permiso ha sido resuelta.\n\nPuede consultar la resolución y, si procede, recogerla en Secretaría.\n\nUn saludo.\n{{CENTRO}}"
+  },
+  {
+    "nombre": "Resolución de medida disciplinaria",
+    "categoria": "ALUMNADO",
+    "tipo": "SANCION",
+    "clase": "documento",
+    "fichero": "resolucion-sancion.docx",
+    "tipoDocumento": "RESOLUCION",
+    "texto": "sancion",
+    "firmante": "direccion",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Diligencia de toma de posesión",
+    "categoria": "PERSONAL",
+    "tipo": "TOMA POSESION",
+    "clase": "documento",
+    "fichero": "diligencia-toma-posesion.docx",
+    "tipoDocumento": "DILIGENCIA",
+    "texto": "toma de posesion",
+    "firmante": "direccion",
+    "vistoBueno": ""
+  }
+]

@@ -110,6 +110,10 @@ var Hitos = (function () {
          de guía). */
       soloInformativo: !!(h && h.soloInformativo),
       normativa: (window.Guias ? Guias.normalizarNormativa(h && h.normativa) : []),
+      /* 20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md: claves del
+         catálogo de `js/formularios.js`. Mismo criterio que `normativa`:
+         solo en el hito de arriba, nunca en el de una opción. */
+      formularios: Array.isArray(h && h.formularios) ? h.formularios.map(String) : [],
       opciones: [], elegida: null
     };
     if (esDecision) {
@@ -324,6 +328,7 @@ var Hitos = (function () {
          4.7): igual que los requisitos, son de los pasos de arriba. */
       soloInformativo: esDecision ? false : !!p.soloInformativo,
       normativa: esDecision ? [] : (p.normativa || []),
+      formularios: esDecision ? [] : (p.formularios || []),
       opciones: esDecision ? p.opciones.map(function (o) {
         return { id: o.id, texto: o.titulo, hitos: (o.pasos || []).map(pasoAHito) };
       }) : [],

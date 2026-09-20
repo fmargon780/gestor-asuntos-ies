@@ -131,6 +131,9 @@ var Guias = (function () {
          existen en los pasos de arriba, nunca en una opción. */
       soloInformativo: !!(p && p.soloInformativo),
       normativa: normalizarNormativa(p && p.normativa),
+      /* 20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md: claves del
+         catálogo de `js/formularios.js`, igual que `normativa`. */
+      formularios: Array.isArray(p && p.formularios) ? p.formularios.map(String) : [],
       origenBiblioteca: (p && p.origenBiblioteca && p.origenBiblioteca.id)
         ? { id: p.origenBiblioteca.id, revision: parseInt(p.origenBiblioteca.revision, 10) || 1,
             divergido: !!p.origenBiblioteca.divergido }
@@ -300,6 +303,7 @@ var Guias = (function () {
            cabecera + verlo +
            (conCuerpo ? '<div class="paso-cuerpo-texto">' + limpiar(p.cuerpo) + '</div>' : '') +
            (window.HitosNormativa ? HitosNormativa.listaHTML(p.normativa) : '') +
+           (window.Formularios ? Formularios.listaHTML(p.formularios) : '') +
            ramas +
            '</li>';
   }
@@ -661,6 +665,12 @@ var Guias = (function () {
         if (window.HitosNormativa && caja.querySelector(':scope > .paso-normativa')) {
           pasos[i].normativa = HitosNormativa.leer(caja);
         }
+        /* Formularios oficiales (20-sep-2026, fila 82): el editor vive
+           DENTRO del mismo `<details>` de normativa. */
+        if (window.Formularios && caja.querySelector(':scope > .paso-normativa .formularios-editor')) {
+          pasos[i].formularios = Formularios.leerEditor(
+            caja.querySelector(':scope > .paso-normativa .formularios-editor'));
+        }
 
         var marca = caja.querySelector(':scope > .paso-es-pregunta-fila .paso-es-pregunta');
         if (!marca || !marca.checked) { pasos[i].opciones = []; return; }
@@ -820,13 +830,19 @@ var Guias = (function () {
           d.appendChild(filaInf);
 
           if (window.HitosNormativa) {
-            d.insertAdjacentHTML('beforeend', HitosNormativa.bloqueHTML(p.normativa));
+            /* Formularios oficiales (20-sep-2026, fila 82,
+               docs/FORMULARIOS-OFICIALES.md): el buscador se pinta
+               dentro del mismo `<details>` de normativa, para no
+               alargar más la pantalla del paso. */
+            var formulariosHTML = window.Formularios ? Formularios.bloqueEmbebidoHTML(p.formularios) : '';
+            d.insertAdjacentHTML('beforeend', HitosNormativa.bloqueHTML(p.normativa, formulariosHTML));
             restaurarAbierto(d.querySelector(':scope > .paso-normativa'), abiertos, i, '');
             HitosNormativa.enganchar(d, function (mutador) {
               recoger();
               mutador(pasos[i].normativa);
               pintar();
             });
+            if (window.Formularios) Formularios.engancharEmbebido(d);
           }
 
           /* "Guardar en la biblioteca" (apartados 4.2 y 4.3): junto al

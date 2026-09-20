@@ -104,7 +104,19 @@
       return;
     }
 
-    var valores = await Plantillas.valoresDeAsunto(asunto);
+    /* El membrete (20-sep-2026, fila 81): se mete ANTES de rellenar,
+       porque `Docx.ponerImagen` busca el hueco `{{MEMBRETE}}` en el
+       XML tal cual viene de la plantilla, no en el texto ya relleno.
+       Sin imagen guardada, `Membrete.montar()` da `null` y no se toca
+       nada: el documento sale igual que si no existiera este paso. */
+    if (window.Membrete) {
+      try {
+        var membrete = await Membrete.montar();
+        if (membrete) buffer = await Docx.ponerImagen(buffer, 'MEMBRETE', membrete.bytes, membrete.ancho, membrete.alto);
+      } catch (e) { /* sin membrete, el documento sigue generándose */ }
+    }
+
+    var valores = await Plantillas.valoresDeAsunto(asunto, { fecha: U.hoyIso(), plantilla: plantillaDoc });
     var resultado;
     try {
       resultado = await Docx.rellenar(buffer, valores);
@@ -261,18 +273,33 @@
   var datosDeAjustes = null;
   var refrescarSeccionActual = function () {};
 
+  /* Los huecos "de llave doble" (20-sep-2026, fila 81): se resuelven
+     aparte, antes que los demás, así que se escriben con doble llave
+     para que no se confundan con un dato de asunto corriente. `{LO QUE
+     FALTA}` ya trae sus propias llaves dentro de la clave (viene de
+     antes); los de aquí, no. */
+  var HUECOS_DE_LLAVE_DOBLE = ['firmante', 'cargo firmante', 'tratamiento firmante',
+    'visto bueno', 'cargo visto bueno', 'tratamiento visto bueno', 'consejeria', 'formularios'];
+
+  function textoDelHueco(h) {
+    if (h.clave.indexOf('{') !== -1) return '{' + h.clave + '}';    /* {LO QUE FALTA} */
+    if (HUECOS_DE_LLAVE_DOBLE.indexOf(h.clave) !== -1) return '{{' + h.clave.toUpperCase() + '}}';
+    return '{' + h.clave + '}';
+  }
+
   function pintarHuecos(caja) {
     if (!caja) return;
     caja.innerHTML = '';
     Plantillas.HUECOS.forEach(function (h) {
+      var texto = textoDelHueco(h);
       var fila = document.createElement('div');
       fila.className = 'pd-hueco-fila';
-      fila.innerHTML = '<code>{' + h.clave + '}</code><span class="suave">' + U.escapar(h.etiqueta) + '</span>';
+      fila.innerHTML = '<code>' + U.escapar(texto) + '</code><span class="suave">' + U.escapar(h.etiqueta) + '</span>';
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'boton';
       b.textContent = 'Copiar';
-      b.onclick = function () { copiarHueco('{' + h.clave + '}', b); };
+      b.onclick = function () { copiarHueco(texto, b); };
       fila.appendChild(b);
       caja.appendChild(fila);
     });
@@ -372,10 +399,23 @@
     } catch (e) { return []; }
   }
 
+  /* Los cargos del centro (20-sep-2026, fila 81), en su `orden`, para
+     los desplegables "Quien firma" y "Visto bueno". */
+  async function opcionesDeCargos(idElegido) {
+    if (!window.Cargos) return '<option value="">(sin cargos)</option>';
+    var datos = await Cargos.leer();
+    return Cargos.ordenados(datos).map(function (c) {
+      return '<option value="' + U.escapar(c.id) + '"' + (c.id === idElegido ? ' selected' : '') + '>' +
+        U.escapar(c.nombre) + '</option>';
+    }).join('');
+  }
+
   async function abrirCuadroDePlantillaDoc(existente, tipoPreset, alGuardar) {
     var categorias = Nombres.CATEGORIAS;
     var categoriaInicial = (existente && existente.categoria) || (tipoPreset && tipoPreset.categoria) || categorias[0];
     var ficheros = await ficherosDeWordDisponibles();
+    var opcionesFirmante = '<option value="">(ninguno)</option>' + await opcionesDeCargos(existente && existente.firmante);
+    var opcionesVistoBueno = '<option value="">(ninguno)</option>' + await opcionesDeCargos(existente && existente.vistoBueno);
 
     function opcionesTipos(categoria) {
       return opcionesDeCategoria(categoria).map(function (t) {
@@ -418,7 +458,15 @@
           '<input id="pd-texto" class="campo" value="' + U.escapar((existente && existente.texto) || '') + '"></div>' +
       '</div>' +
       '<p class="nota">Con esas dos piezas y la fecha de hoy se monta el nombre del documento ' +
-      'generado (js/nombres.js).</p>';
+      'generado (js/nombres.js).</p>' +
+      '<div class="dos-columnas">' +
+        '<div><label class="etiqueta">Quien firma</label>' +
+          '<select id="pd-firmante" class="campo">' + opcionesFirmante + '</select></div>' +
+        '<div><label class="etiqueta">Visto bueno <span class="suave">(opcional)</span></label>' +
+          '<select id="pd-visto-bueno" class="campo">' + opcionesVistoBueno + '</select></div>' +
+      '</div>' +
+      '<p class="nota">Se pone la persona que ocupaba ese cargo en la fecha del documento ' +
+      '(Ajustes → El centro → Cargos del centro).</p>';
 
     var promesa = U.preguntar(existente ? 'Editar plantilla de documento' : 'Nueva plantilla de documento',
       cuerpo, existente ? 'Guardar' : 'Crear');
@@ -436,6 +484,8 @@
     var fichero = $('pd-fichero').value;
     var tipoDocumento = $('pd-tipo-doc').value.trim();
     var texto = $('pd-texto').value.trim();
+    var firmante = $('pd-firmante').value;
+    var vistoBueno = $('pd-visto-bueno').value;
 
     if (!nombre || !tipo || !fichero || !tipoDocumento) {
       U.aviso('Hace falta el nombre, el tipo, el fichero y el tipo de documento.', 'malo');
@@ -448,11 +498,13 @@
           var i = actual.documentos.findIndex(function (x) { return x.id === existente.id; });
           if (i !== -1) {
             actual.documentos[i] = { id: existente.id, tipo: tipo, categoria: categoria, nombre: nombre,
-              fichero: fichero, tipoDocumento: tipoDocumento, texto: texto };
+              fichero: fichero, tipoDocumento: tipoDocumento, texto: texto,
+              firmante: firmante, vistoBueno: vistoBueno };
           }
         } else {
           actual.documentos.push({ id: Plantillas.idNuevoDocumento(), tipo: tipo, categoria: categoria,
-            nombre: nombre, fichero: fichero, tipoDocumento: tipoDocumento, texto: texto });
+            nombre: nombre, fichero: fichero, tipoDocumento: tipoDocumento, texto: texto,
+            firmante: firmante, vistoBueno: vistoBueno });
         }
         return actual;
       });
@@ -462,6 +514,133 @@
       U.aviso('No he podido guardarlo: ' + e.message, 'malo');
     }
   }
+
+  /* ==========================================================
+     "CARGAR LAS PLANTILLAS DEL CENTRO" (20-sep-2026, fila 83,
+     docs/PLANTILLAS-DEL-CENTRO.md)
+
+     Lee `plantillas/indice.json` del propio sitio web, descarga cada
+     `.docx` de documento y lo escribe en `_GESTOR/PLANTILLAS`, y da de
+     alta la fila que le toque en `plantillas.json` (`documentos` para
+     las de documento, `lista` para las de correo, con su `texto` ya
+     como cuerpo). Fusiona y no pisa: si ya hay una con el mismo
+     `nombre` y `tipo`, se deja como está. Mismo patrón que "Cargar la
+     biblioteca del centro" (fila 80, js/cargar-biblioteca.js).
+     ========================================================== */
+
+  var URL_INDICE_PLANTILLAS = 'plantillas/indice.json';
+
+  async function cargarPlantillasDelCentro() {
+    var resp = await fetch(URL_INDICE_PLANTILLAS);
+    if (!resp.ok) throw new Error('no encuentro ' + URL_INDICE_PLANTILLAS + ' (' + resp.status + ')');
+    var indice = await resp.json();
+
+    var actual = await Plantillas.cargar(App.E.gestor);
+    var yaDocumento = {};
+    (actual.documentos || []).forEach(function (p) { yaDocumento[p.tipo + '|' + p.nombre] = true; });
+    var yaCorreo = {};
+    (actual.lista || []).forEach(function (p) { yaCorreo[p.tipo + '|' + p.nombre] = true; });
+
+    var nuevosDocumentos = [], nuevosCorreo = [];
+    var documentosYaEstaban = 0, correoYaEstaban = 0;
+
+    for (var i = 0; i < indice.length; i++) {
+      var e = indice[i];
+      var clave = e.tipo + '|' + e.nombre;
+
+      if (e.clase === 'documento') {
+        if (yaDocumento[clave]) { documentosYaEstaban++; continue; }
+        var respDocx = await fetch('plantillas/' + e.fichero);
+        if (!respDocx.ok) continue;   /* no debería pasar; se salta sin romper las demás */
+        var bytes = new Uint8Array(await respDocx.arrayBuffer());
+        var carpeta = await carpetaDePlantillas();
+        await Carpetas.escribirBytes(carpeta, e.fichero, bytes);
+        nuevosDocumentos.push({
+          id: Plantillas.idNuevoDocumento(), tipo: e.tipo, categoria: e.categoria, nombre: e.nombre,
+          fichero: e.fichero, tipoDocumento: e.tipoDocumento, texto: e.texto || '',
+          firmante: e.firmante || '', vistoBueno: e.vistoBueno || ''
+        });
+      } else {
+        if (yaCorreo[clave]) { correoYaEstaban++; continue; }
+        nuevosCorreo.push({
+          id: Plantillas.idNuevo(), tipo: e.tipo, categoria: e.categoria, nombre: e.nombre,
+          texto: e.cuerpo || ''
+        });
+      }
+    }
+
+    if (nuevosDocumentos.length || nuevosCorreo.length) {
+      await Plantillas.guardar(App.E.gestor, function (a) {
+        a.documentos = (a.documentos || []).concat(nuevosDocumentos);
+        a.lista = (a.lista || []).concat(nuevosCorreo);
+        return a;
+      });
+    }
+
+    return {
+      documentosNuevos: nuevosDocumentos.length, documentosYaEstaban: documentosYaEstaban,
+      correoNuevos: nuevosCorreo.length, correoYaEstaban: correoYaEstaban
+    };
+  }
+
+  (function () {
+    function $$(id) { return document.getElementById(id); }
+
+    function bloque() {
+      var ya = $$('bloque-plantillas-centro');
+      if (ya) return ya;
+      var pantalla = $$('ajustes-tab-mantenimiento');
+      if (!pantalla) return null;
+      var d = document.createElement('details');
+      d.className = 'bloque-ajustes';
+      d.id = 'bloque-plantillas-centro';
+      d.innerHTML =
+        '<summary>' +
+          '<span class="bloque-titulo">Plantillas del centro</span>' +
+          '<span class="bloque-pie">Los textos de documento y de correo ya preparados para el instituto</span>' +
+        '</summary>' +
+        '<div class="bloque-cuerpo">' +
+          '<p class="explica">Cuelga de cada tipo de asunto sus plantillas de documento y de correo, con ' +
+          'la norma citada, el membrete y el pie de firma. Se puede pulsar más de una vez: nada de lo ' +
+          'que ya tengas escrito se toca.</p>' +
+          '<button type="button" class="boton boton-principal" id="btn-cargar-plantillas-centro">' +
+          'Cargar las plantillas del centro</button>' +
+          '<div id="resultado-plantillas-centro"></div>' +
+        '</div>';
+      pantalla.appendChild(d);
+      $$('btn-cargar-plantillas-centro').onclick = ejecutar;
+      return d;
+    }
+
+    async function ejecutar() {
+      var boton = $$('btn-cargar-plantillas-centro');
+      var salida = $$('resultado-plantillas-centro');
+      try {
+        var r = await U.mientrasGuarda(boton, cargarPlantillasDelCentro);
+        salida.innerHTML = '<ul class="lista-repetidos">' +
+          '<li>' + (r.documentosNuevos
+            ? r.documentosNuevos + ' plantilla(s) de documento nueva(s)'
+            : 'Ninguna plantilla de documento nueva') +
+          (r.documentosYaEstaban ? ', ' + r.documentosYaEstaban + ' ya estaban' : '') + '.</li>' +
+          '<li>' + (r.correoNuevos
+            ? r.correoNuevos + ' plantilla(s) de correo nueva(s)'
+            : 'Ninguna plantilla de correo nueva') +
+          (r.correoYaEstaban ? ', ' + r.correoYaEstaban + ' ya estaban' : '') + '.</li>' +
+          '</ul>';
+        U.aviso('Plantillas cargadas.', 'bueno');
+        if (typeof App.pintarAjustes === 'function') App.pintarAjustes();
+      } catch (e) {
+        U.aviso('No he podido cargarlas: ' + e.message, 'malo');
+      }
+    }
+
+    function enganchar() {
+      if (!window.Gestor) return;
+      window.Gestor.alRefrescar.push(function () { if (window.Gestor.carpetaGestor()) bloque(); });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enganchar);
+    else enganchar();
+  })();
 
   /* ==========================================================
      ENGANCHE

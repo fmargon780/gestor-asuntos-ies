@@ -157,6 +157,29 @@
     referencia.parentNode.insertBefore(b, referencia.nextSibling);
   }
 
+  /* ---------- la entrada de "Formularios" (fila 82) ----------
+
+     Igual que las de "Qué me toca" y "Cuentas", justo detrás de ella. */
+
+  function ponerLaEntradaDeFormularios() {
+    if ($('pestana-formularios')) return;
+    var referencia = $('pestana-cuentas') || $('pestana-que-me-toca') ||
+      document.querySelector('.pestana[data-pantalla="personas"]');
+    if (!referencia || !referencia.parentNode) return;
+
+    var b = document.createElement('button');
+    b.id = 'pestana-formularios';
+    b.className = 'pestana';
+    b.type = 'button';
+    b.dataset.pantalla = 'formularios';
+    b.innerHTML = '<span>Formularios</span>';
+    b.onclick = function () { if (window.Formularios) window.Formularios.abrir(); };
+    b.addEventListener('click', function () {
+      if (comoEstaba() === 'plegada') poner('plegada');
+    });
+    referencia.parentNode.insertBefore(b, referencia.nextSibling);
+  }
+
   /* ---------- el botón grande de Nuevo asunto ---------- */
 
   function ponerElDeNuevoAsunto() {
@@ -210,6 +233,7 @@
     ponerElBotonDeAjustes();
     ponerLaEntradaDeQueMeToca();
     ponerLaEntradaDeCuentas();
+    ponerLaEntradaDeFormularios();
     ponerElDeNuevoAsunto();
     poner(comoEstaba());
     vigilarPaneles();

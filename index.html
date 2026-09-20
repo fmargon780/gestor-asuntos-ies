@@ -31,6 +31,7 @@
 <link rel="stylesheet" href="css/unir-asuntos.css">
 <link rel="stylesheet" href="css/papelera.css">
 <link rel="stylesheet" href="css/hitos.css">
+<link rel="stylesheet" href="css/formularios.css">
 <link rel="stylesheet" href="css/que-me-toca.css">
 <link rel="stylesheet" href="css/plantillas-documento.css">
 <link rel="stylesheet" href="css/pdf-separar-unir.css">
@@ -547,6 +548,59 @@
         </div>
       </details>
 
+      <!-- Fila 81, 20-sep-2026, docs/FIRMANTES-Y-MEMBRETE.md: los
+           cargos del centro y quién los ha ocupado, con fechas. Las
+           tarjetas se pintan solas, con js/cargos-ajustes.js. -->
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Cargos del centro</span>
+          <span class="bloque-pie">Quién firma cada documento, según la fecha</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Cada cargo lleva quién lo ha ocupado, con sus fechas. Al generar un
+         documento, la firma la pone quien ocupaba el cargo <strong>en la fecha del
+         documento</strong>, no quien lo ocupe hoy.</p>
+      <div id="cargos-lista" class="lista"></div>
+        </div>
+      </details>
+
+      <!-- Fila 81, 20-sep-2026, docs/FIRMANTES-Y-MEMBRETE.md: la imagen
+           del membrete, sin el nombre de la Consejería dentro (se
+           escribe encima al generar, con js/membrete.js). -->
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Membrete</span>
+          <span class="bloque-pie">La imagen de arriba de cada documento, y el nombre de la Consejería</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">Sube la imagen del membrete sin el nombre de la Consejería: se escribe
+         encima, con el texto de aquí, para no tener que rehacer la imagen cuando cambie de
+         nombre.</p>
+      <div id="membrete-estado" class="suave" style="margin-bottom:8px"></div>
+      <button type="button" class="boton" id="membrete-elegir-imagen">Elegir imagen (PNG o JPG)</button>
+      <label class="etiqueta" style="margin-top:10px">Nombre de la Consejería</label>
+      <input id="membrete-consejeria" class="campo" placeholder="Consejería de Desarrollo Educativo y Formación Profesional">
+      <details style="margin-top:8px">
+        <summary>Dónde va el nombre de la Consejería</summary>
+        <div class="dos-columnas" style="margin-top:8px">
+          <div><label class="etiqueta">Borde izquierdo (% del ancho)</label>
+            <input id="membrete-caja-x" type="number" min="0" max="100" step="0.1" class="campo campo-plazo"></div>
+          <div><label class="etiqueta">Línea base (% del alto)</label>
+            <input id="membrete-caja-y" type="number" min="0" max="100" step="0.1" class="campo campo-plazo"></div>
+        </div>
+        <div class="dos-columnas">
+          <div><label class="etiqueta">Ancho máximo (% del ancho)</label>
+            <input id="membrete-caja-ancho" type="number" min="0" max="100" step="0.1" class="campo campo-plazo"></div>
+          <div><label class="etiqueta">Alto máximo de la letra (% del alto)</label>
+            <input id="membrete-caja-alto" type="number" min="0" max="100" step="0.1" class="campo campo-plazo"></div>
+        </div>
+      </details>
+      <button type="button" class="boton" id="membrete-guardar" style="margin-top:10px">Guardar</button>
+      <p class="nota">Vista previa:</p>
+      <div id="membrete-vista-previa"></div>
+        </div>
+      </details>
+
       <!-- Fila 57, 18-sep-2026, docs/HUECO-PARA-SELLO-Y-FIRMA.md: las
            dos medidas que usa "Ajustar tamaño" (antes "Preparar el
            documento", fila 58). Las lee y las guarda js/ajustes-centro.js. -->
@@ -859,6 +913,11 @@
 <script src="js/via-contacto.js"></script>
 <script src="js/tablon.js"></script>
 <script src="js/copiar.js"></script>
+<!-- js/cargos.js (fila 81, 20-sep-2026, docs/FIRMANTES-Y-MEMBRETE.md): los
+     cargos del centro y quién los ha ocupado, con fechas. Va antes que
+     js/plantillas.js: Plantillas.valoresDeAsunto usa Cargos.enFecha para
+     los huecos {{FIRMANTE}} y compañía. -->
+<script src="js/cargos.js"></script>
 <!-- js/plantillas.js va antes que js/correo.js: el cuadro de Correo usa
      Plantillas.cargar/deTipo/rellenar/valoresDeAsunto para su desplegable
      "Plantilla" (docs/PLANTILLAS-DE-CORREO.md, 2.3). -->
@@ -890,12 +949,23 @@
      otro módulo de la aplicación: solo de `window.U` para el aviso, si
      está disponible. -->
 <script src="js/seneca-ayudante.js"></script>
+<!-- js/membrete.js (fila 81, 20-sep-2026, docs/FIRMANTES-Y-MEMBRETE.md):
+     monta la imagen del membrete con el nombre de la Consejería escrito
+     encima. Va antes que js/plantillas-documento.js, que lo usa al
+     generar. -->
+<script src="js/membrete.js"></script>
 <!-- js/docx.js y js/plantillas-documento.js van después de js/correo.js
      (docs/PLANTILLAS-DE-DOCUMENTO.md, 7): usan Plantillas.valoresDeAsunto
      y, para el botón "Generar documento" de la ficha, el mismo enganche
      de App.abrirFicha que ya usa js/correo.js. -->
 <script src="js/docx.js"></script>
 <script src="js/plantillas-documento.js"></script>
+<!-- js/formularios.js (fila 82, 20-sep-2026, docs/FORMULARIOS-OFICIALES.md):
+     va después de js/ficha-asunto.js (envuelve App.abrirFicha, que se
+     define ahí) y de js/hitos-panel-lista.js (Formularios.listaHTML
+     se llama desde su cuerpoDeHito, en tiempo de ejecución, así que el
+     orden entre los dos no importa de verdad, pero van juntos). -->
+<script src="js/formularios.js"></script>
 <script src="js/salir.js"></script>
 <script src="js/rescate-datos.js"></script>
 <script src="js/traer-datos.js"></script>

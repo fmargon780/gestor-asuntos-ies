@@ -47,6 +47,7 @@
     { fichero: 'ficha-asunto.js', nombre: 'App.verAbiertos' },
     { fichero: 'ficha-asunto.js', nombre: 'App.tarjetaAsunto' },
     { fichero: 'ficha-nombre-acciones.js', nombre: 'App.abrirFicha' },
+    { fichero: 'formularios.js', nombre: 'App.abrirFicha' },
     { fichero: 'hitos-archivo.js', nombre: 'App.cerrarAsunto' },
     { fichero: 'hitos-archivo.js', nombre: 'App.reabrirAsunto' },
     { fichero: 'hitos-panel.js', nombre: 'App.abrirFicha' },

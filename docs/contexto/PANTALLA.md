@@ -79,7 +79,7 @@ el mando" que siempre está ahí.
 
 - **`js/presencia.js`** (`window.Presencia`) es el modelo y la vigilancia. Vive en
   `_GESTOR/presencia.json`: `{ <clave del asunto>: { usuario, ultima } }`. Se escribe y relee
-  **directo con `Carpetas`, nunca con `Copias.guardar`**: es un fichero fuera de los catorce
+  **directo con `Carpetas`, nunca con `Copias.guardar`**: es un fichero fuera de los diecisiete
   protegidos, a propósito (ver "Lo que la aplicación guarda en `_GESTOR`"), porque se escribe muy
   a menudo y es un dato que caduca solo (3 minutos sin renovarse).
   - `vigilar(clave, onCambio)`: comprueba si `clave` está libre; si lo está, anuncia la propia

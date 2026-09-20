@@ -150,6 +150,25 @@ function construirSeccionDatos(tipo) {
     'Lleva la firma digital del director', 'Deja libre la banda de abajo al preparar el documento.'));
   b.cuerpo.appendChild(interruptores);
 
+  /* Formularios oficiales del tipo (20-sep-2026, fila 82,
+     docs/FORMULARIOS-OFICIALES.md): además de los que lleve cada hito,
+     un tipo puede necesitar un impreso sin que dependa de ningún paso
+     concreto. Se guarda directo en tipos.json, como el nombre corto. */
+  if (window.Formularios) {
+    var filaFormularios = document.createElement('div');
+    filaFormularios.style.marginTop = '10px';
+    filaFormularios.innerHTML = '<label class="etiqueta">Formularios oficiales de este tipo</label>';
+    var contenedorFormularios = document.createElement('div');
+    filaFormularios.appendChild(contenedorFormularios);
+    b.cuerpo.appendChild(filaFormularios);
+    Formularios.pintarEditorAsync(contenedorFormularios, tipo.formularios, async function (claves) {
+      tipo.formularios = claves;
+      try {
+        await App.guardarTipos();
+      } catch (e) { U.aviso('No he podido guardarlo: ' + e.message, 'malo'); }
+    });
+  }
+
   return b.sec;
 }
 

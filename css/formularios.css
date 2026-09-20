@@ -1,0 +1,63 @@
+/* ============================================================
+   formularios.css — el catálogo de formularios oficiales (20-sep-2026,
+   fila 82, docs/FORMULARIOS-OFICIALES.md): la etiqueta de vía, la
+   lista de un hito vivo, el editor embebido (paso de guía y "Datos
+   del tipo") y la pantalla propia.
+   ============================================================ */
+
+/* La etiqueta de vía, reutilizada en el editor, en el hito vivo, en la
+   ficha del asunto y en la pantalla propia. Mismo patrón que
+   .marca-estado (css/estilos.css): borde y fondo del mismo tono. */
+.formularios-chip {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  margin: 2px 4px 2px 0;
+  border: 1px solid transparent;
+  text-decoration: none;
+}
+a.formularios-chip { cursor: pointer; }
+a.formularios-chip:hover { text-decoration: underline; }
+.via-descarga { background: var(--verde); color: #1e6b3f; border-color: #bfe3cd; }
+.via-centro { background: var(--azul-claro); color: var(--azul); border-color: #c3d8ec; }
+.via-protocolo { background: #eef1f5; color: var(--tinta-suave); border-color: #d7dde5; }
+.via-seneca { background: var(--ambar); color: #8a6100; border-color: var(--ambar-linea); }
+
+/* ---------- el editor embebido ---------- */
+
+.formularios-editor { margin-top: 10px; }
+.formularios-editor-lista {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  padding: 4px 8px;
+  margin-top: 6px;
+}
+.formularios-fila {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 0;
+  font-size: 13px;
+  cursor: pointer;
+}
+.formularios-fila input { flex: 0 0 auto; }
+
+/* ---------- la lista de solo lectura, en un hito ---------- */
+
+.hito-formularios { margin: 8px 0; display: flex; flex-direction: column; gap: 4px; }
+.formularios-fila-lectura { font-size: 13px; }
+.formularios-nota { margin-top: 2px; }
+
+/* ---------- la pantalla propia ---------- */
+
+.formularios-norma {
+  margin: 18px 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--tinta-suave);
+}
+.formularios-norma:first-child { margin-top: 4px; }

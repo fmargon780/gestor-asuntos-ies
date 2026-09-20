@@ -62,11 +62,13 @@ var Copias = (function () {
      que se fusionan entre ordenadores, ver js/borrados-fusion.js) es
      el decimoquinto. `hitos-biblioteca.json` (20-sep-2026, fila 79, la
      biblioteca de hitos del centro, ver js/hitos-biblioteca.js) es el
-     decimosexto. */
+     decimosexto. `cargos.json` (20-sep-2026, fila 81, los cargos del
+     centro y quién los ha ocupado, ver js/cargos.js) es el
+     decimoséptimo. */
   var FICHEROS = ['asuntos.json', 'guias.json', 'tipos.json', 'estados.json',
                    'tipos-documento.json', 'tablon.json', 'recurrentes.json', 'frescura.json',
                    'campos.json', 'papelera.json', 'no-duplicados.json', 'hitos.json', 'grupos.json',
-                   'usuarios.json', 'borrados-listas.json', 'hitos-biblioteca.json'];
+                   'usuarios.json', 'borrados-listas.json', 'hitos-biblioteca.json', 'cargos.json'];
 
   function dosDigitos(n) { return String(n).padStart(2, '0'); }
 

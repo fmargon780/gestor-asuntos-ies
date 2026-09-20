@@ -19,7 +19,7 @@ El gemelo en papel de las de correo (16-sep-2026, `docs/PLANTILLAS-DE-DOCUMENTO.
 - **Los `.docx` viven en `_GESTOR/PLANTILLAS`**, sin subcarpetas, dentro de la carpeta de asuntos
   abiertos (`Carpetas.crear(App.E.gestor, 'PLANTILLAS')`, que la crea si no existe). Francisco los
   sube a mano a esa carpeta de Dropbox; la aplicación nunca escribe ahí, solo lee y cuelga el
-  nombre del fichero de un tipo en Ajustes. No es ninguno de los catorce ficheros compartidos: no
+  nombre del fichero de un tipo en Ajustes. No es ninguno de los diecisiete ficheros compartidos: no
   lleva copia de seguridad ni detección de fichero roto.
 - **`Plantillas.valoresDeAsunto(asunto)`** (`js/plantillas.js`), pública desde el 16-sep-2026:
   hasta entonces era `valoresDePlantilla()`, privada de `js/correo.js`, y solo traía lo que hacía
@@ -86,6 +86,69 @@ El gemelo en papel de las de correo (16-sep-2026, `docs/PLANTILLAS-DE-DOCUMENTO.
 
 Se comprueba con `pruebas/plantillas-documento.mjs` (jsdom, sin navegador: construye un `.docx` de
 mentira a mano, con su propio escritor de ZIP, independiente del de `js/docx.js`).
+
+### Los cargos del centro, quién firma y el membrete (20-sep-2026, fila 81, `docs/FIRMANTES-Y-MEMBRETE.md`)
+
+Un documento generado sale ahora con la firma de quien ocupaba el cargo **en la fecha del
+documento** (no quien lo ocupe hoy) y con membrete, sin que la imagen tenga que llevar el nombre
+de la Consejería escrito dentro.
+
+- **`_GESTOR/cargos.json`** (decimoséptimo fichero compartido, ver `js/copias.js`):
+  `{ cargos: [{ id, nombre, orden, tratamiento, ocupantes: [{ id, persona, desde, hasta }] }] }`.
+  `js/cargos.js` (`window.Cargos`): `enFecha(idCargo, fecha)`/`vigente(idCargo)` (texto
+  `AAAA-MM-DD`, sin objetos `Date`), `solapes(cargo)` (aviso, nunca impide guardar), y el alta,
+  edición y borrado de cargos y de sus ocupantes. Sin fichero, nace con seis cargos de fábrica sin
+  ningún ocupante (Dirección, Vicedirección, Jefatura de Estudios, Secretaría, Administración,
+  Orientación). El borrado de un cargo pasa por `Papelera.botonBorrar` (clase `'cargo'`, que
+  `js/papelera.js` tampoco sabe devolver, como `'plantilla'`). La pantalla, bloque **Ajustes → El
+  centro → Cargos del centro**, vive en el mismo fichero (`Cargos.pintarEnAjustes`, mismo criterio
+  que `js/recurrentes.js`: el modelo y su pantalla juntos, sin un "-ajustes.js" aparte).
+- **Cada plantilla de documento** (`documentos[]` de `plantillas.json`) gana `firmante` y
+  `vistoBueno`: el `id` de un cargo, o vacío. Se eligen en dos desplegables nuevos del alta/edición,
+  en Ajustes → Plantillas de documento.
+- **Huecos nuevos** en `Plantillas.HUECOS`, con doble llave (como `{{LO QUE FALTA}}`, resueltos
+  aparte de los de una sola llave, antes de que `Plantillas.rellenar` los vea, para que un nombre
+  con espacio como "CARGO FIRMANTE" no deje llaves sueltas en el papel): `{{FIRMANTE}}`,
+  `{{CARGO FIRMANTE}}`, `{{TRATAMIENTO FIRMANTE}}`, `{{VISTO BUENO}}`, `{{CARGO VISTO BUENO}}`,
+  `{{TRATAMIENTO VISTO BUENO}}`, `{{CONSEJERIA}}`. `Plantillas.valoresDeAsunto(asunto, opciones)`
+  gana un segundo argumento opcional `{ fecha, plantilla }`: sin él, como hasta ahora (sin
+  firmante). `js/plantillas-documento.js` pasa `{ fecha: hoy, plantilla: plantillaDoc }` al generar,
+  y resuelve el firmante/visto bueno con `Cargos.enFecha` en esa fecha; sin ocupante en esa fecha,
+  el hueco se queda vacío y sale en "faltan", como cualquier otro dato que no haya.
+- **El membrete**: la imagen (PNG/JPG) se sube una vez en **Ajustes → El centro → Membrete**, tal
+  cual, a `_GESTOR/PLANTILLAS/membrete.png` (la única vez que la aplicación escribe en esa
+  carpeta). El nombre de la Consejería (`consejeria`, clave de raíz de `plantillas.json`) se
+  escribe ENCIMA al generar, nunca dentro de la imagen guardada: cuando cambie de nombre, basta con
+  corregir el texto. `membreteCaja` (`{ x, y, ancho, alto }`, en % del ancho/alto de la imagen; por
+  defecto `{10.3, 43.2, 20.7, 10.0}`) dice dónde. `js/membrete.js` (`window.Membrete`):
+  - `medir(texto, caja, anchoImagen, altoImagen)`, sin efectos: tamaño máximo (`caja.alto` %),
+    reducido de punto en punto hasta un mínimo del 55 % si no cabe en `caja.ancho`, y si ni así
+    cabe, dos líneas partidas por el espacio más parejo (sin ningún espacio, se queda en una sola
+    línea, aunque no quepa del todo). El ancho del texto se estima con un factor medio de letra de
+    palo seco (0,52 × tamaño por carácter): no hay canvas en las pruebas, y para decidir "cabe"/"no
+    cabe" sobra con la aproximación.
+  - `montar()`: lee la imagen y los ajustes, dibuja en un `<canvas>` con `createImageBitmap` y
+    devuelve `{ bytes, ancho, alto }` en PNG; sin imagen guardada, `null`, sin que nada falle.
+    `dibujar(blob, consejeria, caja)` es la misma pintura pero sobre una imagen y unos valores que
+    todavía no se han guardado: la vista previa en vivo de Ajustes (se rehace al cambiar cualquiera
+    de los seis valores: imagen, texto y las cuatro cifras de la caja) la usa para no obligar a
+    guardar antes de ver el resultado.
+  - **`Docx.ponerImagen(bufferDocx, nombreHueco, bytesPng, anchoPx, altoPx)`** (`js/docx.js`), antes
+    de `rellenar`: busca el párrafo `{{MEMBRETE}}` en `word/document.xml` y en cada
+    `word/headerN.xml` (reparando huecos partidos entre varios `<w:t>` igual que `rellenar`) y lo
+    sustituye por un párrafo con un `<w:drawing>` en línea, a 17 cm de ancho (el ancho útil de un A4
+    con márgenes normales) y el alto en proporción. Añade `word/media/membrete.png` al ZIP, la
+    relación que le toque (creando el `.rels` de cero si el `.docx` no traía ninguno, con un `Id`
+    libre `rIdMembreteN`) y `<Default Extension="png".../>` a `[Content_Types].xml` si falta. Si el
+    hueco no está en ningún sitio, no toca nada. `js/plantillas-documento.js`, al generar: monta el
+    membrete y lo mete con `Docx.ponerImagen` antes de rellenar los huecos de texto.
+
+Se comprueba con `pruebas/cargos.mjs` (sin navegador, fechas contadas desde hoy: un ocupante único,
+dos en cadena, una fecha anterior a todos, un hueco entre dos, un solape, un cargo vacío),
+`pruebas/membrete.mjs` (sin navegador, solo `medir`: nombre corto, intermedio, largo con dos
+líneas, largo sin espacios) y un escenario nuevo de `pruebas/plantillas-documento.mjs` (`{{MEMBRETE}}`
+dentro del ZIP con su relación creada de cero, y `{{FIRMANTE}}`/`{{TRATAMIENTO FIRMANTE}}` resueltos
+con el ocupante de la fecha).
 
 ### Un papel que ya trae el sello, sin duplicarlo (17-sep-2026, fila 20)
 
