@@ -177,6 +177,10 @@ App.tarjetaSuelto = function (s, pie, esNuevo) {
           cualquier orden) aparece en el nombre del fichero.
      +15  el asunto está abierto.
      +10  el asunto se creó o se movió en los últimos 30 días.
+     +50  (fila 88, 21-sep-2026) el lector ya ha reconocido el tercero
+          del documento, y es el mismo que el del asunto.
+     +10  (fila 88) el lector ya ha reconocido el tipo, y es el mismo
+          que el del asunto.
 
    Se enseñan los que pasen de 40 puntos, como mucho cinco. */
 
@@ -190,14 +194,30 @@ App.palabrasDelSuelto = function (nombre) {
     .filter(function (p) { return p.length >= 4; });
 };
 
+/* Fila 88, 21-sep-2026, docs/POR-CLASIFICAR-ASUNTO-EXISTENTE.md, punto
+   8: si js/documentos-sueltos-lector.js ya tiene un resultado en caché
+   para este fichero (la pantalla de "Por clasificar" lo lee siempre
+   que puede), se suma a la puntuación de siempre, sin quitar nada:
+   +50 si el tercero leído es el del asunto, +10 si el tipo leído es
+   el del asunto. Así, en "Meter en un asunto", los asuntos del
+   tercero leído salen arriba en "Podrían encajar". Sin lector
+   cargado, o sin resultado todavía (o sin nada que proponer), la
+   puntuación es la de siempre. */
 App.parecidoDelSuelto = function (nombre) {
   var E = window.ElegirAsunto;
   var palabras = App.palabrasDelSuelto(nombre);
   var texto = U.normalizar(nombre);
+  var leido = window.LectorDeSueltos && window.LectorDeSueltos.resultadoDe(nombre);
+  var S = window.SugerenciasAsuntoExistente;
   return E.mejores(E.todos().map(function (x) {
     var puntos = E.puntosPorPalabras(palabras, x.nombre);
     if (E.terceroDentroDe(x.ficha, texto)) puntos += 40;
     puntos += E.puntosDeBase(x.nombre, x.ficha);
+    if (leido) {
+      if (leido.tercero && x.ficha.categoria === leido.tercero.categoria && S &&
+          S.esDelMismoTercero(leido.tercero, x.ficha.tercero)) puntos += 50;
+      if (leido.tipo && x.ficha.tipo === leido.tipo.tipo) puntos += 10;
+    }
     return { nombre: x.nombre, ficha: x.ficha, puntos: puntos };
   }));
 };
@@ -216,6 +236,20 @@ App.meterSueltoEnAsunto = async function (s) {
     sugeridos: sugeridos
   });
   if (!elegido) return;
+  await App.meterSueltoEnAsuntoElegido(s, elegido);
+};
+
+/* El traslado propiamente dicho, una vez que ya se sabe a qué asunto
+   ({nombre, ficha}): si está archivado, pregunta si reabrir antes de
+   meterlo (App.llevarSueltoA, más abajo). Es lo que hace
+   App.meterSueltoEnAsunto tras "Meter en un asunto", pero se saca
+   aparte (21-sep-2026, fila 88, docs/POR-CLASIFICAR-ASUNTO-
+   EXISTENTE.md) porque "Meter aquí", el botón de la sugerencia que
+   pinta js/documentos-sueltos-sugerencias.js, ya sabe a qué asunto va
+   sin pasar por el cuadro de elegir: necesita el mismo camino, sin
+   repetirlo. */
+App.meterSueltoEnAsuntoElegido = async function (s, elegido) {
+  var E = window.ElegirAsunto;
 
   if (!E.estaArchivado(elegido.ficha)) {
     await App.llevarSueltoA(s, elegido.nombre, elegido.ficha);
