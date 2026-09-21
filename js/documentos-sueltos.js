@@ -78,6 +78,11 @@ App.tarjetaSuelto = function (s, pie, esNuevo) {
   div.className = 'tarjeta tarjeta-suelto' + (esNuevo ? ' tarjeta-nueva' : '') +
                    (abierta ? ' tarjeta-abierta' : '');
   div.dataset.suelto = s.nombre;
+  div.title = 'Pulsa para verlo al lado del programa';
+  div.onclick = function (ev) {
+    if (ev.target.closest('button, a, input, select, textarea, label, .acciones')) return;
+    App.abrirSuelto(s);
+  };
   var ext = Nombres.extensionDe(s.nombre);
   div.innerHTML = App.ICONO_DOCUMENTO +
     '<div class="tarjeta-texto">' +

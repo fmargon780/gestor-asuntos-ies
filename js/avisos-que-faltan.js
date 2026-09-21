@@ -41,6 +41,40 @@
     return window.FichasHuerfanas ? FichasHuerfanas.calcular() : Promise.resolve([]);
   }
 
+  /* Ocultar el aviso 7 días (20-sep-2026, fila 86,
+     docs/PULSAR-PARA-ABRIR-Y-AVISO-OCULTABLE.md): preferencia de quien
+     está delante del ordenador, así que va en localStorage, no en
+     `_GESTOR`. Se guarda también cuántas fichas había: si aparecen más
+     antes de que pasen los 7 días, el aviso vuelve. */
+  var CLAVE_HUERFANAS_CALLADO = 'aviso-huerfanas-callado';
+  var DIAS_HUERFANAS_CALLADO = 7;
+
+  function guardadoHuerfanas() {
+    try {
+      var v = JSON.parse(window.localStorage.getItem(CLAVE_HUERFANAS_CALLADO));
+      if (!v || typeof v.hasta !== 'string' || typeof v.n !== 'number') return null;
+      return v;
+    } catch (e) { return null; }
+  }
+
+  function callarHuerfanas(n) {
+    try {
+      window.localStorage.setItem(CLAVE_HUERFANAS_CALLADO, JSON.stringify({
+        hasta: new Date(Date.now() + DIAS_HUERFANAS_CALLADO * 86400000).toISOString(),
+        n: n
+      }));
+    } catch (e) { /* si el navegador no deja guardarlo, el aviso sale siempre */ }
+  }
+
+  /* Sin pantalla, para poder probarla sola: dado cuántas fichas hay
+     ahora y lo que hay guardado (o null si no hay nada, o está
+     corrupto), dice si el aviso tiene que salir. */
+  function sePintaHuerfanas(nAhora, guardado) {
+    if (!guardado) return true;
+    if (nAhora > guardado.n) return true;
+    return Date.now() >= new Date(guardado.hasta).getTime();
+  }
+
   /* ---------- 3. la papelera vieja ---------- */
 
   function bytesLegibles(n) {
@@ -82,7 +116,9 @@
     var c = caja('panel-huerfanas');
     if (!c) return;
     var huerfanas = await calcularHuerfanas();
-    if (!huerfanas.length) { c.className = 'oculto'; c.innerHTML = ''; return; }
+    if (!huerfanas.length || !sePintaHuerfanas(huerfanas.length, guardadoHuerfanas())) {
+      c.className = 'oculto'; c.innerHTML = ''; return;
+    }
 
     c.className = 'aviso aviso-ambar';
     c.innerHTML = '<strong>Hay ' + huerfanas.length +
@@ -93,6 +129,18 @@
     btn.textContent = 'Verlas';
     btn.onclick = function () { irAMantenimiento('bloque-huerfanas'); };
     c.appendChild(btn);
+
+    var cerrar = document.createElement('button');
+    cerrar.type = 'button';
+    cerrar.className = 'boton';
+    cerrar.title = 'Ocultar este aviso durante 7 días';
+    cerrar.textContent = '✕';
+    cerrar.onclick = function () {
+      callarHuerfanas(huerfanas.length);
+      c.className = 'oculto';
+      c.innerHTML = '';
+    };
+    c.appendChild(cerrar);
   }
 
   async function pintarPapeleraVieja() {
@@ -131,6 +179,7 @@
     /* para las pruebas */
     _calcularHuerfanas: calcularHuerfanas,
     _calcularPapeleraVieja: calcularPapeleraVieja,
-    _bytesLegibles: bytesLegibles
+    _bytesLegibles: bytesLegibles,
+    _sePintaHuerfanas: sePintaHuerfanas
   };
 })();

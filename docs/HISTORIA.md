@@ -5,6 +5,56 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 21-sep-2026 — Fila 86: pulsar la tarjeta de un documento la abre, y el aviso de huérfanas se calla 7 días
+
+`docs/PULSAR-PARA-ABRIR-Y-AVISO-OCULTABLE.md`. Dos cambios, en una sola fila.
+
+**1. Pulsar para abrir**, en toda la aplicación:
+
+- `js/documentos-sueltos.js` ("Por clasificar"): la tarjeta entera llama a `App.abrirSuelto(s)`
+  (que `js/visor.js` ya convierte en `Visor.abrir` con su marcador, como hacía el botón "Abrir").
+- `js/documentos.js` (el cuadro "Documentos ▾"): no tiene panel de la derecha —es un cuadro modal
+  con su propio visor a la izquierda—, así que pulsar la fila abre el mismo formulario que "Poner
+  nombre", que ya enseña el documento mientras se rellenan los campos.
+- `js/bandeja-pantalla.js` (bandeja de Gmail): solo si el correo trae su PDF, la tarjeta entera
+  hace lo mismo que el botón "Leer el correo".
+- `js/papelera.js`: un documento (o un suelto) se puede ver sin sacarlo de la papelera, resolviendo
+  el handle igual que ya hace `devolverDocumento` (`carpetaPapelera()` →
+  `getDirectoryHandle(ficha.carpeta)` → `getFileHandle(ficha.nombre)`).
+- `js/ficha-documentos.js` ya cumplía (el nombre ya era un botón), y con él el ARCHIVO, que
+  reutiliza esa misma pieza. `js/duplicados.js` no se toca: enseña carpetas de asuntos, no
+  documentos.
+
+Guardia común en los cuatro sitios tocados: `ev.target.closest('button, a, input, select,
+textarea, label, .acciones')` antes de abrir nada, para que ningún botón de la fila —ni el menú de
+tres puntos— dispare una apertura doble.
+
+**2. El aviso de "fichas sin carpeta"** gana una ✕ (`js/avisos-que-faltan.js`) que lo calla 7 días.
+Se guarda en `localStorage` (clave `aviso-huerfanas-callado`, nunca en `_GESTOR`: es una
+preferencia de quien está delante del ordenador, no un dato del centro), con hasta cuándo calla y
+cuántas fichas había al ocultarlo: si aparecen más antes de que pasen los 7 días, el aviso vuelve
+solo. La decisión de pintar o no sale de una función sin pantalla, `sePintaHuerfanas(nAhora,
+guardado)`, expuesta en `window.AvisosQueFaltan._sePintaHuerfanas` para poder probarla sola. El
+aviso de la papelera vieja se queda sin ✕: la única salida sigue siendo decidir, porque son datos
+de menores.
+
+Pruebas ampliadas: `pruebas/documentos-sueltos.mjs` (test 7: pulsar la tarjeta abre el visor, y el
+menú de tres puntos no lo hace) y `pruebas/avisos-que-faltan.mjs` (los cinco casos del callado:
+sin nada guardado, recién ocultado, a los 3 días, a los 8 días, y con una ficha más). Batería
+completa en verde, una sola pasada al final. Versión publicada `App.VERSION`: `21-sep-2026 ·
+04:20`.
+
+## 21-sep-2026 — Fila 85: las dos direcciones corregidas, fila cerrada
+
+`datos/formularios.json`: la clave `u` de `O11:VI` y `O11:VII` pasa de
+`https://www.juntadeandalucia.es/boja/2011/132/1` (la página web del BOJA, no un PDF) a
+`https://www.juntadeandalucia.es/boja/2011/132/d1.pdf` (el PDF de verdad), como pedía el
+documento. Las otras nueve direcciones del fichero y las cuatro entradas `via:"protocolo"`
+(`O11:I` a `O11:IV`) no se tocan. Cierra la fila 85, bloqueada el 20-sep-2026 por falta de salida
+a internet y ya resuelta en cuanto a los PDF: Francisco los subió a mano a `formularios/`
+(`docs/FORMULARIOS-DESDE-EL-ZIP.md`), solo quedaban estas dos direcciones por corregir en el
+JSON. Con esta fila y la 86, `docs/COLA.md` vuelve a quedar sin ninguna PENDIENTE.
+
 ## 21-sep-2026 — Fila 87: que el enlace de la normativa abra el artículo, no el bloque entero
 
 `docs/ENLACE-AL-ARTICULO-DE-NORMATIVA.md`. Francisco pulsó la cita de un artículo en el bloque

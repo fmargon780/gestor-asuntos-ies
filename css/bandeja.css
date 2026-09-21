@@ -16,6 +16,8 @@
 .tarjeta-correo .tarjeta-icono { color: #5b3fa0; }
 .tarjeta-correo .propuesta-correo { margin-top: 5px; }
 .tarjeta-correo .marca-tipo { background: #f0eafb; color: #5b3fa0; }
+.tarjeta-correo-pulsable { cursor: pointer; }
+.tarjeta-correo-pulsable:hover { background: var(--azul-claro); border-color: var(--azul); }
 
 #aviso-correo-pendiente .boton { margin-top: 10px; }
 

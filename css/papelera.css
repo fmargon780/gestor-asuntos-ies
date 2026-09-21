@@ -10,6 +10,8 @@
   align-items: flex-start;
   gap: 14px;
 }
+.fila-papelera-pulsable { cursor: pointer; }
+.fila-papelera-pulsable:hover { background: var(--azul-claro); border-color: var(--azul); }
 
 .papelera-icono {
   font-size: 18px;

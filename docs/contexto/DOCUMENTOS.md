@@ -139,6 +139,36 @@ se cierra solo si el documento ya no está en "Por clasificar".
 
 Se comprueba con `pruebas/documento-a-la-vista.mjs`.
 
+### Pulsar la tarjeta de un documento lo abre (20-sep-2026, fila 86)
+
+En toda lista de la aplicación que enseñe un documento por su nombre, pulsar sobre la fila lo
+abre, sin pasar por ningún botón:
+
+- **"Por clasificar"** (`js/documentos-sueltos.js`, `App.tarjetaSuelto`): el `div` de la tarjeta
+  lleva `onclick` a `App.abrirSuelto(s)` (que `js/visor.js` convierte en `Visor.abrir` con su
+  marcador, como ya hacía el botón "Abrir" del menú). `.tarjeta-suelto` lleva `cursor: pointer` y
+  el mismo realce que ya usa `.ficha-documento` al pasar por encima.
+- **El cuadro "Documentos ▾"** (`js/documentos.js`, `pintarLista`): este cuadro no tiene panel de
+  la derecha (es un cuadro modal con su propio visor a la izquierda), así que pulsar la fila
+  abre el mismo formulario que "Poner nombre" (`pintarFormulario({modo:'renombrar', ...})`), que
+  ya enseña el documento mientras se rellenan los campos.
+- **La bandeja de correos** (`js/bandeja-pantalla.js`, `tarjeta(item)`): solo cuando el correo
+  trae su PDF (`d.pdf || d.pdfMensaje`) y hay `window.Lector`, la tarjeta entera hace lo mismo que
+  el botón "Leer el correo" (clase `tarjeta-correo-pulsable`, `css/bandeja.css`).
+- **La papelera** (`js/papelera.js`, `filaDePapelera`): un documento (`clase: 'documento'` o
+  `'suelto'`) se puede ver sin sacarlo de la papelera, resolviendo el handle igual que hace
+  `devolverDocumento` (`carpetaPapelera()` → `getDirectoryHandle(ficha.carpeta)` →
+  `getFileHandle(ficha.nombre)`) y llamando a `Visor.abrir`. Clase `fila-papelera-pulsable`.
+- **`js/ficha-documentos.js` ya cumplía** (el nombre es un `<button>` que llama a
+  `abrirDocumento`), y por tanto también el ARCHIVO, que reutiliza esa misma pieza.
+- **No se toca**: `js/duplicados.js` (enseña carpetas de asuntos, no documentos).
+
+La condición que no se puede romper en todos los casos: el `onclick` de la fila comprueba
+`ev.target.closest('button, a, input, select, textarea, label, .acciones')` antes de abrir nada,
+así que ningún botón de la propia fila (ni el menú de tres puntos) dispara una apertura doble.
+
+Se comprueba con `pruebas/documentos-sueltos.mjs` (test 7).
+
 ### Leer los documentos que entran en "Por clasificar" (17-sep-2026, fila 41,
 ### docs/LEER-DOCUMENTOS-POR-CLASIFICAR.md)
 

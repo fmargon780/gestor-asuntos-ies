@@ -24,7 +24,12 @@ En Gmail, la etiqueta `GESTOR` en un correo lo pone a disposición: un script de
 recoge cada 5 minutos y deja su ficha, el hilo en PDF y los adjuntos en la carpeta
 `GESTOR-BANDEJA` de Drive. La aplicación lee esa carpeta y propone tercero, tipo y fecha.
 "Leer el correo" abre el PDF del hilo en el panel de la derecha. **Gmail no se deja meter dentro
-de otra página.** Cada usuario tiene su propia bandeja.
+de otra página.** Cada usuario tiene su propia bandeja. Desde el 20-sep-2026 (fila 86), si el
+correo trae su PDF, pulsar la tarjeta entera hace lo mismo que ese botón (clase
+`tarjeta-correo-pulsable`, `css/bandeja.css`, guardia de botones igual que en "Por clasificar":
+ver `docs/contexto/DOCUMENTOS.md`). Los adjuntos sueltos del correo no se enseñan por su nombre en
+ningún sitio (solo entran, ya leídos, en la línea "Del documento" de la propuesta), así que no
+hay nada más que pulsar ahí.
 
 **En pantalla** (desde el 17-sep-2026, fila 27, `docs/CORREOS-DENTRO-DE-POR-CLASIFICAR.md`) vive
 dentro de "Por clasificar" (`#zona-clasificar`, encima de `#lista-sueltos`), detrás de una barra

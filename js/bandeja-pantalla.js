@@ -294,6 +294,16 @@ var BandejaPantalla = (function () {
       leer.textContent = 'Leer el correo';
       leer.onclick = function () { window.Bandeja.leerElCorreo(d); };
       acciones.appendChild(leer);
+
+      /* Pulsar la tarjeta, igual que "Leer el correo" (17-sep-2026,
+         fila 86): el PDF del hilo ya está en disco, así que se puede
+         enseñar sin pasar por el botón. */
+      div.classList.add('tarjeta-correo-pulsable');
+      div.title = 'Pulsa para leer el correo al lado del programa';
+      div.onclick = function (ev) {
+        if (ev.target.closest('button, a, input, select, textarea, label, .acciones')) return;
+        window.Bandeja.leerElCorreo(d);
+      };
     }
 
     if (d.enlace) {

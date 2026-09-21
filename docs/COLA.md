@@ -86,19 +86,17 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 62, 64 a 75, 77 a 84 y 87 están **HECHAS**. Sus documentos siguen en `docs/`, y el
-detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
+Las filas 1 a 62, 64 a 75, 77 a 84, 85, 86 y 87 están **HECHAS**. Sus documentos siguen en
+`docs/`, y el detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 85 | Corregir 2 direcciones en `datos/formularios.json` y cerrar la fila | PENDIENTE (20-sep-2026): los once PDF ya están en `formularios/`, comprobados uno a uno y subidos a mano por Francisco (detalle completo en `docs/FORMULARIOS-DESDE-EL-ZIP.md`, con la tabla de tamaños para verificarlos). Solo queda: 1) en `datos/formularios.json`, cambiar la clave `u` de las entradas `O11:VI` y `O11:VII` (las únicas dos con clave `f`, es decir, con PDF descargable) de `https://www.juntadeandalucia.es/boja/2011/132/1` (una página web, no un PDF) a `https://www.juntadeandalucia.es/boja/2011/132/d1.pdf` (el PDF de verdad); las entradas `O11:I`, `O11:II`, `O11:III` y `O11:IV` (`via:"protocolo"`) se quedan como están, y las otras nueve direcciones del fichero no se tocan. 2) Marcar esta fila HECHA con la fecha, y añadir la línea que toque en `docs/HISTORIA.md`. No tocar ningún otro fichero de código ni ninguna prueba. |
-| 86 | `docs/PULSAR-PARA-ABRIR-Y-AVISO-OCULTABLE.md` | PENDIENTE (20-sep-2026): dos cosas pequeñas e independientes, en una sola fila para gastar una sola tanda de subidas. (1) Pulsar sobre la tarjeta de un documento lo abre en el visor de la derecha, en "Por clasificar" y en cualquier otra lista de documentos de la aplicación; los botones de la fila siguen haciendo lo suyo. (2) El aviso de fichas sin carpeta gana una ✕ que lo calla 7 días, salvo que aparezcan más fichas. Detalle completo, con la tabla de sitios que hay que comprobar, en `docs/PULSAR-PARA-ABRIR-Y-AVISO-OCULTABLE.md` |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
-**Orden de trabajo: la 85 primero, después la 86.** La 63 y la 76 siguen BLOQUEADAS y no se
-retoman sin que Francisco lo diga. La tabla está en orden de trabajo, no de número: coge siempre
-la primera PENDIENTE **de arriba abajo**.
+**No queda ninguna PENDIENTE.** La 63 y la 76 siguen BLOQUEADAS y no se retoman sin que Francisco
+lo diga. La tabla está en orden de trabajo, no de número: coge siempre la primera PENDIENTE
+**de arriba abajo**.
 
 **Ninguna fila se sube junto con otra.** Cada una, su subida.
 

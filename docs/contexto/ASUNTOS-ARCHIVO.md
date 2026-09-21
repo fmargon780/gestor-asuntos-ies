@@ -235,4 +235,17 @@ línea junto a `#panel-avisos`/`#panel-frescura` en "Asuntos abiertos" que lleva
 siempre en Ajustes → Mantenimiento; antes solo se veía entrando a propósito ahí. Se repinta al
 envolver `App.verAbiertos`, no en cada tecla del buscador.
 
+**Se puede callar 7 días** (20-sep-2026, fila 86,
+`docs/PULSAR-PARA-ABRIR-Y-AVISO-OCULTABLE.md`). A la derecha del botón "Verlas", una ✕ con
+`title` "Ocultar este aviso durante 7 días". Al pulsarla se guarda en `localStorage` (nunca en
+`_GESTOR`: es del ordenador, no del centro), clave `aviso-huerfanas-callado`, un JSON
+`{hasta, n}` con el momento hasta el que calla y cuántas fichas había. La decisión de pintar o no
+vive en una función sin pantalla, `sePintaHuerfanas(nAhora, guardado)`
+(`window.AvisosQueFaltan._sePintaHuerfanas`, para las pruebas): sin nada guardado, o corrupto,
+sale; si `nAhora` es mayor que lo guardado (han aparecido más fichas), sale igual aunque no hayan
+pasado los 7 días; si no, sale solo cuando `Date.now()` ya ha pasado de `hasta`. Como cualquier
+`localStorage` de esta aplicación, dentro de `try/catch`: si el navegador no deja, el aviso sale
+siempre. **El aviso de la papelera vieja se queda sin ✕**: la única salida de ahí sigue siendo
+decidir, porque son datos de menores. Prueba: `pruebas/avisos-que-faltan.mjs`.
+
 ---
