@@ -120,7 +120,14 @@ hacer una página de ayuda `herramientas/conectar-dropbox.html` (se publica en l
 4. y le dice exactamente dónde pegarlo en GitHub (enlace directo a
    `https://github.com/fmargon780/gestor-asuntos-ies/settings/secrets/actions/new`).
 
-Esa página se usa desde casa (en el instituto la web está bloqueada). Añadir su dirección de
+**Quién da el permiso.** Lo tiene que dar alguien con la sesión abierta en la cuenta de Dropbox
+del centro (la que usan los ordenadores del instituto). Francisco **no tiene la contraseña**. La
+guía debe decir, en la primera línea, que ese paso lo hace quien tenga la contraseña (dirección o
+secretaría), escribiéndola él mismo en la página de Dropbox, en dos minutos, **en el móvil de Francisco** cuando Dropbox pida entrar (con datos: en la red del instituto la página de ayuda está bloqueada; Dropbox no guarda la contraseña en el móvil si se elige no recordarla). El permiso solo
+alcanza a una carpeta propia. Todo lo demás lo hace Francisco. Los ordenadores del centro **no necesitan nada**: su Dropbox ya está
+abierto y solo recibe los ficheros.
+
+Esa página tiene que verse bien en un móvil. Añadir su dirección de
 vuelta en las instrucciones de creación de la aplicación de Dropbox (Redirect URI:
 `https://asuntos.fmargon.com/herramientas/conectar-dropbox.html`). Si `herramientas/` no se
 publica en Vercel, poner la página en otra ruta que sí se publique.
