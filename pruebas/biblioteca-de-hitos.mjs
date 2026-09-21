@@ -206,17 +206,23 @@ comprobar('cambiar solo la marca no cuenta como diferencia',
 
 /* ================= 8 · el enlace de una referencia ================= */
 console.log('--- 8. el enlace de una referencia de normativa ---');
-const BASE = 'https://normativa-escolarizacion.vercel.app';
-comprobar('con bloque y clave, se monta contra el sistema de normativa',
-  HitosBiblioteca.enlaceDeNormativa({ cita: 'x', bloque: 'convivencia', clave: 'ROC-40.1', url: '' }, BASE),
-  'https://normativa-escolarizacion.vercel.app/convivencia#r=ROC-40.1');
-comprobar('con solo url, usa la url',
+const BASE = 'https://normativa.fmargon.com';
+comprobar('con clave y dirección base, abre la vista de un solo artículo',
+  HitosBiblioteca.enlaceDeNormativa({ cita: 'x', bloque: '', clave: 'ROC-40', url: '' }, BASE),
+  'https://normativa.fmargon.com/norma#r=ROC-40');
+comprobar('con clave, dirección base y bloque, el bloque no cambia nada',
+  HitosBiblioteca.enlaceDeNormativa({ cita: 'x', bloque: 'convivencia', clave: 'ROC-40', url: '' }, BASE),
+  'https://normativa.fmargon.com/norma#r=ROC-40');
+comprobar('con una dirección base que ya termina en /norma, sin /norma/norma',
+  HitosBiblioteca.enlaceDeNormativa({ cita: 'x', bloque: '', clave: 'ROC-40', url: '' }, BASE + '/norma'),
+  'https://normativa.fmargon.com/norma#r=ROC-40');
+comprobar('sin clave y con url, usa la url tal cual',
   HitosBiblioteca.enlaceDeNormativa({ cita: 'x', bloque: '', clave: '', url: 'https://boe.es/algo' }, BASE),
   'https://boe.es/algo');
-comprobar('sin nada, no hay enlace',
+comprobar('sin clave y sin url, no hay enlace',
   HitosBiblioteca.enlaceDeNormativa({ cita: 'x', bloque: '', clave: '', url: '' }, BASE), '');
-comprobar('con la dirección base vacía, tampoco hay enlace aunque haya bloque y clave',
-  HitosBiblioteca.enlaceDeNormativa({ cita: 'x', bloque: 'convivencia', clave: 'ROC-40.1', url: '' }, ''), '');
+comprobar('con clave pero con la dirección base vacía, tampoco hay enlace',
+  HitosBiblioteca.enlaceDeNormativa({ cita: 'x', bloque: '', clave: 'ROC-40', url: '' }, ''), '');
 
 /* ================= 9 · un espacio en la clave se guarda como guion ================= */
 console.log('--- 9. un espacio en la clave se guarda como guion ---');

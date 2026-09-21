@@ -60,7 +60,7 @@ var HitosNormativa = (function () {
 
   function opcionesBloqueHTML(actual) {
     var bloques = (window.HitosBiblioteca && HitosBiblioteca.BLOQUES_NORMATIVA) || [];
-    return '<option value="">(sin bloque: solo texto, o enlace propio)</option>' +
+    return '<option value="">(sin bloque)</option>' +
       bloques.map(function (b) {
         return '<option value="' + U.escapar(b.clave) + '"' + (b.clave === actual ? ' selected' : '') +
           '>' + U.escapar(b.nombre) + '</option>';
@@ -69,15 +69,22 @@ var HitosNormativa = (function () {
 
   /* ---------- el editor ---------- */
 
+  /* Fila 87, docs/ENLACE-AL-ARTICULO-DE-NORMATIVA.md: aviso suave,
+     nunca un bloqueo, cuando la clave escrita lleva un punto (apartado
+     en vez de artículo entero). */
+  function claveConApartado(clave) { return /\./.test(clave || ''); }
+
   function filaEditorHTML(r) {
     return '<div class="normativa-fila" data-id="' + U.escapar(r.id) + '">' +
       '<input class="campo normativa-cita" value="' + U.escapar(r.cita) +
         '" placeholder="Cita: Decreto 327/2010, art. 40.1">' +
       '<select class="campo normativa-bloque">' + opcionesBloqueHTML(r.bloque) + '</select>' +
-      '<input class="campo normativa-clave" value="' + U.escapar(r.clave) + '" placeholder="Clave: ROC-40.1">' +
+      '<input class="campo normativa-clave" value="' + U.escapar(r.clave) + '" placeholder="Clave: ROC-40">' +
       '<input class="campo normativa-url" value="' + U.escapar(r.url) +
         '" placeholder="O un enlace directo, si no está en el sistema de normativa">' +
       '<button type="button" class="boton boton-peligro normativa-quitar" title="Quitar la referencia">✕</button>' +
+      '<span class="normativa-aviso-clave"' + (claveConApartado(r.clave) ? '' : ' hidden') + '>' +
+        'Las claves son de artículo entero: prueba con <code>ROC-40</code>.</span>' +
       '</div>';
   }
 
@@ -92,6 +99,8 @@ var HitosNormativa = (function () {
       '<summary>Normativa' + (lista.length ? ' (' + lista.length + ')' : '') + '</summary>' +
       '<div class="normativa-lista">' + lista.map(filaEditorHTML).join('') + '</div>' +
       '<button type="button" class="boton boton-ancho normativa-anadir">+ Añadir referencia</button>' +
+      '<p class="normativa-ayuda nota">La clave es del artículo entero, sin apartado: ROC-40, ' +
+        'no ROC-40.1.</p>' +
       (formulariosHTML || '') +
       '</details>';
   }
@@ -131,6 +140,12 @@ var HitosNormativa = (function () {
       if (quitar) quitar.onclick = function () {
         alCambiar(function (lista) { lista.splice(idx, 1); });
       };
+
+      var clave = fila.querySelector('.normativa-clave');
+      var aviso = fila.querySelector('.normativa-aviso-clave');
+      if (clave && aviso) {
+        clave.oninput = function () { aviso.hidden = !claveConApartado(clave.value); };
+      }
     });
   }
 

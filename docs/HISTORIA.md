@@ -5,6 +5,47 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 21-sep-2026 — Fila 87: que el enlace de la normativa abra el artículo, no el bloque entero
+
+`docs/ENLACE-AL-ARTICULO-DE-NORMATIVA.md`. Francisco pulsó la cita de un artículo en el bloque
+"Normativa" de un hito y la aplicación le llevó a la página entera del bloque, sin abrir el
+artículo. Tres causas, comprobadas contra la web publicada:
+
+1. **La página limpia del artículo no estaba publicada** en `fmargon780/normativa-escolarizacion`
+   (fusionada en `main` de aquel repositorio pero sin relanzar la publicación de Vercel). Ya
+   resuelto por Francisco el propio 21-sep-2026, fuera de este repositorio: **un `main` fusionado
+   no significa publicado**, hay que comprobarlo siempre.
+2. **El Gestor enlazaba al bloque, no al artículo.** `HitosBiblioteca.enlaceDeNormativa`
+   (`js/hitos-biblioteca.js`) montaba `<base>/<bloque>#r=<clave>`; ahora monta
+   `<base>/norma#r=<clave>`, la vista de un solo artículo que pide `docs/ENLACE-POR-ARTICULO.md` de
+   aquel repositorio. El bloque deja de intervenir en el enlace (sigue guardado, solo para saber
+   dónde vive el artículo): la condición pasa de `bloque && clave && base` a `clave && base`. A
+   `direccionBase` se le quita la barra final y, si lo llevara ya, un `/norma` final, para que no
+   salga `/norma/norma`. La clave va por `encodeURIComponent`.
+3. **La clave de ejemplo inducía a error**: `ROC-40.1` (con apartado) en vez de `ROC-40` (artículo
+   entero, la única forma que la vista de un solo artículo sabe abrir). `js/hitos-normativa.js`
+   cambia el marcador de posición, añade una línea de ayuda fija bajo la lista de referencias y un
+   aviso suave por fila (nunca bloquea, nunca cambia lo escrito) cuando la clave tecleada lleva un
+   punto. El desplegable de bloques pierde su frase "o enlace propio": ya no hace falta un bloque
+   para que el enlace funcione.
+
+También se retocó el texto de ayuda del campo "Dirección del sistema de normativa"
+(`js/plantillas-ajustes.js`, montado por JS para no tocar `index.html`, que sigue siendo el dueño
+de ese campo): la dirección exacta a escribir, `https://normativa.fmargon.com`, y el aviso de que
+la red del instituto bloquea las direcciones `vercel.app`. Ningún valor guardado cambia, solo el
+texto.
+
+`pruebas/biblioteca-de-hitos.mjs`, apartado 8, reescrito con las seis comprobaciones del encargo
+(clave sola, clave con bloque —mismo resultado—, base ya terminada en `/norma`, solo `url`, nada,
+clave con base vacía). El apartado 9 (el espacio de la clave, guardado como guion) se queda como
+estaba.
+
+Esta sesión no tiene salida a internet a dominios fuera de la lista permitida (mismo motivo que las
+filas 63 y 85): no ha podido comprobar con `curl`/`WebFetch` que
+`https://normativa.fmargon.com/normas/ROC.json` responda 200 con la clave `ROC-40`. El código de
+aquí queda igualmente correcto y probado con `npm test`; falta esa comprobación externa, para
+quien la pueda hacer.
+
 ## 20-sep-2026 — Fila 85: bloqueada, sin salida a internet
 
 `docs/COLA.md` pedía copiar a `formularios/` los once PDF en blanco que la fila 84 no pudo bajar
