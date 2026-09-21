@@ -531,9 +531,7 @@
   var URL_INDICE_PLANTILLAS = 'plantillas/indice.json';
 
   async function cargarPlantillasDelCentro() {
-    var resp = await fetch(URL_INDICE_PLANTILLAS);
-    if (!resp.ok) throw new Error('no encuentro ' + URL_INDICE_PLANTILLAS + ' (' + resp.status + ')');
-    var indice = await resp.json();
+    var indice = await App.leerFicheroDeLaApp(URL_INDICE_PLANTILLAS, 'json');
 
     var actual = await Plantillas.cargar(App.E.gestor);
     var yaDocumento = {};
@@ -550,9 +548,9 @@
 
       if (e.clase === 'documento') {
         if (yaDocumento[clave]) { documentosYaEstaban++; continue; }
-        var respDocx = await fetch('plantillas/' + e.fichero);
-        if (!respDocx.ok) continue;   /* no debería pasar; se salta sin romper las demás */
-        var bytes = new Uint8Array(await respDocx.arrayBuffer());
+        var bytes;
+        try { bytes = await App.leerFicheroDeLaApp('plantillas/' + e.fichero, 'binario'); }
+        catch (err) { continue; }   /* no debería pasar; se salta sin romper las demás */
         var carpeta = await carpetaDePlantillas();
         await Carpetas.escribirBytes(carpeta, e.fichero, bytes);
         nuevosDocumentos.push({

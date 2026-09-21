@@ -59,7 +59,7 @@ de `App` va después del fichero que lo define.
 | `js/ajustes-tipo-palabras-clave.js` | La sección "Palabras clave" de la pantalla de un tipo: `palabrasClave` en `tipos.json` (17-sep-2026, fila 41) |
 | `js/ajustes-centro.js` | La pestaña "El centro" de Ajustes: estados, tipos de documento, campos propios, grupos, ficheros de datos, abreviatura de grupos (17-sep-2026, fila 39) |
 | `js/ajustes-mantenimiento.js` | La pestaña "Mantenimiento" de Ajustes: avisos de vencimiento, carpetas de este ordenador, copias y papelera (17-sep-2026, fila 39) |
-| `js/cargar-biblioteca.js` | El botón "Cargar la biblioteca del centro" (fila 80, 20-sep-2026), en Ajustes → Mantenimiento: lee `datos-biblioteca/biblioteca-centro.json` con `fetch` y lo fusiona con `tipos.json`, `campos.json`, `hitos-biblioteca.json` y `guias.json`, sin pisar nada ya escrito |
+| `js/cargar-biblioteca.js` | El botón "Cargar la biblioteca del centro" (fila 80, 20-sep-2026), en Ajustes → Mantenimiento: lee `datos-biblioteca/biblioteca-centro.json` con `App.leerFicheroDeLaApp` (fila 89: antes `fetch` directo) y lo fusiona con `tipos.json`, `campos.json`, `hitos-biblioteca.json` y `guias.json`, sin pisar nada ya escrito |
 | `herramientas/cargar-biblioteca.mjs` | Programa de una sola vez (fila 80): lee `docs/contenido/BIBLIOTECA-*.md` y genera `datos-biblioteca/biblioteca-centro.json`. Se ejecuta a mano con Node cuando el contenido cambie; no lo carga `index.html` |
 | `datos-biblioteca/biblioteca-centro.json` | El contenido generado de la biblioteca del centro (fila 80): tipos, campos y hitos modelo, listo para que `js/cargar-biblioteca.js` lo fusione |
 | `js/puente.js` | El enganche de los módulos que se añaden por fuera (`window.Gestor`) |
@@ -73,6 +73,8 @@ de `App` va después del fichero que lo define.
 | `js/presencia.js` | No pisarse en un mismo asunto: la señal de `_GESTOR/presencia.json`, la vigilancia y la marca de la tarjeta de la lista |
 | `js/notas.js` | Las notas de cada asunto, con su enlace y su botón; `Notas.pintarEnFicha` es la caja de escribir directa de la ficha, con botón Guardar (se guarda al pulsarlo o al perder el foco, nunca al teclear, fila 58); `confirmarSalirDeFicha` avisa si se sale con algo sin guardar |
 | `js/registro.js` | Registrar un documento en un paso, sin nombrarlo dos veces |
+| `js/cargar-fichero.js` | `App.leerFicheroDeLaApp(ruta, tipo)` (fila 89, 21-sep-2026, docs/COPIA-SIN-INTERNET.md): lee un dato estático (JSON o binario) con `fetch` en `http(s)` y desde `copia-datos/*.js` en `file://` (la copia sin internet); `App.cargarPdfJs()`, compartida por `js/registro-lector.js`, `js/preparar-documento.js` y `js/pdf-separar-unir.js`, que en `file://` carga `js/lib/pdf.iife.js`/`pdf.worker.iife.js` con `<script>` en vez de `import()` |
+| `js/actualizar-copia.js` | Solo actúa si `location.protocol === 'file:'` (fila 89): al abrir la copia sin internet, compara `version.json` del disco con el de `raw.githubusercontent.com/fmargon780/gestor-asuntos-copia`, descarga solo lo que cambia (comprobando el sha256 de cada fichero) y recarga; sin internet, un aviso discreto y arranca igual |
 | `js/registro-lector.js` | Leer el número de registro del sello de Séneca, dentro del PDF (hasta 10 páginas); `textoDe` saca el texto de hasta 5 páginas sin buscar nada (17-sep-2026, fila 41) |
 | `js/lector-documentos.js` | `LectorDocumentos.analizar(texto, contexto)`, puro: propone tipo, fecha, documentos de identidad y tercero de un documento suelto (17-sep-2026, fila 41); si un documento de identidad no cuadra con nadie, también `terceroDesconocido` (fila 42) |
 | `js/registro-sellado.js` | Ver solo un PDF ya sellado en la carpeta del asunto, y colocarlo sin duplicarlo |
@@ -124,6 +126,8 @@ de `App` va después del fichero que lo define.
 | `plantillas/*.docx` | Los `.docx` generados de las plantillas de documento, por `scripts/hacer-plantillas.mjs` (fila 83). No se editan a mano: se cambia el `.md` y se vuelve a ejecutar el script |
 | `plantillas/indice.json` | La lista de todas las plantillas del centro, generada por el script, que lee `js/plantillas-documento.js` al pulsar "Cargar las plantillas del centro" (fila 83) |
 | `scripts/hacer-plantillas.mjs` | Convierte cada `plantillas/*.md` en su `.docx` y en su fila de `plantillas/indice.json`. Se ejecuta a mano; no en Vercel ni en las pruebas (fila 83) |
+| `scripts/copia-local.mjs` | Genera `copia-local/` (fila 89, 21-sep-2026, `npm run copia-local`): copia `index.html`/`css/`/`js/`/`favicon.svg`, construye `js/lib/pdf.iife.js` y `pdf.worker.iife.js` con esbuild, genera `copia-datos/*.js` (uno por cada JSON/PDF/`.docx` estático) y `version.json` (versión + sha256 de cada fichero); no copia `docs/`, `pruebas/`, `herramientas/`, `scripts/` ni `apps-script/` |
+| `scripts/plantillas-copia/ABRIR EL GESTOR.html` | Plantilla del instalador/actualizador autónomo (fila 89) que `scripts/copia-local.mjs` copia tal cual a `copia-local/ABRIR EL GESTOR.html`: elige la carpeta con `showDirectoryPicker`, descarga la copia de `raw.githubusercontent.com/fmargon780/gestor-asuntos-copia` y guarda el identificador de la carpeta en la misma IndexedDB que `js/almacen.js` |
 | `js/salir.js` | El botón de Salir del pie de la barra |
 | `js/rescate-datos.js` | Recoge los CSV que se hayan quedado un piso más arriba |
 | `js/traer-datos.js` | El botón de traer los CSV de Séneca desde donde estén |
@@ -143,7 +147,7 @@ de `App` va después del fichero que lo define.
 | `css/hitos.css` | El aspecto de la lista de hitos en la ficha del asunto, y del bloque de Ajustes |
 | `js/inicio.js` | La última línea: `App.arrancar()` |
 | `js/envolturas-esperadas.js` | El **último** `<script>` de todos (fila 70): compara `U.envolturasAplicadas()` con la lista de las 42 que tienen que estar, y avisa en rojo en la pantalla de entrada si falta alguna (`window.EnvolturasEsperadas`) |
-| `package.json` | Las dependencias de las pruebas (`playwright`, `jsdom`) y `npm test` |
+| `package.json` | Las dependencias de las pruebas (`playwright`, `jsdom`) y `npm test`; `esbuild` (fila 89) para `npm run copia-local` |
 | `pruebas/ejecutar.mjs` | Levanta el servidor local y ejecuta todas las pruebas de esta carpeta |
 | `.github/workflows/pruebas.yml` | Ejecuta `npm test` en cada subida y cada pull request a `main` |
 | `pruebas/logica.mjs` | Pruebas de la lógica, sin navegador |
@@ -183,6 +187,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/formularios.mjs` | Prueba (sin navegador) de `Formularios.buscar`/`etiquetaDeVia` (fila 82): por nombre y por norma, con tildes y sin ellas, texto vacío, las cuatro vías y una desconocida, un formulario sin `u` |
 | `pruebas/formularios-rellenar.mjs` | Prueba (sin navegador, con `vm` y pdf-lib, fila 84): las siete reglas de `proponerMapa`, que `rellenarPdf` solo cambia las casillas del mapa y las deja en solo lectura, y que un PDF sin formulario no rompe nada |
 | `pruebas/plantillas-del-centro.mjs` | Prueba (sin navegador) de las plantillas del centro (fila 83): `indice.json` cita ficheros que existen, el frontmatter de cada `.md` está completo, todo hueco usado está en el catálogo, cada `.docx` se puede releer, y `{{FORMULARIOS}}` vacío no deja una línea suelta |
+| `pruebas/copia-sin-internet.mjs` | Prueba (navegador de verdad, fila 89, 21-sep-2026): genera `copia-local/` y abre su `index.html` por `file://` (sin errores de consola, "copia sin internet" a la vista, la biblioteca y el catálogo de formularios cargan desde `copia-datos/`, un PDF de `formularios/` se abre con pdf.js, un `.docx` de `plantillas/` se lee); y `js/actualizar-copia.js` con un servidor de mentira: descarga solo lo cambiado y recarga, y arranca igual con un aviso si el servidor está apagado |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |
@@ -202,4 +207,8 @@ de `App` va después del fichero que lo define.
 | `docs/HITOS.md` | El encargo de los hitos de un asunto |
 | `docs/QUE-ME-TOCA.md` | El encargo de la pantalla "Qué me toca" |
 | `docs/PLANTILLAS-DE-DOCUMENTO.md` | El encargo de las plantillas de documento de Word por tipo |
+| `docs/COPIA-SIN-INTERNET.md` | El encargo de la copia sin internet (fila 89) |
+| `docs/copia-publica.yml.txt` | El contenido, listo para copiar, de la GitHub Action que publica la copia en `fmargon780/gestor-asuntos-copia` (fila 89). En texto plano porque esta sesión no puede crear el repositorio público ni tocar `.github/workflows/`; el destino real es `.github/workflows/copia-publica.yml` de **este** repositorio (dispara con cada `push` a `main`) |
+| `docs/CLAVE-COPIA-PUBLICA.md` | Pasos para Francisco (fila 89): crear el repositorio público, el token de grano fino y el secreto `COPIA_TOKEN` |
+| `docs/INSTALAR-COPIA.md` | Pasos para Francisco (fila 89): guardar `ABRIR EL GESTOR.html` en el Dropbox del centro y abrirlo |
 | `README.md` | — |

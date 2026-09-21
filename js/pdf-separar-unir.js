@@ -25,23 +25,13 @@ var PdfSepararUnir = (function () {
 
   /* ---------- pdf.js, para las miniaturas ----------
 
-     Mismo truco que js/registro-lector.js: si otro módulo ya lo ha
-     cargado (`window.pdfjsLib`), no se vuelve a traer. Desde la
-     versión 4.2.67 (fila 72, docs/DETALLES-DE-MANTENIMIENTO.md, punto
-     5) pdf.js solo se distribuye como módulo, así que se trae con
-     `import()` en vez de una etiqueta `<script>`. */
-  var cargandoPdfJs = null;
+     Carga compartida con js/registro-lector.js y
+     js/preparar-documento.js: `App.cargarPdfJs()`, en
+     js/cargar-fichero.js (fila 89 de docs/COLA.md), que en `http(s)`
+     usa `import()` y en `file://` (la copia sin internet) dos
+     `<script>` clásicos. */
   function cargarPdfJs() {
-    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
-    if (cargandoPdfJs) return cargandoPdfJs;
-    cargandoPdfJs = import('./lib/pdf.min.mjs').then(function (modulo) {
-      window.pdfjsLib = modulo;
-      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'js/lib/pdf.worker.min.mjs';
-      return window.pdfjsLib;
-    }, function () {
-      throw new Error('No se ha podido cargar pdf.js.');
-    });
-    return cargandoPdfJs;
+    return App.cargarPdfJs();
   }
 
   async function abrirConPdfJs(bytes) {

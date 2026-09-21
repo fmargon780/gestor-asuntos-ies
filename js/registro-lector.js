@@ -22,10 +22,11 @@
 
    Desde la 4.x, pdf.js solo se distribuye como módulo (.mjs): ya no
    hay un `pdf.min.js` de toda la vida que ponga `window.pdfjsLib` con
-   una simple etiqueta `<script>`. Por eso `cargarPdfJs()` usa
-   `import()`, que sí funciona desde un script normal (no hace falta
-   que este fichero sea un módulo), y es quien pone `window.pdfjsLib`
-   a mano al terminar.
+   una simple etiqueta `<script>`. Por eso, en `http(s)`,
+   `App.cargarPdfJs()` (js/cargar-fichero.js) usa `import()`, que sí
+   funciona desde un script normal; en `file://` (la copia sin
+   internet, fila 89) usa en su lugar dos `<script>` clásicos con las
+   versiones IIFE.
 
    El sello unas veces se detectaba y otras no, con el mismo
    documento (queja de Francisco, fila 20 de docs/COLA.md,
@@ -43,25 +44,14 @@ var RegistroLector = (function () {
   var FECHA_SELLO = /Fecha:\s*(\d{2}\/\d{2}\/\d{4})/;
   var TOPE_PAGINAS = 10;
 
-  var cargando = null;
-
   /* pdf.js pesa más de un megabyte con el worker: se trae solo la
-     primera vez que hace falta, no al arrancar la aplicación. */
+     primera vez que hace falta, no al arrancar la aplicación.
+     Carga compartida con js/preparar-documento.js y
+     js/pdf-separar-unir.js (`App.cargarPdfJs()`, en
+     js/cargar-fichero.js, fila 89 de docs/COLA.md): en `file://` (la
+     copia sin internet) no se puede hacer `import()`. */
   function cargarPdfJs() {
-    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
-    if (cargando) return cargando;
-    /* Ruta relativa a ESTE fichero (js/registro-lector.js), no a la
-       página: al contrario que un `script.src` (que se resuelve
-       contra la página), un `import()` dinámico dentro de un script
-       normal toma como base la URL del propio script que lo llama. */
-    cargando = import('./lib/pdf.min.mjs').then(function (modulo) {
-      window.pdfjsLib = modulo;
-      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'js/lib/pdf.worker.min.mjs';
-      return window.pdfjsLib;
-    }, function () {
-      throw new Error('No se ha podido cargar pdf.js.');
-    });
-    return cargando;
+    return App.cargarPdfJs();
   }
 
   /* El texto de la primera página, tal cual lo da pdf.js: los trozos

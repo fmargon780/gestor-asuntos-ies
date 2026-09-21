@@ -109,7 +109,7 @@ win.App = null;   /* lo crea nucleo.js */
 
 for (const f of ['util.js', 'carpetas.js', 'copias.js', 'nombres.js', 'guias.js', 'guias-requisitos.js',
                   'guias-comunicacion.js', 'campos.js', 'nucleo.js', 'borrados-fusion.js',
-                  'hitos-biblioteca.js', 'guias-enganche.js', 'cargar-biblioteca.js']) {
+                  'hitos-biblioteca.js', 'guias-enganche.js', 'cargar-fichero.js', 'cargar-biblioteca.js']) {
   win.eval(fs.readFileSync(RAIZ + f, 'utf8'));
 }
 const { App, Campos, HitosBiblioteca, CargarBiblioteca } = win;

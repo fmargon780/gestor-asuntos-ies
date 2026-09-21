@@ -4,9 +4,11 @@
   "version": "1.0.0",
   "description": "Gestor de asuntos y expedientes del IES Fuente Lucena",
   "scripts": {
-    "test": "node pruebas/ejecutar.mjs"
+    "test": "node pruebas/ejecutar.mjs",
+    "copia-local": "node scripts/copia-local.mjs"
   },
   "devDependencies": {
+    "esbuild": "^0.28.2",
     "jsdom": "^25.0.1",
     "playwright": "^1.47.2"
   }

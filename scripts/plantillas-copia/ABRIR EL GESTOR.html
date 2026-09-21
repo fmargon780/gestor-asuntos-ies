@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Abrir el Gestor de Asuntos</title>
+<style>
+  :root {
+    --tinta: #1b2430; --tinta-suave: #5d6b7a; --linea: #dde3ea; --fondo: #f4f6f9;
+    --papel: #ffffff; --azul: #1f4e79; --ambar: #fff4d6; --ambar-linea: #e0b34a;
+    --rojo: #fdecec; --rojo-linea: #c0392b; --verde: #e7f5ec; --verde-linea: #1e7a46;
+    --radio: 10px; --sombra: 0 1px 2px rgba(20,30,45,.06), 0 4px 12px rgba(20,30,45,.05);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 24px; font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px; color: var(--tinta);
+    background: linear-gradient(160deg, #1f4e79 0%, #2c6ea8 100%);
+  }
+  .caja {
+    background: var(--papel); border-radius: 14px; box-shadow: var(--sombra);
+    padding: 32px; max-width: 460px; width: 100%;
+  }
+  h1 { margin: 0 0 4px; font-size: 22px; color: var(--azul); }
+  p { line-height: 1.5; }
+  .suave { color: var(--tinta-suave); }
+  .aviso { border-radius: var(--radio); padding: 14px 16px; margin: 16px 0; }
+  .aviso p { margin: 6px 0 0; }
+  .ambar { background: var(--ambar); border: 1px solid var(--ambar-linea); }
+  .rojo { background: var(--rojo); border: 1px solid var(--rojo-linea); }
+  .verde { background: var(--verde); border: 1px solid var(--verde-linea); }
+  .boton {
+    font: inherit; border: 1px solid var(--linea); background: var(--papel); color: var(--tinta);
+    padding: 10px 18px; border-radius: 8px; cursor: pointer; margin-top: 8px;
+  }
+  .boton-principal { background: var(--azul); color: #fff; border-color: var(--azul); }
+  .boton:disabled { opacity: .5; cursor: default; }
+  .barra-fondo { background: #e3e8ee; border-radius: 6px; height: 10px; overflow: hidden; margin: 14px 0 6px; }
+  .barra-hecho { background: var(--azul); height: 100%; width: 0%; transition: width .2s; }
+  #paso-progreso { display: none; }
+  #paso-progreso.visible { display: block; }
+  #paso-error, #paso-permiso { display: none; }
+  #paso-error.visible, #paso-permiso.visible { display: block; }
+</style>
+</head>
+<body>
+  <div class="caja">
+    <h1>Gestor de Asuntos</h1>
+    <p class="suave">La copia que funciona sin internet, para cuando el instituto bloquea la dirección de siempre.</p>
+
+    <div id="paso-inicial">
+      <p>Este fichero instala la aplicación en <strong>esta misma carpeta</strong>: la que ya tiene
+         "ABRIR EL GESTOR.html" dentro. Al pulsar el botón, Chrome te pedirá elegir una carpeta:
+         elige <strong>esta misma</strong> (donde está este fichero).</p>
+      <button type="button" class="boton boton-principal" id="btn-empezar">Empezar</button>
+    </div>
+
+    <div id="paso-progreso">
+      <p id="texto-progreso">Descargando…</p>
+      <div class="barra-fondo"><div class="barra-hecho" id="barra-hecho"></div></div>
+    </div>
+
+    <div id="paso-permiso" class="aviso ambar">
+      <strong>Hace falta tu permiso otra vez.</strong>
+      <p>Chrome pide confirmar el acceso a la carpeta cada cierto tiempo.</p>
+      <button type="button" class="boton boton-principal" id="btn-permiso">Dar permiso</button>
+    </div>
+
+    <div id="paso-error" class="aviso rojo">
+      <strong>No se ha podido instalar.</strong>
+      <p id="texto-error"></p>
+      <button type="button" class="boton" id="btn-reintentar">Volver a intentarlo</button>
+    </div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+     El instalador y actualizador de la copia sin internet
+     (21-sep-2026, fila 89, docs/COPIA-SIN-INTERNET.md, apartado 4).
+
+     AUTÓNOMO A PROPÓSITO: no carga ningún otro fichero de la
+     aplicación (todavía no existen en disco la primera vez que se
+     abre este fichero). Lleva su propia y mínima capa de IndexedDB,
+     pero apuntando a LA MISMA base de datos, almacén y clave que
+     `js/almacen.js` (`Almacen`): así lo que este fichero guarda lo
+     puede releer luego `js/actualizar-copia.js`, ya dentro de la
+     aplicación, sin duplicar nada más que ese primer guardado.
+     ============================================================ */
+
+  var BASE_REMOTO = 'https://raw.githubusercontent.com/fmargon780/gestor-asuntos-copia/main/';
+  var BASE_DATOS = 'gestor-asuntos';
+  var ALMACEN = 'ajustes';
+  var CLAVE_CARPETA = 'copiaCarpeta';
+
+  function $(id) { return document.getElementById(id); }
+
+  /* ---------- la misma IndexedDB que js/almacen.js ---------- */
+
+  function abrirBD() {
+    return new Promise(function (resolver, rechazar) {
+      var p = indexedDB.open(BASE_DATOS, 1);
+      p.onupgradeneeded = function () {
+        if (!p.result.objectStoreNames.contains(ALMACEN)) p.result.createObjectStore(ALMACEN);
+      };
+      p.onsuccess = function () { resolver(p.result); };
+      p.onerror = function () { rechazar(p.error); };
+    });
+  }
+
+  function guardarEnAlmacen(clave, valor) {
+    return abrirBD().then(function (bd) {
+      return new Promise(function (resolver, rechazar) {
+        var t = bd.transaction(ALMACEN, 'readwrite');
+        t.objectStore(ALMACEN).put(valor, clave);
+        t.oncomplete = function () { resolver(true); };
+        t.onerror = function () { rechazar(t.error); };
+      });
+    });
+  }
+
+  function leerDeAlmacen(clave) {
+    return abrirBD().then(function (bd) {
+      return new Promise(function (resolver, rechazar) {
+        var t = bd.transaction(ALMACEN, 'readonly');
+        var p = t.objectStore(ALMACEN).get(clave);
+        p.onsuccess = function () { resolver(p.result); };
+        p.onerror = function () { rechazar(p.error); };
+      });
+    });
+  }
+
+  /* ---------- disco ---------- */
+
+  function tienePermiso(dir) {
+    return dir.queryPermission({ mode: 'readwrite' }).then(function (e) { return e === 'granted'; });
+  }
+  function pedirPermiso(dir) {
+    return dir.requestPermission({ mode: 'readwrite' }).then(function (e) { return e === 'granted'; },
+      function () { return false; });
+  }
+
+  async function escribirEnRuta(dirRaiz, ruta, bytes) {
+    var partes = ruta.split('/');
+    var dir = dirRaiz;
+    for (var i = 0; i < partes.length - 1; i++) dir = await dir.getDirectoryHandle(partes[i], { create: true });
+    var fh = await dir.getFileHandle(partes[partes.length - 1], { create: true });
+    var flujo = await fh.createWritable();
+    await flujo.write(new Blob([bytes]));
+    await flujo.close();
+  }
+
+  async function existeIndexHtml(dir) {
+    try { await dir.getFileHandle('index.html'); return true; }
+    catch (e) { return false; }
+  }
+
+  async function sha256Hex(bytes) {
+    var buffer = await crypto.subtle.digest('SHA-256', bytes);
+    var vista = new Uint8Array(buffer);
+    var hex = '';
+    for (var i = 0; i < vista.length; i++) hex += vista[i].toString(16).padStart(2, '0');
+    return hex;
+  }
+
+  /* ---------- pantallas ---------- */
+
+  function mostrar(id) {
+    ['paso-inicial', 'paso-progreso', 'paso-permiso', 'paso-error'].forEach(function (otro) {
+      $(otro).classList.toggle('visible', otro === id);
+    });
+  }
+
+  function progreso(texto, hecho, total) {
+    mostrar('paso-progreso');
+    $('texto-progreso').textContent = texto;
+    $('barra-hecho').style.width = (total ? Math.round((hecho / total) * 100) : 0) + '%';
+  }
+
+  function error(mensaje) {
+    mostrar('paso-error');
+    $('texto-error').textContent = mensaje;
+  }
+
+  /* ---------- instalar ---------- */
+
+  async function instalarEn(dir) {
+    progreso('Descargando la lista de ficheros…', 0, 1);
+    var resp = await fetch(BASE_REMOTO + 'version.json', { cache: 'no-store' });
+    if (!resp.ok) throw new Error('No encuentro la copia en internet (' + resp.status + '). ¿Hay conexión?');
+    var version = await resp.json();
+    var rutas = Object.keys(version.ficheros || {});
+    if (!rutas.length) throw new Error('La lista de ficheros de la copia está vacía.');
+
+    for (var i = 0; i < rutas.length; i++) {
+      var ruta = rutas[i];
+      progreso('Descargando ' + ruta + '…', i, rutas.length);
+      var r = await fetch(BASE_REMOTO + ruta, { cache: 'no-store' });
+      if (!r.ok) throw new Error('No he podido descargar "' + ruta + '" (' + r.status + ').');
+      var bytes = new Uint8Array(await r.arrayBuffer());
+      var sha = await sha256Hex(bytes);
+      if (sha !== version.ficheros[ruta]) throw new Error('"' + ruta + '" ha llegado dañado (el sha256 no coincide). Vuelve a intentarlo.');
+      await escribirEnRuta(dir, ruta, bytes);
+    }
+    /* version.json el último, para que un corte a medias se note. */
+    await escribirEnRuta(dir, 'version.json', new TextEncoder().encode(JSON.stringify(version)));
+    progreso('Todo listo. Abriendo el Gestor…', rutas.length, rutas.length);
+  }
+
+  async function irAIndex() {
+    location.href = 'index.html';
+  }
+
+  async function continuarConCarpeta(dir) {
+    var ok = await tienePermiso(dir);
+    if (!ok) {
+      mostrar('paso-permiso');
+      $('btn-permiso').onclick = async function () {
+        var conseguido = await pedirPermiso(dir);
+        if (conseguido) continuarConCarpeta(dir);
+        else error('Sin permiso sobre la carpeta no puedo instalar ni actualizar nada.');
+      };
+      return;
+    }
+    if (await existeIndexHtml(dir)) { await irAIndex(); return; }
+    try {
+      await guardarEnAlmacen(CLAVE_CARPETA, dir);
+      await instalarEn(dir);
+      await irAIndex();
+    } catch (e) {
+      error((e && e.message) ? e.message : String(e));
+    }
+  }
+
+  async function empezar() {
+    var guardada = null;
+    try { guardada = await leerDeAlmacen(CLAVE_CARPETA); } catch (e) { guardada = null; }
+    if (guardada) { await continuarConCarpeta(guardada); return; }
+    mostrar('paso-inicial');
+  }
+
+  $('btn-empezar').onclick = async function () {
+    if (typeof window.showDirectoryPicker !== 'function') {
+      error('Este navegador no puede instalar la copia: hace falta Google Chrome o Microsoft Edge.');
+      return;
+    }
+    try {
+      var dir = await window.showDirectoryPicker({ mode: 'readwrite', id: 'gestor-copia' });
+      await continuarConCarpeta(dir);
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+      error((e && e.message) ? e.message : String(e));
+    }
+  };
+
+  $('btn-reintentar').onclick = function () { empezar(); };
+
+  empezar();
+})();
+</script>
+</body>
+</html>

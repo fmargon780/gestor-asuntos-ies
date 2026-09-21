@@ -35,9 +35,7 @@ var CargarBiblioteca = (function () {
 
   async function leerDatosEstaticos() {
     if (datosEstaticos) return datosEstaticos;
-    var resp = await fetch(URL_DATOS);
-    if (!resp.ok) throw new Error('no encuentro ' + URL_DATOS + ' (' + resp.status + ')');
-    datosEstaticos = await resp.json();
+    datosEstaticos = await App.leerFicheroDeLaApp(URL_DATOS, 'json');
     return datosEstaticos;
   }
 
