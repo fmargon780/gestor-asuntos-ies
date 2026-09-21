@@ -1,36 +1,3 @@
-# ============================================================
-# copia-publica.yml — publica la copia sin internet en el repositorio
-# público `fmargon780/gestor-asuntos-copia` (fila 89 de docs/COLA.md,
-# docs/COPIA-SIN-INTERNET.md, apartado 3).
-#
-# ESTE FICHERO NO ESTÁ ACTIVO. Es texto plano (.txt a propósito, no
-# .yml): esta sesión de Claude Code, en la nube, tiene bloqueado por su
-# propia configuración tocar `.github/workflows/` de cualquier
-# repositorio (aparte de que el repositorio público `gestor-asuntos-copia`
-# tampoco existe todavía: 403 al intentar crearlo con la API de GitHub
-# el 21-sep-2026). Para dejarlo funcionando de verdad, sigue los pasos
-# de `docs/CLAVE-COPIA-PUBLICA.md`: uno de ellos es copiar el contenido
-# de AQUÍ ABAJO (desde la línea "name:" hasta el final) en un fichero
-# nuevo `.github/workflows/copia-publica.yml`, **dentro de ESTE MISMO
-# repositorio privado, `gestor-asuntos-ies`** (no en el público: el
-# workflow tiene que vivir donde ocurren los `push` que lo disparan).
-# Una sesión de Claude Code en terminal (no en la nube) puede hacerlo
-# directamente; si no, Francisco lo sube a mano desde
-# https://github.com/fmargon780/gestor-asuntos-ies/new/main?filename=.github/workflows/copia-publica.yml
-#
-# Qué hace: en cada `push` a `main` de este repositorio que toque algo
-# fuera de `docs/`, genera la copia con `node scripts/copia-local.mjs`
-# y sube el resultado, en un solo commit, al repositorio público — solo
-# si algo ha cambiado de verdad. No gasta publicaciones de Vercel (no
-# toca nada de este repositorio). Necesita un secreto `COPIA_TOKEN` en
-# este mismo repositorio: un token de acceso de grano fino con permiso
-# de escritura SOLO en `gestor-asuntos-copia` (no hace falta darle
-# ningún permiso sobre este repositorio privado: lo lee con el permiso
-# de siempre de la propia acción). Si el secreto no está puesto
-# todavía, el workflow termina en verde igualmente, con un aviso "falta
-# la clave de la copia pública", para no dejar el repositorio con una
-# acción en rojo por algo que a Francisco le queda por hacer.
-# ============================================================
 name: Publicar la copia sin internet
 
 on:
@@ -38,6 +5,9 @@ on:
     branches: [main]
     paths-ignore:
       - 'docs/**'
+  workflow_dispatch:
+  schedule:
+    - cron: '17 5 * * *'
 
 permissions:
   contents: read
