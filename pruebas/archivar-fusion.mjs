@@ -8,6 +8,7 @@ import vm from 'node:vm';
 const raiz = new URL('../js/', import.meta.url).pathname;
 const contexto = { console, TextDecoder, Blob, window: {} };
 vm.createContext(contexto);
+vm.runInContext(fs.readFileSync(raiz + 'reintentar-escritura.js', 'utf8'), contexto, { filename: 'reintentar-escritura.js' });
 vm.runInContext(fs.readFileSync(raiz + 'carpetas.js', 'utf8'), contexto, { filename: 'carpetas.js' });
 const { Carpetas } = contexto;
 

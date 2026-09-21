@@ -128,6 +128,42 @@ traducirlo.
 Se comprueba con `pruebas/archivar-atascos.mjs`, en navegador de verdad (reutiliza el disco de
 mentira de `pruebas/navegador.mjs`), con los seis escenarios del documento.
 
+### Archivar desde la ficha, sin avisos de más (fila 90, 21-sep-2026)
+
+`docs/ARCHIVAR-SIN-AVISOS-FALSOS.md`. Al archivar un asunto desde su propia ficha (no desde la
+tarjeta de la lista) salían dos avisos rojos sobrantes, aunque el archivado en sí salía bien:
+
+- **"Este asunto ya no está en Asuntos abiertos: puede que se haya archivado o borrado desde el
+  otro ordenador."** `App.cerrarAsunto` llama a `App.verAbiertos()` al terminar, que reengancha la
+  ficha abierta (`App.reengancharFicha`, `js/ficha-asunto.js`); como el asunto ya no está en la
+  lista (lo acaba de archivar este mismo ordenador), confundía su propio archivado con uno ajeno.
+  Arreglo: `App.E.recienArchivados` (`js/nucleo.js`), un conjunto en memoria donde
+  `App.cerrarAsunto` apunta la clave justo antes de llamar a `App.verAbiertos()`;
+  `App.reengancharFicha` lo consulta primero y, si está, vuelve a la lista sin avisar (y borra la
+  marca: es de un solo uso).
+- **"...pero no he podido guardar su ficha en la carpeta: An operation that depends on state
+  cached..."**, en inglés. La envoltura de `App.cerrarAsunto` en `js/ficha-archivo.js` escribe
+  `_ficha.json` justo después de mover la carpeta, y Dropbox a veces todavía está sincronizando esa
+  misma carpeta en ese instante (`InvalidStateError`/`NoModificationAllowedError`). Dos arreglos:
+  - **`Carpetas.escribirTexto`/`escribirBytes`** (`js/carpetas.js`) reintentan solas con
+    `Reintentar.escritura` (`js/reintentar-escritura.js`, cargado justo antes): un intento normal
+    más hasta tres reintentos, con 0,5 s/1 s/2 s de espera por delante de cada uno, pidiendo de
+    nuevo el manejador del fichero en cada intento (nunca reutiliza uno viejo). Cualquier error que
+    no sea de sincronización se lanza a la primera. Como `Copias.guardar`, `guardarJson` y
+    `_ficha.json` pasan todos por ahí, esto arregla de una vez toda escritura de la aplicación.
+  - Si aun así los reintentos se agotan, la envoltura de `js/ficha-archivo.js` distingue ese caso
+    (`Reintentar.esErrorDeSincronizacion(e)`) y avisa en **ámbar**, en castellano, diciendo que no
+    se ha perdido nada (la clave sigue en `asuntos.json`: el borrado va después de escribir
+    `_ficha.json`, así que si la escritura falla no llega a borrarse) y que "Poner en orden las
+    fichas del ARCHIVO" (Ajustes → Mantenimiento) la recogerá sola. Cualquier otro error sigue en
+    rojo, con `U.mensajeDeError(e)` en vez de `e.message` (también arreglado en la envoltura de
+    `App.reabrirAsunto`, aunque ahí no hacía falta el aviso ámbar).
+
+Se comprueba con `pruebas/archivar-sin-avisos-falsos.mjs`, en navegador de verdad: archivar desde
+la ficha abierta sin el aviso de "otro ordenador"; Dropbox fallando dos veces y saliendo bien a la
+tercera, sin ningún aviso de más; y Dropbox fallando todo el rato, con el aviso ámbar y la ficha
+todavía en `asuntos.json`.
+
 ### El índice del ARCHIVO
 
 Fila 44 de `docs/COLA.md`, 17-sep-2026, `docs/BUSCADOR-ARCHIVO-INDICE.md`. Antes, `App.verArchivo`

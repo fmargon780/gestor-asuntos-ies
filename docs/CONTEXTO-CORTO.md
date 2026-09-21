@@ -23,10 +23,9 @@ Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
 - El dominio `fmargon.com` está comprado en la cuenta de Vercel; otras apps irán en subdominios.
 - Repositorio: `fmargon780/gestor-asuntos-ies`, rama `main`, privado.
 - **Un solo proyecto de Vercel** (`gestor-de-asuntos`). No crear otro.
-- **Cada dirección es un sitio distinto para el navegador**: los permisos de carpetas y la
-  identidad se guardan por dirección, así que al pasar a la nueva hay que volver a señalar las
-  dos carpetas (y la bandeja de correos) e identificarse otra vez. Los ajustes del centro no se
-  pierden: viven en `_GESTOR`, dentro del Dropbox.
+- **Cada dirección es un sitio distinto para el navegador**: permisos e identidad se guardan por
+  dirección, así que al cambiar de dirección hay que volver a señalar las carpetas (y la bandeja
+  de correos) y entrar de nuevo. Los ajustes del centro no se pierden: viven en `_GESTOR`.
 
 ## 2. Quién es Francisco, y cómo escribirle
 
@@ -120,7 +119,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha, con el correo ya puesto al
   preparar el cuadro de Correo.
 - Archivar o reabrir cuando el destino ya existe fusiona las dos carpetas sin perder nada; los
-  errores del navegador salen siempre traducidos al castellano.
+  errores del navegador salen siempre traducidos al castellano. Archivar desde la ficha abierta ya
+  no confunde su propio archivado con el de "otro ordenador"; si Dropbox tropieza al escribir
+  `_ficha.json` se reintenta sola, y si falla del todo el aviso es ámbar (fila 90).
 - Guardar un documento en un asunto se queda en su ficha; solo se repinta si algo ha cambiado.
 - Cabecera de cada pantalla fija al bajar y encogida sin temblar.
 - Renombrar, unir o borrar un asunto mueve también sus hitos y su señal de presencia; el registro
@@ -138,7 +139,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   nube), Claude Code lo fusiona solo en cuanto esté en verde y sin conflictos. No hace falta
   esperar a que Francisco lo haga a mano (ver la nota al final de `docs/COLA.md`).
 - **Comprobar siempre lo publicado con `curl`**, nunca darla por hecha.
-- Vercel publica máximo 100 veces/día (gratuito): `vercel.json` salta los commits que solo tocan `docs/`, `pruebas/`, `.github/` o `.md`; regla 13: máximo dos subidas por fila.
+- Vercel publica máximo 100 veces/día (gratuito): `vercel.json` salta los commits que solo tocan `docs/`, `pruebas/`, `.github/` o `.md`; máximo dos subidas por fila (regla 13).
 - Antes de colgar una función nueva de `App`, comprobar que el nombre no está cogido. Un solo cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.
 - Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV.
 - Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o uno nuevo. Sin remedio, con `U.envolver`, apuntado en `js/envolturas-esperadas.js`.
@@ -167,14 +168,14 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - El compañero: entrar en `https://asuntos.fmargon.com`, señalar sus carpetas de nuevo (no se heredan) y coordinar tipos de asunto y estados.
 - Poner en marcha el script de Gmail (`g.educaand.es`): señalar `GESTOR-BANDEJA` en Ajustes y pegar `apps-script/gestor-correos.gs` en `script.google.com`.
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja como una sola compartida.
-- Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI" en la tarjeta.
+- Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: membrete, Consejería, cargos y Provincia.
 - Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
-- Pulsar "Poner en orden las fichas del ARCHIVO" (Mantenimiento): mueve a su carpeta la ficha de los archivados de antes, para que `asuntos.json` no siga creciendo.
+- Pulsar "Poner en orden las fichas del ARCHIVO" (Mantenimiento), para los archivados de antes.
 - Pulsar, antes de junio de 2027, "Guardar el contacto de los asuntos abiertos" (Ajustes → Mantenimiento).
 - Decisión: ¿la papelera se vacía sola a los N días? Sin decidir, solo el aviso más insistente.
-- Antes de una publicación importante, repasar `docs/COMPROBAR-A-MANO.md` (lo que ninguna prueba cubre).
-- Fila 89 bloqueada: falta que Francisco cree el repositorio público `gestor-asuntos-copia` y el secreto `COPIA_TOKEN` (`docs/CLAVE-COPIA-PUBLICA.md`) para instalar la copia sin internet.
+- Antes de publicar algo importante, repasar `docs/COMPROBAR-A-MANO.md`.
+- Fila 89 bloqueada: falta crear el repositorio público y el secreto `COPIA_TOKEN` (`docs/CLAVE-COPIA-PUBLICA.md`).
 
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero
 

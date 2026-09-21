@@ -149,8 +149,15 @@
     if (!fichaVisible() || modoActual !== 'abierto') return Promise.resolve();
     var mismo = App.E.listaAbiertos.filter(function (x) { return x.nombre === actual.nombre; })[0];
     if (!mismo) {
-      U.aviso('Este asunto ya no está en Asuntos abiertos: puede que se haya archivado o ' +
-        'borrado desde el otro ordenador.', 'malo');
+      /* Si este mismo ordenador lo acaba de archivar (fila 90,
+         docs/ARCHIVAR-SIN-AVISOS-FALSOS.md), el aviso verde de
+         App.cerrarAsunto ya lo ha dicho: no hace falta este otro en rojo. */
+      if (App.E.recienArchivados[actual.nombre]) {
+        delete App.E.recienArchivados[actual.nombre];
+      } else {
+        U.aviso('Este asunto ya no está en Asuntos abiertos: puede que se haya archivado o ' +
+          'borrado desde el otro ordenador.', 'malo');
+      }
       volverALaLista();
       return Promise.resolve();
     }

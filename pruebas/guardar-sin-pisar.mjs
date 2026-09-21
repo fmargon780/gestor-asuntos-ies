@@ -23,7 +23,7 @@ const contexto = {
 };
 contexto.window = contexto;   /* en el navegador window === global; aquí también */
 vm.createContext(contexto);
-for (const f of ['util.js', 'carpetas.js', 'copias.js', 'nucleo.js', 'papelera.js']) {
+for (const f of ['util.js', 'reintentar-escritura.js', 'carpetas.js', 'copias.js', 'nucleo.js', 'papelera.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 const { App, Carpetas, Papelera } = contexto;

@@ -109,8 +109,19 @@ var FichaArchivo = (function () {
           delete registro.asuntos[clave];
         });
       } catch (e) {
-        U.aviso('El asunto se ha archivado, pero no he podido guardar su ficha en la carpeta: ' +
-          e.message, 'malo');
+        if (window.Reintentar && Reintentar.esErrorDeSincronizacion(e)) {
+          /* Ya se han hecho los reintentos de escribirTexto (js/reintentar-escritura.js) y
+             han seguido fallando: no se ha perdido nada, la clave sigue en asuntos.json
+             (el borrado de arriba no ha llegado a ejecutarse), y el botón de abajo la
+             recoge sola cuando se pulse. */
+          U.aviso('El asunto se ha archivado. Su ficha no se ha podido guardar todavía dentro ' +
+            'de la carpeta porque Dropbox la estaba sincronizando. No se ha perdido nada: se ' +
+            'hará sola la próxima vez que pulses «Poner en orden las fichas del ARCHIVO» en ' +
+            'Ajustes → Mantenimiento.', 'ambar');
+        } else {
+          U.aviso('El asunto se ha archivado, pero no he podido guardar su ficha en la carpeta: ' +
+            U.mensajeDeError(e), 'malo');
+        }
       }
     };
   });
@@ -136,7 +147,7 @@ var FichaArchivo = (function () {
         await borrar(carpetaAbierta);
       } catch (e) {
         U.aviso('La ficha se ha recuperado, pero no he podido borrar el fichero viejo de la ' +
-          'carpeta: ' + e.message, 'malo');
+          'carpeta: ' + U.mensajeDeError(e), 'malo');
       }
     };
   });

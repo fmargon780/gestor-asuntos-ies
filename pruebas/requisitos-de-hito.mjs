@@ -37,7 +37,7 @@ const contexto = {
   }
 };
 vm.createContext(contexto);
-for (const f of ['util.js', 'carpetas.js', 'copias.js', 'guias.js', 'hitos.js', 'hitos-archivo.js', 'hitos-requisitos.js']) {
+for (const f of ['util.js', 'reintentar-escritura.js', 'carpetas.js', 'copias.js', 'guias.js', 'hitos.js', 'hitos-archivo.js', 'hitos-requisitos.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 const { U, Hitos } = contexto;
