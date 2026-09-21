@@ -1,6 +1,7 @@
 # Copia de la aplicación que funciona sin internet
 
-Decidido con Francisco el 21-sep-2026. Diseño cerrado por él.
+Decidido con Francisco el 21-sep-2026. Diseño cerrado por él (segunda versión, sin Dropbox API
+ni contraseñas: la primera pedía la contraseña del Dropbox del centro y se descartó).
 
 ## Por qué
 
@@ -16,17 +17,23 @@ aplicación dentro del Dropbox del centro y se abre desde el disco (`file://`), 
 
 ## Lo que ve Francisco al final
 
-- En el Dropbox del centro aparece una carpeta `Aplicaciones/Gestor de Asuntos/` (o
-  `Apps/Gestor de Asuntos/`) con un fichero **`ABRIR EL GESTOR.html`**.
-- Doble clic → se abre en Chrome la aplicación de siempre, sin pasar por internet.
-- La primera vez en cada ordenador hay que volver a señalar las carpetas (es otra "dirección" para
-  Chrome). Después, igual que siempre.
+- **La primera vez**, en un ordenador del instituto, guarda un único fichero,
+  **`ABRIR EL GESTOR.html`**, en una carpeta del Dropbox del centro (por ejemplo
+  `Gestor de Asuntos - aplicación`), y lo abre con doble clic. Ese fichero le pide señalar esa
+  misma carpeta, descarga el resto de la aplicación desde GitHub, lo guarda allí y arranca.
+  Después señala las carpetas de trabajo como siempre (es otra "dirección" para Chrome).
+- **Cada vez que la abre**, la copia mira si hay versión nueva. Si la hay, se descarga, se guarda
+  en su carpeta y se recarga sola. Si no hay internet o falla la descarga, arranca con la que tiene.
+- **El otro ordenador** recibe la actualización por Dropbox, sin hacer nada.
 - En la cabecera, junto a la versión, se lee **«copia sin internet»**, para saber cuál está usando.
-- Cada vez que se publica una mejora en `main`, la copia de Dropbox se actualiza sola en unos
-  minutos.
 - La versión web (asuntos.fmargon.com) sigue igual. Las dos trabajan sobre los mismos datos.
 - Los correos no cambian: el script de Gmail corre en Google y deja los correos en su carpeta; la
   copia la lee igual. Los enlaces a `mail.google.com` funcionan (Gmail no está bloqueado).
+- **Nadie de dirección interviene y no hace falta ninguna contraseña de Dropbox.** Es una
+  condición de Francisco: no se puede pedir la contraseña del Dropbox del centro.
+
+Comprobado por Francisco el 21-sep-2026 desde el ordenador del instituto: `github.com` y
+`raw.githubusercontent.com` se abren.
 
 ## Qué hay que hacer
 
@@ -74,8 +81,9 @@ Nuevo `scripts/copia-local.mjs` (se ejecuta con `node`, sin navegador). Genera l
   `plantillas/` (y `plantilla/` si algo lo carga), con el formato del punto 1.
 - `js/lib/pdf.iife.js` y `js/lib/pdf.worker.iife.js` (esbuild, `format: 'iife'`). Añadir
   `esbuild` a `devDependencies` de `package.json`.
-- `ABRIR EL GESTOR.html`: una página mínima que redirige a `index.html` (con `location.replace`)
-  y un texto de una línea por si no redirige.
+- `ABRIR EL GESTOR.html`: el instalador y actualizador del punto 4, que al final abre
+  `index.html`.
+- `version.json` con la versión y el sha256 de cada fichero (punto 3).
 - Que no se copie `docs/`, `pruebas/`, `herramientas/`, `scripts/` ni `apps-script/`.
 
 La etiqueta **«copia sin internet»** junto a la versión la pone `js/version.js` (o donde se pinte
@@ -84,59 +92,73 @@ La etiqueta **«copia sin internet»** junto a la versión la pone `js/version.j
 Enlace a `normativa-escolarizacion.vercel.app`: se queda como está. En el instituto no abrirá, y
 eso no se arregla aquí.
 
-### 3. Subirla a Dropbox sola
+### 3. Publicar la copia en un repositorio público
 
-Nuevo `.github/workflows/copia-dropbox.yml`:
+La copia se descarga desde `raw.githubusercontent.com`, que responde con CORS abierto (se puede
+leer con `fetch` desde una página `file://`). El repositorio `gestor-asuntos-ies` es privado y así
+se queda (en `docs/` hay notas internas). Se crea **otro repositorio, público**,
+`fmargon780/gestor-asuntos-copia`, que solo contiene la salida de `scripts/copia-local.mjs`, más:
 
-- Se dispara en cada `push` a `main` que toque algo fuera de `docs/`, y a mano
-  (`workflow_dispatch`).
-- `npm ci`, `node scripts/copia-local.mjs`, y sube `copia-local/` a Dropbox con la API
-  (`/2/files/upload`, modo `overwrite`; borrar en Dropbox lo que ya no esté en la copia). Sin
-  acciones de terceros: un script `scripts/subir-dropbox.mjs` con `fetch` de Node.
-- Credenciales en secretos del repositorio: `DROPBOX_APP_KEY` y `DROPBOX_REFRESH_TOKEN`
-  (flujo PKCE, sin secreto de aplicación). El script pide el token de acceso con el refresh
-  token en cada ejecución.
-- La aplicación de Dropbox se crea con acceso **«App folder»**: solo ve su propia carpeta, no el
-  resto del Dropbox del centro.
-- Si los secretos no existen, el paso termina en verde con un aviso («falta conectar Dropbox»),
-  sin romper nada.
+- `version.json`: `{ "version": "<App.VERSION>", "ficheros": { "<ruta>": "<sha256>", … } }`.
+- Un `README.md` de dos líneas: qué es y que no contiene datos.
 
-Esto no gasta publicaciones de Vercel (es GitHub Actions, no Vercel).
+**Antes de publicar nada, comprobar que la copia no lleva datos personales** (ni DNI, ni nombres
+de alumnado o personal, ni direcciones de correo reales salvo las del centro). El 21-sep-2026 se
+revisó el repositorio y no los hay: `datos/`, `datos-biblioteca/`, `plantillas/` y `formularios/`
+son impresos y catálogos. La firma del correo con el nombre de Francisco y del centro sí va: se
+acepta.
 
-**Si la sesión no puede subir ficheros a `.github/workflows/`** (en ERP-Nutricion dio 403 desde
-una sesión en la nube): sube todo lo demás, deja el `.yml` escrito en
-`docs/copia-dropbox.yml.txt`, marca la fila BLOQUEADA con esa razón, y Francisco lo sube una vez
-desde una sesión de Claude Code en su ordenador.
+Cómo llega la copia al repositorio público, en este orden de preferencia:
 
-### 4. Los pasos de Francisco, una sola vez
+1. **Una acción de GitHub** (`.github/workflows/copia-publica.yml`) en el repositorio privado: en
+   cada `push` a `main` que toque algo fuera de `docs/`, ejecuta `npm ci`,
+   `node scripts/copia-local.mjs` y sube el resultado al público (un solo commit, solo si algo
+   cambió). Necesita un token con permiso de escritura **solo** en `gestor-asuntos-copia`
+   (token de grano fino), guardado como secreto `COPIA_TOKEN`. Si el secreto no existe, termina
+   en verde con el aviso «falta la clave de la copia pública». No gasta publicaciones de Vercel.
+2. Si la sesión no puede crear el repositorio público o subir a `.github/workflows/` (en
+   ERP-Nutricion dio 403 desde una sesión en la nube): dejarlo todo preparado, el `.yml` escrito
+   en `docs/copia-publica.yml.txt`, y marcar la fila BLOQUEADA con el motivo en una línea.
 
-Escribir `docs/CONECTAR-DROPBOX.md` con los pasos para conectar, **en castellano llano, un paso
-por línea, como mucho ocho pasos**, sin jerga. Para que él no tenga que manejar códigos a mano,
-hacer una página de ayuda `herramientas/conectar-dropbox.html` (se publica en la web) que:
+**Los pasos de Francisco para el token**: escribir `docs/CLAVE-COPIA-PUBLICA.md`, en castellano
+llano, un paso por línea, como mucho seis pasos, con los enlaces directos
+(`https://github.com/settings/personal-access-tokens/new` y
+`https://github.com/fmargon780/gestor-asuntos-ies/settings/secrets/actions/new`). Se puede hacer
+desde el ordenador del instituto: GitHub se abre allí. Si la sesión de Claude Code puede subir al
+repositorio público por sí misma y dejar la acción funcionando sin token, mejor: entonces este
+documento no hace falta y se dice en el mensaje final.
 
-1. le pide la App key (la copia de la página de Dropbox),
-2. le manda a Dropbox a dar el permiso (PKCE, `token_access_type=offline`),
-3. a la vuelta le enseña el refresh token con un botón **Copiar**,
-4. y le dice exactamente dónde pegarlo en GitHub (enlace directo a
-   `https://github.com/fmargon780/gestor-asuntos-ies/settings/secrets/actions/new`).
+### 4. La copia se instala y se actualiza sola
 
-**Quién da el permiso.** Lo tiene que dar alguien con la sesión abierta en la cuenta de Dropbox
-del centro (la que usan los ordenadores del instituto). Francisco **no tiene la contraseña**. La
-guía debe decir, en la primera línea, que ese paso lo hace quien tenga la contraseña (dirección o
-secretaría), escribiéndola él mismo en la página de Dropbox, en dos minutos, **en el móvil de Francisco** cuando Dropbox pida entrar (con datos: en la red del instituto la página de ayuda está bloqueada; Dropbox no guarda la contraseña en el móvil si se elige no recordarla). El permiso solo
-alcanza a una carpeta propia. Todo lo demás lo hace Francisco. Los ordenadores del centro **no necesitan nada**: su Dropbox ya está
-abierto y solo recibe los ficheros.
+Todo en `ABRIR EL GESTOR.html` (autónomo, sin depender de otros ficheros de la copia) más un
+módulo pequeño `js/actualizar-copia.js` que solo actúa si `location.protocol === 'file:'`:
 
-Esa página tiene que verse bien en un móvil. Añadir su dirección de
-vuelta en las instrucciones de creación de la aplicación de Dropbox (Redirect URI:
-`https://asuntos.fmargon.com/herramientas/conectar-dropbox.html`). Si `herramientas/` no se
-publica en Vercel, poner la página en otra ruta que sí se publique.
+- **Instalar** (la carpeta de la aplicación está vacía o no tiene `index.html`): pide con
+  `showDirectoryPicker({ mode: 'readwrite' })` la carpeta **donde está el propio fichero**
+  (explicarlo en una línea en pantalla), guarda el identificador en IndexedDB, descarga
+  `version.json` y todos los ficheros de `raw.githubusercontent.com/fmargon780/gestor-asuntos-copia/main/…`
+  (con `cache: 'no-store'`), los guarda y abre `index.html`. Barra de progreso sencilla (son
+  unos 10 MB por los formularios).
+- **Actualizar** (al abrir): compara `version.json` remoto con el local. Si cambió, descarga
+  **solo los ficheros cuyo sha256 sea distinto**, comprueba cada sha256, y solo si todos están
+  bien los escribe; `version.json` se escribe el último, así un corte a medias se reintenta la
+  siguiente vez. Luego `location.reload()`. Borra los ficheros que ya no estén en la lista.
+- Si Chrome pide otra vez el permiso de la carpeta, un aviso ámbar con un botón, como ya se hace
+  con las carpetas de trabajo. Si el usuario no lo da, se arranca con la versión que hay.
+- Sin internet, con `raw.githubusercontent.com` caído o con cualquier error: arranca con la
+  versión que hay, y un aviso discreto de una línea «no se ha podido comprobar si hay versión
+  nueva». Nunca deja la aplicación sin arrancar.
+- Dos ordenadores a la vez: si otro ya actualizó (el `version.json` local, que llega por Dropbox,
+  ya es el nuevo), no se descarga nada. No hace falta nada más fino.
+- Para la primera vez, `docs/INSTALAR-COPIA.md`: tres o cuatro pasos para guardar
+  `ABRIR EL GESTOR.html` en la carpeta (desde su dirección en `raw.githubusercontent.com`, con
+  clic derecho → Guardar como) y abrirlo.
 
 ## Ficheros a tocar
 
-Nuevos: `js/cargar-fichero.js`, `scripts/copia-local.mjs`, `scripts/subir-dropbox.mjs`,
-`.github/workflows/copia-dropbox.yml`, `herramientas/conectar-dropbox.html` (o la ruta publicada),
-`docs/CONECTAR-DROPBOX.md`, una prueba en `pruebas/`.
+Nuevos: `js/cargar-fichero.js`, `js/actualizar-copia.js`, `scripts/copia-local.mjs`,
+`.github/workflows/copia-publica.yml`, `docs/CLAVE-COPIA-PUBLICA.md`, `docs/INSTALAR-COPIA.md`,
+una prueba en `pruebas/`. Y el repositorio público `fmargon780/gestor-asuntos-copia`.
 
 Cambios de una o pocas líneas: `js/cargar-biblioteca.js`, `js/formularios.js`,
 `js/formularios-rellenar.js`, `js/plantillas-documento.js`, `js/registro-lector.js`,
@@ -155,7 +177,11 @@ versión), `index.html` (añadir `js/cargar-fichero.js` antes de quien lo use), 
     aplicación arranca sin errores en consola, la biblioteca carga, la lista de formularios sale,
     un PDF de `formularios/` se abre en el lector y un `.docx` de `plantillas/` se lee. Se lee
     «copia sin internet» junto a la versión.
+  - La actualización: con un `version.json` local viejo y un servidor de pruebas local que imite
+    a `raw.githubusercontent.com`, la copia descarga solo lo cambiado y se recarga; con el
+    servidor apagado, arranca igual con el aviso.
   - La versión web (`http://`) sigue cargando todo igual.
 - Al terminar: actualiza `docs/CONTEXTO-CORTO.md` y `docs/CONTEXTO.md` (sustituyendo, no
   añadiendo) y una entrada en `docs/HISTORIA.md`.
-- Mensaje final a Francisco: dos o tres frases, y el enlace a `docs/CONECTAR-DROPBOX.md`.
+- Mensaje final a Francisco: dos o tres frases, y los enlaces a `docs/INSTALAR-COPIA.md` y, si
+  hace falta, a `docs/CLAVE-COPIA-PUBLICA.md`.
