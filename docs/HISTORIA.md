@@ -5,6 +5,67 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 21-sep-2026 — Fila 88: "Podría ir en...", sugerir un asunto ya existente desde "Por clasificar"
+
+`docs/POR-CLASIFICAR-ASUNTO-EXISTENTE.md`. Desde la fila 41, el lector de "Por clasificar"
+(`js/documentos-sueltos-lector.js`) ya proponía tipo, fecha, registro y tercero de un PDF suelto,
+pero lo leído solo servía para crear un asunto nuevo. Esta fila lo usa también para encontrar un
+asunto que ya existe.
+
+**El módulo nuevo, `js/documentos-sueltos-sugerencias.js`** (`window.SugerenciasAsuntoExistente`)
+no envuelve nada: `js/documentos-sueltos-lector.js` le pregunta directamente, en el mismo paso de
+su cola (uno en uno, nunca en paralelo), justo después de leer el PDF y solo si ha reconocido un
+tercero. Compara primero por documento —Nº de identificación escolar, los cuatro últimos
+caracteres del documento del personal, o el NIF, el mismo código que va al final del nombre de la
+carpeta (`js/nombres.js`)— y, si no hay documento en algún lado, por el nombre
+(`ElegirAsunto.terceroDentroDe`, la misma pieza que ya usaba "Meter en un asunto"). Los abiertos se
+miran en `App.E.listaAbiertos`, ya en memoria; los archivados, solo cuando no hay ningún abierto,
+con el índice guardado del ARCHIVO (`_GESTOR/indice-archivo.json`) — nunca recorriendo el ARCHIVO
+carpeta a carpeta.
+
+**En la tarjeta**, debajo de la línea de lo leído, sale una línea por sugerencia («Podría ir en:
+*nombre*», con «otro tipo» o «archivado» si toca) y su botón «Meter aquí», destacado. Con
+sugerencias a la vista, "Aceptar" pasa a llamarse «Crear asunto nuevo» y a discreto. «Meter aquí»
+reutiliza el mismo camino que "Meter en un asunto" (con su cuadro de "¿reabrir?" si el asunto está
+archivado): se sacó `App.meterSueltoEnAsuntoElegido` de `App.meterSueltoEnAsunto`
+(`js/documentos-sueltos.js`) para no repetir esa lógica en los dos sitios.
+
+**Punto 8 del encargo**: "Meter en un asunto" también nota lo ya leído. `App.parecidoDelSuelto`
+suma +50 si el tercero leído es el del asunto y +10 si el tipo leído es el del asunto, sin quitar
+la puntuación de siempre (por palabras del nombre del fichero). Para eso, el lector expone
+`window.LectorDeSueltos.resultadoDe(nombre)` (el resultado en caché de un fichero, si lo hay), y
+`SugerenciasAsuntoExistente.esDelMismoTercero` queda exportado para no repetir la comparación de
+documento/nombre en los dos sitios.
+
+Prueba nueva, `pruebas/sugerir-asunto-existente.mjs`, en navegador de verdad, con cuatro empresas
+distintas para no mezclar el estado de una con el de otra: un abierto del mismo tipo (sin marca);
+cuatro abiertos (dos del tipo propuesto, dos de otro: salen tres, el tercero con «otro tipo»); sin
+abiertos con dos archivados del mismo tipo y uno de otro (con «archivado», y "Meter aquí" pregunta
+si reabrir); un abierto y un archivado del mismo tercero (solo sale el abierto); un documento sin
+tercero reconocible (la tarjeta, igual que antes de esta fila); y que "Meter en un asunto" pone
+arriba los asuntos del tercero leído. Comprobado que la prueba falla sin el cambio (se revirtieron
+a mano los tres ficheros de código, sin la fila, y las pruebas 1 y 3 fallaron por falta de
+sugerencias) antes de darla por buena.
+
+**Lo que costó de verdad**: el cuadro de "ponerle nombre" que abre `App.meterSueltoEnAsunto`
+(`App.verDocumentos`, `sinCancelar=true`) deja el botón Cancelar compartido (`#cuadro-cancelar`)
+oculto hasta que otro cuadro con Cancelar lo vuelve a enseñar — no es un fallo nuevo de esta fila,
+ya lo tenía "Meter en un asunto" desde siempre, pero la prueba lo destapó al encadenar varios
+escenarios seguidos: el escenario del archivado (que sí necesita Cancelar) se puso antes que el
+del abierto (que deja ese botón oculto al cerrarse), en vez de arreglar el cuadro compartido, que
+no pedía el encargo.
+
+**Aviso para quien lea el git log de esta fila**: al marcar la fila 88 como EN CURSO, una llamada
+de subida se escribió con un valor de relleno en vez del contenido de verdad de `docs/COLA.md`
+(35 caracteres, el mismo fallo de la regla 14 de `docs/COLA.md`, con otra causa: un parámetro sin
+rellenar en la propia llamada, no una sustitución de shell). Se detectó al momento (tamaño de
+salida muy corto) y se corrigió con una segunda subida, releyendo `docs/COLA.md` de antes de
+tocarlo. Ninguna otra subida de esta fila lo repitió: todas se comprobaron con el tamaño en bytes
+después de subir.
+
+Batería completa en verde (94 ficheros de prueba), una sola pasada al final. Versión publicada
+`App.VERSION`: `21-sep-2026 · 07:17`.
+
 ## 21-sep-2026 — Fila 86: pulsar la tarjeta de un documento la abre, y el aviso de huérfanas se calla 7 días
 
 `docs/PULSAR-PARA-ABRIR-Y-AVISO-OCULTABLE.md`. Dos cambios, en una sola fila.
