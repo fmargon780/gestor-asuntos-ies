@@ -296,3 +296,4 @@ tercero con «otro tipo»); sin abiertos, con archivados del mismo tipo y uno de
 «archivado», y "Meter aquí" pregunta si reabrir); un abierto y un archivado del mismo tercero
 (solo sale el abierto); sin tercero reconocido (la tarjeta, igual que antes de esta fila); y que
 "Meter en un asunto" pone arriba los asuntos del tercero leído.
+
