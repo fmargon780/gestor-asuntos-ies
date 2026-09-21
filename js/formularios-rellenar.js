@@ -103,9 +103,11 @@ var FormulariosRellenar = (function () {
      ========================================================== */
 
   async function leerPdfDelRepositorio(nombreFichero) {
-    var resp = await fetch(CARPETA_REPO + '/' + nombreFichero);
-    if (!resp.ok) throw new Error('No encuentro "' + nombreFichero + '" en formularios/.');
-    return new Uint8Array(await resp.arrayBuffer());
+    try {
+      return await App.leerFicheroDeLaApp(CARPETA_REPO + '/' + nombreFichero, 'binario');
+    } catch (e) {
+      throw new Error('No encuentro "' + nombreFichero + '" en formularios/.');
+    }
   }
 
   /* Los nombres de las casillas de un PDF, o `null` si no tiene

@@ -41,9 +41,7 @@ var Formularios = (function () {
   async function cargar() {
     if (cache) return cache;
     try {
-      var resp = await fetch(URL_DATOS);
-      if (!resp.ok) throw new Error('no encuentro ' + URL_DATOS + ' (' + resp.status + ')');
-      cache = await resp.json();
+      cache = await App.leerFicheroDeLaApp(URL_DATOS, 'json');
     } catch (e) {
       cache = {};
     }

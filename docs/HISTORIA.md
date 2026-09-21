@@ -5,6 +5,113 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 21-sep-2026 — Fila 89: la copia sin internet, bloqueada por el repositorio público
+
+`docs/COPIA-SIN-INTERNET.md`, diseño cerrado por Francisco el mismo día. El filtro de red del
+instituto (Junta de Andalucía) empezó a cortar también `asuntos.fmargon.com`, no solo
+`vercel.app`, así que la aplicación necesitaba poder abrirse desde el disco (`file://`), con doble
+clic, sin depender de esa dirección.
+
+**Apartado 1 (que la app funcione en `file://`).** Nuevo `js/cargar-fichero.js`, con
+`App.leerFicheroDeLaApp(ruta, tipo)`: en `http(s)` sigue siendo el `fetch` de siempre; en `file:`
+inyecta un `<script src="copia-datos/<ruta con / cambiado por ~>.js">` que deja el dato en
+`window.__COPIA__`, con carga perezosa y sin duplicar la inyección si dos módulos piden la misma
+ruta a la vez. Contrato elegido: `'json'` devuelve el objeto ya interpretado, `'binario'` un
+`Uint8Array`, igual que ya hacían a mano los cinco sitios de la tabla del diseño (`js/cargar-biblioteca.js`,
+`js/formularios.js`, `js/formularios-rellenar.js`, `js/plantillas-documento.js` ×2), que pasaron a
+llamar a esta función en vez de a `fetch` directo. Los tres módulos que repetían casi el mismo
+`cargarPdfJs()` con `import('./lib/pdf.min.mjs')` (`js/registro-lector.js`,
+`js/preparar-documento.js`, `js/pdf-separar-unir.js`) pasaron a llamar a la función compartida
+`App.cargarPdfJs()`, también en `js/cargar-fichero.js`. `js/nucleo.js` gana `App.textoVersion()`
+(`App.VERSION` + " · copia sin internet" cuando `location.protocol === 'file:'`), usada en las dos
+líneas que antes pintaban `App.VERSION` a pelo.
+
+**Apartado 2 (el paso que genera la copia).** `scripts/copia-local.mjs` (`npm run copia-local`,
+nueva dependencia `esbuild`): copia `index.html`, `css/`, `js/` y `favicon.svg` tal cual, genera
+`copia-datos/*.js` por cada JSON/PDF/`.docx` estático, construye `js/lib/pdf.iife.js` y
+`pdf.worker.iife.js` con esbuild, copia el instalador (`scripts/plantillas-copia/ABRIR EL GESTOR.html`)
+y escribe `version.json` con el sha256 de todo. No copia `docs/`, `pruebas/`, `herramientas/`,
+`scripts/` ni `apps-script/`. `copia-local/` en `.gitignore`.
+
+**Apartado 4 (se instala y se actualiza sola).** Nuevo `js/actualizar-copia.js` (solo actúa en
+`file:`): compara `version.json` del disco con el de
+`raw.githubusercontent.com/fmargon780/gestor-asuntos-copia/main/` (`cache: 'no-store'`), descarga
+solo lo que cambió de sha256 (comprobando cada uno antes de escribir, `version.json` el último) y
+recarga; sin internet, un aviso discreto (`U.aviso`) y arranca igual. El identificador de la
+carpeta viaja en la misma IndexedDB que `js/almacen.js` (`gestor-asuntos` / `ajustes` /
+`copiaCarpeta`), para que lo que guarda `ABRIR EL GESTOR.html` (autónomo, con su propia capa
+mínima de IndexedDB, sin depender de ningún otro fichero de la copia) lo pueda releer luego este
+módulo. El aviso ámbar de "hace falta el permiso otra vez" reutiliza el patrón de
+`js/bandeja-pantalla.js` (caja + botón), colgado del `<body>` porque no hay un hueco fijo para él
+en `index.html`.
+
+**Lo que costó de verdad, un bug real de pdf.js:** `js/lib/pdf.min.mjs` trae, en su propio código
+(no puesto por nadie del proyecto), un único `await` de nivel superior —
+`globalThis.pdfjsLib = await (globalThis.pdfjsLibPromise = ...)` —, y esbuild no genera un
+`<script>` clásico (`format: 'iife'`) a partir de un módulo con `await` de nivel superior: solo lo
+admite en `format: 'esm'`, que a su vez no se puede cargar en `file://` (es la misma restricción de
+`import()` que se quería evitar). Comprobado a mano con Playwright que `__webpack_require__(228)`
+(lo que hay a la derecha del `await`) es de verdad una promesa ahí dentro: quitar el `await` sin
+más deja `globalThis.pdfjsLib` con la promesa sin resolver, y `pdfjsLib.getDocument` vacío. La
+solución final: `scripts/copia-local.mjs` quita ese único `await` del texto antes de pasarlo a
+esbuild (comprobando primero que el patrón exacto sigue ahí, para que una subida de pdf.js no lo
+rompa en silencio), sin `globalName` (así esbuild no envuelve el resultado en un `var pdfjsLib =
+(()=>{...})()` que pisaría, al final, la asignación de verdad); y `App.cargarPdfJs()`, ya en el
+navegador, espera esa promesa si hace falta (`if (typeof lib.then === 'function') lib = await lib`)
+antes de dar la librería por cargada. El worker (`pdf.worker.min.mjs`) no tenía este problema: se
+autoasigna `globalThis.pdfjsWorker` de forma síncrona, y pdf.js lo usa para montar el "fake worker"
+en el hilo principal sin crear ningún `Worker` de verdad ni pedir `workerSrc`, en cuanto lo
+encuentra ya puesto.
+
+**Lo que costó de verdad, en la propia prueba de la actualización:** el primer intento de
+`pruebas/copia-sin-internet.mjs` fabricaba el disco de mentira (y el `indexedDB` de mentira) con
+`page.addInitScript`, el mismo truco que usa `pruebas/navegador.mjs` para toda la aplicación — pero
+`js/actualizar-copia.js` hace `location.reload()` cuando actualiza, y un `addInitScript` se vuelve a
+ejecutar en cada navegación: la página recién recargada "olvidaba" lo que se acababa de escribir,
+porque recreaba el disco de mentira desde cero con el contenido viejo. Solución: `page.exposeFunction`
+sí sobrevive a una recarga, así que el disco de mentira pasó a vivir en el propio proceso Node (un
+mapa `ruta -> contenido`), y la página solo llama a `window.__disco(accion, ruta, datos)`. Aparte,
+el servidor HTTP de mentira necesitó la cabecera `Access-Control-Allow-Origin: *` (como
+`raw.githubusercontent.com` de verdad): una página `file://` tiene origen `"null"`, y sin CORS
+abierto el `fetch` de `js/actualizar-copia.js` falla con el mismo error que si el servidor
+estuviera apagado, dando un falso "sin internet, arranca igual" que en realidad escondía un
+servidor de pruebas mal configurado. Y el puerto `1` (usado a mano para simular "nadie escucha
+ahí") es de los que Chrome bloquea siempre por seguridad (`ERR_UNSAFE_PORT`): la prueba final abre
+y cierra un servidor real para quedarse con un puerto libre de verdad, en vez de inventarse uno.
+
+**Bloqueada, no HECHA:** el apartado 3 del diseño (publicar la copia en un repositorio público
+nuevo, `fmargon780/gestor-asuntos-copia`, con una GitHub Action) no se pudo completar por dos
+motivos: la API de GitHub de esta sesión devolvió `403 Resource not accessible by integration` al
+intentar crear el repositorio, y esta misma sesión (en la nube) tiene bloqueado por su propia
+configuración de seguridad tocar `.github/workflows/` de cualquier repositorio. El workflow, en
+cambio, sí tiene que vivir en `.github/workflows/` de **este** repositorio privado
+(`gestor-asuntos-ies`, no en el público): es aquí donde ocurren los `push` que lo disparan; solo
+necesita permiso de escritura sobre el repositorio público, para subir ahí el resultado. Siguiendo
+la opción 2 del propio diseño ("si la sesión no puede crear el repositorio público... dejarlo todo
+preparado"), el contenido completo de la Action queda escrito en `docs/copia-publica.yml.txt`
+(texto plano en vez del `.yml` real, con la nota de en qué repositorio va), y
+`docs/CLAVE-COPIA-PUBLICA.md` explica a Francisco, paso a paso, cómo crear el repositorio público
+vacío, añadir el workflow a este repositorio (con un enlace que abre GitHub ya con el nombre de
+fichero puesto) y crear el token de grano fino y el secreto `COPIA_TOKEN`. `docs/INSTALAR-COPIA.md`
+queda escrito también, avisando de que su primer paso depende de que se complete
+`docs/CLAVE-COPIA-PUBLICA.md` primero (la dirección de
+`raw.githubusercontent.com/fmargon780/gestor-asuntos-copia/...` no responde nada todavía). La fila
+89 queda BLOQUEADA, no HECHA.
+
+Prueba nueva, `pruebas/copia-sin-internet.mjs`: genera `copia-local/` y abre su `index.html` con
+Playwright por `file://` (sin errores de consola, "copia sin internet" a la vista, la biblioteca y
+el catálogo de formularios cargan desde `copia-datos/`, un PDF de `formularios/` se abre con pdf.js
+como el lector, un `.docx` de `plantillas/` se lee con `Docx.leerEntradaDeTexto`), y
+`js/actualizar-copia.js` con un servidor de mentira: descarga solo lo cambiado y recarga, y con el
+servidor apagado arranca igual con el aviso. También se ajustó `pruebas/cargar-biblioteca.mjs`
+(añadir `cargar-fichero.js` a la lista de ficheros que carga en su `jsdom` de mentira: sin él,
+`App.leerFicheroDeLaApp` no existía y la prueba, que ya existía antes de esta fila, se rompía).
+
+Batería completa en verde, una sola pasada al final. Versión publicada `App.VERSION`:
+`21-sep-2026 · 11:32`.
+
+---
+
 ## 21-sep-2026 — Fila 88: "Podría ir en...", sugerir un asunto ya existente desde "Por clasificar"
 
 `docs/POR-CLASIFICAR-ASUNTO-EXISTENTE.md`. Desde la fila 41, el lector de "Por clasificar"

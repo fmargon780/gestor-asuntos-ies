@@ -862,6 +862,18 @@
      de js/barra.js, que le añade su pestaña. -->
 <script src="js/cuentas.js"></script>
 <script src="js/notas.js"></script>
+<!-- Fila 89, docs/COPIA-SIN-INTERNET.md: leer un dato estático (JSON o
+     binario) tanto por http(s) (fetch) como abierto desde el disco
+     (file://, la copia sin internet), y la carga compartida de
+     pdf.js. Va antes que js/registro-lector.js, js/preparar-documento.js
+     y js/pdf-separar-unir.js (los tres llaman a App.cargarPdfJs()), y
+     antes que js/cargar-biblioteca.js, js/formularios.js,
+     js/formularios-rellenar.js y js/plantillas-documento.js (llaman a
+     App.leerFicheroDeLaApp), todos más abajo. -->
+<script src="js/cargar-fichero.js"></script>
+<!-- js/actualizar-copia.js (fila 89): solo actúa si location.protocol
+     es "file:". Necesita js/util.js y js/almacen.js, ya cargados. -->
+<script src="js/actualizar-copia.js"></script>
 <script src="js/registro-lector.js"></script>
 <script src="js/lector-documentos.js"></script>
 <script src="js/contexto-documentos.js"></script>

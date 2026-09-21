@@ -17,9 +17,9 @@ Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
 
 ## 1. Lo básico
 
-- Dirección publicada: **https://asuntos.fmargon.com** (dominio propio, 18-sep-2026): **la red
-  del IES bloquea `vercel.app`** (`ERR_CONNECTION_TIMED_OUT`). `https://gestor-de-asuntos.vercel.app`
-  sigue viva, para comprobar lo publicado con `curl` desde fuera del centro.
+- Dirección publicada: **https://asuntos.fmargon.com** (dominio propio). La red del IES bloquea
+  también `vercel.app` y, desde la fila 89, `asuntos.fmargon.com` (de ahí la copia sin internet,
+  `docs/COPIA-SIN-INTERNET.md`). `gestor-de-asuntos.vercel.app` sigue viva, para `curl` desde fuera.
 - El dominio `fmargon.com` está comprado en la cuenta de Vercel; otras apps irán en subdominios.
 - Repositorio: `fmargon780/gestor-asuntos-ies`, rama `main`, privado.
 - **Un solo proyecto de Vercel** (`gestor-de-asuntos`). No crear otro.
@@ -79,12 +79,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Guías del procedimiento por tipo, con pasos, preguntas y opciones.
 - Panel lateral de lectura, y tablón de notas rápidas siempre visible.
 - Correo y mensaje de Séneca preparados (la app nunca envía nada), en un cuadro ancho de dos
-  columnas con el asunto completo y su cuenta de caracteres; el ayudante de Séneca comprueba de
-  verdad quién ha entrado y dice por su nombre quién falta.
+  columnas; el ayudante de Séneca comprueba quién ha entrado y dice por su nombre quién falta.
 - "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; con
-  tercero reconocido, también sugiere meterlo en uno que ya existe («Podría ir en: …», con botón
-  «Meter aquí»). Encima vive la bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y sus
-  adjuntos y propone tipo, fecha, registro y tercero sin decidir por su cuenta.
+  tercero reconocido, también sugiere meterlo en uno que ya existe («Meter aquí»). Encima vive la
+  bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
 - Aspirantes a plaza dados de alta sin Nº de identificación escolar: al escribirlo, se renombran
   solas las carpetas de sus asuntos abiertos.
 - Ficha del tercero con "Datos y contacto" en una línea, cada dato con su copiar; ficha del
@@ -106,16 +104,16 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en GitHub Actions en cada subida.
 - Escape y salida en toda pantalla.
+- Copia sin internet (`file://`, fila 89): "copia sin internet" a la vista, se actualiza sola.
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo, responsable,
   bifurcaciones, documentos, historial, "lo que hay que reunir" y "Comunicar". Biblioteca de
-  hitos del centro: modelos reutilizables entre tipos, con normativa y marca "solo informativo";
-  nombre corto de un tipo. Botón en Mantenimiento para cargar los tipos y guías del instituto.
+  hitos del centro: modelos reutilizables entre tipos, con normativa y marca "solo informativo".
+  Botón en Mantenimiento para cargar los tipos y guías del instituto.
 - "Qué me toca": hitos pendientes, filtro por responsable, bloque "Dormidos" (sin novedades en N
   días). "Cuentas": asuntos por tipo, mes y quién los pidió. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena en el PDF solo los datos del centro.
 - Avisos de "fichas sin carpeta" (✕ que calla 7 días) y de la papelera vieja, en Asuntos abiertos.
-  Pulsar la tarjeta de un documento (Por clasificar, un asunto, correos, papelera) lo abre, sin
-  botón.
+  Pulsar la tarjeta de un documento (Por clasificar, un asunto, correos, papelera) lo abre, sin botón.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
 - Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF, en la carpeta del asunto y en Por
   clasificar; Ajustar tamaño deja libre la banda del sello de Séneca y de la firma del director.
@@ -123,16 +121,15 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   preparar el cuadro de Correo.
 - Archivar o reabrir cuando el destino ya existe fusiona las dos carpetas sin perder nada; los
   errores del navegador salen siempre traducidos al castellano.
-- Guardar un documento en un asunto se queda en su ficha; la ficha solo se repinta si algo suyo
-  ha cambiado de verdad.
-- Cabecera de cada pantalla fija al bajar, y encogida a una sola línea sin temblar.
+- Guardar un documento en un asunto se queda en su ficha; solo se repinta si algo ha cambiado.
+- Cabecera de cada pantalla fija al bajar y encogida sin temblar.
 - Renombrar, unir o borrar un asunto mueve también sus hitos y su señal de presencia; el registro
-  de asuntos siempre relee del disco antes de escribir, para no pisar al compañero.
+  de asuntos siempre relee del disco antes de escribir.
 - Al archivar, la ficha del asunto baja a su propia carpeta (no se queda en `asuntos.json` para
   siempre); al reabrir, vuelve. Botón "Poner en orden las fichas del ARCHIVO" en Ajustes →
-  Mantenimiento para los archivados de antes de este cambio.
+  Mantenimiento para los archivados de antes.
 - Ficha del asunto: foto del contacto del tercero al crearla; si sale del CSV, la sigue enseñando
-  con aviso de fecha. Botón para rellenar los asuntos de antes, en Ajustes → Mantenimiento.
+  con aviso de fecha. Botón para rellenar los asuntos de antes.
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -167,17 +164,17 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 8. Qué falta
 
-- El compañero: entrar en `https://asuntos.fmargon.com`, volver a señalar sus carpetas (no se heredan de la dirección vieja), y coordinar tipos de asunto y estados.
+- El compañero: entrar en `https://asuntos.fmargon.com`, señalar sus carpetas de nuevo (no se heredan) y coordinar tipos de asunto y estados.
 - Poner en marcha el script de Gmail (`g.educaand.es`): señalar `GESTOR-BANDEJA` en Ajustes y pegar `apps-script/gestor-correos.gs` en `script.google.com`.
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI" en la tarjeta.
-- Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: membrete, Consejería, cargos (fila 81) y Provincia (fila 84).
+- Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: membrete, Consejería, cargos y Provincia.
 - Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
-- Pulsar "Poner en orden las fichas del ARCHIVO" (Mantenimiento, fila 64): mueve a su carpeta la ficha de los archivados antes de esa fila, para que `asuntos.json` no siga creciendo.
-- Pulsar, antes de junio de 2027, "Guardar el contacto de los asuntos abiertos" (Ajustes → Mantenimiento, fila 66).
-- Fila 67: colaborador en GitHub/Vercel; copiar `LAS-CUENTAS.md`
+- Pulsar "Poner en orden las fichas del ARCHIVO" (Mantenimiento): mueve a su carpeta la ficha de los archivados de antes, para que `asuntos.json` no siga creciendo.
+- Pulsar, antes de junio de 2027, "Guardar el contacto de los asuntos abiertos" (Ajustes → Mantenimiento).
 - Decisión: ¿la papelera se vacía sola a los N días? Sin decidir, solo el aviso más insistente.
 - Antes de una publicación importante, repasar `docs/COMPROBAR-A-MANO.md` (lo que ninguna prueba cubre).
+- Fila 89 bloqueada: falta que Francisco cree el repositorio público `gestor-asuntos-copia` y el secreto `COPIA_TOKEN` (`docs/CLAVE-COPIA-PUBLICA.md`) para instalar la copia sin internet.
 
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero
 

@@ -136,6 +136,14 @@ App.pintarListaUsuarios = async function () {
   };
 };
 
+/* El texto de la versión, con «· copia sin internet» añadido cuando
+   se abre desde el disco (file://, fila 89, docs/COPIA-SIN-INTERNET.md),
+   para saber cuál se está usando. Una sola función para las dos
+   pantallas que pintan App.VERSION, en vez de repetir la condición. */
+App.textoVersion = function () {
+  return App.VERSION + (location.protocol === 'file:' ? ' · copia sin internet' : '');
+};
+
 /* La versión, también en la pantalla de entrada. Así se puede ver sin
    entrar si el navegador se ha quedado con una copia vieja. */
 App.ponerVersion = function () {
@@ -143,7 +151,7 @@ App.ponerVersion = function () {
   if (!nota || nota.querySelector('.version')) return;
   var v = document.createElement('span');
   v.className = 'version suave';
-  v.textContent = 'Versión ' + App.VERSION;
+  v.textContent = 'Versión ' + App.textoVersion();
   nota.appendChild(document.createElement('br'));
   nota.appendChild(v);
 };
@@ -235,7 +243,7 @@ $('btn-entrar').onclick = async function () {
     $('arranque').classList.add('oculto');
     $('aplicacion').classList.remove('oculto');
     $('usuario-pie').textContent = (App.E.usuario ? 'Sesión de ' + App.E.usuario + '  ·  ' : '') +
-                                   'versión ' + App.VERSION;
+                                   'versión ' + App.textoVersion();
     App.E.vista = App.vistaGuardada();
     await App.verAbiertos();
     App.irVista(App.E.vista);
