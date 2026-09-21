@@ -212,7 +212,8 @@ retipear de un tirón sin `git push`). Puede que falten todavía.
 - A `docs/CONTEXTO.md`: el cuadro de Séneca en dos columnas (fila 53), el ayudante fiable (54), el
   asunto sin elección (55), el panel de campos de tres pestañas y los campos calculados (56), y
   las filas correspondientes de "Ficheros del repositorio" (`js/seneca-cuadro.js`,
-  `css/seneca.css`, `js/campos-calculo.js`, `js/campos-calculados-editor.js`, `js/ajustes-tipo.js`).
+  `css/seneca.css`, `js/campos-calculo.js`, `js/campos-catalogo.js`,
+  `js/campos-calculados-editor.js`, `js/ajustes-tipo.js`).
 - A `docs/HISTORIA.md`: la entrada del 18-sep-2026 de esas cuatro filas, con su "Lo que costó de
   verdad" (los bugs que las propias pruebas cazaron antes de producción).
 
