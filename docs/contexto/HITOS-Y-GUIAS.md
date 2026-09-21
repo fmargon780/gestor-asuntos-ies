@@ -103,13 +103,16 @@ como **copia**.
   a ese hito de ese asunto). Al traer un modelo, nace marcado si su responsable no es el que
   Francisco tenga configurado como Administración (`HitosBiblioteca.naceSoloInformativo`); sin poder
   determinarlo, nace sin marcar.
-- **Normativa** (apartado 4.7, `js/hitos-normativa.js`): campo `normativa`, lista de
-  `{ cita, bloque, clave, url }`. Con `bloque`+`clave`, el enlace se monta contra el sistema de
-  normativa del centro (`HitosBiblioteca.enlaceDeNormativa`, dirección base en Ajustes → El centro,
-  `_GESTOR/plantillas.json`, campo `direccionNormativa`); con solo `url`, usa esa; sin nada, la cita
-  se ve como texto. Se ve igual en un hito y en la vista de solo lectura de los pasos de un tipo
-  (`Guias.vista`). `HitosNormativa.refrescar()` mantiene la dirección base en caché, actualizada por
-  `window.Gestor.alRefrescar`.
+- **Normativa** (apartado 4.7, `js/hitos-normativa.js`; enlace retocado la fila 87,
+  `docs/ENLACE-AL-ARTICULO-DE-NORMATIVA.md`): campo `normativa`, lista de
+  `{ cita, bloque, clave, url }`. Con `clave`, el enlace abre la vista de un solo artículo del
+  sistema de normativa del centro, `<base>/norma#r=<clave>` (`HitosBiblioteca.enlaceDeNormativa`,
+  dirección base en Ajustes → El centro, `_GESTOR/plantillas.json`, campo `direccionNormativa`); el
+  bloque ya no interviene en el enlace, solo sigue guardado para saber dónde vive el artículo. La
+  clave es del artículo entero, sin apartado (`ROC-40`, no `ROC-40.1`); con solo `url`, usa esa; sin
+  nada, la cita se ve como texto. Se ve igual en un hito y en la vista de solo lectura de los pasos
+  de un tipo (`Guias.vista`). `HitosNormativa.refrescar()` mantiene la dirección base en caché,
+  actualizada por `window.Gestor.alRefrescar`.
 - **El bloque de Ajustes → El centro** (`GuiasBiblioteca.pintarAjustes`, colgado solo de
   `#ajustes-tab-centro`): lista de modelos, crear uno desde cero, editarlo (reutiliza `Guias.editar`
   con una lista de un solo paso) y borrarlo (avisa, sin bloquear, de en qué tipos está en uso;

@@ -86,7 +86,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 62, 64 a 75 y 77 a 84 están **HECHAS**. Sus documentos siguen en `docs/`, y el
+Las filas 1 a 62, 64 a 75, 77 a 84 y 87 están **HECHAS**. Sus documentos siguen en `docs/`, y el
 detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
@@ -156,6 +156,10 @@ la primera PENDIENTE **de arriba abajo**.
 - **Del informe del 18-sep-2026: la ficha del asunto.** Se ha rehecho tres veces en cuatro días
   (filas 51, 52 y 58). Va a necesitar una cuarta pasada cuando los hitos lleven un mes en uso. No se
   adelanta nada: se espera al uso real.
+- **Del 21-sep-2026: quitar el tecleo de la clave de normativa.** En el apartado "Normativa" de un
+  paso, un buscador que encuentre el artículo por su texto ("consejo escolar") y rellene la clave
+  solo. Necesita que el sistema de normativa publique un índice ligero de claves y títulos. **Se
+  diseña con Francisco a partir del miércoles 23-sep-2026 a las 14:00**, no antes.
 
 ## Descartado, no proponer otra vez (del informe del 18-sep-2026)
 

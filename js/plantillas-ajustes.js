@@ -50,6 +50,23 @@
     if (window.HitosNormativa) HitosNormativa.refrescar();
   }
 
+  /* Fila 87, docs/ENLACE-AL-ARTICULO-DE-NORMATIVA.md: solo el texto de
+     ayuda del campo, nunca el valor guardado. Se monta desde aquí (el
+     campo en sí sigue estático en index.html) para no tocar ningún
+     otro fichero. */
+  function ayudarConLaDireccionNormativa() {
+    var campo = $('plantillas-direccion-normativa');
+    if (!campo) return;
+    campo.placeholder = 'https://normativa.fmargon.com';
+    if ($('plantillas-direccion-normativa-ayuda')) return;
+    var ayuda = document.createElement('p');
+    ayuda.id = 'plantillas-direccion-normativa-ayuda';
+    ayuda.className = 'nota';
+    ayuda.textContent = 'Escribe solo eso, sin "/norma" ni el nombre de ningún bloque. Ojo: la ' +
+      'red del instituto bloquea las direcciones "vercel.app".';
+    campo.parentNode.insertBefore(ayuda, campo.nextSibling);
+  }
+
   async function guardarFirma() {
     var firma = $('plantillas-firma').value;
     var centro = $('plantillas-centro').value.trim() || Plantillas.POR_DEFECTO_CENTRO;
@@ -310,6 +327,7 @@
      ========================================================== */
 
   function enganchar() {
+    ayudarConLaDireccionNormativa();
     if (!window.Gestor) return;
     window.Gestor.alRefrescar.push(function () {
       if (!App.E.gestor) return;

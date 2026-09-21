@@ -52,17 +52,21 @@ var HitosBiblioteca = (function () {
   }
 
   /* El enlace de una referencia de normativa (función pura, apartado
-     4.7): con bloque y clave, se monta contra el sistema de normativa
-     del centro; sin ellos, con `url` si la lleva; sin nada, no hay
+     4.7, retocada la fila 87, docs/ENLACE-AL-ARTICULO-DE-NORMATIVA.md):
+     con clave, se monta contra la vista de un solo artículo del sistema
+     de normativa del centro, `<base>/norma#r=<clave>`; el bloque ya no
+     interviene en el enlace, solo sigue guardado para saber dónde vive
+     el artículo. Sin clave, con `url` si la lleva; sin nada, no hay
      enlace y la cita se ve como texto suelto. `direccionBase` puede
      venir vacía (Ajustes sin rellenar todavía): entonces tampoco hay
-     enlace, aunque haya bloque y clave. */
+     enlace, aunque haya clave. */
   function enlaceDeNormativa(ref, direccionBase) {
     if (!ref) return '';
-    if (ref.bloque && ref.clave && direccionBase) {
-      return direccionBase.replace(/\/$/, '') + '/' + ref.bloque + '#r=' + ref.clave;
+    if (ref.clave && direccionBase) {
+      var base = direccionBase.replace(/\/$/, '').replace(/\/norma$/, '');
+      return base + '/norma#r=' + encodeURIComponent(ref.clave);
     }
-    if (!ref.bloque && !ref.clave && ref.url) return ref.url;
+    if (!ref.clave && ref.url) return ref.url;
     return '';
   }
 

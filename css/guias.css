@@ -336,6 +336,15 @@
 .normativa-fila .normativa-url { flex: 2; min-width: 160px; }
 .normativa-fila .normativa-quitar { margin-left: auto; padding: 4px 8px; }
 
+/* Fila 87, docs/ENLACE-AL-ARTICULO-DE-NORMATIVA.md: aviso suave por
+   clave con apartado, y línea de ayuda bajo la lista. */
+.normativa-aviso-clave {
+  flex-basis: 100%;
+  font-size: 12px;
+  color: #8a6100;
+}
+.normativa-ayuda { font-size: 12px; margin: 6px 0 0; }
+
 /* ---------- la biblioteca de hitos del centro (20-sep-2026, fila 79) ---------- */
 
 .guia-anadir-fila { display: flex; flex-direction: column; gap: 8px; }
