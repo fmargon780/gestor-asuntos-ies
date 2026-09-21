@@ -45,9 +45,10 @@ de `App` va después del fichero que lo define.
 | `js/unir-asuntos.js` | Une asuntos duplicados que ya existen: aviso junto a Actualizar y pantalla propia "Duplicados" (`css/unir-asuntos.css`) |
 | `js/asuntos-editar.js` | Editar un asunto abierto: renombra la carpeta y mueve su ficha. También `App.renombrarAsuntosAbiertosDelTercero`, al llegar el Nº de identificación escolar de un aspirante (fila 42) |
 | `js/elegir-asunto.js` | El cuadro de escoger un asunto a mano, compartido por "Por clasificar" y por la bandeja de correos |
-| `js/documentos-sueltos.js` | Los papeles sin asunto, "Meter en un asunto", cerrar y reabrir, y la vigilancia de la carpeta |
-| `js/documentos-sueltos-lector.js` | Envuelve `App.tarjetaSuelto` para proponer tipo/fecha/registro/tercero de cada PDF suelto, con el botón "Aceptar" (17-sep-2026, fila 41); si el documento de identidad no cuadra con nadie, el botón "Dar de alta" (fila 42) |
+| `js/documentos-sueltos.js` | Los papeles sin asunto, "Meter en un asunto" (`App.meterSueltoEnAsunto` elige, `App.meterSueltoEnAsuntoElegido` mueve, sacada aparte en la fila 88 para que "Meter aquí" la reutilice), cerrar y reabrir, y la vigilancia de la carpeta. `App.parecidoDelSuelto` suma +50/+10 si el lector ya reconoció tercero/tipo (fila 88) |
 | `js/contexto-documentos.js` | `ContextoDocumentos.delCentro()`: las tres listas de terceros y los tipos con los que `LectorDocumentos.analizar` coteja, sacada de `documentos-sueltos-lector.js` para que la use también la fila siguiente (18-sep-2026, fila 49) |
+| `js/documentos-sueltos-sugerencias.js` | `SugerenciasAsuntoExistente.calcular(propuesta)`: con tercero reconocido, sugiere hasta tres asuntos ya existentes de ese tercero (abiertos, o archivados por el índice) para "Meter aquí" (21-sep-2026, fila 88, docs/POR-CLASIFICAR-ASUNTO-EXISTENTE.md) |
+| `js/documentos-sueltos-lector.js` | Envuelve `App.tarjetaSuelto` para proponer tipo/fecha/registro/tercero de cada PDF suelto, con el botón "Aceptar" (17-sep-2026, fila 41); si el documento de identidad no cuadra con nadie, el botón "Dar de alta" (fila 42); con tercero reconocido, pregunta a `js/documentos-sueltos-sugerencias.js` y pinta sus líneas «Podría ir en…» (fila 88); expone `window.LectorDeSueltos.resultadoDe(nombre)` |
 | `js/bandeja-adjuntos-lector.js` | Lee los adjuntos PDF de un correo de la bandeja y completa el hueco de tercero o tipo que deja `Bandeja.proponer`, con el registro y la fecha del documento en una línea aparte; envuelve `window.Bandeja.llevarANuevo` (18-sep-2026, fila 49) |
 | `js/lo-pide.js` | Quién ha pedido la gestión: candidatos, controles, línea legible y qué casilla marcar en el correo |
 | `js/asuntos-nuevo.js` | Crear un asunto, el cuadro de datos de un tercero y los pies |
@@ -166,6 +167,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/papelera.mjs` | Prueba de borrar con papelera, devolver y borrar del todo |
 | `pruebas/documentos-sueltos.mjs` | Prueba de "Meter en un asunto": un documento suelto a un asunto que ya existe |
 | `pruebas/lector-documentos.mjs` | `LectorDocumentos.analizar`, puro, sin pdf.js ni navegador: sello, DNI de un tercero, dos terceros o dos tipos empatados, DNI con la letra mal, texto vacío (17-sep-2026, fila 41) |
+| `pruebas/sugerir-asunto-existente.mjs` | Prueba de "Podría ir en...": un abierto del mismo tipo, cuatro abiertos (dos del tipo, dos de otro), archivados sin abiertos, un abierto con un archivado, sin tercero reconocido, y que "Meter en un asunto" pone arriba los del tercero leído (21-sep-2026, fila 88) |
 | `pruebas/envios.mjs` | Prueba de mandar documentos por correo: el encargo, el hilo, el límite de 20 MB, "listo" y "error" |
 | `pruebas/plantillas.mjs` | Prueba de las plantillas: huecos, "Faltan datos", cambiar de plantilla, sin plantillas, y el recorte de Séneca |
 | `pruebas/hitos.mjs` | Prueba de los hitos de un asunto: crearlos, marcarlos, bifurcaciones, plazo, responsable y el historial al archivar |
