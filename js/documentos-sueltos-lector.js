@@ -25,6 +25,13 @@
    los datos ya escritos. La aplicación nunca da de alta sola: solo al
    guardar el cuadro se escribe el CSV. Guardado, la propuesta se
    actualiza sola con el tercero ya encontrado, sin volver a leer el PDF.
+
+   21-sep-2026, fila 88 (docs/POR-CLASIFICAR-ASUNTO-EXISTENTE.md): con
+   tercero reconocido, se pregunta también a
+   js/documentos-sueltos-sugerencias.js (window.SugerenciasAsuntoExistente)
+   si ese tercero ya tiene asuntos; si los tiene, salen debajo de la
+   línea, cada uno con su botón "Meter aquí", y "Aceptar" pasa a
+   llamarse "Crear asunto nuevo" y a discreto.
    ============================================================ */
 (function () {
   if (typeof App.tarjetaSuelto !== 'function') return;
@@ -137,12 +144,57 @@
      (fila 42): las dos cosas no salen a la vez, porque solo se propone
      dar de alta cuando no hay tercero claro, y "Aceptar" solo cuando sí
      lo hay. */
+  /* Fila 88, 21-sep-2026, docs/POR-CLASIFICAR-ASUNTO-EXISTENTE.md: una
+     línea por asunto sugerido, con su marca ("otro tipo" / "archivado")
+     si la lleva, y el botón "Meter aquí" —el destacado de la línea,
+     porque con una sugerencia a la vista es lo que se pulsa la mayoría
+     de las veces—. Reutiliza App.meterSueltoEnAsuntoElegido
+     (js/documentos-sueltos.js): el mismo camino que "Meter en un
+     asunto", sin repetir el cuadro de "¿reabrir?". */
+  function lineaDeSugerencia(s, sugerencia) {
+    var linea = document.createElement('div');
+    linea.className = 'tarjeta-pie';
+    linea.textContent = 'Podría ir en: ';
+
+    var nombre = document.createElement('strong');
+    nombre.textContent = sugerencia.nombre;
+    linea.appendChild(nombre);
+
+    if (sugerencia.otroTipo || sugerencia.archivado) {
+      var marca = document.createElement('span');
+      marca.className = 'suave';
+      marca.textContent = '  ' + (sugerencia.archivado ? 'archivado' : 'otro tipo');
+      linea.appendChild(marca);
+    }
+
+    var meter = document.createElement('button');
+    meter.type = 'button';
+    meter.className = 'boton boton-principal';
+    meter.style.marginLeft = '10px';
+    meter.textContent = 'Meter aquí';
+    meter.title = 'Lleva el documento a la carpeta de ' + sugerencia.nombre;
+    meter.onclick = async function (ev) {
+      if (ev) ev.stopPropagation();
+      meter.disabled = true;
+      try {
+        await App.meterSueltoEnAsuntoElegido(s, sugerencia);
+      } catch (e) {
+        U.aviso('No he podido meter el documento en ese asunto: ' + e.message, 'malo');
+        meter.disabled = false;
+      }
+    };
+    linea.appendChild(meter);
+    return linea;
+  }
+
   function rellenarLinea(grupo, s, propuesta) {
     grupo.className = 'tarjeta-propuesta';   /* por si venía de "Leyendo el documento…" */
     grupo.innerHTML = '';
     var texto = textoDeLaPropuesta(propuesta);
     var botonAlta = botonDarDeAlta(propuesta, s);
     if (!texto && !botonAlta) { grupo.parentNode && grupo.parentNode.removeChild(grupo); return; }
+
+    var sugerencias = (propuesta && propuesta.sugerencias) || [];
 
     if (texto) {
       var linea = document.createElement('div');
@@ -154,9 +206,13 @@
       if (tipoObj) {
         var aceptar = document.createElement('button');
         aceptar.type = 'button';
-        aceptar.className = 'boton boton-principal';
+        /* Con sugerencias a la vista, "Aceptar" pasa a "Crear asunto
+           nuevo" y a discreto: lo normal es meterlo en uno de los
+           sugeridos, no crear otro. Sin sugerencias, igual que
+           siempre. */
+        aceptar.className = sugerencias.length ? 'boton' : 'boton boton-principal';
         aceptar.style.marginLeft = '10px';
-        aceptar.textContent = 'Aceptar';
+        aceptar.textContent = sugerencias.length ? 'Crear asunto nuevo' : 'Aceptar';
         aceptar.title = 'Crea el asunto con lo encontrado y mete el documento dentro, sin preguntar nada más';
         aceptar.onclick = async function (ev) {
           if (ev) ev.stopPropagation();
@@ -172,6 +228,10 @@
       }
       grupo.appendChild(linea);
     }
+
+    sugerencias.forEach(function (sugerencia) {
+      grupo.appendChild(lineaDeSugerencia(s, sugerencia));
+    });
 
     if (botonAlta) {
       var lineaAlta = document.createElement('div');
@@ -214,6 +274,17 @@
         }
       } catch (e) {
         propuesta = null;   /* mejor esfuerzo: si algo falla, se queda como hoy */
+      }
+      /* Fila 88, 21-sep-2026, docs/POR-CLASIFICAR-ASUNTO-EXISTENTE.md:
+         con tercero reconocido, se mira además si ya tiene asuntos.
+         Mismo "mejor esfuerzo" que el análisis de arriba: si falla,
+         la propuesta se queda sin sugerencias, no se rompe nada. */
+      if (propuesta && propuesta.tercero && window.SugerenciasAsuntoExistente) {
+        try {
+          propuesta.sugerencias = await SugerenciasAsuntoExistente.calcular(propuesta);
+        } catch (e) {
+          propuesta.sugerencias = [];
+        }
       }
     }
     resultados[nombre] = propuesta;
@@ -275,4 +346,16 @@
       return div;
     };
   });
+
+  /* Punto 8 de la fila 88 (docs/POR-CLASIFICAR-ASUNTO-EXISTENTE.md):
+     App.parecidoDelSuelto (js/documentos-sueltos.js) necesita lo que
+     ya se ha leído de un fichero, si lo hay, para sumarlo a su propia
+     puntuación. `undefined` si todavía no se ha leído (o no está en
+     la cola: la pantalla no se ha abierto), `null` si se leyó y no
+     había nada que proponer. */
+  window.LectorDeSueltos = {
+    resultadoDe: function (nombre) {
+      return resultados.hasOwnProperty(nombre) ? resultados[nombre] : undefined;
+    }
+  };
 })();
