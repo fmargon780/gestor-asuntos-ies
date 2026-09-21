@@ -89,10 +89,13 @@ asunto"). Se carga antes que `js/documentos-sueltos.js`, `js/bandeja-enlace.js` 
 
 **"Meter en un asunto"** (`App.meterSueltoEnAsunto`, en `js/documentos-sueltos.js`) es el tercer
 botón de cada tarjeta de "Por clasificar", entre "Crear asunto con él" y "Borrar" (este último
-se lo pone `js/papelera.js` por envoltura). Su puntuación solo tiene el nombre del fichero: +10
-por cada palabra de cuatro letras o más (sin extensión, sin la fecha AAMMDD de delante y sin el
-código de registro) que esté en el nombre del asunto, +40 si el nombre del tercero del asunto
-sale en el nombre del fichero, +15 abierto y +10 movido hace poco.
+se lo pone `js/papelera.js` por envoltura). Su puntuación de partida solo tiene el nombre del
+fichero: +10 por cada palabra de cuatro letras o más (sin extensión, sin la fecha AAMMDD de
+delante y sin el código de registro) que esté en el nombre del asunto, +40 si el nombre del
+tercero del asunto sale en el nombre del fichero, +15 abierto y +10 movido hace poco. Desde la
+fila 88 (21-sep-2026, ver más abajo "Sugerir un asunto ya existente"), si `js/documentos-sueltos-
+lector.js` ya tiene un resultado en caché para ese fichero, se suma sin quitar nada: +50 si el
+tercero leído es el del asunto, +10 si el tipo leído es el del asunto.
 
 El traslado (`App.llevarSueltoA`) usa `Carpetas.moverFichero`, que copia, comprueba que la copia
 pesa lo mismo y solo entonces borra: en Dropbox el `move()` del navegador no vale. Si ya hay un
@@ -249,3 +252,47 @@ Se comprueba con `pruebas/lector-documentos.mjs` (los 6 escenarios de la instruc
 navegador) y con la batería completa en verde (`pruebas/documentos-sueltos.mjs`,
 `pruebas/ajustes-por-tipo.mjs` actualizada a las ocho secciones).
 
+### Sugerir un asunto ya existente (21-sep-2026, fila 88, docs/POR-CLASIFICAR-ASUNTO-EXISTENTE.md)
+
+Lo leído de un documento suelto (arriba) solo servía para crear un asunto nuevo. Con tercero
+reconocido, se mira además si ese tercero ya tiene asuntos, y se ofrecen para meter el documento
+dentro sin crear uno nuevo.
+
+- **`js/documentos-sueltos-sugerencias.js`** (`window.SugerenciasAsuntoExistente`) no envuelve
+  nada: `js/documentos-sueltos-lector.js` lo llama directamente (`calcular(propuesta)`), en el
+  mismo paso de su cola, justo después de leer el PDF y solo si `propuesta.tercero` está puesto.
+  Guarda el resultado en `propuesta.sugerencias`.
+- **De qué tercero es un asunto**: se compara por documento —Nº de identificación escolar del
+  alumnado, los cuatro últimos caracteres del documento del personal, o el NIF de una empresa: el
+  mismo código que `js/nombres.js` pega al final del nombre de la carpeta— cuando los dos lados
+  lo tienen; si no, por el nombre (`ElegirAsunto.terceroDentroDe`, la misma pieza de "Meter en un
+  asunto"). Los terceros relacionados no cuentan, solo `ficha.tercero`.
+- **Abiertos**: se miran en `App.E.listaAbiertos`, ya en memoria. Hasta tres: primero los del
+  tipo que ha propuesto el lector, después los demás (marcados «otro tipo»); dentro de cada
+  grupo, el que se movió más recientemente primero (`ElegirAsunto.cuandoSeMovio`). Sin tipo
+  propuesto, todos sin marca, por reciente.
+- **Archivados**: solo cuando no hay ningún abierto, y solo con el índice guardado del ARCHIVO
+  (`IndiceArchivo.leerDisco()`) — nunca recorriendo el ARCHIVO carpeta a carpeta. Sin tipo
+  propuesto, o sin índice (no hecho, roto, o de otra versión), no se sugiere ningún archivado.
+  Hasta tres, del tipo propuesto, el más reciente primero (por `cerradoEl`, o si no por la fecha
+  AAMMDD del nombre de la carpeta).
+- **En la tarjeta**: debajo de la línea de lo leído, una línea por sugerencia («Podría ir en:
+  *nombre*», con «otro tipo» o «archivado» si toca) y su botón «Meter aquí» —el destacado de la
+  línea—. Con alguna sugerencia, "Aceptar" (que crea el asunto nuevo) pasa a llamarse «Crear
+  asunto nuevo» y a discreto; sin ninguna, se queda exactamente como antes de esta fila.
+- **«Meter aquí»** llama a `App.meterSueltoEnAsuntoElegido(s, sugerencia)`, sacada de
+  `App.meterSueltoEnAsunto` (`js/documentos-sueltos.js`) para no repetir el mismo camino (mover el
+  documento, o preguntar "¿reabrir?" primero si el asunto está archivado).
+- **"Meter en un asunto" también usa lo leído** (punto 8 del encargo): `App.parecidoDelSuelto`
+  suma +50/+10 a su puntuación de siempre si el lector ya tiene resultado en caché para ese
+  fichero (ver más arriba). `window.LectorDeSueltos.resultadoDe(nombre)` expone ese resultado
+  (`undefined` si no se ha leído aún, `null` si se leyó y no había nada), y
+  `SugerenciasAsuntoExistente.esDelMismoTercero(tercero, terceroCandidato)` queda exportado para
+  no repetir la comparación de documento/nombre en los dos sitios.
+
+Se comprueba con `pruebas/sugerir-asunto-existente.mjs`, en navegador de verdad: un abierto del
+mismo tipo (sin marca); cuatro abiertos, dos del tipo propuesto y dos de otro (salen tres, el
+tercero con «otro tipo»); sin abiertos, con archivados del mismo tipo y uno de otro (con
+«archivado», y "Meter aquí" pregunta si reabrir); un abierto y un archivado del mismo tercero
+(solo sale el abierto); sin tercero reconocido (la tarjeta, igual que antes de esta fila); y que
+"Meter en un asunto" pone arriba los asuntos del tercero leído.
