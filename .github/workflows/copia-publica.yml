@@ -1,0 +1,70 @@
+name: Publicar la copia sin internet
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+  workflow_dispatch:
+  schedule:
+    - cron: '17 5 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comprobar que existe la clave
+        id: clave
+        run: |
+          if [ -z "${{ secrets.COPIA_TOKEN }}" ]; then
+            echo "existe=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Falta la clave de la copia pública (secreto COPIA_TOKEN). No se publica nada esta vez; ver docs/CLAVE-COPIA-PUBLICA.md."
+          else
+            echo "existe=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Clonar este repositorio
+        if: steps.clave.outputs.existe == 'true'
+        uses: actions/checkout@v4
+
+      - name: Node 20
+        if: steps.clave.outputs.existe == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generar la copia
+        if: steps.clave.outputs.existe == 'true'
+        run: |
+          npm ci
+          node scripts/copia-local.mjs
+
+      - name: Clonar el repositorio público (gestor-asuntos-copia)
+        if: steps.clave.outputs.existe == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: fmargon780/gestor-asuntos-copia
+          token: ${{ secrets.COPIA_TOKEN }}
+          path: gestor-asuntos-copia
+
+      - name: Copiar la copia generada encima, y quitar lo que ya no está
+        if: steps.clave.outputs.existe == 'true'
+        run: |
+          rsync -a --delete --exclude='.git' --exclude='README.md' copia-local/ gestor-asuntos-copia/
+
+      - name: Subir al repositorio público, solo si algo ha cambiado
+        if: steps.clave.outputs.existe == 'true'
+        working-directory: gestor-asuntos-copia
+        run: |
+          git config user.name "Copia automática"
+          git config user.email "copia@fmargon.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nada ha cambiado: no se sube ningún commit."
+          else
+            git commit -m "Actualizar la copia sin internet"
+            git push
+          fi
