@@ -134,6 +134,7 @@ App.cerrarAsunto = async function (a) {
           cerradoEl: a.ficha.cerradoEl || U.ahora(), ficheros: totalFicherosYa
         });
         await actualizarIndiceAlArchivar(a.nombre, categoria, tercero, handleYaArchivada);
+        App.E.recienArchivados[a.nombre] = true;
         U.aviso('Este asunto ya estaba archivado. He puesto la lista al día.', 'bueno');
       } else {
         U.aviso('No encuentro la carpeta de este asunto ni en Asuntos abiertos ni en el archivo. ' +
@@ -156,6 +157,10 @@ App.cerrarAsunto = async function (a) {
       cerradoEl: U.ahora(), cerradoPor: App.E.usuario, ficheros: totalFicheros
     });
     await actualizarIndiceAlArchivar(a.nombre, categoria, tercero, handleArchivado);
+    /* Para que App.reengancharFicha (js/ficha-asunto.js), llamado dentro
+       de App.verAbiertos() justo abajo, sepa que este ordenador acaba de
+       archivarlo y no dé el aviso de "otro ordenador" (fila 90). */
+    App.E.recienArchivados[a.nombre] = true;
     var mensaje = 'Asunto archivado.';
     if (haciendoFusion) {
       mensaje = 'Asunto archivado. Se ha completado un archivado anterior que se había quedado a medias.';

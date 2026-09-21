@@ -28,6 +28,7 @@ App.E = {
   listaArchivo: [],
   sueltos: [],         /* documentos sueltos en la carpeta de abiertos */
   reciales: {},        /* los que han llegado con la aplicación abierta */
+  recienArchivados: {},  /* claves archivadas por este ordenador hace un instante (fila 90) */
   pendiente: null,     /* el suelto que se va a meter en el asunto que se está creando */
   nuevo: { tipo: null, categoria: null, tercero: null }
 };

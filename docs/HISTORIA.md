@@ -5,6 +5,60 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 21-sep-2026 — Fila 90: archivar sin avisos falsos ni errores en inglés
+
+`docs/ARCHIVAR-SIN-AVISOS-FALSOS.md`. Al archivar un asunto desde su propia ficha (no desde la
+tarjeta de la lista) salían dos avisos rojos sobrantes, aunque el archivado en sí salía bien: uno
+de "otro ordenador" y otro con un `InvalidStateError` del navegador, en inglés, al intentar guardar
+`_ficha.json`.
+
+**Aviso 1, el falso "otro ordenador".** `App.cerrarAsunto` llama a `App.verAbiertos()` al terminar,
+que reengancha la ficha abierta (`App.reengancharFicha`, `js/ficha-asunto.js`); como el asunto ya
+no está en la lista (lo acaba de archivar este mismo ordenador), el aviso confundía su propio
+archivado con uno ajeno. Arreglo: `App.E.recienArchivados` (`js/nucleo.js`), un conjunto en
+memoria donde `App.cerrarAsunto` (`js/asuntos-archivar.js`) apunta la clave justo antes de llamar a
+`App.verAbiertos()`; `App.reengancharFicha` lo consulta primero, y si está, vuelve a la lista sin
+avisar (y borra la marca: es de un solo uso, para no confundir un archivado de verdad posterior del
+otro ordenador con el mismo nombre).
+
+**Aviso 2, Dropbox sincronizando al escribir `_ficha.json`.** La envoltura de `App.cerrarAsunto` en
+`js/ficha-archivo.js` escribe `_ficha.json` justo después de mover la carpeta, y Dropbox a veces
+todavía está sincronizando esa misma carpeta en ese instante. Dos piezas:
+- `Reintentar.escritura(intento)` (nuevo `js/reintentar-escritura.js`, cargado justo antes de
+  `js/carpetas.js`): un intento normal más hasta tres reintentos, con 0,5 s/1 s/2 s de espera por
+  delante de cada uno, si `intento` falla con `InvalidStateError`/`NoModificationAllowedError`.
+  Cualquier otro error se lanza a la primera. `Carpetas.escribirTexto`/`escribirBytes` pasan a
+  llamarla, envolviendo la escritura entera (pide el manejador del fichero de nuevo en cada
+  intento, nunca reutiliza uno viejo): como `Copias.guardar`, `guardarJson` y `_ficha.json` pasan
+  todos por ahí, esto arregla de una vez toda escritura de la aplicación, no solo la del archivado.
+- Si aun así los reintentos se agotan, la envoltura de `js/ficha-archivo.js` distingue ese caso
+  (`Reintentar.esErrorDeSincronizacion(e)`) y avisa en **ámbar**, diciendo que no se ha perdido nada
+  (la clave sigue en `asuntos.json`: el borrado va después de escribir `_ficha.json`) y que "Poner
+  en orden las fichas del ARCHIVO" la recogerá sola. Cualquier otro error sigue en rojo, con
+  `U.mensajeDeError(e)` en vez de `e.message` a pelo (también en la envoltura de
+  `App.reabrirAsunto`, que no tenía este arreglo).
+
+**Lo que costó de verdad, en la propia prueba.** El primer intento de simular el fallo cambiaba
+`window.__disco.fich` (la función expuesta del disco de mentira de `pruebas/navegador.mjs`) — pero
+`dir.getFileHandle` de ese disco llama a la función `fich` de su propio cierre léxico, no a esa
+propiedad: cambiarla no tiene ningún efecto, y la prueba archivaba sin fallar nunca, dando un falso
+verde. Arreglo: parchear en cascada el propio manejador de la carpeta ARCHIVO
+(`pruebas/archivar-sin-avisos-falsos.mjs`, `hazQueFalleEnElArchivo`), envolviendo
+`getDirectoryHandle`/`getFileHandle` de cualquier carpeta que cuelgue de ahí, para interceptar la
+creación de `_ficha.json` sin tener que adivinar de antemano qué carpetas va a crear el archivado.
+
+Prueba nueva, `pruebas/archivar-sin-avisos-falsos.mjs`, en navegador de verdad: archivar desde la
+ficha abierta sin el aviso de "otro ordenador"; Dropbox fallando dos veces y saliendo bien a la
+tercera, sin ningún aviso de más; y Dropbox fallando todo el rato, con el aviso ámbar y la ficha
+todavía en `asuntos.json`. Se tuvo que añadir `js/reintentar-escritura.js` a la lista de ficheros
+que cargan en su contexto `vm` otras 17 pruebas ya existentes que usan `js/carpetas.js` sin
+navegador (`Carpetas.escribirTexto`/`escribirBytes` ahora llaman a `Reintentar`, que si no está
+cargado revienta con `ReferenceError`).
+
+Fila 90 HECHA. `App.VERSION`: `21-sep-2026 · 14:49`.
+
+---
+
 ## 21-sep-2026 — Fila 89: la copia sin internet, bloqueada por el repositorio público
 
 `docs/COPIA-SIN-INTERNET.md`, diseño cerrado por Francisco el mismo día. El filtro de red del

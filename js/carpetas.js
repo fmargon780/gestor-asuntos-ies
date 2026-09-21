@@ -426,22 +426,28 @@ var Carpetas = (function () {
     }
   }
 
-  async function escribirTexto(dir, nombre, texto) {
-    var h = await dir.getFileHandle(nombre, { create: true });
-    var w = await h.createWritable();
-    await w.write(new Blob([texto], { type: 'text/plain;charset=utf-8' }));
-    await w.close();
-    return true;
+  /* Reintenta si Dropbox está sincronizando esta misma carpeta en este
+     instante (fila 90, docs/ARCHIVAR-SIN-AVISOS-FALSOS.md, js/reintentar-escritura.js). */
+  function escribirTexto(dir, nombre, texto) {
+    return Reintentar.escritura(async function () {
+      var h = await dir.getFileHandle(nombre, { create: true });
+      var w = await h.createWritable();
+      await w.write(new Blob([texto], { type: 'text/plain;charset=utf-8' }));
+      await w.close();
+      return true;
+    });
   }
 
   /* Como escribirTexto, pero para bytes cualquiera: un PDF nuevo, por
      ejemplo (17-sep-2026, fila 22, separar y unir PDF). */
-  async function escribirBytes(dir, nombre, bytes, tipo) {
-    var h = await dir.getFileHandle(nombre, { create: true });
-    var w = await h.createWritable();
-    await w.write(new Blob([bytes], { type: tipo || 'application/octet-stream' }));
-    await w.close();
-    return true;
+  function escribirBytes(dir, nombre, bytes, tipo) {
+    return Reintentar.escritura(async function () {
+      var h = await dir.getFileHandle(nombre, { create: true });
+      var w = await h.createWritable();
+      await w.write(new Blob([bytes], { type: tipo || 'application/octet-stream' }));
+      await w.close();
+      return true;
+    });
   }
 
   /* Distingue "no existe" de "no se puede leer". Si el fichero no está,
