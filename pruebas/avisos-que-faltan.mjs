@@ -228,5 +228,27 @@ const r = await AvisosQueFaltan._calcularPapeleraVieja();
 comprobar('solo la de hace 40 días cuenta como vieja', r.n, 1);
 comprobar('bytesLegibles no revienta con 0', AvisosQueFaltan._bytesLegibles(0), '0 KB');
 
+/* ================================================================
+   6. El aviso de huérfanas se puede callar 7 días (fila 86).
+   ================================================================ */
+console.log('--- 6. aviso de huérfanas ocultable ---');
+
+function dentroDeNDias(n) { return new Date(Date.now() + n * 86400000).toISOString(); }
+
+comprobar('sin nada guardado, sale',
+  AvisosQueFaltan._sePintaHuerfanas(3, null), true);
+
+comprobar('recién ocultado (7 días por delante), no sale',
+  AvisosQueFaltan._sePintaHuerfanas(3, { hasta: dentroDeNDias(7), n: 3 }), false);
+
+comprobar('a los 3 días de ocultarlo (4 por delante), no sale',
+  AvisosQueFaltan._sePintaHuerfanas(3, { hasta: dentroDeNDias(4), n: 3 }), false);
+
+comprobar('a los 8 días de ocultarlo (el plazo ya pasó), sale',
+  AvisosQueFaltan._sePintaHuerfanas(3, { hasta: dentroDeNDias(-1), n: 3 }), true);
+
+comprobar('con una ficha más que cuando se ocultó, sale aunque no hayan pasado los 7 días',
+  AvisosQueFaltan._sePintaHuerfanas(4, { hasta: dentroDeNDias(7), n: 3 }), true);
+
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 process.exit(fallos ? 1 : 0);

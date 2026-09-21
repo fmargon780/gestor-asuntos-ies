@@ -112,8 +112,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - "Qué me toca": hitos pendientes, filtro por responsable, bloque "Dormidos" (sin novedades en N
   días). "Cuentas": asuntos por tipo, mes y quién los pidió. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena en el PDF solo los datos del centro.
-- Avisos de "fichas sin carpeta" y de la papelera vieja también en Asuntos abiertos, no solo
-  entrando a propósito en Ajustes.
+- Avisos de "fichas sin carpeta" (✕ que calla 7 días) y de la papelera vieja, en Asuntos abiertos.
+  Pulsar la tarjeta de un documento (Por clasificar, un asunto, correos, papelera) lo abre, sin
+  botón.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
 - Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF, en la carpeta del asunto y en Por
   clasificar; Ajustar tamaño deja libre la banda del sello de Séneca y de la firma del director.
@@ -170,7 +171,6 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI" en la tarjeta.
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: membrete, Consejería, cargos (fila 81) y Provincia (fila 84).
-- Copiar a `formularios/` los 11 PDF que faltan (sin internet aquí): lista en `COLA.md`.
 - Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
 - Pulsar "Poner en orden las fichas del ARCHIVO" (Mantenimiento, fila 64): mueve a su carpeta la ficha de los archivados antes de esa fila, para que `asuntos.json` no siga creciendo.
 - Pulsar, antes de junio de 2027, "Guardar el contacto de los asuntos abiertos" (Ajustes → Mantenimiento, fila 66).

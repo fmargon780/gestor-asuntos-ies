@@ -113,6 +113,24 @@ await comprobar('1. los botones de una tarjeta de "Por clasificar"',
     'Ajustar tamaño', 'Borrar']);
 
 /* ============================================================
+   7. PULSAR LA TARJETA LA ABRE EN EL VISOR (fila 86)
+   ============================================================ */
+await tarjetaDe('Otro papel cualquiera.pdf').locator('.tarjeta-texto').click();
+await pagina.waitForSelector('#visor-lateral:not(.oculto)');
+await comprobar('7. pulsar la tarjeta abre el documento en el visor',
+  pagina.locator('#visor-lateral:not(.oculto)').count(), 1);
+await comprobar('con el nombre que toca',
+  pagina.locator('#visor-lateral').textContent().then(t => t.indexOf('Otro papel cualquiera.pdf') !== -1), true);
+
+/* Pulsar un botón de la fila no tiene que abrir nada aparte, ni el
+   menú de tres puntos. */
+await pagina.evaluate(() => window.Visor.cerrar());
+await tarjetaDe('Otro papel cualquiera.pdf').locator('.fila-menu-btn').click();
+await comprobar('pulsar el menú de tres puntos no abre el visor',
+  pagina.locator('#visor-lateral:not(.oculto)').count(), 0);
+await pagina.keyboard.press('Escape');
+
+/* ============================================================
    6. LA PUNTUACIÓN DE PARECIDO
    ============================================================ */
 await comprobar('6. manda el asunto cuyo tercero sale en el nombre del fichero',

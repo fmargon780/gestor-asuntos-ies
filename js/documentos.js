@@ -132,6 +132,18 @@ var Documentos = (function () {
       };
     });
 
+    /* Pulsar la fila del documento lo enseña igual que "Poner nombre":
+       es el visor que tiene este cuadro (17-sep-2026, fila 86). Los
+       botones de la propia fila siguen haciendo lo suyo. */
+    Array.prototype.forEach.call(caja.querySelectorAll('.fila-documento'), function (fila, i) {
+      fila.style.cursor = 'pointer';
+      fila.title = 'Pulsa para verlo';
+      fila.onclick = function (ev) {
+        if (ev.target.closest('button, a, input, select, textarea, label')) return;
+        pintarFormulario({ modo: 'renombrar', nombreActual: lista[i].nombre });
+      };
+    });
+
     Array.prototype.forEach.call(caja.querySelectorAll('[data-registrar]'), function (b) {
       b.onclick = async function () {
         var f = lista[Number(b.dataset.registrar)];

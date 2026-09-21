@@ -543,9 +543,33 @@ var Papelera = (function () {
     lista.forEach(function (ficha) { caja.appendChild(filaDePapelera(ficha)); });
   };
 
+  /* Ver un documento sin sacarlo de la papelera (17-sep-2026, fila 86):
+     mismo camino que ya usa devolverDocumento para llegar hasta él. */
+  async function abrirDesdeLaPapelera(ficha) {
+    try {
+      var pap = await carpetaPapelera();
+      var sub = await pap.getDirectoryHandle(ficha.carpeta);
+      var h = await sub.getFileHandle(ficha.nombre);
+      await window.Visor.abrir(h, ficha.nombre, { marcador: 'papelera:' + ficha.id });
+    } catch (e) {
+      U.aviso('No he podido abrirlo: ' + e.message, 'malo');
+    }
+  }
+
+  var CLASES_CON_FICHERO = { documento: true, suelto: true };
+
   function filaDePapelera(ficha) {
     var f = document.createElement('div');
     f.className = 'fila-tipo fila-papelera';
+
+    if (CLASES_CON_FICHERO[ficha.clase] && ficha.carpeta && window.Visor) {
+      f.classList.add('fila-papelera-pulsable');
+      f.title = 'Pulsa para verlo sin sacarlo de la papelera';
+      f.onclick = function (ev) {
+        if (ev.target.closest('button, a, input, select, textarea, label')) return;
+        abrirDesdeLaPapelera(ficha);
+      };
+    }
 
     var icono = document.createElement('span');
     icono.className = 'papelera-icono';
