@@ -81,9 +81,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Correo y mensaje de Séneca preparados (la app nunca envía nada), en un cuadro ancho de dos
   columnas con el asunto completo y su cuenta de caracteres; el ayudante de Séneca comprueba de
   verdad quién ha entrado y dice por su nombre quién falta.
-- "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; encima
-  vive la bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y sus adjuntos y propone tipo,
-  fecha, registro y tercero sin decidir por su cuenta.
+- "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; con
+  tercero reconocido, también sugiere meterlo en uno que ya existe («Podría ir en: …», con botón
+  «Meter aquí»). Encima vive la bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y sus
+  adjuntos y propone tipo, fecha, registro y tercero sin decidir por su cuenta.
 - Aspirantes a plaza dados de alta sin Nº de identificación escolar: al escribirlo, se renombran
   solas las carpetas de sus asuntos abiertos.
 - Ficha del tercero con "Datos y contacto" en una línea, cada dato con su copiar; ficha del
