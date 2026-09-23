@@ -102,8 +102,12 @@ Las filas 1 a 62, 64 a 75, 77 a 104 están **HECHAS**. Sus documentos siguen en
 
 | Nº | Instrucción | Estado |
 |---|---|---|
+| 105 | `docs/AJUSTES-PLEGADO.md` | PENDIENTE (apuntada 23-sep-2026) |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 105 se apuntó el 23-sep-2026**, cerrada con Francisco: en Ajustes todo nace plegado,
+con un resumen en cada título, y los avisos de fallo de Mantenimiento solo salen cuando hay uno.
 
 **La fila 104 está HECHA** (23-sep-2026): `docs/ESTADO-POR-EL-HITO.md`. Los dos paneles de
 Asuntos abiertos pasan a ser "Pendiente de Administración" y "Pendiente de terceros", y el asunto
@@ -202,6 +206,9 @@ mesa de trabajo, sobre lo que dejó la 102.
   paso, un buscador que encuentre el artículo por su texto ("consejo escolar") y rellene la clave
   solo. Necesita que el sistema de normativa publique un índice ligero de claves y títulos. **Se
   diseña con Francisco a partir del miércoles 23-sep-2026 a las 14:00**, no antes.
+- **Del 23-sep-2026: revisión de usabilidad.** Francisco ve pantallas con demasiadas cosas. Ajustes
+  va en la fila 105. Quedan por hablar la ficha del asunto y Asuntos abiertos (qué plegar en cada
+  una), con la misma regla: plegado, resumen en el título, y se recuerda lo abierto.
 
 ## Descartado, no proponer otra vez (del informe del 18-sep-2026)
 
