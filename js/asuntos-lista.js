@@ -713,8 +713,8 @@ App.tarjetaAsunto = function (a, modo) {
   return div;
 };
 
-App.verDocumentos = async function (a) {
-  await Documentos.abrir(a);
+App.verDocumentos = async function (a, opciones) {
+  await Documentos.abrir(a, opciones);
 };
 
 $('buscar-abiertos').oninput = function () {
