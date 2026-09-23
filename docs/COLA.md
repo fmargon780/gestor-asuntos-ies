@@ -97,7 +97,7 @@ Las filas 1 a 62, 64 a 75, 77 a 93 están **HECHAS**. Sus documentos siguen en
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 97 | `docs/NOMBRE-CORTO-EN-LOS-FILTROS.md` (el nombre corto del tipo, en los filtros y en la etiqueta de la tarjeta; buscar por el largo y por el corto) | PENDIENTE |
+| 97 | `docs/NOMBRE-CORTO-EN-LOS-FILTROS.md` (el nombre corto del tipo, en los filtros y en la etiqueta de la tarjeta; buscar por el largo y por el corto) | EN CURSO (23-sep-2026) |
 | 94 | `docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md` (al cambiar el tipo de un asunto abierto, ofrecer traer la guía del tipo nuevo sin perder lo trabajado) | PENDIENTE |
 | 96 | `docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md` (campos propios del tipo de documento, obligatorios si se quiere, que entran solos en el nombre) | PENDIENTE |
 | 98 | `docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md` (botón «Ruta» en la ficha, con la ruta de este ordenador apuntada en Ajustes → El centro) | PENDIENTE |
