@@ -131,9 +131,9 @@ async function copiarYLeer(etiqueta) {
    ============================================================ */
 console.log('--- 1. alumnado con DNI: los cuatro botones ---');
 await abrirFicha(ALUMNO_CON_DNI);
-await esperarBotones(4);
+await esperarBotones(4 + 1);  // + «Ruta» (fila 98)
 await comprobar('1. los cuatro botones, en orden',
-  etiquetas(), ['Asunto', 'NIE', 'Nombre', 'DNI']);
+  etiquetas(), ['Asunto', 'Ruta', 'NIE', 'Nombre', 'DNI']);
 await comprobar('1. "Asunto" copia el nombre completo de la carpeta',
   copiarYLeer('Asunto'), ALUMNO_CON_DNI);
 await comprobar('1. "NIE" copia el número, sin el nombre',
@@ -148,19 +148,19 @@ await comprobar('1. "DNI" copia el documento del alumno',
    ============================================================ */
 console.log('--- 2. alumnado sin DNI en el fichero: sin botón DNI ---');
 await abrirFicha(ALUMNO_SIN_DNI);
-await esperarBotones(3);
+await esperarBotones(3 + 1);  // + «Ruta» (fila 98)
 await pagina.waitForTimeout(300);   /* que no llegue un cuarto botón con retraso */
 await comprobar('2. tres botones: Asunto, NIE y Nombre, sin DNI',
-  etiquetas(), ['Asunto', 'NIE', 'Nombre']);
+  etiquetas(), ['Asunto', 'Ruta', 'NIE', 'Nombre']);
 
 /* ============================================================
    3. PERSONAL: Nombre y DNI, nunca NIE
    ============================================================ */
 console.log('--- 3. personal: Nombre y DNI, sin NIE ---');
 await abrirFicha(PERSONAL);
-await esperarBotones(3);
+await esperarBotones(3 + 1);  // + «Ruta» (fila 98)
 await comprobar('3. tres botones: Asunto, Nombre y DNI, sin NIE',
-  etiquetas(), ['Asunto', 'Nombre', 'DNI']);
+  etiquetas(), ['Asunto', 'Ruta', 'Nombre', 'DNI']);
 await comprobar('3. "DNI" copia el documento del empleado',
   copiarYLeer('DNI'), '44556677B');
 
@@ -169,9 +169,9 @@ await comprobar('3. "DNI" copia el documento del empleado',
    ============================================================ */
 console.log('--- 4. empresas: el botón del documento se llama CIF ---');
 await abrirFicha(EMPRESA);
-await esperarBotones(3);
+await esperarBotones(3 + 1);  // + «Ruta» (fila 98)
 await comprobar('4. tres botones: Asunto, Nombre y CIF, sin NIE',
-  etiquetas(), ['Asunto', 'Nombre', 'CIF']);
+  etiquetas(), ['Asunto', 'Ruta', 'Nombre', 'CIF']);
 await comprobar('4. "Nombre" copia la razón social',
   copiarYLeer('Nombre'), 'Suministros Escolares SL');
 await comprobar('4. "CIF" copia el NIF de la empresa',

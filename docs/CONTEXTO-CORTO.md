@@ -85,6 +85,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
 - Aspirantes a plaza dados de alta sin Nº de identificación escolar: al escribirlo, se renombran
   solas las carpetas de sus asuntos abiertos.
+- Botón «Ruta» en la ficha: copia la ruta de su carpeta.
 - Ficha del tercero con "Datos y contacto" en una línea, cada dato con su copiar; ficha del
   asunto a tres columnas, con cabecera agrupada por el momento del trámite y menú de tres puntos.
 - Registrar un documento detecta el PDF ya sellado, lo renombra y guarda el original como
@@ -146,9 +147,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV.
 - Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o uno nuevo. Sin remedio, con `U.envolver`, apuntado en `js/envolturas-esperadas.js`.
 - Una acción que guarda y repinta: `await` hasta el final y usar `U.mientrasGuarda(control, fn)`
-  para apagar el botón o desplegable ("Guardando…") mientras tanto (fila 23, 17-sep-2026).
+  para apagar el botón o desplegable ("Guardando…") mientras tanto.
 - Un bloque que se repinta solo nunca puede tirar lo que se está escribiendo, ni el foco, ni el
-  cursor: envolver el repintado en `U.conservandoLoEscrito(raiz, fn)` (filas 33 y 34, 17-sep-2026).
+  cursor: envolver el repintado en `U.conservandoLoEscrito(raiz, fn)`.
 - Al terminar una instrucción de la cola: actualizar este documento y `CONTEXTO.md`
   sustituyendo la línea vieja, y anotar en `HISTORIA.md` lo que merezca recordarse.
 - El registro de asuntos (`asuntos.json`) solo se escribe entero por `App.anotar` o por

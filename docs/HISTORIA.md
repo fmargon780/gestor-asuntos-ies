@@ -5,7 +5,17 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
-## 23-sep-2026 — Fila 96: campos propios en el nombre de un documento
+## 23-sep-2026 — Fila 98: el botón «Ruta» de la ficha del asunto
+
+`docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md`. Francisco pidió un botón que abriera la carpeta del
+asunto; el navegador no lo deja (sigue en la lista de descartado), así que se copia la ruta para
+pegarla en el explorador. Los manejadores de carpeta no saben su ruta de verdad, así que la parte
+de delante la apunta cada uno en Ajustes → El centro, y se guarda en `localStorage`, no en
+`_GESTOR`: la ruta del ordenador de Francisco no existe en el de su compañero. Módulo nuevo
+`js/copiar-ruta.js`, que se crea su propio bloque en Ajustes. `pruebas/copiar-fila.mjs` cuenta
+ahora un botón más.
+
+: campos propios en el nombre de un documento
 
 `docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md`. Cada tipo de documento puede llevar campos (texto,
 lista o fecha, obligatorios si se quiere) que entran en el nombre entre el tipo y el texto

@@ -146,6 +146,9 @@
     var fila = document.createElement('div');
     fila.className = 'ficha-copiar-fila';
     fila.appendChild(botonCopiarFila('Asunto', a.nombre, 'Copiar el nombre completo de la carpeta'));
+    /* La ruta de la carpeta, con lo apuntado en Ajustes → El centro
+       (fila 98, js/copiar-ruta.js). */
+    if (window.RutaCarpetas) fila.appendChild(RutaCarpetas.boton(a, modoDelAsunto));
 
     var nie = Copiar.nieDeAsunto(a);
     if (nie) fila.appendChild(botonCopiarFila('NIE', nie, 'Copiar ' + nie + ', el Nº de identificación escolar'));

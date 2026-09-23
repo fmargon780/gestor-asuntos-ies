@@ -88,7 +88,8 @@ de `App` va después del fichero que lo define.
 | `js/lib/pdf.min.mjs`, `js/lib/pdf.worker.min.mjs` | pdf.js (Mozilla) 4.2.67, copiado tal cual (fila 72: sube desde la 3.11.174, con el CVE-2024-4367 arreglado). Se carga con `import()`, no con `<script>`: la 4.x ya no trae el script suelto de antes |
 | `js/ficha-asunto.js` | La pantalla de un asunto: cabecera (con la línea gris del subtítulo, fila 51; barra de 5 acciones y el `<h2>` con sus dos añadidos, fila 52), Hitos a la izquierda, Documentos en el centro, "Datos y contacto"/Notas/los dos plegables/Datos del trámite a la derecha. `App.reengancharFicha` no avisa de "otro ordenador" si `App.E.recienArchivados` dice que este mismo ordenador lo acaba de archivar (fila 90) |
 | `js/ficha-menus.js` | El menú pequeño reutilizable de la cabecera (abrir, cerrar con Escape/al pulsar fuera, uno solo a la vez): lo usan los tres puntos del nombre y "Comunicar" (18-sep-2026, fila 52) |
-| `js/ficha-nombre-acciones.js` | El menú de tres puntos del `<h2>` del nombre del asunto (Editar, Borrar, fila 52) y, debajo, la fila de copiar de un gesto (Asunto, NIE, Nombre, DNI/CIF, fila 58) |
+| `js/ficha-nombre-acciones.js` | El menú de tres puntos del `<h2>` del nombre del asunto (Editar, Borrar, fila 52) y, debajo, la fila de copiar de un gesto (Asunto, Ruta, NIE, Nombre, DNI/CIF, filas 58 y 98) |
+| `js/copiar-ruta.js` | `RutaCarpetas` (fila 98): el botón «Ruta» de la fila de copiar y el bloque «Rutas de las carpetas en este ordenador» de Ajustes → El centro (`localStorage`) |
 | `js/ficha-plegables.js` | Los dos bloques plegables de la ficha ("Otros asuntos de este tercero", "Personas y entidades relacionadas"): montar el `<details>`, el resumen con la cuenta, guardar y reponer el abierto/cerrado entre un repintado y otro (18-sep-2026, fila 51) |
 | `js/ficha-documentos.js` | Los documentos de la carpeta, en la ficha del asunto (separado de `js/ficha-asunto.js` en la fila 26); pone la clase `vacio` al bloque cuando no hay ninguno (fila 51); botón "Documentos ▾" en la cabecera del bloque (fila 52); el original "SIN SELLAR" en gris y "Asociar a un hito" en cada fila (fila 58) |
 | `js/ficha-tercero.js`, `css/ficha-tercero.css` | "Datos y contacto" del tercero: la línea resumen y la ventana "Ver todo" con los tutores agrupados por persona (separado de `js/ficha-asunto.js` en la fila 37) |
@@ -167,6 +168,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/guias.mjs` | Prueba de escribir la guía desde la ficha, y del plegado |
 | `pruebas/opciones.mjs` | Prueba de las preguntas con opciones, con el caso de la factura |
 | `pruebas/registro.mjs` | Prueba de registrar un documento en un paso, sin nombrarlo dos veces |
+| `pruebas/copiar-ruta.mjs` | Prueba (navegador de verdad, fila 98, 23-sep-2026): el botón «Ruta» sin ruta apuntada (nombre y aviso), con ruta de Windows (abierto) y estilo Linux (archivado), guardada en `localStorage` y no en `_GESTOR` |
 | `pruebas/campos-del-documento.mjs` | Prueba (fila 96, 23-sep-2026): el nombre con los campos del tipo de documento, el obligatorio vacío, un tipo sin campos, con registro, reconocer al renombrar, guardar en `campos.json`; y en navegador el cuadro de poner nombre y el editor de Ajustes |
 | `pruebas/campos.mjs` | Prueba de los campos de cada tipo de asunto (ocho escenarios más editar) |
 | `pruebas/relacionados.mjs` | Prueba de los terceros relacionados con un asunto, y la nota al archivar |
