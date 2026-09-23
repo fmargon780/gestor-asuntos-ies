@@ -91,7 +91,7 @@ Las filas 1 a 62, 64 a 75, 77 a 92 están **HECHAS**. Sus documentos siguen en
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 93 | `docs/QUEDARSE-EN-EL-ASUNTO-SIEMPRE.md` (asociar un documento saca de la ficha: revisar todas las salidas y dejar solo Volver, Editar, Archivar/Reabrir y Borrar) | PENDIENTE |
+| 93 | `docs/QUEDARSE-EN-EL-ASUNTO-SIEMPRE.md` (asociar un documento saca de la ficha: revisar todas las salidas y dejar solo Volver, Editar, Archivar/Reabrir y Borrar) | EN CURSO (23-sep-2026) |
 | 97 | `docs/NOMBRE-CORTO-EN-LOS-FILTROS.md` (el nombre corto del tipo, en los filtros y en la etiqueta de la tarjeta; buscar por el largo y por el corto) | PENDIENTE |
 | 94 | `docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md` (al cambiar el tipo de un asunto abierto, ofrecer traer la guía del tipo nuevo sin perder lo trabajado) | PENDIENTE |
 | 96 | `docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md` (campos propios del tipo de documento, obligatorios si se quiere, que entran solos en el nombre) | PENDIENTE |
