@@ -97,6 +97,7 @@ Las filas 1 a 62, 64 a 75, 77 a 102 están **HECHAS**. Sus documentos siguen en
 
 | Nº | Instrucción | Estado |
 |---|---|---|
+| 103 | `docs/EL-HITO-MESA-DE-TRABAJO.md` (segunda tanda del hito: "Añadir documento" con tres caminos, menú de tres puntos en cada documento del hito, "Comunicar" siempre visible con los documentos del hito ya marcados) | PENDIENTE |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
@@ -124,6 +125,9 @@ lo más urgente y van en ese orden: cada una usa lo que deja la anterior.
 
 **La fila 102 se apuntó el 23-sep-2026**, cerrada con Francisco: primera tanda de que el hito sea
 la mesa de trabajo del asunto. Va detrás de la 101.
+
+**La fila 103 se apuntó el 23-sep-2026**, cerrada con Francisco: segunda tanda del hito como
+mesa de trabajo, sobre lo que dejó la 102.
 
 **Ninguna fila se sube junto con otra.** Cada una, su subida.
 
