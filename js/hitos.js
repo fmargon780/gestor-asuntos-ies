@@ -212,18 +212,27 @@ var Hitos = (function () {
     return null;
   }
 
-  function visibles(lista) {
-    var out = [];
+  /* Una pregunta sin responder corta la lista ENTERA, esté al nivel
+     que esté (fila 95: preguntas dentro de las respuestas): si la de
+     dentro de una rama no se ha respondido, tampoco se ve lo que viene
+     después de la pregunta de fuera. */
+  function recorrerVisibles(lista, out) {
     for (var i = 0; i < (lista || []).length; i++) {
       var h = lista[i];
       if (h.delTipoAnterior) continue;   /* fila 94: va con los huérfanos */
       out.push(h);
       if (h.clase === 'decision') {
-        if (!h.elegida) return out;   /* se corta aquí: nada más se ve */
+        if (!h.elegida) return true;   /* se corta aquí: nada más se ve */
         var opt = h.opciones.filter(function (o) { return o.id === h.elegida; })[0];
-        if (opt) out = out.concat(visibles(opt.hitos));
+        if (opt && recorrerVisibles(opt.hitos, out)) return true;
       }
     }
+    return false;
+  }
+
+  function visibles(lista) {
+    var out = [];
+    recorrerVisibles(lista, out);
     return out;
   }
 
@@ -236,12 +245,25 @@ var Hitos = (function () {
       if (h.delTipoAnterior) { out.push(h); return; }   /* fila 94 */
       if (h.clase !== 'decision') return;
       h.opciones.forEach(function (o) {
-        if (o.id !== h.elegida) {
-          (o.hitos || []).forEach(function (x) { if (x.estado === 'noaplica') out.push(x); });
-        } else {
-          out = out.concat(huerfanos(o.hitos));
-        }
+        if (o.id !== h.elegida) out = out.concat(descartados(o.hitos));
+        else out = out.concat(huerfanos(o.hitos));
       });
+    });
+    return out;
+  }
+
+  /* Todo lo "noaplica" de una rama no elegida, a cualquier profundidad
+     (fila 95): una pregunta de dentro se enseña solo si tenía algo
+     suyo apuntado; sus pasos con algo, siempre. */
+  function descartados(lista) {
+    var out = [];
+    (lista || []).forEach(function (x) {
+      if (x.clase === 'decision') {
+        if (x.estado === 'noaplica' && ((x.notas && x.notas.length) || (x.documentos && x.documentos.length))) out.push(x);
+        x.opciones.forEach(function (o) { out = out.concat(descartados(o.hitos)); });
+      } else if (x.estado === 'noaplica') {
+        out.push(x);
+      }
     });
     return out;
   }

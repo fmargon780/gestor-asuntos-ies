@@ -405,7 +405,6 @@ las dos carpetas en ese ordenador, para el botón «Ruta»). **El tablón no se 
 - **Crear un proyecto de Vercel más "por si acaso".** Un repositorio, un proyecto, una dirección.
 - **Abrir la carpeta del asunto en el explorador de archivos del ordenador.** Una página web no
   tiene permiso.
-- **Opciones dentro de opciones en la guía.** Una bifurcación por paso.
 - **Una hoja de Google Sheets como interfaz.**
 - **Enlazar un correo de Gmail con `#all/<identificador del hilo>`.** Se enlaza por el
   `Message-ID`: `#search/rfc822msgid:<id>`.
