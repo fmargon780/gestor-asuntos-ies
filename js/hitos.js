@@ -114,6 +114,11 @@ var Hitos = (function () {
          catálogo de `js/formularios.js`. Mismo criterio que `normativa`:
          solo en el hito de arriba, nunca en el de una opción. */
       formularios: Array.isArray(h && h.formularios) ? h.formularios.map(String) : [],
+      /* 23-sep-2026, fila 94, docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md: el
+         tipo del que venía un hito que se ha quedado tras cambiar el tipo
+         del asunto (tenía algo apuntado). Vacío en todos los demás. No
+         se ve en la lista ni cuenta: sale plegado con los huérfanos. */
+      delTipoAnterior: String((h && h.delTipoAnterior) || ''),
       opciones: [], elegida: null
     };
     if (esDecision) {
@@ -209,6 +214,7 @@ var Hitos = (function () {
     var out = [];
     for (var i = 0; i < (lista || []).length; i++) {
       var h = lista[i];
+      if (h.delTipoAnterior) continue;   /* fila 94: va con los huérfanos */
       out.push(h);
       if (h.clase === 'decision') {
         if (!h.elegida) return out;   /* se corta aquí: nada más se ve */
@@ -225,6 +231,7 @@ var Hitos = (function () {
   function huerfanos(lista) {
     var out = [];
     (lista || []).forEach(function (h) {
+      if (h.delTipoAnterior) { out.push(h); return; }   /* fila 94 */
       if (h.clase !== 'decision') return;
       h.opciones.forEach(function (o) {
         if (o.id !== h.elegida) {

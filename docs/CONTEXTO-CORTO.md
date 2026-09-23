@@ -73,6 +73,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
   sueltas también en documentos, registro de Séneca, ficha y notas.
 - Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
+  Si cambia el tipo, ofrece traer la guía del nuevo sin perder lo trabajado.
 - Nombre comercial de empresas, aparte de la razón social; cambiar los datos de un tercero dado
   de alta a mano.
 - Guías del procedimiento por tipo, con pasos, preguntas y opciones.

@@ -42,9 +42,14 @@ var HitosPanelLista = (function () {
     if (huerfanos.length) {
       var det = document.createElement('details');
       det.className = 'hitos-huerfanos';
+      /* Fila 94: también los que se quedaron del tipo anterior del asunto. */
+      var delTipo = huerfanos.some(function (h) { return h.delTipoAnterior; });
       det.innerHTML = '<summary>' + huerfanos.length +
-        (huerfanos.length === 1 ? ' hito de una rama descartada' : ' hitos de ramas descartadas') +
-        ' (no aplica, pero tenían notas o documentos)</summary>';
+        (delTipo
+          ? (huerfanos.length === 1 ? ' hito que ya no aplica' : ' hitos que ya no aplican') +
+            ' (de una rama descartada o del tipo anterior, pero tenían algo apuntado)'
+          : (huerfanos.length === 1 ? ' hito de una rama descartada' : ' hitos de ramas descartadas') +
+            ' (no aplica, pero tenían notas o documentos)') + '</summary>';
       var dentro = document.createElement('div');
       dentro.className = 'lista-hitos';
       huerfanos.forEach(function (h) { dentro.appendChild(filaDeHito(a, hitos, h, ajustes, false, nombresDeLaCarpeta)); });
