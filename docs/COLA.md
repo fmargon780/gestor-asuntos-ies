@@ -97,6 +97,9 @@ Las filas 1 a 62, 64 a 75, 77 a 98 están **HECHAS**. Sus documentos siguen en
 
 | Nº | Instrucción | Estado |
 |---|---|---|
+| 99 | `docs/GUARDAR-EN-FILA.md` (guardados de uno en uno, copia del día una sola vez, reintentar al leer, tareas de fondo quietas mientras se guarda, tres riesgos de perder datos) | PENDIENTE |
+| 100 | `docs/AVISOS-QUE-DICEN-LA-VERDAD.md` (lo principal y lo accesorio por separado: verde, ámbar o rojo; botones que se bloquean de verdad; errores en castellano). Después de la 99 | PENDIENTE |
+| 101 | `docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md` (repintar solo lo que se ve y ha cambiado; el último repintado gana). Después de la 100 | PENDIENTE |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
@@ -117,6 +120,10 @@ local: tres fallos en las pruebas nuevas (nunca en la aplicación), los tres arr
 pruebas de `pruebas/` en verde. La 63 y la 76 siguen BLOQUEADAS y no se retoman sin que Francisco lo diga. La
 tabla está en orden de trabajo, no de número, así que en cuanto se apunte una fila nueva,
 la primera PENDIENTE **de arriba abajo** es la que se coge.
+
+**Las filas 99, 100 y 101 se apuntaron el 23-sep-2026** tras una revisión a fondo de cómo
+guarda y repinta la aplicación (error o pantalla congelada al guardar, aunque sí se guarda). Son
+lo más urgente y van en ese orden: cada una usa lo que deja la anterior.
 
 **Ninguna fila se sube junto con otra.** Cada una, su subida.
 
