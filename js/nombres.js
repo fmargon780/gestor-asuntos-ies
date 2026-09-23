@@ -77,6 +77,23 @@ var Nombres = (function () {
     return (tipo && tipo.nombreCorto) ? tipo.nombreCorto : ((tipo && tipo.tipo) || '');
   }
 
+  /* Lo que se ENSEÑA de un tipo en los filtros «Por tipo de asunto» y
+     en la etiqueta de la tarjeta (fila 97, docs/NOMBRE-CORTO-EN-LOS-FILTROS.md):
+     el nombre corto si lo tiene, el de siempre si no. `nombreTipo` es el
+     nombre de verdad (el largo, el que devuelve `leer`), y es el que
+     sigue sirviendo para agrupar y filtrar. */
+  function tipoParaVer(nombreTipo, tipos) {
+    var t = (tipos || []).filter(function (x) { return x.tipo === nombreTipo; })[0];
+    return t ? tipoParaCarpeta(t) : (nombreTipo || '');
+  }
+
+  /* Los dos nombres de un tipo, para el buscador: el largo y el corto
+     (fila 97). Se resuelve al buscar, desde la lista de tipos de hoy. */
+  function nombresDeTipo(nombreTipo, tipos) {
+    var corto = tipoParaVer(nombreTipo, tipos);
+    return corto && corto !== nombreTipo ? [nombreTipo || '', corto] : [nombreTipo || ''];
+  }
+
   /* Monta el nombre de la carpeta a partir de sus piezas.
      El tercero va siempre el último. El grupo, si se pide, va detrás
      del año académico y delante de los campos y de la descripción.
@@ -385,6 +402,7 @@ var Nombres = (function () {
     POR_DEFECTO: POR_DEFECTO, CATEGORIAS: CATEGORIAS,
     ESTADOS_POR_DEFECTO: ESTADOS_POR_DEFECTO, VIAS: VIAS, via: via,
     montar: montar, leer: leer, categoriaDeTipo: categoriaDeTipo, tipoParaCarpeta: tipoParaCarpeta,
+    tipoParaVer: tipoParaVer, nombresDeTipo: nombresDeTipo,
     grupoCompacto: grupoCompacto, nivelYEnsenanza: nivelYEnsenanza,
     TIPOS_DOCUMENTO_POR_DEFECTO: TIPOS_DOCUMENTO_POR_DEFECTO,
     codigoRegistro: codigoRegistro, montarDocumento: montarDocumento,

@@ -353,7 +353,12 @@ var IndiceArchivo = (function () {
     var partes = [
       entrada.nombre, entrada.categoria, entrada.tercero, entrada.ruta,
       entrada.tipo, entrada.curso, entrada.grupo
-    ].concat(entrada.documentos || []).concat(entrada.registros || []);
+    ].concat(
+      /* El nombre corto del tipo (fila 97), resuelto al buscar desde la
+         lista de tipos de hoy: sin subir la VERSION del índice. */
+      entrada.tipo && window.Nombres && window.App && App.E && App.E.tipos
+        ? Nombres.nombresDeTipo(entrada.tipo, App.E.tipos).slice(1) : []
+    ).concat(entrada.documentos || []).concat(entrada.registros || []);
 
     partes.push(entrada.situacion || '');
     if (entrada.via) {

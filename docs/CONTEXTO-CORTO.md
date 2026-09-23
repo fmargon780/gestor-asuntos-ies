@@ -67,7 +67,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 (Una línea por cosa. El cómo y el porqué de cada una están en `docs/contexto/` y en `HISTORIA.md`.)
 
-- Categoría → tipo → tercero → nombre de carpeta, con vista previa.
+- Categoría → tipo → tercero → nombre de carpeta, con vista previa. El nombre corto del tipo, en carpeta, filtros y tarjeta.
 - Estado del asunto, vía de comunicación preferente y fecha límite.
 - Asuntos recurrentes, con aviso y creación manual.
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras

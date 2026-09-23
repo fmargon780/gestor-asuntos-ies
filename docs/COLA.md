@@ -92,12 +92,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 62, 64 a 75, 77 a 93 están **HECHAS**. Sus documentos siguen en
+Las filas 1 a 62, 64 a 75, 77 a 93 y 97 están **HECHAS**. Sus documentos siguen en
 `docs/`, y el detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 97 | `docs/NOMBRE-CORTO-EN-LOS-FILTROS.md` (el nombre corto del tipo, en los filtros y en la etiqueta de la tarjeta; buscar por el largo y por el corto) | EN CURSO (23-sep-2026) |
 | 94 | `docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md` (al cambiar el tipo de un asunto abierto, ofrecer traer la guía del tipo nuevo sin perder lo trabajado) | PENDIENTE |
 | 96 | `docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md` (campos propios del tipo de documento, obligatorios si se quiere, que entran solos en el nombre) | PENDIENTE |
 | 98 | `docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md` (botón «Ruta» en la ficha, con la ruta de este ordenador apuntada en Ajustes → El centro) | PENDIENTE |
@@ -244,95 +243,3 @@ retipear de un tirón sin `git push`). Puede que falten todavía.
 Compruébalo contra lo que de verdad dice `main` antes de sustituir nada. Si la sesión tiene
 `git push` de verdad (terminal u ordenador de Francisco), es mucho más simple que ir fichero a
 fichero con la API.
-
-## Nota para la próxima sesión: docs/HISTORIA.md de la fila 93
-
-La fila 93 está HECHA y publicada, y esta vez sí verificada: esta sesión pudo clonar el
-repositorio de solo lectura (`git clone`, sin permiso para `git push`) y correr `npm test` de
-verdad en local. Arregló tres fallos que tenía `pruebas/quedarse-en-el-asunto.mjs` (nunca en la
-aplicación) y dejó las 97 pruebas de `pruebas/` en verde. Pero `docs/HISTORIA.md` pesa más de
-130 KB, y esta sesión tampoco tiene forma fiable de reconstruirlo entero sin arriesgarse a
-truncarlo (regla 12). Pégalo tal cual **arriba del todo**, justo después de la línea `---` que
-sigue a la introducción (antes de `## 23-sep-2026 — Fila 92: «Reintentar is not defined»...`):
-
-    ## 23-sep-2026 — Fila 93: no salir del asunto salvo cuando el usuario lo pide
-
-    `docs/QUEDARSE-EN-EL-ASUNTO-SIEMPRE.md`. Repaso completo, fichero a fichero, de todo `js/` en
-    busca de una salida indebida de la ficha (`App.ir(` hacia otra pantalla, u ocultar
-    `#pantalla-asunto` fuera de las cuatro salidas permitidas): `js/nucleo.js` (dónde vive `App.ir` y
-    `App.PANTALLAS`), `js/ficha-asunto.js`, `js/ficha-nombre-acciones.js`, `js/ficha-documentos.js`,
-    `js/hitos-documentos.js`, `js/hitos-panel.js`, `js/hitos-panel-lista.js`, `js/hitos-comunicar.js`,
-    `js/documentos.js`, `js/documentos-sueltos.js`, `js/documentos-sueltos-lector.js`,
-    `js/documentos-sueltos-sugerencias.js`, `js/registro.js`, `js/registro-sellado.js`, `js/correo.js`,
-    `js/correo-adjuntos.js`, `js/plantillas-documento.js`, `js/pdf-separar-unir.js`,
-    `js/preparar-documento.js`, `js/notas.js`, `js/relacionados.js`, `js/otros-del-tercero.js`,
-    `js/formularios.js`, `js/formularios-rellenar.js`, `js/asuntos-lista.js`, `js/asuntos-archivar.js`,
-    `js/asuntos-editar.js`, `js/asuntos-nuevo.js`, `js/asunto-renombrar.js`, `js/unir-asuntos.js`,
-    `js/borrados-fusion.js`, `js/papelera.js`, `js/fichas-huerfanas.js`, `js/ficha-archivo.js`,
-    `js/ficha-tercero.js`, `js/ficha-plegables.js`, `js/lo-pide.js`, `js/elegir-asunto.js`,
-    `js/duplicados.js`, `js/lector.js`, `js/visor.js`, `js/vista.js`, `js/usabilidad.js`, `js/barra.js`.
-
-    **No se ha encontrado ninguna salida indebida: el código ya cumplía la regla entera.** La fila 30
-    (17-sep-2026) y las que la siguieron (34, 51, 52, 58...) ya habían dejado cada camino bien hecho:
-    asociar un documento a un hito (`js/ficha-documentos.js`, botón "Asociar a un hito") y apuntarlo
-    desde el propio hito (`js/hitos-documentos.js`, "Apuntar un documento") repintan solo su propio
-    trozo, nunca navegan; marcar un hito, "Comunicar", "Documentos ▾", registrar, generar un
-    documento de plantilla y separar/unir/sacar páginas de un PDF llaman todos a `App.verAbiertos()`
-    (que ya reengancha sola la ficha desde la fila 30) o repintan en su sitio con
-    `App.abrirFicha(a, modo)`, nunca a `App.ir(otra-pantalla)`. "Meter en un asunto"/"Meter aquí" de
-    Por clasificar (`js/documentos-sueltos.js`, `js/documentos-sueltos-lector.js`) viven en la
-    pantalla "Por clasificar", nunca dentro de la ficha, así que no pueden sacar de ella; y cuando el
-    asunto de destino es el que antes tenía la ficha abierta, `App.verAbiertos()` no lo vuelve a
-    enseñar porque `App.reengancharFicha()` comprueba primero si la ficha sigue **a la vista**
-    (`#pantalla-asunto` sin `oculto`), no solo si `actual` sigue puesto.
-
-    Se ha ampliado `pruebas/quedarse-en-el-asunto.mjs` con once casos más: marcar un hito, asociar un
-    documento a un hito, apuntar un documento desde el hito, comunicar, "Documentos ▾", y "Meter en
-    un asunto" hacia el asunto que antes tenía la ficha abierta (los seis, se quedan); y Volver,
-    Editar (aunque se cancele), Borrar, Escape, y el asunto que deja de estar abierto desde el otro
-    ordenador (los cinco, sí salen, con el aviso de una línea en el último caso). Quince
-    comprobaciones en total, sobre las cuatro que ya había.
-
-    **Lo que costó de verdad**: nada en el código de la aplicación, porque no hacía falta tocarlo. Lo
-    que costó fueron las pruebas nuevas. La primera sesión que tocó esta fila no tuvo `git push` ni
-    pudo montar el repositorio completo en un navegador local, así que escribió los quince casos
-    nuevos sin poder correrlos, y los dejó publicados así, con una nota pidiendo a la siguiente sesión
-    que los verificara. Esta segunda sesión sí ha podido clonar el repositorio (con `git clone` de
-    lectura; sigue sin permiso para `git push`, así que la subida a `main` pasa igual por la
-    herramienta de GitHub) y correr `npm test` de verdad en local, con `python3 -m http.server` y
-    Playwright. Tres de los quince casos nuevos fallaban, los tres por errores en la propia prueba,
-    nunca en la aplicación:
-
-    - El caso 6 (apuntar un documento a un hito) y otros tres esperaban a que el cuadro se cerrara con
-      `pagina.waitForSelector('#capa.oculto')`. Con `.oculto { display: none !important; }`, ese
-      selector nunca puede quedar "visible" — el propio Playwright no lo resuelve nunca así, y la
-      prueba se quedaba esperando 30 segundos sin motivo. Cambiado a `pagina.waitForTimeout(400)` tras
-      el clic en Aceptar, que es el patrón que ya usan `pruebas/registro.mjs` y el resto del
-      repositorio para lo mismo. El caso 10 (que si sale hacia la lista, no hacia la ficha) se cambió
-      en su lugar a esperar `#pantalla-abiertos:not(.oculto)`, que es el estado de verdad que ese caso
-      comprueba.
-    - El caso 10 ("Meter en un asunto") buscaba el asunto de pruebas por su nombre en el cuadro de
-      «Elegir el asunto», y no lo encontraba: ese asunto se había creado a mano, con una carpeta
-      directamente en el disco de mentira, sin pasar nunca por `App.anotar`, así que no tenía ninguna
-      entrada en `asuntos.json` y `ElegirAsunto.todos()` no lo veía. Arreglado dando de alta el
-      asunto con `App.anotar(nombre, {})` (sin categoría ni tercero, que es lo que necesitaba seguir
-      probando el caso 11) nada más crear la carpeta, antes del primer paso.
-    - El caso 12 (el segundo asunto, para Escape/Editar/Borrar) esperaba su tarjeta con
-      `pagina.waitForSelector('.tarjeta', { hasText: 'PERMISO' })`: `waitForSelector` no admite
-      `hasText` (eso es de `locator()`), así que la opción se ignoraba y la prueba esperaba a que
-      fuera visible la primera `.tarjeta` que hubiera en toda la página — que podía ser la de un
-      documento suelto de un paso anterior, nunca la buscada. Cambiado a
-      `pagina.locator('#lista-abiertos .tarjeta', { hasText: 'PERMISO' }).first().waitFor()`.
-
-    Con los tres arreglos, las quince comprobaciones de `pruebas/quedarse-en-el-asunto.mjs` pasan, y
-    se ha corrido además la batería completa (`pruebas/*.mjs`, 97 ficheros): todas en verde, sin tocar
-    ningún otro fichero de la aplicación.
-
-    Sustituida en `docs/contexto/ASUNTOS.md` la línea vieja de la fila 30 por la lista completa y
-    actual de caminos revisados (ya lo había hecho la primera sesión). Versión publicada
-    `App.VERSION`: `23-sep-2026 · 15:47`.
-
-    ---
-
-Cuando esté pegada, borra este apartado entero de `docs/COLA.md` (esta nota, con su título y su
-bloque de texto): ya no hará falta.

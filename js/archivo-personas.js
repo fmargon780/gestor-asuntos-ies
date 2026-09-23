@@ -374,7 +374,8 @@ App.verAsuntosDeTercero = async function (p) {
       : ((window.FichaArchivo && await FichaArchivo.leer(a.handle)) || {});
     var situacion = ficha.situacion || '';
     return '<div class="resultado"><div>' +
-           (leido.tipo ? '<span class="marca-tipo">' + U.escapar(leido.tipo) + '</span>' : '') +
+           (leido.tipo ? '<span class="marca-tipo" title="' + U.escapar(leido.tipo) + '">' +
+                         U.escapar(Nombres.tipoParaVer(leido.tipo, App.E.tipos)) + '</span>' : '') +
            (situacion ? '<span class="marca-estado ' + App.colorEstado(situacion) + '">' +
                         U.escapar(situacion) + '</span>' : '') +
            U.escapar(a.nombre) + '</div>' +
