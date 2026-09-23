@@ -367,8 +367,9 @@ await pagina.evaluate(async (clave) => {
 }, CLAVE);
 
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
-await pagina.waitForSelector('#ficha-guia .hito[data-id="p1"] .hito-doc-apuntar');
-await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-doc-apuntar').click();
+await pagina.waitForSelector('#ficha-guia .hito[data-id="p1"] .hito-anadir-documento');
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-anadir-documento').click();
+await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Uno que ya está en la carpeta' }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('salen los dos documentos de la carpeta, sin marcar',
   pagina.locator('#hitosdoc-lista .hitosdoc-marca').count(), 2);
@@ -383,7 +384,8 @@ await comprobar('y queda guardado en hitos.json',
 
 console.log('--- se vuelve a abrir el cuadro: sale marcado; se desmarca y desaparece ---');
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
-await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-doc-apuntar').click();
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-anadir-documento').click();
+await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Uno que ya está en la carpeta' }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('sale marcado el que ya se apuntó',
   pagina.locator('#hitosdoc-lista .hitosdoc-fila', { hasText: 'SOLICITUD' }).locator('.hitosdoc-marca').isChecked(), true);
@@ -409,8 +411,40 @@ await comprobar('el nombre sale con "(ya no está)", marcado en gris (nunca con 
   return { texto: b.textContent, enGris: b.classList.contains('hito-doc-falta'), disabled: b.disabled };
 }), { texto: '260907 DNI Marina.pdf (ya no está)', enGris: true, disabled: false });
 
+console.log('--- fila 103: el menú de tres puntos de cada documento del hito ---');
+await pagina.evaluate(async (clave) => {
+  await window.Hitos.anadirDocumento(clave, 'p1', '260907 SOLICITUD Marina.pdf');
+  window.HitosPanel.programarRepintado();
+}, CLAVE);
+await pagina.waitForTimeout(400);
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
-await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-doc-apuntar').click();
+
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-documento[data-doc="260907 DNI Marina.pdf"] .hito-doc-menu-boton').click();
+await pagina.waitForSelector('.ficha-menu:not(.oculto)');
+await comprobar('en un documento "(ya no está)", el menú solo trae "Quitar del hito"',
+  pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents(), ['Quitar del hito']);
+await pagina.keyboard.press('Escape');
+
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-documento[data-doc="260907 SOLICITUD Marina.pdf"] .hito-doc-menu-boton').click();
+await pagina.waitForSelector('.ficha-menu:not(.oculto)');
+await comprobar('en un PDF que sí está y aún sin registro, el menú trae las herramientas y "Quitar del hito"',
+  pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents(),
+  ['Registrar', 'Separar', 'Unir', 'Sacar páginas', 'Ajustar tamaño', 'Quitar del hito']);
+await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Quitar del hito' }).click();
+await pagina.waitForTimeout(400);
+await comprobar('"Quitar del hito" solo desapunta (mismo efecto que la ✕ de antes), nunca borra el fichero',
+  leerHitosDeDisco().then(e => e.hitos.find(h => h.id === 'p1').documentos), ['260907 DNI Marina.pdf']);
+await comprobar('y el fichero sigue en la carpeta de verdad',
+  pagina.evaluate(async (clave) => {
+    const carpeta = await window.__disco.abiertos.getDirectoryHandle(clave);
+    return carpeta._hijos.has('260907 SOLICITUD Marina.pdf');
+  }, CLAVE), true);
+
+/* "Quitar del hito" ya deja el hito desplegado él solo
+   (HitosPanel.desplegarAlAbrir, antes de repintar): no hace falta
+   volver a pulsar el título. */
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-anadir-documento').click();
+await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Uno que ya está en la carpeta' }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('en el cuadro de apuntar también sale, marcado y con el mismo aviso',
   pagina.locator('#hitosdoc-lista .hitosdoc-fila-falta').textContent().then(t => t.indexOf('ya no está') !== -1), true);
