@@ -76,7 +76,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   Al cambiar el tipo, ofrece la guía del nuevo.
 - Nombre comercial de empresas, aparte de la razón social; cambiar los datos de un tercero dado
   de alta a mano.
-- Guías del procedimiento por tipo, con pasos, preguntas y opciones.
+- Guías del procedimiento por tipo, con pasos y preguntas dentro de las respuestas, sin límite.
 - Panel lateral de lectura, y tablón de notas rápidas siempre visible.
 - Correo y mensaje de Séneca preparados (la app nunca envía nada), en un cuadro ancho de dos
   columnas; el ayudante de Séneca comprueba quién ha entrado y dice por su nombre quién falta.
@@ -160,7 +160,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 ## 7. Descartado, no proponer otra vez
 
 - Conector de Vercel sobre un proyecto existente (da 403), o crear otro "por si acaso". `vercel.app` bloqueado en el centro: resuelto con el dominio propio.
-- Abrir la carpeta del asunto en el explorador de archivos, opciones dentro de opciones en la guía, o una hoja de Google Sheets como interfaz.
+- Abrir la carpeta del asunto en el explorador de archivos, o una hoja de Google Sheets como interfaz.
 - Enlazar un correo con `#all/<id de hilo>` (es `#search/rfc822msgid:<id>`), o meter Gmail en un marco (Google no lo permite).
 - Esconder el tablón de notas, sacar el DNI de la columna del tutor, o poner el nombre comercial en el nombre de la carpeta de un asunto de empresa.
 - Reescribir la arquitectura de módulos y envolturas, o meter los campos de cada tipo en el nombre de los documentos (son del asunto, no del papel).

@@ -97,19 +97,17 @@ var Guias = (function () {
      suyo: "¿Cómo hemos recibido la factura?" → en mano (sello, firma,
      entregar a Fátima) o digitalmente (a la firma del director).
 
-     Las opciones no llevan opciones dentro: una bifurcación por paso
-     es lo que se entiende de un vistazo. */
+     Desde la fila 95 (23-sep-2026, docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md)
+     un paso de una opción es un paso entero, con los mismos campos que
+     uno de arriba, y puede ser a su vez una pregunta: sin límite de
+     niveles. `normalizar()` ya es recursivo; aquí solo se le deja
+     hacer. Las guías de antes siguen valiendo tal cual. */
   function normalizarOpciones(lista) {
     return (lista || []).map(function (o) {
       return {
         id: (o && o.id) || nuevoId(),
         titulo: String((o && o.titulo) || ''),
-        pasos: normalizar((o && o.pasos) || []).map(function (sp) {
-          return {
-            id: sp.id, titulo: sp.titulo, cuerpo: sp.cuerpo, opciones: [],
-            requisitos: sp.requisitos, comunicacion: sp.comunicacion
-          };
-        })
+        pasos: normalizar((o && o.pasos) || [])
       };
     }).filter(function (o) { return o.titulo || o.pasos.length; });
   }
@@ -117,9 +115,8 @@ var Guias = (function () {
   /* Los tres campos de hitos (16-sep-2026, docs/HITOS.md sección 11):
      responsable por defecto, estado del asunto y plazo. Los tres son
      opcionales y van plegados en el editor; una guía vieja que no los
-     traiga sigue funcionando igual, con los tres vacíos. Solo existen
-     en los pasos de arriba: normalizarOpciones los quita al bajar a
-     una opción (ver más abajo), que no los necesita todavía. */
+     traiga sigue funcionando igual, con los tres vacíos. Desde la fila
+     95 existen a cualquier nivel, también en los pasos de una opción. */
   function normalizarExtra(p) {
     return {
       responsable: String((p && p.responsable) || ''),
@@ -169,7 +166,7 @@ var Guias = (function () {
         return Object.assign({ id: nuevoId(), titulo: p, cuerpo: '', opciones: [], requisitos: [],
           comunicacion: normalizarComunicacion(null) }, normalizarExtra(null));
       }
-      return Object.assign({
+      var salida = Object.assign({
         id: (p && p.id) || nuevoId(),
         titulo: String((p && p.titulo) || ''),
         cuerpo: limpiar((p && p.cuerpo) || ''),
@@ -177,6 +174,17 @@ var Guias = (function () {
         requisitos: normalizarRequisitos(p && p.requisitos),
         comunicacion: normalizarComunicacion(p && p.comunicacion)
       }, normalizarExtra(p));
+      /* Un paso-pregunta se resuelve eligiendo una opción: no lleva
+         requisitos, comunicación, normativa ni formularios, a ningún
+         nivel (fila 95). El editor ya no los enseña; aquí se asegura. */
+      if (salida.opciones.length) {
+        salida.requisitos = [];
+        salida.comunicacion = normalizarComunicacion(null);
+        salida.normativa = [];
+        salida.formularios = [];
+        salida.soloInformativo = false;
+      }
+      return salida;
     }).filter(function (p) {
       return p.titulo || tieneTexto(p.cuerpo) || p.opciones.length;
     });
@@ -496,6 +504,15 @@ var Guias = (function () {
      vieja no tiene por qué dejar de escribirse). */
   function editar(nombreTipo, lista, listaResponsables, listaEstados) {
     var pasos = normalizar(lista);
+    /* Fila 95 (docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md): el nivel que
+       se ve (la guía entera, o los pasos de una opción de una pregunta
+       de dentro) y el camino hasta él, como carpetas. Todo lo que
+       pinta, recoge o añade trabaja sobre `nivel`; guardar, sobre
+       `pasos`, la guía entera, esté donde esté Francisco. Cada paso del
+       camino es { pregunta, opcion, lista } (lista: los pasos de esa
+       opción, el mismo array que hay dentro del árbol). */
+    var nivel = pasos;
+    var camino = [];
     var opcionesResp = listaResponsables || [];
     var opcionesEstado = listaEstados || [];
     var cuadro = document.querySelector('#capa .cuadro');
@@ -511,6 +528,7 @@ var Guias = (function () {
       '<p class="explica">Los pasos que hay que dar en un asunto de este tipo. ' +
       'Van en el orden del trámite. Dentro de cada asunto salen con una casilla ' +
       'para ir marcando lo que ya está hecho.</p>' +
+      '<div id="guia-camino" class="guia-camino"></div>' +
       BARRA() +
       '<div id="guia-pasos"></div>' +
       '<div class="guia-anadir-fila">' +
@@ -525,7 +543,7 @@ var Guias = (function () {
     if (window.GuiasBiblioteca) {
       GuiasBiblioteca.engancharPanelTraer(cuadro, $('guia-traer-biblioteca'), function (modelo) {
         recoger();
-        pasos.push(HitosBiblioteca.modeloAPaso(modelo));
+        nivel.push(HitosBiblioteca.modeloAPaso(modelo));
         pintar();
       });
     }
@@ -579,11 +597,12 @@ var Guias = (function () {
 
     /* ---------- responsable, estado y plazo por defecto (sección 11) ----------
 
-       "Desde qué paso" solo puede ser OTRO paso de arriba (las
-       opciones no llevan estos campos todavía). Se reconstruye en
-       cada pintado, con los pasos tal y como están en ese momento. */
+       "Desde qué paso" solo puede ser OTRO paso del mismo nivel (el
+       que se está viendo: la guía entera o los pasos de una opción,
+       fila 95). Se reconstruye en cada pintado, con los pasos tal y
+       como están en ese momento. */
     function pasoExtraHTML(p, i) {
-      var otros = pasos.filter(function (x, k) { return k !== i; });
+      var otros = nivel.filter(function (x, k) { return k !== i; });
       return '<details class="paso-extra">' +
         '<summary>Responsable, estado y plazo <span class="suave">(opcional)</span></summary>' +
         '<div class="paso-extra-cuerpo">' +
@@ -628,20 +647,20 @@ var Guias = (function () {
     function recoger() {
       Array.prototype.forEach.call($('guia-pasos').children, function (caja) {
         var i = parseInt(caja.dataset.pos, 10);
-        if (isNaN(i) || !pasos[i]) return;
-        pasos[i].titulo = caja.querySelector(':scope > .paso-cabecera .paso-titulo').value.trim();
-        pasos[i].cuerpo = limpiar(caja.querySelector(':scope > .paso-cuerpo').innerHTML);
+        if (isNaN(i) || !nivel[i]) return;
+        nivel[i].titulo = caja.querySelector(':scope > .paso-cabecera .paso-titulo').value.trim();
+        nivel[i].cuerpo = limpiar(caja.querySelector(':scope > .paso-cuerpo').innerHTML);
 
         /* Los tres campos nuevos (16-sep-2026, hitos), siempre en los
            mismos hijos directos, se lean o no lean las opciones. */
         var respSel = caja.querySelector(':scope > .paso-extra .paso-responsable');
-        pasos[i].responsable = respSel ? respSel.value : '';
+        nivel[i].responsable = respSel ? respSel.value : '';
         var estSel = caja.querySelector(':scope > .paso-extra .paso-estado-asunto');
-        pasos[i].estadoAsunto = (estSel && estSel.value) ? estSel.value : null;
+        nivel[i].estadoAsunto = (estSel && estSel.value) ? estSel.value : null;
         var diasInp = caja.querySelector(':scope > .paso-extra .paso-plazo-dias');
         var desdeSel = caja.querySelector(':scope > .paso-extra .paso-plazo-desde');
         var dias = diasInp ? parseInt(diasInp.value, 10) : NaN;
-        pasos[i].plazo = (!isNaN(dias) && dias > 0 && desdeSel && desdeSel.value)
+        nivel[i].plazo = (!isNaN(dias) && dias > 0 && desdeSel && desdeSel.value)
           ? { dias: dias, desde: desdeSel.value } : null;
 
         /* "Lo que hay que reunir" (18-sep-2026, fila 59): solo en los
@@ -649,52 +668,105 @@ var Guias = (function () {
            SÍ lo sea se queda con lo que ya tuviera (vacío, si nunca lo
            tuvo). */
         if (window.GuiasRequisitos && caja.querySelector(':scope > .paso-requisitos')) {
-          pasos[i].requisitos = GuiasRequisitos.leer(caja);
+          nivel[i].requisitos = GuiasRequisitos.leer(caja);
         }
 
         /* "Comunicación de este paso" (18-sep-2026, fila 60): mismo
            criterio que arriba, solo en los pasos que no son pregunta. */
         if (window.GuiasComunicacion && caja.querySelector(':scope > .paso-comunicacion')) {
-          pasos[i].comunicacion = GuiasComunicacion.leer(caja, pasos[i].id);
+          nivel[i].comunicacion = GuiasComunicacion.leer(caja, nivel[i].id);
         }
 
         /* "Solo informativo" y "Normativa" (20-sep-2026, fila 79): igual,
            solo en los pasos que no son pregunta. */
         var soloInfEl = caja.querySelector(':scope > .paso-solo-informativo-fila .paso-solo-informativo');
-        if (soloInfEl) pasos[i].soloInformativo = soloInfEl.checked;
+        if (soloInfEl) nivel[i].soloInformativo = soloInfEl.checked;
         if (window.HitosNormativa && caja.querySelector(':scope > .paso-normativa')) {
-          pasos[i].normativa = HitosNormativa.leer(caja);
+          nivel[i].normativa = HitosNormativa.leer(caja);
         }
         /* Formularios oficiales (20-sep-2026, fila 82): el editor vive
            DENTRO del mismo `<details>` de normativa. */
         if (window.Formularios && caja.querySelector(':scope > .paso-normativa .formularios-editor')) {
-          pasos[i].formularios = Formularios.leerEditor(
+          nivel[i].formularios = Formularios.leerEditor(
             caja.querySelector(':scope > .paso-normativa .formularios-editor'));
         }
 
         var marca = caja.querySelector(':scope > .paso-es-pregunta-fila .paso-es-pregunta');
-        if (!marca || !marca.checked) { pasos[i].opciones = []; return; }
+        if (!marca || !marca.checked) { nivel[i].opciones = []; return; }
 
-        pasos[i].opciones = Array.prototype.slice.call(
+        /* Se actualizan los objetos que ya había (por su id), sin
+           rehacerlos: un paso de una opción puede llevar más cosas de
+           las que se ven aquí (su plazo, sus propias opciones si es una
+           pregunta de dentro, fila 95), y rehacerlo las perdería. */
+        var viejas = nivel[i].opciones || [];
+        nivel[i].opciones = Array.prototype.slice.call(
           caja.querySelectorAll(':scope > .paso-opciones > .opcion-editor')
         ).map(function (oc) {
-          return {
-            id: oc.dataset.id || nuevoId(),
-            titulo: oc.querySelector(':scope > .opcion-cabecera > .opcion-titulo').value.trim(),
-            pasos: Array.prototype.slice.call(
-              oc.querySelectorAll(':scope > .opcion-pasos > .subpaso-editor')
-            ).map(function (sc) {
-              return {
-                id: sc.dataset.id || nuevoId(),
-                titulo: sc.querySelector(':scope > .paso-cabecera > .subpaso-titulo').value.trim(),
-                cuerpo: limpiar(sc.querySelector(':scope > .subpaso-cuerpo').innerHTML),
-                opciones: [],
-                requisitos: window.GuiasRequisitos ? GuiasRequisitos.leer(sc) : [],
-                comunicacion: window.GuiasComunicacion ? GuiasComunicacion.leer(sc, sc.dataset.id) : null
-              };
-            })
-          };
+          var o = viejas.filter(function (x) { return x.id === oc.dataset.id; })[0] ||
+            { id: oc.dataset.id || nuevoId(), titulo: '', pasos: [] };
+          o.titulo = oc.querySelector(':scope > .opcion-cabecera > .opcion-titulo').value.trim();
+          var viejos = o.pasos || [];
+          o.pasos = Array.prototype.slice.call(
+            oc.querySelectorAll(':scope > .opcion-pasos > .subpaso-editor')
+          ).map(function (sc) {
+            var sp = viejos.filter(function (x) { return x.id === sc.dataset.id; })[0] || subpasoNuevo(sc.dataset.id);
+            sp.titulo = sc.querySelector(':scope > .paso-cabecera > .subpaso-titulo').value.trim();
+            var cuerpoEl = sc.querySelector(':scope > .subpaso-cuerpo');
+            if (cuerpoEl) sp.cuerpo = limpiar(cuerpoEl.innerHTML);
+            if (window.GuiasRequisitos && sc.querySelector(':scope > .paso-requisitos')) sp.requisitos = GuiasRequisitos.leer(sc);
+            if (window.GuiasComunicacion && sc.querySelector(':scope > .paso-comunicacion')) {
+              sp.comunicacion = GuiasComunicacion.leer(sc, sp.id);
+            }
+            var esPreg = sc.querySelector(':scope > .paso-es-pregunta-fila .subpaso-es-pregunta');
+            if (esPreg && !esPreg.checked) sp.opciones = [];
+            return sp;
+          });
+          return o;
         });
+      });
+    }
+
+    function subpasoNuevo(id) {
+      return { id: id || nuevoId(), titulo: '', cuerpo: '', opciones: [], requisitos: [], comunicacion: null };
+    }
+
+    /* ---------- entrar y salir de una pregunta de dentro (fila 95) ---------- */
+
+    function irA(nuevoCamino) {
+      recoger();
+      camino = nuevoCamino;
+      nivel = camino.length ? camino[camino.length - 1].lista : pasos;
+      abiertos = {};
+      $('guia-pasos').innerHTML = '';   /* que pintar() no arrastre los plegables del nivel de antes */
+      pintar();
+      var cuerpo = document.querySelector('#capa .cuadro-cuerpo') || document.getElementById('cuadro-cuerpo');
+      if (cuerpo && cuerpo.scrollTo) cuerpo.scrollTo(0, 0);
+    }
+
+    /* Entrar en la opción `o` de la pregunta `p` del nivel de ahora. */
+    function entrar(p, o) {
+      irA(camino.concat([{ pregunta: p.titulo || 'Pregunta sin título', opcion: o.titulo || 'Opción sin nombre',
+                           lista: o.pasos }]));
+    }
+
+    function pintarCamino() {
+      var caja = $('guia-camino');
+      if (!caja) return;
+      if (!camino.length) { caja.innerHTML = ''; caja.classList.add('oculto'); return; }
+      caja.classList.remove('oculto');
+      var trozos = ['<button type="button" class="guia-camino-trozo" data-nivel="0">Guía de ' +
+        U.escapar(nombreTipo) + '</button>'];
+      camino.forEach(function (c, k) {
+        trozos.push('<span class="guia-camino-pregunta">' + U.escapar(c.pregunta) + '</span>');
+        trozos.push(k === camino.length - 1
+          ? '<strong class="guia-camino-aqui">' + U.escapar(c.opcion) + '</strong>'
+          : '<button type="button" class="guia-camino-trozo" data-nivel="' + (k + 1) + '">' + U.escapar(c.opcion) + '</button>');
+      });
+      caja.innerHTML = '<button type="button" class="boton" id="guia-volver">← Volver</button> ' +
+        trozos.join(' <span class="suave">›</span> ');
+      $('guia-volver').onclick = function () { irA(camino.slice(0, -1)); };
+      Array.prototype.forEach.call(caja.querySelectorAll('.guia-camino-trozo'), function (b) {
+        b.onclick = function () { irA(camino.slice(0, parseInt(b.dataset.nivel, 10))); };
       });
     }
 
@@ -730,12 +802,13 @@ var Guias = (function () {
       abiertos = detallesAbiertos(caja);
       caja.innerHTML = '';
       editando = null;
-      if (!pasos.length) {
+      pintarCamino();
+      if (!nivel.length) {
         caja.innerHTML = '<div class="vacio">Todavía no hay ningún paso. ' +
                          'Añade el primero aquí abajo.</div>';
         return;
       }
-      pasos.forEach(function (p, i) {
+      nivel.forEach(function (p, i) {
         var d = document.createElement('div');
         d.className = 'paso-editor';
         d.dataset.pos = i;
@@ -765,20 +838,20 @@ var Guias = (function () {
         boton('↑', 'Subir este paso', function () {
           recoger();
           if (i === 0) return;
-          var x = pasos[i - 1]; pasos[i - 1] = pasos[i]; pasos[i] = x;
+          var x = nivel[i - 1]; nivel[i - 1] = nivel[i]; nivel[i] = x;
           pintar();
         }).disabled = (i === 0);
 
         boton('↓', 'Bajar este paso', function () {
           recoger();
-          if (i === pasos.length - 1) return;
-          var x = pasos[i + 1]; pasos[i + 1] = pasos[i]; pasos[i] = x;
+          if (i === nivel.length - 1) return;
+          var x = nivel[i + 1]; nivel[i + 1] = nivel[i]; nivel[i] = x;
           pintar();
-        }).disabled = (i === pasos.length - 1);
+        }).disabled = (i === nivel.length - 1);
 
         boton('Quitar', 'Quitar este paso', function () {
           recoger();
-          pasos.splice(i, 1);
+          nivel.splice(i, 1);
           pintar();
         }, 'boton-peligro');
 
@@ -801,7 +874,7 @@ var Guias = (function () {
           restaurarAbierto(d.querySelector(':scope > .paso-requisitos'), abiertos, i, '');
           GuiasRequisitos.enganchar(d, function (mutador) {
             recoger();
-            mutador(pasos[i].requisitos);
+            mutador(nivel[i].requisitos);
             pintar();
           });
         }
@@ -839,7 +912,7 @@ var Guias = (function () {
             restaurarAbierto(d.querySelector(':scope > .paso-normativa'), abiertos, i, '');
             HitosNormativa.enganchar(d, function (mutador) {
               recoger();
-              mutador(pasos[i].normativa);
+              mutador(nivel[i].normativa);
               pintar();
             });
             if (window.Formularios) Formularios.engancharEmbebido(d);
@@ -856,7 +929,7 @@ var Guias = (function () {
                    no estaría en el documento, y tocarlo no serviría de
                    nada (o peor, duplicaría el botón en el sitio viejo). */
                 if (!d.isConnected) return;
-                var pasoActual = pasos[indice];
+                var pasoActual = nivel[indice];
                 if (!pasoActual || pasoActual.opciones.length) return;   /* se ha vuelto pregunta mientras leíamos */
                 var modelo = pasoActual.origenBiblioteca ? HitosBiblioteca.buscar(biblioteca, pasoActual.origenBiblioteca.id) : null;
                 var diffs = modelo ? HitosBiblioteca.diferencias(pasoActual, modelo) : [];
@@ -870,7 +943,7 @@ var Guias = (function () {
                 mandosDelPaso.insertAdjacentHTML('beforeend', GuiasBiblioteca.botonHTML());
                 GuiasBiblioteca.engancharBoton(d, pasoActual, modelo, diffs, function (origenNuevo) {
                   recoger();
-                  pasos[indice].origenBiblioteca = origenNuevo;
+                  nivel[indice].origenBiblioteca = origenNuevo;
                   pintar();
                 });
               }).catch(function () { /* sin biblioteca legible, el botón simplemente no sale */ });
@@ -888,8 +961,8 @@ var Guias = (function () {
 
         fila.querySelector('.paso-es-pregunta').onchange = function () {
           recoger();
-          if (this.checked && !pasos[i].opciones.length) {
-            pasos[i].opciones = [
+          if (this.checked && !nivel[i].opciones.length) {
+            nivel[i].opciones = [
               { id: nuevoId(), titulo: '', pasos: [] },
               { id: nuevoId(), titulo: '', pasos: [] }
             ];
@@ -914,7 +987,7 @@ var Guias = (function () {
       };
     }
 
-    /* Las opciones de un paso-pregunta, cada una con sus propios pasos.
+    /* Las opciones de un paso-pregunta, cada una con sus propios nivel.
        Todo lo que cambia la lista hace lo mismo: recoger lo escrito,
        tocar el array y volver a pintar. */
     function cajaDeOpciones(p, i) {
@@ -945,7 +1018,7 @@ var Guias = (function () {
         quitar.title = 'Quitar esta opción y sus pasos';
         quitar.onclick = function () {
           recoger();
-          pasos[i].opciones.splice(j, 1);
+          nivel[i].opciones.splice(j, 1);
           pintar();
         };
         oc.querySelector('.opcion-cabecera').appendChild(quitar);
@@ -955,13 +1028,37 @@ var Guias = (function () {
           var sc = document.createElement('div');
           sc.className = 'subpaso-editor';
           sc.dataset.id = sp.id;
+
+          /* Fila 95: un paso de una opción que es a su vez una pregunta
+             no se dibuja anidado (recuadros dentro de recuadros no se
+             leen): una línea con su título, la marca y «Entrar», que
+             enseña los pasos de sus opciones en este mismo cuadro. */
+          var subPregunta = esPregunta(sp);
           sc.innerHTML =
             '<div class="paso-cabecera">' +
               '<input class="campo subpaso-titulo" value="' + U.escapar(sp.titulo) + '" ' +
-              'placeholder="Título corto del paso">' +
+              'placeholder="' + (subPregunta ? 'La pregunta' : 'Título corto del paso') + '">' +
+              (subPregunta ? '<span class="marca-pregunta">pregunta</span>' : '') +
             '</div>' +
-            '<div class="paso-cuerpo subpaso-cuerpo" contenteditable="true" ' +
-            'data-vacio="Explicación del paso">' + limpiar(sp.cuerpo) + '</div>';
+            (subPregunta ? '' : '<div class="paso-cuerpo subpaso-cuerpo" contenteditable="true" ' +
+              'data-vacio="Explicación del paso">' + limpiar(sp.cuerpo) + '</div>');
+
+          if (subPregunta) {
+            var entrarB = document.createElement('button');
+            entrarB.type = 'button';
+            entrarB.className = 'boton boton-principal subpaso-entrar';
+            entrarB.textContent = 'Entrar';
+            entrarB.title = 'Ver y escribir las opciones de esta pregunta';
+            entrarB.onclick = function () {
+              recoger();
+              /* Se entra en el nivel donde está la pregunta (los pasos de
+                 esta opción): ahí se ve entera, con sus opciones. */
+              entrar(nivel[i], nivel[i].opciones[j]);
+              var aqui = document.querySelector('#guia-pasos .paso-editor[data-pos="' + k + '"]');
+              if (aqui && aqui.scrollIntoView) aqui.scrollIntoView({ block: 'start' });
+            };
+            sc.querySelector('.paso-cabecera').appendChild(entrarB);
+          }
 
           var fuera = document.createElement('button');
           fuera.type = 'button';
@@ -969,26 +1066,46 @@ var Guias = (function () {
           fuera.textContent = 'Quitar';
           fuera.onclick = function () {
             recoger();
-            pasos[i].opciones[j].pasos.splice(k, 1);
+            nivel[i].opciones[j].pasos.splice(k, 1);
             pintar();
           };
           sc.querySelector('.paso-cabecera').appendChild(fuera);
-          prepararRecuadro(sc.querySelector('.subpaso-cuerpo'));
 
-          if (window.GuiasRequisitos) {
-            sc.insertAdjacentHTML('beforeend', GuiasRequisitos.bloqueHTML(sp.requisitos));
-            restaurarAbierto(sc.querySelector(':scope > .paso-requisitos'), abiertos, i, sp.id);
-            GuiasRequisitos.enganchar(sc, function (mutador) {
-              recoger();
-              mutador(pasos[i].opciones[j].pasos[k].requisitos);
-              pintar();
-            });
+          if (!subPregunta) {
+            prepararRecuadro(sc.querySelector('.subpaso-cuerpo'));
+            if (window.GuiasRequisitos) {
+              sc.insertAdjacentHTML('beforeend', GuiasRequisitos.bloqueHTML(sp.requisitos));
+              restaurarAbierto(sc.querySelector(':scope > .paso-requisitos'), abiertos, i, sp.id);
+              GuiasRequisitos.enganchar(sc, function (mutador) {
+                recoger();
+                mutador(nivel[i].opciones[j].pasos[k].requisitos);
+                pintar();
+              });
+            }
+            if (window.GuiasComunicacion) {
+              sc.insertAdjacentHTML('beforeend', GuiasComunicacion.bloqueHTML(sp.id, sp.comunicacion));
+              restaurarAbierto(sc.querySelector(':scope > .paso-comunicacion'), abiertos, i, sp.id);
+              GuiasComunicacion.enganchar(sc, sp.id);
+            }
           }
-          if (window.GuiasComunicacion) {
-            sc.insertAdjacentHTML('beforeend', GuiasComunicacion.bloqueHTML(sp.id, sp.comunicacion));
-            restaurarAbierto(sc.querySelector(':scope > .paso-comunicacion'), abiertos, i, sp.id);
-            GuiasComunicacion.enganchar(sc, sp.id);
-          }
+
+          /* La misma casilla que un paso de arriba (fila 95). */
+          var filaPreg = document.createElement('label');
+          filaPreg.className = 'interruptor paso-es-pregunta-fila';
+          filaPreg.innerHTML = '<input type="checkbox" class="subpaso-es-pregunta"' +
+            (subPregunta ? ' checked' : '') + '><span>Este paso es una pregunta</span>';
+          sc.appendChild(filaPreg);
+          filaPreg.querySelector('.subpaso-es-pregunta').onchange = function () {
+            recoger();
+            var el = nivel[i].opciones[j].pasos[k];
+            if (this.checked && !el.opciones.length) {
+              el.opciones = [
+                { id: nuevoId(), titulo: '', pasos: [] },
+                { id: nuevoId(), titulo: '', pasos: [] }
+              ];
+            }
+            pintar();
+          };
 
           dentro.appendChild(sc);
         });
@@ -999,7 +1116,7 @@ var Guias = (function () {
         mas.textContent = '+ Añadir un paso a esta opción';
         mas.onclick = function () {
           recoger();
-          pasos[i].opciones[j].pasos.push({ id: nuevoId(), titulo: '', cuerpo: '', opciones: [], requisitos: [],
+          nivel[i].opciones[j].pasos.push({ id: nuevoId(), titulo: '', cuerpo: '', opciones: [], requisitos: [],
             comunicacion: null });
           pintar();
         };
@@ -1014,7 +1131,7 @@ var Guias = (function () {
       otra.textContent = '+ Añadir otra opción';
       otra.onclick = function () {
         recoger();
-        pasos[i].opciones.push({ id: nuevoId(), titulo: '', pasos: [] });
+        nivel[i].opciones.push({ id: nuevoId(), titulo: '', pasos: [] });
         pintar();
       };
       caja.appendChild(otra);
@@ -1024,7 +1141,7 @@ var Guias = (function () {
 
     $('guia-anadir').onclick = function () {
       recoger();
-      pasos.push({ id: nuevoId(), titulo: '', cuerpo: '', opciones: [] });
+      nivel.push({ id: nuevoId(), titulo: '', cuerpo: '', opciones: [] });
       pintar();
       var cajas = document.querySelectorAll('#guia-pasos .paso-titulo');
       if (cajas.length) cajas[cajas.length - 1].focus();

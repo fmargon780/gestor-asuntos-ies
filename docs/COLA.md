@@ -92,12 +92,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 62, 64 a 75, 77 a 94 y 96 a 98 están **HECHAS**. Sus documentos siguen en
+Las filas 1 a 62, 64 a 75, 77 a 98 están **HECHAS**. Sus documentos siguen en
 `docs/`, y el detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 95 | `docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md` (preguntas anidadas sin límite de niveles; el editor entra y sale en vez de anidar en pantalla) | EN CURSO (23-sep-2026) |
 | 99 | `docs/GUARDAR-EN-FILA.md` (guardados de uno en uno, copia del día una sola vez, reintentar al leer, tareas de fondo quietas mientras se guarda, tres riesgos de perder datos) | PENDIENTE |
 | 100 | `docs/AVISOS-QUE-DICEN-LA-VERDAD.md` (lo principal y lo accesorio por separado: verde, ámbar o rojo; botones que se bloquean de verdad; errores en castellano). Después de la 99 | PENDIENTE |
 | 101 | `docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md` (repintar solo lo que se ve y ha cambiado; el último repintado gana). Después de la 100 | PENDIENTE |

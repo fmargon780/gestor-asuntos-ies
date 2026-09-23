@@ -23,7 +23,21 @@ del final de `#ficha-guia`), pero quien guarda es `js/guias-enganche.js`, vía
 Un paso puede ser una PREGUNTA con opciones, cada una con sus propios pasos: eso se escribe en el
 cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegida.
 
-- Una bifurcación por paso (las opciones no llevan opciones dentro).
+- **Preguntas dentro de las respuestas, sin límite de niveles** (fila 95, 23-sep-2026,
+  `docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md`; antes, una sola bifurcación por paso). Un paso de
+  una opción es un paso entero (mismos campos que uno de arriba: responsable, plazo, normativa…;
+  `normalizarOpciones` ya no los recorta) y puede ser pregunta. Un paso-pregunta, a cualquier
+  nivel, no lleva requisitos, comunicación, normativa ni formularios (`Guias.normalizar` los
+  vacía). En el editor, un paso de opción que es pregunta sale como una línea con la marca
+  «pregunta» y **«Entrar»**, que en el mismo cuadro pasa a enseñar los pasos de esa opción, con
+  una línea de camino pulsable (`Guía de X › pregunta › opción`) y «← Volver»; `editar()` trabaja
+  sobre `nivel` (lo que se ve) y guarda `pasos` (la guía entera) esté donde esté, y siempre
+  `recoger()` antes de moverse. `recoger()` actualiza los objetos por su id en vez de rehacerlos,
+  para no perder lo que no se ve. El plazo solo apunta a un paso del mismo nivel. La biblioteca
+  sigue sin admitir preguntas. Dentro de un asunto: `Hitos.visibles` corta la lista ENTERA en
+  cualquier pregunta sin responder, a cualquier profundidad; cambiar una respuesta de arriba poda
+  todo el subárbol (`podar`, `js/hitos-archivo.js`) y `Hitos.huerfanos` pliega lo trabajado de
+  cualquier nivel. Prueba: `pruebas/preguntas-anidadas.mjs`.
 - Las dos ramas se pintan desde el principio en el cuadro de editar, y solo se enseña la elegida.
 - Los identificadores viajan en el `data-id` del recuadro, no por su posición.
 - Al leer el cuadro de escribir la guía, pedir solo los hijos directos (`:scope >`).

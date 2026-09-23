@@ -167,6 +167,27 @@
      marcan "noaplica" y se quedan (huerfanos(), en js/hitos.js, los
      pinta plegados al final). Devuelve además los títulos de los que
      se han quedado, para poder avisar de ellos. */
+  /* La rama que se deja, entera, a cualquier profundidad (fila 95):
+     lo vacío se quita; lo que tiene notas o documentos se queda como
+     "noaplica". Una pregunta de dentro se queda si tiene algo suyo o
+     si le queda algo en alguna de sus ramas. */
+  function podar(lista, quedados) {
+    return (lista || []).filter(function (x) {
+      var suyo = (x.notas && x.notas.length) || (x.documentos && x.documentos.length);
+      var dentro = false;
+      if (x.clase === 'decision') {
+        x.opciones.forEach(function (o) {
+          o.hitos = podar(o.hitos, quedados);
+          if (o.hitos.length) dentro = true;
+        });
+      }
+      if (!suyo && !dentro) return false;
+      x.estado = 'noaplica';
+      if (suyo) quedados.push(x.titulo);
+      return true;
+    });
+  }
+
   async function cambiarRama(clave, idDecision, idOpcionNueva) {
     var resultado = null;
     var quedados = [];
@@ -178,13 +199,7 @@
       var vieja = h.elegida;
       if (vieja && vieja !== idOpcionNueva) {
         var opt = h.opciones.filter(function (o) { return o.id === vieja; })[0];
-        if (opt) {
-          opt.hitos = opt.hitos.filter(function (x) {
-            var tieneAlgo = (x.notas && x.notas.length) || (x.documentos && x.documentos.length);
-            if (tieneAlgo) { x.estado = 'noaplica'; quedados.push(x.titulo); return true; }
-            return false;
-          });
-        }
+        if (opt) opt.hitos = podar(opt.hitos, quedados);
       }
       h.elegida = idOpcionNueva;
       h.estado = 'hecho';

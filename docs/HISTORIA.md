@@ -5,7 +5,24 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
-## 23-sep-2026 — Fila 98: el botón «Ruta» de la ficha del asunto
+## 23-sep-2026 — Fila 95: preguntas dentro de las respuestas, sin límite de niveles
+
+`docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md`. Reabre a propósito lo que estaba descartado
+(«opciones dentro de opciones en la guía»): los procedimientos del centro lo necesitan. La línea
+sale de la lista de descartado.
+
+- **Modelo** (`js/guias.js`): `normalizarOpciones` ya no vacía `opciones` ni recorta campos en los
+  pasos de una opción; `normalizar` es recursivo. Un paso-pregunta, a cualquier nivel, sale sin
+  requisitos, comunicación, normativa ni formularios.
+- **Editor**: entrar y salir como en carpetas, dentro del mismo `U.preguntar` (solo hay uno). El
+  truco fue separar `nivel` (lo que se ve) de `pasos` (lo que se guarda), y cambiar `recoger()`
+  para que actualice los objetos por su id en vez de rehacerlos: antes rehacía los pasos de una
+  opción con cinco campos, y con preguntas de dentro eso se habría llevado sus opciones.
+- **Hitos**: `Hitos.visibles` cortaba solo la sublista de una pregunta de dentro sin responder, y
+  seguía enseñando lo de después de la de fuera. Ahora corta la lista entera. Cambiar de rama poda
+  todo el subárbol (`podar`), y `huerfanos` recoge lo trabajado de cualquier nivel.
+
+: el botón «Ruta» de la ficha del asunto
 
 `docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md`. Francisco pidió un botón que abriera la carpeta del
 asunto; el navegador no lo deja (sigue en la lista de descartado), así que se copia la ruta para

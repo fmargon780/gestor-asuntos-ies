@@ -181,6 +181,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/envios.mjs` | Prueba de mandar documentos por correo: el encargo, el hilo, el límite de 20 MB, "listo" y "error" |
 | `pruebas/plantillas.mjs` | Prueba de las plantillas: huecos, "Faltan datos", cambiar de plantilla, sin plantillas, y el recorte de Séneca |
 | `pruebas/cambiar-tipo-y-guia.mjs` | Prueba (navegador de verdad, fila 94, 23-sep-2026): cambiar el tipo con hitos intactos (se sustituyen), con uno hecho y otro con nota (se quedan abajo como «no aplica»), diciendo que no, tipo nuevo sin guía y sin cambiar el tipo |
+| `pruebas/preguntas-anidadas.mjs` | Prueba (navegador de verdad, fila 95, 23-sep-2026): una guía de tres niveles (modelo, vista y sin requisitos en una pregunta), los hitos en cascada y la poda de todo el subárbol al cambiar una respuesta de arriba, y el editor: entrar dos niveles, escribir, volver y guardar |
 | `pruebas/hitos.mjs` | Prueba de los hitos de un asunto: crearlos, marcarlos, bifurcaciones, plazo, responsable y el historial al archivar |
 | `pruebas/que-me-toca.mjs` | Prueba de "Qué me toca": los tres bloques, el filtro por responsable, abrir la ficha con el hito desplegado y la cuenta de la barra |
 | `pruebas/cuentas.mjs` | Prueba de "Cuentas" (fila 74), sin navegador: cuentas por tipo (con "Sin clasificar"), cursos disponibles, por mes, por quién lo pidió, cuánto se tarda y el texto para "Copiar la tabla" |

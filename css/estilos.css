@@ -471,3 +471,11 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 .doc-campos-tipo { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0 12px; }
 .doccampos-fila { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
 .doccampos-fila .campo { flex: 1 1 160px; width: auto; }
+
+/* Fila 95: el camino del editor de la guía al entrar en una pregunta
+   de dentro, y la marca de un paso de opción que es una pregunta. */
+.guia-camino { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 6px 0 10px;
+  padding: 8px 10px; border-radius: 8px; background: #f3f6f9; }
+.guia-camino-trozo { background: none; border: 0; padding: 0; color: #1f5f99; cursor: pointer; text-decoration: underline; font: inherit; }
+.guia-camino-pregunta { color: #555; font-style: italic; }
+.marca-pregunta { margin: 0 6px; padding: 1px 8px; border-radius: 10px; background: #e8eef7; color: #1f4f80; font-size: 12px; white-space: nowrap; }
