@@ -97,7 +97,7 @@ Las filas 1 a 62, 64 a 75, 77 a 98 están **HECHAS**. Sus documentos siguen en
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 99 | `docs/GUARDAR-EN-FILA.md` (guardados de uno en uno, copia del día una sola vez, reintentar al leer, tareas de fondo quietas mientras se guarda, tres riesgos de perder datos) | PENDIENTE |
+| 99 | `docs/GUARDAR-EN-FILA.md` (guardados de uno en uno, copia del día una sola vez, reintentar al leer, tareas de fondo quietas mientras se guarda, tres riesgos de perder datos) | EN CURSO (23-sep-2026) |
 | 100 | `docs/AVISOS-QUE-DICEN-LA-VERDAD.md` (lo principal y lo accesorio por separado: verde, ámbar o rojo; botones que se bloquean de verdad; errores en castellano). Después de la 99 | PENDIENTE |
 | 101 | `docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md` (repintar solo lo que se ve y ha cambiado; el último repintado gana). Después de la 100 | PENDIENTE |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
