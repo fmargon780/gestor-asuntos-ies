@@ -54,6 +54,21 @@
    `porTipo` se indexa por `tipo.tipo`, la misma clave con la que
    `tipos.json` identifica un tipo de asunto.
 
+   `porTipoDocumento` (23-sep-2026, fila 96,
+   docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md) es otra cosa: los campos
+   del propio tipo de DOCUMENTO, que entran en el nombre del fichero
+   entre el tipo y el texto adicional. Se indexa por el nombre del tipo
+   de documento (`tipos-documento.json` sigue siendo una lista de
+   nombres, sin tocar):
+
+       "porTipoDocumento": {
+         "FACTURA": [ { "id": "d1", "nombre": "Proveedor", "clase": "texto",
+                        "valores": [], "obligatorio": true } ]
+       }
+
+   `clase` es 'texto', 'lista' (usa `valores`) o 'fecha'. Un campo sin
+   nombre no sobrevive. Solo se escribe la clave cuando hay alguno.
+
    Si el fichero no existe, todo funciona como hoy: un tipo sin campos
    configurados se comporta exactamente igual que antes de este
    cambio. `campos.json` entra en las copias de seguridad y en la
@@ -119,6 +134,23 @@ var Campos = (function () {
     return salida;
   }
 
+  function normalizarCampoDeDocumento(c) {
+    var clase = (c && (c.clase === 'lista' || c.clase === 'fecha')) ? c.clase : 'texto';
+    return {
+      id: String((c && c.id) || '') || U.nuevoId('d'),
+      nombre: String((c && c.nombre) || '').trim(),
+      clase: clase,
+      valores: (clase === 'lista' && c && Array.isArray(c.valores))
+        ? c.valores.map(function (v) { return String(v).trim(); }).filter(Boolean) : [],
+      obligatorio: !!(c && c.obligatorio)
+    };
+  }
+
+  function normalizarListaDeDocumento(lista) {
+    return (Array.isArray(lista) ? lista : []).map(normalizarCampoDeDocumento)
+      .filter(function (c) { return c.nombre; });
+  }
+
   function normalizar(leido) {
     var c = leido || {};
     var propios = (Array.isArray(c.propios) ? c.propios : [])
@@ -136,7 +168,18 @@ var Campos = (function () {
       });
     });
 
-    return { propios: propios, calculados: calculados, porTipo: porTipo };
+    var salida = { propios: propios, calculados: calculados, porTipo: porTipo };
+
+    /* Fila 96: solo si hay alguno, para no cambiar la forma del
+       fichero de nadie que no lo use. */
+    var origenDoc = (c.porTipoDocumento && typeof c.porTipoDocumento === 'object') ? c.porTipoDocumento : {};
+    var porTipoDocumento = {};
+    Object.keys(origenDoc).forEach(function (tipoDoc) {
+      var lista = normalizarListaDeDocumento(origenDoc[tipoDoc]);
+      if (lista.length) porTipoDocumento[tipoDoc] = lista;
+    });
+    if (Object.keys(porTipoDocumento).length) salida.porTipoDocumento = porTipoDocumento;
+    return salida;
   }
 
   /* La receta de fábrica del calculado "curso" (fila 56, 18-sep-2026,
@@ -215,6 +258,25 @@ var Campos = (function () {
     }
     await Copias.guardar(gestor, FICHERO, actual);
     return actual;
+  }
+
+  /* Los campos de UN tipo de documento (fila 96). Relee antes de
+     escribir y solo toca su trozo, como guardarConfigDeTipo. */
+  async function guardarCamposDeDocumento(gestor, tipoDoc, listaCampos) {
+    var actual = await leer(gestor);
+    var porTipoDocumento = Object.assign({}, actual.porTipoDocumento || {});
+    var lista = normalizarListaDeDocumento(listaCampos);
+    if (lista.length) porTipoDocumento[tipoDoc] = lista;
+    else delete porTipoDocumento[tipoDoc];
+    if (Object.keys(porTipoDocumento).length) actual.porTipoDocumento = porTipoDocumento;
+    else delete actual.porTipoDocumento;
+    await Copias.guardar(gestor, FICHERO, actual);
+    return actual;
+  }
+
+  function camposDeDocumento(config, tipoDoc) {
+    var m = (config && config.porTipoDocumento) || {};
+    return m[tipoDoc] || [];
   }
 
   /* ---------- identidad de un campo ----------
@@ -421,6 +483,8 @@ var Campos = (function () {
     normalizar: normalizar, leer: leer,
     guardarPropios: guardarPropios, guardarCalculados: guardarCalculados,
     guardarConfigDeTipo: guardarConfigDeTipo,
+    guardarCamposDeDocumento: guardarCamposDeDocumento, camposDeDocumento: camposDeDocumento,
+    normalizarListaDeDocumento: normalizarListaDeDocumento,
     claveDeCampo: claveDeCampo, nombreDeCampo: nombreDeCampo,
     CALCULADOS: CALCULADOS, calcularCurso: calcularCurso,
     RECETA_CURSO_DE_FABRICA: RECETA_CURSO_DE_FABRICA,

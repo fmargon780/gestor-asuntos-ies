@@ -5,7 +5,22 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
-## 23-sep-2026 — Fila 94: cambiar el tipo de un asunto ofrece la guía del nuevo
+## 23-sep-2026 — Fila 96: campos propios en el nombre de un documento
+
+`docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md`. Cada tipo de documento puede llevar campos (texto,
+lista o fecha, obligatorios si se quiere) que entran en el nombre entre el tipo y el texto
+adicional. Módulo nuevo `js/documentos-campos.js`.
+
+**Dónde se guardan, y por qué ahí.** `tipos-documento.json` es una lista de nombres que usan la
+fusión de borrados, la papelera y la guardia de duplicados: convertirla en objetos tocaba todo
+eso. Los campos van a `campos.json`, clave `porTipoDocumento`, que ya es compartido, con copia y
+releído antes de escribir. Ojo con una trampa: `Campos.normalizar` reconstruye el objeto entero,
+así que cualquier clave nueva que no se añada ahí se borra en el siguiente guardado de otro trozo
+(la prueba lo comprueba). La clave solo se escribe cuando hay algún campo.
+
+Un campo de fecha entra como `AAMMDD`, igual que la fecha del documento.
+
+: cambiar el tipo de un asunto ofrece la guía del nuevo
 
 `docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md`. Hasta ahora, cambiar el tipo en «Editar el asunto»
 renombraba la carpeta pero dejaba los hitos del tipo viejo sin decir nada. Ahora pregunta (lo

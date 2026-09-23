@@ -38,7 +38,8 @@ de `App` va después del fichero que lo define.
 | `js/datos.js` | Lee los CSV; el nombre comercial y las columnas leídas por su título; `Datos.tutoresDe` agrupa los tutores legales por persona y `Datos.resumenDeTercero` monta la línea "Datos y contacto" |
 | `js/campos.js` | Los campos de cada tipo de asunto: catálogo, cálculo y guardado |
 | `css/campos.css` | Los estilos del bloque "Datos del asunto" y del cuadro de Campos |
-| `js/documentos.js` | Nombra los documentos, con el texto adicional y los tipos sin duplicados |
+| `js/documentos.js` | Nombra los documentos, con el texto adicional y los tipos sin duplicados; enseña los campos del tipo de documento y no deja guardar con un obligatorio vacío (fila 96) |
+| `js/documentos-campos.js` | `DocCampos` (fila 96): los campos propios de un tipo de documento (`campos.json`, `porTipoDocumento`), reconocerlos al renombrar, ponerlos en orden para el nombre y su editor en Ajustes → Tipos de documento |
 | `js/usabilidad.js` | Volver, Cancelar, etiquetas de filtros, vista compacta y Escape |
 | `js/nucleo.js` | El estado, el arranque y el cambio de pantalla |
 | `js/version.js` | `App.VERSION`, la fecha y hora de la última publicación |
@@ -166,6 +167,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/guias.mjs` | Prueba de escribir la guía desde la ficha, y del plegado |
 | `pruebas/opciones.mjs` | Prueba de las preguntas con opciones, con el caso de la factura |
 | `pruebas/registro.mjs` | Prueba de registrar un documento en un paso, sin nombrarlo dos veces |
+| `pruebas/campos-del-documento.mjs` | Prueba (fila 96, 23-sep-2026): el nombre con los campos del tipo de documento, el obligatorio vacío, un tipo sin campos, con registro, reconocer al renombrar, guardar en `campos.json`; y en navegador el cuadro de poner nombre y el editor de Ajustes |
 | `pruebas/campos.mjs` | Prueba de los campos de cada tipo de asunto (ocho escenarios más editar) |
 | `pruebas/relacionados.mjs` | Prueba de los terceros relacionados con un asunto, y la nota al archivar |
 | `pruebas/duplicados.mjs` | Prueba de que no se dupliquen los asuntos, y de unir los que ya existían |

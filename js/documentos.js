@@ -216,6 +216,16 @@ var Documentos = (function () {
        campo. Lo único que se conserva es lo que ya trajera el nombre
        del propio fichero. */
     var curso = previo.curso || '';
+    /* Los campos del tipo de documento (fila 96): los de lista que ya
+       estén, tal cual, al principio del texto adicional se reconocen y
+       salen de ahí; el resto se queda como texto adicional. */
+    var valoresIniciales = {};
+    var camposIniciales = camposDelTipo(previo.tipo);
+    if (camposIniciales.length) {
+      var rec = DocCampos.reconocer(camposIniciales, curso);
+      valoresIniciales = rec.valores;
+      curso = rec.resto;
+    }
     /* Solo se ofrece cuando ya está en la carpeta: un documento que se
        acaba de añadir todavía no puede estar "pendiente" de nada. */
     var pendienteInicial = opciones.modo === 'renombrar' &&
@@ -254,6 +264,7 @@ var Documentos = (function () {
 
       '<label class="etiqueta">Tipo de documento</label>' +
       '<select id="doc-tipo" class="campo">' + opcionesDeTipo(previo.tipo) + '</select>' +
+      '<div id="doc-campos-tipo"></div>' +
 
       '<label class="interruptor">' +
         '<input type="checkbox" id="doc-hay-registro"' + (previo.registro ? ' checked' : '') + '>' +
@@ -311,9 +322,10 @@ var Documentos = (function () {
        de crear uno. Se engancha antes que el refresco general para que la
        vista previa no llegue a enseñar el nombre postizo. */
     ultimoTipo = $('doc-tipo').value;
+    pintarCamposDelTipo(valoresIniciales);
     $('doc-tipo').addEventListener('change', function () {
       var sel = $('doc-tipo');
-      if (sel.value !== TIPO_NUEVO) { ultimoTipo = sel.value; return; }
+      if (sel.value !== TIPO_NUEVO) { ultimoTipo = sel.value; pintarCamposDelTipo(); return; }
       sel.value = ultimoTipo || (ctx.tipos()[0] || '');
       abrirCuadroDeTipoNuevo();
     });
@@ -342,6 +354,36 @@ var Documentos = (function () {
     $('doc-volver').onclick = function () { soltarVisor(); pintarLista(); };
     $('doc-guardar').onclick = function () { guardar(opciones); };
     refrescar();
+  }
+
+  /* ---------- los campos del tipo de documento (fila 96) ---------- */
+
+  function camposDelTipo(tipo) {
+    return (window.DocCampos && tipo && tipo !== TIPO_NUEVO) ? DocCampos.campos(tipo) : [];
+  }
+
+  function tipoElegido() {
+    var sel = $('doc-tipo');
+    var tipo = sel ? sel.value : '';
+    return tipo === TIPO_NUEVO ? (ultimoTipo || '') : tipo;
+  }
+
+  /* Pinta los campos del tipo elegido. Sin `valores`, conserva lo ya
+     escrito en los que se repiten (mismo id). */
+  function pintarCamposDelTipo(valores) {
+    var caja = $('doc-campos-tipo');
+    if (!caja || !window.DocCampos) return;
+    var antes = valores || DocCampos.leerDe(caja);
+    DocCampos.pintar(caja, camposDelTipo(tipoElegido()), antes);
+    Array.prototype.forEach.call(caja.querySelectorAll('input, select'), function (c) {
+      c.oninput = refrescar;
+      c.onchange = refrescar;
+    });
+    refrescar();
+  }
+
+  function valoresDeCampos() {
+    return window.DocCampos ? DocCampos.leerDe($('doc-campos-tipo')) : {};
   }
 
   /* ---------- la lista de tipos de documento ---------- */
@@ -405,7 +447,7 @@ var Documentos = (function () {
     sel.value = tipo;
     ultimoTipo = tipo;
     cerrarCuadroDeTipoNuevo();
-    refrescar();
+    pintarCamposDelTipo();
   }
 
   /* El aviso que va debajo del campo. Dice una de tres cosas: que el
@@ -478,7 +520,7 @@ var Documentos = (function () {
       sel.value = limpio;
       ultimoTipo = limpio;
       cerrarCuadroDeTipoNuevo();
-      refrescar();
+      pintarCamposDelTipo();
       U.aviso('Tipo de documento ' + limpio + ' añadido a la lista del centro.', 'bueno');
     } catch (e) {
       U.aviso('No he podido guardarlo: ' + e.message, 'malo');
@@ -511,6 +553,7 @@ var Documentos = (function () {
       fecha: $('doc-fecha').value,
       codigo: Nombres.codigoRegistro(registro),
       tipo: tipo,
+      campos: window.DocCampos ? DocCampos.enOrden(camposDelTipo(tipo), valoresDeCampos()) : [],
       curso: $('doc-curso').value.trim(),
       extension: Nombres.extensionDe(opciones.nombreActual)
     };
@@ -542,6 +585,10 @@ var Documentos = (function () {
   }
 
   async function guardar(opciones) {
+    /* Un campo obligatorio del tipo de documento, vacío: no se guarda
+       (fila 96), con el mismo aviso que al crear un asunto. */
+    var falta = window.DocCampos ? DocCampos.faltaObligatorio(camposDelTipo(tipoElegido()), valoresDeCampos()) : '';
+    if (falta) { U.aviso('Hace falta rellenar "' + falta + '".', 'malo'); return; }
     var nombre = Nombres.montarDocumento(datosDelFormulario(opciones));
     if (!nombre) return;
     try {

@@ -465,3 +465,9 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 .cuentas-total td { font-weight: 700; border-top: 2px solid var(--linea); border-bottom: none; }
 .cuentas-tabla-pequena { max-width: 320px; }
 .cuentas-subtitulo { margin: 0 0 4px; font-size: 15px; }
+
+/* Fila 96: los campos del tipo de documento, en el cuadro de poner
+   nombre y en su editor de Ajustes (js/documentos-campos.js). */
+.doc-campos-tipo { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0 12px; }
+.doccampos-fila { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+.doccampos-fila .campo { flex: 1 1 160px; width: auto; }
