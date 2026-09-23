@@ -54,12 +54,26 @@ repinta de verdad mientras se escribe la nota de un hito, esa nota puede perders
 hitos se repinta un instante después, de forma asíncrona); la nota del asunto no tiene ese
 problema. Se comprueba con `pruebas/notas-asunto-no-se-borran.mjs`.
 
-Con esto, `App.verAbiertos` sirve para todas las formas de guardar un documento dentro de un
-asunto (registrar, nombrar, sello de Séneca, generar desde plantilla, separar/unir/sacar páginas,
-meter un suelto o un correo) sin que ninguna tenga que saber de la ficha: **Editar**,
-**Archivar/Reabrir** y **Borrar** siguen siendo los únicos que de verdad vuelven a la lista,
-llamando a `volverALaLista()` como hasta ahora. Se comprueba con
-`pruebas/quedarse-en-el-asunto.mjs`.
+**De la ficha de un asunto solo se sale en cuatro casos** (fila 93, 23-sep-2026,
+`docs/QUEDARSE-EN-EL-ASUNTO-SIEMPRE.md`): Volver o Escape, Editar (aunque se cancele el cuadro:
+`js/ficha-nombre-acciones.js` llama a `App.volverALaLista()` después de `App.editarAsunto(a)`
+pase lo que pase), Archivar/Reabrir y Borrar; y un quinto que no es una acción de Francisco: el
+asunto ha dejado de estar abierto desde el otro ordenador (el aviso de `App.reengancharFicha()`,
+más arriba). Cualquier otra cosa se queda en su sitio, porque `App.verAbiertos` (que ya reengancha
+sola la ficha, más arriba) o `App.abrirFicha(a, modo)` bastan para repintar sin navegar a ninguna
+otra pantalla: guardar o registrar un documento, generar uno desde plantilla, separar/unir/sacar
+páginas de un PDF, marcar un hito, asociar un documento a un hito desde el propio documento
+(`js/ficha-documentos.js`, "Asociar a un hito") o apuntarlo desde el propio hito
+(`js/hitos-documentos.js`, "Apuntar un documento"), "Comunicar", "Documentos ▾", y "Meter en un
+asunto"/"Meter aquí" de Por clasificar (`js/documentos-sueltos.js`,
+`js/documentos-sueltos-lector.js`) — estos dos últimos, además, viven siempre en la pantalla "Por
+clasificar", nunca dentro de la ficha, así que no pueden sacar de ella; y cuando el asunto de
+destino es el que antes tenía la ficha abierta, `App.reengancharFicha()` no la vuelve a enseñar,
+porque comprueba primero si la ficha sigue **a la vista** (`#pantalla-asunto` sin `oculto`), no
+solo si `actual` sigue puesto. Repaso completo de todo `js/` en busca de una salida indebida
+(fila 93): no se encontró ninguna, la regla ya se cumplía entera desde las filas 30, 34, 51, 52 y
+58. Se comprueba con `pruebas/quedarse-en-el-asunto.mjs` (quince casos: los once que se quedan y
+los cuatro que salen, más el quinto del otro ordenador).
 
 **La disposición de la ficha** (18-sep-2026, fila 51, docs/FICHA-DISPOSICION.md): cambio de
 disposición, ningún funcionamiento distinto. La regla: arriba a la izquierda lo que hay que
