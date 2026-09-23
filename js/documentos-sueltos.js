@@ -266,11 +266,15 @@ App.meterSueltoEnAsunto = async function (s) {
    pinta js/documentos-sueltos-sugerencias.js, ya sabe a qué asunto va
    sin pasar por el cuadro de elegir: necesita el mismo camino, sin
    repetirlo. */
-App.meterSueltoEnAsuntoElegido = async function (s, elegido) {
+/* `opciones` (fila 103, docs/EL-HITO-MESA-DE-TRABAJO.md, sección 1,
+   camino "Desde 'Por clasificar'"): opcional, con `{ hito }`. Viaja
+   tal cual hasta App.verDocumentos, para que al ponerle nombre al
+   documento ya movido quede apuntado al hito. */
+App.meterSueltoEnAsuntoElegido = async function (s, elegido, opciones) {
   var E = window.ElegirAsunto;
 
   if (!E.estaArchivado(elegido.ficha)) {
-    await App.llevarSueltoA(s, elegido.nombre, elegido.ficha);
+    await App.llevarSueltoA(s, elegido.nombre, elegido.ficha, opciones);
     return;
   }
 
@@ -293,9 +297,9 @@ App.meterSueltoEnAsuntoElegido = async function (s, elegido) {
     /* Si no se ha llegado a reabrir (se canceló, o falló el traslado de
        la carpeta), el documento no se toca. */
     if (!(await Carpetas.existe(App.E.abiertos, elegido.nombre))) return;
-    await App.llevarSueltoA(s, elegido.nombre, {});
+    await App.llevarSueltoA(s, elegido.nombre, {}, opciones);
   } else if (que === 'guardar') {
-    await App.llevarSueltoA(s, elegido.nombre, elegido.ficha);
+    await App.llevarSueltoA(s, elegido.nombre, elegido.ficha, opciones);
   }
 };
 
@@ -303,7 +307,7 @@ App.meterSueltoEnAsuntoElegido = async function (s, elegido) {
    comprueba que la copia pesa lo mismo y solo entonces borra: en las
    carpetas de Dropbox el move() del navegador no vale. Si algo falla,
    el documento se queda en "Por clasificar". */
-App.llevarSueltoA = async function (s, nombreAsunto, ficha) {
+App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
   var E = window.ElegirAsunto;
 
   var destino;
@@ -358,7 +362,7 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha) {
       nombre: nombreAsunto, handle: destino,
       ficha: (App.E.registro.asuntos || {})[nombreAsunto] || {},
       leido: Nombres.leer(nombreAsunto, App.E.tipos)
-    });
+    }, opciones);
   } catch (e2) {
     U.accesorio('Documento metido, pero no he podido abrir el cuadro para ponerle nombre', e2);
   }
