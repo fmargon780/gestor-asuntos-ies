@@ -8,8 +8,11 @@
    solo apunta con qué le han llamado, y se comprueba eso.
 
    Comprueba:
-   1. Un paso con `comunicacion.correo.cuerpo` escrito hace que su hito
-      tenga botón Comunicar; un paso sin nada, no.
+   1. Desde la fila 103 (23-sep-2026, docs/EL-HITO-MESA-DE-TRABAJO.md,
+      sección 3), el botón sale siempre (salvo decision/noaplica): con
+      `comunicacion.correo.cuerpo` escrito, solo ese canal; sin nada,
+      los dos, porque entonces el cuadro se abre con el desplegable de
+      plantillas del tipo.
    2. Con texto solo de Séneca, "Comunicar" abre Séneca sin pasar por
       el menú (un solo canal → un solo destino, sin FichaMenus).
    3. El destinatario propuesto es el tutor cuando el responsable del
@@ -123,18 +126,23 @@ const asunto1 = {
   leido: { tipo: 'MATRICULA', resto: '' }
 };
 
-/* ================= 1 · hay botón, o no ================= */
-console.log('--- 1. botón "Comunicar" solo si el paso tiene texto ---');
+/* ================= 1 · hay botón, o no (fila 103: siempre, salvo
+   decision/noaplica; sin texto propio, los dos canales) ================= */
+console.log('--- 1. botón "Comunicar" siempre, salvo decision/noaplica (fila 103) ---');
 const hitoConCorreo = Hitos.pasoAHito(PASO_CON_CORREO);
 const hitoSinNada = Hitos.pasoAHito(PASO_SIN_NADA);
-comprobar('un paso con comunicacion.correo.cuerpo trae el canal "correo"',
+comprobar('un paso con comunicacion.correo.cuerpo trae solo el canal "correo"',
   HitosComunicar.canalesDe(asunto1, hitoConCorreo), ['correo']);
-comprobar('un paso sin nada no trae ningún canal',
-  HitosComunicar.canalesDe(asunto1, hitoSinNada), []);
-comprobar('sin canales, no hay botón',
-  HitosComunicar.botonHTML(asunto1, hitoSinNada), '');
-comprobar('con un canal, sí hay botón',
+comprobar('un paso sin nada trae los dos canales (sin texto propio, el desplegable de plantillas)',
+  HitosComunicar.canalesDe(asunto1, hitoSinNada), ['correo', 'seneca']);
+comprobar('sin texto propio, el botón sigue saliendo',
+  HitosComunicar.botonHTML(asunto1, hitoSinNada).indexOf('Comunicar') !== -1, true);
+comprobar('con un canal, también hay botón',
   HitosComunicar.botonHTML(asunto1, hitoConCorreo).indexOf('Comunicar') !== -1, true);
+comprobar('en un hito "decision", no hay botón',
+  HitosComunicar.botonHTML(asunto1, Object.assign({}, hitoConCorreo, { clase: 'decision' })), '');
+comprobar('en un hito "noaplica", no hay botón',
+  HitosComunicar.botonHTML(asunto1, Object.assign({}, hitoConCorreo, { estado: 'noaplica' })), '');
 
 /* ========= 2 · un solo canal abre directo, sin menú ========= */
 console.log('--- 2. con un solo canal, abre directo (sin FichaMenus) ---');
