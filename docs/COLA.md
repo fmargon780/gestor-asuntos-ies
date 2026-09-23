@@ -105,8 +105,13 @@ Las filas 1 a 62, 64 a 75, 77 a 104 están **HECHAS**. Sus documentos siguen en
 | 105 | `docs/AJUSTES-PLEGADO.md` | PENDIENTE (apuntada 23-sep-2026) |
 | 106 | `docs/LO-PIDE-EN-LA-CABECERA.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 107 | `docs/FICHA-EN-TARJETAS.md` | PENDIENTE (apuntada 24-sep-2026). Después de la 106 |
+| 108 | `docs/CONTACTO-EN-TARJETAS.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 108 se apuntó el 24-sep-2026**, cerrada con Francisco: la ventana de contacto del
+alumno pasa a cabecera con etiquetas y una tarjeta por persona (alumno, tutor 1, tutor 2), con el
+nombre completo de cada tutor bien montado.
 
 **La fila 107 se apuntó el 24-sep-2026**, cerrada con Francisco: la ficha del asunto pasa de
 tres columnas a una cuadrícula de tarjetas del mismo tamaño, todas a la vista; al pulsar una, se
