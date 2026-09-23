@@ -51,16 +51,26 @@
     return (origen && origen.comunicacion) || null;
   }
 
-  /* Los canales (correo/seneca) con texto propio para este hito: de
-     los que hay botón. Síncrona, para poder decidir de un vistazo, al
-     pintar la fila del hito, si hace falta el botón. */
+  var AMBOS_CANALES = ['correo', 'seneca'];
+
+  /* Los canales que ofrece el botón de este hito. Síncrona, para
+     poder decidir de un vistazo, al pintar la fila del hito, cuántos
+     hacen falta (uno: abre directo; dos: el menú Correo/Séneca).
+
+     Desde la fila 103 (23-sep-2026, docs/EL-HITO-MESA-DE-TRABAJO.md,
+     sección 3), "Comunicar" sale siempre (salvo decision/noaplica,
+     que ya lo decide botonHTML): con texto propio del paso, solo los
+     canales que lo tengan, como hasta ahora; sin ninguno con texto
+     (o sin comunicación propia del paso), los dos, porque entonces
+     el cuadro se abre con el desplegable de plantillas del tipo, que
+     vale para cualquiera de los dos. */
   function canalesDe(a, hito) {
     var c = comunicacionDe(a, hito);
-    if (!c) return [];
+    if (!c) return AMBOS_CANALES.slice();
     var salida = [];
     if (tieneTexto(c.correo)) salida.push('correo');
     if (tieneTexto(c.seneca)) salida.push('seneca');
-    return salida;
+    return salida.length ? salida : AMBOS_CANALES.slice();
   }
 
   /* ==========================================================
@@ -162,25 +172,45 @@
      ABRIR EL CUADRO YA RELLENO (secciones 4-5 del encargo)
      ========================================================== */
 
+  /* Los documentos ya apuntados a este hito que siguen de verdad en
+     la carpeta (fila 103, sección 3): son los que van premarcados en
+     "Documentos de este asunto" del cuadro de Correo. Solo tiene
+     sentido en Correo, nunca en Séneca (ahí no hay adjuntos). */
+  async function documentosDelHitoEnCarpeta(a, hito) {
+    if (!(hito.documentos || []).length) return [];
+    try {
+      var enCarpeta = (await Carpetas.ficheros(a.handle)).map(function (f) { return f.nombre; });
+      return hito.documentos.filter(function (d) { return enCarpeta.indexOf(d) !== -1; });
+    } catch (e) { return []; }
+  }
+
   async function comunicar(a, hito, canal) {
     var c = comunicacionDe(a, hito);
     var mensaje = c && c[canal];
-    if (!mensaje || !tieneTexto(mensaje)) return;
-
-    var valores = {};
-    /* Con el hito (fila 102): {{HITO}} y {{PLAZO DEL HITO}} también aquí. */
-    try { valores = await Plantillas.valoresDeAsunto(a, { hito: hito, conLoQueFalta: false }); } catch (e) { valores = {}; }
-    var asuntoListo = Plantillas.rellenar(mensaje.asunto || '', valores).texto;
-    var medioListo = Plantillas.rellenar(mensaje.cuerpo || '', valores).texto;
     var destinatario = await resolverDestinatario(a, hito);
 
-    if (!window.CorreoNucleo || !window.CorreoNucleo.abrirCuadro) return;
-    window.CorreoNucleo.abrirCuadro(a, canal === 'seneca', {
-      asuntoListo: asuntoListo,
-      medioListo: medioListo,
+    var extra = {
       correoPreferente: destinatario.correoPreferente,
       comunicarHito: { claveAsunto: a.nombre, idHito: hito.id, nombreDestinatario: destinatario.nombre }
-    });
+    };
+
+    /* Con texto propio del paso: igual que hasta ahora, con los
+       huecos ya resueltos. Sin él (fila 103): el cuadro se abre con
+       el desplegable de plantillas del tipo, como el "Comunicar" de
+       la cabecera, pero conservando el destinatario y la constancia
+       de arriba. */
+    if (mensaje && tieneTexto(mensaje)) {
+      var valores = {};
+      /* Con el hito (fila 102): {{HITO}} y {{PLAZO DEL HITO}} también aquí. */
+      try { valores = await Plantillas.valoresDeAsunto(a, { hito: hito, conLoQueFalta: false }); } catch (e) { valores = {}; }
+      extra.asuntoListo = Plantillas.rellenar(mensaje.asunto || '', valores).texto;
+      extra.medioListo = Plantillas.rellenar(mensaje.cuerpo || '', valores).texto;
+    }
+
+    if (canal !== 'seneca') extra.adjuntosMarcados = await documentosDelHitoEnCarpeta(a, hito);
+
+    if (!window.CorreoNucleo || !window.CorreoNucleo.abrirCuadro) return;
+    window.CorreoNucleo.abrirCuadro(a, canal === 'seneca', extra);
   }
 
   /* ==========================================================
@@ -189,8 +219,12 @@
 
   var ETIQUETA_CANAL = { correo: 'Correo electrónico', seneca: 'Mensaje de Séneca' };
 
+  /* Desde la fila 103: sale siempre, salvo en un hito "decision" o
+     "noaplica" (mismo criterio que "Generar documento"). Antes solo
+     salía si el paso tenía comunicación propia; canalesDe ya se
+     encarga de ofrecer los dos canales cuando no la tiene. */
   function botonHTML(a, hito) {
-    if (!canalesDe(a, hito).length) return '';
+    if (!hito || hito.clase === 'decision' || hito.estado === 'noaplica') return '';
     return '<button type="button" class="boton hito-comunicar-boton">Comunicar</button>';
   }
 
