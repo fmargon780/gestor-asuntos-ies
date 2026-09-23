@@ -97,7 +97,7 @@ Las filas 1 a 62, 64 a 75, 77 a 93 y 97 están **HECHAS**. Sus documentos siguen
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 94 | `docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md` (al cambiar el tipo de un asunto abierto, ofrecer traer la guía del tipo nuevo sin perder lo trabajado) | PENDIENTE |
+| 94 | `docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md` (al cambiar el tipo de un asunto abierto, ofrecer traer la guía del tipo nuevo sin perder lo trabajado) | EN CURSO (23-sep-2026) |
 | 96 | `docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md` (campos propios del tipo de documento, obligatorios si se quiere, que entran solos en el nombre) | PENDIENTE |
 | 98 | `docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md` (botón «Ruta» en la ficha, con la ruta de este ordenador apuntada en Ajustes → El centro) | PENDIENTE |
 | 95 | `docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md` (preguntas anidadas sin límite de niveles; el editor entra y sale en vez de anidar en pantalla) | PENDIENTE |
