@@ -102,9 +102,24 @@ Las filas 1 a 62, 64 a 75, 77 a 102 están **HECHAS**. Sus documentos siguen en
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 103 | `docs/EL-HITO-MESA-DE-TRABAJO.md` (segunda tanda del hito: "Añadir documento" con tres caminos, menú de tres puntos en cada documento del hito, "Comunicar" siempre visible con los documentos del hito ya marcados) | EN CURSO (23-sep-2026) |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 103 está HECHA** (23-sep-2026): `docs/EL-HITO-MESA-DE-TRABAJO.md`, segunda tanda del
+hito como mesa de trabajo. "Añadir documento" (los tres caminos, `js/hitos-anadir.js`), el menú
+de tres puntos de cada documento del hito (`js/hitos-documento-menu.js`) y "Comunicar" siempre
+visible, con los documentos del hito ya marcados en el cuadro de Correo. Ficheros nuevos:
+`js/hitos-anadir.js`, `js/hitos-documento-menu.js`, `pruebas/el-hito-mesa-de-trabajo.mjs`. Todo lo
+demás, unas pocas líneas: `js/hitos-panel-lista.js`, `js/hitos-comunicar.js`, `js/documentos.js`,
+`js/documentos-sueltos.js`, `js/archivo-personas.js`, `js/asuntos-lista.js`,
+`js/correo-adjuntos.js`, `js/correo.js`, `index.html`. Batería completa en verde (106 ficheros de
+prueba). Versión publicada `App.VERSION`: `23-sep-2026 · 20:57`. Comprobado con `curl` contra
+`gestor-de-asuntos.vercel.app` que los ficheros nuevos y `index.html` ya se sirven así. El detalle
+completo, con lo que costó de verdad, está escrito y listo para pegar en la nota "Nota para la
+próxima sesión: la entrada de la fila 103 en docs/HISTORIA.md", al final de este mismo documento:
+esta sesión no ha podido subir `docs/HISTORIA.md` de una pieza (regla 12 y 17: pasa de 140 KB) sin
+arriesgar una subida a medias; queda para una sesión con `git push` de verdad, o para repetirlo
+con `create_or_update_file` en un momento con más margen de salida.
 
 **Las filas 92 a 98 se apuntaron el 23-sep-2026**, diseñadas y cerradas con Francisco esa tarde.
 Van en ese orden de trabajo: primero la 92, que hoy deja la aplicación sin poder guardar nada.
@@ -255,3 +270,82 @@ retipear de un tirón sin `git push`). Puede que falten todavía.
 Compruébalo contra lo que de verdad dice `main` antes de sustituir nada. Si la sesión tiene
 `git push` de verdad (terminal u ordenador de Francisco), es mucho más simple que ir fichero a
 fichero con la API.
+
+## Nota para la próxima sesión: la entrada de la fila 103 en docs/HISTORIA.md
+
+El código, las pruebas, `docs/COLA.md` (esta fila, ya HECHA), `docs/CONTEXTO-CORTO.md` y
+`docs/contexto/HITOS-Y-GUIAS.md` de la fila 103 están en `main` y comprobados en producción. Solo
+falta añadir la entrada de `docs/HISTORIA.md`: el fichero pasa de 140 KB y esta sesión no ha
+podido reconstruirlo entero de una pieza sin arriesgar una subida a medias (regla 12). El texto va
+**arriba de todo**, justo después de la línea `---` que sigue a la introducción (antes de la
+entrada "## 23-sep-2026 — Fila 102: generar documentos desde el hito"), tal cual, sin tocar nada
+más del fichero:
+
+```
+## 23-sep-2026 — Fila 103: el hito, mesa de trabajo (segunda tanda)
+
+`docs/EL-HITO-MESA-DE-TRABAJO.md`. Segunda tanda de que el hito sea la mesa de trabajo del
+asunto, sobre lo que dejó la fila 102: añadir documentos desde el propio hito, un menú para cada
+uno ya apuntado, y "Comunicar" siempre a la vista.
+
+**1. "Añadir documento"**: sustituye al botón suelto "Apuntar un documento" por un único botón que
+abre un menú pequeño (`js/hitos-anadir.js`, nuevo) con tres caminos: **Desde el ordenador** (reabre
+el cuadro de siempre de `js/documentos.js`, ahora con un `{hito}` opcional que hace que lo que se
+guarde quede apuntado solo); **Desde "Por clasificar"** (elige uno de los documentos sueltos y
+sigue el mismo camino que "Meter aquí", con el mismo `{hito}`; sin ninguno, sale deshabilitado con
+"(no hay ninguno)"); y **Uno que ya está en la carpeta** (el cuadro de siempre, sin cambios). Para
+que el segundo camino llegara con el hito hasta el final, `App.meterSueltoEnAsuntoElegido` y
+`App.llevarSueltoA` (`js/documentos-sueltos.js`) ganan un parámetro `opciones` que solo viaja, sin
+tocar su lógica.
+
+**2. El menú de tres puntos de cada documento del hito** (`js/hitos-documento-menu.js`, nuevo), en
+vez de la ✕ de siempre: Registrar (si le falta), Separar, Unir, Sacar páginas y Ajustar tamaño
+(solo PDF, mismo criterio que en la carpeta del asunto) y, siempre, "Quitar del hito" (el mismo
+efecto que la ✕: desapunta, nunca borra el fichero). Cualquier documento que salga de una de esas
+herramientas queda apuntado solo al mismo hito: una función pequeña y pura,
+`HitosDocumentoMenu.ficherosNuevos(antes, después)`, compara el contenido de la carpeta antes y
+después de la herramienta y apunta los que aparecen. Un documento "(ya no está)" solo trae "Quitar
+del hito". Después de cualquier acción, `HitosPanel.desplegarAlAbrir` deja el hito desplegado él
+solo, sin que haga falta volver a pulsar el título — un detalle que la propia prueba de navegador
+cazó (ver "Lo que costó de verdad").
+
+**3. "Comunicar" siempre visible**: antes solo salía si el paso tenía su propio texto de correo o
+de Séneca; ahora sale siempre (salvo en un hito "decision" o "noaplica", igual que "Generar
+documento"). Con texto propio, igual que hasta ahora. Sin él, el cuadro se abre con el desplegable
+de plantillas del tipo — los dos canales quedan disponibles, en vez de ninguno. Los documentos que
+el hito ya tiene en la carpeta salen premarcados en "Documentos de este asunto" del cuadro de
+Correo, por un nuevo `extra.adjuntosMarcados` que sube desde `js/hitos-comunicar.js` hasta
+`CorreoAdjuntos.pintarBloque` (`js/correo-adjuntos.js`), filtrando primero los que ya no estén.
+Cuando se prepara un correo con documentos, la constancia en el historial del hito (y en la nota
+del asunto) termina en "· con N documentos: a, b" — `CorreoNucleo.sufijoDocumentos`, una función
+pura nueva en `js/correo.js`, que reutiliza el mismo `textoDeLaNota`/`apuntarElRastro` de siempre:
+ni un camino aparte ni una copia de esa lógica.
+
+**Ficheros nuevos**: `js/hitos-anadir.js`, `js/hitos-documento-menu.js`,
+`pruebas/el-hito-mesa-de-trabajo.mjs` (puro, sin navegador). Todo lo demás, unas pocas líneas cada
+uno: `js/hitos-panel-lista.js`, `js/hitos-comunicar.js`, `js/documentos.js`,
+`js/documentos-sueltos.js`, `js/archivo-personas.js`, `js/asuntos-lista.js`,
+`js/correo-adjuntos.js`, `js/correo.js`, `index.html`.
+
+**Lo que costó de verdad**: dos cosas, ninguna en la aplicación, las dos cazadas por las propias
+pruebas antes de subir nada. La primera, al escribir la prueba de navegador del punto 2: después
+de "Quitar del hito" (que ya deja el hito desplegado solo, como se explica arriba), un clic de más
+sobre el título del hito lo volvía a plegar sin querer, y el siguiente paso de la prueba —abrir
+"Añadir documento"— se quedaba 30 segundos esperando un botón invisible. Se quitó ese clic de más
+y se dejó la razón por escrito, para que no se repita. La segunda, en la propia subida a `main`:
+la primera llamada por lotes se quedó corta sin avisar y dejó tres ficheros modificados
+(`js/archivo-personas.js`, `js/asuntos-lista.js`, `js/correo-adjuntos.js`) con su contenido
+antiguo; se detectó al comprobar cada fichero después de subir (regla 11 de `docs/COLA.md`) y se
+repitió uno a uno hasta que los doce quedaron bien. Ninguna de las dos tocó la aplicación
+publicada: la primera se cazó antes de dar la fila por buena, y la segunda antes de que Francisco
+la viera.
+
+Comprobado con `pruebas/el-hito-mesa-de-trabajo.mjs` y, en el navegador de verdad, con los
+bloques nuevos de `pruebas/hitos.mjs` y `pruebas/quedarse-en-el-asunto.mjs` y la sección 1
+reescrita de `pruebas/comunicar-desde-hito.mjs`. Batería completa en verde (106 ficheros de
+prueba). Versión publicada `App.VERSION`: `23-sep-2026 · 20:57`.
+
+---
+```
+
+Una vez pegado, borra esta nota entera (esta sección) de `docs/COLA.md`.
