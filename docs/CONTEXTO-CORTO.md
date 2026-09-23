@@ -122,7 +122,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   errores del navegador salen siempre traducidos al castellano. Archivar desde la ficha abierta ya
   no confunde su propio archivado con el de "otro ordenador"; si Dropbox tropieza al escribir
   `_ficha.json` se reintenta sola (y sin ese módulo guarda igual); si falla del todo, aviso ámbar.
-- Guardar un documento en un asunto se queda en su ficha; solo se repinta si algo ha cambiado.
+- De la ficha de un asunto solo se sale al Volver, Editar, Archivar/Reabrir o Borrar; lo demás (guardar, hitos, comunicar...) se queda en su sitio.
 - Cabecera de cada pantalla fija al bajar y encogida sin temblar.
 - Renombrar, unir o borrar un asunto mueve también sus hitos y su señal de presencia; el registro
   de asuntos siempre relee del disco antes de escribir.

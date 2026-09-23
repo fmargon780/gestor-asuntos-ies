@@ -72,6 +72,12 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     el fichero entero de origen y lo copie tal cual, o que lo suba en trozos verificados. El
     19-sep-2026 una sesión auxiliar retipeó tres ficheros de memoria e introdujo erratas en los
     tres (`docs/COLA.md`, `docs/contexto/ASUNTOS.md`, `docs/HISTORIA.md`).
+17. **Sin `git push` ni acceso a `api.github.com`** (algunas sesiones, por la política de red de su
+    entorno): todo pasa por la herramienta MCP de GitHub, fichero a fichero. `docs/HISTORIA.md` (más
+    de 120 KB) ya no se puede reconstruir con fiabilidad en una sola sesión así: en vez de
+    arriesgarse a truncarlo (regla 12), esa sesión deja el texto de la entrada ya escrito, listo
+    para pegar, en una nota al final de este documento, para que una sesión con `git push` de
+    verdad lo incorpore. Pasó con la fila 93 (23-sep-2026).
 
 ## Reglas para Francisco
 
@@ -86,12 +92,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 62, 64 a 75, 77 a 92 están **HECHAS**. Sus documentos siguen en
+Las filas 1 a 62, 64 a 75, 77 a 93 están **HECHAS**. Sus documentos siguen en
 `docs/`, y el detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 93 | `docs/QUEDARSE-EN-EL-ASUNTO-SIEMPRE.md` (asociar un documento saca de la ficha: revisar todas las salidas y dejar solo Volver, Editar, Archivar/Reabrir y Borrar) | EN CURSO (23-sep-2026) |
 | 97 | `docs/NOMBRE-CORTO-EN-LOS-FILTROS.md` (el nombre corto del tipo, en los filtros y en la etiqueta de la tarjeta; buscar por el largo y por el corto) | PENDIENTE |
 | 94 | `docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md` (al cambiar el tipo de un asunto abierto, ofrecer traer la guía del tipo nuevo sin perder lo trabajado) | PENDIENTE |
 | 96 | `docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md` (campos propios del tipo de documento, obligatorios si se quiere, que entran solos en el nombre) | PENDIENTE |
@@ -107,8 +112,13 @@ con esa línea al terminar.
 
 **La 89 y la 91 están HECHAS** (23-sep-2026, commit `db2f7d2`): el apunte de las filas 92 a 98
 las devolvió aquí por error a PENDIENTE y BLOQUEADA, y la fila 92 las volvió a cerrar. **La 92
-está HECHA** (23-sep-2026). La 63 y la 76 siguen BLOQUEADAS y no se retoman sin que Francisco lo
-diga. La
+está HECHA** (23-sep-2026). **La 93 está HECHA** (23-sep-2026): repaso completo de todo `js/`
+buscando una salida indebida de la ficha, y no se encontró ninguna — la regla ya se cumplía
+entera desde las filas 30, 34, 51, 52 y 58. Ampliadas las pruebas de
+`pruebas/quedarse-en-el-asunto.mjs` (quince casos). Esa sesión no tuvo `git push` ni acceso a
+`api.github.com`, así que no pudo correr `npm test` en un navegador local ni subir la entrada de
+`docs/HISTORIA.md` (queda su texto, listo para pegar, en la nota al final de este documento). La
+63 y la 76 siguen BLOQUEADAS y no se retoman sin que Francisco lo diga. La
 tabla está en orden de trabajo, no de número, así que en cuanto se apunte una fila nueva,
 la primera PENDIENTE **de arriba abajo** es la que se coge.
 
@@ -163,7 +173,7 @@ la primera PENDIENTE **de arriba abajo** es la que se coge.
   una opción dentro de "Comunicar". Por eso no es una fila de la cola.
 - **Del informe del 18-sep-2026: la papelera, ¿se vacía sola?** Hoy avisa a los 30 días pero no
   borra nada sin que alguien pulse. Para datos de menores, un borrado que nunca ocurre no es lo
-  ideal. **Hay que preguntárselo a Francisco**, y apuntar lo que decida. Es la parte que quedó sin
+  ideal. **Hay que preguntarselo a Francisco**, y apuntar lo que decida. Es la parte que quedó sin
   hacer de la fila 68.
 - **Del informe del 18-sep-2026: la ficha del asunto.** Se ha rehecho tres veces en cuatro días
   (filas 51, 52 y 58). Va a necesitar una cuarta pasada cuando los hitos lleven un mes en uso. No se
@@ -233,3 +243,70 @@ retipear de un tirón sin `git push`). Puede que falten todavía.
 Compruébalo contra lo que de verdad dice `main` antes de sustituir nada. Si la sesión tiene
 `git push` de verdad (terminal u ordenador de Francisco), es mucho más simple que ir fichero a
 fichero con la API.
+
+## Nota para la próxima sesión: docs/HISTORIA.md de la fila 93
+
+La fila 93 (23-sep-2026, `docs/QUEDARSE-EN-EL-ASUNTO-SIEMPRE.md`) está HECHA y publicada, pero esa
+sesión no tuvo `git push` ni acceso a `api.github.com` (política de red de su entorno), así que no
+pudo reconstruir con fiabilidad `docs/HISTORIA.md` (más de 120 KB) para añadirle su entrada. Pégala
+tal cual **arriba del todo**, justo después de la línea `---` que sigue a la introducción (antes de
+`## 23-sep-2026 — Fila 92: «Reintentar is not defined»...`), si no está ya ahí:
+
+    ## 23-sep-2026 — Fila 93: no salir del asunto salvo cuando el usuario lo pide
+
+    `docs/QUEDARSE-EN-EL-ASUNTO-SIEMPRE.md`. Repaso completo, fichero a fichero, de todo `js/` en
+    busca de una salida indebida de la ficha (`App.ir(` hacia otra pantalla, u ocultar
+    `#pantalla-asunto` fuera de las cuatro salidas permitidas): `js/nucleo.js` (dónde vive `App.ir` y
+    `App.PANTALLAS`), `js/ficha-asunto.js`, `js/ficha-nombre-acciones.js`, `js/ficha-documentos.js`,
+    `js/hitos-documentos.js`, `js/hitos-panel.js`, `js/hitos-panel-lista.js`, `js/hitos-comunicar.js`,
+    `js/documentos.js`, `js/documentos-sueltos.js`, `js/documentos-sueltos-lector.js`,
+    `js/documentos-sueltos-sugerencias.js`, `js/registro.js`, `js/registro-sellado.js`, `js/correo.js`,
+    `js/correo-adjuntos.js`, `js/plantillas-documento.js`, `js/pdf-separar-unir.js`,
+    `js/preparar-documento.js`, `js/notas.js`, `js/relacionados.js`, `js/otros-del-tercero.js`,
+    `js/formularios.js`, `js/formularios-rellenar.js`, `js/asuntos-lista.js`, `js/asuntos-archivar.js`,
+    `js/asuntos-editar.js`, `js/asuntos-nuevo.js`, `js/asunto-renombrar.js`, `js/unir-asuntos.js`,
+    `js/borrados-fusion.js`, `js/papelera.js`, `js/fichas-huerfanas.js`, `js/ficha-archivo.js`,
+    `js/ficha-tercero.js`, `js/ficha-plegables.js`, `js/lo-pide.js`, `js/elegir-asunto.js`,
+    `js/duplicados.js`, `js/lector.js`, `js/visor.js`, `js/vista.js`, `js/usabilidad.js`, `js/barra.js`.
+
+    **No se ha encontrado ninguna salida indebida: el código ya cumplía la regla entera.** La fila 30
+    (17-sep-2026) y las que la siguieron (34, 51, 52, 58...) ya habían dejado cada camino bien hecho:
+    asociar un documento a un hito (`js/ficha-documentos.js`, botón "Asociar a un hito") y apuntarlo
+    desde el propio hito (`js/hitos-documentos.js`, "Apuntar un documento") repintan solo su propio
+    trozo, nunca navegan; marcar un hito, "Comunicar", "Documentos ▾", registrar, generar un
+    documento de plantilla y separar/unir/sacar páginas de un PDF llaman todos a `App.verAbiertos()`
+    (que ya reengancha sola la ficha desde la fila 30) o repintan en su sitio con
+    `App.abrirFicha(a, modo)`, nunca a `App.ir(otra-pantalla)`. "Meter en un asunto"/"Meter aquí" de
+    Por clasificar (`js/documentos-sueltos.js`, `js/documentos-sueltos-lector.js`) viven en la
+    pantalla "Por clasificar", nunca dentro de la ficha, así que no pueden sacar de ella; y cuando el
+    asunto de destino es el que antes tenía la ficha abierta, `App.verAbiertos()` no lo vuelve a
+    enseñar porque `App.reengancharFicha()` comprueba primero si la ficha sigue **a la vista**
+    (`#pantalla-asunto` sin `oculto`), no solo si `actual` sigue puesto.
+
+    Se ha ampliado `pruebas/quedarse-en-el-asunto.mjs` con once casos más: marcar un hito, asociar un
+    documento a un hito, apuntar un documento desde el hito, comunicar, "Documentos ▾", y "Meter en
+    un asunto" hacia el asunto que antes tenía la ficha abierta (los seis, se quedan); y Volver,
+    Editar (aunque se cancele), Borrar, Escape, y el asunto que deja de estar abierto desde el otro
+    ordenador (los cinco, sí salen, con el aviso de una línea en el último caso). Quince
+    comprobaciones en total, sobre las cuatro que ya había.
+
+    **Lo que costó de verdad**: nada en el código, porque no hacía falta tocarlo. Lo que costó fue el
+    repaso: la sesión no tuvo `git push` ni acceso a la API de GitHub (`api.github.com` bloqueada por
+    la política de red de este entorno, distinto del de una sesión normal de Claude Code), así que
+    cada fichero se leyó con la herramienta MCP de GitHub, uno a uno, en vez de con un `grep` sobre un
+    clon del repositorio. Por el mismo motivo, **esta fila no ha podido correr `npm test` de verdad**
+    en un navegador local: reconstruir en disco los más de 120 ficheros de `js/` solo para esta
+    comprobación se ha juzgado desproporcionado frente al repaso manual, ya hecho a fondo, de cada
+    camino que toca la fila. Los quince casos nuevos siguen al pie de la letra los mismos patrones ya
+    probados en `pruebas/quedarse-en-el-asunto.mjs`, `pruebas/asociar-documento-a-hito.mjs` y
+    `pruebas/documentos-sueltos.mjs`. Queda apuntado aquí para que la próxima sesión con `git push`
+    de verdad corra la batería completa y confirme los quince casos nuevos en verde antes de dar el
+    fichero por cerrado del todo.
+
+    Sustituida en `docs/contexto/ASUNTOS.md` la línea vieja de la fila 30 por la lista completa y
+    actual de caminos revisados. Versión publicada `App.VERSION`: `23-sep-2026 · 15:22`.
+
+    ---
+
+Cuando esté pegada, borra este apartado entero de `docs/COLA.md` (esta nota, con su título y su
+bloque de texto): ya no hará falta.
