@@ -265,7 +265,7 @@
         try {
           await U.mientrasGuarda(traerBtn, function () { return traerRequisitos(a, h); });
           window.HitosPanel.programarRepintado();
-        } catch (e) { U.aviso('No he podido traerlas: ' + e.message, 'malo'); }
+        } catch (e) { U.aviso('No he podido traerlas: ' + U.mensajeDeError(e), 'malo'); }
       };
       return;
     }
@@ -346,7 +346,7 @@
       });
       window.HitosPanel.programarRepintado();
     } catch (e) {
-      U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -362,7 +362,7 @@
     try {
       await editarTextoRequisito(a.nombre, h.id, r.id, texto);
       window.HitosPanel.programarRepintado();
-    } catch (e) { U.aviso('No he podido guardarlo: ' + e.message, 'malo'); }
+    } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
   }
 
   async function quitarDesdeFicha(a, h, r) {
@@ -373,7 +373,7 @@
     try {
       await quitarRequisito(a.nombre, h.id, r.id);
       window.HitosPanel.programarRepintado();
-    } catch (e) { U.aviso('No he podido quitarlo: ' + e.message, 'malo'); }
+    } catch (e) { U.aviso('No he podido quitarlo: ' + U.mensajeDeError(e), 'malo'); }
   }
 
   async function anadirDesdeFicha(a, h) {
@@ -399,7 +399,7 @@
     try {
       await anadirRequisito(a.nombre, h.id, texto, clase, obligatorio);
       window.HitosPanel.programarRepintado();
-    } catch (e) { U.aviso('No he podido añadirlo: ' + e.message, 'malo'); }
+    } catch (e) { U.aviso('No he podido añadirlo: ' + U.mensajeDeError(e), 'malo'); }
   }
 
   window.HitosRequisitos = {

@@ -50,7 +50,7 @@
       } catch (e) {
         if (!contacto) {
           return { categoria: categoria, persona: null,
-                   aviso: 'No he podido leer el fichero de datos: ' + e.message };
+                   aviso: 'No he podido leer el fichero de datos: ' + U.mensajeDeError(e) };
         }
       }
     }

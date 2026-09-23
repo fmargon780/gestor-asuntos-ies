@@ -139,7 +139,9 @@ App.plazoDe = function (a) {
 
 /* Cuadro para poner, cambiar o quitar la fecha límite de un asunto que
    ya está abierto. */
-App.editarPlazo = async function (a) {
+/* `control` (opcional, fila 100): el botón que lo abrió, en
+   «Guardando…» solo mientras se guarda, no con el cuadro abierto. */
+App.editarPlazo = async function (a, control) {
   var p = App.plazoDe(a);
   var delTipo = App.plazoDeTipo(a.leido.tipo || (a.ficha && a.ficha.tipo) || '');
   var sugerida = '';
@@ -162,16 +164,20 @@ App.editarPlazo = async function (a) {
 
   var valor = $('plazo-fecha').value;
   try {
-    await App.anotar(a.nombre, {
-      limite: valor,
-      limiteEl: U.ahora(),
-      limitePor: App.E.usuario
+    await U.mientrasGuarda(control || null, function () {
+      return App.anotar(a.nombre, {
+        limite: valor,
+        limiteEl: U.ahora(),
+        limitePor: App.E.usuario
+      });
     });
-    App.pintarAbiertos();
-    U.aviso(valor ? 'Fecha límite guardada.' : 'Asunto sin fecha límite.', 'bueno');
   } catch (e) {
-    U.aviso('No he podido guardarla: ' + e.message, 'malo');
+    U.fallo('No he podido guardarla', e);
+    return;
   }
+  U.aviso(valor ? 'Fecha límite guardada.' : 'Asunto sin fecha límite.', 'bueno');
+  try { App.pintarAbiertos(); }
+  catch (e2) { U.accesorio('Fecha guardada, pero no he podido repintar la lista', e2); }
 };
 
 App.nombreVia = function (clave) {
@@ -187,6 +193,9 @@ App.textoVia = function (ficha) {
 };
 
 /* Guarda el estado que se acaba de elegir en el desplegable. */
+/* Lo principal (guardar) y lo accesorio (repintar la lista) por
+   separado (fila 100): si falla solo el repintado, el estado ya está
+   guardado y el aviso es ámbar, nunca rojo. */
 App.ponerEstado = async function (a, situacion) {
   try {
     await App.anotar(a.nombre, {
@@ -194,10 +203,16 @@ App.ponerEstado = async function (a, situacion) {
       situacionEl: U.ahora(),
       situacionPor: App.E.usuario
     });
-    App.pintarAbiertos();
   } catch (e) {
-    U.aviso('No he podido guardar el estado: ' + e.message, 'malo');
+    U.fallo('No he podido guardar el estado', e);
+    return false;
   }
+  try {
+    App.pintarAbiertos();
+  } catch (e2) {
+    U.accesorio('Estado guardado, pero no he podido repintar la lista', e2);
+  }
+  return true;
 };
 
 /* Cuadro para apuntar por dónde prefiere hablar el tercero EN ESTE
@@ -233,7 +248,7 @@ App.editarVia = async function (a) {
     App.pintarArchivo();
     U.aviso('Vía de comunicación guardada.', 'bueno');
   } catch (e) {
-    U.aviso('No he podido guardarla: ' + e.message, 'malo');
+    U.aviso('No he podido guardarla: ' + U.mensajeDeError(e), 'malo');
   }
 };
 
@@ -658,6 +673,13 @@ App.tarjetaAsunto = function (a, modo) {
   acciones.appendChild(principal);
 
   div.appendChild(acciones);
+  /* Con una acción larga en marcha sobre este asunto (fila 100,
+     App.conOcupado), la tarjeta sale con sus botones apagados aunque
+     se repinte. */
+  if (App.E.ocupados && App.E.ocupados[a.nombre]) {
+    div.classList.add('tarjeta-ocupada');
+    Array.prototype.forEach.call(div.querySelectorAll('button, select'), function (b) { b.disabled = true; });
+  }
   return div;
 };
 

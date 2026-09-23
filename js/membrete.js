@@ -201,7 +201,7 @@ window.Membrete = Membrete;
       img.style.border = '1px solid #ccc';
       caja2.appendChild(img);
     } catch (e) {
-      caja2.innerHTML = '<span class="aviso-en-vivo">No he podido pintar la vista previa: ' + U.escapar(e.message) + '</span>';
+      caja2.innerHTML = '<span class="aviso-en-vivo">No he podido pintar la vista previa: ' + U.escapar(U.mensajeDeError(e)) + '</span>';
     }
   }
 
@@ -220,7 +220,7 @@ window.Membrete = Membrete;
       await refrescarVistaPrevia();
       U.aviso('Membrete guardado.', 'bueno');
     } catch (e) {
-      U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -234,7 +234,7 @@ window.Membrete = Membrete;
       });
       U.aviso('Guardado.', 'bueno');
     } catch (e) {
-      U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 

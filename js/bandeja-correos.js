@@ -88,7 +88,7 @@
       U.aviso('Bandeja de correos señalada: ' + h.name, 'bueno');
     } catch (e) {
       if (e.name === 'AbortError') return;
-      U.aviso('No he podido usar esa carpeta: ' + e.message, 'malo');
+      U.aviso('No he podido usar esa carpeta: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -398,7 +398,7 @@
       if (sitio === -1) hilos.push(huella); else hilos[sitio] = huella;
       await App.anotar(nombreAsunto, { hilos: hilos });
     } catch (e) {
-      U.aviso('El correo está guardado, pero no he podido apuntar el hilo: ' + e.message, 'malo');
+      U.aviso('El correo está guardado, pero no he podido apuntar el hilo: ' + U.mensajeDeError(e), 'ambar');
     }
     await escribirSeguidos();
   }
@@ -492,7 +492,7 @@
         botones: botones
       });
     } catch (e) {
-      U.aviso('No he podido abrir el correo: ' + e.message, 'malo');
+      U.aviso('No he podido abrir el correo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -511,7 +511,7 @@
     try {
       destino = await carpetaDelAsunto(elAsunto.nombre, reabierto ? {} : elAsunto.ficha);
     } catch (e) {
-      U.aviso('No encuentro la carpeta de ese asunto: ' + e.message, 'malo');
+      U.aviso('No encuentro la carpeta de ese asunto: ' + U.mensajeDeError(e), 'malo');
       return;
     }
     /* Si ese mismo correo ya está apuntado en el asunto, no se repite
@@ -564,7 +564,7 @@
     try {
       dentro = await Carpetas.bajar(App.E.archivo, [ficha.categoria, ficha.tercero], false);
     } catch (e) {
-      U.aviso('No encuentro la carpeta de ese asunto en el ARCHIVO: ' + e.message, 'malo');
+      U.aviso('No encuentro la carpeta de ese asunto en el ARCHIVO: ' + U.mensajeDeError(e), 'malo');
       return;
     }
     await App.reabrirAsunto({ nombre: elAsunto.nombre, padre: dentro, ficha: ficha });
@@ -809,7 +809,7 @@
         await apartarElHiloViejo(destino, nombreAsunto, trozo);
         await copiarALaCarpeta(d.pdf, destino, await nombreLibre(destino, comoHilo));
         metidos++;
-      } catch (e) { U.aviso('El PDF del correo no ha podido entrar: ' + e.message, 'malo'); }
+      } catch (e) { U.aviso('El PDF del correo no ha podido entrar: ' + U.mensajeDeError(e), 'malo'); }
     }
     for (var i = 0; i < (d.adjuntos || []).length; i++) {
       try {
@@ -898,7 +898,7 @@
           if (!(await Carpetas.existe(App.E.abiertos, nombre))) return;
           await engancharCorreo(item, nombre);
         } catch (e) {
-          U.aviso('El asunto está creado, pero el correo no ha podido entrar: ' + e.message, 'malo');
+          U.aviso('El asunto está creado, pero el correo no ha podido entrar: ' + U.mensajeDeError(e), 'ambar');
         }
       };
     });

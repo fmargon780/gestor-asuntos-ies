@@ -95,8 +95,13 @@ var FichaArchivo = (function () {
      tocar ninguna de esas dos funciones.
      ========================================================== */
 
+  /* Esta es la envoltura de más fuera: aquí se marca el asunto como
+     ocupado mientras dura todo (fila 100, App.conOcupado). */
   U.envolver(window.App, 'App.cerrarAsunto', 'ficha-archivo.js', function (comoEra) {
-    return async function (a) {
+    return function (a) { return App.conOcupado(a.nombre, function () { return cerrarYBajarFicha(comoEra, a); }); };
+  });
+
+  async function cerrarYBajarFicha(comoEra, a) {
       var clave = a.nombre;
       await comoEra(a);
       var ficha = App.E.registro.asuntos[clave];
@@ -119,15 +124,16 @@ var FichaArchivo = (function () {
             'hará sola la próxima vez que pulses «Poner en orden las fichas del ARCHIVO» en ' +
             'Ajustes → Mantenimiento.', 'ambar');
         } else {
-          U.aviso('El asunto se ha archivado, pero no he podido guardar su ficha en la carpeta: ' +
-            U.mensajeDeError(e), 'malo');
+          U.accesorio('El asunto se ha archivado, pero no he podido guardar su ficha en la carpeta', e);
         }
       }
-    };
-  });
+  }
 
   U.envolver(window.App, 'App.reabrirAsunto', 'ficha-archivo.js', function (comoEra) {
-    return async function (a) {
+    return function (a) { return App.conOcupado(a.nombre, function () { return reabrirYSubirFicha(comoEra, a); }); };
+  });
+
+  async function reabrirYSubirFicha(comoEra, a) {
       /* Se lee (o se completa, si a.handle no venía puesto) ANTES de
          llamar a lo de siempre: en cuanto la carpeta se mueva, el
          manejador viejo de 'a.handle' deja de servir. */
@@ -146,11 +152,9 @@ var FichaArchivo = (function () {
         var carpetaAbierta = await App.E.abiertos.getDirectoryHandle(clave);
         await borrar(carpetaAbierta);
       } catch (e) {
-        U.aviso('La ficha se ha recuperado, pero no he podido borrar el fichero viejo de la ' +
-          'carpeta: ' + U.mensajeDeError(e), 'malo');
+        U.accesorio('La ficha se ha recuperado, pero no he podido borrar el fichero viejo de la carpeta', e);
       }
-    };
-  });
+  }
 
   /* ==========================================================
      LA CONVERSIÓN DE LO QUE YA HAY (sección 3.4 del encargo)

@@ -114,7 +114,7 @@
       try {
         fresca = await Datos.anadirALista(App.E.datos, td.categoria, puestos);
       } catch (e) {
-        U.aviso('No he podido dar de alta: ' + e.message, 'malo');
+        U.aviso('No he podido dar de alta: ' + U.mensajeDeError(e), 'malo');
         boton.disabled = false;
         return;
       }
@@ -179,7 +179,7 @@
       try {
         await App.meterSueltoEnAsuntoElegido(s, sugerencia);
       } catch (e) {
-        U.aviso('No he podido meter el documento en ese asunto: ' + e.message, 'malo');
+        U.aviso('No he podido meter el documento en ese asunto: ' + U.mensajeDeError(e), 'malo');
         meter.disabled = false;
       }
     };
@@ -220,7 +220,7 @@
           try {
             await App.crearAsuntoConPropuesta(tipoObj, propuesta.tercero.persona, s);
           } catch (e) {
-            U.aviso('No he podido crear el asunto: ' + e.message, 'malo');
+            U.aviso('No he podido crear el asunto: ' + U.mensajeDeError(e), 'malo');
             aceptar.disabled = false;
           }
         };

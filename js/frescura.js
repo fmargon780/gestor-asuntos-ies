@@ -76,7 +76,7 @@
       }
     } catch (e) {
       ajustes = normalizar(POR_DEFECTO);
-      U.aviso('No he podido leer las épocas de frescura: ' + e.message, 'malo');
+      U.aviso('No he podido leer las épocas de frescura: ' + U.mensajeDeError(e), 'malo');
     }
   }
 

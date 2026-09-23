@@ -90,7 +90,7 @@
       U.aviso('Responsable añadido.', 'bueno');
       pintar();
     } catch (e) {
-      U.aviso('No he podido añadirlo: ' + e.message, 'malo');
+      U.aviso('No he podido añadirlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -110,7 +110,7 @@
       await Hitos.renombrarResponsable(r.id, nombre);
       pintar();
     } catch (e) {
-      U.aviso('No he podido cambiarlo: ' + e.message, 'malo');
+      U.aviso('No he podido cambiarlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -125,7 +125,7 @@
       U.aviso('Responsable quitado.', 'bueno');
       pintar();
     } catch (e) {
-      U.aviso('No he podido quitarlo: ' + e.message, 'malo');
+      U.aviso('No he podido quitarlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -168,7 +168,7 @@
       U.aviso('Días no lectivos guardados.', 'bueno');
       pintar();
     } catch (e) {
-      U.aviso('No he podido guardarlos: ' + e.message, 'malo');
+      U.aviso('No he podido guardarlos: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -181,7 +181,7 @@
     var datos;
     try { datos = await Hitos.leer(); }
     catch (e) {
-      caja.innerHTML = '<div class="vacio">No he podido leer los hitos: ' + U.escapar(e.message) + '</div>';
+      caja.innerHTML = '<div class="vacio">No he podido leer los hitos: ' + U.escapar(U.mensajeDeError(e)) + '</div>';
       return;
     }
     caja.innerHTML = '';

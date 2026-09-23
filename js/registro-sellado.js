@@ -201,7 +201,7 @@ var RegistroSellado = (function () {
       U.aviso('Documento registrado. El original sin sellar se conserva en la carpeta.', 'bueno');
       return true;
     } catch (e) {
-      U.aviso('No he podido colocarlo: ' + e.message, 'malo');
+      U.aviso('No he podido colocarlo: ' + U.mensajeDeError(e), 'malo');
       return false;
     }
   }

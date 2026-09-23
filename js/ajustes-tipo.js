@@ -165,7 +165,7 @@ function construirSeccionDatos(tipo) {
       tipo.formularios = claves;
       try {
         await App.guardarTipos();
-      } catch (e) { U.aviso('No he podido guardarlo: ' + e.message, 'malo'); }
+      } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
     });
   }
 
@@ -339,7 +339,7 @@ async function construirSeccionCampos(tipo) {
       camposSinGuardar = false;
       U.aviso('Campos de ' + tipo.tipo + ' guardados.', 'bueno');
     } catch (e) {
-      U.aviso('No he podido guardarlos: ' + e.message, 'malo');
+      U.aviso('No he podido guardarlos: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -370,7 +370,7 @@ function construirSeccionPasos(tipo) {
         await GuiasBiblioteca.abrirComparacion(entrada);
         try {
           await GuiasDelCentro.guardarPasos(tipo.tipo, pasos);
-        } catch (e2) { U.aviso('No he podido guardarlo: ' + e2.message, 'malo'); }
+        } catch (e2) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e2), 'malo'); }
         repintar();
       };
       b.cuerpo.appendChild(aviso);

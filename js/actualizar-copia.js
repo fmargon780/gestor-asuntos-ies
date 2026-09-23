@@ -277,7 +277,7 @@
       recargar(dir, remoto);
     } catch (e) {
       if (boton) { boton.disabled = false; boton.textContent = textoBoton; }
-      detalleFranja('No se ha podido actualizar: ' + (e && e.message ? e.message : e));
+      detalleFranja('No se ha podido actualizar: ' + (e && U.mensajeDeError(e) ? U.mensajeDeError(e) : e));
     }
   }
 
@@ -319,7 +319,7 @@
       recargar(dir, remoto);
     } catch (e) {
       franja(remoto, dir, null);
-      detalleFranja('No se ha podido actualizar sola: ' + (e && e.message ? e.message : e));
+      detalleFranja('No se ha podido actualizar sola: ' + (e && U.mensajeDeError(e) ? U.mensajeDeError(e) : e));
     }
   }
 

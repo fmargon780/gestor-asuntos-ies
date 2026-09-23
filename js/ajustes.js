@@ -330,7 +330,7 @@ App.renombrarTipo = async function (tipo) {
       }
       cambiadas++;
     } catch (e) {
-      fallos.push(a.nombre + ': ' + e.message);
+      fallos.push(a.nombre + ': ' + U.mensajeDeError(e));
     }
   }
 
@@ -488,7 +488,7 @@ App.borrarTipo = async function (tipo) {
     App.pintarTiposAjustes();
     U.aviso('Tipo mandado a la papelera.', 'bueno');
   } catch (e) {
-    U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+    U.aviso('No he podido mandarlo a la papelera: ' + U.mensajeDeError(e), 'malo');
   }
 };
 

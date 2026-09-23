@@ -249,7 +249,7 @@ var CamposCatalogo = (function () {
             U.aviso('Campo propio ' + nombre + ' creado.', 'bueno');
           }
           reabrir(cuerpo, tipo, lista, opciones);
-        } catch (e) { U.aviso('No he podido guardarlo: ' + e.message, 'malo'); }
+        } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
       });
     };
     avisoPropio();
@@ -286,7 +286,7 @@ var CamposCatalogo = (function () {
       }
       U.aviso('Campo propio borrado.', 'bueno');
       reabrir(cuerpo, tipo, lista, opciones);
-    } catch (e) { U.aviso('No he podido borrarlo: ' + e.message, 'malo'); }
+    } catch (e) { U.aviso('No he podido borrarlo: ' + U.mensajeDeError(e), 'malo'); }
   }
 
   /* ---------- pestaña "Calculados" ---------- */
@@ -391,7 +391,7 @@ var CamposCatalogo = (function () {
       }
       U.aviso('Campo calculado borrado.', 'bueno');
       reabrir(cuerpo, tipo, lista, opciones);
-    } catch (e) { U.aviso('No he podido borrarlo: ' + e.message, 'malo'); }
+    } catch (e) { U.aviso('No he podido borrarlo: ' + U.mensajeDeError(e), 'malo'); }
   }
 
   return { abrir: abrir };

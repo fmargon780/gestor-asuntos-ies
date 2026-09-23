@@ -127,7 +127,7 @@ var PrepararDocumento = (function () {
   async function abrir(contexto) {
     var fichero;
     try { fichero = await contexto.handle.getFile(); }
-    catch (e) { U.aviso('No he podido abrir el documento: ' + e.message, 'malo'); return; }
+    catch (e) { U.aviso('No he podido abrir el documento: ' + U.mensajeDeError(e), 'malo'); return; }
     var bytes = new Uint8Array(await fichero.arrayBuffer());
 
     if (PdfMargenes.pareceFirmado(bytes)) {
@@ -140,7 +140,7 @@ var PrepararDocumento = (function () {
 
     var pdfDoc;
     try { pdfDoc = await abrirConPdfJs(bytes); }
-    catch (e) { U.aviso(e.message, 'malo'); return; }
+    catch (e) { U.aviso(U.mensajeDeError(e), 'malo'); return; }
 
     var medidas = await App.margenesPdfLeer();
     var estado = {
@@ -152,7 +152,7 @@ var PrepararDocumento = (function () {
 
     var libre;
     try { libre = await todoLibre(pdfDoc, huecoArribaCm(), huecoAbajoCm()); }
-    catch (e) { U.aviso('No he podido mirar el documento: ' + e.message, 'malo'); return; }
+    catch (e) { U.aviso('No he podido mirar el documento: ' + U.mensajeDeError(e), 'malo'); return; }
     if (libre) {
       U.aviso('Este documento ya tiene sitio para el sello y para la firma. No he tocado nada.', 'bueno');
       return;
@@ -208,7 +208,7 @@ var PrepararDocumento = (function () {
 
     var nuevoBytes;
     try { nuevoBytes = await PdfMargenes.conHueco(bytes, huecoArribaCm(), huecoAbajoCm()); }
-    catch (e) { U.aviso(e.message, 'malo'); return; }
+    catch (e) { U.aviso(U.mensajeDeError(e), 'malo'); return; }
 
     await guardar(contexto, nuevoBytes);
   }
@@ -225,7 +225,7 @@ var PrepararDocumento = (function () {
       U.aviso('Documento preparado.', 'bueno');
       if (contexto.alTerminar) contexto.alTerminar();
     } catch (e) {
-      U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 

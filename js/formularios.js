@@ -398,7 +398,7 @@ var Formularios = (function () {
             : 'No he podido leer el catálogo';
           U.aviso(n ? n + ' formularios en el catálogo.' : 'No he podido leer el catálogo.', n ? 'bueno' : 'malo');
         } catch (e) {
-          U.aviso('No he podido actualizarlo: ' + e.message, 'malo');
+          U.aviso('No he podido actualizarlo: ' + U.mensajeDeError(e), 'malo');
         }
       };
       return d;

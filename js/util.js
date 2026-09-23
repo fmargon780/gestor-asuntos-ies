@@ -213,7 +213,13 @@ var U = (function () {
   /* Cuadro de confirmación. Devuelve una promesa con true o false.
      Con 'sinCancelar' a true se esconde el botón de Cancelar, para los
      cuadros que solo enseñan algo. */
+  /* Solo hay un #capa. Si se abre un cuadro con otro todavía esperando,
+     el de antes se da por cancelado (fila 100, docs/AVISOS-QUE-DICEN-LA-VERDAD.md):
+     antes su espera se quedaba colgada para siempre. */
+  var cuadroEsperando = null;
+
   function preguntar(titulo, cuerpoHtml, textoAceptar, sinCancelar) {
+    if (cuadroEsperando) { var anterior = cuadroEsperando; cuadroEsperando = null; anterior(false); }
     return new Promise(function (resolver) {
       var capa = document.getElementById('capa');
       document.getElementById('cuadro-titulo').textContent = titulo;
@@ -224,15 +230,46 @@ var U = (function () {
       cancelar.classList.toggle('oculto', !!sinCancelar);
       capa.classList.remove('oculto');
 
+      var cerrado = false;
       function cerrar(valor) {
+        if (cerrado) return;
+        cerrado = true;
+        if (cuadroEsperando === cerrarSinTocar) cuadroEsperando = null;
         capa.classList.add('oculto');
         aceptar.onclick = null;
         cancelar.onclick = null;
         resolver(valor);
       }
+      /* Lo que hace un cuadro nuevo con este: resolverlo en false sin
+         esconder la capa ni quitar los botones, que ya son del nuevo. */
+      function cerrarSinTocar(valor) {
+        if (cerrado) return;
+        cerrado = true;
+        resolver(valor);
+      }
+      cuadroEsperando = cerrarSinTocar;
       aceptar.onclick = function () { cerrar(true); };
       cancelar.onclick = function () { cerrar(false); };
     });
+  }
+
+  /* Los tres avisos de una acción (fila 100): rojo si falla lo
+     principal, verde si sale bien, y ámbar si lo principal ha salido
+     bien pero falla algo de después. Siempre con mensajeDeError, en
+     castellano, nunca e.message a pelo. */
+  /* Por U.aviso (no por `aviso` a secas): así quien lo sustituye —las
+     pruebas, por ejemplo— ve también estos. */
+  function avisar(texto, clase) {
+    var u = (typeof U !== 'undefined' && U && U.aviso) ? U : null;
+    return u ? u.aviso(texto, clase) : aviso(texto, clase);
+  }
+
+  function fallo(texto, e) {
+    avisar(texto + (e ? ': ' + mensajeDeError(e) : '.'), 'malo');
+  }
+
+  function accesorio(texto, e) {
+    avisar(texto + (e ? ': ' + mensajeDeError(e) : '.'), 'ambar');
   }
 
   /* ============================================================
@@ -354,6 +391,12 @@ var U = (function () {
     }
     if (nombre === 'QuotaExceededError') return 'No queda sitio en el disco.';
     if (nombre === 'AbortError') return 'La operación se ha interrumpido.';
+    if (nombre === 'NotReadableError') {
+      return 'No he podido leer un fichero: seguramente Dropbox lo estaba sincronizando. ' +
+        'Espera un momento y vuelve a intentarlo.';
+    }
+    if (nombre === 'TypeMismatchError') return 'Hay un fichero donde tendría que haber una carpeta, o al revés.';
+    if (nombre === 'SecurityError') return 'El navegador no deja hacer esto aquí. Vuelve a señalar la carpeta en Ajustes.';
     return (e && e.message) || String(e);
   }
 
@@ -370,13 +413,19 @@ var U = (function () {
      haciendo algo y no se puede pulsar dos veces mientras se guarda
      (17-sep-2026, fila 23 de la cola). 'hacer' puede devolver una
      promesa o no devolver nada; el resultado se pasa tal cual. */
+  /* Desde la fila 100 marca el control con `data-guardando`: el modo
+     consulta de la ficha (aplicarModoConsulta) no lo vuelve a encender
+     mientras dura, y un segundo clic mientras guarda no hace nada. */
   function mientrasGuarda(el, hacer) {
-    if (!el) return hacer();
+    if (!el) return Promise.resolve().then(hacer);
+    if (el.dataset && el.dataset.guardando) return Promise.resolve();
     var esBoton = el.tagName === 'BUTTON';
     var textoDeAntes = esBoton ? el.textContent : null;
     el.disabled = true;
+    if (el.dataset) el.dataset.guardando = '1';
     if (esBoton) el.textContent = 'Guardando…';
     function devolver() {
+      if (el.dataset) delete el.dataset.guardando;
       el.disabled = false;
       if (esBoton) el.textContent = textoDeAntes;
     }
@@ -643,6 +692,7 @@ var U = (function () {
     cursoDeFecha: cursoDeFecha, cursoDeAno: cursoDeAno, edadDesde: edadDesde,
     aFecha: aFecha, yaPaso: yaPaso,
     ahora: ahora, aviso: aviso, preguntar: preguntar, escapar: escapar, mensajeDeError: mensajeDeError,
+    fallo: fallo, accesorio: accesorio,
     parecidos: parecidos, dejaCrear: dejaCrear, mientrasGuarda: mientrasGuarda,
     conservandoLoEscrito: conservandoLoEscrito, menuDeAcciones: menuDeAcciones,
     envolver: envolver, envolturasAplicadas: envolturasAplicadas, envolturasFallidas: envolturasFallidas,

@@ -157,12 +157,12 @@ var PdfSepararUnir = (function () {
   async function separar(contexto) {
     var fichero;
     try { fichero = await contexto.handle.getFile(); }
-    catch (e) { U.aviso('No he podido abrir el documento: ' + e.message, 'malo'); return; }
+    catch (e) { U.aviso('No he podido abrir el documento: ' + U.mensajeDeError(e), 'malo'); return; }
     var bytes = new Uint8Array(await fichero.arrayBuffer());
 
     var pdfDoc;
     try { pdfDoc = await abrirConPdfJs(bytes); }
-    catch (e) { U.aviso(e.message, 'malo'); return; }
+    catch (e) { U.aviso(U.mensajeDeError(e), 'malo'); return; }
     var total = pdfDoc.numPages;
 
     if (total < 2) {
@@ -198,7 +198,7 @@ var PdfSepararUnir = (function () {
 
     var trozos;
     try { trozos = await PdfHerramientas.separar(bytes, listaCortes); }
-    catch (e) { U.aviso(e.message, 'malo'); return; }
+    catch (e) { U.aviso(U.mensajeDeError(e), 'malo'); return; }
 
     await guardarTrozosDeSeparar(contexto, trozos);
   }
@@ -299,7 +299,7 @@ var PdfSepararUnir = (function () {
   async function unir(contexto) {
     var candidatos;
     try { candidatos = await listarOtrosPdf(contexto); }
-    catch (e) { U.aviso('No he podido leer la carpeta: ' + e.message, 'malo'); return; }
+    catch (e) { U.aviso('No he podido leer la carpeta: ' + U.mensajeDeError(e), 'malo'); return; }
     if (!candidatos.length) {
       U.aviso('No hay ningún otro PDF ' +
         (contexto.modo === 'asunto' ? 'en este asunto' : 'en Por clasificar') + ' para unir.', 'malo');
@@ -332,11 +332,11 @@ var PdfSepararUnir = (function () {
         var otro = await candidatos[elegidos[j]].handle.getFile();
         listaDeBytes.push(new Uint8Array(await otro.arrayBuffer()));
       }
-    } catch (e) { U.aviso('No he podido leer alguno de los PDF: ' + e.message, 'malo'); return; }
+    } catch (e) { U.aviso('No he podido leer alguno de los PDF: ' + U.mensajeDeError(e), 'malo'); return; }
 
     var unido;
     try { unido = await PdfHerramientas.unir(listaDeBytes); }
-    catch (e) { U.aviso(e.message, 'malo'); return; }
+    catch (e) { U.aviso(U.mensajeDeError(e), 'malo'); return; }
 
     await guardarUnion(contexto, unido, nombresOrigen);
   }
@@ -367,7 +367,7 @@ var PdfSepararUnir = (function () {
       catch (e) { perdidos.push(nombresOrigen[i]); }
     }
     if (perdidos.length) {
-      U.aviso('La unión ha salido bien, pero no he podido mandar a la papelera: ' + perdidos.join(', '), 'malo');
+      U.aviso('La unión ha salido bien, pero no he podido mandar a la papelera: ' + perdidos.join(', '), 'ambar');
     }
     if (contexto.alTerminar) contexto.alTerminar();
   }
@@ -377,12 +377,12 @@ var PdfSepararUnir = (function () {
   async function sacarPaginas(contexto) {
     var fichero;
     try { fichero = await contexto.handle.getFile(); }
-    catch (e) { U.aviso('No he podido abrir el documento: ' + e.message, 'malo'); return; }
+    catch (e) { U.aviso('No he podido abrir el documento: ' + U.mensajeDeError(e), 'malo'); return; }
     var bytes = new Uint8Array(await fichero.arrayBuffer());
 
     var pdfDoc;
     try { pdfDoc = await abrirConPdfJs(bytes); }
-    catch (e) { U.aviso(e.message, 'malo'); return; }
+    catch (e) { U.aviso(U.mensajeDeError(e), 'malo'); return; }
     var total = pdfDoc.numPages;
 
     var marcadas = {};
@@ -410,7 +410,7 @@ var PdfSepararUnir = (function () {
 
     var salida;
     try { salida = await PdfHerramientas.sacarPaginas(bytes, indices); }
-    catch (e) { U.aviso(e.message, 'malo'); return; }
+    catch (e) { U.aviso(U.mensajeDeError(e), 'malo'); return; }
 
     var nombreNuevo;
     if (contexto.modo === 'asunto') {
@@ -512,7 +512,7 @@ var PdfSepararUnir = (function () {
 
   function mandarOriginalAPapelera(contexto) {
     return mandarAPapelera(contexto, contexto.nombre).catch(function (e) {
-      U.aviso('Se ha guardado, pero no he podido mandar el original a la papelera: ' + e.message, 'malo');
+      U.aviso('Se ha guardado, pero no he podido mandar el original a la papelera: ' + U.mensajeDeError(e), 'ambar');
     });
   }
 

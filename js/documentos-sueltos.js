@@ -123,7 +123,14 @@ App.tarjetaSuelto = function (s, pie, esNuevo) {
   meter.className = 'boton';
   meter.textContent = 'Meter en un asunto';
   meter.title = 'Lo lleva a la carpeta de un asunto que ya existe';
-  meter.onclick = function () { App.meterSueltoEnAsunto(s); };
+  /* Apagado mientras dura todo (fila 100: se podía pulsar dos veces). */
+  meter.onclick = async function () {
+    if (meter.disabled) return;
+    meter.disabled = true;
+    try { await App.meterSueltoEnAsunto(s); }
+    catch (e) { U.fallo('No he podido meterlo en el asunto', e); }
+    finally { meter.disabled = false; }
+  };
   acciones.appendChild(meter);
 
   /* Separar, Unir y Sacar páginas (17-sep-2026, fila 22,
@@ -268,7 +275,7 @@ App.meterSueltoEnAsuntoElegido = async function (s, elegido) {
     try {
       dentro = await Carpetas.bajar(App.E.archivo, [ficha.categoria, ficha.tercero], false);
     } catch (e) {
-      U.aviso('No encuentro la carpeta de ese asunto en el ARCHIVO: ' + e.message, 'malo');
+      U.aviso('No encuentro la carpeta de ese asunto en el ARCHIVO: ' + U.mensajeDeError(e), 'malo');
       return;
     }
     await App.reabrirAsunto({ nombre: elegido.nombre, padre: dentro, ficha: ficha });
@@ -292,7 +299,7 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha) {
   try {
     destino = await E.carpetaDelAsunto(nombreAsunto, ficha);
   } catch (e) {
-    U.aviso('No encuentro la carpeta de ese asunto: ' + e.message, 'malo');
+    U.aviso('No encuentro la carpeta de ese asunto: ' + U.mensajeDeError(e), 'malo');
     return;
   }
 
@@ -324,21 +331,26 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha) {
   try {
     await Carpetas.moverFichero(App.E.abiertos, s.nombre, destino);
   } catch (e) {
-    U.aviso('El documento no ha podido entrar en el asunto. Sigue en Por clasificar.', 'malo');
+    /* Con el motivo (fila 100): antes se callaba. */
+    U.fallo('El documento no ha podido entrar en el asunto. Sigue en Por clasificar', e);
     return;
   }
 
   delete App.E.reciales[s.nombre];
   U.aviso('Documento metido en ' + nombreAsunto + '.', 'bueno');
-  await App.verAbiertos();
+  try {
+    await App.verAbiertos();
 
-  /* Con el documento ya dentro, el cuadro de siempre para ponerle el
-     nombre que le toca. */
-  await App.verDocumentos({
-    nombre: nombreAsunto, handle: destino,
-    ficha: (App.E.registro.asuntos || {})[nombreAsunto] || {},
-    leido: Nombres.leer(nombreAsunto, App.E.tipos)
-  });
+    /* Con el documento ya dentro, el cuadro de siempre para ponerle el
+       nombre que le toca. */
+    await App.verDocumentos({
+      nombre: nombreAsunto, handle: destino,
+      ficha: (App.E.registro.asuntos || {})[nombreAsunto] || {},
+      leido: Nombres.leer(nombreAsunto, App.E.tipos)
+    });
+  } catch (e2) {
+    U.accesorio('Documento metido, pero no he podido abrir el cuadro para ponerle nombre', e2);
+  }
 };
 
 App.abrirSuelto = async function (s) {
@@ -348,7 +360,7 @@ App.abrirSuelto = async function (s) {
     window.open(url, '_blank');
     setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
   } catch (e) {
-    U.aviso('No he podido abrir el documento: ' + e.message, 'malo');
+    U.aviso('No he podido abrir el documento: ' + U.mensajeDeError(e), 'malo');
   }
 };
 

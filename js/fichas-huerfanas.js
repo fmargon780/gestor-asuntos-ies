@@ -93,7 +93,7 @@
       U.aviso('Ficha enlazada con ' + destino + '.', 'bueno');
       await App.pintarAjustes();
     } catch (e) {
-      U.aviso('No he podido enlazarla: ' + e.message, 'malo');
+      U.aviso('No he podido enlazarla: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -111,7 +111,7 @@
       U.aviso('Ficha borrada.', 'bueno');
       await App.pintarAjustes();
     } catch (e) {
-      U.aviso('No he podido borrarla: ' + e.message, 'malo');
+      U.aviso('No he podido borrarla: ' + U.mensajeDeError(e), 'malo');
     }
   }
 

@@ -356,7 +356,7 @@
         await Carpetas.escribirTexto(carpetaAsunto, NOMBRE_HISTORIAL, texto);
         await quitarAsunto(clave);
       } catch (e) {
-        U.aviso('El asunto se ha archivado, pero no he podido guardar el historial de hitos: ' + e.message, 'malo');
+        U.accesorio('El asunto se ha archivado, pero no he podido guardar el historial de hitos', e);
       }
     };
   });
@@ -377,7 +377,7 @@
       var datos = leerHitosDeHistorial(textoPrevio);
       if (!datos) {
         U.aviso('Este asunto tenía un historial de hitos, pero no he podido leerlo. ' +
-                'Se reabre sin hitos, y el fichero se queda donde estaba.', 'malo');
+                'Se reabre sin hitos, y el fichero se queda donde estaba.', 'ambar');
         return;
       }
       try {
@@ -385,7 +385,7 @@
         var carpeta = await App.E.abiertos.getDirectoryHandle(clave);
         await carpeta.removeEntry(NOMBRE_HISTORIAL);
       } catch (e) {
-        U.aviso('Los hitos se han recuperado, pero no he podido borrar el historial viejo: ' + e.message, 'malo');
+        U.accesorio('Los hitos se han recuperado, pero no he podido borrar el historial viejo', e);
       }
     };
   });

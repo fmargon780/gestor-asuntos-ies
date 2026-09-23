@@ -234,7 +234,7 @@
         await App.guardarDiasDormido(n);
         U.aviso('Avisará de los dormidos a partir de ' + n + ' días.', 'bueno');
       } catch (e) {
-        U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+        U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
       }
     };
   };
@@ -306,7 +306,7 @@
           await App.anotar(a.nombre, { dormidoOcultoHasta: hasta });
           pintar();
         } catch (e) {
-          U.aviso('No he podido ocultarlo: ' + e.message, 'malo');
+          U.aviso('No he podido ocultarlo: ' + U.mensajeDeError(e), 'malo');
         }
       };
       fila.appendChild(ocultar);

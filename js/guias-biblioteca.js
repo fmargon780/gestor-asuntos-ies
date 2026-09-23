@@ -313,7 +313,7 @@ var GuiasBiblioteca = (function () {
       $('biblioteca-nuevo-nombre').value = '';
       U.aviso('Modelo creado. Ábrelo para escribir el resto.', 'bueno');
       pintarAjustes();
-    } catch (e) { U.aviso('No he podido crearlo: ' + e.message, 'malo'); }
+    } catch (e) { U.aviso('No he podido crearlo: ' + U.mensajeDeError(e), 'malo'); }
   }
 
   /* El mismo editor de un paso que ya existe, para no escribir un
@@ -332,7 +332,7 @@ var GuiasBiblioteca = (function () {
       await HitosBiblioteca.editar(m.id, pasos[0], usuario());
       pintarAjustes();
       U.aviso('Modelo guardado.', 'bueno');
-    } catch (e) { U.aviso('No he podido guardarlo: ' + e.message, 'malo'); }
+    } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
   }
 
   async function borrarModelo(m) {
@@ -350,7 +350,7 @@ var GuiasBiblioteca = (function () {
       await HitosBiblioteca.borrar(m.id);
       pintarAjustes();
       U.aviso('Modelo borrado.', 'bueno');
-    } catch (e) { U.aviso('No he podido borrarlo: ' + e.message, 'malo'); }
+    } catch (e) { U.aviso('No he podido borrarlo: ' + U.mensajeDeError(e), 'malo'); }
   }
 
   async function pintarAjustes() {
@@ -359,7 +359,7 @@ var GuiasBiblioteca = (function () {
     var caja = $('tabla-biblioteca');
     var datos;
     try { datos = await HitosBiblioteca.leer(); }
-    catch (e) { caja.innerHTML = '<div class="vacio">No he podido leer la biblioteca: ' + U.escapar(e.message) + '</div>'; return; }
+    catch (e) { caja.innerHTML = '<div class="vacio">No he podido leer la biblioteca: ' + U.escapar(U.mensajeDeError(e)) + '</div>'; return; }
     caja.innerHTML = '';
     if (!datos.modelos.length) {
       caja.innerHTML = '<div class="vacio">Todavía no hay ningún modelo.</div>';

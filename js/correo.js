@@ -384,7 +384,7 @@
       algoCambiado = true;
       pintarRastro(a, 'Apuntado en las notas del asunto.');
     } catch (e) {
-      pintarRastro(a, 'No he podido apuntarlo en el asunto: ' + e.message);
+      pintarRastro(a, 'No he podido apuntarlo en el asunto: ' + U.mensajeDeError(e));
     }
   }
 
@@ -423,7 +423,7 @@
         b.textContent = 'Hecho: ' + espera;
       } catch (e) {
         b.disabled = false;
-        U.aviso('No he podido cambiar el estado: ' + e.message, 'malo');
+        U.aviso('No he podido cambiar el estado: ' + U.mensajeDeError(e), 'malo');
       }
     };
     sitio.appendChild(b);

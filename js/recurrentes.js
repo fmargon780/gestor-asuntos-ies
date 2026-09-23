@@ -140,7 +140,7 @@
       lista = (leido && leido.length) ? leido : [];
     } catch (e) {
       lista = [];
-      U.aviso('No he podido leer los asuntos que se repiten: ' + e.message, 'malo');
+      U.aviso('No he podido leer los asuntos que se repiten: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -215,7 +215,7 @@
         await crearUno(toca[i]);
         hechos++;
       } catch (e) {
-        fallos.push(toca[i].tipo + ' ' + toca[i].tercero + ': ' + e.message);
+        fallos.push(toca[i].tipo + ' ' + toca[i].tercero + ': ' + U.mensajeDeError(e));
       }
     }
     await guardar();

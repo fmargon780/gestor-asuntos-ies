@@ -42,12 +42,13 @@
       if (!seguro) return;
     }
     try {
-      await Papelera.mandarAsunto(a);
-      U.aviso('Asunto mandado a la papelera.', 'bueno');
-      App.volverALaLista();
+      await App.conOcupado(a.nombre, function () { return Papelera.mandarAsunto(a); });
     } catch (e) {
-      U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+      U.fallo('No he podido mandarlo a la papelera', e);
+      return;
     }
+    U.aviso('Asunto mandado a la papelera.', 'bueno');
+    App.volverALaLista();
   }
 
   /* "Copiar el nombre del asunto" ya no vive aquí desde la fila 58

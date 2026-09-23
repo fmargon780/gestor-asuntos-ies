@@ -113,7 +113,7 @@
         await Carpetas.copiarFicheroEn(datos, h, destino);
         traidos.push(destino);
       } catch (e) {
-        U.aviso('No he podido traer ' + h.name + ': ' + e.message, 'malo');
+        U.aviso('No he podido traer ' + h.name + ': ' + U.mensajeDeError(e), 'malo');
       }
     }
 

@@ -5,7 +5,28 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
-## 23-sep-2026 — Fila 99: guardar en fila y sin trabajo de más
+## 23-sep-2026 — Fila 100: avisos que dicen la verdad, y botones que se bloquean de verdad
+
+`docs/AVISOS-QUE-DICEN-LA-VERDAD.md`. Muchas acciones guardaban lo importante y luego hacían más
+cosas en el mismo `try`: si fallaba una de las de después, salía rojo «No he podido…» con todo ya
+guardado, y al repetir, «Ya hay…». Ahora cada una separa lo principal (rojo si falla) de lo
+accesorio (ámbar), con `U.fallo` y `U.accesorio`. De paso, los ~150 avisos que pegaban `e.message`
+en inglés pasan por `U.mensajeDeError`.
+
+**El botón que se volvía a encender solo**: `aplicarModoConsulta` ponía `disabled=false` a TODOS
+los controles de la ficha cada vez que el observador veía algo nuevo, también al que decía
+«Guardando…» y a las casillas de hito de un asunto archivado. Ahora solo toca lo que él mismo
+apagó y respeta la marca `data-guardando` de `U.mientrasGuarda`.
+
+**Un cuadro sobre otro** dejaba colgada para siempre la espera del primero (un solo `#capa`):
+ahora se da por cancelado. Lo que costó: los avisos nuevos tenían que pasar por `U.aviso` (no por
+la función interna) para que las pruebas que lo sustituyen los vean; sin eso, una prueba sin
+navegador reventaba con `setTimeout is not defined`.
+
+Queda sin hacer, a propósito: partir `js/ficha-asunto.js` (pasa de 1.000 líneas), porque aquí
+solo se ha tocado en unos pocos sitios; se hará en la fila 101, que sí lo toca a fondo.
+
+: guardar en fila y sin trabajo de más
 
 `docs/GUARDAR-EN-FILA.md`. Francisco: al grabar sale un error o la pantalla se queda congelada,
 aunque al volver a entrar sí se ha guardado. Las causas, de la revisión a fondo:

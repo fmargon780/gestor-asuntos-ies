@@ -163,7 +163,7 @@ var Documentos = (function () {
           U.aviso('Documento mandado a la papelera.', 'bueno');
           await pintarLista();
         } catch (e) {
-          U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+          U.aviso('No he podido mandarlo a la papelera: ' + U.mensajeDeError(e), 'malo');
           b.disabled = false;
         }
       };
@@ -174,7 +174,7 @@ var Documentos = (function () {
         var handle = await Carpetas.elegirFichero(asuntoActual.handle);
         pintarFormulario({ modo: 'anadir', handle: handle, nombreActual: handle.name });
       } catch (e) {
-        if (e.name !== 'AbortError') U.aviso('No he podido abrir ese fichero: ' + e.message, 'malo');
+        if (e.name !== 'AbortError') U.aviso('No he podido abrir ese fichero: ' + U.mensajeDeError(e), 'malo');
       }
     };
   }
@@ -352,7 +352,9 @@ var Documentos = (function () {
     };
 
     $('doc-volver').onclick = function () { soltarVisor(); pintarLista(); };
-    $('doc-guardar').onclick = function () { guardar(opciones); };
+    $('doc-guardar').onclick = function () {
+      return U.mientrasGuarda($('doc-guardar'), function () { return guardar(opciones); });
+    };
     refrescar();
   }
 
@@ -523,7 +525,7 @@ var Documentos = (function () {
       pintarCamposDelTipo();
       U.aviso('Tipo de documento ' + limpio + ' añadido a la lista del centro.', 'bueno');
     } catch (e) {
-      U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -607,12 +609,19 @@ var Documentos = (function () {
         await Carpetas.renombrarFichero(asuntoActual.handle, opciones.nombreActual, nombre);
         U.aviso('Documento renombrado.', 'bueno');
       }
-      await actualizarPendiente(opciones, nombre);
-      soltarVisor();
-      await pintarLista();
     } catch (e) {
-      U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+      U.fallo('No he podido guardarlo', e);
+      return;
     }
+    /* El documento ya está en la carpeta con su nombre: lo de después
+       es accesorio, y si falla, ámbar (fila 100). */
+    try {
+      await actualizarPendiente(opciones, nombre);
+    } catch (e2) {
+      U.accesorio('Documento guardado, pero no he podido apuntar si está pendiente de registro', e2);
+    }
+    soltarVisor();
+    try { await pintarLista(); } catch (e3) { U.accesorio('Documento guardado, pero no he podido repintar la lista', e3); }
   }
 
   /* Lee un nombre de documento que ya siga la norma, para rellenar el

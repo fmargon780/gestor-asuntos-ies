@@ -135,10 +135,15 @@ var Papelera = (function () {
      papelera es la fresca (App.E.registro, ya releído), no la que
      traía 'a' desde antes de mover la carpeta: si no, se archivaría
      una versión vieja y se perdería lo mismo al devolverla. */
+  /* Desde la fila 100 (docs/AVISOS-QUE-DICEN-LA-VERDAD.md): primero se
+     apunta en papelera.json (con la ficha fresca y una copia de sus
+     hitos) y DESPUÉS se mueve la carpeta, para que nunca quede una
+     carpeta en la papelera sin apuntar. Si el traslado falla, se quita
+     el apunte y se lanza el error (lo principal). Quitar la ficha y los
+     hitos de su sitio es accesorio: si falla, ámbar, y no se lanza. */
   async function mandarAsunto(a) {
     var pap = await carpetaPapelera();
     var nombreSub = marcaDeTiempo() + ' ' + a.nombre;
-    await Carpetas.trasladar(App.E.abiertos, a.nombre, pap, nombreSub);
 
     await App.cargarRegistro();
     var fresca = (App.E.registro.asuntos && App.E.registro.asuntos[a.nombre]) || a.ficha || {};
@@ -146,17 +151,35 @@ var Papelera = (function () {
        docs/RENOMBRAR-SIN-PERDER-HITOS.md): si no, se quedarían para
        siempre en hitos.json bajo un nombre que ya no existe, y al
        devolver el asunto no habría manera de recuperarlos. */
-    var hitosGuardados = window.AsuntoRenombrar ? await AsuntoRenombrar.quitar(a.nombre) : null;
+    var hitosCopia = null;
+    if (window.Hitos) {
+      var todos = await Hitos.leer();
+      hitosCopia = todos.porAsunto[a.nombre] ? JSON.parse(JSON.stringify(todos.porAsunto[a.nombre])) : null;
+    }
     var ficha = {
       id: nuevoId(), clase: 'asunto', nombre: a.nombre, carpeta: nombreSub,
-      origen: null, datos: JSON.parse(JSON.stringify(fresca)), hitos: hitosGuardados,
+      origen: null, datos: JSON.parse(JSON.stringify(fresca)), hitos: hitosCopia,
       quien: quienSoy(), cuando: U.ahora()
     };
     await cambiar(function (l) { l.unshift(ficha); return l; });
 
-    await App.guardarRegistroFresco(function (registro) {
-      if (registro.asuntos) delete registro.asuntos[a.nombre];
-    });
+    try {
+      await Carpetas.trasladar(App.E.abiertos, a.nombre, pap, nombreSub);
+    } catch (e) {
+      try { await cambiar(function (l) { return l.filter(function (x) { return x.id !== ficha.id; }); }); }
+      catch (e2) { /* se queda un apunte sin carpeta: la papelera lo enseña igual y se puede quitar */ }
+      throw e;
+    }
+
+    try {
+      if (window.AsuntoRenombrar) await AsuntoRenombrar.quitar(a.nombre);
+      await App.guardarRegistroFresco(function (registro) {
+        if (registro.asuntos) delete registro.asuntos[a.nombre];
+      });
+    } catch (e3) {
+      U.accesorio('El asunto está en la papelera, pero no he podido quitar su ficha o sus hitos. ' +
+        'Pulsa Recargar', e3);
+    }
   }
 
   /* ---------- borrar un documento (de un asunto o suelto) ---------- */
@@ -220,7 +243,7 @@ var Papelera = (function () {
         default: return { ok: false, motivo: 'No sé devolver esto.' };
       }
     } catch (e) {
-      return { ok: false, motivo: e.message };
+      return { ok: false, motivo: U.mensajeDeError(e) };
     }
   }
 
@@ -499,7 +522,7 @@ var Papelera = (function () {
     try {
       lista = await leer();
     } catch (e) {
-      caja.innerHTML = '<div class="vacio">No he podido leer la papelera: ' + U.escapar(e.message) + '</div>';
+      caja.innerHTML = '<div class="vacio">No he podido leer la papelera: ' + U.escapar(U.mensajeDeError(e)) + '</div>';
       if (avisoViejas) avisoViejas.classList.add('oculto');
       return;
     }
@@ -552,7 +575,7 @@ var Papelera = (function () {
       var h = await sub.getFileHandle(ficha.nombre);
       await window.Visor.abrir(h, ficha.nombre, { marcador: 'papelera:' + ficha.id });
     } catch (e) {
-      U.aviso('No he podido abrirlo: ' + e.message, 'malo');
+      U.aviso('No he podido abrirlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -606,7 +629,7 @@ var Papelera = (function () {
         U.aviso('Borrado del todo.', 'bueno');
         App.pintarPapelera();
       } catch (e) {
-        U.aviso('No he podido borrarlo: ' + e.message, 'malo');
+        U.aviso('No he podido borrarlo: ' + U.mensajeDeError(e), 'malo');
       }
     };
     f.appendChild(borrar);
@@ -634,7 +657,7 @@ var Papelera = (function () {
           App.pintarPapelera();
           if (typeof App.verAbiertos === 'function') await App.verAbiertos();
         } catch (e) {
-          U.aviso('No he podido devolverlo: ' + e.message, 'malo');
+          U.aviso('No he podido devolverlo: ' + U.mensajeDeError(e), 'malo');
         }
       }
       return;
@@ -679,11 +702,13 @@ var Papelera = (function () {
         if (!ok) return;
         try {
           await mandarSuelto(s);
-          U.aviso('Documento mandado a la papelera.', 'bueno');
-          await App.verAbiertos();
         } catch (e) {
-          U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+          U.fallo('No he podido mandarlo a la papelera', e);
+          return;
         }
+        U.aviso('Documento mandado a la papelera.', 'bueno');
+        try { await App.verAbiertos(); }
+        catch (e2) { U.accesorio('Documento en la papelera, pero no he podido poner la lista al día', e2); }
       });
       /* Entra el último del menú de tres puntos que ya monta
          js/documentos-sueltos.js (17-sep-2026, fila 36); sin menú (no
@@ -724,7 +749,7 @@ var Papelera = (function () {
           U.aviso('Mandado a la papelera.', 'bueno');
           App.pintarPersonas();
         } catch (e) {
-          U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+          U.aviso('No he podido mandarlo a la papelera: ' + U.mensajeDeError(e), 'malo');
         }
       }));
     };

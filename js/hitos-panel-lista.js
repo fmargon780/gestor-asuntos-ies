@@ -104,7 +104,7 @@ var HitosPanelLista = (function () {
             try {
               await U.mientrasGuarda(b, function () { return Hitos.elegirOpcion(a.nombre, h.id, b.dataset.opcion); });
               window.HitosPanel.programarRepintado();
-            } catch (e) { U.aviso('No he podido guardarlo: ' + e.message, 'malo'); }
+            } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
           };
         });
       }
@@ -150,14 +150,19 @@ var HitosPanelLista = (function () {
             '<p class="explica">¿Lo das por hecho igualmente?</p>', 'Darlo por hecho');
           if (!ok) { casillaEl.checked = false; return; }
         }
+        /* La nota automática va en la misma escritura que el estado
+           (fila 100): antes eran dos, y si fallaba la segunda salía rojo
+           con el hito ya marcado. */
+        var nota = faltan.length ? 'Dado por hecho con ' + faltan.length +
+          (faltan.length === 1 ? ' cosa sin reunir.' : ' cosas sin reunir.') : '';
         try {
-          await U.mientrasGuarda(casillaEl, function () { return Hitos.marcar(a.nombre, h.id, nuevoEstado); });
-          if (faltan.length) {
-            await Hitos.anadirNota(a.nombre, h.id, 'Dado por hecho con ' + faltan.length +
-              (faltan.length === 1 ? ' cosa sin reunir.' : ' cosas sin reunir.'));
-          }
+          await U.mientrasGuarda(casillaEl, function () { return Hitos.marcar(a.nombre, h.id, nuevoEstado, nota); });
+        } catch (e) {
+          casillaEl.checked = !casillaEl.checked;
+          U.fallo('No he podido guardar el hito', e);
+        } finally {
           window.HitosPanel.programarRepintado();
-        } catch (e) { U.aviso('No he podido guardarlo: ' + e.message, 'malo'); }
+        }
       };
     }
     var linea = div.querySelector('.hito-linea');
@@ -273,9 +278,8 @@ var HitosPanelLista = (function () {
 
       if (abierto) {
         Array.prototype.forEach.call(caja.querySelectorAll('.hito-doc-quitar'), function (b) {
-          b.onclick = async function () {
-            await U.mientrasGuarda(b, function () { return Hitos.quitarDocumento(a.nombre, h.id, b.dataset.doc); });
-            window.HitosPanel.programarRepintado();
+          b.onclick = function () {
+            return guardarHito(b, 'quitar el documento del hito', function () { return Hitos.quitarDocumento(a.nombre, h.id, b.dataset.doc); });
           };
         });
       }
@@ -283,8 +287,23 @@ var HitosPanelLista = (function () {
 
     var apuntarBtn = div.querySelector('.hito-doc-apuntar');
     if (apuntarBtn) apuntarBtn.onclick = async function () {
-      await U.mientrasGuarda(apuntarBtn, function () { return HitosDocumentos.abrir(a, h); });
+      try { await U.mientrasGuarda(apuntarBtn, function () { return HitosDocumentos.abrir(a, h); }); }
+      catch (e) { U.fallo('No he podido apuntar el documento', e); }
     };
+  }
+
+  /* Guardar un cambio de un hito con el control apagado mientras tanto,
+     aviso rojo si falla y repintado siempre (fila 100,
+     docs/AVISOS-QUE-DICEN-LA-VERDAD.md: antes, si fallaba, el error se
+     perdía y no se repintaba). */
+  async function guardarHito(control, queNo, hacer) {
+    try {
+      await U.mientrasGuarda(control, hacer);
+    } catch (e) {
+      U.fallo('No he podido ' + queNo, e);
+    } finally {
+      window.HitosPanel.programarRepintado();
+    }
   }
 
   function engancharCuerpo(div, a, h, abierto) {
@@ -297,38 +316,33 @@ var HitosPanelLista = (function () {
     }
     if (window.HitosComunicar) HitosComunicar.engancharBoton(div, a, h);
     var resp = div.querySelector('.hito-campo-responsable');
-    if (resp) resp.onchange = async function () {
-      await U.mientrasGuarda(resp, function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: resp.value }); });
-      window.HitosPanel.programarRepintado();
+    if (resp) resp.onchange = function () {
+      return guardarHito(resp, 'guardar el responsable', function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: resp.value }); });
     };
     var fecha = div.querySelector('.hito-campo-fecha');
-    if (fecha) fecha.onchange = async function () {
-      await U.mientrasGuarda(fecha, function () { return Hitos.guardarCampos(a.nombre, h.id, { fecha: fecha.value }); });
-      window.HitosPanel.programarRepintado();
+    if (fecha) fecha.onchange = function () {
+      return guardarHito(fecha, 'guardar la fecha', function () { return Hitos.guardarCampos(a.nombre, h.id, { fecha: fecha.value }); });
     };
     var notaBtn = div.querySelector('.hito-nota-anadir');
     if (notaBtn) notaBtn.onclick = async function () {
       var ta = div.querySelector('.hito-nota-texto');
       var texto = (ta.value || '').trim();
       if (!texto) return;
-      await U.mientrasGuarda(notaBtn, function () { return Hitos.anadirNota(a.nombre, h.id, texto); });
-      window.HitosPanel.programarRepintado();
+      return guardarHito(notaBtn, 'guardar la nota', function () { return Hitos.anadirNota(a.nombre, h.id, texto); });
     };
     var quitar = div.querySelector('.hito-quitar');
     if (quitar) quitar.onclick = async function () {
       var ok = await U.preguntar('Quitar este hito', '<p><strong>' + U.escapar(h.titulo) + '</strong></p>', 'Quitar');
       if (!ok) return;
-      await U.mientrasGuarda(quitar, function () { return Hitos.quitarHito(a.nombre, h.id); });
-      window.HitosPanel.programarRepintado();
+      return guardarHito(quitar, 'quitar el hito', function () { return Hitos.quitarHito(a.nombre, h.id); });
     };
     var cambiarRamaBtn = div.querySelector('.hito-cambiar-rama');
     if (cambiarRamaBtn) cambiarRamaBtn.onclick = function () { mostrarOpcionesDeRama(div, a, h); };
     var soloInfBtn = div.querySelector('.hito-solo-informativo');
-    if (soloInfBtn) soloInfBtn.onclick = async function () {
-      await U.mientrasGuarda(soloInfBtn, function () {
+    if (soloInfBtn) soloInfBtn.onclick = function () {
+      return guardarHito(soloInfBtn, 'guardarlo', function () {
         return Hitos.guardarCampos(a.nombre, h.id, { soloInformativo: !h.soloInformativo });
       });
-      window.HitosPanel.programarRepintado();
     };
   }
 
@@ -366,7 +380,7 @@ var HitosPanelLista = (function () {
         try {
           await U.mientrasGuarda(b, function () { return Hitos.cambiarRama(a.nombre, h.id, b.dataset.opcion); });
           window.HitosPanel.programarRepintado();
-        } catch (e) { U.aviso('No he podido cambiar de rama: ' + e.message, 'malo'); }
+        } catch (e) { U.aviso('No he podido cambiar de rama: ' + U.mensajeDeError(e), 'malo'); }
       };
     });
   }

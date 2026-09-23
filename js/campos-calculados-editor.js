@@ -355,7 +355,7 @@ var CamposCalculadosEditor = (function () {
           });
           U.aviso('Campo calculado ' + calculado.nombre + ' guardado.', 'bueno');
           ctx.alGuardar(calculado, esNuevo);
-        } catch (e) { U.aviso('No he podido guardarlo: ' + e.message, 'malo'); }
+        } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
       });
     }
 

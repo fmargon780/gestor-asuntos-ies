@@ -381,7 +381,7 @@
         pintarAviso();
       } catch (e) {
         noSon.disabled = false;
-        U.aviso('No he podido descartarlo: ' + e.message, 'malo');
+        U.aviso('No he podido descartarlo: ' + U.mensajeDeError(e), 'malo');
       }
     };
     cab.appendChild(noSon);
@@ -488,6 +488,19 @@
     if (!seQueda) return;
     var demas = grupo.filter(function (a) { return a.nombre !== seQueda.nombre; });
 
+    /* Mientras dura, los asuntos del grupo están ocupados (fila 100). */
+    var nombres = grupo.map(function (a) { return a.nombre; });
+    nombres.forEach(function (n) { App.E.ocupados[n] = true; });
+    try { await unirYa(seQueda, demas); }
+    finally { nombres.forEach(function (n) { delete App.E.ocupados[n]; }); }
+  }
+
+  /* Lo principal: los documentos (y las subcarpetas, fila 100) y la
+     ficha de cada uno pasan al que se queda. Quitar la carpeta vacía
+     del que se va es accesorio: si queda algo dentro, ámbar diciendo
+     qué carpeta revisar, nunca rojo con todo ya unido. */
+  async function unirYa(seQueda, demas) {
+    var restos = [];
     try {
       var fechaTexto = fechaDeHoy();
       var renombrados = [];
@@ -497,10 +510,28 @@
         for (var k = 0; k < ficheros.length; k++) {
           await moverConNombreLibre(seVa, ficheros[k].nombre, seQueda, renombrados);
         }
+        var subcarpetas = await Carpetas.subcarpetas(seVa.handle);
+        for (var m = 0; m < subcarpetas.length; m++) {
+          var sub = subcarpetas[m].nombre;
+          if (Carpetas.esCarpetaTemporalDeSincronizacion(sub)) continue;
+          if (await Carpetas.existe(seQueda.handle, sub)) await Carpetas.fusionarEn(seVa.handle, sub, seQueda.handle, sub);
+          else await Carpetas.mover(seVa.handle, sub, seQueda.handle);
+        }
         await fusionarFicha(seQueda, seVa, fechaTexto);
-        await App.E.abiertos.removeEntry(seVa.nombre);
+        try { await App.E.abiertos.removeEntry(seVa.nombre); }
+        catch (eQuitar) { restos.push(seVa.nombre); }
       }
+    } catch (e) {
+      U.fallo('No he podido unirlos', e);
+      try { await App.verAbiertos(); } catch (e2) { /* solo pintar */ }
+      return;
+    }
 
+    try {
+      if (restos.length) {
+        U.aviso('Asuntos unidos, pero no he podido quitar la carpeta vieja de: ' + restos.join(', ') +
+          '. Queda algo dentro (quizá un documento abierto en otro programa): míralo y bórrala a mano.', 'ambar');
+      }
       U.aviso(renombrados.length
         ? 'Asuntos unidos. ' + renombrados.length + (renombrados.length === 1
             ? ' documento tenía el nombre repetido: se ha guardado con "(N)" al final.'
@@ -513,8 +544,8 @@
       if (pantallaConstruida && !$('pantalla-duplicados').classList.contains('oculto')) {
         pintarPantallaDuplicados();
       }
-    } catch (e) {
-      U.aviso('No he podido unirlos: ' + e.message, 'malo');
+    } catch (e3) {
+      U.accesorio('Asuntos unidos, pero no he podido poner la lista al día. Pulsa Recargar', e3);
     }
   }
 
@@ -584,7 +615,7 @@
           U.aviso('Se volverá a avisar de ese grupo si sigue pareciendo el mismo.', 'bueno');
         } catch (e) {
           volver.disabled = false;
-          U.aviso('No he podido deshacerlo: ' + e.message, 'malo');
+          U.aviso('No he podido deshacerlo: ' + U.mensajeDeError(e), 'malo');
         }
       };
       f.appendChild(volver);
