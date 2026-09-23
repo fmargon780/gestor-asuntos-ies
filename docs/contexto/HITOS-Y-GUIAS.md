@@ -205,6 +205,15 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
   elige una opción, la lista se corta ahí. Cambiar de rama quita los hitos vacíos de la vieja y
   marca `noaplica` (plegados, al final) los que tenían notas o documentos.
   `Hitos.visibles`/`Hitos.huerfanos` (`js/hitos.js`) son quienes saben qué se ve y qué se pliega.
+- **Cambiar el tipo del asunto** (fila 94, `docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md`,
+  `js/hitos-cambio-de-tipo.js`): al guardar «Editar el asunto» con otro tipo, si el asunto tiene
+  hitos y el tipo nuevo tiene guía, `HitosCambioDeTipo.ofrecer` pregunta («Traer la guía nueva» /
+  «Dejar los pasos como están»); sin guía, solo un aviso ámbar. Si dice que sí, entran los hitos de
+  la guía nueva; de los viejos se quitan los intactos y se quedan al final, como `noaplica` y con
+  `delTipoAnterior` (el tipo viejo), los hechos o con notas, documentos, requisitos o rama elegida.
+  "En curso" solo no cuenta como trabajo (lo pone la aplicación sola al crear los hitos).
+  `visibles` los salta y `huerfanos` los pliega abajo. Nota en el asunto. Solo se pregunta si la
+  carpeta y la ficha ya han salido bien. Prueba: `pruebas/cambiar-tipo-y-guia.mjs`.
 - **Un solo hito en curso a la vez**: al marcar uno hecho, el siguiente pendiente de la lista
   visible pasa a "en curso" solo (`Hitos.recomputeEnCurso`).
 - **Documentos apuntados** (fila 31, 17-sep-2026, `docs/APUNTAR-DOCUMENTO-A-HITO.md`): el botón

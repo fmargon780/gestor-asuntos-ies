@@ -5,7 +5,22 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
-## 23-sep-2026 — Fila 97: el nombre corto del tipo, también en los filtros y en la tarjeta
+## 23-sep-2026 — Fila 94: cambiar el tipo de un asunto ofrece la guía del nuevo
+
+`docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md`. Hasta ahora, cambiar el tipo en «Editar el asunto»
+renombraba la carpeta pero dejaba los hitos del tipo viejo sin decir nada. Ahora pregunta (lo
+eligió Francisco: a veces el cambio es solo para corregir el nombre). Módulo nuevo
+`js/hitos-cambio-de-tipo.js`, llamado desde `App.editarAsunto` solo cuando carpeta y ficha ya han
+salido bien. Los hitos viejos con algo apuntado no se pierden: campo nuevo `delTipoAnterior`, que
+`Hitos.visibles` salta y `Hitos.huerfanos` pliega abajo, con la misma pantalla que los de una rama
+descartada.
+
+**Una decisión que el documento dejaba abierta**: pedía conservar los hitos «hechos o en curso»,
+pero también que con hitos intactos se sustituyeran todos. Un asunto recién creado ya tiene el
+primero en curso sin que nadie haya hecho nada, así que "en curso" solo no cuenta como trabajo; sí
+cuentan hecho, notas, documentos, requisitos marcados y una rama elegida.
+
+: el nombre corto del tipo, también en los filtros y en la tarjeta
 
 `docs/NOMBRE-CORTO-EN-LOS-FILTROS.md`. Las tarjetas «Por tipo de asunto» y la etiqueta del tipo
 en cada tarjeta enseñan ahora el nombre corto (el largo, al pasar el ratón). Dos funciones nuevas

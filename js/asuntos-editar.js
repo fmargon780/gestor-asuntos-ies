@@ -300,6 +300,7 @@ App.editarAsunto = async function (a) {
       await App.anotar(a.nombre, datos);
       await App.verAbiertos();
       U.aviso('Asunto actualizado.', 'bueno');
+      await ofrecerGuiaNueva(a.nombre, p.tipo, d.tipo);
       return;
     }
     if (await Carpetas.existe(App.E.abiertos, nombreNuevo)) {
@@ -318,5 +319,20 @@ App.editarAsunto = async function (a) {
     U.aviso('Asunto editado. La carpeta ya se llama como querías.', 'bueno');
   } catch (e) {
     U.aviso('No se ha podido editar: ' + e.message, 'malo');
+    return;
   }
+  await ofrecerGuiaNueva(nombreNuevo, p.tipo, d.tipo);
 };
+
+/* Solo cuando la carpeta y la ficha ya han salido bien (fila 94,
+   docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md): si el tipo ha cambiado,
+   ofrecer la guía del tipo nuevo. Si esto falla, el asunto ya está
+   editado: se avisa y no se deshace nada. */
+async function ofrecerGuiaNueva(clave, tipoViejo, tipoNuevo) {
+  if (!window.HitosCambioDeTipo || tipoViejo === tipoNuevo) return;
+  try {
+    await HitosCambioDeTipo.ofrecer(clave, tipoViejo, tipoNuevo);
+  } catch (e) {
+    U.aviso('El asunto está editado, pero no he podido traer la guía nueva: ' + U.mensajeDeError(e), 'malo');
+  }
+}
