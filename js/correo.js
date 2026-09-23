@@ -68,6 +68,11 @@
   var medioListoActual = '';
   var correoPreferenteActual = '';
   var comunicarHitoActual = null;
+  /* Documentos del hito ya marcados en "Documentos de este asunto"
+     (23-sep-2026, fila 103, docs/EL-HITO-MESA-DE-TRABAJO.md, sección
+     3): `extra.adjuntosMarcados`, una lista de nombres. Solo tiene
+     efecto en Correo (en Séneca no hay adjuntos). */
+  var adjuntosMarcadosActual = [];
 
   function $(id) { return document.getElementById(id); }
 
@@ -296,9 +301,26 @@
       (esSeneca ? 'Séneca' : 'correo') + ' · ' + U.fechaLegible(U.aAaMmDd(U.hoyIso()));
   }
 
+  /* "· con N documentos: a, b" (fila 103, sección 3): el mismo trozo
+     para la nota de un correo normal y para la constancia de
+     "Comunicar" desde un hito, pura para poder probarla sin abrir
+     ningún cuadro (CorreoNucleo.sufijoDocumentos). Vacía sin nada que
+     añadir, para no dejar puntos suspendidos de sobra. */
+  function sufijoDocumentos(nombres) {
+    if (!nombres || !nombres.length) return '';
+    return ' · con ' + nombres.length + ' documento' + (nombres.length === 1 ? '' : 's') +
+      ': ' + nombres.join(', ');
+  }
+
   function textoDeLaNota() {
     if (comunicarHitoActual) {
-      return textoDeComunicarHito(comunicarHitoActual.nombreDestinatario, porSeneca);
+      /* La constancia en el historial del hito incluye los documentos
+         (fila 103, sección 3): mismo dato que ya lee "Documentos de
+         este asunto" (window.CorreoCuadro.documentosAdjuntados), así
+         que aparecen igual haya o no texto propio del paso. */
+      var documentosDelHito = (!porSeneca && window.CorreoCuadro) ? CorreoCuadro.documentosAdjuntados() : [];
+      return textoDeComunicarHito(comunicarHitoActual.nombreDestinatario, porSeneca) +
+        sufijoDocumentos(documentosDelHito);
     }
     /* En Séneca el campo del asunto es #seneca-asunto (js/seneca-cuadro.js,
        fila 53): #correo-asunto ya no existe en ese cuadro. */
@@ -316,13 +338,7 @@
       base += ' · en copia oculta a ' + direccionesCco.length +
         (direccionesCco.length === 1 ? ' persona' : ' personas');
     }
-    var documentosAdjuntados = cc ? cc.documentosAdjuntados() : [];
-    if (documentosAdjuntados.length) {
-      base += ' · con ' + documentosAdjuntados.length +
-        ' documento' + (documentosAdjuntados.length === 1 ? '' : 's') +
-        ': ' + documentosAdjuntados.join(', ');
-    }
-    return base;
+    return base + sufijoDocumentos(cc ? cc.documentosAdjuntados() : []);
   }
 
   /* A quién se le va a escribir, dicho en palabras. En Séneca no hay
@@ -444,6 +460,7 @@
     medioListoActual = (extra && extra.medioListo) || '';
     correoPreferenteActual = (extra && extra.correoPreferente) || '';
     comunicarHitoActual = (extra && extra.comunicarHito) || null;
+    adjuntosMarcadosActual = (extra && extra.adjuntosMarcados) || [];
     if (window.SenecaDestinatarios) SenecaDestinatarios.limpiar();
     yaApuntado = false;
     algoCambiado = false;
@@ -482,7 +499,7 @@
     var bloqueAdjuntos = '';
     var opcionesGrupo = '';
     if (!porSeneca && window.CorreoAdjuntos) {
-      try { bloqueAdjuntos = await CorreoAdjuntos.pintarBloque(a); } catch (e) { bloqueAdjuntos = ''; }
+      try { bloqueAdjuntos = await CorreoAdjuntos.pintarBloque(a, adjuntosMarcadosActual); } catch (e) { bloqueAdjuntos = ''; }
     }
     try { opcionesGrupo = await opcionesDeGrupo(); } catch (e) { opcionesGrupo = ''; }
 
@@ -547,6 +564,7 @@
        de "Lo pide" (LoPide.correoDe). */
     destinatarioPreferente: function () { return correoPreferenteActual; },
     textoDeComunicarHito: textoDeComunicarHito,
+    sufijoDocumentos: sufijoDocumentos,
     /* Monta sobre `boton` el mismo menú pequeño "Comunicar" (Correo /
        Séneca) que lleva la cabecera de la ficha, sin duplicar ese
        camino (fila 59, sección 7 del encargo). */
