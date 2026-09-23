@@ -230,16 +230,19 @@ var HitosPanelLista = (function () {
            modo consulta (aplicarModoConsulta). Basta la clase: no se
            engancha ningún onclick, y el CSS ya lo enseña en gris. */
         var falta = nombresDeLaCarpeta && nombresDeLaCarpeta.indexOf(d) === -1;
+        /* La ✕ de siempre se cambia por el menú de tres puntos
+           (23-sep-2026, fila 103, sección 2): Registrar, Separar,
+           Unir, Sacar páginas, Ajustar tamaño y "Quitar del hito",
+           en js/hitos-documento-menu.js. En "(ya no está)" ese menú
+           solo trae "Quitar del hito" (lo decide él, mirando esta
+           misma clase .hito-doc-falta). */
         return '<span class="hito-documento" data-doc="' + U.escapar(d) + '">' +
           '<button type="button" class="hito-doc-abrir' + (falta ? ' hito-doc-falta' : '') + '"' +
             ' data-doc="' + U.escapar(d) + '">' +
             U.escapar(d) + (falta ? ' (ya no está)' : '') + '</button>' +
-          (abierto ? ' <button type="button" class="hito-doc-quitar" data-doc="' + U.escapar(d) + '">✕</button>' : '') +
+          (abierto && window.HitosDocumentoMenu ? ' ' + HitosDocumentoMenu.botonHTML(d) : '') +
           '</span>';
       }).join('') + '</div>');
-      if (abierto) {
-        trozos.push('<button type="button" class="boton hito-doc-apuntar">Apuntar un documento</button>');
-      }
     }
 
     if (abierto) {
@@ -247,6 +250,7 @@ var HitosPanelLista = (function () {
         (h.clase === 'decision' ? '<button type="button" class="boton hito-cambiar-rama">Cambiar de rama</button>' : '') +
         (!htmlRequisitos && window.HitosRequisitos
           ? '<button type="button" class="boton hito-requisitos-anadir-suelto">+ Añadir algo que falte</button>' : '') +
+        (window.HitosAnadir ? HitosAnadir.botonHTML(a, h) : '') +
         (window.HitosComunicar ? HitosComunicar.botonHTML(a, h) : '') +
         (window.HitosGenerar ? HitosGenerar.botonHTML(a, h) : '') +
         '<button type="button" class="boton hito-solo-informativo">' +
@@ -277,20 +281,10 @@ var HitosPanelLista = (function () {
         };
       });
 
-      if (abierto) {
-        Array.prototype.forEach.call(caja.querySelectorAll('.hito-doc-quitar'), function (b) {
-          b.onclick = function () {
-            return guardarHito(b, 'quitar el documento del hito', function () { return Hitos.quitarDocumento(a.nombre, h.id, b.dataset.doc); });
-          };
-        });
-      }
+      /* El menú de tres puntos de cada documento (fila 103, sección
+         2), en vez de la ✕ de siempre. */
+      if (abierto && window.HitosDocumentoMenu) HitosDocumentoMenu.engancharTodos(caja, a, h);
     }
-
-    var apuntarBtn = div.querySelector('.hito-doc-apuntar');
-    if (apuntarBtn) apuntarBtn.onclick = async function () {
-      try { await U.mientrasGuarda(apuntarBtn, function () { return HitosDocumentos.abrir(a, h); }); }
-      catch (e) { U.fallo('No he podido apuntar el documento', e); }
-    };
   }
 
   /* Guardar un cambio de un hito con el control apagado mientras tanto,
@@ -315,6 +309,7 @@ var HitosPanelLista = (function () {
     if (anadirSuelto && window.HitosRequisitos) {
       anadirSuelto.onclick = function () { HitosRequisitos.anadir(a, h); };
     }
+    if (window.HitosAnadir) HitosAnadir.engancharBoton(div, a, h);   /* fila 103 */
     if (window.HitosComunicar) HitosComunicar.engancharBoton(div, a, h);
     if (window.HitosGenerar) HitosGenerar.engancharBoton(div, a, h);   /* fila 102 */
     var resp = div.querySelector('.hito-campo-responsable');
