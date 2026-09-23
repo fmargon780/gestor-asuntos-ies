@@ -26,7 +26,13 @@ function cerrarVisorSiYaNoEsSuelto() {
   if (!App.E.sueltos.some(function (s) { return s.nombre === nombre; })) Visor.cerrar();
 }
 
+/* El último repintado gana (fila 101): la lista se monta aparte y se
+   cambia de una vez al final, y una pasada vieja que termina tarde no
+   pinta nada (antes salían tarjetas repetidas). */
+App.turnoSueltos = 0;
+
 App.pintarSueltos = async function () {
+  var turno = ++App.turnoSueltos;
   cerrarVisorSiYaNoEsSuelto();
   var q = U.normalizar($('buscar-abiertos').value);
   var lista = App.E.sueltos.filter(function (s) {
@@ -45,8 +51,8 @@ App.pintarSueltos = async function () {
   if (App.E.vista !== 'clasificar') return;
 
   var caja = $('lista-sueltos');
-  caja.innerHTML = '';
   if (!lista.length) {
+    caja.innerHTML = '';
     caja.innerHTML = '<div class="vacio">' + (App.E.sueltos.length
       ? 'Ningún documento coincide con lo que buscas.'
       : 'No hay documentos sueltos. Todo lo que ha llegado está ya dentro de su asunto.') +
@@ -55,6 +61,7 @@ App.pintarSueltos = async function () {
   }
 
   var conFecha = lista.length <= 40;
+  var nueva = document.createDocumentFragment();
   for (var i = 0; i < lista.length; i++) {
     var s = lista[i];
     var pie = '';
@@ -67,9 +74,13 @@ App.pintarSueltos = async function () {
               String(d.getHours()).padStart(2, '0') + ':' +
               String(d.getMinutes()).padStart(2, '0');
       } catch (e) { pie = ''; }
+      if (turno !== App.turnoSueltos) return;
     }
-    caja.appendChild(App.tarjetaSuelto(s, pie, !!App.E.reciales[s.nombre]));
+    nueva.appendChild(App.tarjetaSuelto(s, pie, !!App.E.reciales[s.nombre]));
   }
+  if (turno !== App.turnoSueltos) return;
+  caja.innerHTML = '';
+  caja.appendChild(nueva);
 };
 
 App.tarjetaSuelto = function (s, pie, esNuevo) {

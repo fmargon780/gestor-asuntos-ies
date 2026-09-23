@@ -158,10 +158,22 @@ var Plantillas = (function () {
     var leido = null;
     try { leido = gestor ? await Carpetas.leerJson(gestor, ARCHIVO) : null; } catch (e) { leido = null; }
     cache = limpio(leido);
+    cacheEl = Date.now();
     return cache;
   }
 
-  function olvidar() { cache = null; }
+  /* Para lo que se pregunta a menudo y solo PINTA (el botón «Generar
+     documento» de la ficha, que antes releía el fichero en cada tanda
+     de cambios de la pantalla): lo leído hace menos de `ms`, sin
+     volver al disco (fila 101, docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md).
+     Guardar lo pone al día; `olvidar` lo tira. */
+  var cacheEl = 0;
+  function cargarReciente(gestor, ms) {
+    if (cache && Date.now() - cacheEl < (ms || 60000)) return Promise.resolve(cache);
+    return cargar(gestor);
+  }
+
+  function olvidar() { cache = null; cacheEl = 0; }
 
   /* Como Campos.guardarPropios: relee lo de verdad (no lo que hubiera
      en caché, que puede estar viejo si el compañero ha guardado algo
@@ -173,6 +185,7 @@ var Plantillas = (function () {
     var nuevo = mutar(actual) || actual;
     await Copias.guardar(gestor, ARCHIVO, nuevo);
     cache = nuevo;
+    cacheEl = Date.now();
     return nuevo;
   }
 
@@ -587,7 +600,7 @@ var Plantillas = (function () {
     ARCHIVO: ARCHIVO, HUECOS: HUECOS,
     POR_DEFECTO_FIRMA: POR_DEFECTO_FIRMA, POR_DEFECTO_CENTRO: POR_DEFECTO_CENTRO,
     POR_DEFECTO_NORMATIVA: POR_DEFECTO_NORMATIVA, POR_DEFECTO_MEMBRETE_CAJA: POR_DEFECTO_MEMBRETE_CAJA,
-    cargar: cargar, olvidar: olvidar, guardar: guardar,
+    cargar: cargar, cargarReciente: cargarReciente, olvidar: olvidar, guardar: guardar,
     deTipo: deTipo, idNuevo: idNuevo, rellenar: rellenar, tieneLoQueFalta: tieneLoQueFalta,
     documentosDeTipo: documentosDeTipo, idNuevoDocumento: idNuevoDocumento,
     valoresDeAsunto: valoresDeAsunto

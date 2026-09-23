@@ -10,8 +10,22 @@
 
 /* Se lee la carpeta entera de una vez: las carpetas son los asuntos,
    y los ficheros sueltos son trabajo que todavía no tiene carpeta. */
-App.verAbiertos = async function (yaLeido) {
+/* El último que empieza gana (fila 101): si mientras se lee la carpeta
+   arranca otro App.verAbiertos, el viejo no toca nada y espera al
+   nuevo (así quien lo llamó sigue encontrando la lista ya al día). */
+App.turnoVerAbiertos = 0;
+App.promesaVerAbiertos = null;
+
+App.verAbiertos = function (yaLeido) {
+  var p = App.verAbiertosPorTurno(yaLeido);
+  App.promesaVerAbiertos = p;
+  return p;
+};
+
+App.verAbiertosPorTurno = async function (yaLeido) {
+  var turno = ++App.turnoVerAbiertos;
   var hay = yaLeido || await Carpetas.contenido(App.E.abiertos);
+  if (turno !== App.turnoVerAbiertos) return App.promesaVerAbiertos;
 
   App.E.listaAbiertos = hay.carpetas
     .filter(function (c) {
@@ -464,7 +478,23 @@ App.ordenElegido = function () {
   return App.ORDENES[v] ? v : 'fecha-asc';
 };
 
+/* Si la lista no se ve (la ficha está delante, por ejemplo), no se
+   repinta: se deja pendiente y se pinta al volver a ella (fila 101,
+   docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md). */
+App.E.listaPendiente = false;
+
+App.listaALaVista = function () {
+  var p = $('pantalla-abiertos');
+  return !p || !p.classList.contains('oculto');
+};
+
+App.pintarAbiertosSiPendiente = function () {
+  if (App.E.listaPendiente && App.listaALaVista()) App.pintarAbiertos();
+};
+
 App.pintarAbiertos = function () {
+  if (!App.listaALaVista()) { App.E.listaPendiente = true; return; }
+  App.E.listaPendiente = false;
   App.pintarCuentas();
   /* Varias palabras sueltas, en cualquier orden (fila 73,
      docs/BUSCAR-EN-LAS-NOTAS.md, punto 2.1): mismo criterio que ya

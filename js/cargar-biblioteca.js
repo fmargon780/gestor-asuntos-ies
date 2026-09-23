@@ -242,7 +242,10 @@ window.CargarBiblioteca = CargarBiblioteca;
 
   function enganchar() {
     if (!window.Gestor) return;
-    window.Gestor.alRefrescar.push(function () { if (window.Gestor.carpetaGestor()) bloque(); });
+    window.Gestor.alRefrescar.push(function () {
+      if (App.pantallaALaVista && !App.pantallaALaVista('ajustes')) return;   /* fila 101 */
+      if (window.Gestor.carpetaGestor()) bloque();
+    });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enganchar);
   else enganchar();

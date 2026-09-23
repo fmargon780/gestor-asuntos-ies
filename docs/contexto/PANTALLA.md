@@ -4,6 +4,32 @@ Documento hijo de `docs/CONTEXTO.md` (fila 65, `docs/DOCUMENTOS-QUE-QUEPAN.md`, 
 
 ---
 
+### Repintar solo lo que ha cambiado (fila 101, 23-sep-2026, `docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md`)
+
+Cambiar el estado con la ficha abierta hacía 30-40 lecturas de disco. Ahora solo relee y escribe
+`asuntos.json` (lo comprueba `pruebas/repintar-solo-lo-que-cambia.mjs`, contándolas):
+
+- **La lista no se pinta si no se ve**: `App.pintarAbiertos` marca `App.E.listaPendiente` y
+  `App.ir('abiertos')` la pinta al volver (`App.pintarAbiertosSiPendiente`). Como los enganches de
+  `alRefrescar` los lanza la lista, con la ficha delante no corre ninguno.
+- **Los enganches no leen del disco en cada pasada**: los que solo pintan algo de Ajustes (biblioteca,
+  hitos) se saltan si Ajustes no se ve (`App.pantallaALaVista`) y se les avisa al entrar en Ajustes;
+  la cuenta de «Qué me toca» solo relee `hitos.json` si este ordenador ha cambiado algún hito
+  (`Hitos.ultimoCambioLocal`) o han pasado dos minutos; los envíos, una vez por minuto; medir la
+  papelera vieja, cada diez minutos.
+- **Tras cambiar estado, plazo, vía o encargo** (y tras marcar un hito que cambia el estado, o tocar
+  los relacionados) se repinta solo la barra de acciones y las marcas: `App.repintarAccionesFicha
+  ([clave])`, que pone también al día la huella sin leer el disco (si no, el siguiente vistazo a la
+  carpeta rehacía la ficha entera de golpe).
+- **El último repintado gana**: contador de turno en `repintar()` de `js/hitos-panel.js`,
+  `App.verAbiertos` (el viejo espera al nuevo) y `App.pintarSueltos` (monta la lista aparte y la
+  cambia de una vez).
+- `Plantillas.cargarReciente(gestor, ms)` para el botón «Generar documento» (antes releía
+  `plantillas.json` en cada tanda de cambios), con un pequeño retraso en el observador. La fila
+  «Formularios» de la ficha solo se calcula cuando la fila es nueva.
+- La presencia solo avisa cuando cambia el modo o quién está dentro, y la ficha vacía el aviso
+  antes de pintarlo (salía repetido cada 10 s).
+
 **Botón de Salir** (`js/salir.js`). Al pie de la barra de la izquierda. Cierra la sesión: recarga
 la página y vuelve a la pantalla de entrada, con las carpetas ya señaladas. Pide confirmación.
 

@@ -5,7 +5,24 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
-## 23-sep-2026 — Fila 100: avisos que dicen la verdad, y botones que se bloquean de verdad
+## 23-sep-2026 — Fila 101: repintar solo lo que ha cambiado
+
+`docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md`. Tras guardar, la aplicación repintaba casi todo: cambiar el
+estado desde la ficha eran 30-40 lecturas (la lista entera aunque estuviera oculta, sus 17
+enganches, y la ficha entera). Se midió antes de tocar nada, con una prueba que cuenta llamadas a
+`Carpetas`: el mayor gasto era el observador de «Generar documento», que releía `plantillas.json`
+siete veces por tanda. Ahora el cambio de estado solo relee y escribe `asuntos.json`.
+
+Dos fallos de paso: la fila «Formularios» de la ficha no salía nunca (`filasHtml` ignoraba su
+segundo parámetro; un comentario decía que era a propósito por una prueba, que ahora cuenta solo
+las filas visibles), y `js/formularios.js` usaba `Hitos.hitosDe` como si fuera síncrona. Al
+arreglar lo segundo, su observador empezó a leer `hitos.json` en cada cambio de pantalla (antes
+fallaba en silencio): la prueba de lecturas lo cazó, y ahora solo calcula cuando la fila es nueva.
+
+Sin partir `js/ficha-asunto.js` (pasa de 1.000 líneas): los cambios han sido pocos y localizados,
+y partirlo a la vez que se cambia su repintado era arriesgar las dos cosas.
+
+: avisos que dicen la verdad, y botones que se bloquean de verdad
 
 `docs/AVISOS-QUE-DICEN-LA-VERDAD.md`. Muchas acciones guardaban lo importante y luego hacían más
 cosas en el mismo `try`: si fallaba una de las de después, salía rojo «No he podido…» con todo ya
@@ -24,7 +41,7 @@ la función interna) para que las pruebas que lo sustituyen los vean; sin eso, u
 navegador reventaba con `setTimeout is not defined`.
 
 Queda sin hacer, a propósito: partir `js/ficha-asunto.js` (pasa de 1.000 líneas), porque aquí
-solo se ha tocado en unos pocos sitios; se hará en la fila 101, que sí lo toca a fondo.
+solo se ha tocado en unos pocos sitios (tampoco se partió en la 101: ver su entrada).
 
 : guardar en fila y sin trabajo de más
 

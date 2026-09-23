@@ -113,7 +113,9 @@ await comprobar('4. "Datos del asunto" ya no existe',
   pagina.locator('.ficha-bloque .ficha-titulo', { hasText: 'Datos del asunto' }).count(), 0);
 
 await comprobar('5. "Datos del trámite" sale, con la referencia del campo propio',
-  pagina.locator('.ficha-bloque', { hasText: 'Datos del trámite' }).locator('.ficha-dato').allTextContents(),
+  /* Solo las que se ven: la fila «Formularios» nace oculta y solo se
+     enseña si hay alguno (fila 101). */
+  pagina.locator('.ficha-bloque', { hasText: 'Datos del trámite' }).locator('.ficha-dato:not(.oculto)').allTextContents(),
   ['Referencia expedienteREF-2026-01', 'Vía de comunicaciónCorreo electrónico: tutor@correo.es',
    'Lo pideAna Ruiz (madre) · por teléfono · 1-sep-2026']);
 await comprobarQue('5. no trae Tipo, Tercero, Estado ni Fecha límite',

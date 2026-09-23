@@ -64,6 +64,14 @@ U.envolver(App, 'App.tarjetaAsunto', 'puente.js', function (comoEra) {
   };
 });
 
+/* Si una pantalla se ve ahora mismo: los enganches de abajo que solo
+   pintan algo de Ajustes se saltan su pasada si no (fila 101,
+   docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md). */
+App.pantallaALaVista = function (cual) {
+  var p = document.getElementById('pantalla-' + cual);
+  return !!p && !p.classList.contains('oculto');
+};
+
 /* La aplicación llama a esto cada vez que repinta la lista. */
 App.avisarALosModulos = function () {
   (window.Gestor.alRefrescar || []).forEach(function (f) {

@@ -143,9 +143,17 @@
     c.appendChild(cerrar);
   }
 
+  /* Medir la papelera recorre sus ficheros: se hace como mucho cada
+     diez minutos, no en cada vistazo a la carpeta (fila 101,
+     docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md). */
+  var CADA_MS_PAPELERA = 10 * 60 * 1000;
+  var ultimaPapelera = 0;
+
   async function pintarPapeleraVieja() {
     var c = caja('panel-papelera-vieja');
     if (!c) return;
+    if (ultimaPapelera && Date.now() - ultimaPapelera < CADA_MS_PAPELERA) return;
+    ultimaPapelera = Date.now();
     var r = await calcularPapeleraVieja();
     if (!r.n) { c.className = 'oculto'; c.innerHTML = ''; return; }
 

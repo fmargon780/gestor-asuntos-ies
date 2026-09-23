@@ -154,7 +154,14 @@
     }
   }
 
+  /* El último repintado gana (fila 101, docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md):
+     cada llamada coge turno, y tras cada `await` se para si ya ha
+     empezado otra más nueva. Antes, uno viejo que llegaba tarde
+     pintaba encima del bueno. */
+  var turnoRepintado = 0;
+
   async function repintar() {
+    var turno = ++turnoRepintado;
     var a = actual;
     if (!a) return;
     var abierto = modoActual === 'abierto';
@@ -164,12 +171,12 @@
     var datos = null, entrada = null, errorLectura = null;
     try { datos = await Hitos.leer(); entrada = datos.porAsunto[clave] || null; }
     catch (e) { errorLectura = e; }
-    if (actual !== a) return;   /* se ha cambiado de ficha mientras leíamos */
+    if (actual !== a || turno !== turnoRepintado) return;   /* otra ficha, u otro repintado más nuevo */
 
     var hitos = entrada ? entrada.hitos : [];
     if (!errorLectura && !hitos.length) {
       var creados = await crearSiToca(a, clave, tipo, abierto);
-      if (actual !== a) return;
+      if (actual !== a || turno !== turnoRepintado) return;
       if (creados && creados.length) hitos = creados;
     }
 
@@ -182,7 +189,7 @@
     if (!errorLectura && hitos.length) {
       try { nombresDeLaCarpeta = (await Carpetas.ficheros(a.handle)).map(function (f) { return f.nombre; }); }
       catch (e) { nombresDeLaCarpeta = null; }
-      if (actual !== a) return;
+      if (actual !== a || turno !== turnoRepintado) return;
     }
 
     var caja = $('ficha-guia');

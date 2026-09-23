@@ -186,6 +186,7 @@ var Hitos = (function () {
       var actual = await leerParaCambiar(g);
       var nuevo = hacer(actual) || actual;
       await Copias.guardar(g, FICHERO, nuevo);
+      ultimoCambio = Date.now();
       vistosConDatos = Object.keys(nuevo.porAsunto || {}).length;
       return nuevo;
     };
@@ -196,6 +197,12 @@ var Hitos = (function () {
      Si una lectura llega vacía y antes había, se relee dos veces y, si
      sigue vacía, error en vez de escribir (fila 99, punto 5.1). */
   var vistosConDatos = 0;
+
+  /* Cuándo escribió hitos.json este ordenador por última vez (fila 101):
+     quien pinta algo a partir de los hitos puede saltarse la relectura
+     si no ha cambiado nada desde la suya. */
+  var ultimoCambio = 0;
+  function ultimoCambioLocal() { return ultimoCambio; }
   var ESPERAS_LECTURA_VACIA_MS = [700, 1500];
 
   async function leerParaCambiar(g) {
@@ -351,7 +358,13 @@ var Hitos = (function () {
       U.accesorio('Hito guardado, pero no he podido poner el estado "' + estado + '" al asunto', e);
       return;
     }
-    try { if (typeof App.pintarAbiertos === 'function') App.pintarAbiertos(); } catch (e2) { /* solo pintar */ }
+    /* Y la cabecera de la ficha, si está abierta: el desplegable de
+       estado se queda con el valor nuevo (fila 101). La lista, solo si
+       se ve (App.pintarAbiertos la deja pendiente si no). */
+    try {
+      if (typeof App.repintarAccionesFicha === 'function') App.repintarAccionesFicha(clave);
+      if (typeof App.pintarAbiertos === 'function') App.pintarAbiertos();
+    } catch (e2) { /* solo pintar */ }
   }
 
   /* Las fechas límite calculadas por plazo (sección 7): cuando un hito
@@ -514,7 +527,7 @@ var Hitos = (function () {
     aplicarPlazosDependientes: aplicarPlazosDependientes, estadoDelAsunto: estadoDelAsunto,
     pasoAHito: pasoAHito, crearDesdeGuia: crearDesdeGuia,
     crearDesdeGuiaImportando: crearDesdeGuiaImportando,
-    marcar: marcar
+    marcar: marcar, ultimoCambioLocal: ultimoCambioLocal
   };
 })();
 window.Hitos = Hitos;
