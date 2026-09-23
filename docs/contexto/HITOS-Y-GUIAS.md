@@ -104,6 +104,44 @@ Primera tanda de que el hito sea la mesa de trabajo del asunto.
   hito se quedan vacíos sin contar como dato que falta. `{{HITO}}` y `{{PLAZO DEL HITO}}` también al
   «Comunicar» desde un hito. Prueba: `pruebas/documentos-desde-el-hito.mjs`.
 
+### Añadir documento y el menú de cada documento (23-sep-2026, fila 103, `docs/EL-HITO-MESA-DE-TRABAJO.md`)
+
+Segunda tanda de que el hito sea la mesa de trabajo, sobre lo que dejó la fila 102.
+
+- **"Añadir documento"** (`js/hitos-anadir.js`, nuevo; sustituye al botón suelto "Apuntar un
+  documento", que sigue vivo como tercer camino) abre un menú pequeño con tres caminos: **Desde
+  el ordenador** (`Documentos.abrir(a, { hito })`: `js/documentos.js` gana `hitoActual` y, en
+  `guardar()`, apunta el documento al hito con `Hitos.anadirDocumento` y marca su casilla de "Lo
+  que hay que reunir"; con `opciones.irDirectoAAnadir` se salta la lista y va directa al selector
+  de fichero); **Desde "Por clasificar"** (elige uno de `App.E.sueltos` y sigue el mismo camino
+  que "Meter aquí": `App.meterSueltoEnAsuntoElegido`/`App.llevarSueltoA`
+  (`js/documentos-sueltos.js`) ganan un `opciones` que solo viaja hasta `App.verDocumentos`, para
+  que el documento ya movido quede apuntado; deshabilitado, con "(no hay ninguno)", si no hay
+  ningún suelto). No sale en un hito "decision" o "noaplica".
+- **El menú de tres puntos de cada documento** (`js/hitos-documento-menu.js`, nuevo), en vez de la
+  ✕ de siempre: Registrar (si le falta), Separar/Unir/Sacar páginas/Ajustar tamaño (solo PDF,
+  mismo criterio que `js/ficha-documentos.js`) y, siempre, "Quitar del hito" (mismo efecto que la
+  ✕: desapunta, nunca borra el fichero). Cualquiera de esas herramientas puede crear ficheros
+  nuevos (separar, por ejemplo); `HitosDocumentoMenu.ficherosNuevos(antes, después)` —función
+  pura, comparando el listado de la carpeta antes y después— decide cuáles son nuevos, y se
+  apuntan solos al mismo hito. Un documento "(ya no está)" solo trae "Quitar del hito". Tras
+  cualquier acción, `HitosPanel.desplegarAlAbrir(clave, idHito)` deja el hito abierto antes de
+  repintar.
+- **"Comunicar" siempre visible**: `HitosComunicar.botonHTML` ya no exige que el paso tenga texto
+  propio; `canalesDe` devuelve los dos canales cuando no lo tiene (antes, ninguno), así que el
+  cuadro se abre con el desplegable de plantillas del tipo. Los documentos que el hito ya tiene en
+  la carpeta salen premarcados en "Documentos de este asunto": `HitosComunicar.comunicar` calcula
+  `extra.adjuntosMarcados` (los del hito que siguen en la carpeta, `Carpetas.ficheros`) y
+  `CorreoAdjuntos.pintarBloque(a, marcados)` (`js/correo-adjuntos.js`) los pinta ya marcados. La
+  constancia en el historial del hito (y en la nota del asunto), cuando el correo llevaba
+  documentos, termina en "· con N documentos: a, b" —
+  `CorreoNucleo.sufijoDocumentos(nombres)` (`js/correo.js`), función pura nueva, añadida dentro de
+  `textoDeLaNota()`, que ya escribe esa misma línea para `apuntarElRastro`: sin camino aparte.
+
+Se comprueba con `pruebas/el-hito-mesa-de-trabajo.mjs` (puro, sin navegador: la resta de ficheros,
+cuándo sale cada botón, `adjuntosMarcados` y `sufijoDocumentos`) y, en el navegador de verdad, con
+bloques nuevos de `pruebas/hitos.mjs` y `pruebas/quedarse-en-el-asunto.mjs`.
+
 ### La biblioteca de hitos del centro (20-sep-2026, fila 79, docs/BIBLIOTECA-DE-HITOS.md)
 
 Muchos pasos se repiten entre tipos de asunto casi idénticos ("Registrar de salida en Séneca",
@@ -254,8 +292,10 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
   carpeta y la ficha ya han salido bien. Prueba: `pruebas/cambiar-tipo-y-guia.mjs`.
 - **Un solo hito en curso a la vez**: al marcar uno hecho, el siguiente pendiente de la lista
   visible pasa a "en curso" solo (`Hitos.recomputeEnCurso`).
-- **Documentos apuntados** (fila 31, 17-sep-2026, `docs/APUNTAR-DOCUMENTO-A-HITO.md`): el botón
-  "Apuntar un documento" abre `HitosDocumentos.abrir(a, h)` (`js/hitos-documentos.js`, nuevo), un
+- **Documentos apuntados** (fila 31, 17-sep-2026, `docs/APUNTAR-DOCUMENTO-A-HITO.md`; desde la
+  fila 103 el botón del hito es "Añadir documento", con este camino como su tercera opción "Uno
+  que ya está en la carpeta" — ver la sección nueva más abajo, "Añadir documento y el menú de
+  cada documento"): `HitosDocumentos.abrir(a, h)` (`js/hitos-documentos.js`), un
   cuadro con casillas sobre `Carpetas.ficheros(a.handle)`; al aceptar llama a
   `Hitos.anadirDocumento`/`quitarDocumento` y pide el repintado. Apuntar es solo señalar: nunca se
   copia ni se mueve nada, y un documento puede estar apuntado en varios hitos. Cada nombre pasa a
@@ -334,14 +374,15 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
     blanco; vale igual para el cuadro de Correo (`js/correo-cuadro.js`) y el de Séneca
     (`js/seneca-cuadro.js`), sin tocar ninguno de los dos: los dos ya llaman a
     `CorreoNucleo.cuerpoDelMedio`.
-- **"Comunicar" desde un hito** (18-sep-2026, fila 60, `docs/COMUNICAR-DESDE-EL-HITO.md`): botón
-  propio del hito, aparte del "Comunicar" de la cabecera de la ficha, que solo sale si su paso de
-  origen tiene "Comunicación de este paso" (ver la sección de guías, más arriba). Vive entero en
+- **"Comunicar" desde un hito** (18-sep-2026, fila 60, `docs/COMUNICAR-DESDE-EL-HITO.md`; desde la
+  fila 103 sale siempre, salvo decision/noaplica — ver la sección nueva más abajo): botón
+  propio del hito, aparte del "Comunicar" de la cabecera de la ficha. Vive entero en
   `js/hitos-comunicar.js` (nuevo, enganchado a `window.Hitos` como `js/hitos-archivo.js`, aunque no
   añade ningún método al modelo: nada de esto se guarda en el hito).
   - `HitosComunicar.canalesDe(a, hito)` (síncrona: lee la guía en memoria, `GuiasDelCentro.pasosDe`,
-    por `origenGuia`) dice qué canales tienen texto. Con uno, el botón abre ese cuadro directo; con
-    los dos, abre el mismo menú pequeño "Comunicar" (`js/ficha-menus.js`) que la cabecera.
+    por `origenGuia`) dice qué canales tienen texto propio. Con uno, el botón abre ese cuadro
+    directo; con los dos (o sin texto propio, desde la fila 103), abre el mismo menú pequeño
+    "Comunicar" (`js/ficha-menus.js`) que la cabecera.
   - **El destinatario** (`resolverDestinatario`): si el responsable del hito es el papel `tutor`,
     el tutor legal 1 (o el 2, si el 1 no tiene nombre ni correo — `LoPide.datosDeTutor`); si es
     `relacionado`, todos los relacionados con correo (comas, para que
@@ -475,4 +516,3 @@ cuánto se tarda** de todos los asuntos, abiertos y archivados.
 Toda la cuenta (`_entradaAbierta`, `_entradaArchivada`, `_porTipo`, `_porMes`, `_porQuienLoPide`,
 `_tiempoDeTramite`, `_textoParaCopiar`) es pura, sin DOM ni disco: se comprueba sin navegador en
 `pruebas/cuentas.mjs`.
-
