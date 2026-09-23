@@ -115,10 +115,11 @@ las devolvió aquí por error a PENDIENTE y BLOQUEADA, y la fila 92 las volvió 
 está HECHA** (23-sep-2026). **La 93 está HECHA** (23-sep-2026): repaso completo de todo `js/`
 buscando una salida indebida de la ficha, y no se encontró ninguna — la regla ya se cumplía
 entera desde las filas 30, 34, 51, 52 y 58. Ampliadas las pruebas de
-`pruebas/quedarse-en-el-asunto.mjs` (quince casos). Esa sesión no tuvo `git push` ni acceso a
-`api.github.com`, así que no pudo correr `npm test` en un navegador local ni subir la entrada de
-`docs/HISTORIA.md` (queda su texto, listo para pegar, en la nota al final de este documento). La
-63 y la 76 siguen BLOQUEADAS y no se retoman sin que Francisco lo diga. La
+`pruebas/quedarse-en-el-asunto.mjs` (quince casos). Una sesión anterior, sin `git push`, las
+escribió sin poder correrlas; esta sesión sí tiene `git push` de verdad (sin permiso para escribir
+en `main`, solo para clonar y probar en local) y ha corrido `npm test` completo en un navegador
+local: tres fallos en las pruebas nuevas (nunca en la aplicación), los tres arreglados, y las 97
+pruebas de `pruebas/` en verde. La 63 y la 76 siguen BLOQUEADAS y no se retoman sin que Francisco lo diga. La
 tabla está en orden de trabajo, no de número, así que en cuanto se apunte una fila nueva,
 la primera PENDIENTE **de arriba abajo** es la que se coge.
 
@@ -246,11 +247,13 @@ fichero con la API.
 
 ## Nota para la próxima sesión: docs/HISTORIA.md de la fila 93
 
-La fila 93 (23-sep-2026, `docs/QUEDARSE-EN-EL-ASUNTO-SIEMPRE.md`) está HECHA y publicada, pero esa
-sesión no tuvo `git push` ni acceso a `api.github.com` (política de red de su entorno), así que no
-pudo reconstruir con fiabilidad `docs/HISTORIA.md` (más de 120 KB) para añadirle su entrada. Pégala
-tal cual **arriba del todo**, justo después de la línea `---` que sigue a la introducción (antes de
-`## 23-sep-2026 — Fila 92: «Reintentar is not defined»...`), si no está ya ahí:
+La fila 93 está HECHA y publicada, y esta vez sí verificada: esta sesión pudo clonar el
+repositorio de solo lectura (`git clone`, sin permiso para `git push`) y correr `npm test` de
+verdad en local. Arregló tres fallos que tenía `pruebas/quedarse-en-el-asunto.mjs` (nunca en la
+aplicación) y dejó las 97 pruebas de `pruebas/` en verde. Pero `docs/HISTORIA.md` pesa más de
+130 KB, y esta sesión tampoco tiene forma fiable de reconstruirlo entero sin arriesgarse a
+truncarlo (regla 12). Pégalo tal cual **arriba del todo**, justo después de la línea `---` que
+sigue a la introducción (antes de `## 23-sep-2026 — Fila 92: «Reintentar is not defined»...`):
 
     ## 23-sep-2026 — Fila 93: no salir del asunto salvo cuando el usuario lo pide
 
@@ -290,21 +293,44 @@ tal cual **arriba del todo**, justo después de la línea `---` que sigue a la i
     ordenador (los cinco, sí salen, con el aviso de una línea en el último caso). Quince
     comprobaciones en total, sobre las cuatro que ya había.
 
-    **Lo que costó de verdad**: nada en el código, porque no hacía falta tocarlo. Lo que costó fue el
-    repaso: la sesión no tuvo `git push` ni acceso a la API de GitHub (`api.github.com` bloqueada por
-    la política de red de este entorno, distinto del de una sesión normal de Claude Code), así que
-    cada fichero se leyó con la herramienta MCP de GitHub, uno a uno, en vez de con un `grep` sobre un
-    clon del repositorio. Por el mismo motivo, **esta fila no ha podido correr `npm test` de verdad**
-    en un navegador local: reconstruir en disco los más de 120 ficheros de `js/` solo para esta
-    comprobación se ha juzgado desproporcionado frente al repaso manual, ya hecho a fondo, de cada
-    camino que toca la fila. Los quince casos nuevos siguen al pie de la letra los mismos patrones ya
-    probados en `pruebas/quedarse-en-el-asunto.mjs`, `pruebas/asociar-documento-a-hito.mjs` y
-    `pruebas/documentos-sueltos.mjs`. Queda apuntado aquí para que la próxima sesión con `git push`
-    de verdad corra la batería completa y confirme los quince casos nuevos en verde antes de dar el
-    fichero por cerrado del todo.
+    **Lo que costó de verdad**: nada en el código de la aplicación, porque no hacía falta tocarlo. Lo
+    que costó fueron las pruebas nuevas. La primera sesión que tocó esta fila no tuvo `git push` ni
+    pudo montar el repositorio completo en un navegador local, así que escribió los quince casos
+    nuevos sin poder correrlos, y los dejó publicados así, con una nota pidiendo a la siguiente sesión
+    que los verificara. Esta segunda sesión sí ha podido clonar el repositorio (con `git clone` de
+    lectura; sigue sin permiso para `git push`, así que la subida a `main` pasa igual por la
+    herramienta de GitHub) y correr `npm test` de verdad en local, con `python3 -m http.server` y
+    Playwright. Tres de los quince casos nuevos fallaban, los tres por errores en la propia prueba,
+    nunca en la aplicación:
+
+    - El caso 6 (apuntar un documento a un hito) y otros tres esperaban a que el cuadro se cerrara con
+      `pagina.waitForSelector('#capa.oculto')`. Con `.oculto { display: none !important; }`, ese
+      selector nunca puede quedar "visible" — el propio Playwright no lo resuelve nunca así, y la
+      prueba se quedaba esperando 30 segundos sin motivo. Cambiado a `pagina.waitForTimeout(400)` tras
+      el clic en Aceptar, que es el patrón que ya usan `pruebas/registro.mjs` y el resto del
+      repositorio para lo mismo. El caso 10 (que si sale hacia la lista, no hacia la ficha) se cambió
+      en su lugar a esperar `#pantalla-abiertos:not(.oculto)`, que es el estado de verdad que ese caso
+      comprueba.
+    - El caso 10 ("Meter en un asunto") buscaba el asunto de pruebas por su nombre en el cuadro de
+      «Elegir el asunto», y no lo encontraba: ese asunto se había creado a mano, con una carpeta
+      directamente en el disco de mentira, sin pasar nunca por `App.anotar`, así que no tenía ninguna
+      entrada en `asuntos.json` y `ElegirAsunto.todos()` no lo veía. Arreglado dando de alta el
+      asunto con `App.anotar(nombre, {})` (sin categoría ni tercero, que es lo que necesitaba seguir
+      probando el caso 11) nada más crear la carpeta, antes del primer paso.
+    - El caso 12 (el segundo asunto, para Escape/Editar/Borrar) esperaba su tarjeta con
+      `pagina.waitForSelector('.tarjeta', { hasText: 'PERMISO' })`: `waitForSelector` no admite
+      `hasText` (eso es de `locator()`), así que la opción se ignoraba y la prueba esperaba a que
+      fuera visible la primera `.tarjeta` que hubiera en toda la página — que podía ser la de un
+      documento suelto de un paso anterior, nunca la buscada. Cambiado a
+      `pagina.locator('#lista-abiertos .tarjeta', { hasText: 'PERMISO' }).first().waitFor()`.
+
+    Con los tres arreglos, las quince comprobaciones de `pruebas/quedarse-en-el-asunto.mjs` pasan, y
+    se ha corrido además la batería completa (`pruebas/*.mjs`, 97 ficheros): todas en verde, sin tocar
+    ningún otro fichero de la aplicación.
 
     Sustituida en `docs/contexto/ASUNTOS.md` la línea vieja de la fila 30 por la lista completa y
-    actual de caminos revisados. Versión publicada `App.VERSION`: `23-sep-2026 · 15:22`.
+    actual de caminos revisados (ya lo había hecho la primera sesión). Versión publicada
+    `App.VERSION`: `23-sep-2026 · 15:47`.
 
     ---
 
