@@ -432,9 +432,50 @@ App.guardarTipos = async function () {
   await Copias.guardar(App.E.gestor, App.FICHERO_TIPOS, App.E.tipos);
 };
 
+/* Lee asuntos.json. Si llega vacío (no está, o sin asuntos) y la
+   última vez que se leyó o se escribió del disco sí tenía asuntos
+   (`App.E.asuntosEnDisco`), no se lo cree a la primera: Dropbox puede
+   estar cambiando el fichero justo en ese instante. Espera y relee
+   (dos veces). Si sigue vacío, lanza un error en vez de devolver un
+   registro vacío que el siguiente guardado escribiría encima de todo
+   (fila 99, docs/GUARDAR-EN-FILA.md, punto 5.1). */
+App.LECTURA_VACIA_ESPERAS_MS = [700, 1500];
+
+App.contarAsuntos = function (r) {
+  return (r && r.asuntos) ? Object.keys(r.asuntos).length : 0;
+};
+
+App.E.asuntosEnDisco = 0;
+
+App.leerRegistroDelDisco = async function () {
+  var enMemoria = App.E.asuntosEnDisco;
+  for (var i = 0; ; i++) {
+    var r = await Carpetas.leerJson(App.E.gestor, App.FICHERO_ASUNTOS);
+    var leido = (r && r.asuntos) ? r : { asuntos: {} };
+    if (!enMemoria || App.contarAsuntos(leido)) {
+      App.E.asuntosEnDisco = App.contarAsuntos(leido);
+      return leido;
+    }
+    if (i >= App.LECTURA_VACIA_ESPERAS_MS.length) {
+      var e = new Error('asuntos.json ha llegado vacío y hace un momento tenía ' + enMemoria +
+        ' asuntos. No he guardado nada para no borrarlos. Espera un poco (Dropbox puede estar ' +
+        'sincronizando) y vuelve a intentarlo.');
+      e.name = 'LecturaVacia';
+      throw e;
+    }
+    await new Promise(function (ok) { setTimeout(ok, App.LECTURA_VACIA_ESPERAS_MS[i]); });
+  }
+};
+
+/* Si la lectura llega vacía sin motivo, se queda con lo que había en
+   memoria (sin escribir nada) en vez de dejar la lista vacía. */
 App.cargarRegistro = async function () {
-  var r = await Carpetas.leerJson(App.E.gestor, App.FICHERO_ASUNTOS);
-  App.E.registro = (r && r.asuntos) ? r : { asuntos: {} };
+  try {
+    App.E.registro = await App.leerRegistroDelDisco();
+  } catch (e) {
+    if (e.name !== 'LecturaVacia') throw e;
+    console.warn(e.message);
+  }
 };
 
 /* La única forma correcta de escribir el registro entero (fila 61,
@@ -446,11 +487,25 @@ App.cargarRegistro = async function () {
    Copias.guardar(..., App.FICHERO_ASUNTOS, ...) fuera de este
    fichero (salvo js/conflictos.js, que fusiona una copia en
    conflicto que ya se acaba de leer). */
-App.guardarRegistroFresco = async function (cambiar) {
-  await App.cargarRegistro();
-  await cambiar(App.E.registro);
-  await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, App.E.registro);
-  App.refrescarFichas();
+/* Desde la fila 99 (docs/GUARDAR-EN-FILA.md): en fila con los demás
+   guardados de asuntos.json (ColaGuardado), y sobre una copia leída
+   en una variable local, que solo pasa a App.E.registro cuando la
+   escritura ha terminado bien. */
+/* Sin js/cola-guardado.js cargado, se guarda igual, sin fila (la
+   lección de la fila 92: un módulo que falta nunca deja sin guardar). */
+App.enFila = function (fichero, fn) {
+  return window.ColaGuardado ? window.ColaGuardado.poner(fichero, fn) : fn();
+};
+
+App.guardarRegistroFresco = function (cambiar) {
+  return App.enFila(App.FICHERO_ASUNTOS, async function () {
+    var registro = await App.leerRegistroDelDisco();
+    await cambiar(registro);
+    await Copias.guardar(App.E.gestor, App.FICHERO_ASUNTOS, registro);
+    App.E.asuntosEnDisco = App.contarAsuntos(registro);
+    App.E.registro = registro;
+    App.refrescarFichas();
+  });
 };
 
 /* Se relee antes de escribir, por si el compañero ha tocado algo

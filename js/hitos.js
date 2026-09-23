@@ -165,8 +165,10 @@ var Hitos = (function () {
   async function leer() {
     var g = gestor();
     if (!g) return vacio();
-    var leido = await Carpetas.leerJson(g, FICHERO);
-    return normalizar(leido);
+    var leido = normalizar(await Carpetas.leerJson(g, FICHERO));
+    var n = Object.keys(leido.porAsunto).length;
+    if (n) vistosConDatos = n;
+    return leido;
   }
 
   /* Como todo fichero compartido: se relee justo antes de escribir, y
@@ -174,13 +176,42 @@ var Hitos = (function () {
      directo (sección 2.2 del encargo). 'hacer' recibe los datos ya
      releídos, los muta a gusto y los devuelve (o no devuelve nada, y
      se guarda igual: ya han quedado mutados). */
-  async function cambiar(hacer) {
+  /* Desde la fila 99 (docs/GUARDAR-EN-FILA.md), en fila con los demás
+     guardados de hitos.json, y sin escribir encima de todo si la
+     lectura llega vacía de repente (leerParaCambiar). */
+  function cambiar(hacer) {
     var g = gestor();
-    if (!g) return vacio();
-    var actual = await leer();
-    var nuevo = hacer(actual) || actual;
-    await Copias.guardar(g, FICHERO, nuevo);
-    return nuevo;
+    if (!g) return Promise.resolve(vacio());
+    var hacerlo = async function () {
+      var actual = await leerParaCambiar(g);
+      var nuevo = hacer(actual) || actual;
+      await Copias.guardar(g, FICHERO, nuevo);
+      vistosConDatos = Object.keys(nuevo.porAsunto || {}).length;
+      return nuevo;
+    };
+    return window.ColaGuardado ? window.ColaGuardado.poner(FICHERO, hacerlo) : hacerlo();
+  }
+
+  /* Cuántos asuntos con hitos se han visto en la última lectura buena.
+     Si una lectura llega vacía y antes había, se relee dos veces y, si
+     sigue vacía, error en vez de escribir (fila 99, punto 5.1). */
+  var vistosConDatos = 0;
+  var ESPERAS_LECTURA_VACIA_MS = [700, 1500];
+
+  async function leerParaCambiar(g) {
+    for (var i = 0; ; i++) {
+      var datos = normalizar(await Carpetas.leerJson(g, FICHERO));
+      var n = Object.keys(datos.porAsunto).length;
+      if (n || !vistosConDatos) { vistosConDatos = n; return datos; }
+      if (i >= ESPERAS_LECTURA_VACIA_MS.length) {
+        var e = new Error('hitos.json ha llegado vacío y hace un momento tenía los hitos de ' +
+          vistosConDatos + ' asuntos. No he guardado nada para no borrarlos. Espera un poco ' +
+          '(Dropbox puede estar sincronizando) y vuelve a intentarlo.');
+        e.name = 'LecturaVacia';
+        throw e;
+      }
+      await new Promise(function (ok) { setTimeout(ok, ESPERAS_LECTURA_VACIA_MS[i]); });
+    }
   }
 
   async function hitosDe(clave) {

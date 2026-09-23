@@ -78,8 +78,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   de alta a mano.
 - Guías del procedimiento por tipo, con pasos y preguntas dentro de las respuestas, sin límite.
 - Panel lateral de lectura, y tablón de notas rápidas siempre visible.
-- Correo y mensaje de Séneca preparados (la app nunca envía nada), en un cuadro ancho de dos
-  columnas; el ayudante de Séneca comprueba quién ha entrado y dice por su nombre quién falta.
+- Correo y mensaje de Séneca preparados (la app nunca envía nada); el ayudante de Séneca dice
+  por su nombre quién falta.
 - "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; con
   tercero reconocido, también sugiere meterlo en uno que ya existe («Meter aquí»). Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
@@ -122,9 +122,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha, con el correo ya puesto al
   preparar el cuadro de Correo.
 - Archivar o reabrir cuando el destino ya existe fusiona las dos carpetas sin perder nada; los
-  errores del navegador salen siempre traducidos al castellano. Archivar desde la ficha abierta ya
-  no confunde su propio archivado con el de "otro ordenador"; si Dropbox tropieza al escribir
-  `_ficha.json` se reintenta sola (y sin ese módulo guarda igual); si falla del todo, aviso ámbar.
+  errores del navegador salen siempre traducidos al castellano. Archivar desde la ficha no se
+  confunde con "otro ordenador"; si Dropbox tropieza, se reintenta sola.
 - De la ficha de un asunto solo se sale al Volver, Editar, Archivar/Reabrir o Borrar; lo demás (guardar, hitos, comunicar...) se queda en su sitio.
 - Cabecera de cada pantalla fija al bajar y encogida sin temblar.
 - Renombrar, unir o borrar un asunto mueve también sus hitos y su señal de presencia; el registro
@@ -152,8 +151,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   cursor: envolver el repintado en `U.conservandoLoEscrito(raiz, fn)`.
 - Al terminar una instrucción de la cola: actualizar este documento y `CONTEXTO.md`
   sustituyendo la línea vieja, y anotar en `HISTORIA.md` lo que merezca recordarse.
-- El registro de asuntos (`asuntos.json`) solo se escribe entero por `App.anotar` o por
-  `App.guardarRegistroFresco`, nunca directo con `Copias.guardar`.
+- Todo guardado de `_GESTOR` pasa por la cola por fichero (`ColaGuardado`: `App.anotar`/
+  `App.guardarRegistroFresco`, `Hitos.cambiar`); nunca `Copias.guardar` directo de `asuntos.json`.
+  Ninguna tarea de fondo escribe ni mira la carpeta con un guardado en marcha.
 - Renombrar, unir o borrar un asunto (su clave cambia o desaparece) solo por `AsuntoRenombrar`
   (`js/asunto-renombrar.js`): mueve a la vez la ficha, sus hitos y su señal de presencia.
 

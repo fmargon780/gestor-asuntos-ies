@@ -219,6 +219,29 @@ la aplicación escribe `seguidos.json` para el recolector de Apps Script.
 misma carpeta: sin releer, el último en guardar borra lo del otro. Lo hacen los dieciocho ficheros de
 arriba.
 
+**Y en este ordenador, de uno en uno** (fila 99, 23-sep-2026, `docs/GUARDAR-EN-FILA.md`,
+`js/cola-guardado.js`). `ColaGuardado.poner(fichero, fn)` pone cada «leer-cambiar-escribir» detrás
+del anterior del MISMO fichero: `App.guardarRegistroFresco` (y con él `App.anotar`), `Hitos.cambiar`
+y la fusión de copias en conflicto de `asuntos.json` y `hitos.json`. Nunca se llama a `poner` del
+mismo fichero desde dentro de un `fn` que ya está en esa cola (se esperaría a sí mismo). Sin el
+módulo, se guarda igual, sin fila (`App.enFila`). `guardarRegistroFresco` trabaja sobre una copia
+local y solo la pasa a `App.E.registro` al terminar la escritura. `ColaGuardado.hayGuardado()`
+(también cuenta `Copias.guardar` y los traslados de carpeta) hace que presencia, el vistazo a la
+carpeta y la búsqueda de conflictos se salten su pasada. Además:
+
+- La copia del día se comprueba con `Carpetas.existeFichero` (antes `existe`, que busca una
+  carpeta: rehacía la copia y listaba `copias/` en cada guardado) y se recuerda en memoria.
+- Leer también reintenta (`Reintentar.lectura`); `NotReadableError` y `AbortError` cuentan como
+  pasajeros, al leer y al escribir.
+- Si `asuntos.json` o `hitos.json` llegan vacíos cuando la última lectura tenía datos
+  (`App.E.asuntosEnDisco`), se relee dos veces y, si sigue vacío, error `LecturaVacia` sin tocar el
+  disco (`App.cargarRegistro` se queda entonces con lo que tenía en memoria).
+- Un traslado de carpeta copia las «(conflicted copy)» de Dropbox (el filtro de temporales es para
+  carpetas); la fusión de conflictos de `asuntos.json` conserva todo lo de primer nivel.
+- `asuntos.json` y `hitos.json` se guardan sin sangría. `recienArchivados` se marca antes de mover.
+
+Se comprueba con `pruebas/guardar-en-fila.mjs`.
+
 ### Copias de seguridad y fichero roto
 
 `Carpetas.leerJson` no confunde "no existe" con "no se puede leer": si el fichero existe pero el

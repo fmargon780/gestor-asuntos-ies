@@ -131,7 +131,19 @@ var Presencia = (function () {
 
   var vigilando = null;   /* { clave, timer, modo, ultimaAnunciada } */
 
+  /* Fila 99 (docs/GUARDAR-EN-FILA.md): una pasada no se solapa con la
+     anterior, y con un guardado en marcha se salta (la siguiente, a los
+     10 s, ya lo hará). */
+  var actualizando = false;
+
   async function actualizar() {
+    if (!vigilando || actualizando) return;
+    if (window.ColaGuardado && ColaGuardado.hayGuardado()) return;
+    actualizando = true;
+    try { await actualizarUnaVez(); } finally { actualizando = false; }
+  }
+
+  async function actualizarUnaVez() {
     if (!vigilando) return;
     var clave = vigilando.clave;
     var ocupante = await quienEstaDentro(clave);
@@ -264,8 +276,13 @@ window.Presencia = Presencia;
         ultimaHuella = Presencia.huella();
         if (typeof App.pintarAbiertos === 'function') App.pintarAbiertos();
       });
+      var refrescando = false;
       setInterval(function () {
-        Presencia.refrescarCache().then(function () {
+        /* Fila 99: sin solaparse, y nunca con un guardado en marcha. */
+        if (refrescando || (window.ColaGuardado && ColaGuardado.hayGuardado())) return;
+        refrescando = true;
+        Presencia.refrescarCache().then(function () { refrescando = false; }, function () { refrescando = false; })
+        .then(function () {
           var pantalla = document.getElementById('pantalla-abiertos');
           if (!pantalla || pantalla.classList.contains('oculto') || typeof App.pintarAbiertos !== 'function') return;
           if (escribiendoAhoraMismo()) return;   /* se deja la huella sin actualizar: se repinta en la siguiente vuelta */

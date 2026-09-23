@@ -5,7 +5,31 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
-## 23-sep-2026 — Fila 95: preguntas dentro de las respuestas, sin límite de niveles
+## 23-sep-2026 — Fila 99: guardar en fila y sin trabajo de más
+
+`docs/GUARDAR-EN-FILA.md`. Francisco: al grabar sale un error o la pantalla se queda congelada,
+aunque al volver a entrar sí se ha guardado. Las causas, de la revisión a fondo:
+
+- **La copia del día se rehacía en cada guardado.** `Copias` preguntaba con `Carpetas.existe`, que
+  busca una CARPETA: con un fichero siempre decía «no existe». Cada guardado releía, reescribía la
+  copia y listaba `copias/` entera. Las pruebas no lo veían porque el disco de mentira no distingue
+  carpeta de fichero; la prueba nueva sí (como el navegador de verdad).
+- **Nada ponía los guardados en fila.** Dos a la vez leían antes de que escribiera el otro, y ganaba
+  el último. `js/cola-guardado.js`: una cadena de promesas por fichero.
+- **Leer no reintentaba**, y un `NotReadableError` de Dropbox tumbaba el segundo paso.
+- **Las tareas de fondo** (presencia, vistazo a la carpeta, conflictos) se cruzaban con el guardado;
+  el vistazo, a mitad de un archivado, veía desaparecer la carpeta y sacaba de la ficha en rojo.
+- **Tres riesgos de perder datos**: un `asuntos.json` leído vacío se escribía encima; las copias en
+  conflicto se quedaban fuera al trasladar una carpeta y se borraban con el original; la fusión de
+  conflictos perdía todo lo que no fuera `asuntos`.
+
+**Lo que costó**: la guardia de «lectura vacía» comparaba al principio con lo que había en memoria,
+y una prueba (`archivo-indice.mjs`) mete fichas solo en memoria: la guardia saltaba y el archivado
+no se hacía. Se compara con lo último leído o escrito en el disco. Y otra lección de la fila 92:
+las pruebas sin navegador no cargan `js/cola-guardado.js`, así que todo lo usa con `window.` y sin
+él guarda igual.
+
+: preguntas dentro de las respuestas, sin límite de niveles
 
 `docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md`. Reabre a propósito lo que estaba descartado
 («opciones dentro de opciones en la guía»): los procedimientos del centro lo necesitan. La línea
