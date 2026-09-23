@@ -35,6 +35,12 @@ var Documentos = (function () {
   };
   var asuntoActual = null;
   var urlVisor = null;   /* la dirección temporal del documento que se está viendo */
+  /* El hito al que hay que apuntar lo que se guarde en este cuadro
+     (23-sep-2026, fila 103, docs/EL-HITO-MESA-DE-TRABAJO.md, sección
+     1, camino "Desde el ordenador"): opcional, puesto por
+     js/hitos-anadir.js. Vale para todo lo que se guarde mientras este
+     cuadro esté abierto, no solo para el primer documento. */
+  var hitoActual = null;
 
   function configurar(o) { ctx = o; }
 
@@ -42,15 +48,24 @@ var Documentos = (function () {
 
   /* ---------- el cuadro ---------- */
 
-  async function abrir(asunto) {
+  /* `opciones.hito`: ver arriba. `opciones.irDirectoAAnadir`: se salta
+     la lista y va directa al selector de fichero, para cuando ya se
+     sabe que se quiere añadir uno (el camino "Desde el ordenador" de
+     un hito); sin ella, se ve la lista de siempre. */
+  async function abrir(asunto, opciones) {
     asuntoActual = asunto;
+    hitoActual = (opciones && opciones.hito) || null;
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-ancho');
     var esperar = U.preguntar(asunto.nombre, '<div id="doc-cuerpo"></div>', 'Cerrar', true);
     await pintarLista();
+    if (opciones && opciones.irDirectoAAnadir) {
+      try { await anadirDesdeOrdenador(); } catch (e) { /* AbortError: se queda en la lista */ }
+    }
     await esperar;
     soltarVisor();
     cuadro.classList.remove('cuadro-ancho');
+    hitoActual = null;
   }
 
   /* El navegador guarda en memoria el documento que enseña hasta que se
@@ -170,13 +185,18 @@ var Documentos = (function () {
     });
 
     $('doc-anadir').onclick = async function () {
-      try {
-        var handle = await Carpetas.elegirFichero(asuntoActual.handle);
-        pintarFormulario({ modo: 'anadir', handle: handle, nombreActual: handle.name });
-      } catch (e) {
-        if (e.name !== 'AbortError') U.aviso('No he podido abrir ese fichero: ' + U.mensajeDeError(e), 'malo');
-      }
+      try { await anadirDesdeOrdenador(); }
+      catch (e) { if (e.name !== 'AbortError') U.aviso('No he podido abrir ese fichero: ' + U.mensajeDeError(e), 'malo'); }
     };
+  }
+
+  /* Sacada aparte (fila 103) para poder llamarla también desde
+     `abrir()`, cuando `opciones.irDirectoAAnadir` se salta la lista.
+     Lanza lo mismo que Carpetas.elegirFichero: quien llama decide qué
+     hacer con un AbortError (cancelar el selector del navegador). */
+  async function anadirDesdeOrdenador() {
+    var handle = await Carpetas.elegirFichero(asuntoActual.handle);
+    pintarFormulario({ modo: 'anadir', handle: handle, nombreActual: handle.name });
   }
 
   /* ---------- el formulario del nombre ---------- */
@@ -619,6 +639,26 @@ var Documentos = (function () {
       await actualizarPendiente(opciones, nombre);
     } catch (e2) {
       U.accesorio('Documento guardado, pero no he podido apuntar si está pendiente de registro', e2);
+    }
+    /* Este cuadro se ha abierto desde un hito (fila 103, sección 1):
+       lo que se guarde queda apuntado ahí, y se marca sola la casilla
+       de "Lo que hay que reunir" que le toque (no crítico: el
+       documento ya ha quedado guardado igual). Vale para todo lo que
+       se guarde mientras el cuadro esté abierto, no solo lo primero. */
+    if (hitoActual) {
+      try {
+        await Hitos.anadirDocumento(asuntoActual.nombre, hitoActual.id, nombre);
+        if (window.HitosRequisitos) {
+          try { await HitosRequisitos.marcarPorDocumento(asuntoActual.nombre, hitoActual.id, nombre); }
+          catch (e4) { /* no crítico */ }
+        }
+        if (window.HitosPanel) {
+          window.HitosPanel.desplegarAlAbrir(asuntoActual.nombre, hitoActual.id);
+          window.HitosPanel.programarRepintado();
+        }
+      } catch (e2b) {
+        U.accesorio('Documento guardado, pero no he podido apuntarlo al hito', e2b);
+      }
     }
     soltarVisor();
     try { await pintarLista(); } catch (e3) { U.accesorio('Documento guardado, pero no he podido repintar la lista', e3); }
