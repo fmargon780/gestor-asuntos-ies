@@ -327,8 +327,9 @@ En el navegador (IndexedDB), con `Almacen`, y no se comparten entre ordenadores:
 
 **Van atadas a la dirección de la web.** Si la dirección cambia, hay que volver a señalarlas.
 
-Aparte, en `localStorage`: `gestor-barra`, `gestor-filtros`, `gestor-lector-ancho` y
-`gestor-ajustes-categoria`. **El tablón no se recuerda**: nace desplegado siempre, a propósito.
+Aparte, en `localStorage`: `gestor-barra`, `gestor-filtros`, `gestor-lector-ancho`,
+`gestor-ajustes-categoria`, y `gestor-ruta-abiertos`/`gestor-ruta-archivo` (fila 98: la ruta de
+las dos carpetas en ese ordenador, para el botón «Ruta»). **El tablón no se recuerda**: nace desplegado siempre, a propósito.
 
 ### Avisos técnicos ("ojo con...")
 
