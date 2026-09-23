@@ -122,7 +122,14 @@ como **copia**.
   usa el nombre de siempre. Se escribe en la sección "Datos del tipo" de `js/ajustes-tipo.js`, con
   aviso (ámbar si pasa de 16 caracteres; rojo si otro tipo ya lo usa, por `U.parecidos`).
   `Nombres.leer` reconoce también el nombre corto en una carpeta ya creada (no es un alias: es el
-  nombre que se usa desde ahora). Cambiarlo no toca ninguna carpeta ya creada.
+  nombre que se usa desde ahora). Cambiarlo no toca ninguna carpeta ya creada. Desde la fila 97
+  (`docs/NOMBRE-CORTO-EN-LOS-FILTROS.md`) es también lo que se **enseña** en las tarjetas de filtro
+  «Por tipo de asunto» y en la etiqueta del tipo de cada tarjeta de asunto (abierto y archivado),
+  con el largo en el `title`: `Nombres.tipoParaVer(nombreTipo, tipos)`. Se sigue agrupando y
+  filtrando por el nombre de verdad (dos tipos con el mismo corto, dos tarjetas). El buscador
+  encuentra por los dos (`Nombres.nombresDeTipo`): en abiertos, dentro de `busca`; en el ARCHIVO,
+  `IndiceArchivo.textoDeBusqueda` los resuelve al buscar desde `App.E.tipos`, sin subir la
+  `VERSION` del índice. Prueba: `pruebas/nombre-corto-en-los-filtros.mjs`.
 - **Formularios oficiales** (20-sep-2026, fila 82, `docs/FORMULARIOS-OFICIALES.md`): campo
   `formularios`, lista de claves del catálogo (ver la sección de más abajo). Mismo criterio que
   normativa: solo en el paso de arriba, nunca en una opción; se copia igual, sin cambios, a los

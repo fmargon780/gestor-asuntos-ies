@@ -26,11 +26,14 @@ App.verAbiertos = async function (yaLeido) {
          docs/BUSCAR-EN-LAS-NOTAS.md): buscaSinNotas se queda aparte
          para saber, al buscar, si una palabra solo aparece por una
          nota (y entonces enseñar el trocito de la nota, punto 2.3). */
-      var buscaSinNotas = U.normalizar(c.nombre);
+      /* Los dos nombres del tipo, el largo y el corto (fila 97): la
+         carpeta solo lleva uno de los dos. */
+      var buscaSinNotas = U.normalizar(c.nombre + ' ' +
+        (leido.tipo ? Nombres.nombresDeTipo(leido.tipo, App.E.tipos).join(' ') : ''));
       var notasTexto = window.Notas ? Notas.textoParaBuscar(ficha) : '';
       return { nombre: c.nombre, handle: c.handle, leido: leido, ficha: ficha,
                buscaSinNotas: buscaSinNotas, notasTexto: notasTexto,
-               busca: U.normalizar(c.nombre + ' ' + notasTexto) };
+               busca: buscaSinNotas + ' ' + U.normalizar(notasTexto) };
     });
 
   App.E.sueltos = hay.ficheros.filter(function (f) { return App.esDocumentoDeTrabajo(f.nombre); });
@@ -396,7 +399,9 @@ App.pintarGruposTipo = function (lista) {
 
   caja.appendChild(App.tarjetaDeTipo('', 'Todos', lista.length, 0));
   grupos.forEach(function (g) {
-    caja.appendChild(App.tarjetaDeTipo(g.tipo, g.tipo, g.cuantos, g.vencidos));
+    /* Se enseña el nombre corto; se agrupa y filtra por el de verdad
+       (fila 97): dos tipos con el mismo corto siguen siendo dos tarjetas. */
+    caja.appendChild(App.tarjetaDeTipo(g.tipo, Nombres.tipoParaVer(g.tipo, App.E.tipos), g.cuantos, g.vencidos));
   });
 };
 
@@ -567,7 +572,8 @@ App.tarjetaAsunto = function (a, modo) {
   div.innerHTML = App.ICONO_CARPETA +
     '<div class="tarjeta-texto">' +
       '<div class="tarjeta-nombre">' +
-        (a.leido.tipo ? '<span class="marca-tipo">' + U.escapar(a.leido.tipo) + '</span>' : '') +
+        (a.leido.tipo ? '<span class="marca-tipo" title="' + U.escapar(a.leido.tipo) + '">' +
+                        U.escapar(Nombres.tipoParaVer(a.leido.tipo, App.E.tipos)) + '</span>' : '') +
         (situacion ? '<span class="marca-estado ' + App.colorEstado(situacion) + '">' +
                      U.escapar(situacion) + '</span>' : '') +
         (p ? '<span class="marca-plazo ' + p.clase + '">' + U.escapar(p.texto) + '</span>' : '') +
