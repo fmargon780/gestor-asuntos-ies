@@ -234,8 +234,11 @@ var Formularios = (function () {
     var deHitos = [];
     if (window.Hitos && asunto && asunto.nombre) {
       try {
+        /* Hitos.hitosDe(clave) es async y no recibe los datos: los
+           formularios de los hitos no salían nunca (fila 101). */
         var datos = await Hitos.leer();
-        var lista = Hitos.hitosDe(datos, asunto.nombre);
+        var entrada = datos && datos.porAsunto && datos.porAsunto[asunto.nombre];
+        var lista = entrada ? entrada.hitos : [];
         Hitos.visibles(lista).forEach(function (h) {
           (h.formularios || []).forEach(function (c) { deHitos.push(c); });
         });
@@ -259,6 +262,7 @@ var Formularios = (function () {
     var fila = document.getElementById('ficha-formularios-fila');
     var valor = document.getElementById('ficha-formularios-valor');
     if (!fila || !valor) return;
+    fila.dataset.pintada = '1';
     await cargar();
     var claves = await clavesDelAsunto(asunto);
     if (!claves.length) { fila.classList.add('oculto'); valor.innerHTML = ''; return; }
@@ -288,8 +292,13 @@ var Formularios = (function () {
     if (!nueva) return;
     var pantalla = document.getElementById('pantalla-asunto');
     if (pantalla && window.MutationObserver) {
-      new MutationObserver(function () { if (asuntoActualEnFicha) pintarEnFicha(asuntoActualEnFicha); })
-        .observe(pantalla, { childList: true, subtree: true });
+      /* Solo cuando la fila es nueva (la ficha se ha rehecho entera),
+         no en cada cambio de la pantalla (fila 101,
+         docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md): leía hitos.json cada vez. */
+      new MutationObserver(function () {
+        var fila = document.getElementById('ficha-formularios-fila');
+        if (asuntoActualEnFicha && fila && !fila.dataset.pintada) pintarEnFicha(asuntoActualEnFicha);
+      }).observe(pantalla, { childList: true, subtree: true });
     }
   })();
 

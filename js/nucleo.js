@@ -560,7 +560,14 @@ App.ir = function (cual) {
   Array.prototype.forEach.call(document.querySelectorAll('.pestana'), function (b) {
     b.classList.toggle('activa', b.dataset.pantalla === cual);
   });
+  if (cual === 'abiertos' && App.pintarAbiertosSiPendiente) App.pintarAbiertosSiPendiente();
   if (cual === 'nuevo') App.prepararNuevo();
-  if (cual === 'ajustes') App.pintarAjustes();
+  if (cual === 'ajustes') {
+    App.pintarAjustes();
+    /* Los bloques de Ajustes que pintan los módulos (biblioteca, hitos…)
+       ya no se repintan con la lista si Ajustes no se ve (fila 101):
+       se les avisa al entrar. */
+    if (App.avisarALosModulos) App.avisarALosModulos();
+  }
   if (cual === 'personas') App.pintarPersonas();
 };

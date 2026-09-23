@@ -150,8 +150,12 @@ var Presencia = (function () {
     if (!vigilando || vigilando.clave !== clave) return;   /* se ha cambiado de ficha mientras leíamos */
 
     if (ocupante) {
+      /* Solo se avisa cuando cambia algo (fila 101): antes se avisaba
+         cada 10 s, y la ficha pintaba el aviso otra vez encima. */
+      var yaEra = vigilando.modo === 'consulta' && vigilando.usuarioConsulta === ocupante.usuario;
       vigilando.modo = 'consulta';
-      vigilando.onCambio({ modo: 'consulta', usuario: ocupante.usuario });
+      vigilando.usuarioConsulta = ocupante.usuario;
+      if (!yaEra) vigilando.onCambio({ modo: 'consulta', usuario: ocupante.usuario });
       return;
     }
 

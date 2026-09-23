@@ -69,6 +69,31 @@
     });
   };
 
+  /* Las marcas de arriba (tipo y quién lo pide). */
+  function marcasDeFicha(a, tipo) {
+    return (tipo ? '<span class="marca-tipo">' + U.escapar(tipo) + '</span>' : '') +
+      (a.ficha.loPide && a.ficha.loPide.nombre
+        ? '<span class="marca-lopide">Lo pide: ' + U.escapar(a.ficha.loPide.nombre) + '</span>' : '');
+  }
+
+  /* Tras cambiar el estado, el plazo, la vía o el encargo, se repinta
+     solo la barra de acciones (y las marcas), no la ficha entera, y se
+     pone al día la huella sin leer el disco: si no, el siguiente
+     vistazo a la carpeta vería la ficha "cambiada" y la rehacía de
+     golpe (fila 101, docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md). `clave`
+     (opcional): solo si la ficha abierta es la de ese asunto. */
+  App.repintarAccionesFicha = function (clave) {
+    if (!fichaVisible()) return;
+    if (clave && actual.nombre !== clave) return;
+    var a = actual;
+    var fresca = App.E.registro && App.E.registro.asuntos && App.E.registro.asuntos[a.nombre];
+    if (fresca) a.ficha = fresca;
+    var marcas = document.querySelector('#ficha-asunto-cuerpo .ficha-marcas');
+    if (marcas) marcas.innerHTML = marcasDeFicha(a, tipoDe(a));
+    pintarAcciones(a, modoActual === 'abierto');
+    if (huellaPintada) huellaPintada.ficha = huellaFichaSin(a, ultimaListaFicheros);
+  };
+
   function volverALaLista() {
     actual = null;
     if (window.Presencia) Presencia.dejarDeVigilar();
@@ -120,13 +145,23 @@
      nota de hito a medio escribir. Con las dos mitades separadas, un
      cambio de hitos se le pide al panel de hitos, que ya sabe
      conservar lo suyo. */
+  /* Lo último que se leyó de la carpeta de la ficha, para poder poner
+     la huella al día sin volver al disco (App.repintarAccionesFicha). */
+  var ultimaListaFicheros = '';
+
+  function huellaFichaSin(a, listaFicheros) {
+    return [a.nombre, JSON.stringify(a.leido || {}), JSON.stringify(a.ficha || {}), listaFicheros].join('\n');
+  }
+
   async function huellaDe(a) {
     if (!a) return { ficha: '', hitos: '' };
-    var trozos = [a.nombre, JSON.stringify(a.leido || {}), JSON.stringify(a.ficha || {})];
+    var lista;
     try {
       var ficheros = await Carpetas.ficheros(a.handle);
-      trozos.push(ficheros.map(function (f) { return f.nombre; }).join('|'));
-    } catch (e) { trozos.push('carpeta-ilegible'); }
+      lista = ficheros.map(function (f) { return f.nombre; }).join('|');
+    } catch (e) { lista = 'carpeta-ilegible'; }
+    if (a === actual) ultimaListaFicheros = lista;
+    var trozos = [huellaFichaSin(a, lista)];
 
     var hitos;
     try {
@@ -272,16 +307,17 @@
            '</section>';
   }
 
-  function filasHtml(buenas) {
-    /* `id`: js/formularios.js (fila 82) cuelga ahí su propia fila
-       "Formularios", async, solo cuando de verdad hay alguno. Nunca se
-       pinta un hueco vacío aquí: eso rompería el recuento exacto de
-       `.ficha-dato` de pruebas/ficha-disposicion.mjs cuando el asunto
-       no tiene ninguno. */
+  /* `extra` (fila 101): la fila «Formularios» oculta que rellena
+     js/formularios.js; antes este segundo parámetro se ignoraba y la
+     fila no salía nunca. */
+  function filasHtml(buenas, extra) {
+    /* `id`: js/formularios.js (fila 82) rellena ahí su propia fila
+       "Formularios", async, y solo la enseña cuando de verdad hay
+       alguno: nace oculta (`extra`). */
     return '<div class="ficha-datos" id="ficha-datos-tramite">' + buenas.map(function (f) {
       return '<div class="ficha-dato"><span>' + U.escapar(f.titulo) + '</span>' +
              '<span>' + U.escapar(f.valor) + '</span></div>';
-    }).join('') + '</div>';
+    }).join('') + (extra || '') + '</div>';
   }
 
   /* La línea gris bajo el nombre (18-sep-2026, fila 51,
@@ -335,11 +371,7 @@
           '<button type="button" class="boton" id="ficha-volver">← Volver a la lista</button>' +
           '<div id="ficha-volver-origen"></div>' +
         '</div>' +
-        '<div class="ficha-marcas">' +
-          (tipo ? '<span class="marca-tipo">' + U.escapar(tipo) + '</span>' : '') +
-          (a.ficha.loPide && a.ficha.loPide.nombre
-            ? '<span class="marca-lopide">Lo pide: ' + U.escapar(a.ficha.loPide.nombre) + '</span>' : '') +
-        '</div>' +
+        '<div class="ficha-marcas">' + marcasDeFicha(a, tipo) + '</div>' +
         '<h2 class="ficha-nombre"><span class="ficha-nombre-texto">' + U.escapar(a.nombre) + '</span></h2>' +
         subtituloDeFicha(a) +
       '</header>' +
@@ -417,6 +449,7 @@
     if (!ocupacionActual) { caja.className = 'oculto'; caja.innerHTML = ''; return; }
 
     caja.className = 'aviso aviso-ambar aviso-presencia';
+    caja.innerHTML = '';   /* se vacía antes: si no, el aviso salía repetido (fila 101) */
     var texto = document.createElement('div');
     texto.innerHTML = '<strong>' + U.escapar(ocupacionActual.usuario) + ' está en este asunto ahora ' +
       'mismo.</strong> Estás mirando, no puedes modificar.';
@@ -612,6 +645,7 @@
     if (!caja || !window.Relacionados) return;
     window.Relacionados.pintarEnFicha(caja, a, abierto, function () {
       pintarRelacionados(a, abierto);
+      App.repintarAccionesFicha(a.nombre);
     });
   }
 
@@ -789,7 +823,7 @@
         }).join('');
       sel.onchange = async function () {
         try { await U.mientrasGuarda(sel, function () { return App.ponerEstado(a, sel.value); }); }
-        finally { pintar(); }
+        finally { App.repintarAccionesFicha(); }
       };
       caja.appendChild(sel);
 
@@ -800,7 +834,7 @@
       bplazo.textContent = et.texto;
       bplazo.title = 'Poner o cambiar la fecha límite';
       bplazo.onclick = async function (ev) {
-        try { await App.editarPlazo(a, ev.currentTarget); } finally { pintar(); }
+        try { await App.editarPlazo(a, ev.currentTarget); } finally { App.repintarAccionesFicha(); }
       };
       caja.appendChild(bplazo);
 
@@ -811,7 +845,7 @@
         envoltorioEncargo.appendChild(boton('El encargo',
           'Quién ha pedido esta gestión, por qué vía y en qué fecha',
           async function (ev) {
-            try { await abrirLoPide(a, ev.currentTarget); } finally { pintar(); }
+            try { await abrirLoPide(a, ev.currentTarget); } finally { App.repintarAccionesFicha(); }
           }, tieneEncargo));
         var resumen = resumenDelEncargo(a);
         if (resumen) {

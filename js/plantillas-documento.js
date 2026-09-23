@@ -79,7 +79,7 @@
   async function plantillasDelAsunto(a) {
     if (!App.E.gestor) return [];
     var datos = null;
-    try { datos = await Plantillas.cargar(App.E.gestor); } catch (e) { datos = null; }
+    try { datos = await Plantillas.cargarReciente(App.E.gestor, 60000); } catch (e) { datos = null; }
     if (!datos) return [];
     return Plantillas.documentosDeTipo(datos, categoriaDelAsunto(a), tipoDelAsunto(a));
   }
@@ -254,8 +254,14 @@
 
     var pantalla = $('pantalla-asunto');
     if (pantalla && window.MutationObserver) {
-      new MutationObserver(function () { if (actual) ponerBoton(actual); })
-        .observe(pantalla, { childList: true, subtree: true });
+      /* Con un pequeño retraso (fila 101): una tanda de cambios de la
+         ficha es una sola pasada, no una por cada nodo. */
+      var pendiente = null;
+      new MutationObserver(function () {
+        if (!actual) return;
+        if (pendiente) clearTimeout(pendiente);
+        pendiente = setTimeout(function () { pendiente = null; if (actual) ponerBoton(actual); }, 150);
+      }).observe(pantalla, { childList: true, subtree: true });
     }
   })();
 

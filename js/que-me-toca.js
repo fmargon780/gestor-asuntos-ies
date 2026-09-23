@@ -442,7 +442,16 @@
   (function () {
     function enganchar() {
       if (!window.Gestor) return;
+      /* La cuenta de vencidos no relee hitos.json en cada repintado de
+         la lista (fila 101): solo si este ordenador ha cambiado algún
+         hito desde la última cuenta, o si han pasado dos minutos (lo
+         que haya tocado el otro ordenador). */
+      var ultimaCuenta = 0;
       window.Gestor.alRefrescar.push(function () {
+        var ahora = Date.now();
+        var cambio = window.Hitos && Hitos.ultimoCambioLocal ? Hitos.ultimoCambioLocal() : ahora;
+        if (ultimaCuenta && cambio < ultimaCuenta && ahora - ultimaCuenta < 2 * 60 * 1000) return;
+        ultimaCuenta = ahora;
         reunir().then(function (d) { pintarCuenta(d.items); }).catch(function () {});
       });
     }

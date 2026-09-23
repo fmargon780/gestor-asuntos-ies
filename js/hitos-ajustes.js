@@ -196,7 +196,11 @@
 
   function enganchar() {
     if (!window.Gestor) return;
+    /* Solo con Ajustes a la vista (fila 101): si no, cada repintado de
+       la lista releía hitos.json para nada. Al abrir Ajustes ya se pinta. */
     window.Gestor.alRefrescar.push(function () {
+      var p = document.getElementById('pantalla-ajustes');
+      if (p && p.classList.contains('oculto')) return;
       if (window.Gestor.carpetaGestor()) pintar();
     });
   }

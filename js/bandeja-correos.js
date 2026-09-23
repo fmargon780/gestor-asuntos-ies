@@ -1273,9 +1273,14 @@
   function enganchar() {
     if (enganchado || !window.Gestor) return;
     enganchado = true;
+    /* Los envíos, como mucho una vez por minuto (fila 101): antes se
+       releía envios.json en cada repintado de la lista. */
+    var ultimosEnvios = 0;
     window.Gestor.alRefrescar.push(function () {
       if (!arrancado) { arrancar(); return; }
       mirar(false);
+      if (Date.now() - ultimosEnvios < 60 * 1000) return;
+      ultimosEnvios = Date.now();
       revisarEnvios(false);
     });
   }

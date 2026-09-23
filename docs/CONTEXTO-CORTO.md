@@ -131,8 +131,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Al archivar, la ficha del asunto baja a su propia carpeta (no se queda en `asuntos.json` para
   siempre); al reabrir, vuelve. Botón "Poner en orden las fichas del ARCHIVO" en Ajustes →
   Mantenimiento para los archivados de antes.
-- Ficha del asunto: foto del contacto del tercero al crearla; si sale del CSV, la sigue enseñando
-  con aviso de fecha. Botón para rellenar los asuntos de antes.
+- Ficha del asunto: foto del contacto del tercero, que se sigue viendo si sale del CSV.
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -148,6 +147,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Principal y accesorio por separado: rojo si falla lo principal (`U.fallo`), verde si sale, ámbar
   si falla algo de después (`U.accesorio`); siempre `U.mensajeDeError`. `U.mientrasGuarda` solo
   alrededor de la escritura.
+- Tras guardar se repinta solo lo que ha cambiado y está a la vista; todo repintado asíncrono
+  lleva contador de turno (el último gana).
 - Un bloque que se repinta solo nunca puede tirar lo que se está escribiendo, ni el foco, ni el
   cursor: envolver el repintado en `U.conservandoLoEscrito(raiz, fn)`.
 - Al terminar una instrucción de la cola: actualizar este documento y `CONTEXTO.md`

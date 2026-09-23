@@ -385,7 +385,10 @@ var GuiasBiblioteca = (function () {
   (function enganchar() {
     function hacerlo() {
       if (!window.Gestor) return;
-      window.Gestor.alRefrescar.push(function () { if (window.Gestor.carpetaGestor()) pintarAjustes(); });
+      window.Gestor.alRefrescar.push(function () {
+        if (App.pantallaALaVista && !App.pantallaALaVista('ajustes')) return;   /* fila 101 */
+        if (window.Gestor.carpetaGestor()) pintarAjustes();
+      });
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hacerlo);
     else hacerlo();
