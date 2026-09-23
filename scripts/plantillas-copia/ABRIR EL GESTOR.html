@@ -53,6 +53,7 @@
       <p>Este fichero instala la aplicación en <strong>esta misma carpeta</strong>: la que ya tiene
          "ABRIR EL GESTOR.html" dentro. Al pulsar el botón, Chrome te pedirá elegir una carpeta:
          elige <strong>esta misma</strong> (donde está este fichero).</p>
+      <p id="texto-carpeta-mala" style="color: var(--rojo-linea)"></p>
       <button type="button" class="boton boton-principal" id="btn-empezar">Empezar</button>
     </div>
 
@@ -89,9 +90,17 @@
      `js/almacen.js` (`Almacen`): así lo que este fichero guarda lo
      puede releer luego `js/actualizar-copia.js`, ya dentro de la
      aplicación, sin duplicar nada más que ese primer guardado.
+
+     23-sep-2026 (fila 91, docs/COPIA-SE-ACTUALIZA.md): guarda SIEMPRE
+     la carpeta (antes solo la primera vez, y en otro ordenador la copia
+     no se actualizaba nunca), y si la carpeta ya tiene la aplicación,
+     la pone al día antes de abrirla. Así, volver a guardar este fichero
+     y abrirlo una vez rescata una copia que se ha quedado vieja.
      ============================================================ */
 
-  var BASE_REMOTO = 'https://raw.githubusercontent.com/fmargon780/gestor-asuntos-copia/main/';
+  /* `window.__COPIA_BASE_REMOTO__`: solo para las pruebas
+     (pruebas/copia-sin-internet.mjs). En producción nunca está puesto. */
+  var BASE_REMOTO = window.__COPIA_BASE_REMOTO__ || 'https://raw.githubusercontent.com/fmargon780/gestor-asuntos-copia/main/';
   var BASE_DATOS = 'gestor-asuntos';
   var ALMACEN = 'ajustes';
   var CLAVE_CARPETA = 'copiaCarpeta';
@@ -158,6 +167,37 @@
     catch (e) { return false; }
   }
 
+  async function borrarRuta(dirRaiz, ruta) {
+    var partes = ruta.split('/');
+    var dir = dirRaiz;
+    try {
+      for (var i = 0; i < partes.length - 1; i++) dir = await dir.getDirectoryHandle(partes[i]);
+      await dir.removeEntry(partes[partes.length - 1]);
+    } catch (e) { /* ya no está: no pasa nada */ }
+  }
+
+  async function leerVersionLocal(dir) {
+    try {
+      var f = await (await dir.getFileHandle('version.json')).getFile();
+      var datos = JSON.parse(await f.text());
+      return (datos && typeof datos === 'object') ? datos : null;
+    } catch (e) { return null; }
+  }
+
+  /* La carpeta buena: vacía, o con la aplicación, o con este mismo
+     fichero dentro (su nombre empieza por "ABRIR EL GESTOR"). */
+  async function esCarpetaBuena(dir) {
+    var vacia = true;
+    try {
+      for await (var par of dir.entries()) {
+        vacia = false;
+        var nombre = par[0];
+        if (nombre === 'index.html' || nombre.indexOf('ABRIR EL GESTOR') === 0) return true;
+      }
+    } catch (e) { return true; }   /* sin poder mirar dentro, no se bloquea */
+    return vacia;
+  }
+
   async function sha256Hex(bytes) {
     var buffer = await crypto.subtle.digest('SHA-256', bytes);
     var vista = new Uint8Array(buffer);
@@ -185,15 +225,22 @@
     $('texto-error').textContent = mensaje;
   }
 
-  /* ---------- instalar ---------- */
+  /* ---------- instalar o poner al día ---------- */
 
+  /* El mismo algoritmo que js/actualizar-copia.js: solo se descargan
+     los ficheros cuyo sha256 no coincide con el `version.json` del
+     disco (en una carpeta nueva, todos), se comprueba cada uno, se
+     borran los que sobran y `version.json` va el último. */
   async function instalarEn(dir) {
-    progreso('Descargando la lista de ficheros…', 0, 1);
+    progreso('Buscando la versión nueva…', 0, 1);
     var resp = await fetch(BASE_REMOTO + 'version.json', { cache: 'no-store' });
     if (!resp.ok) throw new Error('No encuentro la copia en internet (' + resp.status + '). ¿Hay conexión?');
     var version = await resp.json();
-    var rutas = Object.keys(version.ficheros || {});
-    if (!rutas.length) throw new Error('La lista de ficheros de la copia está vacía.');
+    if (!Object.keys(version.ficheros || {}).length) throw new Error('La lista de ficheros de la copia está vacía.');
+    var local = await leerVersionLocal(dir);
+    var rutas = Object.keys(version.ficheros).filter(function (ruta) {
+      return !local || !local.ficheros || local.ficheros[ruta] !== version.ficheros[ruta];
+    });
 
     for (var i = 0; i < rutas.length; i++) {
       var ruta = rutas[i];
@@ -204,6 +251,11 @@
       var sha = await sha256Hex(bytes);
       if (sha !== version.ficheros[ruta]) throw new Error('"' + ruta + '" ha llegado dañado (el sha256 no coincide). Vuelve a intentarlo.');
       await escribirEnRuta(dir, ruta, bytes);
+    }
+    if (local && local.ficheros) {
+      for (var vieja in local.ficheros) {
+        if (!(vieja in version.ficheros)) await borrarRuta(dir, vieja);
+      }
     }
     /* version.json el último, para que un corte a medias se note. */
     await escribirEnRuta(dir, 'version.json', new TextEncoder().encode(JSON.stringify(version)));
@@ -225,9 +277,17 @@
       };
       return;
     }
-    if (await existeIndexHtml(dir)) { await irAIndex(); return; }
+    /* Siempre, también si ya estaba instalada: así js/actualizar-copia.js
+       la encuentra en cualquier ordenador donde se haya abierto esto. */
+    try { await guardarEnAlmacen(CLAVE_CARPETA, dir); } catch (e) { /* se pedirá otra vez */ }
+    if (await existeIndexHtml(dir)) {
+      /* Ya instalada: se pone al día antes de abrirla. Si falla (sin
+         internet), se abre igual con lo que haya. */
+      try { await instalarEn(dir); } catch (e) { /* se abre igual */ }
+      await irAIndex();
+      return;
+    }
     try {
-      await guardarEnAlmacen(CLAVE_CARPETA, dir);
       await instalarEn(dir);
       await irAIndex();
     } catch (e) {
@@ -249,6 +309,12 @@
     }
     try {
       var dir = await window.showDirectoryPicker({ mode: 'readwrite', id: 'gestor-copia' });
+      if (!(await esCarpetaBuena(dir))) {
+        mostrar('paso-inicial');
+        $('texto-carpeta-mala').textContent = 'Esa no parece la carpeta donde guardaste este fichero. Pulsa «Empezar» otra vez y elige la que tiene «ABRIR EL GESTOR.html».';
+        return;
+      }
+      $('texto-carpeta-mala').textContent = '';
       await continuarConCarpeta(dir);
     } catch (e) {
       if (e && e.name === 'AbortError') return;

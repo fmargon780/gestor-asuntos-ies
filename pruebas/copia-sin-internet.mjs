@@ -9,14 +9,20 @@
       formularios sale, un PDF de `formularios/` se abre con pdf.js
       (como hace el lector) y un `.docx` de `plantillas/` se lee.
       Se lee "copia sin internet" junto a la versión.
-   2. `js/actualizar-copia.js`, con un `version.json` viejo de mentira
-      y un servidor HTTP local que hace de `raw.githubusercontent.com`:
-      descarga solo lo que cambia y recarga; con el servidor apagado,
-      arranca igual con el aviso discreto. */
+   2. `js/actualizar-copia.js` y `ABRIR EL GESTOR.html` (fila 91,
+      docs/COPIA-SE-ACTUALIZA.md), sobre copias de verdad de
+      `copia-local/` en una carpeta temporal y un servidor HTTP local
+      que hace de `raw.githubusercontent.com` con una versión nueva:
+      al día (ni franja ni permiso), con carpeta y permiso (sola), sin
+      carpeta y sin permiso (la franja y «Actualizar ahora»), carpeta
+      equivocada (sin bucle), servidor apagado (aviso discreto) y el
+      instalador sobre una copia vieja (la rescata). */
 import { spawnSync } from 'node:child_process';
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
-import { existsSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 
@@ -37,6 +43,23 @@ console.log('--- generando copia-local/ ---');
 const generacion = spawnSync(process.execPath, [RAIZ + 'scripts/copia-local.mjs'], { stdio: 'inherit' });
 if (generacion.status !== 0) { console.log('FALLA  no se ha podido generar copia-local/'); process.exit(1); }
 if (!existsSync(COPIA_LOCAL + 'index.html')) { console.log('FALLA  copia-local/index.html no existe tras generar'); process.exit(1); }
+
+/* Un servidor HTTP que hace de raw.githubusercontent.com: CORS
+   abierto, para que una página `file://` (origen "null") pueda leerlo
+   con `fetch`. */
+function arrancarServidor(ficheros) {
+  const servidor = createServer((req, res) => {
+    const ruta = decodeURIComponent(req.url.split('?')[0].replace(/^\//, ''));
+    if (Object.prototype.hasOwnProperty.call(ficheros, ruta)) {
+      res.writeHead(200, { 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': '*' });
+      res.end(ficheros[ruta]);
+    } else {
+      res.writeHead(404, { 'access-control-allow-origin': '*' }); res.end('no está');
+    }
+  });
+  return new Promise((resolver) => servidor.listen(0, '127.0.0.1', () => resolver(servidor)));
+}
+function baseDe(servidor) { return 'http://127.0.0.1:' + servidor.address().port + '/'; }
 
 const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 
@@ -128,6 +151,10 @@ function scriptDeDiscoDeMentira() {
   pagina.on('console', (m) => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
   pagina.on('pageerror', (e) => errores.push('EXCEPCIÓN: ' + e.message));
   await pagina.addInitScript(scriptDeDiscoDeMentira());
+  /* Un servidor que dice "estás al día": sin él, la copia saldría a
+     internet a mirar la versión (fila 91: lo hace siempre, lo primero). */
+  const servidorAlDia = await arrancarServidor({ 'version.json': readFileSync(COPIA_LOCAL + 'version.json', 'utf8') });
+  await pagina.addInitScript(`window.__COPIA_BASE_REMOTO__ = ${JSON.stringify(baseDe(servidorAlDia))};`);
   await pagina.goto('file://' + COPIA_LOCAL + 'index.html');
 
   await comprobarAsync('el aviso de navegador no sale', pagina.locator('#aviso-navegador').isHidden(), true);
@@ -184,115 +211,127 @@ function scriptDeDiscoDeMentira() {
 
   await comprobarAsync('sin errores de consola (parte 1)', Promise.resolve(errores), []);
   await pagina.close();
+  servidorAlDia.close();
 }
 
 /* ============================================================
-   PARTE 2: js/actualizar-copia.js, con un servidor de mentira
+   PARTE 2: la copia se actualiza de verdad (fila 91)
    ============================================================ */
 
-function sha256Hex(texto) { return createHash('sha256').update(texto).digest('hex'); }
+function sha256Hex(bytes) { return createHash('sha256').update(bytes).digest('hex'); }
 
-const FICHERO_VIEJO = 'console.log("viejo");\n';
-const FICHERO_NUEVO = 'console.log("nuevo, de verdad");\n';
-const VERSION_VIEJA = { version: 'vieja', ficheros: { 'js/algo.js': sha256Hex(FICHERO_VIEJO), 'index.html': sha256Hex('<html>viejo</html>') } };
-const VERSION_NUEVA = { version: 'nueva', ficheros: { 'js/algo.js': sha256Hex(FICHERO_NUEVO), 'index.html': sha256Hex('<html>viejo</html>') } };
+const VERSION_LOCAL = JSON.parse(readFileSync(COPIA_LOCAL + 'version.json', 'utf8'));
+const VERSION_NUEVA_TEXTO = 'nueva-prueba';
+const VERSION_JS_NUEVO = readFileSync(COPIA_LOCAL + 'js/version.js', 'utf8')
+  .replace(/App\.VERSION\s*=\s*'[^']+'/, "App.VERSION = '" + VERSION_NUEVA_TEXTO + "'");
+const VERSION_REMOTA = {
+  version: VERSION_NUEVA_TEXTO,
+  ficheros: Object.assign({}, VERSION_LOCAL.ficheros, { 'js/version.js': sha256Hex(VERSION_JS_NUEVO) })
+};
+const FICHEROS_REMOTOS = { 'version.json': JSON.stringify(VERSION_REMOTA), 'js/version.js': VERSION_JS_NUEVO };
 
-function arrancarServidorDeMentira() {
-  const ficheros = { 'version.json': JSON.stringify(VERSION_NUEVA), 'js/algo.js': FICHERO_NUEVO, 'index.html': '<html>viejo</html>' };
-  const servidor = createServer((req, res) => {
-    const ruta = decodeURIComponent(req.url.replace(/^\//, ''));
-    /* Como raw.githubusercontent.com de verdad: CORS abierto, para que
-       una página `file://` (origen "null") pueda leerlo con `fetch`. */
-    if (Object.prototype.hasOwnProperty.call(ficheros, ruta)) {
-      res.writeHead(200, { 'content-type': 'text/plain', 'access-control-allow-origin': '*' });
-      res.end(ficheros[ruta]);
-    } else {
-      res.writeHead(404, { 'access-control-allow-origin': '*' }); res.end('no está');
-    }
-  });
-  return new Promise((resolver) => servidor.listen(0, '127.0.0.1', () => resolver(servidor)));
+/* Las carpetas de la prueba son carpetas de verdad, en una temporal:
+   así, tras escribir y recargar, la página abre de verdad lo escrito. */
+const TEMPORAL = mkdtempSync(join(tmpdir(), 'copia-prueba-'));
+function nuevaCopia(nombre) { const d = join(TEMPORAL, nombre); cpSync(COPIA_LOCAL, d, { recursive: true }); return d; }
+function carpetaVacia(nombre, ficheros) {
+  const d = join(TEMPORAL, nombre); mkdirSync(d, { recursive: true });
+  for (const f of ficheros || []) writeFileSync(join(d, f), 'x');
+  return d;
 }
 
-/* El disco de mentira vive en ESTE proceso Node (no dentro de la
-   página): `js/actualizar-copia.js` hace `location.reload()` cuando
-   actualiza, y una página nueva no se acuerda de nada que solo
-   viviera en su propio `window` — un `addInitScript` normal, que se
-   vuelve a ejecutar en cada navegación, recrearía el disco desde cero
-   y "olvidaría" lo que se acaba de escribir. `page.exposeFunction`
-   sí sobrevive a la recarga: por eso el `dir`/`fich` de mentira que ve
-   la página solo llama a `window.__disco(...)`, y quien de verdad
-   guarda los bytes es el `Map` de aquí abajo. */
-function nuevoDiscoDeMentira(ficherosIniciales) {
-  const contenidos = new Map(Object.entries(ficherosIniciales));   /* ruta -> texto */
-  const carpetas = new Set(['']);   /* '' es la raíz; una ruta está en `carpetas` si es un directorio */
-  for (const ruta of contenidos.keys()) {
-    const partes = ruta.split('/');
-    for (let i = 1; i < partes.length; i++) carpetas.add(partes.slice(0, i).join('/'));
+/* La página no puede tocar el disco de verdad: su `dir`/`fich` de
+   mentira llama a `window.__disco(...)` (con `page.exposeFunction`, que
+   sobrevive a las recargas) y quien lee y escribe es este proceso Node.
+   IndexedDB igual: `window.__idb(...)`, porque una carpeta guardada
+   tiene que seguir ahí tras `location.reload()`. */
+function nuevoEntorno({ guardada, permiso }) {
+  const estado = {
+    idb: new Map(guardada ? [['copiaCarpeta', { raiz: guardada }]] : []),
+    permiso: permiso || 'granted',
+    consultas: 0, peticiones: 0,
+    escritos: [],
+    elegir: []   /* lo que irá devolviendo el selector de carpetas, en orden */
+  };
+  function ruta(raiz, r) { return join(TEMPORAL, raiz, r || ''); }
+  async function disco(raiz, accion, r, datos) {
+    const abs = ruta(raiz, r);
+    if (accion === 'permiso') { estado.consultas++; return estado.permiso; }
+    if (accion === 'pedirPermiso') { estado.peticiones++; estado.permiso = 'granted'; return 'granted'; }
+    if (accion === 'existeDir') return existsSync(abs) && statSync(abs).isDirectory();
+    if (accion === 'existeArchivo') return existsSync(abs) && statSync(abs).isFile();
+    if (accion === 'crearDir') { mkdirSync(abs, { recursive: true }); return true; }
+    if (accion === 'leer') return existsSync(abs) ? readFileSync(abs, 'utf8') : null;
+    if (accion === 'escribir') { mkdirSync(dirname(abs), { recursive: true }); writeFileSync(abs, Buffer.from(datos || [])); estado.escritos.push(raiz + '/' + r); return true; }
+    if (accion === 'borrar') { rmSync(abs, { force: true }); return true; }
+    if (accion === 'listar') return readdirSync(abs, { withFileTypes: true }).map((e) => [e.name, e.isDirectory() ? 'directory' : 'file']);
+    throw new Error('acción desconocida: ' + accion);
   }
-  async function operar(accion, ruta, datos) {
-    if (accion === 'existeDir') return carpetas.has(ruta);
-    if (accion === 'existeArchivo') return contenidos.has(ruta);
-    if (accion === 'crearDir') { carpetas.add(ruta); return true; }
-    if (accion === 'leer') return contenidos.has(ruta) ? contenidos.get(ruta) : null;
-    if (accion === 'escribir') { contenidos.set(ruta, datos); return true; }
-    if (accion === 'borrar') { contenidos.delete(ruta); return true; }
-    throw new Error('acción de disco de mentira desconocida: ' + accion);
+  async function idb(accion, clave, valor) {
+    if (accion === 'get') return estado.idb.has(clave) ? estado.idb.get(clave) : null;
+    if (accion === 'put') { estado.idb.set(clave, valor); return true; }
+    if (accion === 'delete') { estado.idb.delete(clave); return true; }
+    if (accion === 'elegir') return estado.elegir.length ? estado.elegir.shift() : null;
+    throw new Error('acción desconocida: ' + accion);
   }
-  return { operar, contenidos };
+  return { estado, disco, idb };
 }
 
-/* El `dir`/`fich` que ve la página: delega todo en `window.__disco`
-   (instalada con `page.exposeFunction`, ver más arriba). */
-const SCRIPT_CARPETA_EXPUESTA = `
+const SCRIPT_PAGINA = `
 (function () {
-  function dir(ruta) {
+  function dir(raiz, ruta) {
     return {
-      kind: 'directory',
-      async queryPermission() { return 'granted'; },
-      async requestPermission() { return 'granted'; },
+      kind: 'directory', _raiz: raiz,
+      name: ruta ? ruta.split('/').pop() : raiz,
+      async queryPermission() { return await window.__disco(raiz, 'permiso', ''); },
+      async requestPermission() { return await window.__disco(raiz, 'pedirPermiso', ''); },
       async getDirectoryHandle(n, o) {
         const hijo = ruta ? ruta + '/' + n : n;
-        if (!(await window.__disco('existeDir', hijo))) {
+        if (!(await window.__disco(raiz, 'existeDir', hijo))) {
           if (!o || !o.create) { const e = new Error('no'); e.name = 'NotFoundError'; throw e; }
-          await window.__disco('crearDir', hijo);
+          await window.__disco(raiz, 'crearDir', hijo);
         }
-        return dir(hijo);
+        return dir(raiz, hijo);
       },
       async getFileHandle(n, o) {
         const hijo = ruta ? ruta + '/' + n : n;
-        if (!(await window.__disco('existeArchivo', hijo))) {
+        if (!(await window.__disco(raiz, 'existeArchivo', hijo))) {
           if (!o || !o.create) { const e = new Error('no'); e.name = 'NotFoundError'; throw e; }
-          await window.__disco('escribir', hijo, '');
+          await window.__disco(raiz, 'escribir', hijo, []);
         }
-        return fich(hijo);
+        return fich(raiz, hijo);
       },
-      async removeEntry(n) { await window.__disco('borrar', ruta ? ruta + '/' + n : n); }
+      async removeEntry(n) { await window.__disco(raiz, 'borrar', ruta ? ruta + '/' + n : n); },
+      async *entries() {
+        const lista = await window.__disco(raiz, 'listar', ruta);
+        for (const [n, tipo] of lista) yield [n, tipo === 'directory' ? dir(raiz, ruta ? ruta + '/' + n : n) : fich(raiz, ruta ? ruta + '/' + n : n)];
+      }
     };
   }
-  function fich(ruta) {
+  function fich(raiz, ruta) {
     return {
-      kind: 'file',
+      kind: 'file', name: ruta.split('/').pop(),
       async getFile() {
-        const texto = await window.__disco('leer', ruta);
+        const texto = await window.__disco(raiz, 'leer', ruta);
         return new Blob([texto == null ? '' : texto], { type: 'text/plain' });
       },
       async createWritable() {
         return {
           async write(c) {
-            var texto;
-            if (typeof c === 'string') texto = c;
-            else if (c instanceof Uint8Array) texto = new TextDecoder().decode(c);
-            else if (c && typeof c.arrayBuffer === 'function') texto = new TextDecoder().decode(await c.arrayBuffer());
-            else texto = String(c);
-            await window.__disco('escribir', ruta, texto);
+            let bytes;
+            if (typeof c === 'string') bytes = new TextEncoder().encode(c);
+            else if (c instanceof Uint8Array) bytes = c;
+            else if (c && typeof c.arrayBuffer === 'function') bytes = new Uint8Array(await c.arrayBuffer());
+            else bytes = new TextEncoder().encode(String(c));
+            await window.__disco(raiz, 'escribir', ruta, Array.from(bytes));
           },
           async close() {}
         };
       }
     };
   }
-  const guardado = new Map();
-  guardado.set('copiaCarpeta', dir(''));
+  function empaquetar(v) { return (v && v._raiz) ? { raiz: v._raiz } : { valor: (v === undefined ? null : v) }; }
+  function desempaquetar(v) { if (!v) return undefined; return v.raiz ? dir(v.raiz, '') : v.valor; }
   Object.defineProperty(window, 'indexedDB', { configurable: true, value: {
     open() {
       const p = {};
@@ -302,12 +341,13 @@ const SCRIPT_CARPETA_EXPUESTA = `
           createObjectStore() {},
           transaction() {
             const t = {};
+            let pendiente = Promise.resolve();
             t.objectStore = () => ({
-              put(v, k) { guardado.set(k, v); },
-              get(k) { const r = {}; setTimeout(() => { r.result = guardado.get(k); r.onsuccess && r.onsuccess(); }, 0); return r; },
-              delete(k) { guardado.delete(k); }
+              put(v, k) { let e; try { e = JSON.parse(JSON.stringify(empaquetar(v))); } catch (x) { e = { valor: null }; } pendiente = window.__idb('put', k, e); },
+              get(k) { const r = {}; window.__idb('get', k).then((v) => { r.result = desempaquetar(v); r.onsuccess && r.onsuccess(); }); return r; },
+              delete(k) { pendiente = window.__idb('delete', k); }
             });
-            setTimeout(() => t.oncomplete && t.oncomplete(), 0);
+            setTimeout(() => pendiente.then(() => t.oncomplete && t.oncomplete()), 0);
             return t;
           }
         };
@@ -316,73 +356,180 @@ const SCRIPT_CARPETA_EXPUESTA = `
       return p;
     }
   } });
+  window.showDirectoryPicker = async function () {
+    const raiz = await window.__idb('elegir');
+    if (!raiz) { const e = new Error('cancelado'); e.name = 'AbortError'; throw e; }
+    return dir(raiz, '');
+  };
 })();
 `;
 
-/* Un puerto que de verdad no escucha nadie: se abre y se cierra un
-   servidor solo para que el sistema operativo suelte uno libre. */
-async function puertoLibreYCerrado() {
-  const s = await arrancarServidorDeMentira();
-  const puerto = s.address().port;
-  await new Promise((r) => s.close(r));
-  return puerto;
+async function abrir(entorno, base, fichero) {
+  const pagina = await navegador.newPage();
+  const errores = [];
+  pagina.on('pageerror', (e) => errores.push(e.message));
+  let navegaciones = 0;
+  pagina.on('framenavigated', (f) => { if (f === pagina.mainFrame()) navegaciones++; });
+  await pagina.exposeFunction('__disco', entorno.disco);
+  await pagina.exposeFunction('__idb', entorno.idb);
+  await pagina.addInitScript(`window.__COPIA_BASE_REMOTO__ = ${JSON.stringify(base)};`);
+  await pagina.addInitScript(SCRIPT_PAGINA);
+  await pagina.goto('file://' + fichero);
+  return { pagina, errores, navegaciones: () => navegaciones };
+}
+const versionDeLaPagina = (pagina) => pagina.evaluate(() => window.App && App.VERSION);
+const hayFranja = (pagina) => pagina.locator('#franja-copia').isVisible().catch(() => false);
+async function esperarVersionNueva(pagina) {
+  try { await pagina.waitForFunction((v) => window.App && App.VERSION === v, VERSION_NUEVA_TEXTO, { timeout: 10000 }); } catch (e) { /* lo dirá la comprobación */ }
+  await pagina.waitForTimeout(500);
 }
 
+const servidor = await arrancarServidor(FICHEROS_REMOTOS);
+const BASE = baseDe(servidor);
+
+/* ---------- al día: ni franja, ni permiso, ni disco ---------- */
 {
-  const servidor = await arrancarServidorDeMentira();
-  const puerto = servidor.address().port;
-  const base = 'http://127.0.0.1:' + puerto + '/';
-
-  const disco = nuevoDiscoDeMentira({
-    'version.json': JSON.stringify(VERSION_VIEJA),
-    'index.html': '<html>viejo</html>',
-    'js/algo.js': FICHERO_VIEJO
-  });
-  const pagina = await navegador.newPage();
-  await pagina.exposeFunction('__disco', disco.operar);
-  await pagina.addInitScript(`window.__COPIA_BASE_REMOTO__ = ${JSON.stringify(base)};`);
-  await pagina.addInitScript(SCRIPT_CARPETA_EXPUESTA);
-  const recargos = [];
-  pagina.on('framenavigated', () => recargos.push(1));
-  await pagina.goto('file://' + COPIA_LOCAL + 'index.html');
-  await pagina.waitForTimeout(1500);   /* tiempo de sobra para comprobar, descargar y recargar */
-
-  await comprobar('con servidor arriba: descarga solo lo cambiado', disco.contenidos.get('js/algo.js'), FICHERO_NUEVO);
-  await comprobar('index.html no cambiado no se toca', disco.contenidos.get('index.html'), '<html>viejo</html>');
-  await comprobar('version.json local queda con la versión nueva', JSON.parse(disco.contenidos.get('version.json')).version, 'nueva');
-  await comprobar('la página se ha recargado sola', recargos.length > 1, true);
-
+  const servidorAlDia = await arrancarServidor({ 'version.json': JSON.stringify(VERSION_LOCAL) });
+  const d = nuevaCopia('aldia');
+  const entorno = nuevoEntorno({ guardada: 'aldia', permiso: 'prompt' });
+  const { pagina, errores } = await abrir(entorno, baseDe(servidorAlDia), d + '/index.html');
+  await pagina.waitForTimeout(1500);
+  await comprobarAsync('al día: no sale la franja', hayFranja(pagina), false);
+  await comprobar('al día: ni se mira ni se pide el permiso', [entorno.estado.consultas, entorno.estado.peticiones], [0, 0]);
+  await comprobar('al día: no se escribe nada en el disco', entorno.estado.escritos, []);
+  await comprobar('al día: ninguna excepción', errores, []);
   await pagina.close();
-  servidor.close();
+  servidorAlDia.close();
+}
+
+/* ---------- vieja, con carpeta y permiso: se actualiza sola ---------- */
+{
+  const d = nuevaCopia('sola');
+  const entorno = nuevoEntorno({ guardada: 'sola', permiso: 'granted' });
+  const { pagina, errores, navegaciones } = await abrir(entorno, BASE, d + '/index.html');
+  await esperarVersionNueva(pagina);
+  await comprobarAsync('con carpeta y permiso: tras recargar, la versión es la nueva', versionDeLaPagina(pagina), VERSION_NUEVA_TEXTO);
+  await comprobar('con carpeta y permiso: solo se escriben js/version.js y version.json', entorno.estado.escritos.sort(), ['sola/js/version.js', 'sola/version.json']);
+  await comprobar('con carpeta y permiso: una sola recarga', navegaciones(), 2);
+  await comprobarAsync('con carpeta y permiso: no sale la franja', hayFranja(pagina), false);
+  await comprobar('con carpeta y permiso: ninguna excepción', errores, []);
+  await pagina.close();
+}
+
+/* ---------- vieja, sin carpeta guardada: franja, «Actualizar ahora» pide la carpeta ---------- */
+{
+  const d = nuevaCopia('sincarpeta');
+  carpetaVacia('otracosa', ['foto.jpg']);
+  const entorno = nuevoEntorno({ guardada: null });
+  const { pagina, errores } = await abrir(entorno, BASE, d + '/index.html');
+  await pagina.waitForSelector('#franja-copia', { timeout: 5000 }).catch(() => {});
+  await comprobarAsync('sin carpeta: sale la franja', hayFranja(pagina), true);
+  await comprobarAsync('sin carpeta: la franja dice las dos versiones', pagina.locator('#franja-copia').textContent().then((t) =>
+    t.indexOf('Hay una versión nueva del Gestor (' + VERSION_NUEVA_TEXTO + ')') !== -1 && t.indexOf('Esta copia tiene la ' + VERSION_LOCAL.version) !== -1), true);
+
+  entorno.estado.elegir.push('otracosa');
+  await pagina.click('#franja-copia-actualizar');
+  await pagina.waitForTimeout(500);
+  await comprobarAsync('sin carpeta: una carpeta equivocada se dice y no se toca', pagina.locator('#franja-copia-detalle').textContent().then((t) => t.indexOf('Esa carpeta no tiene la copia') !== -1), true);
+  await comprobar('sin carpeta: con la equivocada no se escribe nada', entorno.estado.escritos, []);
+
+  entorno.estado.elegir.push('sincarpeta');
+  await pagina.click('#franja-copia-actualizar');
+  await esperarVersionNueva(pagina);
+  await comprobarAsync('sin carpeta: tras «Actualizar ahora», la versión es la nueva', versionDeLaPagina(pagina), VERSION_NUEVA_TEXTO);
+  await comprobarAsync('sin carpeta: después ya no hay franja', hayFranja(pagina), false);
+  await comprobar('sin carpeta: la carpeta queda guardada para la próxima', entorno.estado.idb.get('copiaCarpeta'), { raiz: 'sincarpeta' });
+  await comprobar('sin carpeta: ninguna excepción', errores, []);
+  await pagina.close();
+}
+
+/* ---------- vieja, con carpeta y sin permiso: el botón pide el permiso ---------- */
+{
+  const d = nuevaCopia('sinpermiso');
+  const entorno = nuevoEntorno({ guardada: 'sinpermiso', permiso: 'prompt' });
+  const { pagina, errores } = await abrir(entorno, BASE, d + '/index.html');
+  await pagina.waitForSelector('#franja-copia', { timeout: 5000 }).catch(() => {});
+  await comprobarAsync('sin permiso: sale la franja', hayFranja(pagina), true);
+  await comprobar('sin permiso: no se pide el permiso sin un clic', entorno.estado.peticiones, 0);
+  await comprobarAsync('sin permiso: ya no sale el aviso de abajo de antes', pagina.locator('#aviso-copia-permiso').count(), 0);
+  await pagina.click('#franja-copia-actualizar');
+  await esperarVersionNueva(pagina);
+  await comprobar('sin permiso: el botón pide el permiso', entorno.estado.peticiones, 1);
+  await comprobarAsync('sin permiso: después, la versión es la nueva', versionDeLaPagina(pagina), VERSION_NUEVA_TEXTO);
+  await comprobarAsync('sin permiso: después ya no hay franja', hayFranja(pagina), false);
+  await comprobar('sin permiso: ninguna excepción', errores, []);
+  await pagina.close();
+}
+
+/* ---------- la ✕ calla la franja ---------- */
+{
+  const d = nuevaCopia('cerrar');
+  const entorno = nuevoEntorno({ guardada: null });
+  const { pagina } = await abrir(entorno, BASE, d + '/index.html');
+  await pagina.waitForSelector('#franja-copia', { timeout: 5000 }).catch(() => {});
+  await pagina.click('#franja-copia-cerrar');
+  await comprobarAsync('la ✕ quita la franja', hayFranja(pagina), false);
+  await pagina.close();
+}
+
+/* ---------- carpeta equivocada: no recarga en bucle ---------- */
+{
+  const d = nuevaCopia('estaventana');
+  nuevaCopia('otracopia');
+  const entorno = nuevoEntorno({ guardada: 'otracopia', permiso: 'granted' });
+  const { pagina, errores, navegaciones } = await abrir(entorno, BASE, d + '/index.html');
+  await pagina.waitForTimeout(3000);
+  await comprobar('carpeta equivocada: se recarga una vez y no más', navegaciones(), 2);
+  await comprobarAsync('carpeta equivocada: la franja dice que esta ventana abre otra copia', pagina.locator('#franja-copia').textContent().then((t) =>
+    t.indexOf('He actualizado la carpeta otracopia, pero esta ventana abre otra copia. Abre la aplicación desde la carpeta otracopia.') !== -1).catch(() => false), true);
+  await comprobar('carpeta equivocada: se olvida la carpeta guardada', entorno.estado.idb.has('copiaCarpeta'), false);
+  await comprobar('carpeta equivocada: ninguna excepción', errores, []);
+  await pagina.close();
 }
 
 /* ---------- con el servidor apagado: arranca igual, con el aviso ---------- */
 {
-  const puertoSinNadie = await puertoLibreYCerrado();
-  const disco = nuevoDiscoDeMentira({
-    'version.json': JSON.stringify(VERSION_VIEJA),
-    'index.html': '<html>viejo</html>',
-    'js/algo.js': FICHERO_VIEJO
-  });
-  const pagina = await navegador.newPage();
-  await pagina.exposeFunction('__disco', disco.operar);
-  await pagina.addInitScript(`window.__COPIA_BASE_REMOTO__ = ${JSON.stringify('http://127.0.0.1:' + puertoSinNadie + '/')};`);
-  await pagina.addInitScript(SCRIPT_CARPETA_EXPUESTA);
-  const errores = [];
-  pagina.on('pageerror', (e) => errores.push(e.message));
-  await pagina.goto('file://' + COPIA_LOCAL + 'index.html');
+  const s = await arrancarServidor({});
+  const puertoSinNadie = s.address().port;
+  await new Promise((r) => s.close(r));
+  const d = nuevaCopia('apagado');
+  const entorno = nuevoEntorno({ guardada: 'apagado', permiso: 'granted' });
+  const { pagina, errores } = await abrir(entorno, 'http://127.0.0.1:' + puertoSinNadie + '/', d + '/index.html');
   await pagina.waitForTimeout(1500);
-
-  await comprobarAsync('sin servidor: la copia arranca igual (la pantalla de entrada sale)',
-    pagina.locator('#paso-carpetas').isVisible(), true);
-  await comprobar('sin servidor: version.json local no ha cambiado', JSON.parse(disco.contenidos.get('version.json')).version, 'vieja');
+  await comprobarAsync('sin servidor: la copia arranca igual (la pantalla de entrada sale)', pagina.locator('#paso-carpetas').isVisible(), true);
+  await comprobar('sin servidor: no se escribe nada', entorno.estado.escritos, []);
   await comprobarAsync('sin servidor: aviso discreto de "no se ha podido comprobar"', pagina.evaluate(() => {
-    return Array.from(document.querySelectorAll('#mensajes .mensaje')).some((d) => d.textContent.toLowerCase().indexOf('no se ha podido comprobar') !== -1);
+    return Array.from(document.querySelectorAll('#mensajes .mensaje')).some((m) => m.textContent.toLowerCase().indexOf('no se ha podido comprobar') !== -1);
   }), true);
-  await comprobarAsync('sin servidor: ninguna excepción sin capturar', Promise.resolve(errores), []);
-
+  await comprobarAsync('sin servidor: no sale la franja', hayFranja(pagina), false);
+  await comprobar('sin servidor: ninguna excepción sin capturar', errores, []);
   await pagina.close();
 }
+
+/* ---------- ABRIR EL GESTOR.html sobre una copia vieja ya instalada ---------- */
+{
+  const d = nuevaCopia('rescate');
+  carpetaVacia('mala', ['foto.jpg']);
+  const entorno = nuevoEntorno({ guardada: null });
+  const { pagina, errores } = await abrir(entorno, BASE, d + '/ABRIR EL GESTOR.html');
+  entorno.estado.elegir.push('mala');
+  await pagina.click('#btn-empezar');
+  await pagina.waitForTimeout(500);
+  await comprobarAsync('instalador: una carpeta que no es la suya se dice', pagina.locator('#texto-carpeta-mala').textContent().then((t) => t.indexOf('Esa no parece la carpeta') !== -1), true);
+  entorno.estado.elegir.push('rescate');
+  await pagina.click('#btn-empezar');
+  await esperarVersionNueva(pagina);
+  await comprobarAsync('instalador: acaba en index.html', pagina.evaluate(() => decodeURIComponent(location.pathname).endsWith('/index.html')), true);
+  await comprobarAsync('instalador: la copia vieja queda con la versión nueva', versionDeLaPagina(pagina), VERSION_NUEVA_TEXTO);
+  await comprobar('instalador: solo descarga lo cambiado', entorno.estado.escritos.sort(), ['rescate/js/version.js', 'rescate/version.json']);
+  await comprobar('instalador: guarda la carpeta también si ya estaba instalada', entorno.estado.idb.get('copiaCarpeta'), { raiz: 'rescate' });
+  await comprobarAsync('instalador: sin franja al llegar', hayFranja(pagina), false);
+  await comprobar('instalador: ninguna excepción', errores, []);
+  await pagina.close();
+}
+
+servidor.close();
+rmSync(TEMPORAL, { recursive: true, force: true });
 
 await navegador.close();
 console.log(fallos ? '\n' + fallos + ' PRUEBAS FALLAN' : '\nTodas las pruebas de la copia sin internet pasan.');

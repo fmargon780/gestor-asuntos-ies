@@ -5,6 +5,38 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 23-sep-2026 — Fila 91: la copia sin internet se actualiza de verdad (y se cierra la 89)
+
+`docs/COPIA-SE-ACTUALIZA.md`. La copia que Francisco abría en el instituto seguía en
+`21-sep-2026 · 11:32` con la publicada en `14:49`, y sin decir nada. La copia pública estaba al
+día: fallaba el ordenador. Dos agujeros, tapados los dos porque no se sabía cuál le había tocado:
+
+- **`ABRIR EL GESTOR.html` solo guardaba la carpeta la primera vez.** Si la carpeta ya tenía
+  `index.html`, iba directo a ella sin guardarla; en otro ordenador, navegador o perfil,
+  `js/actualizar-copia.js` no encontraba carpeta y se callaba. Ahora la guarda siempre y, si ya
+  está instalada, la pone al día antes de abrirla (mismo algoritmo: solo los sha256 distintos,
+  `version.json` el último). Así, volver a guardar ese fichero y abrirlo rescata una copia vieja,
+  que es la única salida para la de Francisco (su `js/actualizar-copia.js` es el viejo). Además,
+  solo acepta una carpeta vacía, con `index.html` o con el propio `ABRIR EL GESTOR…`.
+- **Sin permiso, solo un aviso pequeño abajo a la izquierda**, que no decía que había versión
+  nueva. Ahora `js/actualizar-copia.js` mira PRIMERO la versión remota (si coincide con
+  `App.VERSION`, no pide permiso ni toca el disco) y, si no puede actualizar sola, pinta una
+  franja ámbar arriba, a todo el ancho, con las dos versiones y «Actualizar ahora» (pide permiso
+  o carpeta con el clic, la guarda, actualiza y recarga).
+
+**Contra el bucle**: antes de recargar se apunta en `sessionStorage` a qué versión y en qué
+carpeta; si al volver la ventana sigue vieja, se escribió en otra copia: no se recarga más, se
+olvida la carpeta y la franja dice desde qué carpeta abrir.
+
+**La prueba** (`pruebas/copia-sin-internet.mjs`) pasó a usar copias de verdad de `copia-local/`
+en una carpeta temporal, con el disco y la IndexedDB servidos desde Node (`exposeFunction`), para
+que tras la recarga la página abra de verdad lo recién escrito y se pueda comprobar que
+`App.VERSION` ya es la nueva. Sin el arreglo, falla. La parte 1 lleva ahora su propio servidor
+"al día": la copia mira la versión remota lo primero, y sin él saldría a internet.
+
+**La 89 queda HECHA**: Francisco creó `fmargon780/gestor-asuntos-copia` y el secreto, y la acción
+publica desde el 21-sep-2026. `App.VERSION`: `23-sep-2026 · 14:28`.
+
 ## 21-sep-2026 — Fila 90: archivar sin avisos falsos ni errores en inglés
 
 `docs/ARCHIVAR-SIN-AVISOS-FALSOS.md`. Al archivar un asunto desde su propia ficha (no desde la
