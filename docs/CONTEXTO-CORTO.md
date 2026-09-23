@@ -103,7 +103,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en GitHub Actions en cada subida.
 - Escape y salida en toda pantalla.
-- Copia sin internet (`file://`, fila 89): "copia sin internet" a la vista, se actualiza sola.
+- Copia sin internet (`file://`, filas 89 y 91): "copia sin internet" a la vista, se actualiza sola; si no puede, franja arriba con «Actualizar ahora».
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo, responsable,
   bifurcaciones, documentos, historial, "lo que hay que reunir" y "Comunicar". Biblioteca de
   hitos del centro: modelos reutilizables entre tipos, con normativa y marca "solo informativo".
@@ -175,7 +175,6 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Pulsar, antes de junio de 2027, "Guardar el contacto de los asuntos abiertos" (Ajustes → Mantenimiento).
 - Decisión: ¿la papelera se vacía sola a los N días? Sin decidir, solo el aviso más insistente.
 - Antes de publicar algo importante, repasar `docs/COMPROBAR-A-MANO.md`.
-- Fila 89 bloqueada: falta crear el repositorio público y el secreto `COPIA_TOKEN` (`docs/CLAVE-COPIA-PUBLICA.md`).
 
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero
 

@@ -21,29 +21,36 @@
 
    QUÉ HACE, SIN BLOQUEAR NUNCA EL ARRANQUE (la aplicación sigue
    arrancando igual, con lo que ya tenga en disco, pase lo que pase
-   aquí):
-     1. Si no hay carpeta guardada (la copia no se instaló con
-        `ABRIR EL GESTOR.html`, p. ej. alguien copió `index.html` a
-        mano), no se puede comprobar nada: no hace nada más.
-     2. Si el permiso de la carpeta ya no vale (Chrome lo vuelve a
-        pedir de vez en cuando), se pinta un aviso ámbar con un botón,
-        igual que ya se hace con la carpeta de la bandeja de correos
-        (`js/bandeja-pantalla.js`, `pintarCaja`): nunca se vuelve a
-        pedir solo, hace falta un clic del usuario.
-     3. Compara `version.json` del disco con el de
+   aquí). Rehecho el 23-sep-2026 (fila 91, docs/COPIA-SE-ACTUALIZA.md):
+   antes, sin carpeta guardada, se callaba, y sin permiso solo pintaba
+   un aviso pequeño abajo que no decía que había versión nueva.
+     1. PRIMERO lee el `version.json` de
         `raw.githubusercontent.com/fmargon780/gestor-asuntos-copia/main/`
-        (con `cache: 'no-store'`, para no quedarse con una copia vieja
-        del propio `fetch`). Si son iguales, no hace nada.
-     4. Si hay ficheros nuevos: descarga solo los que cambian de
-        sha256, comprueba el sha256 de cada uno antes de escribirlo, y
-        borra los que ya no estén en la lista nueva. `version.json` se
-        escribe el último: si se corta a medias, la próxima vez se
-        vuelve a intentar con lo que falte (el `version.json` de disco
-        sigue siendo el de antes).
-     5. Si todo fue bien, `location.reload()`.
-     6. Sin internet, con el repositorio caído o con cualquier otro
-        fallo: un aviso discreto de una línea (`U.aviso`, se borra
-        solo) y nada más. Nunca se deja de arrancar por esto.
+        (con `cache: 'no-store'`), haya o no carpeta y permiso. Si su
+        `version` es igual a `App.VERSION`, no hace nada más: ni pide
+        permiso ni toca el disco. (Un ordenador que ya recibió la
+        versión nueva por Dropbox cae aquí.)
+     2. Si es distinta y hay carpeta guardada con permiso, se
+        actualiza sola: descarga solo los ficheros que cambian de
+        sha256, comprueba el sha256 de cada uno antes de escribirlo,
+        borra los que ya no están en la lista nueva y escribe
+        `version.json` el último (si se corta a medias, la próxima vez
+        se reintenta). Después, `location.reload()`.
+     3. Sin carpeta, sin permiso, o si la actualización falla: la
+        franja ámbar de arriba del todo («Hay una versión nueva…»),
+        con el botón «Actualizar ahora». El botón pide el permiso o la
+        carpeta (un clic del usuario, así que Chrome deja), la guarda
+        para la próxima vez, actualiza y recarga. La ✕ la calla hasta
+        la próxima vez que se abra la aplicación.
+     4. CONTRA EL BUCLE: antes de recargar se apunta en
+        `sessionStorage` a qué versión se ha actualizado y en qué
+        carpeta. Si al volver `App.VERSION` sigue sin ser la remota,
+        es que se escribió en otra copia que no es la que abre esta
+        ventana: no se vuelve a recargar, se olvida la carpeta
+        guardada y la franja lo dice.
+     5. Sin internet, con el repositorio caído o con cualquier otro
+        fallo al leer la versión remota: un aviso discreto de una
+        línea (`U.aviso`, se borra solo) y nada más.
    ============================================================ */
 (function () {
   if (location.protocol !== 'file:') return;
@@ -128,49 +135,155 @@
     await escribirEnRuta(dir, ruta, bytes);
   }
 
+  function nombreDe(dir) { return (dir && dir.name) || 'de la copia'; }
+
+  /* Descarga lo cambiado respecto al `version.json` del disco y
+     escribe `version.json` el último. Lanza si algo falla. */
+  async function actualizarEn(dir, remoto) {
+    var local = await leerVersionLocal(dir);
+    for (var ruta in remoto.ficheros) {
+      if (!local || !local.ficheros || local.ficheros[ruta] !== remoto.ficheros[ruta]) {
+        await descargarYEscribir(dir, ruta, remoto.ficheros[ruta]);
+      }
+    }
+    if (local && local.ficheros) {
+      for (var rutaVieja in local.ficheros) {
+        if (!(rutaVieja in remoto.ficheros)) await borrarRuta(dir, rutaVieja);
+      }
+    }
+    /* version.json el último: si algo de arriba falla, el de disco
+       sigue siendo el de antes, y la próxima vez se reintenta. */
+    await escribirEnRuta(dir, 'version.json', new TextEncoder().encode(JSON.stringify(remoto)));
+  }
+
+  /* ---------- contra el bucle de recargas (sessionStorage) ---------- */
+
+  var CLAVE_RECARGA = 'gestor-copia-recargada';
+
+  function leerMarca() {
+    try { return JSON.parse(sessionStorage.getItem(CLAVE_RECARGA) || 'null'); } catch (e) { return null; }
+  }
+  function borrarMarca() {
+    try { sessionStorage.removeItem(CLAVE_RECARGA); } catch (e) { /* nada */ }
+  }
+  function recargar(dir, remoto) {
+    try { sessionStorage.setItem(CLAVE_RECARGA, JSON.stringify({ version: remoto.version, carpeta: nombreDe(dir) })); } catch (e) { /* nada */ }
+    location.reload();
+  }
+
   /* ---------- avisos ---------- */
 
   function avisoDiscreto(texto) {
     if (window.U && typeof U.aviso === 'function') U.aviso(texto, 'ambar');
   }
 
-  /* Mismo patrón que js/bandeja-pantalla.js (pintarCaja): un aviso
-     ámbar persistente con un botón, porque pedir el permiso a solas
-     (sin que el usuario acabe de pulsar algo) no funciona en Chrome.
-     No hay un hueco fijo en index.html para esto (el permiso puede
-     hacer falta antes de entrar o ya dentro), así que se cuelga
-     directo del <body>, arriba de todo lo demás. */
-  function avisoPermiso(dir) {
-    if ($('aviso-copia-permiso')) return;
-    var caja = document.createElement('div');
-    caja.id = 'aviso-copia-permiso';
-    caja.className = 'aviso aviso-ambar';
-    caja.style.cssText = 'position:fixed;left:16px;right:16px;bottom:16px;max-width:420px;z-index:9999;box-shadow:0 8px 24px rgba(10,25,45,.25)';
-    caja.innerHTML = '<strong>Esta copia sin internet necesita permiso otra vez.</strong>' +
-      '<p>El navegador lo pide de nuevo cada cierto tiempo. Sin él no puede comprobar si hay una versión nueva, pero la aplicación sigue funcionando con la que ya tienes.</p>';
-    var boton = document.createElement('button');
-    boton.type = 'button';
-    boton.className = 'boton boton-principal';
-    boton.textContent = 'Dar permiso a la copia local';
-    boton.onclick = async function () {
-      var ok = await pedirPermiso(dir);
-      if (ok) { caja.remove(); comprobar(); }
-      else avisoDiscreto('Sin permiso no puedo comprobar si hay una versión nueva.');
-    };
-    caja.appendChild(boton);
-    document.body.appendChild(caja);
+  /* La franja de arriba del todo, a todo el ancho. Se cuelga directo
+     del <body>: puede hacer falta antes de entrar o ya dentro, y no
+     hay un hueco fijo en index.html para ella. */
+  function franja(remoto, dir, textoFijo) {
+    var caja = $('franja-copia');
+    if (!caja) {
+      caja = document.createElement('div');
+      caja.id = 'franja-copia';
+      caja.setAttribute('role', 'alert');
+      caja.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:10000;display:flex;align-items:center;gap:12px;flex-wrap:wrap;' +
+        'padding:10px 48px 10px 16px;background:#fff4d6;border-bottom:2px solid #e0b34a;color:#1b2430;font-size:15px;box-shadow:0 4px 12px rgba(10,25,45,.18)';
+      document.body.appendChild(caja);
+    }
+    caja.innerHTML = '';
+
+    var texto = document.createElement('span');
+    texto.id = 'franja-copia-texto';
+    caja.appendChild(texto);
+
+    var detalle = document.createElement('span');
+    detalle.id = 'franja-copia-detalle';
+    detalle.style.cssText = 'color:#8a5a00';
+
+    if (textoFijo) {
+      texto.innerHTML = textoFijo;
+    } else {
+      texto.innerHTML = 'Hay una versión nueva del Gestor (<strong></strong>). Esta copia tiene la <strong></strong>.';
+      var negritas = texto.querySelectorAll('strong');
+      negritas[0].textContent = remoto.version;
+      negritas[1].textContent = App.VERSION;
+
+      var boton = document.createElement('button');
+      boton.type = 'button';
+      boton.id = 'franja-copia-actualizar';
+      boton.className = 'boton boton-principal';
+      boton.textContent = 'Actualizar ahora';
+      boton.onclick = function () { actualizarAhora(remoto, dir, boton); };
+      caja.appendChild(boton);
+    }
+    caja.appendChild(detalle);
+
+    var cerrar = document.createElement('button');
+    cerrar.type = 'button';
+    cerrar.id = 'franja-copia-cerrar';
+    cerrar.title = 'Cerrar';
+    cerrar.setAttribute('aria-label', 'Cerrar');
+    cerrar.textContent = '✕';
+    cerrar.style.cssText = 'position:absolute;right:12px;top:50%;transform:translateY(-50%);border:0;background:none;font-size:18px;cursor:pointer;color:#5d6b7a';
+    cerrar.onclick = function () { caja.remove(); };
+    caja.appendChild(cerrar);
+  }
+
+  function detalleFranja(texto) {
+    var d = $('franja-copia-detalle');
+    if (d) d.textContent = texto;
+  }
+
+  async function esCarpetaDeLaCopia(dir) {
+    try {
+      await dir.getFileHandle('index.html');
+      await dir.getFileHandle('version.json');
+      return true;
+    } catch (e) { return false; }
+  }
+
+  /* El botón «Actualizar ahora»: la carpeta que ya se tenga (o la que
+     elija ahora), el permiso, y lo mismo que haría sola. */
+  async function actualizarAhora(remoto, dir, boton) {
+    if (!dir) {
+      if (typeof window.showDirectoryPicker !== 'function') {
+        detalleFranja('Este navegador no puede actualizar la copia: hace falta Google Chrome o Microsoft Edge.');
+        return;
+      }
+      detalleFranja('Elige la carpeta donde está esta copia (la que tiene «ABRIR EL GESTOR.html»).');
+      try {
+        dir = await window.showDirectoryPicker({ mode: 'readwrite', id: 'gestor-copia' });
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;
+        detalleFranja('No se ha podido abrir el selector de carpetas.');
+        return;
+      }
+      if (!(await esCarpetaDeLaCopia(dir))) {
+        detalleFranja('Esa carpeta no tiene la copia (le faltan index.html y version.json). Pulsa otra vez y elige la buena.');
+        return;
+      }
+    }
+    if (!(await tienePermiso(dir)) && !(await pedirPermiso(dir))) {
+      detalleFranja('Sin permiso sobre la carpeta no puedo actualizar la copia.');
+      return;
+    }
+    try { await Almacen.guardar(CLAVE_CARPETA, dir); } catch (e) { /* se pedirá otra vez la próxima */ }
+
+    var textoBoton = boton ? boton.textContent : '';
+    if (boton) { boton.disabled = true; boton.textContent = 'Actualizando…'; }
+    detalleFranja('');
+    try {
+      await actualizarEn(dir, remoto);
+      recargar(dir, remoto);
+    } catch (e) {
+      if (boton) { boton.disabled = false; boton.textContent = textoBoton; }
+      detalleFranja('No se ha podido actualizar: ' + (e && e.message ? e.message : e));
+    }
   }
 
   /* ---------- el conjunto ---------- */
 
   async function comprobar() {
-    var dir = await obtenerCarpeta();
-    if (!dir) return;   /* instalada a mano, sin ABRIR EL GESTOR.html: no hay nada que comprobar */
-
-    var ok = await tienePermiso(dir);
-    if (!ok) { avisoPermiso(dir); return; }
-
-    var local = await leerVersionLocal(dir);
     var remoto;
     try {
       remoto = await leerVersionRemota();
@@ -179,28 +292,34 @@
       return;
     }
 
-    if (local && local.version === remoto.version) return;   /* ya está al día */
+    var marca = leerMarca();
+    borrarMarca();
 
-    var cambiados = [];
-    for (var ruta in remoto.ficheros) {
-      if (!local || !local.ficheros || local.ficheros[ruta] !== remoto.ficheros[ruta]) cambiados.push(ruta);
+    if (remoto.version === App.VERSION) return;   /* ya está al día: ni permiso ni disco */
+
+    if (marca && marca.version === remoto.version) {
+      /* Se actualizó una carpeta y se recargó, pero esta ventana sigue
+         con la versión vieja: esa carpeta no es la que abre la
+         ventana. Ni otra recarga ni volver a escribir allí. */
+      if (window.Almacen) { try { await Almacen.borrar(CLAVE_CARPETA); } catch (e) { /* nada */ } }
+      var nombre = document.createElement('strong');
+      nombre.textContent = marca.carpeta || '';
+      franja(remoto, null, 'He actualizado la carpeta ' + nombre.outerHTML + ', pero esta ventana abre otra copia. ' +
+        'Abre la aplicación desde la carpeta ' + nombre.outerHTML + '.');
+      return;
     }
 
+    var dir = await obtenerCarpeta();
+    var permiso = false;
+    if (dir) { try { permiso = await tienePermiso(dir); } catch (e) { permiso = false; } }
+    if (!dir || !permiso) { franja(remoto, dir, null); return; }
+
     try {
-      for (var i = 0; i < cambiados.length; i++) {
-        await descargarYEscribir(dir, cambiados[i], remoto.ficheros[cambiados[i]]);
-      }
-      if (local && local.ficheros) {
-        for (var rutaVieja in local.ficheros) {
-          if (!(rutaVieja in remoto.ficheros)) await borrarRuta(dir, rutaVieja);
-        }
-      }
-      /* version.json el último: si algo de arriba falla, el de disco
-         sigue siendo el de antes, y la próxima vez se reintenta. */
-      await escribirEnRuta(dir, 'version.json', new TextEncoder().encode(JSON.stringify(remoto)));
-      location.reload();
+      await actualizarEn(dir, remoto);
+      recargar(dir, remoto);
     } catch (e) {
-      avisoDiscreto('No se ha podido actualizar la copia: ' + (e && e.message ? e.message : e));
+      franja(remoto, dir, null);
+      detalleFranja('No se ha podido actualizar sola: ' + (e && e.message ? e.message : e));
     }
   }
 

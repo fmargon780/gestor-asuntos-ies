@@ -27,3 +27,8 @@ A partir de ahí, cada vez que abras ese mismo fichero, la copia mira
 sola si hay una versión nueva y se pone al día. Junto a la versión, en
 la pantalla de entrada y abajo del todo, se lee **"copia sin
 internet"**, para saber que estás con esta copia y no con la web.
+
+## Si la copia se ha quedado en una versión vieja
+
+Repite los pasos 1 a 3: guarda `ABRIR EL GESTOR.html` encima del que ya hay (clic derecho →
+**Guardar como…**) y ábrelo con doble clic; si te pide carpeta, elige esa misma. Se pone al día y arranca.
