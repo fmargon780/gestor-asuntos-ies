@@ -300,7 +300,7 @@ App.cambiarDatosDelTercero = async function (p) {
   try {
     await Datos.guardarEnLista(App.E.datos, p.categoria, nombreAntes, puestos);
   } catch (e) {
-    U.aviso('No he podido guardar el cambio: ' + e.message, 'malo');
+    U.aviso('No he podido guardar el cambio: ' + U.mensajeDeError(e), 'malo');
     return;
   }
 

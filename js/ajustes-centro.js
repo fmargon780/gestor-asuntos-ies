@@ -166,7 +166,7 @@ App.renombrarEstado = async function (viejo) {
     App.pintarAbiertos();
     U.aviso('Estado renombrado. Asuntos cambiados: ' + n + '.', 'bueno');
   } catch (e) {
-    U.aviso('No he podido cambiarlo: ' + e.message, 'malo');
+    U.aviso('No he podido cambiarlo: ' + U.mensajeDeError(e), 'malo');
   }
 };
 
@@ -198,7 +198,7 @@ App.quitarEstado = async function (nombre) {
     App.pintarAbiertos();
     U.aviso('Estado mandado a la papelera.', 'bueno');
   } catch (e) {
-    U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+    U.aviso('No he podido mandarlo a la papelera: ' + U.mensajeDeError(e), 'malo');
   }
 };
 
@@ -269,7 +269,7 @@ App.borrarTipoDocumento = async function (nombre) {
     App.pintarTiposDeDocumento();
     U.aviso('Tipo de documento mandado a la papelera.', 'bueno');
   } catch (e) {
-    U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+    U.aviso('No he podido mandarlo a la papelera: ' + U.mensajeDeError(e), 'malo');
   }
 };
 
@@ -338,7 +338,7 @@ App.borrarCampoPropio = async function (p) {
     App.pintarCamposPropios();
     U.aviso('Campo propio mandado a la papelera.', 'bueno');
   } catch (e) {
-    U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+    U.aviso('No he podido mandarlo a la papelera: ' + U.mensajeDeError(e), 'malo');
   }
 };
 
@@ -440,7 +440,7 @@ App.borrarGrupo = async function (g) {
     App.pintarGruposPersonas();
     U.aviso('Grupo mandado a la papelera.', 'bueno');
   } catch (e) {
-    U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+    U.aviso('No he podido mandarlo a la papelera: ' + U.mensajeDeError(e), 'malo');
   }
 };
 
@@ -478,7 +478,7 @@ App.editarMiembrosDeGrupo = function (g) {
         U.aviso('Miembros guardados.', 'bueno');
         resolver(true);
       } catch (e) {
-        U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+        U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
         resolver(false);
       }
     }, { multiple: true, marcadosIniciales: g.miembros });
@@ -667,7 +667,7 @@ async function guardarMargenesPdf() {
     await Copias.guardar(App.E.gestor, FICHERO_MARGENES_PDF, valores);
     U.aviso('Medidas guardadas.', 'bueno');
   } catch (e) {
-    U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+    U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
   }
 }
 
@@ -705,7 +705,7 @@ App.pintarDiasCaducidadCopias = function () {
       await App.guardarDiasCaducidadCopias(n);
       U.aviso('Las copias de más de ' + n + ' días se irán borrando solas.', 'bueno');
     } catch (e) {
-      U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
     }
   };
 };

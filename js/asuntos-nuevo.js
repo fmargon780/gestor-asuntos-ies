@@ -534,7 +534,13 @@ App.refrescarVista = function () {
    avisa y se deja decidir, en vez de cortar el nombre a lo tonto. */
 App.LARGO_MAXIMO_NOMBRE = 180;
 
-$('btn-crear').onclick = async function () {
+/* «Crear», con el botón en «Guardando…» mientras dura (fila 100: se
+   podía pulsar dos veces). */
+$('btn-crear').onclick = function () {
+  return U.mientrasGuarda($('btn-crear'), App.crearAsuntoDelFormulario);
+};
+
+App.crearAsuntoDelFormulario = async function () {
   if (!App.validarCamposObligatorios()) return;
   var d = App.datosDelFormulario();
   var nombre = nombreDeCarpetaPropuesto(d);
@@ -548,12 +554,21 @@ $('btn-crear').onclick = async function () {
     if (!seguir) return;
   }
 
+  /* Lo principal: la carpeta y su ficha. Lo de después (meter el
+     documento traído, limpiar el formulario, la lista, el cuadro de
+     documentos) es accesorio: si falla, ámbar (fila 100). */
+  var carpeta;
   try {
     if (await Carpetas.existe(App.E.abiertos, nombre)) {
       U.aviso('Ya hay un asunto abierto con ese mismo nombre.', 'malo');
       return;
     }
-    var carpeta = await Carpetas.crear(App.E.abiertos, nombre);
+    carpeta = await Carpetas.crear(App.E.abiertos, nombre);
+  } catch (e0) {
+    U.fallo('No he podido crear la carpeta', e0);
+    return;
+  }
+  try {
 
     var camposParaGuardar = {};
     App.valoresCamposActuales().forEach(function (v) {
@@ -579,7 +594,14 @@ $('btn-crear').onclick = async function () {
       datosNuevoAsunto.contacto = Datos.fotoDeContacto(App.E.nuevo.tercero, App.E.nuevo.categoria);
     }
     await App.anotar(nombre, datosNuevoAsunto);
+  } catch (e1) {
+    U.accesorio('La carpeta está creada, pero no he podido guardar su ficha. Ábrela y vuelve a ' +
+      'poner el estado', e1);
+    try { await App.verAbiertos(); } catch (e3) { /* solo pintar */ }
+    return;
+  }
 
+  try {
     /* Si el asunto se ha empezado desde un documento suelto, ese
        documento se mete ahora en la carpeta recién creada. */
     var traido = App.E.pendiente;
@@ -587,8 +609,7 @@ $('btn-crear').onclick = async function () {
       try {
         await Carpetas.moverFichero(App.E.abiertos, traido.nombre, carpeta);
       } catch (e2) {
-        U.aviso('El asunto está creado, pero el documento no ha podido entrar: ' +
-                e2.message, 'malo');
+        U.accesorio('El asunto está creado, pero el documento no ha podido entrar', e2);
         traido = null;
       }
       App.E.pendiente = null;
@@ -623,7 +644,7 @@ $('btn-crear').onclick = async function () {
       if (recien) await App.verDocumentos(recien);
     }
   } catch (e) {
-    U.aviso('No he podido crear la carpeta: ' + e.message, 'malo');
+    U.accesorio('Asunto creado, pero no he podido terminar de poner la pantalla al día. Pulsa Recargar', e);
   }
 };
 

@@ -130,7 +130,7 @@ var FichaDocumentos = (function () {
             if (hitoNuevo) await Hitos.anadirDocumento(a.nombre, hitoNuevo.id, f.nombre);
             if (window.HitosPanel) window.HitosPanel.programarRepintado();
             pintar(a);
-          } catch (e) { U.aviso('No he podido guardarlo: ' + e.message, 'malo'); }
+          } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
         };
       }
 
@@ -186,7 +186,7 @@ var FichaDocumentos = (function () {
           pintar(a);
           if (alBorrarActual) await alBorrarActual();
         } catch (e) {
-          U.aviso('No he podido mandarlo a la papelera: ' + e.message, 'malo');
+          U.aviso('No he podido mandarlo a la papelera: ' + U.mensajeDeError(e), 'malo');
           borrar.disabled = false;
         }
       });
@@ -281,7 +281,7 @@ var FichaDocumentos = (function () {
       grupoDeDocumentos(caja, 'Llegados por correo', correos, conRotulo, a, hitos.visibles, hitos.porDocumento);
     } catch (e) {
       caja.className = 'explica';
-      caja.textContent = 'No he podido leer la carpeta: ' + e.message;
+      caja.textContent = 'No he podido leer la carpeta: ' + U.mensajeDeError(e);
     }
   }
 
@@ -295,7 +295,7 @@ var FichaDocumentos = (function () {
       window.open(url, '_blank');
       setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
     } catch (e) {
-      U.aviso('No he podido abrirlo: ' + e.message, 'malo');
+      U.aviso('No he podido abrirlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 

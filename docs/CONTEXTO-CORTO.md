@@ -145,8 +145,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Antes de colgar una función nueva de `App`, comprobar que el nombre no está cogido. Un solo cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.
 - Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV.
 - Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o uno nuevo. Sin remedio, con `U.envolver`, apuntado en `js/envolturas-esperadas.js`.
-- Una acción que guarda y repinta: `await` hasta el final y usar `U.mientrasGuarda(control, fn)`
-  para apagar el botón o desplegable ("Guardando…") mientras tanto.
+- Principal y accesorio por separado: rojo si falla lo principal (`U.fallo`), verde si sale, ámbar
+  si falla algo de después (`U.accesorio`); siempre `U.mensajeDeError`. `U.mientrasGuarda` solo
+  alrededor de la escritura.
 - Un bloque que se repinta solo nunca puede tirar lo que se está escribiendo, ni el foco, ni el
   cursor: envolver el repintado en `U.conservandoLoEscrito(raiz, fn)`.
 - Al terminar una instrucción de la cola: actualizar este documento y `CONTEXTO.md`

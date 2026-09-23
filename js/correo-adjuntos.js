@@ -202,7 +202,7 @@ var CorreoAdjuntos = (function () {
       U.aviso('Borrador en camino. Avisaré cuando esté listo en Gmail.', 'bueno');
       if (typeof alPreparado === 'function') alPreparado(marcadas);
     } catch (e) {
-      U.aviso('No he podido preparar el borrador: ' + e.message, 'malo');
+      U.aviso('No he podido preparar el borrador: ' + U.mensajeDeError(e), 'malo');
     } finally {
       if (boton) { boton.disabled = false; boton.textContent = 'Preparar borrador con los documentos'; }
       Array.prototype.forEach.call(caja.querySelectorAll('.adjunto-marca'), function (c) { c.checked = false; });

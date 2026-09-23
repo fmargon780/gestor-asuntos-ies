@@ -95,7 +95,7 @@ var Relacionados = (function () {
           var encontrados = Datos.buscar(fuente.lista, valores[def.cabecera[0]], 1);
           resolverUnaVez(encontrados[0] || null);
         } catch (e) {
-          U.aviso('No he podido darlo de alta: ' + e.message, 'malo');
+          U.aviso('No he podido darlo de alta: ' + U.mensajeDeError(e), 'malo');
           resolverUnaVez(null);
         }
       });
@@ -130,7 +130,7 @@ var Relacionados = (function () {
     try {
       await App.anotar(a.nombre, { relacionados: nueva });
     } catch (e) {
-      U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
       return false;
     }
     U.aviso('Relacionado añadido.', 'bueno');
@@ -343,7 +343,7 @@ var Relacionados = (function () {
     try {
       await App.anotar(a.nombre, { relacionados: resultado.finales });
     } catch (e) {
-      U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
       return false;
     }
 
@@ -459,7 +459,7 @@ var Relacionados = (function () {
           await App.anotar(a.nombre, { relacionados: nueva });
           if (alCambiar) alCambiar();
         } catch (e) {
-          U.aviso('No he podido quitarlo: ' + e.message, 'malo');
+          U.aviso('No he podido quitarlo: ' + U.mensajeDeError(e), 'malo');
         }
       };
     });
@@ -521,7 +521,7 @@ var Relacionados = (function () {
         var marcador = await destino.getDirectoryHandle(nombreCarpeta, { create: true });
         await Carpetas.escribirTexto(marcador, NOMBRE_FICHERO_MARCADOR, texto);
       } catch (e) {
-        U.aviso('No he podido dejar la nota en la carpeta de ' + rel.nombre + ': ' + e.message, 'malo');
+        U.aviso('No he podido dejar la nota en la carpeta de ' + rel.nombre + ': ' + U.mensajeDeError(e), 'malo');
       }
     }
   }

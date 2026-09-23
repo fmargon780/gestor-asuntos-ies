@@ -236,7 +236,7 @@ window.CargarBiblioteca = CargarBiblioteca;
       if (typeof App.pintarAjustes === 'function') App.pintarAjustes();
       U.aviso('Biblioteca cargada.', 'bueno');
     } catch (e) {
-      U.aviso('No he podido cargarla: ' + e.message, 'malo');
+      U.aviso('No he podido cargarla: ' + U.mensajeDeError(e), 'malo');
     }
   }
 

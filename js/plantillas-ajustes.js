@@ -93,7 +93,7 @@
       if (window.HitosNormativa) HitosNormativa.refrescar();
       U.aviso('Firma y centro guardados.', 'bueno');
     } catch (e) {
-      U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -130,7 +130,7 @@
         await cargar();
         refrescarSeccionActual();
       } catch (e) {
-        U.aviso('No he podido borrarla: ' + e.message, 'malo');
+        U.aviso('No he podido borrarla: ' + U.mensajeDeError(e), 'malo');
       }
     }));
 
@@ -317,7 +317,7 @@
         await cargar();
         if (typeof alGuardar === 'function') alGuardar();
       } catch (e) {
-        U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+        U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
       }
     });
   }

@@ -28,7 +28,8 @@ App.E = {
   listaArchivo: [],
   sueltos: [],         /* documentos sueltos en la carpeta de abiertos */
   reciales: {},        /* los que han llegado con la aplicación abierta */
-  recienArchivados: {},  /* claves archivadas por este ordenador hace un instante (fila 90) */
+  recienArchivados: {},
+  ocupados: {},         /* asuntos con una acción larga en marcha: archivar, reabrir, renombrar, unir (fila 100) */  /* claves archivadas por este ordenador hace un instante (fila 90) */
   pendiente: null,     /* el suelto que se va a meter en el asunto que se está creando */
   nuevo: { tipo: null, categoria: null, tercero: null }
 };
@@ -179,7 +180,7 @@ App.pedirCarpeta = async function (cual, idCuadro, idEstado) {
     await Almacen.guardar(cual, h);
   } catch (e) {
     if (e.name === 'AbortError') return;
-    U.aviso('No he podido usar esa carpeta: ' + e.message, 'malo');
+    U.aviso('No he podido usar esa carpeta: ' + U.mensajeDeError(e), 'malo');
   }
 };
 
@@ -250,7 +251,7 @@ $('btn-entrar').onclick = async function () {
     App.irVista(App.E.vista);
     App.vigilarLaCarpeta();
   } catch (e) {
-    U.aviso('No he podido entrar: ' + e.message, 'malo');
+    U.aviso('No he podido entrar: ' + U.mensajeDeError(e), 'malo');
   }
 };
 
@@ -291,7 +292,7 @@ App.avisoFicherosRotos = function (rotos) {
           b.disabled = false;
         }
       } catch (e) {
-        U.aviso('No he podido restaurar ' + nombre + ': ' + e.message, 'malo');
+        U.aviso('No he podido restaurar ' + nombre + ': ' + U.mensajeDeError(e), 'malo');
         b.disabled = false;
       }
     };
@@ -506,6 +507,24 @@ App.guardarRegistroFresco = function (cambiar) {
     App.E.registro = registro;
     App.refrescarFichas();
   });
+};
+
+/* Un asunto con una acción larga en marcha (archivar, reabrir,
+   renombrar, unir) queda marcado mientras dura (fila 100,
+   docs/AVISOS-QUE-DICEN-LA-VERDAD.md): una segunda acción sobre él no
+   arranca, y su tarjeta sale con los botones apagados aunque se
+   repinte (App.tarjetaAsunto). */
+App.conOcupado = async function (nombre, fn) {
+  if (App.E.ocupados[nombre]) {
+    U.aviso('Ese asunto ya tiene una acción en marcha. Espera a que termine.', 'ambar');
+    return;
+  }
+  App.E.ocupados[nombre] = true;
+  try { return await fn(); }
+  finally {
+    delete App.E.ocupados[nombre];
+    if (typeof App.pintarAbiertos === 'function') { try { App.pintarAbiertos(); } catch (e) { /* solo pintar */ } }
+  }
 };
 
 /* Se relee antes de escribir, por si el compañero ha tocado algo

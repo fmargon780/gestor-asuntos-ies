@@ -154,12 +154,30 @@ App.cerrarAsunto = async function (a) {
       ? await Carpetas.fusionarEn(App.E.abiertos, a.nombre, destino, a.nombre)
       : { conSufijo: [] };
     if (!haciendoFusion) await Carpetas.mover(App.E.abiertos, a.nombre, destino);
+  } catch (e) {
+    if (App.E.recienArchivados) delete App.E.recienArchivados[a.nombre];
+    U.fallo('No se ha podido archivar', e);
+    return;
+  }
+
+  /* Lo principal (la carpeta, en el archivo) ya está hecho. De aquí
+     para abajo, si algo falla, el aviso es ámbar y dice qué (fila 100,
+     docs/AVISOS-QUE-DICEN-LA-VERDAD.md): antes salía rojo «No se ha
+     podido archivar» y al repetir, «ya hay una carpeta…». */
+  try {
     var handleArchivado = await destino.getDirectoryHandle(a.nombre);
     var totalFicheros = await Carpetas.contarFicheros(handleArchivado);
     await App.anotar(a.nombre, {
       estado: 'cerrado', categoria: categoria, tercero: tercero,
       cerradoEl: U.ahora(), cerradoPor: App.E.usuario, ficheros: totalFicheros
     });
+  } catch (e) {
+    U.accesorio('La carpeta ya está en el archivo, pero no he podido apuntar el cierre en su ficha. ' +
+      'Pulsa Recargar', e);
+    try { await App.verAbiertos(); } catch (e2) { /* solo pintar */ }
+    return;
+  }
+  try {
     await actualizarIndiceAlArchivar(a.nombre, categoria, tercero, handleArchivado);
     /* Para que App.reengancharFicha (js/ficha-asunto.js), llamado dentro
        de App.verAbiertos() justo abajo, sepa que este ordenador acaba de
@@ -176,8 +194,7 @@ App.cerrarAsunto = async function (a) {
     U.aviso(mensaje, 'bueno');
     await App.verAbiertos();
   } catch (e) {
-    if (App.E.recienArchivados) delete App.E.recienArchivados[a.nombre];
-    U.aviso('No se ha podido archivar: ' + U.mensajeDeError(e), 'malo');
+    U.accesorio('Asunto archivado, pero no he podido poner la lista al día. Pulsa Recargar', e);
   }
 };
 

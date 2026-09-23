@@ -80,7 +80,7 @@ var HitosDocumentos = (function () {
         }
       }
     } catch (e) {
-      U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
       return;
     }
     window.HitosPanel.programarRepintado();

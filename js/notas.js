@@ -251,7 +251,7 @@
             ? '1 nota guardada.'
             : notas.length + ' notas guardadas.';
         } catch (e) {
-          U.aviso('No he podido guardar la nota: ' + e.message, 'malo');
+          U.aviso('No he podido guardar la nota: ' + U.mensajeDeError(e), 'malo');
         }
         boton.disabled = false;
         guardando = false;
@@ -360,7 +360,7 @@
           if (alGuardar) alGuardar();
         })
         .catch(function (e) {
-          if (aviso) aviso.textContent = 'No he podido guardar la nota: ' + e.message;
+          if (aviso) aviso.textContent = 'No he podido guardar la nota: ' + U.mensajeDeError(e);
         });
     });
     guardandoBorrador = propia;

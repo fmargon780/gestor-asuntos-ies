@@ -100,7 +100,7 @@
       var fichero = await handle.getFile();
       buffer = await fichero.arrayBuffer();
     } catch (e) {
-      U.aviso('No he podido leer la plantilla: ' + e.message, 'malo');
+      U.aviso('No he podido leer la plantilla: ' + U.mensajeDeError(e), 'malo');
       return;
     }
 
@@ -121,7 +121,7 @@
     try {
       resultado = await Docx.rellenar(buffer, valores);
     } catch (e) {
-      U.aviso('No he podido rellenar el documento: ' + e.message, 'malo');
+      U.aviso('No he podido rellenar el documento: ' + U.mensajeDeError(e), 'malo');
       return;
     }
 
@@ -142,7 +142,7 @@
     try {
       await guardarBlobEnCarpeta(asunto.handle, nombreDoc, resultado.blob);
     } catch (e) {
-      U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
       return;
     }
 
@@ -374,7 +374,7 @@
         U.aviso('Plantilla de documento mandada a la papelera.', 'bueno');
         refrescarSeccionActual();
       } catch (e) {
-        U.aviso('No he podido borrarla: ' + e.message, 'malo');
+        U.aviso('No he podido borrarla: ' + U.mensajeDeError(e), 'malo');
       }
     }));
 
@@ -511,7 +511,7 @@
       U.aviso(existente ? 'Plantilla de documento guardada.' : 'Plantilla de documento creada.', 'bueno');
       if (typeof alGuardar === 'function') alGuardar();
     } catch (e) {
-      U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -628,7 +628,7 @@
         U.aviso('Plantillas cargadas.', 'bueno');
         if (typeof App.pintarAjustes === 'function') App.pintarAjustes();
       } catch (e) {
-        U.aviso('No he podido cargarlas: ' + e.message, 'malo');
+        U.aviso('No he podido cargarlas: ' + U.mensajeDeError(e), 'malo');
       }
     }
 

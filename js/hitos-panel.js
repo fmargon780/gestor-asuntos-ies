@@ -297,7 +297,7 @@
   function pintarVacio(caja, a, abierto, errorLectura) {
     caja.className = 'explica';
     if (errorLectura) {
-      caja.textContent = 'No he podido leer los hitos: ' + errorLectura.message;
+      caja.textContent = 'No he podido leer los hitos: ' + U.mensajeDeError(errorLectura);
       return;
     }
     if (!abierto) {
@@ -332,7 +332,7 @@
       await Hitos.anadirHito(a.nombre, titulo);
       programarRepintado();
     } catch (e) {
-      U.aviso('No he podido añadir el hito: ' + e.message, 'malo');
+      U.aviso('No he podido añadir el hito: ' + U.mensajeDeError(e), 'malo');
     }
   }
 

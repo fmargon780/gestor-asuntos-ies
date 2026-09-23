@@ -295,34 +295,51 @@ App.editarAsunto = async function (a) {
     editadoEl: U.ahora(), editadoPor: App.E.usuario
   };
 
+  /* Mientras se guarda, el asunto está ocupado (fila 100): ni
+     archivar ni volver a editar hasta que termine. */
+  await App.conOcupado(a.nombre, function () { return guardarEdicion(a, p, d, nombreNuevo, datos); });
+};
+
+/* Lo principal (la carpeta y la ficha) y lo accesorio (la lista, la
+   guía) por separado (fila 100, docs/AVISOS-QUE-DICEN-LA-VERDAD.md). */
+async function guardarEdicion(a, p, d, nombreNuevo, datos) {
+  if (nombreNuevo === a.nombre) {
+    try { await App.anotar(a.nombre, datos); }
+    catch (e) { U.fallo('No se ha podido editar', e); return; }
+    U.aviso('Asunto actualizado.', 'bueno');
+    try { await App.verAbiertos(); }
+    catch (e2) { U.accesorio('Asunto actualizado, pero no he podido poner la lista al día. Pulsa Recargar', e2); }
+    await ofrecerGuiaNueva(a.nombre, p.tipo, d.tipo);
+    return;
+  }
   try {
-    if (nombreNuevo === a.nombre) {
-      await App.anotar(a.nombre, datos);
-      await App.verAbiertos();
-      U.aviso('Asunto actualizado.', 'bueno');
-      await ofrecerGuiaNueva(a.nombre, p.tipo, d.tipo);
-      return;
-    }
     if (await Carpetas.existe(App.E.abiertos, nombreNuevo)) {
       U.aviso('Ya hay otro asunto abierto que se llama así.', 'malo');
       return;
     }
     await Carpetas.renombrar(App.E.abiertos, a.nombre, nombreNuevo);
-
-    /* La ficha viaja con la carpeta, y con ella sus hitos y la señal
-       de presencia si la hubiera (fila 62, docs/RENOMBRAR-SIN-PERDER-HITOS.md):
-       AsuntoRenombrar.mover es el único sitio que mueve las tres cosas
-       a la vez. */
-    await AsuntoRenombrar.mover(a.nombre, nombreNuevo, datos);
-
-    await App.verAbiertos();
-    U.aviso('Asunto editado. La carpeta ya se llama como querías.', 'bueno');
   } catch (e) {
-    U.aviso('No se ha podido editar: ' + e.message, 'malo');
+    U.fallo('No se ha podido editar', e);
     return;
   }
+
+  /* La carpeta ya se llama como se quería. La ficha viaja con ella, y
+     con ella sus hitos y la señal de presencia si la hubiera (fila 62,
+     docs/RENOMBRAR-SIN-PERDER-HITOS.md): AsuntoRenombrar.mover es el
+     único sitio que mueve las tres cosas a la vez. */
+  try {
+    await AsuntoRenombrar.mover(a.nombre, nombreNuevo, datos);
+  } catch (e) {
+    U.accesorio('La carpeta ya se llama como querías, pero no he podido mover su ficha o sus hitos. ' +
+      'Pulsa Recargar y míralo', e);
+    try { await App.verAbiertos(); } catch (e2) { /* solo pintar */ }
+    return;
+  }
+  U.aviso('Asunto editado. La carpeta ya se llama como querías.', 'bueno');
+  try { await App.verAbiertos(); }
+  catch (e3) { U.accesorio('Asunto editado, pero no he podido poner la lista al día. Pulsa Recargar', e3); }
   await ofrecerGuiaNueva(nombreNuevo, p.tipo, d.tipo);
-};
+}
 
 /* Solo cuando la carpeta y la ficha ya han salido bien (fila 94,
    docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md): si el tipo ha cambiado,
@@ -333,6 +350,6 @@ async function ofrecerGuiaNueva(clave, tipoViejo, tipoNuevo) {
   try {
     await HitosCambioDeTipo.ofrecer(clave, tipoViejo, tipoNuevo);
   } catch (e) {
-    U.aviso('El asunto está editado, pero no he podido traer la guía nueva: ' + U.mensajeDeError(e), 'malo');
+    U.aviso('El asunto está editado, pero no he podido traer la guía nueva: ' + U.mensajeDeError(e), 'ambar');
   }
 }

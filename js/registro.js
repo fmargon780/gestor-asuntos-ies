@@ -183,7 +183,7 @@ var Registro = (function () {
     try {
       handle = await Carpetas.elegirFichero(carpetaInicio);
     } catch (e) {
-      if (e.name !== 'AbortError') U.aviso('No he podido abrir ese fichero: ' + e.message, 'malo');
+      if (e.name !== 'AbortError') U.aviso('No he podido abrir ese fichero: ' + U.mensajeDeError(e), 'malo');
       return false;
     }
 
@@ -227,6 +227,14 @@ var Registro = (function () {
         return false;
       }
       await Carpetas.copiarFicheroEn(asunto.handle, estado.handle, nombreNuevo);
+    } catch (e) {
+      U.fallo('No he podido registrarlo', e);
+      return false;
+    }
+    /* El documento registrado ya está en la carpeta: lo de después
+       (quitarlo de pendientes, la nota) es accesorio, y si falla el
+       aviso es ámbar (fila 100, docs/AVISOS-QUE-DICEN-LA-VERDAD.md). */
+    try {
       var codigo = (nombreNuevo.match(/^\d{6}\s+(\S+)/) || [])[1] || '';
       var fechaSello = estado.sello && estado.sello.fecha ? ' el ' + estado.sello.fecha : '';
       await quitarDePendientes(asunto, estado.nombreOriginal);
@@ -234,11 +242,10 @@ var Registro = (function () {
         'Registrado ' + codigo + fechaSello + ' · ' + estado.nombreOriginal,
         'registroDeDocumento', estado.nombreOriginal);
       U.aviso('Documento registrado.', 'bueno');
-      return nombreNuevo;
-    } catch (e) {
-      U.aviso('No he podido registrarlo: ' + e.message, 'malo');
-      return false;
+    } catch (e2) {
+      U.accesorio('Documento registrado, pero no he podido apuntar la nota del registro', e2);
     }
+    return nombreNuevo;
   }
 
   /* ---------- para cuando ya hay un cuadro abierto ----------
@@ -260,9 +267,8 @@ var Registro = (function () {
 
     $('reg-volver').onclick = function () { estado = null; if (alTerminar) alTerminar(); };
     $('reg-guardar').onclick = async function () {
-      $('reg-guardar').disabled = true;
-      var bien = await guardar(asunto);
-      $('reg-guardar').disabled = false;
+      var bien = false;
+      await U.mientrasGuarda($('reg-guardar'), async function () { bien = await guardar(asunto); });
       if (bien) { estado = null; if (alTerminar) alTerminar(); }
     };
   }
@@ -277,11 +283,19 @@ var Registro = (function () {
     var promesa = U.preguntar('Registrar "' + nombreDocumento + '"', camposHtml(), 'Registrar');
     enganchar();
     aplicarSelloYFoco('cuadro-aceptar');
+    /* El cuadro no se cierra hasta que termina de guardar, con
+       «Guardando…» en el botón (fila 100): antes se cerraba y el
+       guardado seguía sin ninguna señal. Si falla, se queda abierto. */
+    var aceptar = $('cuadro-aceptar');
+    var cerrarDeVerdad = aceptar.onclick;
+    var bien = false;
+    aceptar.onclick = async function () {
+      await U.mientrasGuarda(aceptar, async function () { bien = await guardar(asunto); });
+      if (bien) cerrarDeVerdad();
+    };
     var ok = await promesa;
-    if (!ok) { estado = null; return; }
-    var bien = await guardar(asunto);
     estado = null;
-    if (bien && alTerminar) alTerminar();
+    if (ok && bien && alTerminar) alTerminar();
   }
 
   return {

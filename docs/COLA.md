@@ -92,12 +92,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 62, 64 a 75, 77 a 99 están **HECHAS**. Sus documentos siguen en
+Las filas 1 a 62, 64 a 75, 77 a 100 están **HECHAS**. Sus documentos siguen en
 `docs/`, y el detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 100 | `docs/AVISOS-QUE-DICEN-LA-VERDAD.md` (lo principal y lo accesorio por separado: verde, ámbar o rojo; botones que se bloquean de verdad; errores en castellano). Después de la 99 | EN CURSO (23-sep-2026) |
 | 101 | `docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md` (repintar solo lo que se ve y ha cambiado; el último repintado gana). Después de la 100 | PENDIENTE |
 | 102 | `docs/DOCUMENTOS-DESDE-EL-HITO.md` (plantillas de documento unidas a un paso o modelo de la biblioteca; "Generar documento" dentro del hito, que lo deja apuntado a él; huecos del hito). Después de la 101 | PENDIENTE |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |

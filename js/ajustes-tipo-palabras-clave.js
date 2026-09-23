@@ -37,7 +37,7 @@ var PalabrasClaveTipo = (function () {
           await App.guardarTipos();
           U.aviso('Palabras clave de ' + tipo.tipo + ' guardadas.', 'bueno');
         } catch (e) {
-          U.aviso('No he podido guardarlas: ' + e.message, 'malo');
+          U.aviso('No he podido guardarlas: ' + U.mensajeDeError(e), 'malo');
         }
       });
     };

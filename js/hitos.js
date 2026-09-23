@@ -346,8 +346,12 @@ var Hitos = (function () {
     if (!estado || !window.App) return;
     try {
       await App.anotar(clave, { situacion: estado, situacionEl: U.ahora(), situacionPor: App.E.usuario });
-      if (typeof App.pintarAbiertos === 'function') App.pintarAbiertos();
-    } catch (e) { /* no crítico: el hito ya ha quedado guardado */ }
+    } catch (e) {
+      /* El hito ya ha quedado guardado: ámbar, no rojo (fila 100). */
+      U.accesorio('Hito guardado, pero no he podido poner el estado "' + estado + '" al asunto', e);
+      return;
+    }
+    try { if (typeof App.pintarAbiertos === 'function') App.pintarAbiertos(); } catch (e2) { /* solo pintar */ }
   }
 
   /* Las fechas límite calculadas por plazo (sección 7): cuando un hito
@@ -454,7 +458,9 @@ var Hitos = (function () {
      MARCAR UN HITO (pendiente/encurso/hecho/noaplica)
      ========================================================== */
 
-  async function marcar(clave, idHito, nuevoEstado) {
+  /* `nota` (opcional, fila 100): una nota que se apunta en el hito en la
+     MISMA escritura, en vez de en una segunda que pudiera fallar sola. */
+  async function marcar(clave, idHito, nuevoEstado, nota) {
     if (CLASES_ESTADO.indexOf(nuevoEstado) === -1) return hitosDe(clave);
     var resultado = null;
     var datos = await cambiar(function (d) {
@@ -463,6 +469,7 @@ var Hitos = (function () {
       var h = buscar(entrada.hitos, idHito);
       if (!h) return d;
       h.estado = nuevoEstado;
+      if (nota) h.notas.push({ texto: String(nota), quien: (window.App && App.E.usuario) || '', cuando: U.ahora() });
       if (nuevoEstado === 'encurso') h.desde = U.hoyIso();
       if (nuevoEstado === 'hecho') aplicarPlazosDependientes(entrada.hitos, h.id, d.ajustes.noLectivos);
       resultado = recomputeEnCurso(entrada.hitos);

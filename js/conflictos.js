@@ -210,7 +210,7 @@
       pintarBloque();
       U.aviso('Se guarda el de este ordenador. El otro queda a salvo en _GESTOR/copias.', 'bueno');
     } catch (e) {
-      U.aviso('No he podido resolverlo: ' + e.message, 'malo');
+      U.aviso('No he podido resolverlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -236,7 +236,7 @@
       pintarBloque();
       U.aviso('Se guarda el del otro ordenador. El que había queda a salvo en _GESTOR/copias.', 'bueno');
     } catch (e) {
-      U.aviso('No he podido resolverlo: ' + e.message, 'malo');
+      U.aviso('No he podido resolverlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 

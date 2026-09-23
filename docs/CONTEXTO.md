@@ -373,7 +373,26 @@ las dos carpetas en ese ordenador, para el botón «Ruta»). **El tablón no se 
   "Guardando…", y lo devuelve a como estaba, guarde o falle. Ya se usa en el estado del asunto, la
   vía, el plazo, archivar/reabrir (`js/ficha-asunto.js`, `js/asuntos-lista.js`) y en marcar,
   cambiar de rama, o tocar el responsable/fecha/notas/documentos de un hito
-  (`js/hitos-panel-lista.js`). Se comprueba con `pruebas/refresco.mjs`.
+  (`js/hitos-panel-lista.js`). Se comprueba con `pruebas/refresco.mjs`. Desde la fila 100 pone
+  `data-guardando` en el control (el modo consulta de la ficha, `aplicarModoConsulta`, ya solo toca
+  lo que él mismo apagó y respeta esa marca) y un segundo clic mientras guarda no hace nada. Va
+  solo alrededor de la escritura, nunca del cuadro de diálogo (`App.editarPlazo(a, control)`,
+  `abrirLoPide(a, control)`; registrar desde su cuadro lo deja abierto en «Guardando…» hasta el
+  final).
+- **Lo principal y lo accesorio, por separado** (fila 100, 23-sep-2026,
+  `docs/AVISOS-QUE-DICEN-LA-VERDAD.md`). Si falla lo principal: `U.fallo('No he podido …', e)`,
+  rojo, y la pantalla como estaba. Si sale bien: verde. Si después falla algo accesorio (índice,
+  nota, lista, hitos, borrar el original de un traslado): `U.accesorio('Guardado, pero no he
+  podido …', e)`, ámbar. Los dos pasan por `U.aviso` y por `U.mensajeDeError` (en castellano:
+  ningún aviso lleva ya `e.message` a pelo). Aplicado en marcar un hito (la nota va en la misma
+  escritura, `Hitos.marcar(clave, id, estado, nota)`), el estado, archivar, registrar, poner
+  nombre, crear, renombrar, meter un papel, la papelera (se apunta ANTES de mover la carpeta) y
+  unir (mueve también las subcarpetas). Un traslado con la copia completa pero sin poder borrar el
+  original se da por bueno, con ámbar (`Carpetas`, `borrarOrigenYaCopiado`).
+- **Un asunto con una acción larga en marcha** (archivar, reabrir, editar, unir, a la papelera)
+  queda en `App.E.ocupados` (`App.conOcupado`): una segunda no arranca y su tarjeta sale apagada.
+  **Un cuadro sobre otro** da por cancelado el primero (`U.preguntar`). Se comprueba con
+  `pruebas/avisos-que-dicen-la-verdad.mjs`.
 - **Un bloque que se repinta solo (sin que nadie lo pida) nunca puede tirar lo que se está
   escribiendo, ni el foco, ni el cursor.** Envolver ese repintado en
   `U.conservandoLoEscrito(raiz, fn, clavePara)` (`js/util.js`, 17-sep-2026, filas 33 y 34 de la

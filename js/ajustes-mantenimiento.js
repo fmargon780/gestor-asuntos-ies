@@ -25,7 +25,7 @@ App.pintarCopias = async function () {
   try {
     todas = await Copias.listarTodas(App.E.gestor);
   } catch (e) {
-    caja.innerHTML = '<div class="vacio">No he podido leer las copias: ' + U.escapar(e.message) + '</div>';
+    caja.innerHTML = '<div class="vacio">No he podido leer las copias: ' + U.escapar(U.mensajeDeError(e)) + '</div>';
     return;
   }
 
@@ -58,7 +58,7 @@ App.pintarCopias = async function () {
         U.aviso(nombre + ' restaurado.', 'bueno');
         location.reload();
       } catch (e) {
-        U.aviso('No he podido restaurarlo: ' + e.message, 'malo');
+        U.aviso('No he podido restaurarlo: ' + U.mensajeDeError(e), 'malo');
       }
     };
     f.appendChild(restaurar);

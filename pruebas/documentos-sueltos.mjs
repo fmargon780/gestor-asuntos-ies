@@ -188,9 +188,10 @@ await pagina.waitForTimeout(300);
 await pagina.click('#enlace-todos .enlace-asunto');
 await pagina.waitForTimeout(700);
 
-await comprobar('5. si el traslado falla, se avisa',
+/* Desde la fila 100 (docs/AVISOS-QUE-DICEN-LA-VERDAD.md) dice también el motivo. */
+await comprobar('5. si el traslado falla, se avisa, con el motivo',
   elUltimoAviso(),
-  'El documento no ha podido entrar en el asunto. Sigue en Por clasificar.');
+  'El documento no ha podido entrar en el asunto. Sigue en Por clasificar: el disco se ha puesto tonto');
 await comprobar('y el documento sigue en la raíz',
   enLaRaiz().then(l => l.indexOf('Otro papel cualquiera.pdf') !== -1), true);
 await comprobar('y no se ha abierto el cuadro de ponerle nombre',

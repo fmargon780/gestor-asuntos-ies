@@ -250,7 +250,7 @@ window.Cargos = Cargos;
       try {
         await Cargos.editarOcupante(cargo.id, o.id, nombre.value.trim(), desde.value, hasta.value);
         alGuardar();
-      } catch (e) { U.aviso('No he podido guardarlo: ' + e.message, 'malo'); }
+      } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
     }
     nombre.onchange = guardarCambio;
     desde.onchange = guardarCambio;
@@ -309,7 +309,7 @@ window.Cargos = Cargos;
         await Cargos.anadirOcupante(cargo.id, persona, desde);
         U.aviso('Persona añadida.', 'bueno');
         alRefrescar();
-      } catch (e) { U.aviso('No he podido guardarlo: ' + e.message, 'malo'); }
+      } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
     };
     acciones.appendChild(anadir);
 
@@ -324,7 +324,7 @@ window.Cargos = Cargos;
           await Cargos.cerrarOcupante(cargo.id, vigente.id, $('cargo-fecha-cese').value);
           U.aviso('Cerrado.', 'bueno');
           alRefrescar();
-        } catch (e) { U.aviso('No he podido guardarlo: ' + e.message, 'malo'); }
+        } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
       };
       acciones.appendChild(cerrar);
     }
@@ -342,7 +342,7 @@ window.Cargos = Cargos;
         await Cargos.renombrarCargo(cargo.id, $('cargo-editar-nombre').value.trim() || cargo.nombre,
           $('cargo-editar-tratamiento').value.trim());
         alRefrescar();
-      } catch (e) { U.aviso('No he podido guardarlo: ' + e.message, 'malo'); }
+      } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
     };
     acciones.appendChild(editar);
 
@@ -355,7 +355,7 @@ window.Cargos = Cargos;
           await Cargos.borrarCargo(cargo.id);
           U.aviso('Cargo mandado a la papelera.', 'bueno');
           alRefrescar();
-        } catch (e) { U.aviso('No he podido borrarlo: ' + e.message, 'malo'); }
+        } catch (e) { U.aviso('No he podido borrarlo: ' + U.mensajeDeError(e), 'malo'); }
       }));
     }
     div.appendChild(acciones);
@@ -393,7 +393,7 @@ window.Cargos = Cargos;
       try {
         await Cargos.crearCargo(nombre, $('cargo-nuevo-tratamiento').value.trim());
         pintarEnAjustes();
-      } catch (e) { U.aviso('No he podido crearlo: ' + e.message, 'malo'); }
+      } catch (e) { U.aviso('No he podido crearlo: ' + U.mensajeDeError(e), 'malo'); }
     };
     caja.appendChild(nuevo);
 

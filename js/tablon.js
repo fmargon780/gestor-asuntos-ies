@@ -83,7 +83,7 @@
       notas = lista;
       pintar();
     } catch (e) {
-      U.aviso('No he podido guardar la nota: ' + e.message, 'malo');
+      U.aviso('No he podido guardar la nota: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -455,7 +455,7 @@
           return lista.filter(function (x) { return x.id !== n.id; });
         });
       } catch (e) {
-        U.aviso('No he podido mandarla a la papelera: ' + e.message, 'malo');
+        U.aviso('No he podido mandarla a la papelera: ' + U.mensajeDeError(e), 'malo');
       }
     }));
 
@@ -496,7 +496,7 @@
       fallo = '';
       pintar();
     } catch (e) {
-      fallo = e.message || 'no he podido leer las notas';
+      fallo = U.mensajeDeError(e) || 'no he podido leer las notas';
       pintar();
     }
   }

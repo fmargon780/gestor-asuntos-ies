@@ -188,7 +188,7 @@
       /* Lo que el navegador no sabe enseñar se abre fuera, como antes. */
       if (clase === 'otro') window.open(url, '_blank');
     } catch (e) {
-      U.aviso('No he podido abrir el documento: ' + e.message, 'malo');
+      U.aviso('No he podido abrir el documento: ' + U.mensajeDeError(e), 'malo');
     }
   }
 

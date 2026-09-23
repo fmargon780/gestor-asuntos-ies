@@ -431,9 +431,14 @@
         '<p>¿Seguro? ' + U.escapar(ocupacionActual.usuario) + ' podría estar escribiendo ahora ' +
         'mismo.</p>', 'Tomar el mando');
       if (!ok || !actual) return;
-      await Presencia.tomarElMando(actual.nombre);
-      ocupacionActual = null;
-      pintar();
+      try {
+        await Presencia.tomarElMando(actual.nombre);
+        ocupacionActual = null;
+      } catch (e) {
+        U.fallo('No he podido tomar el mando', e);
+      } finally {
+        pintar();
+      }
     };
     caja.appendChild(tomar);
   }
@@ -469,8 +474,17 @@
     if (!raiz) return;
     var enConsulta = !!ocupacionActual;
     raiz.classList.toggle('ficha-consulta', enConsulta);
+    /* Solo toca lo que él mismo apaga (fila 100): antes ponía
+       disabled=false en TODO, y volvía a encender un botón que estaba
+       «Guardando…» o las casillas de hito de un asunto archivado. */
     Array.prototype.forEach.call(raiz.querySelectorAll('button, select, input, textarea'), function (el) {
-      el.disabled = enConsulta && !esControlDeSoloLectura(el);
+      if (el.dataset.guardando) return;
+      if (enConsulta && !esControlDeSoloLectura(el)) {
+        if (!el.disabled) { el.disabled = true; el.dataset.apagadoPorConsulta = '1'; }
+      } else if (el.dataset.apagadoPorConsulta) {
+        el.disabled = false;
+        delete el.dataset.apagadoPorConsulta;
+      }
     });
   }
 
@@ -534,20 +548,28 @@
       sel.onchange = async function () {
         if (!sel.value) return;
         var original = sel.value;
-        await U.mientrasGuarda(sel, function () {
-          return RegistroSellado.asociar(a, d.nombre, original, d.sello);
-        });
-        if (actual !== a) return;
-        pintarDocumentos(a);
-        if (window.Notas) {
-          a.ficha.notas = await window.Notas.frescas(a);
-          pintarNotas(a, modoActual === 'abierto');
+        try {
+          await U.mientrasGuarda(sel, function () {
+            return RegistroSellado.asociar(a, d.nombre, original, d.sello);
+          });
+        } catch (e) {
+          U.fallo('No he podido asociar el sello', e);
         }
-        pintarSellos(a);
+        if (actual !== a) return;
+        try {
+          pintarDocumentos(a);
+          if (window.Notas) {
+            a.ficha.notas = await window.Notas.frescas(a);
+            pintarNotas(a, modoActual === 'abierto');
+          }
+        } finally {
+          pintarSellos(a);
+        }
       };
 
       noEs.onclick = async function () {
-        await U.mientrasGuarda(noEs, function () { return RegistroSellado.marcarIgnorado(a, d.nombre); });
+        try { await U.mientrasGuarda(noEs, function () { return RegistroSellado.marcarIgnorado(a, d.nombre); }); }
+        catch (e) { U.fallo('No he podido guardarlo', e); }
         if (actual !== a) return;
         pintarSellos(a);
       };
@@ -673,16 +695,25 @@
      aunque no se haya elegido "quién lo pide", y viceversa. Ninguno de
      los dos cambia de sitio en `asuntos.json` (`loPide` y
      `via`/`viaDato` siguen siendo las mismas claves de siempre). */
-  async function abrirLoPide(a) {
-    var persona = await personaDelTerceroLoPide(a);
+  /* El cuadro se abre al momento y la persona se carga después (fila
+     100: antes esperaba a Datos.cargar con el botón ya en
+     «Guardando…»). `control`, el botón que lo abrió, solo se apaga
+     mientras se guarda. */
+  async function abrirLoPide(a, control) {
     var tieneDato = !!(a.ficha.loPide && a.ficha.loPide.nombre);
     var pieQuitar = tieneDato
       ? '<button type="button" class="boton" id="lopide-quitar" style="margin-top:10px">Quitar el dato</button>'
       : '';
     var promesa = U.preguntar('El encargo',
       '<p class="explica">Quién ha pedido esta gestión, por qué vía y en qué fecha.</p>' +
-      '<div id="lopide-caja-ficha"></div>' + pieQuitar, 'Guardar');
+      '<div id="lopide-caja-ficha"><p class="nota">Cargando…</p></div>' + pieQuitar, 'Guardar');
     var caja = $('lopide-caja-ficha');
+    var aceptar = $('cuadro-aceptar');
+    aceptar.disabled = true;
+    var persona = await personaDelTerceroLoPide(a);
+    aceptar.disabled = false;
+    if (!caja.isConnected) return;   /* se cerró mientras cargaba */
+    caja.innerHTML = '';
     var controles = LoPide.controles(caja, persona, a.ficha.loPide || null,
       { via: a.ficha.via || '', viaDato: a.ficha.viaDato || '' });
 
@@ -693,19 +724,25 @@
     }
 
     var ok = await promesa;
-    if (quitado) {
-      /* `loPide: null`, no `undefined`: App.anotar hace Object.assign, y
-         undefined no borra nada (docs/LO-PIDE.md, 1). La vía no se
-         toca: "Quitar el dato" es solo de "Lo pide". */
-      await App.anotar(a.nombre, { loPide: null });
-      return;
+    try {
+      if (quitado) {
+        /* `loPide: null`, no `undefined`: App.anotar hace Object.assign, y
+           undefined no borra nada (docs/LO-PIDE.md, 1). La vía no se
+           toca: "Quitar el dato" es solo de "Lo pide". */
+        await U.mientrasGuarda(control || null, function () { return App.anotar(a.nombre, { loPide: null }); });
+        return;
+      }
+      if (!ok) return;
+      var via = controles.leerVia();
+      await U.mientrasGuarda(control || null, function () {
+        return App.anotar(a.nombre, {
+          loPide: controles.leer(),
+          via: via.via, viaDato: via.dato, viaEl: U.ahora(), viaPor: App.E.usuario
+        });
+      });
+    } catch (e) {
+      U.fallo('No he podido guardar el encargo', e);
     }
-    if (!ok) return;
-    var via = controles.leerVia();
-    await App.anotar(a.nombre, {
-      loPide: controles.leer(),
-      via: via.via, viaDato: via.dato, viaEl: U.ahora(), viaPor: App.E.usuario
-    });
   }
 
   /* ---------- la barra de botones ----------
@@ -751,8 +788,8 @@
                  '>' + U.escapar(e) + '</option>';
         }).join('');
       sel.onchange = async function () {
-        await U.mientrasGuarda(sel, function () { return App.ponerEstado(a, sel.value); });
-        pintar();
+        try { await U.mientrasGuarda(sel, function () { return App.ponerEstado(a, sel.value); }); }
+        finally { pintar(); }
       };
       caja.appendChild(sel);
 
@@ -763,8 +800,7 @@
       bplazo.textContent = et.texto;
       bplazo.title = 'Poner o cambiar la fecha límite';
       bplazo.onclick = async function (ev) {
-        await U.mientrasGuarda(ev.currentTarget, function () { return App.editarPlazo(a); });
-        pintar();
+        try { await App.editarPlazo(a, ev.currentTarget); } finally { pintar(); }
       };
       caja.appendChild(bplazo);
 
@@ -775,8 +811,7 @@
         envoltorioEncargo.appendChild(boton('El encargo',
           'Quién ha pedido esta gestión, por qué vía y en qué fecha',
           async function (ev) {
-            await U.mientrasGuarda(ev.currentTarget, function () { return abrirLoPide(a); });
-            pintar();
+            try { await abrirLoPide(a, ev.currentTarget); } finally { pintar(); }
           }, tieneEncargo));
         var resumen = resumenDelEncargo(a);
         if (resumen) {
@@ -864,7 +899,7 @@
       await App.verAbiertos();
       U.aviso('Tipo ' + nombre + ' añadido a la lista.', 'bueno');
     } catch (e) {
-      U.aviso('No he podido añadirlo: ' + e.message, 'malo');
+      U.aviso('No he podido añadirlo: ' + U.mensajeDeError(e), 'malo');
     }
   }
 

@@ -38,7 +38,7 @@
       guias = (leido && typeof leido === 'object') ? leido : {};
     } catch (e) {
       guias = {};
-      U.aviso('No he podido leer las guías: ' + e.message, 'malo');
+      U.aviso('No he podido leer las guías: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -157,7 +157,7 @@
         : nombreTipo + ' se queda sin guía.', 'bueno');
       return true;
     } catch (e) {
-      U.aviso('No he podido guardarla: ' + e.message, 'malo');
+      U.aviso('No he podido guardarla: ' + U.mensajeDeError(e), 'malo');
       return false;
     }
   }

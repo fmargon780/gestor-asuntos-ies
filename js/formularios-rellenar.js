@@ -191,7 +191,7 @@ var FormulariosRellenar = (function () {
 
     var bytesPdf;
     try { bytesPdf = await leerPdfDelRepositorio(f.f); }
-    catch (e) { U.aviso(e.message, 'malo'); return; }
+    catch (e) { U.aviso(U.mensajeDeError(e), 'malo'); return; }
 
     var mapas = await cargar(App.E.gestor);
     var mapa = mapas[clave] || {};
@@ -199,7 +199,7 @@ var FormulariosRellenar = (function () {
 
     var resultado;
     try { resultado = await rellenarPdf(bytesPdf, mapa, valores); }
-    catch (e) { U.aviso('No he podido rellenarlo: ' + e.message, 'malo'); return; }
+    catch (e) { U.aviso('No he podido rellenarlo: ' + U.mensajeDeError(e), 'malo'); return; }
 
     var nombreDoc = Nombres.montarDocumento({ fecha: U.hoyIso(), tipo: 'IMPRESO', curso: f.n, extension: 'pdf' });
     if (nombreDoc.length > App.LARGO_MAXIMO_NOMBRE) {
@@ -217,7 +217,7 @@ var FormulariosRellenar = (function () {
     try {
       await Carpetas.escribirBytes(asunto.handle, nombreDoc, resultado.bytes, 'application/pdf');
     } catch (e) {
-      U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
       return;
     }
 
@@ -356,7 +356,7 @@ var FormulariosRellenar = (function () {
           U.aviso('Guardado.', 'bueno');
           pintarPantallaImpresos();
         } catch (e) {
-          U.aviso('No he podido guardarlo: ' + e.message, 'malo');
+          U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
         }
       };
     });

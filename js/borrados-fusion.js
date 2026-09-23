@@ -161,7 +161,7 @@ App.pintarBorradosFusion = async function () {
   try {
     conteo = await Borrados.contar(App.E.gestor);
   } catch (e) {
-    caja.innerHTML = '<div class="vacio">No he podido leer los borrados: ' + U.escapar(e.message) + '</div>';
+    caja.innerHTML = '<div class="vacio">No he podido leer los borrados: ' + U.escapar(U.mensajeDeError(e)) + '</div>';
     return;
   }
 
@@ -193,7 +193,7 @@ App.pintarBorradosFusion = async function () {
         U.aviso('Borrados de ' + App.NOMBRES_BORRADOS[lista].toLowerCase() + ' limpiados.', 'bueno');
         App.pintarBorradosFusion();
       } catch (e) {
-        U.aviso('No he podido limpiarlos: ' + e.message, 'malo');
+        U.aviso('No he podido limpiarlos: ' + U.mensajeDeError(e), 'malo');
       }
     };
     f.appendChild(quitar);

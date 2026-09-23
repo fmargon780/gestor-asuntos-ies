@@ -213,8 +213,25 @@ var Carpetas = (function () {
       try { await padreDestino.removeEntry(nombreDestino, { recursive: true }); } catch (e2) { /* si no se puede limpiar, se lanza igual el error de arriba */ }
       throw e;
     }
-    await padreOrigen.removeEntry(nombre, { recursive: true });
+    await borrarOrigenYaCopiado(padreOrigen, nombre);
     return esperados;
+  }
+
+  /* La copia ya está entera en el destino: si ahora no se puede borrar
+     el original (un fichero abierto en Word o en Acrobat, Dropbox
+     bloqueándolo), el traslado se da por bueno y se avisa en ámbar de
+     que queda una copia vieja (fila 100, docs/AVISOS-QUE-DICEN-LA-VERDAD.md).
+     Antes salía rojo, y al repetir, «ya hay una carpeta…». */
+  async function borrarOrigenYaCopiado(padreOrigen, nombre) {
+    try {
+      await padreOrigen.removeEntry(nombre, { recursive: true });
+    } catch (e) {
+      var donde = (padreOrigen && padreOrigen.name ? padreOrigen.name + ' / ' : '') + nombre;
+      if (window.U && U.accesorio) {
+        U.accesorio('Hecho, pero queda una copia vieja en ' + donde + '; ciérrala si está abierta ' +
+          'en otro programa y bórrala', e);
+      }
+    }
   }
 
   /* ---------- fusionar dos carpetas ----------
@@ -310,7 +327,7 @@ var Carpetas = (function () {
        es del registro de un asunto que se está BORRANDO, no de este
        origen ya fusionado). Se borra igual que hace `trasladar` de
        siempre, ya comprobado uno a uno. */
-    await padreOrigen.removeEntry(nombre, { recursive: true });
+    await borrarOrigenYaCopiado(padreOrigen, nombre);
     return { copiados: rastro.copiados, yaEstaban: rastro.yaEstaban, conSufijo: rastro.conSufijo };
   }
 

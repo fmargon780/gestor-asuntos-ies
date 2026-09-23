@@ -111,7 +111,7 @@ var OtrosDelTercero = (function () {
       });
     } catch (e) {
       caja.className = 'explica';
-      caja.textContent = 'No he podido mirar el archivo: ' + e.message;
+      caja.textContent = 'No he podido mirar el archivo: ' + U.mensajeDeError(e);
       resumenDeOtros(caja, 0);
     }
   }
@@ -174,7 +174,7 @@ var OtrosDelTercero = (function () {
         abrirFicha(a, 'abierto');
       }
     } catch (e) {
-      U.aviso('No he podido abrir «' + nombre + '»: ' + e.message + '.', 'malo');
+      U.aviso('No he podido abrir «' + nombre + '»: ' + U.mensajeDeError(e) + '.', 'malo');
     }
   }
 
