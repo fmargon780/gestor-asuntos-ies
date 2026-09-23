@@ -98,6 +98,7 @@ Las filas 1 a 62, 64 a 75, 77 a 100 están **HECHAS**. Sus documentos siguen en
 | Nº | Instrucción | Estado |
 |---|---|---|
 | 101 | `docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md` (repintar solo lo que se ve y ha cambiado; el último repintado gana). Después de la 100 | PENDIENTE |
+| 102 | `docs/DOCUMENTOS-DESDE-EL-HITO.md` (plantillas de documento unidas a un paso o modelo de la biblioteca; "Generar documento" dentro del hito, que lo deja apuntado a él; huecos del hito). Después de la 101 | PENDIENTE |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
@@ -123,6 +124,9 @@ la primera PENDIENTE **de arriba abajo** es la que se coge.
 guarda y repinta la aplicación (error o pantalla congelada al guardar, aunque sí se guarda). Son
 lo más urgente y van en ese orden: cada una usa lo que deja la anterior.
 
+**La fila 102 se apuntó el 23-sep-2026**, cerrada con Francisco: primera tanda de que el hito sea
+la mesa de trabajo del asunto. Va detrás de la 101.
+
 **Ninguna fila se sube junto con otra.** Cada una, su subida.
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
@@ -140,8 +144,8 @@ lo más urgente y van en ese orden: cada una usa lo que deja la anterior.
   solo viajarían el identificador del asunto y el nombre de quien lo abre, nunca el nombre de la
   carpeta ni dato alguno de alumnado o personal, y con servidor en la Unión Europea.
 - Cuando los hitos (fila 15) estén en uso: si el estado del asunto desaparece y lo sustituye el
-  hito en curso. Lo de que un hito apunte a su plantilla de correo lo resuelve la fila 60; queda
-  pendiente lo mismo con la plantilla de documento (fila 17).
+  hito en curso. Lo de que un hito apunte a su plantilla de correo lo resuelve la fila 60; lo de
+  la plantilla de documento, la fila 102.
 - Los nueve asuntos de `docs/PROXIMOS-ASUNTOS.md` (14-sep-2026) están todos metidos en la cola:
   esa lista queda cerrada.
 - De la fila 54 (18-sep-2026): para un grupo de destinatarios que se repite todos los meses, lo
