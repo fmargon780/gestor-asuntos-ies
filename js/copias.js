@@ -126,18 +126,31 @@ var Copias = (function () {
     var carpeta = await carpetaCopias(gestor);
     var base = nombreSinExtension(nombre);
     var nombreCopia = base + '-' + hoyAaMmDd() + '.json';
-    if (await Carpetas.existe(carpeta, nombreCopia)) return;
+    /* existeFichero, no existe (que busca una CARPETA y con un fichero
+       siempre decía que no): antes cada guardado rehacía la copia del
+       día y listaba copias/ entera (fila 99, docs/GUARDAR-EN-FILA.md).
+       Así la copia de hoy es la de antes del PRIMER guardado del día.
+       Y en memoria, para no preguntarle al disco cada vez. */
+    if (copiasHechas[nombreCopia]) return;
+    if (await Carpetas.existeFichero(carpeta, nombreCopia)) { copiasHechas[nombreCopia] = true; return; }
     var actual = await Carpetas.leerTexto(gestor, nombre);
     if (actual === null) return;
     await Carpetas.escribirTexto(carpeta, nombreCopia, actual);
+    copiasHechas[nombreCopia] = true;
     await podar(carpeta, base);
   }
+  var copiasHechas = {};
 
   /* Lo que hay que llamar en vez de Carpetas.guardarJson para los
      ficheros compartidos: guarda la copia del día y después escribe. */
-  async function guardar(gestor, nombre, objeto) {
-    await copiarSiHaceFalta(gestor, nombre);
-    await Carpetas.guardarJson(gestor, nombre, objeto);
+  function guardar(gestor, nombre, objeto) {
+    /* Cuenta como guardado en marcha (fila 99): las tareas de fondo
+       esperan a la siguiente pasada. */
+    var hacer = async function () {
+      await copiarSiHaceFalta(gestor, nombre);
+      await Carpetas.guardarJson(gestor, nombre, objeto);
+    };
+    return window.ColaGuardado ? window.ColaGuardado.ocupado(hacer) : hacer();
   }
 
   /* Mira los ficheros compartidos y dice cuáles están rotos (existen

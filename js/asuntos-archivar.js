@@ -145,6 +145,10 @@ App.cerrarAsunto = async function (a) {
     }
 
     var destino = await Carpetas.bajar(App.E.archivo, [categoria, tercero], true);
+    /* Antes de mover la carpeta, no después (fila 99): una mirada a la
+       carpeta a mitad del traslado ya sabe que esto no es "otro
+       ordenador". */
+    App.E.recienArchivados[a.nombre] = true;
     var haciendoFusion = await Carpetas.existe(destino, a.nombre);
     var resultado = haciendoFusion
       ? await Carpetas.fusionarEn(App.E.abiertos, a.nombre, destino, a.nombre)
@@ -172,6 +176,7 @@ App.cerrarAsunto = async function (a) {
     U.aviso(mensaje, 'bueno');
     await App.verAbiertos();
   } catch (e) {
+    if (App.E.recienArchivados) delete App.E.recienArchivados[a.nombre];
     U.aviso('No se ha podido archivar: ' + U.mensajeDeError(e), 'malo');
   }
 };

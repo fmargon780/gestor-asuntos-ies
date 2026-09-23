@@ -202,6 +202,10 @@ const carpetaViejaArchivada = await carpetaOtroTercero.getDirectoryHandle(NOMBRE
 /* Nada en asuntos.json (se borró al archivar, como pasaba antes de
    esta fila) y ningún _ficha.json en la carpeta. */
 await escribirAsuntos({ asuntos: {} });
+/* Como si se acabara de entrar con ese asuntos.json: desde la fila 99
+   (docs/GUARDAR-EN-FILA.md) un asuntos.json que llega vacío de golpe,
+   cuando el último leído tenía asuntos, no se cree a la primera. */
+App.E.asuntosEnDisco = 0;
 await App.cargarRegistro();
 
 let rompio = false;

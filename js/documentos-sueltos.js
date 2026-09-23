@@ -396,6 +396,10 @@ App.vigilarLaCarpeta = function () {
 
 App.mirarLaCarpeta = async function () {
   if (!App.E.abiertos || App.mirando) return;
+  /* Con un guardado o un traslado en marcha no se mira (fila 99,
+     docs/GUARDAR-EN-FILA.md): durante un archivado vería desaparecer
+     la carpeta y sacaría de la ficha con un aviso en rojo. */
+  if (window.ColaGuardado && ColaGuardado.hayGuardado()) return;
   if ($('aplicacion').classList.contains('oculto')) return;
   App.mirando = true;
   try {

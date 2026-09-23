@@ -77,7 +77,17 @@
     await Carpetas.moverFichero(g, nombreConflicto, copias, nombreConflicto);
   }
 
-  async function fusionarAsuntos(g, nombreConflicto) {
+  /* Fila 99 (docs/GUARDAR-EN-FILA.md): en la misma fila que los demás
+     guardados de asuntos.json, así no cambia App.E.registro a mitad de
+     otra acción; y parte de una copia ENTERA del fichero real (antes
+     montaba uno nuevo solo con `asuntos` y se perdían `ajustesAvisos`
+     y cualquier otro dato de primer nivel). */
+  function fusionarAsuntos(g, nombreConflicto) {
+    var hacer = function () { return fusionarAsuntosYa(g, nombreConflicto); };
+    return window.ColaGuardado ? ColaGuardado.poner(App.FICHERO_ASUNTOS, hacer) : hacer();
+  }
+
+  async function fusionarAsuntosYa(g, nombreConflicto) {
     var real, conflicto;
     try {
       real = await Carpetas.leerJson(g, App.FICHERO_ASUNTOS);
@@ -90,7 +100,7 @@
     Object.keys(registroReal.asuntos).forEach(function (k) { claves[k] = true; });
     Object.keys(conflicto.asuntos).forEach(function (k) { claves[k] = true; });
 
-    var fusion = { asuntos: {} };
+    var fusion = Object.assign({}, conflicto, registroReal, { asuntos: {} });
     Object.keys(claves).forEach(function (k) {
       var a = registroReal.asuntos[k], b = conflicto.asuntos[k];
       fusion.asuntos[k] = (a && b) ? fusionarFicha(a, b) : (a || b);
@@ -122,7 +132,12 @@
     return salida;
   }
 
-  async function fusionarHitos(g, nombreConflicto) {
+  function fusionarHitos(g, nombreConflicto) {
+    var hacer = function () { return fusionarHitosYa(g, nombreConflicto); };
+    return window.ColaGuardado ? ColaGuardado.poner('hitos.json', hacer) : hacer();
+  }
+
+  async function fusionarHitosYa(g, nombreConflicto) {
     var real, conflicto;
     try {
       real = await Carpetas.leerJson(g, 'hitos.json');
@@ -335,6 +350,8 @@
     window.Gestor.alRefrescar.push(function () {
       var g = window.Gestor.carpetaGestor();
       if (!g) return;
+      /* Con un guardado en marcha, a la siguiente pasada (fila 99). */
+      if (window.ColaGuardado && ColaGuardado.hayGuardado()) return;
       var ahora = Date.now();
       if (ultimaRevision && ahora - ultimaRevision < CADA_MS) return;
       ultimaRevision = ahora;

@@ -25,9 +25,13 @@ var Reintentar = (function () {
     return new Promise(function (r) { setTimeout(r, ms); });
   }
 
+  /* NotReadableError y AbortError (fila 99, docs/GUARDAR-EN-FILA.md):
+     Dropbox tocando un fichero recién escrito, al leerlo o al
+     escribirlo. También son pasajeros. */
   function esErrorDeSincronizacion(e) {
     var nombre = e && e.name;
-    return nombre === 'InvalidStateError' || nombre === 'NoModificationAllowedError';
+    return nombre === 'InvalidStateError' || nombre === 'NoModificationAllowedError' ||
+           nombre === 'NotReadableError' || nombre === 'AbortError';
   }
 
   /* `intento` es una función que hace la escritura ENTERA, desde pedir
@@ -44,6 +48,8 @@ var Reintentar = (function () {
     }
   }
 
-  return { escritura: escritura, esErrorDeSincronizacion: esErrorDeSincronizacion };
+  /* Leer tiene los mismos tropiezos que escribir (fila 99): mismo
+     reintento. */
+  return { escritura: escritura, lectura: escritura, esErrorDeSincronizacion: esErrorDeSincronizacion };
 })();
 window.Reintentar = Reintentar;

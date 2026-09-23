@@ -88,6 +88,22 @@ var Carpetas = (function () {
     return min.indexOf('conflicted copy') !== -1;
   }
 
+  /* Los ficheros que NO se copian al trasladar una carpeta: los
+     temporales de siempre, pero NUNCA una copia en conflicto de Dropbox
+     («conflicted copy», fila 99, docs/GUARDAR-EN-FILA.md). Ese trozo
+     del filtro de arriba es para CARPETAS: aplicado a ficheros, la
+     copia no llegaba al destino y el borrado del original se la
+     llevaba por delante. */
+  function esFicheroQueNoSeCopia(nombre) {
+    var n = String(nombre || '');
+    if (n.toLowerCase().indexOf('conflicted copy') !== -1) return false;
+    return esCarpetaTemporalDeSincronizacion(n);
+  }
+
+  function noSeCopia(nombre, h) {
+    return h.kind === 'file' ? esFicheroQueNoSeCopia(nombre) : esCarpetaTemporalDeSincronizacion(nombre);
+  }
+
   async function existe(dir, nombre) {
     try { await dir.getDirectoryHandle(nombre); return true; }
     catch (e) { return false; }
@@ -142,7 +158,7 @@ var Carpetas = (function () {
     var copiados = 0;
     for await (var pareja of origen.entries()) {
       var nombre = pareja[0], h = pareja[1];
-      if (esCarpetaTemporalDeSincronizacion(nombre)) continue;
+      if (noSeCopia(nombre, h)) continue;
       if (h.kind === 'file') {
         var f = await leerFicheroParaCopiar(h, nombre);
         var salida = await destino.getFileHandle(nombre, { create: true });
@@ -161,7 +177,7 @@ var Carpetas = (function () {
   async function contarFicheros(dir) {
     var n = 0;
     for await (var pareja of dir.entries()) {
-      if (esCarpetaTemporalDeSincronizacion(pareja[0])) continue;
+      if (noSeCopia(pareja[0], pareja[1])) continue;
       if (pareja[1].kind === 'file') n++;
       else n += await contarFicheros(pareja[1]);
     }
@@ -236,7 +252,7 @@ var Carpetas = (function () {
   async function fusionarDentro(origen, destino, rastro) {
     for await (var pareja of origen.entries()) {
       var nombre = pareja[0], h = pareja[1];
-      if (esCarpetaTemporalDeSincronizacion(nombre)) continue;
+      if (noSeCopia(nombre, h)) continue;
       if (h.kind === 'file') {
         var f = await leerFicheroParaCopiar(h, nombre);
         if (await existeFichero(destino, nombre)) {
@@ -298,13 +314,24 @@ var Carpetas = (function () {
     return { copiados: rastro.copiados, yaEstaban: rastro.yaEstaban, conSufijo: rastro.conSufijo };
   }
 
+  /* Un traslado de carpeta cuenta como "guardado en marcha" (fila 99):
+     mientras dura, las tareas de fondo no miran la carpeta, y no ven
+     desaparecer un asunto que se está archivando. */
+  function comoOcupado(fn) {
+    return window.ColaGuardado ? window.ColaGuardado.ocupado(fn) : fn();
+  }
+
   function mover(padreOrigen, nombre, padreDestino) {
-    return trasladar(padreOrigen, nombre, padreDestino, nombre);
+    return comoOcupado(function () { return trasladar(padreOrigen, nombre, padreDestino, nombre); });
   }
 
   function renombrar(padre, nombre, nombreNuevo) {
     if (nombre === nombreNuevo) return Promise.resolve(0);
-    return trasladar(padre, nombre, padre, nombreNuevo);
+    return comoOcupado(function () { return trasladar(padre, nombre, padre, nombreNuevo); });
+  }
+
+  function fusionarEnOcupado(padreOrigen, nombre, padreDestino, nombreDestino) {
+    return comoOcupado(function () { return fusionarEn(padreOrigen, nombre, padreDestino, nombreDestino); });
   }
 
   /* ---------- ficheros sueltos ----------
@@ -408,7 +435,17 @@ var Carpetas = (function () {
 
   /* ---------- ficheros de texto ---------- */
 
-  async function leerTexto(dir, nombre) {
+  /* Reintenta si Dropbox está tocando el fichero justo al leerlo
+     (NotReadableError, fila 99, docs/GUARDAR-EN-FILA.md): antes, eso
+     tumbaba el segundo paso de las acciones encadenadas. */
+  function leerTexto(dir, nombre) {
+    if (window.Reintentar && window.Reintentar.lectura) {
+      return window.Reintentar.lectura(function () { return leerTextoUnaVez(dir, nombre); });
+    }
+    return leerTextoUnaVez(dir, nombre);
+  }
+
+  async function leerTextoUnaVez(dir, nombre) {
     try {
       var h = await dir.getFileHandle(nombre);
       var f = await h.getFile();
@@ -478,8 +515,14 @@ var Carpetas = (function () {
     }
   }
 
+  /* Los dos ficheros grandes se guardan sin sangría (fila 99): pesan
+     bastante menos y Dropbox tarda menos en subirlos. Leerlos no
+     cambia. */
+  var SIN_SANGRIA = ['asuntos.json', 'hitos.json'];
+
   function guardarJson(dir, nombre, objeto) {
-    return escribirTexto(dir, nombre, JSON.stringify(objeto, null, 2));
+    var sangria = SIN_SANGRIA.indexOf(nombre) === -1 ? 2 : 0;
+    return escribirTexto(dir, nombre, JSON.stringify(objeto, null, sangria));
   }
 
   return {
@@ -487,7 +530,7 @@ var Carpetas = (function () {
     subcarpetas: subcarpetas, ficheros: ficheros, contenido: contenido, existe: existe,
     esCarpetaTemporalDeSincronizacion: esCarpetaTemporalDeSincronizacion,
     crear: crear, bajar: bajar, mover: mover, renombrar: renombrar, trasladar: trasladar,
-    fusionarEn: fusionarEn, contarFicheros: contarFicheros,
+    fusionarEn: fusionarEnOcupado, contarFicheros: contarFicheros,
     existeFichero: existeFichero, nombreLibreConSufijo: nombreLibreConSufijo,
     renombrarFichero: renombrarFichero, moverFichero: moverFichero,
     elegirFichero: elegirFichero, copiarFicheroEn: copiarFicheroEn,
