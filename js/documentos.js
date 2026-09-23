@@ -59,6 +59,12 @@ var Documentos = (function () {
     cuadro.classList.add('cuadro-ancho');
     var esperar = U.preguntar(asunto.nombre, '<div id="doc-cuerpo"></div>', 'Cerrar', true);
     await pintarLista();
+    /* `opciones.ponerNombre` (arreglo de la fila 103): abre directamente
+       el formulario de ponerle nombre a ese documento de la carpeta (el
+       que acaba de entrar desde "Por clasificar"). */
+    if (opciones && opciones.ponerNombre) {
+      pintarFormulario({ modo: 'renombrar', nombreActual: opciones.ponerNombre });
+    }
     if (opciones && opciones.irDirectoAAnadir) {
       try { await anadirDesdeOrdenador(); } catch (e) { /* AbortError: se queda en la lista */ }
     }
@@ -647,6 +653,12 @@ var Documentos = (function () {
        se guarde mientras el cuadro esté abierto, no solo lo primero. */
     if (hitoActual) {
       try {
+        /* Renombrar uno que ya estaba apuntado a este hito (el que entra
+           desde "Por clasificar" se apunta nada más entrar): el nombre
+           viejo sale del hito, para que no quede como «(ya no está)». */
+        if (opciones.modo !== 'anadir' && opciones.nombreActual !== nombre) {
+          await Hitos.quitarDocumento(asuntoActual.nombre, hitoActual.id, opciones.nombreActual);
+        }
         await Hitos.anadirDocumento(asuntoActual.nombre, hitoActual.id, nombre);
         if (window.HitosRequisitos) {
           try { await HitosRequisitos.marcarPorDocumento(asuntoActual.nombre, hitoActual.id, nombre); }

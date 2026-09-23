@@ -353,6 +353,22 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
 
   delete App.E.reciales[s.nombre];
   U.aviso('Documento metido en ' + nombreAsunto + '.', 'bueno');
+  /* Desde un hito (arreglo de la fila 103): queda apuntado a él nada
+     más entrar, con el nombre que trae, aunque luego se cierre el
+     cuadro sin ponerle otro. Si se le pone nombre, js/documentos.js
+     cambia el viejo por el nuevo en el hito. */
+  var hito = opciones && opciones.hito;
+  if (hito && window.Hitos) {
+    try {
+      await Hitos.anadirDocumento(nombreAsunto, hito.id, s.nombre);
+      if (window.HitosRequisitos) {
+        try { await HitosRequisitos.marcarPorDocumento(nombreAsunto, hito.id, s.nombre); } catch (e4) { /* no crítico */ }
+      }
+    } catch (e3) {
+      U.accesorio('Documento metido, pero no he podido apuntarlo al hito', e3);
+    }
+    if (window.HitosPanel) HitosPanel.desplegarAlAbrir(nombreAsunto, hito.id);
+  }
   try {
     await App.verAbiertos();
 
@@ -362,9 +378,14 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
       nombre: nombreAsunto, handle: destino,
       ficha: (App.E.registro.asuntos || {})[nombreAsunto] || {},
       leido: Nombres.leer(nombreAsunto, App.E.tipos)
-    }, opciones);
+    }, hito ? { hito: hito, ponerNombre: s.nombre } : opciones);
   } catch (e2) {
     U.accesorio('Documento metido, pero no he podido abrir el cuadro para ponerle nombre', e2);
+  }
+  /* El hito sigue desplegado al volver a la ficha. */
+  if (hito && window.HitosPanel) {
+    HitosPanel.desplegarAlAbrir(nombreAsunto, hito.id);
+    HitosPanel.programarRepintado();
   }
 };
 
