@@ -68,6 +68,9 @@
   var medioListoActual = '';
   var correoPreferenteActual = '';
   var comunicarHitoActual = null;
+  /* Fila 103: los documentos que salen ya marcados en "Documentos de
+     este asunto" (los del hito, al "Comunicar" desde él). */
+  var adjuntosMarcadosActual = [];
 
   function $(id) { return document.getElementById(id); }
 
@@ -291,14 +294,25 @@
      misma línea sirve para la nota del asunto y para el historial del
      hito (ver apuntarElRastro, más abajo). Pura, para poder probarla
      sin abrir ningún cuadro (`CorreoNucleo.textoDeComunicarHito`). */
-  function textoDeComunicarHito(nombreDestinatario, esSeneca) {
+  /* `documentos` (fila 103): los que se mandaron en el borrador; con
+     alguno, la línea termina en "· con N documentos: a, b". */
+  function textoDeComunicarHito(nombreDestinatario, esSeneca, documentos) {
     return 'Comunicado a ' + (nombreDestinatario || 'el tercero') + ' por ' +
-      (esSeneca ? 'Séneca' : 'correo') + ' · ' + U.fechaLegible(U.aAaMmDd(U.hoyIso()));
+      (esSeneca ? 'Séneca' : 'correo') + ' · ' + U.fechaLegible(U.aAaMmDd(U.hoyIso())) +
+      colaDeDocumentos(documentos);
+  }
+
+  function colaDeDocumentos(documentos) {
+    if (!documentos || !documentos.length) return '';
+    return ' · con ' + documentos.length + ' documento' + (documentos.length === 1 ? '' : 's') +
+      ': ' + documentos.join(', ');
   }
 
   function textoDeLaNota() {
     if (comunicarHitoActual) {
-      return textoDeComunicarHito(comunicarHitoActual.nombreDestinatario, porSeneca);
+      var ccHito = window.CorreoCuadro;
+      return textoDeComunicarHito(comunicarHitoActual.nombreDestinatario, porSeneca,
+        (!porSeneca && ccHito) ? ccHito.documentosAdjuntados() : []);
     }
     /* En Séneca el campo del asunto es #seneca-asunto (js/seneca-cuadro.js,
        fila 53): #correo-asunto ya no existe en ese cuadro. */
@@ -316,13 +330,7 @@
       base += ' · en copia oculta a ' + direccionesCco.length +
         (direccionesCco.length === 1 ? ' persona' : ' personas');
     }
-    var documentosAdjuntados = cc ? cc.documentosAdjuntados() : [];
-    if (documentosAdjuntados.length) {
-      base += ' · con ' + documentosAdjuntados.length +
-        ' documento' + (documentosAdjuntados.length === 1 ? '' : 's') +
-        ': ' + documentosAdjuntados.join(', ');
-    }
-    return base;
+    return base + colaDeDocumentos(cc ? cc.documentosAdjuntados() : []);
   }
 
   /* A quién se le va a escribir, dicho en palabras. En Séneca no hay
@@ -444,6 +452,7 @@
     medioListoActual = (extra && extra.medioListo) || '';
     correoPreferenteActual = (extra && extra.correoPreferente) || '';
     comunicarHitoActual = (extra && extra.comunicarHito) || null;
+    adjuntosMarcadosActual = (extra && extra.adjuntosMarcados) || [];
     if (window.SenecaDestinatarios) SenecaDestinatarios.limpiar();
     yaApuntado = false;
     algoCambiado = false;
@@ -482,7 +491,7 @@
     var bloqueAdjuntos = '';
     var opcionesGrupo = '';
     if (!porSeneca && window.CorreoAdjuntos) {
-      try { bloqueAdjuntos = await CorreoAdjuntos.pintarBloque(a); } catch (e) { bloqueAdjuntos = ''; }
+      try { bloqueAdjuntos = await CorreoAdjuntos.pintarBloque(a, adjuntosMarcadosActual); } catch (e) { bloqueAdjuntos = ''; }
     }
     try { opcionesGrupo = await opcionesDeGrupo(); } catch (e) { opcionesGrupo = ''; }
 

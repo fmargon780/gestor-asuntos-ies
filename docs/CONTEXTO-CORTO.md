@@ -107,10 +107,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Pruebas automáticas en GitHub Actions en cada subida.
 - Escape y salida en toda pantalla.
 - Copia sin internet (`file://`): "copia sin internet" a la vista, se actualiza sola; si no puede, franja arriba con «Actualizar ahora».
-- Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo, responsable,
-  bifurcaciones, documentos, historial, "lo que hay que reunir", "Comunicar" y "Generar
-  documento" (plantillas unidas al paso). Biblioteca de
-  hitos del centro: modelos reutilizables entre tipos, con normativa y marca "solo informativo".
+- Hitos, mesa de trabajo del asunto: estado, plazo, responsable, ramas, historial, "lo que hay
+  que reunir", "Añadir documento" (ordenador, Por clasificar, carpeta), tres puntos por documento,
+  "Comunicar" siempre y "Generar documento". Biblioteca de hitos del centro: modelos reutilizables
+  entre tipos, con normativa y marca "solo informativo".
   Botón en Mantenimiento para cargar los tipos y guías del instituto.
 - "Qué me toca": hitos pendientes, filtro por responsable, bloque "Dormidos" (sin novedades en N
   días). "Cuentas": asuntos por tipo, mes y quién los pidió. "Formularios": catálogo buscable de

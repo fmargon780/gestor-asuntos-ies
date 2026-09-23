@@ -367,8 +367,9 @@ await pagina.evaluate(async (clave) => {
 }, CLAVE);
 
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
-await pagina.waitForSelector('#ficha-guia .hito[data-id="p1"] .hito-doc-apuntar');
-await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-doc-apuntar').click();
+await pagina.waitForSelector('#ficha-guia .hito[data-id="p1"] .hito-doc-anadir');
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-doc-anadir').click();
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-anadir-carpeta').click();   /* fila 103: el menú de «Añadir documento» */
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('salen los dos documentos de la carpeta, sin marcar',
   pagina.locator('#hitosdoc-lista .hitosdoc-marca').count(), 2);
@@ -382,8 +383,12 @@ await comprobar('y queda guardado en hitos.json',
   leerHitosDeDisco().then(e => e.hitos.find(h => h.id === 'p1').documentos), ['260907 SOLICITUD Marina.pdf']);
 
 console.log('--- se vuelve a abrir el cuadro: sale marcado; se desmarca y desaparece ---');
-await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
-await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-doc-apuntar').click();
+/* Fila 103: tras apuntar, el hito se queda desplegado; solo se despliega si está plegado. */
+if (await pagina.evaluate(() => document.querySelector('#ficha-guia .hito[data-id="p1"] .hito-cuerpo').classList.contains('oculto'))) {
+  await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
+}
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-doc-anadir').click();
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-anadir-carpeta').click();   /* fila 103: el menú de «Añadir documento» */
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('sale marcado el que ya se apuntó',
   pagina.locator('#hitosdoc-lista .hitosdoc-fila', { hasText: 'SOLICITUD' }).locator('.hitosdoc-marca').isChecked(), true);
@@ -409,8 +414,12 @@ await comprobar('el nombre sale con "(ya no está)", marcado en gris (nunca con 
   return { texto: b.textContent, enGris: b.classList.contains('hito-doc-falta'), disabled: b.disabled };
 }), { texto: '260907 DNI Marina.pdf (ya no está)', enGris: true, disabled: false });
 
-await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
-await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-doc-apuntar').click();
+/* Fila 103: tras apuntar, el hito se queda desplegado; solo se despliega si está plegado. */
+if (await pagina.evaluate(() => document.querySelector('#ficha-guia .hito[data-id="p1"] .hito-cuerpo').classList.contains('oculto'))) {
+  await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
+}
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-doc-anadir').click();
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-anadir-carpeta').click();   /* fila 103: el menú de «Añadir documento» */
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('en el cuadro de apuntar también sale, marcado y con el mismo aviso',
   pagina.locator('#hitosdoc-lista .hitosdoc-fila-falta').textContent().then(t => t.indexOf('ya no está') !== -1), true);

@@ -131,8 +131,9 @@ await comprobar('5. el documento enseña ya el hito debajo de su nombre',
 console.log('--- 6. apuntar un documento a un hito, desde el propio hito ---');
 const laFilaDelHito = pagina.locator('#ficha-guia .hito').first();
 await laFilaDelHito.locator('.hito-desplegar').click();
-await pagina.waitForSelector('.hito-doc-apuntar:not(.oculto)');
-await laFilaDelHito.locator('.hito-doc-apuntar').click();
+await pagina.waitForSelector('.hito-doc-anadir:not(.oculto)');
+await laFilaDelHito.locator('.hito-doc-anadir').click();
+await laFilaDelHito.locator('.hito-anadir-carpeta').click();   /* fila 103: el menú de «Añadir documento» */
 await pagina.waitForSelector('#hitosdoc-lista');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);

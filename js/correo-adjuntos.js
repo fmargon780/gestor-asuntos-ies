@@ -35,9 +35,21 @@ var CorreoAdjuntos = (function () {
 
   /* ---------- el bloque dentro del cuadro de Correo ---------- */
 
+  /* Pura (fila 103): de los nombres que hay que llevar ya marcados,
+     solo los que siguen en la carpeta, sin repetir. */
+  function marcadosQueExisten(nombresDeLaCarpeta, marcados) {
+    var salida = [];
+    (marcados || []).forEach(function (n) {
+      if ((nombresDeLaCarpeta || []).indexOf(n) !== -1 && salida.indexOf(n) === -1) salida.push(n);
+    });
+    return salida;
+  }
+
   /* Devuelve el HTML del bloque, o cadena vacía si el asunto no tiene
-     ningún documento (entonces el bloque no se pinta). */
-  async function pintarBloque(a) {
+     ningún documento (entonces el bloque no se pinta). `marcados`
+     (fila 103, "Comunicar" desde un hito): los documentos que salen ya
+     marcados; sin él, todos desmarcados, como siempre. */
+  async function pintarBloque(a, marcados) {
     ultimaLista = [];
     if (!a || !a.handle) return '';
     var ficheros;
@@ -50,15 +62,18 @@ var CorreoAdjuntos = (function () {
       ultimaLista.push({ nombre: ficheros[i].nombre, tam: tam });
     }
 
+    var yaMarcados = marcadosQueExisten(ultimaLista.map(function (f) { return f.nombre; }), marcados);
     var filas = ultimaLista.map(function (f) {
       return '<label class="correo-fila">' +
-        '<input type="checkbox" class="adjunto-marca" value="' + U.escapar(f.nombre) + '">' +
+        '<input type="checkbox" class="adjunto-marca" value="' + U.escapar(f.nombre) + '"' +
+          (yaMarcados.indexOf(f.nombre) !== -1 ? ' checked' : '') + '>' +
         '<span><strong>' + U.escapar(f.nombre) + '</strong>' +
         '<span class="suave"> · ' + tamanoLegible(f.tam) + '</span></span>' +
         '</label>';
     }).join('');
 
-    /* Desmarcados de partida: lo normal es mandar uno, no todos. */
+    /* Desmarcados de partida: lo normal es mandar uno, no todos (salvo
+       los del hito, fila 103). */
     var pie = carpetaBandeja()
       ? '<button type="button" class="boton" id="adjuntos-preparar" disabled>' +
         'Preparar borrador con los documentos</button>' +
@@ -209,5 +224,5 @@ var CorreoAdjuntos = (function () {
     }
   }
 
-  return { pintarBloque: pintarBloque, enganchar: enganchar };
+  return { pintarBloque: pintarBloque, enganchar: enganchar, marcadosQueExisten: marcadosQueExisten };
 })();

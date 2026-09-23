@@ -75,6 +75,13 @@
   border-radius: 20px; padding: 3px 6px 3px 10px; display: inline-flex; align-items: center; gap: 6px;
 }
 .hito-doc-quitar { border: 0; background: none; cursor: pointer; color: var(--tinta-suave); font-size: 11px; }
+/* Fila 103: los tres puntos de cada documento del hito (js/hitos-documento-menu.js). */
+.hito-doc-menu {
+  border: 0; background: none; cursor: pointer; color: var(--tinta-suave); font-size: 14px;
+  line-height: 1; padding: 0 2px;
+}
+.hito-doc-menu:hover { color: var(--tinta); }
+.hito-documento .ficha-menu { z-index: 30; left: 0; right: auto; }
 .hito-doc-abrir {
   border: 0; background: none; cursor: pointer; color: var(--tinta); font-size: 12px;
   padding: 0; text-decoration: underline;

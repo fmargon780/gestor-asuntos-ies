@@ -42,15 +42,51 @@ var Documentos = (function () {
 
   /* ---------- el cuadro ---------- */
 
-  async function abrir(asunto) {
+  /* Desde un hito (fila 103, docs/EL-HITO-MESA-DE-TRABAJO.md): los
+     nombres que se siguen en esta apertura del cuadro. Cada documento
+     que se añade entra; uno que se renombra cambia su nombre aquí.
+     Al cerrar el cuadro, `abrir` los devuelve para que el hito los
+     apunte (js/hitos-anadir.js): este fichero no sabe nada de hitos. */
+  var seguidos = null;
+
+  /* `opciones` (fila 103), solo desde un hito:
+       { anadir: fichero }  → abre directamente el formulario de
+                             "Añadir documento" con ese fichero ya elegido;
+       { nombre: 'x.pdf' }  → abre directamente "Poner nombre" de un
+                             documento que ya está en la carpeta.
+     Devuelve la lista de nombres seguidos (vacía sin opciones). */
+  async function abrir(asunto, opciones) {
     asuntoActual = asunto;
+    seguidos = opciones ? (opciones.nombre ? [opciones.nombre] : []) : null;
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-ancho');
     var esperar = U.preguntar(asunto.nombre, '<div id="doc-cuerpo"></div>', 'Cerrar', true);
-    await pintarLista();
+    if (opciones && opciones.anadir) {
+      pintarFormulario({ modo: 'anadir', handle: opciones.anadir, nombreActual: opciones.anadir.name });
+    } else if (opciones && opciones.nombre) {
+      pintarFormulario({ modo: 'renombrar', nombreActual: opciones.nombre });
+    } else {
+      await pintarLista();
+    }
     await esperar;
     soltarVisor();
     cuadro.classList.remove('cuadro-ancho');
+    var salida = seguidos || [];
+    seguidos = null;
+    return salida;
+  }
+
+  /* Pura, para las pruebas (fila 103): cómo cambia la lista de seguidos
+     al guardar. */
+  function seguirGuardado(lista, modo, nombreActual, nombreNuevo) {
+    var salida = (lista || []).slice();
+    if (modo === 'anadir') {
+      if (salida.indexOf(nombreNuevo) === -1) salida.push(nombreNuevo);
+      return salida;
+    }
+    var i = salida.indexOf(nombreActual);
+    if (i !== -1) salida[i] = nombreNuevo;
+    return salida;
   }
 
   /* El navegador guarda en memoria el documento que enseña hasta que se
@@ -609,6 +645,7 @@ var Documentos = (function () {
         await Carpetas.renombrarFichero(asuntoActual.handle, opciones.nombreActual, nombre);
         U.aviso('Documento renombrado.', 'bueno');
       }
+      if (seguidos) seguidos = seguirGuardado(seguidos, opciones.modo, opciones.nombreActual, nombre);
     } catch (e) {
       U.fallo('No he podido guardarlo', e);
       return;
@@ -671,5 +708,6 @@ var Documentos = (function () {
   }
 
   return { configurar: configurar, abrir: abrir, leerNombre: leerNombre,
-           parecidos: parecidos, pareceDeLaAplicacion: pareceDeLaAplicacion };
+           parecidos: parecidos, pareceDeLaAplicacion: pareceDeLaAplicacion,
+           seguirGuardado: seguirGuardado };
 })();

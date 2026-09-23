@@ -104,6 +104,25 @@ Primera tanda de que el hito sea la mesa de trabajo del asunto.
   hito se quedan vacíos sin contar como dato que falta. `{{HITO}}` y `{{PLAZO DEL HITO}}` también al
   «Comunicar» desde un hito. Prueba: `pruebas/documentos-desde-el-hito.mjs`.
 
+### El hito, mesa de trabajo (23-sep-2026, fila 103, `docs/EL-HITO-MESA-DE-TRABAJO.md`)
+
+Lo que se hace desde un hito queda apuntado a ese hito solo (`HitosAnadir.apuntar`:
+`Hitos.anadirDocumento` + `HitosRequisitos.marcarPorDocumento`, no crítico, y el hito desplegado).
+
+- **«Añadir documento»** (`js/hitos-anadir.js`, en `.hito-botones`, no en pregunta ni «no aplica»):
+  menú de `FichaMenus` con «Desde el ordenador» (`Documentos.abrir(a, { anadir: fichero })`),
+  «Desde «Por clasificar»» (apagado sin sueltos; elige uno, `App.llevarSueltoA(s, …, { sinCuadro:
+  true })` y `Documentos.abrir(a, { nombre })`) y «Uno que ya está en la carpeta»
+  (`HitosDocumentos.abrir`). `Documentos.abrir` con opciones devuelve los nombres guardados en esa
+  apertura (`Documentos.seguirGuardado`); sin opciones, igual que siempre.
+- **Tres puntos en cada documento del hito** (`js/hitos-documento-menu.js`, sustituye a la ✕):
+  Registrar (si no lo tiene), Separar/Unir/Sacar páginas/Ajustar tamaño (PDF, `modo: 'asunto'`) y
+  «Quitar del hito» (`.hito-doc-menu-quitar`, solo desapunta). Lo nuevo se saca restando la
+  carpeta leída antes y en `alTerminar` (`HitosDocumentoMenu.nuevos`). En uno «(ya no está)»,
+  solo «Quitar del hito».
+- **«Comunicar» siempre** (salvo pregunta o «no aplica»); ver «"Comunicar" desde un hito» más
+  abajo. Prueba: `pruebas/el-hito-mesa-de-trabajo.mjs`.
+
 ### La biblioteca de hitos del centro (20-sep-2026, fila 79, docs/BIBLIOTECA-DE-HITOS.md)
 
 Muchos pasos se repiten entre tipos de asunto casi idénticos ("Registrar de salida en Séneca",
@@ -254,21 +273,14 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
   carpeta y la ficha ya han salido bien. Prueba: `pruebas/cambiar-tipo-y-guia.mjs`.
 - **Un solo hito en curso a la vez**: al marcar uno hecho, el siguiente pendiente de la lista
   visible pasa a "en curso" solo (`Hitos.recomputeEnCurso`).
-- **Documentos apuntados** (fila 31, 17-sep-2026, `docs/APUNTAR-DOCUMENTO-A-HITO.md`): el botón
-  "Apuntar un documento" abre `HitosDocumentos.abrir(a, h)` (`js/hitos-documentos.js`, nuevo), un
-  cuadro con casillas sobre `Carpetas.ficheros(a.handle)`; al aceptar llama a
-  `Hitos.anadirDocumento`/`quitarDocumento` y pide el repintado. Apuntar es solo señalar: nunca se
-  copia ni se mueve nada, y un documento puede estar apuntado en varios hitos. Cada nombre pasa a
-  ser pulsable (abre en el panel de la derecha, `window.Visor.abrir`), pidiendo su handle en el
-  momento de pulsar, no antes. Saber qué apuntado ya no está en la carpeta se lee **una sola vez
-  por repintado**, en `js/hitos-panel.js` antes de tocar el DOM (nunca corrigiéndolo después, a
-  mano: el `MutationObserver` de aquí abajo lo detectaría como un cambio más). Y nunca con el
-  atributo `disabled`: `js/ficha-asunto.js` reactiva solo, sin distinguir por qué, todo lo que
-  encuentre apagado dentro de `#ficha-asunto-cuerpo` en cuanto no hay nadie en modo consulta
-  (`aplicarModoConsulta`) — basta la clase `hito-doc-falta` (sin enganchar ningún `onclick`, y ya
-  en gris por CSS).
+- **Documentos apuntados** (fila 31, `docs/APUNTAR-DOCUMENTO-A-HITO.md`): «Añadir documento › Uno
+  que ya está en la carpeta» abre `HitosDocumentos.abrir(a, h)`, casillas sobre la carpeta. Apuntar
+  es solo señalar (nunca copia ni mueve; un documento puede estar en varios hitos). Cada nombre
+  abre en el panel (`Visor.abrir`, handle pedido al pulsar). Qué apuntado ya no está se lee una vez
+  por repintado, en `js/hitos-panel.js` antes de tocar el DOM, y se marca con la clase
+  `hito-doc-falta` (gris, sin `onclick`), no con `disabled`.
 - **Asociar desde el documento** (18-sep-2026, fila 58, docs/AJUSTES-DE-USO-2026-09-18.md, 6):
-  además de "Apuntar un documento" desde el hito, cada fila de `js/ficha-documentos.js` lleva un
+  además de apuntarlo desde el hito, cada fila de `js/ficha-documentos.js` lleva un
   botón **Asociar a un hito**, con el menú pequeño de `js/ficha-menus.js` (los hitos visibles del
   asunto y "Ninguno" para soltarlo, con un "✓" delante del que ya esté elegido). Solo sale si el
   asunto tiene hitos. Elegir uno quita el documento del hito anterior (si tenía) y lo pone en el
@@ -334,37 +346,28 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
     blanco; vale igual para el cuadro de Correo (`js/correo-cuadro.js`) y el de Séneca
     (`js/seneca-cuadro.js`), sin tocar ninguno de los dos: los dos ya llaman a
     `CorreoNucleo.cuerpoDelMedio`.
-- **"Comunicar" desde un hito** (18-sep-2026, fila 60, `docs/COMUNICAR-DESDE-EL-HITO.md`): botón
-  propio del hito, aparte del "Comunicar" de la cabecera de la ficha, que solo sale si su paso de
-  origen tiene "Comunicación de este paso" (ver la sección de guías, más arriba). Vive entero en
-  `js/hitos-comunicar.js` (nuevo, enganchado a `window.Hitos` como `js/hitos-archivo.js`, aunque no
-  añade ningún método al modelo: nada de esto se guarda en el hito).
-  - `HitosComunicar.canalesDe(a, hito)` (síncrona: lee la guía en memoria, `GuiasDelCentro.pasosDe`,
-    por `origenGuia`) dice qué canales tienen texto. Con uno, el botón abre ese cuadro directo; con
-    los dos, abre el mismo menú pequeño "Comunicar" (`js/ficha-menus.js`) que la cabecera.
-  - **El destinatario** (`resolverDestinatario`): si el responsable del hito es el papel `tutor`,
-    el tutor legal 1 (o el 2, si el 1 no tiene nombre ni correo — `LoPide.datosDeTutor`); si es
-    `relacionado`, todos los relacionados con correo (comas, para que
-    `LoPide.elegirDestinatarios` —ya usada por "Lo pide"— los vuelque enteros en "Otro correo": no
-    va a estar entre las direcciones de la ficha del tercero, que es de OTRA persona); en cualquier
-    otro caso (responsable de la casa, o sin responsable), el tercero del asunto. En Séneca no hay
-    forma de marcar un usuario IdEA concreto desde aquí: el cuadro se abre con la lista de siempre,
-    sin marcar nada por su cuenta (nunca se bloquea el botón por eso).
-  - **El mensaje ya resuelto**: `Plantillas.rellenar(mensaje.asunto/cuerpo, Plantillas.valoresDeAsunto(a))`,
-    los mismos huecos de siempre. `js/correo.js` gana `asuntoListoActual`/`medioListoActual`
-    (`extra.asuntoListo`/`medioListo` de `abrirCuadro`, ver fila 59): con ellos puestos,
-    `asuntoDelCorreo`/`cuerpoDelMedio` los usan tal cual, sin pasar por el desplegable de
-    plantillas del tipo ni por el hueco `{{LO QUE FALTA}}` (eso es de la plantilla general).
-    `correoPreferenteActual` (`extra.correoPreferente`) hace lo mismo que ya hacía "Lo pide" con
-    `correoLoPide`: `js/correo-cuadro.js` la prueba primero (`CorreoNucleo.destinatarioPreferente()`).
-  - **La constancia** (sección 5.3): una nota en el asunto y una línea en el historial del hito, una
-    sola vez. En vez de un camino nuevo, se reutiliza el existente: `comunicarHitoActual`
-    (`extra.comunicarHito`, con `claveAsunto`/`idHito`/`nombreDestinatario`) hace que
-    `textoDeLaNota()` devuelva `CorreoNucleo.textoDeComunicarHito(nombre, esSeneca)` ("Comunicado a
-    &lt;nombre&gt; por correo/Séneca · fecha"), y `apuntarElRastro()` —el mismo cerrojo `yaApuntado`
-    de siempre, "una vez por cuadro"— además de la nota, llama a `Hitos.anadirNota` con el mismo
-    texto. `aQuien(a)` (usada por el aviso de arriba del cuadro de Séneca) también mira primero
-    `comunicarHitoActual.nombreDestinatario`.
+- **"Comunicar" desde un hito** (fila 60, `docs/COMUNICAR-DESDE-EL-HITO.md`; `js/hitos-comunicar.js`,
+  no guarda nada en el hito). Sale siempre desde la fila 103 (salvo pregunta o «no aplica»).
+  - `HitosComunicar.canalesDe(a, hito)` (síncrona, la guía en memoria por `origenGuia`): qué
+    canales tienen texto. Con uno, abre ese cuadro directo; con dos, el menú "Comunicar"
+    (`js/ficha-menus.js`); sin texto propio, los dos canales con las plantillas del tipo
+    (`comunicarSinTexto`), con el destinatario y la constancia del hito.
+  - **El destinatario** (`resolverDestinatario`): papel `tutor` → tutor legal 1 (o el 2 si el 1 no
+    tiene nombre ni correo, `LoPide.datosDeTutor`); `relacionado` → todos los relacionados con
+    correo, separados por comas (`LoPide.elegirDestinatarios` los vuelca en "Otro correo"); si no,
+    el tercero del asunto. En Séneca no se marca a nadie por su cuenta.
+  - **El mensaje ya resuelto** (con texto propio): `Plantillas.rellenar` con
+    `Plantillas.valoresDeAsunto(a, { hito })`; `extra.asuntoListo`/`medioListo` hacen que
+    `asuntoDelCorreo`/`cuerpoDelMedio` los usen tal cual, sin plantillas del tipo ni `{{LO QUE
+    FALTA}}`. `extra.correoPreferente` se prueba primero (`CorreoNucleo.destinatarioPreferente()`).
+  - **Documentos del hito ya marcados** (fila 103): `extra.adjuntosMarcados` marca en "Documentos de
+    este asunto" los del hito que siguen en la carpeta (`CorreoAdjuntos.marcadosQueExisten`).
+  - **La constancia**: una nota en el asunto y una línea en el historial del hito, una sola vez
+    (`apuntarElRastro`, cerrojo `yaApuntado`). Con `extra.comunicarHito` (`claveAsunto`/`idHito`/
+    `nombreDestinatario`), `textoDeLaNota()` es `CorreoNucleo.textoDeComunicarHito(nombre, esSeneca,
+    documentos)`: "Comunicado a &lt;nombre&gt; por correo/Séneca · fecha", más "· con N
+    documentos: a, b" si el borrador los llevó; y se apunta también con `Hitos.anadirNota`.
+    `aQuien(a)` mira primero `nombreDestinatario`.
 - **Responsable**: persona del centro (configurable en Ajustes › Hitos) o un papel fijo
   (`tercero`, `tutor`, `relacionado`) que la aplicación resuelve sola con datos del asunto
   (`Hitos.resolverResponsable`); sin resolver, se enseña en gris.

@@ -162,10 +162,31 @@
      ABRIR EL CUADRO YA RELLENO (secciones 4-5 del encargo)
      ========================================================== */
 
+  /* Los documentos del hito que siguen en la carpeta salen ya marcados
+     en "Documentos de este asunto" del cuadro de Correo (fila 103):
+     aquí van todos los apuntados; js/correo-adjuntos.js quita los que
+     ya no están. */
+  function documentosDelHito(hito) {
+    return ((hito && hito.documentos) || []).slice();
+  }
+
+  /* Sin texto propio del paso (fila 103): el mismo cuadro, con el
+     desplegable de plantillas del tipo como en el "Comunicar" de la
+     cabecera, pero con el destinatario y la constancia del hito. */
+  async function comunicarSinTexto(a, hito, canal) {
+    var destinatario = await resolverDestinatario(a, hito);
+    if (!window.CorreoNucleo || !window.CorreoNucleo.abrirCuadro) return;
+    window.CorreoNucleo.abrirCuadro(a, canal === 'seneca', {
+      correoPreferente: destinatario.correoPreferente,
+      adjuntosMarcados: documentosDelHito(hito),
+      comunicarHito: { claveAsunto: a.nombre, idHito: hito.id, nombreDestinatario: destinatario.nombre }
+    });
+  }
+
   async function comunicar(a, hito, canal) {
     var c = comunicacionDe(a, hito);
     var mensaje = c && c[canal];
-    if (!mensaje || !tieneTexto(mensaje)) return;
+    if (!mensaje || !tieneTexto(mensaje)) return comunicarSinTexto(a, hito, canal);
 
     var valores = {};
     /* Con el hito (fila 102): {{HITO}} y {{PLAZO DEL HITO}} también aquí. */
@@ -179,6 +200,7 @@
       asuntoListo: asuntoListo,
       medioListo: medioListo,
       correoPreferente: destinatario.correoPreferente,
+      adjuntosMarcados: documentosDelHito(hito),
       comunicarHito: { claveAsunto: a.nombre, idHito: hito.id, nombreDestinatario: destinatario.nombre }
     });
   }
@@ -189,8 +211,10 @@
 
   var ETIQUETA_CANAL = { correo: 'Correo electrónico', seneca: 'Mensaje de Séneca' };
 
+  /* Siempre, desde la fila 103, salvo en una pregunta o un hito que ya
+     no aplica (el mismo criterio que "Generar documento"). */
   function botonHTML(a, hito) {
-    if (!canalesDe(a, hito).length) return '';
+    if (!hito || hito.clase === 'decision' || hito.estado === 'noaplica') return '';
     return '<button type="button" class="boton hito-comunicar-boton">Comunicar</button>';
   }
 
@@ -198,6 +222,8 @@
     var boton = div.querySelector('.hito-comunicar-boton');
     if (!boton) return;
     var canales = canalesDe(a, hito);
+    /* Sin texto propio: los dos canales, con las plantillas del tipo. */
+    if (!canales.length) canales = ['correo', 'seneca'];
     if (canales.length === 1) {
       boton.onclick = function () { comunicar(a, hito, canales[0]); };
       return;
@@ -212,6 +238,7 @@
   window.HitosComunicar = {
     canalesDe: canalesDe,
     comunicar: comunicar,
+    documentosDelHito: documentosDelHito,
     botonHTML: botonHTML,
     engancharBoton: engancharBoton
   };

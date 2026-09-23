@@ -124,15 +124,15 @@ const asunto1 = {
 };
 
 /* ================= 1 · hay botón, o no ================= */
-console.log('--- 1. botón "Comunicar" solo si el paso tiene texto ---');
+console.log('--- 1. botón "Comunicar": siempre desde la fila 103, con o sin texto del paso ---');
 const hitoConCorreo = Hitos.pasoAHito(PASO_CON_CORREO);
 const hitoSinNada = Hitos.pasoAHito(PASO_SIN_NADA);
 comprobar('un paso con comunicacion.correo.cuerpo trae el canal "correo"',
   HitosComunicar.canalesDe(asunto1, hitoConCorreo), ['correo']);
 comprobar('un paso sin nada no trae ningún canal',
   HitosComunicar.canalesDe(asunto1, hitoSinNada), []);
-comprobar('sin canales, no hay botón',
-  HitosComunicar.botonHTML(asunto1, hitoSinNada), '');
+comprobar('sin canales, también hay botón (fila 103: abre con las plantillas del tipo)',
+  HitosComunicar.botonHTML(asunto1, hitoSinNada).indexOf('Comunicar') !== -1, true);
 comprobar('con un canal, sí hay botón',
   HitosComunicar.botonHTML(asunto1, hitoConCorreo).indexOf('Comunicar') !== -1, true);
 

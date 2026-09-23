@@ -302,8 +302,11 @@ App.meterSueltoEnAsuntoElegido = async function (s, elegido) {
 /* El traslado propiamente dicho. Carpetas.moverFichero ya copia,
    comprueba que la copia pesa lo mismo y solo entonces borra: en las
    carpetas de Dropbox el move() del navegador no vale. Si algo falla,
-   el documento se queda en "Por clasificar". */
-App.llevarSueltoA = async function (s, nombreAsunto, ficha) {
+   el documento se queda en "Por clasificar".
+   `opciones.sinCuadro` (fila 103, desde un hito, js/hitos-anadir.js):
+   sin volver a la lista ni abrir el cuadro de siempre, que eso lo hace
+   quien llama sin salir de la ficha. Devuelve true si ha entrado. */
+App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
   var E = window.ElegirAsunto;
 
   var destino;
@@ -349,6 +352,11 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha) {
 
   delete App.E.reciales[s.nombre];
   U.aviso('Documento metido en ' + nombreAsunto + '.', 'bueno');
+  if (opciones && opciones.sinCuadro) {
+    App.E.sueltos = App.E.sueltos.filter(function (x) { return x.nombre !== s.nombre; });
+    try { await App.pintarSueltos(); } catch (e3) { /* la cuenta se rehace en la próxima vuelta */ }
+    return true;
+  }
   try {
     await App.verAbiertos();
 
@@ -362,6 +370,7 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha) {
   } catch (e2) {
     U.accesorio('Documento metido, pero no he podido abrir el cuadro para ponerle nombre', e2);
   }
+  return true;
 };
 
 App.abrirSuelto = async function (s) {

@@ -234,10 +234,16 @@ var HitosPanelLista = (function () {
           '<button type="button" class="hito-doc-abrir' + (falta ? ' hito-doc-falta' : '') + '"' +
             ' data-doc="' + U.escapar(d) + '">' +
             U.escapar(d) + (falta ? ' (ya no está)' : '') + '</button>' +
-          (abierto ? ' <button type="button" class="hito-doc-quitar" data-doc="' + U.escapar(d) + '">✕</button>' : '') +
+          /* Fila 103: la ✕ pasa a ser un menú de tres puntos
+             (js/hitos-documento-menu.js), con «Quitar del hito» dentro. */
+          (abierto ? (window.HitosDocumentoMenu
+            ? ' ' + HitosDocumentoMenu.botonHTML(d).replace('<button ', '<button' + (falta ? ' data-falta="1"' : '') + ' ')
+            : ' <button type="button" class="hito-doc-quitar" data-doc="' + U.escapar(d) + '">✕</button>') : '') +
           '</span>';
       }).join('') + '</div>');
-      if (abierto) {
+      /* «Añadir documento» (fila 103, js/hitos-anadir.js) va con el
+         resto de botones del hito; sin ese fichero, el de la fila 31. */
+      if (abierto && !window.HitosAnadir) {
         trozos.push('<button type="button" class="boton hito-doc-apuntar">Apuntar un documento</button>');
       }
     }
@@ -248,6 +254,7 @@ var HitosPanelLista = (function () {
         (!htmlRequisitos && window.HitosRequisitos
           ? '<button type="button" class="boton hito-requisitos-anadir-suelto">+ Añadir algo que falte</button>' : '') +
         (window.HitosComunicar ? HitosComunicar.botonHTML(a, h) : '') +
+        (window.HitosAnadir ? HitosAnadir.botonHTML(a, h) : '') +
         (window.HitosGenerar ? HitosGenerar.botonHTML(a, h) : '') +
         '<button type="button" class="boton hito-solo-informativo">' +
           (h.soloInformativo ? 'Pedírmelo a mí' : 'Dejarlo solo informativo') + '</button>' +
@@ -277,6 +284,11 @@ var HitosPanelLista = (function () {
         };
       });
 
+      if (abierto && window.HitosDocumentoMenu) {
+        Array.prototype.forEach.call(caja.querySelectorAll('.hito-doc-menu'), function (b) {
+          HitosDocumentoMenu.enganchar(b, a, h, b.dataset.doc, !!b.dataset.falta);
+        });
+      }
       if (abierto) {
         Array.prototype.forEach.call(caja.querySelectorAll('.hito-doc-quitar'), function (b) {
           b.onclick = function () {
@@ -317,6 +329,7 @@ var HitosPanelLista = (function () {
     }
     if (window.HitosComunicar) HitosComunicar.engancharBoton(div, a, h);
     if (window.HitosGenerar) HitosGenerar.engancharBoton(div, a, h);   /* fila 102 */
+    if (window.HitosAnadir) HitosAnadir.engancharBoton(div, a, h);     /* fila 103 */
     var resp = div.querySelector('.hito-campo-responsable');
     if (resp) resp.onchange = function () {
       return guardarHito(resp, 'guardar el responsable', function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: resp.value }); });

@@ -5,6 +5,34 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 23-sep-2026 — Fila 103: el hito como mesa de trabajo (segunda tanda)
+
+`docs/EL-HITO-MESA-DE-TRABAJO.md`. Sobre lo que dejó la 102: desde el hito se trae un documento,
+se trabaja con él y se comunica, y todo queda apuntado a ESE hito.
+
+- **«Añadir documento»** sustituye a «Apuntar un documento»: menú con «Desde el ordenador», «Desde
+  «Por clasificar»» (apagado si no hay ninguno) y «Uno que ya está en la carpeta» (el cuadro de la
+  fila 31, igual). Nada se duplica: `Documentos.abrir` gana un segundo parámetro opcional (abrir
+  directo el formulario de añadir o de ponerle nombre) y devuelve los nombres que se han guardado
+  en esa apertura, siguiendo también un renombrado; `App.llevarSueltoA` gana `{ sinCuadro }` para
+  no volver a la lista de abiertos, que sacaba de la ficha.
+- **Tres puntos en cada documento del hito**, en vez de la ✕: Registrar, Separar, Unir, Sacar
+  páginas, Ajustar tamaño y «Quitar del hito». Lo nuevo que sale de cada herramienta se sabe sin
+  tocarlas por dentro: la carpeta leída antes de abrirla y otra vez en su `alTerminar`.
+- **«Comunicar» siempre**: sin texto propio del paso, abre los dos canales con las plantillas del
+  tipo, pero con el destinatario y la constancia del hito. Los documentos del hito salen ya
+  marcados en el cuadro de Correo, y la línea del historial termina en «· con N documentos».
+
+**Lo que costó de verdad**: la opción «Quitar del hito» se llamó primero con la clase de la ✕
+antigua (`hito-doc-quitar`), y el enganche viejo, que sigue ahí por si falta el fichero nuevo, le
+pisaba el `onclick` con un nombre vacío: no quitaba nada y plegaba el hito. Lo cazó la prueba
+nueva (`pruebas/el-hito-mesa-de-trabajo.mjs`), que ahora usa `hito-doc-menu-quitar`. La fila 103 la
+había dejado EN CURSO una sesión que solo marcó la cola; sin ninguna sesión trabajando en ella,
+esta la retomó entera. Pruebas antiguas ajustadas al botón nuevo: `pruebas/hitos.mjs`,
+`pruebas/quedarse-en-el-asunto.mjs` y `pruebas/comunicar-desde-hito.mjs`.
+
+---
+
 ## 23-sep-2026 — Fila 102: generar documentos desde el hito
 
 `docs/DOCUMENTOS-DESDE-EL-HITO.md`. Primera tanda de que el hito sea la mesa de trabajo: las
