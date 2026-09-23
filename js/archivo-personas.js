@@ -136,7 +136,7 @@ App.pintarArchivo = function () {
    tocarlo: `App.reabrirAsunto` ya sabía recalcular la carpeta cuando
    `a.padre` faltaba o estaba viejo (17-sep-2026, fila 45). */
 U.envolver(App, 'App.verDocumentos', 'archivo-personas.js', function (comoEra) {
-  return async function (a) {
+  return async function (a, opciones) {
     if (!a.handle) {
       var resuelto = await IndiceArchivo.resolverHandle(a);
       if (!resuelto) {
@@ -147,7 +147,7 @@ U.envolver(App, 'App.verDocumentos', 'archivo-personas.js', function (comoEra) {
       a.handle = resuelto.handle;
       a.padre = resuelto.padre;
     }
-    return comoEra(a);
+    return comoEra(a, opciones);
   };
 });
 
