@@ -104,8 +104,15 @@ Las filas 1 a 62, 64 a 75, 77 a 104 están **HECHAS**. Sus documentos siguen en
 |---|---|---|
 | 105 | `docs/AJUSTES-PLEGADO.md` | PENDIENTE (apuntada 23-sep-2026) |
 | 106 | `docs/LO-PIDE-EN-LA-CABECERA.md` | PENDIENTE (apuntada 24-sep-2026) |
+| 107 | `docs/FICHA-EN-TARJETAS.md` | PENDIENTE (apuntada 24-sep-2026). Después de la 106 |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 107 se apuntó el 24-sep-2026**, cerrada con Francisco: la ficha del asunto pasa de
+tres columnas a una cuadrícula de tarjetas del mismo tamaño, todas a la vista; al pulsar una, se
+abre en grande con las demás como pestañas arriba, el documento abierto a la derecha y una franja
+con los documentos a mano. Francisco adelanta así la "cuarta pasada" de la ficha que estaba
+prevista para cuando los hitos llevaran un mes en uso.
 
 **La fila 106 se apuntó el 24-sep-2026**, cerrada con Francisco: "quién lo pide" sale una sola
 vez en la cabecera de la ficha, arriba, con la relación entre paréntesis; se quita la línea gris
@@ -205,15 +212,14 @@ mesa de trabajo, sobre lo que dejó la 102.
   ideal. **Hay que preguntarselo a Francisco**, y apuntar lo que decida. Es la parte que quedó sin
   hacer de la fila 68.
 - **Del informe del 18-sep-2026: la ficha del asunto.** Se ha rehecho tres veces en cuatro días
-  (filas 51, 52 y 58). Va a necesitar una cuarta pasada cuando los hitos lleven un mes en uso. No se
-  adelanta nada: se espera al uso real.
+  (filas 51, 52 y 58). La cuarta pasada la adelantó Francisco el 24-sep-2026: es la fila 107.
 - **Del 21-sep-2026: quitar el tecleo de la clave de normativa.** En el apartado "Normativa" de un
   paso, un buscador que encuentre el artículo por su texto ("consejo escolar") y rellene la clave
   solo. Necesita que el sistema de normativa publique un índice ligero de claves y títulos. **Se
   diseña con Francisco a partir del miércoles 23-sep-2026 a las 14:00**, no antes.
 - **Del 23-sep-2026: revisión de usabilidad.** Francisco ve pantallas con demasiadas cosas. Ajustes
-  va en la fila 105. Quedan por hablar la ficha del asunto y Asuntos abiertos (qué plegar en cada
-  una), con la misma regla: plegado, resumen en el título, y se recuerda lo abierto.
+  va en la fila 105 y la ficha del asunto en la 107. Queda por hablar Asuntos abiertos (qué plegar),
+  con la misma regla: plegado, resumen en el título, y se recuerda lo abierto.
 
 ## Descartado, no proponer otra vez (del informe del 18-sep-2026)
 
@@ -270,7 +276,7 @@ retipear de un tirón sin `git push`). Puede que falten todavía.
   `css/seneca.css`, `js/campos-calculo.js`, `js/campos-catalogo.js`,
   `js/campos-calculados-editor.js`, `js/ajustes-tipo.js`).
 - A `docs/HISTORIA.md`: la entrada del 18-sep-2026 de esas cuatro filas, con su "Lo que costó de
-  verdad" (los bugs que las propias pruebas cazaron antes de producción).
+verdad" (los bugs que las propias pruebas cazaron antes de producción).
 
 Compruébalo contra lo que de verdad dice `main` antes de sustituir nada. Si la sesión tiene
 `git push` de verdad (terminal u ordenador de Francisco), es mucho más simple que ir fichero a
