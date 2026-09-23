@@ -123,6 +123,9 @@ var Hitos = (function () {
       opciones: [], elegida: null
     };
     if (h && h.delTipoAnterior) salida.delTipoAnterior = String(h.delTipoAnterior);
+    /* La fecha en que se dio por hecho (fila 102, para {hecho:...}).
+       Solo si la hay: los hitos de antes no la tienen, y no se inventa. */
+    if (h && h.hechoEl) salida.hechoEl = String(h.hechoEl);
     if (esDecision) {
       salida.opciones = (Array.isArray(h && h.opciones) ? h.opciones : []).map(function (o) {
         return {
@@ -484,6 +487,8 @@ var Hitos = (function () {
       h.estado = nuevoEstado;
       if (nota) h.notas.push({ texto: String(nota), quien: (window.App && App.E.usuario) || '', cuando: U.ahora() });
       if (nuevoEstado === 'encurso') h.desde = U.hoyIso();
+      if (nuevoEstado === 'hecho') h.hechoEl = U.hoyIso();
+      else delete h.hechoEl;
       if (nuevoEstado === 'hecho') aplicarPlazosDependientes(entrada.hitos, h.id, d.ajustes.noLectivos);
       resultado = recomputeEnCurso(entrada.hitos);
       return d;

@@ -108,7 +108,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Escape y salida en toda pantalla.
 - Copia sin internet (`file://`): "copia sin internet" a la vista, se actualiza sola; si no puede, franja arriba con «Actualizar ahora».
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo, responsable,
-  bifurcaciones, documentos, historial, "lo que hay que reunir" y "Comunicar". Biblioteca de
+  bifurcaciones, documentos, historial, "lo que hay que reunir", "Comunicar" y "Generar
+  documento" (plantillas unidas al paso). Biblioteca de
   hitos del centro: modelos reutilizables entre tipos, con normativa y marca "solo informativo".
   Botón en Mantenimiento para cargar los tipos y guías del instituto.
 - "Qué me toca": hitos pendientes, filtro por responsable, bloque "Dormidos" (sin novedades en N
@@ -175,9 +176,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: membrete, Consejería, cargos y Provincia.
-- Importar el fichero de usuarios IdEA del alumnado, pendiente de que a Francisco le reactiven el perfil de Gestor de PASEN.
-- Pulsar "Poner en orden las fichas del ARCHIVO" (Mantenimiento), para los archivados de antes.
-- Pulsar, antes de junio de 2027, "Guardar el contacto de los asuntos abiertos" (Ajustes → Mantenimiento).
+- Importar los usuarios IdEA del alumnado, cuando reactiven a Francisco el perfil de Gestor de PASEN.
+- Pulsar "Poner en orden las fichas del ARCHIVO" (Mantenimiento).
+- Antes de junio de 2027: "Guardar el contacto de los asuntos abiertos" (Mantenimiento).
 - Decisión: ¿la papelera se vacía sola a los N días? Sin decidir, solo el aviso más insistente.
 - Antes de publicar algo importante, repasar `docs/COMPROBAR-A-MANO.md`.
 

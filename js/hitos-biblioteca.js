@@ -91,6 +91,9 @@ var HitosBiblioteca = (function () {
       normativa: window.Guias ? Guias.normalizarNormativa(m && m.normativa) : [],
       /* 20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md. */
       formularios: Array.isArray(m && m.formularios) ? m.formularios.map(String) : [],
+      /* 23-sep-2026, fila 102: las plantillas de documento unidas al modelo. */
+      plantillasDocumento: window.Guias ? Guias.listaDeIds(m && m.plantillasDocumento)
+        : (Array.isArray(m && m.plantillasDocumento) ? m.plantillasDocumento.map(String) : []),
       creadoEl: String((m && m.creadoEl) || U.hoyIso()),
       actualizadoEl: String((m && m.actualizadoEl) || U.hoyIso()),
       actualizadoPor: String((m && m.actualizadoPor) || '')
@@ -148,6 +151,7 @@ var HitosBiblioteca = (function () {
       requisitos: paso.requisitos, comunicacion: paso.comunicacion,
       soloInformativo: paso.soloInformativo, normativa: paso.normativa,
       formularios: paso.formularios,
+      plantillasDocumento: paso.plantillasDocumento,
       actualizadoPor: usuario || ''
     });
   }
@@ -165,6 +169,7 @@ var HitosBiblioteca = (function () {
       soloInformativo: modelo.soloInformativo,
       normativa: (modelo.normativa || []).map(function (n) { return Object.assign({}, n); }),
       formularios: (modelo.formularios || []).slice(),
+      plantillasDocumento: (modelo.plantillasDocumento || []).slice(),
       origenBiblioteca: { id: modelo.id, revision: modelo.revision, divergido: false }
     };
   }
@@ -180,7 +185,8 @@ var HitosBiblioteca = (function () {
     { clave: 'plazo', etiqueta: 'Plazo' },
     { clave: 'requisitos', etiqueta: 'Lo que hay que reunir' },
     { clave: 'comunicacion', etiqueta: 'Comunicación de este paso' },
-    { clave: 'normativa', etiqueta: 'Normativa' }
+    { clave: 'normativa', etiqueta: 'Normativa' },
+    { clave: 'plantillasDocumento', etiqueta: 'Documentos' }
   ];
 
   function textoLegibleDe(clave, valor) {
@@ -202,6 +208,16 @@ var HitosBiblioteca = (function () {
     if (clave === 'normativa') {
       var refs = valor || [];
       return refs.length ? refs.map(function (r) { return r.cita; }).join('; ') : '(vacío)';
+    }
+    /* Fila 102: los nombres de las plantillas; un id que ya no existe,
+       "(plantilla borrada)". */
+    if (clave === 'plantillasDocumento') {
+      var ids = valor || [];
+      if (!ids.length) return '(vacío)';
+      return ids.map(function (id) {
+        var d = window.Plantillas && Plantillas.documentoPorId ? Plantillas.documentoPorId(id) : undefined;
+        return d === undefined ? id : (d ? d.nombre : '(plantilla borrada)');
+      }).join(', ');
     }
     return String(valor);
   }

@@ -99,6 +99,12 @@ var Plantillas = (function () {
        nombre con espacio ("CARGO FIRMANTE") no deja restos de llave
        suelta. {{MEMBRETE}} no está en este catálogo: no es un dato de
        texto, lo consume `Docx.ponerImagen` antes de llegar aquí. */
+    /* Desde un hito (23-sep-2026, fila 102, docs/DOCUMENTOS-DESDE-EL-HITO.md):
+       fuera de ese camino se sustituyen por nada y no cuentan como dato
+       que falta (SIN_FALTA, más abajo). `{hecho:TÍTULO DE OTRO HITO}`
+       va aparte, como `{campo:...}`. */
+    { clave: 'hito', etiqueta: 'El hito desde el que se genera o se comunica' },
+    { clave: 'plazo del hito', etiqueta: 'La fecha límite de ese hito' },
     { clave: 'firmante', etiqueta: 'Quien firma el documento (según el cargo, en su fecha)' },
     { clave: 'cargo firmante', etiqueta: 'El cargo de quien firma' },
     { clave: 'tratamiento firmante', etiqueta: 'El tratamiento de quien firma ("El Director")' },
@@ -198,6 +204,14 @@ var Plantillas = (function () {
   /* Las plantillas de documento de Word colgadas de un tipo. Una misma
      plantilla puede colgar de varios tipos, cada uno con su fila en
      `documentos` (docs/PLANTILLAS-DE-DOCUMENTO.md, 3.4). */
+  /* Una plantilla de documento por su id, con lo último que se leyó
+     (síncrona, para pintar). `undefined` si todavía no se ha leído
+     nada; `null` si no existe (borrada). Fila 102. */
+  function documentoPorId(id) {
+    if (!cache) return undefined;
+    return (cache.documentos || []).filter(function (d) { return d.id === id; })[0] || null;
+  }
+
   function documentosDeTipo(datos, categoria, tipo) {
     return ((datos && datos.documentos) || []).filter(function (p) {
       return p.categoria === categoria && p.tipo === tipo;
@@ -250,7 +264,20 @@ var Plantillas = (function () {
   /* Resuelve un hueco ya reconocido (o "{campo:...}"), y apunta en
      `faltan` si no hay dato. Común a la llave sencilla y a la doble
      (`resolverHuecosDobles`, más abajo). */
+  var SIN_FALTA = ['hito', 'plazo del hito'];
+
   function resolverUnHueco(clave, valores, faltan) {
+    /* {hecho:TÍTULO} (fila 102): la fecha en que se marcó hecho otro
+       hito del asunto, buscado por su título sin mayúsculas ni tildes.
+       Fuera del camino de un hito (sin `valores.hechos`), vacío y sin
+       contar como dato que falta. */
+    if (/^hecho\s*:/i.test(clave)) {
+      var titulo = clave.replace(/^hecho\s*:/i, '').trim();
+      if (!valores.hechos) return { encontrado: true, valor: '' };
+      var fechaHecho = valores.hechos[U.normalizar(titulo)] || '';
+      if (!fechaHecho) faltan.push('hecho: ' + titulo);
+      return { encontrado: true, valor: fechaHecho };
+    }
     if (/^campo\s*:/i.test(clave)) {
       var nombreCampo = clave.replace(/^campo\s*:/i, '').trim();
       var valorCampo = buscarCampo(valores.campos, nombreCampo);
@@ -266,7 +293,7 @@ var Plantillas = (function () {
     var real = CONOCIDOS.filter(function (c) { return sinEspacios(c) === sinEspacios(clave); })[0];
     if (!real) return { encontrado: false, valor: '' };
     var valor = valores[real] || '';
-    if (!valor) faltan.push(nombreDeHueco(real));
+    if (!valor && SIN_FALTA.indexOf(real) === -1) faltan.push(nombreDeHueco(real));
     return { encontrado: true, valor: valor };
   }
 
@@ -523,6 +550,32 @@ var Plantillas = (function () {
       campos: camposDelAsuntoDe(a)
     };
 
+    /* Desde un hito (fila 102): {{HITO}}, {{PLAZO DEL HITO}},
+       {hecho:...} y {{LO QUE FALTA}} con lo del propio hito. Sin hito,
+       no se ponen: se quedan vacíos sin contar como dato que falta. */
+    if (op.hito) {
+      var hito = op.hito;
+      valores.hito = hito.titulo || '';
+      valores['plazo del hito'] = hito.fecha ? U.fechaLegible(U.aAaMmDd(hito.fecha)) : '';
+      if (op.conLoQueFalta !== false && window.HitosRequisitos && HitosRequisitos.textoLoQueFalta) {
+        valores.loQueFalta = HitosRequisitos.textoLoQueFalta(hito) || '';
+      }
+      valores.hechos = {};
+      try {
+        var lista = op.hitosDelAsunto;
+        if (!lista && window.Hitos && a.nombre) {
+          var todos = await Hitos.leer();
+          lista = (todos.porAsunto[a.nombre] || {}).hitos || [];
+        }
+        (function recorrer(l) {
+          (l || []).forEach(function (h) {
+            if (h.estado === 'hecho' && h.hechoEl) valores.hechos[U.normalizar(h.titulo)] = U.fechaLegible(U.aAaMmDd(h.hechoEl));
+            (h.opciones || []).forEach(function (o) { recorrer(o.hitos); });
+          });
+        })(lista);
+      } catch (e) { /* sin hitos legibles, los {hecho:...} se quedan vacíos */ }
+    }
+
     /* {{FORMULARIOS}} (20-sep-2026, fila 83, docs/PLANTILLAS-DEL-CENTRO.md,
        parte 3): los del tipo y de los hitos del asunto (fila 82), uno
        por línea, con su nombre y su dirección si la tiene. Sin
@@ -601,6 +654,7 @@ var Plantillas = (function () {
     POR_DEFECTO_FIRMA: POR_DEFECTO_FIRMA, POR_DEFECTO_CENTRO: POR_DEFECTO_CENTRO,
     POR_DEFECTO_NORMATIVA: POR_DEFECTO_NORMATIVA, POR_DEFECTO_MEMBRETE_CAJA: POR_DEFECTO_MEMBRETE_CAJA,
     cargar: cargar, cargarReciente: cargarReciente, olvidar: olvidar, guardar: guardar,
+    documentoPorId: documentoPorId, enMemoria: function () { return cache; },
     deTipo: deTipo, idNuevo: idNuevo, rellenar: rellenar, tieneLoQueFalta: tieneLoQueFalta,
     documentosDeTipo: documentosDeTipo, idNuevoDocumento: idNuevoDocumento,
     valoresDeAsunto: valoresDeAsunto

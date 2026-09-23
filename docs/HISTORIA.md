@@ -5,7 +5,26 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
-## 23-sep-2026 — Fila 101: repintar solo lo que ha cambiado
+## 23-sep-2026 — Fila 102: generar documentos desde el hito
+
+`docs/DOCUMENTOS-DESDE-EL-HITO.md`. Primera tanda de que el hito sea la mesa de trabajo: las
+plantillas de documento se unen a un paso de la guía (o a un modelo de la biblioteca) en
+«Documentos de este paso», y el hito trae «Generar documento», que deja el papel apuntado a él.
+Todo lo nuevo, en dos ficheros nuevos (`js/guias-documentos.js`, `js/hitos-generar.js`); en
+`js/guias.js` y `js/plantillas-documento.js` solo unas pocas líneas.
+
+**Una decisión que el documento dejaba abierta**: `{hecho:…}` pedía la fecha en que se marcó hecho
+otro hito, «del historial». Los hitos no guardaban esa fecha en ningún sitio: desde esta fila se
+apunta `hechoEl` al marcarlo (y al elegir la opción de una pregunta). Los de antes se quedan sin
+ella: no se inventa.
+
+**De paso**: editar un modelo de la biblioteca perdía sus formularios (el editor no se los pasaba);
+«Comunicar» desde un hito no encontraba su paso si estaba dentro de una pregunta de dentro (fila
+95); y el aviso de «huecos sin dato» al generar pasa de rojo a ámbar (el documento ya está hecho).
+`pruebas/ajustes-por-tipo.mjs` buscaba la sección del plazo por el texto «Plazo», que ahora sale
+también en la tabla de huecos: busca el campo.
+
+: repintar solo lo que ha cambiado
 
 `docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md`. Tras guardar, la aplicación repintaba casi todo: cambiar el
 estado desde la ficha eran 30-40 lecturas (la lista entera aunque estuviera oculta, sus 17

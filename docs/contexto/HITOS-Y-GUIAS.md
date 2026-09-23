@@ -80,6 +80,30 @@ cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegi
 
 Se comprueba con `pruebas/guias.mjs` y `pruebas/opciones.mjs`.
 
+### Documentos desde el hito (23-sep-2026, fila 102, `docs/DOCUMENTOS-DESDE-EL-HITO.md`)
+
+Primera tanda de que el hito sea la mesa de trabajo del asunto.
+
+- **La unión plantilla ↔ paso**: campo `plantillasDocumento: [id]` (los `id` de `plantillas.json →
+  documentos`) en un paso, un subpaso o un modelo de la biblioteca; nunca en un paso-pregunta
+  (`Guias.normalizar` lo vacía). Se escribe en «Documentos de este paso» (`js/guias-documentos.js`,
+  buscador con casillas agrupadas por tipo; el catálogo se lee una vez antes de abrir el cuadro,
+  `GuiasDocumentos.precargar`). Un id borrado sale tachado y se quita al guardar. Entra en la
+  comparación de la biblioteca («Documentos»), se copia al traer un modelo y al guardarlo. El hito
+  no guarda copia: lo lee de su paso por `origenGuia` al pulsar. Una plantilla unida al paso vale
+  aunque sea de otro tipo de asunto.
+- **«Generar documento» en el hito** (`js/hitos-generar.js`, en `.hito-botones`): sale si el hito no
+  es pregunta ni «no aplica» y hay alguna plantilla (del paso o del tipo). Con una sola, genera; con
+  varias, el cuadro de elegir con «De este paso» y «Otras de este tipo de asunto». El motor es el de
+  siempre, `PlantillasDocumento.generar(asunto, plantilla, modo, { hito })`: deja el documento
+  apuntado al hito, marca su casilla de «Lo que hay que reunir», apunta «Generado «…»» en el hito y
+  lo deja desplegado.
+- **Huecos nuevos** (`js/plantillas.js`): `{{HITO}}`, `{{PLAZO DEL HITO}}`, `{hecho:TÍTULO}` (la fecha
+  en que se marcó hecho otro hito, `hechoEl`, que se apunta desde esta fila al marcarlo; los de
+  antes no la tienen) y `{{LO QUE FALTA}}` también al generar desde el hito. Fuera del camino de un
+  hito se quedan vacíos sin contar como dato que falta. `{{HITO}}` y `{{PLAZO DEL HITO}}` también al
+  «Comunicar» desde un hito. Prueba: `pruebas/documentos-desde-el-hito.mjs`.
+
 ### La biblioteca de hitos del centro (20-sep-2026, fila 79, docs/BIBLIOTECA-DE-HITOS.md)
 
 Muchos pasos se repiten entre tipos de asunto casi idénticos ("Registrar de salida en Séneca",

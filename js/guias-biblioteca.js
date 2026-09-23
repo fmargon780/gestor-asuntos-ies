@@ -321,11 +321,14 @@ var GuiasBiblioteca = (function () {
      un paso sin id de guía, así que Guias.editar() sirve igual con una
      lista de un solo elemento. Al guardar, solo hace falta el primero. */
   async function editarModelo(m) {
+    if (window.GuiasDocumentos) await GuiasDocumentos.precargar();   /* fila 102 */
     var pasos = await Guias.editar(m.nombre, [{
       id: m.id, titulo: m.titulo, cuerpo: m.explicacion, opciones: [],
       responsable: m.responsable, estadoAsunto: m.estadoAsunto, plazo: m.plazo,
       requisitos: m.requisitos, comunicacion: m.comunicacion,
-      soloInformativo: m.soloInformativo, normativa: m.normativa
+      soloInformativo: m.soloInformativo, normativa: m.normativa,
+      /* Sin estos dos, editar un modelo los perdía (fila 102). */
+      formularios: m.formularios, plantillasDocumento: m.plantillasDocumento
     }], [], []);
     if (!pasos || !pasos.length) return;
     try {
