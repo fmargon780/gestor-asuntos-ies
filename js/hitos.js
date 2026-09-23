@@ -116,11 +116,13 @@ var Hitos = (function () {
       formularios: Array.isArray(h && h.formularios) ? h.formularios.map(String) : [],
       /* 23-sep-2026, fila 94, docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md: el
          tipo del que venía un hito que se ha quedado tras cambiar el tipo
-         del asunto (tenía algo apuntado). Vacío en todos los demás. No
-         se ve en la lista ni cuenta: sale plegado con los huérfanos. */
-      delTipoAnterior: String((h && h.delTipoAnterior) || ''),
+         del asunto (tenía algo apuntado). No existe en los demás. No
+         se ve en la lista ni cuenta: sale plegado con los huérfanos.
+         Solo se escribe cuando lo hay (más abajo), para no cambiar la
+         forma de ningún hito de antes. */
       opciones: [], elegida: null
     };
+    if (h && h.delTipoAnterior) salida.delTipoAnterior = String(h.delTipoAnterior);
     if (esDecision) {
       salida.opciones = (Array.isArray(h && h.opciones) ? h.opciones : []).map(function (o) {
         return {
