@@ -73,7 +73,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
   sueltas también en documentos, registro de Séneca, ficha y notas.
 - Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
-  Si cambia el tipo, ofrece traer la guía del nuevo sin perder lo trabajado.
+  Al cambiar el tipo, ofrece la guía del nuevo.
 - Nombre comercial de empresas, aparte de la razón social; cambiar los datos de un tercero dado
   de alta a mano.
 - Guías del procedimiento por tipo, con pasos, preguntas y opciones.
@@ -94,6 +94,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Parada al crear un asunto duplicado, y pantalla propia "Duplicados".
 - Ajustes con tres pestañas; pantalla propia de cada tipo, con sus ocho secciones a la vista.
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
+  Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
 - Papelera: nada se borra del todo a la primera.
 - Mandar documentos de un asunto por correo, con un borrador que deja Apps Script en Gmail.
 - Plantillas de correo y de documento de Word por tipo de asunto, con huecos que se rellenan

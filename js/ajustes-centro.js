@@ -237,9 +237,15 @@ App.pintarTiposDeDocumento = function () {
     f.dataset.tipoDoc = nombre;
     var linea = document.createElement('div');
     linea.className = 'tarjeta-tipo-linea';
-    linea.innerHTML = '<span class="tarjeta-tipo-nombre">' + U.escapar(nombre) + '</span>';
+    /* Los campos del nombre (fila 96, js/documentos-campos.js). */
+    var susCampos = window.DocCampos ? DocCampos.campos(nombre) : [];
+    linea.innerHTML = '<span class="tarjeta-tipo-nombre">' + U.escapar(nombre) + '</span>' +
+      (susCampos.length ? '<span class="suave"> · ' + susCampos.map(function (c) {
+        return U.escapar(c.nombre) + (c.obligatorio ? ' *' : '');
+      }).join(', ') + '</span>' : '');
     f.appendChild(linea);
     f.appendChild(App.botonMenuTarjeta([
+      { texto: 'Campos del nombre', onclick: function () { if (window.DocCampos) DocCampos.editar(nombre); } },
       { texto: 'Borrar', peligro: true, onclick: function () { App.borrarTipoDocumento(nombre); } }
     ]));
     tdoc.appendChild(f);

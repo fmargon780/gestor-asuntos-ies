@@ -380,6 +380,10 @@ var Nombres = (function () {
     partes.push(U.aAaMmDd(datos.fecha));
     if (datos.codigo) partes.push(U.limpiarNombre(datos.codigo));
     partes.push(U.limpiarNombre(datos.tipo).toUpperCase());
+    /* Los campos del tipo de documento (fila 96,
+       docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md), ya en orden: entre el
+       tipo y el texto adicional. */
+    (datos.campos || []).forEach(function (v) { if (v) partes.push(U.limpiarNombre(v)); });
     if (datos.curso) partes.push(U.limpiarNombre(datos.curso));
     var base = U.limpiarNombre(partes.filter(function (p) { return p; }).join(' '));
     var ext = String(datos.extension || '').replace(/[^A-Za-z0-9]/g, '').toLowerCase();

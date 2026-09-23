@@ -187,7 +187,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `recurrentes.json` | Los asuntos que se repiten y cuándo tocan |
 | `frescura.json` | Cada cuántos días avisar de que el RegAlum.csv está viejo |
 | `tablon.json` | Las notas rápidas del tablón, con su marca de privada |
-| `campos.json` | Los campos propios y los campos configurados de cada tipo de asunto |
+| `campos.json` | Los campos propios y los campos configurados de cada tipo de asunto; y, en `porTipoDocumento` (fila 96), los campos de un tipo de documento que entran en el nombre del fichero |
 | `papelera.json` | El índice de la papelera: qué se ha borrado, de dónde y cuándo |
 | `no-duplicados.json` | Grupos de posibles duplicados descartados con "No son el mismo", por la firma de sus nombres |
 | `envios.json` | **Es una lista, no un objeto.** Los encargos vivos de "mandar documentos por correo": `{ id, asunto, para, creado }` |

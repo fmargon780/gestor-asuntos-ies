@@ -4,6 +4,28 @@ Documento hijo de `docs/CONTEXTO.md` (fila 65, `docs/DOCUMENTOS-QUE-QUEPAN.md`, 
 
 ---
 
+### Campos del tipo de documento en el nombre (23-sep-2026, fila 96)
+
+`docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md`, `js/documentos-campos.js` (`window.DocCampos`). Cada
+tipo de DOCUMENTO puede llevar campos propios (texto, lista cerrada o fecha; obligatorios si se
+quiere), que entran en el nombre **entre el tipo y el texto adicional**:
+`AAMMDD [REGISTRO] TIPO [CAMPOS] [TEXTO ADICIONAL].ext` (`Nombres.montarDocumento`, `datos.campos`).
+No son los campos del tipo de ASUNTO, que siguen fuera del nombre de los documentos.
+
+- Se configuran en Ajustes → El centro → Tipos de documento, menú ⋮ → «Campos del nombre»
+  (`DocCampos.editar`: añadir, quitar, subir y bajar). La tarjeta los enseña en una línea.
+- Se guardan en `_GESTOR/campos.json`, clave `porTipoDocumento` (`Campos.guardarCamposDeDocumento`,
+  que relee y solo toca su trozo). `tipos-documento.json` sigue siendo una lista de nombres.
+- En el cuadro de poner nombre (`js/documentos.js`), al elegir el tipo salen sus campos debajo; la
+  vista previa los mete en su sitio. Un obligatorio vacío no deja guardar («Hace falta rellenar
+  "X".»). Al renombrar, un valor de **lista** que ya esté tal cual justo detrás del tipo se
+  reconoce (`DocCampos.reconocer`) y sale del texto adicional; nada más se adivina.
+- Registrar no pregunta nada: `Documentos.leerNombre` devuelve los valores dentro del texto
+  adicional, y así viajan tal cual. No se guarda nada en `asuntos.json`: el nombre es el dato.
+
+Se comprueba con `pruebas/campos-del-documento.mjs` (montaje sin navegador, cuadro y editor en
+navegador de verdad).
+
 ### Registrar un documento en un paso
 
 Botón **Registrar**, en cada documento que aún no lleve las cuatro piezas del registro en su

@@ -22,7 +22,9 @@ modalidad, puesto, NIF...) o creados a mano, que salen solos y ya rellenos al cr
   (indexado como `tipos.json`), que solo guarda `origen`, `columna` o `id`, `obligatorio` y
   `enNombre` — **no** copia clase ni valores de un campo propio: quien lo pinta
   (`js/asuntos-nuevo.js`, `js/asuntos-editar.js`) lo busca en `propios` con `Campos.propioDe`,
-  así un cambio en los valores se ve en todos los tipos que lo usan.
+  así un cambio en los valores se ve en todos los tipos que lo usan. Desde la fila 96 lleva
+  también `porTipoDocumento` (solo si hay alguno): los campos de un tipo de DOCUMENTO para el
+  nombre del fichero, otra cosa distinta (ver `docs/contexto/DOCUMENTOS.md`).
 - **Configurar los campos de un tipo**: pulsando su tarjeta en Ajustes se abre su pantalla
   propia, con la sección "Campos" ya desplegada (17-sep-2026, fila 39; antes era un botón
   "Campos" que abría un cuadro aparte, `App.abrirCamposDeTipo`, retirado). Los ya puestos

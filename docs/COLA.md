@@ -92,12 +92,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 62, 64 a 75, 77 a 94 y 97 están **HECHAS**. Sus documentos siguen en
+Las filas 1 a 62, 64 a 75, 77 a 94, 96 y 97 están **HECHAS**. Sus documentos siguen en
 `docs/`, y el detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 96 | `docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md` (campos propios del tipo de documento, obligatorios si se quiere, que entran solos en el nombre) | EN CURSO (23-sep-2026) |
 | 98 | `docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md` (botón «Ruta» en la ficha, con la ruta de este ordenador apuntada en Ajustes → El centro) | PENDIENTE |
 | 95 | `docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md` (preguntas anidadas sin límite de niveles; el editor entra y sale en vez de anidar en pantalla) | PENDIENTE |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
