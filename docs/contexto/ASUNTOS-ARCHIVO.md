@@ -151,6 +151,10 @@ tarjeta de la lista) salían dos avisos rojos sobrantes, aunque el archivado en 
     nuevo el manejador del fichero en cada intento (nunca reutiliza uno viejo). Cualquier error que
     no sea de sincronización se lanza a la primera. Como `Copias.guardar`, `guardarJson` y
     `_ficha.json` pasan todos por ahí, esto arregla de una vez toda escritura de la aplicación.
+    Desde la fila 92 lo llaman a través de `conReintento(intento)`: si `window.Reintentar` no
+    está cargado, escriben sin reintento en vez de fallar con «Reintentar is not defined» (que
+    dejaba la aplicación sin poder guardar nada). `pruebas/scripts-cargados.mjs` lo comprueba, y
+    además que todo `js/*.js` tiene su `<script>` en `index.html`.
   - Si aun así los reintentos se agotan, la envoltura de `js/ficha-archivo.js` distingue ese caso
     (`Reintentar.esErrorDeSincronizacion(e)`) y avisa en **ámbar**, en castellano, diciendo que no
     se ha perdido nada (la clave sigue en `asuntos.json`: el borrado va después de escribir

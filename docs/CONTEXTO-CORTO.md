@@ -103,7 +103,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en GitHub Actions en cada subida.
 - Escape y salida en toda pantalla.
-- Copia sin internet (`file://`, filas 89 y 91): "copia sin internet" a la vista, se actualiza sola; si no puede, franja arriba con «Actualizar ahora».
+- Copia sin internet (`file://`): "copia sin internet" a la vista, se actualiza sola; si no puede, franja arriba con «Actualizar ahora».
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo, responsable,
   bifurcaciones, documentos, historial, "lo que hay que reunir" y "Comunicar". Biblioteca de
   hitos del centro: modelos reutilizables entre tipos, con normativa y marca "solo informativo".
@@ -121,7 +121,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Archivar o reabrir cuando el destino ya existe fusiona las dos carpetas sin perder nada; los
   errores del navegador salen siempre traducidos al castellano. Archivar desde la ficha abierta ya
   no confunde su propio archivado con el de "otro ordenador"; si Dropbox tropieza al escribir
-  `_ficha.json` se reintenta sola, y si falla del todo el aviso es ámbar (fila 90).
+  `_ficha.json` se reintenta sola (y sin ese módulo guarda igual); si falla del todo, aviso ámbar.
 - Guardar un documento en un asunto se queda en su ficha; solo se repinta si algo ha cambiado.
 - Cabecera de cada pantalla fija al bajar y encogida sin temblar.
 - Renombrar, unir o borrar un asunto mueve también sus hitos y su señal de presencia; el registro
