@@ -10,7 +10,7 @@
    Dos cosas, las dos guardadas en `ajustes` dentro de hitos.json:
 
      1. Responsables: alta, baja y cambio de nombre de las personas del
-        centro. Los papeles (tercero/tutor/relacionado) se listan pero
+        centro, y su marca "Administración" (fila 104). Los papeles (tercero/tutor/relacionado) se listan pero
         no se pueden tocar: los resuelve la aplicación sola.
      2. Días no lectivos: una caja de texto, una fecha por línea, en
         cualquiera de los formatos habituales (U.aFecha ya los admite:
@@ -133,8 +133,31 @@
     var f = document.createElement('div');
     f.className = 'fila-tipo';
     f.innerHTML = '<span class="nombre-tipo">' + U.escapar(r.nombre) + '</span>' +
-      '<span class="suave" style="flex:1">' + (esPapel ? 'Papel · se resuelve solo' : 'Persona del centro') + '</span>';
+      '<span class="suave" style="flex:1">' + (esPapel ? 'Papel · se resuelve solo · siempre terceros' : 'Persona del centro') + '</span>';
     if (!esPapel) {
+      /* Fila 104: si es de Administración. Decide en qué montón de
+         Asuntos abiertos sale un asunto cuyo hito abierto lo tiene él. */
+      var etiqueta = document.createElement('label');
+      etiqueta.className = 'interruptor interruptor-fila';
+      etiqueta.title = 'Marcado: un asunto cuyo hito abierto lo tiene esta persona sale en ' +
+        '"Pendiente de Administración". Sin marcar, en "Pendiente de terceros".';
+      var casilla = document.createElement('input');
+      casilla.type = 'checkbox';
+      casilla.className = 'responsable-administracion';
+      casilla.checked = !!r.administracion;
+      casilla.onchange = async function () {
+        try {
+          await U.mientrasGuarda(casilla, function () { return Hitos.marcarAdministracion(r.id, casilla.checked); });
+        } catch (e) {
+          U.fallo('No he podido guardar la marca de Administración', e);
+        }
+        pintar();
+      };
+      etiqueta.appendChild(casilla);
+      var texto = document.createElement('span');
+      texto.textContent = 'Administración';
+      etiqueta.appendChild(texto);
+      f.appendChild(etiqueta);
       var ren = document.createElement('button');
       ren.type = 'button'; ren.className = 'boton'; ren.textContent = 'Renombrar';
       ren.onclick = function () { renombrar(r); };

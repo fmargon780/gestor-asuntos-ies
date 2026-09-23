@@ -206,6 +206,13 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 .estado-4 { background: #fdecec; color: #a4302a; border-color: #f2c4c0; }
 .estado-5 { background: #e7f5ec; color: #1e6b3f; border-color: #bfe3cd; }
 .estado-x { background: #eef1f5; color: #5d6b7a; border-color: #d7dde5; }
+/* Quién tiene el asunto, en "Pendiente de terceros" (fila 104): en
+   pequeño y sin color, para no competir con el estado ni el plazo. */
+.marca-quien {
+  display: inline-block; border-radius: 20px; padding: 1px 8px; margin-right: 8px;
+  font-size: 11px; font-weight: 600; color: var(--tinta-suave);
+  background: var(--papel); border: 1px dashed var(--linea);
+}
 
 /* El desplegable de estado no debe ocupar los 300px de los buscadores. */
 .acciones .campo-estado { width: auto; min-width: 165px; }

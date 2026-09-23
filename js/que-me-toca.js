@@ -17,7 +17,7 @@
    la izquierda (js/barra.js la añade y le pone la cuenta de vencidos).
 
    Los tres bloques (sección 2 de docs/QUE-ME-TOCA.md):
-     - "En tu tejado": responsable `yo`/`companero` CON fecha límite,
+     - "En tu tejado": responsable de Administración (fila 104) CON fecha límite,
        ordenados por Plazos.diasHasta (los vencidos arriba). El color
        es el de siempre: se reutiliza Plazos.de/.marca-plazo tal cual
        (css/plazos.css), sin inventar otra escala.
@@ -59,7 +59,12 @@
     return { tercero: f.tercero || (a.leido && a.leido.resto) || '', relacionados: f.relacionados || [], tutor: null };
   }
 
-  function esMio(idResponsable) { return idResponsable === 'yo' || idResponsable === 'companero'; }
+  /* Fila 104: "de Administración" sale de la marca de cada responsable
+     en Ajustes › Hitos (Hitos.esDeAdministracion), no de `yo`/`companero`
+     a pelo. Sin responsable sigue yendo a "Sin fecha", como siempre. */
+  function esMio(idResponsable, ajustes) {
+    return !!idResponsable && Hitos.esDeAdministracion(idResponsable, ajustes);
+  }
 
   async function reunir() {
     var datos = await Hitos.leer();
@@ -88,12 +93,12 @@
     return d === null ? 0 : Math.max(0, -d);
   }
 
-  function clasificar(items) {
+  function clasificar(items, ajustes) {
     var tejado = [], otros = [], sinFecha = [];
     items.forEach(function (it) {
       var h = it.hito;
-      if (esMio(h.responsable) && h.fecha) tejado.push(it);
-      else if (h.responsable && !esMio(h.responsable)) otros.push(it);
+      if (esMio(h.responsable, ajustes) && h.fecha) tejado.push(it);
+      else if (h.responsable && !esMio(h.responsable, ajustes)) otros.push(it);
       else sinFecha.push(it);
     });
     tejado.sort(function (a, b) {
@@ -418,7 +423,7 @@
 
     var filtro = leerFiltro();
     var items = filtro ? datos.items.filter(function (it) { return it.hito.responsable === filtro; }) : datos.items;
-    var g = clasificar(items);
+    var g = clasificar(items, datos.ajustes);
     var nAspirantes = await contarAspirantesSinNumero();
 
     var bloques = [bloqueAspirantes(nAspirantes), bloqueTejado(g.tejado),

@@ -23,9 +23,8 @@ Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
 - El dominio `fmargon.com` está comprado en la cuenta de Vercel; otras apps irán en subdominios.
 - Repositorio: `fmargon780/gestor-asuntos-ies`, rama `main`, privado.
 - **Un solo proyecto de Vercel** (`gestor-de-asuntos`). No crear otro.
-- **Cada dirección es un sitio distinto para el navegador**: permisos e identidad se guardan por
-  dirección, así que al cambiar de dirección hay que volver a señalar las carpetas (y la bandeja
-  de correos) y entrar de nuevo. Los ajustes del centro no se pierden: viven en `_GESTOR`.
+- **Cada dirección es un sitio distinto para el navegador**: al cambiarla hay que volver a
+  señalar las carpetas (y la bandeja) y entrar. Los ajustes del centro viven en `_GESTOR`.
 
 ## 2. Quién es Francisco, y cómo escribirle
 
@@ -68,7 +67,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 (Una línea por cosa. El cómo y el porqué de cada una están en `docs/contexto/` y en `HISTORIA.md`.)
 
 - Categoría → tipo → tercero → nombre de carpeta, con vista previa. El nombre corto del tipo, en carpeta, filtros y tarjeta.
-- Estado del asunto, vía de comunicación preferente y fecha límite.
+- El asunto se coloca solo en «Pendiente de Administración» o «Pendiente de terceros» según su hito abierto (sin hitos, por su estado); quién es Administración se marca en Ajustes. Vía preferente y fecha límite.
 - Asuntos recurrentes, con aviso y creación manual.
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
   sueltas también en documentos, registro de Séneca, ficha y notas.
@@ -186,7 +185,5 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero
 
 Antes de tocar código: `docs/CONTEXTO.md` tiene el índice, las reglas comunes y la tabla de
-ficheros; cada zona (asuntos, personas, documentos, correo y Séneca, hitos y guías, campos y
-tipos, pantalla) vive en su propio hijo dentro de `docs/contexto/`, por debajo de 40.000
-caracteres cada uno. Se lee el hijo que toque para ver cómo funciona un módulo por dentro, o para
-escribir su regla al terminar una instrucción de la cola.
+ficheros; cada zona vive en su hijo de `docs/contexto/`. Se lee el hijo que toque para ver cómo
+funciona un módulo, o para escribir su regla al terminar una instrucción de la cola.
