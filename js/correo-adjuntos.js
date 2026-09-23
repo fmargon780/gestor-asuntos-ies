@@ -36,8 +36,12 @@ var CorreoAdjuntos = (function () {
   /* ---------- el bloque dentro del cuadro de Correo ---------- */
 
   /* Devuelve el HTML del bloque, o cadena vacía si el asunto no tiene
-     ningún documento (entonces el bloque no se pinta). */
-  async function pintarBloque(a) {
+     ningún documento (entonces el bloque no se pinta). `marcados`
+     (fila 103, docs/EL-HITO-MESA-DE-TRABAJO.md, sección 3): nombres
+     que nacen ya marcados —los documentos de un hito, al "Comunicar"
+     desde él—; sin él, todos desmarcados, como siempre. Solo marca
+     los que de verdad están en la lista de la carpeta. */
+  async function pintarBloque(a, marcados) {
     ultimaLista = [];
     if (!a || !a.handle) return '';
     var ficheros;
@@ -50,9 +54,12 @@ var CorreoAdjuntos = (function () {
       ultimaLista.push({ nombre: ficheros[i].nombre, tam: tam });
     }
 
+    var marcadosLista = marcados || [];
     var filas = ultimaLista.map(function (f) {
+      var marcado = marcadosLista.indexOf(f.nombre) !== -1;
       return '<label class="correo-fila">' +
-        '<input type="checkbox" class="adjunto-marca" value="' + U.escapar(f.nombre) + '">' +
+        '<input type="checkbox" class="adjunto-marca" value="' + U.escapar(f.nombre) + '"' +
+          (marcado ? ' checked' : '') + '>' +
         '<span><strong>' + U.escapar(f.nombre) + '</strong>' +
         '<span class="suave"> · ' + tamanoLegible(f.tam) + '</span></span>' +
         '</label>';
