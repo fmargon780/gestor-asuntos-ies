@@ -97,7 +97,7 @@ Las filas 1 a 62, 64 a 75, 77 a 99 están **HECHAS**. Sus documentos siguen en
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 100 | `docs/AVISOS-QUE-DICEN-LA-VERDAD.md` (lo principal y lo accesorio por separado: verde, ámbar o rojo; botones que se bloquean de verdad; errores en castellano). Después de la 99 | PENDIENTE |
+| 100 | `docs/AVISOS-QUE-DICEN-LA-VERDAD.md` (lo principal y lo accesorio por separado: verde, ámbar o rojo; botones que se bloquean de verdad; errores en castellano). Después de la 99 | EN CURSO (23-sep-2026) |
 | 101 | `docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md` (repintar solo lo que se ve y ha cambiado; el último repintado gana). Después de la 100 | PENDIENTE |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
