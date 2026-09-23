@@ -66,6 +66,13 @@ await pagina.evaluate(async (datos) => {
      así el panel de hitos lo pinta solo, sin tener que pedirle un
      repintado aparte desde fuera. */
   await window.Hitos.anadirHito(datos.asunto, datos.titulo);
+  /* El asunto se ha creado a mano, sin pasar por el formulario de
+     Nuevo asunto: sin esto, no tiene ninguna entrada en el registro
+     (asuntos.json) y "Elegir el asunto" (paso 10) no lo encontraría al
+     buscar. anotar con un objeto vacío solo lo da de alta, sin
+     categoría ni tercero: eso lo pone el paso 11, justo antes de
+     archivar. */
+  await window.App.anotar(datos.asunto, {});
 }, { asunto: NOMBRE_ASUNTO, factura: FACTURA, titulo: TITULO_HITO });
 
 await pagina.click('#btn-recargar');
@@ -128,7 +135,7 @@ await pagina.waitForSelector('.hito-doc-apuntar:not(.oculto)');
 await laFilaDelHito.locator('.hito-doc-apuntar').click();
 await pagina.waitForSelector('#hitosdoc-lista');
 await pagina.click('#cuadro-aceptar');
-await pagina.waitForSelector('#capa.oculto');
+await pagina.waitForTimeout(400);
 await comprobar('6. apuntar un documento a un hito no saca de la ficha', pantallas(), { asunto: true, abiertos: false });
 
 console.log('--- 7. comunicar: abrir y cerrar el cuadro de correo ---');
@@ -139,7 +146,7 @@ await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('el cuadro de correo se llama como toca',
   pagina.locator('#cuadro-titulo').textContent(), 'Correo de este asunto');
 await pagina.click('#cuadro-aceptar');
-await pagina.waitForSelector('#capa.oculto');
+await pagina.waitForTimeout(400);
 await comprobar('7. comunicar no saca de la ficha', pantallas(), { asunto: true, abiertos: false });
 
 console.log('--- 8. "Documentos ▾": abrir y cerrar el cuadro de la carpeta ---');
@@ -148,7 +155,7 @@ await pagina.waitForSelector('#doc-cuerpo');
 await comprobar('el cuadro de documentos se llama como el asunto',
   pagina.locator('#cuadro-titulo').textContent(), NOMBRE_ASUNTO);
 await pagina.click('#cuadro-aceptar');
-await pagina.waitForSelector('#capa.oculto');
+await pagina.waitForTimeout(400);
 await comprobar('8. "Documentos ▾" no saca de la ficha', pantallas(), { asunto: true, abiertos: false });
 
 console.log('--- 9. Volver SÍ devuelve a la lista ---');
@@ -174,7 +181,7 @@ await pagina.waitForSelector('#cuadro-titulo');
 await comprobar('se abre el cuadro de documentos del asunto de destino',
   pagina.locator('#cuadro-titulo').textContent(), NOMBRE_ASUNTO);
 await pagina.click('#cuadro-aceptar');
-await pagina.waitForSelector('#capa.oculto');
+await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await comprobar('10. "Meter en un asunto" no lleva de vuelta a la ficha de ese asunto',
   pantallas(), { asunto: false, abiertos: true });
 
@@ -208,7 +215,7 @@ await pagina.evaluate(async (nombre) => {
   await window.__disco.abiertos.getDirectoryHandle(nombre, { create: true });
 }, SEGUNDO_ASUNTO);
 await pagina.click('#btn-recargar');
-await pagina.waitForSelector('.tarjeta', { hasText: 'PERMISO' });
+await pagina.locator('#lista-abiertos .tarjeta', { hasText: 'PERMISO' }).first().waitFor();
 
 async function abrirSegundoAsunto() {
   await pagina.click('#btn-recargar');
