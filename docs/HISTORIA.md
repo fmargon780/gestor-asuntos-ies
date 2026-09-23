@@ -5,6 +5,29 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 23-sep-2026 — Fila 92: «Reintentar is not defined», la aplicación sin poder guardar
+
+`docs/NADA-SE-GUARDA-REINTENTAR.md`. Desde la fila 90, `Carpetas.escribirTexto`/`escribirBytes`
+llamaban a `Reintentar.escritura` a pelo: en un navegador con `js/carpetas.js` nuevo y un
+`index.html` que no cargaba `js/reintentar-escritura.js`, fallaba **toda** escritura. Ahora pasan
+por `conReintento(intento)`, que sin el módulo escribe sin reintento, y
+`js/reintentar-escritura.js` se expone en `window.Reintentar`.
+
+**De dónde salía la versión a medias.** `main` estaba bien (el `<script>` estaba, antes de
+`carpetas.js`). La copia sin internet no lleva lista de ficheros escrita a mano
+(`scripts/copia-local.mjs` copia `js/` e `index.html` enteros), y `vercel.json` ya manda
+`max-age=0, must-revalidate` para todo, `index.html` incluido. Lo más probable: una copia a
+medias, en la que un `.js` nuevo llega antes que el `index.html` que lo carga (Dropbox sincroniza
+fichero a fichero al otro ordenador, y la actualización de la copia también escribe uno a uno).
+Con el arreglo, ese estado a medias ya no deja a nadie sin guardar. **No se pudo mirar lo
+publicado con `curl`**: esta sesión no tenía salida a `asuntos.fmargon.com` ni a `vercel.app`.
+
+Prueba nueva `pruebas/scripts-cargados.mjs` (sin navegador): todo `js/*.js` en `index.html` y al
+revés, el orden de los dos ficheros, y escribir con y sin `Reintentar`. Sin el arreglo, falla.
+
+De paso, `docs/COLA.md` vuelve a dar por HECHAS la 89 y la 91: el commit que apuntó las filas 92
+a 98 las había devuelto, por error, a BLOQUEADA y PENDIENTE.
+
 ## 23-sep-2026 — Fila 91: la copia sin internet se actualiza de verdad (y se cierra la 89)
 
 `docs/COPIA-SE-ACTUALIZA.md`. La copia que Francisco abría en el instituto seguía en

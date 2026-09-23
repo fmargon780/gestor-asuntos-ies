@@ -46,3 +46,4 @@ var Reintentar = (function () {
 
   return { escritura: escritura, esErrorDeSincronizacion: esErrorDeSincronizacion };
 })();
+window.Reintentar = Reintentar;

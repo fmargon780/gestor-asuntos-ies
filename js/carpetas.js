@@ -427,9 +427,17 @@ var Carpetas = (function () {
   }
 
   /* Reintenta si Dropbox está sincronizando esta misma carpeta en este
-     instante (fila 90, docs/ARCHIVAR-SIN-AVISOS-FALSOS.md, js/reintentar-escritura.js). */
+     instante (fila 90, docs/ARCHIVAR-SIN-AVISOS-FALSOS.md, js/reintentar-escritura.js).
+     Si el módulo no se ha cargado, escribe sin reintento: nunca un
+     «Reintentar is not defined» que deja la aplicación sin poder guardar
+     nada (fila 92, docs/NADA-SE-GUARDA-REINTENTAR.md). */
+  function conReintento(intento) {
+    if (window.Reintentar && window.Reintentar.escritura) return window.Reintentar.escritura(intento);
+    return intento();
+  }
+
   function escribirTexto(dir, nombre, texto) {
-    return Reintentar.escritura(async function () {
+    return conReintento(async function () {
       var h = await dir.getFileHandle(nombre, { create: true });
       var w = await h.createWritable();
       await w.write(new Blob([texto], { type: 'text/plain;charset=utf-8' }));
@@ -441,7 +449,7 @@ var Carpetas = (function () {
   /* Como escribirTexto, pero para bytes cualquiera: un PDF nuevo, por
      ejemplo (17-sep-2026, fila 22, separar y unir PDF). */
   function escribirBytes(dir, nombre, bytes, tipo) {
-    return Reintentar.escritura(async function () {
+    return conReintento(async function () {
       var h = await dir.getFileHandle(nombre, { create: true });
       var w = await h.createWritable();
       await w.write(new Blob([bytes], { type: tipo || 'application/octet-stream' }));
