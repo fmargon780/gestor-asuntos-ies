@@ -102,8 +102,13 @@ Las filas 1 a 62, 64 a 75, 77 a 102 están **HECHAS**. Sus documentos siguen en
 
 | Nº | Instrucción | Estado |
 |---|---|---|
+| 104 | `docs/ESTADO-POR-EL-HITO.md` | PENDIENTE (apuntada 23-sep-2026) |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 104 se apuntó el 23-sep-2026**, cerrada con Francisco: el estado del asunto sale solo
+del hito abierto, y Asuntos abiertos se parte en "Pendiente de Administración" y "Pendiente de
+terceros".
 
 **La fila 103 está HECHA** (23-sep-2026): `docs/EL-HITO-MESA-DE-TRABAJO.md`, segunda tanda del
 hito como mesa de trabajo. "Añadir documento" (los tres caminos, `js/hitos-anadir.js`), el menú
@@ -166,8 +171,9 @@ mesa de trabajo, sobre lo que dejó la 102.
   solo viajarían el identificador del asunto y el nombre de quien lo abre, nunca el nombre de la
   carpeta ni dato alguno de alumnado o personal, y con servidor en la Unión Europea.
 - Cuando los hitos (fila 15) estén en uso: si el estado del asunto desaparece y lo sustituye el
-  hito en curso. Lo de que un hito apunte a su plantilla de correo lo resuelve la fila 60; lo de
-  la plantilla de documento, la fila 102.
+  hito en curso. **Lo resuelve la fila 104** (el asunto se coloca solo por su hito abierto); al
+  terminarla, se quita esta línea. Lo de que un hito apunte a su plantilla de correo lo resuelve
+  la fila 60; lo de la plantilla de documento, la fila 102.
 - Los nueve asuntos de `docs/PROXIMOS-ASUNTOS.md` (14-sep-2026) están todos metidos en la cola:
   esa lista queda cerrada.
 - De la fila 54 (18-sep-2026): para un grupo de destinatarios que se repite todos los meses, lo
@@ -192,6 +198,8 @@ mesa de trabajo, sobre lo que dejó la 102.
   cuando cambie un artículo citado por un hito; (b) las plantillas de correo y de Séneca de cada
   tipo, que se escribirán con el uso, no de golpe; y (c) revisar el contenido tipo por tipo
   conforme Francisco los vaya trabajando de verdad, que es cuando verá si algo sobra o falta.
+- De la fila 104 (23-sep-2026): con el uso, un aviso que devuelva el asunto a "Pendiente de
+  Administración" cuando vence el plazo de un hito de terceros, para reclamarlo.
 - **Del informe del 18-sep-2026: los tres botones de comunicar.** En la misma ficha hay
   "Comunicar" en la cabecera (plantilla del tipo), "Comunicar" en un hito (texto de ese paso) y
   "Pedir lo que falta" en un hito. Por dentro están bien: los tres abren el mismo cuadro y no hay
