@@ -5,6 +5,99 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 23-sep-2026 — Fila 104: el estado del asunto sale del hito abierto
+
+`docs/ESTADO-POR-EL-HITO.md`. Los dos paneles de Asuntos abiertos que ya existían ("En el
+departamento" / "A la espera de terceros", que decidía a mano el estado del asunto con su casilla
+"Depende de otros") pasan a llamarse **Pendiente de Administración** y **Pendiente de terceros**,
+y el asunto se coloca solo según su hito abierto. Se aprovecharon los paneles en vez de pintar dos
+bloques nuevos dentro de la lista: ya tenían su cuenta, el buscador, los filtros y las tarjetas por
+tipo funcionando dentro de cada uno.
+
+- Cada responsable de Ajustes › Hitos lleva una casilla "Administración" (de partida, `yo` y
+  `companero`). Los papeles fijos son siempre terceros; un hito sin responsable, Administración.
+- `Hitos.aQuienLeToca` y `Hitos.ladoDelAsunto`, puras, en `js/hitos-a-quien.js` (nuevo: `js/hitos.js`
+  ya pasaba de 400 líneas). En terceros, la tarjeta dice en pequeño quién lo tiene.
+- Asuntos sin hitos: por la marca de su estado, la misma `espera` de siempre, que en Ajustes se
+  enseña ahora al revés, como "Administración", para que las dos casillas digan lo mismo.
+- Decisión: `HitosBiblioteca.naceSoloInformativo` no tenía, en la práctica, ningún "responsable de
+  Administración" configurado (nadie le pasaba ese dato); ahora admite los `ajustes` y usa la misma
+  marca, para que no haya dos sitios que digan quién es Administración. "Qué me toca" también.
+- `asuntos-lista.js` (más de 700 líneas) no se partió: el cambio allí son unas pocas líneas y todo lo
+  nuevo vive en el fichero aparte.
+
+Comprobado con `pruebas/estado-por-el-hito.mjs` (19 casos) y, a mano en un navegador local, que un
+asunto recién creado sale en Administración y, al marcar hecho su primer hito (de Dirección), pasa
+solo a terceros con "Dirección" en la tarjeta. Batería completa en verde. Versión publicada
+`App.VERSION`: `23-sep-2026 · 22:05`.
+
+---
+
+## 23-sep-2026 — Fila 103: el hito, mesa de trabajo (segunda tanda)
+
+`docs/EL-HITO-MESA-DE-TRABAJO.md`. Segunda tanda de que el hito sea la mesa de trabajo del
+asunto, sobre lo que dejó la fila 102: añadir documentos desde el propio hito, un menú para cada
+uno ya apuntado, y "Comunicar" siempre a la vista.
+
+**1. "Añadir documento"**: sustituye al botón suelto "Apuntar un documento" por un único botón que
+abre un menú pequeño (`js/hitos-anadir.js`, nuevo) con tres caminos: **Desde el ordenador** (reabre
+el cuadro de siempre de `js/documentos.js`, ahora con un `{hito}` opcional que hace que lo que se
+guarde quede apuntado solo); **Desde "Por clasificar"** (elige uno de los documentos sueltos y
+sigue el mismo camino que "Meter aquí", con el mismo `{hito}`; sin ninguno, sale deshabilitado con
+"(no hay ninguno)"); y **Uno que ya está en la carpeta** (el cuadro de siempre, sin cambios). Para
+que el segundo camino llegara con el hito hasta el final, `App.meterSueltoEnAsuntoElegido` y
+`App.llevarSueltoA` (`js/documentos-sueltos.js`) ganan un parámetro `opciones` que solo viaja, sin
+tocar su lógica.
+
+**2. El menú de tres puntos de cada documento del hito** (`js/hitos-documento-menu.js`, nuevo), en
+vez de la ✕ de siempre: Registrar (si le falta), Separar, Unir, Sacar páginas y Ajustar tamaño
+(solo PDF, mismo criterio que en la carpeta del asunto) y, siempre, "Quitar del hito" (el mismo
+efecto que la ✕: desapunta, nunca borra el fichero). Cualquier documento que salga de una de esas
+herramientas queda apuntado solo al mismo hito: una función pequeña y pura,
+`HitosDocumentoMenu.ficherosNuevos(antes, después)`, compara el contenido de la carpeta antes y
+después de la herramienta y apunta los que aparecen. Un documento "(ya no está)" solo trae "Quitar
+del hito". Después de cualquier acción, `HitosPanel.desplegarAlAbrir` deja el hito desplegado él
+solo, sin que haga falta volver a pulsar el título — un detalle que la propia prueba de navegador
+cazó (ver "Lo que costó de verdad").
+
+**3. "Comunicar" siempre visible**: antes solo salía si el paso tenía su propio texto de correo o
+de Séneca; ahora sale siempre (salvo en un hito "decision" o "noaplica", igual que "Generar
+documento"). Con texto propio, igual que hasta ahora. Sin él, el cuadro se abre con el desplegable
+de plantillas del tipo — los dos canales quedan disponibles, en vez de ninguno. Los documentos que
+el hito ya tiene en la carpeta salen premarcados en "Documentos de este asunto" del cuadro de
+Correo, por un nuevo `extra.adjuntosMarcados` que sube desde `js/hitos-comunicar.js` hasta
+`CorreoAdjuntos.pintarBloque` (`js/correo-adjuntos.js`), filtrando primero los que ya no estén.
+Cuando se prepara un correo con documentos, la constancia en el historial del hito (y en la nota
+del asunto) termina en "· con N documentos: a, b" — `CorreoNucleo.sufijoDocumentos`, una función
+pura nueva en `js/correo.js`, que reutiliza el mismo `textoDeLaNota`/`apuntarElRastro` de siempre:
+ni un camino aparte ni una copia de esa lógica.
+
+**Ficheros nuevos**: `js/hitos-anadir.js`, `js/hitos-documento-menu.js`,
+`pruebas/el-hito-mesa-de-trabajo.mjs` (puro, sin navegador). Todo lo demás, unas pocas líneas cada
+uno: `js/hitos-panel-lista.js`, `js/hitos-comunicar.js`, `js/documentos.js`,
+`js/documentos-sueltos.js`, `js/archivo-personas.js`, `js/asuntos-lista.js`,
+`js/correo-adjuntos.js`, `js/correo.js`, `index.html`.
+
+**Lo que costó de verdad**: dos cosas, ninguna en la aplicación, las dos cazadas por las propias
+pruebas antes de subir nada. La primera, al escribir la prueba de navegador del punto 2: después
+de "Quitar del hito" (que ya deja el hito desplegado solo, como se explica arriba), un clic de más
+sobre el título del hito lo volvía a plegar sin querer, y el siguiente paso de la prueba —abrir
+"Añadir documento"— se quedaba 30 segundos esperando un botón invisible. Se quitó ese clic de más
+y se dejó la razón por escrito, para que no se repita. La segunda, en la propia subida a `main`:
+la primera llamada por lotes se quedó corta sin avisar y dejó tres ficheros modificados
+(`js/archivo-personas.js`, `js/asuntos-lista.js`, `js/correo-adjuntos.js`) con su contenido
+antiguo; se detectó al comprobar cada fichero después de subir (regla 11 de `docs/COLA.md`) y se
+repitió uno a uno hasta que los doce quedaron bien. Ninguna de las dos tocó la aplicación
+publicada: la primera se cazó antes de dar la fila por buena, y la segunda antes de que Francisco
+la viera.
+
+Comprobado con `pruebas/el-hito-mesa-de-trabajo.mjs` y, en el navegador de verdad, con los
+bloques nuevos de `pruebas/hitos.mjs` y `pruebas/quedarse-en-el-asunto.mjs` y la sección 1
+reescrita de `pruebas/comunicar-desde-hito.mjs`. Batería completa en verde (106 ficheros de
+prueba). Versión publicada `App.VERSION`: `23-sep-2026 · 20:57`.
+
+---
+
 ## 23-sep-2026 — Fila 102: generar documentos desde el hito
 
 `docs/DOCUMENTOS-DESDE-EL-HITO.md`. Primera tanda de que el hito sea la mesa de trabajo: las

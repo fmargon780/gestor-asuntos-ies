@@ -142,6 +142,35 @@ Se comprueba con `pruebas/el-hito-mesa-de-trabajo.mjs` (puro, sin navegador: la 
 cuándo sale cada botón, `adjuntosMarcados` y `sufijoDocumentos`) y, en el navegador de verdad, con
 bloques nuevos de `pruebas/hitos.mjs` y `pruebas/quedarse-en-el-asunto.mjs`.
 
+### A quién le toca un asunto (23-sep-2026, fila 104, `docs/ESTADO-POR-EL-HITO.md`)
+
+Asuntos abiertos se parte en **Pendiente de Administración** y **Pendiente de terceros** (los dos
+paneles de siempre, `data-vista` `departamento`/`espera`, renombrados), y el montón sale solo del
+hito abierto. Todo en `js/hitos-a-quien.js`, enganchado a `Hitos`:
+
+- `Hitos.esDeAdministracion(id, ajustes)`: el ÚNICO sitio que dice quién es Administración. Sin
+  responsable, sí; papel fijo (`tercero`/`tutor`/`relacionado`), no; persona del centro, su marca
+  `administracion` de `hitos.json → ajustes.responsables` (casilla "Administración" en Ajustes ›
+  Hitos, `Hitos.marcarAdministracion`; de partida `yo` y `companero`); un nombre que no está en la
+  lista, no. La usan también "Qué me toca" ("En tu tejado") y `HitosBiblioteca.naceSoloInformativo`
+  cuando se le pasan los `ajustes` (con un id suelto sigue como antes; hoy nadie lo llama así).
+- `Hitos.aQuienLeToca(hitos, ajustes, contexto)` (pura): el primer hito visible ni `hecho` ni
+  `noaplica`, saltando los `soloInformativo` y las preguntas respondidas; si hay otros `encurso` a
+  la vez y alguno es de Administración, gana. Pregunta sin responder: Administración. Todos
+  terminados: Administración (toca archivar). Sin hitos: `lado: null`. Devuelve `{ lado, quien,
+  hito, desde }`; `quien` solo en terceros (papeles: "Tercero", "Tutor legal", "Relacionado").
+- `Hitos.ladoDelAsunto(hitos, ajustes, situacion, estados)` (pura): sin hitos, por la marca
+  `espera` del estado manual (en Ajustes, la casilla del estado se enseña al revés, como
+  "Administración"; de partida `App.esperaPorNombre`: "espera" o "tercero" en el nombre); sin
+  estado, Administración. `App.ladoDe(a)` (`js/asuntos-lista.js`) la llama con lo último leído.
+- La lista no lee `hitos.json` en cada repintado: usa `Hitos.ultimosLeidos()` (lo último leído o
+  escrito en este ordenador), lo relee por `window.Gestor.alRefrescar` cada dos minutos como mucho,
+  y cada escritura de hitos avisa por `Hitos.alCambiar`. Solo repinta si algún asunto cambia de
+  montón o de "quién lo tiene". La tarjeta de terceros enseña `.marca-quien` y "en espera desde"
+  cuenta desde el `desde` del hito.
+
+Se comprueba con `pruebas/estado-por-el-hito.mjs`.
+
 ### La biblioteca de hitos del centro (20-sep-2026, fila 79, docs/BIBLIOTECA-DE-HITOS.md)
 
 Muchos pasos se repiten entre tipos de asunto casi idénticos ("Registrar de salida en Séneca",
@@ -412,9 +441,11 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
 - **Plazo**: un paso puede llevar "tantos días hábiles desde que se complete otro paso". Al
   marcarlo hecho, `Plazos.sumarDiasHabiles` (días no lectivos de Ajustes › Hitos incluidos) pone
   sola la fecha límite del siguiente, salvo que Francisco la haya tocado a mano.
-- **Estado del asunto**: un paso puede llevar apuntado un estado de `estados.json`; al pasar su
-  hito a "en curso", el asunto pasa solo a ese estado. La única función que lo decide es
-  `Hitos.estadoDelAsunto` (`js/hitos.js`), para poder cambiar el criterio sin tocar diez sitios.
+- **Estado del asunto**: el montón de Asuntos abiertos ("Pendiente de Administración" /
+  "Pendiente de terceros") sale solo del hito abierto (`Hitos.aQuienLeToca`, ver "A quién le toca
+  un asunto"). El estado escrito sigue igual: un paso puede llevar apuntado un estado de
+  `estados.json` y, al pasar su hito a "en curso", el asunto pasa solo a ese estado; la única
+  función que decide ese estado escrito es `Hitos.estadoDelAsunto` (`js/hitos.js`).
 - **Al archivar**, los hitos salen de `hitos.json` y se escriben, dentro de la carpeta ya
   archivada, como `HISTORIAL DE TRAMITACION.txt` (legible sin la aplicación, sin copiar ningún
   documento; gemelo de `DONDE ESTA ESTE ASUNTO.txt` de `js/relacionados.js`). Si el asunto se
@@ -443,7 +474,7 @@ Cruza los hitos `pendiente`/`encurso` de **todos los asuntos abiertos** (nunca a
 no tener que entrar en ellos uno a uno: lee `Hitos.leer()` una vez y `window.Gestor.asuntos()`, y
 cruza por la clave del asunto.
 
-- Bloques, en este orden: **"En tu tejado"** (responsable `yo`/`companero`, **con** fecha
+- Bloques, en este orden: **"En tu tejado"** (responsable de Administración, `Hitos.esDeAdministracion`, **con** fecha
   límite, ordenados por `Plazos.diasHasta` — los vencidos arriba; el color es el de siempre,
   reutilizando tal cual `Plazos.de`/`.marca-plazo` de `css/plazos.css`, sin inventar otra escala);
   **"Esperando a otros"** (cualquier otro responsable, tenga fecha o no: se ordena por los días

@@ -145,7 +145,13 @@ var Hitos = (function () {
 
   function normalizarAjustes(a) {
     var responsables = (Array.isArray(a && a.responsables) ? a.responsables : RESPONSABLES_DEFECTO.slice())
-      .map(function (r) { return { id: String((r && r.id) || ''), nombre: String((r && r.nombre) || ''), clase: 'centro' }; })
+      .map(function (r) {
+        var id = String((r && r.id) || '');
+        /* Fila 104: si es de Administración (sí/no). De partida, `yo` y
+           `companero`; los que se guardaron antes de la marca, igual. */
+        var adm = (r && typeof r.administracion === 'boolean') ? r.administracion : (id === 'yo' || id === 'companero');
+        return { id: id, nombre: String((r && r.nombre) || ''), clase: 'centro', administracion: adm };
+      })
       .filter(function (r) { return r.id && r.nombre; });
     var noLectivos = (Array.isArray(a && a.noLectivos) ? a.noLectivos : [])
       .map(String).filter(function (f) { return /^\d{4}-\d{2}-\d{2}$/.test(f); }).sort();
@@ -171,6 +177,7 @@ var Hitos = (function () {
     var leido = normalizar(await Carpetas.leerJson(g, FICHERO));
     var n = Object.keys(leido.porAsunto).length;
     if (n) vistosConDatos = n;
+    ultimos = leido;
     return leido;
   }
 
@@ -191,6 +198,8 @@ var Hitos = (function () {
       await Copias.guardar(g, FICHERO, nuevo);
       ultimoCambio = Date.now();
       vistosConDatos = Object.keys(nuevo.porAsunto || {}).length;
+      ultimos = nuevo;
+      alCambiar.forEach(function (f) { try { f(nuevo); } catch (e) { /* solo avisar */ } });
       return nuevo;
     };
     return window.ColaGuardado ? window.ColaGuardado.poner(FICHERO, hacerlo) : hacerlo();
@@ -206,6 +215,13 @@ var Hitos = (function () {
      si no ha cambiado nada desde la suya. */
   var ultimoCambio = 0;
   function ultimoCambioLocal() { return ultimoCambio; }
+
+  /* Lo último leído o escrito de hitos.json en este ordenador, sin ir
+     al disco (fila 104: la lista de asuntos abiertos lo mira en cada
+     repintado), y quién quiere enterarse de cada escritura. */
+  var ultimos = null;
+  function ultimosLeidos() { return ultimos; }
+  var alCambiar = [];
   var ESPERAS_LECTURA_VACIA_MS = [700, 1500];
 
   async function leerParaCambiar(g) {
@@ -532,7 +548,8 @@ var Hitos = (function () {
     aplicarPlazosDependientes: aplicarPlazosDependientes, estadoDelAsunto: estadoDelAsunto,
     pasoAHito: pasoAHito, crearDesdeGuia: crearDesdeGuia,
     crearDesdeGuiaImportando: crearDesdeGuiaImportando,
-    marcar: marcar, ultimoCambioLocal: ultimoCambioLocal
+    marcar: marcar, ultimoCambioLocal: ultimoCambioLocal,
+    ultimosLeidos: ultimosLeidos, alCambiar: alCambiar
   };
 })();
 window.Hitos = Hitos;

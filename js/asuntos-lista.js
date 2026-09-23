@@ -316,7 +316,7 @@ Array.prototype.forEach.call(document.querySelectorAll('.panel'), function (b) {
 
 /* ---------- los montones por tipo de asunto ----------
 
-   Dentro de "En el departamento" y de "A la espera de terceros", los
+   Dentro de "Pendiente de Administración" y de "Pendiente de terceros", los
    asuntos se agrupan además por su tipo: una tarjeta pequeña por tipo,
    encima de la lista. Al pulsar una, la lista se queda solo con los de
    ese tipo; al volver a pulsarla, vuelven a salir todos. */
@@ -434,16 +434,25 @@ App.pintarGruposTipo = function (lista) {
   });
 };
 
-/* Cuántos días lleva un asunto en el estado que tiene puesto. */
+/* A qué montón va un asunto (fila 104, docs/ESTADO-POR-EL-HITO.md):
+   "Pendiente de Administración" o "Pendiente de terceros", según su
+   hito abierto (js/hitos-a-quien.js); sin hitos, por su estado. */
+App.ladoDe = function (a) {
+  if (window.Hitos && Hitos.ladoDeAsunto) return Hitos.ladoDeAsunto(a);
+  return { lado: App.esDeEspera(a.ficha.situacion || '') ? 'terceros' : 'administracion', quien: '', hito: null };
+};
+
+/* Cuántos días lleva esperando: desde que su hito está en curso o,
+   sin hitos, desde que tiene el estado que tiene puesto. */
 App.diasEnEstado = function (a) {
-  var d = new Date(a.ficha.situacionEl || a.ficha.abiertoEl || '');
+  var d = new Date(App.ladoDe(a).desde || a.ficha.situacionEl || a.ficha.abiertoEl || '');
   if (isNaN(d.getTime())) return -1;
   return Math.floor((Date.now() - d.getTime()) / 86400000);
 };
 
 App.deLaVista = function (a, vista) {
-  if (vista === 'espera') return App.esDeEspera(a.ficha.situacion || '');
-  return !App.esDeEspera(a.ficha.situacion || '');
+  var terceros = App.ladoDe(a).lado === 'terceros';
+  return vista === 'espera' ? terceros : !terceros;
 };
 
 App.pintarCuentas = function () {
@@ -593,7 +602,8 @@ App.tarjetaAsunto = function (a, modo) {
   if (via) pie.push(via);
   if (modo === 'archivado' && a.ruta) pie.push(a.ruta);
 
-  var dias = (modo === 'abierto' && App.esDeEspera(situacion)) ? App.diasEnEstado(a) : -1;
+  var lado = (modo === 'abierto') ? App.ladoDe(a) : null;
+  var dias = (lado && lado.lado === 'terceros') ? App.diasEnEstado(a) : -1;
   var esperaLarga = dias >= App.DIAS_DE_AVISO;
   if (dias === 0) pie.push('en espera desde hoy');
   else if (dias === 1) pie.push('en espera desde ayer');
@@ -622,6 +632,8 @@ App.tarjetaAsunto = function (a, modo) {
         (situacion ? '<span class="marca-estado ' + App.colorEstado(situacion) + '">' +
                      U.escapar(situacion) + '</span>' : '') +
         (p ? '<span class="marca-plazo ' + p.clase + '">' + U.escapar(p.texto) + '</span>' : '') +
+        (lado && lado.lado === 'terceros' && lado.quien
+          ? '<span class="marca-quien" title="Lo tiene ahora">' + U.escapar(lado.quien) + '</span>' : '') +
         U.escapar(a.nombre) +
       '</div>' +
       '<div class="tarjeta-pie' + (esperaLarga ? ' pie-aviso' : '') + '">' +

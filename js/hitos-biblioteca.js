@@ -326,7 +326,15 @@ var HitosBiblioteca = (function () {
      centro (`js/hitos-ajustes.js`); sin poder determinarlo, nace sin
      marcar (mejor de menos que reclamar trabajo de más por error).
      ========================================================== */
+  /* Fila 104: el segundo dato puede ser también los `ajustes` de
+     hitos.json; entonces decide la marca "Administración" de cada
+     responsable (Hitos.esDeAdministracion), el mismo sitio que usa la
+     lista de asuntos abiertos. */
   function naceSoloInformativo(idResponsable, idResponsableAdministracion) {
+    if (idResponsable && idResponsableAdministracion && typeof idResponsableAdministracion === 'object' &&
+        window.Hitos && Hitos.esDeAdministracion) {
+      return !Hitos.esDeAdministracion(idResponsable, idResponsableAdministracion);
+    }
     if (!idResponsable || !idResponsableAdministracion) return false;
     return idResponsable !== idResponsableAdministracion;
   }

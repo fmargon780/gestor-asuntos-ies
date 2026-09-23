@@ -382,9 +382,16 @@ App.normalizarEstados = function (lista) {
   var deFabrica = {};
   Nombres.ESTADOS_POR_DEFECTO.forEach(function (e) { deFabrica[e.nombre] = e.espera; });
   return (lista || []).map(function (e) {
-    if (typeof e === 'string') return { nombre: e, espera: !!deFabrica[e] };
+    if (typeof e === 'string') return { nombre: e, espera: (e in deFabrica) ? !!deFabrica[e] : App.esperaPorNombre(e) };
     return { nombre: String((e && e.nombre) || ''), espera: !!(e && e.espera) };
   }).filter(function (e) { return e.nombre; });
+};
+
+/* De partida (fila 104): un estado cuyo nombre hable de "espera" o de
+   "tercero" es de terceros; el resto, de Administración. */
+App.esperaPorNombre = function (nombre) {
+  var n = U.normalizar(nombre);
+  return n.indexOf('espera') !== -1 || n.indexOf('tercero') !== -1;
 };
 
 App.cargarEstados = async function () {

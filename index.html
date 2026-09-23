@@ -178,7 +178,7 @@
             <path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.2l2 2.6h8.8A1.5 1.5 0 0 1 21 9.1v9A1.5 1.5 0 0 1 19.5 19.6h-15A1.5 1.5 0 0 1 3 18.1z"/>
           </svg>
           <span class="panel-texto">
-            <span class="panel-nombre">En el departamento</span>
+            <span class="panel-nombre">Pendiente de Administración</span>
             <span class="panel-pie">Asuntos que nos toca mover a nosotros</span>
           </span>
           <span class="panel-cuenta" id="cuenta-departamento">0</span>
@@ -191,8 +191,8 @@
             <path d="M12 7.3V12l3 1.8"/>
           </svg>
           <span class="panel-texto">
-            <span class="panel-nombre">A la espera de terceros</span>
-            <span class="panel-pie">Lo nuestro está hecho; falta que conteste otro</span>
+            <span class="panel-nombre">Pendiente de terceros</span>
+            <span class="panel-pie">Esperando a que otro haga su parte</span>
           </span>
           <span class="panel-cuenta" id="cuenta-espera">0</span>
         </button>
@@ -1077,6 +1077,9 @@
      App.verAbiertos, ya definido en js/asuntos-lista.js. -->
 <script src="js/avisos-que-faltan.js"></script>
 <script src="js/hitos-ajustes.js"></script>
+<!-- Fila 104: a quién le toca cada asunto, por su hito abierto. Después de
+     js/hitos-archivo.js (usa Hitos.resolverResponsable). -->
+<script src="js/hitos-a-quien.js"></script>
 
 <!-- Ajustes por tipo (17-sep-2026, fila 39, docs/AJUSTES-POR-TIPO.md):
      js/ajustes.js se quedó solo con el marco (las tres pestañas, la

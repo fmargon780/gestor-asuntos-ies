@@ -150,7 +150,8 @@ de `App` va después del fichero que lo define.
 | `js/dni.js` | El DNI del alumnado, el aviso de que falta y la búsqueda por DNI |
 | `js/papelera.js` | Borrar con papelera: mandar, devolver, borrar del todo y el bloque de Ajustes |
 | `css/papelera.css` | El bloque de la papelera en Ajustes, y su icono por clase |
-| `js/hitos-ajustes.js` | El bloque "Hitos" de Ajustes: responsables y días no lectivos |
+| `js/hitos-ajustes.js` | El bloque "Hitos" de Ajustes: responsables (con su marca "Administración", fila 104) y días no lectivos |
+| `js/hitos-a-quien.js` | A quién le toca un asunto (fila 104): `Hitos.esDeAdministracion`, `Hitos.aQuienLeToca`, `Hitos.ladoDelAsunto` y el repintado de la lista cuando un asunto cambia de montón |
 | `css/hitos.css` | El aspecto de la lista de hitos en la ficha del asunto, y del bloque de Ajustes |
 | `js/inicio.js` | La última línea: `App.arrancar()` |
 | `js/envolturas-esperadas.js` | El **último** `<script>` de todos (fila 70): compara `U.envolturasAplicadas()` con la lista de las 42 que tienen que estar, y avisa en rojo en la pantalla de entrada si falta alguna (`window.EnvolturasEsperadas`) |
@@ -206,6 +207,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/guardar-en-fila.mjs` | Prueba (navegador de verdad, fila 99, 23-sep-2026): una sola copia al día con lo de antes, dos guardados a la vez sin pisarse, reintentar al leer, una lectura vacía que no escribe, la copia en conflicto que viaja al archivar y el contador de guardado en marcha |
 | `pruebas/scripts-cargados.mjs` | Prueba (sin navegador, fila 92, 23-sep-2026): todo `js/*.js` tiene su `<script>` en `index.html` (y al revés), `reintentar-escritura.js` va antes que `carpetas.js`, y `Carpetas.escribirTexto`/`escribirBytes` escriben aunque falte `Reintentar` |
 | `pruebas/archivar-sin-avisos-falsos.mjs` | Prueba (navegador de verdad, fila 90, 21-sep-2026): archivar desde la ficha abierta no da el aviso de "otro ordenador"; con Dropbox fallando dos veces al escribir `_ficha.json` y saliendo bien a la tercera, ningún aviso de más; fallando siempre, aviso ámbar en castellano y la ficha sigue en `asuntos.json` |
+| `pruebas/estado-por-el-hito.mjs` | Prueba (sin navegador, fila 104, 23-sep-2026): `Hitos.aQuienLeToca` y `Hitos.ladoDelAsunto` (Administración, terceros, pregunta sin responder, solo informativo saltado, todos hechos, sin hitos, estado manual de terceros), la marca de partida de los responsables y `naceSoloInformativo` con los ajustes |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |
