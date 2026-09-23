@@ -141,6 +141,9 @@
     } catch (e) { /* sin desplegable de responsable, pero se sigue */ }
     var opcionesEstado = (App.E && App.E.estados) ? App.E.estados.map(function (e) { return e.nombre; }) : [];
 
+    /* Las plantillas de documento, una vez antes de abrir el cuadro
+       (fila 102, «Documentos de este paso»). */
+    if (window.GuiasDocumentos) await GuiasDocumentos.precargar();
     var pasos = await Guias.editar(nombreTipo, pasosDe(nombreTipo), opcionesResp, opcionesEstado);
     if (pasos === null || pasos === false || pasos === undefined) return false;
 

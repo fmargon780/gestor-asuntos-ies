@@ -155,6 +155,7 @@
       var mismo = h.elegida === idOpcion;
       h.elegida = mismo ? null : idOpcion;
       h.estado = h.elegida ? 'hecho' : 'pendiente';
+      if (h.elegida) h.hechoEl = U.hoyIso(); else delete h.hechoEl;   /* fila 102 */
       resultado = recomputeEnCurso(entrada.hitos);
       return d;
     });
@@ -203,6 +204,7 @@
       }
       h.elegida = idOpcionNueva;
       h.estado = 'hecho';
+      h.hechoEl = U.hoyIso();   /* fila 102 */
       resultado = recomputeEnCurso(entrada.hitos);
       return d;
     });

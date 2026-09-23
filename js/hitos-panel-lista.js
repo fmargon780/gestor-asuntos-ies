@@ -248,6 +248,7 @@ var HitosPanelLista = (function () {
         (!htmlRequisitos && window.HitosRequisitos
           ? '<button type="button" class="boton hito-requisitos-anadir-suelto">+ Añadir algo que falte</button>' : '') +
         (window.HitosComunicar ? HitosComunicar.botonHTML(a, h) : '') +
+        (window.HitosGenerar ? HitosGenerar.botonHTML(a, h) : '') +
         '<button type="button" class="boton hito-solo-informativo">' +
           (h.soloInformativo ? 'Pedírmelo a mí' : 'Dejarlo solo informativo') + '</button>' +
         '<button type="button" class="boton boton-peligro hito-quitar">Quitar este hito</button></div>');
@@ -315,6 +316,7 @@ var HitosPanelLista = (function () {
       anadirSuelto.onclick = function () { HitosRequisitos.anadir(a, h); };
     }
     if (window.HitosComunicar) HitosComunicar.engancharBoton(div, a, h);
+    if (window.HitosGenerar) HitosGenerar.engancharBoton(div, a, h);   /* fila 102 */
     var resp = div.querySelector('.hito-campo-responsable');
     if (resp) resp.onchange = function () {
       return guardarHito(resp, 'guardar el responsable', function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: resp.value }); });

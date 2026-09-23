@@ -28,17 +28,15 @@
   /* Busca un paso (o un subpaso, dentro de una opción) por su id, en
      la guía tal y como está en memoria (síncrono, como en
      js/hitos-requisitos.js: no hace falta releer nada del disco). */
+  /* A cualquier profundidad, desde la fila 95 (preguntas dentro de las
+     respuestas). */
   function buscarPasoEnGuia(pasos, id) {
     for (var i = 0; i < (pasos || []).length; i++) {
       var p = pasos[i];
       if (p.id === id) return p;
-      if (p.opciones && p.opciones.length) {
-        for (var j = 0; j < p.opciones.length; j++) {
-          var sub = (p.opciones[j] && p.opciones[j].pasos) || [];
-          for (var k = 0; k < sub.length; k++) {
-            if (sub[k].id === id) return sub[k];
-          }
-        }
+      for (var j = 0; j < (p.opciones || []).length; j++) {
+        var enc = buscarPasoEnGuia((p.opciones[j] && p.opciones[j].pasos) || [], id);
+        if (enc) return enc;
       }
     }
     return null;
@@ -170,7 +168,8 @@
     if (!mensaje || !tieneTexto(mensaje)) return;
 
     var valores = {};
-    try { valores = await Plantillas.valoresDeAsunto(a); } catch (e) { valores = {}; }
+    /* Con el hito (fila 102): {{HITO}} y {{PLAZO DEL HITO}} también aquí. */
+    try { valores = await Plantillas.valoresDeAsunto(a, { hito: hito, conLoQueFalta: false }); } catch (e) { valores = {}; }
     var asuntoListo = Plantillas.rellenar(mensaje.asunto || '', valores).texto;
     var medioListo = Plantillas.rellenar(mensaje.cuerpo || '', valores).texto;
     var destinatario = await resolverDestinatario(a, hito);

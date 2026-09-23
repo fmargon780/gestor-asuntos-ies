@@ -85,7 +85,14 @@
   }
 
   /* Los siete pasos de "Al generar" (docs/PLANTILLAS-DE-DOCUMENTO.md, 5). */
-  async function generarDocumento(asunto, plantillaDoc, modo) {
+  /* `opciones.hito` (fila 102, docs/DOCUMENTOS-DESDE-EL-HITO.md): generado
+     desde un hito. Rellena sus huecos ({{HITO}}, {{PLAZO DEL HITO}},
+     {hecho:...}, {{LO QUE FALTA}}), deja el documento apuntado a ese
+     hito, marca su casilla de "Lo que hay que reunir", apunta una nota
+     en el hito y lo deja desplegado al volver a pintar la ficha. Sin
+     `opciones`, exactamente lo de siempre. */
+  async function generarDocumento(asunto, plantillaDoc, modo, opciones) {
+    var hito = (opciones && opciones.hito) || null;
     var carpeta = await carpetaDePlantillas();
     var handle;
     try {
@@ -116,7 +123,7 @@
       } catch (e) { /* sin membrete, el documento sigue generándose */ }
     }
 
-    var valores = await Plantillas.valoresDeAsunto(asunto, { fecha: U.hoyIso(), plantilla: plantillaDoc });
+    var valores = await Plantillas.valoresDeAsunto(asunto, { fecha: U.hoyIso(), plantilla: plantillaDoc, hito: hito });
     var resultado;
     try {
       resultado = await Docx.rellenar(buffer, valores);
@@ -150,11 +157,26 @@
       try { await Notas.anadir(asunto, 'Generado ' + nombreDoc); } catch (e) { /* ya está guardado */ }
     }
 
+    /* El documento ya está en la carpeta: con amarillo, nunca rojo, si
+       le faltan datos (fila 100). */
     U.aviso(
       resultado.faltan.length
         ? 'Documento generado, con huecos sin dato: ' + resultado.faltan.join(', ') + '.'
         : 'Documento generado: ' + nombreDoc,
-      resultado.faltan.length ? 'malo' : 'bueno');
+      resultado.faltan.length ? 'ambar' : 'bueno');
+
+    if (hito && window.Hitos) {
+      try {
+        await Hitos.anadirDocumento(asunto.nombre, hito.id, nombreDoc);
+        await Hitos.anadirNota(asunto.nombre, hito.id, 'Generado «' + nombreDoc + '»');
+      } catch (e) {
+        U.accesorio('Documento generado, pero no he podido apuntarlo en el hito', e);
+      }
+      if (window.HitosRequisitos) {
+        try { await HitosRequisitos.marcarPorDocumento(asunto.nombre, hito.id, nombreDoc); } catch (e2) { /* no crítico */ }
+      }
+      if (window.HitosPanel && HitosPanel.desplegarAlAbrir) HitosPanel.desplegarAlAbrir(asunto.nombre, hito.id);
+    }
 
     if (typeof App.abrirFicha === 'function') App.abrirFicha(asunto, modo);
   }
@@ -168,7 +190,18 @@
      un cuadro de diálogo a la vez en toda la aplicación.
      ========================================================== */
 
+  /* `lista` puede ser un array (lo de siempre) o, desde un hito (fila
+     102), `{ delPaso: [...], delTipo: [...] }`: dos grupos con rótulo,
+     y una plantilla que esté en los dos sale solo en "De este paso". */
   function elegirPlantilla(lista) {
+    var grupos = Array.isArray(lista) ? [{ rotulo: '', lista: lista }] : (function () {
+      var delPaso = lista.delPaso || [];
+      var ids = {};
+      delPaso.forEach(function (p) { ids[p.id] = true; });
+      var delTipo = (lista.delTipo || []).filter(function (p) { return !ids[p.id]; });
+      return [{ rotulo: 'De este paso', lista: delPaso }, { rotulo: 'Otras de este tipo de asunto', lista: delTipo }]
+        .filter(function (g) { return g.lista.length; });
+    })();
     return new Promise(function (resolver) {
       var resuelto = false;
       function resolverUnaVez(v) { if (resuelto) return; resuelto = true; resolver(v); }
@@ -188,13 +221,21 @@
       }
       $('cuadro-cancelar').onclick = function () { cerrar(); resolverUnaVez(null); };
 
-      lista.forEach(function (p) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'boton pd-elegir-opcion';
-        b.textContent = p.nombre;
-        b.onclick = function () { cerrar(); resolverUnaVez(p); };
-        $('pd-elegir-lista').appendChild(b);
+      grupos.forEach(function (g) {
+        if (g.rotulo) {
+          var r = document.createElement('div');
+          r.className = 'etiqueta pd-elegir-rotulo';
+          r.textContent = g.rotulo;
+          $('pd-elegir-lista').appendChild(r);
+        }
+        g.lista.forEach(function (p) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'boton pd-elegir-opcion';
+          b.textContent = p.nombre;
+          b.onclick = function () { cerrar(); resolverUnaVez(p); };
+          $('pd-elegir-lista').appendChild(b);
+        });
       });
     });
   }
@@ -660,7 +701,10 @@
   window.PlantillasDocumento = {
     nombreDelDocumentoGenerado: nombreDelDocumentoGenerado,
     pintarDeTipo: pintarDeTipo,
-    abrirCuadroDePlantillaDoc: abrirCuadroDePlantillaDoc
+    abrirCuadroDePlantillaDoc: abrirCuadroDePlantillaDoc,
+    /* Para js/hitos-generar.js (fila 102). */
+    generar: generarDocumento, elegir: elegirPlantilla, plantillasDelAsunto: plantillasDelAsunto,
+    categoriaDelAsunto: categoriaDelAsunto, tipoDelAsunto: tipoDelAsunto
   };
 
 })();

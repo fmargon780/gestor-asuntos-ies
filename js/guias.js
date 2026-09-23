@@ -117,6 +117,12 @@ var Guias = (function () {
      opcionales y van plegados en el editor; una guía vieja que no los
      traiga sigue funcionando igual, con los tres vacíos. Desde la fila
      95 existen a cualquier nivel, también en los pasos de una opción. */
+  function listaDeIds(lista) {
+    var vistos = {};
+    return (Array.isArray(lista) ? lista : []).map(function (x) { return String(x || '').trim(); })
+      .filter(function (x) { if (!x || vistos[x]) return false; vistos[x] = true; return true; });
+  }
+
   function normalizarExtra(p) {
     return {
       responsable: String((p && p.responsable) || ''),
@@ -131,6 +137,10 @@ var Guias = (function () {
       /* 20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md: claves del
          catálogo de `js/formularios.js`, igual que `normativa`. */
       formularios: Array.isArray(p && p.formularios) ? p.formularios.map(String) : [],
+      /* 23-sep-2026, fila 102, docs/DOCUMENTOS-DESDE-EL-HITO.md: los `id`
+         de las plantillas de documento (plantillas.json → documentos)
+         unidas a este paso. Sin repetir; vacío si no es lista. */
+      plantillasDocumento: listaDeIds(p && p.plantillasDocumento),
       origenBiblioteca: (p && p.origenBiblioteca && p.origenBiblioteca.id)
         ? { id: p.origenBiblioteca.id, revision: parseInt(p.origenBiblioteca.revision, 10) || 1,
             divergido: !!p.origenBiblioteca.divergido }
@@ -182,6 +192,7 @@ var Guias = (function () {
         salida.comunicacion = normalizarComunicacion(null);
         salida.normativa = [];
         salida.formularios = [];
+        salida.plantillasDocumento = [];
         salida.soloInformativo = false;
       }
       return salida;
@@ -312,6 +323,7 @@ var Guias = (function () {
            (conCuerpo ? '<div class="paso-cuerpo-texto">' + limpiar(p.cuerpo) + '</div>' : '') +
            (window.HitosNormativa ? HitosNormativa.listaHTML(p.normativa) : '') +
            (window.Formularios ? Formularios.listaHTML(p.formularios) : '') +
+           (window.GuiasDocumentos ? GuiasDocumentos.lineaHTML(p.plantillasDocumento) : '') +
            ramas +
            '</li>';
   }
@@ -676,6 +688,9 @@ var Guias = (function () {
         if (window.GuiasComunicacion && caja.querySelector(':scope > .paso-comunicacion')) {
           nivel[i].comunicacion = GuiasComunicacion.leer(caja, nivel[i].id);
         }
+        if (window.GuiasDocumentos && caja.querySelector(':scope > .paso-documentos')) {
+          nivel[i].plantillasDocumento = GuiasDocumentos.leer(caja);   /* fila 102 */
+        }
 
         /* "Solo informativo" y "Normativa" (20-sep-2026, fila 79): igual,
            solo en los pasos que no son pregunta. */
@@ -716,6 +731,9 @@ var Guias = (function () {
             if (window.GuiasRequisitos && sc.querySelector(':scope > .paso-requisitos')) sp.requisitos = GuiasRequisitos.leer(sc);
             if (window.GuiasComunicacion && sc.querySelector(':scope > .paso-comunicacion')) {
               sp.comunicacion = GuiasComunicacion.leer(sc, sp.id);
+            }
+            if (window.GuiasDocumentos && sc.querySelector(':scope > .paso-documentos')) {
+              sp.plantillasDocumento = GuiasDocumentos.leer(sc);   /* fila 102 */
             }
             var esPreg = sc.querySelector(':scope > .paso-es-pregunta-fila .subpaso-es-pregunta');
             if (esPreg && !esPreg.checked) sp.opciones = [];
@@ -889,6 +907,14 @@ var Guias = (function () {
           d.insertAdjacentHTML('beforeend', GuiasComunicacion.bloqueHTML(p.id, p.comunicacion));
           restaurarAbierto(d.querySelector(':scope > .paso-comunicacion'), abiertos, i, '');
           GuiasComunicacion.enganchar(d, p.id);
+        }
+
+        /* «Documentos de este paso» (fila 102, js/guias-documentos.js):
+           mismo criterio, solo en los pasos que no son pregunta. */
+        if (!pregunta && window.GuiasDocumentos) {
+          d.insertAdjacentHTML('beforeend', GuiasDocumentos.bloqueHTML(p.plantillasDocumento));
+          restaurarAbierto(d.querySelector(':scope > .paso-documentos'), abiertos, i, '');
+          GuiasDocumentos.enganchar(d);
         }
 
         /* "Solo informativo" y "Normativa" (20-sep-2026, fila 79,
@@ -1087,6 +1113,11 @@ var Guias = (function () {
               restaurarAbierto(sc.querySelector(':scope > .paso-comunicacion'), abiertos, i, sp.id);
               GuiasComunicacion.enganchar(sc, sp.id);
             }
+            if (window.GuiasDocumentos) {
+              sc.insertAdjacentHTML('beforeend', GuiasDocumentos.bloqueHTML(sp.plantillasDocumento));
+              restaurarAbierto(sc.querySelector(':scope > .paso-documentos'), abiertos, i, sp.id);
+              GuiasDocumentos.enganchar(sc);
+            }
           }
 
           /* La misma casilla que un paso de arriba (fila 95). */
@@ -1170,7 +1201,7 @@ var Guias = (function () {
     cuantos: cuantos, vista: vista, hechosDe: hechosDe, cuenta: cuenta,
     esPregunta: esPregunta, cuandoSeElige: cuandoSeElige,
     normalizarRequisitos: normalizarRequisitos, normalizarComunicacion: normalizarComunicacion,
-    normalizarNormativa: normalizarNormativa,
+    normalizarNormativa: normalizarNormativa, listaDeIds: listaDeIds,
     abrir: abrir, editar: editar
   };
 })();

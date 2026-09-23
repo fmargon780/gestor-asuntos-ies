@@ -142,7 +142,9 @@ await comprobar('las dos columnas están, una a cada lado',
    ================================================================ */
 console.log('--- 3. cambiar el Plazo y los Campos, y que se guarden de verdad ---');
 
-const seccionPlazo = pagina.locator('.tipo-asunto-seccion').filter({ hasText: 'Plazo' }).last();
+/* La que tiene el campo del plazo (desde la fila 102, la tabla de huecos
+   de las plantillas también dice «Plazo del hito», y .last() ya no valía). */
+const seccionPlazo = pagina.locator('.tipo-asunto-seccion').filter({ has: pagina.locator('.campo-plazo') }).last();
 await seccionPlazo.locator('.campo-plazo').fill('12');
 await seccionPlazo.locator('.campo-plazo').blur();
 await pagina.waitForTimeout(300);
