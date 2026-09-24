@@ -5,6 +5,31 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 123: el certificado de función tutorial, como el del centro
+
+`docs/CERTIFICADO-TUTORIA-DEL-CENTRO.md`. Francisco pasó el certificado que usa hoy el centro; la
+plantilla de la fila 110 se reescribió sobre ese modelo. Detalle en `docs/contexto/TABLAS-DE-DATOS.md`.
+
+- La plantilla pasa al tipo DESEMPEÑO FUNCIÓN TUTORIAL, firma Secretaría y V.º B.º Dirección. Para
+  «C E R T I F I C A:» en negrita y las firmas en dos columnas, `scripts/hacer-plantillas.mjs`
+  aprendió `**negrita**`, `^^mayúsculas^^` (versalitas de Word, que alcanzan al valor del hueco) y
+  un bloque `| a | b |` (tabla sin bordes). Las demás plantillas salen idénticas byte a byte.
+- Decisión: «Secretario/a:firmante» y «del/de la:vistobueno Director/a:vistobueno» escritos en la
+  plantilla, en vez de `{{CARGO FIRMANTE}}`/`{{CARGO VISTO BUENO}}`: el cargo se llama «Secretaría»
+  o «Dirección» y el texto habría dicho «y Secretaría del IES» o «del Dirección». La fecha va como
+  «en {{LOCALIDAD}}, a {{HOY LARGO}}» (`{{LUGAR Y FECHA}}` empieza por «En …» y quedaba «en En …»).
+- `{{DNI}}` trae ya el documento entero del personal (antes, solo del alumnado); `{{PROVINCIA}}`
+  entra en el catálogo de huecos (el dato ya estaba en «El centro»).
+- La plantilla casa con el tipo del asunto sin tildes ni mayúsculas, y el botón de la biblioteca
+  empareja igual el tipo que ya existe, sin cambiarle el nombre corto (las carpetas lo llevan).
+- Ojo: `datos-biblioteca/biblioteca-centro.json` se editó a mano (y el tipo se apuntó también en
+  `docs/contenido/BIBLIOTECA-PERSONAL.md`): volver a generarlo con `herramientas/cargar-biblioteca.mjs`
+  perdería los guiones de los modelos, que se añadieron después por otro camino.
+- `js/plantillas.js` pasa de 400 líneas y no se ha partido: solo se tocaron líneas sueltas, y varias
+  pruebas lo cargan solo, sin navegador; partirlo pide tocar esas pruebas a la vez.
+
+Versión `App.VERSION`: `24-sep-2026 · 12:22`.
+
 ## 24-sep-2026 — Fila 122: el editor de la guía, en acordeón
 
 `docs/GUIA-EN-ACORDEON.md`. Con varios pasos, el cuadro de escribir la guía salía con todos los

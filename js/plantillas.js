@@ -52,7 +52,7 @@ var Plantillas = (function () {
     { clave: 'curso', etiqueta: 'Año académico' },
     { clave: 'tipo', etiqueta: 'Tipo de asunto' },
     { clave: 'referencia', etiqueta: 'Nº escolar, documento o NIF del tercero' },
-    { clave: 'dni', etiqueta: 'DNI del alumnado' },
+    { clave: 'dni', etiqueta: 'DNI del alumnado o del personal' },
     { clave: 'telefono', etiqueta: 'Teléfono del tercero' },
     { clave: 'correo', etiqueta: 'Correo del tercero' },
     { clave: 'tutor1', etiqueta: 'Nombre del primer tutor' },
@@ -71,6 +71,7 @@ var Plantillas = (function () {
     { clave: 'usuario', etiqueta: 'Quien firma' },
     { clave: 'centro', etiqueta: 'Nombre del centro' },
     { clave: 'localidad', etiqueta: 'Localidad del centro' },
+    { clave: 'provincia', etiqueta: 'Provincia del centro' },
     { clave: 'direccionCentro', etiqueta: 'Dirección del centro' },
     { clave: 'codigoCentro', etiqueta: 'Código del centro' },
     { clave: 'cargo', etiqueta: 'Cargo de quien firma' },
@@ -123,7 +124,11 @@ var Plantillas = (function () {
        {{DATO <tabla>: <columna>}} y {{TABLA <tabla>: <col1> | <col2>}}, van
        aparte, como {campo:...}. Sin dato, «[falta: …]» en amarillo. */
     { clave: 'especialidad', etiqueta: 'Especialidad del profesor (del RelPerCen)' },
-    { clave: '{TABLA TUTORIAS}', etiqueta: 'Tabla de periodos de tutoría: curso, grupo, desde y hasta' },
+    /* Fila 123 (docs/CERTIFICADO-TUTORIA-DEL-CENTRO.md): la de quien firma y
+       la de quien da el visto bueno, buscados en el personal por su nombre. */
+    { clave: 'especialidad firmante', etiqueta: 'Especialidad de quien firma (del RelPerCen)' },
+    { clave: 'especialidad visto bueno', etiqueta: 'Especialidad de quien da el visto bueno (del RelPerCen)' },
+    { clave: '{TABLA TUTORIAS}', etiqueta: 'Tabla de periodos de tutoría: cargo, curso, toma de posesión y cese' },
     { clave: '{DATO tabla: columna}', etiqueta: 'Un dato suelto de una tabla de datos (el de su curso más reciente)' },
     { clave: '{TABLA tabla: columna | columna}', etiqueta: 'Una tabla de datos entera, con esas columnas' }
   ];
@@ -223,7 +228,9 @@ var Plantillas = (function () {
 
   function documentosDeTipo(datos, categoria, tipo) {
     return ((datos && datos.documentos) || []).filter(function (p) {
-      return p.categoria === categoria && p.tipo === tipo;
+      /* Sin tildes ni mayúsculas (fila 123): «DESEMPEÑO FUNCION TUTORIAL»
+         casa con la plantilla de «DESEMPEÑO FUNCIÓN TUTORIAL». */
+      return p.categoria === categoria && U.normalizar(p.tipo || '') === U.normalizar(tipo || '');
     });
   }
 
@@ -417,6 +424,18 @@ var Plantillas = (function () {
     return (palabras.join(' ') + ' ' + apellidos).trim();
   }
 
+  /* {{DNI}}: el del alumnado (js/dni.js) o, desde la fila 123, el documento
+     entero del personal (nunca los 4 caracteres sueltos de {referencia}). */
+  function dniDe(categoria, persona) {
+    if (!persona) return '';
+    if (categoria === 'ALUMNADO') return window.Dni ? (Dni.de(persona) || '') : '';
+    if (categoria === 'PERSONAL') {
+      var doc = String(persona.documento || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
+      return doc.length > 4 ? doc : '';
+    }
+    return '';
+  }
+
   /* {referencia}: cambia según la categoría (3.2). */
   function referenciaDe(categoria, persona) {
     if (!persona) return '';
@@ -550,7 +569,7 @@ var Plantillas = (function () {
       curso: p.curso,
       tipo: tipoDelAsunto(a),
       referencia: referenciaDe(categoria, persona),
-      dni: (categoria === 'ALUMNADO' && window.Dni && persona) ? (Dni.de(persona) || '') : '',
+      dni: dniDe(categoria, persona),
       telefono: persona ? primerValorQueParezca(persona.campos, RE_TELEFONO) : '',
       correo: persona ? primerValorQueParezca(persona.campos, RE_CORREO) : '',
       tutor1: '', tutor1telefono: '', tutor1correo: '',
@@ -565,6 +584,7 @@ var Plantillas = (function () {
       usuario: (window.App && App.E && App.E.usuario) || '',
       centro: datosCentro.centro || POR_DEFECTO_CENTRO,
       localidad: datosCentro.localidad || '',
+      provincia: datosCentro.provincia || '',
       direccionCentro: datosCentro.direccion || '',
       codigoCentro: datosCentro.codigo || '',
       cargo: datosCentro.cargo || '',

@@ -29,7 +29,9 @@
    Marcas que entiende (docs/PLANTILLAS-DEL-CENTRO.md, parte 1): `# `
    título, `## ` subtítulo, línea vacía = párrafo, `- ` lista,
    `> ` bloque a la derecha (la fórmula de firma), `---` salto de
-   línea grueso. Nada más: no hace falta un conversor de Markdown
+   línea grueso; desde la fila 123, `**negrita**` y `^^mayúsculas^^`
+   dentro de una línea, y `| a | b |` para una tabla de firmas sin
+   bordes. Nada más: no hace falta un conversor de Markdown
    completo para esto.
    ============================================================ */
 import fs from 'node:fs';
@@ -143,12 +145,52 @@ function runConSaltos(lineas, negrita, tamano) {
     .join('<w:br/>') + '</w:r>';
 }
 
+/* Marcas dentro de una línea (24-sep-2026, fila 123,
+   docs/CERTIFICADO-TUTORIA-DEL-CENTRO.md): `**texto**` en negrita y
+   `^^texto^^` en versalitas de Word (todo en mayúsculas, también lo que
+   traiga un hueco). Cada trozo es su propio run; un hueco o una forma
+   doble («Profesor/a:firmante») no deben partirse entre dos marcas. */
+const RE_MARCAS = /(\*\*[^*]+\*\*|\^\^[^^]+\^\^)/;
+function tieneMarcas(lineas) { return lineas.some((l) => RE_MARCAS.test(l)); }
+
+function runsConMarcas(lineas, negrita, tamano) {
+  return lineas.map((linea) => linea.split(RE_MARCAS).filter((t) => t !== '').map((trozo) => {
+    let b = negrita, caps = false, t = trozo;
+    if (/^\*\*[^*]+\*\*$/.test(t)) { b = true; t = t.slice(2, -2); }
+    else if (/^\^\^[^^]+\^\^$/.test(t)) { caps = true; t = t.slice(2, -2); }
+    const rPr = (b || caps || tamano)
+      ? '<w:rPr>' + (b ? '<w:b/>' : '') + (caps ? '<w:caps/>' : '') + (tamano ? '<w:sz w:val="' + tamano + '"/>' : '') + '</w:rPr>'
+      : '';
+    return '<w:r>' + rPr + '<w:t xml:space="preserve">' + escaparXml(t) + '</w:t></w:r>';
+  }).join('')).join('<w:r><w:br/></w:r>');
+}
+
 function parrafo(lineas, opciones) {
   const o = opciones || {};
-  const pPr = o.derecha
-    ? '<w:pPr><w:jc w:val="right"/></w:pPr>'
-    : '';
-  return '<w:p>' + pPr + runConSaltos(lineas, o.negrita, o.tamano) + '</w:p>';
+  const jc = o.derecha ? 'right' : (o.centro ? 'center' : (o.justificado ? 'both' : ''));
+  const pPr = jc ? '<w:pPr><w:jc w:val="' + jc + '"/></w:pPr>' : '';
+  const runs = tieneMarcas(lineas) ? runsConMarcas(lineas, o.negrita, o.tamano) : runConSaltos(lineas, o.negrita, o.tamano);
+  return '<w:p>' + pPr + runs + '</w:p>';
+}
+
+/* Un bloque de líneas `| izquierda | derecha |` (fila 123): una tabla sin
+   bordes de una sola fila, con una celda por columna y cada línea del
+   bloque como una línea más dentro de su celda, centrada. Para las firmas
+   en dos columnas. */
+function tablaSinBordes(lineas) {
+  const filas = lineas.map((l) => l.replace(/^\|/, '').replace(/\|\s*$/, '').split('|').map((c) => c.trim()));
+  const n = Math.max(...filas.map((f) => f.length));
+  const ancho = Math.floor(9000 / n);
+  const celdas = [];
+  for (let c = 0; c < n; c++) {
+    const lineasCelda = filas.map((f) => f[c] || '').filter((t) => t !== '');
+    celdas.push('<w:tc><w:tcPr><w:tcW w:w="' + ancho + '" w:type="dxa"/></w:tcPr>' +
+      lineasCelda.map((t) => parrafo([t], { centro: true })).join('') + (lineasCelda.length ? '' : '<w:p/>') + '</w:tc>');
+  }
+  return '<w:tbl><w:tblPr><w:tblW w:w="9000" w:type="dxa"/><w:tblBorders>' +
+    ['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map((b) => '<w:' + b + ' w:val="nil"/>').join('') +
+    '</w:tblBorders></w:tblPr><w:tblGrid>' + celdas.map(() => '<w:gridCol w:w="' + ancho + '"/>').join('') +
+    '</w:tblGrid><w:tr>' + celdas.join('') + '</w:tr></w:tbl><w:p/>';
 }
 
 function parrafoLineaGruesa() {
@@ -172,6 +214,7 @@ function parrafosDeBloque(bloque) {
   if (lineas.every((l) => l.startsWith('- '))) {
     return lineas.map((l) => parrafo(['•  ' + l.replace(/^-\s+/, '')])).join('');
   }
+  if (lineas.every((l) => l.startsWith('|'))) return tablaSinBordes(lineas);
   if (lineas[0].startsWith('> ')) {
     return parrafo(lineas.map((l) => l.replace(/^>\s?/, '')), { derecha: true });
   }
@@ -193,7 +236,7 @@ function textoPlanoDe(cuerpoMd) {
   return bloques.map((bloque) => {
     if (bloque.trim() === '---') return '';
     return bloque.split('\n').map((l) => l.trim())
-      .map((l) => l.replace(/^#{1,2}\s+/, '').replace(/^-\s+/, '• ').replace(/^>\s?/, ''))
+      .map((l) => l.replace(/^#{1,2}\s+/, '').replace(/^-\s+/, '• ').replace(/^>\s?/, '').replace(/\*\*|\^\^/g, ''))
       .filter(Boolean).join('\n');
   }).filter(Boolean).join('\n\n');
 }

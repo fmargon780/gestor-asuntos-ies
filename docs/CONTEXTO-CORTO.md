@@ -68,7 +68,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 - Categoría → tipo → tercero → nombre de carpeta, con vista previa. El nombre corto del tipo, en carpeta, filtros y tarjeta.
 - El asunto se coloca solo en «Pendiente de Administración» o «Pendiente de terceros» según su hito abierto (sin hitos, por su estado); quién es Administración se marca en Ajustes. Vía preferente y fecha límite.
-- Asuntos recurrentes, con aviso y creación manual.
+- Asuntos recurrentes, con aviso y alta a mano.
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
   sueltas también en documentos, registro de Séneca, ficha y notas.
 - Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
@@ -84,8 +84,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; con
   tercero reconocido, también sugiere meterlo en uno que ya existe («Meter aquí»). Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
-- Aspirantes sin Nº de identificación escolar: al escribirlo, se renombran sus carpetas abiertas.
-- Botón «Ruta» en la ficha: copia la ruta de su carpeta.
+- Aspirantes sin Nº de identificación escolar: al escribirlo, se renombran sus carpetas.
+- Botón «Ruta» en la ficha: copia la ruta de la carpeta.
 - Ficha del tercero con "Datos y contacto" en una línea, con copiar; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
@@ -102,12 +102,12 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   centro en `plantillas/` (botón en Mantenimiento). Salen con membrete, la firma de quien ocupaba
   el cargo en su fecha y «el/la alumno/a» en masculino o femenino según el sexo de cada persona.
 - Tablas de datos (tutorías de Séneca en PDF, CSV/Excel en `datos/Tablas`) unidas por DNI, con huecos
-  {{ESPECIALIDAD}} y {{TABLA TUTORIAS}}; lo que falta sale en amarillo. Certificado de función tutorial.
+  {{ESPECIALIDAD}} y {{TABLA TUTORIAS}}; lo que falta sale en amarillo. Certificado de función tutorial
+  como el del centro (tipo DESEMPEÑO FUNCIÓN TUTORIAL, campo «Cursos que pide»).
 - Copias diarias (caducan a los 90 días, configurable), detección de fichero roto, fusión de
   conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un borrado (tipo, estado,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
-- Pruebas automáticas en GitHub Actions en cada subida.
-- Escape y salida en toda pantalla.
+- Pruebas automáticas en GitHub Actions en cada subida. Escape y salida en toda pantalla.
 - Copia sin internet (`file://`): se actualiza sola; si no puede, o no puede comprobarlo, franja fija arriba; mira cada 30 min.
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo, responsable,
   bifurcaciones, historial y "lo que hay que reunir". Cada hito se abre a pantalla completa (la mesa):
@@ -123,16 +123,14 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
 - Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF, en la carpeta del asunto y en Por
   clasificar; Ajustar tamaño deja libre la banda del sello de Séneca y de la firma del director.
-- "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha, con el correo ya puesto al
-  preparar el cuadro de Correo.
-- Archivar o reabrir sobre un destino que ya existe fusiona las carpetas; errores en castellano;
-  si Dropbox tropieza, se reintenta sola.
+- "Lo pide": quién pidió la gestión, por qué vía y cuándo; su correo sale ya en el cuadro de Correo.
+- Archivar o reabrir sobre un destino que ya existe fusiona carpetas; errores en castellano; reintenta si Dropbox tropieza.
 - Crear, reabrir o editar deja en la ficha del asunto; Volver regresa a la pantalla de origen, a su altura; lo demás, aviso con «Ir al asunto».
-- Cabecera de cada pantalla fija al bajar y encogida sin temblar.
+- Cabecera de cada pantalla fija al bajar, encogida sin temblar.
 - Al archivar, la ficha del asunto baja a su propia carpeta (no se queda en `asuntos.json` para
   siempre); al reabrir, vuelve. Botón "Poner en orden las fichas del ARCHIVO" en Ajustes →
   Mantenimiento para los archivados de antes.
-- Ficha del asunto: foto del contacto del tercero, que se sigue viendo si sale del CSV.
+- Ficha del asunto: foto del contacto del tercero, que sigue aunque salga del CSV.
 
 ## 6. Reglas de código que no se pueden olvidar
 

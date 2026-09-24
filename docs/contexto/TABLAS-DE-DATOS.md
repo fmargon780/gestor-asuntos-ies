@@ -35,8 +35,21 @@ leer, con el motivo. `TablasDatos.filasDe(tabla, persona)`, ordenadas por curso 
 ## Los huecos (`js/plantillas.js`, catálogo `HUECOS`)
 
 - `{{ESPECIALIDAD}}`: el `puesto` de la persona en los RelPerCen (del curso más reciente), tal cual.
-- `{{TABLA TUTORIAS}}`: tabla de Word con **Curso escolar · Grupo · Desde · Hasta**, una fila por
-  periodo, cabecera en negrita y bordes finos, a 9.000 dxa.
+- `{{ESPECIALIDAD FIRMANTE}}` y `{{ESPECIALIDAD VISTO BUENO}}` (fila 123): el `puesto` de quien
+  ocupa ese cargo en la fecha del documento (`valores.firmante` / `valores['visto bueno']`),
+  buscado en el personal por su documento si se sabe y, si no, por el nombre sin tildes, comas ni
+  orden (`TablasDatos.especialidadPorNombre`). Sin dato, `[falta: …]` como `{{ESPECIALIDAD}}`.
+- `{{TABLA TUTORIAS}}`: tabla de Word con **Cargo · Curso · Toma de posesión · Cese** (fila 123,
+  como el certificado del centro), una fila por periodo, cabecera en negrita y bordes finos, a
+  9.000 dxa. Cargo = «Tutoría » + grupo, o «Tutoría de Pedagogía Terapéutica, …» en el bloque de
+  atención a la diversidad (`TablasDatos.cargoDe`); curso con guion («2025-2026»). En
+  `{{TABLA TUTORIAS: …}}` valen los nombres nuevos y los viejos (Curso escolar, Grupo, Desde,
+  Hasta). La tablita de la ficha del tercero usa las mismas cuatro columnas.
+- **«Cursos que pide»** (fila 123): campo propio de texto del tipo DESEMPEÑO FUNCIÓN TUTORIAL. Si
+  el asunto lo trae, `{{TABLA TUTORIAS}}` saca solo los periodos de esos cursos (la tablita de la
+  ficha, todos). Lo entiende `js/tablas-datos-cursos.js` (`TablasDatosCursos.entender`, pura):
+  «2017-2018», «2017/18», «17-18», «2017», listas con coma, punto y coma o «y», y rangos «… a …»
+  (o «hasta»). Sin entenderlo, todos y una línea en el aviso ámbar; vacío, todos.
 - Generales: `{{DATO <tabla>: <columna>}}` (el de la fila más reciente) y
   `{{TABLA <tabla>: <col1> | <col2> | …}}` (sin columnas, todas).
 
@@ -65,8 +78,20 @@ ZIP). Las pruebas con jsdom que cargan `docx.js` cargan también los dos.
 ## La plantilla «Certificado de función tutorial»
 
 `plantillas/certificado-funcion-tutorial.md` (+ `.docx` con `node scripts/hacer-plantillas.mjs`, que
-también actualiza `plantillas/indice.json`): PERSONAL, CERTIFICADO PERSONAL, tipo de documento
-CERTIFICADO, texto `tutorias`, firma Dirección, sin visto bueno. Se carga con el botón de siempre
+también actualiza `plantillas/indice.json`). Desde la fila 123
+(`docs/CERTIFICADO-TUTORIA-DEL-CENTRO.md`), con el modelo del centro: PERSONAL, tipo **DESEMPEÑO
+FUNCIÓN TUTORIAL**, tipo de documento CERTIFICADO, texto `tutorias`, firma **Secretaría** y V.º B.º
+de **Dirección**. Encabezado de quien firma con su especialidad, «C E R T I F I C A:» en negrita,
+«Que D./Dña. … con DNI …» (`{{DNI}}` trae ya el documento entero del personal, `dniDe` en
+`js/plantillas.js`), la tabla, la fórmula con el V.º B.º («del/de la:vistobueno Director/a:vistobueno»)
+y las firmas en dos columnas (tabla sin bordes; los tratamientos en mayúsculas con `<w:caps/>`).
+Para eso `scripts/hacer-plantillas.mjs` entiende ahora `**negrita**`, `^^mayúsculas^^` y un bloque
+`| izquierda | derecha |`. La plantilla casa con el tipo del asunto sin tildes ni mayúsculas
+(`Plantillas.documentosDeTipo`). El tipo y su campo están en `datos-biblioteca/biblioteca-centro.json`
+(y en `docs/contenido/BIBLIOTECA-PERSONAL.md`; ojo, volver a generar el JSON con
+`herramientas/cargar-biblioteca.mjs` pierde los guiones, que se añadieron aparte): el botón de
+Mantenimiento lo empareja con el tipo que ya existe, también escrito sin tilde, y le añade el campo
+sin tocar su nombre corto. `{{PROVINCIA}}` es ya un hueco de cualquier plantilla. Se carga con el botón de siempre
 (Mantenimiento → Plantillas del centro). `pruebas/plantillas-del-centro.mjs` acepta ya los huecos
 `TABLA …`/`DATO …`.
 

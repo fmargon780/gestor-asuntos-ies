@@ -47,12 +47,18 @@ var CargarBiblioteca = (function () {
     return 'p' + Date.now().toString(36) + Math.floor(Math.random() * 46656).toString(36) + extra;
   }
 
+  function mismo(a, b) { return U.normalizar(String(a || '')) === U.normalizar(String(b || '')); }
+
   /* ---------- 1. Tipos: altas y nombre corto ---------- */
 
   async function fusionarTipos(datos, resumen) {
     var mapa = {};   /* nombreLargo del documento -> el objeto tipo real de App.E.tipos */
     datos.tipos.forEach(function (entrada, i) {
-      var yaConLargo = App.E.tipos.filter(function (t) { return t.tipo === entrada.nombreLargo; })[0];
+      /* Sin tildes ni mayúsculas (fila 123): «DESEMPEÑO FUNCION TUTORIAL»
+         escrito a mano casa con «DESEMPEÑO FUNCIÓN TUTORIAL». */
+      var yaConLargo = App.E.tipos.filter(function (t) {
+        return mismo(t.tipo, entrada.nombreLargo) || (entrada.nombreCorto && t.nombreCorto && mismo(t.nombreCorto, entrada.nombreCorto));
+      })[0];
       if (yaConLargo) { mapa[entrada.nombreLargo] = yaConLargo; return; }
 
       if (entrada.nuevo) {
@@ -65,10 +71,12 @@ var CargarBiblioteca = (function () {
       }
 
       var existente = App.E.tipos.filter(function (t) {
-        return t.tipo === entrada.nombreCorto && !t.nombreCorto;
+        return mismo(t.tipo, entrada.nombreCorto) && !t.nombreCorto;
       })[0];
       if (existente) {
-        existente.nombreCorto = entrada.nombreCorto;
+        /* Se queda con el nombre corto tal como lo tenía escrito (con o sin
+           tilde): las carpetas de sus asuntos lo llevan en el nombre. */
+        existente.nombreCorto = existente.tipo;
         existente.tipo = entrada.nombreLargo;
         mapa[entrada.nombreLargo] = existente;
         resumen.tiposRenombrados++;

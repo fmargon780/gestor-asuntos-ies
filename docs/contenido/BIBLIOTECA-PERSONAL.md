@@ -192,6 +192,10 @@ Campos: Colectivo
 3. Grabar en Séneca · Secretaría
 4. Archivar · Secretaría
 
+### DESEMPEÑO FUNCIÓN TUTORIAL — Certificado de desempeño de la función tutorial
+Encarga: Secretaría
+Campos: Cursos que pide
+
 ### INSUFICIENCIA HORARIA — Insuficiencia de horario y reubicación
 Encarga: Secretaría
 NUEVO
