@@ -28,21 +28,29 @@
    ============================================================ */
 var Documentos = (function () {
 
-  var ctx = {
+  /* Fila 133 (docs/PARTIR-FICHEROS-GRANDES.md): partido por temas, sin
+     cambiar nada de lo que hace. Aquí, el cuadro, el visor y la lista;
+     el formulario del nombre, en js/documentos-formulario.js; crear un
+     tipo sin salir, en js/documentos-tipo-nuevo.js; guardar, en
+     js/documentos-guardar.js. El estado del cuadro y lo que se piden
+     entre ellos va en `Documentos._interno` (N). */
+  var N = {};
+
+  N.ctx = {
     tipos: function () { return []; },
     curso: function () { return ''; },
     crearTipo: null            /* lo pone nucleo.js: guarda el tipo nuevo en _GESTOR */
   };
-  var asuntoActual = null;
-  var urlVisor = null;   /* la dirección temporal del documento que se está viendo */
+  N.asuntoActual = null;
+  N.urlVisor = null;   /* la dirección temporal del documento que se está viendo */
   /* El hito al que hay que apuntar lo que se guarde en este cuadro
      (23-sep-2026, fila 103, docs/EL-HITO-MESA-DE-TRABAJO.md, sección
      1, camino "Desde el ordenador"): opcional, puesto por
      js/hitos-anadir.js. Vale para todo lo que se guarde mientras este
      cuadro esté abierto, no solo para el primer documento. */
-  var hitoActual = null;
+  N.hitoActual = null;
 
-  function configurar(o) { ctx = o; }
+  function configurar(o) { N.ctx = o; }
 
   function $(id) { return document.getElementById(id); }
 
@@ -53,8 +61,8 @@ var Documentos = (function () {
      sabe que se quiere añadir uno (el camino "Desde el ordenador" de
      un hito); sin ella, se ve la lista de siempre. */
   async function abrir(asunto, opciones) {
-    asuntoActual = asunto;
-    hitoActual = (opciones && opciones.hito) || null;
+    N.asuntoActual = asunto;
+    N.hitoActual = (opciones && opciones.hito) || null;
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-ancho');
     var esperar = U.preguntar(asunto.nombre, '<div id="doc-cuerpo"></div>', 'Cerrar', true);
@@ -63,13 +71,13 @@ var Documentos = (function () {
        el formulario de ponerle nombre a ese documento de la carpeta (el
        que acaba de entrar desde "Por clasificar"). */
     if (opciones && opciones.ponerNombre) {
-      pintarFormulario({ modo: 'renombrar', nombreActual: opciones.ponerNombre });
+      N.pintarFormulario({ modo: 'renombrar', nombreActual: opciones.ponerNombre });
     }
     /* Un fichero soltado encima de la mesa del hito (fila 109): lo mismo
        que "Desde el ordenador", con el fichero ya elegido. */
     if (opciones && opciones.ficheroSoltado) {
       var soltado = opciones.ficheroSoltado;
-      pintarFormulario({ modo: 'anadir', nombreActual: soltado.name,
+      N.pintarFormulario({ modo: 'anadir', nombreActual: soltado.name,
         handle: { kind: 'file', name: soltado.name, getFile: function () { return Promise.resolve(soltado); } } });
     } else if (opciones && opciones.irDirectoAAnadir) {
       try { await anadirDesdeOrdenador(); } catch (e) { /* AbortError: se queda en la lista */ }
@@ -77,13 +85,13 @@ var Documentos = (function () {
     await esperar;
     soltarVisor();
     cuadro.classList.remove('cuadro-ancho');
-    hitoActual = null;
+    N.hitoActual = null;
   }
 
   /* El navegador guarda en memoria el documento que enseña hasta que se
      le dice que ya no hace falta. */
   function soltarVisor() {
-    if (urlVisor) { URL.revokeObjectURL(urlVisor); urlVisor = null; }
+    if (N.urlVisor) { URL.revokeObjectURL(N.urlVisor); N.urlVisor = null; }
   }
 
   /* Qué se puede enseñar. Los PDF y las imágenes los pinta el navegador
@@ -93,16 +101,16 @@ var Documentos = (function () {
     var ext = Nombres.extensionDe(nombre);
     var tipo = fichero.type || '';
     if (tipo === 'application/pdf' || ext === 'pdf') {
-      urlVisor = URL.createObjectURL(fichero);
+      N.urlVisor = URL.createObjectURL(fichero);
       /* Sin la barra de Chrome: enseña el nombre interno del fichero, que no
          dice nada, y roba sitio a la página. Se sigue pudiendo desplazar y
          hacer zoom con Ctrl y la rueda. */
-      return '<iframe id="doc-visor" src="' + urlVisor +
+      return '<iframe id="doc-visor" src="' + N.urlVisor +
              '#toolbar=0&navpanes=0&view=FitH" title="Documento"></iframe>';
     }
     if (tipo.indexOf('image/') === 0 || ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].indexOf(ext) !== -1) {
-      urlVisor = URL.createObjectURL(fichero);
-      return '<img id="doc-visor" src="' + urlVisor + '" alt="Documento">';
+      N.urlVisor = URL.createObjectURL(fichero);
+      return '<img id="doc-visor" src="' + N.urlVisor + '" alt="Documento">';
     }
     return '<p class="explica" id="doc-sin-visor">Este tipo de fichero no se puede ver aquí. ' +
            'El navegador solo sabe enseñar PDF e imágenes.<br>' +
@@ -112,7 +120,7 @@ var Documentos = (function () {
   async function pintarLista() {
     var caja = $('doc-cuerpo');
     if (!caja) return;
-    var lista = await Carpetas.ficheros(asuntoActual.handle);
+    var lista = await Carpetas.ficheros(N.asuntoActual.handle);
 
     var html = '<p class="explica">' +
       (lista.length ? 'Los documentos guardados en esta carpeta.'
@@ -120,7 +128,7 @@ var Documentos = (function () {
 
     if (lista.length) {
       html += '<div class="lista-documentos">' + lista.map(function (f, i) {
-        var pendiente = Registro.pendiente(asuntoActual, f.nombre);
+        var pendiente = Registro.pendiente(N.asuntoActual, f.nombre);
         var sinRegistro = !Registro.tieneRegistro(f.nombre);
         return '<div class="fila-documento">' +
                  '<span class="nombre-documento">' + U.escapar(f.nombre) + '</span>' +
@@ -155,7 +163,7 @@ var Documentos = (function () {
     Array.prototype.forEach.call(caja.querySelectorAll('[data-renombrar]'), function (b) {
       b.onclick = function () {
         var f = lista[Number(b.dataset.renombrar)];
-        pintarFormulario({ modo: 'renombrar', nombreActual: f.nombre });
+        N.pintarFormulario({ modo: 'renombrar', nombreActual: f.nombre });
       };
     });
 
@@ -167,14 +175,14 @@ var Documentos = (function () {
       fila.title = 'Pulsa para verlo';
       fila.onclick = function (ev) {
         if (ev.target.closest('button, a, input, select, textarea, label')) return;
-        pintarFormulario({ modo: 'renombrar', nombreActual: lista[i].nombre });
+        N.pintarFormulario({ modo: 'renombrar', nombreActual: lista[i].nombre });
       };
     });
 
     Array.prototype.forEach.call(caja.querySelectorAll('[data-registrar]'), function (b) {
       b.onclick = async function () {
         var f = lista[Number(b.dataset.registrar)];
-        await Registro.pintarEnContenedor(caja, asuntoActual, f.nombre, function () { pintarLista(); });
+        await Registro.pintarEnContenedor(caja, N.asuntoActual, f.nombre, function () { pintarLista(); });
       };
     });
 
@@ -186,7 +194,7 @@ var Documentos = (function () {
         if (!ok) return;
         b.disabled = true;
         try {
-          await Papelera.mandarDocumentoDeAsunto(asuntoActual, f.nombre);
+          await Papelera.mandarDocumentoDeAsunto(N.asuntoActual, f.nombre);
           U.aviso('Documento mandado a la papelera.', 'bueno');
           await pintarLista();
         } catch (e) {
@@ -207,482 +215,8 @@ var Documentos = (function () {
      Lanza lo mismo que Carpetas.elegirFichero: quien llama decide qué
      hacer con un AbortError (cancelar el selector del navegador). */
   async function anadirDesdeOrdenador() {
-    var handle = await Carpetas.elegirFichero(asuntoActual.handle);
-    pintarFormulario({ modo: 'anadir', handle: handle, nombreActual: handle.name });
-  }
-
-  /* ---------- el formulario del nombre ---------- */
-
-  var ultimasOpciones = null;
-  var ultimoTipo = '';       /* el tipo elegido antes de abrir el cuadro de crear uno */
-
-  /* El valor de la opción que abre el cuadro de crear un tipo nuevo.
-     No es un tipo: son dos guiones bajos a cada lado para que no pueda
-     coincidir nunca con uno de verdad. */
-  var TIPO_NUEVO = '__nuevo__';
-
-  async function pintarFormulario(opciones) {
-    var caja = $('doc-cuerpo');
-    if (!caja) return;
-    ultimasOpciones = opciones;   /* lo usa la vista previa */
-
-    /* El documento, para poder verlo mientras se le pone el nombre. */
-    var fichero = null;
-    try {
-      var h = opciones.handle ||
-              await asuntoActual.handle.getFileHandle(opciones.nombreActual);
-      fichero = await h.getFile();
-    } catch (e) { fichero = null; }
-    var visor = fichero ? visorDe(fichero, opciones.nombreActual)
-                        : '<p class="explica">No he podido abrir el documento para verlo.</p>';
-
-    var previo = leerNombre(opciones.nombreActual);
-    var hoy = U.hoyIso();
-    var fecha = previo.fecha || hoy;
-    /* El hueco de texto libre del nombre. Antes se llamaba "Año
-       académico" y se rellenaba solo con el curso que tocaba por la
-       fecha. Él lo usa para otras cosas —un número de expediente, una
-       referencia de la factura— y ese relleno automático estorbaba:
-       había que borrarlo cada vez. Desde el 10-sep-2026 se llama
-       **Texto adicional**, nace vacío y no depende de ningún otro
-       campo. Lo único que se conserva es lo que ya trajera el nombre
-       del propio fichero. */
-    var curso = previo.curso || '';
-    /* Los campos del tipo de documento (fila 96): los de lista que ya
-       estén, tal cual, al principio del texto adicional se reconocen y
-       salen de ahí; el resto se queda como texto adicional. */
-    var valoresIniciales = {};
-    var camposIniciales = camposDelTipo(previo.tipo);
-    if (camposIniciales.length) {
-      var rec = DocCampos.reconocer(camposIniciales, curso);
-      valoresIniciales = rec.valores;
-      curso = rec.resto;
-    }
-    /* Solo se ofrece cuando ya está en la carpeta: un documento que se
-       acaba de añadir todavía no puede estar "pendiente" de nada. */
-    var pendienteInicial = opciones.modo === 'renombrar' &&
-      Registro.pendiente(asuntoActual, opciones.nombreActual);
-
-    caja.innerHTML =
-      '<div class="doc-partido">' +
-
-      '<div>' +
-        '<div class="visor-barra">' +
-          '<button type="button" class="boton" id="doc-ampliar">Ver más grande</button>' +
-        '</div>' +
-        '<div class="visor">' + visor + '</div>' +
-      '</div>' +
-
-      '<div class="doc-campos">' +
-
-      '<p class="explica">' +
-        (opciones.modo === 'anadir'
-          ? 'Se guardará una copia en la carpeta del asunto. El original se queda donde está.'
-          : 'Se le cambia el nombre al fichero que ya está en la carpeta.') +
-        '<br><span class="suave">Fichero: ' + U.escapar(opciones.nombreActual) + '</span></p>' +
-
-      '<div class="dos-columnas">' +
-        '<div>' +
-          '<label class="etiqueta">Fecha del documento</label>' +
-          '<input type="date" id="doc-fecha" class="campo" value="' + fecha + '">' +
-          '<p class="nota">La que trae el documento, no la de hoy.</p>' +
-        '</div>' +
-        '<div>' +
-          '<label class="etiqueta">Texto adicional <span class="suave">(opcional)</span></label>' +
-          '<input id="doc-curso" class="campo" value="' + U.escapar(curso) + '">' +
-          '<p class="nota">Lo que quieras añadir al nombre: el curso, una referencia…</p>' +
-        '</div>' +
-      '</div>' +
-
-      '<label class="etiqueta">Tipo de documento</label>' +
-      '<select id="doc-tipo" class="campo">' + opcionesDeTipo(previo.tipo) + '</select>' +
-      '<div id="doc-campos-tipo"></div>' +
-
-      '<label class="interruptor">' +
-        '<input type="checkbox" id="doc-hay-registro"' + (previo.registro ? ' checked' : '') + '>' +
-        '<span>Está registrado en Séneca</span>' +
-      '</label>' +
-
-      '<label class="interruptor' + (previo.registro ? ' oculto' : '') + '" id="doc-fila-pendiente">' +
-        '<input type="checkbox" id="doc-pendiente-registro"' +
-          (pendienteInicial ? ' checked' : '') + '>' +
-        '<span>Pendiente de registro</span>' +
-      '</label>' +
-
-      '<div id="doc-registro" class="' + (previo.registro ? '' : 'oculto') + '">' +
-        '<div class="registro-campos">' +
-          '<div>' +
-            '<label class="etiqueta">Año</label>' +
-            '<input id="doc-ano" class="campo" maxlength="2" value="' +
-              U.escapar(previo.registro ? previo.registro.ano : fecha.slice(2, 4)) + '">' +
-          '</div>' +
-          '<div>' +
-            '<label class="etiqueta">Entrada o salida</label>' +
-            '<div class="opciones">' +
-              botonOpcion('doc-sentido', 'E', 'Entrada', !previo.registro || previo.registro.sentido !== 'S') +
-              botonOpcion('doc-sentido', 'S', 'Salida', !!previo.registro && previo.registro.sentido === 'S') +
-            '</div>' +
-          '</div>' +
-          '<div>' +
-            '<label class="etiqueta">Serie</label>' +
-            '<div class="opciones">' +
-              botonOpcion('doc-modo', 'M', 'Manual', !previo.registro || previo.registro.modo !== 'A') +
-              botonOpcion('doc-modo', 'A', 'Automático', !!previo.registro && previo.registro.modo === 'A') +
-            '</div>' +
-          '</div>' +
-          '<div>' +
-            '<label class="etiqueta">Número</label>' +
-            '<input id="doc-numero" class="campo" maxlength="6" inputmode="numeric" value="' +
-              U.escapar(previo.registro ? previo.registro.numero : '') + '">' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-
-      '<div class="vista-previa">' +
-        '<div class="vista-rotulo">Se guardará así</div>' +
-        '<div id="doc-vista" class="vista-nombre"></div>' +
-      '</div>' +
-
-      '<div class="cuadro-botones">' +
-        '<button type="button" class="boton" id="doc-volver">Volver</button>' +
-        '<button type="button" class="boton boton-principal" id="doc-guardar">Guardar</button>' +
-      '</div>' +
-
-      '</div></div>';
-
-    /* La última opción de la lista de tipos no es un tipo: abre el cuadro
-       de crear uno. Se engancha antes que el refresco general para que la
-       vista previa no llegue a enseñar el nombre postizo. */
-    ultimoTipo = $('doc-tipo').value;
-    pintarCamposDelTipo(valoresIniciales);
-    $('doc-tipo').addEventListener('change', function () {
-      var sel = $('doc-tipo');
-      if (sel.value !== TIPO_NUEVO) { ultimoTipo = sel.value; pintarCamposDelTipo(); return; }
-      sel.value = ultimoTipo || (ctx.tipos()[0] || '');
-      abrirCuadroDeTipoNuevo();
-    });
-
-    /* refrescar la vista previa con cualquier cambio */
-    Array.prototype.forEach.call(caja.querySelectorAll('input, select'), function (c) {
-      c.oninput = refrescar;
-      c.onchange = refrescar;
-    });
-    /* La fecha ya no toca el texto adicional: son dos campos
-       independientes, y escribir en uno no puede pisar el otro. */
-    $('doc-hay-registro').onchange = function () {
-      var hay = $('doc-hay-registro').checked;
-      $('doc-registro').classList.toggle('oculto', !hay);
-      $('doc-fila-pendiente').classList.toggle('oculto', hay);
-      refrescar();
-    };
-
-    /* Esconde los campos para que el documento ocupe toda la ventana. */
-    $('doc-ampliar').onclick = function () {
-      var partido = caja.querySelector('.doc-partido');
-      var ampliado = partido.classList.toggle('solo-visor');
-      $('doc-ampliar').textContent = ampliado ? 'Volver a los campos' : 'Ver más grande';
-    };
-
-    $('doc-volver').onclick = function () { soltarVisor(); pintarLista(); };
-    $('doc-guardar').onclick = function () {
-      return U.mientrasGuarda($('doc-guardar'), function () { return guardar(opciones); });
-    };
-    refrescar();
-  }
-
-  /* ---------- los campos del tipo de documento (fila 96) ---------- */
-
-  function camposDelTipo(tipo) {
-    return (window.DocCampos && tipo && tipo !== TIPO_NUEVO) ? DocCampos.campos(tipo) : [];
-  }
-
-  function tipoElegido() {
-    var sel = $('doc-tipo');
-    var tipo = sel ? sel.value : '';
-    return tipo === TIPO_NUEVO ? (ultimoTipo || '') : tipo;
-  }
-
-  /* Pinta los campos del tipo elegido. Sin `valores`, conserva lo ya
-     escrito en los que se repiten (mismo id). */
-  function pintarCamposDelTipo(valores) {
-    var caja = $('doc-campos-tipo');
-    if (!caja || !window.DocCampos) return;
-    var antes = valores || DocCampos.leerDe(caja);
-    DocCampos.pintar(caja, camposDelTipo(tipoElegido()), antes);
-    Array.prototype.forEach.call(caja.querySelectorAll('input, select'), function (c) {
-      c.oninput = refrescar;
-      c.onchange = refrescar;
-    });
-    refrescar();
-  }
-
-  function valoresDeCampos() {
-    return window.DocCampos ? DocCampos.leerDe($('doc-campos-tipo')) : {};
-  }
-
-  /* ---------- la lista de tipos de documento ---------- */
-
-  function opcionesDeTipo(elegido) {
-    return ctx.tipos().map(function (t) {
-      return '<option value="' + U.escapar(t) + '"' +
-             (U.normalizar(t) === U.normalizar(elegido) ? ' selected' : '') + '>' +
-             U.escapar(t) + '</option>';
-    }).join('') +
-    '<option value="' + TIPO_NUEVO + '">+  Crear un tipo nuevo…</option>';
-  }
-
-  /* ---------- crear un tipo sin salir del cuadro ----------
-
-     La comparación de nombres parecidos vive en util.js, porque la usan
-     también las listas de Ajustes: aquí solo se pinta el resultado. */
-
-  function parecidos(nombre, lista) {
-    return U.parecidos(nombre, lista);
-  }
-
-  function cerrarCuadroDeTipoNuevo() {
-    var caja = $('doc-tipo-nuevo');
-    if (caja) caja.parentNode.removeChild(caja);
-  }
-
-  function abrirCuadroDeTipoNuevo() {
-    var sel = $('doc-tipo');
-    if (!sel || $('doc-tipo-nuevo')) return;
-
-    var caja = document.createElement('div');
-    caja.id = 'doc-tipo-nuevo';
-    caja.style.cssText = 'margin:8px 0 4px;padding:10px 12px;border:1px solid #d7dee6;' +
-                         'border-radius:8px;background:#f7f9fb';
-    caja.innerHTML =
-      '<label class="etiqueta">Nombre del tipo nuevo</label>' +
-      '<input id="doc-tipo-nombre" class="campo" autocomplete="off" ' +
-        'placeholder="Por ejemplo: DILIGENCIA">' +
-      '<div id="doc-tipo-aviso" class="nota"></div>' +
-      '<div id="doc-tipo-botones" style="display:flex;gap:8px;justify-content:flex-end;' +
-        'margin-top:8px">' +
-        '<button type="button" class="boton" id="doc-tipo-cancelar">Cancelar</button>' +
-        '<button type="button" class="boton boton-principal" id="doc-tipo-crear">Crear y usar</button>' +
-      '</div>';
-    sel.parentNode.insertBefore(caja, sel.nextSibling);
-
-    $('doc-tipo-nombre').oninput = pintarAvisoDeTipo;
-    $('doc-tipo-nombre').onkeydown = function (ev) {
-      if (ev.key === 'Enter') { ev.preventDefault(); crearYUsarTipo(); }
-      if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); cerrarCuadroDeTipoNuevo(); }
-    };
-    $('doc-tipo-cancelar').onclick = cerrarCuadroDeTipoNuevo;
-    $('doc-tipo-crear').onclick = crearYUsarTipo;
-    pintarAvisoDeTipo();
-    $('doc-tipo-nombre').focus();
-  }
-
-  function usarTipoDeLaLista(tipo) {
-    var sel = $('doc-tipo');
-    sel.value = tipo;
-    ultimoTipo = tipo;
-    cerrarCuadroDeTipoNuevo();
-    pintarCamposDelTipo();
-  }
-
-  /* El aviso que va debajo del campo. Dice una de tres cosas: que el
-     tipo ya existe, que hay otros que se le parecen, o que se va a
-     crear. Los parecidos salen como botones: pulsarlos usa el que ya
-     está, que es lo que se quiere casi siempre. */
-  function pintarAvisoDeTipo() {
-    var campo = $('doc-tipo-nombre');
-    var aviso = $('doc-tipo-aviso');
-    var crear = $('doc-tipo-crear');
-    if (!campo || !aviso || !crear) return;
-
-    var limpio = U.limpiarNombre(campo.value).toUpperCase();
-    aviso.innerHTML = '';
-
-    function decir(texto) {
-      var p = document.createElement('div');
-      p.textContent = texto;
-      aviso.appendChild(p);
-    }
-
-    function botonUsar(tipo) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'boton';
-      b.style.margin = '6px 6px 0 0';
-      b.textContent = 'Usar ' + tipo;
-      b.onclick = function () { usarTipoDeLaLista(tipo); };
-      aviso.appendChild(b);
-    }
-
-    if (!limpio) {
-      crear.disabled = true;
-      decir('Escribe el nombre del tipo.');
-      return;
-    }
-
-    var lista = parecidos(limpio, ctx.tipos());
-    var mismo = lista.filter(function (p) { return p.igual; })[0];
-
-    if (mismo) {
-      crear.disabled = true;
-      decir('Ese tipo ya está en la lista, escrito así: ' + mismo.nombre + '.');
-      botonUsar(mismo.nombre);
-      return;
-    }
-
-    crear.disabled = false;
-    if (lista.length) {
-      decir('Ojo, hay tipos que se le parecen. Si es el mismo, usa el que ya está:');
-      lista.slice(0, 4).forEach(function (p) { botonUsar(p.nombre); });
-    } else {
-      decir('Se creará ' + limpio + ', y queda en la lista del centro para todos.');
-    }
-  }
-
-  async function crearYUsarTipo() {
-    var campo = $('doc-tipo-nombre');
-    if (!campo) return;
-    var limpio = U.limpiarNombre(campo.value).toUpperCase();
-    if (!limpio) return;
-    if (typeof ctx.crearTipo !== 'function') {
-      U.aviso('Desde aquí no se pueden crear tipos. Se crean en Ajustes.', 'malo');
-      return;
-    }
-    try {
-      await ctx.crearTipo(limpio);
-      var sel = $('doc-tipo');
-      sel.innerHTML = opcionesDeTipo(limpio);
-      sel.value = limpio;
-      ultimoTipo = limpio;
-      cerrarCuadroDeTipoNuevo();
-      pintarCamposDelTipo();
-      U.aviso('Tipo de documento ' + limpio + ' añadido a la lista del centro.', 'bueno');
-    } catch (e) {
-      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
-    }
-  }
-
-  function botonOpcion(grupo, valor, texto, marcado) {
-    return '<label class="opcion"><input type="radio" name="' + grupo + '" value="' + valor + '"' +
-           (marcado ? ' checked' : '') + '><span>' + texto + '</span></label>';
-  }
-
-  function elegido(grupo) {
-    var m = document.querySelector('input[name="' + grupo + '"]:checked');
-    return m ? m.value : '';
-  }
-
-  function datosDelFormulario(opciones) {
-    var registro = null;
-    if ($('doc-hay-registro').checked) {
-      registro = {
-        ano: $('doc-ano').value.trim(),
-        sentido: elegido('doc-sentido'),
-        modo: elegido('doc-modo'),
-        numero: $('doc-numero').value.trim()
-      };
-    }
-    var tipo = $('doc-tipo').value;
-    if (tipo === TIPO_NUEVO) tipo = ultimoTipo || '';
-    return {
-      fecha: $('doc-fecha').value,
-      codigo: Nombres.codigoRegistro(registro),
-      tipo: tipo,
-      campos: window.DocCampos ? DocCampos.enOrden(camposDelTipo(tipo), valoresDeCampos()) : [],
-      curso: $('doc-curso').value.trim(),
-      extension: Nombres.extensionDe(opciones.nombreActual)
-    };
-  }
-
-  function refrescar() {
-    if (!$('doc-vista') || !ultimasOpciones) return;
-    var ajustado = Nombres.montarDocumentoAjustado(datosDelFormulario(ultimasOpciones));
-    var nombre = ajustado.nombre;
-    $('doc-vista').textContent = nombre;
-    Nombres.avisoRecorte($('doc-vista'), ajustado.recortado);   /* fila 130 */
-    $('doc-guardar').disabled = nombre.length < 10;
-  }
-
-  /* La lista de "pendientesRegistro" vive en la ficha del asunto, no
-     en el nombre del fichero. Un documento con registro nunca puede
-     estar pendiente: si se marca "Está registrado en Séneca" aquí
-     mismo, la casilla de pendiente queda oculta y no cuenta. Al
-     renombrar, si el documento seguía en la lista se actualiza al
-     nombre nuevo. */
-  async function actualizarPendiente(opciones, nombreNuevo) {
-    var marcado = !$('doc-hay-registro').checked &&
-      !!($('doc-pendiente-registro') && $('doc-pendiente-registro').checked);
-    var lista = (asuntoActual.ficha && asuntoActual.ficha.pendientesRegistro) || [];
-    var sinElAntiguo = lista.filter(function (n) { return n !== opciones.nombreActual; });
-    var final = marcado ? sinElAntiguo.concat([nombreNuevo]) : sinElAntiguo;
-    var igual = final.length === lista.length &&
-      final.slice().sort().join('\n') === lista.slice().sort().join('\n');
-    if (igual) return;
-    await App.anotar(asuntoActual.nombre, { pendientesRegistro: final });
-  }
-
-  async function guardar(opciones) {
-    /* Un campo obligatorio del tipo de documento, vacío: no se guarda
-       (fila 96), con el mismo aviso que al crear un asunto. */
-    var falta = window.DocCampos ? DocCampos.faltaObligatorio(camposDelTipo(tipoElegido()), valoresDeCampos()) : '';
-    if (falta) { U.aviso('Hace falta rellenar "' + falta + '".', 'malo'); return; }
-    var nombre = Nombres.montarDocumento(datosDelFormulario(opciones));
-    if (!nombre) return;
-    try {
-      var yaEsta = await Carpetas.ficheros(asuntoActual.handle);
-      var repetido = yaEsta.some(function (f) {
-        return f.nombre === nombre && f.nombre !== opciones.nombreActual;
-      });
-      if (repetido) {
-        U.aviso('Ya hay un documento con ese nombre en la carpeta.', 'malo');
-        return;
-      }
-      if (opciones.modo === 'anadir') {
-        await Carpetas.copiarFicheroEn(asuntoActual.handle, opciones.handle, nombre);
-        U.aviso('Documento guardado en la carpeta.', 'bueno');
-      } else {
-        await Carpetas.renombrarFichero(asuntoActual.handle, opciones.nombreActual, nombre);
-        U.aviso('Documento renombrado.', 'bueno');
-      }
-    } catch (e) {
-      U.fallo('No he podido guardarlo', e);
-      return;
-    }
-    /* El documento ya está en la carpeta con su nombre: lo de después
-       es accesorio, y si falla, ámbar (fila 100). */
-    try {
-      await actualizarPendiente(opciones, nombre);
-    } catch (e2) {
-      U.accesorio('Documento guardado, pero no he podido apuntar si está pendiente de registro', e2);
-    }
-    /* Este cuadro se ha abierto desde un hito (fila 103, sección 1):
-       lo que se guarde queda apuntado ahí, y se marca sola la casilla
-       de "Lo que hay que reunir" que le toque (no crítico: el
-       documento ya ha quedado guardado igual). Vale para todo lo que
-       se guarde mientras el cuadro esté abierto, no solo lo primero. */
-    if (hitoActual) {
-      try {
-        /* Renombrar uno que ya estaba apuntado a este hito (el que entra
-           desde "Por clasificar" se apunta nada más entrar): el nombre
-           viejo sale del hito, para que no quede como «(ya no está)». */
-        if (opciones.modo !== 'anadir' && opciones.nombreActual !== nombre) {
-          await Hitos.quitarDocumento(asuntoActual.nombre, hitoActual.id, opciones.nombreActual);
-        }
-        await Hitos.anadirDocumento(asuntoActual.nombre, hitoActual.id, nombre);
-        if (window.HitosRequisitos) {
-          try { await HitosRequisitos.marcarPorDocumento(asuntoActual.nombre, hitoActual.id, nombre); }
-          catch (e4) { /* no crítico */ }
-        }
-        if (opciones.modo === 'anadir' && Hitos.marcarGuionPorAccion) await Hitos.marcarGuionPorAccion(asuntoActual, hitoActual.id, 'anadir');   /* fila 109 */
-        if (window.HitosPanel) {
-          window.HitosPanel.desplegarAlAbrir(asuntoActual.nombre, hitoActual.id);
-          window.HitosPanel.programarRepintado();
-        }
-      } catch (e2b) {
-        U.accesorio('Documento guardado, pero no he podido apuntarlo al hito', e2b);
-      }
-    }
-    soltarVisor();
-    try { await pintarLista(); } catch (e3) { U.accesorio('Documento guardado, pero no he podido repintar la lista', e3); }
+    var handle = await Carpetas.elegirFichero(N.asuntoActual.handle);
+    N.pintarFormulario({ modo: 'anadir', handle: handle, nombreActual: handle.name });
   }
 
   /* Lee un nombre de documento que ya siga la norma, para rellenar el
@@ -701,7 +235,7 @@ var Documentos = (function () {
       resto = reg[5];
     }
 
-    var tipos = ctx.tipos().slice().sort(function (a, b) { return b.length - a.length; });
+    var tipos = N.ctx.tipos().slice().sort(function (a, b) { return b.length - a.length; });
     var seSabeElTipo = false;
     for (var i = 0; i < tipos.length; i++) {
       if (U.normalizar(resto).indexOf(U.normalizar(tipos[i])) === 0) {
@@ -731,6 +265,8 @@ var Documentos = (function () {
     return !!leerNombre(nombre).fecha;
   }
 
+  Object.assign(N, { pintarLista: pintarLista, soltarVisor: soltarVisor, visorDe: visorDe, leerNombre: leerNombre });
+
   return { configurar: configurar, abrir: abrir, leerNombre: leerNombre,
-           parecidos: parecidos, pareceDeLaAplicacion: pareceDeLaAplicacion };
+           pareceDeLaAplicacion: pareceDeLaAplicacion, _interno: N };
 })();
