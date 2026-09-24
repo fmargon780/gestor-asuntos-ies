@@ -112,8 +112,18 @@ Las filas 1 a 75 y 77 a 127 están **HECHAS**. Sus documentos siguen en `docs/`,
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 128 | `docs/TIPO-DESDE-EL-ASUNTO.md` (crear un tipo de asunto sin salir de Nuevo asunto) | PENDIENTE |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 128 está HECHA** (24-sep-2026, sesión programada): `docs/TIPO-DESDE-EL-ASUNTO.md`. En
+Nuevo asunto, junto al buscador de tipos, «+ Crear tipo nuevo»: destacado bajo el buscador con
+texto escrito, discreto al final de la parrilla sin texto (`js/tipo-al-vuelo.js`, enganchado a
+`js/tipos-buscador.js`). Panel de tres datos (nombre, nombre corto, categoría), dentro de la
+misma pantalla, nunca un segundo cuadro; Escape solo lo cierra a él. Guarda con `App.crearTipo`
+(`js/ajustes.js`, compartida con «Añadir» de Ajustes) tras la misma guardia de nombres de
+siempre; un nombre repetido no se duplica, ofrece «Usar este». Deja el tipo elegido con
+`App.marcarTipoElegido` (`js/asuntos-nuevo.js`), que no toca el tercero ni lo ya escrito. Prueba
+`pruebas/tipo-desde-el-asunto.mjs`, batería completa (`npm test`) en verde. Versión `App.VERSION`:
+`24-sep-2026 · 15:32`.
 
 **La fila 127 está HECHA** (24-sep-2026): `docs/MEMBRETE-NO-SE-ENCUENTRA.md`. El membrete ya se encuentra: `js/membrete.js` pregunta por `membrete.png` con `Carpetas.existeFichero` (antes, `Carpetas.existe`, que busca una carpeta). Lo mismo en tres sitios de `js/papelera.js` al devolver documentos. Francisco no tiene que volver a subir la imagen. Prueba `pruebas/membrete-se-encuentra.mjs`. Versión `App.VERSION`: `24-sep-2026 · 14:04` (ver la nota del cupo de Vercel: puede tardar en publicarse).
 

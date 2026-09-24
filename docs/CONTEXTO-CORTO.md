@@ -66,7 +66,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 (Una línea por cosa. El cómo y el porqué de cada una están en `docs/contexto/` y en `HISTORIA.md`.)
 
-- Categoría → tipo → tercero → nombre de carpeta, con vista previa. El nombre corto del tipo, en carpeta, filtros y tarjeta.
+- Categoría → tipo → tercero → nombre de carpeta, con vista previa. El nombre corto del tipo, en carpeta, filtros y tarjeta; se crea un tipo nuevo sin salir de Nuevo asunto.
 - El asunto se coloca solo en «Pendiente de Administración» o «Pendiente de terceros» según su hito abierto (sin hitos, por su estado); quién es Administración se marca en Ajustes. Vía preferente y fecha límite.
 - Asuntos recurrentes, con aviso.
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
