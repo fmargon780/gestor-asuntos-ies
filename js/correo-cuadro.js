@@ -46,25 +46,9 @@ var CorreoCuadro = (function () {
 
   /* ---------- de dónde salen los correos ---------- */
 
-  /* Todas las direcciones que haya en la ficha de esa persona, vengan en
-     la columna que vengan. Se buscan por la arroba, no por el título de
-     la columna: Séneca las llama de maneras distintas según el informe. */
-  function correosDe(persona) {
-    var salida = [], vistos = {};
-    if (!persona) return salida;
-    Object.keys(persona.campos || {}).forEach(function (columna) {
-      var trozos = String(persona.campos[columna] || '')
-        .match(/[^\s,;<>()"]+@[^\s,;<>()"]+\.[A-Za-z]{2,}/g);
-      if (!trozos) return;
-      trozos.forEach(function (dir) {
-        var clave = dir.toLowerCase();
-        if (vistos[clave]) return;
-        vistos[clave] = true;
-        salida.push({ titulo: columna, dir: dir });
-      });
-    });
-    return salida;
-  }
+  /* Todas las direcciones de la ficha de esa persona: la regla común de
+     js/destinatarios.js (fila 132). */
+  function correosDe(persona) { return Destinatarios.correosDe(persona); }
 
   function paraDelCuadro() {
     var lista = [];
@@ -87,23 +71,8 @@ var CorreoCuadro = (function () {
      copia oculta, nunca en Para, para que una familia no vea el correo
      de las demás. */
 
-  /* De cada miembro se sacan TODOS los correos que tenga (un alumno
-     puede traer el de los dos tutores); sin efectos, se puede probar
-     sola. `persona` ya viene resuelta (o null si no se ha encontrado). */
-  function combinarCorreosDeGrupo(miembrosConPersona) {
-    var direcciones = [], vistos = {}, sinCorreo = [];
-    miembrosConPersona.forEach(function (m) {
-      var correos = correosDe(m.persona);
-      if (!correos.length) { sinCorreo.push(m.nombre); return; }
-      correos.forEach(function (c) {
-        var clave = c.dir.toLowerCase();
-        if (vistos[clave]) return;
-        vistos[clave] = true;
-        direcciones.push(c.dir);
-      });
-    });
-    return { direcciones: direcciones, sinCorreo: sinCorreo };
-  }
+  /* De cada miembro, TODOS sus correos: la regla común (fila 132). */
+  function combinarCorreosDeGrupo(miembrosConPersona) { return Destinatarios.delGrupo(miembrosConPersona); }
 
   function contenidoCco() {
     var direcciones = Object.keys(cco);
@@ -181,14 +150,10 @@ var CorreoCuadro = (function () {
        por coma): tiene prioridad sobre la de "Lo pide". */
     var correoLoPide = (n().destinatarioPreferente && n().destinatarioPreferente()) ||
       (window.LoPide ? LoPide.correoDe(a.ficha) : '');
-    var otroInicial = '';
-    if (window.LoPide) {
-      var resultado = LoPide.elegirDestinatarios(correos, correoLoPide, elegidos);
-      elegidos = resultado.elegidos;
-      otroInicial = resultado.otro;
-    } else {
-      correos.forEach(function (c) { if (elegidos[c.dir] === undefined) elegidos[c.dir] = true; });
-    }
+    /* Cuáles van marcados de partida: la regla común (fila 132). */
+    var posibles = Destinatarios.posibles(persona, correoLoPide, elegidos);
+    elegidos = posibles.elegidos;
+    var otroInicial = posibles.otro;
 
     return '<div id="correo-formulario">' +
              '<div class="correo-grid">' +
@@ -311,11 +276,8 @@ var CorreoCuadro = (function () {
       selectorGrupo.onchange = async function () {
         var valor = selectorGrupo.value;
         selectorGrupo.value = '';
-        if (!valor || !window.CorreoGrupos) return;
-        var miembros;
-        try { miembros = await CorreoGrupos.miembrosDeOpcion(valor); } catch (e) { miembros = []; }
-        if (!miembros.length) return;
-        var resueltos = await CorreoGrupos.resolverMiembros(miembros);
+        var resueltos = await Destinatarios.miembrosDeOpcion(valor);   /* fila 132 */
+        if (!resueltos.length) return;
         var resultado = combinarCorreosDeGrupo(resueltos);
         resultado.direcciones.forEach(function (d) { cco[d] = true; });
         resultado.sinCorreo.forEach(function (nombre) {

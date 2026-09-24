@@ -58,6 +58,11 @@ cabecera nueva la primera vez que se da de alta o se cambia una empresa.
 Cada una va por `ColaGuardado.poner(<fichero del CSV>, …)` y relee el CSV dentro de la cola. Las
 copias en conflicto de Dropbox de esos CSV las une `js/conflictos.js` (ver `CONTEXTO.md`).
 
+**Los terceros se releen solos** (fila 132): la caché de `Datos` ya no dura toda la sesión. En la
+revisión de `js/conflictos.js` (cada cinco minutos, nunca con un guardado en marcha,
+`revisarFechasDatos`) se mira la fecha de cada CSV de `_GESTOR/datos`; si ha cambiado, se olvida
+esa categoría (`Datos.olvidar`) y se relee la próxima vez que se pida, sin repintar nada.
+
 Botón "Cambiar los datos" en la ficha de Personas y empresas: abre el mismo cuadro del alta,
 relleno, y guarda encima. **Solo para los dados de alta a mano** (`p.deSeneca !== true`). Si
 cambia el nombre, las carpetas de sus asuntos de antes conservan el nombre viejo, y se avisa. El

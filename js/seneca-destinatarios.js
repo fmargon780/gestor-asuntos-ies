@@ -137,11 +137,9 @@ var SenecaDestinatarios = (function () {
       selector.onchange = async function () {
         var valor = selector.value;
         selector.value = '';
-        if (!valor || !window.CorreoGrupos) return;
-        var miembros;
-        try { miembros = await CorreoGrupos.miembrosDeOpcion(valor); } catch (e) { miembros = []; }
-        if (!miembros.length) return;
-        var resueltos = await CorreoGrupos.resolverMiembros(miembros);
+        /* Los miembros, por la regla común (js/destinatarios.js, fila 132). */
+        var resueltos = await Destinatarios.miembrosDeOpcion(valor);
+        if (!resueltos.length) return;
         var resultado = (window.IdEA && IdEA.usuariosDeGrupo(resueltos)) || { usuarios: [], sinUsuario: [] };
         anadir(resultado);
         refrescar();

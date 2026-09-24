@@ -85,18 +85,26 @@ await comprobar('el hito ha quedado guardado', Promise.resolve(r1.h), ['h1:hecho
 await comprobar('no ha tocado asuntos.json', Promise.resolve(r1.llamadas), 0);
 await comprobar('y no hay ningún aviso', avisos().then(colores), []);
 
-/* ---------- 2. cambiar el estado ---------- */
-console.log('--- 2. cambiar el estado con el repintado fallando ---');
-const r2 = await pagina.evaluate(async (A) => {
-  const pintar = App.pintarAbiertos;
+/* ---------- 2. poner la fecha límite ----------
+   (Hasta la fila 132 era «cambiar el estado»; ya no hay estados escritos
+   a mano. La fecha límite sigue el mismo patrón: guardar, y repintar la
+   lista como accesorio.) */
+console.log('--- 2. poner la fecha límite con el repintado fallando ---');
+await pagina.evaluate((A) => {
+  window.__pintarAntes = App.pintarAbiertos;
   App.pintarAbiertos = function () { throw new Error('repintado roto'); };
-  const a = App.E.listaAbiertos.filter(x => x.nombre === A)[0];
-  try { await App.ponerEstado(a, 'EN TRÁMITE'); } finally { App.pintarAbiertos = pintar; }
-  const r = JSON.parse(await Carpetas.leerTexto(App.E.gestor, 'asuntos.json'));
-  return r.asuntos[A].situacion;
+  window.__plazo = App.editarPlazo(App.E.listaAbiertos.filter(x => x.nombre === A)[0]);
 }, A);
-await comprobar('el estado está guardado', Promise.resolve(r2), 'EN TRÁMITE');
-await comprobar('el aviso es ámbar, no rojo', avisos().then(colores), ['ambar']);
+await pagina.waitForSelector('#capa:not(.oculto) #plazo-fecha');
+await pagina.fill('#plazo-fecha', '2099-01-15');
+await pagina.click('#cuadro-aceptar');
+const r2 = await pagina.evaluate(async (A) => {
+  try { await window.__plazo; } finally { App.pintarAbiertos = window.__pintarAntes; }
+  const r = JSON.parse(await Carpetas.leerTexto(App.E.gestor, 'asuntos.json'));
+  return r.asuntos[A].limite;
+}, A);
+await comprobar('la fecha está guardada', Promise.resolve(r2), '2099-01-15');
+await comprobar('verde por lo guardado y ámbar por el repintado; nada en rojo', avisos().then(colores), ['bueno', 'ambar']);
 
 /* ---------- 3. archivar ---------- */
 console.log('--- 3. archivar con el borrado del original fallando ---');

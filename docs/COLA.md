@@ -107,12 +107,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 75 y 77 a 131 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 75 y 77 a 132 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 132 | `docs/ARREGLOS-POR-DENTRO.md` (terceros que se releen, fuera los estados manuales, cabeceras de seguridad, pdf.js, una regla de destinatarios) | EN CURSO (24-sep-2026) |
 | 133 | `docs/PARTIR-FICHEROS-GRANDES.md` (los que pasan de 600 líneas, sin cambiar nada) | PENDIENTE |
 | 134 | `docs/QUIEN-ENCARGA-CADA-TIPO.md` (Secretaría, Dirección, Jefatura o Varios en cada tipo) | PENDIENTE |
 | 135 | `docs/ASUNTOS-RESERVADOS.md` (sin el nombre del tercero en listas, buscador y Cuentas) | PENDIENTE |
@@ -122,6 +121,12 @@ Las filas 1 a 75 y 77 a 131 están **HECHAS**. Sus documentos siguen en `docs/`,
 | 139 | `docs/UNA-SOLA-LIBRETA-DE-NOTAS.md` (las notas del hito pasan al asunto, con etiqueta) | PENDIENTE |
 | 140 | `docs/TIEMPO-DE-TRAMITACION.md` (media y máximo por tipo, y los abiertos más antiguos) | PENDIENTE |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 132 está HECHA** (24-sep-2026): `docs/ARREGLOS-POR-DENTRO.md`. Terceros que se releen solos
+(fecha de los CSV), fuera el código de los estados escritos a mano, cabeceras de seguridad en
+`vercel.json`, pdf.js 4.10.38 y una sola regla de destinatarios (`js/destinatarios.js`). Prueba
+`pruebas/arreglos-por-dentro.mjs`, batería completa en verde. Versión `App.VERSION`: `24-sep-2026 · 23:00`.
+Pendiente de comprobar con `curl -I` que las cabeceras nuevas salen (esta sesión no llega a la web).
 
 **La fila 131 está HECHA** (24-sep-2026): `docs/PLAZOS-BIEN-CONTADOS.md`. Cada plazo de un paso dice
 cómo se cuenta (hábiles por defecto, lectivos o naturales; `js/guias-plazo.js`, `Plazos.sumarPlazo`);

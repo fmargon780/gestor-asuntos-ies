@@ -350,17 +350,10 @@ var Papelera = (function () {
     return { ok: true };
   }
 
-  async function devolverEstado(ficha) {
-    var estado = (ficha.datos && ficha.datos.estado) || { nombre: ficha.nombre, espera: false };
-    var yaEsta = App.E.estados.some(function (e) { return e.nombre === estado.nombre; });
-    if (yaEsta) return { ok: false, motivo: 'Ya hay un estado llamado "' + estado.nombre + '".' };
-    var pos = (ficha.datos && typeof ficha.datos.posicion === 'number') ? ficha.datos.posicion : App.E.estados.length;
-    if (pos < 0 || pos > App.E.estados.length) pos = App.E.estados.length;
-    await Borrados.revivir(App.E.gestor, 'estados', estado.nombre);
-    App.E.estados.splice(pos, 0, estado);
-    await App.guardarEstados();
-    await quitarDeIndice(ficha.id);
-    return { ok: true };
+  /* Fila 132: ya no hay estados escritos a mano (el estado del asunto es
+     su hito actual), así que un estado borrado de antes no se devuelve. */
+  async function devolverEstado() {
+    return { ok: false, motivo: 'Los estados escritos a mano ya no existen: el estado de cada asunto es su hito actual.' };
   }
 
   async function devolverTipoDocumento(ficha) {

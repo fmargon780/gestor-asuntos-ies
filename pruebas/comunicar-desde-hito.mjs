@@ -57,7 +57,7 @@ vm.createContext(contexto);
    comprueba `typeof comoEra !== 'function'` antes de usarlo. */
 contexto.App = contexto.window.App = { E: { usuario: 'Francisco', datos: {} } };
 for (const f of [
-  'util.js', 'reintentar-escritura.js', 'carpetas.js', 'copias.js', 'nombres.js', 'datos.js', 'datos-listas.js', 'datos-tutores.js', 'dni.js', 'lo-pide.js',
+  'util.js', 'reintentar-escritura.js', 'carpetas.js', 'copias.js', 'nombres.js', 'datos.js', 'datos-listas.js', 'datos-tutores.js', 'dni.js', 'lo-pide.js', 'destinatarios.js',
   'plantillas.js', 'guias.js', 'hitos.js', 'hitos-archivo.js', 'correo.js', 'hitos-comunicar.js'
 ]) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });

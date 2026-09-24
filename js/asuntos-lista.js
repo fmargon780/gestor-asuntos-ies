@@ -125,13 +125,6 @@ App.textoDeOrden = function (a, cual) {
   return U.normalizar(a.ficha.tercero || a.leido.resto || 'zzz');
 };
 
-/* Cada estado se pinta de un color, según el sitio que ocupa en la
-   lista. Hay seis colores y se van repitiendo. */
-App.colorEstado = function (situacion) {
-  var i = App.posDeEstado(situacion);
-  return 'estado-' + (i === -1 ? 'x' : (i % 6));
-};
-
 /* ---------- la fecha límite de un asunto ----------
 
    Las cuentas y los textos están en plazos.js. Aquí solo queda lo que
@@ -209,30 +202,6 @@ App.textoVia = function (ficha) {
   return ficha.viaDato ? n + ': ' + ficha.viaDato : n;
 };
 
-/* Guarda un estado escrito a mano. Desde la fila 129 ninguna pantalla lo
-   usa (el estado del asunto es su hito actual, y `situacion` ya no se
-   lee); se queda por si hay que deshacer el cambio. */
-/* Lo principal (guardar) y lo accesorio (repintar la lista) por
-   separado (fila 100): si falla solo el repintado, el estado ya está
-   guardado y el aviso es ámbar, nunca rojo. */
-App.ponerEstado = async function (a, situacion) {
-  try {
-    await App.anotar(a.nombre, {
-      situacion: situacion,
-      situacionEl: U.ahora(),
-      situacionPor: App.E.usuario
-    });
-  } catch (e) {
-    U.fallo('No he podido guardar el estado', e);
-    return false;
-  }
-  try {
-    App.pintarAbiertos();
-  } catch (e2) {
-    U.accesorio('Estado guardado, pero no he podido repintar la lista', e2);
-  }
-  return true;
-};
 
 /* Cuadro para apuntar por dónde prefiere hablar el tercero EN ESTE
    asunto. Se guarda en la carpeta del centro, así que lo ve todo el

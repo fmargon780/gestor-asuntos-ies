@@ -280,7 +280,7 @@ pegado a `Fecha: dd/mm/aaaa hh:mm:ss`.
 - La fecha del sello no cambia la fecha `AAMMDD` del nombre (la del propio documento); se guarda
   en la nota ("Registrado 26EM0368 el 10/09/2026 · <documento>").
 - **pdf.js va copiado en el repositorio**, en `js/lib/pdf.min.mjs` y `js/lib/pdf.worker.min.mjs`
-  (versión 4.2.67, del `build/` de `pdfjs-dist`, no de `legacy/`; sube desde la 3.11.174 en la fila
+  (versión 4.10.38 desde la fila 132, antes 4.2.67, del `build/` de `pdfjs-dist`, no de `legacy/`; sube desde la 3.11.174 en la fila
   72, docs/DETALLES-DE-MANTENIMIENTO.md, punto 5, que tenía el CVE-2024-4367). No se carga de
   ninguna dirección externa, y solo se trae la primera vez que hace falta. Desde la 4.x pdf.js solo
   se distribuye como módulo, así que los tres sitios que lo cargan (`js/registro-lector.js`,

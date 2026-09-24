@@ -28,38 +28,10 @@ for (const f of ['util.js', 'nombres.js', 'datos.js', 'datos-listas.js', 'datos-
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 const { Nombres, Datos, Relacionados } = contexto;
-// correosDe() vive dentro de la IIFE de js/correo.js, así que se prueba
-// su misma máquina (deducir correos por la arroba) por su cuenta aquí.
-function correosDe(persona) {
-  var salida = [], vistos = {};
-  if (!persona) return salida;
-  Object.keys(persona.campos || {}).forEach(function (columna) {
-    var trozos = String(persona.campos[columna] || '')
-      .match(/[^\s,;<>()"]+@[^\s,;<>()"]+\.[A-Za-z]{2,}/g);
-    if (!trozos) return;
-    trozos.forEach(function (dir) {
-      var clave = dir.toLowerCase();
-      if (vistos[clave]) return;
-      vistos[clave] = true;
-      salida.push({ titulo: columna, dir: dir });
-    });
-  });
-  return salida;
-}
-function combinarCorreosDeGrupo(miembrosConPersona) {
-  var direcciones = [], vistos = {}, sinCorreo = [];
-  miembrosConPersona.forEach(function (m) {
-    var correos = correosDe(m.persona);
-    if (!correos.length) { sinCorreo.push(m.nombre); return; }
-    correos.forEach(function (c) {
-      var clave = c.dir.toLowerCase();
-      if (vistos[clave]) return;
-      vistos[clave] = true;
-      direcciones.push(c.dir);
-    });
-  });
-  return { direcciones: direcciones, sinCorreo: sinCorreo };
-}
+// Desde la fila 132, la regla de los correos vive en js/destinatarios.js:
+// se prueba la de verdad, no una copia.
+vm.runInContext(fs.readFileSync(raiz + 'destinatarios.js', 'utf8'), contexto, { filename: 'destinatarios.js' });
+const combinarCorreosDeGrupo = (m) => contexto.Destinatarios.delGrupo(m);
 
 let fallos = 0;
 function comprobar(titulo, real, esperado) {

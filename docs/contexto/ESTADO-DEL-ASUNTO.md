@@ -67,7 +67,10 @@ Conviven cero sistemas: `ficha.situacion` se queda quieta en `asuntos.json` (no 
   del ARCHIVO dice «Archivado · se quedó en: …», «Archivado · terminado» o, en los de antes,
   «Archivado». Al reabrir, los hitos vuelven del historial tal cual.
 - Fuera también: el desplegable de estado de Nuevo asunto, la rejilla "Estados del asunto" de
-  Ajustes (con su casilla Administración) y el paso a un estado de `js/correo.js`. El hueco de
+  Ajustes (con su casilla Administración) y el paso a un estado de `js/correo.js`. Desde la fila
+  132, también su código (`App.cargarEstados`, `App.E.estados`, `App.ponerEstado`, la tabla de
+  Ajustes y devolver un estado de la papelera); un archivado de antes enseña su estado viejo como
+  dato histórico («Archivado · RESUELTO»). El hueco de
   plantilla del estado, "Duplicados" y el archivo de un tercero enseñan el texto del hito.
 - La lista no lee `hitos.json` en cada repintado: `Hitos.ultimosLeidos()`, relectura por
   `window.Gestor.alRefrescar` cada dos minutos como mucho, y `Hitos.alCambiar`. Solo repinta si

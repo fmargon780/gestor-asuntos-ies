@@ -61,6 +61,32 @@ var EstadoMigracion = (function () {
     return { creados: creados, enEspera: enEspera };
   }
 
+  /* Fila 132: la lista de estados ya no se carga al entrar; se lee estados.json aquí, una
+     vez. Las primeras versiones guardaban solo el nombre: la marca de
+     espera sale entonces de los de fábrica o del propio nombre. */
+  async function estadosViejos(g) {
+    var leido = null;
+    try { leido = await Carpetas.leerJson(g, 'estados.json'); } catch (e) { leido = null; }
+    var lista = normalizarEstados(leido);
+    /* Sin fichero (o vacío), los de fábrica, como hacía antes App.cargarEstados. */
+    if (!lista.length && window.Nombres && Nombres.ESTADOS_POR_DEFECTO) {
+      lista = Nombres.ESTADOS_POR_DEFECTO.map(function (x) { return { nombre: x.nombre, espera: !!x.espera }; });
+    }
+    return lista;
+  }
+
+  function normalizarEstados(lista) {
+    var deFabrica = {};
+    ((window.Nombres && Nombres.ESTADOS_POR_DEFECTO) || []).forEach(function (e) { deFabrica[e.nombre] = e.espera; });
+    return (Array.isArray(lista) ? lista : []).map(function (e) {
+      if (typeof e === 'string') {
+        var n = U.normalizar(e);
+        return { nombre: e, espera: (e in deFabrica) ? !!deFabrica[e] : (n.indexOf('espera') !== -1 || n.indexOf('tercero') !== -1) };
+      }
+      return { nombre: String((e && e.nombre) || ''), espera: !!(e && e.espera) };
+    }).filter(function (e) { return e.nombre; });
+  }
+
   async function nombresDe(a) {
     if (!a.handle) return [];
     try {
@@ -92,7 +118,7 @@ var EstadoMigracion = (function () {
       guias[t] = GuiasDelCentro.pasosDe(t);
       if (!guias[t].length) guias[t] = await EstadoHito.guiaMinima(t);
     }
-    var estados = App.E.estados || [];
+    var estados = await estadosViejos(g);
     var conEspera = {};
     estados.forEach(function (e) { if (e.espera) conEspera[e.nombre] = true; });
     for (var k = 0; k < lista.length; k++) {
@@ -135,6 +161,6 @@ var EstadoMigracion = (function () {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enganchar);
   else enganchar();
 
-  return { aplicar: aplicar, hacer: hacer, MARCA: MARCA };
+  return { aplicar: aplicar, hacer: hacer, MARCA: MARCA, normalizarEstados: normalizarEstados };
 })();
 window.EstadoMigracion = EstadoMigracion;

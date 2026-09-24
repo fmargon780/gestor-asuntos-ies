@@ -160,7 +160,10 @@ El `?v=` es imprescindible: sin él se puede recibir una copia guardada.
 - **Comprobar que está publicado no es comprobar que funciona.** La comprobación de verdad es la
   prueba en navegador de `pruebas/`.
 - **El conector de Vercel no sirve para esto:** da 403 y 404.
-- `vercel.json` manda `Cache-Control: public, max-age=0, must-revalidate` para todo.
+- `vercel.json` manda `Cache-Control: public, max-age=0, must-revalidate` para todo, y desde la fila
+  132 `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer` y `Content-Security-Policy:
+  frame-ancestors 'none'; object-src 'none'; base-uri 'self'` (a propósito, sin política de scripts
+  ni de conexiones: la aplicación llama a Apps Script, usa `blob:` y tiene manejadores en línea).
 - **El plan gratuito (Hobby) solo da 100 publicaciones al día** (fila 48, 17-sep-2026,
   `docs/NO-GASTAR-PUBLICACIONES.md`): se agotaron una vez, con `main` recibiendo 100 commits en
   un día, más de la mitad de ellos solo `docs/COLA.md` y compañía, y cada push a una rama
@@ -186,7 +189,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 |---|---|
 | `tipos.json` | Tipos de asunto y su categoría. `formularios` (fila 82): claves del catálogo de `datos/formularios.json` que aplican a cualquier asunto de ese tipo, sin depender de ningún paso |
 | `tipos-documento.json` | Tipos de documento |
-| `estados.json` | Estados de tramitación de antes de la fila 129: ya no se enseñan ni se editan; se leen solo para el paso único (`js/estado-migracion.js`) |
+| `estados.json` | Estados de tramitación de antes de la fila 129: ya no se enseñan, ni se editan, ni se cargan al entrar (fila 132: fuera su código); solo los lee una vez el paso único (`js/estado-migracion.js`). No se borra del Dropbox |
 | `asuntos.json` | Ficha de cada asunto: quién lo abrió, estado, vía, notas, cierre, pasos, fecha límite, documentos pendientes de registro, relacionados, campos configurados del tipo, hilos de correo enganchados, quién ha pedido la gestión (`loPide`) |
 | `guias.json` | Los pasos de cada tipo de asunto, con sus preguntas y opciones |
 | `recurrentes.json` | Los asuntos que se repiten y cuándo tocan |

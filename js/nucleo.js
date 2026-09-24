@@ -223,7 +223,6 @@ $('btn-entrar').onclick = async function () {
 
     await App.cargarTipos();
     await App.cargarTiposDocumento();
-    await App.cargarEstados();
     await App.cargarCampos();
     if (window.Grupos) await Grupos.cargar();
     await App.cargarRegistro();
@@ -372,61 +371,10 @@ App.fusionarConDisco = async function (fichero, listaLocal, clave) {
   return listaLocal.concat(extra);
 };
 
-/* Los estados de tramitación. Se guardan en el orden en que los pone
-   el usuario, que es el orden del trámite: no se ordenan solos.
-
-   Cada estado es { nombre, espera }. Las primeras versiones guardaban
-   solo el nombre, así que aquí se admiten las dos formas y el fichero
-   se deja ya con la nueva. */
-App.normalizarEstados = function (lista) {
-  var deFabrica = {};
-  Nombres.ESTADOS_POR_DEFECTO.forEach(function (e) { deFabrica[e.nombre] = e.espera; });
-  return (lista || []).map(function (e) {
-    if (typeof e === 'string') return { nombre: e, espera: (e in deFabrica) ? !!deFabrica[e] : App.esperaPorNombre(e) };
-    return { nombre: String((e && e.nombre) || ''), espera: !!(e && e.espera) };
-  }).filter(function (e) { return e.nombre; });
-};
-
-/* De partida (fila 104): un estado cuyo nombre hable de "espera" o de
-   "tercero" es de terceros; el resto, de Administración. */
-App.esperaPorNombre = function (nombre) {
-  var n = U.normalizar(nombre);
-  return n.indexOf('espera') !== -1 || n.indexOf('tercero') !== -1;
-};
-
-App.cargarEstados = async function () {
-  var leido = await Carpetas.leerJson(App.E.gestor, App.FICHERO_ESTADOS);
-  var eraTexto = !!(leido && leido.length && typeof leido[0] === 'string');
-  var e = App.normalizarEstados(leido);
-  if (!e.length) e = Nombres.ESTADOS_POR_DEFECTO.map(function (x) {
-    return { nombre: x.nombre, espera: x.espera };
-  });
-  App.E.estados = e;
-  if (!leido || !leido.length || eraTexto) await App.guardarEstados();
-};
-
-/* El sitio que ocupa un estado en la lista, y si es de los que
-   significan "esto ya no depende de nosotros". */
-App.posDeEstado = function (nombre) {
-  for (var i = 0; i < App.E.estados.length; i++) {
-    if (App.E.estados[i].nombre === nombre) return i;
-  }
-  return -1;
-};
-
-App.esDeEspera = function (nombre) {
-  var i = App.posDeEstado(nombre);
-  return i !== -1 && !!App.E.estados[i].espera;
-};
-
-App.guardarEstados = async function () {
-  var fusion = await App.fusionarConDisco(
-    App.FICHERO_ESTADOS, App.E.estados, function (e) { return e.nombre; });
-  fusion = await Borrados.filtrarActivos(
-    App.E.gestor, 'estados', fusion, function (e) { return e.nombre; });
-  App.E.estados = App.normalizarEstados(fusion);
-  await Copias.guardar(App.E.gestor, App.FICHERO_ESTADOS, App.E.estados);
-};
+/* Los estados de tramitación escritos a mano ya no existen (fila 129: el
+   estado del asunto es su hito actual; fila 132: fuera su código).
+   `estados.json` se queda en el Dropbox, sin tocar; solo lo lee una vez
+   js/estado-migracion.js. */
 
 App.guardarTipos = async function () {
   App.E.tipos = await App.fusionarConDisco(

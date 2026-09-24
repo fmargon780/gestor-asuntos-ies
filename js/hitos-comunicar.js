@@ -77,24 +77,12 @@
      EL DESTINATARIO (sección 5.1 del encargo)
      ========================================================== */
 
-  var RE_CORREO = /[^\s,;<>()"]+@[^\s,;<>()"]+\.[A-Za-z]{2,}/g;
 
   /* Todas las direcciones que traiga cualquier columna de esa persona,
      como en js/correo-cuadro.js (`correosDe`, no expuesta desde allí:
      se repite aquí, es media docena de líneas). */
-  function correosDePersona(persona) {
-    var salida = [], vistos = {};
-    if (!persona) return salida;
-    Object.keys(persona.campos || {}).forEach(function (columna) {
-      var trozos = String(persona.campos[columna] || '').match(RE_CORREO);
-      if (!trozos) return;
-      trozos.forEach(function (dir) {
-        var clave = dir.toLowerCase();
-        if (!vistos[clave]) { vistos[clave] = true; salida.push(dir); }
-      });
-    });
-    return salida;
-  }
+  /* La regla común (js/destinatarios.js, fila 132). */
+  function correosDePersona(persona) { return Destinatarios.direccionesDe(persona); }
 
   function tercero(a) {
     var f = a.ficha || {}, l = a.leido || {};
@@ -134,38 +122,16 @@
      IdEA concreto desde aquí: el cuadro se abre con la lista de
      siempre, sin marcar nada por su cuenta (nunca se bloquea el botón
      por eso, sección 5.1). */
+  /* A quién va: la regla común (Destinatarios.deHito, fila 132); aquí
+     solo se buscan, si hacen falta, la ficha del alumno y los relacionados. */
   async function resolverDestinatario(a, hito) {
-    var nombreTercero = soloElNombre(tercero(a));
-
-    if (hito.responsable === 'tutor') {
-      var persona = await buscarPersonaDelAsunto(a);
-      if (persona && window.LoPide) {
-        var t1 = LoPide.datosDeTutor(persona.campos, 1);
-        if (t1.correo || t1.nombre) return { nombre: t1.nombre || 'el tutor legal 1', correoPreferente: t1.correo };
-        var t2 = LoPide.datosDeTutor(persona.campos, 2);
-        if (t2.correo || t2.nombre) return { nombre: t2.nombre || 'el tutor legal 2', correoPreferente: t2.correo };
-      }
-      return { nombre: 'el tutor', correoPreferente: '' };
+    var datos = { nombreTercero: soloElNombre(tercero(a)), relacionados: (a.ficha && a.ficha.relacionados) || [] };
+    if (hito.responsable === 'tutor') datos.persona = await buscarPersonaDelAsunto(a);
+    if (hito.responsable === 'relacionado' && datos.relacionados.length) {
+      try { datos.relacionadosResueltos = (window.CorreoGrupos && await CorreoGrupos.resolverMiembros(datos.relacionados)) || []; }
+      catch (e) { datos.relacionadosResueltos = []; }
     }
-
-    if (hito.responsable === 'relacionado') {
-      var relacionados = (a.ficha && a.ficha.relacionados) || [];
-      if (!relacionados.length) return { nombre: nombreTercero, correoPreferente: '' };
-      var resueltos = [];
-      try { resueltos = (window.CorreoGrupos && await CorreoGrupos.resolverMiembros(relacionados)) || []; }
-      catch (e) { resueltos = []; }
-      var correos = [];
-      resueltos.forEach(function (m) {
-        correosDePersona(m.persona).forEach(function (dir) { if (correos.indexOf(dir) === -1) correos.push(dir); });
-      });
-      return {
-        nombre: relacionados.map(function (r) { return r.nombre; }).join(', '),
-        correoPreferente: correos.join(', ')
-      };
-    }
-
-    /* Responsable del centro, o sin responsable: el tercero del asunto. */
-    return { nombre: nombreTercero, correoPreferente: '' };
+    return Destinatarios.deHito(hito.responsable, datos);
   }
 
   /* ==========================================================

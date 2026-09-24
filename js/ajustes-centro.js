@@ -3,8 +3,7 @@
    fila 39, docs/AJUSTES-POR-TIPO.md).
 
    Las listas que valen para todos los tipos de asunto, sacadas tal
-   cual de js/ajustes.js cuando ese fichero se partió: estados de
-   tramitación, tipos de documento, catálogo de campos propios, grupos
+   cual de js/ajustes.js cuando ese fichero se partió: tipos de documento, catálogo de campos propios, grupos
    de personas, ficheros de datos y cómo se abrevia cada grupo. Nada
    de lógica nueva, solo el mismo código apuntando a su sitio de
    siempre dentro de la pestaña "El centro" en vez de a la pantalla de
@@ -21,212 +20,8 @@
 
 /* ---------- estados del asunto ----------
 
-   Van en el orden del trámite, no en orden alfabético, así que se
-   pueden subir y bajar con las flechas. */
-
-App.pintarTablaEstados = function () {
-  var caja = $('tabla-estados');
-  if (!caja) return;
-  caja.innerHTML = '';
-  if (!App.E.estados.length) {
-    caja.innerHTML = '<div class="vacio">No hay ningún estado. Añade el primero aquí arriba.</div>';
-    return;
-  }
-  App.E.estados.forEach(function (estado, i) {
-    var nombre = estado.nombre;
-    var f = document.createElement('div');
-    f.className = 'tarjeta-tipo';
-    f.dataset.estado = nombre;
-
-    var linea1 = document.createElement('div');
-    linea1.className = 'tarjeta-tipo-linea';
-    linea1.innerHTML = '<span class="marca-estado ' + App.colorEstado(nombre) + '">' +
-                  U.escapar(nombre) + '</span>' +
-                  '<span class="suave">' + App.cuantosCon(nombre) + '</span>';
-    f.appendChild(linea1);
-
-    /* Estos no van al menú: se usan mucho y conviene tenerlos a la
-       vista. El orden del trámite no se toca con esto (A7): las
-       flechas siguen moviendo el sitio en la secuencia, no la columna
-       de la rejilla. */
-    var linea2 = document.createElement('div');
-    linea2.className = 'tarjeta-tipo-linea tarjeta-tipo-sub';
-
-    var etiqueta = document.createElement('label');
-    etiqueta.className = 'interruptor interruptor-fila';
-    var casilla = document.createElement('input');
-    casilla.type = 'checkbox';
-    /* Fila 104: la misma marca de siempre (`espera`), enseñada al
-       revés, igual que la de los responsables de Ajustes › Hitos. */
-    casilla.checked = !estado.espera;
-    casilla.onchange = async function () {
-      estado.espera = !casilla.checked;
-      await App.guardarEstados();
-      App.pintarTablaEstados();
-      App.pintarAbiertos();
-    };
-    etiqueta.appendChild(casilla);
-    var texto = document.createElement('span');
-    texto.textContent = 'Administración';
-    texto.title = 'Un asunto SIN hitos en este estado sale en "Pendiente de Administración" si está ' +
-      'marcado, y en "Pendiente de terceros" si no. Con hitos, manda el hito abierto.';
-    etiqueta.appendChild(texto);
-    linea2.appendChild(etiqueta);
-
-    var subir = document.createElement('button');
-    subir.type = 'button';
-    subir.className = 'boton';
-    subir.textContent = '▲';
-    subir.title = 'Subirlo un puesto';
-    subir.disabled = (i === 0);
-    subir.onclick = function () { App.moverEstado(i, -1); };
-    linea2.appendChild(subir);
-
-    var bajar = document.createElement('button');
-    bajar.type = 'button';
-    bajar.className = 'boton';
-    bajar.textContent = '▼';
-    bajar.title = 'Bajarlo un puesto';
-    bajar.disabled = (i === App.E.estados.length - 1);
-    bajar.onclick = function () { App.moverEstado(i, 1); };
-    linea2.appendChild(bajar);
-
-    f.appendChild(linea2);
-
-    f.appendChild(App.botonMenuTarjeta([
-      { texto: 'Cambiar el nombre', onclick: function () { App.renombrarEstado(nombre); } },
-      { texto: 'Borrar', peligro: true, onclick: function () { App.quitarEstado(nombre); } }
-    ]));
-
-    caja.appendChild(f);
-  });
-};
-
-/* Cuántos asuntos están ahora mismo en ese estado. */
-App.contarCon = function (nombre) {
-  var n = 0;
-  Object.keys(App.E.registro.asuntos).forEach(function (k) {
-    if (App.E.registro.asuntos[k].situacion === nombre) n++;
-  });
-  return n;
-};
-
-App.cuantosCon = function (nombre) {
-  var n = App.contarCon(nombre);
-  if (!n) return 'Ningún asunto';
-  return n === 1 ? '1 asunto' : n + ' asuntos';
-};
-
-App.moverEstado = async function (i, salto) {
-  var j = i + salto;
-  if (j < 0 || j >= App.E.estados.length) return;
-  var guardado = App.E.estados[i];
-  App.E.estados[i] = App.E.estados[j];
-  App.E.estados[j] = guardado;
-  await App.guardarEstados();
-  App.pintarTablaEstados();
-  App.pintarFiltroEstado();
-  App.pintarAbiertos();
-};
-
-/* Al cambiarle el nombre a un estado hay que cambiarlo también en los
-   asuntos que lo tienen puesto, abiertos y archivados. */
-App.renombrarEstado = async function (viejo) {
-  var ok = await U.preguntar('Cambiar el nombre del estado',
-    '<label class="etiqueta">Nombre nuevo</label>' +
-    '<input id="estado-nuevo-nombre" class="campo" value="' + U.escapar(viejo) + '">' +
-    '<p class="nota">Se cambiará también en los asuntos que estén en este estado. ' +
-    'Las carpetas no se tocan: el estado no forma parte del nombre.</p>', 'Cambiar');
-  if (!ok) return;
-
-  var nuevo = U.limpiarNombre($('estado-nuevo-nombre').value).toUpperCase();
-  if (!nuevo || nuevo === viejo) return;
-  var repetido = App.E.estados.some(function (e) {
-    return e.nombre !== viejo && U.normalizar(e.nombre) === U.normalizar(nuevo);
-  });
-  if (repetido) { U.aviso('Ya hay otro estado con ese nombre.', 'malo'); return; }
-
-  try {
-    App.E.estados.forEach(function (e) { if (e.nombre === viejo) e.nombre = nuevo; });
-    /* 20-sep-2026, fila 79, apartado 9: mismo arreglo que App.renombrarTipo
-       (js/ajustes.js) para que el nombre viejo no resucite solo. */
-    await Borrados.marcar(App.E.gestor, 'estados', viejo);
-    await Borrados.revivir(App.E.gestor, 'estados', nuevo);
-    await App.guardarEstados();
-
-    var n = 0;
-    await App.guardarRegistroFresco(function (registro) {
-      Object.keys(registro.asuntos).forEach(function (k) {
-        if (registro.asuntos[k].situacion === viejo) {
-          registro.asuntos[k].situacion = nuevo;
-          n++;
-        }
-      });
-    });
-
-    App.pintarTablaEstados();
-    App.pintarFiltroEstado();
-    App.pintarAbiertos();
-    U.aviso('Estado renombrado. Asuntos cambiados: ' + n + '.', 'bueno');
-  } catch (e) {
-    U.aviso('No he podido cambiarlo: ' + U.mensajeDeError(e), 'malo');
-  }
-};
-
-/* Borrar un estado, con papelera (11-sep-2026). Si algún asunto lo
-   tiene puesto, no se borra: se dice cuántos. */
-App.quitarEstado = async function (nombre) {
-  var n = App.contarCon(nombre);
-  if (n) {
-    await U.preguntar('No se puede borrar',
-      '<p>Hay ' + n + ' asunto' + (n === 1 ? '' : 's') + ' en el estado <strong>' +
-      U.escapar(nombre) + '</strong>. No se puede borrar mientras tenga alguno.</p>', 'Vale', true);
-    return;
-  }
-
-  var ok = await window.Papelera.preguntarBorrar(nombre);
-  if (!ok) return;
-
-  try {
-    var pos = -1;
-    for (var i = 0; i < App.E.estados.length; i++) { if (App.E.estados[i].nombre === nombre) { pos = i; break; } }
-    var estadoObjeto = pos !== -1 ? App.E.estados[pos] : { nombre: nombre, espera: false };
-    App.E.estados = App.E.estados.filter(function (e) { return e.nombre !== nombre; });
-    await Borrados.marcar(App.E.gestor, 'estados', nombre);
-    await App.guardarEstados();
-    await window.Papelera.mandarDato('estado', nombre, null, { estado: estadoObjeto, posicion: pos });
-
-    App.pintarTablaEstados();
-    App.pintarFiltroEstado();
-    App.pintarAbiertos();
-    U.aviso('Estado mandado a la papelera.', 'bueno');
-  } catch (e) {
-    U.aviso('No he podido mandarlo a la papelera: ' + U.mensajeDeError(e), 'malo');
-  }
-};
-
-/* Fila 129: sin la rejilla de estados en index.html, no hay nada que enganchar. */
-if ($('nuevo-estado')) {
-$('nuevo-estado').oninput = function () {
-  App.pintarAvisoSimple('nuevo-estado', 'aviso-nuevo-estado', 'btn-anadir-estado',
-    function () { return App.E.estados.map(function (e) { return e.nombre; }); });
-};
-
-$('btn-anadir-estado').onclick = async function () {
-  var nombre = U.limpiarNombre($('nuevo-estado').value).toUpperCase();
-  if (!nombre) return;
-  var hay = App.E.estados.map(function (e) { return e.nombre; });
-  if (!await U.dejaCrear(nombre, hay, 'estado')) return;
-  await Borrados.revivir(App.E.gestor, 'estados', nombre);
-  App.E.estados.push({ nombre: nombre, espera: App.esperaPorNombre(nombre) });
-  await App.guardarEstados();
-  $('nuevo-estado').value = '';
-  $('nuevo-estado').oninput();
-  App.pintarTablaEstados();
-  App.pintarFiltroEstado();
-  U.aviso('Estado añadido.', 'bueno');
-};
-}
+   Ya no existen (fila 129: el estado del asunto es su hito actual; fila
+   132, docs/ARREGLOS-POR-DENTRO.md: fuera su rejilla y su código). */
 
 /* ---------- tipos de documento ---------- */
 
@@ -719,7 +514,6 @@ App.pintarDiasCaducidadCopias = function () {
 /* ---------- el orquestador de esta pestaña ---------- */
 
 App.pintarAjustesCentro = async function () {
-  App.pintarTablaEstados();
   App.pintarTiposDeDocumento();
   App.pintarCamposPropios();
   App.pintarGruposPersonas();

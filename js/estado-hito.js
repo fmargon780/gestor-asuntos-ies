@@ -56,6 +56,8 @@ var EstadoHito = (function () {
     var f = ficha || {};
     if (f.terminado) return 'Archivado · terminado';
     if (f.seQuedoEn) return 'Archivado · se quedó en: ' + f.seQuedoEn;
+    /* Archivado antes de la fila 129: su estado viejo, como dato histórico. */
+    if (f.situacion) return 'Archivado · ' + f.situacion;
     return 'Archivado';
   }
 

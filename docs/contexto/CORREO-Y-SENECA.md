@@ -210,6 +210,12 @@ navegador llama **directamente**, sin carpeta intermedia ni revisión periódica
 `GESTOR-BANDEJA` y Apps Script no siempre lo recogía. **Esto cambia una regla de siempre**: desde
 esta fila la aplicación sí envía correo de verdad, pero solo tras una confirmación explícita.
 
+**Una sola regla para los destinatarios** (fila 132, `js/destinatarios.js`): qué correos tiene una
+persona (por la arroba, en cualquier columna), cuáles van marcados de partida (con «Lo pide» o la
+dirección de un hito, solo esa), los de un grupo (en copia oculta) y a quién va el «Comunicar» de un
+hito. El cuadro de Correo, «Comunicar» y los destinatarios de Séneca la usan; cada uno pinta su
+cuadro como antes.
+
 **Un correo no sale dos veces** (fila 130, `docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md`). Cada cuadro de
 confirmación lleva su identificador (`CorreoEnviar.nuevoIdEnvio`, en `js/correo-cuadro.js`; volver a
 pulsar en el mismo cuadro manda el mismo). El script (`enviarUnaVez`, `VERSION_SCRIPT`) lo recuerda 6

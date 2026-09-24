@@ -14,7 +14,7 @@
    delante, pegado a ENTRADA o SALIDA, pegado a la fecha y hora del
    sello. Ese ejemplo es el registro 26EM0368.
 
-   Usa pdf.js (Mozilla), copiado en js/lib/ (versión 4.2.67, fila 72,
+   Usa pdf.js (Mozilla), copiado en js/lib/ (versión 4.10.38 desde la fila 132; antes 4.2.67, fila 72,
    docs/DETALLES-DE-MANTENIMIENTO.md, punto 5: la 3.11.174 de antes
    tenía un fallo de seguridad real, CVE-2024-4367, arreglado en la
    4.2.67), y solo se carga la primera vez que hace falta: no al

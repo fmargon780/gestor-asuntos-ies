@@ -173,7 +173,8 @@ comprobar('6. no se salta una pregunta sin responder', [Hitos.situarLista(conPre
 /* 7 */
 comprobar('7. archivado: se quedó en', EstadoHito.textoArchivado({ seQuedoEn: 'Esperar la firma' }), 'Archivado · se quedó en: Esperar la firma');
 comprobar('7. archivado: terminado', EstadoHito.textoArchivado({ terminado: true }), 'Archivado · terminado');
-comprobar('7. archivado de antes', EstadoHito.textoArchivado({ situacion: 'RESUELTO' }), 'Archivado');
+comprobar('7. archivado de antes, con su estado viejo como dato histórico (fila 132)', EstadoHito.textoArchivado({ situacion: 'RESUELTO' }), 'Archivado · RESUELTO');
+comprobar('7. archivado sin nada', EstadoHito.textoArchivado({}), 'Archivado');
 
 /* 8 */
 comprobar('8. la fila cerrada del acordeón: «Espera: Familia»',

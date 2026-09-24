@@ -174,10 +174,12 @@ async function main() {
         asignación de verdad que hace el propio código. */
   const ORIGEN_AWAIT = /=await \(globalThis\.pdfjsLibPromise=/;
   const fuentePdfLib = readFileSync(rutaRaiz('js', 'lib', 'pdf.min.mjs'), 'utf8');
-  if (!ORIGEN_AWAIT.test(fuentePdfLib)) {
-    throw new Error('js/lib/pdf.min.mjs ha cambiado: ya no lleva el "await" de nivel superior esperado. Revisa el parche de scripts/copia-local.mjs.');
-  }
-  const fuentePdfLibSinAwait = fuentePdfLib.replace(ORIGEN_AWAIT, '=(globalThis.pdfjsLibPromise=');
+  /* pdf.js 4.10 (fila 132) ya no trae ese `await`: pone
+     `globalThis.pdfjsLib = {}` directamente, y el fichero se usa tal
+     cual. El parche solo se aplica si el `await` sigue ahí (4.2). */
+  const fuentePdfLibSinAwait = ORIGEN_AWAIT.test(fuentePdfLib)
+    ? fuentePdfLib.replace(ORIGEN_AWAIT, '=(globalThis.pdfjsLibPromise=')
+    : fuentePdfLib;
 
   await esbuild.build({
     entryPoints: [rutaRaiz('js', 'lib', 'pdf.worker.min.mjs')],

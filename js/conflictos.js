@@ -328,9 +328,7 @@
      propia pantalla, así que basta con avisar. */
   async function refrescarTrasResolver(real) {
     if (real === App.FICHERO_TIPOS) { await App.cargarTipos(); App.pintarAjustes(); }
-    else if (real === App.FICHERO_ESTADOS) {
-      await App.cargarEstados(); App.pintarFiltroEstado(); App.pintarAbiertos(); App.pintarAjustes();
-    } else if (real === App.FICHERO_TIPOS_DOC) { await App.cargarTiposDocumento(); App.pintarAjustes(); }
+    else if (real === App.FICHERO_TIPOS_DOC) { await App.cargarTiposDocumento(); App.pintarAjustes(); }
     else { U.aviso('Guardado. Para verlo aquí, cierra sesión y vuelve a entrar.', 'bueno'); }
   }
 
@@ -461,7 +459,58 @@
       if (!yaPendiente(real, nombre)) pendientes.push({ real: real, nombreConflicto: nombre });
     }
     await revisarCsv(g);
+    try { await revisarFechasDatos(); } catch (e) { /* no crítico */ }
     pintarBloque();
+  }
+
+  /* ---------- los terceros se releen solos (fila 132) ----------
+
+     La caché de `Datos` no caducaba en toda la sesión: un alta del
+     compañero o un RegAlum.csv nuevo no se veían hasta recargar. En
+     esta misma revisión (cada cinco minutos, nunca con un guardado en
+     marcha) se mira la fecha de cada CSV de `_GESTOR/datos`; si ha
+     cambiado desde la vez anterior, se olvida esa categoría. Nada más:
+     se relee la próxima vez que se pida, sin repintar nada. */
+  var fechasDatos = null;   /* { nombre: lastModified } de la pasada anterior */
+
+  function categoriaDeDatos(nombre) {
+    var cat = categoriaDeCsv(nombre);
+    if (cat) return cat;
+    var n = String(nombre).toLowerCase();
+    if (/regalum|alumn|matric/.test(n)) return 'ALUMNADO';
+    if (/relpercen|personal|profesor/.test(n)) return 'PERSONAL';
+    return '';
+  }
+
+  /* Función pura: qué categorías olvidar al pasar de `antes` a `ahora`
+     (null = todas; [] = ninguna). La primera pasada solo apunta. */
+  function categoriasCambiadas(antes, ahora) {
+    if (!antes) return [];
+    var cats = {}, todas = false;
+    Object.keys(ahora).forEach(function (n) {
+      if (antes[n] === ahora[n]) return;
+      var c = categoriaDeDatos(n);
+      if (c) cats[c] = true; else todas = true;
+    });
+    return todas ? null : Object.keys(cats);
+  }
+
+  async function revisarFechasDatos() {
+    var dirDatos = window.App && App.E && App.E.datos;
+    if (!dirDatos || !window.Datos) return;
+    if (window.ColaGuardado && ColaGuardado.hayGuardado()) return;
+    var ahora = {};
+    try {
+      var lista = await Carpetas.ficheros(dirDatos);
+      for (var i = 0; i < lista.length; i++) {
+        if (!/\.(csv|xlsx?)$/i.test(lista[i].nombre)) continue;
+        try { ahora[lista[i].nombre] = (await lista[i].handle.getFile()).lastModified; } catch (e) { /* se mira la próxima vez */ }
+      }
+    } catch (e) { return; }
+    var cambiadas = categoriasCambiadas(fechasDatos, ahora);
+    fechasDatos = ahora;
+    if (cambiadas === null) Datos.olvidar();
+    else cambiadas.forEach(function (c) { Datos.olvidar(c); });
   }
 
   /* Fila 130: las copias en conflicto de los CSV de terceros, en _GESTOR/datos. */
@@ -491,7 +540,8 @@
      fusionar una copia en conflicto. */
   window.Conflictos = {
     revisar: revisar, pendientes: function () { return pendientes.slice(); }, unirPorId: unirPorId,
-    unirCsv: unirCsv, fusionarCsv: fusionarCsv
+    unirCsv: unirCsv, fusionarCsv: fusionarCsv,
+    categoriasCambiadas: categoriasCambiadas, revisarFechasDatos: revisarFechasDatos
   };
 
   function enganchar() {

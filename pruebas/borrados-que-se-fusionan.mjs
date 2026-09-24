@@ -185,26 +185,8 @@ const conteoTiposTrasRevivir = await Borrados.contar(gestor);
 comprobar('tipos: tras revivir, ya no queda BECA marcada como borrada',
   conteoTiposTrasRevivir.tipos.total, 0);
 
-/* ---------- 2. estados.json: el mismo escenario, con objetos {nombre, espera} ---------- */
-
-App.E.estados = [{ nombre: 'ABIERTO', espera: false }, { nombre: 'CERRADO', espera: false }];
-await App.guardarEstados();
-let estadosPC2 = JSON.parse(JSON.stringify(App.E.estados));
-
-App.E.estados = App.E.estados.filter((e) => e.nombre !== 'ABIERTO');
-await Borrados.marcar(gestor, 'estados', 'ABIERTO');
-await App.guardarEstados();
-
-App.E.estados = estadosPC2;
-await App.guardarEstados();
-comprobar('estados: el borrado de ABIERTO no reaparece con el guardado de un ordenador con memoria vieja',
-  App.E.estados.map((e) => e.nombre).sort(), ['CERRADO']);
-
-await Borrados.revivir(gestor, 'estados', 'ABIERTO');
-App.E.estados.push({ nombre: 'ABIERTO', espera: false });
-await App.guardarEstados();
-comprobar('estados: dar de alta ABIERTO a mano después de borrarlo sí entra',
-  App.E.estados.map((e) => e.nombre).sort(), ['ABIERTO', 'CERRADO']);
+/* ---------- 2. estados.json: desde la fila 132 ya no hay estados escritos a
+   mano (el estado del asunto es su hito actual), así que no hay nada que fusionar. ---------- */
 
 /* ---------- 3. tipos-documento.json: una lista de textos sueltos ---------- */
 

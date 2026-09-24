@@ -5,6 +5,24 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 132: arreglos por dentro
+
+`docs/ARREGLOS-POR-DENTRO.md`. Cinco arreglos sin pantalla propia:
+
+- **Los terceros se releen solos**: la caché de `Datos` se olvida cuando cambia la fecha de un CSV
+  (revisión de cada cinco minutos de `js/conflictos.js`).
+- **Fuera el código de los estados escritos a mano** (tras la fila 129 ya no pintaba nada). La
+  migración lee `estados.json` por su cuenta. Un archivado de antes enseña su estado viejo.
+- **Cabeceras de seguridad** en `vercel.json` (nosniff, sin referer, CSP de marcos/objetos/base),
+  sin política de scripts a propósito.
+- **pdf.js 4.10.38** (antes 4.2.67). Ya no trae el `await` de nivel superior que
+  `scripts/copia-local.mjs` parcheaba: el parche ahora solo se aplica si está.
+- **Una sola regla para los destinatarios** (`js/destinatarios.js`). Diferencia encontrada al
+  unificar: «Comunicar» a un relacionado sacaba los correos con una expresión propia, igual en la
+  práctica a la del cuadro de Correo; manda la del cuadro de Correo.
+- Pruebas ajustadas: la de avisos usa ahora la fecha límite (verde por lo guardado, ámbar por el
+  repintado) en vez del estado; `pruebas/grupos.mjs` prueba la regla de verdad, no una copia.
+
 ## 24-sep-2026 — Fila 131: plazos bien contados
 
 `docs/PLAZOS-BIEN-CONTADOS.md`. **El porqué**: `Plazos.sumarDiasHabiles` saltaba los días no

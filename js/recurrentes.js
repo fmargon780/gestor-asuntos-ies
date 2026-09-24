@@ -194,7 +194,7 @@
       estado: 'abierto', tipo: r.tipo, categoria: r.categoria,
       tercero: r.tercero, curso: r.curso || U.cursoDeFecha(hoy),
       grupo: '', descripcion: r.descripcion || '',
-      situacion: '', via: '', viaDato: '',
+      via: '', viaDato: '',
       recurrente: r.id,
       abiertoEl: U.ahora(), abiertoPor: window.Gestor.usuario()
     };
