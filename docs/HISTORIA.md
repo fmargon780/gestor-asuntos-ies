@@ -1044,3 +1044,495 @@ cambio, sí tiene que vivir en `.github/workflows/` de **este** repositorio priv
 necesita permiso de escritura sobre el repositorio público, para subir ahí el resultado. Siguiendo
 la opción 2 del propio diseño ("si la sesión no puede crear el repositorio público... dejarlo todo
 preparado"), el contenido completo de la Action queda escrito en `docs/copia-publica.yml.txt`
+(texto plano en vez del `.yml` real, con la nota de en qué repositorio va), y
+`docs/CLAVE-COPIA-PUBLICA.md` explica a Francisco, paso a paso, cómo crear el repositorio público
+vacío, añadir el workflow a este repositorio (con un enlace que abre GitHub ya con el nombre de
+fichero puesto) y crear el token de grano fino y el secreto `COPIA_TOKEN`. `docs/INSTALAR-COPIA.md`
+queda escrito también, avisando de que su primer paso depende de que se complete
+`docs/CLAVE-COPIA-PUBLICA.md` primero (la dirección de
+`raw.githubusercontent.com/fmargon780/gestor-asuntos-copia/...` no responde nada todavía). La fila
+89 queda BLOQUEADA, no HECHA.
+
+Prueba nueva, `pruebas/copia-sin-internet.mjs`: genera `copia-local/` y abre su `index.html` con
+Playwright por `file://` (sin errores de consola, "copia sin internet" a la vista, la biblioteca y
+el catálogo de formularios cargan desde `copia-datos/`, un PDF de `formularios/` se abre con pdf.js
+como el lector, un `.docx` de `plantillas/` se lee con `Docx.leerEntradaDeTexto`), y
+`js/actualizar-copia.js` con un servidor de mentira: descarga solo lo cambiado y recarga, y con el
+servidor apagado arranca igual con el aviso. También se ajustó `pruebas/cargar-biblioteca.mjs`
+(añadir `cargar-fichero.js` a la lista de ficheros que carga en su `jsdom` de mentira: sin él,
+`App.leerFicheroDeLaApp` no existía y la prueba, que ya existía antes de esta fila, se rompía).
+
+Batería completa en verde, una sola pasada al final. Versión publicada `App.VERSION`:
+`21-sep-2026 · 11:32`.
+
+---
+
+## 21-sep-2026 — Fila 88: "Podría ir en...", sugerir un asunto ya existente desde "Por clasificar"
+
+`docs/POR-CLASIFICAR-ASUNTO-EXISTENTE.md`. Desde la fila 41, el lector de "Por clasificar"
+(`js/documentos-sueltos-lector.js`) ya proponía tipo, fecha, registro y tercero de un PDF suelto,
+pero lo leído solo servía para crear un asunto nuevo. Esta fila lo usa también para encontrar un
+asunto que ya existe.
+
+**El módulo nuevo, `js/documentos-sueltos-sugerencias.js`** (`window.SugerenciasAsuntoExistente`)
+no envuelve nada: `js/documentos-sueltos-lector.js` le pregunta directamente, en el mismo paso de
+su cola (uno en uno, nunca en paralelo), justo después de leer el PDF y solo si ha reconocido un
+tercero. Compara primero por documento —Nº de identificación escolar, los cuatro últimos
+caracteres del documento del personal, o el NIF, el mismo código que va al final del nombre de la
+carpeta (`js/nombres.js`)— y, si no hay documento en algún lado, por el nombre
+(`ElegirAsunto.terceroDentroDe`, la misma pieza que ya usaba "Meter en un asunto"). Los abiertos se
+miran en `App.E.listaAbiertos`, ya en memoria; los archivados, solo cuando no hay ningún abierto,
+con el índice guardado del ARCHIVO (`_GESTOR/indice-archivo.json`) — nunca recorriendo el ARCHIVO
+carpeta a carpeta.
+
+**En la tarjeta**, debajo de la línea de lo leído, sale una línea por sugerencia («Podría ir en:
+*nombre*», con «otro tipo» o «archivado» si toca) y su botón «Meter aquí», destacado. Con
+sugerencias a la vista, "Aceptar" pasa a llamarse «Crear asunto nuevo» y a discreto. «Meter aquí»
+reutiliza el mismo camino que "Meter en un asunto" (con su cuadro de "¿reabrir?" si el asunto está
+archivado): se sacó `App.meterSueltoEnAsuntoElegido` de `App.meterSueltoEnAsunto`
+(`js/documentos-sueltos.js`) para no repetir esa lógica en los dos sitios.
+
+**Punto 8 del encargo**: "Meter en un asunto" también nota lo ya leído. `App.parecidoDelSuelto`
+suma +50 si el tercero leído es el del asunto y +10 si el tipo leído es el del asunto, sin quitar
+la puntuación de siempre (por palabras del nombre del fichero). Para eso, el lector expone
+`window.LectorDeSueltos.resultadoDe(nombre)` (el resultado en caché de un fichero, si lo hay), y
+`SugerenciasAsuntoExistente.esDelMismoTercero` queda exportado para no repetir la comparación de
+documento/nombre en los dos sitios.
+
+Prueba nueva, `pruebas/sugerir-asunto-existente.mjs`, en navegador de verdad, con cuatro empresas
+distintas para no mezclar el estado de una con el de otra: un abierto del mismo tipo (sin marca);
+cuatro abiertos (dos del tipo propuesto, dos de otro: salen tres, el tercero con «otro tipo»); sin
+abiertos con dos archivados del mismo tipo y uno de otro (con «archivado», y "Meter aquí" pregunta
+si reabrir); un abierto y un archivado del mismo tercero (solo sale el abierto); un documento sin
+tercero reconocible (la tarjeta, igual que antes de esta fila); y que "Meter en un asunto" pone
+arriba los asuntos del tercero leído. Comprobado que la prueba falla sin el cambio (se revirtieron
+a mano los tres ficheros de código, sin la fila, y las pruebas 1 y 3 fallaron por falta de
+sugerencias) antes de darla por buena.
+
+**Lo que costó de verdad**: el cuadro de "ponerle nombre" que abre `App.meterSueltoEnAsunto`
+(`App.verDocumentos`, `sinCancelar=true`) deja el botón Cancelar compartido (`#cuadro-cancelar`)
+oculto hasta que otro cuadro con Cancelar lo vuelve a enseñar — no es un fallo nuevo de esta fila,
+ya lo tenía "Meter en un asunto" desde siempre, pero la prueba lo destapó al encadenar varios
+escenarios seguidos: el escenario del archivado (que sí necesita Cancelar) se puso antes que el
+del abierto (que deja ese botón oculto al cerrarse), en vez de arreglar el cuadro compartido, que
+no pedía el encargo.
+
+**Aviso para quien lea el git log de esta fila**: al marcar la fila 88 como EN CURSO, una llamada
+de subida se escribió con un valor de relleno en vez del contenido de verdad de `docs/COLA.md`
+(35 caracteres, el mismo fallo de la regla 14 de `docs/COLA.md`, con otra causa: un parámetro sin
+rellenar en la propia llamada, no una sustitución de shell). Se detectó al momento (tamaño de
+salida muy corto) y se corrigió con una segunda subida, releyendo `docs/COLA.md` de antes de
+tocarlo. Ninguna otra subida de esta fila lo repitió: todas se comprobaron con el tamaño en bytes
+después de subir.
+
+Batería completa en verde (94 ficheros de prueba), una sola pasada al final. Versión publicada
+`App.VERSION`: `21-sep-2026 · 07:17`.
+
+## 21-sep-2026 — Fila 86: pulsar la tarjeta de un documento la abre, y el aviso de huérfanas se calla 7 días
+
+`docs/PULSAR-PARA-ABRIR-Y-AVISO-OCULTABLE.md`. Dos cambios, en una sola fila.
+
+**1. Pulsar para abrir**, en toda la aplicación:
+
+- `js/documentos-sueltos.js` ("Por clasificar"): la tarjeta entera llama a `App.abrirSuelto(s)`
+  (que `js/visor.js` ya convierte en `Visor.abrir` con su marcador, como hacía el botón "Abrir").
+- `js/documentos.js` (el cuadro "Documentos ▾"): no tiene panel de la derecha —es un cuadro modal
+  con su propio visor a la izquierda—, así que pulsar la fila abre el mismo formulario que "Poner
+  nombre", que ya enseña el documento mientras se rellenan los campos.
+- `js/bandeja-pantalla.js` (bandeja de Gmail): solo si el correo trae su PDF, la tarjeta entera
+  hace lo mismo que el botón "Leer el correo".
+- `js/papelera.js`: un documento (o un suelto) se puede ver sin sacarlo de la papelera, resolviendo
+  el handle igual que ya hace `devolverDocumento` (`carpetaPapelera()` →
+  `getDirectoryHandle(ficha.carpeta)` → `getFileHandle(ficha.nombre)`).
+- `js/ficha-documentos.js` ya cumplía (el nombre ya era un botón), y con él el ARCHIVO, que
+  reutiliza esa misma pieza. `js/duplicados.js` no se toca: enseña carpetas de asuntos, no
+  documentos.
+
+Guardia común en los cuatro sitios tocados: `ev.target.closest('button, a, input, select,
+textarea, label, .acciones')` antes de abrir nada, para que ningún botón de la fila —ni el menú de
+tres puntos— dispare una apertura doble.
+
+**2. El aviso de "fichas sin carpeta"** gana una ✕ (`js/avisos-que-faltan.js`) que lo calla 7 días.
+Se guarda en `localStorage` (clave `aviso-huerfanas-callado`, nunca en `_GESTOR`: es una
+preferencia de quien está delante del ordenador, no un dato del centro), con hasta cuándo calla y
+cuántas fichas había al ocultarlo: si aparecen más antes de que pasen los 7 días, el aviso vuelve
+solo. La decisión de pintar o no sale de una función sin pantalla, `sePintaHuerfanas(nAhora,
+guardado)`, expuesta en `window.AvisosQueFaltan._sePintaHuerfanas` para poder probarla sola. El
+aviso de la papelera vieja se queda sin ✕: la única salida sigue siendo decidir, porque son datos
+de menores.
+
+Pruebas ampliadas: `pruebas/documentos-sueltos.mjs` (test 7: pulsar la tarjeta abre el visor, y el
+menú de tres puntos no lo hace) y `pruebas/avisos-que-faltan.mjs` (los cinco casos del callado:
+sin nada guardado, recién ocultado, a los 3 días, a los 8 días, y con una ficha más). Batería
+completa en verde, una sola pasada al final. Versión publicada `App.VERSION`: `21-sep-2026 ·
+04:20`.
+
+## 21-sep-2026 — Fila 85: las dos direcciones corregidas, fila cerrada
+
+`datos/formularios.json`: la clave `u` de `O11:VI` y `O11:VII` pasa de
+`https://www.juntadeandalucia.es/boja/2011/132/1` (la página web del BOJA, no un PDF) a
+`https://www.juntadeandalucia.es/boja/2011/132/d1.pdf` (el PDF de verdad), como pedía el
+documento. Las otras nueve direcciones del fichero y las cuatro entradas `via:"protocolo"`
+(`O11:I` a `O11:IV`) no se tocan. Cierra la fila 85, bloqueada el 20-sep-2026 por falta de salida
+a internet y ya resuelta en cuanto a los PDF: Francisco los subió a mano a `formularios/`
+(`docs/FORMULARIOS-DESDE-EL-ZIP.md`), solo quedaban estas dos direcciones por corregir en el
+JSON. Con esta fila y la 86, `docs/COLA.md` vuelve a quedar sin ninguna PENDIENTE.
+
+## 21-sep-2026 — Fila 87: que el enlace de la normativa abra el artículo, no el bloque entero
+
+`docs/ENLACE-AL-ARTICULO-DE-NORMATIVA.md`. Francisco pulsó la cita de un artículo en el bloque
+"Normativa" de un hito y la aplicación le llevó a la página entera del bloque, sin abrir el
+artículo. Tres causas, comprobadas contra la web publicada:
+
+1. **La página limpia del artículo no estaba publicada** en `fmargon780/normativa-escolarizacion`
+   (fusionada en `main` de aquel repositorio pero sin relanzar la publicación de Vercel). Ya
+   resuelto por Francisco el propio 21-sep-2026, fuera de este repositorio: **un `main` fusionado
+   no significa publicado**, hay que comprobarlo siempre.
+2. **El Gestor enlazaba al bloque, no al artículo.** `HitosBiblioteca.enlaceDeNormativa`
+   (`js/hitos-biblioteca.js`) montaba `<base>/<bloque>#r=<clave>`; ahora monta
+   `<base>/norma#r=<clave>`, la vista de un solo artículo que pide `docs/ENLACE-POR-ARTICULO.md` de
+   aquel repositorio. El bloque deja de intervenir en el enlace (sigue guardado, solo para saber
+   dónde vive el artículo): la condición pasa de `bloque && clave && base` a `clave && base`. A
+   `direccionBase` se le quita la barra final y, si lo llevara ya, un `/norma` final, para que no
+   salga `/norma/norma`. La clave va por `encodeURIComponent`.
+3. **La clave de ejemplo inducía a error**: `ROC-40.1` (con apartado) en vez de `ROC-40` (artículo
+   entero, la única forma que la vista de un solo artículo sabe abrir). `js/hitos-normativa.js`
+   cambia el marcador de posición, añade una línea de ayuda fija bajo la lista de referencias y un
+   aviso suave por fila (nunca bloquea, nunca cambia lo escrito) cuando la clave tecleada lleva un
+   punto. El desplegable de bloques pierde su frase "o enlace propio": ya no hace falta un bloque
+   para que el enlace funcione.
+
+También se retocó el texto de ayuda del campo "Dirección del sistema de normativa"
+(`js/plantillas-ajustes.js`, montado por JS para no tocar `index.html`, que sigue siendo el dueño
+de ese campo): la dirección exacta a escribir, `https://normativa.fmargon.com`, y el aviso de que
+la red del instituto bloquea las direcciones `vercel.app`. Ningún valor guardado cambia, solo el
+texto.
+
+`pruebas/biblioteca-de-hitos.mjs`, apartado 8, reescrito con las seis comprobaciones del encargo
+(clave sola, clave con bloque —mismo resultado—, base ya terminada en `/norma`, solo `url`, nada,
+clave con base vacía). El apartado 9 (el espacio de la clave, guardado como guion) se queda como
+estaba.
+
+Esta sesión no tiene salida a internet a dominios fuera de la lista permitida (mismo motivo que las
+filas 63 y 85): no ha podido comprobar con `curl`/`WebFetch` que
+`https://normativa.fmargon.com/normas/ROC.json` responda 200 con la clave `ROC-40`. El código de
+aquí queda igualmente correcto y probado con `npm test`; falta esa comprobación externa, para
+quien la pueda hacer.
+
+## 20-sep-2026 — Fila 85: bloqueada, sin salida a internet
+
+`docs/COLA.md` pedía copiar a `formularios/` los once PDF en blanco que la fila 84 no pudo bajar
+(`O-I.pdf` a `O-IX.pdf`, `O11-VI.pdf`, `O11-VII.pdf`, con sus direcciones de origen ya en
+`datos/formularios.json`). Esta sesión probó dos caminos —`curl` directo y `WebFetch`— contra
+`www.juntadeandalucia.es`, y los dos devolvieron el mismo rechazo del proxy de la organización
+(`CONNECT tunnel failed, response 403` / `EGRESS_BLOCKED`): sin salida a internet, exactamente el
+mismo motivo que ya bloqueó las filas 63 y 84. No queda ninguna fila PENDIENTE en `docs/COLA.md`;
+queda esta, apuntada, para la próxima sesión con salida a internet general (o para que Francisco
+copie los once PDF a mano en la carpeta `formularios/` del repositorio).
+
+## 20-sep-2026 — Fila 84: el impreso, con los datos del centro ya puestos
+
+`docs/FORMULARIOS-CON-LOS-DATOS-DEL-CENTRO.md`. Última de las cuatro filas acordadas de golpe el
+20-sep-2026 (81 a 84): la 81 y la 82-83 las completó otra sesión en paralelo (PR #63, fusionada a
+`main` mientras esta sesión hacía su propia fila 81 sin saberlo — se descartó esa duplicada, PR
+#64, cerrada sin fusionar, y se sincronizó la rama con `main` antes de seguir).
+
+**La regla que no se toca sin volver a hablarlo, escrita para que nadie la deshaga sin saberlo:**
+un impreso oficial preparado con "Preparar para el tercero" rellena SOLO los datos del centro y el
+año académico, nunca los de la persona (nombre, documento, domicilio, teléfono, tutores…), aunque
+la aplicación los tenga. Es a propósito, decisión de Francisco: así, al recibir el impreso de
+vuelta, se ve si algún dato de la persona ha cambiado desde la última vez. Un impreso que llega ya
+relleno del todo no sirve para comprobar nada de eso. Queda anotado en "Descartado" de
+`docs/CONTEXTO-CORTO.md`.
+
+**Sin salida a internet para copiar los PDF de verdad**, como ya le pasó a la fila 63 (19-sep-2026):
+el catálogo (`datos/formularios.json`, de la fila 82) ya trae la clave `f` con el nombre del PDF en
+las once entradas de vía `descarga`/`centro`, pero la carpeta `formularios/` se queda vacía. Todo
+lo demás —el mapa de casillas, `proponerMapa`, `rellenarPdf`, la pantalla de Ajustes y el botón—
+está hecho y probado con PDF de mentira montados con la propia pdf-lib (que es, además, más fiable
+que probar contra un PDF real de la Junta que puede cambiar de un día para otro). El mecanismo
+funciona en cuanto se copien los once PDF, uno a uno, sin tocar ni una línea de código: la lista de
+cuáles faltan queda en `docs/COLA.md`. Es exactamente el caso que el propio encargo preveía.
+
+**Por qué `proponerMapa` mira "código" antes que "centro".** La regla de la tabla dice "centro,
+denominación, instituto (y no código)": una casilla llamada "código del centro" contiene la
+palabra "centro", así que si la regla de `{{CENTRO}}` se mirase primero, ganaría por error. El
+orden de las comprobaciones es la propia regla, no un detalle de implementación: primero "código"
+(-> `{{CODIGO CENTRO}}`), luego "domicilio/dirección junto a centro" (-> `{{DIRECCION CENTRO}}`,
+que también contendría "centro"), y solo entonces "centro" a secas.
+
+**Por qué el botón cuelga de un atributo (`data-clave-formulario`) y no envuelve nada nuevo.**
+`js/formularios.js` (fila 82) ya pinta la lista de un hito y la línea "Formularios" de la ficha; en
+vez de que `js/formularios-rellenar.js` reimplemente esa pintura o envuelva las funciones que la
+hacen, `js/formularios.js` gana un atributo `data-clave-formulario` en cada chip (dos líneas de
+cambio, ya en `main` gracias a la fila 82). `js/formularios-rellenar.js` solo necesita saber qué
+asunto está abierto (lo consigue envolviendo `App.abrirFicha`, como el resto de módulos que
+cuelgan un botón de la ficha) y vigilar la ficha con un `MutationObserver` para colgar el botón en
+cuanto aparezca un chip nuevo, sin tocar el fichero de la fila 82 más que en ese punto previsto.
+
+**Un fallo de coordinación con la sesión de la PR #63, para que quede escrito.** Esta sesión hizo
+su propia fila 81 completa (cargos, membrete, `Docx.ponerImagen`) sin saber que otra sesión, en
+paralelo, la estaba haciendo también — las dos partieron del mismo `docs/COLA-NUEVAS-2026-09-20.md`
+casi a la vez. Se detectó a tiempo (Francisco avisó de que había "otra conversación corriendo") y
+se resolvió sin pisar nada: la PR duplicada se cerró sin fusionar, y la rama se sincronizó con
+`main` (`git checkout origin/main -- .` más `git rm` de los dos ficheros de Ajustes que la otra
+sesión no había separado igual) antes de seguir con la única fila que quedaba. Motivo para
+dejarlo escrito: cuando dos sesiones parten del mismo documento de instrucciones nuevas casi a la
+vez, conviene comprobar pronto (antes de escribir mucho código) si alguna ya está en marcha.
+
+Ficheros nuevos: `js/formularios-rellenar.js`, `pruebas/formularios-rellenar.mjs`. Tocados:
+`datos/formularios.json` (clave `f`), `js/formularios.js` (`data-clave-formulario`),
+`js/plantillas.js` (`provincia`), `js/plantillas-ajustes.js` e `index.html` (el campo Provincia),
+`js/copias.js` (`formularios-campos.json`, decimoctavo fichero compartido),
+`js/ajustes-centro.js` (engancha "Impresos oficiales"), `js/envolturas-esperadas.js`. Batería
+completa en verde (86 ficheros de prueba), una sola pasada al final.
+
+## 20-sep-2026 — Fila 83: las plantillas de documento y de correo del centro
+
+`docs/PLANTILLAS-DEL-CENTRO.md`. Las filas 14 y 17 montaron la máquina de plantillas de correo y
+de documento; llevaban vacías desde entonces. Con la biblioteca de hitos ya llena (fila 80), y
+los cargos, el membrete (fila 81) y los formularios (fila 82) ya montados, esta fila por fin
+escribe los textos y los mete en la aplicación sin que Francisco tenga que subir nada a mano.
+
+**De dónde salen los `.docx`.** Viven en el repositorio, en `plantillas/`, como `.md` con un
+frontmatter (`nombre`, `tipo`, `categoria`; y, solo si es de documento, `tipoDocumento`, `texto`,
+`firmante`, `vistoBueno`). `scripts/hacer-plantillas.mjs` (a mano, nunca en Vercel ni en las
+pruebas) los convierte: monta el `.docx` de cero, como un ZIP, con lo mínimo que Word necesita
+(`[Content_Types].xml`, `_rels/.rels`, `word/document.xml`, `word/styles.xml` y
+`word/_rels/document.xml.rels`, este último vacío de relaciones a propósito: `Docx.ponerImagen`,
+de la fila 81, crea la suya la primera vez que un documento con esa plantilla se genera con
+membrete). Entiende cinco marcas: `# `/`## ` (título/subtítulo, en negrita), línea vacía como
+párrafo, `- ` lista, `> ` bloque a la derecha (la fórmula de firma) y `---` como salto de línea
+grueso (un borde inferior en un párrafo vacío). Nada más: no hace falta un conversor de Markdown
+completo para esto. Las de correo no generan ningún fichero: su cuerpo, ya a texto plano, se
+escribe directo en `plantillas/indice.json`.
+
+**Un hueco escrito con doble llave.** Al escribir de verdad los textos apareció un fallo latente
+de la fila 81: `{{NOMBRE NATURAL}}` (con espacio, mayúsculas) no encontraba la clave `nombreNatural`
+del catálogo (sin espacio, minúscula media), porque `resolverUnHueco` solo ignoraba mayúsculas y
+tildes, no los espacios. Se arregló comparando sin ningún espacio en ninguno de los dos lados
+(`sinEspacios`, en `js/plantillas.js`), así que ahora **cualquier** hueco, no solo los de la fila
+81, se puede escribir con doble llave en las plantillas del centro, de forma uniforme.
+`Plantillas.HUECOS` gana también `{{FORMULARIOS}}` (fila 82): los formularios del tipo y de los
+hitos del asunto, uno por línea.
+
+**Un párrafo que se queda vacío, desaparece.** `{{FORMULARIOS}}` sin ningún formulario se quedaba
+vacío pero dejaba una línea en blanco suelta en el papel. `js/docx.js` (`rellenarXml`) gana la
+regla: un párrafo que tenía texto de verdad antes de rellenar y se queda enteramente vacío después
+se quita del todo; uno que ya estaba vacío de partida (un salto de línea puesto a mano) no se
+toca.
+
+**El contenido escrito**: doce plantillas (ocho de documento, cuatro de correo), repartidas entre
+las tres categorías — no las cincuenta y tantas de la biblioteca de golpe, sino una muestra
+representativa y cuidada de cada caso (una corrección de conducta con su citación y su aviso, una
+sanción, un cambio de centro, un cese, una toma de posesión con dos firmas (empleado y dirección),
+un certificado con firma y visto bueno, un permiso, un pedido a proveedor, una reclamación de
+garantía): decisión tomada para no sacrificar la calidad y la comprobación de cada texto por
+llegar a un número. Queda para más adelante escribir el resto, tipo a tipo, con el uso.
+
+**El botón "Cargar las plantillas del centro"** (Ajustes → Mantenimiento, dentro de
+`js/plantillas-documento.js`, mismo patrón que "Cargar la biblioteca del centro" de la fila 80):
+lee `plantillas/indice.json`, descarga cada `.docx` a `_GESTOR/PLANTILLAS` y da de alta su fila en
+`plantillas.json`. Fusiona y no pisa: una plantilla con el mismo nombre y tipo que una ya
+existente se deja como está.
+
+Comprobado con `pruebas/plantillas-del-centro.mjs`: que `indice.json` cite ficheros que existen,
+que cada `.md` traiga su frontmatter completo, que **todo** hueco usado en los doce cuerpos esté
+en el catálogo (la prueba que de verdad importa: un hueco mal escrito sale tal cual en el papel,
+y esta prueba cazó los dos `{{ASUNTO}}` que se me habían escapado al escribir los primeros
+borradores, huecos que sonaban bien pero no existían), que cada `.docx` se pueda releer con
+`Docx.leerEntradaDeTexto`, y que `{{FORMULARIOS}}` vacío no deje una línea suelta. Batería
+completa en verde, una sola pasada al final.
+
+## 20-sep-2026 — Fila 82: los formularios oficiales, a un clic
+
+`docs/FORMULARIOS-OFICIALES.md`. El catálogo de 29 impresos del trámite de escolarización y
+convivencia ya estaba escrito, en otro repositorio (`fmargon780/normativa-escolarizacion`,
+`datos/formularios.json`): esta fila lo trae aquí, tal cual (`get_file_contents`, sin tocar nada),
+y lo cuelga de los sitios donde de verdad hace falta un impreso — un hito, un tipo de asunto, la
+ficha del asunto — en vez de salir a buscarlo.
+
+**Se copia, no se lee en vivo.** La red del centro bloquea direcciones que no hacen falta, y la
+aplicación trabaja sobre ficheros del ordenador: depender de otra web para pintar una pantalla
+habría sido frágil. `js/formularios.js` lo lee con `fetch` relativo del propio sitio, una sola vez
+por sesión; el botón "Actualizar el catálogo" (Ajustes → Mantenimiento) fuerza a releerlo, para
+cuando se publique una versión de la aplicación con más formularios.
+
+**Dónde se elige.** Un paso de guía (y, copiado, un hito modelo de la biblioteca y un hito vivo)
+gana `formularios: [clave, ...]`, con el mismo criterio que la normativa de la fila 79: solo en el
+paso de arriba, nunca en una opción. El buscador con casillas se pinta DENTRO del mismo `<details>`
+de normativa —`HitosNormativa.bloqueHTML` gana un segundo argumento, `formulariosHTML`, en vez de
+crear un `<details>` hermano— para no alargar más la pantalla del paso, tal y como pedía el
+encargo. Un tipo de asunto también gana su propia lista, en "Datos del tipo", para lo que no
+depende de ningún paso concreto.
+
+**Dónde se ven.** En el cuerpo de un hito vivo, igual que la normativa: un enlace con aspecto de
+botón para los de vía "descarga"/"centro" (hay un impreso real que bajar), un aviso —con su nota,
+si la tiene— para "protocolo"/"seneca" (no hay nada que descargar, y no debía parecer que sí). En
+la ficha del asunto, una línea nueva "Formularios" dentro de "Datos del trámite", con los de todos
+los hitos VISIBLES del asunto (la rama en curso, sin repetir) más los del tipo; como hace falta leer
+los hitos —async— y `datosDelAsunto` es síncrona, se pinta un hueco vacío y `js/formularios.js` lo
+rellena después, envolviendo `App.abrirFicha` (mismo patrón que ya usan `js/correo.js` y
+`js/plantillas-documento.js`). Y una pantalla propia "Formularios", con su entrada en la barra
+lateral junto a "Qué me toca" y "Cuentas": el catálogo entero, buscable, agrupado por norma, para
+cuando hace falta un impreso sin tener un asunto delante.
+
+Comprobado con `pruebas/formularios.mjs` (sin navegador: solo las dos funciones puras, `buscar` y
+`etiquetaDeVia`) y `pruebas/nombres-app.mjs` (ningún nombre de `App` repetido). Batería completa en
+verde, una sola pasada al final.
+
+## 20-sep-2026 — Fila 81: los firmantes del centro y el membrete
+
+`docs/FIRMANTES-Y-MEMBRETE.md`. Un documento generado salía sin membrete y con una firma fija
+escrita a mano en `plantillas.json`. Dos problemas de fondo: las personas que ocupan un cargo
+cambian, y un documento antiguo debería seguir diciendo quién firmaba entonces; y el membrete
+llevaba el nombre de la Consejería dentro de la imagen, así que un cambio de nombre obligaba a
+rehacer la imagen entera.
+
+**Los cargos, con fechas.** `_GESTOR/cargos.json` (decimoséptimo fichero compartido) guarda, por
+cargo, quién lo ha ocupado y desde/hasta cuándo (`hasta` vacío = sigue). `js/cargos.js`
+(`Cargos.enFecha`) resuelve por texto `AAAA-MM-DD`, sin `Date`, para no arrastrar líos de huso
+horario ni depender de que la sesión y el reloj del sistema coincidan de un día para otro. Sin
+fichero, nace con seis cargos de fábrica sin ningún ocupante: Dirección, Vicedirección, Jefatura de
+Estudios, Secretaría, Administración, Orientación. La pantalla (`Cargos.pintarEnAjustes`) vive en
+el mismo fichero que el modelo, como ya hacía `js/recurrentes.js`: separar en un "-ajustes.js" no
+lo pedía el encargo y habría sido una fila más para nada.
+
+**Quién firma cada plantilla.** Cada fila de `documentos[]` en `plantillas.json` gana `firmante`
+y `vistoBueno` (el `id` de un cargo). Los huecos nuevos (`{{FIRMANTE}}`, `{{CARGO FIRMANTE}}`,
+`{{TRATAMIENTO FIRMANTE}}` y su pareja de visto bueno, más `{{CONSEJERIA}}`) van con **doble
+llave**, resueltos aparte de los huecos normales de una sola llave, antes de que
+`Plantillas.rellenar` los vea: con una sola llave, `{CARGO FIRMANTE}` funciona igual de bien
+mientras el texto no lleve nada raro alrededor, pero deja las dos llaves de fuera sueltas en el
+papel en cuanto el hueco viene escrito `{{...}}` (que es como pide escribirlo la fila 83, para que
+no se confunda con un dato de asunto corriente) — así que `Plantillas.rellenar` gana un paso previo
+genérico para cualquier hueco reconocido entre llave doble, no solo para `{{LO QUE FALTA}}` como
+hasta ahora.
+
+**El membrete, sin el nombre de la Consejería dentro.** La imagen (PNG/JPG) se sube una vez, en
+Ajustes → El centro → Membrete, a `_GESTOR/PLANTILLAS/membrete.png`: la única vez que la aplicación
+escribe en esa carpeta (el resto de `PLANTILLAS/` sigue siendo de Francisco). El nombre de la
+Consejería se escribe ENCIMA al generar (`js/membrete.js`, `Membrete.montar`), con un `<canvas>` y
+`createImageBitmap`, según una caja en % del ancho/alto de la imagen (así vale igual si la imagen
+cambia de tamaño). `Membrete.medir` (sin efectos, con las pruebas de siempre) decide el tamaño de
+letra —bajándolo hasta un mínimo del 55 % si no cabe— y, si ni así cabe, parte el texto en dos
+líneas por el espacio más parejo; como no hay canvas en las pruebas, el ancho se estima con un
+factor medio de letra de palo seco, que basta para decidir "cabe"/"no cabe" sin arrastrar la
+máquina de pintar a un contexto sin DOM. La vista previa de Ajustes, en vivo, usa `Membrete.dibujar`
+sobre la imagen y los valores TODAVÍA SIN GUARDAR del formulario: así se ve el resultado de cambiar
+un número sin tener que guardar primero para comprobarlo.
+
+**Meter la imagen en el `.docx`.** `Docx.ponerImagen` (nuevo en `js/docx.js`) busca el párrafo
+`{{MEMBRETE}}` en `word/document.xml` y en cada `word/headerN.xml` (con la misma reparación de
+huecos partidos entre varios `<w:t>` que ya usa `rellenar`, para que un corrector ortográfico de
+Word no rompa la detección) y lo sustituye por un párrafo con un `<w:drawing>` en línea, a 17 cm de
+ancho. Añade la imagen al ZIP, la relación que le toque —creando el `.rels` de cero si el `.docx`
+no traía ninguno— y el tipo `png` a `[Content_Types].xml` si falta. Se aplica ANTES de `rellenar`,
+porque busca el hueco en el XML tal cual viene de la plantilla, no en el texto ya sustituido.
+
+Comprobado con `pruebas/cargos.mjs` (fechas contadas desde hoy, nunca escritas a mano),
+`pruebas/membrete.mjs` (solo `medir`, que es la parte sin efectos) y un escenario nuevo de
+`pruebas/plantillas-documento.mjs` que construye un `.docx` de mentira con `{{MEMBRETE}}` y
+`{{FIRMANTE}}`/`{{TRATAMIENTO FIRMANTE}}`, comprueba con Python `zipfile` (lector independiente del
+propio de `js/docx.js`) que el ZIP de salida es válido, y que el firmante sale del cargo en la
+fecha del documento. Batería completa en verde, una sola pasada al final.
+
+## 20-sep-2026 — Fila 80: cargar el contenido de la biblioteca
+
+`docs/CARGAR-BIBLIOTECA.md`. Con la herramienta de la fila 79 ya hecha, esta fila la llena con el
+contenido que Francisco y Claude prepararon en otra conversación (`docs/contenido/BIBLIOTECA-
+ALUMNADO.md`, `-PERSONAL.md` y `-EMPRESAS-Y-OTROS.md`, cerca de 55 tipos de asunto de un IES
+andaluz).
+
+**Cómo se carga.** `herramientas/cargar-biblioteca.mjs` (Node, se ejecuta a mano cuando el
+contenido cambie) lee los tres documentos y escribe `datos-biblioteca/biblioteca-centro.json`, un
+dato estático más de la aplicación (como `js/lib/pdf.min.mjs`). `js/cargar-biblioteca.js` es el
+botón nuevo en Ajustes → Mantenimiento, "Cargar la biblioteca del centro": lo lee con `fetch` y lo
+fusiona con `tipos.json`, `campos.json`, `hitos-biblioteca.json` y `guias.json` — nunca pisa nada
+ya escrito, y se puede pulsar más de una vez sin duplicar.
+
+**Decisiones del programa que carga el contenido, para que quede escrito por qué:**
+
+- El tramo de "plazo" de cada línea del documento (casi siempre una frase — "el mismo día", "antes
+  de imponer nada, sin excepción" — no un número) **no** se convierte al campo `plazo` de la
+  aplicación (una fecha calculada, `{dias, desde}`): eso habría rellenado casi todos los plazos con
+  una interpretación mía, exactamente lo que la regla 3 del encargo prohíbe ("los plazos que el
+  documento deja vacíos, se dejan vacíos"). Se deja como parte de la explicación del hito. Lo mismo
+  con "comunica:" (a quién se avisa, no la plantilla del correo: esa se escribe con el uso).
+- **Un hito que se repite se guarda una sola vez**: se deduplica por título + responsable exactos.
+  Con 69 tipos y cerca de 300 líneas de hito, sin esto la biblioteca habría nacido con decenas de
+  copias de "Grabar en Séneca". Dos hitos con el mismo título pero distinto responsable sí son dos
+  modelos: de verdad los hace gente distinta.
+- **"Mismos hitos que X."** (SUMINISTRO, OBRA y CONTRATO MENOR, en EMPRESAS, dicen literalmente que
+  tienen los mismos diez pasos que COMPRA): en vez de repetirlos, esos tipos apuntan a la misma
+  lista de modelos ya creada para COMPRA. Es el mismo mecanismo de la fila 79, ya en el contenido
+  de partida.
+- Dos campos (`Colectivo`, en PERSONAL; `Objeto`, en EMPRESAS) son de lista cerrada, pero sus
+  valores están explicados en la prosa de cada documento, no en la propia línea "Campos:": se
+  dejan a mano en el programa (`CAMPOS_LISTA_CONOCIDOS`), más fiable que adivinar una enumeración
+  dentro de un párrafo.
+- `CONTRATO MENOR` es, según la prosa del documento, "el tipo que hoy se llama CONTRATO": una
+  frase así no se intenta parsear sola, va a mano en `RENOMBRES_ESPECIALES`.
+
+**Lo que no ha resuelto solo, y queda a la vista de Francisco:** con la regla de arriba de que el
+segmento sin prefijo después del responsable es "el plazo" y no una explicación, unas pocas líneas
+del documento (el propio responsable escrito como una frase, del tipo "el mismo día" o "según cuál
+sea") acaban guardadas tal cual en el campo `responsable` del modelo. No es un dato perdido ni un
+error de guardado: se ve rarísimo como una insignia corta, pero está todo el texto. Se corrige a
+mano, en dos clics, desde Ajustes → El centro → Biblioteca de hitos → Editar el modelo (el mismo
+editor de un paso que ya existía).
+
+Comprobado con `pruebas/cargar-biblioteca.mjs` (jsdom, un contenido pequeño inventado para la
+prueba, no el real): altas, renombrados con nombre corto, modelos compartidos entre dos tipos,
+campos propios, una guía ya escrita a mano que no se toca, y que cargarlo dos veces no duplica
+nada. El contenido real se ha comprobado a mano mirando la salida de
+`node herramientas/cargar-biblioteca.mjs` (69 tipos, 296 modelos, 69 guías, 21 tipos con campos
+propios) y revisando varios tipos completos contra el documento de origen.
+
+## 20-sep-2026 — Fila 79: la biblioteca de hitos del centro
+
+`docs/BIBLIOTECA-DE-HITOS.md`. Hasta hoy la guía de un tipo se escribía a mano, paso por paso, sin
+reutilizar nada entre tipos casi idénticos. Se construye una **biblioteca de hitos del centro**:
+una colección de hitos modelo, guardada una sola vez en `_GESTOR/hitos-biblioteca.json` (el
+decimosexto fichero compartido), que se trae a la guía de un tipo como copia.
+
+**Lo que ve Francisco**, con detalle en `docs/contexto/HITOS-Y-GUIAS.md` (sección nueva) y
+`docs/contexto/CAMPOS-Y-TIPOS.md`: "+ Traer de la biblioteca" y "Guardar en la biblioteca" en el
+cuadro de la guía; el aviso ámbar de un paso desactualizado en la pantalla de un tipo, con "Ver el
+cambio"; un hito puede marcarse "Solo informativo" (se ve, no reclama trabajo) y llevar su
+normativa citada, con enlace al sistema de normativa del centro; un Tipo de Asunto puede llevar un
+nombre corto para el nombre de la carpeta; el bloque "Biblioteca de hitos" en Ajustes → El centro.
+
+**El truco de "solo hay un cuadro de diálogo".** Toda la aplicación tiene una sola regla de oro
+para `U.preguntar`: nunca dos a la vez. "Traer de la biblioteca" y "Guardar en la biblioteca"
+pasan mientras el cuadro de la guía SIGUE ABIERTO, así que no pueden abrir un segundo
+`U.preguntar`: se resuelven con un panel dentro del propio cuadro, con el mismo patrón que ya
+usaba "guia-enlace-fila". En cambio, la revisión automática al pulsar Guardar
+(`GuiasBiblioteca.revisarAlGuardar`) se dispara DESPUÉS de que `U.preguntar` haya cerrado `#capa`
+al resolver su promesa: ahí sí se puede volver a abrir un cuadro, uno por paso cambiado. Las dos
+mitades del mismo problema, resueltas de dos formas distintas porque el momento en que se disparan
+es distinto.
+
+**Qué cuenta como cambio, y qué no.** `HitosBiblioteca.diferencias` compara un paso con su modelo
+por: título, explicación, responsable, estado del asunto, plazo, requisitos, comunicación y
+normativa. `soloInformativo` queda fuera a propósito (es una decisión de cada tipo, no del
+modelo). El aviso en los DEMÁS tipos (apartado 4.4) no compara contenido en directo: compara
+`origenBiblioteca.revision` contra la del modelo. Así, "Solo en este tipo" y "Dejarlo como está"
+pueden silenciar el aviso para siempre (marcando `divergido: true`, o subiendo la `revision`
+apuntada) aunque el contenido del paso siga siendo distinto del modelo — es la propia decisión de
+Francisco de que esa copia es suya, no un olvido que haya que seguir recordándole.
+
+**El arreglo suelto del apartado 9: el tipo renombrado que resucitaba.** `App.renombrarTipo`
+cambiaba el nombre y guardaba, pero nunca marcaba el nombre viejo como borrado en
+`js/borrados-fusion.js` (fila 77): `App.fusionarConDisco` veía el nombre viejo como algo que el
+otro ordenador tenía de más, y lo devolvía a la vida como tipo fantasma en cuanto alguien guardara
+cualquier otra cosa con su copia vieja en memoria — exactamente lo que le pasó a Francisco con
+ANULACIÓN/ANULACIÓN MATRÍCULA y con DTMA. Mismo arreglo en `App.renombrarEstado`
+(`js/ajustes-centro.js`); los tipos de documento no tienen función de renombrar, así que no
+aplica. De paso, `App.borrarTipo` ya no cuenta como "en uso" un tipo cuyo nombre figura como alias
+de otro tipo vivo: sin eso, un tipo fantasma no se podía borrar nunca, porque las carpetas
+archivadas con su nombre viejo se le seguían adjudicando a él.
+
+**Lo que se ha dejado fuera, a propósito, de esta fila:**
+
+- El `?v=` de caché en los `<script>` de `index.html` (para que una publicación nueva llegue
