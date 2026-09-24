@@ -49,7 +49,6 @@ var FichaTarjetas = (function () {
 
   function $(id) { return document.getElementById(id); }
   function raiz() { return $('ficha-tarjetas'); }
-  function plural(n, uno, varios) { return n + ' ' + (n === 1 ? uno : varios); }
 
   /* ---------- el HTML (lo pide js/ficha-asunto.js) ---------- */
 
@@ -287,118 +286,13 @@ var FichaTarjetas = (function () {
     turnoResumen = setTimeout(function () { resumirTodas(); pintarFranja(); pintarPestanas(); ajustarAlto(); }, 80);
   }
 
-  function ponerCuenta(id, texto) {
-    var r = raiz();
-    var el = r && r.querySelector('.ficha-cuenta[data-cuenta-tarjeta="' + id + '"]');
-    if (el && el.textContent !== texto) el.textContent = texto;
-  }
-
-  /* `partes`: lista de { texto, clase, alPulsar }. Solo se rehace si
-     cambia lo que dice (así no despierta al observador en balde). */
-  function ponerResumen(id, partes, vacio) {
-    var r = raiz();
-    var caja = r && r.querySelector('.ficha-tarjeta[data-tarjeta="' + id + '"] > .ficha-tarjeta-resumen');
-    if (!caja) return;
-    var firma = JSON.stringify(partes.map(function (p) { return [p.texto, p.clase || '']; })) + (vacio ? '·v' : '');
-    if (caja.dataset.firma === firma) return;
-    caja.dataset.firma = firma;
-    caja.innerHTML = '';
-    caja.closest('.ficha-tarjeta').classList.toggle('ficha-tarjeta-vacia', !!vacio);
-    partes.forEach(function (p) {
-      var el = document.createElement(p.alPulsar ? 'button' : 'div');
-      if (p.alPulsar) {
-        el.type = 'button';
-        el.onclick = function (ev) { ev.stopPropagation(); p.alPulsar(); };
-      }
-      el.className = 'ficha-resumen-linea' + (p.clase ? ' ' + p.clase : '');
-      el.textContent = p.texto;
-      caja.appendChild(el);
-    });
-  }
-
-  function resumirHitos() {
-    var guia = $('ficha-guia');
-    if (!guia) return;
-    var filas = Array.prototype.filter.call(guia.querySelectorAll('.hito'), function (h) {
-      return !h.classList.contains('hito-noaplica');
-    });
-    if (!filas.length) {
-      ponerCuenta('hitos', '');
-      ponerResumen('hitos', [{ texto: 'ninguno todavía' }], true);
-      return;
-    }
-    var hechos = filas.filter(function (h) { return h.classList.contains('hito-hecho'); }).length;
-    ponerCuenta('hitos', hechos + '/' + filas.length);
-    var partes = [{ texto: hechos + ' de ' + filas.length + (filas.length === 1 ? ' hecho' : ' hechos'), clase: 'fuerte' }];
-    var siguiente = filas.filter(function (h) { return h.classList.contains('hito-encurso'); })[0] ||
-                    filas.filter(function (h) { return h.classList.contains('hito-pendiente'); })[0];
-    if (siguiente) {
-      var titulo = siguiente.querySelector('.hito-titulo');
-      var meta = siguiente.querySelector('.hito-meta');
-      partes.push({ texto: 'Siguiente: ' + (titulo ? titulo.textContent.trim() : '') });
-      if (meta && meta.textContent.trim()) partes.push({ texto: meta.textContent.trim(), clase: 'suave' });
-    }
-    ponerResumen('hitos', partes, false);
-  }
-
-  function resumirDocumentos() {
-    var docs = documentosDeLaCarpeta();
-    if (!docs.length) {
-      var caja = $('ficha-documentos');
-      var leyendo = caja && /Leyendo/.test(caja.textContent || '');
-      ponerResumen('documentos', [{ texto: leyendo ? 'Leyendo…' : 'ninguno todavía' }], !leyendo);
-      return;
-    }
-    var partes = [{ texto: plural(docs.length, 'documento', 'documentos'), clase: 'fuerte' }];
-    docs.forEach(function (d) {
-      partes.push({ texto: d.nombre, clase: 'ficha-resumen-doc', alPulsar: function () { abrirDocumento(d.nombre); } });
-    });
-    ponerResumen('documentos', partes, false);
-  }
-
-  function resumirNotas() {
-    var a = asuntoActual;
-    var ficha = a && ((App.E.registro && App.E.registro.asuntos && App.E.registro.asuntos[a.nombre]) || a.ficha);
-    var notas = (ficha && ficha.notas) || [];
-    ponerCuenta('notas', notas.length ? String(notas.length) : '');
-    if (!notas.length) { ponerResumen('notas', [{ texto: 'ninguna todavía' }], true); return; }
-    var n = notas[notas.length - 1];
-    var cuando = n.cuando ? U.fechaLegible(U.aAaMmDd(String(n.cuando).slice(0, 10))) : '';
-    ponerResumen('notas', [
-      { texto: plural(notas.length, 'nota', 'notas'), clase: 'fuerte' },
-      { texto: [n.quien, cuando].filter(Boolean).join(' · '), clase: 'suave' },
-      { texto: String(n.texto || '').replace(/\s+/g, ' ').trim() }
-    ], false);
-  }
-
-  function resumirLista(id, cajaId, selector, nombreDe, uno, varios) {
-    var caja = $(cajaId);
-    if (!caja) return;
-    var filas = Array.prototype.slice.call(caja.querySelectorAll(selector));
-    var total = caja.dataset.cuenta ? parseInt(caja.dataset.cuenta, 10) : filas.length;
-    ponerCuenta(id, total ? String(total) : '');
-    if (!filas.length) {
-      var buscando = /Buscando|Leyendo/.test(caja.textContent || '');
-      ponerResumen(id, [{ texto: buscando ? caja.textContent.trim() : 'ninguno todavía' }], !buscando);
-      return;
-    }
-    var partes = [{ texto: plural(Math.max(total, filas.length), uno, varios), clase: 'fuerte' }];
-    filas.forEach(function (f) { partes.push({ texto: nombreDe(f) }); });
-    ponerResumen(id, partes, false);
-  }
-
-  function resumirTodas() {
-    if (!raiz()) return;
-    resumirHitos();
-    resumirDocumentos();
-    resumirNotas();
-    resumirLista('otros', 'ficha-otros', '.otros-asunto', function (b) { return b.dataset.nombre || b.textContent; },
-      'asunto', 'asuntos');
-    resumirLista('relacionados', 'ficha-relacionados', '.relacionado-fila', function (f) {
-      var s = f.querySelectorAll(':scope > span');
-      return s.length > 1 ? s[1].textContent : f.textContent;
-    }, 'persona', 'personas');
-  }
+  /* Los resúmenes viven en js/ficha-tarjetas-resumen.js (fila 114). */
+  var resumen = FichaTarjetasResumen.crear({
+    raiz: raiz, documentos: function () { return documentosDeLaCarpeta(); },
+    abrirDocumento: function (n) { abrirDocumento(n); }, abrir: function (id) { abrir(id); },
+    asunto: function () { return asuntoActual; }
+  });
+  function resumirTodas() { resumen.todas(); }
 
   /* ---------- que llene el alto visible, sin bajar ---------- */
 
@@ -420,6 +314,7 @@ var FichaTarjetas = (function () {
       var filas = Math.ceil(rejilla.querySelectorAll('.ficha-tarjeta').length / columnas);
       rejilla.style.minHeight = '';
       rejilla.style.height = Math.max(hueco, filas * 130) + 'px';
+      resumen.medir();   /* cuántos documentos caben enteros (fila 114) */
     }
   }
 

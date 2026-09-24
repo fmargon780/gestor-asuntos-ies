@@ -45,7 +45,10 @@ body.con-lector .ficha-tarjetas:not([data-abierta]) .ficha-tarjetas-rejilla {
 .ficha-tarjeta .ficha-cuenta:empty { display: none; }
 
 .ficha-tarjeta-resumen { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 4px; }
+/* `flex: none` (fila 114): un renglón no se encoge nunca por debajo de su
+   alto; lo que no cabe se corta entero (y en Documentos, «y N más»). */
 .ficha-resumen-linea {
+  flex: none;
   font-size: 13px; line-height: 1.35; color: var(--tinta);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;
 }
@@ -56,6 +59,7 @@ button.ficha-resumen-linea {
   color: var(--azul); cursor: pointer; max-width: 100%;
 }
 button.ficha-resumen-linea:hover { text-decoration: underline; }
+.ficha-resumen-mas { font-weight: 600; }
 .ficha-tarjeta-vacia .ficha-resumen-linea { color: var(--tinta-suave); }
 
 /* Cerrada: solo el resumen. Las "siempre" (Datos y contacto, Datos del

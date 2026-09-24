@@ -84,10 +84,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
 - Aspirantes sin Nº de identificación escolar: al escribirlo, se renombran sus carpetas abiertas.
 - Botón «Ruta» en la ficha: copia la ruta de su carpeta.
-- Ficha del tercero con "Datos y contacto" en una línea, cada dato con su copiar; su «Ver todo»
-  del alumno, en tarjetas (el alumno y cada tutor, con su nombre entero); ficha del
-  asunto en tarjetas (se abre una en grande; se vuelve pulsando otra vez su pestaña), con cabecera
-  en dos líneas y menú de tres puntos.
+- Ficha del tercero con "Datos y contacto" en una línea, con copiar; «Ver todo» del alumno en
+  tarjetas (alumno y tutores). Ficha del asunto en tarjetas (una se abre en grande; se vuelve
+  pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
 - Registrar un documento detecta el PDF ya sellado, lo renombra y guarda el original como
   "SIN SELLAR"; cada documento se puede asociar a un hito.
 - Terceros relacionados con un asunto, con altas por grupo (unidad, nivel, grupo propio), que

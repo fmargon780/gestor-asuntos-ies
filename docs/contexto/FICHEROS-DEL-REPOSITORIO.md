@@ -103,6 +103,7 @@ de `App` va después del fichero que lo define.
 | `js/guias-guion.js` | «Guion de este paso» en el editor de la guía, y `GuiasGuion.normalizar` (fila 109) |
 | `js/guias-mapa.js`, `css/guias-mapa.css` | El mapa de la guía (fila 113): `GuiasMapa.html` (pura) y abrirlo en Ajustes, dentro del editor de la guía y en la ficha de un asunto |
 | `js/guias-niveles.js` | Entrar y salir de las preguntas de dentro en el editor de la guía, e ir a un paso concreto (`GuiasNiveles`, fila 113, sacado de `js/guias.js`) |
+| `js/ficha-tarjetas-resumen.js` | Lo que enseña cada tarjeta cerrada de la ficha (`FichaTarjetasResumen`, fila 114, sacado de `js/ficha-tarjetas.js`): Documentos con 5 nombres como mucho y «y N más» |
 | `css/ficha-tarjetas.css` | El aspecto de la ficha en tarjetas (fila 107) |
 | `js/ficha-documentos.js` | Los documentos de la carpeta, en la ficha del asunto (separado de `js/ficha-asunto.js` en la fila 26); pone la clase `vacio` al bloque cuando no hay ninguno (fila 51); botón "Documentos ▾" en la cabecera del bloque (fila 52); el original "SIN SELLAR" en gris y "Asociar a un hito" en cada fila (fila 58) |
 | `js/ficha-tercero.js`, `css/ficha-tercero.css` | "Datos y contacto" del tercero: la línea resumen y la ventana "Ver todo" de personal y del resto (separado de `js/ficha-asunto.js` en la fila 37) |
@@ -229,6 +230,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/genero.mjs` | Prueba (navegador de verdad, fila 111, 24-sep-2026): alumna/alumno/sin dato, «El/La Director/a» con firmante mujer, marcas `:tutor1`, lo que no se toca (fechas, y/o, registros, webs), `faltan` al rellenar, forma partida en el Word, sexos del RegAlum/ficha/cargo y una plantilla del centro limpia |
 | `pruebas/cabecera-compacta.mjs` | Prueba (navegador de verdad, fila 112, 24-sep-2026): cabecera del asunto en dos líneas, sin volver repetidos ni línea de ruta, «GUION DEL HITO» a 250 px o menos a 1600×920, la pestaña abierta vuelve atrás, y sin desplazamiento lateral a 800 px |
 | `pruebas/guias-mapa.mjs` | Prueba (sin navegador, fila 113, 24-sep-2026): `GuiasMapa.html` con una guía de dos niveles de preguntas, sin y con hitos (camino resaltado, ramas en gris, «Fuera de la guía»), y `GuiasNiveles.caminoHasta` |
+| `pruebas/documentos-en-la-tarjeta.mjs` | Prueba (navegador de verdad, fila 114, 24-sep-2026): con 8 documentos, la tarjeta cerrada enseña como mucho 5 nombres y «y N más», sin la línea «8 documentos», sin renglones aplastados ni cortados, con `title`, y «y N más» abre la tarjeta |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |

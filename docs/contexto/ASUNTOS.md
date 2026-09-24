@@ -122,6 +122,12 @@ Datos del trámite) son los de siempre, y los sigue pintando el mismo módulo.
   `#ficha-otros[data-cuenta]`, que pone `js/otros-del-tercero.js`) y Personas. "Datos y contacto"
   y "Datos del trámite" (`.ficha-tarjeta-siempre`) enseñan su propio cuerpo, que ya es un resumen.
   Sin contenido: "ninguno todavía", en gris.
+- **Documentos, legibles** (24-sep-2026, fila 114, `docs/DOCUMENTOS-EN-LA-TARJETA.md`): los
+  resúmenes viven en `js/ficha-tarjetas-resumen.js` (`FichaTarjetasResumen.crear`, sacado de
+  `js/ficha-tarjetas.js`). Cada renglón lleva `title` con su texto y `flex: none` (antes se
+  aplastaban unos encima de otros). Documentos ya no dice «N documentos» (va en el círculo): como
+  mucho 5 nombres, o los que quepan enteros (`medir()`, que llama `ajustarAlto()`: alto de la caja
+  entre el de un renglón), y «y N más» (`.ficha-resumen-mas`), que abre la tarjeta en grande.
 - **Abrir en grande**: pulsar la tarjeta (menos en un botón, enlace o campo). `data-abierta` en
   `#ficha-tarjetas`; las demás pasan a pestañas (`#ficha-tarjetas-pestanas`, con su cuenta). Desde
   la fila 112 no hay "← Volver a las tarjetas": se vuelve pulsando otra vez la pestaña abierta
