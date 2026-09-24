@@ -112,6 +112,7 @@ Las filas 1 a 75 y 77 a 125 están **HECHAS**. Sus documentos siguen en `docs/`,
 
 | Nº | Instrucción | Estado |
 |---|---|---|
+| 127 | `docs/MEMBRETE-NO-SE-ENCUENTRA.md` (**URGENTE**, hacer la primera: el membrete se guarda pero la aplicación nunca lo encuentra; tres líneas de `js/membrete.js`) | PENDIENTE |
 | 126 | `docs/TIPO-QUE-CAMBIA-DE-NOMBRE.md` (un tipo que cambia de nombre se lleva guía, campos y plantillas; arreglo solo del tipo DESEMPEÑO FUNCIÓN TUTORIAL; «Buscar otra plantilla…» en cualquier hito) | EN CURSO (24-sep-2026) |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
