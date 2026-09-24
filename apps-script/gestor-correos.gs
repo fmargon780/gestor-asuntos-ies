@@ -18,23 +18,37 @@
    de otra carpeta, no solo en la raíz de «Mi unidad». Sin esto, los
    borradores con documentos se quedaban en "Borrador en camino".
 
+   24-sep-2026 (más tarde), fila 115, docs/ENVIAR-DESDE-EL-ASUNTO.md:
+   la aplicación web (doPost) manda el correo EN EL MOMENTO, llamada
+   directamente por el Gestor de Asuntos desde el cuadro de Correo. Se
+   acabó la carpeta intermedia de "mandar documentos por correo": los
+   encargos se quedaban sin recoger (comprobado el 24-sep-2026), y
+   Francisco tenía que irse del asunto a buscar el borrador a Gmail.
+   `mandarBorradores()` se queda tal cual, sin uso, por si quedara
+   algún encargo `.envio.json` antiguo suelto en la bandeja; no se
+   borra para no perder ese camino de rescate.
    ============================================================
-   Gestor de Asuntos — recogida de correos
+   Gestor de Asuntos — recogida de correos y envío desde el asunto
    Google Apps Script, en la cuenta g.educaand.es
 
-   ESTE FICHERO NO SE EJECUTA DESDE LA WEB. Es una copia de lo que hay
-   pegado en script.google.com. Si se cambia aquí, hay que volver a
-   pegarlo allí: el repositorio no lo despliega.
+   La recogida de correos (ETIQUETA GESTOR, GESTOR-BANDEJA en Drive) no
+   se ejecuta desde la web: es una copia de lo que hay pegado en
+   script.google.com. Si se cambia aquí, hay que volver a pegarlo allí.
 
-   Qué hace, cada minuto:
+   El ENVÍO (doPost) sí se ejecuta desde la web: es la aplicación web
+   que el Gestor de Asuntos llama directamente al pulsar "Confirmar y
+   enviar" en el cuadro de Correo. Hace falta implementarla (Ajustes →
+   Enviar correo, en la propia aplicación, explica los pasos) y pegar
+   aquí el código cada vez que cambie.
 
-   1. Manda los borradores pendientes (ver más abajo, "mandar
-      documentos por correo").
-   2. Mira los correos que tengan la etiqueta GESTOR.
-   3. De cada uno guarda una ficha en la carpeta GESTOR-BANDEJA de
+   Qué hace, cada minuto (recogerCorreos, con el disparador puesto por
+   prepararTodo):
+
+   1. Mira los correos que tengan la etiqueta GESTOR.
+   2. De cada uno guarda una ficha en la carpeta GESTOR-BANDEJA de
       Drive: remitente, fecha, asunto, texto y direcciones.
-   4. Guarda también el hilo en PDF y sus documentos adjuntos.
-   5. Le quita la etiqueta GESTOR y le pone GESTOR/Hecho, para no
+   3. Guarda también el hilo en PDF y sus documentos adjuntos.
+   4. Le quita la etiqueta GESTOR y le pone GESTOR/Hecho, para no
       volver a recogerlo.
    5. Y después lee seguidos.json, que escribe el Gestor de Asuntos con
       los hilos que ya están enganchados a un asunto. De esos hilos ya
@@ -44,17 +58,6 @@
 
    El Gestor de Asuntos lee esa carpeta en js/bandeja-correos.js.
    Este script no crea carpetas de asuntos ni toca nada del centro.
-
-   16-sep-2026, "mandar documentos por correo"
-   (docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md): el Gestor no puede
-   adjuntar ficheros a un correo desde el navegador, así que deja en
-   esta misma carpeta una copia de cada documento marcado y un encargo,
-   <id>.envio.json. mandarBorradores() los recoge, antes de recoger
-   correos, y monta un BORRADOR en Gmail (nunca lo envía) con los
-   adjuntos, respondiendo dentro del hilo si el encargo trae uno. Deja
-   <id>.listo.json (con el enlace a los borradores) o <id>.error.json
-   (con el motivo), y borra el .envio.json y las copias: un encargo no
-   puede repetirse cada minuto para siempre.
    ============================================================ */
 
 var ETIQUETA = 'GESTOR';
@@ -65,6 +68,8 @@ var MAX_POR_VUELTA = 20;
 var MAX_SEGUIDOS_POR_VUELTA = 40;
 var MAX_LETRAS_TEXTO = 6000;
 var MAX_ENCARGOS_POR_VUELTA = 20;
+var MAX_BYTES_ENVIO = 20 * 1024 * 1024;
+var PROPIEDAD_CLAVE = 'clave-envio';
 
 /* ---------- lo que hay que ejecutar una sola vez ---------- */
 
@@ -82,14 +87,36 @@ function prepararTodo() {
   ScriptApp.newTrigger('recogerCorreos').timeBased().everyMinutes(1).create();
 
   Logger.log('Listo. Etiquetas creadas, carpeta ' + carpeta.getName() +
-             ' preparada, y revisión cada minuto.');
+             ' preparada, y revisión cada minuto. Para el ENVÍO, implementa esto como ' +
+             'aplicación web (Implementar → Nueva implementación) y ejecuta prepararEnvio().');
+}
+
+/* Se ejecuta una sola vez, después de haber implementado el proyecto
+   como aplicación web (paso 3 de Ajustes → Enviar correo, en el
+   Gestor de Asuntos). Crea la clave si no existe y deja en el
+   registro de ejecución la línea que Francisco tiene que pegar en
+   Ajustes: la dirección de la aplicación web con la clave dentro. */
+function prepararEnvio() {
+  var propiedades = PropertiesService.getScriptProperties();
+  var clave = propiedades.getProperty(PROPIEDAD_CLAVE);
+  if (!clave) {
+    clave = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
+    propiedades.setProperty(PROPIEDAD_CLAVE, clave);
+  }
+  var url = '';
+  try { url = ScriptApp.getService().getUrl(); } catch (e) { url = ''; }
+  if (!url) {
+    Logger.log('Todavía no hay ninguna implementación como aplicación web. Ve a "Implementar" → ' +
+      '"Nueva implementación", tipo "Aplicación web", y vuelve a ejecutar prepararEnvio() para ' +
+      'conseguir la dirección.');
+    return;
+  }
+  Logger.log('Pega esto en el Gestor de Asuntos, en Ajustes → Enviar correo: ' + url + '?k=' + clave);
 }
 
 /* ---------- la vuelta de cada minuto ---------- */
 
 function recogerCorreos() {
-  mandarBorradores();
-
   var pendiente = etiqueta(ETIQUETA);
   var hecho = etiqueta(ETIQUETA_HECHO);
   var carpeta = carpetaBandeja();
@@ -289,13 +316,141 @@ function guardarHilo(hilo, carpeta, respuestaDe) {
   carpeta.createFile(id + '.json', JSON.stringify(ficha, null, 2), 'application/json');
 }
 
-/* ---------- mandar documentos por correo ----------
+/* ============================================================
+   ENVIAR EL CORREO DESDE EL ASUNTO (24-sep-2026, fila 115,
+   docs/ENVIAR-DESDE-EL-ASUNTO.md)
 
-   docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md, 16-sep-2026. El Gestor deja
-   en GESTOR-BANDEJA las copias de los documentos marcados y un
-   encargo, <id>.envio.json. Aquí se recogen, se monta el borrador (con
-   los adjuntos, que Gmail sí deja poner desde Apps Script) y nunca se
-   envía nada: siempre queda como borrador. */
+   La aplicación web de este mismo proyecto. El Gestor de Asuntos le
+   manda un POST, con el cuerpo en JSON, y `Content-Type: text/plain`
+   a propósito: así el navegador lo trata como una petición "simple" y
+   no hace la consulta previa CORS, que Apps Script no sabe contestar.
+
+   Cuerpo esperado:
+     { clave, para, cco, asunto, cuerpo, hilo,
+       adjuntos: [ { nombre, tipo, base64 } ], prueba }
+
+   `clave` se comprueba contra la propiedad del script que deja
+   prepararEnvio(); si no coincide, no se manda nada. También se
+   acepta por `e.parameter.k` (el `?k=` de la propia dirección), para
+   que Francisco solo tenga que pegar una cosa en Ajustes.
+
+   Con `hilo`: si el hilo existe y los destinatarios que se piden ya
+   son destinatarios del hilo (todos ellos), se responde DENTRO del
+   hilo, con `createDraftReply(...)` + `.send()` del borrador: eso
+   conserva el hilo y admite adjuntos y `bcc`. Si no, correo nuevo
+   (mismo camino, `createDraft(...)` + `.send()`): así el Message-ID de
+   lo mandado sale igual en los dos casos.
+
+   `prueba: true` (el botón "Probar" de Ajustes) manda el correo a la
+   propia cuenta, sin mirar `para`/`cco`.
+   ============================================================ */
+
+function doPost(e) {
+  var resultado;
+  try {
+    var cuerpo = {};
+    if (e && e.postData && e.postData.contents) {
+      cuerpo = JSON.parse(e.postData.contents);
+    }
+    var claveRecibida = cuerpo.clave || (e && e.parameter && e.parameter.k) || '';
+    var claveGuardada = PropertiesService.getScriptProperties().getProperty(PROPIEDAD_CLAVE);
+    if (!claveGuardada) {
+      resultado = { ok: false, motivo: 'Esta aplicación todavía no tiene clave. Ejecuta prepararEnvio() una vez.' };
+    } else if (claveRecibida !== claveGuardada) {
+      resultado = { ok: false, motivo: 'La clave no es correcta.' };
+    } else {
+      resultado = enviarCorreo(cuerpo);
+    }
+  } catch (err) {
+    resultado = { ok: false, motivo: 'No he podido enviar el correo: ' + (err && err.message ? err.message : err) };
+  }
+  return ContentService.createTextOutput(JSON.stringify(resultado)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function enviarCorreo(cuerpo) {
+  var esPrueba = !!cuerpo.prueba;
+  var para = esPrueba ? '' : String(cuerpo.para || '').trim();
+  var cco = esPrueba ? '' : String(cuerpo.cco || '').trim();
+  var asunto = String(cuerpo.asunto || '(sin asunto)');
+  var texto = String(cuerpo.cuerpo || '');
+
+  if (esPrueba) para = Session.getActiveUser().getEmail();
+  /* Un grupo va siempre en copia oculta: si no hay nadie en "Para",
+     Gmail necesita igualmente alguien ahí, y se pone la propia cuenta
+     de quien ejecuta el script (mismo caso de siempre). */
+  if (!para && cco) para = Session.getActiveUser().getEmail();
+  if (!para) return { ok: false, motivo: 'No hay ningún destinatario.' };
+
+  var adjuntosPedidos = cuerpo.adjuntos || [];
+  var attachments = [];
+  var total = 0;
+  for (var i = 0; i < adjuntosPedidos.length; i++) {
+    var a = adjuntosPedidos[i] || {};
+    if (!a.base64) continue;
+    var bytes;
+    try {
+      bytes = Utilities.base64Decode(a.base64);
+    } catch (e) {
+      return { ok: false, motivo: 'Un documento no se ha podido leer.' };
+    }
+    total += bytes.length;
+    if (total > MAX_BYTES_ENVIO) return { ok: false, motivo: 'Los documentos pesan más de 20 MB.' };
+    attachments.push(Utilities.newBlob(bytes, a.tipo || 'application/octet-stream', a.nombre || ('adjunto ' + (i + 1))));
+  }
+
+  var opciones = { attachments: attachments };
+  if (cco) opciones.bcc = cco;
+
+  var hiloId = String(cuerpo.hilo || '').trim();
+  var hilo = hiloId ? hiloParaResponder(hiloId, para, cco) : null;
+
+  try {
+    var mensaje;
+    if (hilo) {
+      mensaje = hilo.createDraftReply(texto, opciones).send();
+    } else {
+      mensaje = GmailApp.createDraft(para, asunto, texto, opciones).send();
+    }
+    return { ok: true, hilo: mensaje.getThread().getId(), matricula: matricula(mensaje) };
+  } catch (err) {
+    return { ok: false, motivo: 'Gmail no ha podido enviarlo: ' + (err && err.message ? err.message : err) };
+  }
+}
+
+/* Solo se responde DENTRO del hilo cuando todas las direcciones que se
+   piden (Para + Copia oculta) ya han recibido algún mensaje de ese
+   hilo: si el hilo existe pero se le añade alguien nuevo de golpe,
+   mejor un correo nuevo que mezclar destinatarios sin que nadie lo
+   haya decidido. */
+function hiloParaResponder(hiloId, para, cco) {
+  var hilo;
+  try { hilo = GmailApp.getThreadById(hiloId); } catch (e) { return null; }
+  if (!hilo) return null;
+  var yaEnHilo = direccionesDelHilo(hilo.getMessages());
+  var pedidas = todasLasDirecciones(para + ',' + cco);
+  if (!pedidas.length) return null;
+  var todasDentro = pedidas.every(function (d) { return yaEnHilo.indexOf(d) !== -1; });
+  return todasDentro ? hilo : null;
+}
+
+function todasLasDirecciones(texto) {
+  var vistas = {};
+  var salida = [];
+  String(texto || '').split(',').forEach(function (t) {
+    var c = quien(t).correo;
+    if (c && c.indexOf('@') !== -1 && !vistas[c]) { vistas[c] = true; salida.push(c); }
+  });
+  return salida;
+}
+
+/* ---------- mandar documentos por correo (16-sep-2026, sin uso) ----------
+
+   docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md. Sustituido por doPost, más
+   arriba (fila 115, 24-sep-2026): la carpeta intermedia y la revisión
+   cada minuto no funcionaban de fiar (los encargos se quedaban sin
+   recoger). Se deja esta función tal cual, sin llamarla desde
+   recogerCorreos, por si quedara algún encargo `.envio.json` antiguo
+   suelto en la bandeja de alguien: ejecutarla a mano lo rescata. */
 
 function mandarBorradores() {
   var carpeta = carpetaBandeja();
@@ -328,9 +483,6 @@ function mandarUnBorrador(fichero, carpeta) {
     if (hilo) {
       hilo.createDraftReply(encargo.cuerpo || '', opciones);
     } else {
-      /* Un grupo va siempre en copia oculta: si no hay nadie en "Para",
-         Gmail necesita igualmente alguien ahí, y se pone la propia
-         cuenta de quien ejecuta el script. */
       var destinatario = encargo.para || (encargo.cco ? Session.getActiveUser().getEmail() : '');
       GmailApp.createDraft(destinatario, encargo.asunto || '', encargo.cuerpo || '', opciones);
     }
@@ -438,7 +590,8 @@ function quien(texto) {
 }
 
 /* Todas las direcciones que aparecen en el hilo, sin repetir y sin la
-   tuya. Con ellas el Gestor busca al alumno en el RegAlum. */
+   tuya. Con ellas el Gestor busca al alumno en el RegAlum, y doPost
+   decide si un envío puede responder dentro del hilo. */
 function direccionesDelHilo(mensajes) {
   var mia = String(Session.getActiveUser().getEmail() || '').toLowerCase();
   var vistas = {};
