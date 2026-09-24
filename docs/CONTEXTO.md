@@ -22,6 +22,7 @@ que cambie algo general).
 | `docs/contexto/DOCUMENTOS-PDF.md` | Generar el documento de Word, separar/unir un PDF y ajustar su tamaño |
 | `docs/contexto/CORREO-Y-SENECA.md` | La bandeja de Gmail, sus adjuntos, las plantillas de correo y el cuadro de Séneca |
 | `docs/contexto/HITOS-Y-GUIAS.md` | Las guías del procedimiento, los hitos de un asunto, "Qué me toca" y "Cuentas" |
+| `docs/contexto/HITO-MESA.md` | El hito a pantalla completa (la mesa de trabajo), su guion y "Traer los guiones del instituto" (fila 109) |
 | `docs/contexto/CAMPOS-Y-TIPOS.md` | Los campos propios y calculados de cada tipo de asunto, y Ajustes de un tipo |
 | `docs/contexto/PANTALLA.md` | La cabecera fija, el refresco, la barra lateral, el tablón, el panel de lectura, la presencia |
 | `docs/contexto/FICHEROS-DEL-REPOSITORIO.md` | La tabla de todos los ficheros del repositorio, uno por uno |

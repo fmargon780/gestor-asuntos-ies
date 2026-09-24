@@ -174,6 +174,7 @@
       }
       if (window.HitosRequisitos) {
         try { await HitosRequisitos.marcarPorDocumento(asunto.nombre, hito.id, nombreDoc); } catch (e2) { /* no crítico */ }
+        if (Hitos.marcarGuionPorAccion) await Hitos.marcarGuionPorAccion(asunto, hito.id, 'generar');   /* fila 109 */
       }
       if (window.HitosPanel && HitosPanel.desplegarAlAbrir) HitosPanel.desplegarAlAbrir(asunto.nombre, hito.id);
     }

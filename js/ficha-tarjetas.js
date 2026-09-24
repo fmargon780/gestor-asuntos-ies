@@ -89,8 +89,15 @@ var FichaTarjetas = (function () {
 
   /* ---------- entrar, pintar, abrir y cerrar ---------- */
 
-  function alEntrar() {
-    abierta = pendienteAlEntrar;
+  /* Al entrar en una ficha, la cuadrícula. Pero si es la misma que ya
+     está a la vista (la aplicación la vuelve a abrir sola tras guardar
+     algo, por ejemplo al cerrar el cuadro de Correo o al generar un
+     documento), se queda la tarjeta que estuviera abierta. */
+  function alEntrar(a) {
+    var r = raiz();
+    var mismaALaVista = !!(a && asuntoActual && asuntoActual.nombre === a.nombre && r && r.offsetParent);
+    if (pendienteAlEntrar) abierta = pendienteAlEntrar;
+    else if (!mismaALaVista) abierta = null;
     pendienteAlEntrar = null;
   }
 
@@ -245,7 +252,10 @@ var FichaTarjetas = (function () {
     if (!r) return;
     Array.prototype.forEach.call(r.querySelectorAll('.ficha-tarjeta-franja'), function (f) {
       var t = f.closest('.ficha-tarjeta');
-      if (!abierta || t.dataset.tarjeta !== abierta || abierta === 'documentos') {
+      /* Con la mesa de un hito abierta, la franja no sale: la mesa ya
+         tiene sus documentos (fila 109). */
+      var conMesa = abierta === 'hitos' && document.querySelector('#ficha-guia.con-mesa');
+      if (!abierta || t.dataset.tarjeta !== abierta || abierta === 'documentos' || conMesa) {
         if (f.childNodes.length) f.innerHTML = '';
         delete f.dataset.firma;
         return;
@@ -427,6 +437,7 @@ var FichaTarjetas = (function () {
     html: html, alEntrar: alEntrar, alPintar: alPintar, abrirAlEntrar: abrirAlEntrar,
     abrir: abrir, cerrar: cerrar, cerrarSiAbierta: cerrarSiAbierta,
     abierta: function () { return abierta; },
+    alCambiarLaMesa: function () { pintarFranja(); },
     ajustarAlto: ajustarAlto
   };
 })();

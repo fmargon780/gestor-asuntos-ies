@@ -184,10 +184,15 @@
     } catch (e) { return []; }
   }
 
-  async function comunicar(a, hito, canal) {
+  /* `opciones` (fila 109, la mesa del hito): { correos: [...] } manda
+     sobre el destinatario resuelto, y { adjuntos: [...] } sobre los
+     documentos premarcados. */
+  async function comunicar(a, hito, canal, opciones) {
     var c = comunicacionDe(a, hito);
     var mensaje = c && c[canal];
     var destinatario = await resolverDestinatario(a, hito);
+    if (opciones && opciones.correos && opciones.correos.length) destinatario.correoPreferente = opciones.correos.join(', ');
+    if (opciones && opciones.nombres && opciones.nombres.length) destinatario.nombre = opciones.nombres.join(', ');
 
     var extra = {
       correoPreferente: destinatario.correoPreferente,
@@ -207,7 +212,9 @@
       extra.medioListo = Plantillas.rellenar(mensaje.cuerpo || '', valores).texto;
     }
 
-    if (canal !== 'seneca') extra.adjuntosMarcados = await documentosDelHitoEnCarpeta(a, hito);
+    if (canal !== 'seneca') {
+      extra.adjuntosMarcados = (opciones && opciones.adjuntos) ? opciones.adjuntos.slice() : await documentosDelHitoEnCarpeta(a, hito);
+    }
 
     if (!window.CorreoNucleo || !window.CorreoNucleo.abrirCuadro) return;
     window.CorreoNucleo.abrirCuadro(a, canal === 'seneca', extra);
@@ -246,6 +253,9 @@
   window.HitosComunicar = {
     canalesDe: canalesDe,
     comunicar: comunicar,
+    resolverDestinatario: resolverDestinatario,
+    buscarPersonaDelAsunto: buscarPersonaDelAsunto,
+    correosDePersona: correosDePersona,
     botonHTML: botonHTML,
     engancharBoton: engancharBoton
   };

@@ -73,7 +73,10 @@ window.HitosDocumentoMenu = (function () {
 
   async function accionRegistrar(a, hito, nombre) {
     var antesNombres = await ficherosDeLaCarpeta(a);
-    await Registro.abrirCuadro(a, nombre, function () { trasElCambio(a, hito, antesNombres); });
+    await Registro.abrirCuadro(a, nombre, function () {
+      trasElCambio(a, hito, antesNombres);
+      if (Hitos.marcarGuionPorAccion) Hitos.marcarGuionPorAccion(a, hito.id, 'registrar');   /* fila 109 */
+    });
   }
 
   async function abrirHerramientaPdf(a, hito, nombre, accion) {
@@ -122,6 +125,19 @@ window.HitosDocumentoMenu = (function () {
           } });
         }
       }
+    }
+    /* Fila 109 (la mesa del hito): renombrar el documento (el cuadro de
+       siempre, que ya cambia su nombre también en el hito) y moverlo a
+       otro hito. */
+    if (!falta && window.Documentos && Documentos.abrir) {
+      opciones.push({ texto: 'Renombrar', alPulsar: function () { Documentos.abrir(a, { hito: hito, ponerNombre: nombre }); } });
+    }
+    if (window.HitoMesaDocumentos && HitoMesaDocumentos.moverAOtroHito) {
+      opciones.push({ texto: 'Mover a otro hito', alPulsar: function () {
+        var datos = Hitos.ultimosLeidos && Hitos.ultimosLeidos();
+        var entrada = datos && datos.porAsunto && datos.porAsunto[a.nombre];
+        HitoMesaDocumentos.moverAOtroHito(a, hito, entrada ? entrada.hitos : [], [nombre]);
+      } });
     }
     if (opciones.length) opciones.push({ raya: true });
     opciones.push({

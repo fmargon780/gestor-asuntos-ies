@@ -344,6 +344,8 @@ await comprobar('p4 enseña el tercero del asunto como responsable',
 /* ================= ESCENARIO 5: cambiar de rama ================= */
 
 console.log('--- escenario 5: cambiar de rama ---');
+/* Fila 109: pulsar un hito abre su mesa; antes, se vuelve a la lista. */
+await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());
 await pagina.locator('#ficha-guia .hito[data-id="p3a1"] .hito-titulo').click();
 await pagina.fill('#ficha-guia .hito[data-id="p3a1"] .hito-nota-texto', 'Entregado en mano el lunes');
 await pagina.locator('#ficha-guia .hito[data-id="p3a1"] .hito-nota-anadir').click();
@@ -354,6 +356,8 @@ await comprobar('la nota se ha guardado',
     return h.notas.length;
   }), 1);
 
+/* Fila 109: pulsar un hito abre su mesa; antes, se vuelve a la lista. */
+await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());
 await pagina.locator('#ficha-guia .hito[data-id="p3"] .hito-titulo').click();
 await pagina.locator('#ficha-guia .hito[data-id="p3"] .hito-cambiar-rama').click();
 await pagina.locator('#ficha-guia .hito[data-id="p3"] .hito-cuerpo .hito-opcion', { hasText: 'Por email' }).click();
@@ -380,6 +384,8 @@ await pagina.evaluate(async (clave) => {
   carpeta._hijos.set('260907 DNI Marina.pdf', window.__disco.fich('260907 DNI Marina.pdf', 'el dni'));
 }, CLAVE);
 
+/* Fila 109: pulsar un hito abre su mesa; antes, se vuelve a la lista. */
+await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
 await pagina.waitForSelector('#ficha-guia .hito[data-id="p1"] .hito-anadir-documento');
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-anadir-documento').click();
@@ -397,6 +403,8 @@ await comprobar('y queda guardado en hitos.json',
   leerHitosDeDisco().then(e => e.hitos.find(h => h.id === 'p1').documentos), ['260907 SOLICITUD Marina.pdf']);
 
 console.log('--- se vuelve a abrir el cuadro: sale marcado; se desmarca y desaparece ---');
+/* Fila 109: pulsar un hito abre su mesa; antes, se vuelve a la lista. */
+await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-anadir-documento').click();
 await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Uno que ya está en la carpeta' }).click();
@@ -431,19 +439,22 @@ await pagina.evaluate(async (clave) => {
   window.HitosPanel.programarRepintado();
 }, CLAVE);
 await pagina.waitForTimeout(400);
+/* Fila 109: pulsar un hito abre su mesa; antes, se vuelve a la lista. */
+await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
 
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-documento[data-doc="260907 DNI Marina.pdf"] .hito-doc-menu-boton').click();
 await pagina.waitForSelector('.ficha-menu:not(.oculto)');
-await comprobar('en un documento "(ya no está)", el menú solo trae "Quitar del hito"',
-  pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents(), ['Quitar del hito']);
+/* Fila 109: también "Mover a otro hito" (y "Renombrar" si el documento está). */
+await comprobar('en un documento "(ya no está)", el menú solo trae "Mover a otro hito" y "Quitar del hito"',
+  pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents(), ['Mover a otro hito', 'Quitar del hito']);
 await pagina.keyboard.press('Escape');
 
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-documento[data-doc="260907 SOLICITUD Marina.pdf"] .hito-doc-menu-boton').click();
 await pagina.waitForSelector('.ficha-menu:not(.oculto)');
 await comprobar('en un PDF que sí está y aún sin registro, el menú trae las herramientas y "Quitar del hito"',
   pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents(),
-  ['Registrar', 'Separar', 'Unir', 'Sacar páginas', 'Ajustar tamaño', 'Quitar del hito']);
+  ['Registrar', 'Separar', 'Unir', 'Sacar páginas', 'Ajustar tamaño', 'Renombrar', 'Mover a otro hito', 'Quitar del hito']);
 await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Quitar del hito' }).click();
 await pagina.waitForTimeout(400);
 await comprobar('"Quitar del hito" solo desapunta (mismo efecto que la ✕ de antes), nunca borra el fichero',

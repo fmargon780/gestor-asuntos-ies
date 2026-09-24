@@ -132,21 +132,25 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await comprobar('2. y se ve la caja de escribir la nota',
     pagina.locator('#ficha-notas textarea').first().isVisible(), true);
 
-  /* 4. */
+  /* 4. Desde la fila 109, un hito se abre a pantalla completa (su mesa)
+     en vez de desplegarse: la franja sale con la lista de hitos, y con
+     la mesa abierta se esconde (la mesa ya tiene sus documentos). */
   await pagina.click('#ficha-tarjetas-pestanas .ficha-pestana[data-tarjeta="hitos"]');
-  await comprobar('4. sin hito desplegado, la franja trae todos los documentos',
+  await comprobar('4. con la lista de hitos, la franja trae todos los documentos',
     pagina.locator('.ficha-tarjeta.abierta .ficha-chip-doc').count(), 3);
-  await pagina.locator('#ficha-guia .hito[data-id="m1"] .hito-desplegar').click();
-  await pagina.waitForTimeout(200);
-  await comprobar('4. con el primer hito desplegado, solo su documento',
-    pagina.locator('.ficha-tarjeta.abierta .ficha-chip-doc').allTextContents(), [DOCS[0]]);
-  await pagina.locator('.ficha-tarjeta.abierta .ficha-chip-doc').first().click();
+  await pagina.locator('.ficha-tarjeta.abierta .ficha-chip-doc', { hasText: DOCS[0] }).click();
   await pagina.waitForSelector('body.con-visor');
   await pagina.waitForTimeout(300);
   await comprobar('4. el chip abre el documento a la derecha, sin cerrar la tarjeta', abierta(pagina), 'hitos');
   await comprobar('4. y el chip queda marcado',
     pagina.locator('.ficha-tarjeta.abierta .ficha-chip-doc.activo').textContent(), DOCS[0]);
-  await comprobar('4. el hito sigue desplegado',
+  await pagina.locator('#ficha-guia .hito[data-id="m1"] .hito-desplegar').click();
+  await pagina.waitForTimeout(200);
+  await comprobar('4. con la mesa del hito abierta, la franja no sale',
+    pagina.locator('.ficha-tarjeta.abierta .ficha-chip-doc').count(), 0);
+  await comprobar('4. la mesa enseña el documento del hito',
+    pagina.locator('#ficha-guia .hito-en-mesa .hito-documento').allTextContents().then((t) => t.join(' ').indexOf(DOCS[0]) !== -1), true);
+  await comprobar('4. la mesa del hito sigue abierta con el documento a la derecha',
     pagina.locator('#ficha-guia .hito[data-id="m1"] .hito-cuerpo').isVisible(), true);
 
   /* 3. */
@@ -163,6 +167,9 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await pagina.keyboard.press('Escape');
   await pagina.waitForTimeout(200);
   await comprobar('5. el primer Escape cierra el documento y deja la tarjeta', abierta(pagina), 'hitos');
+  await pagina.keyboard.press('Escape');
+  await pagina.waitForTimeout(200);
+  await comprobar('5. el siguiente cierra la mesa del hito (fila 109) y deja la tarjeta', abierta(pagina), 'hitos');
   await pagina.keyboard.press('Escape');
   await pagina.waitForTimeout(200);
   await comprobar('5. Escape vuelve a la cuadrícula', abierta(pagina), null);

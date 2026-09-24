@@ -126,6 +126,9 @@ var Hitos = (function () {
     /* La fecha en que se dio por hecho (fila 102, para {hecho:...}).
        Solo si la hay: los hitos de antes no la tienen, y no se inventa. */
     if (h && h.hechoEl) salida.hechoEl = String(h.hechoEl);
+    /* El estado del guion (fila 109, js/hitos-guion.js): solo si lo hay. */
+    if (h && h.guionHecho && typeof h.guionHecho === 'object') salida.guionHecho = h.guionHecho;
+    if (h && Array.isArray(h.guionPropio) && h.guionPropio.length) salida.guionPropio = h.guionPropio;
     if (esDecision) {
       salida.opciones = (Array.isArray(h && h.opciones) ? h.opciones : []).map(function (o) {
         return {

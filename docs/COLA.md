@@ -97,12 +97,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 62, 64 a 75, 77 a 108 están **HECHAS**. Sus documentos siguen en
+Las filas 1 a 62, 64 a 75, 77 a 109 están **HECHAS**. Sus documentos siguen en
 `docs/`, y el detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 109 | `docs/EL-HITO-A-PANTALLA-COMPLETA.md` | PENDIENTE (apuntada 24-sep-2026). Después de la 107 |
 | 110 | `docs/TABLAS-DE-DATOS.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 111 | `docs/GENERO-EN-PLANTILLAS.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
@@ -116,9 +115,7 @@ de la persona; sin dato, se quedan con la barra.
 función tutorial de Séneca, RelPerCen, Excel/CSV) unidas por DNI, huecos `{{ESPECIALIDAD}}` y
 `{{TABLA TUTORIAS}}`, y plantilla «Certificado de función tutorial».
 
-**La fila 109 se apuntó el 24-sep-2026**, cerrada con Francisco: el hito se abre a pantalla
-completa como mesa de trabajo (guion con normativa y acciones, documentos en tabla con
-selección, formularios y plantillas, comunicar y notas), con borrador de guion para cada hito.
+**La fila 109 está HECHA** (24-sep-2026): `docs/EL-HITO-A-PANTALLA-COMPLETA.md`. El hito se abre a pantalla completa como mesa de trabajo (guion que se marca solo, documentos en tabla, plantillas y formularios, comunicar y notas), con borrador de guion para los 296 hitos modelo del centro (`docs/contexto/HITO-MESA.md`). Versión publicada `App.VERSION`: `24-sep-2026 · 04:32`.
 
 **La fila 108 está HECHA** (24-sep-2026): `docs/CONTACTO-EN-TARJETAS.md`. La ventana «Ver todo» del alumno pasa a una cabecera con etiquetas y una tarjeta por persona (el alumno, tutor 1, tutor 2), con el nombre entero de cada tutor bien montado (`js/datos-tutores.js`, `js/ficha-tercero-alumno.js`). Versión publicada `App.VERSION`: `24-sep-2026 · 04:08`.
 

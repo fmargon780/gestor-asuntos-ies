@@ -94,6 +94,8 @@ var HitosBiblioteca = (function () {
       /* 23-sep-2026, fila 102: las plantillas de documento unidas al modelo. */
       plantillasDocumento: window.Guias ? Guias.listaDeIds(m && m.plantillasDocumento)
         : (Array.isArray(m && m.plantillasDocumento) ? m.plantillasDocumento.map(String) : []),
+      /* 24-sep-2026, fila 109: el guion del hito (js/guias-guion.js). */
+      guion: window.GuiasGuion ? GuiasGuion.normalizar(m && m.guion) : ((m && m.guion) || []),
       creadoEl: String((m && m.creadoEl) || U.hoyIso()),
       actualizadoEl: String((m && m.actualizadoEl) || U.hoyIso()),
       actualizadoPor: String((m && m.actualizadoPor) || '')
@@ -152,6 +154,7 @@ var HitosBiblioteca = (function () {
       soloInformativo: paso.soloInformativo, normativa: paso.normativa,
       formularios: paso.formularios,
       plantillasDocumento: paso.plantillasDocumento,
+      guion: paso.guion,
       actualizadoPor: usuario || ''
     });
   }
@@ -170,6 +173,7 @@ var HitosBiblioteca = (function () {
       normativa: (modelo.normativa || []).map(function (n) { return Object.assign({}, n); }),
       formularios: (modelo.formularios || []).slice(),
       plantillasDocumento: (modelo.plantillasDocumento || []).slice(),
+      guion: (modelo.guion || []).map(function (g) { return Object.assign({}, g); }),
       origenBiblioteca: { id: modelo.id, revision: modelo.revision, divergido: false }
     };
   }
@@ -186,7 +190,8 @@ var HitosBiblioteca = (function () {
     { clave: 'requisitos', etiqueta: 'Lo que hay que reunir' },
     { clave: 'comunicacion', etiqueta: 'Comunicación de este paso' },
     { clave: 'normativa', etiqueta: 'Normativa' },
-    { clave: 'plantillasDocumento', etiqueta: 'Documentos' }
+    { clave: 'plantillasDocumento', etiqueta: 'Documentos' },
+    { clave: 'guion', etiqueta: 'Guion' }
   ];
 
   function textoLegibleDe(clave, valor) {
@@ -204,6 +209,10 @@ var HitosBiblioteca = (function () {
       if (c.correo && c.correo.cuerpo) canales.push('correo');
       if (c.seneca && c.seneca.cuerpo) canales.push('Séneca');
       return canales.length ? canales.join(' y ') : '(vacío)';
+    }
+    if (clave === 'guion') {
+      var pasos = valor || [];
+      return pasos.length ? pasos.map(function (g) { return g.texto + (g.accion ? ' [' + g.accion + ']' : ''); }).join('; ') : '(vacío)';
     }
     if (clave === 'normativa') {
       var refs = valor || [];

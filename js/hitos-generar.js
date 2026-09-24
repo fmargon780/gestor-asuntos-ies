@@ -114,5 +114,6 @@ window.HitosGenerar = (function () {
     };
   }
 
-  return { botonHTML: botonHTML, engancharBoton: engancharBoton, agrupar: agrupar, buscarPaso: buscarPaso };
+  return { botonHTML: botonHTML, engancharBoton: engancharBoton, agrupar: agrupar, buscarPaso: buscarPaso,
+           grupos: gruposEnMemoria /* fila 109, la mesa del hito */ };
 })();

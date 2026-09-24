@@ -412,6 +412,11 @@
     }
     /* En la ficha, con una tarjeta abierta en grande, el primer Escape
        vuelve a la cuadrícula (fila 107, js/ficha-tarjetas.js). */
+    /* Con la mesa de un hito abierta, el primero vuelve a la lista de hitos (fila 109). */
+    if (pantallaVisible.id === 'pantalla-asunto' && window.HitoMesa && HitoMesa.cerrarSiAbierta()) {
+      ev.preventDefault();
+      return;
+    }
     if (pantallaVisible.id === 'pantalla-asunto' && window.FichaTarjetas && FichaTarjetas.cerrarSiAbierta()) {
       ev.preventDefault();
       return;

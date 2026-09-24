@@ -282,6 +282,10 @@ funciones puras).
 
 ### Los hitos de un asunto
 
+**Desde la fila 109, cada hito se abre a pantalla completa (la mesa de trabajo), con su guion:** ver
+`docs/contexto/HITO-MESA.md`. Lo de aquí sobre el cuerpo desplegado de un hito vale para las
+columnas de la mesa.
+
 Dentro de un asunto abierto, la guía **es** la lista de **hitos** que se trabaja: cada paso, vivo
 dentro de ese asunto, con estado (pendiente · en curso · hecho · no aplica), fecha límite,
 responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (fila 26, 17-sep-2026,

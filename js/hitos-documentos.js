@@ -71,6 +71,7 @@ var HitosDocumentos = (function () {
            quedado apuntado igual. */
         if (window.HitosRequisitos) {
           try { await HitosRequisitos.marcarPorDocumento(a.nombre, h.id, anadidos[i]); } catch (e2) { /* no crítico */ }
+          if (Hitos.marcarGuionPorAccion) await Hitos.marcarGuionPorAccion(a, h.id, 'anadir');   /* fila 109 */
         }
       }
       for (var j = 0; j < quitados.length; j++) {

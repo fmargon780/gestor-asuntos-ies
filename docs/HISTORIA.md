@@ -5,6 +5,43 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 109: el hito a pantalla completa, la mesa de trabajo
+
+`docs/EL-HITO-A-PANTALLA-COMPLETA.md`. Dentro de la tarjeta de Hitos, la lista queda compacta y
+pulsar un hito abre su mesa: cabecera con etiquetas pulsables (estado, plazo en días hábiles,
+responsable), "Marcar hito como hecho", menú ⋯ y la tira de hitos; y tres columnas: el guion, los
+documentos (en tabla, con gemelos y selección de varios) con plantillas y formularios, y la
+consulta (normativa, comunicar con destinatarios, notas e historial). Detalle en
+`docs/contexto/HITO-MESA.md` (hijo nuevo: `HITOS-Y-GUIAS.md` ya pasaba de 40 KB).
+
+- Decisión: la mesa no es una pantalla nueva sino el mismo hito con su cuerpo a la vista y los demás
+  escondidos. Así todo lo que ya hacía cada botón del hito (generar, comunicar, añadir, el menú de
+  cada documento, lo que falta reunir) sigue funcionando igual, con las mismas clases, y las
+  pruebas de antes casi no han cambiado.
+- Decisión: el guion vive en la guía y en la biblioteca; en el hito solo su estado. Los pasos con
+  acción se marcan solos (generar, registrar desde el ⋯, comunicar, añadir un documento nuevo).
+- El borrador de los guiones (296 hitos modelo, 1.064 pasos) lo escribió una sesión auxiliar a partir
+  de los documentos del centro; la normativa solo repite la que ya citaba cada modelo (ninguna traía
+  enlace, así que ninguna lo lleva). Se trae a la carpeta con "Traer los guiones del instituto",
+  que nunca pisa uno escrito. Sugerencias de convertir en pregunta (no se ha cambiado nada):
+  - b11 — Imponer la corrección: quién la impone cambia según la corrección (profesor, tutor, jefatura, director); convertir en pregunta "¿Qué corrección se impone?".
+  - b144 — Resolver o remitir, según el supuesto: dos caminos (resuelve el centro / se remite fuera); convertir en pregunta "¿Lo resuelve el centro o se remite?".
+  - b160 — Resolver o remitir a quien firma: firma la Dirección o la Delegación según el permiso; convertir en pregunta "¿Quién firma este permiso?".
+  - b165 — Recibir el parte de baja: va por MUFACE o por el Régimen General según el colectivo; convertir en pregunta "¿MUFACE o Régimen General?".
+  - b180 — Publicar o remitir según proceda: dos destinos distintos; convertir en pregunta "¿Se publica o se remite?".
+  - b274 — Repartir o remitir: entrada (reparto interno) y salida (envío fuera) son caminos distintos; convertir en pregunta "¿Es entrada o salida?".
+- Lo que no se ha hecho: "Abrir para imprimir" y "Enviar por correo" en cada formulario oficial
+  (siguen sus botones de siempre); la normativa de un paso de guion es solo cita y enlace, sin el
+  bloque del sistema de normativa.
+- Lo que costó: la aplicación vuelve a abrir la misma ficha sola tras guardar algo (al cerrar el
+  cuadro de Correo, al generar), y eso devolvía la ficha a la cuadrícula de tarjetas; ahora solo
+  vuelve a la cuadrícula si se entra en otro asunto.
+
+Prueba nueva `pruebas/hito-mesa.mjs` (los ocho puntos del encargo, a 1905 y a 1280 px), foto a
+1905 px revisada. Batería completa en verde. Versión publicada `App.VERSION`: `24-sep-2026 · 04:32`.
+
+---
+
 ## 24-sep-2026 — Fila 108: la ventana de contacto del alumno, en tarjetas
 
 `docs/CONTACTO-EN-TARJETAS.md`. La ventana «Ver todo» del alumno pasa de cinco columnas a una
