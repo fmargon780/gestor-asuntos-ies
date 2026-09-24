@@ -30,6 +30,7 @@ var HitosDocumentos = (function () {
     var ficheros;
     try { ficheros = await Carpetas.ficheros(a.handle); }
     catch (e) { ficheros = []; }
+    if (window.IndiceExpediente) ficheros = IndiceExpediente.fuera(ficheros);   /* fila 137 */
     ficheros = ficheros.slice().sort(function (x, y) {
       return String(x.nombre).localeCompare(String(y.nombre), 'es');
     });

@@ -62,9 +62,11 @@ var FichaDocumentos = (function () {
     var ext = Nombres.extensionDe(f.nombre);
     var sinSellar = esSinSellar(f.nombre);
     var hitoDelDoc = hitoDe[f.nombre] || null;
+    /* Fila 137: el índice del expediente no se registra ni se asocia a hitos. */
+    var esIndice = !!(window.IndiceExpediente && IndiceExpediente.es(f.nombre));
     var b = document.createElement('button');
     b.type = 'button';
-    b.className = 'ficha-documento' + (sinSellar ? ' ficha-documento-sinsellar' : '');
+    b.className = 'ficha-documento' + (sinSellar ? ' ficha-documento-sinsellar' : '') + (esIndice ? ' ficha-documento-indice' : '');
     b.title = sinSellar
       ? 'El original sin sellar, conservado por si hay que repetir el registro. Verlo al lado del programa'
       : 'Verlo al lado del programa';
@@ -87,7 +89,7 @@ var FichaDocumentos = (function () {
        docs/FILAS-QUE-NO-SE-ESTRUJAN.md). */
     var enMenu = [];
 
-    if (window.Registro && !Registro.tieneRegistro(f.nombre)) {
+    if (window.Registro && !esIndice && !Registro.tieneRegistro(f.nombre)) {
       var pendiente = Registro.pendiente(a, f.nombre);
       if (pendiente) {
         var marca = document.createElement('span');
@@ -114,7 +116,7 @@ var FichaDocumentos = (function () {
        menú de js/ficha-menus.js, no el de tres puntos (U.menuDeAcciones)
        de más abajo, que es solo para acciones de un único paso. Solo
        sale si el asunto tiene hitos con los que asociar. */
-    if (window.FichaMenus && hitosVisibles && hitosVisibles.length) {
+    if (window.FichaMenus && !esIndice && hitosVisibles && hitosVisibles.length) {
       var asociar = document.createElement('button');
       asociar.type = 'button';
       asociar.className = 'boton boton-chico ficha-documento-asociar';
@@ -256,7 +258,9 @@ var FichaDocumentos = (function () {
     if (!caja) return;
     try {
       var lista = await Carpetas.ficheros(a.handle);
-      if (cuenta) cuenta.textContent = lista.length || '';
+      /* El índice del expediente (fila 137) se ve, pero no cuenta. */
+      var sinIndice = window.IndiceExpediente ? IndiceExpediente.fuera(lista) : lista;
+      if (cuenta) cuenta.textContent = sinIndice.length || '';
       /* Un bloque vacío ocupa una sola línea, no una tarjeta entera
          (18-sep-2026, fila 51, docs/FICHA-DISPOSICION.md, 8). */
       var bloqueEl = caja.closest('.ficha-bloque');

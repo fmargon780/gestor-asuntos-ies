@@ -247,6 +247,23 @@ tabla de ficheros), y la búsqueda es por palabras sueltas.
 Se comprueba con `pruebas/archivo-indice.mjs`, en navegador de verdad con el disco de mentira de
 `pruebas/navegador.mjs`, con los nueve escenarios del documento.
 
+### El índice del expediente (25-sep-2026, fila 137, `docs/INDICE-DEL-EXPEDIENTE.md`)
+
+`js/indice-expediente.js` (`IndiceExpediente`) hace `000 ÍNDICE DEL EXPEDIENTE.pdf` dentro de la
+carpeta del asunto, con pdf-lib (`PdfHerramientas.cargarPdfLib`), A4: el centro, la carpeta, tipo,
+tercero, apertura y archivo; tabla Nº · Fecha · Registro · Documento · Páginas (del nombre del
+fichero; páginas solo de los PDF), por fecha y nombre; los «SIN SELLAR» marcados; pie con quién y
+cuándo, y «Página i de n». Helvetica solo escribe WinAnsi: lo demás sale como «?».
+
+- **Al archivar** (`App.cerrarAsunto`, después de apuntar el cierre): si falla, ámbar y el asunto
+  queda archivado. **En el menú de la ficha** (abierto o archivado): «Índice del expediente», que lo
+  rehace y lo abre en el visor. Si ya había uno, el viejo va a la papelera
+  (`Papelera._interno.mandarFichero`, sin nota en el asunto).
+- **No es un documento** (`es(nombre)`, `fuera(lista)`): se ve en la lista de la ficha
+  (`.ficha-documento-indice`) pero no cuenta en su círculo ni en el resumen, no lleva «Registrar»,
+  no se asocia a hitos (`js/hitos-documentos.js`, `js/hitos-documento-menu.js`), no entra en los
+  `documentos` del índice del ARCHIVO ni en la lectura de sellos (`js/registro-sellado.js`).
+
 ### El plazo de conservación (25-sep-2026, fila 136, `docs/PLAZO-DE-CONSERVACION.md`)
 
 Cada tipo puede llevar `conservarAnios` (entero; vacío = sin plazo, nunca avisa), puesto en «Datos

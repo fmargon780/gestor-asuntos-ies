@@ -5,6 +5,21 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 137: el índice del expediente
+
+`docs/INDICE-DEL-EXPEDIENTE.md`. Para mandar un expediente a Inspección o a un recurso, la ley pide un
+índice numerado de sus documentos: ahora lo hace la aplicación, en PDF, al archivar y con un botón
+en el menú de la ficha. Decisiones:
+
+- El «Botón «Poner en orden las fichas del ARCHIVO»» salió de `CONTEXTO-CORTO.md` para hacer sitio;
+  sigue en Mantenimiento y en `docs/contexto/ASUNTOS-ARCHIVO.md`.
+- Al rehacer el índice, el viejo va a la papelera sin nota en el asunto (una nota por cada índice
+  rehecho sería ruido).
+- El índice sí se ve en la lista de documentos de la ficha (es un fichero de la carpeta), pero no
+  cuenta, no se registra ni se asocia a hitos.
+- La letra del PDF es Helvetica, que solo escribe el juego WinAnsi: tildes, eñes, «», · y — salen
+  bien; algo raro (un emoji en un nombre) sale como «?» en vez de romper el índice.
+
 ## 25-sep-2026 — Fila 136: cuánto tiempo se guarda cada asunto
 
 `docs/PLAZO-DE-CONSERVACION.md`. La ley de protección de datos pide no guardar datos personales más de

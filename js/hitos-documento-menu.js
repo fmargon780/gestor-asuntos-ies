@@ -53,7 +53,10 @@ window.HitosDocumentoMenu = (function () {
      herramienta puede haber dejado un fichero nuevo que esa lista
      tiene que enseñar. */
   async function ficherosDeLaCarpeta(a) {
-    try { return nombresDe(await Carpetas.ficheros(a.handle)); }
+    try {
+      var lista = await Carpetas.ficheros(a.handle);
+      return nombresDe(window.IndiceExpediente ? IndiceExpediente.fuera(lista) : lista);   /* fila 137 */
+    }
     catch (e) { return []; }
   }
 

@@ -138,7 +138,9 @@ var IndiceArchivo = (function () {
     var salida = [];
     var contenido = await Carpetas.contenido(handle);
     contenido.ficheros.forEach(function (f) {
-      if (!Carpetas.esCarpetaTemporalDeSincronizacion(f.nombre)) salida.push(f.nombre);
+      if (Carpetas.esCarpetaTemporalDeSincronizacion(f.nombre)) return;
+      if (window.IndiceExpediente && IndiceExpediente.es(f.nombre)) return;   /* fila 137 */
+      salida.push(f.nombre);
     });
     for (var i = 0; i < contenido.carpetas.length; i++) {
       var sub = contenido.carpetas[i];

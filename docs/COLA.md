@@ -107,16 +107,22 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 75 y 77 a 136 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 75 y 77 a 137 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 137 | `docs/INDICE-DEL-EXPEDIENTE.md` (PDF con la lista numerada de documentos, al archivar y con botón) | PENDIENTE |
 | 138 | `docs/UNA-SOLA-LISTA-EN-EL-HITO.md` («lo que hay que reunir» pasa al guion) | PENDIENTE |
 | 139 | `docs/UNA-SOLA-LIBRETA-DE-NOTAS.md` (las notas del hito pasan al asunto, con etiqueta) | PENDIENTE |
 | 140 | `docs/TIEMPO-DE-TRAMITACION.md` (media y máximo por tipo, y los abiertos más antiguos) | PENDIENTE |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 137 está HECHA** (25-sep-2026): `docs/INDICE-DEL-EXPEDIENTE.md`. `000 ÍNDICE DEL
+EXPEDIENTE.pdf` (`js/indice-expediente.js`): lista numerada de los documentos (fecha, registro,
+nombre, páginas), hecha al archivar (si falla, ámbar y archivado igual) y con «Índice del
+expediente» en el menú de la ficha (el viejo, a la papelera). No cuenta como documento. Prueba
+`pruebas/indice-del-expediente.mjs` (y `pruebas/cabecera-del-asunto.mjs`, con la opción nueva),
+batería completa en verde. Versión `App.VERSION`: `25-sep-2026 · 01:10`.
 
 **La fila 136 está HECHA** (25-sep-2026): `docs/PLAZO-DE-CONSERVACION.md`. Cada tipo puede llevar
 cuántos años se conserva después de archivar (`conservarAnios`, con el enlace a las tablas de la

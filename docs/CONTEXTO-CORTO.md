@@ -122,9 +122,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - "Lo pide": quién pidió la gestión, por qué vía y cuándo; su correo sale en el cuadro de Correo.
 - Archivar o reabrir sobre un destino que ya existe fusiona carpetas; errores en castellano; reintenta si Dropbox tropieza.
 - Crear, reabrir o editar deja en la ficha del asunto; Volver regresa a la pantalla de origen, a su altura; lo demás, aviso con «Ir al asunto».
-- Al archivar, la ficha del asunto baja a su propia carpeta (no se queda en `asuntos.json` para
-  siempre); al reabrir, vuelve. Botón "Poner en orden las fichas del ARCHIVO" en Ajustes →
-  Mantenimiento para los archivados de antes.
+- Al archivar, la ficha baja a su carpeta (al reabrir, vuelve) y se hace el índice del expediente
+  (PDF numerado; también desde el menú de la ficha).
 - Ficha del asunto: foto del contacto del tercero; cabecera fija al bajar.
 
 ## 6. Reglas de código que no se pueden olvidar

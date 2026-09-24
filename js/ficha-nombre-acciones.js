@@ -70,6 +70,8 @@
         }
       });
     }
+    /* Fila 137: «Índice del expediente», abierto o archivado. */
+    if (window.IndiceExpediente) lista.push(IndiceExpediente.opcionDelMenu(a));
     /* Fila 135: «Marcar como reservado» / «Quitar la reserva». */
     if (abierto && window.Reservados) lista.push(Reservados.opcionDelMenu(a));
     if (abierto && window.Papelera) {

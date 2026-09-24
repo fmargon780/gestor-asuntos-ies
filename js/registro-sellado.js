@@ -87,7 +87,10 @@ var RegistroSellado = (function () {
       var fichero = await lista[i].handle.getFile();
       pdfs.push({ nombre: lista[i].nombre, handle: lista[i].handle, tamano: fichero.size });
     }
-    var candidatos = pdfs.filter(function (f) { return !Documentos.pareceDeLaAplicacion(f.nombre); });
+    var candidatos = pdfs.filter(function (f) {
+      if (window.IndiceExpediente && IndiceExpediente.es(f.nombre)) return false;   /* fila 137 */
+      return !Documentos.pareceDeLaAplicacion(f.nombre);
+    });
     if (!candidatos.length) return [];
 
     var memoria = await actualizarMemoria(asunto, candidatos, async function (f) {

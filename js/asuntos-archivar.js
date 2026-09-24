@@ -177,6 +177,16 @@ App.cerrarAsunto = async function (a) {
     try { await App.verAbiertos(); } catch (e2) { /* solo pintar */ }
     return;
   }
+  /* Fila 137: el índice del expediente, ya en la carpeta archivada. Si
+     falla, ámbar: el asunto queda archivado igual. */
+  if (window.IndiceExpediente) {
+    try {
+      await IndiceExpediente.crear({ nombre: a.nombre, handle: handleArchivado, leido: a.leido,
+        ficha: Object.assign({}, a.ficha, { tercero: tercero, categoria: categoria }) }, { archivadoEl: U.hoyIso() });
+    } catch (e) {
+      U.accesorio('Asunto archivado, pero no he podido hacer su índice del expediente', e);
+    }
+  }
   try {
     await actualizarIndiceAlArchivar(a.nombre, categoria, tercero, handleArchivado);
     /* Para que App.reengancharFicha (js/ficha-asunto.js), llamado dentro

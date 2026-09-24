@@ -215,7 +215,8 @@ var FichaTarjetas = (function () {
   function documentosDeLaCarpeta() {
     var caja = $('ficha-documentos');
     if (!caja) return [];
-    return Array.prototype.map.call(caja.querySelectorAll('button.ficha-documento'), function (b) {
+    /* El índice del expediente (fila 137) no cuenta como documento. */
+    return Array.prototype.map.call(caja.querySelectorAll('button.ficha-documento:not(.ficha-documento-indice)'), function (b) {
       var spans = b.querySelectorAll(':scope > span');
       var nombre = spans.length ? spans[spans.length - 1].textContent : b.textContent;
       return { nombre: nombre, boton: b };

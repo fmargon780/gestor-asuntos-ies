@@ -270,6 +270,7 @@ var Papelera = (function () {
   Object.assign(I, {
     DIAS_AVISO: DIAS_AVISO, gestor: gestor, quienSoy: quienSoy, leer: leer, cambiar: cambiar,
     carpetaPapelera: carpetaPapelera, buscarCarpetaDeAsunto: buscarCarpetaDeAsunto,
+    mandarFichero: mandarFichero,   /* fila 137: el índice del expediente viejo, sin nota en el asunto */
     mandarDato: mandarDato, mandarSuelto: mandarSuelto
   });
 
