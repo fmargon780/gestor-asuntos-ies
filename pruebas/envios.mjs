@@ -1,22 +1,28 @@
-/* Prueba en navegador de verdad de "mandar los documentos de un asunto
-   por correo" (docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md, 16-sep-2026,
-   fila 13 de docs/COLA.md).
+/* Prueba en navegador de verdad de "enviar el correo desde el asunto,
+   con sus documentos" (docs/ENVIAR-DESDE-EL-ASUNTO.md, 24-sep-2026,
+   fila 115 de docs/COLA.md). Sustituye a la prueba del borrador con
+   documentos (16-sep-2026): ya no hay ningún borrador que montar.
 
    Lo que tiene que pasar:
-     1. Marcar dos documentos y preparar deja en la bandeja las dos
-        copias y el .envio.json.
-     2. El encargo lleva el hilo del asunto cuando lo tiene, y cadena
-        vacía cuando el asunto no tiene hilos.
-     3. Si lo marcado suma más de 20 MB no se prepara nada y sale el
-        aviso.
-     4. Cuando aparece <id>.listo.json, la tarjeta pasa a "Abrir el
-        borrador en Gmail" y el encargo sale de envios.json.
-     5. Con <id>.error.json, sale el motivo y el encargo desaparece.
-     6. Un .envio.json en la carpeta no aparece como un correo en la
-        bandeja.
+     1. Sin ninguna dirección conectada, el botón "Enviar" lleva a
+        Ajustes → Enviar correo, sin llamar a nada.
+     2. Con la dirección conectada, "Enviar" abre el resumen (Para,
+        Asunto, primeras líneas, documentos con su tamaño) DENTRO del
+        mismo cuadro; "Volver" conserva todo lo escrito, marcado y
+        editado a mano.
+     3. Más de 20 MB: aviso, sin abrir el resumen y sin llamar a nada.
+     4. "Confirmar y enviar" llama a la aplicación web simulada (mock
+        de `fetch`, nunca una URL real) con el cuerpo correcto —clave
+        en la propia dirección, asunto, cuerpo, hilo y los documentos
+        en base64— y, si responde `ok`, sale aviso verde, la nota en el
+        asunto dice "Correo enviado a…" y el hilo que trae la respuesta
+        queda enganchado en `hilos`.
+     5. Si la aplicación web responde con error, aviso rojo con el
+        motivo y el formulario sigue intacto detrás, listo para
+        reintentar.
+     6. En ningún momento sale una tarjeta "Borrador en camino".
 
-   Reutiliza el disco de mentira de pruebas/navegador.mjs y el montaje
-   de la bandeja de mentira de pruebas/correos.mjs. */
+   Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
@@ -25,7 +31,8 @@ const preparacion = fuente.slice(fuente.indexOf('const preparacion = `') + 'cons
                                  fuente.indexOf('`;\n\nconst DIRECCION'));
 
 const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
-const pagina = await navegador.newPage({ viewport: { width: 1500, height: 950 } });
+const contexto = await navegador.newContext({ viewport: { width: 1500, height: 950 } });
+const pagina = await contexto.newPage();
 const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
@@ -39,10 +46,16 @@ async function comprobar(titulo, promesa, esperado) {
   if (!ok) { fallos++; console.log('FALLA  ' + titulo + '\n   sale: ' + JSON.stringify(real) + '\n   debía: ' + JSON.stringify(esperado)); }
   else console.log('bien   ' + titulo);
 }
+async function comprobarQue(titulo, promesa) {
+  const real = await promesa;
+  if (!real) { fallos++; console.log('FALLA  ' + titulo); }
+  else console.log('bien   ' + titulo);
+}
 
 const CON_HILO = '260910 CONTRATO 26-27 Empresa Test SL';
 const SIN_HILO = '260901 FACTURA 26-27 Otra Empresa SL';
 const GRANDE = '260905 FACTURA 26-27 Empresa Grande SL';
+const URL_ENVIO = 'https://script.google.test/macros/s/FAKE/exec?k=clave-de-prueba';
 
 /* --- entrar --- */
 await pagina.click('#btn-abiertos');
@@ -87,72 +100,26 @@ await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
 await pagina.click('#btn-barra');
 
-/* --- señalar la bandeja, igual que pruebas/correos.mjs --- */
-await pagina.evaluate(async () => {
-  window.__bandeja = await window.__disco.archivo.getDirectoryHandle('GESTOR-BANDEJA', { create: true });
-  const antes = window.showDirectoryPicker;
-  window.showDirectoryPicker = async function (opciones) {
-    if (opciones && opciones.id === 'gestor-bandeja') return window.__bandeja;
-    return antes(opciones);
-  };
+/* ---------- el mock de la aplicación web (nunca una URL real) ---------- */
+
+let llamadas = [];
+let proximaRespuesta = { ok: true, hilo: 'hilo-nuevo-001', matricula: 'matricula-001' };
+await pagina.route(URL_ENVIO.split('?')[0] + '**', async (route) => {
+  const peticion = route.request();
+  let cuerpo = {};
+  try { cuerpo = JSON.parse(peticion.postData() || '{}'); } catch (e) { cuerpo = {}; }
+  llamadas.push({ url: peticion.url(), metodo: peticion.method(),
+    contentType: peticion.headers()['content-type'] || '', cuerpo: cuerpo });
+  await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(proximaRespuesta) });
 });
-await pagina.evaluate(() => App.ir('ajustes'));
-await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
-await pagina.waitForSelector('#bloque-bandeja');
-await pagina.evaluate(() => { document.getElementById('bloque-bandeja').open = true; });
-await pagina.click('#botones-bandeja .boton');
-await pagina.waitForTimeout(400);
-await pagina.evaluate(() => App.ir('abiertos'));
-await pagina.waitForTimeout(400);
 
 /* ---------- utilidades ---------- */
-
-function nombresDeBandeja() {
-  return pagina.evaluate(() => Array.from(window.__bandeja._hijos.keys()).sort());
-}
-
-function leerDeBandeja(nombre) {
-  return pagina.evaluate(async (n) => {
-    const h = await window.__bandeja.getFileHandle(n);
-    return JSON.parse(await (await h.getFile()).text());
-  }, nombre);
-}
-
-function listaDeEnvios() {
-  return pagina.evaluate(async () => {
-    const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
-    const h = await g.getFileHandle('envios.json');
-    return JSON.parse(await (await h.getFile()).text());
-  });
-}
-
-async function idDelUltimoEnvio() {
-  const lista = await listaDeEnvios();
-  return lista.length ? lista[lista.length - 1].id : null;
-}
-
-/* Simula lo que dejaría el script de Apps Script al terminar. */
-function dejarListo(id, enlace) {
-  return pagina.evaluate(({ id, enlace }) => {
-    window.__bandeja._hijos.set(id + '.listo.json',
-      window.__disco.fich(id + '.listo.json', JSON.stringify({ id, hecho: 'ahora', enlace })));
-  }, { id, enlace });
-}
-
-function dejarError(id, motivo) {
-  return pagina.evaluate(({ id, motivo }) => {
-    window.__bandeja._hijos.set(id + '.error.json',
-      window.__disco.fich(id + '.error.json', JSON.stringify({ id, motivo })));
-  }, { id, motivo });
-}
 
 async function abrirCorreoDe(nombreAsunto) {
   await pagina.evaluate(() => App.ir('abiertos'));
   await pagina.waitForTimeout(200);
   await pagina.locator('.tarjeta-nombre', { hasText: nombreAsunto }).click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-  /* "Correo" vive ahora dentro de "Comunicar" (18-sep-2026, fila 52,
-     docs/CABECERA-DEL-ASUNTO.md). */
   await pagina.click('.boton-comunicar');
   await pagina.getByRole('button', { name: 'Correo electrónico', exact: true }).click();
   await pagina.waitForSelector('#capa:not(.oculto)');
@@ -164,110 +131,153 @@ async function cerrarCuadro() {
   await pagina.waitForSelector('#capa', { state: 'hidden' });
 }
 
+function hilosDe(nombreAsunto) {
+  return pagina.evaluate(async (nombre) => {
+    const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+    const h = await g.getFileHandle('asuntos.json');
+    const j = JSON.parse(await (await h.getFile()).text());
+    return (j.asuntos[nombre] && j.asuntos[nombre].hilos) || [];
+  }, nombreAsunto);
+}
+
+function notasDe(nombreAsunto) {
+  return pagina.evaluate(async (nombre) => {
+    const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+    const h = await g.getFileHandle('asuntos.json');
+    const j = JSON.parse(await (await h.getFile()).text());
+    return (j.asuntos[nombre] && j.asuntos[nombre].notas) || [];
+  }, nombreAsunto);
+}
+
 /* ========================================================
-   1 y 2 · dos documentos, con hilo
+   1 · sin ninguna dirección conectada: "Enviar" lleva a Ajustes
+   ======================================================== */
+await pagina.evaluate(() => { try { window.localStorage.removeItem('gestor-envio-correo'); } catch (e) {} });
+await abrirCorreoDe(CON_HILO);
+await comprobar('sin conexión, el botón dice a dónde ir',
+  pagina.locator('#correo-enviar').textContent(), 'Conecta el envío en Ajustes → Enviar correo');
+await pagina.click('#correo-enviar');
+await pagina.waitForSelector('#pantalla-ajustes:not(.oculto)');
+await pagina.waitForTimeout(200);
+await comprobarQue('lleva al bloque "Enviar correo" de Ajustes, abierto',
+  pagina.evaluate(() => { const b = document.getElementById('bloque-envio-correo'); return !!b && b.open; }));
+await comprobar('ninguna llamada a la aplicación web todavía', llamadas.length, 0);
+
+/* ========================================================
+   ahora se conecta (como si Francisco hubiera pegado la dirección)
+   ======================================================== */
+await pagina.fill('#envio-correo-url', URL_ENVIO);
+await pagina.click('#envio-correo-guardar');
+await comprobar('el resumen del bloque pasa a "Conectado"',
+  pagina.locator('#envio-correo-resumen').textContent(), 'Conectado');
+
+/* ========================================================
+   2 · con dos documentos marcados, "Enviar" abre el resumen; "Volver"
+   conserva lo escrito y lo marcado
    ======================================================== */
 await abrirCorreoDe(CON_HILO);
+await comprobar('con conexión, el botón dice "Enviar"', pagina.locator('#correo-enviar').textContent(), 'Enviar');
+
 await pagina.fill('#correo-otro', 'proveedor@correo.es');
+await pagina.fill('#correo-cuerpo-texto', 'Le adjunto los documentos del contrato.\nUn saludo.');
 await pagina.check('.adjunto-marca >> nth=0');
 await pagina.check('.adjunto-marca >> nth=1');
-await pagina.click('#adjuntos-preparar');
-await pagina.waitForSelector('.mensaje.bueno:has-text("Borrador en camino")');
-await pagina.waitForTimeout(300);
+await pagina.click('#correo-enviar');
 
-const idConHilo = await idDelUltimoEnvio();
-const bandejaTrasPrimero = await nombresDeBandeja();
-await comprobar('las dos copias han entrado en la bandeja',
-  bandejaTrasPrimero.filter(n => n.indexOf(idConHilo + ' - ') === 0).sort(),
-  [idConHilo + ' - 260901 docA.pdf', idConHilo + ' - 260902 docB.pdf'].sort());
-await comprobar('el .envio.json ha entrado también',
-  bandejaTrasPrimero.includes(idConHilo + '.envio.json'), true);
+await pagina.waitForSelector('#correo-resumen:not(.oculto)');
+await comprobarQue('el formulario queda oculto detrás del resumen',
+  pagina.evaluate(() => document.getElementById('correo-formulario').className.indexOf('oculto') !== -1));
+await comprobar('el resumen enseña el "Para"',
+  pagina.locator('#correo-resumen').textContent().then(t => t.indexOf('proveedor@correo.es') !== -1), true);
+await comprobar('el resumen enseña las primeras líneas del cuerpo',
+  pagina.locator('#correo-resumen').textContent().then(t => t.indexOf('Le adjunto los documentos') !== -1), true);
+await comprobar('el resumen lista los dos documentos con su tamaño',
+  pagina.locator('#correo-resumen li').count(), 2);
+await comprobarQue('el resumen dice el tamaño de cada documento',
+  pagina.locator('#correo-resumen li').first().textContent().then(t => /·\s*\d/.test(t)));
 
-const encargoConHilo = await leerDeBandeja(idConHilo + '.envio.json');
-await comprobar('el encargo lleva el hilo del asunto', encargoConHilo.hilo, 'hilo-abc');
-await comprobar('el encargo lleva el destinatario escrito a mano', encargoConHilo.para, 'proveedor@correo.es');
-await comprobar('el encargo lleva los dos adjuntos', (encargoConHilo.adjuntos || []).length, 2);
-await comprobar('la lista de encargos vivos trae uno', listaDeEnvios().then(l => l.length), 1);
+await pagina.click('#correo-resumen-volver');
+await pagina.waitForSelector('#correo-formulario:not(.oculto)');
+await comprobar('"Volver" conserva el correo escrito a mano',
+  pagina.locator('#correo-otro').inputValue(), 'proveedor@correo.es');
+await comprobar('"Volver" conserva el cuerpo escrito a mano',
+  pagina.locator('#correo-cuerpo-texto').inputValue(), 'Le adjunto los documentos del contrato.\nUn saludo.');
+await comprobar('"Volver" conserva los documentos marcados',
+  pagina.locator('.adjunto-marca:checked').count(), 2);
+await comprobar('todavía ninguna llamada a la aplicación web', llamadas.length, 0);
+
+/* ========================================================
+   4 · Confirmar y enviar: la llamada lleva lo correcto, y responde ok
+   ======================================================== */
+await pagina.click('#correo-enviar');
+await pagina.waitForSelector('#correo-resumen:not(.oculto)');
+await pagina.click('#correo-confirmar-envio');
+await pagina.waitForSelector('.mensaje.bueno:has-text("Correo enviado a")');
+
+await comprobar('se ha hecho una sola llamada a la aplicación web', llamadas.length, 1);
+const llamada1 = llamadas[0];
+await comprobar('con Content-Type: text/plain, para no disparar CORS',
+  llamada1.contentType.indexOf('text/plain') === 0, true);
+await comprobar('el cuerpo lleva el destinatario escrito a mano', llamada1.cuerpo.para, 'proveedor@correo.es');
+await comprobar('el cuerpo lleva el hilo del asunto', llamada1.cuerpo.hilo, 'hilo-abc');
+await comprobar('el cuerpo lleva los dos documentos en base64', (llamada1.cuerpo.adjuntos || []).length, 2);
+await comprobarQue('cada adjunto lleva su base64 y su nombre',
+  Promise.resolve((llamada1.cuerpo.adjuntos || []).every(a => a.nombre && a.base64 && a.base64.length > 0)));
+await comprobar('la clave va en la propia dirección, no hace falta releerla del cuerpo',
+  llamada1.url.indexOf('k=clave-de-prueba') !== -1, true);
+
+await comprobar('la nota del asunto dice "Correo enviado a…"',
+  notasDe(CON_HILO).then(ns => ns.length && ns[ns.length - 1].texto.indexOf('Correo enviado a proveedor@correo.es') === 0), true);
+await comprobar('el hilo que trae la respuesta queda enganchado',
+  hilosDe(CON_HILO).then(hs => hs.some(h => h.id === 'hilo-nuevo-001')), true);
 
 await cerrarCuadro();
 
 /* ========================================================
-   2 (segunda mitad) · sin hilo
+   3 · más de 20 MB: aviso, sin abrir el resumen ni llamar a nada
    ======================================================== */
+llamadas = [];
+await abrirCorreoDe(GRANDE);
+await pagina.check('.adjunto-marca >> nth=0');
+await pagina.click('#correo-enviar');
+await pagina.waitForSelector('.mensaje.malo:has-text("20 MB")');
+await comprobar('el resumen no se ha abierto', pagina.locator('#correo-resumen:not(.oculto)').count(), 0);
+await comprobar('no se ha llamado a la aplicación web', llamadas.length, 0);
+await cerrarCuadro();
+
+/* ========================================================
+   5 · la aplicación web responde con error: aviso rojo, y el
+   formulario sigue intacto detrás para reintentar
+   ======================================================== */
+llamadas = [];
+proximaRespuesta = { ok: false, motivo: 'La cuenta no ha podido mandarlo.' };
 await abrirCorreoDe(SIN_HILO);
 await pagina.fill('#correo-otro', 'compras@correo.es');
 await pagina.check('.adjunto-marca >> nth=0');
-await pagina.click('#adjuntos-preparar');
-await pagina.waitForSelector('.mensaje.bueno:has-text("Borrador en camino")');
-await pagina.waitForTimeout(300);
+await pagina.click('#correo-enviar');
+await pagina.waitForSelector('#correo-resumen:not(.oculto)');
+await pagina.click('#correo-confirmar-envio');
+await pagina.waitForSelector('#correo-resumen-aviso .aviso-rojo:has-text("La cuenta no ha podido mandarlo.")');
 
-const idSinHilo = await idDelUltimoEnvio();
-const encargoSinHilo = await leerDeBandeja(idSinHilo + '.envio.json');
-await comprobar('sin hilos en el asunto, el encargo lleva el hilo vacío', encargoSinHilo.hilo, '');
+await comprobar('sin hilo en el asunto, se ha llamado igualmente', llamadas.length, 1);
+await comprobar('el encargo sin hilo manda cadena vacía', llamadas[0].cuerpo.hilo, '');
+await comprobarQue('"Confirmar y enviar" se puede volver a pulsar',
+  pagina.evaluate(() => !document.getElementById('correo-confirmar-envio').disabled));
+await pagina.click('#correo-resumen-volver');
+await comprobar('el correo escrito a mano sigue ahí, listo para reintentar',
+  pagina.locator('#correo-otro').inputValue(), 'compras@correo.es');
+await comprobar('nada se ha apuntado en las notas', notasDe(SIN_HILO).then(ns => ns.length), 0);
 await cerrarCuadro();
 
 /* ========================================================
-   6 · un .envio.json no es un correo
+   6 · nunca sale "Borrador en camino"
    ======================================================== */
 await pagina.evaluate(() => App.ir('abiertos'));
 await pagina.waitForTimeout(300);
-await comprobar('los .envio.json no salen como correos en la bandeja',
-  pagina.locator('#bandeja-correos .tarjeta-correo').count(), 0);
-
-/* ========================================================
-   3 · más de 20 MB
-   ======================================================== */
-await abrirCorreoDe(GRANDE);
-await pagina.check('.adjunto-marca >> nth=0');
-await pagina.click('#adjuntos-preparar');
-await pagina.waitForSelector('#adjuntos-aviso .aviso-rojo');
-await comprobar('el aviso dice que pesa de más', pagina.locator('#adjuntos-aviso').textContent()
-  .then(t => t.indexOf('20 MB') !== -1), true);
-
-const bandejaTrasElGrande = await nombresDeBandeja();
-await comprobar('nada del documento grande ha entrado en la bandeja',
-  bandejaTrasElGrande.some(n => n.indexOf('docGrande') !== -1), false);
-await comprobar('la lista de encargos vivos sigue con los mismos dos', listaDeEnvios().then(l => l.length), 2);
-await cerrarCuadro();
-
-/* ========================================================
-   4 · llega el .listo.json
-   ======================================================== */
-await pagina.evaluate(() => App.ir('abiertos'));
-await pagina.waitForTimeout(300);
-await comprobar('sale la tarjeta "Borrador en camino"',
-  pagina.locator('#bandeja-envios .tarjeta').count(), 2);
-
-await dejarListo(idConHilo, 'https://mail.google.com/mail/u/?authuser=francisco%40centro.es#drafts');
-await pagina.evaluate(() => window.Bandeja.avisarEnvioNuevo());
-await pagina.waitForSelector('#bandeja-envios button:has-text("Abrir el borrador en Gmail")');
-
-await comprobar('sigue habiendo dos encargos, uno listo y otro esperando',
-  listaDeEnvios().then(l => l.length), 2);
-
-await pagina.click('#bandeja-envios button:has-text("Abrir el borrador en Gmail")');
-await pagina.waitForTimeout(400);
-
-await comprobar('el encargo listo ha salido de la lista de vivos',
-  listaDeEnvios().then(l => l.map(x => x.id)), [idSinHilo]);
-await comprobar('el .listo.json se ha borrado de la bandeja',
-  nombresDeBandeja().then(l => l.includes(idConHilo + '.listo.json')), false);
-
-/* ========================================================
-   5 · llega el .error.json
-   ======================================================== */
-await dejarError(idSinHilo, 'La dirección de correo no es válida.');
-await pagina.evaluate(() => window.Bandeja.avisarEnvioNuevo());
-await pagina.waitForSelector('#bandeja-envios .aviso-rojo:has-text("La dirección de correo no es válida.")');
-
-await pagina.click('#bandeja-envios button:has-text("Entendido")');
-await pagina.waitForTimeout(400);
-
-await comprobar('no queda ningún encargo vivo', listaDeEnvios(), []);
-await comprobar('ya no sale ninguna tarjeta de "Borrador en camino"',
-  pagina.locator('#bandeja-envios .tarjeta').count(), 0);
-await comprobar('el .error.json se ha borrado de la bandeja',
-  nombresDeBandeja().then(l => l.includes(idSinHilo + '.error.json')), false);
+await comprobar('no existe ninguna tarjeta "Borrador en camino"',
+  pagina.locator('.tarjeta-nombre:has-text("Borrador en camino")').count(), 0);
+await comprobar('no hay ningún botón "Preparar borrador"',
+  pagina.getByRole('button', { name: 'Preparar borrador con los documentos' }).count(), 0);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
