@@ -112,7 +112,7 @@ Las filas 1 a 75 y 77 a 123 están **HECHAS**. Sus documentos siguen en `docs/`,
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 124 | `docs/RENUNCIA-JUNTA-ELECTORAL.md` (plantilla de renuncia a la Junta Electoral, asociada al hito «Constituir la Junta Electoral») | PENDIENTE |
+| 124 | `docs/RENUNCIA-JUNTA-ELECTORAL.md` (plantilla de renuncia a la Junta Electoral, asociada al hito «Constituir la Junta Electoral») | EN CURSO (24-sep-2026) |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
 **La fila 123 está HECHA** (24-sep-2026): `docs/CERTIFICADO-TUTORIA-DEL-CENTRO.md`. El certificado de función tutorial, como el del centro: tipo DESEMPEÑO FUNCIÓN TUTORIAL (casa también sin tilde), firma Secretaría con su especialidad (`{{ESPECIALIDAD FIRMANTE}}`), V.º B.º de Dirección, «C E R T I F I C A:» en negrita, tabla Cargo · Curso · Toma de posesión · Cese y firmas en dos columnas. Campo «Cursos que pide» del tipo (en la biblioteca del centro): filtra la tabla (`js/tablas-datos-cursos.js`). `{{DNI}}` trae el documento entero del personal y `{{PROVINCIA}}` es hueco. Falta que Francisco vuelva a pulsar «Cargar las plantillas del centro» y «Cargar la biblioteca del centro» en Mantenimiento. Versión `App.VERSION`: `24-sep-2026 · 12:22`.
