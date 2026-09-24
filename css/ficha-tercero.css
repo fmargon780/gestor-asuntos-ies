@@ -49,16 +49,56 @@
 .vertodo-resto summary { cursor: pointer; font-size: 13px; color: var(--tinta-suave); }
 .vertodo-resto[open] summary { margin-bottom: 8px; }
 
-/* Los tutores legales, una tarjeta por persona (4.1 del encargo). */
-.tutores-lista { display: flex; flex-direction: column; gap: 10px; }
-.tutor-tarjeta { border: 1px solid var(--linea); border-radius: 8px; padding: 10px 12px; }
-.tutor-nombre { margin: 0 0 4px; font-weight: 600; font-size: 14px; }
-.tutor-dato {
-  display: flex; align-items: center; gap: 4px; font-size: 13px;
-  padding: 2px 0; word-break: break-word;
-}
-.tutor-dato.suave { color: var(--tinta-suave); }
+
 
 @media (max-width: 640px) {
   .tercero-vertodo { margin-left: 0; }
 }
+
+/* ============================================================
+   La ventana «Ver todo» de un alumno, en tarjetas (24-sep-2026,
+   fila 108, docs/CONTACTO-EN-TARJETAS.md, js/ficha-tercero-alumno.js).
+   Colores suaves con el texto oscuro del mismo tono, sin sombras.
+   ============================================================ */
+.vt-cabecera { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
+.vt-cabecera-texto { flex: 1 1 220px; min-width: 0; }
+.vt-nombre { font-size: 20px; font-weight: 700; color: var(--tinta); }
+.vt-sub { font-size: 13px; color: var(--tinta-suave); margin-top: 2px; }
+.vt-etiquetas { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.vt-etq { font-size: 12px; font-weight: 600; border-radius: 12px; padding: 3px 10px; display: inline-flex; align-items: center; gap: 4px; }
+.vt-etq-azul { background: #e3eefb; color: #1d4f86; }
+.vt-etq-verde { background: #e2f4e6; color: #1f6b33; }
+.vt-etq-gris { background: #eef1f5; color: #4c5968; }
+.vt-etq .dato-copiable { padding: 0 2px; }
+
+.vt-circulo {
+  flex: none; width: 44px; height: 44px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 15px;
+}
+.vt-circulo-alumno { background: #e3eefb; color: #1d4f86; width: 52px; height: 52px; font-size: 18px; }
+.vt-circulo-tutor1 { background: #e2f4e6; color: #1f6b33; }
+.vt-circulo-tutor2 { background: #f1e6f7; color: #6a2d86; }
+
+.vt-tarjetas { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 12px; }
+@media (max-width: 900px) { .vt-tarjetas { grid-auto-flow: row; grid-auto-columns: auto; } }
+.vt-tarjeta { border: 1px solid var(--linea); border-radius: 10px; padding: 12px 14px; min-width: 0; }
+.vt-tarjeta-alumno { background: #f5f9fe; border-color: #cfe0f4; }
+.vt-tarjeta-tutor1 { background: #f5fbf6; border-color: #cfe8d5; }
+.vt-tarjeta-tutor2 { background: #faf6fc; border-color: #e3d3ec; }
+.vt-tarjeta-otros { background: #f7f8fa; }
+.vt-tarjeta-titulo { font-weight: 700; font-size: 14px; color: #1d4f86; margin-bottom: 8px; display: flex; gap: 6px; align-items: center; }
+.vt-tarjeta-otros .vt-tarjeta-titulo { color: var(--tinta-suave); }
+.vt-tutor-cabecera { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+.vt-tutor-nombre { font-weight: 700; font-size: 14px; color: var(--tinta); }
+.vt-etq-chica { font-size: 11px; font-weight: 600; color: var(--tinta-suave); background: #fff; border: 1px solid var(--linea); border-radius: 10px; padding: 1px 8px; }
+
+.vt-dato { display: flex; align-items: center; gap: 8px; font-size: 14px; padding: 3px 0; min-width: 0; }
+.vt-icono { flex: none; width: 18px; text-align: center; opacity: .75; }
+.vt-valor { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vt-pie { font-size: 12px; color: var(--tinta-suave); white-space: nowrap; }
+.vt-dato .dato-copiable { margin-left: auto; }
+
+.vt-abajo { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+.vt-botones { display: flex; gap: 8px; flex-wrap: wrap; }
+.vt-abajo .vertodo-resto { margin-top: 6px; }

@@ -97,12 +97,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 62, 64 a 75, 77 a 107 están **HECHAS**. Sus documentos siguen en
+Las filas 1 a 62, 64 a 75, 77 a 108 están **HECHAS**. Sus documentos siguen en
 `docs/`, y el detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 108 | `docs/CONTACTO-EN-TARJETAS.md` | EN CURSO (24-sep-2026) |
 | 109 | `docs/EL-HITO-A-PANTALLA-COMPLETA.md` | PENDIENTE (apuntada 24-sep-2026). Después de la 107 |
 | 110 | `docs/TABLAS-DE-DATOS.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 111 | `docs/GENERO-EN-PLANTILLAS.md` | PENDIENTE (apuntada 24-sep-2026) |
@@ -121,9 +120,7 @@ función tutorial de Séneca, RelPerCen, Excel/CSV) unidas por DNI, huecos `{{ES
 completa como mesa de trabajo (guion con normativa y acciones, documentos en tabla con
 selección, formularios y plantillas, comunicar y notas), con borrador de guion para cada hito.
 
-**La fila 108 se apuntó el 24-sep-2026**, cerrada con Francisco: la ventana de contacto del
-alumno pasa a cabecera con etiquetas y una tarjeta por persona (alumno, tutor 1, tutor 2), con el
-nombre completo de cada tutor bien montado.
+**La fila 108 está HECHA** (24-sep-2026): `docs/CONTACTO-EN-TARJETAS.md`. La ventana «Ver todo» del alumno pasa a una cabecera con etiquetas y una tarjeta por persona (el alumno, tutor 1, tutor 2), con el nombre entero de cada tutor bien montado (`js/datos-tutores.js`, `js/ficha-tercero-alumno.js`). Versión publicada `App.VERSION`: `24-sep-2026 · 04:08`.
 
 **La fila 107 está HECHA** (24-sep-2026): `docs/FICHA-EN-TARJETAS.md`. La ficha del asunto pasa de tres columnas a una cuadrícula de tarjetas con su resumen; al pulsar una se abre en grande, con las demás como pestañas y una franja con los documentos (`js/ficha-tarjetas.js`). Versión publicada `App.VERSION`: `24-sep-2026 · 03:53`.
 

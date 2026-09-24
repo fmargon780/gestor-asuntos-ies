@@ -40,7 +40,7 @@ function comprobarQue(titulo, condicion, detalle) {
 const dom = new JSDOM('<!doctype html><html><body></body></html>', { runScripts: 'outside-only' });
 const win = dom.window;
 
-for (const f of ['util.js', 'datos.js', 'dni.js']) {
+for (const f of ['util.js', 'datos.js', 'datos-tutores.js', 'dni.js', 'ficha-tercero-alumno.js']) {
   win.eval(fs.readFileSync(RAIZ + f, 'utf8'));
 }
 const { Datos } = win;
@@ -77,11 +77,11 @@ function fechaParaEdad(anios) {
   comprobarQue('1. dos tarjetas de tutor', tutores.length === 2, JSON.stringify(tutores));
   comprobar('1. el tutor 1 trae su nombre, teléfono y correo, y solo los suyos', tutores[0], {
     numero: 1, nombre: 'María Ruiz Gómez', relacion: '',
-    telefonos: ['612345678'], correos: ['maria@ejemplo.es'], documento: '', otros: []
+    telefonos: ['612345678'], correos: ['maria@ejemplo.es'], documento: '', otros: [], sexo: '', iniciales: 'MR'
   });
   comprobar('1. el tutor 2 trae su nombre y su móvil, sin mezclarse con el 1', tutores[1], {
     numero: 2, nombre: 'Juan Pérez Soto', relacion: '',
-    telefonos: ['698765432'], correos: [], documento: '', otros: []
+    telefonos: ['698765432'], correos: [], documento: '', otros: [], sexo: '', iniciales: 'JP'
   });
 }
 
@@ -102,11 +102,11 @@ function fechaParaEdad(anios) {
   comprobarQue('2. dos tarjetas con "Primer/Segundo tutor"', tutores.length === 2, JSON.stringify(tutores));
   comprobar('2. el primer tutor', tutores[0], {
     numero: 1, nombre: 'Elena López Vidal', relacion: '',
-    telefonos: [], correos: ['elena@ejemplo.es'], documento: '', otros: []
+    telefonos: [], correos: ['elena@ejemplo.es'], documento: '', otros: [], sexo: '', iniciales: 'EL'
   });
   comprobar('2. el segundo tutor', tutores[1], {
     numero: 2, nombre: '', relacion: '',
-    telefonos: ['611222333'], correos: [], documento: '', otros: []
+    telefonos: ['611222333'], correos: [], documento: '', otros: [], sexo: '', iniciales: ''
   });
 }
 
@@ -216,6 +216,70 @@ function fechaParaEdad(anios) {
   comprobar('8. etiqueta azul "SOLICITANTE"', r.grupo, { texto: 'SOLICITANTE', clase: 'azul' });
   comprobarQue('8. sin renglón de última matrícula (undefined: no se llegó a poner `detalle`)',
     r.grupo.detalle === undefined);
+}
+
+/* ============================================================
+   9. El caso real de la fila 108 (docs/CONTACTO-EN-TARJETAS.md): las
+      ocho columnas de tutores de Séneca, con «Primer apellido Segundo
+      tutor» (el «primer» es del apellido, no del tutor).
+   ============================================================ */
+{
+  const alumno = {
+    nombre: 'Bonilla García, Ángel', id: '1234567', categoria: 'ALUMNADO', ano: 2026,
+    matriculado: true, unidad: '3º ESO A', curso: '3º de E.S.O.', fechaNac: fechaParaEdad(13),
+    campos: {
+      'Sexo': 'H',
+      'Teléfono': '655645995',
+      'Teléfono personal': '655 645 995',
+      'Correo electrónico personal': 'abongar2909@g.educaand.es',
+      'Primer apellido Primer tutor': 'García',
+      'Segundo apellido Primer tutor': 'Gallego',
+      'Nombre Primer tutor': 'Isabel María',
+      'Sexo Primer tutor': 'M',
+      'Teléfono Primer tutor': '655645995',
+      'Primer apellido Segundo tutor': 'Bonilla',
+      'Segundo apellido Segundo tutor': 'Fernández',
+      'Nombre Segundo tutor': 'Jesús',
+      'Sexo Segundo tutor': 'H',
+      'Correo electrónico Segundo tutor': 'jesus@correo.es'
+    }
+  };
+  const tutores = Datos.tutoresDe(alumno);
+  comprobar('9. dos tutores, cada uno con su nombre entero',
+    tutores.map((t) => [t.numero, t.nombre, t.sexo, t.iniciales]),
+    [[1, 'Isabel María García Gallego', 'M', 'IM'], [2, 'Jesús Bonilla Fernández', 'H', 'JB']]);
+  comprobar('9. sin datos sueltos colgando (nada en «otros»)',
+    [tutores[0].otros.length, tutores[1].otros.length, tutores.otros.length], [0, 0, 0]);
+
+  const caja = win.document.createElement('div');
+  const v = win.FichaTerceroAlumno.ventana(alumno, Datos.resumenDeTercero(alumno, 'ALUMNADO'), null);
+  caja.innerHTML = v.html;
+  win.document.body.appendChild(caja);
+  v.montar(caja);
+  const texto = caja.textContent;
+  comprobar('9. la cabecera, con el nombre en orden natural',
+    caja.querySelector('.vt-nombre').textContent, 'Ángel Bonilla García');
+  comprobarQue('9. «nacido el», porque es un chico', caja.querySelector('.vt-sub').textContent.indexOf('nacido el') !== -1);
+  comprobar('9. tres tarjetas: el alumno y los dos tutores',
+    caja.querySelectorAll('.vt-tarjeta').length, 3);
+  comprobar('9. los tutores, con su nombre y su etiqueta',
+    Array.from(caja.querySelectorAll('.vt-tarjeta-tutor')).map((t) =>
+      [t.querySelector('.vt-tutor-nombre').textContent, t.querySelector('.vt-etq-chica').textContent]),
+    [['Isabel María García Gallego', 'Tutora 1'], ['Jesús Bonilla Fernández', 'Tutor 2']]);
+  /* Fuera de «Todo lo que trae Séneca», que sigue enseñando las columnas tal cual. */
+  const tarjetas = caja.querySelector('#vt-tarjetas').textContent;
+  comprobarQue('9. ninguna línea «Sexo…» ni «Primer apellido Segundo tutor…» en las tarjetas',
+    tarjetas.indexOf('Sexo') === -1 && tarjetas.indexOf('Primer apellido') === -1);
+  const telAlumno = caja.querySelectorAll('.vt-tarjeta-alumno .vt-dato-telefono');
+  comprobar('9. el teléfono del alumno, una sola vez y en grupos de tres',
+    Array.from(telAlumno).map((d) => d.querySelector('.vt-valor').textContent), ['655 645 995']);
+  comprobar('9. con «mismo que la tutora 1»',
+    telAlumno[0].querySelector('.vt-pie').textContent, 'mismo que la tutora 1');
+  comprobarQue('9. sin «Otros datos de la familia»', texto.indexOf('Otros datos de la familia') === -1);
+  comprobar('9. «Copiar todo el contacto», una línea por persona', v.textoDeTodo(), [
+    'Ángel Bonilla García (3º ESO A) · 655645995 · abongar2909@g.educaand.es',
+    'Tutora 1: Isabel María García Gallego · 655645995',
+    'Tutor 2: Jesús Bonilla Fernández · jesus@correo.es'].join('\n'));
 }
 
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

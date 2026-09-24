@@ -136,7 +136,7 @@
       '; esta persona ya no está en ' + U.escapar(persona.fotoFichero || 'el fichero') + '.</p>';
   }
 
-  function montarLinea(caja, persona, categoria, resumen) {
+  function montarLinea(caja, persona, categoria, resumen, a) {
     caja.innerHTML =
       '<section class="ficha-bloque">' +
         '<h3 class="ficha-titulo">Datos y contacto</h3>' +
@@ -167,7 +167,7 @@
       huecoDni.appendChild(datoConCopiar('DNI ' + resumen.documento.valor, resumen.documento.valor, 'Copiar el DNI'));
     }
     var btn = document.getElementById('tercero-ver-todo');
-    if (btn) btn.onclick = function () { abrirVerTodo(persona, categoria, resumen); };
+    if (btn) btn.onclick = function () { abrirVerTodo(persona, categoria, resumen, a); };
   }
 
   /* La usa js/ficha-asunto.js (`pintarContacto`): busca al tercero y
@@ -178,7 +178,7 @@
     var r = await buscarPersona(a);
     if (!r.persona) { caja.innerHTML = suelto(r.aviso || 'No encontrado.'); return; }
     var resumen = Datos.resumenDeTercero(r.persona, r.categoria);
-    montarLinea(caja, r.persona, r.categoria, resumen);
+    montarLinea(caja, r.persona, r.categoria, resumen, a);
   }
 
   /* ---------- la ventana "Ver todo" ---------- */
@@ -198,98 +198,8 @@
            '</div>';
   }
 
-  function filaDato(etiqueta, valor, ayuda) {
-    var div = document.createElement('div');
-    div.className = 'tutor-dato';
-    div.appendChild(document.createTextNode((etiqueta ? etiqueta + ' ' : '') + valor + ' '));
-    div.appendChild(botonCopiar(valor, ayuda));
-    return div;
-  }
-
-  /* Una tarjeta por tutor (4.1 del encargo): nombre, relación,
-     teléfonos y correos, cada uno con su copiar. Sin botón
-     "Escribirle": `js/correo.js` no expone ninguna función pública
-     para abrir su cuadro con un destinatario puesto (su `abrirCuadro`
-     es privado a su propio IIFE) y tocar ese fichero se sale de lo que
-     pide esta fila; queda anotado en `docs/COLA.md`. */
-  function tarjetaTutor(tutor) {
-    var div = document.createElement('div');
-    div.className = 'tutor-tarjeta';
-
-    var nombre = document.createElement('p');
-    nombre.className = 'tutor-nombre';
-    nombre.textContent = tutor.nombre || ('Tutor legal ' + tutor.numero);
-    div.appendChild(nombre);
-
-    if (tutor.relacion) {
-      var relacion = document.createElement('p');
-      relacion.className = 'suave';
-      relacion.style.margin = '0 0 6px';
-      relacion.textContent = tutor.relacion;
-      div.appendChild(relacion);
-    }
-
-    tutor.telefonos.forEach(function (t) { div.appendChild(filaDato('', t, 'Copiar el teléfono')); });
-    tutor.correos.forEach(function (c) { div.appendChild(filaDato('', c, 'Copiar el correo')); });
-    if (tutor.documento) div.appendChild(filaDato('DNI', tutor.documento, 'Copiar el DNI'));
-    tutor.otros.forEach(function (o) {
-      var fila = document.createElement('div');
-      fila.className = 'tutor-dato suave';
-      fila.textContent = o.titulo + ': ' + o.valor;
-      div.appendChild(fila);
-    });
-
-    return div;
-  }
-
-  function ventanaAlumnado(persona, resumen) {
-    var dest = Datos.destacadosAlumno(persona);
-    var filaDni = dest.destacados.filter(function (f) { return U.normalizar(f.titulo) === 'dni'; })[0];
-    var tutores = Datos.tutoresDe(persona);
-
-    var identificacion = filasHtml([
-      { titulo: 'Nombre', valor: persona.nombre },
-      { titulo: 'DNI', valor: filaDni ? filaDni.valor : '' },
-      { titulo: 'Nº de identificación escolar', valor: persona.id },
-      { titulo: 'Fecha de nacimiento', valor: persona.fechaNac },
-      { titulo: 'Edad', valor: resumen.edad }
-    ]);
-
-    var matricula = filasHtml([
-      { titulo: 'Curso', valor: persona.matriculado ? persona.curso : '' },
-      { titulo: 'Unidad', valor: persona.matriculado ? persona.unidad : '' },
-      { titulo: 'Estado de la matrícula', valor: persona.matriculado
-          ? 'Matriculado en el curso ' + U.cursoDeAno(persona.ano)
-          : (persona.solicitante ? 'Solicitante, todavía sin matricular' : 'No matriculado este curso') },
-      { titulo: 'Última matrícula', valor: (!persona.matriculado && !persona.solicitante && persona.anoUltima)
-          ? (U.cursoDeAno(persona.anoUltima) +
-             (persona.cursoUltima ? ' · ' + persona.cursoUltima : '') +
-             (persona.unidadUltima ? ' · ' + persona.unidadUltima : ''))
-          : '' }
-    ]);
-
-    var contacto = filasHtml(dest.destacados.filter(function (f) {
-      var t = U.normalizar(f.titulo);
-      return /telefono|movil|correo|e-?mail/.test(t) && !/tutor|padre|madre|responsable|familia/.test(t);
-    }));
-
-    var otrosFamilia = filasHtml(tutores.otros);
-    var resto = filasHtml(dest.resto);
-
-    var html =
-      '<div class="vertodo-cols">' +
-        seccion('Identificación', identificacion) +
-        seccion('Matrícula y grupo', matricula) +
-        seccion('Contacto del alumno', contacto) +
-        seccion('Tutores legales', tutores.length
-          ? '<div class="tutores-lista"></div>'
-          : '<p class="explica">No hay tutores legales en el fichero.</p>', 'vertodo-tutores') +
-        seccion('Otros datos de la familia', otrosFamilia) +
-      '</div>' +
-      '<details class="vertodo-resto"><summary>Todo lo que trae Séneca</summary>' + resto + '</details>';
-
-    return { html: html, tutores: tutores };
-  }
+  /* La ventana de un alumno (tarjetas del alumno y de cada tutor, fila
+     108) vive en js/ficha-tercero-alumno.js. */
 
   function ventanaPersonal(persona) {
     var dest = Datos.destacadosPersona(persona);
@@ -343,22 +253,19 @@
     return { html: html, tutores: [] };
   }
 
-  async function abrirVerTodo(persona, categoria, resumen) {
-    var construido = categoria === 'ALUMNADO' ? ventanaAlumnado(persona, resumen)
+  async function abrirVerTodo(persona, categoria, resumen, a) {
+    var construido = categoria === 'ALUMNADO' ? FichaTerceroAlumno.ventana(persona, resumen, a)
       : categoria === 'PERSONAL' ? ventanaPersonal(persona)
       : ventanaGenerica(persona, categoria);
 
-    var promesa = U.preguntar(persona.nombre, construido.html, 'Cerrar', true);
+    var promesa = U.preguntar(construido.titulo || persona.nombre, construido.html, 'Cerrar', true);
     var cuadro = document.querySelector('#capa .cuadro');
     if (cuadro) cuadro.classList.add('cuadro-ancho');
-
-    if (construido.tutores && construido.tutores.length) {
-      var lista = document.querySelector('.vertodo-tutores .tutores-lista');
-      if (lista) construido.tutores.forEach(function (t) { lista.appendChild(tarjetaTutor(t)); });
-    }
+    if (construido.montar) construido.montar(document.getElementById('capa'));
 
     await promesa;
     if (cuadro) cuadro.classList.remove('cuadro-ancho');
+    if (construido.alCerrar) construido.alCerrar();
   }
 
   /* Expuesta para js/ficha-nombre-acciones.js (18-sep-2026, fila 58,
