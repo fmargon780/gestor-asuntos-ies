@@ -112,7 +112,7 @@ Las filas 1 a 75 y 77 a 129 están **HECHAS**. Sus documentos siguen en `docs/`,
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 130 | `docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md` (tablón y listas por la cola, correo que no sale dos veces, nombres con tope de largo) | PENDIENTE |
+| 130 | `docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md` (tablón y listas por la cola, correo que no sale dos veces, nombres con tope de largo) | EN CURSO (24-sep-2026) |
 | 131 | `docs/PLAZOS-BIEN-CONTADOS.md` (días hábiles, lectivos o naturales en cada plazo; festivos en Ajustes) | PENDIENTE |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
