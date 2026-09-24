@@ -17,6 +17,7 @@ de `App` va después del fichero que lo define.
 | `css/vista.css` | El ancho de la pantalla, los filtros plegados y las tarjetas por tipo |
 | `css/guias.css` | La guía: pasos, plegado, preguntas y opciones |
 | `css/tipos-buscador.css` | Las listas de resultados, y la marca naranja del que ya no está |
+| `css/tipo-al-vuelo.css` | El botón y el panel de "+ Crear tipo nuevo" en Nuevo asunto (fila 128) |
 | `css/copiar-nie.css` | Los estilos de `js/copiar.js` (nombre viejo del módulo) |
 | `js/util.js` | Utilidades comunes, y la comparación de nombres parecidos. `U.mensajeDeError(e)` traduce al castellano los errores del navegador (`NotFoundError` y compañía). `U.envolver`/`U.envolturasAplicadas`/`U.envolturasFallidas` (fila 70) apuntan las envolturas de la aplicación. `U.copiar`/`U.nuevoId`/`U.fechaCorta` (fila 71) son la caja común de copiar al portapapeles, crear identificadores e imprimir fechas cortas |
 | `js/almacen.js` | Guarda los ajustes en el navegador |
@@ -57,10 +58,10 @@ de `App` va después del fichero que lo define.
 | `js/documentos-sueltos-lector.js` | Envuelve `App.tarjetaSuelto` para proponer tipo/fecha/registro/tercero de cada PDF suelto, con el botón "Aceptar" (17-sep-2026, fila 41); si el documento de identidad no cuadra con nadie, el botón "Dar de alta" (fila 42); con tercero reconocido, pregunta a `js/documentos-sueltos-sugerencias.js` y pinta sus líneas «Podría ir en…» (fila 88); expone `window.LectorDeSueltos.resultadoDe(nombre)` |
 | `js/bandeja-adjuntos-lector.js` | Lee los adjuntos PDF de un correo de la bandeja y completa el hueco de tercero o tipo que deja `Bandeja.proponer`, con el registro y la fecha del documento en una línea aparte; envuelve `window.Bandeja.llevarANuevo` (18-sep-2026, fila 49) |
 | `js/lo-pide.js` | Quién ha pedido la gestión: candidatos, controles, línea legible y qué casilla marcar en el correo |
-| `js/asuntos-nuevo.js` | Crear un asunto, el cuadro de datos de un tercero y los pies |
+| `js/asuntos-nuevo.js` | Crear un asunto, el cuadro de datos de un tercero y los pies. `App.marcarTipoElegido` (fila 128): deja un tipo elegido sin tocar el tercero ni lo escrito, a diferencia de `App.elegirTipo`; lo usa `js/tipo-al-vuelo.js` |
 | `js/archivo-personas.js` | Personas y empresas, cambiar los datos de un tercero, y la pantalla ARCHIVO: orquesta `js/archivo-indice.js` (lee el índice o cae al recorrido de disco), busca por palabras y resuelve el manejador de una carpeta al vuelo para "Documentos" (fila 44) |
 | `js/archivo-indice.js` | El índice guardado del ARCHIVO, `_GESTOR/indice-archivo.json` (`window.IndiceArchivo`, ver "El índice del ARCHIVO", fila 44) |
-| `js/ajustes.js` | El marco de Ajustes (17-sep-2026, fila 39): las tres pestañas, la lista de tipos (pestañas de categoría, buscador cruzado, aviso en vivo) y los ayudantes compartidos (`botonMenuTarjeta`, `filaEstado`, `construirCasillaPlazo`) |
+| `js/ajustes.js` | El marco de Ajustes (17-sep-2026, fila 39): las tres pestañas, la lista de tipos (pestañas de categoría, buscador cruzado, aviso en vivo) y los ayudantes compartidos (`botonMenuTarjeta`, `filaEstado`, `construirCasillaPlazo`). `App.crearTipo` (fila 128): guarda un tipo nuevo ya pasada la guardia de nombres; lo usan "Añadir" de aquí y "+ Crear tipo nuevo" de Nuevo asunto (`js/tipo-al-vuelo.js`) |
 | `js/tipos-nombre.js` | Un tipo que cambia de nombre se lleva guía, campos, plantillas y recurrentes (`TiposNombre.mover`); el arreglo al entrar de lo que se quedó bajo el nombre corto o un alias, y las plantillas repetidas; `App.renombrarTipo` (sacado de `js/ajustes.js`). Fila 126 |
 | `js/ajustes-tipo.js` | La pantalla propia de un tipo de asunto, con sus ocho secciones (17-sep-2026, fila 39) |
 | `js/ajustes-tipo-palabras-clave.js` | La sección "Palabras clave" de la pantalla de un tipo: `palabrasClave` en `tipos.json` (17-sep-2026, fila 41) |
@@ -130,7 +131,8 @@ de `App` va después del fichero que lo define.
 | `js/hitos-comunicar.js` | El botón "Comunicar" propio de un hito (fila 60): lee la comunicación de su paso de origen, resuelve el destinatario y los huecos, abre el cuadro de Correo/Séneca ya relleno (vía `CorreoNucleo`) y pinta el botón en la ficha. No añade nada a `window.Hitos`: nada de esto se guarda en el hito |
 | `js/hitos-generar.js` | «Generar documento» dentro de un hito (fila 102): elige entre las plantillas del paso y las del tipo y llama a `PlantillasDocumento.generar(..., { hito })`; cargado justo después de `js/plantillas-documento.js` |
 | `js/visor.js` | El panel de la derecha para ver un documento (`con-visor`); marcador y acciones opcionales para que quien lo abre sepa qué se está viendo |
-| `js/tipos-buscador.js` | Buscar el tipo de asunto por letras, y los más usados arriba |
+| `js/tipos-buscador.js` | Buscar el tipo de asunto por letras, y los más usados arriba. Al final de `aplicar()` llama a `TipoAlVuelo.repintar()` si existe (fila 128): un punto enganchado, no una envoltura |
+| `js/tipo-al-vuelo.js` | "+ Crear tipo nuevo" sin salir de Nuevo asunto (fila 128, `docs/TIPO-DESDE-EL-ASUNTO.md`): el botón (destacado bajo el buscador con texto escrito, discreto al final de la parrilla sin texto) y el panel de tres datos (nombre, nombre corto, categoría). Guarda con `App.crearTipo` y deja elegido con `App.marcarTipoElegido` |
 | `js/via-contacto.js` | Los teléfonos y correos del tercero, como botones |
 | `js/tablon.js` | El tablón de notas rápidas, con las notas "Solo para mí" |
 | `js/copiar.js` | Los botones de copiar: el nombre del documento en la ficha, y `Copiar.boton`/`nieDeAsunto`/`categoriaDe`/`copiar` expuestos en `window.Copiar` para la fila de copiar de un gesto (`js/ficha-nombre-acciones.js`, fila 58) |
@@ -196,6 +198,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/nombres-app.mjs` | Falla si dos ficheros definen la misma función de `App` |
 | `pruebas/navegador.mjs` | Prueba de la aplicación entera |
 | `pruebas/tipos.mjs` | Prueba de las tarjetas por tipo |
+| `pruebas/tipo-desde-el-asunto.mjs` | Prueba de la fila 128: "+ Crear tipo nuevo" en Nuevo asunto (destacado con texto, discreto sin texto), crear el tipo y que quede elegido, que un nombre repetido no se duplique, que no se pierda el tercero ni lo escrito, Escape que solo cierra el panel, y que aparezca en Ajustes |
 | `pruebas/correos.mjs` | Prueba de lo que deja un correo dentro de un asunto, de la huella del hilo y del elegidor |
 | `pruebas/tablon.mjs` | Prueba de cuándo se ve el tablón (a 1905 píxeles) |
 | `pruebas/dni.mjs` | Prueba del DNI, del aviso y de las tres mejoras del buscador |

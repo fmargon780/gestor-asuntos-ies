@@ -9,6 +9,31 @@ código comunes y la tabla de ficheros del repositorio están en el propio `docs
 
 ---
 
+### Crear un tipo sin salir de Nuevo asunto (24-sep-2026, fila 128)
+
+`js/tipo-al-vuelo.js` (`docs/TIPO-DESDE-EL-ASUNTO.md`). Cambia una decisión de siempre: los
+tipos de asunto ya no se crean solo en Ajustes. En Nuevo asunto, junto al buscador de tipos
+(`js/tipos-buscador.js`), un botón **«+ Crear tipo nuevo»**:
+
+- **Destacado, justo debajo del buscador**, mientras el buscador tenga texto escrito (no solo
+  sin resultados: puede haber parecidos que no valgan). **Discreto, al final de la parrilla**,
+  con el buscador vacío. `TipoAlVuelo.repintar()` decide y mueve siempre el mismo nodo; se llama
+  desde `js/tipos-buscador.js`, al final de su `aplicar()` (escribir en el buscador solo llama a
+  `aplicar()`, no a `App.pintarTipos` entero), no envuelve nada.
+- Abre un panel con tres datos —Nombre (relleno con lo escrito, en mayúsculas), Nombre corto
+  (opcional) y Categoría (la elegida)—, **dentro de la misma pantalla**, nunca un segundo `#capa`.
+  Escape lo cierra a él, no Nuevo asunto (mismo cuidado que `js/huecos-buscador.js`: un
+  `keydown` propio en captura, con `stopPropagation`).
+- Guarda con `App.crearTipo` (`js/ajustes.js`), la misma función que usa «Añadir» en Ajustes, tras
+  la misma guardia `U.dejaCrear`. Un nombre ya existente no se duplica: se avisa y se ofrece
+  «Usar este», que deja elegido el que ya había.
+- Deja el tipo elegido con `App.marcarTipoElegido` (`js/asuntos-nuevo.js`), no con
+  `App.elegirTipo`: a diferencia de éste, no toca el tercero ni lo ya escrito (descripción,
+  campos), por si se está reconsiderando el tipo con el formulario ya avanzado. Si el tercero
+  todavía no se había elegido, revela ese bloque igual que `App.elegirTipo`.
+
+Se comprueba con `pruebas/tipo-desde-el-asunto.mjs`.
+
 ### La ficha de un asunto
 
 Al pulsar el nombre de un asunto se entra en su ficha: sus datos, el contacto del tercero, la

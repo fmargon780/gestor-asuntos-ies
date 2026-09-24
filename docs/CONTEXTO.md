@@ -49,8 +49,9 @@ señalarlas.
 Decisiones de diseño:
 
 - Primero se elige la categoría (ALUMNADO, PERSONAL, EMPRESAS, OTROS), y después el tipo.
-- Los tipos de asunto solo se crean en Ajustes, nunca sobre la marcha. Los de DOCUMENTO sí se
-  crean al vuelo, desde el propio cuadro.
+- Los tipos de asunto se crean en Ajustes o, con nombre, nombre corto y categoría, desde Nuevo
+  asunto («+ Crear tipo nuevo», `js/tipo-al-vuelo.js`, fila 128); la guía, los campos y las
+  plantillas, siempre en Ajustes. Los de DOCUMENTO sí se crean al vuelo, desde el propio cuadro.
 - Se puede ver el archivo completo de un tercero.
 - La ficha del alumnado enseña arriba la edad actual, el DNI y el contacto de los tutores.
 - Además de arrastrar un documento a la carpeta, se puede elegir desde la app en la carpeta
