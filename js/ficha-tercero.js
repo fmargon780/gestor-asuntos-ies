@@ -181,6 +181,8 @@
     montarLinea(caja, r.persona, r.categoria, resumen, a);
     /* Fila 110: sus filas en las tablas de datos (tutorías…), plegadas. */
     if (window.TablasDatosPantalla) TablasDatosPantalla.pintarEnFicha(caja, r.persona);
+    /* Fila 111: la casilla Sexo, para el masculino o el femenino de las plantillas. */
+    if (window.Genero) await Genero.pintarEnFicha(caja, r.persona, r.categoria);
   }
 
   /* ---------- la ventana "Ver todo" ---------- */

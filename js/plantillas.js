@@ -332,6 +332,13 @@ var Plantillas = (function () {
       return valores.loQueFalta || '';
     });
     var faltan = [];
+    /* Fila 111 (js/genero.js): con los sexos del asunto, «alumno/a» se
+       queda en la forma que toca; sin el dato, tal cual y en `faltan`. */
+    if (valores.sexos && window.Genero) {
+      var g = Genero.resolver(conLoQueFalta, valores.sexos);
+      conLoQueFalta = g.texto;
+      Object.keys(g.sinResolver).forEach(function (q) { faltan.push(Genero.dondePonerlo(q, valores.categoria)); });
+    }
     var conDobles = resolverHuecosDobles(conLoQueFalta, valores, faltan);
     var salida = conDobles.replace(/\{([^{}]+)\}/g, function (todo, dentro) {
       var clave = dentro.trim();
@@ -619,9 +626,10 @@ var Plantillas = (function () {
     var fechaDelDocumento = op.fecha || U.hoyIso();
     valores.firmante = ''; valores['cargo firmante'] = ''; valores['tratamiento firmante'] = '';
     valores['visto bueno'] = ''; valores['cargo visto bueno'] = ''; valores['tratamiento visto bueno'] = '';
+    var firmante = null, vistoBueno = null;
     if (op.plantilla && window.Cargos) {
       if (op.plantilla.firmante) {
-        var firmante = await Cargos.enFecha(op.plantilla.firmante, fechaDelDocumento);
+        firmante = await Cargos.enFecha(op.plantilla.firmante, fechaDelDocumento);
         if (firmante) {
           valores.firmante = firmante.persona;
           valores['cargo firmante'] = firmante.nombre;
@@ -629,7 +637,7 @@ var Plantillas = (function () {
         }
       }
       if (op.plantilla.vistoBueno) {
-        var vistoBueno = await Cargos.enFecha(op.plantilla.vistoBueno, fechaDelDocumento);
+        vistoBueno = await Cargos.enFecha(op.plantilla.vistoBueno, fechaDelDocumento);
         if (vistoBueno) {
           valores['visto bueno'] = vistoBueno.persona;
           valores['cargo visto bueno'] = vistoBueno.nombre;
@@ -655,6 +663,18 @@ var Plantillas = (function () {
       var t2 = datosDeTutor(persona.campos, 2);
       valores.tutor1 = t1.nombre; valores.tutor1telefono = t1.telefono; valores.tutor1correo = t1.correo;
       valores.tutor2 = t2.nombre; valores.tutor2telefono = t2.telefono; valores.tutor2correo = t2.correo;
+    }
+
+    /* Fila 111: los sexos de cada persona, para el masculino o el femenino
+       (Plantillas.rellenar -> Genero.resolver); el tratamiento con barra
+       («El/La Director/a») se resuelve aquí con el de quien ocupa el cargo. */
+    if (window.Genero) {
+      valores.categoria = categoria;
+      valores.sexos = await Genero.sexosDeAsunto(persona, categoria, firmante || null, vistoBueno || null);
+      ['firmante', 'visto bueno'].forEach(function (q) {
+        var s = valores.sexos[q.replace(' ', '')];
+        valores['tratamiento ' + q] = Genero.resolver(valores['tratamiento ' + q], { tercero: s, firmante: s }).texto;
+      });
     }
 
     /* {firma}: el texto de la firma del centro, ya con sus propios

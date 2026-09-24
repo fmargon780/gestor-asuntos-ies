@@ -97,9 +97,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
 - Papelera: nada se borra del todo a la primera.
 - Mandar documentos de un asunto por correo, con un borrador que deja Apps Script en Gmail.
-- Plantillas de correo y de documento de Word por tipo de asunto, con huecos que se rellenan
-  solos; el centro ya tiene sus textos (`plantillas/`), cargados con un botón en Mantenimiento.
-  El documento sale con membrete y con la firma de quien ocupaba el cargo, en su fecha.
+- Plantillas de correo y de Word por tipo de asunto, con huecos que se rellenan solos; textos del
+  centro en `plantillas/` (botón en Mantenimiento). Salen con membrete, la firma de quien ocupaba
+  el cargo en su fecha y «el/la alumno/a» en masculino o femenino según el sexo de cada persona.
 - Tablas de datos (tutorías de Séneca en PDF, CSV/Excel en `datos/Tablas`) unidas por DNI, con huecos
   {{ESPECIALIDAD}} y {{TABLA TUTORIAS}}; lo que falta sale en amarillo. Certificado de función tutorial.
 - Copias diarias (caducan a los 90 días, configurable), detección de fichero roto, fusión de
