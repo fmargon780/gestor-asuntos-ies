@@ -238,6 +238,7 @@ await cerrarCuadro();
    ======================================================== */
 llamadas = [];
 await abrirCorreoDe(GRANDE);
+await pagina.fill('#correo-otro', 'proveedor@correo.es');
 await pagina.check('.adjunto-marca >> nth=0');
 await pagina.click('#correo-enviar');
 await pagina.waitForSelector('.mensaje.malo:has-text("20 MB")');
