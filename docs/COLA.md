@@ -83,6 +83,16 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     de commit en el parámetro `content`, y `docs/COLA.md` se quedó en 83 bytes. Antes de cada
     llamada, comprueba que `content` es el documento entero y `message` es la frase del commit:
     son dos parámetros distintos, nunca el mismo texto.
+19. **Tras fusionar o subir, comprueba con `curl` que lo publicado coincide con `main`** (por
+    ejemplo `js/version.js?v=<algo distinto>`). Si `App.VERSION` publicada se queda atrás varios
+    minutos, puede que Vercel no haya llegado a lanzar la publicación de los últimos commits (sin
+    error visible: sencillamente no hay ninguna `deployment` para esos SHA). Pasó el 24-sep-2026
+    con la fila 63 (`216bff3a`, ~40 min sin publicarse). Si tienes acceso a la herramienta MCP de
+    Vercel, `list_deployments` con el `sha` del commit lo confirma, y un `create_deployment` con
+    `deploymentId` de la última publicación buena y `withLatestCommit: true` (`target: production`)
+    fuerza una nueva publicación desde el commit actual de `main` sin tocar el repositorio. Si no
+    tienes esa herramienta, déjalo anotado aquí para que otra sesión lo compruebe: no reintentes
+    subidas del mismo fichero pensando que el problema está en el contenido.
 
 ## Reglas para Francisco
 
@@ -97,12 +107,28 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 75, 77 a 116 están **HECHAS**. Sus documentos siguen en
-`docs/`, y el detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
+No queda ninguna fila **PENDIENTE** (comprobado 24-sep-2026, sesión programada). Las filas 1 a 75,
+77 a 116 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+`docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**24-sep-2026, sesión programada (taller automático):** al llegar, la fila 115 ya estaba
+**EN CURSO** por otra sesión (la marqué yo mismo a las 04:08 y, mientras tanto, esa otra sesión la
+completó entera con `git push` real: commits `d07e080e`…`be0bb513`). Entre las 04:08 y las 05:50
+esa misma sesión (u otra en paralelo) también cerró las filas 116 y 63. Resultado al comprobarlo:
+**ninguna fila PENDIENTE**, solo la 76 sigue BLOQUEADA como estaba. Lo único que hizo falta
+arreglar: la publicación de Vercel se había quedado parada en el commit de la fila 116 (`App.VERSION`
+`07:32`) sin publicar los dos commits siguientes de la fila 63 (`cb98ef75` y el merge `216bff3a`,
+`07:35`) — **más de 40 minutos sin ninguna `deployment` para esos commits**, sin error visible (ver
+regla 19, arriba). Con la herramienta MCP de Vercel (`create_deployment`, `deploymentId` de la
+última publicación buena + `withLatestCommit: true`) se forzó una publicación nueva: quedó
+`READY` en segundos y `curl` confirmó `App.VERSION`: `24-sep-2026 · 07:35`, con `docs/COLA.md`
+dando 404 en producción (la fila 63 funcionando). No se ha tocado código ni pruebas en esta
+sesión, solo la marca EN CURSO de la fila 115 (ya sin efecto, sobrescrita por la fila HECHA) y esta
+nota.
 
 **La fila 63 está HECHA** (24-sep-2026): `docs/PUBLICAR-SOLO-LA-APP.md`. Francisco comprobó que `asuntos.fmargon.com/docs/COLA.md` se veía: `.vercelignore` deja fuera `docs/`, `pruebas/`, `plantilla/`, `apps-script/`, `herramientas/`, `.github/`, `README.md` y `package*.json` (`scripts/` se queda, por el `ignoreCommand`). El autónomo real de los ejemplos, cambiado por uno inventado. Queda por comprobar, ya publicado, que `docs/COLA.md` da error y que un cambio solo de `docs/` no publica. Versión publicada `App.VERSION`: `24-sep-2026 · 07:35`.
 
@@ -287,6 +313,15 @@ otra (una fila volvió a PENDIENTE varias veces). Mientras la cola esté muy act
 las sesiones de una en una. El detalle de aquel día, y de los ficheros que se rompieron y se
 recuperaron (`docs/CONTEXTO.md` con un `PLACEHOLDER`, `docs/HISTORIA.md` truncado a la mitad),
 está en `docs/HISTORIA.md`; de ahí salieron las reglas 10, 11, 12 y 14.
+
+24-sep-2026: dos sesiones a la vez en la fila 115 (una programada, sin `git push`; otra con `git
+push` real) no llegaron a pisarse — la segunda la completó entera antes de que la primera subiera
+nada más que la marca EN CURSO. Pero si una sesión sin `git push` intenta escribir de un tirón un
+fichero grande (por ejemplo, pasarle a un subagente el contenido entero de un fichero de más de
+~50 KB dentro del propio mensaje), puede agotar su propio límite de respuesta antes de llegar a
+subir nada: no es un fallo del repositorio, es la sesión quedándose sin aire a mitad de frase. Si
+pasa, no ha tocado nada todavía (compruébalo con `docs/COLA.md` y el historial de commits antes de
+seguir) — deshazte de esa sesión y, si hace falta ayuda, repártela en trozos más pequeños.
 
 ## Nota para la próxima sesión: docs/CONTEXTO.md y docs/HISTORIA.md de las filas 53-56
 
