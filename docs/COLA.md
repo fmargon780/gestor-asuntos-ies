@@ -103,8 +103,13 @@ Las filas 1 a 62, 64 a 75, 77 a 112 están **HECHAS**. Sus documentos siguen en
 | Nº | Instrucción | Estado |
 |---|---|---|
 | 113 | `docs/MAPA-DE-LA-GUIA.md` | PENDIENTE (apuntada 24-sep-2026) |
+| 114 | `docs/DOCUMENTOS-EN-LA-TARJETA.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 114 se apuntó el 24-sep-2026**, cerrada con Francisco: en la tarjeta cerrada de
+Documentos, los nombres legibles sin pisarse, como mucho cinco más «y N más», y sin la línea
+«N documentos».
 
 **La fila 113 se apuntó el 24-sep-2026**, cerrada con Francisco: un mapa de la guía, de solo
 lectura, con las ramas de cada pregunta una al lado de otra; en Ajustes, en el editor de la guía

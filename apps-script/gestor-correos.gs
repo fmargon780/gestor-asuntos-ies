@@ -14,6 +14,10 @@
    ejecuta el script: Gmail no admite un borrador sin nadie ahí, y es
    lo que hace todo el mundo con un envío en copia oculta.
 
+   24-sep-2026: encuentra la carpeta GESTOR-BANDEJA aunque esté dentro
+   de otra carpeta, no solo en la raíz de «Mi unidad». Sin esto, los
+   borradores con documentos se quedaban en "Borrador en camino".
+
    ============================================================
    Gestor de Asuntos — recogida de correos
    Google Apps Script, en la cuenta g.educaand.es
@@ -392,9 +396,29 @@ function etiqueta(nombre) {
   return GmailApp.getUserLabelByName(nombre) || GmailApp.createLabel(nombre);
 }
 
+/* 24-sep-2026: la carpeta puede estar dentro de otra (en el Drive de
+   Francisco vive en «APP GESTION ASUNTOS/GESTOR-BANDEJA»). Antes solo se
+   buscaba en la raíz de «Mi unidad», y los encargos de borrador se
+   quedaban sin recoger. Ahora: primero la raíz; si no, la busca en todo
+   el Drive (sin papelera, propia antes que compartida); y solo si no
+   existe en ningún sitio, la crea en la raíz. */
 function carpetaBandeja() {
-  var busca = DriveApp.getRootFolder().getFoldersByName(CARPETA);
-  return busca.hasNext() ? busca.next() : DriveApp.getRootFolder().createFolder(CARPETA);
+  var enRaiz = DriveApp.getRootFolder().getFoldersByName(CARPETA);
+  if (enRaiz.hasNext()) return enRaiz.next();
+
+  var yo = Session.getEffectiveUser().getEmail();
+  var ajena = null;
+  var todas = DriveApp.getFoldersByName(CARPETA);
+  while (todas.hasNext()) {
+    var c = todas.next();
+    if (c.isTrashed()) continue;
+    var dueno = c.getOwner();
+    if (dueno && dueno.getEmail() === yo) return c;
+    if (!ajena) ajena = c;
+  }
+  if (ajena) return ajena;
+
+  return DriveApp.getRootFolder().createFolder(CARPETA);
 }
 
 function ahora() {
