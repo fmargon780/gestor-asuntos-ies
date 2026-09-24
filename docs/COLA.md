@@ -102,7 +102,7 @@ Las filas 1 a 62, 64 a 75, 77 a 104 están **HECHAS**. Sus documentos siguen en
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 105 | `docs/AJUSTES-PLEGADO.md` | PENDIENTE (apuntada 23-sep-2026) |
+| 105 | `docs/AJUSTES-PLEGADO.md` | EN CURSO (24-sep-2026) |
 | 106 | `docs/LO-PIDE-EN-LA-CABECERA.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 107 | `docs/FICHA-EN-TARJETAS.md` | PENDIENTE (apuntada 24-sep-2026). Después de la 106 |
 | 108 | `docs/CONTACTO-EN-TARJETAS.md` | PENDIENTE (apuntada 24-sep-2026) |
