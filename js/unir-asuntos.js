@@ -39,8 +39,16 @@
    bloque de Ajustes los crea este fichero por su cuenta, así que
    index.html no necesita más marcado que el enlace a
    css/unir-asuntos.css y el propio <script>.
+
+   Desde la fila 133 (24-sep-2026, docs/PARTIR-FICHEROS-GRANDES.md) la
+   pantalla de Duplicados vive en js/unir-asuntos-pantalla.js y la
+   unión de verdad en js/unir-asuntos-unir.js, que se cargan justo
+   después y comparten lo necesario por `UnirAsuntos._interno` (I).
    ============================================================ */
 (function () {
+  var I = {};
+  /* Lo que usan js/unir-asuntos-pantalla.js y js/unir-asuntos-unir.js. */
+  I.pintarAviso = pintarAviso; I.gruposActivos = gruposActivos; I.descartarGrupo = descartarGrupo;
 
   var FICHERO_DESCARTES = 'no-duplicados.json';
   var SEPARADOR_FIRMA = '';
@@ -176,7 +184,7 @@
     botonAviso.type = 'button';
     botonAviso.id = 'btn-duplicados';
     botonAviso.className = 'boton boton-ambar oculto';
-    botonAviso.onclick = function () { irADuplicados(); };
+    botonAviso.onclick = function () { I.irADuplicados(); };
     var antesDe = $('btn-tablon') || $('btn-recargar');
     if (antesDe && antesDe.parentNode === acciones) acciones.insertBefore(botonAviso, antesDe);
     else acciones.appendChild(botonAviso);
@@ -213,344 +221,6 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enganchar);
     else enganchar();
   })();
-
-  /* ---------- la pantalla de Duplicados ----------
-
-     La crea este fichero, dinámicamente: no está en index.html ni en
-     el menú de la izquierda. Solo se llega a ella desde el aviso. */
-
-  App.PANTALLAS.push('duplicados');
-
-  var pantallaConstruida = false;
-
-  function construirPantalla() {
-    if (pantallaConstruida) return;
-    var contenido = document.querySelector('main.contenido');
-    if (!contenido) return;
-    var seccion = document.createElement('section');
-    seccion.id = 'pantalla-duplicados';
-    seccion.className = 'pantalla oculto';
-    seccion.innerHTML =
-      '<header class="cabecera">' +
-        '<h2>Posibles duplicados</h2>' +
-        '<div class="acciones">' +
-          '<button type="button" id="dup-pantalla-volver" class="boton">← Volver a asuntos abiertos</button>' +
-        '</div>' +
-      '</header>' +
-      '<p class="explica">Asuntos que coinciden en tercero, tipo y año académico, y que parece que ' +
-      'son la misma gestión repetida por error. El grupo y el texto libre del nombre no cuentan ' +
-      'para esta comparación.</p>' +
-      '<div id="duplicados-lista"></div>';
-    contenido.appendChild(seccion);
-    $('dup-pantalla-volver').onclick = function () { App.ir('abiertos'); };
-    pantallaConstruida = true;
-  }
-
-  /* Se construye ya, al cargar el script: App.ir espera que exista
-     #pantalla-<cada nombre de App.PANTALLAS>, así que la sección tiene
-     que estar en el DOM desde el principio (oculta), no solo la
-     primera vez que se visita. El script se carga con el body ya
-     parseado, así que main.contenido ya existe en este punto. */
-  construirPantalla();
-
-  function irADuplicados() {
-    construirPantalla();
-    App.ir('duplicados');
-    pintarPantallaDuplicados();
-  }
-
-  /* ---------- una columna por asunto, dentro de un grupo ---------- */
-
-  function lineaDatos(a) {
-    var f = a.ficha || {};
-    var trozos = [];
-    if (a.leido && a.leido.fecha) trozos.push('Abierto el ' + U.fechaLegible(a.leido.fecha));
-    trozos.push(window.EstadoHito ? EstadoHito.textoDeNombre(a.nombre) : 'Sin hitos');   /* fila 129 */
-    var via = App.textoVia ? App.textoVia(f) : '';
-    if (via) trozos.push(via);
-    var p = App.plazoDe ? App.plazoDe(a) : null;
-    if (p) trozos.push(p.texto);
-    return trozos.join('  ·  ');
-  }
-
-  function columnaDeAsunto(a) {
-    var col = document.createElement('div');
-    col.className = 'columna-duplicado';
-
-    var nombre = document.createElement('button');
-    nombre.type = 'button';
-    nombre.className = 'columna-nombre';
-    nombre.textContent = a.nombre;
-    nombre.title = 'Abrir la ficha de este asunto';
-    nombre.onclick = function () { App.abrirFicha(a, 'abierto'); };
-    col.appendChild(nombre);
-
-    var datos = document.createElement('div');
-    datos.className = 'columna-datos';
-    datos.textContent = lineaDatos(a);
-    col.appendChild(datos);
-
-    var rotuloDocs = document.createElement('div');
-    rotuloDocs.className = 'columna-rotulo';
-    rotuloDocs.textContent = 'Documentos';
-    col.appendChild(rotuloDocs);
-
-    var docs = document.createElement('div');
-    docs.className = 'columna-documentos';
-    docs.textContent = 'Leyendo…';
-    col.appendChild(docs);
-
-    Carpetas.ficheros(a.handle).then(function (lista) {
-      docs.innerHTML = '';
-      if (!lista.length) {
-        docs.innerHTML = '<p class="nota">Sin documentos.</p>';
-        return;
-      }
-      lista.forEach(function (f) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'columna-documento';
-        b.textContent = f.nombre;
-        b.onclick = function () { Visor.abrir(f.handle, f.nombre); };
-        docs.appendChild(b);
-      });
-    }).catch(function () { docs.innerHTML = '<p class="nota">No he podido leer la carpeta.</p>'; });
-
-    var rotuloNotas = document.createElement('div');
-    rotuloNotas.className = 'columna-rotulo';
-    rotuloNotas.textContent = 'Notas';
-    col.appendChild(rotuloNotas);
-
-    var notas = document.createElement('div');
-    notas.className = 'columna-notas';
-    var todas = (window.Notas ? window.Notas.de(a) : []).slice();
-    if (!todas.length) {
-      notas.innerHTML = '<p class="nota">Sin notas.</p>';
-    } else {
-      var ultimas = todas.slice(-3).reverse();
-      notas.innerHTML = ultimas.map(function (n) {
-        return '<div class="columna-nota">' +
-          '<div class="columna-nota-cabeza">' +
-            (n.quien ? '<span class="nota-quien">' + U.escapar(n.quien) + '</span>' : '') +
-            '<span class="nota-cuando">' + U.escapar(window.Notas.cuando(n.cuando)) + '</span>' +
-          '</div>' +
-          '<div class="columna-nota-texto">' + U.escapar(n.texto) + '</div>' +
-        '</div>';
-      }).join('');
-      if (todas.length > 3) {
-        var mas = document.createElement('p');
-        mas.className = 'nota';
-        mas.textContent = 'y ' + (todas.length - 3) + ' más.';
-        notas.appendChild(mas);
-      }
-    }
-    col.appendChild(notas);
-
-    return col;
-  }
-
-  /* ---------- un grupo entero, con sus botones ---------- */
-
-  function bloqueDeGrupo(grupo) {
-    var d = document.createElement('div');
-    d.className = 'grupo-duplicado';
-
-    var cab = document.createElement('div');
-    cab.className = 'grupo-duplicado-cabecera';
-    cab.innerHTML = '<strong>Parecen el mismo asunto.</strong>';
-
-    var unir = document.createElement('button');
-    unir.type = 'button';
-    unir.className = 'boton boton-principal';
-    unir.textContent = 'Unir';
-    unir.onclick = function () { unirAsuntos(grupo); };
-    cab.appendChild(unir);
-
-    var noSon = document.createElement('button');
-    noSon.type = 'button';
-    noSon.className = 'boton';
-    noSon.textContent = 'No son el mismo';
-    noSon.title = 'No volver a avisar de este grupo';
-    noSon.onclick = async function () {
-      noSon.disabled = true;
-      try {
-        await descartarGrupo(grupo);
-        U.aviso('No se volverá a avisar de este grupo. Puedes deshacerlo en Ajustes, ' +
-          '"Duplicados descartados".', 'bueno');
-        pintarPantallaDuplicados();
-        pintarAviso();
-      } catch (e) {
-        noSon.disabled = false;
-        U.aviso('No he podido descartarlo: ' + U.mensajeDeError(e), 'malo');
-      }
-    };
-    cab.appendChild(noSon);
-
-    d.appendChild(cab);
-
-    var columnas = document.createElement('div');
-    columnas.className = 'grupo-columnas';
-    grupo.forEach(function (a) { columnas.appendChild(columnaDeAsunto(a)); });
-    d.appendChild(columnas);
-
-    return d;
-  }
-
-  function pintarPantallaDuplicados() {
-    var caja = $('duplicados-lista');
-    if (!caja) return;
-    var grupos = gruposActivos();
-    caja.innerHTML = '';
-    if (!grupos.length) {
-      caja.innerHTML = '<div class="vacio">No hay ningún posible duplicado ahora mismo.</div>';
-      return;
-    }
-    grupos.forEach(function (g) { caja.appendChild(bloqueDeGrupo(g)); });
-  }
-
-  /* ---------- unir: la misma lógica de siempre, sin tocar ---------- */
-
-  function porNombreLargo(a, b) { return b.nombre.length - a.nombre.length; }
-
-  async function elegirQuienSeQueda(grupo) {
-    var ordenado = grupo.slice().sort(porNombreLargo);
-    var opciones = ordenado.map(function (a, i) {
-      return '<label class="dup-opcion"><input type="radio" name="unir-cual" value="' + i + '"' +
-             (i === 0 ? ' checked' : '') + '> ' + U.escapar(a.nombre) + '</label>';
-    }).join('');
-    var ok = await U.preguntar('¿Cuál se queda?',
-      '<p class="explica">Los documentos y las notas del otro pasan a este, y el otro ' +
-      'se borra. Nada se pierde: solo queda una carpeta en vez de dos.</p>' + opciones,
-      'Unir');
-    if (!ok) return null;
-    var marcado = document.querySelector('input[name="unir-cual"]:checked');
-    var indice = marcado ? parseInt(marcado.value, 10) : 0;
-    return ordenado[indice] || ordenado[0];
-  }
-
-  function fechaDeHoy() {
-    var d = new Date();
-    return String(d.getDate()).padStart(2, '0') + '/' +
-           String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
-  }
-
-  async function fusionarFicha(seQueda, seVa, fechaTexto) {
-    await App.guardarRegistroFresco(function (registro) {
-      var fichaQueda = registro.asuntos[seQueda.nombre] || {};
-      var fichaVa = registro.asuntos[seVa.nombre] || {};
-
-      var notas = (Array.isArray(fichaQueda.notas) ? fichaQueda.notas.slice() : [])
-        .concat(Array.isArray(fichaVa.notas) ? fichaVa.notas.slice() : [])
-        .sort(function (x, y) { return String(x.cuando || '').localeCompare(String(y.cuando || '')); });
-
-      var pasosHechos = (fichaQueda.pasosHechos && fichaQueda.pasosHechos.length)
-        ? fichaQueda.pasosHechos : (fichaVa.pasosHechos || []);
-      var pasosElegidos = (fichaQueda.pasosElegidos && Object.keys(fichaQueda.pasosElegidos).length)
-        ? fichaQueda.pasosElegidos : (fichaVa.pasosElegidos || {});
-
-      notas.push({
-        texto: 'Unido con la carpeta «' + seVa.nombre + '» el ' + fechaTexto,
-        quien: App.E.usuario || '',
-        cuando: U.ahora()
-      });
-
-      registro.asuntos[seQueda.nombre] = Object.assign({}, fichaQueda, {
-        notas: notas, pasosHechos: pasosHechos, pasosElegidos: pasosElegidos
-      });
-      delete registro.asuntos[seVa.nombre];
-    });
-
-    /* Los hitos y la señal de presencia de "seVa" viajan con él: se
-       fusionan con los de "seQueda", sin perder ninguno (fila 62,
-       docs/RENOMBRAR-SIN-PERDER-HITOS.md). */
-    await AsuntoRenombrar.fusionar(seQueda.nombre, seVa.nombre);
-  }
-
-  /* Un documento con el mismo nombre en las dos carpetas ya no para la
-     unión (fila 75, docs/HUECOS-ENCONTRADOS-FILA-69.md, 1: el hueco
-     que dejó la fila 69 entre lo que decía el encargo y lo que hacía
-     de verdad el código): entra con " (2)", " (3)"..., el mismo
-     patrón que ya usa Carpetas.fusionarEn al archivar sobre un
-     destino que ya existe. Se apunta cada renombrado, para avisar al
-     terminar de cuáles conviene revisar a mano. */
-  async function moverConNombreLibre(seVa, nombreFichero, seQueda, renombrados) {
-    var destino = seQueda.handle;
-    var nombreFinal = nombreFichero;
-    if (await Carpetas.existeFichero(destino, nombreFichero)) {
-      nombreFinal = await Carpetas.nombreLibreConSufijo(destino, nombreFichero);
-      renombrados.push({ de: nombreFichero, a: nombreFinal, deAsunto: seVa.nombre });
-    }
-    await Carpetas.moverFichero(seVa.handle, nombreFichero, destino, nombreFinal);
-  }
-
-  async function unirAsuntos(grupo) {
-    var seQueda = await elegirQuienSeQueda(grupo);
-    if (!seQueda) return;
-    var demas = grupo.filter(function (a) { return a.nombre !== seQueda.nombre; });
-
-    /* Mientras dura, los asuntos del grupo están ocupados (fila 100). */
-    var nombres = grupo.map(function (a) { return a.nombre; });
-    nombres.forEach(function (n) { App.E.ocupados[n] = true; });
-    try { await unirYa(seQueda, demas); }
-    finally { nombres.forEach(function (n) { delete App.E.ocupados[n]; }); }
-  }
-
-  /* Lo principal: los documentos (y las subcarpetas, fila 100) y la
-     ficha de cada uno pasan al que se queda. Quitar la carpeta vacía
-     del que se va es accesorio: si queda algo dentro, ámbar diciendo
-     qué carpeta revisar, nunca rojo con todo ya unido. */
-  async function unirYa(seQueda, demas) {
-    var restos = [];
-    try {
-      var fechaTexto = fechaDeHoy();
-      var renombrados = [];
-      for (var j = 0; j < demas.length; j++) {
-        var seVa = demas[j];
-        var ficheros = await Carpetas.ficheros(seVa.handle);
-        for (var k = 0; k < ficheros.length; k++) {
-          await moverConNombreLibre(seVa, ficheros[k].nombre, seQueda, renombrados);
-        }
-        var subcarpetas = await Carpetas.subcarpetas(seVa.handle);
-        for (var m = 0; m < subcarpetas.length; m++) {
-          var sub = subcarpetas[m].nombre;
-          if (Carpetas.esCarpetaTemporalDeSincronizacion(sub)) continue;
-          if (await Carpetas.existe(seQueda.handle, sub)) await Carpetas.fusionarEn(seVa.handle, sub, seQueda.handle, sub);
-          else await Carpetas.mover(seVa.handle, sub, seQueda.handle);
-        }
-        await fusionarFicha(seQueda, seVa, fechaTexto);
-        try { await App.E.abiertos.removeEntry(seVa.nombre); }
-        catch (eQuitar) { restos.push(seVa.nombre); }
-      }
-    } catch (e) {
-      U.fallo('No he podido unirlos', e);
-      try { await App.verAbiertos(); } catch (e2) { /* solo pintar */ }
-      return;
-    }
-
-    try {
-      if (restos.length) {
-        U.aviso('Asuntos unidos, pero no he podido quitar la carpeta vieja de: ' + restos.join(', ') +
-          '. Queda algo dentro (quizá un documento abierto en otro programa): míralo y bórrala a mano.', 'ambar');
-      }
-      var textoUnidos = renombrados.length
-        ? 'Asuntos unidos. ' + renombrados.length + (renombrados.length === 1
-            ? ' documento tenía el nombre repetido: se ha guardado con "(N)" al final.'
-            : ' documentos tenían el nombre repetido: se han guardado con "(N)" al final.')
-        : 'Asuntos unidos.';
-      /* Fila 119: con «Ir al asunto» (el que se queda, que ya estaba en la lista). */
-      if (window.Navegacion) Navegacion.avisoConIr(textoUnidos, 'bueno', seQueda.nombre);
-      else U.aviso(textoUnidos, 'bueno');
-      await App.verAbiertos();
-      /* Si se ha unido desde la pantalla de Duplicados, se sigue
-         viendo esa pantalla con la lista al día: no se saca a nadie
-         de donde estaba mirando. */
-      if (pantallaConstruida && !$('pantalla-duplicados').classList.contains('oculto')) {
-        pintarPantallaDuplicados();
-      }
-    } catch (e3) {
-      U.accesorio('Asuntos unidos, pero no he podido poner la lista al día. Pulsa Recargar', e3);
-    }
-  }
 
   /* ---------- el bloque de Ajustes: "Duplicados descartados" ----------
 
@@ -644,6 +314,6 @@
 
   /* Para pruebas/unir-asuntos.mjs (fila 69, docs/PRUEBAS-QUE-FALTAN.md,
      2.2): la unión de verdad, sin fingir un segundo camino aparte. */
-  window.UnirAsuntos = { unirAsuntos: unirAsuntos };
+  window.UnirAsuntos = { _interno: I };
 
 })();

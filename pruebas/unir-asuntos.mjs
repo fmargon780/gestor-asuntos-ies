@@ -57,7 +57,7 @@ contexto.Gestor = {
   usuario: function () { return App.E.usuario; },
   alRefrescar: []
 };
-for (const f of ['conflictos.js', 'presencia.js', 'hitos.js', 'asunto-renombrar.js', 'unir-asuntos.js']) {
+for (const f of ['conflictos.js', 'presencia.js', 'hitos.js', 'asunto-renombrar.js', 'unir-asuntos.js', 'unir-asuntos-pantalla.js', 'unir-asuntos-unir.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 const { Carpetas, Hitos, UnirAsuntos } = contexto;
