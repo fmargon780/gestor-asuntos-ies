@@ -107,12 +107,13 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-No queda ninguna fila **PENDIENTE** (comprobado 24-sep-2026, sesión programada). Las filas 1 a 75,
+**La fila 117 está PENDIENTE** (apuntada el 24-sep-2026). Las filas 1 a 75,
 77 a 116 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
+| 117 | `docs/ENVIO-CUENTA-DEL-SCRIPT.md` (el envío de correo con la aplicación web publicada: dirección `/exec`, cuenta que ejecuta y «Probar») | PENDIENTE |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
 **24-sep-2026, sesión programada (taller automático):** al llegar, la fila 115 ya estaba
