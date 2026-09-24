@@ -102,6 +102,7 @@ App.pintarAjustesMantenimiento = async function () {
   if (typeof App.pintarContactoGuardado === 'function') await App.pintarContactoGuardado();
   if (typeof App.pintarPapelera === 'function') await App.pintarPapelera();
   if (typeof App.pintarEnvolturas === 'function') App.pintarEnvolturas();
+  if (window.TablasDatosPantalla) await TablasDatosPantalla.pintar();   /* fila 110 */
   /* Fila 105: los avisos de fallo arriba (solo si hay), Herramientas
      al final y el resumen de cada título. */
   if (window.AjustesPlegado) AjustesPlegado.ordenarMantenimiento();

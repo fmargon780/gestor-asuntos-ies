@@ -1021,7 +1021,7 @@ var Datos = (function () {
     buscar: buscar, olvidar: olvidar, LISTAS: LISTAS,
     guardarEnLista: guardarEnLista, quitarDeLista: quitarDeLista,
     unidadesDistintas: unidadesDistintas, destacadosAlumno: destacadosAlumno,
-    destacadosPersona: destacadosPersona, cursoDelFichero: cursoDelFichero,
+    destacadosPersona: destacadosPersona, cursoDelFichero: cursoDelFichero, clavePersona: clavePersona,
     resumenDeTercero: resumenDeTercero,
     fotoDeContacto: fotoDeContacto, personaDesdeFoto: personaDesdeFoto,
     contarSolicitantesAnteriores: contarSolicitantesAnteriores,

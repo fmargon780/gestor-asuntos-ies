@@ -73,7 +73,7 @@ win.Carpetas = {
    hacer nada) y para poder llamar a PlantillasDocumento.nombreDelDocumentoGenerado. */
 win.App = { E: {}, LARGO_MAXIMO_NOMBRE: 180 };
 
-for (const f of ['util.js', 'nombres.js', 'plantillas.js', 'docx.js', 'plantillas-documento.js']) {
+for (const f of ['util.js', 'nombres.js', 'plantillas.js', 'docx.js', 'docx-imagen.js', 'docx-tabla.js', 'plantillas-documento.js']) {
   win.eval(fs.readFileSync(RAIZ + f, 'utf8'));
 }
 const { Plantillas, Docx, Nombres, PlantillasDocumento } = win;

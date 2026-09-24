@@ -5,6 +5,31 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 110: tablas de datos y el certificado de función tutorial
+
+`docs/TABLAS-DE-DATOS.md`. Francisco pasaba a mano a Excel el PDF «Relación de funciones
+tutoriales» de cada curso para certificar en qué periodos fue tutor un profesor. Ahora la aplicación
+lee esos PDF de la carpeta de datos, y cualquier CSV o Excel de `datos/Tablas`, los une a cada
+persona por su DNI y los usa en huecos de plantilla: `{{ESPECIALIDAD}}`, `{{TABLA TUTORIAS}}` y los
+generales `{{DATO …}}`/`{{TABLA …}}`. Plantilla nueva «Certificado de función tutorial». Detalle en
+`docs/contexto/TABLAS-DE-DATOS.md` (hijo nuevo).
+
+- Decisión: el PDF se lee por posiciones (cada trozo va a la columna cuya cabecera empieza a su
+  izquierda), no por texto corrido: así los nombres partidos en dos líneas y «(Sustituto/a)» se
+  pegan a su fila.
+- Decisión: lo que no tiene dato no se deja en blanco: sale «[falta: …]» resaltado en amarillo en el
+  Word, y en el aviso ámbar de siempre.
+- `js/docx.js` pasaba de 580 líneas: el membrete se fue a `js/docx-imagen.js` y las tablas van en
+  `js/docx-tabla.js`, los dos sobre `Docx.interno`.
+- Lo que costó: pdf.js vacía el buffer que se le da (y el mismo PDF se quedaba luego en cero
+  bytes); y el «[falta: …]» caía en un trozo de Word con un salto de línea dentro, así que se parte
+  el texto donde está la marca en vez del trozo entero.
+
+Prueba nueva `pruebas/tablas-datos.mjs` (con nombres y DNI inventados). Batería completa en verde.
+Versión publicada `App.VERSION`: `24-sep-2026 · 04:51`.
+
+---
+
 ## 24-sep-2026 — Fila 109: el hito a pantalla completa, la mesa de trabajo
 
 `docs/EL-HITO-A-PANTALLA-COMPLETA.md`. Dentro de la tarjeta de Hitos, la lista queda compacta y
