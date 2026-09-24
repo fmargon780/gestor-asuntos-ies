@@ -187,15 +187,17 @@ await pagina.evaluate(() => App.cambiarPestanaAjustes('centro'));
 await pagina.evaluate(() => App.pintarAjustes());
 await pagina.waitForTimeout(400);
 const titulosCentro = await pagina.locator('#ajustes-tab-centro > details.bloque-ajustes > summary .bloque-titulo').allTextContents();
-await comprobar('los ocho primeros, en el orden nuevo', titulosCentro.slice(0, 8), [
-  'Estados del asunto', 'Tipos de documento', 'Grupos de personas', 'Campos propios', 'Hitos',
+/* Fila 129: "Estados del asunto" ya no existe (el estado es el hito actual). */
+await comprobar('los siete primeros, en el orden nuevo', titulosCentro.slice(0, 7), [
+  'Tipos de documento', 'Grupos de personas', 'Campos propios', 'Hitos',
   'Datos del centro y firma', 'Cómo se abrevia cada grupo', 'Ficheros de datos']);
 await comprobar('todos plegados',
   pagina.locator('#ajustes-tab-centro details.bloque-ajustes[open]').count(), 0);
-await comprobar('"Estados del asunto" dice cuántos hay',
+await comprobar('ya no hay "Estados del asunto"', titulosCentro.indexOf('Estados del asunto'), -1);
+await comprobar('"Tipos de documento" dice cuántos hay',
   pagina.evaluate(() => {
     const t = document.querySelector('#ajustes-tab-centro > details.bloque-ajustes .bloque-resumen').textContent;
-    return t === App.E.estados.length + ' estados';
+    return t === String((App.E.tiposDocumento || []).length);
   }), true);
 
 /* ================================================================

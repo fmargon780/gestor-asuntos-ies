@@ -343,9 +343,23 @@
     } catch (e) { return null; }
   }
 
+  /* Fila 129 (docs/EL-HITO-ES-EL-ESTADO.md): antes de archivar, en la
+     ficha, dónde se quedó (el título del hito actual) o si estaba
+     terminado, para la tarjeta del ARCHIVO. Los hitos no se tocan. */
+  async function apuntarDondeSeQuedo(a) {
+    var entrada = await hitosDeConCreados(a.nombre);
+    if (!entrada || !entrada.hitos.length || typeof Hitos.estadoDelAsunto !== 'function') return;
+    var r = Hitos.estadoDelAsunto(entrada.hitos, null);
+    var seQuedoEn = r.listo ? '' : (r.titulo || '');
+    var f = a.ficha || {};
+    if ((f.seQuedoEn || '') === seQuedoEn && !!f.terminado === !!r.listo) return;
+    await App.anotar(a.nombre, { seQuedoEn: seQuedoEn, terminado: !!r.listo });
+  }
+
   U.envolver(window.App, 'App.cerrarAsunto', 'hitos-archivo.js', function (comoEra) {
     return async function (a) {
       var clave = a.nombre;
+      try { await apuntarDondeSeQuedo(a); } catch (e) { /* no crítico: la tarjeta dirá solo «Archivado» */ }
       await comoEra(a);
       var ficha = App.E.registro.asuntos[clave] || {};
       if (ficha.estado !== 'cerrado') return;   /* cancelado, o ha fallado */

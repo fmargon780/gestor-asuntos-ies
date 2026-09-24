@@ -40,8 +40,8 @@ Al pulsar el nombre de un asunto se entra en su ficha: sus datos, el contacto de
 guía de su tipo con las casillas, sus notas, sus documentos y los demás asuntos del mismo
 tercero.
 
-**La tarjeta de la lista se queda con lo justo**: el desplegable del estado, "Copiar nombre" y
-"Archivar". `js/ficha-asunto.js` quita de la tarjeta cualquier otro botón, con una lista blanca
+**La tarjeta de la lista se queda con lo justo**: la marca del hito actual (fila 129, pulsable a
+su mesa, `docs/contexto/ESTADO-DEL-ASUNTO.md`), "Copiar nombre" y "Archivar". `js/ficha-asunto.js` quita de la tarjeta cualquier otro botón, con una lista blanca
 (`BOTONES_DE_LA_TARJETA`). **Ojo con esto**: un módulo que añada un botón a la tarjeta con
 `window.Gestor.botonesDeTarjeta` **no se verá** si su texto no está en esa lista.
 
@@ -182,15 +182,10 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   derecha, `.ficha-apertura`: la fila de copiar, que `js/ficha-nombre-acciones.js` mete ahí, y la
   línea gris en una sola línea, recortada, con el texto entero en su `title`). Sin raya ni margen
   debajo. Encogida: las dos líneas, sin `.ficha-apertura`.
-- **`#ficha-acciones` queda en cuatro elementos**, siempre en este orden: el desplegable de
-  estado, la etiqueta de vencimiento, "El encargo" y "Comunicar" (lo añade `js/correo.js`, ver
+- **`#ficha-acciones` queda en cuatro elementos**, siempre en este orden: el hito actual
+  (fila 129, `#ficha-estado-hito`: la marca y «Esperando a…» / «Ya ha llegado»), la etiqueta de vencimiento, "El encargo" y "Comunicar" (lo añade `js/correo.js`, ver
   abajo); "Archivar"/"Reabrir" (`.boton-principal`) va en `#ficha-archivar` desde la fila 112. `pintarAcciones(a, abierto)` perdió el
   parámetro `p` (la fecha límite ya no hace falta ahí: la etiqueta se calcula sola).
-- **El estado, con su color**: el `<select class="campo campo-estado">` lleva además la clase
-  `App.colorEstado(situacion)` (`estado-0`…`estado-5`, `estado-x`) cuando hay situación puesta.
-  Funciona sin CSS nuevo: `.estado-N` (css/estilos.css) y `.campo` tienen la misma especificidad
-  de una sola clase, y `.estado-N` va declarada después en el propio fichero, así que gana en el
-  fondo y el color sin tocar nada de `.campo`.
 - **La etiqueta de vencimiento** (`Plazos.etiquetaVencimiento(limite)`, nueva, `js/plazos.js`):
   sustituye al botón "Plazo" y a `.marca-plazo` (quitada de la cabecera). Devuelve
   `{texto, clase}`; `clase` es `''` (normal), `vencimiento-cerca` (ámbar: hoy o quedan ≤2 días —

@@ -23,6 +23,7 @@ que cambie algo general).
 | `docs/contexto/TABLAS-DE-DATOS.md` | Las tablas de datos (tutorías de Séneca, `datos/Tablas`), sus huecos y el certificado de función tutorial (fila 110) |
 | `docs/contexto/CORREO-Y-SENECA.md` | La bandeja de Gmail, sus adjuntos, las plantillas de correo y el cuadro de Séneca |
 | `docs/contexto/HITOS-Y-GUIAS.md` | Las guías del procedimiento, los hitos de un asunto, "Qué me toca" y "Cuentas" |
+| `docs/contexto/ESTADO-DEL-ASUNTO.md` | El estado del asunto es su hito actual: los dos montones, «Esperando a…», «Estamos en este paso», la guía mínima (fila 129) |
 | `docs/contexto/HITO-MESA.md` | El hito a pantalla completa (la mesa de trabajo), su guion y "Traer los guiones del instituto" (fila 109) |
 | `docs/contexto/CAMPOS-Y-TIPOS.md` | Los campos propios y calculados de cada tipo de asunto, y Ajustes de un tipo |
 | `docs/contexto/PANTALLA.md` | La cabecera fija, el refresco, la barra lateral, el tablón, el panel de lectura, la presencia |
@@ -57,9 +58,10 @@ Decisiones de diseño:
 - Además de arrastrar un documento a la carpeta, se puede elegir desde la app en la carpeta
   donde esté: se guarda una copia ya con el nombre montado, y el original se queda donde estaba.
 
-**Estado del asunto.** Lista configurable en Ajustes, en el orden del trámite, no alfabético.
-Se guarda en `_GESTOR/estados.json`. La casilla "Depende de otros" decide en cuál de las tres
-tarjetas de arriba sale el asunto.
+**Estado del asunto.** Es su hito actual («Paso N de M · título»), y de él sale solo si va en
+"Pendiente de Administración" o en "Pendiente de terceros" (fila 129,
+`docs/contexto/ESTADO-DEL-ASUNTO.md`). Ya no hay estados escritos a mano: `estados.json` se sigue
+leyendo pero no se enseña ni se edita.
 
 **Vía de comunicación preferente.** Es del asunto, no del tercero. `js/via-contacto.js` ofrece
 como botones los teléfonos o correos que ya están en el CSV del tercero, tanto en
@@ -184,7 +186,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 |---|---|
 | `tipos.json` | Tipos de asunto y su categoría. `formularios` (fila 82): claves del catálogo de `datos/formularios.json` que aplican a cualquier asunto de ese tipo, sin depender de ningún paso |
 | `tipos-documento.json` | Tipos de documento |
-| `estados.json` | Estados de tramitación, en el orden del trámite |
+| `estados.json` | Estados de tramitación de antes de la fila 129: ya no se enseñan ni se editan; se leen solo para el paso único (`js/estado-migracion.js`) |
 | `asuntos.json` | Ficha de cada asunto: quién lo abrió, estado, vía, notas, cierre, pasos, fecha límite, documentos pendientes de registro, relacionados, campos configurados del tipo, hilos de correo enganchados, quién ha pedido la gestión (`loPide`) |
 | `guias.json` | Los pasos de cada tipo de asunto, con sus preguntas y opciones |
 | `recurrentes.json` | Los asuntos que se repiten y cuándo tocan |
@@ -206,6 +208,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `PLANTILLAS/` | Los `.docx` que Francisco sube a mano, colgados de un tipo desde Ajustes › Plantillas de documento. También `membrete.png` (fila 81), y los `.docx` del centro que trae solo el botón "Cargar las plantillas del centro" (fila 83, `plantillas/` del repositorio): las dos son las únicas veces que la propia aplicación escribe ahí. No lleva copia de seguridad: no es uno de los dieciocho ficheros compartidos |
 | `presencia.json` | `{ <clave del asunto>: { usuario, ultima } }`: quién tiene abierta la ficha de cada asunto, y desde cuándo. **A propósito, fuera de los dieciocho**: no pasa por `Copias.guardar` (nada de copia de seguridad), no entra en `Papelera` ni en `Conflictos` (si dos versiones chocan, se quedan las dos entradas y punto). Se escribe y relee directo con `Carpetas` (ver "No pisarse en un mismo asunto") |
 | `indice-archivo.json` | `{ version, hechoEl, hechoPor, recuento: { CATEGORIA: nº de carpetas de tercero }, asuntos: [{ nombre, categoria, tercero, ruta, fecha, tipo, curso, grupo, documentos, registros, sueltoEn }] }`: el índice guardado del ARCHIVO (`js/archivo-indice.js`, ver "El índice del ARCHIVO"). **También fuera de los dieciocho**, por el mismo motivo que `presencia.json`: se puede rehacer entero en cualquier momento con "Reconstruir el índice", así que no necesita copia de seguridad, papelera ni fusión de conflictos. Se escribe y relee directo con `Carpetas` |
+| `estado-migrado.json` | `{ hechoEl, hechoPor, creados, enEspera }`: la marca de que el paso único de la fila 129 ya se hizo (`js/estado-migracion.js`). **Fuera de los dieciocho**, como `presencia.json` |
 | `copias/*.json` | Copias de seguridad de los dieciocho ficheros de arriba, una por día, 30 como mucho de cada uno |
 
 **Los CSV van en `datos`, no en `_GESTOR`.** `js/rescate-datos.js` los baja solos al entrar.
@@ -468,34 +471,33 @@ las dos carpetas en ese ordenador, para el botón «Ruta»). **El tablón no se 
 1. **Avisar al compañero de la dirección nueva** (`https://asuntos.fmargon.com`) y de que
    tendrá que volver a señalar las dos carpetas y escribir su nombre.
 2. Coordinar con el compañero la **lista de tipos de asunto**. Está aceptado empezar sin ella.
-3. Coordinar con él también la **lista de estados**.
-4. **Poner en marcha el script de Gmail** en la cuenta `g.educaand.es`, y señalar la carpeta
+3. **Poner en marcha el script de Gmail** en la cuenta `g.educaand.es`, y señalar la carpeta
    `GESTOR-BANDEJA` en Ajustes. **Pendiente volver a pegar el script**: el del 16-sep-2026 es el
    que sigue los hilos ya enganchados (`seguidos.json`) y el que arregla el enlace a Gmail. Sin
    pegarlo, las respuestas no vuelven a la bandeja.
-5. Ver con el uso si la bandeja **acierta con el tipo**. Si falla mucho, palabras clave por tipo.
-6. Comprobar, con Séneca delante, si desde el perfil de administrativo la pantalla de
+4. Ver con el uso si la bandeja **acierta con el tipo**. Si falla mucho, palabras clave por tipo.
+5. Comprobar, con Séneca delante, si desde el perfil de administrativo la pantalla de
    Comunicaciones es la misma, y si el asunto admite el largo que le estamos dando.
-7. Pendiente de decidir: si el aviso de fichero viejo debe vigilar también el `RelPerCen`.
-8. **Cuando tengan una cuenta de correo común**, replantear la bandeja: una sola compartida.
-9. Descartado por ahora: un filtro de Gmail que etiquete **todo** el correo entrante.
-10. Ver con el uso si el panel de la derecha se queda corto para leer: hoy el 46%.
-11. Ver con el uso si las tarjetas por tipo se quedan cortas: hoy son solo del tipo.
-12. Mirar si el tablón debería ensancharse: hoy son 320 píxeles fijos.
-13. Las notas viejas de correo se quedan como están: son el rastro.
-14. Si el DNI no sale de nadie, **marcar la columna del documento al generar el RegAlum**.
-15. Ver con el uso si el aviso de "falta el DNI" conviene también en la tarjeta del asunto.
-16. Ver con el uso si el botón "Cambiar los datos" hace falta también en el buscador de Nuevo
+6. Pendiente de decidir: si el aviso de fichero viejo debe vigilar también el `RelPerCen`.
+7. **Cuando tengan una cuenta de correo común**, replantear la bandeja: una sola compartida.
+8. Descartado por ahora: un filtro de Gmail que etiquete **todo** el correo entrante.
+9. Ver con el uso si el panel de la derecha se queda corto para leer: hoy el 46%.
+10. Ver con el uso si las tarjetas por tipo se quedan cortas: hoy son solo del tipo.
+11. Mirar si el tablón debería ensancharse: hoy son 320 píxeles fijos.
+12. Las notas viejas de correo se quedan como están: son el rastro.
+13. Si el DNI no sale de nadie, **marcar la columna del documento al generar el RegAlum**.
+14. Ver con el uso si el aviso de "falta el DNI" conviene también en la tarjeta del asunto.
+15. Ver con el uso si el botón "Cambiar los datos" hace falta también en el buscador de Nuevo
     asunto.
-17. Ver con el uso si a las preguntas de la guía les hace falta algo más.
-18. **Cuando el uso lo pida**: búsqueda dentro de las notas, cuentas por tipo para la memoria de
+16. Ver con el uso si a las preguntas de la guía les hace falta algo más.
+17. **Cuando el uso lo pida**: búsqueda dentro de las notas, cuentas por tipo para la memoria de
     fin de curso, qué hacer con los asuntos vivos al cambiar de curso, y pasar el repositorio y
     Vercel a una cuenta del centro para el relevo.
-19. Las copias en conflicto de `guias.json`, `recurrentes.json` y `frescura.json` (las que deja
+18. Las copias en conflicto de `guias.json`, `recurrentes.json` y `frescura.json` (las que deja
     Dropbox si los dos ordenadores guardan casi a la vez) no se fusionan solas: avisan en Ajustes
     para elegir con cuál quedarse. Revisar si con el uso hace falta algo más fino. (Los borrados de
     `tipos.json`, `estados.json`, `tipos-documento.json` y `recurrentes.json` sí se fusionan ya,
     desde la fila 77, 20-sep-2026: ver "Copias en conflicto de Dropbox" arriba.)
-20. `js/papelera.js` no sabe devolver una plantilla de correo borrada (clase `'plantilla'`, no
+19. `js/papelera.js` no sabe devolver una plantilla de correo borrada (clase `'plantilla'`, no
     estaba en el encargo de las plantillas): si hace falta, se copia a mano desde el bloque
     Papelera de Ajustes.

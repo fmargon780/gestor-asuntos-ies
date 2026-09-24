@@ -135,26 +135,25 @@ await pagina.waitForTimeout(150);
 await comprobar('se abre en grande al pulsar',
   pagina.evaluate(() => document.getElementById('ficha-tarjetas').dataset.abierta), 'relacionados');
 
-/* Forzar un repintado de la ficha entera (cambiar el estado, como en
-   pruebas/cabecera-fija.mjs, escenario 6): no debe cerrar la tarjeta. */
-await pagina.evaluate(() => {
-  const sel = document.querySelector('#ficha-acciones select.campo-estado');
-  const opcion = Array.prototype.filter.call(sel.options, (o) => o.textContent === 'A LA ESPERA DEL TERCERO')[0];
-  sel.value = opcion.value;
-  sel.dispatchEvent(new Event('change', { bubbles: true }));
+/* Forzar un repintado de la ficha entera (un cambio en la ficha por
+   debajo, como en pruebas/cabecera-fija.mjs, escenario 6; desde la fila
+   129 ya no hay desplegable de estado): no debe cerrar la tarjeta. */
+await pagina.evaluate(async () => {
+  const n = App.fichaAbierta();
+  window.__descripcionAntes = (App.E.registro.asuntos[n] || {}).descripcion || '';
+  await App.anotar(n, { descripcion: 'Cambiada para la prueba' });
+  await App.reengancharFicha();
 });
 await pagina.waitForTimeout(500);
 await comprobar('sigue abierta tras el repintado',
   pagina.evaluate(() => document.getElementById('ficha-tarjetas').dataset.abierta), 'relacionados');
 await pagina.evaluate(() => FichaTarjetas.cerrar());
 
-/* Se deja el estado como estaba, para no complicar los escenarios de
+/* Se deja la ficha como estaba, para no complicar los escenarios de
    más abajo (que vuelven a abrir este mismo asunto desde la lista). */
-await pagina.evaluate(() => {
-  const sel = document.querySelector('#ficha-acciones select.campo-estado');
-  const opcion = Array.prototype.filter.call(sel.options, (o) => o.textContent === 'PENDIENTE')[0];
-  sel.value = opcion.value;
-  sel.dispatchEvent(new Event('change', { bubbles: true }));
+await pagina.evaluate(async () => {
+  await App.anotar(App.fichaAbierta(), { descripcion: window.__descripcionAntes });
+  await App.reengancharFicha();
 });
 await pagina.waitForTimeout(500);
 

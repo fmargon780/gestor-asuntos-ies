@@ -265,7 +265,7 @@
     var f = a.ficha || {};
     var trozos = [];
     if (a.leido && a.leido.fecha) trozos.push('Abierto el ' + U.fechaLegible(a.leido.fecha));
-    trozos.push(f.situacion ? f.situacion : 'Sin estado');
+    trozos.push(window.EstadoHito ? EstadoHito.textoDeNombre(a.nombre) : 'Sin hitos');   /* fila 129 */
     var via = App.textoVia ? App.textoVia(f) : '';
     if (via) trozos.push(via);
     var p = App.plazoDe ? App.plazoDe(a) : null;

@@ -459,6 +459,7 @@
     if (el.id === 'ficha-volver-al-origen') return true;
     if (el.classList.contains('ficha-documento')) return true;
     if (el.classList.contains('hito-desplegar')) return true;
+    if (el.classList.contains('marca-hito')) return true;   /* fila 129: abre la mesa del hito */
     if (el.classList.contains('boton-presencia-tomar')) return true;
     /* El disparador de los tres puntos del nombre (18-sep-2026, fila
        52, docs/CABECERA-DEL-ASUNTO.md, 5): en modo consulta el menú se
@@ -762,7 +763,7 @@
 
   /* La barra de acciones queda en cinco elementos y nada más
      (18-sep-2026, fila 52, docs/CABECERA-DEL-ASUNTO.md, 3): el
-     desplegable de estado, el vencimiento, "El encargo", "Comunicar"
+     hito actual (fila 129; antes, el desplegable de estado), el vencimiento, "El encargo", "Comunicar"
      (lo añade js/correo.js) y "Archivar"/"Reabrir". "Editar", "Borrar"
      y "Copiar nombre" viven en el menú de tres puntos del nombre
      (js/ficha-nombre-acciones.js); "Gestionar documentos", en la
@@ -772,22 +773,10 @@
     caja.innerHTML = '';
 
     if (abierto) {
-      var sel = document.createElement('select');
-      var situacion = a.ficha.situacion || '';
-      sel.className = 'campo campo-estado' + (situacion ? ' ' + App.colorEstado(situacion) : '');
-      sel.title = 'Estado del asunto';
-      var lista = App.E.estados.map(function (e) { return e.nombre; });
-      if (situacion && lista.indexOf(situacion) === -1) lista.push(situacion);
-      sel.innerHTML = '<option value="">Sin estado</option>' +
-        lista.map(function (e) {
-          return '<option value="' + U.escapar(e) + '"' + (e === situacion ? ' selected' : '') +
-                 '>' + U.escapar(e) + '</option>';
-        }).join('');
-      sel.onchange = async function () {
-        try { await U.mientrasGuarda(sel, function () { return App.ponerEstado(a, sel.value); }); }
-        finally { App.repintarAccionesFicha(); }
-      };
-      caja.appendChild(sel);
+      /* Fila 129 (docs/EL-HITO-ES-EL-ESTADO.md): en vez del desplegable
+         de estado, el hito actual («Paso N de M · título», que abre su
+         mesa) y «Esperando a…» / «Ya ha llegado» (js/estado-hito.js). */
+      if (window.EstadoHito) EstadoHito.pintarEnFicha(caja, a);
 
       var et = Plazos.etiquetaVencimiento(a.ficha.limite);
       var bplazo = document.createElement('button');

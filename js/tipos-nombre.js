@@ -61,6 +61,9 @@ var TiposNombre = (function () {
     if (!origen.length) { if (guias[viejo]) await GuiasDelCentro.guardarPasos(viejo, []); return; }
     var destino = guias[nuevo] || [];
     var queda = origen;
+    /* Fila 129: la guía mínima sin tocar (js/estado-hito.js) no compite:
+       se queda la de verdad, sin mandar nada a la papelera. */
+    if (window.EstadoHito && EstadoHito.esGuiaMinima(destino)) destino = [];
     if (destino.length) {
       var sobra = cuentaPasos(destino) >= cuentaPasos(origen) ? origen : destino;
       queda = sobra === origen ? destino : origen;

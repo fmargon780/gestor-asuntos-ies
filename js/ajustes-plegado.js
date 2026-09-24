@@ -228,10 +228,6 @@ var AjustesPlegado = (function () {
      ponerle un id en index.html). En este orden, de más a menos uso; el
      resto de bloques va detrás, en el orden en que ya estuvieran. */
   var CENTRO = [
-    { id: 'estados', dentro: '#tabla-estados', resumen: function () {
-      var n = (App.E.estados || []).length;
-      return [plural(n, 'estado', 'estados')];
-    } },
     { id: 'tipos-documento', dentro: '#tabla-tipos-documento', resumen: function () {
       return [String((App.E.tiposDocumento || []).length)];
     } },

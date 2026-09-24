@@ -238,22 +238,13 @@ await comprobar('MATRICULA sigue en la lista',
   pagina.evaluate(() => App.E.tipos.some(t => t.tipo === 'MATRICULA')), true);
 
 /* ================================================================
-   6. Un estado que algún asunto tiene puesto no se puede borrar.
+   6. (Hasta la fila 129: un estado en uso no se borraba. Desde
+   docs/EL-HITO-ES-EL-ESTADO.md ya no hay rejilla de estados en Ajustes.)
    ================================================================ */
-console.log('--- 6. un estado en uso no se borra ---');
-
-/* 17-sep-2026, fila 39: los Estados viven en la pestaña "El centro". */
+console.log('--- 6. ya no hay rejilla de estados ---');
 await pagina.evaluate(() => App.cambiarPestanaAjustes('centro'));
-await pagina.waitForSelector('#tabla-estados .tarjeta-tipo');
-const tarjetaPendiente = pagina.locator('#tabla-estados .tarjeta-tipo').filter({ hasText: 'PENDIENTE' });
-await tarjetaPendiente.locator('.tarjeta-tipo-menu-btn').click();
-await tarjetaPendiente.getByRole('button', { name: 'Borrar' }).click();
-await pagina.waitForSelector('#capa:not(.oculto)');
-await comprobar('el cuadro dice que hay asuntos en ese estado',
-  pagina.locator('#cuadro-cuerpo').textContent().then(t => /\d asunto/.test(t)), true);
-await pagina.click('#cuadro-aceptar');
-await comprobar('PENDIENTE sigue en la lista',
-  pagina.evaluate(() => App.E.estados.some(e => e.nombre === 'PENDIENTE')), true);
+await comprobar('la rejilla "Estados del asunto" ya no existe',
+  pagina.locator('#tabla-estados').count(), 0);
 
 /* ================================================================
    7. Devolver un documento cuyo asunto ya no existe.

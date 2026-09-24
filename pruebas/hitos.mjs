@@ -316,10 +316,14 @@ await comprobar('p1 queda hecho',
 await comprobar('p2 pasa a estar en curso',
   pagina.locator('#ficha-guia .hito[data-id="p2"]').getAttribute('class').then(c => c.indexOf('hito-encurso') !== -1), true);
 
-console.log('--- escenario 6: el estado del asunto cambia con el hito en curso ---');
-await comprobar('el estado del asunto ya es EN TRÁMITE', pagina.evaluate((clave) => {
-  return App.E.registro.asuntos[clave].situacion;
-}, CLAVE), 'EN TRÁMITE');
+console.log('--- escenario 6: el estado del asunto es el hito en curso (fila 129) ---');
+await comprobar('la cabecera enseña el paso en curso, pulsable', pagina.evaluate(() => {
+  const m = document.querySelector('#ficha-acciones .marca-hito');
+  return !!m && m.tagName === 'BUTTON' && /^Paso \d+ de \d+ · /.test(m.textContent);
+}), true);
+await comprobar('y nada se escribe en el estado viejo de la ficha', pagina.evaluate((clave) => {
+  return App.E.registro.asuntos[clave].situacion || '';
+}, CLAVE), '');
 
 console.log('--- escenario 4: la lista se corta en la decisión, y al elegir aparece la rama ---');
 await pagina.locator('#ficha-guia .hito[data-id="p2"] .hito-casilla').check();

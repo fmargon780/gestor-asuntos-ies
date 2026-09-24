@@ -59,19 +59,10 @@ App.prepararNuevo = function () {
   App.refrescarVista();
 };
 
-/* El estado con el que nace el asunto. Se propone el primero de la
-   lista de Ajustes, que es el primer paso del trámite. */
+/* La vía de comunicación con la que nace el asunto. Desde la fila 129
+   (docs/EL-HITO-ES-EL-ESTADO.md) ya no se elige estado: el estado del
+   asunto es su hito actual. El nombre se queda por quien ya lo llama. */
 App.pintarEstadoNuevo = function () {
-  var sel = $('campo-estado');
-  var antes = sel.value;
-  sel.innerHTML = '<option value="">Sin estado</option>' +
-    App.E.estados.map(function (e) {
-      return '<option value="' + U.escapar(e.nombre) + '">' + U.escapar(e.nombre) + '</option>';
-    }).join('');
-  var primero = App.E.estados.length ? App.E.estados[0].nombre : '';
-  sel.value = antes || primero;
-  if (sel.selectedIndex === -1) sel.value = primero;
-
   var via = $('campo-via');
   if (!via.options.length) {
     via.innerHTML = '<option value="">Sin indicar</option>' +
@@ -601,7 +592,6 @@ App.crearAsuntoDelFormulario = async function () {
       estado: 'abierto', tipo: d.tipo, categoria: App.E.nuevo.categoria,
       tercero: d.tercero, curso: d.curso, grupo: d.grupo, descripcion: d.descripcion,
       campos: camposParaGuardar,
-      situacion: $('campo-estado').value,
       via: $('campo-via').value,
       viaDato: $('campo-via-dato').value.trim(),
       limite: $('campo-limite').value,
@@ -642,7 +632,6 @@ App.crearAsuntoDelFormulario = async function () {
     U.copiar(nombre);
     App.E.nuevo = { tipo: null, categoria: null, tercero: null, configCampos: [] };
     $('campo-descripcion').value = '';
-    $('campo-estado').value = App.E.estados.length ? App.E.estados[0].nombre : '';
     $('campo-via').value = '';
     $('campo-via-dato').value = '';
     $('campo-limite').value = '';

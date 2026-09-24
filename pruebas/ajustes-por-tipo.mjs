@@ -80,9 +80,9 @@ await pagina.click('[data-ajustes-pestana="centro"]');
 await comprobar('"El centro" pasa a verse', pagina.locator('#ajustes-tab-centro').isVisible(), true);
 await comprobar('"Tipos de asunto" se oculta', pagina.locator('#ajustes-tab-tipos').isVisible(), false);
 await pagina.evaluate(() => document.querySelectorAll('#ajustes-tab-centro details').forEach((d) => { d.open = true; }));
-await comprobar('"El centro" trae Estados, Campos propios, Grupos y Datos del centro',
+await comprobar('"El centro" trae Campos propios, Grupos y Datos del centro, y ya no Estados (fila 129)',
   pagina.locator('#ajustes-tab-centro').textContent().then((t) =>
-    t.indexOf('Estados del asunto') !== -1 && t.indexOf('Campos propios') !== -1 &&
+    t.indexOf('Estados del asunto') === -1 && t.indexOf('Campos propios') !== -1 &&
     t.indexOf('Grupos de personas') !== -1 && t.indexOf('Datos del centro y firma') !== -1), true);
 
 await pagina.click('[data-ajustes-pestana="mantenimiento"]');

@@ -77,7 +77,9 @@ async function archivarDesdeLaFicha(nombre) {
   await pagina.click('button:has-text("Archivar el asunto")');
   await pagina.waitForSelector('#capa:not(.oculto)');
   await pagina.click('#cuadro-aceptar');
-  await pagina.waitForSelector('.mensaje.bueno');
+  /* El de archivar, no otro verde cualquiera (desde la fila 129, al entrar
+     puede salir también el de poner al día los asuntos de antes). */
+  await pagina.waitForSelector('.mensaje.bueno:has-text("Asunto archivado.")');
 }
 
 /* Hace que, dentro del árbol de `window.__disco.archivo` (nunca en

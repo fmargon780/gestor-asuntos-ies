@@ -398,24 +398,18 @@
     return nombre;
   }
 
-  /* El estado que toca después de escribir a alguien de fuera. La lista
-     la pone el centro en Ajustes, así que no se da por hecho que exista
-     uno llamado "A LA ESPERA DEL TERCERO": se busca entre los que están
-     marcados como de espera, y de esos manda el que hable del tercero.
-     "ENVIADO A FIRMA" también es de espera, pero no es lo que pasa
-     cuando se manda un correo a una familia. */
-  function estadoDeEspera() {
-    var lista = ((App.E && App.E.estados) || []).filter(function (e) { return e.espera; });
-    if (!lista.length) return '';
-    var conTercero = lista.filter(function (e) {
-      return U.normalizar(e.nombre).indexOf('tercero') !== -1;
-    });
-    if (conTercero.length) return conTercero[0].nombre;
-    var conEspera = lista.filter(function (e) {
-      return U.normalizar(e.nombre).indexOf('espera') !== -1;
-    });
-    if (conEspera.length) return conEspera[0].nombre;
-    return lista[lista.length - 1].nombre;
+  /* A quién se espera después de escribir a alguien de fuera (fila 129,
+     docs/EL-HITO-ES-EL-ESTADO.md: ya no hay estados escritos a mano, se
+     deja el asunto «Esperando a…», js/estado-hito.js): la familia en
+     ALUMNADO, el tercero en lo demás. */
+  function esperaTrasCorreo(a) {
+    var cat = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
+    return cat === 'ALUMNADO' ? { id: 'tutor', nombre: 'la familia' } : { id: 'tercero', nombre: 'el tercero' };
+  }
+
+  function yaEsperando(a) {
+    var l = (window.App && typeof App.ladoDe === 'function') ? App.ladoDe(a) : null;
+    return !!(l && l.esperando);
   }
 
   async function apuntarElRastro(a) {
@@ -458,9 +452,8 @@
       caja.appendChild(sitio);
     }
 
-    var espera = estadoDeEspera();
-    var ahora = (a.ficha && a.ficha.situacion) || '';
-    var puedeEsperar = modoDelAsunto !== 'archivado' && espera && ahora !== espera;
+    var espera = esperaTrasCorreo(a);
+    var puedeEsperar = modoDelAsunto !== 'archivado' && window.EstadoHito && !yaEsperando(a);
 
     /* El recordatorio de guardar el PDF del hilo solo hace falta
        cuando el correo NO ha salido por aquí (fila 115): un envío real
@@ -475,17 +468,16 @@
     b.type = 'button';
     b.className = 'boton';
     b.style.marginTop = '8px';
-    b.textContent = 'Poner el asunto en ' + espera;
+    b.textContent = 'Dejar el asunto esperando a ' + espera.nombre;
     b.onclick = async function () {
       b.disabled = true;
       try {
-        await App.ponerEstado(a, espera);
-        if (a.ficha) a.ficha.situacion = espera;
+        await EstadoHito.ponerEsperando(a, espera.id, 'Correo enviado');
         algoCambiado = true;
-        b.textContent = 'Hecho: ' + espera;
+        b.textContent = 'Hecho: esperando a ' + espera.nombre;
       } catch (e) {
         b.disabled = false;
-        U.aviso('No he podido cambiar el estado: ' + U.mensajeDeError(e), 'malo');
+        U.aviso('No he podido dejarlo en espera: ' + U.mensajeDeError(e), 'malo');
       }
     };
     sitio.appendChild(b);

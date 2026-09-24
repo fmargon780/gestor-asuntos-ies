@@ -53,7 +53,8 @@ App.verArchivo = async function () {
        completa con FichaArchivo.completar. */
     var ficha = {
       situacion: e.situacion || '', via: e.via || '', viaDato: e.viaDato || '',
-      categoria: e.categoria || '', tercero: e.tercero || ''
+      categoria: e.categoria || '', tercero: e.tercero || '',
+      seQuedoEn: e.seQuedoEn || '', terminado: !!e.terminado   /* fila 129 */
     };
     return {
       nombre: e.nombre, handle: null, padre: null, ruta: e.ruta,
@@ -386,12 +387,13 @@ App.verAsuntosDeTercero = async function (p) {
     var ficha = a.donde === 'Abierto'
       ? (App.E.registro.asuntos[a.nombre] || {})
       : ((window.FichaArchivo && await FichaArchivo.leer(a.handle)) || {});
-    var situacion = ficha.situacion || '';
+    /* Fila 129: el estado es el hito actual, o dónde se quedó al archivar. */
+    var situacion = !window.EstadoHito ? '' : (a.donde === 'Abierto'
+      ? EstadoHito.textoDeNombre(a.nombre) : EstadoHito.textoArchivado(ficha));
     return '<div class="resultado"><div>' +
            (leido.tipo ? '<span class="marca-tipo" title="' + U.escapar(leido.tipo) + '">' +
                          U.escapar(Nombres.tipoParaVer(leido.tipo, App.E.tipos)) + '</span>' : '') +
-           (situacion ? '<span class="marca-estado ' + App.colorEstado(situacion) + '">' +
-                        U.escapar(situacion) + '</span>' : '') +
+           (situacion ? '<span class="marca-hito">' + U.escapar(situacion) + '</span>' : '') +
            U.escapar(a.nombre) + '</div>' +
            '<div class="resultado-pie">' + a.donde +
            (leido.fecha ? '  ·  ' + U.fechaLegible(leido.fecha) : '') + '</div></div>';

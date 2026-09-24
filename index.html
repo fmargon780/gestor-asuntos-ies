@@ -42,6 +42,7 @@
 <link rel="stylesheet" href="css/filas.css">
 <link rel="stylesheet" href="css/cabecera-fija.css">
 <link rel="stylesheet" href="css/personas.css">
+<link rel="stylesheet" href="css/estado-hito.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -130,9 +131,9 @@
              se salían de linea y las etiquetas acababan lejos de su campo. -->
         <div id="filtros-abiertos" class="filtros oculto">
           <label class="filtro">
-            <span class="filtro-rotulo">Estado</span>
-            <select id="filtro-estado" class="campo campo-estado">
-              <option value="">Todos los estados</option>
+            <span class="filtro-rotulo">Montón</span>
+            <select id="filtro-estado" class="campo">
+              <option value="">Todos</option>
             </select>
           </label>
           <label class="filtro">
@@ -151,7 +152,7 @@
               <option value="fecha-asc">Fecha · los más antiguos arriba</option>
               <option value="fecha-desc">Fecha · los más recientes arriba</option>
               <option value="limite">Fecha límite · lo que antes vence</option>
-              <option value="estado">Estado del asunto</option>
+              <option value="estado">Paso del asunto</option>
               <option value="tipo">Tipo de asunto</option>
               <option value="tercero">Tercero</option>
             </select>
@@ -286,10 +287,6 @@
 
           <div class="dos-columnas">
             <div>
-              <label class="etiqueta">Estado</label>
-              <select id="campo-estado" class="campo"></select>
-            </div>
-            <div>
               <label class="etiqueta">Vía de comunicación <span class="suave">(opcional)</span></label>
               <select id="campo-via" class="campo"></select>
             </div>
@@ -390,23 +387,8 @@
 
       <div id="ajustes-tab-centro" class="ajustes-tab oculto">
 
-      <details class="bloque-ajustes">
-        <summary>
-          <span class="bloque-titulo">Estados del asunto</span>
-          <span class="bloque-pie">Por dónde va la tramitación, en el orden del trámite</span>
-        </summary>
-        <div class="bloque-cuerpo">
-      <p class="explica">Dicen por dónde va cada gestión: pendiente, enviado a la firma, resuelto…
-         También se comparten con el resto de ordenadores. Van en el orden del trámite,
-         no por orden alfabético: con las flechas los subes y los bajas.</p>
-      <div class="alta-tipo">
-        <input id="nuevo-estado" class="campo" placeholder="ESTADO NUEVO" style="max-width:260px">
-        <button id="btn-anadir-estado" class="boton">Añadir</button>
-      </div>
-      <div id="aviso-nuevo-estado" class="aviso-en-vivo"></div>
-      <div id="tabla-estados" class="rejilla-tipos"></div>
-        </div>
-      </details>
+      <!-- Fila 129 (docs/EL-HITO-ES-EL-ESTADO.md): la rejilla "Estados del asunto"
+           ya no existe: el estado del asunto es su hito actual. -->
 
       <details class="bloque-ajustes">
         <summary>
@@ -799,6 +781,7 @@
 <script src="js/guias-documentos.js"></script>
 <script src="js/guias-niveles.js"></script>
 <script src="js/guias-barra.js"></script>
+<script src="js/guias-toca.js"></script>
 <script src="js/guias.js"></script>
 <script src="js/guias-plegado.js"></script>
 <script src="js/guias-opciones-editor.js"></script>
@@ -1133,6 +1116,8 @@
 <!-- Fila 104: a quién le toca cada asunto, por su hito abierto. Después de
      js/hitos-archivo.js (usa Hitos.resolverResponsable). -->
 <script src="js/hitos-a-quien.js"></script>
+<script src="js/estado-hito.js"></script>
+<script src="js/estado-migracion.js"></script>
 
 <!-- Ajustes por tipo (17-sep-2026, fila 39, docs/AJUSTES-POR-TIPO.md):
      js/ajustes.js se quedó solo con el marco (las tres pestañas, la

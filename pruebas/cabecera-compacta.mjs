@@ -112,12 +112,12 @@ async function abrirMesa(pagina) {
   const v = await alto(pagina, '#ficha-volver');
   const a = await alto(pagina, '#ficha-archivar .boton-principal');
   const n = await alto(pagina, '.ficha-nombre');
-  const e = await alto(pagina, '#ficha-acciones select.campo-estado');
+  const e = await alto(pagina, '#ficha-acciones .marca-hito');   /* fila 129: el hito actual, en vez del desplegable de estado */
   const s = await alto(pagina, '.ficha-subtitulo');
   await comprobar('1. «← Volver», nombre y «Archivar», en la misma línea',
     Promise.resolve([Math.abs(v.top - a.top) < 12, Math.abs(v.top - n.top) < 12]), [true, true]);
   await comprobar('1. «Archivar» a la derecha', Promise.resolve(a.left > n.left), true);
-  await comprobar('1. el estado y la línea gris, en la segunda línea',
+  await comprobar('1. el hito actual y la línea gris, en la segunda línea',
     Promise.resolve([e.top > v.bottom - 2, Math.abs((s.top + s.bottom) / 2 - (e.top + e.bottom) / 2) < 16]), [true, true]);
   await comprobar('1. el texto del botón de volver', pagina.locator('#ficha-volver').textContent(), '← Volver');
 

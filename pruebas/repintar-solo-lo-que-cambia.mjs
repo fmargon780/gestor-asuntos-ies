@@ -70,13 +70,16 @@ await pagina.evaluate(async (B) => {
   await App.verAbiertos();
   App.abrirFicha(App.E.listaAbiertos.filter(x => x.nombre === B)[0], 'abierto');
 }, B);
-await pagina.waitForSelector('#ficha-acciones select.campo-estado');
+await pagina.waitForSelector('#ficha-acciones .marca-hito');
 await pagina.waitForSelector('#ficha-guia .hito');
 await pagina.waitForTimeout(1200);
 
-/* ---------- 1. cambiar el estado ---------- */
-console.log('--- 1. cambiar el estado con la ficha abierta ---');
-const r1 = await pagina.evaluate(async () => {
+/* ---------- 1. «Esperando a…» ----------
+   Desde la fila 129 (docs/EL-HITO-ES-EL-ESTADO.md) ya no hay desplegable
+   de estado: lo que se toca en la cabecera es «Esperando a…», que solo
+   mira la carpeta del asunto y escribe hitos.json. */
+console.log('--- 1. «Esperando a…» con la ficha abierta ---');
+const r1 = await pagina.evaluate(async (B) => {
   const cuenta = {};
   const apunta = (k) => { cuenta[k] = (cuenta[k] || 0) + 1; };
   const originales = {};
@@ -87,40 +90,38 @@ const r1 = await pagina.evaluate(async () => {
       return originales[f].apply(this, arguments);
     };
   });
-  const sel = document.querySelector('#ficha-acciones select.campo-estado');
-  const opcion = Array.from(sel.options).find(o => o.value && o.value !== sel.value);
-  sel.value = opcion.value;
-  sel.dispatchEvent(new Event('change'));
+  await EstadoHito.ponerEsperando(App.E.listaAbiertos.filter(x => x.nombre === B)[0], 'tutor', '');
   await new Promise(r => setTimeout(r, 1500));
   Object.keys(originales).forEach(f => { Carpetas[f] = originales[f]; });
-  return { cuenta, valor: opcion.value, pendiente: App.E.listaPendiente };
-});
-const lecturasPermitidas = ['leerJson:asuntos.json', 'leerTexto:asuntos.json', 'guardarJson:asuntos.json', 'escribirTexto:asuntos.json'];
-await comprobar('solo relee y escribe asuntos.json',
-  Promise.resolve(Object.keys(r1.cuenta).filter(k => lecturasPermitidas.indexOf(k) === -1)), []);
-await comprobar('como mucho una relectura', Promise.resolve((r1.cuenta['leerJson:asuntos.json'] || 0) <= 1), true);
+  return { cuenta, pendiente: App.E.listaPendiente };
+}, B);
+const permitidas = ['ficheros', 'leerJson:hitos.json', 'leerTexto:hitos.json', 'guardarJson:hitos.json', 'escribirTexto:hitos.json'];
+await comprobar('solo mira la carpeta y relee y escribe hitos.json',
+  Promise.resolve(Object.keys(r1.cuenta).filter(k => permitidas.indexOf(k) === -1 &&
+    !/^(escribirTexto|guardarJson):hitos-\d{6}\.json$/.test(k))), []);   /* la copia del día de hitos.json */
+await comprobar('como mucho una relectura', Promise.resolve((r1.cuenta['leerJson:hitos.json'] || 0) <= 1), true);
 await comprobar('la lista, oculta detrás de la ficha, queda pendiente', Promise.resolve(r1.pendiente), true);
-await comprobar('el desplegable enseña el estado nuevo',
-  pagina.locator('#ficha-acciones select.campo-estado').inputValue(), r1.valor);
+await comprobar('la cabecera lo enseña, sin repintar la ficha',
+  pagina.locator('#ficha-acciones .marca-esperando').textContent().then(t => t.indexOf('Esperando a Familia') === 0), true);
 await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
-await comprobar('al volver a la lista se pinta, con el estado nuevo',
-  pagina.evaluate(([B, valor]) => {
-    const t = Array.from(document.querySelectorAll('#lista-abiertos .tarjeta')).find(x => x.textContent.indexOf(B) > -1);
-    return [!App.E.listaPendiente, !!t && t.textContent.indexOf(valor) > -1];
-  }, [B, r1.valor]), [true, true]);
+await comprobar('al volver a la lista se pinta, y el asunto ya va con los de terceros',
+  pagina.evaluate((B) => [!App.E.listaPendiente, App.ladoDe(App.E.listaAbiertos.filter(x => x.nombre === B)[0]).lado], B),
+  [true, 'terceros']);
 
-/* ---------- 2. marcar un hito con estado asociado ---------- */
-console.log('--- 2. marcar un hito que cambia el estado ---');
+/* ---------- 2. marcar un hito ---------- */
+console.log('--- 2. marcar un hito cambia el paso de la cabecera ---');
 await pagina.evaluate((B) => App.abrirFicha(App.E.listaAbiertos.filter(x => x.nombre === B)[0], 'abierto'), B);
 await pagina.waitForSelector('#ficha-guia .hito[data-id="h1"] .hito-casilla');
 await pagina.click('#ficha-guia .hito[data-id="h1"] .hito-casilla');
 await pagina.waitForFunction(() => {
-  const s = document.querySelector('#ficha-acciones select.campo-estado');
-  return s && s.value === 'EN TRÁMITE';
+  const m = document.querySelector('#ficha-acciones .marca-hito');
+  return m && m.textContent === 'Paso 2 de 2 · Tramitar';
 }, null, { timeout: 5000 }).then(() => {}, () => {});
-await comprobar('el desplegable de la cabecera pasa a EN TRÁMITE',
-  pagina.locator('#ficha-acciones select.campo-estado').inputValue(), 'EN TRÁMITE');
+await comprobar('la cabecera pasa a «Paso 2 de 2 · Tramitar»',
+  pagina.locator('#ficha-acciones .marca-hito').textContent(), 'Paso 2 de 2 · Tramitar');
+await comprobar('y el «Esperando a…» del hito hecho se ha quitado solo',
+  pagina.locator('#ficha-acciones .marca-esperando').count(), 0);
 
 /* ---------- 3. el aviso de consulta, una sola vez ---------- */
 console.log('--- 3. el aviso de consulta no se repite ---');

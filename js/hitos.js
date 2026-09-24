@@ -131,6 +131,17 @@ var Hitos = (function () {
     if (h && Array.isArray(h.guionPropio) && h.guionPropio.length) salida.guionPropio = h.guionPropio;
     /* Fila 116: la respuesta a cada pregunta del guion, solo si la hay. */
     if (h && h.guionElegido && typeof h.guionElegido === 'object' && Object.keys(h.guionElegido).length) salida.guionElegido = h.guionElegido;
+    /* Fila 129 (docs/EL-HITO-ES-EL-ESTADO.md), solo si los hay: la marca
+       del paso («Nos toca» / «Esperamos a…») y el «Esperando a…» puesto a
+       mano, con desde cuándo, el motivo y los ficheros que había. */
+    if (h && (h.toca === 'nos' || h.toca === 'espera')) salida.toca = h.toca;
+    if (h && h.toca === 'espera' && h.tocaA) salida.tocaA = String(h.tocaA);
+    if (h && h.esperandoA) {
+      salida.esperandoA = String(h.esperandoA);
+      salida.esperandoDesde = String(h.esperandoDesde || '');
+      if (h.esperandoMotivo) salida.esperandoMotivo = String(h.esperandoMotivo);
+      if (Array.isArray(h.esperandoFicheros)) salida.esperandoFicheros = h.esperandoFicheros.map(String);
+    }
     if (esDecision) {
       salida.opciones = (Array.isArray(h && h.opciones) ? h.opciones : []).map(function (o) {
         return {
@@ -185,6 +196,7 @@ var Hitos = (function () {
     var n = Object.keys(leido.porAsunto).length;
     if (n) vistosConDatos = n;
     ultimos = leido;
+    alLeer.forEach(function (f) { try { f(leido); } catch (e) { /* solo pintar */ } });
     return leido;
   }
 
@@ -229,6 +241,9 @@ var Hitos = (function () {
   var ultimos = null;
   function ultimosLeidos() { return ultimos; }
   var alCambiar = [];
+  /* Y quién quiere enterarse de cada lectura (fila 129: la cabecera de la
+     ficha enseña el hito actual con lo último leído). */
+  var alLeer = [];
   var ESPERAS_LECTURA_VACIA_MS = [700, 1500];
 
   async function leerParaCambiar(g) {
@@ -364,29 +379,20 @@ var Hitos = (function () {
   /* ==========================================================
      EL ESTADO DEL ASUNTO (sección 8 del encargo)
 
-     Cada paso de la guía puede llevar apuntado un estado de
-     estados.json. Cuando el hito pasa a "encurso", el asunto pasa
-     solo a ese estado. Esta es la ÚNICA función que lo decide: nadie
-     más lo deduce por su cuenta, para poder cambiarla sin tocar diez
-     sitios si el día de mañana el estado del asunto desaparece y lo
-     sustituye el propio hito en curso. */
-  function estadoDelAsunto(hito) {
-    return (hito && hito.estadoAsunto) || null;
+     Desde la fila 129 (docs/EL-HITO-ES-EL-ESTADO.md) el estado del
+     asunto ES su hito actual: «Paso N de M · título», «Listo para
+     archivar» o «Sin hitos», y a quién le toca. Esta es la ÚNICA
+     función que lo decide; la cuenta vive en js/hitos-a-quien.js
+     (Hitos.ladoDelAsunto). Ya no se escribe nada en asuntos.json. */
+  function estadoDelAsunto(hitos, ajustes, contexto) {
+    if (typeof Hitos.ladoDelAsunto !== 'function') return { lado: 'administracion', texto: '', sinHitos: true };
+    return Hitos.ladoDelAsunto(hitos || [], ajustes || null, contexto);
   }
 
-  async function aplicarEstadoDelHito(clave, hito) {
-    var estado = estadoDelAsunto(hito);
-    if (!estado || !window.App) return;
-    try {
-      await App.anotar(clave, { situacion: estado, situacionEl: U.ahora(), situacionPor: App.E.usuario });
-    } catch (e) {
-      /* El hito ya ha quedado guardado: ámbar, no rojo (fila 100). */
-      U.accesorio('Hito guardado, pero no he podido poner el estado "' + estado + '" al asunto', e);
-      return;
-    }
-    /* Y la cabecera de la ficha, si está abierta: el desplegable de
-       estado se queda con el valor nuevo (fila 101). La lista, solo si
-       se ve (App.pintarAbiertos la deja pendiente si no). */
+  /* Tras mover un hito: la cabecera de la ficha, si está abierta, y la
+     lista, solo si se ve (App.pintarAbiertos la deja pendiente si no). */
+  async function aplicarEstadoDelHito(clave) {
+    if (!window.App) return;
     try {
       if (typeof App.repintarAccionesFicha === 'function') App.repintarAccionesFicha(clave);
       if (typeof App.pintarAbiertos === 'function') App.pintarAbiertos();
@@ -423,6 +429,7 @@ var Hitos = (function () {
       id: p.id, origenGuia: p.id, titulo: p.titulo, cuerpo: p.cuerpo,
       clase: esDecision ? 'decision' : 'paso', estado: 'pendiente',
       responsable: p.responsable || '', estadoAsunto: p.estadoAsunto || null,
+      toca: p.toca || '', tocaA: p.tocaA || '',
       plazo: (p.plazo && p.plazo.dias) ? { dias: p.plazo.dias, desde: p.plazo.desde || '' } : null,
       /* Una pregunta no lleva requisitos propios (fila 59, sección 4.1
          del encargo: el editor no se los deja poner); los de sus
@@ -441,6 +448,14 @@ var Hitos = (function () {
     });
   }
 
+  /* La guía del tipo; si no tiene, la guía mínima (fila 129,
+     js/estado-hito.js), que se guarda como guía normal del tipo. */
+  async function pasosOMinima(tipo) {
+    var pasos = (window.GuiasDelCentro && window.GuiasDelCentro.pasosDe(tipo)) || [];
+    if (pasos.length || !tipo || !window.EstadoHito || !EstadoHito.guiaMinima) return pasos;
+    try { return (await EstadoHito.guiaMinima(tipo)) || []; } catch (e) { return []; }
+  }
+
   /* Asunto nuevo (sección 3.1): los hitos se crean de golpe al abrirlo,
      y el primero queda en curso. No hace nada si el asunto ya tiene
      hitos (para no crearlos dos veces si esto se llama más de una
@@ -449,7 +464,7 @@ var Hitos = (function () {
   async function crearDesdeGuia(clave, tipo) {
     var previos = await hitosDe(clave);
     if (previos.length) return previos;
-    var pasos = (window.GuiasDelCentro && window.GuiasDelCentro.pasosDe(tipo)) || [];
+    var pasos = await pasosOMinima(tipo);
     if (!pasos.length) return [];
     var resultado = null;
     var datos = await cambiar(function (d) {
@@ -462,6 +477,25 @@ var Hitos = (function () {
     return datos.porAsunto[clave] ? datos.porAsunto[clave].hitos : [];
   }
 
+  /* Los hitos de una guía, con lo ya marcado en pasosHechos/pasosElegidos
+     de un asunto viejo. Función pura (también la usa el paso único de la
+     fila 129, js/estado-migracion.js). */
+  function listaImportando(pasos, pasosHechos, pasosElegidos) {
+    var hechos = pasosHechos || [];
+    var elegidos = pasosElegidos || {};
+    var lista = (pasos || []).map(pasoAHito);
+    (function aplicar(l) {
+      (l || []).forEach(function (h) {
+        if (h.origenGuia && hechos.indexOf(h.origenGuia) !== -1) h.estado = 'hecho';
+        if (h.clase === 'decision') {
+          if (h.origenGuia && elegidos[h.origenGuia]) h.elegida = elegidos[h.origenGuia];
+          h.opciones.forEach(function (o) { aplicar(o.hitos); });
+        }
+      });
+    })(lista);
+    return lista;
+  }
+
   /* Asunto viejo, botón "Crear los hitos de la guía" (sección 3.2):
      igual que crearDesdeGuia, pero importando lo que ya estaba
      marcado en pasosHechos/pasosElegidos. pasosHechos y pasosElegidos
@@ -469,22 +503,11 @@ var Hitos = (function () {
   async function crearDesdeGuiaImportando(clave, tipo, pasosHechos, pasosElegidos) {
     var previos = await hitosDe(clave);
     if (previos.length) return previos;
-    var pasos = (window.GuiasDelCentro && window.GuiasDelCentro.pasosDe(tipo)) || [];
+    var pasos = await pasosOMinima(tipo);
     if (!pasos.length) return [];
-    var hechos = pasosHechos || [];
-    var elegidos = pasosElegidos || {};
     var resultado = null;
     var datos = await cambiar(function (d) {
-      var lista = pasos.map(pasoAHito);
-      (function aplicar(l) {
-        (l || []).forEach(function (h) {
-          if (h.origenGuia && hechos.indexOf(h.origenGuia) !== -1) h.estado = 'hecho';
-          if (h.clase === 'decision') {
-            if (h.origenGuia && elegidos[h.origenGuia]) h.elegida = elegidos[h.origenGuia];
-            h.opciones.forEach(function (o) { aplicar(o.hitos); });
-          }
-        });
-      })(lista);
+      var lista = listaImportando(pasos, pasosHechos, pasosElegidos);
       resultado = recomputeEnCurso(lista);
       d.porAsunto[clave] = { creados: U.hoyIso(), hitos: lista };
       return d;
@@ -508,6 +531,8 @@ var Hitos = (function () {
       var h = buscar(entrada.hitos, idHito);
       if (!h) return d;
       h.estado = nuevoEstado;
+      /* Fila 129: el «Esperando a…» se quita al terminar su hito. */
+      if ((nuevoEstado === 'hecho' || nuevoEstado === 'noaplica') && Hitos.quitarEspera) Hitos.quitarEspera(h);
       if (nota) h.notas.push({ texto: String(nota), quien: (window.App && App.E.usuario) || '', cuando: U.ahora() });
       if (nuevoEstado === 'encurso') h.desde = U.hoyIso();
       if (nuevoEstado === 'hecho') h.hechoEl = U.hoyIso();
@@ -553,10 +578,10 @@ var Hitos = (function () {
     faltanObligatorios: faltanObligatorios,
     recomputeEnCurso: recomputeEnCurso, aplicarEstadoDelHito: aplicarEstadoDelHito,
     aplicarPlazosDependientes: aplicarPlazosDependientes, estadoDelAsunto: estadoDelAsunto,
-    pasoAHito: pasoAHito, crearDesdeGuia: crearDesdeGuia,
+    pasoAHito: pasoAHito, crearDesdeGuia: crearDesdeGuia, listaImportando: listaImportando,
     crearDesdeGuiaImportando: crearDesdeGuiaImportando,
     marcar: marcar, ultimoCambioLocal: ultimoCambioLocal,
-    ultimosLeidos: ultimosLeidos, alCambiar: alCambiar
+    ultimosLeidos: ultimosLeidos, alCambiar: alCambiar, alLeer: alLeer
   };
 })();
 window.Hitos = Hitos;

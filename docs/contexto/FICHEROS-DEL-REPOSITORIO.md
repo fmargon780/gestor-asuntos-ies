@@ -65,7 +65,7 @@ de `App` va después del fichero que lo define.
 | `js/tipos-nombre.js` | Un tipo que cambia de nombre se lleva guía, campos, plantillas y recurrentes (`TiposNombre.mover`); el arreglo al entrar de lo que se quedó bajo el nombre corto o un alias, y las plantillas repetidas; `App.renombrarTipo` (sacado de `js/ajustes.js`). Fila 126 |
 | `js/ajustes-tipo.js` | La pantalla propia de un tipo de asunto, con sus ocho secciones (17-sep-2026, fila 39) |
 | `js/ajustes-tipo-palabras-clave.js` | La sección "Palabras clave" de la pantalla de un tipo: `palabrasClave` en `tipos.json` (17-sep-2026, fila 41) |
-| `js/ajustes-centro.js` | La pestaña "El centro" de Ajustes: estados, tipos de documento, campos propios, grupos, ficheros de datos, abreviatura de grupos (17-sep-2026, fila 39) |
+| `js/ajustes-centro.js` | La pestaña "El centro" de Ajustes: tipos de documento (la rejilla de estados ya no está en `index.html` desde la fila 129; su código se queda sin enganchar), campos propios, grupos, ficheros de datos, abreviatura de grupos (17-sep-2026, fila 39) |
 | `js/ajustes-mantenimiento.js` | La pestaña "Mantenimiento" de Ajustes: avisos de vencimiento, carpetas de este ordenador, copias y papelera (17-sep-2026, fila 39) |
 | `js/ajustes-plegado.js` | Ajustes plegado (fila 105): las secciones de un tipo, "El centro" y "Mantenimiento" nacen plegadas, con un resumen en el título, la memoria de lo abierto (`gestor-ajustes-plegado`), los avisos de fallo solo con fallo y el bloque "Herramientas" |
 | `js/cargar-biblioteca.js` | El botón "Cargar la biblioteca del centro" (fila 80, 20-sep-2026), en Ajustes → Mantenimiento: lee `datos-biblioteca/biblioteca-centro.json` con `App.leerFicheroDeLaApp` (fila 89: antes `fetch` directo) y lo fusiona con `tipos.json`, `campos.json`, `hitos-biblioteca.json` y `guias.json`, sin pisar nada ya escrito |
@@ -107,6 +107,7 @@ de `App` va después del fichero que lo define.
 | `js/guias-mapa.js`, `css/guias-mapa.css` | El mapa de la guía (fila 113): `GuiasMapa.html` (pura) y abrirlo en Ajustes, dentro del editor de la guía y en la ficha de un asunto |
 | `js/guias-niveles.js` | Entrar y salir de las preguntas de dentro en el editor de la guía, e ir a un paso concreto (`GuiasNiveles`, fila 113, sacado de `js/guias.js`) |
 | `js/guias-plegado.js` | El editor de la guía en acordeón: un solo paso abierto, la línea resumida con sus marcas (`GuiasPlegado`, fila 122) |
+| `js/guias-toca.js` | «Nos toca» / «Esperamos a…» de cada paso de la guía, en el editor y en la fila cerrada (`GuiasToca`, fila 129). Antes de `js/guias.js` |
 | `js/guias-barra.js` | La barra de formato del editor de la guía (negrita, viñetas, enlace; `GuiasBarra`, fila 122, sacada de `js/guias.js`) |
 | `js/guias-opciones-editor.js` | Las opciones de un paso-pregunta y sus pasos, en el editor de la guía (`GuiasOpcionesEditor.caja`, fila 122, sacado de `js/guias.js`) |
 | `js/ficha-tarjetas-resumen.js` | Lo que enseña cada tarjeta cerrada de la ficha (`FichaTarjetasResumen`, fila 114, sacado de `js/ficha-tarjetas.js`): Documentos con 5 nombres como mucho y «y N más» |
@@ -180,11 +181,14 @@ de `App` va después del fichero que lo define.
 | `js/cabecera-fija.js` | La cabecera de la pantalla visible (`header.cabecera` o `header.ficha-cabecera`) se queda pegada arriba (`position: sticky`) y se encoge con el scroll, con histéresis; en "Por clasificar", con un documento abierto, añade "Viendo: …" e "Ir a su fila" (`window.CabeceraFija`) |
 | `css/cabecera-fija.css` | El aspecto de la cabecera pegada: fondo opaco de borde a borde, título más pequeño encogida, qué se esconde |
 | `css/personas.css` | Personas y empresas (fila 125): la ficha fija al bajar, la tarjeta marcada, las tarjetas de «Familias» y el bloque «Antiguos (N)» |
+| `css/estado-hito.css` | La marca del hito actual (`.marca-hito`) y «Esperando a…» (`.marca-esperando`), en la tarjeta y en la ficha (fila 129) |
 | `js/dni.js` | El DNI del alumnado, el aviso de que falta y la búsqueda por DNI |
 | `js/papelera.js` | Borrar con papelera: mandar, devolver, borrar del todo y el bloque de Ajustes |
 | `css/papelera.css` | El bloque de la papelera en Ajustes, y su icono por clase |
 | `js/hitos-ajustes.js` | El bloque "Hitos" de Ajustes: responsables (con su marca "Administración", fila 104) y días no lectivos |
-| `js/hitos-a-quien.js` | A quién le toca un asunto (fila 104): `Hitos.esDeAdministracion`, `Hitos.aQuienLeToca`, `Hitos.ladoDelAsunto` y el repintado de la lista cuando un asunto cambia de montón |
+| `js/hitos-a-quien.js` | El estado del asunto es su hito actual (filas 104 y 129): `Hitos.esDeAdministracion`, `Hitos.aQuienLeToca`, `Hitos.ladoDelAsunto`, `Hitos.textoDelEstado`, `Hitos.situarEn` y el repintado de la lista cuando un asunto cambia de montón o de paso |
+| `js/estado-hito.js` | La marca «Paso N de M · título» en la tarjeta y en la ficha, «Esperando a…» / «Ya ha llegado», «Estamos en este paso» y la guía mínima (`EstadoHito`, fila 129) |
+| `js/estado-migracion.js` | El paso único de los estados escritos a mano a los hitos, con marca `_GESTOR/estado-migrado.json` (`EstadoMigracion`, fila 129) |
 | `css/hitos.css` | El aspecto de la lista de hitos en la ficha del asunto, y del bloque de Ajustes |
 | `js/inicio.js` | La última línea: `App.arrancar()` |
 | `js/envolturas-esperadas.js` | El **último** `<script>` de todos (fila 70): compara `U.envolturasAplicadas()` con la lista de las 42 que tienen que estar, y avisa en rojo en la pantalla de entrada si falta alguna (`window.EnvolturasEsperadas`) |
@@ -249,7 +253,8 @@ de `App` va después del fichero que lo define.
 | `pruebas/guardar-en-fila.mjs` | Prueba (navegador de verdad, fila 99, 23-sep-2026): una sola copia al día con lo de antes, dos guardados a la vez sin pisarse, reintentar al leer, una lectura vacía que no escribe, la copia en conflicto que viaja al archivar y el contador de guardado en marcha |
 | `pruebas/scripts-cargados.mjs` | Prueba (sin navegador, fila 92, 23-sep-2026): todo `js/*.js` tiene su `<script>` en `index.html` (y al revés), `reintentar-escritura.js` va antes que `carpetas.js`, y `Carpetas.escribirTexto`/`escribirBytes` escriben aunque falte `Reintentar` |
 | `pruebas/archivar-sin-avisos-falsos.mjs` | Prueba (navegador de verdad, fila 90, 21-sep-2026): archivar desde la ficha abierta no da el aviso de "otro ordenador"; con Dropbox fallando dos veces al escribir `_ficha.json` y saliendo bien a la tercera, ningún aviso de más; fallando siempre, aviso ámbar en castellano y la ficha sigue en `asuntos.json` |
-| `pruebas/estado-por-el-hito.mjs` | Prueba (sin navegador, fila 104, 23-sep-2026): `Hitos.aQuienLeToca` y `Hitos.ladoDelAsunto` (Administración, terceros, pregunta sin responder, solo informativo saltado, todos hechos, sin hitos, estado manual de terceros), la marca de partida de los responsables y `naceSoloInformativo` con los ajustes |
+| `pruebas/estado-por-el-hito.mjs` | Prueba (sin navegador, fila 104, 23-sep-2026): `Hitos.aQuienLeToca` y `Hitos.ladoDelAsunto` (Administración, terceros, pregunta sin responder, solo informativo saltado, todos hechos, sin hitos → Administración desde la fila 129), la marca de partida de los responsables y `naceSoloInformativo` con los ajustes |
+| `pruebas/el-hito-es-el-estado.mjs` | Prueba (sin navegador, fila 129, 24-sep-2026): «Paso N de M», la marca del paso sobre el responsable y su llegada a los hitos, «Esperando a…» que manda y se quita al llegar un fichero, la guía mínima, el paso único, «Estamos en este paso» sin saltarse una pregunta y el texto del ARCHIVO |
 | `pruebas/genero.mjs` | Prueba (navegador de verdad, fila 111, 24-sep-2026): alumna/alumno/sin dato, «El/La Director/a» con firmante mujer, marcas `:tutor1`, lo que no se toca (fechas, y/o, registros, webs), `faltan` al rellenar, forma partida en el Word, sexos del RegAlum/ficha/cargo y una plantilla del centro limpia |
 | `pruebas/cabecera-compacta.mjs` | Prueba (navegador de verdad, fila 112, 24-sep-2026): cabecera del asunto en dos líneas, sin volver repetidos ni línea de ruta, «GUION DEL HITO» a 250 px o menos a 1600×920, la pestaña abierta vuelve atrás, y sin desplazamiento lateral a 800 px |
 | `pruebas/guias-mapa.mjs` | Prueba (sin navegador, fila 113, 24-sep-2026): `GuiasMapa.html` con una guía de dos niveles de preguntas, sin y con hitos (camino resaltado, ramas en gris, «Fuera de la guía»), y `GuiasNiveles.caminoHasta` |

@@ -116,6 +116,36 @@
     return -1;
   }
 
+  /* Fila 129 (docs/EL-HITO-ES-EL-ESTADO.md): la marca «Nos toca» /
+     «Esperamos a…» de cada paso (`toca`, `tocaA`) llega a los hitos que
+     ya existen, a cualquier profundidad. Devuelve cuántos ha cambiado. */
+  function retocarMarcas(lista, pasos) {
+    var porId = {};
+    (function recoger(ps) {
+      (ps || []).forEach(function (p) {
+        if (p && p.id) porId[p.id] = p;
+        if (esPregunta(p)) p.opciones.forEach(function (o) { recoger(o.pasos); });
+      });
+    })(pasos);
+    var n = 0;
+    (function recorrer(hs) {
+      (hs || []).forEach(function (h) {
+        var p = h.origenGuia && !h.delTipoAnterior ? porId[h.origenGuia] : null;
+        if (p) {
+          var toca = (p.toca === 'nos' || p.toca === 'espera') ? p.toca : '';
+          var tocaA = toca === 'espera' ? String(p.tocaA || '') : '';
+          if ((h.toca || '') !== toca || (h.tocaA || '') !== tocaA) {
+            if (toca) h.toca = toca; else delete h.toca;
+            if (tocaA) h.tocaA = tocaA; else delete h.tocaA;
+            n++;
+          }
+        }
+        if (h.clase === 'decision') (h.opciones || []).forEach(function (o) { recorrer(o.hitos); });
+      });
+    })(lista);
+    return n;
+  }
+
   /* La función pura: no toca disco ni pantalla, y no cambia `hitos`.
      Devuelve { hitos, anadidos, conocidos, enCurso }: la lista nueva,
      cuántos pasos (u opciones) se han añadido, los ids de paso que hay
@@ -129,9 +159,11 @@
     var cuenta = { n: 0 };
     completarNivel(lista, pasos || [], ya, cuenta);
     var enCurso = cuenta.n ? Hitos.recomputeEnCurso(lista) : null;
+    var retocados = retocarMarcas(lista, pasos || []);
     return {
       hitos: lista,
       anadidos: cuenta.n,
+      retocados: retocados,
       conocidos: unirSinRepetir(yaLista, idsDePasos(pasos)),
       enCurso: enCurso
     };
@@ -141,7 +173,7 @@
      de un Hitos.cambiar). Devuelve lo mismo que pasosQueFaltan. */
   function completarEntrada(entrada, pasos) {
     var r = pasosQueFaltan(entrada.hitos, pasos, entrada.pasosConocidos);
-    if (r.anadidos) entrada.hitos = r.hitos;
+    if (r.anadidos || r.retocados) entrada.hitos = r.hitos;
     entrada.pasosConocidos = r.conocidos;
     return r;
   }
@@ -181,13 +213,14 @@
      escribe si de verdad falta algo, mirándolo antes en memoria. */
   async function completarAsunto(clave, entradaLeida, pasos) {
     if (!entradaLeida || !(entradaLeida.hitos || []).length || !(pasos || []).length) return null;
-    if (!pasosQueFaltan(entradaLeida.hitos, pasos, entradaLeida.pasosConocidos).anadidos) return null;
+    var previa = pasosQueFaltan(entradaLeida.hitos, pasos, entradaLeida.pasosConocidos);
+    if (!previa.anadidos && !previa.retocados) return null;
     var resultado = null, anadidos = 0;
     var datos = await Hitos.cambiar(function (d) {
       var entrada = d.porAsunto[clave];
       if (!entrada || !(entrada.hitos || []).length) return d;
       var r = completarEntrada(entrada, pasos);
-      anadidos = r.anadidos;
+      anadidos = r.anadidos + r.retocados;
       resultado = r.enCurso;
       return d;
     });

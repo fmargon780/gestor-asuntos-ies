@@ -66,6 +66,11 @@ await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.evaluate(async () => {
   await window.__disco.abiertos.getDirectoryHandle('260901 COMPRA Papeles del Sur SL B29111222', { create: true });
+  /* Fila 129: el paso único de los asuntos de antes ya está hecho (si no,
+     le daría a este asunto la guía mínima antes de escribir la suya). */
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
+  const f = await g.getFileHandle('estado-migrado.json', { create: true });
+  const w = await f.createWritable(); await w.write('{}'); await w.close();
 });
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');

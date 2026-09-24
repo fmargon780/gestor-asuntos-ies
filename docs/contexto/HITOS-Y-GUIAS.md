@@ -177,34 +177,12 @@ Se comprueba con `pruebas/el-hito-mesa-de-trabajo.mjs` (puro, sin navegador: la 
 cuándo sale cada botón, `adjuntosMarcados` y `sufijoDocumentos`) y, en el navegador de verdad, con
 bloques nuevos de `pruebas/hitos.mjs` y `pruebas/quedarse-en-el-asunto.mjs`.
 
-### A quién le toca un asunto (23-sep-2026, fila 104, `docs/ESTADO-POR-EL-HITO.md`)
+### El hito es el estado del asunto (24-sep-2026, fila 129, `docs/EL-HITO-ES-EL-ESTADO.md`)
 
-Asuntos abiertos se parte en **Pendiente de Administración** y **Pendiente de terceros** (los dos
-paneles de siempre, `data-vista` `departamento`/`espera`, renombrados), y el montón sale solo del
-hito abierto. Todo en `js/hitos-a-quien.js`, enganchado a `Hitos`:
-
-- `Hitos.esDeAdministracion(id, ajustes)`: el ÚNICO sitio que dice quién es Administración. Sin
-  responsable, sí; papel fijo (`tercero`/`tutor`/`relacionado`), no; persona del centro, su marca
-  `administracion` de `hitos.json → ajustes.responsables` (casilla "Administración" en Ajustes ›
-  Hitos, `Hitos.marcarAdministracion`; de partida `yo` y `companero`); un nombre que no está en la
-  lista, no. La usan también "Qué me toca" ("En tu tejado") y `HitosBiblioteca.naceSoloInformativo`
-  cuando se le pasan los `ajustes` (con un id suelto sigue como antes; hoy nadie lo llama así).
-- `Hitos.aQuienLeToca(hitos, ajustes, contexto)` (pura): el primer hito visible ni `hecho` ni
-  `noaplica`, saltando los `soloInformativo` y las preguntas respondidas; si hay otros `encurso` a
-  la vez y alguno es de Administración, gana. Pregunta sin responder: Administración. Todos
-  terminados: Administración (toca archivar). Sin hitos: `lado: null`. Devuelve `{ lado, quien,
-  hito, desde }`; `quien` solo en terceros (papeles: "Tercero", "Tutor legal", "Relacionado").
-- `Hitos.ladoDelAsunto(hitos, ajustes, situacion, estados)` (pura): sin hitos, por la marca
-  `espera` del estado manual (en Ajustes, la casilla del estado se enseña al revés, como
-  "Administración"; de partida `App.esperaPorNombre`: "espera" o "tercero" en el nombre); sin
-  estado, Administración. `App.ladoDe(a)` (`js/asuntos-lista.js`) la llama con lo último leído.
-- La lista no lee `hitos.json` en cada repintado: usa `Hitos.ultimosLeidos()` (lo último leído o
-  escrito en este ordenador), lo relee por `window.Gestor.alRefrescar` cada dos minutos como mucho,
-  y cada escritura de hitos avisa por `Hitos.alCambiar`. Solo repinta si algún asunto cambia de
-  montón o de "quién lo tiene". La tarjeta de terceros enseña `.marca-quien` y "en espera desde"
-  cuenta desde el `desde` del hito.
-
-Se comprueba con `pruebas/estado-por-el-hito.mjs`.
+Sustituye a "A quién le toca un asunto" (fila 104). El estado del asunto es su hito actual y
+ya no hay estados escritos a mano. El detalle (quién decide, la marca de cada paso, «Esperando
+a…», «Estamos en este paso», la guía mínima, el paso único y el ARCHIVO) vive en
+`docs/contexto/ESTADO-DEL-ASUNTO.md`.
 
 ### La biblioteca de hitos del centro (20-sep-2026, fila 79, docs/BIBLIOTECA-DE-HITOS.md)
 
@@ -234,7 +212,7 @@ como **copia**.
   `soloInformativo` del tipo, nunca la pisa el modelo) / "Dejarlo como está" (calla el aviso sin
   tocar el paso). Se escribe con `GuiasDelCentro.guardarPasos(tipo, pasos)`, sin reabrir el editor.
 - **La comparación** siempre por los mismos campos (`HitosBiblioteca.diferencias`): título,
-  explicación, responsable, estado del asunto, plazo, requisitos, comunicación y normativa.
+  explicación, responsable, a quién le toca, plazo, requisitos, comunicación y normativa.
   **`soloInformativo` no cuenta como cambio**: es una decisión de cada tipo, no del modelo.
 - **Solo informativo** (apartado 4.6): campo `soloInformativo` en un paso de guía, un modelo y un
   hito. Se ve en gris con la etiqueta "Informativo", no sale en "Qué me toca" ni en "Dormidos", no
@@ -500,18 +478,15 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
 - **Plazo**: un paso puede llevar "tantos días hábiles desde que se complete otro paso". Al
   marcarlo hecho, `Plazos.sumarDiasHabiles` (días no lectivos de Ajustes › Hitos incluidos) pone
   sola la fecha límite del siguiente, salvo que Francisco la haya tocado a mano.
-- **Estado del asunto**: el montón de Asuntos abiertos ("Pendiente de Administración" /
-  "Pendiente de terceros") sale solo del hito abierto (`Hitos.aQuienLeToca`, ver "A quién le toca
-  un asunto"). El estado escrito sigue igual: un paso puede llevar apuntado un estado de
-  `estados.json` y, al pasar su hito a "en curso", el asunto pasa solo a ese estado; la única
-  función que decide ese estado escrito es `Hitos.estadoDelAsunto` (`js/hitos.js`).
+- **Estado del asunto**: es el hito actual (fila 129, ver "El hito es el estado del asunto");
+  la única función que lo decide es `Hitos.estadoDelAsunto` (`js/hitos.js`).
 - **Al archivar**, los hitos salen de `hitos.json` y se escriben, dentro de la carpeta ya
   archivada, como `HISTORIAL DE TRAMITACION.txt` (legible sin la aplicación, sin copiar ningún
   documento; gemelo de `DONDE ESTA ESTE ASUNTO.txt` de `js/relacionados.js`). Si el asunto se
   reabre y el fichero sigue ahí, los hitos se cargan de vuelta a `hitos.json` y el fichero se
   borra.
 - Se escriben desde el mismo cuadro de la guía (`Guias.editar`, con tres campos nuevos y
-  opcionales por paso: responsable por defecto, estado del asunto y plazo) y se pintan
+  opcionales por paso: responsable por defecto, a quién le toca —fila 129— y plazo) y se pintan
   directamente dentro de `#ficha-guia` (el bloque "Hitos" de la ficha), con un
   `MutationObserver` sobre `#ficha-asunto-cuerpo` para saber cuándo repintar (no hay ninguna
   función de `App` que envolver). `js/ficha-asunto.js` solo pone ahí el

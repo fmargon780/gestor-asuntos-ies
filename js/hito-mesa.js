@@ -162,6 +162,8 @@ var HitoMesa = (function () {
         (abierto && h.clase !== 'decision'
           ? '<button type="button" class="boton' + (completo ? ' boton-principal mesa-hecho-resaltado' : '') + ' mesa-marcar-hecho">' +
             (h.estado === 'hecho' ? 'Hecho ✓ (desmarcar)' : 'Marcar hito como hecho') + '</button>' : '') +
+        /* Fila 129: dar por hechos los anteriores (js/estado-hito.js). */
+        (abierto && window.EstadoHito && EstadoHito.puedeSituar(hitos, h.id) ? EstadoHito.botonSituarHTML('mesa-situar') : '') +
         (abierto ? '<button type="button" class="boton mesa-mas" title="Más opciones">⋯</button>' : '') +
       '</div>' +
       '<div class="mesa-tira">' + visibles.map(function (x, i) {
@@ -173,6 +175,8 @@ var HitoMesa = (function () {
     Array.prototype.forEach.call(cab.querySelectorAll('.mesa-tira-hito'), function (b) {
       b.onclick = function () { abrir(a, b.dataset.id); };
     });
+    var situarBtn = cab.querySelector('.mesa-situar');
+    if (situarBtn) situarBtn.onclick = function () { EstadoHito.situar(a, h.id, situarBtn); };
     if (!abierto || !window.FichaMenus) return;
 
     /* "Marcar hito como hecho": la casilla de siempre, pulsada por debajo

@@ -16,8 +16,8 @@
    6. Sin hitos → null; y un hito sin responsable → administracion.
    7. Dos en curso a la vez, uno de cada lado → gana Administración.
    8. La marca de un responsable manda (Dirección marcada → administracion).
-   9. Sin hitos, por el estado manual: con la marca de terceros
-      (`espera`) → terceros; sin ella, o sin estado → administracion.
+   9. Sin hitos → administracion (desde la fila 129 el estado manual
+      ya no se lee).
   10. Los ajustes guardados sin la marca: `yo`/`companero` salen de
       Administración; los demás, no.
   11. HitosBiblioteca.naceSoloInformativo con los ajustes: lee la misma
@@ -116,16 +116,12 @@ comprobar('8. Dirección marcada como Administración',
   lado([hito('a', { estado: 'encurso', responsable: 'direccion' })], conDireccion),
   ['administracion', '', 'a']);
 
-/* 9 */
-const estados = [{ nombre: 'EN TRAMITE', espera: false }, { nombre: 'A LA ESPERA DEL TERCERO', espera: true }];
-comprobar('9. sin hitos, estado de terceros',
-  Hitos.ladoDelAsunto([], ajustes, 'A LA ESPERA DEL TERCERO', estados).lado, 'terceros');
-comprobar('9. sin hitos, estado de Administración',
-  Hitos.ladoDelAsunto([], ajustes, 'EN TRAMITE', estados).lado, 'administracion');
-comprobar('9. sin hitos ni estado',
-  Hitos.ladoDelAsunto([], ajustes, '', estados).lado, 'administracion');
-comprobar('9. con hitos, manda el hito y no el estado',
-  Hitos.ladoDelAsunto([hito('a', { estado: 'encurso', responsable: 'yo' })], ajustes, 'A LA ESPERA DEL TERCERO', estados).lado,
+/* 9 (desde la fila 129, docs/EL-HITO-ES-EL-ESTADO.md: el estado escrito
+   a mano ya no se lee; sin hitos, Administración) */
+comprobar('9. sin hitos: Administración, sin mirar el estado manual',
+  Hitos.ladoDelAsunto([], ajustes).lado, 'administracion');
+comprobar('9. con hitos, manda el hito',
+  Hitos.ladoDelAsunto([hito('a', { estado: 'encurso', responsable: 'yo' })], ajustes).lado,
   'administracion');
 
 /* 10 */

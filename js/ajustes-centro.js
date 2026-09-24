@@ -205,6 +205,8 @@ App.quitarEstado = async function (nombre) {
   }
 };
 
+/* Fila 129: sin la rejilla de estados en index.html, no hay nada que enganchar. */
+if ($('nuevo-estado')) {
 $('nuevo-estado').oninput = function () {
   App.pintarAvisoSimple('nuevo-estado', 'aviso-nuevo-estado', 'btn-anadir-estado',
     function () { return App.E.estados.map(function (e) { return e.nombre; }); });
@@ -224,6 +226,7 @@ $('btn-anadir-estado').onclick = async function () {
   App.pintarFiltroEstado();
   U.aviso('Estado añadido.', 'bueno');
 };
+}
 
 /* ---------- tipos de documento ---------- */
 

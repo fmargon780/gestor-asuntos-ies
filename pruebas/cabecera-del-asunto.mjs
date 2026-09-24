@@ -78,7 +78,8 @@ function elementosDeAcciones() {
   /* Desde la fila 112 «Archivar» va en la primera línea (#ficha-archivar). */
   return pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-acciones > *'))
     .concat(Array.from(document.querySelectorAll('#ficha-archivar > *'))).map((el) => {
-    if (el.tagName === 'SELECT') return 'estado';
+    /* Fila 129: el estado es el hito actual (#ficha-estado-hito), no un desplegable. */
+    if (el.id === 'ficha-estado-hito') return 'estado';
     if (el.classList.contains('boton-vencimiento')) return 'vencimiento';
     if (el.classList.contains('ficha-encargo')) return 'encargo';
     if (el.classList.contains('ficha-menu-envoltorio')) return 'comunicar';

@@ -583,7 +583,8 @@ var Plantillas = (function () {
       tutor1: '', tutor1telefono: '', tutor1correo: '',
       tutor2: '', tutor2telefono: '', tutor2correo: '',
       descripcion: f.descripcion || '',
-      estado: f.situacion || '',
+      /* Fila 129: el hito actual; en el ARCHIVO, dónde se quedó. */
+      estado: !window.EstadoHito || !a.nombre ? '' : (f.estado === 'cerrado' ? EstadoHito.textoArchivado(f) : EstadoHito.textoDeNombre(a.nombre)),
       registro: registro,
       hoy: U.fechaLegible(U.aAaMmDd(U.hoyIso())),
       hoyLargo: fechaLargaDe(),

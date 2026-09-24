@@ -127,6 +127,11 @@ var Guias = (function () {
     return {
       responsable: String((p && p.responsable) || ''),
       estadoAsunto: (p && p.estadoAsunto) || null,
+      /* Fila 129 (docs/EL-HITO-ES-EL-ESTADO.md): «Nos toca» ('nos') o
+         «Esperamos a…» ('espera', con `tocaA`: un responsable o papel).
+         Vacío: se deduce del responsable (Hitos.esDeAdministracion). */
+      toca: (p && (p.toca === 'nos' || p.toca === 'espera')) ? p.toca : '',
+      tocaA: (p && p.toca === 'espera') ? String(p.tocaA || '') : '',
       plazo: (p && p.plazo && p.plazo.dias)
         ? { dias: parseInt(p.plazo.dias, 10) || 0, desde: String(p.plazo.desde || '') } : null,
       /* 20-sep-2026, fila 79, apartados 4.6, 4.7 y 4.1
@@ -508,7 +513,6 @@ var Guias = (function () {
        opción, el mismo array que hay dentro del árbol). */
     var nivel = pasos;
     var opcionesResp = listaResponsables || [];
-    var opcionesEstado = listaEstados || [];
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-medio');
     GuiasBarra.reiniciar();
@@ -564,7 +568,7 @@ var Guias = (function () {
     function pasoExtraHTML(p, i) {
       var otros = nivel.filter(function (x, k) { return k !== i; });
       return '<details class="paso-extra">' +
-        '<summary>Responsable, estado y plazo <span class="suave">(opcional)</span></summary>' +
+        '<summary>Responsable, a quién le toca y plazo <span class="suave">(opcional)</span></summary>' +
         '<div class="paso-extra-cuerpo">' +
           '<label class="etiqueta">Responsable por defecto</label>' +
           '<select class="campo paso-responsable"><option value="">(sin responsable)</option>' +
@@ -572,12 +576,8 @@ var Guias = (function () {
             return '<option value="' + U.escapar(r.id) + '"' + (r.id === p.responsable ? ' selected' : '') +
               '>' + U.escapar(r.nombre) + '</option>';
           }).join('') + '</select>' +
-          '<label class="etiqueta">Estado del asunto</label>' +
-          '<select class="campo paso-estado-asunto"><option value="">(ninguno)</option>' +
-          opcionesEstado.map(function (e) {
-            return '<option value="' + U.escapar(e) + '"' + (e === p.estadoAsunto ? ' selected' : '') +
-              '>' + U.escapar(e) + '</option>';
-          }).join('') + '</select>' +
+          /* Fila 129: a quién le toca este paso (js/guias-toca.js). */
+          (window.GuiasToca ? GuiasToca.html(p, opcionesResp) : '') +
           '<label class="etiqueta">Plazo</label>' +
           '<div class="paso-plazo-fila">' +
             '<input type="number" min="1" class="campo paso-plazo-dias" placeholder="días" value="' +
@@ -615,8 +615,7 @@ var Guias = (function () {
            mismos hijos directos, se lean o no lean las opciones. */
         var respSel = caja.querySelector(':scope > .paso-extra .paso-responsable');
         nivel[i].responsable = respSel ? respSel.value : '';
-        var estSel = caja.querySelector(':scope > .paso-extra .paso-estado-asunto');
-        nivel[i].estadoAsunto = (estSel && estSel.value) ? estSel.value : null;
+        if (window.GuiasToca) GuiasToca.leer(caja, nivel[i]);   /* fila 129 */
         var diasInp = caja.querySelector(':scope > .paso-extra .paso-plazo-dias');
         var desdeSel = caja.querySelector(':scope > .paso-extra .paso-plazo-desde');
         var dias = diasInp ? parseInt(diasInp.value, 10) : NaN;

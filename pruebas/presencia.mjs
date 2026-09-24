@@ -64,7 +64,7 @@ await comprobar('presencia.json lleva la señal de Ana',
 await comprobar('no sale ningún aviso: el asunto es solo suyo',
   pagina.locator('.aviso-presencia').count(), 0);
 await comprobar('el desplegable de estado está activo',
-  pagina.locator('#ficha-acciones select.campo-estado').isDisabled(), false);
+  pagina.locator('#ficha-acciones .boton-vencimiento').isDisabled(), false);
 
 console.log('--- 2) al volver a la lista, se quita la propia señal ---');
 await pagina.click('#ficha-volver');
@@ -87,7 +87,7 @@ await comprobar('el aviso nombra a Juan',
   pagina.locator('.aviso-presencia').textContent().then(t => t.indexOf('Juan') !== -1 &&
     t.indexOf('no puedes modificar') !== -1), true);
 await comprobar('el desplegable de estado está apagado',
-  pagina.locator('#ficha-acciones select.campo-estado').isDisabled(), true);
+  pagina.locator('#ficha-acciones .boton-vencimiento').isDisabled(), true);
 await comprobar('el botón de archivar está apagado',
   pagina.getByRole('button', { name: 'Archivar el asunto', exact: true }).isDisabled(), true);
 await comprobar('pero "Volver a la lista" sigue activo',
@@ -104,7 +104,7 @@ await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(200);
 await comprobar('el aviso desaparece', pagina.locator('.aviso-presencia').count(), 0);
 await comprobar('el desplegable de estado vuelve a estar activo',
-  pagina.locator('#ficha-acciones select.campo-estado').isDisabled(), false);
+  pagina.locator('#ficha-acciones .boton-vencimiento').isDisabled(), false);
 await comprobar('presencia.json ahora dice que es de Ana',
   leerPresencia().then(p => p['260901 MATRICULA 26-27 Alguien 1140233'].usuario), 'Ana');
 
@@ -126,7 +126,7 @@ await pagina.waitForTimeout(200);
 await comprobar('no sale ningún aviso: la señal ya había caducado',
   pagina.locator('.aviso-presencia').count(), 0);
 await comprobar('el desplegable de estado está activo',
-  pagina.locator('#ficha-acciones select.campo-estado').isDisabled(), false);
+  pagina.locator('#ficha-acciones .boton-vencimiento').isDisabled(), false);
 await comprobar('la señal caducada se ha limpiado, y ahora es de Ana',
   leerPresencia().then(p => p['260902 MATRICULA 26-27 Otra Persona 1140777'].usuario), 'Ana');
 await pagina.click('#ficha-volver');

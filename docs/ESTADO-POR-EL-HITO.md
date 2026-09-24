@@ -1,3 +1,5 @@
+> Sustituido por `docs/EL-HITO-ES-EL-ESTADO.md` (fila 129, 24-sep-2026).
+
 # El estado del asunto sale del hito abierto
 
 Fila 104 de `docs/COLA.md`. Diseño cerrado con Francisco el 23-sep-2026.

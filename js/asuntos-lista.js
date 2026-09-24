@@ -105,11 +105,14 @@ App.ORDENES = {
   }
 };
 
-/* El sitio que ocupa el estado del asunto en la lista de Ajustes.
-   Los que no tienen estado, o tienen uno que ya se quitó, al final. */
+/* Por dónde va el asunto (fila 129: su hito actual). Primero los que
+   van por el principio; los listos para archivar y los sin hitos, al
+   final. */
 App.posEstado = function (a) {
-  var i = App.posDeEstado(a.ficha.situacion || '');
-  return i === -1 ? 9999 : i;
+  var l = App.ladoDe(a);
+  if (l.sinHitos) return 9999;
+  if (l.listo) return 1000;
+  return Math.round(100 * (l.n || 0) / Math.max(l.m || 1, 1));
 };
 
 /* Un asunto sin fecha en el nombre se va al final en los dos sentidos. */
@@ -206,7 +209,9 @@ App.textoVia = function (ficha) {
   return ficha.viaDato ? n + ': ' + ficha.viaDato : n;
 };
 
-/* Guarda el estado que se acaba de elegir en el desplegable. */
+/* Guarda un estado escrito a mano. Desde la fila 129 ninguna pantalla lo
+   usa (el estado del asunto es su hito actual, y `situacion` ya no se
+   lee); se queda por si hay que deshacer el cambio. */
 /* Lo principal (guardar) y lo accesorio (repintar la lista) por
    separado (fila 100): si falla solo el repintado, el estado ya está
    guardado y el aviso es ámbar, nunca rojo. */
@@ -436,16 +441,17 @@ App.pintarGruposTipo = function (lista) {
 
 /* A qué montón va un asunto (fila 104, docs/ESTADO-POR-EL-HITO.md):
    "Pendiente de Administración" o "Pendiente de terceros", según su
-   hito abierto (js/hitos-a-quien.js); sin hitos, por su estado. */
+   hito actual (js/hitos-a-quien.js). Desde la fila 129, sin hitos va
+   a Administración: el estado escrito a mano ya no se lee. */
 App.ladoDe = function (a) {
   if (window.Hitos && Hitos.ladoDeAsunto) return Hitos.ladoDeAsunto(a);
-  return { lado: App.esDeEspera(a.ficha.situacion || '') ? 'terceros' : 'administracion', quien: '', hito: null };
+  return { lado: 'administracion', quien: '', hito: null, sinHitos: true, texto: 'Sin hitos' };
 };
 
-/* Cuántos días lleva esperando: desde que su hito está en curso o,
-   sin hitos, desde que tiene el estado que tiene puesto. */
+/* Cuántos días lleva esperando: desde el «Esperando a…» o desde que su
+   hito está en curso; si no, desde que se abrió. */
 App.diasEnEstado = function (a) {
-  var d = new Date(App.ladoDe(a).desde || a.ficha.situacionEl || a.ficha.abiertoEl || '');
+  var d = new Date(App.ladoDe(a).desde || a.ficha.abiertoEl || '');
   if (isNaN(d.getTime())) return -1;
   return Math.floor((Date.now() - d.getTime()) / 86400000);
 };
@@ -466,19 +472,34 @@ App.pintarCuentas = function () {
   $('cuenta-clasificar').classList.toggle('cuenta-ambar', App.E.sueltos.length > 0);
 };
 
-/* El desplegable de arriba que deja ver solo los asuntos que están en
-   un estado. Se rehace cada vez porque la lista de estados se puede
-   cambiar en Ajustes. */
+/* El desplegable de arriba (fila 129): ya no filtra por estado escrito
+   a mano, sino por montón, según el hito actual de cada asunto. */
+App.FILTROS_MONTON = [
+  { valor: '', texto: 'Todos' },
+  { valor: 'administracion', texto: 'Nos toca' },
+  { valor: 'terceros', texto: 'Esperan a terceros' },
+  { valor: 'esperando', texto: 'Con «Esperando a…»' },
+  { valor: 'listo', texto: 'Listos para archivar' },
+  { valor: 'sinhitos', texto: 'Sin hitos' }
+];
+
 App.pintarFiltroEstado = function () {
   var sel = $('filtro-estado');
   var antes = sel.value;
-  sel.innerHTML = '<option value="">Todos los estados</option>' +
-    '<option value="__sin__">Sin estado</option>' +
-    App.E.estados.map(function (e) {
-      return '<option value="' + U.escapar(e.nombre) + '">' + U.escapar(e.nombre) + '</option>';
-    }).join('');
+  sel.innerHTML = App.FILTROS_MONTON.map(function (f) {
+    return '<option value="' + f.valor + '">' + U.escapar(f.texto) + '</option>';
+  }).join('');
   sel.value = antes;
   if (sel.selectedIndex === -1) sel.value = '';
+};
+
+App.pasaFiltroMonton = function (a, filtro) {
+  if (!filtro) return true;
+  var l = App.ladoDe(a);
+  if (filtro === 'esperando') return !!l.esperando;
+  if (filtro === 'listo') return !!l.listo;
+  if (filtro === 'sinhitos') return !!l.sinHitos;
+  return l.lado === filtro;
 };
 
 App.ordenElegido = function () {
@@ -521,9 +542,7 @@ App.pintarAbiertos = function () {
     if (!App.deLaVista(a, App.E.vista)) return false;
     if (palabras.length && !palabras.every(function (p) { return a.busca.indexOf(p) !== -1; })) return false;
     if (!Plazos.pasaFiltro(a.ficha.limite || '', plazo)) return false;
-    if (filtro === '__sin__') return !a.ficha.situacion;
-    if (filtro) return a.ficha.situacion === filtro;
-    return true;
+    return App.pasaFiltroMonton(a, filtro);
   });
 
   /* Si el tipo elegido ya no está en el montón, se vuelve a todos: si
@@ -595,7 +614,6 @@ App.tarjetaAsunto = function (a, modo) {
   var div = document.createElement('div');
   div.className = 'tarjeta tarjeta-asunto';
   var tercero = a.ficha.tercero || '';
-  var situacion = a.ficha.situacion || '';
   var via = App.textoVia(a.ficha);
   var pie = [];
   if (a.leido.fecha) pie.push('Abierto el ' + U.fechaLegible(a.leido.fecha));
@@ -607,7 +625,8 @@ App.tarjetaAsunto = function (a, modo) {
   var lado = (modo === 'abierto') ? App.ladoDe(a) : null;
   var dias = (lado && lado.lado === 'terceros') ? App.diasEnEstado(a) : -1;
   var esperaLarga = dias >= App.DIAS_DE_AVISO;
-  if (dias === 0) pie.push('en espera desde hoy');
+  if (lado && lado.esperando) { /* ya lo dice su marca: «Esperando a Familia desde el 24-sep» */ }
+  else if (dias === 0) pie.push('en espera desde hoy');
   else if (dias === 1) pie.push('en espera desde ayer');
   else if (dias > 1) pie.push('en espera desde hace ' + dias + ' días');
 
@@ -631,13 +650,14 @@ App.tarjetaAsunto = function (a, modo) {
       '<div class="tarjeta-nombre">' +
         (a.leido.tipo ? '<span class="marca-tipo" title="' + U.escapar(a.leido.tipo) + '">' +
                         U.escapar(Nombres.tipoParaVer(a.leido.tipo, App.E.tipos)) + '</span>' : '') +
-        (situacion ? '<span class="marca-estado ' + App.colorEstado(situacion) + '">' +
-                     U.escapar(situacion) + '</span>' : '') +
         (p ? '<span class="marca-plazo ' + p.clase + '">' + U.escapar(p.texto) + '</span>' : '') +
-        (lado && lado.lado === 'terceros' && lado.quien
+        (lado && lado.lado === 'terceros' && lado.quien && !lado.esperando
           ? '<span class="marca-quien" title="Lo tiene ahora">' + U.escapar(lado.quien) + '</span>' : '') +
         U.escapar(a.nombre) +
       '</div>' +
+      /* Fila 129: el estado es el hito actual (js/estado-hito.js), en su
+         propia línea: pulsar el nombre sigue abriendo la ficha. */
+      (window.EstadoHito ? '<div class="tarjeta-hito">' + EstadoHito.marcaHTML(a, modo, lado) + '</div>' : '') +
       '<div class="tarjeta-pie' + (esperaLarga ? ' pie-aviso' : '') + '">' +
         U.escapar(pie.join('  ·  ')) + '</div>' +
       notaEncontrada +
@@ -646,25 +666,10 @@ App.tarjetaAsunto = function (a, modo) {
   var acciones = document.createElement('div');
   acciones.className = 'acciones';
 
-  /* En los asuntos abiertos, el estado se cambia aquí mismo y la vía
-     de comunicación se apunta con el botón de al lado. En el archivo
-     no: allí lo que hay es el rastro de lo que se hizo. */
+  /* En los asuntos abiertos, la vía de comunicación se apunta aquí
+     (fila 129: el estado ya no se elige a mano; es el hito actual). En
+     el archivo no: allí lo que hay es el rastro de lo que se hizo. */
   if (modo === 'abierto') {
-    var sel = document.createElement('select');
-    sel.className = 'campo campo-estado';
-    sel.title = 'Estado del asunto';
-    var lista = App.E.estados.map(function (e) { return e.nombre; });
-    if (situacion && lista.indexOf(situacion) === -1) lista.push(situacion);
-    sel.innerHTML = '<option value="">Sin estado</option>' +
-      lista.map(function (e) {
-        return '<option value="' + U.escapar(e) + '"' + (e === situacion ? ' selected' : '') +
-               '>' + U.escapar(e) + '</option>';
-      }).join('');
-    sel.onchange = async function () {
-      await U.mientrasGuarda(sel, function () { return App.ponerEstado(a, sel.value); });
-    };
-    acciones.appendChild(sel);
-
     var bvia = document.createElement('button');
     bvia.className = 'boton' + (a.ficha.via ? ' boton-marcado' : '');
     var v = Nombres.via(a.ficha.via);
@@ -717,6 +722,7 @@ App.tarjetaAsunto = function (a, modo) {
   acciones.appendChild(principal);
 
   div.appendChild(acciones);
+  if (window.EstadoHito) EstadoHito.engancharMarca(div, a, modo);
   /* Con una acción larga en marcha sobre este asunto (fila 100,
      App.conOcupado), la tarjeta sale con sus botones apagados aunque
      se repinte. */

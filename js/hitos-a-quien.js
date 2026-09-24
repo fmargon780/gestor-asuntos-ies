@@ -1,21 +1,24 @@
 /* ============================================================
-   hitos-a-quien.js — a quién le toca mover un asunto (fila 104,
-   23-sep-2026, docs/ESTADO-POR-EL-HITO.md).
+   hitos-a-quien.js — el estado del asunto es su hito actual (fila 104,
+   23-sep-2026, docs/ESTADO-POR-EL-HITO.md; desde la fila 129,
+   24-sep-2026, docs/EL-HITO-ES-EL-ESTADO.md, sin estados a mano).
 
-   Desde que el hito es la mesa de trabajo (filas 102 y 103), el hito
-   abierto ya dice a quién le toca. Aquí sale de él, solo, en qué
-   montón va el asunto en Asuntos abiertos: "Pendiente de
-   Administración" o "Pendiente de terceros".
+   El hito actual dice en qué paso va el asunto («Paso N de M · título»)
+   y a quién le toca moverlo: en qué montón va en Asuntos abiertos,
+   "Pendiente de Administración" o "Pendiente de terceros".
 
-     - Cada responsable de Ajustes › Hitos lleva la marca
-       `administracion` (hitos.json → ajustes.responsables). Los papeles
-       fijos (tercero, tutor, relacionado) son siempre terceros. Un
-       hito sin responsable es de Administración: alguien de la casa
-       tiene que decidir. Un nombre que no está en la lista (escrito a
-       mano, o de un responsable ya quitado), de terceros.
-     - Un asunto sin hitos va por su estado manual: la marca de cada
-       estado de estados.json (`espera`, "Depende de otros" de siempre,
-       que en Ajustes se enseña al revés, como "Administración").
+     - Cada paso de la guía puede decir «Nos toca» o «Esperamos a…»
+       (`toca`/`tocaA`, heredado por sus hitos): esa marca manda.
+     - Sin marca, el responsable: cada responsable de Ajustes › Hitos
+       lleva la marca `administracion` (hitos.json → ajustes.responsables).
+       Los papeles fijos (tercero, tutor, relacionado) son siempre
+       terceros. Un hito sin responsable es de Administración: alguien
+       de la casa tiene que decidir. Un nombre que no está en la lista
+       (escrito a mano, o de un responsable ya quitado), de terceros.
+     - «Esperando a…» (`esperandoA`, puesto a mano en el hito actual,
+       js/estado-hito.js) manda sobre todo lo demás.
+     - Un asunto sin hitos va a Administración: el estado escrito a mano
+       ya no se lee (`ficha.situacion` se queda quieta en asuntos.json).
 
    Va aparte de js/hitos.js para no pasar de las 400 líneas allí. Se
    engancha al mismo objeto Hitos. Se carga después de js/hitos-archivo.js
@@ -25,7 +28,7 @@
   if (typeof window.Hitos === 'undefined') return;
 
   /* El nombre corto de cada papel fijo, para la tarjeta. */
-  var PAPELES_CORTOS = { tercero: 'Tercero', tutor: 'Tutor legal', relacionado: 'Relacionado' };
+  var PAPELES_CORTOS = { tercero: 'Tercero', tutor: 'Familia', relacionado: 'Relacionado' };
 
   function esPapel(id) {
     return Hitos.PAPELES.some(function (p) { return p.id === id; });
@@ -41,8 +44,19 @@
     return !!(r && r.administracion);
   }
 
+  /* A quién espera un hito: lo puesto a mano, la marca del paso o el
+     responsable, por ese orden. '' si le toca a la casa. */
+  function esperaDeHito(h) {
+    if (h.esperandoA) return h.esperandoA;
+    if (h.toca === 'espera') return h.tocaA || h.responsable || 'tercero';
+    return h.responsable;
+  }
+
   function ladoDeHito(h, ajustes) {
     if (h.clase === 'decision' && !h.elegida) return 'administracion';
+    if (h.esperandoA) return 'terceros';
+    if (h.toca === 'nos') return 'administracion';
+    if (h.toca === 'espera') return 'terceros';
     return esDeAdministracion(h.responsable, ajustes) ? 'administracion' : 'terceros';
   }
 
@@ -54,46 +68,122 @@
     return (r && r.texto) || idResponsable;
   }
 
-  /* Función pura. El primer hito visible sin terminar (ni hecho ni "no
-     aplica"), saltando los "solo informativo" y las preguntas ya
-     respondidas. Si hay otros en curso a la vez y alguno es de
-     Administración, gana Administración. Todos terminados: toca
-     archivarlo, Administración. Sin hitos: `lado: null`. */
+  /* Los hitos que cuentan para «Paso N de M»: los visibles, sin los
+     «solo informativo», los «no aplica» ni los del tipo anterior. */
+  function contables(hitos) {
+    return Hitos.visibles(hitos || []).filter(function (h) {
+      return !h.soloInformativo && h.estado !== 'noaplica' && !h.delTipoAnterior;
+    });
+  }
+
+  /* Función pura. El hito actual: el primer hito visible sin terminar
+     (ni hecho ni "no aplica"), saltando los "solo informativo" y las
+     preguntas ya respondidas. Si hay otros en curso a la vez y alguno
+     es de Administración, gana Administración. Todos terminados: listo
+     para archivar, Administración. Sin hitos: `lado: null`.
+     Devuelve { lado, quien, hito, desde, titulo, n, m, esperando,
+     listo, sinHitos }. */
   function aQuienLeToca(hitos, ajustes, contexto) {
-    if (!hitos || !hitos.length) return { lado: null, quien: '', hito: null };
+    if (!hitos || !hitos.length) return { lado: null, quien: '', hito: null, sinHitos: true, esperando: null };
+    var cuentan = contables(hitos);
     var abiertos = Hitos.visibles(hitos).filter(function (h) {
       if (h.estado === 'hecho' || h.estado === 'noaplica') return false;
       if (h.soloInformativo) return false;
       if (h.clase === 'decision' && h.elegida) return false;
       return true;
     });
-    if (!abiertos.length) return { lado: 'administracion', quien: '', hito: null };
+    if (!abiertos.length) {
+      return { lado: 'administracion', quien: '', hito: null, listo: true, n: cuentan.length, m: cuentan.length, esperando: null };
+    }
     var candidatos = [abiertos[0]].concat(abiertos.slice(1).filter(function (h) { return h.estado === 'encurso'; }));
     var h = candidatos.filter(function (x) { return ladoDeHito(x, ajustes) === 'administracion'; })[0] || candidatos[0];
     var lado = ladoDeHito(h, ajustes);
     return {
       lado: lado,
-      quien: lado === 'terceros' ? nombreVisible(h.responsable, ajustes, contexto) : '',
+      quien: lado === 'terceros' ? nombreVisible(esperaDeHito(h), ajustes, contexto) : '',
       hito: h.id,
-      desde: h.desde || ''
+      desde: h.esperandoA ? (h.esperandoDesde || '') : (h.desde || ''),
+      titulo: h.titulo || '',
+      n: cuentan.indexOf(h) + 1,
+      m: cuentan.length,
+      esperando: h.esperandoA
+        ? { a: h.esperandoA, nombre: nombreVisible(h.esperandoA, ajustes, contexto),
+            desde: h.esperandoDesde || '', motivo: h.esperandoMotivo || '' }
+        : null
     };
   }
 
-  /* Función pura. El montón de un asunto: por su hito si tiene; si no,
-     por la marca de su estado manual; sin estado, Administración. */
-  function ladoDelAsunto(hitos, ajustes, situacion, estados) {
-    var r = aQuienLeToca(hitos, ajustes);
-    if (r.lado) return r;
-    var e = (estados || []).filter(function (x) { return x.nombre === situacion; })[0];
-    return { lado: (e && e.espera) ? 'terceros' : 'administracion', quien: '', hito: null, porEstado: true };
+  /* Función pura. El texto del estado: «Paso N de M · título», «Listo
+     para archivar» o «Sin hitos». */
+  function textoDelEstado(r) {
+    if (!r || r.sinHitos) return 'Sin hitos';
+    if (r.listo) return 'Listo para archivar';
+    return 'Paso ' + (r.n || 1) + ' de ' + Math.max(r.m || 0, r.n || 1) + (r.titulo ? ' · ' + r.titulo : '');
+  }
+
+  /* Función pura. El montón de un asunto: por su hito actual; sin
+     hitos, Administración (fila 129: el estado manual ya no se lee). */
+  function ladoDelAsunto(hitos, ajustes, contexto) {
+    var r = aQuienLeToca(hitos, ajustes, contexto);
+    if (!r.lado) r.lado = 'administracion';
+    r.texto = textoDelEstado(r);
+    return r;
   }
 
   /* Para la lista: lo último leído de hitos.json, sin ir al disco. */
   function ladoDeAsunto(a) {
     var datos = Hitos.ultimosLeidos();
     var entrada = datos && datos.porAsunto[a.nombre];
-    return ladoDelAsunto(entrada ? entrada.hitos : [], datos ? datos.ajustes : null,
-      (a.ficha && a.ficha.situacion) || '', (window.App && App.E && App.E.estados) || []);
+    return ladoDelAsunto(entrada ? entrada.hitos : [], datos ? datos.ajustes : null);
+  }
+
+  /* Función pura (punto 7, «Estamos en este paso»): da por hechos todos
+     los hitos visibles anteriores a `idHito` que sigan sin terminar, con
+     `nota` en su historial, y deja `idHito` en curso. Las preguntas se
+     quedan como están (una sin responder corta la lista: lo que va
+     detrás ni se ve). Devuelve cuántos se han dado por hechos, o -1 si
+     el hito no está entre los visibles. */
+  function situarLista(hitos, idHito, nota, quien) {
+    var vis = Hitos.visibles(hitos);
+    var pos = -1;
+    vis.forEach(function (h, i) { if (h.id === idHito) pos = i; });
+    if (pos === -1) return -1;
+    var hoy = U.hoyIso();
+    var n = 0;
+    vis.slice(0, pos).forEach(function (h) {
+      if (h.clase === 'decision') return;
+      if (h.estado === 'hecho' || h.estado === 'noaplica') return;
+      h.estado = 'hecho';
+      h.hechoEl = hoy;
+      h.notas.push({ texto: nota, quien: quien || '', cuando: U.ahora() });
+      quitarEspera(h);
+      n++;
+    });
+    var destino = vis[pos];
+    if (destino.estado === 'pendiente') { destino.estado = 'encurso'; destino.desde = hoy; }
+    return n;
+  }
+
+  function quitarEspera(h) {
+    delete h.esperandoA; delete h.esperandoDesde; delete h.esperandoMotivo; delete h.esperandoFicheros;
+  }
+
+  /* Marca «Dado por hecho al situar el asunto (<fecha>, <quién>)». */
+  async function situarEn(clave, idHito) {
+    var quien = (window.App && App.E && App.E.usuario) || '';
+    var hoy = U.hoyIso().split('-');
+    var meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    var fecha = parseInt(hoy[2], 10) + '-' + meses[parseInt(hoy[1], 10) - 1] + '-' + hoy[0];
+    var nota = 'Dado por hecho al situar el asunto (' + fecha + (quien ? ', ' + quien : '') + ')';
+    var n = -1;
+    var datos = await Hitos.cambiar(function (d) {
+      var entrada = d.porAsunto[clave];
+      if (!entrada) return d;
+      n = situarLista(entrada.hitos, idHito, nota, quien);
+      return d;
+    });
+    var entrada = datos.porAsunto[clave];
+    return { hechos: n, estado: ladoDelAsunto(entrada ? entrada.hitos : [], datos.ajustes) };
   }
 
   async function marcarAdministracion(id, si) {
@@ -107,6 +197,8 @@
   Object.assign(Hitos, {
     esDeAdministracion: esDeAdministracion, aQuienLeToca: aQuienLeToca,
     ladoDelAsunto: ladoDelAsunto, ladoDeAsunto: ladoDeAsunto,
+    textoDelEstado: textoDelEstado, nombreDeEspera: nombreVisible,
+    situarLista: situarLista, situarEn: situarEn, quitarEspera: quitarEspera,
     marcarAdministracion: marcarAdministracion
   });
 
@@ -116,7 +208,7 @@
      window.Gestor.alRefrescar solo si han pasado dos minutos (lo que
      haya tocado el otro ordenador). Lo que cambia este ordenador llega
      solo por Hitos.alCambiar. Solo se repinta si algún asunto cambia de
-     montón o de "quién lo tiene". */
+     montón, de "quién lo tiene" o de paso. */
   var firma = null;
   var leidoEl = 0;
 
@@ -124,7 +216,7 @@
     if (!window.App || !App.E || !App.E.listaAbiertos) return '';
     return App.E.listaAbiertos.map(function (a) {
       var l = ladoDeAsunto(a);
-      return a.nombre + '|' + l.lado + '|' + l.quien;
+      return a.nombre + '|' + l.lado + '|' + l.quien + '|' + l.texto + '|' + (l.esperando ? l.esperando.desde : '');
     }).join('\n');
   }
 

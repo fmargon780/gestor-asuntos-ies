@@ -306,18 +306,20 @@ await comprobar('al entrar en la ficha, su cabecera se ve entera', encogidaDe('h
 await subirYEsperar(200);
 await comprobar('al bajar, la cabecera de la ficha se encoge', encogidaDe('header.ficha-cabecera'), true);
 
-console.log('--- cambiar el estado repinta la ficha entera: no debe perder el "encogida" ---');
-await pagina.evaluate(() => {
-  const sel = document.querySelector('#ficha-acciones select.campo-estado');
-  const opcion = Array.prototype.filter.call(sel.options, (o) => o.textContent === 'A LA ESPERA DEL TERCERO')[0];
-  sel.value = opcion.value;
-  sel.dispatchEvent(new Event('change', { bubbles: true }));
+console.log('--- un cambio en la ficha la repinta entera: no debe perder el "encogida" ---');
+/* Desde la fila 129 no hay desplegable de estado: se cambia la ficha por
+   debajo y se deja que la ficha se reenganche sola, como con un cambio
+   del otro ordenador (la huella cambia → pintar(), <header> nuevo). */
+await pagina.evaluate(async () => {
+  document.querySelector('header.ficha-cabecera').dataset.viejo = '1';
+  await App.anotar(App.fichaAbierta(), { descripcion: 'Cambiada para la prueba' });
+  await App.reengancharFicha();
 });
 await pagina.waitForTimeout(500);
 await comprobar('tras el repintado (nuevo <header> de verdad), sigue encogida sin haber vuelto a hacer scroll',
   encogidaDe('header.ficha-cabecera'), true);
-await comprobar('y el repintado sí ha llegado (el estado nuevo se ve)',
-  pagina.locator('#ficha-acciones select.campo-estado').inputValue(), 'A LA ESPERA DEL TERCERO');
+await comprobar('y el repintado sí ha llegado (el <header> es otro)',
+  pagina.evaluate(() => !document.querySelector('header.ficha-cabecera').dataset.viejo), true);
 
 await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');

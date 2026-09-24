@@ -107,13 +107,23 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 75 y 77 a 127 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 75 y 77 a 129 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 129 | `docs/EL-HITO-ES-EL-ESTADO.md` (el estado del asunto es su hito actual; fuera los estados escritos a mano) | EN CURSO (24-sep-2026) |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 129 está HECHA** (24-sep-2026): `docs/EL-HITO-ES-EL-ESTADO.md`. El estado del asunto es
+su hito actual: «Paso N de M · título» en la tarjeta y en la cabecera (pulsable a su mesa), y de
+él sale el montón. Cada paso de la guía dice «Nos toca» / «Esperamos a…» (`js/guias-toca.js`);
+«Esperando a…» / «Ya ha llegado» en la ficha y «Estamos en este paso» en los hitos
+(`js/estado-hito.js`); guía mínima para los tipos sin guía; paso único de los abiertos
+(`js/estado-migracion.js`). Fuera los estados escritos a mano. Prueba
+`pruebas/el-hito-es-el-estado.mjs`, batería completa en verde. Versión `App.VERSION`:
+`24-sep-2026 · 19:51`. De paso, `docs/HISTORIA.md` vuelve
+a estar entero. Esta sesión no tiene salida a `vercel.app` ni permiso en el conector de Vercel
+(403): la próxima, comprobar con `curl` que `App.VERSION` publicada es la de esta fila.
 
 **La fila 128 está HECHA** (24-sep-2026, sesión programada): `docs/TIPO-DESDE-EL-ASUNTO.md`. En
 Nuevo asunto, junto al buscador de tipos, «+ Crear tipo nuevo»: destacado bajo el buscador con
@@ -379,33 +389,8 @@ Compruébalo contra lo que de verdad dice `main` antes de sustituir nada. Si la 
 `git push` de verdad (terminal u ordenador de Francisco), es mucho más simple que ir fichero a
 fichero con la API.
 
-## Nota para la próxima sesión: docs/HISTORIA.md se corta otra vez, ahora en la fila 82
+## docs/HISTORIA.md, otra vez entero
 
-24-sep-2026, sesión programada (taller automático, sin `git push`, fila 128): al cerrar la fila
-128, la subida de documentación dejó `docs/HISTORIA.md` cortado. **No es una corrupción: es que
-la fila nueva se subió bien, pero el fichero entero (185 KB) no cupo de una vez** (regla 12).
-Hoy en `main`, `docs/HISTORIA.md` empieza en la fila 128 y llega completo, byte a byte
-comprobado, hasta el final de la entrada de la **fila 83** (20-sep-2026, "las plantillas de
-documento y de correo del centro"). A partir de ahí (fila 82 hacia atrás, hasta "Lo anterior al
-18-sep-2026") falta.
-
-**No se ha perdido ninguna información de verdad**: cada fila que falta en `docs/HISTORIA.md`
-sigue completa en su propio documento de `docs/` (`docs/FORMULARIOS-OFICIALES.md`,
-`docs/FIRMANTES-Y-MEMBRETE.md`, `docs/CARGAR-BIBLIOTECA.md`, `docs/BIBLIOTECA-DE-HITOS.md`...) y
-en el propio historial de commits de GitHub (esta sesión solo tiene un clon superficial,
-`--depth 1`, así que no ha podido comprobar el historial completo ella misma, pero el commit
-donde se escribió esa parte de `docs/HISTORIA.md` sigue ahí). No hay ninguna prisa de datos por
-esto: es un diario que "casi nunca se lee".
-
-Dos intentos de completarlo en esta misma sesión (uno propio, subiendo por trozos cada vez más
-grandes; dos con una sesión auxiliar) se pararon solos, sin corromper nada, por el mismo motivo
-de la regla 12: pasado un cierto tamaño (entre 111 KB, que sí subió bien, y 148 KB, que ya no),
-la propia respuesta se queda sin aire a mitad de frase (el mismo aviso que ya deja la sección
-"Cuidado con varias sesiones a la vez", de la fila 115). No se ha reintentado más veces, tal
-como pide la regla.
-
-**Para la próxima sesión**: si tiene `git push` de verdad (terminal u ordenador de Francisco),
-esto se arregla en un segundo, con el `docs/HISTORIA.md` completo del propio repositorio en
-disco. Si no lo tiene, seguir subiendo desde donde se quedó (la fila 83 ya está bien: empezar
-justo después), en trozos de unas 150-200 líneas cada vez (no de golpe), comprobando el tamaño
-después de cada uno antes de seguir con el siguiente.
+24-sep-2026, fila 129: `docs/HISTORIA.md`, que se había cortado en la fila 82 al cerrar la fila
+128, se ha recompuesto con el historial de git (lo de la fila 82 hacia atrás, sacado tal cual del
+commit `86d22d4`) y se ha subido con `git push` de verdad. Nada pendiente.

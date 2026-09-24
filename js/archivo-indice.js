@@ -199,6 +199,8 @@ var IndiceArchivo = (function () {
       documentos: documentos, registros: registrosDeNombres(documentos),
       sueltoEn: sueltoEn || '',
       situacion: ficha.situacion || '', via: ficha.via || '', viaDato: ficha.viaDato || '',
+      /* Fila 129: dónde se quedó al archivar (js/hitos-archivo.js). */
+      seQuedoEn: ficha.seQuedoEn || '', terminado: !!ficha.terminado,
       loPideNombre: (ficha.loPide && ficha.loPide.nombre) || '',
       /* Fila 74, docs/CUENTAS-DE-FIN-DE-CURSO.md: categoría y relación
          de quien lo pidió (para agrupar "familia"/"alumnado"/"centro"/

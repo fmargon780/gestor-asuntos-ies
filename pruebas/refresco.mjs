@@ -86,32 +86,35 @@ await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 
-console.log('--- 1) cambiar el estado de un asunto ---');
+console.log('--- 1) poner el asunto «Esperando a…» ---');
+/* Desde la fila 129 (docs/EL-HITO-ES-EL-ESTADO.md) ya no hay desplegable
+   de estado: lo que se toca en la cabecera es «Esperando a…». Tiene que
+   verse en la ficha y en la tarjeta sin recargar. */
 await pagina.click('#lista-abiertos .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-const selEstado = pagina.locator('#ficha-acciones select.campo-estado');
-/* El cambio y la comprobación de que el desplegable se apaga van en el
-   mismo 'evaluate': entre elegir la opción y mirar 'disabled' no puede
-   colarse ninguna otra vuelta al bucle de eventos, así que da igual lo
-   rápido que guarde el disco de mentira o lo que tarde el viaje de ida
-   y vuelta de Playwright. */
-const seApagaAlElegir = await pagina.evaluate(() => {
-  var sel = document.querySelector('#ficha-acciones select.campo-estado');
-  var opcion = Array.prototype.filter.call(sel.options, function (o) {
-    return o.textContent === 'En el departamento';
-  })[0];
-  sel.value = opcion.value;
-  sel.dispatchEvent(new Event('change', { bubbles: true }));
-  return sel.disabled;
-});
-await comprobar('el desplegable se apaga mientras guarda', seApagaAlElegir, true);
-await pagina.waitForTimeout(300);
-await comprobar('la ficha ya enseña el estado nuevo, sin recargar',
-  pagina.locator('#ficha-acciones select.campo-estado').inputValue(), 'En el departamento');
+await pagina.waitForSelector('#ficha-acciones .boton-esperando');
+await pagina.click('#ficha-acciones .boton-esperando');
+await pagina.waitForSelector('#capa:not(.oculto) #esperando-a');
+await pagina.click('#cuadro-aceptar');
+await pagina.waitForSelector('#ficha-acciones .boton-ya-llegado');
+await comprobar('la ficha ya enseña «Esperando a…», sin recargar',
+  pagina.locator('#ficha-acciones .marca-esperando').textContent().then(t => t.indexOf('Esperando a ') === 0), true);
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(200);
-await comprobar('la tarjeta de la lista también, sin recargar',
-  pagina.locator('#lista-abiertos .tarjeta .marca-estado').first().textContent(), 'En el departamento');
+await comprobar('el asunto se ha ido de «Pendiente de Administración», sin recargar',
+  pagina.locator('#lista-abiertos .tarjeta-asunto').count(), 0);
+await pagina.click('.panel[data-vista="espera"]');
+await pagina.waitForTimeout(200);
+await comprobar('y su tarjeta, en «Pendiente de terceros», lo dice',
+  pagina.locator('#lista-abiertos .tarjeta .marca-esperando').first().textContent().then(t => t.indexOf('Esperando a ') === 0), true);
+/* Se deja como estaba: «Ya ha llegado», y de vuelta al montón de siempre. */
+await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.waitForSelector('#ficha-acciones .boton-ya-llegado');
+await pagina.click('#ficha-acciones .boton-ya-llegado');
+await pagina.waitForSelector('#ficha-acciones .boton-esperando');
+await pagina.click('#ficha-volver');
+await pagina.click('.panel[data-vista="departamento"]');
+await pagina.waitForTimeout(200);
 
 console.log('--- 2) marcar un hito (paso de la guía) como hecho ---');
 await pagina.click('#lista-abiertos .nombre-pulsable');

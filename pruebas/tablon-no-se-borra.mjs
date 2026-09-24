@@ -36,6 +36,11 @@ await pagina.fill('#campo-usuario', 'Ana');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.evaluate(async () => {
   await window.__disco.abiertos.getDirectoryHandle('260901 MATRICULA 26-27 Alguien 1140233', { create: true });
+  /* Fila 129: el paso único de los asuntos de antes ya está hecho (si no,
+     al ponerlos al día repintaría la lista una vez, a los 3 s de entrar). */
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
+  const f = await g.getFileHandle('estado-migrado.json', { create: true });
+  const w = await f.createWritable(); await w.write('{}'); await w.close();
 });
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');

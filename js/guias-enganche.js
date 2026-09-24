@@ -128,11 +128,10 @@
       yaLeido = true;
     } catch (e) { /* si no se puede releer, se sigue con lo que hay */ }
 
-    /* Las tres listas que necesitan los tres campos nuevos de cada
-       paso (16-sep-2026, hitos): las personas y los papeles de
-       Ajustes › Hitos, y los estados de tramitación. Si algo falla al
-       leerlas, los desplegables salen vacíos y el resto del cuadro
-       sigue funcionando igual. */
+    /* Las personas y los papeles de Ajustes › Hitos, para el
+       responsable y para «Esperamos a…» de cada paso (fila 129: ya no
+       hay estados escritos a mano). Si algo falla al leerlas, los
+       desplegables salen vacíos y el resto del cuadro sigue igual. */
     var opcionesResp = [];
     try {
       if (window.Hitos) {
@@ -140,12 +139,11 @@
         opcionesResp = datosHitos.ajustes.responsables.concat(window.Hitos.PAPELES);
       }
     } catch (e) { /* sin desplegable de responsable, pero se sigue */ }
-    var opcionesEstado = (App.E && App.E.estados) ? App.E.estados.map(function (e) { return e.nombre; }) : [];
 
     /* Las plantillas de documento, una vez antes de abrir el cuadro
        (fila 102, «Documentos de este paso»). */
     if (window.GuiasDocumentos) await GuiasDocumentos.precargar();
-    var pasos = await Guias.editar(nombreTipo, pasosDe(nombreTipo), opcionesResp, opcionesEstado, opciones);
+    var pasos = await Guias.editar(nombreTipo, pasosDe(nombreTipo), opcionesResp, [], opciones);
     if (pasos === null || pasos === false || pasos === undefined) return false;
 
     if (pasos.length) guias[nombreTipo] = pasos;
@@ -221,6 +219,21 @@
     return true;
   }
 
+  /* Fila 129 (docs/EL-HITO-ES-EL-ESTADO.md): si el tipo no tiene guía,
+     le pone `pasosNuevos` (la guía mínima de js/estado-hito.js) como
+     guía normal, editable después como cualquier otra. Relee antes; si
+     el otro ordenador ya le puso una, se queda la suya. Sin llevarla a
+     los abiertos ni recargar: quien llama crea los hitos él mismo. */
+  async function asegurarGuia(nombreTipo, pasosNuevos) {
+    try { await cargar(); } catch (e) { /* se sigue con lo que hay */ }
+    if (!pasosDe(nombreTipo).length) {
+      guias[nombreTipo] = Guias.normalizar(pasosNuevos || []);
+      await guardar();
+      try { pintarTabla(); } catch (e2) { /* solo pintar */ }
+    }
+    return pasosDe(nombreTipo).slice();
+  }
+
   /* Lo que usa la ficha de un asunto para escribir la guía de su tipo
      sin pasar por Ajustes. Las guías viven en un solo sitio, y es este
      fichero el que las lleva: si la ficha escribiera por su cuenta, las
@@ -229,7 +242,8 @@
     escribir: escribirGuia,
     pasosDe: function (tipo) { return pasosDe(tipo).slice(); },
     guardarPasos: guardarPasos,
-    cambiarPasos: cambiarPasos
+    cambiarPasos: cambiarPasos,
+    asegurarGuia: asegurarGuia
   };
 
   /* ---------- arranque ---------- */

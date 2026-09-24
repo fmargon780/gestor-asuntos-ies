@@ -128,6 +128,8 @@ var HitosPanelLista = (function () {
           (h.soloInformativo ? ' <span class="etiqueta-informativo">Informativo</span>' : '') +
         '</span>' +
         '<span class="hito-meta">' + metaDeHito(h, ajustes, contexto) + '</span>' +
+        /* Fila 129: dar por hechos los anteriores (js/estado-hito.js). */
+        (abierto && window.EstadoHito && EstadoHito.puedeSituar(raiz, h.id) ? EstadoHito.botonSituarHTML('hito-situar') : '') +
         '<button type="button" class="hito-desplegar" title="Ver más">▾</button>' +
       '</div>' +
       '<div class="hito-cuerpo oculto">' + cuerpoDeHito(a, h, ajustes, contexto, abierto, nombresDeLaCarpeta, raiz) + '</div>';
@@ -173,6 +175,8 @@ var HitosPanelLista = (function () {
     }
     linea.querySelector('.hito-desplegar').onclick = abrirMesa;
     linea.querySelector('.hito-titulo').onclick = abrirMesa;
+    var situarBtn = linea.querySelector('.hito-situar');
+    if (situarBtn) situarBtn.onclick = function (ev) { ev.stopPropagation(); EstadoHito.situar(a, h.id, situarBtn); };
 
     engancharCuerpo(div, a, h, abierto);
     return div;

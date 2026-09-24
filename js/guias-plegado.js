@@ -44,6 +44,8 @@ var GuiasPlegado = (function () {
       var r = (responsables || []).filter(function (x) { return x.id === p.responsable; })[0];
       m.push(r ? r.nombre : p.responsable);
     }
+    /* Fila 129: «Nos toca» o «Espera: Familia» (js/guias-toca.js). */
+    if (window.GuiasToca && GuiasToca.marca(p, responsables)) m.push(GuiasToca.marca(p, responsables));
     return m;
   }
 

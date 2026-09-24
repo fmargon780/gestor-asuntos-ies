@@ -64,10 +64,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 5. Qué está hecho
 
-(Una línea por cosa. El cómo y el porqué de cada una están en `docs/contexto/` y en `HISTORIA.md`.)
+(Una línea por cosa; el porqué, en `docs/contexto/` y `HISTORIA.md`.)
 
 - Categoría → tipo → tercero → nombre de carpeta, con vista previa. El nombre corto del tipo, en carpeta, filtros y tarjeta; se crea un tipo nuevo sin salir de Nuevo asunto.
-- El asunto se coloca solo en «Pendiente de Administración» o «Pendiente de terceros» según su hito abierto (sin hitos, por su estado); quién es Administración se marca en Ajustes. Vía preferente y fecha límite.
+- El estado del asunto es su hito actual («Paso N de M · título»): lo pone solo en Administración o terceros; cada paso de la guía dice a quién le toca; «Esperando a…», a mano. Sin estados manuales. Vía y fecha límite.
 - Asuntos recurrentes, con aviso.
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
   sueltas también en documentos, registro de Séneca, ficha y notas.
@@ -106,7 +106,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   {{ESPECIALIDAD}} y {{TABLA TUTORIAS}}; lo que falta, en amarillo. Certificado de función tutorial
   como el del centro (tipo DESEMPEÑO FUNCIÓN TUTORIAL, campo «Cursos que pide»). Renuncia a la
   Junta Electoral, en su hito.
-- Copias diarias (caducan a los 90 días), detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un borrado (tipo, estado,
+- Copias diarias (caducan a los 90 días), detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un borrado (tipo,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en cada subida. Escape y salida en toda pantalla.
 - Copia sin internet (`file://`): se actualiza sola; si no puede, o no puede comprobarlo, franja fija arriba; mira cada 30 min.
@@ -166,7 +166,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 8. Qué falta
 
-- El compañero: entrar en `https://asuntos.fmargon.com`, señalar sus carpetas de nuevo (no se heredan) y coordinar tipos de asunto y estados.
+- El compañero: entrar en `https://asuntos.fmargon.com`, señalar sus carpetas de nuevo (no se heredan) y coordinar tipos de asunto.
 - Envío: pegar el script nuevo (fila 117), «Gestionar implementaciones → lápiz → Nueva versión», y «Probar».
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI".

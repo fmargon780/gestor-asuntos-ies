@@ -61,8 +61,11 @@ await pagina.evaluate(async (A) => {
   await App.verAbiertos();
 }, A);
 
-/* ---------- 1. marcar un hito ---------- */
-console.log('--- 1. marcar un hito con el paso accesorio fallando ---');
+/* ---------- 1. marcar un hito ----------
+   Desde la fila 129 (docs/EL-HITO-ES-EL-ESTADO.md) el estado del asunto
+   es su hito actual: marcar un hito ya no escribe nada en asuntos.json,
+   así que ni siquiera con el disco de asuntos.json fallando hay aviso. */
+console.log('--- 1. marcar un hito, con asuntos.json fallando: no lo toca ---');
 const r1 = await pagina.evaluate(async (A) => {
   await Hitos.cambiar(d => {
     d.porAsunto[A] = { creados: U.hoyIso(), hitos: [
@@ -72,17 +75,15 @@ const r1 = await pagina.evaluate(async (A) => {
   });
   window.__avisos = [];
   const anotar = App.anotar;
-  App.anotar = async function () { const e = new Error('disco lento'); e.name = 'NotReadableError'; throw e; };
+  let llamadas = 0;
+  App.anotar = async function () { llamadas++; const e = new Error('disco lento'); e.name = 'NotReadableError'; throw e; };
   try { await Hitos.marcar(A, 'h1', 'hecho'); } finally { App.anotar = anotar; }
   const h = (await Hitos.hitosDe(A)).map(x => x.id + ':' + x.estado);
-  return h;
+  return { h: h, llamadas: llamadas };
 }, A);
-await comprobar('el hito ha quedado guardado', Promise.resolve(r1), ['h1:hecho', 'h2:encurso']);
-const a1 = await avisos();
-await comprobar('el aviso es ámbar, no rojo', Promise.resolve(colores(a1)), ['ambar']);
-await comprobar('y dice qué ha fallado, en castellano',
-  Promise.resolve(a1[0] && a1[0].texto.indexOf('Hito guardado, pero no he podido poner el estado') === 0 &&
-    a1[0].texto.indexOf('Dropbox') > -1), true);
+await comprobar('el hito ha quedado guardado', Promise.resolve(r1.h), ['h1:hecho', 'h2:encurso']);
+await comprobar('no ha tocado asuntos.json', Promise.resolve(r1.llamadas), 0);
+await comprobar('y no hay ningún aviso', avisos().then(colores), []);
 
 /* ---------- 2. cambiar el estado ---------- */
 console.log('--- 2. cambiar el estado con el repintado fallando ---');
@@ -134,34 +135,40 @@ await comprobar('verde de archivado y ámbar de la copia vieja',
                    a3.some(a => a.clase === 'ambar' && a.texto.indexOf('queda una copia vieja') > -1)]), [true, true]);
 await comprobar('al terminar, ya no está ocupado', pagina.evaluate((A) => !!App.E.ocupados[A], A), false);
 
-/* ---------- 4. el desplegable sigue apagado mientras guarda ---------- */
+/* ---------- 4. el control sigue apagado mientras guarda ----------
+   Desde la fila 129 ya no hay desplegable de estado: se usa «Ya ha
+   llegado» (js/estado-hito.js), que guarda sin abrir ningún cuadro. */
 console.log('--- 4. el control se queda apagado mientras guarda ---');
 const B = '260921 SOLICITUD Dos, Luis 1150002';
 await pagina.evaluate(async (B) => {
   await window.__disco.abiertos.getDirectoryHandle(B, { create: true });
-  await App.anotar(B, { tercero: 'Dos, Luis 1150002', categoria: 'ALUMNADO', situacion: 'PENDIENTE' });
+  await App.anotar(B, { tercero: 'Dos, Luis 1150002', categoria: 'ALUMNADO' });
+  await Hitos.cambiar(d => {
+    d.porAsunto[B] = { creados: U.hoyIso(), hitos: [
+      Hitos.normalizarHito({ id: 'b1', titulo: 'Recoger', estado: 'encurso', esperandoA: 'tutor', esperandoDesde: U.ahora() })
+    ] };
+  });
   await App.verAbiertos();
   App.abrirFicha(App.E.listaAbiertos.filter(x => x.nombre === B)[0], 'abierto');
 }, B);
-await pagina.waitForSelector('#ficha-acciones select.campo-estado');
-const r4 = await pagina.evaluate(async (B) => {
-  const anotar = App.anotar;
+await pagina.waitForSelector('#ficha-acciones .boton-ya-llegado');
+const r4 = await pagina.evaluate(async () => {
+  const cambiar = Hitos.cambiar;
   let soltar;
-  App.anotar = function (c, d) { return new Promise(r => { soltar = () => r(anotar(c, d)); }); };
-  const sel = document.querySelector('#ficha-acciones select.campo-estado');
-  sel.value = 'EN TRÁMITE';
-  sel.dispatchEvent(new Event('change'));
+  Hitos.cambiar = function (f) { return new Promise(r => { soltar = () => r(cambiar(f)); }); };
+  const b = document.querySelector('#ficha-acciones .boton-ya-llegado');
+  b.click();
   await new Promise(r => setTimeout(r, 20));
   /* Algo nuevo en la ficha: el modo consulta repasa los controles. */
   document.getElementById('ficha-asunto-cuerpo').appendChild(document.createElement('div'));
   await new Promise(r => setTimeout(r, 120));
-  const durante = sel.disabled;
+  const durante = b.disabled;
   soltar();
-  App.anotar = anotar;
+  Hitos.cambiar = cambiar;
   await new Promise(r => setTimeout(r, 300));
   return durante;
-}, B);
-await comprobar('el desplegable sigue apagado mientras guarda', Promise.resolve(r4), true);
+});
+await comprobar('el botón sigue apagado mientras guarda', Promise.resolve(r4), true);
 await avisos();
 
 /* ---------- 5. un cuadro sobre otro ---------- */
