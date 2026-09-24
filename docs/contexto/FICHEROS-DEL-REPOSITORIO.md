@@ -12,7 +12,7 @@ de `App` va después del fichero que lo define.
 | Fichero | Qué hace |
 |---|---|
 | `index.html` | La página |
-| `vercel.json` | Que el navegador no se quede con copias viejas |
+| `vercel.json` | Que el navegador no se quede con copias viejas, las cabeceras de seguridad, qué commits no publican (`ignoreCommand`) y la hora de la versión al publicar (`buildCommand`, fila 76) |
 | `css/estilos.css` | El aspecto general. Los demás `css/` van con su módulo del mismo nombre |
 | `css/vista.css` | El ancho de la pantalla, los filtros plegados y las tarjetas por tipo |
 | `css/guias.css` | La guía: pasos, plegado, preguntas y opciones |
@@ -207,6 +207,7 @@ de `App` va después del fichero que lo define.
 | `plantillas/indice.json` | La lista de todas las plantillas del centro, generada por el script, que lee `js/plantillas-documento.js` al pulsar "Cargar las plantillas del centro" (fila 83) |
 | `scripts/hacer-plantillas.mjs` | Convierte cada `plantillas/*.md` en su `.docx` y en su fila de `plantillas/indice.json`. Se ejecuta a mano; no en Vercel ni en las pruebas (fila 83) |
 | `scripts/copia-local.mjs` | Genera `copia-local/` (fila 89, 21-sep-2026, `npm run copia-local`): copia `index.html`/`css/`/`js/`/`favicon.svg`, construye `js/lib/pdf.iife.js` y `pdf.worker.iife.js` con esbuild, genera `copia-datos/*.js` (uno por cada JSON/PDF/`.docx` estático) y `version.json` (versión + sha256 de cada fichero); no copia `docs/`, `pruebas/`, `herramientas/`, `scripts/` ni `apps-script/` |
+| `scripts/version-al-publicar.mjs` | El `buildCommand` de `vercel.json` (fila 76): al publicar, escribe la hora de España en la línea `App.VERSION` de `js/version.js`, solo en lo que sirve Vercel y sin ningún commit; si falla, se queda la escrita |
 | `scripts/plantillas-copia/ABRIR EL GESTOR.html` | Plantilla del instalador/actualizador autónomo (fila 89) que `scripts/copia-local.mjs` copia tal cual a `copia-local/ABRIR EL GESTOR.html`: elige la carpeta con `showDirectoryPicker`, descarga la copia de `raw.githubusercontent.com/fmargon780/gestor-asuntos-copia` y guarda el identificador de la carpeta en la misma IndexedDB que `js/almacen.js`. Desde la fila 91 la guarda siempre, y si la carpeta ya tiene `index.html` la pone al día (mismo algoritmo) antes de abrirla: es el camino para rescatar una copia vieja. Solo acepta una carpeta vacía, con `index.html` o con un fichero que empiece por `ABRIR EL GESTOR` |
 | `js/salir.js` | El botón de Salir del pie de la barra |
 | `js/rescate-datos.js` | Recoge los CSV que se hayan quedado un piso más arriba |
@@ -309,6 +310,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/plazo-de-conservacion.mjs` | Prueba (navegador, fila 136): tipo con 4 años y archivado de 2021 → avisa; `conservarHasta` futuro o tipo sin plazo → no; sin fecha de cierre, aproximado; «Conservar más tiempo…» y «Mandar a la papelera» (y devolverlo a su sitio del ARCHIVO) |
 | `pruebas/indice-del-expediente.mjs` | Prueba (navegador, fila 137): tres documentos (registrado, «SIN SELLAR», Word) en orden y con páginas; el botón del menú lo crea y lo rehace (el viejo, a la papelera); no cuenta como documento; archivar lo crea y un fallo no impide archivar |
 | `pruebas/una-sola-lista-en-el-hito.mjs` | Prueba (navegador, fila 138): los requisitos de un paso y de un hito pasan al guion (el hecho, marcado; el del asunto, como línea propia), dos veces no duplica, un documento marca su línea, la mesa pinta 📎/✎/obligatorio y el dato se marca al escribirlo, y el editor guarda «Hay que reunirlo» |
+| `pruebas/version-al-publicar.mjs` | Prueba (sin navegador, fila 76): la hora de España en invierno, verano y medianoche; solo cambia la línea de la versión; `buildCommand` e `ignoreCommand` en `vercel.json`; sobre una copia escribe la hora y el fichero del repositorio no cambia |
 | `pruebas/genero.mjs` | Prueba (navegador de verdad, fila 111, 24-sep-2026): alumna/alumno/sin dato, «El/La Director/a» con firmante mujer, marcas `:tutor1`, lo que no se toca (fechas, y/o, registros, webs), `faltan` al rellenar, forma partida en el Word, sexos del RegAlum/ficha/cargo y una plantilla del centro limpia |
 | `pruebas/cabecera-compacta.mjs` | Prueba (navegador de verdad, fila 112, 24-sep-2026): cabecera del asunto en dos líneas, sin volver repetidos ni línea de ruta, «GUION DEL HITO» a 250 px o menos a 1600×920, la pestaña abierta vuelve atrás, y sin desplazamiento lateral a 800 px |
 | `pruebas/guias-mapa.mjs` | Prueba (sin navegador, fila 113, 24-sep-2026): `GuiasMapa.html` con una guía de dos niveles de preguntas, sin y con hitos (camino resaltado, ramas en gris, «Fuera de la guía»), y `GuiasNiveles.caminoHasta` |

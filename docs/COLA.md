@@ -107,22 +107,23 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 75 y 77 a 138 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 138 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 76 | `docs/VERSION-AL-PUBLICAR.md` (la versión, generada sola al publicar en Vercel, sin ningún commit) | PENDIENTE |
 | 139 | `docs/UNA-SOLA-LIBRETA-DE-NOTAS.md` (las notas del hito pasan al asunto, con etiqueta) | PENDIENTE |
 | 140 | `docs/TIEMPO-DE-TRAMITACION.md` (media y máximo por tipo, y los abiertos más antiguos) | PENDIENTE |
 
-**La fila 76 se desbloquea el 25-sep-2026**, diseño cerrado con Francisco en conversación aparte
-(no en esta cola): la versión se genera sola al publicar en Vercel, sin ningún commit al
-repositorio, así queda fuera el riesgo de bucle que la había bloqueado el 19-sep-2026. Detalle en
-`docs/VERSION-AL-PUBLICAR.md`. Se apunta la primera de la tabla porque Francisco pidió hacerla
-antes que las filas 138 a 140, pero **solo se puede comprobar publicando de verdad**: si al
-terminar la hora publicada no es la real, vuelve a la fecha a mano y márcala BLOQUEADA otra vez,
-sin insistir más de una vez.
+**La fila 76 está HECHA** (25-sep-2026): `docs/VERSION-AL-PUBLICAR.md`. La web pone sola la hora de
+la versión al publicar: `vercel.json` gana `"buildCommand": "node scripts/version-al-publicar.mjs"`,
+que escribe la hora de España de ese momento en la copia que sirve Vercel, sin ningún commit (el
+`ignoreCommand` no se ha tocado). Si falla, se queda la escrita a mano. La escrita en
+`js/version.js` se sigue poniendo en cada subida (la usa la copia sin internet). Prueba
+`pruebas/version-al-publicar.mjs`, batería completa en verde. **Pendiente de comprobar publicando**:
+esta sesión no llega a la web; si la hora de abajo a la izquierda no es la de la publicación, se
+vuelve a la escrita a mano quitando el `buildCommand` y la fila pasa a BLOQUEADA (una vez, sin
+insistir). Versión escrita a mano: `25-sep-2026 · 01:37`.
 
 **La fila 138 está HECHA** (25-sep-2026): `docs/UNA-SOLA-LISTA-EN-EL-HITO.md`. Dentro del hito queda
 una sola lista, el guion: lo que hay que reunir es una línea más (📎 documento, ✎ dato, «obligatorio»;

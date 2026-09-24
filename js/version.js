@@ -13,6 +13,14 @@
    los ficheros más grandes, y cada subida es una publicación de Vercel
    que hace cola con las demás.
 
+   DESDE LA FILA 76 (25-sep-2026, docs/VERSION-AL-PUBLICAR.md) la web
+   la pone sola: al publicar, Vercel ejecuta scripts/version-al-publicar.mjs
+   (el `buildCommand` de vercel.json), que cambia la línea de abajo por
+   la hora de España de ese momento en lo que va a servir, sin ningún
+   commit. La escrita aquí es la que ven la copia sin internet (se
+   genera de este fichero y solo se actualiza si cambia) y quien abra
+   index.html en local: por eso se sigue poniendo en cada subida.
+
    OJO al escribir esta línea: coge la hora de verdad, nunca a ojo ni
    sumando algo al valor de antes (17-sep-2026, aviso de Francisco: las
    versiones estaban saliendo con horas por delante de la real). Antes
@@ -22,4 +30,4 @@
          meses=(ene feb mar abr may jun jul ago sep oct nov dic); \
          echo "$d-${meses[$((10#$m-1))]}-$y · $hm"; }
    ============================================================ */
-App.VERSION = '25-sep-2026 · 01:26';
+App.VERSION = '25-sep-2026 · 01:37';

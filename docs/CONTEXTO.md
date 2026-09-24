@@ -111,12 +111,16 @@ cada 7 días; matrícula y verano (01-06 a 31-08) cada 15; escolarización (01-0
 el resto del año, cada 30.
 
 **La versión, a la vista** (`App.VERSION`, en `js/version.js`). En la pantalla de entrada y,
-dentro, abajo a la izquierda. Se cambia cada vez que se publica algo que Francisco tenga que ver,
-con fecha y hora de España (`10-sep-2026 · 13:55`). Sirve también para comprobar que Vercel ha
-publicado de verdad (ver la sección 8). **La hora tiene que ser la real**, sacada del reloj
-(`TZ='Europe/Madrid' date`), nunca a ojo ni sumando algo a la de antes: el 17-sep-2026 Francisco
-avisó de que estaban saliendo versiones con horas por delante de la de verdad (comentario con la
-receta exacta en `js/version.js`).
+dentro, abajo a la izquierda, con fecha y hora de España (`10-sep-2026 · 13:55`). Sirve también
+para comprobar que Vercel ha publicado de verdad (ver la sección 8). **Desde la fila 76
+(25-sep-2026, `docs/VERSION-AL-PUBLICAR.md`) la web la genera sola al publicar**: el
+`buildCommand` de `vercel.json` (`scripts/version-al-publicar.mjs`) escribe la hora de España de
+ese momento en la copia que sirve Vercel, sin ningún commit (el fichero de git no cambia; si algo
+falla, se queda la escrita). La escrita a mano en `js/version.js` sigue haciendo falta: la usan
+la copia sin internet (que se genera del repositorio y solo se actualiza si cambia) y quien abra
+`index.html` en local. Así que se sigue poniendo en cada subida de código, **con la hora real**,
+sacada del reloj (`TZ='Europe/Madrid' date`), nunca a ojo ni sumando algo a la de antes (aviso de
+Francisco del 17-sep-2026; receta exacta en `js/version.js`).
 
 
 ## 2. Cómo trabajamos el código ← LÉELO ANTES DE TOCAR NADA

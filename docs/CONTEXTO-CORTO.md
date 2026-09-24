@@ -108,7 +108,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Copias diarias (caducan a los 90 días), detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un borrado (tipo,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en cada subida. Escape y salida siempre.
-- Copia sin internet (`file://`): se actualiza sola; si no puede, o no puede comprobarlo, franja fija arriba; mira cada 30 min.
+- Copia sin internet (`file://`): se actualiza sola; si no puede o no lo comprueba, franja fija arriba; cada 30 min.
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
   bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa): una sola lista, el guion
   (con preguntas y lo que hay que reunir: 📎 documento, ✎ dato), que se marca solo al generar, registrar, comunicar o añadir; documentos en tabla con sus
@@ -128,7 +128,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 6. Reglas de código que no se pueden olvidar
 
-- El repositorio es la versión buena; Vercel publica solo la app (`.vercelignore`: sin `docs/` ni `pruebas/`).
+- El repositorio es la versión buena; Vercel publica solo la app (`.vercelignore`: sin `docs/` ni `pruebas/`) y pone
+  sola la hora de la versión al publicar; la de `js/version.js` (hora real) es la de la copia sin internet.
 - **Permiso permanente de Francisco**: un pull request (sesiones desde la nube) lo fusiona Claude
   Code solo, en verde y sin conflictos (nota al final de `docs/COLA.md`).
 - **Comprobar siempre lo publicado con `curl`.**

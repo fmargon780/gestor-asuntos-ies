@@ -5,6 +5,22 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 76: la versión, escrita sola al publicar
+
+`docs/VERSION-AL-PUBLICAR.md`. Bloqueada desde el 19-sep-2026 por miedo a un bucle de commits; se
+desbloqueó con otro diseño: **nunca un commit**. Cómo quedó:
+
+- `vercel.json` lleva `"buildCommand": "node scripts/version-al-publicar.mjs"`. El script cambia la
+  línea `App.VERSION = '…';` de `js/version.js` por la hora de España (con `Intl`, zona
+  `Europe/Madrid`, nunca UTC a pelo) solo en lo que Vercel va a servir. Si algo falla, sale con 0 y
+  se queda la escrita: la publicación no se rompe nunca por esto.
+- No hace falta `installCommand`: `package.json` no se sube a Vercel (`.vercelignore`), así que no
+  instala nada; `scripts/` sí se sube (ya lo necesitaba el `ignoreCommand`).
+- La escrita a mano no se jubila: la copia sin internet se genera del repositorio en GitHub
+  Actions y solo se actualiza sola si cambia esa línea. Por eso se sigue poniendo en cada subida.
+- Solo se puede comprobar publicando: esta sesión no llega a la web, así que se pide a Francisco
+  que mire la hora de abajo a la izquierda.
+
 ## 25-sep-2026 — Fila 138: una sola lista dentro del hito
 
 `docs/UNA-SOLA-LISTA-EN-EL-HITO.md`. El guion y «lo que hay que reunir» hacían lo mismo: queda el guion.

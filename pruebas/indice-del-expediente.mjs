@@ -145,7 +145,9 @@ await comprobar('y el índice del ARCHIVO no lo cuenta entre sus documentos',
 console.log('--- un fallo al crearlo no impide archivar ---');
 await pagina.evaluate(() => { PdfHerramientas.cargarPdfLib = () => Promise.reject(new Error('pdf-lib no carga')); });
 await archivar(LUIS);
-await comprobar('Luis está archivado, sin índice', enArchivo(LUIS, 'Gómez, Luis 5678').then(l => [l.length, l.indexOf(INDICE)]), [3, -1]);
+/* Sin contar `_ficha.json`, que la ficha baja a la carpeta por su cuenta. */
+await comprobar('Luis está archivado, sin índice',
+  enArchivo(LUIS, 'Gómez, Luis 5678').then(l => l.filter(x => x.charAt(0) !== '_')).then(l => [l.length, l.indexOf(INDICE)]), [3, -1]);
 await comprobar('con aviso ámbar que lo dice',
   pagina.locator('.mensaje.ambar').allTextContents().then(l => l.some(t => t.indexOf('índice del expediente') !== -1)), true);
 
