@@ -112,6 +112,7 @@ Las filas 1 a 75 y 77 a 126 están **HECHAS**. Sus documentos siguen en `docs/`,
 
 | Nº | Instrucción | Estado |
 |---|---|---|
+| 127 | `docs/MEMBRETE-NO-SE-ENCUENTRA.md` (**URGENTE**, hacer la primera: el membrete se guarda pero la aplicación nunca lo encuentra; tres líneas de `js/membrete.js`) | EN CURSO (24-sep-2026) |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
 **La fila 126 está HECHA** (24-sep-2026): `docs/TIPO-QUE-CAMBIA-DE-NOMBRE.md`. Renombrar un tipo (a mano o con «Cargar la biblioteca del centro») se lleva su guía, campos, plantillas y recurrentes (`js/tipos-nombre.js`); al entrar, lo que se quedó bajo el nombre corto o un alias se junta solo con aviso verde (arregla la guía de DESEMPEÑO FUNCIÓN TUTORIAL) y la plantilla repetida va a la papelera; las plantillas casan con el tipo por cualquiera de sus nombres; «Cargar las plantillas del centro» ya no duplica; «Buscar otra plantilla…» en la mesa del hito y en «Generar documento». Prueba `pruebas/tipos-nombre.mjs`. Versión `App.VERSION`: `24-sep-2026 · 13:37`.
