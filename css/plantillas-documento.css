@@ -37,3 +37,15 @@
   display: block; width: 100%; text-align: left;
   margin-bottom: 6px;
 }
+
+/* «Buscar otra plantilla…» (fila 126, js/plantilla-buscar.js): en la mesa
+   del hito y en el cuadro de elegir plantilla. */
+.mesa-buscar-plantilla, .pd-buscar-otra { margin-top: 6px; }
+.plantilla-buscar-campo { width: 100%; margin: 6px 0; }
+.plantilla-buscar-lista { max-height: 320px; overflow-y: auto; }
+.plantilla-buscar-opcion {
+  display: flex; justify-content: space-between; gap: 12px; width: 100%;
+  border: 0; border-top: 1px solid var(--linea); background: transparent; padding: 6px 4px;
+  font: inherit; font-size: 14px; text-align: left; cursor: pointer; color: inherit;
+}
+.plantilla-buscar-opcion:hover { background: var(--azul-claro); }

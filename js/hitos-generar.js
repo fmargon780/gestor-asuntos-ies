@@ -89,7 +89,9 @@ window.HitosGenerar = (function () {
       }
       return '';
     }
-    if (!g.delPaso.length && !g.delTipo.length) return '';
+    /* Fila 126: con cualquier plantilla en el centro, el botón sale (y
+       ofrece «Buscar otra plantilla…»). */
+    if (!g.delPaso.length && !g.delTipo.length && !(window.PlantillaBuscar && (Plantillas.enMemoria().documentos || []).length)) return '';
     return '<button type="button" class="boton hito-generar" title="Sacar un documento de una plantilla, ' +
       'ya apuntado a este hito">Generar documento</button>';
   }
@@ -103,8 +105,11 @@ window.HitosGenerar = (function () {
         try { await Plantillas.cargarReciente(App.E.gestor, 60000); } catch (e) { /* con lo que haya */ }
         var g = gruposEnMemoria(a, hito) || { delPaso: [], delTipo: [] };
         var total = g.delPaso.length + g.delTipo.length;
-        if (!total) { U.aviso('No hay ninguna plantilla de documento para este hito.', 'ambar'); return; }
-        var elegida = total === 1 ? (g.delPaso[0] || g.delTipo[0]) : await PlantillasDocumento.elegir(g);
+        var buscar = !!window.PlantillaBuscar;
+        if (!total && !buscar) { U.aviso('No hay ninguna plantilla de documento para este hito.', 'ambar'); return; }
+        /* Con «Buscar otra plantilla…» (fila 126) siempre se pasa por el cuadro. */
+        var elegida = (total === 1 && !buscar) ? (g.delPaso[0] || g.delTipo[0])
+          : await PlantillasDocumento.elegir({ delPaso: g.delPaso, delTipo: g.delTipo, buscar: buscar });
         if (!elegida) return;
         /* «Guardando…» solo mientras genera, no con el cuadro de elegir abierto. */
         await U.mientrasGuarda(b, function () { return PlantillasDocumento.generar(a, elegida, 'abierto', { hito: hito }); });

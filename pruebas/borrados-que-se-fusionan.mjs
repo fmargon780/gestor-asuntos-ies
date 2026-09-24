@@ -71,7 +71,7 @@ const contexto = {
 contexto.window = contexto;
 contexto.addEventListener = function () {};
 vm.createContext(contexto);
-for (const f of ['util.js', 'reintentar-escritura.js', 'carpetas.js', 'copias.js', 'nombres.js', 'nucleo.js', 'borrados-fusion.js', 'ajustes.js']) {
+for (const f of ['util.js', 'reintentar-escritura.js', 'carpetas.js', 'copias.js', 'nombres.js', 'nucleo.js', 'borrados-fusion.js', 'ajustes.js', 'tipos-nombre.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 const { App, Borrados, U } = contexto;

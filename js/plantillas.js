@@ -209,9 +209,16 @@ var Plantillas = (function () {
     return nuevo;
   }
 
+  /* Fila 126: casa con el tipo por cualquiera de sus nombres (el de hoy,
+     el corto o uno de antes, js/tipos-nombre.js). */
+  function nombresDelTipo(tipo) {
+    return window.TiposNombre ? TiposNombre.nombresDe(tipo) : [U.normalizar(tipo || '')];
+  }
+
   function deTipo(datos, categoria, tipo) {
+    var nombres = nombresDelTipo(tipo);
     return ((datos && datos.lista) || []).filter(function (p) {
-      return p.categoria === categoria && p.tipo === tipo;
+      return p.categoria === categoria && (p.tipo === tipo || nombres.indexOf(U.normalizar(p.tipo || '')) !== -1);
     });
   }
 
@@ -227,10 +234,11 @@ var Plantillas = (function () {
   }
 
   function documentosDeTipo(datos, categoria, tipo) {
+    var nombres = nombresDelTipo(tipo);
     return ((datos && datos.documentos) || []).filter(function (p) {
       /* Sin tildes ni mayúsculas (fila 123): «DESEMPEÑO FUNCION TUTORIAL»
          casa con la plantilla de «DESEMPEÑO FUNCIÓN TUTORIAL». */
-      return p.categoria === categoria && U.normalizar(p.tipo || '') === U.normalizar(tipo || '');
+      return p.categoria === categoria && nombres.indexOf(U.normalizar(p.tipo || '')) !== -1;
     });
   }
 

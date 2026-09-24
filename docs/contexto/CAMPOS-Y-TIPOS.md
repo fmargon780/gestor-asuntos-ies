@@ -225,3 +225,29 @@ al final de su orquestador (`ordenarCentro`, `ordenarMantenimiento`).
 Se comprueba con `pruebas/ajustes-plegado.mjs`. Las pruebas que trabajan dentro de la pantalla de
 un tipo abren antes sus secciones con esa misma clave de `localStorage`.
 
+### Un tipo que cambia de nombre se lleva todo lo suyo (24-sep-2026, fila 126, `docs/TIPO-QUE-CAMBIA-DE-NOMBRE.md`)
+
+`js/tipos-nombre.js` (`window.TiposNombre`). Lo que en `_GESTOR` se guarda por el NOMBRE del tipo:
+la guía (`guias.json`, clave), sus campos (`campos.json` → `porTipo`), las plantillas de correo y de
+documento (`plantillas.json`, `p.tipo`) y los recurrentes (`recurrentes.json`, `r.tipo`). Formularios,
+palabras, plazo y estado de partida van dentro del propio tipo y viajan solos; los hitos casan con la
+guía por el `id` del paso (`origenGuia`), que se conserva.
+
+- `TiposNombre.mover(viejo, nuevo)`: lo pasa todo, cada fichero por su cola (`App.enFila`), releyendo
+  antes. Si el nombre nuevo ya tiene guía o campos: vacío, se sustituye; con contenido, se queda el
+  que más tenga y el otro va a la papelera (clases `guia` y `campos-de-tipo`, que la papelera no sabe
+  devolver sola). Lo usan `App.renombrarTipo` (que vive ahora en este fichero, sacado de
+  `js/ajustes.js`) y `fusionarTipos` de `js/cargar-biblioteca.js` (el tipo renombrado al nombre largo).
+- `TiposNombre.arreglar()`: una vez al entrar (`Gestor.alRefrescar`), junta con su tipo lo que siga
+  guardado bajo su `nombreCorto` o un `alias` (salvo que otro tipo se llame así de verdad), con aviso
+  verde «He juntado con su tipo la guía de "…"»; y quita las plantillas de documento repetidas (mismo
+  nombre y fichero; se queda la unida a un paso de guía, la otra a la papelera, clase
+  `plantilla-documento`).
+- `TiposNombre.nombresDe(tipo)`: el nombre, el corto y los alias, normalizados.
+  `Plantillas.deTipo` y `Plantillas.documentosDeTipo` casan por cualquiera de ellos.
+- «Cargar las plantillas del centro» (ahora en `js/plantillas-centro.js`, sacado de
+  `js/plantillas-documento.js`): una del índice que ya esté (mismo nombre y fichero) colgada de otro
+  tipo no se duplica: se le pone el tipo del índice, salvo que sea el mismo tipo con otro nombre.
+  Después quita las repetidas.
+
+Se comprueba con `pruebas/tipos-nombre.mjs`.

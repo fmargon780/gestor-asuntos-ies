@@ -52,7 +52,8 @@ var CargarBiblioteca = (function () {
   /* ---------- 1. Tipos: altas y nombre corto ---------- */
 
   async function fusionarTipos(datos, resumen) {
-    var mapa = {};   /* nombreLargo del documento -> el objeto tipo real de App.E.tipos */
+    var mapa = {};
+    var renombrados = [];   /* nombreLargo del documento -> el objeto tipo real de App.E.tipos */
     datos.tipos.forEach(function (entrada, i) {
       /* Sin tildes ni mayúsculas (fila 123): «DESEMPEÑO FUNCION TUTORIAL»
          escrito a mano casa con «DESEMPEÑO FUNCIÓN TUTORIAL». */
@@ -79,6 +80,7 @@ var CargarBiblioteca = (function () {
         existente.nombreCorto = existente.tipo;
         existente.tipo = entrada.nombreLargo;
         mapa[entrada.nombreLargo] = existente;
+        renombrados.push([existente.nombreCorto, existente.tipo]);   /* fila 126 */
         resumen.tiposRenombrados++;
         return;
       }
@@ -86,6 +88,12 @@ var CargarBiblioteca = (function () {
       resumen.tiposNoEncontrados.push(entrada.nombreCorto || entrada.nombreLargo);
     });
     if (resumen.tiposCreados || resumen.tiposRenombrados) await App.guardarTipos();
+    /* Fila 126 (docs/TIPO-QUE-CAMBIA-DE-NOMBRE.md): un tipo renombrado al
+       nombre largo se lleva su guía, campos, plantillas y recurrentes, que
+       iban guardados por el nombre de antes. */
+    for (var r = 0; r < renombrados.length; r++) {
+      if (window.TiposNombre) await TiposNombre.mover(renombrados[r][0], renombrados[r][1]);
+    }
     return mapa;
   }
 

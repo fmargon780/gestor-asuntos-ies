@@ -74,9 +74,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Personas (Alumnado): matriculados primero, antiguos plegados; busca por padre, madre o tutor;
   hermanos en la ficha, que sigue al bajar.
 - Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
-  Al cambiar el tipo, ofrece la guía del nuevo.
-- Nombre comercial de empresas, aparte de la razón social; cambiar los datos de un tercero dado
-  de alta a mano.
+  Renombrar un tipo: se lleva su guía.
+  Al cambiarle el tipo, ofrece su guía.
+- Nombre comercial de empresas; cambiar los datos de un tercero dado de alta a mano.
 - Guías del procedimiento por tipo, con preguntas dentro de las respuestas sin límite, y su mapa
   (dibujo de la guía entera; en un asunto, con el camino elegido resaltado). Se escriben en
   acordeón: un paso abierto a la vez.
@@ -98,7 +98,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ajustes con tres pestañas y pantalla propia de cada tipo; todo plegado, con resumen en cada título; los avisos de fallo, solo con fallo.
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
-- Papelera: nada se borra a la primera.
+- Papelera: nada se borra de golpe.
 - Plantillas de correo y de Word por tipo de asunto, con huecos que se rellenan solos; textos del
   centro en `plantillas/` (botón en Mantenimiento). Salen con membrete, la firma de quien ocupaba
   el cargo en su fecha y «el/la alumno/a» en masculino o femenino según el sexo de cada persona.
@@ -106,20 +106,18 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   {{ESPECIALIDAD}} y {{TABLA TUTORIAS}}; lo que falta, en amarillo. Certificado de función tutorial
   como el del centro (tipo DESEMPEÑO FUNCIÓN TUTORIAL, campo «Cursos que pide»). Renuncia a la
   Junta Electoral, en su hito.
-- Copias diarias (caducan a los 90 días, configurable), detección de fichero roto, fusión de
-  conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un borrado (tipo, estado,
+- Copias diarias (caducan a los 90 días), detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un borrado (tipo, estado,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
-- Pruebas automáticas en GitHub Actions en cada subida. Escape y salida en toda pantalla.
+- Pruebas automáticas en cada subida. Escape y salida en toda pantalla.
 - Copia sin internet (`file://`): se actualiza sola; si no puede, o no puede comprobarlo, franja fija arriba; mira cada 30 min.
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo, responsable,
   bifurcaciones, historial y "lo que hay que reunir". Cada hito se abre a pantalla completa (la mesa):
   guion (con preguntas: un botón por respuesta) que se marca solo al generar, registrar, comunicar o añadir; documentos en tabla con sus
-  gemelos y selección de varios; plantillas y formularios; comunicar con destinatarios; notas.
+  gemelos y selección de varios; plantillas y formularios («Buscar otra plantilla…»: cualquiera); comunicar con destinatarios; notas.
   Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa.
   Biblioteca de hitos del centro, con guion. Botones en Mantenimiento para cargar los tipos y guías
   del instituto y traer los guiones (y las líneas nuevas del instituto a un guion ya escrito).
-- "Qué me toca": hitos pendientes, filtro por responsable, bloque "Dormidos" (sin novedades en N
-  días). "Cuentas": asuntos por tipo, mes y quién los pidió. "Formularios": catálogo buscable de
+- "Qué me toca": hitos pendientes, filtro por responsable, "Dormidos" (sin novedades en N días). "Cuentas": asuntos por tipo, mes y quién los pidió. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena en el PDF solo los datos del centro.
 - Avisos de "fichas sin carpeta" (✕ calla 7 días) y de papelera vieja.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".

@@ -5,6 +5,34 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 126: un tipo que cambia de nombre se lleva todo lo suyo
+
+`docs/TIPO-QUE-CAMBIA-DE-NOMBRE.md`. Caso real: «Cargar la biblioteca del centro» renombró DESEMPEÑO
+FUNCIÓN TUTORIAL al nombre largo (fila 123) y su guía se quedó bajo el nombre corto, así que la mesa
+del hito dejó de enseñar la plantilla. `App.renombrarTipo` tenía el mismo hueco.
+
+- `js/tipos-nombre.js`: `TiposNombre.mover` para los dos caminos, y un arreglo al entrar que junta con
+  su tipo lo que siga bajo el nombre corto o un alias. Plantillas casan por cualquiera de los nombres.
+- Decisión: el arreglo al entrar solo se dispara por la guía, los campos o los recurrentes. Las
+  plantillas del centro llevan el nombre corto en `indice.json`; si también dispararan el arreglo, la
+  carga las devolvería al nombre corto y el arreglo al largo, en cada entrada. Como ya casan por
+  cualquier nombre, no hace falta.
+- La carga de plantillas no duplica (mismo nombre y fichero con otro tipo: se le cambia el tipo, salvo
+  que sea el mismo tipo con otro nombre) y quita las repetidas; la del centro de Francisco, repetida
+  desde la fila 110 con CERTIFICADO PERSONAL, se va a la papelera al entrar.
+- «Buscar otra plantilla…» en la mesa del hito y en el cuadro de «Generar documento»
+  (`js/plantilla-buscar.js`).
+- Ficheros partidos: `App.renombrarTipo` sale de `js/ajustes.js` (583 → 510 líneas) y «Cargar las
+  plantillas del centro», de `js/plantillas-documento.js` (730 → 624) a `js/plantillas-centro.js`.
+  No se han partido `js/plantillas.js` (solo dos funciones de una línea tocadas; varias pruebas lo
+  cargan solo, sin navegador) ni `js/recurrentes.js` (no se toca: el recurrente se cambia en el disco
+  y se relee con `Recurrentes._cargar`). Siguen pasando de 400 líneas: queda para otra fila.
+- La guía y los campos que sobran al juntar van a la papelera con clases nuevas (`guia`,
+  `campos-de-tipo`) que la papelera no sabe devolver sola: si hiciera falta, se copian a mano.
+- Versión `App.VERSION`: `24-sep-2026 · 13:37`.
+
+---
+
 ## 24-sep-2026 — Fila 125: Personas, matriculados primero, buscar por la familia y hermanos
 
 `docs/BUSCAR-PERSONAS-Y-FAMILIAS.md`. En secretaría llama la madre y hay que saber de quién es;

@@ -285,82 +285,9 @@ App.pintarAvisoSimple = function (idCampo, idAviso, idBoton, listaDeNombres) {
 
 $('nuevo-tipo').oninput = App.pintarAvisoNuevoTipo;
 
-/* ---------- cambiarle el nombre a un tipo de asunto ----------
-
-   Los asuntos ABIERTOS se renombran: son pocos y es el trabajo vivo.
-
-   El ARCHIVO no se toca. Renombrar allí obligaría a copiar y borrar
-   carpeta por carpeta, con Dropbox resincronizando de fondo, y el
-   nombre de una carpeta archivada es el rastro de lo que se hizo aquel
-   día. En su lugar, el nombre viejo se guarda como alias del tipo: las
-   carpetas antiguas se siguen reconociendo y se enseñan con el nombre
-   nuevo, sin mover un solo fichero. */
-App.renombrarTipo = async function (tipo) {
-  var ok = await U.preguntar('Cambiar el nombre del tipo',
-    '<label class="etiqueta">Nombre nuevo</label>' +
-    '<input id="tipo-nuevo-nombre" class="campo" value="' + U.escapar(tipo.tipo) + '">' +
-    '<p class="nota">Se cambiará en los asuntos abiertos que lo usen. ' +
-    'Las carpetas del archivo no se tocan: se seguirán llamando como se llaman, ' +
-    'y el buscador las encontrará igual.</p>', 'Cambiar');
-  if (!ok) return;
-
-  var nombreNuevo = U.limpiarNombre($('tipo-nuevo-nombre').value).toUpperCase();
-  if (!nombreNuevo || nombreNuevo === tipo.tipo) return;
-
-  var repetido = App.E.tipos.some(function (t) {
-    return t !== tipo && U.normalizar(t.tipo) === U.normalizar(nombreNuevo);
-  });
-  if (repetido) { U.aviso('Ya hay otro tipo con ese nombre.', 'malo'); return; }
-
-  var nombreViejo = tipo.tipo;
-  var afectadas = App.E.listaAbiertos.filter(function (a) {
-    return a.leido.reconocido && a.leido.tipo === nombreViejo;
-  });
-
-  var cambiadas = 0, fallos = [];
-  for (var i = 0; i < afectadas.length; i++) {
-    var a = afectadas[i];
-    var nombreCarpeta = a.nombre.replace(a.nombre.slice(7, 7 + nombreViejo.length), nombreNuevo);
-    try {
-      await Carpetas.renombrar(App.E.abiertos, a.nombre, nombreCarpeta);
-      var ficha = App.E.registro.asuntos[a.nombre];
-      if (ficha) {
-        ficha.tipo = nombreNuevo;
-        await App.anotar(nombreCarpeta, ficha);
-      }
-      cambiadas++;
-    } catch (e) {
-      fallos.push(a.nombre + ': ' + U.mensajeDeError(e));
-    }
-  }
-
-  tipo.alias = tipo.alias || [];
-  if (tipo.alias.indexOf(nombreViejo) === -1) tipo.alias.push(nombreViejo);
-  tipo.tipo = nombreNuevo;
-
-  /* 20-sep-2026, fila 79, apartado 9: sin esto, App.fusionarConDisco
-     veía el nombre viejo como algo que el otro ordenador tiene de más
-     y lo devolvía a la vida como tipo fantasma en cuanto alguien
-     guardara cualquier otra cosa (mismo mecanismo de la fila 77). Se
-     revive el nombre nuevo por si alguna vez se borró él mismo: si no,
-     renombrar a un nombre que se borró en el pasado lo haría
-     desaparecer al guardar. */
-  await Borrados.marcar(App.E.gestor, 'tipos', nombreViejo);
-  await Borrados.revivir(App.E.gestor, 'tipos', nombreNuevo);
-  await App.guardarTipos();
-
-  await App.verAbiertos();
-  App.pintarAjustes();
-  if (App.E.tipoAjustesActual === tipo && typeof App.pintarTipoDeAsunto === 'function') {
-    App.pintarTipoDeAsunto();
-  }
-
-  if (fallos.length) {
-    U.aviso('Cambiadas ' + cambiadas + ' carpetas. ' + fallos.length + ' no se han podido.', 'malo');
-  } else {
-    U.aviso('Tipo renombrado. Carpetas abiertas cambiadas: ' + cambiadas + '.', 'bueno');
-  }
-};
+/* Cambiarle el nombre a un tipo de asunto (`App.renombrarTipo`) vive en
+   js/tipos-nombre.js desde la fila 126: se lleva también su guía, sus
+   campos, sus plantillas y sus recurrentes. */
 
 /* La tarjeta de un tipo, en la rejilla. `mostrarCategoria` es para los
    resultados del buscador (A3), que mezcla las cuatro categorías.
