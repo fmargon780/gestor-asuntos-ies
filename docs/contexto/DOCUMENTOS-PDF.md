@@ -145,7 +145,9 @@ de la Consejería escrito dentro.
   el hueco se queda vacío y sale en "faltan", como cualquier otro dato que no haya.
 - **El membrete**: la imagen (PNG/JPG) se sube una vez en **Ajustes → El centro → Membrete**, tal
   cual, a `_GESTOR/PLANTILLAS/membrete.png` (la única vez que la aplicación escribe en esa
-  carpeta). El nombre de la Consejería (`consejeria`, clave de raíz de `plantillas.json`) se
+  carpeta). Es un FICHERO: se pregunta por él con `Carpetas.existeFichero`, nunca con
+  `Carpetas.existe`, que busca una carpeta (fila 127: por eso Ajustes decía que no había imagen y los
+  documentos salían con `{{MEMBRETE}}` escrito; `pruebas/membrete-se-encuentra.mjs`). El nombre de la Consejería (`consejeria`, clave de raíz de `plantillas.json`) se
   escribe ENCIMA al generar, nunca dentro de la imagen guardada: cuando cambie de nombre, basta con
   corregir el texto. `membreteCaja` (`{ x, y, ancho, alto }`, en % del ancho/alto de la imagen; por
   defecto `{10.3, 43.2, 20.7, 10.0}`) dice dónde. `js/membrete.js` (`window.Membrete`):
