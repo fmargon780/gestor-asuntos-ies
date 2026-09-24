@@ -68,9 +68,11 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 - Categoría → tipo → tercero → nombre de carpeta, con vista previa. El nombre corto del tipo, en carpeta, filtros y tarjeta.
 - El asunto se coloca solo en «Pendiente de Administración» o «Pendiente de terceros» según su hito abierto (sin hitos, por su estado); quién es Administración se marca en Ajustes. Vía preferente y fecha límite.
-- Asuntos recurrentes, con aviso y alta a mano.
+- Asuntos recurrentes, con aviso.
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
   sueltas también en documentos, registro de Séneca, ficha y notas.
+- Personas (Alumnado): matriculados primero, antiguos plegados; busca por padre, madre o tutor;
+  hermanos en la ficha, que sigue al bajar.
 - Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
   Al cambiar el tipo, ofrece la guía del nuevo.
 - Nombre comercial de empresas, aparte de la razón social; cambiar los datos de un tercero dado
@@ -78,26 +80,25 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Guías del procedimiento por tipo, con preguntas dentro de las respuestas sin límite, y su mapa
   (dibujo de la guía entera; en un asunto, con el camino elegido resaltado). Se escriben en
   acordeón: un paso abierto a la vez.
-- Panel lateral de lectura, y tablón de notas rápidas siempre visible.
+- Panel lateral de lectura, y tablón de notas siempre visible.
 - Correo y mensaje de Séneca: el mensaje se prepara; el correo de un asunto se envía de
   verdad, con Apps Script y confirmación.
 - "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; con
   tercero reconocido, también sugiere meterlo en uno que ya existe («Meter aquí»). Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
-- Aspirantes sin Nº escolar: al escribirlo, se renombran sus carpetas.
-- Botón «Ruta» en la ficha: copia la ruta de la carpeta.
-- Ficha del tercero con "Datos y contacto" en una línea, con copiar; «Ver todo» del alumno en
+- Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas.
+- Botón «Ruta» (copia la ruta de la carpeta). Ficha del tercero con "Datos y contacto" en una línea, con copiar; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
 - Registrar un documento detecta el PDF ya sellado, lo renombra y guarda el original como
   "SIN SELLAR"; cada documento se puede asociar a un hito.
 - Terceros relacionados con un asunto, con altas por grupo (unidad, nivel, grupo propio), que
   también sirven de destinatarios de un correo o de un mensaje de Séneca.
-- Parada al crear un asunto duplicado, y pantalla propia "Duplicados".
+- Parada al crear un duplicado, y pantalla "Duplicados".
 - Ajustes con tres pestañas y pantalla propia de cada tipo; todo plegado, con resumen en cada título; los avisos de fallo, solo con fallo.
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
-- Papelera: nada se borra del todo a la primera.
+- Papelera: nada se borra a la primera.
 - Plantillas de correo y de Word por tipo de asunto, con huecos que se rellenan solos; textos del
   centro en `plantillas/` (botón en Mantenimiento). Salen con membrete, la firma de quien ocupaba
   el cargo en su fecha y «el/la alumno/a» en masculino o femenino según el sexo de cada persona.
@@ -122,15 +123,14 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   impresos; "Preparar para el tercero" rellena en el PDF solo los datos del centro.
 - Avisos de "fichas sin carpeta" (✕ calla 7 días) y de papelera vieja.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
-- Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF, en la carpeta del asunto y en Por
-  clasificar; Ajustar tamaño deja libre la banda del sello de Séneca y de la firma del director.
-- "Lo pide": quién pidió la gestión, por qué vía y cuándo; su correo sale ya en el cuadro de Correo.
+- Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF (carpeta del asunto y Por clasificar); Ajustar tamaño deja libre la banda del sello de Séneca y de la firma.
+- "Lo pide": quién pidió la gestión, por qué vía y cuándo; su correo sale en el cuadro de Correo.
 - Archivar o reabrir sobre un destino que ya existe fusiona carpetas; errores en castellano; reintenta si Dropbox tropieza.
 - Crear, reabrir o editar deja en la ficha del asunto; Volver regresa a la pantalla de origen, a su altura; lo demás, aviso con «Ir al asunto».
 - Al archivar, la ficha del asunto baja a su propia carpeta (no se queda en `asuntos.json` para
   siempre); al reabrir, vuelve. Botón "Poner en orden las fichas del ARCHIVO" en Ajustes →
   Mantenimiento para los archivados de antes.
-- Ficha del asunto: foto del contacto del tercero, que sigue aunque salga del CSV. Cabecera fija al bajar.
+- Ficha del asunto: foto del contacto del tercero, aunque salga del CSV. Cabecera fija al bajar.
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -174,7 +174,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: membrete, Consejería, cargos y Provincia.
 - Importar los usuarios IdEA del alumnado, cuando reactiven a Francisco el perfil de Gestor de PASEN.
-- Mantenimiento: "Poner en orden las fichas del ARCHIVO"; y, por la renuncia a la Junta Electoral, «Cargar las plantillas del centro» y «Traer los guiones del instituto».
+- Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar las plantillas del centro» y «Traer los guiones del instituto».
 - Antes de junio de 2027: "Guardar el contacto de los asuntos abiertos" (Mantenimiento).
 - Decisión: ¿la papelera se vacía sola a los N días? Sin decidir, solo el aviso más insistente.
 - Antes de publicar algo importante, repasar `docs/COMPROBAR-A-MANO.md`.

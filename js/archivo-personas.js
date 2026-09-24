@@ -174,22 +174,30 @@ App.buscarPersonas = function () {
   if (!App.personasCargadas) return;
   var texto = $('buscar-personas').value;
   var caja = $('lista-personas');
-  var lista = U.normalizar(texto).length >= 2
-    ? Datos.buscar(App.personasCargadas.lista, texto, 60)
-    : App.personasCargadas.lista.slice(0, 60);
   caja.innerHTML = '';
-  if (!lista.length) {
-    caja.innerHTML = '<div class="vacio">Nada que mostrar.</div>';
-  }
-  lista.forEach(function (p) {
+  function tarjeta(p) {
     var d = document.createElement('div');
     d.className = App.claseDeResultado(p);
+    if (window.PersonasFamilias) PersonasFamilias.marcarTarjeta(d, p);   /* fila 125 */
     if (p.id) d.dataset.nie = p.id;
     d.innerHTML = '<div>' + U.escapar(p.nombre) + '</div>' +
                   '<div class="resultado-pie">' + U.escapar(App.pieDe(p)) + '</div>';
     d.onclick = function () { App.verFicha(p); };
-    caja.appendChild(d);
-  });
+    return d;
+  }
+  /* Fila 125: en Alumnado, familias arriba, matriculados y aspirantes, y
+     los antiguos plegados (js/personas-familias.js). */
+  if ($('filtro-personas').value === 'ALUMNADO' && window.PersonasFamilias) {
+    if (!PersonasFamilias.pintar(caja, App.personasCargadas, texto, tarjeta, function (h) { App.verFicha(h); })) {
+      caja.innerHTML = '<div class="vacio">Nada que mostrar.</div>';
+    }
+  } else {
+    var lista = U.normalizar(texto).length >= 2
+      ? Datos.buscar(App.personasCargadas.lista, texto, 60)
+      : App.personasCargadas.lista.slice(0, 60);
+    if (!lista.length) caja.innerHTML = '<div class="vacio">Nada que mostrar.</div>';
+    lista.forEach(function (p) { caja.appendChild(tarjeta(p)); });
+  }
   var b = document.createElement('button');
   b.className = 'boton';
   b.textContent = $('filtro-personas').value === 'ALUMNADO'
@@ -206,6 +214,7 @@ App.altaDesdePersonas = async function () {
 
 App.verFicha = function (p) {
   var caja = $('ficha-persona');
+  if (window.PersonasFamilias) PersonasFamilias.marcarVista(p);   /* fila 125 */
 
   function pintarFilas(filas) {
     return filas.map(function (f) {
@@ -221,7 +230,9 @@ App.verFicha = function (p) {
        matriculado, el grupo y los datos de contacto de los tutores
        legales. El resto del fichero de Séneca sigue estando, más abajo. */
     var d = Datos.destacadosAlumno(p);
-    html += pintarFilas(d.destacados);
+    /* «Hermanos en el centro», justo después de «Curso» (fila 125). */
+    html += window.PersonasFamilias
+      ? PersonasFamilias.filasConHermanos(d.destacados, p, pintarFilas) : pintarFilas(d.destacados);
     if (d.resto.length) {
       html += '<p class="nota"><button type="button" class="enlace" id="ver-resto">' +
               'Ver los demás datos del fichero (' + d.resto.length + ')</button></p>' +
@@ -254,6 +265,7 @@ App.verFicha = function (p) {
     };
   }
   $('ver-sus-asuntos').onclick = function () { App.verAsuntosDeTercero(p); };
+  if (window.PersonasFamilias) PersonasFamilias.engancharHermanos(caja);
 
   /* Y, si es de los que se dieron de alta a mano, el botón de cambiar
      sus datos. */

@@ -467,3 +467,32 @@ para ALUMNADO. Personal y el resto de terceros no cambian.
   Nombre»); `sexo` (M/H/vacío) e `iniciales` son campos nuevos, sin cambiar los que ya había.
 
 Se comprueba en `pruebas/ficha-tercero.mjs` (escenario 9, el caso real de las ocho columnas).
+
+### Matriculados primero, familias y hermanos (24-sep-2026, fila 125, `docs/BUSCAR-PERSONAS-Y-FAMILIAS.md`)
+
+En Personas y empresas, categoría ALUMNADO (`js/personas-familias.js`, `window.PersonasFamilias`,
+llamado desde `App.buscarPersonas` y `App.verFicha` de `js/archivo-personas.js`, sin envolver nada):
+
+- **La lista en bloques** (`PersonasFamilias.pintar` / `resultados`): arriba «Familias (N)» si algún
+  tutor casa; luego los matriculados de este curso y los aspirantes (`p.matriculado || p.solicitante`);
+  debajo, `<details class="personas-antiguos">` «Antiguos (N)», plegado (abierto si no hay nada más;
+  si se abre a mano, se recuerda mientras la página siga abierta). El tope de 60 de `Datos.buscar` va
+  por bloque; N es el total de antiguos. Las demás categorías, como siempre.
+- **El índice de tutores** (`indice(lista)`, guardado como `_familias` en la propia lista de
+  `Datos.cargar`, así que se rehace solo con `Datos.olvidar`): de cada alumno **matriculado**, sus
+  tutores de `Datos.tutoresDe`, unidos por DNI sin espacios, puntos ni guiones (sin DNI, por nombre
+  entero normalizado), con sus hijos matriculados y su etiqueta («Tutora 1»…, la de
+  `FichaTerceroAlumno.etiquetaDeTutor`). `porAlumno` da los tutores de cada alumno.
+- **Buscar por la familia** (`buscarFamilias`): desde 3 caracteres; un tutor casa si su nombre, DNI,
+  teléfonos y correos tienen todas las palabras, o si lo escrito, sin espacios ni puntos, está en su
+  DNI o teléfono compactos. Tarjeta `.familia-tarjeta`: nombre, etiqueta, DNI · teléfonos · correos,
+  y un botón por hijo (nombre, grupo · curso) que abre su ficha.
+- **Hermanos en el centro** (`hermanosDe`, `filasConHermanos`): en la ficha del alumno, detrás de
+  «Curso» (o de la última fila de matrícula), los matriculados que comparten un tutor, sin él;
+  pulsables. Sin hermanos, la fila no sale.
+- **La ficha acompaña** (`css/personas.css`): `#ficha-persona` es `position: sticky` bajo
+  `--cabecera-fija-alto`, con su propia barra; en pantallas estrechas, normal. La tarjeta de quien se
+  está viendo lleva `.resultado-elegido` (`marcarTarjeta`/`marcarVista`, por `data-persona` =
+  categoría + Nº o nombre), en todas las categorías.
+
+Se comprueba con `pruebas/personas-familias.mjs` (sin navegador).

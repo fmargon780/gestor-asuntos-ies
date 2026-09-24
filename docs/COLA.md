@@ -107,13 +107,14 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 75 y 77 a 124 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 75 y 77 a 125 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 125 | `docs/BUSCAR-PERSONAS-Y-FAMILIAS.md` (Personas y empresas: matriculados primero y antiguos plegados, buscar por padre/madre/tutor legal con sus hijos, ficha fija al bajar y hermanos en el centro) | EN CURSO (24-sep-2026) |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 125 está HECHA** (24-sep-2026): `docs/BUSCAR-PERSONAS-Y-FAMILIAS.md`. Personas y empresas → Alumnado: bloque «Familias» arriba al buscar un padre, madre o tutor legal (nombre, apellidos, DNI, teléfono o correo; una tarjeta por tutor con sus hijos matriculados), luego los de este curso y aspirantes, y «Antiguos (N)» plegado; la ficha se queda a la vista al bajar y la tarjeta vista, marcada; en la ficha del alumno, «Hermanos en el centro». `js/personas-familias.js`, `css/personas.css`, prueba `pruebas/personas-familias.mjs`. Versión `App.VERSION`: `24-sep-2026 · 13:14`.
 
 **La fila 124 está HECHA** (24-sep-2026): `docs/RENUNCIA-JUNTA-ELECTORAL.md`. Plantilla «Renuncia a formar parte de la Junta Electoral» (OTROS · ELECCIONES CONSEJO ESCOLAR, una hoja A4, datos de quien renuncia en blanco), con `id` fijo `pd-centro-renuncia-junta-electoral`, unida al hito `b260` «Constituir la Junta Electoral», cuyo guion gana «Recoger las renuncias y avisar al suplente que corresponda» (generar). «Traer los guiones del instituto» ahora añade a un guion ya escrito las líneas nuevas del centro que le falten. Falta que Francisco pulse «Cargar las plantillas del centro» y «Traer los guiones del instituto» en Mantenimiento. Versión `App.VERSION`: `24-sep-2026 · 12:58`.
 
