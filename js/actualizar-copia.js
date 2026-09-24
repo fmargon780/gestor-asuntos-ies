@@ -49,8 +49,15 @@
         ventana: no se vuelve a recargar, se olvida la carpeta
         guardada y la franja lo dice.
      5. Sin internet, con el repositorio caído o con cualquier otro
-        fallo al leer la versión remota: un aviso discreto de una
-        línea (`U.aviso`, se borra solo) y nada más.
+        fallo al leer la versión remota: desde la fila 121
+        (docs/AVISO-DE-VERSION-SEGURO.md), la franja de arriba, fija
+        («No he podido comprobar si hay una versión nueva…»), con el
+        botón «Cómo actualizar a mano». Antes era un aviso de una línea
+        que se borraba solo y nadie veía. Cerrada, no vuelve a salir en
+        esa ventana.
+     6. Con la aplicación abierta, se vuelve a comprobar cada 30
+        minutos (fila 121). Esa vuelta nunca recarga la página: si hay
+        versión nueva, solo la franja con «Actualizar ahora».
    ============================================================ */
 (function () {
   if (location.protocol !== 'file:') return;
@@ -173,8 +180,44 @@
 
   /* ---------- avisos ---------- */
 
-  function avisoDiscreto(texto) {
-    if (window.U && typeof U.aviso === 'function') U.aviso(texto, 'ambar');
+  /* Fila 121: si no se ha podido comprobar, la franja fija, con los
+     pasos para actualizar a mano. Cerrada, no vuelve en esta ventana. */
+  var sinComprobarCerrada = false;
+  var PASOS_A_MANO =
+    '<ol style="margin:6px 0 0 18px;padding:0">' +
+    '<li>En Chrome, abre <strong>https://raw.githubusercontent.com/fmargon780/gestor-asuntos-copia/main/ABRIR%20EL%20GESTOR.html</strong>.</li>' +
+    '<li>Clic derecho → <strong>Guardar como…</strong>, encima del <strong>ABRIR EL GESTOR.html</strong> que ya tienes, sin cambiarle el nombre.</li>' +
+    '<li>Doble clic en ese fichero; si pide carpeta, elige esa misma.</li>' +
+    '</ol>' +
+    '<div>Si la dirección no carga, esta red la bloquea: hazlo desde otra (por ejemplo, desde casa).</div>';
+
+  function franjaSinComprobar() {
+    if (sinComprobarCerrada) return;
+    var texto = document.createElement('strong');
+    texto.textContent = (window.App && App.VERSION) || '';
+    franja(null, null, 'No he podido comprobar si hay una versión nueva (esta copia tiene la ' + texto.outerHTML + ').');
+    var caja = $('franja-copia');
+    if (!caja) return;
+    caja.dataset.clase = 'sin-comprobar';
+    var boton = document.createElement('button');
+    boton.type = 'button';
+    boton.id = 'franja-copia-a-mano';
+    boton.className = 'boton';
+    boton.textContent = 'Cómo actualizar a mano';
+    var pasos = document.createElement('div');
+    pasos.id = 'franja-copia-pasos';
+    pasos.style.cssText = 'flex-basis:100%;display:none';
+    pasos.innerHTML = PASOS_A_MANO;
+    boton.onclick = function () { pasos.style.display = pasos.style.display === 'none' ? 'block' : 'none'; };
+    caja.insertBefore(boton, $('franja-copia-detalle'));
+    caja.appendChild(pasos);
+    var cerrar = $('franja-copia-cerrar');
+    if (cerrar) cerrar.onclick = function () { sinComprobarCerrada = true; caja.remove(); };
+  }
+
+  function quitarFranjaSinComprobar() {
+    var caja = $('franja-copia');
+    if (caja && caja.dataset.clase === 'sin-comprobar') caja.remove();
   }
 
   /* La franja de arriba del todo, a todo el ancho. Se cuelga directo
@@ -283,12 +326,19 @@
 
   /* ---------- el conjunto ---------- */
 
-  async function comprobar() {
+  /* `enMarcha` (fila 121): la vuelta de cada 30 minutos, con la
+     aplicación abierta. Nunca recarga la página. */
+  async function comprobar(enMarcha) {
     var remoto;
     try {
       remoto = await leerVersionRemota();
     } catch (e) {
-      avisoDiscreto('No se ha podido comprobar si hay una versión nueva.');
+      franjaSinComprobar();
+      return;
+    }
+    quitarFranjaSinComprobar();
+    if (enMarcha === true) {
+      if (remoto.version !== App.VERSION && !$('franja-copia')) franja(remoto, await obtenerCarpeta(), null);
       return;
     }
 
@@ -323,9 +373,11 @@
     }
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', comprobar);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { comprobar(); });
   else comprobar();
+  setInterval(function () { comprobar(true); }, 30 * 60 * 1000);   /* fila 121 */
 
   /* Para la prueba de actualización (pruebas/), sin tocar nada más. */
-  window.ActualizarCopia = { comprobar: comprobar, _BASE_REMOTO: BASE_REMOTO };
+  window.ActualizarCopia = { comprobar: comprobar, _BASE_REMOTO: BASE_REMOTO,
+    _cambiarBase: function (b) { BASE_REMOTO = b; } };
 })();

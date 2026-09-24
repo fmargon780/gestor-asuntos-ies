@@ -107,12 +107,14 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-**Ninguna fila PENDIENTE.** Las filas 1 a 75 y 77 a 120 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+**Ninguna fila PENDIENTE.** Las filas 1 a 75 y 77 a 121 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 121 está HECHA** (24-sep-2026): `docs/AVISO-DE-VERSION-SEGURO.md`. Si la copia sin internet no puede comprobar si hay versión nueva, franja fija arriba con «Cómo actualizar a mano», en vez del aviso que se borraba solo; con la aplicación abierta, vuelve a mirar cada 30 minutos, sin recargar nunca. Versión `App.VERSION`: `24-sep-2026 · 11:23`.
 
 **24-sep-2026, cupo de Vercel agotado:** al abrir el pull request de las filas 117 y 118 (hacia las 09:58), Vercel respondió «Resource is limited - try again in 24 hours (more than 100, code: "api-deployments-free-per-day")». Las filas 117 a 120 están fusionadas en `main`, pero puede que la web no las publique hasta que el cupo se libere. La próxima sesión: comprobar con `curl` (`js/version.js?v=<algo>`) que `App.VERSION` es `24-sep-2026 · 10:44` o posterior; si sigue atrás pasadas 24 horas, un commit nuevo en `main` (o `create_deployment` con `withLatestCommit`, regla 19) publica todo lo pendiente. Esta sesión no tiene salida a `vercel.app` ni permiso en el conector de Vercel (403), así que no ha podido comprobarlo.
 

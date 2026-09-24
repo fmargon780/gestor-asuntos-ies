@@ -107,7 +107,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en GitHub Actions en cada subida.
 - Escape y salida en toda pantalla.
-- Copia sin internet (`file://`): "copia sin internet" a la vista, se actualiza sola; si no puede, franja arriba con «Actualizar ahora».
+- Copia sin internet (`file://`): se actualiza sola; si no puede, o no puede comprobarlo, franja fija arriba; mira cada 30 min.
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo, responsable,
   bifurcaciones, historial y "lo que hay que reunir". Cada hito se abre a pantalla completa (la mesa):
   guion (con preguntas: un botón por respuesta) que se marca solo al generar, registrar, comunicar o añadir; documentos en tabla con sus
