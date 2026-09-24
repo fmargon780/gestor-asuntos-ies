@@ -270,7 +270,7 @@ var Papelera = (function () {
         ofrecerSuelto: true
       };
     }
-    if (await Carpetas.existe(sitio.handle, ficha.nombre)) {
+    if (await Carpetas.existeFichero(sitio.handle, ficha.nombre)) {
       return { ok: false, motivo: 'Ya hay un documento llamado "' + ficha.nombre + '" en esa carpeta.' };
     }
     var pap = await carpetaPapelera();
@@ -290,7 +290,7 @@ var Papelera = (function () {
   /* Cuando el asunto de un documento ya no existe: se ofrece llevarlo
      a "Por clasificar" en vez de a su asunto. */
   async function devolverDocumentoComoSuelto(ficha) {
-    if (await Carpetas.existe(App.E.abiertos, ficha.nombre)) {
+    if (await Carpetas.existeFichero(App.E.abiertos, ficha.nombre)) {
       return { ok: false, motivo: 'Ya hay algo llamado "' + ficha.nombre + '" en Por clasificar.' };
     }
     var pap = await carpetaPapelera();
@@ -302,7 +302,7 @@ var Papelera = (function () {
   }
 
   async function devolverSuelto(ficha) {
-    if (await Carpetas.existe(App.E.abiertos, ficha.nombre)) {
+    if (await Carpetas.existeFichero(App.E.abiertos, ficha.nombre)) {
       return { ok: false, motivo: 'Ya hay algo llamado "' + ficha.nombre + '" en Por clasificar.' };
     }
     var pap = await carpetaPapelera();

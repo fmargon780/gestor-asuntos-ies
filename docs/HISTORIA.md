@@ -5,6 +5,23 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 127: el membrete se guardaba pero nunca se encontraba
+
+`docs/MEMBRETE-NO-SE-ENCUENTRA.md`. `js/membrete.js` preguntaba por `membrete.png` con
+`Carpetas.existe`, que busca una CARPETA: siempre «no hay imagen», y los documentos salían con
+`{{MEMBRETE}}` escrito. Tres llamadas pasan a `Carpetas.existeFichero`; la imagen que Francisco ya
+subió está bien guardada y vale sin volver a subirla.
+
+- Buscando más casos iguales salieron tres en `js/papelera.js` (devolver un documento a su asunto,
+  un documento a «Por clasificar» y un suelto): comprobaban si ya había «algo con ese nombre» como
+  carpeta, así que un documento devuelto podía pisar a otro que se llamara igual. También pasan a
+  `existeFichero`. Las demás llamadas son de carpetas de asunto y están bien.
+- `pruebas/membrete.mjs` solo probaba `Membrete.medir`: por eso no lo cazó. Prueba nueva
+  `pruebas/membrete-se-encuentra.mjs`, con `js/carpetas.js` de verdad; falla sin el arreglo.
+- Versión `App.VERSION`: `24-sep-2026 · 14:04`.
+
+---
+
 ## 24-sep-2026 — Fila 126: un tipo que cambia de nombre se lleva todo lo suyo
 
 `docs/TIPO-QUE-CAMBIA-DE-NOMBRE.md`. Caso real: «Cargar la biblioteca del centro» renombró DESEMPEÑO

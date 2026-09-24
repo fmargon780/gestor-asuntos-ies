@@ -113,7 +113,7 @@ var Membrete = (function () {
     if (!g || !window.Carpetas) return null;
     var carpetaPlantillas;
     try { carpetaPlantillas = await Carpetas.crear(g, 'PLANTILLAS'); } catch (e) { return null; }
-    if (!(await Carpetas.existe(carpetaPlantillas, 'membrete.png'))) return null;
+    if (!(await Carpetas.existeFichero(carpetaPlantillas, 'membrete.png'))) return null;
 
     var handle = await carpetaPlantillas.getFileHandle('membrete.png');
     var fichero = await handle.getFile();
@@ -139,7 +139,7 @@ var Membrete = (function () {
     if (!g || !window.Carpetas) return false;
     try {
       var carpetaPlantillas = await Carpetas.crear(g, 'PLANTILLAS');
-      return await Carpetas.existe(carpetaPlantillas, 'membrete.png');
+      return await Carpetas.existeFichero(carpetaPlantillas, 'membrete.png');
     } catch (e) { return false; }
   }
 
@@ -151,7 +151,7 @@ var Membrete = (function () {
     if (!g || !window.Carpetas) return null;
     try {
       var carpetaPlantillas = await Carpetas.crear(g, 'PLANTILLAS');
-      if (!(await Carpetas.existe(carpetaPlantillas, 'membrete.png'))) return null;
+      if (!(await Carpetas.existeFichero(carpetaPlantillas, 'membrete.png'))) return null;
       var handle = await carpetaPlantillas.getFileHandle('membrete.png');
       return await handle.getFile();
     } catch (e) { return null; }
