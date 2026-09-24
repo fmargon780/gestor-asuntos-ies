@@ -235,6 +235,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/guias-mapa.mjs` | Prueba (sin navegador, fila 113, 24-sep-2026): `GuiasMapa.html` con una guía de dos niveles de preguntas, sin y con hitos (camino resaltado, ramas en gris, «Fuera de la guía»), y `GuiasNiveles.caminoHasta` |
 | `pruebas/documentos-en-la-tarjeta.mjs` | Prueba (navegador de verdad, fila 114, 24-sep-2026): con 8 documentos, la tarjeta cerrada enseña como mucho 5 nombres y «y N más», sin la línea «8 documentos», sin renglones aplastados ni cortados, con `title`, y «y N más» abre la tarjeta |
 | `apps-script/gestor-correos.gs` | El script de Gmail: recoger correos, y, desde la fila 115, la aplicación web (`doPost`) que el navegador llama directamente para enviar de verdad (`enviarCorreo`, `hiloParaResponder`, `prepararEnvio`) |
+| `pruebas/preguntas-en-el-guion.mjs` | Prueba (sin navegador, fila 116, 24-sep-2026): preguntas en el guion de un hito — normalizar (un solo nivel), `guionDe` sin y con respuesta, cambiar de respuesta con líneas marcadas (plegadas), la cuenta y el marcado automático dentro de la respuesta elegida |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |
 | `docs/HISTORIA.md` | El diario, con fechas y el porqué de cada cosa |

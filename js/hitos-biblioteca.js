@@ -173,7 +173,7 @@ var HitosBiblioteca = (function () {
       normativa: (modelo.normativa || []).map(function (n) { return Object.assign({}, n); }),
       formularios: (modelo.formularios || []).slice(),
       plantillasDocumento: (modelo.plantillasDocumento || []).slice(),
-      guion: (modelo.guion || []).map(function (g) { return Object.assign({}, g); }),
+      guion: JSON.parse(JSON.stringify(modelo.guion || [])),   /* entero, con sus preguntas (fila 116) */
       origenBiblioteca: { id: modelo.id, revision: modelo.revision, divergido: false }
     };
   }
@@ -212,7 +212,9 @@ var HitosBiblioteca = (function () {
     }
     if (clave === 'guion') {
       var pasos = valor || [];
-      return pasos.length ? pasos.map(function (g) { return g.texto + (g.accion ? ' [' + g.accion + ']' : ''); }).join('; ') : '(vacío)';
+      if (!pasos.length) return '(vacío)';
+      return window.GuiasGuion ? GuiasGuion.textoLegible(pasos)
+        : pasos.map(function (g) { return g.texto + (g.accion ? ' [' + g.accion + ']' : ''); }).join('; ');
     }
     if (clave === 'normativa') {
       var refs = valor || [];

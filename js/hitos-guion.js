@@ -10,6 +10,8 @@
 
      guionHecho:  { <id>: { hecho, noaplica, quien, cuando } }
      guionPropio: [{ id, texto }]   (lo añadido solo a este asunto)
+     guionElegido: { <idPregunta>: <idOpcion> }   (fila 116: la respuesta
+                   a cada pregunta del guion, docs/PREGUNTAS-EN-EL-GUION.md)
 
    Un paso de guion que desaparece de la guía se deja de ver; su estado
    se queda guardado sin estorbar.
@@ -20,6 +22,12 @@
      Hitos.marcarGuion(clave, idHito, idPaso, { hecho?, noaplica? })
      Hitos.marcarGuionPorAccion(a, idHito, accion)  (el primer paso sin marcar con esa acción)
      Hitos.anadirGuionPropio(clave, idHito, texto)
+     Hitos.elegirEnGuion(clave, idHito, idPregunta, idOpcion)   (fila 116)
+
+   Con preguntas (fila 116), `guionDe` devuelve las líneas tal como se
+   ven: las normales, la pregunta (hecha si está respondida) y, detrás,
+   las de la respuesta elegida. Aparte, en `.plegadas`, las líneas ya
+   marcadas de una respuesta que se cambió.
 
    Se carga después de js/hitos-requisitos.js.
    ============================================================ */
@@ -54,21 +62,40 @@
      guardado en el hito. */
   function unir(guionDelPaso, hito) {
     var estado = (hito && hito.guionHecho) || {};
-    var lista = (guionDelPaso || []).map(function (g) {
-      return Object.assign({ propio: false }, g, estado[g.id] || {});
+    var elegido = (hito && hito.guionElegido) || {};
+    function linea(g, propio, deOpcion) {
+      var x = Object.assign({}, g, estado[g.id] || {});
+      return { id: g.id, texto: x.texto || '', explicacion: x.explicacion || '', accion: x.accion || '',
+               normativa: x.normativa || null, propio: !!propio, hecho: !!x.hecho,
+               noaplica: !!x.noaplica, quien: x.quien || '', cuando: x.cuando || '',
+               pregunta: false, deOpcion: deOpcion || null };
+    }
+    var lista = [], plegadas = [];
+    (guionDelPaso || []).forEach(function (g) {
+      if (!g.pregunta) { lista.push(linea(g, false)); return; }
+      var opciones = g.opciones || [];
+      var op = opciones.filter(function (o) { return o.id === elegido[g.id]; })[0] || null;
+      lista.push({ id: g.id, texto: g.texto || '', explicacion: g.explicacion || '', accion: '', normativa: null,
+                   propio: false, hecho: !!op, noaplica: false, quien: '', cuando: '', pregunta: true,
+                   elegida: op ? op.id : '', opciones: opciones.map(function (o) { return { id: o.id, texto: o.texto }; }),
+                   deOpcion: null });
+      opciones.forEach(function (o) {
+        (o.lineas || []).forEach(function (x) {
+          var l = linea(x, false, { pregunta: g.id, opcion: o.id, respuesta: o.texto || '' });
+          if (op && o.id === op.id) lista.push(l);
+          else if (l.hecho || l.noaplica) plegadas.push(l);
+        });
+      });
     });
     ((hito && hito.guionPropio) || []).forEach(function (g) {
-      lista.push(Object.assign({ explicacion: '', accion: '', normativa: null, propio: true }, g, estado[g.id] || {}));
+      lista.push(linea(Object.assign({ explicacion: '', accion: '', normativa: null }, g), true));
     });
-    return lista.map(function (g) {
-      return { id: g.id, texto: g.texto || '', explicacion: g.explicacion || '', accion: g.accion || '',
-               normativa: g.normativa || null, propio: !!g.propio, hecho: !!g.hecho,
-               noaplica: !!g.noaplica, quien: g.quien || '', cuando: g.cuando || '' };
-    });
+    lista.plegadas = plegadas;
+    return lista;
   }
 
   function guionDe(a, hito) {
-    if (!hito || hito.clase === 'decision') return [];
+    if (!hito || hito.clase === 'decision') { var vacia = []; vacia.plegadas = []; return vacia; }
     var paso = pasoDe(a, hito);
     return unir((paso && paso.guion) || [], hito);
   }
@@ -134,6 +161,15 @@
     }
   }
 
+  /* Fila 116: la respuesta a una pregunta del guion. Cambiarla no borra lo
+     marcado en la otra respuesta: se queda plegado (`guionDe().plegadas`). */
+  function elegirEnGuion(clave, idHito, idPregunta, idOpcion) {
+    return editarHito(clave, idHito, function (h) {
+      h.guionElegido = Object.assign({}, h.guionElegido || {});
+      if (idOpcion) h.guionElegido[idPregunta] = idOpcion; else delete h.guionElegido[idPregunta];
+    });
+  }
+
   function anadirGuionPropio(clave, idHito, texto) {
     texto = String(texto || '').trim();
     if (!texto) return Promise.resolve(null);
@@ -148,6 +184,7 @@
   Hitos.marcarGuion = marcarGuion;
   Hitos.marcarGuionPorAccion = marcarGuionPorAccion;
   Hitos.anadirGuionPropio = anadirGuionPropio;
+  Hitos.elegirEnGuion = elegirEnGuion;
   Hitos.pasoDeGuia = pasoDe;
   Hitos.ACCIONES_GUION = ACCIONES;
 })();

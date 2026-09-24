@@ -5,6 +5,23 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 116: preguntas dentro del guion de un hito
+
+`docs/PREGUNTAS-EN-EL-GUION.md`. Dentro de un mismo hito, lo que hay que hacer a menudo depende de
+una respuesta («¿Viene con toda la documentación?» → «Pedir que la complete»). Ahora una línea del
+guion puede ser pregunta, con un botón por respuesta y sus propias líneas. Detalle en
+`docs/contexto/HITO-MESA.md` («El guion»).
+
+- Se apuntó como fila 115, número que ya llevaba en curso la de enviar el correo desde el asunto;
+  pasó a la 116. Mientras esa fila estaba a medias, `main` tuvo pruebas en rojo: esta esperó a que
+  quedara en verde para subirse.
+- Decisión: un solo nivel; cambiar de respuesta no borra lo ya marcado de la otra, queda plegado al
+  final en gris; la pregunta cuenta como una línea (hecha al responder).
+- El marcado automático solo mira lo que se ve: nunca marca una línea de una respuesta no elegida.
+
+Prueba nueva `pruebas/preguntas-en-el-guion.mjs` (sin navegador). Batería completa en verde.
+Versión publicada `App.VERSION`: `VERSION_116`.
+
 ## 24-sep-2026 — Fila 114: los documentos en la tarjeta cerrada, legibles
 
 `docs/DOCUMENTOS-EN-LA-TARJETA.md`. En la tarjeta cerrada «Documentos de la carpeta» los nombres

@@ -110,7 +110,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Copia sin internet (`file://`): "copia sin internet" a la vista, se actualiza sola; si no puede, franja arriba con «Actualizar ahora».
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo, responsable,
   bifurcaciones, historial y "lo que hay que reunir". Cada hito se abre a pantalla completa (la mesa):
-  guion que se marca solo al generar, registrar, comunicar o añadir; documentos en tabla con sus
+  guion (con preguntas: un botón por respuesta) que se marca solo al generar, registrar, comunicar o añadir; documentos en tabla con sus
   gemelos y selección de varios; plantillas y formularios; comunicar con destinatarios; notas.
   Biblioteca de hitos del centro, con guion. Botones en Mantenimiento para cargar los tipos y guías
   del instituto y traer los guiones.
