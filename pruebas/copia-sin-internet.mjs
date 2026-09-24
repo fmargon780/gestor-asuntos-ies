@@ -498,12 +498,43 @@ const BASE = baseDe(servidor);
   await pagina.waitForTimeout(1500);
   await comprobarAsync('sin servidor: la copia arranca igual (la pantalla de entrada sale)', pagina.locator('#paso-carpetas').isVisible(), true);
   await comprobar('sin servidor: no se escribe nada', entorno.estado.escritos, []);
-  await comprobarAsync('sin servidor: aviso discreto de "no se ha podido comprobar"', pagina.evaluate(() => {
-    return Array.from(document.querySelectorAll('#mensajes .mensaje')).some((m) => m.textContent.toLowerCase().indexOf('no se ha podido comprobar') !== -1);
-  }), true);
-  await comprobarAsync('sin servidor: no sale la franja', hayFranja(pagina), false);
+  /* Fila 121 (docs/AVISO-DE-VERSION-SEGURO.md): la franja fija, no un aviso que se borra. */
+  await comprobarAsync('sin servidor: sale la franja fija de «no he podido comprobar»', pagina.locator('#franja-copia').textContent().then((t) =>
+    t.indexOf('No he podido comprobar si hay una versión nueva') !== -1), true);
+  await comprobarAsync('sin servidor: dice qué versión tiene esta copia', pagina.locator('#franja-copia').textContent().then((t) =>
+    t.indexOf(VERSION_LOCAL.version) !== -1), true);
+  await comprobarAsync('sin servidor: los pasos a mano, plegados', pagina.locator('#franja-copia-pasos').isVisible(), false);
+  await pagina.click('#franja-copia-a-mano');
+  await comprobarAsync('sin servidor: «Cómo actualizar a mano» enseña los pasos', pagina.locator('#franja-copia-pasos').textContent().then((t) =>
+    t.indexOf('ABRIR EL GESTOR.html') !== -1), true);
+  await pagina.waitForTimeout(5500);
+  await comprobarAsync('sin servidor: la franja sigue ahí pasados unos segundos', hayFranja(pagina), true);
+  await pagina.click('#franja-copia-cerrar');
+  await pagina.evaluate(() => window.ActualizarCopia.comprobar(true));
+  await pagina.waitForTimeout(300);
+  await comprobarAsync('sin servidor: cerrada, no vuelve a salir en esta ventana', hayFranja(pagina), false);
   await comprobar('sin servidor: ninguna excepción sin capturar', errores, []);
   await pagina.close();
+}
+
+/* ---------- fila 121: la vuelta de cada 30 minutos nunca recarga ---------- */
+{
+  const servidorAlDia = await arrancarServidor({ 'version.json': JSON.stringify(VERSION_LOCAL) });
+  const d = nuevaCopia('enmarcha');
+  const entorno = nuevoEntorno({ guardada: 'enmarcha', permiso: 'granted' });
+  const { pagina, errores, navegaciones } = await abrir(entorno, baseDe(servidorAlDia), d + '/index.html');
+  await pagina.waitForTimeout(1200);
+  await comprobarAsync('en marcha: al entrar, al día, sin franja', hayFranja(pagina), false);
+  /* Mientras está abierta, se publica una versión nueva. */
+  await pagina.evaluate((base) => { window.ActualizarCopia._cambiarBase && window.ActualizarCopia._cambiarBase(base); }, BASE);
+  await pagina.evaluate(() => window.ActualizarCopia.comprobar(true));
+  await pagina.waitForTimeout(800);
+  await comprobarAsync('en marcha: sale la franja con «Actualizar ahora»', pagina.locator('#franja-copia-actualizar').isVisible(), true);
+  await comprobar('en marcha: no se recarga la página', navegaciones(), 1);
+  await comprobar('en marcha: no escribe nada sola', entorno.estado.escritos, []);
+  await comprobar('en marcha: ninguna excepción', errores, []);
+  await pagina.close();
+  servidorAlDia.close();
 }
 
 /* ---------- ABRIR EL GESTOR.html sobre una copia vieja ya instalada ---------- */

@@ -5,6 +5,21 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 121: el aviso de versión nueva de la copia, que no se pierda
+
+`docs/AVISO-DE-VERSION-SEGURO.md`. La copia sin internet de Francisco se quedó en la versión de las
+07:35 con la de las 10:44 ya publicada, sin ningún aviso a la vista: cuando la copia no puede leer
+`version.json` de GitHub, solo salía un aviso de una línea que se borraba a los 4,5 segundos. Se
+puso al día a mano con `ABRIR EL GESTOR.html`.
+
+- Ahora, si no puede comprobarlo, la franja fija de arriba, con «Cómo actualizar a mano» (los
+  pasos de `docs/INSTALAR-COPIA.md`). Cerrada, no vuelve a salir en esa ventana.
+- Con la aplicación abierta, vuelve a mirar cada 30 minutos. Decisión: esa vuelta nunca se
+  actualiza ni recarga sola (se perdería lo que se está escribiendo): solo la franja con
+  «Actualizar ahora».
+
+Versión `App.VERSION`: `24-sep-2026 · 11:23`.
+
 ## 24-sep-2026 — Fila 120: el guion de la guía, desde el hito
 
 `docs/GUION-DESDE-EL-HITO.md`. Francisco quería completar las guías tramitando, sin irse a Ajustes.
