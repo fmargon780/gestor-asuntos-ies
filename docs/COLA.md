@@ -114,6 +114,15 @@ Las filas 1 a 75 y 77 a 129 están **HECHAS**. Sus documentos siguen en `docs/`,
 |---|---|---|
 | 130 | `docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md` (tablón y listas por la cola, correo que no sale dos veces, nombres con tope de largo) | EN CURSO (24-sep-2026) |
 | 131 | `docs/PLAZOS-BIEN-CONTADOS.md` (días hábiles, lectivos o naturales en cada plazo; festivos en Ajustes) | PENDIENTE |
+| 132 | `docs/ARREGLOS-POR-DENTRO.md` (terceros que se releen, fuera los estados manuales, cabeceras de seguridad, pdf.js, una regla de destinatarios) | PENDIENTE |
+| 133 | `docs/PARTIR-FICHEROS-GRANDES.md` (los que pasan de 600 líneas, sin cambiar nada) | PENDIENTE |
+| 134 | `docs/QUIEN-ENCARGA-CADA-TIPO.md` (Secretaría, Dirección, Jefatura o Varios en cada tipo) | PENDIENTE |
+| 135 | `docs/ASUNTOS-RESERVADOS.md` (sin el nombre del tercero en listas, buscador y Cuentas) | PENDIENTE |
+| 136 | `docs/PLAZO-DE-CONSERVACION.md` (años por tipo y aviso cuando se cumplen; nunca borra solo) | PENDIENTE |
+| 137 | `docs/INDICE-DEL-EXPEDIENTE.md` (PDF con la lista numerada de documentos, al archivar y con botón) | PENDIENTE |
+| 138 | `docs/UNA-SOLA-LISTA-EN-EL-HITO.md` («lo que hay que reunir» pasa al guion) | PENDIENTE |
+| 139 | `docs/UNA-SOLA-LIBRETA-DE-NOTAS.md` (las notas del hito pasan al asunto, con etiqueta) | PENDIENTE |
+| 140 | `docs/TIEMPO-DE-TRAMITACION.md` (media y máximo por tipo, y los abiertos más antiguos) | PENDIENTE |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
 **La fila 129 está HECHA** (24-sep-2026): `docs/EL-HITO-ES-EL-ESTADO.md`. El estado del asunto es
