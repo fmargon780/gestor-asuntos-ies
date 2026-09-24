@@ -197,5 +197,21 @@ comprobarQue('el párrafo con más texto alrededor se queda (vacío el hueco, no
   parrafos.some((p) => p.indexOf('Antes:') !== -1));
 comprobarQue('el párrafo siguiente sigue ahí, sin tocar', parrafos.some((p) => p.indexOf('Después.') !== -1));
 
+/* ================= 6 · los pasos de la biblioteca citan plantillas que existen (fila 124) ================= */
+console.log('--- 6. plantillasDocumento de la biblioteca del centro ---');
+
+const biblioteca = JSON.parse(fs.readFileSync(path.join(RAIZ, 'datos-biblioteca', 'biblioteca-centro.json'), 'utf8'));
+const idsDelIndice = new Set(indice.filter((e) => e.id).map((e) => e.id));
+comprobar('los id fijos del índice no se repiten', idsDelIndice.size, indice.filter((e) => e.id).length);
+biblioteca.modelos.forEach((m) => (m.plantillasDocumento || []).forEach((id) => {
+  comprobarQue(m.id + ' cita «' + id + '», que está en plantillas/indice.json', idsDelIndice.has(id));
+}));
+const b260 = biblioteca.modelos.filter((m) => m.id === 'b260')[0];
+comprobar('b260: la línea de las renuncias va detrás de g1, con «generar»',
+  b260.guion.slice(0, 2).map((g) => g.id + ':' + g.accion), ['g1:', 'g-renuncias:generar']);
+const renuncia = indice.filter((e) => e.id === 'pd-centro-renuncia-junta-electoral')[0] || {};
+comprobar('la renuncia cuelga de OTROS · ELECCIONES CONSEJO ESCOLAR, tipo RENUNCIA',
+  [renuncia.categoria, renuncia.tipo, renuncia.tipoDocumento, renuncia.texto], ['OTROS', 'ELECCIONES CONSEJO ESCOLAR', 'RENUNCIA', 'junta electoral']);
+
 console.log(fallos ? '\n' + fallos + ' fallo(s) en plantillas-del-centro.mjs' : '\nTodo bien en plantillas-del-centro.mjs');
 if (fallos) process.exit(1);

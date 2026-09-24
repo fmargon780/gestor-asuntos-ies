@@ -121,7 +121,12 @@ Botón en Ajustes → Mantenimiento → Herramientas → "Biblioteca del centro"
 (`CargarBiblioteca.traerGuiones`, `js/cargar-biblioteca.js`). Pone el `guion` de
 `datos-biblioteca/biblioteca-centro.json` en los pasos de `guias.json` (emparejando por
 `origenBiblioteca.id` o el id del paso) y en los modelos de `hitos-biblioteca.json` (por id), solo
-si no tienen ya uno. Una sola escritura de `guias.json` con `Copias.guardar` y un
+si no tienen ya uno. A un guion ya escrito solo le añade las líneas del centro marcadas
+`nueva: true` que no tenga (por su id), detrás de la línea que las precede en el guion del centro,
+y las plantillas de `plantillasDocumento` del modelo que le falten (fila 124: la línea
+`g-renuncias` y la plantilla `pd-centro-renuncia-junta-electoral` del modelo `b260`, «Constituir la
+Junta Electoral»). Nunca quita ni mueve nada; una línea nueva que se borre a mano vuelve si se pulsa
+otra vez el botón. Una sola escritura de `guias.json` con `Copias.guardar` y un
 `GuiasDelCentro.guardarPasos` del último tipo tocado para que la aplicación lo relea. Dice cuántos
 ha traído. El borrador (296 modelos, 1.064 pasos) está en `biblioteca-centro.json`: si se vuelve a
 generar ese fichero con `herramientas/cargar-biblioteca.mjs`, los guiones se perderían.

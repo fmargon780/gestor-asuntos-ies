@@ -617,8 +617,11 @@
         catch (err) { continue; }   /* no debería pasar; se salta sin romper las demás */
         var carpeta = await carpetaDePlantillas();
         await Carpetas.escribirBytes(carpeta, e.fichero, bytes);
+        /* Un `id` fijo del índice (fila 124) se respeta si nadie lo usa ya:
+           así lo puede citar un paso de la biblioteca del centro. */
+        var idFijo = e.id && !(actual.documentos || []).some(function (p) { return p.id === e.id; }) ? e.id : '';
         nuevosDocumentos.push({
-          id: Plantillas.idNuevoDocumento(), tipo: e.tipo, categoria: e.categoria, nombre: e.nombre,
+          id: idFijo || Plantillas.idNuevoDocumento(), tipo: e.tipo, categoria: e.categoria, nombre: e.nombre,
           fichero: e.fichero, tipoDocumento: e.tipoDocumento, texto: e.texto || '',
           firmante: e.firmante || '', vistoBueno: e.vistoBueno || ''
         });

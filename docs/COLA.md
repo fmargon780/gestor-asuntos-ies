@@ -107,13 +107,14 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 75 y 77 a 123 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 75 y 77 a 124 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 124 | `docs/RENUNCIA-JUNTA-ELECTORAL.md` (plantilla de renuncia a la Junta Electoral, asociada al hito «Constituir la Junta Electoral») | EN CURSO (24-sep-2026) |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 124 está HECHA** (24-sep-2026): `docs/RENUNCIA-JUNTA-ELECTORAL.md`. Plantilla «Renuncia a formar parte de la Junta Electoral» (OTROS · ELECCIONES CONSEJO ESCOLAR, una hoja A4, datos de quien renuncia en blanco), con `id` fijo `pd-centro-renuncia-junta-electoral`, unida al hito `b260` «Constituir la Junta Electoral», cuyo guion gana «Recoger las renuncias y avisar al suplente que corresponda» (generar). «Traer los guiones del instituto» ahora añade a un guion ya escrito las líneas nuevas del centro que le falten. Falta que Francisco pulse «Cargar las plantillas del centro» y «Traer los guiones del instituto» en Mantenimiento. Versión `App.VERSION`: `24-sep-2026 · 12:58`.
 
 **La fila 123 está HECHA** (24-sep-2026): `docs/CERTIFICADO-TUTORIA-DEL-CENTRO.md`. El certificado de función tutorial, como el del centro: tipo DESEMPEÑO FUNCIÓN TUTORIAL (casa también sin tilde), firma Secretaría con su especialidad (`{{ESPECIALIDAD FIRMANTE}}`), V.º B.º de Dirección, «C E R T I F I C A:» en negrita, tabla Cargo · Curso · Toma de posesión · Cese y firmas en dos columnas. Campo «Cursos que pide» del tipo (en la biblioteca del centro): filtra la tabla (`js/tablas-datos-cursos.js`). `{{DNI}}` trae el documento entero del personal y `{{PROVINCIA}}` es hueco. Falta que Francisco vuelva a pulsar «Cargar las plantillas del centro» y «Cargar la biblioteca del centro» en Mantenimiento. Versión `App.VERSION`: `24-sep-2026 · 12:22`.
 

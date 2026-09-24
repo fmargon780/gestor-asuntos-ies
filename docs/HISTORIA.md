@@ -5,6 +5,34 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 124: la renuncia a formar parte de la Junta Electoral
+
+`docs/RENUNCIA-JUNTA-ELECTORAL.md`. En el sorteo de la Junta Electoral, la madre titular del sector
+de familias renunció por motivos laborales y el escrito se hizo a mano; ahora sale desde la app.
+
+- Plantilla nueva del centro, `plantillas/renuncia-junta-electoral.md` (OTROS · ELECCIONES CONSEJO
+  ESCOLAR, RENUNCIA). Los datos de quien renuncia van en blanco con casillas (sector, designación,
+  motivo) y un recuadro final «A cumplimentar por el centro». Una hoja A4: comprobado con el `.docx`
+  pasado a PDF con LibreOffice (hubo que instalar su parte de Writer en la sesión).
+- Decisión: la persona se nombra en neutro («la persona abajo firmante», «designada»), porque
+  `js/genero.js` habría cambiado «designado/a» según el sexo del tercero del asunto, que no es quien
+  renuncia. El destinatario sí va con forma doble marcada `:firmante`, y por eso la plantilla lleva
+  `firmante: direccion` (solo para el género; la firma del cargo no se pinta).
+- Los `id` de las plantillas del centro eran al azar al cargarlas, así que ningún paso de la
+  biblioteca podía citar una. Ahora el `.md` puede llevar un `id` fijo, que viaja a `indice.json` y
+  se respeta al cargar si nadie lo usa. El modelo `b260` lo cita en `plantillasDocumento`.
+- El guion de `b260` gana «Recoger las renuncias y avisar al suplente que corresponda»
+  (`g-renuncias`, «generar») detrás de g1, marcada `nueva: true`. «Traer los guiones del instituto»
+  no tocaba un guion ya escrito, así que en el centro nunca habría llegado: ahora añade a un guion
+  escrito solo las líneas `nueva` que le falten, en su sitio, y las plantillas del modelo. Como el
+  hito lee el guion de la guía, llega también a los asuntos ya abiertos.
+- `scripts/hacer-plantillas.mjs` aprende `~` (párrafo vacío, para dejar aire). Las demás plantillas
+  salen idénticas byte a byte.
+- `biblioteca-centro.json` editado con un script que lee y escribe el JSON (solo el modelo `b260`).
+- Versión `App.VERSION`: `24-sep-2026 · 12:58`.
+
+---
+
 ## 24-sep-2026 — Fila 123: el certificado de función tutorial, como el del centro
 
 `docs/CERTIFICADO-TUTORIA-DEL-CENTRO.md`. Francisco pasó el certificado que usa hoy el centro; la
