@@ -189,12 +189,6 @@ var FichaTarjetas = (function () {
     if (!caja || !r) return;
     caja.innerHTML = '';
     if (!abierta) return;
-    var volver = document.createElement('button');
-    volver.type = 'button';
-    volver.className = 'boton ficha-tarjetas-volver';
-    volver.textContent = '← Volver a las tarjetas';
-    volver.onclick = cerrar;
-    caja.appendChild(volver);
     Array.prototype.forEach.call(r.querySelectorAll('.ficha-tarjeta'), function (t) {
       var id = t.dataset.tarjeta;
       var b = document.createElement('button');
@@ -203,7 +197,15 @@ var FichaTarjetas = (function () {
       b.dataset.tarjeta = id;
       var cuenta = cuentaDe(id);
       b.innerHTML = U.escapar(tituloDe(id)) + (cuenta ? ' <span class="ficha-pestana-cuenta">' + U.escapar(cuenta) + '</span>' : '');
-      b.onclick = function () { abrir(id); };
+      /* Fila 112: sin «Volver a las tarjetas»; se vuelve pulsando otra vez
+         la pestaña abierta: desde un hito abierto, a la lista de hitos;
+         desde ahí, a las tarjetas (lo mismo que Escape). */
+      if (id === abierta) b.title = 'Volver a las tarjetas';
+      b.onclick = function () {
+        if (id !== abierta) { abrir(id); return; }
+        if (id === 'hitos' && window.HitoMesa && HitoMesa.cerrarSiAbierta()) { pintarPestanas(); return; }
+        cerrar();
+      };
       caja.appendChild(b);
     });
   }

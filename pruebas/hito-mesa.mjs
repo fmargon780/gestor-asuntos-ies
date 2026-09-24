@@ -221,6 +221,7 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await pagina.evaluate(() => document.querySelector('.pestana[data-pantalla="que-me-toca"]').click());
   await pagina.waitForSelector('#pantalla-que-me-toca:not(.oculto)');
   await pagina.waitForTimeout(300);
+  await pagina.waitForSelector('.qmt-fila[data-hito="m1"]', { state: 'attached' });   /* la lista se pinta un momento después */
   await pagina.evaluate(() => document.querySelector('.qmt-fila[data-hito="m1"]').click());
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.waitForTimeout(700);

@@ -5,6 +5,27 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 112: cabecera compacta de la ficha y del hito
+
+`docs/CABECERA-COMPACTA.md`. Con un hito abierto, lo importante empezaba a más de 500 px del borde
+de arriba, detrás de tres botones de volver, el nombre del asunto dos veces y «Hitos 2/5» dos
+veces. Ahora la cabecera del asunto va en dos líneas y el hito en una, y «GUION DEL HITO» queda a
+unos 234 px (a 1600×920; antes, 528).
+
+- Decisión: para volver se pulsa otra vez la pestaña abierta (desde un hito, a la lista de hitos;
+  desde ahí, a las tarjetas), igual que Escape. Fuera «Volver a las tarjetas», «Volver a la lista
+  de hitos» y la línea de ruta.
+- Decisión: «Archivar» sube a la primera línea (`#ficha-archivar`), y la fila de copiar y la línea
+  gris van a la derecha de la segunda, en pequeño.
+- Con la cabecera encogida al bajar, la barra de acciones sigue a la vista (lo pedía la fila 52):
+  solo se esconde la parte gris.
+- Lo que costó: la clase `.ficha-datos` ya existía para otra cosa y apilaba la línea gris; se llama
+  `.ficha-apertura`.
+
+Prueba nueva `pruebas/cabecera-compacta.mjs`; `pruebas/cabecera-del-asunto.mjs` busca «Archivar» en
+su sitio nuevo. Batería completa en verde.
+Versión publicada `App.VERSION`: `24-sep-2026 · 05:18`.
+
 ## 24-sep-2026 — Fila 111: el masculino o el femenino, solo, en las plantillas
 
 `docs/GENERO-EN-PLANTILLAS.md`. Las plantillas se escriben con «el/la alumno/a», «D./Dña.»,

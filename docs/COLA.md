@@ -97,12 +97,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 62, 64 a 75, 77 a 111 están **HECHAS**. Sus documentos siguen en
+Las filas 1 a 62, 64 a 75, 77 a 112 están **HECHAS**. Sus documentos siguen en
 `docs/`, y el detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 112 | `docs/CABECERA-COMPACTA.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 113 | `docs/MAPA-DE-LA-GUIA.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 114 | `docs/DOCUMENTOS-EN-LA-TARJETA.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
@@ -116,9 +115,7 @@ Documentos, los nombres legibles sin pisarse, como mucho cinco más «y N más»
 lectura, con las ramas de cada pregunta una al lado de otra; en Ajustes, en el editor de la guía
 y dentro de un asunto, con el camino elegido resaltado.
 
-**La fila 112 se apuntó el 24-sep-2026**, cerrada con Francisco: cabecera de la ficha en dos
-líneas, sin los botones de volver repetidos ni la línea de ruta, y el hito abierto empezando
-casi arriba del todo.
+**La fila 112 está HECHA** (24-sep-2026): `docs/CABECERA-COMPACTA.md`. La cabecera del asunto va en dos líneas y la del hito en una; fuera «Volver a las tarjetas», «Volver a la lista de hitos» y la línea de ruta (se vuelve pulsando otra vez la pestaña abierta, o con Escape). Con un hito abierto, «GUION DEL HITO» queda a unos 234 px del borde (antes, 528). Versión publicada `App.VERSION`: `24-sep-2026 · 05:18`.
 
 **La fila 111 está HECHA** (24-sep-2026): `docs/GENERO-EN-PLANTILLAS.md`. Las plantillas se escriben con «el/la alumno/a», «D./Dña.»… y sale solo la forma que toca según el sexo de cada persona (RegAlum, casilla nueva en «Datos y contacto», desplegable en cada persona de los cargos); sin el dato, se queda con la barra y aviso ámbar. Marca para otra persona: `hijo/a:tutor1`, `:tutor2`, `:firmante`, `:vistobueno`. Versión publicada `App.VERSION`: `24-sep-2026 · 05:00`.
 

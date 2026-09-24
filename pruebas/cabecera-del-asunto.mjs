@@ -75,7 +75,9 @@ async function abrirFicha(nombre) {
 }
 
 function elementosDeAcciones() {
-  return pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-acciones > *')).map((el) => {
+  /* Desde la fila 112 «Archivar» va en la primera línea (#ficha-archivar). */
+  return pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-acciones > *'))
+    .concat(Array.from(document.querySelectorAll('#ficha-archivar > *'))).map((el) => {
     if (el.tagName === 'SELECT') return 'estado';
     if (el.classList.contains('boton-vencimiento')) return 'vencimiento';
     if (el.classList.contains('ficha-encargo')) return 'encargo';

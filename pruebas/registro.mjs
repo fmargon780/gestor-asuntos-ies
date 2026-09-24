@@ -76,6 +76,14 @@ await pagina.addInitScript(() => {
 });
 await pagina.goto(process.env.DIRECCION || 'http://localhost:8123/index.html');
 
+/* El cuadro pone el foco después de mirar si el PDF trae sello (js/registro.js,
+   `aplicarSelloYFoco`, con un pequeño retraso a propósito): en una máquina lenta
+   tarda algo más, así que se espera a que llegue (hasta 3 s) antes de mirarlo. */
+async function focoEn(id) {
+  await pagina.waitForFunction((x) => document.activeElement && document.activeElement.id === x, id, { timeout: 3000 }).catch(() => {});
+  return pagina.evaluate(() => document.activeElement && document.activeElement.id);
+}
+
 let fallos = 0;
 async function comprobar(titulo, promesa, esperado) {
   const real = await promesa;
@@ -137,7 +145,7 @@ await comprobar('el título del cuadro dice qué documento se registra',
 await comprobar('el fichero elegido no es un PDF con sello: el cuadro sale vacío',
   pagina.locator('#reg-sello').textContent(), '');
 await comprobar('y el foco entra en los cuatro dígitos',
-  pagina.evaluate(() => document.activeElement && document.activeElement.id), 'reg-numero');
+  focoEn('reg-numero'), 'reg-numero');
 
 await pagina.fill('#reg-numero', '1234');
 await pagina.check('input[name="reg-sentido"][value="E"]');
@@ -262,7 +270,7 @@ await comprobar('el año, entrada, manual y el número salen solos',
     numero: document.getElementById('reg-numero').value
   })), { ano: '26', sentido: 'E', modo: 'M', numero: '0368' });
 await comprobar('el foco va directo al botón de aceptar: solo hay que confirmar',
-  pagina.evaluate(() => document.activeElement && document.activeElement.id), 'cuadro-aceptar');
+  focoEn('cuadro-aceptar'), 'cuadro-aceptar');
 
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
@@ -340,7 +348,7 @@ await pagina.waitForTimeout(600);
 await comprobar('el cuadro sale vacío, como siempre',
   pagina.locator('#reg-sello').textContent(), '');
 await comprobar('y el foco entra en los cuatro dígitos',
-  pagina.evaluate(() => document.activeElement && document.activeElement.id), 'reg-numero');
+  focoEn('reg-numero'), 'reg-numero');
 await pagina.click('#cuadro-cancelar');
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }

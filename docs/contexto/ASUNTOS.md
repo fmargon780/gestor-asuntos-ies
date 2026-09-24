@@ -80,13 +80,12 @@ disposición, ningún funcionamiento distinto. La regla: arriba a la izquierda l
 hacer, arriba a la derecha lo que hay que saber, lo que casi nunca se mira plegado con su número
 al lado.
 
-- **La línea gris de la cabecera** (`.ficha-subtitulo`, dentro de `<header class="ficha-cabecera">`,
-  justo debajo de `<h2 class="ficha-nombre">`): `subtituloDeFicha(a)` en `js/ficha-asunto.js` junta,
+- **La línea gris de la cabecera** (`.ficha-subtitulo`, dentro de `<header class="ficha-cabecera">`;
+  desde la fila 112, en `.ficha-apertura`, a la derecha de la segunda línea): `subtituloDeFicha(a)` en `js/ficha-asunto.js` junta,
   separados por ` · `, lo que no se repite en ningún otro sitio de la pantalla — Abierto el
   (`U.fechaLegible(a.leido.fecha)`), Categoría, Año académico, Descripción y Lo abrió—; lo vacío no
   deja ni el separador ni un hueco. Se esconde entera con la cabecera encogida
-  (`.ficha-cabecera.encogida .ficha-subtitulo { display: none; }`, `css/ficha-asunto.css`): no
-  entra en el reparto por `order` de la fila 46, solo desaparece.
+  (`.ficha-cabecera.encogida .ficha-apertura { display: none; }`, `css/ficha-asunto.css`).
 - **Tarjetas** (24-sep-2026, fila 107, `docs/FICHA-EN-TARJETAS.md`; antes, tres columnas y dos
   plegables, `js/ficha-plegables.js`, retirado): ver "La ficha en tarjetas", más abajo.
 - **"Datos del asunto" se desmonta y pasa a llamarse "Datos del trámite"**: `datosDelAsunto(a)`
@@ -124,8 +123,10 @@ Datos del trámite) son los de siempre, y los sigue pintando el mismo módulo.
   y "Datos del trámite" (`.ficha-tarjeta-siempre`) enseñan su propio cuerpo, que ya es un resumen.
   Sin contenido: "ninguno todavía", en gris.
 - **Abrir en grande**: pulsar la tarjeta (menos en un botón, enlace o campo). `data-abierta` en
-  `#ficha-tarjetas`; las demás pasan a pestañas (`#ficha-tarjetas-pestanas`, con su cuenta) y
-  "← Volver a las tarjetas". **Escape** (`js/usabilidad.js`, `FichaTarjetas.cerrarSiAbierta()`,
+  `#ficha-tarjetas`; las demás pasan a pestañas (`#ficha-tarjetas-pestanas`, con su cuenta). Desde
+  la fila 112 no hay "← Volver a las tarjetas": se vuelve pulsando otra vez la pestaña abierta
+  (`title` "Volver a las tarjetas"); en Hitos con un hito abierto, primero a la lista
+  (`HitoMesa.cerrarSiAbierta()`). **Escape** (`js/usabilidad.js`, `FichaTarjetas.cerrarSiAbierta()`,
   después de cerrar el visor si estaba) vuelve a la cuadrícula; el siguiente, lo de siempre.
 - **Franja de documentos** (`.ficha-tarjeta-franja`) en la tarjeta abierta, menos Documentos: chips
   que pulsan por debajo el mismo `button.ficha-documento` de la lista (sin repintar). En Hitos, los
@@ -144,10 +145,15 @@ Datos del trámite) son los de siempre, y los sigue pintando el mismo módulo.
 docs/CABECERA-DEL-ASUNTO.md): cambio de disposición y de agrupación, ninguna acción desaparece ni
 cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
 
-- **`#ficha-acciones` queda en cinco elementos**, siempre en este orden: el desplegable de
-  estado, la etiqueta de vencimiento, "El encargo", "Comunicar" (lo añade `js/correo.js`, ver
-  abajo) y "Archivar"/"Reabrir" (`.boton-principal`, con `margin-left: auto` en
-  `css/ficha-asunto.css` para pegarlo al borde derecho). `pintarAcciones(a, abierto)` perdió el
+- **La cabecera en dos líneas** (24-sep-2026, fila 112, `docs/CABECERA-COMPACTA.md`): dentro de
+  `<header class="ficha-cabecera">`, `.ficha-linea1` (`#ficha-volver` «← Volver», las marcas, el
+  `<h2>` con «⋯» y `#ficha-archivar`, a la derecha) y `.ficha-linea2` (`#ficha-acciones` y, a la
+  derecha, `.ficha-apertura`: la fila de copiar, que `js/ficha-nombre-acciones.js` mete ahí, y la
+  línea gris en una sola línea, recortada, con el texto entero en su `title`). Sin raya ni margen
+  debajo. Encogida: las dos líneas, sin `.ficha-apertura`.
+- **`#ficha-acciones` queda en cuatro elementos**, siempre en este orden: el desplegable de
+  estado, la etiqueta de vencimiento, "El encargo" y "Comunicar" (lo añade `js/correo.js`, ver
+  abajo); "Archivar"/"Reabrir" (`.boton-principal`) va en `#ficha-archivar` desde la fila 112. `pintarAcciones(a, abierto)` perdió el
   parámetro `p` (la fecha límite ya no hace falta ahí: la etiqueta se calcula sola).
 - **El estado, con su color**: el `<select class="campo campo-estado">` lleva además la clase
   `App.colorEstado(situacion)` (`estado-0`…`estado-5`, `estado-x`) cuando hay situación puesta.

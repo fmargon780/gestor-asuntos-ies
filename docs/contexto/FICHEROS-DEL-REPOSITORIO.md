@@ -225,6 +225,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/archivar-sin-avisos-falsos.mjs` | Prueba (navegador de verdad, fila 90, 21-sep-2026): archivar desde la ficha abierta no da el aviso de "otro ordenador"; con Dropbox fallando dos veces al escribir `_ficha.json` y saliendo bien a la tercera, ningún aviso de más; fallando siempre, aviso ámbar en castellano y la ficha sigue en `asuntos.json` |
 | `pruebas/estado-por-el-hito.mjs` | Prueba (sin navegador, fila 104, 23-sep-2026): `Hitos.aQuienLeToca` y `Hitos.ladoDelAsunto` (Administración, terceros, pregunta sin responder, solo informativo saltado, todos hechos, sin hitos, estado manual de terceros), la marca de partida de los responsables y `naceSoloInformativo` con los ajustes |
 | `pruebas/genero.mjs` | Prueba (navegador de verdad, fila 111, 24-sep-2026): alumna/alumno/sin dato, «El/La Director/a» con firmante mujer, marcas `:tutor1`, lo que no se toca (fechas, y/o, registros, webs), `faltan` al rellenar, forma partida en el Word, sexos del RegAlum/ficha/cargo y una plantilla del centro limpia |
+| `pruebas/cabecera-compacta.mjs` | Prueba (navegador de verdad, fila 112, 24-sep-2026): cabecera del asunto en dos líneas, sin volver repetidos ni línea de ruta, «GUION DEL HITO» a 250 px o menos a 1600×920, la pestaña abierta vuelve atrás, y sin desplazamiento lateral a 800 px |
 | `apps-script/gestor-correos.gs` | El script de Gmail. No se ejecuta desde la web |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |
