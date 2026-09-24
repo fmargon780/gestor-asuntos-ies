@@ -59,7 +59,7 @@ const dom = new JSDOM('<!doctype html><html><body></body></html>', { runScripts:
 const win = dom.window;
 win.App = { E: { usuario: 'Francisco' } };
 
-for (const f of ['util.js', 'nombres.js', 'lo-pide.js', 'plantillas.js', 'plantillas-valores.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'nombres.js', 'lo-pide.js', 'plantillas.js', 'plantillas-valores.js']) {
   win.eval(fs.readFileSync(RAIZ + f, 'utf8'));
 }
 const { LoPide, Plantillas } = win;

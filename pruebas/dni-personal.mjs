@@ -13,7 +13,7 @@ const contexto = {
   App: {}, $: function () { return {}; }
 };
 vm.createContext(contexto);
-for (const f of ['util.js', 'reintentar-escritura.js', 'carpetas.js', 'nombres.js', 'datos.js', 'datos-alumnado.js', 'datos-personal.js', 'datos-resumen.js', 'datos-listas.js', 'datos-tutores.js', 'asuntos-nuevo.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas.js', 'nombres.js', 'datos.js', 'datos-alumnado.js', 'datos-personal.js', 'datos-resumen.js', 'datos-listas.js', 'datos-tutores.js', 'asuntos-nuevo.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 const { Datos, App } = contexto;

@@ -24,6 +24,7 @@ const ctx = { console, document: documentoFalso, App: { E: {}, PANTALLAS: [] } }
 ctx.window = ctx;
 vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(raiz + 'util.js', 'utf8'), ctx, { filename: 'util.js' });
+for (const f of ['util-parecidos.js', 'util-pantalla.js']) vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), ctx, { filename: f });
 vm.runInContext(fs.readFileSync(raiz + 'lib/pdf-lib.min.js', 'utf8'), ctx, { filename: 'pdf-lib.min.js' });
 vm.runInContext(fs.readFileSync(raiz + 'pdf-herramientas.js', 'utf8'), ctx, { filename: 'pdf-herramientas.js' });
 vm.runInContext(fs.readFileSync(raiz + 'formularios-rellenar.js', 'utf8'), ctx, { filename: 'formularios-rellenar.js' });

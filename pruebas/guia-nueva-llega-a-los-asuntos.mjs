@@ -57,6 +57,7 @@ function nuevoContexto(opciones) {
   ctx.window = ctx;
   vm.createContext(ctx);
   vm.runInContext(leerFuente('util.js'), ctx, { filename: 'util.js' });
+  for (const f of ['util-parecidos.js', 'util-pantalla.js']) vm.runInContext(leerFuente(f), ctx, { filename: f });
   vm.runInContext(leerFuente('hitos.js'), ctx, { filename: 'hitos.js' });
   vm.runInContext(leerFuente('hitos-sincronizar.js'), ctx, { filename: 'hitos-sincronizar.js' });
   return { ctx, disco, Hitos: ctx.Hitos };

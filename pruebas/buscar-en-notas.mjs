@@ -15,7 +15,7 @@ const contexto = {
 };
 contexto.window = contexto;
 vm.createContext(contexto);
-for (const f of ['util.js', 'notas.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'notas.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 const { U, Notas } = contexto;
@@ -92,7 +92,7 @@ console.log('--- el índice del archivo lleva las notas, y también se pueden de
 const ctxIndice = { console, App: { E: {} } };
 ctxIndice.window = ctxIndice;
 vm.createContext(ctxIndice);
-for (const f of ['util.js', 'archivo-indice.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'archivo-indice.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), ctxIndice, { filename: f });
 }
 const { IndiceArchivo } = ctxIndice;

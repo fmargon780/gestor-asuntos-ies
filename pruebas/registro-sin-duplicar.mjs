@@ -12,7 +12,7 @@ import vm from 'node:vm';
 const raiz = new URL('../js/', import.meta.url).pathname;
 const contexto = { console, window: {} };
 vm.createContext(contexto);
-for (const f of ['util.js', 'nombres.js', 'documentos.js', 'documentos-formulario.js', 'documentos-tipo-nuevo.js', 'documentos-guardar.js', 'registro-lector.js', 'registro-sellado.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'nombres.js', 'documentos.js', 'documentos-formulario.js', 'documentos-tipo-nuevo.js', 'documentos-guardar.js', 'registro-lector.js', 'registro-sellado.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 const { Documentos, RegistroLector, RegistroSellado } = contexto;

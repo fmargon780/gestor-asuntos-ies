@@ -14,7 +14,7 @@ import vm from 'node:vm';
 const raiz = new URL('../js/', import.meta.url).pathname;
 const contexto = { console, window: {} };
 vm.createContext(contexto);
-for (const f of ['util.js', 'idea.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'idea.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 const { IdEA } = contexto.window;

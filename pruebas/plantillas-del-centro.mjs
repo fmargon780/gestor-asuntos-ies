@@ -49,7 +49,7 @@ const contexto = {
 vm.createContext(contexto);
 contexto.window.App = contexto.App;
 contexto.window.Carpetas = contexto.Carpetas;
-for (const f of ['util.js', 'docx.js', 'docx-imagen.js', 'docx-tabla.js', 'plantillas.js', 'plantillas-valores.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'docx.js', 'docx-imagen.js', 'docx-tabla.js', 'plantillas.js', 'plantillas-valores.js']) {
   vm.runInContext(fs.readFileSync(path.join(RAIZ_JS, f), 'utf8'), contexto);
 }
 contexto.window.U = contexto.U;

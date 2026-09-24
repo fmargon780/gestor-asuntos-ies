@@ -19,7 +19,7 @@ import vm from 'node:vm';
 const raiz = new URL('../js/', import.meta.url).pathname;
 const contexto = { console };
 vm.createContext(contexto);
-for (const f of ['util.js', 'nombres.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'nombres.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 const { U, Nombres } = contexto;

@@ -36,7 +36,7 @@ const gestor = carpeta();
 const contexto = { console, Blob, DOMException, setTimeout, clearTimeout, TextEncoder, TextDecoder, window: {}, document: { addEventListener() {} } };
 contexto.window.Gestor = { carpetaGestor: () => gestor };
 vm.createContext(contexto);
-for (const f of ['util.js', 'reintentar-escritura.js', 'carpetas.js', 'membrete.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas.js', 'membrete.js']) {
   vm.runInContext(fs.readFileSync(RAIZ + f, 'utf8'), contexto, { filename: f });
 }
 const { Carpetas, Membrete } = vm.runInContext('({ Carpetas: Carpetas, Membrete: Membrete })', contexto);

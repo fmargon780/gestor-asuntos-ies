@@ -16,7 +16,7 @@ const contexto = {
 };
 contexto.window = contexto;
 vm.createContext(contexto);
-for (const f of ['util.js', 'nombres.js', 'cuentas.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'nombres.js', 'cuentas.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 const { Cuentas } = contexto;

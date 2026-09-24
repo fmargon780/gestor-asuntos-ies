@@ -29,7 +29,7 @@ const raiz = new URL('../js/', import.meta.url).pathname;
 const ctx = { console };
 ctx.window = ctx;
 vm.createContext(ctx);
-for (const f of ['util.js', 'nombres.js', 'campos.js', 'documentos-campos.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'nombres.js', 'campos.js', 'documentos-campos.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8') + (f === 'campos.js' ? '\nwindow.Campos = Campos;' : ''),
     ctx, { filename: f });
 }

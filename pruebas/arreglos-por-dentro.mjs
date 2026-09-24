@@ -38,7 +38,7 @@ function carpeta(nombre) {
 const contexto = { console, TextDecoder, Blob, window: {}, indexedDB: null, setTimeout, clearTimeout,
   document: { readyState: 'loading', addEventListener() {} } };
 vm.createContext(contexto);
-for (const f of ['util.js', 'reintentar-escritura.js', 'carpetas.js', 'nombres.js', 'datos.js', 'datos-alumnado.js', 'datos-personal.js', 'datos-resumen.js', 'datos-listas.js', 'conflictos.js', 'destinatarios.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas.js', 'nombres.js', 'datos.js', 'datos-alumnado.js', 'datos-personal.js', 'datos-resumen.js', 'datos-listas.js', 'conflictos.js', 'destinatarios.js']) {
   vm.runInContext(leer('js/' + f), contexto, { filename: f });
   Object.keys(contexto.window).forEach(function (k) { if (!(k in contexto)) contexto[k] = contexto.window[k]; });
 }

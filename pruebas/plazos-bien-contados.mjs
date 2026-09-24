@@ -19,7 +19,7 @@ const dom = new JSDOM('');
 const contexto = { console, window: {}, document: dom.window.document, DOMParser: dom.window.DOMParser };
 vm.createContext(contexto);
 contexto.App = contexto.window.App = { E: { usuario: 'Francisco' } };
-for (const f of ['util.js', 'plazos.js', 'guias.js', 'hitos.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'plazos.js', 'guias.js', 'hitos.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
   Object.keys(contexto.window).forEach(function (k) { if (!(k in contexto)) contexto[k] = contexto.window[k]; });
 }

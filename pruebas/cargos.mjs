@@ -41,7 +41,7 @@ win.TextDecoder = TextDecoder;
 win.Blob = Blob;
 win.App = { E: {} };
 
-for (const f of ['util.js', 'reintentar-escritura.js', 'carpetas.js', 'copias.js', 'cargos.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas.js', 'copias.js', 'cargos.js']) {
   win.eval(fs.readFileSync(RAIZ + f, 'utf8'));
 }
 const { Cargos } = win;

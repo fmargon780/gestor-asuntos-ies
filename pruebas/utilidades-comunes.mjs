@@ -72,6 +72,7 @@ const contexto = {
 };
 vm.createContext(contexto);
 vm.runInContext(fs.readFileSync(raiz + 'util.js', 'utf8'), contexto, { filename: 'util.js' });
+for (const f of ['util-parecidos.js', 'util-pantalla.js']) vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 const { U } = contexto;
 
 let fallos = 0;

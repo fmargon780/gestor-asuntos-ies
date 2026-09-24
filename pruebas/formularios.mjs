@@ -52,6 +52,7 @@ const documentoFalso = {
 const contexto = { window: {}, document: documentoFalso, App: { E: {}, PANTALLAS: [] } };
 vm.createContext(contexto);
 vm.runInContext(fs.readFileSync(RAIZ + 'util.js', 'utf8'), contexto);
+for (const f of ['util-parecidos.js', 'util-pantalla.js']) vm.runInContext(fs.readFileSync(RAIZ + f, 'utf8'), contexto);
 contexto.window.U = contexto.U;
 contexto.window.App = contexto.App;
 vm.runInContext(fs.readFileSync(RAIZ + 'formularios.js', 'utf8'), contexto);

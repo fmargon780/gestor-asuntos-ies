@@ -48,7 +48,7 @@ const contexto = {
 vm.createContext(contexto);
 contexto.App = contexto.window.App = { E: { usuario: 'Francisco', datos: {} } };
 for (const f of [
-  'util.js', 'reintentar-escritura.js', 'carpetas.js', 'copias.js', 'guias-toca.js', 'guias.js',
+  'util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas.js', 'copias.js', 'guias-toca.js', 'guias.js',
   'guias-plegado.js', 'hitos.js', 'hitos-archivo.js', 'hitos-sincronizar.js', 'hitos-a-quien.js',
   'estado-hito.js', 'estado-migracion.js'
 ]) {
