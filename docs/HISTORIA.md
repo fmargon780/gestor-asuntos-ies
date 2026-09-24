@@ -5,6 +5,25 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 108: la ventana de contacto del alumno, en tarjetas
+
+`docs/CONTACTO-EN-TARJETAS.md`. La ventana «Ver todo» del alumno pasa de cinco columnas a una
+cabecera con etiquetas y una tarjeta por persona (el alumno, tutor 1, tutor 2), con «Correo a la
+familia» y «Copiar todo el contacto» abajo.
+
+- El fallo de fondo: `numeroDeTitulo` miraba la primera palabra «primer» del título, y en «Primer
+  apellido Segundo tutor» esa palabra es del apellido: el segundo tutor acababa dentro del primero.
+  Ahora manda el número pegado a «tutor». Y el nombre ya no sale a trozos: se monta entero.
+- `js/datos.js` pasaba de 1.100 líneas: los tutores se van a `js/datos-tutores.js`; y la ventana
+  del alumno, a `js/ficha-tercero-alumno.js`, para no pasar de 400 en `js/ficha-tercero.js`.
+- Decisión: «Correo a la familia» cierra la ventana y abre el cuadro de Correo de siempre (un solo
+  cuadro a la vez), con los correos de los tutores como destinatarios propuestos.
+
+La prueba del caso real falla con el código de antes y pasa con el nuevo; foto a 1905 px revisada.
+Batería completa en verde. Versión publicada `App.VERSION`: `24-sep-2026 · 04:08`.
+
+---
+
 ## 24-sep-2026 — Fila 107: la ficha del asunto en tarjetas
 
 `docs/FICHA-EN-TARJETAS.md`. Las tres columnas dejaban lo de abajo fuera de la pantalla y el

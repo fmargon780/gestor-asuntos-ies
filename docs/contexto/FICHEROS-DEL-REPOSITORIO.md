@@ -37,7 +37,8 @@ de `App` va después del fichero que lo define.
 | `js/guias-requisitos.js` | La sección "Lo que hay que reunir" del editor de un paso (`GuiasRequisitos.bloqueHTML`/`leer`/`enganchar`, fila 59, aparte de `js/guias.js` para no engordarlo) |
 | `js/guias-comunicacion.js` | La sección "Comunicación de este paso" del editor de un paso (`GuiasComunicacion.bloqueHTML`/`leer`/`enganchar`, fila 60, aparte de `js/guias.js`); reutiliza el campo de texto con "Insertar hueco" de `js/plantillas-ajustes.js` |
 | `js/guias-documentos.js` | «Documentos de este paso» (fila 102): qué plantillas de documento van con un paso de la guía o un modelo de la biblioteca (`plantillasDocumento`); cargado justo antes de `js/guias.js` |
-| `js/datos.js` | Lee los CSV; el nombre comercial y las columnas leídas por su título; `Datos.tutoresDe` agrupa los tutores legales por persona y `Datos.resumenDeTercero` monta la línea "Datos y contacto" |
+| `js/datos.js` | Lee los CSV; el nombre comercial y las columnas leídas por su título; `Datos.resumenDeTercero` monta la línea "Datos y contacto" |
+| `js/datos-tutores.js` | `Datos.tutoresDe`: los tutores legales de un alumno agrupados por persona, con su nombre entero, sexo e iniciales (sacado de `js/datos.js` en la fila 108) |
 | `js/campos.js` | Los campos de cada tipo de asunto: catálogo, cálculo y guardado |
 | `css/campos.css` | Los estilos del bloque "Datos del asunto" y del cuadro de Campos |
 | `js/documentos.js` | Nombra los documentos, con el texto adicional y los tipos sin duplicados; enseña los campos del tipo de documento y no deja guardar con un obligatorio vacío (fila 96) |
@@ -96,7 +97,8 @@ de `App` va después del fichero que lo define.
 | `js/ficha-tarjetas.js` | La ficha del asunto en tarjetas (fila 107): la cuadrícula, los resúmenes, abrir una en grande con las demás como pestañas, la franja de documentos y Escape |
 | `css/ficha-tarjetas.css` | El aspecto de la ficha en tarjetas (fila 107) |
 | `js/ficha-documentos.js` | Los documentos de la carpeta, en la ficha del asunto (separado de `js/ficha-asunto.js` en la fila 26); pone la clase `vacio` al bloque cuando no hay ninguno (fila 51); botón "Documentos ▾" en la cabecera del bloque (fila 52); el original "SIN SELLAR" en gris y "Asociar a un hito" en cada fila (fila 58) |
-| `js/ficha-tercero.js`, `css/ficha-tercero.css` | "Datos y contacto" del tercero: la línea resumen y la ventana "Ver todo" con los tutores agrupados por persona (separado de `js/ficha-asunto.js` en la fila 37) |
+| `js/ficha-tercero.js`, `css/ficha-tercero.css` | "Datos y contacto" del tercero: la línea resumen y la ventana "Ver todo" de personal y del resto (separado de `js/ficha-asunto.js` en la fila 37) |
+| `js/ficha-tercero-alumno.js` | La ventana "Ver todo" de un alumno, en tarjetas: cabecera, el alumno y cada tutor, "Correo a la familia" y "Copiar todo el contacto" (fila 108) |
 | `js/hitos-panel.js` | Pinta los hitos en la ficha del asunto (los pasos de la guía SON los hitos): el observador (solo `childList` sobre `#ficha-asunto-cuerpo`, sin `subtree`, desde la fila 58), el repintado y la creación automática |
 | `js/hitos-panel-lista.js` | La otra mitad del panel de hitos: la fila de cada hito, su cuerpo desplegado, el cambio de rama, "lo que hay que reunir" (llama a `js/hitos-requisitos.js`, fila 59) y la guarda antes de pasar un hito a hecho |
 | `js/duplicados.js` | ¿Esto no lo hicimos ya? Asuntos iguales del mismo tercero; exporta también `carpetaDelTercero` (fila 40) |

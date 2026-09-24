@@ -441,3 +441,29 @@ tercero en el CSV manda el CSV, incluso si cambia un dato; sin el tercero en el 
 con su fecha y su fichero; sin foto y sin CSV, sin datos y sin romperse; el botón de rellenar
 cuenta y guarda bien, sin tocar los que ya tenían foto ni los cerrados.
 
+
+### La ventana «Ver todo» del alumno, en tarjetas (24-sep-2026, fila 108, `docs/CONTACTO-EN-TARJETAS.md`)
+
+`js/ficha-tercero-alumno.js` (`FichaTerceroAlumno.ventana(persona, resumen, a)`, que devuelve
+`{ html, titulo, montar(raiz), alCerrar() }`); `js/ficha-tercero.js` (`abrirVerTodo`) solo la llama
+para ALUMNADO. Personal y el resto de terceros no cambian.
+
+- **Cabecera**: círculo con iniciales, nombre en orden natural (`Datos.nombreNatural`), «13 años ·
+  nacido el …» («nacida» si la columna `Sexo` del alumno dice mujer; si no se sabe, «nacimiento:
+  …») y tres etiquetas: unidad (azul), estado de la matrícula (verde si está matriculado) y NIE con
+  su copiar. «Curso» ya no sale: la unidad lo dice.
+- **Tarjetas del mismo ancho** (`.vt-tarjetas`, en columna por debajo de 900px): el alumno, cada
+  tutor que traiga algo (círculo, nombre entero de título y etiqueta «Tutora 1»/«Tutor 2»/«Tutor
+  legal N» según su sexo; nunca «Madre»/«Padre»; si Séneca trae relación o parentesco, manda esa)
+  y «Otros datos de la familia» solo si hay algo. Dentro, teléfono(s), correo(s) y DNI, con icono y
+  copiar; los teléfonos en grupos de tres, copiados sin espacios; un teléfono repetido del alumno
+  sale una vez, y si coincide con el de un tutor, «mismo que la tutora 1».
+- **Abajo**: «Correo a la familia» (cierra la ventana y abre `CorreoNucleo.abrirCuadro(a, false,
+  { correoPreferente })` con los correos de los tutores; sin correos de tutor, no sale) y «Copiar
+  todo el contacto» (una línea por persona). A la derecha, «Todo lo que trae Séneca», como antes.
+- **El arreglo de fondo** (`js/datos-tutores.js`, sacado de `js/datos.js`): el número del tutor es
+  el pegado a «tutor» («Primer apellido **Segundo tutor**» es del 2); el nombre se monta con nombre +
+  primer apellido + segundo apellido (o una columna entera, dándole la vuelta a «Apellidos,
+  Nombre»); `sexo` (M/H/vacío) e `iniciales` son campos nuevos, sin cambiar los que ya había.
+
+Se comprueba en `pruebas/ficha-tercero.mjs` (escenario 9, el caso real de las ocho columnas).
