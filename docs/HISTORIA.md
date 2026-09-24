@@ -24,7 +24,7 @@ unos 234 px (a 1600×920; antes, 528).
 
 Prueba nueva `pruebas/cabecera-compacta.mjs`; `pruebas/cabecera-del-asunto.mjs` busca «Archivar» en
 su sitio nuevo. Batería completa en verde.
-Versión publicada `App.VERSION`: `VERSION_112`.
+Versión publicada `App.VERSION`: `24-sep-2026 · 05:18`.
 
 ## 24-sep-2026 — Fila 111: el masculino o el femenino, solo, en las plantillas
 
