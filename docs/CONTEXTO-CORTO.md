@@ -100,6 +100,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Plantillas de correo y de documento de Word por tipo de asunto, con huecos que se rellenan
   solos; el centro ya tiene sus textos (`plantillas/`), cargados con un botón en Mantenimiento.
   El documento sale con membrete y con la firma de quien ocupaba el cargo, en su fecha.
+- Tablas de datos (tutorías de Séneca en PDF, CSV/Excel en `datos/Tablas`) unidas por DNI, con huecos
+  {{ESPECIALIDAD}} y {{TABLA TUTORIAS}}; lo que falta sale en amarillo. Certificado de función tutorial.
 - Copias diarias (caducan a los 90 días, configurable), detección de fichero roto, fusión de
   conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un borrado (tipo, estado,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.

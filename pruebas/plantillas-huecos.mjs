@@ -117,7 +117,7 @@ await comprobar('buscando "tutor" quedan solo los huecos de los tutores',
   pagina.evaluate(() => Array.prototype.map.call(
     document.querySelectorAll('#huecos-cuadro .huecos-opcion'),
     (b) => b.getAttribute('data-clave')).join(',')),
-  'tutor1,tutor1telefono,tutor1correo,tutor2,tutor2telefono,tutor2correo');
+  'tutor1,tutor1telefono,tutor1correo,tutor2,tutor2telefono,tutor2correo,{TABLA TUTORIAS}');   /* fila 110: la tabla de tutorías también dice «tutor» */
 await comprobar('y "Grupo" se queda fuera',
   pagina.locator('#huecos-cuadro .huecos-opcion[data-clave="grupo"]').count(), 0);
 

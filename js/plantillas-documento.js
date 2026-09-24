@@ -124,9 +124,17 @@
     }
 
     var valores = await Plantillas.valoresDeAsunto(asunto, { fecha: U.hoyIso(), plantilla: plantillaDoc, hito: hito });
+    /* Las tablas de datos (fila 110, js/tablas-datos.js): {{TABLA …}} se mete
+       aquí como tabla de Word; {{ESPECIALIDAD}} y {{DATO …}}, en `valores`. */
+    var tablas = null;
+    if (window.TablasDatos) {
+      try { tablas = await TablasDatos.prepararDocumento(buffer, asunto, valores); buffer = tablas.buffer; }
+      catch (e) { tablas = null; }
+    }
     var resultado;
     try {
       resultado = await Docx.rellenar(buffer, valores);
+      if (tablas) resultado = await TablasDatos.resaltarResultado(resultado, tablas.faltan);
     } catch (e) {
       U.aviso('No he podido rellenar el documento: ' + U.mensajeDeError(e), 'malo');
       return;
@@ -327,7 +335,7 @@
      FALTA}` ya trae sus propias llaves dentro de la clave (viene de
      antes); los de aquí, no. */
   var HUECOS_DE_LLAVE_DOBLE = ['firmante', 'cargo firmante', 'tratamiento firmante',
-    'visto bueno', 'cargo visto bueno', 'tratamiento visto bueno', 'consejeria', 'formularios'];
+    'visto bueno', 'cargo visto bueno', 'tratamiento visto bueno', 'consejeria', 'formularios', 'especialidad'];
 
   function textoDelHueco(h) {
     if (h.clave.indexOf('{') !== -1) return '{' + h.clave + '}';    /* {LO QUE FALTA} */

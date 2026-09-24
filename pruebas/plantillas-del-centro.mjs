@@ -49,7 +49,7 @@ const contexto = {
 vm.createContext(contexto);
 contexto.window.App = contexto.App;
 contexto.window.Carpetas = contexto.Carpetas;
-for (const f of ['util.js', 'docx.js', 'plantillas.js']) {
+for (const f of ['util.js', 'docx.js', 'docx-imagen.js', 'docx-tabla.js', 'plantillas.js']) {
   vm.runInContext(fs.readFileSync(path.join(RAIZ_JS, f), 'utf8'), contexto);
 }
 contexto.window.U = contexto.U;
@@ -112,6 +112,8 @@ function huecosDeTexto(texto) {
 
 function esHuecoConocido(clave) {
   if (/^campo\s*:/i.test(clave)) return true;
+  /* Fila 110: las tablas de datos (js/tablas-datos.js), como {campo:...}. */
+  if (/^(tabla|dato)\s/i.test(clave)) return true;
   if (clave === 'LO QUE FALTA' || clave === 'MEMBRETE') return true;
   return CONOCIDOS.has(contexto.U.normalizar(clave).replace(/\s+/g, ''));
 }

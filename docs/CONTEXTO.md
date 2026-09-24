@@ -20,6 +20,7 @@ que cambie algo general).
 | `docs/contexto/PERSONAS.md` | Terceros, RegAlum, personal, empresas, grupos, DNI y la ficha del tercero |
 | `docs/contexto/DOCUMENTOS.md` | El nombre y el registro de un documento, el código de verificación, "Por clasificar" |
 | `docs/contexto/DOCUMENTOS-PDF.md` | Generar el documento de Word, separar/unir un PDF y ajustar su tamaño |
+| `docs/contexto/TABLAS-DE-DATOS.md` | Las tablas de datos (tutorías de Séneca, `datos/Tablas`), sus huecos y el certificado de función tutorial (fila 110) |
 | `docs/contexto/CORREO-Y-SENECA.md` | La bandeja de Gmail, sus adjuntos, las plantillas de correo y el cuadro de Séneca |
 | `docs/contexto/HITOS-Y-GUIAS.md` | Las guías del procedimiento, los hitos de un asunto, "Qué me toca" y "Cuentas" |
 | `docs/contexto/HITO-MESA.md` | El hito a pantalla completa (la mesa de trabajo), su guion y "Traer los guiones del instituto" (fila 109) |

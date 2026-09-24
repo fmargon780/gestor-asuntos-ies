@@ -116,7 +116,16 @@ var Plantillas = (function () {
        los formularios oficiales del tipo y de los hitos del asunto
        (fila 82), uno por línea. Doble llave, como el resto de este
        grupo. */
-    { clave: 'formularios', etiqueta: 'Los formularios oficiales del tipo y de sus hitos, uno por línea' }
+    { clave: 'formularios', etiqueta: 'Los formularios oficiales del tipo y de sus hitos, uno por línea' },
+    /* Las tablas de datos (24-sep-2026, fila 110, docs/TABLAS-DE-DATOS.md,
+       js/tablas-datos.js): la especialidad (el puesto en los RelPerCen) y
+       la tabla de periodos de tutoría del tercero. Los generales,
+       {{DATO <tabla>: <columna>}} y {{TABLA <tabla>: <col1> | <col2>}}, van
+       aparte, como {campo:...}. Sin dato, «[falta: …]» en amarillo. */
+    { clave: 'especialidad', etiqueta: 'Especialidad del profesor (del RelPerCen)' },
+    { clave: '{TABLA TUTORIAS}', etiqueta: 'Tabla de periodos de tutoría: curso, grupo, desde y hasta' },
+    { clave: '{DATO tabla: columna}', etiqueta: 'Un dato suelto de una tabla de datos (el de su curso más reciente)' },
+    { clave: '{TABLA tabla: columna | columna}', etiqueta: 'Una tabla de datos entera, con esas columnas' }
   ];
 
   var cache = null;
@@ -277,6 +286,12 @@ var Plantillas = (function () {
       var fechaHecho = valores.hechos[U.normalizar(titulo)] || '';
       if (!fechaHecho) faltan.push('hecho: ' + titulo);
       return { encontrado: true, valor: fechaHecho };
+    }
+    /* Las tablas de datos (fila 110): js/tablas-datos.js ya las ha
+       resuelto en `valores.datosTablas` (o metido la tabla en su sitio).
+       Fuera de un documento, nada y sin contar como falta. */
+    if (/^(dato|tabla)\s/i.test(clave)) {
+      return { encontrado: true, valor: (valores.datosTablas && valores.datosTablas[U.normalizar(clave)]) || '' };
     }
     if (/^campo\s*:/i.test(clave)) {
       var nombreCampo = clave.replace(/^campo\s*:/i, '').trim();

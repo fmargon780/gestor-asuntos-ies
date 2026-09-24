@@ -179,6 +179,8 @@
     if (!r.persona) { caja.innerHTML = suelto(r.aviso || 'No encontrado.'); return; }
     var resumen = Datos.resumenDeTercero(r.persona, r.categoria);
     montarLinea(caja, r.persona, r.categoria, resumen, a);
+    /* Fila 110: sus filas en las tablas de datos (tutorías…), plegadas. */
+    if (window.TablasDatosPantalla) TablasDatosPantalla.pintarEnFicha(caja, r.persona);
   }
 
   /* ---------- la ventana "Ver todo" ---------- */

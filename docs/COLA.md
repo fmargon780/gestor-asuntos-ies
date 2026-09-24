@@ -97,12 +97,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 62, 64 a 75, 77 a 109 están **HECHAS**. Sus documentos siguen en
+Las filas 1 a 62, 64 a 75, 77 a 110 están **HECHAS**. Sus documentos siguen en
 `docs/`, y el detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 110 | `docs/TABLAS-DE-DATOS.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 111 | `docs/GENERO-EN-PLANTILLAS.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
@@ -111,9 +110,7 @@ Las filas 1 a 62, 64 a 75, 77 a 109 están **HECHAS**. Sus documentos siguen en
 con las formas dobles de siempre («el/la alumno/a») y la app deja sola la que toca según el sexo
 de la persona; sin dato, se quedan con la barra.
 
-**La fila 110 se apuntó el 24-sep-2026**, cerrada con Francisco: tablas de datos (PDF de
-función tutorial de Séneca, RelPerCen, Excel/CSV) unidas por DNI, huecos `{{ESPECIALIDAD}}` y
-`{{TABLA TUTORIAS}}`, y plantilla «Certificado de función tutorial».
+**La fila 110 está HECHA** (24-sep-2026): `docs/TABLAS-DE-DATOS.md`. Tablas de datos (el PDF de funciones tutoriales de Séneca y los CSV/Excel de `datos/Tablas`) unidas por DNI, huecos `{{ESPECIALIDAD}}`, `{{TABLA TUTORIAS}}`, `{{DATO …}}` y `{{TABLA …}}`, y plantilla «Certificado de función tutorial» (`docs/contexto/TABLAS-DE-DATOS.md`). Versión publicada `App.VERSION`: `24-sep-2026 · 04:51`.
 
 **La fila 109 está HECHA** (24-sep-2026): `docs/EL-HITO-A-PANTALLA-COMPLETA.md`. El hito se abre a pantalla completa como mesa de trabajo (guion que se marca solo, documentos en tabla, plantillas y formularios, comunicar y notas), con borrador de guion para los 296 hitos modelo del centro (`docs/contexto/HITO-MESA.md`). Versión publicada `App.VERSION`: `24-sep-2026 · 04:32`.
 

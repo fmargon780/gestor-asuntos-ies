@@ -102,3 +102,11 @@
 .vt-abajo { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
 .vt-botones { display: flex; gap: 8px; flex-wrap: wrap; }
 .vt-abajo .vertodo-resto { margin-top: 6px; }
+
+/* Las tablas de datos en la ficha del tercero (fila 110, js/tablas-datos-pantalla.js). */
+.tablas-en-ficha { margin-top: 8px; font-size: 13px; }
+.tablas-en-ficha summary { cursor: pointer; color: var(--tinta-suave); }
+.tablas-ficha-tabla { margin-top: 6px; }
+.tablas-ficha { border-collapse: collapse; font-size: 12px; margin-top: 2px; }
+.tablas-ficha th, .tablas-ficha td { border: 1px solid var(--linea); padding: 2px 8px; text-align: left; }
+.tablas-ficha th { background: #eef1f5; }
