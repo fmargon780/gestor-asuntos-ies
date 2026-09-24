@@ -68,7 +68,7 @@ var EstadoMigracion = (function () {
     var leido = null;
     try { leido = await Carpetas.leerJson(g, 'estados.json'); } catch (e) { leido = null; }
     var lista = normalizarEstados(leido);
-    /* Sin fichero (o vacío), los de fábrica, como hacía antes App.cargarEstados. */
+    /* Sin fichero (o vacío), los de fábrica, como se hacía antes al entrar. */
     if (!lista.length && window.Nombres && Nombres.ESTADOS_POR_DEFECTO) {
       lista = Nombres.ESTADOS_POR_DEFECTO.map(function (x) { return { nombre: x.nombre, espera: !!x.espera }; });
     }
