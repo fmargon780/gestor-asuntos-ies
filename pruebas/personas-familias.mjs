@@ -16,7 +16,7 @@ function comprobar(titulo, real, esperado) {
 const contexto = { console, window: {}, document: { addEventListener() {}, getElementById() { return null; } } };
 vm.createContext(contexto);
 contexto.App = contexto.window.App = { E: {} };
-for (const f of ['util.js', 'datos.js', 'datos-listas.js', 'datos-tutores.js', 'personas-familias.js']) {
+for (const f of ['util.js', 'datos.js', 'datos-alumnado.js', 'datos-personal.js', 'datos-resumen.js', 'datos-listas.js', 'datos-tutores.js', 'personas-familias.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 const { U, Datos, PersonasFamilias } = vm.runInContext('({ U: U, Datos: Datos, PersonasFamilias: PersonasFamilias })', contexto);
