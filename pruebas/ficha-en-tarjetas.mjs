@@ -113,8 +113,9 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
     }), true);
   await comprobar('1. Hitos resume "0 de 3 hechos"',
     pagina.locator('.ficha-tarjeta[data-tarjeta="hitos"] .ficha-tarjeta-resumen .fuerte').textContent(), '0 de 3 hechos');
-  await comprobar('1. Documentos dice cuántos hay',
-    pagina.locator('.ficha-tarjeta[data-tarjeta="documentos"] .ficha-tarjeta-resumen .fuerte').textContent(), '3 documentos');
+  /* Desde la fila 114, sin la línea «3 documentos» (el número va en el círculo): sus nombres. */
+  await comprobar('1. Documentos enseña sus nombres',
+    pagina.locator('.ficha-tarjeta[data-tarjeta="documentos"] .ficha-tarjeta-resumen .ficha-resumen-doc').allTextContents(), DOCS);
   await comprobar('1. Notas enseña la última',
     pagina.locator('.ficha-tarjeta[data-tarjeta="notas"] .ficha-tarjeta-resumen').textContent().then((t) => t.indexOf('Llamó la madre') !== -1), true);
   if (ancho === 1905 && process.env.FOTOS) await pagina.screenshot({ path: process.env.FOTOS + '/tarjetas-cuadricula.png' });

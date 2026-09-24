@@ -5,6 +5,24 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 114: los documentos en la tarjeta cerrada, legibles
+
+`docs/DOCUMENTOS-EN-LA-TARJETA.md`. En la tarjeta cerrada «Documentos de la carpeta» los nombres
+salían montados unos encima de otros y cortados por abajo, y la primera línea repetía el número del
+círculo. Ahora cada documento va en su renglón, como mucho cinco (o los que quepan enteros), y
+«y N más» abre la lista entera.
+
+- Causa: los renglones del resumen se encogían por debajo de su alto de línea (`flex-shrink` por
+  defecto en una columna flex con `overflow: hidden`); con `flex: none`, en todas las tarjetas.
+- Decisión: cuántos caben se mide después de pintar (alto de la caja entre el de un renglón) y se
+  vuelve a medir con `ajustarAlto()`; nunca un renglón a medias.
+- `js/ficha-tarjetas.js` iba a pasar de 450 líneas: los resúmenes se fueron a
+  `js/ficha-tarjetas-resumen.js`. Cada renglón lleva `title` con su texto entero.
+
+Prueba nueva `pruebas/documentos-en-la-tarjeta.mjs`; `pruebas/ficha-en-tarjetas.mjs` ya no espera la
+línea «3 documentos». Batería completa en verde.
+Versión publicada `App.VERSION`: `VERSION_114`.
+
 ## 24-sep-2026 — Fila 113: el mapa de la guía
 
 `docs/MAPA-DE-LA-GUIA.md`. Con dos niveles de preguntas, al escribir la guía cada rama se veía por
