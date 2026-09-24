@@ -580,7 +580,8 @@ cuánto se tarda** de todos los asuntos, abiertos y archivados.
   la carpeta.
 - **Por quién lo pidió**: agrupa `ficha.loPide` (`js/lo-pide.js`) en Familia (su `relacion`
   empieza por "Tutor legal"), Alumnado, Centro o Empresa (según `loPide.categoria`); sin
-  "Quién lo pide" apuntado, va aparte en "Sin apuntar", no se cuenta como si fuera de nadie.
+  "Quién lo pide" apuntado, va aparte en "Sin apuntar", no se cuenta como si fuera de nadie. Un
+  asunto reservado (fila 135, `Reservados.es`) se cuenta, pero aquí sale como "Reservado".
 - **Cuánto se tarda**: solo de los archivados con `abiertoEl` y `cerradoEl` (los de antes de
   llevar esos dos datos no entran: no se inventa una duración). Media y el que más tardó, en días.
 - El índice del ARCHIVO guarda, desde esta fila (`VERSION` 2 → 3), `reconocido`, `loPideCategoria`,

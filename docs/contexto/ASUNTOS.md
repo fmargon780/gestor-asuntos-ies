@@ -289,6 +289,28 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   (el botón queda oculto) y, en pantallas cortas, el de aceptar puede quedar fuera de la parte
   visible del cuadro.
 
+### Asuntos reservados (25-sep-2026, fila 135, `docs/ASUNTOS-RESERVADOS.md`)
+
+Para que un expediente disciplinario o de salud no se vea **sin querer**; la carpeta sigue viéndose
+en Dropbox y la aplicación lo dice así. `js/reservados.js` (`Reservados`) es la única que decide
+(`es(a)`): la ficha de `asuntos.json` puede llevar `reservado: true` o `false` (este saca un asunto
+de un tipo reservado); sin el dato, hereda del tipo (`reservado: true` en `tipos.json`). Cada sitio
+llama a una función, sin envolver nada:
+
+- **Dónde se marca**: casilla en «Datos del tipo» (`filaDeTipo`, con la línea «Solo evita que se vea
+  sin querer…») y, en la ficha, el menú de tres puntos: «Marcar como reservado» / «Quitar la
+  reserva» (`opcionDelMenu`, por `App.guardarRegistroFresco`; en un tipo reservado, quitarla deja
+  `false`). En modo consulta se apaga como las demás.
+- **Tarjeta** en Asuntos abiertos y ARCHIVO (`enTarjeta`, al colgarla, ya pasada por sus
+  envoltorios): candado; tapada, el rótulo es «fecha TIPO curso grupo · reservado», el pie no dice
+  quién es y se quitan el trocito de nota y el botón del NIE. Se sigue abriendo.
+- **Buscadores** (abiertos y ARCHIVO): un tapado solo sale por su nombre de carpeta
+  (`textoDeBusqueda`), no por notas, documentos ni ficha.
+- **«Qué me toca»**: el mismo rótulo tapado y sin tercero (`nombreParaVer`). **Ficha del asunto**:
+  entera, con candado en la cabecera (`ponerCandado`). **Ficha de una persona**: con candado.
+- **«Mostrar reservados»** (`#btn-mostrar-reservados`, junto a «Filtros», solo si hay algún tipo o
+  asunto reservado): destapa todo, solo en esta sesión; a propósito, sin `localStorage`.
+
 ### Las tarjetas por tipo de asunto
 
 Dentro de "En el departamento" y de "A la espera de terceros", encima de la lista, sale una fila

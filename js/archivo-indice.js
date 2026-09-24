@@ -223,7 +223,9 @@ var IndiceArchivo = (function () {
          recortado (Notas.textoParaBuscar ya lo recorta a 2.000
          caracteres), para poder buscar dentro de ellas sin tener que
          abrir la carpeta. */
-      notas: window.Notas ? Notas.textoParaBuscar(ficha) : ''
+      notas: window.Notas ? Notas.textoParaBuscar(ficha) : '',
+      /* Fila 135: solo si la ficha lo dice (sin el dato, manda el tipo). */
+      reservado: typeof ficha.reservado === 'boolean' ? ficha.reservado : undefined
     };
   }
 

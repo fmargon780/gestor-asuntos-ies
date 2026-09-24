@@ -68,6 +68,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 - Categoría → tipo → tercero → nombre de carpeta, con vista previa. Nombre corto del tipo; tipo nuevo sin salir de Nuevo asunto.
 - Cada tipo dice quién lo encarga (Secretaría, Dirección, Jefatura, Varios): parrilla agrupada, filtro y Cuentas.
+- Asuntos reservados (por tipo o uno a uno): candado y sin el nombre del tercero en listas y buscador.
 - El estado del asunto es su hito actual («Paso N de M · título»): lo pone solo en Administración o terceros; cada paso de la guía dice a quién le toca; «Esperando a…», a mano. Sin estados manuales. Vía y fecha límite.
 - Asuntos recurrentes, con aviso. Avisos de fichas sin carpeta y de papelera vieja.
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
@@ -115,12 +116,11 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   guion (con preguntas: un botón por respuesta) que se marca solo al generar, registrar, comunicar o añadir; documentos en tabla con sus
   gemelos y selección de varios; plantillas y formularios («Buscar otra plantilla…»: cualquiera); comunicar con destinatarios; notas.
   Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa.
-  Biblioteca de hitos del centro, con guion. Botones en Mantenimiento para cargar los tipos y guías
-  del instituto y traer los guiones (y las líneas nuevas del instituto a un guion ya escrito).
+  Biblioteca de hitos del centro, con guion; en Mantenimiento, cargar tipos, guías y guiones del instituto.
 - "Qué me toca": hitos pendientes, filtro por responsable, "Dormidos" (sin novedades en N días). "Cuentas": asuntos por tipo, mes y quién los pidió. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena en el PDF solo los datos del centro.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
-- Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF (carpeta del asunto y Por clasificar); deja libre la banda del sello y la firma.
+- Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF; deja libre la banda del sello y la firma.
 - "Lo pide": quién pidió la gestión, por qué vía y cuándo; su correo sale en el cuadro de Correo.
 - Archivar o reabrir sobre un destino que ya existe fusiona carpetas; errores en castellano; reintenta si Dropbox tropieza.
 - Crear, reabrir o editar deja en la ficha del asunto; Volver regresa a la pantalla de origen, a su altura; lo demás, aviso con «Ir al asunto».

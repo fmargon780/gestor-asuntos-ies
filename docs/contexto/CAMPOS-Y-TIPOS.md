@@ -212,6 +212,13 @@ función, sin envolver nada:
   etiqueta en la barra de filtros (`js/usabilidad.js`) y su marca en el botón «Filtros»
   (`js/vista.js`). **Cuentas**: ver `docs/contexto/HITOS-Y-GUIAS.md`.
 
+### Tipos reservados (25-sep-2026, fila 135)
+
+Un tipo puede llevar `reservado: true` en `tipos.json`: sus asuntos salen tapados en las listas, el
+buscador y «Qué me toca». La casilla vive en «Datos del tipo», debajo de «Quién lo encarga»
+(`Reservados.filaDeTipo`, `js/reservados.js`). Todo lo demás, en «Asuntos reservados» de
+`docs/contexto/ASUNTOS.md`.
+
 ### Ajustes plegado (24-sep-2026, fila 105, docs/AJUSTES-PLEGADO.md)
 
 Todo lo nuevo vive en `js/ajustes-plegado.js` (`AjustesPlegado`); `js/ajustes-tipo.js` solo llama

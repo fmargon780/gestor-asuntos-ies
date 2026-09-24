@@ -190,10 +190,13 @@
     b.className = 'qmt-fila';
     b.dataset.asunto = a.nombre;
     b.dataset.hito = h.id;
-    var tercero = terceroDe(a);
+    /* Fila 135: un reservado, con candado y sin el nombre del tercero. */
+    var tapado = window.Reservados && Reservados.tapar(a);
+    var tercero = tapado ? '' : terceroDe(a);
     b.innerHTML =
       '<span class="qmt-fila-titulo">' + U.escapar(h.titulo || '(sin título)') + '</span>' +
-      '<span class="qmt-fila-asunto">' + U.escapar(a.nombre) + '</span>' +
+      '<span class="qmt-fila-asunto">' + (window.Reservados ? Reservados.candadoHtml(a) : '') +
+        U.escapar(window.Reservados ? Reservados.nombreParaVer(a) : a.nombre) + '</span>' +
       (tercero ? '<span class="qmt-fila-tercero">' + U.escapar(tercero) + '</span>' : '') +
       (extraHtml || '');
     b.onclick = function () {
@@ -287,12 +290,14 @@
     caja.className = 'qmt-lista';
     lista.forEach(function (it) {
       var a = it.asunto;
-      var tercero = terceroDe(a);
+      var tapado = window.Reservados && Reservados.tapar(a);   /* fila 135 */
+      var tercero = tapado ? '' : terceroDe(a);
       var fila = document.createElement('div');
       fila.className = 'qmt-fila qmt-fila-dormido';
       fila.style.cursor = 'default';
       fila.innerHTML =
-        '<span class="qmt-fila-titulo">' + U.escapar(a.nombre) + '</span>' +
+        '<span class="qmt-fila-titulo">' + (window.Reservados ? Reservados.candadoHtml(a) : '') +
+          U.escapar(window.Reservados ? Reservados.nombreParaVer(a) : a.nombre) + '</span>' +
         (tercero ? '<span class="qmt-fila-tercero">' + U.escapar(tercero) + '</span>' : '') +
         '<span class="qmt-fila-espera">Sin novedades desde hace ' + it.dias + ' días</span>';
 

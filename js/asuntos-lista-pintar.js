@@ -7,6 +7,7 @@
    ============================================================ */
 
 App.pintarAbiertos = function () {
+  if (window.Reservados) Reservados.pintarBoton();   /* «Mostrar reservados» (fila 135) */
   if (!App.listaALaVista()) { App.E.listaPendiente = true; return; }
   App.E.listaPendiente = false;
   App.pintarCuentas();
@@ -25,7 +26,11 @@ App.pintarAbiertos = function () {
      Sobre esto se cuentan las tarjetas de tipo. */
   var monton = App.E.listaAbiertos.filter(function (a) {
     if (!App.deLaVista(a, App.E.vista)) return false;
-    if (palabras.length && !palabras.every(function (p) { return a.busca.indexOf(p) !== -1; })) return false;
+    if (palabras.length) {
+      /* Un reservado tapado solo sale por su nombre de carpeta (fila 135). */
+      var busca = (window.Reservados && Reservados.tapar(a)) ? Reservados.textoDeBusqueda(a) : a.busca;
+      if (!palabras.every(function (p) { return busca.indexOf(p) !== -1; })) return false;
+    }
     if (!Plazos.pasaFiltro(a.ficha.limite || '', plazo)) return false;
     if (organo && window.TiposOrgano && !TiposOrgano.pasaFiltro(App.tipoDeAsunto(a), organo)) return false;
     return App.pasaFiltroMonton(a, filtro);
@@ -54,8 +59,10 @@ App.pintarAbiertos = function () {
     return;
   }
   lista.forEach(function (a) {
-    a._fragmento = App.fragmentoDeNota(a, palabras);
-    caja.appendChild(App.tarjetaAsunto(a, 'abierto'));
+    var tapado = window.Reservados && Reservados.tapar(a);
+    a._fragmento = tapado ? null : App.fragmentoDeNota(a, palabras);
+    var tarjeta = App.tarjetaAsunto(a, 'abierto');
+    caja.appendChild(window.Reservados ? Reservados.enTarjeta(tarjeta, a) : tarjeta);
   });
   if (window.scrollY !== alto) window.scrollTo(0, alto);
   App.avisarALosModulos();

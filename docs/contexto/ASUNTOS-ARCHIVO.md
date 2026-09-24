@@ -205,6 +205,10 @@ tabla de ficheros), y la búsqueda es por palabras sueltas.
     `reconocido`, `loPideCategoria`, `loPideRelacion`, `abiertoEl` y `cerradoEl` a cada entrada:
     cada subida de `VERSION` deja sin esos campos a un índice guardado con la versión vieja, que
     se reconstruye solo (mismo aviso "El índice no está hecho" de siempre). Normalizado una vez.
+  - Desde la fila 135 la entrada lleva `reservado` solo si la ficha lo trae (`true`/`false`); sin
+    él manda el tipo, así que no hizo falta subir `VERSION`. `App.verArchivo` lo pasa a la ficha
+    de la tarjeta, y un reservado tapado solo se busca por su nombre (ver «Asuntos reservados» en
+    `docs/contexto/ASUNTOS.md`).
   - `resolverHandle(entrada)` calcula el manejador real de una carpeta a partir de lo que el índice
     sabe (categoría, tercero, ruta, `sueltoEn`): el índice no puede guardar manejadores en un JSON.
 - **`App.verArchivo`** (`js/archivo-personas.js`) lee el índice; si no existe, está roto o es de

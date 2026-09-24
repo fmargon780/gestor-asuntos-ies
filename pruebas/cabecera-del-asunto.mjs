@@ -115,9 +115,10 @@ await pagina.waitForTimeout(100);
 /* "Copiar el nombre del asunto" ya no vive aquí desde la fila 58
    (docs/AJUSTES-DE-USO-2026-09-18.md, 1): es el botón "Asunto" de la
    fila de copiar, siempre a la vista (punto 4 de esta misma prueba). */
-await comprobar('3. las dos opciones, en orden',
+/* «Marcar como reservado» (fila 135, js/reservados.js) va entre las dos. */
+await comprobar('3. las tres opciones, en orden',
   pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents(),
-  ['Editar el asunto', 'Borrar el asunto']);
+  ['Editar el asunto', 'Marcar como reservado', 'Borrar el asunto']);
 await comprobarQue('3. "Borrar el asunto" se ve en rojo',
   pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion'))
     .some((b) => b.textContent.trim() === 'Borrar el asunto' && b.classList.contains('ficha-menu-peligro'))));

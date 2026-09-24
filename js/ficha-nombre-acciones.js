@@ -70,6 +70,8 @@
         }
       });
     }
+    /* Fila 135: «Marcar como reservado» / «Quitar la reserva». */
+    if (abierto && window.Reservados) lista.push(Reservados.opcionDelMenu(a));
     if (abierto && window.Papelera) {
       if (lista.length) lista.push({ raya: true });
       lista.push({ texto: 'Borrar el asunto', clase: 'ficha-menu-peligro', alPulsar: borrarAsunto });
@@ -81,6 +83,7 @@
     if (!viendo) return;
     var h2 = document.querySelector('.ficha-nombre');
     if (!h2) return;
+    if (window.Reservados) Reservados.ponerCandado(h2, viendo);   /* fila 135 */
 
     if (!h2.querySelector('.ficha-nombre-menu-boton')) {
       var opciones = opcionesDelMenu(viendo, modoDelAsunto === 'abierto');

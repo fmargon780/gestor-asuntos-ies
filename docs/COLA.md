@@ -107,18 +107,25 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 75 y 77 a 134 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 75 y 77 a 135 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 135 | `docs/ASUNTOS-RESERVADOS.md` (sin el nombre del tercero en listas, buscador y Cuentas) | PENDIENTE |
 | 136 | `docs/PLAZO-DE-CONSERVACION.md` (años por tipo y aviso cuando se cumplen; nunca borra solo) | PENDIENTE |
 | 137 | `docs/INDICE-DEL-EXPEDIENTE.md` (PDF con la lista numerada de documentos, al archivar y con botón) | PENDIENTE |
 | 138 | `docs/UNA-SOLA-LISTA-EN-EL-HITO.md` («lo que hay que reunir» pasa al guion) | PENDIENTE |
 | 139 | `docs/UNA-SOLA-LIBRETA-DE-NOTAS.md` (las notas del hito pasan al asunto, con etiqueta) | PENDIENTE |
 | 140 | `docs/TIEMPO-DE-TRAMITACION.md` (media y máximo por tipo, y los abiertos más antiguos) | PENDIENTE |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 135 está HECHA** (25-sep-2026): `docs/ASUNTOS-RESERVADOS.md`. Un tipo (casilla en su
+pantalla) o un asunto (menú de la ficha) puede ser reservado (`js/reservados.js`, la única regla):
+en Asuntos abiertos, ARCHIVO y «Qué me toca» sale con candado y sin el nombre del tercero; el
+buscador solo lo encuentra por el nombre de la carpeta; «Mostrar reservados» lo destapa solo en esa
+sesión; en Cuentas, «Reservado» en «quién lo pide». Prueba `pruebas/asuntos-reservados.mjs`
+(y `pruebas/cabecera-del-asunto.mjs`, con la opción nueva del menú), batería completa en verde.
+Versión `App.VERSION`: `25-sep-2026 · 00:52`.
 
 **La fila 134 está HECHA** (25-sep-2026): `docs/QUIEN-ENCARGA-CADA-TIPO.md`. Cada tipo dice quién
 lo encarga (`organo` en `tipos.json`, `js/tipos-organo.js`): desplegable en la pantalla del tipo y

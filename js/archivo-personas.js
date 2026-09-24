@@ -56,6 +56,7 @@ App.verArchivo = async function () {
       categoria: e.categoria || '', tercero: e.tercero || '',
       seQuedoEn: e.seQuedoEn || '', terminado: !!e.terminado   /* fila 129 */
     };
+    if (e.reservado !== undefined) ficha.reservado = e.reservado;   /* fila 135 */
     return {
       nombre: e.nombre, handle: null, padre: null, ruta: e.ruta,
       categoria: e.categoria, tercero: e.tercero, sueltoEn: e.sueltoEn || '',
@@ -107,7 +108,9 @@ App.reconstruirIndiceArchivo = async function () {
 App.pintarArchivo = function () {
   var palabras = U.normalizar($('buscar-archivo').value).split(' ').filter(Boolean);
   var lista = App.E.listaArchivo.filter(function (a) {
-    return palabras.every(function (p) { return a.busca.indexOf(p) !== -1; });
+    /* Un reservado tapado solo sale por su nombre de carpeta (fila 135). */
+    var busca = (window.Reservados && Reservados.tapar(a)) ? Reservados.textoDeBusqueda(a) : a.busca;
+    return palabras.every(function (p) { return busca.indexOf(p) !== -1; });
   });
   var caja = $('lista-archivo');
   var alto = window.scrollY;   /* fila 119: la lista se queda a la misma altura */
@@ -121,8 +124,10 @@ App.pintarArchivo = function () {
     return;
   }
   lista.slice(0, 300).forEach(function (a) {
-    a._fragmento = App.fragmentoDeNota(a, palabras);
-    caja.appendChild(App.tarjetaAsunto(a, 'archivado'));
+    var tapado = window.Reservados && Reservados.tapar(a);
+    a._fragmento = tapado ? null : App.fragmentoDeNota(a, palabras);
+    var tarjeta = App.tarjetaAsunto(a, 'archivado');
+    caja.appendChild(window.Reservados ? Reservados.enTarjeta(tarjeta, a) : tarjeta);
   });
   if (lista.length > 300) {
     var mas = document.createElement('div');
@@ -391,6 +396,8 @@ App.verAsuntosDeTercero = async function (p) {
     var situacion = !window.EstadoHito ? '' : (a.donde === 'Abierto'
       ? EstadoHito.textoDeNombre(a.nombre) : EstadoHito.textoArchivado(ficha));
     return '<div class="resultado"><div>' +
+           /* Fila 135: aquí ya se ha elegido a la persona; el reservado se ve, con su candado. */
+           (window.Reservados ? Reservados.candadoHtml({ nombre: a.nombre, leido: leido, ficha: ficha }) : '') +
            (leido.tipo ? '<span class="marca-tipo" title="' + U.escapar(leido.tipo) + '">' +
                          U.escapar(Nombres.tipoParaVer(leido.tipo, App.E.tipos)) + '</span>' : '') +
            (situacion ? '<span class="marca-hito">' + U.escapar(situacion) + '</span>' : '') +

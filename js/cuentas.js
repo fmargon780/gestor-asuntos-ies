@@ -57,16 +57,23 @@
      NORMALIZAR UNA ENTRADA, ABIERTA O ARCHIVADA, A LA MISMA FORMA
      ========================================================== */
 
+  /* Fila 135: un asunto reservado se cuenta, pero en «quién lo pide»
+     sale como «Reservado» (js/reservados.js decide cuál lo es). */
+  function esReservado(a) {
+    return typeof Reservados !== 'undefined' ? Reservados.es(a) : false;
+  }
+
   /* `a` es lo que trae `window.Gestor.asuntos()`: {nombre, ficha, ...}. */
   function entradaAbierta(a, tipos) {
     var leido = Nombres.leer(a.nombre, tipos || []);
     var ficha = a.ficha || {};
     var loPide = ficha.loPide || null;
+    var reservado = esReservado({ leido: leido, ficha: ficha });
     return {
       abierta: true, fecha: leido.fecha || '',
       categoria: leido.reconocido ? leido.categoria : '', tipo: leido.reconocido ? leido.tipo : '',
-      tieneLoPide: !!(loPide && loPide.nombre),
-      loPide: loPide ? grupoLoPide(loPide.categoria, loPide.relacion) : '',
+      tieneLoPide: reservado || !!(loPide && loPide.nombre),
+      loPide: reservado ? 'Reservado' : (loPide ? grupoLoPide(loPide.categoria, loPide.relacion) : ''),
       abiertoEl: ficha.abiertoEl || '', cerradoEl: ''
     };
   }
@@ -74,11 +81,12 @@
   /* `e` es una entrada del índice del ARCHIVO (js/archivo-indice.js,
      `entradaDe`, con los campos añadidos en esta misma fila). */
   function entradaArchivada(e) {
+    var reservado = esReservado({ tipo: e.tipo, reservado: e.reservado });
     return {
       abierta: false, fecha: e.fecha || '',
       categoria: e.reconocido ? e.categoria : '', tipo: e.reconocido ? e.tipo : '',
-      tieneLoPide: !!e.loPideNombre,
-      loPide: e.loPideNombre ? grupoLoPide(e.loPideCategoria, e.loPideRelacion) : '',
+      tieneLoPide: reservado || !!e.loPideNombre,
+      loPide: reservado ? 'Reservado' : (e.loPideNombre ? grupoLoPide(e.loPideCategoria, e.loPideRelacion) : ''),
       abiertoEl: e.abiertoEl || '', cerradoEl: e.cerradoEl || ''
     };
   }

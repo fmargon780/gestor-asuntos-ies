@@ -5,6 +5,19 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 135: asuntos reservados
+
+`docs/ASUNTOS-RESERVADOS.md`. Un expediente disciplinario o de salud ya no se ve sin querer: sale con
+candado y sin el nombre del tercero en las listas, «Qué me toca» y el buscador (que solo lo
+encuentra por el nombre de la carpeta). La ficha, si se abre, se ve entera. Decisiones:
+
+- La tarjeta se tapa al colgarla, ya pasada por todos sus envoltorios (el del NIE, el de presencia…),
+  no dentro de `App.tarjetaAsunto`: si no, un envoltorio de después volvía a poner el NIE.
+- «Mostrar reservados» también devuelve el buscador normal (notas incluidas) mientras está puesto.
+- El índice del ARCHIVO guarda `reservado` solo si la ficha lo trae; sin él manda el tipo, así que
+  no hizo falta reconstruir el índice.
+- El botón solo sale si hay algún tipo o asunto reservado, para no llenar la barra.
+
 ## 25-sep-2026 — Fila 134: quién encarga cada tipo
 
 `docs/QUIEN-ENCARGA-CADA-TIPO.md`. Cada tipo de asunto dice qué órgano lo encarga (Secretaría,

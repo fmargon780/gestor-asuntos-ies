@@ -1,0 +1,15 @@
+/* Asuntos reservados (fila 135, js/reservados.js). */
+
+/* El candado, delante del nombre (tarjeta, ficha, «Qué me toca», ficha de una persona). */
+.marca-reservado { margin-right: 6px; font-size: .95em; }
+
+/* Una tarjeta tapada: el rótulo sin el tercero, en cursiva. */
+.tarjeta-tapada .tarjeta-nombre { font-style: italic; }
+
+/* «Mostrar reservados», arriba en Asuntos abiertos: pequeño. */
+.boton-reservados { font-size: 12px; padding: 4px 10px; }
+.boton-reservados[aria-pressed="true"] { background: var(--ambar); border-color: var(--ambar-linea); }
+
+/* La casilla en la pantalla de un tipo. */
+.tipo-reservado-fila { margin-top: 10px; }
+.tipo-reservado-casilla { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }

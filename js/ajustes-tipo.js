@@ -60,6 +60,8 @@ function construirSeccionDatos(tipo) {
   b.cuerpo.appendChild(lista);
   /* «Quién lo encarga» (fila 134, js/tipos-organo.js), junto a la categoría. */
   if (window.TiposOrgano) b.cuerpo.appendChild(TiposOrgano.filaDeTipo(tipo));
+  /* «Reservado» (fila 135, js/reservados.js). */
+  if (window.Reservados) b.cuerpo.appendChild(Reservados.filaDeTipo(tipo));
   var cambiar = document.createElement('button');
   cambiar.type = 'button';
   cambiar.className = 'boton';
