@@ -137,6 +137,12 @@ cualquier instrucción de la cola, actualizar este documento y `CONTEXTO-CORTO.m
 la línea vieja, no añadiendo una debajo**, y anotar en `docs/HISTORIA.md` lo que merezca
 recordarse, con su fecha.
 
+**Ningún fichero de `js/` pasa de 600 líneas** (fila 133, 24-sep-2026,
+`docs/PARTIR-FICHEROS-GRANDES.md`). Si uno crece, se parte por temas en trozos de menos de 400,
+moviendo funciones enteras: el estado que comparten va en un objeto interno (`X._interno`, o
+`window.XNucleo`), cada trozo se carga en `index.html` justo después de su origen, y las pruebas
+que cargan el origen suelto (con `vm`) cargan también sus trozos.
+
 ### Publicar: comprobarlo siempre, no darlo por hecho ← IMPORTANTE
 
 **Subir al repositorio no garantiza que Vercel publique.** Después de subir algo hay que

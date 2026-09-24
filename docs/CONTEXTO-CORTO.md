@@ -74,15 +74,14 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Personas (Alumnado): matriculados primero, antiguos plegados; busca por padre, madre o tutor;
   hermanos en la ficha, que sigue al bajar.
 - Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
-  Renombrar un tipo: se lleva su guía.
-  Al cambiarle el tipo, ofrece su guía.
+  Renombrar un tipo se lleva su guía; cambiarle el tipo, la ofrece.
 - Nombre comercial de empresas; cambiar los datos de un tercero dado de alta a mano.
 - Guías del procedimiento por tipo, con preguntas dentro de las respuestas sin límite, y su mapa
   (dibujo de la guía entera; en un asunto, con el camino elegido resaltado). Se escriben en
   acordeón: un paso abierto a la vez.
 - Panel lateral de lectura, y tablón de notas siempre visible.
-- Correo y mensaje de Séneca: el mensaje se prepara; el correo de un asunto se envía de
-  verdad, con Apps Script y confirmación, y nunca dos veces.
+- Correo y mensaje de Séneca: se prepara; el correo se envía de verdad (Apps Script, con
+  confirmación) y nunca dos veces.
 - "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; con
   tercero reconocido, también sugiere meterlo en uno que ya existe («Meter aquí»). Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
@@ -137,7 +136,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   Code solo, en verde y sin conflictos (nota al final de `docs/COLA.md`).
 - **Comprobar siempre lo publicado con `curl`.**
 - Vercel: 100 publicaciones/día (gratuito); `vercel.json` salta los commits de solo `docs/`, `pruebas/`, `.github/` o `.md`; máximo dos subidas por fila (regla 13).
-- Antes de colgar una función nueva de `App`, comprobar que el nombre no está cogido. Un solo cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.
+- Antes de colgar una función de `App`, mirar que el nombre esté libre. Un solo cuadro (`U.preguntar`) a la vez.
 - Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV.
 - Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o uno nuevo. Sin remedio, con `U.envolver`, apuntado en `js/envolturas-esperadas.js`.
 - Principal y accesorio por separado: rojo si falla lo principal (`U.fallo`), verde si sale, ámbar
@@ -147,8 +146,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   lleva contador de turno (el último gana).
 - Un bloque que se repinta solo nunca puede tirar lo que se está escribiendo, ni el foco, ni el
   cursor: envolver el repintado en `U.conservandoLoEscrito(raiz, fn)`.
-- Al terminar una instrucción de la cola: actualizar este documento y `CONTEXTO.md`
-  sustituyendo la línea vieja, y anotar en `HISTORIA.md` lo que merezca recordarse.
+- Ningún fichero de `js/` pasa de 600 líneas: se parte por temas, con el estado común en `X._interno`.
 - Todo guardado de `_GESTOR` pasa por la cola por fichero (`ColaGuardado`: asuntos, hitos, tablón,
   CSV de terceros, índice, borrados); nunca `Copias.guardar` directo de `asuntos.json`.
   Ninguna tarea de fondo escribe ni mira la carpeta con un guardado en marcha.
@@ -157,7 +155,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 7. Descartado, no proponer otra vez
 
-- Conector de Vercel sobre un proyecto existente (da 403), o crear otro "por si acaso". `vercel.app` bloqueado en el centro: resuelto con el dominio propio.
+- Conector de Vercel sobre un proyecto existente (da 403), o crear otro "por si acaso".
 - Abrir la carpeta del asunto en el explorador de archivos, o una hoja de Google Sheets como interfaz.
 - Enlazar un correo con `#all/<id de hilo>` (es `#search/rfc822msgid:<id>`), o meter Gmail en un marco (Google no lo permite).
 - Esconder el tablón de notas, sacar el DNI de la columna del tutor, o poner el nombre comercial en el nombre de la carpeta de un asunto de empresa.

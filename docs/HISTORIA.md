@@ -5,6 +5,21 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 133: partir los ficheros grandes
+
+`docs/PARTIR-FICHEROS-GRANDES.md`. Catorce ficheros de más de 600 líneas partidos por temas en 35
+trozos nuevos de menos de 400, moviendo funciones enteras, sin cambiar nada de lo que se ve
+(`ajustes-centro.js` ya había bajado con la fila 132). Cómo se hizo, para la próxima vez:
+
+- El estado que comparten los trozos (variables del cierre) pasa a un objeto interno
+  (`Datos._interno`, `BandejaNucleo`, `FichaNucleo`, `CorreoNucleo._interno`…), y solo se cambian
+  las llamadas y los usos del valor, nunca los comentarios ni los textos.
+- Cada trozo va en `index.html` justo después de su origen; las envolturas que se mudaron de
+  fichero se cambiaron en `js/envolturas-esperadas.js`.
+- Las pruebas sin navegador que cargaban el origen suelto (`vm`) cargan también sus trozos. En
+  `vm`, `window.X` no es global: un trozo que busca a su origen lo hace por `window.X`.
+- Batería completa tras cada fichero partido (la excepción a «una sola tanda»).
+
 ## 24-sep-2026 — Fila 132: arreglos por dentro
 
 `docs/ARREGLOS-POR-DENTRO.md`. Cinco arreglos sin pantalla propia:

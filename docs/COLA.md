@@ -107,12 +107,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 75 y 77 a 132 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 75 y 77 a 133 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 133 | `docs/PARTIR-FICHEROS-GRANDES.md` (los que pasan de 600 líneas, sin cambiar nada) | EN CURSO (24-sep-2026) |
 | 134 | `docs/QUIEN-ENCARGA-CADA-TIPO.md` (Secretaría, Dirección, Jefatura o Varios en cada tipo) | PENDIENTE |
 | 135 | `docs/ASUNTOS-RESERVADOS.md` (sin el nombre del tercero en listas, buscador y Cuentas) | PENDIENTE |
 | 136 | `docs/PLAZO-DE-CONSERVACION.md` (años por tipo y aviso cuando se cumplen; nunca borra solo) | PENDIENTE |
@@ -121,6 +120,14 @@ Las filas 1 a 75 y 77 a 132 están **HECHAS**. Sus documentos siguen en `docs/`,
 | 139 | `docs/UNA-SOLA-LIBRETA-DE-NOTAS.md` (las notas del hito pasan al asunto, con etiqueta) | PENDIENTE |
 | 140 | `docs/TIEMPO-DE-TRAMITACION.md` (media y máximo por tipo, y los abiertos más antiguos) | PENDIENTE |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 133 está HECHA** (24-sep-2026): `docs/PARTIR-FICHEROS-GRANDES.md`. Partidos los quince,
+sin cambiar nada de lo que se ve: `bandeja-correos.js`, `datos.js`, `ficha-asunto.js`, `guias.js`,
+`asuntos-nuevo.js`, `papelera.js`, `asuntos-lista.js`, `plantillas.js`, `documentos.js`,
+`relacionados.js`, `util.js`, `correo.js`, `unir-asuntos.js` y `plantillas-documento.js` (35
+ficheros nuevos, en `docs/contexto/FICHEROS-DEL-REPOSITORIO.md`); `ajustes-centro.js` ya había
+bajado de 600 con la fila 132. Ninguno de `js/` pasa ya de 600 líneas. Batería completa en verde
+tras cada fichero; `npm run copia-local` sigue funcionando. Versión `App.VERSION`: `25-sep-2026 · 00:18`.
 
 **La fila 132 está HECHA** (24-sep-2026): `docs/ARREGLOS-POR-DENTRO.md`. Terceros que se releen solos
 (fecha de los CSV), fuera el código de los estados escritos a mano, cabeceras de seguridad en
