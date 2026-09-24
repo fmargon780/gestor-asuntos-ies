@@ -6,46 +6,48 @@
 .nombre-pulsable { cursor: pointer; }
 .nombre-pulsable:hover { text-decoration: underline; }
 
-.ficha-cabecera { margin-bottom: 16px; }
-.ficha-marcas { margin: 12px 0 4px; }
-
-/* La línea gris bajo el nombre (18-sep-2026, fila 51,
-   docs/FICHA-DISPOSICION.md, 4): lo que antes repetía "Datos del
-   asunto". Se esconde entera con la cabecera encogida: no entra en el
-   reparto por "order" de ahí abajo, solo desaparece. */
-.ficha-subtitulo { margin: 4px 0 0; font-size: 13px; color: var(--tinta-suave); }
-.ficha-cabecera.encogida .ficha-subtitulo { display: none; }
-
-/* Encogida (css/cabecera-fija.css pone y quita la clase): todo en una
-   sola línea — volver, nombre (con puntos suspensivos si no cabe),
-   tipo, estado y plazo — docs/CABECERA-QUE-SE-QUEDA.md, tabla del
-   punto 2. El orden visual cambia con "order", sin tocar el HTML que
-   escribe js/ficha-asunto.js (el nombre va en medio, las marcas al
-   final). */
-.ficha-cabecera.encogida {
-  display: flex; align-items: center; gap: 12px; flex-wrap: nowrap;
-  margin-bottom: 0;
+/* La cabecera en dos líneas (24-sep-2026, fila 112,
+   docs/CABECERA-COMPACTA.md). Línea 1: volver, tipo, nombre con «⋯» y,
+   a la derecha, «Archivar». Línea 2: la barra de acciones y, a la
+   derecha, en pequeño y gris, la fila de copiar y la línea de apertura.
+   Sin raya ni margen grande debajo. En pantallas estrechas las líneas
+   se parten, nunca con desplazamiento lateral. */
+.ficha-cabecera { margin-bottom: 8px; padding-top: 2px; }
+.ficha-linea1 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-width: 0; }
+.ficha-linea1 .ficha-nombre { flex: 1 1 260px; min-width: 0; display: flex; align-items: center; }
+.ficha-linea1 .ficha-nombre-texto { min-width: 0; }
+.ficha-archivar { margin-left: auto; flex: 0 0 auto; }
+.ficha-archivar:empty { display: none; }
+.ficha-marcas { margin: 0; display: flex; gap: 6px; flex-wrap: wrap; }
+.ficha-linea2 { display: flex; align-items: center; gap: 8px 16px; flex-wrap: wrap; margin-top: 6px; min-width: 0; }
+.ficha-apertura {
+  margin-left: auto; display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%;
+  flex: 0 1 auto; font-size: 12px; color: var(--tinta-suave);
 }
-.ficha-cabecera.encogida .ficha-volver-fila { flex: 0 0 auto; order: 1; }
+
+/* La línea gris (18-sep-2026, fila 51, docs/FICHA-DISPOSICION.md, 4),
+   ahora en una sola línea, recortada si no cabe (el texto entero, en el
+   `title`). */
+.ficha-subtitulo {
+  margin: 0; font-size: 12px; color: var(--tinta-suave);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
+
+/* Encogida (css/cabecera-fija.css pone y quita la clase): las dos
+   líneas siguen, pero sin la parte gris; el nombre, recortado con
+   puntos suspensivos si no cabe (docs/CABECERA-QUE-SE-QUEDA.md). */
+.ficha-cabecera.encogida { margin-bottom: 0; }
+.ficha-cabecera.encogida .ficha-linea1 { flex-wrap: nowrap; }
+.ficha-cabecera.encogida .ficha-linea2 { margin-top: 4px; }
+.ficha-cabecera.encogida .ficha-apertura { display: none; }
 .ficha-cabecera.encogida #ficha-volver-origen { display: none; }
-/* El icono de copiar y los tres puntos siguen a la vista con la
-   cabecera encogida (18-sep-2026, fila 52, docs/CABECERA-DEL-ASUNTO.md,
-   5): el `<h2>` pasa a fila, y solo el texto del nombre
-   (`.ficha-nombre-texto`) se recorta con puntos suspensivos, nunca los
-   botones. */
-.ficha-cabecera.encogida .ficha-nombre {
-  order: 2; flex: 1 1 auto; min-width: 0; font-size: 16px; margin: 0;
-  display: flex; align-items: center; overflow: hidden;
-}
+.ficha-cabecera.encogida .ficha-nombre { font-size: 16px; overflow: hidden; }
 .ficha-cabecera.encogida .ficha-nombre-texto {
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
 }
 .ficha-cabecera.encogida .ficha-nombre .boton-nie,
 .ficha-cabecera.encogida .ficha-nombre-menu-boton { flex: 0 0 auto; }
-.ficha-cabecera.encogida .ficha-marcas {
-  order: 3; flex: 0 0 auto; margin: 0; display: flex; gap: 6px;
-  white-space: nowrap; overflow: hidden;
-}
+.ficha-cabecera.encogida .ficha-marcas { flex-wrap: nowrap; white-space: nowrap; overflow: hidden; }
 
 /* La fila de "Volver a la lista" y, si se ha saltado desde otro asunto
    (17-sep-2026, fila 40, docs/SALTAR-A-OTRO-ASUNTO.md), "← Volver a
@@ -76,9 +78,9 @@
    pequeños en una sola línea que envuelve antes que desaparecer. Se
    esconde con la cabecera encogida, igual que la línea gris de debajo
    (menos sitio, y el nombre ya lleva los tres puntos). */
-.ficha-copiar-fila { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 0; }
+.ficha-copiar-fila { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; }
 .ficha-cabecera.encogida .ficha-copiar-fila { display: none; }
-.boton-copiar-fila { padding: 3px 10px; font-size: 12px; }
+.boton-copiar-fila { padding: 1px 8px; font-size: 11.5px; color: var(--tinta-suave); }
 .ficha-nombre-menu-boton {
   display: inline-flex; align-items: center; justify-content: center;
   width: 28px; height: 28px; margin-left: 6px; padding: 0; vertical-align: middle;
@@ -108,12 +110,9 @@
    que el título, sin hueco a la derecha (18-sep-2026, fila 52,
    docs/CABECERA-DEL-ASUNTO.md, 12): "Archivar"/"Reabrir" se pega al
    borde con `margin-left: auto`. */
-.ficha-acciones {
-  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
-  padding: 12px 0 18px; border-bottom: 1px solid var(--linea); margin-bottom: 18px;
-}
-.ficha-acciones .campo-estado { width: auto; min-width: 180px; }
-.ficha-acciones .boton-principal { margin-left: auto; }
+.ficha-acciones { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ficha-acciones .campo-estado { width: auto; min-width: 180px; padding-top: 6px; padding-bottom: 6px; }
+.ficha-acciones .boton, .ficha-archivar .boton { padding-top: 6px; padding-bottom: 6px; }
 
 /* El vencimiento, a la vista (18-sep-2026, fila 52,
    docs/CABECERA-DEL-ASUNTO.md, 8): sustituye al botón "Plazo" y a la

@@ -147,22 +147,22 @@ var HitoMesa = (function () {
     var cuenta = Hitos.cuentaGuion ? Hitos.cuentaGuion(guion) : { hechos: 0, total: 0 };
     var completo = cuenta.total > 0 && cuenta.hechos === cuenta.total && h.estado !== 'hecho';
 
+    /* Fila 112 (docs/CABECERA-COMPACTA.md): una sola línea (nombre,
+       etiquetas y, a la derecha, «Hecho» y «⋯»); sin «Volver a la lista
+       de hitos» ni la línea de ruta: se vuelve pulsando otra vez la
+       pestaña «Hitos» o con Escape. */
     cab.innerHTML =
-      '<div class="mesa-fila-arriba">' +
-        '<button type="button" class="boton mesa-volver">← Volver a la lista de hitos</button>' +
-        '<span class="mesa-camino">Asuntos abiertos › ' + U.escapar(a.nombre) + ' › Hito ' + (n || '?') + ' de ' + visibles.length + '</span>' +
-      '</div>' +
       '<div class="mesa-titulo-fila">' +
-        '<h3 class="mesa-titulo">' + U.escapar(h.titulo || '') + '</h3>' +
+        '<h3 class="mesa-titulo" title="Hito ' + (n || '?') + ' de ' + visibles.length + '">' + U.escapar(h.titulo || '') + '</h3>' +
+        '<div class="mesa-etiquetas">' +
+          '<button type="button" class="mesa-etq mesa-etq-estado mesa-etq-' + h.estado + '">' + U.escapar(textoEstado(h.estado)) + '</button>' +
+          '<button type="button" class="mesa-etq mesa-etq-plazo ' + plazo.clase + '">' + U.escapar(plazo.texto) + '</button>' +
+          '<button type="button" class="mesa-etq mesa-etq-resp">' + U.escapar(resp ? resp.texto : 'Sin responsable') + '</button>' +
+        '</div>' +
         (abierto && h.clase !== 'decision'
           ? '<button type="button" class="boton' + (completo ? ' boton-principal mesa-hecho-resaltado' : '') + ' mesa-marcar-hecho">' +
             (h.estado === 'hecho' ? 'Hecho ✓ (desmarcar)' : 'Marcar hito como hecho') + '</button>' : '') +
         (abierto ? '<button type="button" class="boton mesa-mas" title="Más opciones">⋯</button>' : '') +
-      '</div>' +
-      '<div class="mesa-etiquetas">' +
-        '<button type="button" class="mesa-etq mesa-etq-estado mesa-etq-' + h.estado + '">' + U.escapar(textoEstado(h.estado)) + '</button>' +
-        '<button type="button" class="mesa-etq mesa-etq-plazo ' + plazo.clase + '">' + U.escapar(plazo.texto) + '</button>' +
-        '<button type="button" class="mesa-etq mesa-etq-resp">' + U.escapar(resp ? resp.texto : 'Sin responsable') + '</button>' +
       '</div>' +
       '<div class="mesa-tira">' + visibles.map(function (x, i) {
         return '<button type="button" class="mesa-tira-hito' + (x.id === h.id ? ' actual' : '') +
@@ -170,7 +170,6 @@ var HitoMesa = (function () {
           (x.estado === 'hecho' ? '✓ ' : '') + (i + 1) + '. ' + U.escapar(x.titulo || '') + '</button>';
       }).join('') + '</div>';
 
-    cab.querySelector('.mesa-volver').onclick = cerrar;
     Array.prototype.forEach.call(cab.querySelectorAll('.mesa-tira-hito'), function (b) {
       b.onclick = function () { abrir(a, b.dataset.id); };
     });

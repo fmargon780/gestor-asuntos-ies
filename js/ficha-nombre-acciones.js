@@ -142,7 +142,8 @@
   }
 
   function ponerFilaDeCopiar(h2) {
-    if (!window.Copiar || h2.parentNode.querySelector('.ficha-copiar-fila')) return;
+    var cabecera = h2.closest('.ficha-cabecera');
+    if (!window.Copiar || (cabecera || h2.parentNode).querySelector('.ficha-copiar-fila')) return;
     var a = viendo;
     var fila = document.createElement('div');
     fila.className = 'ficha-copiar-fila';
@@ -164,7 +165,10 @@
       'Copiar el ' + (esEmpresa ? 'CIF' : 'documento') + ' del tercero');
     fila.appendChild(botonDoc);
 
-    h2.parentNode.insertBefore(fila, h2.nextSibling);
+    /* Desde la fila 112, en la segunda línea, a la derecha, antes de la línea gris. */
+    var datos = cabecera && cabecera.querySelector('.ficha-apertura');
+    if (datos) datos.insertBefore(fila, datos.firstChild);
+    else h2.parentNode.insertBefore(fila, h2.nextSibling);
 
     if (!window.FichaTercero || typeof FichaTercero.datosBasicos !== 'function') return;
     FichaTercero.datosBasicos(a).then(function (r) {

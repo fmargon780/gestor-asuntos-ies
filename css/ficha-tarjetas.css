@@ -73,10 +73,13 @@ button.ficha-resumen-linea:hover { text-decoration: underline; }
 .ficha-tarjeta.abierta { cursor: default; overflow: visible; min-height: inherit; }
 .ficha-tarjeta.abierta > .ficha-tarjeta-resumen { display: none; }
 .ficha-tarjeta.abierta > .ficha-tarjeta-cuerpo { display: block; }
+/* Fila 112: con un hito abierto, el título «Hitos 2/5» ya está en la pestaña. */
+.ficha-tarjeta.abierta:has(#ficha-guia.con-mesa) > .ficha-titulo { display: none; }
+.ficha-tarjeta.abierta:has(#ficha-guia.con-mesa) { padding-top: 10px; }
 
 /* Las pestañas de arriba, con una tarjeta abierta. */
 .ficha-tarjetas-pestanas { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-.ficha-tarjetas[data-abierta] .ficha-tarjetas-pestanas { margin-bottom: 10px; }
+.ficha-tarjetas[data-abierta] .ficha-tarjetas-pestanas { margin-bottom: 8px; }
 .ficha-pestana {
   font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
   background: var(--papel); color: var(--tinta-suave);

@@ -23,11 +23,12 @@
 .hito-en-mesa .hito-requisitos-pedir { display: none; }   /* va en "Comunicar" */
 
 /* ---------- la cabecera ---------- */
-.mesa-cabecera { display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--linea); padding-bottom: 10px; }
-.mesa-fila-arriba { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.mesa-camino { font-size: 12px; color: var(--tinta-suave); }
+/* Fila 112: nombre, etiquetas y botones en una sola línea; debajo, la tira. */
+.mesa-cabecera { display: flex; flex-direction: column; gap: 6px; border-bottom: 1px solid var(--linea); padding-bottom: 8px; }
 .mesa-titulo-fila { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.mesa-titulo { margin: 0; font-size: 20px; flex: 1 1 300px; }
+.mesa-titulo { margin: 0; font-size: 19px; flex: 0 1 auto; min-width: 0; }
+.mesa-titulo-fila .mesa-etiquetas { flex: 1 1 auto; }
+.mesa-titulo-fila .boton { padding-top: 5px; padding-bottom: 5px; }
 .mesa-hecho-resaltado { box-shadow: 0 0 0 3px rgba(30, 122, 70, .25); }
 .mesa-etiquetas { display: flex; gap: 6px; flex-wrap: wrap; }
 .mesa-etq {

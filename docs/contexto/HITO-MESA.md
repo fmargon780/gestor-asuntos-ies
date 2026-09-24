@@ -32,14 +32,19 @@ de un documento, generar o meter un papel en un hito) abre la mesa de ese hito
 
 ## La cabecera (`js/hito-mesa.js`, `pintarCabecera`)
 
-Camino (`Asuntos abiertos › <asunto> › Hito N de M`), título, "Marcar hito como hecho" (resaltado
+Una sola línea (fila 112, `docs/CABECERA-COMPACTA.md`): título (con "Hito N de M" en su `title`),
+las etiquetas y, a la derecha, "Marcar hito como hecho" (resaltado
 con el guion completo; nunca se marca solo), menú ⋯ ("Dejarlo solo informativo"/"Pedírmelo a mí",
 "Quitar este hito": pulsan los botones de siempre, que quedan ocultos en `.hito-botones`), tres
 etiquetas pulsables con `FichaMenus` (estado → `Hitos.marcar`; plazo → "Cambiar la fecha…"/"Quitar
 la fecha" con `Hitos.guardarCampos`, texto "Vence el 15-oct · quedan N días hábiles" contando con
 `Plazos.sumarDiasHabiles` y los no lectivos; responsable → los de Ajustes › Hitos y los papeles) y
 la tira de hitos visibles (sin `noaplica` ni los del tipo anterior): ✓ los hechos, el actual
-marcado; pulsar uno salta a su mesa. Los campos grandes de responsable y fecha desaparecen.
+marcado; pulsar uno salta a su mesa. Los campos grandes de responsable y fecha desaparecen. Sin
+"← Volver a la lista de hitos" ni camino: se vuelve pulsando otra vez la pestaña "Hitos" o con
+Escape; con la mesa abierta, el título "Hitos" del recuadro no sale (`:has(#ficha-guia.con-mesa)`,
+`css/ficha-tarjetas.css`). Con 1600×920, "GUION DEL HITO" queda a unos 234 px del borde
+(`pruebas/cabecera-compacta.mjs`, límite 250).
 
 ## Las tres columnas (el cuerpo, `cuerpoDeHito` en `js/hitos-panel-lista.js`)
 

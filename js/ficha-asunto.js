@@ -326,8 +326,8 @@
       f.abiertoPor || ''
     ].filter(Boolean);
     if (!trozos.length) return '';
-    return '<p class="ficha-subtitulo">' +
-      trozos.map(function (t) { return U.escapar(t); }).join(' · ') + '</p>';
+    var linea = trozos.join(' · ');
+    return '<p class="ficha-subtitulo" title="' + U.escapar(linea) + '">' + U.escapar(linea) + '</p>';
   }
 
   /* La ficha entera se rehace con innerHTML, y con ella el campo de la
@@ -349,19 +349,28 @@
     var tipo = tipoDe(a);
     var tramite = datosDelAsunto(a);
     caja.innerHTML =
+      /* Dos líneas (24-sep-2026, fila 112, docs/CABECERA-COMPACTA.md):
+         volver, tipo, nombre y «⋯», con «Archivar» a la derecha; debajo,
+         la barra de acciones y, a la derecha, en gris, la fila de copiar
+         (js/ficha-nombre-acciones.js) y la línea de apertura. */
       '<header class="ficha-cabecera">' +
-        '<div class="ficha-volver-fila">' +
-          '<button type="button" class="boton" id="ficha-volver">← Volver a la lista</button>' +
-          '<div id="ficha-volver-origen"></div>' +
+        '<div class="ficha-linea1">' +
+          '<div class="ficha-volver-fila">' +
+            '<button type="button" class="boton" id="ficha-volver" title="Volver a la lista">← Volver</button>' +
+            '<div id="ficha-volver-origen"></div>' +
+          '</div>' +
+          '<div class="ficha-marcas">' + marcasDeFicha(a, tipo) + '</div>' +
+          '<h2 class="ficha-nombre"><span class="ficha-nombre-texto">' + U.escapar(a.nombre) + '</span></h2>' +
+          '<div class="ficha-archivar" id="ficha-archivar"></div>' +
         '</div>' +
-        '<div class="ficha-marcas">' + marcasDeFicha(a, tipo) + '</div>' +
-        '<h2 class="ficha-nombre"><span class="ficha-nombre-texto">' + U.escapar(a.nombre) + '</span></h2>' +
-        subtituloDeFicha(a) +
+        '<div class="ficha-linea2">' +
+          '<div class="ficha-acciones" id="ficha-acciones"></div>' +
+          '<div class="ficha-apertura">' + subtituloDeFicha(a) + '</div>' +
+        '</div>' +
       '</header>' +
       '<div id="ficha-presencia"></div>' +
       '<div id="ficha-sellos"></div>' +
       '<div id="ficha-aviso-tipo"></div>' +
-      '<div class="ficha-acciones" id="ficha-acciones"></div>' +
       /* Tarjetas (24-sep-2026, fila 107, docs/FICHA-EN-TARJETAS.md): la
          cuadrícula, abrir una en grande y la franja de documentos viven
          en js/ficha-tarjetas.js; los huecos de dentro (#ficha-guia,
@@ -814,7 +823,10 @@
       volverALaLista();
     });
     cerrar.classList.add('boton-principal');
-    caja.appendChild(cerrar);
+    /* En la primera línea de la cabecera, a la derecha (fila 112). */
+    var sitioArchivar = $('ficha-archivar');
+    if (sitioArchivar) { sitioArchivar.innerHTML = ''; sitioArchivar.appendChild(cerrar); }
+    else caja.appendChild(cerrar);
   }
 
   function boton(texto, ayuda, alPulsar, marcado) {
