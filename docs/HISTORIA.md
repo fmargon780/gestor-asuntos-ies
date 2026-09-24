@@ -5,6 +5,25 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 113: el mapa de la guía
+
+`docs/MAPA-DE-LA-GUIA.md`. Con dos niveles de preguntas, al escribir la guía cada rama se veía por
+separado y Francisco se perdía. Ahora hay un mapa de solo lectura, como un diagrama de flujo, con
+la guía entera: en Ajustes (pantalla del tipo), dentro del cuadro de escribir la guía y en la ficha
+de un asunto (con el camino elegido resaltado y el estado de cada hito). Detalle en
+`docs/contexto/HITOS-Y-GUIAS.md`.
+
+- Decisión: HTML y CSS a secas (cajas y líneas con `::before`), sin librerías, para que valga en la
+  copia sin internet.
+- Decisión: dentro del editor, el mapa es un panel del mismo cuadro, no un segundo cuadro; pulsar
+  un paso lleva a su nivel con él desplegado y resaltado.
+- `js/guias.js` pasaba de 1.200 líneas: la navegación por niveles se fue a `js/guias-niveles.js`
+  antes de añadir nada.
+- Lo que costó: la raya de las ramas se cortaba en el hueco entre una y otra.
+
+Prueba nueva `pruebas/guias-mapa.mjs` (sin navegador). Batería completa en verde.
+Versión publicada `App.VERSION`: `VERSION_113`.
+
 ## 24-sep-2026 — Fila 112: cabecera compacta de la ficha y del hito
 
 `docs/CABECERA-COMPACTA.md`. Con un hito abierto, lo importante empezaba a más de 500 px del borde

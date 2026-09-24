@@ -224,6 +224,7 @@
         if (!errorLectura && hitos.length) {
           caja.className = 'hitos-panel';
           caja.appendChild(HitosPanelLista.bloqueDeHitos(a, hitos, datos.ajustes, abierto, nombresDeLaCarpeta));
+          ponerBotonMapa(caja, a);
           volverADesplegar(caja, desplegados);
           aplicarDesplegarPendiente(caja, clave);
           /* La mesa del hito abierto, si la hay (fila 109, js/hito-mesa.js). */
@@ -237,6 +238,19 @@
       repintando = false;
       asegurarObservador();
     }
+  }
+
+  /* «Ver mapa» (fila 113, js/guias-mapa.js), en la línea de la cuenta. */
+  function ponerBotonMapa(caja, a) {
+    var linea = window.GuiasMapa && caja.querySelector('.hitos-cuenta');
+    if (!linea) return;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'boton boton-chico hitos-ver-mapa';
+    b.textContent = 'Ver mapa';
+    b.title = 'La guía entera de un vistazo, con el camino de este asunto';
+    b.onclick = function () { GuiasMapa.abrirDeAsunto(a); };
+    linea.appendChild(b);
   }
 
   /* La clave estable de un campo del cuerpo de un hito, para

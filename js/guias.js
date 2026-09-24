@@ -517,7 +517,9 @@ var Guias = (function () {
      estados.json. Las dos son opcionales: sin ellas, los desplegables
      salen vacíos, pero el resto del cuadro funciona igual (una guía
      vieja no tiene por qué dejar de escribirse). */
-  function editar(nombreTipo, lista, listaResponsables, listaEstados) {
+  /* `opciones.irA` (fila 113): el id de un paso; el cuadro se abre ya en
+     su nivel y con él desplegado (lo usa el mapa, js/guias-mapa.js). */
+  function editar(nombreTipo, lista, listaResponsables, listaEstados, opciones) {
     var pasos = normalizar(lista);
     /* Fila 95 (docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md): el nivel que
        se ve (la guía entera, o los pasos de una opción de una pregunta
@@ -527,7 +529,6 @@ var Guias = (function () {
        camino es { pregunta, opcion, lista } (lista: los pasos de esa
        opción, el mismo array que hay dentro del árbol). */
     var nivel = pasos;
-    var camino = [];
     var opcionesResp = listaResponsables || [];
     var opcionesEstado = listaEstados || [];
     var cuadro = document.querySelector('#capa .cuadro');
@@ -548,11 +549,13 @@ var Guias = (function () {
       '<div id="guia-pasos"></div>' +
       '<div class="guia-anadir-fila">' +
         '<button type="button" class="boton boton-ancho" id="guia-anadir">Añadir un paso</button>' +
+        (window.GuiasMapa ? '<button type="button" class="boton boton-ancho" id="guia-ver-mapa">Ver mapa</button>' : '') +
         (window.GuiasBiblioteca
           ? '<button type="button" class="boton boton-ancho" id="guia-traer-biblioteca">+ Traer de la biblioteca</button>' +
             GuiasBiblioteca.panelTraerHTML()
           : '') +
-      '</div>',
+      '</div>' +
+      (window.GuiasMapa ? GuiasMapa.panelHTML() : ''),
       'Guardar');
 
     if (window.GuiasBiblioteca) {
@@ -753,45 +756,11 @@ var Guias = (function () {
       return { id: id || nuevoId(), titulo: '', cuerpo: '', opciones: [], requisitos: [], comunicacion: null };
     }
 
-    /* ---------- entrar y salir de una pregunta de dentro (fila 95) ---------- */
-
-    function irA(nuevoCamino) {
-      recoger();
-      camino = nuevoCamino;
-      nivel = camino.length ? camino[camino.length - 1].lista : pasos;
-      abiertos = {};
-      $('guia-pasos').innerHTML = '';   /* que pintar() no arrastre los plegables del nivel de antes */
-      pintar();
-      var cuerpo = document.querySelector('#capa .cuadro-cuerpo') || document.getElementById('cuadro-cuerpo');
-      if (cuerpo && cuerpo.scrollTo) cuerpo.scrollTo(0, 0);
-    }
-
-    /* Entrar en la opción `o` de la pregunta `p` del nivel de ahora. */
-    function entrar(p, o) {
-      irA(camino.concat([{ pregunta: p.titulo || 'Pregunta sin título', opcion: o.titulo || 'Opción sin nombre',
-                           lista: o.pasos }]));
-    }
-
-    function pintarCamino() {
-      var caja = $('guia-camino');
-      if (!caja) return;
-      if (!camino.length) { caja.innerHTML = ''; caja.classList.add('oculto'); return; }
-      caja.classList.remove('oculto');
-      var trozos = ['<button type="button" class="guia-camino-trozo" data-nivel="0">Guía de ' +
-        U.escapar(nombreTipo) + '</button>'];
-      camino.forEach(function (c, k) {
-        trozos.push('<span class="guia-camino-pregunta">' + U.escapar(c.pregunta) + '</span>');
-        trozos.push(k === camino.length - 1
-          ? '<strong class="guia-camino-aqui">' + U.escapar(c.opcion) + '</strong>'
-          : '<button type="button" class="guia-camino-trozo" data-nivel="' + (k + 1) + '">' + U.escapar(c.opcion) + '</button>');
-      });
-      caja.innerHTML = '<button type="button" class="boton" id="guia-volver">← Volver</button> ' +
-        trozos.join(' <span class="suave">›</span> ');
-      $('guia-volver').onclick = function () { irA(camino.slice(0, -1)); };
-      Array.prototype.forEach.call(caja.querySelectorAll('.guia-camino-trozo'), function (b) {
-        b.onclick = function () { irA(camino.slice(0, parseInt(b.dataset.nivel, 10))); };
-      });
-    }
+    /* ---------- entrar y salir de una pregunta de dentro (fila 95) ----------
+       En js/guias-niveles.js desde la fila 113. */
+    var niveles = GuiasNiveles.crear({ pasos: pasos, nombreTipo: nombreTipo, recoger: recoger, pintar: pintar,
+      alCambiar: function (lista) { nivel = lista; abiertos = {}; } });
+    var entrar = niveles.entrar, pintarCamino = niveles.pintarCamino;
 
     /* Qué secciones plegables (paso-extra, "Lo que hay que reunir",
        "Comunicación de este paso", de un paso o de un subpaso) estaban
@@ -1197,6 +1166,16 @@ var Guias = (function () {
     };
 
     pintar();
+
+    /* El mapa (fila 113): panel dentro del mismo cuadro, dibujado con lo
+       que hay en pantalla; pulsar un paso lleva a él. */
+    if (window.GuiasMapa && $('guia-ver-mapa')) {
+      $('guia-ver-mapa').onclick = function () {
+        recoger();
+        GuiasMapa.pintarEnPanel($('guia-mapa-panel'), pasos, function (id) { niveles.irAPaso(id); });
+      };
+    }
+    if (opciones && opciones.irA) niveles.irAPaso(opciones.irA);
 
     return esperar.then(async function (ok) {
       if (ok) recoger();

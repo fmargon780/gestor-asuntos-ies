@@ -75,7 +75,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   Al cambiar el tipo, ofrece la guía del nuevo.
 - Nombre comercial de empresas, aparte de la razón social; cambiar los datos de un tercero dado
   de alta a mano.
-- Guías del procedimiento por tipo, con pasos y preguntas dentro de las respuestas, sin límite.
+- Guías del procedimiento por tipo, con preguntas dentro de las respuestas sin límite, y su mapa
+  (dibujo de la guía entera; en un asunto, con el camino elegido resaltado).
 - Panel lateral de lectura, y tablón de notas rápidas siempre visible.
 - Correo y mensaje de Séneca preparados (la app nunca envía nada).
 - "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; con

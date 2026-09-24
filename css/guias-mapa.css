@@ -1,0 +1,78 @@
+/* ============================================================
+   guias-mapa.css — el mapa de la guía (24-sep-2026, fila 113,
+   docs/MAPA-DE-LA-GUIA.md, js/guias-mapa.js). Cajas y líneas con
+   HTML y CSS: los pasos en columna, unidos por una línea; en cada
+   pregunta, las ramas una al lado de otra. Con muchas ramas, se
+   desplaza a los lados dentro de su caja, nunca la página.
+   ============================================================ */
+.mapa { width: 100%; max-width: 100%; overflow-x: auto; padding: 6px 0 10px; }
+.mapa-lienzo { display: flex; justify-content: center; min-width: min-content; }
+.mapa-columna { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+
+/* La línea que une un paso con el siguiente. */
+.mapa-nodo { display: flex; flex-direction: column; align-items: center; position: relative; padding-top: 18px; }
+.mapa-columna > .mapa-nodo:first-child { padding-top: 0; }
+.mapa-columna > .mapa-nodo + .mapa-nodo::before {
+  content: ''; position: absolute; top: 0; left: 50%; height: 18px; border-left: 2px solid var(--linea);
+}
+
+.mapa-caja {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center;
+  min-width: 140px; max-width: 220px; padding: 7px 12px;
+  background: var(--papel); color: var(--tinta);
+  border: 1px solid var(--linea); border-radius: 8px; box-shadow: var(--sombra);
+  font-size: 13px; line-height: 1.3;
+}
+.mapa-titulo { font-weight: 600; overflow-wrap: anywhere; }
+.mapa-meta { font-size: 11px; color: var(--tinta-suave); }
+.mapa-marca { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--azul); }
+.mapa-pregunta { border: 2px dashed var(--azul); background: var(--azul-claro); border-radius: 16px; }
+.mapa-informativo { color: var(--tinta-suave); background: var(--fondo); border-style: dotted; }
+.mapa-pulsable { cursor: pointer; }
+.mapa-pulsable:hover, .mapa-pulsable:focus { outline: 2px solid var(--azul); outline-offset: 1px; }
+.mapa-vacio { font-size: 12px; color: var(--tinta-suave); font-style: italic; }
+
+/* Las ramas: una raya de lado a lado y, de ella, una línea a cada rama. */
+.mapa-ramas { display: flex; align-items: flex-start; gap: 18px; margin-top: 18px; position: relative; padding-top: 18px; }
+.mapa-ramas::before {
+  content: ''; position: absolute; top: -18px; left: 50%; height: 18px; border-left: 2px solid var(--linea);
+}
+.mapa-rama { display: flex; flex-direction: column; align-items: center; position: relative; padding: 0 4px; }
+/* La raya cubre también la mitad del hueco entre ramas (gap de 18px). */
+.mapa-rama::before {
+  content: ''; position: absolute; top: -18px; left: -9px; right: -9px; border-top: 2px solid var(--linea);
+}
+.mapa-rama:first-child::before { left: 50%; }
+.mapa-rama:last-child::before { right: 50%; }
+.mapa-rama:only-child::before { display: none; }
+.mapa-rama::after {
+  content: ''; position: absolute; top: -18px; left: 50%; height: 18px; border-left: 2px solid var(--linea);
+}
+.mapa-respuesta {
+  font-size: 12px; font-weight: 600; color: var(--azul); margin-bottom: 8px; text-align: center; max-width: 220px;
+  background: var(--papel); border: 1px solid var(--linea); border-radius: 10px; padding: 1px 8px;
+}
+
+/* En un asunto: el camino elegido, con el estado de cada hito; lo demás, en gris. */
+.mapa-gris { opacity: .45; box-shadow: none; }
+.mapa-rama-gris > .mapa-respuesta { opacity: .5; }
+.mapa-rama-elegida > .mapa-respuesta { background: var(--azul); color: #fff; border-color: var(--azul); }
+.mapa-en-camino { border-width: 2px; }
+.mapa-estado { font-size: 11px; font-weight: 600; border-radius: 10px; padding: 0 8px; margin-top: 2px; }
+.mapa-estado-pendiente .mapa-estado { background: #eef1f5; color: #4c5968; }
+.mapa-estado-encurso { border-color: var(--ambar-linea); }
+.mapa-estado-encurso .mapa-estado { background: var(--ambar); color: #8a6100; }
+.mapa-estado-hecho { border-color: #8fcf9f; }
+.mapa-estado-hecho .mapa-estado { background: var(--verde); color: #1f6b33; }
+.mapa-estado-noaplica { opacity: .6; }
+.mapa-estado-noaplica .mapa-estado { background: #eef1f5; color: var(--tinta-suave); }
+
+.mapa-fuera { margin-top: 18px; border-top: 1px dashed var(--linea); padding-top: 10px; }
+.mapa-fuera-titulo { font-size: 12px; font-weight: 700; color: var(--tinta-suave); text-transform: uppercase; margin-bottom: 8px; }
+.mapa-fuera-fila { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* Dentro del cuadro de escribir la guía. */
+.guia-mapa-panel { border: 1px solid var(--linea); border-radius: var(--radio); background: var(--fondo); padding: 10px; margin-top: 12px; }
+.guia-mapa-panel-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.paso-destacado { box-shadow: 0 0 0 3px rgba(31, 78, 121, .35); }
+.hitos-cuenta .hitos-ver-mapa { margin-left: 10px; vertical-align: middle; }
