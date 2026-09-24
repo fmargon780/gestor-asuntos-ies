@@ -23,6 +23,24 @@ del final de `#ficha-guia`), pero quien guarda es `js/guias-enganche.js`, vía
 Un paso puede ser una PREGUNTA con opciones, cada una con sus propios pasos: eso se escribe en el
 cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegida.
 
+- **El mapa de la guía** (24-sep-2026, fila 113, `docs/MAPA-DE-LA-GUIA.md`): un dibujo de solo
+  lectura, como un diagrama de flujo, con HTML y CSS (`js/guias-mapa.js`, `css/guias-mapa.css`, sin
+  librerías). `GuiasMapa.html(pasos, { hitos, responsable })` es pura: pasos en columna unidos por
+  una línea; en cada pregunta (borde discontinuo y la palabra «pregunta») las ramas una al lado de
+  otra con la respuesta encima, a cualquier profundidad; los `soloInformativo`, en gris; con
+  muchas ramas se desplaza a los lados dentro de `.mapa`. Sale en tres sitios: **Ajustes → tipo →
+  «Pasos del trámite» → «Ver mapa»** (cuadro grande; pulsar un paso abre el editor en él con
+  `GuiasDelCentro.escribir(tipo, { irA: id })` → `Guias.editar(..., { irA })`); **dentro del
+  editor**, «Ver mapa» junto a «Añadir un paso» (panel `#guia-mapa-panel` en el mismo cuadro,
+  dibujado tras `recoger()`; pulsar un paso lleva a él y cierra el panel); y **en la ficha**, en la
+  línea de la cuenta de hitos (`js/hitos-panel.js`, `.hitos-ver-mapa`): con `hitos`, el camino
+  elegido resaltado con el estado de cada hito, las ramas no elegidas y las preguntas sin
+  responder en gris y sin pulsar, y los hitos que no son de la guía (a mano o `delTipoAnterior`)
+  en «Fuera de la guía»; pulsar uno abre su mesa (`HitoMesa.abrir`).
+- **Los niveles del editor** («Entrar», «← Volver», la línea de camino) viven desde la fila 113 en
+  `js/guias-niveles.js` (`GuiasNiveles.crear`, con `irAPaso(id)` para el mapa; `caminoHasta`,
+  pura), sacados de `js/guias.js`, que pasaba de 1.200 líneas.
+
 - **Preguntas dentro de las respuestas, sin límite de niveles** (fila 95, 23-sep-2026,
   `docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md`; antes, una sola bifurcación por paso). Un paso de
   una opción es un paso entero (mismos campos que uno de arriba: responsable, plazo, normativa…;

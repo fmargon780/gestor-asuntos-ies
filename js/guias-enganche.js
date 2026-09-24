@@ -120,7 +120,8 @@
      haber escrito otra guía desde el otro ordenador mientras tanto, y sin
      releer se guardaría encima de la suya. Es la misma precaución que
      toma App.anotar con asuntos.json. */
-  async function escribirGuia(nombreTipo) {
+  /* `opciones.irA` (fila 113): abrir el cuadro ya en ese paso (desde el mapa). */
+  async function escribirGuia(nombreTipo, opciones) {
     if (!nombreTipo) return false;
     try {
       await cargar();
@@ -144,7 +145,7 @@
     /* Las plantillas de documento, una vez antes de abrir el cuadro
        (fila 102, «Documentos de este paso»). */
     if (window.GuiasDocumentos) await GuiasDocumentos.precargar();
-    var pasos = await Guias.editar(nombreTipo, pasosDe(nombreTipo), opcionesResp, opcionesEstado);
+    var pasos = await Guias.editar(nombreTipo, pasosDe(nombreTipo), opcionesResp, opcionesEstado, opciones);
     if (pasos === null || pasos === false || pasos === undefined) return false;
 
     if (pasos.length) guias[nombreTipo] = pasos;

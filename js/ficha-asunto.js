@@ -467,7 +467,7 @@
     /* La fila de copiar de un gesto (18-sep-2026, fila 58,
        docs/AJUSTES-DE-USO-2026-09-18.md, 1): copiar no cambia nada del
        asunto, así que sigue activa en consulta. */
-    if (el.classList.contains('boton-copiar-fila')) return true;
+    if (el.classList.contains('boton-copiar-fila') || el.classList.contains('hitos-ver-mapa')) return true;
     /* Las pestañas, los chips de documentos y los nombres del resumen de
        las tarjetas (fila 107) solo abren o cambian de vista. */
     if (el.closest('.ficha-tarjetas-pestanas, .ficha-tarjeta-franja, .ficha-tarjeta-resumen')) return true;

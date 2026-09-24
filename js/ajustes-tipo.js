@@ -378,7 +378,25 @@ function construirSeccionPasos(tipo) {
       var ok = await GuiasDelCentro.escribir(tipo.tipo);
       if (ok) repintar();
     };
+    /* «Ver mapa» (fila 113, js/guias-mapa.js): la guía entera de un
+       vistazo; pulsar un paso abre el cuadro de escribirla en ese paso. */
+    var mapa = null;
+    if (pasos.length && window.GuiasMapa) {
+      mapa = document.createElement('button');
+      mapa.type = 'button';
+      mapa.className = 'boton';
+      mapa.style.marginTop = '10px';
+      mapa.style.marginLeft = '8px';
+      mapa.textContent = 'Ver mapa';
+      mapa.onclick = function () {
+        GuiasMapa.abrirEnAjustes(tipo.tipo, pasos, async function (id) {
+          var ok = await GuiasDelCentro.escribir(tipo.tipo, { irA: id });
+          if (ok) repintar();
+        });
+      };
+    }
     b.cuerpo.appendChild(boton);
+    if (mapa) b.cuerpo.appendChild(mapa);
     pintarAvisosBiblioteca(pasos);
   }
   repintar();
