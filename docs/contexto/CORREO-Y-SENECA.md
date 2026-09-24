@@ -159,9 +159,11 @@ la línea pasa a avisar. Vive en `js/bandeja-correos.js`, `pintarUltimoCorreoRec
 ### El correo y la mensajería de Séneca
 
 Un solo botón "Comunicar" en la cabecera de la ficha (fila 52) abre "Correo electrónico" o
-"Mensaje de Séneca" (`js/correo.js`, `abrirCuadro(a, deSeneca)`). La aplicación **no envía
-nada**: prepara los campos y los deja listos. Al copiar el texto o abrir la ventana de redactar
-se apunta sola una nota (una sola vez por cuadro).
+"Mensaje de Séneca" (`js/correo.js`, `abrirCuadro(a, deSeneca)`). El mensaje de Séneca sigue sin
+enviarse desde la aplicación: se prepara y se copia. El correo de un asunto sí se envía de
+verdad desde el propio cuadro (ver "Mandar los documentos de un asunto por correo", más abajo).
+Al copiar el texto o abrir la ventana de redactar se apunta sola una nota (una sola vez por
+cuadro).
 
 Los dos cuadros viven cada uno en su propio fichero, sacados de `js/correo.js` (que llegó a pasar
 de las 800 líneas) para que se vean enteros: mismo ancho hasta 1100px y dos columnas a partir de
@@ -190,8 +192,7 @@ plantilla, a quién se escribe en palabras, el rastro que se apunta en las notas
   de los grupos (`cco`/`ccoSinCorreo`) y los últimos documentos adjuntados, reiniciados en cada
   `cuerpoHtml()` (mismo patrón que `SenecaCuadro`); `window.CorreoCuadro` expone `paraDelCuadro`,
   `ccoDirecciones` y `documentosAdjuntados` para que `textoDeLaNota` (en `js/correo.js`) arme el
-  rastro. `js/correo-adjuntos.js` no cambia nada de por dentro: sigue pintando la lista desplegada
-  y leyendo "Para"/la copia oculta directamente del DOM (`paraActual`/`ccoActual`), como siempre.
+  rastro. Desde la fila 115, además pinta y gobierna el resumen de envío (ver abajo).
 
 Se comprueba con `pruebas/seneca-cuadro-ancho.mjs` (Séneca) y con `pruebas/asunto-sin-eleccion.mjs`,
 `pruebas/plantillas.mjs`, `pruebas/envios.mjs` y `pruebas/grupos-navegador.mjs` (Correo: los dos
@@ -199,38 +200,64 @@ cuadros comparten los mismos ids de siempre —`#correo-asunto`, `#correo-cuerpo
 `#correo-plantilla`, `#correo-otro`, `#correo-grupo`, `#correo-cco-caja`, `#adjuntos-lista`—, así
 que ninguna de esas pruebas tuvo que cambiar de selectores, solo de disposición).
 
-### Mandar los documentos de un asunto por correo
+### Mandar los documentos de un asunto por correo (24-sep-2026, fila 115,
+### `docs/ENVIAR-DESDE-EL-ASUNTO.md`)
 
-Gmail no deja que una página web le enganche ficheros. Bloque **"Documentos de este asunto"**
-(`js/correo-adjuntos.js`, `window.CorreoAdjuntos`), solo en el cuadro de Correo (nunca en el de
-Séneca): la lista de ficheros del asunto con una casilla cada uno (desmarcadas de partida) y el
-botón **"Preparar borrador con los documentos"**.
+Gmail no deja que una página web le enganche ficheros, así que el envío pasa por una segunda
+aplicación: una aplicación web de Apps Script (`apps-script/gestor-correos.gs`, `doPost`) que el
+navegador llama **directamente**, sin carpeta intermedia ni revisión periódica. Sustituye al
+"borrador con documentos" de la fila del 16-sep-2026: aquel mecanismo dejaba el encargo en
+`GESTOR-BANDEJA` y Apps Script no siempre lo recogía. **Esto cambia una regla de siempre**: desde
+esta fila la aplicación sí envía correo de verdad, pero solo tras una confirmación explícita.
 
-- Al pulsar, se copian los documentos marcados a `GESTOR-BANDEJA` con el nombre `<id> -
-  <nombre original>` y, **el último**, el encargo `<id>.envio.json` (`para`, `asunto`, `cuerpo`,
-  `adjuntos`, `hilo` —de `hilos` en la ficha del asunto si lo tiene, si no cadena vacía— y
-  `asuntoCarpeta`). Si lo marcado suma más de **20 MB**, no se prepara nada y sale un aviso.
-- Se apunta también en `_GESTOR/envios.json` (una lista, no un objeto como los demás ficheros de
-  `_GESTOR`), para que la tarjeta **"Borrador en camino — \<asunto\>"** se vea aunque se cierre
-  el cuadro. Se relee antes de escribir, con `Copias.guardar`.
-- **La vigilancia y la tarjeta viven en `js/bandeja-correos.js`** (no en `js/correo-adjuntos.js`):
-  cada 15 segundos, y solo mientras haya algún encargo vivo, mira si ha aparecido `<id>.listo.json`
-  (pasa a botón "Abrir el borrador en Gmail") o `<id>.error.json` (aviso rojo con el motivo y
-  botón "Entendido"); pasados 3 minutos sin respuesta, aviso ámbar y botón "Dejarlo" (borra el
-  `.envio.json` y sus copias de la bandeja, y el encargo de `envios.json`). `window.Bandeja`
-  expone `carpeta()` (la misma carpeta de los correos recogidos) y `avisarEnvioNuevo()`, para que
-  la tarjeta no espere a la próxima vuelta de 15 segundos.
-- `js/bandeja-correos.js` **no lee un `.envio.json`, `.listo.json` ni `.error.json` como si fuera
-  un correo recogido**: se descartan antes de mirar el `.id` de dentro.
-- El rastro reutiliza `apuntarElRastro` de `js/correo.js`: si se ha preparado un borrador con
-  documentos en este cuadro, la nota añade "· con N documentos: …".
-- **Siempre borrador, nunca envío automático.** El script de Apps Script
-  (`apps-script/gestor-correos.gs`, `mandarBorradores()`) lo monta con `GmailApp.createDraft` o,
-  si el encargo trae `hilo`, con `createDraftReply`, y pasa a revisar cada **minuto** (antes,
-  cinco). El enlace que deja en `.listo.json` es siempre la lista de borradores
-  (`#drafts`), nunca uno construido con el identificador del borrador.
+- **`js/correo-adjuntos.js`** (`window.CorreoAdjuntos`, reducido a unas 100 líneas): pinta el
+  bloque "Documentos de este asunto" con una casilla por fichero (desmarcadas de partida), suma
+  el tamaño de lo marcado (`totalBytesDe`, `tamanoLegible`) y pasa un fichero a base64
+  (`aBase64`, con `FileReader.readAsDataURL`) cuando toca enviar. Ya no copia nada a ninguna
+  carpeta ni escribe ningún `.json` de encargo.
+- **`js/correo-cuadro.js`**: el cuadro de Correo tiene dos bloques HERMANOS,
+  `#correo-formulario` y `#correo-resumen`, que se alternan con la clase `oculto` (nunca un
+  segundo `U.preguntar`: solo hay una capa de diálogo en toda la aplicación). El botón
+  **"Enviar"** (`alPulsarEnviar`) comprueba que hay destinatario y que lo marcado no pasa de
+  **20 MB** (si pasa, aviso y no se hace nada), y pinta el resumen (`pintarResumen`): Para, Copia
+  oculta, Asunto, primeras líneas del cuerpo (`primerasLineas`) y los documentos con su tamaño.
+  "Volver" no pierde nada de lo escrito a mano. **"Confirmar y enviar"** (`confirmarEnvio`) pasa
+  los documentos marcados a base64 y llama a `CorreoEnviar.enviar(...)` con `para`, `cco`,
+  `asunto`, `cuerpo`, `hilo` y `adjuntos`.
+- **`js/correo-enviar.js`** (nuevo, `window.CorreoEnviar`): guarda la dirección de la aplicación
+  web **en este navegador** (`localStorage`, nunca en `_GESTOR`: cada persona conecta su propia
+  cuenta de Google, igual que `js/copiar-ruta.js` con la ruta de las carpetas) y hace la llamada
+  (`fetch`, `POST`, `Content-Type: text/plain` a propósito, para que el navegador la trate como
+  petición "simple" y no dispare la consulta previa CORS, que Apps Script no contesta). También
+  monta el bloque **Ajustes → Mantenimiento → "Enviar correo"**, con los cinco pasos para
+  conectar la cuenta (copiar el script, publicarlo como aplicación web, ejecutar
+  `prepararEnvio()` una vez, pegar la dirección con su clave, "Probar").
+- **`apps-script/gestor-correos.gs`, `doPost(e)`**: exige la clave (`e.parameter.k` o el cuerpo)
+  contra la que guardó `prepararEnvio()` en `PropertiesService`; si no coincide, error. Llama a
+  `enviarCorreo(cuerpo)`, que decide el hilo con `hiloParaResponder(hiloId, para, cco)`: **solo
+  responde DENTRO de un hilo existente si TODOS los destinatarios pedidos (Para + Copia oculta)
+  ya han recibido algún mensaje de ese hilo** (`direccionesDelHilo`); si se añade a alguien
+  nuevo, correo nuevo, para no mezclar destinatarios sin que nadie lo haya decidido. Manda con
+  `GmailApp.createDraft(...).send()` o `createDraftReply(...).send()`: el correo sale en el
+  momento, no queda como borrador.
+- El rastro reutiliza `apuntarElRastro` de `js/correo.js`: tras un envío de verdad, la nota dice
+  "Correo enviado a…" (no "preparado") y no repite el aviso de guardar el PDF si ya se ha
+  enviado (`window.CorreoNucleo.marcarEnvioRealizado`).
+- **`js/bandeja-correos.js` ya no vigila nada de esto**: la sección entera de "Borrador en
+  camino" (revisión cada 15 segundos, tarjeta, `.listo.json`/`.error.json`) se quitó. Solo queda
+  `limpiarEnviosViejos()`, que se ejecuta una vez al arrancar y borra cualquier resto de
+  `envios.json`/`.envio.json`/`.listo.json`/`.error.json` de antes de esta fila.
+- **"Abrir en Gmail" y "Abrir en el correo del ordenador"** siguen tal cual, como opciones
+  secundarias sin adjuntos (para cuando no interesa conectar la aplicación web, o hay que
+  adjuntar algo que no está en la carpeta del asunto).
 
-Se comprueba con `pruebas/envios.mjs`.
+Se comprueba con `pruebas/envios.mjs` (navegador de verdad, `fetch` simulado con
+`page.route` de Playwright, nunca una URL real), `pruebas/envio-apps-script.mjs` (la lógica de
+`doPost`/`enviarCorreo`/`hiloParaResponder`, con `vm` y `GmailApp`/`PropertiesService` de
+mentira) y `pruebas/correo-enviar.mjs` (`leerUrl`/`guardarUrl`/`enviar`/`probar`, con `vm` y
+`fetch`/`localStorage` de mentira). Ningún correo real se ha podido mandar en las sesiones que
+prepararon esta fila: no hay cuenta de Google en ese entorno; los pasos que Francisco tiene que
+comprobar a mano están en `docs/COMPROBAR-A-MANO.md`.
 
 ### Plantillas de correo y de mensaje de Séneca
 
@@ -386,4 +413,3 @@ como en `pruebas/dar-de-alta-desde-documento.mjs`): sin tercero en el correo, el
 con tercero ya reconocido, el PDF no lo pisa aunque traiga uno distinto; sin tipo, el PDF lo trae
 por sus palabras clave; con tipo ya puesto, el PDF no lo pisa; sin adjuntos, sin PDF entre los
 adjuntos, y con uno que no se puede leer, la tarjeta se queda exactamente como antes de esta fila.
-
