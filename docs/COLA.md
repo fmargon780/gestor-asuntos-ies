@@ -112,10 +112,18 @@ Las filas 1 a 75 y 77 a 137 están **HECHAS**. Sus documentos siguen en `docs/`,
 
 | Nº | Instrucción | Estado |
 |---|---|---|
+| 76 | `docs/VERSION-AL-PUBLICAR.md` (la versión, generada sola al publicar en Vercel, sin ningún commit) | PENDIENTE |
 | 138 | `docs/UNA-SOLA-LISTA-EN-EL-HITO.md` («lo que hay que reunir» pasa al guion) | PENDIENTE |
 | 139 | `docs/UNA-SOLA-LIBRETA-DE-NOTAS.md` (las notas del hito pasan al asunto, con etiqueta) | PENDIENTE |
 | 140 | `docs/TIEMPO-DE-TRAMITACION.md` (media y máximo por tipo, y los abiertos más antiguos) | PENDIENTE |
-| 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 76 se desbloquea el 25-sep-2026**, diseño cerrado con Francisco en conversación aparte
+(no en esta cola): la versión se genera sola al publicar en Vercel, sin ningún commit al
+repositorio, así queda fuera el riesgo de bucle que la había bloqueado el 19-sep-2026. Detalle en
+`docs/VERSION-AL-PUBLICAR.md`. Se apunta la primera de la tabla porque Francisco pidió hacerla
+antes que las filas 138 a 140, pero **solo se puede comprobar publicando de verdad**: si al
+terminar la hora publicada no es la real, vuelve a la fecha a mano y márcala BLOQUEADA otra vez,
+sin insistir más de una vez.
 
 **La fila 137 está HECHA** (25-sep-2026): `docs/INDICE-DEL-EXPEDIENTE.md`. `000 ÍNDICE DEL
 EXPEDIENTE.pdf` (`js/indice-expediente.js`): lista numerada de los documentos (fecha, registro,
