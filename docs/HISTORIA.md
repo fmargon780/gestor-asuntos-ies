@@ -5,6 +5,13 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 140: tiempo de tramitación por tipo
+
+`docs/TIEMPO-DE-TRAMITACION.md`. «Cuentas» ya daba la media y el máximo de días del total; ahora
+también por tipo, y enseña lo que lleva abierto demasiado (más de 30 días) y los diez abiertos más
+antiguos. Va en `js/cuentas-tiempos.js` para no pasar `js/cuentas.js` de 400 líneas. Los días de un
+abierto se cuentan desde su `abiertoEl` o, si no lo tiene, desde la fecha de su carpeta.
+
 ## 25-sep-2026 — Fila 139: una sola libreta de notas por asunto
 
 `docs/UNA-SOLA-LIBRETA-DE-NOTAS.md`. Las notas del asunto y las de cada hito se juntan en una: las del

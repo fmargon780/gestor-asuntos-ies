@@ -182,6 +182,10 @@ await pagina.waitForTimeout(400);
 const cuerpo = await pagina.locator('#cuentas-cuerpo').textContent();
 await comprobar('la pantalla de Cuentas trae la columna «Lo encarga» y la tabla por órgano',
   [cuerpo.indexOf('Lo encarga') !== -1, cuerpo.indexOf('Por quién lo encarga') !== -1], [true, true]);
+/* Fila 140 (js/cuentas-tiempos.js): las columnas de tiempo y lo que lleva abierto. */
+await comprobar('y los tiempos de tramitación (fila 140)',
+  [cuerpo.indexOf('Media (días)') !== -1, cuerpo.indexOf('Abiertos hace más de 30 días') !== -1,
+   cuerpo.indexOf('Los que más tiempo llevan abiertos') !== -1], [true, true, true]);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

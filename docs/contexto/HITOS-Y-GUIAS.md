@@ -588,6 +588,11 @@ cuánto se tarda** de todos los asuntos, abiertos y archivados.
   asunto reservado (fila 135, `Reservados.es`) se cuenta, pero aquí sale como "Reservado".
 - **Cuánto se tarda**: solo de los archivados con `abiertoEl` y `cerradoEl` (los de antes de
   llevar esos dos datos no entran: no se inventa una duración). Media y el que más tardó, en días.
+- **Tiempo de tramitación** (fila 140, `js/cuentas-tiempos.js`, aparte para no pasar
+  `js/cuentas.js` de 400 líneas): en la tabla por tipo, «Media (días)» y «Máximo (días)» con el
+  mismo cálculo solo de ese tipo («—» sin datos; también al copiar); arriba, «Abiertos hace más de
+  30 días: N»; y la tabla «Los que más tiempo llevan abiertos» (los diez más antiguos, con tipo,
+  días y hito actual; pulsar uno abre su ficha; los reservados, tapados). Todo con el curso elegido.
 - El índice del ARCHIVO guarda, desde esta fila (`VERSION` 2 → 3), `reconocido`, `loPideCategoria`,
   `loPideRelacion`, `abiertoEl` y `cerradoEl` de cada entrada (antes solo `loPideNombre`, para
   buscar). `Nombres.cursoYGrupoDeResto` (antes privada de `js/archivo-indice.js`, ahora en

@@ -77,7 +77,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   hermanos en la ficha.
 - Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
   Renombrar un tipo se lleva su guía; cambiarle el tipo, la ofrece.
-- Nombre comercial de empresas; cambiar los datos de un tercero dado de alta a mano.
+- Nombre comercial de empresas; editar datos de un tercero dado de alta a mano.
 - Guías del procedimiento por tipo, con preguntas dentro de las respuestas sin límite, y su mapa
   (dibujo de la guía entera; en un asunto, con el camino elegido resaltado). Se escriben en
   acordeón: un paso abierto a la vez.
@@ -88,7 +88,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   tercero reconocido, también sugiere meterlo en uno que ya existe («Meter aquí»). Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
 - Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. Carpeta ≤150 caracteres, documento ≤120.
-- Botón «Ruta» (copia la ruta). Ficha del tercero con "Datos y contacto" en una línea, con copiar; «Ver todo» del alumno en
+- Botón «Ruta». Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
 - Registrar un documento detecta el PDF ya sellado, lo renombra y guarda el original como
@@ -115,7 +115,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   gemelos y selección de varios; plantillas y formularios («Buscar otra plantilla…»: cualquiera); comunicar con destinatarios; sus notas (las del asunto, con etiqueta) e historia.
   Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa.
   Biblioteca de hitos del centro, con guion; en Mantenimiento, cargar tipos, guías y guiones del instituto.
-- "Qué me toca": hitos pendientes, filtro por responsable, "Dormidos" (sin novedades en N días). "Cuentas": asuntos por tipo, mes y quién los pidió. "Formularios": catálogo buscable de
+- "Qué me toca": hitos pendientes, filtro por responsable, "Dormidos" (sin novedades en N días). "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena en el PDF solo los datos del centro.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
 - Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF; deja libre la banda del sello y la firma.

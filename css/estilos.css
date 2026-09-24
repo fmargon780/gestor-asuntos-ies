@@ -491,3 +491,9 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 .marca-pregunta { margin: 0 6px; padding: 1px 8px; border-radius: 10px; background: #e8eef7; color: #1f4f80; font-size: 12px; white-space: nowrap; }
 /* Fila 130: la línea ámbar de la vista previa cuando el nombre se acorta. */
 .vista-recorte { margin-top: 6px; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+
+/* Cuentas, fila 140: el número de arriba y la tabla de los abiertos más antiguos. */
+.cuentas-aviso-abiertos { margin: 0 0 12px; }
+.cuentas-aviso-ambar strong { color: var(--rojo-linea); }
+.cuentas-antiguos .cuentas-antiguo { cursor: pointer; }
+.cuentas-antiguos .cuentas-antiguo:hover td { background: var(--azul-claro); }

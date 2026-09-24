@@ -275,6 +275,7 @@
   }
 
   function tablaPorTipo(filas) {
+    var conTiempos = !!window.CuentasTiempos;   /* fila 140: media y máximo por tipo */
     var total = filas.reduce(function (a, f) { return a + f.cuantos; }, 0);
     var totalAbiertos = filas.reduce(function (a, f) { return a + f.abiertos; }, 0);
     var totalArchivados = filas.reduce(function (a, f) { return a + f.archivados; }, 0);
@@ -282,12 +283,14 @@
     var cuerpo = filas.map(function (f) {
       return '<tr><td>' + U.escapar(f.categoria) + '</td><td>' + U.escapar(f.tipo) + '</td>' +
         '<td>' + U.escapar(textoOrgano(f.tipo)) + '</td>' +
-        '<td>' + f.cuantos + '</td><td>' + f.abiertos + '</td><td>' + f.archivados + '</td></tr>';
+        '<td>' + f.cuantos + '</td><td>' + f.abiertos + '</td><td>' + f.archivados + '</td>' +
+        (conTiempos ? '<td>' + CuentasTiempos.celda(f.media) + '</td><td>' + CuentasTiempos.celda(f.maximo) + '</td>' : '') + '</tr>';
     }).join('');
     return '<table class="cuentas-tabla"><thead><tr><th>Categoría</th><th>Tipo de asunto</th><th>Lo encarga</th>' +
-      '<th>Cuántos</th><th>Abiertos</th><th>Archivados</th></tr></thead><tbody>' + cuerpo +
+      '<th>Cuántos</th><th>Abiertos</th><th>Archivados</th>' +
+      (conTiempos ? '<th>Media (días)</th><th>Máximo (días)</th>' : '') + '</tr></thead><tbody>' + cuerpo +
       '<tr class="cuentas-total"><td colspan="3">Total</td><td>' + total + '</td><td>' +
-      totalAbiertos + '</td><td>' + totalArchivados + '</td></tr></tbody></table>';
+      totalAbiertos + '</td><td>' + totalArchivados + '</td>' + (conTiempos ? '<td></td><td></td>' : '') + '</tr></tbody></table>';
   }
 
   function textoOrgano(tipo) {
@@ -353,21 +356,28 @@
     }
 
     var filas = porTipo(ultimo.entradas, curso);
-    caja.innerHTML = tablaPorTipo(filas) +
+    /* Fila 140 (js/cuentas-tiempos.js): tiempos por tipo y los abiertos más antiguos. */
+    var antiguos = window.CuentasTiempos ? CuentasTiempos.abiertosAntiguos(window.Gestor ? Gestor.asuntos() : [], curso) : null;
+    if (window.CuentasTiempos) CuentasTiempos.anadirTiempos(filas, ultimo.entradas, curso);
+    caja.innerHTML = (antiguos ? CuentasTiempos.numeroArribaHTML(antiguos) : '') + tablaPorTipo(filas) +
       bloquePorOrgano(porOrgano(ultimo.entradas, curso, window.TiposOrgano && TiposOrgano.deNombre)) +
       bloquePorMes(porMes(ultimo.entradas, curso)) +
       bloquePorQuienLoPide(porQuienLoPide(ultimo.entradas, curso)) +
-      bloqueTiempo(tiempoDeTramite(ultimo.entradas, curso));
+      bloqueTiempo(tiempoDeTramite(ultimo.entradas, curso)) +
+      (antiguos ? CuentasTiempos.tablaAntiguosHTML(antiguos) : '');
+    if (antiguos) CuentasTiempos.enganchar(caja, antiguos);
   }
 
   function copiarTabla() {
     if (!ultimo) return;
     var curso = $('cuentas-curso') ? $('cuentas-curso').value : '';
     var filas = porTipo(ultimo.entradas, curso);
-    var texto = textoParaCopiar(
-      ['Categoría', 'Tipo de asunto', 'Lo encarga', 'Cuántos', 'Abiertos', 'Archivados'],
-      filas.map(function (f) { return [f.categoria, f.tipo, textoOrgano(f.tipo), f.cuantos, f.abiertos, f.archivados]; })
-    );
+    var t = window.CuentasTiempos && CuentasTiempos.anadirTiempos(filas, ultimo.entradas, curso);   /* fila 140 */
+    var texto = textoParaCopiar(['Categoría', 'Tipo de asunto', 'Lo encarga', 'Cuántos', 'Abiertos', 'Archivados']
+      .concat(t ? ['Media (días)', 'Máximo (días)'] : []), filas.map(function (f) {
+      return [f.categoria, f.tipo, textoOrgano(f.tipo), f.cuantos, f.abiertos, f.archivados]
+        .concat(t ? [CuentasTiempos.celda(f.media), CuentasTiempos.celda(f.maximo)] : []);
+    }));
     U.copiar(texto, $('cuentas-copiar'));
   }
 
