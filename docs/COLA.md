@@ -112,6 +112,7 @@ Las filas 1 a 75 y 77 a 125 están **HECHAS**. Sus documentos siguen en `docs/`,
 
 | Nº | Instrucción | Estado |
 |---|---|---|
+| 126 | `docs/TIPO-QUE-CAMBIA-DE-NOMBRE.md` (un tipo que cambia de nombre se lleva guía, campos y plantillas; arreglo solo del tipo DESEMPEÑO FUNCIÓN TUTORIAL; «Buscar otra plantilla…» en cualquier hito) | EN CURSO (24-sep-2026) |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
 **24-sep-2026, cupo de Vercel agotado otra vez:** al abrir los pull request de las filas 124 y 125 (hacia las 12:59 y las 13:22), Vercel respondió «Resource is limited - try again in 24 hours (code: "api-deployments-free-per-day")». Las dos filas quedan en `main`, pero la web puede seguir en `24-sep-2026 · 12:22` hasta que el cupo se libere. La próxima sesión: comprobar con `curl` (`js/version.js?v=<algo>`) que `App.VERSION` es `24-sep-2026 · 13:14` o posterior; si sigue atrás pasadas 24 horas, un commit nuevo en `main` (o `create_deployment` con `withLatestCommit`, regla 19) lo publica todo. Esta sesión no tiene salida a `vercel.app` ni permiso en el conector de Vercel (403).
@@ -357,7 +358,7 @@ retipear de un tirón sin `git push`). Puede que falten todavía.
   `css/seneca.css`, `js/campos-calculo.js`, `js/campos-catalogo.js`,
   `js/campos-calculados-editor.js`, `js/ajustes-tipo.js`).
 - A `docs/HISTORIA.md`: la entrada del 18-sep-2026 de esas cuatro filas, con su "Lo que costó de
-  verdad" (los bugs que las propias pruebas cazaron antes de producción).
+verdad" (los bugs que las propias pruebas cazaron antes de producción).
 
 Compruébalo contra lo que de verdad dice `main` antes de sustituir nada. Si la sesión tiene
 `git push` de verdad (terminal u ordenador de Francisco), es mucho más simple que ir fichero a
