@@ -20,7 +20,7 @@ guion puede ser pregunta, con un botón por respuesta y sus propias líneas. Det
 - El marcado automático solo mira lo que se ve: nunca marca una línea de una respuesta no elegida.
 
 Prueba nueva `pruebas/preguntas-en-el-guion.mjs` (sin navegador). Batería completa en verde.
-Versión publicada `App.VERSION`: `VERSION_116`.
+Versión publicada `App.VERSION`: `24-sep-2026 · 07:32`.
 
 ## 24-sep-2026 — Fila 114: los documentos en la tarjeta cerrada, legibles
 
