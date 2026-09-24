@@ -548,3 +548,499 @@ tipo funcionando dentro de cada uno.
 - Asuntos sin hitos: por la marca de su estado, la misma `espera` de siempre, que en Ajustes se
   enseña ahora al revés, como "Administración", para que las dos casillas digan lo mismo.
 - Decisión: `HitosBiblioteca.naceSoloInformativo` no tenía, en la práctica, ningún "responsable de
+  Administración" configurado (nadie le pasaba ese dato); ahora admite los `ajustes` y usa la misma
+  marca, para que no haya dos sitios que digan quién es Administración. "Qué me toca" también.
+- `asuntos-lista.js` (más de 700 líneas) no se partió: el cambio allí son unas pocas líneas y todo lo
+  nuevo vive en el fichero aparte.
+
+Comprobado con `pruebas/estado-por-el-hito.mjs` (19 casos) y, a mano en un navegador local, que un
+asunto recién creado sale en Administración y, al marcar hecho su primer hito (de Dirección), pasa
+solo a terceros con "Dirección" en la tarjeta. Batería completa en verde. Versión publicada
+`App.VERSION`: `23-sep-2026 · 22:05`.
+
+---
+
+## 23-sep-2026 — Fila 103: el hito, mesa de trabajo (segunda tanda)
+
+`docs/EL-HITO-MESA-DE-TRABAJO.md`. Segunda tanda de que el hito sea la mesa de trabajo del
+asunto, sobre lo que dejó la fila 102: añadir documentos desde el propio hito, un menú para cada
+uno ya apuntado, y "Comunicar" siempre a la vista.
+
+**1. "Añadir documento"**: sustituye al botón suelto "Apuntar un documento" por un único botón que
+abre un menú pequeño (`js/hitos-anadir.js`, nuevo) con tres caminos: **Desde el ordenador** (reabre
+el cuadro de siempre de `js/documentos.js`, ahora con un `{hito}` opcional que hace que lo que se
+guarde quede apuntado solo); **Desde "Por clasificar"** (elige uno de los documentos sueltos y
+sigue el mismo camino que "Meter aquí", con el mismo `{hito}`; sin ninguno, sale deshabilitado con
+"(no hay ninguno)"); y **Uno que ya está en la carpeta** (el cuadro de siempre, sin cambios). Para
+que el segundo camino llegara con el hito hasta el final, `App.meterSueltoEnAsuntoElegido` y
+`App.llevarSueltoA` (`js/documentos-sueltos.js`) ganan un parámetro `opciones` que solo viaja, sin
+tocar su lógica.
+
+**2. El menú de tres puntos de cada documento del hito** (`js/hitos-documento-menu.js`, nuevo), en
+vez de la ✕ de siempre: Registrar (si le falta), Separar, Unir, Sacar páginas y Ajustar tamaño
+(solo PDF, mismo criterio que en la carpeta del asunto) y, siempre, "Quitar del hito" (el mismo
+efecto que la ✕: desapunta, nunca borra el fichero). Cualquier documento que salga de una de esas
+herramientas queda apuntado solo al mismo hito: una función pequeña y pura,
+`HitosDocumentoMenu.ficherosNuevos(antes, después)`, compara el contenido de la carpeta antes y
+después de la herramienta y apunta los que aparecen. Un documento "(ya no está)" solo trae "Quitar
+del hito". Después de cualquier acción, `HitosPanel.desplegarAlAbrir` deja el hito desplegado él
+solo, sin que haga falta volver a pulsar el título — un detalle que la propia prueba de navegador
+cazó (ver "Lo que costó de verdad").
+
+**3. "Comunicar" siempre visible**: antes solo salía si el paso tenía su propio texto de correo o
+de Séneca; ahora sale siempre (salvo en un hito "decision" o "noaplica", igual que "Generar
+documento"). Con texto propio, igual que hasta ahora. Sin él, el cuadro se abre con el desplegable
+de plantillas del tipo — los dos canales quedan disponibles, en vez de ninguno. Los documentos que
+el hito ya tiene en la carpeta salen premarcados en "Documentos de este asunto" del cuadro de
+Correo, por un nuevo `extra.adjuntosMarcados` que sube desde `js/hitos-comunicar.js` hasta
+`CorreoAdjuntos.pintarBloque` (`js/correo-adjuntos.js`), filtrando primero los que ya no estén.
+Cuando se prepara un correo con documentos, la constancia en el historial del hito (y en la nota
+del asunto) termina en "· con N documentos: a, b" — `CorreoNucleo.sufijoDocumentos`, una función
+pura nueva en `js/correo.js`, que reutiliza el mismo `textoDeLaNota`/`apuntarElRastro` de siempre:
+ni un camino aparte ni una copia de esa lógica.
+
+**Ficheros nuevos**: `js/hitos-anadir.js`, `js/hitos-documento-menu.js`,
+`pruebas/el-hito-mesa-de-trabajo.mjs` (puro, sin navegador). Todo lo demás, unas pocas líneas cada
+uno: `js/hitos-panel-lista.js`, `js/hitos-comunicar.js`, `js/documentos.js`,
+`js/documentos-sueltos.js`, `js/archivo-personas.js`, `js/asuntos-lista.js`,
+`js/correo-adjuntos.js`, `js/correo.js`, `index.html`.
+
+**Lo que costó de verdad**: dos cosas, ninguna en la aplicación, las dos cazadas por las propias
+pruebas antes de subir nada. La primera, al escribir la prueba de navegador del punto 2: después
+de "Quitar del hito" (que ya deja el hito desplegado solo, como se explica arriba), un clic de más
+sobre el título del hito lo volvía a plegar sin querer, y el siguiente paso de la prueba —abrir
+"Añadir documento"— se quedaba 30 segundos esperando un botón invisible. Se quitó ese clic de más
+y se dejó la razón por escrito, para que no se repita. La segunda, en la propia subida a `main`:
+la primera llamada por lotes se quedó corta sin avisar y dejó tres ficheros modificados
+(`js/archivo-personas.js`, `js/asuntos-lista.js`, `js/correo-adjuntos.js`) con su contenido
+antiguo; se detectó al comprobar cada fichero después de subir (regla 11 de `docs/COLA.md`) y se
+repitió uno a uno hasta que los doce quedaron bien. Ninguna de las dos tocó la aplicación
+publicada: la primera se cazó antes de dar la fila por buena, y la segunda antes de que Francisco
+la viera.
+
+Comprobado con `pruebas/el-hito-mesa-de-trabajo.mjs` y, en el navegador de verdad, con los
+bloques nuevos de `pruebas/hitos.mjs` y `pruebas/quedarse-en-el-asunto.mjs` y la sección 1
+reescrita de `pruebas/comunicar-desde-hito.mjs`. Batería completa en verde (106 ficheros de
+prueba). Versión publicada `App.VERSION`: `23-sep-2026 · 20:57`.
+
+---
+
+## 23-sep-2026 — Fila 102: generar documentos desde el hito
+
+`docs/DOCUMENTOS-DESDE-EL-HITO.md`. Primera tanda de que el hito sea la mesa de trabajo: las
+plantillas de documento se unen a un paso de la guía (o a un modelo de la biblioteca) en
+«Documentos de este paso», y el hito trae «Generar documento», que deja el papel apuntado a él.
+Todo lo nuevo, en dos ficheros nuevos (`js/guias-documentos.js`, `js/hitos-generar.js`); en
+`js/guias.js` y `js/plantillas-documento.js` solo unas pocas líneas.
+
+**Una decisión que el documento dejaba abierta**: `{hecho:…}` pedía la fecha en que se marcó hecho
+otro hito, «del historial». Los hitos no guardaban esa fecha en ningún sitio: desde esta fila se
+apunta `hechoEl` al marcarlo (y al elegir la opción de una pregunta). Los de antes se quedan sin
+ella: no se inventa.
+
+**De paso**: editar un modelo de la biblioteca perdía sus formularios (el editor no se los pasaba);
+«Comunicar» desde un hito no encontraba su paso si estaba dentro de una pregunta de dentro (fila
+95); y el aviso de «huecos sin dato» al generar pasa de rojo a ámbar (el documento ya está hecho).
+`pruebas/ajustes-por-tipo.mjs` buscaba la sección del plazo por el texto «Plazo», que ahora sale
+también en la tabla de huecos: busca el campo.
+
+: repintar solo lo que ha cambiado
+
+`docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md`. Tras guardar, la aplicación repintaba casi todo: cambiar el
+estado desde la ficha eran 30-40 lecturas (la lista entera aunque estuviera oculta, sus 17
+enganches, y la ficha entera). Se midió antes de tocar nada, con una prueba que cuenta llamadas a
+`Carpetas`: el mayor gasto era el observador de «Generar documento», que releía `plantillas.json`
+siete veces por tanda. Ahora el cambio de estado solo relee y escribe `asuntos.json`.
+
+Dos fallos de paso: la fila «Formularios» de la ficha no salía nunca (`filasHtml` ignoraba su
+segundo parámetro; un comentario decía que era a propósito por una prueba, que ahora cuenta solo
+las filas visibles), y `js/formularios.js` usaba `Hitos.hitosDe` como si fuera síncrona. Al
+arreglar lo segundo, su observador empezó a leer `hitos.json` en cada cambio de pantalla (antes
+fallaba en silencio): la prueba de lecturas lo cazó, y ahora solo calcula cuando la fila es nueva.
+
+Sin partir `js/ficha-asunto.js` (pasa de 1.000 líneas): los cambios han sido pocos y localizados,
+y partirlo a la vez que se cambia su repintado era arriesgar las dos cosas.
+
+: avisos que dicen la verdad, y botones que se bloquean de verdad
+
+`docs/AVISOS-QUE-DICEN-LA-VERDAD.md`. Muchas acciones guardaban lo importante y luego hacían más
+cosas en el mismo `try`: si fallaba una de las de después, salía rojo «No he podido…» con todo ya
+guardado, y al repetir, «Ya hay…». Ahora cada una separa lo principal (rojo si falla) de lo
+accesorio (ámbar), con `U.fallo` y `U.accesorio`. De paso, los ~150 avisos que pegaban `e.message`
+en inglés pasan por `U.mensajeDeError`.
+
+**El botón que se volvía a encender solo**: `aplicarModoConsulta` ponía `disabled=false` a TODOS
+los controles de la ficha cada vez que el observador veía algo nuevo, también al que decía
+«Guardando…» y a las casillas de hito de un asunto archivado. Ahora solo toca lo que él mismo
+apagó y respeta la marca `data-guardando` de `U.mientrasGuarda`.
+
+**Un cuadro sobre otro** dejaba colgada para siempre la espera del primero (un solo `#capa`):
+ahora se da por cancelado. Lo que costó: los avisos nuevos tenían que pasar por `U.aviso` (no por
+la función interna) para que las pruebas que lo sustituyen los vean; sin eso, una prueba sin
+navegador reventaba con `setTimeout is not defined`.
+
+Queda sin hacer, a propósito: partir `js/ficha-asunto.js` (pasa de 1.000 líneas), porque aquí
+solo se ha tocado en unos pocos sitios (tampoco se partió en la 101: ver su entrada).
+
+: guardar en fila y sin trabajo de más
+
+`docs/GUARDAR-EN-FILA.md`. Francisco: al grabar sale un error o la pantalla se queda congelada,
+aunque al volver a entrar sí se ha guardado. Las causas, de la revisión a fondo:
+
+- **La copia del día se rehacía en cada guardado.** `Copias` preguntaba con `Carpetas.existe`, que
+  busca una CARPETA: con un fichero siempre decía «no existe». Cada guardado releía, reescribía la
+  copia y listaba `copias/` entera. Las pruebas no lo veían porque el disco de mentira no distingue
+  carpeta de fichero; la prueba nueva sí (como el navegador de verdad).
+- **Nada ponía los guardados en fila.** Dos a la vez leían antes de que escribiera el otro, y ganaba
+  el último. `js/cola-guardado.js`: una cadena de promesas por fichero.
+- **Leer no reintentaba**, y un `NotReadableError` de Dropbox tumbaba el segundo paso.
+- **Las tareas de fondo** (presencia, vistazo a la carpeta, conflictos) se cruzaban con el guardado;
+  el vistazo, a mitad de un archivado, veía desaparecer la carpeta y sacaba de la ficha en rojo.
+- **Tres riesgos de perder datos**: un `asuntos.json` leído vacío se escribía encima; las copias en
+  conflicto se quedaban fuera al trasladar una carpeta y se borraban con el original; la fusión de
+  conflictos perdía todo lo que no fuera `asuntos`.
+
+**Lo que costó**: la guardia de «lectura vacía» comparaba al principio con lo que había en memoria,
+y una prueba (`archivo-indice.mjs`) mete fichas solo en memoria: la guardia saltaba y el archivado
+no se hacía. Se compara con lo último leído o escrito en el disco. Y otra lección de la fila 92:
+las pruebas sin navegador no cargan `js/cola-guardado.js`, así que todo lo usa con `window.` y sin
+él guarda igual.
+
+: preguntas dentro de las respuestas, sin límite de niveles
+
+`docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md`. Reabre a propósito lo que estaba descartado
+(«opciones dentro de opciones en la guía»): los procedimientos del centro lo necesitan. La línea
+sale de la lista de descartado.
+
+- **Modelo** (`js/guias.js`): `normalizarOpciones` ya no vacía `opciones` ni recorta campos en los
+  pasos de una opción; `normalizar` es recursivo. Un paso-pregunta, a cualquier nivel, sale sin
+  requisitos, comunicación, normativa ni formularios.
+- **Editor**: entrar y salir como en carpetas, dentro del mismo `U.preguntar` (solo hay uno). El
+  truco fue separar `nivel` (lo que se ve) de `pasos` (lo que se guarda), y cambiar `recoger()`
+  para que actualice los objetos por su id en vez de rehacerlos: antes rehacía los pasos de una
+  opción con cinco campos, y con preguntas de dentro eso se habría llevado sus opciones.
+- **Hitos**: `Hitos.visibles` cortaba solo la sublista de una pregunta de dentro sin responder, y
+  seguía enseñando lo de después de la de fuera. Ahora corta la lista entera. Cambiar de rama poda
+  todo el subárbol (`podar`), y `huerfanos` recoge lo trabajado de cualquier nivel.
+
+: el botón «Ruta» de la ficha del asunto
+
+`docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md`. Francisco pidió un botón que abriera la carpeta del
+asunto; el navegador no lo deja (sigue en la lista de descartado), así que se copia la ruta para
+pegarla en el explorador. Los manejadores de carpeta no saben su ruta de verdad, así que la parte
+de delante la apunta cada uno en Ajustes → El centro, y se guarda en `localStorage`, no en
+`_GESTOR`: la ruta del ordenador de Francisco no existe en el de su compañero. Módulo nuevo
+`js/copiar-ruta.js`, que se crea su propio bloque en Ajustes. `pruebas/copiar-fila.mjs` cuenta
+ahora un botón más.
+
+: campos propios en el nombre de un documento
+
+`docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md`. Cada tipo de documento puede llevar campos (texto,
+lista o fecha, obligatorios si se quiere) que entran en el nombre entre el tipo y el texto
+adicional. Módulo nuevo `js/documentos-campos.js`.
+
+**Dónde se guardan, y por qué ahí.** `tipos-documento.json` es una lista de nombres que usan la
+fusión de borrados, la papelera y la guardia de duplicados: convertirla en objetos tocaba todo
+eso. Los campos van a `campos.json`, clave `porTipoDocumento`, que ya es compartido, con copia y
+releído antes de escribir. Ojo con una trampa: `Campos.normalizar` reconstruye el objeto entero,
+así que cualquier clave nueva que no se añada ahí se borra en el siguiente guardado de otro trozo
+(la prueba lo comprueba). La clave solo se escribe cuando hay algún campo.
+
+Un campo de fecha entra como `AAMMDD`, igual que la fecha del documento.
+
+: cambiar el tipo de un asunto ofrece la guía del nuevo
+
+`docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md`. Hasta ahora, cambiar el tipo en «Editar el asunto»
+renombraba la carpeta pero dejaba los hitos del tipo viejo sin decir nada. Ahora pregunta (lo
+eligió Francisco: a veces el cambio es solo para corregir el nombre). Módulo nuevo
+`js/hitos-cambio-de-tipo.js`, llamado desde `App.editarAsunto` solo cuando carpeta y ficha ya han
+salido bien. Los hitos viejos con algo apuntado no se pierden: campo nuevo `delTipoAnterior`, que
+`Hitos.visibles` salta y `Hitos.huerfanos` pliega abajo, con la misma pantalla que los de una rama
+descartada.
+
+**Una decisión que el documento dejaba abierta**: pedía conservar los hitos «hechos o en curso»,
+pero también que con hitos intactos se sustituyeran todos. Un asunto recién creado ya tiene el
+primero en curso sin que nadie haya hecho nada, así que "en curso" solo no cuenta como trabajo; sí
+cuentan hecho, notas, documentos, requisitos marcados y una rama elegida.
+
+: el nombre corto del tipo, también en los filtros y en la tarjeta
+
+`docs/NOMBRE-CORTO-EN-LOS-FILTROS.md`. Las tarjetas «Por tipo de asunto» y la etiqueta del tipo
+en cada tarjeta enseñan ahora el nombre corto (el largo, al pasar el ratón). Dos funciones nuevas
+en `js/nombres.js`, `tipoParaVer` y `nombresDeTipo`. Se sigue agrupando por el nombre de verdad:
+la prueba monta dos tipos con el mismo nombre corto y comprueba que salen dos tarjetas y que cada
+una filtra solo lo suyo. El buscador encuentra por los dos nombres, abierto y archivado; en el
+ARCHIVO se resuelve al buscar, así que nadie tiene que reconstruir el índice. Ojo al escribir la
+prueba: la lista de tipos de partida ya trae un `TRASLADO`, y un corto igual a un tipo existente
+hace que `Nombres.leer` se quede con el otro (Ajustes ya lo avisa en rojo).
+
+## 23-sep-2026 — Fila 93: no salir del asunto salvo cuando el usuario lo pide
+
+`docs/QUEDARSE-EN-EL-ASUNTO-SIEMPRE.md`. Repaso completo, fichero a fichero, de todo `js/` en
+busca de una salida indebida de la ficha (`App.ir(` hacia otra pantalla, u ocultar
+`#pantalla-asunto` fuera de las cuatro salidas permitidas): `js/nucleo.js` (dónde vive `App.ir` y
+`App.PANTALLAS`), `js/ficha-asunto.js`, `js/ficha-nombre-acciones.js`, `js/ficha-documentos.js`,
+`js/hitos-documentos.js`, `js/hitos-panel.js`, `js/hitos-panel-lista.js`, `js/hitos-comunicar.js`,
+`js/documentos.js`, `js/documentos-sueltos.js`, `js/documentos-sueltos-lector.js`,
+`js/documentos-sueltos-sugerencias.js`, `js/registro.js`, `js/registro-sellado.js`, `js/correo.js`,
+`js/correo-adjuntos.js`, `js/plantillas-documento.js`, `js/pdf-separar-unir.js`,
+`js/preparar-documento.js`, `js/notas.js`, `js/relacionados.js`, `js/otros-del-tercero.js`,
+`js/formularios.js`, `js/formularios-rellenar.js`, `js/asuntos-lista.js`, `js/asuntos-archivar.js`,
+`js/asuntos-editar.js`, `js/asuntos-nuevo.js`, `js/asunto-renombrar.js`, `js/unir-asuntos.js`,
+`js/borrados-fusion.js`, `js/papelera.js`, `js/fichas-huerfanas.js`, `js/ficha-archivo.js`,
+`js/ficha-tercero.js`, `js/ficha-plegables.js`, `js/lo-pide.js`, `js/elegir-asunto.js`,
+`js/duplicados.js`, `js/lector.js`, `js/visor.js`, `js/vista.js`, `js/usabilidad.js`, `js/barra.js`.
+
+**No se ha encontrado ninguna salida indebida: el código ya cumplía la regla entera.** La fila 30
+(17-sep-2026) y las que la siguieron (34, 51, 52, 58...) ya habían dejado cada camino bien hecho:
+asociar un documento a un hito (`js/ficha-documentos.js`, botón "Asociar a un hito") y apuntarlo
+desde el propio hito (`js/hitos-documentos.js`, "Apuntar un documento") repintan solo su propio
+trozo, nunca navegan; marcar un hito, "Comunicar", "Documentos ▾", registrar, generar un
+documento de plantilla y separar/unir/sacar páginas de un PDF llaman todos a `App.verAbiertos()`
+(que ya reengancha sola la ficha desde la fila 30) o repintan en su sitio con
+`App.abrirFicha(a, modo)`, nunca a `App.ir(otra-pantalla)`. "Meter en un asunto"/"Meter aquí" de
+Por clasificar (`js/documentos-sueltos.js`, `js/documentos-sueltos-lector.js`) viven en la
+pantalla "Por clasificar", nunca dentro de la ficha, así que no pueden sacar de ella; y cuando el
+asunto de destino es el que antes tenía la ficha abierta, `App.verAbiertos()` no lo vuelve a
+enseñar porque `App.reengancharFicha()` comprueba primero si la ficha sigue **a la vista**
+(`#pantalla-asunto` sin `oculto`), no solo si `actual` sigue puesto.
+
+Se ha ampliado `pruebas/quedarse-en-el-asunto.mjs` con once casos más: marcar un hito, asociar un
+documento a un hito, apuntar un documento desde el hito, comunicar, "Documentos ▾", y "Meter en
+un asunto" hacia el asunto que antes tenía la ficha abierta (los seis, se quedan); y Volver,
+Editar (aunque se cancele), Borrar, Escape, y el asunto que deja de estar abierto desde el otro
+ordenador (los cinco, sí salen, con el aviso de una línea en el último caso). Quince
+comprobaciones en total, sobre las cuatro que ya había.
+
+**Lo que costó de verdad**: nada en el código de la aplicación, porque no hacía falta tocarlo. Lo
+que costó fueron las pruebas nuevas. La primera sesión que tocó esta fila no tuvo `git push` ni
+pudo montar el repositorio completo en un navegador local, así que escribió los quince casos
+nuevos sin poder correrlos, y los dejó publicados así, con una nota pidiendo a la siguiente sesión
+que los verificara. Esta segunda sesión sí ha podido clonar el repositorio (con `git clone` de
+lectura; sigue sin permiso para `git push`, así que la subida a `main` pasa igual por la
+herramienta de GitHub) y correr `npm test` de verdad en local, con `python3 -m http.server` y
+Playwright. Tres de los quince casos nuevos fallaban, los tres por errores en la propia prueba,
+nunca en la aplicación:
+
+- El caso 6 (apuntar un documento a un hito) y otros tres esperaban a que el cuadro se cerrara con
+  `pagina.waitForSelector('#capa.oculto')`. Con `.oculto { display: none !important; }`, ese
+  selector nunca puede quedar "visible" — el propio Playwright no lo resuelve nunca así, y la
+  prueba se quedaba esperando 30 segundos sin motivo. Cambiado a `pagina.waitForTimeout(400)` tras
+  el clic en Aceptar, que es el patrón que ya usan `pruebas/registro.mjs` y el resto del
+  repositorio para lo mismo. El caso 10 (que si sale hacia la lista, no hacia la ficha) se cambió
+  en su lugar a esperar `#pantalla-abiertos:not(.oculto)`, que es el estado de verdad que ese caso
+  comprueba.
+- El caso 10 ("Meter en un asunto") buscaba el asunto de pruebas por su nombre en el cuadro de
+  «Elegir el asunto», y no lo encontraba: ese asunto se había creado a mano, con una carpeta
+  directamente en el disco de mentira, sin pasar nunca por `App.anotar`, así que no tenía ninguna
+  entrada en `asuntos.json` y `ElegirAsunto.todos()` no lo veía. Arreglado dando de alta el
+  asunto con `App.anotar(nombre, {})` (sin categoría ni tercero, que es lo que necesitaba seguir
+  probando el caso 11) nada más crear la carpeta, antes del primer paso.
+- El caso 12 (el segundo asunto, para Escape/Editar/Borrar) esperaba su tarjeta con
+  `pagina.waitForSelector('.tarjeta', { hasText: 'PERMISO' })`: `waitForSelector` no admite
+  `hasText` (eso es de `locator()`), así que la opción se ignoraba y la prueba esperaba a que
+  fuera visible la primera `.tarjeta` que hubiera en toda la página — que podía ser la de un
+  documento suelto de un paso anterior, nunca la buscada. Cambiado a
+  `pagina.locator('#lista-abiertos .tarjeta', { hasText: 'PERMISO' }).first().waitFor()`.
+
+Con los tres arreglos, las quince comprobaciones de `pruebas/quedarse-en-el-asunto.mjs` pasan, y
+se ha corrido además la batería completa (`pruebas/*.mjs`, 97 ficheros): todas en verde, sin tocar
+ningún otro fichero de la aplicación.
+
+Sustituida en `docs/contexto/ASUNTOS.md` la línea vieja de la fila 30 por la lista completa y
+actual de caminos revisados (ya lo había hecho la primera sesión). Versión publicada
+`App.VERSION`: `23-sep-2026 · 15:47`.
+
+## 23-sep-2026 — Fila 92: «Reintentar is not defined», la aplicación sin poder guardar
+
+`docs/NADA-SE-GUARDA-REINTENTAR.md`. Desde la fila 90, `Carpetas.escribirTexto`/`escribirBytes`
+llamaban a `Reintentar.escritura` a pelo: en un navegador con `js/carpetas.js` nuevo y un
+`index.html` que no cargaba `js/reintentar-escritura.js`, fallaba **toda** escritura. Ahora pasan
+por `conReintento(intento)`, que sin el módulo escribe sin reintento, y
+`js/reintentar-escritura.js` se expone en `window.Reintentar`.
+
+**De dónde salía la versión a medias.** `main` estaba bien (el `<script>` estaba, antes de
+`carpetas.js`). La copia sin internet no lleva lista de ficheros escrita a mano
+(`scripts/copia-local.mjs` copia `js/` e `index.html` enteros), y `vercel.json` ya manda
+`max-age=0, must-revalidate` para todo, `index.html` incluido. Lo más probable: una copia a
+medias, en la que un `.js` nuevo llega antes que el `index.html` que lo carga (Dropbox sincroniza
+fichero a fichero al otro ordenador, y la actualización de la copia también escribe uno a uno).
+Con el arreglo, ese estado a medias ya no deja a nadie sin guardar. **No se pudo mirar lo
+publicado con `curl`**: esta sesión no tenía salida a `asuntos.fmargon.com` ni a `vercel.app`.
+
+Prueba nueva `pruebas/scripts-cargados.mjs` (sin navegador): todo `js/*.js` en `index.html` y al
+revés, el orden de los dos ficheros, y escribir con y sin `Reintentar`. Sin el arreglo, falla.
+
+De paso, `docs/COLA.md` vuelve a dar por HECHAS la 89 y la 91: el commit que apuntó las filas 92
+a 98 las había devuelto, por error, a BLOQUEADA y PENDIENTE.
+
+## 23-sep-2026 — Fila 91: la copia sin internet se actualiza de verdad (y se cierra la 89)
+
+`docs/COPIA-SE-ACTUALIZA.md`. La copia que Francisco abría en el instituto seguía en
+`21-sep-2026 · 11:32` con la publicada en `14:49`, y sin decir nada. La copia pública estaba al
+día: fallaba el ordenador. Dos agujeros, tapados los dos porque no se sabía cuál le había tocado:
+
+- **`ABRIR EL GESTOR.html` solo guardaba la carpeta la primera vez.** Si la carpeta ya tenía
+  `index.html`, iba directo a ella sin guardarla; en otro ordenador, navegador o perfil,
+  `js/actualizar-copia.js` no encontraba carpeta y se callaba. Ahora la guarda siempre y, si ya
+  está instalada, la pone al día antes de abrirla (mismo algoritmo: solo los sha256 distintos,
+  `version.json` el último). Así, volver a guardar ese fichero y abrirlo rescata una copia vieja,
+  que es la única salida para la de Francisco (su `js/actualizar-copia.js` es el viejo). Además,
+  solo acepta una carpeta vacía, con `index.html` o con el propio `ABRIR EL GESTOR…`.
+- **Sin permiso, solo un aviso pequeño abajo a la izquierda**, que no decía que había versión
+  nueva. Ahora `js/actualizar-copia.js` mira PRIMERO la versión remota (si coincide con
+  `App.VERSION`, no pide permiso ni toca el disco) y, si no puede actualizar sola, pinta una
+  franja ámbar arriba, a todo el ancho, con las dos versiones y «Actualizar ahora» (pide permiso
+  o carpeta con el clic, la guarda, actualiza y recarga).
+
+**Contra el bucle**: antes de recargar se apunta en `sessionStorage` a qué versión y en qué
+carpeta; si al volver la ventana sigue vieja, se escribió en otra copia: no se recarga más, se
+olvida la carpeta y la franja dice desde qué carpeta abrir.
+
+**La prueba** (`pruebas/copia-sin-internet.mjs`) pasó a usar copias de verdad de `copia-local/`
+en una carpeta temporal, con el disco y la IndexedDB servidos desde Node (`exposeFunction`), para
+que tras la recarga la página abra de verdad lo recién escrito y se pueda comprobar que
+`App.VERSION` ya es la nueva. Sin el arreglo, falla. La parte 1 lleva ahora su propio servidor
+"al día": la copia mira la versión remota lo primero, y sin él saldría a internet.
+
+**La 89 queda HECHA**: Francisco creó `fmargon780/gestor-asuntos-copia` y el secreto, y la acción
+publica desde el 21-sep-2026. `App.VERSION`: `23-sep-2026 · 14:28`.
+
+## 21-sep-2026 — Fila 90: archivar sin avisos falsos ni errores en inglés
+
+`docs/ARCHIVAR-SIN-AVISOS-FALSOS.md`. Al archivar un asunto desde su propia ficha (no desde la
+tarjeta de la lista) salían dos avisos rojos sobrantes, aunque el archivado en sí salía bien: uno
+de "otro ordenador" y otro con un `InvalidStateError` del navegador, en inglés, al intentar guardar
+`_ficha.json`.
+
+**Aviso 1, el falso "otro ordenador".** `App.cerrarAsunto` llama a `App.verAbiertos()` al terminar,
+que reengancha la ficha abierta (`App.reengancharFicha`, `js/ficha-asunto.js`); como el asunto ya
+no está en la lista (lo acaba de archivar este mismo ordenador), el aviso confundía su propio
+archivado con uno ajeno. Arreglo: `App.E.recienArchivados` (`js/nucleo.js`), un conjunto en
+memoria donde `App.cerrarAsunto` (`js/asuntos-archivar.js`) apunta la clave justo antes de llamar a
+`App.verAbiertos()`; `App.reengancharFicha` lo consulta primero, y si está, vuelve a la lista sin
+avisar (y borra la marca: es de un solo uso, para no confundir un archivado de verdad posterior del
+otro ordenador con el mismo nombre).
+
+**Aviso 2, Dropbox sincronizando al escribir `_ficha.json`.** La envoltura de `App.cerrarAsunto` en
+`js/ficha-archivo.js` escribe `_ficha.json` justo después de mover la carpeta, y Dropbox a veces
+todavía está sincronizando esa misma carpeta en ese instante. Dos piezas:
+- `Reintentar.escritura(intento)` (nuevo `js/reintentar-escritura.js`, cargado justo antes de
+  `js/carpetas.js`): un intento normal más hasta tres reintentos, con 0,5 s/1 s/2 s de espera por
+  delante de cada uno, si `intento` falla con `InvalidStateError`/`NoModificationAllowedError`.
+  Cualquier otro error se lanza a la primera. `Carpetas.escribirTexto`/`escribirBytes` pasan a
+  llamarla, envolviendo la escritura entera (pide el manejador del fichero de nuevo en cada
+  intento, nunca reutiliza uno viejo): como `Copias.guardar`, `guardarJson` y `_ficha.json` pasan
+  todos por ahí, esto arregla de una vez toda escritura de la aplicación, no solo la del archivado.
+- Si aun así los reintentos se agotan, la envoltura de `js/ficha-archivo.js` distingue ese caso
+  (`Reintentar.esErrorDeSincronizacion(e)`) y avisa en **ámbar**, diciendo que no se ha perdido nada
+  (la clave sigue en `asuntos.json`: el borrado va después de escribir `_ficha.json`) y que "Poner
+  en orden las fichas del ARCHIVO" la recogerá sola. Cualquier otro error sigue en rojo, con
+  `U.mensajeDeError(e)` en vez de `e.message` a pelo (también en la envoltura de
+  `App.reabrirAsunto`, que no tenía este arreglo).
+
+**Lo que costó de verdad, en la propia prueba.** El primer intento de simular el fallo cambiaba
+`window.__disco.fich` (la función expuesta del disco de mentira de `pruebas/navegador.mjs`) — pero
+`dir.getFileHandle` de ese disco llama a la función `fich` de su propio cierre léxico, no a esa
+propiedad: cambiarla no tiene ningún efecto, y la prueba archivaba sin fallar nunca, dando un falso
+verde. Arreglo: parchear en cascada el propio manejador de la carpeta ARCHIVO
+(`pruebas/archivar-sin-avisos-falsos.mjs`, `hazQueFalleEnElArchivo`), envolviendo
+`getDirectoryHandle`/`getFileHandle` de cualquier carpeta que cuelgue de ahí, para interceptar la
+creación de `_ficha.json` sin tener que adivinar de antemano qué carpetas va a crear el archivado.
+
+Prueba nueva, `pruebas/archivar-sin-avisos-falsos.mjs`, en navegador de verdad: archivar desde la
+ficha abierta sin el aviso de "otro ordenador"; Dropbox fallando dos veces y saliendo bien a la
+tercera, sin ningún aviso de más; y Dropbox fallando todo el rato, con el aviso ámbar y la ficha
+todavía en `asuntos.json`. Se tuvo que añadir `js/reintentar-escritura.js` a la lista de ficheros
+que cargan en su contexto `vm` otras 17 pruebas ya existentes que usan `js/carpetas.js` sin
+navegador (`Carpetas.escribirTexto`/`escribirBytes` ahora llaman a `Reintentar`, que si no está
+cargado revienta con `ReferenceError`).
+
+Fila 90 HECHA. `App.VERSION`: `21-sep-2026 · 14:49`.
+
+---
+
+## 21-sep-2026 — Fila 89: la copia sin internet, bloqueada por el repositorio público
+
+`docs/COPIA-SIN-INTERNET.md`, diseño cerrado por Francisco el mismo día. El filtro de red del
+instituto (Junta de Andalucía) empezó a cortar también `asuntos.fmargon.com`, no solo
+`vercel.app`, así que la aplicación necesitaba poder abrirse desde el disco (`file://`), con doble
+clic, sin depender de esa dirección.
+
+**Apartado 1 (que la app funcione en `file://`).** Nuevo `js/cargar-fichero.js`, con
+`App.leerFicheroDeLaApp(ruta, tipo)`: en `http(s)` sigue siendo el `fetch` de siempre; en `file:`
+inyecta un `<script src="copia-datos/<ruta con / cambiado por ~>.js">` que deja el dato en
+`window.__COPIA__`, con carga perezosa y sin duplicar la inyección si dos módulos piden la misma
+ruta a la vez. Contrato elegido: `'json'` devuelve el objeto ya interpretado, `'binario'` un
+`Uint8Array`, igual que ya hacían a mano los cinco sitios de la tabla del diseño (`js/cargar-biblioteca.js`,
+`js/formularios.js`, `js/formularios-rellenar.js`, `js/plantillas-documento.js` ×2), que pasaron a
+llamar a esta función en vez de a `fetch` directo. Los tres módulos que repetían casi el mismo
+`cargarPdfJs()` con `import('./lib/pdf.min.mjs')` (`js/registro-lector.js`,
+`js/preparar-documento.js`, `js/pdf-separar-unir.js`) pasaron a llamar a la función compartida
+`App.cargarPdfJs()`, también en `js/cargar-fichero.js`. `js/nucleo.js` gana `App.textoVersion()`
+(`App.VERSION` + " · copia sin internet" cuando `location.protocol === 'file:'`), usada en las dos
+líneas que antes pintaban `App.VERSION` a pelo.
+
+**Apartado 2 (el paso que genera la copia).** `scripts/copia-local.mjs` (`npm run copia-local`,
+nueva dependencia `esbuild`): copia `index.html`, `css/`, `js/` y `favicon.svg` tal cual, genera
+`copia-datos/*.js` por cada JSON/PDF/`.docx` estático, construye `js/lib/pdf.iife.js` y
+`pdf.worker.iife.js` con esbuild, copia el instalador (`scripts/plantillas-copia/ABRIR EL GESTOR.html`)
+y escribe `version.json` con el sha256 de todo. No copia `docs/`, `pruebas/`, `herramientas/`,
+`scripts/` ni `apps-script/`. `copia-local/` en `.gitignore`.
+
+**Apartado 4 (se instala y se actualiza sola).** Nuevo `js/actualizar-copia.js` (solo actúa en
+`file:`): compara `version.json` del disco con el de
+`raw.githubusercontent.com/fmargon780/gestor-asuntos-copia/main/` (`cache: 'no-store'`), descarga
+solo lo que cambió de sha256 (comprobando cada uno antes de escribir, `version.json` el último) y
+recarga; sin internet, un aviso discreto (`U.aviso`) y arranca igual. El identificador de la
+carpeta viaja en la misma IndexedDB que `js/almacen.js` (`gestor-asuntos` / `ajustes` /
+`copiaCarpeta`), para que lo que guarda `ABRIR EL GESTOR.html` (autónomo, con su propia capa
+mínima de IndexedDB, sin depender de ningún otro fichero de la copia) lo pueda releer luego este
+módulo. El aviso ámbar de "hace falta el permiso otra vez" reutiliza el patrón de
+`js/bandeja-pantalla.js` (caja + botón), colgado del `<body>` porque no hay un hueco fijo para él
+en `index.html`.
+
+**Lo que costó de verdad, un bug real de pdf.js:** `js/lib/pdf.min.mjs` trae, en su propio código
+(no puesto por nadie del proyecto), un único `await` de nivel superior —
+`globalThis.pdfjsLib = await (globalThis.pdfjsLibPromise = ...)` —, y esbuild no genera un
+`<script>` clásico (`format: 'iife'`) a partir de un módulo con `await` de nivel superior: solo lo
+admite en `format: 'esm'`, que a su vez no se puede cargar en `file://` (es la misma restricción de
+`import()` que se quería evitar). Comprobado a mano con Playwright que `__webpack_require__(228)`
+(lo que hay a la derecha del `await`) es de verdad una promesa ahí dentro: quitar el `await` sin
+más deja `globalThis.pdfjsLib` con la promesa sin resolver, y `pdfjsLib.getDocument` vacío. La
+solución final: `scripts/copia-local.mjs` quita ese único `await` del texto antes de pasarlo a
+esbuild (comprobando primero que el patrón exacto sigue ahí, para que una subida de pdf.js no lo
+rompa en silencio), sin `globalName` (así esbuild no envuelve el resultado en un `var pdfjsLib =
+(()=>{...})()` que pisaría, al final, la asignación de verdad); y `App.cargarPdfJs()`, ya en el
+navegador, espera esa promesa si hace falta (`if (typeof lib.then === 'function') lib = await lib`)
+antes de dar la librería por cargada. El worker (`pdf.worker.min.mjs`) no tenía este problema: se
+autoasigna `globalThis.pdfjsWorker` de forma síncrona, y pdf.js lo usa para montar el "fake worker"
+en el hilo principal sin crear ningún `Worker` de verdad ni pedir `workerSrc`, en cuanto lo
+encuentra ya puesto.
+
+**Lo que costó de verdad, en la propia prueba de la actualización:** el primer intento de
+`pruebas/copia-sin-internet.mjs` fabricaba el disco de mentira (y el `indexedDB` de mentira) con
+`page.addInitScript`, el mismo truco que usa `pruebas/navegador.mjs` para toda la aplicación — pero
+`js/actualizar-copia.js` hace `location.reload()` cuando actualiza, y un `addInitScript` se vuelve a
+ejecutar en cada navegación: la página recién recargada "olvidaba" lo que se acababa de escribir,
+porque recreaba el disco de mentira desde cero con el contenido viejo. Solución: `page.exposeFunction`
+sí sobrevive a una recarga, así que el disco de mentira pasó a vivir en el propio proceso Node (un
+mapa `ruta -> contenido`), y la página solo llama a `window.__disco(accion, ruta, datos)`. Aparte,
+el servidor HTTP de mentira necesitó la cabecera `Access-Control-Allow-Origin: *` (como
+`raw.githubusercontent.com` de verdad): una página `file://` tiene origen `"null"`, y sin CORS
+abierto el `fetch` de `js/actualizar-copia.js` falla con el mismo error que si el servidor
+estuviera apagado, dando un falso "sin internet, arranca igual" que en realidad escondía un
+servidor de pruebas mal configurado. Y el puerto `1` (usado a mano para simular "nadie escucha
+ahí") es de los que Chrome bloquea siempre por seguridad (`ERR_UNSAFE_PORT`): la prueba final abre
+y cierra un servidor real para quedarse con un puerto libre de verdad, en vez de inventarse uno.
+
+**Bloqueada, no HECHA:** el apartado 3 del diseño (publicar la copia en un repositorio público
+nuevo, `fmargon780/gestor-asuntos-copia`, con una GitHub Action) no se pudo completar por dos
+motivos: la API de GitHub de esta sesión devolvió `403 Resource not accessible by integration` al
+intentar crear el repositorio, y esta misma sesión (en la nube) tiene bloqueado por su propia
+configuración de seguridad tocar `.github/workflows/` de cualquier repositorio. El workflow, en
+cambio, sí tiene que vivir en `.github/workflows/` de **este** repositorio privado
+(`gestor-asuntos-ies`, no en el público): es aquí donde ocurren los `push` que lo disparan; solo
+necesita permiso de escritura sobre el repositorio público, para subir ahí el resultado. Siguiendo
+la opción 2 del propio diseño ("si la sesión no puede crear el repositorio público... dejarlo todo
+preparado"), el contenido completo de la Action queda escrito en `docs/copia-publica.yml.txt`
