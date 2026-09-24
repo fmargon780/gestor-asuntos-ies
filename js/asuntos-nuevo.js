@@ -635,14 +635,13 @@ App.crearAsuntoDelFormulario = async function () {
     $('bloque-tercero').classList.add('oculto');
     $('bloque-detalles').classList.add('oculto');
     await App.verAbiertos();
-    App.ir('abiertos');
+    /* Fila 119: se abre la ficha del recién creado; si no aparece, la lista. */
+    var recien = App.E.listaAbiertos.filter(function (a) { return a.nombre === nombre; })[0];
+    if (!(recien && window.Navegacion && Navegacion.abrirAbierto(nombre))) App.ir('abiertos');
 
     /* Con el documento ya dentro, se abre el cuadro de siempre para
-       ponerle el nombre que le toca. */
-    if (traido) {
-      var recien = App.E.listaAbiertos.filter(function (a) { return a.nombre === nombre; })[0];
-      if (recien) await App.verDocumentos(recien);
-    }
+       ponerle el nombre que le toca (encima de la ficha nueva). */
+    if (traido && recien) await App.verDocumentos(recien);
   } catch (e) {
     U.accesorio('Asunto creado, pero no he podido terminar de poner la pantalla al día. Pulsa Recargar', e);
   }

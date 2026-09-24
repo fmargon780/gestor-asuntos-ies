@@ -161,6 +161,9 @@ await pagina.waitForSelector('#resultados-tercero .resultado');
 await pagina.click('#resultados-tercero .resultado');
 await pagina.fill('#campo-fecha', '2026-09-07');
 await pagina.click('#btn-crear');
+/* Fila 119: crear abre la ficha del asunto; se vuelve a la lista. */
+await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await pagina.waitForTimeout(400);
 

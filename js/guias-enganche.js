@@ -210,6 +210,17 @@
     }
   }
 
+  /* Fila 120 (docs/GUION-DESDE-EL-HITO.md): relee guias.json, deja que
+     `cambiar` toque una copia de los pasos del tipo y la guarda por
+     guardarPasos. Si `cambiar` devuelve false, no se guarda nada. */
+  async function cambiarPasos(nombreTipo, cambiar) {
+    try { await cargar(); } catch (e) { /* se sigue con lo que hay */ }
+    var copia = JSON.parse(JSON.stringify(pasosDe(nombreTipo)));
+    if (cambiar(copia) === false) return false;
+    await guardarPasos(nombreTipo, copia);
+    return true;
+  }
+
   /* Lo que usa la ficha de un asunto para escribir la guía de su tipo
      sin pasar por Ajustes. Las guías viven en un solo sitio, y es este
      fichero el que las lleva: si la ficha escribiera por su cuenta, las
@@ -217,7 +228,8 @@
   window.GuiasDelCentro = {
     escribir: escribirGuia,
     pasosDe: function (tipo) { return pasosDe(tipo).slice(); },
-    guardarPasos: guardarPasos
+    guardarPasos: guardarPasos,
+    cambiarPasos: cambiarPasos
   };
 
   /* ---------- arranque ---------- */

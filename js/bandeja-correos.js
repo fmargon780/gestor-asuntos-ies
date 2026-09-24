@@ -549,9 +549,10 @@
     } catch (e) { /* la nota es lo menos importante */ }
     await apuntarHuella(elAsunto.nombre, d);
     await borrarDeLaBandeja(item);
-    U.aviso(metidos
-      ? 'Guardado en ' + elAsunto.nombre + '.'
-      : 'Anotado en ' + elAsunto.nombre + '.', 'bueno');
+    var texto = metidos ? 'Guardado en ' + elAsunto.nombre + '.' : 'Anotado en ' + elAsunto.nombre + '.';
+    /* Fila 119: se queda en la bandeja, con «Ir al asunto». */
+    if (window.Navegacion) Navegacion.avisoConIr(texto, 'bueno', elAsunto.nombre);
+    else U.aviso(texto, 'bueno');
     if (window.Gestor && window.Gestor.recargar) window.Gestor.recargar();
   }
 

@@ -49,6 +49,7 @@
     if (window.Notas) window.Notas.olvidarBorrador();
     /* Al entrar, siempre la cuadrícula de tarjetas (fila 107). */
     FichaTarjetas.alEntrar(a);
+    if (window.Navegacion) Navegacion.apuntar();   /* fila 119: de dónde se viene */
     App.ir('asunto');
     pintar();
 
@@ -96,7 +97,8 @@
     actual = null;
     if (window.Presencia) Presencia.dejarDeVigilar();
     if (window.OtrosDelTercero) OtrosDelTercero.olvidarOrigen();
-    App.ir(modoActual === 'archivado' ? 'archivo' : 'abiertos');
+    var defecto = modoActual === 'archivado' ? 'archivo' : 'abiertos';
+    if (window.Navegacion) Navegacion.volver(defecto); else App.ir(defecto);
   }
 
   /* Expuesta para js/ficha-nombre-acciones.js (18-sep-2026, fila 52):
@@ -820,6 +822,8 @@
       await U.mientrasGuarda(ev.currentTarget, function () {
         return abierto ? App.cerrarAsunto(a) : App.reabrirAsunto(a);
       });
+      /* Reabierto: a su ficha de asunto abierto (fila 119). */
+      if (!abierto && window.Navegacion && Navegacion.abrirAbierto(a.nombre)) return;
       volverALaLista();
     });
     cerrar.classList.add('boton-principal');

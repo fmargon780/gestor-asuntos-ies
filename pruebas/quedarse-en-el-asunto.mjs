@@ -1,7 +1,8 @@
 /* Prueba en navegador de verdad de la fila 30 (docs/QUEDARSE-EN-EL-ASUNTO.md)
    y de la fila 93 (docs/QUEDARSE-EN-EL-ASUNTO-SIEMPRE.md): de la ficha de
-   un asunto solo se sale en cuatro casos —Volver/Escape, Editar,
-   Archivar/Reabrir y Borrar— y un quinto que no es una acción de
+   un asunto solo se sale en tres casos —Volver/Escape, Archivar y
+   Borrar— (desde la fila 119, docs/TRAS-CADA-ACCION.md, Editar y
+   Reabrir dejan en la ficha) y un cuarto que no es una acción de
    Francisco: el asunto ha dejado de estar abierto desde el otro
    ordenador. Cualquier otra cosa —guardar un documento, el repaso
    automático de la carpeta, marcar un hito, asociar o apuntar un
@@ -256,7 +257,7 @@ await pagina.keyboard.press('Escape');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await comprobar('12. Escape devuelve a la lista de asuntos abiertos', pantallas(), { asunto: false, abiertos: true });
 
-console.log('--- 13. Editar SÍ devuelve a la lista (aunque se cancele el cuadro) ---');
+console.log('--- 13. Editar NO saca de la ficha (fila 119), aunque se cancele el cuadro ---');
 await abrirSegundoAsunto();
 await pagina.click('.ficha-nombre-menu-boton');
 await pagina.waitForSelector('.ficha-menu:not(.oculto)');
@@ -265,8 +266,10 @@ await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('el cuadro de editar se llama como toca',
   pagina.locator('#cuadro-titulo').textContent(), 'Editar el asunto');
 await pagina.click('#cuadro-cancelar');
+await pagina.waitForTimeout(200);
+await comprobar('13. Editar deja en la ficha del asunto', pantallas(), { asunto: true, abiertos: false });
+await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
-await comprobar('13. Editar devuelve a la lista de asuntos abiertos', pantallas(), { asunto: false, abiertos: true });
 
 console.log('--- 14. Borrar SÍ devuelve a la lista ---');
 await abrirSegundoAsunto();

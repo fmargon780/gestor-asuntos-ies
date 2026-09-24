@@ -8,6 +8,10 @@
      su acción (si tiene: pulsa el botón de siempre del hito), su
      normativa como etiqueta "§ cita" y "No aplica". Marcado: tachado,
      con quién y cuándo en el `title`.
+   - "+ Añadir un paso a la guía del tipo" (fila 120, docs/GUION-DESDE-EL-HITO.md):
+     la línea va al final del guion del paso de la guía (`origenGuia`) y
+     sale en todos los asuntos de ese tipo. No sale si el hito no viene
+     de un paso de la guía, ni si ese paso es una pregunta.
    - "+ Añadir un paso solo para este asunto" (no toca la guía).
    - Una pregunta del guion (fila 116, docs/PREGUNTAS-EN-EL-GUION.md): su
      texto y un botón por respuesta; debajo, sangradas, las líneas de la
@@ -114,7 +118,8 @@ var HitoMesaGuion = (function () {
         '<span class="mesa-guion-cuenta">' + c.hechos + ' de ' + c.total + '</span></div>' +
       '<div class="mesa-barra"><span style="width:' + pct + '%"></span></div>' +
       (guion.length ? guion.map(function (g) { return lineaHTML(g, abierto); }).join('') + plegadasHTML(guion.plegadas)
-        : '<p class="explica">Este hito todavía no tiene guion. Se escribe en la guía del tipo (Ajustes), en «Guion de este paso».</p>') +
+        : '<p class="explica">Este hito todavía no tiene guion. Añade el primer paso aquí abajo.</p>') +
+      (abierto && pasoDeLaGuia(a, h) ? '<button type="button" class="enlace guion-anadir-guia">+ Añadir un paso a la guía del tipo</button><br>' : '') +
       (abierto ? '<button type="button" class="enlace guion-anadir-propio">+ Añadir un paso solo para este asunto</button>' : '');
 
     /* La normativa de los pasos del guion, también en la columna de consulta. */
@@ -156,6 +161,8 @@ var HitoMesaGuion = (function () {
         else U.aviso('Esa acción está en los documentos del hito.', 'ambar');
       };
     });
+    var deGuia = caja.querySelector('.guion-anadir-guia');
+    if (deGuia) deGuia.onclick = function () { anadirALaGuia(a, h); };
     var propio = caja.querySelector('.guion-anadir-propio');
     if (propio) propio.onclick = async function () {
       var ok = await U.preguntar('Añadir un paso al guion de este asunto',
@@ -166,6 +173,64 @@ var HitoMesaGuion = (function () {
       var texto = t ? t.value : '';
       guardar(null, function () { return Hitos.anadirGuionPropio(a.nombre, h.id, texto); });
     };
+  }
+
+  function tipoDe(a) {
+    return (a && ((a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo))) || '';
+  }
+
+  /* El paso de la guía del que sale el hito, si lo hay y no es una pregunta. */
+  function pasoDeLaGuia(a, h) {
+    if (!h || !h.origenGuia || !Hitos.pasoDeGuia || !window.GuiasDelCentro || !GuiasDelCentro.cambiarPasos) return null;
+    var p = Hitos.pasoDeGuia(a, h);
+    return (p && !(p.opciones && p.opciones.length)) ? p : null;
+  }
+
+  function buscarPaso(pasos, id) {
+    for (var i = 0; i < (pasos || []).length; i++) {
+      if (pasos[i].id === id) return pasos[i];
+      for (var j = 0; j < (pasos[i].opciones || []).length; j++) {
+        var enc = buscarPaso(pasos[i].opciones[j].pasos, id);
+        if (enc) return enc;
+      }
+    }
+    return null;
+  }
+
+  /* Lo escrito que no se pudo guardar: vuelve a salir al abrir el cuadro. */
+  var sinGuardar = '';
+
+  /* Fila 120: la línea nueva, al final del guion del paso (fuera de las
+     respuestas de una pregunta), sin acción ni normativa. */
+  async function anadirALaGuia(a, h) {
+    var tipo = tipoDe(a);
+    var esperar = U.preguntar('Añadir un paso a la guía del tipo',
+      '<input class="campo" id="guion-guia-texto" placeholder="Qué hay que hacer">' +
+      '<p class="nota">Sale en todos los asuntos de ' + U.escapar(tipo) + ', abiertos y nuevos. ' +
+      'La acción, la normativa y la explicación se completan en Ajustes.</p>', 'Añadir');
+    var t = document.getElementById('guion-guia-texto');
+    if (t && sinGuardar) t.value = sinGuardar;
+    var ok = await esperar;
+    if (!ok) return;
+    var texto = String((t && t.value) || '').trim();
+    if (!texto) return;
+    sinGuardar = texto;
+    try {
+      var hecho = await GuiasDelCentro.cambiarPasos(tipo, function (pasos) {
+        var p = buscarPaso(pasos, h.origenGuia);
+        if (!p || (p.opciones && p.opciones.length)) return false;
+        p.guion = GuiasGuion.normalizar((p.guion || []).concat([{ texto: texto, explicacion: '', accion: '', normativa: null }]));
+        return true;
+      });
+      if (!hecho) { U.aviso('Ese paso ya no está en la guía del tipo.', 'ambar'); return; }
+    } catch (e) {
+      U.fallo('No he podido añadirlo a la guía', e);
+      return;
+    }
+    sinGuardar = '';
+    var t2 = (App.E.tipos || []).filter(function (x) { return x.tipo === tipo; })[0];
+    U.aviso('Añadido a la guía de ' + (Nombres.tipoParaCarpeta ? Nombres.tipoParaCarpeta(t2) || tipo : tipo), 'bueno');
+    if (window.HitosPanel) HitosPanel.programarRepintado();
   }
 
   return { pintar: pintar };

@@ -5,6 +5,42 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 120: el guion de la guía, desde el hito
+
+`docs/GUION-DESDE-EL-HITO.md`. Francisco quería completar las guías tramitando, sin irse a Ajustes.
+En la mesa del hito, «+ Añadir un paso a la guía del tipo» (además del de «solo para este asunto»):
+la línea va al final del guion del paso de la guía y sale en todos los asuntos de ese tipo, porque
+`Hitos.guionDe` ya lee el paso en vivo. Detalle en `docs/contexto/HITO-MESA.md` («El guion»).
+
+- `GuiasDelCentro.cambiarPasos(tipo, fn)` (nuevo, `js/guias-enganche.js`): relee `guias.json`,
+  cambia una copia y guarda por `guardarPasos`, para no pisar lo que el otro ordenador haya
+  escrito entretanto en la guía.
+- No sale en un hito añadido a mano, en uno cuyo paso ya no está en la guía, ni en un paso-pregunta.
+  La biblioteca de hitos no se toca.
+
+Versión publicada `App.VERSION`: `24-sep-2026 · 10:44`.
+
+## 24-sep-2026 — Fila 119: adónde lleva la aplicación después de cada acción
+
+`docs/TRAS-CADA-ACCION.md`. Casi nunca dejaba en lo que se acababa de tocar. Ahora crear, reabrir y
+editar dejan en la ficha; «Volver» regresa a la pantalla de la que se vino (y a la misma altura de
+la lista); cuando lo lógico es quedarse, el aviso trae «Ir al asunto». Detalle en
+`docs/contexto/PANTALLA.md`.
+
+- Fichero nuevo `js/navegacion.js` (un solo nivel de memoria, sin pila de historial).
+  `U.aviso` admite un tercer parámetro con el botón.
+- Cambio de una regla anterior (filas 30 y 93, «de la ficha solo se sale al Volver, Editar,
+  Archivar/Reabrir o Borrar»): Editar y Reabrir ya no sacan de la ficha. Se actualizaron
+  `pruebas/quedarse-en-el-asunto.mjs` y once pruebas más que, tras crear un asunto, esperaban la
+  lista; ahora abren la ficha y vuelven.
+- Decisión: «Crear los que tocan» solo abre la ficha si tocaba uno; con varios, nada. El aviso de
+  «Meter aquí» sale al cerrar el cuadro de ponerle nombre, no antes, para que el botón no quede
+  debajo del cuadro.
+- «Abrir el que ya existe» de un duplicado archivado abre su ficha (se expuso
+  `OtrosDelTercero.montarArchivado`).
+
+Versión publicada `App.VERSION`: `24-sep-2026 · 10:44`.
+
 ## 24-sep-2026 — Fila 118: los pasos nuevos de una guía llegan a los asuntos abiertos
 
 `docs/GUIA-NUEVA-LLEGA-A-LOS-ASUNTOS.md`. Francisco añadió pasos a la guía de un tipo desde la
@@ -25,7 +61,7 @@ abrir la ficha por primera vez. Detalle en `docs/contexto/HITOS-Y-GUIAS.md`.
 - El segundo `catch` de `escribirGuia` decía «No he podido guardarla» aunque la guía ya estaba
   guardada (fallaba el repintado): ahora es ámbar.
 
-Versión publicada `App.VERSION`: `24-sep-2026 · 09:57`.
+Versión `App.VERSION`: `24-sep-2026 · 10:44`.
 
 ## 24-sep-2026 — Fila 117: el envío de correo con la aplicación web publicada
 
@@ -47,7 +83,7 @@ centro y salieron tres fallos, uno detrás de otro:
 - Sigue sin poderse enviar un correo real desde aquí (no hay cuenta de Google): lo comprueba
   Francisco con «Probar».
 
-Versión publicada `App.VERSION`: `24-sep-2026 · 09:57`.
+Versión `App.VERSION`: `24-sep-2026 · 10:44`.
 
 ## 24-sep-2026 — Fila 63: publicar solo la aplicación
 

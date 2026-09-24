@@ -201,13 +201,23 @@ var U = (function () {
   }
 
   /* Avisos flotantes de la esquina. Nunca detienen nada. */
-  function aviso(texto, clase) {
+  /* `accion` (opcional, fila 119): { boton: 'Ir al asunto', alPulsar: fn }.
+     Pone un botón en el aviso, que dura algo más (8 s) y se cierra al pulsarlo. */
+  function aviso(texto, clase, accion) {
     var caja = document.getElementById('mensajes');
     var d = document.createElement('div');
     d.className = 'mensaje' + (clase ? ' ' + clase : '');
     d.textContent = texto;
+    if (accion && accion.boton && typeof accion.alPulsar === 'function') {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'mensaje-boton';
+      b.textContent = accion.boton;
+      b.onclick = function () { d.remove(); accion.alPulsar(); };
+      d.appendChild(b);
+    }
     caja.appendChild(d);
-    setTimeout(function () { d.remove(); }, clase === 'malo' ? 9000 : 4500);
+    setTimeout(function () { d.remove(); }, clase === 'malo' ? 9000 : (accion ? 8000 : 4500));
   }
 
   /* Cuadro de confirmación. Devuelve una promesa con true o false.

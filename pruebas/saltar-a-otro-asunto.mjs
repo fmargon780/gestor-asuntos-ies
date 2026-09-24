@@ -153,7 +153,8 @@ await comprobar('6. App.verArchivo no se ha llamado en ningún momento',
 
 console.log('--- 5. al salir por "Volver a la lista" y entrar en otro asunto desde la lista, el botón ya no está ---');
 await pagina.click('#ficha-volver');
-await pagina.waitForSelector('#pantalla-archivo:not(.oculto)');
+/* Fila 119: vuelve a la pantalla de la que se vino (la lista de abiertos, de donde se abrió A). */
+await pagina.waitForSelector('#pantalla-asunto.oculto', { state: 'attached' });
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await abrirDesdeLaLista(D);

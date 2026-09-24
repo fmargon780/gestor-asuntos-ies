@@ -314,7 +314,14 @@
     App.ir('abiertos');
   }
 
-  function irAlCandidatoArchivado(nombre) {
+  /* Fila 119: directamente su ficha de archivado; si no se puede
+     montar, como antes, el ARCHIVO con la búsqueda puesta. */
+  async function irAlCandidatoArchivado(nombre, categoria, tercero) {
+    try {
+      var objeto = window.OtrosDelTercero && OtrosDelTercero.montarArchivado
+        ? await OtrosDelTercero.montarArchivado(nombre, categoria, tercero) : null;
+      if (objeto && App.abrirFicha) { App.abrirFicha(objeto, 'archivado'); return; }
+    } catch (e) { /* se sigue con la búsqueda */ }
     App.ir('archivo');
     var campo = $('buscar-archivo');
     if (campo) campo.value = nombre;
@@ -337,7 +344,7 @@
           var res = await mostrarAvisoExistente(candidatos);
           if (res.accion === 'cancelar') return;
           if (res.accion === 'abrir') {
-            if (res.candidato.archivado) irAlCandidatoArchivado(res.candidato.nombre);
+            if (res.candidato.archivado) await irAlCandidatoArchivado(res.candidato.nombre, App.E.nuevo.categoria, d.tercero);
             else irAlCandidatoAbierto(res.candidato.nombre);
             return;
           }

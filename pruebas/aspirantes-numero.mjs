@@ -75,6 +75,9 @@ await comprobar('la carpeta se monta sin número, solo con el nombre',
 console.log('--- un asunto abierto y uno archivado, los dos suyos ---');
 await pagina.fill('#campo-fecha', '2026-09-05');
 await pagina.click('#btn-crear');
+/* Fila 119: crear abre la ficha del asunto; se vuelve a la lista. */
+await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await comprobar('el primer asunto se crea sin número en el nombre',
   nombresAbiertos().then(ns => ns.some(n => /^260905 \S+( \d{2}-\d{2})? Pendiente De Numero, Nora$/.test(n))), true);
@@ -108,6 +111,9 @@ await pagina.waitForTimeout(300);
 await pagina.click('#resultados-tercero .resultado');
 await pagina.fill('#campo-fecha', '2026-09-10');
 await pagina.click('#btn-crear');
+/* Fila 119: crear abre la ficha del asunto; se vuelve a la lista. */
+await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 const nombreAbierto = (await nombresAbiertos())[0];
 await comprobar('el segundo asunto también se crea sin número',

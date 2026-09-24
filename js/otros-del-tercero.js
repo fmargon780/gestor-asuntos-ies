@@ -234,7 +234,8 @@ var OtrosDelTercero = (function () {
   return {
     pintarEnFicha: pintarEnFicha,
     pintarVuelta: pintarVuelta,
-    olvidarOrigen: olvidarOrigen
+    olvidarOrigen: olvidarOrigen,
+    montarArchivado: montarArchivado   /* fila 119: js/duplicados.js */
   };
 })();
 window.OtrosDelTercero = OtrosDelTercero;

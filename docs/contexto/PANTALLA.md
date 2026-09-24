@@ -86,6 +86,31 @@ pequeño que ponga su propio Escape** (el tipo de documento nuevo de `js/documen
 de tres puntos de `js/ajustes.js`) tiene que cortar la propagación (`ev.stopPropagation()`), o
 el Escape general de aquí se dispara también y hace algo de más.
 
+### Adónde lleva la aplicación después de cada acción (fila 119, 24-sep-2026, `docs/TRAS-CADA-ACCION.md`)
+
+- **Crear un asunto abre su ficha** (formulario, «Por clasificar» con «Aceptar», «Crear el asunto»
+  de la bandeja, que pasan todos por `App.crearAsuntoDelFormulario`, y un recurrente cuando solo
+  toca uno). Desde un documento suelto, el cuadro de ponerle nombre se abre encima de la ficha.
+  «Crear los que tocan» con varios no abre nada.
+- **Reabrir desde la ficha** abre su ficha de asunto abierto; **Editar** (menú de tres puntos) deja
+  en la ficha del asunto editado, con su nombre nuevo (`App.editarAsunto` devuelve el nombre con
+  que queda; cancelado, se queda en la misma ficha). Archivar y Borrar siguen saliendo a la lista.
+- **«Volver» (y Escape) vuelve a la pantalla de la que se vino** (`js/navegacion.js`):
+  `App.abrirFicha` llama a `Navegacion.apuntar()` antes de cambiar de pantalla (pantalla visible
+  y `scrollY`; de ficha a ficha se conserva el origen de la primera; desde «Nuevo», Asuntos
+  abiertos) y `volverALaLista` a `Navegacion.volver(defecto)`. Un solo nivel, sin pila.
+  `Navegacion.abrirAbierto(nombre)` abre por nombre con Asuntos abiertos de origen.
+- **La lista vuelve a la misma altura** (la ventana es la que se desplaza): al volver, y al
+  repintar `App.pintarAbiertos`/`App.pintarArchivo`, que guardan y devuelven `scrollY`.
+- **Aviso con «Ir al asunto»** cuando lo lógico es quedarse: `U.aviso(texto, clase, { boton,
+  alPulsar })` (dura 8 s, el botón lo cierra; clase `.mensaje-boton`), vía
+  `Navegacion.avisoConIr(texto, clase, nombre)` (sin botón si el asunto no está en abiertos). En
+  meter un documento suelto (sale al cerrar el cuadro de ponerle nombre), guardar un correo de la
+  bandeja, unir y devolver un asunto de la papelera.
+- «Abrir el que ya existe» de un duplicado archivado abre su ficha de archivado
+  (`OtrosDelTercero.montarArchivado`); si no se puede, el ARCHIVO con la búsqueda puesta.
+- Prueba: `pruebas/tras-cada-accion.mjs`.
+
 ### El tablón, desplegado por defecto
 
 El tablón se ve siempre. Solo se quita cuando hay algo abierto en el panel de la derecha (no

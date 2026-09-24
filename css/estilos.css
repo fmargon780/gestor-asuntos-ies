@@ -379,6 +379,9 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 .mensaje.malo { background: var(--rojo-linea); }
 .mensaje.bueno { background: #1e7a46; }
 .mensaje.ambar { background: var(--ambar-linea); color: #3a2a00; }
+/* El botón de un aviso («Ir al asunto», fila 119). */
+.mensaje-boton { display: inline-block; margin-left: 12px; padding: 3px 10px; border: 1px solid rgba(255,255,255,.7); border-radius: 6px; background: transparent; color: inherit; font: inherit; font-size: 13px; cursor: pointer; pointer-events: auto; }
+.mensaje-boton:hover { background: rgba(255,255,255,.15); }
 
 @media (max-width: 900px) {
   .dos-paneles, .dos-columnas { grid-template-columns: 1fr; }

@@ -541,6 +541,7 @@ App.pintarAbiertos = function () {
   lista.sort(App.ORDENES[orden]);
   if (rotulo) rotulo.textContent = lista.length;
   var caja = $('lista-abiertos');
+  var alto = window.scrollY;   /* fila 119: la lista se queda a la misma altura */
   caja.innerHTML = '';
   if (!lista.length) {
     caja.innerHTML = '<div class="vacio">' + App.textoVacio() + '</div>';
@@ -551,6 +552,7 @@ App.pintarAbiertos = function () {
     a._fragmento = App.fragmentoDeNota(a, palabras);
     caja.appendChild(App.tarjetaAsunto(a, 'abierto'));
   });
+  if (window.scrollY !== alto) window.scrollTo(0, alto);
   App.avisarALosModulos();
 };
 
