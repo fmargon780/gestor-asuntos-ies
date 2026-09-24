@@ -51,7 +51,7 @@ contexto.window.Gestor = {
   usuario: function () { return App.E.usuario; }
 };
 
-for (const f of ['archivo-indice.js', 'fichas-huerfanas.js', 'papelera.js',
+for (const f of ['archivo-indice.js', 'fichas-huerfanas.js', 'papelera.js', 'papelera-devolver.js', 'papelera-ajustes.js',
                   'avisos-que-faltan.js', 'que-me-toca.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
