@@ -97,12 +97,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 62, 64 a 75, 77 a 106 están **HECHAS**. Sus documentos siguen en
+Las filas 1 a 62, 64 a 75, 77 a 107 están **HECHAS**. Sus documentos siguen en
 `docs/`, y el detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 107 | `docs/FICHA-EN-TARJETAS.md` | PENDIENTE (apuntada 24-sep-2026). Después de la 106 |
 | 108 | `docs/CONTACTO-EN-TARJETAS.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 109 | `docs/EL-HITO-A-PANTALLA-COMPLETA.md` | PENDIENTE (apuntada 24-sep-2026). Después de la 107 |
 | 110 | `docs/TABLAS-DE-DATOS.md` | PENDIENTE (apuntada 24-sep-2026) |
@@ -126,11 +125,7 @@ selección, formularios y plantillas, comunicar y notas), con borrador de guion 
 alumno pasa a cabecera con etiquetas y una tarjeta por persona (alumno, tutor 1, tutor 2), con el
 nombre completo de cada tutor bien montado.
 
-**La fila 107 se apuntó el 24-sep-2026**, cerrada con Francisco: la ficha del asunto pasa de
-tres columnas a una cuadrícula de tarjetas del mismo tamaño, todas a la vista; al pulsar una, se
-abre en grande con las demás como pestañas arriba, el documento abierto a la derecha y una franja
-con los documentos a mano. Francisco adelanta así la "cuarta pasada" de la ficha que estaba
-prevista para cuando los hitos llevaran un mes en uso.
+**La fila 107 está HECHA** (24-sep-2026): `docs/FICHA-EN-TARJETAS.md`. La ficha del asunto pasa de tres columnas a una cuadrícula de tarjetas con su resumen; al pulsar una se abre en grande, con las demás como pestañas y una franja con los documentos (`js/ficha-tarjetas.js`). Versión publicada `App.VERSION`: `24-sep-2026 · 03:53`.
 
 **La fila 106 está HECHA** (24-sep-2026): `docs/LO-PIDE-EN-LA-CABECERA.md`. En la ficha, quién lo pide sale una sola vez, arriba, con la relación entre paréntesis; debajo de "El encargo", nada. Versión publicada `App.VERSION`: `24-sep-2026 · 03:26`.
 

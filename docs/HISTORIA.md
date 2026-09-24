@@ -5,6 +5,31 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 107: la ficha del asunto en tarjetas
+
+`docs/FICHA-EN-TARJETAS.md`. Las tres columnas dejaban lo de abajo fuera de la pantalla y el
+centro casi vacío. Ahora, debajo de la cabecera, una cuadrícula de tarjetas del mismo tamaño que
+cabe entera sin bajar, cada una con su resumen; al pulsar una se abre en grande con las demás como
+pestañas arriba y, encima, una franja con los documentos. `js/ficha-plegables.js` se retira: los
+dos plegables son ya tarjetas.
+
+- Decisión: los resúmenes se leen de lo que cada módulo ya pinta en la tarjeta (su cuerpo sigue en
+  la página, oculto), en vez de abrir en cada módulo una forma nueva de preguntarle. Así no se toca
+  cómo se pinta nada y el resumen nunca dice algo distinto de lo que se ve al abrirla.
+- Decisión: "Datos y contacto" y "Datos del trámite" enseñan su propio contenido también cerradas:
+  ya eran una línea de resumen, con sus botones de copiar.
+- Lo que costó: el alto "sin bajar" no contaba el relleno de abajo de la pantalla (60 px) y la
+  página seguía bajando un poco; y la franja no volvía a pintarse al volver a una tarjeta por su
+  pestaña (se quedaba con la huella de la vez anterior).
+- Veintidós pruebas trabajaban dentro de la ficha con todo a la vista: ahora entran con su tarjeta
+  abierta (`window.__tarjeta`) o la abren; `pruebas/ficha-disposicion.mjs` pasa de columnas a
+  tarjetas, y las de la cabecera encogida abren una tarjeta larga para tener por dónde bajar.
+
+Prueba nueva `pruebas/ficha-en-tarjetas.mjs` (a 1905 y a 1280 px), con fotos revisadas antes de
+publicar. Batería completa en verde. Versión publicada `App.VERSION`: `24-sep-2026 · 03:53`.
+
+---
+
 ## 24-sep-2026 — Fila 106: quién lo pide, una sola vez en la cabecera
 
 `docs/LO-PIDE-EN-LA-CABECERA.md`. La marca de arriba dice ya `Lo pide: García, Isabel María

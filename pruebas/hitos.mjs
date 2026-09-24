@@ -16,6 +16,20 @@ const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript(preparacion);
+/* Fila 107 (docs/FICHA-EN-TARJETAS.md): la ficha va en tarjetas. Esta
+   prueba trabaja dentro de una: se entra con ella ya abierta en grande
+   (`window.__tarjeta`; se cambia con FichaTarjetas.abrir). */
+await pagina.addInitScript(() => {
+  window.__tarjeta = 'hitos';
+  window.addEventListener('DOMContentLoaded', () => {
+    if (!window.FichaTarjetas) return;
+    const alEntrar = FichaTarjetas.alEntrar;
+    FichaTarjetas.alEntrar = function () {
+      if (window.__tarjeta) FichaTarjetas.abrirAlEntrar(window.__tarjeta);
+      return alEntrar();
+    };
+  });
+});
 await pagina.goto(process.env.DIRECCION || 'http://localhost:8123/index.html');
 
 let fallos = 0;

@@ -20,13 +20,6 @@
   var actual = null;      /* el asunto que se está viendo */
   var modoActual = 'abierto';
 
-  /* El nombre del asunto que había en pantalla la ÚLTIMA vez que se
-     rehizo el innerHTML: hace falta por separado de `actual`, porque
-     al saltar a otro asunto `actual` ya vale el nuevo antes de pintar
-     (18-sep-2026, fila 51: para no confundir el abierto/cerrado de
-     los dos plegables de uno con el del otro). */
-  var ultimoPintado = null;
-
   /* Si el compañero ya está dentro de este asunto (17-sep-2026, fila
      24): { usuario } mientras se está en modo consulta, o null si el
      asunto está libre o el mando es de uno mismo. La vigilancia de
@@ -54,6 +47,8 @@
        escribir directa de js/notas.js solo sigue metiendo texto en la
        MISMA nota mientras la ficha se repinta sola por debajo. */
     if (window.Notas) window.Notas.olvidarBorrador();
+    /* Al entrar, siempre la cuadrícula de tarjetas (fila 107). */
+    FichaTarjetas.alEntrar();
     App.ir('asunto');
     pintar();
 
@@ -303,13 +298,6 @@
     return (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
   }
 
-  function bloque(titulo, dentro, id, alLado) {
-    return '<section class="ficha-bloque"' + (id ? ' id="' + id + '"' : '') + '>' +
-             '<h3 class="ficha-titulo">' + U.escapar(titulo) + (alLado || '') + '</h3>' +
-             dentro +
-           '</section>';
-  }
-
   /* `extra` (fila 101): la fila «Formularios» oculta que rellena
      js/formularios.js; antes este segundo parámetro se ignoraba y la
      fila no salía nunca. */
@@ -360,14 +348,6 @@
     var abierto = (modoActual === 'abierto');
     var tipo = tipoDe(a);
     var tramite = datosDelAsunto(a);
-    /* Los dos plegables se rehacen enteros con el resto de la ficha:
-       se guarda qué tenía abierto el asunto que HABÍA en pantalla
-       hasta ahora (18-sep-2026, fila 51), y se repone después lo que
-       tuviera guardado el asunto que se pasa a ver (el mismo, en un
-       repintado, u otro tras saltar: `ultimoPintado` es justo la
-       diferencia entre los dos). */
-    if (window.FichaPlegables) FichaPlegables.recordar(ultimoPintado, caja);
-
     caja.innerHTML =
       '<header class="ficha-cabecera">' +
         '<div class="ficha-volver-fila">' +
@@ -382,34 +362,11 @@
       '<div id="ficha-sellos"></div>' +
       '<div id="ficha-aviso-tipo"></div>' +
       '<div class="ficha-acciones" id="ficha-acciones"></div>' +
-      /* Tres columnas (18-sep-2026, fila 51, docs/FICHA-DISPOSICION.md):
-         a la izquierda lo que hay que hacer (Hitos); en el centro los
-         documentos (llevan botones, hueco ancho); a la derecha lo que
-         hay que saber (Datos y contacto primero) y, plegado, lo que
-         casi nunca se mira. En pantallas que no dan para tres tramos,
-         css/ficha-asunto.css pone el centro debajo de la izquierda. */
-      '<div class="ficha-columnas">' +
-        '<div class="ficha-izquierda">' +
-          bloque('Hitos', '<div id="ficha-guia" class="explica">Leyendo…</div>') +
-        '</div>' +
-        '<div class="ficha-centro">' +
-          bloque('Documentos de la carpeta',
-                 '<div id="ficha-documentos" class="explica">Leyendo…</div>', null,
-                 '<span class="ficha-cuenta" id="ficha-cuenta-docs"></span>') +
-        '</div>' +
-        '<div class="ficha-derecha">' +
-          '<div id="ficha-contacto-caja"></div>' +
-          bloque('Notas', '<div id="ficha-notas"></div>') +
-          FichaPlegables.bloque('ficha-plegable-otros', 'Otros asuntos de este tercero',
-                                 'ficha-otros', 'Buscando…') +
-          FichaPlegables.bloque('ficha-plegable-relacionados', 'Personas y entidades relacionadas',
-                                 'ficha-relacionados', 'Leyendo…') +
-          (tramite ? bloque('Datos del trámite', tramite) : '') +
-        '</div>' +
-      '</div>';
-
-    if (window.FichaPlegables) FichaPlegables.reponer(a.nombre, caja);
-    ultimoPintado = a.nombre;
+      /* Tarjetas (24-sep-2026, fila 107, docs/FICHA-EN-TARJETAS.md): la
+         cuadrícula, abrir una en grande y la franja de documentos viven
+         en js/ficha-tarjetas.js; los huecos de dentro (#ficha-guia,
+         #ficha-documentos, #ficha-notas…) son los mismos de siempre. */
+      FichaTarjetas.html(tramite);
 
     /* Antes de volver a la lista, si queda una nota sin guardar en la
        caja de la ficha, avisa (18-sep-2026, fila 58,
@@ -437,6 +394,7 @@
     if (window.OtrosDelTercero) OtrosDelTercero.pintarVuelta($('ficha-volver-origen'), a);
     asegurarObservadorConsulta();
     aplicarModoConsulta();
+    FichaTarjetas.alPintar(caja, a);
   }
 
   /* ---------- no pisarse en un mismo asunto (17-sep-2026, fila 24) ----------
@@ -501,6 +459,9 @@
        docs/AJUSTES-DE-USO-2026-09-18.md, 1): copiar no cambia nada del
        asunto, así que sigue activa en consulta. */
     if (el.classList.contains('boton-copiar-fila')) return true;
+    /* Las pestañas, los chips de documentos y los nombres del resumen de
+       las tarjetas (fila 107) solo abren o cambian de vista. */
+    if (el.closest('.ficha-tarjetas-pestanas, .ficha-tarjeta-franja, .ficha-tarjeta-resumen')) return true;
     var texto = (el.textContent || '').trim();
     return texto === 'Copiar';
   }

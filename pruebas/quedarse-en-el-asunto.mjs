@@ -23,6 +23,20 @@ const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript(preparacion);
+/* Fila 107 (docs/FICHA-EN-TARJETAS.md): la ficha va en tarjetas. Esta
+   prueba trabaja dentro de una: se entra con ella ya abierta en grande
+   (`window.__tarjeta`; se cambia con FichaTarjetas.abrir). */
+await pagina.addInitScript(() => {
+  window.__tarjeta = 'documentos';
+  window.addEventListener('DOMContentLoaded', () => {
+    if (!window.FichaTarjetas) return;
+    const alEntrar = FichaTarjetas.alEntrar;
+    FichaTarjetas.alEntrar = function () {
+      if (window.__tarjeta) FichaTarjetas.abrirAlEntrar(window.__tarjeta);
+      return alEntrar();
+    };
+  });
+});
 await pagina.goto(process.env.DIRECCION || 'http://localhost:8123/index.html');
 
 let fallos = 0;
@@ -79,7 +93,9 @@ await pagina.click('#btn-recargar');
 await pagina.waitForSelector('#lista-abiertos .tarjeta');
 await pagina.click('#lista-abiertos .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
 await pagina.waitForSelector('#ficha-documentos .ficha-documento');
+await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForSelector('#ficha-guia .hito');
 
 console.log('--- 1 y 2. guardar un documento dentro del asunto ---');
@@ -112,11 +128,14 @@ await comprobar('3. la ficha sigue enseñando el mismo asunto',
   pagina.evaluate(() => window.App.fichaAbierta()), NOMBRE_ASUNTO);
 
 console.log('--- 4. marcar un hito como hecho ---');
+await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.locator('#ficha-guia .hito .hito-casilla').first().click();
+await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForSelector('#ficha-guia .hito.hito-hecho');
 await comprobar('4. marcar un hito como hecho no saca de la ficha', pantallas(), { asunto: true, abiertos: false });
 
 console.log('--- 5. asociar un documento a un hito, desde el propio documento ---');
+await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
 const filaDelDoc = pagina.locator('.ficha-documento-fila', {
   has: pagina.locator('.ficha-documento', { hasText: NUEVO_DOC })
 });
@@ -129,6 +148,7 @@ await comprobar('5. el documento enseña ya el hito debajo de su nombre',
   filaDelDoc.locator('.ficha-documento-hito').textContent(), TITULO_HITO);
 
 console.log('--- 6. apuntar un documento a un hito, desde el propio hito ---');
+await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 const laFilaDelHito = pagina.locator('#ficha-guia .hito').first();
 await laFilaDelHito.locator('.hito-desplegar').click();
 await pagina.waitForSelector('.hito-anadir-documento:not(.oculto)');
@@ -152,6 +172,7 @@ await pagina.waitForTimeout(400);
 await comprobar('7. comunicar no saca de la ficha', pantallas(), { asunto: true, abiertos: false });
 
 console.log('--- 8. "Documentos ▾": abrir y cerrar el cuadro de la carpeta ---');
+await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
 await pagina.click('.ficha-documentos-gestionar');
 await pagina.waitForSelector('#doc-cuerpo');
 await comprobar('el cuadro de documentos se llama como el asunto',
@@ -227,6 +248,9 @@ async function abrirSegundoAsunto() {
 }
 
 console.log('--- 12. Escape SÍ devuelve a la lista ---');
+/* Desde aquí se entra en la cuadrícula, como en la aplicación de verdad:
+   sin tarjeta abierta, Escape sale de la ficha a la primera. */
+await pagina.evaluate(() => { window.__tarjeta = null; });
 await abrirSegundoAsunto();
 await pagina.keyboard.press('Escape');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');

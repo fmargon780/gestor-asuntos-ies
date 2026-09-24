@@ -87,14 +87,8 @@ al lado.
   deja ni el separador ni un hueco. Se esconde entera con la cabecera encogida
   (`.ficha-cabecera.encogida .ficha-subtitulo { display: none; }`, `css/ficha-asunto.css`): no
   entra en el reparto por `order` de la fila 46, solo desaparece.
-- **Tres columnas** (`.ficha-columnas`, `css/ficha-asunto.css`, mobile-first con `@media
-  (min-width: …)`, al contrario que el resto del fichero que usa `max-width`): izquierda, Hitos;
-  centro (`.ficha-centro`, nueva), Documentos de la carpeta; derecha, Datos y contacto → Notas →
-  los dos plegables → Datos del trámite (si tiene algo que decir). Por debajo de 1000px, una sola
-  columna en el orden del HTML; de 1000 a 1499px, dos (el centro debajo de la izquierda,
-  `grid-row`); de 1500px en adelante, las tres a la vez. Con `body.con-visor`/`body.con-lector` se
-  fuerza una columna con `grid-column/row: auto` en los tres tramos —si no, un tramo pediría una
-  columna o una fila que ya no existe con una sola columna, y el sitio le saldría mal.
+- **Tarjetas** (24-sep-2026, fila 107, `docs/FICHA-EN-TARJETAS.md`; antes, tres columnas y dos
+  plegables, `js/ficha-plegables.js`, retirado): ver "La ficha en tarjetas", más abajo.
 - **"Datos del asunto" se desmonta y pasa a llamarse "Datos del trámite"**: `datosDelAsunto(a)`
   (ya no lleva `p`, la fecha límite se quitó) solo deja los campos propios del tipo
   (`filasDeCampos`), Vía de comunicación, Lo pide y En el archivo — el resto ya se ve en la
@@ -102,28 +96,49 @@ al lado.
   entero no se pinta**, ni el título ni la tarjeta (antes `filas()` pintaba "Nada que enseñar
   aquí."; `filasHtml()`, nueva, es la parte de `filas()` que solo dibuja, reutilizada aquí y por
   `filas()` para los sitios que sí quieren ese aviso).
-- **Los dos bloques plegables** (`js/ficha-plegables.js`, `window.FichaPlegables`, nuevo, pequeño
-  a propósito para no engordar `js/ficha-asunto.js`, que ya pasaba de las 400 líneas desde antes):
-  "Otros asuntos de este tercero" y "Personas y entidades relacionadas" usan el
-  `<details class="ficha-bloque ficha-plegable">` que ya estaba en `css/ficha-asunto.css` (líneas
-  158-168 de antes de esta fila) sin que nadie lo usara. `FichaPlegables.bloque(id, titulo,
-  idDentro, textoDeEntrada)` monta el molde; `estadoActual(raiz)`/`reponer(raiz, estado)` guardan
-  qué `<details>` estaba abierto antes de que `pintarLaFicha()` rehaga el `innerHTML` entero y lo
-  reabren después (mismo patrón que `volverADesplegar` de `js/hitos-panel.js`); cerrados de
-  partida, sin nada guardado. `FichaPlegables.ponResumen(caja, texto, vacio)` la llama quien pinta
-  el contenido (`js/otros-del-tercero.js`, `js/relacionados.js`) en cuanto sabe la cuenta, aunque
-  el bloque siga cerrado: "1 asunto"/"3 asuntos"/"ninguno todavía", "2 personas"/"nadie todavía";
-  con la cuenta a cero, `.ficha-plegable-vacio` deja el título en gris suave y sin negrita.
-- **Un bloque vacío ocupa una línea, no una tarjeta**: `.ficha-bloque.vacio` (`css/ficha-asunto.css`)
-  pone el título y el aviso en una sola línea, con menos padding. Hoy solo lo pone
-  `js/ficha-documentos.js` cuando la carpeta no tiene ningún documento
-  (`caja.closest('.ficha-bloque').classList.toggle('vacio', !lista.length)`).
-- Se comprueba con `pruebas/ficha-disposicion.mjs`, en navegador de verdad: el orden de
-  `.ficha-derecha`, que `#ficha-notas` vaya antes que `#ficha-otros`, el contenido de la línea
-  gris, que "Datos del asunto" no exista, "Datos del trámite" con y sin campos propios, los dos
-  plegables (cerrados de partida, el resumen con la cuenta aunque estén cerrados, y que sobreviven
-  a un repintado forzado cambiando el estado), el bloque de Documentos vacío, y la rejilla a
-  1600px (tres columnas), 1200px (dos, el centro debajo) y con `body.con-lector` (una).
+- `js/ficha-documentos.js` sigue poniendo `.vacio` a su bloque con la carpeta vacía; en una
+  tarjeta (`.ficha-tarjeta.vacio`) ya no encoge nada: la tarjeta tiene el tamaño de las demás.
+- Se comprueba con `pruebas/ficha-disposicion.mjs` (el orden de las tarjetas, la línea gris,
+  "Datos del trámite" con y sin campos propios, los resúmenes de "Otros asuntos" y "Personas", que
+  un repintado no cierra la tarjeta abierta y las columnas según el ancho).
+
+### La ficha en tarjetas (24-sep-2026, fila 107, docs/FICHA-EN-TARJETAS.md)
+
+`js/ficha-tarjetas.js` (`window.FichaTarjetas`) y `css/ficha-tarjetas.css`. `js/ficha-asunto.js`
+solo monta el HTML con `FichaTarjetas.html(tramite)` y avisa con `FichaTarjetas.alEntrar()` (en
+`App.abrirFicha`, antes de pintar) y `FichaTarjetas.alPintar(caja, a)` (al final de
+`pintarLaFicha`): puntos previstos, nada se envuelve. Los huecos de dentro (`#ficha-guia`,
+`#ficha-documentos`, `#ficha-contacto-caja`, `#ficha-notas`, `#ficha-otros`, `#ficha-relacionados`,
+Datos del trámite) son los de siempre, y los sigue pintando el mismo módulo.
+
+- **Cuadrícula**: `.ficha-tarjetas-rejilla`, 3 columnas × 2 filas (4 con "Datos del trámite"), dos
+  por debajo de 1100px o con el visor/lector abierto. Todas del mismo tamaño; `ajustarAlto()` les
+  da el alto que queda hasta abajo de la ventana (sin desplazarse), al pintar, al cambiar de tamaño
+  y al abrir o cerrar el documento de la derecha. Lo que no cabe se corta.
+- **Resúmenes** de la tarjeta cerrada (`.ficha-tarjeta-resumen`), sacados de lo que cada módulo
+  ya pinta dentro (su cuerpo sigue en el DOM, oculto), con un `MutationObserver` que ignora lo que
+  pinta este fichero: Hitos ("N de M hechos" y el siguiente, con su plazo), Documentos (cuántos y
+  sus nombres, que se abren en el panel de la derecha sin abrir la tarjeta), Notas (la última:
+  quién, cuándo, el texto; de `App.E.registro`), Otros asuntos (la cuenta de verdad en
+  `#ficha-otros[data-cuenta]`, que pone `js/otros-del-tercero.js`) y Personas. "Datos y contacto"
+  y "Datos del trámite" (`.ficha-tarjeta-siempre`) enseñan su propio cuerpo, que ya es un resumen.
+  Sin contenido: "ninguno todavía", en gris.
+- **Abrir en grande**: pulsar la tarjeta (menos en un botón, enlace o campo). `data-abierta` en
+  `#ficha-tarjetas`; las demás pasan a pestañas (`#ficha-tarjetas-pestanas`, con su cuenta) y
+  "← Volver a las tarjetas". **Escape** (`js/usabilidad.js`, `FichaTarjetas.cerrarSiAbierta()`,
+  después de cerrar el visor si estaba) vuelve a la cuadrícula; el siguiente, lo de siempre.
+- **Franja de documentos** (`.ficha-tarjeta-franja`) en la tarjeta abierta, menos Documentos: chips
+  que pulsan por debajo el mismo `button.ficha-documento` de la lista (sin repintar). En Hitos, los
+  del hito desplegado (`.hito-cuerpo` visible → sus `.hito-documento[data-doc]`); si no hay, todos.
+  El chip del documento a la vista (`Visor.nombreAbierto()`, nuevo), marcado.
+- **Qué se recuerda**: al entrar, siempre la cuadrícula; desde "Qué me toca",
+  `FichaTarjetas.abrirAlEntrar('hitos')` antes de `App.abrirFicha`. Un repintado de la misma ficha
+  mantiene la tarjeta abierta (el estado vive en el módulo) y `U.conservandoLoEscrito` lo escrito.
+- En modo consulta, las pestañas, los chips y los nombres del resumen siguen activos
+  (`esControlDeSoloLectura`).
+- Se comprueba con `pruebas/ficha-en-tarjetas.mjs` (a 1905×1000 y 1280×800). Las pruebas que
+  trabajan dentro de la ficha entran con su tarjeta ya abierta (`window.__tarjeta`) o la abren con
+  `FichaTarjetas.abrir(id)`.
 
 **La cabecera de la ficha, agrupada por el trámite** (18-sep-2026, fila 52,
 docs/CABECERA-DEL-ASUNTO.md): cambio de disposición y de agrupación, ninguna acción desaparece ni

@@ -63,13 +63,10 @@ var OtrosDelTercero = (function () {
      'abierto' o 'archivado'; `datos` trae la categoria, el tercero
      (`nombreDelTercero(a)`, que se queda en js/ficha-asunto.js porque
      también la usa "Lo pide") y el tipo, ya calculados allí. */
-  /* "1 asunto" / "3 asuntos" / "ninguno todavía" (18-sep-2026, fila
-     51): el resumen del plegable, escrito en cuanto se sabe la cuenta
-     aunque el bloque siga cerrado. */
+  /* La cuenta de verdad (la lista solo enseña los doce primeros de cada
+     grupo), para el resumen de su tarjeta (fila 107, js/ficha-tarjetas.js). */
   function resumenDeOtros(caja, n) {
-    if (!window.FichaPlegables) return;
-    var texto = n ? n + (n === 1 ? ' asunto' : ' asuntos') : 'ninguno todavía';
-    FichaPlegables.ponResumen(caja, texto, !n);
+    caja.dataset.cuenta = String(n);
   }
 
   async function pintarEnFicha(caja, a, modoActual, datos) {

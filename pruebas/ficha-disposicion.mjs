@@ -85,13 +85,11 @@ async function abrirFicha(nombre) {
 console.log('--- el asunto con de todo ---');
 await abrirFicha(RICO);
 
-await comprobar('1. el orden de los hijos de .ficha-derecha',
-  pagina.evaluate(() => Array.from(document.querySelector('.ficha-derecha').children).map((el) => {
-    if (el.id) return el.id;
-    const h3 = el.querySelector(':scope > summary h3, :scope > h3');
-    return h3 ? h3.textContent : el.className;
-  })),
-  ['ficha-contacto-caja', 'Notas', 'ficha-plegable-otros', 'ficha-plegable-relacionados', 'Datos del trámite']);
+/* Fila 107 (docs/FICHA-EN-TARJETAS.md): las tres columnas pasan a una
+   cuadrícula de tarjetas; con "Datos del trámite", cuatro arriba. */
+await comprobar('1. el orden de las tarjetas',
+  pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-tarjetas .ficha-tarjeta')).map((t) => t.dataset.tarjeta)),
+  ['hitos', 'documentos', 'contacto', 'tramite', 'notas', 'otros', 'relacionados']);
 
 await comprobarQue('2. #ficha-notas está antes que #ficha-otros en el documento',
   pagina.evaluate(() => {
@@ -126,23 +124,19 @@ await comprobarQue('5. no trae Tipo, Tercero, Estado ni Fecha límite',
     return ['Tipo', 'Tercero', 'Estado', 'Fecha límite'].every((t) => texto.indexOf(t) === -1);
   }));
 
-console.log('--- 6. los dos plegables ---');
-await comprobar('6. los dos arrancan cerrados',
-  pagina.evaluate(() => [
-    document.getElementById('ficha-plegable-otros').open,
-    document.getElementById('ficha-plegable-relacionados').open
-  ]), [false, false]);
+console.log('--- 6. "Otros asuntos" y "Personas", ahora tarjetas con su resumen ---');
 await comprobar('6. el resumen de "Otros asuntos" (es el único de ese tercero)',
-  pagina.locator('#ficha-plegable-otros .ficha-resumen').textContent(), 'ninguno todavía');
-await comprobar('6. el resumen de "Relacionados" trae la cuenta, cerrado todavía',
-  pagina.locator('#ficha-plegable-relacionados .ficha-resumen').textContent(), '1 persona');
+  pagina.locator('.ficha-tarjeta[data-tarjeta="otros"] .ficha-tarjeta-resumen').textContent(), 'ninguno todavía');
+await comprobar('6. el resumen de "Relacionados" trae la cuenta y el nombre',
+  pagina.locator('.ficha-tarjeta[data-tarjeta="relacionados"] .ficha-tarjeta-resumen').textContent(), '1 personaAlguien Del Cole');
 
-await pagina.click('#ficha-plegable-relacionados > summary');
+await pagina.click('.ficha-tarjeta[data-tarjeta="relacionados"] .ficha-tarjeta-resumen');
 await pagina.waitForTimeout(150);
-await comprobar('se despliega al pulsar', pagina.evaluate(() => document.getElementById('ficha-plegable-relacionados').open), true);
+await comprobar('se abre en grande al pulsar',
+  pagina.evaluate(() => document.getElementById('ficha-tarjetas').dataset.abierta), 'relacionados');
 
 /* Forzar un repintado de la ficha entera (cambiar el estado, como en
-   pruebas/cabecera-fija.mjs, escenario 6): no debe perder el abierto. */
+   pruebas/cabecera-fija.mjs, escenario 6): no debe cerrar la tarjeta. */
 await pagina.evaluate(() => {
   const sel = document.querySelector('#ficha-acciones select.campo-estado');
   const opcion = Array.prototype.filter.call(sel.options, (o) => o.textContent === 'A LA ESPERA DEL TERCERO')[0];
@@ -150,8 +144,9 @@ await pagina.evaluate(() => {
   sel.dispatchEvent(new Event('change', { bubbles: true }));
 });
 await pagina.waitForTimeout(500);
-await comprobar('sigue abierto tras el repintado', pagina.evaluate(() => document.getElementById('ficha-plegable-relacionados').open), true);
-await comprobar('y el que estaba cerrado sigue cerrado', pagina.evaluate(() => document.getElementById('ficha-plegable-otros').open), false);
+await comprobar('sigue abierta tras el repintado',
+  pagina.evaluate(() => document.getElementById('ficha-tarjetas').dataset.abierta), 'relacionados');
+await pagina.evaluate(() => FichaTarjetas.cerrar());
 
 /* Se deja el estado como estaba, para no complicar los escenarios de
    más abajo (que vuelven a abrir este mismo asunto desde la lista). */
@@ -184,46 +179,26 @@ await comprobarQue('con un documento dentro, el bloque de Documentos no lleva "v
   }));
 
 /* ============================================================
-   8. LOS TRES TRAMOS DE LA REJILLA
+   8. LA CUADRÍCULA, SEGÚN EL ANCHO (fila 107)
    ============================================================ */
-console.log('--- 8. la rejilla, según el ancho ---');
+console.log('--- 8. la cuadrícula, según el ancho ---');
 await abrirFicha(RICO);
 
 async function columnas() {
   return pagina.evaluate(() =>
-    getComputedStyle(document.querySelector('.ficha-columnas')).gridTemplateColumns.trim().split(/\s+/).length);
-}
-async function posiciones() {
-  return pagina.evaluate(() => {
-    const rect = (id) => document.querySelector(id).getBoundingClientRect();
-    return { izq: rect('.ficha-izquierda'), centro: rect('.ficha-centro'), der: rect('.ficha-derecha') };
-  });
+    getComputedStyle(document.querySelector('.ficha-tarjetas-rejilla')).gridTemplateColumns.trim().split(/\s+/).length);
 }
 
 await pagina.setViewportSize({ width: 1600, height: 900 });
 await pagina.waitForTimeout(200);
-await comprobar('a 1600px, tres columnas', columnas(), 3);
-const p1600 = await posiciones();
-await comprobarQue('a 1600px, izquierda, centro y derecha van una al lado de la otra',
-  Promise.resolve(p1600.centro.left > p1600.izq.left && p1600.der.left > p1600.centro.left &&
-    Math.abs(p1600.izq.top - p1600.centro.top) < 3));
-
-await pagina.setViewportSize({ width: 1200, height: 900 });
+await comprobar('a 1600px, con "Datos del trámite", cuatro columnas', columnas(), 4);
+await pagina.setViewportSize({ width: 1000, height: 900 });
 await pagina.waitForTimeout(200);
-await comprobar('a 1200px, dos columnas', columnas(), 2);
-const p1200 = await posiciones();
-await comprobarQue('a 1200px, el centro va debajo de la izquierda, no al lado',
-  Promise.resolve(p1200.centro.top > p1200.izq.bottom - 3 && Math.abs(p1200.centro.left - p1200.izq.left) < 3));
-await comprobarQue('y la derecha sigue a la altura de la izquierda, no de más abajo',
-  Promise.resolve(Math.abs(p1200.der.top - p1200.izq.top) < 3));
-
+await comprobar('por debajo de 1100px, dos columnas', columnas(), 2);
 await pagina.setViewportSize({ width: 1600, height: 900 });
 await pagina.evaluate(() => document.body.classList.add('con-lector'));
 await pagina.waitForTimeout(200);
-await comprobar('con el lector abierto, una sola columna', columnas(), 1);
-const pLector = await posiciones();
-await comprobarQue('en el orden del HTML: izquierda, centro y derecha, cada una debajo de la anterior',
-  Promise.resolve(pLector.centro.top >= pLector.izq.bottom - 3 && pLector.der.top >= pLector.centro.bottom - 3));
+await comprobar('con el lector abierto, dos columnas', columnas(), 2);
 await pagina.evaluate(() => document.body.classList.remove('con-lector'));
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
