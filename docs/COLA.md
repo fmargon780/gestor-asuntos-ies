@@ -102,13 +102,12 @@ Las filas 1 a 62, 64 a 75, 77 a 114 están **HECHAS**. Sus documentos siguen en
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 115 | `docs/ENVIAR-DESDE-EL-ASUNTO.md` | EN CURSO (24-sep-2026) |
+| 115 | `docs/PREGUNTAS-EN-EL-GUION.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
-**La fila 115 se apuntó el 24-sep-2026**, cerrada con Francisco: el correo se envía desde el
-asunto (marcar documentos, "Enviar", resumen y "Confirmar y enviar"), por una aplicación web de
-Apps Script que la app llama directamente. Sustituye al borrador con documentos, que no funcionaba.
+**La fila 115 se apuntó el 24-sep-2026**, cerrada con Francisco: una línea del guion de un hito
+puede ser pregunta, con un botón por respuesta y sus propias líneas; un solo nivel.
 
 **La fila 114 está HECHA** (24-sep-2026): `docs/DOCUMENTOS-EN-LA-TARJETA.md`. En la tarjeta cerrada «Documentos de la carpeta», cada documento en su renglón, sin aplastarse (`flex: none` en todas las tarjetas); sin la línea «N documentos»; como mucho 5 nombres (o los que quepan enteros) y «y N más», que abre la lista entera. Los resúmenes pasaron a `js/ficha-tarjetas-resumen.js`. Versión publicada `App.VERSION`: `24-sep-2026 · 05:53`.
 
@@ -231,10 +230,6 @@ mesa de trabajo, sobre lo que dejó la 102.
 - **Del 23-sep-2026: revisión de usabilidad.** Francisco ve pantallas con demasiadas cosas. Ajustes
   va en la fila 105 y la ficha del asunto en la 107. Queda por hablar Asuntos abiertos (qué plegar),
   con la misma regla: plegado, resumen en el título, y se recuerda lo abierto.
-- **Pendiente de más adelante (24-sep-2026): preguntas dentro del guion de un hito.** Un paso del
-  guion que sea pregunta ("¿Viene con toda la documentación?") y según la respuesta aparezcan unos
-  pasos u otros, dentro del mismo hito. Francisco dice que es un caso muy común. Se diseña después
-  del mapa de la guía (fila 113), que ya lo tendrá en cuenta.
 
 ## Descartado, no proponer otra vez (del informe del 18-sep-2026)
 
