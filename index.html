@@ -1072,14 +1072,22 @@
 <script src="js/bandeja-adjuntos-lector.js"></script>
 <script src="js/bandeja-enlace.js"></script>
 <script src="js/correo-adjuntos.js"></script>
+<!-- js/correo-enviar.js (fila 115, 24-sep-2026,
+     docs/ENVIAR-DESDE-EL-ASUNTO.md): habla con la aplicación web de
+     Apps Script que manda el correo de verdad, y pinta el bloque
+     Ajustes → Mantenimiento → "Enviar correo". Va después de
+     js/bandeja-correos.js (mismo bloque de Ajustes) y antes de
+     js/correo-cuadro.js, que lo usa. -->
+<script src="js/correo-enviar.js"></script>
 <!-- js/correo-cuadro.js (fila 58, 18-sep-2026,
      docs/AJUSTES-DE-USO-2026-09-18.md, 5): el cuadro de "Correo
      electrónico", sacado de js/correo.js igual que se hizo con Séneca
      en la fila 53. Va después de js/correo.js (usa
      `window.CorreoNucleo`), js/plantillas.js/js/plantillas-ajustes.js
-     (Plantillas.*, para el desplegable "Plantilla") y
-     js/correo-adjuntos.js (CorreoAdjuntos.enganchar, para adjuntar
-     documentos), los tres ya definidos en tiempo de carga. -->
+     (Plantillas.*, para el desplegable "Plantilla"), js/correo-adjuntos.js
+     (para pesar y leer los documentos) y js/correo-enviar.js (para el
+     botón "Enviar", fila 115), los cuatro ya definidos en tiempo de
+     carga. -->
 <script src="js/correo-cuadro.js"></script>
 <script src="js/barra.js"></script>
 <script src="js/vista.js"></script>
