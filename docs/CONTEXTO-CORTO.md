@@ -135,7 +135,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 6. Reglas de código que no se pueden olvidar
 
-- El repositorio es la versión buena; Vercel publica solo. Un solo proyecto de Vercel.
+- El repositorio es la versión buena; Vercel publica solo la app (`.vercelignore`: sin `docs/` ni `pruebas/`).
 - **Permiso permanente de Francisco**: un pull request (sesiones desde la nube) lo fusiona Claude
   Code solo, en verde y sin conflictos (nota al final de `docs/COLA.md`).
 - **Comprobar siempre lo publicado con `curl`**, nunca darla por hecha.

@@ -67,7 +67,7 @@ Una lista de fichas, la más nueva arriba. Cada ficha:
   "clase": "documento",
   "nombre": "260415 FACTURA Material de oficina.pdf",
   "carpeta": "260911-1432 260415 FACTURA Material de oficina.pdf",
-  "origen": { "asunto": "260415 COMPRA Papelería Pintor Palomo 33385414V" },
+  "origen": { "asunto": "260415 COMPRA Papelería La Pluma Azul 00000002W" },
   "datos": null,
   "quien": "Francisco",
   "cuando": "2026-09-11T14:32:00.000Z"

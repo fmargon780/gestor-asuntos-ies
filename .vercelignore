@@ -1,0 +1,12 @@
+# Lo que no es la aplicación no se publica (fila 63, docs/PUBLICAR-SOLO-LA-APP.md).
+# scripts/ se queda publicado a propósito: de ahí sale el ignoreCommand de
+# vercel.json (fila 48), y no tiene nada que tapar.
+docs/
+pruebas/
+plantilla/
+apps-script/
+herramientas/
+.github/
+README.md
+package.json
+package-lock.json

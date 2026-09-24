@@ -66,17 +66,17 @@ console.log('--- dando de alta con nombre comercial ---');
 await comprobar('se guarda y se lee',
   pagina.evaluate(async () => {
     await Datos.anadirALista(App.E.datos, 'EMPRESAS', {
-      'Razón social': 'ADOLFO GONZÁLEZ DE LEÓN',
-      'Nombre comercial': 'Papelería Pintor Palomo',
-      'NIF': '33385414V',
+      'Razón social': 'ANTONIO PRUEBA INVENTADO',
+      'Nombre comercial': 'Papelería La Pluma Azul',
+      'NIF': '00000002W',
       'Contacto': '', 'Teléfono': '', 'Correo': ''
     });
     const f = await Datos.cargar(App.E.datos, 'EMPRESAS');
-    const p = f.lista.filter(x => x.nombre === 'ADOLFO GONZÁLEZ DE LEÓN')[0];
+    const p = f.lista.filter(x => x.nombre === 'ANTONIO PRUEBA INVENTADO')[0];
     return { nif: p.nif, comercial: p.comercial, pie: App.pieDe(p) };
   }),
-  { nif: '33385414V', comercial: 'Papelería Pintor Palomo',
-    pie: 'Rótulo: Papelería Pintor Palomo  ·  33385414V' });
+  { nif: '00000002W', comercial: 'Papelería La Pluma Azul',
+    pie: 'Rótulo: Papelería La Pluma Azul  ·  00000002W' });
 
 /* Al escribir el fichero con la cabecera nueva, el de antes tiene que
    seguir con su NIF en su sitio: es el paso donde se podría estropear. */
@@ -93,20 +93,20 @@ const buscar = (q) => pagina.evaluate(async (texto) => {
   const f = await Datos.cargar(App.E.datos, 'EMPRESAS');
   return Datos.buscar(f.lista, texto, 30).map(p => p.nombre);
 }, q);
-await comprobar('por la razón social', buscar('adolfo'), ['ADOLFO GONZÁLEZ DE LEÓN']);
-await comprobar('por el rótulo del negocio', buscar('pintor palomo'), ['ADOLFO GONZÁLEZ DE LEÓN']);
-await comprobar('por el principio del rótulo', buscar('papeleria'), ['ADOLFO GONZÁLEZ DE LEÓN']);
-await comprobar('por el NIF', buscar('33385414V'), ['ADOLFO GONZÁLEZ DE LEÓN']);
+await comprobar('por la razón social', buscar('antonio'), ['ANTONIO PRUEBA INVENTADO']);
+await comprobar('por el rótulo del negocio', buscar('la pluma azul'), ['ANTONIO PRUEBA INVENTADO']);
+await comprobar('por el principio del rótulo', buscar('papeleria'), ['ANTONIO PRUEBA INVENTADO']);
+await comprobar('por el NIF', buscar('00000002W'), ['ANTONIO PRUEBA INVENTADO']);
 await comprobar('la otra empresa sigue apareciendo', buscar('papeles'), ['PAPELES DEL SUR SL']);
 
 console.log('--- el nombre de la carpeta no cambia ---');
 await comprobar('manda la razón social, no el rótulo',
   pagina.evaluate(async () => {
     const f = await Datos.cargar(App.E.datos, 'EMPRESAS');
-    const p = f.lista.filter(x => x.nombre === 'ADOLFO GONZÁLEZ DE LEÓN')[0];
+    const p = f.lista.filter(x => x.nombre === 'ANTONIO PRUEBA INVENTADO')[0];
     return App.textoTercero(p);
   }),
-  'ADOLFO GONZÁLEZ DE LEÓN 33385414V');
+  'ANTONIO PRUEBA INVENTADO 00000002W');
 
 console.log('--- cambiando los datos de una que ya estaba ---');
 await comprobar('se le puede poner el rótulo después',
@@ -129,7 +129,7 @@ await pagina.evaluate(() => App.ir('personas'));
 await pagina.waitForTimeout(300);
 await pagina.selectOption('#filtro-personas', 'EMPRESAS');
 await pagina.waitForTimeout(300);
-await pagina.fill('#buscar-personas', 'adolfo');
+await pagina.fill('#buscar-personas', 'antonio');
 await pagina.waitForSelector('#lista-personas .resultado');
 await pagina.click('#lista-personas .resultado');
 await pagina.waitForTimeout(400);
@@ -137,7 +137,7 @@ await pagina.waitForTimeout(400);
 await comprobar('sale el botón de cambiar los datos',
   pagina.locator('#cambiar-tercero').isVisible(), true);
 await comprobar('y la ficha enseña el nombre comercial',
-  pagina.locator('#ficha-persona').textContent().then(t => t.indexOf('Papelería Pintor Palomo') !== -1),
+  pagina.locator('#ficha-persona').textContent().then(t => t.indexOf('Papelería La Pluma Azul') !== -1),
   true);
 
 console.log('--- lo de Séneca no se cambia desde aquí ---');

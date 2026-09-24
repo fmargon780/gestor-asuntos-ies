@@ -5,6 +5,26 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 63: publicar solo la aplicación
+
+`docs/PUBLICAR-SOLO-LA-APP.md`. Estaba BLOQUEADA porque ninguna sesión podía comprobar desde fuera si
+Vercel publicaba la documentación. Francisco abrió `https://asuntos.fmargon.com/docs/COLA.md` y se
+veía el texto entero, con las filas bloqueadas: confirmado.
+
+- `.vercelignore` en la raíz: `docs/`, `pruebas/`, `plantilla/`, `apps-script/`, `herramientas/`,
+  `.github/`, `README.md`, `package.json` y `package-lock.json`. La aplicación no lee nada de ahí
+  (la copia sin internet se actualiza desde GitHub, no desde la web).
+- Decisión: `scripts/` se queda publicado. De ahí sale el `ignoreCommand` que evita gastar
+  publicaciones con cambios solo de documentación (fila 48), y desde aquí no se puede probar si le
+  afectaría; no tiene nada que tapar.
+- El autónomo real que salía de ejemplo (una papelería, con su nombre y NIF) se cambió por uno
+  inventado en `docs/PAPELERA.md`, `docs/HISTORIA-ANTERIOR.md`, `js/datos.js` y `pruebas/empresas.mjs`.
+- Queda por comprobar ya publicado: que `docs/COLA.md` da error, que la aplicación entra, y que el
+  siguiente cambio solo de `docs/` no publica. Lo del panel de Vercel (Analytics, registros) sigue
+  pendiente de que Francisco lo mire.
+
+Versión publicada `App.VERSION`: `24-sep-2026 · 07:35`.
+
 ## 24-sep-2026 — Fila 116: preguntas dentro del guion de un hito
 
 `docs/PREGUNTAS-EN-EL-GUION.md`. Dentro de un mismo hito, lo que hay que hacer a menudo depende de

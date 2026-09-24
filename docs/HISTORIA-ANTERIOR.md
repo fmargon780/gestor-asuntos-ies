@@ -1800,7 +1800,7 @@ hoy, en `docs/CONTEXTO-CORTO.md`.
 > Las empresas tienen una columna más, **Nombre comercial**, la segunda del cuadro de alta.
 >
 > - **El buscador encuentra al proveedor escribiendo cualquiera de los dos**, y por trozos.
-> - **Debajo del nombre se lee `Rótulo: Papelería Pintor Palomo · 33385414V`.** Lo pinta
+> - **Debajo del nombre se lee `Rótulo: Papelería La Pluma Azul · 00000002W`.** Lo pinta
 >   `App.pieEmpresa`.
 > - **En el nombre de la carpeta sigue mandando la razón social.**
 >
