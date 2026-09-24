@@ -102,7 +102,7 @@ Las filas 1 a 62, 64 a 75, 77 a 107 están **HECHAS**. Sus documentos siguen en
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 108 | `docs/CONTACTO-EN-TARJETAS.md` | PENDIENTE (apuntada 24-sep-2026) |
+| 108 | `docs/CONTACTO-EN-TARJETAS.md` | EN CURSO (24-sep-2026) |
 | 109 | `docs/EL-HITO-A-PANTALLA-COMPLETA.md` | PENDIENTE (apuntada 24-sep-2026). Después de la 107 |
 | 110 | `docs/TABLAS-DE-DATOS.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 111 | `docs/GENERO-EN-PLANTILLAS.md` | PENDIENTE (apuntada 24-sep-2026) |
