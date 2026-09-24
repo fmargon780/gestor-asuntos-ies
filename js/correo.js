@@ -44,15 +44,24 @@
    dos cuadros (Correo y Séneca): el asunto y el cuerpo del mensaje, a
    quién se escribe en palabras, y el rastro que se apunta en las notas
    del asunto.
+
+   Desde la fila 133 (24-sep-2026, docs/PARTIR-FICHEROS-GRANDES.md) los
+   grupos para la copia oculta (window.CorreoGrupos) viven en
+   js/correo-grupos.js y el rastro que queda en el asunto en
+   js/correo-rastro.js, que se cargan justo después. El estado del
+   cuadro que comparten está en `CorreoNucleo._interno` (I).
    ============================================================ */
 (function () {
+  var I = {};
+  /* Lo que js/correo-rastro.js llama de aquí. */
+  I.categoriaDe = categoriaDe; I.terceroDe = terceroDe; I.soloElNombre = soloElNombre;
 
-  var viendo = null;         /* el asunto que se está mirando */
-  var modoDelAsunto = 'abierto';
-  var yaApuntado = false;    /* la nota se escribe una vez por cuadro, no una por botón */
-  var porSeneca = false;     /* true: el cuadro es el de la mensajería de Séneca */
-  var algoCambiado = false;  /* al cerrar, la ficha se repinta si se ha tocado algo */
-  var envioRealizado = false; /* true: el correo ha salido de verdad por "Enviar" (fila 115) */
+  I.viendo = null;         /* el asunto que se está mirando */
+  I.modoDelAsunto = 'abierto';
+  I.yaApuntado = false;    /* la nota se escribe una vez por cuadro, no una por botón */
+  I.porSeneca = false;     /* true: el cuadro es el de la mensajería de Séneca */
+  I.algoCambiado = false;  /* al cerrar, la ficha se repinta si se ha tocado algo */
+  I.envioRealizado = false; /* true: el correo ha salido de verdad por "Enviar" (fila 115) */
 
   var plantillasDatos = null;   /* _GESTOR/plantillas.json, ya leído */
   var valoresActuales = null;   /* Plantillas.valoresDeAsunto(a), calculado una vez por apertura
@@ -78,7 +87,7 @@
   var asuntoListoActual = '';
   var medioListoActual = '';
   var correoPreferenteActual = '';
-  var comunicarHitoActual = null;
+  I.comunicarHitoActual = null;
   /* Documentos del hito ya marcados en "Documentos de este asunto"
      (23-sep-2026, fila 103, docs/EL-HITO-MESA-DE-TRABAJO.md, sección
      3): `extra.adjuntosMarcados`, una lista de nombres. Solo tiene
@@ -193,296 +202,6 @@
     return { texto: texto, faltan: faltan };
   }
 
-  /* ---------- los grupos, para la copia oculta ----------
-
-     17-sep-2026, fila 21, docs/GRUPOS-DE-PERSONAS.md. Decisión de
-     Francisco: los destinatarios que vienen de un grupo van SIEMPRE en
-     copia oculta, nunca en Para, para que una familia no vea el correo
-     de las demás. Combinar los correos de un grupo es cosa de
-     js/correo-cuadro.js (fila 58): aquí solo queda resolver quiénes
-     son los miembros, que también usa Séneca. */
-
-  /* Busca la ficha de cada miembro que no la traiga ya puesta (los
-     atajos de alumnado la traen; los miembros de un grupo guardado,
-     no: solo se guarda { categoria, nombre }). Una sola lectura de
-     Datos.cargar por categoría, no una por miembro. */
-  async function resolverMiembros(miembros) {
-    var porCategoria = {};
-    miembros.forEach(function (m) {
-      if (!porCategoria[m.categoria]) porCategoria[m.categoria] = [];
-      porCategoria[m.categoria].push(m);
-    });
-    var resueltos = [];
-    for (var categoria in porCategoria) {
-      var fuente = null;
-      if (!porCategoria[categoria].every(function (m) { return m.persona; })) {
-        try { fuente = App.E.datos ? await Datos.cargar(App.E.datos, categoria) : null; }
-        catch (e) { fuente = null; }
-      }
-      porCategoria[categoria].forEach(function (m) {
-        var persona = m.persona ||
-          (fuente ? fuente.lista.filter(function (p) { return App.textoTercero(p) === m.nombre; })[0] : null);
-        resueltos.push({ nombre: m.nombre, persona: persona || null });
-      });
-    }
-    return resueltos;
-  }
-
-  /* Los mismos tres filtros de js/relacionados.js (Relacionados.filtrarPorUnidad
-     y compañía): ni el análisis de la unidad ni el filtro de matriculado
-     se repiten aquí. */
-  async function miembrosDeOpcionDeGrupo(valor) {
-    if (valor.indexOf('grupo:') === 0) {
-      var g = window.Grupos && Grupos.porId(valor.slice(6));
-      return g ? g.miembros.slice() : [];
-    }
-    if (!App.E.datos || !window.Relacionados) return [];
-    var fuente = await Datos.cargar(App.E.datos, 'ALUMNADO');
-    var lista;
-    if (valor.indexOf('unidad:') === 0) lista = Relacionados.filtrarPorUnidad(fuente.lista, valor.slice(7));
-    else if (valor.indexOf('nivel:') === 0) lista = Relacionados.filtrarPorNivel(fuente.lista, valor.slice(6));
-    else if (valor.indexOf('ensenanza:') === 0) lista = Relacionados.filtrarPorEnsenanza(fuente.lista, valor.slice(10));
-    else return [];
-    return lista.map(function (al) { return { categoria: 'ALUMNADO', nombre: App.textoTercero(al), persona: al }; });
-  }
-
-  /* Las opciones del desplegable "Añadir un grupo": los grupos propios
-     y, para el alumnado, los mismos atajos de unidad, nivel y
-     enseñanza de "Añadir varios" en js/relacionados.js. Cadena vacía
-     si no hay ni grupos ni alumnado cargado: entonces no sale el
-     desplegable. */
-  async function opcionesDeGrupo() {
-    var partes = [];
-    var grupos = (window.Grupos && Grupos.lista()) || [];
-    if (grupos.length) {
-      partes.push('<optgroup label="Grupos">' + grupos.map(function (g) {
-        return '<option value="grupo:' + U.escapar(g.id) + '">' + U.escapar(g.nombre) + '</option>';
-      }).join('') + '</optgroup>');
-    }
-    if (App.E.datos) {
-      try {
-        var fuente = await Datos.cargar(App.E.datos, 'ALUMNADO');
-        var unidades = Datos.unidadesDistintas(fuente.lista);
-        if (unidades.length) {
-          var niveles = {}, ensenanzas = {};
-          unidades.forEach(function (u) {
-            var p = Nombres.nivelYEnsenanza(u.unidad);
-            if (p.nivel) niveles[p.nivel] = true;
-            if (p.ensenanza) ensenanzas[p.ensenanza] = true;
-          });
-          partes.push('<optgroup label="Unidades">' + unidades.map(function (u) {
-            return '<option value="unidad:' + U.escapar(u.unidad) + '">' + U.escapar(u.unidad) + '</option>';
-          }).join('') + '</optgroup>');
-          partes.push('<optgroup label="Niveles">' + Object.keys(niveles).sort().map(function (n) {
-            return '<option value="nivel:' + U.escapar(n) + '">' + U.escapar(n) + '</option>';
-          }).join('') + '</optgroup>');
-          partes.push('<optgroup label="Enseñanzas">' + Object.keys(ensenanzas).sort().map(function (e) {
-            return '<option value="ensenanza:' + U.escapar(e) + '">' + U.escapar(e) + '</option>';
-          }).join('') + '</optgroup>');
-        }
-      } catch (e) { /* sin datos cargados, no pasa nada: el desplegable se queda sin esas opciones */ }
-    }
-    return partes.join('');
-  }
-
-  /* Las mismas piezas de "Añadir un grupo" las necesita también el
-     cuadro de Séneca (fila 47, docs/DESTINATARIOS-EN-SENECA.md), que
-     vive en su propio fichero (js/seneca-destinatarios.js) para no
-     engordar más este. Se exponen sin tocar nada de lo de arriba. */
-  window.CorreoGrupos = {
-    opciones: opcionesDeGrupo,
-    miembrosDeOpcion: miembrosDeOpcionDeGrupo,
-    resolverMiembros: resolverMiembros
-  };
-
-  /* ---------- el rastro que queda en el asunto ----------
-
-     Se escribe una sola vez por cada vez que se abre el cuadro: da
-     igual que se copie el cuerpo y además se abra Gmail. En un asunto
-     archivado no se escribe nada, porque sus notas ya no se tocan.
-     "Para" y la copia oculta salen de js/correo-cuadro.js (fila 58, que
-     ahora es dueño de esos dos datos), a través de `window.CorreoCuadro`. */
-
-  /* "Comunicar" desde un hito (fila 60, sección 5.3 del encargo): la
-     misma línea sirve para la nota del asunto y para el historial del
-     hito (ver apuntarElRastro, más abajo). Pura, para poder probarla
-     sin abrir ningún cuadro (`CorreoNucleo.textoDeComunicarHito`). */
-  function textoDeComunicarHito(nombreDestinatario, esSeneca) {
-    return 'Comunicado a ' + (nombreDestinatario || 'el tercero') + ' por ' +
-      (esSeneca ? 'Séneca' : 'correo') + ' · ' + U.fechaLegible(U.aAaMmDd(U.hoyIso()));
-  }
-
-  /* "· con N documentos: a, b" (fila 103, sección 3): el mismo trozo
-     para la nota de un correo normal y para la constancia de
-     "Comunicar" desde un hito, pura para poder probarla sin abrir
-     ningún cuadro (CorreoNucleo.sufijoDocumentos). Vacía sin nada que
-     añadir, para no dejar puntos suspendidos de sobra. */
-  function sufijoDocumentos(nombres) {
-    if (!nombres || !nombres.length) return '';
-    return ' · con ' + nombres.length + ' documento' + (nombres.length === 1 ? '' : 's') +
-      ': ' + nombres.join(', ');
-  }
-
-  /* "Correo enviado a X" (fila 115): a quién, en la misma forma que ya
-     usa el resto de la nota (Para, o "en copia oculta a N personas" si
-     Para viene vacío). Pura salvo por leer window.CorreoCuadro, igual
-     que el resto de textoDeLaNota. */
-  function quienHaRecibidoElEnvio() {
-    var cc = window.CorreoCuadro;
-    var para = cc ? cc.paraDelCuadro() : '';
-    if (para) return para;
-    var direccionesCco = cc ? cc.ccoDirecciones() : [];
-    if (direccionesCco.length) {
-      return 'en copia oculta a ' + direccionesCco.length +
-        (direccionesCco.length === 1 ? ' persona' : ' personas');
-    }
-    return 'el tercero';
-  }
-
-  function textoDeLaNota() {
-    if (comunicarHitoActual) {
-      /* La constancia en el historial del hito incluye los documentos
-         (fila 103, sección 3): mismo dato que ya lee "Documentos de
-         este asunto" (window.CorreoCuadro.documentosAdjuntados), así
-         que aparecen igual haya o no texto propio del paso. */
-      var documentosDelHito = (!porSeneca && window.CorreoCuadro) ? CorreoCuadro.documentosAdjuntados() : [];
-      /* Si esta comunicación de hito ha salido por el envío real de
-         Correo (fila 115), la nota dice "enviado", igual que fuera de
-         un hito. */
-      if (!porSeneca && envioRealizado) {
-        return 'Correo enviado a ' + (comunicarHitoActual.nombreDestinatario || 'el tercero') +
-          sufijoDocumentos(documentosDelHito);
-      }
-      return textoDeComunicarHito(comunicarHitoActual.nombreDestinatario, porSeneca) + sufijoDocumentos(documentosDelHito);
-    }
-
-    /* Un envío real (fila 115): "Correo enviado a X · con N documentos: …". */
-    if (!porSeneca && envioRealizado) {
-      var cc2 = window.CorreoCuadro;
-      return 'Correo enviado a ' + quienHaRecibidoElEnvio() +
-        sufijoDocumentos(cc2 ? cc2.documentosAdjuntados() : []);
-    }
-
-    /* En Séneca el campo del asunto es #seneca-asunto (js/seneca-cuadro.js,
-       fila 53): #correo-asunto ya no existe en ese cuadro. */
-    var campoAsunto = $('correo-asunto') || $('seneca-asunto');
-    var asunto = campoAsunto ? campoAsunto.value : '';
-    var cola = asunto ? ' — asunto: "' + asunto + '"' : '';
-    if (porSeneca) {
-      return 'Mensaje por Séneca a ' + (aQuien(viendo) || 'el tercero') + cola;
-    }
-    var cc = window.CorreoCuadro;
-    var para = cc ? cc.paraDelCuadro() : '';
-    var base = 'Correo ' + (para ? 'a ' + para : 'preparado') + cola;
-    var direccionesCco = cc ? cc.ccoDirecciones() : [];
-    if (direccionesCco.length) {
-      base += ' · en copia oculta a ' + direccionesCco.length +
-        (direccionesCco.length === 1 ? ' persona' : ' personas');
-    }
-    return base + sufijoDocumentos(cc ? cc.documentosAdjuntados() : []);
-  }
-
-  /* A quién se le va a escribir, dicho en palabras. En Séneca no hay
-     direcciones que enseñar: lo que ayuda es acordarse de a quién hay
-     que marcar en su lista. Si el asunto trae "Lo pide" (17-sep-2026,
-     fila 28), manda ese nombre: es a quien hay que contestar, y puede
-     no ser el propio interesado. */
-  function aQuien(a) {
-    if (comunicarHitoActual && comunicarHitoActual.nombreDestinatario) return comunicarHitoActual.nombreDestinatario;
-    var deLoPide = window.LoPide && a && a.ficha && a.ficha.loPide && a.ficha.loPide.nombre;
-    if (deLoPide) return deLoPide;
-    var categoria = categoriaDe(a);
-    var nombre = soloElNombre(terceroDe(a));
-    if (!nombre) return '';
-    if (categoria === 'ALUMNADO') return 'los tutores legales de ' + nombre;
-    return nombre;
-  }
-
-  /* A quién se espera después de escribir a alguien de fuera (fila 129,
-     docs/EL-HITO-ES-EL-ESTADO.md: ya no hay estados escritos a mano, se
-     deja el asunto «Esperando a…», js/estado-hito.js): la familia en
-     ALUMNADO, el tercero en lo demás. */
-  function esperaTrasCorreo(a) {
-    var cat = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
-    return cat === 'ALUMNADO' ? { id: 'tutor', nombre: 'la familia' } : { id: 'tercero', nombre: 'el tercero' };
-  }
-
-  function yaEsperando(a) {
-    var l = (window.App && typeof App.ladoDe === 'function') ? App.ladoDe(a) : null;
-    return !!(l && l.esperando);
-  }
-
-  async function apuntarElRastro(a) {
-    if (yaApuntado) { pintarRastro(a, ''); return; }
-    yaApuntado = true;
-
-    if (modoDelAsunto === 'archivado' || !window.Notas) {
-      pintarRastro(a, '');
-      return;
-    }
-    try {
-      var texto = textoDeLaNota();
-      await window.Notas.anadir(a, texto);
-      /* "Comunicar" desde un hito (fila 60, sección 5.3): la misma
-         línea, además, en el historial del propio hito. No crítico: si
-         falla, el mensaje ya se ha preparado y la nota ya ha quedado. */
-      if (comunicarHitoActual && window.Hitos && typeof Hitos.anadirNota === 'function') {
-        try {
-          await Hitos.anadirNota(comunicarHitoActual.claveAsunto, comunicarHitoActual.idHito, texto);
-          if (Hitos.marcarGuionPorAccion) await Hitos.marcarGuionPorAccion(a, comunicarHitoActual.idHito, 'comunicar');   /* fila 109 */
-          if (window.HitosPanel) window.HitosPanel.programarRepintado();
-        } catch (e) { /* no crítico */ }
-      }
-      algoCambiado = true;
-      pintarRastro(a, 'Apuntado en las notas del asunto.');
-    } catch (e) {
-      pintarRastro(a, 'No he podido apuntarlo en el asunto: ' + U.mensajeDeError(e));
-    }
-  }
-
-  function pintarRastro(a, aviso) {
-    var caja = $('correo-caja');
-    if (!caja) return;
-    var sitio = $('correo-rastro');
-    if (!sitio) {
-      sitio = document.createElement('div');
-      sitio.id = 'correo-rastro';
-      sitio.className = 'aviso aviso-ambar';
-      sitio.style.marginTop = '14px';
-      caja.appendChild(sitio);
-    }
-
-    var espera = esperaTrasCorreo(a);
-    var puedeEsperar = modoDelAsunto !== 'archivado' && window.EstadoHito && !yaEsperando(a);
-
-    /* El recordatorio de guardar el PDF del hilo solo hace falta
-       cuando el correo NO ha salido por aquí (fila 115): un envío real
-       ya deja su propio hilo enganchado, y la respuesta entra sola. */
-    sitio.innerHTML = '<strong>' + U.escapar(aviso || 'Rastro del correo') + '</strong>' +
-      (envioRealizado ? '' :
-        '<p>Acuérdate de guardar el PDF del hilo en la carpeta del asunto, ' +
-        'con el botón "Gestionar documentos".</p>');
-
-    if (!puedeEsperar) return;
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'boton';
-    b.style.marginTop = '8px';
-    b.textContent = 'Dejar el asunto esperando a ' + espera.nombre;
-    b.onclick = async function () {
-      b.disabled = true;
-      try {
-        await EstadoHito.ponerEsperando(a, espera.id, 'Correo enviado');
-        algoCambiado = true;
-        b.textContent = 'Hecho: esperando a ' + espera.nombre;
-      } catch (e) {
-        b.disabled = false;
-        U.aviso('No he podido dejarlo en espera: ' + U.mensajeDeError(e), 'malo');
-      }
-    };
-    sitio.appendChild(b);
-  }
-
   /* ---------- el cuadro ----------
 
      La disposición de los dos cuadros (Séneca, fila 53; Correo, fila
@@ -491,18 +210,18 @@
      (persona, plantillas, valores) y se llama al que toque. */
 
   async function abrirCuadro(a, deSeneca, extra) {
-    viendo = a;
-    porSeneca = !!deSeneca;
+    I.viendo = a;
+    I.porSeneca = !!deSeneca;
     loQueFaltaActual = (extra && extra.loQueFalta) || '';
     asuntoListoActual = (extra && extra.asuntoListo) || '';
     medioListoActual = (extra && extra.medioListo) || '';
     correoPreferenteActual = (extra && extra.correoPreferente) || '';
-    comunicarHitoActual = (extra && extra.comunicarHito) || null;
+    I.comunicarHitoActual = (extra && extra.comunicarHito) || null;
     adjuntosMarcadosActual = (extra && extra.adjuntosMarcados) || [];
     if (window.SenecaDestinatarios) SenecaDestinatarios.limpiar();
-    yaApuntado = false;
-    algoCambiado = false;
-    envioRealizado = false;
+    I.yaApuntado = false;
+    I.algoCambiado = false;
+    I.envioRealizado = false;
     /* El cuadro de Séneca ocupa más ancho que el de Correo (fila 53,
        docs/SENECA-CUADRO-ANCHO.md): mismo patrón que .cuadro-ancho en
        js/documentos.js, con su propia clase y un tope menor. Correo
@@ -510,10 +229,10 @@
        5), con el mismo ancho pero cabecera y botonera fijas. */
     var cuadroEl = document.querySelector('#capa .cuadro');
     if (cuadroEl) {
-      cuadroEl.classList.toggle('cuadro-seneca', porSeneca);
-      cuadroEl.classList.toggle('cuadro-correo', !porSeneca);
+      cuadroEl.classList.toggle('cuadro-seneca', I.porSeneca);
+      cuadroEl.classList.toggle('cuadro-correo', !I.porSeneca);
     }
-    var esperar = U.preguntar(porSeneca ? 'Mensaje por Séneca' : 'Correo de este asunto',
+    var esperar = U.preguntar(I.porSeneca ? 'Mensaje por Séneca' : 'Correo de este asunto',
       '<div id="correo-caja"><p class="explica">Preparando…</p></div>', 'Cerrar', true);
     var persona = null;
     try { persona = await buscarPersona(a); } catch (e) { persona = null; }
@@ -524,7 +243,7 @@
     if (cuadroEl) { cuadroEl.classList.remove('cuadro-seneca'); cuadroEl.classList.remove('cuadro-correo'); }
     /* Si se ha apuntado la nota o cambiado el estado, la ficha que hay
        detrás se ha quedado vieja: se vuelve a abrir. */
-    if (algoCambiado) App.abrirFicha(a, modoDelAsunto);
+    if (I.algoCambiado) App.abrirFicha(a, I.modoDelAsunto);
   }
 
   async function pintarCuadro(a, persona) {
@@ -537,12 +256,12 @@
        saca correos, en Séneca usuarios IdEA. */
     var bloqueAdjuntos = '';
     var opcionesGrupo = '';
-    if (!porSeneca && window.CorreoAdjuntos) {
+    if (!I.porSeneca && window.CorreoAdjuntos) {
       try { bloqueAdjuntos = await CorreoAdjuntos.pintarBloque(a, adjuntosMarcadosActual); } catch (e) { bloqueAdjuntos = ''; }
     }
-    try { opcionesGrupo = await opcionesDeGrupo(); } catch (e) { opcionesGrupo = ''; }
+    try { opcionesGrupo = await window.CorreoGrupos.opciones(); } catch (e) { opcionesGrupo = ''; }
 
-    if (porSeneca) {
+    if (I.porSeneca) {
       caja.innerHTML = window.SenecaCuadro ? SenecaCuadro.cuerpoHtml(a, opcionesGrupo) : '';
       if (window.SenecaCuadro) SenecaCuadro.enganchar(a);
       if (window.SenecaDestinatarios) SenecaDestinatarios.enganchar();
@@ -585,14 +304,13 @@
   }
 
   window.CorreoNucleo = {
+    _interno: I,
     categoriaDe: categoriaDe,
     terceroDe: terceroDe,
     soloElNombre: soloElNombre,
-    aQuien: aQuien,
     asuntoDelCorreo: asuntoDelCorreo,
     plantillasDelTipo: plantillasDelTipo,
     cuerpoDelMedio: cuerpoDelMedio,
-    apuntarElRastro: apuntarElRastro,
     MAXIMO_LETRAS_SENECA: MAXIMO_LETRAS_SENECA,
     /* Abrir un cuadro directamente, sin pasar por el menú "Comunicar":
        lo usa js/hitos-comunicar.js (fila 60) cuando el paso del hito
@@ -602,12 +320,10 @@
        60), si la hay: js/correo-cuadro.js la usa igual que ya usaba la
        de "Lo pide" (LoPide.correoDe). */
     destinatarioPreferente: function () { return correoPreferenteActual; },
-    textoDeComunicarHito: textoDeComunicarHito,
-    sufijoDocumentos: sufijoDocumentos,
     /* Fila 115: js/correo-cuadro.js avisa aquí en cuanto el correo ha
        salido de verdad, para que textoDeLaNota diga "enviado" y el
        recordatorio del PDF del hilo no salga de más. */
-    marcarEnvioRealizado: function () { envioRealizado = true; },
+    marcarEnvioRealizado: function () { I.envioRealizado = true; },
     /* Monta sobre `boton` el mismo menú pequeño "Comunicar" (Correo /
        Séneca) que lleva la cabecera de la ficha, sin duplicar ese
        camino (fila 59, sección 7 del encargo). */
@@ -624,7 +340,7 @@
     var nueva = U.envolver(App, 'App.abrirFicha', 'correo.js', function (comoEra) {
       return function (a, modo) {
         actual = a;
-        modoDelAsunto = modo || 'abierto';
+        I.modoDelAsunto = modo || 'abierto';
         comoEra(a, modo);
         poner();
       };
