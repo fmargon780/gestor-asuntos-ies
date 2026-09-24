@@ -92,6 +92,7 @@
     var botones = Array.prototype.slice.call(lista.querySelectorAll('.tipo-boton'));
     if (!botones.length) {
       if (caja) caja.classList.add('oculto');
+      if (window.TipoAlVuelo) TipoAlVuelo.repintar();
       return;
     }
     if (caja) caja.classList.remove('oculto');
@@ -131,6 +132,12 @@
         ? 'Ver solo los más usados'
         : 'Ver todos (' + botones.length + ')';
     }
+
+    /* "+ Crear tipo nuevo" (fila 128, js/tipo-al-vuelo.js): un punto
+       enganchado, no una envoltura. Se llama aquí, al final de
+       aplicar(), porque escribir en el buscador solo llama a aplicar()
+       (el oninput de más abajo), no a App.pintarTipos entero. */
+    if (window.TipoAlVuelo) TipoAlVuelo.repintar();
   }
 
   /* Cada vez que la aplicación repinta los tipos se vuelve a ordenar y

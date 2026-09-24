@@ -149,6 +149,28 @@ App.elegirTipo = function (t) {
   $('buscar-tercero').focus();
 };
 
+/* Deja un tipo elegido, exactamente como si se hubiera pulsado su
+   botón, pero SIN tocar el tercero, los campos ni lo escrito (fila
+   128, docs/TIPO-DESDE-EL-ASUNTO.md): lo usa "+ Crear tipo nuevo"
+   (js/tipo-al-vuelo.js) al crear un tipo desde el propio buscador, que
+   puede llegar con un tercero y unos campos ya rellenos. Si todavía no
+   se había elegido tercero, se revela ese bloque igual que
+   App.elegirTipo; si ya estaba a la vista, se deja tal cual. */
+App.marcarTipoElegido = function (t) {
+  App.E.nuevo.tipo = t.tipo;
+  App.E.nuevo.categoria = t.categoria;
+  App.pintarTipos();
+  if ($('bloque-tercero').classList.contains('oculto')) {
+    $('bloque-tercero').classList.remove('oculto');
+    $('etiqueta-tercero').textContent = {
+      ALUMNADO: 'Alumno o alumna', PERSONAL: 'Persona del centro',
+      EMPRESAS: 'Empresa', OTROS: 'Con quién es el asunto'
+    }[t.categoria];
+  }
+  App.actualizarLimiteNuevo();
+  App.refrescarVista();
+};
+
 $('ir-a-ajustes').onclick = function () { App.ir('ajustes'); };
 
 App.temporizador = null;

@@ -1,0 +1,19 @@
+/* ============================================================
+   tipo-al-vuelo.css — el botón y el panel de "+ Crear tipo nuevo"
+   dentro de Nuevo asunto (fila 128, docs/TIPO-DESDE-EL-ASUNTO.md).
+   ============================================================ */
+
+.tipo-al-vuelo-destacado { margin: 0 0 10px; }
+.tipo-al-vuelo-discreto { display: inline-flex; }
+
+/* Discreto: un botón sin fondo, casi un enlace, entre los chips de
+   tipo (.tipos es display:flex; flex-wrap:wrap, así que encaja solo
+   al final de la fila). */
+.tipo-al-vuelo-discreto .enlace { font-size: 13px; }
+
+.tipo-al-vuelo-panel {
+  background: #f7f9fc; border: 1px solid var(--linea); border-radius: 10px;
+  padding: 14px 16px; margin-top: 8px; max-width: 360px;
+}
+.tipo-al-vuelo-panel .etiqueta:first-child { margin-top: 0; }
+.tipo-al-vuelo-botones { display: flex; gap: 8px; margin-top: 14px; }

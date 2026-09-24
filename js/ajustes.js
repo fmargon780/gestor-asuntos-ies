@@ -476,6 +476,20 @@ App.pintarTiposAjustes = function () {
 $('nueva-categoria').onchange = function () { App.cambiarCategoriaAjustes($('nueva-categoria').value); };
 $('buscar-tipos').oninput = function () { App.pintarTiposAjustes(); };
 
+/* Guarda un tipo nuevo: la parte de después de la guardia de nombres
+   (U.dejaCrear), que cada sitio comprueba con lo suyo antes de llamar
+   aquí. La usan tanto "Añadir" de aquí abajo como "+ Crear tipo
+   nuevo" de Nuevo asunto (fila 128, js/tipo-al-vuelo.js): una sola
+   forma de guardar un tipo, no dos. */
+App.crearTipo = async function (datos) {
+  var tipo = { tipo: datos.nombre, categoria: datos.categoria };
+  if (datos.nombreCorto) tipo.nombreCorto = datos.nombreCorto;
+  await Borrados.revivir(App.E.gestor, 'tipos', datos.nombre);
+  App.E.tipos.push(tipo);
+  await App.guardarTipos();
+  return tipo;
+};
+
 /* Al añadir se pasa la misma guardia que a estados y tipos de
    documento (js/ajustes-centro.js): si el nombre ya está escrito de
    otra manera no se crea, y si solo se parece a otro se avisa antes.
@@ -486,9 +500,7 @@ $('btn-anadir-tipo').onclick = async function () {
   if (!nombre) return;
   var hay = App.E.tipos.map(function (t) { return t.tipo; });
   if (!await U.dejaCrear(nombre, hay, 'tipo')) return;
-  await Borrados.revivir(App.E.gestor, 'tipos', nombre);
-  App.E.tipos.push({ tipo: nombre, categoria: $('nueva-categoria').value });
-  await App.guardarTipos();
+  await App.crearTipo({ nombre: nombre, categoria: $('nueva-categoria').value });
   $('nuevo-tipo').value = '';
   App.pintarAvisoNuevoTipo();
   App.pintarTiposAjustes();
