@@ -21,7 +21,7 @@ círculo. Ahora cada documento va en su renglón, como mucho cinco (o los que qu
 
 Prueba nueva `pruebas/documentos-en-la-tarjeta.mjs`; `pruebas/ficha-en-tarjetas.mjs` ya no espera la
 línea «3 documentos». Batería completa en verde.
-Versión publicada `App.VERSION`: `VERSION_114`.
+Versión publicada `App.VERSION`: `24-sep-2026 · 05:53`.
 
 ## 24-sep-2026 — Fila 113: el mapa de la guía
 
