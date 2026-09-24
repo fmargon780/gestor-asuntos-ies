@@ -22,7 +22,7 @@ de un asunto (con el camino elegido resaltado y el estado de cada hito). Detalle
 - Lo que costó: la raya de las ramas se cortaba en el hueco entre una y otra.
 
 Prueba nueva `pruebas/guias-mapa.mjs` (sin navegador). Batería completa en verde.
-Versión publicada `App.VERSION`: `VERSION_113`.
+Versión publicada `App.VERSION`: `24-sep-2026 · 05:45`.
 
 ## 24-sep-2026 — Fila 112: cabecera compacta de la ficha y del hito
 
