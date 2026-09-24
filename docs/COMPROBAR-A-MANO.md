@@ -21,9 +21,27 @@ para ir tachando.
 - [ ] **Los dos ordenadores guardando a la vez en el mismo asunto.** Que sale el aviso de "el
       compañero está dentro" en el segundo, y que si Dropbox deja una copia en conflicto, se
       fusiona sola (`js/conflictos.js`) la próxima vez que se entra.
-- [ ] **El script de Google, con un correo de verdad.** Que recoge uno con adjuntos, deja su ficha
-      en `GESTOR-BANDEJA`, y que al mandar documentos de un asunto por correo el borrador sale
-      bien en Gmail.
+- [ ] **El script de Google, con un correo de verdad.** Que recoge uno con adjuntos y deja su
+      ficha en `GESTOR-BANDEJA`.
+- [ ] **Conectar el envío de verdad (fila 115, 24-sep-2026, `docs/ENVIAR-DESDE-EL-ASUNTO.md`), con
+      la cuenta del centro.** Nadie ha podido probar esto con una cuenta de Google real: no existe
+      ninguna en el entorno donde se escribió el código. Cinco pasos, en Ajustes → Mantenimiento →
+      "Enviar correo":
+      1. Abrir `script.google.com` con la cuenta del centro, entrar en el proyecto
+         «Gestor - Correos».
+      2. Copiar el código nuevo desde GitHub (`apps-script/gestor-correos.gs`) y pegarlo en lugar
+         del viejo. Guardar.
+      3. «Implementar» → «Nueva implementación» → tipo «Aplicación web», ejecutar como «Yo»,
+         acceso «Cualquier usuario» (si no aparece, «Cualquier usuario de la organización»).
+         «Implementar» y aceptar los permisos.
+      4. Elegir `prepararEnvio` en el desplegable de arriba y pulsar «Ejecutar»; copiar la línea
+         que sale en el registro de ejecución (lleva la dirección y la clave juntas).
+      5. Pegar esa línea en el cuadro de Ajustes y pulsar «Probar».
+      Ver: que llega un correo de prueba a la bandeja de entrada. Después, mandar uno de verdad
+      desde el cuadro de Correo de un asunto, con un documento adjunto marcado: comprobar que el
+      resumen sale bien, que "Confirmar y enviar" dice "Correo enviado a…", que el correo llega de
+      verdad con el documento enganchado, y que si el asunto ya tenía un hilo con ese mismo
+      destinatario, responde dentro de él en vez de abrir uno nuevo.
 - [ ] **La aplicación desde la red del IES.** Entrar en `https://asuntos.fmargon.com` desde un
       ordenador del centro (no desde casa): que carga y que `vercel.app` sigue bloqueado, para
       confirmar que hace falta el dominio propio.
