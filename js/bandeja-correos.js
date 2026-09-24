@@ -39,6 +39,15 @@
 
    La ficha se escribe la última en Drive, así que un correo se lee
    solo cuando su .json existe: nunca se coge uno a medio guardar.
+
+   24-sep-2026 (fila 115, docs/ENVIAR-DESDE-EL-ASUNTO.md): este fichero
+   ya NO vigila "encargos de correo" (el viejo "Borrador en camino").
+   Mandar documentos por correo ahora envía de verdad, en el momento,
+   desde js/correo-cuadro.js + js/correo-enviar.js: no hay nada que
+   dejar en esta carpeta ni que revisar cada 15 segundos. Solo queda
+   `limpiarEnviosViejos`, que se ejecuta una vez al arrancar por si
+   quedara algún encargo `.envio.json`/`.listo.json`/`.error.json`
+   suelto de antes de esta fila.
    ============================================================ */
 (function () {
 
@@ -124,9 +133,9 @@
       for (var i = 0; i < lista.length; i++) {
         var n = lista[i].nombre;
         if (!/\.json$/i.test(n)) continue;
-        /* Los encargos de "mandar los documentos por correo"
-           (docs/ADJUNTAR-DOCUMENTOS-AL-CORREO.md) dejan sus propios
-           .json en esta misma carpeta: no son correos que recoger. */
+        /* Restos del viejo "Borrador en camino" (antes de la fila 115),
+           por si quedara alguno sin limpiar todavía: no son correos que
+           recoger. */
         if (/\.(envio|listo|error)\.json$/i.test(n)) continue;
         if (n === FICHERO_SEGUIDOS) continue;   /* ese lo escribimos nosotros */
         var d = await Carpetas.leerJson(carpeta, n);
@@ -1016,193 +1025,48 @@
   }
 
   /* ==========================================================
-     "BORRADOR EN CAMINO" (16-sep-2026, mandar documentos por correo)
+     LIMPIAR LOS RESTOS DEL VIEJO "BORRADOR EN CAMINO"
+     (16-sep-2026 → 24-sep-2026, fila 115, docs/ENVIAR-DESDE-EL-ASUNTO.md)
 
-     `js/correo-adjuntos.js` deja en `_GESTOR/envios.json` cada encargo
-     vivo, y en esta misma carpeta de la bandeja su `<id>.envio.json`.
-     El script de Apps Script lo recoge y, cuando termina, deja
-     `<id>.listo.json` (con el enlace al borrador) o `<id>.error.json`
-     (con el motivo). Aquí se vigila eso, cada 15 segundos y solo
-     mientras haya algún encargo vivo, y se enseña una tarjeta por cada
-     uno encima de la bandeja de correos. */
+     Hasta esta fila, `_GESTOR/envios.json` guardaba los encargos vivos
+     de "mandar documentos por correo" (un borrador que montaba Apps
+     Script), y la carpeta de la bandeja tenía sus copias de documentos
+     y sus `<id>.envio.json`/`.listo.json`/`.error.json`. Ese mecanismo
+     ha desaparecido: ahora el correo sale en el momento
+     (js/correo-cuadro.js + js/correo-enviar.js). Esta limpieza se
+     ejecuta una sola vez por arranque, y no hace nada si no queda
+     ningún encargo viejo: no vigila nada, no repinta ninguna tarjeta. */
 
-  var envios = [];
-  var ultimaMiradaEnvios = 0;
-  var temporizadorEnvios = null;
-  var SEGUNDOS_ENTRE_MIRADAS_ENVIOS = 15;
-  var MINUTOS_ANTES_DE_AVISAR = 3;
-
-  async function leerEnviosJson() {
-    if (!window.Gestor || !window.Gestor.carpetaGestor()) return [];
-    var leido = await Carpetas.leerJson(window.Gestor.carpetaGestor(), 'envios.json');
-    return Array.isArray(leido) ? leido : [];
-  }
-
-  async function quitarDeEnviosJson(id) {
-    var g = window.Gestor && window.Gestor.carpetaGestor();
-    if (!g) return;
-    var lista = (await leerEnviosJson()).filter(function (x) { return x.id !== id; });
-    await Copias.guardar(g, 'envios.json', lista);
-  }
-
-  function pararTemporizadorEnvios() {
-    if (temporizadorEnvios) { clearInterval(temporizadorEnvios); temporizadorEnvios = null; }
-  }
-
-  /* `forzar` salta el límite de los 15 segundos: se usa nada más
-     arrancar y justo después de tocar un encargo. */
-  async function revisarEnvios(forzar) {
-    var lista;
-    try { lista = await leerEnviosJson(); } catch (e) { lista = []; }
-
-    if (!lista.length) {
-      envios = [];
-      pintarEnvios();
-      pararTemporizadorEnvios();
-      return;
-    }
-    if (!temporizadorEnvios) {
-      temporizadorEnvios = setInterval(function () { revisarEnvios(false); },
-        SEGUNDOS_ENTRE_MIRADAS_ENVIOS * 1000);
-    }
-
-    var ahora = Date.now();
-    if (!forzar && ahora - ultimaMiradaEnvios < SEGUNDOS_ENTRE_MIRADAS_ENVIOS * 1000) {
-      envios = lista;
-      pintarEnvios();
-      return;
-    }
-    if (!carpeta || !(await tienePermiso(false))) { envios = lista; pintarEnvios(); return; }
-    ultimaMiradaEnvios = ahora;
-
-    for (var i = 0; i < lista.length; i++) {
-      var item = lista[i];
-      var listo = null, error = null;
-      try { listo = await Carpetas.leerJson(carpeta, item.id + '.listo.json'); } catch (e) { /* aún no */ }
-      try { error = await Carpetas.leerJson(carpeta, item.id + '.error.json'); } catch (e) { /* aún no */ }
-      if (listo) {
-        item.estado = 'listo';
-        item.enlace = listo.enlace;
-      } else if (error) {
-        item.estado = 'error';
-        item.motivo = error.motivo;
-      } else if (Date.now() - new Date(item.creado).getTime() > MINUTOS_ANTES_DE_AVISAR * 60000) {
-        item.estado = 'tardando';
-      } else {
-        item.estado = 'esperando';
-      }
-    }
-    envios = lista;
-    pintarEnvios();
-  }
-
-  function cajaEnvios() {
-    var c = $('bandeja-envios');
-    if (c) return c;
-    var paneles = document.querySelector('#pantalla-abiertos .paneles');
-    if (!paneles || !paneles.parentNode) return null;
-    c = document.createElement('div');
-    c.id = 'bandeja-envios';
-    c.className = 'oculto';
-    /* Antes se anclaba a $('bandeja-correos') si existía: desde que
-       esa caja vive dentro de #zona-clasificar (fila 27, 17-sep-2026)
-       ya no es hermana de .paneles, así que insertBefore con ella
-       fallaría. Se fija explícitamente al siguiente hermano. */
-    paneles.parentNode.insertBefore(c, paneles.nextSibling);
-    return c;
-  }
-
-  function pintarEnvios() {
-    var c = cajaEnvios();
-    if (!c) return;
-    c.innerHTML = '';
-    if (!envios.length) { c.className = 'oculto'; return; }
-    c.className = 'bandeja';
-    var lista = document.createElement('div');
-    lista.className = 'lista';
-    envios.forEach(function (item) { lista.appendChild(tarjetaEnvio(item)); });
-    c.appendChild(lista);
-  }
-
-  function tarjetaEnvio(item) {
-    var div = document.createElement('div');
-    div.className = 'tarjeta tarjeta-correo';
-    div.innerHTML = sobre() +
-      '<div class="tarjeta-texto">' +
-        '<div class="tarjeta-nombre">Borrador en camino — ' + U.escapar(item.asunto) + '</div>' +
-        '<div class="tarjeta-pie">' + U.escapar(item.para || '') + '</div>' +
-      '</div>';
-    var texto = div.querySelector('.tarjeta-texto');
-
-    var acciones = document.createElement('div');
-    acciones.className = 'acciones';
-
-    if (item.estado === 'listo') {
-      var abrir = document.createElement('button');
-      abrir.type = 'button';
-      abrir.className = 'boton boton-principal';
-      abrir.textContent = 'Abrir el borrador en Gmail';
-      abrir.onclick = function () { abrirBorrador(item); };
-      acciones.appendChild(abrir);
-    } else if (item.estado === 'error') {
-      var avisoError = document.createElement('div');
-      avisoError.className = 'aviso aviso-rojo';
-      avisoError.textContent = item.motivo || 'No se ha podido preparar el borrador.';
-      texto.appendChild(avisoError);
-      var entendido = document.createElement('button');
-      entendido.type = 'button';
-      entendido.className = 'boton';
-      entendido.textContent = 'Entendido';
-      entendido.onclick = function () { quitarEnvioConError(item); };
-      acciones.appendChild(entendido);
-    } else if (item.estado === 'tardando') {
-      var avisoTarde = document.createElement('div');
-      avisoTarde.className = 'aviso aviso-ambar';
-      avisoTarde.textContent = 'Está tardando. El script de Gmail podría no estar en marcha.';
-      texto.appendChild(avisoTarde);
-      var dejarlo = document.createElement('button');
-      dejarlo.type = 'button';
-      dejarlo.className = 'boton';
-      dejarlo.textContent = 'Dejarlo';
-      dejarlo.onclick = function () { dejarEnvio(item); };
-      acciones.appendChild(dejarlo);
-    }
-
-    div.appendChild(acciones);
-    return div;
-  }
-
-  async function abrirBorrador(item) {
-    if (item.enlace) window.open(item.enlace, '_blank');
-    try { if (carpeta) await carpeta.removeEntry(item.id + '.listo.json'); } catch (e) {}
-    try { await quitarDeEnviosJson(item.id); } catch (e) {}
-    await revisarEnvios(true);
-  }
-
-  async function quitarEnvioConError(item) {
-    try { if (carpeta) await carpeta.removeEntry(item.id + '.error.json'); } catch (e) {}
-    try { await quitarDeEnviosJson(item.id); } catch (e) {}
-    await revisarEnvios(true);
-  }
-
-  /* El script todavía no lo ha tocado (si lo hubiera tocado, habría
-     .listo.json o .error.json): se borra el encargo entero, con sus
-     copias de los documentos, para que no se quede nada suelto en la
-     bandeja. */
-  async function dejarEnvio(item) {
+  async function limpiarEnviosViejos() {
+    if (!window.Gestor || !window.Gestor.carpetaGestor()) return;
     try {
-      if (carpeta) {
-        var encargo = await Carpetas.leerJson(carpeta, item.id + '.envio.json');
-        if (encargo) {
-          for (var i = 0; i < (encargo.adjuntos || []).length; i++) {
-            try { await carpeta.removeEntry(encargo.adjuntos[i]); } catch (e) {}
+      var g = window.Gestor.carpetaGestor();
+      var lista = await Carpetas.leerJson(g, 'envios.json');
+      if (!Array.isArray(lista) || !lista.length) return;
+
+      if (carpeta && (await tienePermiso(false))) {
+        for (var i = 0; i < lista.length; i++) {
+          var id = lista[i] && lista[i].id;
+          if (!id) continue;
+          var restos = [id + '.envio.json', id + '.listo.json', id + '.error.json'];
+          for (var j = 0; j < restos.length; j++) {
+            try { await carpeta.removeEntry(restos[j]); } catch (e) { /* ya no estaba */ }
           }
-          try { await carpeta.removeEntry(item.id + '.envio.json'); } catch (e) {}
         }
+        try {
+          var ficherosBandeja = await Carpetas.ficheros(carpeta);
+          for (var k = 0; k < ficherosBandeja.length; k++) {
+            var nombreFichero = ficherosBandeja[k].nombre;
+            var esCopiaDeUnEncargo = lista.some(function (item) {
+              return item && item.id && nombreFichero.indexOf(item.id + ' - ') === 0;
+            });
+            if (esCopiaDeUnEncargo) { try { await carpeta.removeEntry(nombreFichero); } catch (e) {} }
+          }
+        } catch (e) { /* si no se puede listar, se deja como esté: no es crítico */ }
       }
-    } catch (e) { /* si ya no está el .envio.json, no hay nada más que borrar */ }
-    try { await quitarDeEnviosJson(item.id); } catch (e) {}
-    await revisarEnvios(true);
+
+      await Copias.guardar(g, 'envios.json', []);
+    } catch (e) { /* limpieza accesoria de un mecanismo que ya no existe: si falla, no pasa nada */ }
   }
 
   /* ==========================================================
@@ -1217,7 +1081,7 @@
     pintarBloqueAjustes();
     engancharElBotonDeCrear();
     await mirar(true);
-    await revisarEnvios(true);
+    await limpiarEnviosViejos();
     await escribirSeguidos();
   }
 
@@ -1249,7 +1113,6 @@
     asuntoDelHilo: asuntoDelHilo,
     escribirSeguidos: escribirSeguidos,
     carpeta: function () { return carpeta; },
-    avisarEnvioNuevo: function () { revisarEnvios(true); },
     /* Para js/bandeja-pantalla.js. */
     correos: function () { return correos; },
     asuntoDeLaMatricula: asuntoDeLaMatricula,
@@ -1273,15 +1136,9 @@
   function enganchar() {
     if (enganchado || !window.Gestor) return;
     enganchado = true;
-    /* Los envíos, como mucho una vez por minuto (fila 101): antes se
-       releía envios.json en cada repintado de la lista. */
-    var ultimosEnvios = 0;
     window.Gestor.alRefrescar.push(function () {
       if (!arrancado) { arrancar(); return; }
       mirar(false);
-      if (Date.now() - ultimosEnvios < 60 * 1000) return;
-      ultimosEnvios = Date.now();
-      revisarEnvios(false);
     });
   }
 
