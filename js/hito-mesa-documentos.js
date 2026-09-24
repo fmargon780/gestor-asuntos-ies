@@ -182,7 +182,8 @@ var HitoMesaDocumentos = (function () {
     var caja = fila.querySelector('.mesa-plantillas');
     if (!caja || !window.HitosGenerar || !HitosGenerar.grupos) return;
     var g = HitosGenerar.grupos(a, h);
-    if (!g || (!g.delPaso.length && !g.delTipo.length)) { caja.innerHTML = ''; return; }
+    /* Fila 126: con la mesa abierta, «Buscar otra plantilla…» sale siempre. */
+    if (!g || (!g.delPaso.length && !g.delTipo.length && !(abierto && window.PlantillaBuscar))) { caja.innerHTML = ''; return; }
     function filaP(p) {
       return '<div class="mesa-plantilla" data-id="' + U.escapar(p.id) + '"><span class="mesa-icono-doc">DOC</span>' +
         '<span class="mesa-plantilla-nombre">' + U.escapar(p.nombre) + '</span>' +
@@ -190,7 +191,20 @@ var HitoMesaDocumentos = (function () {
     }
     caja.innerHTML = g.delPaso.map(filaP).join('') +
       (g.delTipo.length ? '<details class="mesa-otras-plantillas"><summary>Otras plantillas (' + g.delTipo.length + ')</summary>' +
-        g.delTipo.map(filaP).join('') + '</details>' : '');
+        g.delTipo.map(filaP).join('') + '</details>' : '') +
+      (abierto && window.PlantillaBuscar ? '<button type="button" class="enlace mesa-buscar-plantilla">Buscar otra plantilla…</button>' +
+        '<div class="mesa-buscar-caja"></div>' : '');
+    var buscar = caja.querySelector('.mesa-buscar-plantilla');
+    if (buscar) {
+      buscar.onclick = function () {
+        buscar.classList.add('oculto');
+        PlantillaBuscar.montar(caja.querySelector('.mesa-buscar-caja'), async function (p, boton) {
+          try {
+            await U.mientrasGuarda(boton, function () { return PlantillasDocumento.generar(a, p, 'abierto', { hito: h }); });
+          } catch (e) { U.fallo('No he podido generar el documento', e); }
+        });
+      };
+    }
     var todas = g.delPaso.concat(g.delTipo);
     Array.prototype.forEach.call(caja.querySelectorAll('.mesa-plantilla-generar'), function (b) {
       b.onclick = async function () {

@@ -107,15 +107,16 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 75 y 77 a 125 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 75 y 77 a 126 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 126 | `docs/TIPO-QUE-CAMBIA-DE-NOMBRE.md` (un tipo que cambia de nombre se lleva guía, campos y plantillas; arreglo solo del tipo DESEMPEÑO FUNCIÓN TUTORIAL; «Buscar otra plantilla…» en cualquier hito) | EN CURSO (24-sep-2026) |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
-**24-sep-2026, cupo de Vercel agotado otra vez:** al abrir los pull request de las filas 124 y 125 (hacia las 12:59 y las 13:22), Vercel respondió «Resource is limited - try again in 24 hours (code: "api-deployments-free-per-day")». Las dos filas quedan en `main`, pero la web puede seguir en `24-sep-2026 · 12:22` hasta que el cupo se libere. La próxima sesión: comprobar con `curl` (`js/version.js?v=<algo>`) que `App.VERSION` es `24-sep-2026 · 13:14` o posterior; si sigue atrás pasadas 24 horas, un commit nuevo en `main` (o `create_deployment` con `withLatestCommit`, regla 19) lo publica todo. Esta sesión no tiene salida a `vercel.app` ni permiso en el conector de Vercel (403).
+**La fila 126 está HECHA** (24-sep-2026): `docs/TIPO-QUE-CAMBIA-DE-NOMBRE.md`. Renombrar un tipo (a mano o con «Cargar la biblioteca del centro») se lleva su guía, campos, plantillas y recurrentes (`js/tipos-nombre.js`); al entrar, lo que se quedó bajo el nombre corto o un alias se junta solo con aviso verde (arregla la guía de DESEMPEÑO FUNCIÓN TUTORIAL) y la plantilla repetida va a la papelera; las plantillas casan con el tipo por cualquiera de sus nombres; «Cargar las plantillas del centro» ya no duplica; «Buscar otra plantilla…» en la mesa del hito y en «Generar documento». Prueba `pruebas/tipos-nombre.mjs`. Versión `App.VERSION`: `24-sep-2026 · 13:37`.
+
+**24-sep-2026, cupo de Vercel agotado otra vez:** al abrir los pull request de las filas 124 y 125 (hacia las 12:59 y las 13:22), Vercel respondió «Resource is limited - try again in 24 hours (code: "api-deployments-free-per-day")». Las dos filas quedan en `main`, pero la web puede seguir en `24-sep-2026 · 12:22` hasta que el cupo se libere. La próxima sesión: comprobar con `curl` (`js/version.js?v=<algo>`) que `App.VERSION` es `24-sep-2026 · 13:37` o posterior; si sigue atrás pasadas 24 horas, un commit nuevo en `main` (o `create_deployment` con `withLatestCommit`, regla 19) lo publica todo. Esta sesión no tiene salida a `vercel.app` ni permiso en el conector de Vercel (403).
 
 **La fila 125 está HECHA** (24-sep-2026): `docs/BUSCAR-PERSONAS-Y-FAMILIAS.md`. Personas y empresas → Alumnado: bloque «Familias» arriba al buscar un padre, madre o tutor legal (nombre, apellidos, DNI, teléfono o correo; una tarjeta por tutor con sus hijos matriculados), luego los de este curso y aspirantes, y «Antiguos (N)» plegado; la ficha se queda a la vista al bajar y la tarjeta vista, marcada; en la ficha del alumno, «Hermanos en el centro». `js/personas-familias.js`, `css/personas.css`, prueba `pruebas/personas-familias.mjs`. Versión `App.VERSION`: `24-sep-2026 · 13:14`.
 

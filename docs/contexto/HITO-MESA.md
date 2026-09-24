@@ -115,6 +115,18 @@ Escape; con la mesa abierta, el título "Hitos" del recuadro no sale (`:has(#fic
   al apuntar un documento nuevo al hito desde el ordenador (`js/documentos.js`), desde "Por
   clasificar" (`js/documentos-sueltos.js`) o desde la carpeta (`js/hitos-documentos.js`).
 
+## «Buscar otra plantilla…» (fila 126)
+
+`js/plantilla-buscar.js` (`PlantillaBuscar.montar(caja, alElegir)`, `filtrar`): un campo y la lista de
+TODAS las plantillas de documento del centro, de cualquier tipo, filtrando al escribir (todas las
+palabras en nombre, tipo, categoría y tipo de documento; 40 como mucho). En la mesa, debajo de las del
+paso y «Otras plantillas», el enlace «Buscar otra plantilla…» (sale siempre con la mesa abierta, aunque
+el hito no tenga ninguna) monta el buscador ahí mismo; pulsar una la genera con
+`PlantillasDocumento.generar(a, p, 'abierto', { hito: h })`. El botón «Generar documento» del hito sale
+si hay cualquier plantilla en el centro y siempre pasa por el cuadro de elegir, que lleva el mismo
+enlace (`PlantillasDocumento.elegir({ delPaso, delTipo, buscar: true })`); sin ninguna del paso ni del
+tipo, el buscador sale ya abierto.
+
 ## "Traer los guiones del instituto"
 
 Botón en Ajustes → Mantenimiento → Herramientas → "Biblioteca del centro"
