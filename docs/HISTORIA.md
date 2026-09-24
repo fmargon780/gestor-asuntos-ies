@@ -5,6 +5,30 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 105: Ajustes plegado
+
+`docs/AJUSTES-PLEGADO.md`. Francisco veía Ajustes con demasiadas cosas a la vez. Ahora las tres
+zonas (la pantalla de un tipo, "El centro" y "Mantenimiento") nacen plegadas, con un resumen en
+cada título ("2 campos", "sin plazo", "faltan 2 datos"…) y la memoria de lo que se dejó abierto
+en ese ordenador. Todo lo nuevo en `js/ajustes-plegado.js`; en los demás, pocas líneas.
+
+- Decisión: el bloque del RegAlum.csv viejo no se esconde nunca, porque es también donde se
+  configuran las épocas; con aviso, sube arriba y se abre. Los otros tres avisos de fallo
+  (conflictos, fichas sin carpeta) y los dos que ya existían de la misma clase (hitos huérfanos,
+  envolturas sin aplicar) solo se ven cuando hay algo.
+- Decisión: los resúmenes que dependen de datos privados de otro módulo (plantillas, recurrentes,
+  papelera) se cuentan en lo que ese módulo pinta, en vez de abrirle una puerta nueva.
+- Lo que costó: reordenar los bloques de Mantenimiento en cada repintado devolvía arriba los
+  normales, por encima del aviso que acababa de subir; el orden normal empieza ahora después de
+  los bloques con aviso. Y mover un nodo al sitio donde ya está despierta igual a los
+  observadores: solo se mueve si no está ya en su sitio.
+
+Prueba nueva `pruebas/ajustes-plegado.mjs` (falla sin el cambio); cinco pruebas que trabajan
+dentro de la pantalla de un tipo abren antes sus secciones. Batería completa en verde. Versión
+publicada `App.VERSION`: `24-sep-2026 · 03:25`.
+
+---
+
 ## 23-sep-2026 — Fila 104: el estado del asunto sale del hito abierto
 
 `docs/ESTADO-POR-EL-HITO.md`. Los dos paneles de Asuntos abiertos que ya existían ("En el

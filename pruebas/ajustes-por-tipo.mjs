@@ -121,14 +121,17 @@ await comprobar('la pantalla de Ajustes ha quedado oculta detrás',
 const SECCIONES = ['Datos del tipo', 'Campos', 'Pasos del trámite', 'Palabras clave',
   'Plantillas de correo y de Séneca', 'Plantilla de documento de Word', 'Plazo', 'Se repite'];
 await pagina.waitForTimeout(300);
-await comprobar('están las ocho secciones, todas a la vista sin plegar (sin ningún <details>)',
-  pagina.locator('#tipo-asunto-cuerpo .tipo-asunto-seccion h3').allTextContents().then((titulos) => {
+/* Fila 105 (docs/AJUSTES-PLEGADO.md): las ocho secciones nacen
+   plegadas, cada una con su título; para el resto de esta prueba se
+   despliegan todas. */
+await comprobar('están las ocho secciones, plegadas, cada una con su título',
+  pagina.locator('#tipo-asunto-cuerpo .tipo-asunto-seccion > summary .bloque-titulo').allTextContents().then((titulos) => {
     const mismos = SECCIONES.every((s) => titulos.indexOf(s) !== -1);
-    const sinDetails = titulos.length === SECCIONES.length;
-    return mismos && sinDetails;
+    return mismos && titulos.length === SECCIONES.length;
   }), true);
-await comprobar('no hay ningún <details> dentro de la pantalla del tipo (nada que desplegar)',
-  pagina.locator('#pantalla-tipo-asunto details').count(), 0);
+await comprobar('ninguna sale desplegada la primera vez',
+  pagina.locator('#pantalla-tipo-asunto details[open]').count(), 0);
+await pagina.evaluate(() => document.querySelectorAll('#pantalla-tipo-asunto details').forEach((d) => { d.open = true; }));
 
 await comprobar('las dos columnas están, una a cada lado',
   pagina.evaluate(() => {

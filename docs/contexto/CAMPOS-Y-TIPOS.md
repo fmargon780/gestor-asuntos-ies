@@ -74,7 +74,8 @@ tipo).
 "asunto" o "que-me-toca": botón "← Volver" y Escape los pone solos `js/usabilidad.js`, porque su
 `<header class="cabecera"><h2>` tiene la misma forma que las demás pantallas). Dos columnas
 (`#tipo-asunto-col-1`/`-2`, CSS `grid-template-columns: 1fr 1fr`, una sola por debajo de 1000px),
-con ocho secciones **siempre desplegadas**, sin `<details>`, construidas enteras por
+con ocho secciones **plegadas** (fila 105: cada una es un `<details class="bloque-ajustes">` con
+un resumen en el título, ver "Ajustes plegado" más abajo), construidas enteras por
 `App.pintarTipoDeAsunto()`:
 
 1. **Datos del tipo** — nombre, categoría, alias si los tiene, botón "Cambiar el nombre" que
@@ -187,4 +188,40 @@ separado por `.separador-lateral`; con la barra plegada, el icono de rueda denta
 Se comprueba con `pruebas/ajustes-agil.mjs` (las tres pestañas, a 1905 píxeles) y
 `pruebas/ajustes-por-tipo.mjs` (la pantalla de un tipo: las ocho secciones, cambiar Plazo y
 Campos, volver sin perder categoría ni buscador, Escape).
+
+### Ajustes plegado (24-sep-2026, fila 105, docs/AJUSTES-PLEGADO.md)
+
+Todo lo nuevo vive en `js/ajustes-plegado.js` (`AjustesPlegado`); `js/ajustes-tipo.js` solo llama
+a `AjustesPlegado.seccion(id, titulo, pie)` desde `seccionDeTipo` y a `resumirTipo()` al terminar de
+pintar y al guardar los campos; `js/ajustes-centro.js` y `js/ajustes-mantenimiento.js`, una línea
+al final de su orquestador (`ordenarCentro`, `ordenarMantenimiento`).
+
+- **Todo nace plegado**, con `<details class="bloque-ajustes">` en las tres zonas. El resumen va
+  en `<span class="bloque-resumen">` detrás del título; en ámbar (`.bloque-resumen-ambar`) si hay
+  un aviso dentro, para que un problema no quede escondido.
+- **Se recuerda lo abierto** en `localStorage`, clave `gestor-ajustes-plegado`, `{ id: true }`. En
+  un tipo, por sección (`tipo:datos`, `tipo:campos`, `tipo:pasos`, `tipo:correo`, `tipo:word`,
+  `tipo:plazo`, `tipo:palabras`, `tipo:repite`), no por tipo; en las pestañas, `centro:<id>` y
+  `mantenimiento:<id>`. La primera vez, todo plegado.
+- **Los resúmenes** salen de lo guardado (`App.E`, `GuiasDelCentro.pasosDe`) o, si el dato vive en
+  otro módulo, de lo que ese módulo pinta en el cuerpo (plantillas, recurrentes, papelera, grupos).
+  Se ponen al día con un `MutationObserver` sobre los cuerpos (nunca sobre el título) y tras
+  cualquier `change`/clic en la pantalla (a los 250 ms y a los 1,5 s). Los pasos desactualizados
+  de la biblioteca ponen "⚠ N pasos desactualizados" en ámbar. Un bloque sin forma sencilla de
+  contarse se queda solo con el título.
+- **"El centro"**, en este orden: Estados, Tipos de documento, Grupos de personas, Campos propios,
+  Hitos, Datos del centro y firma ("faltan N datos" en ámbar), Cómo se abrevia cada grupo, Ficheros
+  de datos; el resto detrás, como estaban. Cada bloque se reconoce por lo que lleva dentro
+  (`#tabla-estados`…), sin ids nuevos en `index.html`.
+- **"Mantenimiento"**: conflictos de Dropbox, fichas sin carpeta, hitos huérfanos y envolturas sin
+  aplicar **solo se ven con fallo** (mirando si su módulo ha pintado algo), y entonces arriba del
+  todo, desplegados y en ámbar (`.bloque-con-fallo`). **Decisión**: el bloque del RegAlum.csv viejo
+  (`js/frescura.js`) es también donde se configuran las épocas, así que no se esconde nunca; con
+  aviso sube arriba y se abre. Para saberlo, `js/frescura.js` deja una línea: `data-aviso` en su
+  bloque. Los botones sueltos (biblioteca, plantillas del centro, fichas del ARCHIVO, contacto de
+  los abiertos, catálogo de formularios) van dentro de **"Herramientas"**, al final.
+  `App.E.ultimaCopia` (lo apunta `App.pintarCopias`) da la fecha del resumen de Copias.
+
+Se comprueba con `pruebas/ajustes-plegado.mjs`. Las pruebas que trabajan dentro de la pantalla de
+un tipo abren antes sus secciones con esa misma clave de `localStorage`.
 

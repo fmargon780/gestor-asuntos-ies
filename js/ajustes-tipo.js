@@ -40,31 +40,16 @@ App.cerrarTipoDeAsunto = function () {
   App.ir('ajustes');
 };
 
-/* Un bloque de sección, siempre desplegado: mismo aspecto que un
-   `.bloque-ajustes`, pero sin `<details>`, porque las siete tienen que
-   verse a la vez, sin plegar. */
-function seccionDeTipo(titulo, pie) {
-  var sec = document.createElement('section');
-  sec.className = 'tipo-asunto-seccion';
-  var h = document.createElement('h3');
-  h.textContent = titulo;
-  sec.appendChild(h);
-  if (pie) {
-    var p = document.createElement('span');
-    p.className = 'bloque-pie';
-    p.textContent = pie;
-    sec.appendChild(p);
-  }
-  var cuerpo = document.createElement('div');
-  cuerpo.className = 'tipo-asunto-seccion-cuerpo';
-  sec.appendChild(cuerpo);
-  return { sec: sec, cuerpo: cuerpo };
+/* Un bloque de sección: plegable, con su resumen en el título y la
+   memoria de lo abierto (fila 105, js/ajustes-plegado.js). */
+function seccionDeTipo(id, titulo, pie) {
+  return AjustesPlegado.seccion(id, titulo, pie);
 }
 
 /* ---------- 1. Datos del tipo ---------- */
 
 function construirSeccionDatos(tipo) {
-  var b = seccionDeTipo('Datos del tipo');
+  var b = seccionDeTipo('datos', 'Datos del tipo');
   var lista = document.createElement('div');
   lista.className = 'lista';
   lista.appendChild(App.filaEstado('Nombre', tipo.tipo));
@@ -207,7 +192,7 @@ function envolverVolverDeTipo() {
 }
 
 async function construirSeccionCampos(tipo) {
-  var b = seccionDeTipo('Campos',
+  var b = seccionDeTipo('campos', 'Campos',
     'Los campos de este tipo, en el orden en que saldrán en el formulario y en el nombre de la carpeta.');
   var cuerpo = b.cuerpo;
 
@@ -338,6 +323,7 @@ async function construirSeccionCampos(tipo) {
       App.E.campos = await Campos.guardarConfigDeTipo(App.E.gestor, tipo.tipo, lista);
       camposSinGuardar = false;
       U.aviso('Campos de ' + tipo.tipo + ' guardados.', 'bueno');
+      AjustesPlegado.resumirTipo();
     } catch (e) {
       U.aviso('No he podido guardarlos: ' + U.mensajeDeError(e), 'malo');
     }
@@ -350,7 +336,7 @@ async function construirSeccionCampos(tipo) {
 /* ---------- 3. Pasos del trámite ---------- */
 
 function construirSeccionPasos(tipo) {
-  var b = seccionDeTipo('Pasos del trámite', 'La guía del tipo, con sus preguntas y bifurcaciones.');
+  var b = seccionDeTipo('pasos', 'Pasos del trámite', 'La guía del tipo, con sus preguntas y bifurcaciones.');
 
   /* El aviso de la biblioteca (20-sep-2026, fila 79, apartado 4.4):
      misma clase .aviso-compartido que ya usan los campos compartidos,
@@ -402,12 +388,12 @@ function construirSeccionPasos(tipo) {
 /* ---------- 6. Plazo ---------- */
 
 function construirSeccionPlazo(tipo) {
-  var b = seccionDeTipo('Plazo', 'Los días de plazo por defecto de este tipo.');
+  var b = seccionDeTipo('plazo', 'Plazo', 'Los días de plazo por defecto de este tipo.');
   b.cuerpo.appendChild(App.construirCasillaPlazo(tipo));
   return b.sec;
 }
 
-/* ---------- el orquestador de las siete secciones ---------- */
+/* ---------- el orquestador de las ocho secciones ---------- */
 
 App.pintarTipoDeAsunto = async function () {
   var tipo = App.E.tipoAjustesActual;
@@ -431,23 +417,24 @@ App.pintarTipoDeAsunto = async function () {
      CLASIFICAR.md), sacada aparte en js/ajustes-tipo-palabras-clave.js
      para no seguir engordando este fichero. */
   if (window.PalabrasClaveTipo) {
-    var secPalabras = seccionDeTipo('Palabras clave',
+    var secPalabras = seccionDeTipo('palabras', 'Palabras clave',
       'Para proponer este tipo al leer un documento suelto en "Por clasificar".');
     col1.appendChild(secPalabras.sec);
     PalabrasClaveTipo.pintarDeTipo(secPalabras.cuerpo, tipo);
   }
 
-  var secCorreo = seccionDeTipo('Plantillas de correo y de Séneca',
+  var secCorreo = seccionDeTipo('correo', 'Plantillas de correo y de Séneca',
     'Las plantillas pegadas a este tipo, con su editor de huecos.');
   col2.appendChild(secCorreo.sec);
-  var secWord = seccionDeTipo('Plantilla de documento de Word',
+  var secWord = seccionDeTipo('word', 'Plantilla de documento de Word',
     'El .docx colgado de este tipo y su tipo de documento.');
   col2.appendChild(secWord.sec);
-  var secRec = seccionDeTipo('Se repite',
+  var secRec = seccionDeTipo('repite', 'Se repite',
     'La recurrencia de este tipo: cada cuánto, qué día y para qué tercero.');
   col2.appendChild(secRec.sec);
 
   if (window.PlantillasAjustes) await PlantillasAjustes.pintarDeTipo(secCorreo.cuerpo, tipo);
   if (window.PlantillasDocumento) await PlantillasDocumento.pintarDeTipo(secWord.cuerpo, tipo);
   if (window.Recurrentes) Recurrentes.pintarEnContenedor(secRec.cuerpo, tipo.tipo);
+  AjustesPlegado.resumirTipo();
 };
