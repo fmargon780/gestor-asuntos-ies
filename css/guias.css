@@ -395,3 +395,13 @@
 .tabla-comparacion th { background: var(--fondo); }
 
 /* publicado 10-sep-2026 13:55 */
+
+/* Preguntas dentro del guion de un paso (24-sep-2026, fila 116,
+   docs/PREGUNTAS-EN-EL-GUION.md): las respuestas y sus líneas, sangradas. */
+.guion-pregunta-fila { margin: 4px 0; font-size: 13px; }
+.guion-opciones { margin: 6px 0 4px 18px; display: flex; flex-direction: column; gap: 8px; }
+.guion-opcion { border-left: 3px solid var(--azul-claro); padding-left: 10px; }
+.guion-opcion-lineas { margin-left: 16px; display: flex; flex-direction: column; gap: 6px; }
+.guion-subfila { background: var(--fondo); border-radius: 6px; padding: 4px 6px; }
+.guion-opcion-cabecera { display: flex; gap: 6px; align-items: center; }
+.guion-opcion-cabecera .guion-opcion-texto { flex: 1; font-weight: 600; }

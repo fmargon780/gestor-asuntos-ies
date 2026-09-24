@@ -118,3 +118,19 @@ body.con-visor .mesa-col-consulta, body.con-lector .mesa-col-consulta { grid-col
 .hito-nota.hito-nota-auto { background: none; padding-left: 0; color: var(--tinta-suave); }
 .guion-anadir-propio { font-size: 12px; align-self: flex-start; margin-top: 6px; }
 .mesa-normativa .hito-normativa-titulo { font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--tinta-suave); }
+
+/* ---------- preguntas dentro del guion (fila 116) ---------- */
+.guion-pregunta .guion-paso-linea { display: flex; align-items: baseline; gap: 6px; }
+.guion-pregunta-marca { font-weight: 700; color: var(--azul); }
+.guion-respuestas { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 2px 22px; }
+.guion-respuesta {
+  font: inherit; font-size: 12.5px; cursor: pointer; border: 1px solid var(--linea); border-radius: 14px;
+  padding: 3px 12px; background: var(--papel); color: var(--tinta);
+}
+.guion-respuesta:hover { border-color: var(--azul); }
+.guion-respuesta.elegida { background: var(--azul); border-color: var(--azul); color: #fff; }
+.guion-paso.guion-de-opcion { margin-left: 22px; border-left: 2px solid var(--azul-claro); padding-left: 8px; }
+.guion-plegadas { margin-top: 8px; font-size: 12px; color: var(--tinta-suave); }
+.guion-plegadas summary { cursor: pointer; }
+.guion-paso-plegada { opacity: .7; padding: 2px 0 2px 22px; }
+.guion-pregunta.hecho .guion-paso-texto { text-decoration: none; color: var(--tinta); }

@@ -86,8 +86,20 @@ Escape; con la mesa abierta, el título "Hitos" del recuadro no sale (`:has(#fic
   hecho, noaplica, quien, cuando } }` y `guionPropio: [{ id, texto }]` (`normalizarHito` los
   conserva). `Hitos.guionDe(a, h)` junta el guion del paso (por `origenGuia`) con eso; un paso que
   desaparece de la guía deja de verse.
+- **Preguntas en el guion** (24-sep-2026, fila 116, `docs/PREGUNTAS-EN-EL-GUION.md`): una línea
+  puede ser `{ id, texto, explicacion, pregunta: true, opciones: [{ id, texto, lineas: [...] }] }`.
+  Un solo nivel (`GuiasGuion.normalizar(lista, dentro)` quita la marca dentro de una opción) y sin
+  `accion` ni `normativa`. Si la respuesta cambia los hitos de después, el responsable o el plazo,
+  es un hito-pregunta; si solo cambia las tareas del mismo hito, una pregunta en el guion. Editor:
+  casilla «Es una pregunta» en cada línea, con «+ Añadir respuesta» y «+ Añadir línea». En el hito,
+  `guionElegido: { idPregunta: idOpcion }` (`Hitos.elegirEnGuion`; `normalizarHito` lo conserva).
+  `Hitos.guionDe` devuelve lo que se ve (la pregunta, hecha si está respondida, y detrás las líneas
+  de la respuesta elegida, `deOpcion`) y, en `.plegadas`, lo ya marcado de otra respuesta. En la
+  mesa (`js/hito-mesa-guion.js`), un botón por respuesta, las líneas de la elegida sangradas y lo
+  plegado al final, en gris. La biblioteca copia y compara el guion entero
+  (`GuiasGuion.textoLegible`). En el mapa, «¿» en la caja de un paso cuyo guion tiene pregunta.
 - **Se marca solo** (`Hitos.marcarGuionPorAccion(a | clave, idHito, accion)`, el primer paso sin
-  marcar con esa acción; si falla, ámbar con `U.accesorio`): `generar` en
+  marcar con esa acción, en el orden en que se ven, nunca de una respuesta no elegida; si falla, ámbar con `U.accesorio`): `generar` en
   `js/plantillas-documento.js` (generar con hito); `registrar` al terminar el registro desde el ⋯
   del documento; `comunicar` en `apuntarElRastro` de `js/correo.js` (con `comunicarHito`); `anadir`
   al apuntar un documento nuevo al hito desde el ordenador (`js/documentos.js`), desde "Por

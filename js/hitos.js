@@ -129,6 +129,8 @@ var Hitos = (function () {
     /* El estado del guion (fila 109, js/hitos-guion.js): solo si lo hay. */
     if (h && h.guionHecho && typeof h.guionHecho === 'object') salida.guionHecho = h.guionHecho;
     if (h && Array.isArray(h.guionPropio) && h.guionPropio.length) salida.guionPropio = h.guionPropio;
+    /* Fila 116: la respuesta a cada pregunta del guion, solo si la hay. */
+    if (h && h.guionElegido && typeof h.guionElegido === 'object' && Object.keys(h.guionElegido).length) salida.guionElegido = h.guionElegido;
     if (esDecision) {
       salida.opciones = (Array.isArray(h && h.opciones) ? h.opciones : []).map(function (o) {
         return {
