@@ -378,3 +378,34 @@ verdad" (los bugs que las propias pruebas cazaron antes de producción).
 Compruébalo contra lo que de verdad dice `main` antes de sustituir nada. Si la sesión tiene
 `git push` de verdad (terminal u ordenador de Francisco), es mucho más simple que ir fichero a
 fichero con la API.
+
+## Nota para la próxima sesión: docs/HISTORIA.md se corta otra vez, ahora en la fila 82
+
+24-sep-2026, sesión programada (taller automático, sin `git push`, fila 128): al cerrar la fila
+128, la subida de documentación dejó `docs/HISTORIA.md` cortado. **No es una corrupción: es que
+la fila nueva se subió bien, pero el fichero entero (185 KB) no cupo de una vez** (regla 12).
+Hoy en `main`, `docs/HISTORIA.md` empieza en la fila 128 y llega completo, byte a byte
+comprobado, hasta el final de la entrada de la **fila 83** (20-sep-2026, "las plantillas de
+documento y de correo del centro"). A partir de ahí (fila 82 hacia atrás, hasta "Lo anterior al
+18-sep-2026") falta.
+
+**No se ha perdido ninguna información de verdad**: cada fila que falta en `docs/HISTORIA.md`
+sigue completa en su propio documento de `docs/` (`docs/FORMULARIOS-OFICIALES.md`,
+`docs/FIRMANTES-Y-MEMBRETE.md`, `docs/CARGAR-BIBLIOTECA.md`, `docs/BIBLIOTECA-DE-HITOS.md`...) y
+en el propio historial de commits de GitHub (esta sesión solo tiene un clon superficial,
+`--depth 1`, así que no ha podido comprobar el historial completo ella misma, pero el commit
+donde se escribió esa parte de `docs/HISTORIA.md` sigue ahí). No hay ninguna prisa de datos por
+esto: es un diario que "casi nunca se lee".
+
+Dos intentos de completarlo en esta misma sesión (uno propio, subiendo por trozos cada vez más
+grandes; dos con una sesión auxiliar) se pararon solos, sin corromper nada, por el mismo motivo
+de la regla 12: pasado un cierto tamaño (entre 111 KB, que sí subió bien, y 148 KB, que ya no),
+la propia respuesta se queda sin aire a mitad de frase (el mismo aviso que ya deja la sección
+"Cuidado con varias sesiones a la vez", de la fila 115). No se ha reintentado más veces, tal
+como pide la regla.
+
+**Para la próxima sesión**: si tiene `git push` de verdad (terminal u ordenador de Francisco),
+esto se arregla en un segundo, con el `docs/HISTORIA.md` completo del propio repositorio en
+disco. Si no lo tiene, seguir subiendo desde donde se quedó (la fila 83 ya está bien: empezar
+justo después), en trozos de unas 150-200 líneas cada vez (no de golpe), comprobando el tamaño
+después de cada uno antes de seguir con el siguiente.
