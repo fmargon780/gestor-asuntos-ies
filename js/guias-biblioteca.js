@@ -328,7 +328,8 @@ var GuiasBiblioteca = (function () {
       requisitos: m.requisitos, comunicacion: m.comunicacion,
       soloInformativo: m.soloInformativo, normativa: m.normativa,
       /* Sin estos dos, editar un modelo los perdía (fila 102). */
-      formularios: m.formularios, plantillasDocumento: m.plantillasDocumento
+      formularios: m.formularios, plantillasDocumento: m.plantillasDocumento,
+      guion: m.guion   /* fila 109 */
     }], [], []);
     if (!pasos || !pasos.length) return;
     try {

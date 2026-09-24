@@ -1,0 +1,119 @@
+/* ============================================================
+   hito-mesa.css — el hito a pantalla completa: la mesa de trabajo
+   (24-sep-2026, fila 109, docs/EL-HITO-A-PANTALLA-COMPLETA.md,
+   js/hito-mesa.js).
+
+   Con la mesa abierta, `#ficha-guia` lleva `con-mesa`: se esconden los
+   demás hitos, la cuenta y "+ Añadir un hito", y el hito abierto ocupa
+   todo el sitio con su cuerpo en tres columnas. Con el documento a la
+   derecha (visor o lector), la tercera columna baja debajo.
+   ============================================================ */
+
+/* La lista, compacta: una línea por hito, nada desplegado. */
+.hitos-panel .hito { padding: 8px 12px; }
+
+.hitos-panel.con-mesa .hito:not(.hito-en-mesa),
+.hitos-panel.con-mesa .hitos-cuenta,
+.hitos-panel.con-mesa .hitos-huerfanos,
+.hitos-panel.con-mesa > div > .boton-ancho { display: none; }
+.hitos-panel.con-mesa .lista-hitos { gap: 0; }
+.hito.hito-en-mesa { border: 0; border-radius: 0; background: none; box-shadow: none; padding: 0; }
+.hito-en-mesa > .hito-linea { display: none; }
+.hito-en-mesa > .hito-cuerpo { margin: 0; gap: 12px; }
+.hito-en-mesa .hito-requisitos-pedir { display: none; }   /* va en "Comunicar" */
+
+/* ---------- la cabecera ---------- */
+.mesa-cabecera { display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--linea); padding-bottom: 10px; }
+.mesa-fila-arriba { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.mesa-camino { font-size: 12px; color: var(--tinta-suave); }
+.mesa-titulo-fila { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.mesa-titulo { margin: 0; font-size: 20px; flex: 1 1 300px; }
+.mesa-hecho-resaltado { box-shadow: 0 0 0 3px rgba(30, 122, 70, .25); }
+.mesa-etiquetas { display: flex; gap: 6px; flex-wrap: wrap; }
+.mesa-etq {
+  font: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+  border: 1px solid var(--linea); border-radius: 12px; padding: 3px 10px;
+  background: #eef1f5; color: #4c5968;
+}
+.mesa-etq-hecho, .mesa-etq-verde { background: #e2f4e6; color: #1f6b33; border-color: #c6e6cf; }
+.mesa-etq-encurso, .mesa-etq-ambar { background: #fff4d6; color: #8a6100; border-color: #e6c377; }
+.mesa-etq-rojo { background: #fdecec; color: #a4302a; border-color: #f2c4c0; }
+.mesa-etq-noaplica { opacity: .7; }
+.mesa-tira { display: flex; gap: 4px; flex-wrap: wrap; }
+.mesa-tira-hito {
+  font: inherit; font-size: 12px; cursor: pointer; max-width: 220px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  border: 1px solid var(--linea); border-radius: 12px; padding: 2px 9px;
+  background: var(--papel); color: var(--tinta-suave);
+}
+.mesa-tira-hito.hecho { color: #1f6b33; }
+.mesa-tira-hito.actual { background: var(--azul); border-color: var(--azul); color: #fff; }
+
+/* ---------- las tres columnas ---------- */
+.mesa-columnas {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 16px; align-items: start;
+}
+body.con-visor .mesa-columnas, body.con-lector .mesa-columnas { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); }
+body.con-visor .mesa-col-consulta, body.con-lector .mesa-col-consulta { grid-column: 1 / -1; }
+@media (max-width: 1100px) {
+  .mesa-columnas { grid-template-columns: minmax(0, 1fr); }
+}
+.mesa-col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.mesa-bloque { display: flex; flex-direction: column; gap: 8px; }
+.mesa-bloque + .mesa-bloque { border-top: 1px solid var(--linea); padding-top: 10px; }
+.mesa-bloque-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.mesa-bloque-titulo { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .02em; color: var(--tinta-suave); }
+
+/* El guion */
+.mesa-guion-cuenta { font-size: 12px; color: var(--tinta-suave); }
+.mesa-barra { height: 6px; background: #eef1f5; border-radius: 4px; overflow: hidden; margin: 2px 0 8px; }
+.mesa-barra > span { display: block; height: 100%; background: #2f8a55; }
+.guion-paso { padding: 6px 0; border-bottom: 1px dashed var(--linea); }
+.guion-paso-linea { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
+.guion-paso-texto { font-weight: 600; font-size: 14px; }
+.guion-paso.hecho .guion-paso-texto, .guion-paso.noaplica .guion-paso-texto { text-decoration: line-through; color: var(--tinta-suave); font-weight: 400; }
+.guion-paso-explicacion { font-size: 12px; color: var(--tinta-suave); margin: 2px 0 0 24px; }
+.guion-paso-botones { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 4px 0 0 24px; font-size: 12px; }
+.mesa-cita { font-size: 12px; background: #e3eefb; color: #1d4f86; border-radius: 10px; padding: 1px 8px; text-decoration: none; }
+.mesa-pregunta-opciones { display: flex; flex-direction: column; gap: 6px; }
+.mesa-opcion {
+  font: inherit; text-align: left; cursor: pointer; padding: 10px 12px;
+  border: 1px solid var(--linea); border-radius: 8px; background: var(--papel);
+}
+.mesa-opcion.elegida { background: #e2f4e6; border-color: #9fd3b0; color: #1f6b33; font-weight: 600; }
+
+/* Los documentos, en tabla */
+.hito-en-mesa .hito-documentos { display: flex; flex-direction: column; gap: 0; }
+.hito-documento.mesa-doc {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 8px; align-items: center;
+  border: 0; border-bottom: 1px solid var(--linea); border-radius: 0; background: none; padding: 6px 2px; font-size: 13px;
+}
+.mesa-doc-nombre { display: flex; flex-direction: column; min-width: 0; }
+.mesa-doc-tipo { font-weight: 700; }
+.mesa-doc-nombre .hito-doc-abrir { text-align: left; color: var(--tinta-suave); font-size: 12px; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mesa-doc-nombre .hito-doc-abrir:hover { text-decoration: underline; }
+.mesa-doc-origen { font-size: 11px; color: var(--tinta-suave); }
+.mesa-doc-gemelo { font: inherit; font-size: 11px; text-align: left; border: 0; background: none; color: var(--azul); cursor: pointer; padding: 0 0 0 12px; }
+.mesa-doc-estado { font-size: 11px; font-weight: 600; border-radius: 10px; padding: 1px 8px; white-space: nowrap; }
+.mesa-doc-verde { background: #e2f4e6; color: #1f6b33; }
+.mesa-doc-ambar { background: #fff4d6; color: #8a6100; }
+.mesa-doc-gris { background: #eef1f5; color: #6b7785; }
+.mesa-doc-acciones { display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+.mesa-seleccion { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; background: #e3eefb; border-radius: 8px; padding: 6px 8px; font-size: 12px; }
+.mesa-seleccion.oculto { display: none; }
+.mesa-soltar { border: 1px dashed #b9c6d6; border-radius: 8px; padding: 8px; text-align: center; font-size: 12px; color: var(--tinta-suave); }
+.mesa-soltar.encima { background: #e3eefb; border-color: var(--azul); }
+.mesa-plantilla { display: flex; gap: 8px; align-items: center; font-size: 13px; padding: 4px 0; }
+.mesa-plantilla-nombre { flex: 1; min-width: 0; }
+.mesa-icono-doc { font-size: 10px; font-weight: 700; color: #fff; background: #2b6cb0; border-radius: 3px; padding: 1px 4px; }
+.mesa-otras-plantillas summary { cursor: pointer; font-size: 12px; color: var(--tinta-suave); }
+
+/* Consulta: comunicar y notas */
+.mesa-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.mesa-chip { display: inline-flex; gap: 4px; align-items: center; font-size: 12px; border: 1px solid var(--linea); border-radius: 12px; padding: 2px 9px; cursor: pointer; }
+.mesa-chip:has(input:checked) { background: #e3eefb; border-color: #a9c6e6; }
+.mesa-comunicar-botones { display: flex; gap: 6px; flex-wrap: wrap; }
+.hito-nota.hito-nota-auto { background: none; padding-left: 0; color: var(--tinta-suave); }
+.guion-anadir-propio { font-size: 12px; align-self: flex-start; margin-top: 6px; }
+.mesa-normativa .hito-normativa-titulo { font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--tinta-suave); }

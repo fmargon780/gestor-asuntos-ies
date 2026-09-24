@@ -394,6 +394,7 @@
       if (comunicarHitoActual && window.Hitos && typeof Hitos.anadirNota === 'function') {
         try {
           await Hitos.anadirNota(comunicarHitoActual.claveAsunto, comunicarHitoActual.idHito, texto);
+          if (Hitos.marcarGuionPorAccion) await Hitos.marcarGuionPorAccion(a, comunicarHitoActual.idHito, 'comunicar');   /* fila 109 */
           if (window.HitosPanel) window.HitosPanel.programarRepintado();
         } catch (e) { /* no crítico */ }
       }

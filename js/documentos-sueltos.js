@@ -363,6 +363,7 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
       await Hitos.anadirDocumento(nombreAsunto, hito.id, s.nombre);
       if (window.HitosRequisitos) {
         try { await HitosRequisitos.marcarPorDocumento(nombreAsunto, hito.id, s.nombre); } catch (e4) { /* no crítico */ }
+        if (Hitos.marcarGuionPorAccion) await Hitos.marcarGuionPorAccion(nombreAsunto, hito.id, 'anadir');   /* fila 109 */
       }
     } catch (e3) {
       U.accesorio('Documento metido, pero no he podido apuntarlo al hito', e3);

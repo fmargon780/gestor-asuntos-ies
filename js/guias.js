@@ -182,7 +182,9 @@ var Guias = (function () {
         cuerpo: limpiar((p && p.cuerpo) || ''),
         opciones: normalizarOpciones(p && p.opciones),
         requisitos: normalizarRequisitos(p && p.requisitos),
-        comunicacion: normalizarComunicacion(p && p.comunicacion)
+        comunicacion: normalizarComunicacion(p && p.comunicacion),
+        /* El guion del hito (fila 109, js/guias-guion.js), a cualquier nivel. */
+        guion: window.GuiasGuion ? GuiasGuion.normalizar(p && p.guion) : ((p && p.guion) || [])
       }, normalizarExtra(p));
       /* Un paso-pregunta se resuelve eligiendo una opción: no lleva
          requisitos, comunicación, normativa ni formularios, a ningún
@@ -193,6 +195,7 @@ var Guias = (function () {
         salida.normativa = [];
         salida.formularios = [];
         salida.plantillasDocumento = [];
+        salida.guion = [];
         salida.soloInformativo = false;
       }
       return salida;
@@ -691,6 +694,7 @@ var Guias = (function () {
         if (window.GuiasDocumentos && caja.querySelector(':scope > .paso-documentos')) {
           nivel[i].plantillasDocumento = GuiasDocumentos.leer(caja);   /* fila 102 */
         }
+        if (window.GuiasGuion && caja.querySelector(':scope > .paso-guion')) nivel[i].guion = GuiasGuion.leer(caja);   /* fila 109 */
 
         /* "Solo informativo" y "Normativa" (20-sep-2026, fila 79): igual,
            solo en los pasos que no son pregunta. */
@@ -735,6 +739,7 @@ var Guias = (function () {
             if (window.GuiasDocumentos && sc.querySelector(':scope > .paso-documentos')) {
               sp.plantillasDocumento = GuiasDocumentos.leer(sc);   /* fila 102 */
             }
+            if (window.GuiasGuion && sc.querySelector(':scope > .paso-guion')) sp.guion = GuiasGuion.leer(sc);   /* fila 109 */
             var esPreg = sc.querySelector(':scope > .paso-es-pregunta-fila .subpaso-es-pregunta');
             if (esPreg && !esPreg.checked) sp.opciones = [];
             return sp;
@@ -915,6 +920,12 @@ var Guias = (function () {
           d.insertAdjacentHTML('beforeend', GuiasDocumentos.bloqueHTML(p.plantillasDocumento));
           restaurarAbierto(d.querySelector(':scope > .paso-documentos'), abiertos, i, '');
           GuiasDocumentos.enganchar(d);
+        }
+        /* «Guion de este paso» (fila 109, js/guias-guion.js). */
+        if (!pregunta && window.GuiasGuion) {
+          d.insertAdjacentHTML('beforeend', GuiasGuion.bloqueHTML(p.guion));
+          restaurarAbierto(d.querySelector(':scope > .paso-guion'), abiertos, i, '');
+          GuiasGuion.enganchar(d, function (mutador) { recoger(); mutador(nivel[i].guion = nivel[i].guion || []); pintar(); });
         }
 
         /* "Solo informativo" y "Normativa" (20-sep-2026, fila 79,
@@ -1117,6 +1128,13 @@ var Guias = (function () {
               sc.insertAdjacentHTML('beforeend', GuiasDocumentos.bloqueHTML(sp.plantillasDocumento));
               restaurarAbierto(sc.querySelector(':scope > .paso-documentos'), abiertos, i, sp.id);
               GuiasDocumentos.enganchar(sc);
+            }
+            if (window.GuiasGuion) {   /* fila 109 */
+              sc.insertAdjacentHTML('beforeend', GuiasGuion.bloqueHTML(sp.guion));
+              restaurarAbierto(sc.querySelector(':scope > .paso-guion'), abiertos, i, sp.id);
+              GuiasGuion.enganchar(sc, function (mutador) {
+                recoger(); var spx = nivel[i].opciones[j].pasos[k]; mutador(spx.guion = spx.guion || []); pintar();
+              });
             }
           }
 

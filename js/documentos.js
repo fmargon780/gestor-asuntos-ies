@@ -65,7 +65,13 @@ var Documentos = (function () {
     if (opciones && opciones.ponerNombre) {
       pintarFormulario({ modo: 'renombrar', nombreActual: opciones.ponerNombre });
     }
-    if (opciones && opciones.irDirectoAAnadir) {
+    /* Un fichero soltado encima de la mesa del hito (fila 109): lo mismo
+       que "Desde el ordenador", con el fichero ya elegido. */
+    if (opciones && opciones.ficheroSoltado) {
+      var soltado = opciones.ficheroSoltado;
+      pintarFormulario({ modo: 'anadir', nombreActual: soltado.name,
+        handle: { kind: 'file', name: soltado.name, getFile: function () { return Promise.resolve(soltado); } } });
+    } else if (opciones && opciones.irDirectoAAnadir) {
       try { await anadirDesdeOrdenador(); } catch (e) { /* AbortError: se queda en la lista */ }
     }
     await esperar;
@@ -664,6 +670,7 @@ var Documentos = (function () {
           try { await HitosRequisitos.marcarPorDocumento(asuntoActual.nombre, hitoActual.id, nombre); }
           catch (e4) { /* no crítico */ }
         }
+        if (opciones.modo === 'anadir' && Hitos.marcarGuionPorAccion) await Hitos.marcarGuionPorAccion(asuntoActual, hitoActual.id, 'anadir');   /* fila 109 */
         if (window.HitosPanel) {
           window.HitosPanel.desplegarAlAbrir(asuntoActual.nombre, hitoActual.id);
           window.HitosPanel.programarRepintado();

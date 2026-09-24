@@ -226,6 +226,8 @@
           caja.appendChild(HitosPanelLista.bloqueDeHitos(a, hitos, datos.ajustes, abierto, nombresDeLaCarpeta));
           volverADesplegar(caja, desplegados);
           aplicarDesplegarPendiente(caja, clave);
+          /* La mesa del hito abierto, si la hay (fila 109, js/hito-mesa.js). */
+          if (window.HitoMesa) HitoMesa.aplicar(caja, a, hitos, datos.ajustes, abierto);
         } else {
           pintarVacio(caja, a, abierto, errorLectura);
         }
@@ -285,6 +287,8 @@
     if (!pendienteDesplegar || pendienteDesplegar.clave !== clave) return;
     var idHito = pendienteDesplegar.idHito;
     pendienteDesplegar = null;
+    /* Desde la fila 109, "desplegar" es entrar en la mesa de ese hito. */
+    if (window.HitoMesa) { HitoMesa.abrirAlPintar(clave, idHito); return; }
     var filas = caja.querySelectorAll('.hito');
     for (var i = 0; i < filas.length; i++) {
       if (filas[i].dataset.id !== idHito) continue;

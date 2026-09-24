@@ -95,6 +95,12 @@ de `App` va después del fichero que lo define.
 | `js/ficha-nombre-acciones.js` | El menú de tres puntos del `<h2>` del nombre del asunto (Editar, Borrar, fila 52) y, debajo, la fila de copiar de un gesto (Asunto, Ruta, NIE, Nombre, DNI/CIF, filas 58 y 98) |
 | `js/copiar-ruta.js` | `RutaCarpetas` (fila 98): el botón «Ruta» de la fila de copiar y el bloque «Rutas de las carpetas en este ordenador» de Ajustes → El centro (`localStorage`) |
 | `js/ficha-tarjetas.js` | La ficha del asunto en tarjetas (fila 107): la cuadrícula, los resúmenes, abrir una en grande con las demás como pestañas, la franja de documentos y Escape |
+| `js/hito-mesa.js`, `css/hito-mesa.css` | El hito a pantalla completa (fila 109): abrir y cerrar la mesa, su cabecera (etiquetas, menú ⋯, tira de hitos) y Escape |
+| `js/hito-mesa-guion.js` | La columna del guion de la mesa, y la pregunta de un hito-pregunta (fila 109) |
+| `js/hito-mesa-documentos.js` | La tabla de documentos de la mesa, sus gemelos, la selección de varios, las plantillas y soltar un fichero (fila 109) |
+| `js/hito-mesa-comunicar.js` | Los destinatarios de «Comunicar» en la mesa, como chips (fila 109) |
+| `js/hitos-guion.js` | El guion de un hito: `Hitos.guionDe`, `marcarGuion`, `marcarGuionPorAccion`, `anadirGuionPropio` (fila 109) |
+| `js/guias-guion.js` | «Guion de este paso» en el editor de la guía, y `GuiasGuion.normalizar` (fila 109) |
 | `css/ficha-tarjetas.css` | El aspecto de la ficha en tarjetas (fila 107) |
 | `js/ficha-documentos.js` | Los documentos de la carpeta, en la ficha del asunto (separado de `js/ficha-asunto.js` en la fila 26); pone la clase `vacio` al bloque cuando no hay ninguno (fila 51); botón "Documentos ▾" en la cabecera del bloque (fila 52); el original "SIN SELLAR" en gris y "Asociar a un hito" en cada fila (fila 58) |
 | `js/ficha-tercero.js`, `css/ficha-tercero.css` | "Datos y contacto" del tercero: la línea resumen y la ventana "Ver todo" de personal y del resto (separado de `js/ficha-asunto.js` en la fila 37) |

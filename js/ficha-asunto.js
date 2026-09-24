@@ -48,7 +48,7 @@
        MISMA nota mientras la ficha se repinta sola por debajo. */
     if (window.Notas) window.Notas.olvidarBorrador();
     /* Al entrar, siempre la cuadrícula de tarjetas (fila 107). */
-    FichaTarjetas.alEntrar();
+    FichaTarjetas.alEntrar(a);
     App.ir('asunto');
     pintar();
 
