@@ -5,34 +5,39 @@
    vea entero, igual que se hizo con Séneca en la fila 53
    (js/seneca-cuadro.js).
 
-   El problema que resolvía la fila era que el cuadro salía muy alto y
-   estrecho, y "Documentos de este asunto" (js/correo-adjuntos.js, que
-   ya pintaba la lista desplegada, con su casilla y su tamaño) se
-   quedaba fuera de la pantalla. Aquí no cambia ningún funcionamiento:
-   el borrador se sigue dejando en Gmail o en el correo del ordenador,
-   nunca se envía solo. Solo cambia la disposición y de qué fichero
-   sale.
+   Este fichero es dueño de todo lo que solo usa el cuadro de Correo:
+   a quién se escribe (`elegidos`), la copia oculta de los grupos
+   (`cco`/`ccoSinCorreo`), qué documentos se han adjuntado por última
+   vez, y —desde el 24-sep-2026 (fila 115, docs/ENVIAR-DESDE-EL-ASUNTO.md)—
+   el botón "Enviar" y el resumen que lo confirma. Lo que necesita de
+   js/correo.js —el asunto del mensaje, el cuerpo con su plantilla, a
+   quién se escribe en palabras, apuntar el rastro— se usa a través de
+   `window.CorreoNucleo` (mismo patrón que ya usaba js/seneca-cuadro.js).
 
-   Este fichero pasa a ser dueño de todo lo que solo usa el cuadro de
-   Correo: a quién se escribe (`elegidos`), la copia oculta de los
-   grupos (`cco`/`ccoSinCorreo`) y qué documentos se han adjuntado por
-   última vez. Se reinicia entero cada vez que se llama a `cuerpoHtml`,
-   igual que hace `SenecaCuadro.cuerpoHtml` con lo suyo. Lo que
-   necesita de js/correo.js —el asunto del mensaje, el cuerpo con su
-   plantilla, a quién se escribe en palabras, apuntar el rastro— se usa
-   a través de `window.CorreoNucleo` (mismo patrón que ya usaba
-   js/seneca-cuadro.js); lo que necesita ESTE fichero al revés —"Para"
-   y la copia oculta, para el rastro y para js/correo-adjuntos.js— sale
-   en `window.CorreoCuadro`.
+   EL BOTÓN "ENVIAR" (fila 115): sustituye a "Preparar borrador con los
+   documentos". La aplicación ya NO deja nunca todo listo sin más: al
+   pulsar "Enviar" se pinta, dentro del mismo cuadro (nunca un segundo
+   cuadro encima: regla de U.preguntar), un resumen de lo que se va a
+   mandar — Para, Copia oculta, Asunto, primeras líneas del texto y los
+   documentos con su tamaño — con "Confirmar y enviar" y "Volver". El
+   formulario (`#correo-formulario`) y el resumen (`#correo-resumen`)
+   son dos bloques HERMANOS dentro del mismo `#correo-caja`: "Enviar" y
+   "Volver" solo alternan cuál de los dos se ve (con la clase `oculto`),
+   sin volver a montar el formulario ni perder nada de lo escrito a
+   mano. Al confirmar, `window.CorreoEnviar` llama a la aplicación web
+   de Apps Script; si falla, el aviso sale en rojo dentro del propio
+   resumen y el formulario sigue intacto detrás, listo para reintentar
+   sin haber perdido el texto. "Abrir en Gmail" y "Abrir en el correo
+   del ordenador" se quedan, como botones secundarios.
 
-   Va después de js/correo.js y de js/correo-adjuntos.js en
-   index.html. */
+   Va después de js/correo.js, js/correo-adjuntos.js y
+   js/correo-enviar.js en index.html. */
 var CorreoCuadro = (function () {
 
   var elegidos = {};             /* qué correos van marcados */
   var cco = {};                  /* direcciones en copia oculta, de los grupos */
   var ccoSinCorreo = [];         /* nombres de miembros de un grupo sin ningún correo */
-  var documentosAdjuntados = []; /* los que ha llevado el último borrador preparado */
+  var documentosAdjuntados = []; /* los que ha llevado el último correo enviado de verdad */
   var plantillaElegida = '';
   var textoProgramado = '';
 
@@ -161,7 +166,8 @@ var CorreoCuadro = (function () {
      patrón que `SenecaCuadro.cuerpoHtml` (fila 53) — ancho hasta
      1100px, y a partir de 900px, dos columnas: a la izquierda
      destinatarios, asunto y los documentos que se adjuntan; a la
-     derecha el texto del correo. */
+     derecha el texto del correo. Todo el formulario va dentro de
+     `#correo-formulario`, hermano de `#correo-resumen` (fila 115). */
   function cuerpoHtml(a, persona, bloqueAdjuntos, opcionesGrupo) {
     elegidos = {};
     cco = {};
@@ -184,26 +190,31 @@ var CorreoCuadro = (function () {
       correos.forEach(function (c) { if (elegidos[c.dir] === undefined) elegidos[c.dir] = true; });
     }
 
-    return '<div class="correo-grid">' +
-             '<div class="correo-col-izq">' +
-               bloqueDestinatarios(a, correos, persona, otroInicial, opcionesGrupo) +
-               bloqueAsunto(a) +
-               (bloqueAdjuntos || '') +
+    return '<div id="correo-formulario">' +
+             '<div class="correo-grid">' +
+               '<div class="correo-col-izq">' +
+                 bloqueDestinatarios(a, correos, persona, otroInicial, opcionesGrupo) +
+                 bloqueAsunto(a) +
+                 (bloqueAdjuntos || '') +
+               '</div>' +
+               '<div class="correo-col-der">' +
+                 '<div id="correo-comunes-der">' + bloqueCuerpo(a) + '</div>' +
+               '</div>' +
              '</div>' +
-             '<div class="correo-col-der">' +
-               '<div id="correo-comunes-der">' + bloqueCuerpo(a) + '</div>' +
+             '<div class="correo-botones" style="margin-top:14px">' +
+               '<button type="button" class="boton" id="correo-copiar-para">Copiar Para</button>' +
+               '<button type="button" class="boton" id="correo-copiar-asunto">Copiar Asunto</button>' +
+               '<button type="button" class="boton" id="correo-copiar-cuerpo">Copiar Cuerpo</button>' +
              '</div>' +
+             '<div class="correo-botones" style="margin-top:8px">' +
+               '<button type="button" class="boton boton-principal" id="correo-enviar">Enviar</button>' +
+               '<button type="button" class="boton" id="correo-gmail">Abrir en Gmail</button>' +
+               '<button type="button" class="boton" id="correo-ordenador">Abrir en el correo del ordenador</button>' +
+             '</div>' +
+             '<p class="nota">"Enviar" manda el correo de verdad, tras confirmar el resumen. ' +
+             '"Abrir en Gmail" y "Abrir en el correo del ordenador" son para escribir allí, sin adjuntos.</p>' +
            '</div>' +
-           '<div class="correo-botones" style="margin-top:14px">' +
-             '<button type="button" class="boton" id="correo-copiar-para">Copiar Para</button>' +
-             '<button type="button" class="boton" id="correo-copiar-asunto">Copiar Asunto</button>' +
-             '<button type="button" class="boton" id="correo-copiar-cuerpo">Copiar Cuerpo</button>' +
-           '</div>' +
-           '<div class="correo-botones" style="margin-top:8px">' +
-             '<button type="button" class="boton boton-principal" id="correo-gmail">Abrir en Gmail</button>' +
-             '<button type="button" class="boton" id="correo-ordenador">Abrir en el correo del ordenador</button>' +
-           '</div>' +
-           '<p class="nota">Se abre la ventana de redactar con todo puesto. Enviar, lo envías tú.</p>';
+           '<div id="correo-resumen" class="oculto"></div>';
   }
 
   /* La línea gris de "Lo pidió...", encima de la lista de "Para"
@@ -317,8 +328,11 @@ var CorreoCuadro = (function () {
     $('correo-copiar-para').onclick = function () { copiar(paraDelCuadro(), this); };
     $('correo-copiar-asunto').onclick = function () { copiar($('correo-asunto').value, this); };
 
-    /* Estos tres son los que quieren decir "esto ya va para fuera", y
-       por eso son los que dejan rastro en el asunto. */
+    /* "Copiar Cuerpo", "Abrir en Gmail" y "Abrir en el correo del
+       ordenador" son para quien quiere escribir por su cuenta: dejan
+       el mismo rastro de siempre ("Correo a X"), distinto del que deja
+       un envío real ("Correo enviado a X", ver textoDeLaNota en
+       js/correo.js). */
     $('correo-copiar-cuerpo').onclick = function () {
       copiar($('correo-cuerpo-texto').value, this);
       if (n().apuntarElRastro) n().apuntarElRastro(a);
@@ -326,12 +340,7 @@ var CorreoCuadro = (function () {
     $('correo-gmail').onclick = function () { abrirGmail(); if (n().apuntarElRastro) n().apuntarElRastro(a); };
     $('correo-ordenador').onclick = function () { abrirDelOrdenador(); if (n().apuntarElRastro) n().apuntarElRastro(a); };
 
-    if (window.CorreoAdjuntos) {
-      CorreoAdjuntos.enganchar(a, function (nombres) {
-        documentosAdjuntados = nombres;
-        if (n().apuntarElRastro) n().apuntarElRastro(a);
-      });
-    }
+    engancharEnviar(a);
   }
 
   function engancharPlantilla(a) {
@@ -371,13 +380,186 @@ var CorreoCuadro = (function () {
     engancharPlantilla(a);
   }
 
+  /* ---------- ENVIAR: resumen y confirmación (fila 115) ---------- */
+
+  function ultimoHiloDelAsunto(a) {
+    var hilos = a.ficha && a.ficha.hilos;
+    if (!hilos || !hilos.length) return '';
+    return hilos[hilos.length - 1].id || '';
+  }
+
+  /* Primeras líneas del cuerpo, recortadas: ni una pared de texto en
+     el resumen, ni una sola palabra sin decir nada. */
+  function primerasLineas(texto) {
+    var lineas = String(texto || '').split('\n');
+    var recorte = lineas.slice(0, 4).join('\n');
+    if (recorte.length > 400) return recorte.slice(0, 400) + '…';
+    if (lineas.length > 4) return recorte + '…';
+    return recorte;
+  }
+
+  function marcasDeAdjuntos() {
+    return Array.prototype.filter.call(
+      document.querySelectorAll('#correo-formulario .adjunto-marca'),
+      function (c) { return c.checked; }
+    ).map(function (c) { return c.value; });
+  }
+
+  function engancharEnviar(a) {
+    var boton = $('correo-enviar');
+    if (!boton) return;
+    var conectado = window.CorreoEnviar && CorreoEnviar.tieneConexion();
+    if (!conectado) {
+      boton.textContent = 'Conecta el envío en Ajustes → Enviar correo';
+      boton.onclick = function () { if (window.CorreoEnviar) CorreoEnviar.irAAjustes(); };
+      return;
+    }
+    boton.textContent = 'Enviar';
+    boton.onclick = function () { alPulsarEnviar(a); };
+  }
+
+  function alPulsarEnviar(a) {
+    var para = paraDelCuadro();
+    var ccoTexto = ccoDelCuadro();
+    if (!para && !ccoTexto) { U.aviso('Elige a quién se lo mandas.', 'malo'); return; }
+
+    var marcadas = marcasDeAdjuntos();
+    var totalBytes = (window.CorreoAdjuntos && CorreoAdjuntos.totalBytesDe) ? CorreoAdjuntos.totalBytesDe(marcadas) : 0;
+    if (totalBytes > (window.CorreoAdjuntos ? CorreoAdjuntos.MAXIMO_BYTES : 20 * 1024 * 1024)) {
+      var tl = window.CorreoAdjuntos ? CorreoAdjuntos.tamanoLegible(totalBytes) : (totalBytes + ' B');
+      U.aviso('Eso pesa ' + tl + '. Gmail no admite más de 20 MB.', 'malo');
+      return;
+    }
+
+    pintarResumen(a, {
+      para: para,
+      cco: ccoTexto,
+      asunto: $('correo-asunto') ? $('correo-asunto').value : '',
+      cuerpo: $('correo-cuerpo-texto') ? $('correo-cuerpo-texto').value : '',
+      adjuntos: marcadas
+    });
+  }
+
+  /* Sale DENTRO del mismo cuadro (regla de U.preguntar: nunca un
+     segundo cuadro encima). `#correo-formulario` y `#correo-resumen`
+     son hermanos: se alterna cuál se ve, así que "Volver" no pierde
+     nada de lo escrito a mano, sin tener que volver a montar nada. */
+  function pintarResumen(a, datos) {
+    var formulario = $('correo-formulario');
+    var resumen = $('correo-resumen');
+    if (!formulario || !resumen) return;
+
+    var listaTam = (window.CorreoAdjuntos && CorreoAdjuntos.listaConTamanos) ? CorreoAdjuntos.listaConTamanos() : [];
+    var porNombre = {};
+    listaTam.forEach(function (f) { porNombre[f.nombre] = f.tam; });
+    var tl = window.CorreoAdjuntos ? CorreoAdjuntos.tamanoLegible : function (b) { return b + ' B'; };
+
+    resumen.innerHTML =
+      '<h3 style="margin-top:0">Vas a mandar este correo</h3>' +
+      '<p><strong>Para:</strong> ' +
+        (datos.para ? U.escapar(datos.para) : '<span class="suave">(nadie en Para; va en copia oculta)</span>') +
+      '</p>' +
+      (datos.cco ? '<p><strong>Copia oculta:</strong> ' + U.escapar(datos.cco) + '</p>' : '') +
+      '<p><strong>Asunto:</strong> ' + U.escapar(datos.asunto) + '</p>' +
+      '<p class="nota" style="white-space:pre-wrap">' + U.escapar(primerasLineas(datos.cuerpo)) + '</p>' +
+      (datos.adjuntos.length
+        ? '<p><strong>Documentos</strong></p><ul>' + datos.adjuntos.map(function (nombre) {
+            return '<li>' + U.escapar(nombre) + (porNombre[nombre] !== undefined ? ' · ' + tl(porNombre[nombre]) : '') + '</li>';
+          }).join('') + '</ul>'
+        : '<p class="nota">Sin documentos adjuntos.</p>') +
+      '<div id="correo-resumen-aviso"></div>' +
+      '<div class="correo-botones" style="margin-top:14px">' +
+        '<button type="button" class="boton boton-principal" id="correo-confirmar-envio">Confirmar y enviar</button>' +
+        '<button type="button" class="boton" id="correo-resumen-volver">Volver</button>' +
+      '</div>';
+
+    formulario.className = 'oculto';
+    resumen.className = '';
+
+    $('correo-resumen-volver').onclick = function () {
+      resumen.className = 'oculto';
+      formulario.className = '';
+    };
+    $('correo-confirmar-envio').onclick = function () { confirmarEnvio(a, datos); };
+  }
+
+  async function confirmarEnvio(a, datos) {
+    var boton = $('correo-confirmar-envio');
+    var volver = $('correo-resumen-volver');
+    var avisoEl = $('correo-resumen-aviso');
+    if (avisoEl) avisoEl.innerHTML = '';
+    if (boton) { boton.disabled = true; boton.textContent = 'Enviando…'; }
+    if (volver) volver.disabled = true;
+
+    try {
+      var adjuntosBase64 = [];
+      for (var i = 0; i < datos.adjuntos.length; i++) {
+        var origen = await a.handle.getFileHandle(datos.adjuntos[i]);
+        var fichero = await origen.getFile();
+        var base64 = await CorreoAdjuntos.aBase64(fichero);
+        adjuntosBase64.push({ nombre: datos.adjuntos[i], tipo: fichero.type || 'application/octet-stream', base64: base64 });
+      }
+
+      var respuesta = await CorreoEnviar.enviar({
+        para: datos.para,
+        cco: datos.cco,
+        asunto: datos.asunto,
+        cuerpo: datos.cuerpo,
+        hilo: ultimoHiloDelAsunto(a),
+        adjuntos: adjuntosBase64
+      });
+      if (!respuesta || !respuesta.ok) {
+        throw new Error((respuesta && respuesta.motivo) || 'El envío no ha salido bien.');
+      }
+
+      documentosAdjuntados = datos.adjuntos.slice();
+      if (respuesta.hilo) { try { await anadirHiloAlAsunto(a, respuesta.hilo, datos.asunto); } catch (e) { /* accesorio */ } }
+      if (n().marcarEnvioRealizado) n().marcarEnvioRealizado();
+      if (n().apuntarElRastro) n().apuntarElRastro(a);
+
+      var resumen = $('correo-resumen');
+      if (resumen) {
+        resumen.innerHTML = '<p class="aviso aviso-ambar"><strong>Correo enviado a ' +
+          U.escapar(datos.para || datos.cco || 'la cuenta') + '.</strong></p>';
+      }
+      U.aviso('Correo enviado a ' + (datos.para || datos.cco || '') + '.', 'bueno');
+    } catch (e) {
+      if (avisoEl) {
+        avisoEl.innerHTML = '<p class="aviso aviso-rojo">No he podido enviarlo: ' +
+          U.escapar(U.mensajeDeError(e)) + '</p>';
+      }
+      if (boton) { boton.disabled = false; boton.textContent = 'Confirmar y enviar'; }
+      if (volver) volver.disabled = false;
+    }
+  }
+
+  /* Deja el hilo del correo enviado enganchado al asunto (como un
+     correo guardado desde la bandeja): así la respuesta del tercero
+     entra sola. No crítico: si falla, el correo ya ha salido. */
+  async function anadirHiloAlAsunto(a, hiloId, asuntoTexto) {
+    await App.cargarRegistro();
+    var ficha = (App.E.registro.asuntos && App.E.registro.asuntos[a.nombre]) || {};
+    var hilos = Array.isArray(ficha.hilos) ? ficha.hilos.slice() : [];
+    if (hilos.some(function (h) { return h && h.id === hiloId; })) return;
+    hilos.push({
+      id: hiloId,
+      asunto: String(asuntoTexto || a.nombre).toLowerCase(),
+      visto: 1,
+      matriculas: [],
+      metidoPor: App.E.usuario,
+      metidoEl: U.ahora()
+    });
+    await App.anotar(a.nombre, { hilos: hilos });
+    if (a.ficha) a.ficha.hilos = hilos;
+    if (window.Bandeja && window.Bandeja.escribirSeguidos) await window.Bandeja.escribirSeguidos();
+  }
+
   /* ---------- lo que usa js/correo.js ----------
 
      `textoDeLaNota` (js/correo.js) necesita "a quién" y "con cuántos
      documentos" para el rastro que se apunta en las notas del asunto;
-     js/correo-adjuntos.js sigue leyendo el DOM directamente para
-     "Para" y la copia oculta (paraActual/ccoActual, sin depender de
-     esto), como ya hacía antes de esta fila. */
+     js/correo-adjuntos.js ya no lee "Para"/la copia oculta del DOM: se
+     lee aquí mismo, al enviar. */
   return {
     cuerpoHtml: cuerpoHtml,
     enganchar: enganchar,

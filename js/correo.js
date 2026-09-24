@@ -1,10 +1,17 @@
 /* ============================================================
    correo.js — el correo de un asunto, con los campos ya escritos.
 
-   La aplicación no manda nada. Lo que hace es preparar las tres
-   piezas de un correo —a quién va, el asunto y el cuerpo— sacándolas
-   del propio asunto y de los ficheros de Séneca, y dejarlas listas
-   para pegar o para abrir la ventana de redactar de Gmail.
+   Desde el 24-sep-2026 (fila 115, docs/ENVIAR-DESDE-EL-ASUNTO.md) la
+   aplicación SÍ envía correo: el botón "Enviar" del cuadro de Correo
+   (js/correo-cuadro.js), tras confirmar un resumen, llama a la
+   aplicación web de Apps Script (js/correo-enviar.js) y el mensaje
+   sale en ese momento, con sus documentos. Esto sustituye a la regla
+   de siempre ("la aplicación nunca envía nada"): el correo solo sale
+   tras "Confirmar y enviar", nunca antes. Lo que sigue haciendo este
+   fichero es preparar las tres piezas de un correo —a quién va, el
+   asunto y el cuerpo— sacándolas del propio asunto y de los ficheros
+   de Séneca, y dejarlas listas para pegar, para abrir la ventana de
+   redactar de Gmail, o para el envío real:
 
      - PARA: los correos que trae el fichero del tercero. En el
        alumnado son los de los tutores legales, y salen con casilla
@@ -14,26 +21,29 @@
        después a qué asunto pertenece cada mensaje del hilo.
      - CUERPO: el saludo y la despedida hechos; el medio, en blanco.
 
-   Lo único que sí queda guardado es el rastro: en cuanto se copia el
-   cuerpo o se abre la ventana de redactar, se apunta una nota en el
-   asunto diciendo a quién se le ha escrito y qué día. Así el compañero
-   ve lo que ya está hecho sin tener que preguntar. Debajo salen además
-   el botón para dejar el asunto a la espera del tercero y el
-   recordatorio de guardar el PDF del hilo en la carpeta.
+   Lo único que sí queda guardado, se envíe o no, es el rastro: en
+   cuanto se copia el cuerpo, se abre la ventana de redactar o se
+   envía de verdad, se apunta una nota en el asunto diciendo a quién se
+   le ha escrito y qué día (con "enviado" cuando de verdad ha salido).
+   Así el compañero ve lo que ya está hecho sin tener que preguntar.
+   Debajo salen además el botón para dejar el asunto a la espera del
+   tercero y el recordatorio de guardar el PDF del hilo en la carpeta
+   (cuando no se ha enviado por aquí, que ya lo deja solo la bandeja).
 
    El mismo cuadro sirve para la MENSAJERÍA DE SÉNECA, con un cambio:
    allí el destinatario no se escribe, se elige de las listas del propio
    Séneca (Utilidades → Comunicaciones). Así que no hay "Para": solo el
    asunto y el texto, y un botón que los va dando de uno en uno, en el
-   orden en que hay que pegarlos.
+   orden en que hay que pegarlos. Séneca nunca envía desde aquí: solo
+   Correo.
 
-   El cuadro de Correo (con "Para", los grupos y los documentos que se
-   adjuntan) vive en js/correo-cuadro.js desde la fila 58 (18-sep-2026,
-   docs/AJUSTES-DE-USO-2026-09-18.md, 5): este fichero se había ido a
-   más de 800 líneas. Aquí solo queda lo que comparten los dos cuadros
-   (Correo y Séneca): el asunto y el cuerpo del mensaje, a quién se
-   escribe en palabras, y el rastro que se apunta en las notas del
-   asunto.
+   El cuadro de Correo (con "Para", los grupos, los documentos y el
+   botón "Enviar") vive en js/correo-cuadro.js desde la fila 58
+   (18-sep-2026, docs/AJUSTES-DE-USO-2026-09-18.md, 5): este fichero se
+   había ido a más de 800 líneas. Aquí solo queda lo que comparten los
+   dos cuadros (Correo y Séneca): el asunto y el cuerpo del mensaje, a
+   quién se escribe en palabras, y el rastro que se apunta en las notas
+   del asunto.
    ============================================================ */
 (function () {
 
@@ -42,6 +52,7 @@
   var yaApuntado = false;    /* la nota se escribe una vez por cuadro, no una por botón */
   var porSeneca = false;     /* true: el cuadro es el de la mensajería de Séneca */
   var algoCambiado = false;  /* al cerrar, la ficha se repinta si se ha tocado algo */
+  var envioRealizado = false; /* true: el correo ha salido de verdad por "Enviar" (fila 115) */
 
   var plantillasDatos = null;   /* _GESTOR/plantillas.json, ya leído */
   var valoresActuales = null;   /* Plantillas.valoresDeAsunto(a), calculado una vez por apertura
@@ -312,6 +323,22 @@
       ': ' + nombres.join(', ');
   }
 
+  /* "Correo enviado a X" (fila 115): a quién, en la misma forma que ya
+     usa el resto de la nota (Para, o "en copia oculta a N personas" si
+     Para viene vacío). Pura salvo por leer window.CorreoCuadro, igual
+     que el resto de textoDeLaNota. */
+  function quienHaRecibidoElEnvio() {
+    var cc = window.CorreoCuadro;
+    var para = cc ? cc.paraDelCuadro() : '';
+    if (para) return para;
+    var direccionesCco = cc ? cc.ccoDirecciones() : [];
+    if (direccionesCco.length) {
+      return 'en copia oculta a ' + direccionesCco.length +
+        (direccionesCco.length === 1 ? ' persona' : ' personas');
+    }
+    return 'el tercero';
+  }
+
   function textoDeLaNota() {
     if (comunicarHitoActual) {
       /* La constancia en el historial del hito incluye los documentos
@@ -319,9 +346,23 @@
          este asunto" (window.CorreoCuadro.documentosAdjuntados), así
          que aparecen igual haya o no texto propio del paso. */
       var documentosDelHito = (!porSeneca && window.CorreoCuadro) ? CorreoCuadro.documentosAdjuntados() : [];
-      return textoDeComunicarHito(comunicarHitoActual.nombreDestinatario, porSeneca) +
-        sufijoDocumentos(documentosDelHito);
+      /* Si esta comunicación de hito ha salido por el envío real de
+         Correo (fila 115), la nota dice "enviado", igual que fuera de
+         un hito. */
+      if (!porSeneca && envioRealizado) {
+        return 'Correo enviado a ' + (comunicarHitoActual.nombreDestinatario || 'el tercero') +
+          sufijoDocumentos(documentosDelHito);
+      }
+      return textoDeComunicarHito(comunicarHitoActual.nombreDestinatario, porSeneca) + sufijoDocumentos(documentosDelHito);
     }
+
+    /* Un envío real (fila 115): "Correo enviado a X · con N documentos: …". */
+    if (!porSeneca && envioRealizado) {
+      var cc2 = window.CorreoCuadro;
+      return 'Correo enviado a ' + quienHaRecibidoElEnvio() +
+        sufijoDocumentos(cc2 ? cc2.documentosAdjuntados() : []);
+    }
+
     /* En Séneca el campo del asunto es #seneca-asunto (js/seneca-cuadro.js,
        fila 53): #correo-asunto ya no existe en ese cuadro. */
     var campoAsunto = $('correo-asunto') || $('seneca-asunto');
@@ -421,9 +462,13 @@
     var ahora = (a.ficha && a.ficha.situacion) || '';
     var puedeEsperar = modoDelAsunto !== 'archivado' && espera && ahora !== espera;
 
+    /* El recordatorio de guardar el PDF del hilo solo hace falta
+       cuando el correo NO ha salido por aquí (fila 115): un envío real
+       ya deja su propio hilo enganchado, y la respuesta entra sola. */
     sitio.innerHTML = '<strong>' + U.escapar(aviso || 'Rastro del correo') + '</strong>' +
-      '<p>Acuérdate de guardar el PDF del hilo en la carpeta del asunto, ' +
-      'con el botón "Gestionar documentos".</p>';
+      (envioRealizado ? '' :
+        '<p>Acuérdate de guardar el PDF del hilo en la carpeta del asunto, ' +
+        'con el botón "Gestionar documentos".</p>');
 
     if (!puedeEsperar) return;
     var b = document.createElement('button');
@@ -465,6 +510,7 @@
     if (window.SenecaDestinatarios) SenecaDestinatarios.limpiar();
     yaApuntado = false;
     algoCambiado = false;
+    envioRealizado = false;
     /* El cuadro de Séneca ocupa más ancho que el de Correo (fila 53,
        docs/SENECA-CUADRO-ANCHO.md): mismo patrón que .cuadro-ancho en
        js/documentos.js, con su propia clase y un tope menor. Correo
@@ -566,6 +612,10 @@
     destinatarioPreferente: function () { return correoPreferenteActual; },
     textoDeComunicarHito: textoDeComunicarHito,
     sufijoDocumentos: sufijoDocumentos,
+    /* Fila 115: js/correo-cuadro.js avisa aquí en cuanto el correo ha
+       salido de verdad, para que textoDeLaNota diga "enviado" y el
+       recordatorio del PDF del hilo no salga de más. */
+    marcarEnvioRealizado: function () { envioRealizado = true; },
     /* Monta sobre `boton` el mismo menú pequeño "Comunicar" (Correo /
        Séneca) que lleva la cabecera de la ficha, sin duplicar ese
        camino (fila 59, sección 7 del encargo). */
