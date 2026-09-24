@@ -5,6 +5,50 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 118: los pasos nuevos de una guía llegan a los asuntos abiertos
+
+`docs/GUIA-NUEVA-LLEGA-A-LOS-ASUNTOS.md`. Francisco añadió pasos a la guía de un tipo desde la
+ficha de un asunto y, al volver, no estaban: los hitos se copiaban de la guía una sola vez, al
+abrir la ficha por primera vez. Detalle en `docs/contexto/HITOS-Y-GUIAS.md`.
+
+- Fichero nuevo `js/hitos-sincronizar.js` (`js/hitos.js` ya pasaba de 400 líneas). Al guardar la
+  guía, una sola escritura de `hitos.json` para todos los asuntos abiertos de ese tipo con hitos;
+  al pintar la ficha, la misma cuenta como red de seguridad (es el caso del asunto de Francisco,
+  que cambió la guía antes de esta fila).
+- Decisión: nada existente se toca, se reordena ni se borra; un paso quitado de la guía sigue en
+  los asuntos; el ARCHIVO no cambia.
+- `pasosConocidos` en cada asunto: lo completa `Hitos.leer` en cada lectura con los `origenGuia`
+  que haya, en vez de rellenarlo solo al crear. Así cualquier escritura lo guarda (también
+  «quitar a mano», el cambio de tipo o una fusión), y un hito quitado a mano no vuelve ni en los
+  asuntos de antes de esta fila. Un paso podado al cambiar de rama antes de esta fila sí puede
+  volver, pero dentro de la rama no elegida, donde no se ve.
+- El segundo `catch` de `escribirGuia` decía «No he podido guardarla» aunque la guía ya estaba
+  guardada (fallaba el repintado): ahora es ámbar.
+
+Versión publicada `App.VERSION`: `24-sep-2026 · 09:57`.
+
+## 24-sep-2026 — Fila 117: el envío de correo con la aplicación web publicada
+
+`docs/ENVIO-CUENTA-DEL-SCRIPT.md`. Francisco conectó el envío de la fila 115 con la cuenta del
+centro y salieron tres fallos, uno detrás de otro:
+
+- `prepararEnvio()`, ejecutado desde el editor, da con `getUrl()` la dirección `/dev` (la de
+  pruebas de «head»), que solo funciona con la sesión del dueño: «Probar» daba `Failed to fetch`.
+  Cambiarla a `/exec` a mano tampoco vale (el id corto es el de «head»: Google pide iniciar
+  sesión). Ahora `prepararEnvio()` da solo la clave y dice que la URL se copia de «Gestionar
+  implementaciones», y la aplicación rechaza una `/dev` o una sin `?k=` sin llamar a Google.
+- Con la `/exec` buena llegaba, pero «No hay ningún destinatario»: con acceso «Cualquier
+  usuario», `Session.getActiveUser()` viene vacía. Todo el script usa ya `miCorreo()`
+  (`getEffectiveUser()`, la cuenta que ejecuta).
+- Fuera la nota de «Cualquier usuario de la organización»: con esa opción Google pide iniciar
+  sesión y la llamada desde el navegador falla siempre.
+- Nuevo paso fijo al actualizar el script: «Gestionar implementaciones → lápiz → Nueva versión →
+  Implementar», para conservar la misma dirección.
+- Sigue sin poderse enviar un correo real desde aquí (no hay cuenta de Google): lo comprueba
+  Francisco con «Probar».
+
+Versión publicada `App.VERSION`: `24-sep-2026 · 09:57`.
+
 ## 24-sep-2026 — Fila 63: publicar solo la aplicación
 
 `docs/PUBLICAR-SOLO-LA-APP.md`. Estaba BLOQUEADA porque ninguna sesión podía comprobar desde fuera si

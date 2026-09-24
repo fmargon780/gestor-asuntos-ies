@@ -230,8 +230,20 @@ esta fila la aplicación sí envía correo de verdad, pero solo tras una confirm
   (`fetch`, `POST`, `Content-Type: text/plain` a propósito, para que el navegador la trate como
   petición "simple" y no dispare la consulta previa CORS, que Apps Script no contesta). También
   monta el bloque **Ajustes → Mantenimiento → "Enviar correo"**, con los cinco pasos para
-  conectar la cuenta (copiar el script, publicarlo como aplicación web, ejecutar
-  `prepararEnvio()` una vez, pegar la dirección con su clave, "Probar").
+  conectar la cuenta (copiar el script, publicarlo como aplicación web con acceso «Cualquier
+  usuario», copiar la URL `/exec` de «Gestionar implementaciones», sacar la clave con
+  `prepararEnvio()`, pegar `URL?k=clave` y "Probar"), y el de siempre al pegar código nuevo
+  («Gestionar implementaciones» → lápiz → «Nueva versión»: la dirección no cambia). Desde la fila
+  117, `CorreoEnviar.problemaDeDireccion(url)` rechaza sin llamar a Google una dirección `/dev`
+  (la de pruebas del editor, que solo funciona con la sesión del dueño abierta) o sin `?k=`, con
+  aviso rojo, al guardar, al probar y al enviar.
+- **La cuenta propia en el script es `miCorreo()`** (fila 117): `Session.getEffectiveUser()` (la
+  que ejecuta, «Ejecutar como: Yo»), y solo si viniera vacía, `getActiveUser()`. Con acceso
+  «Cualquier usuario», `getActiveUser()` llega vacía y «Probar» decía «No hay ningún
+  destinatario». La usan la prueba, el «Para» de un envío solo con copia oculta, `guardarHilo`,
+  `direccionesDelHilo`, `enlaceAlHilo`, `enlaceABorradores` y `carpetaBandeja`.
+  `prepararEnvio()` ya no da la dirección de `getUrl()` si es `/dev` (lo es siempre ejecutada
+  desde el editor): deja la clave sola y dice de dónde copiar la `/exec`.
 - **`apps-script/gestor-correos.gs`, `doPost(e)`**: exige la clave (`e.parameter.k` o el cuerpo)
   contra la que guardó `prepararEnvio()` en `PropertiesService`; si no coincide, error. Llama a
   `enviarCorreo(cuerpo)`, que decide el hilo con `hiloParaResponder(hiloId, para, cco)`: **solo

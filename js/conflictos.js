@@ -163,7 +163,8 @@
       var clave = claves[i];
       var a = base.porAsunto[clave], b = confPorAsunto[clave];
       if (a && b) {
-        base.porAsunto[clave] = { creados: a.creados || b.creados, hitos: unirPorId(a.hitos, b.hitos) };
+        base.porAsunto[clave] = { creados: a.creados || b.creados, hitos: unirPorId(a.hitos, b.hitos),
+          pasosConocidos: (a.pasosConocidos || []).concat(b.pasosConocidos || []) };   /* fila 118 */
       } else {
         base.porAsunto[clave] = a || b;
       }

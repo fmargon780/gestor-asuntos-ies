@@ -32,11 +32,18 @@ para ir tachando.
       2. Copiar el código nuevo desde GitHub (`apps-script/gestor-correos.gs`) y pegarlo en lugar
          del viejo. Guardar.
       3. «Implementar» → «Nueva implementación» → tipo «Aplicación web», ejecutar como «Yo»,
-         acceso «Cualquier usuario» (si no aparece, «Cualquier usuario de la organización»).
-         «Implementar» y aceptar los permisos.
-      4. Elegir `prepararEnvio` en el desplegable de arriba y pulsar «Ejecutar»; copiar la línea
-         que sale en el registro de ejecución (lleva la dirección y la clave juntas).
-      5. Pegar esa línea en el cuadro de Ajustes y pulsar «Probar».
+         acceso «Cualquier usuario». «Implementar» y aceptar los permisos. Si no aparece
+         «Cualquier usuario», la cuenta del centro no deja publicar así y el envío no puede
+         funcionar: decírselo a Claude (con «Cualquier usuario de la organización» Google pide
+         iniciar sesión y la llamada desde el navegador falla siempre).
+      4. Copiar la URL de «Implementar» → «Gestionar implementaciones» (termina en `/exec`; la
+         que termina en `/dev` es la de pruebas y no sirve). Después elegir `prepararEnvio` en el
+         desplegable de arriba y pulsar «Ejecutar»: solo sirve para sacar la clave, que sale en el
+         registro de ejecución.
+      5. Pegar en el cuadro de Ajustes `URL?k=clave` y pulsar «Probar».
+      Cada vez que se pegue código nuevo en el script: «Gestionar implementaciones» → lápiz →
+      Versión: «Nueva versión» → «Implementar» (fila 117). Así la dirección no cambia y no hay que
+      volver a pegarla en Ajustes.
       Ver: que llega un correo de prueba a la bandeja de entrada. Después, mandar uno de verdad
       desde el cuadro de Correo de un asunto, con un documento adjunto marcado: comprobar que el
       resumen sale bien, que "Confirmar y enviar" dice "Correo enviado a…", que el correo llega de

@@ -170,6 +170,8 @@ var Hitos = (function () {
     Object.keys(origen).forEach(function (clave) {
       var e = origen[clave] || {};
       porAsunto[clave] = { creados: String(e.creados || ''), hitos: normalizarLista(e.hitos) };
+      /* Fila 118 (js/hitos-sincronizar.js): los pasos de la guía que ya han pasado por el asunto. */
+      if (window.Hitos && Hitos.pasosConocidosDe) porAsunto[clave].pasosConocidos = Hitos.pasosConocidosDe(e, porAsunto[clave].hitos);
     });
     return { ajustes: normalizarAjustes(l.ajustes), porAsunto: porAsunto };
   }

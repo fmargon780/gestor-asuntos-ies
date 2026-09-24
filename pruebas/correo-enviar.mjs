@@ -135,5 +135,31 @@ console.log('--- 3. probar ---');
   comprobarQue('sin destinatario propio (lo decide el script)', !cuerpo.para, JSON.stringify(cuerpo));
 }
 
+/* ============================================================
+   4. (fila 117) direcciones que nunca funcionan: sin llamar a fetch
+   ============================================================ */
+console.log('--- 4. /dev y falta de ?k= ---');
+{
+  const c = nuevoContexto();
+  await ejecutar(c.ctx, 'window.CorreoEnviar.guardarUrl("https://script.google.com/a/g.educaand.es/macros/s/CORTO/dev?k=abc")');
+  const r1 = await ejecutar(c.ctx, 'window.CorreoEnviar.probar()');
+  comprobar('/dev con clave: no manda', r1.ok, false);
+  comprobarQue('/dev: dice que es la de pruebas', r1.motivo.indexOf('pruebas') !== -1 && r1.motivo.indexOf('/exec') !== -1, r1.motivo);
+
+  await ejecutar(c.ctx, 'window.CorreoEnviar.guardarUrl("https://script.google.com/macros/s/CORTO/dev")');
+  const r2 = await ejecutar(c.ctx, 'window.CorreoEnviar.enviar({ para: "ana@correo.es" })');
+  comprobar('/dev sin clave: no manda', r2.ok, false);
+  comprobarQue('/dev sin clave: también dice que es la de pruebas', r2.motivo.indexOf('pruebas') !== -1, r2.motivo);
+
+  await ejecutar(c.ctx, 'window.CorreoEnviar.guardarUrl("https://script.google.com/macros/s/LARGO/exec")');
+  const r3 = await ejecutar(c.ctx, 'window.CorreoEnviar.probar()');
+  comprobar('/exec sin ?k=: no manda', r3.ok, false);
+  comprobarQue('/exec sin ?k=: pide la clave', r3.motivo.indexOf('?k=') !== -1, r3.motivo);
+
+  comprobar('en ninguno de los tres se ha llamado a fetch', c.peticiones.length, 0);
+  comprobar('una /exec con ?k= no tiene problema',
+    await ejecutar(c.ctx, 'window.CorreoEnviar.problemaDeDireccion("https://script.google.com/macros/s/X/exec?k=abc")'), '');
+}
+
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 process.exit(fallos ? 1 : 0);

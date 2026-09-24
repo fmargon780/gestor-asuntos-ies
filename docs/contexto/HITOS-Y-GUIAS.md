@@ -311,7 +311,7 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
 
 - Viven en `_GESTOR/hitos.json` (el duodécimo fichero compartido), no en `asuntos.json`: se leen
   solo al abrir un asunto, al archivarlo y en la pantalla "Qué me toca". Estructura:
-  `{ ajustes: { responsables, noLectivos }, porAsunto: { <clave del asunto>: { creados, hitos } } }`.
+  `{ ajustes: { responsables, noLectivos }, porAsunto: { <clave del asunto>: { creados, hitos, pasosConocidos } } }`.
 - **Se crean solos**, sin botón ni preguntar nada, la primera vez que se abre la ficha de un asunto
   **abierto** cuyo tipo tiene guía (vale igual para uno recién creado que para uno que ya existía
   desde antes): sus pasos se convierten en hitos (el id del hito es el mismo que el del paso,
@@ -322,6 +322,26 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
   (`aplicarModoConsulta`) o si la guía de ese tipo todavía no ha terminado de cargar (en ese caso
   no se marca nada como "ya intentado": el siguiente repintado lo reintenta). Tocar los hitos de
   un asunto nunca cambia la guía del tipo.
+- **Los pasos nuevos de la guía llegan a los asuntos abiertos** (fila 118, 24-sep-2026,
+  `docs/GUIA-NUEVA-LLEGA-A-LOS-ASUNTOS.md`, `js/hitos-sincronizar.js`). Al guardar la guía de un
+  tipo (`escribirGuia` y `guardarPasos` de `js/guias-enganche.js`, este también para «Traer el
+  cambio» de la biblioteca), `Hitos.llevarGuiaAAbiertos(tipo, pasos)` añade, en una sola
+  escritura de `hitos.json` por `Hitos.cambiar`, los pasos que falten a cada asunto **abierto**
+  (`Gestor.asuntos()`) de ese tipo que ya tenga hitos; el aviso dice a cuántos ha llegado (si
+  falla, ámbar: la guía ya está guardada). Y como red de seguridad, `js/hitos-panel.js`
+  (`completarSiToca`, mismas condiciones y mismo cerrojo que la creación) hace lo mismo al pintar
+  la ficha, y solo escribe si falta algo. La función pura es `Hitos.pasosQueFaltan(hitos, pasos,
+  conocidos)` → `{ hitos, anadidos, conocidos, enCurso }`: cada paso nuevo entra con
+  `Hitos.pasoAHito` detrás del hito del paso anterior de la guía en ese nivel (o al principio),
+  también dentro de las opciones de una pregunta a cualquier profundidad, y una opción nueva entra
+  entera; nada existente se toca, se reordena ni se borra (un paso quitado de la guía sigue en el
+  asunto), `elegida` no cambia, y `recomputeEnCurso` solo si no había ninguno en curso.
+  `pasosConocidos` son los ids de paso que ya pasaron por el asunto, para que un hito quitado a
+  mano o podado al cambiar de rama no vuelva: `Hitos.leer` lo completa en cada lectura
+  (`normalizar` → `Hitos.pasosConocidosDe`, lo guardado más los `origenGuia` actuales), así que
+  cualquier escritura lo deja en disco, también en los asuntos de antes de esta fila; la fusión de
+  copias en conflicto une los dos. El ARCHIVO no cambia. Prueba:
+  `pruebas/guia-nueva-llega-a-los-asuntos.mjs`.
 - **Cerrojo contra la doble creación**: `js/hitos-panel.js` repinta con un `MutationObserver`
   debounced a 30 ms, y crear los hitos es `async` (una lectura y una escritura); dos repintados
   podrían colarse antes de que `hitos.json` quedara escrito y los dos verían "sin hitos todavía".

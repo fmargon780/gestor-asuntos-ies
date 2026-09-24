@@ -154,6 +154,22 @@
     }
   }
 
+  /* Fila 118 (js/hitos-sincronizar.js): como crearSiToca, pero añade los pasos nuevos de la guía. */
+  async function completarSiToca(clave, entrada, tipo, abierto) {
+    if (!abierto || enConsulta() || creandoDesdeGuia[clave] || !sigueAbiertoDeVerdad(clave)) return null;
+    if (!Hitos.completarAsuntoConGuia) return null;
+    var pasos = (window.GuiasDelCentro && window.GuiasDelCentro.pasosDe(tipo)) || [];
+    if (!pasos.length) return null;
+    creandoDesdeGuia[clave] = true;
+    try {
+      return await Hitos.completarAsuntoConGuia(clave, entrada, pasos);
+    } catch (e) {
+      return null;   /* no crítico: se reintenta en el próximo repintado */
+    } finally {
+      delete creandoDesdeGuia[clave];
+    }
+  }
+
   /* El último repintado gana (fila 101, docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md):
      cada llamada coge turno, y tras cada `await` se para si ya ha
      empezado otra más nueva. Antes, uno viejo que llegaba tarde
@@ -178,6 +194,11 @@
       var creados = await crearSiToca(a, clave, tipo, abierto);
       if (actual !== a || turno !== turnoRepintado) return;
       if (creados && creados.length) hitos = creados;
+    } else if (!errorLectura) {
+      /* Fila 118: los pasos que la guía tiene y el asunto nunca ha tenido. */
+      var completados = await completarSiToca(clave, entrada, tipo, abierto);
+      if (actual !== a || turno !== turnoRepintado) return;
+      if (completados && completados.length) hitos = completados;
     }
 
     /* Los documentos apuntados a un hito (fila 31, 17-sep-2026) se
