@@ -107,12 +107,13 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-**La fila 119 está EN CURSO** (apuntada el 24-sep-2026). Las filas 1 a 75 y 77 a 118 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+**La fila 119 está EN CURSO y la 120 PENDIENTE** (apuntadas el 24-sep-2026). Las filas 1 a 75 y 77 a 118 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
 | 119 | `docs/TRAS-CADA-ACCION.md` (adónde lleva la aplicación después de crear, reabrir, editar o volver; aviso con «Ir al asunto») | EN CURSO (24-sep-2026) |
+| 120 | `docs/GUION-DESDE-EL-HITO.md` (escribir el guion de la guía del tipo desde la mesa del hito; sale en todos los asuntos de ese tipo) | PENDIENTE |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
 **La fila 118 está HECHA** (24-sep-2026): `docs/GUIA-NUEVA-LLEGA-A-LOS-ASUNTOS.md`. Al guardar la guía de un tipo, sus pasos nuevos se añaden, en su sitio, a los asuntos abiertos de ese tipo que ya tienen hitos (una sola escritura de `hitos.json`), y el aviso dice a cuántos; al abrir la ficha, lo mismo como red de seguridad. No se toca, reordena ni borra nada de lo que ya hay; el ARCHIVO no cambia; un hito quitado a mano no vuelve (`pasosConocidos`). Fichero nuevo `js/hitos-sincronizar.js`. Versión publicada `App.VERSION`: `24-sep-2026 · 09:57`.
