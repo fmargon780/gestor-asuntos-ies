@@ -572,6 +572,10 @@ cuánto se tarda** de todos los asuntos, abiertos y archivados.
   se pierde. Ordenada por categoría y, dentro, de más a menos; fila de Total al final. Botón
   **"Copiar la tabla"** (`U.copiar`) la deja en el portapapeles separada por tabuladores, lista
   para pegar en un documento o una hoja de cálculo.
+- **Por quién lo encarga** (fila 134, `js/tipos-organo.js`): la columna «Lo encarga» en la tabla
+  por tipo (también al copiarla) y una tabla más, asuntos por órgano (abiertos, archivados,
+  total), en el orden Secretaría, Dirección, Jefatura de Estudios, Varios, Sin asignar. Un asunto
+  sin tipo reconocible va a «Sin asignar» (`_porOrgano(entradas, curso, organoDe)`).
 - **Por mes**: cuántos asuntos se abrieron cada mes del curso elegido, de la fecha del nombre de
   la carpeta.
 - **Por quién lo pidió**: agrupa `ficha.loPide` (`js/lo-pide.js`) en Familia (su `relacion`
@@ -585,5 +589,5 @@ cuánto se tarda** de todos los asuntos, abiertos y archivados.
   `js/nombres.js`) hacía falta también para los abiertos, que no pasan por el índice.
 
 Toda la cuenta (`_entradaAbierta`, `_entradaArchivada`, `_porTipo`, `_porMes`, `_porQuienLoPide`,
-`_tiempoDeTramite`, `_textoParaCopiar`) es pura, sin DOM ni disco: se comprueba sin navegador en
+`_porOrgano`, `_tiempoDeTramite`, `_textoParaCopiar`) es pura, sin DOM ni disco: se comprueba sin navegador en
 `pruebas/cuentas.mjs`.

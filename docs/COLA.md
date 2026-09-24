@@ -107,12 +107,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 75 y 77 a 133 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 75 y 77 a 134 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 134 | `docs/QUIEN-ENCARGA-CADA-TIPO.md` (Secretaría, Dirección, Jefatura o Varios en cada tipo) | PENDIENTE |
 | 135 | `docs/ASUNTOS-RESERVADOS.md` (sin el nombre del tercero en listas, buscador y Cuentas) | PENDIENTE |
 | 136 | `docs/PLAZO-DE-CONSERVACION.md` (años por tipo y aviso cuando se cumplen; nunca borra solo) | PENDIENTE |
 | 137 | `docs/INDICE-DEL-EXPEDIENTE.md` (PDF con la lista numerada de documentos, al archivar y con botón) | PENDIENTE |
@@ -120,6 +119,13 @@ Las filas 1 a 75 y 77 a 133 están **HECHAS**. Sus documentos siguen en `docs/`,
 | 139 | `docs/UNA-SOLA-LIBRETA-DE-NOTAS.md` (las notas del hito pasan al asunto, con etiqueta) | PENDIENTE |
 | 140 | `docs/TIEMPO-DE-TRAMITACION.md` (media y máximo por tipo, y los abiertos más antiguos) | PENDIENTE |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 134 está HECHA** (25-sep-2026): `docs/QUIEN-ENCARGA-CADA-TIPO.md`. Cada tipo dice quién
+lo encarga (`organo` en `tipos.json`, `js/tipos-organo.js`): desplegable en la pantalla del tipo y
+en «+ Crear tipo nuevo», bloque «Quién encarga cada tipo» en Ajustes › Tipos de asunto (con «N sin
+asignar»), parrilla de Nuevo asunto agrupada, filtro «Lo encarga» en Asuntos abiertos, y columna y
+tabla por órgano en Cuentas. Prueba `pruebas/quien-encarga-cada-tipo.mjs`, batería completa en
+verde. Versión `App.VERSION`: `25-sep-2026 · 00:38`.
 
 **La fila 133 está HECHA** (24-sep-2026): `docs/PARTIR-FICHEROS-GRANDES.md`. Partidos los quince,
 sin cambiar nada de lo que se ve: `bandeja-correos.js`, `datos.js`, `ficha-asunto.js`, `guias.js`,

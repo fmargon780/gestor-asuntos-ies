@@ -58,6 +58,8 @@ function construirSeccionDatos(tipo) {
     lista.appendChild(App.filaEstado('Antes se llamó', tipo.alias.join(', ')));
   }
   b.cuerpo.appendChild(lista);
+  /* «Quién lo encarga» (fila 134, js/tipos-organo.js), junto a la categoría. */
+  if (window.TiposOrgano) b.cuerpo.appendChild(TiposOrgano.filaDeTipo(tipo));
   var cambiar = document.createElement('button');
   cambiar.type = 'button';
   cambiar.className = 'boton';

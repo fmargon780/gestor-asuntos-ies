@@ -484,6 +484,7 @@ $('buscar-tipos').oninput = function () { App.pintarTiposAjustes(); };
 App.crearTipo = async function (datos) {
   var tipo = { tipo: datos.nombre, categoria: datos.categoria };
   if (datos.nombreCorto) tipo.nombreCorto = datos.nombreCorto;
+  if (datos.organo) tipo.organo = datos.organo;   /* fila 134 */
   await Borrados.revivir(App.E.gestor, 'tipos', datos.nombre);
   App.E.tipos.push(tipo);
   await App.guardarTipos();
@@ -517,6 +518,8 @@ $('btn-anadir-tipo').onclick = async function () {
 App.pintarAjustes = async function () {
   App.pintarPestanaAjustes();
   App.pintarTiposAjustes();
+  /* «Quién encarga cada tipo» (fila 134, js/tipos-organo.js). */
+  if (window.TiposOrgano) TiposOrgano.pintarAjustes();
   if (typeof App.pintarAjustesCentro === 'function') await App.pintarAjustesCentro();
   if (typeof App.pintarAjustesMantenimiento === 'function') await App.pintarAjustesMantenimiento();
 };

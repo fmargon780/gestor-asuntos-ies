@@ -24,7 +24,7 @@ Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
 - Repositorio: `fmargon780/gestor-asuntos-ies`, rama `main`, privado.
 - **Un solo proyecto de Vercel** (`gestor-de-asuntos`). No crear otro.
 - **Cada dirección es un sitio distinto para el navegador**: al cambiarla hay que volver a
-  señalar las carpetas (y la bandeja) y entrar. Los ajustes del centro viven en `_GESTOR`.
+  señalar las carpetas y entrar. Los ajustes del centro viven en `_GESTOR`.
 
 ## 2. Quién es Francisco, y cómo escribirle
 
@@ -66,13 +66,14 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 (Una línea por cosa; el porqué, en `docs/contexto/` y `HISTORIA.md`.)
 
-- Categoría → tipo → tercero → nombre de carpeta, con vista previa. El nombre corto del tipo, en carpeta, filtros y tarjeta; se crea un tipo nuevo sin salir de Nuevo asunto.
+- Categoría → tipo → tercero → nombre de carpeta, con vista previa. Nombre corto del tipo; tipo nuevo sin salir de Nuevo asunto.
+- Cada tipo dice quién lo encarga (Secretaría, Dirección, Jefatura, Varios): parrilla agrupada, filtro y Cuentas.
 - El estado del asunto es su hito actual («Paso N de M · título»): lo pone solo en Administración o terceros; cada paso de la guía dice a quién le toca; «Esperando a…», a mano. Sin estados manuales. Vía y fecha límite.
-- Asuntos recurrentes, con aviso.
+- Asuntos recurrentes, con aviso. Avisos de fichas sin carpeta y de papelera vieja.
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
   sueltas también en documentos, registro de Séneca, ficha y notas.
 - Personas (Alumnado): matriculados primero, antiguos plegados; busca por padre, madre o tutor;
-  hermanos en la ficha, que sigue al bajar.
+  hermanos en la ficha.
 - Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
   Renombrar un tipo se lleva su guía; cambiarle el tipo, la ofrece.
 - Nombre comercial de empresas; cambiar los datos de un tercero dado de alta a mano.
@@ -86,14 +87,14 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   tercero reconocido, también sugiere meterlo en uno que ya existe («Meter aquí»). Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
 - Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. Carpeta ≤150 caracteres, documento ≤120.
-- Botón «Ruta» (copia la ruta de la carpeta). Ficha del tercero con "Datos y contacto" en una línea, con copiar; «Ver todo» del alumno en
+- Botón «Ruta» (copia la ruta). Ficha del tercero con "Datos y contacto" en una línea, con copiar; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
 - Registrar un documento detecta el PDF ya sellado, lo renombra y guarda el original como
   "SIN SELLAR"; cada documento se puede asociar a un hito.
 - Terceros relacionados con un asunto, con altas por grupo (unidad, nivel, grupo propio), que
   también sirven de destinatarios de un correo o de un mensaje de Séneca.
-- Parada al crear un duplicado, y pantalla "Duplicados".
+- Parada al crear un duplicado; pantalla "Duplicados".
 - Ajustes: tres pestañas y pantalla por tipo; todo plegado, con resumen; avisos de fallo, solo con fallo.
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
@@ -107,7 +108,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   Junta Electoral, en su hito.
 - Copias diarias (caducan a los 90 días), detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un borrado (tipo,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
-- Pruebas automáticas en cada subida. Escape y salida en toda pantalla.
+- Pruebas automáticas en cada subida. Escape y salida siempre.
 - Copia sin internet (`file://`): se actualiza sola; si no puede, o no puede comprobarlo, franja fija arriba; mira cada 30 min.
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
   bifurcaciones, historial y "lo que hay que reunir". Cada hito se abre a pantalla completa (la mesa):
@@ -118,7 +119,6 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   del instituto y traer los guiones (y las líneas nuevas del instituto a un guion ya escrito).
 - "Qué me toca": hitos pendientes, filtro por responsable, "Dormidos" (sin novedades en N días). "Cuentas": asuntos por tipo, mes y quién los pidió. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena en el PDF solo los datos del centro.
-- Avisos de "fichas sin carpeta" y de papelera vieja.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
 - Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF (carpeta del asunto y Por clasificar); deja libre la banda del sello y la firma.
 - "Lo pide": quién pidió la gestión, por qué vía y cuándo; su correo sale en el cuadro de Correo.
@@ -127,7 +127,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Al archivar, la ficha del asunto baja a su propia carpeta (no se queda en `asuntos.json` para
   siempre); al reabrir, vuelve. Botón "Poner en orden las fichas del ARCHIVO" en Ajustes →
   Mantenimiento para los archivados de antes.
-- Ficha del asunto: foto del contacto del tercero, aunque salga del CSV. Cabecera fija al bajar.
+- Ficha del asunto: foto del contacto del tercero; cabecera fija al bajar.
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -160,7 +160,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Enlazar un correo con `#all/<id de hilo>` (es `#search/rfc822msgid:<id>`), o meter Gmail en un marco (Google no lo permite).
 - Esconder el tablón de notas, sacar el DNI de la columna del tutor, o poner el nombre comercial en el nombre de la carpeta de un asunto de empresa.
 - Reescribir la arquitectura de módulos y envolturas, o meter los campos de cada tipo en el nombre de los documentos (son del asunto, no del papel).
-- Rellenar los datos de la PERSONA en un impreso: no, a propósito, para ver si algo cambió (fila 84).
+- Rellenar los datos de la PERSONA en un impreso (a propósito: para ver si algo cambió).
 
 ## 8. Qué falta
 
@@ -170,7 +170,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ver con el uso: ancho del panel y del tablón, tarjetas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: membrete, Consejería, cargos y Provincia.
 - Importar los usuarios IdEA del alumnado, cuando reactiven a Francisco el perfil de Gestor de PASEN.
-- Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar las plantillas del centro» y «Traer los guiones del instituto». Ajustes › Hitos: pegar los festivos.
+- Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar las plantillas del centro» y «Traer los guiones del instituto». Ajustes › Hitos: pegar los festivos. Ajustes › Tipos: quién encarga cada uno.
 - Antes de junio de 2027: "Guardar el contacto de los asuntos abiertos" (Mantenimiento).
 - Decisión: ¿la papelera se vacía sola a los N días? Sin decidir.
 - Antes de publicar algo importante, repasar `docs/COMPROBAR-A-MANO.md`.

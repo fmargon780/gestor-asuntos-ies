@@ -1,0 +1,20 @@
+/* Quién encarga cada tipo (fila 134, js/tipos-organo.js). */
+
+/* Nuevo asunto: el rótulo de cada grupo ocupa su propia línea de la parrilla. */
+.tipos-grupo-organo {
+  flex-basis: 100%;
+  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--tinta-suave); margin-top: 6px;
+}
+.tipos-grupo-organo:first-child { margin-top: 0; }
+
+/* La pantalla de un tipo: el desplegable, junto a la categoría. */
+.tipo-organo-fila .tipo-organo { max-width: 260px; }
+
+/* Ajustes › Tipos de asunto › «Quién encarga cada tipo». */
+.tipos-organo-bloque { margin-top: 18px; }
+.tipos-organo-solo { display: inline-flex; align-items: center; gap: 6px; margin: 4px 0 10px; }
+.tipos-organo-filas .tipos-organo-fila { display: flex; align-items: center; gap: 12px; }
+.tipos-organo-filas .nombre-tipo { flex: 1; }
+.tipos-organo-filas .tipos-organo-categoria { min-width: 90px; }
+.tipos-organo-filas .tipo-organo { max-width: 220px; }

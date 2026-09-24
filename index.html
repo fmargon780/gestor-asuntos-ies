@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="css/visor.css">
 <link rel="stylesheet" href="css/tipos-buscador.css">
 <link rel="stylesheet" href="css/tipo-al-vuelo.css">
+<link rel="stylesheet" href="css/tipos-organo.css">
 <link rel="stylesheet" href="css/via-contacto.css">
 <link rel="stylesheet" href="css/usabilidad.css">
 <link rel="stylesheet" href="css/copiar-nie.css">
@@ -127,7 +128,7 @@
           <button id="btn-recargar" class="boton">Actualizar</button>
         </div>
 
-        <!-- Los tres desplegables viven aquí, plegados. Sueltos en la barra
+        <!-- Los desplegables viven aquí, plegados. Sueltos en la barra
              se salían de linea y las etiquetas acababan lejos de su campo. -->
         <div id="filtros-abiertos" class="filtros oculto">
           <label class="filtro">
@@ -144,6 +145,17 @@
               <option value="pronto">Vencidos y de esta semana</option>
               <option value="conplazo">Solo los que tienen plazo</option>
               <option value="sinplazo">Solo los que no tienen plazo</option>
+            </select>
+          </label>
+          <label class="filtro">
+            <span class="filtro-rotulo">Lo encarga</span>
+            <select id="filtro-organo" class="campo">
+              <option value="">Todos</option>
+              <option value="SECRETARIA">Secretaría</option>
+              <option value="DIRECCION">Dirección</option>
+              <option value="JEFATURA">Jefatura de Estudios</option>
+              <option value="VARIOS">Varios</option>
+              <option value="SIN">Sin asignar</option>
             </select>
           </label>
           <label class="filtro">
@@ -997,6 +1009,8 @@
 <!-- Fila 109: el guion de un hito (Hitos.guionDe, marcarGuion…). -->
 <script src="js/hitos-guion.js"></script>
 <script src="js/visor.js"></script>
+<!-- Quién encarga cada tipo (fila 134): antes de js/tipos-buscador.js y js/tipo-al-vuelo.js, que lo usan. -->
+<script src="js/tipos-organo.js"></script>
 <script src="js/tipos-buscador.js"></script>
 <script src="js/tipo-al-vuelo.js"></script>
 <script src="js/via-contacto.js"></script>

@@ -133,6 +133,10 @@
         : 'Ver todos (' + botones.length + ')';
     }
 
+    /* Agrupados por quién los encarga (fila 134, js/tipos-organo.js),
+       sin cambiar el orden por uso dentro de cada grupo. */
+    if (window.TiposOrgano) TiposOrgano.agruparParrilla(lista, botones);
+
     /* "+ Crear tipo nuevo" (fila 128, js/tipo-al-vuelo.js): un punto
        enganchado, no una envoltura. Se llama aquí, al final de
        aplicar(), porque escribir en el buscador solo llama a aplicar()

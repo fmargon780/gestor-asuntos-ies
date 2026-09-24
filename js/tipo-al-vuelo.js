@@ -2,8 +2,8 @@
    tipo-al-vuelo.js — crear un tipo de asunto sin salir de Nuevo
    asunto (fila 128, docs/TIPO-DESDE-EL-ASUNTO.md).
 
-   El botón "+ Crear tipo nuevo" y su panel de tres datos (nombre,
-   nombre corto y categoría) viven en Nuevo asunto, junto al buscador
+   El botón "+ Crear tipo nuevo" y su panel de cuatro datos (nombre,
+   nombre corto, categoría y, desde la fila 134, quién lo encarga) viven en Nuevo asunto, junto al buscador
    de tipos. No es un segundo cuadro de diálogo (#capa ya lo usa Nuevo
    asunto si hiciera falta): es un panel desplegable, dentro de la
    misma pantalla.
@@ -51,6 +51,12 @@
       '<select class="campo" id="tipo-al-vuelo-categoria">' +
         Nombres.CATEGORIAS.map(function (c) { return '<option value="' + c + '">' + c + '</option>'; }).join('') +
       '</select>' +
+      /* Fila 134: quién lo encarga, opcional (js/tipos-organo.js). */
+      (window.TiposOrgano
+        ? '<label class="etiqueta" for="tipo-al-vuelo-organo">Quién lo encarga ' +
+            '<span class="suave">(opcional)</span></label>' +
+          '<select class="campo" id="tipo-al-vuelo-organo">' + TiposOrgano.opcionesHtml('') + '</select>'
+        : '') +
       '<div class="tipo-al-vuelo-botones">' +
         '<button type="button" class="boton boton-principal" id="tipo-al-vuelo-crear">Crear</button>' +
         '<button type="button" class="boton" id="tipo-al-vuelo-cancelar">Cancelar</button>' +
@@ -73,6 +79,7 @@
     $('tipo-al-vuelo-nombre').value = U.limpiarNombre(($('buscar-tipo') && $('buscar-tipo').value) || '').toUpperCase();
     $('tipo-al-vuelo-corto').value = '';
     $('tipo-al-vuelo-categoria').value = App.E.nuevo.categoria || Nombres.CATEGORIAS[0];
+    if ($('tipo-al-vuelo-organo')) $('tipo-al-vuelo-organo').value = '';
     pintarAviso();
     document.addEventListener('mousedown', alPulsarFuera, true);
     document.addEventListener('keydown', alPulsarTecla, true);
@@ -136,6 +143,7 @@
       if (!await U.dejaCrear(nombre, hay, 'tipo')) return;
       var datos = { nombre: nombre, categoria: categoria };
       if (nombreCorto) datos.nombreCorto = nombreCorto;
+      if ($('tipo-al-vuelo-organo') && $('tipo-al-vuelo-organo').value) datos.organo = $('tipo-al-vuelo-organo').value;
       var tipo;
       try {
         tipo = await App.crearTipo(datos);

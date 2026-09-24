@@ -19,6 +19,7 @@ App.pintarAbiertos = function () {
   $('orden-abiertos').value = orden;
   var filtro = $('filtro-estado').value;
   var plazo = $('filtro-plazo').value;
+  var organo = $('filtro-organo') ? $('filtro-organo').value : '';   /* fila 134 */
 
   /* Primero, el montón entero: lo que pasa el buscador y los filtros.
      Sobre esto se cuentan las tarjetas de tipo. */
@@ -26,6 +27,7 @@ App.pintarAbiertos = function () {
     if (!App.deLaVista(a, App.E.vista)) return false;
     if (palabras.length && !palabras.every(function (p) { return a.busca.indexOf(p) !== -1; })) return false;
     if (!Plazos.pasaFiltro(a.ficha.limite || '', plazo)) return false;
+    if (organo && window.TiposOrgano && !TiposOrgano.pasaFiltro(App.tipoDeAsunto(a), organo)) return false;
     return App.pasaFiltroMonton(a, filtro);
   });
 
@@ -87,7 +89,8 @@ App.ICONO_DOCUMENTO =
 App.textoVacio = function () {
   if (!App.E.listaAbiertos.length) return 'No hay asuntos abiertos. Crea el primero en "Nuevo asunto".';
   if (App.tipoElegido) return 'No queda ningún asunto de tipo ' + App.tipoElegido + ' en este montón.';
-  if ($('buscar-abiertos').value.trim() || $('filtro-estado').value || $('filtro-plazo').value) {
+  if ($('buscar-abiertos').value.trim() || $('filtro-estado').value || $('filtro-plazo').value ||
+      ($('filtro-organo') && $('filtro-organo').value)) {
     return 'Ningún asunto coincide con lo que buscas.';
   }
   if (App.E.vista === 'espera') return 'No hay nada esperando a terceros. Mejor así.';
@@ -227,6 +230,7 @@ $('buscar-abiertos').oninput = function () {
 };
 $('filtro-estado').onchange = function () { App.pintarAbiertos(); };
 $('filtro-plazo').onchange = function () { App.pintarAbiertos(); };
+if ($('filtro-organo')) $('filtro-organo').onchange = function () { App.pintarAbiertos(); };
 
 $('orden-abiertos').onchange = function () {
   try { window.localStorage.setItem('orden-abiertos', this.value); } catch (e) {}

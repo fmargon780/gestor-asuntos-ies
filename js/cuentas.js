@@ -131,6 +131,26 @@
   /* Cuántos asuntos se abrieron cada mes del curso elegido (o de
      todos, sin curso elegido). "AAMM" tal cual sale de la fecha de la
      carpeta: quien pinta le pone el nombre del mes. */
+  /* Por quién lo encarga (fila 134, js/tipos-organo.js): el órgano de
+     su tipo, en el orden de siempre (Secretaría, Dirección, Jefatura,
+     Varios, Sin asignar); un asunto sin tipo reconocible va a «Sin
+     asignar». `organoDe(tipo)` da el órgano de un nombre de tipo. */
+  function porOrgano(entradas, curso, organoDe) {
+    var organos = (window.TiposOrgano && TiposOrgano.ORGANOS) ||
+      [{ valor: '', texto: 'Sin asignar' }];
+    var mapa = {};
+    filtradasPorCurso(entradas, curso).forEach(function (e) {
+      var o = (e.tipo && organoDe) ? (organoDe(e.tipo) || '') : '';
+      if (!mapa[o]) mapa[o] = { cuantos: 0, abiertos: 0, archivados: 0 };
+      mapa[o].cuantos++;
+      if (e.abierta) mapa[o].abiertos++; else mapa[o].archivados++;
+    });
+    return organos.filter(function (o) { return mapa[o.valor]; }).map(function (o) {
+      var m = mapa[o.valor];
+      return { organo: o.texto, cuantos: m.cuantos, abiertos: m.abiertos, archivados: m.archivados };
+    });
+  }
+
   function porMes(entradas, curso) {
     var mapa = {};
     filtradasPorCurso(entradas, curso).forEach(function (e) {
@@ -253,12 +273,29 @@
     if (!filas.length) return '<div class="vacio">No hay ningún asunto en ese curso.</div>';
     var cuerpo = filas.map(function (f) {
       return '<tr><td>' + U.escapar(f.categoria) + '</td><td>' + U.escapar(f.tipo) + '</td>' +
+        '<td>' + U.escapar(textoOrgano(f.tipo)) + '</td>' +
         '<td>' + f.cuantos + '</td><td>' + f.abiertos + '</td><td>' + f.archivados + '</td></tr>';
     }).join('');
-    return '<table class="cuentas-tabla"><thead><tr><th>Categoría</th><th>Tipo de asunto</th>' +
+    return '<table class="cuentas-tabla"><thead><tr><th>Categoría</th><th>Tipo de asunto</th><th>Lo encarga</th>' +
       '<th>Cuántos</th><th>Abiertos</th><th>Archivados</th></tr></thead><tbody>' + cuerpo +
-      '<tr class="cuentas-total"><td colspan="2">Total</td><td>' + total + '</td><td>' +
+      '<tr class="cuentas-total"><td colspan="3">Total</td><td>' + total + '</td><td>' +
       totalAbiertos + '</td><td>' + totalArchivados + '</td></tr></tbody></table>';
+  }
+
+  function textoOrgano(tipo) {
+    if (!window.TiposOrgano || !tipo || tipo === '—') return '';
+    return TiposOrgano.texto(TiposOrgano.deNombre(tipo));
+  }
+
+  function bloquePorOrgano(filas) {
+    if (!filas.length) return '';
+    var cuerpo = filas.map(function (f) {
+      return '<tr><td>' + U.escapar(f.organo) + '</td><td>' + f.abiertos + '</td><td>' + f.archivados +
+        '</td><td>' + f.cuantos + '</td></tr>';
+    }).join('');
+    return '<h3 class="cuentas-subtitulo">Por quién lo encarga</h3>' +
+      '<table class="cuentas-tabla cuentas-tabla-pequena"><thead><tr><th></th><th>Abiertos</th>' +
+      '<th>Archivados</th><th>Total</th></tr></thead><tbody>' + cuerpo + '</tbody></table>';
   }
 
   function bloquePorMes(filas) {
@@ -309,6 +346,7 @@
 
     var filas = porTipo(ultimo.entradas, curso);
     caja.innerHTML = tablaPorTipo(filas) +
+      bloquePorOrgano(porOrgano(ultimo.entradas, curso, window.TiposOrgano && TiposOrgano.deNombre)) +
       bloquePorMes(porMes(ultimo.entradas, curso)) +
       bloquePorQuienLoPide(porQuienLoPide(ultimo.entradas, curso)) +
       bloqueTiempo(tiempoDeTramite(ultimo.entradas, curso));
@@ -319,8 +357,8 @@
     var curso = $('cuentas-curso') ? $('cuentas-curso').value : '';
     var filas = porTipo(ultimo.entradas, curso);
     var texto = textoParaCopiar(
-      ['Categoría', 'Tipo de asunto', 'Cuántos', 'Abiertos', 'Archivados'],
-      filas.map(function (f) { return [f.categoria, f.tipo, f.cuantos, f.abiertos, f.archivados]; })
+      ['Categoría', 'Tipo de asunto', 'Lo encarga', 'Cuántos', 'Abiertos', 'Archivados'],
+      filas.map(function (f) { return [f.categoria, f.tipo, textoOrgano(f.tipo), f.cuantos, f.abiertos, f.archivados]; })
     );
     U.copiar(texto, $('cuentas-copiar'));
   }
@@ -337,7 +375,7 @@
     /* para las pruebas (sin DOM ni disco: pruebas/cuentas.mjs) */
     _entradaAbierta: entradaAbierta, _entradaArchivada: entradaArchivada,
     _cursosDeEntradas: cursosDeEntradas, _porTipo: porTipo, _porMes: porMes,
-    _porQuienLoPide: porQuienLoPide, _tiempoDeTramite: tiempoDeTramite,
+    _porQuienLoPide: porQuienLoPide, _porOrgano: porOrgano, _tiempoDeTramite: tiempoDeTramite,
     _textoParaCopiar: textoParaCopiar
   };
 

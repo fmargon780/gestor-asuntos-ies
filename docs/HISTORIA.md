@@ -5,6 +5,21 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 134: quién encarga cada tipo
+
+`docs/QUIEN-ENCARGA-CADA-TIPO.md`. Cada tipo de asunto dice qué órgano lo encarga (Secretaría,
+Dirección, Jefatura de Estudios o Varios; sin nada, «Sin asignar»), para que con dos personas
+creando tipos no se repitan. Se pone en la pantalla del tipo, al crearlo desde Nuevo asunto o, de
+una vez, en Ajustes › Tipos de asunto › «Quién encarga cada tipo»; se usa para agrupar la parrilla
+de Nuevo asunto, filtrar Asuntos abiertos y contar en Cuentas. Decisiones:
+
+- Si todos los tipos de una categoría son del mismo órgano (al principio, todos «Sin asignar»), la
+  parrilla no pone rótulos: no dirían nada.
+- En el bloque de Ajustes, al cambiar un desplegable con «Solo los sin asignar» puesto, la fila se
+  queda donde está hasta el siguiente repintado: que no salte debajo del ratón.
+- En la prueba, `waitForFunction` con una función `async` no espera (una promesa ya cuenta como
+  verdadera): se espera al disco con un bucle en la propia prueba.
+
 ## 24-sep-2026 — Fila 133: partir los ficheros grandes
 
 `docs/PARTIR-FICHEROS-GRANDES.md`. Catorce ficheros de más de 600 líneas partidos por temas en 35

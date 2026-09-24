@@ -189,6 +189,29 @@ Se comprueba con `pruebas/ajustes-agil.mjs` (las tres pestañas, a 1905 píxeles
 `pruebas/ajustes-por-tipo.mjs` (la pantalla de un tipo: las ocho secciones, cambiar Plazo y
 Campos, volver sin perder categoría ni buscador, Escape).
 
+### Quién encarga cada tipo (25-sep-2026, fila 134, `docs/QUIEN-ENCARGA-CADA-TIPO.md`)
+
+Cada tipo de `tipos.json` lleva `organo`: `SECRETARIA`, `DIRECCION`, `JEFATURA`, `VARIOS` o nada
+(«Sin asignar»; un valor raro se lee igual). Viaja con el tipo, así que se fusiona como el resto
+de `tipos.json`. Todo vive en `js/tipos-organo.js` (`TiposOrgano`), y cada sitio llama a una
+función, sin envolver nada:
+
+- **Pantalla de un tipo**: desplegable «Quién lo encarga» en «Datos del tipo», junto a la
+  categoría (`filaDeTipo`). Se guarda al cambiarlo.
+- **«+ Crear tipo nuevo»** (`js/tipo-al-vuelo.js`): cuarto dato, opcional; `App.crearTipo` lo
+  guarda si viene.
+- **Ajustes › Tipos de asunto › «Quién encarga cada tipo»**: bloque plegado debajo de la rejilla
+  (`pintarAjustes`, llamado desde `App.pintarAjustes`), una fila por tipo con su desplegable, que
+  se guarda al cambiar; casilla «Solo los sin asignar»; resumen «N sin asignar».
+- Cada guardado va por `App.enFila(App.FICHERO_TIPOS, App.guardarTipos)` y sobre el tipo que haya
+  en memoria con ese nombre en ese momento.
+- **Nuevo asunto**: la parrilla de una categoría se agrupa por órgano, con un rótulo por grupo
+  (`agruparParrilla`, al final de `aplicar()` de `js/tipos-buscador.js`), sin cambiar el orden por
+  uso dentro de cada uno. Si todos los de la categoría son del mismo órgano, sin rótulos.
+- **Asuntos abiertos**: filtro «Lo encarga» (`#filtro-organo`, «Sin asignar» = `SIN`), con su
+  etiqueta en la barra de filtros (`js/usabilidad.js`) y su marca en el botón «Filtros»
+  (`js/vista.js`). **Cuentas**: ver `docs/contexto/HITOS-Y-GUIAS.md`.
+
 ### Ajustes plegado (24-sep-2026, fila 105, docs/AJUSTES-PLEGADO.md)
 
 Todo lo nuevo vive en `js/ajustes-plegado.js` (`AjustesPlegado`); `js/ajustes-tipo.js` solo llama
