@@ -153,16 +153,24 @@
 
     try {
       await guardar();
+    } catch (e) {
+      U.aviso('No he podido guardarla: ' + U.mensajeDeError(e), 'malo');
+      return false;
+    }
+    var llegados = await llevarAAbiertos(nombreTipo, pasos);
+    try {
       pintarTabla();
       pintarGuiaNuevo();
       await window.Gestor.recargar();
       U.aviso(pasos.length
-        ? 'Guía de ' + nombreTipo + ' guardada: ' + pasos.length + ' pasos.'
+        ? 'Guía de ' + nombreTipo + ' guardada: ' + pasos.length + ' pasos.' +
+          (llegados ? ' Los pasos nuevos han llegado a ' +
+            (llegados === 1 ? '1 asunto abierto.' : llegados + ' asuntos abiertos.') : '')
         : nombreTipo + ' se queda sin guía.', 'bueno');
       return true;
     } catch (e) {
-      U.aviso('No he podido guardarla: ' + U.mensajeDeError(e), 'malo');
-      return false;
+      U.accesorio('Guía guardada, pero no he podido repintar la pantalla', e);
+      return true;
     }
   }
 
@@ -175,9 +183,42 @@
     try { await cargar(); } catch (e) { /* se sigue con lo que hay */ }
     if (pasosNuevos.length) guias[nombreTipo] = pasosNuevos; else delete guias[nombreTipo];
     await guardar();
+    var llegados = await llevarAAbiertos(nombreTipo, pasosNuevos);
+    if (llegados) {
+      U.aviso('Los pasos nuevos de ' + nombreTipo + ' han llegado a ' +
+        (llegados === 1 ? '1 asunto abierto.' : llegados + ' asuntos abiertos.'), 'bueno');
+    }
     pintarTabla();
     pintarGuiaNuevo();
     await window.Gestor.recargar();
+    return llegados;
+  }
+
+  /* Fila 118 (docs/GUIA-NUEVA-LLEGA-A-LOS-ASUNTOS.md): los pasos nuevos
+     de la guía, a los asuntos abiertos de ese tipo que ya tienen hitos
+     (js/hitos-sincronizar.js). La guía ya está guardada: si esto
+     falla, ámbar, nunca rojo. Devuelve a cuántos asuntos ha llegado. */
+  async function llevarAAbiertos(nombreTipo, pasos) {
+    if (!pasos || !pasos.length || !window.Hitos || !Hitos.llevarGuiaAAbiertos) return 0;
+    try {
+      var n = await Hitos.llevarGuiaAAbiertos(nombreTipo, pasos);
+      if (n && window.HitosPanel) HitosPanel.programarRepintado();
+      return n;
+    } catch (e) {
+      U.accesorio('Guía guardada, pero no he podido llevar los pasos nuevos a los asuntos abiertos', e);
+      return 0;
+    }
+  }
+
+  /* Fila 120 (docs/GUION-DESDE-EL-HITO.md): relee guias.json, deja que
+     `cambiar` toque una copia de los pasos del tipo y la guarda por
+     guardarPasos. Si `cambiar` devuelve false, no se guarda nada. */
+  async function cambiarPasos(nombreTipo, cambiar) {
+    try { await cargar(); } catch (e) { /* se sigue con lo que hay */ }
+    var copia = JSON.parse(JSON.stringify(pasosDe(nombreTipo)));
+    if (cambiar(copia) === false) return false;
+    await guardarPasos(nombreTipo, copia);
+    return true;
   }
 
   /* Lo que usa la ficha de un asunto para escribir la guía de su tipo
@@ -187,7 +228,8 @@
   window.GuiasDelCentro = {
     escribir: escribirGuia,
     pasosDe: function (tipo) { return pasosDe(tipo).slice(); },
-    guardarPasos: guardarPasos
+    guardarPasos: guardarPasos,
+    cambiarPasos: cambiarPasos
   };
 
   /* ---------- arranque ---------- */

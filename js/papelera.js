@@ -640,9 +640,11 @@ var Papelera = (function () {
   async function pulsarDevolver(ficha) {
     var r = await devolver(ficha);
     if (r.ok) {
-      U.aviso((ficha.nombre) + ' devuelto a su sitio.', 'bueno');
       App.pintarPapelera();
       if (typeof App.verAbiertos === 'function') { try { await App.verAbiertos(); } catch (e) {} }
+      /* Fila 119: un asunto devuelto, con «Ir al asunto» (ya con la lista al día). */
+      if (ficha.clase === 'asunto' && window.Navegacion) Navegacion.avisoConIr(ficha.nombre + ' devuelto a su sitio.', 'bueno', ficha.nombre);
+      else U.aviso((ficha.nombre) + ' devuelto a su sitio.', 'bueno');
       if (typeof App.pintarAjustes === 'function') { try { await App.pintarAjustes(); } catch (e) {} }
       return;
     }

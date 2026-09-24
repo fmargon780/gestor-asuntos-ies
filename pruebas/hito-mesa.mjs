@@ -15,6 +15,9 @@
      7. Escape vuelve a la lista; desde "Qué me toca" se entra directo en
         la mesa.
      8. "Traer los guiones del instituto" no pisa un guion ya escrito.
+     9. (fila 120) "+ Añadir un paso a la guía del tipo" desde la mesa: la
+        línea va al guion del paso de la guía y sale también en otro
+        asunto abierto del mismo tipo; el paso propio no toca la guía.
 
    Con FOTOS=<carpeta>, deja una foto de la mesa a 1905 px. */
 import { chromium } from 'playwright';
@@ -246,6 +249,49 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   });
   await comprobar('8. trae el guion al paso que no tenía', Promise.resolve([r8.traidos, r8.x1]), [true, true]);
   await comprobar('8. y no pisa el que ya estaba escrito', Promise.resolve(r8.x2), ['El mío, que no se toca']);
+
+  /* 9. */
+  const OTRO = '260906 MATRICULA 26-27 Gómez Sanz, Luis 5678';
+  await pagina.evaluate(async (otro) => {
+    await window.__disco.abiertos.getDirectoryHandle(otro, { create: true });
+    await App.anotar(otro, { abiertoEl: U.ahora(), tipo: 'MATRICULA', categoria: 'ALUMNADO',
+      tercero: 'Gómez Sanz, Luis 5678', curso: '26-27', grupo: '', descripcion: '', campos: {} });
+  }, OTRO);
+  if (!(await pagina.locator('#ficha-guia.con-mesa .hito-en-mesa[data-id="m1"]').isVisible())) await abrirMesa(pagina, 'm1');
+  await comprobar('9. el aviso de hito sin guion ya no manda a Ajustes',
+    pagina.evaluate(() => (document.querySelector('.hito-en-mesa .mesa-guion') || {}).textContent.indexOf('Se escribe en la guía del tipo (Ajustes)') === -1), true);
+  await pagina.locator('.hito-en-mesa .guion-anadir-guia').click();
+  await pagina.waitForSelector('#capa:not(.oculto)');
+  await pagina.fill('#guion-guia-texto', 'Pedir el certificado de empadronamiento');
+  await pagina.click('#cuadro-aceptar');
+  await pagina.waitForFunction(() => Array.prototype.some.call(document.querySelectorAll('.mensaje'),
+    (m) => m.textContent.indexOf('Añadido a la guía de') !== -1));
+  await pagina.waitForTimeout(500);
+  const r9 = await pagina.evaluate(async (otro) => {
+    const guias = await Carpetas.leerJson(App.E.gestor, 'guias.json');
+    const m1 = guias.MATRICULA.filter((p) => p.id === 'm1')[0];
+    const d = await Hitos.leer();
+    const hOtro = Hitos.buscar(d.porAsunto[otro].hitos, 'm1');
+    const enOtro = Hitos.guionDe({ nombre: otro, leido: { tipo: 'MATRICULA' }, ficha: {} }, hOtro).map((g) => g.texto);
+    return { ultima: m1.guion[m1.guion.length - 1], cuantas: m1.guion.length, enOtro };
+  }, OTRO);
+  await comprobar('9. la línea va al final del guion del paso de la guía',
+    Promise.resolve([r9.ultima.texto, r9.ultima.accion, !!r9.ultima.id]), ['Pedir el certificado de empadronamiento', '', true]);
+  await comprobar('9. y sale en el otro asunto abierto del mismo tipo',
+    Promise.resolve(r9.enOtro.indexOf('Pedir el certificado de empadronamiento') !== -1), true);
+  await comprobar('9. la mesa sigue abierta en el mismo hito, con la línea sin marcar',
+    pagina.locator('.hito-en-mesa[data-id="m1"] .guion-paso', { hasText: 'Pedir el certificado de empadronamiento' })
+      .locator('.guion-casilla').isChecked(), false);
+  await pagina.locator('.hito-en-mesa .guion-anadir-propio').click();
+  await pagina.waitForSelector('#capa:not(.oculto)');
+  await pagina.fill('#guion-propio-texto', 'Solo para Ana');
+  await pagina.click('#cuadro-aceptar');
+  await pagina.waitForTimeout(800);
+  await comprobar('9. el paso propio no toca la guía', pagina.evaluate(async () => {
+    const guias = await Carpetas.leerJson(App.E.gestor, 'guias.json');
+    const m1 = guias.MATRICULA.filter((p) => p.id === 'm1')[0];
+    return m1.guion.length;
+  }), r9.cuantas);
 
   await comprobar('sin errores en la consola', errores, []);
   await pagina.close();

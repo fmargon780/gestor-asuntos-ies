@@ -98,6 +98,16 @@ Escape; con la mesa abierta, el título "Hitos" del recuadro no sale (`:has(#fic
   mesa (`js/hito-mesa-guion.js`), un botón por respuesta, las líneas de la elegida sangradas y lo
   plegado al final, en gris. La biblioteca copia y compara el guion entero
   (`GuiasGuion.textoLegible`). En el mapa, «¿» en la caja de un paso cuyo guion tiene pregunta.
+- **Escribir el guion desde la mesa** (24-sep-2026, fila 120, `docs/GUION-DESDE-EL-HITO.md`): bajo
+  el guion, «+ Añadir un paso a la guía del tipo» (solo si el hito tiene `origenGuia`, su paso sigue
+  en la guía y no es una pregunta; nunca en modo consulta) y «+ Añadir un paso solo para este
+  asunto» (`guionPropio`, como antes). El primero añade la línea al final del `guion` del paso de la
+  guía (fuera de las respuestas, `accion: ''`, sin normativa ni explicación, id de
+  `GuiasGuion.normalizar`) con `GuiasDelCentro.cambiarPasos(tipo, fn)` (relee `guias.json`, cambia
+  una copia y guarda por `guardarPasos`); como `Hitos.guionDe` lee el paso en vivo, sale en todos
+  los asuntos de ese tipo. La biblioteca no se toca. Aviso verde «Añadido a la guía de <tipo
+  corto>»; si falla, rojo, y lo escrito vuelve a salir al abrir el cuadro. El aviso de hito sin
+  guion dice ya «Añade el primer paso aquí abajo».
 - **Se marca solo** (`Hitos.marcarGuionPorAccion(a | clave, idHito, accion)`, el primer paso sin
   marcar con esa acción, en el orden en que se ven, nunca de una respuesta no elegida; si falla, ámbar con `U.accesorio`): `generar` en
   `js/plantillas-documento.js` (generar con hito); `registrar` al terminar el registro desde el ⋯

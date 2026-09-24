@@ -352,7 +352,7 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
   }
 
   delete App.E.reciales[s.nombre];
-  U.aviso('Documento metido en ' + nombreAsunto + '.', 'bueno');
+  /* Fila 119: el aviso, con «Ir al asunto», sale al cerrar el cuadro de ponerle nombre (abajo). */
   /* Desde un hito (arreglo de la fila 103): queda apuntado a él nada
      más entrar, con el nombre que trae, aunque luego se cierre el
      cuadro sin ponerle otro. Si se le pone nombre, js/documentos.js
@@ -383,6 +383,9 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
   } catch (e2) {
     U.accesorio('Documento metido, pero no he podido abrir el cuadro para ponerle nombre', e2);
   }
+  /* Se queda en Por clasificar (fila 119). */
+  if (window.Navegacion) Navegacion.avisoConIr('Documento metido en ' + nombreAsunto + '.', 'bueno', nombreAsunto);
+  else U.aviso('Documento metido en ' + nombreAsunto + '.', 'bueno');
   /* El hito sigue desplegado al volver a la ficha. */
   if (hito && window.HitosPanel) {
     HitosPanel.desplegarAlAbrir(nombreAsunto, hito.id);

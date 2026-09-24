@@ -112,6 +112,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   bifurcaciones, historial y "lo que hay que reunir". Cada hito se abre a pantalla completa (la mesa):
   guion (con preguntas: un botón por respuesta) que se marca solo al generar, registrar, comunicar o añadir; documentos en tabla con sus
   gemelos y selección de varios; plantillas y formularios; comunicar con destinatarios; notas.
+  Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa.
   Biblioteca de hitos del centro, con guion. Botones en Mantenimiento para cargar los tipos y guías
   del instituto y traer los guiones.
 - "Qué me toca": hitos pendientes, filtro por responsable, bloque "Dormidos" (sin novedades en N
@@ -126,7 +127,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   preparar el cuadro de Correo.
 - Archivar o reabrir sobre un destino que ya existe fusiona las carpetas; errores en castellano;
   si Dropbox tropieza, se reintenta sola.
-- De la ficha de un asunto solo se sale al Volver, Editar, Archivar/Reabrir o Borrar; lo demás (guardar, hitos, comunicar...) se queda en su sitio.
+- Crear, reabrir o editar deja en la ficha del asunto; Volver regresa a la pantalla de origen, a su altura; lo demás, aviso con «Ir al asunto».
 - Cabecera de cada pantalla fija al bajar y encogida sin temblar.
 - Al archivar, la ficha del asunto baja a su propia carpeta (no se queda en `asuntos.json` para
   siempre); al reabrir, vuelve. Botón "Poner en orden las fichas del ARCHIVO" en Ajustes →
@@ -170,7 +171,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 ## 8. Qué falta
 
 - El compañero: entrar en `https://asuntos.fmargon.com`, señalar sus carpetas de nuevo (no se heredan) y coordinar tipos de asunto y estados.
-- Conectar el envío en Ajustes → Enviar correo (pegar script, publicar, pegar su URL).
+- Envío: pegar el script nuevo (fila 117), «Gestionar implementaciones → lápiz → Nueva versión», y «Probar».
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: membrete, Consejería, cargos y Provincia.

@@ -59,7 +59,15 @@
     if (abierto) {
       lista.push({
         texto: 'Editar el asunto',
-        alPulsar: async function () { await App.editarAsunto(a); App.volverALaLista(); }
+        /* Fila 119: se queda en la ficha del asunto editado (con su
+           nombre nuevo). Cancelado, en la misma ficha; si ya no está en
+           abiertos, a la lista. */
+        alPulsar: async function () {
+          var nombre = await App.editarAsunto(a);
+          if (nombre && window.Navegacion && Navegacion.abrirAbierto(nombre)) return;
+          var sigue = (App.E.listaAbiertos || []).some(function (x) { return x.nombre === a.nombre; });
+          if (!sigue) App.volverALaLista();
+        }
       });
     }
     if (abierto && window.Papelera) {

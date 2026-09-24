@@ -223,7 +223,8 @@ await comprobar('el cuerpo de h1 ya está desplegado, sin esperar a que se pulse
     .then(c => c.indexOf('oculto') === -1), true);
 
 await pagina.click('#ficha-volver');
-await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+/* Fila 119: «Volver» regresa a la pantalla de origen, «Qué me toca». */
+await pagina.waitForSelector('#pantalla-que-me-toca:not(.oculto)');
 
 /* ================= ESCENARIO 7: la cuenta de la barra coincide con los vencidos ================= */
 

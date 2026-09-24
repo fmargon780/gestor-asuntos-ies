@@ -109,6 +109,7 @@ App.pintarArchivo = function () {
     return palabras.every(function (p) { return a.busca.indexOf(p) !== -1; });
   });
   var caja = $('lista-archivo');
+  var alto = window.scrollY;   /* fila 119: la lista se queda a la misma altura */
   caja.innerHTML = '';
   if (!lista.length) {
     var msg = palabras.length
@@ -128,6 +129,7 @@ App.pintarArchivo = function () {
     mas.textContent = 'Se muestran los 300 primeros de ' + lista.length + '. Afina la búsqueda.';
     caja.appendChild(mas);
   }
+  if (window.scrollY !== alto) window.scrollTo(0, alto);
 };
 
 /* Las tarjetas del ARCHIVO no traen manejador de carpeta (el índice

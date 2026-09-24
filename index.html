@@ -912,6 +912,8 @@
 <script src="js/preparar-documento.js"></script>
 <script src="js/pdf-separar-unir.js"></script>
 <script src="js/ficha-asunto.js"></script>
+<!-- Fila 119: de qué pantalla se viene a una ficha, y la altura de la lista. -->
+<script src="js/navegacion.js"></script>
 <!-- El menú pequeño reutilizable de la cabecera (fila 52, 18-sep-2026,
      docs/CABECERA-DEL-ASUNTO.md): lo usan los tres puntos del nombre
      (js/ficha-nombre-acciones.js, justo debajo) y "Comunicar"
@@ -954,6 +956,9 @@
      Duplicados.delTercero/carpetaDelTercero/tipoDeNombre). -->
 <script src="js/otros-del-tercero.js"></script>
 <script src="js/hitos-archivo.js"></script>
+<!-- Fila 118: los pasos nuevos de una guía llegan a los asuntos abiertos. Detrás de
+     js/hitos-archivo.js, enganchado a window.Hitos sin envolver nada. -->
+<script src="js/hitos-sincronizar.js"></script>
 <!-- Fila 94 (docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md): al cambiar el tipo
      de un asunto, ofrecer la guía del nuevo. Usa Hitos y GuiasDelCentro;
      lo llama App.editarAsunto. -->

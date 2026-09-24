@@ -209,10 +209,10 @@
     var toca = pendientes();
     if (!toca.length) return;
 
-    var hechos = 0, fallos = [];
+    var hechos = 0, fallos = [], ultimo = '';
     for (var i = 0; i < toca.length; i++) {
       try {
-        await crearUno(toca[i]);
+        ultimo = await crearUno(toca[i]);
         hechos++;
       } catch (e) {
         fallos.push(toca[i].tipo + ' ' + toca[i].tercero + ': ' + U.mensajeDeError(e));
@@ -227,6 +227,8 @@
       U.aviso('Creados ' + hechos + '. No se han podido crear ' + fallos.length + '.', 'malo');
     } else {
       U.aviso(hechos === 1 ? 'Asunto creado.' : hechos + ' asuntos creados.', 'bueno');
+      /* Fila 119: uno solo, se abre su ficha; varios de golpe, no se abre nada. */
+      if (toca.length === 1 && hechos === 1 && window.Navegacion) Navegacion.abrirAbierto(ultimo);
     }
   }
 

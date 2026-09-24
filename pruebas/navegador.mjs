@@ -210,6 +210,9 @@ await comprobar('al encenderlo el grupo entra en el nombre',
   '260907 MATRICULA 26-27 2ºB Cambio de optativa Aguilar Ponce, Marina 1140233');
 
 await pagina.click('#btn-crear');
+/* Fila 119: crear abre la ficha del asunto; se vuelve a la lista. */
+await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await comprobar('la carpeta existe en el disco', pagina.evaluate(async () => {
   const nombres = [];
@@ -470,6 +473,9 @@ await pagina.waitForSelector('#resultados-tercero .resultado');
 await pagina.click('#resultados-tercero .resultado');
 await pagina.fill('#campo-fecha', '2026-09-07');
 await pagina.click('#btn-crear');
+/* Fila 119: crear abre la ficha del asunto; se vuelve a la lista. */
+await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 
 /* "Documentos" ya no está en la tarjeta (10-sep-2026): está dentro de
@@ -563,6 +569,9 @@ await pagina.waitForSelector('#resultados-tercero .resultado');
 await pagina.click('#resultados-tercero .resultado');
 await pagina.fill('#campo-fecha', '2026-09-03');
 await pagina.click('#btn-crear');
+/* Fila 119: crear abre la ficha del asunto; se vuelve a la lista. */
+await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 
 await pagina.click('.pestana[data-pantalla="ajustes"]');

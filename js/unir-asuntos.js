@@ -532,11 +532,14 @@
         U.aviso('Asuntos unidos, pero no he podido quitar la carpeta vieja de: ' + restos.join(', ') +
           '. Queda algo dentro (quizá un documento abierto en otro programa): míralo y bórrala a mano.', 'ambar');
       }
-      U.aviso(renombrados.length
+      var textoUnidos = renombrados.length
         ? 'Asuntos unidos. ' + renombrados.length + (renombrados.length === 1
             ? ' documento tenía el nombre repetido: se ha guardado con "(N)" al final.'
             : ' documentos tenían el nombre repetido: se han guardado con "(N)" al final.')
-        : 'Asuntos unidos.', 'bueno');
+        : 'Asuntos unidos.';
+      /* Fila 119: con «Ir al asunto» (el que se queda, que ya estaba en la lista). */
+      if (window.Navegacion) Navegacion.avisoConIr(textoUnidos, 'bueno', seQueda.nombre);
+      else U.aviso(textoUnidos, 'bueno');
       await App.verAbiertos();
       /* Si se ha unido desde la pantalla de Duplicados, se sigue
          viendo esa pantalla con la lista al día: no se saca a nadie

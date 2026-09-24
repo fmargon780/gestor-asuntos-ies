@@ -32,7 +32,12 @@
         (nunca se mezclan destinatarios sin que nadie lo haya
         decidido).
     11. Un `hilo` que no existe en este buzón: correo nuevo, sin
-        reventar. */
+        reventar.
+    12. (fila 117) Con getActiveUser() vacío y getEffectiveUser() con
+        correo, «Probar» y un envío solo con copia oculta van a la
+        cuenta efectiva.
+    13. (fila 117) `prepararEnvio` con getUrl() terminado en /dev:
+        registra la clave y de dónde copiar la /exec, nunca la /dev. */
 import fs from 'node:fs';
 import vm from 'node:vm';
 
@@ -117,7 +122,9 @@ function nuevoContexto(opciones) {
       })
     },
     Session: {
-      getActiveUser: () => ({ getEmail: () => opciones.miCorreo || 'francisco@centro.es' }),
+      /* Con acceso «Cualquier usuario», getActiveUser() llega vacía
+         (fila 117): `correoActivo: ''` lo simula. */
+      getActiveUser: () => ({ getEmail: () => ('correoActivo' in opciones ? opciones.correoActivo : (opciones.miCorreo || 'francisco@centro.es')) }),
       getEffectiveUser: () => ({ getEmail: () => opciones.miCorreo || 'francisco@centro.es' }),
       getScriptTimeZone: () => 'Europe/Madrid'
     },
@@ -176,8 +183,9 @@ console.log('--- 1b. prepararEnvio sin implementación todavía ---');
 {
   const c = nuevoContexto({ urlImplementacion: '' });
   vm.runInContext('prepararEnvio()', c.ctx);
-  comprobarQue('sin URL, avisa de que falta implementar, sin reventar',
-    c.logs.some((l) => l.indexOf('aplicación web') !== -1), c.logs.join(' | '));
+  comprobarQue('sin URL, da la clave y dice de dónde copiar la dirección, sin reventar',
+    c.logs.some((l) => l.indexOf(c.propiedades['clave-envio']) !== -1) &&
+    c.logs.some((l) => l.indexOf('Gestionar implementaciones') !== -1), c.logs.join(' | '));
 }
 
 /* ============================================================
@@ -293,6 +301,38 @@ console.log('--- 9-11. el hilo ---');
   });
   comprobar('11. un hilo que no existe en este buzón no revienta nada', r11.ok, true);
   comprobar('11. sale como correo nuevo', c.enviados[c.enviados.length - 1].tipo, 'nuevo');
+}
+
+/* ============================================================
+   12. getActiveUser() vacío (acceso «Cualquier usuario»), fila 117
+   ============================================================ */
+console.log('--- 12. getActiveUser vacío ---');
+{
+  const c = nuevoContexto({ correoActivo: '', miCorreo: 'secretaria@g.educaand.es' });
+  vm.runInContext('prepararEnvio()', c.ctx);
+  const clave = c.propiedades['clave-envio'];
+
+  const r1 = llamarDoPost(c, { clave: clave, prueba: true });
+  comprobar('12. «Probar» manda aunque getActiveUser llegue vacío', r1.ok, true);
+  comprobar('12. la prueba va a la cuenta que ejecuta', c.enviados[c.enviados.length - 1].para, 'secretaria@g.educaand.es');
+
+  const r2 = llamarDoPost(c, { clave: clave, para: '', cco: 'grupo@correo.es', asunto: 'x', cuerpo: 'x' });
+  comprobar('12. solo copia oculta: se manda', r2.ok, true);
+  comprobar('12. «Para» es la cuenta que ejecuta', c.enviados[c.enviados.length - 1].para, 'secretaria@g.educaand.es');
+}
+
+/* ============================================================
+   13. prepararEnvio con la dirección de pruebas (/dev), fila 117
+   ============================================================ */
+console.log('--- 13. prepararEnvio con /dev ---');
+{
+  const c = nuevoContexto({ urlImplementacion: 'https://script.google.com/a/g.educaand.es/macros/s/CORTO/dev' });
+  vm.runInContext('prepararEnvio()', c.ctx);
+  const clave = c.propiedades['clave-envio'];
+  const todo = c.logs.join(' | ');
+  comprobarQue('13. no da nunca la dirección /dev', todo.indexOf('/dev') === -1, todo);
+  comprobarQue('13. deja la clave en el registro', todo.indexOf(clave) !== -1, todo);
+  comprobarQue('13. dice de dónde copiar la /exec', todo.indexOf('Gestionar implementaciones') !== -1 && todo.indexOf('/exec') !== -1, todo);
 }
 
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

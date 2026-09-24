@@ -27,6 +27,13 @@
    `mandarBorradores()` se queda tal cual, sin uso, por si quedara
    algún encargo `.envio.json` antiguo suelto en la bandeja; no se
    borra para no perder ese camino de rescate.
+
+   24-sep-2026 (tarde), fila 117, docs/ENVIO-CUENTA-DEL-SCRIPT.md:
+   la cuenta propia sale de getEffectiveUser() (la que ejecuta el
+   script, «Ejecutar como: Yo»), no de getActiveUser(), que llega vacía
+   con acceso «Cualquier usuario» y dejaba «Probar» en «No hay ningún
+   destinatario». prepararEnvio() ya no da la dirección /dev: da la
+   clave sola y dice de dónde copiar la dirección /exec.
    ============================================================
    Gestor de Asuntos — recogida de correos y envío desde el asunto
    Google Apps Script, en la cuenta g.educaand.es
@@ -93,9 +100,11 @@ function prepararTodo() {
 
 /* Se ejecuta una sola vez, después de haber implementado el proyecto
    como aplicación web (paso 3 de Ajustes → Enviar correo, en el
-   Gestor de Asuntos). Crea la clave si no existe y deja en el
-   registro de ejecución la línea que Francisco tiene que pegar en
-   Ajustes: la dirección de la aplicación web con la clave dentro. */
+   Gestor de Asuntos). Crea la clave si no existe y la deja en el
+   registro de ejecución. getUrl(), ejecutado desde el editor, da la
+   dirección de pruebas (/dev), que solo funciona con la sesión del
+   dueño abierta: esa no se da nunca. La buena se copia de «Implementar
+   → Gestionar implementaciones» (termina en /exec). */
 function prepararEnvio() {
   var propiedades = PropertiesService.getScriptProperties();
   var clave = propiedades.getProperty(PROPIEDAD_CLAVE);
@@ -104,14 +113,14 @@ function prepararEnvio() {
     propiedades.setProperty(PROPIEDAD_CLAVE, clave);
   }
   var url = '';
-  try { url = ScriptApp.getService().getUrl(); } catch (e) { url = ''; }
-  if (!url) {
-    Logger.log('Todavía no hay ninguna implementación como aplicación web. Ve a "Implementar" → ' +
-      '"Nueva implementación", tipo "Aplicación web", y vuelve a ejecutar prepararEnvio() para ' +
-      'conseguir la dirección.');
+  try { url = ScriptApp.getService().getUrl() || ''; } catch (e) { url = ''; }
+  if (/\/exec$/.test(url)) {
+    Logger.log('Pega esto en el Gestor de Asuntos, en Ajustes → Enviar correo: ' + url + '?k=' + clave);
     return;
   }
-  Logger.log('Pega esto en el Gestor de Asuntos, en Ajustes → Enviar correo: ' + url + '?k=' + clave);
+  Logger.log('Clave: ' + clave);
+  Logger.log('Copia la URL de Implementar → Gestionar implementaciones (termina en /exec), y pégala ' +
+    'en Ajustes → Enviar correo; añade al final ?k=' + clave);
 }
 
 /* ---------- la vuelta de cada minuto ---------- */
@@ -248,7 +257,7 @@ function guardarHilo(hilo, carpeta, respuestaDe) {
   var primero = mensajes[0];
   var ultimo = mensajes[mensajes.length - 1];
   var id = hilo.getId();
-  var mia = String(Session.getActiveUser().getEmail() || '').toLowerCase();
+  var mia = String(miCorreo() || '').toLowerCase();
 
   limpiarRestos(carpeta, id);
 
@@ -374,11 +383,11 @@ function enviarCorreo(cuerpo) {
   var asunto = String(cuerpo.asunto || '(sin asunto)');
   var texto = String(cuerpo.cuerpo || '');
 
-  if (esPrueba) para = Session.getActiveUser().getEmail();
+  if (esPrueba) para = miCorreo();
   /* Un grupo va siempre en copia oculta: si no hay nadie en "Para",
      Gmail necesita igualmente alguien ahí, y se pone la propia cuenta
      de quien ejecuta el script (mismo caso de siempre). */
-  if (!para && cco) para = Session.getActiveUser().getEmail();
+  if (!para && cco) para = miCorreo();
   if (!para) return { ok: false, motivo: 'No hay ningún destinatario.' };
 
   var adjuntosPedidos = cuerpo.adjuntos || [];
@@ -483,7 +492,7 @@ function mandarUnBorrador(fichero, carpeta) {
     if (hilo) {
       hilo.createDraftReply(encargo.cuerpo || '', opciones);
     } else {
-      var destinatario = encargo.para || (encargo.cco ? Session.getActiveUser().getEmail() : '');
+      var destinatario = encargo.para || (encargo.cco ? miCorreo() : '');
       GmailApp.createDraft(destinatario, encargo.asunto || '', encargo.cuerpo || '', opciones);
     }
 
@@ -518,7 +527,7 @@ function borrarFicherosDelEncargo(carpeta, encargo, fichero) {
    costó dos sesiones arreglar (ver enlaceAlHilo, más abajo). */
 function enlaceABorradores() {
   return 'https://mail.google.com/mail/u/?authuser=' +
-    encodeURIComponent(Session.getActiveUser().getEmail()) + '#drafts';
+    encodeURIComponent(miCorreo()) + '#drafts';
 }
 
 /* ---------- el enlace que abre el correo en Gmail ----------
@@ -534,7 +543,7 @@ function enlaceABorradores() {
    Si un correo no trajera esa cabecera, se usa el de antes. */
 function enlaceAlHilo(hilo, primero) {
   var quienSoy = 'https://mail.google.com/mail/u/?authuser=' +
-                 encodeURIComponent(Session.getActiveUser().getEmail());
+                 encodeURIComponent(miCorreo());
   try {
     var cabecera = String(primero.getHeader('Message-ID') || '').replace(/[<>]/g, '').trim();
     if (cabecera) return quienSoy + '#search/rfc822msgid:' + encodeURIComponent(cabecera);
@@ -558,7 +567,7 @@ function carpetaBandeja() {
   var enRaiz = DriveApp.getRootFolder().getFoldersByName(CARPETA);
   if (enRaiz.hasNext()) return enRaiz.next();
 
-  var yo = Session.getEffectiveUser().getEmail();
+  var yo = miCorreo();
   var ajena = null;
   var todas = DriveApp.getFoldersByName(CARPETA);
   while (todas.hasNext()) {
@@ -571,6 +580,18 @@ function carpetaBandeja() {
   if (ajena) return ajena;
 
   return DriveApp.getRootFolder().createFolder(CARPETA);
+}
+
+/* La cuenta propia: la que ejecuta el script («Ejecutar como: Yo»).
+   getActiveUser() llega vacía cuando la aplicación web se llama con
+   acceso «Cualquier usuario» (fila 117). */
+function miCorreo() {
+  var correo = '';
+  try { correo = Session.getEffectiveUser().getEmail() || ''; } catch (e) { correo = ''; }
+  if (!correo) {
+    try { correo = Session.getActiveUser().getEmail() || ''; } catch (e) { correo = ''; }
+  }
+  return correo;
 }
 
 function ahora() {
@@ -593,7 +614,7 @@ function quien(texto) {
    tuya. Con ellas el Gestor busca al alumno en el RegAlum, y doPost
    decide si un envío puede responder dentro del hilo. */
 function direccionesDelHilo(mensajes) {
-  var mia = String(Session.getActiveUser().getEmail() || '').toLowerCase();
+  var mia = String(miCorreo() || '').toLowerCase();
   var vistas = {};
   var salida = [];
   for (var i = 0; i < mensajes.length; i++) {

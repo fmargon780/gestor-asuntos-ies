@@ -132,6 +132,9 @@ await comprobar('el de crear otro queda como el discreto',
   pagina.locator('#cuadro-aceptar').evaluate(b => b.classList.contains('boton-principal')), false);
 
 await pagina.click('#cuadro-aceptar');   /* "Crear otro de todas formas" */
+/* Fila 119: crear abre la ficha del asunto; se vuelve a la lista. */
+await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await comprobar('las dos carpetas conviven',
   nombresDeAbiertos().then(n => n.filter(x => x.indexOf('TRANSPORTE') !== -1).sort()),
@@ -195,9 +198,9 @@ await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 
 /* ============================================================
-   4. UN CANDIDATO ARCHIVADO: "Abrir" lleva a su carpeta en el ARCHIVO
+   4. UN CANDIDATO ARCHIVADO: "Abrir" lleva a su ficha de archivado (fila 119)
    ============================================================ */
-console.log('--- un candidato archivado lleva al ARCHIVO ---');
+console.log('--- un candidato archivado lleva a su ficha de archivado ---');
 
 const ARCHIVADO = '250115 TRANSPORTE 26-27 Reserva State, Ricardo Catalán 7731644';
 await pagina.evaluate(async (nombre) => {
@@ -223,13 +226,16 @@ await comprobar('el archivado lleva su marca',
 
 await pagina.check('input[name="dup-cual"][value="2"]');
 await pagina.click('#dup-abrir');
-await pagina.waitForSelector('#pantalla-archivo:not(.oculto)');
-await pagina.waitForTimeout(500);
-await comprobar('el buscador del archivo se rellena con su nombre',
-  pagina.locator('#buscar-archivo').inputValue(), ARCHIVADO);
-await comprobar('y el archivo lo enseña', pagina.locator('#lista-archivo .tarjeta').count(), 1);
+/* Fila 119: abre directamente su ficha de archivado. */
+await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await pagina.waitForTimeout(300);
+await comprobar('lleva a la ficha del archivado', pagina.locator('.ficha-nombre-texto').textContent(), ARCHIVADO);
+await comprobar('en modo archivo (con «Reabrir el asunto»)',
+  pagina.getByRole('button', { name: 'Reabrir el asunto', exact: true }).count(), 1);
 await comprobar('no se ha creado una cuarta carpeta abierta',
   nombresDeAbiertos().then(n => n.filter(x => x.indexOf('TRANSPORTE') !== -1).length), 2);
+await pagina.click('#ficha-volver');
+await pagina.waitForSelector('#pantalla-asunto.oculto', { state: 'attached' });
 
 /* ============================================================
    5. EL AVISO JUNTO A "TABLÓN": YA NO HAY FRANJA

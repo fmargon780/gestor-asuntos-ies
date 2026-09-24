@@ -80,13 +80,16 @@ async function nombresDeAbiertos() {
 async function crearAsunto() {
   await pagina.click('#btn-crear');
   await Promise.race([
-    pagina.waitForSelector('#pantalla-abiertos:not(.oculto)'),
+    pagina.waitForSelector('#pantalla-asunto:not(.oculto)'),
     pagina.waitForSelector('#capa:not(.oculto)')
   ]);
   if (await pagina.locator('#capa:not(.oculto)').isVisible().catch(() => false)) {
     await pagina.click('#cuadro-aceptar');
-    await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
   }
+  /* Fila 119: crear abre la ficha del asunto; se vuelve a la lista. */
+  await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+  await pagina.click('#ficha-volver');
+  await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 }
 
 /* ---------- arranque, con un RegAlum de mentira propio ---------- */

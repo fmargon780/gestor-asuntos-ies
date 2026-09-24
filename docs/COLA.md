@@ -107,17 +107,22 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-**Las filas 117, 118, 119 y 120 están PENDIENTES** (apuntadas el 24-sep-2026). Las filas 1 a 75,
-77 a 116 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+**Ninguna fila PENDIENTE.** Las filas 1 a 75 y 77 a 120 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 117 | `docs/ENVIO-CUENTA-DEL-SCRIPT.md` (el envío de correo con la aplicación web publicada: dirección `/exec`, cuenta que ejecuta y «Probar») | PENDIENTE |
-| 118 | `docs/GUIA-NUEVA-LLEGA-A-LOS-ASUNTOS.md` (los pasos nuevos de una guía llegan a los asuntos abiertos de ese tipo) | PENDIENTE |
-| 119 | `docs/TRAS-CADA-ACCION.md` (adónde lleva la aplicación después de crear, reabrir, editar o volver; aviso con «Ir al asunto») | PENDIENTE |
-| 120 | `docs/GUION-DESDE-EL-HITO.md` (escribir el guion de la guía del tipo desde la mesa del hito; sale en todos los asuntos de ese tipo) | PENDIENTE |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**24-sep-2026, cupo de Vercel agotado:** al abrir el pull request de las filas 117 y 118 (hacia las 09:58), Vercel respondió «Resource is limited - try again in 24 hours (more than 100, code: "api-deployments-free-per-day")». Las filas 117 a 120 están fusionadas en `main`, pero puede que la web no las publique hasta que el cupo se libere. La próxima sesión: comprobar con `curl` (`js/version.js?v=<algo>`) que `App.VERSION` es `24-sep-2026 · 10:44` o posterior; si sigue atrás pasadas 24 horas, un commit nuevo en `main` (o `create_deployment` con `withLatestCommit`, regla 19) publica todo lo pendiente. Esta sesión no tiene salida a `vercel.app` ni permiso en el conector de Vercel (403), así que no ha podido comprobarlo.
+
+**La fila 120 está HECHA** (24-sep-2026): `docs/GUION-DESDE-EL-HITO.md`. En la mesa del hito, «+ Añadir un paso a la guía del tipo» añade la línea al final del guion del paso de la guía (`GuiasDelCentro.cambiarPasos`), y sale en todos los asuntos de ese tipo; «+ Añadir un paso solo para este asunto» sigue igual. No sale en hitos añadidos a mano, en pasos que ya no están en la guía ni en preguntas. Versión `App.VERSION`: `24-sep-2026 · 10:44`.
+
+**La fila 119 está HECHA** (24-sep-2026): `docs/TRAS-CADA-ACCION.md`. Crear, reabrir y editar dejan en la ficha del asunto; «Volver» (y Escape) regresa a la pantalla de origen y a la misma altura de la lista; meter un documento, guardar un correo, unir y devolver de la papelera dan un aviso con «Ir al asunto»; un duplicado archivado abre su ficha. Fichero nuevo `js/navegacion.js`; prueba `pruebas/tras-cada-accion.mjs`. Versión `App.VERSION`: `24-sep-2026 · 10:44`.
+
+**La fila 118 está HECHA** (24-sep-2026): `docs/GUIA-NUEVA-LLEGA-A-LOS-ASUNTOS.md`. Al guardar la guía de un tipo, sus pasos nuevos se añaden, en su sitio, a los asuntos abiertos de ese tipo que ya tienen hitos (una sola escritura de `hitos.json`), y el aviso dice a cuántos; al abrir la ficha, lo mismo como red de seguridad. No se toca, reordena ni borra nada de lo que ya hay; el ARCHIVO no cambia; un hito quitado a mano no vuelve (`pasosConocidos`). Fichero nuevo `js/hitos-sincronizar.js`. Versión `App.VERSION`: `24-sep-2026 · 10:44`.
+
+**La fila 117 está HECHA** (24-sep-2026): `docs/ENVIO-CUENTA-DEL-SCRIPT.md`. El script usa la cuenta que lo ejecuta (`getEffectiveUser()`, `miCorreo()`) en vez de `getActiveUser()`, que llega vacía con acceso «Cualquier usuario»; `prepararEnvio()` da solo la clave y dice de dónde copiar la URL `/exec`; Ajustes → Enviar correo rechaza sin llamar a Google una dirección `/dev` o sin `?k=`, y explica los pasos corregidos. Falta que Francisco pegue el script nuevo, haga «Nueva versión» y pulse «Probar» (no hay cuenta de Google en estas sesiones). Versión `App.VERSION`: `24-sep-2026 · 10:44`.
 
 **24-sep-2026, sesión programada (taller automático):** al llegar, la fila 115 ya estaba
 **EN CURSO** por otra sesión (la marqué yo mismo a las 04:08 y, mientras tanto, esa otra sesión la

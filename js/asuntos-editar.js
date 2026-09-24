@@ -297,7 +297,8 @@ App.editarAsunto = async function (a) {
 
   /* Mientras se guarda, el asunto está ocupado (fila 100): ni
      archivar ni volver a editar hasta que termine. */
-  await App.conOcupado(a.nombre, function () { return guardarEdicion(a, p, d, nombreNuevo, datos); });
+  /* Devuelve el nombre con que queda el asunto si ha salido bien (fila 119). */
+  return await App.conOcupado(a.nombre, function () { return guardarEdicion(a, p, d, nombreNuevo, datos); });
 };
 
 /* Lo principal (la carpeta y la ficha) y lo accesorio (la lista, la
@@ -310,7 +311,7 @@ async function guardarEdicion(a, p, d, nombreNuevo, datos) {
     try { await App.verAbiertos(); }
     catch (e2) { U.accesorio('Asunto actualizado, pero no he podido poner la lista al día. Pulsa Recargar', e2); }
     await ofrecerGuiaNueva(a.nombre, p.tipo, d.tipo);
-    return;
+    return a.nombre;
   }
   try {
     if (await Carpetas.existe(App.E.abiertos, nombreNuevo)) {
@@ -339,6 +340,7 @@ async function guardarEdicion(a, p, d, nombreNuevo, datos) {
   try { await App.verAbiertos(); }
   catch (e3) { U.accesorio('Asunto editado, pero no he podido poner la lista al día. Pulsa Recargar', e3); }
   await ofrecerGuiaNueva(nombreNuevo, p.tipo, d.tipo);
+  return nombreNuevo;
 }
 
 /* Solo cuando la carpeta y la ficha ya han salido bien (fila 94,

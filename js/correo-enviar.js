@@ -40,12 +40,31 @@ window.CorreoEnviar = (function () {
 
   function tieneConexion() { return !!leerUrl(); }
 
+  /* Fila 117 (docs/ENVIO-CUENTA-DEL-SCRIPT.md): dos direcciones que
+     nunca pueden funcionar, y se dicen sin llamar a Google. La /dev es
+     la de pruebas del editor (solo vale con la sesión del dueño
+     abierta); sin `?k=` el script rechaza siempre la llamada. */
+  function problemaDeDireccion(url) {
+    url = String(url || '').trim();
+    if (!url) return '';
+    var ruta = url.split('?')[0].split('#')[0].replace(/\/+$/, '');
+    if (/\/dev$/.test(ruta)) {
+      return 'Esa es la dirección de pruebas. Copia la de Implementar → Gestionar implementaciones, que termina en /exec.';
+    }
+    if (!/[?&]k=[^&]+/.test(url)) {
+      return 'A la dirección le falta la clave: añade al final ?k= y la clave que da prepararEnvio.';
+    }
+    return '';
+  }
+
   /* Manda el JSON con Content-Type: text/plain a propósito: así el
      navegador lo trata como una petición "simple" y no hace la
      consulta previa CORS, que Apps Script no sabe contestar. */
   async function llamar(cuerpo) {
     var url = leerUrl();
     if (!url) return { ok: false, motivo: 'No hay ninguna dirección de envío conectada.' };
+    var problema = problemaDeDireccion(url);
+    if (problema) return { ok: false, motivo: problema };
     var respuesta;
     try {
       respuesta = await fetch(url, {
@@ -105,13 +124,18 @@ window.CorreoEnviar = (function () {
           '<li>Arriba a la derecha: «Implementar» → «Nueva implementación». Tipo: «Aplicación web». ' +
           'Ejecutar como: «Yo». Quién tiene acceso: «Cualquier usuario». Pulsa «Implementar» y ' +
           'acepta los permisos.</li>' +
-          '<li>Elige <code>prepararEnvio</code> en el desplegable de arriba y pulsa «Ejecutar». ' +
-          'Copia la línea que sale abajo, en el registro de ejecución.</li>' +
-          '<li>Pégala aquí abajo y pulsa «Probar».</li>' +
+          '<li>Copia la URL de «Implementar» → «Gestionar implementaciones» (termina en ' +
+          '<code>/exec</code>). Después elige <code>prepararEnvio</code> en el desplegable de arriba ' +
+          'y pulsa «Ejecutar»: solo sirve para sacar la clave, que sale abajo, en el registro de ' +
+          'ejecución.</li>' +
+          '<li>Pega aquí abajo la URL con la clave al final, así: <code>URL?k=clave</code>, y pulsa ' +
+          '«Probar».</li>' +
         '</ol>' +
-        '<p class="nota">Si en el paso 3 no aparece «Cualquier usuario» (la cuenta del centro puede ' +
-        'tenerlo limitado), elige «Cualquier usuario de la organización» y pulsa «Probar» igual: si ' +
-        'funciona, no hace falta nada más.</p>' +
+        '<p class="nota">Si en el paso 3 no aparece «Cualquier usuario», la cuenta del centro no deja ' +
+        'publicar así y el envío no puede funcionar; díselo a Claude.</p>' +
+        '<p class="nota">Cada vez que pegues código nuevo en el script: «Implementar» → «Gestionar ' +
+        'implementaciones» → lápiz → Versión: «Nueva versión» → «Implementar». Así se conserva la ' +
+        'misma dirección y no hay que volver a pegarla aquí.</p>' +
         '<label class="etiqueta">Dirección de la aplicación web</label>' +
         '<input id="envio-correo-url" class="campo" placeholder="https://script.google.com/macros/s/.../exec?k=...">' +
         '<div class="alta-tipo" style="margin-top:8px">' +
@@ -140,17 +164,27 @@ window.CorreoEnviar = (function () {
     var campo = document.getElementById('envio-correo-url');
     if (!guardar || !probarBtn || !campo) return;
 
+    function avisarProblema() {
+      var problema = problemaDeDireccion(campo.value);
+      if (problema && aviso) {
+        aviso.innerHTML = '<p class="aviso aviso-rojo">' + U.escapar(problema) + '</p>';
+      }
+      return !!problema;
+    }
+
     guardar.onclick = function () {
+      if (aviso) aviso.innerHTML = '';
+      if (avisarProblema()) return;
       guardarUrl(campo.value);
       pintarResumenBloque();
-      if (aviso) aviso.innerHTML = '';
       U.aviso('Dirección guardada en este navegador.', 'bueno');
     };
 
     probarBtn.onclick = async function () {
+      if (aviso) aviso.innerHTML = '';
+      if (avisarProblema()) return;
       guardarUrl(campo.value);
       pintarResumenBloque();
-      if (aviso) aviso.innerHTML = '';
       await U.mientrasGuarda(probarBtn, async function () {
         var r = await probar();
         if (r && r.ok) {
@@ -199,6 +233,7 @@ window.CorreoEnviar = (function () {
     tieneConexion: tieneConexion,
     leerUrl: leerUrl,
     guardarUrl: guardarUrl,
+    problemaDeDireccion: problemaDeDireccion,
     enviar: enviar,
     probar: probar,
     irAAjustes: irAAjustes
