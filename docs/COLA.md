@@ -112,7 +112,7 @@ Las filas 1 a 75 y 77 a 132 están **HECHAS**. Sus documentos siguen en `docs/`,
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 133 | `docs/PARTIR-FICHEROS-GRANDES.md` (los que pasan de 600 líneas, sin cambiar nada) | PENDIENTE |
+| 133 | `docs/PARTIR-FICHEROS-GRANDES.md` (los que pasan de 600 líneas, sin cambiar nada) | EN CURSO (24-sep-2026) |
 | 134 | `docs/QUIEN-ENCARGA-CADA-TIPO.md` (Secretaría, Dirección, Jefatura o Varios en cada tipo) | PENDIENTE |
 | 135 | `docs/ASUNTOS-RESERVADOS.md` (sin el nombre del tercero en listas, buscador y Cuentas) | PENDIENTE |
 | 136 | `docs/PLAZO-DE-CONSERVACION.md` (años por tipo y aviso cuando se cumplen; nunca borra solo) | PENDIENTE |
