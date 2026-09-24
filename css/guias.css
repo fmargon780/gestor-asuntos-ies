@@ -450,3 +450,7 @@
 }
 .paso-documentos > summary,
 .paso-guion > summary { cursor: pointer; font-size: 13px; color: var(--tinta-suave); }
+
+/* Fila 138: «Hay que reunirlo» en una línea del guion. */
+.guion-reunir-fila { gap: 10px; align-items: center; flex-wrap: wrap; }
+.guion-reunir-fila .guion-reunir-clase { max-width: 180px; }

@@ -15,8 +15,14 @@
    líneas de una opción nunca son pregunta, y una pregunta no lleva
    `accion` ni `normativa`.
 
-   Mismo patrón que js/guias-requisitos.js: pintar, leer y enganchar una
-   lista dentro de un contenedor. Se carga después de js/guias.js.
+   Algo que hay que reunir (25-sep-2026, fila 138, docs/UNA-SOLA-LISTA-EN-EL-HITO.md):
+   una línea normal puede llevar `reunir: 'documento' | 'dato'` y
+   `obligatorio`. Es lo que antes era «Lo que hay que reunir», que deja de
+   ser una lista aparte: la casilla «Hay que reunirlo», junto a «Es una
+   pregunta».
+
+   Pinta, lee y engancha una lista dentro de un contenedor. Se carga
+   después de js/guias.js.
    ============================================================ */
 var GuiasGuion = (function () {
 
@@ -56,6 +62,11 @@ var GuiasGuion = (function () {
       var accion = String((g && g.accion) || '');
       base.accion = ACCIONES.some(function (a) { return a.valor === accion; }) ? accion : '';
       base.normativa = normalizarNormativa(g && g.normativa);
+      /* Fila 138: algo que hay que reunir. */
+      if (g && (g.reunir === 'documento' || g.reunir === 'dato')) {
+        base.reunir = g.reunir;
+        base.obligatorio = !!g.obligatorio;
+      }
       return base;
     }).filter(function (g) { return g.texto; });
   }
@@ -68,7 +79,8 @@ var GuiasGuion = (function () {
           return o.texto + ' → ' + (o.lineas || []).map(function (x) { return x.texto; }).join(', ');
         }).join(' / ') + ']';
       }
-      return g.texto + (g.accion ? ' [' + g.accion + ']' : '');
+      return g.texto + (g.accion ? ' [' + g.accion + ']' : '') +
+        (g.reunir ? ' [reunir ' + g.reunir + (g.obligatorio ? ', obligatorio' : '') + ']' : '');
     }).join('; ');
   }
 
@@ -95,6 +107,17 @@ var GuiasGuion = (function () {
         '<div class="guion-fila-linea guion-norma">' +
           '<input class="campo guion-cita" value="' + U.escapar(n.cita || '') + '" placeholder="Normativa: la cita (opcional)">' +
           '<input class="campo guion-url" value="' + U.escapar(n.url || '') + '" placeholder="Enlace al BOE o al BOJA (opcional)">' +
+        '</div>') +
+      (pregunta ? '' :
+        '<div class="guion-fila-linea guion-reunir-fila">' +
+          '<label class="interruptor"><input type="checkbox" class="guion-reunir"' + (g.reunir ? ' checked' : '') +
+            '><span>Hay que reunirlo</span></label>' +
+          '<select class="campo guion-reunir-clase">' +
+            '<option value="documento"' + (g.reunir !== 'dato' ? ' selected' : '') + '>📎 Un documento</option>' +
+            '<option value="dato"' + (g.reunir === 'dato' ? ' selected' : '') + '>✎ Un dato</option>' +
+          '</select>' +
+          '<label class="interruptor"><input type="checkbox" class="guion-obligatorio"' + (g.obligatorio ? ' checked' : '') +
+            '><span>Obligatorio</span></label>' +
         '</div>') +
       (dentro ? '' : '<label class="interruptor guion-pregunta-fila"><input type="checkbox" class="guion-es-pregunta"' +
         (pregunta ? ' checked' : '') + '><span>Es una pregunta: lo que hay que hacer depende de la respuesta</span></label>') +
@@ -143,6 +166,11 @@ var GuiasGuion = (function () {
     base.accion = sel ? sel.value : '';
     base.normativa = (cita && cita.value.trim())
       ? { cita: cita.value.trim(), bloque: '', clave: '', url: q('.guion-norma > .guion-url').value.trim() } : null;
+    var reunir = q('.guion-reunir-fila .guion-reunir');
+    if (reunir && reunir.checked) {
+      base.reunir = q('.guion-reunir-fila > .guion-reunir-clase').value === 'dato' ? 'dato' : 'documento';
+      base.obligatorio = !!q('.guion-reunir-fila .guion-obligatorio').checked;
+    }
     return base;
   }
 

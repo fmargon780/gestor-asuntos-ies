@@ -39,20 +39,11 @@ var GuiasPasoBloques = (function () {
   }
 
   function anadir(d, p, i, pregunta, ctx) {
-    /* "Lo que hay que reunir" (18-sep-2026, fila 59,
-       docs/REQUISITOS-DE-HITO.md): solo en los pasos que no son
-       pregunta. Una pregunta no se "da por hecha" con una casilla:
-       se resuelve eligiendo una opción, y son SUS pasos (más abajo,
-       cajaDeOpciones) los que pueden llevar requisitos. */
-    if (!pregunta && window.GuiasRequisitos) {
-      d.insertAdjacentHTML('beforeend', GuiasRequisitos.bloqueHTML(p.requisitos));
-      ctx.restaurar(d.querySelector(':scope > .paso-requisitos'), i, '');
-      GuiasRequisitos.enganchar(d, function (mutador) {
-        ctx.recoger();
-        mutador(ctx.nivel()[i].requisitos);
-        ctx.pintar();
-      });
-    }
+    /* "Lo que hay que reunir" ya no es una sección aparte (fila 138,
+       docs/UNA-SOLA-LISTA-EN-EL-HITO.md): es la casilla «Hay que
+       reunirlo» de cada línea del guion (js/guias-guion.js). Sin la
+       sección, js/guias-editor.js no toca los `requisitos` viejos del
+       paso: se quedan en el fichero, sin leerse. */
 
     /* "Comunicación de este paso" (18-sep-2026, fila 60,
        docs/COMUNICAR-DESDE-EL-HITO.md): mismo criterio, solo en los

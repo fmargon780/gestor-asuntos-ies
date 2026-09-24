@@ -79,6 +79,9 @@ cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegi
 - `Guias.vista(pasos, [], false)` sigue sirviendo de recordatorio sin casillas al crear un asunto
   (`#guia-nuevo`, `js/guias-enganche.js`): es el único sitio, aparte del propio cuadro de editar,
   que todavía la pinta. `Guias.cuandoSeElige` ya no tiene quien la llame.
+- **Desde la fila 138 «lo que hay que reunir» es una línea del guion** (`reunir`, `obligatorio`):
+  ver «Una sola lista» en `docs/contexto/HITO-MESA.md`. Lo de abajo es cómo era, y los `requisitos`
+  viejos siguen en los ficheros sin leerse.
 - **"Lo que hay que reunir"** (18-sep-2026, fila 59, `docs/REQUISITOS-DE-HITO.md`): un paso (o un
   subpaso, dentro de una opción de una pregunta) puede llevar una lista opcional de casillas —
   `requisitos: [{ id, texto, clase: 'documento'|'dato', obligatorio }]` —, normalizada por
@@ -395,6 +398,7 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
   repintado ENTERO de la ficha (`pintarLaFicha` rehace de un golpe los hijos directos de
   `#ficha-asunto-cuerpo`), que es lo único que de verdad hace falta captar aquí — cualquier cambio
   que sí toque a los hitos por su cuenta ya llama a `HitosPanel.programarRepintado()` él mismo.
+- (Hasta la fila 138; ahora son líneas del guion, ver `docs/contexto/HITO-MESA.md`.)
 - **"Lo que hay que reunir"** (18-sep-2026, fila 59, `docs/REQUISITOS-DE-HITO.md`): cada hito trae
   `requisitos`, copiados de los del paso de la guía al crearse (`Hitos.pasoAHito`), con el estado
   propio del hito encima: `{ id, texto, clase, obligatorio, hecho, valor, documento, quien,

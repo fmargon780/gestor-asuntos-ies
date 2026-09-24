@@ -379,7 +379,9 @@ var Hitos = (function () {
      no hay ninguna, o si el hito no tiene requisitos. No cambia
      `marcar`: es js/hitos-panel-lista.js quien llama a esto ANTES de
      pasar un hito a "hecho", para avisar sin impedir nada. */
-  function faltanObligatorios(hito) {
+  function faltanObligatorios(hito, a) {
+    /* Fila 138: con el asunto, las líneas obligatorias del guion por reunir. */
+    if (a && window.Hitos && Hitos.faltanReunir) return Hitos.faltanReunir(a, hito, true);
     return ((hito && hito.requisitos) || []).filter(function (r) { return r.obligatorio && !r.hecho; });
   }
 

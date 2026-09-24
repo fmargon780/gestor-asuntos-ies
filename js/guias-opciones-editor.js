@@ -100,15 +100,7 @@ var GuiasOpcionesEditor = (function () {
 
         if (!subPregunta) {
           c.prepararRecuadro(sc.querySelector('.subpaso-cuerpo'));
-          if (window.GuiasRequisitos) {
-            sc.insertAdjacentHTML('beforeend', GuiasRequisitos.bloqueHTML(sp.requisitos));
-            c.restaurar(sc.querySelector(':scope > .paso-requisitos'), i, sp.id);
-            GuiasRequisitos.enganchar(sc, function (mutador) {
-              recoger();
-              mutador(nivel[i].opciones[j].pasos[k].requisitos);
-              pintar();
-            });
-          }
+          /* Fila 138: sin «Lo que hay que reunir» aparte (va en el guion). */
           if (window.GuiasComunicacion) {
             sc.insertAdjacentHTML('beforeend', GuiasComunicacion.bloqueHTML(sp.id, sp.comunicacion));
             c.restaurar(sc.querySelector(':scope > .paso-comunicacion'), i, sp.id);

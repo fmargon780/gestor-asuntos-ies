@@ -52,6 +52,14 @@ await pagina.click('#btn-abiertos');
 await pagina.click('#btn-archivo');
 await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
+await pagina.evaluate(async () => {
+  /* Fila 138: el paso de «lo que hay que reunir» al guion ya está hecho
+     (si no, al entrar lee guias.json y escribe su marca, justo en medio
+     de lo que se mide aquí). */
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
+  const f = await g.getFileHandle('reunir-migrado.json', { create: true });
+  const w = await f.createWritable(); await w.write('{}'); await w.close();
+});
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
 

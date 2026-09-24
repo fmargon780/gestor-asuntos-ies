@@ -144,7 +144,7 @@ var HitosPanelLista = (function () {
            reunir y Francisco sigue igualmente, el hito se marca y se le
            apunta una nota automática. */
         var faltan = (nuevoEstado === 'hecho' && window.Hitos.faltanObligatorios)
-          ? Hitos.faltanObligatorios(h) : [];
+          ? Hitos.faltanObligatorios(h, a) : [];
         if (faltan.length) {
           var ok = await U.preguntar('Dar este hito por hecho',
             '<p class="explica">Faltan ' + faltan.length + (faltan.length === 1 ? ' cosa' : ' cosas') +
@@ -191,7 +191,10 @@ var HitosPanelLista = (function () {
      siempre conservan su clase, y los mismos `enganchar…` de cada módulo
      los encuentran dentro de la fila. */
   function cuerpoDeHito(a, h, ajustes, contexto, abierto, nombresDeLaCarpeta, hitos) {
-    var htmlRequisitos = (abierto && window.HitosRequisitos) ? HitosRequisitos.bloqueDeRequisitos(a, h) : '';
+    /* Fila 138: lo que hay que reunir está en el guion. Solo un hito del
+       ARCHIVO que aún lo trajera aparte lo enseña, para leer. */
+    var htmlRequisitos = (!abierto && window.HitosRequisitos && (h.requisitos || []).length)
+      ? HitosRequisitos.bloqueDeRequisitos(a, h) : '';
 
     var colGuion = '<div class="mesa-col mesa-col-guion">' +
       (h.cuerpo ? '<div class="hito-explicacion">' + h.cuerpo + '</div>' : '') +
@@ -211,8 +214,7 @@ var HitosPanelLista = (function () {
         (abierto ? '<div class="mesa-soltar">Suelta aquí un documento del ordenador</div>' : '') +
         (abierto || (h.documentos || []).length ? '<div class="hito-documentos">' + documentosHTML + '</div>' : '') +
         '<div class="mesa-seleccion oculto"></div>' +
-        (htmlRequisitos || (abierto && window.HitosRequisitos
-          ? '<button type="button" class="boton hito-requisitos-anadir-suelto">+ Añadir algo que falte</button>' : '')) +
+        htmlRequisitos +
       '</div>' +
       '<div class="mesa-bloque mesa-formularios">' +
         '<div class="mesa-bloque-cabecera"><span class="mesa-bloque-titulo">Formularios y plantillas de este hito</span>' +
@@ -295,11 +297,6 @@ var HitosPanelLista = (function () {
   function engancharCuerpo(div, a, h, abierto) {
     engancharDocumentos(div, a, h, abierto);
     if (!abierto) return;
-    if (window.HitosRequisitos) HitosRequisitos.engancharBloque(div, a, h);
-    var anadirSuelto = div.querySelector('.hito-requisitos-anadir-suelto');
-    if (anadirSuelto && window.HitosRequisitos) {
-      anadirSuelto.onclick = function () { HitosRequisitos.anadir(a, h); };
-    }
     if (window.HitosAnadir) HitosAnadir.engancharBoton(div, a, h);   /* fila 103 */
     if (window.HitosComunicar) HitosComunicar.engancharBoton(div, a, h);
     if (window.HitosGenerar) HitosGenerar.engancharBoton(div, a, h);   /* fila 102 */

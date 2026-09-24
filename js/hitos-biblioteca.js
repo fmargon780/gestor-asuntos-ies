@@ -164,7 +164,7 @@ var HitosBiblioteca = (function () {
      4.1: "es una copia"). `origenBiblioteca` es lo único que lo
      distingue de un paso escrito a mano. */
   function modeloAPaso(modelo) {
-    return {
+    var paso = {
       id: (window.Guias ? Guias.nuevoId() : nuevoId()),
       titulo: modelo.titulo, cuerpo: modelo.explicacion, opciones: [],
       responsable: modelo.responsable, estadoAsunto: modelo.estadoAsunto, plazo: modelo.plazo,
@@ -177,6 +177,10 @@ var HitosBiblioteca = (function () {
       guion: JSON.parse(JSON.stringify(modelo.guion || [])),   /* entero, con sus preguntas (fila 116) */
       origenBiblioteca: { id: modelo.id, revision: modelo.revision, divergido: false }
     };
+    /* Fila 138: un modelo de antes con «lo que hay que reunir» lo trae ya
+       como líneas del guion (js/reunir-migracion.js). */
+    if (window.ReunirMigracion) ReunirMigracion.pasoAGuion(paso);
+    return paso;
   }
 
   /* Los campos que se comparan entre un paso y su modelo (apartado 4.3
@@ -188,7 +192,7 @@ var HitosBiblioteca = (function () {
     { clave: 'responsable', etiqueta: 'Responsable' },
     { clave: 'estadoAsunto', etiqueta: 'Estado del asunto' },
     { clave: 'plazo', etiqueta: 'Plazo' },
-    { clave: 'requisitos', etiqueta: 'Lo que hay que reunir' },
+    /* «Lo que hay que reunir» ya no se compara aparte: va en el guion (fila 138). */
     { clave: 'comunicacion', etiqueta: 'Comunicación de este paso' },
     { clave: 'normativa', etiqueta: 'Normativa' },
     { clave: 'plantillasDocumento', etiqueta: 'Documentos' },

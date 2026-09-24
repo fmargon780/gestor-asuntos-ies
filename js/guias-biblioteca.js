@@ -53,7 +53,8 @@ var GuiasBiblioteca = (function () {
     var trozos = [];
     if (m.responsable) trozos.push(m.responsable);
     if (m.plazo && m.plazo.dias) trozos.push((typeof Plazos !== 'undefined' && Plazos.textoPlazo ? Plazos.textoPlazo(m.plazo) : m.plazo.dias + ' días') + ' de plazo');   /* fila 131 */
-    var n = (m.requisitos || []).length;
+    /* Fila 138: lo que hay que reunir son líneas del guion. */
+    var n = (m.guion || []).filter(function (g) { return g && g.reunir; }).length;
     if (n) trozos.push(n + (n === 1 ? ' cosa que reunir' : ' cosas que reunir'));
     return trozos.join(' · ') || 'Sin más datos';
   }

@@ -130,6 +130,13 @@ var FichaDocumentos = (function () {
           try {
             if (hitoDelDoc) await Hitos.quitarDocumento(a.nombre, hitoDelDoc.id, f.nombre);
             if (hitoNuevo) await Hitos.anadirDocumento(a.nombre, hitoNuevo.id, f.nombre);
+            /* Fila 138: la línea «hay que reunir un documento» del guion. */
+            if (window.HitosRequisitos) {
+              try {
+                if (hitoDelDoc) await HitosRequisitos.desmarcarPorDocumento(a.nombre, hitoDelDoc.id, f.nombre);
+                if (hitoNuevo) await HitosRequisitos.marcarPorDocumento(a.nombre, hitoNuevo.id, f.nombre);
+              } catch (e2) { /* no crítico */ }
+            }
             if (window.HitosPanel) window.HitosPanel.programarRepintado();
             pintar(a);
           } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }

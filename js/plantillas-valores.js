@@ -256,7 +256,7 @@
       valores.hito = hito.titulo || '';
       valores['plazo del hito'] = hito.fecha ? U.fechaLegible(U.aAaMmDd(hito.fecha)) : '';
       if (op.conLoQueFalta !== false && window.HitosRequisitos && HitosRequisitos.textoLoQueFalta) {
-        valores.loQueFalta = HitosRequisitos.textoLoQueFalta(hito) || '';
+        valores.loQueFalta = HitosRequisitos.textoLoQueFalta(hito, a) || '';   /* fila 138: del guion */
       }
       valores.hechos = {};
       try {

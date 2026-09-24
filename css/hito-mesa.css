@@ -134,3 +134,9 @@ body.con-visor .mesa-col-consulta, body.con-lector .mesa-col-consulta { grid-col
 .guion-plegadas summary { cursor: pointer; }
 .guion-paso-plegada { opacity: .7; padding: 2px 0 2px 22px; }
 .guion-pregunta.hecho .guion-paso-texto { text-decoration: none; color: var(--tinta); }
+
+/* Fila 138: algo que hay que reunir, dentro del guion. */
+.guion-reunir-marca { margin: 0 4px 0 2px; }
+.guion-obligatorio { font-size: 12px; color: var(--rojo-linea); }
+.guion-dato { margin: 4px 0 0 26px; max-width: 360px; }
+.guion-reunir-documento { margin-left: 26px; }

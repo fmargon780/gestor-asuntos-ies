@@ -243,6 +243,7 @@
     pasosDe: function (tipo) { return pasosDe(tipo).slice(); },
     guardarPasos: guardarPasos,
     cambiarPasos: cambiarPasos,
+    recargar: cargar,   /* fila 138: tras pasar «lo que hay que reunir» al guion */
     asegurarGuia: asegurarGuia
   };
 

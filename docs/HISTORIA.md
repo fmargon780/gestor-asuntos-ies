@@ -5,13 +5,30 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 138: una sola lista dentro del hito
+
+`docs/UNA-SOLA-LISTA-EN-EL-HITO.md`. El guion y «lo que hay que reunir» hacían lo mismo: queda el guion.
+Las palabras son tres: guía (el modelo), hito (cada paso) y guion (la lista de tareas). Decisiones:
+
+- Los requisitos viejos no se borran de `guias.json`, `hitos-biblioteca.json` ni `hitos.json`: se
+  dejan de leer. El paso se hace una vez (marca `reunir-migrado.json`) y es idempotente por el id
+  `reunir-<id>`.
+- Un requisito de un hito que su paso de la guía no tiene (lo había añadido solo ese asunto) pasa
+  a línea propia del asunto; uno que sí, deja su estado (hecho, valor, documento, quién y cuándo)
+  en la línea del paso.
+- Los documentos se marcan solos por el mismo camino de siempre (`marcarPorDocumento`), que ahora
+  manda al guion; también al asociar un documento a un hito desde la ficha.
+- En el contenido del instituto (`biblioteca-centro.json`) los 87 requisitos de 44 pasos y modelos
+  pasaron a líneas del guion, y ahí sí se vaciaron (es un fichero nuestro, no del centro).
+- «+ Añadir algo que falte» desaparece con el bloque: una línea propia del guion hace lo mismo.
+
 ## 25-sep-2026 — Fila 137: el índice del expediente
 
 `docs/INDICE-DEL-EXPEDIENTE.md`. Para mandar un expediente a Inspección o a un recurso, la ley pide un
 índice numerado de sus documentos: ahora lo hace la aplicación, en PDF, al archivar y con un botón
 en el menú de la ficha. Decisiones:
 
-- El «Botón «Poner en orden las fichas del ARCHIVO»» salió de `CONTEXTO-CORTO.md` para hacer sitio;
+- La línea del botón «Poner en orden las fichas del ARCHIVO» salió de `CONTEXTO-CORTO.md` para hacer sitio;
   sigue en Mantenimiento y en `docs/contexto/ASUNTOS-ARCHIVO.md`.
 - Al rehacer el índice, el viejo va a la papelera sin nota en el asunto (una nota por cada índice
   rehecho sería ruido).

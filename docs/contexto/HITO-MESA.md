@@ -62,8 +62,8 @@ Escape; con la mesa abierta, el título "Hitos" del recuadro no sale (`:has(#fic
    con la misma clave: sin extensión, sin "SIN SELLAR" y sin código de registro) cuelgan debajo, de
    la carpeta aunque no estén apuntados. "viene del hito N" si ya estaba en uno anterior. Con varios
    marcados, barra: Enviar por correo, Abrir para imprimir (una pestaña cada uno), Mover a otro hito.
-   Zona de soltar un fichero del ordenador (`Documentos.abrir(a, { hito, ficheroSoltado })`). "Lo que
-   falta reunir" (lo de siempre). Las plantillas del paso con "Generar documento" (y las del tipo en
+   Zona de soltar un fichero del ordenador (`Documentos.abrir(a, { hito, ficheroSoltado })`). Desde
+   la fila 138, «lo que hay que reunir» ya no va aquí: son líneas del guion (ver más abajo). Las plantillas del paso con "Generar documento" (y las del tipo en
    "Otras plantillas", plegado) y los formularios oficiales (`Formularios.listaHTML`, como antes).
    El ⋯ de cada documento suma "Renombrar" y "Mover a otro hito" (`js/hitos-documento-menu.js`).
 3. **Consulta**: normativa del hito y la de su guion, sin repetir; "Comunicar"
@@ -146,3 +146,24 @@ generar ese fichero con `herramientas/cargar-biblioteca.mjs`, los guiones se per
 
 Se comprueba con `pruebas/hito-mesa.mjs` (a 1905×1000 y 1280×800). Las pruebas que abrían varios
 hitos seguidos cierran antes la mesa (`HitoMesa.cerrar()`).
+
+### Una sola lista: lo que hay que reunir, en el guion (25-sep-2026, fila 138, `docs/UNA-SOLA-LISTA-EN-EL-HITO.md`)
+
+Las palabras son tres: **guía** (el modelo), **hito** (cada paso) y **guion** (la lista de tareas del
+hito). «Lo que hay que reunir» deja de ser otra lista: una línea del guion puede llevar `reunir:
+'documento' | 'dato'` y `obligatorio` (casilla «Hay que reunirlo», junto a «Es una pregunta», en
+`js/guias-guion.js`). En la mesa (`js/hito-mesa-guion.js`): 📎 o ✎ delante y «obligatorio» en
+negrita; un dato lleva su caja y se marca al escribirlo (`Hitos.escribirValorGuion`); un documento
+se marca solo al añadirlo, generarlo, registrarlo o asociarlo al hito
+(`HitosRequisitos.marcarPorDocumento` → `Hitos.marcarReunirPorDocumento`, que pregunta con cuál si
+hay varios, y dice cuál es) y se desmarca al quitarlo. «Dar por hecho» avisa de las obligatorias
+sin reunir (`Hitos.faltanObligatorios(h, a)` → `Hitos.faltanReunir`) y «Pedir lo que falta» sale
+del guion (`Hitos.textoLoQueFaltaGuion`).
+
+`js/reunir-migracion.js` pasó lo que había, una vez (marca `_GESTOR/reunir-migrado.json`): los
+requisitos de cada paso de `guias.json` y de cada modelo de `hitos-biblioteca.json`, al final de su
+guion (id `reunir-<id>`); los de cada hito de `hitos.json`, a su estado (`guionHecho`, con valor,
+documento, quién y cuándo) o, si su paso no los tiene, a `guionPropio`. Los requisitos viejos siguen
+en los ficheros, sin leerse; un hito del ARCHIVO que aún los traiga los enseña, para leer. El
+contenido del instituto (`datos-biblioteca/biblioteca-centro.json`) ya los trae como líneas del
+guion, y un modelo viejo se convierte al meterlo en una guía (`ReunirMigracion.pasoAGuion`).

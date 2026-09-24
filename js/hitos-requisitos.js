@@ -1,4 +1,11 @@
 /* ============================================================
+   Desde la fila 138 (25-sep-2026, docs/UNA-SOLA-LISTA-EN-EL-HITO.md)
+   «Lo que hay que reunir» es una línea más del guion
+   (js/hitos-guion.js): este bloque ya no se pinta en un hito abierto
+   (solo, para leer, en uno del ARCHIVO que lo trajera), y
+   marcarPorDocumento/desmarcarPorDocumento/textoLoQueFalta mandan al
+   guion. Los requisitos viejos se quedan en hitos.json, sin leerse.
+
    hitos-requisitos.js — "lo que hay que reunir" de un hito (18-sep-2026,
    fila 59, docs/REQUISITOS-DE-HITO.md).
 
@@ -157,6 +164,8 @@
      ========================================================== */
 
   async function marcarPorDocumento(clave, idHito, nombreDocumento) {
+    /* Fila 138: lo que hay que reunir vive ya en el guion. */
+    if (Hitos.marcarReunirPorDocumento) { await Hitos.marcarReunirPorDocumento(clave, idHito, nombreDocumento); return; }
     var hitos = await Hitos.hitosDe(clave);
     var h = buscar(hitos, idHito);
     if (!h) return;
@@ -187,6 +196,7 @@
   }
 
   async function desmarcarPorDocumento(clave, idHito, nombreDocumento) {
+    if (Hitos.desmarcarReunirPorDocumento) { await Hitos.desmarcarReunirPorDocumento(clave, idHito, nombreDocumento); return; }
     var hitos = await Hitos.hitosDe(clave);
     var h = buscar(hitos, idHito);
     if (!h) return;
@@ -208,7 +218,9 @@
      SECCIÓN 7: "Pedir lo que falta"
      ========================================================== */
 
-  function textoLoQueFalta(hito) {
+  /* Fila 138: con el asunto, del guion (la lista buena); sin él, de lo viejo. */
+  function textoLoQueFalta(hito, a) {
+    if (a && Hitos.textoLoQueFaltaGuion) return Hitos.textoLoQueFaltaGuion(a, hito);
     var pendientes = (hito.requisitos || []).filter(function (r) { return !r.hecho; });
     if (!pendientes.length) return '';
     return 'Falta por aportar:\n' + pendientes.map(function (r) { return '- ' + r.texto; }).join('\n');

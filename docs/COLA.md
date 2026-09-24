@@ -107,13 +107,12 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 75 y 77 a 137 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 75 y 77 a 138 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
 | 76 | `docs/VERSION-AL-PUBLICAR.md` (la versión, generada sola al publicar en Vercel, sin ningún commit) | PENDIENTE |
-| 138 | `docs/UNA-SOLA-LISTA-EN-EL-HITO.md` («lo que hay que reunir» pasa al guion) | PENDIENTE |
 | 139 | `docs/UNA-SOLA-LIBRETA-DE-NOTAS.md` (las notas del hito pasan al asunto, con etiqueta) | PENDIENTE |
 | 140 | `docs/TIEMPO-DE-TRAMITACION.md` (media y máximo por tipo, y los abiertos más antiguos) | PENDIENTE |
 
@@ -124,6 +123,14 @@ repositorio, así queda fuera el riesgo de bucle que la había bloqueado el 19-s
 antes que las filas 138 a 140, pero **solo se puede comprobar publicando de verdad**: si al
 terminar la hora publicada no es la real, vuelve a la fecha a mano y márcala BLOQUEADA otra vez,
 sin insistir más de una vez.
+
+**La fila 138 está HECHA** (25-sep-2026): `docs/UNA-SOLA-LISTA-EN-EL-HITO.md`. Dentro del hito queda
+una sola lista, el guion: lo que hay que reunir es una línea más (📎 documento, ✎ dato, «obligatorio»;
+casilla «Hay que reunirlo» en el editor). `js/reunir-migracion.js` pasó lo que había, una vez
+(guías, biblioteca de hitos y hitos, conservando lo hecho; los requisitos viejos siguen en los
+ficheros). El contenido del instituto ya lo trae en el guion. Prueba
+`pruebas/una-sola-lista-en-el-hito.mjs` (y `pruebas/repintar-solo-lo-que-cambia.mjs`, que deja
+puesta la marca), batería completa en verde. Versión `App.VERSION`: `25-sep-2026 · 01:26`.
 
 **La fila 137 está HECHA** (25-sep-2026): `docs/INDICE-DEL-EXPEDIENTE.md`. `000 ÍNDICE DEL
 EXPEDIENTE.pdf` (`js/indice-expediente.js`): lista numerada de los documentos (fecha, registro,

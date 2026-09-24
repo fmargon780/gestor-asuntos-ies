@@ -65,7 +65,7 @@ var HitoMesaComunicar = (function () {
     if (mio !== turno || !caja.isConnected) return;
     var marcados = premarcados(h, lista);
 
-    var falta = window.HitosRequisitos && HitosRequisitos.textoLoQueFalta ? HitosRequisitos.textoLoQueFalta(h) : '';
+    var falta = window.HitosRequisitos && HitosRequisitos.textoLoQueFalta ? HitosRequisitos.textoLoQueFalta(h, a) : '';
     caja.innerHTML =
       '<div class="mesa-chips">' + lista.map(function (c) {
         return '<label class="mesa-chip"><input type="checkbox" data-id="' + U.escapar(c.id) + '"' +

@@ -19,6 +19,11 @@
    - Un hito-pregunta enseña "¿Qué supuesto es?" con las opciones como
      tarjetas; elegir otra cambia de rama como siempre.
 
+   - Algo que hay que reunir (fila 138, docs/UNA-SOLA-LISTA-EN-EL-HITO.md):
+     📎 delante si es un documento (se marca solo al añadirlo o asociarlo
+     al hito, y dice cuál), ✎ si es un dato (con su caja: se marca al
+     escribirlo), y «obligatorio» en negrita si lo es.
+
    El dato y el guardado viven en js/hitos-guion.js (Hitos.guionDe,
    Hitos.marcarGuion, Hitos.anadirGuionPropio). Lo llama js/hito-mesa.js.
    ============================================================ */
@@ -44,11 +49,17 @@ var HitoMesaGuion = (function () {
     var titulo = marcado ? (g.noaplica ? 'No aplica' : 'Hecho') + (g.quien ? ' por ' + g.quien : '') +
       (g.cuando ? ' el ' + String(g.cuando).slice(0, 10) : '') : '';
     var accion = BOTON_DE_ACCION[g.accion];
-    return '<div class="guion-paso' + (g.hecho ? ' hecho' : '') + (g.noaplica ? ' noaplica' : '') + '" data-id="' +
+    var marcaReunir = g.reunir === 'documento' ? '<span class="guion-reunir-marca" title="Un documento que hay que reunir">📎</span>'
+      : (g.reunir === 'dato' ? '<span class="guion-reunir-marca" title="Un dato que hay que reunir">✎</span>' : '');
+    return '<div class="guion-paso' + (g.hecho ? ' hecho' : '') + (g.noaplica ? ' noaplica' : '') + (g.reunir ? ' guion-reunir' : '') + '" data-id="' +
         U.escapar(g.id) + '"' + (titulo ? ' title="' + U.escapar(titulo) + '"' : '') + '>' +
       '<label class="guion-paso-linea"><input type="checkbox" class="guion-casilla"' + (g.hecho ? ' checked' : '') +
-        (abierto ? '' : ' disabled') + '><span class="guion-paso-texto">' + U.escapar(g.texto) + '</span></label>' +
+        (abierto ? '' : ' disabled') + '>' + marcaReunir + '<span class="guion-paso-texto">' + U.escapar(g.texto) + '</span>' +
+        (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + '</label>' +
       (g.explicacion ? '<div class="guion-paso-explicacion">' + U.escapar(g.explicacion) + '</div>' : '') +
+      (g.reunir === 'dato' ? '<input class="campo guion-dato" value="' + U.escapar(g.valor || '') + '" placeholder="Escríbelo aquí"' +
+        (abierto ? '' : ' disabled') + '>' : '') +
+      (g.reunir === 'documento' && g.hecho && g.documento ? '<div class="guion-paso-explicacion guion-reunir-documento">📎 ' + U.escapar(g.documento) + '</div>' : '') +
       '<div class="guion-paso-botones">' +
         (abierto && accion && !marcado ? '<button type="button" class="boton boton-chico guion-accion-boton" data-accion="' +
           U.escapar(g.accion) + '">' + U.escapar(accion.texto) + '</button>' : '') +
@@ -148,6 +159,11 @@ var HitoMesaGuion = (function () {
       var casilla = el.querySelector('.guion-casilla');
       casilla.onchange = function () {
         guardar(casilla, function () { return Hitos.marcarGuion(a.nombre, h.id, id, { hecho: casilla.checked }); });
+      };
+      /* Fila 138: un dato se marca al escribirlo. */
+      var dato = el.querySelector('.guion-dato');
+      if (dato) dato.onchange = function () {
+        guardar(dato, function () { return Hitos.escribirValorGuion(a.nombre, h.id, id, dato.value); });
       };
       var noaplica = el.querySelector('.guion-noaplica');
       if (noaplica) noaplica.onclick = function () {
