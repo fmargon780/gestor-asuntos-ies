@@ -30,7 +30,7 @@ de `App` va después del fichero que lo define.
 | `js/conflictos.js` | Las copias en conflicto que deja Dropbox: fusión sola o aviso para elegir |
 | `js/fichas-huerfanas.js` | Fichas de `asuntos.json` cuya carpeta ya no está: enlazar o borrar |
 | `js/nombres.js` | Monta los nombres de carpetas y documentos; desde la fila 130, con tope de largo (`Nombres.montarAsunto`, 150; `Nombres.montarDocumentoAjustado`, 120 más la extensión) y la línea ámbar de la vista previa (`Nombres.avisoRecorte`) |
-| `js/plazos.js` | La fecha límite de los asuntos |
+| `js/plazos.js` | La fecha límite de los asuntos; desde la fila 131, cómo se cuenta un plazo de hito (`Plazos.sumarPlazo`: hábiles, lectivos o naturales, con festivos y no lectivos), `diasQueQuedan` y `textoPlazo` |
 | `js/guias.js` | Pintar y escribir una guía, con sus preguntas y opciones; en el editor de cada paso llama a `js/guias-requisitos.js` para "lo que hay que reunir" (fila 59), a `js/guias-comunicacion.js` para su comunicación propia (fila 60), a `js/hitos-normativa.js` para "Normativa" y a `js/guias-biblioteca.js` para traer/guardar en la biblioteca (fila 79) |
 | `js/hitos-biblioteca.js` | El modelo de la biblioteca de hitos del centro (fila 79, 20-sep-2026): leer/escribir `_GESTOR/hitos-biblioteca.json`, crear/editar/borrar un modelo, comparar un paso con el suyo, y las funciones puras de si un hito nace "solo informativo" y del enlace de una referencia de normativa |
 | `js/hitos-normativa.js` | El bloque "Normativa" de un paso o de un hito (fila 79): el editor de referencias y la lista de solo lectura, con la dirección base del sistema de normativa en caché |
@@ -108,6 +108,7 @@ de `App` va después del fichero que lo define.
 | `js/guias-mapa.js`, `css/guias-mapa.css` | El mapa de la guía (fila 113): `GuiasMapa.html` (pura) y abrirlo en Ajustes, dentro del editor de la guía y en la ficha de un asunto |
 | `js/guias-niveles.js` | Entrar y salir de las preguntas de dentro en el editor de la guía, e ir a un paso concreto (`GuiasNiveles`, fila 113, sacado de `js/guias.js`) |
 | `js/guias-plegado.js` | El editor de la guía en acordeón: un solo paso abierto, la línea resumida con sus marcas (`GuiasPlegado`, fila 122) |
+| `js/guias-plazo.js` | El desplegable «Días hábiles / lectivos / naturales» del plazo de cada paso de la guía (`GuiasPlazo`, fila 131). Antes de `js/guias.js` |
 | `js/guias-toca.js` | «Nos toca» / «Esperamos a…» de cada paso de la guía, en el editor y en la fila cerrada (`GuiasToca`, fila 129). Antes de `js/guias.js` |
 | `js/guias-barra.js` | La barra de formato del editor de la guía (negrita, viñetas, enlace; `GuiasBarra`, fila 122, sacada de `js/guias.js`) |
 | `js/guias-opciones-editor.js` | Las opciones de un paso-pregunta y sus pasos, en el editor de la guía (`GuiasOpcionesEditor.caja`, fila 122, sacado de `js/guias.js`) |
@@ -257,6 +258,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/estado-por-el-hito.mjs` | Prueba (sin navegador, fila 104, 23-sep-2026): `Hitos.aQuienLeToca` y `Hitos.ladoDelAsunto` (Administración, terceros, pregunta sin responder, solo informativo saltado, todos hechos, sin hitos → Administración desde la fila 129), la marca de partida de los responsables y `naceSoloInformativo` con los ajustes |
 | `pruebas/el-hito-es-el-estado.mjs` | Prueba (sin navegador, fila 129, 24-sep-2026): «Paso N de M», la marca del paso sobre el responsable y su llegada a los hitos, «Esperando a…» que manda y se quita al llegar un fichero, la guía mínima, el paso único, «Estamos en este paso» sin saltarse una pregunta y el texto del ARCHIVO |
 | `pruebas/guardar-y-enviar-sin-sorpresas.mjs` | Prueba (navegador y `vm`, fila 130): tablón y `empresas.csv` con dos cambios a la vez, copia en conflicto de `personal.csv`, nombres con tope de largo, el envío que vence su tiempo y el script que no manda dos veces el mismo `idEnvio` |
+| `pruebas/plazos-bien-contados.mjs` | Prueba (sin navegador, fila 131): hábiles con las vacaciones de Navidad, lectivos, naturales que caen en domingo o festivo, un plazo viejo sin `cuenta`, el hito que copia la cuenta y los textos |
 | `pruebas/genero.mjs` | Prueba (navegador de verdad, fila 111, 24-sep-2026): alumna/alumno/sin dato, «El/La Director/a» con firmante mujer, marcas `:tutor1`, lo que no se toca (fechas, y/o, registros, webs), `faltan` al rellenar, forma partida en el Word, sexos del RegAlum/ficha/cargo y una plantilla del centro limpia |
 | `pruebas/cabecera-compacta.mjs` | Prueba (navegador de verdad, fila 112, 24-sep-2026): cabecera del asunto en dos líneas, sin volver repetidos ni línea de ruta, «GUION DEL HITO» a 250 px o menos a 1600×920, la pestaña abierta vuelve atrás, y sin desplazamiento lateral a 800 px |
 | `pruebas/guias-mapa.mjs` | Prueba (sin navegador, fila 113, 24-sep-2026): `GuiasMapa.html` con una guía de dos niveles de preguntas, sin y con hitos (camino resaltado, ramas en gris, «Fuera de la guía»), y `GuiasNiveles.caminoHasta` |

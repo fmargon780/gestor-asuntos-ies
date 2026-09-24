@@ -88,7 +88,7 @@ const modelo = await pagina.evaluate((GUIA) => {
 }, GUIA);
 await comprobar('los tres niveles llegan enteros', Promise.resolve([modelo.q3, modelo.x1req]), ['¿Se puede pedir?', ['DNI']]);
 await comprobar('un paso de una opción conserva su responsable y su plazo',
-  Promise.resolve(modelo.a1), { responsable: 'tercero', plazo: { dias: 3, desde: 'q2' } });
+  Promise.resolve(modelo.a1), { responsable: 'tercero', plazo: { dias: 3, desde: 'q2', cuenta: 'habiles' } });   /* fila 131: hábiles si no dice */
 await comprobar('una pregunta de segundo y de tercer nivel no admite requisitos', Promise.resolve(modelo.reqPreguntas), [0, 0]);
 await comprobar('normalizar dos veces da lo mismo (se guarda y se relee igual)', Promise.resolve(modelo.otraVez), true);
 await comprobar('la vista de lectura pinta los tres niveles', Promise.resolve(modelo.vistaTresNiveles), true);
@@ -192,7 +192,7 @@ await comprobar('se guarda la guía entera, aunque se guarde desde dentro',
   Promise.resolve([guardada[0].titulo, q3.titulo, q3.opciones[1].pasos.map(p => p.titulo)]),
   ['Registrar la solicitud', '¿Se puede pedir lo que falta?', ['Denegar', 'Avisar a la familia']]);
 await comprobar('el plazo del paso de una opción no se pierde al guardar',
-  Promise.resolve(guardada[1].opciones[0].pasos[0].plazo), { dias: 3, desde: 'q2' });
+  Promise.resolve(guardada[1].opciones[0].pasos[0].plazo), { dias: 3, desde: 'q2', cuenta: 'habiles' });
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 await navegador.close();

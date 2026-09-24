@@ -37,8 +37,9 @@ las etiquetas y, a la derecha, "Marcar hito como hecho" (resaltado
 con el guion completo; nunca se marca solo), menú ⋯ ("Dejarlo solo informativo"/"Pedírmelo a mí",
 "Quitar este hito": pulsan los botones de siempre, que quedan ocultos en `.hito-botones`), tres
 etiquetas pulsables con `FichaMenus` (estado → `Hitos.marcar`; plazo → "Cambiar la fecha…"/"Quitar
-la fecha" con `Hitos.guardarCampos`, texto "Vence el 15-oct · quedan N días hábiles" contando con
-`Plazos.sumarDiasHabiles` y los no lectivos; responsable → los de Ajustes › Hitos y los papeles) y
+la fecha" con `Hitos.guardarCampos`, texto "Vence el 15-oct · quedan N días hábiles" (o lectivos, o
+naturales: el modo del plazo del hito, fila 131) con `Plazos.diasQueQuedan`, los festivos y los no
+lectivos; responsable → los de Ajustes › Hitos y los papeles) y
 la tira de hitos visibles (sin `noaplica` ni los del tipo anterior): ✓ los hechos, el actual
 marcado; pulsar uno salta a su mesa. Los campos grandes de responsable y fecha desaparecen. Sin
 "← Volver a la lista de hitos" ni camino: se vuelve pulsando otra vez la pestaña "Hitos" o con

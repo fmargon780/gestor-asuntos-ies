@@ -5,6 +5,22 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 131: plazos bien contados
+
+`docs/PLAZOS-BIEN-CONTADOS.md`. **El porqué**: `Plazos.sumarDiasHabiles` saltaba los días no
+lectivos, y eso mezclaba dos cosas: los días hábiles del procedimiento administrativo (sin
+festivos, pero las vacaciones escolares SÍ cuentan) y los lectivos de convivencia (sin festivos ni
+no lectivos). Un plazo de diez días hábiles que cruzaba la Navidad se alargaba de más.
+
+- Cada plazo dice cómo se cuenta (`plazo.cuenta`: hábiles por defecto, lectivos o naturales;
+  en naturales, si el último día no es hábil, pasa al siguiente). Desplegable en el editor del
+  paso (`js/guias-plazo.js`); el hito lo copia; los plazos de antes se leen como hábiles.
+- Ajustes › Hitos gana la caja de **festivos** (`ajustes.festivos`), aparte de los no lectivos,
+  con aviso ámbar en el título mientras esté vacía. Se fusionan en conflicto como los no lectivos.
+- La mesa del hito dice «quedan N días hábiles / lectivos / naturales» según el plazo del hito.
+- Consecuencia para Francisco: los plazos que tuviera pasan a contarse en hábiles; uno de
+  convivencia hay que cambiarlo a lectivos en su guía. Y hay que pegar los festivos.
+
 ## 24-sep-2026 — Fila 130: guardar y enviar sin sorpresas
 
 `docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md`, del análisis crítico del 24-sep-2026. Tres arreglos de

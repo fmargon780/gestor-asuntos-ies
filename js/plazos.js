@@ -6,9 +6,9 @@
    mientras se tramita, y renombrar carpetas en un Dropbox sincronizado
    cada vez que algo se mueve es pedir problemas.
 
-   Los días se cuentan naturales, de calendario. Es lo que viene en el
-   papel del trámite; si en un caso hacen falta hábiles, se cambia la
-   fecha a mano.
+   La fecha límite de un asunto se cuenta en días naturales, de
+   calendario. Los plazos de los hitos dicen cómo se cuentan: hábiles,
+   lectivos o naturales (fila 131, sumarPlazo, más abajo).
    ============================================================ */
 var Plazos = (function () {
 
@@ -83,6 +83,8 @@ var Plazos = (function () {
      Ajustes › Hitos (una fecha AAAA-MM-DD por línea, en
      _GESTOR/hitos.json). Con nombre propio para que lo reutilice
      también la pantalla "Qué me toca" (fila 16 de la cola). */
+  /* Compatibilidad (fila 131): salta sábados, domingos y los días que se
+     le pasen, como siempre. Lo nuevo usa sumarPlazo. */
   function sumarDiasHabiles(iso, dias, noLectivos) {
     var p = String(iso || '').split('-');
     if (p.length !== 3) return '';
@@ -105,6 +107,93 @@ var Plazos = (function () {
     var m2 = String(d.getMonth() + 1).padStart(2, '0');
     var d2 = String(d.getDate()).padStart(2, '0');
     return d.getFullYear() + '-' + m2 + '-' + d2;
+  }
+
+  /* ---------- cómo se cuenta un plazo (24-sep-2026, fila 131,
+     docs/PLAZOS-BIEN-CONTADOS.md) ----------
+
+     - `habiles` (por defecto): sin sábados, domingos ni festivos. Las
+       vacaciones escolares SÍ cuentan (procedimiento administrativo).
+     - `lectivos`: sin sábados, domingos, festivos ni días no lectivos.
+     - `naturales`: todos; pero si el último cae en sábado, domingo o
+       festivo, pasa al siguiente hábil.
+     Se empieza a contar el día siguiente al de partida. Un plazo sin
+     `cuenta` (todos los de antes) se cuenta en hábiles. */
+  var CUENTAS = [
+    { valor: 'habiles', texto: 'Días hábiles', corto: 'hábiles' },
+    { valor: 'lectivos', texto: 'Días lectivos', corto: 'lectivos' },
+    { valor: 'naturales', texto: 'Días naturales', corto: 'naturales' }
+  ];
+
+  function cuentaValida(c) {
+    return CUENTAS.some(function (x) { return x.valor === c; }) ? c : 'habiles';
+  }
+
+  function aIso(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function conjunto(lista) {
+    var s = {};
+    (lista || []).forEach(function (f) { s[String(f)] = true; });
+    return s;
+  }
+
+  /* ¿Cuenta este día para un plazo de este modo? */
+  function diaCuenta(d, cuenta, fest, noLect) {
+    if (cuenta === 'naturales') return true;
+    var ds = d.getDay();
+    if (ds === 0 || ds === 6) return false;
+    var iso = aIso(d);
+    if (fest[iso]) return false;
+    if (cuenta === 'lectivos' && noLect[iso]) return false;
+    return true;
+  }
+
+  function sumarPlazo(iso, dias, cuenta, festivos, noLectivos) {
+    var p = String(iso || '').split('-');
+    if (p.length !== 3) return '';
+    var n = parseInt(dias, 10);
+    if (isNaN(n) || n < 0) return '';
+    var d = new Date(+p[0], +p[1] - 1, +p[2]);
+    if (isNaN(d.getTime())) return '';
+    cuenta = cuentaValida(cuenta);
+    var fest = conjunto(festivos), noLect = conjunto(noLectivos);
+    var contados = 0;
+    while (contados < n) {
+      d.setDate(d.getDate() + 1);
+      if (diaCuenta(d, cuenta, fest, noLect)) contados++;
+    }
+    /* Naturales: si el último día no es hábil, al siguiente hábil. */
+    if (cuenta === 'naturales') {
+      var vueltas = 0;
+      while (!diaCuenta(d, 'habiles', fest, noLect) && vueltas++ < 60) d.setDate(d.getDate() + 1);
+    }
+    return aIso(d);
+  }
+
+  /* Cuántos días de ese modo quedan desde `hoy` hasta `fecha` (0 si ya
+     ha llegado), para «quedan N días hábiles» de la mesa del hito. */
+  function diasQueQuedan(hoy, fecha, cuenta, festivos, noLectivos) {
+    cuenta = cuentaValida(cuenta);
+    if (cuenta === 'naturales') {
+      var d = diasHasta(fecha);
+      return d === null ? 0 : Math.max(d, 0);
+    }
+    var n = 0;
+    while (n < 400 && sumarPlazo(hoy, n + 1, cuenta, festivos, noLectivos) <= fecha) n++;
+    return n;
+  }
+
+  /* «10 días hábiles», «2 días lectivos», «1 día natural». */
+  function textoPlazo(plazo) {
+    if (!plazo || !plazo.dias) return '';
+    return textoDias(parseInt(plazo.dias, 10), plazo.cuenta);
+  }
+
+  function textoDias(n, cuenta) {
+    var c = CUENTAS.filter(function (x) { return x.valor === cuentaValida(cuenta); })[0];
+    return n + (n === 1 ? ' día ' + c.corto.replace(/es$/, '').replace(/s$/, '') : ' días ' + c.corto);
   }
 
   /* ---------- la etiqueta de vencimiento de la cabecera (18-sep-2026,
@@ -149,6 +238,8 @@ var Plazos = (function () {
     DIAS_CERCA: DIAS_CERCA,
     sumarDias: sumarDias, sumarDiasHabiles: sumarDiasHabiles,
     diasHasta: diasHasta, legible: legible,
+    CUENTAS: CUENTAS, cuentaValida: cuentaValida, sumarPlazo: sumarPlazo,
+    diasQueQuedan: diasQueQuedan, textoPlazo: textoPlazo, textoDias: textoDias,
     de: de, pasaFiltro: pasaFiltro,
     etiquetaVencimiento: etiquetaVencimiento
   };

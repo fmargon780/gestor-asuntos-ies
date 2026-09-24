@@ -154,6 +154,10 @@
     var noLectivos = {};
     (base.ajustes.noLectivos || []).concat(confAjustes.noLectivos || []).forEach(function (f) { noLectivos[f] = true; });
     base.ajustes.noLectivos = Object.keys(noLectivos).sort();
+    /* Fila 131: los festivos, igual (solo se fusionan las altas). */
+    var festivos = {};
+    (base.ajustes.festivos || []).concat(confAjustes.festivos || []).forEach(function (f) { festivos[f] = true; });
+    base.ajustes.festivos = Object.keys(festivos).sort();
 
     var claves = {};
     Object.keys(base.porAsunto).forEach(function (k) { claves[k] = true; });

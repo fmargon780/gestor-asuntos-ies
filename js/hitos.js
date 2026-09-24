@@ -80,6 +80,9 @@ var Hitos = (function () {
     };
   }
 
+  /* Cómo se cuenta un plazo (fila 131, js/plazos.js): hábiles si no dice. */
+  function cuentaDePlazo(c) { return (c === 'lectivos' || c === 'naturales') ? c : 'habiles'; }
+
   /* Un hito, tal y como se guarda. Recursivo: un hito de clase
      "decision" lleva sus opciones, cada una con su propia lista de
      hitos (nunca otra decisión dentro, igual que en la guía). */
@@ -97,7 +100,8 @@ var Hitos = (function () {
       fecha: String((h && h.fecha) || ''),
       fechaManual: !!(h && h.fechaManual),
       plazo: (h && h.plazo && h.plazo.dias)
-        ? { dias: parseInt(h.plazo.dias, 10) || 0, desde: String(h.plazo.desde || '') } : null,
+        ? { dias: parseInt(h.plazo.dias, 10) || 0, desde: String(h.plazo.desde || ''),
+            cuenta: cuentaDePlazo(h.plazo.cuenta) } : null,   /* fila 131: hábiles si no dice */
       estadoAsunto: (h && h.estadoAsunto) || null,
       notas: Array.isArray(h && h.notas) ? h.notas.map(normalizarNota) : [],
       documentos: Array.isArray(h && h.documentos) ? h.documentos.map(String) : [],
@@ -171,7 +175,10 @@ var Hitos = (function () {
       .filter(function (r) { return r.id && r.nombre; });
     var noLectivos = (Array.isArray(a && a.noLectivos) ? a.noLectivos : [])
       .map(String).filter(function (f) { return /^\d{4}-\d{2}-\d{2}$/.test(f); }).sort();
-    return { responsables: responsables, noLectivos: noLectivos };
+    /* Fila 131: los festivos, aparte (cuentan para todos los plazos). */
+    var festivos = (Array.isArray(a && a.festivos) ? a.festivos : [])
+      .map(String).filter(function (f) { return /^\d{4}-\d{2}-\d{2}$/.test(f); }).sort();
+    return { responsables: responsables, noLectivos: noLectivos, festivos: festivos };
   }
 
   function normalizar(leido) {
@@ -401,13 +408,15 @@ var Hitos = (function () {
 
   /* Las fechas límite calculadas por plazo (sección 7): cuando un hito
      pasa a "hecho", los hitos cuyo plazo cuenta "desde" él (y que
-     Francisco no haya tocado a mano) recalculan su fecha, en días
-     hábiles según los no lectivos de Ajustes. */
-  function aplicarPlazosDependientes(raiz, idHecho, noLectivos) {
+     Francisco no haya tocado a mano) recalculan su fecha, contada como
+     diga su plazo (fila 131: hábiles, lectivos o naturales) con los
+     festivos y los no lectivos de Ajustes › Hitos. */
+  function aplicarPlazosDependientes(raiz, idHecho, ajustes) {
+    var aj = ajustes || {};
     (function recorrer(lista) {
       (lista || []).forEach(function (h) {
         if (h.plazo && h.plazo.desde === idHecho && !h.fechaManual) {
-          h.fecha = Plazos.sumarDiasHabiles(U.hoyIso(), h.plazo.dias, noLectivos);
+          h.fecha = Plazos.sumarPlazo(U.hoyIso(), h.plazo.dias, h.plazo.cuenta, aj.festivos, aj.noLectivos);
         }
         if (h.clase === 'decision') h.opciones.forEach(function (o) { recorrer(o.hitos); });
       });
@@ -430,7 +439,7 @@ var Hitos = (function () {
       clase: esDecision ? 'decision' : 'paso', estado: 'pendiente',
       responsable: p.responsable || '', estadoAsunto: p.estadoAsunto || null,
       toca: p.toca || '', tocaA: p.tocaA || '',
-      plazo: (p.plazo && p.plazo.dias) ? { dias: p.plazo.dias, desde: p.plazo.desde || '' } : null,
+      plazo: (p.plazo && p.plazo.dias) ? { dias: p.plazo.dias, desde: p.plazo.desde || '', cuenta: p.plazo.cuenta } : null,
       /* Una pregunta no lleva requisitos propios (fila 59, sección 4.1
          del encargo: el editor no se los deja poner); los de sus
          opciones llegan solos, porque cada paso de dentro se convierte
@@ -537,7 +546,7 @@ var Hitos = (function () {
       if (nuevoEstado === 'encurso') h.desde = U.hoyIso();
       if (nuevoEstado === 'hecho') h.hechoEl = U.hoyIso();
       else delete h.hechoEl;
-      if (nuevoEstado === 'hecho') aplicarPlazosDependientes(entrada.hitos, h.id, d.ajustes.noLectivos);
+      if (nuevoEstado === 'hecho') aplicarPlazosDependientes(entrada.hitos, h.id, d.ajustes);
       resultado = recomputeEnCurso(entrada.hitos);
       return d;
     });

@@ -243,7 +243,12 @@ var AjustesPlegado = (function () {
       var r = filasDe(det.querySelector('#tabla-responsables'));
       var campo = det.querySelector('#hitos-no-lectivos');
       var d = campo ? campo.value.split('\n').filter(function (l) { return l.trim(); }).length : 0;
-      return [plural(r, 'responsable', 'responsables') + ' · ' + plural(d, 'día no lectivo', 'días no lectivos')];
+      /* Fila 131: sin festivos, aviso ámbar en el título. */
+      var cf = det.querySelector('#hitos-festivos');
+      var f = cf ? cf.value.split('\n').filter(function (l) { return l.trim(); }).length : 0;
+      return [plural(r, 'responsable', 'responsables') + ' · ' +
+        (f ? plural(f, 'festivo', 'festivos') : 'Faltan los festivos') + ' · ' +
+        plural(d, 'día no lectivo', 'días no lectivos'), !f];
     } },
     { id: 'datos-centro', dentro: '#centro-firma-cuerpo', resumen: function (det) {
       var ids = ['plantillas-firma', 'plantillas-centro', 'plantillas-cargo', 'plantillas-localidad',

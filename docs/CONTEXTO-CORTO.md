@@ -110,7 +110,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en cada subida. Escape y salida en toda pantalla.
 - Copia sin internet (`file://`): se actualiza sola; si no puede, o no puede comprobarlo, franja fija arriba; mira cada 30 min.
-- Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo, responsable,
+- Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
   bifurcaciones, historial y "lo que hay que reunir". Cada hito se abre a pantalla completa (la mesa):
   guion (con preguntas: un botón por respuesta) que se marca solo al generar, registrar, comunicar o añadir; documentos en tabla con sus
   gemelos y selección de varios; plantillas y formularios («Buscar otra plantilla…»: cualquiera); comunicar con destinatarios; notas.
@@ -119,9 +119,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   del instituto y traer los guiones (y las líneas nuevas del instituto a un guion ya escrito).
 - "Qué me toca": hitos pendientes, filtro por responsable, "Dormidos" (sin novedades en N días). "Cuentas": asuntos por tipo, mes y quién los pidió. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena en el PDF solo los datos del centro.
-- Avisos de "fichas sin carpeta" (✕ calla 7 días) y de papelera vieja.
+- Avisos de "fichas sin carpeta" y de papelera vieja.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
-- Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF (carpeta del asunto y Por clasificar); Ajustar tamaño deja libre la banda del sello de Séneca y de la firma.
+- Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF (carpeta del asunto y Por clasificar); deja libre la banda del sello y la firma.
 - "Lo pide": quién pidió la gestión, por qué vía y cuándo; su correo sale en el cuadro de Correo.
 - Archivar o reabrir sobre un destino que ya existe fusiona carpetas; errores en castellano; reintenta si Dropbox tropieza.
 - Crear, reabrir o editar deja en la ficha del asunto; Volver regresa a la pantalla de origen, a su altura; lo demás, aviso con «Ir al asunto».
@@ -172,9 +172,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ver con el uso: ancho del panel y del tablón, tarjetas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: membrete, Consejería, cargos y Provincia.
 - Importar los usuarios IdEA del alumnado, cuando reactiven a Francisco el perfil de Gestor de PASEN.
-- Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar las plantillas del centro» y «Traer los guiones del instituto».
+- Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar las plantillas del centro» y «Traer los guiones del instituto». Ajustes › Hitos: pegar los festivos.
 - Antes de junio de 2027: "Guardar el contacto de los asuntos abiertos" (Mantenimiento).
-- Decisión: ¿la papelera se vacía sola a los N días? Sin decidir, solo el aviso más insistente.
+- Decisión: ¿la papelera se vacía sola a los N días? Sin decidir.
 - Antes de publicar algo importante, repasar `docs/COMPROBAR-A-MANO.md`.
 
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero

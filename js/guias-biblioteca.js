@@ -52,7 +52,7 @@ var GuiasBiblioteca = (function () {
   function resumenDeModelo(m) {
     var trozos = [];
     if (m.responsable) trozos.push(m.responsable);
-    if (m.plazo && m.plazo.dias) trozos.push(m.plazo.dias + ' días de plazo');
+    if (m.plazo && m.plazo.dias) trozos.push((typeof Plazos !== 'undefined' && Plazos.textoPlazo ? Plazos.textoPlazo(m.plazo) : m.plazo.dias + ' días') + ' de plazo');   /* fila 131 */
     var n = (m.requisitos || []).length;
     if (n) trozos.push(n + (n === 1 ? ' cosa que reunir' : ' cosas que reunir'));
     return trozos.join(' · ') || 'Sin más datos';

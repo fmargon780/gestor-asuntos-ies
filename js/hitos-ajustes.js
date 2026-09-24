@@ -46,7 +46,7 @@
     d.innerHTML =
       '<summary>' +
         '<span class="bloque-titulo">Hitos</span>' +
-        '<span class="bloque-pie">Responsables y días no lectivos, para los hitos de los asuntos</span>' +
+        '<span class="bloque-pie">Responsables, festivos y días no lectivos, para los hitos de los asuntos</span>' +
       '</summary>' +
       '<div class="bloque-cuerpo">' +
         '<h4 class="hitos-subtitulo">Responsables</h4>' +
@@ -57,9 +57,18 @@
           '<button id="btn-anadir-responsable" class="boton">Añadir</button>' +
         '</div>' +
         '<div id="tabla-responsables" class="lista"></div>' +
+        /* Fila 131 (docs/PLAZOS-BIEN-CONTADOS.md): los festivos, aparte. */
+        '<h4 class="hitos-subtitulo">Festivos</h4>' +
+        '<p class="explica">Una fecha por línea (DD/MM/AAAA). Nacionales, de Andalucía y locales. ' +
+        'Cuentan para todos los plazos.</p>' +
+        '<textarea id="hitos-festivos" class="campo" rows="5" ' +
+        'placeholder="12/10/2026&#10;08/12/2026"></textarea>' +
+        '<button id="btn-guardar-festivos" class="boton" style="margin-top:8px">Guardar festivos</button>' +
+        '<div id="aviso-festivos" class="aviso-en-vivo"></div>' +
         '<h4 class="hitos-subtitulo">Días no lectivos</h4>' +
-        '<p class="explica">Una fecha por línea (DD/MM/AAAA, o como te resulte cómodo). Se usan para ' +
-        'contar los plazos en días hábiles. Se pega una vez por curso.</p>' +
+        '<p class="explica">Una fecha por línea (DD/MM/AAAA, o como te resulte cómodo). Vacaciones y ' +
+        'días sin clase del calendario escolar. Solo cuentan para los plazos en días lectivos. Un ' +
+        'festivo no hace falta repetirlo aquí. Se pega una vez por curso.</p>' +
         '<textarea id="hitos-no-lectivos" class="campo" rows="6" ' +
         'placeholder="24/12/2026&#10;25/12/2026"></textarea>' +
         '<button id="btn-guardar-no-lectivos" class="boton" style="margin-top:8px">Guardar días no lectivos</button>' +
@@ -70,6 +79,7 @@
     $('btn-anadir-responsable').onclick = anadirResponsable;
     $('nuevo-responsable').onkeydown = function (ev) { if (ev.key === 'Enter') anadirResponsable(); };
     $('btn-guardar-no-lectivos').onclick = guardarNoLectivos;
+    $('btn-guardar-festivos').onclick = guardarFestivos;
     return d;
   }
 
@@ -170,7 +180,32 @@
     return f;
   }
 
-  /* ---------- días no lectivos ---------- */
+  /* ---------- festivos (fila 131) y días no lectivos ---------- */
+
+  function fechasDeLaCaja(id) {
+    var lineas = ($(id).value || '').split('\n').map(function (l) { return l.trim(); }).filter(Boolean);
+    var vistos = {}, buenas = [], malas = 0;
+    lineas.forEach(function (l) {
+      var f = U.aFecha(l);
+      if (!f || isNaN(f.getTime())) { malas++; return; }
+      var iso = isoDeFecha(f);
+      if (!vistos[iso]) { vistos[iso] = true; buenas.push(iso); }
+    });
+    return { buenas: buenas, malas: malas };
+  }
+
+  async function guardarFestivos() {
+    var r = fechasDeLaCaja('hitos-festivos');
+    try {
+      await Hitos.guardarFestivos(r.buenas);
+      $('aviso-festivos').textContent = r.buenas.length + (r.buenas.length === 1 ? ' festivo guardado.' : ' festivos guardados.') +
+        (r.malas ? ' (' + r.malas + (r.malas === 1 ? ' línea no se ha entendido.)' : ' líneas no se han entendido.)') : '');
+      U.aviso('Festivos guardados.', 'bueno');
+      pintar();
+    } catch (e) {
+      U.fallo('No he podido guardarlos', e);
+    }
+  }
 
   async function guardarNoLectivos() {
     var texto = $('hitos-no-lectivos').value || '';
@@ -214,6 +249,10 @@
     var caja2 = $('hitos-no-lectivos');
     if (caja2 && document.activeElement !== caja2) {
       caja2.value = datos.ajustes.noLectivos.map(function (iso) { return Plazos.legible(iso); }).join('\n');
+    }
+    var caja3 = $('hitos-festivos');
+    if (caja3 && document.activeElement !== caja3) {
+      caja3.value = (datos.ajustes.festivos || []).map(function (iso) { return Plazos.legible(iso); }).join('\n');
     }
   }
 

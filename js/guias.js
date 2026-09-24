@@ -132,8 +132,10 @@ var Guias = (function () {
          Vacío: se deduce del responsable (Hitos.esDeAdministracion). */
       toca: (p && (p.toca === 'nos' || p.toca === 'espera')) ? p.toca : '',
       tocaA: (p && p.toca === 'espera') ? String(p.tocaA || '') : '',
+      /* Fila 131: `cuenta` (hábiles, lectivos o naturales); hábiles si no dice. */
       plazo: (p && p.plazo && p.plazo.dias)
-        ? { dias: parseInt(p.plazo.dias, 10) || 0, desde: String(p.plazo.desde || '') } : null,
+        ? { dias: parseInt(p.plazo.dias, 10) || 0, desde: String(p.plazo.desde || ''),
+            cuenta: (p.plazo.cuenta === 'lectivos' || p.plazo.cuenta === 'naturales') ? p.plazo.cuenta : 'habiles' } : null,
       /* 20-sep-2026, fila 79, apartados 4.6, 4.7 y 4.1
          (docs/BIBLIOTECA-DE-HITOS.md): igual que lo de arriba, solo
          existen en los pasos de arriba, nunca en una opción. */
@@ -582,7 +584,8 @@ var Guias = (function () {
           '<div class="paso-plazo-fila">' +
             '<input type="number" min="1" class="campo paso-plazo-dias" placeholder="días" value="' +
             (p.plazo ? p.plazo.dias : '') + '">' +
-            '<span class="suave">días desde</span>' +
+            (window.GuiasPlazo ? GuiasPlazo.html(p) : '<span class="suave">días</span>') +   /* fila 131 */
+            '<span class="suave">desde</span>' +
             '<select class="campo paso-plazo-desde"><option value="">(sin plazo)</option>' +
             otros.map(function (o) {
               return '<option value="' + U.escapar(o.id) + '"' +
@@ -620,7 +623,7 @@ var Guias = (function () {
         var desdeSel = caja.querySelector(':scope > .paso-extra .paso-plazo-desde');
         var dias = diasInp ? parseInt(diasInp.value, 10) : NaN;
         nivel[i].plazo = (!isNaN(dias) && dias > 0 && desdeSel && desdeSel.value)
-          ? { dias: dias, desde: desdeSel.value } : null;
+          ? { dias: dias, desde: desdeSel.value, cuenta: window.GuiasPlazo ? GuiasPlazo.leer(caja) : 'habiles' } : null;
 
         /* "Lo que hay que reunir" (18-sep-2026, fila 59): solo en los
            pasos que no son pregunta (ver pintar()), así que un paso que

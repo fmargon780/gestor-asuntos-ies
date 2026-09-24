@@ -54,7 +54,7 @@ var GuiasMapa = (function () {
   function lineaPequena(p, op) {
     var trozos = [];
     if (p.responsable) trozos.push((op.responsable && op.responsable(p.responsable)) || 'con responsable');
-    if (p.plazo && p.plazo.dias) trozos.push(p.plazo.dias + ' días');
+    if (p.plazo && p.plazo.dias) trozos.push(typeof Plazos !== 'undefined' && Plazos.textoPlazo ? Plazos.textoPlazo(p.plazo) : p.plazo.dias + ' días');   /* fila 131: «10 días hábiles» */
     return trozos.length ? '<span class="mapa-meta">' + esc(trozos.join(' · ')) + '</span>' : '';
   }
 

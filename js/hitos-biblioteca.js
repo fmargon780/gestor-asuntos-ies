@@ -84,7 +84,8 @@ var HitosBiblioteca = (function () {
       responsable: String((m && m.responsable) || ''),
       estadoAsunto: (m && m.estadoAsunto) || null,
       plazo: (m && m.plazo && m.plazo.dias)
-        ? { dias: parseInt(m.plazo.dias, 10) || 0, desde: String(m.plazo.desde || '') } : null,
+        ? { dias: parseInt(m.plazo.dias, 10) || 0, desde: String(m.plazo.desde || ''),
+            cuenta: (m.plazo.cuenta === 'lectivos' || m.plazo.cuenta === 'naturales') ? m.plazo.cuenta : 'habiles' } : null,
       requisitos: window.Guias ? Guias.normalizarRequisitos(m && m.requisitos) : [],
       comunicacion: window.Guias ? Guias.normalizarComunicacion(m && m.comunicacion) : null,
       soloInformativo: !!(m && m.soloInformativo),
@@ -197,7 +198,7 @@ var HitosBiblioteca = (function () {
   function textoLegibleDe(clave, valor) {
     if (valor === null || valor === undefined || valor === '') return '(vacío)';
     if (clave === 'plazo') {
-      return valor.dias ? (valor.dias + ' días desde otro paso') : '(vacío)';
+      return valor.dias ? ((typeof Plazos !== 'undefined' && Plazos.textoPlazo ? Plazos.textoPlazo(valor) : valor.dias + ' días') + ' desde otro paso') : '(vacío)';
     }
     if (clave === 'requisitos') {
       var lista = valor || [];

@@ -253,6 +253,14 @@
     })).ajustes;
   }
 
+  /* Fila 131: los festivos, igual que los no lectivos. */
+  async function guardarFestivos(lista) {
+    return (await cambiar(function (d) {
+      d.ajustes.festivos = Hitos.normalizarAjustes({ festivos: lista }).festivos;
+      return d;
+    })).ajustes;
+  }
+
   async function guardarNoLectivos(lista) {
     return (await cambiar(function (d) {
       d.ajustes.noLectivos = Hitos.normalizarAjustes({ noLectivos: lista }).noLectivos;
@@ -414,7 +422,7 @@
     elegirOpcion: elegirOpcion, cambiarRama: cambiarRama,
     resolverResponsable: resolverResponsable,
     anadirResponsable: anadirResponsable, renombrarResponsable: renombrarResponsable,
-    quitarResponsable: quitarResponsable, guardarNoLectivos: guardarNoLectivos,
+    quitarResponsable: quitarResponsable, guardarNoLectivos: guardarNoLectivos, guardarFestivos: guardarFestivos,
     NOMBRE_HISTORIAL: NOMBRE_HISTORIAL,
     /* para las pruebas */
     _textoHistorial: textoHistorial, _leerHitosDeHistorial: leerHitosDeHistorial

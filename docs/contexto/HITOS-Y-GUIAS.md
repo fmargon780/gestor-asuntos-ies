@@ -475,9 +475,15 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
 - **Responsable**: persona del centro (configurable en Ajustes › Hitos) o un papel fijo
   (`tercero`, `tutor`, `relacionado`) que la aplicación resuelve sola con datos del asunto
   (`Hitos.resolverResponsable`); sin resolver, se enseña en gris.
-- **Plazo**: un paso puede llevar "tantos días hábiles desde que se complete otro paso". Al
-  marcarlo hecho, `Plazos.sumarDiasHabiles` (días no lectivos de Ajustes › Hitos incluidos) pone
-  sola la fecha límite del siguiente, salvo que Francisco la haya tocado a mano.
+- **Plazo**: un paso puede llevar "tantos días desde que se complete otro paso", y (fila 131,
+  `docs/PLAZOS-BIEN-CONTADOS.md`) cómo se cuentan: `plazo.cuenta` = `habiles` (por defecto: sin
+  sábados, domingos ni festivos; las vacaciones cuentan), `lectivos` (además sin los no lectivos) o
+  `naturales` (todos; si el último no es hábil, al siguiente hábil). Desplegable en el editor del
+  paso (`js/guias-plazo.js`); el hito copia la cuenta; un plazo viejo sin ella, hábiles. Al marcar
+  hecho el paso del que depende, `Plazos.sumarPlazo` pone sola la fecha límite, con los
+  `festivos` y `noLectivos` de Ajustes › Hitos (dos cajas; sin festivos, el título plegado avisa
+  en ámbar «Faltan los festivos»), salvo que Francisco la haya tocado a mano. El mapa y la
+  biblioteca dicen el modo («10 días hábiles», `Plazos.textoPlazo`).
 - **Estado del asunto**: es el hito actual (fila 129, ver "El hito es el estado del asunto");
   la única función que lo decide es `Hitos.estadoDelAsunto` (`js/hitos.js`).
 - **Al archivar**, los hitos salen de `hitos.json` y se escriben, dentro de la carpeta ya

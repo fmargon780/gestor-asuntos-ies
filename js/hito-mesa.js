@@ -109,18 +109,19 @@ var HitoMesa = (function () {
 
   /* "Vence el 15-oct · quedan N días hábiles", con los no lectivos de
      Ajustes › Hitos; colores de Plazos.de. */
-  function textoPlazo(fecha, ajustes) {
+  /* `cuenta` (fila 131): cómo se cuenta el plazo de este hito, para
+     «quedan N días hábiles / lectivos / naturales». Hábiles si no dice. */
+  function textoPlazo(fecha, ajustes, cuenta) {
     if (!fecha) return { texto: 'Sin plazo', clase: 'mesa-etq-gris' };
     var p = Plazos.de(fecha);
-    var habiles = 0;
+    var quedan = 0;
+    var modo = Plazos.cuentaValida ? Plazos.cuentaValida(cuenta) : 'habiles';
     if (p && p.dias > 0) {
-      var hoy = U.hoyIso();
-      var noLectivos = (ajustes && ajustes.noLectivos) || [];
-      while (habiles < 400 && Plazos.sumarDiasHabiles(hoy, habiles + 1, noLectivos) <= fecha) habiles++;
+      quedan = Plazos.diasQueQuedan(U.hoyIso(), fecha, modo, (ajustes && ajustes.festivos) || [], (ajustes && ajustes.noLectivos) || []);
     }
     var corto = Plazos.etiquetaVencimiento ? Plazos.etiquetaVencimiento(fecha).texto : Plazos.legible(fecha);
     var texto = p && p.dias > 0
-      ? corto.replace(/ · quedan \d+ días?$/, '') + ' · quedan ' + habiles + (habiles === 1 ? ' día hábil' : ' días hábiles')
+      ? corto.replace(/ · quedan \d+ días?$/, '') + ' · quedan ' + Plazos.textoDias(quedan, modo)
       : corto;
     var clase = !p ? 'mesa-etq-gris' : (p.clase === 'plazo-vencido' ? 'mesa-etq-rojo' : p.clase === 'plazo-cerca' ? 'mesa-etq-ambar' : 'mesa-etq-verde');
     return { texto: texto, clase: clase };
@@ -141,7 +142,7 @@ var HitoMesa = (function () {
     if (!cab || !h) return;
     var visibles = Hitos.visibles(hitos).filter(function (x) { return x.estado !== 'noaplica' && !x.delTipoAnterior; });
     var n = visibles.indexOf(visibles.filter(function (x) { return x.id === h.id; })[0]) + 1;
-    var plazo = textoPlazo(h.fecha, ajustes);
+    var plazo = textoPlazo(h.fecha, ajustes, h.plazo && h.plazo.cuenta);
     var resp = h.responsable ? Hitos.resolverResponsable(h.responsable, ajustes, contextoDe(a)) : null;
     var guion = Hitos.guionDe ? Hitos.guionDe(a, h) : [];
     var cuenta = Hitos.cuentaGuion ? Hitos.cuentaGuion(guion) : { hechos: 0, total: 0 };

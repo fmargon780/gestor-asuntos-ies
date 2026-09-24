@@ -273,7 +273,7 @@ await comprobar('lo marcado sigue igual, no se ha vuelto a importar por encima',
 
 /* ================= AJUSTES › HITOS: un día no lectivo (para el escenario 7) ================= */
 
-console.log('--- Ajustes › Hitos: días no lectivos ---');
+console.log('--- Ajustes › Hitos: un festivo y un día no lectivo ---');
 const hoy = new Date();
 const noLectivo = new Date(hoy.getTime());
 { /* el 5º día hábil desde hoy: cae dentro de la ventana de 10 del escenario 7 */
@@ -293,16 +293,26 @@ await pagina.evaluate(() => App.cambiarPestanaAjustes('centro'));
 await pagina.evaluate(() => {
   document.querySelectorAll('#pantalla-ajustes details').forEach((d) => { d.open = true; });
 });
-await pagina.waitForSelector('#hitos-no-lectivos');
-await pagina.fill('#hitos-no-lectivos', noLectivoLegible);
+/* Desde la fila 131 (docs/PLAZOS-BIEN-CONTADOS.md) los días hábiles
+   saltan los FESTIVOS, no los no lectivos (las vacaciones son hábiles):
+   el día de por medio se guarda como festivo; y un no lectivo aparte, que
+   un plazo en días hábiles no debe saltarse. */
+await pagina.waitForSelector('#hitos-festivos');
+await pagina.fill('#hitos-festivos', noLectivoLegible);
+await pagina.click('#btn-guardar-festivos');
+await pagina.waitForTimeout(400);
+const otroDia = new Date(noLectivo.getTime());
+do { otroDia.setDate(otroDia.getDate() + 1); } while (otroDia.getDay() === 0 || otroDia.getDay() === 6);
+await pagina.fill('#hitos-no-lectivos', String(otroDia.getDate()).padStart(2, '0') + '/' +
+  String(otroDia.getMonth() + 1).padStart(2, '0') + '/' + otroDia.getFullYear());
 await pagina.click('#btn-guardar-no-lectivos');
 await pagina.waitForTimeout(400);
-await comprobar('el día no lectivo se ha guardado en hitos.json', pagina.evaluate(async () => {
+await comprobar('el festivo y el no lectivo se han guardado en hitos.json', pagina.evaluate(async () => {
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
   const f = await g.getFileHandle('hitos.json');
   const j = JSON.parse(await (await f.getFile()).text());
-  return j.ajustes.noLectivos.length;
-}), 1);
+  return [j.ajustes.festivos.length, j.ajustes.noLectivos.length];
+}), [1, 1]);
 
 /* ================= ESCENARIOS 3, 6, 4, 7 y 8: el hilo del primer asunto ================= */
 
@@ -341,7 +351,7 @@ await comprobar('aparecen los hitos de la rama elegida',
   pagina.locator('#ficha-guia .hito[data-id="p3a1"]').count(), 1);
 await comprobar('y el que viene después de la decisión, p4, también',
   pagina.locator('#ficha-guia .hito[data-id="p4"]').count(), 1);
-await comprobar('el plazo de p4 (10 días hábiles desde p2, con un no lectivo por medio) es el correcto',
+await comprobar('el plazo de p4 (10 días hábiles desde p2: salta el festivo, no el no lectivo) es el correcto',
   leerHitosDeDisco().then(e => (e.hitos.find(h => h.id === 'p4') || {}).fecha), esperado7);
 
 console.log('--- escenario 8: el responsable "papel" se resuelve con el tercero ---');
