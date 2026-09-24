@@ -485,8 +485,8 @@ var Datos = (function () {
     PERSONAL: { fichero: 'personal.csv',
                 cabecera: ['Nombre', 'Documento', 'Puesto', 'Teléfono', 'Correo'] },
     /* El nombre comercial es el rótulo del negocio, que muchas veces no
-       tiene nada que ver con la razón social: "Papelería Pintor Palomo"
-       de un autónomo que se llama Adolfo González de León. Se busca por
+       tiene nada que ver con la razón social: "Papelería La Pluma Azul"
+       de un autónomo que se llama Antonio Prueba Inventado. Se busca por
        los dos. En el nombre de la carpeta sigue mandando la razón
        social, que es la que viene en las facturas. */
     EMPRESAS: { fichero: 'empresas.csv',
