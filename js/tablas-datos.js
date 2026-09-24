@@ -24,7 +24,10 @@ var TablasDatos = (function () {
 
   var CACHE = null;   /* { tablas: { NOMBRE: { nombre, ficheros, cursos, cabecera, filas } }, errores: [] } */
   var L = window.TablasDatosLeer;
-  var COLUMNAS_TUTORIAS = ['Curso escolar', 'Grupo', 'Desde', 'Hasta'];
+  /* Fila 123: como el certificado del centro. Los nombres viejos (Curso
+     escolar, Grupo, Desde, Hasta) siguen valiendo en {{TABLA TUTORIAS: …}}. */
+  var COLUMNAS_TUTORIAS = ['Cargo', 'Curso', 'Toma de posesión', 'Cese'];
+  var GRUPO_DIVERSIDAD = 'pedagogia terapeutica';
 
   function dirDatos() { return window.App && App.E && App.E.datos; }
   function nombreTabla(n) { return U.normalizar(String(n || '')).replace(/\.(csv|xlsx)$/i, '').replace(/[^a-z0-9]+/g, ' ').trim().toUpperCase(); }
@@ -126,14 +129,39 @@ var TablasDatos = (function () {
   /* Una fila como lista de celdas, con las columnas pedidas. */
   function celdasDe(tabla, fila, columnas) {
     if (tabla === 'TUTORIAS') {
-      var mapa = { 'curso escolar': fila.curso, 'curso': fila.curso, 'grupo': fila.grupo, 'desde': fechaLegible(fila.desde),
-                   'hasta': fechaLegible(fila.hasta), 'nombre': fila.nombre, 'dni': fila.dni };
+      var desde = fechaLegible(fila.desde), hasta = fechaLegible(fila.hasta);
+      var mapa = { 'curso escolar': fila.curso, 'curso': String(fila.curso || '').replace('/', '-'), 'grupo': fila.grupo,
+                   'cargo': cargoDe(fila.grupo), 'desde': desde, 'toma de posesion': desde, 'hasta': hasta, 'cese': hasta,
+                   'nombre': fila.nombre, 'dni': fila.dni };
       return columnas.map(function (c) { return mapa[U.normalizar(c)] || ''; });
     }
     return columnas.map(function (c) {
       var real = Object.keys(fila.celdas).filter(function (k) { return U.normalizar(k) === U.normalizar(c); })[0];
       return real ? fila.celdas[real] : '';
     });
+  }
+
+  /* «Tutoría 4º ESO C»; en el bloque de atención a la diversidad (sin
+     unidad), «Tutoría de Pedagogía Terapéutica, …» (fila 123). */
+  function cargoDe(grupo) {
+    var g = String(grupo || '').trim();
+    if (!g) return 'Tutoría';
+    return U.normalizar(g).indexOf(GRUPO_DIVERSIDAD) === 0 ? 'Tutoría de ' + g : 'Tutoría ' + g;
+  }
+
+  /* «Cursos que pide» (campo propio del tipo, fila 123): solo los periodos
+     de esos cursos. Vacío, todos; sin entenderlo, todos y un aviso. */
+  function filtrarPorCursos(filas, valores, faltan) {
+    var escrito = '';
+    var campos = (valores && valores.campos) || {};
+    Object.keys(campos).forEach(function (k) { if (U.normalizar(k) === 'cursos que pide') escrito = campos[k]; });
+    var pedido = window.TablasDatosCursos ? TablasDatosCursos.entender(escrito) : null;
+    if (!pedido) return filas;
+    if (!pedido.entendido) {
+      faltan.push('Cursos que pide: no entiendo «' + escrito + '», salen todos los cursos');
+      return filas;
+    }
+    return filas.filter(function (f) { return pedido.anios.indexOf(TablasDatosCursos.anioDe(f.curso)) !== -1; });
   }
 
   /* ---------- los huecos de un documento ---------- */
@@ -150,7 +178,7 @@ var TablasDatos = (function () {
   async function prepararDocumento(buffer, asunto, valores) {
     var texto = await Docx.textoDelDocumento(buffer);
     var huecos = [];
-    texto.replace(/\{\{\s*(ESPECIALIDAD|TABLA[^{}]*|DATO[^{}]*)\s*\}\}/gi, function (t, dentro) { huecos.push(dentro.trim()); });
+    texto.replace(/\{\{\s*(ESPECIALIDAD(?:\s+FIRMANTE|\s+VISTO\s+BUENO)?|TABLA[^{}]*|DATO[^{}]*)\s*\}\}/gi, function (t, dentro) { huecos.push(dentro.trim()); });
     if (!huecos.length) return { buffer: buffer, faltan: [] };
 
     var persona = await personaDelAsunto(asunto);
@@ -165,12 +193,24 @@ var TablasDatos = (function () {
         valores.especialidad = esp;
         continue;
       }
+      /* {{ESPECIALIDAD FIRMANTE}} / {{ESPECIALIDAD VISTO BUENO}} (fila 123):
+         el puesto de quien ocupa el cargo en la fecha del documento. */
+      var deCargo = h.match(/^especialidad\s+(firmante|visto\s+bueno)$/i);
+      if (deCargo) {
+        var quien = /^firmante$/i.test(deCargo[1]) ? 'firmante' : 'visto bueno';
+        var etiquetaCargo = quien === 'firmante' ? 'Especialidad de quien firma' : 'Especialidad del visto bueno';
+        var espCargo = await especialidadPorNombre(valores[quien], valores[quien + ' documento']);
+        if (!espCargo) { faltan.push(etiquetaCargo); espCargo = Docx.MARCA_FALTA(etiquetaCargo); }
+        valores['especialidad ' + quien] = espCargo;
+        continue;
+      }
       var tabla = h.match(/^TABLA\s+([^:]+?)\s*(?::\s*(.*))?$/i);
       if (tabla) {
         var nombre = nombreTabla(tabla[1]);
         var columnas = tabla[2] ? tabla[2].split('|').map(function (c) { return c.trim(); }).filter(Boolean)
           : (nombre === 'TUTORIAS' ? COLUMNAS_TUTORIAS : ((await cargar()).tablas[nombre] || { cabecera: [] }).cabecera);
         var filas = await filasDe(nombre, persona);
+        if (nombre === 'TUTORIAS' && filas.length) filas = filtrarPorCursos(filas, valores, faltan);
         if (filas.length) {
           var r = await Docx.ponerTabla(buffer, h, columnas, filas.map(function (f) { return celdasDe(nombre, f, columnas); }));
           buffer = r.bytes;
@@ -204,6 +244,26 @@ var TablasDatos = (function () {
     } catch (e) { return ''; }
   }
 
+  /* La de quien ocupa un cargo (fila 123): por su documento si se sabe y,
+     si no, por el nombre, sin tildes, mayúsculas, comas ni orden («Pérez
+     Gómez, Juana» = «Juana Pérez Gómez»). */
+  function huesoDelNombre(n) {
+    return U.normalizar(String(n || '')).replace(/[^a-z0-9 ]+/g, ' ').split(/\s+/).filter(Boolean).sort().join(' ');
+  }
+
+  async function especialidadPorNombre(nombre, documento) {
+    if (!nombre && !documento) return '';
+    try {
+      var personal = await Datos.cargar(App.E.datos, 'PERSONAL');
+      var clave = L.clave(documento || '');
+      var hueso = huesoDelNombre(nombre);
+      var p = personal.lista.filter(function (x) {
+        return (clave.length > 4 && L.clave(x.documento) === clave) || (hueso && huesoDelNombre(x.nombre) === hueso);
+      })[0];
+      return (p && p.puesto) || '';
+    } catch (e) { return ''; }
+  }
+
   /* Después de Docx.rellenar: lo marcado como falta, en amarillo. */
   async function resaltarResultado(resultado, faltan) {
     var bytes = new Uint8Array(await resultado.blob.arrayBuffer());
@@ -216,7 +276,8 @@ var TablasDatos = (function () {
   return {
     cargar: cargar, olvidar: olvidar, lista: lista, filasDe: filasDe, celdasDe: celdasDe,
     nombreTabla: nombreTabla, prepararDocumento: prepararDocumento, resaltarResultado: resaltarResultado,
-    especialidadDe: especialidadDe, COLUMNAS_TUTORIAS: COLUMNAS_TUTORIAS, _esDeLaPersona: esDeLaPersona
+    especialidadDe: especialidadDe, especialidadPorNombre: especialidadPorNombre, cargoDe: cargoDe,
+    COLUMNAS_TUTORIAS: COLUMNAS_TUTORIAS, _esDeLaPersona: esDeLaPersona
   };
 })();
 window.TablasDatos = TablasDatos;

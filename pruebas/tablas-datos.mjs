@@ -11,7 +11,12 @@
      3. {{ESPECIALIDAD}} sin dato -> «[falta: Especialidad]» en amarillo y
         en «faltan»; con dato, el puesto del RelPerCen.
      4. Un CSV en Latin-1 y un .xlsx mínimo en `Tablas/` -> se leen con su
-        cabecera, y {{DATO …}} trae su valor. */
+        cabecera, y {{DATO …}} trae su valor.
+     5. Fila 123 (docs/CERTIFICADO-TUTORIA-DEL-CENTRO.md): el cargo con su
+        grupo, el curso con guion, «Cursos que pide» (un curso, una lista,
+        un rango y algo que no se entiende), {{ESPECIALIDAD FIRMANTE}} con y
+        sin dato, el tipo sin tilde casa con la plantilla, y el certificado
+        con «C E R T I F I C A:» en negrita y las firmas en dos columnas. */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
@@ -124,7 +129,7 @@ const r23 = await pagina.evaluate(async () => {
     tablas: lista.tablas.map((t) => [t.nombre, t.filas]),
     columnas: (tbl.match(/<w:gridCol /g) || []).length,
     filasJuana: (tbl.match(/<w:tr>/g) || []).length,
-    cabecera: /Curso escolar[\s\S]*Grupo[\s\S]*Desde[\s\S]*Hasta/.test(tbl),
+    cabecera: /Cargo[\s\S]*Curso[\s\S]*Toma de posesión[\s\S]*Cese/.test(tbl),
     negrita: /<w:b\/>/.test(tbl),
     filasB: (tblB.match(/<w:tr>/g) || []).length,
     huecoTablaQueda: /TABLA TUTORIAS/.test(a.xml),
@@ -136,7 +141,7 @@ const r23 = await pagina.evaluate(async () => {
 });
 await comprobar('2. la tabla de tutorías, leída de los dos PDF sin repetir', Promise.resolve(r23.tablas), [['TUTORIAS', 7]]);
 await comprobar('2. <w:tbl> con cuatro columnas', Promise.resolve(r23.columnas), 4);
-await comprobar('2. cabecera en negrita (Curso escolar · Grupo · Desde · Hasta)', Promise.resolve([r23.cabecera, r23.negrita]), [true, true]);
+await comprobar('2. cabecera en negrita (Cargo · Curso · Toma de posesión · Cese, fila 123)', Promise.resolve([r23.cabecera, r23.negrita]), [true, true]);
 await comprobar('2. Juana: la cabecera y sus dos periodos (unidad y atención a la diversidad)', Promise.resolve(r23.filasJuana), 3);
 await comprobar('2. María del Carmen: la cabecera y sus tres periodos', Promise.resolve(r23.filasB), 4);
 await comprobar('2. el hueco ya no queda escrito', Promise.resolve(r23.huecoTablaQueda), false);
@@ -205,6 +210,68 @@ await comprobar('4. el .xlsx, con su cabecera', Promise.resolve(r4.xlsxCab), ['D
 await comprobar('4. y unido a la persona por su DNI', Promise.resolve(r4.xlsxFilas), ['Jefa de Departamento']);
 await comprobar('4. {{DATO …}} trae su valor', Promise.resolve(r4.dato), 'Matemáticas');
 await comprobar('4. sin ficheros que no se hayan podido leer', Promise.resolve(r4.errores), []);
+
+/* ---------- 5. el certificado como el del centro (fila 123) ---------- */
+console.log('--- 5. el certificado de función tutorial del centro ---');
+const r5 = await pagina.evaluate(async () => {
+  const buffer = new Uint8Array(await (await fetch('plantillas/certificado-funcion-tutorial.docx')).arrayBuffer());
+  TablasDatos.olvidar();
+  const juana = { nombre: 'Pérez Gómez, Juana', documento: '11111111H', puesto: 'Matemáticas P.E.S.' };
+  window.FichaTercero.datosBasicos = async () => ({ persona: juana, categoria: 'PERSONAL' });
+  const cargarDeVerdad = Datos.cargar;
+  Datos.cargar = async (dir, cat) => cat === 'PERSONAL'
+    ? { lista: [{ nombre: 'Ruiz Sanz, Elena', documento: '55555555K', puesto: 'Lengua Castellana y Literatura P.E.S.' }] }
+    : cargarDeVerdad(dir, cat);
+  async function generar(valores) {
+    const prep = await TablasDatos.prepararDocumento(buffer, { nombre: 'x', ficha: {} }, valores);
+    let res = await Docx.rellenar(prep.buffer, valores);
+    res = await TablasDatos.resaltarResultado(res, prep.faltan);
+    const xml = await Docx.leerEntradaDeTexto(new Uint8Array(await res.blob.arrayBuffer()), 'word/document.xml');
+    const tablas = xml.match(/<w:tbl>[\s\S]*?<\/w:tbl>/g) || [];
+    const filas = (tablas[0] || '').match(/<w:tr>[\s\S]*?<\/w:tr>/g) || [];
+    const texto = (x) => (x.match(/<w:t[^>]*>[^<]*<\/w:t>/g) || []).map((t) => t.replace(/<[^>]+>/g, '')).join('');
+    return { xml, faltan: res.faltan, filas: filas.map((f) => (f.match(/<w:tc>[\s\S]*?<\/w:tc>/g) || []).map(texto)),
+             firmas: tablas.length > 1 ? (tablas[1].match(/<w:tc>[\s\S]*?<\/w:tc>/g) || []).map(texto) : [] };
+  }
+  const todos = await generar({ firmante: 'Elena Ruiz Sanz', 'visto bueno': 'Pedro Gil Mora', campos: {} });
+  const unCurso = await generar({ firmante: 'Elena Ruiz Sanz', campos: { 'Cursos que pide': '2025/26' } });
+  const otro = await generar({ firmante: 'Elena Ruiz Sanz', campos: { 'cursos que pide': '2019-2020' } });
+  const raro = await generar({ firmante: 'Elena Ruiz Sanz', campos: { 'Cursos que pide': 'los de antes' } });
+  Datos.cargar = cargarDeVerdad;
+  const C = TablasDatosCursos;
+  return {
+    filas: todos.filas,
+    espFirmante: todos.xml.indexOf('Lengua Castellana y Literatura P.E.S.') !== -1 && todos.faltan.indexOf('Especialidad de quien firma') === -1,
+    espVistoBuenoNoSeUsa: todos.faltan.indexOf('Especialidad del visto bueno') === -1,
+    sinFirmante: (await generar({ firmante: 'Nadie Conocido', campos: {} })).faltan.indexOf('Especialidad de quien firma') !== -1,
+    certifica: /<w:b\/><\/w:rPr><w:t xml:space="preserve">C E R T I F I C A:<\/w:t>/.test(todos.xml),
+    firmas: todos.firmas,
+    unCurso: unCurso.filas.length, otro: [otro.xml.indexOf('Toma de posesión') === -1, otro.faltan.indexOf('Tabla TUTORIAS') !== -1],
+    raro: [raro.filas.length, raro.faltan.some((f) => /Cursos que pide/.test(f))],
+    entender: [C.entender(''), C.entender('2017-2018'), C.entender('2017/18, 19-20 y 2021-2022'),
+               C.entender('2017-2018 a 2019-2020'), C.entender('el año pasado').entendido],
+    sinTilde: Plantillas.documentosDeTipo({ documentos: [{ categoria: 'PERSONAL', tipo: 'DESEMPEÑO FUNCIÓN TUTORIAL' }] },
+      'PERSONAL', 'Desempeño funcion tutorial').length
+  };
+});
+await comprobar('5. cabecera Cargo · Curso · Toma de posesión · Cese, cargo con su grupo y curso con guion',
+  Promise.resolve(r5.filas), [
+    ['Cargo', 'Curso', 'Toma de posesión', 'Cese'],
+    ['Tutoría 1º ESO A', '2025-2026', '01/09/2025', '31/08/2026'],
+    ['Tutoría de Pedagogía Terapéutica, Audición y Lenguaje o Diversificación', '2025-2026', '01/09/2025', '31/08/2026']]);
+await comprobar('5. {{ESPECIALIDAD FIRMANTE}}: el puesto de quien firma, buscado por su nombre en otro orden', Promise.resolve(r5.espFirmante), true);
+await comprobar('5. sin esa persona en el personal: en «faltan»', Promise.resolve(r5.sinFirmante), true);
+await comprobar('5. el certificado no usa {{ESPECIALIDAD VISTO BUENO}}', Promise.resolve(r5.espVistoBuenoNoSeUsa), true);
+await comprobar('5. «C E R T I F I C A:» en negrita', Promise.resolve(r5.certifica), true);
+await comprobar('5. las firmas en dos columnas: V.º B.º a la izquierda, quien firma a la derecha',
+  Promise.resolve(r5.firmas), ['V.º B.ºFirma digitalPedro Gil Mora', 'Firma digitalElena Ruiz Sanz']);
+await comprobar('5. «Cursos que pide» con un curso: solo esos periodos', Promise.resolve(r5.unCurso), 3);
+await comprobar('5. con un curso que no tiene: sin tabla, y en «faltan»', Promise.resolve(r5.otro), [true, true]);
+await comprobar('5. sin entender lo escrito: todos, y se avisa', Promise.resolve(r5.raro), [3, true]);
+await comprobar('5. formatos de «Cursos que pide»: vacío, un curso, una lista y un rango', Promise.resolve(r5.entender), [
+  null, { entendido: true, anios: [2017] }, { entendido: true, anios: [2017, 2019, 2021] },
+  { entendido: true, anios: [2017, 2018, 2019] }, false]);
+await comprobar('5. el tipo sin tilde casa con la plantilla', Promise.resolve(r5.sinTilde), 1);
 
 await comprobar('sin errores en la página', Promise.resolve(errores), []);
 await navegador.close();

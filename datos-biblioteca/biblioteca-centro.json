@@ -284,6 +284,12 @@
       "nuevo": false
     },
     {
+      "nombreCorto": "DESEMPEÑO FUNCIÓN TUTORIAL",
+      "nombreLargo": "Certificado de desempeño de la función tutorial",
+      "categoria": "PERSONAL",
+      "nuevo": false
+    },
+    {
       "nombreCorto": "INSUFICIENCIA HORARIA",
       "nombreLargo": "Insuficiencia de horario y reubicación",
       "categoria": "PERSONAL",
@@ -667,6 +673,13 @@
     "Subvención": [
       {
         "nombre": "Convocatoria",
+        "clase": "texto",
+        "valores": []
+      }
+    ],
+    "Certificado de desempeño de la función tutorial": [
+      {
+        "nombre": "Cursos que pide",
         "clase": "texto",
         "valores": []
       }

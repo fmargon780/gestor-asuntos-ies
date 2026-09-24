@@ -1,26 +1,28 @@
 ---
 nombre: Certificado de función tutorial
-tipo: CERTIFICADO PERSONAL
+tipo: DESEMPEÑO FUNCIÓN TUTORIAL
 categoria: PERSONAL
 tipoDocumento: CERTIFICADO
 texto: tutorias
-firmante: direccion
-vistoBueno:
+firmante: secretaria
+vistoBueno: direccion
 ---
 
 {{MEMBRETE}}
 
-# Certificado
+{{FIRMANTE}}, Profesor/a:firmante de {{ESPECIALIDAD FIRMANTE}} y Secretario/a:firmante del {{CENTRO}}, de {{LOCALIDAD}} ({{PROVINCIA}}),
 
-{{TRATAMIENTO FIRMANTE}} {{FIRMANTE}}, del {{CENTRO}}, código {{CODIGO CENTRO}}
+**C E R T I F I C A:**
 
-CERTIFICA: que {{NOMBRE NATURAL}}, con DNI {{REFERENCIA}}, especialidad {{ESPECIALIDAD}}, ha
-ejercido la función tutorial en este centro en los periodos siguientes:
+Que **D./Dña. {{NOMBRE NATURAL}}**, con DNI {{DNI}}, profesor/a de {{ESPECIALIDAD}}, ha ejercido la
+función tutorial en este centro en los periodos siguientes:
 
 {{TABLA TUTORIAS}}
 
-Y para que conste a petición de la persona interesada, firmo el presente en {{LUGAR Y FECHA}}.
+Y para que conste y surta los efectos oportunos, a petición de la persona interesada, expido la
+presente con el V.º B.º del/de la:vistobueno Director/a:vistobueno, en {{LOCALIDAD}}, a {{HOY LARGO}}.
 
-> {{TRATAMIENTO FIRMANTE}}
->
-> Fdo.: {{FIRMANTE}}
+| V.º B.º | ^^{{TRATAMIENTO FIRMANTE}}^^ |
+| ^^{{TRATAMIENTO VISTO BUENO}}^^ | Firma digital |
+| Firma digital | {{FIRMANTE}} |
+| {{VISTO BUENO}} | |
