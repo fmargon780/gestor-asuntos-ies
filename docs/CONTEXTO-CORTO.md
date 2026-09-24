@@ -84,7 +84,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; con
   tercero reconocido, también sugiere meterlo en uno que ya existe («Meter aquí»). Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
-- Aspirantes sin Nº de identificación escolar: al escribirlo, se renombran sus carpetas.
+- Aspirantes sin Nº escolar: al escribirlo, se renombran sus carpetas.
 - Botón «Ruta» en la ficha: copia la ruta de la carpeta.
 - Ficha del tercero con "Datos y contacto" en una línea, con copiar; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto en tarjetas (una se abre en grande; se vuelve
@@ -101,9 +101,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Plantillas de correo y de Word por tipo de asunto, con huecos que se rellenan solos; textos del
   centro en `plantillas/` (botón en Mantenimiento). Salen con membrete, la firma de quien ocupaba
   el cargo en su fecha y «el/la alumno/a» en masculino o femenino según el sexo de cada persona.
-- Tablas de datos (tutorías de Séneca en PDF, CSV/Excel en `datos/Tablas`) unidas por DNI, con huecos
-  {{ESPECIALIDAD}} y {{TABLA TUTORIAS}}; lo que falta sale en amarillo. Certificado de función tutorial
-  como el del centro (tipo DESEMPEÑO FUNCIÓN TUTORIAL, campo «Cursos que pide»).
+- Tablas de datos (tutorías de Séneca, CSV/Excel en `datos/Tablas`) unidas por DNI, con huecos
+  {{ESPECIALIDAD}} y {{TABLA TUTORIAS}}; lo que falta, en amarillo. Certificado de función tutorial
+  como el del centro (tipo DESEMPEÑO FUNCIÓN TUTORIAL, campo «Cursos que pide»). Renuncia a la
+  Junta Electoral, en su hito.
 - Copias diarias (caducan a los 90 días, configurable), detección de fichero roto, fusión de
   conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un borrado (tipo, estado,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
@@ -115,22 +116,21 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   gemelos y selección de varios; plantillas y formularios; comunicar con destinatarios; notas.
   Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa.
   Biblioteca de hitos del centro, con guion. Botones en Mantenimiento para cargar los tipos y guías
-  del instituto y traer los guiones.
+  del instituto y traer los guiones (y las líneas nuevas del instituto a un guion ya escrito).
 - "Qué me toca": hitos pendientes, filtro por responsable, bloque "Dormidos" (sin novedades en N
   días). "Cuentas": asuntos por tipo, mes y quién los pidió. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena en el PDF solo los datos del centro.
-- Avisos de "fichas sin carpeta" (✕ calla 7 días) y de papelera vieja. Pulsar un documento lo abre.
+- Avisos de "fichas sin carpeta" (✕ calla 7 días) y de papelera vieja.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
 - Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF, en la carpeta del asunto y en Por
   clasificar; Ajustar tamaño deja libre la banda del sello de Séneca y de la firma del director.
 - "Lo pide": quién pidió la gestión, por qué vía y cuándo; su correo sale ya en el cuadro de Correo.
 - Archivar o reabrir sobre un destino que ya existe fusiona carpetas; errores en castellano; reintenta si Dropbox tropieza.
 - Crear, reabrir o editar deja en la ficha del asunto; Volver regresa a la pantalla de origen, a su altura; lo demás, aviso con «Ir al asunto».
-- Cabecera de cada pantalla fija al bajar, encogida sin temblar.
 - Al archivar, la ficha del asunto baja a su propia carpeta (no se queda en `asuntos.json` para
   siempre); al reabrir, vuelve. Botón "Poner en orden las fichas del ARCHIVO" en Ajustes →
   Mantenimiento para los archivados de antes.
-- Ficha del asunto: foto del contacto del tercero, que sigue aunque salga del CSV.
+- Ficha del asunto: foto del contacto del tercero, que sigue aunque salga del CSV. Cabecera fija al bajar.
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -138,7 +138,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - **Permiso permanente de Francisco**: un pull request (sesiones desde la nube) lo fusiona Claude
   Code solo, en verde y sin conflictos (nota al final de `docs/COLA.md`).
 - **Comprobar siempre lo publicado con `curl`**, nunca darla por hecha.
-- Vercel publica máximo 100 veces/día (gratuito): `vercel.json` salta los commits que solo tocan `docs/`, `pruebas/`, `.github/` o `.md`; máximo dos subidas por fila (regla 13).
+- Vercel: 100 publicaciones/día (gratuito); `vercel.json` salta los commits de solo `docs/`, `pruebas/`, `.github/` o `.md`; máximo dos subidas por fila (regla 13).
 - Antes de colgar una función nueva de `App`, comprobar que el nombre no está cogido. Un solo cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.
 - Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV.
 - Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o uno nuevo. Sin remedio, con `U.envolver`, apuntado en `js/envolturas-esperadas.js`.
@@ -174,13 +174,12 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: membrete, Consejería, cargos y Provincia.
 - Importar los usuarios IdEA del alumnado, cuando reactiven a Francisco el perfil de Gestor de PASEN.
-- Pulsar "Poner en orden las fichas del ARCHIVO" (Mantenimiento).
+- Mantenimiento: "Poner en orden las fichas del ARCHIVO"; y, por la renuncia a la Junta Electoral, «Cargar las plantillas del centro» y «Traer los guiones del instituto».
 - Antes de junio de 2027: "Guardar el contacto de los asuntos abiertos" (Mantenimiento).
 - Decisión: ¿la papelera se vacía sola a los N días? Sin decidir, solo el aviso más insistente.
 - Antes de publicar algo importante, repasar `docs/COMPROBAR-A-MANO.md`.
 
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero
 
-Antes de tocar código: `docs/CONTEXTO.md` tiene el índice, las reglas comunes y la tabla de
-ficheros; cada zona vive en su hijo de `docs/contexto/`. Se lee el hijo que toque para ver cómo
-funciona un módulo, o para escribir su regla al terminar una instrucción de la cola.
+Antes de tocar código: `docs/CONTEXTO.md` tiene el índice y las reglas comunes; cada zona vive en
+su hijo de `docs/contexto/`, que se lee (y se pone al día) al tocarla.

@@ -325,7 +325,11 @@ repositorio, y se cargan con un botón, sin que Francisco tenga que escribir ni 
 mano.
 
 - **`plantillas/*.md`**: cada plantilla, como texto, con un frontmatter (`nombre`, `tipo`,
-  `categoria`; y, solo si es de documento, `tipoDocumento`, `texto`, `firmante`, `vistoBueno`).
+  `categoria`; y, solo si es de documento, `tipoDocumento`, `texto`, `firmante`, `vistoBueno` y,
+  opcional, `id`). Un `id` fijo (fila 124) pasa a `indice.json` y es el que recibe la plantilla al
+  cargarla, si nadie lo usa ya: así un paso de `datos-biblioteca/biblioteca-centro.json` la puede
+  citar en `plantillasDocumento` antes de que exista (hoy solo `pd-centro-renuncia-junta-electoral`).
+  Un bloque que solo lleva `~` es un párrafo vacío, para dejar aire.
   `scripts/hacer-plantillas.mjs` (se ejecuta a mano, nunca en Vercel ni en las pruebas) convierte
   cada una en su `.docx` (montado a mano, como un ZIP, con lo mínimo que Word necesita) y escribe
   `plantillas/indice.json`, la lista de todas con sus datos.
@@ -346,7 +350,16 @@ mano.
 Se comprueba con `pruebas/plantillas-del-centro.mjs`: que `indice.json` cite ficheros que
 existen, que cada `.md` traiga su frontmatter completo, que todo hueco usado en los cuerpos esté
 en el catálogo (la prueba que de verdad importa: un hueco mal escrito sale tal cual en el papel),
-que cada `.docx` se pueda releer, y que `{{FORMULARIOS}}` vacío no deje una línea suelta.
+que cada `.docx` se pueda releer, que `{{FORMULARIOS}}` vacío no deje una línea suelta, y que todo
+`plantillasDocumento` de la biblioteca del centro cite un `id` de `indice.json` (fila 124).
+
+**Renuncia a formar parte de la Junta Electoral** (fila 124, `plantillas/renuncia-junta-electoral.md`):
+OTROS · ELECCIONES CONSEJO ESCOLAR, tipo de documento RENUNCIA. La app rellena membrete, centro,
+curso y lugar y fecha; los datos de quien renuncia van en blanco (el asunto es del centro). La
+persona se nombra en neutro («la persona abajo firmante», «designada») para que `js/genero.js` no
+la cambie según el tercero; `firmante: direccion` solo sirve para poner en su género el
+destinatario («Sr./Sra.:firmante Director/a:firmante…»): la firma del cargo no se pinta. Cabe en una
+hoja A4 (comprobado convirtiéndolo a PDF).
 
 #### Insertar un hueco al escribir una plantilla (17-sep-2026, fila 35, docs/HUECOS-INSERTAR.md)
 

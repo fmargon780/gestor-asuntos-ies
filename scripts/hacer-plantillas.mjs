@@ -31,7 +31,8 @@
    `> ` bloque a la derecha (la fórmula de firma), `---` salto de
    línea grueso; desde la fila 123, `**negrita**` y `^^mayúsculas^^`
    dentro de una línea, y `| a | b |` para una tabla de firmas sin
-   bordes. Nada más: no hace falta un conversor de Markdown
+   bordes; desde la fila 124, `~` solo en su bloque = un párrafo
+   vacío. Nada más: no hace falta un conversor de Markdown
    completo para esto.
    ============================================================ */
 import fs from 'node:fs';
@@ -202,6 +203,9 @@ function parrafoLineaGruesa() {
    su propio párrafo. */
 function parrafosDeBloque(bloque) {
   if (bloque.trim() === '---') return parrafoLineaGruesa();
+  /* Fila 124: un bloque que solo lleva `~` es un párrafo vacío, para
+     dejar aire entre dos apartados sin tocar el estilo de las demás. */
+  if (bloque.trim() === '~') return '<w:p/>';
   const lineas = bloque.split('\n').map((l) => l.trim()).filter(Boolean);
   if (!lineas.length) return '';
 
@@ -234,7 +238,7 @@ function documentoXmlDe(cuerpoMd) {
 function textoPlanoDe(cuerpoMd) {
   const bloques = cuerpoMd.replace(/\r\n/g, '\n').split(/\n\s*\n+/).map((b) => b.trim()).filter(Boolean);
   return bloques.map((bloque) => {
-    if (bloque.trim() === '---') return '';
+    if (bloque.trim() === '---' || bloque.trim() === '~') return '';
     return bloque.split('\n').map((l) => l.trim())
       .map((l) => l.replace(/^#{1,2}\s+/, '').replace(/^-\s+/, '• ').replace(/^>\s?/, '').replace(/\*\*|\^\^/g, ''))
       .filter(Boolean).join('\n');
@@ -311,6 +315,10 @@ async function main() {
       const nombreDocx = fichero.replace(/\.md$/, '.docx');
       const zip = construirDocx(cuerpo);
       fs.writeFileSync(path.join(CARPETA_PLANTILLAS, nombreDocx), zip);
+      /* Fila 124: un `id` fijo en el frontmatter viaja al índice, para que
+         un paso de la biblioteca del centro pueda citar la plantilla
+         (`plantillasDocumento`) antes de que exista en plantillas.json. */
+      if (datos.id) entrada.id = datos.id;
       entrada.fichero = nombreDocx;
       entrada.tipoDocumento = datos.tipoDocumento;
       entrada.texto = datos.texto || '';

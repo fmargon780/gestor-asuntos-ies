@@ -181,13 +181,43 @@ var CargarBiblioteca = (function () {
      `origenBiblioteca.id`, o por el id del paso) y en los modelos de
      hitos-biblioteca.json (por su id), solo en los que no tengan ya uno.
      Nunca pisa un guion escrito. Todo pasa por GuiasDelCentro.guardarPasos
-     y HitosBiblioteca.cambiar, que releen antes de escribir. */
+     y HitosBiblioteca.cambiar, que releen antes de escribir.
+
+     Fila 124 (docs/RENUNCIA-JUNTA-ELECTORAL.md): a un guion que YA está
+     escrito solo se le añaden las líneas que el centro marca `nueva: true`
+     y que ese guion no tenga (por su id), justo detrás de la línea que
+     las precede en el guion del centro (o al final); y las plantillas de
+     `plantillasDocumento` del modelo que el paso no tenga. Nada se quita
+     ni se cambia de sitio. */
   async function traerGuiones() {
     var datos = await leerDatosEstaticos();
     var porId = {};
     (datos.modelos || []).forEach(function (m) { if (m.guion && m.guion.length) porId[m.id] = m.guion; });
-    function copia(g) { return g.map(function (x) { return Object.assign({}, x); }); }
+    function copia(g) { return g.map(function (x) { var c = Object.assign({}, x); delete c.nueva; return c; }); }
+    var docsPorId = {};
+    (datos.modelos || []).forEach(function (m) { if ((m.plantillasDocumento || []).length) docsPorId[m.id] = m.plantillasDocumento; });
     var resumen = { pasos: 0, modelos: 0 };
+
+    /* Fila 124: las líneas nuevas del centro y sus plantillas, sobre un
+       paso (o modelo) que ya tiene guion. Devuelve si ha cambiado algo. */
+    function completar(p, origen) {
+      var cambio = false;
+      var delCentro = porId[origen] || [];
+      p.guion = p.guion || [];
+      delCentro.forEach(function (linea, i) {
+        if (!linea.nueva || p.guion.some(function (g) { return g && g.id === linea.id; })) return;
+        var anterior = i > 0 ? delCentro[i - 1].id : null;
+        var pos = -1;
+        p.guion.forEach(function (g, j) { if (anterior && g && g.id === anterior) pos = j; });
+        p.guion.splice(pos === -1 ? (i === 0 ? 0 : p.guion.length) : pos + 1, 0, copia([linea])[0]);
+        cambio = true;
+      });
+      (docsPorId[origen] || []).forEach(function (id) {
+        p.plantillasDocumento = p.plantillasDocumento || [];
+        if (p.plantillasDocumento.indexOf(id) === -1) { p.plantillasDocumento.push(id); cambio = true; }
+      });
+      return cambio;
+    }
 
     var enDisco = null;
     try { enDisco = await Carpetas.leerJson(App.E.gestor, 'guias.json'); } catch (e) { enDisco = null; }
@@ -200,7 +230,8 @@ var CargarBiblioteca = (function () {
           if (!p || typeof p !== 'object') return;
           var esPregunta = (p.opciones || []).length > 0;
           var origen = (p.origenBiblioteca && p.origenBiblioteca.id) || p.id;
-          if (!esPregunta && !(p.guion && p.guion.length) && porId[origen]) { p.guion = copia(porId[origen]); cambiado++; }
+          if (!esPregunta && !(p.guion && p.guion.length) && porId[origen]) { p.guion = copia(porId[origen]); completar(p, origen); cambiado++; }
+          else if (!esPregunta && completar(p, origen)) cambiado++;
           (p.opciones || []).forEach(function (o) { recorrer(o.pasos); });
         });
       })(enDisco[tipo]);
@@ -216,7 +247,8 @@ var CargarBiblioteca = (function () {
 
     await HitosBiblioteca.cambiar(function (d) {
       (d.modelos || []).forEach(function (m) {
-        if (!(m.guion && m.guion.length) && porId[m.id]) { m.guion = copia(porId[m.id]); resumen.modelos++; }
+        if (!(m.guion && m.guion.length) && porId[m.id]) { m.guion = copia(porId[m.id]); completar(m, m.id); resumen.modelos++; }
+        else if (completar(m, m.id)) resumen.modelos++;
       });
       return d;
     });
@@ -256,7 +288,8 @@ window.CargarBiblioteca = CargarBiblioteca;
         /* Fila 109: el guion de cada hito, aparte (quien ya cargó la
            biblioteca antes no lo tiene). */
         '<p class="explica" style="margin-top:14px">El guion de cada hito (lo que hay que hacer dentro de él) ' +
-        'se trae aparte: solo se pone en los hitos que todavía no tengan uno.</p>' +
+        'se trae aparte: solo se pone en los hitos que todavía no tengan uno. A los que ya lo tienen solo ' +
+        'se les añaden las líneas nuevas del instituto que les falten, sin tocar lo demás.</p>' +
         '<button type="button" class="boton" id="btn-traer-guiones">Traer los guiones del instituto</button>' +
         '<div id="resultado-traer-guiones"></div>' +
       '</div>';
@@ -311,7 +344,7 @@ window.CargarBiblioteca = CargarBiblioteca;
       var r = await U.mientrasGuarda(boton, function () { return CargarBiblioteca.traerGuiones(); });
       var texto = (r.pasos || r.modelos)
         ? 'He traído el guion de ' + r.pasos + ' paso(s) de las guías y de ' + r.modelos + ' hito(s) modelo de la biblioteca.'
-        : 'No había nada que traer: todos tenían ya su guion.';
+        : 'No había nada que traer: todos tenían ya su guion completo.';
       salida.innerHTML = '<p class="explica">' + U.escapar(texto) + '</p>';
       U.aviso(texto, 'bueno');
     } catch (e) {

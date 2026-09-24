@@ -250,6 +250,27 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await comprobar('8. trae el guion al paso que no tenía', Promise.resolve([r8.traidos, r8.x1]), [true, true]);
   await comprobar('8. y no pisa el que ya estaba escrito', Promise.resolve(r8.x2), ['El mío, que no se toca']);
 
+  /* 8b. Fila 124: a un guion ya escrito del modelo b260 (Constituir la
+     Junta Electoral) solo se le añade la línea nueva del centro, detrás de
+     g1, y la plantilla de renuncia; una segunda pasada no repite nada. */
+  const r8b = await pagina.evaluate(async () => {
+    const g = App.E.gestor;
+    const guias = await Carpetas.leerJson(g, 'guias.json');
+    guias.MATRICULA.push({ id: 'x3', titulo: 'Junta', origenBiblioteca: { id: 'b260', revision: 1 },
+      guion: [{ id: 'g1', texto: 'Comprobar quién forma la Junta Electoral', accion: '' },
+              { id: 'mia', texto: 'Una mía', accion: '' }] });
+    await Copias.guardar(g, 'guias.json', guias);
+    await CargarBiblioteca.traerGuiones();
+    await CargarBiblioteca.traerGuiones();
+    const despues = await Carpetas.leerJson(g, 'guias.json');
+    const x3 = despues.MATRICULA.filter((p) => p.id === 'x3')[0];
+    return { ids: x3.guion.map((p) => p.id), accion: x3.guion[1].accion, docs: x3.plantillasDocumento };
+  });
+  await comprobar('8b. la línea nueva del centro entra detrás de g1, sin tocar la mía ni repetirse',
+    Promise.resolve([r8b.ids, r8b.accion]), [['g1', 'g-renuncias', 'mia'], 'generar']);
+  await comprobar('8b. y el paso queda unido a la plantilla de renuncia',
+    Promise.resolve(r8b.docs), ['pd-centro-renuncia-junta-electoral']);
+
   /* 9. */
   const OTRO = '260906 MATRICULA 26-27 Gómez Sanz, Luis 5678';
   await pagina.evaluate(async (otro) => {
