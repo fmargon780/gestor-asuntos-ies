@@ -23,7 +23,7 @@ según el sexo de cada persona. Detalle en `docs/contexto/DOCUMENTOS-PDF.md`.
 - En el Word las formas dobles también llegan partidas en trozos: se juntan como los huecos.
 
 Prueba nueva `pruebas/genero.mjs` (nombres inventados). Batería completa en verde.
-Versión publicada `App.VERSION`: `VERSION_111`.
+Versión publicada `App.VERSION`: `24-sep-2026 · 05:00`.
 
 ## 24-sep-2026 — Fila 110: tablas de datos y el certificado de función tutorial
 
