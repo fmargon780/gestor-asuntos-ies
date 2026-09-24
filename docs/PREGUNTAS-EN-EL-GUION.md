@@ -1,6 +1,7 @@
 # Preguntas dentro del guion de un hito
 
-Apuntada el 24-sep-2026. Fila 115 de `docs/COLA.md`.
+Apuntada el 24-sep-2026. Fila 116 de `docs/COLA.md` (se apuntó como fila 115, pero esa fila la
+llevaba ya, en curso, `docs/ENVIAR-DESDE-EL-ASUNTO.md`; para no pisar ese trabajo, pasó a la 116).
 
 ## Para qué
 
