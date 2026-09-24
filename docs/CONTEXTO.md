@@ -228,7 +228,10 @@ arriba.
 **Y en este ordenador, de uno en uno** (fila 99, 23-sep-2026, `docs/GUARDAR-EN-FILA.md`,
 `js/cola-guardado.js`). `ColaGuardado.poner(fichero, fn)` pone cada «leer-cambiar-escribir» detrás
 del anterior del MISMO fichero: `App.guardarRegistroFresco` (y con él `App.anotar`), `Hitos.cambiar`
-y la fusión de copias en conflicto de `asuntos.json` y `hitos.json`. Nunca se llama a `poner` del
+y la fusión de copias en conflicto de `asuntos.json` y `hitos.json`. Desde la fila 130
+(`docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md`) también el tablón (sus cambios, su fusión y devolver una
+nota de la papelera), los CSV de terceros (`js/datos-listas.js`, releyendo dentro de la cola),
+`borrados-listas.json` y `indice-archivo.json`. Nunca se llama a `poner` del
 mismo fichero desde dentro de un `fn` que ya está en esa cola (se esperaría a sí mismo). Sin el
 módulo, se guarda igual, sin fila (`App.enFila`). `guardarRegistroFresco` trabaja sobre una copia
 local y solo la pasa a `App.E.registro` al terminar la escritura. `ColaGuardado.hayGuardado()`
@@ -273,6 +276,11 @@ Si los dos ordenadores guardan casi a la vez, Dropbox no pisa nada: deja aparte 
 `asuntos (copia en conflicto de PC2 2026-09-11).json`.
 
 - `js/conflictos.js` busca esos ficheros al entrar y cada cinco minutos.
+- Los CSV de terceros dados de alta a mano (`solicitantes.csv`, `personal.csv`, `empresas.csv`,
+  `otros.csv`, en `_GESTOR/datos`; fila 130) también se fusionan solos: unión de filas, dos iguales
+  se quedan en una; con el mismo nombre y datos distintos se queda la del fichero real y la otra
+  sale en **Conflictos de Dropbox** para elegir. El real se copia antes a `_GESTOR/copias`
+  (`<nombre>-antes-de-unir-AAMMDD-HHMM.csv`) y la copia en conflicto se mueve allí.
 - `asuntos.json`, `tablon.json` y `hitos.json` se fusionan solos: se unen los asuntos (o las
   notas del tablón) por su clave, y dentro de cada uno se unen las notas, los pasos hechos y los
   pasos elegidos (`asuntos.json`), o los hitos por su id (`hitos.json`), sin repetir nada. En

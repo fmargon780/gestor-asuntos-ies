@@ -78,7 +78,15 @@ var IndiceArchivo = (function () {
      fusiona por nombre de carpeta de asunto, como Grupos.guardar. Lo
      que haya en disco y no esté en lo recién construido (el compañero
      archivó algo mientras tanto) se suma. */
-  async function guardar(datos) {
+  /* Fila 130 (docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md): los tres que
+     escriben el índice, en fila con los demás guardados de este fichero. */
+  function enFila(fn) { return window.ColaGuardado ? ColaGuardado.poner(FICHERO, fn) : fn(); }
+
+  function guardar(datos) { return enFila(function () { return guardarYa(datos); }); }
+  function anadirEntrada(entrada) { return enFila(function () { return anadirEntradaYa(entrada); }); }
+  function quitarEntrada(nombre) { return enFila(function () { return quitarEntradaYa(nombre); }); }
+
+  async function guardarYa(datos) {
     var previo = null;
     try { previo = await Carpetas.leerJson(gestor(), FICHERO); } catch (e) { previo = null; }
     var deDisco = (previo && Array.isArray(previo.asuntos)) ? previo.asuntos : [];
@@ -94,7 +102,7 @@ var IndiceArchivo = (function () {
      resto: para cuando se archiva un asunto (punto 6.3 del encargo).
      Si el índice todavía no existe, no se crea uno a medias: se
      queda sin hacer nada, como pide el encargo. */
-  async function anadirEntrada(entrada) {
+  async function anadirEntradaYa(entrada) {
     var g = gestor();
     if (!g) return;
     var previo = null;
@@ -107,7 +115,7 @@ var IndiceArchivo = (function () {
 
   /* Quita una entrada por el nombre de su carpeta: para cuando se
      reabre un asunto. Igual de silencioso si el índice no existe. */
-  async function quitarEntrada(nombre) {
+  async function quitarEntradaYa(nombre) {
     var g = gestor();
     if (!g) return;
     var previo = null;

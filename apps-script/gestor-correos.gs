@@ -34,6 +34,14 @@
    con acceso «Cualquier usuario» y dejaba «Probar» en «No hay ningún
    destinatario». prepararEnvio() ya no da la dirección /dev: da la
    clave sola y dice de dónde copiar la dirección /exec.
+
+   24-sep-2026 (noche), fila 130, docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md:
+   un correo no sale dos veces. La aplicación manda un identificador de
+   envío (`idEnvio`); si llega otra vez el mismo (se cortó la red después
+   de enviar y se volvió a pulsar), no se envía de nuevo: se contesta
+   como si hubiera salido bien, con `yaEnviado: true`. Se recuerda 6 horas
+   (CacheService). Una petición sin identificador se envía como siempre.
+   Versión del script: VERSION_SCRIPT, más abajo.
    ============================================================
    Gestor de Asuntos — recogida de correos y envío desde el asunto
    Google Apps Script, en la cuenta g.educaand.es
@@ -354,6 +362,9 @@ function guardarHilo(hilo, carpeta, respuestaDe) {
    propia cuenta, sin mirar `para`/`cco`.
    ============================================================ */
 
+var VERSION_SCRIPT = '24-sep-2026 · fila 130';
+var SEGUNDOS_RECORDAR_ENVIO = 6 * 60 * 60;   /* el máximo de CacheService */
+
 function doPost(e) {
   var resultado;
   try {
@@ -368,12 +379,42 @@ function doPost(e) {
     } else if (claveRecibida !== claveGuardada) {
       resultado = { ok: false, motivo: 'La clave no es correcta.' };
     } else {
-      resultado = enviarCorreo(cuerpo);
+      resultado = enviarUnaVez(cuerpo);
     }
   } catch (err) {
     resultado = { ok: false, motivo: 'No he podido enviar el correo: ' + (err && err.message ? err.message : err) };
   }
   return ContentService.createTextOutput(JSON.stringify(resultado)).setMimeType(ContentService.MimeType.JSON);
+}
+
+/* Fila 130: con `idEnvio`, cada envío sale una sola vez. El candado del
+   script evita que dos peticiones con el mismo identificador, llegadas a
+   la vez, salgan las dos. */
+function enviarUnaVez(cuerpo) {
+  var id = String(cuerpo.idEnvio || '').trim();
+  if (!id || cuerpo.prueba) return conVersion(enviarCorreo(cuerpo));
+  var cache = CacheService.getScriptCache();
+  var clave = 'envio:' + id;
+  var candado = LockService.getScriptLock();
+  candado.waitLock(30000);
+  try {
+    var previo = cache.get(clave);
+    if (previo) {
+      var r = JSON.parse(previo);
+      r.yaEnviado = true;
+      return conVersion(r);
+    }
+    var resultado = enviarCorreo(cuerpo);
+    if (resultado && resultado.ok) cache.put(clave, JSON.stringify(resultado), SEGUNDOS_RECORDAR_ENVIO);
+    return conVersion(resultado);
+  } finally {
+    candado.releaseLock();
+  }
+}
+
+function conVersion(r) {
+  if (r && typeof r === 'object') r.version = VERSION_SCRIPT;
+  return r;
 }
 
 function enviarCorreo(cuerpo) {

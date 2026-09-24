@@ -112,9 +112,11 @@ await pagina.evaluate(async (datos) => {
 }, { asunto: NOMBRE_ASUNTO, nuevo: NUEVO_DOC });
 
 await comprobar('1. la ficha sigue a la vista tras guardar', pantallas(), { asunto: true, abiertos: false });
+/* El repintado de la ficha es asíncrono (relee la carpeta): se le dan
+   hasta 5 s, en vez de mirar en el acto (con la máquina cargada, fallaba). */
 await comprobar('2. el documento nuevo aparece en la ficha, sin recargar nada',
-  pagina.evaluate((n) => Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento'))
-    .some((b) => b.textContent.indexOf(n) !== -1), NUEVO_DOC), true);
+  pagina.waitForFunction((n) => Array.from(document.querySelectorAll('#ficha-documentos .ficha-documento'))
+    .some((b) => b.textContent.indexOf(n) !== -1), NUEVO_DOC, { timeout: 5000 }).then(() => true, () => false), true);
 
 console.log('--- 3. el repaso automático de la carpeta, con la ficha abierta ---');
 await pagina.evaluate(async () => {

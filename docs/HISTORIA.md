@@ -5,6 +5,27 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 130: guardar y enviar sin sorpresas
+
+`docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md`, del análisis crítico del 24-sep-2026. Tres arreglos de
+«que no se pierda ni se duplique nada», casi sin nada que se vea.
+
+- **Todo guardado de `_GESTOR` por la cola.** Quedaban fuera el tablón (`cambiar`, su fusión y
+  devolver una nota), los CSV de terceros dados de alta a mano, `borrados-listas.json` e
+  `indice-archivo.json`. Los CSV salen de `js/datos.js` a `js/datos-listas.js`, releyendo el CSV
+  dentro de la cola. Entre dos ordenadores, `js/conflictos.js` une ya las copias en conflicto de
+  esos cuatro CSV (unión de filas; si chocan por el nombre, se queda la del fichero real y la otra
+  se ofrece en Ajustes).
+- Un tropiezo del camino: `Datos.olvidar()` sustituía el objeto de la caché por uno nuevo, y
+  `js/datos-listas.js`, que lo tenía cogido, se quedaba con el viejo. Ahora se vacía el mismo.
+- **Un correo no sale dos veces**: identificador de envío por cuadro, recordado 6 horas por el
+  script (`enviarUnaVez`), y 90 s de tiempo límite con «No sé si ha salido». Hay que pegar el
+  script otra vez (junto con lo de la fila 117).
+- **Nombres con tope**: carpeta de asunto ≤150, documento ≤120 más extensión, recortando solo el
+  texto libre y los campos; aviso ámbar en la vista previa. Adjuntos: extensión limpia.
+- Decisión propia: `tablon.js`, `papelera.js`, `nombres.js` y `archivo-indice.js` no se parten
+  (cambio de pocas líneas), como pedía la fila; `datos.js` sí adelgaza.
+
 ## 24-sep-2026 — Fila 129: el hito es el estado del asunto
 
 `docs/EL-HITO-ES-EL-ESTADO.md`. **El porqué**: tras la fila 104 convivían dos sistemas, el

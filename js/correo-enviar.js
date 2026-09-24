@@ -60,21 +60,40 @@ window.CorreoEnviar = (function () {
   /* Manda el JSON con Content-Type: text/plain a propósito: así el
      navegador lo trata como una petición "simple" y no hace la
      consulta previa CORS, que Apps Script no sabe contestar. */
-  async function llamar(cuerpo) {
+  /* Fila 130 (docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md): tiempo límite de
+     la petición. Si vence, no se sabe si Google ha llegado a enviarlo. */
+  var LIMITE_MS = 90 * 1000;
+  var NO_SE_SI_HA_SALIDO = 'No sé si ha salido. Mira en Enviados de Gmail antes de volver a pulsar.';
+
+  /* El identificador de un envío: uno por cuadro de confirmación (se
+     reutiliza si se vuelve a pulsar en el MISMO cuadro). Con él, el
+     script no manda dos veces el mismo correo. */
+  function nuevoIdEnvio() {
+    var trozo = function () { return Math.random().toString(36).slice(2, 12); };
+    return 'env-' + Date.now().toString(36) + '-' + trozo() + trozo() + trozo();
+  }
+
+  async function llamar(cuerpo, limiteMs) {
     var url = leerUrl();
     if (!url) return { ok: false, motivo: 'No hay ninguna dirección de envío conectada.' };
     var problema = problemaDeDireccion(url);
     if (problema) return { ok: false, motivo: problema };
     var respuesta;
+    var corte = (typeof AbortController === 'function') ? new AbortController() : null;
+    var reloj = corte ? setTimeout(function () { corte.abort(); }, limiteMs || LIMITE_MS) : null;
     try {
       respuesta = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(cuerpo)
+        body: JSON.stringify(cuerpo),
+        signal: corte ? corte.signal : undefined
       });
     } catch (e) {
+      if (reloj) clearTimeout(reloj);
+      if (e && e.name === 'AbortError') return { ok: false, sinSaber: true, motivo: NO_SE_SI_HA_SALIDO };
       return { ok: false, motivo: 'No he podido contactar con Google: ' + (window.U ? U.mensajeDeError(e) : e.message) };
     }
+    if (reloj) clearTimeout(reloj);
     var texto = '';
     try { texto = await respuesta.text(); } catch (e) { /* sin cuerpo */ }
     var datos = null;
@@ -86,7 +105,7 @@ window.CorreoEnviar = (function () {
     return datos;
   }
 
-  function enviar(datos) { return llamar(datos); }
+  function enviar(datos, limiteMs) { return llamar(datos, limiteMs); }
 
   function probar() {
     return llamar({
@@ -235,6 +254,7 @@ window.CorreoEnviar = (function () {
     guardarUrl: guardarUrl,
     problemaDeDireccion: problemaDeDireccion,
     enviar: enviar,
+    nuevoIdEnvio: nuevoIdEnvio, NO_SE_SI_HA_SALIDO: NO_SE_SI_HA_SALIDO,
     probar: probar,
     irAAjustes: irAAjustes
   };

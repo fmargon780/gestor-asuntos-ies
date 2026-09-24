@@ -595,8 +595,10 @@ var Documentos = (function () {
 
   function refrescar() {
     if (!$('doc-vista') || !ultimasOpciones) return;
-    var nombre = Nombres.montarDocumento(datosDelFormulario(ultimasOpciones));
+    var ajustado = Nombres.montarDocumentoAjustado(datosDelFormulario(ultimasOpciones));
+    var nombre = ajustado.nombre;
     $('doc-vista').textContent = nombre;
+    Nombres.avisoRecorte($('doc-vista'), ajustado.recortado);   /* fila 130 */
     $('doc-guardar').disabled = nombre.length < 10;
   }
 

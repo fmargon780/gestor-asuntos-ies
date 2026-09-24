@@ -416,12 +416,16 @@ var Papelera = (function () {
   async function devolverNotaTablon(ficha) {
     var g = gestor();
     if (!g) return { ok: false, motivo: 'No hay carpeta señalada.' };
-    var leido = await Carpetas.leerJson(g, 'tablon.json');
-    var lista = (leido && Array.isArray(leido.notas)) ? leido.notas.slice() : [];
     var nota = ficha.datos;
     if (!nota) return { ok: false, motivo: 'No tengo guardados sus datos.' };
-    lista.push(nota);
-    await Copias.guardar(g, 'tablon.json', { notas: lista });
+    /* En fila con los demás guardados de tablon.json (fila 130). */
+    var enFila = function (f, fn) { return window.ColaGuardado ? ColaGuardado.poner(f, fn) : fn(); };
+    await enFila('tablon.json', async function () {
+      var leido = await Carpetas.leerJson(g, 'tablon.json');
+      var lista = (leido && Array.isArray(leido.notas)) ? leido.notas.slice() : [];
+      lista.push(nota);
+      await Copias.guardar(g, 'tablon.json', { notas: lista });
+    });
     await quitarDeIndice(ficha.id);
     return { ok: true };
   }

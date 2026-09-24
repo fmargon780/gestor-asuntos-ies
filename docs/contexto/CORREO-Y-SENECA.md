@@ -210,6 +210,14 @@ navegador llama **directamente**, sin carpeta intermedia ni revisión periódica
 `GESTOR-BANDEJA` y Apps Script no siempre lo recogía. **Esto cambia una regla de siempre**: desde
 esta fila la aplicación sí envía correo de verdad, pero solo tras una confirmación explícita.
 
+**Un correo no sale dos veces** (fila 130, `docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md`). Cada cuadro de
+confirmación lleva su identificador (`CorreoEnviar.nuevoIdEnvio`, en `js/correo-cuadro.js`; volver a
+pulsar en el mismo cuadro manda el mismo). El script (`enviarUnaVez`, `VERSION_SCRIPT`) lo recuerda 6
+horas en `CacheService`, con el candado del script: si llega otra vez, no envía y contesta bien con
+`yaEnviado: true`. Sin identificador (navegador viejo), como siempre. La petición tiene 90 s de
+tiempo límite: si vence, ámbar, «No sé si ha salido. Mira en Enviados de Gmail antes de volver a
+pulsar.». Hay que pegar el script nuevo (sirve también para lo de la fila 117).
+
 - **`js/correo-adjuntos.js`** (`window.CorreoAdjuntos`, reducido a unas 100 líneas): pinta el
   bloque "Documentos de este asunto" con una casilla por fichero (desmarcadas de partida), suma
   el tamaño de lo marcado (`totalBytesDe`, `tamanoLegible`) y pasa un fichero a base64

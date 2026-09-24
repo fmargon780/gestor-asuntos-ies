@@ -736,6 +736,10 @@
     var punto = limpio.lastIndexOf('.');
     var tronco = punto > 0 ? limpio.slice(0, punto) : limpio;
     var extension = punto > 0 ? limpio.slice(punto) : '';
+    /* Fila 130: la extensión también se limpia y no pasa de 10 caracteres;
+       si no parece una extensión de verdad, se quita. */
+    extension = extension.replace(/[\\/:*?"<>|\s]/g, '');
+    if (!/^\.[A-Za-z0-9]{1,9}$/.test(extension)) { tronco = limpio; extension = ''; }
     tronco = tronco.replace(/[\\/:*?"<>|]/g, ' ').replace(/\s+/g, ' ').trim();
     if (tronco.length > 40) tronco = tronco.slice(0, 40).trim();
     return U.aAaMmDd(soloElDia(d.fechaUltimo || d.fecha)) + ' ADJUNTO' +

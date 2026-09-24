@@ -64,11 +64,16 @@ var Borrados = (function () {
   /* Se relee justo antes de escribir, como el resto de ficheros
      compartidos: si el otro ordenador ha marcado o revivido algo
      mientras tanto, no se pisa. */
-  async function conFichero(gestor, cambiar) {
-    var datos = await leer(gestor);
-    cambiar(datos);
-    await Copias.guardar(gestor, FICHERO, datos);
-    return datos;
+  /* En fila con los demás guardados de este fichero (fila 130,
+     docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md): releer, cambiar y escribir. */
+  function conFichero(gestor, cambiar) {
+    var hacer = async function () {
+      var datos = await leer(gestor);
+      cambiar(datos);
+      await Copias.guardar(gestor, FICHERO, datos);
+      return datos;
+    };
+    return window.ColaGuardado ? ColaGuardado.poner(FICHERO, hacer) : hacer();
   }
 
   /* Marca 'clave' como borrada en 'lista', con la fecha de hoy. Si ya

@@ -507,10 +507,13 @@ $('campo-grupo').onchange = function () { App.refrescarVista(); };
    con el nombre de siempre (lo buscan por él la guía del tipo, las
    cuentas de asuntos con ese tipo...). Solo el nombre que se monta
    pasa por Nombres.tipoParaCarpeta. */
-function nombreDeCarpetaPropuesto(d) {
+function nombreDeCarpetaPropuesto(d) { return nombreDeCarpetaAjustado(d).nombre; }
+
+/* { nombre, recortado } (fila 130: la carpeta no pasa de 150 caracteres). */
+function nombreDeCarpetaAjustado(d) {
   var tipo = App.E.tipos.filter(function (t) { return t.tipo === d.tipo; })[0];
   var copia = Object.assign({}, d, { tipo: tipo ? Nombres.tipoParaCarpeta(tipo) : d.tipo });
-  return Nombres.montar(copia);
+  return Nombres.montarAsunto(copia);
 }
 
 App.datosDelFormulario = function () {
@@ -536,8 +539,10 @@ App.datosDelFormulario = function () {
 App.refrescarVista = function () {
   if (!App.E.nuevo.tipo || !App.E.nuevo.tercero) return;
   var d = App.datosDelFormulario();
-  var nombre = nombreDeCarpetaPropuesto(d);
+  var ajustado = nombreDeCarpetaAjustado(d);
+  var nombre = ajustado.nombre;
   $('vista-nombre').textContent = nombre;
+  Nombres.avisoRecorte($('vista-nombre'), ajustado.recortado);   /* fila 130 */
   $('vista-ruta').textContent = 'En ' + App.E.abiertos.name +
     '. Al cerrarlo irá a ' + App.E.archivo.name + ' / ' + App.E.nuevo.categoria + ' / ' + d.tercero;
   $('btn-crear').disabled = !nombre || nombre.length < 8;

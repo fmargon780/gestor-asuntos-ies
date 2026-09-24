@@ -63,6 +63,8 @@
     });
   }
 
+  function enFila(fichero, fn) { return window.ColaGuardado ? ColaGuardado.poner(fichero, fn) : fn(); }
+
   async function leer() {
     var g = window.Gestor && window.Gestor.carpetaGestor();
     if (!g) return [];
@@ -73,13 +75,18 @@
   /* Todo cambio pasa por aquí: se relee el fichero, se aplica el cambio
      sobre lo que hay ahora mismo, y se escribe. Así dos ordenadores no
      se borran las notas el uno al otro. */
+  /* Fila 130 (docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md): leer, cambiar y
+     escribir, en fila con los demás guardados de tablon.json. */
   async function cambiar(hacer) {
     var g = window.Gestor && window.Gestor.carpetaGestor();
     if (!g) return;
     try {
-      var lista = await leer();
-      lista = hacer(lista) || lista;
-      await Copias.guardar(g, FICHERO, { notas: lista });
+      var lista = await enFila(FICHERO, async function () {
+        var l = await leer();
+        l = hacer(l) || l;
+        await Copias.guardar(g, FICHERO, { notas: l });
+        return l;
+      });
       notas = lista;
       pintar();
     } catch (e) {
@@ -522,5 +529,8 @@
      día cambiara el orden, se reintenta al terminar la página. */
   enganchar();
   if (!enganchado) document.addEventListener('DOMContentLoaded', enganchar);
+
+  /* Para las pruebas (fila 130): el mismo cambiar() que usan los botones. */
+  window.Tablon = { _cambiar: cambiar };
 
 })();

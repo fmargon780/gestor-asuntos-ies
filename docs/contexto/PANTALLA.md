@@ -287,7 +287,9 @@ cabecera). No sabe nada de ninguna pantalla en concreto:
 Columna a la derecha de asuntos abiertos, para lo que aún no es un asunto. Color, autor, fecha y
 opcionalmente "para el día X". Botones: Hecha, Cambiar, A asunto y Borrar. Se guarda en
 `_GESTOR/tablon.json`. Las notas "Solo para mí" salen únicamente en el tablón de quien las
-escribió (no es un secreto: el fichero sigue en la carpeta compartida).
+escribió (no es un secreto: el fichero sigue en la carpeta compartida). Desde la fila 130, cada
+cambio (y la fusión de una copia en conflicto, y devolver una nota de la papelera) va por
+`ColaGuardado.poner('tablon.json', …)`: dos cambios seguidos ya no se pisan.
 
 **No se borra mientras se escribe** (fila 33, 17-sep-2026, `docs/TABLON-NO-SE-BORRA.md`): lo que
 se lleva escrito en la nota nueva vive también en variables del módulo (`borrador`,

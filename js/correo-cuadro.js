@@ -480,10 +480,13 @@ var CorreoCuadro = (function () {
       resumen.className = 'oculto';
       formulario.className = '';
     };
-    $('correo-confirmar-envio').onclick = function () { confirmarEnvio(a, datos); };
+    /* Fila 130: un identificador por cuadro de confirmación; si se vuelve
+       a pulsar aquí mismo, el mismo (el script no manda dos veces). */
+    var idEnvio = CorreoEnviar.nuevoIdEnvio ? CorreoEnviar.nuevoIdEnvio() : '';
+    $('correo-confirmar-envio').onclick = function () { confirmarEnvio(a, datos, idEnvio); };
   }
 
-  async function confirmarEnvio(a, datos) {
+  async function confirmarEnvio(a, datos, idEnvio) {
     var boton = $('correo-confirmar-envio');
     var volver = $('correo-resumen-volver');
     var avisoEl = $('correo-resumen-aviso');
@@ -506,10 +509,13 @@ var CorreoCuadro = (function () {
         asunto: datos.asunto,
         cuerpo: datos.cuerpo,
         hilo: ultimoHiloDelAsunto(a),
-        adjuntos: adjuntosBase64
+        adjuntos: adjuntosBase64,
+        idEnvio: idEnvio || ''
       });
       if (!respuesta || !respuesta.ok) {
-        throw new Error((respuesta && respuesta.motivo) || 'El envío no ha salido bien.');
+        var fallo = new Error((respuesta && respuesta.motivo) || 'El envío no ha salido bien.');
+        fallo.sinSaber = !!(respuesta && respuesta.sinSaber);
+        throw fallo;
       }
 
       documentosAdjuntados = datos.adjuntos.slice();
@@ -525,8 +531,10 @@ var CorreoCuadro = (function () {
       U.aviso('Correo enviado a ' + (datos.para || datos.cco || '') + '.', 'bueno');
     } catch (e) {
       if (avisoEl) {
-        avisoEl.innerHTML = '<p class="aviso aviso-rojo">No he podido enviarlo: ' +
-          U.escapar(U.mensajeDeError(e)) + '</p>';
+        /* Fila 130: si venció el tiempo, no se sabe si ha salido: ámbar. */
+        avisoEl.innerHTML = e && e.sinSaber
+          ? '<p class="aviso aviso-ambar">' + U.escapar(e.message) + '</p>'
+          : '<p class="aviso aviso-rojo">No he podido enviarlo: ' + U.escapar(U.mensajeDeError(e)) + '</p>';
       }
       if (boton) { boton.disabled = false; boton.textContent = 'Confirmar y enviar'; }
       if (volver) volver.disabled = false;

@@ -564,82 +564,6 @@ var Datos = (function () {
     return CACHE[clave];
   }
 
-  /* Da de alta un tercero nuevo y lo escribe en su CSV. Un solicitante
-     (categoría ALUMNADO) se marca con el curso de hoy, aunque quien lo
-     dé de alta no lo escriba: así se puede saber más adelante de qué
-     curso es, sin preguntárselo a nadie (fila 66, 2.4). */
-  async function anadirALista(dirDatos, categoria, valores) {
-    var def = LISTAS[categoria];
-    if (categoria === 'ALUMNADO' && !valores['Curso de alta']) {
-      valores = Object.assign({}, valores, { 'Curso de alta': U.cursoActual() });
-    }
-    var clave = (categoria === 'PERSONAL' || categoria === 'ALUMNADO')
-      ? categoria + '_MANUAL' : categoria;
-    var actual = await cargarLista(dirDatos, categoria, clave);
-    var filas = actual.lista.map(function (p) {
-      return def.cabecera.map(function (c) { return p.campos[c] || ''; });
-    });
-    filas.push(def.cabecera.map(function (c) { return valores[c] || ''; }));
-    filas.sort(function (a, b) { return U.normalizar(a[0]) < U.normalizar(b[0]) ? -1 : 1; });
-    await Carpetas.escribirTexto(dirDatos, def.fichero, aCsv(def.cabecera, filas));
-    delete CACHE[clave];
-    delete CACHE[categoria];
-    return cargar(dirDatos, categoria);
-  }
-
-  /* Cambia los datos de un tercero que ya está dado de alta a mano.
-     Se busca por el nombre que tenía antes, que es la primera columna
-     del fichero. Si no aparece, se añade como uno nuevo: así un cambio
-     nunca hace desaparecer a nadie.
-
-     Ojo: esto NO renombra las carpetas de sus asuntos. El nombre de una
-     carpeta es el rastro del día en que se creó. */
-  async function guardarEnLista(dirDatos, categoria, nombreAntes, valores) {
-    var def = LISTAS[categoria];
-    var clave = (categoria === 'PERSONAL' || categoria === 'ALUMNADO')
-      ? categoria + '_MANUAL' : categoria;
-    var actual = await cargarLista(dirDatos, categoria, clave);
-    var buscado = U.normalizar(nombreAntes || '');
-    var estaba = false;
-    var filas = actual.lista.map(function (p) {
-      if (!estaba && U.normalizar(p.nombre) === buscado) {
-        estaba = true;
-        return def.cabecera.map(function (c) { return valores[c] || ''; });
-      }
-      return def.cabecera.map(function (c) { return p.campos[c] || ''; });
-    });
-    if (!estaba) filas.push(def.cabecera.map(function (c) { return valores[c] || ''; }));
-    filas.sort(function (a, b) { return U.normalizar(a[0]) < U.normalizar(b[0]) ? -1 : 1; });
-    await Carpetas.escribirTexto(dirDatos, def.fichero, aCsv(def.cabecera, filas));
-    delete CACHE[clave];
-    delete CACHE[categoria];
-    return cargar(dirDatos, categoria);
-  }
-
-  /* Quita a alguien de la lista de dados de alta a mano (papelera,
-     11-sep-2026). Se busca por su nombre, igual que guardarEnLista.
-     Solo tiene sentido para quien se dio de alta a mano: quitar a
-     alguien de Séneca de aquí no tendría ningún efecto, porque el
-     fichero de Séneca no lo escribe la aplicación. */
-  async function quitarDeLista(dirDatos, categoria, nombre) {
-    var def = LISTAS[categoria];
-    var clave = (categoria === 'PERSONAL' || categoria === 'ALUMNADO')
-      ? categoria + '_MANUAL' : categoria;
-    var actual = await cargarLista(dirDatos, categoria, clave);
-    var buscado = U.normalizar(nombre || '');
-    var quitado = null;
-    var filas = [];
-    actual.lista.forEach(function (p) {
-      if (!quitado && U.normalizar(p.nombre) === buscado) { quitado = p; return; }
-      filas.push(def.cabecera.map(function (c) { return p.campos[c] || ''; }));
-    });
-    if (!quitado) return null;
-    await Carpetas.escribirTexto(dirDatos, def.fichero, aCsv(def.cabecera, filas));
-    delete CACHE[clave];
-    delete CACHE[categoria];
-    return quitado;
-  }
-
   async function cargar(dirDatos, categoria) {
     if (categoria === 'ALUMNADO') return cargarAlumnado(dirDatos);
     if (categoria === 'PERSONAL') return cargarPersonal(dirDatos);
@@ -662,7 +586,8 @@ var Datos = (function () {
   }
 
   function olvidar(categoria) {
-    if (!categoria) { CACHE = {}; return; }
+    /* Se vacía el mismo objeto (no uno nuevo): js/datos-listas.js lo tiene cogido (fila 130). */
+    if (!categoria) { Object.keys(CACHE).forEach(function (k) { delete CACHE[k]; }); return; }
     delete CACHE[categoria];
     delete CACHE[categoria + '_MANUAL'];
   }
@@ -988,43 +913,18 @@ var Datos = (function () {
     return actual.lista.filter(function (p) { return esDeCursoAnterior(p.campos); }).length;
   }
 
-  async function apartarSolicitantesAnteriores(dirDatos) {
-    var def = LISTAS.ALUMNADO;
-    var clave = 'ALUMNADO_MANUAL';
-    var actual = await cargarLista(dirDatos, 'ALUMNADO', clave);
-    var quedan = [], apartados = [];
-    actual.lista.forEach(function (p) {
-      (esDeCursoAnterior(p.campos) ? apartados : quedan).push(p);
-    });
-    if (!apartados.length) return 0;
-
-    var filasQuedan = quedan.map(function (p) {
-      return def.cabecera.map(function (c) { return p.campos[c] || ''; });
-    });
-    await Carpetas.escribirTexto(dirDatos, def.fichero, aCsv(def.cabecera, filasQuedan));
-
-    var textoAnteriores = await Carpetas.leerTexto(dirDatos, FICHERO_SOLICITANTES_ANTERIORES);
-    var filasAnteriores = textoAnteriores ? aTabla(textoAnteriores).filas.slice(1) : [];
-    apartados.forEach(function (p) {
-      filasAnteriores.push(def.cabecera.map(function (c) { return p.campos[c] || ''; }));
-    });
-    await Carpetas.escribirTexto(dirDatos, FICHERO_SOLICITANTES_ANTERIORES,
-      aCsv(def.cabecera, filasAnteriores));
-
-    delete CACHE[clave];
-    delete CACHE.ALUMNADO;
-    return apartados.length;
-  }
-
   return {
-    aTabla: aTabla, aCsv: aCsv, cargar: cargar, anadirALista: anadirALista,
+    aTabla: aTabla, aCsv: aCsv, cargar: cargar,
     buscar: buscar, olvidar: olvidar, LISTAS: LISTAS,
-    guardarEnLista: guardarEnLista, quitarDeLista: quitarDeLista,
     unidadesDistintas: unidadesDistintas, destacadosAlumno: destacadosAlumno,
     destacadosPersona: destacadosPersona, cursoDelFichero: cursoDelFichero, clavePersona: clavePersona,
     resumenDeTercero: resumenDeTercero,
     fotoDeContacto: fotoDeContacto, personaDesdeFoto: personaDesdeFoto,
     contarSolicitantesAnteriores: contarSolicitantesAnteriores,
-    apartarSolicitantesAnteriores: apartarSolicitantesAnteriores
+    /* Fila 130: lo que necesita js/datos-listas.js (anadirALista,
+       guardarEnLista, quitarDeLista y apartarSolicitantesAnteriores, que
+       viven allí y se cuelgan de Datos con los mismos nombres). */
+    _interno: { CACHE: CACHE, cargarLista: cargarLista, esDeCursoAnterior: esDeCursoAnterior,
+      FICHERO_SOLICITANTES_ANTERIORES: FICHERO_SOLICITANTES_ANTERIORES }
   };
 })();

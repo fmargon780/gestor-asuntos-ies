@@ -107,12 +107,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 75 y 77 a 129 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 75 y 77 a 130 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 130 | `docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md` (tablón y listas por la cola, correo que no sale dos veces, nombres con tope de largo) | EN CURSO (24-sep-2026) |
 | 131 | `docs/PLAZOS-BIEN-CONTADOS.md` (días hábiles, lectivos o naturales en cada plazo; festivos en Ajustes) | PENDIENTE |
 | 132 | `docs/ARREGLOS-POR-DENTRO.md` (terceros que se releen, fuera los estados manuales, cabeceras de seguridad, pdf.js, una regla de destinatarios) | PENDIENTE |
 | 133 | `docs/PARTIR-FICHEROS-GRANDES.md` (los que pasan de 600 líneas, sin cambiar nada) | PENDIENTE |
@@ -124,6 +123,12 @@ Las filas 1 a 75 y 77 a 129 están **HECHAS**. Sus documentos siguen en `docs/`,
 | 139 | `docs/UNA-SOLA-LIBRETA-DE-NOTAS.md` (las notas del hito pasan al asunto, con etiqueta) | PENDIENTE |
 | 140 | `docs/TIEMPO-DE-TRAMITACION.md` (media y máximo por tipo, y los abiertos más antiguos) | PENDIENTE |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
+
+**La fila 130 está HECHA** (24-sep-2026): `docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md`. Tablón, CSV de
+terceros (`js/datos-listas.js`), borrados e índice del ARCHIVO, por la cola; copias en conflicto de
+los CSV unidas solas; un correo no sale dos veces (hay que pegar el script); carpeta ≤150 y
+documento ≤120 caracteres, con aviso ámbar. Prueba `pruebas/guardar-y-enviar-sin-sorpresas.mjs`,
+batería completa en verde. Versión `App.VERSION`: `24-sep-2026 · 22:30`.
 
 **La fila 129 está HECHA** (24-sep-2026): `docs/EL-HITO-ES-EL-ESTADO.md`. El estado del asunto es
 su hito actual: «Paso N de M · título» en la tarjeta y en la cabecera (pulsable a su mesa), y de

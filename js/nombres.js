@@ -101,19 +101,45 @@ var Nombres = (function () {
      (los que el usuario ha marcado "Añadir al nombre" y que no están
      vacíos), en el orden en que deben salir: aquí solo se limpian y
      se colocan, uno detrás de otro. */
-  function montar(datos) {
-    var partes = [];
-    partes.push(U.aAaMmDd(datos.fecha));
-    partes.push(U.limpiarNombre(datos.tipo).toUpperCase());
-    if (datos.curso) partes.push(U.limpiarNombre(datos.curso));
-    if (datos.grupo) partes.push(U.limpiarNombre(datos.grupo));
-    (datos.campos || []).forEach(function (v) {
-      var limpio = U.limpiarNombre(v);
-      if (limpio) partes.push(limpio);
-    });
-    if (datos.descripcion) partes.push(U.limpiarNombre(datos.descripcion));
-    partes.push(U.limpiarNombre(datos.tercero));
-    return U.limpiarNombre(partes.filter(function (p) { return p; }).join(' '));
+  function montar(datos) { return montarAsunto(datos).nombre; }
+
+  /* Fila 130 (docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md): los nombres no
+     pasan de un largo seguro (Windows no sincroniza rutas de más de 260
+     caracteres). Carpeta de asunto: 150 como mucho; nombre de documento:
+     120, más la extensión. */
+  var TOPE_ASUNTO = 150;
+  var TOPE_DOCUMENTO = 120;
+
+  function unir(partes) { return U.limpiarNombre(partes.filter(function (p) { return p; }).join(' ')); }
+
+  /* `antes` y `despues` no se tocan nunca; `medio` se recorta desde el
+     final (lo último de `medio`, lo primero que se acorta). */
+  function ajustarAlTope(antes, medio, despues, tope) {
+    var m = medio.filter(function (p) { return p; });
+    var recortado = false;
+    var nombre = unir(antes.concat(m, despues));
+    while (nombre.length > tope && m.length) {
+      recortado = true;
+      var i = m.length - 1;
+      var queda = m[i].length - (nombre.length - tope);
+      if (queda >= 3) m[i] = U.limpiarNombre(m[i].slice(0, queda));
+      else m.splice(i, 1);
+      nombre = unir(antes.concat(m, despues));
+    }
+    return { nombre: nombre, recortado: recortado };
+  }
+
+  /* El nombre de la carpeta y si ha habido que recortarlo. Se recorta
+     primero la descripción (el texto libre) y después los campos del
+     tipo, por el final. Nunca la fecha, el tipo, el año académico, el
+     grupo ni el tercero con su número. */
+  function montarAsunto(datos) {
+    var antes = [U.aAaMmDd(datos.fecha), U.limpiarNombre(datos.tipo).toUpperCase()];
+    if (datos.curso) antes.push(U.limpiarNombre(datos.curso));
+    if (datos.grupo) antes.push(U.limpiarNombre(datos.grupo));
+    var medio = (datos.campos || []).map(function (v) { return U.limpiarNombre(v); });
+    if (datos.descripcion) medio.push(U.limpiarNombre(datos.descripcion));
+    return ajustarAlTope(antes, medio, [U.limpiarNombre(datos.tercero)], TOPE_ASUNTO);
   }
 
   /* ---------- la abreviatura del grupo ----------
@@ -375,19 +401,39 @@ var Nombres = (function () {
     return ano + (r.sentido === 'S' ? 'S' : 'E') + (r.modo === 'A' ? 'A' : 'M') + numero;
   }
 
-  function montarDocumento(datos) {
-    var partes = [];
-    partes.push(U.aAaMmDd(datos.fecha));
-    if (datos.codigo) partes.push(U.limpiarNombre(datos.codigo));
-    partes.push(U.limpiarNombre(datos.tipo).toUpperCase());
+  function montarDocumento(datos) { return montarDocumentoAjustado(datos).nombre; }
+
+  /* El nombre del documento y si ha habido que recortarlo (fila 130): se
+     recorta el texto adicional (`curso`) y, si no basta, los campos del
+     tipo por el final. La fecha, el registro y el tipo no se tocan. */
+  function montarDocumentoAjustado(datos) {
+    var antes = [U.aAaMmDd(datos.fecha)];
+    if (datos.codigo) antes.push(U.limpiarNombre(datos.codigo));
+    antes.push(U.limpiarNombre(datos.tipo).toUpperCase());
     /* Los campos del tipo de documento (fila 96,
        docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md), ya en orden: entre el
        tipo y el texto adicional. */
-    (datos.campos || []).forEach(function (v) { if (v) partes.push(U.limpiarNombre(v)); });
-    if (datos.curso) partes.push(U.limpiarNombre(datos.curso));
-    var base = U.limpiarNombre(partes.filter(function (p) { return p; }).join(' '));
+    var medio = (datos.campos || []).map(function (v) { return U.limpiarNombre(v); });
+    if (datos.curso) medio.push(U.limpiarNombre(datos.curso));
+    var r = ajustarAlTope(antes, medio, [], TOPE_DOCUMENTO);
     var ext = String(datos.extension || '').replace(/[^A-Za-z0-9]/g, '').toLowerCase();
-    return base + (ext ? '.' + ext : '');
+    return { nombre: r.nombre + (ext ? '.' + ext : ''), recortado: r.recortado };
+  }
+
+  /* La línea ámbar de la vista previa, si ha habido recorte. */
+  var AVISO_RECORTE = 'Nombre demasiado largo: se ha acortado el texto libre.';
+
+  /* Pone (o quita) esa línea justo debajo de `el`, el nombre de la vista previa. */
+  function avisoRecorte(el, recortado) {
+    if (!el || !el.parentNode || typeof document === 'undefined') return;
+    var sig = el.nextElementSibling;
+    var ya = sig && sig.classList && sig.classList.contains('vista-recorte') ? sig : null;
+    if (!recortado) { if (ya) ya.parentNode.removeChild(ya); return; }
+    if (ya) return;
+    var p = document.createElement('div');
+    p.className = 'vista-recorte aviso-en-vivo aviso-ambar';
+    p.textContent = AVISO_RECORTE;
+    el.parentNode.insertBefore(p, el.nextSibling);
   }
 
   function extensionDe(nombre) {
@@ -410,6 +456,8 @@ var Nombres = (function () {
     grupoCompacto: grupoCompacto, nivelYEnsenanza: nivelYEnsenanza,
     TIPOS_DOCUMENTO_POR_DEFECTO: TIPOS_DOCUMENTO_POR_DEFECTO,
     codigoRegistro: codigoRegistro, montarDocumento: montarDocumento,
+    montarAsunto: montarAsunto, montarDocumentoAjustado: montarDocumentoAjustado,
+    TOPE_ASUNTO: TOPE_ASUNTO, TOPE_DOCUMENTO: TOPE_DOCUMENTO, AVISO_RECORTE: AVISO_RECORTE, avisoRecorte: avisoRecorte,
     extensionDe: extensionDe,
     terceroAlumno: terceroAlumno, terceroDeResto: terceroDeResto,
     cursoYGrupoDeResto: cursoYGrupoDeResto,

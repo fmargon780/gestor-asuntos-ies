@@ -5,7 +5,7 @@ import vm from 'node:vm';
 const raiz = new URL('../js/', import.meta.url).pathname;
 const contexto = { console, TextDecoder, Blob, window: {}, indexedDB: null };
 vm.createContext(contexto);
-for (const f of ['util.js', 'reintentar-escritura.js', 'carpetas.js', 'nombres.js', 'datos.js', 'datos-tutores.js', 'dni.js']) {
+for (const f of ['util.js', 'reintentar-escritura.js', 'carpetas.js', 'nombres.js', 'datos.js', 'datos-listas.js', 'datos-tutores.js', 'dni.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 const { U, Carpetas, Nombres, Datos } = contexto;

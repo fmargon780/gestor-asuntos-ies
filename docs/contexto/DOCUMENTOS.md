@@ -4,6 +4,16 @@ Documento hijo de `docs/CONTEXTO.md` (fila 65, `docs/DOCUMENTOS-QUE-QUEPAN.md`, 
 
 ---
 
+### Los nombres, con tope de largo (fila 130)
+
+Para no pasar del límite de rutas de Windows: la carpeta de un asunto, 150 caracteres como mucho
+(`Nombres.montarAsunto`: se recorta primero la descripción y después los campos del tipo, por el
+final; nunca la fecha, el tipo, el año, el grupo ni el tercero); el nombre de un documento, 120 más
+la extensión (`Nombres.montarDocumentoAjustado`: el texto adicional y después los campos). La
+vista previa (Nuevo asunto, Editar y el cuadro de documentos) avisa en ámbar con
+`Nombres.avisoRecorte`. Los adjuntos de la bandeja: extensión limpia de 10 caracteres como mucho, o
+ninguna. Los asuntos que ya existen no se renombran.
+
 ### Campos del tipo de documento en el nombre (23-sep-2026, fila 96)
 
 `docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md`, `js/documentos-campos.js` (`window.DocCampos`). Cada

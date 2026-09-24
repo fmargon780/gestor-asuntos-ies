@@ -40,7 +40,7 @@ function comprobarQue(titulo, condicion, detalle) {
 const dom = new JSDOM('<!doctype html><html><body></body></html>', { runScripts: 'outside-only' });
 const win = dom.window;
 
-for (const f of ['util.js', 'datos.js', 'datos-tutores.js', 'dni.js', 'ficha-tercero-alumno.js']) {
+for (const f of ['util.js', 'datos.js', 'datos-listas.js', 'datos-tutores.js', 'dni.js', 'ficha-tercero-alumno.js']) {
   win.eval(fs.readFileSync(RAIZ + f, 'utf8'));
 }
 const { Datos } = win;

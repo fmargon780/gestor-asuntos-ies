@@ -22,10 +22,13 @@
    `datos.tipo`) se quedan con el nombre de siempre, que es el que hay
    que buscar en la guía y en las cuentas por tipo; solo el nombre que
    se monta pasa por Nombres.tipoParaCarpeta. */
-function nombreConTipoCorto(d) {
+function nombreConTipoCorto(d) { return nombreConTipoCortoAjustado(d).nombre; }
+
+/* { nombre, recortado } (fila 130: la carpeta no pasa de 150 caracteres). */
+function nombreConTipoCortoAjustado(d) {
   var tipo = App.E.tipos.filter(function (t) { return t.tipo === d.tipo; })[0];
   var copia = Object.assign({}, d, { tipo: tipo ? Nombres.tipoParaCarpeta(tipo) : d.tipo });
-  return Nombres.montar(copia);
+  return Nombres.montarAsunto(copia);
 }
 
 App.piezasDelAsunto = function (a) {
@@ -253,7 +256,11 @@ App.editarAsunto = async function (a) {
     };
   }
 
-  function refrescar() { $('ed-vista').textContent = nombreConTipoCorto(piezasDelCuadro()); }
+  function refrescar() {
+    var r = nombreConTipoCortoAjustado(piezasDelCuadro());
+    $('ed-vista').textContent = r.nombre;
+    Nombres.avisoRecorte($('ed-vista'), r.recortado);   /* fila 130 */
+  }
 
   ['ed-fecha', 'ed-curso', 'ed-tipo', 'ed-grupo', 'ed-descripcion', 'ed-tercero']
     .forEach(function (id) { $(id).oninput = refrescar; $(id).onchange = refrescar; });

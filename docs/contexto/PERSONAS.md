@@ -53,6 +53,11 @@ cabecera nueva la primera vez que se da de alta o se cambia una empresa.
 
 ### Cambiar los datos de un tercero
 
+**Escribir las listas** (fila 130): `anadirALista`, `guardarEnLista`, `quitarDeLista` y
+`apartarSolicitantesAnteriores` viven en `js/datos-listas.js` (colgadas de `Datos`, mismos nombres).
+Cada una va por `ColaGuardado.poner(<fichero del CSV>, …)` y relee el CSV dentro de la cola. Las
+copias en conflicto de Dropbox de esos CSV las une `js/conflictos.js` (ver `CONTEXTO.md`).
+
 Botón "Cambiar los datos" en la ficha de Personas y empresas: abre el mismo cuadro del alta,
 relleno, y guarda encima. **Solo para los dados de alta a mano** (`p.deSeneca !== true`). Si
 cambia el nombre, las carpetas de sus asuntos de antes conservan el nombre viejo, y se avisa. El

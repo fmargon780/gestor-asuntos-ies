@@ -176,7 +176,13 @@
   }
 
   /* ---------- fusionar el tablón: unión de notas por id ---------- */
-  async function fusionarTablon(g, nombreConflicto) {
+  /* En fila con los demás guardados de tablon.json (fila 130). */
+  function fusionarTablon(g, nombreConflicto) {
+    var hacer = function () { return fusionarTablonYa(g, nombreConflicto); };
+    return window.ColaGuardado ? ColaGuardado.poner('tablon.json', hacer) : hacer();
+  }
+
+  async function fusionarTablonYa(g, nombreConflicto) {
     var real, conflicto;
     try {
       real = await Carpetas.leerJson(g, 'tablon.json');
@@ -195,6 +201,104 @@
     await Copias.guardar(g, 'tablon.json', { notas: orden.map(function (k) { return mapa[k]; }) });
     await archivarConflicto(g, nombreConflicto);
     return true;
+  }
+
+  /* ---------- los CSV de terceros dados de alta a mano (fila 130) ----------
+
+     `solicitantes.csv`, `personal.csv`, `empresas.csv` y `otros.csv`, en
+     `_GESTOR/datos`. Se unen solos: unión de filas, y dos filas iguales
+     se quedan en una. Si dos filas tienen el mismo nombre (primera
+     columna) y datos distintos, se queda la del fichero real y la otra
+     se apunta para que Francisco elija en Ajustes. Antes, el fichero
+     real se copia a `_GESTOR/copias` y la copia en conflicto se mueve
+     allí: no se pierde ninguna fila. */
+  var CSV_DE_TERCEROS = ['solicitantes.csv', 'personal.csv', 'empresas.csv', 'otros.csv'];
+
+  function ficheroRealCsv(nombreConflicto) {
+    var m = nombreConflicto.match(/^(.+?)\s*\([^)]*conflic[^)]*\)\.csv$/i);
+    return m ? m[1].trim() + '.csv' : '';
+  }
+
+  /* Función pura. `real` y `otro`: el texto de los dos CSV. Devuelve
+     { texto, anadidas, dudosas: [{ nombre, fila (objeto columna → valor) }] }. */
+  function unirCsv(real, otro) {
+    var tReal = Datos.aTabla(real || '').filas;
+    var tOtro = Datos.aTabla(otro || '').filas;
+    var cab = (tReal[0] || tOtro[0] || []).map(function (x) { return String(x).trim(); });
+    var cabOtro = (tOtro[0] || cab).map(function (x) { return String(x).trim(); });
+    function limpia(fila) { return cab.map(function (c, i) { return String(fila[i] === undefined ? '' : fila[i]).trim(); }); }
+    function delOtro(fila) {
+      return cab.map(function (c) {
+        var i = cabOtro.indexOf(c);
+        return i === -1 ? '' : String(fila[i] === undefined ? '' : fila[i]).trim();
+      });
+    }
+    var filas = tReal.slice(1).map(limpia).filter(function (f) { return f[0]; });
+    var enteras = {}, porNombre = {};
+    filas.forEach(function (f) { enteras[f.join('\u0001')] = true; porNombre[U.normalizar(f[0])] = true; });
+    var anadidas = 0, dudosas = [];
+    tOtro.slice(1).map(delOtro).forEach(function (f) {
+      if (!f[0] || enteras[f.join('\u0001')]) return;
+      if (porNombre[U.normalizar(f[0])]) {
+        var obj = {};
+        cab.forEach(function (c, i) { obj[c] = f[i]; });
+        dudosas.push({ nombre: f[0], fila: obj });
+        return;
+      }
+      enteras[f.join('\u0001')] = true;
+      porNombre[U.normalizar(f[0])] = true;
+      filas.push(f);
+      anadidas++;
+    });
+    filas.sort(function (a, b) { return U.normalizar(a[0]) < U.normalizar(b[0]) ? -1 : 1; });
+    return { texto: Datos.aCsv(cab, filas), anadidas: anadidas, dudosas: dudosas };
+  }
+
+  function categoriaDeCsv(fichero) {
+    var L = (window.Datos && Datos.LISTAS) || {};
+    return Object.keys(L).filter(function (k) { return L[k].fichero === fichero; })[0] || '';
+  }
+
+  function sello() {
+    var d = new Date();
+    function dos(n) { return String(n).padStart(2, '0'); }
+    return String(d.getFullYear()).slice(2) + dos(d.getMonth() + 1) + dos(d.getDate()) + '-' + dos(d.getHours()) + dos(d.getMinutes());
+  }
+
+  function fusionarCsv(g, dirDatos, nombreConflicto, real) {
+    var hacer = function () { return fusionarCsvYa(g, dirDatos, nombreConflicto, real); };
+    return window.ColaGuardado ? ColaGuardado.poner(real, hacer) : hacer();
+  }
+
+  async function fusionarCsvYa(g, dirDatos, nombreConflicto, real) {
+    var textoReal, textoOtro;
+    try {
+      textoReal = (await Carpetas.leerTexto(dirDatos, real)) || '';
+      textoOtro = await Carpetas.leerTexto(dirDatos, nombreConflicto);
+    } catch (e) { return null; }
+    if (textoOtro === null) return null;
+    var r = unirCsv(textoReal, textoOtro);
+    var copias = await Carpetas.crear(g, 'copias');
+    await Carpetas.escribirTexto(copias, real.replace(/\.csv$/, '') + '-antes-de-unir-' + sello() + '.csv', textoReal);
+    await Carpetas.escribirTexto(dirDatos, real, r.texto);
+    await Carpetas.moverFichero(dirDatos, nombreConflicto, copias, nombreConflicto);
+    var cat = categoriaDeCsv(real);
+    if (cat && window.Datos) Datos.olvidar(cat);
+    r.dudosas.forEach(function (d) {
+      pendientes.push({ real: real, nombreConflicto: nombreConflicto, fila: d.fila, nombre: d.nombre, categoria: cat });
+    });
+    return r;
+  }
+
+  async function quedarseConLaFilaDelOtro(p) {
+    try {
+      await Datos.guardarEnLista(App.E.datos, p.categoria, p.nombre, p.fila);
+      pendientes = pendientes.filter(function (x) { return x !== p; });
+      pintarBloque();
+      U.aviso('Se guardan los datos del otro ordenador para ' + p.nombre + '.', 'bueno');
+    } catch (e) {
+      U.fallo('No he podido guardarlo', e);
+    }
   }
 
   /* ---------- los ficheros que no se fusionan solos ---------- */
@@ -285,6 +389,24 @@
     pendientes.forEach(function (p) {
       var f = document.createElement('div');
       f.className = 'fila-tipo';
+      /* Fila 130: una fila de un CSV de terceros que choca por el nombre. */
+      if (p.fila) {
+        f.innerHTML = '<span class="nombre-tipo">' + U.escapar(p.real) + '</span>' +
+          '<span class="suave" style="flex:1">' + U.escapar(p.nombre) + ': el otro ordenador tenía ' +
+          U.escapar(Object.keys(p.fila).map(function (k) { return p.fila[k]; }).filter(Boolean).join(' · ')) + '</span>';
+        var deja = document.createElement('button');
+        deja.className = 'boton';
+        deja.textContent = 'Dejar los de este ordenador';
+        deja.onclick = function () { pendientes = pendientes.filter(function (x) { return x !== p; }); pintarBloque(); };
+        f.appendChild(deja);
+        var toma = document.createElement('button');
+        toma.className = 'boton';
+        toma.textContent = 'Quedarse con los del otro';
+        toma.onclick = function () { quedarseConLaFilaDelOtro(p); };
+        f.appendChild(toma);
+        caja.appendChild(f);
+        return;
+      }
       f.innerHTML = '<span class="nombre-tipo">' + U.escapar(p.real) + '</span>' +
         '<span class="suave" style="flex:1">' + U.escapar(p.nombreConflicto) + '</span>';
       var esteOrdenador = document.createElement('button');
@@ -334,7 +456,28 @@
       }
       if (!yaPendiente(real, nombre)) pendientes.push({ real: real, nombreConflicto: nombre });
     }
+    await revisarCsv(g);
     pintarBloque();
+  }
+
+  /* Fila 130: las copias en conflicto de los CSV de terceros, en _GESTOR/datos. */
+  async function revisarCsv(g) {
+    var dirDatos = window.App && App.E && App.E.datos;
+    if (!dirDatos || !window.Datos) return;
+    var lista;
+    try { lista = await Carpetas.ficheros(dirDatos); } catch (e) { return; }
+    for (var i = 0; i < lista.length; i++) {
+      var nombre = lista[i].nombre;
+      var real = ficheroRealCsv(nombre);
+      if (!real || CSV_DE_TERCEROS.indexOf(real) === -1) continue;
+      var r = null;
+      try { r = await fusionarCsv(g, dirDatos, nombre, real); } catch (e) { r = null; }
+      if (!r) continue;
+      U.aviso('Se han unido los cambios de los dos ordenadores en ' + real + '.' +
+        (r.dudosas.length ? ' ' + r.dudosas.length + (r.dudosas.length === 1 ? ' persona sale' : ' personas salen') +
+          ' con datos distintos en cada uno: elige en Ajustes → Mantenimiento → Conflictos de Dropbox.' : ''),
+        r.dudosas.length ? 'ambar' : '');
+    }
   }
 
   /* Para las pruebas, y por si algún día hace falta forzar una revisión
@@ -343,7 +486,8 @@
      dos listas de hitos por su identificador es el mismo problema que
      fusionar una copia en conflicto. */
   window.Conflictos = {
-    revisar: revisar, pendientes: function () { return pendientes.slice(); }, unirPorId: unirPorId
+    revisar: revisar, pendientes: function () { return pendientes.slice(); }, unirPorId: unirPorId,
+    unirCsv: unirCsv, fusionarCsv: fusionarCsv
   };
 
   function enganchar() {

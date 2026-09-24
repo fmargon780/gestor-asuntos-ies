@@ -82,11 +82,11 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   acordeón: un paso abierto a la vez.
 - Panel lateral de lectura, y tablón de notas siempre visible.
 - Correo y mensaje de Séneca: el mensaje se prepara; el correo de un asunto se envía de
-  verdad, con Apps Script y confirmación.
+  verdad, con Apps Script y confirmación, y nunca dos veces.
 - "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; con
   tercero reconocido, también sugiere meterlo en uno que ya existe («Meter aquí»). Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
-- Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas.
+- Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. Carpeta ≤150 caracteres, documento ≤120.
 - Botón «Ruta» (copia la ruta de la carpeta). Ficha del tercero con "Datos y contacto" en una línea, con copiar; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
@@ -95,7 +95,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Terceros relacionados con un asunto, con altas por grupo (unidad, nivel, grupo propio), que
   también sirven de destinatarios de un correo o de un mensaje de Séneca.
 - Parada al crear un duplicado, y pantalla "Duplicados".
-- Ajustes con tres pestañas y pantalla propia de cada tipo; todo plegado, con resumen en cada título; los avisos de fallo, solo con fallo.
+- Ajustes: tres pestañas y pantalla por tipo; todo plegado, con resumen; avisos de fallo, solo con fallo.
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
 - Papelera: nada se borra de golpe.
@@ -135,7 +135,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - El repositorio es la versión buena; Vercel publica solo la app (`.vercelignore`: sin `docs/` ni `pruebas/`).
 - **Permiso permanente de Francisco**: un pull request (sesiones desde la nube) lo fusiona Claude
   Code solo, en verde y sin conflictos (nota al final de `docs/COLA.md`).
-- **Comprobar siempre lo publicado con `curl`**, nunca darla por hecha.
+- **Comprobar siempre lo publicado con `curl`.**
 - Vercel: 100 publicaciones/día (gratuito); `vercel.json` salta los commits de solo `docs/`, `pruebas/`, `.github/` o `.md`; máximo dos subidas por fila (regla 13).
 - Antes de colgar una función nueva de `App`, comprobar que el nombre no está cogido. Un solo cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.
 - Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV.
@@ -149,8 +149,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   cursor: envolver el repintado en `U.conservandoLoEscrito(raiz, fn)`.
 - Al terminar una instrucción de la cola: actualizar este documento y `CONTEXTO.md`
   sustituyendo la línea vieja, y anotar en `HISTORIA.md` lo que merezca recordarse.
-- Todo guardado de `_GESTOR` pasa por la cola por fichero (`ColaGuardado`: `App.anotar`/
-  `App.guardarRegistroFresco`, `Hitos.cambiar`); nunca `Copias.guardar` directo de `asuntos.json`.
+- Todo guardado de `_GESTOR` pasa por la cola por fichero (`ColaGuardado`: asuntos, hitos, tablón,
+  CSV de terceros, índice, borrados); nunca `Copias.guardar` directo de `asuntos.json`.
   Ninguna tarea de fondo escribe ni mira la carpeta con un guardado en marcha.
 - Renombrar, unir o borrar un asunto (su clave cambia o desaparece) solo por `AsuntoRenombrar`
   (`js/asunto-renombrar.js`): mueve a la vez la ficha, sus hitos y su señal de presencia.
@@ -167,9 +167,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 ## 8. Qué falta
 
 - El compañero: entrar en `https://asuntos.fmargon.com`, señalar sus carpetas de nuevo (no se heredan) y coordinar tipos de asunto.
-- Envío: pegar el script nuevo (fila 117), «Gestionar implementaciones → lápiz → Nueva versión», y «Probar».
+- Envío: pegar el script nuevo (filas 117 y 130), «Gestionar implementaciones → lápiz → Nueva versión», y «Probar».
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja como una sola compartida.
-- Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI".
+- Ver con el uso: ancho del panel y del tablón, tarjetas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: membrete, Consejería, cargos y Provincia.
 - Importar los usuarios IdEA del alumnado, cuando reactiven a Francisco el perfil de Gestor de PASEN.
 - Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar las plantillas del centro» y «Traer los guiones del instituto».
