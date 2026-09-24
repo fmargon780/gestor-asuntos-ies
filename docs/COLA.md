@@ -112,7 +112,7 @@ Las filas 1 a 75 y 77 a 121 están **HECHAS**. Sus documentos siguen en `docs/`,
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 122 | `docs/BUSCAR-AL-ANADIR-TIPO.md` (al escribir un tipo nuevo, la lista se filtra por lo que contiene, sin tildes) | PENDIENTE |
+| 122 | `docs/GUIA-EN-ACORDEON.md` (el editor de la guía en acordeón: un paso abierto a la vez) | PENDIENTE |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
 **La fila 121 está HECHA** (24-sep-2026): `docs/AVISO-DE-VERSION-SEGURO.md`. Si la copia sin internet no puede comprobar si hay versión nueva, franja fija arriba con «Cómo actualizar a mano», en vez del aviso que se borraba solo; con la aplicación abierta, vuelve a mirar cada 30 minutos, sin recargar nunca. Versión `App.VERSION`: `24-sep-2026 · 11:23`.
