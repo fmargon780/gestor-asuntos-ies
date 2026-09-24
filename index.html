@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="css/campos.css">
 <link rel="stylesheet" href="css/guias.css">
 <link rel="stylesheet" href="css/ficha-asunto.css">
+<link rel="stylesheet" href="css/ficha-tarjetas.css">
 <link rel="stylesheet" href="css/ficha-tercero.css">
 <link rel="stylesheet" href="css/notas.css">
 <link rel="stylesheet" href="css/visor.css">
@@ -914,11 +915,6 @@
      pone js/ficha-nombre-acciones.js, y su bloque en Ajustes → El centro. -->
 <script src="js/copiar-ruta.js"></script>
 <script src="js/ficha-nombre-acciones.js"></script>
-<!-- Los dos bloques plegables de la ficha (fila 51, 18-sep-2026): montar
-     el <details>, escribir el resumen, guardar y reponer el
-     abierto/cerrado entre un repintado y otro. Va justo después de
-     js/ficha-asunto.js, que es quien lo llama. -->
-<script src="js/ficha-plegables.js"></script>
 <!-- Los documentos de la carpeta del asunto, separado de
      js/ficha-asunto.js el 17-sep-2026 (fila 26) al quitarle trabajo la
      fila "los hitos son la guía". Se habla con él por
@@ -1067,6 +1063,11 @@
 <script src="js/barra.js"></script>
 <script src="js/vista.js"></script>
 <script src="js/cabecera-fija.js"></script>
+<!-- Fila 107, 24-sep-2026, docs/FICHA-EN-TARJETAS.md: la ficha del asunto
+     en tarjetas. Lo llama js/ficha-asunto.js al pintar; va después de todo
+     lo que pinta dentro de las tarjetas (documentos, hitos, notas,
+     relacionados, otros asuntos del tercero) y del visor. -->
+<script src="js/ficha-tarjetas.js"></script>
 <script src="js/dni.js"></script>
 <script src="js/presencia.js"></script>
 <script src="js/asunto-renombrar.js"></script>

@@ -295,6 +295,11 @@ await pagina.click('#lista-abiertos .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(300);
 
+/* Fila 107: la cuadrícula de tarjetas cabe sin bajar; para tener por
+   dónde bajar se abre una tarjeta en grande con contenido largo. */
+await pagina.addStyleTag({ content: '#ficha-guia { min-height: 2000px; }' });
+await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
+await pagina.waitForTimeout(200);
 await comprobarQue('la ficha tiene sitio de sobra para bajar más de 80px',
   pagina.evaluate(() => document.documentElement.scrollHeight - window.innerHeight > 150));
 await comprobar('al entrar en la ficha, su cabecera se ve entera', encogidaDe('header.ficha-cabecera'), false);

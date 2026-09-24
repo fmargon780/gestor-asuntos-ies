@@ -19,6 +19,20 @@ const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript(preparacion);
+/* Fila 107 (docs/FICHA-EN-TARJETAS.md): la ficha va en tarjetas. Esta
+   prueba trabaja dentro de una: se entra con ella ya abierta en grande
+   (`window.__tarjeta`; se cambia con FichaTarjetas.abrir). */
+await pagina.addInitScript(() => {
+  window.__tarjeta = 'otros';
+  window.addEventListener('DOMContentLoaded', () => {
+    if (!window.FichaTarjetas) return;
+    const alEntrar = FichaTarjetas.alEntrar;
+    FichaTarjetas.alEntrar = function () {
+      if (window.__tarjeta) FichaTarjetas.abrirAlEntrar(window.__tarjeta);
+      return alEntrar();
+    };
+  });
+});
 await pagina.goto(process.env.DIRECCION || 'http://localhost:8123/index.html');
 
 let fallos = 0;
@@ -86,12 +100,10 @@ function botonVuelta() {
   return pagina.locator('#ficha-volver-al-origen');
 }
 
-/* "Otros asuntos de este tercero" vive plegado (fila 51, 18-sep-2026,
-   docs/FICHA-DISPOSICION.md), cerrado de partida en cada asunto que se
-   ve por primera vez: hay que desplegarlo antes de poder pulsar nada
-   de dentro. */
+/* "Otros asuntos de este tercero" es una tarjeta (fila 107): hay que
+   abrirla en grande antes de poder pulsar nada de dentro. */
 async function abrirOtrosAsuntos() {
-  await pagina.click('#ficha-plegable-otros > summary');
+  await pagina.evaluate(() => FichaTarjetas.abrir('otros'));
   await pagina.waitForTimeout(100);
 }
 

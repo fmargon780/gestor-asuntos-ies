@@ -1,0 +1,98 @@
+/* ============================================================
+   ficha-tarjetas.css — la ficha del asunto en tarjetas (24-sep-2026,
+   fila 107, docs/FICHA-EN-TARJETAS.md, js/ficha-tarjetas.js).
+
+   Cuadrícula de tarjetas del mismo tamaño que llena el alto visible
+   (el alto lo pone js/ficha-tarjetas.js); una abierta ocupa todo el
+   sitio y las demás pasan a pestañas pequeñas arriba.
+   ============================================================ */
+
+.ficha-tarjetas { margin-top: 10px; }
+
+.ficha-tarjetas-rejilla {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.ficha-tarjetas.con-tramite .ficha-tarjetas-rejilla { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 1100px) {
+  .ficha-tarjetas .ficha-tarjetas-rejilla,
+  .ficha-tarjetas.con-tramite .ficha-tarjetas-rejilla {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none; grid-auto-rows: minmax(0, 1fr);
+  }
+}
+/* Con el documento abierto a la derecha, el hueco se estrecha: dos
+   columnas, como en una pantalla estrecha. */
+body.con-visor .ficha-tarjetas:not([data-abierta]) .ficha-tarjetas-rejilla,
+body.con-lector .ficha-tarjetas:not([data-abierta]) .ficha-tarjetas-rejilla {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: none; grid-auto-rows: minmax(0, 1fr);
+}
+
+/* Cada tarjeta: mismo tamaño, no crece; lo que no cabe se corta. */
+.ficha-tarjeta {
+  display: flex; flex-direction: column; min-height: 0; min-width: 0;
+  overflow: hidden; cursor: pointer; margin: 0;
+}
+.ficha-tarjetas:not([data-abierta]) .ficha-tarjeta:hover { border-color: #b9c6d6; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.ficha-tarjeta.vacio {          /* la clase de "bloque vacío" de antes no encoge la tarjeta */
+  display: flex; flex-direction: column; align-items: stretch; padding: 16px 18px;
+  font-size: inherit; color: inherit; margin-top: 0;
+}
+.ficha-tarjeta > .ficha-titulo { flex: none; }
+.ficha-tarjeta .ficha-cuenta:empty { display: none; }
+
+.ficha-tarjeta-resumen { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 4px; }
+.ficha-resumen-linea {
+  font-size: 13px; line-height: 1.35; color: var(--tinta);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;
+}
+.ficha-resumen-linea.fuerte { font-weight: 600; }
+.ficha-resumen-linea.suave { color: var(--tinta-suave); font-size: 12px; }
+button.ficha-resumen-linea {
+  font: inherit; font-size: 13px; background: none; border: 0; padding: 0;
+  color: var(--azul); cursor: pointer; max-width: 100%;
+}
+button.ficha-resumen-linea:hover { text-decoration: underline; }
+.ficha-tarjeta-vacia .ficha-resumen-linea { color: var(--tinta-suave); }
+
+/* Cerrada: solo el resumen. Las "siempre" (Datos y contacto, Datos del
+   trámite) ya son una línea: enseñan su cuerpo, cortado. */
+.ficha-tarjeta-cuerpo { min-height: 0; }
+.ficha-tarjetas:not([data-abierta]) .ficha-tarjeta:not(.ficha-tarjeta-siempre) > .ficha-tarjeta-cuerpo { display: none; }
+.ficha-tarjeta-siempre > .ficha-tarjeta-resumen { display: none; }
+.ficha-tarjetas:not([data-abierta]) .ficha-tarjeta-siempre > .ficha-tarjeta-cuerpo { flex: 1; overflow: hidden; }
+.ficha-tarjeta[data-tarjeta="contacto"] { padding: 0; }
+.ficha-tarjeta[data-tarjeta="contacto"] .ficha-bloque { border: 0; margin: 0; box-shadow: none; }
+
+/* Abierta: solo ella, entera, con su contenido de siempre. */
+.ficha-tarjetas[data-abierta] .ficha-tarjetas-rejilla { display: block; }
+.ficha-tarjetas[data-abierta] .ficha-tarjeta:not(.abierta) { display: none; }
+.ficha-tarjeta.abierta { cursor: default; overflow: visible; min-height: inherit; }
+.ficha-tarjeta.abierta > .ficha-tarjeta-resumen { display: none; }
+.ficha-tarjeta.abierta > .ficha-tarjeta-cuerpo { display: block; }
+
+/* Las pestañas de arriba, con una tarjeta abierta. */
+.ficha-tarjetas-pestanas { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ficha-tarjetas[data-abierta] .ficha-tarjetas-pestanas { margin-bottom: 10px; }
+.ficha-pestana {
+  font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+  background: var(--papel); color: var(--tinta-suave);
+  border: 1px solid var(--linea); border-radius: 16px; padding: 5px 12px;
+}
+.ficha-pestana:hover { color: var(--tinta); border-color: #b9c6d6; }
+.ficha-pestana.activa { background: var(--azul); border-color: var(--azul); color: #fff; }
+.ficha-pestana-cuenta { font-weight: 400; opacity: .8; }
+
+/* La franja de documentos de la tarjeta abierta. */
+.ficha-tarjeta-franja:empty { display: none; }
+.ficha-tarjeta-franja { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.ficha-chip-doc {
+  font: inherit; font-size: 12px; cursor: pointer; max-width: 320px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  background: #eef3f9; color: var(--tinta); border: 1px solid #d3deea; border-radius: 14px; padding: 3px 10px;
+}
+.ficha-chip-doc:hover { border-color: var(--azul); }
+.ficha-chip-doc.activo { background: var(--azul); border-color: var(--azul); color: #fff; }

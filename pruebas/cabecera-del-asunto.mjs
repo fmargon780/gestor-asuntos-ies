@@ -311,6 +311,11 @@ await comprobar('10. copiar de verdad funciona en consulta: el nombre entero, en
    11. CABECERA ENCOGIDA: EL NOMBRE Y LA BARRA SIGUEN A LA VISTA
    ============================================================ */
 console.log('--- 11. con la cabecera encogida, el nombre y la barra siguen visibles ---');
+/* Fila 107: la cuadrícula de tarjetas cabe sin bajar; para tener por
+   dónde bajar se abre una tarjeta en grande con contenido largo. */
+await pagina.addStyleTag({ content: '#ficha-guia { min-height: 2000px; }' });
+await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
+await pagina.waitForTimeout(200);
 await pagina.evaluate(() => window.scrollTo(0, 400));
 await pagina.waitForTimeout(500);
 await comprobarQue('11. la cabecera está encogida',

@@ -23,6 +23,20 @@ const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript(preparacion);
+/* Fila 107 (docs/FICHA-EN-TARJETAS.md): la ficha va en tarjetas. Esta
+   prueba trabaja dentro de una: se entra con ella ya abierta en grande
+   (`window.__tarjeta`; se cambia con FichaTarjetas.abrir). */
+await pagina.addInitScript(() => {
+  window.__tarjeta = 'notas';
+  window.addEventListener('DOMContentLoaded', () => {
+    if (!window.FichaTarjetas) return;
+    const alEntrar = FichaTarjetas.alEntrar;
+    FichaTarjetas.alEntrar = function () {
+      if (window.__tarjeta) FichaTarjetas.abrirAlEntrar(window.__tarjeta);
+      return alEntrar();
+    };
+  });
+});
 await pagina.goto(process.env.DIRECCION || 'http://localhost:8123/index.html');
 
 let fallos = 0;
@@ -79,11 +93,13 @@ await pagina.click('#btn-recargar');
 await pagina.waitForSelector('#lista-abiertos .tarjeta');
 await pagina.click('#lista-abiertos .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
 await pagina.waitForSelector('#ficha-nota-texto');
 /* que la huella de la ficha quede apuntada antes de empezar */
 await pagina.waitForTimeout(400);
 
 console.log('--- 1 a 3. la nota del asunto ---');
+await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
 await pagina.click('#ficha-nota-texto');
 await pagina.keyboard.type('He llamado al proveedor y me devuelve la llamada', { delay: 5 });
 /* el cursor se deja a mitad de frase, no al final */
@@ -109,10 +125,14 @@ await pagina.evaluate(async (asunto) => {
   await window.Hitos.anadirHito(asunto, 'Pedir presupuesto');
   window.HitosPanel.programarRepintado();
 }, NOMBRE_ASUNTO);
+await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForSelector('#ficha-guia .hito');
+await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.click('#ficha-guia .hito .hito-desplegar');
+await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForSelector('#ficha-guia .hito-nota-texto');
 
+await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.click('#ficha-guia .hito-nota-texto');
 await pagina.keyboard.type('Me lo mandan el lunes', { delay: 5 });
 await pagina.evaluate(() => {
@@ -154,6 +174,7 @@ console.log('--- 6. cuando sí cambia algo se repinta, y la nota sobrevive al re
 /* Aquí la ficha se rehace de verdad (llega un documento a la carpeta
    DEL ASUNTO): es U.conservandoLoEscrito quien tiene que salvar la
    nota, el foco y el cursor, no el atajo de no repintar. */
+await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
 await pagina.click('#ficha-nota-texto');
 await pagina.evaluate(() => document.getElementById('ficha-nota-texto').setSelectionRange(11, 11));
 await pagina.evaluate(async (asunto) => {
@@ -176,44 +197,16 @@ await comprobar('6. y el foco y el cursor también',
     return [document.activeElement === c, c.selectionStart, c.selectionEnd];
   }), [true, 11, 11]);
 
-console.log('--- 7. la ficha nueva (fila 51, 18-sep-2026): orden de bloques y nota sin botón ---');
-/* docs/FICHA-DISPOSICION.md, 6: tres columnas — izquierda Hitos; centro
-   Documentos (hueco ancho); derecha Datos y contacto (el primero),
-   después Notas, y plegados al final "Otros asuntos" y "Relacionados"
-   (lo que casi nunca se mira). Sustituye a la comprobación de la fila
-   37 (docs/FICHA-DEL-ASUNTO-NUEVA.md), que daba por hecho el reparto
-   de columnas anterior. */
-await comprobar('7. a la izquierda, solo Hitos',
-  pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-izquierda .ficha-titulo')).map((h) => h.textContent.trim())),
-  ['Hitos']);
-
-await comprobar('7. en el centro, Documentos de la carpeta',
-  pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-centro .ficha-titulo')).map((h) => {
-    /* El título de "Documentos" lleva pegados la cuenta (`.ficha-cuenta`)
-       y, desde la fila 52 (18-sep-2026), el botón "Documentos ▾"
-       (`.ficha-documentos-gestionar`), dentro del mismo <h3>: se
-       quitan los dos de una copia antes de leer el texto, que si no
-       sale "Documentos de la carpeta2Documentos ▾". */
-    const copia = h.cloneNode(true);
-    copia.querySelectorAll('.ficha-cuenta, .ficha-documentos-gestionar').forEach((el) => el.remove());
-    return copia.textContent.trim();
-  })),
-  ['Documentos de la carpeta']);
-
-await comprobar('7. a la derecha, "Datos y contacto" es el primer bloque',
-  pagina.evaluate(() => {
-    const primero = document.querySelector('.ficha-derecha > *');
-    return primero && primero.id;
-  }), 'ficha-contacto-caja');
-
-await comprobar('7. y "Notas" va antes que los bloques plegados (Otros asuntos, Relacionados)',
-  pagina.evaluate(() => {
-    const titulos = Array.from(document.querySelectorAll('.ficha-derecha .ficha-titulo')).map((h) => h.textContent);
-    return [titulos.indexOf('Notas') < titulos.indexOf('Otros asuntos de este tercero'),
-            titulos.indexOf('Notas') < titulos.indexOf('Personas y entidades relacionadas')];
-  }), [true, true]);
+console.log('--- 7. la ficha en tarjetas (fila 107, 24-sep-2026): el orden ---');
+/* docs/FICHA-EN-TARJETAS.md, 1: arriba Hitos, Documentos, Datos y
+   contacto; abajo Notas, Otros asuntos, Personas. Sustituye a la
+   comprobación de las tres columnas de la fila 51. */
+await comprobar('7. el orden de las tarjetas',
+  pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-tarjetas .ficha-tarjeta')).map((t) => t.dataset.tarjeta)),
+  ['hitos', 'documentos', 'contacto', 'notas', 'otros', 'relacionados']);
 
 console.log('--- 8. la nota ya no se guarda sola mientras se escribe (fila 58) ---');
+await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
 await pagina.fill('#ficha-nota-texto', 'No se guarda mientras se escribe');
 await pagina.waitForTimeout(1400);
 await comprobar('8. pasado más de un segundo, sigue sin estar en la lista',
@@ -230,6 +223,7 @@ await comprobar('8. lo escrito sigue en la caja (no se limpia sola)',
   pagina.inputValue('#ficha-nota-texto'), 'No se guarda mientras se escribe');
 
 console.log('--- 9. perder el foco con algo escrito también guarda ---');
+await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
 await pagina.fill('#ficha-nota-texto', 'Se guarda al salir del recuadro');
 await pagina.evaluate(() => document.getElementById('ficha-nota-texto').blur());
 await pagina.waitForFunction(() =>
@@ -244,7 +238,11 @@ console.log('--- 10. salir de la ficha con una nota sin guardar avisa ---');
    con Escape, que pulsa el mismo botón por dentro (js/usabilidad.js)
    sin que el campo llegue a perder el foco antes (no hay blur real,
    solo el evento "click" sintético). */
+await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
 await pagina.fill('#ficha-nota-texto', 'Nota sin guardar de verdad');
+/* Con la tarjeta de Notas abierta, el primer Escape vuelve a la
+   cuadrícula (fila 107); el segundo es el que sale de la ficha. */
+await pagina.keyboard.press('Escape');
 await pagina.keyboard.press('Escape');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('10. el aviso es el que toca',

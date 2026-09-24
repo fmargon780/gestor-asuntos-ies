@@ -31,6 +31,20 @@ const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript(preparacion);
+/* Fila 107 (docs/FICHA-EN-TARJETAS.md): la ficha va en tarjetas. Esta
+   prueba trabaja dentro de una: se entra con ella ya abierta en grande
+   (`window.__tarjeta`; se cambia con FichaTarjetas.abrir). */
+await pagina.addInitScript(() => {
+  window.__tarjeta = 'relacionados';
+  window.addEventListener('DOMContentLoaded', () => {
+    if (!window.FichaTarjetas) return;
+    const alEntrar = FichaTarjetas.alEntrar;
+    FichaTarjetas.alEntrar = function () {
+      if (window.__tarjeta) FichaTarjetas.abrirAlEntrar(window.__tarjeta);
+      return alEntrar();
+    };
+  });
+});
 await pagina.goto(DIRECCION);
 
 let fallos = 0;
@@ -166,9 +180,8 @@ async function crearAsunto(categoriaIndice, botonTipo, buscarTexto) {
 await crearAsunto(2, 'PERMISO', 'aguado');
 await pagina.click('#lista-abiertos .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-/* "Personas y entidades relacionadas" vive plegada (fila 51,
-   18-sep-2026, docs/FICHA-DISPOSICION.md). */
-await pagina.click('#ficha-plegable-relacionados > summary');
+/* "Personas y entidades relacionadas" es una tarjeta (fila 107). */
+await pagina.evaluate(() => FichaTarjetas.abrir('relacionados'));
 await pagina.waitForSelector('#rel-anadir-varios');
 
 await pagina.click('#rel-anadir-varios');

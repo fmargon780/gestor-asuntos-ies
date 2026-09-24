@@ -198,6 +198,8 @@
       (extraHtml || '');
     b.onclick = function () {
       if (window.HitosPanel) window.HitosPanel.desplegarAlAbrir(a.nombre, h.id);
+      /* Con la tarjeta de Hitos abierta en grande (fila 107). */
+      if (window.FichaTarjetas) FichaTarjetas.abrirAlEntrar('hitos');
       App.abrirFicha(a, 'abierto');
     };
     return b;

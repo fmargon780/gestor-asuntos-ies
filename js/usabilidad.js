@@ -410,6 +410,12 @@
       salirDeNuevoConEscape();
       return;
     }
+    /* En la ficha, con una tarjeta abierta en grande, el primer Escape
+       vuelve a la cuadrícula (fila 107, js/ficha-tarjetas.js). */
+    if (pantallaVisible.id === 'pantalla-asunto' && window.FichaTarjetas && FichaTarjetas.cerrarSiAbierta()) {
+      ev.preventDefault();
+      return;
+    }
     var salida = pantallaVisible.querySelector(
       '.boton-volver:not(.oculto), #ficha-volver, #dup-pantalla-volver');
     if (salida) { ev.preventDefault(); salida.click(); }

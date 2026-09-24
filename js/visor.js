@@ -36,6 +36,7 @@
      solo si el documento deja de estar ahí, sin que este fichero sepa
      nada de esa lista. */
   var marcador = null;
+  var nombreAbierto = '';   /* el documento que se está viendo (fila 107: el chip marcado) */
   var oyentes = [];
 
   function avisar() {
@@ -183,6 +184,7 @@
       document.body.classList.add('con-visor');
       pintarDocumento();
       marcador = opts.marcador || null;
+      nombreAbierto = nombre || fichero.name;
       avisar();
 
       /* Lo que el navegador no sabe enseñar se abre fuera, como antes. */
@@ -198,6 +200,7 @@
     if (cuerpo) cuerpo.innerHTML = '';
     pintarAcciones(null);
     soltar();
+    nombreAbierto = '';
     if (marcador !== null) { marcador = null; avisar(); }
   }
 
@@ -242,6 +245,7 @@
   window.Visor = {
     abrir: abrir, cerrar: cerrar,
     marcadorAbierto: function () { return marcador; },
+    nombreAbierto: function () { return nombreAbierto; },
     alCambiar: function (fn) { oyentes.push(fn); }
   };
 
