@@ -5,6 +5,29 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 125: Personas, matriculados primero, buscar por la familia y hermanos
+
+`docs/BUSCAR-PERSONAS-Y-FAMILIAS.md`. En secretaría llama la madre y hay que saber de quién es;
+y en Personas el alumno buscado quedaba entre antiguos, con la ficha arriba, fuera de la vista.
+
+- Módulo nuevo `js/personas-familias.js`, llamado desde `js/archivo-personas.js` (sin envolver).
+  La parte nueva de la ficha también vive ahí: con ella dentro, `archivo-personas.js` pasaba de 420
+  líneas; se queda en 403.
+- Decisión: un tutor se reconoce por su DNI sin espacios, puntos ni guiones, y sin DNI por su
+  nombre entero. Dos tutores sin DNI que se llamen igual se unirían: con el RegAlum no hay nada
+  mejor, y en la práctica suelen ser la misma persona.
+- El índice de tutores se guarda en la propia lista que devuelve `Datos.cargar` (`_familias`): así
+  se calcula una vez y se rehace solo cuando la lista se vuelve a leer.
+- Además de todas las palabras, lo escrito junto («600112233», «12.345.678») se busca en el DNI y
+  los teléfonos compactados, para que un número escrito con espacios o puntos también case.
+- Comprobado en un navegador a 1905 px con un RegAlum de 83 alumnos: tarjeta de la madre con sus dos
+  hijos, «Antiguos (41)» plegado, la ficha fija bajo la cabecera al bajar y el hermano pulsable.
+- En la pasada completa de `npm test`, `notas-asunto-no-se-borran.mjs` (caso 10, salir con una nota
+  sin guardar) se pasó una vez del tiempo; sola, dos veces en verde. No toca nada de esta fila.
+- Versión `App.VERSION`: `24-sep-2026 · 13:14`.
+
+---
+
 ## 24-sep-2026 — Fila 124: la renuncia a formar parte de la Junta Electoral
 
 `docs/RENUNCIA-JUNTA-ELECTORAL.md`. En el sorteo de la Junta Electoral, la madre titular del sector

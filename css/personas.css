@@ -1,0 +1,52 @@
+/* ============================================================
+   personas.css — Personas y empresas (24-sep-2026, fila 125,
+   docs/BUSCAR-PERSONAS-Y-FAMILIAS.md): la ficha que acompaña al bajar,
+   la persona marcada en la lista, las tarjetas «Familias» y el bloque
+   plegado «Antiguos (N)». El JS está en js/personas-familias.js.
+   ============================================================ */
+
+/* La ficha se queda a la vista, por debajo de la cabecera fija
+   (--cabecera-fija-alto la pone js/cabecera-fija.js), con su propia
+   barra si es más alta que la ventana. */
+#ficha-persona {
+  position: sticky;
+  top: calc(var(--cabecera-fija-alto, 0px) + 10px);
+  max-height: calc(100vh - var(--cabecera-fija-alto, 0px) - 20px);
+  overflow-y: auto;
+}
+
+#lista-personas .resultado-elegido {
+  border-color: var(--azul);
+  box-shadow: inset 4px 0 0 var(--azul);
+  background: var(--azul-claro);
+}
+
+.personas-bloque-titulo {
+  margin: 4px 0 6px; font-size: 12px; font-weight: 600; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--tinta-suave);
+}
+
+.familia-tarjeta {
+  border: 1px solid var(--linea); border-left: 4px solid #6b8fbf; border-radius: var(--radio);
+  background: var(--papel); padding: 8px 12px; margin-bottom: 8px;
+}
+.familia-cabeza { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.familia-etiqueta { font-size: 12px; color: var(--tinta-suave); }
+.familia-contacto { font-size: 13px; color: var(--tinta-suave); margin: 2px 0 4px; word-break: break-word; }
+.familia-hijo {
+  display: flex; gap: 12px; justify-content: space-between; width: 100%;
+  border: 0; border-top: 1px solid #f0f3f7; background: transparent; padding: 4px 2px;
+  font: inherit; font-size: 14px; text-align: left; cursor: pointer; color: inherit;
+}
+.familia-hijo:hover { background: #f4f7fb; }
+
+.personas-antiguos { margin-top: 8px; }
+.personas-antiguos > summary {
+  cursor: pointer; padding: 6px 2px; font-weight: 600; color: var(--tinta-suave);
+}
+
+.ficha-hermanos .enlace { padding: 0; text-align: left; }
+
+@media (max-width: 900px) {
+  #ficha-persona { position: static; max-height: none; overflow: visible; }
+}
