@@ -113,6 +113,7 @@ Las filas 1 a 75 y 77 a 124 están **HECHAS**. Sus documentos siguen en `docs/`,
 | Nº | Instrucción | Estado |
 |---|---|---|
 | 125 | `docs/BUSCAR-PERSONAS-Y-FAMILIAS.md` (Personas y empresas: matriculados primero y antiguos plegados, buscar por padre/madre/tutor legal con sus hijos, ficha fija al bajar y hermanos en el centro) | EN CURSO (24-sep-2026) |
+| 126 | `docs/TIPO-QUE-CAMBIA-DE-NOMBRE.md` (un tipo que cambia de nombre se lleva guía, campos y plantillas; arreglo solo del tipo DESEMPEÑO FUNCIÓN TUTORIAL; «Buscar otra plantilla…» en cualquier hito) | PENDIENTE (apuntada 24-sep-2026) |
 | 76 | `docs/DETALLES-DE-MANTENIMIENTO.md`, punto 1 (la versión, sacada del reloj) | BLOQUEADA (20-sep-2026): riesgo real de bucle de commits o de publicaciones de Vercel duplicadas si el paso automático falla, y no hay forma de probarlo a fondo sin que Francisco mire el panel de Vercel. Ya lo avisaba el propio documento cuando se separó de la fila 72: mejor dejarlo pendiente que arriesgar la cuota o la publicación entera sin nadie delante |
 
 **La fila 124 está HECHA** (24-sep-2026): `docs/RENUNCIA-JUNTA-ELECTORAL.md`. Plantilla «Renuncia a formar parte de la Junta Electoral» (OTROS · ELECCIONES CONSEJO ESCOLAR, una hoja A4, datos de quien renuncia en blanco), con `id` fijo `pd-centro-renuncia-junta-electoral`, unida al hito `b260` «Constituir la Junta Electoral», cuyo guion gana «Recoger las renuncias y avisar al suplente que corresponda» (generar). «Traer los guiones del instituto» ahora añade a un guion ya escrito las líneas nuevas del centro que le falten. Falta que Francisco pulse «Cargar las plantillas del centro» y «Traer los guiones del instituto» en Mantenimiento. Versión `App.VERSION`: `24-sep-2026 · 12:58`.
@@ -354,7 +355,7 @@ retipear de un tirón sin `git push`). Puede que falten todavía.
   `css/seneca.css`, `js/campos-calculo.js`, `js/campos-catalogo.js`,
   `js/campos-calculados-editor.js`, `js/ajustes-tipo.js`).
 - A `docs/HISTORIA.md`: la entrada del 18-sep-2026 de esas cuatro filas, con su "Lo que costó de
-  verdad" (los bugs que las propias pruebas cazaron antes de producción).
+verdad" (los bugs que las propias pruebas cazaron antes de producción).
 
 Compruébalo contra lo que de verdad dice `main` antes de sustituir nada. Si la sesión tiene
 `git push` de verdad (terminal u ordenador de Francisco), es mucho más simple que ir fichero a
