@@ -130,10 +130,9 @@
 .boton-vencimiento.vencimiento-sin { background: #eef1f5; color: #5d6b7a; border-color: #d7dde5; }
 
 /* "El encargo" (18-sep-2026, fila 52, docs/CABECERA-DEL-ASUNTO.md, 7):
-   el botón y, si ya hay datos, un resumen de una línea debajo, en gris
-   y pequeño. Cuenta como un solo elemento de la barra. */
-.ficha-encargo { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
-.ficha-encargo-resumen { font-size: 12px; color: var(--tinta-suave); }
+   desde la fila 106 va solo, sin línea debajo (quién lo pide sale
+   arriba, en su etiqueta), alineado con los demás botones de la barra. */
+.ficha-encargo { display: flex; align-items: center; }
 
 /* Tres tramos (18-sep-2026, fila 51, docs/FICHA-DISPOSICION.md, 7):
    izquierda lo que hay que hacer (Hitos), centro los documentos

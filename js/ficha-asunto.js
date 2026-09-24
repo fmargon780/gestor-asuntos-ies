@@ -69,11 +69,14 @@
     });
   };
 
-  /* Las marcas de arriba (tipo y quién lo pide). */
+  /* Las marcas de arriba (tipo y quién lo pide). "Lo pide" lleva la
+     relación entre paréntesis, en minúscula (fila 106, docs/LO-PIDE-EN-
+     LA-CABECERA.md): es el único sitio de la cabecera donde sale. */
   function marcasDeFicha(a, tipo) {
+    var lp = a.ficha.loPide;
     return (tipo ? '<span class="marca-tipo">' + U.escapar(tipo) + '</span>' : '') +
-      (a.ficha.loPide && a.ficha.loPide.nombre
-        ? '<span class="marca-lopide">Lo pide: ' + U.escapar(a.ficha.loPide.nombre) + '</span>' : '');
+      (lp && lp.nombre
+        ? '<span class="marca-lopide">Lo pide: ' + U.escapar(LoPide.etiqueta(lp)) + '</span>' : '');
   }
 
   /* Tras cambiar el estado, el plazo, la vía o el encargo, se repinta
@@ -785,19 +788,6 @@
      ficha, y los que mueven o renombran la carpeta devuelven a la
      lista, porque el asunto ya no se llama igual. */
 
-  /* El resumen de una línea bajo "El encargo" (18-sep-2026, fila 52,
-     docs/CABECERA-DEL-ASUNTO.md, 7): "Tutor legal 1 · por correo".
-     Cadena vacía si el asunto no tiene ni quién lo pide ni vía, y
-     entonces el botón "va solo", sin la línea de debajo. */
-  function resumenDelEncargo(a) {
-    var d = a.ficha.loPide || null;
-    var trozos = [];
-    if (d && d.nombre) trozos.push(d.relacion || d.nombre);
-    var v = d && d.via && Nombres.via(d.via);
-    if (v) trozos.push('por ' + v.corto.toLowerCase());
-    return trozos.join(' · ');
-  }
-
   /* La barra de acciones queda en cinco elementos y nada más
      (18-sep-2026, fila 52, docs/CABECERA-DEL-ASUNTO.md, 3): el
      desplegable de estado, el vencimiento, "El encargo", "Comunicar"
@@ -847,13 +837,8 @@
           async function (ev) {
             try { await abrirLoPide(a, ev.currentTarget); } finally { App.repintarAccionesFicha(); }
           }, tieneEncargo));
-        var resumen = resumenDelEncargo(a);
-        if (resumen) {
-          var spanResumen = document.createElement('span');
-          spanResumen.className = 'ficha-encargo-resumen';
-          spanResumen.textContent = resumen;
-          envoltorioEncargo.appendChild(spanResumen);
-        }
+        /* Sin línea debajo (fila 106): quién lo pide ya sale arriba, en
+           su etiqueta, y la vía se ve al abrir "El encargo". */
         caja.appendChild(envoltorioEncargo);
       }
     }

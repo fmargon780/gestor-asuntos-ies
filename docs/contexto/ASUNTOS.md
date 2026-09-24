@@ -161,9 +161,11 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   siempre); `App.editarVia` sigue tal cual, sigue usándolo la tarjeta de la lista
   (`js/asuntos-lista.js`). `js/via-contacto.js` envuelve `LoPide.controles` (además de
   `App.editarVia`, que no se toca) para poner las sugerencias de teléfono/correo también en el
-  campo `.lopide-via-dato` del cuadro nuevo, solo si `controles()` recibe `persona`. El botón
-  muestra debajo, en gris (`.ficha-encargo-resumen`), `relación · por vía` cuando hay algo que
-  enseñar (`resumenDelEncargo(a)`, en `js/ficha-asunto.js`); "va solo" si no hay nada.
+  campo `.lopide-via-dato` del cuadro nuevo, solo si `controles()` recibe `persona`. Desde la
+  fila 106 (24-sep-2026, `docs/LO-PIDE-EN-LA-CABECERA.md`) el botón va siempre solo, sin línea
+  debajo: quién lo pide sale una sola vez, en la marca `.marca-lopide` de arriba, con la relación
+  entre paréntesis y en minúscula (`LoPide.etiqueta`, que no la repite si el nombre ya es "Tutor
+  legal N"); la vía solo se ve al abrir "El encargo".
 - **"Comunicar"**: `js/correo.js` deja de montar dos botones ("Correo", "Mensaje Séneca") y monta
   uno (`.boton-comunicar`) con `FichaMenus.montar(b, [...])` (dos opciones, mismas llamadas a
   `abrirCuadro(a, false/true)` de siempre). Como este fichero pinta por su cuenta (mismo patrón de
