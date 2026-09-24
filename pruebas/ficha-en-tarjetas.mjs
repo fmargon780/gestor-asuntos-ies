@@ -198,6 +198,8 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await pagina.keyboard.press('Escape');
   await pagina.evaluate(() => document.querySelector('.pestana[data-pantalla="que-me-toca"]').click());
   await pagina.waitForSelector('#pantalla-que-me-toca:not(.oculto)');
+  /* La lista se pinta un momento después de verse la pantalla (lee los hitos). */
+  await pagina.waitForSelector('.qmt-fila[data-hito="m1"]', { state: 'attached' });
   await pagina.evaluate(() => document.querySelector('.qmt-fila[data-hito="m1"]').click());
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.waitForTimeout(600);
