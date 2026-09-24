@@ -1,0 +1,10 @@
+/* Plazo de conservación (fila 136, js/conservacion.js). */
+
+/* «Conservar ___ años después de archivar», en la pantalla de un tipo. */
+.tipo-conservar-fila { margin-top: 10px; }
+.tipo-conservar-fila .campo-plazo { width: 70px; display: inline-block; margin: 0 4px; }
+
+/* Ajustes › Mantenimiento › «Plazo de conservación cumplido». */
+.conservacion-todos { display: inline-flex; align-items: center; gap: 6px; margin: 4px 0 8px; }
+.conservacion-fila { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; cursor: pointer; }
+.conservacion-fila .nombre-tipo { flex: 1 1 260px; }

@@ -99,14 +99,12 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ajustes: tres pestañas y pantalla por tipo; todo plegado, con resumen; avisos de fallo, solo con fallo.
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
-- Papelera: nada se borra de golpe.
+- Papelera: nada se borra de golpe. Plazo de conservación por tipo: avisa cuando un archivado lo cumple; nunca borra solo.
 - Plantillas de correo y de Word por tipo de asunto, con huecos que se rellenan solos; textos del
   centro en `plantillas/` (botón en Mantenimiento). Salen con membrete, la firma de quien ocupaba
   el cargo en su fecha y «el/la alumno/a» en masculino o femenino según el sexo de cada persona.
-- Tablas de datos (tutorías de Séneca, CSV/Excel en `datos/Tablas`) unidas por DNI, con huecos
-  {{ESPECIALIDAD}} y {{TABLA TUTORIAS}}; lo que falta, en amarillo. Certificado de función tutorial
-  como el del centro (tipo DESEMPEÑO FUNCIÓN TUTORIAL, campo «Cursos que pide»). Renuncia a la
-  Junta Electoral, en su hito.
+- Tablas de datos (tutorías de Séneca, CSV/Excel) unidas por DNI, con huecos; lo que falta, en amarillo. Certificado de función tutorial
+  como el del centro; renuncia a la Junta Electoral, en su hito.
 - Copias diarias (caducan a los 90 días), detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un borrado (tipo,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en cada subida. Escape y salida siempre.
@@ -170,7 +168,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ver con el uso: ancho del panel y del tablón, tarjetas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: membrete, Consejería, cargos y Provincia.
 - Importar los usuarios IdEA del alumnado, cuando reactiven a Francisco el perfil de Gestor de PASEN.
-- Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar las plantillas del centro» y «Traer los guiones del instituto». Ajustes › Hitos: pegar los festivos. Ajustes › Tipos: quién encarga cada uno.
+- Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar las plantillas del centro» y «Traer los guiones del instituto». Ajustes › Hitos: pegar los festivos. Ajustes › Tipos: quién encarga cada uno y su plazo de conservación.
 - Antes de junio de 2027: "Guardar el contacto de los asuntos abiertos" (Mantenimiento).
 - Decisión: ¿la papelera se vacía sola a los N días? Sin decidir.
 - Antes de publicar algo importante, repasar `docs/COMPROBAR-A-MANO.md`.

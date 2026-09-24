@@ -209,6 +209,8 @@ tabla de ficheros), y la búsqueda es por palabras sueltas.
     él manda el tipo, así que no hizo falta subir `VERSION`. `App.verArchivo` lo pasa a la ficha
     de la tarjeta, y un reservado tapado solo se busca por su nombre (ver «Asuntos reservados» en
     `docs/contexto/ASUNTOS.md`).
+  - Desde la fila 136 también `archivadoEl` (AAAA-MM-DD, de `cerradoEl`) y `conservarHasta`, solo
+    si la ficha los trae; tampoco subió `VERSION`. Ver «El plazo de conservación», más abajo.
   - `resolverHandle(entrada)` calcula el manejador real de una carpeta a partir de lo que el índice
     sabe (categoría, tercero, ruta, `sueltoEn`): el índice no puede guardar manejadores en un JSON.
 - **`App.verArchivo`** (`js/archivo-personas.js`) lee el índice; si no existe, está roto o es de
@@ -244,6 +246,23 @@ tabla de ficheros), y la búsqueda es por palabras sueltas.
 
 Se comprueba con `pruebas/archivo-indice.mjs`, en navegador de verdad con el disco de mentira de
 `pruebas/navegador.mjs`, con los nueve escenarios del documento.
+
+### El plazo de conservación (25-sep-2026, fila 136, `docs/PLAZO-DE-CONSERVACION.md`)
+
+Cada tipo puede llevar `conservarAnios` (entero; vacío = sin plazo, nunca avisa), puesto en «Datos
+del tipo» con el enlace a las tablas de valoración de la Junta. `js/conservacion.js`
+(`Conservacion`) recorre el índice del ARCHIVO: un archivado ha cumplido si `archivadoEl +
+conservarAnios` (o su `conservarHasta`, que manda) es anterior a hoy. Sin `archivadoEl` (de antes),
+se usa la fecha del nombre y se marca «(aprox.)». **Nunca borra nada sola.**
+
+- Al entrar, una vez al día como mucho (`localStorage` `gestor-conservacion-revisado`), un aviso
+  ámbar si hay alguno.
+- Ajustes › Mantenimiento › «Plazo de conservación cumplido» (`#bloque-conservacion`), solo si hay:
+  arriba, plegado, con el resumen «N asuntos han cumplido su plazo de conservación». Lista con
+  casillas y dos botones: **«Mandar a la papelera»** (`Papelera.mandarArchivado`: la carpeta entera,
+  con su `_ficha.json`, clase `archivado`, y fuera del índice; «Devolver» la lleva a su sitio del
+  ARCHIVO y a su índice) y **«Conservar más tiempo…»** (años desde hoy → `conservarHasta` en su
+  `_ficha.json` y en su entrada del índice).
 
 ### La ficha de un asunto archivado, en su propia carpeta
 

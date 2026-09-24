@@ -225,7 +225,12 @@ var IndiceArchivo = (function () {
          abrir la carpeta. */
       notas: window.Notas ? Notas.textoParaBuscar(ficha) : '',
       /* Fila 135: solo si la ficha lo dice (sin el dato, manda el tipo). */
-      reservado: typeof ficha.reservado === 'boolean' ? ficha.reservado : undefined
+      reservado: typeof ficha.reservado === 'boolean' ? ficha.reservado : undefined,
+      /* Fila 136 (js/conservacion.js): el día en que se archivó (sin él,
+         se usa la fecha del nombre, como aproximada) y, si se ha pedido
+         «Conservar más tiempo», hasta cuándo. */
+      archivadoEl: ficha.cerradoEl ? String(ficha.cerradoEl).slice(0, 10) : undefined,
+      conservarHasta: ficha.conservarHasta || undefined
     };
   }
 

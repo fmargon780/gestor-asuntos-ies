@@ -189,6 +189,43 @@ var Papelera = (function () {
     }
   }
 
+  /* ---------- un asunto del ARCHIVO (fila 136, docs/PLAZO-DE-CONSERVACION.md) ----------
+
+     Para los que han cumplido su plazo de conservación (js/conservacion.js):
+     la carpeta entera va a la papelera, con su _ficha.json dentro, y se
+     apunta de dónde venía (categoría, tercero, ruta) para poder
+     devolverla a su sitio. `entrada` es la del índice del ARCHIVO. */
+  async function mandarArchivado(entrada) {
+    var sitio = window.IndiceArchivo ? await IndiceArchivo.resolverHandle(entrada) : null;
+    if (!sitio) throw new Error('No encuentro su carpeta en el ARCHIVO.');
+    var pap = await carpetaPapelera();
+    var nombreSub = marcaDeTiempo() + ' ' + entrada.nombre;
+    var ficha = {
+      id: nuevoId(), clase: 'archivado', nombre: entrada.nombre, carpeta: nombreSub,
+      origen: { categoria: entrada.categoria || '', tercero: entrada.tercero || '',
+                ruta: entrada.ruta || '', sueltoEn: entrada.sueltoEn || '' },
+      datos: { entrada: JSON.parse(JSON.stringify(entrada)) },
+      quien: quienSoy(), cuando: U.ahora()
+    };
+    await cambiar(function (l) { l.unshift(ficha); return l; });
+    try {
+      await Carpetas.trasladar(sitio.padre, entrada.nombre, pap, nombreSub);
+    } catch (e) {
+      try { await cambiar(function (l) { return l.filter(function (x) { return x.id !== ficha.id; }); }); }
+      catch (e2) { /* se queda un apunte sin carpeta: la papelera lo enseña igual y se puede quitar */ }
+      throw e;
+    }
+    try {
+      await IndiceArchivo.quitarEntrada(entrada.nombre);
+    } catch (e3) {
+      U.accesorio('El asunto está en la papelera, pero no he podido quitarlo del índice del ARCHIVO. ' +
+        'Pulsa "Reconstruir el índice"', e3);
+    }
+    if (App.E.listaArchivo) {
+      App.E.listaArchivo = App.E.listaArchivo.filter(function (a) { return a.nombre !== entrada.nombre; });
+    }
+  }
+
   /* ---------- borrar un documento (de un asunto o suelto) ---------- */
 
   async function mandarDocumentoDeAsunto(a, nombreFichero) {
@@ -242,6 +279,7 @@ var Papelera = (function () {
     mandarDocumentoDeAsunto: mandarDocumentoDeAsunto,
     mandarSuelto: mandarSuelto,
     mandarAsunto: mandarAsunto,
+    mandarArchivado: mandarArchivado,
     mandarDato: mandarDato,
     _interno: I
   };

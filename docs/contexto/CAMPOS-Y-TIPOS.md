@@ -219,6 +219,13 @@ buscador y «Qué me toca». La casilla vive en «Datos del tipo», debajo de «
 (`Reservados.filaDeTipo`, `js/reservados.js`). Todo lo demás, en «Asuntos reservados» de
 `docs/contexto/ASUNTOS.md`.
 
+### Plazo de conservación del tipo (25-sep-2026, fila 136)
+
+«Conservar ___ años después de archivar» (`conservarAnios` en `tipos.json`), en «Datos del tipo»,
+debajo de «Reservado» (`Conservacion.filaDeTipo`, `js/conservacion.js`), con el enlace a las
+tablas de valoración de la Junta. El aviso, en «El plazo de conservación» de
+`docs/contexto/ASUNTOS-ARCHIVO.md`.
+
 ### Ajustes plegado (24-sep-2026, fila 105, docs/AJUSTES-PLEGADO.md)
 
 Todo lo nuevo vive en `js/ajustes-plegado.js` (`AjustesPlegado`); `js/ajustes-tipo.js` solo llama

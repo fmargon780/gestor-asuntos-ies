@@ -66,7 +66,7 @@
   }
 
   var ICONOS = {
-    documento: '📄', suelto: '📄', asunto: '📁', tipo: '📋', estado: '📋',
+    documento: '📄', suelto: '📄', asunto: '📁', archivado: '📁', tipo: '📋', estado: '📋',
     'tipo-documento': '📋', 'campo-propio': '📋', tercero: '📋', 'nota-tablon': '📋', grupo: '👥'
   };
 
@@ -74,6 +74,7 @@
     if (ficha.clase === 'documento') return 'Documento de ' + ((ficha.origen && ficha.origen.asunto) || '?');
     if (ficha.clase === 'suelto') return 'Documento suelto';
     if (ficha.clase === 'asunto') return 'Asunto abierto';
+    if (ficha.clase === 'archivado') return 'Asunto del ARCHIVO (plazo de conservación cumplido)';
     if (ficha.clase === 'tipo') return 'Tipo de asunto';
     if (ficha.clase === 'estado') return 'Estado del asunto';
     if (ficha.clase === 'tipo-documento') return 'Tipo de documento';

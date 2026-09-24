@@ -5,6 +5,21 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 136: cuánto tiempo se guarda cada asunto
+
+`docs/PLAZO-DE-CONSERVACION.md`. La ley de protección de datos pide no guardar datos personales más de
+lo necesario: cada tipo de asunto puede llevar sus años de conservación, y la aplicación avisa de
+los archivados que los han cumplido. Nunca borra sola. Decisiones:
+
+- «Mandar a la papelera» un archivado es una clase nueva de la papelera (`archivado`): la carpeta
+  entera va dentro, y «Devolver» la lleva a su sitio del ARCHIVO (categoría y tercero, o donde
+  estuviera suelta) y a su índice.
+- «Conservar más tiempo…» cuenta los años desde hoy, no desde el plazo viejo.
+- Un tipo sin plazo no avisa nunca, aunque algún asunto suyo tenga `conservarHasta`.
+- El índice del ARCHIVO guarda `archivadoEl` y `conservarHasta` solo si la ficha los trae: sin
+  subir su versión ni reconstruirlo. Un archivado de antes sin fecha de cierre usa la de su nombre,
+  marcada como aproximada.
+
 ## 25-sep-2026 — Fila 135: asuntos reservados
 
 `docs/ASUNTOS-RESERVADOS.md`. Un expediente disciplinario o de salud ya no se ve sin querer: sale con

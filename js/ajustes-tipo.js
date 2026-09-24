@@ -62,6 +62,8 @@ function construirSeccionDatos(tipo) {
   if (window.TiposOrgano) b.cuerpo.appendChild(TiposOrgano.filaDeTipo(tipo));
   /* «Reservado» (fila 135, js/reservados.js). */
   if (window.Reservados) b.cuerpo.appendChild(Reservados.filaDeTipo(tipo));
+  /* «Conservar ___ años después de archivar» (fila 136, js/conservacion.js). */
+  if (window.Conservacion) b.cuerpo.appendChild(Conservacion.filaDeTipo(tipo));
   var cambiar = document.createElement('button');
   cambiar.type = 'button';
   cambiar.className = 'boton';

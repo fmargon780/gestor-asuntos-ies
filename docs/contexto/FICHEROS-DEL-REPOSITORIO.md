@@ -20,6 +20,7 @@ de `App` va después del fichero que lo define.
 | `css/tipo-al-vuelo.css` | El botón y el panel de "+ Crear tipo nuevo" en Nuevo asunto (fila 128) |
 | `css/tipos-organo.css` | Los rótulos por órgano de la parrilla de tipos y el bloque «Quién encarga cada tipo» (fila 134) |
 | `css/reservados.css` | El candado, la tarjeta tapada y «Mostrar reservados» (fila 135) |
+| `css/conservacion.css` | El campo de años del tipo y el bloque «Plazo de conservación cumplido» (fila 136) |
 | `css/copiar-nie.css` | Los estilos de `js/copiar.js` (nombre viejo del módulo) |
 | `js/util.js` | Utilidades comunes (fechas, avisos, preguntar, escapar). Los nombres parecidos están en `js/util-parecidos.js` y copiar/menú/conservar lo escrito en `js/util-pantalla.js` (fila 133). `U.mensajeDeError(e)` traduce al castellano los errores del navegador (`NotFoundError` y compañía). `U.envolver`/`U.envolturasAplicadas`/`U.envolturasFallidas` (fila 70) apuntan las envolturas de la aplicación. `U.nuevoId`/`U.fechaCorta` (fila 71) crean identificadores e imprimen fechas cortas |
 | `js/util-pantalla.js` | Ayudas de pantalla: conservar lo escrito al repintar (U.conservandoLoEscrito), el menú de tres puntos (U.menuDeAcciones) y copiar al portapapeles (U.copiar) (fila 133, sacado de `js/util.js`) |
@@ -163,6 +164,7 @@ de `App` va después del fichero que lo define.
 | `js/visor.js` | El panel de la derecha para ver un documento (`con-visor`); marcador y acciones opcionales para que quien lo abre sepa qué se está viendo |
 | `js/tipos-organo.js` | Quién encarga cada tipo (`TiposOrgano`, fila 134): el dato `organo` de `tipos.json`, su desplegable en la pantalla de un tipo, el bloque de Ajustes «Quién encarga cada tipo», la parrilla agrupada de Nuevo asunto, el filtro «Lo encarga» y lo que usa Cuentas. Antes de `js/tipos-buscador.js` |
 | `js/reservados.js` | Los asuntos reservados (`Reservados`, fila 135): la única regla (`es`), la tarjeta tapada, lo que se deja buscar, «Mostrar reservados» (solo en la sesión), el candado y el menú de la ficha, la casilla del tipo |
+| `js/conservacion.js` | El plazo de conservación (`Conservacion`, fila 136): el campo del tipo, qué archivados lo han cumplido (del índice del ARCHIVO), el aviso al entrar (una vez al día) y el bloque de Mantenimiento con «Mandar a la papelera» y «Conservar más tiempo…». Nunca borra solo. Después de `js/puente.js` |
 | `js/tipos-buscador.js` | Buscar el tipo de asunto por letras, y los más usados arriba. Al final de `aplicar()` agrupa por órgano (`TiposOrgano.agruparParrilla`, fila 134) y llama a `TipoAlVuelo.repintar()` si existe (fila 128): puntos enganchados, no envolturas |
 | `js/tipo-al-vuelo.js` | "+ Crear tipo nuevo" sin salir de Nuevo asunto (fila 128, `docs/TIPO-DESDE-EL-ASUNTO.md`): el botón (destacado bajo el buscador con texto escrito, discreto al final de la parrilla sin texto) y el panel de cuatro datos (nombre, nombre corto, categoría y, desde la fila 134, quién lo encarga). Guarda con `App.crearTipo` y deja elegido con `App.marcarTipoElegido` |
 | `js/via-contacto.js` | Los teléfonos y correos del tercero, como botones |
@@ -223,7 +225,7 @@ de `App` va después del fichero que lo define.
 | `css/personas.css` | Personas y empresas (fila 125): la ficha fija al bajar, la tarjeta marcada, las tarjetas de «Familias» y el bloque «Antiguos (N)» |
 | `css/estado-hito.css` | La marca del hito actual (`.marca-hito`) y «Esperando a…» (`.marca-esperando`), en la tarjeta y en la ficha (fila 129) |
 | `js/dni.js` | El DNI del alumnado, el aviso de que falta y la búsqueda por DNI |
-| `js/papelera.js` | Borrar con papelera: mandar, devolver, borrar del todo y el bloque de Ajustes |
+| `js/papelera.js` | Borrar con papelera: mandar (también un asunto del ARCHIVO, `mandarArchivado`, fila 136), devolver, borrar del todo y el bloque de Ajustes |
 | `js/papelera-ajustes.js` | El bloque «Papelera» de Ajustes: cuánto ocupa, cuánto hace, cada fila y sus botones (fila 133, sacado de `js/papelera.js`) |
 | `js/papelera-devolver.js` | Devolver a su sitio lo que está en la papelera, y borrarlo del todo (fila 133, sacado de `js/papelera.js`) |
 | `css/papelera.css` | El bloque de la papelera en Ajustes, y su icono por clase |
@@ -302,6 +304,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/arreglos-por-dentro.mjs` | Prueba (sin navegador, fila 132): la caché de terceros se olvida al cambiar la fecha de un CSV, no queda código de los estados escritos a mano, las cabeceras de `vercel.json`, pdf.js 4.10.38 y la regla común de destinatarios |
 | `pruebas/quien-encarga-cada-tipo.mjs` | Prueba (navegador, fila 134): un tipo sin órgano es «Sin asignar», asignarlo en Ajustes, en la pantalla del tipo y al crearlo desde Nuevo asunto lo guarda en `tipos.json`, la parrilla agrupa, el filtro «Lo encarga» filtra y Cuentas suma por órgano |
 | `pruebas/asuntos-reservados.mjs` | Prueba (navegador, fila 135): tipo reservado → tarjeta tapada; `reservado: false` → entera; no sale por una nota, sí por el nombre; «Mostrar reservados» destapa y no se recuerda; marcar desde la ficha; «Reservado» en Cuentas |
+| `pruebas/plazo-de-conservacion.mjs` | Prueba (navegador, fila 136): tipo con 4 años y archivado de 2021 → avisa; `conservarHasta` futuro o tipo sin plazo → no; sin fecha de cierre, aproximado; «Conservar más tiempo…» y «Mandar a la papelera» (y devolverlo a su sitio del ARCHIVO) |
 | `pruebas/genero.mjs` | Prueba (navegador de verdad, fila 111, 24-sep-2026): alumna/alumno/sin dato, «El/La Director/a» con firmante mujer, marcas `:tutor1`, lo que no se toca (fechas, y/o, registros, webs), `faltan` al rellenar, forma partida en el Word, sexos del RegAlum/ficha/cargo y una plantilla del centro limpia |
 | `pruebas/cabecera-compacta.mjs` | Prueba (navegador de verdad, fila 112, 24-sep-2026): cabecera del asunto en dos líneas, sin volver repetidos ni línea de ruta, «GUION DEL HITO» a 250 px o menos a 1600×920, la pestaña abierta vuelve atrás, y sin desplazamiento lateral a 800 px |
 | `pruebas/guias-mapa.mjs` | Prueba (sin navegador, fila 113, 24-sep-2026): `GuiasMapa.html` con una guía de dos niveles de preguntas, sin y con hitos (camino resaltado, ramas en gris, «Fuera de la guía»), y `GuiasNiveles.caminoHasta` |

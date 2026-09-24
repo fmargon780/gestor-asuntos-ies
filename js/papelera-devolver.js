@@ -22,6 +22,7 @@
         case 'documento': return await devolverDocumento(ficha);
         case 'suelto': return await devolverSuelto(ficha);
         case 'asunto': return await devolverAsunto(ficha);
+        case 'archivado': return await devolverArchivado(ficha);
         case 'tipo': return await devolverTipo(ficha);
         case 'estado': return await devolverEstado(ficha);
         case 'tipo-documento': return await devolverTipoDocumento(ficha);
@@ -115,6 +116,36 @@
     /* Los hitos vuelven con el asunto (fila 62,
        docs/RENOMBRAR-SIN-PERDER-HITOS.md). */
     if (ficha.hitos && window.AsuntoRenombrar) await AsuntoRenombrar.restaurar(ficha.nombre, ficha.hitos);
+    await quitarDeIndice(ficha.id);
+    return { ok: true };
+  }
+
+  /* Un asunto del ARCHIVO (fila 136): vuelve a su sitio del ARCHIVO
+     (categoría y tercero, o la ruta donde estaba suelto) y a su índice. */
+  async function devolverArchivado(ficha) {
+    var o = ficha.origen || {};
+    if (!App.E.archivo) return { ok: false, motivo: 'No está señalada la carpeta del ARCHIVO.' };
+    var padre;
+    if (o.sueltoEn === 'bajo la categoría') {
+      padre = await Carpetas.crear(App.E.archivo, o.categoria);
+    } else if (o.sueltoEn) {
+      padre = App.E.archivo;
+      var trozos = String(o.ruta || '').split(' / ').filter(Boolean);
+      for (var i = 0; i < trozos.length; i++) padre = await Carpetas.crear(padre, trozos[i]);
+    } else {
+      if (!o.categoria || !o.tercero) return { ok: false, motivo: 'No sé dónde estaba en el ARCHIVO.' };
+      padre = await Carpetas.crear(await Carpetas.crear(App.E.archivo, o.categoria), o.tercero);
+    }
+    if (await Carpetas.existe(padre, ficha.nombre)) {
+      return { ok: false, motivo: 'Ya hay un asunto llamado "' + ficha.nombre + '" en su sitio del ARCHIVO.' };
+    }
+    var pap = await I.carpetaPapelera();
+    await Carpetas.trasladar(pap, ficha.carpeta, padre, ficha.nombre);
+    var entrada = ficha.datos && ficha.datos.entrada;
+    if (entrada && window.IndiceArchivo) {
+      try { await IndiceArchivo.anadirEntrada(entrada); }
+      catch (e) { U.accesorio('Devuelto, pero no he podido apuntarlo en el índice del ARCHIVO', e); }
+    }
     await quitarDeIndice(ficha.id);
     return { ok: true };
   }
