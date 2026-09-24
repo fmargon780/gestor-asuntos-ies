@@ -253,18 +253,27 @@ var Docx = (function () {
      dentro de un único segmento (el último de los que toca), sin
      tocar el texto de los segmentos que no forman parte de ningún
      hueco. Muta `segmentos` en el sitio. */
+  /* Fila 111: también las formas dobles («alumno/a», «El/La:firmante»),
+     que Word parte igual que los huecos y js/genero.js necesita enteras. */
+  var RE_DOBLE = /[A-Za-zÁÉÍÓÚÜÑáéíóúüñª.]+\/[A-Za-zÁÉÍÓÚÜÑáéíóúüñª.]+(?: la)?(?::[a-z0-9]+)?/g;
+
   function repararHuecosPartidos(segmentos) {
-    var offsets = [];
-    var acc = 0;
-    segmentos.forEach(function (s) { offsets.push(acc); acc += s.texto.length; });
     var conjunto = segmentos.map(function (s) { return s.texto; }).join('');
 
     var huecos = [];
     var m;
     RE_HUECO.lastIndex = 0;
     while ((m = RE_HUECO.exec(conjunto))) huecos.push({ ini: m.index, fin: m.index + m[0].length });
+    RE_DOBLE.lastIndex = 0;
+    while ((m = RE_DOBLE.exec(conjunto))) {
+      var d = { ini: m.index, fin: m.index + m[0].length };
+      if (!huecos.some(function (h) { return d.ini < h.fin && h.ini < d.fin; })) huecos.push(d);
+    }
 
     huecos.forEach(function (h) {
+      /* Las posiciones de cada trozo, de nuevo: el hueco anterior pudo mover texto. */
+      var offsets = [], acc = 0;
+      segmentos.forEach(function (s) { offsets.push(acc); acc += s.texto.length; });
       var iInicio = -1, iFin = -1;
       for (var i = 0; i < segmentos.length; i++) {
         var s0 = offsets[i], s1 = s0 + segmentos[i].texto.length;

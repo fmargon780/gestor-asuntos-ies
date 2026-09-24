@@ -87,6 +87,34 @@ El gemelo en papel de las de correo (16-sep-2026, `docs/PLANTILLAS-DE-DOCUMENTO.
 Se comprueba con `pruebas/plantillas-documento.mjs` (jsdom, sin navegador: construye un `.docx` de
 mentira a mano, con su propio escritor de ZIP, independiente del de `js/docx.js`).
 
+### El masculino o el femenino, solo (24-sep-2026, fila 111, `docs/GENERO-EN-PLANTILLAS.md`)
+
+Las plantillas (Word, correo, Séneca) se escriben con las formas dobles de siempre: «el/la
+alumno/a», «D./Dña.», «interesado/a». Al rellenar queda solo la que toca. Un solo sitio,
+`js/genero.js` (`Genero.resolver(texto, sexos)`, pura), llamado desde `Plantillas.rellenar` **antes**
+de sustituir los huecos (así no toca los datos que entran) y solo si `valores.sexos` existe (la vista
+previa de Ajustes no lo trae y no cambia nada).
+
+- **Qué reconoce**: pares conocidos (el/la, los/las, del/de la, al/a la, un/una, D./Dña., Don/Doña,
+  Sr./Sra., padre/madre, él/ella, este/esta, hijo/hija…) y palabras terminadas en «/a» o «/as»
+  (alumno/a, profesor/a, jefe/a, alumnos/as, profesores/as). Mayúscula inicial respetada. **No
+  toca**: fechas, «y/o», fracciones, registros, direcciones web, correos, rutas ni lo que está entre
+  llaves.
+- **De quién**: por defecto, del tercero. Para otra persona, la marca pegada detrás: `:tutor1`,
+  `:tutor2`, `:firmante`, `:vistobueno` («hijo/a:tutor1»). Un cargo con barra («Director/a»,
+  «Secretario/a», «Jefe/a»…) y el artículo justo delante son de quien firma sin marcar nada. El
+  `{{TRATAMIENTO FIRMANTE}}` con barra se resuelve en `valoresDeAsunto` con el sexo del ocupante.
+- **Sin el dato**: la forma se queda tal cual, con su barra (nunca una por defecto), y entra en
+  `faltan` diciendo dónde ponerlo (`Genero.dondePonerlo`): sale en el aviso ámbar de siempre.
+- **De dónde sale el sexo** (`Genero.sexosDeAsunto`): alumno y tutores, la columna «Sexo» del
+  RegAlum (`Datos.tutoresDe`); los demás, la casilla «Sexo, para las plantillas» de «Datos y
+  contacto» (no sale si el fichero ya lo trae, ni para empresas), guardada en `_GESTOR/sexos.json`
+  por documento o nombre; cargos, el campo `sexo` de cada ocupante (`cargos.json`, desplegable en
+  «Cargos del centro») o, si no, lo que diga el tratamiento («La Directora» → mujer).
+- **En el Word**, `repararHuecosPartidos` junta también las formas dobles partidas en varios trozos.
+
+Se comprueba con `pruebas/genero.mjs`.
+
 ### Los cargos del centro, quién firma y el membrete (20-sep-2026, fila 81, `docs/FIRMANTES-Y-MEMBRETE.md`)
 
 Un documento generado sale ahora con la firma de quien ocupaba el cargo **en la fecha del

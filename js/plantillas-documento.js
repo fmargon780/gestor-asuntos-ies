@@ -359,6 +359,14 @@
       fila.appendChild(b);
       caja.appendChild(fila);
     });
+    /* Fila 111 (js/genero.js): las formas dobles, y de quién son. */
+    var genero = document.createElement('p');
+    genero.className = 'suave pd-hueco-genero';
+    genero.innerHTML = 'Masculino o femenino: escribe las dos formas con barra (<code>el/la alumno/a</code>, ' +
+      '<code>D./Dña.</code>) y sale solo la que toca. Son de la persona del asunto; para otra, pega detrás ' +
+      '<code>:tutor1</code>, <code>:tutor2</code>, <code>:firmante</code> o <code>:vistobueno</code> ' +
+      '(<code>hijo/a:tutor1</code>). «Director/a» y los demás cargos ya son de quien firma.';
+    caja.appendChild(genero);
   }
 
   function copiarHueco(texto, boton) {

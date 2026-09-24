@@ -5,6 +5,26 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 111: el masculino o el femenino, solo, en las plantillas
+
+`docs/GENERO-EN-PLANTILLAS.md`. Las plantillas se escriben con «el/la alumno/a», «D./Dña.»,
+«interesado/a»… y al generar el Word, el correo o el mensaje de Séneca sale solo la forma que toca
+según el sexo de cada persona. Detalle en `docs/contexto/DOCUMENTOS-PDF.md`.
+
+- Decisión: sin el dato, la forma se queda con su barra (nunca una por defecto) y el aviso ámbar dice
+  de quién falta y dónde ponerlo.
+- Decisión: para otra persona, una marca pegada detrás (`hijo/a:tutor1`, `:tutor2`, `:firmante`,
+  `:vistobueno`), fácil de escribir en Word. Los cargos con barra («Director/a») y su artículo son
+  de quien firma sin marcar nada.
+- Decisión: solo se tocan pares conocidos y terminaciones «/a», «/as»; fechas, «y/o», registros y
+  webs se quedan como están. Se resuelve antes de meter los datos, para no tocar lo que traen.
+- El sexo: columna «Sexo» del RegAlum (alumno y tutores); casilla nueva en «Datos y contacto»
+  (`_GESTOR/sexos.json`); y desplegable nuevo en cada persona de «Cargos del centro».
+- En el Word las formas dobles también llegan partidas en trozos: se juntan como los huecos.
+
+Prueba nueva `pruebas/genero.mjs` (nombres inventados). Batería completa en verde.
+Versión publicada `App.VERSION`: `24-sep-2026 · 05:00`.
+
 ## 24-sep-2026 — Fila 110: tablas de datos y el certificado de función tutorial
 
 `docs/TABLAS-DE-DATOS.md`. Francisco pasaba a mano a Excel el PDF «Relación de funciones

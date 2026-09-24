@@ -40,6 +40,7 @@ var Cargos = (function () {
     return {
       id: (o && o.id) || nuevoId(),
       persona: String((o && o.persona) || ''),
+      sexo: (o && (o.sexo === 'H' || o.sexo === 'M')) ? o.sexo : '',   /* fila 111: 'H', 'M' o '' */
       desde: String((o && o.desde) || ''),
       hasta: String((o && o.hasta) || '')
     };
@@ -113,7 +114,7 @@ var Cargos = (function () {
     if (!cargo) return null;
     var o = enFechaDeLista(cargo.ocupantes, fecha);
     if (!o) return null;
-    return { persona: o.persona, tratamiento: cargo.tratamiento, nombre: cargo.nombre };
+    return { persona: o.persona, sexo: o.sexo, tratamiento: cargo.tratamiento, nombre: cargo.nombre };
   }
 
   async function vigente(idCargo) {
@@ -171,12 +172,12 @@ var Cargos = (function () {
     });
   }
 
-  async function anadirOcupante(idCargo, persona, desde) {
+  async function anadirOcupante(idCargo, persona, desde, sexo) {
     var creado = null;
     await cambiar(function (d) {
       var c = buscar(d, idCargo);
       if (!c) return d;
-      creado = normalizarOcupante({ persona: persona, desde: desde, hasta: '' });
+      creado = normalizarOcupante({ persona: persona, sexo: sexo, desde: desde, hasta: '' });
       c.ocupantes.push(creado);
       return d;
     });
@@ -193,12 +194,12 @@ var Cargos = (function () {
     });
   }
 
-  async function editarOcupante(idCargo, idOcupante, persona, desde, hasta) {
+  async function editarOcupante(idCargo, idOcupante, persona, desde, hasta, sexo) {
     await cambiar(function (d) {
       var c = buscar(d, idCargo);
       if (!c) return d;
       var o = c.ocupantes.filter(function (x) { return x.id === idOcupante; })[0];
-      if (o) { o.persona = persona; o.desde = desde; o.hasta = hasta; }
+      if (o) { o.persona = persona; o.desde = desde; o.hasta = hasta; if (sexo !== undefined) o.sexo = sexo; }
       return d;
     });
   }
@@ -245,18 +246,24 @@ window.Cargos = Cargos;
     var hasta = document.createElement('input');
     hasta.type = 'date'; hasta.className = 'campo campo-plazo'; hasta.value = o.hasta;
     hasta.title = 'Vacío: sigue en el cargo';
+    var sexo = document.createElement('select');   /* fila 111: para «El/La Director/a» */
+    sexo.className = 'campo'; sexo.title = 'Sexo, para las plantillas';
+    sexo.innerHTML = '<option value="">Sexo…</option><option value="H">Hombre</option><option value="M">Mujer</option>';
+    sexo.value = o.sexo || '';
 
     async function guardarCambio() {
       try {
-        await Cargos.editarOcupante(cargo.id, o.id, nombre.value.trim(), desde.value, hasta.value);
+        await Cargos.editarOcupante(cargo.id, o.id, nombre.value.trim(), desde.value, hasta.value, sexo.value);
         alGuardar();
       } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
     }
     nombre.onchange = guardarCambio;
     desde.onchange = guardarCambio;
     hasta.onchange = guardarCambio;
+    sexo.onchange = guardarCambio;
 
     fila.appendChild(nombre);
+    fila.appendChild(sexo);
     fila.appendChild(desde);
     fila.appendChild(hasta);
     return fila;
@@ -294,6 +301,8 @@ window.Cargos = Cargos;
     anadir.type = 'button'; anadir.className = 'boton'; anadir.textContent = 'Añadir persona';
     anadir.onclick = async function () {
       var cuerpo = '<label class="etiqueta">Nombre</label><input id="cargo-nueva-persona" class="campo">' +
+        '<label class="etiqueta">Sexo</label><select id="cargo-nueva-sexo" class="campo"><option value="">Sin decir</option>' +
+        '<option value="H">Hombre</option><option value="M">Mujer</option></select>' +
         '<label class="etiqueta">Desde</label><input id="cargo-nueva-desde" type="date" class="campo" value="' +
         U.escapar(vigente ? '' : hoy()) + '">';
       var ok = await U.preguntar('Añadir a ' + cargo.nombre, cuerpo, 'Añadir');
@@ -306,7 +315,7 @@ window.Cargos = Cargos;
           var ayer = new Date(desde); ayer.setDate(ayer.getDate() - 1);
           await Cargos.cerrarOcupante(cargo.id, vigente.id, ayer.toISOString().slice(0, 10));
         }
-        await Cargos.anadirOcupante(cargo.id, persona, desde);
+        await Cargos.anadirOcupante(cargo.id, persona, desde, $('cargo-nueva-sexo').value);
         U.aviso('Persona añadida.', 'bueno');
         alRefrescar();
       } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }

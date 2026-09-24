@@ -97,12 +97,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 62, 64 a 75, 77 a 110 están **HECHAS**. Sus documentos siguen en
+Las filas 1 a 62, 64 a 75, 77 a 111 están **HECHAS**. Sus documentos siguen en
 `docs/`, y el detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 111 | `docs/GENERO-EN-PLANTILLAS.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 112 | `docs/CABECERA-COMPACTA.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 113 | `docs/MAPA-DE-LA-GUIA.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
@@ -116,9 +115,7 @@ y dentro de un asunto, con el camino elegido resaltado.
 líneas, sin los botones de volver repetidos ni la línea de ruta, y el hito abierto empezando
 casi arriba del todo.
 
-**La fila 111 se apuntó el 24-sep-2026**, cerrada con Francisco: las plantillas se escriben
-con las formas dobles de siempre («el/la alumno/a») y la app deja sola la que toca según el sexo
-de la persona; sin dato, se quedan con la barra.
+**La fila 111 está HECHA** (24-sep-2026): `docs/GENERO-EN-PLANTILLAS.md`. Las plantillas se escriben con «el/la alumno/a», «D./Dña.»… y sale solo la forma que toca según el sexo de cada persona (RegAlum, casilla nueva en «Datos y contacto», desplegable en cada persona de los cargos); sin el dato, se queda con la barra y aviso ámbar. Marca para otra persona: `hijo/a:tutor1`, `:tutor2`, `:firmante`, `:vistobueno`. Versión publicada `App.VERSION`: `24-sep-2026 · 05:00`.
 
 **La fila 110 está HECHA** (24-sep-2026): `docs/TABLAS-DE-DATOS.md`. Tablas de datos (el PDF de funciones tutoriales de Séneca y los CSV/Excel de `datos/Tablas`) unidas por DNI, huecos `{{ESPECIALIDAD}}`, `{{TABLA TUTORIAS}}`, `{{DATO …}}` y `{{TABLA …}}`, y plantilla «Certificado de función tutorial» (`docs/contexto/TABLAS-DE-DATOS.md`). Versión publicada `App.VERSION`: `24-sep-2026 · 04:51`.
 
