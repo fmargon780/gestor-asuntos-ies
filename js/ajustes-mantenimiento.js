@@ -29,8 +29,12 @@ App.pintarCopias = async function () {
     return;
   }
 
+  /* La fecha de la última copia de todas, para el resumen del título
+     (fila 105, js/ajustes-plegado.js). */
+  App.E.ultimaCopia = '';
   Copias.FICHEROS.forEach(function (nombre) {
     var copias = todas[nombre] || [];
+    if (copias.length && copias[copias.length - 1].fecha > App.E.ultimaCopia) App.E.ultimaCopia = copias[copias.length - 1].fecha;
     var f = document.createElement('div');
     f.className = 'fila-tipo';
 
@@ -98,4 +102,7 @@ App.pintarAjustesMantenimiento = async function () {
   if (typeof App.pintarContactoGuardado === 'function') await App.pintarContactoGuardado();
   if (typeof App.pintarPapelera === 'function') await App.pintarPapelera();
   if (typeof App.pintarEnvolturas === 'function') App.pintarEnvolturas();
+  /* Fila 105: los avisos de fallo arriba (solo si hay), Herramientas
+     al final y el resumen de cada título. */
+  if (window.AjustesPlegado) AjustesPlegado.ordenarMantenimiento();
 };

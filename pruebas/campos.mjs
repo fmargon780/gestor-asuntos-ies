@@ -33,6 +33,17 @@ const errores = [];
 pagina.on('console', m => { if (m.type() === 'error' && m.text().indexOf('favicon') === -1) errores.push(m.text()); });
 pagina.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
 await pagina.addInitScript(preparacion);
+
+/* Fila 105 (docs/AJUSTES-PLEGADO.md): Ajustes nace plegado; esta prueba
+   trabaja con las secciones de la pantalla de un tipo ya desplegadas. */
+await pagina.addInitScript(() => {
+  try {
+    const abiertas = {};
+    ['datos', 'campos', 'pasos', 'correo', 'word', 'plazo', 'palabras', 'repite']
+      .forEach((s) => { abiertas['tipo:' + s] = true; });
+    window.localStorage.setItem('gestor-ajustes-plegado', JSON.stringify(abiertas));
+  } catch (e) { /* sin localStorage, se queda plegado */ }
+});
 await pagina.goto(process.env.DIRECCION || 'http://localhost:8123/index.html');
 
 let fallos = 0;

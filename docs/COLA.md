@@ -97,12 +97,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 62, 64 a 75, 77 a 104 están **HECHAS**. Sus documentos siguen en
+Las filas 1 a 62, 64 a 75, 77 a 105 están **HECHAS**. Sus documentos siguen en
 `docs/`, y el detalle de cada una en `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 105 | `docs/AJUSTES-PLEGADO.md` | EN CURSO (24-sep-2026) |
 | 106 | `docs/LO-PIDE-EN-LA-CABECERA.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 107 | `docs/FICHA-EN-TARJETAS.md` | PENDIENTE (apuntada 24-sep-2026). Después de la 106 |
 | 108 | `docs/CONTACTO-EN-TARJETAS.md` | PENDIENTE (apuntada 24-sep-2026) |
@@ -138,8 +137,9 @@ prevista para cuando los hitos llevaran un mes en uso.
 vez en la cabecera de la ficha, arriba, con la relación entre paréntesis; se quita la línea gris
 de debajo de "El encargo".
 
-**La fila 105 se apuntó el 23-sep-2026**, cerrada con Francisco: en Ajustes todo nace plegado,
-con un resumen en cada título, y los avisos de fallo de Mantenimiento solo salen cuando hay uno.
+**La fila 105 está HECHA** (24-sep-2026): `docs/AJUSTES-PLEGADO.md`. En Ajustes todo nace
+plegado, con un resumen en cada título (`js/ajustes-plegado.js`), y los avisos de fallo de
+Mantenimiento solo salen cuando hay uno. Versión publicada `App.VERSION`: `24-sep-2026 · 03:25`.
 
 **La fila 104 está HECHA** (23-sep-2026): `docs/ESTADO-POR-EL-HITO.md`. Los dos paneles de
 Asuntos abiertos pasan a ser "Pendiente de Administración" y "Pendiente de terceros", y el asunto

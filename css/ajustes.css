@@ -293,3 +293,26 @@
 
 .huecos-vacio { padding: 10px 8px; color: var(--tinta-suave); font-size: 13.5px; }
 .huecos-pie { margin: 0; padding: 0 4px 2px; font-size: 12px; color: var(--tinta-suave); }
+
+/* ============================================================
+   Ajustes plegado (24-sep-2026, fila 105, docs/AJUSTES-PLEGADO.md):
+   todo nace plegado y el título dice lo que hay dentro. El resumen va
+   justo detrás del nombre; en ámbar si dentro hay un aviso.
+   ============================================================ */
+.bloque-resumen {
+  font-size: 13px; font-weight: 600; color: var(--tinta-suave, #44505c);
+  background: #eef2f6; border-radius: 10px; padding: 1px 9px;
+}
+.bloque-resumen-ambar {
+  color: #8a5a00; background: var(--ambar-fondo, #fff4d6);
+  border: 1px solid var(--ambar-linea, #e6b949);
+}
+/* Un aviso de fallo de Mantenimiento: arriba, desplegado y en ámbar. */
+.bloque-ajustes.bloque-con-fallo { border-color: var(--ambar-linea, #e6b949); background: #fffaf0; }
+
+/* La pantalla de un tipo: sus ocho secciones son ya bloques plegables,
+   así que pierden el relleno propio de cuando iban siempre abiertas. */
+details.tipo-asunto-seccion { padding: 0; margin: 0; }
+details.tipo-asunto-seccion .bloque-pie { display: inline; margin-bottom: 0; }
+/* "Herramientas" lleva dentro otros bloques plegables. */
+#herramientas-cuerpo > .bloque-ajustes { margin: 8px 0; }

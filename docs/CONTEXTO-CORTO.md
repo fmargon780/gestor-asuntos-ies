@@ -77,13 +77,11 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   de alta a mano.
 - Guías del procedimiento por tipo, con pasos y preguntas dentro de las respuestas, sin límite.
 - Panel lateral de lectura, y tablón de notas rápidas siempre visible.
-- Correo y mensaje de Séneca preparados (la app nunca envía nada); el ayudante de Séneca dice
-  por su nombre quién falta.
+- Correo y mensaje de Séneca preparados (la app nunca envía nada).
 - "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; con
   tercero reconocido, también sugiere meterlo en uno que ya existe («Meter aquí»). Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
-- Aspirantes a plaza dados de alta sin Nº de identificación escolar: al escribirlo, se renombran
-  solas las carpetas de sus asuntos abiertos.
+- Aspirantes sin Nº de identificación escolar: al escribirlo, se renombran sus carpetas abiertas.
 - Botón «Ruta» en la ficha: copia la ruta de su carpeta.
 - Ficha del tercero con "Datos y contacto" en una línea, cada dato con su copiar; ficha del
   asunto a tres columnas, con cabecera agrupada por el momento del trámite y menú de tres puntos.
@@ -92,7 +90,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Terceros relacionados con un asunto, con altas por grupo (unidad, nivel, grupo propio), que
   también sirven de destinatarios de un correo o de un mensaje de Séneca.
 - Parada al crear un asunto duplicado, y pantalla propia "Duplicados".
-- Ajustes con tres pestañas; pantalla propia de cada tipo, con sus ocho secciones a la vista.
+- Ajustes con tres pestañas y pantalla propia de cada tipo; todo plegado, con resumen en cada título; los avisos de fallo, solo con fallo.
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
 - Papelera: nada se borra del todo a la primera.
@@ -122,13 +120,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   clasificar; Ajustar tamaño deja libre la banda del sello de Séneca y de la firma del director.
 - "Lo pide": quién ha pedido la gestión, por qué vía y en qué fecha, con el correo ya puesto al
   preparar el cuadro de Correo.
-- Archivar o reabrir cuando el destino ya existe fusiona las dos carpetas sin perder nada; los
-  errores del navegador salen siempre traducidos al castellano. Archivar desde la ficha no se
-  confunde con "otro ordenador"; si Dropbox tropieza, se reintenta sola.
+- Archivar o reabrir sobre un destino que ya existe fusiona las carpetas; errores en castellano;
+  si Dropbox tropieza, se reintenta sola.
 - De la ficha de un asunto solo se sale al Volver, Editar, Archivar/Reabrir o Borrar; lo demás (guardar, hitos, comunicar...) se queda en su sitio.
 - Cabecera de cada pantalla fija al bajar y encogida sin temblar.
-- Renombrar, unir o borrar un asunto mueve también sus hitos y su señal de presencia; el registro
-  de asuntos siempre relee del disco antes de escribir.
 - Al archivar, la ficha del asunto baja a su propia carpeta (no se queda en `asuntos.json` para
   siempre); al reabrir, vuelve. Botón "Poner en orden las fichas del ARCHIVO" en Ajustes →
   Mantenimiento para los archivados de antes.
@@ -137,9 +132,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 ## 6. Reglas de código que no se pueden olvidar
 
 - El repositorio es la versión buena; Vercel publica solo. Un solo proyecto de Vercel.
-- **Permiso permanente de Francisco**: cuando el trabajo vaya por pull request (sesiones desde la
-  nube), Claude Code lo fusiona solo en cuanto esté en verde y sin conflictos. No hace falta
-  esperar a que Francisco lo haga a mano (ver la nota al final de `docs/COLA.md`).
+- **Permiso permanente de Francisco**: un pull request (sesiones desde la nube) lo fusiona Claude
+  Code solo, en verde y sin conflictos (nota al final de `docs/COLA.md`).
 - **Comprobar siempre lo publicado con `curl`**, nunca darla por hecha.
 - Vercel publica máximo 100 veces/día (gratuito): `vercel.json` salta los commits que solo tocan `docs/`, `pruebas/`, `.github/` o `.md`; máximo dos subidas por fila (regla 13).
 - Antes de colgar una función nueva de `App`, comprobar que el nombre no está cogido. Un solo cuadro de diálogo (`U.preguntar`): no abrir un segundo mientras el primero espera.

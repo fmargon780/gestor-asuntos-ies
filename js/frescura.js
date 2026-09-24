@@ -398,6 +398,8 @@
     if (!ajustes) return;
     var estado = await mirarElFichero();
     pintarPanel(estado);
+    /* Fila 105 (js/ajustes-plegado.js): si hay aviso, su bloque de Ajustes sube arriba. */
+    var d = $('bloque-frescura'); if (d) d.dataset.aviso = estado.falta ? 'falta' : (estado.dias > epocaDe(new Date()).dias ? estado.dias + ' días' : '');
   }
 
   async function arrancar() {
