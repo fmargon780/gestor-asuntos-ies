@@ -112,7 +112,7 @@ Las filas 1 a 75 y 77 a 130 están **HECHAS**. Sus documentos siguen en `docs/`,
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 131 | `docs/PLAZOS-BIEN-CONTADOS.md` (días hábiles, lectivos o naturales en cada plazo; festivos en Ajustes) | PENDIENTE |
+| 131 | `docs/PLAZOS-BIEN-CONTADOS.md` (días hábiles, lectivos o naturales en cada plazo; festivos en Ajustes) | EN CURSO (24-sep-2026) |
 | 132 | `docs/ARREGLOS-POR-DENTRO.md` (terceros que se releen, fuera los estados manuales, cabeceras de seguridad, pdf.js, una regla de destinatarios) | PENDIENTE |
 | 133 | `docs/PARTIR-FICHEROS-GRANDES.md` (los que pasan de 600 líneas, sin cambiar nada) | PENDIENTE |
 | 134 | `docs/QUIEN-ENCARGA-CADA-TIPO.md` (Secretaría, Dirección, Jefatura o Varios en cada tipo) | PENDIENTE |
