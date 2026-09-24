@@ -78,7 +78,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Guías del procedimiento por tipo, con preguntas dentro de las respuestas sin límite, y su mapa
   (dibujo de la guía entera; en un asunto, con el camino elegido resaltado).
 - Panel lateral de lectura, y tablón de notas rápidas siempre visible.
-- Correo y mensaje de Séneca preparados (la app nunca envía nada).
+- Correo y mensaje de Séneca: el mensaje se prepara; el correo de un asunto se envía de
+  verdad, con Apps Script y confirmación.
 - "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; con
   tercero reconocido, también sugiere meterlo en uno que ya existe («Meter aquí»). Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
@@ -96,7 +97,6 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
 - Papelera: nada se borra del todo a la primera.
-- Mandar documentos de un asunto por correo, con un borrador que deja Apps Script en Gmail.
 - Plantillas de correo y de Word por tipo de asunto, con huecos que se rellenan solos; textos del
   centro en `plantillas/` (botón en Mantenimiento). Salen con membrete, la firma de quien ocupaba
   el cargo en su fecha y «el/la alumno/a» en masculino o femenino según el sexo de cada persona.
@@ -118,7 +118,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   días). "Cuentas": asuntos por tipo, mes y quién los pidió. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena en el PDF solo los datos del centro.
 - Avisos de "fichas sin carpeta" (✕ que calla 7 días) y de la papelera vieja, en Asuntos abiertos.
-  Pulsar la tarjeta de un documento (Por clasificar, un asunto, correos, papelera) lo abre, sin botón.
+  Pulsar la tarjeta de un documento lo abre, sin botón.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
 - Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF, en la carpeta del asunto y en Por
   clasificar; Ajustar tamaño deja libre la banda del sello de Séneca y de la firma del director.
@@ -170,7 +170,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 ## 8. Qué falta
 
 - El compañero: entrar en `https://asuntos.fmargon.com`, señalar sus carpetas de nuevo (no se heredan) y coordinar tipos de asunto y estados.
-- Poner en marcha el script de Gmail (`g.educaand.es`): señalar `GESTOR-BANDEJA` en Ajustes y pegar `apps-script/gestor-correos.gs` en `script.google.com`.
+- Conectar el envío en Ajustes → Enviar correo (pegar script, publicar, pegar su URL).
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel y del tablón, tarjetas cortas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: membrete, Consejería, cargos y Provincia.
