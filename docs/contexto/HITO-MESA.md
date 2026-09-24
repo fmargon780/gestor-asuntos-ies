@@ -167,3 +167,9 @@ documento, quién y cuándo) o, si su paso no los tiene, a `guionPropio`. Los re
 en los ficheros, sin leerse; un hito del ARCHIVO que aún los traiga los enseña, para leer. El
 contenido del instituto (`datos-biblioteca/biblioteca-centro.json`) ya los trae como líneas del
 guion, y un modelo viejo se convierte al meterlo en una guía (`ReunirMigracion.pasoAGuion`).
+
+### Las notas de la mesa (25-sep-2026, fila 139)
+
+El bloque «Notas» de la mesa enseña las notas del asunto escritas desde este hito, y lo que se
+escribe ahí se guarda como nota del asunto con su etiqueta; debajo, «Historia», lo automático del
+hito. Ver «Una sola libreta de notas» en `docs/contexto/ASUNTOS.md`.

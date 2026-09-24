@@ -57,8 +57,10 @@ await pagina.evaluate(async () => {
      (si no, al entrar lee guias.json y escribe su marca, justo en medio
      de lo que se mide aquí). */
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
-  const f = await g.getFileHandle('reunir-migrado.json', { create: true });
-  const w = await f.createWritable(); await w.write('{}'); await w.close();
+  for (const marca of ['reunir-migrado.json', 'notas-migrado.json']) {   /* filas 138 y 139 */
+    const f = await g.getFileHandle(marca, { create: true });
+    const w = await f.createWritable(); await w.write('{}'); await w.close();
+  }
 });
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');

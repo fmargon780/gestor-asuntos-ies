@@ -22,14 +22,15 @@ window.HitosCambioDeTipo = (function () {
   /* Algo apuntado en un hito, o en cualquiera de los de sus ramas. */
   /* "En curso" solo no cuenta: la aplicación pone en curso el primero
      pendiente sola, al crear los hitos, sin que nadie haya hecho nada. */
-  function tieneAlgo(h) {
+  function tieneAlgo(h, conNotas) {
     if (h.estado === 'hecho') return true;
     if (h.notas && h.notas.length) return true;
+    if (conNotas && conNotas[h.id]) return true;   /* fila 139: sus notas, en el asunto */
     if (h.documentos && h.documentos.length) return true;
     if ((h.requisitos || []).some(function (r) { return r.hecho || r.valor || r.documento; })) return true;
     if (h.clase === 'decision') {
       if (h.elegida) return true;
-      return (h.opciones || []).some(function (o) { return (o.hitos || []).some(tieneAlgo); });
+      return (h.opciones || []).some(function (o) { return (o.hitos || []).some(function (x) { return tieneAlgo(x, conNotas); }); });
     }
     return false;
   }
@@ -40,11 +41,12 @@ window.HitosCambioDeTipo = (function () {
     var pasos = (window.GuiasDelCentro && GuiasDelCentro.pasosDe(tipoNuevo)) || [];
     var conservados = 0;
     var resultado = null;
+    var conNotas = window.NotasHito ? NotasHito.idsConNotas(clave) : {};   /* fila 139 */
     await Hitos.cambiar(function (d) {
       var entrada = d.porAsunto[clave] || { creados: U.hoyIso(), hitos: [] };
       var quedan = entrada.hitos.filter(function (h) {
         if (h.delTipoAnterior) return true;          /* de un cambio anterior: se queda */
-        if (!tieneAlgo(h)) return false;
+        if (!tieneAlgo(h, conNotas)) return false;
         h.estado = 'noaplica';
         h.delTipoAnterior = tipoViejo;
         conservados++;

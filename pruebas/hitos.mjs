@@ -367,11 +367,13 @@ await pagina.locator('#ficha-guia .hito[data-id="p3a1"] .hito-titulo').click();
 await pagina.fill('#ficha-guia .hito[data-id="p3a1"] .hito-nota-texto', 'Entregado en mano el lunes');
 await pagina.locator('#ficha-guia .hito[data-id="p3a1"] .hito-nota-anadir').click();
 await pagina.waitForTimeout(400);
+/* Fila 139: la nota escrita en la mesa va a las del asunto, con el hito
+   como etiqueta (docs/UNA-SOLA-LIBRETA-DE-NOTAS.md). */
 await comprobar('la nota se ha guardado',
-  leerHitosDeDisco().then(e => {
-    const h = e.hitos.find(x => x.id === 'p3').opciones.find(o => o.id === 'o1').hitos.find(x => x.id === 'p3a1');
-    return h.notas.length;
-  }), 1);
+  pagina.evaluate(async (clave) => {
+    const r = await Carpetas.leerJson(App.E.gestor, 'asuntos.json');
+    return ((r.asuntos[clave] || {}).notas || []).filter(n => n.hito === 'p3a1' && n.texto === 'Entregado en mano el lunes').length;
+  }, CLAVE), 1);
 
 /* Fila 109: pulsar un hito abre su mesa; antes, se vuelve a la lista. */
 await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());

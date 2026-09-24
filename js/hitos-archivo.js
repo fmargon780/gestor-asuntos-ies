@@ -172,13 +172,14 @@
      lo vacío se quita; lo que tiene notas o documentos se queda como
      "noaplica". Una pregunta de dentro se queda si tiene algo suyo o
      si le queda algo en alguna de sus ramas. */
-  function podar(lista, quedados) {
+  function podar(lista, quedados, conNotas) {
     return (lista || []).filter(function (x) {
-      var suyo = (x.notas && x.notas.length) || (x.documentos && x.documentos.length);
+      /* Fila 139: también cuentan sus notas, que viven en el asunto. */
+      var suyo = (x.notas && x.notas.length) || (x.documentos && x.documentos.length) || (conNotas && conNotas[x.id]);
       var dentro = false;
       if (x.clase === 'decision') {
         x.opciones.forEach(function (o) {
-          o.hitos = podar(o.hitos, quedados);
+          o.hitos = podar(o.hitos, quedados, conNotas);
           if (o.hitos.length) dentro = true;
         });
       }
@@ -192,6 +193,7 @@
   async function cambiarRama(clave, idDecision, idOpcionNueva) {
     var resultado = null;
     var quedados = [];
+    var conNotas = window.NotasHito ? NotasHito.idsConNotas(clave) : {};
     var datos = await cambiar(function (d) {
       var entrada = d.porAsunto[clave];
       if (!entrada) return d;
@@ -200,7 +202,7 @@
       var vieja = h.elegida;
       if (vieja && vieja !== idOpcionNueva) {
         var opt = h.opciones.filter(function (o) { return o.id === vieja; })[0];
-        if (opt) opt.hitos = podar(opt.hitos, quedados);
+        if (opt) opt.hitos = podar(opt.hitos, quedados, conNotas);
       }
       h.elegida = idOpcionNueva;
       h.estado = 'hecho';
@@ -312,7 +314,9 @@
     if (h.fecha) detalle.push('fecha límite ' + fechaCorta(h.fecha));
     if (h.responsable) detalle.push('responsable: ' + h.responsable);
     lineas.push(cabecera + '  [' + detalle.join(' · ') + ']');
-    (h.notas || []).forEach(function (n) {
+    /* Fila 139: las notas escritas desde el hito viven en el asunto, con
+       su etiqueta; la historia automática, en el hito. Se juntan aquí. */
+    ((notasDelAsuntoPorHito[h.id] || []).concat(h.notas || [])).forEach(function (n) {
       lineas.push(pre + '     nota (' + (n.quien || '?') + ', ' + fechaCorta(n.cuando) + '): ' + n.texto);
     });
     (h.documentos || []).forEach(function (d) {
@@ -330,7 +334,14 @@
     return lineas;
   }
 
+  var notasDelAsuntoPorHito = {};
+
   function textoHistorial(clave, hitos, creados) {
+    notasDelAsuntoPorHito = {};
+    var ficha = (window.App && App.E && App.E.registro && App.E.registro.asuntos && App.E.registro.asuntos[clave]) || {};
+    (Array.isArray(ficha.notas) ? ficha.notas : []).forEach(function (n) {
+      if (n && n.hito) (notasDelAsuntoPorHito[n.hito] = notasDelAsuntoPorHito[n.hito] || []).push(n);
+    });
     var lineas = [
       'HISTORIAL DE TRAMITACIÓN',
       clave,

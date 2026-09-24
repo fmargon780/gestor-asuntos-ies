@@ -289,6 +289,22 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   (el botón queda oculto) y, en pantallas cortas, el de aceptar puede quedar fuera de la parte
   visible del cuadro.
 
+### Una sola libreta de notas (25-sep-2026, fila 139, `docs/UNA-SOLA-LIBRETA-DE-NOTAS.md`)
+
+Un asunto tiene una libreta: sus notas de `asuntos.json`. La que se escribe desde la mesa de un hito
+va ahí, con `hito` (id) y `hitoTitulo` (su título entonces), y en la lista de la ficha lleva una
+etiqueta pequeña (`⚑ título`, `.nota-hito`) que, pulsada dentro de la ficha, abre la mesa de ese
+hito. La mesa enseña solo las notas de su hito y, aparte, «Historia»: lo que apunta la aplicación
+(`h.notas`: marcado, generado, comunicado…), que se queda en el hito. Todo en `js/notas-migracion.js`
+(`NotasHito`): etiqueta, `delHito`, `anadirDesdeHito` (vacía la caja al guardar; el repintado sigue
+conservando lo escrito) y `idsConNotas` (al cambiar de rama o de tipo, un hito con notas en el
+asunto no se quita). El historial que se escribe al archivar junta las dos cosas.
+
+El paso de lo que había, una vez (marca `_GESTOR/notas-migrado.json`): las notas escritas a mano de
+cada hito de `hitos.json` (las automáticas se reconocen por su forma fija: «Comunicado a», «Correo
+enviado a», «Dado por hecho», «Generado «»…) pasan al asunto, por fecha, y después se quitan del
+hito. Primero `asuntos.json`, luego `hitos.json`; repetirlo no duplica (texto, quién y cuándo).
+
 ### Asuntos reservados (25-sep-2026, fila 135, `docs/ASUNTOS-RESERVADOS.md`)
 
 Para que un expediente disciplinario o de salud no se vea **sin querer**; la carpeta sigue viéndose

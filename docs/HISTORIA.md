@@ -5,6 +5,20 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 139: una sola libreta de notas por asunto
+
+`docs/UNA-SOLA-LIBRETA-DE-NOTAS.md`. Las notas del asunto y las de cada hito se juntan en una: las del
+asunto, con el hito como etiqueta. De paso se acaba el viejo riesgo de la fila 34 (una nota de hito
+a medio escribir que se perdía con un repintado). Decisiones:
+
+- La historia automática (marcado, generado, comunicado, dado por hecho) se queda en el hito, bajo
+  «Historia». En el código no se distinguía de las escritas a mano: la migración las separa por su
+  forma fija, y desde ahora lo escrito a mano ya no va al hito.
+- Un hito cuyas notas están en el asunto sigue contando como «con algo apuntado» al cambiar de
+  rama o de tipo (no se quita), como antes.
+- Al guardar desde la mesa, la caja se vacía: el repintado, que conserva lo escrito, la habría
+  vuelto a llenar con la nota ya guardada.
+
 ## 25-sep-2026 — Fila 76: la versión, escrita sola al publicar
 
 `docs/VERSION-AL-PUBLICAR.md`. Bloqueada desde el 19-sep-2026 por miedo a un bucle de commits; se

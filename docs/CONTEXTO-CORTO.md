@@ -112,7 +112,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
   bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa): una sola lista, el guion
   (con preguntas y lo que hay que reunir: 📎 documento, ✎ dato), que se marca solo al generar, registrar, comunicar o añadir; documentos en tabla con sus
-  gemelos y selección de varios; plantillas y formularios («Buscar otra plantilla…»: cualquiera); comunicar con destinatarios; notas.
+  gemelos y selección de varios; plantillas y formularios («Buscar otra plantilla…»: cualquiera); comunicar con destinatarios; sus notas (las del asunto, con etiqueta) e historia.
   Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa.
   Biblioteca de hitos del centro, con guion; en Mantenimiento, cargar tipos, guías y guiones del instituto.
 - "Qué me toca": hitos pendientes, filtro por responsable, "Dormidos" (sin novedades en N días). "Cuentas": asuntos por tipo, mes y quién los pidió. "Formularios": catálogo buscable de
@@ -120,8 +120,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
 - Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF; deja libre la banda del sello y la firma.
 - "Lo pide": quién pidió la gestión, por qué vía y cuándo; su correo sale en el cuadro de Correo.
-- Archivar o reabrir sobre un destino que ya existe fusiona carpetas; errores en castellano; reintenta si Dropbox tropieza.
-- Crear, reabrir o editar deja en la ficha del asunto; Volver regresa a la pantalla de origen, a su altura; lo demás, aviso con «Ir al asunto».
+- Archivar o reabrir sobre un destino que ya existe fusiona carpetas; reintenta si Dropbox tropieza.
+- Crear, reabrir o editar deja en la ficha; Volver regresa a la pantalla de origen, a su altura.
 - Al archivar, la ficha baja a su carpeta (al reabrir, vuelve) y se hace el índice del expediente
   (PDF numerado; también desde el menú de la ficha).
 - Ficha del asunto: foto del contacto del tercero; cabecera fija al bajar.

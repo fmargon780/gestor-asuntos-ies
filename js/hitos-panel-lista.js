@@ -224,22 +224,31 @@ var HitosPanelLista = (function () {
       '</div>' +
     '</div>';
 
-    var notas = (h.notas || []).slice().reverse();
+    /* Fila 139 (docs/UNA-SOLA-LIBRETA-DE-NOTAS.md): las notas son las del
+       asunto escritas desde este hito (js/notas-migracion.js); la historia
+       automática del hito se queda aquí, aparte. */
+    var notas = (window.NotasHito ? NotasHito.delHito(a, h.id) : []).slice().reverse();
+    var historia = (h.notas || []).slice().reverse();
     var colConsulta = '<div class="mesa-col mesa-col-consulta">' +
       (window.HitosNormativa ? '<div class="mesa-bloque mesa-normativa">' +
         HitosNormativa.listaHTML(h.normativa) + '<div class="mesa-normativa-guion"></div></div>' : '') +
       (abierto ? '<div class="mesa-bloque mesa-comunicar"><div class="mesa-bloque-cabecera"><span class="mesa-bloque-titulo">Comunicar</span>' +
         (window.HitosComunicar ? HitosComunicar.botonHTML(a, h) : '') + '</div>' +
         '<div class="mesa-destinatarios"></div></div>' : '') +
-      '<div class="mesa-bloque mesa-notas"><span class="mesa-bloque-titulo">Notas e historial</span>' +
+      '<div class="mesa-bloque mesa-notas"><span class="mesa-bloque-titulo">Notas</span>' +
         (abierto ? '<div class="nota-nueva">' +
-          '<textarea class="campo hito-nota-texto" rows="2" placeholder="Añadir una nota a este hito (Intro guarda; Mayúsculas+Intro, otra línea)"></textarea>' +
+          '<textarea class="campo hito-nota-texto" rows="2" placeholder="Añadir una nota (va a las del asunto, con este hito; Intro guarda; Mayúsculas+Intro, otra línea)"></textarea>' +
           '<button type="button" class="boton hito-nota-anadir">Añadir nota</button></div>' : '') +
         '<div class="hito-notas">' + notas.map(function (n) {
-          var auto = /^(Comunicado a|Dado por hecho|Generado|Registrado|Marcado)/.test(n.texto || '');
-          return '<div class="hito-nota' + (auto ? ' hito-nota-auto' : '') + '"><strong>' + U.escapar(n.quien || '') + '</strong> · ' +
+          return '<div class="hito-nota"><strong>' + U.escapar(n.quien || '') + '</strong> · ' +
             U.escapar((n.cuando || '').slice(0, 10)) + '<br>' + U.escapar(n.texto) + '</div>';
         }).join('') + '</div>' +
+        (historia.length ? '<div class="mesa-bloque-titulo hito-historia-titulo">Historia</div>' +
+          '<div class="hito-notas hito-historia">' + historia.map(function (n) {
+            var auto = !window.NotasHito || NotasHito.esAutomatica(n.texto);
+            return '<div class="hito-nota' + (auto ? ' hito-nota-auto' : '') + '"><strong>' + U.escapar(n.quien || '') + '</strong> · ' +
+              U.escapar((n.cuando || '').slice(0, 10)) + '<br>' + U.escapar(n.texto) + '</div>';
+          }).join('') + '</div>' : '') +
       '</div>' +
     '</div>';
 
@@ -317,7 +326,13 @@ var HitosPanelLista = (function () {
       var ta = div.querySelector('.hito-nota-texto');
       var texto = (ta.value || '').trim();
       if (!texto) return;
-      return guardarHito(notaBtn, 'guardar la nota', function () { return Hitos.anadirNota(a.nombre, h.id, texto); });
+      /* Fila 139: a las notas del asunto, con la etiqueta de este hito. */
+      return guardarHito(notaBtn, 'guardar la nota', function () {
+        var guardar = window.NotasHito ? NotasHito.anadirDesdeHito(a, h, texto) : Hitos.anadirNota(a.nombre, h.id, texto);
+        /* Guardada, la caja se vacía: si no, el repintado (que conserva lo
+           escrito) la volvería a llenar con la nota ya guardada. */
+        return Promise.resolve(guardar).then(function (r) { ta.value = ''; return r; });
+      });
     };
     var quitar = div.querySelector('.hito-quitar');
     if (quitar) quitar.onclick = async function () {
@@ -377,8 +392,9 @@ var HitosPanelLista = (function () {
       b.onclick = async function () {
         if (b.dataset.opcion === h.elegida) return;
         var opt = h.opciones.filter(function (o) { return o.id === h.elegida; })[0];
+        var conNotas = window.NotasHito ? NotasHito.idsConNotas(a.nombre) : {};   /* fila 139 */
         var conAlgo = ((opt && opt.hitos) || []).filter(function (x) {
-          return (x.notas && x.notas.length) || (x.documentos && x.documentos.length);
+          return (x.notas && x.notas.length) || (x.documentos && x.documentos.length) || conNotas[x.id];
         });
         if (conAlgo.length) {
           var ok = await U.preguntar('Cambiar de rama',

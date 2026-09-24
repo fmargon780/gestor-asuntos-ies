@@ -201,6 +201,8 @@
                '<div class="nota-cabeza">' +
                  '<span class="nota-cuando">' + U.escapar(cuando(n.cuando)) + '</span>' +
                  (n.quien ? '<span class="nota-quien">' + U.escapar(n.quien) + '</span>' : '') +
+                 /* Fila 139: la que se escribió desde un hito, con su etiqueta. */
+                 (window.NotasHito ? NotasHito.etiquetaHtml(n) : '') +
                '</div>' +
                '<div class="nota-texto">' + U.escapar(n.texto) + '</div>' +
                enlaceDeNota(n) +

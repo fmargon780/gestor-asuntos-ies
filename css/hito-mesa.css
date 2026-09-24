@@ -140,3 +140,6 @@ body.con-visor .mesa-col-consulta, body.con-lector .mesa-col-consulta { grid-col
 .guion-obligatorio { font-size: 12px; color: var(--rojo-linea); }
 .guion-dato { margin: 4px 0 0 26px; max-width: 360px; }
 .guion-reunir-documento { margin-left: 26px; }
+
+/* Fila 139: la historia automática del hito, debajo de sus notas. */
+.hito-historia-titulo { display: block; margin-top: 10px; }

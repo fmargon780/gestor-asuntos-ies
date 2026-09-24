@@ -107,13 +107,19 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 138 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 139 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 139 | `docs/UNA-SOLA-LIBRETA-DE-NOTAS.md` (las notas del hito pasan al asunto, con etiqueta) | PENDIENTE |
 | 140 | `docs/TIEMPO-DE-TRAMITACION.md` (media y máximo por tipo, y los abiertos más antiguos) | PENDIENTE |
+
+**La fila 139 está HECHA** (25-sep-2026): `docs/UNA-SOLA-LIBRETA-DE-NOTAS.md`. Una sola libreta de
+notas por asunto: la que se escribe desde la mesa de un hito va a las del asunto con la etiqueta
+del hito (pulsarla en la ficha abre la mesa); la mesa enseña solo las suyas y, aparte, la
+«Historia» automática del hito. `js/notas-migracion.js` pasó las notas a mano de los hitos al
+asunto, una vez. Prueba `pruebas/una-sola-libreta-de-notas.mjs` (y `pruebas/hitos.mjs`, que ya
+busca la nota en el asunto), batería completa en verde. Versión `App.VERSION`: `25-sep-2026 · 01:52`.
 
 **La fila 76 está HECHA** (25-sep-2026): `docs/VERSION-AL-PUBLICAR.md`. La web pone sola la hora de
 la versión al publicar: `vercel.json` gana `"buildCommand": "node scripts/version-al-publicar.mjs"`,
