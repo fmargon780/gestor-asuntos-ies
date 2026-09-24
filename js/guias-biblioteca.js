@@ -330,7 +330,7 @@ var GuiasBiblioteca = (function () {
       /* Sin estos dos, editar un modelo los perdía (fila 102). */
       formularios: m.formularios, plantillasDocumento: m.plantillasDocumento,
       guion: m.guion   /* fila 109 */
-    }], [], []);
+    }], [], [], { irA: m.id });   /* fila 122: el único paso, ya abierto */
     if (!pasos || !pasos.length) return;
     try {
       await HitosBiblioteca.editar(m.id, pasos[0], usuario());

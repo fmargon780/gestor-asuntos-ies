@@ -405,3 +405,48 @@
 .guion-subfila { background: var(--fondo); border-radius: 6px; padding: 4px 6px; }
 .guion-opcion-cabecera { display: flex; gap: 6px; align-items: center; }
 .guion-opcion-cabecera .guion-opcion-texto { flex: 1; font-weight: 600; }
+
+/* ---------- el editor de la guía, en acordeón (24-sep-2026, fila 122) ----------
+   Un paso cerrado enseña solo su cabecera, con el título y las marcas
+   en vez del campo de escribir (js/guias-plegado.js). */
+
+.paso-editor > .paso-cabecera,
+.subpaso-editor > .paso-cabecera { cursor: pointer; }
+.paso-plegado > :not(.paso-cabecera) { display: none !important; }
+.paso-plegado > .paso-cabecera > .paso-titulo,
+.paso-plegado > .paso-cabecera > .subpaso-titulo,
+.paso-plegado > .paso-cabecera > .marca-pregunta { display: none; }
+.paso-editor:not(.paso-plegado) > .paso-cabecera > .paso-resumen,
+.subpaso-editor:not(.paso-plegado) > .paso-cabecera > .paso-resumen { display: none; }
+.paso-editor.paso-plegado { padding-top: 7px; padding-bottom: 7px; }
+.paso-resumen {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.paso-resumen-titulo { font-weight: 600; }
+.paso-marca {
+  font-size: 11px;
+  color: var(--tinta-suave);
+  background: var(--fondo);
+  border: 1px solid var(--linea);
+  border-radius: 999px;
+  padding: 1px 8px;
+  white-space: nowrap;
+}
+
+/* «Documentos de este paso» y «Guion de este paso», con la misma caja
+   gris y la misma letra que los demás apartados del paso. */
+.paso-documentos,
+.paso-guion {
+  margin-top: 10px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--fondo);
+}
+.paso-documentos > summary,
+.paso-guion > summary { cursor: pointer; font-size: 13px; color: var(--tinta-suave); }

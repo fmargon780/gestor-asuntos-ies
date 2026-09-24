@@ -39,7 +39,24 @@ cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegi
   en «Fuera de la guía»; pulsar uno abre su mesa (`HitoMesa.abrir`).
 - **Los niveles del editor** («Entrar», «← Volver», la línea de camino) viven desde la fila 113 en
   `js/guias-niveles.js` (`GuiasNiveles.crear`, con `irAPaso(id)` para el mapa; `caminoHasta`,
-  pura), sacados de `js/guias.js`, que pasaba de 1.200 líneas.
+  pura). Desde la fila 122 salieron también de `js/guias.js` la barra de formato
+  (`js/guias-barra.js`) y la caja de opciones de un paso-pregunta con sus pasos
+  (`js/guias-opciones-editor.js`, `GuiasOpcionesEditor.caja(ctx, p, i)`).
+- **El editor, en acordeón** (fila 122, `docs/GUIA-EN-ACORDEON.md`, `js/guias-plegado.js`). Cada
+  paso cerrado es una línea: número, título y marcas (`GuiasPlegado.marcas`: Pregunta, Solo
+  informativo, Normativa (N), Documentos (N), Guion (N), el responsable), con ↑ ↓ y «Quitar».
+  Pulsar la línea (fuera de botones y campos) lo abre o lo cierra. **Un solo paso abierto** en
+  todo el editor (`abierto`, un id); si es un paso de una opción, su paso-pregunta sigue abierto.
+  No se quita nada del DOM: la clase `paso-plegado` y el CSS esconden todo menos la cabecera, así
+  que `recoger()` lee igual y lo guardado no cambia. Cada `.paso-editor`/`.subpaso-editor` lleva
+  `data-paso-id`. `pintar()` acaba en `plegado.aplicar()` (el abierto sigue abierto tras
+  repintar); al entrar o cambiar de nivel, todo cerrado, salvo el paso de `irA` (mapa, y el
+  editor de un modelo de la biblioteca, que pasa `{ irA: m.id }`). Un paso nuevo («Añadir un
+  paso», «+ Añadir un paso a esta opción», «+ Traer de la biblioteca») sale abierto con el cursor
+  en su título; las flechas no abren ni cierran y la pantalla sigue al paso. No hay error al
+  guardar que abrir (el punto 9 de la fila no tiene hoy a qué aplicarse: un paso vacío se descarta
+  sin avisar). «Documentos de este paso» y «Guion de este paso» toman la caja gris de los demás
+  apartados (`css/guias.css`). Prueba: `pruebas/guia-en-acordeon.mjs`.
 
 - **Preguntas dentro de las respuestas, sin límite de niveles** (fila 95, 23-sep-2026,
   `docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md`; antes, una sola bifurcación por paso). Un paso de
