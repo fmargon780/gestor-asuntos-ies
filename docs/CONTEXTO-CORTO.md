@@ -76,7 +76,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Nombre comercial de empresas, aparte de la razón social; cambiar los datos de un tercero dado
   de alta a mano.
 - Guías del procedimiento por tipo, con preguntas dentro de las respuestas sin límite, y su mapa
-  (dibujo de la guía entera; en un asunto, con el camino elegido resaltado).
+  (dibujo de la guía entera; en un asunto, con el camino elegido resaltado). Se escriben en
+  acordeón: un paso abierto a la vez.
 - Panel lateral de lectura, y tablón de notas rápidas siempre visible.
 - Correo y mensaje de Séneca: el mensaje se prepara; el correo de un asunto se envía de
   verdad, con Apps Script y confirmación.
@@ -118,8 +119,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - "Qué me toca": hitos pendientes, filtro por responsable, bloque "Dormidos" (sin novedades en N
   días). "Cuentas": asuntos por tipo, mes y quién los pidió. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena en el PDF solo los datos del centro.
-- Avisos de "fichas sin carpeta" (✕ que calla 7 días) y de la papelera vieja, en Asuntos abiertos.
-  Pulsar la tarjeta de un documento lo abre, sin botón.
+- Avisos de "fichas sin carpeta" (✕ calla 7 días) y de papelera vieja. Pulsar un documento lo abre.
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
 - Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF, en la carpeta del asunto y en Por
   clasificar; Ajustar tamaño deja libre la banda del sello de Séneca y de la firma del director.

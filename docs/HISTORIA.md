@@ -5,6 +5,27 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 122: el editor de la guía, en acordeón
+
+`docs/GUIA-EN-ACORDEON.md`. Con varios pasos, el cuadro de escribir la guía salía con todos los
+campos a la vista y no se veía el trámite de un vistazo. Ahora cada paso cerrado es una línea
+(número, título, marcas) y solo hay uno abierto a la vez. Detalle en
+`docs/contexto/HITOS-Y-GUIAS.md` («El editor, en acordeón»).
+
+- Decisión: plegar con una clase y CSS, sin quitar nada del DOM, para que `recoger()` siga leyendo
+  todos los campos y lo guardado no cambie en nada.
+- `js/guias.js` (1.204 líneas) se partió antes de tocarlo: la barra de formato a
+  `js/guias-barra.js` y la caja de opciones a `js/guias-opciones-editor.js`; el acordeón, en
+  `js/guias-plegado.js`.
+- El editor de un modelo de la biblioteca (un solo paso) entra con `{ irA: m.id }`, para que ese
+  paso no salga cerrado.
+- El punto 9 de la fila (abrir el paso con error al guardar) no tiene hoy a qué aplicarse: guardar
+  no da ningún error por paso (un paso vacío se descarta sin avisar).
+- Tres pruebas viejas (`preguntas-anidadas`, `documentos-desde-el-hito`) daban por hecho que los
+  pasos nacían abiertos: ahora abren la línea antes de escribir.
+
+Versión `App.VERSION`: `24-sep-2026 · 12:04`.
+
 ## 24-sep-2026 — Fila 121: el aviso de versión nueva de la copia, que no se pierda
 
 `docs/AVISO-DE-VERSION-SEGURO.md`. La copia sin internet de Francisco se quedó en la versión de las

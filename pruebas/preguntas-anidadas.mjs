@@ -148,7 +148,10 @@ await comprobar('un paso normal de una opción trae la casilla de pregunta',
   }), true);
 
 /* Se escribe algo arriba antes de entrar: no se debe perder. */
+/* Fila 122: los pasos nacen cerrados; se abre el primero pulsando su línea. */
+await pagina.click('#guia-pasos .paso-editor[data-pos="0"] > .paso-cabecera > .paso-numero');
 await pagina.fill('#guia-pasos .paso-editor[data-pos="0"] .paso-titulo', 'Registrar la solicitud');
+await pagina.click('#guia-pasos .paso-editor[data-pos="1"] > .paso-cabecera > .paso-numero');   /* fila 122: abrir la pregunta */
 await pagina.locator('.subpaso-editor', { has: pagina.locator('.subpaso-entrar') }).locator('.subpaso-entrar').click();
 await comprobar('el camino dice dónde se está',
   pagina.locator('#guia-camino').innerText().then(t => t.replace(/\s+/g, ' ').trim()),
@@ -157,10 +160,13 @@ await comprobar('dentro, la pregunta q2 sale entera, con sus opciones',
   pagina.locator('#guia-pasos .paso-editor .paso-titulo').evaluateAll(e => e.map(x => x.value)), ['Sellar', '¿Viene completa?']);
 
 /* Segundo nivel: entrar en q3 (dentro de «No» de q2). */
+await pagina.click('#guia-pasos .paso-editor[data-pos="1"] > .paso-cabecera > .paso-numero');   /* fila 122: abrir la pregunta */
 await pagina.locator('.subpaso-editor', { has: pagina.locator('.subpaso-entrar') }).locator('.subpaso-entrar').click();
 await comprobar('dos niveles dentro',
   pagina.locator('#guia-camino').innerText().then(t => t.replace(/\s+/g, ' ').trim()),
   '← Volver Guía de TRASLADO › ¿Cómo se recibió? › En mano › ¿Viene completa? › No');
+/* Fila 122: los pasos nacen cerrados; se abre el primero pulsando su línea. */
+await pagina.click('#guia-pasos .paso-editor[data-pos="0"] > .paso-cabecera > .paso-numero');
 await pagina.fill('#guia-pasos .paso-editor[data-pos="0"] .paso-titulo', '¿Se puede pedir lo que falta?');
 /* un paso nuevo en la opción «No» de q3 */
 await pagina.locator('.opcion-editor').nth(1).locator('button', { hasText: '+ Añadir un paso a esta opción' }).click();
@@ -177,6 +183,7 @@ await comprobar('y lo escrito arriba antes de entrar sigue ahí',
   pagina.inputValue('#guia-pasos .paso-editor[data-pos="0"] .paso-titulo'), 'Registrar la solicitud');
 
 /* Guardar desde dentro: se entra otra vez y se guarda ahí. */
+await pagina.click('#guia-pasos .paso-editor[data-pos="1"] > .paso-cabecera > .paso-numero');   /* fila 122: abrir la pregunta */
 await pagina.locator('.subpaso-entrar').first().click();
 await pagina.click('#cuadro-aceptar');
 const guardada = await pagina.evaluate(() => window.__guardada);

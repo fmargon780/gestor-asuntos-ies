@@ -486,31 +486,9 @@ var Guias = (function () {
      ESCRIBIR LA GUÍA
 
      Un recuadro por paso, y una sola barra de formato arriba que
-     actúa sobre el recuadro en el que se está escribiendo.
+     actúa sobre el recuadro en el que se está escribiendo (desde la
+     fila 122, en js/guias-barra.js).
      ========================================================== */
-
-  var editando = null;      /* el recuadro donde está el cursor */
-  var rangoGuardado = null; /* lo que había seleccionado al pedir un enlace */
-
-  function mandar(orden, valor) {
-    if (!editando) { U.aviso('Pon antes el cursor en el texto de un paso.'); return; }
-    editando.focus();
-    try { document.execCommand(orden, false, valor || null); } catch (e) {}
-  }
-
-  function BARRA() {
-    return '<div class="guia-barra">' +
-      '<button type="button" class="boton" id="guia-negrita" title="Negrita"><strong>N</strong></button>' +
-      '<button type="button" class="boton" id="guia-vinetas" title="Lista con viñetas">Viñetas</button>' +
-      '<button type="button" class="boton" id="guia-enlace" title="Poner un enlace">Enlace</button>' +
-      '<button type="button" class="boton" id="guia-quitar" title="Quitar el formato">Quitar formato</button>' +
-      '</div>' +
-      '<div class="guia-enlace-fila oculto" id="guia-enlace-fila">' +
-      '<input id="guia-enlace-url" class="campo" placeholder="https://…  o  correo@centro.es">' +
-      '<button type="button" class="boton boton-principal" id="guia-enlace-poner">Poner</button>' +
-      '<button type="button" class="boton" id="guia-enlace-quitar">Cancelar</button>' +
-      '</div>';
-  }
 
   /* 'listaResponsables' es [{id,nombre}], personas de Ajustes más los
      papeles fijos; 'listaEstados' es una lista de nombres de
@@ -533,19 +511,26 @@ var Guias = (function () {
     var opcionesEstado = listaEstados || [];
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-medio');
-    editando = null;
-    rangoGuardado = null;
+    GuiasBarra.reiniciar();
     /* Qué `<details>` estaban abiertos antes del último pintar(): lo lee
        `restaurarAbierto`, más abajo, y lo usan tanto `pintar()` como
-       `cajaDeOpciones()` (fila 60, ver la nota junto a detallesAbiertos). */
+       `GuiasOpcionesEditor.caja()` (fila 60, ver la nota junto a detallesAbiertos). */
     var abiertos = {};
+    /* El acordeón (fila 122, js/guias-plegado.js): un solo paso abierto. */
+    var plegado = GuiasPlegado.crear({ nivel: function () { return nivel; }, recoger: recoger, responsables: opcionesResp });
+    /* Lo que la caja de opciones (js/guias-opciones-editor.js) toma prestado. */
+    var opcionesCtx = {
+      nivel: function () { return nivel; }, recoger: recoger, pintar: pintar,
+      entrar: function (p, op) { entrar(p, op); }, prepararRecuadro: prepararRecuadro,
+      restaurar: function (det, pos, idSub) { restaurarAbierto(det, abiertos, pos, idSub); }, plegado: plegado
+    };
 
     var esperar = U.preguntar('Guía de ' + nombreTipo,
       '<p class="explica">Los pasos que hay que dar en un asunto de este tipo. ' +
       'Van en el orden del trámite. Dentro de cada asunto salen con una casilla ' +
       'para ir marcando lo que ya está hecho.</p>' +
       '<div id="guia-camino" class="guia-camino"></div>' +
-      BARRA() +
+      GuiasBarra.html() +
       '<div id="guia-pasos"></div>' +
       '<div class="guia-anadir-fila">' +
         '<button type="button" class="boton boton-ancho" id="guia-anadir">Añadir un paso</button>' +
@@ -562,56 +547,13 @@ var Guias = (function () {
       GuiasBiblioteca.engancharPanelTraer(cuadro, $('guia-traer-biblioteca'), function (modelo) {
         recoger();
         nivel.push(HitosBiblioteca.modeloAPaso(modelo));
+        plegado.abrir(nivel[nivel.length - 1].id);   /* fila 122: sale abierto */
         pintar();
+        plegado.alTitulo(nivel[nivel.length - 1].id);
       });
     }
 
-    /* ---------- la barra de formato ---------- */
-
-    function sinPerderElCursor(id, hacer) {
-      var b = $(id);
-      b.onmousedown = function (ev) { ev.preventDefault(); };
-      b.onclick = hacer;
-    }
-
-    sinPerderElCursor('guia-negrita', function () { mandar('bold'); });
-    sinPerderElCursor('guia-vinetas', function () { mandar('insertUnorderedList'); });
-    sinPerderElCursor('guia-quitar', function () { mandar('removeFormat'); });
-    sinPerderElCursor('guia-enlace', function () {
-      if (!editando) { U.aviso('Pon antes el cursor en el texto de un paso.'); return; }
-      var sel = window.getSelection();
-      rangoGuardado = (sel && sel.rangeCount) ? sel.getRangeAt(0).cloneRange() : null;
-      $('guia-enlace-fila').classList.remove('oculto');
-      $('guia-enlace-url').value = '';
-      $('guia-enlace-url').focus();
-    });
-
-    $('guia-enlace-quitar').onclick = function () {
-      $('guia-enlace-fila').classList.add('oculto');
-    };
-
-    $('guia-enlace-poner').onclick = function () {
-      var url = $('guia-enlace-url').value.trim();
-      if (!url) return;
-      if (url.indexOf('@') !== -1 && !/^mailto:/i.test(url) && url.indexOf(' ') === -1 &&
-          !/^https?:\/\//i.test(url)) url = 'mailto:' + url;
-      if (!/^(https?:\/\/|mailto:)/i.test(url)) url = 'https://' + url;
-      $('guia-enlace-fila').classList.add('oculto');
-      if (!editando) return;
-      editando.focus();
-      if (rangoGuardado) {
-        var sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(rangoGuardado);
-        if (rangoGuardado.collapsed) {
-          document.execCommand('insertHTML', false,
-            '<a href="' + U.escapar(url) + '">' + U.escapar(url) + '</a>');
-        } else {
-          document.execCommand('createLink', false, url);
-        }
-      }
-      rangoGuardado = null;
-    };
+    GuiasBarra.enganchar();
 
     /* ---------- responsable, estado y plazo por defecto (sección 11) ----------
 
@@ -759,7 +701,7 @@ var Guias = (function () {
     /* ---------- entrar y salir de una pregunta de dentro (fila 95) ----------
        En js/guias-niveles.js desde la fila 113. */
     var niveles = GuiasNiveles.crear({ pasos: pasos, nombreTipo: nombreTipo, recoger: recoger, pintar: pintar,
-      alCambiar: function (lista) { nivel = lista; abiertos = {}; } });
+      alCambiar: function (lista) { nivel = lista; abiertos = {}; plegado.alCambiarDeNivel(); } });
     var entrar = niveles.entrar, pintarCamino = niveles.pintarCamino;
 
     /* Qué secciones plegables (paso-extra, "Lo que hay que reunir",
@@ -793,7 +735,7 @@ var Guias = (function () {
       var caja = $('guia-pasos');
       abiertos = detallesAbiertos(caja);
       caja.innerHTML = '';
-      editando = null;
+      GuiasBarra.reiniciar();
       pintarCamino();
       if (!nivel.length) {
         caja.innerHTML = '<div class="vacio">Todavía no hay ningún paso. ' +
@@ -804,6 +746,7 @@ var Guias = (function () {
         var d = document.createElement('div');
         d.className = 'paso-editor';
         d.dataset.pos = i;
+        d.dataset.pasoId = p.id;   /* fila 122, js/guias-plegado.js */
         d.innerHTML =
           '<div class="paso-cabecera">' +
             '<span class="paso-numero">' + (i + 1) + '</span>' +
@@ -832,6 +775,7 @@ var Guias = (function () {
           if (i === 0) return;
           var x = nivel[i - 1]; nivel[i - 1] = nivel[i]; nivel[i] = x;
           pintar();
+          plegado.seguir(nivel[i - 1].id);   /* fila 122: abierto o cerrado, como estaba */
         }).disabled = (i === 0);
 
         boton('↓', 'Bajar este paso', function () {
@@ -839,6 +783,7 @@ var Guias = (function () {
           if (i === nivel.length - 1) return;
           var x = nivel[i + 1]; nivel[i + 1] = nivel[i]; nivel[i] = x;
           pintar();
+          plegado.seguir(nivel[i + 1].id);
         }).disabled = (i === nivel.length - 1);
 
         boton('Quitar', 'Quitar este paso', function () {
@@ -976,16 +921,17 @@ var Guias = (function () {
           pintar();
         };
 
-        if (pregunta) d.appendChild(cajaDeOpciones(p, i));
+        if (pregunta) d.appendChild(GuiasOpcionesEditor.caja(opcionesCtx, p, i));
 
         caja.appendChild(d);
       });
+      plegado.aplicar();   /* fila 122: el paso abierto sigue abierto tras repintar */
     }
 
     /* Al pegar desde Word o desde una web, solo el texto: así no se
        cuela el formato de fuera. */
     function prepararRecuadro(cuerpo) {
-      cuerpo.onfocus = function () { editando = cuerpo; };
+      cuerpo.onfocus = function () { GuiasBarra.escribiendoEn(cuerpo); };
       cuerpo.onpaste = function (ev) {
         ev.preventDefault();
         var t = (ev.clipboardData || window.clipboardData).getData('text/plain');
@@ -993,178 +939,16 @@ var Guias = (function () {
       };
     }
 
-    /* Las opciones de un paso-pregunta, cada una con sus propios nivel.
-       Todo lo que cambia la lista hace lo mismo: recoger lo escrito,
-       tocar el array y volver a pintar. */
-    function cajaDeOpciones(p, i) {
-      var caja = document.createElement('div');
-      caja.className = 'paso-opciones';
-
-      var explica = document.createElement('p');
-      explica.className = 'explica';
-      explica.textContent = 'Dentro del asunto se elige una opción, y solo salen los ' +
-                            'pasos de la elegida.';
-      caja.appendChild(explica);
-
-      p.opciones.forEach(function (o, j) {
-        var oc = document.createElement('div');
-        oc.className = 'opcion-editor';
-        oc.dataset.id = o.id;
-        oc.innerHTML =
-          '<div class="opcion-cabecera">' +
-            '<input class="campo opcion-titulo" value="' + U.escapar(o.titulo) + '" ' +
-            'placeholder="Nombre de la opción. Por ejemplo: la hemos recibido en mano">' +
-          '</div>' +
-          '<div class="opcion-pasos"></div>';
-
-        var quitar = document.createElement('button');
-        quitar.type = 'button';
-        quitar.className = 'boton boton-peligro';
-        quitar.textContent = 'Quitar la opción';
-        quitar.title = 'Quitar esta opción y sus pasos';
-        quitar.onclick = function () {
-          recoger();
-          nivel[i].opciones.splice(j, 1);
-          pintar();
-        };
-        oc.querySelector('.opcion-cabecera').appendChild(quitar);
-
-        var dentro = oc.querySelector('.opcion-pasos');
-        o.pasos.forEach(function (sp, k) {
-          var sc = document.createElement('div');
-          sc.className = 'subpaso-editor';
-          sc.dataset.id = sp.id;
-
-          /* Fila 95: un paso de una opción que es a su vez una pregunta
-             no se dibuja anidado (recuadros dentro de recuadros no se
-             leen): una línea con su título, la marca y «Entrar», que
-             enseña los pasos de sus opciones en este mismo cuadro. */
-          var subPregunta = esPregunta(sp);
-          sc.innerHTML =
-            '<div class="paso-cabecera">' +
-              '<input class="campo subpaso-titulo" value="' + U.escapar(sp.titulo) + '" ' +
-              'placeholder="' + (subPregunta ? 'La pregunta' : 'Título corto del paso') + '">' +
-              (subPregunta ? '<span class="marca-pregunta">pregunta</span>' : '') +
-            '</div>' +
-            (subPregunta ? '' : '<div class="paso-cuerpo subpaso-cuerpo" contenteditable="true" ' +
-              'data-vacio="Explicación del paso">' + limpiar(sp.cuerpo) + '</div>');
-
-          if (subPregunta) {
-            var entrarB = document.createElement('button');
-            entrarB.type = 'button';
-            entrarB.className = 'boton boton-principal subpaso-entrar';
-            entrarB.textContent = 'Entrar';
-            entrarB.title = 'Ver y escribir las opciones de esta pregunta';
-            entrarB.onclick = function () {
-              recoger();
-              /* Se entra en el nivel donde está la pregunta (los pasos de
-                 esta opción): ahí se ve entera, con sus opciones. */
-              entrar(nivel[i], nivel[i].opciones[j]);
-              var aqui = document.querySelector('#guia-pasos .paso-editor[data-pos="' + k + '"]');
-              if (aqui && aqui.scrollIntoView) aqui.scrollIntoView({ block: 'start' });
-            };
-            sc.querySelector('.paso-cabecera').appendChild(entrarB);
-          }
-
-          var fuera = document.createElement('button');
-          fuera.type = 'button';
-          fuera.className = 'boton boton-peligro';
-          fuera.textContent = 'Quitar';
-          fuera.onclick = function () {
-            recoger();
-            nivel[i].opciones[j].pasos.splice(k, 1);
-            pintar();
-          };
-          sc.querySelector('.paso-cabecera').appendChild(fuera);
-
-          if (!subPregunta) {
-            prepararRecuadro(sc.querySelector('.subpaso-cuerpo'));
-            if (window.GuiasRequisitos) {
-              sc.insertAdjacentHTML('beforeend', GuiasRequisitos.bloqueHTML(sp.requisitos));
-              restaurarAbierto(sc.querySelector(':scope > .paso-requisitos'), abiertos, i, sp.id);
-              GuiasRequisitos.enganchar(sc, function (mutador) {
-                recoger();
-                mutador(nivel[i].opciones[j].pasos[k].requisitos);
-                pintar();
-              });
-            }
-            if (window.GuiasComunicacion) {
-              sc.insertAdjacentHTML('beforeend', GuiasComunicacion.bloqueHTML(sp.id, sp.comunicacion));
-              restaurarAbierto(sc.querySelector(':scope > .paso-comunicacion'), abiertos, i, sp.id);
-              GuiasComunicacion.enganchar(sc, sp.id);
-            }
-            if (window.GuiasDocumentos) {
-              sc.insertAdjacentHTML('beforeend', GuiasDocumentos.bloqueHTML(sp.plantillasDocumento));
-              restaurarAbierto(sc.querySelector(':scope > .paso-documentos'), abiertos, i, sp.id);
-              GuiasDocumentos.enganchar(sc);
-            }
-            if (window.GuiasGuion) {   /* fila 109 */
-              sc.insertAdjacentHTML('beforeend', GuiasGuion.bloqueHTML(sp.guion));
-              restaurarAbierto(sc.querySelector(':scope > .paso-guion'), abiertos, i, sp.id);
-              GuiasGuion.enganchar(sc, function (mutador) {
-                recoger(); var spx = nivel[i].opciones[j].pasos[k]; mutador(spx.guion = spx.guion || []); pintar();
-              });
-            }
-          }
-
-          /* La misma casilla que un paso de arriba (fila 95). */
-          var filaPreg = document.createElement('label');
-          filaPreg.className = 'interruptor paso-es-pregunta-fila';
-          filaPreg.innerHTML = '<input type="checkbox" class="subpaso-es-pregunta"' +
-            (subPregunta ? ' checked' : '') + '><span>Este paso es una pregunta</span>';
-          sc.appendChild(filaPreg);
-          filaPreg.querySelector('.subpaso-es-pregunta').onchange = function () {
-            recoger();
-            var el = nivel[i].opciones[j].pasos[k];
-            if (this.checked && !el.opciones.length) {
-              el.opciones = [
-                { id: nuevoId(), titulo: '', pasos: [] },
-                { id: nuevoId(), titulo: '', pasos: [] }
-              ];
-            }
-            pintar();
-          };
-
-          dentro.appendChild(sc);
-        });
-
-        var mas = document.createElement('button');
-        mas.type = 'button';
-        mas.className = 'boton boton-ancho';
-        mas.textContent = '+ Añadir un paso a esta opción';
-        mas.onclick = function () {
-          recoger();
-          nivel[i].opciones[j].pasos.push({ id: nuevoId(), titulo: '', cuerpo: '', opciones: [], requisitos: [],
-            comunicacion: null });
-          pintar();
-        };
-        oc.appendChild(mas);
-
-        caja.appendChild(oc);
-      });
-
-      var otra = document.createElement('button');
-      otra.type = 'button';
-      otra.className = 'boton boton-ancho';
-      otra.textContent = '+ Añadir otra opción';
-      otra.onclick = function () {
-        recoger();
-        nivel[i].opciones.push({ id: nuevoId(), titulo: '', pasos: [] });
-        pintar();
-      };
-      caja.appendChild(otra);
-
-      return caja;
-    }
-
     $('guia-anadir').onclick = function () {
       recoger();
-      nivel.push({ id: nuevoId(), titulo: '', cuerpo: '', opciones: [] });
+      var nuevo = { id: nuevoId(), titulo: '', cuerpo: '', opciones: [] };
+      nivel.push(nuevo);
+      plegado.abrir(nuevo.id);   /* fila 122: el nuevo, abierto; los demás, cerrados */
       pintar();
-      var cajas = document.querySelectorAll('#guia-pasos .paso-titulo');
-      if (cajas.length) cajas[cajas.length - 1].focus();
+      plegado.alTitulo(nuevo.id);
     };
 
+    plegado.enganchar();
     pintar();
 
     /* El mapa (fila 113): panel dentro del mismo cuadro, dibujado con lo
@@ -1172,16 +956,22 @@ var Guias = (function () {
     if (window.GuiasMapa && $('guia-ver-mapa')) {
       $('guia-ver-mapa').onclick = function () {
         recoger();
-        GuiasMapa.pintarEnPanel($('guia-mapa-panel'), pasos, function (id) { niveles.irAPaso(id); });
+        GuiasMapa.pintarEnPanel($('guia-mapa-panel'), pasos, irAPaso);
       };
     }
-    if (opciones && opciones.irA) niveles.irAPaso(opciones.irA);
+    /* Desde el mapa, el paso al que se va sale abierto (fila 122). */
+    function irAPaso(id) {
+      plegado.abrirAlLlegar(id);
+      var ok = niveles.irAPaso(id);
+      plegado.abrirAlLlegar(null);
+      return ok;
+    }
+    if (opciones && opciones.irA) irAPaso(opciones.irA);
 
     return esperar.then(async function (ok) {
       if (ok) recoger();
       cuadro.classList.remove('cuadro-medio');
-      editando = null;
-      rangoGuardado = null;
+      GuiasBarra.reiniciar();
       if (!ok) return null;
       /* Apartado 4.3: el cuadro de la guía ya está cerrado (U.preguntar
          ha resuelto y ocultado #capa), así que aquí sí se puede volver

@@ -103,6 +103,9 @@ de `App` va después del fichero que lo define.
 | `js/guias-guion.js` | «Guion de este paso» en el editor de la guía, y `GuiasGuion.normalizar` (fila 109) |
 | `js/guias-mapa.js`, `css/guias-mapa.css` | El mapa de la guía (fila 113): `GuiasMapa.html` (pura) y abrirlo en Ajustes, dentro del editor de la guía y en la ficha de un asunto |
 | `js/guias-niveles.js` | Entrar y salir de las preguntas de dentro en el editor de la guía, e ir a un paso concreto (`GuiasNiveles`, fila 113, sacado de `js/guias.js`) |
+| `js/guias-plegado.js` | El editor de la guía en acordeón: un solo paso abierto, la línea resumida con sus marcas (`GuiasPlegado`, fila 122) |
+| `js/guias-barra.js` | La barra de formato del editor de la guía (negrita, viñetas, enlace; `GuiasBarra`, fila 122, sacada de `js/guias.js`) |
+| `js/guias-opciones-editor.js` | Las opciones de un paso-pregunta y sus pasos, en el editor de la guía (`GuiasOpcionesEditor.caja`, fila 122, sacado de `js/guias.js`) |
 | `js/ficha-tarjetas-resumen.js` | Lo que enseña cada tarjeta cerrada de la ficha (`FichaTarjetasResumen`, fila 114, sacado de `js/ficha-tarjetas.js`): Documentos con 5 nombres como mucho y «y N más» |
 | `css/ficha-tarjetas.css` | El aspecto de la ficha en tarjetas (fila 107) |
 | `js/navegacion.js` | Fila 119: de qué pantalla se viene a una ficha y a qué altura estaba la lista (`Navegacion.apuntar`/`volver`), abrir un asunto abierto por su nombre y el aviso con «Ir al asunto». Va justo después de `js/ficha-asunto.js` |
@@ -192,6 +195,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/dni.mjs` | Prueba del DNI, del aviso y de las tres mejoras del buscador |
 | `pruebas/empresas.mjs` | Prueba del nombre comercial y de cambiar los datos de un tercero |
 | `pruebas/guias.mjs` | Prueba de escribir la guía desde la ficha, y del plegado |
+| `pruebas/guia-en-acordeon.mjs` | Prueba del editor de la guía en acordeón (fila 122) |
 | `pruebas/opciones.mjs` | Prueba de las preguntas con opciones, con el caso de la factura |
 | `pruebas/registro.mjs` | Prueba de registrar un documento en un paso, sin nombrarlo dos veces |
 | `pruebas/copiar-ruta.mjs` | Prueba (navegador de verdad, fila 98, 23-sep-2026): el botón «Ruta» sin ruta apuntada (nombre y aviso), con ruta de Windows (abierto) y estilo Linux (archivado), guardada en `localStorage` y no en `_GESTOR` |

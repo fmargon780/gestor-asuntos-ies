@@ -182,7 +182,7 @@ await pagina.evaluate(() => { App.volverALaLista(); });
 await pagina.evaluate(() => {
   window.__editada = Guias.editar('MATRICULA', [{ id: 'e1', titulo: 'Paso', plantillasDocumento: ['pd-a', 'pd-borrada'] }], [], []);
 });
-await pagina.waitForSelector('#guia-pasos .paso-documentos');
+await pagina.waitForSelector('#guia-pasos .paso-documentos', { state: 'attached' });   /* fila 122: el paso nace cerrado */
 await comprobar('sale la sección, con la del paso marcada y la borrada tachada',
   pagina.evaluate(() => {
     const d = document.querySelector('#guia-pasos .paso-documentos');
