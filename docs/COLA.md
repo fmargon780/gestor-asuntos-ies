@@ -102,7 +102,7 @@ Las filas 1 a 62, 64 a 75, 77 a 108 están **HECHAS**. Sus documentos siguen en
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 109 | `docs/EL-HITO-A-PANTALLA-COMPLETA.md` | PENDIENTE (apuntada 24-sep-2026). Después de la 107 |
+| 109 | `docs/EL-HITO-A-PANTALLA-COMPLETA.md` | EN CURSO (24-sep-2026) |
 | 110 | `docs/TABLAS-DE-DATOS.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 111 | `docs/GENERO-EN-PLANTILLAS.md` | PENDIENTE (apuntada 24-sep-2026) |
 | 63 | `docs/PUBLICAR-SOLO-LA-APP.md` | BLOQUEADA (19-sep-2026): sin salida a internet desde esa sesión. Vercel publica el repositorio entero, `docs/` incluida; primero comprobarlo con `curl` y, si se confirma, un `.vercelignore` |
