@@ -309,5 +309,12 @@ comprobarQue('el módulo LoPide existe (si esto falla, falta js/lo-pide.js)', ty
   comprobar('7. LoPide.correoDe ya no enseña nada', LoPide.correoDe(despues), '');
 }
 
+/* 8. La etiqueta de la cabecera (fila 106, docs/LO-PIDE-EN-LA-CABECERA.md). */
+comprobar('8. con relación, entre paréntesis y en minúscula',
+  LoPide.etiqueta({ nombre: 'García, Isabel María', relacion: 'Tutor legal 1' }), 'García, Isabel María (tutor legal 1)');
+comprobar('8. sin relación, solo el nombre', LoPide.etiqueta({ nombre: 'Juan Pérez', relacion: '' }), 'Juan Pérez');
+comprobar('8. si el nombre ya es la relación, no se repite',
+  LoPide.etiqueta({ nombre: 'Tutor legal 2', relacion: 'Tutor legal 2' }), 'Tutor legal 2');
+
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 process.exit(fallos ? 1 : 0);

@@ -5,6 +5,16 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 24-sep-2026 — Fila 106: quién lo pide, una sola vez en la cabecera
+
+`docs/LO-PIDE-EN-LA-CABECERA.md`. La marca de arriba dice ya `Lo pide: García, Isabel María
+(tutor legal 1)` (`LoPide.etiqueta`), y desaparece la línea gris de debajo de "El encargo", que
+repetía la relación y traía la errata "por en persona". La vía se sigue viendo, con su valor
+guardado, al abrir "El encargo" (comprobado en `pruebas/cabecera-del-asunto.mjs`). Nada cambia en
+`asuntos.json`. Versión publicada `App.VERSION`: `24-sep-2026 · 03:26`.
+
+---
+
 ## 24-sep-2026 — Fila 105: Ajustes plegado
 
 `docs/AJUSTES-PLEGADO.md`. Francisco veía Ajustes con demasiadas cosas a la vez. Ahora las tres

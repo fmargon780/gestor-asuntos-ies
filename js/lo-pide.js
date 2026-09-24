@@ -289,6 +289,17 @@ var LoPide = (function () {
      `ficha` es la ficha entera del asunto (a.ficha), igual que
      App.textoVia(ficha): así lo llama js/ficha-asunto.js, en la
      misma fila que ese otro dato. */
+  /* La etiqueta de la cabecera de la ficha (fila 106, docs/LO-PIDE-EN-
+     LA-CABECERA.md): el nombre y, si la hay, la relación entre
+     paréntesis y en minúscula. Si el nombre ya es la relación ("Tutor
+     legal 1", tutor sin nombre en Séneca), no se repite. */
+  function etiqueta(d) {
+    if (!d || !d.nombre) return '';
+    var rel = String(d.relacion || '').trim();
+    if (!rel || U.normalizar(rel) === U.normalizar(d.nombre)) return d.nombre;
+    return d.nombre + ' (' + rel.toLowerCase() + ')';
+  }
+
   function texto(ficha) {
     var d = ficha && ficha.loPide;
     if (!d || !d.nombre) return '';
@@ -331,7 +342,7 @@ var LoPide = (function () {
   }
 
   return {
-    opciones: opciones, controles: controles, texto: texto, correoDe: correoDe,
+    opciones: opciones, controles: controles, texto: texto, etiqueta: etiqueta, correoDe: correoDe,
     elegirDestinatarios: elegirDestinatarios, datosDeTutor: datosDeTutor
   };
 })();

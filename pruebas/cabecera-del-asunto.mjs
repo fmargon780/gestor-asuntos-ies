@@ -217,8 +217,19 @@ await comprobar('8. quedan escritos donde estaban antes: loPide y via/viaDato',
     return [f.loPide.nombre, f.loPide.via, f.via, f.viaDato];
   }, RICO), ['María López', 'CORREO', 'CORREO', 'maria@correo.es']);
 
-await comprobarQue('8. el botón muestra el resumen debajo',
-  pagina.locator('.ficha-encargo-resumen').textContent().then((t) => t.indexOf('Tutora') !== -1 && t.indexOf('correo') !== -1));
+/* Fila 106 (docs/LO-PIDE-EN-LA-CABECERA.md): quién lo pide sale una sola
+   vez, arriba, con la relación en minúscula; debajo del botón, nada. */
+await comprobar('8. la etiqueta de arriba lleva la relación entre paréntesis',
+  pagina.locator('#pantalla-asunto .marca-lopide').textContent(), 'Lo pide: María López (tutora)');
+await comprobar('8. debajo de "El encargo" ya no hay línea gris',
+  pagina.locator('.ficha-encargo').evaluate((e) => e.children.length), 1);
+await pagina.click('.ficha-encargo button');
+await pagina.waitForSelector('#capa:not(.oculto)');
+await pagina.waitForSelector('#lopide-caja-ficha .lopide-via');
+await comprobar('8. al volver a abrir "El encargo", la vía sale con lo guardado',
+  pagina.locator('#lopide-caja-ficha .lopide-via').inputValue(), 'CORREO');
+await pagina.keyboard.press('Escape');
+await pagina.waitForSelector('#capa', { state: 'hidden' });
 
 /* ============================================================
    9. "DOCUMENTOS ▾", EN EL BLOQUE, TAMBIÉN VACÍO
