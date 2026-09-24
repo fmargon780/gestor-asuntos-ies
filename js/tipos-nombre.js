@@ -128,9 +128,10 @@ var TiposNombre = (function () {
   async function mover(viejo, nuevo) {
     var r = vacio();
     if (!viejo || !nuevo || viejo === nuevo || !App.E.gestor) return r;
-    await App.enFila('guias.json', function () { return moverGuia(viejo, nuevo, r); });
-    await App.enFila('campos.json', function () { return moverCampos(viejo, nuevo, r); });
-    await App.enFila('plantillas.json', function () { return moverPlantillas(viejo, nuevo, r); });
+    /* Cada parte, solo si su módulo está cargado. */
+    if (window.GuiasDelCentro) await App.enFila('guias.json', function () { return moverGuia(viejo, nuevo, r); });
+    if (window.Campos) await App.enFila('campos.json', function () { return moverCampos(viejo, nuevo, r); });
+    if (window.Plantillas) await App.enFila('plantillas.json', function () { return moverPlantillas(viejo, nuevo, r); });
     await App.enFila('recurrentes.json', function () { return moverRecurrentes(viejo, nuevo, r); });
     return r;
   }
