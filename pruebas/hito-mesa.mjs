@@ -2,8 +2,8 @@
    109 de docs/COLA.md, docs/EL-HITO-A-PANTALLA-COMPLETA.md).
 
    A 1905×1000 y a 1280×800:
-     1. Pulsar un hito en la lista abre su mesa con las tres columnas
-        (a 1905 px, una al lado de otra y sin desplazarse).
+     1. Pulsar un hito en la lista abre su mesa con sus dos zonas (fila
+        145; a 1905 px, una al lado de otra y sin desplazarse).
      2. Cambiar el responsable y el plazo desde sus etiquetas; se guarda.
      3. Generar un documento desde la mesa marca solo el paso de guion
         `generar`, y el documento sale en la tabla; un PDF con su .docx
@@ -126,15 +126,15 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await comprobar('1. la lista es compacta: ningún hito desplegado',
     pagina.locator('#ficha-guia .hito-cuerpo:visible').count(), 0);
   await abrirMesa(pagina, 'm1');
-  await comprobar('1. la mesa se abre, con las tres columnas',
-    pagina.locator('.hito-en-mesa .mesa-col:visible').count(), 3);
+  await comprobar('1. la mesa se abre, con sus dos zonas (fila 145)',
+    pagina.locator('.hito-en-mesa .mesa-col:visible').count(), 2);
   await comprobar('1. los demás hitos no se ven', pagina.locator('#ficha-guia .hito[data-id="m3"]').isVisible(), false);
   await comprobar('1. el guion, con su cuenta', pagina.locator('.hito-en-mesa .mesa-guion-cuenta').textContent(), '0 de 3');
   if (ancho === 1905) {
-    await comprobar('1. a 1905 px, las tres columnas una al lado de otra y a la vista, sin bajar',
+    await comprobar('1. a 1905 px, las dos zonas una al lado de otra y a la vista, sin bajar',
       pagina.evaluate(() => {
         const c = Array.from(document.querySelectorAll('.hito-en-mesa .mesa-col')).map((e) => e.getBoundingClientRect());
-        return c.length === 3 && c[0].right <= c[1].left && c[1].right <= c[2].left &&
+        return c.length === 2 && c[0].right <= c[1].left &&
           c.every((r) => Math.abs(r.top - c[0].top) < 2 && r.top < window.innerHeight - 100) && window.scrollY === 0;
       }), true);
     if (process.env.FOTOS) await pagina.screenshot({ path: process.env.FOTOS + '/mesa.png' });
@@ -156,6 +156,8 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await comprobar('2. la mesa sigue abierta tras guardar', pagina.locator('.hito-en-mesa[data-id="m1"]').isVisible(), true);
 
   /* 3. */
+  /* Fila 145: las plantillas, en el desplegable «Generar documento ▾». */
+  await pagina.locator('.hito-en-mesa .mesa-abrir-panel[data-panel="generar"]').click();
   await pagina.locator('.hito-en-mesa .mesa-plantilla-generar').first().click();
   await pagina.waitForTimeout(900);
   await comprobar('3. generar marca solo el paso «generar» del guion',
@@ -281,7 +283,8 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   if (!(await pagina.locator('#ficha-guia.con-mesa .hito-en-mesa[data-id="m1"]').isVisible())) await abrirMesa(pagina, 'm1');
   await comprobar('9. el aviso de hito sin guion ya no manda a Ajustes',
     pagina.evaluate(() => (document.querySelector('.hito-en-mesa .mesa-guion') || {}).textContent.indexOf('Se escribe en la guía del tipo (Ajustes)') === -1), true);
-  await pagina.locator('.hito-en-mesa .guion-anadir-guia').click();
+  /* Fila 145: en el menú «···» de la cabecera. */
+  await elegirDelMenu(pagina, '.hito-en-mesa .mesa-mas', 'Añadir un paso a la guía del tipo');
   await pagina.waitForSelector('#capa:not(.oculto)');
   await pagina.fill('#guion-guia-texto', 'Pedir el certificado de empadronamiento');
   await pagina.click('#cuadro-aceptar');

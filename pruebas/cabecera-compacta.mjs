@@ -8,7 +8,7 @@
         línea gris en la segunda.
      2. Sin «Volver a las tarjetas», «Volver a la lista de hitos» ni la
         línea de ruta; sin el título «Hitos» del recuadro.
-     3. El título «GUION DEL HITO», a 250 px o menos del borde de arriba.
+     3. El título del guion («QUÉ HAY QUE HACER» desde la fila 145), a 250 px o menos del borde de arriba.
      4. El nombre del hito, sus etiquetas y «Marcar hito como hecho», en
         una sola línea.
      5. Pulsar otra vez la pestaña «Hitos»: primero a la lista de hitos;
@@ -132,8 +132,9 @@ async function abrirMesa(pagina) {
 
   /* 3. */
   const guion = await alto(pagina, '.mesa-guion .mesa-bloque-titulo');
-  console.log('   (GUION DEL HITO a ' + Math.round(guion.top) + ' px)');
-  await comprobar('3. «GUION DEL HITO» a 250 px o menos del borde', Promise.resolve(guion.top <= 250), true);
+  /* Fila 145: el título del guion es ahora «Qué hay que hacer». */
+  console.log('   (QUÉ HAY QUE HACER a ' + Math.round(guion.top) + ' px)');
+  await comprobar('3. «QUÉ HAY QUE HACER» a 250 px o menos del borde', Promise.resolve(guion.top <= 250), true);
 
   /* 4. */
   const t = await alto(pagina, '.mesa-titulo');

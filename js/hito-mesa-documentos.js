@@ -88,7 +88,8 @@ var HitoMesaDocumentos = (function () {
 
   function filasHTML(a, h, hitos, nombresDeLaCarpeta, abierto) {
     var docs = h.documentos || [];
-    if (!docs.length) return abierto ? '<p class="explica mesa-sin-docs">Todavía no hay ningún documento en este hito.</p>' : '';
+    /* Fila 145: vacío, una sola línea gris. */
+    if (!docs.length) return abierto ? '<p class="mesa-sin-docs">Ninguno todavía. <span class="mesa-soltar-pista">Suelta aquí un documento del ordenador</span></p>' : '';
     return agrupar(docs, nombresDeLaCarpeta).map(function (g) {
       var falta = !!(nombresDeLaCarpeta && nombresDeLaCarpeta.indexOf(g.nombre) === -1);
       var estado = estadoDe(g.nombre, falta);
@@ -220,8 +221,9 @@ var HitoMesaDocumentos = (function () {
 
   /* Soltar un fichero: lo mismo que "Desde el ordenador" (js/documentos.js,
      con el hito), con el fichero ya elegido. */
+  /* Fila 145: sobre toda la columna derecha, sin recuadro. */
   function engancharSoltar(fila, a, h) {
-    var zona = fila.querySelector('.mesa-soltar');
+    var zona = fila.querySelector('.mesa-col-derecha') || fila.querySelector('.mesa-soltar');
     if (!zona) return;
     zona.ondragover = function (ev) { ev.preventDefault(); zona.classList.add('encima'); };
     zona.ondragleave = function () { zona.classList.remove('encima'); };

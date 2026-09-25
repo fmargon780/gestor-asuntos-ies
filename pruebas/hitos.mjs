@@ -365,7 +365,8 @@ console.log('--- escenario 5: cambiar de rama ---');
 await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());
 await pagina.locator('#ficha-guia .hito[data-id="p3a1"] .hito-titulo').click();
 await pagina.fill('#ficha-guia .hito[data-id="p3a1"] .hito-nota-texto', 'Entregado en mano el lunes');
-await pagina.locator('#ficha-guia .hito[data-id="p3a1"] .hito-nota-anadir').click();
+/* Fila 145: sin botón «Añadir nota»; Intro guarda. */
+await pagina.press('#ficha-guia .hito[data-id="p3a1"] .hito-nota-texto', 'Enter');
 await pagina.waitForTimeout(400);
 /* Fila 139: la nota escrita en la mesa va a las del asunto, con el hito
    como etiqueta (docs/UNA-SOLA-LIBRETA-DE-NOTAS.md). */

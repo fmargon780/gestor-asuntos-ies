@@ -11,7 +11,9 @@
    (`HitosComunicar.comunicar`) con esos destinatarios y los documentos
    del hito premarcados. "Pedir lo que falta", solo si falta algo.
 
-   Lo llama js/hito-mesa-documentos.js con la mesa abierta.
+   Desde la fila 145, todo esto va dentro del desplegable «Comunicar ▾» de
+   la cabecera (js/hito-mesa.js). Lo llama js/hito-mesa-documentos.js con
+   la mesa abierta.
    ============================================================ */
 var HitoMesaComunicar = (function () {
 

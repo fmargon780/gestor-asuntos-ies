@@ -422,6 +422,11 @@
     }
     /* En la ficha, con una tarjeta abierta en grande, el primer Escape
        vuelve a la cuadrícula (fila 107, js/ficha-tarjetas.js). */
+    /* Fila 145: un desplegable de la cabecera de la mesa, antes que la mesa. */
+    if (pantallaVisible.id === 'pantalla-asunto' && window.HitoMesa && HitoMesa.cerrarPanelSiAbierto && HitoMesa.cerrarPanelSiAbierto()) {
+      ev.preventDefault();
+      return;
+    }
     /* Con la mesa de un hito abierta, el primero vuelve a la lista de hitos (fila 109). */
     if (pantallaVisible.id === 'pantalla-asunto' && window.HitoMesa && HitoMesa.cerrarSiAbierta()) {
       ev.preventDefault();

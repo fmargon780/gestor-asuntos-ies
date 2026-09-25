@@ -112,7 +112,8 @@ const mesa = () => pagina.evaluate(() => {
   const b = document.querySelector('#ficha-guia .hito[data-id="h1"] .mesa-notas');
   return {
     notas: Array.prototype.map.call(b.querySelectorAll('.hito-notas:not(.hito-historia) .hito-nota'), x => x.textContent.split('\n').pop().replace(/^.*· \d{4}-\d{2}-\d{2}/, '')),
-    historia: Array.prototype.map.call(b.querySelectorAll('.hito-historia .hito-nota'), x => x.classList.contains('hito-nota-auto'))
+    /* Fila 145: «Historia» es su propio bloque, debajo de «Notas». */
+    historia: Array.prototype.map.call(b.closest('.hito').querySelectorAll('.mesa-historia .hito-historia .hito-nota'), x => x.classList.contains('hito-nota-auto'))
   };
 });
 await comprobar('solo las notas de ese hito (la más nueva arriba), y la historia aparte', mesa(), {
@@ -125,7 +126,8 @@ await pagina.fill(ta, 'Llamada a la familia');
 await pagina.evaluate(() => HitosPanel.programarRepintado());
 await pagina.waitForTimeout(800);
 await comprobar('lo escrito sobrevive a un repintado', pagina.locator(ta).inputValue(), 'Llamada a la familia');
-await pagina.click('#ficha-guia .hito[data-id="h1"] .hito-nota-anadir');
+/* Fila 145: sin botón «Añadir nota»; Intro guarda. */
+await pagina.press(ta, 'Enter');
 await esperar(async (ana) => {
   const r = await Carpetas.leerJson(App.E.gestor, 'asuntos.json');
   return r.asuntos[ana].notas.some(n => n.texto === 'Llamada a la familia');

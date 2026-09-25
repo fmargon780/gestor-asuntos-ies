@@ -5,6 +5,24 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 145: la mesa del hito, enfocada
+
+`docs/MESA-DEL-HITO-ENFOCADA.md`, a partir de una captura de «Recoger la solicitud» y de un ejemplo en
+HTML que Francisco aprobó. La mesa lo enseñaba todo con el mismo peso (tres columnas, unos quince
+botones). Ahora **el guion manda**: el siguiente paso resaltado con su acción como botón principal, y lo
+demás en dos desplegables de la cabecera («Generar documento ▾», «Comunicar ▾») y en el menú «···».
+Decisiones:
+
+- Solo cambia cómo se ve. Los botones de siempre del hito siguen en el DOM, escondidos, y las acciones
+  del guion los pulsan; las funciones que rellenan plantillas y destinatarios no cambian: solo se
+  movió su caja (`.mesa-plantillas`, `.mesa-destinatarios`) a los desplegables.
+- Los desplegables van dentro de la página (no chocan con el cuadro único) y recuerdan cuál estaba
+  abierto, para que un repintado (guardar, llegar un documento) no lo cierre.
+- «Pedir lo que falta» vive dentro de «Comunicar ▾»: queda resuelto el punto «los tres botones de
+  comunicar» de «Lo que queda por hablar».
+- Una línea 📎 sin acción se trata como «Añadir documento» (así el siguiente paso siempre tiene botón).
+- «Estamos en este paso» (fila 129) pasa al menú «···», para que la cabecera tenga cuatro botones.
+
 ## 25-sep-2026 — Fila 144: el alumnado de la base de datos, desde la carpeta de Drive
 
 `docs/ALUMNADO-BD-DESDE-DRIVE.md` y el acuerdo, versión 2. La dirección web con clave de la fila 142

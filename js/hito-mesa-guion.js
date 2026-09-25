@@ -44,25 +44,33 @@ var HitoMesaGuion = (function () {
       : '<span class="mesa-cita">§ ' + U.escapar(n.cita) + '</span>';
   }
 
-  function pasoHTML(g, abierto) {
+  /* Fila 145: la acción del paso; algo 📎 que hay que reunir, sin
+     acción, se añade con «Añadir documento». */
+  function accionDe(g) { return g.accion || (g.reunir === 'documento' ? 'anadir' : ''); }
+
+  function pasoHTML(g, abierto, siguiente) {
     var marcado = g.hecho || g.noaplica;
     var titulo = marcado ? (g.noaplica ? 'No aplica' : 'Hecho') + (g.quien ? ' por ' + g.quien : '') +
-      (g.cuando ? ' el ' + String(g.cuando).slice(0, 10) : '') : '';
-    var accion = BOTON_DE_ACCION[g.accion];
+      (g.cuando ? ' el ' + String(g.cuando).slice(0, 10) : '') +
+      (g.valor ? ' · ' + g.valor : '') + (g.documento ? ' · ' + g.documento : '') : '';
+    var claveAccion = accionDe(g);
+    var accion = BOTON_DE_ACCION[claveAccion];
     var marcaReunir = g.reunir === 'documento' ? '<span class="guion-reunir-marca" title="Un documento que hay que reunir">📎</span>'
       : (g.reunir === 'dato' ? '<span class="guion-reunir-marca" title="Un dato que hay que reunir">✎</span>' : '');
-    return '<div class="guion-paso' + (g.hecho ? ' hecho' : '') + (g.noaplica ? ' noaplica' : '') + (g.reunir ? ' guion-reunir' : '') + '" data-id="' +
+    var botonAccion = abierto && accion && !marcado ? '<button type="button" class="boton ' + (siguiente ? 'boton-principal' : 'boton-chico') +
+      ' guion-accion-boton" data-accion="' + U.escapar(claveAccion) + '">' + U.escapar(accion.texto) + '</button>' : '';
+    return '<div class="guion-paso' + (g.hecho ? ' hecho' : '') + (g.noaplica ? ' noaplica' : '') + (g.reunir ? ' guion-reunir' : '') +
+        (siguiente ? ' guion-siguiente' : '') + '" data-id="' +
         U.escapar(g.id) + '"' + (titulo ? ' title="' + U.escapar(titulo) + '"' : '') + '>' +
-      '<label class="guion-paso-linea"><input type="checkbox" class="guion-casilla"' + (g.hecho ? ' checked' : '') +
+      '<div class="guion-paso-fila"><label class="guion-paso-linea"><input type="checkbox" class="guion-casilla"' + (g.hecho ? ' checked' : '') +
         (abierto ? '' : ' disabled') + '>' + marcaReunir + '<span class="guion-paso-texto">' + U.escapar(g.texto) + '</span>' +
-        (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + '</label>' +
+        (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + '</label>' + botonAccion + '</div>' +
       (g.explicacion ? '<div class="guion-paso-explicacion">' + U.escapar(g.explicacion) + '</div>' : '') +
       (g.reunir === 'dato' ? '<input class="campo guion-dato" value="' + U.escapar(g.valor || '') + '" placeholder="Escríbelo aquí"' +
         (abierto ? '' : ' disabled') + '>' : '') +
       (g.reunir === 'documento' && g.hecho && g.documento ? '<div class="guion-paso-explicacion guion-reunir-documento">📎 ' + U.escapar(g.documento) + '</div>' : '') +
+      (abierto && siguiente && claveAccion === 'anadir' ? '<div class="guion-soltar">Suelta aquí el PDF, o pulsa el botón</div>' : '') +
       '<div class="guion-paso-botones">' +
-        (abierto && accion && !marcado ? '<button type="button" class="boton boton-chico guion-accion-boton" data-accion="' +
-          U.escapar(g.accion) + '">' + U.escapar(accion.texto) + '</button>' : '') +
         enlaceNormativa(g.normativa) +
         (abierto ? '<button type="button" class="enlace guion-noaplica">' + (g.noaplica ? 'Sí aplica' : 'No aplica') + '</button>' : '') +
       '</div>' +
@@ -70,8 +78,8 @@ var HitoMesaGuion = (function () {
   }
 
   /* Fila 116: una pregunta del guion, con un botón por respuesta. */
-  function preguntaGuionHTML(g, abierto) {
-    return '<div class="guion-paso guion-pregunta' + (g.elegida ? ' hecho' : '') + '" data-id="' + U.escapar(g.id) + '">' +
+  function preguntaGuionHTML(g, abierto, siguiente) {
+    return '<div class="guion-paso guion-pregunta' + (g.elegida ? ' hecho' : '') + (siguiente ? ' guion-siguiente' : '') + '" data-id="' + U.escapar(g.id) + '">' +
       '<div class="guion-paso-linea"><span class="guion-pregunta-marca">¿</span><span class="guion-paso-texto">' +
         U.escapar(g.texto) + '</span></div>' +
       (g.explicacion ? '<div class="guion-paso-explicacion">' + U.escapar(g.explicacion) + '</div>' : '') +
@@ -83,9 +91,9 @@ var HitoMesaGuion = (function () {
     '</div>';
   }
 
-  function lineaHTML(g, abierto) {
-    if (g.pregunta) return preguntaGuionHTML(g, abierto);
-    var html = pasoHTML(g, abierto);
+  function lineaHTML(g, abierto, siguiente) {
+    if (g.pregunta) return preguntaGuionHTML(g, abierto, siguiente);
+    var html = pasoHTML(g, abierto, siguiente);
     return g.deOpcion ? html.replace('class="guion-paso', 'class="guion-paso guion-de-opcion') : html;
   }
 
@@ -124,13 +132,15 @@ var HitoMesaGuion = (function () {
     var guion = Hitos.guionDe(a, h);
     var c = Hitos.cuentaGuion(guion);
     var pct = c.total ? Math.round(100 * c.hechos / c.total) : 0;
+    /* Fila 145: el siguiente paso, el primero sin hacer y sin «No aplica»
+       (con el hito ya hecho, ninguno). */
+    var siguiente = h.estado === 'hecho' ? null : guion.filter(function (g) { return !g.hecho && !g.noaplica; })[0];
     caja.innerHTML =
-      '<div class="mesa-bloque-cabecera"><span class="mesa-bloque-titulo">Guion del hito</span>' +
+      '<div class="mesa-bloque-cabecera mesa-guion-cabecera"><span class="mesa-bloque-titulo">Qué hay que hacer</span>' +
+        '<div class="mesa-barra"><span style="width:' + pct + '%"></span></div>' +
         '<span class="mesa-guion-cuenta">' + c.hechos + ' de ' + c.total + '</span></div>' +
-      '<div class="mesa-barra"><span style="width:' + pct + '%"></span></div>' +
-      (guion.length ? guion.map(function (g) { return lineaHTML(g, abierto); }).join('') + plegadasHTML(guion.plegadas)
+      (guion.length ? guion.map(function (g) { return lineaHTML(g, abierto, g === siguiente); }).join('') + plegadasHTML(guion.plegadas)
         : '<p class="explica">Este hito todavía no tiene guion. Añade el primer paso aquí abajo.</p>') +
-      (abierto && pasoDeLaGuia(a, h) ? '<button type="button" class="enlace guion-anadir-guia">+ Añadir un paso a la guía del tipo</button><br>' : '') +
       (abierto ? '<button type="button" class="enlace guion-anadir-propio">+ Añadir un paso solo para este asunto</button>' : '');
 
     /* La normativa de los pasos del guion, también en la columna de consulta. */
@@ -138,8 +148,16 @@ var HitoMesaGuion = (function () {
     if (consulta) {
       var ya = {};
       (h.normativa || []).forEach(function (n) { ya[n.cita] = true; });
-      consulta.innerHTML = guion.filter(function (g) { return g.normativa && !ya[g.normativa.cita] && (ya[g.normativa.cita] = true); })
-        .map(function (g) { return '<div class="mesa-normativa-linea">' + enlaceNormativa(g.normativa) + '</div>'; }).join('');
+      var delGuion = guion.filter(function (g) { return g.normativa && !ya[g.normativa.cita] && (ya[g.normativa.cita] = true); });
+      consulta.innerHTML = delGuion.map(function (g) { return '<div class="mesa-normativa-linea">' + enlaceNormativa(g.normativa) + '</div>'; }).join('');
+      /* Fila 145: «Normativa (N)», plegada; sin ninguna, no sale. */
+      var bloqueNormas = consulta.closest('.mesa-normativa');
+      var total = Object.keys(ya).length;
+      if (bloqueNormas) {
+        bloqueNormas.classList.toggle('oculto', !total);
+        var cuenta = bloqueNormas.querySelector('.mesa-normativa-cuenta');
+        if (cuenta) cuenta.textContent = total;
+      }
     }
     if (!abierto) return;
 
@@ -177,8 +195,19 @@ var HitoMesaGuion = (function () {
         else U.aviso('Esa acción está en los documentos del hito.', 'ambar');
       };
     });
-    var deGuia = caja.querySelector('.guion-anadir-guia');
-    if (deGuia) deGuia.onclick = function () { anadirALaGuia(a, h); };
+    /* Fila 145: soltar un fichero en el siguiente paso, como en la columna derecha. */
+    var soltar = caja.querySelector('.guion-soltar');
+    if (soltar) {
+      soltar.ondragover = function (ev) { ev.preventDefault(); ev.stopPropagation(); soltar.classList.add('encima'); };
+      soltar.ondragleave = function () { soltar.classList.remove('encima'); };
+      soltar.ondrop = function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        soltar.classList.remove('encima');
+        var ficheros = ev.dataTransfer && ev.dataTransfer.files;
+        if (ficheros && ficheros.length && window.Documentos && Documentos.abrir) Documentos.abrir(a, { hito: h, ficheroSoltado: ficheros[0] });
+      };
+    }
     var propio = caja.querySelector('.guion-anadir-propio');
     if (propio) propio.onclick = async function () {
       var ok = await U.preguntar('Añadir un paso al guion de este asunto',
@@ -249,6 +278,8 @@ var HitoMesaGuion = (function () {
     if (window.HitosPanel) HitosPanel.programarRepintado();
   }
 
-  return { pintar: pintar };
+  function puedeAnadirALaGuia(a, h) { return !!pasoDeLaGuia(a, h); }
+
+  return { pintar: pintar, puedeAnadirALaGuia: puedeAnadirALaGuia, anadirALaGuia: anadirALaGuia };
 })();
 window.HitoMesaGuion = HitoMesaGuion;

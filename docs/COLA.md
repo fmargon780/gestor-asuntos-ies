@@ -107,13 +107,19 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 142 y la 144 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 142, la 144 y la 145 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 145 | `docs/MESA-DEL-HITO-ENFOCADA.md` (la mesa del hito, enfocada: el guion manda, dos zonas, «Generar documento ▾» y «Comunicar ▾» en la cabecera) | EN CURSO (25-sep-2026) |
 | 146 | `docs/IMPRESOS-CASILLAS-LEGIBLES.md` (Ajustes › Impresos oficiales: casillas con nombre legible, miniatura de dónde están y solo las del centro a la vista) | PENDIENTE |
+
+**La fila 145 está HECHA** (25-sep-2026): `docs/MESA-DEL-HITO-ENFOCADA.md`. La mesa del hito, enfocada:
+tira de hitos a todo el ancho, una línea de cabecera con «Generar documento ▾», «Comunicar ▾»
+(dentro, «Pedir lo que falta»), «Marcar como hecho» y «···» (con «Cambiar la guía…» y «+ Añadir un paso
+a la guía del tipo»); dos zonas (el guion, con el siguiente paso resaltado; y documentos, normativa
+plegada, notas e historia). Prueba nueva `pruebas/mesa-del-hito-enfocada.mjs` y captura en
+`pruebas/capturas/`. Versión escrita: `25-sep-2026 · 03:32`.
 
 **La fila 144 está HECHA** (25-sep-2026): `docs/ALUMNADO-BD-DESDE-DRIVE.md`. Fuera la dirección
 web de la fila 142. En Ajustes › El centro, «Carpeta de la base de datos de alumnado» (se señala la
@@ -418,12 +424,6 @@ mesa de trabajo, sobre lo que dejó la 102.
   conforme Francisco los vaya trabajando de verdad, que es cuando verá si algo sobra o falta.
 - De la fila 104 (23-sep-2026): con el uso, un aviso que devuelva el asunto a "Pendiente de
   Administración" cuando vence el plazo de un hito de terceros, para reclamarlo.
-- **Del informe del 18-sep-2026: los tres botones de comunicar.** En la misma ficha hay
-  "Comunicar" en la cabecera (plantilla del tipo), "Comunicar" en un hito (texto de ese paso) y
-  "Pedir lo que falta" en un hito. Por dentro están bien: los tres abren el mismo cuadro y no hay
-  código duplicado. Desde la pantalla, tres botones parecidos van a confundir. **No se toca hasta
-  que Francisco haya usado los hitos un mes**: entonces se decide si "Pedir lo que falta" pasa a ser
-  una opción dentro de "Comunicar". Por eso no es una fila de la cola.
 - **Del informe del 18-sep-2026: la papelera, ¿se vacía sola?** Hoy avisa a los 30 días pero no
   borra nada sin que alguien pulse. Para datos de menores, un borrado que nunca ocurre no es lo
   ideal. **Hay que preguntarselo a Francisco**, y apuntar lo que decida. Es la parte que quedó sin

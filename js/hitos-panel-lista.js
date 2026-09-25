@@ -196,6 +196,11 @@ var HitosPanelLista = (function () {
     var htmlRequisitos = (!abierto && window.HitosRequisitos && (h.requisitos || []).length)
       ? HitosRequisitos.bloqueDeRequisitos(a, h) : '';
 
+    /* Fila 145 (docs/MESA-DEL-HITO-ENFOCADA.md): dos zonas. A la izquierda,
+       «Qué hay que hacer» (el guion); a la derecha, lo que ya existe
+       (documentos, normativa plegada, notas e historia). Las plantillas,
+       los formularios y «Comunicar» van a los desplegables de la cabecera
+       (js/hito-mesa.js). */
     var colGuion = '<div class="mesa-col mesa-col-guion">' +
       (h.cuerpo ? '<div class="hito-explicacion">' + h.cuerpo + '</div>' : '') +
       '<div class="mesa-guion"></div>' +
@@ -207,60 +212,54 @@ var HitosPanelLista = (function () {
           return '<span class="hito-documento" data-doc="' + U.escapar(d) + '"><button type="button" class="hito-doc-abrir" data-doc="' +
             U.escapar(d) + '">' + U.escapar(d) + '</button></span>';
         }).join('');
-    var colDocs = '<div class="mesa-col mesa-col-docs">' +
-      '<div class="mesa-bloque">' +
+    var bloqueDocs = '<div class="mesa-bloque mesa-docs">' +
         '<div class="mesa-bloque-cabecera"><span class="mesa-bloque-titulo">Documentos del hito</span>' +
           (abierto && window.HitosAnadir ? HitosAnadir.botonHTML(a, h) : '') + '</div>' +
-        (abierto ? '<div class="mesa-soltar">Suelta aquí un documento del ordenador</div>' : '') +
         (abierto || (h.documentos || []).length ? '<div class="hito-documentos">' + documentosHTML + '</div>' : '') +
         '<div class="mesa-seleccion oculto"></div>' +
         htmlRequisitos +
-      '</div>' +
-      '<div class="mesa-bloque mesa-formularios">' +
-        '<div class="mesa-bloque-cabecera"><span class="mesa-bloque-titulo">Formularios y plantillas de este hito</span>' +
-          (abierto && window.HitosGenerar ? HitosGenerar.botonHTML(a, h) : '') + '</div>' +
-        '<div class="mesa-plantillas"></div>' +
-        (window.Formularios ? Formularios.listaHTML(h.formularios) : '') +
-      '</div>' +
-    '</div>';
+      '</div>';
 
     /* Fila 139 (docs/UNA-SOLA-LIBRETA-DE-NOTAS.md): las notas son las del
        asunto escritas desde este hito (js/notas-migracion.js); la historia
        automática del hito se queda aquí, aparte. */
     var notas = (window.NotasHito ? NotasHito.delHito(a, h.id) : []).slice().reverse();
     var historia = (h.notas || []).slice().reverse();
-    var colConsulta = '<div class="mesa-col mesa-col-consulta">' +
-      (window.HitosNormativa ? '<div class="mesa-bloque mesa-normativa">' +
-        HitosNormativa.listaHTML(h.normativa) + '<div class="mesa-normativa-guion"></div></div>' : '') +
-      (abierto ? '<div class="mesa-bloque mesa-comunicar"><div class="mesa-bloque-cabecera"><span class="mesa-bloque-titulo">Comunicar</span>' +
-        (window.HitosComunicar ? HitosComunicar.botonHTML(a, h) : '') + '</div>' +
-        '<div class="mesa-destinatarios"></div></div>' : '') +
+    var cuantasNormas = (h.normativa || []).filter(function (r) { return r && r.cita; }).length;
+    var colDerecha = '<div class="mesa-col mesa-col-derecha">' + bloqueDocs +
+      (window.HitosNormativa ? '<details class="mesa-bloque mesa-normativa' + (cuantasNormas ? '' : ' oculto') + '">' +
+        '<summary class="mesa-bloque-titulo">Normativa (<span class="mesa-normativa-cuenta">' + cuantasNormas + '</span>)</summary>' +
+        HitosNormativa.listaHTML(h.normativa) + '<div class="mesa-normativa-guion"></div></details>' : '') +
       '<div class="mesa-bloque mesa-notas"><span class="mesa-bloque-titulo">Notas</span>' +
         (abierto ? '<div class="nota-nueva">' +
-          '<textarea class="campo hito-nota-texto" rows="2" placeholder="Añadir una nota (va a las del asunto, con este hito; Intro guarda; Mayúsculas+Intro, otra línea)"></textarea>' +
-          '<button type="button" class="boton hito-nota-anadir">Añadir nota</button></div>' : '') +
+          '<textarea class="campo hito-nota-texto" rows="1" placeholder="Escribe una nota; Intro guarda (Mayúsculas+Intro, otra línea)"></textarea>' +
+          '<button type="button" class="boton hito-nota-anadir oculto">Añadir nota</button></div>' : '') +
         '<div class="hito-notas">' + notas.map(function (n) {
           return '<div class="hito-nota"><strong>' + U.escapar(n.quien || '') + '</strong> · ' +
             U.escapar((n.cuando || '').slice(0, 10)) + '<br>' + U.escapar(n.texto) + '</div>';
         }).join('') + '</div>' +
-        (historia.length ? '<div class="mesa-bloque-titulo hito-historia-titulo">Historia</div>' +
-          '<div class="hito-notas hito-historia">' + historia.map(function (n) {
-            var auto = !window.NotasHito || NotasHito.esAutomatica(n.texto);
-            return '<div class="hito-nota' + (auto ? ' hito-nota-auto' : '') + '"><strong>' + U.escapar(n.quien || '') + '</strong> · ' +
-              U.escapar((n.cuando || '').slice(0, 10)) + '<br>' + U.escapar(n.texto) + '</div>';
-          }).join('') + '</div>' : '') +
       '</div>' +
+      (historia.length ? '<div class="mesa-bloque mesa-historia"><span class="mesa-bloque-titulo hito-historia-titulo">Historia</span>' +
+        '<div class="hito-notas hito-historia">' + historia.map(function (n) {
+          var auto = !window.NotasHito || NotasHito.esAutomatica(n.texto);
+          return '<div class="hito-nota' + (auto ? ' hito-nota-auto' : '') + '"><strong>' + U.escapar(n.quien || '') + '</strong> · ' +
+            U.escapar((n.cuando || '').slice(0, 10)) + '<br>' + U.escapar(n.texto) + '</div>';
+        }).join('') + '</div></div>' : '') +
     '</div>';
 
     /* Lo que va en el menú ⋯ de la cabecera de la mesa (js/hito-mesa.js
-       pulsa estos botones por debajo), y "Cambiar de rama" de siempre. */
+       pulsa estos botones por debajo), y "Cambiar de rama" de siempre.
+       Los botones de siempre de generar y comunicar quedan escondidos: los
+       pulsan las acciones del guion. */
     var botones = abierto ? '<div class="hito-botones">' +
       (h.clase === 'decision' ? '<button type="button" class="boton hito-cambiar-rama">Cambiar de rama</button>' : '') +
       '<button type="button" class="boton hito-solo-informativo oculto">' +
         (h.soloInformativo ? 'Pedírmelo a mí' : 'Dejarlo solo informativo') + '</button>' +
-      '<button type="button" class="boton boton-peligro hito-quitar oculto">Quitar este hito</button></div>' : '';
+      '<button type="button" class="boton boton-peligro hito-quitar oculto">Quitar este hito</button>' +
+      '<span class="mesa-ocultos oculto">' + (window.HitosGenerar ? HitosGenerar.botonHTML(a, h) : '') +
+        (window.HitosComunicar ? HitosComunicar.botonHTML(a, h) : '') + '</span></div>' : '';
 
-    return '<div class="mesa-cabecera"></div><div class="mesa-columnas">' + colGuion + colDocs + colConsulta + '</div>' + botones;
+    return '<div class="mesa-cabecera"></div><div class="mesa-columnas">' + colGuion + colDerecha + '</div>' + botones;
   }
 
   /* Ya se sabe, desde que se pintó el cuerpo, qué documentos siguen en
@@ -321,6 +320,8 @@ var HitosPanelLista = (function () {
     if (notaTa) notaTa.onkeydown = function (ev) {
       if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); var b = div.querySelector('.hito-nota-anadir'); if (b) b.click(); }
     };
+    /* Fila 145: de una línea, crece al escribir. */
+    if (notaTa) notaTa.oninput = function () { notaTa.style.height = 'auto'; notaTa.style.height = notaTa.scrollHeight + 'px'; };
     var notaBtn = div.querySelector('.hito-nota-anadir');
     if (notaBtn) notaBtn.onclick = async function () {
       var ta = div.querySelector('.hito-nota-texto');

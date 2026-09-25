@@ -5,8 +5,9 @@
 
    Con la mesa abierta, `#ficha-guia` lleva `con-mesa`: se esconden los
    demás hitos, la cuenta y "+ Añadir un hito", y el hito abierto ocupa
-   todo el sitio con su cuerpo en tres columnas. Con el documento a la
-   derecha (visor o lector), la tercera columna baja debajo.
+   todo el sitio. Desde la fila 145 (docs/MESA-DEL-HITO-ENFOCADA.md), en dos
+   zonas (el guion, 2fr; lo que ya existe, 1fr). Con el documento a la
+   derecha (visor o lector), o por debajo de 1100 px, la derecha baja.
    ============================================================ */
 
 /* La lista, compacta: una línea por hito, nada desplegado. */
@@ -22,13 +23,13 @@
 .hito-en-mesa > .hito-cuerpo { margin: 0; gap: 12px; }
 .hito-en-mesa .hito-requisitos-pedir { display: none; }   /* va en "Comunicar" */
 
-/* ---------- la cabecera ---------- */
-/* Fila 112: nombre, etiquetas y botones en una sola línea; debajo, la tira. */
-.mesa-cabecera { display: flex; flex-direction: column; gap: 6px; border-bottom: 1px solid var(--linea); padding-bottom: 8px; }
-.mesa-titulo-fila { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.mesa-titulo { margin: 0; font-size: 19px; flex: 0 1 auto; min-width: 0; }
-.mesa-titulo-fila .mesa-etiquetas { flex: 1 1 auto; }
-.mesa-titulo-fila .boton { padding-top: 5px; padding-bottom: 5px; }
+/* ---------- la cabecera (fila 145, docs/MESA-DEL-HITO-ENFOCADA.md) ---------- */
+/* Arriba, la tira a todo el ancho; debajo, el título con plazo y responsable
+   en texto pequeño y, a la derecha, cuatro botones. */
+.mesa-cabecera { display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--linea); padding-bottom: 8px; }
+.mesa-titulo-fila { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.mesa-titulo { margin: 0; font-size: 21px; flex: 0 1 auto; min-width: 0; }
+.mesa-titulo-fila .mesa-etiquetas { flex: 1 1 auto; align-items: center; }
 .mesa-hecho-resaltado { box-shadow: 0 0 0 3px rgba(30, 122, 70, .25); }
 .mesa-etiquetas { display: flex; gap: 6px; flex-wrap: wrap; }
 .mesa-etq {
@@ -36,39 +37,70 @@
   border: 1px solid var(--linea); border-radius: 12px; padding: 3px 10px;
   background: #eef1f5; color: #4c5968;
 }
-.mesa-etq-hecho, .mesa-etq-verde { background: #e2f4e6; color: #1f6b33; border-color: #c6e6cf; }
-.mesa-etq-encurso, .mesa-etq-ambar { background: #fff4d6; color: #8a6100; border-color: #e6c377; }
-.mesa-etq-rojo { background: #fdecec; color: #a4302a; border-color: #f2c4c0; }
-.mesa-etq-noaplica { opacity: .7; }
-.mesa-tira { display: flex; gap: 4px; flex-wrap: wrap; }
-.mesa-tira-hito {
-  font: inherit; font-size: 12px; cursor: pointer; max-width: 220px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  border: 1px solid var(--linea); border-radius: 12px; padding: 2px 9px;
-  background: var(--papel); color: var(--tinta-suave);
-}
-.mesa-tira-hito.hecho { color: #1f6b33; }
-.mesa-tira-hito.actual { background: var(--azul); border-color: var(--azul); color: #fff; }
+.mesa-etq-hecho { background: #e2f4e6; color: #1f6b33; border-color: #c6e6cf; }
+/* Plazo, responsable y el estado (si no está hecho): texto pequeño y gris, pulsable. */
+.mesa-meta { font: inherit; font-size: 12.5px; color: var(--tinta-suave); background: none; border: 0; padding: 0; cursor: pointer; }
+.mesa-meta:hover { color: var(--azul); text-decoration: underline; }
+.mesa-meta.mesa-etq-rojo { color: #a4302a; font-weight: 600; }
+.mesa-meta.mesa-etq-ambar { color: #8a6100; font-weight: 600; }
+.mesa-meta-punto { font-size: 12px; color: var(--tinta-suave); }
+.mesa-acciones { display: flex; gap: 8px; align-items: center; margin-left: auto; flex-wrap: wrap; }
+.mesa-acciones .boton { padding-top: 6px; padding-bottom: 6px; }
 
-/* ---------- las tres columnas ---------- */
-.mesa-columnas {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 1fr);
-  gap: 16px; align-items: start;
+/* La tira de hitos: todo el ancho, celdas iguales. */
+.mesa-tira { display: flex; gap: 0; border: 1px solid var(--linea); border-radius: 8px; overflow: hidden; }
+.mesa-tira-hito {
+  flex: 1 1 0; min-width: 0; font: inherit; font-size: 12px; cursor: pointer; text-align: left;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  border: 0; border-right: 1px solid var(--linea); border-bottom: 3px solid transparent;
+  padding: 5px 10px; background: var(--papel); color: var(--tinta-suave);
 }
-body.con-visor .mesa-columnas, body.con-lector .mesa-columnas { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); }
-body.con-visor .mesa-col-consulta, body.con-lector .mesa-col-consulta { grid-column: 1 / -1; }
+.mesa-tira-hito:last-child { border-right: 0; }
+.mesa-tira-hito:hover { background: #f4f7fb; }
+.mesa-tira-hito.hecho { color: #1f6b33; background: #f1faf3; }
+.mesa-tira-hito.actual { background: #e3eefb; color: #1d4f86; font-weight: 600; border-bottom-color: var(--azul); }
+
+/* Los dos desplegables: dentro de la página, debajo de su botón. */
+.mesa-desplegable { position: relative; }
+.mesa-abrir-panel.abierto { background: #e3eefb; border-color: #a9c6e6; }
+.mesa-panel {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; width: 420px; max-width: 90vw;
+  max-height: 70vh; overflow: auto; background: var(--papel); border: 1px solid var(--linea); border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(10, 25, 45, .18); padding: 12px; display: flex; flex-direction: column; gap: 10px;
+}
+.mesa-panel.oculto { display: none; }
+
+/* ---------- dos zonas: qué hay que hacer y lo que ya existe ---------- */
+.contenido:has(#ficha-guia.con-mesa) { max-width: none; }
+#ficha-guia.con-mesa #ficha-guia-nota { display: none; }
+.mesa-columnas {
+  display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 20px; align-items: start;
+}
+body.con-visor .mesa-columnas, body.con-lector .mesa-columnas { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 1100px) {
   .mesa-columnas { grid-template-columns: minmax(0, 1fr); }
 }
 .mesa-col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.mesa-col-derecha { background: #f6f7f9; border-radius: 10px; padding: 12px 14px; }
+.mesa-col-derecha.encima { outline: 2px dashed var(--azul); background: #e3eefb; }
 .mesa-bloque { display: flex; flex-direction: column; gap: 8px; }
 .mesa-bloque + .mesa-bloque { border-top: 1px solid var(--linea); padding-top: 10px; }
 .mesa-bloque-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .mesa-bloque-titulo { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .02em; color: var(--tinta-suave); }
+.mesa-sin-docs { margin: 0; font-size: 13px; color: var(--tinta-suave); }
+.mesa-soltar-pista { display: block; font-size: 11px; }
+details.mesa-normativa > summary { cursor: pointer; }
+.mesa-normativa .hito-normativa-titulo { display: none; }
+.mesa-normativa.oculto { display: none; }
+.hito-en-mesa .nota-nueva textarea { resize: none; overflow: hidden; min-height: 34px; }
+.mesa-historia .hito-nota { font-size: 12px; }
 
 /* El guion */
-.mesa-guion-cuenta { font-size: 12px; color: var(--tinta-suave); }
+.mesa-guion-cuenta { font-size: 12px; color: var(--tinta-suave); white-space: nowrap; }
 .mesa-barra { height: 6px; background: #eef1f5; border-radius: 4px; overflow: hidden; margin: 2px 0 8px; }
+.mesa-guion-cabecera { flex-wrap: nowrap; margin-bottom: 6px; }
+.mesa-guion-cabecera .mesa-barra { flex: 1 1 auto; margin: 0 4px; }
 .mesa-barra > span { display: block; height: 100%; background: #2f8a55; }
 .guion-paso { padding: 6px 0; border-bottom: 1px dashed var(--linea); }
 .guion-paso-linea { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
@@ -76,6 +108,25 @@ body.con-visor .mesa-col-consulta, body.con-lector .mesa-col-consulta { grid-col
 .guion-paso.hecho .guion-paso-texto, .guion-paso.noaplica .guion-paso-texto { text-decoration: line-through; color: var(--tinta-suave); font-weight: 400; }
 .guion-paso-explicacion { font-size: 12px; color: var(--tinta-suave); margin: 2px 0 0 24px; }
 .guion-paso-botones { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 4px 0 0 24px; font-size: 12px; }
+/* Fila 145: una línea con la acción a la derecha; los hechos, en una sola
+   línea gris; el siguiente, resaltado; «No aplica», al pasar el ratón. */
+.guion-paso-fila { display: flex; align-items: center; gap: 10px; }
+.guion-paso-fila .guion-paso-linea { flex: 1 1 auto; min-width: 0; }
+.guion-paso-fila .guion-accion-boton { flex: 0 0 auto; }
+.guion-paso.hecho:not(.guion-pregunta) .guion-paso-explicacion,
+.guion-paso.hecho:not(.guion-pregunta) .guion-paso-botones,
+.guion-paso.hecho:not(.guion-pregunta) .guion-dato { display: none; }
+.guion-paso.hecho .guion-casilla { accent-color: #2f8a55; }
+.guion-paso.hecho { padding: 3px 0; }
+.guion-paso:not(.hecho):not(.guion-pregunta) .guion-paso-texto { font-weight: 400; }
+.guion-paso.guion-siguiente { background: #fff8e6; border: 1px solid #e6c377; border-radius: 8px; padding: 10px 12px; margin: 4px 0; }
+.guion-paso.guion-siguiente .guion-paso-texto { font-size: 15.5px; font-weight: 600; }
+.guion-paso.guion-siguiente .guion-paso-explicacion { font-size: 13px; }
+.guion-noaplica { visibility: hidden; }
+.guion-paso:hover .guion-noaplica, .guion-paso:focus-within .guion-noaplica, .guion-paso.noaplica .guion-noaplica { visibility: visible; }
+@media (hover: none) { .guion-noaplica { visibility: visible; } }
+.guion-soltar { margin: 8px 0 0 24px; border: 1px dashed #e6c377; border-radius: 6px; padding: 6px; text-align: center; font-size: 12px; color: #8a6100; }
+.guion-soltar.encima { background: #fff1c7; }
 .mesa-cita { font-size: 12px; background: #e3eefb; color: #1d4f86; border-radius: 10px; padding: 1px 8px; text-decoration: none; }
 .mesa-pregunta-opciones { display: flex; flex-direction: column; gap: 6px; }
 .mesa-opcion {

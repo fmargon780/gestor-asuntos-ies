@@ -156,6 +156,8 @@ await pagina.waitForTimeout(400);
 await pagina.locator('#ficha-guia .hito[data-id="b2"] .hito-titulo').click();
 await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa[data-id="b2"]');
 await pagina.waitForTimeout(300);
+/* Fila 145: dentro del desplegable «Generar documento ▾». */
+await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="generar"]');
 await comprobar('4. en un hito sin plantillas sale «Buscar otra plantilla…»',
   pagina.locator('.hito-en-mesa .mesa-buscar-plantilla').count(), 1);
 await pagina.click('.hito-en-mesa .mesa-buscar-plantilla');

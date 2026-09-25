@@ -6,9 +6,10 @@
    de hitos es compacta: una línea por hito. Pulsar uno abre su mesa,
    que ocupa todo el sitio: la cabecera (camino, título, etiquetas de
    estado, plazo y responsable, "Marcar hito como hecho", menú ⋯ y la
-   tira de hitos) y, debajo, las tres columnas que ya pinta
-   js/hitos-panel-lista.js en el cuerpo del hito (guion, documentos y
-   formularios, consulta).
+   tira de hitos) y, debajo, lo que pinta js/hitos-panel-lista.js en el
+   cuerpo del hito. Desde la fila 145 (docs/MESA-DEL-HITO-ENFOCADA.md), dos
+   zonas (el guion; documentos, normativa, notas e historia) y, en la
+   cabecera, los desplegables «Generar documento ▾» y «Comunicar ▾».
 
    No hay pantalla nueva: la mesa es el mismo `.hito` con su
    `.hito-cuerpo` visible y la clase `con-mesa` en `#ficha-guia`, que
@@ -148,39 +149,48 @@ var HitoMesa = (function () {
     var cuenta = Hitos.cuentaGuion ? Hitos.cuentaGuion(guion) : { hechos: 0, total: 0 };
     var completo = cuenta.total > 0 && cuenta.hechos === cuenta.total && h.estado !== 'hecho';
 
-    /* Fila 112 (docs/CABECERA-COMPACTA.md): una sola línea (nombre,
-       etiquetas y, a la derecha, «Hecho» y «⋯»); sin «Volver a la lista
-       de hitos» ni la línea de ruta: se vuelve pulsando otra vez la
-       pestaña «Hitos» o con Escape. */
+    /* Fila 145 (docs/MESA-DEL-HITO-ENFOCADA.md): arriba, la tira de hitos a
+       todo el ancho; debajo, una línea con el título, lo de plazo y
+       responsable en texto pequeño (pulsable) y, a la derecha, cuatro
+       botones: «Generar documento ▾», «Comunicar ▾», «Marcar como hecho» y
+       «···». El estado solo se ve como etiqueta si está hecho. */
+    var decision = h.clase === 'decision';
+    var estadoHTML = h.estado === 'hecho'
+      ? '<button type="button" class="mesa-etq mesa-etq-estado mesa-etq-hecho">Hecho</button>'
+      : '<button type="button" class="mesa-meta mesa-etq-estado">' + U.escapar(textoEstado(h.estado)) + '</button><span class="mesa-meta-punto">·</span>';
     cab.innerHTML =
-      '<div class="mesa-titulo-fila">' +
-        '<h3 class="mesa-titulo" title="Hito ' + (n || '?') + ' de ' + visibles.length + '">' + U.escapar(h.titulo || '') + '</h3>' +
-        '<div class="mesa-etiquetas">' +
-          '<button type="button" class="mesa-etq mesa-etq-estado mesa-etq-' + h.estado + '">' + U.escapar(textoEstado(h.estado)) + '</button>' +
-          '<button type="button" class="mesa-etq mesa-etq-plazo ' + plazo.clase + '">' + U.escapar(plazo.texto) + '</button>' +
-          '<button type="button" class="mesa-etq mesa-etq-resp">' + U.escapar(resp ? resp.texto : 'Sin responsable') + '</button>' +
-        '</div>' +
-        (abierto && h.clase !== 'decision'
-          ? '<button type="button" class="boton' + (completo ? ' boton-principal mesa-hecho-resaltado' : '') + ' mesa-marcar-hecho">' +
-            (h.estado === 'hecho' ? 'Hecho ✓ (desmarcar)' : 'Marcar hito como hecho') + '</button>' : '') +
-        /* Fila 129: dar por hechos los anteriores (js/estado-hito.js). */
-        (abierto && window.EstadoHito && EstadoHito.puedeSituar(hitos, h.id) ? EstadoHito.botonSituarHTML('mesa-situar') : '') +
-        (abierto ? '<button type="button" class="boton mesa-mas" title="Más opciones">⋯</button>' : '') +
-      '</div>' +
       '<div class="mesa-tira">' + visibles.map(function (x, i) {
         return '<button type="button" class="mesa-tira-hito' + (x.id === h.id ? ' actual' : '') +
-          (x.estado === 'hecho' ? ' hecho' : '') + '" data-id="' + U.escapar(x.id) + '" title="' + U.escapar(x.titulo || '') + '">' +
+          (x.estado === 'hecho' ? ' hecho' : '') + '" data-id="' + U.escapar(x.id) + '" title="' + U.escapar((i + 1) + '. ' + (x.titulo || '')) + '">' +
           (x.estado === 'hecho' ? '✓ ' : '') + (i + 1) + '. ' + U.escapar(x.titulo || '') + '</button>';
-      }).join('') + '</div>';
+      }).join('') + '</div>' +
+      '<div class="mesa-titulo-fila">' +
+        '<h3 class="mesa-titulo" title="Hito ' + (n || '?') + ' de ' + visibles.length + '">' + U.escapar(h.titulo || '') + '</h3>' +
+        '<div class="mesa-etiquetas">' + estadoHTML +
+          '<button type="button" class="mesa-meta mesa-etq-plazo ' + plazo.clase + '">' + U.escapar(plazo.texto) + '</button>' +
+          '<span class="mesa-meta-punto">·</span>' +
+          '<button type="button" class="mesa-meta mesa-etq-resp">' + U.escapar(resp ? resp.texto : 'Sin responsable') + '</button>' +
+        '</div>' +
+        '<div class="mesa-acciones">' +
+          (abierto ? '<div class="mesa-desplegable"><button type="button" class="boton mesa-abrir-panel" data-panel="generar" aria-expanded="false">Generar documento ▾</button>' +
+            '<div class="mesa-panel mesa-panel-generar oculto"><div class="mesa-plantillas"></div>' +
+            (window.Formularios ? Formularios.listaHTML(h.formularios, 'Formularios oficiales') : '') + '</div></div>' : '') +
+          (abierto && !decision ? '<div class="mesa-desplegable"><button type="button" class="boton mesa-abrir-panel" data-panel="comunicar" aria-expanded="false">Comunicar ▾</button>' +
+            '<div class="mesa-panel mesa-panel-comunicar oculto"><div class="mesa-destinatarios"></div></div></div>' : '') +
+          (abierto && !decision
+            ? '<button type="button" class="boton' + (h.estado === 'hecho' ? '' : ' boton-principal') + (completo ? ' mesa-hecho-resaltado' : '') + ' mesa-marcar-hecho">' +
+              (h.estado === 'hecho' ? 'Hecho ✓ (desmarcar)' : 'Marcar como hecho') + '</button>' : '') +
+          (abierto ? '<button type="button" class="boton mesa-mas" title="Más opciones">···</button>' : '') +
+        '</div>' +
+      '</div>';
 
     Array.prototype.forEach.call(cab.querySelectorAll('.mesa-tira-hito'), function (b) {
       b.onclick = function () { abrir(a, b.dataset.id); };
     });
-    var situarBtn = cab.querySelector('.mesa-situar');
-    if (situarBtn) situarBtn.onclick = function () { EstadoHito.situar(a, h.id, situarBtn); };
+    engancharPaneles(cab, a, h);
     if (!abierto || !window.FichaMenus) return;
 
-    /* "Marcar hito como hecho": la casilla de siempre, pulsada por debajo
+    /* "Marcar como hecho": la casilla de siempre, pulsada por debajo
        (así sigue avisando de lo obligatorio sin reunir). */
     var marcarBtn = cab.querySelector('.mesa-marcar-hecho');
     if (marcarBtn) marcarBtn.onclick = function () {
@@ -214,21 +224,102 @@ var HitoMesa = (function () {
       } };
     })));
     var mas = cab.querySelector('.mesa-mas');
-    if (mas) FichaMenus.montar(mas, [
-      { texto: h.soloInformativo ? 'Pedírmelo a mí' : 'Dejarlo solo informativo', alPulsar: function () {
-        var b = fila.querySelector('.hito-solo-informativo'); if (b) b.click();
-      } },
+    var opcionesMas = [];
+    /* Fila 129: dar por hechos los anteriores (js/estado-hito.js). */
+    if (window.EstadoHito && EstadoHito.puedeSituar(hitos, h.id)) opcionesMas.push({ texto: 'Estamos en este paso…', clase: 'mesa-situar', alPulsar: function () {
+      EstadoHito.situar(a, h.id, mas);
+    } });
+    opcionesMas.push({ texto: h.soloInformativo ? 'Pedírmelo a mí' : 'Dejarlo solo informativo', alPulsar: function () {
+      var b = fila.querySelector('.hito-solo-informativo'); if (b) b.click();
+    } });
+    /* Fila 145: lo que había debajo del guion y al pie de la mesa. */
+    if (window.HitoMesaGuion && HitoMesaGuion.puedeAnadirALaGuia && HitoMesaGuion.puedeAnadirALaGuia(a, h)) {
+      opcionesMas.push({ texto: '+ Añadir un paso a la guía del tipo', clase: 'mesa-anadir-guia', alPulsar: function () { HitoMesaGuion.anadirALaGuia(a, h); } });
+    }
+    if (window.GuiasDelCentro && GuiasDelCentro.escribir) opcionesMas.push({ texto: 'Cambiar la guía…', clase: 'mesa-cambiar-guia', alPulsar: function () { cambiarLaGuia(a); } });
+    if (mas) FichaMenus.montar(mas, opcionesMas.concat([
       { raya: true },
       { texto: 'Quitar este hito', clase: 'ficha-menu-peligro', alPulsar: function () {
         var b = fila.querySelector('.hito-quitar'); if (b) b.click();
       } }
-    ]);
+    ]));
   }
+
+  function tipoDe(a) { return (a && ((a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo))) || ''; }
+
+  /* «Cambiar la guía…» del menú ···, con la advertencia de siempre. */
+  async function cambiarLaGuia(a) {
+    var tipo = tipoDe(a);
+    if (!tipo) return;
+    var ok = await U.preguntar('Cambiar la guía',
+      '<p>Vale para todos los asuntos ' + U.escapar(tipo) + ', no solo para este.</p>', 'Cambiar la guía');
+    if (!ok) return;
+    var hecho = await GuiasDelCentro.escribir(tipo);
+    if (hecho && window.HitosPanel) HitosPanel.programarRepintado();
+  }
+
+  /* ---------- los dos desplegables de la cabecera (fila 145) ----------
+
+     «Generar documento ▾» (plantillas del paso y del tipo, «Buscar otra
+     plantilla…» y formularios: las rellena js/hito-mesa-documentos.js) y
+     «Comunicar ▾» (js/hito-mesa-comunicar.js). Van dentro de la página,
+     no son un U.preguntar. Uno solo abierto; se cierran con Escape
+     (js/usabilidad.js, antes que la mesa), al pulsar fuera o al abrir el
+     otro. Cuál estaba abierto se recuerda, para que un repintado no lo
+     cierre. */
+  var panelAbierto = null;   /* { clave, idHito, panel } */
+
+  function engancharPaneles(cab, a, h) {
+    Array.prototype.forEach.call(cab.querySelectorAll('.mesa-abrir-panel'), function (b) {
+      b.onclick = function (ev) {
+        ev.stopPropagation();
+        var cual = b.dataset.panel;
+        var yaEra = panelAbierto && panelAbierto.panel === cual;
+        cerrarPaneles();
+        if (!yaEra) mostrarPanel(cab, cual, a, h);
+      };
+    });
+    if (panelAbierto && panelAbierto.clave === a.nombre && panelAbierto.idHito === h.id) mostrarPanel(cab, panelAbierto.panel, a, h);
+    else panelAbierto = null;
+  }
+
+  function mostrarPanel(cab, cual, a, h) {
+    var panel = cab.querySelector('.mesa-panel-' + cual);
+    var boton = cab.querySelector('.mesa-abrir-panel[data-panel="' + cual + '"]');
+    if (!panel || !boton) return;
+    panel.classList.remove('oculto');
+    boton.setAttribute('aria-expanded', 'true');
+    boton.classList.add('abierto');
+    panelAbierto = { clave: a.nombre, idHito: h.id, panel: cual };
+  }
+
+  function cerrarPaneles() {
+    var hubo = false;
+    Array.prototype.forEach.call(document.querySelectorAll('.mesa-panel:not(.oculto)'), function (p) { p.classList.add('oculto'); hubo = true; });
+    Array.prototype.forEach.call(document.querySelectorAll('.mesa-abrir-panel.abierto'), function (b) {
+      b.classList.remove('abierto');
+      b.setAttribute('aria-expanded', 'false');
+    });
+    panelAbierto = null;
+    return hubo;
+  }
+
+  /* Para Escape: true si había uno abierto y se ha cerrado. */
+  function cerrarPanelSiAbierto() { return cerrarPaneles(); }
+
+  /* Pulsar fuera cierra (sin contar los cuadros que se abren desde dentro). */
+  document.addEventListener('mousedown', function (ev) {
+    if (!panelAbierto) return;
+    var t = ev.target;
+    if (t && t.closest && (t.closest('.mesa-desplegable') || t.closest('#capa') || t.closest('.huecos-cuadro'))) return;
+    cerrarPaneles();
+  }, true);
 
   return {
     abrir: abrir, abrirAlPintar: abrirAlPintar, cerrar: cerrar, aplicar: aplicar,
     cerrarSiAbierta: cerrarSiAbierta, estaAbierta: estaAbierta,
-    abierta: function () { return abierta; }, textoPlazo: textoPlazo
+    abierta: function () { return abierta; }, textoPlazo: textoPlazo,
+    cerrarPanelSiAbierto: cerrarPanelSiAbierto
   };
 })();
 window.HitoMesa = HitoMesa;

@@ -109,9 +109,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Pruebas automáticas en cada subida.
 - Copia sin internet (`file://`): se actualiza sola; si no puede o no lo comprueba, franja fija arriba; cada 30 min.
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
-  bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa): una sola lista, el guion
-  (con preguntas y lo que hay que reunir: 📎 documento, ✎ dato), que se marca solo al generar, registrar, comunicar o añadir; documentos en tabla con sus
-  gemelos y selección de varios; plantillas y formularios («Buscar otra plantilla…»: cualquiera); comunicar con destinatarios; sus notas (las del asunto, con etiqueta) e historia.
+  bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa): cabecera con «Generar documento ▾» y «Comunicar ▾»; a la izquierda
+  el guion (siguiente paso resaltado; preguntas; 📎 documento, ✎ dato), que se marca solo al generar, registrar, comunicar o añadir; a la derecha
+  documentos en tabla (gemelos, selección de varios), normativa, notas (las del asunto, con etiqueta) e historia.
   Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa.
   Biblioteca de hitos del centro, con guion; en Mantenimiento, cargar tipos, guías y guiones del instituto.
 - "Qué me toca": hitos pendientes, filtro por responsable, "Dormidos" (sin novedades en N días). "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Formularios": catálogo buscable de
