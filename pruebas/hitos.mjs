@@ -381,8 +381,21 @@ await comprobar('la nota se ha guardado',
 /* Fila 109: pulsar un hito abre su mesa; antes, se vuelve a la lista. */
 await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());
 await pagina.locator('#ficha-guia .hito[data-id="p3"] .hito-titulo').click();
-await pagina.locator('#ficha-guia .hito[data-id="p3"] .hito-cambiar-rama').click();
-await pagina.locator('#ficha-guia .hito[data-id="p3"] .hito-cuerpo .hito-opcion', { hasText: 'Por email' }).click();
+/* La mesa recién abierta puede repintarse sola y dejar el botón fuera del
+   DOM a mitad del clic (pasaba a veces en GitHub): se pulsa en la misma
+   pasada en que se busca, y se reintenta hasta que sale el cuadro. */
+for (let intento = 0; intento < 8; intento++) {
+  await pagina.waitForTimeout(250);
+  if (await pagina.locator('#capa:not(.oculto)').count()) break;
+  await pagina.evaluate(() => {
+    const hito = document.querySelector('#ficha-guia .hito[data-id="p3"]');
+    if (!hito) return;
+    const opcion = Array.from(hito.querySelectorAll('.hito-cuerpo .hito-opcion')).find((b) => b.textContent.indexOf('Por email') !== -1);
+    if (opcion) { opcion.click(); return; }
+    const cambiar = hito.querySelector('.hito-cambiar-rama');
+    if (cambiar) cambiar.click();
+  });
+}
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('el aviso solo nombra el hito con notas',
   pagina.locator('#cuadro-cuerpo').textContent().then(t =>
