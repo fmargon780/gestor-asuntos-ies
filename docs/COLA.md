@@ -114,6 +114,16 @@ Las filas 1 a 141 están **HECHAS**. Sus documentos siguen en `docs/`, y el deta
 |---|---|---|
 | 142 | `docs/ALUMNADO-DESDE-LA-BD.md` (el alumnado, desde la base de datos de alumnado; acuerdo en `docs/ACUERDO-ALUMNADO.md`) | PENDIENTE |
 
+**La fila 141 está HECHA** (25-sep-2026): `docs/REPARTIR-ENTRE-TERCEROS.md`. En el menú de un PDF de
+un asunto abierto, «Repartir entre terceros»: lo parte en trozos (con miniaturas, +1/−1 y el nombre
+leído del texto si lo trae), crea por persona un asunto ya archivado con su trozo, y deja en el
+origen el oficio, una nota y `repartos`. Repetirlo solo reintenta lo que falló
+(`js/repartir-nucleo.js`, `js/repartir-pantalla.js`, `js/repartir-crear.js`). Prueba
+`pruebas/repartir-entre-terceros.mjs`, batería completa en verde. Versión escrita: `25-sep-2026 · 02:29`.
+
+**Ojo con la numeración**: `docs/VENTANAS-QUE-CABEN.md` también se presenta como «fila 142», pero
+en la tabla la 142 es `docs/ALUMNADO-DESDE-LA-BD.md`. Ventanas no está apuntada en la tabla.
+
 **La fila 140 está HECHA** (25-sep-2026): `docs/TIEMPO-DE-TRAMITACION.md`. Cuentas gana, por tipo,
 «Media (días)» y «Máximo (días)» (también al copiar), el número «Abiertos hace más de 30 días» y la
 tabla «Los que más tiempo llevan abiertos» (los diez más antiguos; pulsar abre la ficha; reservados,
