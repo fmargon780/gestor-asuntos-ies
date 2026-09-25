@@ -23,6 +23,19 @@
 }
 .seneca-aviso-arriba strong { font-weight: 600; }
 
+/* Fila 153: el documento a adjuntar a mano cuando el cuadro se abre
+   con «Enviar ▾» → «Por Séneca» de un documento del hito. */
+.seneca-doc-adjuntar {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border-left: 4px solid var(--linea);
+  background: var(--fondo-suave, #f7f9fc);
+  font-size: 14px;
+  line-height: 1.4;
+  margin-top: 8px;
+}
+.seneca-doc-adjuntar strong { font-weight: 600; }
+
 .seneca-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
