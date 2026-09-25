@@ -220,6 +220,7 @@ App.editarAsunto = async function (a) {
     '<input id="ed-descripcion" class="campo" value="' + U.escapar(p.descripcion) + '">' +
     '<label class="etiqueta">Tercero</label>' +
     '<input id="ed-tercero" class="campo" value="' + U.escapar(p.tercero) + '">' +
+    (window.AdministracionesFicha ? AdministracionesFicha.htmlEditar(a) : '') +   /* fila 167 */
     '<div class="vista-previa">' +
       '<div class="vista-rotulo">Se llamará</div>' +
       '<div id="ed-vista" class="vista-nombre"></div>' +
@@ -301,6 +302,8 @@ App.editarAsunto = async function (a) {
     campos: camposGuardados,
     editadoEl: U.ahora(), editadoPor: App.E.usuario
   };
+  var departamento = window.AdministracionesFicha ? AdministracionesFicha.leerEditar(a) : undefined;
+  if (departamento !== undefined) datos.departamento = departamento;   /* fila 167; null lo quita */
 
   /* Mientras se guarda, el asunto está ocupado (fila 100): ni
      archivar ni volver a editar hasta que termine. */

@@ -128,6 +128,15 @@
         delete tutor._partes;
         var trozos = [p.nombreSolo, p.apellido1, p.apellido2, p.apellidos].filter(Boolean);
         tutor.nombre = trozos.length ? trozos.join(' ').replace(/\s+/g, ' ').trim() : nombreNatural(p.nombreEntero);
+        /* «Apellido1 Apellido2, Nombre», como el personal: el nombre del
+           tutor como tercero (fila 166, js/tutores-legales.js). */
+        var apellidos = [p.apellido1, p.apellido2, p.apellidos].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+        /* No enumerable a propósito: quien compara o recorre el tutor
+           (pruebas, «Ver todo») sigue viendo los mismos datos de siempre. */
+        Object.defineProperty(tutor, 'nombreApellidos', { enumerable: false, value:
+          (apellidos && p.nombreSolo) ? apellidos + ', ' + p.nombreSolo.trim()
+          : (p.nombreEntero && p.nombreEntero.indexOf(',') !== -1 ? p.nombreEntero.replace(/\s+/g, ' ').trim()
+          : tutor.nombre) });
         tutor.iniciales = iniciales(tutor.nombre);
         return tutor;
       })

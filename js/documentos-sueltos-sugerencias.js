@@ -51,11 +51,12 @@ window.SugerenciasAsuntoExistente = (function () {
   function documentoDeLaPersona(categoria, persona) {
     var p = persona || {};
     if (categoria === 'ALUMNADO') return String(p.id || '').toUpperCase();
-    if (categoria === 'PERSONAL') {
+    if (categoria === 'PERSONAL' || categoria === 'TUTORES LEGALES') {
       var doc = String(p.documento || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
       return doc.slice(-4);
     }
     if (categoria === 'EMPRESAS') return String(p.nif || '').toUpperCase();
+    if (categoria === 'ADMINISTRACIONES') return String(p.codigoCentro || '');   /* fila 167: el de un centro */
     return '';
   }
 

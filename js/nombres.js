@@ -64,7 +64,45 @@ var Nombres = (function () {
     { tipo: 'CORRESPONDENCIA', categoria: 'OTROS' }
   ];
 
-  var CATEGORIAS = ['ALUMNADO', 'PERSONAL', 'EMPRESAS', 'OTROS'];
+  /* Las categorías de tercero. Es la ÚNICA lista: todo lo que enseña o
+     recorre categorías (botones, desplegables, buscadores, la bandeja)
+     lee esta (fila 166, docs/TUTORES-LEGALES-COMO-TERCERO.md). Una
+     categoría nueva se añade aquí (al final: los botones se reconocen
+     por su sitio) y en TEXTOS_CATEGORIA, y su carpeta del ARCHIVO se
+     llama igual. */
+  var CATEGORIAS = ['ALUMNADO', 'PERSONAL', 'EMPRESAS', 'OTROS', 'TUTORES LEGALES', 'ADMINISTRACIONES'];
+
+  /* Cómo se nombra cada categoría en pantalla: `lista` (el desplegable
+     de Personas y empresas), `descripcion` (el botón de Nuevo asunto) y
+     `tercero` (la etiqueta del buscador del tercero). */
+  var TEXTOS_CATEGORIA = {
+    'ALUMNADO': { lista: 'Alumnado', descripcion: 'Alumnos y alumnas', tercero: 'Alumno o alumna' },
+    'TUTORES LEGALES': { lista: 'Tutores legales', descripcion: 'Padres, madres y tutores del alumnado',
+                         tercero: 'Tutor o tutora legal' },
+    'PERSONAL': { lista: 'Personal', descripcion: 'Profesorado y personal del centro', tercero: 'Persona del centro' },
+    'EMPRESAS': { lista: 'Empresas', descripcion: 'Proveedores y empresas', tercero: 'Empresa' },
+    'OTROS': { lista: 'Otros', descripcion: 'Todo lo demás', tercero: 'Con quién es el asunto' },
+    'ADMINISTRACIONES': { lista: 'Administraciones', descripcion: 'Organismos y centros educativos',
+                          tercero: 'Organismo o centro educativo' }
+  };
+
+  function textoCategoria(categoria, que) {
+    var t = TEXTOS_CATEGORIA[categoria];
+    return (t && t[que || 'lista']) || String(categoria || '');
+  }
+
+  /* Rellena un <select> con las categorías (valor = la categoría; texto,
+     el de `que`, o la categoría en mayúsculas si `que` es 'clave'),
+     conservando lo elegido si sigue existiendo. */
+  function opcionesCategorias(select, que) {
+    if (!select) return;
+    var antes = select.value;
+    select.innerHTML = CATEGORIAS.map(function (c) {
+      var texto = que === 'clave' ? c : textoCategoria(c, que);
+      return '<option value="' + c + '">' + U.escapar(texto) + '</option>';
+    }).join('');
+    if (antes && CATEGORIAS.indexOf(antes) !== -1) select.value = antes;
+  }
 
   /* El nombre corto de un tipo (20-sep-2026, fila 79, apartado 4.9,
      docs/BIBLIOTECA-DE-HITOS.md): lo que entra en el nombre de la
@@ -310,6 +348,17 @@ var Nombres = (function () {
     var cuatro = doc.slice(-4);
     return U.limpiarNombre(persona.nombre + (cuatro ? ' ' + cuatro : ''));
   }
+  /* Tutores legales (fila 166): igual que el personal, «Apellido1
+     Apellido2, Nombre» + los 4 últimos caracteres de su DNI. */
+  function terceroTutor(tutor) { return terceroPersonal(tutor); }
+
+  /* Administraciones (fila 167): el organismo, por su nombre corto y
+     estable (ni el DIR3 ni la Consejería: cambian con cada legislatura);
+     el centro educativo, nombre corto + su código de centro, que no cambia. */
+  function terceroAdministracion(o) {
+    var codigo = o && o.clase === 'centro' ? String(o.codigoCentro || '').replace(/\D/g, '') : '';
+    return U.limpiarNombre(String((o && o.corto) || '') + (codigo ? ' ' + codigo : ''));
+  }
   function terceroEmpresa(empresa) {
     return U.limpiarNombre(empresa.nombre + (empresa.nif ? ' ' + empresa.nif : ''));
   }
@@ -449,7 +498,9 @@ var Nombres = (function () {
   }
 
   return {
-    POR_DEFECTO: POR_DEFECTO, CATEGORIAS: CATEGORIAS,
+    POR_DEFECTO: POR_DEFECTO, CATEGORIAS: CATEGORIAS, TEXTOS_CATEGORIA: TEXTOS_CATEGORIA,
+    textoCategoria: textoCategoria, opcionesCategorias: opcionesCategorias, terceroTutor: terceroTutor,
+    terceroAdministracion: terceroAdministracion,
     ESTADOS_POR_DEFECTO: ESTADOS_POR_DEFECTO, VIAS: VIAS, via: via,
     montar: montar, leer: leer, categoriaDeTipo: categoriaDeTipo, tipoParaCarpeta: tipoParaCarpeta,
     tipoParaVer: tipoParaVer, nombresDeTipo: nombresDeTipo,

@@ -53,9 +53,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 - Carpeta de asunto: `AAMMDD TIPO [AÑO ACADÉMICO] [GRUPO] [campos del tipo] [texto libre]
   Tercero`. El tercero va siempre al final.
-- Tercero: alumnado `Apellido1 Apellido2, Nombre` + Nº de identificación escolar; personal
-  igual + 4 últimos caracteres del documento; empresas **razón social** (nunca el nombre
-  comercial) + NIF.
+- Tercero: alumnado `Apellido1 Apellido2, Nombre` + Nº de identificación escolar; personal y
+  tutores legales igual + 4 últimos caracteres del documento; empresas **razón social** (nunca el
+  nombre comercial) + NIF; Administraciones, nombre corto estable (centros, + su código).
 - Documento: `AAMMDD [REGISTRO] TIPO [TEXTO ADICIONAL].ext`, con la fecha del propio documento.
 - Registro de Séneca: `26EM1234` = año + E/S (entrada/salida) + M/A (serie manual/automática) +
   cuatro dígitos del asiento.
@@ -78,6 +78,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
   Renombrar un tipo se lleva su guía; cambiarle el tipo, la ofrece.
 - Nombre comercial de empresas; editar un tercero dado de alta a mano.
+- Tutores legales (del RegAlum, sin alta) y Administraciones (organismos y centros, con departamentos) como tercero.
 - Guías del procedimiento por tipo, con preguntas dentro de las respuestas sin límite, y su mapa
   (dibujo de la guía entera; en un asunto, con el camino elegido resaltado). Se escriben en
   acordeón: un paso abierto a la vez.
@@ -111,10 +112,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Pruebas automáticas en cada subida de código (no con solo `docs/`).
 - Copia sin internet (`file://`): se actualiza sola (reintenta si se estaba publicando); si no, franja fija arriba; cada 30 min.
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
-  bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa): las acciones solo ahí, «Generar documento ▾», «Comunicar ▾»
-  y «Registrar» (con hitos, no en la barra de arriba); tres tarjetas, una en grande y dos de resumen: el guion (lista para marcar, sin
-  botones, quién y cuándo al lado; «receta» opcional que sale arriba del menú y deja el cuadro relleno; preguntas; 📎, ✎; se marca
-  solo al generar, registrar, comunicar o añadir), todos los documentos del asunto (los de otros hitos, con su etiqueta), gemelos, selección, «Enviar ▾» por correo o Séneca y notas con historia.
+  bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa), con las acciones solo ahí («Generar documento ▾»,
+  «Comunicar ▾», «Registrar») y tres tarjetas: el guion (lista para marcar; «receta» opcional que deja el cuadro relleno; se marca
+  solo al generar, registrar, comunicar o añadir), todos los documentos del asunto («Enviar ▾» por correo o Séneca) y notas.
   Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa
   («✎ Cambiar el guion», sin salir a Ajustes). «Paso N de M», «Hitos N/M» y la mesa, con una sola cuenta.
   Biblioteca de hitos del centro, con guion; en Mantenimiento, cargar tipos, guías y guiones del instituto.

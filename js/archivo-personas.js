@@ -169,9 +169,20 @@ $('btn-reconstruir-indice').onclick = function () { App.reconstruirIndiceArchivo
 
 App.personasCargadas = null;
 
+/* Puntos previstos de la ficha de Personas (fila 166): la ficha de una
+   categoría que monta otro módulo (`{ html(p), enganchar(caja, p) }`), y
+   lo que se añade después de pintar cualquier ficha (`fn(p, caja)`). */
+App.FICHAS_DE_CATEGORIA = {};
+App.trasPintarFicha = [];
+/* Y la lista de una categoría pintada a su manera (fila 167:
+   Administraciones, agrupada): `fn(caja, fuente, texto, tarjeta)` -> cuántos. */
+App.LISTAS_DE_CATEGORIA = {};
+
 App.pintarPersonas = async function () {
   var categoria = $('filtro-personas').value;
+  var turno = App.turnoPersonas = (App.turnoPersonas || 0) + 1;   /* el último gana (fila 167) */
   var fuente = await Datos.cargar(App.E.datos, categoria);
+  if (turno !== App.turnoPersonas) return;
   App.personasCargadas = fuente;
   App.buscarPersonas();
 };
@@ -197,6 +208,10 @@ App.buscarPersonas = function () {
     if (!PersonasFamilias.pintar(caja, App.personasCargadas, texto, tarjeta, function (h) { App.verFicha(h); })) {
       caja.innerHTML = '<div class="vacio">Nada que mostrar.</div>';
     }
+  } else if (App.LISTAS_DE_CATEGORIA[$('filtro-personas').value]) {
+    if (!App.LISTAS_DE_CATEGORIA[$('filtro-personas').value](caja, App.personasCargadas, texto, tarjeta)) {
+      caja.innerHTML = '<div class="vacio">Nada que mostrar.</div>';
+    }
   } else {
     var lista = U.normalizar(texto).length >= 2
       ? Datos.buscar(App.personasCargadas.lista, texto, 60)
@@ -204,6 +219,7 @@ App.buscarPersonas = function () {
     if (!lista.length) caja.innerHTML = '<div class="vacio">Nada que mostrar.</div>';
     lista.forEach(function (p) { caja.appendChild(tarjeta(p)); });
   }
+  if (!App.admiteAlta($('filtro-personas').value)) return;   /* fila 166: tutores, sin alta */
   var b = document.createElement('button');
   b.className = 'boton';
   b.textContent = $('filtro-personas').value === 'ALUMNADO'
@@ -254,6 +270,8 @@ App.verFicha = function (p) {
               'Ver los demás datos del fichero (' + dp.resto.length + ')</button></p>' +
               '<div id="resto-ficha" class="oculto">' + pintarFilas(dp.resto) + '</div>';
     }
+  } else if (App.FICHAS_DE_CATEGORIA[p.categoria]) {
+    html += App.FICHAS_DE_CATEGORIA[p.categoria].html(p);
   } else {
     html += pintarFilas(Object.keys(p.campos).map(function (c) {
       return { titulo: c, valor: p.campos[c] };
@@ -272,6 +290,10 @@ App.verFicha = function (p) {
   }
   $('ver-sus-asuntos').onclick = function () { App.verAsuntosDeTercero(p); };
   if (window.PersonasFamilias) PersonasFamilias.engancharHermanos(caja);
+  if (App.FICHAS_DE_CATEGORIA[p.categoria]) App.FICHAS_DE_CATEGORIA[p.categoria].enganchar(caja, p);
+  App.trasPintarFicha.forEach(function (f) {
+    try { f(p, caja); } catch (e) { /* un módulo roto no tumba la ficha */ }
+  });
 
   /* Y, si es de los que se dieron de alta a mano, el botón de cambiar
      sus datos. */
@@ -408,5 +430,6 @@ App.verAsuntosDeTercero = async function (p) {
   caja.innerHTML = filas.join('');
 };
 
+Nombres.opcionesCategorias($('filtro-personas'), 'lista');   /* fila 166: la lista única */
 $('filtro-personas').onchange = function () { App.pintarPersonas(); };
 $('buscar-personas').oninput = function () { App.buscarPersonas(); };

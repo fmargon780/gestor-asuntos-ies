@@ -18,6 +18,7 @@ que cambie algo general).
 | `docs/contexto/ASUNTOS.md` | Crear, editar, la ficha, "Lo pide" y duplicados de un asunto |
 | `docs/contexto/ASUNTOS-ARCHIVO.md` | Papelera, archivar/reabrir, atascos, índice del ARCHIVO y fichas huérfanas (partido de `ASUNTOS.md` en la fila 78) |
 | `docs/contexto/PERSONAS.md` | Terceros, RegAlum, personal, empresas, grupos, DNI y la ficha del tercero |
+| `docs/contexto/TUTORES-Y-ADMINISTRACIONES.md` | La lista única de categorías y sus puntos previstos; los tutores legales (fila 166) y las Administraciones (fila 167) como tercero |
 | `docs/contexto/DOCUMENTOS.md` | El nombre y el registro de un documento, el código de verificación, "Por clasificar" |
 | `docs/contexto/DOCUMENTOS-PDF.md` | Generar el documento de Word, separar/unir un PDF y ajustar su tamaño |
 | `docs/contexto/WORD-EN-LA-APP.md` | Lo que falta antes de generar un Word, el Word dentro de la aplicación («Guardar PDF», «Imprimir», fila 155) y la subcarpeta «Versiones previas» (fila 160) |
@@ -217,7 +218,8 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `grupos.json` | `{ grupos: [{ id, nombre, miembros: [{ categoria, nombre }], creadoPor, creadoEl }] }`: los grupos propios de personas, gestionados en `js/grupos.js` (ver "Grupos de personas") |
 | `usuarios.json` | `{ nombres: [...] }`: los nombres ya usados para entrar, para el desplegable de la pantalla de entrada (`js/usuarios.js`, fila 72). Comparación exacta a propósito: "Francisco" y "francisco" quedan como dos nombres |
 | `borrados-listas.json` | `{ tipos, estados, tiposDocumento, recurrentes }`: cada uno, un array de `{ clave, borradoEl }` con lo borrado de esa lista (`js/borrados-fusion.js`, fila 77). No se enseña en ningún sitio salvo Ajustes → Mantenimiento (cuántos hay y quitarlos pasados 90 días) |
-| `datos/*.csv` | Alumnado (Séneca), personal, empresas y otros |
+| `datos/*.csv` | Alumnado (Séneca), personal, empresas y otros; `tutores.csv` (fila 166), los tutores legales que ya son tercero de un asunto |
+| `datos/administraciones.json` | Los organismos y centros educativos, su «Depende de» y su árbol de departamentos (fila 167, `docs/contexto/TUTORES-Y-ADMINISTRACIONES.md`). Fuera de los dieciocho: su propia cola y su copia del día |
 | `PAPELERA/` | Las carpetas y ficheros borrados, cada uno en su subcarpeta `AAMMDD-HHMM <nombre>` |
 | `PLANTILLAS/` | Los `.docx` que Francisco sube a mano, colgados de un tipo desde Ajustes › Plantillas de documento. También `logo-centro.png` (fila 149, el logo opcional del membrete; `membrete.png` de la fila 81 ya no se usa), y los `.docx` del centro que trae solo el botón "Cargar las plantillas del centro" (fila 83, `plantillas/` del repositorio): las dos son las únicas veces que la propia aplicación escribe ahí. No lleva copia de seguridad: no es uno de los dieciocho ficheros compartidos |
 | `presencia.json` | `{ <clave del asunto>: { usuario, ultima } }`: quién tiene abierta la ficha de cada asunto, y desde cuándo. **A propósito, fuera de los dieciocho**: no pasa por `Copias.guardar` (nada de copia de seguridad), no entra en `Papelera` ni en `Conflictos` (si dos versiones chocan, se quedan las dos entradas y punto). Se escribe y relee directo con `Carpetas` (ver "No pisarse en un mismo asunto") |
@@ -369,6 +371,7 @@ cambiar la versión (casi todos los commits) no obliga a resubir `nucleo.js` ent
 | `personal.csv` | Nombre · Documento · Puesto · Teléfono · Correo |
 | `empresas.csv` | Razón social · **Nombre comercial** · NIF · Contacto · Teléfono · Correo |
 | `otros.csv` | Nombre · Referencia · Teléfono · Correo |
+| `tutores.csv` | Nombre · Documento · Teléfono · Teléfono 2 · Correo · Correo 2 · Domicilio · Hijos (lo escribe la aplicación sola, fila 166) |
 
 La primera columna es siempre el nombre, y es la clave con la que se busca al cambiar los
 datos. **Las demás se leen por su título, no por su sitio.**

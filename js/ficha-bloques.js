@@ -64,6 +64,7 @@
     var buenas = filasDeCampos(a).concat([
       { titulo: 'Vía de comunicación', valor: App.textoVia(f) },
       { titulo: 'Lo pide', valor: window.LoPide ? LoPide.texto(f) : '' },
+      { titulo: 'Departamento', valor: (f.departamento && f.departamento.nombre) || '' },   /* fila 167 */
       { titulo: 'En el archivo', valor: a.ruta || '' }
     ]).filter(function (x) { return x && x.valor; });
     /* "Formularios" (20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md):

@@ -204,10 +204,26 @@ var LectorDocumentos = (function () {
      cuadra: solo se prueba por nombre si no hay ningún documento que
      coincida. Si cuadran dos terceros distintos (por documento, o si
      no por nombre), no se propone ninguno: se deja el hueco. */
+  /* Las categorías de después (fila 166: tutores legales) solo se
+     prueban si ninguna de las tres de siempre cuadra: una solicitud trae
+     a la vez el documento del alumno y el de su madre, y el tercero es el
+     alumno. `contexto.otras`: [{ categoria, lista: [{ nombre, documento, persona }] }]. */
+  function candidatosDeOtras(contexto) {
+    var salida = [];
+    (contexto.otras || []).forEach(function (o) { salida = salida.concat(candidatosDe(o.lista, o.categoria)); });
+    return salida;
+  }
+
   function elegirTercero(documentos, texto, contexto) {
-    var candidatos = candidatosDe(contexto.alumnado, 'ALUMNADO')
+    var r = elegirEntre(candidatosDe(contexto.alumnado, 'ALUMNADO')
       .concat(candidatosDe(contexto.personal, 'PERSONAL'))
-      .concat(candidatosDe(contexto.empresas, 'EMPRESAS'));
+      .concat(candidatosDe(contexto.empresas, 'EMPRESAS')), documentos, texto);
+    if (r || r === false || !(contexto.otras || []).length) return r || null;
+    return elegirEntre(candidatosDeOtras(contexto), documentos, texto) || null;
+  }
+
+  /* null si nadie cuadra; false si cuadran varios (no se propone nada). */
+  function elegirEntre(candidatos, documentos, texto) {
 
     var valoresTexto = documentos.map(function (d) { return d.valor; });
     var porDocumento = {};
@@ -221,20 +237,26 @@ var LectorDocumentos = (function () {
       return { categoria: listaDoc[0].categoria, nombre: listaDoc[0].nombre,
                persona: listaDoc[0].persona, por: 'documento' };
     }
-    if (listaDoc.length > 1) return null;
+    if (listaDoc.length > 1) return false;
 
     var textoNorm = normalizarTexto(texto);
     var porNombre = {};
+    var yaVistas = [];   /* fila 167: un organismo entra con varios nombres; cuenta una vez */
     candidatos.forEach(function (c) {
       if (!nombreEnTexto(c.nombre, textoNorm)) return;
+      if (c.persona && yaVistas.indexOf(c.persona) !== -1) return;
+      if (c.persona) yaVistas.push(c.persona);
       porNombre[c.categoria + '|' + c.nombre] = c;
     });
     var listaNom = Object.keys(porNombre).map(function (k) { return porNombre[k]; });
     if (listaNom.length === 1) {
-      return { categoria: listaNom[0].categoria, nombre: listaNom[0].nombre,
+      /* Un organismo se reconoce por cualquiera de sus nombres, pero se
+         propone con su nombre corto, el de su carpeta (fila 167). */
+      return { categoria: listaNom[0].categoria,
+               nombre: (listaNom[0].persona && listaNom[0].persona.corto) || listaNom[0].nombre,
                persona: listaNom[0].persona, por: 'nombre' };
     }
-    return null;
+    return listaNom.length > 1 ? false : null;
   }
 
   /* ---------- 4b. el tercero desconocido (fila 42) ----------
@@ -292,7 +314,8 @@ var LectorDocumentos = (function () {
 
     var candidatos = candidatosDe(contexto.alumnado, 'ALUMNADO')
       .concat(candidatosDe(contexto.personal, 'PERSONAL'))
-      .concat(candidatosDe(contexto.empresas, 'EMPRESAS'));
+      .concat(candidatosDe(contexto.empresas, 'EMPRESAS'))
+      .concat(candidatosDeOtras(contexto));
     var documentosConocidos = {};
     candidatos.forEach(function (c) { if (c.documento) documentosConocidos[c.documento] = true; });
 

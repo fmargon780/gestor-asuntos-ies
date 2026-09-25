@@ -40,7 +40,24 @@ var ContextoDocumentos = (function () {
       var em = await Datos.cargar(App.E.datos, 'EMPRESAS');
       empresas = em.lista.map(function (p) { return { nombre: p.nombre, documento: p.nif, persona: p }; });
     } catch (e) { /* sin empresas.csv, se sigue sin empresas */ }
-    return { tipos: App.E.tipos, alumnado: alumnado, personal: personal, empresas: empresas };
+    /* Fila 166: las categorías de después, solo si las de siempre no cuadran. */
+    var otras = [];
+    try {
+      var tu = await Datos.cargar(App.E.datos, 'TUTORES LEGALES');
+      otras.push({ categoria: 'TUTORES LEGALES', lista: tu.lista.map(function (p) {
+        return { nombre: p.nombre, documento: p.documento, persona: p };
+      }) });
+    } catch (e) { /* sin tutores, se sigue */ }
+    /* Fila 167: los organismos y centros, por su nombre corto, el oficial y los de antes. */
+    try {
+      var ad = await Datos.cargar(App.E.datos, 'ADMINISTRACIONES');
+      var entradas = [];
+      ad.lista.forEach(function (p) {
+        [p.corto, p.oficial].filter(Boolean).forEach(function (n) { entradas.push({ nombre: n, documento: '', persona: p }); });
+      });
+      otras.push({ categoria: 'ADMINISTRACIONES', lista: entradas });
+    } catch (e) { /* sin administraciones.json, se sigue */ }
+    return { tipos: App.E.tipos, alumnado: alumnado, personal: personal, empresas: empresas, otras: otras };
   }
 
   return { delCentro: delCentro };

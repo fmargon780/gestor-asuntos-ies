@@ -40,10 +40,12 @@ var PersonasFamilias = (function () {
 
   /* ---------- el índice ---------- */
 
-  function indice(lista) {
+  /* `todos` (fila 166, js/tutores-legales.js): también los hijos que ya
+     no están matriculados, para la categoría TUTORES LEGALES. */
+  function indice(lista, todos) {
     var porClave = {}, orden = [], porAlumno = {};
     (lista || []).forEach(function (p) {
-      if (!p || !p.matriculado || !Datos.tutoresDe) return;
+      if (!p || (!p.matriculado && !todos) || !Datos.tutoresDe) return;
       var ca = claveAlumno(p);
       Datos.tutoresDe(p).forEach(function (t) {
         var doc = compacto(t.documento);
@@ -52,10 +54,18 @@ var PersonasFamilias = (function () {
         var f = porClave[clave];
         if (!f) {
           f = porClave[clave] = { clave: clave, nombre: t.nombre || '', documento: t.documento || '',
+                                  nombreApellidos: t.nombreApellidos || '', sexo: t.sexo || '', domicilio: '',
                                   telefonos: [], correos: [], etiquetas: [], hijos: [] };
           orden.push(f);
         }
         if (!f.nombre && t.nombre) f.nombre = t.nombre;
+        if (!f.nombreApellidos && t.nombreApellidos) f.nombreApellidos = t.nombreApellidos;
+        if (!f.sexo && t.sexo) f.sexo = t.sexo;
+        if (!f.domicilio) {
+          (t.otros || []).forEach(function (o) {
+            if (!f.domicilio && /domicilio|direccion/.test(U.normalizar(o.titulo))) f.domicilio = o.valor;
+          });
+        }
         if (!f.documento && t.documento) f.documento = t.documento;
         (t.telefonos || []).forEach(function (x) { if (f.telefonos.indexOf(x) === -1) f.telefonos.push(x); });
         (t.correos || []).forEach(function (x) { if (f.correos.indexOf(x) === -1) f.correos.push(x); });
