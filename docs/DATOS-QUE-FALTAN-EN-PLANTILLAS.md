@@ -25,7 +25,6 @@ La columna «Propuesta» es la recomendación de Claude; la decisión es de Fran
 | Horario de atención al público | Aviso de recogida del título | Centro: hueco `{{HORARIO ATENCION}}` |
 | Horario lectivo (8:30 a 15:00) | Matrícula con horario | Centro: hueco `{{HORARIO LECTIVO}}` |
 | Teléfono y correo del centro | Ninguna todavía; el pie de los documentos antiguos los llevaba | Centro: `{{TELEFONO CENTRO}}`, `{{CORREO CENTRO}}` |
-| Nombre de la Consejería | Todas (membrete) y NIF del centro | Ya existe (`{{CONSEJERIA}}`), pero su valor por defecto es el antiguo: lo corrige la fila 170 |
 
 ## 2. Datos del alumnado que podrían salir de la base de datos
 
@@ -48,22 +47,22 @@ La columna «Propuesta» es la recomendación de Claude; la decisión es de Fran
 
 ## 4. Campos propuestos por tipo de asunto
 
-Son los que tiene sentido rellenar al crear el asunto, porque sirven para el documento, para el
-correo y para el mensaje de Séneca a la vez.
+Son los que tendría sentido rellenar al crear el asunto, porque sirven para el documento, para el
+correo y para el mensaje de Séneca a la vez. **Hoy no existen: la aplicación los pregunta al
+generar.** Crearlos es decisión de Francisco, tipo a tipo, cuando los use.
 
 | Tipo | Campos |
 |---|---|
 | OTROS · ACTIVIDAD EXTRAESCOLAR | Actividad · Lugar · Fechas · Horas |
-| ALUMNADO · JUSTIFICANTE ASISTENCIA (nuevo) | Fecha de la visita · Hora de llegada · Hora de salida · Motivo de la visita · Ante quién se presenta |
+| ALUMNADO · CERTIFICADO (justificante de asistencia) | Fecha de la visita · Hora de llegada · Hora de salida · Motivo de la visita · Ante quién se presenta |
 | ALUMNADO · ABSENTISMO | Día de la reunión · Hora de la reunión · Con quién es la reunión · Motivo de la reunión |
 | ALUMNADO · RECLAMACION | Materia · Departamento didáctico · Decisión del departamento · Calificación final · Motivo de la decisión |
 | ALUMNADO · CAMBIO DE GRUPO y CAMBIO OPTATIVA | Qué se solicita · Resolución (Conceder o Denegar) · Motivo de la resolución |
 | ALUMNADO · TITULO | Título · Estudios · Número de registro del título · Fecha de pago de la tasa |
 | OTROS · CONSEJO ESCOLAR | Órgano · Tipo de sesión · Fecha de la sesión · Votación · Acuerdo |
-| OTROS · OFERTA EDUCATIVA (nuevo) | Fecha del Claustro · Curso para el que se oferta · Materias o proyectos y cursos |
-| PERSONAL · AUTORIZACION (nuevo) | Para qué se autoriza · Organismo o entidad · Puesto |
+| OTROS · PROYECTO (oferta educativa, Anexos I y II) | Fecha del Claustro · Curso para el que se oferta · Materias o proyectos y cursos |
+| PERSONAL · CERTIFICADO PERSONAL (autorización de la Dirección) | Para qué se autoriza · Organismo o entidad · Puesto |
 
-La fila 170 da de alta estos campos en la biblioteca del centro (como texto, salvo las fechas).
 
 ## 5. Lo que no es un dato, sino algo que la aplicación no sabe hacer
 
@@ -74,6 +73,13 @@ La fila 170 da de alta estos campos en la biblioteca del centro (como texto, sal
   Secretaría, la citación a la familia y el oficio de remisión sirven para casi cualquier asunto,
   pero una plantilla cuelga de un solo tipo. Hoy están en DOCUMENTACION, ABSENTISMO y
   CORRESPONDENCIA.
+- **Tipos que quizá falten.** Para no crear nada sin Francisco, algunas plantillas van en el tipo
+  existente más cercano: el justificante de asistencia de la familia en ALUMNADO · CERTIFICADO; la
+  autorización de la Dirección en PERSONAL · CERTIFICADO PERSONAL; la oferta educativa en
+  OTROS · PROYECTO; el NIF del centro y «no imparte» en OTROS · CORRESPONDENCIA. Si con el uso
+  conviene un tipo propio, se crea y se mueve la plantilla.
+- **Enlazar una plantilla a un hito concreto.** Hoy salen en todos los hitos de su tipo. Se puede
+  afinar después, tipo a tipo, con su guía delante.
 - **La lista de un grupo dentro del documento.** El certificado de viaje con la lista de alumnos
   y profesores necesita un hueco `{{TABLA RELACIONADOS}}` que no existe. Por eso no se ha escrito.
 - **El saludo del correo para antiguos alumnos.** En ALUMNADO la aplicación saluda siempre a
