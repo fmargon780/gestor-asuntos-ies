@@ -10,8 +10,8 @@
    Este fichero hace tres cosas:
 
    - Deja a mano la consulta, para que la use la ficha del asunto.
-   - Pone un aviso en "Nuevo asunto" cuando el tercero y el tipo
-     elegidos ya tienen asuntos así. Es solo un aviso: nunca impide
+   - Pone en "Nuevo asunto" el recuadro de lo que ya tiene el tercero
+     (fila 163, js/duplicados-aviso.js). Es solo un aviso: nunca impide
      crear nada, porque dos matrículas del mismo alumno en cursos
      distintos son legítimas.
    - Para el mismo tercero, tipo Y año académico (11-sep-2026, "que no
@@ -150,24 +150,22 @@
     ultimaConsulta = '';
   }
 
-  function comoLista(nombres) {
-    return '<ul class="lista-repetidos">' + nombres.slice(0, 6).map(function (n) {
-      return '<li>' + U.escapar(n) + '</li>';
-    }).join('') + '</ul>' +
-    (nombres.length > 6 ? '<p class="nota">Y ' + (nombres.length - 6) + ' más.</p>' : '');
-  }
-
+  /* Fila 163 (docs/AVISO-DE-PARECIDOS-AL-CREAR.md): el recuadro con lo
+     que ya tiene el tercero (js/duplicados-aviso.js), en cuanto hay
+     tercero, aunque aún no haya tipo; la fecha cuenta para los
+     archivados. Sustituye al aviso ámbar de antes. */
   async function mirarSiYaExiste() {
     var c = cajaDelAviso();
-    if (!c) return;
+    if (!c || !window.DuplicadosAviso) return;
 
     var categoria = App.E.nuevo.categoria;
-    var tipo = App.E.nuevo.tipo;
+    var tipo = App.E.nuevo.tipo || '';
     var persona = App.E.nuevo.tercero;
-    if (!categoria || !tipo || !persona) { esconder(c); return; }
+    if (!categoria || !persona) { esconder(c); return; }
 
     var tercero = App.textoTercero(persona);
-    var consulta = categoria + '|' + tercero + '|' + tipo;
+    var fecha = ($('campo-fecha') && $('campo-fecha').value) || U.hoyIso();
+    var consulta = categoria + '|' + tercero + '|' + tipo + '|' + fecha;
     if (consulta === ultimaConsulta) return;
     ultimaConsulta = consulta;
 
@@ -176,22 +174,12 @@
        que acaba de llegar ya no vale. */
     if (consulta !== ultimaConsulta) return;
 
-    var archivados = delTipo(todo.archivados, tipo);
-    var abiertos = delTipo(todo.abiertos, tipo);
-    if (!archivados.length && !abiertos.length) {
-      c.className = 'oculto';
-      c.innerHTML = '';
-      return;
-    }
-
-    c.className = 'aviso aviso-ambar';
-    c.innerHTML = '<strong>Este tercero ya tiene asuntos de tipo ' + U.escapar(tipo) + '.</strong>' +
-      (abiertos.length
-        ? '<p>Abiertos ahora mismo:</p>' + comoLista(abiertos) : '') +
-      (archivados.length
-        ? '<p>En el archivo:</p>' + comoLista(archivados) : '') +
-      '<p class="nota">Es solo un aviso. Si el asunto nuevo es distinto de verdad ' +
-      '(otro curso, otra gestión), créalo sin más.</p>';
+    var t = U.normalizar(tipo);
+    var b = DuplicadosAviso.bloques(todo, tipo, fecha, function (n) { return U.normalizar(tipoDeNombre(n)) === t; });
+    DuplicadosAviso.pintar(c, b, function (nombre, archivado) {
+      if (archivado) irAlCandidatoArchivado(nombre, categoria, tercero);
+      else irAlCandidatoAbierto(nombre);
+    });
   }
 
   /* Se envuelve la función que repinta la vista previa, para no tener

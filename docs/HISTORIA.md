@@ -5,6 +5,17 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 163: el recuadro de lo que ya tiene el tercero, al crear
+
+`docs/AVISO-DE-PARECIDOS-AL-CREAR.md`. El aviso ámbar solo salía con tipo y solo con asuntos del
+mismo tipo, sin fechas. Ahora, en cuanto hay tercero, un recuadro con tres bloques (mismo tipo en
+rojo; archivados del mismo tipo a 15 días; el resto en gris). Decisiones:
+
+- Lo puro (fechas, bloques) y el pintado van en `js/duplicados-aviso.js`; `js/duplicados.js` solo
+  cambia `mirarSiYaExiste`, con la misma envoltura de siempre (ninguna nueva).
+- Se comprobó en la prueba que ir a la ficha desde el recuadro y volver a «Nuevo asunto» conserva lo
+  escrito: no hizo falta abrir nada en un panel aparte.
+
 ## 25-sep-2026 — Fila 160: «Versiones previas»
 
 `docs/VERSIONES-PREVIAS.md`. El «SIN SELLAR» y el Word que ya tiene su PDF pasan a una subcarpeta

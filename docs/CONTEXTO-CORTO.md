@@ -66,9 +66,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 (Una línea por cosa; el porqué, en `docs/contexto/` y `HISTORIA.md`.)
 
-- Categoría → tipo → tercero → nombre de carpeta, con vista previa. Nombre corto del tipo; tipo nuevo sin salir de Nuevo asunto.
-- Cada tipo dice quién lo encarga (Secretaría, Dirección, Jefatura, Varios): parrilla agrupada, filtro y Cuentas.
-- Asuntos reservados (por tipo o uno a uno): candado y sin el nombre del tercero en listas y buscador.
+- Categoría → tipo → tercero → nombre de carpeta, con vista previa. Nombre corto; tipo nuevo desde Nuevo asunto.
+- Cada tipo dice quién lo encarga (Secretaría, Dirección…): parrilla agrupada, filtro y Cuentas.
+- Asuntos reservados (por tipo o uno a uno): candado, sin el tercero en listas y buscador.
 - El estado es el primer hito sin terminar («Paso N de M · título», «Paso actual»): Administración o terceros; «Esperando a…» sale solo con el responsable (a mano, hasta que cambia el paso). Guías: «Administración», no personas. Vía y fecha límite.
 - Asuntos recurrentes, con aviso. Avisos de fichas huérfanas y papelera vieja.
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
@@ -81,7 +81,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Guías del procedimiento por tipo, con preguntas dentro de las respuestas sin límite, y su mapa
   (dibujo de la guía entera; en un asunto, con el camino elegido resaltado). Se escriben en
   acordeón: un paso abierto a la vez.
-- Panel lateral de lectura; tablón a la vista. Aviso de duplicado; pantalla "Duplicados".
+- Panel lateral de lectura; tablón a la vista. Al crear, recuadro con lo que ya tiene el tercero; parada si es idéntico; pantalla "Duplicados".
 - Correo y mensaje de Séneca: se prepara; el correo se envía de verdad (Apps Script, con
   confirmación) y nunca dos veces.
 - "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; con

@@ -419,6 +419,18 @@ Se comprueba con `pruebas/lo-pide.mjs`, sin navegador (jsdom).
 
 ### Que no se dupliquen los asuntos
 
+- **Mientras se rellena «Nuevo asunto»** (fila 163, `docs/AVISO-DE-PARECIDOS-AL-CREAR.md`,
+  `js/duplicados-aviso.js`, llamado desde `mirarSiYaExiste` de `js/duplicados.js`, con la envoltura
+  de siempre sobre `App.refrescarVista`): en `#aviso-duplicado`, en cuanto hay tercero (aunque no
+  haya tipo), un recuadro con sus abiertos del mismo tipo en rojo arriba («Ya tiene abierto un
+  asunto de este tipo»), sus archivados del mismo tipo abiertos a 15 días o menos de `#campo-fecha`
+  (por el AAMMDD del nombre; «Archivado hace poco, del mismo tipo», con la etiqueta «archivado») y el
+  resto de sus abiertos en gris («Otros asuntos abiertos de este tercero»; sin tipo, todos). Seis
+  como mucho por bloque y «Y N más»; un reservado, tapado y con candado (`Reservados.nombreParaVer`);
+  cada uno se pulsa (un abierto, su ficha; un archivado, su ficha del ARCHIVO), y al volver a «Nuevo
+  asunto» lo escrito sigue ahí. Se recalcula al cambiar tercero, tipo o fecha (la fecha entra en
+  `ultimaConsulta`; lo que llega tarde de una consulta vieja se tira). Sin nada, no sale. Sustituye
+  al aviso ámbar de antes (solo mismo tipo, sin fechas). Nunca impide crear.
 - **Al crear un asunto** (`js/duplicados.js`, el `onclick` de `btn-crear` envuelto): si ya hay
   uno abierto o archivado del mismo tercero, mismo tipo y mismo año académico (el grupo y el
   texto libre **no cuentan**), se para del todo: cuadro "Este asunto ya existe", con "Abrir el

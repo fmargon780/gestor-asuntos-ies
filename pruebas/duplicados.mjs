@@ -528,6 +528,84 @@ await comprobar('ya no queda ningún descarte', leerJson('no-duplicados.json'), 
 await comprobar('y Ajustes lo dice',
   pagina.locator('#tabla-duplicados-descartados .vacio').textContent(), 'Ninguno.');
 
+/* ============================================================
+   12. FILA 163: EL RECUADRO DE LO QUE YA TIENE EL TERCERO
+   (docs/AVISO-DE-PARECIDOS-AL-CREAR.md)
+   ============================================================ */
+console.log('--- fila 163: el recuadro de lo que ya tiene el tercero ---');
+const LUIS = 'Parecido Prueba, Luis 4440001';
+const P_ROJO = '260910 TRANSPORTE 26-27 ' + LUIS;
+const P_MAT = '260901 MATRICULA 26-27 ' + LUIS;
+const P_BECA = '260902 BECA 26-27 ' + LUIS;
+await pagina.evaluate(async ([luis, nombres]) => {
+  for (const n of nombres) await window.__disco.abiertos.getDirectoryHandle(n, { create: true });
+  const cat = await window.__disco.archivo.getDirectoryHandle('ALUMNADO', { create: true });
+  const ter = await cat.getDirectoryHandle(luis, { create: true });
+  for (const n of ['260905 TRANSPORTE 26-27 ' + luis, '260826 TRANSPORTE 26-27 ' + luis, '260912 BECA 26-27 ' + luis]) {
+    await ter.getDirectoryHandle(n, { create: true });
+  }
+}, [LUIS, [P_ROJO, P_MAT, P_BECA]]);
+await pagina.click('.pestana[data-pantalla="abiertos"]');
+await pagina.click('#btn-recargar');
+await pagina.waitForTimeout(300);
+await pagina.evaluate(async (n) => { await App.anotar(n, { reservado: true }); }, P_BECA);
+
+const recuadro = () => pagina.evaluate(() => {
+  const c = document.getElementById('aviso-duplicado');
+  if (!c || c.classList.contains('oculto')) return null;
+  return Array.from(c.querySelectorAll('.parecidos-bloque')).map((b) => [b.querySelector('strong').textContent,
+    Array.from(b.querySelectorAll('.parecido')).map((x) => x.className.replace(/.*(parecido-[a-z-]+).*/, '$1') + ':' + x.textContent)]);
+});
+
+await pagina.click('.pestana[data-pantalla="nuevo"]');
+await pagina.click('#categorias-lista .categoria-boton:nth-child(1)');
+await pagina.getByRole('button', { name: 'TRANSPORTE', exact: true }).click();
+await pagina.fill('#buscar-tercero', 'Nadie');
+await pagina.waitForTimeout(300);
+await darDeAltaAlumno('Nadie Prueba, Eva', '4440009');
+await pagina.waitForTimeout(400);
+await comprobar('163.1 un tercero sin asuntos: no sale nada', recuadro(), null);
+
+await pagina.fill('#buscar-tercero', 'Parecido');
+await pagina.waitForTimeout(300);
+await darDeAltaAlumno('Parecido Prueba, Luis', '4440001');
+await pagina.fill('#campo-fecha', '2026-09-15');
+await pagina.waitForTimeout(500);
+const bloquesLuis = await recuadro();
+await comprobar('163.3 y 163.4: rojo arriba el abierto del mismo tipo; el archivado a 10 días sí (el de 20 y el de otro tipo, no); el resto, en gris',
+  Promise.resolve(bloquesLuis && bloquesLuis.map((b) => [b[0], b[1].map((x) => x.split(':')[0])])),
+  [['Ya tiene abierto un asunto de este tipo', ['parecido-mismo-tipo']],
+   ['Archivado hace poco, del mismo tipo', ['parecido-archivado']],
+   ['Otros asuntos abiertos de este tercero', ['parecido-otro', 'parecido-otro']]]);
+await comprobar('163.4 el archivado es el de 10 días',
+  Promise.resolve(bloquesLuis && bloquesLuis[1][1][0].indexOf('260905 TRANSPORTE') > -1), true);
+await comprobar('163.6 el reservado sale tapado, con candado',
+  Promise.resolve(bloquesLuis && bloquesLuis[2][1].some((x) => x.indexOf('🔒') > -1 && x.indexOf('reservado') > -1 && x.indexOf('Parecido') === -1)), true);
+
+await pagina.fill('#campo-fecha', '2026-08-30');
+await pagina.waitForTimeout(500);
+await comprobar('163.5 al cambiar la fecha se recalculan los archivados (ahora los dos de agosto y septiembre)',
+  recuadro().then((b) => b && b.filter((x) => x[0].indexOf('Archivado') === 0).map((x) => x[1].length)[0]), 2);
+
+await pagina.evaluate(() => { App.E.nuevo.tipo = ''; App.refrescarVista(); });
+await pagina.waitForTimeout(500);
+await comprobar('163.2 sin tipo: solo el bloque gris, con todos sus abiertos',
+  recuadro().then((b) => b && b.map((x) => [x[0], x[1].length])), [['Otros asuntos abiertos de este tercero', 3]]);
+await comprobar('y la nota al pie',
+  pagina.locator('#aviso-duplicado .parecidos-pie').textContent(), 'Es solo un aviso. Si es otra gestión, créalo sin más.');
+
+await pagina.evaluate(() => { App.E.nuevo.tipo = 'TRANSPORTE'; App.refrescarVista(); });
+await pagina.fill('#campo-descripcion', 'texto a mano');
+await pagina.waitForTimeout(500);
+await pagina.click('#aviso-duplicado .parecido-mismo-tipo');
+await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await comprobar('163 pulsar un abierto del recuadro abre su ficha', pagina.locator('.ficha-nombre-texto').textContent(), P_ROJO);
+await pagina.click('.pestana[data-pantalla="nuevo"]');
+await pagina.waitForTimeout(400);
+await comprobar('163 y al volver a «Nuevo asunto», lo escrito sigue ahí',
+  pagina.evaluate(() => [document.getElementById('campo-descripcion').value, document.getElementById('campo-fecha').value, App.E.nuevo.tipo, !!App.E.nuevo.tercero]),
+  ['texto a mano', '2026-08-30', 'TRANSPORTE', true]);
+
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 await navegador.close();
