@@ -123,6 +123,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 | 154 | `docs/HITOS-ACCIONES-EN-EL-HITO.md` (hitos más sencillos: las acciones solo en el hito; los pasos, lista para marcar con «receta» opcional que rellena el cuadro; todos los documentos del asunto a la vista en cada hito; y que «Paso N de M», «Hitos N/M» y la barra digan lo mismo; después de la 150 y la 153) | PENDIENTE |
 | 155 | `docs/WORD-DENTRO-DE-LA-APP.md` (avisar de los datos que faltan antes de generar un Word; y el Word se abre dentro de la app, editable, con «Guardar PDF» en la carpeta del asunto, «Imprimir» y «Guardar cambios», sin pasar por Descargas) | PENDIENTE |
 | 157 | `docs/COPIA-ACTUALIZAR-SIN-CARRERA.md` (en la copia sin internet, «Actualizar ahora» vuelve a leer la lista de ficheros al pulsar y reintenta una vez si un fichero no coincide; error en lenguaje llano, sin «sha256») | PENDIENTE |
+| 158 | `docs/INSERTAR-HUECO-EN-EL-PASO.md` (el botón «Insertar hueco» de «Comunicación de este paso», en el editor del guion, no hace nada: se engancha antes de que el paso esté en la página) | PENDIENTE |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
