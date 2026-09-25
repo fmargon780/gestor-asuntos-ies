@@ -150,6 +150,11 @@ abierto en ellas:
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
+- De la fila 165 (25-sep-2026): corregir el Word dentro de la aplicación. La única librería que lo
+  hace bien (SuperDoc) es AGPL-3.0: con la web publicada, obliga a ofrecer el código a quien la use.
+  Opciones: aceptarlo (el repositorio pasaría a poder enseñarse), pagar su licencia, o seguir
+  corrigiendo en Word y volviendo a generar. Hoy el Word se ve, se guarda en PDF y se imprime dentro.
+
 - De la fila 146 (25-sep-2026): en el Anexo III (solicitud de admisión) la propuesta pone el centro,
   su código y su localidad en «Centro prioritario» y en «Centro 1» (los que pide la familia), no en
   «Centro 2, 3, 4». Si «Centro 1» no debe ser el nuestro, se cambia a mano en Ajustes › Impresos
