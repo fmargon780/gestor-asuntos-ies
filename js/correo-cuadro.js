@@ -156,6 +156,8 @@ var CorreoCuadro = (function () {
     var otroInicial = posibles.otro;
 
     return '<div id="correo-formulario">' +
+             '<div class="cuadro-cabecera-ruta"><span id="correo-ruta-lugar"></span></div>' +
+             '<div id="correo-ruta-en-linea" class="oculto"></div>' +
              '<div class="correo-grid">' +
                '<div class="correo-col-izq">' +
                  bloqueDestinatarios(a, correos, persona, otroInicial, opcionesGrupo) +
@@ -277,6 +279,7 @@ var CorreoCuadro = (function () {
 
     engancharPlantilla(a);
     engancharCco();
+    engancharRuta(a);
 
     var selectorGrupo = $('correo-grupo');
     if (selectorGrupo) {
@@ -310,6 +313,15 @@ var CorreoCuadro = (function () {
     $('correo-ordenador').onclick = function () { abrirDelOrdenador(); if (n().apuntarElRastro) n().apuntarElRastro(a); };
 
     engancharEnviar(a);
+  }
+
+  /* El botón «Ruta» en la cabecera del cuadro (fila 152,
+     docs/RUTA-QUE-NO-VA-A-BING.md, punto 3): el modo (abierto/archivado)
+     sale del propio asunto, igual que en js/ficha-nombre-acciones.js. */
+  function engancharRuta(a) {
+    if (!window.RutaCarpetas) return;
+    var interno = n()._interno || {};
+    RutaCarpetas.montarEnCuadro($('correo-ruta-lugar'), $('correo-ruta-en-linea'), a, interno.modoDelAsunto || 'abierto');
   }
 
   function engancharPlantilla(a) {
