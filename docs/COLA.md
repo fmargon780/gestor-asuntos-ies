@@ -125,6 +125,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 | 157 | `docs/COPIA-ACTUALIZAR-SIN-CARRERA.md` (en la copia sin internet, «Actualizar ahora» vuelve a leer la lista de ficheros al pulsar y reintenta una vez si un fichero no coincide; error en lenguaje llano, sin «sha256») | PENDIENTE |
 | 158 | `docs/INSERTAR-HUECO-EN-EL-PASO.md` (el botón «Insertar hueco» de «Comunicación de este paso», en el editor del guion, no hace nada: se engancha antes de que el paso esté en la página) | PENDIENTE |
 | 159 | `docs/RESPONSABLE-ADMINISTRACION.md` (responsable fijo «Administración» en lugar de los nombres de las personas en el responsable por defecto de las guías, con migración; en un asunto concreto siguen las personas; «Qué me toca» los reparte a los dos; y en la biblioteca de hitos, «Firma de Secretaría» y «Visto bueno de Dirección»; después de la 154) | PENDIENTE |
+| 160 | `docs/VERSIONES-PREVIAS.md` (subcarpeta «Versiones previas» en cada asunto: allí van el «SIN SELLAR» al registrar y el Word cuando ya tiene su PDF; en la ficha y en la mesa, plegadas en «N versiones previas · ver»; fuera del índice del expediente; botón en Mantenimiento para ordenar lo que ya existe; después de la 155) | PENDIENTE |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
