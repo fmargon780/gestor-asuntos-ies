@@ -5,6 +5,39 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 148: las pruebas de GitHub, en verde, y menos ejecuciones
+
+`docs/PRUEBAS-EN-VERDE.md`. Francisco recibía un «Run failed» por cada subida. Leídas las ejecuciones
+de «Pruebas» en `main` (herramienta de Actions): solo fallaba `pruebas/indice-del-expediente.mjs`,
+en «un fallo al crearlo no impide archivar», desde la fila 138 (la ficha baja a su carpeta al
+archivar, y archivar tarda un poco más). No era la aplicación: la prueba esperaba el aviso verde
+«Asunto archivado.», que seguía a la vista desde el asunto anterior, y miraba el ARCHIVO antes de que
+el segundo archivado terminase (salía 1 fichero en vez de 3, y aún sin el aviso ámbar). Ahora espera
+a que el asunto salga de los abiertos. «Publicar la copia sin internet» estaba en verde.
+
+`pruebas.yml`: `paths-ignore: ['docs/**']` (marcar una fila EN CURSO ya no lanza la batería) y
+`concurrency` con `cancel-in-progress` (dos subidas seguidas: solo se prueba la última). Los avisos por
+correo de GitHub son de la cuenta de Francisco: no se tocan.
+
+Lo que costó: la primera pasada local se contaminó (un servidor de pruebas viejo seguía en el puerto
+8123 sirviendo la copia de trabajo, con la mesa ya cambiada); el registro de GitHub fue lo fiable.
+
+## 25-sep-2026 — Fila 147: la mesa del hito, en tarjetas que se abren en grande
+
+`docs/MESA-TARJETAS-QUE-SE-ABREN.md`. Los documentos y las notas iban apretados en la columna
+derecha (nombres cortados con «…», caja de notas de una línea). Ahora hay tres tarjetas: una en grande
+a la izquierda y dos de resumen a la derecha; pulsar una la abre en grande. Decisiones:
+
+- Las tres tarjetas grandes están siempre en el DOM y el CSS enseña una (`data-tarjeta` en
+  `.mesa-columnas`): cambiar no repinta nada, así que no se pierde lo que se escribe, y los botones del
+  guion siguen pulsando los de siempre aunque estén en otra tarjeta.
+- La tarjeta abierta se recuerda por asunto e hito (`HitoMesa`); «Quitar del hito» (que vuelve a pedir
+  la mesa con `abrirAlPintar`) no devuelve al guion si es el mismo hito.
+- El código de registro va en su propia columna; el estado dice solo «Registrado»/«Sin registrar».
+- «Registrar» desde el guion abre antes la tarjeta de documentos (el menú ⋯ está allí).
+- Nuevo `js/hito-mesa-tarjetas.js` (los tres resúmenes y los gestos). Pruebas que escribían en la
+  nota del hito o tocaban la tabla abren antes su tarjeta; nueva `pruebas/mesa-tarjetas-que-se-abren.mjs`.
+
 ## 25-sep-2026 — Fila 146: las casillas de un impreso, con nombres que se entienden
 
 `docs/IMPRESOS-CASILLAS-LEGIBLES.md`. En Ajustes › «Impresos oficiales» salían decenas de filas con el
