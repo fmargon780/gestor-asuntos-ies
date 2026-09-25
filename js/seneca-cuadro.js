@@ -41,6 +41,7 @@ var SenecaCuadro = (function () {
     plantillaElegida = '';
     copiadoElAsunto = false;
     var quien = n().aQuien ? n().aQuien(a) : '';
+    var documento = n().documentoSeneca ? n().documentoSeneca() : '';
 
     return '<div id="seneca-formulario">' +
            '<div class="cuadro-cabecera-ruta"><span id="seneca-ruta-lugar"></span></div>' +
@@ -50,6 +51,10 @@ var SenecaCuadro = (function () {
              'Los destinatarios se marcan allí, en su lista' +
              (quien ? ': <strong>' + U.escapar(quien) + '</strong>' : '') + '.' +
            '</div>' +
+           (documento
+             ? '<div class="seneca-doc-adjuntar"><strong>Adjunta este documento en Séneca:</strong> ' +
+               U.escapar(documento) + ' <button type="button" class="enlace" id="seneca-copiar-doc">Copiar el nombre</button></div>'
+             : '') +
            '<div class="seneca-grid">' +
              '<div class="seneca-col-izq">' +
                (window.SenecaDestinatarios ? SenecaDestinatarios.bloqueHtml(opcionesGrupo) : '') +
@@ -158,6 +163,7 @@ var SenecaCuadro = (function () {
     engancharPlantilla(a);
     engancharPasos(a);
     engancharRuta(a);
+    engancharDocAdjuntar();
 
     if (window.SenecaAyudante) {
       /* El enlace se queda a la vista; la explicación entra en el
@@ -173,6 +179,14 @@ var SenecaCuadro = (function () {
     if (!window.RutaCarpetas) return;
     var interno = n()._interno || {};
     RutaCarpetas.montarEnCuadro($('seneca-ruta-lugar'), $('seneca-ruta-en-linea'), a, interno.modoDelAsunto || 'abierto');
+  }
+
+  /* Fila 153: «Copiar el nombre» del documento señalado, si lo hay. */
+  function engancharDocAdjuntar() {
+    var boton = $('seneca-copiar-doc');
+    if (!boton) return;
+    var nombre = n().documentoSeneca ? n().documentoSeneca() : '';
+    boton.onclick = function () { U.copiar(nombre, boton); };
   }
 
   function engancharPlantilla(a) {
