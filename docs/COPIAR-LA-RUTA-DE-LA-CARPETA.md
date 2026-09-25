@@ -2,6 +2,11 @@
 
 23-sep-2026. Diseñado y cerrado con Francisco el 23-sep-2026 (14:00).
 
+> **Continúa en la fila 152** (`docs/RUTA-QUE-NO-VA-A-BING.md`, 25-sep-2026): el formato de lo
+> copiado pasó a `file:///` (para que el navegador lo abra siempre como carpeta, nunca como una
+> búsqueda en Bing), sin ruta apuntada ya no se copia el nombre suelto, y el mismo botón salió
+> también en los cuadros de Correo y de Séneca.
+
 ## 1. Por qué no es «un botón que abra la carpeta»
 
 Francisco pidió un botón que llevara directamente a la carpeta del asunto en su ordenador. **El
