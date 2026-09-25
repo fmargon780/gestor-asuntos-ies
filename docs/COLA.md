@@ -155,6 +155,10 @@ abierto en ellas:
   esta sesión no pudo comprobar lo publicado (su red bloquea `vercel.app` y el conector de Vercel da 403).
   Comprobar que se sirven `js/tutores-legales.js` y `js/administraciones.js` y que `App.VERSION` es de
   después de las 17:32 del 25-sep-2026.
+- Filas 168, 170 y 171 (25-sep-2026): fusionadas en `main` (`bd6f889`, PR #125, pruebas de GitHub en
+  verde), pero esta sesión no pudo comprobar lo publicado (su red no llega a la web y el conector de
+  Vercel da 403). Comprobar que se sirven `js/generar-para-relacionados.js` y `plantillas/correo-actividad.md`
+  en `plantillas/indice.json`, y que `App.VERSION` es de después de las 22:43 del 25-sep-2026.
 - Fila 132: comprobar con `curl -I` que salen las cabeceras de seguridad nuevas.
 - Fila 63: comprobar que `docs/COLA.md` da error en la web publicada.
 - Numeración: `docs/PLANTILLAS-Y-FORMULARIOS-DESDE-EL-HITO.md` se presenta como «fila 146» y
