@@ -112,6 +112,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 
 | Nº | Instrucción | Estado |
 |---|---|---|
+| 147 | `docs/MESA-TARJETAS-QUE-SE-ABREN.md` (la mesa del hito en tarjetas: una en grande, las otras dos de resumen a la derecha; pulsar una la abre en grande) | PENDIENTE |
 
 **La fila 146 está HECHA** (25-sep-2026): `docs/IMPRESOS-CASILLAS-LEGIBLES.md`. En Ajustes › El centro ›
 «Impresos oficiales», cada casilla con nombre legible («Página 2 · Primer apellido»), las repetidas en una
