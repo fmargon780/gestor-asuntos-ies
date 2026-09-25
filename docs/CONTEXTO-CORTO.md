@@ -91,8 +91,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Botón «Ruta» (`file:///`; ficha, Correo/Séneca): deduce Dropbox; lo de dentro, una vez para el centro. Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
-- Registrar un documento detecta el PDF ya sellado, lo renombra y guarda el original como
-  "SIN SELLAR"; cada documento se puede asociar a un hito.
+- Registrar detecta el PDF sellado; el "SIN SELLAR" y el Word con su PDF van a «Versiones previas»
+  (plegadas); cada documento, asociable a un hito.
 - Terceros relacionados con un asunto, con altas por grupo (unidad, nivel, grupo propio), que
   también sirven de destinatarios de un correo o de un mensaje de Séneca.
 - Ajustes: tres pestañas y pantalla por tipo; todo plegado, con resumen; avisos de fallo, solo con fallo.

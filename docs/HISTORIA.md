@@ -5,6 +5,19 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 160: «Versiones previas»
+
+`docs/VERSIONES-PREVIAS.md`. El «SIN SELLAR» y el Word que ya tiene su PDF pasan a una subcarpeta
+del asunto, plegada en la ficha y en la mesa. Decisiones:
+
+- Nada nuevo en los hitos: siguen apuntando el nombre; la mesa lee también la subcarpeta y enseña allí,
+  plegadas, las de ese hito. Así «no se pierde el enlace» sin guardar rutas en `hitos.json`.
+- El índice del expediente no se ha tocado: solo lee la carpeta del asunto, así que ya no las ve; su
+  marca «(original sin sellar)» se deja para los asuntos que aún no se han ordenado.
+- La fusión de carpetas al archivar ya entraba en las subcarpetas: no hizo falta cambiarla.
+- Tres pruebas daban por hecho que el «SIN SELLAR» y el Word se quedaban arriba: ahora comprueban que
+  van a «Versiones previas».
+
 ## 25-sep-2026 — Fila 159: «Administración» en las guías, en vez de las personas
 
 `docs/RESPONSABLE-ADMINISTRACION.md`. Decisiones:

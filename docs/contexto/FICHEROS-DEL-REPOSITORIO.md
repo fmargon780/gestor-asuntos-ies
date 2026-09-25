@@ -175,6 +175,7 @@ de `App` va después del fichero que lo define.
 | `js/hitos-generar.js` | «Generar documento» dentro de un hito (fila 102): elige entre las plantillas del paso y las del tipo y llama a `PlantillasDocumento.generar(..., { hito })`; cargado justo después de `js/plantillas-documento.js` |
 | `js/visor.js` | El panel de la derecha para ver un documento (`con-visor`); marcador y acciones opcionales para que quien lo abre sepa qué se está viendo. Desde la fila 155, un `.docx` va a `js/word-visor.js` y lo que no sabe enseñar se baja con su nombre |
 | `js/word-visor.js` | `WordVisor` (fila 155): el Word en grande dentro de la aplicación, con «Guardar PDF» en la carpeta del asunto e «Imprimir» (`css/word-visor.css`) |
+| `js/versiones-previas.js` | `VersionesPrevias` (fila 160): la subcarpeta «Versiones previas» de cada asunto (mover, sacar, listar, qué va allí) y el botón de Ajustes › Mantenimiento |
 | `js/word-faltan.js` | `WordFaltan` (fila 155): «Faltan datos para este documento», antes de guardar el Word |
 | `js/lib/docx-preview.min.js`, `js/lib/jszip.min.js`, `js/lib/html2canvas.min.js` | Librerías del visor de Word (fila 155): docx-preview 0.4.1 (Apache-2.0), JSZip 3.10.1 (MIT o GPL-3.0), html2canvas 1.4.1 (MIT); se cargan al abrir el primer Word |
 | `js/tipos-organo.js` | Quién encarga cada tipo (`TiposOrgano`, fila 134): el dato `organo` de `tipos.json`, su desplegable en la pantalla de un tipo, el bloque de Ajustes «Quién encarga cada tipo», la parrilla agrupada de Nuevo asunto, el filtro «Lo encarga» y lo que usa Cuentas. Antes de `js/tipos-buscador.js` |
@@ -276,6 +277,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/guia-en-acordeon.mjs` | Prueba del editor de la guía en acordeón (fila 122) |
 | `pruebas/opciones.mjs` | Prueba de las preguntas con opciones, con el caso de la factura |
 | `pruebas/registro.mjs` | Prueba de registrar un documento en un paso, sin nombrarlo dos veces |
+| `pruebas/versiones-previas.mjs` | Prueba (fila 160): registrar deja el «SIN SELLAR» en «Versiones previas», el Word con PDF va y sin PDF no, la ficha las pliega y no las cuenta, el índice no las ve, y ordenar dos veces no cambia nada la segunda |
 | `pruebas/responsable-administracion.mjs` | Prueba (fila 159): «Administración» fija, la guía sin las personas, la pasada única (guía y biblioteca sí, hitos no), los dos hitos de firma sin duplicar y el filtro de «Qué me toca» |
 | `pruebas/insertar-hueco-en-el-paso.mjs` | Prueba (fila 158): «Insertar hueco» de «Comunicación de este paso» abre el buscador y mete el hueco, en Correo y Séneca, en un paso normal y en uno de una pregunta |
 | `pruebas/word-dentro-de-la-app.mjs` | Prueba (fila 155): el cuadro de lo que falta antes de guardar (y «Cancelar» sin nada), el Word dentro de la aplicación, «Guardar PDF» en la carpeta, un .docx de la ficha sin `window.open` y otro fichero bajado con su nombre |

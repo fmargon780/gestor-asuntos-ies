@@ -179,11 +179,29 @@ var HitoMesaDocumentos = (function () {
     return propios + (mas ? ' (y ' + mas + ' más del asunto)' : '');
   }
 
+  /* Fila 160: «N versiones previas · ver», plegado: las de este hito (las
+     suyas y los gemelos de las suyas) que viven en «Versiones previas». */
+  function previasHTML(h, previas) {
+    if (!previas || !previas.length) return '';
+    var claves = {};
+    (h.documentos || []).forEach(function (n) { claves[claveGemelo(n)] = true; });
+    var suyas = previas.filter(function (n) { return (h.documentos || []).indexOf(n) !== -1 || claves[claveGemelo(n)]; });
+    if (!suyas.length) return '';
+    return '<details class="mesa-previas"><summary>' + suyas.length + (suyas.length === 1 ? ' versión previa' : ' versiones previas') +
+      ' · ver</summary>' + suyas.map(function (n) {
+        return '<div class="mesa-previa-fila"><span class="mesa-previa-nombre">' + U.escapar(n) + '</span>' +
+          '<button type="button" class="enlace mesa-previa-abrir" data-doc="' + U.escapar(n) + '">Abrir</button>' +
+          '<button type="button" class="enlace mesa-previa-sacar" data-doc="' + U.escapar(n) + '">Sacar de versiones previas</button></div>';
+      }).join('') + '</details>';
+  }
+
   function filasHTML(a, h, hitos, nombresDeLaCarpeta, abierto) {
-    var docs = h.documentos || [];
+    var previas = (nombresDeLaCarpeta && nombresDeLaCarpeta.previas) || [];
+    var docs = (h.documentos || []).filter(function (n) { return previas.indexOf(n) === -1; });
+    var plegadas = previasHTML(h, previas);
     var otros = enLaMesa(a, h) ? otrosHTML(h, hitos, nombresDeLaCarpeta) : '';
     /* Fila 145: vacío, una sola línea gris. */
-    if (!docs.length) return (abierto ? '<p class="mesa-sin-docs">Ninguno todavía. <span class="mesa-soltar-pista">Suelta aquí un documento del ordenador</span></p>' : '') + otros;
+    if (!docs.length) return (abierto ? '<p class="mesa-sin-docs">Ninguno todavía. <span class="mesa-soltar-pista">Suelta aquí un documento del ordenador</span></p>' : '') + plegadas + otros;
     return agrupar(docs, nombresDeLaCarpeta).map(function (g) {
       var falta = !!(nombresDeLaCarpeta && nombresDeLaCarpeta.indexOf(g.nombre) === -1);
       var estado = estadoDe(g.nombre, falta);
@@ -211,7 +229,7 @@ var HitoMesaDocumentos = (function () {
             '<button type="button" class="enlace mesa-doc-gemelo" data-doc="' + U.escapar(x) + '">Abrir</button></div>';
         }).join('') +
       '</div>';
-    }).join('') + otros;
+    }).join('') + plegadas + otros;
   }
 
   /* ---------- con la mesa abierta ---------- */
@@ -371,6 +389,16 @@ var HitoMesaDocumentos = (function () {
     });
     Array.prototype.forEach.call(fila.querySelectorAll('.mesa-doc-marca'), function (c) {
       c.onchange = function () { pintarSeleccion(fila, a, h, hitos); };
+    });
+    Array.prototype.forEach.call(fila.querySelectorAll('.mesa-previa-abrir'), function (b) {
+      b.onclick = function () { if (window.VersionesPrevias) VersionesPrevias.abrir(a, b.dataset.doc); };
+    });
+    Array.prototype.forEach.call(fila.querySelectorAll('.mesa-previa-sacar'), function (b) {
+      b.onclick = async function () {
+        try { await VersionesPrevias.sacar(a.handle, b.dataset.doc); U.aviso('Devuelto a la carpeta del asunto.', 'bueno'); }
+        catch (e) { U.fallo('No he podido sacarlo', e); }
+        if (window.HitosPanel) HitosPanel.programarRepintado();
+      };
     });
     pintarSeleccion(fila, a, h, hitos);
     pintarPlantillas(fila, a, h, abierto);

@@ -169,6 +169,11 @@ var WordVisor = (function () {
       });
     } catch (e) { U.fallo('No he podido guardar el PDF', e); return; }
     U.aviso('PDF guardado en la carpeta del asunto: ' + nombre, 'bueno');
+    /* Fila 160: con su PDF, el Word pasa a «Versiones previas». */
+    if (window.VersionesPrevias) await VersionesPrevias.ordenarTrasCambio(mismo.carpeta);
+    if (mismo.asunto && window.FichaDocumentos && App.fichaAbierta && App.fichaAbierta() === mismo.asunto.nombre) {
+      try { FichaDocumentos.pintar(mismo.asunto); } catch (e) { /* solo pintar */ }
+    }
     try {
       if (mismo.asunto && window.Notas) await Notas.anadir(mismo.asunto, 'PDF guardado ' + nombre);
       if (mismo.asunto && mismo.hito && window.Hitos) {

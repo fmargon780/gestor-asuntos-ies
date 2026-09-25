@@ -210,6 +210,10 @@
     if (!errorLectura && hitos.length) {
       try { nombresDeLaCarpeta = (await Carpetas.ficheros(a.handle)).map(function (f) { return f.nombre; }); }
       catch (e) { nombresDeLaCarpeta = null; }
+      /* Fila 160: lo de «Versiones previas», aparte (la mesa lo pliega). */
+      if (nombresDeLaCarpeta && window.VersionesPrevias) {
+        nombresDeLaCarpeta.previas = (await VersionesPrevias.listar(a.handle)).map(function (f) { return f.nombre; });
+      }
       if (actual !== a || turno !== turnoRepintado) return;
     }
 

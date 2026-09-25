@@ -262,3 +262,9 @@ details.mesa-normativa > summary { cursor: pointer; }
 .mesa-receta:hover { background: #ffefc2; }
 .guion-receta { flex-wrap: wrap; gap: 6px; }
 .guion-receta-titulo { font-size: 12px; color: var(--tinta-suave); }
+
+/* Fila 160: «N versiones previas · ver», plegado y en gris (mesa y ficha). */
+.mesa-previas, .ficha-previas { margin-top: 10px; color: var(--tinta-suave); font-size: 13px; }
+.mesa-previas summary, .ficha-previas summary { cursor: pointer; }
+.mesa-previa-fila, .ficha-previa-fila { display: flex; align-items: center; gap: 10px; padding: 3px 0 3px 14px; }
+.mesa-previa-nombre, .ficha-previa-nombre { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }

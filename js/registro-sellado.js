@@ -193,6 +193,13 @@ var RegistroSellado = (function () {
 
       var nombreConservado = nombreLibreEntre(nombres.concat([nombreNuevo]), nombreSinSellar(nombreDocumentoOriginal));
       await Carpetas.renombrarFichero(asunto.handle, nombreDocumentoOriginal, nombreConservado);
+      /* Fila 160 (docs/VERSIONES-PREVIAS.md): el «SIN SELLAR», a «Versiones
+         previas» (y el Word que ya tenga su PDF); si falla, se queda aquí. */
+      var aPrevias = false;
+      if (window.VersionesPrevias) {
+        try { await VersionesPrevias.mover(asunto.handle, nombreConservado); aPrevias = true; } catch (e3) { aPrevias = false; }
+        await VersionesPrevias.ordenarTrasCambio(asunto.handle);
+      }
 
       var codigo = (nombreNuevo.match(/^\d{6}\s+(\S+)/) || [])[1] || '';
       var fechaSello = sello.fecha ? ' el ' + sello.fecha : '';
@@ -201,7 +208,8 @@ var RegistroSellado = (function () {
         '. Se conserva el original sin sellar.',
         'registroDeDocumento', nombreDocumentoOriginal);
 
-      U.aviso('Documento registrado. El original sin sellar se conserva en la carpeta.', 'bueno');
+      U.aviso(aPrevias ? 'Documento registrado. El original sin sellar se conserva en «Versiones previas».'
+        : 'Documento registrado. El original sin sellar se conserva en la carpeta.', 'bueno');
       return true;
     } catch (e) {
       U.aviso('No he podido colocarlo: ' + U.mensajeDeError(e), 'malo');

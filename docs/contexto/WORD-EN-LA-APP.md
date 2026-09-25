@@ -41,3 +41,28 @@ faltando.
 Prueba: `pruebas/word-dentro-de-la-app.mjs`, con `plantillas/acuerdo-iniciacion-cambio-centro.docx`.
 Las pruebas que generaban un Word y seguían trabajando detrás cierran antes el visor
 (`WordVisor.cerrar()`).
+
+## «Versiones previas» (fila 160, `docs/VERSIONES-PREVIAS.md`, `js/versiones-previas.js`)
+
+Aquí porque `docs/contexto/DOCUMENTOS-PDF.md` pasa de 40 KB. Subcarpeta `Versiones previas` en la
+carpeta de cada asunto, creada solo cuando hace falta:
+
+- **Qué va**: el «SIN SELLAR» al registrar un documento sellado (`RegistroSellado.asociar`), siempre; y
+  el Word (`.doc`/`.docx`) en cuanto hay un PDF con su misma clave de gemelo (sin extensión, «SIN SELLAR»
+  ni código de registro; `VersionesPrevias.queMover`), comprobado al registrar (también `Registro`) y al
+  «Guardar PDF» del visor. Un Word sin su PDF nunca se mueve solo. Si ya hay uno con el nombre, «(2)».
+  No es un borrado (no pasa por la papelera). Archivar, reabrir y fusionar la llevan con la carpeta
+  (`Carpetas.fusionarDentro` entra en las subcarpetas).
+- **Dónde se ve**: en la ficha (`js/ficha-documentos.js`) y en la mesa (`js/hito-mesa-documentos.js`),
+  debajo de los documentos, «N versiones previas · ver», plegado, con «Abrir» y «Sacar de versiones
+  previas» (clases `.ficha-previas`/`.mesa-previas`: no cuentan en el número ni en el resumen). En la
+  mesa, las de ese hito (las suyas y los gemelos de las suyas; `nombresDeLaCarpeta.previas`, de
+  `js/hitos-panel.js`); los hitos no pierden su apunte. El ⋯ de un documento (ficha y mesa) lleva
+  «Pasar a versiones previas». El índice del expediente no las ve (lee solo la carpeta del asunto; su
+  marca «original sin sellar» se queda para los asuntos aún sin ordenar); el índice del ARCHIVO sí las
+  indexa (ya entraba en las subcarpetas).
+- **Ajustes › Mantenimiento › «Versiones previas»** (`ordenarTodo`): recorre abiertos y ARCHIVO, dice
+  cuántos moverá y de cuántos asuntos, pregunta, mueve y avisa (ámbar con los que no pudo). La segunda
+  vez no hay nada que mover.
+
+Prueba: `pruebas/versiones-previas.mjs`.

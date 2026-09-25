@@ -188,6 +188,19 @@ var FichaDocumentos = (function () {
       }
     }
 
+    /* Fila 160: «Pasar a versiones previas», para corregir a mano. */
+    if (window.VersionesPrevias && !esIndice) {
+      var aPrevias = document.createElement('button');
+      aPrevias.type = 'button';
+      aPrevias.textContent = 'Pasar a versiones previas';
+      aPrevias.onclick = async function () {
+        try { await VersionesPrevias.mover(a.handle, f.nombre); U.aviso('Pasado a «Versiones previas».', 'bueno'); }
+        catch (e) { U.fallo('No he podido moverlo', e); }
+        pintar(a);
+      };
+      enMenu.push(aPrevias);
+    }
+
     /* Borrar, con papelera (11-sep-2026): siempre el último del menú. */
     if (window.Papelera) {
       var borrar = window.Papelera.botonBorrar(async function () {
@@ -281,6 +294,7 @@ var FichaDocumentos = (function () {
       if (!lista.length) {
         caja.className = 'explica';
         caja.textContent = 'La carpeta todavía está vacía.';
+        await pintarPrevias(caja, a);
         return;
       }
       caja.className = 'ficha-documentos';
@@ -295,10 +309,46 @@ var FichaDocumentos = (function () {
       var conRotulo = correos.length > 0 && expediente.length > 0;
       grupoDeDocumentos(caja, 'Del expediente', expediente, conRotulo, a, hitos.visibles, hitos.porDocumento);
       grupoDeDocumentos(caja, 'Llegados por correo', correos, conRotulo, a, hitos.visibles, hitos.porDocumento);
+      await pintarPrevias(caja, a);
     } catch (e) {
       caja.className = 'explica';
       caja.textContent = 'No he podido leer la carpeta: ' + U.mensajeDeError(e);
     }
+  }
+
+  /* Fila 160 (docs/VERSIONES-PREVIAS.md): debajo, en gris, «N versiones
+     previas · ver», plegado; cada una con «Abrir» y «Sacar de versiones
+     previas». Sin ninguna, no sale. No cuentan en el número del bloque
+     ni en el resumen de la tarjeta (clases propias, no `.ficha-documento`). */
+  async function pintarPrevias(caja, a) {
+    if (!window.VersionesPrevias) return;
+    var previas = await VersionesPrevias.listar(a.handle);
+    if (!previas.length) return;
+    var det = document.createElement('details');
+    det.className = 'ficha-previas';
+    det.innerHTML = '<summary>' + previas.length + (previas.length === 1 ? ' versión previa' : ' versiones previas') + ' · ver</summary>';
+    previas.forEach(function (f) {
+      var fila = document.createElement('div');
+      fila.className = 'ficha-previa-fila';
+      var nombre = document.createElement('span');
+      nombre.className = 'ficha-previa-nombre';
+      nombre.textContent = f.nombre;
+      var abrir = document.createElement('button');
+      abrir.type = 'button'; abrir.className = 'enlace ficha-previa-abrir'; abrir.textContent = 'Abrir';
+      abrir.onclick = function () { if (window.Visor) Visor.abrir(f.handle, f.nombre, { asunto: a, carpeta: a.handle }); };
+      var sacar = document.createElement('button');
+      sacar.type = 'button'; sacar.textContent = 'Sacar de versiones previas';
+      sacar.onclick = async function () {
+        try { await VersionesPrevias.sacar(a.handle, f.nombre); U.aviso('Devuelto a la carpeta del asunto.', 'bueno'); }
+        catch (e) { U.fallo('No he podido sacarlo', e); }
+        pintar(a);
+      };
+      fila.appendChild(nombre);
+      fila.appendChild(abrir);
+      fila.appendChild(U.menuDeAcciones([sacar]));
+      det.appendChild(fila);
+    });
+    caja.appendChild(det);
   }
 
   /* Se abre en la columna de la derecha, al lado del programa, para

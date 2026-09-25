@@ -126,12 +126,17 @@ await comprobar('y es un PDF de verdad', pagina.evaluate(async ([a1, n]) => {
   const t = await (await (await d.getFileHandle(n)).getFile()).arrayBuffer();
   return new TextDecoder().decode(new Uint8Array(t).slice(0, 5));
 }, [ASUNTO, pdf]), '%PDF-');
+/* Fila 160: con su PDF, el Word pasa a «Versiones previas». */
+await comprobar('y el Word, con su PDF, pasa a «Versiones previas»', pagina.evaluate(async ([a1, n]) => {
+  const d = await window.__disco.abiertos.getDirectoryHandle(a1);
+  try { await (await d.getDirectoryHandle('Versiones previas')).getFileHandle(n); return true; } catch (e) { return false; }
+}, [ASUNTO, word]), true);
 await pagina.click('#word-visor .word-visor-cerrar');
 
 console.log('--- 4. abrir un .docx que ya está ---');
 await pagina.evaluate(() => { window.__abiertos = []; });
 await pagina.evaluate(async ([a1, n]) => {
-  const d = await window.__disco.abiertos.getDirectoryHandle(a1);
+  const d = await (await window.__disco.abiertos.getDirectoryHandle(a1)).getDirectoryHandle('Versiones previas');
   await Visor.abrir(await d.getFileHandle(n), n);
 }, [ASUNTO, word]);
 await pagina.waitForSelector('#word-visor:not(.oculto) section.docx', { timeout: 20000 });
