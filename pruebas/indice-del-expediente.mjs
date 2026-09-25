@@ -129,6 +129,9 @@ const archivar = async (n) => {
   await pagina.evaluate((n) => { App.cerrarAsunto(App.E.listaAbiertos.filter(a => a.nombre === n)[0]); }, n);
   await pagina.waitForSelector('#capa:not(.oculto)');
   await pagina.click('#cuadro-aceptar');
+  /* Fila 148: el «Asunto archivado.» del anterior puede seguir a la vista,
+     así que se espera a que ESTE asunto haya salido de los abiertos. */
+  await pagina.waitForFunction((n) => !App.E.listaAbiertos.some((a) => a.nombre === n), n, { timeout: 20000 });
   await pagina.waitForSelector('.mensaje.bueno:has-text("Asunto archivado.")');
 };
 /* Se quita antes el de Ana, para ver que lo hace el archivado. */

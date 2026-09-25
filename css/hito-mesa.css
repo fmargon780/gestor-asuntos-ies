@@ -6,7 +6,8 @@
    Con la mesa abierta, `#ficha-guia` lleva `con-mesa`: se esconden los
    demás hitos, la cuenta y "+ Añadir un hito", y el hito abierto ocupa
    todo el sitio. Desde la fila 145 (docs/MESA-DEL-HITO-ENFOCADA.md), en dos
-   zonas (el guion, 2fr; lo que ya existe, 1fr). Con el documento a la
+   zonas (2fr y 1fr); desde la fila 147, la de la izquierda es la tarjeta
+   abierta en grande y la de la derecha, las otras dos de resumen. Con el documento a la
    derecha (visor o lector), o por debajo de 1100 px, la derecha baja.
    ============================================================ */
 
@@ -93,8 +94,49 @@ body.con-visor .mesa-columnas, body.con-lector .mesa-columnas { grid-template-co
 details.mesa-normativa > summary { cursor: pointer; }
 .mesa-normativa .hito-normativa-titulo { display: none; }
 .mesa-normativa.oculto { display: none; }
-.hito-en-mesa .nota-nueva textarea { resize: none; overflow: hidden; min-height: 34px; }
+.hito-en-mesa .nota-nueva textarea { resize: none; overflow: hidden; min-height: 110px; }
 .mesa-historia .hito-nota { font-size: 12px; }
+
+/* ---------- las tres tarjetas (fila 147, docs/MESA-TARJETAS-QUE-SE-ABREN.md) ----------
+   Una en grande a la izquierda y las otras dos, de resumen, a la derecha.
+   Cuál está en grande lo dice `data-tarjeta` de `.mesa-columnas`. */
+.mesa-columnas[data-tarjeta="guion"] .mesa-grande:not([data-tarjeta="guion"]),
+.mesa-columnas[data-tarjeta="docs"] .mesa-grande:not([data-tarjeta="docs"]),
+.mesa-columnas[data-tarjeta="notas"] .mesa-grande:not([data-tarjeta="notas"]),
+.mesa-columnas[data-tarjeta="guion"] .mesa-resumen[data-tarjeta="guion"],
+.mesa-columnas[data-tarjeta="docs"] .mesa-resumen[data-tarjeta="docs"],
+.mesa-columnas[data-tarjeta="notas"] .mesa-resumen[data-tarjeta="notas"] { display: none; }
+.mesa-grande { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.mesa-grande-titulo { font-size: 16px; font-weight: 700; display: inline-flex; align-items: center; gap: 12px; }
+.mesa-grande-titulo .boton { font-size: 13px; font-weight: 400; }
+.mesa-volver-guion { font-size: 13px; }
+
+.mesa-resumen {
+  background: var(--papel); border: 1px solid var(--linea); border-radius: 8px; padding: 10px 12px;
+  cursor: pointer; display: flex; flex-direction: column; gap: 4px; min-width: 0;
+}
+.mesa-resumen:hover, .mesa-resumen:focus-visible { border-color: var(--azul); outline: none; }
+.mesa-resumen-cabecera { display: flex; gap: 6px; align-items: baseline; }
+.mesa-resumen-cuenta { font-size: 12px; color: var(--tinta-suave); }
+.mesa-resumen-cuerpo { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mesa-resumen-linea { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.mesa-resumen-hecho { color: var(--tinta-suave); }
+.mesa-resumen-hecho .mesa-resumen-marca { color: #2f8a55; font-weight: 700; }
+.mesa-resumen-pendiente .mesa-resumen-marca { color: #8a95a3; }
+.mesa-resumen-siguiente { font-weight: 700; }
+.mesa-resumen-doc { display: flex; gap: 8px; align-items: center; }
+.mesa-resumen-doc-tipo { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.mesa-resumen-etq { flex: 0 0 auto; font-size: 11px; font-weight: 600; border-radius: 10px; padding: 0 7px; }
+.mesa-resumen-reg { background: #e2f4e6; color: #1f6b33; }
+.mesa-resumen-sinreg { background: #fde8e6; color: #a4302a; }
+.mesa-resumen-mas, .mesa-resumen-vacio { font-size: 12px; color: var(--tinta-suave); }
+.mesa-resumen-pie { font-size: 11px; color: var(--tinta-suave); margin-top: 2px; }
+
+/* Notas e historia, en grande: dos columnas (3 a 2); por debajo de 1100 px, una. */
+.mesa-notas-columnas { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; align-items: start; }
+.mesa-notas-columnas .mesa-bloque + .mesa-bloque { border-top: 0; padding-top: 0; }
+.mesa-grande-notas .hito-historia-titulo { margin-top: 0; }
+@media (max-width: 1100px) { .mesa-notas-columnas { grid-template-columns: minmax(0, 1fr); } }
 
 /* El guion */
 .mesa-guion-cuenta { font-size: 12px; color: var(--tinta-suave); white-space: nowrap; }
@@ -138,15 +180,20 @@ details.mesa-normativa > summary { cursor: pointer; }
 /* Los documentos, en tabla */
 .hito-en-mesa .hito-documentos { display: flex; flex-direction: column; gap: 0; }
 .hito-documento.mesa-doc {
-  display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 8px; align-items: center;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto auto auto; gap: 4px 14px; align-items: center;
   border: 0; border-bottom: 1px solid var(--linea); border-radius: 0; background: none; padding: 6px 2px; font-size: 13px;
 }
 .mesa-doc-nombre { display: flex; flex-direction: column; min-width: 0; }
 .mesa-doc-tipo { font-weight: 700; }
-.mesa-doc-nombre .hito-doc-abrir { text-align: left; color: var(--tinta-suave); font-size: 12px; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mesa-doc-nombre .hito-doc-abrir { text-align: left; color: var(--tinta-suave); font-size: 12px; text-decoration: none; white-space: normal; overflow-wrap: anywhere; }
+/* Fila 147: fecha y registro en su columna; los gemelos, debajo, sangrados. */
+.mesa-doc-fecha, .mesa-doc-registro { font-size: 12px; color: var(--tinta-suave); white-space: nowrap; }
+.mesa-doc-gemelo-fila { grid-column: 2 / -1; display: flex; gap: 10px; align-items: baseline; padding-left: 16px; font-size: 12px; color: var(--tinta-suave); }
+.mesa-doc-gemelo-nombre { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.mesa-doc-gemelo-que { font-style: italic; }
 .mesa-doc-nombre .hito-doc-abrir:hover { text-decoration: underline; }
 .mesa-doc-origen { font-size: 11px; color: var(--tinta-suave); }
-.mesa-doc-gemelo { font: inherit; font-size: 11px; text-align: left; border: 0; background: none; color: var(--azul); cursor: pointer; padding: 0 0 0 12px; }
+.mesa-doc-gemelo { font: inherit; font-size: 12px; border: 0; background: none; color: var(--azul); cursor: pointer; padding: 0; }
 .mesa-doc-estado { font-size: 11px; font-weight: 600; border-radius: 10px; padding: 1px 8px; white-space: nowrap; }
 .mesa-doc-verde { background: #e2f4e6; color: #1f6b33; }
 .mesa-doc-ambar { background: #fff4d6; color: #8a6100; }
@@ -154,8 +201,8 @@ details.mesa-normativa > summary { cursor: pointer; }
 .mesa-doc-acciones { display: flex; gap: 6px; align-items: center; white-space: nowrap; }
 .mesa-seleccion { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; background: #e3eefb; border-radius: 8px; padding: 6px 8px; font-size: 12px; }
 .mesa-seleccion.oculto { display: none; }
-.mesa-soltar { border: 1px dashed #b9c6d6; border-radius: 8px; padding: 8px; text-align: center; font-size: 12px; color: var(--tinta-suave); }
-.mesa-soltar.encima { background: #e3eefb; border-color: var(--azul); }
+.mesa-soltar { border: 1px dashed #b9c6d6; border-radius: 8px; padding: 14px; text-align: center; font-size: 12px; color: var(--tinta-suave); }
+.mesa-grande-docs.encima .mesa-soltar, .mesa-soltar.encima { background: #e3eefb; border-color: var(--azul); }
 .mesa-plantilla { display: flex; gap: 8px; align-items: center; font-size: 13px; padding: 4px 0; }
 .mesa-plantilla-nombre { flex: 1; min-width: 0; }
 .mesa-icono-doc { font-size: 10px; font-weight: 700; color: #fff; background: #2b6cb0; border-radius: 3px; padding: 1px 4px; }

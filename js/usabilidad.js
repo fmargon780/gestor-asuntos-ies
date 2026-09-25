@@ -427,6 +427,11 @@
       ev.preventDefault();
       return;
     }
+    /* Fila 147: con otra tarjeta de la mesa en grande, vuelve al guion. */
+    if (pantallaVisible.id === 'pantalla-asunto' && window.HitoMesa && HitoMesa.volverAlGuionSiOtra && HitoMesa.volverAlGuionSiOtra()) {
+      ev.preventDefault();
+      return;
+    }
     /* Con la mesa de un hito abierta, el primero vuelve a la lista de hitos (fila 109). */
     if (pantallaVisible.id === 'pantalla-asunto' && window.HitoMesa && HitoMesa.cerrarSiAbierta()) {
       ev.preventDefault();

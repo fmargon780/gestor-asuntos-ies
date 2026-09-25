@@ -122,6 +122,8 @@ await comprobar('solo las notas de ese hito (la más nueva arriba), y la histori
 
 console.log('--- 5. escribir en la mesa ---');
 const ta = '#ficha-guia .hito[data-id="h1"] .hito-nota-texto';
+/* Fila 147: las notas del hito, en su tarjeta de la mesa. */
+await pagina.evaluate(() => HitoMesa.abrirTarjeta('notas'));
 await pagina.fill(ta, 'Llamada a la familia');
 await pagina.evaluate(() => HitosPanel.programarRepintado());
 await pagina.waitForTimeout(800);

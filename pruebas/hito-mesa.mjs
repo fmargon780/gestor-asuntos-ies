@@ -169,10 +169,17 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await comprobar('3. el PDF enseña su .docx gemelo colgando, sin fila propia',
     pagina.evaluate(() => {
       const fila = document.querySelector('.hito-en-mesa .hito-documento[data-doc="260901 SOLICITUD.pdf"]');
-      return !!fila && !!fila.querySelector('.mesa-doc-gemelo') && fila.querySelector('.mesa-doc-gemelo').textContent;
+      return !!fila && !!fila.querySelector('.mesa-doc-gemelo') && fila.querySelector('.mesa-doc-gemelo-que').textContent;
     }), 'Borrador en Word');
+  /* Fila 147: el código, en su columna; el estado, aparte. */
   await comprobar('3. el registrado dice su código',
-    pagina.locator('.hito-en-mesa .hito-documento[data-doc="' + DOCS[2] + '"] .mesa-doc-estado').textContent(), 'Registrado 26EM0617');
+    pagina.evaluate((d) => {
+      const f = document.querySelector('.hito-en-mesa .hito-documento[data-doc="' + d + '"]');
+      return [f.querySelector('.mesa-doc-registro').textContent, f.querySelector('.mesa-doc-estado').textContent];
+    }, DOCS[2]), ['26EM0617', 'Registrado']);
+
+  /* 4. Fila 147: los documentos se trabajan en su tarjeta grande. */
+  await pagina.locator('.hito-en-mesa .mesa-resumen[data-tarjeta="docs"]').click();
 
   /* 4. */
   await pagina.locator('.hito-en-mesa .hito-documento[data-doc="' + DOCS[0] + '"] .mesa-doc-marca').check();
@@ -208,13 +215,18 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   /* 6. */
   await pagina.locator('.hito-en-mesa .mesa-tira-hito', { hasText: 'Recoger la solicitud' }).click();
   await pagina.waitForTimeout(300);
+  await pagina.locator('.hito-en-mesa .mesa-resumen[data-tarjeta="docs"]').click();
   await pagina.locator('.hito-en-mesa .hito-documento[data-doc="' + DOCS[2] + '"] .hito-doc-abrir').click();
   await pagina.waitForSelector('body.con-visor');
   await pagina.waitForTimeout(300);
   await comprobar('6. con el documento a la derecha, la mesa sigue abierta',
-    pagina.locator('.hito-en-mesa[data-id="m1"] .mesa-guion').isVisible(), true);
+    pagina.locator('.hito-en-mesa[data-id="m1"] .mesa-grande-docs').isVisible(), true);
   await pagina.keyboard.press('Escape');   /* cierra el documento */
   await pagina.waitForTimeout(200);
+  await pagina.keyboard.press('Escape');   /* fila 147: vuelve al guion */
+  await pagina.waitForTimeout(200);
+  await comprobar('6. el siguiente Escape vuelve al guion, con la mesa abierta',
+    pagina.locator('.hito-en-mesa[data-id="m1"] .mesa-guion').isVisible(), true);
 
   /* 7. */
   await pagina.keyboard.press('Escape');

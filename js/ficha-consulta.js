@@ -64,7 +64,9 @@
     if (el.id === 'ficha-volver-al-origen') return true;
     if (el.classList.contains('ficha-documento')) return true;
     if (el.classList.contains('hito-desplegar')) return true;
-    if (el.classList.contains('marca-hito')) return true;   /* fila 129: abre la mesa del hito */
+    if (el.classList.contains('marca-hito')) return true;
+    /* Fila 147: cambiar de tarjeta en la mesa y abrir un documento solo miran. */
+    if (el.classList.contains('mesa-volver-guion') || el.classList.contains('mesa-doc-abrir') || el.classList.contains('mesa-doc-gemelo')) return true;   /* fila 129: abre la mesa del hito */
     if (el.classList.contains('boton-presencia-tomar')) return true;
     /* El disparador de los tres puntos del nombre (18-sep-2026, fila
        52, docs/CABECERA-DEL-ASUNTO.md, 5): en modo consulta el menú se

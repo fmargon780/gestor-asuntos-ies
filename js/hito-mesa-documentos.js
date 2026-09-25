@@ -5,8 +5,8 @@
 
    - Una tabla con los documentos del hito: casilla de selección, el
      tipo en negrita y el nombre del fichero en gris, el estado
-     ("Registrado 26SM0617", "Sin registrar" en ámbar, "(ya no está)") y
-     sus acciones: Abrir, Enviar y ⋯ (el menú de siempre,
+     ("Registrado", "Sin registrar" en ámbar, "(ya no está)"; el código,
+     en su columna desde la fila 147) y sus acciones: Abrir, Enviar y ⋯ (el menú de siempre,
      js/hitos-documento-menu.js). Cada fila sigue siendo un
      `.hito-documento[data-doc]` con su `.hito-doc-abrir`.
    - Los gemelos (el "SIN SELLAR" y el .doc/.docx con el mismo nombre
@@ -62,13 +62,28 @@ var HitoMesaDocumentos = (function () {
     return grupos;
   }
 
-  function estadoDe(n, falta) {
-    if (falta) return { texto: '(ya no está)', clase: 'mesa-doc-gris' };
+  function codigoDe(n) {
     var leido = window.Documentos && Documentos.leerNombre ? Documentos.leerNombre(n) : {};
     var reg = leido && leido.registro;
-    var codigo = (sinExtension(n).match(RE_REGISTRO) || [])[0] ||
+    return (sinExtension(n).match(RE_REGISTRO) || [])[0] ||
       (reg && typeof reg === 'object' && window.Nombres && Nombres.codigoRegistro ? Nombres.codigoRegistro(reg) : (typeof reg === 'string' ? reg : ''));
-    return codigo ? { texto: 'Registrado ' + codigo, clase: 'mesa-doc-verde' } : { texto: 'Sin registrar', clase: 'mesa-doc-ambar' };
+  }
+
+  /* Fila 147: el código de registro va en su columna; aquí, solo el estado. */
+  function estadoDe(n, falta) {
+    if (falta) return { texto: '(ya no está)', clase: 'mesa-doc-gris' };
+    return codigoDe(n) ? { texto: 'Registrado', clase: 'mesa-doc-verde' } : { texto: 'Sin registrar', clase: 'mesa-doc-ambar' };
+  }
+
+  function fechaDe(n) {
+    var leido = window.Documentos && Documentos.leerNombre ? Documentos.leerNombre(n) : null;
+    return leido && leido.fecha && window.Plazos ? Plazos.legible(leido.fecha) : '';
+  }
+
+  /* Fila 147: lo que enseña la tarjeta pequeña: el tipo y el registro de
+     cada documento principal, sin gemelos. */
+  function resumen(h) {
+    return agrupar(h.documentos || [], null).map(function (g) { return { nombre: g.nombre, tipo: tipoDe(g.nombre), registro: codigoDe(g.nombre) }; });
   }
 
   function tipoDe(n) {
@@ -94,22 +109,28 @@ var HitoMesaDocumentos = (function () {
       var falta = !!(nombresDeLaCarpeta && nombresDeLaCarpeta.indexOf(g.nombre) === -1);
       var estado = estadoDe(g.nombre, falta);
       var origen = origenDe(g.nombre, h, hitos);
+      /* Fila 147: la tabla con sitio (en la tarjeta grande): casilla,
+         documento (tipo y el nombre entero), fecha, registro, estado y
+         acciones; los gemelos, debajo, sangrados, cada uno con su «Abrir». */
       return '<div class="hito-documento mesa-doc" data-doc="' + U.escapar(g.nombre) + '">' +
         '<input type="checkbox" class="mesa-doc-marca" title="Seleccionar"' + (falta ? ' disabled' : '') + '>' +
         '<div class="mesa-doc-nombre"><span class="mesa-doc-tipo">' + U.escapar(tipoDe(g.nombre)) + '</span>' +
           '<button type="button" class="hito-doc-abrir' + (falta ? ' hito-doc-falta' : '') + '" data-doc="' + U.escapar(g.nombre) + '">' +
             U.escapar(g.nombre) + (falta ? ' (ya no está)' : '') + '</button>' +
           (origen ? '<span class="mesa-doc-origen">' + U.escapar(origen) + '</span>' : '') +
-          g.gemelos.map(function (x) {
-            return '<button type="button" class="mesa-doc-gemelo" data-doc="' + U.escapar(x) + '">' +
-              (esSinSellar(x) ? 'Original sin sellar' : 'Borrador en Word') + '</button>';
-          }).join('') +
         '</div>' +
+        '<span class="mesa-doc-fecha">' + U.escapar(fechaDe(g.nombre)) + '</span>' +
+        '<span class="mesa-doc-registro">' + U.escapar(codigoDe(g.nombre) || '—') + '</span>' +
         '<span class="mesa-doc-estado ' + estado.clase + '">' + U.escapar(estado.texto) + '</span>' +
         '<span class="mesa-doc-acciones">' +
-          (falta ? '' : '<button type="button" class="enlace mesa-doc-enviar">Enviar</button>') +
+          (falta ? '' : '<button type="button" class="enlace mesa-doc-abrir">Abrir</button><button type="button" class="enlace mesa-doc-enviar">Enviar</button>') +
           (abierto && window.HitosDocumentoMenu ? HitosDocumentoMenu.botonHTML(g.nombre) : '') +
         '</span>' +
+        g.gemelos.map(function (x) {
+          return '<div class="mesa-doc-gemelo-fila"><span class="mesa-doc-gemelo-nombre"><span class="mesa-doc-gemelo-que">' +
+            (esSinSellar(x) ? 'Original sin sellar' : 'Borrador en Word') + '</span> · ' + U.escapar(x) + '</span>' +
+            '<button type="button" class="enlace mesa-doc-gemelo" data-doc="' + U.escapar(x) + '">Abrir</button></div>';
+        }).join('') +
       '</div>';
     }).join('');
   }
@@ -221,10 +242,15 @@ var HitoMesaDocumentos = (function () {
 
   /* Soltar un fichero: lo mismo que "Desde el ordenador" (js/documentos.js,
      con el hito), con el fichero ya elegido. */
-  /* Fila 145: sobre toda la columna derecha, sin recuadro. */
+  /* Fila 145: sobre toda la columna derecha, sin recuadro. Fila 147: y
+     sobre la tarjeta grande de documentos (con su zona de soltar al pie). */
   function engancharSoltar(fila, a, h) {
-    var zona = fila.querySelector('.mesa-col-derecha') || fila.querySelector('.mesa-soltar');
-    if (!zona) return;
+    Array.prototype.forEach.call(fila.querySelectorAll('.mesa-col-derecha, .mesa-grande-docs'), function (zona) {
+      engancharZona(zona, a, h);
+    });
+  }
+
+  function engancharZona(zona, a, h) {
     zona.ondragover = function (ev) { ev.preventDefault(); zona.classList.add('encima'); };
     zona.ondragleave = function () { zona.classList.remove('encima'); };
     zona.ondrop = function (ev) {
@@ -243,6 +269,9 @@ var HitoMesaDocumentos = (function () {
     Array.prototype.forEach.call(fila.querySelectorAll('.mesa-doc-gemelo'), function (b) {
       b.onclick = function () { abrirEnVisor(a, b.dataset.doc); };
     });
+    Array.prototype.forEach.call(fila.querySelectorAll('.mesa-doc-abrir'), function (b) {
+      b.onclick = function () { abrirEnVisor(a, b.closest('.hito-documento').dataset.doc); };
+    });
     Array.prototype.forEach.call(fila.querySelectorAll('.mesa-doc-enviar'), function (b) {
       b.onclick = function () { enviar(a, h, [b.closest('.hito-documento').dataset.doc]); };
     });
@@ -255,7 +284,7 @@ var HitoMesaDocumentos = (function () {
     if (abierto && window.HitoMesaComunicar) HitoMesaComunicar.pintar(fila, a, h);
   }
 
-  return { filasHTML: filasHTML, enganchar: enganchar, agrupar: agrupar, claveGemelo: claveGemelo, marcados: marcados,
+  return { filasHTML: filasHTML, enganchar: enganchar, resumen: resumen, agrupar: agrupar, claveGemelo: claveGemelo, marcados: marcados,
            moverAOtroHito: moverAOtroHito };
 })();
 window.HitoMesaDocumentos = HitoMesaDocumentos;

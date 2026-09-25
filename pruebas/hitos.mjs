@@ -364,6 +364,8 @@ console.log('--- escenario 5: cambiar de rama ---');
 /* Fila 109: pulsar un hito abre su mesa; antes, se vuelve a la lista. */
 await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());
 await pagina.locator('#ficha-guia .hito[data-id="p3a1"] .hito-titulo').click();
+/* Fila 147: las notas del hito, en su tarjeta de la mesa. */
+await pagina.locator('#ficha-guia .hito[data-id="p3a1"] .mesa-resumen[data-tarjeta="notas"]').click();
 await pagina.fill('#ficha-guia .hito[data-id="p3a1"] .hito-nota-texto', 'Entregado en mano el lunes');
 /* Fila 145: sin botón «Añadir nota»; Intro guarda. */
 await pagina.press('#ficha-guia .hito[data-id="p3a1"] .hito-nota-texto', 'Enter');
@@ -407,6 +409,7 @@ await pagina.evaluate(async (clave) => {
 /* Fila 109: pulsar un hito abre su mesa; antes, se vuelve a la lista. */
 await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .mesa-resumen[data-tarjeta="docs"]').click();   /* fila 147 */
 await pagina.waitForSelector('#ficha-guia .hito[data-id="p1"] .hito-anadir-documento');
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-anadir-documento').click();
 await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Uno que ya está en la carpeta' }).click();
@@ -426,6 +429,7 @@ console.log('--- se vuelve a abrir el cuadro: sale marcado; se desmarca y desapa
 /* Fila 109: pulsar un hito abre su mesa; antes, se vuelve a la lista. */
 await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .mesa-resumen[data-tarjeta="docs"]').click();   /* fila 147 */
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-anadir-documento').click();
 await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Uno que ya está en la carpeta' }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
@@ -462,6 +466,7 @@ await pagina.waitForTimeout(400);
 /* Fila 109: pulsar un hito abre su mesa; antes, se vuelve a la lista. */
 await pagina.evaluate(() => window.HitoMesa && HitoMesa.cerrar());
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-titulo').click();
+await pagina.locator('#ficha-guia .hito[data-id="p1"] .mesa-resumen[data-tarjeta="docs"]').click();   /* fila 147 */
 
 await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-documento[data-doc="260907 DNI Marina.pdf"] .hito-doc-menu-boton').click();
 await pagina.waitForSelector('.ficha-menu:not(.oculto)');

@@ -100,7 +100,7 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
     pagina.evaluate(() => {
       const c = Array.from(document.querySelectorAll('.hito-en-mesa .mesa-col')).filter((e) => e.offsetParent);
       const r = c.map((e) => e.getBoundingClientRect());
-      return [c.length, c[0].classList.contains('mesa-col-guion'), c[1].classList.contains('mesa-col-derecha'),
+      return [c.length, !!(c[0].querySelector('.mesa-grande-guion') || {}).offsetParent, c[1].classList.contains('mesa-col-derecha'),
         r[0].width > r[1].width, !!document.querySelector('.hito-en-mesa .mesa-col-consulta, .hito-en-mesa .mesa-col-docs')];
     }), [2, true, true, true, false]);
   if (ancho === 1905) {
@@ -188,10 +188,11 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
     pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-panel')).filter((p) => p.offsetParent).length), 0);
 
   /* 7. */
+  /* Fila 147: lo dice la tarjeta pequeña de documentos. */
   await comprobar('7. sin documentos, «Ninguno todavía.» en una línea',
     pagina.evaluate(() => {
-      const e = document.querySelector('.hito-en-mesa .mesa-col-derecha .mesa-sin-docs');
-      return e ? e.firstChild.textContent.trim() : null;
+      const e = document.querySelector('.hito-en-mesa .mesa-col-derecha .mesa-resumen[data-tarjeta="docs"] .mesa-resumen-vacio');
+      return e ? e.textContent.trim() : null;
     }), 'Ninguno todavía.');
   await comprobar('7. sin el botón «Añadir nota» (Intro guarda)',
     pagina.evaluate(() => !!(document.querySelector('.hito-en-mesa .hito-nota-anadir') || {}).offsetParent), false);
