@@ -164,6 +164,18 @@ La tabla de documentos, los gemelos, la selección y «Comunicar» funcionan com
   hito (sin cambios, siempre por correo). Soltar un fichero del ordenador
   (`Documentos.abrir(a, { hito, ficheroSoltado })`). El ⋯ de cada documento suma «Renombrar» y «Mover a
   otro hito» (`js/hitos-documento-menu.js`).
+- **Un documento para cada relacionado** (fila 171, `docs/DOCUMENTO-PARA-CADA-RELACIONADO.md`,
+  `js/generar-para-relacionados.js`): en «Generar documento ▾», junto a cada plantilla, «… para cada
+  relacionado (N)» si el asunto tiene `ficha.relacionados` (lo pinta y engancha
+  `GenerarParaRelacionados.botonHTML`/`enganchar`, llamados desde `pintarPlantillas`). Genera uno por
+  persona con `Plantillas.valoresDePersona` (el asunto con el relacionado en el sitio del tercero, sin
+  su `contacto`); lo del asunto que falte se pregunta una vez (`WordFaltan`), lo de la persona (DNI,
+  sexo, especialidad…) se dice en el resumen. Nombre: el de siempre con el nombre de la persona al
+  final del texto adicional; uno que ya esté no se rehace. Resumen en `U.preguntar` con «Enviar a cada
+  uno…» (solo con el envío conectado): un correo por persona, su documento adjunto, «Hola, <nombre>:»,
+  la plantilla de correo del tipo (la que se llama «certificado»/«envío», o la primera) y la firma;
+  `idEnvio` fijo por asunto + documento + correo, y `ficha.enviosPorPersona` para no mandarlo dos
+  veces. Quien no tiene correo sale «para Séneca». Se comprueba con `pruebas/generar-para-relacionados.mjs`.
 - **Comunicar** (`js/hito-mesa-comunicar.js`): chips del tercero, sus tutores (`Datos.tutoresDe`) y los
   relacionados, premarcados según el responsable (tutor → tutor legal 1/2; relacionado → ellos; si no, el
   tercero); «Preparar correo» y «Mensaje de Séneca» llaman a `HitosComunicar.comunicar(a, h, canal, {

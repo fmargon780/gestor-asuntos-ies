@@ -318,7 +318,9 @@ var HitoMesaDocumentos = (function () {
     function filaP(p) {
       return '<div class="mesa-plantilla" data-id="' + U.escapar(p.id) + '"><span class="mesa-icono-doc">DOC</span>' +
         '<span class="mesa-plantilla-nombre">' + U.escapar(p.nombre) + '</span>' +
-        (abierto ? '<button type="button" class="boton boton-chico mesa-plantilla-generar">Generar documento</button>' : '') + '</div>';
+        (abierto ? '<button type="button" class="boton boton-chico mesa-plantilla-generar">Generar documento</button>' : '') +
+        /* Fila 171: «… para cada relacionado (N)», si el asunto los tiene. */
+        (abierto && window.GenerarParaRelacionados ? GenerarParaRelacionados.botonHTML(a) : '') + '</div>';
     }
     /* Fila 164: arriba, los pasos pendientes con receta de generar. */
     caja.innerHTML = (abierto && window.HitoMesaRecetas ? HitoMesaRecetas.bloqueHTML(a, h, 'generar') : '') +
@@ -340,6 +342,7 @@ var HitoMesaDocumentos = (function () {
       };
     }
     var todas = g.delPaso.concat(g.delTipo);
+    if (abierto && window.GenerarParaRelacionados) GenerarParaRelacionados.enganchar(caja, a, h, todas);
     Array.prototype.forEach.call(caja.querySelectorAll('.mesa-plantilla-generar'), function (b) {
       b.onclick = async function () {
         var id = b.closest('.mesa-plantilla').dataset.id;

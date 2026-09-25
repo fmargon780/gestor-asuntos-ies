@@ -5,6 +5,23 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 171: un documento para cada relacionado
+
+`docs/DOCUMENTO-PARA-CADA-RELACIONADO.md`. En la mesa del hito, junto a cada plantilla, «… para cada
+relacionado (N)»: un documento por persona y, en el resumen, «Enviar a cada uno». Decisiones:
+
+- Los valores de cada persona salen de `Plantillas.valoresDePersona`, que llama a la de siempre con
+  una copia del asunto donde el relacionado ocupa el sitio del tercero (sin el `contacto` del
+  principal): así el DNI, el sexo, la especialidad y el correo salen de la persona, y los campos,
+  los firmantes y el curso, del asunto, sin duplicar código.
+- Lo que falta se reparte: lo de la persona (DNI, nombre, correo, sexo, especialidad) va al resumen,
+  por persona; el resto se pregunta una vez con el cuadro de la fila 155.
+- «Nunca dos veces»: `idEnvio` fijo por asunto + documento + correo (el script lo recuerda 6 horas)
+  y, para siempre, `ficha.enviosPorPersona` en el asunto. Un documento que ya estaba no se rehace,
+  pero sí se puede mandar a quien aún no lo tenga.
+- `PlantillasDocumento._interno.leerConMembrete` sale de `generarDocumento` sin cambiar lo que hace:
+  el lote lee la plantilla una sola vez.
+
 ## 25-sep-2026 — Fila 170: las plantillas del compañero
 
 `docs/PLANTILLAS-DEL-COMPANERO.md`. 50 plantillas nuevas en `plantillas/` (34 de documento, 16 de

@@ -14,8 +14,8 @@ El gemelo en papel de las de correo (16-sep-2026, `docs/PLANTILLAS-DE-DOCUMENTO.
 documentos del compañero (`docs/PLANTILLAS-DEL-COMPANERO.md`), cada una colgada de un tipo que ya
 existe; los datos que piden con `{campo:…}` y el tipo no tiene se preguntan al generar. Llegan a
 `_GESTOR/PLANTILLAS` con «Cargar las plantillas del centro» (Mantenimiento). `participacion-
-actividad.md` (OTROS · ACTIVIDAD EXTRAESCOLAR) es para la fila 171 (un documento por profesor
-relacionado); `peticion-historial.md` saca el centro de procedencia de la BD del alumnado
+actividad.md` (OTROS · ACTIVIDAD EXTRAESCOLAR) se genera con «… para cada relacionado» de la mesa
+(fila 171, `docs/contexto/HITO-MESA.md`: uno por profesor, con `Plantillas.valoresDePersona`); `peticion-historial.md` saca el centro de procedencia de la BD del alumnado
 (`{{DATO ALUMNADO BD: Centro de procedencia}}`).
 
 - **El fichero**: mismo `_GESTOR/plantillas.json` que las de correo, con la clave de raíz nueva

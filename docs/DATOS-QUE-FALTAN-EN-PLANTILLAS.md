@@ -84,4 +84,3 @@ generar.** Crearlos es decisión de Francisco, tipo a tipo, cuando los use.
   y profesores necesita un hueco `{{TABLA RELACIONADOS}}` que no existe. Por eso no se ha escrito.
 - **El saludo del correo para antiguos alumnos.** En ALUMNADO la aplicación saluda siempre a
   «tutores legales», también a un antiguo alumno mayor de edad que viene a por su título.
-- **El documento para cada relacionado.** Lo resuelve la fila 171 (actividad extraescolar).

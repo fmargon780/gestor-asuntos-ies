@@ -90,12 +90,12 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
 - Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. Carpeta ≤150, documento ≤120.
 - Botón «Ruta» (`file:///`; ficha, Correo/Séneca): deduce Dropbox; lo de dentro, una vez para el centro. Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en
-  tarjetas (alumno y tutores). Ficha del asunto en tarjetas (una se abre en grande; se vuelve
+  tarjetas (alumno y tutores). Ficha del asunto (foto, cabecera fija) en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
 - Registrar detecta el PDF sellado; el "SIN SELLAR" y el Word con su PDF van a «Versiones previas»
   (plegadas); cada documento, asociable a un hito.
-- Terceros relacionados con un asunto, con altas por grupo (unidad, nivel, grupo propio), que
-  también sirven de destinatarios de un correo o de un mensaje de Séneca.
+- Terceros relacionados con un asunto (altas por grupo: unidad, nivel, grupo propio), destinatarios de
+  correo o Séneca; generar para cada relacionado: un documento por persona y un correo a cada una.
 - Ajustes: tres pestañas y pantalla por tipo; todo plegado, con resumen; avisos de fallo, solo con fallo.
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
@@ -123,8 +123,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Cada documento, todo en su fila (⧉, «Poner nombre», ⋮); Separar, Unir, Sacar páginas, Ajustar tamaño
   (sello y firma) y Repartir entre terceros, en la barra del visor.
 - "Lo pide": quién pidió la gestión, por qué vía y cuándo; su correo sale en el cuadro de Correo.
-- Archivar o reabrir sobre un destino que ya existe fusiona carpetas; reintenta.
-- Crear, reabrir o editar deja en la ficha; Volver regresa a donde estaba. Ficha: foto del tercero, cabecera fija.
+- Archivar/reabrir sobre un destino que ya existe fusiona. Crear, reabrir o editar deja en la ficha; Volver, a donde estaba.
 - Al archivar, la ficha baja a su carpeta (al reabrir, vuelve) y se hace el índice del expediente
   (PDF numerado; también desde el menú de la ficha).
 
