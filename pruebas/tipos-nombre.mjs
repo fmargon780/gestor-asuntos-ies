@@ -160,10 +160,31 @@ await pagina.waitForTimeout(300);
 await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="generar"]');
 await comprobar('4. en un hito sin plantillas sale «Buscar otra plantilla…»',
   pagina.locator('.hito-en-mesa .mesa-buscar-plantilla').count(), 1);
-await pagina.click('.hito-en-mesa .mesa-buscar-plantilla');
-await pagina.fill('.hito-en-mesa .plantilla-buscar-campo', 'salida');
-await comprobar('4. encuentra una de otro tipo', pagina.locator('.hito-en-mesa .plantilla-buscar-opcion').evaluateAll(b => b.map(x => x.dataset.id)), ['pd-otra']);
-await pagina.click('.hito-en-mesa .plantilla-buscar-opcion');
+/* Fila 170: con 64 plantillas del centro, la mesa puede repintarse (y
+   cerrar el buscador) justo después de abrirlo: se busca y se pulsa en
+   la misma pasada, y si el buscador ha desaparecido se vuelve a abrir. */
+async function buscarYPulsar(texto) {
+  for (let intento = 0; intento < 5; intento++) {
+    await pagina.waitForTimeout(300);
+    if (!(await pagina.locator('.hito-en-mesa .plantilla-buscar-campo').count())) {
+      if (!(await pagina.locator('.hito-en-mesa .mesa-panel-generar:not(.oculto)').count())) {
+        await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="generar"]');
+      }
+      await pagina.click('.hito-en-mesa .mesa-buscar-plantilla');
+    }
+    await pagina.fill('.hito-en-mesa .plantilla-buscar-campo', texto);
+    const ids = await pagina.locator('.hito-en-mesa .plantilla-buscar-opcion').evaluateAll(b => b.map(x => x.dataset.id));
+    const pulsado = await pagina.evaluate(() => {
+      const b = document.querySelector('.hito-en-mesa .plantilla-buscar-opcion');
+      if (!b) return false;
+      b.click();
+      return true;
+    });
+    if (pulsado) return ids;
+  }
+  return null;
+}
+await comprobar('4. encuentra una de otro tipo', buscarYPulsar('salida'), ['pd-otra']);
 await pagina.waitForTimeout(800);
 const r4 = await pagina.evaluate(async (nombre) => {
   const h = (await Hitos.hitosDe(nombre)).filter(x => x.id === 'b2')[0];
