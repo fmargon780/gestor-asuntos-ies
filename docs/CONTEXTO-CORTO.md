@@ -106,12 +106,12 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   como el del centro; renuncia a la Junta Electoral, en su hito.
 - Copias diarias (90 días), detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable de nombres. Un borrado (tipo,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
-- Pruebas automáticas en cada subida.
+- Pruebas automáticas en cada subida de código (no con solo `docs/`).
 - Copia sin internet (`file://`): se actualiza sola; si no puede o no lo comprueba, franja fija arriba; cada 30 min.
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
-  bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa): cabecera con «Generar documento ▾» y «Comunicar ▾»; a la izquierda
-  el guion (siguiente paso resaltado; preguntas; 📎 documento, ✎ dato), que se marca solo al generar, registrar, comunicar o añadir; a la derecha
-  documentos en tabla (gemelos, selección de varios), normativa, notas (las del asunto, con etiqueta) e historia.
+  bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa): «Generar documento ▾» y «Comunicar ▾»; tres tarjetas,
+  una en grande y dos de resumen (pulsar una la abre): el guion (siguiente paso resaltado; preguntas; 📎, ✎; se marca solo al generar,
+  registrar, comunicar o añadir), los documentos (nombre entero, gemelos, selección) y notas con historia.
   Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa.
   Biblioteca de hitos del centro, con guion; en Mantenimiento, cargar tipos, guías y guiones del instituto.
 - "Qué me toca": pendientes, filtro por responsable, "Dormidos" (sin novedades en N días). "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Formularios": catálogo buscable de

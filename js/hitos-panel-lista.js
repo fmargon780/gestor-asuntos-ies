@@ -184,10 +184,9 @@ var HitosPanelLista = (function () {
 
   /* El cuerpo de un hito es su mesa de trabajo (24-sep-2026, fila 109,
      docs/EL-HITO-A-PANTALLA-COMPLETA.md): solo se ve con el hito abierto
-     a pantalla completa (js/hito-mesa.js). Tres columnas: el guion (lo
-     pinta js/hito-mesa-guion.js en `.mesa-guion`), los documentos y
-     formularios, y la consulta (normativa, comunicar, notas). La
-     cabecera (`.mesa-cabecera`) la pone js/hito-mesa.js. Los botones de
+     a pantalla completa (js/hito-mesa.js). Desde la fila 147, tres
+     tarjetas: el guion (lo pinta js/hito-mesa-guion.js en `.mesa-guion`),
+     los documentos, y las notas con la historia. La cabecera (`.mesa-cabecera`) la pone js/hito-mesa.js. Los botones de
      siempre conservan su clase, y los mismos `enganchar…` de cada módulo
      los encuentran dentro de la fila. */
   function cuerpoDeHito(a, h, ajustes, contexto, abierto, nombresDeLaCarpeta, hitos) {
@@ -196,15 +195,20 @@ var HitosPanelLista = (function () {
     var htmlRequisitos = (!abierto && window.HitosRequisitos && (h.requisitos || []).length)
       ? HitosRequisitos.bloqueDeRequisitos(a, h) : '';
 
-    /* Fila 145 (docs/MESA-DEL-HITO-ENFOCADA.md): dos zonas. A la izquierda,
-       «Qué hay que hacer» (el guion); a la derecha, lo que ya existe
-       (documentos, normativa plegada, notas e historia). Las plantillas,
-       los formularios y «Comunicar» van a los desplegables de la cabecera
-       (js/hito-mesa.js). */
-    var colGuion = '<div class="mesa-col mesa-col-guion">' +
+    /* Fila 147 (docs/MESA-TARJETAS-QUE-SE-ABREN.md): tres tarjetas. Una
+       abierta en grande a la izquierda (el guion, los documentos, o las
+       notas y la historia) y las otras dos, de resumen, a la derecha. Las
+       tres grandes están siempre en el DOM (los botones del guion pulsan
+       los de siempre por debajo); cuál se ve lo dice `data-tarjeta` de
+       `.mesa-columnas`, que pone js/hito-mesa.js. Los resúmenes los
+       rellena js/hito-mesa-tarjetas.js. Las plantillas, los formularios y
+       «Comunicar» van a los desplegables de la cabecera (fila 145). */
+    var tarjeta = window.HitoMesa && HitoMesa.tarjetaDe ? HitoMesa.tarjetaDe(a.nombre, h.id) : 'guion';
+    var volver = '<button type="button" class="enlace mesa-volver-guion">← Volver al guion</button>';
+    var grandeGuion = '<section class="mesa-grande mesa-grande-guion" data-tarjeta="guion">' +
       (h.cuerpo ? '<div class="hito-explicacion">' + h.cuerpo + '</div>' : '') +
       '<div class="mesa-guion"></div>' +
-    '</div>';
+    '</section>';
 
     var documentosHTML = window.HitoMesaDocumentos
       ? HitoMesaDocumentos.filasHTML(a, h, hitos || [], nombresDeLaCarpeta, abierto)
@@ -212,40 +216,54 @@ var HitosPanelLista = (function () {
           return '<span class="hito-documento" data-doc="' + U.escapar(d) + '"><button type="button" class="hito-doc-abrir" data-doc="' +
             U.escapar(d) + '">' + U.escapar(d) + '</button></span>';
         }).join('');
-    var bloqueDocs = '<div class="mesa-bloque mesa-docs">' +
-        '<div class="mesa-bloque-cabecera"><span class="mesa-bloque-titulo">Documentos del hito</span>' +
-          (abierto && window.HitosAnadir ? HitosAnadir.botonHTML(a, h) : '') + '</div>' +
-        (abierto || (h.documentos || []).length ? '<div class="hito-documentos">' + documentosHTML + '</div>' : '') +
+    var grandeDocs = '<section class="mesa-grande mesa-grande-docs mesa-docs" data-tarjeta="docs">' +
+        '<div class="mesa-bloque-cabecera"><span class="mesa-grande-titulo">Documentos del hito' +
+          (abierto && window.HitosAnadir ? HitosAnadir.botonHTML(a, h) : '') + '</span>' + volver + '</div>' +
         '<div class="mesa-seleccion oculto"></div>' +
+        (abierto || (h.documentos || []).length ? '<div class="hito-documentos">' + documentosHTML + '</div>' : '') +
         htmlRequisitos +
-      '</div>';
+        (abierto ? '<div class="mesa-soltar">Suelta aquí un documento del ordenador: va a este hito</div>' : '') +
+      '</section>';
 
     /* Fila 139 (docs/UNA-SOLA-LIBRETA-DE-NOTAS.md): las notas son las del
        asunto escritas desde este hito (js/notas-migracion.js); la historia
-       automática del hito se queda aquí, aparte. */
+       automática del hito se queda aparte, a la derecha (fila 147). */
     var notas = (window.NotasHito ? NotasHito.delHito(a, h.id) : []).slice().reverse();
     var historia = (h.notas || []).slice().reverse();
+    var grandeNotas = '<section class="mesa-grande mesa-grande-notas" data-tarjeta="notas">' +
+      '<div class="mesa-bloque-cabecera"><span class="mesa-grande-titulo">Notas e historia</span>' + volver + '</div>' +
+      '<div class="mesa-notas-columnas">' +
+        '<div class="mesa-bloque mesa-notas">' +
+          (abierto ? '<div class="nota-nueva">' +
+            '<textarea class="campo hito-nota-texto" rows="5" placeholder="Escribe una nota; Intro guarda (Mayúsculas+Intro, otra línea)"></textarea>' +
+            '<button type="button" class="boton hito-nota-anadir oculto">Añadir nota</button></div>' : '') +
+          '<div class="hito-notas">' + notas.map(function (n) {
+            return '<div class="hito-nota"><strong>' + U.escapar(n.quien || '') + '</strong> · ' +
+              U.escapar((n.cuando || '').slice(0, 10)) + '<br>' + U.escapar(n.texto) + '</div>';
+          }).join('') + '</div>' +
+        '</div>' +
+        '<div class="mesa-bloque mesa-historia"><span class="mesa-bloque-titulo hito-historia-titulo">Historia</span>' +
+          '<div class="hito-notas hito-historia">' + (historia.length ? historia.map(function (n) {
+            var auto = !window.NotasHito || NotasHito.esAutomatica(n.texto);
+            return '<div class="hito-nota' + (auto ? ' hito-nota-auto' : '') + '"><strong>' + U.escapar(n.quien || '') + '</strong> · ' +
+              U.escapar((n.cuando || '').slice(0, 10)) + '<br>' + U.escapar(n.texto) + '</div>';
+          }).join('') : '<p class="mesa-sin-docs">Nada todavía.</p>') + '</div></div>' +
+      '</div>' +
+    '</section>';
+
     var cuantasNormas = (h.normativa || []).filter(function (r) { return r && r.cita; }).length;
-    var colDerecha = '<div class="mesa-col mesa-col-derecha">' + bloqueDocs +
+    var resumen = function (cual, titulo) {
+      return '<div class="mesa-resumen" data-tarjeta="' + cual + '" role="button" tabindex="0" title="Abrir en grande">' +
+        '<div class="mesa-resumen-cabecera"><span class="mesa-bloque-titulo">' + titulo + '</span><span class="mesa-resumen-cuenta"></span></div>' +
+        '<div class="mesa-resumen-cuerpo"></div></div>';
+    };
+    var colDerecha = '<div class="mesa-col mesa-col-derecha">' +
+      resumen('guion', 'Qué hay que hacer') + resumen('docs', 'Documentos del hito') + resumen('notas', 'Notas e historia') +
       (window.HitosNormativa ? '<details class="mesa-bloque mesa-normativa' + (cuantasNormas ? '' : ' oculto') + '">' +
         '<summary class="mesa-bloque-titulo">Normativa (<span class="mesa-normativa-cuenta">' + cuantasNormas + '</span>)</summary>' +
         HitosNormativa.listaHTML(h.normativa) + '<div class="mesa-normativa-guion"></div></details>' : '') +
-      '<div class="mesa-bloque mesa-notas"><span class="mesa-bloque-titulo">Notas</span>' +
-        (abierto ? '<div class="nota-nueva">' +
-          '<textarea class="campo hito-nota-texto" rows="1" placeholder="Escribe una nota; Intro guarda (Mayúsculas+Intro, otra línea)"></textarea>' +
-          '<button type="button" class="boton hito-nota-anadir oculto">Añadir nota</button></div>' : '') +
-        '<div class="hito-notas">' + notas.map(function (n) {
-          return '<div class="hito-nota"><strong>' + U.escapar(n.quien || '') + '</strong> · ' +
-            U.escapar((n.cuando || '').slice(0, 10)) + '<br>' + U.escapar(n.texto) + '</div>';
-        }).join('') + '</div>' +
-      '</div>' +
-      (historia.length ? '<div class="mesa-bloque mesa-historia"><span class="mesa-bloque-titulo hito-historia-titulo">Historia</span>' +
-        '<div class="hito-notas hito-historia">' + historia.map(function (n) {
-          var auto = !window.NotasHito || NotasHito.esAutomatica(n.texto);
-          return '<div class="hito-nota' + (auto ? ' hito-nota-auto' : '') + '"><strong>' + U.escapar(n.quien || '') + '</strong> · ' +
-            U.escapar((n.cuando || '').slice(0, 10)) + '<br>' + U.escapar(n.texto) + '</div>';
-        }).join('') + '</div></div>' : '') +
     '</div>';
+    var colGrande = '<div class="mesa-col mesa-col-grande">' + grandeGuion + grandeDocs + grandeNotas + '</div>';
 
     /* Lo que va en el menú ⋯ de la cabecera de la mesa (js/hito-mesa.js
        pulsa estos botones por debajo), y "Cambiar de rama" de siempre.
@@ -259,7 +277,8 @@ var HitosPanelLista = (function () {
       '<span class="mesa-ocultos oculto">' + (window.HitosGenerar ? HitosGenerar.botonHTML(a, h) : '') +
         (window.HitosComunicar ? HitosComunicar.botonHTML(a, h) : '') + '</span></div>' : '';
 
-    return '<div class="mesa-cabecera"></div><div class="mesa-columnas">' + colGuion + colDerecha + '</div>' + botones;
+    return '<div class="mesa-cabecera"></div><div class="mesa-columnas" data-tarjeta="' + U.escapar(tarjeta) + '">' +
+      colGrande + colDerecha + '</div>' + botones;
   }
 
   /* Ya se sabe, desde que se pintó el cuerpo, qué documentos siguen en

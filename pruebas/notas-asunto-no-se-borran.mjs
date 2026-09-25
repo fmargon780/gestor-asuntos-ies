@@ -130,6 +130,8 @@ await pagina.waitForSelector('#ficha-guia .hito');
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.click('#ficha-guia .hito .hito-desplegar');
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
+/* Fila 147: las notas del hito, en su tarjeta de la mesa. */
+await pagina.evaluate(() => HitoMesa.abrirTarjeta('notas'));
 await pagina.waitForSelector('#ficha-guia .hito-nota-texto');
 
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));

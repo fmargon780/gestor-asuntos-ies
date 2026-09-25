@@ -22,7 +22,8 @@ de un documento, generar o meter un papel en un hito) abre la mesa de ese hito
 (`HitoMesa.abrirAlPintar`).
 
 - **Escape** (`js/usabilidad.js`): primero cierra el documento de la derecha si está; luego un
-  desplegable de la cabecera (fila 145); luego la mesa
+  desplegable de la cabecera (fila 145); luego, si la tarjeta en grande no es el guion, vuelve al
+  guion (fila 147); luego la mesa
   (`HitoMesa.cerrarSiAbierta`); luego la tarjeta (fila 107); luego sale de la ficha.
 - Con la mesa abierta, la franja de documentos de la tarjeta no sale (`FichaTarjetas.alCambiarLaMesa`).
 - Con el visor o el lector abierto, o por debajo de 1100 px, la zona derecha baja debajo del guion
@@ -61,25 +62,45 @@ Cambió cómo se ve, no lo que hace: cada botón llama a lo mismo que antes. **E
 - Los botones de siempre del hito (`.hito-generar`, `.hito-comunicar-boton`) siguen en el DOM,
   escondidos en `.mesa-ocultos`: los pulsan las acciones del guion.
 
-### Dos zonas (`cuerpoDeHito` en `js/hitos-panel-lista.js`)
+### Tres tarjetas (fila 147, 25-sep-2026, `docs/MESA-TARJETAS-QUE-SE-ABREN.md`)
 
 Rejilla `2fr 1fr` a todo el ancho (con la mesa abierta, `.contenido` pierde su ancho máximo). Con el
-visor o el lector abiertos, o por debajo de 1100 px, la derecha baja.
+visor o el lector abiertos, o por debajo de 1100 px, la derecha baja. La mesa tiene tres tarjetas:
+«Qué hay que hacer», «Documentos del hito» y «Notas e historia». **Una está en grande** a la
+izquierda (`.mesa-col-grande`, secciones `.mesa-grande[data-tarjeta="guion|docs|notas"]`, las tres
+siempre en el DOM: los botones del guion pulsan los de siempre por debajo) y **las otras dos, de
+resumen**, a la derecha (`.mesa-resumen`, en `.mesa-col-derecha`, con «Normativa (N)» plegada al pie).
+Cuál se ve lo dice `data-tarjeta` de `.mesa-columnas` (solo CSS: cambiar no repinta nada).
 
-1. **Izquierda, «Qué hay que hacer»** (`js/hito-mesa-guion.js`): el título, la barra y «N de M» en la
-   misma línea. Los pasos hechos, en una línea gris y tachada, sin explicación ni botones (quién,
-   cuándo, el valor o el documento, en el `title`). **El siguiente paso** (el primero sin hacer y sin «No
-   aplica»; ninguno con el hito hecho) lleva `.guion-siguiente`: fondo ámbar claro, título más grande,
-   su explicación y su acción como botón principal a la derecha; si su acción es añadir un documento (o
-   es una línea 📎 sin acción, que se trata como «Añadir documento»), una zona pequeña para soltar el
-   PDF. Los demás pendientes: su explicación en gris pequeño y su acción como botón normal. «No aplica»
-   solo al pasar el ratón o con el foco (siempre en pantallas táctiles). Al pie, «+ Añadir un paso solo
-   para este asunto».
-2. **Derecha, con fondo gris** (`.mesa-col-derecha`): «Documentos del hito» (la tabla de siempre, con
-   gemelos, selección de varios y su barra; vacía, «Ninguno todavía.» y la pista de soltar; se suelta
-   sobre toda la columna), «Normativa (N)» plegada (la del hito y la del guion, sin repetir; sin ninguna,
-   no sale), «Notas» (una línea que crece; Intro guarda, sin botón) e «Historia» (lo automático, lo más
-   nuevo arriba).
+- **Cambiar**: pulsar una tarjeta pequeña (o Intro/espacio con el foco) la abre en grande;
+  «← Volver al guion», la pequeña del guion o Escape vuelven. `HitoMesa.abrirTarjeta(cual)`,
+  `HitoMesa.tarjetaDe(clave, idHito)`, `HitoMesa.volverAlGuionSiOtra()` (`js/usabilidad.js`, entre el
+  desplegable de la cabecera y cerrar la mesa). Se recuerda por asunto e hito: guardar, llegar un
+  documento o la presencia no devuelven al guion; abrir otro hito (tira, lista, «Qué me toca»,
+  cerrar la mesa) sí. La acción «Registrar» del guion abre antes la de documentos.
+- **Los resúmenes** (`js/hito-mesa-tarjetas.js`, sin botones): el guion con «N de M», ✓ hechos, ☐
+  pendientes y «→» el siguiente en negrita (sin los «No aplica»); los documentos con su número, el tipo
+  y el registro en verde o «Sin registrar» en rojo claro (sin gemelos, cinco y «y N más»; vacío,
+  «Ninguno todavía.»); las notas con «N notas», la primera línea de la última y «Última: quién · día»
+  (sin notas, lo último de la historia, o «Sin notas»).
+- **Guion en grande** (`js/hito-mesa-guion.js`): el título, la barra y «N de M» en la misma línea.
+  Los pasos hechos, en una línea gris y tachada, sin explicación ni botones (quién, cuándo, el valor o
+  el documento, en el `title`). **El siguiente paso** (el primero sin hacer y sin «No aplica»; ninguno
+  con el hito hecho) lleva `.guion-siguiente`: fondo ámbar claro, título más grande, su explicación y su
+  acción como botón principal a la derecha; si su acción es añadir un documento (o es una línea 📎 sin
+  acción), una zona pequeña para soltar el PDF. Los demás pendientes: explicación en gris pequeño y su
+  acción como botón normal. «No aplica» solo al pasar el ratón o con el foco (siempre en pantallas
+  táctiles). Al pie, «+ Añadir un paso solo para este asunto».
+- **Documentos en grande**: «Añadir documento» junto al título, la barra de marcados encima, la tabla
+  (casilla, tipo en negrita y el nombre del fichero entero debajo, fecha, registro `.mesa-doc-registro`,
+  estado «Registrado»/«Sin registrar», Abrir `.mesa-doc-abrir`, Enviar y ⋯), los gemelos debajo de su
+  documento (`.mesa-doc-gemelo-fila`, sangrados, con su «Abrir») y, al pie, una zona de soltar de
+  ancho completo. Soltar funciona sobre esta tarjeta y sobre toda la columna derecha.
+- **Notas e historia en grande**: dos columnas (3 a 2; una por debajo de 1100 px). A la izquierda, la
+  caja de cinco líneas que crece (Intro guarda, Mayúsculas+Intro salta) y las notas, lo más nuevo
+  arriba; a la derecha, «Historia», lo automático en gris pequeño.
+- **Modo consulta**: se puede cambiar de tarjeta y abrir documentos (`js/ficha-consulta.js` deja
+  encendidos `.mesa-volver-guion`, `.mesa-doc-abrir` y `.mesa-doc-gemelo`).
 
 La tabla de documentos, los gemelos, la selección y «Comunicar» funcionan como se describe más abajo.
 
@@ -90,9 +111,7 @@ La tabla de documentos, los gemelos, la selección y «Comunicar» funcionan com
   trae `url`) y «No aplica». Marcado: tachado, quién y cuándo en el `title`. Un **hito-pregunta** enseña
   «¿Qué supuesto es?» con las opciones en tarjetas (la elegida en verde); elegir otra llama a
   `HitosPanelLista.cambiarRama` (la misma pregunta de siempre si la rama de ahora tiene cosas apuntadas).
-- **Documentos** (`js/hito-mesa-documentos.js`): tabla de `.hito-documento[data-doc]` (casilla, tipo en
-  negrita, fichero en gris con su `.hito-doc-abrir`, estado «Registrado 26EM0617»/«Sin registrar»/«(ya no
-  está)», Enviar y ⋯). Los gemelos (`SIN SELLAR`, `.doc/.docx` con la misma clave: sin extensión, sin «SIN
+- **Documentos** (`js/hito-mesa-documentos.js`): tabla de `.hito-documento[data-doc]` (ver «Tres tarjetas»). Los gemelos (`SIN SELLAR`, `.doc/.docx` con la misma clave: sin extensión, sin «SIN
   SELLAR» y sin código de registro) cuelgan debajo, de la carpeta aunque no estén apuntados. «viene del
   hito N» si ya estaba en uno anterior. Con varios marcados, barra: Enviar por correo, Abrir para
   imprimir (una pestaña cada uno), Mover a otro hito. Soltar un fichero del ordenador
@@ -173,7 +192,7 @@ otra vez el botón. Una sola escritura de `guias.json` con `Copias.guardar` y un
 ha traído. El borrador (296 modelos, 1.064 pasos) está en `biblioteca-centro.json`: si se vuelve a
 generar ese fichero con `herramientas/cargar-biblioteca.mjs`, los guiones se perderían.
 
-Se comprueba con `pruebas/hito-mesa.mjs` y `pruebas/mesa-del-hito-enfocada.mjs` (a 1905×1000 y 1280×800). Las pruebas que abrían varios
+Se comprueba con `pruebas/hito-mesa.mjs`, `pruebas/mesa-del-hito-enfocada.mjs` y `pruebas/mesa-tarjetas-que-se-abren.mjs` (a 1905×1000 y 1280×800; con `CAPTURAS=1`, fotos en `pruebas/capturas/`). Las pruebas que abrían varios
 hitos seguidos cierran antes la mesa (`HitoMesa.cerrar()`).
 
 ### Una sola lista: lo que hay que reunir, en el guion (25-sep-2026, fila 138, `docs/UNA-SOLA-LISTA-EN-EL-HITO.md`)

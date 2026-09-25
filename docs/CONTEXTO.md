@@ -321,7 +321,13 @@ Se comprueba con `pruebas/conflictos.mjs`.
 `package.json` trae `playwright` y `jsdom`; `npm test` (ejecuta `pruebas/ejecutar.mjs`) levanta
 el servidor local y corre todas las pruebas de `pruebas/` una tras otra, fallando si falla
 cualquiera. `.github/workflows/pruebas.yml` lo lanza en cada subida y en cada pull request a
-`main`, con Ubuntu, Node 20 y Chromium instalado por Playwright.
+`main`, con Ubuntu, Node 20 y Chromium instalado por Playwright. Desde la fila 148 no se lanza si el
+cambio solo toca `docs/` (`paths-ignore`), y dos subidas seguidas cancelan la primera
+(`concurrency`, `cancel-in-progress`).
+
+**Una prueba no se fía de un aviso que ya estaba a la vista** (fila 148): el «Asunto archivado.» del
+asunto anterior puede seguir en pantalla; se espera a lo que cambia de verdad (el asunto fuera de
+`App.E.listaAbiertos`).
 
 Las pruebas de navegador leen `process.env.CHROMIUM_PATH` (si no está, Playwright usa el suyo),
 para funcionar igual en local y en Actions.

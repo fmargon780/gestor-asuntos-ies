@@ -7,9 +7,10 @@
    que ocupa todo el sitio: la cabecera (camino, título, etiquetas de
    estado, plazo y responsable, "Marcar hito como hecho", menú ⋯ y la
    tira de hitos) y, debajo, lo que pinta js/hitos-panel-lista.js en el
-   cuerpo del hito. Desde la fila 145 (docs/MESA-DEL-HITO-ENFOCADA.md), dos
-   zonas (el guion; documentos, normativa, notas e historia) y, en la
-   cabecera, los desplegables «Generar documento ▾» y «Comunicar ▾».
+   cuerpo del hito. Desde la fila 145 (docs/MESA-DEL-HITO-ENFOCADA.md), en la
+   cabecera, los desplegables «Generar documento ▾» y «Comunicar ▾»; desde
+   la fila 147 (docs/MESA-TARJETAS-QUE-SE-ABREN.md), tres tarjetas (guion,
+   documentos, notas e historia): una en grande y dos de resumen.
 
    No hay pantalla nueva: la mesa es el mismo `.hito` con su
    `.hito-cuerpo` visible y la clase `con-mesa` en `#ficha-guia`, que
@@ -29,6 +30,9 @@ var HitoMesa = (function () {
 
   var abierta = null;   /* { clave, idHito } */
   var ultimo = null;    /* { caja, a, hitos, ajustes, abierto } del último pintado */
+  /* Fila 147: qué tarjeta está en grande ('guion', 'docs' o 'notas'), por
+     asunto e hito, para que un repintado no devuelva al guion. */
+  var tarjetaAbierta = null;   /* { clave, idHito, cual } */
 
   function $(id) { return document.getElementById(id); }
 
@@ -37,6 +41,8 @@ var HitoMesa = (function () {
   /* ---------- abrir y cerrar ---------- */
 
   function abrir(a, idHito) {
+    /* Fila 147: al abrir un hito (o cambiar con la tira), el guion en grande. */
+    if (!abierta || abierta.clave !== a.nombre || abierta.idHito !== idHito) tarjetaAbierta = null;
     abierta = { clave: a.nombre, idHito: idHito };
     if (ultimo && ultimo.a && ultimo.a.nombre === a.nombre) {
       aplicar(ultimo.caja, ultimo.a, ultimo.hitos, ultimo.ajustes, ultimo.abierto);
@@ -48,10 +54,14 @@ var HitoMesa = (function () {
   }
 
   /* Para "Qué me toca": se abrirá en cuanto se pinte ese asunto. */
-  function abrirAlPintar(clave, idHito) { abierta = { clave: clave, idHito: idHito }; }
+  function abrirAlPintar(clave, idHito) {
+    if (!abierta || abierta.clave !== clave || abierta.idHito !== idHito) tarjetaAbierta = null;
+    abierta = { clave: clave, idHito: idHito };
+  }
 
   function cerrar() {
     abierta = null;
+    tarjetaAbierta = null;
     if (ultimo) aplicar(ultimo.caja, ultimo.a, ultimo.hitos, ultimo.ajustes, ultimo.abierto);
   }
 
@@ -63,6 +73,34 @@ var HitoMesa = (function () {
   function cerrarSiAbierta() {
     if (!estaAbierta()) return false;
     cerrar();
+    return true;
+  }
+
+  /* ---------- la tarjeta en grande (fila 147) ---------- */
+
+  function tarjetaDe(clave, idHito) {
+    return (tarjetaAbierta && tarjetaAbierta.clave === clave && tarjetaAbierta.idHito === idHito) ? tarjetaAbierta.cual : 'guion';
+  }
+
+  function ponerTarjeta() {
+    if (!abierta || !ultimo || !ultimo.caja) return;
+    var fila = ultimo.caja.querySelector('.hito-en-mesa[data-id="' + abierta.idHito + '"]');
+    var cols = fila && fila.querySelector(':scope > .hito-cuerpo > .mesa-columnas');
+    if (cols) cols.dataset.tarjeta = tarjetaDe(abierta.clave, abierta.idHito);
+  }
+
+  /* Cambiar de tarjeta es solo cambiar cuál se ve: no se repinta nada, así
+     que no se pierde lo que se esté escribiendo. */
+  function abrirTarjeta(cual) {
+    if (!abierta) return;
+    tarjetaAbierta = { clave: abierta.clave, idHito: abierta.idHito, cual: cual || 'guion' };
+    ponerTarjeta();
+  }
+
+  /* Para Escape: true si había otra tarjeta en grande y se ha vuelto al guion. */
+  function volverAlGuionSiOtra() {
+    if (!estaAbierta() || tarjetaDe(abierta.clave, abierta.idHito) === 'guion') return false;
+    abrirTarjeta('guion');
     return true;
   }
 
@@ -91,6 +129,8 @@ var HitoMesa = (function () {
     pintarCabecera(fila, a, h, hitos, ajustes, abierto);
     if (window.HitoMesaGuion) HitoMesaGuion.pintar(fila, a, h, abierto);
     if (window.HitoMesaDocumentos) HitoMesaDocumentos.enganchar(fila, a, h, hitos, abierto);
+    if (window.HitoMesaTarjetas) HitoMesaTarjetas.pintar(fila, a, h, hitos);
+    ponerTarjeta();
     if (window.FichaTarjetas && FichaTarjetas.alCambiarLaMesa) FichaTarjetas.alCambiarLaMesa();
   }
 
@@ -319,7 +359,9 @@ var HitoMesa = (function () {
     abrir: abrir, abrirAlPintar: abrirAlPintar, cerrar: cerrar, aplicar: aplicar,
     cerrarSiAbierta: cerrarSiAbierta, estaAbierta: estaAbierta,
     abierta: function () { return abierta; }, textoPlazo: textoPlazo,
-    cerrarPanelSiAbierto: cerrarPanelSiAbierto
+    cerrarPanelSiAbierto: cerrarPanelSiAbierto,
+    tarjetaDe: tarjetaDe, abrirTarjeta: abrirTarjeta, volverAlGuionSiOtra: volverAlGuionSiOtra,
+    tarjeta: function () { return abierta ? tarjetaDe(abierta.clave, abierta.idHito) : null; }
   };
 })();
 window.HitoMesa = HitoMesa;

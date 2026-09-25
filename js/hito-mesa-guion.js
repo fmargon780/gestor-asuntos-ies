@@ -189,6 +189,8 @@ var HitoMesaGuion = (function () {
       };
       var accion = el.querySelector('.guion-accion-boton');
       if (accion) accion.onclick = function () {
+        /* Fila 147: registrar se hace desde el ⋯ del documento, en su tarjeta. */
+        if (accion.dataset.accion === 'registrar' && window.HitoMesa && HitoMesa.abrirTarjeta) HitoMesa.abrirTarjeta('docs');
         var destino = BOTON_DE_ACCION[accion.dataset.accion];
         var b = destino && fila.querySelector(destino.clase);
         if (b) b.click();

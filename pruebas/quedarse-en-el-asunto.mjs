@@ -154,6 +154,7 @@ console.log('--- 6. apuntar un documento a un hito, desde el propio hito ---');
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 const laFilaDelHito = pagina.locator('#ficha-guia .hito').first();
 await laFilaDelHito.locator('.hito-desplegar').click();
+await laFilaDelHito.locator('.mesa-resumen[data-tarjeta="docs"]').click();   /* fila 147 */
 await pagina.waitForSelector('.hito-anadir-documento:not(.oculto)');
 await laFilaDelHito.locator('.hito-anadir-documento').click();
 await pagina.waitForSelector('.ficha-menu:not(.oculto)');

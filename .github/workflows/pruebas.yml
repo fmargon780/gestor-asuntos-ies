@@ -3,8 +3,15 @@ name: Pruebas
 on:
   push:
     branches: [main]
+    paths-ignore: ['docs/**']
   pull_request:
     branches: [main]
+    paths-ignore: ['docs/**']
+
+# Fila 148: si llegan dos subidas seguidas, solo se prueba la última.
+concurrency:
+  group: pruebas-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   pruebas:
