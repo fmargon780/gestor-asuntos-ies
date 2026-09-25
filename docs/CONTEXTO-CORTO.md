@@ -112,7 +112,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa): «Generar documento ▾» y «Comunicar ▾»; tres tarjetas,
   una en grande y dos de resumen (pulsar una la abre): el guion (siguiente paso resaltado; preguntas; 📎, ✎; se marca solo al generar,
   registrar, comunicar o añadir), los documentos (nombre entero, gemelos, selección) y notas con historia.
-  Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa.
+  Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa
+  («✎ Cambiar el guion», sin salir a Ajustes); su «Comunicar» abre lo mismo que la cabecera y marca ese paso.
   Biblioteca de hitos del centro, con guion; en Mantenimiento, cargar tipos, guías y guiones del instituto.
 - "Qué me toca": pendientes, filtro por responsable, "Dormidos" (sin novedades en N días). "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena solo los datos del centro (casillas con nombre legible y miniatura).
@@ -163,14 +164,14 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 ## 8. Qué falta
 
 - El compañero: entrar en `https://asuntos.fmargon.com`, señalar sus carpetas de nuevo (no se heredan) y coordinar tipos de asunto.
-- Envío: pegar el script nuevo (filas 117 y 130), «Gestionar implementaciones → lápiz → Nueva versión», y «Probar».
+- Envío: pegar el script nuevo (filas 117 y 130), «Nueva versión» y «Probar».
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja como una sola compartida.
-- Ver con el uso: ancho del panel y del tablón, tarjetas, aviso de "falta el DNI".
+- Ver con el uso: ancho del panel/tablón, tarjetas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: cargos, Provincia y el logo del centro.
-- Importar los usuarios IdEA del alumnado, cuando reactiven a Francisco el perfil de Gestor de PASEN.
-- Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar las plantillas del centro» y «Traer los guiones del instituto». Ajustes › Hitos: pegar los festivos. Ajustes › Tipos: quién encarga cada uno y su plazo de conservación.
-- Antes de junio de 2027: "Guardar el contacto de los asuntos abiertos" (Mantenimiento).
-- Decisión: ¿la papelera se vacía sola a los N días? Sin decidir.
+- Importar usuarios IdEA del alumnado, cuando reactiven a Francisco el perfil de Gestor de PASEN.
+- Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar plantillas» y «Traer guiones del instituto». Ajustes › Hitos: pegar los festivos.
+- Antes de junio 2027: "Guardar el contacto de los asuntos abiertos" (Mantenimiento).
+- Decisión: ¿la papelera se vacía sola? Sin decidir.
 - Antes de publicar algo importante, repasar `docs/COMPROBAR-A-MANO.md`.
 
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero

@@ -90,7 +90,25 @@ Cuál se ve lo dice `data-tarjeta` de `.mesa-columnas` (solo CSS: cambiar no rep
   acción como botón principal a la derecha; si su acción es añadir un documento (o es una línea 📎 sin
   acción), una zona pequeña para soltar el PDF. Los demás pendientes: explicación en gris pequeño y su
   acción como botón normal. «No aplica» solo al pasar el ratón o con el foco (siempre en pantallas
-  táctiles). Al pie, «+ Añadir un paso solo para este asunto».
+  táctiles). Al pie, «+ Añadir un paso solo para este asunto» y, si el hito viene de un paso de la
+  guía, «✎ Cambiar el guion de este hito (para todos los asuntos de este tipo)».
+
+  **El «Comunicar» de un paso** (25-sep-2026, fila 150, `docs/MESA-COMUNICAR-DEL-PASO-Y-GUION.md`):
+  llama a `HitosComunicar.comunicar(a, h, canal, { idPasoGuion })` en línea recta (nunca clicando el
+  botón escondido `.hito-comunicar-boton` de `.mesa-ocultos`: con dos vías, `FichaMenus` montaba su
+  menú dentro de ese contenedor `oculto`, invisible aunque funcionara). Con una sola vía la llama
+  directa; con dos, `FichaMenus.montar` cuelga del propio botón del paso, visible. `idPasoGuion` viaja
+  hasta `extra.comunicarHito` (`js/hitos-comunicar.js`) y `js/correo-rastro.js` lo usa para marcar
+  justo ese paso (`Hitos.marcarGuion`) en vez de «el primero pendiente» (`Hitos.marcarGuionPorAccion`,
+  que se sigue usando cuando se comunica desde la cabecera, sin paso concreto). **«Generar
+  documento»/«Añadir documento» de un paso no tenían este fallo**: su único botón vive dentro de una
+  tarjeta visible (`Documentos del hito`), no en `.mesa-ocultos`, así que `querySelector` ya encontraba
+  ese, no el escondido.
+
+  **«✎ Cambiar el guion de este hito»** (misma fila): abre `U.preguntar` con el editor de
+  `js/guias-guion.js` (el mismo de Ajustes, sin duplicar: `bloqueHTML`/`enganchar`/`leer`/`normalizar`
+  sobre una copia en memoria del `guion` de ese paso) y guarda con `GuiasDelCentro.cambiarPasos`, igual
+  que «+ Añadir un paso a la guía del tipo». Sin salir a Ajustes.
 - **Documentos en grande**: «Añadir documento» junto al título, la barra de marcados encima, la tabla
   (casilla, tipo en negrita y el nombre del fichero entero debajo, fecha, registro `.mesa-doc-registro`,
   estado «Registrado»/«Sin registrar», Abrir `.mesa-doc-abrir`, Enviar y ⋯), los gemelos debajo de su
@@ -192,8 +210,10 @@ otra vez el botón. Una sola escritura de `guias.json` con `Copias.guardar` y un
 ha traído. El borrador (296 modelos, 1.064 pasos) está en `biblioteca-centro.json`: si se vuelve a
 generar ese fichero con `herramientas/cargar-biblioteca.mjs`, los guiones se perderían.
 
-Se comprueba con `pruebas/hito-mesa.mjs`, `pruebas/mesa-del-hito-enfocada.mjs` y `pruebas/mesa-tarjetas-que-se-abren.mjs` (a 1905×1000 y 1280×800; con `CAPTURAS=1`, fotos en `pruebas/capturas/`). Las pruebas que abrían varios
-hitos seguidos cierran antes la mesa (`HitoMesa.cerrar()`).
+Se comprueba con `pruebas/hito-mesa.mjs`, `pruebas/mesa-del-hito-enfocada.mjs`, `pruebas/mesa-tarjetas-que-se-abren.mjs`
+(a 1905×1000 y 1280×800; con `CAPTURAS=1`, fotos en `pruebas/capturas/`) y `pruebas/mesa-comunicar-del-paso-y-guion.mjs`
+(el «Comunicar» de un paso, visible con dos vías, marca el paso pulsado; y «✎ Cambiar el guion»). Las pruebas que abrían
+varios hitos seguidos cierran antes la mesa (`HitoMesa.cerrar()`).
 
 ### Una sola lista: lo que hay que reunir, en el guion (25-sep-2026, fila 138, `docs/UNA-SOLA-LISTA-EN-EL-HITO.md`)
 
