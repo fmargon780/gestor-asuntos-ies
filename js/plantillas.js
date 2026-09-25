@@ -367,6 +367,8 @@ var Plantillas = (function () {
     POR_DEFECTO_FIRMA: POR_DEFECTO_FIRMA, POR_DEFECTO_CENTRO: POR_DEFECTO_CENTRO,
     POR_DEFECTO_NORMATIVA: POR_DEFECTO_NORMATIVA, POR_DEFECTO_CONSEJERIA: POR_DEFECTO_CONSEJERIA,
     cargar: cargar, cargarReciente: cargarReciente, olvidar: olvidar, guardar: guardar,
+    /* Fila 164: lo último leído, sin ir al disco (el editor del guion). */
+    enMemoria: function () { return cache; },
     documentoPorId: documentoPorId, enMemoria: function () { return cache; },
     deTipo: deTipo, idNuevo: idNuevo, rellenar: rellenar, tieneLoQueFalta: tieneLoQueFalta,
     documentosDeTipo: documentosDeTipo, idNuevoDocumento: idNuevoDocumento,

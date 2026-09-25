@@ -97,6 +97,9 @@ var SenecaCuadro = (function () {
      firma. */
   function bloqueCuerpo(a) {
     var opciones = (n().plantillasDelTipo && n().plantillasDelTipo(a)) || [];
+    /* Fila 164: la receta de un paso trae su plantilla (una vez). */
+    var pedida = (n()._interno || {}).plantillaPedida;
+    if (pedida && opciones.some(function (p) { return p.id === pedida; })) { plantillaElegida = pedida; n()._interno.plantillaPedida = ''; }
     if (!plantillaElegida && opciones.length) plantillaElegida = opciones[0].id;
     if (plantillaElegida && !opciones.some(function (p) { return p.id === plantillaElegida; })) {
       plantillaElegida = '';

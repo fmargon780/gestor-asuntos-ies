@@ -21,6 +21,17 @@
    ser una lista aparte: la casilla «Hay que reunirlo», junto a «Es una
    pregunta».
 
+   La receta de un paso (25-sep-2026, fila 164, docs/HITOS-ACCIONES-EN-EL-HITO.md,
+   punto 3): la `accion` es su clase (comunicar, generar, registrar) y
+   `receta` sus detalles, todos opcionales: comunicar `{ a, via,
+   plantilla }` (a: tercero, tutores, tutoria, relacionados u otro; via:
+   correo o seneca; plantilla: id de `plantillas.json` › `lista`);
+   generar `{ plantilla }` (id de `plantillas.json` › `documentos`);
+   registrar `{ sentido }` (entrada o salida). Un paso con `accion` y sin
+   `receta` (los de la guía del instituto de antes) ya es un paso con
+   receta, sin detalles: no hace falta convertir nada. Sale arriba en el
+   menú del hito (js/hito-mesa-recetas.js).
+
    Pinta, lee y engancha una lista dentro de un contenedor. Se carga
    después de js/guias.js.
    ============================================================ */
@@ -33,6 +44,70 @@ var GuiasGuion = (function () {
     { valor: 'comunicar', texto: 'Comunicar' },
     { valor: 'anadir', texto: 'Añadir un documento' }
   ];
+
+  var A_QUIEN = [
+    { valor: '', texto: 'A quien toque' }, { valor: 'tercero', texto: 'El tercero' },
+    { valor: 'tutores', texto: 'La familia (tutores legales)' }, { valor: 'tutoria', texto: 'La tutoría' },
+    { valor: 'relacionados', texto: 'Los relacionados' }, { valor: 'otro', texto: 'Otro' }
+  ];
+  var VIAS = [{ valor: '', texto: 'Correo o Séneca' }, { valor: 'correo', texto: 'Por correo' }, { valor: 'seneca', texto: 'Por Séneca' }];
+  var SENTIDOS = [{ valor: '', texto: 'Entrada o salida' }, { valor: 'entrada', texto: 'Entrada' }, { valor: 'salida', texto: 'Salida' }];
+
+  function valido(lista, v) { return lista.some(function (x) { return x.valor === v; }) ? v : ''; }
+
+  /* La receta, limpia y solo con lo que toca a su acción; null si no dice nada. */
+  function normalizarReceta(accion, r) {
+    r = r || {};
+    var out = null;
+    if (accion === 'comunicar') {
+      out = { a: valido(A_QUIEN, String(r.a || '')), via: valido(VIAS, String(r.via || '')), plantilla: String(r.plantilla || '') };
+    } else if (accion === 'generar') {
+      out = { plantilla: String(r.plantilla || '') };
+    } else if (accion === 'registrar') {
+      out = { sentido: valido(SENTIDOS, String(r.sentido || '')) };
+    }
+    if (!out) return null;
+    return Object.keys(out).some(function (k) { return out[k]; }) ? out : null;
+  }
+
+  function opcionesHTML(lista, actual) {
+    return lista.map(function (x) {
+      return '<option value="' + U.escapar(x.valor) + '"' + (x.valor === (actual || '') ? ' selected' : '') + '>' + U.escapar(x.texto) + '</option>';
+    }).join('');
+  }
+
+  /* Las plantillas del centro que ya se hayan leído (Plantillas.enMemoria);
+     la elegida sale aunque no esté, para no perderla al guardar. */
+  function plantillasPara(clase, actual) {
+    var datos = window.Plantillas && Plantillas.enMemoria ? Plantillas.enMemoria() : null;
+    if (!datos && window.Plantillas && Plantillas.cargarReciente && window.App && App.E && App.E.gestor) {
+      Plantillas.cargarReciente(App.E.gestor).catch(function () { /* sin plantillas, sin lista */ });
+    }
+    var lista = ((datos && datos[clase]) || []).map(function (p) {
+      return { valor: p.id, texto: p.nombre + (p.tipo ? ' (' + p.tipo + ')' : '') };
+    });
+    if (actual && !lista.some(function (x) { return x.valor === actual; })) lista.push({ valor: actual, texto: actual });
+    return [{ valor: '', texto: 'Sin plantilla fija' }].concat(lista);
+  }
+
+  function recetaHTML(g) {
+    var r = g.receta || {};
+    if (g.accion === 'comunicar') {
+      return '<div class="guion-fila-linea guion-receta"><span class="guion-receta-titulo">Receta:</span>' +
+        '<select class="campo guion-receta-a">' + opcionesHTML(A_QUIEN, r.a) + '</select>' +
+        '<select class="campo guion-receta-via">' + opcionesHTML(VIAS, r.via) + '</select>' +
+        '<select class="campo guion-receta-plantilla">' + opcionesHTML(plantillasPara('lista', r.plantilla), r.plantilla) + '</select></div>';
+    }
+    if (g.accion === 'generar') {
+      return '<div class="guion-fila-linea guion-receta"><span class="guion-receta-titulo">Receta:</span>' +
+        '<select class="campo guion-receta-plantilla">' + opcionesHTML(plantillasPara('documentos', r.plantilla), r.plantilla) + '</select></div>';
+    }
+    if (g.accion === 'registrar') {
+      return '<div class="guion-fila-linea guion-receta"><span class="guion-receta-titulo">Receta:</span>' +
+        '<select class="campo guion-receta-sentido">' + opcionesHTML(SENTIDOS, r.sentido) + '</select></div>';
+    }
+    return '';
+  }
 
   function nuevoId() { return U.nuevoId('g'); }
 
@@ -62,6 +137,8 @@ var GuiasGuion = (function () {
       var accion = String((g && g.accion) || '');
       base.accion = ACCIONES.some(function (a) { return a.valor === accion; }) ? accion : '';
       base.normativa = normalizarNormativa(g && g.normativa);
+      var receta = normalizarReceta(base.accion, g && g.receta);
+      if (receta) base.receta = receta;
       /* Fila 138: algo que hay que reunir. */
       if (g && (g.reunir === 'documento' || g.reunir === 'dato')) {
         base.reunir = g.reunir;
@@ -79,7 +156,7 @@ var GuiasGuion = (function () {
           return o.texto + ' → ' + (o.lineas || []).map(function (x) { return x.texto; }).join(', ');
         }).join(' / ') + ']';
       }
-      return g.texto + (g.accion ? ' [' + g.accion + ']' : '') +
+      return g.texto + (g.accion ? ' [' + g.accion + (g.receta ? ' ' + JSON.stringify(g.receta) : '') + ']' : '') +
         (g.reunir ? ' [reunir ' + g.reunir + (g.obligatorio ? ', obligatorio' : '') + ']' : '');
     }).join('; ');
   }
@@ -102,6 +179,7 @@ var GuiasGuion = (function () {
           '<button type="button" class="boton boton-peligro guion-quitar" title="Quitar">✕</button>' +
         '</span>' +
       '</div>' +
+      (pregunta ? '' : recetaHTML(g)) +
       '<input class="campo guion-explicacion" value="' + U.escapar(g.explicacion || '') + '" placeholder="Explicación corta (opcional)">' +
       (pregunta ? '' :
         '<div class="guion-fila-linea guion-norma">' +
@@ -164,6 +242,14 @@ var GuiasGuion = (function () {
     var sel = q('.guion-fila-linea > .guion-accion');
     var cita = q('.guion-norma > .guion-cita');
     base.accion = sel ? sel.value : '';
+    var receta = q('.guion-receta');
+    if (receta) {
+      var leida = {};
+      [['a', '.guion-receta-a'], ['via', '.guion-receta-via'], ['plantilla', '.guion-receta-plantilla'], ['sentido', '.guion-receta-sentido']]
+        .forEach(function (x) { var c = receta.querySelector(x[1]); if (c) leida[x[0]] = c.value; });
+      var limpia = normalizarReceta(base.accion, leida);
+      if (limpia) base.receta = limpia;
+    }
     base.normativa = (cita && cita.value.trim())
       ? { cita: cita.value.trim(), bloque: '', clave: '', url: q('.guion-norma > .guion-url').value.trim() } : null;
     var reunir = q('.guion-reunir-fila .guion-reunir');
@@ -199,6 +285,9 @@ var GuiasGuion = (function () {
       boton('.guion-quitar').onclick = function () {
         alCambiar(function (l) { l.splice(idx, 1); });
       };
+      /* Fila 164: al cambiar la acción, sale (o se va) su receta. */
+      var accionSel = fila.querySelector(':scope > .guion-fila-linea > .guion-accion');
+      if (accionSel) accionSel.onchange = function () { alCambiar(function () { /* solo repintar con lo leído */ }); };
       /* Fila 116: la casilla «Es una pregunta» y sus respuestas. */
       var marca = fila.querySelector(':scope > .guion-pregunta-fila > .guion-es-pregunta');
       if (marca) marca.onchange = function () {
@@ -233,6 +322,7 @@ var GuiasGuion = (function () {
     });
   }
 
-  return { normalizar: normalizar, textoLegible: textoLegible, bloqueHTML: bloqueHTML, leer: leer, enganchar: enganchar, ACCIONES: ACCIONES };
+  return { normalizar: normalizar, textoLegible: textoLegible, bloqueHTML: bloqueHTML, leer: leer, enganchar: enganchar, ACCIONES: ACCIONES,
+           normalizarReceta: normalizarReceta, A_QUIEN: A_QUIEN };
 })();
 window.GuiasGuion = GuiasGuion;

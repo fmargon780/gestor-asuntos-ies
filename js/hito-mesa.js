@@ -42,8 +42,11 @@ var HitoMesa = (function () {
 
   function abrir(a, idHito) {
     /* Fila 147: al abrir un hito (o cambiar con la tira), el guion en grande. */
-    if (!abierta || abierta.clave !== a.nombre || abierta.idHito !== idHito) tarjetaAbierta = null;
+    var otro = !abierta || abierta.clave !== a.nombre || abierta.idHito !== idHito;
+    if (otro) tarjetaAbierta = null;
     abierta = { clave: a.nombre, idHito: idHito };
+    /* Fila 164: los documentos de otros hitos se pintan solo en el de la mesa. */
+    if (otro && window.HitosPanel && HitosPanel.programarRepintado) HitosPanel.programarRepintado();
     if (ultimo && ultimo.a && ultimo.a.nombre === a.nombre) {
       aplicar(ultimo.caja, ultimo.a, ultimo.hitos, ultimo.ajustes, ultimo.abierto);
     }
@@ -308,8 +311,13 @@ var HitoMesa = (function () {
       abrirTarjeta('docs');
       if (window.HitosDocumentoMenu && HitosDocumentoMenu.registrar) HitosDocumentoMenu.registrar(a, h, nombre);
     }
-    if (sin.length > 1 && window.FichaMenus) {
-      FichaMenus.montar(boton, sin.map(function (n) { return { texto: n, alPulsar: function () { registrar(n); } }; }));
+    /* Fila 164: los pasos pendientes con receta de registrar, como título del menú. */
+    var pasos = window.HitoMesaRecetas ? HitoMesaRecetas.pendientes(a, h, 'registrar') : [];
+    if ((sin.length > 1 || (sin.length && pasos.length)) && window.FichaMenus) {
+      FichaMenus.montar(boton, pasos.map(function (g) {
+        var sentido = g.receta && g.receta.sentido ? ' (' + g.receta.sentido + ')' : '';
+        return { texto: 'Paso: ' + g.texto + sentido, deshabilitado: true, clase: 'mesa-registrar-paso', alPulsar: function () {} };
+      }).concat(pasos.length ? [{ raya: true }] : []).concat(sin.map(function (n) { return { texto: n, alPulsar: function () { registrar(n); } }; })));
       return;
     }
     boton.onclick = function () {

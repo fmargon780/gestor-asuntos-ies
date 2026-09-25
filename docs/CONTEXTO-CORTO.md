@@ -112,7 +112,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
   bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa): las acciones solo ahí, «Generar documento ▾», «Comunicar ▾»
   y «Registrar» (con hitos, no en la barra de arriba); tres tarjetas, una en grande y dos de resumen: el guion (lista para marcar, sin
-  botones, quién y cuándo al lado; preguntas; 📎, ✎; se marca solo al generar, registrar, comunicar o añadir), los documentos (nombre entero, gemelos, selección, «Enviar ▾» por correo o Séneca) y notas con historia.
+  botones, quién y cuándo al lado; «receta» opcional que sale arriba del menú y deja el cuadro relleno; preguntas; 📎, ✎; se marca
+  solo al generar, registrar, comunicar o añadir), todos los documentos del asunto (los de otros hitos, con su etiqueta), gemelos, selección, «Enviar ▾» por correo o Séneca y notas con historia.
   Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa
   («✎ Cambiar el guion», sin salir a Ajustes). «Paso N de M», «Hitos N/M» y la mesa, con una sola cuenta.
   Biblioteca de hitos del centro, con guion; en Mantenimiento, cargar tipos, guías y guiones del instituto.

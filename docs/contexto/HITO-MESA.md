@@ -104,13 +104,33 @@ Cuál se ve lo dice `data-tarjeta` de `.mesa-columnas` (solo CSS: cambiar no rep
   **El «Comunicar» de un paso** (fila 150) ya no existe desde la fila 154: se comunica desde «Comunicar
   ▾» de la cabecera, que marca el primer paso pendiente con esa acción (`Hitos.marcarGuionPorAccion`).
   `HitosComunicar.comunicar(a, h, canal, { idPasoGuion })` sigue sabiendo marcar un paso concreto
-  (`extra.comunicarHito`, `js/correo-rastro.js`, `Hitos.marcarGuion`), para las recetas de la fila 164.
+  (`extra.comunicarHito`, `js/correo-rastro.js`, `Hitos.marcarGuion`): lo usan las recetas.
+
+  **Las recetas** (fila 164, `js/hito-mesa-recetas.js`): un paso con `accion` comunicar, generar o
+  registrar es un paso con receta; `receta` (opcional, `js/guias-guion.js`) trae los detalles:
+  comunicar `{ a, via, plantilla }`, generar `{ plantilla }`, registrar `{ sentido }`. Los pasos de
+  antes, con acción y sin receta, ya valen tal cual (receta sin detalles): no se convierte nada. En la
+  mesa, arriba de «Comunicar ▾» salen los pasos pendientes de comunicar (`.mesa-recetas`, un botón
+  `.mesa-receta` por paso, con su texto): al elegir uno se abre el cuadro de la vía de la receta (si
+  no dice, la primera de `HitosComunicar.canalesDe`), con los destinatarios de «a quién» (de los
+  candidatos de `HitoMesaComunicar`: tercero, tutores, relacionados; sin «a quién», los premarcados;
+  «la tutoría» u «otro», sin correo) y la plantilla ya elegida (`extra.plantilla` →
+  `CorreoNucleo._interno.plantillaPedida`, que los dos cuadros usan una vez; gana a un texto propio
+  del paso), y al terminar se marca ese paso. Arriba de «Generar documento ▾», los de generar: con
+  plantilla fija, `PlantillasDocumento.generar(a, p, 'abierto', { hito, idPasoGuion })` y se marca ese
+  paso; sin ella, el cuadro de elegir de siempre. «Registrar» pone los de registrar (con su sentido)
+  como título, apagado, de su menú de documentos. El editor del guion enseña la receta debajo de la
+  acción (la lista de plantillas sale de `Plantillas.enMemoria`, lo último leído).
 
   **«✎ Cambiar el guion de este hito»** (misma fila): abre `U.preguntar` con el editor de
   `js/guias-guion.js` (el mismo de Ajustes, sin duplicar: `bloqueHTML`/`enganchar`/`leer`/`normalizar`
   sobre una copia en memoria del `guion` de ese paso) y guarda con `GuiasDelCentro.cambiarPasos`, igual
   que «+ Añadir un paso a la guía del tipo». Sin salir a Ajustes.
-- **Documentos en grande**: «Añadir documento» junto al título, la barra de marcados encima, la tabla
+- **Documentos en grande** (fila 164: con **todos los documentos del asunto**, `otrosDelAsunto`: debajo
+  de los del hito, «De otros hitos», cada uno con la etiqueta `.mesa-doc-de-hito` «N · título» de su
+  hito, y al final «En la carpeta, sin hito», sin gemelos ni ficheros internos; se abren, se envían y se
+  marcan para adjuntar como los propios, sin el ⋯, que es de su hito; `.mesa-doc-ajeno`. El título dice
+  «Documentos del hito · 2 (y 5 más del asunto)», `cuentaTitulo`): «Añadir documento» junto al título, la barra de marcados encima, la tabla
   (casilla, tipo en negrita y el nombre del fichero entero debajo, fecha, registro `.mesa-doc-registro`,
   estado «Registrado»/«Sin registrar», Abrir `.mesa-doc-abrir`, Enviar y ⋯), los gemelos debajo de su
   documento (`.mesa-doc-gemelo-fila`, sangrados, con su «Abrir») y, al pie, una zona de soltar de
@@ -226,7 +246,9 @@ Se comprueba con `pruebas/hito-mesa.mjs`, `pruebas/mesa-del-hito-enfocada.mjs`, 
 (el «Comunicar» de un paso, visible con dos vías, marca el paso pulsado; y «✎ Cambiar el guion») y
 `pruebas/enviar-documento-por-seneca.mjs` («Enviar ▾» de un documento, por correo o por Séneca, y el guion al
 terminar) y `pruebas/hitos-acciones-en-el-hito.mjs` (fila 154: sin botones en los pasos, «Registrar» en la
-cabecera, «Comunicar» de arriba escondido, quién al lado del paso hecho, y los tres números iguales). Las pruebas que abrían varios hitos seguidos cierran antes la mesa (`HitoMesa.cerrar()`).
+cabecera, «Comunicar» de arriba escondido, quién al lado del paso hecho, y los tres números iguales) y
+`pruebas/hitos-recetas.mjs` (fila 164: la receta de comunicar abre el cuadro con su plantilla y marca ese
+paso; los documentos de otros hitos; el editor de la receta; generar y registrar). Las pruebas que abrían varios hitos seguidos cierran antes la mesa (`HitoMesa.cerrar()`).
 
 ### Una sola lista: lo que hay que reunir, en el guion (25-sep-2026, fila 138, `docs/UNA-SOLA-LISTA-EN-EL-HITO.md`)
 

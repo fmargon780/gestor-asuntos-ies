@@ -5,6 +5,20 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 164: las recetas de los pasos y todos los documentos en cada hito
+
+Segunda mitad de `docs/HITOS-ACCIONES-EN-EL-HITO.md` (puntos 3 y 4). Decisiones:
+
+- **No hubo que convertir nada**: la `accion` que ya tenían los pasos (la guía del instituto) es la
+  clase de receta; `receta` solo añade detalles opcionales. Un paso con acción y sin receta sale igual
+  arriba del menú, sin destinatarios ni plantilla fijos.
+- La plantilla de la receta llega a los cuadros por `CorreoNucleo._interno.plantillaPedida`, que se usa
+  una sola vez (cambiar de plantilla a mano después sigue funcionando), y gana al texto propio del paso.
+- «La tutoría» y «otro» no se pueden resolver a un correo: el cuadro sale sin él, para escribirlo.
+- `Hitos.guionDe` ya copiaba la línea de la guía, pero armaba cada paso campo a campo: la receta se
+  perdía ahí hasta añadirla (lo cazó la prueba).
+- Los documentos de otros hitos se ven sin el ⋯: renombrar, registrar o quitar es cosa de su hito.
+
 ## 25-sep-2026 — Fila 154 (puntos 1, 2 y 5): las acciones, solo en el hito
 
 `docs/HITOS-ACCIONES-EN-EL-HITO.md`. El mismo botón salía en tres sitios y los números no cuadraban.

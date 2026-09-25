@@ -187,7 +187,11 @@
       }
       if (window.HitosRequisitos) {
         try { await HitosRequisitos.marcarPorDocumento(asunto.nombre, hito.id, nombreDoc); } catch (e2) { /* no crítico */ }
-        if (Hitos.marcarGuionPorAccion) await Hitos.marcarGuionPorAccion(asunto, hito.id, 'generar');   /* fila 109 */
+        /* Fila 164: desde la receta de un paso, se marca ese paso. */
+        if (opciones && opciones.idPasoGuion && Hitos.marcarGuion) {
+          try { await Hitos.marcarGuion(asunto.nombre, hito.id, opciones.idPasoGuion, { hecho: true }); }
+          catch (e3) { U.accesorio('Documento generado, pero no he podido marcar el paso', e3); }
+        } else if (Hitos.marcarGuionPorAccion) await Hitos.marcarGuionPorAccion(asunto, hito.id, 'generar');   /* fila 109 */
       }
       if (window.HitosPanel && HitosPanel.desplegarAlAbrir) HitosPanel.desplegarAlAbrir(asunto.nombre, hito.id);
     }

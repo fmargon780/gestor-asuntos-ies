@@ -102,6 +102,8 @@ await pagina.waitForFunction(() => document.getElementById('capa').classList.con
 await pagina.waitForTimeout(300);
 await comprobar('3. el enlace para cambiar el guion está en la mesa',
   pagina.evaluate(() => !!document.querySelector('.hito-en-mesa .guion-cambiar-guion')), true);
+/* El desplegable «Comunicar ▾» sigue abierto encima del guion: se cierra antes. */
+await pagina.evaluate(() => HitoMesa.cerrarPanelSiAbierto());
 await pagina.click('.hito-en-mesa .guion-cambiar-guion', { force: true });
 await pagina.waitForSelector('#capa:not(.oculto) .paso-guion .guion-fila');
 await pagina.fill('#capa .paso-guion .guion-fila[data-id="g1"] .guion-texto', 'Avisar a la tutoría (por iPasen)');

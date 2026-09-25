@@ -80,7 +80,9 @@
                pregunta: false, deOpcion: deOpcion || null,
                /* Fila 138: algo que hay que reunir, con su valor o su documento. */
                reunir: (g.reunir === 'documento' || g.reunir === 'dato') ? g.reunir : '',
-               obligatorio: !!g.obligatorio, valor: x.valor || '', documento: x.documento || '' };
+               obligatorio: !!g.obligatorio, valor: x.valor || '', documento: x.documento || '',
+               /* Fila 164: la receta del paso (sus detalles), si la lleva. */
+               receta: g.receta || null };
     }
     var lista = [], plegadas = [];
     (guionDelPaso || []).forEach(function (g) {

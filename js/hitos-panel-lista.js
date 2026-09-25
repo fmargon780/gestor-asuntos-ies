@@ -218,9 +218,11 @@ var HitosPanelLista = (function () {
         }).join('');
     var grandeDocs = '<section class="mesa-grande mesa-grande-docs mesa-docs" data-tarjeta="docs">' +
         '<div class="mesa-bloque-cabecera"><span class="mesa-grande-titulo">Documentos del hito' +
+          (window.HitoMesaDocumentos && HitoMesaDocumentos.cuentaTitulo
+            ? ' <span class="mesa-docs-cuenta">· ' + U.escapar(HitoMesaDocumentos.cuentaTitulo(h, hitos || [], nombresDeLaCarpeta)) + '</span>' : '') +
           (abierto && window.HitosAnadir ? HitosAnadir.botonHTML(a, h) : '') + '</span>' + volver + '</div>' +
         '<div class="mesa-seleccion oculto"></div>' +
-        (abierto || (h.documentos || []).length ? '<div class="hito-documentos">' + documentosHTML + '</div>' : '') +
+        (abierto || documentosHTML ? '<div class="hito-documentos">' + documentosHTML + '</div>' : '') +
         htmlRequisitos +
         (abierto ? '<div class="mesa-soltar">Suelta aquí un documento del ordenador: va a este hito</div>' : '') +
       '</section>';
