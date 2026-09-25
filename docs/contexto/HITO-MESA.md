@@ -131,14 +131,24 @@ La tabla de documentos, los gemelos, la selección y «Comunicar» funcionan com
   `HitosPanelLista.cambiarRama` (la misma pregunta de siempre si la rama de ahora tiene cosas apuntadas).
 - **Documentos** (`js/hito-mesa-documentos.js`): tabla de `.hito-documento[data-doc]` (ver «Tres tarjetas»). Los gemelos (`SIN SELLAR`, `.doc/.docx` con la misma clave: sin extensión, sin «SIN
   SELLAR» y sin código de registro) cuelgan debajo, de la carpeta aunque no estén apuntados. «viene del
-  hito N» si ya estaba en uno anterior. Con varios marcados, barra: Enviar por correo, Abrir para
-  imprimir (una pestaña cada uno), Mover a otro hito. Soltar un fichero del ordenador
+  hito N» si ya estaba en uno anterior. **«Enviar ▾»** de cada documento (25-sep-2026, fila 153,
+  docs/ENVIAR-DOCUMENTO-POR-SENECA.md): un menú (`FichaMenus.montar`), «Por correo» / «Por Séneca», que
+  llaman a `HitosComunicar.comunicarConDocumento(a, h, canal, nombre)` — lo mismo que «Comunicar ▾» de
+  la cabecera, pero con ese documento ya elegido: en Correo, ya adjunto; en Séneca (que no puede
+  enganchar ficheros desde la web), señalado en una línea propia del cuadro
+  (`#seneca-formulario .seneca-doc-adjuntar`, «Adjunta este documento en Séneca: … · Copiar el nombre»,
+  `CorreoNucleo.documentoSeneca()`). Al terminar se marca el primer paso del guion con `accion:
+  'comunicar'` de ese hito, igual que «Comunicar» de la cabecera (`Hitos.marcarGuionPorAccion`). Con
+  varios marcados, barra: Enviar por correo, Abrir para imprimir (una pestaña cada uno), Mover a otro
+  hito (sin cambios, siempre por correo). Soltar un fichero del ordenador
   (`Documentos.abrir(a, { hito, ficheroSoltado })`). El ⋯ de cada documento suma «Renombrar» y «Mover a
   otro hito» (`js/hitos-documento-menu.js`).
 - **Comunicar** (`js/hito-mesa-comunicar.js`): chips del tercero, sus tutores (`Datos.tutoresDe`) y los
   relacionados, premarcados según el responsable (tutor → tutor legal 1/2; relacionado → ellos; si no, el
   tercero); «Preparar correo» y «Mensaje de Séneca» llaman a `HitosComunicar.comunicar(a, h, canal, {
   correos, nombres, adjuntos })` (los adjuntos: los marcados en la tabla, o todos los del hito).
+  `HitosComunicar.comunicarConDocumento(a, h, canal, nombre)` es la misma función con un documento ya
+  elegido («Enviar ▾» de un documento, más arriba).
 
 ## El guion
 
@@ -211,9 +221,10 @@ ha traído. El borrador (296 modelos, 1.064 pasos) está en `biblioteca-centro.j
 generar ese fichero con `herramientas/cargar-biblioteca.mjs`, los guiones se perderían.
 
 Se comprueba con `pruebas/hito-mesa.mjs`, `pruebas/mesa-del-hito-enfocada.mjs`, `pruebas/mesa-tarjetas-que-se-abren.mjs`
-(a 1905×1000 y 1280×800; con `CAPTURAS=1`, fotos en `pruebas/capturas/`) y `pruebas/mesa-comunicar-del-paso-y-guion.mjs`
-(el «Comunicar» de un paso, visible con dos vías, marca el paso pulsado; y «✎ Cambiar el guion»). Las pruebas que abrían
-varios hitos seguidos cierran antes la mesa (`HitoMesa.cerrar()`).
+(a 1905×1000 y 1280×800; con `CAPTURAS=1`, fotos en `pruebas/capturas/`), `pruebas/mesa-comunicar-del-paso-y-guion.mjs`
+(el «Comunicar» de un paso, visible con dos vías, marca el paso pulsado; y «✎ Cambiar el guion») y
+`pruebas/enviar-documento-por-seneca.mjs` («Enviar ▾» de un documento, por correo o por Séneca, y el guion al
+terminar). Las pruebas que abrían varios hitos seguidos cierran antes la mesa (`HitoMesa.cerrar()`).
 
 ### Una sola lista: lo que hay que reunir, en el guion (25-sep-2026, fila 138, `docs/UNA-SOLA-LISTA-EN-EL-HITO.md`)
 
