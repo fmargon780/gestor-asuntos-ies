@@ -43,6 +43,8 @@ var SenecaCuadro = (function () {
     var quien = n().aQuien ? n().aQuien(a) : '';
 
     return '<div id="seneca-formulario">' +
+           '<div class="cuadro-cabecera-ruta"><span id="seneca-ruta-lugar"></span></div>' +
+           '<div id="seneca-ruta-en-linea" class="oculto"></div>' +
            '<div class="seneca-aviso-arriba">' +
              '<strong>En Séneca: Utilidades → Comunicaciones.</strong> ' +
              'Los destinatarios se marcan allí, en su lista' +
@@ -155,12 +157,22 @@ var SenecaCuadro = (function () {
 
     engancharPlantilla(a);
     engancharPasos(a);
+    engancharRuta(a);
 
     if (window.SenecaAyudante) {
       /* El enlace se queda a la vista; la explicación entra en el
          <details> cerrado (3.5, docs/SENECA-CUADRO-ANCHO.md). */
       SenecaAyudante.insertarEnlace($('seneca-ayudante-enlace'), $('seneca-ayudante-explica'));
     }
+  }
+
+  /* El botón «Ruta» en la cabecera del cuadro (fila 152,
+     docs/RUTA-QUE-NO-VA-A-BING.md, punto 3): misma función que en
+     js/correo-cuadro.js, no duplicada. */
+  function engancharRuta(a) {
+    if (!window.RutaCarpetas) return;
+    var interno = n()._interno || {};
+    RutaCarpetas.montarEnCuadro($('seneca-ruta-lugar'), $('seneca-ruta-en-linea'), a, interno.modoDelAsunto || 'abierto');
   }
 
   function engancharPlantilla(a) {
