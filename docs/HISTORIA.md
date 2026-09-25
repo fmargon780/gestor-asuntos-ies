@@ -5,6 +5,19 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 162: el estado sigue a los hitos
+
+`docs/ESTADO-SIGUE-A-LOS-HITOS.md`. Con el 3 de Secretaría sin marcar y el 4 en curso y nuestro, la
+cabecera decía «Paso 4 de 5»: `aQuienLeToca` dejaba ganar a un hito en curso de Administración.
+Ahora el actual es siempre el primero sin terminar. Decisiones:
+
+- La espera automática (responsable del paso que no es de Administración) no se guarda: se calcula
+  cada vez, con `auto: true`, y por eso no lleva «Ya ha llegado» ni la vigila `revisarLlegadas`.
+- La espera a mano de un hito que ya no es el actual se borra dentro de la propia escritura de
+  `hitos.json` (`Hitos.cambiar` → `limpiarEsperasViejas`), sin una segunda escritura ni depender de
+  quién haya cambiado el hito.
+- La prueba de la fila 104 que comprobaba «gana Administración» se ha dado la vuelta.
+
 ## 25-sep-2026 — Fila 164: las recetas de los pasos y todos los documentos en cada hito
 
 Segunda mitad de `docs/HITOS-ACCIONES-EN-EL-HITO.md` (puntos 3 y 4). Decisiones:

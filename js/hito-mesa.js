@@ -215,7 +215,10 @@ var HitoMesa = (function () {
       }).join('') + '</div>' +
       '<div class="mesa-titulo-fila">' +
         '<h3 class="mesa-titulo" title="' + (n ? 'Hito ' + n + ' de ' + numerados.length : 'Hito solo informativo') + '">' + U.escapar(h.titulo || '') + '</h3>' +
-        '<div class="mesa-etiquetas">' + estadoHTML +
+        '<div class="mesa-etiquetas">' +
+          /* Fila 162: «Paso actual», el mismo que en la lista y en la cabecera. */
+          (window.EstadoHito && EstadoHito.idActual && EstadoHito.idActual(hitos, ajustes) === h.id ? EstadoHito.etiquetaPasoActualHTML() : '') +
+          estadoHTML +
           '<button type="button" class="mesa-meta mesa-etq-plazo ' + plazo.clase + '">' + U.escapar(plazo.texto) + '</button>' +
           '<span class="mesa-meta-punto">·</span>' +
           '<button type="button" class="mesa-meta mesa-etq-resp">' + U.escapar(resp ? resp.texto : 'Sin responsable') + '</button>' +
@@ -278,7 +281,7 @@ var HitoMesa = (function () {
     var mas = cab.querySelector('.mesa-mas');
     var opcionesMas = [];
     /* Fila 129: dar por hechos los anteriores (js/estado-hito.js). */
-    if (window.EstadoHito && EstadoHito.puedeSituar(hitos, h.id)) opcionesMas.push({ texto: 'Estamos en este paso…', clase: 'mesa-situar', alPulsar: function () {
+    if (window.EstadoHito && EstadoHito.puedeSituar(hitos, h.id)) opcionesMas.push({ texto: 'Saltar a este paso…', clase: 'mesa-situar', alPulsar: function () {
       EstadoHito.situar(a, h.id, mas);
     } });
     opcionesMas.push({ texto: h.soloInformativo ? 'Pedírmelo a mí' : 'Dejarlo solo informativo', alPulsar: function () {

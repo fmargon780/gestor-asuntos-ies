@@ -79,11 +79,13 @@
     });
   }
 
-  /* Función pura. El hito actual: el primer hito visible sin terminar
-     (ni hecho ni "no aplica"), saltando los "solo informativo" y las
-     preguntas ya respondidas. Si hay otros en curso a la vez y alguno
-     es de Administración, gana Administración. Todos terminados: listo
-     para archivar, Administración. Sin hitos: `lado: null`.
+  /* Función pura. El hito actual: SIEMPRE el primer hito visible sin
+     terminar (ni hecho ni "no aplica"), saltando los "solo informativo"
+     y las preguntas ya respondidas (fila 162, docs/ESTADO-SIGUE-A-LOS-
+     HITOS.md: ya no «gana Administración» si hay otro en curso). Todos
+     terminados: listo para archivar, Administración. Sin hitos: `lado:
+     null`. «Esperando a…»: la puesta a mano en ese hito; si no hay, la
+     del responsable del paso cuando no es de Administración (`auto`).
      Devuelve { lado, quien, hito, desde, titulo, n, m, esperando,
      listo, sinHitos }. */
   function aQuienLeToca(hitos, ajustes, contexto) {
@@ -98,9 +100,12 @@
     if (!abiertos.length) {
       return { lado: 'administracion', quien: '', hito: null, listo: true, n: cuentan.length, m: cuentan.length, esperando: null };
     }
-    var candidatos = [abiertos[0]].concat(abiertos.slice(1).filter(function (h) { return h.estado === 'encurso'; }));
-    var h = candidatos.filter(function (x) { return ladoDeHito(x, ajustes) === 'administracion'; })[0] || candidatos[0];
+    var h = abiertos[0];
     var lado = ladoDeHito(h, ajustes);
+    var esperando = h.esperandoA
+      ? { a: h.esperandoA, nombre: nombreVisible(h.esperandoA, ajustes, contexto),
+          desde: h.esperandoDesde || '', motivo: h.esperandoMotivo || '' }
+      : esperaAutomatica(h, ajustes, contexto);
     return {
       lado: lado,
       quien: lado === 'terceros' ? nombreVisible(esperaDeHito(h), ajustes, contexto) : '',
@@ -109,11 +114,36 @@
       titulo: h.titulo || '',
       n: cuentan.indexOf(h) + 1,
       m: cuentan.length,
-      esperando: h.esperandoA
-        ? { a: h.esperandoA, nombre: nombreVisible(h.esperandoA, ajustes, contexto),
-            desde: h.esperandoDesde || '', motivo: h.esperandoMotivo || '' }
-        : null
+      esperando: esperando
     };
+  }
+
+  /* Fila 162: «Esperando a <responsable>» sale solo cuando el paso es de
+     alguien que no es de Administración (y no es una pregunta ni un
+     paso marcado «Nos toca»). No se guarda: es el paso. */
+  function esperaAutomatica(h, ajustes, contexto) {
+    if (!h.responsable || h.clase === 'decision' || h.toca === 'nos') return null;
+    if (esDeAdministracion(h.responsable, ajustes)) return null;
+    return { a: h.responsable, nombre: nombreVisible(h.responsable, ajustes, contexto),
+             desde: h.desde || '', motivo: 'Es el responsable de este paso', auto: true };
+  }
+
+  /* Fila 162: la espera puesta a mano vale solo mientras su hito sea el
+     actual. Función pura, sobre los datos de hitos.json: la quita de
+     cualquier otro hito. La llama Hitos.cambiar antes de guardar. */
+  function limpiarEsperasViejas(datos) {
+    Object.keys((datos && datos.porAsunto) || {}).forEach(function (k) {
+      var entrada = datos.porAsunto[k];
+      if (!entrada || !entrada.hitos) return;
+      var actual = aQuienLeToca(entrada.hitos, datos.ajustes).hito;
+      (function recorrer(lista) {
+        (lista || []).forEach(function (x) {
+          if (x.esperandoA && x.id !== actual) quitarEspera(x);
+          if (x.clase === 'decision') (x.opciones || []).forEach(function (o) { recorrer(o.hitos); });
+        });
+      })(entrada.hitos);
+    });
+    return datos;
   }
 
   /* Función pura. El texto del estado: «Paso N de M · título», «Listo
@@ -202,7 +232,8 @@
     ladoDelAsunto: ladoDelAsunto, ladoDeAsunto: ladoDeAsunto,
     textoDelEstado: textoDelEstado, nombreDeEspera: nombreVisible,
     situarLista: situarLista, situarEn: situarEn, quitarEspera: quitarEspera,
-    marcarAdministracion: marcarAdministracion, numerados: contables
+    marcarAdministracion: marcarAdministracion, numerados: contables,
+    limpiarEsperasViejas: limpiarEsperasViejas
   });
 
   /* ---------- la lista, al día sin releer en cada repintado ----------

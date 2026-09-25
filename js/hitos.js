@@ -221,6 +221,8 @@ var Hitos = (function () {
     var hacerlo = async function () {
       var actual = await leerParaCambiar(g);
       var nuevo = hacer(actual) || actual;
+      /* Fila 162: una espera a mano que ya no es del hito actual, fuera. */
+      if (Hitos.limpiarEsperasViejas) Hitos.limpiarEsperasViejas(nuevo);
       await Copias.guardar(g, FICHERO, nuevo);
       ultimoCambio = Date.now();
       vistosConDatos = Object.keys(nuevo.porAsunto || {}).length;

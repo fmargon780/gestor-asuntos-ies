@@ -19,8 +19,10 @@ Conviven cero sistemas: `ficha.situacion` se queda quieta en `asuntos.json` (no 
   «Hito N de M» de la mesa, donde un informativo sale sin número, «i ·»), «Listo para archivar»
   o «Sin hitos» (sin hitos → Administración). `App.ladoDe(a)` la llama con lo último leído.
 - **El hito actual** (`Hitos.aQuienLeToca`): el primer hito visible ni `hecho` ni `noaplica`,
-  saltando los `soloInformativo` y las preguntas respondidas; si hay otros `encurso` a la vez y
-  alguno es de Administración, gana. Pregunta sin responder: Administración.
+  saltando los `soloInformativo` y las preguntas respondidas. **Siempre ese** (fila 162,
+  `docs/ESTADO-SIGUE-A-LOS-HITOS.md`: ya no «gana Administración» si hay otro en curso). Pregunta
+  sin responder: Administración. Lleva la etiqueta fija «Paso actual» (`.etiqueta-paso-actual`)
+  en la lista de hitos y en la mesa.
 - **A quién le toca**, por este orden: `esperandoA` del hito (puesto a mano) → la marca del paso
   (`toca: 'nos' | 'espera'`, `tocaA`) → el responsable con `Hitos.esDeAdministracion(id,
   ajustes)`, que sigue siendo el ÚNICO sitio que dice quién es Administración (sin responsable,
@@ -36,7 +38,11 @@ Conviven cero sistemas: `ficha.situacion` se queda quieta en `asuntos.json` (no 
 - **«Esperando a…»** (`js/estado-hito.js`), en la cabecera de la ficha: a quién (misma lista) y
   un motivo. Se guarda en el hito actual (`esperandoA`, `esperandoDesde`, `esperandoMotivo`,
   `esperandoFicheros`: los ficheros que había en la carpeta), por `Hitos.cambiar`, nunca en la
-  ficha; solo uno a la vez. Se quita: al llegar un fichero nuevo a la carpeta
+  ficha; solo uno a la vez. **Vale solo mientras su hito sea el actual** (fila 162):
+  `Hitos.limpiarEsperasViejas`, dentro de cada `Hitos.cambiar`, la quita de cualquier otro hito.
+  **Sin espera a mano, sale sola la del responsable** del hito actual si no es de Administración
+  (ni «Nos toca», ni pregunta): `esperando.auto`, «Esperando a Secretaría», sin «Ya ha llegado»
+  ni se guarda (es el paso). Además, se quita: al llegar un fichero nuevo a la carpeta
   (`EstadoHito.revisarLlegadas`, al abrir la ficha y por `Gestor.alRefrescar` cada minuto como
   mucho, solo en los asuntos en espera; aviso verde con «Ir al asunto»), al marcar ese hito
   `hecho` o `noaplica` (`Hitos.marcar`), al situar el asunto, o a mano con «Ya ha llegado».
@@ -47,12 +53,13 @@ Conviven cero sistemas: `ficha.situacion` se queda quieta en `asuntos.json` (no 
   desplegable, con «Esperando a…» / «Ya ha llegado» al lado). Pulsarla abre la mesa de ese hito
   (`EstadoHito.abrirHito`). Con espera, `.marca-esperando`: «Esperando a Familia desde el 24-sep».
   La cabecera se pone al día sola por `Hitos.alCambiar` y `Hitos.alLeer` (nuevo: cada lectura de
-  `hitos.json` avisa), solo si cambia.
+  `hitos.json` avisa), solo si cambia (la firma incluye, desde la fila 162, quién espera y si es
+  automático: cambiar el responsable también la repinta).
 - **El filtro** de Asuntos abiertos filtra por montón (`App.FILTROS_MONTON`: nos toca, esperan a
   terceros, con «Esperando a…», listos para archivar, sin hitos); ordenar por «Paso del asunto»
   va por `n/m`.
-- **«Estamos en este paso»** (en la fila de cada hito y en la cabecera de la mesa, solo si hay
-  algo antes sin terminar): `Hitos.situarEn(clave, id)` → `Hitos.situarLista` (pura) da por
+- **«Saltar a este paso»** (antes «Estamos en este paso», fila 162; en la fila de cada hito y en
+  el ··· de la mesa, solo si hay algo antes sin terminar y no es el actual): `Hitos.situarEn(clave, id)` → `Hitos.situarLista` (pura) da por
   hechos, en una escritura, los visibles anteriores sin terminar (las preguntas se quedan como
   están; tras una sin responder no hay nada visible), con la nota «Dado por hecho al situar el
   asunto (<fecha>, <quién>)», y deja ese hito en curso. Aviso «Asunto en el paso N: <título>».
