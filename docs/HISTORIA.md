@@ -5,6 +5,21 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 141: repartir un PDF entre terceros
+
+`docs/REPARTIR-ENTRE-TERCEROS.md`. El caso: los cuestionarios de altas capacidades que manda cada
+colegio en un solo PDF. Ahora se reparten: un trozo por persona, cada uno en su asunto ya archivado,
+y el oficio se queda en el asunto del colegio. Decisiones:
+
+- El archivado es el de siempre (`App.cerrarAsunto`, con su índice y su índice del expediente), sin
+  su pregunta: `App.E.archivarSinPreguntar`, puesto solo mientras dura cada uno.
+- Lo leído en el texto del PDF manda sobre el orden; el resto de relacionados se asigna por orden a
+  los trozos que quedan.
+- El buscador de «otra persona» es una lista del alumnado dentro del propio desplegable (datalist):
+  así no se abre un segundo cuadro encima del de repartir.
+- `Carpetas.nombreLibreConSufijo` siempre pone «(2)»: para el oficio se mira antes si el nombre ya
+  existe.
+
 ## 25-sep-2026 — Fila 140: tiempo de tramitación por tipo
 
 `docs/TIEMPO-DE-TRAMITACION.md`. «Cuentas» ya daba la media y el máximo de días del total; ahora

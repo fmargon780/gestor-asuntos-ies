@@ -362,6 +362,31 @@ mentira compartido (`pruebas/navegador.mjs`): su `createWritable().write(...)` l
 verdad (un PDF); ahora usa `.arrayBuffer()`, como hace el navegador de verdad. No cambia nada
 para el texto plano que ya usaban el resto de pruebas.
 
+### Repartir un PDF entre terceros (25-sep-2026, fila 141, `docs/REPARTIR-ENTRE-TERCEROS.md`)
+
+En el menú de cada PDF de la ficha de un asunto ABIERTO (`js/ficha-documentos.js`), «Repartir entre
+terceros»: parte un PDF que junta papeles de varias personas (los cuestionarios de altas capacidades
+de un colegio, informes de tránsito…) y deja cada trozo en su propio asunto, ya archivado.
+
+- `js/repartir-nucleo.js` (`RepartirNucleo`, sin disco ni pantalla): proponer los trozos (las
+  páginas antes de la primera, «Se queda en este asunto»; páginas por trozo propuestas = las que
+  quedan entre los relacionados, con aviso ámbar si no es exacto), +1/−1 (los de debajo se
+  recolocan; lo que sobra, un trozo más sin asignar; ninguno en cero páginas), asignar por orden y
+  comparar nombres (sin tildes, en cualquier orden, «M.ª» = María; verde con el Nº escolar, el DNI o
+  nombre y dos apellidos; ámbar con nombre y primer apellido o dos posibles).
+- `js/repartir-pantalla.js` (`Repartir`): el cuadro (`U.preguntar` ancho, con «Cerrar»), miniaturas
+  perezosas con pdf.js, el desplegable de cada trozo (los relacionados, tachados si ya tienen trozo,
+  y «Se queda en este asunto»; debajo, un buscador de todo el alumnado que, si se usa, añade a esa
+  persona a los relacionados), el texto de cada página con pdf.js (si no hay, línea gris
+  «escaneado»), los tipos y el resumen en el mismo cuadro. Y el dato del tipo en Ajustes
+  (`repartirTipo`, `repartirTipoDocumento`; renombrar un tipo se los lleva, `js/tipos-nombre.js`).
+- `js/repartir-crear.js` (`RepartirCrear`): por persona, crea el asunto (fecha y registro del PDF
+  original, año académico de esa fecha, sin grupo), guarda su trozo (`PdfHerramientas.sacarPaginas`,
+  `Nombres.montarDocumento`), apunta «Viene de …» y lo archiva con `App.cerrarAsunto` sin su pregunta
+  (`App.E.archivarSinPreguntar`). En el origen: el PDF completo se queda; los trozos que se quedan,
+  como documentos propios; una nota con el reparto; y `repartos` en su ficha. Repetirlo sobre el
+  mismo PDF enseña lo hecho como «Hecho» y solo reintenta lo que falló.
+
 ### Hueco para el sello de Séneca y la firma del director (18-sep-2026, fila 57,
 docs/HUECO-PARA-SELLO-Y-FIRMA.md)
 

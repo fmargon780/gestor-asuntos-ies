@@ -247,6 +247,13 @@ tabla de ficheros), y la búsqueda es por palabras sueltas.
 Se comprueba con `pruebas/archivo-indice.mjs`, en navegador de verdad con el disco de mentira de
 `pruebas/navegador.mjs`, con los nueve escenarios del documento.
 
+### Archivar sin preguntar (fila 141)
+
+`App.E.archivarSinPreguntar = true` hace que `App.cerrarAsunto` no pida confirmación: solo lo usa
+«Repartir entre terceros» (`js/repartir-crear.js`), que archiva muchos de golpe ya confirmados en su
+resumen, y lo vuelve a poner a `false` al terminar cada uno. Todo lo demás del archivado (índice,
+ficha a su carpeta, índice del expediente) funciona igual.
+
 ### El índice del expediente (25-sep-2026, fila 137, `docs/INDICE-DEL-EXPEDIENTE.md`)
 
 `js/indice-expediente.js` (`IndiceExpediente`) hace `000 ÍNDICE DEL EXPEDIENTE.pdf` dentro de la

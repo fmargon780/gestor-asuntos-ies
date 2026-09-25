@@ -107,12 +107,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 140 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 141 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 141 | `docs/REPARTIR-ENTRE-TERCEROS.md` (repartir un PDF en trozos, un asunto archivado por persona) | PENDIENTE |
 | 142 | `docs/ALUMNADO-DESDE-LA-BD.md` (el alumnado, desde la base de datos de alumnado; acuerdo en `docs/ACUERDO-ALUMNADO.md`) | PENDIENTE |
 
 **La fila 140 está HECHA** (25-sep-2026): `docs/TIEMPO-DE-TRAMITACION.md`. Cuentas gana, por tipo,

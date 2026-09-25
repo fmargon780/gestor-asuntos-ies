@@ -103,7 +103,9 @@ App.cerrarAsunto = async function (a) {
       'guarda al lado con un (2) detrás.</p>'
     : '';
 
-  var confirmar = await U.preguntar('Archivar el asunto',
+  /* Fila 141: al repartir un PDF entre terceros se archivan muchos de
+     golpe, ya confirmados en su propio resumen (js/repartir-crear.js). */
+  var confirmar = App.E.archivarSinPreguntar ? true : await U.preguntar('Archivar el asunto',
     '<p>Se llevará la carpeta a:</p>' +
     '<div class="vista-previa"><div class="vista-nombre">' +
       U.escapar(App.E.archivo.name + ' / ' + categoria + ' / ' + tercero) +

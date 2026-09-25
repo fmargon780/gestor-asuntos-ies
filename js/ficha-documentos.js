@@ -181,6 +181,11 @@ var FichaDocumentos = (function () {
         enMenu.push(botonPdf('Ajustar tamaño',
           'Deja hueco arriba para el sello de Séneca y abajo para la firma', PrepararDocumento.abrir));
       }
+      /* Fila 141: repartir un PDF entre terceros, solo en un asunto abierto. */
+      if (window.Repartir && Repartir.puede(a)) {
+        enMenu.push(botonPdf('Repartir entre terceros',
+          'Partirlo en trozos, uno por persona, y dejar cada trozo en su propio asunto archivado', Repartir.abrir));
+      }
     }
 
     /* Borrar, con papelera (11-sep-2026): siempre el último del menú. */

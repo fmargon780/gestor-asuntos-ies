@@ -136,6 +136,12 @@ var TiposNombre = (function () {
     if (window.Campos) await App.enFila('campos.json', function () { return moverCampos(viejo, nuevo, r); });
     if (window.Plantillas) await App.enFila('plantillas.json', function () { return moverPlantillas(viejo, nuevo, r); });
     await App.enFila('recurrentes.json', function () { return moverRecurrentes(viejo, nuevo, r); });
+    /* Fila 141: los tipos que, al repartir un PDF, crean asuntos de este. */
+    var apuntan = (App.E.tipos || []).filter(function (t) { return t.repartirTipo === viejo; });
+    if (apuntan.length) {
+      apuntan.forEach(function (t) { t.repartirTipo = nuevo; });
+      try { await App.enFila(App.FICHERO_TIPOS, function () { return App.guardarTipos(); }); } catch (e) { /* se guarda con el nombre */ }
+    }
     return r;
   }
 

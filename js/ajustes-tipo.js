@@ -64,6 +64,8 @@ function construirSeccionDatos(tipo) {
   if (window.Reservados) b.cuerpo.appendChild(Reservados.filaDeTipo(tipo));
   /* «Conservar ___ años después de archivar» (fila 136, js/conservacion.js). */
   if (window.Conservacion) b.cuerpo.appendChild(Conservacion.filaDeTipo(tipo));
+  /* «Al repartir, crear asuntos de tipo…» (fila 141, js/repartir-pantalla.js). */
+  if (window.Repartir) b.cuerpo.appendChild(Repartir.filaDeTipo(tipo));
   var cambiar = document.createElement('button');
   cambiar.type = 'button';
   cambiar.className = 'boton';

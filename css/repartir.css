@@ -1,0 +1,19 @@
+/* Repartir un PDF entre terceros (fila 141, js/repartir-pantalla.js). */
+.repartir-arriba label { display: inline-flex; align-items: center; gap: 6px; margin-right: 16px; }
+.repartir-arriba .campo-plazo { width: 70px; }
+.repartir-lista { max-height: 55vh; overflow: auto; margin: 10px 0; border-top: 1px solid var(--linea); }
+.repartir-trozo { display: flex; gap: 12px; padding: 8px 4px; border-bottom: 1px solid var(--linea); align-items: flex-start; }
+.repartir-trozo.repartir-ambar { background: var(--ambar); }
+.repartir-trozo.repartir-verde { background: var(--verde); }
+.repartir-trozo.repartir-hecho { opacity: .6; }
+.repartir-minis { display: flex; gap: 4px; flex-wrap: wrap; max-width: 330px; }
+.repartir-mini { border: 1px solid var(--linea); background: var(--papel); }
+.repartir-datos { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 220px; }
+.repartir-datos .boton-chico { margin-left: 6px; }
+.repartir-marca { font-size: 12px; font-weight: 700; }
+.repartir-marca-verde { color: #1e7b45; }
+.repartir-marca-ambar { color: #9a6a00; }
+.repartir-abajo .campo { max-width: 360px; }
+.repartir-repetido { display: flex; gap: 6px; align-items: center; }
+.tipo-repartir-fila { margin-top: 10px; }
+.tipo-repartir-fila .campo { max-width: 320px; }
