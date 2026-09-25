@@ -200,6 +200,16 @@ cuadros comparten los mismos ids de siempre —`#correo-asunto`, `#correo-cuerpo
 `#correo-plantilla`, `#correo-otro`, `#correo-grupo`, `#correo-cco-caja`, `#adjuntos-lista`—, así
 que ninguna de esas pruebas tuvo que cambiar de selectores, solo de disposición).
 
+**El botón «Ruta» en la cabecera de los dos cuadros** (25-sep-2026, fila 152,
+docs/RUTA-QUE-NO-VA-A-BING.md, punto 3): arriba del todo, dentro de `#correo-formulario`/
+`#seneca-formulario` (`.cuadro-cabecera-ruta`), montado por `RutaCarpetas.montarEnCuadro` — misma
+función para los dos cuadros, no duplicada, con el modo (abierto/archivado) sacado de
+`CorreoNucleo._interno.modoDelAsunto`. Sale igual abierto desde la ficha o desde «Comunicar ▾» de
+la mesa del hito: los dos acaban en `CorreoNucleo.abrirCuadro`. Sin ruta apuntada, pide la ruta EN
+LÍNEA, en un bloque hermano (`#correo-ruta-en-linea`/`#seneca-ruta-en-linea`, nunca un segundo
+`U.preguntar`), sin perder «Para» ni lo escrito en el cuerpo. Se comprueba con
+`pruebas/copiar-ruta.mjs`.
+
 ### Mandar los documentos de un asunto por correo (24-sep-2026, fila 115,
 ### `docs/ENVIAR-DESDE-EL-ASUNTO.md`)
 
