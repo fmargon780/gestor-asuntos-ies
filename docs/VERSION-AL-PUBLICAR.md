@@ -52,3 +52,6 @@ publicación detrás de otra.
   que la hora se genera sola al publicar, no que se escribe a mano; el aviso de "si se edita a
   mano, sacarla del reloj de verdad" se queda, como red de seguridad.
 - `docs/HISTORIA.md`: cómo quedó montado, y si hizo falta volver atrás y por qué.
+
+**Ojo (25-sep-2026):** con `buildCommand` y sin marco, Vercel busca la web en `public/`. Hace falta
+`"outputDirectory": "."` en `vercel.json`; sin eso, todas las publicaciones fallaban.

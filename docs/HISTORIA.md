@@ -5,6 +5,13 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Arreglo: Vercel no publicaba desde la fila 139
+
+Desde la fila 76 (`buildCommand` que escribe la hora de la versión), Vercel buscaba la web en una
+carpeta `public` que no existe y cada publicación acababa en error («No Output Directory named
+"public"»): la última buena fue la de la fila 138. Arreglo: `"outputDirectory": "."` en
+`vercel.json` (la web está en la raíz del repositorio, como antes del `buildCommand`).
+
 ## 25-sep-2026 — Fila 142: el alumnado, desde la base de datos de alumnado
 
 `docs/ALUMNADO-DESDE-LA-BD.md` y el acuerdo `docs/ACUERDO-ALUMNADO.md`. El gestor consulta el
