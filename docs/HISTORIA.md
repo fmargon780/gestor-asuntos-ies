@@ -5,6 +5,23 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 142: el alumnado, desde la base de datos de alumnado
+
+`docs/ALUMNADO-DESDE-LA-BD.md` y el acuerdo `docs/ACUERDO-ALUMNADO.md`. El gestor consulta el
+resultado de la base de datos de alumnado (que limpia y cruza las listas de Séneca) en vez de
+preparar cada lista por su cuenta. Decisiones:
+
+- Todo en un módulo nuevo, `js/alumnado-bd.js`, enganchado con una llamada en cada sitio
+  (`js/datos-alumnado.js`, `js/ficha-tercero-alumno.js`, `js/tablas-datos.js`, `js/frescura.js`,
+  `App.pintarAjustes`), sin envolver nada.
+- La dirección va en `asuntos.json`, no en el navegador: es del centro. Nunca en el repositorio.
+- Lo que trae la base manda sobre el RegAlum alumno a alumno; lo que no trae, sigue del RegAlum.
+  Con un fichero que no cumple el acuerdo (`acuerdo` distinto de 1, o alumnos sin Nº escolar), se
+  ignora entero: mejor el RegAlum que medio fichero.
+- La NEAE, solo «Sí» o nada: es dato de salud.
+- La tabla «ALUMNADO BD» reutiliza el camino de las tablas de datos: los informes futuros salen de ahí.
+- Prueba `pruebas/alumnado-desde-la-bd.mjs`, con tres alumnos inventados.
+
 ## 25-sep-2026 — Fila 141: repartir un PDF entre terceros
 
 `docs/REPARTIR-ENTRE-TERCEROS.md`. El caso: los cuestionarios de altas capacidades que manda cada

@@ -76,15 +76,22 @@
      de este curso. Al que ya se fue no se le ofrece ninguno: su último
      grupo es de otro año y meterlo en el nombre de una carpeta de hoy
      sería mentir. */
+  function contarMatriculados(lista) {
+    return lista.filter(function (p) { return p.matriculado; }).length;
+  }
+
   async function cargarAlumnado(dirDatos) {
     if (I.CACHE.ALUMNADO) return I.CACHE.ALUMNADO;
     var fichero = await ficheroQueEmpiezaPor(dirDatos, 'RegAlum');
     if (!fichero) {
       var sueltos = [];
-      var soloSolicitantes = await anadirSolicitantes(dirDatos, sueltos, null);
+      /* Fila 142: el alumnado de la base de datos, si hay copia válida. */
+      var idsSueltos = {};
+      var bdSueltos = window.AlumnadoBD ? await AlumnadoBD.unir(sueltos, idsSueltos) : null;
+      var soloSolicitantes = await anadirSolicitantes(dirDatos, sueltos, bdSueltos ? idsSueltos : null);
       I.CACHE.ALUMNADO = { lista: sueltos, fichero: null, ano: 0, curso: '',
                          sinAnos: false, columnas: {}, faltan: [], cabecera: [],
-                         matriculados: 0, solicitantes: soloSolicitantes };
+                         matriculados: contarMatriculados(sueltos), solicitantes: soloSolicitantes, bd: bdSueltos };
       return I.CACHE.ALUMNADO;
     }
 
@@ -92,10 +99,12 @@
     var t = I.aTabla(texto);
     if (!t.filas.length) {
       var vacios = [];
-      var soloSol = await anadirSolicitantes(dirDatos, vacios, null);
+      var idsVacios = {};
+      var bdVacios = window.AlumnadoBD ? await AlumnadoBD.unir(vacios, idsVacios) : null;
+      var soloSol = await anadirSolicitantes(dirDatos, vacios, bdVacios ? idsVacios : null);
       I.CACHE.ALUMNADO = { lista: vacios, fichero: fichero.nombre, ano: 0, curso: '',
                          sinAnos: false, columnas: {}, faltan: [], cabecera: [],
-                         matriculados: 0, solicitantes: soloSol };
+                         matriculados: contarMatriculados(vacios), solicitantes: soloSol, bd: bdVacios };
       return I.CACHE.ALUMNADO;
     }
 
@@ -189,8 +198,10 @@
     var matriculados = 0;
     for (var i = 0; i < lista.length; i++) {
       lista[i].busca = U.normalizar(lista[i].nombre + ' ' + lista[i].id);
-      if (lista[i].matriculado) matriculados++;
     }
+    /* Fila 142: lo que traiga la base de datos de alumnado manda. */
+    var bd = window.AlumnadoBD ? await AlumnadoBD.unir(lista, porId) : null;
+    matriculados = contarMatriculados(lista);
     var solicitantes = await anadirSolicitantes(dirDatos, lista, porId);
 
     I.CACHE.ALUMNADO = {
@@ -198,7 +209,7 @@
       curso: sinAnos ? U.cursoActual() : U.cursoDeAno(anoUltimo),
       sinAnos: sinAnos, columnas: columnas, faltan: faltan,
       cabecera: cab.map(function (x) { return String(x).trim(); }),
-      matriculados: matriculados, solicitantes: solicitantes
+      matriculados: matriculados, solicitantes: solicitantes, bd: bd
     };
     return I.CACHE.ALUMNADO;
   }

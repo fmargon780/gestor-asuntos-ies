@@ -62,6 +62,15 @@ para ir tachando.
       lista). Solo pdf.js va como módulo (`import()`); si algún día pdf-lib hiciera lo mismo, el
       cambio de `<script>` a `import()` en `js/pdf-herramientas.js` sería igual que el que ya se
       hizo para pdf.js.
+- [ ] **La base de datos de alumnado, con la dirección de verdad (fila 142, 25-sep-2026,
+      `docs/ALUMNADO-DESDE-LA-BD.md`).** Las pruebas usan alumnos inventados y una dirección de
+      mentira. Pasos:
+      1. En la base de datos de alumnado, copiar la dirección que da, **entera** (con su `?k=`).
+      2. En el gestor, Ajustes → El centro → «Base de datos de alumnado»: pegarla y pulsar «Probar».
+         Tiene que decir cuántos alumnos trae y de qué fecha. Si dice que falla, no guardar.
+      3. Pulsar «Guardar». Luego, Ajustes → Mantenimiento → «Traer el alumnado ahora».
+      4. Abrir la ficha de un alumno → «Ver todo»: debe salir la tarjeta «Datos académicos», con la
+         fecha al pie. Y el mismo alumno, en el otro ordenador, igual.
 
 ## Por qué esta lista y no una prueba automática
 

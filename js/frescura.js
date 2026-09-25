@@ -120,7 +120,18 @@
 
   /* ---------- la fecha del fichero ---------- */
 
+  /* Fila 142: si la copia de la base de datos de alumnado es más
+     reciente que el RegAlum, cuenta su fecha `generado`. */
   async function mirarElFichero() {
+    var r = await mirarElRegAlum();
+    var bd = null;
+    try { bd = window.AlumnadoBD ? await AlumnadoBD.fechaGenerado() : null; } catch (e) { bd = null; }
+    if (!bd || (!r.falta && r.cuando >= bd)) return r;
+    var dias = Math.floor((Date.now() - bd.getTime()) / 86400000);
+    return { falta: false, nombre: 'la base de datos de alumnado', cuando: bd, dias: dias < 0 ? 0 : dias };
+  }
+
+  async function mirarElRegAlum() {
     var g = window.Gestor && window.Gestor.carpetaGestor();
     if (!g) return { falta: true };
     var lista = [];

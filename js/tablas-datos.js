@@ -87,6 +87,8 @@ var TablasDatos = (function () {
         } catch (e) { salida.errores.push({ fichero: f2, motivo: U.mensajeDeError(e) }); }
       }
     }
+    /* Fila 142: la tabla «ALUMNADO BD» (unida por Nº escolar). */
+    if (window.AlumnadoBD) { try { await AlumnadoBD.comoTabla(salida); } catch (e) { salida.errores.push({ fichero: 'ALUMNADO-BD.json', motivo: U.mensajeDeError(e) }); } }
     CACHE = salida;
     return salida;
   }
@@ -108,6 +110,7 @@ var TablasDatos = (function () {
   /* Con el documento entero, por sus dígitos; si solo se tienen los 4
      últimos caracteres, por esos 4 y el nombre normalizado. */
   function esDeLaPersona(fila, persona) {
+    if (fila.idEscolar) return !!persona && String(persona.idEscolar || persona.id || '').trim() === fila.idEscolar;
     var doc = String((persona && (persona.documento || persona.dni)) || '');
     var clave = L.clave(doc);
     if (clave.length > 4) return fila.clave === clave;

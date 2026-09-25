@@ -522,4 +522,5 @@ App.pintarAjustes = async function () {
   if (window.TiposOrgano) TiposOrgano.pintarAjustes();
   if (typeof App.pintarAjustesCentro === 'function') await App.pintarAjustesCentro();
   if (typeof App.pintarAjustesMantenimiento === 'function') await App.pintarAjustesMantenimiento();
+  if (window.AlumnadoBD) AlumnadoBD.pintarAjustes();
 };

@@ -248,6 +248,8 @@ var FichaTerceroAlumno = (function () {
         otros.innerHTML = '<div class="vt-tarjeta-titulo">Otros datos de la familia</div>' + filasHtml(otrosFamilia);
         caja.appendChild(otros);
       }
+      /* Fila 142: los datos académicos de la base de datos de alumnado. */
+      if (window.AlumnadoBD) { var academica = AlumnadoBD.tarjetaAcademica(persona); if (academica) caja.appendChild(academica); }
 
       var copiar = raiz.querySelector('#vt-copiar-todo');
       if (copiar) copiar.onclick = function () {

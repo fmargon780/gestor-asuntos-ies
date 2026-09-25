@@ -506,3 +506,26 @@ llamado desde `App.buscarPersonas` y `App.verFicha` de `js/archivo-personas.js`,
   categoría + Nº o nombre), en todas las categorías.
 
 Se comprueba con `pruebas/personas-familias.mjs` (sin navegador).
+
+### El alumnado, desde la base de datos de alumnado (25-sep-2026, fila 142, `docs/ALUMNADO-DESDE-LA-BD.md`)
+
+El acuerdo entre las dos aplicaciones está en `docs/ACUERDO-ALUMNADO.md`. Todo en `js/alumnado-bd.js`:
+
+- **La dirección** (la de la base de datos, con `?k=`) se pega en Ajustes › El centro › «Base de
+  datos de alumnado» (junto a «Ficheros de datos»), con «Guardar» y «Probar». Se guarda en
+  `asuntos.json` (`ajustesAlumnadoBD.url`): es del centro, vale para los dos ordenadores. Sin `?k=`
+  o sin `https://`, se rechaza sin llamar.
+- **Traer**: al entrar (una vez al día, apuntado en `localStorage` `gestor-alumnado-bd-traido`) y con
+  «Traer el alumnado ahora» en Mantenimiento. Lo recibido se valida (`acuerdo: 1`, todos con
+  `idEscolar`) y va a `_GESTOR/datos/ALUMNADO-BD.json` por `ColaGuardado`. Si falla, se sigue con la
+  última copia; ámbar (`U.accesorio`) una sola vez por sesión en la vuelta diaria.
+- **Quién manda**: `js/datos-alumnado.js` llama a `AlumnadoBD.unir(lista, porId)` antes de los
+  solicitantes. Con copia válida, para cada alumno que traiga (por Nº escolar): nombre, matrícula y
+  unidad, fecha de nacimiento, documento y contacto. El que no está en el RegAlum se añade. Sin copia
+  válida, todo como antes. La persona lleva `bd` (lo recibido) y `bdGenerado`.
+- **Ficha**: tarjeta «Datos académicos» en «Ver todo» del alumno (unidad, repeticiones, PIL,
+  pendientes, materias no superadas, NEAE solo «Sí» o nada) con la fecha al pie. Sin copia, no sale.
+- **Plantillas**: tabla «ALUMNADO BD» en `js/tablas-datos.js` (`{{DATO ALUMNADO BD: Unidad}}`…), con
+  sus filas unidas por `idEscolar` en vez de por DNI.
+- **Frescura**: `js/frescura.js` usa la fecha `generado` de la copia si es más reciente que el RegAlum.
+

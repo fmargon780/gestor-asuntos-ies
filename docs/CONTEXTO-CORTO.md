@@ -74,14 +74,14 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
   sueltas también en documentos, registro de Séneca, ficha y notas.
 - Personas (Alumnado): matriculados primero, antiguos plegados; busca por padre, madre o tutor;
-  hermanos en la ficha.
+  hermanos en la ficha. Manda la copia de la BD de alumnado, si la hay («Datos académicos»).
 - Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
   Renombrar un tipo se lleva su guía; cambiarle el tipo, la ofrece.
 - Nombre comercial de empresas; editar datos de un tercero dado de alta a mano.
 - Guías del procedimiento por tipo, con preguntas dentro de las respuestas sin límite, y su mapa
   (dibujo de la guía entera; en un asunto, con el camino elegido resaltado). Se escriben en
   acordeón: un paso abierto a la vez.
-- Panel lateral de lectura; tablón a la vista. Parada al crear un duplicado; pantalla "Duplicados".
+- Panel lateral de lectura; tablón a la vista. Aviso de duplicado; pantalla "Duplicados".
 - Correo y mensaje de Séneca: se prepara; el correo se envía de verdad (Apps Script, con
   confirmación) y nunca dos veces.
 - "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; con
@@ -104,9 +104,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   el cargo en su fecha y «el/la alumno/a» en masculino o femenino según el sexo de cada persona.
 - Tablas de datos (tutorías de Séneca, CSV/Excel) unidas por DNI, con huecos; lo que falta, en amarillo. Certificado de función tutorial
   como el del centro; renuncia a la Junta Electoral, en su hito.
-- Copias diarias (caducan a los 90 días), detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable con los nombres ya usados. Un borrado (tipo,
+- Copias diarias (90 días), detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable de nombres. Un borrado (tipo,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
-- Pruebas automáticas en cada subida. Escape y salida siempre.
+- Pruebas automáticas en cada subida.
 - Copia sin internet (`file://`): se actualiza sola; si no puede o no lo comprueba, franja fija arriba; cada 30 min.
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
   bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa): una sola lista, el guion
@@ -124,7 +124,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Crear, reabrir o editar deja en la ficha; Volver regresa a la pantalla de origen, a su altura.
 - Al archivar, la ficha baja a su carpeta (al reabrir, vuelve) y se hace el índice del expediente
   (PDF numerado; también desde el menú de la ficha).
-- Ficha del asunto: foto del contacto del tercero; cabecera fija al bajar.
+- Ficha del asunto: foto del tercero; cabecera fija al bajar.
 
 ## 6. Reglas de código que no se pueden olvidar
 

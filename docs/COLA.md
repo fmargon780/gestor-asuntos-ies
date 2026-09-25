@@ -107,12 +107,19 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 141 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 142 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 142 | `docs/ALUMNADO-DESDE-LA-BD.md` (el alumnado, desde la base de datos de alumnado; acuerdo en `docs/ACUERDO-ALUMNADO.md`) | PENDIENTE |
+
+**La fila 142 está HECHA** (25-sep-2026): `docs/ALUMNADO-DESDE-LA-BD.md`. Bloque «Base de datos
+de alumnado» en Ajustes › El centro (pegar la dirección con su `?k=`, Guardar, Probar) y «Traer el
+alumnado ahora» en Mantenimiento; se trae también al entrar, una vez al día, a
+`_GESTOR/datos/ALUMNADO-BD.json`. Con copia válida, sus datos mandan sobre el RegAlum; tarjeta «Datos
+académicos» en «Ver todo» del alumno; tabla «ALUMNADO BD» para los huecos; la frescura mira su
+fecha (`js/alumnado-bd.js`). Prueba `pruebas/alumnado-desde-la-bd.mjs` (alumnos inventados).
+Falta que Francisco pegue la dirección de verdad (`docs/COMPROBAR-A-MANO.md`). Versión escrita: `25-sep-2026 · 02:39`.
 
 **La fila 141 está HECHA** (25-sep-2026): `docs/REPARTIR-ENTRE-TERCEROS.md`. En el menú de un PDF de
 un asunto abierto, «Repartir entre terceros»: lo parte en trozos (con miniaturas, +1/−1 y el nombre
