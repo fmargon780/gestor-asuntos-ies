@@ -5,6 +5,10 @@ necesario y Francisco las corrige con el uso. **Sube directamente a `main`, sin 
 petición de cambios.** Cambios quirúrgicos, sin leer el repositorio entero, y una sola pasada de
 pruebas al final.
 
+> **Corregido el 25-sep-2026 con Francisco:** no se crean tipos de asunto ni campos, y no se
+> cambia el nombre de la Consejería. Si la descripción de esta fila en `docs/COLA.md` dice otra
+> cosa, manda este documento.
+
 Lee antes `docs/CONTEXTO.md`, `docs/contexto/DOCUMENTOS-PDF.md`,
 `docs/contexto/CORREO-Y-SENECA.md` y `docs/PLANTILLAS-DEL-CENTRO.md` (fila 83: formato de los
 `.md`, el script y el botón «Cargar las plantillas del centro»).
@@ -61,53 +65,37 @@ dos veces. Quítales la primera línea de saludo («Buenos días…») y el cier
 
 Las plantillas ya cargadas en `_GESTOR` no se tocan (el botón no pisa): basta con el repositorio.
 
-## Parte 4 · Tipos y campos nuevos en la biblioteca del centro
+## Parte 4 · A qué tipo va cada plantilla (no se crea nada)
 
-En `datos-biblioteca/biblioteca-centro.json`, sin tocar lo que ya hay:
+Cada plantilla lleva en su cabecera la categoría y el tipo de asunto **que ya existen** en la
+biblioteca del centro (comprobado contra `datos-biblioteca/biblioteca-centro.json` el 25-sep-2026).
+**No se crean tipos de asunto, ni campos, ni se toca la biblioteca.** Tampoco se enlaza ninguna
+plantilla a un hito concreto: salen en «Generar documento ▾» de los hitos de su tipo, como las que
+ya había. Si al cargar alguna no encuentra su tipo, no se inventa: se apunta en
+`docs/DATOS-QUE-FALTAN-EN-PLANTILLAS.md`.
 
-- **Tipos nuevos** (con nombre corto y largo, como los demás):
-
-  | Categoría | Tipo (corto) | Nombre largo | Quién lo encarga |
-  |---|---|---|---|
-  | ALUMNADO | JUSTIFICANTE ASISTENCIA | Justificante de asistencia de la familia al centro | Secretaría |
-  | PERSONAL | AUTORIZACION | Autorización de la Dirección a una persona del centro | Dirección |
-  | OTROS | OFERTA EDUCATIVA | Oferta educativa: materias de diseño propio y proyectos | Dirección |
-  | OTROS | CERTIFICADO CENTRO | Certificado sobre datos del propio centro | Secretaría |
-
-  Cada uno con una guía mínima de tres pasos, como los tipos sencillos que ya hay: preparar el
-  documento, firma (los hitos «Firma de Secretaría» o «Visto bueno de Dirección» de la fila 159,
-  según el firmante de su plantilla) y enviar.
-- **Campos por tipo**: los de la sección 4 de `docs/DATOS-QUE-FALTAN-EN-PLANTILLAS.md`, todos de
-  texto salvo los que empiezan por «Fecha» o «Día» (fecha). Con el nombre **exacto** que usa la
-  plantilla (lo de entre paréntesis forma parte del nombre).
-- Sube `version` de la biblioteca, para que «Cargar la biblioteca del centro» los traiga.
-
-## Parte 5 · La Consejería por defecto
-
-`{{CONSEJERIA}}` vale por defecto «Consejería de Educación». Cambia **solo el valor por defecto**
-a «Consejería de Desarrollo Educativo y Formación Profesional». Lo que el centro tenga ya
-guardado en Ajustes no se toca.
+Los datos que la plantilla pide con `{campo:…}` y que el tipo no tiene los pregunta la aplicación
+al generar. Eso es lo buscado por ahora.
 
 ## Qué no se hace
 
-- Nada de la sección 1, 2, 3 y 5 de `docs/DATOS-QUE-FALTAN-EN-PLANTILLAS.md` salvo lo dicho aquí:
-  son decisiones de Francisco, pendientes.
+- Nada de `docs/DATOS-QUE-FALTAN-EN-PLANTILLAS.md`: son decisiones de Francisco, pendientes.
+- No se cambia el nombre de la Consejería: «Consejería de Educación» es el correcto.
 - No se cambia el texto de las plantillas que ya existían, salvo la Parte 3.
 
 ## Ficheros que se tocan
 
 `plantillas/` (50 `.md` nuevos, los de `generar.py`, sus `.docx`, `indice.json` y los 4 correos de la Parte 3),
 `scripts/hacer-plantillas.mjs`, `js/plantillas-centro.js`, el módulo del cuadro de Séneca y el
-editor de plantillas de Ajustes (búscalos en `docs/contexto/CORREO-Y-SENECA.md`), el fichero de
-los valores por defecto de `plantillas.json` (donde viva `CONSEJERIA`),
-`datos-biblioteca/biblioteca-centro.json`, `pruebas/plantillas-del-centro.mjs`.
+editor de plantillas de Ajustes (búscalos en `docs/contexto/CORREO-Y-SENECA.md`) y
+`pruebas/plantillas-del-centro.mjs`.
 
 ## Al terminar
 
 - `docs/CONTEXTO-CORTO.md`, sección 5: la línea de las plantillas dice que el centro tiene sus
   plantillas de documento y de correo (con texto propio para Séneca), sacadas de los documentos
-  del compañero; y en la sección 8, «Cargar la biblioteca» y «Cargar plantillas» otra vez.
+  del compañero; y en la sección 8, «Cargar plantillas» otra vez.
 - `docs/contexto/CORREO-Y-SENECA.md` y `docs/contexto/DOCUMENTOS-PDF.md`.
 - `docs/HISTORIA.md`: una entrada con fecha.
-- Mensaje final a Francisco: que pulse, en Ajustes › Mantenimiento, «Cargar la biblioteca del
-  centro» y después «Cargar las plantillas del centro».
+- Mensaje final a Francisco: que pulse, en Ajustes › Mantenimiento, «Cargar las plantillas del
+  centro».

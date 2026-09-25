@@ -1,8 +1,8 @@
 # Fila 171 · Un documento para cada relacionado (certificados de actividad extraescolar)
 
 Acordado con Francisco el 25-sep-2026. **Va después de la fila 170**, que trae la plantilla
-«Participación del profesorado en actividad extraescolar» (OTROS · ACTIVIDAD EXTRAESCOLAR) y los
-campos Actividad, Lugar, Fechas y Horas de ese tipo. **Sube directamente a `main`, sin abrir
+«Participación del profesorado en actividad extraescolar» (OTROS · ACTIVIDAD EXTRAESCOLAR), que
+pide Actividad, Lugar, Fechas y Horas (la aplicación los pregunta si el tipo no los tiene). **Sube directamente a `main`, sin abrir
 ninguna petición de cambios.** Cambios quirúrgicos, sin leer el repositorio entero, y una sola
 pasada de pruebas al final.
 
