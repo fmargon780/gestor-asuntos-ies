@@ -163,7 +163,25 @@ await comprobar('4. en un hito sin plantillas sale «Buscar otra plantilla…»'
 await pagina.click('.hito-en-mesa .mesa-buscar-plantilla');
 await pagina.fill('.hito-en-mesa .plantilla-buscar-campo', 'salida');
 await comprobar('4. encuentra una de otro tipo', pagina.locator('.hito-en-mesa .plantilla-buscar-opcion').evaluateAll(b => b.map(x => x.dataset.id)), ['pd-otra']);
-await pagina.click('.hito-en-mesa .plantilla-buscar-opcion');
+/* Fila 170: cargar las 64 plantillas del centro (parte 3) deja trabajo de
+   fondo que puede repintar la mesa justo aquí y llevarse la opción; si
+   pasa, se vuelve a abrir el desplegable y a buscar. */
+for (let intento = 0; ; intento++) {
+  try {
+    if (!(await pagina.locator('.hito-en-mesa .mesa-panel-generar:not(.oculto)').count())) {
+      await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="generar"]');
+    }
+    if (!(await pagina.locator('.hito-en-mesa .plantilla-buscar-campo').count())) {
+      await pagina.click('.hito-en-mesa .mesa-buscar-plantilla');
+      await pagina.fill('.hito-en-mesa .plantilla-buscar-campo', 'salida');
+    }
+    await pagina.click('.hito-en-mesa .plantilla-buscar-opcion', { timeout: 5000 });
+    break;
+  } catch (e) {
+    if (intento >= 3) throw e;
+    await pagina.waitForTimeout(500);
+  }
+}
 await pagina.waitForTimeout(800);
 const r4 = await pagina.evaluate(async (nombre) => {
   const h = (await Hitos.hitosDe(nombre)).filter(x => x.id === 'b2')[0];
