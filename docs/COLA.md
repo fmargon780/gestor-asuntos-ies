@@ -112,7 +112,7 @@ Las filas 1 a 142 y la 144 están **HECHAS**. Sus documentos siguen en `docs/`, 
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 145 | `docs/MESA-DEL-HITO-ENFOCADA.md` (la mesa del hito, enfocada: el guion manda, dos zonas, «Generar documento ▾» y «Comunicar ▾» en la cabecera) | PENDIENTE |
+| 145 | `docs/MESA-DEL-HITO-ENFOCADA.md` (la mesa del hito, enfocada: el guion manda, dos zonas, «Generar documento ▾» y «Comunicar ▾» en la cabecera) | EN CURSO (25-sep-2026) |
 
 **La fila 144 está HECHA** (25-sep-2026): `docs/ALUMNADO-BD-DESDE-DRIVE.md`. Fuera la dirección
 web de la fila 142. En Ajustes › El centro, «Carpeta de la base de datos de alumnado» (se señala la
