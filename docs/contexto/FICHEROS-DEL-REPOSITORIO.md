@@ -47,7 +47,7 @@ de `App` va después del fichero que lo define.
 | `js/hitos-normativa.js` | El bloque "Normativa" de un paso o de un hito (fila 79): el editor de referencias y la lista de solo lectura, con la dirección base del sistema de normativa en caché |
 | `js/guias-biblioteca.js` | La pintura de la biblioteca de hitos (fila 79): el panel "+ Traer de la biblioteca", "Guardar en la biblioteca" de cada paso, la comparación campo a campo, el aviso de los demás tipos y el bloque de Ajustes → El centro |
 | `js/guias-requisitos.js` | La vieja sección "Lo que hay que reunir" del editor de un paso (fila 59). Desde la fila 138 ya no se pinta: es la casilla «Hay que reunirlo» del guion (`js/guias-guion.js`) |
-| `js/guias-comunicacion.js` | La sección "Comunicación de este paso" del editor de un paso (`GuiasComunicacion.bloqueHTML`/`leer`/`enganchar`, fila 60, aparte de `js/guias.js`); reutiliza el campo de texto con "Insertar hueco" de `js/plantillas-ajustes.js` |
+| `js/guias-comunicacion.js` | La sección "Comunicación de este paso" del editor de un paso (`GuiasComunicacion.bloqueHTML`/`leer`/`enganchar`, fila 60, aparte de `js/guias.js`); reutiliza el HTML del campo de texto con "Insertar hueco" de `js/plantillas-ajustes.js` (`campoDeTextoHTML`); desde la fila 158 engancha el botón con `HuecosBuscador.montar`, buscando botón y campos dentro de `raiz` (se engancha antes de que el paso esté en la página) |
 | `js/guias-documentos.js` | «Documentos de este paso» (fila 102): qué plantillas de documento van con un paso de la guía o un modelo de la biblioteca (`plantillasDocumento`); cargado justo antes de `js/guias.js` |
 | `js/datos.js` | Lee los CSV; el nombre comercial y las columnas leídas por su título; `Datos.resumenDeTercero` monta la línea "Datos y contacto" |
 | `js/datos-alumnado.js` | El alumnado (RegAlum de Séneca) y los solicitantes dados de alta a mano (fila 133, sacado de `js/datos.js`); desde la fila 142 llama a `AlumnadoBD.unir` |
@@ -275,6 +275,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/guia-en-acordeon.mjs` | Prueba del editor de la guía en acordeón (fila 122) |
 | `pruebas/opciones.mjs` | Prueba de las preguntas con opciones, con el caso de la factura |
 | `pruebas/registro.mjs` | Prueba de registrar un documento en un paso, sin nombrarlo dos veces |
+| `pruebas/insertar-hueco-en-el-paso.mjs` | Prueba (fila 158): «Insertar hueco» de «Comunicación de este paso» abre el buscador y mete el hueco, en Correo y Séneca, en un paso normal y en uno de una pregunta |
 | `pruebas/word-dentro-de-la-app.mjs` | Prueba (fila 155): el cuadro de lo que falta antes de guardar (y «Cancelar» sin nada), el Word dentro de la aplicación, «Guardar PDF» en la carpeta, un .docx de la ficha sin `window.open` y otro fichero bajado con su nombre |
 | `pruebas/estado-sigue-a-los-hitos.mjs` | Prueba (fila 162): el caso de Francisco (paso 3 de Secretaría, paso 4 en curso nuestro): «Paso 3 de 5» con espera automática a Secretaría, la espera a mano que se quita al cambiar de paso, «Paso actual» y «Saltar a este paso», y la cabecera al día sola |
 | `pruebas/hitos-recetas.mjs` | Prueba (navegador de verdad, fila 164): la receta de comunicar (cuadro con su vía y plantilla, marca ese paso), las de generar y registrar en sus menús, el editor de la receta y los documentos de otros hitos en la mesa |

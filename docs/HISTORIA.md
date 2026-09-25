@@ -5,6 +5,14 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 158: «Insertar hueco» en la comunicación de un paso
+
+`docs/INSERTAR-HUECO-EN-EL-PASO.md`. `GuiasComunicacion.enganchar` buscaba el botón y el texto con
+`document.getElementById` antes de que el recuadro del paso estuviera en la página: daba `null` y el
+botón no hacía nada. Ahora los busca dentro de `raiz` y llama a `HuecosBuscador.montar` directo. Los
+otros dos usos de `engancharCampoDeTexto` (el cuadro de una plantilla y el editor en línea de la fila
+151) ya enganchan con el cuadro en la página. La prueba nueva falla sin el arreglo.
+
 ## 25-sep-2026 — Fila 157: «Actualizar ahora», sin carrera con la publicación
 
 `docs/COPIA-ACTUALIZAR-SIN-CARRERA.md`. La franja guardaba la lista de ficheros de cuando se pintó;
