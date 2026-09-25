@@ -26,7 +26,8 @@ faltando.
 - **Se ve, no se edita.** Lo pinta docx-preview (`js/lib/docx-preview.min.js`, Apache-2.0, con
   `js/lib/jszip.min.js`, MIT o GPL-3.0), en páginas (`section.docx`). Un Word sin tamaño ni márgenes
   (las plantillas del centro no los traen) sale en A4 con 2,5 cm arriba y abajo y 3 cm a los lados.
-  «Guardar cambios» (corregirlo dentro de la aplicación) está BLOQUEADO: fila 165 de `docs/COLA.md`.
+  «Guardar cambios» (corregirlo dentro de la aplicación) está DESCARTADO con Francisco (fila 165 de
+  `docs/COLA.md`, y su apartado «Descartado»): para corregir, se cambia la plantilla o el dato y se genera otra vez.
 - **«Guardar PDF»**: cada página, como imagen a 200 ppp (`js/lib/html2canvas.min.js`, MIT) en JPEG,
   en un PDF de pdf-lib con el tamaño de la página en puntos. Sin texto seleccionable. Mismo nombre que
   el Word con `.pdf`; si ya está, pregunta antes de sustituirlo. Nota en el asunto («PDF guardado …») y,
