@@ -6,9 +6,9 @@
    - Una tabla con los documentos del hito: casilla de selección, el
      tipo en negrita y el nombre del fichero en gris, el estado
      ("Registrado", "Sin registrar" en ámbar, "(ya no está)"; el código,
-     en su columna desde la fila 147) y sus acciones: Abrir, Enviar y ⋯ (el menú de siempre,
-     js/hitos-documento-menu.js). Cada fila sigue siendo un
-     `.hito-documento[data-doc]` con su `.hito-doc-abrir`.
+     en su columna desde la fila 147) y sus acciones: Abrir, Enviar ▾ y
+     ⋯ (el menú de siempre, js/hitos-documento-menu.js). Cada fila
+     sigue siendo un `.hito-documento[data-doc]` con su `.hito-doc-abrir`.
    - Los gemelos (el "SIN SELLAR" y el .doc/.docx con el mismo nombre
      base) cuelgan debajo del principal, en pequeño.
    - Con varios marcados, una barra: "Enviar por correo", "Abrir para
@@ -123,7 +123,7 @@ var HitoMesaDocumentos = (function () {
         '<span class="mesa-doc-registro">' + U.escapar(codigoDe(g.nombre) || '—') + '</span>' +
         '<span class="mesa-doc-estado ' + estado.clase + '">' + U.escapar(estado.texto) + '</span>' +
         '<span class="mesa-doc-acciones">' +
-          (falta ? '' : '<button type="button" class="enlace mesa-doc-abrir">Abrir</button><button type="button" class="enlace mesa-doc-enviar">Enviar</button>') +
+          (falta ? '' : '<button type="button" class="enlace mesa-doc-abrir">Abrir</button><button type="button" class="enlace mesa-doc-enviar">Enviar ▾</button>') +
           (abierto && window.HitosDocumentoMenu ? HitosDocumentoMenu.botonHTML(g.nombre) : '') +
         '</span>' +
         g.gemelos.map(function (x) {
@@ -157,6 +157,18 @@ var HitoMesaDocumentos = (function () {
 
   function enviar(a, h, nombres) {
     if (window.HitosComunicar && HitosComunicar.comunicar) HitosComunicar.comunicar(a, h, 'correo', { adjuntos: nombres });
+  }
+
+  /* Fila 153: «Enviar ▾» de un documento, por correo o por Séneca, con
+     ese documento ya elegido. Una sola función (`HitosComunicar.
+     comunicarConDocumento`), para no duplicarla en otro sitio que
+     también tenga «Enviar» de un documento. */
+  function menuEnviarUno(boton, a, h, nombre) {
+    if (!window.FichaMenus || !window.HitosComunicar || !HitosComunicar.comunicarConDocumento) return;
+    FichaMenus.montar(boton, [
+      { texto: 'Por correo', alPulsar: function () { HitosComunicar.comunicarConDocumento(a, h, 'correo', nombre); } },
+      { texto: 'Por Séneca', alPulsar: function () { HitosComunicar.comunicarConDocumento(a, h, 'seneca', nombre); } }
+    ]);
   }
 
   async function moverAOtroHito(a, h, hitos, nombres) {
@@ -273,7 +285,7 @@ var HitoMesaDocumentos = (function () {
       b.onclick = function () { abrirEnVisor(a, b.closest('.hito-documento').dataset.doc); };
     });
     Array.prototype.forEach.call(fila.querySelectorAll('.mesa-doc-enviar'), function (b) {
-      b.onclick = function () { enviar(a, h, [b.closest('.hito-documento').dataset.doc]); };
+      menuEnviarUno(b, a, h, b.closest('.hito-documento').dataset.doc);
     });
     Array.prototype.forEach.call(fila.querySelectorAll('.mesa-doc-marca'), function (c) {
       c.onchange = function () { pintarSeleccion(fila, a, h, hitos); };
