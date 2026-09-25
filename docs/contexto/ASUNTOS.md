@@ -233,12 +233,16 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
 - **La fila de copiar de un gesto** (18-sep-2026, fila 58, `js/ficha-nombre-acciones.js`,
   `ponerFilaDeCopiar`): debajo del `<h2>`, siempre a la vista, sin menú — Asunto, Ruta, NIE, Nombre
   y DNI/CIF, en ese orden; un botón sin dato no se pone. **«Ruta»** (fila 98,
-  `docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md`, `js/copiar-ruta.js`, `RutaCarpetas.boton`) copia la ruta
-  de la carpeta para pegarla en el explorador: la de abiertos (o la del ARCHIVO + `a.ruta` del
-  índice, o categoría y tercero) que cada uno apunta en Ajustes → El centro → «Rutas de las carpetas
-  en este ordenador» (`localStorage`, `gestor-ruta-abiertos`/`gestor-ruta-archivo`, nunca en
-  `_GESTOR`), más el nombre; con `\` si empieza por letra de unidad o `\\`, con `/` si no. Sin ruta
-  apuntada copia solo el nombre y avisa en ámbar. Abrir la carpeta sigue descartado. Prueba:
+  `docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md`, `js/copiar-ruta.js`, `RutaCarpetas.boton`; formato
+  `file:///` desde la fila 152, `docs/RUTA-QUE-NO-VA-A-BING.md`) copia la ruta de la carpeta, en
+  formato `file:///` (para que el navegador la abra siempre como carpeta y nunca la busque en
+  Bing): la de abiertos (o la del ARCHIVO + `a.ruta` del índice, o categoría y tercero) que cada
+  uno apunta en Ajustes → El centro → «Rutas de las carpetas en este ordenador» (`localStorage`,
+  `gestor-ruta-abiertos`/`gestor-ruta-archivo`, nunca en `_GESTOR`), más el nombre, cada trozo
+  codificado (`RutaCarpetas.comoFileUrl`). Sin ruta apuntada, ya no copia el nombre suelto: pide la
+  ruta en ese momento, con `U.preguntar`, y copia ya la completa. El mismo botón, en línea (sin
+  `U.preguntar`, `RutaCarpetas.montarEnCuadro`), va también en la cabecera de los cuadros de Correo
+  y de Séneca (`docs/contexto/CORREO-Y-SENECA.md`). Abrir la carpeta sigue descartado. Prueba:
   `pruebas/copiar-ruta.mjs`. Sustituye al icono `.boton-nie` que antes
   vivía pegado al `<h2>` (quitado de `js/copiar.js`) y a "Copiar el nombre del asunto" del menú
   de tres puntos. Reutiliza `Copiar.boton` (el mismo copiado con aviso "Copiado" de siempre,
