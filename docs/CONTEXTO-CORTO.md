@@ -112,7 +112,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
   bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa): «Generar documento ▾» y «Comunicar ▾»; tres tarjetas,
   una en grande y dos de resumen (pulsar una la abre): el guion (siguiente paso resaltado; preguntas; 📎, ✎; se marca solo al generar,
-  registrar, comunicar o añadir), los documentos (nombre entero, gemelos, selección) y notas con historia.
+  registrar, comunicar o añadir), los documentos (nombre entero, gemelos, selección, «Enviar ▾» por correo o Séneca) y notas con historia.
   Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa
   («✎ Cambiar el guion», sin salir a Ajustes); su «Comunicar» abre lo mismo que la cabecera y marca ese paso.
   Biblioteca de hitos del centro, con guion; en Mantenimiento, cargar tipos, guías y guiones del instituto.
@@ -166,7 +166,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 - El compañero: entrar en `https://asuntos.fmargon.com`, señalar sus carpetas de nuevo y coordinar tipos de asunto.
 - Envío: pegar el script nuevo (filas 117 y 130), «Nueva versión» y «Probar».
-- Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja.
+- Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto.
 - Ver con el uso: ancho del panel/tablón, tarjetas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar curso; cuenta del centro; Ajustes: cargos y Provincia.
 - Importar usuarios IdEA del alumnado, al reactivar a Francisco el perfil de Gestor de PASEN.
