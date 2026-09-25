@@ -16,8 +16,9 @@
        por Hitos.cambiar, nunca en la ficha. Se quita al llegar un
        fichero nuevo a la carpeta del asunto, al marcar hecho ese hito
        (Hitos.marcar) o a mano con «Ya ha llegado».
-     - «Estamos en este paso» (en la lista de hitos y en la mesa): da
-       por hechos los anteriores sin terminar (Hitos.situarEn).
+     - «Saltar a este paso» (antes «Estamos en este paso»; en la lista de
+       hitos y en la mesa): da por hechos los anteriores sin terminar
+       (Hitos.situarEn). El hito actual lleva «Paso actual» (fila 162).
      - La guía mínima de un tipo sin guía: Tramitar (nos toca),
        Esperar respuesta (esperamos al tercero) y Archivar (nos toca).
 
@@ -85,7 +86,8 @@ var EstadoHito = (function () {
         '" title="Abrir este hito">' + esc(texto) + '</button>'
       : '<span class="marca-hito' + clase + '">' + esc(texto) + '</span>';
     if (l.esperando) {
-      html += '<span class="marca-esperando" title="' + esc(l.esperando.motivo || 'Puesto a mano con «Esperando a…»') + '">' +
+      html += '<span class="marca-esperando' + (l.esperando.auto ? ' marca-esperando-auto' : '') + '" title="' +
+        esc(l.esperando.motivo || 'Puesto a mano con «Esperando a…»') + '">' +
         esc(textoEsperando(l.esperando)) + '</span>';
     }
     return html;
@@ -124,7 +126,9 @@ var EstadoHito = (function () {
   }
 
   function firmaDe(l) {
-    return [l.texto, l.hito, l.lado, l.esperando ? l.esperando.a + l.esperando.desde : ''].join('|');
+    /* Fila 162: también quién espera y si es automático (cambiar el
+       responsable del paso cambia lo que se ve). */
+    return [l.texto, l.hito, l.lado, l.quien, l.esperando ? [l.esperando.a, l.esperando.nombre, l.esperando.desde, l.esperando.auto ? 'auto' : ''].join('/') : ''].join('|');
   }
 
   function pintarCaja(cont, a) {
@@ -132,7 +136,9 @@ var EstadoHito = (function () {
     cont.dataset.firma = firmaDe(l);
     cont.innerHTML = marcaHTML(a, 'abierto', l);
     engancharMarca(cont, a, 'abierto');
-    if (l.esperando) {
+    if (l.esperando && l.esperando.auto) {
+      /* Fila 162: la espera del responsable del paso no se quita: es el paso. */
+    } else if (l.esperando) {
       cont.appendChild(boton('Ya ha llegado', 'Quitar «Esperando a…»: el asunto vuelve a su montón', 'boton-ya-llegado',
         function (ev) { yaHaLlegado(a, ev.currentTarget); }));
     } else if (l.hito) {
@@ -322,7 +328,7 @@ var EstadoHito = (function () {
     }
   }
 
-  /* ---------- «Estamos en este paso» ---------- */
+  /* ---------- «Saltar a este paso» ---------- */
 
   /* Función pura: ¿hay algo antes de este hito que dar por hecho? */
   function puedeSituar(hitos, idHito) {
@@ -335,16 +341,26 @@ var EstadoHito = (function () {
     return false;
   }
 
+  /* Fila 162: «Saltar a este paso» (antes «Estamos en este paso», que
+     se leía como una marca de estado); el hito actual lleva en su lugar
+     la etiqueta fija «Paso actual». */
   function botonSituarHTML(clase) {
     return '<button type="button" class="boton ' + clase + '" title="Dar por hechos los pasos anteriores que sigan sin terminar">' +
-      'Estamos en este paso</button>';
+      'Saltar a este paso</button>';
+  }
+
+  function etiquetaPasoActualHTML() { return '<span class="etiqueta-paso-actual">Paso actual</span>'; }
+
+  /* El id del hito actual de una lista de hitos. */
+  function idActual(hitos, ajustes) {
+    return window.Hitos && Hitos.aQuienLeToca ? Hitos.aQuienLeToca(hitos || [], ajustes).hito : null;
   }
 
   async function situar(a, idHito, control) {
-    var ok = await U.preguntar('Estamos en este paso',
+    var ok = await U.preguntar('Saltar a este paso',
       '<p class="explica">Los pasos anteriores que sigan sin terminar se dan por hechos, con una nota en ' +
       'su historial. Las preguntas sin responder se quedan como están. No se borra nada: se puede ' +
-      'deshacer hito a hito.</p>', 'Estamos aquí');
+      'deshacer hito a hito.</p>', 'Saltar aquí');
     if (!ok) return;
     var r;
     try {
@@ -411,6 +427,7 @@ var EstadoHito = (function () {
     ponerEsperaEn: ponerEsperaEn, quitarEsperaDeLista: quitarEsperaDeLista, llegados: llegados,
     revisarLlegadas: revisarLlegadas, aQuienSePuedeEsperar: aQuienSePuedeEsperar,
     puedeSituar: puedeSituar, botonSituarHTML: botonSituarHTML, situar: situar,
+    etiquetaPasoActualHTML: etiquetaPasoActualHTML, idActual: idActual,
     pasosMinimos: pasosMinimos, guiaMinima: guiaMinima, esGuiaMinima: esGuiaMinima
   };
 })();

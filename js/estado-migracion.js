@@ -137,7 +137,7 @@ var EstadoMigracion = (function () {
     if (cuenta.creados || cuenta.enEspera) {
       U.aviso('He puesto al día los asuntos abiertos: el estado de cada uno es ahora su paso actual' +
         (cuenta.enEspera ? ' (' + cuenta.enEspera + (cuenta.enEspera === 1 ? ' queda' : ' quedan') + ' «Esperando a» tercero)' : '') +
-        '. Usa «Estamos en este paso» para ponerlos en su sitio.', 'bueno');
+        '. Usa «Saltar a este paso» para ponerlos en su sitio.', 'bueno');
       /* La lista se repinta sola: Hitos.alCambiar (js/hitos-a-quien.js). */
     }
   }

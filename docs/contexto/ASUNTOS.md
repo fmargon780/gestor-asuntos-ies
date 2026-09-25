@@ -236,11 +236,21 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   `docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md`, `js/copiar-ruta.js`, `RutaCarpetas.boton`; formato
   `file:///` desde la fila 152, `docs/RUTA-QUE-NO-VA-A-BING.md`) copia la ruta de la carpeta, en
   formato `file:///` (para que el navegador la abra siempre como carpeta y nunca la busque en
-  Bing): la de abiertos (o la del ARCHIVO + `a.ruta` del índice, o categoría y tercero) que cada
-  uno apunta en Ajustes → El centro → «Rutas de las carpetas en este ordenador» (`localStorage`,
-  `gestor-ruta-abiertos`/`gestor-ruta-archivo`, nunca en `_GESTOR`), más el nombre, cada trozo
-  codificado (`RutaCarpetas.comoFileUrl`). Sin ruta apuntada, ya no copia el nombre suelto: pide la
-  ruta en ese momento, con `U.preguntar`, y copia ya la completa. El mismo botón, en línea (sin
+  Bing): la de abiertos (o la del ARCHIVO + `a.ruta` del índice, o categoría y tercero), más el
+  nombre, cada trozo codificado (`RutaCarpetas.comoFileUrl`). **Desde la fila 161**
+  (`docs/RUTA-SIN-PREGUNTAR.md`) la ruta de la carpeta sale de dos mitades: lo de dentro de Dropbox,
+  una vez para todo el centro en `_GESTOR/rutas.json` (`{ abiertos, archivo }`, con `/`; se relee
+  en cada clic y se rellena solo con una ruta completa antigua de `localStorage` si su último trozo
+  se llama como la carpeta señalada), y dónde está Dropbox en este ordenador: en la copia sin
+  internet, deducido de `location.pathname` (el primer trozo `Dropbox` o `Dropbox (…)`); en la web,
+  `localStorage` `gestor-ruta-dropbox` o lo de delante de una ruta completa antigua
+  (`gestor-ruta-abiertos`/`gestor-ruta-archivo`, que se siguen leyendo y, sin trozo `Dropbox`, se
+  usan tal cual). Si falta algo, pide la ruta con `U.preguntar` («Ruta de la carpeta ASUNTOS
+  ABIERTOS», con ejemplo y cómo sacarla); la pegada se parte por `Dropbox` (`RutaCarpetas.partir`):
+  delante a `localStorage`, detrás a `rutas.json` si no estaba; si no acaba en la carpeta pedida,
+  no se guarda. Primero copia y después guarda. Ajustes → El centro → «Rutas de las carpetas»:
+  «dentro de Dropbox» (abiertos y ARCHIVO, para todo el centro) y «Dropbox en este ordenador»
+  (deducido y sin campo en la copia sin internet). El mismo botón, en línea (sin
   `U.preguntar`, `RutaCarpetas.montarEnCuadro`), va también en la cabecera de los cuadros de Correo
   y de Séneca (`docs/contexto/CORREO-Y-SENECA.md`). Abrir la carpeta sigue descartado. Prueba:
   `pruebas/copiar-ruta.mjs`. Sustituye al icono `.boton-nie` que antes
@@ -409,6 +419,18 @@ Se comprueba con `pruebas/lo-pide.mjs`, sin navegador (jsdom).
 
 ### Que no se dupliquen los asuntos
 
+- **Mientras se rellena «Nuevo asunto»** (fila 163, `docs/AVISO-DE-PARECIDOS-AL-CREAR.md`,
+  `js/duplicados-aviso.js`, llamado desde `mirarSiYaExiste` de `js/duplicados.js`, con la envoltura
+  de siempre sobre `App.refrescarVista`): en `#aviso-duplicado`, en cuanto hay tercero (aunque no
+  haya tipo), un recuadro con sus abiertos del mismo tipo en rojo arriba («Ya tiene abierto un
+  asunto de este tipo»), sus archivados del mismo tipo abiertos a 15 días o menos de `#campo-fecha`
+  (por el AAMMDD del nombre; «Archivado hace poco, del mismo tipo», con la etiqueta «archivado») y el
+  resto de sus abiertos en gris («Otros asuntos abiertos de este tercero»; sin tipo, todos). Seis
+  como mucho por bloque y «Y N más»; un reservado, tapado y con candado (`Reservados.nombreParaVer`);
+  cada uno se pulsa (un abierto, su ficha; un archivado, su ficha del ARCHIVO), y al volver a «Nuevo
+  asunto» lo escrito sigue ahí. Se recalcula al cambiar tercero, tipo o fecha (la fecha entra en
+  `ultimaConsulta`; lo que llega tarde de una consulta vieja se tira). Sin nada, no sale. Sustituye
+  al aviso ámbar de antes (solo mismo tipo, sin fechas). Nunca impide crear.
 - **Al crear un asunto** (`js/duplicados.js`, el `onclick` de `btn-crear` envuelto): si ya hay
   uno abierto o archivado del mismo tercero, mismo tipo y mismo año académico (el grupo y el
   texto libre **no cuentan**), se para del todo: cuadro "Este asunto ya existe", con "Abrir el

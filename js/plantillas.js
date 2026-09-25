@@ -287,7 +287,23 @@ var Plantillas = (function () {
      (`resolverHuecosDobles`, más abajo). */
   var SIN_FALTA = ['hito', 'plazo del hito'];
 
+  /* Fila 155 (docs/WORD-DENTRO-DE-LA-APP.md, A): lo escrito a mano en
+     «Faltan datos para este documento», por el mismo nombre con el que
+     salió en `faltan` (el hueco tal cual, o el campo sin «campo:»).
+     Solo para ese documento: no se guarda en ninguna ficha. */
+  function escritoAMano(clave, valores) {
+    var aMano = valores && valores.aMano;
+    if (!aMano) return null;
+    var candidatos = [clave, clave.replace(/^campo\s*:/i, '').trim()];
+    for (var i = 0; i < candidatos.length; i++) {
+      if (Object.prototype.hasOwnProperty.call(aMano, candidatos[i]) && String(aMano[candidatos[i]]).trim()) return String(aMano[candidatos[i]]);
+    }
+    return null;
+  }
+
   function resolverUnHueco(clave, valores, faltan) {
+    var escrito = escritoAMano(clave, valores);
+    if (escrito !== null) return { encontrado: true, valor: escrito };
     /* {hecho:TÍTULO} (fila 102): la fecha en que se marcó hecho otro
        hito del asunto, buscado por su título sin mayúsculas ni tildes.
        Fuera del camino de un hito (sin `valores.hechos`), vacío y sin
@@ -320,6 +336,8 @@ var Plantillas = (function () {
     var real = CONOCIDOS.filter(function (c) { return sinEspacios(c) === sinEspacios(clave); })[0];
     if (!real) return { encontrado: false, valor: '' };
     var valor = valores[real] || '';
+    /* Fila 155: sin dato, lo escrito a mano con el nombre con el que salió en `faltan`. */
+    if (!valor) { var aMano = escritoAMano(nombreDeHueco(real), valores); if (aMano !== null) valor = aMano; }
     if (!valor && SIN_FALTA.indexOf(real) === -1) faltan.push(nombreDeHueco(real));
     return { encontrado: true, valor: valor };
   }

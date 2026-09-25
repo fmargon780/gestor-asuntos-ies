@@ -170,6 +170,14 @@
      sin ellos, el visor se comporta exactamente como hasta hoy. */
   async function abrir(handle, nombre, opts) {
     opts = opts || {};
+    /* Fila 155 (docs/WORD-DENTRO-DE-LA-APP.md, B): un Word se abre en
+       grande dentro de la aplicación (js/word-visor.js), con «Guardar
+       PDF» en la carpeta del asunto, nunca en Descargas. */
+    if (window.WordVisor && /\.docx$/i.test(nombre || '')) {
+      var asunto = opts.asunto || (window.App && App.asuntoDeLaFicha ? App.asuntoDeLaFicha() : null);
+      return WordVisor.abrir({ handle: handle, nombre: nombre, asunto: asunto,
+        carpeta: opts.carpeta || (asunto && asunto.handle) || null, hito: opts.hito || null });
+    }
     construir();
     try {
       var fichero = await handle.getFile();
@@ -187,8 +195,17 @@
       nombreAbierto = nombre || fichero.name;
       avisar();
 
-      /* Lo que el navegador no sabe enseñar se abre fuera, como antes. */
-      if (clase === 'otro') window.open(url, '_blank');
+      /* Lo que el navegador no sabe enseñar se abre fuera, como antes,
+         pero con su nombre de verdad (fila 155), no el de letras y
+         números del `blob:`. */
+      if (clase === 'otro') {
+        var enlace = document.createElement('a');
+        enlace.href = url;
+        enlace.download = nombre || fichero.name || 'documento';
+        document.body.appendChild(enlace);
+        enlace.click();
+        enlace.remove();
+      }
     } catch (e) {
       U.aviso('No he podido abrir el documento: ' + U.mensajeDeError(e), 'malo');
     }

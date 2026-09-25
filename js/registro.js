@@ -242,6 +242,8 @@ var Registro = (function () {
         'Registrado ' + codigo + fechaSello + ' · ' + estado.nombreOriginal,
         'registroDeDocumento', estado.nombreOriginal);
       U.aviso('Documento registrado.', 'bueno');
+      /* Fila 160: un Word que ya tiene su PDF, a «Versiones previas». */
+      if (window.VersionesPrevias) await VersionesPrevias.ordenarTrasCambio(asunto.handle);
     } catch (e2) {
       U.accesorio('Documento registrado, pero no he podido apuntar la nota del registro', e2);
     }

@@ -103,9 +103,11 @@ comprobar('6. sin hitos', lado([]), [null, '', null]);
 comprobar('6. hito sin responsable', lado([hito('a', { estado: 'encurso' })]), ['administracion', '', 'a']);
 
 /* 7 */
-comprobar('7. dos en curso, gana Administración',
+/* Fila 162 (docs/ESTADO-SIGUE-A-LOS-HITOS.md): ya no «gana Administración»;
+   manda siempre el primero sin terminar. */
+comprobar('7. dos en curso: manda el primero, aunque el segundo sea de Administración',
   lado([hito('a', { estado: 'encurso', responsable: 'direccion' }), hito('b', { estado: 'encurso', responsable: 'companero' })]),
-  ['administracion', '', 'b']);
+  ['terceros', 'Dirección', 'a']);
 
 /* 8 */
 const conDireccion = Hitos.normalizarAjustes({ responsables: [

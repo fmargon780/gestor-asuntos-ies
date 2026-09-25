@@ -93,7 +93,7 @@ var GuiasComunicacion = (function () {
   }
 
   /* Engancha las pestañas y, por cada canal, su botón "Insertar hueco"
-     (con `PlantillasAjustes.engancharCampoDeTexto`, que ya sabe meter
+     (antes con `PlantillasAjustes.engancharCampoDeTexto`; desde la fila 158, `HuecosBuscador.montar` directo, que ya sabe meter
      el hueco en el asunto o en el cuerpo según cuál tuviera el foco). */
   function enganchar(raiz, idPaso) {
     var det = raiz.querySelector(':scope > .paso-comunicacion');
@@ -108,12 +108,18 @@ var GuiasComunicacion = (function () {
       };
     });
 
-    if (!window.PlantillasAjustes) return;
+    /* Fila 158 (docs/INSERTAR-HUECO-EN-EL-PASO.md): se engancha ANTES de
+       que el recuadro del paso esté en la página (js/guias-paso-bloques.js
+       y js/guias-opciones-editor.js), así que el botón y los campos se
+       buscan dentro de `raiz`, no con `document.getElementById` (que
+       daba null y dejaba «Insertar hueco» sin hacer nada). */
+    if (!window.HuecosBuscador) return;
+    function dentro(id) { return raiz.querySelector('#' + (window.CSS && CSS.escape ? CSS.escape(id) : id)); }
     CANALES.forEach(function (canal) {
-      PlantillasAjustes.engancharCampoDeTexto(
-        idCuerpo(idPaso, canal.clave), idHueco(idPaso, canal.clave),
-        [document.getElementById(idAsunto(idPaso, canal.clave))]
-      );
+      var boton = dentro(idHueco(idPaso, canal.clave));
+      var cuerpo = dentro(idCuerpo(idPaso, canal.clave));
+      if (!boton || !cuerpo) return;
+      HuecosBuscador.montar({ boton: boton, campos: [dentro(idAsunto(idPaso, canal.clave)), cuerpo] });
     });
   }
 

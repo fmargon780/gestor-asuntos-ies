@@ -59,6 +59,25 @@ var HitoMesaComunicar = (function () {
     return ['tercero'];
   }
 
+  /* Los correos de los elegidos (los relacionados, resueltos a sus
+     personas). Fuera de `pintar` desde la fila 164: la usan también las
+     recetas (js/hito-mesa-recetas.js). */
+  async function correosDe(sel) {
+    var correos = [];
+    for (var i = 0; i < sel.length; i++) {
+      var c = sel[i];
+      var dirs = c.correos;
+      if (c.relacionado && !dirs.length && window.CorreoGrupos && CorreoGrupos.resolverMiembros) {
+        try {
+          var r = await CorreoGrupos.resolverMiembros([c.relacionado]);
+          dirs = (r || []).reduce(function (acc, m) { return acc.concat(HitosComunicar.correosDePersona(m.persona)); }, []);
+        } catch (e) { dirs = []; }
+      }
+      dirs.forEach(function (d) { if (correos.indexOf(d) === -1) correos.push(d); });
+    }
+    return correos;
+  }
+
   async function pintar(fila, a, h) {
     var caja = fila.querySelector('.mesa-destinatarios');
     if (!caja || !h || h.clase === 'decision') return;
@@ -68,7 +87,8 @@ var HitoMesaComunicar = (function () {
     var marcados = premarcados(h, lista);
 
     var falta = window.HitosRequisitos && HitosRequisitos.textoLoQueFalta ? HitosRequisitos.textoLoQueFalta(h, a) : '';
-    caja.innerHTML =
+    /* Fila 164: arriba, los pasos pendientes con receta de comunicar. */
+    caja.innerHTML = (window.HitoMesaRecetas ? HitoMesaRecetas.bloqueHTML(a, h, 'comunicar') : '') +
       '<div class="mesa-chips">' + lista.map(function (c) {
         return '<label class="mesa-chip"><input type="checkbox" data-id="' + U.escapar(c.id) + '"' +
           (marcados.indexOf(c.id) !== -1 ? ' checked' : '') + '><span>' + U.escapar(c.nombre) + '</span></label>';
@@ -82,21 +102,6 @@ var HitoMesaComunicar = (function () {
     function elegidos() {
       return Array.prototype.filter.call(caja.querySelectorAll('.mesa-chip input'), function (c) { return c.checked; })
         .map(function (c) { return lista.filter(function (x) { return x.id === c.dataset.id; })[0]; }).filter(Boolean);
-    }
-    async function correosDe(sel) {
-      var correos = [];
-      for (var i = 0; i < sel.length; i++) {
-        var c = sel[i];
-        var dirs = c.correos;
-        if (c.relacionado && !dirs.length && window.CorreoGrupos && CorreoGrupos.resolverMiembros) {
-          try {
-            var r = await CorreoGrupos.resolverMiembros([c.relacionado]);
-            dirs = (r || []).reduce(function (acc, m) { return acc.concat(HitosComunicar.correosDePersona(m.persona)); }, []);
-          } catch (e) { dirs = []; }
-        }
-        dirs.forEach(function (d) { if (correos.indexOf(d) === -1) correos.push(d); });
-      }
-      return correos;
     }
     function nombres(sel) { return sel.map(function (c) { return c.soloNombre || c.nombre; }); }
     function adjuntos() {
@@ -114,12 +119,13 @@ var HitoMesaComunicar = (function () {
     caja.querySelector('.mesa-mensaje-seneca').onclick = function () {
       HitosComunicar.comunicar(a, h, 'seneca', { nombres: nombres(elegidos()) });
     };
+    if (window.HitoMesaRecetas) HitoMesaRecetas.enganchar(caja, a, h, 'comunicar', { lista: lista });
     var pedir = caja.querySelector('.mesa-pedir-falta');
     if (pedir && window.CorreoNucleo && CorreoNucleo.montarBotonComunicar) {
       CorreoNucleo.montarBotonComunicar(pedir, a, { loQueFalta: falta });
     }
   }
 
-  return { pintar: pintar, premarcados: premarcados };
+  return { pintar: pintar, premarcados: premarcados, candidatos: candidatos, correosDe: correosDe };
 })();
 window.HitoMesaComunicar = HitoMesaComunicar;

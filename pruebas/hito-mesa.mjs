@@ -178,6 +178,8 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
       return [f.querySelector('.mesa-doc-registro').textContent, f.querySelector('.mesa-doc-estado').textContent];
     }, DOCS[2]), ['26EM0617', 'Registrado']);
 
+  /* Fila 155: el Word recién generado se abre en grande (js/word-visor.js): se cierra. */
+  await pagina.evaluate(() => window.WordVisor && WordVisor.cerrar());
   /* 4. Fila 147: los documentos se trabajan en su tarjeta grande. */
   await pagina.locator('.hito-en-mesa .mesa-resumen[data-tarjeta="docs"]').click();
 

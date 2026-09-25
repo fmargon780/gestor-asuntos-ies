@@ -125,14 +125,17 @@ await pagina.waitForTimeout(500);
    el original ya no va a la papelera: se queda en la carpeta,
    renombrado con "SIN SELLAR" al final. */
 const SIN_SELLAR = '260911 SOLICITUD Prueba del sello SIN SELLAR.pdf';
-await comprobar('el PDF sellado se ha renombrado, y el original se conserva como SIN SELLAR',
+/* Fila 160 (docs/VERSIONES-PREVIAS.md): el SIN SELLAR, en la subcarpeta «Versiones previas». */
+await comprobar('el PDF sellado se ha renombrado, y el original se conserva como SIN SELLAR en «Versiones previas»',
   pagina.evaluate(async (asunto) => {
     const carpeta = await window.__disco.abiertos.getDirectoryHandle(asunto);
     const nombres = [];
     for await (const p of carpeta.entries()) nombres.push(p[0]);
-    return nombres.sort();
+    const previas = [];
+    for await (const p of (await carpeta.getDirectoryHandle('Versiones previas')).entries()) previas.push(p[0]);
+    return [nombres.sort(), previas];
   }, NOMBRE_ASUNTO),
-  ['260911 26EM0368 SOLICITUD Prueba del sello.pdf', SIN_SELLAR].sort());
+  [['260911 26EM0368 SOLICITUD Prueba del sello.pdf', 'Versiones previas'], [SIN_SELLAR]]);
 
 await comprobar('el aviso ha desaparecido', pagina.locator('.aviso-sello').count(), 0);
 
@@ -146,8 +149,8 @@ await comprobar('se apunta la nota del registro, sin ninguna de mandarlo a la pa
   }, NOMBRE_ASUNTO),
   ['Registrado 26EM0368 el 10/09/2026 · ' + ORIGINAL + '. Se conserva el original sin sellar.'].sort());
 
-await comprobar('el documento SIN SELLAR sale en gris, debajo del sellado',
-  pagina.locator('.ficha-documento-sinsellar').count(), 1);
+await comprobar('el documento SIN SELLAR sale plegado en «1 versión previa · ver»',
+  pagina.locator('.ficha-previas summary').textContent(), '1 versión previa · ver');
 
 console.log('--- "No es un registro" descarta el aviso y no vuelve a preguntar ---');
 const OTRO_SELLADO = '29700777 - Otro papel.pdf';

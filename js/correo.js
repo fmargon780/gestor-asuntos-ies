@@ -224,6 +224,8 @@
     I.comunicarHitoActual = (extra && extra.comunicarHito) || null;
     adjuntosMarcadosActual = (extra && extra.adjuntosMarcados) || [];
     documentoSenecaActual = (extra && extra.documentoSeneca) || '';
+    /* Fila 164: la plantilla de la receta de un paso, ya elegida. */
+    I.plantillaPedida = (extra && extra.plantilla) || '';
     if (window.SenecaDestinatarios) SenecaDestinatarios.limpiar();
     I.yaApuntado = false;
     I.algoCambiado = false;

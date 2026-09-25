@@ -112,10 +112,11 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   }
 
   /* 2. */
-  await comprobar('2. en la cabecera, exactamente los cuatro botones',
+  /* Fila 154: más «Registrar», que antes vivía en un paso del guion. */
+  await comprobar('2. en la cabecera, exactamente los cinco botones',
     pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-acciones button'))
       .filter((b) => b.offsetParent && !b.closest('.mesa-panel') && !b.closest('.ficha-menu')).map((b) => b.textContent.trim())),
-    ['Generar documento ▾', 'Comunicar ▾', 'Marcar como hecho', '···']);
+    ['Generar documento ▾', 'Comunicar ▾', 'Registrar', 'Marcar como hecho', '···']);
   await comprobar('2. plazo y responsable, en texto pequeño y pulsable (no etiquetas de color)',
     pagina.evaluate(() => ['.mesa-etq-plazo', '.mesa-etq-resp'].map((s) => {
       const e = document.querySelector('.hito-en-mesa ' + s);
@@ -130,24 +131,21 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
     }), [true, 'c1']);
 
   /* 3. */
-  await comprobar('3. el tercer paso es el siguiente, con su acción como botón principal',
+  /* Fila 154: los pasos ya no llevan botón de acción (las acciones, solo en la cabecera). */
+  await comprobar('3. el tercer paso es el siguiente, sin botón de acción',
     pagina.evaluate(() => {
       const p = document.querySelector('.hito-en-mesa .guion-paso.guion-siguiente');
       const b = p && p.querySelector('.guion-accion-boton');
-      return [p && p.dataset.id, !!b && b.classList.contains('boton-principal'), b && b.textContent,
-        document.querySelectorAll('.hito-en-mesa .guion-siguiente').length];
-    }), ['g3', true, 'Generar documento', 1]);
+      return [p && p.dataset.id, !!b, document.querySelectorAll('.hito-en-mesa .guion-siguiente').length];
+    }), ['g3', false, 1]);
   await comprobar('3. los dos hechos, sin explicación ni botones a la vista',
     pagina.evaluate(() => ['g1', 'g2'].map((id) => {
       const p = document.querySelector('.hito-en-mesa .guion-paso[data-id="' + id + '"]');
       const vis = (s) => { const e = p.querySelector(s); return !!(e && e.offsetParent); };
       return p.classList.contains('hecho') && !vis('.guion-paso-explicacion') && !vis('.guion-paso-botones') && !vis('.guion-accion-boton');
     })), [true, true]);
-  await comprobar('3. los otros pendientes llevan su acción como botón normal',
-    pagina.evaluate(() => {
-      const b = document.querySelector('.hito-en-mesa .guion-paso[data-id="g5"] .guion-accion-boton');
-      return !!b && !b.classList.contains('boton-principal');
-    }), true);
+  await comprobar('3. los otros pendientes, tampoco',
+    pagina.evaluate(() => !!document.querySelector('.hito-en-mesa .guion-paso[data-id="g5"] .guion-accion-boton')), false);
 
   /* 4. */
   await pagina.mouse.move(2, 2);

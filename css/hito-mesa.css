@@ -147,7 +147,10 @@ details.mesa-normativa > summary { cursor: pointer; }
 .guion-paso { padding: 6px 0; border-bottom: 1px dashed var(--linea); }
 .guion-paso-linea { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
 .guion-paso-texto { font-weight: 600; font-size: 14px; }
-.guion-paso.hecho .guion-paso-texto, .guion-paso.noaplica .guion-paso-texto { text-decoration: line-through; color: var(--tinta-suave); font-weight: 400; }
+/* Fila 154: un paso hecho, en gris con su casilla marcada y quién y cuándo al lado; solo «No aplica» se tacha. */
+.guion-paso.hecho .guion-paso-texto { color: var(--tinta-suave); font-weight: 400; }
+.guion-paso.noaplica .guion-paso-texto { text-decoration: line-through; color: var(--tinta-suave); font-weight: 400; }
+.guion-paso-quien { margin-left: auto; font-size: 12px; color: var(--tinta-suave); white-space: nowrap; }
 .guion-paso-explicacion { font-size: 12px; color: var(--tinta-suave); margin: 2px 0 0 24px; }
 .guion-paso-botones { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 4px 0 0 24px; font-size: 12px; }
 /* Fila 145: una línea con la acción a la derecha; los hechos, en una sola
@@ -241,3 +244,27 @@ details.mesa-normativa > summary { cursor: pointer; }
 
 /* Fila 139: la historia automática del hito, debajo de sus notas. */
 .hito-historia-titulo { display: block; margin-top: 10px; }
+
+/* Fila 154: con hitos, las acciones solo en la cabecera de cada hito. */
+#pantalla-asunto.asunto-con-hitos #ficha-acciones .boton-comunicar,
+#pantalla-asunto.asunto-con-hitos #ficha-acciones .boton-generar-documento { display: none; }
+
+/* Fila 164: los documentos de otros hitos y los de la carpeta sin hito, en la mesa de cada hito. */
+.mesa-docs-apartado { margin: 14px 0 4px; font-size: 12px; font-weight: 600; color: var(--tinta-suave); text-transform: uppercase; letter-spacing: .03em; }
+.mesa-doc-de-hito { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 8px; background: #eef2f7; color: #3c4a5c; font-size: 11px; white-space: nowrap; }
+.mesa-doc-ajeno .mesa-doc-tipo { font-weight: 500; }
+.mesa-docs-cuenta { font-weight: 400; color: var(--tinta-suave); font-size: .9em; }
+
+/* Fila 164: los pasos con receta, arriba de «Comunicar ▾» y «Generar documento ▾». */
+.mesa-recetas { display: flex; flex-direction: column; gap: 4px; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--borde, #dde3ea); }
+.mesa-recetas-titulo { font-size: 12px; font-weight: 600; color: var(--tinta-suave); }
+.mesa-receta { text-align: left; padding: 6px 10px; border: 1px solid #f0d58a; background: #fff8e1; border-radius: 6px; cursor: pointer; font: inherit; }
+.mesa-receta:hover { background: #ffefc2; }
+.guion-receta { flex-wrap: wrap; gap: 6px; }
+.guion-receta-titulo { font-size: 12px; color: var(--tinta-suave); }
+
+/* Fila 160: «N versiones previas · ver», plegado y en gris (mesa y ficha). */
+.mesa-previas, .ficha-previas { margin-top: 10px; color: var(--tinta-suave); font-size: 13px; }
+.mesa-previas summary, .ficha-previas summary { cursor: pointer; }
+.mesa-previa-fila, .ficha-previa-fila { display: flex; align-items: center; gap: 10px; padding: 3px 0 3px 14px; }
+.mesa-previa-nombre, .ficha-previa-nombre { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }

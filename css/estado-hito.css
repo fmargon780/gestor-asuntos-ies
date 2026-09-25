@@ -28,3 +28,9 @@ button.marca-hito:hover { border-color: var(--azul); }
 .hito-situar { font-size: 12px; padding: 2px 8px; margin-left: 6px; }
 .tarjeta-hito { margin: 3px 0 2px; }
 .tarjeta-hito:empty { display: none; }
+/* Fila 162: «Paso actual», fijo y no pulsable, con el color de la marca de la cabecera. */
+.etiqueta-paso-actual {
+  display: inline-block; border-radius: 20px; padding: 1px 8px; margin-left: 6px; margin-right: 6px;
+  font-size: 11px; font-weight: 600; line-height: 1.5; vertical-align: middle; white-space: nowrap;
+  background: #e8f0f8; color: #1f4e79; border: 1px solid #c3d8ec;
+}

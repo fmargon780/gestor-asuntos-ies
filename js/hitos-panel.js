@@ -210,6 +210,10 @@
     if (!errorLectura && hitos.length) {
       try { nombresDeLaCarpeta = (await Carpetas.ficheros(a.handle)).map(function (f) { return f.nombre; }); }
       catch (e) { nombresDeLaCarpeta = null; }
+      /* Fila 160: lo de «Versiones previas», aparte (la mesa lo pliega). */
+      if (nombresDeLaCarpeta && window.VersionesPrevias) {
+        nombresDeLaCarpeta.previas = (await VersionesPrevias.listar(a.handle)).map(function (f) { return f.nombre; });
+      }
       if (actual !== a || turno !== turnoRepintado) return;
     }
 
@@ -242,6 +246,11 @@
         var nota = $('ficha-guia-nota');
         if (nota && nota.parentNode === caja) nota.remove();
         caja.innerHTML = '';
+        /* Fila 154: con hitos, «Comunicar» y «Generar documento» viven
+           solo en la cabecera de cada hito; la barra de arriba de la
+           ficha los esconde (css/hito-mesa.css). */
+        var pantalla = $('pantalla-asunto');
+        if (pantalla) pantalla.classList.toggle('asunto-con-hitos', !errorLectura && hitos.length > 0);
         if (!errorLectura && hitos.length) {
           caja.className = 'hitos-panel';
           caja.appendChild(HitosPanelLista.bloqueDeHitos(a, hitos, datos.ajustes, abierto, nombresDeLaCarpeta));

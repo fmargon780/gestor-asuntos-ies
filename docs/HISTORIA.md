@@ -5,6 +5,150 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 163: el recuadro de lo que ya tiene el tercero, al crear
+
+`docs/AVISO-DE-PARECIDOS-AL-CREAR.md`. El aviso ámbar solo salía con tipo y solo con asuntos del
+mismo tipo, sin fechas. Ahora, en cuanto hay tercero, un recuadro con tres bloques (mismo tipo en
+rojo; archivados del mismo tipo a 15 días; el resto en gris). Decisiones:
+
+- Lo puro (fechas, bloques) y el pintado van en `js/duplicados-aviso.js`; `js/duplicados.js` solo
+  cambia `mirarSiYaExiste`, con la misma envoltura de siempre (ninguna nueva).
+- Se comprobó en la prueba que ir a la ficha desde el recuadro y volver a «Nuevo asunto» conserva lo
+  escrito: no hizo falta abrir nada en un panel aparte.
+
+## 25-sep-2026 — Fila 160: «Versiones previas»
+
+`docs/VERSIONES-PREVIAS.md`. El «SIN SELLAR» y el Word que ya tiene su PDF pasan a una subcarpeta
+del asunto, plegada en la ficha y en la mesa. Decisiones:
+
+- Nada nuevo en los hitos: siguen apuntando el nombre; la mesa lee también la subcarpeta y enseña allí,
+  plegadas, las de ese hito. Así «no se pierde el enlace» sin guardar rutas en `hitos.json`.
+- El índice del expediente no se ha tocado: solo lee la carpeta del asunto, así que ya no las ve; su
+  marca «(original sin sellar)» se deja para los asuntos que aún no se han ordenado.
+- La fusión de carpetas al archivar ya entraba en las subcarpetas: no hizo falta cambiarla.
+- Tres pruebas daban por hecho que el «SIN SELLAR» y el Word se quedaban arriba: ahora comprueban que
+  van a «Versiones previas».
+
+## 25-sep-2026 — Fila 159: «Administración» en las guías, en vez de las personas
+
+`docs/RESPONSABLE-ADMINISTRACION.md`. Decisiones:
+
+- No había marca de «persona»: se deduce (con la marca de Administración, y que no sea un cargo por id o
+  por nombre), como proponía el encargo.
+- `js/hitos.js` estaba justo en 600 líneas: una sola línea para `HitosAdministracion.asegurar` y un
+  comentario acortado. Lo demás, en `js/hitos-administracion.js`.
+- La pasada única mete también los dos hitos de firma en la biblioteca del centro, sin esperar a que
+  Francisco pulse «Cargar…» en Mantenimiento; los dos van además en `biblioteca-centro.json`.
+- El editor de un modelo de la biblioteca recibía una lista vacía de responsables (el suyo se perdía al
+  guardar): ahora recibe la misma que la guía.
+- `pruebas/repintar-solo-lo-que-cambia.mjs` pone también la marca nueva, para que la pasada no se cuele
+  en lo que mide.
+
+## 25-sep-2026 — Fila 158: «Insertar hueco» en la comunicación de un paso
+
+`docs/INSERTAR-HUECO-EN-EL-PASO.md`. `GuiasComunicacion.enganchar` buscaba el botón y el texto con
+`document.getElementById` antes de que el recuadro del paso estuviera en la página: daba `null` y el
+botón no hacía nada. Ahora los busca dentro de `raiz` y llama a `HuecosBuscador.montar` directo. Los
+otros dos usos de `engancharCampoDeTexto` (el cuadro de una plantilla y el editor en línea de la fila
+151) ya enganchan con el cuadro en la página. La prueba nueva falla sin el arreglo.
+
+## 25-sep-2026 — Fila 157: «Actualizar ahora», sin carrera con la publicación
+
+`docs/COPIA-ACTUALIZAR-SIN-CARRERA.md`. La franja guardaba la lista de ficheros de cuando se pintó;
+si entre medias se publicaba otra versión, un fichero nuevo no casaba con la lista vieja y salía «el
+sha256 de js/version.js no coincide». Ahora «Actualizar ahora» relee la lista al pulsar, y si algo no
+casa se reintenta una vez, a los 5 s, con la lista releída y `?t=` contra la caché de GitHub (también
+al abrir). La espera se acorta en la prueba con `window.__COPIA_ESPERA_MS__`. Solo si falla dos
+veces, un mensaje llano; lo técnico va a la consola.
+
+## 25-sep-2026 — Fila 155: el Word, dentro de la aplicación
+
+`docs/WORD-DENTRO-DE-LA-APP.md`. El aviso de datos que faltan llegaba con el Word ya guardado, y el
+Word se abría con `window.open` de un `blob:`: el Chromebook lo bajaba a Descargas con un nombre de
+letras. Ahora lo que falta se pregunta antes de guardar nada, y el Word se ve dentro, con «Guardar
+PDF» en la carpeta del asunto e «Imprimir». Decisiones:
+
+- **Librerías** (en `js/lib/`, sin CDN, cargadas al abrir el primer Word): docx-preview 0.4.1
+  (Apache-2.0), JSZip 3.10.1 (MIT o GPL-3.0, se usa con la MIT) y html2canvas 1.4.1 (MIT); el PDF, con
+  la pdf-lib que ya estaba.
+- **Editar no**: SuperDoc, el candidato que el encargo pedía mirar, es AGPL-3.0 (o licencia de pago).
+  Con la aplicación publicada en internet, la AGPL obliga a ofrecer el código a quien la use: no es
+  una decisión para tomar sola. docx-preview solo enseña. «Guardar cambios» queda en la fila 165,
+  BLOQUEADA, para hablarlo con Francisco. Ver, PDF e imprimir, que es lo de casi siempre, sí.
+- **PDF como imagen** (200 ppp, JPEG): lo que el encargo aceptaba si no había texto seleccionable.
+- Las plantillas del centro no traen tamaño de página ni márgenes: sin ellos, docx-preview pegaba el
+  texto al borde. El visor pone A4 con los márgenes de Word en España (2,5 y 3 cm).
+- Lo escrito en «Faltan datos» entra por `valores.aMano`, mirado primero en `resolverUnHueco`: los
+  huecos del catálogo salen en `faltan` con su nombre legible («Grupo»), no con la clave, y así se
+  casa por los dos (lo cazó la prueba con la plantilla real).
+- `js/plantillas-documento.js` no se partió: con la parte A en `js/word-faltan.js` se queda en 382
+  líneas.
+
+## 25-sep-2026 — Fila 162: el estado sigue a los hitos
+
+`docs/ESTADO-SIGUE-A-LOS-HITOS.md`. Con el 3 de Secretaría sin marcar y el 4 en curso y nuestro, la
+cabecera decía «Paso 4 de 5»: `aQuienLeToca` dejaba ganar a un hito en curso de Administración.
+Ahora el actual es siempre el primero sin terminar. Decisiones:
+
+- La espera automática (responsable del paso que no es de Administración) no se guarda: se calcula
+  cada vez, con `auto: true`, y por eso no lleva «Ya ha llegado» ni la vigila `revisarLlegadas`.
+- La espera a mano de un hito que ya no es el actual se borra dentro de la propia escritura de
+  `hitos.json` (`Hitos.cambiar` → `limpiarEsperasViejas`), sin una segunda escritura ni depender de
+  quién haya cambiado el hito.
+- La prueba de la fila 104 que comprobaba «gana Administración» se ha dado la vuelta.
+
+## 25-sep-2026 — Fila 164: las recetas de los pasos y todos los documentos en cada hito
+
+Segunda mitad de `docs/HITOS-ACCIONES-EN-EL-HITO.md` (puntos 3 y 4). Decisiones:
+
+- **No hubo que convertir nada**: la `accion` que ya tenían los pasos (la guía del instituto) es la
+  clase de receta; `receta` solo añade detalles opcionales. Un paso con acción y sin receta sale igual
+  arriba del menú, sin destinatarios ni plantilla fijos.
+- La plantilla de la receta llega a los cuadros por `CorreoNucleo._interno.plantillaPedida`, que se usa
+  una sola vez (cambiar de plantilla a mano después sigue funcionando), y gana al texto propio del paso.
+- «La tutoría» y «otro» no se pueden resolver a un correo: el cuadro sale sin él, para escribirlo.
+- `Hitos.guionDe` ya copiaba la línea de la guía, pero armaba cada paso campo a campo: la receta se
+  perdía ahí hasta añadirla (lo cazó la prueba).
+- Los documentos de otros hitos se ven sin el ⋯: renombrar, registrar o quitar es cosa de su hito.
+
+## 25-sep-2026 — Fila 154 (puntos 1, 2 y 5): las acciones, solo en el hito
+
+`docs/HITOS-ACCIONES-EN-EL-HITO.md`. El mismo botón salía en tres sitios y los números no cuadraban.
+Partida en dos como pide el propio documento: aquí las acciones, la lista y los números; las recetas
+y los documentos de otros hitos, en la fila 164. Decisiones:
+
+- **Los números**: la causa del «Paso 4 de 4» con el hito 5 en curso era que cada sitio contaba a su
+  manera: la marca quitaba los «solo informativo», la tira de la mesa no, y la pestaña «Hitos N/M»
+  contaba los hechos (no la posición). Ahora hay una sola cuenta (`Hitos.numerados`, la de la marca):
+  la pestaña dice la posición del hito actual y la tira pone «i ·» a los informativos, sin número.
+- La barra del guion ya no cuenta un «No aplica» como hecho: 4 pasos, uno no aplica y uno hecho, «1 de 3».
+- «Comunicar» y «Generar documento» de la barra de arriba se esconden con CSS si hay hitos (siguen en
+  el DOM con su menú). Un tipo sin guía recibe la guía mínima, así que en la práctica todos los
+  abiertos tienen hitos. Las pruebas del cuadro de Correo/Séneca que entraban por ahí pulsan ahora su
+  menú por debajo; el camino de la mesa ya lo prueban otras.
+- «Registrar» de la cabecera usa `HitosDocumentoMenu.registrar` (lo del ⋯), sin tocar `Registro`.
+- «No aplica» se queda como enlace que sale al pasar el ratón por el paso.
+
+## 25-sep-2026 — Fila 161: «Ruta» deduce dónde está Dropbox y no pregunta
+
+`docs/RUTA-SIN-PREGUNTAR.md`. En la copia sin internet, «Ruta» abría un cuadro vacío sin decir qué
+carpeta pedía, y la ruta completa vivía en `localStorage`, distinto en cada navegador y en la web
+frente a la copia. Ahora la ruta sale de dos mitades: lo de dentro de Dropbox, igual en los dos
+ordenadores, en `_GESTOR/rutas.json` (una vez para el centro); y dónde está Dropbox aquí, deducido de
+la propia dirección en la copia sin internet (`file://`), o de `localStorage` en la web. Decisiones:
+
+- Las rutas completas antiguas se siguen leyendo: rellenan `rutas.json` solas (solo si su último
+  trozo se llama como la carpeta señalada) y dan la parte de este ordenador en la web.
+- Una ruta pegada que no acaba en la carpeta pedida no se guarda: aviso rojo. Evita pegar la del
+  ARCHIVO donde se pedía la de abiertos, que dejaría mal el `rutas.json` de todo el centro.
+- Se copia antes de guardar `rutas.json`: el navegador solo deja copiar justo tras el clic.
+- La prueba sirve la aplicación como `file://` desde un enlace en `…/Dropbox (Personal)/
+  ADMINISTRACIÓN/REGISTROS/Gestor de Asuntos - aplicación/` (con acentos), sin generar la copia.
+- Las pruebas de GitHub estaban en rojo desde la fila 152: el Chromium de Actions (headless shell) abre
+  la carpeta `file://` pero no pinta su lista («addRow is not defined»). La prueba 7 de
+  `pruebas/copiar-ruta.mjs` comprueba ahora que se queda en la carpeta entera (sin cortar en el `#`) y,
+  solo si la lista se pinta, que sale el fichero.
+
 ## 25-sep-2026 — Fila 149: el membrete lo dibuja la aplicación, con el manual de la Junta
 
 `docs/MEMBRETE-LETRA-DEL-MANUAL.md`. Desde la fila 81 se subía una imagen de membrete y la app

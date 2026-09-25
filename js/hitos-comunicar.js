@@ -169,13 +169,15 @@
     /* Fila 150: el «Comunicar» de un paso del guion pasa cuál marcar al
        terminar, para no marcar «el primero pendiente» sino ese mismo. */
     if (opciones && opciones.idPasoGuion) extra.comunicarHito.idPasoGuion = opciones.idPasoGuion;
+    /* Fila 164: la plantilla de la receta del paso. */
+    if (opciones && opciones.plantilla) extra.plantilla = opciones.plantilla;
 
     /* Con texto propio del paso: igual que hasta ahora, con los
        huecos ya resueltos. Sin él (fila 103): el cuadro se abre con
        el desplegable de plantillas del tipo, como el "Comunicar" de
        la cabecera, pero conservando el destinatario y la constancia
        de arriba. */
-    if (mensaje && tieneTexto(mensaje)) {
+    if (mensaje && tieneTexto(mensaje) && !(opciones && opciones.plantilla)) {
       var valores = {};
       /* Con el hito (fila 102): {{HITO}} y {{PLAZO DEL HITO}} también aquí. */
       try { valores = await Plantillas.valoresDeAsunto(a, { hito: hito, conLoQueFalta: false }); } catch (e) { valores = {}; }

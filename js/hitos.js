@@ -28,8 +28,7 @@ var Hitos = (function () {
   var FICHERO = 'hitos.json';
   var CLASES_ESTADO = ['pendiente', 'encurso', 'hecho', 'noaplica'];
 
-  /* Los responsables de "persona del centro" de partida (sección 6 del
-     encargo). Francisco los cambia desde Ajustes › Hitos. */
+  /* Los responsables de partida (sección 6); se cambian en Ajustes › Hitos. */
   var RESPONSABLES_DEFECTO = [
     { id: 'yo', nombre: 'Yo', clase: 'centro' },
     { id: 'companero', nombre: 'Mi compañero', clase: 'centro' },
@@ -173,6 +172,7 @@ var Hitos = (function () {
         return { id: id, nombre: String((r && r.nombre) || ''), clase: 'centro', administracion: adm };
       })
       .filter(function (r) { return r.id && r.nombre; });
+    if (window.HitosAdministracion) responsables = HitosAdministracion.asegurar(responsables);   /* fila 159 */
     var noLectivos = (Array.isArray(a && a.noLectivos) ? a.noLectivos : [])
       .map(String).filter(function (f) { return /^\d{4}-\d{2}-\d{2}$/.test(f); }).sort();
     /* Fila 131: los festivos, aparte (cuentan para todos los plazos). */
@@ -221,6 +221,8 @@ var Hitos = (function () {
     var hacerlo = async function () {
       var actual = await leerParaCambiar(g);
       var nuevo = hacer(actual) || actual;
+      /* Fila 162: una espera a mano que ya no es del hito actual, fuera. */
+      if (Hitos.limpiarEsperasViejas) Hitos.limpiarEsperasViejas(nuevo);
       await Copias.guardar(g, FICHERO, nuevo);
       ultimoCambio = Date.now();
       vistosConDatos = Object.keys(nuevo.porAsunto || {}).length;

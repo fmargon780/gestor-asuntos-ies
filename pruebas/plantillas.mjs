@@ -87,8 +87,9 @@ async function abrirCorreoDe(nombreAsunto) {
   await abrirFichaDe(nombreAsunto);
   /* "Correo" vive ahora dentro de "Comunicar" (18-sep-2026, fila 52,
      docs/CABECERA-DEL-ASUNTO.md). */
-  await pagina.click('.boton-comunicar');
-  await pagina.getByRole('button', { name: 'Correo electrónico', exact: true }).click();
+  /* Fila 154: con hitos, «Comunicar» de arriba va escondido (vive en la mesa del hito); su menú se pulsa por debajo. */
+  await pagina.waitForSelector('.boton-comunicar', { state: 'attached' });
+  await pagina.evaluate((t) => Array.from(document.querySelector('.boton-comunicar').closest('.ficha-menu-envoltorio').querySelectorAll('.ficha-menu-opcion')).find((o) => o.textContent.trim() === t).click(), 'Correo electrónico');
   await pagina.waitForSelector('#capa:not(.oculto)');
   await pagina.waitForSelector('#correo-cuerpo-texto');
 }
@@ -204,8 +205,9 @@ await cerrarCuadro();
 await abrirFichaDe(CON_PLANTILLA);
 /* "Mensaje Séneca" vive ahora dentro de "Comunicar" (18-sep-2026, fila 52,
    docs/CABECERA-DEL-ASUNTO.md). */
-await pagina.click('.boton-comunicar');
-await pagina.getByRole('button', { name: 'Mensaje de Séneca', exact: true }).click();
+/* Fila 154: con hitos, «Comunicar» de arriba va escondido (vive en la mesa del hito); su menú se pulsa por debajo. */
+await pagina.waitForSelector('.boton-comunicar', { state: 'attached' });
+await pagina.evaluate((t) => Array.from(document.querySelector('.boton-comunicar').closest('.ficha-menu-envoltorio').querySelectorAll('.ficha-menu-opcion')).find((o) => o.textContent.trim() === t).click(), 'Mensaje de Séneca');
 await pagina.waitForSelector('#capa:not(.oculto)');
 /* El cuadro de Séneca es el de js/seneca-cuadro.js desde la fila 53
    (18-sep-2026, docs/SENECA-CUADRO-ANCHO.md): el texto va en

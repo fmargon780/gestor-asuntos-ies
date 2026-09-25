@@ -175,21 +175,23 @@ await pagina.waitForSelector('#capa', { state: 'hidden' });
    7. "COMUNICAR"
    ============================================================ */
 console.log('--- 7. Comunicar abre Correo y Mensaje de Séneca ---');
-await pagina.click('.boton-comunicar');
+/* Fila 154: con hitos, «Comunicar» de arriba va escondido (vive en la mesa del hito); su menú se pulsa por debajo. */
+await pagina.waitForSelector('.boton-comunicar', { state: 'attached' });
 await pagina.waitForTimeout(100);
 await comprobar('7. las dos opciones',
-  pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents(),
+  pagina.evaluate(() => Array.from(document.querySelector('.boton-comunicar').closest('.ficha-menu-envoltorio').querySelectorAll('.ficha-menu-opcion')).map((o) => o.textContent.trim())),
   ['Correo electrónico', 'Mensaje de Séneca']);
-await pagina.getByRole('button', { name: 'Correo electrónico', exact: true }).click();
+await pagina.evaluate(() => Array.from(document.querySelector('.boton-comunicar').closest('.ficha-menu-envoltorio').querySelectorAll('.ficha-menu-opcion')).find((o) => o.textContent.trim() === 'Correo electrónico').click());
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('7. "Correo electrónico" abre el cuadro de Correo de siempre',
   pagina.locator('#cuadro-titulo').textContent(), 'Correo de este asunto');
 await pagina.keyboard.press('Escape');
 await pagina.waitForSelector('#capa', { state: 'hidden' });
 
-await pagina.click('.boton-comunicar');
+/* Fila 154: con hitos, «Comunicar» de arriba va escondido (vive en la mesa del hito); su menú se pulsa por debajo. */
+await pagina.waitForSelector('.boton-comunicar', { state: 'attached' });
 await pagina.waitForTimeout(100);
-await pagina.getByRole('button', { name: 'Mensaje de Séneca', exact: true }).click();
+await pagina.evaluate((t) => Array.from(document.querySelector('.boton-comunicar').closest('.ficha-menu-envoltorio').querySelectorAll('.ficha-menu-opcion')).find((o) => o.textContent.trim() === t).click(), 'Mensaje de Séneca');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('7. "Mensaje de Séneca" abre el cuadro de Séneca de siempre',
   pagina.locator('#cuadro-titulo').textContent(), 'Mensaje por Séneca');

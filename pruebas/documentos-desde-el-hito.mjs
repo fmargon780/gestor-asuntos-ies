@@ -178,6 +178,8 @@ await comprobar('con su nota en el hito', Promise.resolve(r5.notas), ['Generado 
 
 /* ---------- 6. el editor del paso ---------- */
 console.log('--- 6. «Documentos de este paso» en el editor ---');
+/* Fila 155: el Word recién generado se abre en grande (js/word-visor.js): se cierra. */
+await pagina.evaluate(() => window.WordVisor && WordVisor.cerrar());
 await pagina.evaluate(() => { App.volverALaLista(); });
 await pagina.evaluate(() => {
   window.__editada = Guias.editar('MATRICULA', [{ id: 'e1', titulo: 'Paso', plantillasDocumento: ['pd-a', 'pd-borrada'] }], [], []);

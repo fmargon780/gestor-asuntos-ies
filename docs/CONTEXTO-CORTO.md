@@ -66,10 +66,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 (Una línea por cosa; el porqué, en `docs/contexto/` y `HISTORIA.md`.)
 
-- Categoría → tipo → tercero → nombre de carpeta, con vista previa. Nombre corto del tipo; tipo nuevo sin salir de Nuevo asunto.
-- Cada tipo dice quién lo encarga (Secretaría, Dirección, Jefatura, Varios): parrilla agrupada, filtro y Cuentas.
-- Asuntos reservados (por tipo o uno a uno): candado y sin el nombre del tercero en listas y buscador.
-- El estado del asunto es su hito actual («Paso N de M · título»): lo pone solo en Administración o terceros; cada paso de la guía dice a quién le toca; «Esperando a…», a mano. Sin estados manuales. Vía y fecha límite.
+- Categoría → tipo → tercero → nombre de carpeta, con vista previa. Nombre corto; tipo nuevo al vuelo.
+- Cada tipo dice quién lo encarga (Secretaría, Dirección…): parrilla agrupada, filtro y Cuentas.
+- Asuntos reservados (por tipo o uno a uno): candado, sin el tercero en listas y buscador.
+- El estado es el primer hito sin terminar («Paso N de M · título», «Paso actual»): Administración o terceros; «Esperando a…» sale solo con el responsable (a mano, hasta que cambia el paso). Guías: «Administración», no personas. Vía y fecha límite.
 - Asuntos recurrentes, con aviso. Avisos de fichas huérfanas y papelera vieja.
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
   sueltas también en documentos, registro de Séneca, ficha y notas.
@@ -77,28 +77,29 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   hermanos en la ficha. La BD de alumnado (carpeta de Drive) suma sus datos: ficha, huecos, grupos.
 - Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
   Renombrar un tipo se lleva su guía; cambiarle el tipo, la ofrece.
-- Nombre comercial de empresas; editar datos de un tercero dado de alta a mano.
+- Nombre comercial de empresas; editar un tercero dado de alta a mano.
 - Guías del procedimiento por tipo, con preguntas dentro de las respuestas sin límite, y su mapa
   (dibujo de la guía entera; en un asunto, con el camino elegido resaltado). Se escriben en
   acordeón: un paso abierto a la vez.
-- Panel lateral de lectura; tablón a la vista. Aviso de duplicado; pantalla "Duplicados".
+- Panel lateral de lectura; tablón a la vista. Al crear, recuadro con lo que ya tiene el tercero; parada si es idéntico; pantalla "Duplicados".
 - Correo y mensaje de Séneca: se prepara; el correo se envía de verdad (Apps Script, con
   confirmación) y nunca dos veces.
 - "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; con
   tercero reconocido, también sugiere meterlo en uno que ya existe («Meter aquí»). Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
-- Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. Carpeta ≤150 caracteres, documento ≤120.
-- Botón «Ruta» (`file:///`, no Bing; y en Correo/Séneca). Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en
+- Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. Carpeta ≤150, documento ≤120.
+- Botón «Ruta» (`file:///`; ficha, Correo/Séneca): deduce Dropbox; lo de dentro, una vez para el centro. Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
-- Registrar un documento detecta el PDF ya sellado, lo renombra y guarda el original como
-  "SIN SELLAR"; cada documento se puede asociar a un hito.
+- Registrar detecta el PDF sellado; el "SIN SELLAR" y el Word con su PDF van a «Versiones previas»
+  (plegadas); cada documento, asociable a un hito.
 - Terceros relacionados con un asunto, con altas por grupo (unidad, nivel, grupo propio), que
   también sirven de destinatarios de un correo o de un mensaje de Séneca.
 - Ajustes: tres pestañas y pantalla por tipo; todo plegado, con resumen; avisos de fallo, solo con fallo.
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
 - Papelera: nada se borra de golpe. Plazo de conservación por tipo: avisa, nunca borra solo.
+- Word: lo que falta se pregunta antes; se ve en la app, con «Guardar PDF» e «Imprimir» (sin editar aún).
 - Plantillas de correo y de Word por tipo, con huecos que se rellenan solos; se crean o editan también
   desde el propio cuadro de Correo/Séneca («Crear»/«Editar plantilla»); textos del centro en `plantillas/`
   (botón en Mantenimiento). Membrete de la Junta (lo dibuja la app; logo opcional), firma de quien ocupaba
@@ -108,25 +109,25 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Copias diarias (90 días), detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable de nombres. Un borrado (tipo,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en cada subida de código (no con solo `docs/`).
-- Copia sin internet (`file://`): se actualiza sola; si no puede o no lo comprueba, franja fija arriba; cada 30 min.
+- Copia sin internet (`file://`): se actualiza sola (reintenta si se estaba publicando); si no, franja fija arriba; cada 30 min.
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
-  bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa): «Generar documento ▾» y «Comunicar ▾»; tres tarjetas,
-  una en grande y dos de resumen (pulsar una la abre): el guion (siguiente paso resaltado; preguntas; 📎, ✎; se marca solo al generar,
-  registrar, comunicar o añadir), los documentos (nombre entero, gemelos, selección, «Enviar ▾» por correo o Séneca) y notas con historia.
+  bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa): las acciones solo ahí, «Generar documento ▾», «Comunicar ▾»
+  y «Registrar» (con hitos, no en la barra de arriba); tres tarjetas, una en grande y dos de resumen: el guion (lista para marcar, sin
+  botones, quién y cuándo al lado; «receta» opcional que sale arriba del menú y deja el cuadro relleno; preguntas; 📎, ✎; se marca
+  solo al generar, registrar, comunicar o añadir), todos los documentos del asunto (los de otros hitos, con su etiqueta), gemelos, selección, «Enviar ▾» por correo o Séneca y notas con historia.
   Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa
-  («✎ Cambiar el guion», sin salir a Ajustes); su «Comunicar» abre lo mismo que la cabecera y marca ese paso.
+  («✎ Cambiar el guion», sin salir a Ajustes). «Paso N de M», «Hitos N/M» y la mesa, con una sola cuenta.
   Biblioteca de hitos del centro, con guion; en Mantenimiento, cargar tipos, guías y guiones del instituto.
-- "Qué me toca": pendientes, filtro por responsable, "Dormidos" (sin novedades en N días). "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Formularios": catálogo buscable de
+- "Qué me toca": pendientes, filtro por responsable (una persona ve también los de Administración), "Dormidos" (sin novedades en N días). "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena solo los datos del centro (casillas con nombre legible y miniatura).
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
 - Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF (banda libre para sello y firma); repartir un PDF
   entre terceros, un archivado por persona.
 - "Lo pide": quién pidió la gestión, por qué vía y cuándo; su correo sale en el cuadro de Correo.
-- Archivar o reabrir sobre un destino que ya existe fusiona carpetas; reintenta si Dropbox tropieza.
-- Crear, reabrir o editar deja en la ficha; Volver regresa a la pantalla de origen, a su altura.
+- Archivar o reabrir sobre un destino que ya existe fusiona carpetas; reintenta.
+- Crear, reabrir o editar deja en la ficha; Volver regresa a donde estaba. Ficha: foto del tercero, cabecera fija.
 - Al archivar, la ficha baja a su carpeta (al reabrir, vuelve) y se hace el índice del expediente
   (PDF numerado; también desde el menú de la ficha).
-- Ficha del asunto: foto del tercero; cabecera fija al bajar.
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -135,7 +136,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - **Permiso permanente de Francisco**: un pull request (sesiones desde la nube) lo fusiona Claude
   Code solo, en verde y sin conflictos (nota al final de `docs/COLA.md`).
 - **Comprobar siempre lo publicado con `curl`.**
-- Vercel: 100 publicaciones/día (gratuito); `vercel.json` salta los commits de solo `docs/`, `pruebas/`, `.github/` o `.md`; máximo dos subidas por fila (regla 13).
+- Vercel: 100 publicaciones/día; `vercel.json` salta los commits de solo `docs/`, `pruebas/`, `.github/` o `.md`; máx. dos subidas por fila.
 - Antes de colgar una función de `App`, mirar que el nombre esté libre. Un solo cuadro (`U.preguntar`) a la vez.
 - Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV.
 - Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o uno nuevo. Sin remedio, con `U.envolver`, apuntado en `js/envolturas-esperadas.js`.
@@ -158,8 +159,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Conector de Vercel sobre un proyecto existente (da 403), o crear otro "por si acaso".
 - Abrir la carpeta del asunto en el explorador de archivos, o una hoja de Google Sheets como interfaz.
 - Enlazar un correo con `#all/<id de hilo>` (es `#search/rfc822msgid:<id>`), o meter Gmail en un marco (Google no lo permite).
-- Esconder el tablón de notas, sacar el DNI de la columna del tutor, o poner el nombre comercial en el nombre de la carpeta de un asunto de empresa.
-- Reescribir la arquitectura de módulos y envolturas, o meter los campos de cada tipo en el nombre de los documentos (son del asunto, no del papel).
+- Esconder el tablón, sacar el DNI de la columna del tutor, o el nombre comercial en la carpeta de una empresa.
+- Reescribir módulos y envolturas, o meter los campos del tipo en el nombre de los documentos (son del asunto).
 - Rellenar los datos de la PERSONA en un impreso (a propósito: para ver si algo cambió).
 
 ## 8. Qué falta

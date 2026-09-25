@@ -45,8 +45,10 @@ Cambió cómo se ve, no lo que hace: cada botón llama a lo mismo que antes. **E
   no está hecho), el plazo («Sin plazo» o «Vence el 15-oct · quedan N días hábiles», en rojo o ámbar si
   vence) y el responsable. Siguen siendo pulsables con `FichaMenus` (`.mesa-etq-estado`,
   `.mesa-etq-plazo`, `.mesa-etq-resp`, clase `mesa-meta`). «Hecho» sí es etiqueta verde.
-- **A la derecha, cuatro botones**: «Generar documento ▾», «Comunicar ▾» (no en un hito-pregunta),
-  «Marcar como hecho» (principal; pulsa la casilla de siempre, que avisa de lo obligatorio; con el hito
+- **A la derecha, cinco botones**: «Generar documento ▾», «Comunicar ▾» (no en un hito-pregunta),
+  **«Registrar»** (fila 154, no en un hito-pregunta: con un documento del hito sin registro, lo
+  registra; con varios, menú para elegir; sin ninguno, aviso ámbar; es `HitosDocumentoMenu.registrar`,
+  lo mismo que el ⋯ del documento, y abre antes la tarjeta de documentos), «Marcar como hecho» (principal; pulsa la casilla de siempre, que avisa de lo obligatorio; con el hito
   hecho, «Hecho ✓ (desmarcar)») y «···»: «Estamos en este paso…» (fila 129, si se puede), «Dejarlo solo
   informativo»/«Pedírmelo a mí», «+ Añadir un paso a la guía del tipo» (fila 120), «Cambiar la guía…»
   (con la advertencia «Vale para todos los asuntos…», luego `GuiasDelCentro.escribir`) y «Quitar este
@@ -60,7 +62,11 @@ Cambió cómo se ve, no lo que hace: cada botón llama a lo mismo que antes. **E
   pulsar fuera (no cuenta el cuadro `#capa` que se abra desde dentro) o al abrir el otro. El abierto se
   recuerda por asunto e hito, así que un repintado no lo cierra.
 - Los botones de siempre del hito (`.hito-generar`, `.hito-comunicar-boton`) siguen en el DOM,
-  escondidos en `.mesa-ocultos`: los pulsan las acciones del guion.
+  escondidos en `.mesa-ocultos`.
+- **Con hitos, la barra de arriba de la ficha ya no enseña «Comunicar» ni «Generar documento»** (fila
+  154): `js/hitos-panel.js` pone `asunto-con-hitos` en `#pantalla-asunto` al pintar y
+  `css/hito-mesa.css` los esconde (siguen en el DOM, con su menú). Como un tipo sin guía recibe la guía
+  mínima, en la práctica todo asunto abierto tiene hitos: se comunica y se genera desde la mesa.
 
 ### Tres tarjetas (fila 147, 25-sep-2026, `docs/MESA-TARJETAS-QUE-SE-ABREN.md`)
 
@@ -83,33 +89,48 @@ Cuál se ve lo dice `data-tarjeta` de `.mesa-columnas` (solo CSS: cambiar no rep
   y el registro en verde o «Sin registrar» en rojo claro (sin gemelos, cinco y «y N más»; vacío,
   «Ninguno todavía.»); las notas con «N notas», la primera línea de la última y «Última: quién · día»
   (sin notas, lo último de la historia, o «Sin notas»).
-- **Guion en grande** (`js/hito-mesa-guion.js`): el título, la barra y «N de M» en la misma línea.
-  Los pasos hechos, en una línea gris y tachada, sin explicación ni botones (quién, cuándo, el valor o
-  el documento, en el `title`). **El siguiente paso** (el primero sin hacer y sin «No aplica»; ninguno
-  con el hito hecho) lleva `.guion-siguiente`: fondo ámbar claro, título más grande, su explicación y su
-  acción como botón principal a la derecha; si su acción es añadir un documento (o es una línea 📎 sin
-  acción), una zona pequeña para soltar el PDF. Los demás pendientes: explicación en gris pequeño y su
-  acción como botón normal. «No aplica» solo al pasar el ratón o con el foco (siempre en pantallas
+- **Guion en grande** (`js/hito-mesa-guion.js`): el título, la barra y «N de M» en la misma línea
+  (fila 154: sin contar los «No aplica», ni en lo hecho ni en el total: `Hitos.cuentaGuion`).
+  **Desde la fila 154 (`docs/HITOS-ACCIONES-EN-EL-HITO.md`) los pasos son una lista para marcar, sin
+  botones de acción**: las acciones viven solo en la cabecera del hito. Un paso hecho, en gris (sin
+  tachar) con «quién · día» al lado en pequeño (`.guion-paso-quien`); solo «No aplica» se tacha. **El
+  siguiente paso** (el primero sin hacer y sin «No aplica»; ninguno con el hito hecho) lleva
+  `.guion-siguiente`: fondo ámbar claro, título más grande y su explicación; si su acción es añadir un
+  documento (o es una línea 📎), una zona pequeña para soltar el PDF. Los demás pendientes: explicación
+  en gris pequeño. «No aplica» solo al pasar el ratón o con el foco (siempre en pantallas
   táctiles). Al pie, «+ Añadir un paso solo para este asunto» y, si el hito viene de un paso de la
   guía, «✎ Cambiar el guion de este hito (para todos los asuntos de este tipo)».
 
-  **El «Comunicar» de un paso** (25-sep-2026, fila 150, `docs/MESA-COMUNICAR-DEL-PASO-Y-GUION.md`):
-  llama a `HitosComunicar.comunicar(a, h, canal, { idPasoGuion })` en línea recta (nunca clicando el
-  botón escondido `.hito-comunicar-boton` de `.mesa-ocultos`: con dos vías, `FichaMenus` montaba su
-  menú dentro de ese contenedor `oculto`, invisible aunque funcionara). Con una sola vía la llama
-  directa; con dos, `FichaMenus.montar` cuelga del propio botón del paso, visible. `idPasoGuion` viaja
-  hasta `extra.comunicarHito` (`js/hitos-comunicar.js`) y `js/correo-rastro.js` lo usa para marcar
-  justo ese paso (`Hitos.marcarGuion`) en vez de «el primero pendiente» (`Hitos.marcarGuionPorAccion`,
-  que se sigue usando cuando se comunica desde la cabecera, sin paso concreto). **«Generar
-  documento»/«Añadir documento» de un paso no tenían este fallo**: su único botón vive dentro de una
-  tarjeta visible (`Documentos del hito`), no en `.mesa-ocultos`, así que `querySelector` ya encontraba
-  ese, no el escondido.
+  **El «Comunicar» de un paso** (fila 150) ya no existe desde la fila 154: se comunica desde «Comunicar
+  ▾» de la cabecera, que marca el primer paso pendiente con esa acción (`Hitos.marcarGuionPorAccion`).
+  `HitosComunicar.comunicar(a, h, canal, { idPasoGuion })` sigue sabiendo marcar un paso concreto
+  (`extra.comunicarHito`, `js/correo-rastro.js`, `Hitos.marcarGuion`): lo usan las recetas.
+
+  **Las recetas** (fila 164, `js/hito-mesa-recetas.js`): un paso con `accion` comunicar, generar o
+  registrar es un paso con receta; `receta` (opcional, `js/guias-guion.js`) trae los detalles:
+  comunicar `{ a, via, plantilla }`, generar `{ plantilla }`, registrar `{ sentido }`. Los pasos de
+  antes, con acción y sin receta, ya valen tal cual (receta sin detalles): no se convierte nada. En la
+  mesa, arriba de «Comunicar ▾» salen los pasos pendientes de comunicar (`.mesa-recetas`, un botón
+  `.mesa-receta` por paso, con su texto): al elegir uno se abre el cuadro de la vía de la receta (si
+  no dice, la primera de `HitosComunicar.canalesDe`), con los destinatarios de «a quién» (de los
+  candidatos de `HitoMesaComunicar`: tercero, tutores, relacionados; sin «a quién», los premarcados;
+  «la tutoría» u «otro», sin correo) y la plantilla ya elegida (`extra.plantilla` →
+  `CorreoNucleo._interno.plantillaPedida`, que los dos cuadros usan una vez; gana a un texto propio
+  del paso), y al terminar se marca ese paso. Arriba de «Generar documento ▾», los de generar: con
+  plantilla fija, `PlantillasDocumento.generar(a, p, 'abierto', { hito, idPasoGuion })` y se marca ese
+  paso; sin ella, el cuadro de elegir de siempre. «Registrar» pone los de registrar (con su sentido)
+  como título, apagado, de su menú de documentos. El editor del guion enseña la receta debajo de la
+  acción (la lista de plantillas sale de `Plantillas.enMemoria`, lo último leído).
 
   **«✎ Cambiar el guion de este hito»** (misma fila): abre `U.preguntar` con el editor de
   `js/guias-guion.js` (el mismo de Ajustes, sin duplicar: `bloqueHTML`/`enganchar`/`leer`/`normalizar`
   sobre una copia en memoria del `guion` de ese paso) y guarda con `GuiasDelCentro.cambiarPasos`, igual
   que «+ Añadir un paso a la guía del tipo». Sin salir a Ajustes.
-- **Documentos en grande**: «Añadir documento» junto al título, la barra de marcados encima, la tabla
+- **Documentos en grande** (fila 164: con **todos los documentos del asunto**, `otrosDelAsunto`: debajo
+  de los del hito, «De otros hitos», cada uno con la etiqueta `.mesa-doc-de-hito` «N · título» de su
+  hito, y al final «En la carpeta, sin hito», sin gemelos ni ficheros internos; se abren, se envían y se
+  marcan para adjuntar como los propios, sin el ⋯, que es de su hito; `.mesa-doc-ajeno`. El título dice
+  «Documentos del hito · 2 (y 5 más del asunto)», `cuentaTitulo`): «Añadir documento» junto al título, la barra de marcados encima, la tabla
   (casilla, tipo en negrita y el nombre del fichero entero debajo, fecha, registro `.mesa-doc-registro`,
   estado «Registrado»/«Sin registrar», Abrir `.mesa-doc-abrir`, Enviar y ⋯), los gemelos debajo de su
   documento (`.mesa-doc-gemelo-fila`, sangrados, con su «Abrir») y, al pie, una zona de soltar de
@@ -224,7 +245,10 @@ Se comprueba con `pruebas/hito-mesa.mjs`, `pruebas/mesa-del-hito-enfocada.mjs`, 
 (a 1905×1000 y 1280×800; con `CAPTURAS=1`, fotos en `pruebas/capturas/`), `pruebas/mesa-comunicar-del-paso-y-guion.mjs`
 (el «Comunicar» de un paso, visible con dos vías, marca el paso pulsado; y «✎ Cambiar el guion») y
 `pruebas/enviar-documento-por-seneca.mjs` («Enviar ▾» de un documento, por correo o por Séneca, y el guion al
-terminar). Las pruebas que abrían varios hitos seguidos cierran antes la mesa (`HitoMesa.cerrar()`).
+terminar) y `pruebas/hitos-acciones-en-el-hito.mjs` (fila 154: sin botones en los pasos, «Registrar» en la
+cabecera, «Comunicar» de arriba escondido, quién al lado del paso hecho, y los tres números iguales) y
+`pruebas/hitos-recetas.mjs` (fila 164: la receta de comunicar abre el cuadro con su plantilla y marca ese
+paso; los documentos de otros hitos; el editor de la receta; generar y registrar). Las pruebas que abrían varios hitos seguidos cierran antes la mesa (`HitoMesa.cerrar()`).
 
 ### Una sola lista: lo que hay que reunir, en el guion (25-sep-2026, fila 138, `docs/UNA-SOLA-LISTA-EN-EL-HITO.md`)
 

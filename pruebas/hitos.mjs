@@ -479,7 +479,7 @@ await pagina.locator('#ficha-guia .hito[data-id="p1"] .hito-documento[data-doc="
 await pagina.waitForSelector('.ficha-menu:not(.oculto)');
 await comprobar('en un PDF que sí está y aún sin registro, el menú trae las herramientas y "Quitar del hito"',
   pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents(),
-  ['Registrar', 'Separar', 'Unir', 'Sacar páginas', 'Ajustar tamaño', 'Renombrar', 'Mover a otro hito', 'Quitar del hito']);
+  ['Registrar', 'Separar', 'Unir', 'Sacar páginas', 'Ajustar tamaño', 'Renombrar', 'Mover a otro hito', 'Pasar a versiones previas', 'Quitar del hito']);   /* fila 160 */
 await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Quitar del hito' }).click();
 await pagina.waitForTimeout(400);
 await comprobar('"Quitar del hito" solo desapunta (mismo efecto que la ✕ de antes), nunca borra el fichero',

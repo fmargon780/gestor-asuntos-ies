@@ -429,7 +429,11 @@
     pintarCuenta(datos.items);
 
     var filtro = leerFiltro();
-    var items = filtro ? datos.items.filter(function (it) { return it.hito.responsable === filtro; }) : datos.items;
+    /* Fila 159: al filtrar por una persona, también los de «Administración». */
+    var items = filtro ? datos.items.filter(function (it) {
+      return window.HitosAdministracion ? HitosAdministracion.cuentaPara(it.hito.responsable, filtro, datos.ajustes)
+        : it.hito.responsable === filtro;
+    }) : datos.items;
     var g = clasificar(items, datos.ajustes);
     var nAspirantes = await contarAspirantesSinNumero();
 

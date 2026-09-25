@@ -14354,6 +14354,58 @@
           "normativa": null
         }
       ]
+    },
+    {
+      "id": "b-firma-secretaria",
+      "nombre": "Firma de Secretaría",
+      "titulo": "Firma de Secretaría",
+      "explicacion": "La Secretaría firma el certificado.",
+      "responsable": "secretaria",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [],
+      "guion": [
+        {
+          "id": "g1",
+          "texto": "Pasar el certificado a la firma de Secretaría",
+          "explicacion": "",
+          "accion": "",
+          "normativa": null
+        },
+        {
+          "id": "g2",
+          "texto": "Recoger el certificado firmado y añadirlo al asunto",
+          "explicacion": "",
+          "accion": "anadir",
+          "normativa": null
+        }
+      ]
+    },
+    {
+      "id": "b-visto-bueno-direccion",
+      "nombre": "Visto bueno de Dirección",
+      "titulo": "Visto bueno de Dirección",
+      "explicacion": "La Dirección da el visto bueno al certificado ya firmado por Secretaría.",
+      "responsable": "direccion",
+      "requisitos": [],
+      "soloInformativo": false,
+      "normativa": [],
+      "guion": [
+        {
+          "id": "g1",
+          "texto": "Pasar el certificado al visto bueno de Dirección",
+          "explicacion": "",
+          "accion": "",
+          "normativa": null
+        },
+        {
+          "id": "g2",
+          "texto": "Recoger el certificado con el visto bueno y añadirlo al asunto",
+          "explicacion": "",
+          "accion": "anadir",
+          "normativa": null
+        }
+      ]
     }
   ],
   "guiasPorTipo": {

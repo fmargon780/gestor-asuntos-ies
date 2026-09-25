@@ -142,6 +142,14 @@ window.HitosDocumentoMenu = (function () {
         HitoMesaDocumentos.moverAOtroHito(a, hito, entrada ? entrada.hitos : [], [nombre]);
       } });
     }
+    /* Fila 160: sin sacarlo del hito (se ve plegado en su mesa). */
+    if (!falta && window.VersionesPrevias) {
+      opciones.push({ texto: 'Pasar a versiones previas', alPulsar: async function () {
+        try { await VersionesPrevias.mover(a.handle, nombre); U.aviso('Pasado a «Versiones previas».', 'bueno'); }
+        catch (e) { U.fallo('No he podido moverlo', e); }
+        if (window.HitosPanel) HitosPanel.programarRepintado();
+      } });
+    }
     if (opciones.length) opciones.push({ raya: true });
     opciones.push({
       texto: 'Quitar del hito', clase: 'ficha-menu-peligro',
@@ -167,5 +175,6 @@ window.HitosDocumentoMenu = (function () {
     });
   }
 
-  return { ficherosNuevos: ficherosNuevos, botonHTML: botonHTML, engancharTodos: engancharTodos };
+  return { ficherosNuevos: ficherosNuevos, botonHTML: botonHTML, engancharTodos: engancharTodos,
+           registrar: accionRegistrar };
 })();

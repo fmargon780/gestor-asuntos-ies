@@ -111,8 +111,9 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
       const t = Array.from(document.querySelectorAll('#ficha-tarjetas .ficha-tarjeta')).map((el) => Math.round(el.getBoundingClientRect().height));
       return Math.max(...t) - Math.min(...t) <= 1;
     }), true);
-  await comprobar('1. Hitos resume "0 de 3 hechos"',
-    pagina.locator('.ficha-tarjeta[data-tarjeta="hitos"] .ficha-tarjeta-resumen .fuerte').textContent(), '0 de 3 hechos');
+  /* Fila 154: la misma cuenta que «Paso N de M» de la cabecera. */
+  await comprobar('1. Hitos resume "Paso 1 de 3"',
+    pagina.locator('.ficha-tarjeta[data-tarjeta="hitos"] .ficha-tarjeta-resumen .fuerte').textContent(), 'Paso 1 de 3');
   /* Desde la fila 114, sin la línea «3 documentos» (el número va en el círculo): sus nombres. */
   await comprobar('1. Documentos enseña sus nombres',
     pagina.locator('.ficha-tarjeta[data-tarjeta="documentos"] .ficha-tarjeta-resumen .ficha-resumen-doc').allTextContents(), DOCS);

@@ -137,9 +137,22 @@
       catch (e) { tablas = null; }
     }
     var resultado;
+    async function rellenarCon(v) {
+      var r = await Docx.rellenar(buffer, v);
+      return tablas ? TablasDatos.resaltarResultado(r, tablas.faltan) : r;
+    }
     try {
-      resultado = await Docx.rellenar(buffer, valores);
-      if (tablas) resultado = await TablasDatos.resaltarResultado(resultado, tablas.faltan);
+      resultado = await rellenarCon(valores);
+      /* Fila 155 (docs/WORD-DENTRO-DE-LA-APP.md, A): lo que falta se
+         pregunta ANTES de guardar nada (js/word-faltan.js); lo de las
+         tablas de datos, en amarillo, no entra aquí. */
+      var deTablas = (tablas && tablas.faltan) || [];
+      var preguntar = resultado.faltan.filter(function (f) { return deTablas.indexOf(f) === -1; });
+      if (preguntar.length && window.WordFaltan) {
+        var r = await WordFaltan.preguntar(preguntar);
+        if (r.accion === 'cancelar') { U.aviso('No se ha generado nada.', 'ambar'); return; }
+        if (r.accion === 'generar' && Object.keys(r.aMano).length) resultado = await rellenarCon(Object.assign({}, valores, { aMano: r.aMano }));
+      }
     } catch (e) {
       U.aviso('No he podido rellenar el documento: ' + U.mensajeDeError(e), 'malo');
       return;
@@ -187,12 +200,18 @@
       }
       if (window.HitosRequisitos) {
         try { await HitosRequisitos.marcarPorDocumento(asunto.nombre, hito.id, nombreDoc); } catch (e2) { /* no crítico */ }
-        if (Hitos.marcarGuionPorAccion) await Hitos.marcarGuionPorAccion(asunto, hito.id, 'generar');   /* fila 109 */
+        /* Fila 164: desde la receta de un paso, se marca ese paso. */
+        if (opciones && opciones.idPasoGuion && Hitos.marcarGuion) {
+          try { await Hitos.marcarGuion(asunto.nombre, hito.id, opciones.idPasoGuion, { hecho: true }); }
+          catch (e3) { U.accesorio('Documento generado, pero no he podido marcar el paso', e3); }
+        } else if (Hitos.marcarGuionPorAccion) await Hitos.marcarGuionPorAccion(asunto, hito.id, 'generar');   /* fila 109 */
       }
       if (window.HitosPanel && HitosPanel.desplegarAlAbrir) HitosPanel.desplegarAlAbrir(asunto.nombre, hito.id);
     }
 
     if (typeof App.abrirFicha === 'function') App.abrirFicha(asunto, modo);
+    /* Fila 155, B: el Word recién hecho, en grande dentro de la aplicación. */
+    if (window.WordVisor) WordVisor.abrir({ blob: resultado.blob, nombre: nombreDoc, carpeta: asunto.handle, asunto: asunto, hito: hito });
   }
 
   /* ==========================================================
