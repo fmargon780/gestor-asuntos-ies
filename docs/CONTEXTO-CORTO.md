@@ -109,7 +109,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Copias diarias (90 días), detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable de nombres. Un borrado (tipo,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en cada subida de código (no con solo `docs/`).
-- Copia sin internet (`file://`): se actualiza sola; si no puede o no lo comprueba, franja fija arriba; cada 30 min.
+- Copia sin internet (`file://`): se actualiza sola (reintenta si se estaba publicando); si no, franja fija arriba; cada 30 min.
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
   bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa): las acciones solo ahí, «Generar documento ▾», «Comunicar ▾»
   y «Registrar» (con hitos, no en la barra de arriba); tres tarjetas, una en grande y dos de resumen: el guion (lista para marcar, sin

@@ -96,8 +96,12 @@
     } catch (e) { return null; }
   }
 
-  async function leerVersionRemota() {
-    var resp = await fetch(BASE_REMOTO + 'version.json', { cache: 'no-store' });
+  /* `sinCache` (fila 157): con `?t=`, para saltarse la caché de
+     raw.githubusercontent.com (unos 5 minutos) en el reintento. */
+  function conT(url, sinCache) { return sinCache ? url + '?t=' + Date.now() : url; }
+
+  async function leerVersionRemota(sinCache) {
+    var resp = await fetch(conT(BASE_REMOTO + 'version.json', sinCache), { cache: 'no-store' });
     if (!resp.ok) throw new Error('http ' + resp.status);
     var datos = await resp.json();
     if (!datos || typeof datos.ficheros !== 'object') throw new Error('version.json remoto ilegible');
@@ -133,11 +137,12 @@
     } catch (e) { /* ya no está, o su carpeta tampoco: no pasa nada */ }
   }
 
-  async function descargarYEscribir(dir, ruta, shaEsperado) {
-    var resp = await fetch(BASE_REMOTO + ruta, { cache: 'no-store' });
+  async function descargarYEscribir(dir, ruta, shaEsperado, sinCache) {
+    var resp = await fetch(conT(BASE_REMOTO + ruta, sinCache), { cache: 'no-store' });
     if (!resp.ok) throw new Error('no se pudo descargar ' + ruta + ' (' + resp.status + ')');
     var bytes = new Uint8Array(await resp.arrayBuffer());
     var sha = await sha256Hex(bytes);
+    /* La regla de oro: nada se escribe si no coincide. */
     if (sha !== shaEsperado) throw new Error('el sha256 de ' + ruta + ' no coincide');
     await escribirEnRuta(dir, ruta, bytes);
   }
@@ -146,11 +151,11 @@
 
   /* Descarga lo cambiado respecto al `version.json` del disco y
      escribe `version.json` el último. Lanza si algo falla. */
-  async function actualizarEn(dir, remoto) {
+  async function actualizarEn(dir, remoto, sinCache) {
     var local = await leerVersionLocal(dir);
     for (var ruta in remoto.ficheros) {
       if (!local || !local.ficheros || local.ficheros[ruta] !== remoto.ficheros[ruta]) {
-        await descargarYEscribir(dir, ruta, remoto.ficheros[ruta]);
+        await descargarYEscribir(dir, ruta, remoto.ficheros[ruta], sinCache);
       }
     }
     if (local && local.ficheros) {
@@ -161,6 +166,36 @@
     /* version.json el último: si algo de arriba falla, el de disco
        sigue siendo el de antes, y la próxima vez se reintenta. */
     await escribirEnRuta(dir, 'version.json', new TextEncoder().encode(JSON.stringify(remoto)));
+  }
+
+  /* Fila 157 (docs/COPIA-ACTUALIZAR-SIN-CARRERA.md): si se publica una
+     versión nueva justo mientras se actualiza, la lista vieja no casa con
+     algún fichero ya nuevo. Un reintento, pasados unos segundos, con la
+     lista leída otra vez y sin caché. Devuelve el `version.json` con el
+     que se ha actualizado, o null si resulta que ya estaba al día. Si el
+     segundo intento también falla, lanza el error en palabras llanas (el
+     técnico, a la consola). */
+  var ESPERA_REINTENTO_MS = typeof window.__COPIA_ESPERA_MS__ === 'number' ? window.__COPIA_ESPERA_MS__ : 5000;
+  var MENSAJE_PUBLICANDO = 'No se ha podido actualizar porque se estaba publicando una versión nueva justo ahora. ' +
+    'Espera un par de minutos y pulsa otra vez.';
+
+  async function actualizarConReintento(dir, remoto) {
+    try {
+      await actualizarEn(dir, remoto);
+      return remoto;
+    } catch (e) {
+      console.warn('Actualizar la copia, primer intento:', e);
+    }
+    await new Promise(function (r) { setTimeout(r, ESPERA_REINTENTO_MS); });
+    try {
+      var otra = await leerVersionRemota(true);
+      if (otra.version === App.VERSION) return null;
+      await actualizarEn(dir, otra, true);
+      return otra;
+    } catch (e2) {
+      console.warn('Actualizar la copia, segundo intento:', e2);
+      throw new Error(MENSAJE_PUBLICANDO);
+    }
   }
 
   /* ---------- contra el bucle de recargas (sessionStorage) ---------- */
@@ -315,12 +350,25 @@
     var textoBoton = boton ? boton.textContent : '';
     if (boton) { boton.disabled = true; boton.textContent = 'Actualizando…'; }
     detalleFranja('');
+    /* Fila 157: la lista de ficheros, leída otra vez al pulsar (no la de
+       cuando se pintó la franja, que puede ser de otra publicación). */
     try {
-      await actualizarEn(dir, remoto);
-      recargar(dir, remoto);
+      var ahora = await leerVersionRemota(true);
+      if (ahora.version === App.VERSION) { var f = $('franja-copia'); if (f) f.remove(); return; }
+      if (ahora.version !== remoto.version) {
+        var negrita = document.querySelector('#franja-copia-texto strong');
+        if (negrita) negrita.textContent = ahora.version;
+      }
+      remoto = ahora;
+    } catch (e) { /* sin conexión ahora mismo: se intenta con la que había */ }
+    try {
+      var hecha = await actualizarConReintento(dir, remoto);
+      if (!hecha) { var f2 = $('franja-copia'); if (f2) f2.remove(); return; }
+      recargar(dir, hecha);
     } catch (e) {
       if (boton) { boton.disabled = false; boton.textContent = textoBoton; }
-      detalleFranja('No se ha podido actualizar: ' + (e && U.mensajeDeError(e) ? U.mensajeDeError(e) : e));
+      detalleFranja(e && e.message === MENSAJE_PUBLICANDO ? MENSAJE_PUBLICANDO
+        : 'No se ha podido actualizar: ' + (e && U.mensajeDeError(e) ? U.mensajeDeError(e) : e));
     }
   }
 
@@ -365,11 +413,12 @@
     if (!dir || !permiso) { franja(remoto, dir, null); return; }
 
     try {
-      await actualizarEn(dir, remoto);
-      recargar(dir, remoto);
+      var hecha = await actualizarConReintento(dir, remoto);
+      if (hecha) recargar(dir, hecha);
     } catch (e) {
       franja(remoto, dir, null);
-      detalleFranja('No se ha podido actualizar sola: ' + (e && U.mensajeDeError(e) ? U.mensajeDeError(e) : e));
+      detalleFranja(e && e.message === MENSAJE_PUBLICANDO ? MENSAJE_PUBLICANDO
+        : 'No se ha podido actualizar sola: ' + (e && U.mensajeDeError(e) ? U.mensajeDeError(e) : e));
     }
   }
 

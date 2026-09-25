@@ -364,7 +364,7 @@ const SCRIPT_PAGINA = `
 })();
 `;
 
-async function abrir(entorno, base, fichero) {
+async function abrir(entorno, base, fichero, antes) {
   const pagina = await navegador.newPage();
   const errores = [];
   pagina.on('pageerror', (e) => errores.push(e.message));
@@ -373,6 +373,7 @@ async function abrir(entorno, base, fichero) {
   await pagina.exposeFunction('__disco', entorno.disco);
   await pagina.exposeFunction('__idb', entorno.idb);
   await pagina.addInitScript(`window.__COPIA_BASE_REMOTO__ = ${JSON.stringify(base)};`);
+  if (antes) await pagina.addInitScript(antes);
   await pagina.addInitScript(SCRIPT_PAGINA);
   await pagina.goto('file://' + fichero);
   return { pagina, errores, navegaciones: () => navegaciones };
@@ -557,6 +558,62 @@ const BASE = baseDe(servidor);
   await comprobarAsync('instalador: sin franja al llegar', hayFranja(pagina), false);
   await comprobar('instalador: ninguna excepción', errores, []);
   await pagina.close();
+}
+
+/* ---------- fila 157: «Actualizar» mientras se publica (una carrera) ----------
+   El servidor sirve un version.json cuya huella de js/version.js no
+   casa con el fichero (lo que pasa si se publica justo entre leer la
+   lista y bajar el fichero). */
+function arrancarServidorConTurnos(versionJson) {
+  const cuenta = { lecturas: 0 };
+  const servidor = createServer((req, res) => {
+    const ruta = decodeURIComponent(req.url.split('?')[0].replace(/^\//, ''));
+    const cabeceras = { 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': '*' };
+    if (ruta === 'version.json') { cuenta.lecturas++; res.writeHead(200, cabeceras); res.end(versionJson(cuenta.lecturas)); return; }
+    if (ruta === 'js/version.js') { res.writeHead(200, cabeceras); res.end(VERSION_JS_NUEVO); return; }
+    res.writeHead(404, { 'access-control-allow-origin': '*' }); res.end('no está');
+  });
+  return new Promise((r) => servidor.listen(0, '127.0.0.1', () => r({ servidor, cuenta })));
+}
+const LISTA_QUE_NO_CASA = JSON.stringify(Object.assign({}, VERSION_REMOTA,
+  { ficheros: Object.assign({}, VERSION_REMOTA.ficheros, { 'js/version.js': sha256Hex('otra publicación') }) }));
+const ESPERA_CORTA = 'window.__COPIA_ESPERA_MS__ = 100;';
+
+{
+  /* La primera lista no casa; la segunda, sí: se actualiza igual, sin error. */
+  const { servidor: s1 } = await arrancarServidorConTurnos((n) => n === 1 ? LISTA_QUE_NO_CASA : JSON.stringify(VERSION_REMOTA));
+  const d = nuevaCopia('carrera');
+  const entorno = nuevoEntorno({ guardada: 'carrera', permiso: 'granted' });
+  const { pagina, errores } = await abrir(entorno, baseDe(s1), d + '/index.html', ESPERA_CORTA);
+  await esperarVersionNueva(pagina);
+  await comprobarAsync('carrera: con un reintento, acaba con la versión nueva', versionDeLaPagina(pagina), VERSION_NUEVA_TEXTO);
+  await comprobar('carrera: escribe lo que toca, y version.json', entorno.estado.escritos.sort(), ['carrera/js/version.js', 'carrera/version.json']);
+  await comprobarAsync('carrera: sin franja ni error', hayFranja(pagina), false);
+  await comprobar('carrera: ninguna excepción', errores, []);
+  await pagina.close();
+  s1.close();
+}
+
+{
+  /* Las dos listas fallan: mensaje llano (sin «sha256») y el disco, sin tocar. */
+  const { servidor: s2 } = await arrancarServidorConTurnos(() => LISTA_QUE_NO_CASA);
+  const d = nuevaCopia('siempremal');
+  const antes = readFileSync(join(d, 'version.json'), 'utf8');
+  const entorno = nuevoEntorno({ guardada: null });
+  const { pagina, errores } = await abrir(entorno, baseDe(s2), d + '/index.html', ESPERA_CORTA);
+  await pagina.waitForSelector('#franja-copia-actualizar', { timeout: 5000 }).catch(() => {});
+  entorno.estado.elegir.push('siempremal');
+  await pagina.click('#franja-copia-actualizar');
+  await pagina.waitForFunction(() => /No se ha podido/.test((document.getElementById('franja-copia-detalle') || {}).textContent || ''), null, { timeout: 10000 }).catch(() => {});
+  await comprobarAsync('siempre mal: el mensaje es llano',
+    pagina.locator('#franja-copia-detalle').textContent(),
+    'No se ha podido actualizar porque se estaba publicando una versión nueva justo ahora. Espera un par de minutos y pulsa otra vez.');
+  await comprobarAsync('siempre mal: sin «sha256» en la franja', pagina.locator('#franja-copia').textContent().then((t) => t.indexOf('sha256') === -1), true);
+  await comprobar('siempre mal: no se escribe nada', entorno.estado.escritos, []);
+  await comprobar('siempre mal: el version.json del disco sigue siendo el viejo', readFileSync(join(d, 'version.json'), 'utf8'), antes);
+  await comprobar('siempre mal: ninguna excepción', errores, []);
+  await pagina.close();
+  s2.close();
 }
 
 servidor.close();

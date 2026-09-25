@@ -5,6 +5,15 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 157: «Actualizar ahora», sin carrera con la publicación
+
+`docs/COPIA-ACTUALIZAR-SIN-CARRERA.md`. La franja guardaba la lista de ficheros de cuando se pintó;
+si entre medias se publicaba otra versión, un fichero nuevo no casaba con la lista vieja y salía «el
+sha256 de js/version.js no coincide». Ahora «Actualizar ahora» relee la lista al pulsar, y si algo no
+casa se reintenta una vez, a los 5 s, con la lista releída y `?t=` contra la caché de GitHub (también
+al abrir). La espera se acorta en la prueba con `window.__COPIA_ESPERA_MS__`. Solo si falla dos
+veces, un mensaje llano; lo técnico va a la consola.
+
 ## 25-sep-2026 — Fila 155: el Word, dentro de la aplicación
 
 `docs/WORD-DENTRO-DE-LA-APP.md`. El aviso de datos que faltan llegaba con el Word ya guardado, y el
