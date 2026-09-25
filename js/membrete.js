@@ -352,7 +352,15 @@ window.Membrete = Membrete;
     $('membrete-quitar-logo').onclick = quitarLogo;
     $('membrete-guardar').onclick = guardar;
     ['membrete-consejeria', 'membrete-centro'].forEach(function (id) { $(id).oninput = refrescarVistaPrevia; });
-    await refrescarVistaPrevia();
+    /* La vista previa (letra, símbolo y un lienzo de 2480 px) solo se
+       dibuja con el bloque abierto, y sin hacer esperar al resto de
+       Ajustes: si no, su pintado se retrasaba y la pantalla se movía. */
+    var bloque = $('membrete-vista-previa').closest('details');
+    if (bloque && !bloque.dataset.membreteVista) {
+      bloque.dataset.membreteVista = '1';
+      bloque.addEventListener('toggle', function () { if (bloque.open) refrescarVistaPrevia(); });
+    }
+    if (!bloque || bloque.open) refrescarVistaPrevia();
   }
 
   Membrete.pintarEnAjustes = pintarEnAjustes;
