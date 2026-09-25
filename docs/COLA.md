@@ -117,6 +117,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 | 149 | `docs/MEMBRETE-LETRA-DEL-MANUAL.md` (el nombre de la Consejería del membrete, con la letra Noto Sans HK del manual de la Junta, y la caja por defecto del membrete nuevo) | HECHA (25-sep-2026). La app dibuja el membrete entero; letra recortada con la API de Google Fonts (`text=`), porque esta sesión no llega a GitHub |
 | 150 | `docs/MESA-COMUNICAR-DEL-PASO-Y-GUION.md` (el botón «Comunicar» de cada paso del guion, que no hace nada; y un enlace en la mesa para cambiar el guion del hito para todos los asuntos del tipo) | PENDIENTE |
 | 151 | `docs/PLANTILLA-DESDE-EL-CUADRO.md` (crear o editar la plantilla desde el propio cuadro de Séneca y de Correo; al guardar, el mensaje se rellena con ella) | PENDIENTE |
+| 152 | `docs/RUTA-QUE-NO-VA-A-BING.md` (el botón «Ruta» copia en formato `file:///` para que el navegador no busque en Bing, pide la ruta si falta, y sale también en los cuadros de Correo y de Séneca) | PENDIENTE |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
