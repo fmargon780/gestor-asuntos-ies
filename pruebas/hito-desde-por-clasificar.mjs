@@ -81,6 +81,8 @@ async function meter(nombre) {
   if (await pagina.evaluate(() => document.querySelector('#ficha-guia .hito[data-id="p1"] .hito-cuerpo').classList.contains('oculto'))) {
     await hito1.locator('.hito-titulo').click();
   }
+  /* Fila 147: «Añadir documento» está en la tarjeta de documentos de la mesa. */
+  await pagina.evaluate(() => HitoMesa.abrirTarjeta('docs'));
   await hito1.locator('.hito-anadir-documento').click();
   await hito1.locator('.ficha-menu-opcion', { hasText: 'Por clasificar' }).click();
   await pagina.waitForSelector('.enlace-asunto');
