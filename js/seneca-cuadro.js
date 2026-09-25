@@ -42,7 +42,8 @@ var SenecaCuadro = (function () {
     copiadoElAsunto = false;
     var quien = n().aQuien ? n().aQuien(a) : '';
 
-    return '<div class="seneca-aviso-arriba">' +
+    return '<div id="seneca-formulario">' +
+           '<div class="seneca-aviso-arriba">' +
              '<strong>En Séneca: Utilidades → Comunicaciones.</strong> ' +
              'Los destinatarios se marcan allí, en su lista' +
              (quien ? ': <strong>' + U.escapar(quien) + '</strong>' : '') + '.' +
@@ -66,7 +67,9 @@ var SenecaCuadro = (function () {
                '<summary>¿Cómo se instala el ayudante de Séneca? (se hace una sola vez)</summary>' +
                '<div id="seneca-ayudante-explica"></div>' +
              '</details>' +
-           '</div>';
+           '</div>' +
+           '</div>' +
+           '<div id="seneca-plantilla-editor" class="oculto"></div>';
   }
 
   /* El asunto es siempre el nombre de la carpeta (fila 55, 18-sep-2026,
@@ -95,8 +98,11 @@ var SenecaCuadro = (function () {
     var cuerpo = (n().cuerpoDelMedio && n().cuerpoDelMedio(a, plantillaElegida)) || { texto: '', faltan: [] };
     textoProgramado = cuerpo.texto;
 
+    /* Fila 151: sin ninguna plantilla, «Crear plantilla»; con alguna,
+       «Editar plantilla» junto al desplegable, para la elegida. */
     var desplegable = opciones.length
       ? '<label class="etiqueta" style="margin-top:0">Plantilla</label>' +
+        '<div class="etiqueta-con-boton">' +
         '<select id="seneca-plantilla" class="campo">' +
           '<option value="">Sin plantilla</option>' +
           opciones.map(function (p) {
@@ -104,9 +110,12 @@ var SenecaCuadro = (function () {
               U.escapar(p.nombre) + '</option>';
           }).join('') +
         '</select>' +
+        '<button type="button" class="boton boton-chico" id="seneca-plantilla-editar">Editar plantilla</button>' +
+        '</div>' +
         '<div id="seneca-plantilla-confirmar" class="oculto"></div>'
       : '<p class="nota aviso-en-linea" id="seneca-sin-plantilla">Este tipo de asunto no tiene plantilla de ' +
-        'mensaje de Séneca. Escríbela una vez y saldrá rellena siempre.</p>';
+        'mensaje de Séneca. Escríbela una vez y saldrá rellena siempre.</p>' +
+        '<button type="button" class="boton" id="seneca-plantilla-crear">Crear plantilla</button>';
 
     return desplegable +
       '<label class="etiqueta">Texto del mensaje</label>' +
@@ -156,40 +165,77 @@ var SenecaCuadro = (function () {
 
   function engancharPlantilla(a) {
     var desplegable = $('seneca-plantilla');
-    if (!desplegable) return;
-    desplegable.onchange = function () {
-      var elegida = this.value;
-      var campoCuerpo = $('seneca-cuerpo-texto');
-      var escritoAMano = campoCuerpo.value !== textoProgramado;
-      if (!escritoAMano) { cambiarDePlantilla(a, elegida); return; }
+    if (desplegable) desplegable.onchange = function () { elegirPlantilla(a, this.value); };
 
-      var caja2 = $('seneca-plantilla-confirmar');
-      caja2.className = 'aviso aviso-ambar';
-      caja2.innerHTML = '<p>Lo que hay escrito en el texto se perderá.</p>';
-      var seguir = document.createElement('button');
-      seguir.type = 'button';
-      seguir.className = 'boton boton-principal';
-      seguir.textContent = 'Cambiar de todas formas';
-      seguir.onclick = function () { cambiarDePlantilla(a, elegida); };
-      var cancelar = document.createElement('button');
-      cancelar.type = 'button';
-      cancelar.className = 'boton';
-      cancelar.textContent = 'Seguir con lo escrito';
-      cancelar.style.marginLeft = '8px';
-      cancelar.onclick = function () {
-        desplegable.value = plantillaElegida;
-        caja2.className = 'oculto';
-        caja2.innerHTML = '';
-      };
-      caja2.appendChild(seguir);
-      caja2.appendChild(cancelar);
+    var editar = $('seneca-plantilla-editar');
+    if (editar) editar.onclick = function () {
+      var opciones = (n().plantillasDelTipo && n().plantillasDelTipo(a)) || [];
+      var existente = opciones.filter(function (p) { return p.id === plantillaElegida; })[0] || null;
+      abrirEditorPlantilla(a, existente);
     };
+    var crear = $('seneca-plantilla-crear');
+    if (crear) crear.onclick = function () { abrirEditorPlantilla(a, null); };
+  }
+
+  /* Igual que en js/correo-cuadro.js: la misma confirmación en línea si
+     el texto tenía algo escrito a mano, al elegir del desplegable o al
+     guardar una nueva o editada desde el propio cuadro (fila 151). */
+  function elegirPlantilla(a, idElegida) {
+    var campoCuerpo = $('seneca-cuerpo-texto');
+    var escritoAMano = campoCuerpo && campoCuerpo.value !== textoProgramado;
+    if (!escritoAMano) { cambiarDePlantilla(a, idElegida); return; }
+
+    var caja2 = $('seneca-plantilla-confirmar');
+    var desplegable = $('seneca-plantilla');
+    caja2.className = 'aviso aviso-ambar';
+    caja2.innerHTML = '<p>Lo que hay escrito en el texto se perderá.</p>';
+    var seguir = document.createElement('button');
+    seguir.type = 'button';
+    seguir.className = 'boton boton-principal';
+    seguir.textContent = 'Cambiar de todas formas';
+    seguir.onclick = function () { cambiarDePlantilla(a, idElegida); };
+    var cancelar = document.createElement('button');
+    cancelar.type = 'button';
+    cancelar.className = 'boton';
+    cancelar.textContent = 'Seguir con lo escrito';
+    cancelar.style.marginLeft = '8px';
+    cancelar.onclick = function () {
+      if (desplegable) desplegable.value = plantillaElegida;
+      caja2.className = 'oculto';
+      caja2.innerHTML = '';
+    };
+    caja2.appendChild(seguir);
+    caja2.appendChild(cancelar);
   }
 
   function cambiarDePlantilla(a, idElegida) {
     plantillaElegida = idElegida;
     $('seneca-comunes-der').innerHTML = bloqueCuerpo(a);
     engancharPlantilla(a);
+  }
+
+  /* ---------- crear/editar la plantilla desde el propio cuadro
+     (25-sep-2026, fila 151, docs/PLANTILLA-DESDE-EL-CUADRO.md) ---------- */
+
+  function abrirEditorPlantilla(a, existente) {
+    var formulario = $('seneca-formulario');
+    var editor = $('seneca-plantilla-editor');
+    if (!formulario || !editor || !window.PlantillasAjustes) return;
+    formulario.className = 'oculto';
+    editor.className = '';
+    PlantillasAjustes.montarEditorEnLinea(editor, a, existente, function (guardada) {
+      cerrarEditorPlantilla();
+      (n().recargarPlantillas ? n().recargarPlantillas(a) : Promise.resolve()).then(function () {
+        elegirPlantilla(a, guardada.id);
+      });
+    }, cerrarEditorPlantilla);
+  }
+
+  function cerrarEditorPlantilla() {
+    var formulario = $('seneca-formulario');
+    var editor = $('seneca-plantilla-editor');
+    if (editor) editor.className = 'oculto';
+    if (formulario) formulario.className = '';
   }
 
   /* Los dos botones numerados (3.4): cada uno copia siempre lo suyo,

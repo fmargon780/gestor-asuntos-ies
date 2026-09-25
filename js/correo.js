@@ -286,6 +286,15 @@
     return Plantillas.deTipo(plantillasDatos, categoria, tipo);
   }
 
+  /* Fila 151: tras crear o editar una plantilla desde el propio cuadro,
+     `plantillasDatos` (leído una vez al abrir) se ha quedado viejo:
+     se vuelve a leer para que el desplegable y `plantillasDelTipo` vean
+     ya la nueva. */
+  async function recargarPlantillas() {
+    try { plantillasDatos = await Plantillas.cargar(App.E.gestor); } catch (e) { /* se queda con lo que había */ }
+    return plantillasDatos;
+  }
+
   /* ---------- lo que usa js/seneca-cuadro.js y js/correo-cuadro.js ----------
 
      Los dos cuadros viven aparte, pero comparten con este la forma de
@@ -310,6 +319,7 @@
     soloElNombre: soloElNombre,
     asuntoDelCorreo: asuntoDelCorreo,
     plantillasDelTipo: plantillasDelTipo,
+    recargarPlantillas: recargarPlantillas,
     cuerpoDelMedio: cuerpoDelMedio,
     MAXIMO_LETRAS_SENECA: MAXIMO_LETRAS_SENECA,
     /* Abrir un cuadro directamente, sin pasar por el menú "Comunicar":

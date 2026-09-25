@@ -179,7 +179,8 @@ var CorreoCuadro = (function () {
              '<p class="nota">"Enviar" manda el correo de verdad, tras confirmar el resumen. ' +
              '"Abrir en Gmail" y "Abrir en el correo del ordenador" son para escribir allí, sin adjuntos.</p>' +
            '</div>' +
-           '<div id="correo-resumen" class="oculto"></div>';
+           '<div id="correo-resumen" class="oculto"></div>' +
+           '<div id="correo-plantilla-editor" class="oculto"></div>';
   }
 
   /* La línea gris de "Lo pidió...", encima de la lista de "Para"
@@ -239,8 +240,11 @@ var CorreoCuadro = (function () {
     var cuerpo = n().cuerpoDelMedio(a, plantillaElegida);
     textoProgramado = cuerpo.texto;
 
+    /* Fila 151: sin ninguna plantilla, «Crear plantilla»; con alguna,
+       «Editar plantilla» junto al desplegable, para la elegida. */
     var desplegable = opciones.length
       ? '<label class="etiqueta" style="margin-top:0">Plantilla</label>' +
+        '<div class="etiqueta-con-boton">' +
         '<select id="correo-plantilla" class="campo">' +
           '<option value="">Sin plantilla</option>' +
           opciones.map(function (p) {
@@ -248,8 +252,11 @@ var CorreoCuadro = (function () {
               U.escapar(p.nombre) + '</option>';
           }).join('') +
         '</select>' +
+        '<button type="button" class="boton boton-chico" id="correo-plantilla-editar">Editar plantilla</button>' +
+        '</div>' +
         '<div id="correo-plantilla-confirmar" class="oculto"></div>'
-      : '';
+      : '<label class="etiqueta" style="margin-top:0">Plantilla</label>' +
+        '<button type="button" class="boton" id="correo-plantilla-crear">Crear plantilla</button>';
 
     return desplegable +
       '<label class="etiqueta"' + (opciones.length ? '' : ' style="margin-top:0"') + '>Cuerpo</label>' +
@@ -307,39 +314,77 @@ var CorreoCuadro = (function () {
 
   function engancharPlantilla(a) {
     var desplegable = $('correo-plantilla');
-    if (!desplegable) return;
-    desplegable.onchange = function () {
-      var elegida = this.value;
-      var escritoAMano = $('correo-cuerpo-texto').value !== textoProgramado;
-      if (!escritoAMano) { cambiarDePlantilla(a, elegida); return; }
+    if (desplegable) desplegable.onchange = function () { elegirPlantilla(a, this.value); };
 
-      var caja2 = $('correo-plantilla-confirmar');
-      caja2.className = 'aviso aviso-ambar';
-      caja2.innerHTML = '<p>Lo que hay escrito en el cuerpo se perderá.</p>';
-      var seguir = document.createElement('button');
-      seguir.type = 'button';
-      seguir.className = 'boton boton-principal';
-      seguir.textContent = 'Cambiar de todas formas';
-      seguir.onclick = function () { cambiarDePlantilla(a, elegida); };
-      var cancelar = document.createElement('button');
-      cancelar.type = 'button';
-      cancelar.className = 'boton';
-      cancelar.textContent = 'Seguir con lo escrito';
-      cancelar.style.marginLeft = '8px';
-      cancelar.onclick = function () {
-        desplegable.value = plantillaElegida;
-        caja2.className = 'oculto';
-        caja2.innerHTML = '';
-      };
-      caja2.appendChild(seguir);
-      caja2.appendChild(cancelar);
+    var editar = $('correo-plantilla-editar');
+    if (editar) editar.onclick = function () {
+      var opciones = (n().plantillasDelTipo && n().plantillasDelTipo(a)) || [];
+      var existente = opciones.filter(function (p) { return p.id === plantillaElegida; })[0] || null;
+      abrirEditorPlantilla(a, existente);
     };
+    var crear = $('correo-plantilla-crear');
+    if (crear) crear.onclick = function () { abrirEditorPlantilla(a, null); };
+  }
+
+  /* Cambiar de plantilla, con la confirmación en línea de siempre si el
+     cuerpo tenía algo escrito a mano (`#correo-plantilla-confirmar`):
+     la misma regla al elegir del desplegable y al guardar una nueva o
+     editada desde el propio cuadro (fila 151). */
+  function elegirPlantilla(a, idElegida) {
+    var escritoAMano = $('correo-cuerpo-texto') && $('correo-cuerpo-texto').value !== textoProgramado;
+    if (!escritoAMano) { cambiarDePlantilla(a, idElegida); return; }
+
+    var caja2 = $('correo-plantilla-confirmar');
+    var desplegable = $('correo-plantilla');
+    caja2.className = 'aviso aviso-ambar';
+    caja2.innerHTML = '<p>Lo que hay escrito en el cuerpo se perderá.</p>';
+    var seguir = document.createElement('button');
+    seguir.type = 'button';
+    seguir.className = 'boton boton-principal';
+    seguir.textContent = 'Cambiar de todas formas';
+    seguir.onclick = function () { cambiarDePlantilla(a, idElegida); };
+    var cancelar = document.createElement('button');
+    cancelar.type = 'button';
+    cancelar.className = 'boton';
+    cancelar.textContent = 'Seguir con lo escrito';
+    cancelar.style.marginLeft = '8px';
+    cancelar.onclick = function () {
+      if (desplegable) desplegable.value = plantillaElegida;
+      caja2.className = 'oculto';
+      caja2.innerHTML = '';
+    };
+    caja2.appendChild(seguir);
+    caja2.appendChild(cancelar);
   }
 
   function cambiarDePlantilla(a, idElegida) {
     plantillaElegida = idElegida;
     $('correo-comunes-der').innerHTML = bloqueCuerpo(a);
     engancharPlantilla(a);
+  }
+
+  /* ---------- crear/editar la plantilla desde el propio cuadro
+     (25-sep-2026, fila 151, docs/PLANTILLA-DESDE-EL-CUADRO.md) ---------- */
+
+  function abrirEditorPlantilla(a, existente) {
+    var formulario = $('correo-formulario');
+    var editor = $('correo-plantilla-editor');
+    if (!formulario || !editor || !window.PlantillasAjustes) return;
+    formulario.className = 'oculto';
+    editor.className = '';
+    PlantillasAjustes.montarEditorEnLinea(editor, a, existente, function (guardada) {
+      cerrarEditorPlantilla();
+      (n().recargarPlantillas ? n().recargarPlantillas(a) : Promise.resolve()).then(function () {
+        elegirPlantilla(a, guardada.id);
+      });
+    }, cerrarEditorPlantilla);
+  }
+
+  function cerrarEditorPlantilla() {
+    var formulario = $('correo-formulario');
+    var editor = $('correo-plantilla-editor');
+    if (editor) editor.className = 'oculto';
+    if (formulario) formulario.className = '';
   }
 
   /* ---------- ENVIAR: resumen y confirmación (fila 115) ---------- */

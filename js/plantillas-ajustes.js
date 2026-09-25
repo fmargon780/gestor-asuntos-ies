@@ -322,6 +322,82 @@
     });
   }
 
+  /* ---------- el editor en línea, dentro del cuadro de Correo o de
+     Séneca (25-sep-2026, fila 151, docs/PLANTILLA-DESDE-EL-CUADRO.md)
+
+     A diferencia de `abrirCuadroDePlantilla`, no abre un `U.preguntar`
+     (solo hay una capa de diálogo, y ya la está usando el cuadro de
+     Correo o de Séneca): se monta dentro de `contenedor`, un bloque
+     hermano del formulario del cuadro, que ese mismo fichero esconde y
+     vuelve a enseñar. El tipo y la categoría son los del asunto abierto,
+     no se preguntan. Reutiliza `campoDeTextoHTML`/`engancharCampoDeTexto`
+     (el mismo "Insertar hueco" de arriba); la vista previa usa los datos
+     reales del asunto en el que se está, con `Plantillas.valoresDeAsunto`. */
+
+  function cuerpoEditorEnLineaHTML(existente) {
+    return '<label class="etiqueta" style="margin-top:0">Nombre de la plantilla</label>' +
+      '<input id="pl2-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '">' +
+      campoDeTextoHTML('pl2-texto', 'pl2-insertar-hueco', 'Texto', (existente && existente.texto) || '', 6) +
+      '<label class="etiqueta">Vista previa</label>' +
+      '<div class="vista-previa"><div class="vista-nombre" id="pl2-previa"></div></div>' +
+      '<div id="pl2-aviso"></div>' +
+      '<div class="correo-botones" style="margin-top:14px">' +
+        '<button type="button" class="boton boton-principal" id="pl2-guardar">Guardar</button>' +
+        '<button type="button" class="boton" id="pl2-cancelar">Cancelar</button>' +
+      '</div>';
+  }
+
+  /* `a`: el asunto abierto (de ahí salen el tipo, la categoría y los
+     datos de la vista previa). `existente`: la plantilla a editar, o
+     `null` para crear una nueva. `alGuardar(plantillaGuardada)` se
+     llama al terminar bien; `alCancelar()`, al pulsar Cancelar. */
+  function montarEditorEnLinea(contenedor, a, existente, alGuardar, alCancelar) {
+    contenedor.innerHTML = cuerpoEditorEnLineaHTML(existente);
+    engancharCampoDeTexto('pl2-texto', 'pl2-insertar-hueco', []);
+
+    var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
+    var tipo = (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
+
+    function pintarPrevia() {
+      Plantillas.valoresDeAsunto(a).then(function (valores) {
+        var r = Plantillas.rellenar($('pl2-texto').value, valores || {});
+        if ($('pl2-previa')) $('pl2-previa').textContent = r.texto || '(vacío)';
+      }).catch(function () { if ($('pl2-previa')) $('pl2-previa').textContent = '(vacío)'; });
+    }
+    $('pl2-texto').oninput = pintarPrevia;
+    pintarPrevia();
+
+    $('pl2-cancelar').onclick = function () { if (typeof alCancelar === 'function') alCancelar(); };
+    $('pl2-guardar').onclick = async function () {
+      var nombre = $('pl2-nombre').value.trim();
+      var texto = $('pl2-texto').value;
+      if (!nombre || !texto.trim()) {
+        $('pl2-aviso').innerHTML = '<p class="aviso aviso-rojo">Hace falta el nombre y el texto.</p>';
+        return;
+      }
+      try {
+        var guardada = null;
+        await Plantillas.guardar(App.E.gestor, function (actual) {
+          if (existente) {
+            var i = actual.lista.findIndex(function (x) { return x.id === existente.id; });
+            if (i !== -1) {
+              actual.lista[i] = { id: existente.id, tipo: tipo, categoria: categoria, nombre: nombre, texto: texto };
+              guardada = actual.lista[i];
+            }
+          } else {
+            guardada = { id: Plantillas.idNuevo(), tipo: tipo, categoria: categoria, nombre: nombre, texto: texto };
+            actual.lista.push(guardada);
+          }
+          return actual;
+        });
+        await cargar();
+        if (typeof alGuardar === 'function') alGuardar(guardada);
+      } catch (e) {
+        $('pl2-aviso').innerHTML = '<p class="aviso aviso-rojo">No he podido guardarlo: ' + U.escapar(U.mensajeDeError(e)) + '</p>';
+      }
+    };
+  }
+
   /* ==========================================================
      ENGANCHE
      ========================================================== */
@@ -345,7 +421,10 @@
     /* Para "Comunicación de este paso" (js/guias-comunicacion.js, fila
        60): el mismo campo de texto con "Insertar hueco" de aquí. */
     campoDeTextoHTML: campoDeTextoHTML,
-    engancharCampoDeTexto: engancharCampoDeTexto
+    engancharCampoDeTexto: engancharCampoDeTexto,
+    /* Fila 151: el editor de plantilla dentro del cuadro de Correo o de
+       Séneca, sin U.preguntar. */
+    montarEditorEnLinea: montarEditorEnLinea
   };
 
 })();
