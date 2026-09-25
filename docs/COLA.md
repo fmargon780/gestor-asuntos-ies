@@ -118,7 +118,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 | 150 | `docs/MESA-COMUNICAR-DEL-PASO-Y-GUION.md` (el botón «Comunicar» de cada paso del guion, que no hace nada; y un enlace en la mesa para cambiar el guion del hito para todos los asuntos del tipo) | HECHA (25-sep-2026). El botón montaba su menú dentro de `.mesa-ocultos` (escondido): ahora llama en línea recta y marca el paso pulsado, no «el primero pendiente» |
 | 151 | `docs/PLANTILLA-DESDE-EL-CUADRO.md` (crear o editar la plantilla desde el propio cuadro de Séneca y de Correo; al guardar, el mensaje se rellena con ella) | HECHA (25-sep-2026). Editor en línea (sin segundo cuadro), reutilizando el de Ajustes |
 | 156 | `docs/REPARAR-DOCS-DE-LA-151.md` (devolver su contenido a `docs/CONTEXTO-CORTO.md` y `docs/contexto/CORREO-Y-SENECA.md`, que el cierre de la 151 dejó con la palabra `__READ__`) | HECHA (25-sep-2026). Los dos ficheros restaurados con `create_or_update_file`, tamaño comprobado tras subir contra el de local (13.982 y 36.814 bytes) |
-| 152 | `docs/RUTA-QUE-NO-VA-A-BING.md` (el botón «Ruta» copia en formato `file:///` para que el navegador no busque en Bing, pide la ruta si falta, y sale también en los cuadros de Correo y de Séneca) | PENDIENTE |
+| 152 | `docs/RUTA-QUE-NO-VA-A-BING.md` (el botón «Ruta» copia en formato `file:///` para que el navegador no busque en Bing, pide la ruta si falta, y sale también en los cuadros de Correo y de Séneca) | HECHA (25-sep-2026). Sin ruta apuntada ya no copia el nombre suelto: la pide (en línea si está dentro de un cuadro, con `U.preguntar` desde la ficha) |
 | 153 | `docs/ENVIAR-DOCUMENTO-POR-SENECA.md` (el «Enviar» de cada documento del hito pasa a «Enviar ▾»: por correo o por Séneca, con ese documento ya elegido; después de la 150) | PENDIENTE |
 | 154 | `docs/HITOS-ACCIONES-EN-EL-HITO.md` (hitos más sencillos: las acciones solo en el hito; los pasos, lista para marcar con «receta» opcional que rellena el cuadro; todos los documentos del asunto a la vista en cada hito; y que «Paso N de M», «Hitos N/M» y la barra digan lo mismo; después de la 150 y la 153) | PENDIENTE |
 | 155 | `docs/WORD-DENTRO-DE-LA-APP.md` (avisar de los datos que faltan antes de generar un Word; y el Word se abre dentro de la app, editable, con «Guardar PDF» en la carpeta del asunto, «Imprimir» y «Guardar cambios», sin pasar por Descargas) | PENDIENTE |
@@ -259,10 +259,10 @@ subir nada: no es un fallo del repositorio, es la sesión quedándose sin aire a
 pasa, no ha tocado nada todavía (compruébalo con `docs/COLA.md` y el historial de commits antes de
 seguir) — deshazte de esa sesión y, si hace falta ayuda, repártela en trozos más pequeños.
 
-25-sep-2026: esta misma tarde, tres sesiones distintas trabajaron la cola a la vez (filas 150-153,
-155, 157) y `docs/COLA.md` cambió de mano varias veces en minutos: una subida rota con `__READ__`
-(fila 151, corregida en la fila 156) y varias filas nuevas coladas entre medias. Ninguna se
-perdió: cada sesión volvió a bajar `main` justo antes de subir, como pide la regla 10.
+25-sep-2026: esta misma tarde, varias sesiones distintas trabajaron la cola a la vez (filas
+150-153, 155, 157, 158) y `docs/COLA.md` cambió de mano muchas veces en minutos: una subida rota
+con `__READ__` (fila 151, corregida en la fila 156) y varias filas nuevas coladas entre medias.
+Ninguna se perdió: cada sesión volvió a bajar `main` justo antes de subir, como pide la regla 10.
 
 ## Nota para la próxima sesión: docs/CONTEXTO.md y docs/HISTORIA.md de las filas 53-56
 
@@ -277,7 +277,7 @@ retipear de un tirón sin `git push`). Puede que falten todavía.
   `css/seneca.css`, `js/campos-calculo.js`, `js/campos-catalogo.js`,
   `js/campos-calculados-editor.js`, `js/ajustes-tipo.js`).
 - A `docs/HISTORIA.md`: la entrada del 18-sep-2026 de esas cuatro filas, con su "Lo que costó de
-verdad" (los bugs que las propias pruebas cazaron antes de producción).
+  verdad" (los bugs que las propias pruebas cazaron antes de producción).
 
 Compruébalo contra lo que de verdad dice `main` antes de sustituir nada. Si la sesión tiene
 `git push` de verdad (terminal u ordenador de Francisco), es mucho más simple que ir fichero a
