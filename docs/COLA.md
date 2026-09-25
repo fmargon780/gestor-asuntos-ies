@@ -119,6 +119,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 | 151 | `docs/PLANTILLA-DESDE-EL-CUADRO.md` (crear o editar la plantilla desde el propio cuadro de Séneca y de Correo; al guardar, el mensaje se rellena con ella) | HECHA (25-sep-2026). Editor en línea (sin segundo cuadro), reutilizando el de Ajustes |
 | 156 | `docs/REPARAR-DOCS-DE-LA-151.md` (devolver su contenido a `docs/CONTEXTO-CORTO.md` y `docs/contexto/CORREO-Y-SENECA.md`, que el cierre de la 151 dejó con la palabra `__READ__`) | HECHA (25-sep-2026). Los dos ficheros restaurados con `create_or_update_file`, tamaño comprobado tras subir contra el de local (13.982 y 36.814 bytes) |
 | 152 | `docs/RUTA-QUE-NO-VA-A-BING.md` (el botón «Ruta» copia en formato `file:///` para que el navegador no busque en Bing, pide la ruta si falta, y sale también en los cuadros de Correo y de Séneca) | HECHA (25-sep-2026). Sin ruta apuntada ya no copia el nombre suelto: la pide (en línea si está dentro de un cuadro, con `U.preguntar` desde la ficha) |
+| 161 | `docs/RUTA-SIN-PREGUNTAR.md` (**PRIORITARIA**: el botón «Ruta» deduce dónde está Dropbox en cada ordenador —en la copia sin internet, de su propia dirección— y guarda una vez para todo el centro la parte de dentro de Dropbox en `_GESTOR/rutas.json`; si tiene que preguntar, dice qué carpeta pide) | PENDIENTE |
 | 153 | `docs/ENVIAR-DOCUMENTO-POR-SENECA.md` (el «Enviar» de cada documento del hito pasa a «Enviar ▾»: por correo o por Séneca, con ese documento ya elegido; después de la 150) | PENDIENTE |
 | 154 | `docs/HITOS-ACCIONES-EN-EL-HITO.md` (hitos más sencillos: las acciones solo en el hito; los pasos, lista para marcar con «receta» opcional que rellena el cuadro; todos los documentos del asunto a la vista en cada hito; y que «Paso N de M», «Hitos N/M» y la barra digan lo mismo; después de la 150 y la 153) | PENDIENTE |
 | 155 | `docs/WORD-DENTRO-DE-LA-APP.md` (avisar de los datos que faltan antes de generar un Word; y el Word se abre dentro de la app, editable, con «Guardar PDF» en la carpeta del asunto, «Imprimir» y «Guardar cambios», sin pasar por Descargas) | PENDIENTE |
@@ -259,7 +260,7 @@ fichero grande (por ejemplo, pasarle a un subagente el contenido entero de un fi
 ~50 KB dentro del propio mensaje), puede agotar su propio límite de respuesta antes de llegar a
 subir nada: no es un fallo del repositorio, es la sesión quedándose sin aire a mitad de frase. Si
 pasa, no ha tocado nada todavía (compruébalo con `docs/COLA.md` y el historial de commits antes de
-seguir) — deshazte de esa sesión y, si hace falta ayuda, repártela en trozos más pequeños.
+seguir) — desházte de esa sesión y, si hace falta ayuda, repártela en trozos más pequeños.
 
 25-sep-2026: esta misma tarde, varias sesiones distintas trabajaron la cola a la vez (filas
 150-153, 155, 157, 158) y `docs/COLA.md` cambió de mano muchas veces en minutos: una subida rota
