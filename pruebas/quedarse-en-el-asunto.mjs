@@ -178,7 +178,7 @@ await comprobar('7. comunicar no saca de la ficha', pantallas(), { asunto: true,
 
 console.log('--- 8. "Documentos ▾": abrir y cerrar el cuadro de la carpeta ---');
 await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
-await pagina.click('.ficha-documentos-gestionar');
+await pagina.click('.ficha-documentos-anadir');
 await pagina.waitForSelector('#doc-cuerpo');
 await comprobar('el cuadro de documentos se llama como el asunto',
   pagina.locator('#cuadro-titulo').textContent(), NOMBRE_ASUNTO);

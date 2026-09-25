@@ -31,7 +31,6 @@
     { fichero: 'avisos-que-faltan.js', nombre: 'App.verAbiertos' },
     { fichero: 'bandeja-adjuntos-lector.js', nombre: 'window.Bandeja.llevarANuevo' },
     { fichero: 'copiar.js', nombre: 'App.tarjetaAsunto' },
-    { fichero: 'copiar.js', nombre: 'App.abrirFicha' },
     { fichero: 'copiar.js', nombre: 'App.buscarPersonas' },
     { fichero: 'copiar.js', nombre: 'App.buscarTercero' },
     { fichero: 'copiar.js', nombre: 'App.verFicha' },

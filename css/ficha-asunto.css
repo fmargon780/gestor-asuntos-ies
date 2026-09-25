@@ -159,10 +159,9 @@
 }
 .ficha-titulo { margin: 0 0 10px; font-size: 15px; }
 
-/* "Documentos ▾", en la cabecera del bloque (18-sep-2026, fila 52,
-   docs/CABECERA-DEL-ASUNTO.md, 11): antes "Gestionar documentos" en la
-   barra de la ficha. */
-.ficha-documentos-gestionar { margin-left: 8px; padding: 3px 10px; font-size: 12px; }
+/* «+ Añadir documento», en la cabecera del bloque (fila 168,
+   docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md; antes «Documentos ▾»). */
+.ficha-documentos-anadir { margin-left: 8px; padding: 3px 10px; font-size: 12px; }
 
 /* Un bloque vacío no gasta una tarjeta entera (18-sep-2026, fila 51,
    docs/FICHA-DISPOSICION.md, 8): título y aviso en una sola línea, con

@@ -50,6 +50,9 @@ body.visor-arrastrando { user-select: none; cursor: col-resize; }
   display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
   padding: 8px 14px; border-bottom: 1px solid var(--linea);
 }
+/* La barra de herramientas de un PDF de la carpeta del asunto (fila 168):
+   Separar, Unir, Sacar páginas, Ajustar tamaño y Repartir. */
+.visor-barra-pdf { display: flex; gap: 6px; flex-wrap: wrap; }
 
 /* El documento se sube y se baja aquí dentro. No se encoge para caber
    entero: se abre al ancho de la columna. */

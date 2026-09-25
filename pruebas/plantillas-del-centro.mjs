@@ -213,5 +213,28 @@ const renuncia = indice.filter((e) => e.id === 'pd-centro-renuncia-junta-elector
 comprobar('la renuncia cuelga de OTROS · ELECCIONES CONSEJO ESCOLAR, tipo RENUNCIA',
   [renuncia.categoria, renuncia.tipo, renuncia.tipoDocumento, renuncia.texto], ['OTROS', 'ELECCIONES CONSEJO ESCOLAR', 'RENUNCIA', 'junta electoral']);
 
+/* ================= 7 · el texto propio de Séneca (fila 170) ================= */
+console.log('--- 7. los correos con «=== SÉNECA ===» dan dos textos ---');
+
+const MARCA_SENECA = /^[ \t]*=== SÉNECA ===[ \t]*$/m;
+const conSeneca = ficherosMd.filter((f) => !porFichero[f].tipoDocumento &&
+  MARCA_SENECA.test(fs.readFileSync(path.join(CARPETA_PLANTILLAS, f), 'utf8')));
+comprobarQue('hay correos con texto propio para Séneca', conSeneca.length > 0);
+conSeneca.forEach((f) => {
+  const d = porFichero[f];
+  const e = indice.filter((x) => x.clase === 'correo' && x.nombre === d.nombre && x.tipo === d.tipo)[0] || {};
+  comprobarQue(f + ': da cuerpo y cuerpoSeneca',
+    !!(String(e.cuerpo || '').trim() && String(e.cuerpoSeneca || '').trim()));
+  comprobarQue(f + ': ninguno de los dos lleva la marca',
+    String(e.cuerpo || '').indexOf('=== SÉNECA ===') === -1 && String(e.cuerpoSeneca || '').indexOf('=== SÉNECA ===') === -1);
+});
+indice.filter((e) => e.clase === 'correo').forEach((e) => {
+  const f = ficherosMd.filter((x) => porFichero[x].nombre === e.nombre && porFichero[x].tipo === e.tipo)[0];
+  if (f && conSeneca.indexOf(f) === -1) comprobarQue(f + ': sin la marca, no hay cuerpoSeneca', !e.cuerpoSeneca);
+});
+comprobarQue('los correos que ya había no repiten el saludo ni la firma',
+  ['comunicacion-baja.md', 'aviso-citacion.md', 'reclamacion-proveedor.md', 'comunicacion-resolucion-permiso.md']
+    .every((f) => { const t = fs.readFileSync(path.join(CARPETA_PLANTILLAS, f), 'utf8'); return t.indexOf('Buenos días') === -1 && t.indexOf('Un saludo') === -1; }));
+
 console.log(fallos ? '\n' + fallos + ' fallo(s) en plantillas-del-centro.mjs' : '\nTodo bien en plantillas-del-centro.mjs');
 if (fallos) process.exit(1);

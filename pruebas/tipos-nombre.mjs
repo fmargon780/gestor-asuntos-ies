@@ -163,7 +163,25 @@ await comprobar('4. en un hito sin plantillas sale «Buscar otra plantilla…»'
 await pagina.click('.hito-en-mesa .mesa-buscar-plantilla');
 await pagina.fill('.hito-en-mesa .plantilla-buscar-campo', 'salida');
 await comprobar('4. encuentra una de otro tipo', pagina.locator('.hito-en-mesa .plantilla-buscar-opcion').evaluateAll(b => b.map(x => x.dataset.id)), ['pd-otra']);
-await pagina.click('.hito-en-mesa .plantilla-buscar-opcion');
+/* Fila 170: cargar las 64 plantillas del centro (parte 3) deja trabajo de
+   fondo que puede repintar la mesa justo aquí y llevarse la opción; si
+   pasa, se vuelve a abrir el desplegable y a buscar. */
+for (let intento = 0; ; intento++) {
+  try {
+    if (!(await pagina.locator('.hito-en-mesa .mesa-panel-generar:not(.oculto)').count())) {
+      await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="generar"]');
+    }
+    if (!(await pagina.locator('.hito-en-mesa .plantilla-buscar-campo').count())) {
+      await pagina.click('.hito-en-mesa .mesa-buscar-plantilla');
+      await pagina.fill('.hito-en-mesa .plantilla-buscar-campo', 'salida');
+    }
+    await pagina.click('.hito-en-mesa .plantilla-buscar-opcion', { timeout: 5000 });
+    break;
+  } catch (e) {
+    if (intento >= 3) throw e;
+    await pagina.waitForTimeout(500);
+  }
+}
 await pagina.waitForTimeout(800);
 const r4 = await pagina.evaluate(async (nombre) => {
   const h = (await Hitos.hitosDe(nombre)).filter(x => x.id === 'b2')[0];
@@ -176,7 +194,7 @@ await comprobar('4. el cuadro de «Generar documento» también la busca, en el 
     const promesa = PlantillasDocumento.elegir({ delPaso: [], delTipo: [], buscar: true });
     await new Promise(r => setTimeout(r, 300));
     const campo = document.querySelector('#cuadro-cuerpo .plantilla-buscar-campo');
-    campo.value = 'autorizacion'; campo.oninput();
+    campo.value = 'autorizacion de salida';   /* fila 170: hay otras «Autorización…» del centro */ campo.oninput();
     document.querySelector('#cuadro-cuerpo .plantilla-buscar-opcion').click();
     return (await promesa).id;
   }), 'pd-otra');

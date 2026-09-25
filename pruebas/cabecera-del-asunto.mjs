@@ -241,13 +241,13 @@ await pagina.waitForSelector('#capa', { state: 'hidden' });
 /* ============================================================
    9. "DOCUMENTOS ▾", EN EL BLOQUE, TAMBIÉN VACÍO
    ============================================================ */
-console.log('--- 9. "Documentos ▾" en el bloque de documentos ---');
+console.log('--- 9. "+ Añadir documento" en el bloque de documentos (fila 168) ---');
 await comprobarQue('9. el bloque de Documentos está vacío (RICO no tiene ficheros)',
   pagina.evaluate(() => {
     const doc = document.getElementById('ficha-documentos');
     return !!(doc && doc.closest('.ficha-bloque') && doc.closest('.ficha-bloque').classList.contains('vacio'));
   }));
-await pagina.click('.ficha-documentos-gestionar');
+await pagina.click('.ficha-documentos-anadir');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('9. abre exactamente lo mismo que abría "Gestionar documentos"',
   pagina.locator('#cuadro-titulo').textContent(), RICO);

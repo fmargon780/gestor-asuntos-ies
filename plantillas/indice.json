@@ -1,10 +1,48 @@
 [
   {
+    "nombre": "Citación a la familia",
+    "categoria": "ALUMNADO",
+    "tipo": "ABSENTISMO",
+    "clase": "documento",
+    "fichero": "citacion-familia.docx",
+    "tipoDocumento": "CITACION",
+    "texto": "reunion",
+    "firmante": "jefatura-estudios",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Citación a la familia por la asistencia a clase",
+    "categoria": "ALUMNADO",
+    "tipo": "ABSENTISMO",
+    "clase": "correo",
+    "cuerpo": "Les citamos a una reunión en el centro el {campo:Día de la reunión}, a las {campo:Hora de la reunión}, para hablar de la asistencia a clase de {{NOMBRE NATURAL}}. Les adjuntamos la citación.\n\nSi no pueden venir, respondan a este correo y buscamos otra fecha.",
+    "cuerpoSeneca": "Les citamos a una reunión en el centro el {campo:Día de la reunión}, a las {campo:Hora de la reunión}, para hablar de la asistencia a clase de {{NOMBRE NATURAL}}. Si no pueden venir, avísennos para buscar otra fecha."
+  },
+  {
+    "nombre": "Envío del certificado de participación en una actividad",
+    "categoria": "OTROS",
+    "tipo": "ACTIVIDAD EXTRAESCOLAR",
+    "clase": "correo",
+    "cuerpo": "Le enviamos adjunto el certificado de su participación en la actividad «{campo:Actividad}» ({campo:Fechas}), con {campo:Horas} horas reconocidas.\n\nGracias por acompañar al alumnado.",
+    "cuerpoSeneca": "Le hemos enviado por correo electrónico el certificado de su participación en la actividad «{campo:Actividad}», con {campo:Horas} horas reconocidas."
+  },
+  {
+    "nombre": "Participación del profesorado en actividad extraescolar",
+    "categoria": "OTROS",
+    "tipo": "ACTIVIDAD EXTRAESCOLAR",
+    "clase": "documento",
+    "fichero": "participacion-actividad.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "participacion",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
     "nombre": "Comunicación de baja",
     "categoria": "ALUMNADO",
     "tipo": "BAJA",
     "clase": "correo",
-    "cuerpo": "Buenos días:\n\nLe confirmamos que hemos tramitado la baja de {{NOMBRE NATURAL}} en este centro, con fecha\n{{HOY}}.\n\nSi necesita cualquier documento del expediente, puede solicitarlo en Secretaría.\n\nUn saludo.\n{{CENTRO}}"
+    "cuerpo": "Le confirmamos que hemos tramitado la baja de {{NOMBRE NATURAL}} en este centro, con fecha\n{{HOY}}.\n\nSi necesita cualquier documento del expediente, puede solicitarlo en Secretaría."
   },
   {
     "nombre": "Acuerdo de iniciación de expediente de cambio de centro",
@@ -14,6 +52,129 @@
     "fichero": "acuerdo-iniciacion-cambio-centro.docx",
     "tipoDocumento": "ACUERDO",
     "texto": "iniciacion",
+    "firmante": "direccion",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Envío de la resolución de la solicitud",
+    "categoria": "ALUMNADO",
+    "tipo": "CAMBIO DE GRUPO",
+    "clase": "correo",
+    "cuerpo": "Les enviamos adjunta la resolución de la Dirección sobre su solicitud relativa a {{NOMBRE NATURAL}}.\n\nEn el propio documento se indica qué pueden hacer si no están de acuerdo.",
+    "cuerpoSeneca": "Su solicitud relativa a {{NOMBRE NATURAL}} ya está resuelta. Les hemos enviado la resolución por correo electrónico; también pueden recogerla en la Secretaría del centro."
+  },
+  {
+    "nombre": "Resolución de cambio de grupo",
+    "categoria": "ALUMNADO",
+    "tipo": "CAMBIO DE GRUPO",
+    "clase": "documento",
+    "fichero": "resolucion-cambio-grupo.docx",
+    "tipoDocumento": "RESOLUCION",
+    "texto": "resolucion",
+    "firmante": "direccion",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Envío de la resolución de la solicitud",
+    "categoria": "ALUMNADO",
+    "tipo": "CAMBIO OPTATIVA",
+    "clase": "correo",
+    "cuerpo": "Les enviamos adjunta la resolución de la Dirección sobre su solicitud relativa a {{NOMBRE NATURAL}}.\n\nEn el propio documento se indica qué pueden hacer si no están de acuerdo.",
+    "cuerpoSeneca": "Su solicitud relativa a {{NOMBRE NATURAL}} ya está resuelta. Les hemos enviado la resolución por correo electrónico; también pueden recogerla en la Secretaría del centro."
+  },
+  {
+    "nombre": "Resolución de cambio de optativa",
+    "categoria": "ALUMNADO",
+    "tipo": "CAMBIO OPTATIVA",
+    "clase": "documento",
+    "fichero": "resolucion-cambio-optativa.docx",
+    "tipoDocumento": "RESOLUCION",
+    "texto": "resolucion",
+    "firmante": "direccion",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Envío de un certificado de matrícula",
+    "categoria": "ALUMNADO",
+    "tipo": "CERT. MATRICULA",
+    "clase": "correo",
+    "cuerpo": "Les enviamos adjunto el certificado de matrícula de {{NOMBRE NATURAL}} que nos pidieron, ya firmado digitalmente.\n\nSi necesitan algún cambio, respondan a este correo.",
+    "cuerpoSeneca": "Les hemos enviado por correo electrónico el certificado de matrícula de {{NOMBRE NATURAL}} que nos pidieron. Si no lo han recibido, pueden recogerlo en la Secretaría del centro."
+  },
+  {
+    "nombre": "Matrícula con asistencia regular",
+    "categoria": "ALUMNADO",
+    "tipo": "CERT. MATRICULA",
+    "clase": "documento",
+    "fichero": "matricula-asistencia.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "asistencia",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Matrícula con horario",
+    "categoria": "ALUMNADO",
+    "tipo": "CERT. MATRICULA",
+    "clase": "documento",
+    "fichero": "matricula-horario.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "horario",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Matrícula con seguro escolar abonado",
+    "categoria": "ALUMNADO",
+    "tipo": "CERT. MATRICULA",
+    "clase": "documento",
+    "fichero": "matricula-seguro-escolar.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "seguro escolar",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Matrícula en cursos anteriores",
+    "categoria": "ALUMNADO",
+    "tipo": "CERT. MATRICULA",
+    "clase": "documento",
+    "fichero": "matricula-cursos-anteriores.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "cursos anteriores",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Matrícula sin servicio de comedor",
+    "categoria": "ALUMNADO",
+    "tipo": "CERT. MATRICULA",
+    "clase": "documento",
+    "fichero": "matricula-sin-comedor.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "sin comedor",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Asistencia del profesorado en septiembre",
+    "categoria": "PERSONAL",
+    "tipo": "CERTIFICADO PERSONAL",
+    "clase": "documento",
+    "fichero": "asistencia-septiembre.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "asistencia septiembre",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Autorización de la Dirección",
+    "categoria": "PERSONAL",
+    "tipo": "CERTIFICADO PERSONAL",
+    "clase": "documento",
+    "fichero": "autorizacion-direccion.docx",
+    "tipoDocumento": "AUTORIZACION",
+    "texto": "autorizacion",
     "firmante": "direccion",
     "vistoBueno": ""
   },
@@ -29,6 +190,66 @@
     "vistoBueno": "direccion"
   },
   {
+    "nombre": "Certificado a petición del personal (texto libre)",
+    "categoria": "PERSONAL",
+    "tipo": "CERTIFICADO PERSONAL",
+    "clase": "documento",
+    "fichero": "certificado-libre-personal.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "a peticion",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Envío de un certificado al personal",
+    "categoria": "PERSONAL",
+    "tipo": "CERTIFICADO PERSONAL",
+    "clase": "correo",
+    "cuerpo": "Le enviamos adjunto el certificado que nos pidió, ya firmado digitalmente.\n\nSi necesita algún cambio, responda a este correo.",
+    "cuerpoSeneca": "Le hemos enviado por correo electrónico el certificado que nos pidió, ya firmado digitalmente. Si no lo ha recibido, puede recogerlo en la Secretaría del centro."
+  },
+  {
+    "nombre": "Envío de una autorización de la Dirección",
+    "categoria": "PERSONAL",
+    "tipo": "CERTIFICADO PERSONAL",
+    "clase": "correo",
+    "cuerpo": "Le enviamos adjunta la autorización de la Dirección para {campo:Para qué se autoriza}.\n\nLlévela consigo, en papel o en el móvil, cuando haga la gestión.",
+    "cuerpoSeneca": "Le hemos enviado por correo electrónico la autorización de la Dirección para {campo:Para qué se autoriza}. Si no la ha recibido, puede recogerla en la Secretaría del centro."
+  },
+  {
+    "nombre": "Informe de la Dirección sobre el desempeño",
+    "categoria": "PERSONAL",
+    "tipo": "CERTIFICADO PERSONAL",
+    "clase": "documento",
+    "fichero": "informe-desempeno.docx",
+    "tipoDocumento": "INFORME",
+    "texto": "desempeño",
+    "firmante": "direccion",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Participación en actividad extraescolar (a petición)",
+    "categoria": "PERSONAL",
+    "tipo": "CERTIFICADO PERSONAL",
+    "clase": "documento",
+    "fichero": "participacion-actividad-a-peticion.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "actividad extraescolar",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Servicios prestados en el centro",
+    "categoria": "PERSONAL",
+    "tipo": "CERTIFICADO PERSONAL",
+    "clase": "documento",
+    "fichero": "servicios-prestados.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "servicios prestados",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
     "nombre": "Certificación académica",
     "categoria": "ALUMNADO",
     "tipo": "CERTIFICADO",
@@ -36,6 +257,88 @@
     "fichero": "certificacion-academica.docx",
     "tipoDocumento": "CERTIFICACION",
     "texto": "academica",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Envío de un certificado del alumnado",
+    "categoria": "ALUMNADO",
+    "tipo": "CERTIFICADO",
+    "clase": "correo",
+    "cuerpo": "Les enviamos adjunto el certificado de {{NOMBRE NATURAL}} que nos pidieron, ya firmado digitalmente.\n\nSi necesitan algún cambio, respondan a este correo.",
+    "cuerpoSeneca": "Les hemos enviado por correo electrónico el certificado de {{NOMBRE NATURAL}} que nos pidieron. Si no lo han recibido, pueden recogerlo en la Secretaría del centro."
+  },
+  {
+    "nombre": "Envío del justificante de asistencia al centro",
+    "categoria": "ALUMNADO",
+    "tipo": "CERTIFICADO",
+    "clase": "correo",
+    "cuerpo": "Les enviamos adjunto el justificante de su visita al centro del {campo:Fecha de la visita}, ya firmado digitalmente.",
+    "cuerpoSeneca": "Les hemos enviado por correo electrónico el justificante de su visita al centro del {campo:Fecha de la visita}."
+  },
+  {
+    "nombre": "Justificante de asistencia de la familia al centro",
+    "categoria": "ALUMNADO",
+    "tipo": "CERTIFICADO",
+    "clase": "documento",
+    "fichero": "justificante-asistencia-familia.docx",
+    "tipoDocumento": "JUSTIFICANTE",
+    "texto": "asistencia",
+    "firmante": "direccion",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Matrícula de Honor en Bachillerato",
+    "categoria": "ALUMNADO",
+    "tipo": "CERTIFICADO",
+    "clase": "documento",
+    "fichero": "matricula-de-honor.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "matricula de honor",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Nota media de unos estudios",
+    "categoria": "ALUMNADO",
+    "tipo": "CERTIFICADO",
+    "clase": "documento",
+    "fichero": "nota-media.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "nota media",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Participación del alumno en una actividad o viaje",
+    "categoria": "ALUMNADO",
+    "tipo": "CERTIFICADO",
+    "clase": "documento",
+    "fichero": "actividad-alumno.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "actividad",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Sin conductas contrarias a la convivencia",
+    "categoria": "ALUMNADO",
+    "tipo": "CERTIFICADO",
+    "clase": "documento",
+    "fichero": "convivencia.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "convivencia",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Cese y vacaciones pendientes",
+    "categoria": "PERSONAL",
+    "tipo": "CESE",
+    "clase": "documento",
+    "fichero": "cese-y-vacaciones.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "cese y vacaciones",
     "firmante": "secretaria",
     "vistoBueno": "direccion"
   },
@@ -62,11 +365,30 @@
     "vistoBueno": ""
   },
   {
+    "nombre": "Acuerdo del Consejo Escolar o del Claustro",
+    "categoria": "OTROS",
+    "tipo": "CONSEJO ESCOLAR",
+    "clase": "documento",
+    "fichero": "acuerdo-organo-colegiado.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "acuerdo",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Envío del certificado de un acuerdo",
+    "categoria": "OTROS",
+    "tipo": "CONSEJO ESCOLAR",
+    "clase": "correo",
+    "cuerpo": "Les enviamos adjunto el certificado del acuerdo adoptado por el {campo:Órgano (Consejo Escolar o Claustro)} del centro en su sesión del {campo:Fecha de la sesión}.",
+    "cuerpoSeneca": "Les enviamos el certificado del acuerdo adoptado por el {campo:Órgano (Consejo Escolar o Claustro)} del centro en su sesión del {campo:Fecha de la sesión}."
+  },
+  {
     "nombre": "Aviso de citación",
     "categoria": "ALUMNADO",
     "tipo": "CORRECCION",
     "clase": "correo",
-    "cuerpo": "Buenos días:\n\nLe informamos de que se ha iniciado un procedimiento de corrección de conducta a\n{{NOMBRE NATURAL}}, del grupo {{GRUPO}}, y se le cita a una audiencia en el centro.\n\nAdjuntamos la citación con el día, la hora y el lugar exactos.\n\nPuede responder a este correo para cualquier aclaración.\n\nUn saludo.\n{{CENTRO}}"
+    "cuerpo": "Le informamos de que se ha iniciado un procedimiento de corrección de conducta a\n{{NOMBRE NATURAL}}, del grupo {{GRUPO}}, y se le cita a una audiencia en el centro.\n\nAdjuntamos la citación con el día, la hora y el lugar exactos.\n\nPuede responder a este correo para cualquier aclaración."
   },
   {
     "nombre": "Citación a audiencia",
@@ -80,6 +402,47 @@
     "vistoBueno": ""
   },
   {
+    "nombre": "El centro no imparte unas enseñanzas",
+    "categoria": "OTROS",
+    "tipo": "CORRESPONDENCIA",
+    "clase": "documento",
+    "fichero": "no-imparte.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "no imparte",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Envío de documentación con oficio",
+    "categoria": "OTROS",
+    "tipo": "CORRESPONDENCIA",
+    "clase": "correo",
+    "cuerpo": "Les remitimos la documentación que se detalla en el oficio adjunto.\n\nLes agradeceremos que nos confirmen la recepción respondiendo a este correo.",
+    "cuerpoSeneca": "Les remitimos la documentación que se detalla en el oficio que les hemos enviado por correo electrónico."
+  },
+  {
+    "nombre": "NIF del centro",
+    "categoria": "OTROS",
+    "tipo": "CORRESPONDENCIA",
+    "clase": "documento",
+    "fichero": "cif-centro.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "NIF",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Oficio de remisión de documentación",
+    "categoria": "OTROS",
+    "tipo": "CORRESPONDENCIA",
+    "clase": "documento",
+    "fichero": "oficio-remision.docx",
+    "tipoDocumento": "OFICIO",
+    "texto": "remision",
+    "firmante": "direccion",
+    "vistoBueno": ""
+  },
+  {
     "nombre": "Certificado de función tutorial",
     "categoria": "PERSONAL",
     "tipo": "DESEMPEÑO FUNCIÓN TUTORIAL",
@@ -89,6 +452,52 @@
     "texto": "tutorias",
     "firmante": "secretaria",
     "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Envío del certificado de función tutorial",
+    "categoria": "PERSONAL",
+    "tipo": "DESEMPEÑO FUNCIÓN TUTORIAL",
+    "clase": "correo",
+    "cuerpo": "Le enviamos adjunto el certificado de función tutorial que nos pidió, ya firmado digitalmente.\n\nSi falta algún curso o hay que cambiar algo, responda a este correo.",
+    "cuerpoSeneca": "Le hemos enviado por correo electrónico el certificado de función tutorial que nos pidió. Si no lo ha recibido, puede recogerlo en la Secretaría del centro."
+  },
+  {
+    "nombre": "Envío del certificado de funciones y horario",
+    "categoria": "PERSONAL",
+    "tipo": "DESEMPEÑO FUNCIONES",
+    "clase": "correo",
+    "cuerpo": "Le enviamos adjunto el certificado de funciones y horario que nos pidió, ya firmado digitalmente.\n\nSi necesita algún cambio, responda a este correo.",
+    "cuerpoSeneca": "Le hemos enviado por correo electrónico el certificado de funciones y horario que nos pidió. Si no lo ha recibido, puede recogerlo en la Secretaría del centro."
+  },
+  {
+    "nombre": "Justificante de entrega en Secretaría",
+    "categoria": "ALUMNADO",
+    "tipo": "DOCUMENTACION",
+    "clase": "documento",
+    "fichero": "justificante-entrega.docx",
+    "tipoDocumento": "JUSTIFICANTE",
+    "texto": "entrega",
+    "firmante": "administracion",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Requerimiento de documentación",
+    "categoria": "ALUMNADO",
+    "tipo": "DOCUMENTACION",
+    "clase": "correo",
+    "cuerpo": "Para completar el trámite de {{NOMBRE NATURAL}} nos falta la documentación siguiente:\n\n{{LO QUE FALTA}}\n\nPueden entregarla en la Secretaría o enviarla escaneada respondiendo a este correo, antes del {{LIMITE}}. Les adjuntamos el requerimiento.",
+    "cuerpoSeneca": "Para completar el trámite de {{NOMBRE NATURAL}} nos falta la documentación siguiente: {{LO QUE FALTA}}. Pueden entregarla en la Secretaría o enviarla por correo electrónico antes del {{LIMITE}}."
+  },
+  {
+    "nombre": "Requerimiento de documentación",
+    "categoria": "ALUMNADO",
+    "tipo": "DOCUMENTACION",
+    "clase": "documento",
+    "fichero": "requerimiento-documentacion.docx",
+    "tipoDocumento": "REQUERIMIENTO",
+    "texto": "documentacion",
+    "firmante": "secretaria",
+    "vistoBueno": ""
   },
   {
     "nombre": "Renuncia a formar parte de la Junta Electoral",
@@ -107,14 +516,66 @@
     "categoria": "EMPRESAS",
     "tipo": "GARANTIA",
     "clase": "correo",
-    "cuerpo": "Buenos días, {{NOMBRE}}:\n\nLe escribimos para comunicarle una incidencia con {campo:Objeto}, suministrado a este centro,\nque se encuentra todavía en garantía.\n\nLe rogamos nos indique cómo proceder para su reparación o sustitución.\n\nQuedamos a la espera de su respuesta.\n\nUn saludo.\n{{CENTRO}}"
+    "cuerpo": "Le escribimos para comunicarle una incidencia con {campo:Objeto}, suministrado a este centro,\nque se encuentra todavía en garantía.\n\nLe rogamos nos indique cómo proceder para su reparación o sustitución.\n\nQuedamos a la espera de su respuesta."
   },
   {
     "nombre": "Comunicación de la resolución del permiso",
     "categoria": "PERSONAL",
     "tipo": "PERMISO",
     "clase": "correo",
-    "cuerpo": "Buenos días, {{NOMBRE}}:\n\nLe comunicamos que su solicitud de permiso ha sido resuelta.\n\nPuede consultar la resolución y, si procede, recogerla en Secretaría.\n\nUn saludo.\n{{CENTRO}}"
+    "cuerpo": "Le comunicamos que su solicitud de permiso ha sido resuelta.\n\nPuede consultar la resolución y, si procede, recogerla en Secretaría."
+  },
+  {
+    "nombre": "Actividad realizada en el centro por una entidad",
+    "categoria": "OTROS",
+    "tipo": "PROYECTO",
+    "clase": "documento",
+    "fichero": "actividad-entidad.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "actividad realizada",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Oferta educativa: conformidad del Claustro (Anexo I)",
+    "categoria": "OTROS",
+    "tipo": "PROYECTO",
+    "clase": "documento",
+    "fichero": "oferta-anexo-i.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "anexo I",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Oferta educativa: medios propios (Anexo II)",
+    "categoria": "OTROS",
+    "tipo": "PROYECTO",
+    "clase": "documento",
+    "fichero": "oferta-anexo-ii.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "anexo II",
+    "firmante": "direccion",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Comunicación de la decisión sobre una reclamación de calificación",
+    "categoria": "ALUMNADO",
+    "tipo": "RECLAMACION",
+    "clase": "documento",
+    "fichero": "comunicacion-reclamacion.docx",
+    "tipoDocumento": "COMUNICACION",
+    "texto": "reclamacion",
+    "firmante": "jefatura-estudios",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Envío de la decisión sobre la reclamación",
+    "categoria": "ALUMNADO",
+    "tipo": "RECLAMACION",
+    "clase": "correo",
+    "cuerpo": "Les enviamos adjunta la decisión del departamento sobre la reclamación de la calificación de {campo:Materia} de {{NOMBRE NATURAL}}.\n\nEn el documento se indica qué pueden hacer si no están de acuerdo.",
+    "cuerpoSeneca": "El departamento ya ha decidido sobre la reclamación de la calificación de {campo:Materia} de {{NOMBRE NATURAL}}. Les hemos enviado la comunicación por correo electrónico; también pueden recogerla en la Secretaría del centro."
   },
   {
     "nombre": "Resolución de medida disciplinaria",
@@ -128,6 +589,25 @@
     "vistoBueno": ""
   },
   {
+    "nombre": "Aviso de recogida del título",
+    "categoria": "ALUMNADO",
+    "tipo": "TITULO",
+    "clase": "correo",
+    "cuerpo": "El título de {campo:Título} de {{NOMBRE NATURAL}} ya ha llegado al centro.\n\nPuede recogerlo en la Secretaría, en horario de {campo:Horario de atención al público}, la persona titular con su DNI. Si lo recoge otra persona, debe traer una autorización firmada por la persona titular y una copia de su DNI.",
+    "cuerpoSeneca": "El título de {campo:Título} de {{NOMBRE NATURAL}} ya ha llegado al centro. Puede recogerlo en la Secretaría, en horario de {campo:Horario de atención al público}, con el DNI de la persona titular."
+  },
+  {
+    "nombre": "Título en trámite de expedición",
+    "categoria": "ALUMNADO",
+    "tipo": "TITULO",
+    "clase": "documento",
+    "fichero": "titulo-en-tramite.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "titulo",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
     "nombre": "Diligencia de toma de posesión",
     "categoria": "PERSONAL",
     "tipo": "TOMA POSESION",
@@ -136,6 +616,28 @@
     "tipoDocumento": "DILIGENCIA",
     "texto": "toma de posesion",
     "firmante": "direccion",
+    "vistoBueno": ""
+  },
+  {
+    "nombre": "Devolución de libros de gratuidad por traslado",
+    "categoria": "ALUMNADO",
+    "tipo": "TRASLADO",
+    "clase": "documento",
+    "fichero": "devolucion-libros.docx",
+    "tipoDocumento": "CERTIFICADO",
+    "texto": "libros",
+    "firmante": "secretaria",
+    "vistoBueno": "direccion"
+  },
+  {
+    "nombre": "Petición del historial al centro de procedencia",
+    "categoria": "ALUMNADO",
+    "tipo": "TRASLADO",
+    "clase": "documento",
+    "fichero": "peticion-historial.docx",
+    "tipoDocumento": "OFICIO",
+    "texto": "peticion historial",
+    "firmante": "secretaria",
     "vistoBueno": ""
   }
 ]

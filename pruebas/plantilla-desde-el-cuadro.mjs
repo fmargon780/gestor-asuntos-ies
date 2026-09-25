@@ -136,6 +136,20 @@ await pagina.click('button:has-text("Cambiar de todas formas")');
 await comprobarQue('4. al confirmar, el cuerpo se rellena con la plantilla editada',
   pagina.locator('#seneca-cuerpo-texto').inputValue().then((v) => v.indexOf('de nuevo') !== -1));
 
+/* ---------- 4b (fila 170): el texto propio para Séneca ---------- */
+
+await pagina.click('#seneca-plantilla-editar');
+await pagina.waitForSelector('#seneca-plantilla-editor:not(.oculto) #pl2-nombre');
+await comprobar('4b. el recuadro «Texto para Séneca» sale plegado',
+  pagina.evaluate(() => { const d = document.querySelector('#seneca-plantilla-editor details.pl-seneca'); return !!d && !d.open; }), true);
+await pagina.click('#seneca-plantilla-editor details.pl-seneca > summary');
+await pagina.fill('#pl2-texto-seneca', 'Solo para Séneca, sobre {nombre}.');
+await pagina.click('#pl2-guardar');
+await pagina.waitForSelector('#seneca-formulario:not(.oculto)');
+await pagina.waitForTimeout(200);
+await comprobarQue('4b. el mensaje de Séneca usa su texto propio',
+  pagina.locator('#seneca-cuerpo-texto').inputValue().then((v) => v.indexOf('Solo para Séneca') !== -1 && v.indexOf('de nuevo') === -1));
+
 await pagina.keyboard.press('Escape');
 await pagina.waitForSelector('#capa', { state: 'hidden' });
 
@@ -148,6 +162,8 @@ await pagina.evaluate((t) => Array.from(document.querySelector('.boton-comunicar
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.waitForTimeout(200);
 
+await comprobarQue('5. el correo sigue con el texto de siempre, no el de Séneca (fila 170)',
+  pagina.locator('#correo-cuerpo-texto').inputValue().then((v) => v.indexOf('de nuevo') !== -1 && v.indexOf('Solo para Séneca') === -1));
 await comprobarQue('5. con plantilla ya creada, «Editar plantilla» también en el cuadro de Correo',
   pagina.evaluate(() => !!document.getElementById('correo-plantilla-editar')));
 await pagina.fill('#correo-otro', 'alguien@example.com');

@@ -365,5 +365,26 @@
     return valores;
   }
 
+  /* Fila 171 (docs/DOCUMENTO-PARA-CADA-RELACIONADO.md): el mismo asunto,
+     pero con un relacionado (`{ categoria, nombre }`) en el sitio del
+     tercero. Todo lo del asunto (campos, curso, hitos, «Lo pide»,
+     firmantes) se queda; lo de la persona (nombre, DNI, referencia,
+     correo, sexo, especialidad) sale de ella. Sin `contacto`: ese es el
+     del tercero principal. `valoresDeAsunto` no cambia. */
+  function asuntoParaPersona(asunto, relacionado) {
+    var a = asunto || {};
+    var ficha = Object.assign({}, a.ficha || {}, { categoria: relacionado.categoria, tercero: relacionado.nombre });
+    delete ficha.contacto;
+    var leido = Object.assign({}, a.leido || {}, { categoria: relacionado.categoria });
+    if (!leido.tipo && a.ficha && a.ficha.tipo) leido.tipo = a.ficha.tipo;
+    return Object.assign({}, a, { ficha: ficha, leido: leido });
+  }
+
+  function valoresDePersona(asunto, relacionado, opciones) {
+    return valoresDeAsunto(asuntoParaPersona(asunto, relacionado), opciones);
+  }
+
   Plantillas.valoresDeAsunto = valoresDeAsunto;
+  Plantillas.asuntoParaPersona = asuntoParaPersona;
+  Plantillas.valoresDePersona = valoresDePersona;
 })();

@@ -52,6 +52,14 @@ async function comprobar(titulo, promesa, esperado) {
 /* Desde la fila 36 (docs/FILAS-QUE-NO-SE-ESTRUJAN.md, 17-sep-2026),
    Separar/Unir/Sacar páginas viven detrás del menú de tres puntos
    (U.menuDeAcciones): hay que abrirlo antes de poder pulsarlos. */
+/* Desde la fila 168 (docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md), en la ficha
+   del asunto las herramientas de PDF están en la barra del visor: se
+   abre el documento y se pulsa ahí. */
+async function pulsarDeLaBarra(locatorFila, texto) {
+  await locatorFila.locator('.ficha-documento').click();
+  await pagina.waitForSelector('#visor-acciones .visor-barra-pdf');
+  await pagina.locator('#visor-acciones .visor-barra-pdf').getByRole('button', { name: texto, exact: true }).click();
+}
 async function pulsarDelMenu(locatorFila, texto) {
   await locatorFila.locator('.fila-menu-btn').click();
   await locatorFila.locator('.fila-menu').getByRole('button', { name: texto, exact: true }).click();
@@ -132,13 +140,19 @@ console.log('--- los tres botones salen para un PDF ---');
 function filaDe(nombre) {
   return pagina.locator('.ficha-documento-fila').filter({ hasText: nombre });
 }
-await comprobar('Separar, Unir y Sacar páginas salen en la fila del documento',
+await comprobar('Separar, Unir y Sacar páginas ya no están en la fila del documento (fila 168)',
   filaDe(ESCANEO).locator('button').allTextContents().then(ts => ts.filter(t =>
+    ['Separar', 'Unir', 'Sacar páginas'].includes(t.trim()))),
+  []);
+await filaDe(ESCANEO).locator('.ficha-documento').click();
+await pagina.waitForSelector('#visor-acciones .visor-barra-pdf');
+await comprobar('salen en la barra del visor al abrir el PDF',
+  pagina.locator('#visor-acciones .visor-barra-pdf button').allTextContents().then(ts => ts.filter(t =>
     ['Separar', 'Unir', 'Sacar páginas'].includes(t.trim()))),
   ['Separar', 'Unir', 'Sacar páginas']);
 
 console.log('--- Separar: dos cortes dan tres trozos, con nombre y a la papelera ---');
-await pulsarDelMenu(filaDe(ESCANEO), 'Separar');
+await pulsarDeLaBarra(filaDe(ESCANEO), 'Separar');
 await pagina.waitForSelector('.pdf-rejilla .pdf-pagina');
 await comprobar('salen las 6 miniaturas', pagina.locator('.pdf-rejilla .pdf-pagina').count(), 6);
 await comprobar('sin cortes, el resumen pide marcar una tijera',
@@ -195,7 +209,7 @@ await pagina.click('#lista-abiertos .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila');
 
-await pulsarDelMenu(filaDe(TROZO_2), 'Sacar páginas');
+await pulsarDeLaBarra(filaDe(TROZO_2), 'Sacar páginas');
 await pagina.waitForSelector('.pdf-rejilla .pdf-pagina');
 await pagina.check('.pdf-rejilla .pdf-pagina:nth-child(1) input[type="checkbox"]');
 await pagina.click('#cuadro-aceptar');   /* "Sacar páginas" */

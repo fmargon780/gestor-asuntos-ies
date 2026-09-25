@@ -88,22 +88,18 @@
     return Plantillas.documentosDeTipo(datos, categoriaDelAsunto(a), tipoDelAsunto(a));
   }
 
-  /* Los siete pasos de "Al generar" (docs/PLANTILLAS-DE-DOCUMENTO.md, 5). */
-  /* `opciones.hito` (fila 102, docs/DOCUMENTOS-DESDE-EL-HITO.md): generado
-     desde un hito. Rellena sus huecos ({{HITO}}, {{PLAZO DEL HITO}},
-     {hecho:...}, {{LO QUE FALTA}}), deja el documento apuntado a ese
-     hito, marca su casilla de "Lo que hay que reunir", apunta una nota
-     en el hito y lo deja desplegado al volver a pintar la ficha. Sin
-     `opciones`, exactamente lo de siempre. */
-  async function generarDocumento(asunto, plantillaDoc, modo, opciones) {
-    var hito = (opciones && opciones.hito) || null;
+  /* La plantilla leída de `_GESTOR/PLANTILLAS`, con el membrete ya puesto.
+     `null` (con su aviso) si no se encuentra o no se puede leer. Aparte
+     (fila 171) para js/generar-para-relacionados.js, que la lee una vez
+     para todo el lote. */
+  async function leerConMembrete(plantillaDoc) {
     var carpeta = await carpetaDePlantillas();
     var handle;
     try {
       handle = await carpeta.getFileHandle(plantillaDoc.fichero);
     } catch (e) {
       U.aviso('No encuentro "' + plantillaDoc.fichero + '" en _GESTOR/PLANTILLAS.', 'malo');
-      return;
+      return null;
     }
 
     var buffer;
@@ -112,7 +108,7 @@
       buffer = await fichero.arrayBuffer();
     } catch (e) {
       U.aviso('No he podido leer la plantilla: ' + U.mensajeDeError(e), 'malo');
-      return;
+      return null;
     }
 
     /* El membrete (20-sep-2026, fila 81): se mete ANTES de rellenar,
@@ -127,6 +123,20 @@
         if (membrete) buffer = await Docx.ponerImagen(buffer, 'MEMBRETE', membrete.bytes, membrete.ancho, membrete.alto);
       } catch (e) { /* sin membrete, el documento sigue generándose */ }
     }
+    return buffer;
+  }
+
+  /* Los siete pasos de "Al generar" (docs/PLANTILLAS-DE-DOCUMENTO.md, 5). */
+  /* `opciones.hito` (fila 102, docs/DOCUMENTOS-DESDE-EL-HITO.md): generado
+     desde un hito. Rellena sus huecos ({{HITO}}, {{PLAZO DEL HITO}},
+     {hecho:...}, {{LO QUE FALTA}}), deja el documento apuntado a ese
+     hito, marca su casilla de "Lo que hay que reunir", apunta una nota
+     en el hito y lo deja desplegado al volver a pintar la ficha. Sin
+     `opciones`, exactamente lo de siempre. */
+  async function generarDocumento(asunto, plantillaDoc, modo, opciones) {
+    var hito = (opciones && opciones.hito) || null;
+    var buffer = await leerConMembrete(plantillaDoc);
+    if (!buffer) return;
 
     var valores = await Plantillas.valoresDeAsunto(asunto, { fecha: U.hoyIso(), plantilla: plantillaDoc, hito: hito });
     /* Las tablas de datos (fila 110, js/tablas-datos.js): {{TABLA …}} se mete
@@ -373,7 +383,8 @@
     nombreDelDocumentoGenerado: nombreDelDocumentoGenerado,
     /* pintarDeTipo y abrirCuadroDePlantillaDoc los pone
        js/plantillas-documento-ajustes.js (fila 133). */
-    _interno: { carpetaDePlantillas: carpetaDePlantillas },
+    _interno: { carpetaDePlantillas: carpetaDePlantillas, leerConMembrete: leerConMembrete,
+      guardarBlobEnCarpeta: guardarBlobEnCarpeta },
     /* Para js/hitos-generar.js (fila 102). */
     generar: generarDocumento, elegir: elegirPlantilla, plantillasDelAsunto: plantillasDelAsunto,
     categoriaDelAsunto: categoriaDelAsunto, tipoDelAsunto: tipoDelAsunto

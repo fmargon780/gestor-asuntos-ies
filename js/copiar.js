@@ -99,33 +99,9 @@
 
   /* ---------- 2. la ficha del asunto ----------
 
-     La ficha se repinta ella sola cada vez que se cambia el estado, el
-     plazo o la vía, y en ese repintado se lleva por delante el botón.
-     Por eso se vigila la pantalla y se vuelve a poner. Lo mismo vale
-     para los botones de los documentos, que llegan más tarde, cuando
-     se termina de leer la carpeta. */
-
-  (function () {
-    /* El número del alumno ya no se pone aquí, pegado al `<h2>`: desde
-       la fila 58 (docs/AJUSTES-DE-USO-2026-09-18.md, 1) vive en la fila
-       de botones de copiar de un gesto (js/ficha-nombre-acciones.js),
-       para no tener dos caminos. Este envoltorio se queda solo con los
-       documentos, que siguen llegando tarde (cuando termina de leer la
-       carpeta). */
-    var nueva = U.envolver(App, 'App.abrirFicha', 'copiar.js', function (comoEra) {
-      return function (a, modo) {
-        comoEra(a, modo);
-        ponerEnDocumentos();
-      };
-    });
-    if (!nueva) return;
-
-    var pantalla = document.getElementById('pantalla-asunto');
-    if (pantalla && window.MutationObserver) {
-      new MutationObserver(function () { ponerEnDocumentos(); })
-        .observe(pantalla, { childList: true, subtree: true });
-    }
-  })();
+     Desde la fila 168 (docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md) el botón ⧉
+     que copia el nombre de un documento lo pinta la propia fila, en
+     js/ficha-documentos.js: aquí ya no se vigila la ficha. */
 
   /* ---------- 3. las listas de resultados ----------
 
@@ -190,65 +166,6 @@
       return r;
     };
   });
-
-  /* ==========================================================
-     EL NOMBRE DEL DOCUMENTO, SIN LA EXTENSIÓN
-
-     En la lista de documentos de la ficha del asunto, cada documento
-     es un botón que lo abre. Al lado se le pone otro que copia su
-     nombre. Se copia sin el .pdf del final, que es como se pega en el
-     registro o en el asunto de un correo.
-     ========================================================== */
-
-  function sinExtension(nombre) {
-    return String(nombre || '').replace(/\.[A-Za-z0-9]{1,8}$/, '').trim();
-  }
-
-  function ponerEnDocumentos() {
-    var caja = document.getElementById('ficha-documentos');
-    if (!caja) return;
-    Array.prototype.forEach.call(caja.querySelectorAll('.ficha-documento'), function (b) {
-      if (b.getAttribute('data-con-copiar')) return;
-      b.setAttribute('data-con-copiar', '1');
-
-      /* El botón del documento lleva dentro la extensión en un recuadro
-         y el nombre en otro. El nombre es el último. */
-      var trozos = b.querySelectorAll('span');
-      var nombre = trozos.length ? trozos[trozos.length - 1].textContent : b.textContent;
-      var limpio = sinExtension(nombre);
-      if (!limpio) return;
-
-      var copiar = boton({
-        etiqueta: 'Copiar',
-        texto: limpio,
-        ayuda: 'Copiar el nombre del documento, sin la extensión',
-        clase: 'boton-copiar-nombre'
-      });
-
-      /* Entra el primero del menú de tres puntos que ya monta
-         js/ficha-documentos.js (17-sep-2026, fila 36,
-         docs/FILAS-QUE-NO-SE-ESTRUJAN.md): nunca un envoltorio propio al
-         lado del nombre, que es justo lo que lo aplastaba con el panel
-         de la derecha abierto. Sin menú (documento sin ningún otro
-         botón: no debería darse en la aplicación de verdad, pero puede
-         pasar en una prueba mínima), se cae al lado del nombre, como
-         antes. */
-      var fila = b.closest('.ficha-documento-fila');
-      var menu = fila && fila.querySelector('.fila-menu');
-      if (menu) {
-        menu.insertBefore(copiar, menu.firstChild);
-        return;
-      }
-
-      var envoltorio = document.createElement('div');
-      envoltorio.style.cssText = 'display:flex;gap:6px;align-items:stretch';
-      b.parentNode.insertBefore(envoltorio, b);
-      envoltorio.appendChild(b);
-      b.style.flex = '1';
-      b.style.minWidth = '0';
-      envoltorio.appendChild(copiar);
-    });
-  }
 
   /* Expuesto para js/ficha-nombre-acciones.js (18-sep-2026, fila 58,
      docs/AJUSTES-DE-USO-2026-09-18.md, 1): la fila de botones de copiar

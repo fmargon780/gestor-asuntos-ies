@@ -4,6 +4,24 @@ Documento hijo de `docs/CONTEXTO.md` (fila 65, `docs/DOCUMENTOS-QUE-QUEPAN.md`, 
 
 ---
 
+### Las opciones de cada documento, en su fila (fila 168)
+
+`docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md`. En la ficha del asunto (`js/ficha-documentos.js`), cada
+fila de «Documentos de la carpeta» lleva, de izquierda a derecha: el nombre (abre el visor), **⧉**
+(`.ficha-documento-copiar`: copia el nombre sin la extensión con `U.copiar`), la etiqueta del hito,
+«Sin registrar» + «Registrar» (solo sin registro), **«Poner nombre»** (`App.verDocumentos(a,
+{ ponerNombre })`, repinta al cerrar), «Asociar a un hito» y ⋮ con **solo** «Pasar a versiones
+previas» y «Borrar». En el título, **«+ Añadir documento»** (`irDirectoAAnadir`). El índice del
+expediente no lleva «Poner nombre», «Registrar» ni «Asociar».
+
+Las herramientas de PDF (Separar, Unir, Sacar páginas, Ajustar tamaño si hay `PrepararDocumento`,
+Repartir si `Repartir.puede(a)`) salen del menú y van a **una barra encima del documento en el
+visor** (`barraPdf(f, a)`, pasada como `opts.acciones` a `Visor.abrir`; clase `.visor-barra-pdf`),
+solo al abrir un PDF desde esa lista; al terminar, repintan la lista. Abierto desde otro sitio, o
+un no-PDF, no hay barra. La ventana de `App.verDocumentos` se queda (tarjeta de la lista, «Por
+clasificar», «Nuevo asunto»). `js/copiar.js` ya no vigila la ficha (fuera su envoltura de
+`App.abrirFicha`). Se comprueba con `pruebas/documentos-en-un-solo-sitio.mjs`.
+
 ### Los nombres, con tope de largo (fila 130)
 
 Para no pasar del límite de rutas de Windows: la carpeta de un asunto, 150 caracteres como mucho

@@ -178,12 +178,9 @@ await comprobar('el original, sin registro en su nombre, lo sigue pudiendo lleva
   filaDeDocumento(FACTURA), { pendiente: false, registrar: true });
 
 console.log('--- un documento con la casilla "Pendiente de registro" ---');
-/* "Gestionar documentos" pasó a llamarse "Documentos ▾" y vive en la
-   cabecera del propio bloque (18-sep-2026, fila 52,
-   docs/CABECERA-DEL-ASUNTO.md, 11). */
-await pagina.click('.ficha-documentos-gestionar');
-await pagina.waitForSelector('#doc-anadir');
-await pagina.click('#doc-anadir');
+/* Desde la fila 168, «+ Añadir documento» en la cabecera del bloque va
+   directo al cuadro de añadir (antes «Documentos ▾» y luego «Añadir»). */
+await pagina.click('.ficha-documentos-anadir');
 await pagina.waitForSelector('#doc-vista');
 await pagina.fill('#doc-fecha', '2026-09-11');
 await pagina.selectOption('#doc-tipo', 'SOLICITUD');

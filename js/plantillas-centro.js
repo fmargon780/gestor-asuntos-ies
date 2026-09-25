@@ -69,10 +69,13 @@
         });
       } else {
         if (yaCorreo[clave]) { correoYaEstaban++; continue; }
-        nuevosCorreo.push({
+        var nuevo = {
           id: Plantillas.idNuevo(), tipo: e.tipo, categoria: e.categoria, nombre: e.nombre,
           texto: e.cuerpo || ''
-        });
+        };
+        /* Fila 170: el texto propio para el mensaje de Séneca, si lo trae. */
+        if (e.cuerpoSeneca) nuevo.textoSeneca = e.cuerpoSeneca;
+        nuevosCorreo.push(nuevo);
       }
     }
 
