@@ -1,9 +1,10 @@
-# Fila 151 — Hitos más sencillos: las acciones en el hito, los pasos como lista
+# Fila 154 — Hitos más sencillos: las acciones en el hito, los pasos como lista
 
-Cerrado con Francisco el 25-sep-2026. Va **después de la fila 150** y la sustituye en parte: el
-«Comunicar» de cada paso que arregla la fila 150 se quita de la lista y pasa al menú del hito. El
-arreglo de la fila 150 (que comunicar marque el paso correcto) se aprovecha tal cual. El enlace
-«✎ Cambiar el guion de este hito» de la fila 150 se mantiene.
+Cerrado con Francisco el 25-sep-2026. Va **después de las filas 150 a 153** y sustituye en parte a
+la 150: el «Comunicar» de cada paso que arregla la fila 150 se quita de la lista y pasa al menú del
+hito. El arreglo de la fila 150 (que comunicar marque el paso correcto) se aprovecha tal cual. El
+enlace «✎ Cambiar el guion de este hito» de la fila 150 se mantiene. El «Enviar ▾» de cada
+documento de la fila 153 se mantiene también.
 
 ## Por qué
 
@@ -94,7 +95,7 @@ Francisco trabaja con la mesa del hito y le resulta poco fluida:
   los ficheros de arriba.
 - Cambios quirúrgicos. Ningún fichero de `js/` pasa de 600 líneas: si alguno se acerca, pártelo.
 - Si es demasiado para una sesión, parte la fila en dos (1-2-5 primero, 3-4 después) y apunta la
-  segunda mitad como fila 152 PENDIENTE.
+  segunda mitad como fila nueva PENDIENTE, justo debajo.
 - Una sola prueba al final (`npm test`).
 - Sube a `main`, sin pull request (si la sesión solo puede con pull request, fusiónalo tú en verde,
   según el permiso permanente). Máximo dos subidas por fila (regla 13 de la cola).
