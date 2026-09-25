@@ -47,7 +47,7 @@ doc('cese-y-vacaciones','Cese y vacaciones pendientes','PERSONAL','CESE','CERTIF
  cert_sec("Que **D./Dña. {{NOMBRE NATURAL}}**, con DNI {{DNI}}, ha prestado servicios en este centro como {campo:Puesto} hasta el {campo:Fecha de cese}, fecha de su cese.\n\nQue, a esa fecha, le quedan por disfrutar {campo:Días de vacaciones pendientes} días de vacaciones."))
 doc('informe-desempeno','Informe de la Dirección sobre el desempeño','PERSONAL','CERTIFICADO PERSONAL','INFORME','desempeño','direccion','',
  verbo_dir("I N F O R M A","Que **D./Dña. {{NOMBRE NATURAL}}**, con DNI {{DNI}}, ha desempeñado en este centro el puesto de {campo:Puesto} {campo:Periodo}.\n\nQue ha cumplido sus funciones con responsabilidad y eficacia, por lo que su desempeño merece una valoración favorable de esta Dirección.",fin="la emisión de este informe"))
-doc('autorizacion-direccion','Autorización de la Dirección','PERSONAL','AUTORIZACION','AUTORIZACION','autorizacion','direccion','',
+doc('autorizacion-direccion','Autorización de la Dirección','PERSONAL','CERTIFICADO PERSONAL','AUTORIZACION','autorizacion','direccion','',
  verbo_dir("A U T O R I Z A","A **D./Dña. {{NOMBRE NATURAL}}**, con DNI {{DNI}}, {campo:Puesto} de este centro, a {campo:Para qué se autoriza}, en nombre del {{CENTRO}}, ante {campo:Organismo o entidad}.",fin="la gestión de esta autorización"))
 
 # ---------------- ALUMNADO
@@ -68,13 +68,13 @@ doc('titulo-en-tramite','Título en trámite de expedición','ALUMNADO','TITULO'
  cert_sec("Que **D./Dña. {{NOMBRE NATURAL}}**, con DNI {{DNI}}, ha terminado en este centro {campo:Estudios} y reúne los requisitos para obtener el título de {campo:Título}.\n\nQue el título está en trámite de expedición, con número de registro {campo:Número de registro del título}, y que la tasa se abonó el {campo:Fecha de pago de la tasa}."))
 doc('actividad-alumno','Participación del alumno en una actividad o viaje','ALUMNADO','CERTIFICADO','CERTIFICADO','actividad','secretaria','direccion',
  cert_sec(MATR+", y que va a participar en la actividad «{campo:Actividad}», en {campo:Lugar}, {campo:Fechas}, aprobada por el Consejo Escolar e incluida en el Plan de Centro."))
-doc('justificante-asistencia-familia','Justificante de asistencia de la familia al centro','ALUMNADO','JUSTIFICANTE ASISTENCIA','JUSTIFICANTE','asistencia','direccion','',
+doc('justificante-asistencia-familia','Justificante de asistencia de la familia al centro','ALUMNADO','CERTIFICADO','JUSTIFICANTE','asistencia','direccion','',
  verbo_dir("H A C E   C O N S T A R","Que {{QUIENLOPIDE}}, {{QUIENLOPIDERELACION}} del alumno/a {{NOMBRE NATURAL}}, del grupo {{GRUPO}}, ha estado en este centro el {campo:Fecha de la visita}, de {campo:Hora de llegada} a {campo:Hora de salida}, para {campo:Motivo de la visita}.\n\nY para que conste ante {campo:Ante quién se presenta}, firmo el presente justificante.",fin="la emisión de este justificante",cierre=False))
 doc('requerimiento-documentacion','Requerimiento de documentación','ALUMNADO','DOCUMENTACION','REQUERIMIENTO','documentacion','secretaria','',
  "# Requerimiento de documentación\n\nA la atención de {{TUTOR1}}, como persona que ejerce la tutela legal de {{NOMBRE NATURAL}}, del grupo {{GRUPO}}.\n\nPara completar la tramitación de su solicitud es necesario que aporte la documentación siguiente:\n\n{{LO QUE FALTA}}\n\nConforme al artículo 68.1 de la Ley 39/2015, de 1 de octubre, del Procedimiento Administrativo Común de las Administraciones Públicas, dispone de diez días hábiles, hasta el {{LIMITE}}, para entregarla en la Secretaría del centro. Si no lo hace, se le tendrá por desistido/a:tutor1 de su petición.\n\n"+FIRMA_SOLO+"\n\n"+LOPD.replace('{fin}','la tramitación de su solicitud'))
 doc('justificante-entrega','Justificante de entrega en Secretaría','ALUMNADO','DOCUMENTACION','JUSTIFICANTE','entrega','administracion','',
  "# Justificante de entrega de documentación\n\nSe hace constar que {{QUIENLOPIDE}} ha entregado hoy, {{HOY LARGO}}, en la Secretaría de este centro la documentación siguiente, relativa a {{NOMBRE NATURAL}}, del grupo {{GRUPO}}:\n\n{campo:Documentación entregada}\n\nNúmero de registro de entrada en Séneca: {{REGISTRO}}.\n\n"+FIRMA_SOLO+"\n\n"+LOPD.replace('{fin}','la tramitación de su solicitud'))
-RES="Vista la solicitud presentada por {{QUIENLOPIDE}} el {{QUIENLOPIDEFECHA}}, relativa a {{NOMBRE NATURAL}}, del grupo {{GRUPO}}, en la que pide {campo:Qué se solicita},\n\n**R E S U E L V O:**\n\n{campo:Resolución (Conceder o Denegar)} lo solicitado, por el motivo siguiente: {campo:Motivo de la resolución}.\n\nContra esta resolución, que no pone fin a la vía administrativa, puede interponer recurso de alzada ante la persona titular de la Delegación Territorial de Desarrollo Educativo y Formación Profesional en {{PROVINCIA}}, en el plazo de un mes desde el día siguiente a su notificación, conforme a los artículos 121 y 122 de la Ley 39/2015, de 1 de octubre, del Procedimiento Administrativo Común de las Administraciones Públicas."
+RES="Vista la solicitud presentada por {{QUIENLOPIDE}} el {{QUIENLOPIDEFECHA}}, relativa a {{NOMBRE NATURAL}}, del grupo {{GRUPO}}, en la que pide {campo:Qué se solicita},\n\n**R E S U E L V O:**\n\n{campo:Resolución (Conceder o Denegar)} lo solicitado, por el motivo siguiente: {campo:Motivo de la resolución}.\n\nContra esta resolución, que no pone fin a la vía administrativa, puede interponer recurso de alzada ante la persona titular de la Delegación Territorial de la {{CONSEJERIA}} en {{PROVINCIA}}, en el plazo de un mes desde el día siguiente a su notificación, conforme a los artículos 121 y 122 de la Ley 39/2015, de 1 de octubre, del Procedimiento Administrativo Común de las Administraciones Públicas."
 for tipo,slug,nom in [('CAMBIO DE GRUPO','resolucion-cambio-grupo','Resolución de cambio de grupo'),('CAMBIO OPTATIVA','resolucion-cambio-optativa','Resolución de cambio de optativa')]:
     doc(slug,nom,'ALUMNADO',tipo,'RESOLUCION','resolucion','direccion','',f"{DIR}\n\n{RES}\n\n{FIRMA_SOLO}\n\n"+LOPD.replace('{fin}','la tramitación de su solicitud'))
 doc('citacion-familia','Citación a la familia','ALUMNADO','ABSENTISMO','CITACION','reunion','jefatura-estudios','',
@@ -89,15 +89,15 @@ doc('devolucion-libros','Devolución de libros de gratuidad por traslado','ALUMN
 # ---------------- OTROS
 doc('acuerdo-organo-colegiado','Acuerdo del Consejo Escolar o del Claustro','OTROS','CONSEJO ESCOLAR','CERTIFICADO','acuerdo','secretaria','direccion',
  cert_sec("Que en la sesión {campo:Tipo de sesión (ordinaria o extraordinaria)} del {campo:Órgano (Consejo Escolar o Claustro)}, celebrada el {campo:Fecha de la sesión}, se adoptó {campo:Votación (por unanimidad o por mayoría)} el acuerdo siguiente:\n\n{campo:Acuerdo}",pet="ante {{NOMBRE NATURAL}}, "))
-doc('oferta-anexo-i','Oferta educativa: conformidad del Claustro (Anexo I)','OTROS','OFERTA EDUCATIVA','CERTIFICADO','anexo I','secretaria','direccion',
+doc('oferta-anexo-i','Oferta educativa: conformidad del Claustro (Anexo I)','OTROS','PROYECTO','CERTIFICADO','anexo I','secretaria','direccion',
  cert_sec("Que el Claustro de Profesorado, en sesión celebrada el {campo:Fecha del Claustro}, ha dado su conformidad a la oferta de las materias de diseño propio y proyectos interdisciplinares siguientes para el curso {campo:Curso para el que se oferta}:\n\n{campo:Materias o proyectos y cursos}",pet=""))
-doc('oferta-anexo-ii','Oferta educativa: medios propios (Anexo II)','OTROS','OFERTA EDUCATIVA','CERTIFICADO','anexo II','direccion','',
+doc('oferta-anexo-ii','Oferta educativa: medios propios (Anexo II)','OTROS','PROYECTO','CERTIFICADO','anexo II','direccion','',
  verbo_dir("H A C E   C O N S T A R","Que las materias de diseño propio y proyectos interdisciplinares siguientes, para el curso {campo:Curso para el que se oferta}, se impartirán con los medios propios del centro, sin aumento de la plantilla de profesorado:\n\n{campo:Materias o proyectos y cursos}",fin="la tramitación de la oferta educativa"))
 doc('actividad-entidad','Actividad realizada en el centro por una entidad','OTROS','PROYECTO','CERTIFICADO','actividad realizada','secretaria','direccion',
  cert_sec("Que {{NOMBRE NATURAL}} ha realizado en este centro {campo:Actividad realizada}, dirigida a {campo:Alumnado destinatario}, {campo:Fechas}.",pet="a petición de la entidad interesada, "))
-doc('cif-centro','NIF del centro','OTROS','CERTIFICADO CENTRO','CERTIFICADO','NIF','secretaria','direccion',
+doc('cif-centro','NIF del centro','OTROS','CORRESPONDENCIA','CERTIFICADO','NIF','secretaria','direccion',
  cert_sec("Que el {{CENTRO}}, con código {{CODIGO CENTRO}}, es un centro docente público dependiente de la {{CONSEJERIA}} de la Junta de Andalucía, y que su número de identificación fiscal es el de la Junta de Andalucía: {campo:NIF del centro}.",pet=""))
-doc('no-imparte','El centro no imparte unas enseñanzas','OTROS','CERTIFICADO CENTRO','CERTIFICADO','no imparte','secretaria','direccion',
+doc('no-imparte','El centro no imparte unas enseñanzas','OTROS','CORRESPONDENCIA','CERTIFICADO','no imparte','secretaria','direccion',
  cert_sec("Que en el {{CENTRO}} no se imparten durante el curso {{CURSO}} las enseñanzas de {campo:Enseñanza que no se imparte}.",pet="a petición de {{NOMBRE NATURAL}}, "))
 doc('oficio-remision','Oficio de remisión de documentación','OTROS','CORRESPONDENCIA','OFICIO','remision','direccion','',
  "# Oficio de remisión\n\nDestinatario: {{NOMBRE NATURAL}}.\n\nAdjunto le remito la documentación siguiente:\n\n{campo:Documentación que se remite}\n\nMotivo del envío: {campo:Motivo del envío}.\n\n"+FIRMA_SOLO)
@@ -112,7 +112,7 @@ correo('funciones','Envío del certificado de funciones y horario','PERSONAL','D
 correo('tutoria','Envío del certificado de función tutorial','PERSONAL','DESEMPEÑO FUNCIÓN TUTORIAL',
  "Le enviamos adjunto el certificado de función tutorial que nos pidió, ya firmado digitalmente.\n\nSi falta algún curso o hay que cambiar algo, responda a este correo.",
  "Le hemos enviado por correo electrónico el certificado de función tutorial que nos pidió. Si no lo ha recibido, puede recogerlo en la Secretaría del centro.")
-correo('autorizacion','Envío de una autorización de la Dirección','PERSONAL','AUTORIZACION',
+correo('autorizacion','Envío de una autorización de la Dirección','PERSONAL','CERTIFICADO PERSONAL',
  "Le enviamos adjunta la autorización de la Dirección para {campo:Para qué se autoriza}.\n\nLlévela consigo, en papel o en el móvil, cuando haga la gestión.",
  "Le hemos enviado por correo electrónico la autorización de la Dirección para {campo:Para qué se autoriza}. Si no la ha recibido, puede recogerla en la Secretaría del centro.")
 correo('actividad','Envío del certificado de participación en una actividad','OTROS','ACTIVIDAD EXTRAESCOLAR',
@@ -130,7 +130,7 @@ correo('titulo','Aviso de recogida del título','ALUMNADO','TITULO',
 correo('documentacion','Requerimiento de documentación','ALUMNADO','DOCUMENTACION',
  "Para completar el trámite de {{NOMBRE NATURAL}} nos falta la documentación siguiente:\n\n{{LO QUE FALTA}}\n\nPueden entregarla en la Secretaría o enviarla escaneada respondiendo a este correo, antes del {{LIMITE}}. Les adjuntamos el requerimiento.",
  "Para completar el trámite de {{NOMBRE NATURAL}} nos falta la documentación siguiente: {{LO QUE FALTA}}. Pueden entregarla en la Secretaría o enviarla por correo electrónico antes del {{LIMITE}}.")
-correo('justificante-asistencia','Envío del justificante de asistencia al centro','ALUMNADO','JUSTIFICANTE ASISTENCIA',
+correo('justificante-asistencia','Envío del justificante de asistencia al centro','ALUMNADO','CERTIFICADO',
  "Les enviamos adjunto el justificante de su visita al centro del {campo:Fecha de la visita}, ya firmado digitalmente.",
  "Les hemos enviado por correo electrónico el justificante de su visita al centro del {campo:Fecha de la visita}.")
 for tipo,slug in [('CAMBIO DE GRUPO','cambio-grupo'),('CAMBIO OPTATIVA','cambio-optativa')]:
