@@ -148,6 +148,10 @@ abierto en ellas:
 - Filas 154 a 164 (25-sep-2026): **publicadas, comprobado por Francisco**: la web dice
   `25-sep-2026 · 15:16`. Justo mientras se publicaba vio «44 envolturas no se han aplicado» (el
   navegador mezcló ficheros de antes y de después); al volver a cargar, bien.
+- Filas 166 y 167 (25-sep-2026): fusionadas en `main` (`e6bf33b`, `npm test` entero en verde en local), pero
+  esta sesión no pudo comprobar lo publicado (su red bloquea `vercel.app` y el conector de Vercel da 403).
+  Comprobar que se sirven `js/tutores-legales.js` y `js/administraciones.js` y que `App.VERSION` es de
+  después de las 17:32 del 25-sep-2026.
 - Fila 132: comprobar con `curl -I` que salen las cabeceras de seguridad nuevas.
 - Fila 63: comprobar que `docs/COLA.md` da error en la web publicada.
 - Numeración: `docs/PLANTILLAS-Y-FORMULARIOS-DESDE-EL-HITO.md` se presenta como «fila 146» y
