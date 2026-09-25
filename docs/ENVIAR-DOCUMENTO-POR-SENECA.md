@@ -30,8 +30,8 @@ Séneca).
 - Si el mismo enlace «Enviar» de un documento existe en otro sitio (pestaña «Documentos de la
   carpeta» de la ficha, menú «···» del documento), que se comporte igual. No hacer una copia del
   menú: una sola función, usada en todos los sitios.
-- No reutilizar: si la fila 150 ya dejó un punto común para abrir «Comunicar» desde fuera de la
-  cabecera, usarlo. Si no, crearlo en `js/hito-mesa-comunicar.js` y usarlo desde aquí.
+- Si la fila 150 ya dejó un punto común para abrir «Comunicar» desde fuera de la cabecera,
+  usarlo. Si no, crearlo en `js/hito-mesa-comunicar.js` y usarlo desde aquí.
 
 ## Ficheros que hay que tocar
 
