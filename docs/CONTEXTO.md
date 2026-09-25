@@ -221,6 +221,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `PLANTILLAS/` | Los `.docx` que Francisco sube a mano, colgados de un tipo desde Ajustes › Plantillas de documento. También `logo-centro.png` (fila 149, el logo opcional del membrete; `membrete.png` de la fila 81 ya no se usa), y los `.docx` del centro que trae solo el botón "Cargar las plantillas del centro" (fila 83, `plantillas/` del repositorio): las dos son las únicas veces que la propia aplicación escribe ahí. No lleva copia de seguridad: no es uno de los dieciocho ficheros compartidos |
 | `presencia.json` | `{ <clave del asunto>: { usuario, ultima } }`: quién tiene abierta la ficha de cada asunto, y desde cuándo. **A propósito, fuera de los dieciocho**: no pasa por `Copias.guardar` (nada de copia de seguridad), no entra en `Papelera` ni en `Conflictos` (si dos versiones chocan, se quedan las dos entradas y punto). Se escribe y relee directo con `Carpetas` (ver "No pisarse en un mismo asunto") |
 | `indice-archivo.json` | `{ version, hechoEl, hechoPor, recuento: { CATEGORIA: nº de carpetas de tercero }, asuntos: [{ nombre, categoria, tercero, ruta, fecha, tipo, curso, grupo, documentos, registros, sueltoEn }] }`: el índice guardado del ARCHIVO (`js/archivo-indice.js`, ver "El índice del ARCHIVO"). **También fuera de los dieciocho**, por el mismo motivo que `presencia.json`: se puede rehacer entero en cualquier momento con "Reconstruir el índice", así que no necesita copia de seguridad, papelera ni fusión de conflictos. Se escribe y relee directo con `Carpetas` |
+| `rutas.json` | `{ abiertos, archivo }`: dónde están las dos carpetas DENTRO de Dropbox, con `/`, igual para los dos ordenadores (fila 161, `js/copiar-ruta.js`, botón «Ruta»). Pequeño, como `margenes-pdf.json`: se relee antes de guardar y pasa por `Copias.guardar` |
 | `estado-migrado.json` | `{ hechoEl, hechoPor, creados, enEspera }`: la marca de que el paso único de la fila 129 ya se hizo (`js/estado-migracion.js`). **Fuera de los dieciocho**, como `presencia.json` |
 | `copias/*.json` | Copias de seguridad de los dieciocho ficheros de arriba, una por día, 30 como mucho de cada uno |
 
@@ -384,8 +385,9 @@ En el navegador (IndexedDB), con `Almacen`, y no se comparten entre ordenadores:
 **Van atadas a la dirección de la web.** Si la dirección cambia, hay que volver a señalarlas.
 
 Aparte, en `localStorage`: `gestor-barra`, `gestor-filtros`, `gestor-lector-ancho`,
-`gestor-ajustes-categoria`, y `gestor-ruta-abiertos`/`gestor-ruta-archivo` (fila 98: la ruta de
-las dos carpetas en ese ordenador, para el botón «Ruta»). **El tablón no se recuerda**: nace desplegado siempre, a propósito.
+`gestor-ajustes-categoria`, `gestor-ruta-dropbox` (fila 161: dónde está Dropbox en ese ordenador,
+para el botón «Ruta»; en la copia sin internet se deduce de su dirección) y, solo para leer,
+`gestor-ruta-abiertos`/`gestor-ruta-archivo` (las rutas completas de antes de la fila 161). **El tablón no se recuerda**: nace desplegado siempre, a propósito.
 
 ### Avisos técnicos ("ojo con...")
 

@@ -132,7 +132,7 @@ de `App` va después del fichero que lo define.
 | `js/ficha-sellos.js` | Un papel que ya trae el sello del registro, avisado arriba de la ficha (fila 133, sacado de `js/ficha-asunto.js`) |
 | `js/ficha-menus.js` | El menú pequeño reutilizable de la cabecera (abrir, cerrar con Escape/al pulsar fuera, uno solo a la vez): lo usan los tres puntos del nombre y "Comunicar" (18-sep-2026, fila 52) |
 | `js/ficha-nombre-acciones.js` | El menú de tres puntos del `<h2>` del nombre del asunto (Editar, Borrar, fila 52) y, debajo, la fila de copiar de un gesto (Asunto, Ruta, NIE, Nombre, DNI/CIF, filas 58 y 98) |
-| `js/copiar-ruta.js` | `RutaCarpetas` (fila 98): el botón «Ruta» de la fila de copiar y el bloque «Rutas de las carpetas en este ordenador» de Ajustes → El centro (`localStorage`) |
+| `js/copiar-ruta.js` | `RutaCarpetas` (filas 98, 152 y 161): el botón «Ruta» (ficha y cuadros de Correo/Séneca) y el bloque «Rutas de las carpetas» de Ajustes → El centro; lo de dentro de Dropbox en `_GESTOR/rutas.json`, lo de este ordenador deducido o en `localStorage` |
 | `js/ficha-tarjetas.js` | La ficha del asunto en tarjetas (fila 107): la cuadrícula, los resúmenes, abrir una en grande con las demás como pestañas, la franja de documentos y Escape |
 | `js/hito-mesa.js`, `css/hito-mesa.css` | El hito a pantalla completa (fila 109): abrir y cerrar la mesa, su cabecera (tira de hitos, plazo y responsable, menú ···) y, desde la fila 145, los desplegables «Generar documento ▾» y «Comunicar ▾» (`cerrarPanelSiAbierto`, para Escape); desde la fila 147, qué tarjeta está en grande (`abrirTarjeta`, `volverAlGuionSiOtra`) |
 | `js/hito-mesa-tarjetas.js` | Las tres tarjetas de la mesa (fila 147): los resúmenes de la derecha (guion, documentos, notas) y los gestos para abrir una en grande o volver al guion. Se carga justo después de `js/hito-mesa.js` |
@@ -271,7 +271,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/guia-en-acordeon.mjs` | Prueba del editor de la guía en acordeón (fila 122) |
 | `pruebas/opciones.mjs` | Prueba de las preguntas con opciones, con el caso de la factura |
 | `pruebas/registro.mjs` | Prueba de registrar un documento en un paso, sin nombrarlo dos veces |
-| `pruebas/copiar-ruta.mjs` | Prueba (navegador de verdad, fila 98, 23-sep-2026): el botón «Ruta» sin ruta apuntada (nombre y aviso), con ruta de Windows (abierto) y estilo Linux (archivado), guardada en `localStorage` y no en `_GESTOR` |
+| `pruebas/copiar-ruta.mjs` | Prueba (navegador de verdad, filas 98, 152 y 161): el botón «Ruta» en la ficha y en los cuadros, `file:///`, la ruta pegada partida por `Dropbox` (`rutas.json` y `localStorage`), la antigua que rellena `rutas.json`, y la app servida como `file://` desde dentro de `Dropbox (Personal)` copiando sin preguntar |
 | `pruebas/campos-del-documento.mjs` | Prueba (fila 96, 23-sep-2026): el nombre con los campos del tipo de documento, el obligatorio vacío, un tipo sin campos, con registro, reconocer al renombrar, guardar en `campos.json`; y en navegador el cuadro de poner nombre y el editor de Ajustes |
 | `pruebas/campos.mjs` | Prueba de los campos de cada tipo de asunto (ocho escenarios más editar) |
 | `pruebas/relacionados.mjs` | Prueba de los terceros relacionados con un asunto, y la nota al archivar |

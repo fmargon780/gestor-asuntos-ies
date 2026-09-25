@@ -88,7 +88,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   tercero reconocido, también sugiere meterlo en uno que ya existe («Meter aquí»). Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
 - Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. Carpeta ≤150 caracteres, documento ≤120.
-- Botón «Ruta» (`file:///`, no Bing; y en Correo/Séneca). Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en
+- Botón «Ruta» (`file:///`; ficha, Correo/Séneca): deduce Dropbox; lo de dentro, una vez para el centro. Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
 - Registrar un documento detecta el PDF ya sellado, lo renombra y guarda el original como

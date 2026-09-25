@@ -5,6 +5,22 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 161: «Ruta» deduce dónde está Dropbox y no pregunta
+
+`docs/RUTA-SIN-PREGUNTAR.md`. En la copia sin internet, «Ruta» abría un cuadro vacío sin decir qué
+carpeta pedía, y la ruta completa vivía en `localStorage`, distinto en cada navegador y en la web
+frente a la copia. Ahora la ruta sale de dos mitades: lo de dentro de Dropbox, igual en los dos
+ordenadores, en `_GESTOR/rutas.json` (una vez para el centro); y dónde está Dropbox aquí, deducido de
+la propia dirección en la copia sin internet (`file://`), o de `localStorage` en la web. Decisiones:
+
+- Las rutas completas antiguas se siguen leyendo: rellenan `rutas.json` solas (solo si su último
+  trozo se llama como la carpeta señalada) y dan la parte de este ordenador en la web.
+- Una ruta pegada que no acaba en la carpeta pedida no se guarda: aviso rojo. Evita pegar la del
+  ARCHIVO donde se pedía la de abiertos, que dejaría mal el `rutas.json` de todo el centro.
+- Se copia antes de guardar `rutas.json`: el navegador solo deja copiar justo tras el clic.
+- La prueba sirve la aplicación como `file://` desde un enlace en `…/Dropbox (Personal)/
+  ADMINISTRACIÓN/REGISTROS/Gestor de Asuntos - aplicación/` (con acentos), sin generar la copia.
+
 ## 25-sep-2026 — Fila 149: el membrete lo dibuja la aplicación, con el manual de la Junta
 
 `docs/MEMBRETE-LETRA-DEL-MANUAL.md`. Desde la fila 81 se subía una imagen de membrete y la app

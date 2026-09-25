@@ -236,11 +236,21 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   `docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md`, `js/copiar-ruta.js`, `RutaCarpetas.boton`; formato
   `file:///` desde la fila 152, `docs/RUTA-QUE-NO-VA-A-BING.md`) copia la ruta de la carpeta, en
   formato `file:///` (para que el navegador la abra siempre como carpeta y nunca la busque en
-  Bing): la de abiertos (o la del ARCHIVO + `a.ruta` del índice, o categoría y tercero) que cada
-  uno apunta en Ajustes → El centro → «Rutas de las carpetas en este ordenador» (`localStorage`,
-  `gestor-ruta-abiertos`/`gestor-ruta-archivo`, nunca en `_GESTOR`), más el nombre, cada trozo
-  codificado (`RutaCarpetas.comoFileUrl`). Sin ruta apuntada, ya no copia el nombre suelto: pide la
-  ruta en ese momento, con `U.preguntar`, y copia ya la completa. El mismo botón, en línea (sin
+  Bing): la de abiertos (o la del ARCHIVO + `a.ruta` del índice, o categoría y tercero), más el
+  nombre, cada trozo codificado (`RutaCarpetas.comoFileUrl`). **Desde la fila 161**
+  (`docs/RUTA-SIN-PREGUNTAR.md`) la ruta de la carpeta sale de dos mitades: lo de dentro de Dropbox,
+  una vez para todo el centro en `_GESTOR/rutas.json` (`{ abiertos, archivo }`, con `/`; se relee
+  en cada clic y se rellena solo con una ruta completa antigua de `localStorage` si su último trozo
+  se llama como la carpeta señalada), y dónde está Dropbox en este ordenador: en la copia sin
+  internet, deducido de `location.pathname` (el primer trozo `Dropbox` o `Dropbox (…)`); en la web,
+  `localStorage` `gestor-ruta-dropbox` o lo de delante de una ruta completa antigua
+  (`gestor-ruta-abiertos`/`gestor-ruta-archivo`, que se siguen leyendo y, sin trozo `Dropbox`, se
+  usan tal cual). Si falta algo, pide la ruta con `U.preguntar` («Ruta de la carpeta ASUNTOS
+  ABIERTOS», con ejemplo y cómo sacarla); la pegada se parte por `Dropbox` (`RutaCarpetas.partir`):
+  delante a `localStorage`, detrás a `rutas.json` si no estaba; si no acaba en la carpeta pedida,
+  no se guarda. Primero copia y después guarda. Ajustes → El centro → «Rutas de las carpetas»:
+  «dentro de Dropbox» (abiertos y ARCHIVO, para todo el centro) y «Dropbox en este ordenador»
+  (deducido y sin campo en la copia sin internet). El mismo botón, en línea (sin
   `U.preguntar`, `RutaCarpetas.montarEnCuadro`), va también en la cabecera de los cuadros de Correo
   y de Séneca (`docs/contexto/CORREO-Y-SENECA.md`). Abrir la carpeta sigue descartado. Prueba:
   `pruebas/copiar-ruta.mjs`. Sustituye al icono `.boton-nie` que antes

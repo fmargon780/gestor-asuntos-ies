@@ -1,3 +1,5 @@
+> **Corregido por la fila 161** (`docs/RUTA-SIN-PREGUNTAR.md`): la ruta ya no se apunta entera en cada ordenador; lo de dentro de Dropbox va en `_GESTOR/rutas.json` y lo de este ordenador se deduce.
+
 # Fila 152 — El botón «Ruta» que no acaba en Bing, y también en los cuadros de Comunicar
 
 Diseño cerrado con Francisco el 25-sep-2026. Continúa la fila 98

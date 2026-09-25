@@ -205,7 +205,7 @@ docs/RUTA-QUE-NO-VA-A-BING.md, punto 3): arriba del todo, dentro de `#correo-for
 `#seneca-formulario` (`.cuadro-cabecera-ruta`), montado por `RutaCarpetas.montarEnCuadro` — misma
 función para los dos cuadros, no duplicada, con el modo (abierto/archivado) sacado de
 `CorreoNucleo._interno.modoDelAsunto`. Sale igual abierto desde la ficha o desde «Comunicar ▾» de
-la mesa del hito: los dos acaban en `CorreoNucleo.abrirCuadro`. Sin ruta apuntada, pide la ruta EN
+la mesa del hito: los dos acaban en `CorreoNucleo.abrirCuadro`. Si le falta algo de la ruta (fila 161), pide la ruta EN
 LÍNEA, en un bloque hermano (`#correo-ruta-en-linea`/`#seneca-ruta-en-linea`, nunca un segundo
 `U.preguntar`), sin perder «Para» ni lo escrito en el cuerpo. Se comprueba con
 `pruebas/copiar-ruta.mjs`.
