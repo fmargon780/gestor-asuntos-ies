@@ -107,13 +107,19 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 139 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 140 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 140 | `docs/TIEMPO-DE-TRAMITACION.md` (media y máximo por tipo, y los abiertos más antiguos) | PENDIENTE |
 | 141 | `docs/REPARTIR-ENTRE-TERCEROS.md` (repartir un PDF en trozos, un asunto archivado por persona) | PENDIENTE |
+
+**La fila 140 está HECHA** (25-sep-2026): `docs/TIEMPO-DE-TRAMITACION.md`. Cuentas gana, por tipo,
+«Media (días)» y «Máximo (días)» (también al copiar), el número «Abiertos hace más de 30 días» y la
+tabla «Los que más tiempo llevan abiertos» (los diez más antiguos; pulsar abre la ficha; reservados,
+tapados), todo con el curso elegido (`js/cuentas-tiempos.js`). Prueba
+`pruebas/tiempo-de-tramitacion.mjs` (y `pruebas/quien-encarga-cada-tipo.mjs`, en la pantalla de
+verdad), batería completa en verde. Versión `App.VERSION`: `25-sep-2026 · 01:58`.
 
 **La fila 139 está HECHA** (25-sep-2026): `docs/UNA-SOLA-LIBRETA-DE-NOTAS.md`. Una sola libreta de
 notas por asunto: la que se escribe desde la mesa de un hito va a las del asunto con la etiqueta
