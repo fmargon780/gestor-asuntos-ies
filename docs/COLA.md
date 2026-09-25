@@ -112,7 +112,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 147 | `docs/MESA-TARJETAS-QUE-SE-ABREN.md` (la mesa del hito en tarjetas: una en grande, las otras dos de resumen a la derecha; pulsar una la abre en grande) | PENDIENTE |
+| 147 | `docs/MESA-TARJETAS-QUE-SE-ABREN.md` (la mesa del hito en tarjetas: una en grande, las otras dos de resumen a la derecha; pulsar una la abre en grande) | EN CURSO (25-sep-2026) |
 | 148 | `docs/PRUEBAS-EN-VERDE.md` (las pruebas de GitHub en verde otra vez, y que un cambio solo de `docs/` no las lance) | PENDIENTE |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
