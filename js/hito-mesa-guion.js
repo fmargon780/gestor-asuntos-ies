@@ -36,6 +36,15 @@ var HitoMesaGuion = (function () {
     registrar: { clase: '.hito-doc-menu-boton', texto: 'Registrar (en el ⋯ del documento)' }
   };
 
+  /* Fila 150: el «Comunicar» de un paso del guion no pasa por el botón
+     escondido de siempre (`.hito-comunicar-boton`, dentro de
+     `.mesa-ocultos`): cuando ofrece dos vías, `FichaMenus` monta su menú
+     ahí mismo, y un contenedor con `display:none` se lo lleva por
+     delante, invisible. Se llama a `HitosComunicar.comunicar` en línea
+     recta, con el mismo cuadro que la cabecera, y con `idPasoGuion` para
+     marcar justo este paso (no «el primero pendiente»). */
+  var ETIQUETA_CANAL_GUION = { correo: 'Correo electrónico', seneca: 'Mensaje de Séneca' };
+
   function enlaceNormativa(n) {
     if (!n || !n.cita) return '';
     var url = n.url || '';
@@ -141,7 +150,9 @@ var HitoMesaGuion = (function () {
         '<span class="mesa-guion-cuenta">' + c.hechos + ' de ' + c.total + '</span></div>' +
       (guion.length ? guion.map(function (g) { return lineaHTML(g, abierto, g === siguiente); }).join('') + plegadasHTML(guion.plegadas)
         : '<p class="explica">Este hito todavía no tiene guion. Añade el primer paso aquí abajo.</p>') +
-      (abierto ? '<button type="button" class="enlace guion-anadir-propio">+ Añadir un paso solo para este asunto</button>' : '');
+      (abierto ? '<button type="button" class="enlace guion-anadir-propio">+ Añadir un paso solo para este asunto</button>' : '') +
+      (abierto && puedeAnadirALaGuia(a, h)
+        ? '<button type="button" class="enlace guion-cambiar-guion">✎ Cambiar el guion de este hito (para todos los asuntos de este tipo)</button>' : '');
 
     /* La normativa de los pasos del guion, también en la columna de consulta. */
     var consulta = fila.querySelector('.mesa-normativa-guion');
@@ -188,14 +199,28 @@ var HitoMesaGuion = (function () {
         guardar(noaplica, function () { return Hitos.marcarGuion(a.nombre, h.id, id, { noaplica: !el.classList.contains('noaplica') }); });
       };
       var accion = el.querySelector('.guion-accion-boton');
-      if (accion) accion.onclick = function () {
-        /* Fila 147: registrar se hace desde el ⋯ del documento, en su tarjeta. */
-        if (accion.dataset.accion === 'registrar' && window.HitoMesa && HitoMesa.abrirTarjeta) HitoMesa.abrirTarjeta('docs');
-        var destino = BOTON_DE_ACCION[accion.dataset.accion];
-        var b = destino && fila.querySelector(destino.clase);
-        if (b) b.click();
-        else U.aviso('Esa acción está en los documentos del hito.', 'ambar');
-      };
+      if (accion && accion.dataset.accion === 'comunicar' && window.HitosComunicar) {
+        /* Fila 150: en línea recta, con este paso ya elegido para marcar. */
+        var canales = HitosComunicar.canalesDe(a, h);
+        if (canales.length > 1 && window.FichaMenus) {
+          FichaMenus.montar(accion, canales.map(function (canal) {
+            return { texto: ETIQUETA_CANAL_GUION[canal] || canal, alPulsar: function () {
+              HitosComunicar.comunicar(a, h, canal, { idPasoGuion: id });
+            } };
+          }));
+        } else {
+          accion.onclick = function () { HitosComunicar.comunicar(a, h, canales[0] || 'correo', { idPasoGuion: id }); };
+        }
+      } else if (accion) {
+        accion.onclick = function () {
+          /* Fila 147: registrar se hace desde el ⋯ del documento, en su tarjeta. */
+          if (accion.dataset.accion === 'registrar' && window.HitoMesa && HitoMesa.abrirTarjeta) HitoMesa.abrirTarjeta('docs');
+          var destino = BOTON_DE_ACCION[accion.dataset.accion];
+          var b = destino && fila.querySelector(destino.clase);
+          if (b) b.click();
+          else U.aviso('Esa acción está en los documentos del hito.', 'ambar');
+        };
+      }
     });
     /* Fila 145: soltar un fichero en el siguiente paso, como en la columna derecha. */
     var soltar = caja.querySelector('.guion-soltar');
@@ -220,6 +245,8 @@ var HitoMesaGuion = (function () {
       var texto = t ? t.value : '';
       guardar(null, function () { return Hitos.anadirGuionPropio(a.nombre, h.id, texto); });
     };
+    var cambiarGuion = caja.querySelector('.guion-cambiar-guion');
+    if (cambiarGuion) cambiarGuion.onclick = function () { cambiarGuionDelPaso(a, h); };
   }
 
   function tipoDe(a) {
@@ -282,6 +309,53 @@ var HitoMesaGuion = (function () {
 
   function puedeAnadirALaGuia(a, h) { return !!pasoDeLaGuia(a, h); }
 
-  return { pintar: pintar, puedeAnadirALaGuia: puedeAnadirALaGuia, anadirALaGuia: anadirALaGuia };
+  /* Fila 150: «✎ Cambiar el guion de este hito», en la propia mesa, sin
+     salir a Ajustes. Reutiliza js/guias-guion.js (el mismo editor de
+     Ajustes), aquí solo para la lista `guion` de este paso: `leer()` para
+     recoger lo escrito, `enganchar()` para subir/bajar/quitar/preguntas,
+     igual que hace js/guias-paso-bloques.js con `ctx.recoger()`/`ctx.pintar()`. */
+  async function cambiarGuionDelPaso(a, h) {
+    var p = pasoDeLaGuia(a, h);
+    if (!p || !window.GuiasGuion) return;
+    var tipo = tipoDe(a);
+    var lista = GuiasGuion.normalizar(p.guion || []);
+    var caja = document.createElement('div');
+    function pintarLocal() {
+      caja.innerHTML = GuiasGuion.bloqueHTML(lista);
+      var det = caja.querySelector('.paso-guion');
+      if (det) det.open = true;
+      GuiasGuion.enganchar(caja, function (mutador) {
+        lista = GuiasGuion.leer(caja);
+        mutador(lista);
+        pintarLocal();
+      });
+    }
+    pintarLocal();
+    var esperar = U.preguntar('Cambiar el guion de este hito',
+      '<p class="nota">Vale para todos los asuntos de ' + U.escapar(tipo) + ', abiertos y nuevos. ' +
+      'Los pasos ya marcados en un asunto no se desmarcan.</p><div id="mesa-guion-editor"></div>', 'Guardar');
+    var sitio = document.getElementById('mesa-guion-editor');
+    if (sitio) sitio.appendChild(caja);
+    var ok = await esperar;
+    if (!ok) return;
+    try {
+      var normalizado = GuiasGuion.normalizar(GuiasGuion.leer(caja));
+      var hecho = await GuiasDelCentro.cambiarPasos(tipo, function (pasos) {
+        var pp = buscarPaso(pasos, h.origenGuia);
+        if (!pp || (pp.opciones && pp.opciones.length)) return false;
+        pp.guion = normalizado;
+        return true;
+      });
+      if (!hecho) { U.aviso('Ese paso ya no está en la guía del tipo.', 'ambar'); return; }
+    } catch (e) {
+      U.fallo('No he podido guardar el guion', e);
+      return;
+    }
+    U.aviso('Guion actualizado.', 'bueno');
+    if (window.HitosPanel) HitosPanel.programarRepintado();
+  }
+
+  return { pintar: pintar, puedeAnadirALaGuia: puedeAnadirALaGuia, anadirALaGuia: anadirALaGuia,
+           cambiarGuionDelPaso: cambiarGuionDelPaso };
 })();
 window.HitoMesaGuion = HitoMesaGuion;

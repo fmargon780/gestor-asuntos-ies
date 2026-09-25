@@ -164,6 +164,9 @@
       correoPreferente: destinatario.correoPreferente,
       comunicarHito: { claveAsunto: a.nombre, idHito: hito.id, nombreDestinatario: destinatario.nombre }
     };
+    /* Fila 150: el «Comunicar» de un paso del guion pasa cuál marcar al
+       terminar, para no marcar «el primero pendiente» sino ese mismo. */
+    if (opciones && opciones.idPasoGuion) extra.comunicarHito.idPasoGuion = opciones.idPasoGuion;
 
     /* Con texto propio del paso: igual que hasta ahora, con los
        huecos ya resueltos. Sin él (fila 103): el cuadro se abre con

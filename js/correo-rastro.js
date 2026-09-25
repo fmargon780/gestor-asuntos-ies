@@ -144,7 +144,14 @@
       if (I.comunicarHitoActual && window.Hitos && typeof Hitos.anadirNota === 'function') {
         try {
           await Hitos.anadirNota(I.comunicarHitoActual.claveAsunto, I.comunicarHitoActual.idHito, texto);
-          if (Hitos.marcarGuionPorAccion) await Hitos.marcarGuionPorAccion(a, I.comunicarHitoActual.idHito, 'comunicar');   /* fila 109 */
+          /* Fila 150: si se sabe qué paso del guion lo pidió (el botón
+             «Comunicar» de ese paso, no el de la cabecera), se marca ese
+             mismo, no «el primero pendiente». */
+          if (I.comunicarHitoActual.idPasoGuion && Hitos.marcarGuion) {
+            await Hitos.marcarGuion(I.comunicarHitoActual.claveAsunto, I.comunicarHitoActual.idHito, I.comunicarHitoActual.idPasoGuion, { hecho: true });
+          } else if (Hitos.marcarGuionPorAccion) {
+            await Hitos.marcarGuionPorAccion(a, I.comunicarHitoActual.idHito, 'comunicar');   /* fila 109 */
+          }
           if (window.HitosPanel) window.HitosPanel.programarRepintado();
         } catch (e) { /* no crítico */ }
       }
