@@ -28,9 +28,11 @@ caracteres, por esos 4 y el nombre.
   reconoce por su nombre (`DNI`, `D.N.I.`, `DNI/Pasaporte`, `Documento`, `NIF`). El CSV, con
   `Carpetas.leerTexto` (Latin-1 si no es UTF-8) y `Datos.aTabla`; el `.xlsx`, con el lector de ZIP de
   `js/docx.js` (`Docx.interno`): la primera hoja y sus `sharedStrings`, sin librería nueva.
-- **ALUMNADO BD** (fila 142, `js/alumnado-bd.js`, `AlumnadoBD.comoTabla`): la copia de la base de
-  datos de alumnado (`datos/ALUMNADO-BD.json`), una fila por alumno. Sus filas llevan `idEscolar` y
-  se unen a la persona por su Nº escolar, no por DNI (`{{DATO ALUMNADO BD: Unidad}}`, `…: NEAE}}`…).
+- **ALUMNADO BD** (filas 142 y 144, `js/alumnado-bd-ver.js`, `AlumnadoBDVer.comoTabla`): la copia de
+  la base de datos de alumnado (`datos/ALUMNADO-BD.json`), una fila por alumno y una columna por dato
+  (su `etiqueta`); y una tabla «ALUMNADO BD <etiqueta>» por cada dato de tipo `tabla`. Sus filas llevan
+  `idEscolar` y se unen a la persona por su Nº escolar, no por DNI
+  (`{{DATO ALUMNADO BD: Centro de procedencia}}`, `{{TABLA ALUMNADO BD Materias matriculadas}}`).
 
 `TablasDatos.lista()` → tablas encontradas (fichero, cursos, filas) y ficheros que no se han podido
 leer, con el motivo. `TablasDatos.filasDe(tabla, persona)`, ordenadas por curso y fecha.

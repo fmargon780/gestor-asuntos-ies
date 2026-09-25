@@ -288,6 +288,8 @@
 }
 .huecos-opcion:hover { background: #f0f3f7; }
 .huecos-opcion.elegido { background: var(--azul-claro); }
+/* Fila 144: los huecos del alumnado de la base de datos, agrupados por apartado. */
+.huecos-grupo { font-size: 11px; font-weight: 700; color: var(--tinta-suave); padding: 8px 10px 2px; text-transform: uppercase; }
 .huecos-nombre { font-size: 14px; }
 .huecos-codigo { font-size: 12px; color: var(--tinta-suave); font-family: ui-monospace, Consolas, monospace; }
 

@@ -507,25 +507,34 @@ llamado desde `App.buscarPersonas` y `App.verFicha` de `js/archivo-personas.js`,
 
 Se comprueba con `pruebas/personas-familias.mjs` (sin navegador).
 
-### El alumnado, desde la base de datos de alumnado (25-sep-2026, fila 142, `docs/ALUMNADO-DESDE-LA-BD.md`)
+### El alumnado de la base de datos, desde la carpeta de Drive (25-sep-2026, filas 142 y 144, `docs/ALUMNADO-BD-DESDE-DRIVE.md`)
 
-El acuerdo entre las dos aplicaciones está en `docs/ACUERDO-ALUMNADO.md`. Todo en `js/alumnado-bd.js`:
+El acuerdo entre las dos aplicaciones está en `docs/ACUERDO-ALUMNADO.md` (versión 2: un archivo en
+Drive, nada de dirección web ni clave; la fila 142 lo hacía por dirección web y la 144 lo quitó).
 
-- **La dirección** (la de la base de datos, con `?k=`) se pega en Ajustes › El centro › «Base de
-  datos de alumnado» (junto a «Ficheros de datos»), con «Guardar» y «Probar». Se guarda en
-  `asuntos.json` (`ajustesAlumnadoBD.url`): es del centro, vale para los dos ordenadores. Sin `?k=`
-  o sin `https://`, se rechaza sin llamar.
-- **Traer**: al entrar (una vez al día, apuntado en `localStorage` `gestor-alumnado-bd-traido`) y con
-  «Traer el alumnado ahora» en Mantenimiento. Lo recibido se valida (`acuerdo: 1`, todos con
-  `idEscolar`) y va a `_GESTOR/datos/ALUMNADO-BD.json` por `ColaGuardado`. Si falla, se sigue con la
-  última copia; ámbar (`U.accesorio`) una sola vez por sesión en la vuelta diaria.
-- **Quién manda**: `js/datos-alumnado.js` llama a `AlumnadoBD.unir(lista, porId)` antes de los
-  solicitantes. Con copia válida, para cada alumno que traiga (por Nº escolar): nombre, matrícula y
-  unidad, fecha de nacimiento, documento y contacto. El que no está en el RegAlum se añade. Sin copia
-  válida, todo como antes. La persona lleva `bd` (lo recibido) y `bdGenerado`.
-- **Ficha**: tarjeta «Datos académicos» en «Ver todo» del alumno (unidad, repeticiones, PIL,
-  pendientes, materias no superadas, NEAE solo «Sí» o nada) con la fecha al pie. Sin copia, no sale.
-- **Plantillas**: tabla «ALUMNADO BD» en `js/tablas-datos.js` (`{{DATO ALUMNADO BD: Unidad}}`…), con
-  sus filas unidas por `idEscolar` en vez de por DNI.
-- **Frescura**: `js/frescura.js` usa la fecha `generado` de la copia si es más reciente que el RegAlum.
-
+- **La carpeta** (`js/alumnado-bd.js`): Ajustes › El centro › «Carpeta de la base de datos de
+  alumnado» → «Señalar la carpeta» (la «Datos de matrícula» de Google Drive para ordenador). Se
+  recuerda en este ordenador (Almacen, `alumnado-bd-carpeta`), como las del Dropbox; el otro
+  ordenador no la señala y usa la copia. Debajo, la última copia (alumnos, datos y fecha).
+- **Traer**: al entrar (sin pedir permiso) y con «Traer el alumnado ahora» en Mantenimiento (pide
+  permiso si hace falta). Si el `ALUMNADO-BD.json` de la carpeta es válido (`acuerdo: 2`, `campos`,
+  todos con `idEscolar`) y su `generado` es más nuevo que el de la copia, se copia a
+  `_GESTOR/datos/ALUMNADO-BD.json` por `ColaGuardado`. Si no vale, la copia y ámbar (`U.accesorio`).
+  La copia se lee una vez y queda en memoria (`AlumnadoBD.leer`, `enMemoria`).
+- **Mezcla**: `js/datos-alumnado.js` llama a `AlumnadoBD.unir(lista, porId, fechaRegAlum)`. El
+  RegAlum sigue siendo la base: el archivo no añade personas. A cada alumno que esté en los dos le
+  pone `bd` (sus `datos`) y `bdGenerado`; si el archivo no es más viejo que el RegAlum, manda en
+  `matriculado` y en las columnas del RegAlum que se llamen igual que una `etiqueta`; si es más
+  viejo, solo rellena las vacías.
+- **Todo guiado por `campos`** (`js/alumnado-bd-ver.js`): ningún dato con nombre propio salvo
+  `idEscolar` y `matriculado`. Cada tipo a su manera (`lista` con comas, `si-no`, `fecha`
+  dd-mm-aaaa, `tabla` como tabla; lo desconocido, como texto).
+  - Ficha («Ver todo» del alumno): una tarjeta plegada por `apartado`, con resumen en el título y la
+    fecha de los datos al pie.
+  - Plantillas: tabla «ALUMNADO BD» (una columna por dato) y una tabla «ALUMNADO BD <etiqueta>» por
+    cada dato de tipo `tabla`, unidas por Nº escolar (ver `TABLAS-DE-DATOS.md`). En el cuadro de
+    insertar huecos, agrupados por apartado («Alumnado · …»).
+  - Relacionados: en las altas por grupo de alumnado, «Por datos del alumnado»: uno o varios datos
+    con su valor (desplegable con los que hay), cuántos salen y «Añadirlos». Solo matriculados,
+    salvo «Incluir antiguos». Quien no está en el RegAlum no se puede añadir (se cuenta aparte).
+- **Frescura**: `js/frescura.js` usa `generado` si es más reciente que el RegAlum.

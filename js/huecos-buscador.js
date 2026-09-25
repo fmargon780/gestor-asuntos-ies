@@ -138,6 +138,8 @@
     function abrir() {
       var lista = opciones.huecos ||
         ((window.Plantillas && Plantillas.HUECOS) || []);
+      /* Fila 144: los datos de la base de datos de alumnado, agrupados por apartado. */
+      if (!opciones.huecos && window.AlumnadoBDVer) lista = lista.concat(AlumnadoBDVer.huecos());
 
       var caja = document.createElement('div');
       caja.className = 'huecos-cuadro';
@@ -167,6 +169,12 @@
           return;
         }
         visibles.forEach(function (h, i) {
+          if (h.grupo && (i === 0 || visibles[i - 1].grupo !== h.grupo)) {
+            var g = document.createElement('div');
+            g.className = 'huecos-grupo';
+            g.textContent = h.grupo;
+            cajaLista.appendChild(g);
+          }
           var b = document.createElement('button');
           b.type = 'button';
           b.className = 'huecos-opcion' + (i === 0 ? ' elegido' : '');

@@ -74,7 +74,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
   sueltas también en documentos, registro de Séneca, ficha y notas.
 - Personas (Alumnado): matriculados primero, antiguos plegados; busca por padre, madre o tutor;
-  hermanos en la ficha. Manda la copia de la BD de alumnado, si la hay («Datos académicos»).
+  hermanos en la ficha. La BD de alumnado (carpeta de Drive) suma sus datos: ficha, huecos, grupos.
 - Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
   Renombrar un tipo se lleva su guía; cambiarle el tipo, la ofrece.
 - Nombre comercial de empresas; editar datos de un tercero dado de alta a mano.

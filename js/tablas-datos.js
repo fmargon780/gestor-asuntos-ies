@@ -87,8 +87,8 @@ var TablasDatos = (function () {
         } catch (e) { salida.errores.push({ fichero: f2, motivo: U.mensajeDeError(e) }); }
       }
     }
-    /* Fila 142: la tabla «ALUMNADO BD» (unida por Nº escolar). */
-    if (window.AlumnadoBD) { try { await AlumnadoBD.comoTabla(salida); } catch (e) { salida.errores.push({ fichero: 'ALUMNADO-BD.json', motivo: U.mensajeDeError(e) }); } }
+    /* Filas 142 y 144: las tablas «ALUMNADO BD…» (unidas por Nº escolar). */
+    if (window.AlumnadoBDVer) { try { await AlumnadoBDVer.comoTabla(salida); } catch (e) { salida.errores.push({ fichero: 'ALUMNADO-BD.json', motivo: U.mensajeDeError(e) }); } }
     CACHE = salida;
     return salida;
   }

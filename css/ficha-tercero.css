@@ -87,8 +87,15 @@
 .vt-tarjeta-tutor1 { background: #f5fbf6; border-color: #cfe8d5; }
 .vt-tarjeta-tutor2 { background: #faf6fc; border-color: #e3d3ec; }
 .vt-tarjeta-otros { background: #f7f8fa; }
-/* «Datos académicos» (fila 142, js/alumnado-bd.js): la fecha de la copia, al pie. */
-.vt-tarjeta-academica .nota { margin: 8px 0 0; font-size: 12px; color: var(--tinta-suave); }
+/* Datos de la base de datos de alumnado (fila 144, js/alumnado-bd-ver.js): una tarjeta plegada por apartado. */
+.vt-tarjeta-bd { background: #fbfaf5; }
+.vt-tarjeta-bd > summary { cursor: pointer; margin-bottom: 0; flex-wrap: wrap; }
+.vt-tarjeta-bd[open] > summary { margin-bottom: 8px; }
+.vt-bd-resumen { font-weight: 400; font-size: 12px; color: var(--tinta-suave); }
+.vt-tarjeta-bd .nota { margin: 8px 0 0; font-size: 12px; color: var(--tinta-suave); }
+.vt-bd-tabla-titulo { font-weight: 600; font-size: 13px; margin: 8px 0 4px; }
+.bd-tabla { width: 100%; border-collapse: collapse; font-size: 12px; }
+.bd-tabla th, .bd-tabla td { border-bottom: 1px solid var(--linea); padding: 3px 6px; text-align: left; vertical-align: top; }
 .vt-tarjeta-titulo { font-weight: 700; font-size: 14px; color: #1d4f86; margin-bottom: 8px; display: flex; gap: 6px; align-items: center; }
 .vt-tarjeta-otros .vt-tarjeta-titulo { color: var(--tinta-suave); }
 .vt-tutor-cabecera { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }

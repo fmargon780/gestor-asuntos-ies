@@ -79,3 +79,8 @@
 .atajo-fila select { flex: 1 1 auto; }
 .grupo-fila { margin-bottom: 12px; }
 .grupo-fila .etiqueta { display: block; margin-bottom: 4px; }
+/* Fila 144: «Por datos del alumnado» (js/alumnado-bd-ver.js). */
+.bd-grupo { display: flex; flex-direction: column; gap: 6px; border-top: 1px dashed var(--linea); padding-top: 8px; }
+.bd-grupo-conds { display: flex; flex-wrap: wrap; gap: 6px; }
+.bd-grupo-cond { font-size: 12px; background: #eef3f9; border: 1px solid var(--linea); border-radius: 10px; padding: 2px 8px; }
+.atajo-fila #bd-grupo-cuantos { flex: 1 1 auto; }

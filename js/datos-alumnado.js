@@ -199,8 +199,10 @@
     for (var i = 0; i < lista.length; i++) {
       lista[i].busca = U.normalizar(lista[i].nombre + ' ' + lista[i].id);
     }
-    /* Fila 142: lo que traiga la base de datos de alumnado manda. */
-    var bd = window.AlumnadoBD ? await AlumnadoBD.unir(lista, porId) : null;
+    /* Fila 144: la base de datos de alumnado suma sus datos (y manda si no es más vieja que el RegAlum). */
+    var fechaRegAlum = null;
+    try { fechaRegAlum = new Date((await fichero.handle.getFile()).lastModified); } catch (e) { fechaRegAlum = null; }
+    var bd = window.AlumnadoBD ? await AlumnadoBD.unir(lista, porId, fechaRegAlum) : null;
     matriculados = contarMatriculados(lista);
     var solicitantes = await anadirSolicitantes(dirDatos, lista, porId);
 

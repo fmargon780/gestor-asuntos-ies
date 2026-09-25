@@ -5,6 +5,25 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 144: el alumnado de la base de datos, desde la carpeta de Drive
+
+`docs/ALUMNADO-BD-DESDE-DRIVE.md` y el acuerdo, versión 2. La dirección web con clave de la fila 142
+la paró el control de seguridad al hacer la otra mitad en `bd-alumnado-ies` (datos de menores abiertos
+a quien tuviera la línea), y Francisco la descartó. Ahora la base de datos deja `ALUMNADO-BD.json` en
+su carpeta de Drive, con **todo** lo que sabe de cada alumno. Decisiones:
+
+- Fuera todo lo de la dirección (caja, «Probar», `fetch`); lo guardado en `asuntos.json`
+  (`ajustesAlumnadoBD`) se borra solo al entrar.
+- La carpeta, de cada ordenador (Almacen), como las del Dropbox; la copia en `_GESTOR/datos/`, para el
+  otro. Se copia solo si su `generado` es más nuevo.
+- Genérico de verdad: el código no nombra ningún dato salvo `idEscolar` y `matriculado`. Por eso el
+  archivo no añade personas (no sabría su nombre): el RegAlum sigue siendo la base. Queda apuntado
+  en «Lo que queda por hablar».
+- «Manda el archivo salvo que sea más viejo que el RegAlum»: en `matriculado` y en las columnas del
+  RegAlum que se llaman igual que una `etiqueta`.
+- Dos módulos: `js/alumnado-bd.js` (carpeta, copia, mezcla) y `js/alumnado-bd-ver.js` (ficha, huecos,
+  grupos). La tarjeta «Datos académicos» de la 142 desaparece: la sustituyen las de cada apartado.
+
 ## 25-sep-2026 — Arreglo: Vercel no publicaba desde la fila 139
 
 Desde la fila 76 (`buildCommand` que escribe la hora de la versión), Vercel buscaba la web en una

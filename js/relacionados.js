@@ -266,6 +266,8 @@ var Relacionados = (function () {
         return { categoria: 'ALUMNADO', nombre: App.textoTercero(al), persona: al };
       }));
     }
+    /* Fila 144: «Por datos del alumnado» (js/alumnado-bd-ver.js). */
+    if (window.AlumnadoBDVer) AlumnadoBDVer.pintarGrupo(caja, fuente, marcarAlumnado);
 
     $('atajo-unidad').onchange = function () {
       var v = $('atajo-unidad').value;

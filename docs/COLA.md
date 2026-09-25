@@ -107,13 +107,20 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 142 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 142 y la 144 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 144 | `docs/ALUMNADO-BD-DESDE-DRIVE.md` (todo el alumnado de la base de datos, desde la carpeta de Drive; sustituye la dirección web de la fila 142; acuerdo en `docs/ACUERDO-ALUMNADO.md`, versión 2) | EN CURSO (25-sep-2026) |
 | 145 | `docs/MESA-DEL-HITO-ENFOCADA.md` (la mesa del hito, enfocada: el guion manda, dos zonas, «Generar documento ▾» y «Comunicar ▾» en la cabecera) | PENDIENTE |
+
+**La fila 144 está HECHA** (25-sep-2026): `docs/ALUMNADO-BD-DESDE-DRIVE.md`. Fuera la dirección
+web de la fila 142. En Ajustes › El centro, «Carpeta de la base de datos de alumnado» (se señala la
+«Datos de matrícula» de Drive, en este ordenador); al entrar y con «Traer el alumnado ahora» se copia
+su `ALUMNADO-BD.json` (acuerdo 2) a `_GESTOR/datos/`. Todo guiado por `campos`: tarjetas por apartado
+en «Ver todo», huecos «ALUMNADO BD…» agrupados y «Por datos del alumnado» en las altas por grupo de
+relacionados (`js/alumnado-bd.js`, `js/alumnado-bd-ver.js`). Prueba `pruebas/alumnado-desde-la-bd.mjs`
+rehecha (alumnos inventados). Versión escrita: `25-sep-2026 · 03:17`.
 
 **La fila 142 está HECHA** (25-sep-2026): `docs/ALUMNADO-DESDE-LA-BD.md`. Bloque «Base de datos
 de alumnado» en Ajustes › El centro (pegar la dirección con su `?k=`, Guardar, Probar) y «Traer el
@@ -367,6 +374,11 @@ mesa de trabajo, sobre lo que dejó la 102.
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
+- De la fila 144 (25-sep-2026): el archivo de la base de datos de alumnado puede traer alumnos que
+  no están en el RegAlum (antiguos con historia). Como el RegAlum sigue siendo la base y el código no
+  puede usar datos con nombre propio (ni el nombre del alumno), esos no aparecen como personas ni se
+  pueden añadir a un asunto: «Por datos del alumnado» los cuenta aparte («y N sin ficha en el
+  RegAlum»). Si se quieren, el acuerdo tendría que decir qué campos son el nombre y los apellidos.
 - De la fila 21: departamentos del personal, tutorías y equipos educativos. `personal.csv` no
   guarda nada de eso; hay que ver qué se puede sacar de Séneca antes de diseñar nada.
 - De la fila 28: el parentesco de verdad (padre, madre, abuela). El RegAlum no trae esa columna,
