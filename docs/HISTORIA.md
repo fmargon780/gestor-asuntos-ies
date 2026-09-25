@@ -5,6 +5,14 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 165, decidida: el Word se queda como está
+
+Hablado con Francisco. Editar el Word dentro de la aplicación pedía SuperDoc (AGPL-3.0: enseñar el
+código o pagar). Se miró también usar plantillas de Google Docs en vez de Word: cada documento con
+datos del alumnado pasaría por el Drive del centro, haría falta internet siempre, y habría que rehacer
+la generación (membrete, tablas, género, firma) y pasar todas las plantillas. Decisión: seguir con
+Word. Queda en «Descartado» de `docs/COLA.md`.
+
 ## 25-sep-2026 — Fila 163: el recuadro de lo que ya tiene el tercero, al crear
 
 `docs/AVISO-DE-PARECIDOS-AL-CREAR.md`. El aviso ámbar solo salía con tipo y solo con asuntos del

@@ -125,7 +125,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 | 164 | `docs/HITOS-ACCIONES-EN-EL-HITO.md`, puntos 3 y 4 (la «receta» opcional de un paso: comunicar, generar o registrar, que sale arriba en el menú del hito y deja el cuadro relleno, con los botones de hoy convertidos solos; y todos los documentos del asunto a la vista en la mesa de cada hito, «De otros hitos» con su etiqueta) | HECHA (25-sep-2026). La receta de registrar se enseña como título del menú «Registrar» (el sentido aún no rellena el cuadro de registro) |
 | 162 | `docs/ESTADO-SIGUE-A-LOS-HITOS.md` (el estado es siempre el primer hito sin terminar, sin la regla de «gana Administración»; se recalcula con cualquier cambio; «Esperando a…» sale solo con el responsable del paso y lo puesto a mano dura hasta que cambia el paso; «Estamos en este paso» pasa a «Saltar a este paso» y el actual lleva «Paso actual»; después de la 154) | HECHA (25-sep-2026). La espera a mano vieja se limpia dentro de cada escritura de `hitos.json` |
 | 155 | `docs/WORD-DENTRO-DE-LA-APP.md` (avisar de los datos que faltan antes de generar un Word; y el Word se abre dentro de la app, editable, con «Guardar PDF» en la carpeta del asunto, «Imprimir» y «Guardar cambios», sin pasar por Descargas) | HECHA (25-sep-2026) salvo «Guardar cambios» (editar el Word), que pasa a la fila 165. El Word se ve con docx-preview; el PDF, imagen a 200 ppp |
-| 165 | Editar el Word dentro de la aplicación («Guardar cambios» de `docs/WORD-DENTRO-DE-LA-APP.md`, parte B) | BLOQUEADA (25-sep-2026): el editor de .docx en el navegador que respeta el Word (SuperDoc) es AGPL-3.0, y con la web publicada eso obliga a dar el código a quien la use; las libres (docx-preview) solo enseñan. Decidirlo con Francisco |
+| 165 | Editar el Word dentro de la aplicación («Guardar cambios» de `docs/WORD-DENTRO-DE-LA-APP.md`, parte B) | DESCARTADA (25-sep-2026, con Francisco): se sigue con plantillas de Word; para corregir, se cambia la plantilla o el dato y se vuelve a generar. Ni SuperDoc (AGPL) ni plantillas en Google Docs |
 | 157 | `docs/COPIA-ACTUALIZAR-SIN-CARRERA.md` (en la copia sin internet, «Actualizar ahora» vuelve a leer la lista de ficheros al pulsar y reintenta una vez si un fichero no coincide; error en lenguaje llano, sin «sha256») | HECHA (25-sep-2026) |
 | 158 | `docs/INSERTAR-HUECO-EN-EL-PASO.md` (el botón «Insertar hueco» de «Comunicación de este paso», en el editor del guion, no hace nada: se engancha antes de que el paso esté en la página) | HECHA (25-sep-2026). Ningún otro sitio tenía el mismo fallo |
 | 159 | `docs/RESPONSABLE-ADMINISTRACION.md` (responsable fijo «Administración» en lugar de los nombres de las personas en el responsable por defecto de las guías, con migración; en un asunto concreto siguen las personas; «Qué me toca» los reparte a los dos; y en la biblioteca de hitos, «Firma de Secretaría» y «Visto bueno de Dirección»; después de la 154) | HECHA (25-sep-2026). Los dos hitos de firma entran solos en la biblioteca (sin pulsar nada) |
@@ -154,11 +154,6 @@ abierto en ellas:
   `docs/VENTANAS-QUE-CABEN.md` como «fila 142», pero ninguna de las dos está en la tabla.
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
-
-- De la fila 165 (25-sep-2026): corregir el Word dentro de la aplicación. La única librería que lo
-  hace bien (SuperDoc) es AGPL-3.0: con la web publicada, obliga a ofrecer el código a quien la use.
-  Opciones: aceptarlo (el repositorio pasaría a poder enseñarse), pagar su licencia, o seguir
-  corrigiendo en Word y volviendo a generar. Hoy el Word se ve, se guarda en PDF y se imprime dentro.
 
 - De la fila 146 (25-sep-2026): en el Anexo III (solicitud de admisión) la propuesta pone el centro,
   su código y su localidad en «Centro prioritario» y en «Centro 1» (los que pide la familia), no en
@@ -226,6 +221,13 @@ abierto en ellas:
   «paso» y «guion»).
 
 ## Descartado, no proponer otra vez (del informe del 18-sep-2026)
+
+- **Editar el Word dentro de la aplicación, o plantillas en Google Docs** (25-sep-2026, fila 165,
+  decidido con Francisco). El editor que respeta el Word es AGPL (obligaría a enseñar el código o a
+  pagar licencia). Las plantillas en Google Docs harían pasar cada documento con datos del alumnado
+  por Google, pedirían internet siempre (la copia sin internet no podría generar) y obligarían a
+  rehacer la generación y todas las plantillas. Se sigue con Word: se ve, se guarda en PDF y se
+  imprime dentro; para corregir, se cambia la plantilla o el dato y se vuelve a generar.
 
 - **Un servidor.** Ni en internet ni dentro del centro, mientras sean dos o tres personas. En
   internet rompería el límite de no sacar datos personales. Dentro del centro lo respetaría, pero
