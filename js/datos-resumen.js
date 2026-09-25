@@ -231,7 +231,9 @@
       /* Empresas y otros: nombre, el nombre comercial o la referencia en
          el sitio del grupo, un teléfono y el NIF o el documento. */
       r.nombre = (categoria === 'EMPRESAS' ? persona.nombre : persona.nombre) || '';
-      var otro = (categoria === 'EMPRESAS' ? persona.comercial : persona.referencia) || '';
+      var otro = (categoria === 'EMPRESAS' ? persona.comercial
+        : categoria === 'ADMINISTRACIONES' ? (window.Administraciones ? Administraciones.pie(persona) : '')
+        : persona.referencia) || '';
       if (otro) r.grupo = { texto: otro, clase: '' };
       var telOtro = telefonoPropio(persona);
       if (telOtro) r.telefono = { valor: telOtro, etiqueta: '' };

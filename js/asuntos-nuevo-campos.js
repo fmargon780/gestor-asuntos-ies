@@ -139,6 +139,10 @@ App.validarCamposObligatorios = function () {
   return true;
 };
 
+/* Lo que los módulos añaden debajo del tercero elegido (fila 167: el
+   desplegable «Departamento» de Administraciones): `fn(persona, caja)`. */
+App.alFijarTercero = [];
+
 App.fijarTercero = function (p) {
   App.E.nuevo.tercero = p;
   var texto = App.textoTercero(p);
@@ -176,6 +180,9 @@ App.fijarTercero = function (p) {
 
   App.pintarCamposDelTipo();
   App.pintarLoPideNuevo(p);
+  App.alFijarTercero.forEach(function (f) {
+    try { f(p, caja); } catch (e) { /* un módulo roto no frena el alta del asunto */ }
+  });
 
   $('bloque-detalles').classList.remove('oculto');
   App.refrescarVista();
@@ -202,6 +209,8 @@ App.grupoDelTercero = function () {
 App.textoTercero = function (p) {
   if (p.categoria === 'ALUMNADO') return Nombres.terceroAlumno(p);
   if (p.categoria === 'PERSONAL') return Nombres.terceroPersonal(p);
+  if (p.categoria === 'TUTORES LEGALES') return Nombres.terceroTutor(p);   /* fila 166 */
+  if (p.categoria === 'ADMINISTRACIONES') return Nombres.terceroAdministracion(p);   /* fila 167 */
   if (p.categoria === 'EMPRESAS') return Nombres.terceroEmpresa({ nombre: p.nombre, nif: p.nif });
   return U.limpiarNombre(p.nombre + (p.referencia ? ' ' + p.referencia : ''));
 };

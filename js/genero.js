@@ -174,7 +174,7 @@ var Genero = (function () {
   }
 
   async function sexoDe(persona, categoria) {
-    if (!persona || categoria === 'EMPRESAS') return '';
+    if (!persona || categoria === 'EMPRESAS' || categoria === 'ADMINISTRACIONES') return '';
     var delFichero = sexoDelFichero(persona);
     if (delFichero) return delFichero;
     var datos = cache || await leer();
@@ -215,7 +215,7 @@ var Genero = (function () {
      No sale si el sexo ya viene en el fichero (el RegAlum) ni para empresas. */
   async function pintarEnFicha(caja, persona, categoria) {
     var bloque = caja && caja.querySelector('.ficha-bloque');
-    if (!bloque || !persona || categoria === 'EMPRESAS' || sexoDelFichero(persona)) return;
+    if (!bloque || !persona || categoria === 'EMPRESAS' || categoria === 'ADMINISTRACIONES' || sexoDelFichero(persona)) return;
     var actual = await sexoDe(persona, categoria);
     var p = document.createElement('p');
     p.className = 'tercero-detalle genero-casilla';

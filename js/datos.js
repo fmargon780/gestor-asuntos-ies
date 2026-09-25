@@ -89,8 +89,21 @@ var Datos = (function () {
                 cabecera: ['Razón social', 'Nombre comercial', 'NIF',
                            'Contacto', 'Teléfono', 'Correo'] },
     OTROS:    { fichero: 'otros.csv',
-                cabecera: ['Nombre', 'Referencia', 'Teléfono', 'Correo'] }
+                cabecera: ['Nombre', 'Referencia', 'Teléfono', 'Correo'] },
+    /* Los tutores legales (fila 166, js/tutores-legales.js) salen del
+       RegAlum; este fichero solo guarda la foto de los que ya son
+       tercero de algún asunto, para que no desaparezcan si su hijo deja
+       el centro. Sin alta a mano (`sinAlta`). */
+    'TUTORES LEGALES': { fichero: 'tutores.csv', sinAlta: true,
+                cabecera: ['Nombre', 'Documento', 'Teléfono', 'Teléfono 2', 'Correo', 'Correo 2',
+                           'Domicilio', 'Hijos'] }
   };
+
+  /* Categorías cuya lista monta otro módulo (fila 166): `registrarFuente
+     (categoria, fn)`, con `fn(dirDatos)` -> { lista, fichero, cabecera }.
+     Es el punto previsto para una categoría nueva, sin envolver `cargar`. */
+  var FUENTES = {};
+  function registrarFuente(categoria, fn) { FUENTES[categoria] = fn; }
 
   /* El valor de una columna buscándola por su título en la cabecera del
      propio fichero. Si ese título no está, se cae al sitio de reserva
@@ -163,6 +176,7 @@ var Datos = (function () {
   async function cargar(dirDatos, categoria) {
     if (categoria === 'ALUMNADO') return I.cargarAlumnado(dirDatos);
     if (categoria === 'PERSONAL') return I.cargarPersonal(dirDatos);
+    if (FUENTES[categoria]) return FUENTES[categoria](dirDatos);
     return cargarLista(dirDatos, categoria);
   }
 
@@ -217,7 +231,7 @@ var Datos = (function () {
 
   return {
     aTabla: aTabla, aCsv: aCsv, cargar: cargar,
-    buscar: buscar, olvidar: olvidar, LISTAS: LISTAS,
+    buscar: buscar, olvidar: olvidar, LISTAS: LISTAS, registrarFuente: registrarFuente,
     contarSolicitantesAnteriores: contarSolicitantesAnteriores,
     /* Lo que necesitan los demás ficheros de Datos (filas 130 y 133). */
     _interno: I

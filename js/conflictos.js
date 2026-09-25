@@ -216,7 +216,8 @@
      se apunta para que Francisco elija en Ajustes. Antes, el fichero
      real se copia a `_GESTOR/copias` y la copia en conflicto se mueve
      allí: no se pierde ninguna fila. */
-  var CSV_DE_TERCEROS = ['solicitantes.csv', 'personal.csv', 'empresas.csv', 'otros.csv'];
+  var CSV_DE_TERCEROS = ['solicitantes.csv', 'personal.csv', 'empresas.csv', 'otros.csv',
+                         'tutores.csv'];   /* fila 166: los tutores legales ya terceros */
 
   function ficheroRealCsv(nombreConflicto) {
     var m = nombreConflicto.match(/^(.+?)\s*\([^)]*conflic[^)]*\)\.csv$/i);
@@ -513,6 +514,26 @@
     else cambiadas.forEach(function (c) { Datos.olvidar(c); });
   }
 
+  /* Fila 167: la copia en conflicto de administraciones.json se une por
+     id dentro de la misma cola que sus guardados, y se aparta a copias. */
+  function fusionarAdministraciones(g, dirDatos, nombreConflicto) {
+    var otro = null;
+    return Administraciones.cambiar(dirDatos, async function (d) {
+      var texto = await Carpetas.leerTexto(dirDatos, nombreConflicto);
+      if (texto === null) return false;
+      try { otro = JSON.parse(texto); } catch (e) { otro = null; }
+      var unido = Administraciones.unirDatos(d, otro);
+      d.superiores = unido.superiores;
+      d.organismos = unido.organismos;
+      return true;
+    }).then(async function (hecho) {
+      if (!hecho) return false;
+      var copias = await Carpetas.crear(g, 'copias');
+      await Carpetas.moverFichero(dirDatos, nombreConflicto, copias, nombreConflicto);
+      return true;
+    });
+  }
+
   /* Fila 130: las copias en conflicto de los CSV de terceros, en _GESTOR/datos. */
   async function revisarCsv(g) {
     var dirDatos = window.App && App.E && App.E.datos;
@@ -521,6 +542,12 @@
     try { lista = await Carpetas.ficheros(dirDatos); } catch (e) { return; }
     for (var i = 0; i < lista.length; i++) {
       var nombre = lista[i].nombre;
+      /* Fila 167: administraciones.json, unido por id (Administraciones.unirDatos). */
+      if (/^administraciones\s*\([^)]*conflic[^)]*\)\.json$/i.test(nombre) && window.Administraciones) {
+        try { if (await fusionarAdministraciones(g, dirDatos, nombre)) U.aviso('Se han unido los cambios de los dos ordenadores en administraciones.json.'); }
+        catch (e) { /* a la siguiente pasada */ }
+        continue;
+      }
       var real = ficheroRealCsv(nombre);
       if (!real || CSV_DE_TERCEROS.indexOf(real) === -1) continue;
       var r = null;

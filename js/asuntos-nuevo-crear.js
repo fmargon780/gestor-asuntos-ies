@@ -90,7 +90,7 @@ App.crearAsuntoDelFormulario = async function () {
   /* Lo principal: la carpeta y su ficha. Lo de después (meter el
      documento traído, limpiar el formulario, la lista, el cuadro de
      documentos) es accesorio: si falla, ámbar (fila 100). */
-  var carpeta;
+  var carpeta, terceroCreado = null;
   try {
     if (await Carpetas.existe(App.E.abiertos, nombre)) {
       U.aviso('Ya hay un asunto abierto con ese mismo nombre.', 'malo');
@@ -118,6 +118,7 @@ App.crearAsuntoDelFormulario = async function () {
       abiertoEl: U.ahora(), abiertoPor: App.E.usuario
     };
     if (d.loPide) datosNuevoAsunto.loPide = d.loPide;
+    if (App.E.nuevo.departamento) datosNuevoAsunto.departamento = App.E.nuevo.departamento;   /* fila 167 */
     /* La foto del contacto (fila 66, docs/CONTACTO-GUARDADO-EN-LA-
        FICHA.md): se guarda solo si el tercero se ha cogido del CSV
        (App.E.nuevo.tercero), nunca para uno dado de alta a mano sin
@@ -126,6 +127,7 @@ App.crearAsuntoDelFormulario = async function () {
       datosNuevoAsunto.contacto = Datos.fotoDeContacto(App.E.nuevo.tercero, App.E.nuevo.categoria);
     }
     await App.anotar(nombre, datosNuevoAsunto);
+    terceroCreado = App.E.nuevo.tercero;
   } catch (e1) {
     U.accesorio('La carpeta está creada, pero no he podido guardar su ficha. Ábrela y vuelve a ' +
       'poner el estado', e1);
@@ -137,6 +139,12 @@ App.crearAsuntoDelFormulario = async function () {
     /* Si el asunto se ha empezado desde un documento suelto, ese
        documento se mete ahora en la carpeta recién creada. */
     var traido = App.E.pendiente;
+    /* Lo que los módulos hacen al crear (fila 166), accesorio. */
+    var alCrear = (window.Gestor && Gestor.alCrearAsunto) || [], falloAlCrear = null;
+    for (var ac = 0; ac < alCrear.length; ac++) {
+      try { await alCrear[ac](nombre, datosNuevoAsunto, terceroCreado); }
+      catch (e4) { falloAlCrear = e4; }
+    }
     if (traido) {
       try {
         await Carpetas.moverFichero(App.E.abiertos, traido.nombre, carpeta);
@@ -149,6 +157,7 @@ App.crearAsuntoDelFormulario = async function () {
     }
 
     U.aviso('Asunto creado.', 'bueno');
+    if (falloAlCrear) U.accesorio('Asunto creado, pero no he podido guardar los datos del tercero', falloAlCrear);
     U.copiar(nombre);
     App.E.nuevo = { tipo: null, categoria: null, tercero: null, configCampos: [] };
     $('campo-descripcion').value = '';

@@ -154,6 +154,10 @@
         '</div>' +
         (resumen.grupo && resumen.grupo.detalle
           ? '<p class="tercero-detalle">' + U.escapar(resumen.grupo.detalle) + '</p>' : '') +
+        /* Fila 167: el departamento del organismo elegido para este asunto. */
+        (a && a.ficha && a.ficha.departamento && a.ficha.departamento.nombre
+          ? '<p class="tercero-detalle">Departamento: ' + U.escapar(a.ficha.departamento.nombre) +
+            (a.ficha.departamento.correo ? '  ·  ' + U.escapar(a.ficha.departamento.correo) : '') + '</p>' : '') +
         avisoDeFotoHtml(persona) +
       '</section>';
 

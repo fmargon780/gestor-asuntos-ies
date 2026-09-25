@@ -48,6 +48,7 @@
 <link rel="stylesheet" href="css/cabecera-fija.css">
 <link rel="stylesheet" href="css/personas.css">
 <link rel="stylesheet" href="css/estado-hito.css">
+<link rel="stylesheet" href="css/administraciones.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -351,12 +352,7 @@
       <header class="cabecera">
         <h2>Personas y empresas</h2>
         <div class="acciones">
-          <select id="filtro-personas" class="campo">
-            <option value="ALUMNADO">Alumnado</option>
-            <option value="PERSONAL">Personal</option>
-            <option value="EMPRESAS">Empresas</option>
-            <option value="OTROS">Otros</option>
-          </select>
+          <select id="filtro-personas" class="campo"><!-- las categorías las pone Nombres.opcionesCategorias --></select>
           <input id="buscar-personas" class="campo" placeholder="Escribe un nombre">
         </div>
       </header>
@@ -383,12 +379,7 @@
          Pulsa una tarjeta para entrar en todo lo suyo: campos, pasos, plantillas, plazo y recurrencia.</p>
       <div class="alta-tipo">
         <input id="nuevo-tipo" class="campo" placeholder="TIPO NUEVO" style="max-width:260px">
-        <select id="nueva-categoria" class="campo" style="max-width:180px">
-          <option value="ALUMNADO">ALUMNADO</option>
-          <option value="PERSONAL">PERSONAL</option>
-          <option value="EMPRESAS">EMPRESAS</option>
-          <option value="OTROS">OTROS</option>
-        </select>
+        <select id="nueva-categoria" class="campo" style="max-width:180px"><!-- Nombres.opcionesCategorias --></select>
         <button id="btn-anadir-tipo" class="boton">Añadir</button>
       </div>
       <div id="aviso-nuevo-tipo" class="aviso-en-vivo"></div>
@@ -874,6 +865,11 @@
 <script src="js/tipos-nombre.js"></script>
 <script src="js/fichas-huerfanas.js"></script>
 <script src="js/puente.js"></script>
+<!-- Los tutores legales como tercero (fila 166). Después de js/puente.js y js/archivo-personas.js (sus puntos previstos). -->
+<script src="js/tutores-legales.js"></script>
+<!-- Las Administraciones como tercero (fila 167): datos y ficha. Después de js/puente.js, js/archivo-personas.js y js/asuntos-nuevo-campos.js (sus puntos previstos). -->
+<script src="js/administraciones.js"></script>
+<script src="js/administraciones-ficha.js"></script>
 
 <!-- Los módulos que se enganchan al puente. -->
 <script src="js/avisos.js"></script>
@@ -1212,6 +1208,8 @@
 <script src="js/ajustes-tipo-palabras-clave.js"></script>
 <script src="js/ajustes-centro.js"></script>
 <script src="js/ajustes-mantenimiento.js"></script>
+<!-- «Pasar a Administraciones» (fila 167), en Mantenimiento. -->
+<script src="js/administraciones-traer.js"></script>
 <!-- Fila 105, 24-sep-2026, docs/AJUSTES-PLEGADO.md: todo Ajustes plegado,
      con un resumen en cada título y la memoria de lo abierto. -->
 <script src="js/ajustes-plegado.js"></script>

@@ -147,9 +147,9 @@ var CorreoCuadro = (function () {
     var correos = correosDe(persona);
     /* Un hito con "Comunicar" (fila 60, docs/COMUNICAR-DESDE-EL-HITO.md,
        5.1) puede proponer una dirección propia (o varias, separadas
-       por coma): tiene prioridad sobre la de "Lo pide". */
+       por coma): gana a la de "Lo pide", y esta a la del departamento (fila 167). */
     var correoLoPide = (n().destinatarioPreferente && n().destinatarioPreferente()) ||
-      (window.LoPide ? LoPide.correoDe(a.ficha) : '');
+      (window.LoPide ? LoPide.correoDe(a.ficha) : '') || (window.Administraciones ? Administraciones.correoDelAsunto(a) : '');
     /* Cuáles van marcados de partida: la regla común (fila 132). */
     var posibles = Destinatarios.posibles(persona, correoLoPide, elegidos);
     elegidos = posibles.elegidos;

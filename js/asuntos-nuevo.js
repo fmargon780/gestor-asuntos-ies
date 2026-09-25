@@ -133,10 +133,7 @@ App.elegirTipo = function (t) {
   $('bloque-tercero').classList.remove('oculto');
   $('bloque-detalles').classList.add('oculto');
   App.loPideNuevoControles = null;
-  $('etiqueta-tercero').textContent = {
-    ALUMNADO: 'Alumno o alumna', PERSONAL: 'Persona del centro',
-    EMPRESAS: 'Empresa', OTROS: 'Con quién es el asunto'
-  }[t.categoria];
+  $('etiqueta-tercero').textContent = Nombres.textoCategoria(t.categoria, 'tercero');
   $('buscar-tercero').value = '';
   $('resultados-tercero').innerHTML = '';
   $('tercero-elegido').classList.add('oculto');
@@ -160,10 +157,7 @@ App.marcarTipoElegido = function (t) {
   App.pintarTipos();
   if ($('bloque-tercero').classList.contains('oculto')) {
     $('bloque-tercero').classList.remove('oculto');
-    $('etiqueta-tercero').textContent = {
-      ALUMNADO: 'Alumno o alumna', PERSONAL: 'Persona del centro',
-      EMPRESAS: 'Empresa', OTROS: 'Con quién es el asunto'
-    }[t.categoria];
+    $('etiqueta-tercero').textContent = Nombres.textoCategoria(t.categoria, 'tercero');
   }
   App.actualizarLimiteNuevo();
   App.refrescarVista();
@@ -200,24 +194,31 @@ App.buscarTercero = async function () {
         ? 'Nadie con ese nombre en ' + U.escapar(fuente.fichero) +
           ' ni en las altas a mano.'
         : 'Todavía no hay ningún fichero RelPerCen en la carpeta _GESTOR/datos.';
+    } else if (App.E.nuevo.categoria === 'TUTORES LEGALES') {
+      vacio.textContent = 'Nadie con ese nombre entre los tutores legales del RegAlum.csv. ' +
+        'Busca por su nombre, su DNI, su teléfono o su correo.';
     } else {
       vacio.textContent = 'No está en la lista todavía.';
     }
     caja.appendChild(vacio);
-    caja.appendChild(App.botonAlta(texto));
+    if (App.admiteAlta(App.E.nuevo.categoria)) caja.appendChild(App.botonAlta(texto));
     return;
   }
 
-  encontrados.forEach(function (p) {
+  function tarjeta(p) {
     var d = document.createElement('div');
     d.className = App.claseDeResultado(p);
     if (p.id) d.dataset.nie = p.id;
     d.innerHTML = '<div>' + U.escapar(p.nombre) + '</div>' +
                   '<div class="resultado-pie">' + U.escapar(App.pieDe(p)) + '</div>';
     d.onclick = function () { App.fijarTercero(p); };
-    caja.appendChild(d);
-  });
-  caja.appendChild(App.botonAlta(texto));
+    return d;
+  }
+  /* Fila 167: una categoría con su propia lista (Administraciones, agrupada). */
+  var propia = App.LISTAS_DE_CATEGORIA && App.LISTAS_DE_CATEGORIA[App.E.nuevo.categoria];
+  if (propia) propia(caja, { lista: encontrados }, '', tarjeta);
+  else encontrados.forEach(function (p) { caja.appendChild(tarjeta(p)); });
+  if (App.admiteAlta(App.E.nuevo.categoria)) caja.appendChild(App.botonAlta(texto));
 };
 
 /* La fila de un resultado se marca cuando abrirle un asunto casi
@@ -285,6 +286,8 @@ App.pieDe = function (p) {
   if (p.categoria === 'ALUMNADO') return App.pieAlumno(p);
   if (p.categoria === 'PERSONAL') return App.piePersona(p);
   if (p.categoria === 'EMPRESAS') return App.pieEmpresa(p);
+  if (p.categoria === 'TUTORES LEGALES' && window.TutoresLegales) return TutoresLegales.pie(p);
+  if (p.categoria === 'ADMINISTRACIONES' && window.Administraciones) return Administraciones.pie(p);
   return [p.documento, p.nif, p.referencia, p.campos['Puesto'] || ''].filter(Boolean).join('  ·  ');
 };
 

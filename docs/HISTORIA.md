@@ -5,6 +5,39 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 167: las Administraciones, un tipo de tercero propio
+
+`docs/ADMINISTRACIONES-COMO-TERCERO.md`. Categoría `ADMINISTRACIONES`: organismos (agrupados por
+«Depende de») y centros educativos, con su árbol de departamentos. Decisiones:
+
+- Tres módulos (`js/administraciones.js`, `-ficha.js`, `-traer.js`) enganchados por los puntos
+  previstos de la fila 166 y dos más: `App.ALTAS_DE_CATEGORIA` (alta con cuadro propio) y
+  `App.LISTAS_DE_CATEGORIA` (la lista agrupada, también en el buscador de Nuevo asunto). Ninguna
+  envoltura.
+- El departamento del asunto se propone en Correo detrás del del hito y del de «Lo pide»: los dos
+  son elecciones más concretas. Como no está en la ficha del organismo, va en «Otro correo».
+- La bandeja reconoce por el correo exacto de un departamento; por dominio, solo si un único
+  organismo lo tiene (el dominio de la Junta es de todos).
+- «Pasar a Administraciones» renombra también las carpetas archivadas (su nombre acaba en el
+  tercero, que cambia) y rehace el índice del ARCHIVO si ha movido alguna.
+- `js/correo-cuadro.js` ya tenía 601 líneas: el cambio se hizo sin añadir ninguna.
+
+## 25-sep-2026 — Fila 166: los tutores legales, un tipo de tercero propio
+
+`docs/TUTORES-LEGALES-COMO-TERCERO.md`. Categoría `TUTORES LEGALES`, sacada sola del RegAlum.
+Decisiones:
+
+- Primero, una sola lista de categorías (`Nombres.CATEGORIAS`, con sus textos). Las nuevas van al
+  final: muchas pruebas (y la costumbre) reconocen los botones de categoría por su sitio; ponerla
+  junto a ALUMNADO rompía seis.
+- Puntos previstos nuevos en vez de envolturas: `Datos.registrarFuente`, `App.FICHAS_DE_CATEGORIA`,
+  `App.trasPintarFicha`, `App.alFijarTercero`, `Gestor.alCrearAsunto`.
+- `nombreApellidos` del tutor va como propiedad no enumerable: añadirla a secas rompía las pruebas
+  que comparan el tutor entero.
+- En «Por clasificar», los tutores solo se prueban si nadie de las listas de siempre cuadra: una
+  solicitud trae el documento del alumno y el de su madre, y el interesado es el alumno.
+- `tutores.csv` no entra en `Copias.guardar` (es de JSON): lleva su propia copia del día.
+
 ## 25-sep-2026 — Fila 165, decidida: el Word se queda como está
 
 Hablado con Francisco. Editar el Word dentro de la aplicación pedía SuperDoc (AGPL-3.0: enseñar el

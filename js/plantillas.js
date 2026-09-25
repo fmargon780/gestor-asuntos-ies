@@ -75,6 +75,10 @@ var Plantillas = (function () {
     { clave: 'codigoCentro', etiqueta: 'Código del centro' },
     { clave: 'cargo', etiqueta: 'Cargo de quien firma' },
     { clave: 'firma', etiqueta: 'Firma completa, ya rellena' },
+    /* Administraciones (fila 167): el departamento elegido en el asunto. */
+    { clave: 'departamento', etiqueta: 'Departamento del organismo' },
+    { clave: 'departamentocorreo', etiqueta: 'Correo del departamento' },
+    { clave: 'organismooficial', etiqueta: 'Nombre oficial del organismo o del centro' },
     /* "Lo pide" (17-sep-2026, fila 28, docs/LO-PIDE.md): quién ha
        pedido esta gestión, si se ha apuntado. */
     { clave: 'quienlopide', etiqueta: 'Quien lo pide' },

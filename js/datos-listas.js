@@ -27,7 +27,8 @@
   function enFila(fichero, fn) { return window.ColaGuardado ? ColaGuardado.poner(fichero, fn) : fn(); }
 
   function claveDe(categoria) {
-    return (categoria === 'PERSONAL' || categoria === 'ALUMNADO') ? categoria + '_MANUAL' : categoria;
+    return (categoria === 'PERSONAL' || categoria === 'ALUMNADO' || categoria === 'TUTORES LEGALES')
+      ? categoria + '_MANUAL' : categoria;
   }
 
   /* Lo que hay en el fichero ahora mismo, sin lo guardado en memoria. */

@@ -69,7 +69,7 @@
      que dar la vuelta: se deja tal cual. */
   function nombreNaturalDe(texto, categoria) {
     var t = String(texto || '').trim();
-    if (!t || categoria === 'EMPRESAS' || categoria === 'OTROS') return t;
+    if (!t || categoria === 'EMPRESAS' || categoria === 'OTROS' || categoria === 'ADMINISTRACIONES') return t;
     var coma = t.indexOf(',');
     if (coma === -1) return t;
     var apellidos = t.slice(0, coma).trim();
@@ -84,7 +84,7 @@
   function dniDe(categoria, persona) {
     if (!persona) return '';
     if (categoria === 'ALUMNADO') return window.Dni ? (Dni.de(persona) || '') : '';
-    if (categoria === 'PERSONAL') {
+    if (categoria === 'PERSONAL' || categoria === 'TUTORES LEGALES') {
       var doc = String(persona.documento || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
       return doc.length > 4 ? doc : '';
     }
@@ -95,12 +95,13 @@
   function referenciaDe(categoria, persona) {
     if (!persona) return '';
     if (categoria === 'ALUMNADO') return persona.id || '';
-    if (categoria === 'PERSONAL') {
+    if (categoria === 'PERSONAL' || categoria === 'TUTORES LEGALES') {
       var doc = String(persona.documento || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
       return doc.slice(-4);
     }
     if (categoria === 'EMPRESAS') return persona.nif || '';
     if (categoria === 'OTROS') return persona.referencia || '';
+    if (categoria === 'ADMINISTRACIONES') return persona.codigoCentro || persona.dir3 || '';
     return '';
   }
 
@@ -247,6 +248,10 @@
       consejeria: datosCentro.consejeria || I.POR_DEFECTO_CONSEJERIA || '',
       campos: camposDelAsuntoDe(a)
     };
+    /* Fila 167: {departamento}, {departamentocorreo} y {organismooficial}. */
+    var deAdministracion = window.Administraciones ? Administraciones.valoresDe(a)
+      : { departamento: '', departamentocorreo: '', organismooficial: '' };
+    Object.keys(deAdministracion).forEach(function (k) { valores[k] = deAdministracion[k]; });
 
     /* Desde un hito (fila 102): {{HITO}}, {{PLAZO DEL HITO}},
        {hecho:...} y {{LO QUE FALTA}} con lo del propio hito. Sin hito,

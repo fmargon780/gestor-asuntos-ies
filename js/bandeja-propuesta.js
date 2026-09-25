@@ -44,13 +44,22 @@
     var buscadas = (datos.correos || []).map(function (c) { return U.normalizar(c); });
     if (datos.de && datos.de.correo) buscadas.push(U.normalizar(datos.de.correo));
     if (!buscadas.length) return null;
-    var categorias = ['ALUMNADO', 'PERSONAL', 'EMPRESAS', 'OTROS'];
+    var categorias = Nombres.CATEGORIAS;
     for (var i = 0; i < categorias.length; i++) {
       try {
         var fuente = await Datos.cargar(App.E.datos, categorias[i]);
         var p = personaConEseCorreo(fuente.lista || [], buscadas);
         if (p) return p;
       } catch (e) { /* si un CSV no está, se sigue con el siguiente */ }
+    }
+    /* Fila 167: un organismo, por el correo de uno de sus departamentos o por su dominio. */
+    if (window.Administraciones) {
+      try {
+        var adm = await Datos.cargar(App.E.datos, Administraciones.CATEGORIA);
+        var crudos = (datos.correos || []).concat(datos.de && datos.de.correo ? [datos.de.correo] : []);
+        var org = Administraciones.porDominio(adm.lista || [], crudos);
+        if (org) return org;
+      } catch (e) { /* sin administraciones.json, nada */ }
     }
     return null;
   }
@@ -63,7 +72,7 @@
     if (datos.de && datos.de.correo) buscadas.push(U.normalizar(datos.de.correo));
     if (!buscadas.length) return [];
     var salida = [];
-    var categorias = ['ALUMNADO', 'PERSONAL', 'EMPRESAS', 'OTROS'];
+    var categorias = Nombres.CATEGORIAS;
     for (var i = 0; i < categorias.length; i++) {
       try {
         var fuente = await Datos.cargar(App.E.datos, categorias[i]);

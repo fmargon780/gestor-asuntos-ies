@@ -47,6 +47,7 @@
 
   function grupoLoPide(categoria, relacion) {
     if (U.normalizar(relacion || '').indexOf('tutor legal') !== -1) return 'Familia';
+    if (categoria === 'TUTORES LEGALES') return 'Familia';   /* fila 166 */
     if (categoria === 'ALUMNADO') return 'Alumnado';
     if (categoria === 'PERSONAL') return 'Centro';
     if (categoria === 'EMPRESAS') return 'Empresa';

@@ -473,6 +473,7 @@ App.pintarTiposAjustes = function () {
   items.forEach(function (tipo) { caja.appendChild(App.tarjetaTipoAjustes(tipo, enBusqueda)); });
 };
 
+Nombres.opcionesCategorias($('nueva-categoria'), 'clave');   /* fila 166: la lista única */
 $('nueva-categoria').onchange = function () { App.cambiarCategoriaAjustes($('nueva-categoria').value); };
 $('buscar-tipos').oninput = function () { App.pintarTiposAjustes(); };
 

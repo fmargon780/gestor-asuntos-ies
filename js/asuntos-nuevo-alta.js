@@ -47,9 +47,28 @@ App.cuadroDeTercero = async function (categoria, valores, titulo, botonar) {
   return puestos;
 };
 
-App.altaTercero = async function (categoria, sugerencia) {
+/* Altas con cuadro propio (fila 167: Administraciones): `fn(sugerencia)`
+   abre su cuadro, guarda, y devuelve la persona nueva o null. */
+App.ALTAS_DE_CATEGORIA = {};
+
+/* Si una categoría admite alta a mano (fila 166: los tutores legales no,
+   salen solos del RegAlum). */
+App.admiteAlta = function (categoria) {
+  if (App.ALTAS_DE_CATEGORIA[categoria]) return true;
   var def = Datos.LISTAS[categoria];
-  if (!def) return;
+  return !!def && !def.sinAlta;
+};
+
+App.altaTercero = async function (categoria, sugerencia) {
+  if (App.ALTAS_DE_CATEGORIA[categoria]) {
+    var nueva = await App.ALTAS_DE_CATEGORIA[categoria](sugerencia);
+    if (!nueva) return;
+    U.aviso('Dado de alta.', 'bueno');
+    if (App.E.nuevo.categoria === categoria) { $('buscar-tercero').value = nueva.nombre; App.buscarTercero(); }
+    return;
+  }
+  var def = Datos.LISTAS[categoria];
+  if (!def || def.sinAlta) return;
   var titulo = categoria === 'ALUMNADO'
     ? 'Dar de alta un solicitante'
     : 'Dar de alta en ' + categoria;
@@ -251,7 +270,7 @@ App.pintarBuscadorDeTercero = function (contenedor, categoriaInicial, alElegir, 
       cajaResultados.appendChild(d);
     });
 
-    if (!multiple) {
+    if (!multiple && App.admiteAlta(estado.categoria)) {
       var alta = document.createElement('button');
       alta.type = 'button';
       alta.className = 'boton';

@@ -34,12 +34,9 @@ App.E = {
   nuevo: { tipo: null, categoria: null, tercero: null }
 };
 
-App.DESCRIPCION_CATEGORIA = {
-  ALUMNADO: 'Alumnos y alumnas',
-  PERSONAL: 'Profesorado y personal del centro',
-  EMPRESAS: 'Proveedores y empresas',
-  OTROS: 'Todo lo demás'
-};
+/* Sale de la lista única de js/nombres.js (fila 166). */
+App.DESCRIPCION_CATEGORIA = {};
+if (typeof Nombres !== 'undefined') Nombres.CATEGORIAS.forEach(function (c) { App.DESCRIPCION_CATEGORIA[c] = Nombres.textoCategoria(c, 'descripcion'); });
 
 App.CARPETA_GESTOR = '_GESTOR';
 App.FICHERO_TIPOS = 'tipos.json';

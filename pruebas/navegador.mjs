@@ -178,8 +178,8 @@ await comprobar('la lista empieza vacía', pagina.locator('#lista-abiertos .vaci
 
 /* --- nuevo asunto: primero la categoría --- */
 await pagina.click('.pestana[data-pantalla="nuevo"]');
-await comprobar('salen las cuatro categorías',
-  pagina.locator('#categorias-lista .categoria-boton').count(), 4);
+await comprobar('salen las seis categorías',
+  pagina.locator('#categorias-lista .categoria-boton').count(), 6);
 await comprobar('los tipos no se ven todavía',
   pagina.locator('#bloque-tipos').isHidden(), true);
 

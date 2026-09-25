@@ -13,7 +13,7 @@
    ============================================================ */
 var CamposCalculadosEditor = (function () {
 
-  var CATEGORIAS = ['ALUMNADO', 'PERSONAL', 'EMPRESAS', 'OTROS'];
+  var CATEGORIAS = Nombres.CATEGORIAS;   /* fila 166: la lista única */
   var ETIQUETA_OPERACION = {
     quitarFinal: 'Quitar los últimos caracteres', quitarInicio: 'Quitar los primeros caracteres',
     partir: 'Partir por un signo', equivalencias: 'Tabla de equivalencias',

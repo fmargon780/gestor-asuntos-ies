@@ -4,6 +4,9 @@ Documento hijo de `docs/CONTEXTO.md` (fila 65, `docs/DOCUMENTOS-QUE-QUEPAN.md`, 
 
 ---
 
+Los tutores legales y las Administraciones como tercero (filas 166 y 167), y la lista única de
+categorías, viven en `docs/contexto/TUTORES-Y-ADMINISTRACIONES.md`.
+
 ### El DNI del alumnado
 
 Debajo del nombre de un alumno sale su DNI; si no consta y por edad ya debería tenerlo, sale un

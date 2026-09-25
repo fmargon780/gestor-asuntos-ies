@@ -40,6 +40,12 @@ window.Gestor = {
      asuntos abiertos. Los módulos se apuntan aquí. */
   alRefrescar: [],
 
+  /* Funciones que se llaman justo después de crear un asunto y guardar
+     su ficha: `fn(nombre, datos, tercero)`, que puede devolver una
+     promesa. Lo que hagan es accesorio (fila 166: la foto del tutor
+     legal en tutores.csv). */
+  alCrearAsunto: [],
+
   /* Botones que los módulos añaden a la tarjeta de cada asunto. Cada
      función recibe el asunto y el modo, y devuelve un botón ya hecho,
      o null si en ese asunto no pinta nada. */
