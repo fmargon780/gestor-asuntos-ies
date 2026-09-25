@@ -143,11 +143,9 @@ abierto en ellas:
   GitHub en verde), pero la sesión no pudo comprobar lo publicado: su red bloquea `vercel.app` y el
   conector de Vercel da 403. Comprobar con `curl` que se sirven `js/hito-mesa-tarjetas.js` y
   `fonts/NotoSansHK-latin-400.woff2`, y que `App.VERSION` es de después de las 07:18 del 25-sep-2026.
-- Filas 154 a 164 (25-sep-2026): fusionadas en `main` (`c2509c3`, pruebas de GitHub en verde), pero
-  esta sesión tampoco pudo comprobar lo publicado (red sin `vercel.app`, conector de Vercel con 403).
-  Comprobar con `curl` que se sirven `js/hito-mesa-recetas.js`, `js/word-visor.js`,
-  `js/versiones-previas.js`, `js/duplicados-aviso.js`, `js/hitos-administracion.js` y
-  `js/lib/docx-preview.min.js`, y que `App.VERSION` es de después de las 15:01 del 25-sep-2026.
+- Filas 154 a 164 (25-sep-2026): **publicadas, comprobado por Francisco**: la web dice
+  `25-sep-2026 · 15:16`. Justo mientras se publicaba vio «44 envolturas no se han aplicado» (el
+  navegador mezcló ficheros de antes y de después); al volver a cargar, bien.
 - Fila 132: comprobar con `curl -I` que salen las cabeceras de seguridad nuevas.
 - Fila 63: comprobar que `docs/COLA.md` da error en la web publicada.
 - Numeración: `docs/PLANTILLAS-Y-FORMULARIOS-DESDE-EL-HITO.md` se presenta como «fila 146» y
