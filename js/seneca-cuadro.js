@@ -105,7 +105,7 @@ var SenecaCuadro = (function () {
       plantillaElegida = '';
     }
 
-    var cuerpo = (n().cuerpoDelMedio && n().cuerpoDelMedio(a, plantillaElegida)) || { texto: '', faltan: [] };
+    var cuerpo = (n().cuerpoDelMedio && n().cuerpoDelMedio(a, plantillaElegida, true)) || { texto: '', faltan: [] };
     textoProgramado = cuerpo.texto;
 
     /* Fila 151: sin ninguna plantilla, «Crear plantilla»; con alguna,

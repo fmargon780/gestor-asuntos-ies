@@ -388,12 +388,26 @@ mano.
   lee `plantillas/indice.json`, descarga cada `.docx` y lo escribe en `_GESTOR/PLANTILLAS`, y da
   de alta su fila en `plantillas.json` (`documentos` o `lista`, según su `clase`). Fusiona y no
   pisa: una plantilla con el mismo nombre y tipo que una ya existente se deja como está.
+- **Las plantillas del compañero** (fila 170, `docs/PLANTILLAS-DEL-COMPANERO.md`): 50 más (34 de
+  documento y 16 de correo, `plantillas/correo-*.md`), sacadas de los documentos que emitía el
+  compañero, cada una colgada de un tipo que ya existe en la biblioteca (no se crea ninguno).
+  Hoy `plantillas/` tiene 64 (44 de documento, 20 de correo). Los cuatro correos de antes ya no
+  llevan saludo ni firma (los pone `cuerpoDelMedio`).
+- **Texto propio para Séneca** (fila 170): en un `.md` de correo, una línea `=== SÉNECA ===` parte
+  el cuerpo: arriba `cuerpo`, abajo `cuerpoSeneca` en `indice.json`. «Cargar las plantillas del
+  centro» (`js/plantillas-centro.js`) lo lleva a la fila de `plantillas.json` como `textoSeneca`.
+  `CorreoNucleo.cuerpoDelMedio(a, id, paraSeneca)` usa `textoSeneca` si lo hay (solo lo pide
+  `js/seneca-cuadro.js`); el correo, siempre `texto`. Los dos editores de plantilla
+  (`js/plantillas-ajustes.js`, el de Ajustes y el en línea) llevan un recuadro plegado «Texto para
+  Séneca (opcional)» (`campoSenecaHTML`); vacío, no se guarda la clave.
 
 Se comprueba con `pruebas/plantillas-del-centro.mjs`: que `indice.json` cite ficheros que
 existen, que cada `.md` traiga su frontmatter completo, que todo hueco usado en los cuerpos esté
 en el catálogo (la prueba que de verdad importa: un hueco mal escrito sale tal cual en el papel),
 que cada `.docx` se pueda releer, que `{{FORMULARIOS}}` vacío no deje una línea suelta, y que todo
-`plantillasDocumento` de la biblioteca del centro cite un `id` de `indice.json` (fila 124).
+`plantillasDocumento` de la biblioteca del centro cite un `id` de `indice.json` (fila 124), y que
+un correo con `=== SÉNECA ===` dé los dos textos sin la marca (fila 170; en el cuadro, con
+`pruebas/plantilla-desde-el-cuadro.mjs`, 4b).
 
 **Renuncia a formar parte de la Junta Electoral** (fila 124, `plantillas/renuncia-junta-electoral.md`):
 OTROS · ELECCIONES CONSEJO ESCOLAR, tipo de documento RENUNCIA. La app rellena membrete, centro,

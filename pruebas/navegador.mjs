@@ -483,12 +483,12 @@ await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
    movido a la cabecera del propio bloque en la fila 52, 18-sep-2026). */
 await pagina.click('#lista-abiertos .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-await pagina.click('.ficha-documentos-gestionar');
-await pagina.waitForSelector('#doc-anadir');
+/* Fila 168: «+ Añadir documento», en la cabecera del bloque, va directo
+   al cuadro de añadir. */
 await comprobar('la carpeta del asunto empieza sin documentos',
-  pagina.locator('#doc-cuerpo .fila-documento').count(), 0);
+  pagina.locator('#ficha-documentos .ficha-documento').count(), 0);
 
-await pagina.click('#doc-anadir');
+await pagina.click('.ficha-documentos-anadir');
 await pagina.waitForSelector('#doc-vista');
 await comprobar('el documento se ve al lado del formulario',
   pagina.locator('#doc-visor').count(), 1);

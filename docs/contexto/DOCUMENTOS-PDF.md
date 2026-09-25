@@ -10,6 +10,14 @@ El gemelo en papel de las de correo (16-sep-2026, `docs/PLANTILLAS-DE-DOCUMENTO.
 `docs/COLA.md`): un botón **Generar documento** en la ficha de un asunto saca una copia de un
 `.docx` con los huecos rellenos, ya guardada en la carpeta del asunto, sin preguntar nada.
 
+**Las del centro, en `plantillas/`** (filas 83 y 170): 44 de documento, 34 de ellas sacadas de los
+documentos del compañero (`docs/PLANTILLAS-DEL-COMPANERO.md`), cada una colgada de un tipo que ya
+existe; los datos que piden con `{campo:…}` y el tipo no tiene se preguntan al generar. Llegan a
+`_GESTOR/PLANTILLAS` con «Cargar las plantillas del centro» (Mantenimiento). `participacion-
+actividad.md` (OTROS · ACTIVIDAD EXTRAESCOLAR) es para la fila 171 (un documento por profesor
+relacionado); `peticion-historial.md` saca el centro de procedencia de la BD del alumnado
+(`{{DATO ALUMNADO BD: Centro de procedencia}}`).
+
 - **El fichero**: mismo `_GESTOR/plantillas.json` que las de correo, con la clave de raíz nueva
   `documentos`: `[{ id, categoria, tipo, nombre, fichero, tipoDocumento, texto }]`. Una misma
   plantilla puede colgar de varios tipos, cada uno con su propia fila. `limpio()` la normaliza

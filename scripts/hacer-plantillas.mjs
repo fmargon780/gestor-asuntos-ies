@@ -289,6 +289,7 @@ function ficherosMd() {
 }
 
 const CAMPOS_OBLIGATORIOS = ['nombre', 'tipo', 'categoria'];
+const SEPARADOR_SENECA = /^[ \t]*=== SÉNECA ===[ \t]*$/m;
 
 async function main() {
   const indice = [];
@@ -326,7 +327,14 @@ async function main() {
       entrada.vistoBueno = datos.vistoBueno || '';
       console.log('escrito  ' + nombreDocx);
     } else {
-      entrada.cuerpo = textoPlanoDe(cuerpo);
+      /* Fila 170: una línea `=== SÉNECA ===` parte el cuerpo en dos: arriba
+         el correo, abajo el texto propio del mensaje de Séneca (que no
+         adjunta ficheros). Sin la línea, no hay `cuerpoSeneca`. */
+      const partes = cuerpo.split(SEPARADOR_SENECA);
+      entrada.cuerpo = textoPlanoDe(partes[0]);
+      if (partes.length > 1 && partes.slice(1).join('\n').trim()) {
+        entrada.cuerpoSeneca = textoPlanoDe(partes.slice(1).join('\n'));
+      }
     }
 
     indice.push(entrada);

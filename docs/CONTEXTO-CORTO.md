@@ -101,9 +101,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
 - Papelera: nada se borra de golpe. Plazo de conservación por tipo: avisa, nunca borra solo.
 - Word: lo que falta se pregunta antes; se ve en la app, con «Guardar PDF» e «Imprimir» (sin editar aún).
-- Plantillas de correo y de Word por tipo, con huecos que se rellenan solos; se crean o editan también
-  desde el propio cuadro de Correo/Séneca («Crear»/«Editar plantilla»); textos del centro en `plantillas/`
-  (botón en Mantenimiento). Membrete de la Junta (lo dibuja la app; logo opcional), firma de quien ocupaba
+- Plantillas de correo (con texto propio para Séneca) y de Word por tipo, con huecos que se rellenan solos;
+  también desde el cuadro de Correo/Séneca; las del centro, sacadas de los documentos del compañero (Mantenimiento). Membrete de la Junta (lo dibuja la app; logo opcional), firma de quien ocupaba
   el cargo en su fecha y «el/la alumno/a» según el sexo de cada persona.
 - Tablas de datos (tutorías de Séneca, CSV/Excel) unidas por DNI, con huecos; lo que falta, en amarillo. Certificado de función tutorial
   como el del centro; renuncia a la Junta Electoral, en su hito.
@@ -121,8 +120,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - "Qué me toca": pendientes, filtro por responsable (una persona ve también los de Administración), "Dormidos" (sin novedades en N días). "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena solo los datos del centro (casillas con nombre legible y miniatura).
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
-- Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF (banda libre para sello y firma); repartir un PDF
-  entre terceros, un archivado por persona.
+- Cada documento, todo en su fila (⧉, «Poner nombre», ⋮); Separar, Unir, Sacar páginas, Ajustar tamaño
+  (sello y firma) y Repartir entre terceros, en la barra del visor.
 - "Lo pide": quién pidió la gestión, por qué vía y cuándo; su correo sale en el cuadro de Correo.
 - Archivar o reabrir sobre un destino que ya existe fusiona carpetas; reintenta.
 - Crear, reabrir o editar deja en la ficha; Volver regresa a donde estaba. Ficha: foto del tercero, cabecera fija.
@@ -171,7 +170,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ver con el uso: ancho del panel/tablón, tarjetas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar curso; cuenta del centro; Ajustes: cargos y Provincia.
 - Importar usuarios IdEA del alumnado, al reactivar a Francisco el perfil de Gestor de PASEN.
-- Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar plantillas», «Traer guiones». Ajustes › Hitos: festivos.
+- Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar plantillas» (50 nuevas), «Traer guiones». Ajustes › Hitos: festivos.
 - Antes de junio 2027: "Guardar el contacto de los asuntos abiertos" (Mantenimiento).
 - Decisión: ¿la papelera se vacía sola?
 - Antes de publicar algo importante, repasar `docs/COMPROBAR-A-MANO.md`.

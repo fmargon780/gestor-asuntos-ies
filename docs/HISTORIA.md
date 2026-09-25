@@ -5,6 +5,36 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 170: las plantillas del compañero
+
+`docs/PLANTILLAS-DEL-COMPANERO.md`. 50 plantillas nuevas en `plantillas/` (34 de documento, 16 de
+correo), escritas por `generar.py` a partir de los documentos del compañero; el script se borró
+después, como pedía la fila. Decisiones:
+
+- Ningún tipo ni campo nuevo: las 64 plantillas cuelgan de un tipo que ya está en
+  `datos-biblioteca/biblioteca-centro.json` (comprobado antes de subir; ninguna quedó sin tipo, así
+  que nada nuevo en `docs/DATOS-QUE-FALTAN-EN-PLANTILLAS.md`).
+- Texto propio para Séneca con una línea `=== SÉNECA ===` en el `.md` (`cuerpoSeneca` en el índice,
+  `textoSeneca` en `plantillas.json`). Sin él, Séneca sigue con el `texto`, como antes.
+- `peticion-historial.md` saca el centro de procedencia con `{{DATO ALUMNADO BD: …}}`: el hueco de
+  tablas ya lo entendían la app y la prueba.
+- Los cuatro correos antiguos pierden su saludo y su firma escritos a mano (salían dos veces).
+  Las plantillas ya cargadas en `_GESTOR` no se tocan: Francisco tiene que pulsar otra vez «Cargar
+  las plantillas del centro» para traer las nuevas (no pisa las que ya tiene).
+
+## 25-sep-2026 — Fila 168: las opciones de cada documento, en su fila
+
+`docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md`. En la ficha, cada documento lleva en su propia fila ⧉
+(copiar el nombre sin extensión), «Poner nombre» siempre visible y ⋮ con solo «Pasar a versiones
+previas» y «Borrar»; «+ Añadir documento» en el título sustituye a «Documentos ▾». Decisiones:
+
+- Las herramientas de PDF van en la barra de acciones que el visor ya tenía para «Por
+  clasificar» (`opts.acciones`): ningún punto nuevo en `js/visor.js`.
+- El ⧉ lo pinta la propia fila; `js/copiar.js` pierde su envoltura de `App.abrirFicha` y su
+  `MutationObserver` sobre la ficha (una envoltura menos en `js/envolturas-esperadas.js`).
+- «Poner nombre» y «+ Añadir documento» reutilizan las opciones que ya tenía `Documentos.abrir`
+  (`ponerNombre`, `irDirectoAAnadir`): mismo cuadro, sin copiar código.
+
 ## 25-sep-2026 — Fila 167: las Administraciones, un tipo de tercero propio
 
 `docs/ADMINISTRACIONES-COMO-TERCERO.md`. Categoría `ADMINISTRACIONES`: organismos (agrupados por

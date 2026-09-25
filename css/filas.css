@@ -28,6 +28,8 @@
 }
 .ficha-documento-fila > .boton,
 .ficha-documento-fila > .marca-sin-registrar { flex: 0 0 auto; }
+/* ⧉, pegado al nombre (fila 168): copia el nombre sin la extensión. */
+.ficha-documento-fila > .ficha-documento-copiar { padding: 3px 7px; line-height: 1; }
 
 /* ---------- el menú de tres puntos de una fila (U.menuDeAcciones) ---------- */
 

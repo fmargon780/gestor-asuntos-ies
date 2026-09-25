@@ -89,7 +89,7 @@ sola la ficha, más arriba) o `App.abrirFicha(a, modo)` bastan para repintar sin
 otra pantalla: guardar o registrar un documento, generar uno desde plantilla, separar/unir/sacar
 páginas de un PDF, marcar un hito, asociar un documento a un hito desde el propio documento
 (`js/ficha-documentos.js`, "Asociar a un hito") o apuntarlo desde el propio hito
-(`js/hitos-documentos.js`, "Apuntar un documento"), "Comunicar", "Documentos ▾", y "Meter en un
+(`js/hitos-documentos.js`, "Apuntar un documento"), "Comunicar", «+ Añadir documento» y «Poner nombre» de la lista de documentos, y "Meter en un
 asunto"/"Meter aquí" de Por clasificar (`js/documentos-sueltos.js`,
 `js/documentos-sueltos-lector.js`) — estos dos últimos, además, viven siempre en la pantalla "Por
 clasificar", nunca dentro de la ficha, así que no pueden sacar de ella; y cuando el asunto de
@@ -281,11 +281,12 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   cambia nada del asunto). "Comunicar" no se marca como de solo lectura: ya se apagaba entero en
   consulta antes de esta fila (ninguna de sus dos acciones estaba en la lista blanca), así que
   sigue igual, apagado el botón entero.
-- **"Documentos ▾"** (`js/ficha-documentos.js`, `ponerBotonGestionar(bloqueEl, a)`): mismo
-  `App.verDocumentos(a)` de siempre, ahora en la cabecera del propio bloque, al lado del título;
-  se pinta también con la carpeta vacía (antes del primer `return` de `pintar(a)`), comprobando
-  que no exista ya (el título no se rehace en cada repintado de la lista de documentos, solo
-  `#ficha-documentos` por dentro).
+- **«+ Añadir documento»** (fila 168, `js/ficha-documentos.js`, `ponerBotonAnadir(bloqueEl, a)`;
+  antes «Documentos ▾»): en la cabecera del propio bloque, al lado del título, llama a
+  `App.verDocumentos(a, { irDirectoAAnadir: true })`; se pinta también con la carpeta vacía
+  (antes del primer `return` de `pintar(a)`), comprobando que no exista ya (el título no se
+  rehace en cada repintado de la lista de documentos, solo `#ficha-documentos` por dentro). Las
+  demás opciones de cada documento, en su fila: ver `docs/contexto/DOCUMENTOS.md`.
 - **El `<h2>` con la cabecera encogida**: el nombre pasa a `<span class="ficha-nombre-texto">`
   dentro del `<h2>`; solo ese `<span>` lleva `overflow: hidden; text-overflow: ellipsis;` con la
   cabecera encogida, nunca el `<h2>` entero, para que los tres puntos —hermano del `<span>`, no
@@ -297,7 +298,7 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   de vencimiento pulsable y sus textos/colores
   (probados llamando a `Plazos.etiquetaVencimiento` directamente, con fechas relativas a `hoy`,
   sin depender de qué día se ejecute la prueba), "Comunicar" con sus dos cuadros, "El encargo"
-  guardando los dos datos de una vez, "Documentos ▾" también con la carpeta vacía, modo consulta,
+  guardando los dos datos de una vez, «+ Añadir documento» también con la carpeta vacía, modo consulta,
   y la cabecera encogida. Los cuadros de Correo/Séneca/Documentos se cierran con Escape en la
   prueba, no pulsando `#cuadro-cancelar`/`#cuadro-aceptar`: los tres abren con `sinCancelar`
   (el botón queda oculto) y, en pantallas cortas, el de aceptar puede quedar fuera de la parte
