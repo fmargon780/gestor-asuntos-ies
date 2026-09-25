@@ -100,7 +100,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
 - Papelera: nada se borra de golpe. Plazo de conservación por tipo: avisa, nunca borra solo.
 - Plantillas de correo y de Word por tipo de asunto, con huecos que se rellenan solos; textos del
-  centro en `plantillas/` (botón en Mantenimiento). Salen con membrete, la firma de quien ocupaba
+  centro en `plantillas/` (botón en Mantenimiento). Salen con el membrete de la Junta (lo dibuja la app; logo opcional), la firma de quien ocupaba
   el cargo en su fecha y «el/la alumno/a» en masculino o femenino según el sexo de cada persona.
 - Tablas de datos (tutorías de Séneca, CSV/Excel) unidas por DNI, con huecos; lo que falta, en amarillo. Certificado de función tutorial
   como el del centro; renuncia a la Junta Electoral, en su hito.
@@ -166,7 +166,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Envío: pegar el script nuevo (filas 117 y 130), «Gestionar implementaciones → lápiz → Nueva versión», y «Probar».
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto. Con correo común, replantear la bandeja como una sola compartida.
 - Ver con el uso: ancho del panel y del tablón, tarjetas, aviso de "falta el DNI".
-- Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: membrete, Consejería, cargos y Provincia.
+- Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar de curso; cuenta del centro; Ajustes: cargos, Provincia y el logo del centro.
 - Importar los usuarios IdEA del alumnado, cuando reactiven a Francisco el perfil de Gestor de PASEN.
 - Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar las plantillas del centro» y «Traer los guiones del instituto». Ajustes › Hitos: pegar los festivos. Ajustes › Tipos: quién encarga cada uno y su plazo de conservación.
 - Antes de junio de 2027: "Guardar el contacto de los asuntos abiertos" (Mantenimiento).

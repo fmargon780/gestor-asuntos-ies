@@ -5,6 +5,28 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 149: el membrete lo dibuja la aplicación, con el manual de la Junta
+
+`docs/MEMBRETE-LETRA-DEL-MANUAL.md`. Desde la fila 81 se subía una imagen de membrete y la app
+escribía encima la Consejería, en Arial, dentro de una caja de cuatro números. Ahora `js/membrete.js`
+dibuja el membrete entero (2480 × 400): el símbolo de la Junta (SVG), «Junta de Andalucía» en Noto
+Sans HK negrita, la Consejería (vacía, «Consejería de Educación») y el nombre del centro en
+mayúsculas y verde, con las medidas del manual en proporción a la altura del símbolo; a la derecha,
+si la plantilla lo lleva (`conLogoCentro`, marcada por defecto), el logo del centro. Decisiones:
+
+- El nombre del centro es el mismo dato `centro` de «Datos del centro y firma»: el bloque Membrete lo
+  enseña y lo guarda, y pone al día el otro campo.
+- La letra: esta sesión no llega a GitHub (donde está la Noto Sans HK entera para recortarla con
+  `pyftsubset`), así que se pidió a la API de Google Fonts con `text=` los caracteres latinos y los
+  signos del español: dos `.woff2` de 14 KB, con kerning. La licencia OFL, del paquete
+  `@fontsource/noto-sans-hk` de npm.
+- La letra y el símbolo se leen con `App.leerFicheroDeLaApp`, así que valen también en la copia sin
+  internet (`scripts/copia-local.mjs` los mete en `copia-datos/`). Si la letra falla, Arial; si el
+  símbolo falla, sin membrete, como antes sin imagen.
+- `vercel.json` no necesita cambios: su política de seguridad no pone `font-src` ni `img-src`.
+- Quitar el logo lo manda a la papelera (`Papelera.mandarFichero`, ahora exportada). `membrete.png` ya
+  no se usa y no se borra.
+
 ## 25-sep-2026 — Fila 148: las pruebas de GitHub, en verde, y menos ejecuciones
 
 `docs/PRUEBAS-EN-VERDE.md`. Francisco recibía un «Run failed» por cada subida. Leídas las ejecuciones

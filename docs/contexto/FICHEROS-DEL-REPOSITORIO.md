@@ -13,6 +13,8 @@ de `App` va después del fichero que lo define.
 |---|---|
 | `index.html` | La página |
 | `vercel.json` | Que el navegador no se quede con copias viejas, las cabeceras de seguridad, qué commits no publican (`ignoreCommand`) y la hora de la versión al publicar (`buildCommand`, fila 76) |
+| `fonts/NotoSansHK-latin-400.woff2`, `fonts/NotoSansHK-latin-700.woff2`, `fonts/OFL.txt` | La letra del manual de la Junta para el membrete (fila 149), recortada a los caracteres latinos, con su licencia |
+| `img/junta-andalucia-simbolo.svg` | El símbolo de la Junta, en vectorial, para el membrete (fila 149) |
 | `css/estilos.css` | El aspecto general. Los demás `css/` van con su módulo del mismo nombre |
 | `css/vista.css` | El ancho de la pantalla, los filtros plegados y las tarjetas por tipo |
 | `css/guias.css` | La guía: pasos, plegado, preguntas y opciones |

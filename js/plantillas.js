@@ -34,12 +34,9 @@ var Plantillas = (function () {
      de normativa del centro, para montar el enlace de una referencia.
      Vacía, las citas se ven sin enlace y no se rompe nada. */
   var POR_DEFECTO_NORMATIVA = 'https://normativa-escolarizacion.vercel.app';
-  /* La caja del nombre de la Consejería sobre la imagen del membrete
-     (20-sep-2026, fila 81, docs/FIRMANTES-Y-MEMBRETE.md): todo en
-     porcentaje del ancho o del alto de la imagen, para que valga igual
-     si el membrete se cambia por otro de distinto tamaño. La usa
-     js/membrete.js. */
-  var POR_DEFECTO_MEMBRETE_CAJA = { x: 10.3, y: 43.2, ancho: 20.7, alto: 10.0 };
+  /* Fila 149 (docs/MEMBRETE-LETRA-DEL-MANUAL.md): la Consejería del
+     membrete, si Ajustes la deja vacía (nombre vigente desde julio de 2026). */
+  var POR_DEFECTO_CONSEJERIA = 'Consejería de Educación';
 
   /* Los huecos que se conocen, con el nombre en cristiano que se
      enseña en Ajustes y en el aviso de "Faltan datos". `{campo:LO QUE
@@ -152,12 +149,10 @@ var Plantillas = (function () {
       provincia: l.provincia || '',
       cargo: l.cargo || '',
       direccionNormativa: (typeof l.direccionNormativa === 'string') ? l.direccionNormativa : POR_DEFECTO_NORMATIVA,
-      /* El membrete (20-sep-2026, fila 81): la imagen vive en
-         _GESTOR/PLANTILLAS/membrete.png (ver js/membrete.js), aquí
-         solo el nombre de la Consejería y dónde escribirlo encima. */
+      /* El membrete (fila 149): lo dibuja entero js/membrete.js; aquí solo
+         el nombre de la Consejería (el del centro es `centro`). Las claves
+         `membreteCaja` que queden de la fila 81 se ignoran. */
       consejeria: l.consejeria || '',
-      membreteCaja: (l.membreteCaja && typeof l.membreteCaja === 'object')
-        ? Object.assign({}, POR_DEFECTO_MEMBRETE_CAJA, l.membreteCaja) : Object.assign({}, POR_DEFECTO_MEMBRETE_CAJA),
       lista: Array.isArray(l.lista) ? l.lista : [],
       /* Plantillas de documento de Word (docs/PLANTILLAS-DE-DOCUMENTO.md,
          3.4): { id, categoria, tipo, nombre, fichero, tipoDocumento,
@@ -370,7 +365,7 @@ var Plantillas = (function () {
   var API = {
     ARCHIVO: ARCHIVO, HUECOS: HUECOS,
     POR_DEFECTO_FIRMA: POR_DEFECTO_FIRMA, POR_DEFECTO_CENTRO: POR_DEFECTO_CENTRO,
-    POR_DEFECTO_NORMATIVA: POR_DEFECTO_NORMATIVA, POR_DEFECTO_MEMBRETE_CAJA: POR_DEFECTO_MEMBRETE_CAJA,
+    POR_DEFECTO_NORMATIVA: POR_DEFECTO_NORMATIVA, POR_DEFECTO_CONSEJERIA: POR_DEFECTO_CONSEJERIA,
     cargar: cargar, cargarReciente: cargarReciente, olvidar: olvidar, guardar: guardar,
     documentoPorId: documentoPorId, enMemoria: function () { return cache; },
     deTipo: deTipo, idNuevo: idNuevo, rellenar: rellenar, tieneLoQueFalta: tieneLoQueFalta,
@@ -378,7 +373,7 @@ var Plantillas = (function () {
     /* Fila 133: lo que usa js/plantillas-valores.js (valoresDeAsunto, que
        vive allí y se cuelga de este mismo objeto con su nombre de siempre). */
     _interno: {
-      POR_DEFECTO_CENTRO: POR_DEFECTO_CENTRO, POR_DEFECTO_FIRMA: POR_DEFECTO_FIRMA,
+      POR_DEFECTO_CENTRO: POR_DEFECTO_CENTRO, POR_DEFECTO_CONSEJERIA: POR_DEFECTO_CONSEJERIA, POR_DEFECTO_FIRMA: POR_DEFECTO_FIRMA,
       cargar: cargar, limpio: limpio, rellenar: rellenar
     }
   };

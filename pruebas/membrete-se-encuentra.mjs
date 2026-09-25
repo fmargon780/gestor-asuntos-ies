@@ -1,6 +1,6 @@
 /* Prueba (sin navegador) de la fila 127 (docs/MEMBRETE-NO-SE-ENCUENTRA.md):
-   `membrete.png` es un FICHERO dentro de _GESTOR/PLANTILLAS, y
-   `Membrete.hayImagen` / `imagenGuardada` tienen que encontrarlo (antes
+   una imagen es un FICHERO dentro de _GESTOR/PLANTILLAS, y
+   `Membrete.logoGuardado` (desde la fila 149, el logo del centro) tiene que encontrarlo (antes
    se preguntaba con `Carpetas.existe`, que busca una carpeta, y nunca lo
    veían). Con el js/carpetas.js de verdad y un disco de mentira mínimo. */
 import fs from 'node:fs';
@@ -42,19 +42,19 @@ for (const f of ['util.js', 'util-parecidos.js', 'util-pantalla.js', 'reintentar
 const { Carpetas, Membrete } = vm.runInContext('({ Carpetas: Carpetas, Membrete: Membrete })', contexto);
 contexto.window.Carpetas = Carpetas;
 
-comprobar('sin membrete.png, no hay imagen', await Membrete.hayImagen(), false);
-comprobar('sin membrete.png, imagenGuardada da null', await Membrete.imagenGuardada(), null);
+/* Fila 149: el membrete ya no es una imagen subida; lo que se busca así es
+   el logo del centro, `logo-centro.png`. */
+comprobar('sin logo-centro.png, logoGuardado da null', await Membrete.logoGuardado(), null);
 
-(await gestor.getDirectoryHandle('PLANTILLAS', { create: true })).ficheros.set('membrete.png', 'PNG');
-comprobar('con el fichero membrete.png, hayImagen lo encuentra', await Membrete.hayImagen(), true);
-const imagen = await Membrete.imagenGuardada();
-comprobar('e imagenGuardada lo devuelve', imagen ? await imagen.text() : null, 'PNG');
+(await gestor.getDirectoryHandle('PLANTILLAS', { create: true })).ficheros.set('logo-centro.png', 'PNG');
+const imagen = await Membrete.logoGuardado();
+comprobar('con el fichero logo-centro.png, logoGuardado lo devuelve', imagen ? await imagen.text() : null, 'PNG');
 
 /* Y una carpeta que se llame así no cuenta como imagen. */
 const otro = carpeta();
 contexto.window.Gestor.carpetaGestor = () => otro;
-(await otro.getDirectoryHandle('PLANTILLAS', { create: true })).carpetas.set('membrete.png', carpeta());
-comprobar('una carpeta llamada membrete.png no es la imagen', await Membrete.hayImagen(), false);
+(await otro.getDirectoryHandle('PLANTILLAS', { create: true })).carpetas.set('logo-centro.png', carpeta());
+comprobar('una carpeta llamada logo-centro.png no es el logo', await Membrete.logoGuardado(), null);
 
 console.log(fallos ? '\n' + fallos + ' fallo(s) en membrete-se-encuentra.mjs' : '\nTodo bien en membrete-se-encuentra.mjs');
 if (fallos) process.exit(1);

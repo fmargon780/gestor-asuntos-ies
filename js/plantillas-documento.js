@@ -118,11 +118,12 @@
     /* El membrete (20-sep-2026, fila 81): se mete ANTES de rellenar,
        porque `Docx.ponerImagen` busca el hueco `{{MEMBRETE}}` en el
        XML tal cual viene de la plantilla, no en el texto ya relleno.
-       Sin imagen guardada, `Membrete.montar()` da `null` y no se toca
+       Si no se puede dibujar, `Membrete.montar()` da `null` y no se toca
        nada: el documento sale igual que si no existiera este paso. */
     if (window.Membrete) {
       try {
-        var membrete = await Membrete.montar();
+        /* Fila 149: cada plantilla dice si lleva el logo del centro (sin la clave, sí). */
+        var membrete = await Membrete.montar({ conLogoCentro: plantillaDoc.conLogoCentro !== false });
         if (membrete) buffer = await Docx.ponerImagen(buffer, 'MEMBRETE', membrete.bytes, membrete.ancho, membrete.alto);
       } catch (e) { /* sin membrete, el documento sigue generándose */ }
     }
