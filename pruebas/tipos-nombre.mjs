@@ -176,7 +176,7 @@ await comprobar('4. el cuadro de «Generar documento» también la busca, en el 
     const promesa = PlantillasDocumento.elegir({ delPaso: [], delTipo: [], buscar: true });
     await new Promise(r => setTimeout(r, 300));
     const campo = document.querySelector('#cuadro-cuerpo .plantilla-buscar-campo');
-    campo.value = 'autorizacion'; campo.oninput();
+    campo.value = 'autorizacion salida'; campo.oninput();   /* fila 170: hay otras «Autorización» del centro */
     document.querySelector('#cuadro-cuerpo .plantilla-buscar-opcion').click();
     return (await promesa).id;
   }), 'pd-otra');

@@ -365,5 +365,25 @@
     return valores;
   }
 
+  /* Fila 171 (docs/DOCUMENTO-PARA-CADA-RELACIONADO.md): los mismos
+     valores, pero con un relacionado (`{ categoria, nombre }`) en el
+     sitio del tercero principal. Lo del asunto (campos, curso, hitos,
+     registro, firmantes) no cambia; lo de la persona (nombre, DNI,
+     referencia, contacto, especialidad, el género) sale de él. La de
+     siempre no se toca. */
+  function asuntoConPersona(asunto, rel) {
+    var a = asunto || {};
+    return Object.assign({}, a, {
+      ficha: Object.assign({}, a.ficha || {}, { tercero: rel.nombre, categoria: rel.categoria }),
+      leido: Object.assign({}, a.leido || {}, { categoria: rel.categoria })
+    });
+  }
+
+  function valoresParaPersona(asunto, rel, opciones) {
+    return valoresDeAsunto(asuntoConPersona(asunto, rel), opciones);
+  }
+
   Plantillas.valoresDeAsunto = valoresDeAsunto;
+  Plantillas.valoresParaPersona = valoresParaPersona;
+  Plantillas.asuntoConPersona = asuntoConPersona;
 })();

@@ -225,6 +225,24 @@ si hay cualquier plantilla en el centro y siempre pasa por el cuadro de elegir, 
 enlace (`PlantillasDocumento.elegir({ delPaso, delTipo, buscar: true })`); sin ninguna del paso ni del
 tipo, el buscador sale ya abierto.
 
+## «… para cada relacionado (N)» (fila 171, `docs/DOCUMENTO-PARA-CADA-RELACIONADO.md`)
+
+En «Generar documento ▾» de la mesa, cada plantilla lleva además «… para cada relacionado (N)» si el
+asunto tiene relacionados (`ficha.relacionados`). `js/generar-para-relacionados.js`
+(`GenerarParaRelacionados.generar(a, plantilla, hito)`) hace un documento por relacionado: los huecos de
+la persona salen de `Plantillas.valoresParaPersona(a, rel, opciones)` (js/plantillas-valores.js: el
+asunto con ese relacionado en el sitio del tercero), los del asunto, el centro y los firmantes iguales
+para todos. Primero rellena todos en memoria; lo que falta del asunto (campos, firmante…) se pregunta
+una vez con `WordFaltan`; lo de la persona (nombre, DNI, referencia, contacto, especialidad, tutores,
+datos de tablas: `repartirFaltan`) se dice al final, por persona. Cada uno va a la carpeta del asunto
+con el nombre de la persona como texto adicional (`… CERTIFICADO participacion Apellidos, Nombre.docx`);
+uno que ya estaba no se pisa. Se apuntan todos en el hito, una nota y el guion («generar»). El resumen
+(«N certificados generados. A 1 persona le falta el DNI: …») trae «Enviar a cada uno»: lista a quién
+(y quién no tiene correo, para Séneca), «Confirmar y enviar», y un correo por persona con su documento
+adjunto (`CorreoEnviar.enviar`), la plantilla de correo del tipo (la que dice «certificado», si hay
+varias), saludo y firma. El `idEnvio` sale del asunto, el documento y el correo (`idEnvioDe`): el script
+no manda dos veces el mismo. Se comprueba con `pruebas/generar-para-relacionados.mjs`.
+
 ## "Traer los guiones del instituto"
 
 Botón en Ajustes → Mantenimiento → Herramientas → "Biblioteca del centro"

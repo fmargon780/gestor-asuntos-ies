@@ -5,6 +5,22 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 171: un documento para cada relacionado
+
+`docs/DOCUMENTO-PARA-CADA-RELACIONADO.md`. Para el certificado de participación de cada profesor en
+una actividad extraescolar (el documento que más emitía el compañero): un asunto por actividad, los
+profesores como relacionados, y en la mesa del hito «… para cada relacionado (N)» junto a cada
+plantilla. `js/generar-para-relacionados.js` rellena todos en memoria antes de guardar nada, para
+separar lo que falta: lo del asunto se pregunta una vez para todos; lo de cada persona (su DNI) se
+dice en el resumen, sin parar el lote (preguntarlo para todos habría puesto el mismo DNI a todos).
+Los huecos de la persona salen de `Plantillas.valoresParaPersona`, que llama a la de siempre con el
+relacionado en el sitio del tercero: nada cambia en la generación normal. «Enviar a cada uno» manda
+un correo por persona con su documento; el `idEnvio` es fijo por asunto, documento y correo, así que
+repetir el envío no duplica. Lo que costó: `TablasDatos.resaltarResultado` es asíncrona, y sin
+esperarla los Word salían con la palabra «undefined» dentro; lo cazó la prueba.
+
+---
+
 ## 25-sep-2026 — Fila 170: las plantillas del compañero
 
 `docs/PLANTILLAS-DEL-COMPANERO.md`. De unos 1.035 documentos del compañero salieron 50 plantillas

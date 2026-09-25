@@ -94,7 +94,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Registrar detecta el PDF sellado; el "SIN SELLAR" y el Word con su PDF van a «Versiones previas»
   (plegadas). Cada documento de la ficha, todo en su fila (⧉, Registrar, Poner nombre, hito, ⋮); herramientas de PDF, en el visor.
 - Terceros relacionados con un asunto, con altas por grupo (unidad, nivel, grupo propio), que
-  también sirven de destinatarios de un correo o de un mensaje de Séneca.
+  también sirven de destinatarios. Generar para cada relacionado: un documento por persona y un correo a cada una.
 - Ajustes: tres pestañas y pantalla por tipo; todo plegado, con resumen; avisos de fallo, solo con fallo.
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
@@ -108,7 +108,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Copias diarias (90 días), detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable de nombres. Un borrado (tipo,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en cada subida de código (no con solo `docs/`).
-- Copia sin internet (`file://`): se actualiza sola (reintenta si se estaba publicando); si no, franja fija arriba; cada 30 min.
+- Copia sin internet (`file://`): se actualiza sola (reintenta); si no, franja fija arriba; cada 30 min.
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
   bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa), con las acciones solo ahí («Generar documento ▾»,
   «Comunicar ▾», «Registrar») y tres tarjetas: el guion (lista para marcar; «receta» opcional que deja el cuadro relleno; se marca

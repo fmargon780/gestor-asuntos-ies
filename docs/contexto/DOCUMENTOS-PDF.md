@@ -12,6 +12,8 @@ El gemelo en papel de las de correo (16-sep-2026, `docs/PLANTILLAS-DE-DOCUMENTO.
 El repositorio trae 44 de documento en `plantillas/` (34 de ellas sacadas en la fila 170 de los
 documentos del compañero, `docs/PLANTILLAS-DEL-COMPANERO.md`), cada una colgada de un tipo que ya
 existe en la biblioteca; lo que el tipo no tiene lo piden con `{campo:…}` y se pregunta al generar.
+Desde la mesa, una plantilla se puede generar **para cada relacionado** (fila 171,
+`js/generar-para-relacionados.js`, detalle en `docs/contexto/HITO-MESA.md`).
 
 - **El fichero**: mismo `_GESTOR/plantillas.json` que las de correo, con la clave de raíz nueva
   `documentos`: `[{ id, categoria, tipo, nombre, fichero, tipoDocumento, texto }]`. Una misma

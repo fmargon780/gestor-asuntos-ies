@@ -315,10 +315,13 @@ var HitoMesaDocumentos = (function () {
     var g = HitosGenerar.grupos(a, h);
     /* Fila 126: con la mesa abierta, «Buscar otra plantilla…» sale siempre. */
     if (!g || (!g.delPaso.length && !g.delTipo.length && !(abierto && window.PlantillaBuscar))) { caja.innerHTML = ''; return; }
+    var nRel = window.GenerarParaRelacionados ? GenerarParaRelacionados.cuantos(a) : 0;
     function filaP(p) {
       return '<div class="mesa-plantilla" data-id="' + U.escapar(p.id) + '"><span class="mesa-icono-doc">DOC</span>' +
         '<span class="mesa-plantilla-nombre">' + U.escapar(p.nombre) + '</span>' +
-        (abierto ? '<button type="button" class="boton boton-chico mesa-plantilla-generar">Generar documento</button>' : '') + '</div>';
+        (abierto ? '<button type="button" class="boton boton-chico mesa-plantilla-generar">Generar documento</button>' : '') +
+        /* Fila 171: «… para cada relacionado (N)», js/generar-para-relacionados.js. */
+        (abierto && nRel ? '<button type="button" class="boton boton-chico mesa-plantilla-cada-uno" title="Un documento por relacionado, cada uno con sus datos">… para cada relacionado (' + nRel + ')</button>' : '') + '</div>';
     }
     /* Fila 164: arriba, los pasos pendientes con receta de generar. */
     caja.innerHTML = (abierto && window.HitoMesaRecetas ? HitoMesaRecetas.bloqueHTML(a, h, 'generar') : '') +
@@ -348,6 +351,19 @@ var HitoMesaDocumentos = (function () {
         try {
           await U.mientrasGuarda(b, function () { return PlantillasDocumento.generar(a, p, 'abierto', { hito: h }); });
         } catch (e) { U.fallo('No he podido generar el documento', e); }
+      };
+    });
+    Array.prototype.forEach.call(caja.querySelectorAll('.mesa-plantilla-cada-uno'), function (b) {
+      b.onclick = async function () {
+        var id = b.closest('.mesa-plantilla').dataset.id;
+        var p = todas.filter(function (x) { return x.id === id; })[0];
+        if (!p) return;
+        /* Sin U.mientrasGuarda: lleva cuadros (lo que falta, el resumen). */
+        if (b.disabled) return;
+        b.disabled = true;
+        try { await GenerarParaRelacionados.generar(a, p, h); }
+        catch (e) { U.fallo('No he podido generar los documentos', e); }
+        finally { b.disabled = false; }
       };
     });
   }
