@@ -115,6 +115,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 | 147 | `docs/MESA-TARJETAS-QUE-SE-ABREN.md` (la mesa del hito en tarjetas: una en grande, las otras dos de resumen a la derecha; pulsar una la abre en grande) | HECHA (25-sep-2026) |
 | 148 | `docs/PRUEBAS-EN-VERDE.md` (las pruebas de GitHub en verde otra vez, y que un cambio solo de `docs/` no las lance) | HECHA (25-sep-2026). Fallaba `indice-del-expediente.mjs` desde la fila 138: esperaba el «Asunto archivado.» del asunto anterior, aún a la vista, y miraba el ARCHIVO antes de terminar |
 | 149 | `docs/MEMBRETE-LETRA-DEL-MANUAL.md` (el nombre de la Consejería del membrete, con la letra Noto Sans HK del manual de la Junta, y la caja por defecto del membrete nuevo) | HECHA (25-sep-2026). La app dibuja el membrete entero; letra recortada con la API de Google Fonts (`text=`), porque esta sesión no llega a GitHub |
+| 150 | `docs/MESA-COMUNICAR-DEL-PASO-Y-GUION.md` (el botón «Comunicar» de cada paso del guion, que no hace nada; y un enlace en la mesa para cambiar el guion del hito para todos los asuntos del tipo) | PENDIENTE |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
@@ -195,6 +196,8 @@ abierto en ellas:
 - **Del 23-sep-2026: revisión de usabilidad.** Francisco ve pantallas con demasiadas cosas. Ajustes
   va en la fila 105 y la ficha del asunto en la 107. Queda por hablar Asuntos abiertos (qué plegar),
   con la misma regla: plegado, resumen en el título, y se recuerda lo abierto.
+- **Del 25-sep-2026: el trabajo con hitos y pasos, más intuitivo y fluido.** Francisco lo pide
+  tras la fila 150. Hablarlo con él una cosa cada vez, cuando esa fila esté publicada.
 
 ## Descartado, no proponer otra vez (del informe del 18-sep-2026)
 
