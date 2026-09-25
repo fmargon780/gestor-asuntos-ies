@@ -71,8 +71,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Asuntos reservados (por tipo o uno a uno): candado, sin el tercero en listas y buscador.
 - El estado es el primer hito sin terminar («Paso N de M · título», «Paso actual»): Administración o terceros; «Esperando a…» sale solo con el responsable (a mano, hasta que cambia el paso). Guías: «Administración», no personas. Vía y fecha límite.
 - Asuntos recurrentes, con aviso. Avisos de fichas huérfanas y papelera vieja.
-- Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
-  sueltas también en documentos, registro de Séneca, ficha y notas.
+- Buscador de tipos y terceros; índice del ARCHIVO; busca palabras en documentos, registro, ficha y notas.
 - Personas (Alumnado): matriculados primero, antiguos plegados; busca por padre, madre o tutor;
   hermanos en la ficha. La BD de alumnado (carpeta de Drive) suma sus datos: ficha, huecos, grupos.
 - Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
@@ -93,7 +92,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   tarjetas (alumno y tutores). Ficha del asunto en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
 - Registrar detecta el PDF sellado; el "SIN SELLAR" y el Word con su PDF van a «Versiones previas»
-  (plegadas); cada documento, asociable a un hito.
+  (plegadas). Cada documento de la ficha, todo en su fila (⧉, Registrar, Poner nombre, hito, ⋮); herramientas de PDF, en el visor.
 - Terceros relacionados con un asunto, con altas por grupo (unidad, nivel, grupo propio), que
   también sirven de destinatarios de un correo o de un mensaje de Séneca.
 - Ajustes: tres pestañas y pantalla por tipo; todo plegado, con resumen; avisos de fallo, solo con fallo.
@@ -105,8 +104,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   desde el propio cuadro de Correo/Séneca («Crear»/«Editar plantilla»); textos del centro en `plantillas/`
   (botón en Mantenimiento). Membrete de la Junta (lo dibuja la app; logo opcional), firma de quien ocupaba
   el cargo en su fecha y «el/la alumno/a» según el sexo de cada persona.
-- Tablas de datos (tutorías de Séneca, CSV/Excel) unidas por DNI, con huecos; lo que falta, en amarillo. Certificado de función tutorial
-  como el del centro; renuncia a la Junta Electoral, en su hito.
+- Tablas de datos (Séneca, CSV/Excel) unidas por DNI, con huecos; lo que falta, en amarillo. Certificado tutorial; renuncia a la Junta Electoral.
 - Copias diarias (90 días), detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable de nombres. Un borrado (tipo,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en cada subida de código (no con solo `docs/`).
@@ -121,8 +119,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - "Qué me toca": pendientes, filtro por responsable (una persona ve también los de Administración), "Dormidos" (sin novedades en N días). "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena solo los datos del centro (casillas con nombre legible y miniatura).
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
-- Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF (banda libre para sello y firma); repartir un PDF
-  entre terceros, un archivado por persona.
+- PDF: Separar, Unir, Sacar páginas, Ajustar tamaño (sello y firma) y repartir entre terceros.
 - "Lo pide": quién pidió la gestión, por qué vía y cuándo; su correo sale en el cuadro de Correo.
 - Archivar o reabrir sobre un destino que ya existe fusiona carpetas; reintenta.
 - Crear, reabrir o editar deja en la ficha; Volver regresa a donde estaba. Ficha: foto del tercero, cabecera fija.

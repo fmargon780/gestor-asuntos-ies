@@ -5,6 +5,19 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 168: las opciones de cada documento, en su fila
+
+`docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md`. En la ficha del asunto, fuera «Documentos ▾»: en su sitio,
+«+ Añadir documento», que abre el mismo cuadro yendo directo al selector de fichero. Cada fila
+lleva ⧉ detrás del nombre (copia sin extensión), «Registrar» si falta, «Poner nombre» siempre y
+«Asociar a un hito»; el ⋮ queda con «Pasar a versiones previas» y «Borrar». Separar, Unir, Sacar
+páginas, Ajustar tamaño y Repartir pasan a una barra encima del PDF en el visor, usando el hueco
+`opts.acciones` que el visor ya tenía para «Por clasificar» (nada nuevo en `js/visor.js`). La
+barra solo sale al abrir un PDF desde la ficha; la mesa del hito sigue con su propio menú. ⧉ lo
+pone ahora `js/ficha-documentos.js` con `Copiar.boton`, y marca la fila para que la envoltura de
+`js/copiar.js` no añada otro «Copiar». Seis pruebas que pulsaban «Documentos ▾» o el menú pasan a
+los botones nuevos; prueba nueva `pruebas/documentos-en-un-solo-sitio.mjs`.
+
 ## 25-sep-2026 — Fila 167: las Administraciones, un tipo de tercero propio
 
 `docs/ADMINISTRACIONES-COMO-TERCERO.md`. Categoría `ADMINISTRACIONES`: organismos (agrupados por

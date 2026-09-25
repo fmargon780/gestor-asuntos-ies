@@ -239,20 +239,24 @@ await pagina.keyboard.press('Escape');
 await pagina.waitForSelector('#capa', { state: 'hidden' });
 
 /* ============================================================
-   9. "DOCUMENTOS ▾", EN EL BLOQUE, TAMBIÉN VACÍO
+   9. «+ AÑADIR DOCUMENTO», EN EL BLOQUE, TAMBIÉN VACÍO (fila 168: antes
+   «Documentos ▾», que ya no está en la ficha)
    ============================================================ */
-console.log('--- 9. "Documentos ▾" en el bloque de documentos ---');
+console.log('--- 9. «+ Añadir documento» en el bloque de documentos ---');
 await comprobarQue('9. el bloque de Documentos está vacío (RICO no tiene ficheros)',
   pagina.evaluate(() => {
     const doc = document.getElementById('ficha-documentos');
     return !!(doc && doc.closest('.ficha-bloque') && doc.closest('.ficha-bloque').classList.contains('vacio'));
   }));
-await pagina.click('.ficha-documentos-gestionar');
+await comprobar('9. ya no hay «Documentos ▾» en la ficha',
+  pagina.locator('#pantalla-asunto').getByRole('button', { name: 'Documentos ▾' }).count(), 0);
+await pagina.click('.ficha-documentos-anadir');
 await pagina.waitForSelector('#capa:not(.oculto)');
-await comprobar('9. abre exactamente lo mismo que abría "Gestionar documentos"',
+await comprobar('9. abre el cuadro de siempre, con el nombre del asunto',
   pagina.locator('#cuadro-titulo').textContent(), RICO);
-await comprobarQue('9. trae el hueco de siempre de la lista de documentos',
-  pagina.locator('#doc-cuerpo').count().then((n) => n === 1));
+await pagina.waitForSelector('#doc-vista');
+await comprobarQue('9. y va directo a añadir: el formulario del documento elegido',
+  pagina.locator('#doc-guardar').count().then((n) => n === 1));
 await pagina.keyboard.press('Escape');
 await pagina.waitForSelector('#capa', { state: 'hidden' });
 

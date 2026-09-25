@@ -176,15 +176,15 @@ await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
 await comprobar('7. comunicar no saca de la ficha', pantallas(), { asunto: true, abiertos: false });
 
-console.log('--- 8. "Documentos ▾": abrir y cerrar el cuadro de la carpeta ---');
+console.log('--- 8. «+ Añadir documento»: abrir y cerrar el cuadro de la carpeta ---');
 await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
-await pagina.click('.ficha-documentos-gestionar');
+await pagina.click('.ficha-documentos-anadir');
 await pagina.waitForSelector('#doc-cuerpo');
 await comprobar('el cuadro de documentos se llama como el asunto',
   pagina.locator('#cuadro-titulo').textContent(), NOMBRE_ASUNTO);
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
-await comprobar('8. "Documentos ▾" no saca de la ficha', pantallas(), { asunto: true, abiertos: false });
+await comprobar('8. «+ Añadir documento» no saca de la ficha', pantallas(), { asunto: true, abiertos: false });
 
 console.log('--- 9. Volver SÍ devuelve a la lista ---');
 await pagina.click('#ficha-volver');

@@ -76,17 +76,24 @@ var FichaDocumentos = (function () {
     b.innerHTML = (ext ? '<span class="marca-ext">' + U.escapar(ext.toUpperCase()) + '</span>' : '') +
                   '<span>' + U.escapar(f.nombre) + '</span>' +
                   (hitoDelDoc ? '<div class="ficha-documento-hito">' + U.escapar(hitoDelDoc.titulo) + '</div>' : '');
-    b.onclick = function () { abrirDocumento(f); };
+    b.onclick = function () { abrirDocumento(f, a); };
 
     var fila = document.createElement('div');
     fila.className = 'ficha-documento-fila';
     fila.appendChild(b);
 
-    /* A la vista solo el nombre y "Registrar" (cuando sale): el resto
-       (Copiar —lo añade js/copiar.js, aparte—, Separar, Unir, Sacar
-       páginas y Borrar) va detrás del menú de tres puntos, para que el
-       nombre nunca se estruje (17-sep-2026, fila 36,
-       docs/FILAS-QUE-NO-SE-ESTRUJAN.md). */
+    /* Fila 168 (docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md): ⧉, justo detrás
+       del nombre, copia el nombre sin la extensión. Lo pone este fichero
+       (con el botón de js/copiar.js), y la marca `data-con-copiar` hace
+       que js/copiar.js ya no meta su «Copiar» en el menú. */
+    b.setAttribute('data-con-copiar', '1');
+    fila.appendChild(botonCopiarNombre(f.nombre));
+
+    /* El nombre nunca se estruja (17-sep-2026, fila 36,
+       docs/FILAS-QUE-NO-SE-ESTRUJAN.md): si falta sitio, la fila se parte.
+       Detrás del menú de tres puntos, desde la fila 168, solo «Pasar a
+       versiones previas» y «Borrar»; las herramientas de PDF van en una
+       barra encima del documento, en el visor (`barraPdf`). */
     var enMenu = [];
 
     if (window.Registro && !esIndice && !Registro.tieneRegistro(f.nombre)) {
@@ -109,6 +116,21 @@ var FichaDocumentos = (function () {
         reg.disabled = false;
       };
       fila.appendChild(reg);
+    }
+
+    /* «Poner nombre», siempre visible (fila 168): el mismo formulario de
+       la ventana de documentos (js/documentos.js), ya con este documento. */
+    if (!esIndice) {
+      var nombrar = document.createElement('button');
+      nombrar.type = 'button';
+      nombrar.className = 'boton boton-chico ficha-documento-nombrar';
+      nombrar.title = 'Ponerle a este documento el nombre de la norma';
+      nombrar.textContent = 'Poner nombre';
+      nombrar.onclick = async function () {
+        await App.verDocumentos(a, { ponerNombre: f.nombre });
+        pintar(a);
+      };
+      fila.appendChild(nombrar);
     }
 
     /* "Asociar a un hito" (18-sep-2026, fila 58,
@@ -152,40 +174,6 @@ var FichaDocumentos = (function () {
           alPulsar: accionAsociar(h)
         };
       })));
-    }
-
-    /* Separar, Unir y Sacar páginas (17-sep-2026, fila 22,
-       docs/SEPARAR-Y-UNIR-PDF.md): solo para PDF. */
-    if (window.PdfSepararUnir && window.PdfHerramientas && PdfHerramientas.esPdf(f.nombre, '')) {
-      function botonPdf(texto, ayuda, accion) {
-        var boton = document.createElement('button');
-        boton.type = 'button';
-        boton.className = 'boton';
-        boton.title = ayuda;
-        boton.textContent = texto;
-        boton.onclick = function () {
-          accion({
-            modo: 'asunto', dir: a.handle, nombre: f.nombre, handle: f.handle, asunto: a,
-            alTerminar: function () { pintar(a); }
-          });
-        };
-        return boton;
-      }
-      enMenu.push(botonPdf('Separar', 'Partirlo en varios documentos', PdfSepararUnir.separar));
-      enMenu.push(botonPdf('Unir', 'Juntarlo con otro PDF del asunto', PdfSepararUnir.unir));
-      enMenu.push(botonPdf('Sacar páginas', 'Sacar una copia con solo algunas páginas', PdfSepararUnir.sacarPaginas));
-      /* Fila 57, 18-sep-2026, docs/HUECO-PARA-SELLO-Y-FIRMA.md. Texto del
-         botón "Ajustar tamaño" desde la fila 58 (docs/AJUSTES-DE-USO-2026-
-         09-18.md, 2); el fichero y la función se quedan igual. */
-      if (window.PrepararDocumento) {
-        enMenu.push(botonPdf('Ajustar tamaño',
-          'Deja hueco arriba para el sello de Séneca y abajo para la firma', PrepararDocumento.abrir));
-      }
-      /* Fila 141: repartir un PDF entre terceros, solo en un asunto abierto. */
-      if (window.Repartir && Repartir.puede(a)) {
-        enMenu.push(botonPdf('Repartir entre terceros',
-          'Partirlo en trozos, uno por persona, y dejar cada trozo en su propio asunto archivado', Repartir.abrir));
-      }
     }
 
     /* Fila 160: «Pasar a versiones previas», para corregir a mano. */
@@ -257,24 +245,77 @@ var FichaDocumentos = (function () {
     }
   }
 
-  /* "Documentos ▾", en la cabecera del bloque (18-sep-2026, fila 52,
-     docs/CABECERA-DEL-ASUNTO.md, 11): lo que antes era "Gestionar
-     documentos" en la barra de la ficha, exactamente igual, solo que
-     al lado del título de este bloque, también con la carpeta vacía.
-     Se pinta una sola vez por bloque: `pintar()` se llama en cada
-     repintado de la lista de documentos, pero el título del bloque
-     (`<h3>`) no se rehace, así que basta con no duplicar el botón. */
-  function ponerBotonGestionar(bloqueEl, a) {
+  /* ⧉: el botón de copiar de js/copiar.js (con su «Copiado»), y si no
+     está cargado, uno igual de sencillo. */
+  function botonCopiarNombre(nombre) {
+    var limpio = String(nombre || '').replace(/\.[A-Za-z0-9]{1,8}$/, '').trim();
+    var ayuda = 'Copiar el nombre, sin la extensión';
+    var c;
+    if (window.Copiar && Copiar.boton) {
+      c = Copiar.boton({ etiqueta: '⧉', texto: limpio, ayuda: ayuda, clase: 'boton-chico ficha-documento-copiar' });
+    } else {
+      c = document.createElement('button');
+      c.type = 'button';
+      c.className = 'boton boton-chico ficha-documento-copiar';
+      c.textContent = '⧉';
+      c.title = ayuda;
+      c.onclick = function (ev) { ev.stopPropagation(); U.copiar(limpio, c); };
+    }
+    c.setAttribute('aria-label', ayuda);
+    return c;
+  }
+
+  /* «+ Añadir documento», al lado del título del bloque (fila 168; antes
+     aquí estaba «Documentos ▾», que abría la ventana entera): va directo
+     al selector de fichero y al mismo cuadro de siempre. Se pinta una
+     sola vez por bloque: el `<h3>` no se rehace en cada repintado. */
+  function ponerBotonAnadir(bloqueEl, a) {
     if (!bloqueEl) return;
     var titulo = bloqueEl.querySelector('.ficha-titulo');
-    if (!titulo || titulo.querySelector('.ficha-documentos-gestionar')) return;
+    if (!titulo || titulo.querySelector('.ficha-documentos-anadir')) return;
     var b = document.createElement('button');
     b.type = 'button';
-    b.className = 'boton ficha-documentos-gestionar';
-    b.textContent = 'Documentos ▾';
-    b.title = 'Nombrar y archivar los documentos de la carpeta';
-    b.onclick = async function () { await App.verDocumentos(a); pintar(a); };
+    b.className = 'boton boton-principal ficha-documentos-anadir';
+    b.textContent = '+ Añadir documento';
+    b.title = 'Traer un documento del ordenador a la carpeta, ya con su nombre';
+    b.onclick = async function () { await App.verDocumentos(a, { irDirectoAAnadir: true }); pintar(a); };
     titulo.appendChild(b);
+  }
+
+  /* La barra de herramientas de un PDF del asunto, encima del documento
+     en el visor (fila 168; antes, en el menú ⋮ de la fila): Separar,
+     Unir y Sacar páginas (fila 22), Ajustar tamaño (fila 57) y Repartir
+     entre terceros (fila 141, solo si `Repartir.puede(a)`). Al terminar,
+     se repinta la lista de la ficha. Sin PDF, nada. */
+  function barraPdf(f, a) {
+    if (!window.PdfSepararUnir || !window.PdfHerramientas || !PdfHerramientas.esPdf(f.nombre, '')) return null;
+    var barra = document.createElement('div');
+    barra.className = 'ficha-visor-pdf';
+    function botonPdf(texto, ayuda, accion) {
+      var boton = document.createElement('button');
+      boton.type = 'button';
+      boton.className = 'boton';
+      boton.title = ayuda;
+      boton.textContent = texto;
+      boton.onclick = function () {
+        accion({
+          modo: 'asunto', dir: a.handle, nombre: f.nombre, handle: f.handle, asunto: a,
+          alTerminar: function () { pintar(a); }
+        });
+      };
+      barra.appendChild(boton);
+    }
+    botonPdf('Separar', 'Partirlo en varios documentos', PdfSepararUnir.separar);
+    botonPdf('Unir', 'Juntarlo con otro PDF del asunto', PdfSepararUnir.unir);
+    botonPdf('Sacar páginas', 'Sacar una copia con solo algunas páginas', PdfSepararUnir.sacarPaginas);
+    if (window.PrepararDocumento) {
+      botonPdf('Ajustar tamaño', 'Deja hueco arriba para el sello de Séneca y abajo para la firma', PrepararDocumento.abrir);
+    }
+    if (window.Repartir && Repartir.puede(a)) {
+      botonPdf('Repartir entre terceros',
+        'Partirlo en trozos, uno por persona, y dejar cada trozo en su propio asunto archivado', Repartir.abrir);
+    }
+    return barra;
   }
 
   async function pintar(a) {
@@ -290,7 +331,7 @@ var FichaDocumentos = (function () {
          (18-sep-2026, fila 51, docs/FICHA-DISPOSICION.md, 8). */
       var bloqueEl = caja.closest('.ficha-bloque');
       if (bloqueEl) bloqueEl.classList.toggle('vacio', !lista.length);
-      ponerBotonGestionar(bloqueEl, a);
+      ponerBotonAnadir(bloqueEl, a);
       if (!lista.length) {
         caja.className = 'explica';
         caja.textContent = 'La carpeta todavía está vacía.';
@@ -353,8 +394,11 @@ var FichaDocumentos = (function () {
 
   /* Se abre en la columna de la derecha, al lado del programa, para
      poder trabajar con el papel delante. */
-  async function abrirDocumento(f) {
-    if (window.Visor) return window.Visor.abrir(f.handle, f.nombre);
+  async function abrirDocumento(f, a) {
+    if (window.Visor) {
+      var barra = a ? barraPdf(f, a) : null;
+      return window.Visor.abrir(f.handle, f.nombre, a ? { asunto: a, carpeta: a.handle, acciones: barra } : undefined);
+    }
     try {
       var fichero = await f.handle.getFile();
       var url = URL.createObjectURL(fichero);

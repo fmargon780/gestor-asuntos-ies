@@ -367,7 +367,7 @@ para el texto plano que ya usaban el resto de pruebas.
 
 ### Repartir un PDF entre terceros (25-sep-2026, fila 141, `docs/REPARTIR-ENTRE-TERCEROS.md`)
 
-En el menú de cada PDF de la ficha de un asunto ABIERTO (`js/ficha-documentos.js`), «Repartir entre
+En la barra del visor de cada PDF de la ficha de un asunto ABIERTO (`js/ficha-documentos.js`, fila 168; antes en el menú ⋮), «Repartir entre
 terceros»: parte un PDF que junta papeles de varias personas (los cuestionarios de altas capacidades
 de un colegio, informes de tránsito…) y deja cada trozo en su propio asunto, ya archivado.
 

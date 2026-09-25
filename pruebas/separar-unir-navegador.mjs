@@ -57,6 +57,18 @@ async function pulsarDelMenu(locatorFila, texto) {
   await locatorFila.locator('.fila-menu').getByRole('button', { name: texto, exact: true }).click();
 }
 
+/* Desde la fila 168 (docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md), en la ficha
+   del asunto van en una barra encima del documento, en el visor: se abre
+   el documento pulsando su nombre y se pulsa en la barra. */
+async function pulsarDelVisor(nombre, texto) {
+  await pagina.locator('#ficha-documentos .ficha-documento', { hasText: nombre }).click();
+  await pagina.waitForFunction((n) => {
+    const r = document.getElementById('visor-nombre');
+    return r && r.title === n && document.querySelector('#visor-acciones:not(.oculto) .ficha-visor-pdf');
+  }, nombre);
+  await pagina.locator('#visor-acciones').getByRole('button', { name: texto, exact: true }).click();
+}
+
 /* Un PDF de `n` páginas, montado en el propio navegador con la
    pdf-lib ya vendida en el repositorio. Devuelve un array normal de
    números (se serializa bien entre Node y la página). */
@@ -132,13 +144,19 @@ console.log('--- los tres botones salen para un PDF ---');
 function filaDe(nombre) {
   return pagina.locator('.ficha-documento-fila').filter({ hasText: nombre });
 }
-await comprobar('Separar, Unir y Sacar páginas salen en la fila del documento',
+await comprobar('Separar, Unir y Sacar páginas ya no salen en la fila del documento (fila 168)',
   filaDe(ESCANEO).locator('button').allTextContents().then(ts => ts.filter(t =>
+    ['Separar', 'Unir', 'Sacar páginas'].includes(t.trim()))),
+  []);
+await pagina.locator('#ficha-documentos .ficha-documento', { hasText: ESCANEO }).click();
+await pagina.waitForSelector('#visor-acciones:not(.oculto) .ficha-visor-pdf');
+await comprobar('salen en la barra de encima del documento, en el visor',
+  pagina.locator('#visor-acciones .ficha-visor-pdf button').allTextContents().then(ts => ts.filter(t =>
     ['Separar', 'Unir', 'Sacar páginas'].includes(t.trim()))),
   ['Separar', 'Unir', 'Sacar páginas']);
 
 console.log('--- Separar: dos cortes dan tres trozos, con nombre y a la papelera ---');
-await pulsarDelMenu(filaDe(ESCANEO), 'Separar');
+await pulsarDelVisor(ESCANEO, 'Separar');
 await pagina.waitForSelector('.pdf-rejilla .pdf-pagina');
 await comprobar('salen las 6 miniaturas', pagina.locator('.pdf-rejilla .pdf-pagina').count(), 6);
 await comprobar('sin cortes, el resumen pide marcar una tijera',
@@ -195,7 +213,7 @@ await pagina.click('#lista-abiertos .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila');
 
-await pulsarDelMenu(filaDe(TROZO_2), 'Sacar páginas');
+await pulsarDelVisor(TROZO_2, 'Sacar páginas');
 await pagina.waitForSelector('.pdf-rejilla .pdf-pagina');
 await pagina.check('.pdf-rejilla .pdf-pagina:nth-child(1) input[type="checkbox"]');
 await pagina.click('#cuadro-aceptar');   /* "Sacar páginas" */

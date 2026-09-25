@@ -58,9 +58,10 @@ devuelve un envoltorio con un botón "⋮" que los despliega debajo, anclado a �
 elegir uno, al pulsar fuera o con Escape); los botones viven siempre en el DOM, ocultos con la
 clase `oculto`, así que `aplicarModoConsulta` (que recorre `#ficha-asunto-cuerpo` entero) los
 apaga igual que a los demás sin necesitar ningún caso especial. En `js/ficha-documentos.js`
-(`filaDeDocumento`) solo quedan a la vista el nombre y "Registrar" (cuando sale); Copiar (que lo
-sigue añadiendo `js/copiar.js`, por envoltura, buscando el `.fila-menu` ya montado), Separar,
-Unir, Sacar páginas y Borrar van al menú. En `js/documentos-sueltos.js` (`App.tarjetaSuelto`, las
+(`filaDeDocumento`), desde la fila 168, a la vista el nombre, ⧉, «Registrar» (cuando sale), «Poner
+nombre» y «Asociar a un hito»; al menú, solo «Pasar a versiones previas» y «Borrar». Separar, Unir,
+Sacar páginas, Ajustar tamaño y Repartir van en una barra encima del documento, en el visor
+(`barraPdf`, pasada como `opts.acciones` de `Visor.abrir`), solo al abrir un PDF desde la ficha. En `js/documentos-sueltos.js` (`App.tarjetaSuelto`, las
 tarjetas de "Por clasificar") quedan a la vista "Crear asunto con él" y "Meter en un asunto";
 Abrir, Separar, Unir, Sacar páginas y Borrar (que lo sigue añadiendo `js/papelera.js`, por
 envoltura) van al menú — `App.accionesDeSuelto` (fila 25, reutilizado dentro del visor) busca

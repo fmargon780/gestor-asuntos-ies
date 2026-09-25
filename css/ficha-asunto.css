@@ -162,7 +162,9 @@
 /* "Documentos ▾", en la cabecera del bloque (18-sep-2026, fila 52,
    docs/CABECERA-DEL-ASUNTO.md, 11): antes "Gestionar documentos" en la
    barra de la ficha. */
-.ficha-documentos-gestionar { margin-left: 8px; padding: 3px 10px; font-size: 12px; }
+.ficha-documentos-anadir { margin-left: 8px; padding: 3px 10px; font-size: 12px; }
+/* Fila 168: ⧉ detrás del nombre de cada documento, pequeño. */
+.ficha-documento-fila > .ficha-documento-copiar { padding: 3px 7px; line-height: 1; }
 
 /* Un bloque vacío no gasta una tarjeta entera (18-sep-2026, fila 51,
    docs/FICHA-DISPOSICION.md, 8): título y aviso en una sola línea, con

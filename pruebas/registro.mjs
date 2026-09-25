@@ -180,10 +180,9 @@ await comprobar('el original, sin registro en su nombre, lo sigue pudiendo lleva
 console.log('--- un documento con la casilla "Pendiente de registro" ---');
 /* "Gestionar documentos" pasó a llamarse "Documentos ▾" y vive en la
    cabecera del propio bloque (18-sep-2026, fila 52,
-   docs/CABECERA-DEL-ASUNTO.md, 11). */
-await pagina.click('.ficha-documentos-gestionar');
-await pagina.waitForSelector('#doc-anadir');
-await pagina.click('#doc-anadir');
+   docs/CABECERA-DEL-ASUNTO.md, 11); desde la fila 168, «+ Añadir
+   documento», que va directo al formulario. */
+await pagina.click('.ficha-documentos-anadir');
 await pagina.waitForSelector('#doc-vista');
 await pagina.fill('#doc-fecha', '2026-09-11');
 await pagina.selectOption('#doc-tipo', 'SOLICITUD');

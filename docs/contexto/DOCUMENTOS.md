@@ -183,7 +183,7 @@ abre, sin pasar por ningún botón:
   lleva `onclick` a `App.abrirSuelto(s)` (que `js/visor.js` convierte en `Visor.abrir` con su
   marcador, como ya hacía el botón "Abrir" del menú). `.tarjeta-suelto` lleva `cursor: pointer` y
   el mismo realce que ya usa `.ficha-documento` al pasar por encima.
-- **El cuadro "Documentos ▾"** (`js/documentos.js`, `pintarLista`): este cuadro no tiene panel de
+- **El cuadro de los documentos de la carpeta** (`js/documentos.js`, `pintarLista`; el «Documentos» de la tarjeta): este cuadro no tiene panel de
   la derecha (es un cuadro modal con su propio visor a la izquierda), así que pulsar la fila
   abre el mismo formulario que "Poner nombre" (`pintarFormulario({modo:'renombrar', ...})`), que
   ya enseña el documento mientras se rellenan los campos.
