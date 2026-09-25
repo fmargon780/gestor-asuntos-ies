@@ -119,8 +119,9 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
 abierto en ellas:
 
-- Fila 76: comprobar, ya publicado, que la hora de abajo a la izquierda es la de la publicación.
-  Si no, quitar el `buildCommand` de `vercel.json` y pasar la fila a BLOQUEADA (una vez).
+- Fila 76: **comprobado publicando de verdad, 25-sep-2026.** `App.VERSION` en la web sigue la hora
+  real de cada publicación (`Europe/Madrid`), generada sola por el `buildCommand`, sin ningún
+  commit nuevo al repositorio. Cerrado, nada pendiente.
 - Fila 132: comprobar con `curl -I` que salen las cabeceras de seguridad nuevas.
 - Fila 63: comprobar que `docs/COLA.md` da error en la web publicada.
 - Numeración: `docs/PLANTILLAS-Y-FORMULARIOS-DESDE-EL-HITO.md` se presenta como «fila 146» y
