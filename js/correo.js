@@ -93,6 +93,11 @@
      3): `extra.adjuntosMarcados`, una lista de nombres. Solo tiene
      efecto en Correo (en Séneca no hay adjuntos). */
   var adjuntosMarcadosActual = [];
+  /* Fila 153 (docs/ENVIAR-DOCUMENTO-POR-SENECA.md): el nombre del
+     documento a señalar en el cuadro de Séneca cuando el «Enviar ▾»
+     de un documento del hito elige "Por Séneca" (no hay adjuntos de
+     verdad allí: se marca el nombre para copiarlo y pegarlo a mano). */
+  var documentoSenecaActual = '';
 
   function $(id) { return document.getElementById(id); }
 
@@ -218,6 +223,7 @@
     correoPreferenteActual = (extra && extra.correoPreferente) || '';
     I.comunicarHitoActual = (extra && extra.comunicarHito) || null;
     adjuntosMarcadosActual = (extra && extra.adjuntosMarcados) || [];
+    documentoSenecaActual = (extra && extra.documentoSeneca) || '';
     if (window.SenecaDestinatarios) SenecaDestinatarios.limpiar();
     I.yaApuntado = false;
     I.algoCambiado = false;
@@ -330,6 +336,11 @@
        60), si la hay: js/correo-cuadro.js la usa igual que ya usaba la
        de "Lo pide" (LoPide.correoDe). */
     destinatarioPreferente: function () { return correoPreferenteActual; },
+    /* Fila 153: el documento a señalar en el cuadro de Séneca, si el
+       cuadro se abrió con «Enviar ▾» → «Por Séneca» de un documento del
+       hito. js/seneca-cuadro.js lo usa para la línea "Adjunta este
+       documento en Séneca: …" con su botón "Copiar el nombre". */
+    documentoSeneca: function () { return documentoSenecaActual; },
     /* Fila 115: js/correo-cuadro.js avisa aquí en cuanto el correo ha
        salido de verdad, para que textoDeLaNota diga "enviado" y el
        recordatorio del PDF del hilo no salga de más. */
