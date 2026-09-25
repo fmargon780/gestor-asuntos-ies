@@ -5,6 +5,29 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 155: el Word, dentro de la aplicación
+
+`docs/WORD-DENTRO-DE-LA-APP.md`. El aviso de datos que faltan llegaba con el Word ya guardado, y el
+Word se abría con `window.open` de un `blob:`: el Chromebook lo bajaba a Descargas con un nombre de
+letras. Ahora lo que falta se pregunta antes de guardar nada, y el Word se ve dentro, con «Guardar
+PDF» en la carpeta del asunto e «Imprimir». Decisiones:
+
+- **Librerías** (en `js/lib/`, sin CDN, cargadas al abrir el primer Word): docx-preview 0.4.1
+  (Apache-2.0), JSZip 3.10.1 (MIT o GPL-3.0, se usa con la MIT) y html2canvas 1.4.1 (MIT); el PDF, con
+  la pdf-lib que ya estaba.
+- **Editar no**: SuperDoc, el candidato que el encargo pedía mirar, es AGPL-3.0 (o licencia de pago).
+  Con la aplicación publicada en internet, la AGPL obliga a ofrecer el código a quien la use: no es
+  una decisión para tomar sola. docx-preview solo enseña. «Guardar cambios» queda en la fila 165,
+  BLOQUEADA, para hablarlo con Francisco. Ver, PDF e imprimir, que es lo de casi siempre, sí.
+- **PDF como imagen** (200 ppp, JPEG): lo que el encargo aceptaba si no había texto seleccionable.
+- Las plantillas del centro no traen tamaño de página ni márgenes: sin ellos, docx-preview pegaba el
+  texto al borde. El visor pone A4 con los márgenes de Word en España (2,5 y 3 cm).
+- Lo escrito en «Faltan datos» entra por `valores.aMano`, mirado primero en `resolverUnHueco`: los
+  huecos del catálogo salen en `faltan` con su nombre legible («Grupo»), no con la clave, y así se
+  casa por los dos (lo cazó la prueba con la plantilla real).
+- `js/plantillas-documento.js` no se partió: con la parte A en `js/word-faltan.js` se queda en 382
+  líneas.
+
 ## 25-sep-2026 — Fila 162: el estado sigue a los hitos
 
 `docs/ESTADO-SIGUE-A-LOS-HITOS.md`. Con el 3 de Secretaría sin marcar y el 4 en curso y nuestro, la

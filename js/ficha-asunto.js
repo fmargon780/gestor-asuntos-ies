@@ -134,6 +134,8 @@
     return !!pantalla && !pantalla.classList.contains('oculto');
   }
   App.fichaAbierta = function () { return fichaVisible() ? N.actual.nombre : ''; };
+  /* Fila 155: el asunto de la ficha a la vista (para guardar el PDF de un Word en su carpeta). */
+  App.asuntoDeLaFicha = function () { return fichaVisible() ? N.actual : null; };
 
 
   /* ==========================================================

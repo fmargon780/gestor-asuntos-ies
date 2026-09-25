@@ -77,7 +77,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   hermanos en la ficha. La BD de alumnado (carpeta de Drive) suma sus datos: ficha, huecos, grupos.
 - Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
   Renombrar un tipo se lleva su guía; cambiarle el tipo, la ofrece.
-- Nombre comercial de empresas; editar datos de un tercero dado de alta a mano.
+- Nombre comercial de empresas; editar un tercero dado de alta a mano.
 - Guías del procedimiento por tipo, con preguntas dentro de las respuestas sin límite, y su mapa
   (dibujo de la guía entera; en un asunto, con el camino elegido resaltado). Se escriben en
   acordeón: un paso abierto a la vez.
@@ -87,7 +87,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; con
   tercero reconocido, también sugiere meterlo en uno que ya existe («Meter aquí»). Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
-- Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. Carpeta ≤150 caracteres, documento ≤120.
+- Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. Carpeta ≤150, documento ≤120.
 - Botón «Ruta» (`file:///`; ficha, Correo/Séneca): deduce Dropbox; lo de dentro, una vez para el centro. Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
@@ -99,6 +99,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
 - Papelera: nada se borra de golpe. Plazo de conservación por tipo: avisa, nunca borra solo.
+- Word: lo que falta se pregunta antes; se ve en la app, con «Guardar PDF» e «Imprimir» (sin editar aún).
 - Plantillas de correo y de Word por tipo, con huecos que se rellenan solos; se crean o editan también
   desde el propio cuadro de Correo/Séneca («Crear»/«Editar plantilla»); textos del centro en `plantillas/`
   (botón en Mantenimiento). Membrete de la Junta (lo dibuja la app; logo opcional), firma de quien ocupaba
@@ -123,11 +124,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF (banda libre para sello y firma); repartir un PDF
   entre terceros, un archivado por persona.
 - "Lo pide": quién pidió la gestión, por qué vía y cuándo; su correo sale en el cuadro de Correo.
-- Archivar o reabrir sobre un destino que ya existe fusiona carpetas; reintenta si Dropbox tropieza.
-- Crear, reabrir o editar deja en la ficha; Volver regresa a la pantalla de origen, a su altura.
+- Archivar o reabrir sobre un destino que ya existe fusiona carpetas; reintenta.
+- Crear, reabrir o editar deja en la ficha; Volver regresa a donde estaba. Ficha: foto del tercero, cabecera fija.
 - Al archivar, la ficha baja a su carpeta (al reabrir, vuelve) y se hace el índice del expediente
   (PDF numerado; también desde el menú de la ficha).
-- Ficha del asunto: foto del tercero; cabecera fija al bajar.
 
 ## 6. Reglas de código que no se pueden olvidar
 

@@ -219,7 +219,7 @@ var HitoMesaDocumentos = (function () {
   async function abrirEnVisor(a, nombre) {
     try {
       var handle = await a.handle.getFileHandle(nombre);
-      if (window.Visor) Visor.abrir(handle, nombre);
+      if (window.Visor) Visor.abrir(handle, nombre, { asunto: a, carpeta: a.handle });
     } catch (e) { U.aviso('No he podido abrirlo: ' + U.mensajeDeError(e), 'malo'); }
   }
 
