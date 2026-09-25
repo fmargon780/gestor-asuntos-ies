@@ -119,6 +119,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 | 151 | `docs/PLANTILLA-DESDE-EL-CUADRO.md` (crear o editar la plantilla desde el propio cuadro de Séneca y de Correo; al guardar, el mensaje se rellena con ella) | PENDIENTE |
 | 152 | `docs/RUTA-QUE-NO-VA-A-BING.md` (el botón «Ruta» copia en formato `file:///` para que el navegador no busque en Bing, pide la ruta si falta, y sale también en los cuadros de Correo y de Séneca) | PENDIENTE |
 | 153 | `docs/ENVIAR-DOCUMENTO-POR-SENECA.md` (el «Enviar» de cada documento del hito pasa a «Enviar ▾»: por correo o por Séneca, con ese documento ya elegido; después de la 150) | PENDIENTE |
+| 154 | `docs/HITOS-ACCIONES-EN-EL-HITO.md` (hitos más sencillos: las acciones solo en el hito; los pasos, lista para marcar con «receta» opcional que rellena el cuadro; todos los documentos del asunto a la vista en cada hito; y que «Paso N de M», «Hitos N/M» y la barra digan lo mismo; después de la 150 y la 153) | PENDIENTE |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
@@ -199,8 +200,9 @@ abierto en ellas:
 - **Del 23-sep-2026: revisión de usabilidad.** Francisco ve pantallas con demasiadas cosas. Ajustes
   va en la fila 105 y la ficha del asunto en la 107. Queda por hablar Asuntos abiertos (qué plegar),
   con la misma regla: plegado, resumen en el título, y se recuerda lo abierto.
-- **Del 25-sep-2026: el trabajo con hitos y pasos, más intuitivo y fluido.** Francisco lo pide
-  tras la fila 150. Hablarlo con él una cosa cada vez, cuando esa fila esté publicada.
+- **Del 25-sep-2026: hitos y pasos más fluidos.** Cerrado con Francisco: es la fila 154. Cuando
+  esté publicada, ver con él si con eso basta o queda algo (por ejemplo, las palabras «hito»,
+  «paso» y «guion»).
 
 ## Descartado, no proponer otra vez (del informe del 18-sep-2026)
 
