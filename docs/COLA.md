@@ -123,10 +123,10 @@ abierto en ellas:
 - Fila 76: **comprobado publicando de verdad, 25-sep-2026.** `App.VERSION` en la web sigue la hora
   real de cada publicación (`Europe/Madrid`), generada sola por el `buildCommand`, sin ningún
   commit nuevo al repositorio. Cerrado, nada pendiente.
-- Filas 147 y 148 (25-sep-2026): fusionadas en `main` (`4fa0e65`, pruebas de GitHub en verde), pero
-  la sesión no pudo comprobar lo publicado: su red bloquea `vercel.app` y el conector de Vercel da
-  403. Comprobar con `curl` que `js/hito-mesa-tarjetas.js` se sirve y que `App.VERSION` es de
-  después de las 04:32 del 25-sep-2026.
+- Filas 147, 148 y 149 (25-sep-2026): fusionadas en `main` (`4fa0e65` y `d998333`, pruebas de
+  GitHub en verde), pero la sesión no pudo comprobar lo publicado: su red bloquea `vercel.app` y el
+  conector de Vercel da 403. Comprobar con `curl` que se sirven `js/hito-mesa-tarjetas.js` y
+  `fonts/NotoSansHK-latin-400.woff2`, y que `App.VERSION` es de después de las 07:18 del 25-sep-2026.
 - Fila 132: comprobar con `curl -I` que salen las cabeceras de seguridad nuevas.
 - Fila 63: comprobar que `docs/COLA.md` da error en la web publicada.
 - Numeración: `docs/PLANTILLAS-Y-FORMULARIOS-DESDE-EL-HITO.md` se presenta como «fila 146» y
