@@ -5,6 +5,27 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 146: las casillas de un impreso, con nombres que se entienden
+
+`docs/IMPRESOS-CASILLAS-LEGIBLES.md`. En Ajustes › «Impresos oficiales» salían decenas de filas con el
+nombre interno de cada casilla (`form1[0].#pageSet[0].Página_2[0]…apellido1encab[0]`). Ahora cada una
+tiene un nombre legible, las repetidas van juntas, hay una miniatura de dónde está y solo las del
+centro están a la vista. Decisiones:
+
+- Al mirar los impresos de verdad (`formularios/`), la propuesta automática de la fila 84 (que miraba
+  el nombre entero) proponía el centro para «Rellenable», «Botones», «Field»… porque un bloque de más
+  arriba se llamaba «CENTROS», y la fecha de hoy para «Lugar», «Día», «Fdo». Como esta fila hace que la
+  propuesta se guarde sola, se cambió a mirar solo el nombre propio de la casilla, y a no proponer las
+  numeradas del 2 en adelante (los otros centros que pide la familia). En el Anexo III quedan cinco.
+- De persona: por palabras en el nombre o en el bloque que la contiene; «centro actual» es de la
+  persona (el suyo), no el nuestro.
+- La parte XFA: pdf-lib ya la quita él solo al leer un formulario (lo avisa por consola); se añadió
+  el borrado explícito y una prueba. Los impresos siguen con todas sus casillas.
+- «Sin casillas del centro» se recuerda solo en la sesión: `formularios-campos.json` no cambia de
+  forma.
+- La pantalla pasó a `js/formularios-ajustes.js` y lo que no toca el disco a
+  `js/formularios-casillas.js`.
+
 ## 25-sep-2026 — Fila 145: la mesa del hito, enfocada
 
 `docs/MESA-DEL-HITO-ENFOCADA.md`, a partir de una captura de «Recoger la solicitud» y de un ejemplo en

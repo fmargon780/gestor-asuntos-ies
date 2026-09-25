@@ -15,7 +15,8 @@
         la casilla, mirando siete reglas (docs, parte 2).
      3. `rellenarPdf`, con pdf-lib: rellena solo las casillas del mapa,
         las deja en solo lectura, y no aplana el formulario.
-     4. La pantalla "Impresos oficiales" de Ajustes → El centro.
+     4. La pantalla "Impresos oficiales" de Ajustes → El centro (desde la
+        fila 146, en js/formularios-ajustes.js).
      5. El botón "Preparar para el tercero", colgado del punto que deja
         js/formularios.js (`data-clave-formulario`) en el panel de
         hitos y en la línea "Formularios" de la ficha.
@@ -54,14 +55,19 @@ var FormulariosRellenar = (function () {
     return cache;
   }
 
-  async function guardar(gestor, mutar) {
-    var leido = null;
-    try { leido = await Carpetas.leerJson(gestor, ARCHIVO); } catch (e) { leido = null; }
-    var actual = (leido && typeof leido === 'object') ? leido : {};
-    var nuevo = mutar(actual) || actual;
-    await Copias.guardar(gestor, ARCHIVO, nuevo);
-    cache = nuevo;
-    return nuevo;
+  /* Releer, cambiar y guardar, de uno en uno (fila 146: por ColaGuardado,
+     como todo _GESTOR). */
+  function guardar(gestor, mutar) {
+    var hacer = async function () {
+      var leido = null;
+      try { leido = await Carpetas.leerJson(gestor, ARCHIVO); } catch (e) { leido = null; }
+      var actual = (leido && typeof leido === 'object') ? leido : {};
+      var nuevo = mutar(actual) || actual;
+      await Copias.guardar(gestor, ARCHIVO, nuevo);
+      cache = nuevo;
+      return nuevo;
+    };
+    return window.ColaGuardado ? ColaGuardado.poner(ARCHIVO, hacer) : hacer();
   }
 
   /* ==========================================================
@@ -74,7 +80,13 @@ var FormulariosRellenar = (function () {
      centro" con el nombre del centro), y "domicilio/dirección junto a
      centro" antes que "centro" a secas. */
   function huecoPropuestoDe(nombreCasilla) {
-    var n = U.normalizar(nombreCasilla);
+    /* Fila 146: solo el nombre propio de la casilla, no el camino entero
+       (en los impresos de la Junta, un bloque «CENTROS» de más arriba
+       hacía proponer el centro para casillas como «Rellenable» o
+       «Botones»). Y nada para una numerada del 2 en adelante: «Centro 2»,
+       «Código 3»… son los otros centros que pide la familia. */
+    var n = window.FormulariosCasillas ? FormulariosCasillas.palabrasDe(nombreCasilla) : U.normalizar(nombreCasilla);
+    if (/(^|\s)([2-9]|\d{2,})$/.test(n)) return '';
     if (/codigo/.test(n)) return '{{CODIGO CENTRO}}';
     if (/(domicilio|direccion)/.test(n) && /centro/.test(n)) return '{{DIRECCION CENTRO}}';
     if (/centro|denominacion|instituto/.test(n)) return '{{CENTRO}}';
@@ -92,6 +104,9 @@ var FormulariosRellenar = (function () {
   function proponerMapa(nombresDeCasillas) {
     var mapa = {};
     (nombresDeCasillas || []).forEach(function (nombre) {
+      /* Fila 146: nada para una casilla de la persona (la fecha de
+         nacimiento no es {{HOY}}, el domicilio no es el del centro). */
+      if (window.FormulariosCasillas && FormulariosCasillas.esDePersona(nombre)) return;
       var hueco = huecoPropuestoDe(nombre);
       if (hueco) mapa[nombre] = hueco;
     });
@@ -154,6 +169,13 @@ var FormulariosRellenar = (function () {
         rellenas.push(nombre);
       } catch (e) { /* una casilla que no admite texto se deja como está */ }
     });
+
+    /* Fila 146: sin la parte XFA, todos los visores enseñan lo rellenado
+       (pdf-lib ya la quita al leer el formulario; esto lo asegura). */
+    try {
+      var xfa = PDFLib.PDFName.of('XFA');
+      if (form.acroForm.dict.has(xfa)) form.acroForm.dict.delete(xfa);
+    } catch (e) { /* sin AcroForm que tocar */ }
 
     return { bytes: await doc.save(), rellenas: rellenas, rellenable: true };
   }
@@ -282,120 +304,16 @@ var FormulariosRellenar = (function () {
     }
   })();
 
-  /* ==========================================================
-     AJUSTES → EL CENTRO → "IMPRESOS OFICIALES"
-     ========================================================== */
-
-  var casillasPorFichero = {};   /* nombreFichero -> lista de casillas, o null si no se pudo leer */
-
-  function $(id) { return document.getElementById(id); }
-
-  function opcionesHuecos(elegido) {
-    return '<option value="">(sin asignar)</option>' + HUECOS.map(function (h) {
-      return '<option value="' + U.escapar(h.clave) + '"' + (h.clave === elegido ? ' selected' : '') + '>' +
-        U.escapar(h.etiqueta) + '</option>';
-    }).join('');
-  }
-
-  async function guardarCasilla(clave, nombreCasilla, hueco) {
-    await guardar(App.E.gestor, function (actual) {
-      actual[clave] = actual[clave] || {};
-      if (hueco) actual[clave][nombreCasilla] = hueco;
-      else delete actual[clave][nombreCasilla];
-      return actual;
-    });
-  }
-
-  /* El botón "Leer las casillas del PDF" (en vez de leerlo solo al
-     desplegar la tarjeta): abrir un `<details>` no debe disparar una
-     petición de red por su cuenta —lo hacen, sin querer, varias
-     pruebas de navegador que despliegan TODOS los `<details>` de
-     Ajustes para comprobar otra cosa—, así que la lectura de verdad
-     espera a un clic. */
-  function botonLeerHTML() {
-    return '<button type="button" class="boton boton-leer-impreso">Leer las casillas del PDF</button>';
-  }
-
-  async function pintarDetalleImpreso(contenedor, clave, f) {
-    contenedor.innerHTML = '<p class="suave">Leyendo el PDF…</p>';
-    if (!(f.f in casillasPorFichero)) {
-      try {
-        var bytes = await leerPdfDelRepositorio(f.f);
-        casillasPorFichero[f.f] = await casillasDe(bytes);
-      } catch (e) {
-        casillasPorFichero[f.f] = undefined;   /* no encontrado: distinto de null (sin casillas) */
-      }
-    }
-    var casillas = casillasPorFichero[f.f];
-    if (casillas === undefined) {
-      contenedor.innerHTML = '<p class="suave">No encuentro "' + U.escapar(f.f) +
-        '" en <code>formularios/</code> todavía.</p>';
-      return;
-    }
-    if (casillas === null) {
-      contenedor.innerHTML = '<p class="suave">Este impreso no se puede rellenar: no trae casillas. Se guardará en blanco.</p>';
-      return;
-    }
-    var mapas = await cargar(App.E.gestor);
-    var guardado = mapas[clave] || {};
-    var propuesta = Object.keys(guardado).length ? guardado : proponerMapa(casillas);
-
-    contenedor.innerHTML = casillas.map(function (nombreCasilla) {
-      return '<div class="fila-tipo" data-casilla="' + U.escapar(nombreCasilla) + '">' +
-        '<span class="nombre-tipo" style="flex:1">' + U.escapar(nombreCasilla) + '</span>' +
-        '<select class="campo campo-hueco-impreso">' + opcionesHuecos(propuesta[nombreCasilla] || '') + '</select>' +
-        '</div>';
-    }).join('');
-
-    Array.prototype.forEach.call(contenedor.querySelectorAll('[data-casilla]'), function (fila) {
-      var nombreCasilla = fila.dataset.casilla;
-      var select = fila.querySelector('select');
-      select.onchange = async function () {
-        try {
-          await guardarCasilla(clave, nombreCasilla, select.value);
-          U.aviso('Guardado.', 'bueno');
-          pintarPantallaImpresos();
-        } catch (e) {
-          U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
-        }
-      };
-    });
-  }
-
-  function tarjetaImpreso(clave, f, mapaGuardado) {
-    var n = mapaGuardado ? Object.keys(mapaGuardado).length : 0;
-    var d = document.createElement('details');
-    d.className = 'bloque-ajustes';
-    var resumen = document.createElement('summary');
-    resumen.innerHTML = '<span class="bloque-titulo">' + U.escapar(f.n) + '</span>' +
-      '<span class="bloque-pie">' + (n ? n + ' casilla' + (n === 1 ? '' : 's') + ' puesta' + (n === 1 ? '' : 's') : 'Sin configurar') + '</span>';
-    d.appendChild(resumen);
-    var cuerpo = document.createElement('div');
-    cuerpo.className = 'bloque-cuerpo';
-    cuerpo.innerHTML = botonLeerHTML();
-    cuerpo.querySelector('.boton-leer-impreso').onclick = function () { pintarDetalleImpreso(cuerpo, clave, f); };
-    d.appendChild(cuerpo);
-    return d;
-  }
-
-  async function pintarPantallaImpresos() {
-    var caja = $('tabla-impresos-oficiales');
-    if (!caja) return;
-    var catalogo = await Formularios.cargar();
-    var mapas = await cargar(App.E.gestor);
-    var conPdf = Object.keys(catalogo).filter(function (c) { return catalogo[c].f; })
-      .sort(function (a, b) { return catalogo[a].n < catalogo[b].n ? -1 : 1; });
-    caja.innerHTML = '';
-    if (!conPdf.length) {
-      caja.innerHTML = '<div class="vacio">Todavía no hay ningún impreso con PDF en <code>formularios/</code>.</div>';
-      return;
-    }
-    conPdf.forEach(function (clave) { caja.appendChild(tarjetaImpreso(clave, catalogo[clave], mapas[clave])); });
+  /* La pantalla «Impresos oficiales» de Ajustes → El centro vive, desde
+     la fila 146, en js/formularios-ajustes.js. */
+  function pintarPantallaImpresos() {
+    return window.FormulariosAjustes ? FormulariosAjustes.pintar() : Promise.resolve();
   }
 
   return {
     ARCHIVO: ARCHIVO, HUECOS: HUECOS,
-    proponerMapa: proponerMapa,
+    proponerMapa: proponerMapa, huecoPropuestoDe: huecoPropuestoDe,
+    cargar: cargar, guardar: guardar, leerPdfDelRepositorio: leerPdfDelRepositorio,
     casillasDe: casillasDe,
     rellenarPdf: rellenarPdf,
     valoresDelCentro: valoresDelCentro,

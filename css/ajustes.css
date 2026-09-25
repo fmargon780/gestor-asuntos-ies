@@ -318,3 +318,12 @@ details.tipo-asunto-seccion { padding: 0; margin: 0; }
 details.tipo-asunto-seccion .bloque-pie { display: inline; margin-bottom: 0; }
 /* "Herramientas" lleva dentro otros bloques plegables. */
 #herramientas-cuerpo > .bloque-ajustes { margin: 8px 0; }
+/* Fila 146: las casillas de un impreso oficial (js/formularios-ajustes.js). */
+.impreso-casilla { align-items: center; gap: 10px; }
+.impreso-casilla-nombre { flex: 1; min-width: 0; }
+.impreso-mini { flex: 0 0 auto; width: 56px; min-height: 20px; cursor: zoom-in; }
+.impreso-mini canvas { width: 100%; height: auto; border: 1px solid var(--linea); border-radius: 3px; display: block; }
+.impreso-mini.grande { width: min(600px, 90%); cursor: zoom-out; }
+.impreso-casilla:has(.impreso-mini.grande) { flex-wrap: wrap; }
+.impreso-grupo { margin-top: 8px; }
+.impreso-grupo > summary { cursor: pointer; font-size: 13px; color: var(--tinta-suave); }

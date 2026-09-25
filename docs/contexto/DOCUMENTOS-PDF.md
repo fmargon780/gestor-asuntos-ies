@@ -496,24 +496,49 @@ está descartado a propósito (`docs/CONTEXTO-CORTO.md`, sección 7).
 - **`js/formularios-rellenar.js`** (`window.FormulariosRellenar`), con pdf-lib (`js/pdf-herramientas.js`,
   `PdfHerramientas.cargarPdfLib`):
   - `proponerMapa(nombresDeCasillas)`, **sin efectos** (es lo que se prueba sin navegador): mira el
-    nombre de cada casilla, sin mayúsculas ni tildes, con siete reglas en orden (`codigo` antes que
+    nombre **propio** de cada casilla (su último tramo, desde la fila 146: el camino entero hacía
+    proponer el centro para «Rellenable» o «Botones»), sin mayúsculas ni tildes, con siete reglas en orden (`codigo` antes que
     `centro`, para no confundir "código del centro" con el nombre del centro; "domicilio/dirección
     junto a centro" antes que `centro` a secas; luego `localidad`/`municipio`, `provincia`,
     `curso` + `escolar`/`academico` o "año académico", y por último `fecha`). Una casilla que no
-    case con ninguna regla no entra en el mapa propuesto.
+    case con ninguna regla no entra en el mapa propuesto. Desde la fila 146, tampoco una casilla de la
+    persona (`FormulariosCasillas.esDePersona`: la fecha de nacimiento no es `{{HOY}}`) ni una
+    numerada del 2 en adelante («Centro 2», «Código 3»: los otros centros que pide la familia).
   - `rellenarPdf(bytesPdf, mapa, valores)`: con `PDFDocument.load` + `getForm().getFields()`,
     rellena (`campo.setText`) **solo** las casillas del mapa que tengan valor, las deja en solo
     lectura (`campo.enableReadOnly()`) y no toca las demás; **nunca aplana el formulario**
     (`flatten()`). Si el PDF no trae formulario, o `getFields()` sale vacío, devuelve
-    `rellenable: false` y los bytes tal cual, sin inventarse nada.
-  - **Ajustes → El centro → "Impresos oficiales"**: una tarjeta por impreso con PDF (`f`), con su
-    estado ("Sin configurar" / "N casillas puestas") y un botón **"Leer las casillas del PDF"**
-    dentro de su `<details>` (a propósito no se lee solo al desplegar: varias pruebas de
-    navegador despliegan TODOS los `<details>` de Ajustes, y una petición de red por su cuenta les
-    ensuciaría el conteo de errores de consola). Al pulsarlo, lee el PDF (fetch relativo a
-    `formularios/`) y pinta sus casillas con un desplegable de los siete huecos; la primera vez
-    propone sola con `proponerMapa`, y cada cambio se guarda al momento. Un PDF que no se
-    encuentra (o sin casillas) se avisa en gris, sin romper nada.
+    `rellenable: false` y los bytes tal cual, sin inventarse nada. Quita la parte `/XFA` del
+    `AcroForm` (fila 146) para que todos los visores enseñen lo rellenado; pdf-lib ya la quita él
+    solo al leer el formulario (comprobado con los impresos de `formularios/`: siguen con todas sus
+    casillas).
+  - **Ajustes → El centro → "Impresos oficiales"** (desde la fila 146, 25-sep-2026,
+    `docs/IMPRESOS-CASILLAS-LEGIBLES.md`, en `js/formularios-ajustes.js`): un bloque plegado por
+    impreso con PDF (`f`). Su resumen: «N casillas del centro puestas», «Sin casillas del centro» (leído
+    en esta sesión, sin ninguna) o «Sin leer todavía». Dentro, el botón **"Leer las casillas del PDF"**
+    (a propósito no se lee solo al desplegar: varias pruebas de navegador despliegan TODOS los
+    `<details>` de Ajustes). Leídas: arriba, abiertas, **las del centro**; debajo, plegados, «Otras
+    casillas (N)» y «Datos de la persona (N) — no se rellenan nunca» (con su desplegable, por si alguna
+    estuviera mal clasificada). Sin ninguna del centro: «Este impreso no tiene casillas del centro:
+    saldrá en blanco». Cada fila con su **nombre legible** («Página 2 · Primer apellido»; el interno en
+    el `title`), las repetidas en una sola («Primer apellido (en 3 páginas)», un desplegable que guarda
+    el mismo hueco para todas) y una **miniatura** de su página con la casilla recuadrada (pdf.js; se
+    pinta al pasar por encima o al desplegar su grupo; pulsarla la agranda ahí mismo). **Si el impreso
+    no tenía nada guardado, la propuesta se guarda sola** (una escritura, por `ColaGuardado`) y avisa
+    en verde «He puesto N casillas del centro. Revísalas si quieres». Un PDF que no se encuentra (o sin
+    casillas) se avisa en gris.
+  - **`js/formularios-casillas.js`** (`FormulariosCasillas`, fila 146), sin efectos salvo las dos
+    últimas: `nombreLegible(nombre)` → `{ pagina, texto }` (página de `Página_N`/`PageN`; el último
+    tramo sin `[n]`, partido por `_`, guiones, puntos, mayúsculas y cifras; sin sufijos de maquetación
+    —`encab`, `enca`, `enc`, `cab`, `txt`, `campo`, `field`, `datos`—; `apellido 1` → «Primer
+    apellido», `dni` → «DNI», `num` → «Número»…), `esDePersona`, `clasificarCasilla(nombre,
+    guardado)` → `'centro'` (con hueco guardado o propuesto) / `'persona'` / `'otra'`, `agrupar`,
+    `posicionesDe(bytes)` (el rectángulo del primer widget y su página, con pdf-lib) y
+    `pintarMiniatura`. Es de persona: apellido, nombre, DNI/NIF/NIE, pasaporte, domicilio o dirección,
+    teléfono, móvil, correo, firma, nacimiento (y `nac`), sexo, nacionalidad, tutor, padre, madre,
+    progenitor, alumno, solicitante, representante, hermano, guardador, parentesco o código postal,
+    en su nombre o en el bloque que la contiene (solicitante, alumno, domicilio…); nunca si el nombre
+    entero habla del centro, salvo «centro actual/de procedencia/de origen» (el de la persona).
   - **El botón "Preparar para el tercero"**: cuelga de `data-clave-formulario`, un atributo que
     `js/formularios.js` ya deja en la lista de solo lectura de un hito y en la línea "Formularios"
     de la ficha (fila 82) para no tener que envolver nada de ese fichero. Al pulsarlo: lee el PDF,
@@ -524,6 +549,10 @@ está descartado a propósito (`docs/CONTEXTO-CORTO.md`, sección 7).
     blanco, con un aviso.
   - Sabe qué asunto está abierto envolviendo `App.abrirFicha` (`js/envolturas-esperadas.js`),
     como `js/formularios.js`/`js/correo.js`, y vigila la ficha con un `MutationObserver`.
+
+Se comprueba también con `pruebas/impresos-casillas-legibles.mjs` (navegador, con el Anexo III de
+verdad, en blanco) y, desde la fila 146, `pruebas/formularios-rellenar.mjs` suma `nombreLegible`,
+`clasificarCasilla`, las repetidas y la parte XFA.
 
 Se comprueba con `pruebas/formularios-rellenar.mjs` (sin navegador, con `vm`, como
 `pruebas/separar-unir.mjs`: los objetos de pdf-lib no cruzan bien entre "realms" distintos, así que

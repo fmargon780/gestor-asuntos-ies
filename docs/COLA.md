@@ -107,12 +107,21 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## La cola
 
-Las filas 1 a 142, la 144 y la 145 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 146 | `docs/IMPRESOS-CASILLAS-LEGIBLES.md` (Ajustes › Impresos oficiales: casillas con nombre legible, miniatura de dónde están y solo las del centro a la vista) | EN CURSO (25-sep-2026) |
+
+**La fila 146 está HECHA** (25-sep-2026): `docs/IMPRESOS-CASILLAS-LEGIBLES.md`. En Ajustes › El centro ›
+«Impresos oficiales», cada casilla con nombre legible («Página 2 · Primer apellido»), las repetidas en una
+fila, una miniatura de dónde está, las del centro arriba y «Otras casillas» y «Datos de la persona»
+plegados; la propuesta se guarda sola si no había nada (`js/formularios-casillas.js`,
+`js/formularios-ajustes.js`). La propuesta mira ya solo el nombre propio de la casilla (antes, en los
+impresos de verdad, proponía el centro para casillas como «Rellenable»). Pruebas
+`pruebas/formularios-rellenar.mjs` (ampliada) y `pruebas/impresos-casillas-legibles.mjs`. Versión
+escrita: `25-sep-2026 · 03:43`. **Ojo con la numeración**: `docs/PLANTILLAS-Y-FORMULARIOS-DESDE-EL-HITO.md`
+también se presenta como «fila 146», pero no está en la tabla.
 
 **La fila 145 está HECHA** (25-sep-2026): `docs/MESA-DEL-HITO-ENFOCADA.md`. La mesa del hito, enfocada:
 tira de hitos a todo el ancho, una línea de cabecera con «Generar documento ▾», «Comunicar ▾»
@@ -381,6 +390,11 @@ mesa de trabajo, sobre lo que dejó la 102.
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
+- De la fila 146 (25-sep-2026): en el Anexo III (solicitud de admisión) la propuesta pone el centro,
+  su código y su localidad en «Centro prioritario» y en «Centro 1» (los que pide la familia), no en
+  «Centro 2, 3, 4». Si «Centro 1» no debe ser el nuestro, se cambia a mano en Ajustes › Impresos
+  oficiales. Los recuadros de fecha partidos (Día, Mes, Año) no se proponen: `{{HOY}}` es la fecha
+  entera y no cabe en tres casillas.
 - De la fila 144 (25-sep-2026): el archivo de la base de datos de alumnado puede traer alumnos que
   no están en el RegAlum (antiguos con historia). Como el RegAlum sigue siendo la base y el código no
   puede usar datos con nombre propio (ni el nombre del alumno), esos no aparecen como personas ni se

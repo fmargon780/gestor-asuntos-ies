@@ -27,8 +27,9 @@ vm.runInContext(fs.readFileSync(raiz + 'util.js', 'utf8'), ctx, { filename: 'uti
 for (const f of ['util-parecidos.js', 'util-pantalla.js']) vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), ctx, { filename: f });
 vm.runInContext(fs.readFileSync(raiz + 'lib/pdf-lib.min.js', 'utf8'), ctx, { filename: 'pdf-lib.min.js' });
 vm.runInContext(fs.readFileSync(raiz + 'pdf-herramientas.js', 'utf8'), ctx, { filename: 'pdf-herramientas.js' });
+vm.runInContext(fs.readFileSync(raiz + 'formularios-casillas.js', 'utf8'), ctx, { filename: 'formularios-casillas.js' });
 vm.runInContext(fs.readFileSync(raiz + 'formularios-rellenar.js', 'utf8'), ctx, { filename: 'formularios-rellenar.js' });
-const { FormulariosRellenar } = ctx;
+const { FormulariosRellenar, FormulariosCasillas } = ctx;
 
 function ejecutar(cuerpoAsync) {
   return vm.runInContext('(async () => {\n' + cuerpoAsync + '\n})()', ctx);
@@ -131,6 +132,80 @@ console.log('--- 5. un PDF sin formulario ---');
   comprobar('5. no es rellenable', resultado.rellenable, false);
   comprobar('5. no rellena nada', resultado.rellenas, []);
   comprobarQue('5. no falla, devuelve los mismos bytes', resultado.mismoTamano, JSON.stringify(resultado));
+}
+
+/* ============================================================
+   6-10. Fila 146 (docs/IMPRESOS-CASILLAS-LEGIBLES.md): nombres que se
+   entienden, de quién es cada casilla, las repetidas y la parte XFA.
+   Los nombres son los del Anexo III de verdad (formularios/O-III.pdf).
+   ============================================================ */
+console.log('--- 6. nombreLegible ---');
+{
+  const P = 'form1[0].#pageSet[0].';
+  const casos = [
+    [P + 'Página_2[0].CABECERA[0].datos[0].apellido1encab[0]', 'Página 2 · Primer apellido'],
+    [P + 'Página_2[0].CABECERA[0].datos[0].apellido2enca[0]', 'Página 2 · Segundo apellido'],
+    [P + 'Página_2[0].CABECERA[0].datos[0].nombreenc[0]', 'Página 2 · Nombre'],
+    [P + 'Página_2[0].Numero_inscripcion[0]', 'Página 2 · Número inscripción'],
+    [P + 'Página_1[0].Barras[0]', 'Página 1 · Barras'],
+    [P + 'Page3[1].Numero_inscripcion[0]', 'Página 3 · Número inscripción'],
+    ['form1[0].ANEXO[0].APARTADO_1[0].CUERPO[0].SOLICITANTE[0].LINEA[0].DNI-NIE-NIF[0]', 'DNI NIE NIF']
+  ];
+  casos.forEach(([nombre, esperado]) =>
+    comprobar(nombre.replace(P, '…'), FormulariosCasillas.textoConPagina(FormulariosCasillas.nombreLegible(nombre)), esperado));
+}
+
+console.log('--- 7. clasificarCasilla ---');
+{
+  const casos = [
+    ['form1[0].#pageSet[0].Página_2[0].CABECERA[0].datos[0].apellido1encab[0]', 'persona'],
+    ['fecha_nacimiento', 'persona'],
+    ['nombre_centro', 'centro'],
+    ['codigo_centro', 'centro'],
+    ['fecha', 'centro'],
+    ['form1[0].#pageSet[0].Página_1[0].Barras[0]', 'otra'],
+    ['form1[0].ANEXO[0].APARTADO_1[0].CUERPO[0].SOLICITANTE[0].LINEA[0].DOMICILIO[0].UNIDAD[0].FECHA_NAC[0]', 'persona'],
+    ['form1[0].ANEXO[0].APARTADO_3[0].CUERPO[0].SOLICITANTE[0].LINEA[0].CENTROACTUAL[0]', 'persona']
+  ];
+  casos.forEach(([nombre, esperado]) => comprobar(nombre + ' -> ' + esperado, FormulariosCasillas.clasificarCasilla(nombre, {}), esperado));
+  comprobar('una casilla con hueco guardado es del centro', FormulariosCasillas.clasificarCasilla('apellidos', { apellidos: '{{CENTRO}}' }), 'centro');
+}
+
+console.log('--- 8. proponerMapa ya no propone nada para la persona ---');
+{
+  const mapa = await ejecutar('return FormulariosRellenar.proponerMapa(["fecha_nacimiento", "domicilio", "domicilio_centro", "fecha"]);');
+  comprobar('fecha_nacimiento, domicilio: nada; domicilio_centro y fecha, sí', mapa, { domicilio_centro: '{{DIRECCION CENTRO}}', fecha: '{{HOY}}' });
+}
+
+console.log('--- 9. las repetidas, en una sola fila ---');
+{
+  const g = FormulariosCasillas.agrupar([
+    'form1[0].#pageSet[0].Página_2[0].CABECERA[0].datos[0].apellido1encab[0]',
+    'form1[0].#pageSet[0].Página_2[1].CABECERA[0].datos[0].apellido1encab[0]',
+    'form1[0].#pageSet[0].Página_3[0].CABECERA[0].datos[0].apellido1encab[0]',
+    'form1[0].#pageSet[0].Página_1[0].Barras[0]'
+  ]);
+  comprobar('dos filas, la primera con las tres', g.map((x) => [x.etiqueta, x.nombres.length]),
+    [['Primer apellido (en 3 páginas)', 3], ['Página 1 · Barras', 1]]);
+}
+
+console.log('--- 10. sin la parte XFA ---');
+{
+  const r = await ejecutar(
+    'var doc = await PDFLib.PDFDocument.create();\n' +
+    'var pagina = doc.addPage([300, 300]);\n' +
+    'var form = doc.getForm();\n' +
+    '["nombre_centro", "apellido1"].forEach(function (n) { form.createTextField(n).addToPage(pagina, { x: 10, y: 10, width: 100, height: 20 }); });\n' +
+    'form.acroForm.dict.set(PDFLib.PDFName.of("XFA"), PDFLib.PDFString.of("xfa de mentira"));\n' +
+    'var bytesPdf = await doc.save({ updateFieldAppearances: false });\n' +
+    'var r = await FormulariosRellenar.rellenarPdf(bytesPdf, { nombre_centro: "{{CENTRO}}" }, { "{{CENTRO}}": "IES Inventado" });\n' +
+    'var fin = await PDFLib.PDFDocument.load(r.bytes);\n' +
+    'return { xfa: fin.catalog.lookup(PDFLib.PDFName.of("AcroForm")).has(PDFLib.PDFName.of("XFA")),\n' +
+    '  centro: fin.getForm().getTextField("nombre_centro").getText(),\n' +
+    '  apellidoEditable: !fin.getForm().getTextField("apellido1").isReadOnly(), casillas: fin.getForm().getFields().length };'
+  );
+  comprobar('tras rellenar no queda /XFA, y la de la persona sigue escribiéndose', r,
+    { xfa: false, centro: 'IES Inventado', apellidoEditable: true, casillas: 2 });
 }
 
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
