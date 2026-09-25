@@ -112,7 +112,7 @@ Las filas 1 a 142, la 144 y la 145 están **HECHAS**. Sus documentos siguen en `
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 146 | `docs/IMPRESOS-CASILLAS-LEGIBLES.md` (Ajustes › Impresos oficiales: casillas con nombre legible, miniatura de dónde están y solo las del centro a la vista) | PENDIENTE |
+| 146 | `docs/IMPRESOS-CASILLAS-LEGIBLES.md` (Ajustes › Impresos oficiales: casillas con nombre legible, miniatura de dónde están y solo las del centro a la vista) | EN CURSO (25-sep-2026) |
 
 **La fila 145 está HECHA** (25-sep-2026): `docs/MESA-DEL-HITO-ENFOCADA.md`. La mesa del hito, enfocada:
 tira de hitos a todo el ancho, una línea de cabecera con «Generar documento ▾», «Comunicar ▾»
