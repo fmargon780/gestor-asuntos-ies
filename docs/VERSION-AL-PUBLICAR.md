@@ -55,3 +55,4 @@ publicación detrás de otra.
 
 **Ojo (25-sep-2026):** con `buildCommand` y sin marco, Vercel busca la web en `public/`. Hace falta
 `"outputDirectory": "."` en `vercel.json`; sin eso, todas las publicaciones fallaban.
+Y las ramas `claude/…` no publican (`git.deploymentEnabled`), para no gastar el límite de 100 al día.

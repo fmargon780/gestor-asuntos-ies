@@ -105,3 +105,9 @@ Si el tope se vuelve a alcanzar con la regla 13 puesta, la salida siguiente (sin
 apagar del todo las publicaciones automáticas de Git (`git.deploymentEnabled: false` en
 `vercel.json`) y publicar con un *deploy hook* llamado desde una acción de GitHub solo cuando
 cambie algo fuera de `docs/`. Eso no se hace ahora: es más complicado y todavía no hace falta.
+
+## Las ramas de Claude no publican (25-sep-2026)
+
+Se pasó el límite de 100 publicaciones al día: cada subida contaba dos (`main` y la rama `claude/…`).
+Desde entonces `vercel.json` lleva `"git": { "deploymentEnabled": { "claude/**": false } }`: solo
+publica `main`.

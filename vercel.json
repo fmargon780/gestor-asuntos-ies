@@ -3,6 +3,11 @@
   "ignoreCommand": "bash scripts/vercel-ignore-build.sh",
   "buildCommand": "node scripts/version-al-publicar.mjs",
   "outputDirectory": ".",
+  "git": {
+    "deploymentEnabled": {
+      "claude/**": false
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",

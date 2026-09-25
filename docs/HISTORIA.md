@@ -12,6 +12,11 @@ carpeta `public` que no existe y cada publicación acababa en error («No Output
 "public"»): la última buena fue la de la fila 138. Arreglo: `"outputDirectory": "."` en
 `vercel.json` (la web está en la raíz del repositorio, como antes del `buildCommand`).
 
+Ese día se pasó además el límite de Vercel gratuito (100 publicaciones al día, `api-deployments-free-per-day`):
+cada subida contaba dos (`main` y la rama `claude/…` de la sesión, aunque esta se saltara). Ahora
+`vercel.json` lleva `git.deploymentEnabled: { "claude/**": false }`: las ramas `claude/…` ya no crean
+publicación.
+
 ## 25-sep-2026 — Fila 142: el alumnado, desde la base de datos de alumnado
 
 `docs/ALUMNADO-DESDE-LA-BD.md` y el acuerdo `docs/ACUERDO-ALUMNADO.md`. El gestor consulta el
