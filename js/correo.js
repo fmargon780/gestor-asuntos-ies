@@ -160,8 +160,10 @@
 
   /* El cuerpo entero: saludo, el medio (en blanco, o la plantilla
      elegida con sus huecos ya rellenos) y la firma. Devuelve también
-     los huecos que se han quedado sin dato, para el aviso de arriba. */
-  function cuerpoDelMedio(a, idPlantilla) {
+     los huecos que se han quedado sin dato, para el aviso de arriba.
+     `paraSeneca` (fila 170): el cuadro de Séneca usa el `textoSeneca`
+     de la plantilla si lo tiene (allí no se adjunta nada); si no, `texto`. */
+  function cuerpoDelMedio(a, idPlantilla, paraSeneca) {
     var categoria = categoriaDe(a);
     var nombre = soloElNombre(terceroDe(a));
     var saludo;
@@ -185,9 +187,12 @@
       var plantilla = idPlantilla && plantillasDatos
         ? plantillasDatos.lista.filter(function (p) { return p.id === idPlantilla; })[0]
         : null;
+      var textoPlantilla = plantilla
+        ? ((paraSeneca && String(plantilla.textoSeneca || '').trim()) ? plantilla.textoSeneca : plantilla.texto)
+        : '';
       if (plantilla) {
         var valoresConLoQueFalta = Object.assign({}, valoresActuales || {}, { loQueFalta: loQueFaltaActual });
-        var r = Plantillas.rellenar(plantilla.texto, valoresConLoQueFalta);
+        var r = Plantillas.rellenar(textoPlantilla, valoresConLoQueFalta);
         medio = r.texto;
         faltan = r.faltan;
       }
@@ -197,7 +202,7 @@
          se añade al final, separado por una línea en blanco (sección 7
          del encargo): el hueco, cuando existe en la plantilla, ya lo ha
          metido Plantillas.rellenar en su sitio. */
-      if (loQueFaltaActual && !(plantilla && Plantillas.tieneLoQueFalta(plantilla.texto))) {
+      if (loQueFaltaActual && !(plantilla && Plantillas.tieneLoQueFalta(textoPlantilla))) {
         medio = medio ? (medio + '\n\n' + loQueFaltaActual) : loQueFaltaActual;
       }
     }

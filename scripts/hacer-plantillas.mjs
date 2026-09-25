@@ -326,7 +326,14 @@ async function main() {
       entrada.vistoBueno = datos.vistoBueno || '';
       console.log('escrito  ' + nombreDocx);
     } else {
-      entrada.cuerpo = textoPlanoDe(cuerpo);
+      /* Fila 170: debajo de una línea `=== SÉNECA ===`, el texto propio
+         para el mensaje de Séneca (allí no se adjuntan ficheros). Sin la
+         línea, no hay `cuerpoSeneca` y Séneca usa el del correo. */
+      const trozos = cuerpo.split(/^[ \t]*=== SÉNECA ===[ \t]*$/m);
+      entrada.cuerpo = textoPlanoDe(trozos[0]);
+      if (trozos.length > 1 && trozos.slice(1).join('\n').trim()) {
+        entrada.cuerpoSeneca = textoPlanoDe(trozos.slice(1).join('\n'));
+      }
     }
 
     indice.push(entrada);

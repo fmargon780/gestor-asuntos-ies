@@ -213,5 +213,21 @@ const renuncia = indice.filter((e) => e.id === 'pd-centro-renuncia-junta-elector
 comprobar('la renuncia cuelga de OTROS · ELECCIONES CONSEJO ESCOLAR, tipo RENUNCIA',
   [renuncia.categoria, renuncia.tipo, renuncia.tipoDocumento, renuncia.texto], ['OTROS', 'ELECCIONES CONSEJO ESCOLAR', 'RENUNCIA', 'junta electoral']);
 
+/* Fila 170: un correo con la línea `=== SÉNECA ===` da dos textos (el del
+   correo y el de Séneca), y ninguno lleva la línea; sin ella, solo uno. */
+const MARCA_SENECA = '=== SÉNECA ===';
+const correosConSeneca = indice.filter((e) => e.clase === 'correo' && e.cuerpoSeneca);
+comprobarQue('hay correos con texto propio para Séneca', correosConSeneca.length >= 16, correosConSeneca.length + ' con texto de Séneca');
+comprobarQue('ningún texto de correo ni de Séneca contiene la línea «' + MARCA_SENECA + '»',
+  indice.every((e) => String(e.cuerpo || '').indexOf(MARCA_SENECA) === -1 && String(e.cuerpoSeneca || '').indexOf(MARCA_SENECA) === -1));
+comprobarQue('los correos con texto de Séneca traen también el del correo',
+  correosConSeneca.every((e) => String(e.cuerpo || '').trim() && String(e.cuerpoSeneca).trim()));
+const baja = indice.filter((e) => e.clase === 'correo' && e.nombre === 'Comunicación de baja')[0] || {};
+comprobar('un correo sin la línea no trae texto de Séneca', 'cuerpoSeneca' in baja, false);
+/* Parte 3: el saludo y la firma los pone la aplicación; la plantilla, no. */
+comprobarQue('ningún correo empieza por «Buenos días» ni termina con «Un saludo.»',
+  indice.filter((e) => e.clase === 'correo').every((e) =>
+    !/^\s*Buenos d[ií]as/.test(e.cuerpo) && !/Un saludo\.?\s*(\{\{CENTRO\}\})?\s*$/.test(e.cuerpo)));
+
 console.log(fallos ? '\n' + fallos + ' fallo(s) en plantillas-del-centro.mjs' : '\nTodo bien en plantillas-del-centro.mjs');
 if (fallos) process.exit(1);

@@ -5,6 +5,21 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 170: las plantillas del compañero
+
+`docs/PLANTILLAS-DEL-COMPANERO.md`. De unos 1.035 documentos del compañero salieron 50 plantillas
+(34 de documento, 16 de correo), escritas por `docs/plantillas-nuevas/generar.py` en `plantillas/`
+(la carpeta del script se ha borrado después). Cada una cuelga de un tipo que ya existía en la
+biblioteca: no se ha creado ningún tipo ni campo, y la Consejería no se toca. Los correos traen,
+debajo de `=== SÉNECA ===`, un texto propio para Séneca (allí no se adjunta nada): el script lo
+guarda como `cuerpoSeneca`, «Cargar las plantillas del centro» como `textoSeneca`, y el cuadro de
+Séneca lo usa si existe. A los cuatro correos de antes se les quitó el saludo y la firma, que ya
+pone la aplicación y salían dos veces. En `peticion-historial.md` el centro de procedencia sale de
+la BD de alumnado (`{{DATO ALUMNADO BD: Centro de procedencia}}`), porque la prueba lo admite.
+Hace falta volver a pulsar «Cargar las plantillas del centro»: no pisa las que ya estaban.
+
+---
+
 ## 25-sep-2026 — Fila 168: las opciones de cada documento, en su fila
 
 `docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md`. En la ficha del asunto, fuera «Documentos ▾»: en su sitio,

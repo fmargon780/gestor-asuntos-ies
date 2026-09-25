@@ -388,6 +388,13 @@ mano.
   lee `plantillas/indice.json`, descarga cada `.docx` y lo escribe en `_GESTOR/PLANTILLAS`, y da
   de alta su fila en `plantillas.json` (`documentos` o `lista`, según su `clase`). Fusiona y no
   pisa: una plantilla con el mismo nombre y tipo que una ya existente se deja como está.
+- **Texto propio para Séneca** (fila 170, `docs/PLANTILLAS-DEL-COMPANERO.md`): en un `.md` de
+  correo, lo que va debajo de una línea `=== SÉNECA ===` es `cuerpoSeneca` en `indice.json` (y lo
+  de arriba, `cuerpo`); al cargar, pasa a `textoSeneca` de la fila de `lista`. El cuadro de Séneca
+  lo usa si lo hay (`cuerpoDelMedio(a, id, paraSeneca)` de `js/correo.js`); si no, `texto`. En
+  Ajustes y en el editor en línea de la fila 151, un recuadro plegado «Texto para Séneca
+  (opcional)». Las plantillas de correo no llevan saludo ni firma: los pone la aplicación. Hoy son
+  20 de correo (16 de la fila 170, todas con texto de Séneca).
 
 Se comprueba con `pruebas/plantillas-del-centro.mjs`: que `indice.json` cite ficheros que
 existen, que cada `.md` traiga su frontmatter completo, que todo hueco usado en los cuerpos esté

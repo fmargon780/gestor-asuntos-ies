@@ -101,8 +101,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Papelera: nada se borra de golpe. Plazo de conservación por tipo: avisa, nunca borra solo.
 - Word: lo que falta se pregunta antes; se ve en la app, con «Guardar PDF» e «Imprimir» (sin editar aún).
 - Plantillas de correo y de Word por tipo, con huecos que se rellenan solos; se crean o editan también
-  desde el propio cuadro de Correo/Séneca («Crear»/«Editar plantilla»); textos del centro en `plantillas/`
-  (botón en Mantenimiento). Membrete de la Junta (lo dibuja la app; logo opcional), firma de quien ocupaba
+  desde el cuadro de Correo/Séneca. El centro trae las suyas en `plantillas/` (las del compañero incluidas;
+  los correos, con texto propio para Séneca; botón en Mantenimiento). Membrete de la Junta (lo dibuja la app; logo opcional), firma de quien ocupaba
   el cargo en su fecha y «el/la alumno/a» según el sexo de cada persona.
 - Tablas de datos (Séneca, CSV/Excel) unidas por DNI, con huecos; lo que falta, en amarillo. Certificado tutorial; renuncia a la Junta Electoral.
 - Copias diarias (90 días), detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable de nombres. Un borrado (tipo,
@@ -168,7 +168,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ver con el uso: ancho del panel/tablón, tarjetas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar curso; cuenta del centro; Ajustes: cargos y Provincia.
 - Importar usuarios IdEA del alumnado, al reactivar a Francisco el perfil de Gestor de PASEN.
-- Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar plantillas», «Traer guiones». Ajustes › Hitos: festivos.
+- Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar plantillas» (otra vez: hay 50 nuevas), «Traer guiones». Ajustes › Hitos: festivos.
 - Antes de junio 2027: "Guardar el contacto de los asuntos abiertos" (Mantenimiento).
 - Decisión: ¿la papelera se vacía sola?
 - Antes de publicar algo importante, repasar `docs/COMPROBAR-A-MANO.md`.

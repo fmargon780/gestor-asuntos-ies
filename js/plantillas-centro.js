@@ -71,7 +71,9 @@
         if (yaCorreo[clave]) { correoYaEstaban++; continue; }
         nuevosCorreo.push({
           id: Plantillas.idNuevo(), tipo: e.tipo, categoria: e.categoria, nombre: e.nombre,
-          texto: e.cuerpo || ''
+          texto: e.cuerpo || '',
+          /* Fila 170: el texto propio para Séneca, si la plantilla lo trae. */
+          textoSeneca: e.cuerpoSeneca || ''
         });
       }
     }

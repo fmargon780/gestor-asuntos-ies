@@ -136,6 +136,21 @@ await pagina.click('button:has-text("Cambiar de todas formas")');
 await comprobarQue('4. al confirmar, el cuerpo se rellena con la plantilla editada',
   pagina.locator('#seneca-cuerpo-texto').inputValue().then((v) => v.indexOf('de nuevo') !== -1));
 
+/* ---------- 4b (fila 170): el texto propio para Séneca ---------- */
+
+await pagina.click('#seneca-plantilla-editar');
+await pagina.waitForSelector('#seneca-plantilla-editor:not(.oculto) #pl2-nombre');
+await comprobar('4b. el recuadro «Texto para Séneca» sale plegado',
+  pagina.evaluate(() => { const d = document.querySelector('#seneca-plantilla-editor details.plantilla-seneca'); return d ? d.open : null; }), false);
+await pagina.click('#seneca-plantilla-editor details.plantilla-seneca summary');
+await pagina.fill('#pl2-texto-seneca', 'Solo para Séneca, sobre {nombre}.');
+await pagina.click('#pl2-guardar');
+await pagina.waitForSelector('#seneca-formulario:not(.oculto)');
+await pagina.waitForTimeout(200);
+await comprobar('4b. el mensaje de Séneca usa su propio texto, no el del correo',
+  pagina.locator('#seneca-cuerpo-texto').inputValue().then((v) => [v.indexOf('Solo para Séneca') !== -1, v.indexOf('de nuevo') !== -1]),
+  [true, false]);
+
 await pagina.keyboard.press('Escape');
 await pagina.waitForSelector('#capa', { state: 'hidden' });
 

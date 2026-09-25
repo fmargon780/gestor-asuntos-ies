@@ -232,6 +232,16 @@
       '<textarea id="' + idTexto + '" class="campo" rows="' + (filas || 7) + '">' + U.escapar(valor || '') + '</textarea>';
   }
 
+  /* Fila 170: el texto propio para el mensaje de Séneca (allí no se
+     adjunta nada), plegado. Vacío, Séneca usa el mismo texto del correo. */
+  function campoSenecaHTML(idTexto, valor) {
+    return '<details class="plantilla-seneca">' +
+      '<summary>Texto para Séneca (opcional)' + (String(valor || '').trim() ? ' · escrito' : '') + '</summary>' +
+      '<p class="explica">Si lo dejas vacío, el mensaje de Séneca usa el mismo texto del correo.</p>' +
+      '<textarea id="' + idTexto + '" class="campo" rows="5">' + U.escapar(valor || '') + '</textarea>' +
+      '</details>';
+  }
+
   function engancharCampoDeTexto(idTexto, idBoton, otrosCampos) {
     var boton = $(idBoton), campo = $(idTexto);
     if (!boton || !campo) return;
@@ -264,6 +274,7 @@
       '<label class="etiqueta">Nombre de la plantilla</label>' +
       '<input id="pl-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '">' +
       campoDeTextoHTML('pl-texto', 'pl-insertar-hueco', 'Texto', (existente && existente.texto) || '', 7) +
+      campoSenecaHTML('pl-texto-seneca', existente && existente.textoSeneca) +
       '<label class="etiqueta">Vista previa</label>' +
       '<div class="vista-previa"><div class="vista-nombre" id="pl-previa"></div></div>';
 
@@ -277,7 +288,7 @@
        última vez; sin foco previo, al final del último, que es el
        cuadro de texto. La vista previa se repinta sola, porque al
        insertar se lanza un evento `input`. */
-    engancharCampoDeTexto('pl-texto', 'pl-insertar-hueco', []);
+    engancharCampoDeTexto('pl-texto', 'pl-insertar-hueco', [$('pl-texto-seneca')].filter(Boolean));
 
     function pintarPrevia() {
       var muestra = datosDeMuestra($('pl-categoria').value, $('pl-tipo').value);
@@ -299,6 +310,7 @@
       var tipo = $('pl-tipo').value;
       var categoria = $('pl-categoria').value;
       var texto = $('pl-texto').value;
+      var textoSeneca = $('pl-texto-seneca') ? $('pl-texto-seneca').value : '';
       if (!nombre || !tipo || !texto.trim()) {
         U.aviso('Hace falta el nombre, el tipo y el texto.', 'malo');
         return;
@@ -307,9 +319,9 @@
         await Plantillas.guardar(App.E.gestor, function (actual) {
           if (existente) {
             var i = actual.lista.findIndex(function (x) { return x.id === existente.id; });
-            if (i !== -1) actual.lista[i] = { id: existente.id, tipo: tipo, categoria: categoria, nombre: nombre, texto: texto };
+            if (i !== -1) actual.lista[i] = { id: existente.id, tipo: tipo, categoria: categoria, nombre: nombre, texto: texto, textoSeneca: textoSeneca };
           } else {
-            actual.lista.push({ id: Plantillas.idNuevo(), tipo: tipo, categoria: categoria, nombre: nombre, texto: texto });
+            actual.lista.push({ id: Plantillas.idNuevo(), tipo: tipo, categoria: categoria, nombre: nombre, texto: texto, textoSeneca: textoSeneca });
           }
           return actual;
         });
@@ -338,6 +350,7 @@
     return '<label class="etiqueta" style="margin-top:0">Nombre de la plantilla</label>' +
       '<input id="pl2-nombre" class="campo" value="' + U.escapar((existente && existente.nombre) || '') + '">' +
       campoDeTextoHTML('pl2-texto', 'pl2-insertar-hueco', 'Texto', (existente && existente.texto) || '', 6) +
+      campoSenecaHTML('pl2-texto-seneca', existente && existente.textoSeneca) +
       '<label class="etiqueta">Vista previa</label>' +
       '<div class="vista-previa"><div class="vista-nombre" id="pl2-previa"></div></div>' +
       '<div id="pl2-aviso"></div>' +
@@ -353,7 +366,7 @@
      llama al terminar bien; `alCancelar()`, al pulsar Cancelar. */
   function montarEditorEnLinea(contenedor, a, existente, alGuardar, alCancelar) {
     contenedor.innerHTML = cuerpoEditorEnLineaHTML(existente);
-    engancharCampoDeTexto('pl2-texto', 'pl2-insertar-hueco', []);
+    engancharCampoDeTexto('pl2-texto', 'pl2-insertar-hueco', [$('pl2-texto-seneca')].filter(Boolean));
 
     var categoria = (a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria) || '';
     var tipo = (a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '';
@@ -371,6 +384,7 @@
     $('pl2-guardar').onclick = async function () {
       var nombre = $('pl2-nombre').value.trim();
       var texto = $('pl2-texto').value;
+      var textoSeneca = $('pl2-texto-seneca') ? $('pl2-texto-seneca').value : '';
       if (!nombre || !texto.trim()) {
         $('pl2-aviso').innerHTML = '<p class="aviso aviso-rojo">Hace falta el nombre y el texto.</p>';
         return;
@@ -381,11 +395,11 @@
           if (existente) {
             var i = actual.lista.findIndex(function (x) { return x.id === existente.id; });
             if (i !== -1) {
-              actual.lista[i] = { id: existente.id, tipo: tipo, categoria: categoria, nombre: nombre, texto: texto };
+              actual.lista[i] = { id: existente.id, tipo: tipo, categoria: categoria, nombre: nombre, texto: texto, textoSeneca: textoSeneca };
               guardada = actual.lista[i];
             }
           } else {
-            guardada = { id: Plantillas.idNuevo(), tipo: tipo, categoria: categoria, nombre: nombre, texto: texto };
+            guardada = { id: Plantillas.idNuevo(), tipo: tipo, categoria: categoria, nombre: nombre, texto: texto, textoSeneca: textoSeneca };
             actual.lista.push(guardada);
           }
           return actual;
