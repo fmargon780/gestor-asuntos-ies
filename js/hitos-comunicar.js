@@ -152,7 +152,9 @@
 
   /* `opciones` (fila 109, la mesa del hito): { correos: [...] } manda
      sobre el destinatario resuelto, y { adjuntos: [...] } sobre los
-     documentos premarcados. */
+     documentos premarcados. Fila 153: { documentoSeneca: '...' } manda
+     el nombre a señalar en el cuadro de Séneca (no hay adjuntos allí:
+     se marca el nombre para copiarlo y pegarlo a mano). */
   async function comunicar(a, hito, canal, opciones) {
     var c = comunicacionDe(a, hito);
     var mensaje = c && c[canal];
@@ -183,10 +185,21 @@
 
     if (canal !== 'seneca') {
       extra.adjuntosMarcados = (opciones && opciones.adjuntos) ? opciones.adjuntos.slice() : await documentosDelHitoEnCarpeta(a, hito);
+    } else if (opciones && opciones.documentoSeneca) {
+      extra.documentoSeneca = opciones.documentoSeneca;
     }
 
     if (!window.CorreoNucleo || !window.CorreoNucleo.abrirCuadro) return;
     window.CorreoNucleo.abrirCuadro(a, canal === 'seneca', extra);
+  }
+
+  /* Fila 153: «Enviar ▾» de un documento del hito, por correo o por
+     Séneca, con ese documento ya elegido. Envuelve `comunicar` en vez
+     de duplicar su lógica: por correo, lo marca entre los adjuntos; por
+     Séneca, lo señala como el documento a adjuntar a mano. */
+  function comunicarConDocumento(a, hito, canal, nombreDocumento) {
+    var opciones = canal === 'seneca' ? { documentoSeneca: nombreDocumento } : { adjuntos: [nombreDocumento] };
+    return comunicar(a, hito, canal, opciones);
   }
 
   /* ==========================================================
@@ -222,6 +235,7 @@
   window.HitosComunicar = {
     canalesDe: canalesDe,
     comunicar: comunicar,
+    comunicarConDocumento: comunicarConDocumento,
     resolverDestinatario: resolverDestinatario,
     buscarPersonaDelAsunto: buscarPersonaDelAsunto,
     correosDePersona: correosDePersona,
