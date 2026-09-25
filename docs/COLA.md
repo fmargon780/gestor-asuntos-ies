@@ -113,6 +113,7 @@ Las filas 1 a 140 están **HECHAS**. Sus documentos siguen en `docs/`, y el deta
 | Nº | Instrucción | Estado |
 |---|---|---|
 | 141 | `docs/REPARTIR-ENTRE-TERCEROS.md` (repartir un PDF en trozos, un asunto archivado por persona) | PENDIENTE |
+| 142 | `docs/ALUMNADO-DESDE-LA-BD.md` (el alumnado, desde la base de datos de alumnado; acuerdo en `docs/ACUERDO-ALUMNADO.md`) | PENDIENTE |
 
 **La fila 140 está HECHA** (25-sep-2026): `docs/TIEMPO-DE-TRAMITACION.md`. Cuentas gana, por tipo,
 «Media (días)» y «Máximo (días)» (también al copiar), el número «Abiertos hace más de 30 días» y la
