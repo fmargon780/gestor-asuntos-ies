@@ -114,6 +114,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 |---|---|---|
 | 147 | `docs/MESA-TARJETAS-QUE-SE-ABREN.md` (la mesa del hito en tarjetas: una en grande, las otras dos de resumen a la derecha; pulsar una la abre en grande) | HECHA (25-sep-2026) |
 | 148 | `docs/PRUEBAS-EN-VERDE.md` (las pruebas de GitHub en verde otra vez, y que un cambio solo de `docs/` no las lance) | HECHA (25-sep-2026). Fallaba `indice-del-expediente.mjs` desde la fila 138: esperaba el «Asunto archivado.» del asunto anterior, aún a la vista, y miraba el ARCHIVO antes de terminar |
+| 149 | `docs/MEMBRETE-LETRA-DEL-MANUAL.md` (el nombre de la Consejería del membrete, con la letra Noto Sans HK del manual de la Junta, y la caja por defecto del membrete nuevo) | PENDIENTE |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
