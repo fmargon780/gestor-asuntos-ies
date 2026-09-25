@@ -1,13 +1,10 @@
 /* Prueba en navegador de verdad de la fila 150 de docs/COLA.md
    (docs/MESA-COMUNICAR-DEL-PASO-Y-GUION.md):
 
-   1. El «Comunicar» de un paso del guion (con dos vías, correo y Séneca)
-      abre un menú VISIBLE (antes, con dos vías, se enganchaba con
-      FichaMenus al botón escondido de `.mesa-ocultos`, y el menú salía
-      invisible: el fallo que veía Francisco).
-   2. Con dos pasos «Comunicar» en el mismo hito, pulsar el del SEGUNDO y
-      terminar por Séneca marca ESE paso, no el primero (antes, marcaba
-      «el primero pendiente» sin mirar cuál se había pulsado).
+   1 y 2. Desde la fila 154 (docs/HITOS-ACCIONES-EN-EL-HITO.md) los pasos
+      ya no llevan botón «Comunicar»: se comunica desde «Comunicar ▾» de la
+      cabecera del hito, y al terminar por Séneca se marca el primer paso
+      pendiente con acción de comunicar (g1), no el segundo.
    3. «✎ Cambiar el guion de este hito» edita la guía del tipo desde la
       propia mesa, y el cambio se ve en otro asunto abierto del mismo tipo. */
 import { chromium } from 'playwright';
@@ -78,33 +75,23 @@ async function abrirMesaDe(nombreCorto) {
 
 await abrirMesaDe('Inventada Uno');
 
-/* 1 y 2: pulsar «Comunicar» del SEGUNDO paso (g2) abre un menú visible. */
-await pagina.click('.hito-en-mesa .guion-paso[data-id="g2"] .guion-accion-boton');
-await pagina.waitForTimeout(150);
-await comprobar('1. el menú de «Comunicar» de un paso sale VISIBLE (no dentro de .mesa-ocultos)',
-  pagina.evaluate(() => {
-    const menu = Array.from(document.querySelectorAll('.ficha-menu')).find((m) => m.offsetParent &&
-      Array.from(m.querySelectorAll('.ficha-menu-opcion')).some((o) => /Séneca/.test(o.textContent)));
-    if (!menu) return null;
-    return Array.from(menu.querySelectorAll('.ficha-menu-opcion')).map((o) => o.textContent.trim());
-  }), ['Correo electrónico', 'Mensaje de Séneca']);
-
-/* Elegir «Mensaje de Séneca» y terminar (botón 2, copiar el texto). */
-await pagina.evaluate(() => {
-  const menu = Array.from(document.querySelectorAll('.ficha-menu')).find((m) => m.offsetParent);
-  const opcion = menu && Array.from(menu.querySelectorAll('.ficha-menu-opcion')).find((o) => /Séneca/.test(o.textContent));
-  if (opcion) opcion.click();
-});
+/* 1 y 2: los pasos ya no llevan botón; «Comunicar ▾» de la cabecera. */
+await comprobar('1. los pasos del guion no llevan botón «Comunicar»',
+  pagina.evaluate(() => document.querySelectorAll('.hito-en-mesa .guion-paso .guion-accion-boton').length), 0);
+await pagina.click('.hito-en-mesa .mesa-abrir-panel[data-panel="comunicar"]');
+await pagina.waitForSelector('.hito-en-mesa .mesa-mensaje-seneca');
+await pagina.waitForTimeout(200);
+await pagina.click('.hito-en-mesa .mesa-mensaje-seneca');
 await pagina.waitForSelector('#capa:not(.oculto) #seneca-copiar-texto');
 await pagina.click('#seneca-copiar-texto');
 await pagina.waitForTimeout(300);
 
-await comprobar('2. se marca el paso pulsado (g2), no «el primero pendiente» (g1)',
+await comprobar('2. se marca el primer paso pendiente con acción de comunicar (g1)',
   pagina.evaluate(() => {
     const g1 = document.querySelector('.hito-en-mesa .guion-paso[data-id="g1"]');
     const g2 = document.querySelector('.hito-en-mesa .guion-paso[data-id="g2"]');
     return [g1 && g1.classList.contains('hecho'), g2 && g2.classList.contains('hecho')];
-  }), [false, true]);
+  }), [true, false]);
 
 /* Cerrar el cuadro de Séneca («Cerrar» es #cuadro-aceptar: se abre sin
    botón Cancelar, U.preguntar(..., 'Cerrar', true)). */

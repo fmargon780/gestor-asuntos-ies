@@ -182,7 +182,12 @@ var HitoMesa = (function () {
     var cab = fila.querySelector(':scope > .hito-cuerpo > .mesa-cabecera');
     if (!cab || !h) return;
     var visibles = Hitos.visibles(hitos).filter(function (x) { return x.estado !== 'noaplica' && !x.delTipoAnterior; });
-    var n = visibles.indexOf(visibles.filter(function (x) { return x.id === h.id; })[0]) + 1;
+    /* Fila 154: los números, con la misma cuenta que «Paso N de M» y la
+       pestaña «Hitos N/M» (sin los «solo informativo», que en la tira
+       salen sin número). */
+    var numerados = Hitos.numerados ? Hitos.numerados(hitos) : visibles;
+    function numeroDe(x) { return numerados.indexOf(x) + 1; }
+    var n = numeroDe(h);
     var plazo = textoPlazo(h.fecha, ajustes, h.plazo && h.plazo.cuenta);
     var resp = h.responsable ? Hitos.resolverResponsable(h.responsable, ajustes, contextoDe(a)) : null;
     var guion = Hitos.guionDe ? Hitos.guionDe(a, h) : [];
@@ -199,13 +204,14 @@ var HitoMesa = (function () {
       ? '<button type="button" class="mesa-etq mesa-etq-estado mesa-etq-hecho">Hecho</button>'
       : '<button type="button" class="mesa-meta mesa-etq-estado">' + U.escapar(textoEstado(h.estado)) + '</button><span class="mesa-meta-punto">·</span>';
     cab.innerHTML =
-      '<div class="mesa-tira">' + visibles.map(function (x, i) {
+      '<div class="mesa-tira">' + visibles.map(function (x) {
+        var num = numeroDe(x) ? numeroDe(x) + '. ' : 'i · ';
         return '<button type="button" class="mesa-tira-hito' + (x.id === h.id ? ' actual' : '') +
-          (x.estado === 'hecho' ? ' hecho' : '') + '" data-id="' + U.escapar(x.id) + '" title="' + U.escapar((i + 1) + '. ' + (x.titulo || '')) + '">' +
-          (x.estado === 'hecho' ? '✓ ' : '') + (i + 1) + '. ' + U.escapar(x.titulo || '') + '</button>';
+          (x.estado === 'hecho' ? ' hecho' : '') + '" data-id="' + U.escapar(x.id) + '" title="' + U.escapar(num + (x.titulo || '')) + '">' +
+          (x.estado === 'hecho' ? '✓ ' : '') + num + U.escapar(x.titulo || '') + '</button>';
       }).join('') + '</div>' +
       '<div class="mesa-titulo-fila">' +
-        '<h3 class="mesa-titulo" title="Hito ' + (n || '?') + ' de ' + visibles.length + '">' + U.escapar(h.titulo || '') + '</h3>' +
+        '<h3 class="mesa-titulo" title="' + (n ? 'Hito ' + n + ' de ' + numerados.length : 'Hito solo informativo') + '">' + U.escapar(h.titulo || '') + '</h3>' +
         '<div class="mesa-etiquetas">' + estadoHTML +
           '<button type="button" class="mesa-meta mesa-etq-plazo ' + plazo.clase + '">' + U.escapar(plazo.texto) + '</button>' +
           '<span class="mesa-meta-punto">·</span>' +
@@ -217,6 +223,7 @@ var HitoMesa = (function () {
             (window.Formularios ? Formularios.listaHTML(h.formularios, 'Formularios oficiales') : '') + '</div></div>' : '') +
           (abierto && !decision ? '<div class="mesa-desplegable"><button type="button" class="boton mesa-abrir-panel" data-panel="comunicar" aria-expanded="false">Comunicar ▾</button>' +
             '<div class="mesa-panel mesa-panel-comunicar oculto"><div class="mesa-destinatarios"></div></div></div>' : '') +
+          (abierto && !decision ? '<button type="button" class="boton mesa-registrar" title="Registrar un documento de este hito">Registrar</button>' : '') +
           (abierto && !decision
             ? '<button type="button" class="boton' + (h.estado === 'hecho' ? '' : ' boton-principal') + (completo ? ' mesa-hecho-resaltado' : '') + ' mesa-marcar-hecho">' +
               (h.estado === 'hecho' ? 'Hecho ✓ (desmarcar)' : 'Marcar como hecho') + '</button>' : '') +
@@ -237,6 +244,8 @@ var HitoMesa = (function () {
       var casilla = fila.querySelector(':scope > .hito-linea .hito-casilla');
       if (casilla) casilla.click();
     };
+
+    engancharRegistrar(cab.querySelector('.mesa-registrar'), a, h);
 
     FichaMenus.montar(cab.querySelector('.mesa-etq-estado'), ESTADOS.map(function (e) {
       return { texto: e.texto, alPulsar: function () {
@@ -283,6 +292,30 @@ var HitoMesa = (function () {
         var b = fila.querySelector('.hito-quitar'); if (b) b.click();
       } }
     ]));
+  }
+
+  /* Fila 154 (docs/HITOS-ACCIONES-EN-EL-HITO.md): «Registrar» en la
+     cabecera, en vez de en un paso del guion. Con un solo documento sin
+     registrar, lo registra; con varios, pregunta cuál; sin ninguno, lo
+     dice. Lo mismo que «Registrar» del ⋯ de un documento (marca el paso
+     del guion con acción `registrar`). */
+  function engancharRegistrar(boton, a, h) {
+    if (!boton) return;
+    var sin = (h.documentos || []).filter(function (n) {
+      return window.Registro && !Registro.tieneRegistro(n) && !/SIN SELLAR/i.test(n) && !/\.docx?$/i.test(n);
+    });
+    function registrar(nombre) {
+      abrirTarjeta('docs');
+      if (window.HitosDocumentoMenu && HitosDocumentoMenu.registrar) HitosDocumentoMenu.registrar(a, h, nombre);
+    }
+    if (sin.length > 1 && window.FichaMenus) {
+      FichaMenus.montar(boton, sin.map(function (n) { return { texto: n, alPulsar: function () { registrar(n); } }; }));
+      return;
+    }
+    boton.onclick = function () {
+      if (!sin.length) { U.aviso('No hay ningún documento de este hito sin registrar. Añádelo primero.', 'ambar'); return; }
+      registrar(sin[0]);
+    };
   }
 
   function tipoDe(a) { return (a && ((a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo))) || ''; }

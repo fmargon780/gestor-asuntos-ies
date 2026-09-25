@@ -66,9 +66,10 @@ await pagina.waitForTimeout(300);
 
 /* ---------- 1-3: el cuadro de Séneca ---------- */
 
-await pagina.click('.boton-comunicar');
+/* Fila 154: con hitos, «Comunicar» de arriba va escondido (vive en la mesa del hito); su menú se pulsa por debajo. */
+await pagina.waitForSelector('.boton-comunicar', { state: 'attached' });
 await pagina.waitForTimeout(100);
-await pagina.getByRole('button', { name: 'Mensaje de Séneca', exact: true }).click();
+await pagina.evaluate((t) => Array.from(document.querySelector('.boton-comunicar').closest('.ficha-menu-envoltorio').querySelectorAll('.ficha-menu-opcion')).find((o) => o.textContent.trim() === t).click(), 'Mensaje de Séneca');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.waitForTimeout(200);
 
@@ -140,9 +141,10 @@ await pagina.waitForSelector('#capa', { state: 'hidden' });
 
 /* ---------- 5: el cuadro de Correo, no se pierde «Para» ni el asunto ---------- */
 
-await pagina.click('.boton-comunicar');
+/* Fila 154: con hitos, «Comunicar» de arriba va escondido (vive en la mesa del hito); su menú se pulsa por debajo. */
+await pagina.waitForSelector('.boton-comunicar', { state: 'attached' });
 await pagina.waitForTimeout(100);
-await pagina.getByRole('button', { name: 'Correo electrónico', exact: true }).click();
+await pagina.evaluate((t) => Array.from(document.querySelector('.boton-comunicar').closest('.ficha-menu-envoltorio').querySelectorAll('.ficha-menu-opcion')).find((o) => o.textContent.trim() === t).click(), 'Correo electrónico');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.waitForTimeout(200);
 

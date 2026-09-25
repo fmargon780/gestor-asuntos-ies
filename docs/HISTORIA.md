@@ -5,6 +5,24 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 154 (puntos 1, 2 y 5): las acciones, solo en el hito
+
+`docs/HITOS-ACCIONES-EN-EL-HITO.md`. El mismo botón salía en tres sitios y los números no cuadraban.
+Partida en dos como pide el propio documento: aquí las acciones, la lista y los números; las recetas
+y los documentos de otros hitos, en la fila 164. Decisiones:
+
+- **Los números**: la causa del «Paso 4 de 4» con el hito 5 en curso era que cada sitio contaba a su
+  manera: la marca quitaba los «solo informativo», la tira de la mesa no, y la pestaña «Hitos N/M»
+  contaba los hechos (no la posición). Ahora hay una sola cuenta (`Hitos.numerados`, la de la marca):
+  la pestaña dice la posición del hito actual y la tira pone «i ·» a los informativos, sin número.
+- La barra del guion ya no cuenta un «No aplica» como hecho: 4 pasos, uno no aplica y uno hecho, «1 de 3».
+- «Comunicar» y «Generar documento» de la barra de arriba se esconden con CSS si hay hitos (siguen en
+  el DOM con su menú). Un tipo sin guía recibe la guía mínima, así que en la práctica todos los
+  abiertos tienen hitos. Las pruebas del cuadro de Correo/Séneca que entraban por ahí pulsan ahora su
+  menú por debajo; el camino de la mesa ya lo prueban otras.
+- «Registrar» de la cabecera usa `HitosDocumentoMenu.registrar` (lo del ⋯), sin tocar `Registro`.
+- «No aplica» se queda como enlace que sale al pasar el ratón por el paso.
+
 ## 25-sep-2026 — Fila 161: «Ruta» deduce dónde está Dropbox y no pregunta
 
 `docs/RUTA-SIN-PREGUNTAR.md`. En la copia sin internet, «Ruta» abría un cuadro vacío sin decir qué
@@ -20,6 +38,10 @@ la propia dirección en la copia sin internet (`file://`), o de `localStorage` e
 - Se copia antes de guardar `rutas.json`: el navegador solo deja copiar justo tras el clic.
 - La prueba sirve la aplicación como `file://` desde un enlace en `…/Dropbox (Personal)/
   ADMINISTRACIÓN/REGISTROS/Gestor de Asuntos - aplicación/` (con acentos), sin generar la copia.
+- Las pruebas de GitHub estaban en rojo desde la fila 152: el Chromium de Actions (headless shell) abre
+  la carpeta `file://` pero no pinta su lista («addRow is not defined»). La prueba 7 de
+  `pruebas/copiar-ruta.mjs` comprueba ahora que se queda en la carpeta entera (sin cortar en el `#`) y,
+  solo si la lista se pinta, que sale el fichero.
 
 ## 25-sep-2026 — Fila 149: el membrete lo dibuja la aplicación, con el manual de la Junta
 

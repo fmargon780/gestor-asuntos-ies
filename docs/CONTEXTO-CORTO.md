@@ -110,11 +110,11 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Pruebas automáticas en cada subida de código (no con solo `docs/`).
 - Copia sin internet (`file://`): se actualiza sola; si no puede o no lo comprueba, franja fija arriba; cada 30 min.
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
-  bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa): «Generar documento ▾» y «Comunicar ▾»; tres tarjetas,
-  una en grande y dos de resumen (pulsar una la abre): el guion (siguiente paso resaltado; preguntas; 📎, ✎; se marca solo al generar,
-  registrar, comunicar o añadir), los documentos (nombre entero, gemelos, selección, «Enviar ▾» por correo o Séneca) y notas con historia.
+  bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa): las acciones solo ahí, «Generar documento ▾», «Comunicar ▾»
+  y «Registrar» (con hitos, no en la barra de arriba); tres tarjetas, una en grande y dos de resumen: el guion (lista para marcar, sin
+  botones, quién y cuándo al lado; preguntas; 📎, ✎; se marca solo al generar, registrar, comunicar o añadir), los documentos (nombre entero, gemelos, selección, «Enviar ▾» por correo o Séneca) y notas con historia.
   Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa
-  («✎ Cambiar el guion», sin salir a Ajustes); su «Comunicar» abre lo mismo que la cabecera y marca ese paso.
+  («✎ Cambiar el guion», sin salir a Ajustes). «Paso N de M», «Hitos N/M» y la mesa, con una sola cuenta.
   Biblioteca de hitos del centro, con guion; en Mantenimiento, cargar tipos, guías y guiones del instituto.
 - "Qué me toca": pendientes, filtro por responsable, "Dormidos" (sin novedades en N días). "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena solo los datos del centro (casillas con nombre legible y miniatura).

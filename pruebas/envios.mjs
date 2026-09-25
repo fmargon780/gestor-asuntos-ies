@@ -120,8 +120,9 @@ async function abrirCorreoDe(nombreAsunto) {
   await pagina.waitForTimeout(200);
   await pagina.locator('.tarjeta-nombre', { hasText: nombreAsunto }).click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-  await pagina.click('.boton-comunicar');
-  await pagina.getByRole('button', { name: 'Correo electrónico', exact: true }).click();
+  /* Fila 154: con hitos, «Comunicar» de arriba va escondido (vive en la mesa del hito); su menú se pulsa por debajo. */
+  await pagina.waitForSelector('.boton-comunicar', { state: 'attached' });
+  await pagina.evaluate((t) => Array.from(document.querySelector('.boton-comunicar').closest('.ficha-menu-envoltorio').querySelectorAll('.ficha-menu-opcion')).find((o) => o.textContent.trim() === t).click(), 'Correo electrónico');
   await pagina.waitForSelector('#capa:not(.oculto)');
   await pagina.waitForSelector('#adjuntos-lista .correo-fila');
 }

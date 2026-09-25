@@ -167,5 +167,6 @@ window.HitosDocumentoMenu = (function () {
     });
   }
 
-  return { ficherosNuevos: ficherosNuevos, botonHTML: botonHTML, engancharTodos: engancharTodos };
+  return { ficherosNuevos: ficherosNuevos, botonHTML: botonHTML, engancharTodos: engancharTodos,
+           registrar: accionRegistrar };
 })();

@@ -234,14 +234,11 @@ await pagina.evaluate(() => { localStorage.removeItem('gestor-ruta-dropbox'); lo
 await abrirAbierto();
 
 /* Abrir el cuadro de Correo desde la cabecera de la ficha ("Comunicar"). */
+/* Fila 154: con hitos, «Comunicar» de arriba va escondido; su menú se pulsa por debajo. */
+await pagina.waitForSelector('.boton-comunicar', { state: 'attached' });
 await pagina.evaluate(() => {
-  const boton = Array.from(document.querySelectorAll('button, .enlace')).find(b => /^Comunicar/.test(b.textContent.trim()));
-  if (boton) boton.click();
-});
-await pagina.waitForTimeout(150);
-await pagina.evaluate(() => {
-  const menu = Array.from(document.querySelectorAll('.ficha-menu')).find((m) => m.offsetParent);
-  const opcion = menu && Array.from(menu.querySelectorAll('.ficha-menu-opcion')).find((o) => /Correo/.test(o.textContent));
+  const opcion = Array.from(document.querySelector('.boton-comunicar').closest('.ficha-menu-envoltorio').querySelectorAll('.ficha-menu-opcion'))
+    .find((o) => /Correo/.test(o.textContent));
   if (opcion) opcion.click();
 });
 await pagina.waitForSelector('#capa:not(.oculto) #correo-formulario');
@@ -278,14 +275,11 @@ await pagina.waitForFunction(() => document.getElementById('capa').classList.con
 
 /* Séneca: el botón también sale, y sin ruta el campo también en línea. */
 await pagina.evaluate(() => localStorage.removeItem('gestor-ruta-dropbox'));
+/* Fila 154: con hitos, «Comunicar» de arriba va escondido; su menú se pulsa por debajo. */
+await pagina.waitForSelector('.boton-comunicar', { state: 'attached' });
 await pagina.evaluate(() => {
-  const boton = Array.from(document.querySelectorAll('button, .enlace')).find(b => /^Comunicar/.test(b.textContent.trim()));
-  if (boton) boton.click();
-});
-await pagina.waitForTimeout(150);
-await pagina.evaluate(() => {
-  const menu = Array.from(document.querySelectorAll('.ficha-menu')).find((m) => m.offsetParent);
-  const opcion = menu && Array.from(menu.querySelectorAll('.ficha-menu-opcion')).find((o) => /Séneca/.test(o.textContent));
+  const opcion = Array.from(document.querySelector('.boton-comunicar').closest('.ficha-menu-envoltorio').querySelectorAll('.ficha-menu-opcion'))
+    .find((o) => /Séneca/.test(o.textContent));
   if (opcion) opcion.click();
 });
 await pagina.waitForSelector('#capa:not(.oculto) #seneca-formulario');
@@ -331,10 +325,22 @@ const carpetaReal = path.join(base, nombreDificil);
 fs.mkdirSync(carpetaReal);
 fs.writeFileSync(path.join(carpetaReal, 'marca-de-la-prueba.txt'), 'hola');
 const urlReal = await pagina.evaluate(([base, nombre]) => RutaCarpetas.comoFileUrl(base, [nombre]), [base, nombreDificil]);
+const erroresDelListado = errores.length;
 await pagina.goto(urlReal);
 await comprobarQue('la URL codifica el # (si no, la ruta se cortaría ahí)', urlReal.indexOf('%23') > -1);
-await comprobarQue('Chromium abre la carpeta de verdad: se ve el fichero de dentro, no una búsqueda',
-  pagina.locator('body', { hasText: 'marca-de-la-prueba.txt' }).count().then(n => n > 0));
+/* El Chromium de GitHub Actions (headless shell) abre la carpeta pero no
+   pinta su lista (sus propios scripts fallan: «addRow is not defined»),
+   así que se comprueba que se ha quedado en esa carpeta entera, sin
+   cortar en el # ni buscar nada; y, si pinta la lista, que sale el fichero. */
+await comprobarQue('Chromium abre la carpeta de verdad (la ruta entera, no una búsqueda)',
+  Promise.resolve(pagina.url().startsWith('file://') &&
+    decodeURIComponent(new URL(pagina.url()).pathname).replace(/\/+$/, '') === carpetaReal.replace(/\/+$/, '')));
+const conLista = await pagina.evaluate(() => !!document.querySelector('#tbody, table'));
+if (conLista && errores.length === erroresDelListado) {
+  await comprobarQue('y se ve el fichero de dentro',
+    pagina.locator('body', { hasText: 'marca-de-la-prueba.txt' }).count().then(n => n > 0));
+}
+errores.splice(erroresDelListado);
 fs.rmSync(base, { recursive: true, force: true });
 
 /* ---------- 14. la copia sin internet, servida como file:// desde

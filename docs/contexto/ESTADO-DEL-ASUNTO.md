@@ -14,7 +14,9 @@ Conviven cero sistemas: `ficha.situacion` se queda quieta en `asuntos.json` (no 
 - **El único que decide**: `Hitos.estadoDelAsunto(hitos, ajustes, contexto)` (`js/hitos.js`), que
   llama a `Hitos.ladoDelAsunto` (`js/hitos-a-quien.js`, pura). Devuelve `{ lado, quien, hito,
   desde, titulo, n, m, esperando, listo, sinHitos, texto }`. `texto`: «Paso N de M · título»
-  (M = visibles sin «solo informativo», «no aplica» ni del tipo anterior), «Listo para archivar»
+  (M = visibles sin «solo informativo», «no aplica» ni del tipo anterior; fila 154: es la única
+  cuenta, `Hitos.numerados`, que usan también la pestaña «Hitos N/M» de la ficha y la tira y el
+  «Hito N de M» de la mesa, donde un informativo sale sin número, «i ·»), «Listo para archivar»
   o «Sin hitos» (sin hitos → Administración). `App.ladoDe(a)` la llama con lo último leído.
 - **El hito actual** (`Hitos.aQuienLeToca`): el primer hito visible ni `hecho` ni `noaplica`,
   saltando los `soloInformativo` y las preguntas respondidas; si hay otros `encurso` a la vez y

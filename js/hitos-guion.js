@@ -112,9 +112,12 @@
     return unir((paso && paso.guion) || [], hito);
   }
 
+  /* Fila 154: un paso «No aplica» no cuenta ni para lo hecho ni para el
+     total (4 pasos, uno no aplica y uno hecho: «1 de 3»). */
   function cuentaGuion(lista) {
-    var hechos = (lista || []).filter(function (g) { return g.hecho || g.noaplica; }).length;
-    return { hechos: hechos, total: (lista || []).length };
+    var aplican = (lista || []).filter(function (g) { return !g.noaplica; });
+    var hechos = aplican.filter(function (g) { return g.hecho; }).length;
+    return { hechos: hechos, total: aplican.length };
   }
 
   async function editarHito(clave, idHito, mutador) {

@@ -242,6 +242,11 @@
         var nota = $('ficha-guia-nota');
         if (nota && nota.parentNode === caja) nota.remove();
         caja.innerHTML = '';
+        /* Fila 154: con hitos, «Comunicar» y «Generar documento» viven
+           solo en la cabecera de cada hito; la barra de arriba de la
+           ficha los esconde (css/hito-mesa.css). */
+        var pantalla = $('pantalla-asunto');
+        if (pantalla) pantalla.classList.toggle('asunto-con-hitos', !errorLectura && hitos.length > 0);
         if (!errorLectura && hitos.length) {
           caja.className = 'hitos-panel';
           caja.appendChild(HitosPanelLista.bloqueDeHitos(a, hitos, datos.ajustes, abierto, nombresDeLaCarpeta));

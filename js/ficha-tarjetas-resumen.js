@@ -49,6 +49,16 @@ var FichaTarjetasResumen = (function () {
     });
   }
 
+  function pasoDelAsunto() {
+    var nombre = window.App && App.fichaAbierta && App.fichaAbierta();
+    var datos = nombre && window.Hitos && Hitos.ultimosLeidos && Hitos.ultimosLeidos();
+    var entrada = datos && datos.porAsunto && datos.porAsunto[nombre];
+    if (!entrada || !entrada.hitos || !entrada.hitos.length || !Hitos.estadoDelAsunto) return null;
+    var r = Hitos.estadoDelAsunto(entrada.hitos, datos.ajustes);
+    if (!r || r.sinHitos || !r.m) return null;
+    return { n: r.listo ? r.m : Math.max(r.n || 1, 1), m: r.m, listo: !!r.listo };
+  }
+
   function resumirHitos() {
     var guia = $('ficha-guia');
     if (!guia) return;
@@ -61,8 +71,12 @@ var FichaTarjetasResumen = (function () {
       return;
     }
     var hechos = filas.filter(function (h) { return h.classList.contains('hito-hecho'); }).length;
-    ponerCuenta('hitos', hechos + '/' + filas.length);
-    var partes = [{ texto: hechos + ' de ' + filas.length + (filas.length === 1 ? ' hecho' : ' hechos'), clase: 'fuerte' }];
+    /* Fila 154: «Hitos N/M» dice lo mismo que «Paso N de M» de la
+       cabecera (Hitos.estadoDelAsunto, una sola cuenta). */
+    var paso = pasoDelAsunto();
+    ponerCuenta('hitos', paso ? paso.n + '/' + paso.m : hechos + '/' + filas.length);
+    var partes = [{ texto: paso ? (paso.listo ? 'Todos hechos · ' + paso.m + ' de ' + paso.m : 'Paso ' + paso.n + ' de ' + paso.m)
+      : hechos + ' de ' + filas.length + (filas.length === 1 ? ' hecho' : ' hechos'), clase: 'fuerte' }];
     var siguiente = filas.filter(function (h) { return h.classList.contains('hito-encurso'); })[0] ||
                     filas.filter(function (h) { return h.classList.contains('hito-pendiente'); })[0];
     if (siguiente) {

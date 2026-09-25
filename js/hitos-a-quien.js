@@ -69,7 +69,10 @@
   }
 
   /* Los hitos que cuentan para «Paso N de M»: los visibles, sin los
-     «solo informativo», los «no aplica» ni los del tipo anterior. */
+     «solo informativo», los «no aplica» ni los del tipo anterior. Fila
+     154: es la única cuenta, la misma para la marca del asunto, la
+     pestaña «Hitos N/M» y la tira y el «Hito N de M» de la mesa
+     (`Hitos.numerados`; en la tira, un informativo sale sin número). */
   function contables(hitos) {
     return Hitos.visibles(hitos || []).filter(function (h) {
       return !h.soloInformativo && h.estado !== 'noaplica' && !h.delTipoAnterior;
@@ -199,7 +202,7 @@
     ladoDelAsunto: ladoDelAsunto, ladoDeAsunto: ladoDeAsunto,
     textoDelEstado: textoDelEstado, nombreDeEspera: nombreVisible,
     situarLista: situarLista, situarEn: situarEn, quitarEspera: quitarEspera,
-    marcarAdministracion: marcarAdministracion
+    marcarAdministracion: marcarAdministracion, numerados: contables
   });
 
   /* ---------- la lista, al día sin releer en cada repintado ----------

@@ -4,10 +4,11 @@
    docs/EL-HITO-A-PANTALLA-COMPLETA.md, sección 3).
 
    - "Guion del hito", la cuenta "N de M" y una barra de progreso.
-   - Cada paso: casilla, texto en negrita, explicación en gris y, debajo,
-     su acción (si tiene: pulsa el botón de siempre del hito), su
-     normativa como etiqueta "§ cita" y "No aplica". Marcado: tachado,
-     con quién y cuándo en el `title`.
+   - Cada paso: casilla, texto en negrita, explicación en gris, su
+     normativa como etiqueta "§ cita" y "No aplica". Desde la fila 154
+     (docs/HITOS-ACCIONES-EN-EL-HITO.md), sin botones de acción: las
+     acciones viven en la cabecera del hito (js/hito-mesa.js). Hecho: en
+     gris, con quién y cuándo al lado; «No aplica»: tachado.
    - "+ Añadir un paso a la guía del tipo" (fila 120, docs/GUION-DESDE-EL-HITO.md):
      la línea va al final del guion del paso de la guía (`origenGuia`) y
      sale en todos los asuntos de ese tipo. No sale si el hito no viene
@@ -29,22 +30,6 @@
    ============================================================ */
 var HitoMesaGuion = (function () {
 
-  var BOTON_DE_ACCION = {
-    generar: { clase: '.hito-generar', texto: 'Generar documento' },
-    comunicar: { clase: '.hito-comunicar-boton', texto: 'Comunicar' },
-    anadir: { clase: '.hito-anadir-documento', texto: 'Añadir documento' },
-    registrar: { clase: '.hito-doc-menu-boton', texto: 'Registrar (en el ⋯ del documento)' }
-  };
-
-  /* Fila 150: el «Comunicar» de un paso del guion no pasa por el botón
-     escondido de siempre (`.hito-comunicar-boton`, dentro de
-     `.mesa-ocultos`): cuando ofrece dos vías, `FichaMenus` monta su menú
-     ahí mismo, y un contenedor con `display:none` se lo lleva por
-     delante, invisible. Se llama a `HitosComunicar.comunicar` en línea
-     recta, con el mismo cuadro que la cabecera, y con `idPasoGuion` para
-     marcar justo este paso (no «el primero pendiente»). */
-  var ETIQUETA_CANAL_GUION = { correo: 'Correo electrónico', seneca: 'Mensaje de Séneca' };
-
   function enlaceNormativa(n) {
     if (!n || !n.cita) return '';
     var url = n.url || '';
@@ -57,28 +42,37 @@ var HitoMesaGuion = (function () {
      acción, se añade con «Añadir documento». */
   function accionDe(g) { return g.accion || (g.reunir === 'documento' ? 'anadir' : ''); }
 
+  var MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  function fechaCorta(iso) {
+    var p = String(iso || '').slice(0, 10).split('-');
+    if (p.length !== 3 || !MESES[parseInt(p[1], 10) - 1]) return '';
+    return parseInt(p[2], 10) + '-' + MESES[parseInt(p[1], 10) - 1];
+  }
+
   function pasoHTML(g, abierto, siguiente) {
     var marcado = g.hecho || g.noaplica;
     var titulo = marcado ? (g.noaplica ? 'No aplica' : 'Hecho') + (g.quien ? ' por ' + g.quien : '') +
       (g.cuando ? ' el ' + String(g.cuando).slice(0, 10) : '') +
       (g.valor ? ' · ' + g.valor : '') + (g.documento ? ' · ' + g.documento : '') : '';
     var claveAccion = accionDe(g);
-    var accion = BOTON_DE_ACCION[claveAccion];
     var marcaReunir = g.reunir === 'documento' ? '<span class="guion-reunir-marca" title="Un documento que hay que reunir">📎</span>'
       : (g.reunir === 'dato' ? '<span class="guion-reunir-marca" title="Un dato que hay que reunir">✎</span>' : '');
-    var botonAccion = abierto && accion && !marcado ? '<button type="button" class="boton ' + (siguiente ? 'boton-principal' : 'boton-chico') +
-      ' guion-accion-boton" data-accion="' + U.escapar(claveAccion) + '">' + U.escapar(accion.texto) + '</button>' : '';
+    /* Fila 154 (docs/HITOS-ACCIONES-EN-EL-HITO.md): los pasos ya no llevan
+       botones de acción; las acciones viven solo en la cabecera del hito.
+       Un paso hecho dice al lado, en pequeño, quién y cuándo. */
+    var quienCuando = g.hecho && !g.noaplica && (g.quien || g.cuando)
+      ? '<span class="guion-paso-quien">' + U.escapar([g.quien || '', fechaCorta(g.cuando)].filter(Boolean).join(' · ')) + '</span>' : '';
     return '<div class="guion-paso' + (g.hecho ? ' hecho' : '') + (g.noaplica ? ' noaplica' : '') + (g.reunir ? ' guion-reunir' : '') +
         (siguiente ? ' guion-siguiente' : '') + '" data-id="' +
         U.escapar(g.id) + '"' + (titulo ? ' title="' + U.escapar(titulo) + '"' : '') + '>' +
       '<div class="guion-paso-fila"><label class="guion-paso-linea"><input type="checkbox" class="guion-casilla"' + (g.hecho ? ' checked' : '') +
         (abierto ? '' : ' disabled') + '>' + marcaReunir + '<span class="guion-paso-texto">' + U.escapar(g.texto) + '</span>' +
-        (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + '</label>' + botonAccion + '</div>' +
+        (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + '</label>' + quienCuando + '</div>' +
       (g.explicacion ? '<div class="guion-paso-explicacion">' + U.escapar(g.explicacion) + '</div>' : '') +
       (g.reunir === 'dato' ? '<input class="campo guion-dato" value="' + U.escapar(g.valor || '') + '" placeholder="Escríbelo aquí"' +
         (abierto ? '' : ' disabled') + '>' : '') +
       (g.reunir === 'documento' && g.hecho && g.documento ? '<div class="guion-paso-explicacion guion-reunir-documento">📎 ' + U.escapar(g.documento) + '</div>' : '') +
-      (abierto && siguiente && claveAccion === 'anadir' ? '<div class="guion-soltar">Suelta aquí el PDF, o pulsa el botón</div>' : '') +
+      (abierto && siguiente && claveAccion === 'anadir' ? '<div class="guion-soltar">Suelta aquí el PDF</div>' : '') +
       '<div class="guion-paso-botones">' +
         enlaceNormativa(g.normativa) +
         (abierto ? '<button type="button" class="enlace guion-noaplica">' + (g.noaplica ? 'Sí aplica' : 'No aplica') + '</button>' : '') +
@@ -198,29 +192,6 @@ var HitoMesaGuion = (function () {
       if (noaplica) noaplica.onclick = function () {
         guardar(noaplica, function () { return Hitos.marcarGuion(a.nombre, h.id, id, { noaplica: !el.classList.contains('noaplica') }); });
       };
-      var accion = el.querySelector('.guion-accion-boton');
-      if (accion && accion.dataset.accion === 'comunicar' && window.HitosComunicar) {
-        /* Fila 150: en línea recta, con este paso ya elegido para marcar. */
-        var canales = HitosComunicar.canalesDe(a, h);
-        if (canales.length > 1 && window.FichaMenus) {
-          FichaMenus.montar(accion, canales.map(function (canal) {
-            return { texto: ETIQUETA_CANAL_GUION[canal] || canal, alPulsar: function () {
-              HitosComunicar.comunicar(a, h, canal, { idPasoGuion: id });
-            } };
-          }));
-        } else {
-          accion.onclick = function () { HitosComunicar.comunicar(a, h, canales[0] || 'correo', { idPasoGuion: id }); };
-        }
-      } else if (accion) {
-        accion.onclick = function () {
-          /* Fila 147: registrar se hace desde el ⋯ del documento, en su tarjeta. */
-          if (accion.dataset.accion === 'registrar' && window.HitoMesa && HitoMesa.abrirTarjeta) HitoMesa.abrirTarjeta('docs');
-          var destino = BOTON_DE_ACCION[accion.dataset.accion];
-          var b = destino && fila.querySelector(destino.clase);
-          if (b) b.click();
-          else U.aviso('Esa acción está en los documentos del hito.', 'ambar');
-        };
-      }
     });
     /* Fila 145: soltar un fichero en el siguiente paso, como en la columna derecha. */
     var soltar = caja.querySelector('.guion-soltar');

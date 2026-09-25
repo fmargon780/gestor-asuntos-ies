@@ -271,6 +271,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/guia-en-acordeon.mjs` | Prueba del editor de la guía en acordeón (fila 122) |
 | `pruebas/opciones.mjs` | Prueba de las preguntas con opciones, con el caso de la factura |
 | `pruebas/registro.mjs` | Prueba de registrar un documento en un paso, sin nombrarlo dos veces |
+| `pruebas/hitos-acciones-en-el-hito.mjs` | Prueba (navegador de verdad, fila 154): las acciones solo en la cabecera del hito (sin botones en los pasos, «Registrar», «Comunicar» de arriba escondido), quién y cuándo al lado del paso hecho, y «Paso N de M», «Hitos N/M» y «Hito N de M» iguales con un hito informativo; la barra del guion sin los «No aplica» |
 | `pruebas/copiar-ruta.mjs` | Prueba (navegador de verdad, filas 98, 152 y 161): el botón «Ruta» en la ficha y en los cuadros, `file:///`, la ruta pegada partida por `Dropbox` (`rutas.json` y `localStorage`), la antigua que rellena `rutas.json`, y la app servida como `file://` desde dentro de `Dropbox (Personal)` copiando sin preguntar |
 | `pruebas/campos-del-documento.mjs` | Prueba (fila 96, 23-sep-2026): el nombre con los campos del tipo de documento, el obligatorio vacío, un tipo sin campos, con registro, reconocer al renombrar, guardar en `campos.json`; y en navegador el cuadro de poner nombre y el editor de Ajustes |
 | `pruebas/campos.mjs` | Prueba de los campos de cada tipo de asunto (ocho escenarios más editar) |

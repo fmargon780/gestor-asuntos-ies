@@ -206,8 +206,9 @@ await comprobar('los dos miembros del grupo quedan relacionados con el asunto', 
 console.log('--- "Añadir un grupo" en Correo mete los correos en Copia oculta ---');
 /* "Correo" vive ahora dentro de "Comunicar" (18-sep-2026, fila 52,
    docs/CABECERA-DEL-ASUNTO.md). */
-await pagina.getByRole('button', { name: 'Comunicar', exact: true }).click();
-await pagina.getByRole('button', { name: 'Correo electrónico', exact: true }).click();
+/* Fila 154: con hitos, «Comunicar» de arriba va escondido (vive en la mesa del hito); su menú se pulsa por debajo. */
+await pagina.waitForSelector('.boton-comunicar', { state: 'attached' });
+await pagina.evaluate((t) => Array.from(document.querySelector('.boton-comunicar').closest('.ficha-menu-envoltorio').querySelectorAll('.ficha-menu-opcion')).find((o) => o.textContent.trim() === t).click(), 'Correo electrónico');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.waitForSelector('#correo-grupo');
 await pagina.selectOption('#correo-grupo', { label: 'Grupo de prueba' });

@@ -147,7 +147,10 @@ details.mesa-normativa > summary { cursor: pointer; }
 .guion-paso { padding: 6px 0; border-bottom: 1px dashed var(--linea); }
 .guion-paso-linea { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
 .guion-paso-texto { font-weight: 600; font-size: 14px; }
-.guion-paso.hecho .guion-paso-texto, .guion-paso.noaplica .guion-paso-texto { text-decoration: line-through; color: var(--tinta-suave); font-weight: 400; }
+/* Fila 154: un paso hecho, en gris con su casilla marcada y quién y cuándo al lado; solo «No aplica» se tacha. */
+.guion-paso.hecho .guion-paso-texto { color: var(--tinta-suave); font-weight: 400; }
+.guion-paso.noaplica .guion-paso-texto { text-decoration: line-through; color: var(--tinta-suave); font-weight: 400; }
+.guion-paso-quien { margin-left: auto; font-size: 12px; color: var(--tinta-suave); white-space: nowrap; }
 .guion-paso-explicacion { font-size: 12px; color: var(--tinta-suave); margin: 2px 0 0 24px; }
 .guion-paso-botones { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 4px 0 0 24px; font-size: 12px; }
 /* Fila 145: una línea con la acción a la derecha; los hechos, en una sola
@@ -241,3 +244,8 @@ details.mesa-normativa > summary { cursor: pointer; }
 
 /* Fila 139: la historia automática del hito, debajo de sus notas. */
 .hito-historia-titulo { display: block; margin-top: 10px; }
+
+/* Fila 154: con hitos, las acciones solo en la cabecera de cada hito. */
+#pantalla-asunto.asunto-con-hitos #ficha-acciones .boton-comunicar,
+#pantalla-asunto.asunto-con-hitos #ficha-acciones .boton-generar-documento { display: none; }
+

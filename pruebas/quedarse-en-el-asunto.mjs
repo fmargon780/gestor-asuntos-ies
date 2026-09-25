@@ -165,9 +165,10 @@ await pagina.waitForTimeout(400);
 await comprobar('6. apuntar un documento a un hito no saca de la ficha', pantallas(), { asunto: true, abiertos: false });
 
 console.log('--- 7. comunicar: abrir y cerrar el cuadro de correo ---');
-await pagina.click('.boton-comunicar');
-await pagina.waitForSelector('.ficha-menu:not(.oculto)');
-await pagina.getByRole('button', { name: 'Correo electrónico', exact: true }).click();
+/* Fila 154: con hitos, «Comunicar» de arriba va escondido (vive en la mesa del hito); su menú se pulsa por debajo. */
+await pagina.waitForSelector('.boton-comunicar', { state: 'attached' });
+
+await pagina.evaluate((t) => Array.from(document.querySelector('.boton-comunicar').closest('.ficha-menu-envoltorio').querySelectorAll('.ficha-menu-opcion')).find((o) => o.textContent.trim() === t).click(), 'Correo electrónico');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('el cuadro de correo se llama como toca',
   pagina.locator('#cuadro-titulo').textContent(), 'Correo de este asunto');
