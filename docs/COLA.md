@@ -112,7 +112,7 @@ Las filas 1 a 142 están **HECHAS**. Sus documentos siguen en `docs/`, y el deta
 
 | Nº | Instrucción | Estado |
 |---|---|---|
-| 144 | `docs/ALUMNADO-BD-DESDE-DRIVE.md` (todo el alumnado de la base de datos, desde la carpeta de Drive; sustituye la dirección web de la fila 142; acuerdo en `docs/ACUERDO-ALUMNADO.md`, versión 2) | PENDIENTE |
+| 144 | `docs/ALUMNADO-BD-DESDE-DRIVE.md` (todo el alumnado de la base de datos, desde la carpeta de Drive; sustituye la dirección web de la fila 142; acuerdo en `docs/ACUERDO-ALUMNADO.md`, versión 2) | EN CURSO (25-sep-2026) |
 | 145 | `docs/MESA-DEL-HITO-ENFOCADA.md` (la mesa del hito, enfocada: el guion manda, dos zonas, «Generar documento ▾» y «Comunicar ▾» en la cabecera) | PENDIENTE |
 
 **La fila 142 está HECHA** (25-sep-2026): `docs/ALUMNADO-DESDE-LA-BD.md`. Bloque «Base de datos
