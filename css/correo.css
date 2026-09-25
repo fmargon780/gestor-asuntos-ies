@@ -24,6 +24,15 @@
 
 .correo-botones { display: flex; gap: 8px; flex-wrap: wrap; }
 
+/* El botón «Ruta» de la cabecera del cuadro (fila 152), y el
+   formulario en línea que pide la ruta si falta: lo usan Correo y
+   Séneca los dos, de aquí. */
+.cuadro-cabecera-ruta { display: flex; justify-content: flex-end; }
+.ruta-en-linea {
+  border: 1px solid var(--linea); border-radius: 8px;
+  padding: 10px 12px; margin-bottom: 10px; background: #f7f9fc;
+}
+
 /* El cuadro entero: ancho hasta 1100px, y alto acotado al de la
    pantalla para que el título y los botones de abajo (Cerrar, o los
    propios "Abrir en Gmail"/"Abrir en el correo del ordenador") no
