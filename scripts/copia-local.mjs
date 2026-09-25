@@ -206,6 +206,10 @@ async function main() {
   generarCopiaDatosDeJson('datos-biblioteca/biblioteca-centro.json');
   generarCopiaDatosDeJson('datos/formularios.json');
   generarCopiaDatosDeJson('plantillas/indice.json');
+  /* Fila 149: la letra y el símbolo del membrete (js/membrete.js). */
+  generarCopiaDatosDeBinario('img/junta-andalucia-simbolo.svg');
+  generarCopiaDatosDeBinario('fonts/NotoSansHK-latin-400.woff2');
+  generarCopiaDatosDeBinario('fonts/NotoSansHK-latin-700.woff2');
 
   for (const nombre of listarFicheros(rutaRaiz('formularios'), (n) => n.toLowerCase().endsWith('.pdf'))) {
     generarCopiaDatosDeBinario('formularios/' + nombre);

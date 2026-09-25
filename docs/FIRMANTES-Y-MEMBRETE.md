@@ -1,5 +1,11 @@
 # Fila 81 · Los firmantes del centro y el membrete
 
+> **25-sep-2026, fila 149:** la parte 3 (el membrete) ya no vale tal cual. El membrete no es una
+> imagen subida: lo dibuja entero la aplicación con el manual de la Junta (símbolo, «Junta de
+> Andalucía», la Consejería, el centro y, si la plantilla lo lleva, el logo del centro). Ver
+> `docs/MEMBRETE-LETRA-DEL-MANUAL.md` y `docs/contexto/DOCUMENTOS-PDF.md`. La parte de los cargos
+> y los firmantes sigue igual.
+
 Acordado con Francisco el 20-sep-2026. **Sube directamente a `main`, sin abrir ninguna petición
 de cambios.** Cambios quirúrgicos: no reescribas ficheros enteros que no cambien, no leas el
 repositorio entero, y haz una sola pasada de pruebas al final.

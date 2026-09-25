@@ -1,211 +1,300 @@
 /* ============================================================
-   membrete.js — el membrete del centro, sin el nombre de la
-   Consejería dentro de la imagen (20-sep-2026, fila 81,
-   docs/FIRMANTES-Y-MEMBRETE.md).
+   membrete.js — el membrete de los documentos, dibujado entero por la
+   aplicación con el manual de la Junta (25-sep-2026, fila 149,
+   docs/MEMBRETE-LETRA-DEL-MANUAL.md). Sustituye al de la fila 81, que
+   escribía el nombre de la Consejería encima de una imagen subida.
 
-   La imagen se sube una vez, en Ajustes → El centro, y se guarda tal
-   cual en _GESTOR/PLANTILLAS/membrete.png (la única vez que la
-   aplicación escribe en esa carpeta: el resto sigue siendo solo
-   lectura). El nombre de la Consejería se escribe ENCIMA, con
-   `Membrete.montar()`, a partir de lo que diga Ajustes: así, cuando la
-   Consejería cambie de nombre, basta con corregir una línea de texto,
-   sin rehacer ninguna imagen.
+   Lo fijo: el símbolo de la Junta (img/junta-andalucia-simbolo.svg) y
+   «Junta de Andalucía» en Noto Sans HK negrita. Lo de Ajustes → El
+   centro → Membrete: la Consejería (vacía, «Consejería de Educación»),
+   el nombre del centro (el mismo dato `centro` de plantillas.json, en
+   MAYÚSCULAS y verde) y, opcional, el logo del centro
+   (_GESTOR/PLANTILLAS/logo-centro.png), a la derecha. Cada plantilla de
+   documento dice si lleva el logo (`conLogoCentro`; sin la clave, sí).
 
-   `Membrete.medir` es una función SIN EFECTOS (nada de DOM ni de
-   canvas): calcula el tamaño de letra y, si no cabe ni al mínimo,
-   las dos líneas en las que partir el texto. Se prueba suelta en
-   pruebas/membrete.mjs. Como no hay una fuente de verdad delante (ni
-   en Node ni pensada para depender de un <canvas>), el ancho del
-   texto se estima con un factor medio de una tipografía de palo seco
-   (Arial/Helvetica): cada carácter, unas 0,52 veces el tamaño de la
-   letra. Es una aproximación a propósito: sobra para decidir "cabe" o
-   "no cabe" sin arrastrar aquí toda la máquina de pintar.
+   `Membrete.componer` es SIN EFECTOS (nada de DOM ni de canvas): dice
+   dónde va cada cosa, en píxeles de un lienzo de 2480 × 400, todo en
+   proporción a S (la altura del símbolo). Se prueba suelta en
+   pruebas/membrete.mjs. Para medir el ancho de un texto recibe una
+   función; sin ella, lo estima (0,56 veces el tamaño por carácter).
+
+   La letra (fonts/NotoSansHK-latin-400/700.woff2) y el símbolo se leen
+   con `App.leerFicheroDeLaApp`, así que también valen en la copia sin
+   internet. Si la letra no carga, se dibuja con Arial; si el símbolo no
+   carga, el documento sale sin membrete, como antes sin imagen.
    ============================================================ */
 var Membrete = (function () {
 
-  var FACTOR_ANCHO_CARACTER = 0.52;
-  var MINIMO_PROPORCION = 0.55;
+  var LIENZO = { ancho: 2480, alto: 400 };
+  var S = 270;
+  var MARGEN = 60;
+  var SIMBOLO_PROPORCION = 670 / 627;   /* ancho / alto del viewBox del SVG */
+  var NEGRO = '#221E1B';
+  var VERDE = '#017836';
+  var POR_DEFECTO_CONSEJERIA = 'Consejería de Educación';
+  var FAMILIA = 'MembreteNotoSansHK';
+  var FACTOR_ANCHO_CARACTER = 0.56;
+  var RUTA_SIMBOLO = 'img/junta-andalucia-simbolo.svg';
+  var LOGO = 'logo-centro.png';
 
   function gestor() { return window.Gestor && window.Gestor.carpetaGestor(); }
 
-  function anchoAproximado(texto, tamano) {
-    return String(texto || '').length * tamano * FACTOR_ANCHO_CARACTER;
-  }
+  function estimarAncho(texto, tamano) { return String(texto || '').length * tamano * FACTOR_ANCHO_CARACTER; }
 
-  /* El punto donde partir en dos líneas más parejas posible, por un
-     espacio (nunca a mitad de palabra). Sin ningún espacio, no hay
-     dónde partir: se deja como una sola línea, aunque no quepa del
-     todo (mejor que partir una palabra por la mitad). */
+  /* Parte en dos líneas por el espacio que las deje más parejas. */
   function partirEnDosLineas(texto) {
     var palabras = String(texto || '').trim().split(/\s+/);
-    if (palabras.length < 2) return [texto];
+    if (palabras.length < 2) return [String(texto || '').trim()];
     var mejorCorte = 1, mejorDiferencia = Infinity;
     for (var i = 1; i < palabras.length; i++) {
-      var izq = palabras.slice(0, i).join(' ');
-      var der = palabras.slice(i).join(' ');
-      var diferencia = Math.abs(izq.length - der.length);
-      if (diferencia < mejorDiferencia) { mejorDiferencia = diferencia; mejorCorte = i; }
+      var d = Math.abs(palabras.slice(0, i).join(' ').length - palabras.slice(i).join(' ').length);
+      if (d < mejorDiferencia) { mejorDiferencia = d; mejorCorte = i; }
     }
     return [palabras.slice(0, mejorCorte).join(' '), palabras.slice(mejorCorte).join(' ')];
   }
 
-  /* `caja` es la de docs/FIRMANTES-Y-MEMBRETE.md (Plantillas.HUECOS
-     no la toca; vive en plantillas.json como `membreteCaja`): `{ x, y,
-     ancho, alto }`, todo en % del ancho o del alto de la imagen.
-     Devuelve `{ tamano, lineas }`, con `tamano` en píxeles de la
-     imagen (no en %: quien pinta ya sabe el tamaño real). */
-  function medir(texto, caja, anchoImagen, altoImagen) {
-    var maximo = (caja.alto / 100) * altoImagen;
-    var minimo = maximo * MINIMO_PROPORCION;
-    var anchoMaximo = (caja.ancho / 100) * anchoImagen;
-
-    for (var tamano = maximo; tamano >= minimo; tamano -= 1) {
-      if (anchoAproximado(texto, tamano) <= anchoMaximo) return { tamano: tamano, lineas: [String(texto || '')] };
-    }
-    if (anchoAproximado(texto, minimo) <= anchoMaximo) return { tamano: minimo, lineas: [String(texto || '')] };
-    return { tamano: minimo, lineas: partirEnDosLineas(texto) };
+  /* Una línea si cabe; si no, dos; si ni así, la letra más pequeña. */
+  function ajustar(texto, tamano, peso, anchoMax, medir) {
+    var cabe = function (lineas, t) { return lineas.every(function (l) { return medir(l, t, peso) <= anchoMax; }); };
+    var una = [texto];
+    if (cabe(una, tamano)) return { lineas: una, tamano: tamano };
+    var dos = partirEnDosLineas(texto);
+    var t = tamano;
+    while (t > 4 && !cabe(dos, t)) t -= 0.5;
+    return { lineas: dos, tamano: t };
   }
 
-  /* Dibuja `blob` (la imagen tal cual, un File o un Blob) en un
-     `<canvas>` de su propio tamaño, con `consejeria` escrita encima
-     según `caja`, y devuelve `{ bytes, ancho, alto }` en PNG. Aparte de
-     `montar` (que lee todo de disco) para que la vista previa en vivo
-     de Ajustes pueda usar la imagen y los valores TODAVÍA SIN GUARDAR
-     del formulario, sin tener que guardar primero para verla. */
-  async function dibujar(blob, consejeria, caja) {
-    var bitmap = await createImageBitmap(blob);
-    var ancho = bitmap.width, alto = bitmap.height;
+  /* Dónde va cada cosa. `opciones`: { consejeria, centro, logo: { ancho,
+     alto } | null, conLogo, medir(texto, tamano, peso) }. */
+  function componer(opciones) {
+    var o = opciones || {};
+    var medir = typeof o.medir === 'function' ? o.medir : estimarAncho;
+    var arriba = (LIENZO.alto - S) / 2;
+    var simbolo = { x: MARGEN, y: arriba, ancho: S * SIMBOLO_PROPORCION, alto: S };
+    var x = simbolo.x + simbolo.ancho + 0.20 * S;
+    var anchoMax = 0.72 * LIENZO.ancho - x;
+    var salto = 0.20 * S;
+
+    var consejeria = String(o.consejeria || '').trim() || POR_DEFECTO_CONSEJERIA;
+    var centro = String(o.centro || '').trim().toUpperCase();
+    var k = ajustar(consejeria, 0.144 * S, 400, anchoMax, medir);
+    var c = centro ? ajustar(centro, 0.111 * S, 400, anchoMax, medir) : { lineas: [], tamano: 0.111 * S };
+
+    /* De abajo arriba: la última línea del centro, en la base del símbolo;
+       las líneas de más suben todo el bloque. */
+    var textos = [];
+    var base = arriba + S;
+    var i;
+    for (i = c.lineas.length - 1; i >= 0; i--) {
+      textos.unshift({ texto: c.lineas[i], x: x, y: base, tamano: c.tamano, peso: 400, color: VERDE });
+      if (i > 0) base -= salto;
+    }
+    base = c.lineas.length ? base - 0.265 * S : arriba + 0.735 * S;
+    var lineasK = [];
+    for (i = k.lineas.length - 1; i >= 0; i--) {
+      lineasK.unshift({ texto: k.lineas[i], x: x, y: base, tamano: k.tamano, peso: 400, color: NEGRO });
+      if (i > 0) base -= salto;
+    }
+    var junta = { texto: 'Junta de Andalucía', x: x, y: base - 0.27 * S, tamano: 0.244 * S, peso: 700, color: NEGRO };
+
+    var logo = null;
+    if (o.conLogo !== false && o.logo && o.logo.ancho > 0 && o.logo.alto > 0) {
+      var alto = S + 20;
+      var ancho = alto * o.logo.ancho / o.logo.alto;
+      if (ancho > 0.25 * LIENZO.ancho) { ancho = 0.25 * LIENZO.ancho; alto = ancho * o.logo.alto / o.logo.ancho; }
+      logo = { x: LIENZO.ancho - MARGEN - ancho, y: (LIENZO.alto - alto) / 2, ancho: ancho, alto: alto };
+    }
+
+    return { lienzo: { ancho: LIENZO.ancho, alto: LIENZO.alto }, simbolo: simbolo, textos: [junta].concat(lineasK, textos), logo: logo };
+  }
+
+  /* ---------- la letra y el símbolo, una sola vez ---------- */
+
+  var promesaLetra = null;
+  /* true si la Noto Sans HK está lista; false si hay que tirar de Arial. */
+  function cargarLetra() {
+    if (promesaLetra) return promesaLetra;
+    promesaLetra = (async function () {
+      try {
+        if (typeof FontFace === 'undefined' || !window.App || !App.leerFicheroDeLaApp) return false;
+        var pesos = [400, 700];
+        for (var i = 0; i < pesos.length; i++) {
+          var bytes = await App.leerFicheroDeLaApp('fonts/NotoSansHK-latin-' + pesos[i] + '.woff2', 'binario');
+          var cara = new FontFace(FAMILIA, bytes, { weight: String(pesos[i]) });
+          await cara.load();
+          document.fonts.add(cara);
+        }
+        return true;
+      } catch (e) { return false; }
+    })();
+    return promesaLetra;
+  }
+
+  function imagenDeBlob(blob) {
+    return new Promise(function (resolver, rechazar) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () { resolver(img); setTimeout(function () { URL.revokeObjectURL(url); }, 0); };
+      img.onerror = function () { URL.revokeObjectURL(url); rechazar(new Error('No se ha podido leer la imagen.')); };
+      img.src = url;
+    });
+  }
+
+  var promesaSimbolo = null;
+  function cargarSimbolo() {
+    if (promesaSimbolo) return promesaSimbolo;
+    promesaSimbolo = (async function () {
+      var bytes = await App.leerFicheroDeLaApp(RUTA_SIMBOLO, 'binario');
+      return imagenDeBlob(new Blob([bytes], { type: 'image/svg+xml' }));
+    })();
+    promesaSimbolo.catch(function () { promesaSimbolo = null; });
+    return promesaSimbolo;
+  }
+
+  /* ---------- dibujar ---------- */
+
+  /* Dibuja el membrete con estos datos y devuelve `{ bytes, ancho, alto }`
+     en PNG. `logo`: un Blob/File o null. Aparte de `montar` para que la
+     vista previa de Ajustes use lo que hay escrito, aún sin guardar. */
+  async function dibujar(datos) {
+    var d = datos || {};
+    var simbolo = await cargarSimbolo();
+    var conNoto = await cargarLetra();
+    var imgLogo = null;
+    if (d.logo && d.conLogo !== false) {
+      try { imgLogo = await imagenDeBlob(d.logo); } catch (e) { imgLogo = null; }
+    }
 
     var canvas = document.createElement('canvas');
-    canvas.width = ancho; canvas.height = alto;
+    canvas.width = LIENZO.ancho; canvas.height = LIENZO.alto;
     var ctx = canvas.getContext('2d');
-    ctx.drawImage(bitmap, 0, 0, ancho, alto);
+    var familia = conNoto ? FAMILIA + ', Arial, sans-serif' : 'Arial, Helvetica, sans-serif';
+    function fuente(tamano, peso) { return peso + ' ' + tamano + 'px ' + familia; }
 
-    var texto = String(consejeria || '').trim();
-    if (texto) {
-      var m = medir(texto, caja, ancho, alto);
-      var x = (caja.x / 100) * ancho;
-      var yBase = (caja.y / 100) * alto;
-      ctx.fillStyle = '#1E1A1E';
-      ctx.textBaseline = 'alphabetic';
-      ctx.font = m.tamano + 'px Arial, Helvetica, sans-serif';
-      if (m.lineas.length === 1) {
-        ctx.fillText(m.lineas[0], x, yBase);
-      } else {
-        var salto = m.tamano * 1.15;
-        ctx.fillText(m.lineas[0], x, yBase - salto / 2);
-        ctx.fillText(m.lineas[1], x, yBase + salto / 2);
-      }
-    }
+    var plan = componer({
+      consejeria: d.consejeria, centro: d.centro, conLogo: d.conLogo,
+      logo: imgLogo ? { ancho: imgLogo.naturalWidth || imgLogo.width, alto: imgLogo.naturalHeight || imgLogo.height } : null,
+      medir: function (texto, tamano, peso) { ctx.font = fuente(tamano, peso); return ctx.measureText(texto).width; }
+    });
 
-    var blobSalida = await new Promise(function (resolver) { canvas.toBlob(resolver, 'image/png'); });
-    var bytes = new Uint8Array(await blobSalida.arrayBuffer());
-    return { bytes: bytes, ancho: ancho, alto: alto };
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, LIENZO.ancho, LIENZO.alto);
+    ctx.drawImage(simbolo, plan.simbolo.x, plan.simbolo.y, plan.simbolo.ancho, plan.simbolo.alto);
+    ctx.textBaseline = 'alphabetic';
+    plan.textos.forEach(function (t) {
+      ctx.font = fuente(t.tamano, t.peso);
+      ctx.fillStyle = t.color;
+      ctx.fillText(t.texto, t.x, t.y);
+    });
+    if (plan.logo && imgLogo) ctx.drawImage(imgLogo, plan.logo.x, plan.logo.y, plan.logo.ancho, plan.logo.alto);
+
+    var blob = await new Promise(function (resolver) { canvas.toBlob(resolver, 'image/png'); });
+    return { bytes: new Uint8Array(await blob.arrayBuffer()), ancho: LIENZO.ancho, alto: LIENZO.alto, conNoto: conNoto, plan: plan };
   }
 
-  /* Lee _GESTOR/PLANTILLAS/membrete.png y los ajustes de
-     plantillas.json, y devuelve `{ bytes, ancho, alto }` en PNG, con
-     el nombre de la Consejería ya escrito encima. Si no hay imagen
-     guardada, o no hay carpeta señalada, devuelve `null`: quien llama
-     sigue sin membrete, sin que nada falle. */
-  async function montar() {
+  async function carpetaPlantillas() {
     var g = gestor();
     if (!g || !window.Carpetas) return null;
-    var carpetaPlantillas;
-    try { carpetaPlantillas = await Carpetas.crear(g, 'PLANTILLAS'); } catch (e) { return null; }
-    if (!(await Carpetas.existeFichero(carpetaPlantillas, 'membrete.png'))) return null;
-
-    var handle = await carpetaPlantillas.getFileHandle('membrete.png');
-    var fichero = await handle.getFile();
-
-    var datos = window.Plantillas ? await Plantillas.cargar(g) : { consejeria: '', membreteCaja: null };
-    var caja = datos.membreteCaja || (window.Plantillas ? Plantillas.POR_DEFECTO_MEMBRETE_CAJA : { x: 10.3, y: 43.2, ancho: 20.7, alto: 10 });
-
-    return dibujar(fichero, datos.consejeria, caja);
+    try { return await Carpetas.crear(g, 'PLANTILLAS'); } catch (e) { return null; }
   }
 
-  /* Guarda la imagen elegida en Ajustes tal cual, sin tocarla: el
-     nombre de la Consejería se escribe encima solo al generar un
-     documento (`montar`), nunca sobre el propio `membrete.png`. */
-  async function guardarImagen(bytesOFile) {
-    var g = gestor();
-    if (!g || !window.Carpetas) throw new Error('No hay carpeta de asuntos abiertos señalada.');
-    var carpetaPlantillas = await Carpetas.crear(g, 'PLANTILLAS');
-    await Carpetas.escribirBytes(carpetaPlantillas, 'membrete.png', bytesOFile, 'image/png');
-  }
-
-  async function hayImagen() {
-    var g = gestor();
-    if (!g || !window.Carpetas) return false;
+  /* El logo guardado, como File, o null. */
+  async function logoGuardado() {
+    var c = await carpetaPlantillas();
+    if (!c) return null;
     try {
-      var carpetaPlantillas = await Carpetas.crear(g, 'PLANTILLAS');
-      return await Carpetas.existeFichero(carpetaPlantillas, 'membrete.png');
-    } catch (e) { return false; }
-  }
-
-  /* La imagen ya guardada, como File (un Blob), o `null`. Para la
-     vista previa en vivo de Ajustes: así no hace falta volver a elegir
-     el fichero solo para ver el resultado de cambiar un número. */
-  async function imagenGuardada() {
-    var g = gestor();
-    if (!g || !window.Carpetas) return null;
-    try {
-      var carpetaPlantillas = await Carpetas.crear(g, 'PLANTILLAS');
-      if (!(await Carpetas.existeFichero(carpetaPlantillas, 'membrete.png'))) return null;
-      var handle = await carpetaPlantillas.getFileHandle('membrete.png');
-      return await handle.getFile();
+      if (!(await Carpetas.existeFichero(c, LOGO))) return null;
+      return await (await c.getFileHandle(LOGO)).getFile();
     } catch (e) { return null; }
   }
 
+  /* Para generar un documento: lee Ajustes y el logo, y dibuja. Si algo
+     falla (sin carpeta, sin símbolo), `null`: el documento sale igual,
+     sin membrete. `opciones.conLogoCentro === false` lo deja sin logo. */
+  async function montar(opciones) {
+    var g = gestor();
+    if (!g) return null;
+    try {
+      var datos = window.Plantillas ? await Plantillas.cargar(g) : {};
+      var conLogo = !(opciones && opciones.conLogoCentro === false);
+      return await dibujar({
+        consejeria: datos.consejeria, centro: datos.centro,
+        logo: conLogo ? await logoGuardado() : null, conLogo: conLogo
+      });
+    } catch (e) { return null; }
+  }
+
+  async function guardarLogo(bytesOFile) {
+    var c = await carpetaPlantillas();
+    if (!c) throw new Error('No hay carpeta de asuntos abiertos señalada.');
+    await Carpetas.escribirBytes(c, LOGO, bytesOFile, 'image/png');
+  }
+
+  /* A la papelera, como el resto de borrados. */
+  async function quitarLogo() {
+    var c = await carpetaPlantillas();
+    if (!c || !(await Carpetas.existeFichero(c, LOGO))) return;
+    if (window.Papelera && Papelera.mandarFichero) await Papelera.mandarFichero(c, LOGO, 'logo', { plantillas: true });
+    else await c.removeEntry(LOGO);
+  }
+
   return {
-    medir: medir, montar: montar, dibujar: dibujar,
-    guardarImagen: guardarImagen, hayImagen: hayImagen, imagenGuardada: imagenGuardada,
+    componer: componer, montar: montar, dibujar: dibujar,
+    guardarLogo: guardarLogo, quitarLogo: quitarLogo, logoGuardado: logoGuardado,
+    cargarLetra: cargarLetra,
+    LIENZO: LIENZO, S: S, POR_DEFECTO_CONSEJERIA: POR_DEFECTO_CONSEJERIA,
     /* para las pruebas */
-    _partirEnDosLineas: partirEnDosLineas
+    _partirEnDosLineas: partirEnDosLineas,
+    _olvidarCargas: function () { promesaLetra = null; promesaSimbolo = null; }
   };
 })();
 window.Membrete = Membrete;
 
 /* ============================================================
-   La pantalla, en Ajustes → El centro, bloque "Membrete" (index.html,
-   `details` estático, como "Datos del centro y firma"). Mismo criterio
-   que js/cargos.js: el modelo y su pantalla en un solo fichero.
+   La pantalla, en Ajustes → El centro, bloque "Membrete" (index.html):
+   Consejería, nombre del centro (el mismo `centro` de «Datos del centro
+   y firma») y el logo, con la vista previa en vivo debajo.
    ============================================================ */
 (function () {
   function $(id) { return document.getElementById(id); }
 
-  var imagenActual = null;   /* File/Blob todavía sin guardar, o ya guardada */
+  var logoActual = null;
   var urlVistaPrevia = null;
-
-  function cajaDelFormulario() {
-    return {
-      x: parseFloat(($('membrete-caja-x') || {}).value) || 0,
-      y: parseFloat(($('membrete-caja-y') || {}).value) || 0,
-      ancho: parseFloat(($('membrete-caja-ancho') || {}).value) || 0,
-      alto: parseFloat(($('membrete-caja-alto') || {}).value) || 0
-    };
-  }
+  var turno = 0;
 
   async function refrescarVistaPrevia() {
-    var caja2 = $('membrete-vista-previa');
-    if (!caja2) return;
-    if (!imagenActual) { caja2.innerHTML = '<span class="suave">Sin imagen todavía.</span>'; return; }
+    var caja = $('membrete-vista-previa');
+    if (!caja) return;
+    var mio = ++turno;
     try {
-      var resultado = await Membrete.dibujar(imagenActual, ($('membrete-consejeria') || {}).value, cajaDelFormulario());
+      var r = await Membrete.dibujar({
+        consejeria: ($('membrete-consejeria') || {}).value,
+        centro: ($('membrete-centro') || {}).value || (window.Plantillas ? Plantillas.POR_DEFECTO_CENTRO : ''),
+        logo: logoActual, conLogo: true
+      });
+      if (mio !== turno) return;
       if (urlVistaPrevia) URL.revokeObjectURL(urlVistaPrevia);
-      urlVistaPrevia = URL.createObjectURL(new Blob([resultado.bytes], { type: 'image/png' }));
-      caja2.innerHTML = '';
+      urlVistaPrevia = URL.createObjectURL(new Blob([r.bytes], { type: 'image/png' }));
+      caja.innerHTML = '';
       var img = document.createElement('img');
       img.src = urlVistaPrevia;
-      img.style.maxWidth = '100%';
-      img.style.border = '1px solid #ccc';
-      caja2.appendChild(img);
+      img.alt = 'Vista previa del membrete';
+      img.className = 'membrete-vista-img';
+      caja.appendChild(img);
     } catch (e) {
-      caja2.innerHTML = '<span class="aviso-en-vivo">No he podido pintar la vista previa: ' + U.escapar(U.mensajeDeError(e)) + '</span>';
+      if (mio !== turno) return;
+      caja.innerHTML = '<span class="aviso-en-vivo">No he podido pintar la vista previa: ' + U.escapar(U.mensajeDeError(e)) + '</span>';
     }
   }
 
-  async function elegirImagen() {
+  function pintarEstadoLogo() {
+    var estado = $('membrete-logo-estado');
+    if (estado) estado.textContent = logoActual ? 'Hay un logo guardado.' : 'Sin logo: la derecha del membrete sale en blanco.';
+    var quitar = $('membrete-quitar-logo');
+    if (quitar) quitar.classList.toggle('oculto', !logoActual);
+  }
+
+  async function elegirLogo() {
     var handle;
     try {
       handle = await Carpetas.elegirFichero(null, [{
@@ -214,51 +303,55 @@ window.Membrete = Membrete;
     } catch (e) { return; }   /* cancelado */
     var fichero = await handle.getFile();
     try {
-      await Membrete.guardarImagen(fichero);
-      imagenActual = fichero;
-      $('membrete-estado').textContent = 'Imagen guardada. Puedes cambiarla cuando quieras.';
-      await refrescarVistaPrevia();
-      U.aviso('Membrete guardado.', 'bueno');
-    } catch (e) {
-      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
-    }
+      await Membrete.guardarLogo(fichero);
+      logoActual = fichero;
+      pintarEstadoLogo();
+      U.aviso('Logo guardado.', 'bueno');
+    } catch (e) { U.fallo('No he podido guardar el logo', e); return; }
+    await refrescarVistaPrevia();
   }
 
-  async function guardarConsejeria() {
-    var caja2 = cajaDelFormulario();
+  async function quitarLogo() {
+    var ok = await U.preguntar('Quitar el logo del centro', '<p>Va a la papelera. Los documentos saldrán con la derecha del membrete en blanco.</p>', 'Quitar');
+    if (!ok) return;
     try {
-      await Plantillas.guardar(App.E.gestor, function (actual) {
-        actual.consejeria = $('membrete-consejeria').value.trim();
-        actual.membreteCaja = caja2;
-        return actual;
+      await Membrete.quitarLogo();
+      logoActual = null;
+      pintarEstadoLogo();
+      U.aviso('Logo quitado.', 'bueno');
+    } catch (e) { U.fallo('No he podido quitar el logo', e); return; }
+    await refrescarVistaPrevia();
+  }
+
+  async function guardar() {
+    var consejeria = $('membrete-consejeria').value.trim();
+    var centro = $('membrete-centro').value.trim() || Plantillas.POR_DEFECTO_CENTRO;
+    try {
+      await U.mientrasGuarda($('membrete-guardar'), function () {
+        return Plantillas.guardar(App.E.gestor, function (actual) {
+          actual.consejeria = consejeria;
+          actual.centro = centro;
+          return actual;
+        });
       });
+      /* El mismo dato que «Datos del centro y firma»: se pone al día allí. */
+      if ($('plantillas-centro')) $('plantillas-centro').value = centro;
       U.aviso('Guardado.', 'bueno');
-    } catch (e) {
-      U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
-    }
+    } catch (e) { U.fallo('No he podido guardarlo', e); }
   }
 
   async function pintarEnAjustes() {
-    if (!$('membrete-elegir-imagen') || !App.E.gestor) return;
-
-    imagenActual = await Membrete.imagenGuardada();
-    $('membrete-estado').textContent = imagenActual
-      ? 'Imagen guardada. Puedes cambiarla cuando quieras.'
-      : 'Todavía no se ha subido ninguna imagen.';
-
+    if (!$('membrete-consejeria') || !App.E.gestor) return;
     var datos = await Plantillas.cargar(App.E.gestor);
     $('membrete-consejeria').value = datos.consejeria || '';
-    var caja2 = datos.membreteCaja || Plantillas.POR_DEFECTO_MEMBRETE_CAJA;
-    $('membrete-caja-x').value = caja2.x;
-    $('membrete-caja-y').value = caja2.y;
-    $('membrete-caja-ancho').value = caja2.ancho;
-    $('membrete-caja-alto').value = caja2.alto;
-
-    $('membrete-elegir-imagen').onclick = elegirImagen;
-    $('membrete-guardar').onclick = guardarConsejeria;
-    ['membrete-consejeria', 'membrete-caja-x', 'membrete-caja-y', 'membrete-caja-ancho', 'membrete-caja-alto']
-      .forEach(function (id) { $(id).oninput = refrescarVistaPrevia; });
-
+    $('membrete-consejeria').placeholder = Membrete.POR_DEFECTO_CONSEJERIA;
+    $('membrete-centro').value = datos.centro || '';
+    logoActual = await Membrete.logoGuardado();
+    pintarEstadoLogo();
+    $('membrete-elegir-logo').onclick = elegirLogo;
+    $('membrete-quitar-logo').onclick = quitarLogo;
+    $('membrete-guardar').onclick = guardar;
+    ['membrete-consejeria', 'membrete-centro'].forEach(function (id) { $(id).oninput = refrescarVistaPrevia; });
     await refrescarVistaPrevia();
   }
 

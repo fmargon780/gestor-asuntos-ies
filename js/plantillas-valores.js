@@ -244,7 +244,7 @@
       direccionCentro: datosCentro.direccion || '',
       codigoCentro: datosCentro.codigo || '',
       cargo: datosCentro.cargo || '',
-      consejeria: datosCentro.consejeria || '',
+      consejeria: datosCentro.consejeria || I.POR_DEFECTO_CONSEJERIA || '',
       campos: camposDelAsuntoDe(a)
     };
 

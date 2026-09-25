@@ -570,39 +570,27 @@
         </div>
       </details>
 
-      <!-- Fila 81, 20-sep-2026, docs/FIRMANTES-Y-MEMBRETE.md: la imagen
-           del membrete, sin el nombre de la Consejería dentro (se
-           escribe encima al generar, con js/membrete.js). -->
+      <!-- Fila 149, 25-sep-2026, docs/MEMBRETE-LETRA-DEL-MANUAL.md: el
+           membrete lo dibuja la aplicación (js/membrete.js) con el manual
+           de la Junta; aquí, la Consejería, el nombre del centro y el logo. -->
       <details class="bloque-ajustes">
         <summary>
           <span class="bloque-titulo">Membrete</span>
-          <span class="bloque-pie">La imagen de arriba de cada documento, y el nombre de la Consejería</span>
+          <span class="bloque-pie">Lo de arriba de cada documento: la Consejería, el centro y su logo</span>
         </summary>
         <div class="bloque-cuerpo">
-      <p class="explica">Sube la imagen del membrete sin el nombre de la Consejería: se escribe
-         encima, con el texto de aquí, para no tener que rehacer la imagen cuando cambie de
-         nombre.</p>
-      <div id="membrete-estado" class="suave" style="margin-bottom:8px"></div>
-      <button type="button" class="boton" id="membrete-elegir-imagen">Elegir imagen (PNG o JPG)</button>
-      <label class="etiqueta" style="margin-top:10px">Nombre de la Consejería</label>
-      <input id="membrete-consejeria" class="campo" placeholder="Consejería de Desarrollo Educativo y Formación Profesional">
-      <details style="margin-top:8px">
-        <summary>Dónde va el nombre de la Consejería</summary>
-        <div class="dos-columnas" style="margin-top:8px">
-          <div><label class="etiqueta">Borde izquierdo (% del ancho)</label>
-            <input id="membrete-caja-x" type="number" min="0" max="100" step="0.1" class="campo campo-plazo"></div>
-          <div><label class="etiqueta">Línea base (% del alto)</label>
-            <input id="membrete-caja-y" type="number" min="0" max="100" step="0.1" class="campo campo-plazo"></div>
-        </div>
-        <div class="dos-columnas">
-          <div><label class="etiqueta">Ancho máximo (% del ancho)</label>
-            <input id="membrete-caja-ancho" type="number" min="0" max="100" step="0.1" class="campo campo-plazo"></div>
-          <div><label class="etiqueta">Alto máximo de la letra (% del alto)</label>
-            <input id="membrete-caja-alto" type="number" min="0" max="100" step="0.1" class="campo campo-plazo"></div>
-        </div>
-      </details>
-      <button type="button" class="boton" id="membrete-guardar" style="margin-top:10px">Guardar</button>
-      <p class="nota">Vista previa:</p>
+      <p class="explica">El símbolo y «Junta de Andalucía» salen solos, con la letra del manual de
+         la Junta. Aquí se escribe lo demás.</p>
+      <label class="etiqueta">Consejería</label>
+      <input id="membrete-consejeria" class="campo" placeholder="Consejería de Educación">
+      <label class="etiqueta" style="margin-top:10px">Nombre del centro <span class="suave">(el mismo de «Datos del centro y firma»; sale en mayúsculas)</span></label>
+      <input id="membrete-centro" class="campo" placeholder="IES Fuente Lucena">
+      <label class="etiqueta" style="margin-top:10px">Logo del centro <span class="suave">(opcional; cada plantilla dice si lo lleva)</span></label>
+      <div id="membrete-logo-estado" class="suave" style="margin-bottom:6px"></div>
+      <button type="button" class="boton" id="membrete-elegir-logo">Subir el logo (PNG o JPG)</button>
+      <button type="button" class="boton boton-peligro oculto" id="membrete-quitar-logo">Quitar el logo</button>
+      <div><button type="button" class="boton" id="membrete-guardar" style="margin-top:10px">Guardar</button></div>
+      <p class="nota">Vista previa (cambia mientras escribes; se guarda con «Guardar»):</p>
       <div id="membrete-vista-previa"></div>
         </div>
       </details>
@@ -1077,9 +1065,9 @@
      otro módulo de la aplicación: solo de `window.U` para el aviso, si
      está disponible. -->
 <script src="js/seneca-ayudante.js"></script>
-<!-- js/membrete.js (fila 81, 20-sep-2026, docs/FIRMANTES-Y-MEMBRETE.md):
-     monta la imagen del membrete con el nombre de la Consejería escrito
-     encima. Va antes que js/plantillas-documento.js, que lo usa al
+<!-- js/membrete.js (fila 81, 20-sep-2026, docs/FIRMANTES-Y-MEMBRETE.md; desde
+     la fila 149, docs/MEMBRETE-LETRA-DEL-MANUAL.md): dibuja el membrete
+     entero, con el símbolo, la Consejería, el centro y el logo. Va antes que js/plantillas-documento.js, que lo usa al
      generar. -->
 <script src="js/membrete.js"></script>
 <!-- js/docx.js y js/plantillas-documento.js van después de js/correo.js

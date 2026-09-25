@@ -143,26 +143,29 @@ de la Consejería escrito dentro.
   firmante). `js/plantillas-documento.js` pasa `{ fecha: hoy, plantilla: plantillaDoc }` al generar,
   y resuelve el firmante/visto bueno con `Cargos.enFecha` en esa fecha; sin ocupante en esa fecha,
   el hueco se queda vacío y sale en "faltan", como cualquier otro dato que no haya.
-- **El membrete**: la imagen (PNG/JPG) se sube una vez en **Ajustes → El centro → Membrete**, tal
-  cual, a `_GESTOR/PLANTILLAS/membrete.png` (la única vez que la aplicación escribe en esa
-  carpeta). Es un FICHERO: se pregunta por él con `Carpetas.existeFichero`, nunca con
-  `Carpetas.existe`, que busca una carpeta (fila 127: por eso Ajustes decía que no había imagen y los
-  documentos salían con `{{MEMBRETE}}` escrito; `pruebas/membrete-se-encuentra.mjs`). El nombre de la Consejería (`consejeria`, clave de raíz de `plantillas.json`) se
-  escribe ENCIMA al generar, nunca dentro de la imagen guardada: cuando cambie de nombre, basta con
-  corregir el texto. `membreteCaja` (`{ x, y, ancho, alto }`, en % del ancho/alto de la imagen; por
-  defecto `{10.3, 43.2, 20.7, 10.0}`) dice dónde. `js/membrete.js` (`window.Membrete`):
-  - `medir(texto, caja, anchoImagen, altoImagen)`, sin efectos: tamaño máximo (`caja.alto` %),
-    reducido de punto en punto hasta un mínimo del 55 % si no cabe en `caja.ancho`, y si ni así
-    cabe, dos líneas partidas por el espacio más parejo (sin ningún espacio, se queda en una sola
-    línea, aunque no quepa del todo). El ancho del texto se estima con un factor medio de letra de
-    palo seco (0,52 × tamaño por carácter): no hay canvas en las pruebas, y para decidir "cabe"/"no
-    cabe" sobra con la aproximación.
-  - `montar()`: lee la imagen y los ajustes, dibuja en un `<canvas>` con `createImageBitmap` y
-    devuelve `{ bytes, ancho, alto }` en PNG; sin imagen guardada, `null`, sin que nada falle.
-    `dibujar(blob, consejeria, caja)` es la misma pintura pero sobre una imagen y unos valores que
-    todavía no se han guardado: la vista previa en vivo de Ajustes (se rehace al cambiar cualquiera
-    de los seis valores: imagen, texto y las cuatro cifras de la caja) la usa para no obligar a
-    guardar antes de ver el resultado.
+- **El membrete** (desde la fila 149, 25-sep-2026, `docs/MEMBRETE-LETRA-DEL-MANUAL.md`): lo dibuja
+  entero la aplicación con el manual de la Junta; ya no se sube ninguna imagen de base
+  (`membrete.png`, si queda, no se usa ni se borra; `membreteCaja` se ignora). Lienzo PNG de
+  2480 × 400, todo en proporción a S = 270 (la altura del símbolo): el símbolo
+  (`img/junta-andalucia-simbolo.svg`) a 60 px del borde; los textos 0,20·S a su derecha: «Junta de
+  Andalucía» (Noto Sans HK 700, `#221E1B`, 0,244·S, base a 0,465·S), la Consejería (`consejeria` de
+  `plantillas.json`; vacía, «Consejería de Educación»; 400, `#221E1B`, 0,144·S, base a 0,735·S) y el
+  centro (el mismo `centro` de «Datos del centro y firma», en MAYÚSCULAS; 400, `#017836`, 0,111·S,
+  base en la base del símbolo). Un texto que no cabe antes del 72 % del ancho va en dos líneas
+  (0,20·S entre ellas) y el bloque sube; si ni así, letra más pequeña. El logo del centro
+  (`_GESTOR/PLANTILLAS/logo-centro.png`, opcional; se sube y se quita —a la papelera— en Ajustes →
+  El centro → Membrete) a la derecha, alto S + 20 (o 25 % del ancho si es muy ancho). Cada plantilla
+  de documento lleva «Con el logo del centro» (`conLogoCentro`; sin la clave, sí); sin marcar, la
+  derecha en blanco y el mismo lienzo. `js/membrete.js` (`window.Membrete`):
+  - `componer({ consejeria, centro, logo: { ancho, alto }, conLogo, medir })`, SIN EFECTOS: dónde va
+    cada cosa (`lienzo`, `simbolo`, `textos`, `logo`); sin `medir`, estima 0,56 × tamaño por carácter.
+  - `dibujar({ consejeria, centro, logo, conLogo })` pinta en un `<canvas>` (la vista previa en vivo
+    de Ajustes la usa con lo aún no guardado) y `montar({ conLogoCentro })` lee Ajustes y el logo;
+    los dos devuelven `{ bytes, ancho, alto, conNoto, plan }`. La letra
+    (`fonts/NotoSansHK-latin-400/700.woff2`, recortada a latín, licencia en `fonts/OFL.txt`) y el
+    símbolo se leen con `App.leerFicheroDeLaApp` (valen en la copia sin internet) y se cargan una
+    sola vez (`FontFace`); si la letra falla, Arial; si el símbolo falla, `montar` da `null` y el
+    documento sale sin membrete.
   - **`Docx.ponerImagen(bufferDocx, nombreHueco, bytesPng, anchoPx, altoPx)`** (`js/docx.js`), antes
     de `rellenar`: busca el párrafo `{{MEMBRETE}}` en `word/document.xml` y en cada
     `word/headerN.xml` (reparando huecos partidos entre varios `<w:t>` igual que `rellenar`) y lo
@@ -175,8 +178,8 @@ de la Consejería escrito dentro.
 
 Se comprueba con `pruebas/cargos.mjs` (sin navegador, fechas contadas desde hoy: un ocupante único,
 dos en cadena, una fecha anterior a todos, un hueco entre dos, un solape, un cargo vacío),
-`pruebas/membrete.mjs` (sin navegador, solo `medir`: nombre corto, intermedio, largo con dos
-líneas, largo sin espacios) y un escenario nuevo de `pruebas/plantillas-documento.mjs` (`{{MEMBRETE}}`
+`pruebas/membrete.mjs` (fila 149: `componer` sin navegador —medidas, Consejería larga, logo— y,
+con navegador, el dibujo, el logo, `conLogoCentro` al generar y la letra que no carga) y un escenario nuevo de `pruebas/plantillas-documento.mjs` (`{{MEMBRETE}}`
 dentro del ZIP con su relación creada de cero, y `{{FIRMANTE}}`/`{{TRATAMIENTO FIRMANTE}}` resueltos
 con el ocupante de la fecha).
 

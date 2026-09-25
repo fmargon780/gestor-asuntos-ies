@@ -225,7 +225,11 @@
           '<select id="pd-visto-bueno" class="campo">' + opcionesVistoBueno + '</select></div>' +
       '</div>' +
       '<p class="nota">Se pone la persona que ocupaba ese cargo en la fecha del documento ' +
-      '(Ajustes → El centro → Cargos del centro).</p>';
+      '(Ajustes → El centro → Cargos del centro).</p>' +
+      /* Fila 149: con o sin el logo del centro en el membrete (sin la clave, con). */
+      '<label class="pd-con-logo"><input type="checkbox" id="pd-con-logo"' +
+        (existente && existente.conLogoCentro === false ? '' : ' checked') + '> Con el logo del centro</label>' +
+      '<p class="nota">En el membrete, a la derecha (Ajustes → El centro → Membrete). Sin marcar, esa parte sale en blanco.</p>';
 
     var promesa = U.preguntar(existente ? 'Editar plantilla de documento' : 'Nueva plantilla de documento',
       cuerpo, existente ? 'Guardar' : 'Crear');
@@ -245,6 +249,7 @@
     var texto = $('pd-texto').value.trim();
     var firmante = $('pd-firmante').value;
     var vistoBueno = $('pd-visto-bueno').value;
+    var conLogoCentro = !$('pd-con-logo') || $('pd-con-logo').checked;
 
     if (!nombre || !tipo || !fichero || !tipoDocumento) {
       U.aviso('Hace falta el nombre, el tipo, el fichero y el tipo de documento.', 'malo');
@@ -258,12 +263,12 @@
           if (i !== -1) {
             actual.documentos[i] = { id: existente.id, tipo: tipo, categoria: categoria, nombre: nombre,
               fichero: fichero, tipoDocumento: tipoDocumento, texto: texto,
-              firmante: firmante, vistoBueno: vistoBueno };
+              firmante: firmante, vistoBueno: vistoBueno, conLogoCentro: conLogoCentro };
           }
         } else {
           actual.documentos.push({ id: Plantillas.idNuevoDocumento(), tipo: tipo, categoria: categoria,
             nombre: nombre, fichero: fichero, tipoDocumento: tipoDocumento, texto: texto,
-            firmante: firmante, vistoBueno: vistoBueno });
+            firmante: firmante, vistoBueno: vistoBueno, conLogoCentro: conLogoCentro });
         }
         return actual;
       });

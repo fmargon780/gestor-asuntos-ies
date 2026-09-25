@@ -282,6 +282,7 @@ var Papelera = (function () {
     mandarAsunto: mandarAsunto,
     mandarArchivado: mandarArchivado,
     mandarDato: mandarDato,
+    mandarFichero: mandarFichero,   /* fila 149: el logo del centro */
     _interno: I
   };
 })();
