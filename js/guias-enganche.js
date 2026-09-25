@@ -136,7 +136,9 @@
     try {
       if (window.Hitos) {
         var datosHitos = await window.Hitos.leer();
-        opcionesResp = datosHitos.ajustes.responsables.concat(window.Hitos.PAPELES);
+        /* Fila 159: en la guía, «Administración» en vez de las personas. */
+        opcionesResp = (window.HitosAdministracion ? HitosAdministracion.paraGuia(datosHitos.ajustes) : datosHitos.ajustes.responsables)
+          .concat(window.Hitos.PAPELES);
       }
     } catch (e) { /* sin desplegable de responsable, pero se sigue */ }
 

@@ -5,6 +5,21 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 25-sep-2026 — Fila 159: «Administración» en las guías, en vez de las personas
+
+`docs/RESPONSABLE-ADMINISTRACION.md`. Decisiones:
+
+- No había marca de «persona»: se deduce (con la marca de Administración, y que no sea un cargo por id o
+  por nombre), como proponía el encargo.
+- `js/hitos.js` estaba justo en 600 líneas: una sola línea para `HitosAdministracion.asegurar` y un
+  comentario acortado. Lo demás, en `js/hitos-administracion.js`.
+- La pasada única mete también los dos hitos de firma en la biblioteca del centro, sin esperar a que
+  Francisco pulse «Cargar…» en Mantenimiento; los dos van además en `biblioteca-centro.json`.
+- El editor de un modelo de la biblioteca recibía una lista vacía de responsables (el suyo se perdía al
+  guardar): ahora recibe la misma que la guía.
+- `pruebas/repintar-solo-lo-que-cambia.mjs` pone también la marca nueva, para que la pasada no se cuele
+  en lo que mide.
+
 ## 25-sep-2026 — Fila 158: «Insertar hueco» en la comunicación de un paso
 
 `docs/INSERTAR-HUECO-EN-EL-PASO.md`. `GuiasComunicacion.enganchar` buscaba el botón y el texto con

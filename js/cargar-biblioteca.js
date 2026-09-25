@@ -131,6 +131,12 @@ var CargarBiblioteca = (function () {
     var yaEsta = {};
     biblioteca.modelos.forEach(function (m) { yaEsta[m.id] = true; });
     var faltan = datos.modelos.filter(function (m) { return !yaEsta[m.id]; });
+    /* Fila 159: los dos de firma, tampoco si ya hay uno con ese título. */
+    if (window.HitosAdministracion) {
+      var deFirma = faltan.filter(function (m) { return HitosAdministracion.MODELOS_FIRMA.indexOf(m.id) !== -1; });
+      var quedan = HitosAdministracion.faltanPorTitulo(biblioteca, deFirma);
+      faltan = faltan.filter(function (m) { return deFirma.indexOf(m) === -1 || quedan.indexOf(m) !== -1; });
+    }
     if (!faltan.length) return;
     await HitosBiblioteca.cambiar(function (d) {
       faltan.forEach(function (m) { d.modelos.push(m); });

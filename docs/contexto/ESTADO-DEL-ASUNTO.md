@@ -86,3 +86,25 @@ Conviven cero sistemas: `ficha.situacion` se queda quieta en `asuntos.json` (no 
   algún asunto cambia de montón, de "quién lo tiene" o de paso.
 
 Se comprueba con `pruebas/el-hito-es-el-estado.mjs` y `pruebas/estado-por-el-hito.mjs`.
+
+## El responsable fijo «Administración» (fila 159, `docs/RESPONSABLE-ADMINISTRACION.md`)
+
+`js/hitos-administracion.js` (`HitosAdministracion`, justo después de `js/hitos.js`):
+
+- `Hitos.normalizarAjustes` pone siempre, la primera, `{ id: 'administracion', nombre: 'Administración',
+  administracion: true, fijo: true }` (`asegurar`). En Ajustes › Hitos sale como «Fijo»: sin quitar, sin
+  renombrar y sin casilla. `Hitos.esDeAdministracion('administracion')` es sí.
+- **Persona** (`esPersona`): responsable con la marca de Administración que no es «Administración» ni un
+  cargo (Dirección, Jefatura, Secretaría, Vicedirección, por id o por nombre).
+- **En la guía y en un modelo de la biblioteca**, «Responsable por defecto» ofrece `paraGuia`:
+  Administración y los que no son personas, más los papeles (`js/guias-enganche.js`,
+  `js/guias-biblioteca.js`). **En un asunto concreto** (lista y mesa del hito) salen todos, personas
+  incluidas.
+- **Una sola vez** (marca `_GESTOR/responsable-migrado.json`, fuera de los dieciocho; la lanza
+  `Gestor.alRefrescar`): los pasos de `guias.json` y los modelos de `hitos-biblioteca.json` a nombre de
+  una persona pasan a Administración (los hitos de los asuntos, no); y se meten en la biblioteca
+  «Firma de Secretaría» (`b-firma-secretaria`, Secretaría) y «Visto bueno de Dirección»
+  (`b-visto-bueno-direccion`, Dirección), de `datos-biblioteca/biblioteca-centro.json`, si no hay ya uno
+  con ese id o ese título (`faltanPorTitulo`; lo mismo en «Cargar… del instituto»).
+- **«Qué me toca»** (`cuentaPara`): al filtrar por una persona salen sus hitos y los de Administración;
+  por Administración, solo esos. En «En tu tejado» ya contaban (es de Administración).

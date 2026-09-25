@@ -132,6 +132,7 @@ de `App` va después del fichero que lo define.
 | `js/ficha-sellos.js` | Un papel que ya trae el sello del registro, avisado arriba de la ficha (fila 133, sacado de `js/ficha-asunto.js`) |
 | `js/ficha-menus.js` | El menú pequeño reutilizable de la cabecera (abrir, cerrar con Escape/al pulsar fuera, uno solo a la vez): lo usan los tres puntos del nombre y "Comunicar" (18-sep-2026, fila 52) |
 | `js/ficha-nombre-acciones.js` | El menú de tres puntos del `<h2>` del nombre del asunto (Editar, Borrar, fila 52) y, debajo, la fila de copiar de un gesto (Asunto, Ruta, NIE, Nombre, DNI/CIF, filas 58 y 98) |
+| `js/hitos-administracion.js` | `HitosAdministracion` (fila 159): el responsable fijo «Administración», qué es una persona, lo que ofrece la guía, la pasada única de guías y biblioteca (`responsable-migrado.json`) y el filtro de «Qué me toca» |
 | `js/hito-mesa-recetas.js` | `HitoMesaRecetas` (fila 164): los pasos pendientes con receta (comunicar, generar), arriba de los menús de la cabecera del hito; al elegir uno, el cuadro relleno y se marca ese paso |
 | `js/copiar-ruta.js` | `RutaCarpetas` (filas 98, 152 y 161): el botón «Ruta» (ficha y cuadros de Correo/Séneca) y el bloque «Rutas de las carpetas» de Ajustes → El centro; lo de dentro de Dropbox en `_GESTOR/rutas.json`, lo de este ordenador deducido o en `localStorage` |
 | `js/ficha-tarjetas.js` | La ficha del asunto en tarjetas (fila 107): la cuadrícula, los resúmenes, abrir una en grande con las demás como pestañas, la franja de documentos y Escape |
@@ -275,6 +276,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/guia-en-acordeon.mjs` | Prueba del editor de la guía en acordeón (fila 122) |
 | `pruebas/opciones.mjs` | Prueba de las preguntas con opciones, con el caso de la factura |
 | `pruebas/registro.mjs` | Prueba de registrar un documento en un paso, sin nombrarlo dos veces |
+| `pruebas/responsable-administracion.mjs` | Prueba (fila 159): «Administración» fija, la guía sin las personas, la pasada única (guía y biblioteca sí, hitos no), los dos hitos de firma sin duplicar y el filtro de «Qué me toca» |
 | `pruebas/insertar-hueco-en-el-paso.mjs` | Prueba (fila 158): «Insertar hueco» de «Comunicación de este paso» abre el buscador y mete el hueco, en Correo y Séneca, en un paso normal y en uno de una pregunta |
 | `pruebas/word-dentro-de-la-app.mjs` | Prueba (fila 155): el cuadro de lo que falta antes de guardar (y «Cancelar» sin nada), el Word dentro de la aplicación, «Guardar PDF» en la carpeta, un .docx de la ficha sin `window.open` y otro fichero bajado con su nombre |
 | `pruebas/estado-sigue-a-los-hitos.mjs` | Prueba (fila 162): el caso de Francisco (paso 3 de Secretaría, paso 4 en curso nuestro): «Paso 3 de 5» con espera automática a Secretaría, la espera a mano que se quita al cambiar de paso, «Paso actual» y «Saltar a este paso», y la cabecera al día sola |

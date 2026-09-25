@@ -69,7 +69,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Categoría → tipo → tercero → nombre de carpeta, con vista previa. Nombre corto del tipo; tipo nuevo sin salir de Nuevo asunto.
 - Cada tipo dice quién lo encarga (Secretaría, Dirección, Jefatura, Varios): parrilla agrupada, filtro y Cuentas.
 - Asuntos reservados (por tipo o uno a uno): candado y sin el nombre del tercero en listas y buscador.
-- El estado es el primer hito sin terminar («Paso N de M · título», «Paso actual»): Administración o terceros; «Esperando a…» sale solo con el responsable (a mano, hasta que cambia el paso). Vía y fecha límite.
+- El estado es el primer hito sin terminar («Paso N de M · título», «Paso actual»): Administración o terceros; «Esperando a…» sale solo con el responsable (a mano, hasta que cambia el paso). Guías: «Administración», no personas. Vía y fecha límite.
 - Asuntos recurrentes, con aviso. Avisos de fichas huérfanas y papelera vieja.
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
   sueltas también en documentos, registro de Séneca, ficha y notas.
@@ -118,7 +118,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa
   («✎ Cambiar el guion», sin salir a Ajustes). «Paso N de M», «Hitos N/M» y la mesa, con una sola cuenta.
   Biblioteca de hitos del centro, con guion; en Mantenimiento, cargar tipos, guías y guiones del instituto.
-- "Qué me toca": pendientes, filtro por responsable, "Dormidos" (sin novedades en N días). "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Formularios": catálogo buscable de
+- "Qué me toca": pendientes, filtro por responsable (una persona ve también los de Administración), "Dormidos" (sin novedades en N días). "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena solo los datos del centro (casillas con nombre legible y miniatura).
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
 - Separar, Unir, Sacar páginas y Ajustar tamaño de un PDF (banda libre para sello y firma); repartir un PDF
@@ -136,7 +136,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - **Permiso permanente de Francisco**: un pull request (sesiones desde la nube) lo fusiona Claude
   Code solo, en verde y sin conflictos (nota al final de `docs/COLA.md`).
 - **Comprobar siempre lo publicado con `curl`.**
-- Vercel: 100 publicaciones/día (gratuito); `vercel.json` salta los commits de solo `docs/`, `pruebas/`, `.github/` o `.md`; máximo dos subidas por fila (regla 13).
+- Vercel: 100 publicaciones/día; `vercel.json` salta los commits de solo `docs/`, `pruebas/`, `.github/` o `.md`; máx. dos subidas por fila.
 - Antes de colgar una función de `App`, mirar que el nombre esté libre. Un solo cuadro (`U.preguntar`) a la vez.
 - Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV.
 - Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o uno nuevo. Sin remedio, con `U.envolver`, apuntado en `js/envolturas-esperadas.js`.
@@ -159,8 +159,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Conector de Vercel sobre un proyecto existente (da 403), o crear otro "por si acaso".
 - Abrir la carpeta del asunto en el explorador de archivos, o una hoja de Google Sheets como interfaz.
 - Enlazar un correo con `#all/<id de hilo>` (es `#search/rfc822msgid:<id>`), o meter Gmail en un marco (Google no lo permite).
-- Esconder el tablón de notas, sacar el DNI de la columna del tutor, o poner el nombre comercial en el nombre de la carpeta de un asunto de empresa.
-- Reescribir la arquitectura de módulos y envolturas, o meter los campos de cada tipo en el nombre de los documentos (son del asunto, no del papel).
+- Esconder el tablón, sacar el DNI de la columna del tutor, o el nombre comercial en la carpeta de una empresa.
+- Reescribir módulos y envolturas, o meter los campos del tipo en el nombre de los documentos (son del asunto).
 - Rellenar los datos de la PERSONA en un impreso (a propósito: para ver si algo cambió).
 
 ## 8. Qué falta
