@@ -129,6 +129,10 @@
     Object.keys(conflicto.asuntos).forEach(function (k) { claves[k] = true; });
 
     var fusion = Object.assign({}, conflicto, registroReal, { asuntos: {} });
+    /* Fila 178, punto 3: el Object.assign de arriba se queda con el
+       _esquema de registroReal (va el último), aunque el de la copia
+       en conflicto sea mayor; aquí se corrige al mayor de los dos. */
+    fusion._esquema = Math.max(conflicto._esquema || 0, registroReal._esquema || 0);
     Object.keys(claves).forEach(function (k) {
       if (lapidas[k]) return;
       var a = registroReal.asuntos[k], b = conflicto.asuntos[k];
@@ -174,6 +178,8 @@
     } catch (e) { return false; }
     if (!conflicto || typeof conflicto !== 'object') return false;
     var base = (real && typeof real === 'object') ? real : {};
+    /* Fila 178, punto 3: se conserva el mayor de los dos _esquema. */
+    base._esquema = Math.max((real && real._esquema) || 0, (conflicto && conflicto._esquema) || 0);
     base.ajustes = base.ajustes || {};
     base.porAsunto = base.porAsunto || {};
     var confAjustes = conflicto.ajustes || {};
@@ -239,7 +245,10 @@
       mapa[k] = mapa[k] ? Object.assign({}, mapa[k], n) : n;
     });
 
-    await Copias.guardar(g, 'tablon.json', { notas: orden.map(function (k) { return mapa[k]; }) });
+    /* Fila 178, punto 3: se conserva el mayor de los dos _esquema. */
+    var esquemaTablon = Math.max((real && real._esquema) || 0, (conflicto && conflicto._esquema) || 0);
+    await Copias.guardar(g, 'tablon.json',
+      { notas: orden.map(function (k) { return mapa[k]; }), _esquema: esquemaTablon });
     await archivarConflicto(g, nombreConflicto);
     return true;
   }

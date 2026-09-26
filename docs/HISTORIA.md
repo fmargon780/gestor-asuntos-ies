@@ -5,6 +5,40 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 26-sep-2026 — Fila 178: correo que no sale dos veces, versiones que se reconocen, y limpieza
+
+`docs/CORREO-VERSIONES-Y-LIMPIEZA.md`, última parte de la «tanda de estabilidad». Seis arreglos
+pequeños e independientes; ninguno cambia lo que se hace en pantalla, dos añaden un aviso.
+
+1. **El script recuerda los envíos más allá de las 6 horas de `CacheService`**: cada `idEnvio` que
+   sale bien también se apunta en `PropertiesService`, agrupado por día (`enviados-AAMMDD`);
+   `limpiarEnviadosViejos()` borra los grupos de más de 60 días en cada vuelta de
+   `recogerCorreos()`. `VERSION_SCRIPT` sube a «fila 178».
+2. **La app sabe qué versión de script tiene delante** (`js/correo-enviar.js`,
+   `CorreoEnviar.SCRIPT_ESPERADO`): compara la `fila N` del script contra la esperada tras cada
+   respuesta; si es más viejo, aviso ámbar persistente en Ajustes y en el cuadro de Correo. «Probar»
+   enseña la versión recibida.
+3. **`_esquema` en los ficheros compartidos que son un objeto**: `Copias.guardar` añade
+   `_esquema: Copias.ESQUEMA` (ahora 1) a cada uno de los dieciocho que sea un objeto de verdad (no
+   una lista, ni `guias.json`/`formularios-campos.json`, de claves dinámicas). Un `_esquema` mayor
+   en disco (el otro ordenador tiene una versión más nueva) hace que no se escriba nada, con error
+   `EsquemaMasNuevo`. Las fusiones de `js/conflictos.js` conservan el mayor de los dos.
+4. **Aviso de versión nueva también en la web**: `js/aviso-version-web.js`, la misma franja que ya
+   usaba la copia sin internet, cada 30 min (y al recuperar el foco, máx. cada 10 min); nunca
+   actualiza nada sola.
+5. **La copia de seguridad se comprueba antes de sobrescribir el original**: tras escribirla, se
+   relee y se le hace `JSON.parse`; si falla, un reintento; si sigue sin poder leerse, no se toca el
+   original (error `CopiaNoVerificada`).
+6. **`script-src 'self' blob:` en la Content-Security-Policy** de `vercel.json`: ya no había
+   manejadores en línea que lo impidieran.
+7. Datos de prueba (DNI, teléfonos, correos) de `pruebas/relacionados.mjs`, `pruebas/logica.mjs` y
+   `pruebas/ficha-tercero.mjs` sustituidos por otros claramente inventados.
+8. Los hitos de un asunto ya no se quedan huérfanos en `hitos.json` si falla la escritura del
+   historial al archivar (`js/hitos-archivo.js`): se quitan igual, en su misma operación de la
+   cola, con un reintento del historial y un aviso ámbar si sigue fallando.
+
+Se comprueba sin navegador en `pruebas/correo-versiones-y-limpieza.mjs`.
+
 ## 26-sep-2026 — Fila 177: el índice del archivo, por curso; y el largo de la ruta completa
 
 `docs/ARCHIVO-POR-CURSO-Y-RUTAS.md`. Dos cosas sin relación entre sí, del mismo encargo.

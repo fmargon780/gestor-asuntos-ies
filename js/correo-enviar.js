@@ -73,6 +73,34 @@ window.CorreoEnviar = (function () {
     return 'env-' + Date.now().toString(36) + '-' + trozo() + trozo() + trozo();
   }
 
+  /* Fila 178, punto 2 (docs/CORREO-VERSIONES-Y-LIMPIEZA.md): el script
+     ya devuelve `version` en cada respuesta, pero la app no la leía —
+     un script viejo con una app nueva fallaba en silencio (por
+     ejemplo, reenviaba porque no conocía `idEnvio`). Las dos llevan
+     " · fila N"; comparar ese número basta, porque las filas de
+     docs/COLA.md solo suben. */
+  var SCRIPT_ESPERADO = '26-sep-2026 · fila 178';
+  var ultimaVersionScript = '';
+
+  function filaDe(version) {
+    var m = /fila\s+(\d+)/.exec(String(version || ''));
+    return m ? parseInt(m[1], 10) : 0;
+  }
+
+  /* null si no se sabe nada todavía o el script está igual o más
+     nuevo; el texto del aviso si es más viejo que esta app. */
+  function avisoScriptViejo() {
+    if (!ultimaVersionScript || filaDe(ultimaVersionScript) >= filaDe(SCRIPT_ESPERADO)) return null;
+    return 'El script de Gmail es más antiguo que la app (tienes ' + ultimaVersionScript + '; hace falta ' +
+      SCRIPT_ESPERADO + '). Vuelve a pegarlo: docs/ENVIO-CUENTA-DEL-SCRIPT.md.';
+  }
+
+  function comprobarVersionScript(datos) {
+    if (!datos || !datos.version) return;
+    ultimaVersionScript = datos.version;
+    pintarResumenBloque();
+  }
+
   async function llamar(cuerpo, limiteMs) {
     var url = leerUrl();
     if (!url) return { ok: false, motivo: 'No hay ninguna dirección de envío conectada.' };
@@ -98,6 +126,7 @@ window.CorreoEnviar = (function () {
     try { texto = await respuesta.text(); } catch (e) { /* sin cuerpo */ }
     var datos = null;
     try { datos = texto ? JSON.parse(texto) : null; } catch (e) { datos = null; }
+    comprobarVersionScript(datos);
     if (!respuesta.ok) {
       return { ok: false, motivo: (datos && datos.motivo) || ('Google ha respondido con un error (' + respuesta.status + ').') };
     }
@@ -161,6 +190,7 @@ window.CorreoEnviar = (function () {
           '<button type="button" class="boton" id="envio-correo-guardar">Guardar</button>' +
           '<button type="button" class="boton" id="envio-correo-probar">Probar</button>' +
         '</div>' +
+        '<div id="envio-correo-script-viejo"></div>' +
         '<div id="envio-correo-aviso"></div>' +
       '</div>';
     pantalla.appendChild(d);
@@ -172,6 +202,13 @@ window.CorreoEnviar = (function () {
     if (r) r.textContent = tieneConexion() ? 'Conectado' : 'Sin conectar';
     var campo = document.getElementById('envio-correo-url');
     if (campo && document.activeElement !== campo) campo.value = leerUrl();
+    /* Fila 178, punto 2: aviso ámbar persistente si el script pegado
+       se queda atrás de esta app. */
+    var avisoVersion = document.getElementById('envio-correo-script-viejo');
+    if (avisoVersion) {
+      var mensaje = avisoScriptViejo();
+      avisoVersion.innerHTML = mensaje ? '<p class="aviso aviso-ambar">' + U.escapar(mensaje) + '</p>' : '';
+    }
   }
 
   function pintarBloqueAjustes() {
@@ -207,7 +244,8 @@ window.CorreoEnviar = (function () {
       await U.mientrasGuarda(probarBtn, async function () {
         var r = await probar();
         if (r && r.ok) {
-          U.aviso('Correo de prueba enviado. Revisa tu bandeja de entrada.', 'bueno');
+          U.aviso('Correo de prueba enviado. Revisa tu bandeja de entrada. Versión del script: ' +
+            (r.version || '(no la dice)') + '.', 'bueno');
         } else if (aviso) {
           aviso.innerHTML = '<p class="aviso aviso-rojo">' +
             U.escapar((r && r.motivo) || 'No he podido enviarlo.') + '</p>';
@@ -256,6 +294,9 @@ window.CorreoEnviar = (function () {
     enviar: enviar,
     nuevoIdEnvio: nuevoIdEnvio, NO_SE_SI_HA_SALIDO: NO_SE_SI_HA_SALIDO,
     probar: probar,
-    irAAjustes: irAAjustes
+    irAAjustes: irAAjustes,
+    SCRIPT_ESPERADO: SCRIPT_ESPERADO, avisoScriptViejo: avisoScriptViejo,
+    /* para las pruebas */
+    _comprobarVersionScript: comprobarVersionScript
   };
 })();

@@ -918,6 +918,10 @@
 <!-- js/actualizar-copia.js (fila 89): solo actúa si location.protocol
      es "file:". Necesita js/util.js y js/almacen.js, ya cargados. -->
 <script src="js/actualizar-copia.js"></script>
+<!-- Fila 178, punto 4: la misma franja «Hay una versión nueva», pero
+     para la web (location.protocol "https:"); nunca se actualiza sola,
+     solo avisa. Necesita js/version.js (App.VERSION), ya cargado. -->
+<script src="js/aviso-version-web.js"></script>
 <script src="js/registro-lector.js"></script>
 <script src="js/lector-documentos.js"></script>
 <script src="js/contexto-documentos.js"></script>

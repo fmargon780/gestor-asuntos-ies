@@ -385,10 +385,22 @@
       try {
         var entrada = await hitosDeConCreados(clave);
         if (!entrada || !entrada.hitos.length) return;
-        var destino = await Carpetas.bajar(App.E.archivo, [ficha.categoria, ficha.tercero], true);
-        var carpetaAsunto = await destino.getDirectoryHandle(clave);
-        var texto = textoHistorial(clave, entrada.hitos, entrada.creados);
-        await Carpetas.escribirTexto(carpetaAsunto, NOMBRE_HISTORIAL, texto);
+        /* Fila 178, punto 8: si el historial no se puede escribir (ni
+           reintentando una vez), los hitos no se quedan huérfanos en
+           hitos.json por eso: se quitan igual, en su misma operación
+           de la cola, y solo se avisa. */
+        try {
+          var destino = await Carpetas.bajar(App.E.archivo, [ficha.categoria, ficha.tercero], true);
+          var carpetaAsunto = await destino.getDirectoryHandle(clave);
+          var texto = textoHistorial(clave, entrada.hitos, entrada.creados);
+          try {
+            await Carpetas.escribirTexto(carpetaAsunto, NOMBRE_HISTORIAL, texto);
+          } catch (e1) {
+            await Carpetas.escribirTexto(carpetaAsunto, NOMBRE_HISTORIAL, texto);   /* un reintento */
+          }
+        } catch (e) {
+          U.accesorio('El asunto se ha archivado, pero no he podido guardar el historial de hitos', e);
+        }
         await quitarAsunto(clave);
       } catch (e) {
         U.accesorio('El asunto se ha archivado, pero no he podido guardar el historial de hitos', e);

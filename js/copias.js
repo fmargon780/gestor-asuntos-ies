@@ -135,20 +135,77 @@ var Copias = (function () {
     if (await Carpetas.existeFichero(carpeta, nombreCopia)) { copiasHechas[nombreCopia] = true; return; }
     var actual = await Carpetas.leerTexto(gestor, nombre);
     if (actual === null) return;
-    await Carpetas.escribirTexto(carpeta, nombreCopia, actual);
+    await escribirCopiaVerificada(carpeta, nombreCopia, actual);
     copiasHechas[nombreCopia] = true;
     await podar(carpeta, base);
   }
   var copiasHechas = {};
 
+  /* Fila 178, punto 5: la copia recién escrita se relee y se
+     comprueba que es JSON de verdad (un corte a media escritura la
+     dejaría a medias). Si falla, se reintenta escribirla una vez;
+     si sigue sin poder leerse, no sirve de red de seguridad y no se
+     llega a tocar el original: mejor quedarse con lo de antes. */
+  async function copiaLegible(carpeta, nombreCopia) {
+    try {
+      var texto = await Carpetas.leerTexto(carpeta, nombreCopia);
+      if (texto === null) return false;
+      JSON.parse(texto);
+      return true;
+    } catch (e) { return false; }
+  }
+  async function escribirCopiaVerificada(carpeta, nombreCopia, texto) {
+    await Carpetas.escribirTexto(carpeta, nombreCopia, texto);
+    if (await copiaLegible(carpeta, nombreCopia)) return;
+    await Carpetas.escribirTexto(carpeta, nombreCopia, texto);   /* un reintento */
+    if (await copiaLegible(carpeta, nombreCopia)) return;
+    U.fallo('No he podido guardar: la copia de seguridad no se ha escrito bien. Vuelve a intentarlo.');
+    var e = new Error('La copia de seguridad no se ha escrito bien');
+    e.name = 'CopiaNoVerificada';
+    throw e;
+  }
+
+  /* Fila 178, punto 3: número de esquema de los ficheros compartidos
+     que son un objeto (no una lista, como envios.json, tipos.json,
+     tipos-documento.json o recurrentes.json: a esos no se les añade,
+     no tienen dónde meter una clave de primer nivel). Cada migración
+     futura que cambie el formato de alguno sube este número.
+
+     `guias.json` y `formularios-campos.json` también se quedan fuera,
+     aunque sean un objeto: sus claves de primer nivel son dinámicas
+     (un tipo de asunto, la clave de un impreso), no un sitio fijo
+     donde meter algo más sin que alguien que recorra sus claves
+     (`for...in`, `Object.keys`) se encuentre con una que no espera. */
+  var ESQUEMA = 1;
+  var SIN_ESQUEMA = { 'guias.json': true, 'formularios-campos.json': true };
+
+  /* Si el fichero en disco trae un _esquema MAYOR que el de esta app,
+     es que el otro ordenador tiene una versión más nueva que ya ha
+     migrado el formato: escribir encima con el formato viejo lo
+     estropearía. Se avisa y no se escribe nada. */
+  async function comprobarEsquemaDisco(gestor, nombre) {
+    var disco;
+    try { disco = await Carpetas.leerJson(gestor, nombre); } catch (e) { return; }
+    if (!disco || typeof disco._esquema !== 'number' || disco._esquema <= ESQUEMA) return;
+    U.fallo('En el otro ordenador hay una versión más nueva de la aplicación. Recarga la página para ponerte al día.');
+    var e = new Error('En el otro ordenador hay una versión más nueva de la aplicación');
+    e.name = 'EsquemaMasNuevo';
+    throw e;
+  }
+
   /* Lo que hay que llamar en vez de Carpetas.guardarJson para los
-     ficheros compartidos: guarda la copia del día y después escribe. */
+     ficheros compartidos: guarda la copia del día y después escribe,
+     con su _esquema si es de los que lo llevan. */
   function guardar(gestor, nombre, objeto) {
     /* Cuenta como guardado en marcha (fila 99): las tareas de fondo
        esperan a la siguiente pasada. */
     var hacer = async function () {
       await copiarSiHaceFalta(gestor, nombre);
-      await Carpetas.guardarJson(gestor, nombre, objeto);
+      var sinEsquema = Array.isArray(objeto) || SIN_ESQUEMA[nombre];
+      if (!sinEsquema) await comprobarEsquemaDisco(gestor, nombre);
+      var paraEscribir = sinEsquema ? objeto
+        : Object.assign({}, objeto, { _esquema: Math.max(ESQUEMA, (typeof objeto._esquema === 'number') ? objeto._esquema : 0) });
+      await Carpetas.guardarJson(gestor, nombre, paraEscribir);
     };
     return window.ColaGuardado ? window.ColaGuardado.ocupado(hacer) : hacer();
   }
@@ -213,6 +270,7 @@ var Copias = (function () {
 
   return {
     FICHEROS: FICHEROS,
+    ESQUEMA: ESQUEMA,
     guardar: guardar,
     comprobarTodos: comprobarTodos,
     restaurar: restaurar,

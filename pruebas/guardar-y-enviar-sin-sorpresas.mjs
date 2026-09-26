@@ -31,13 +31,29 @@ console.log('--- 6. el mismo envío no sale dos veces ---');
 {
   const codigo = fs.readFileSync(new URL('../apps-script/gestor-correos.gs', import.meta.url), 'utf8');
   const cache = new Map();
+  const props = new Map();
   let enviados = 0;
   const ctx = {
     console,
     CacheService: { getScriptCache: () => ({ get: (k) => cache.get(k) || null, put: (k, v) => cache.set(k, v) }) },
+    PropertiesService: {
+      getScriptProperties: () => ({
+        getProperty: (k) => (props.has(k) ? props.get(k) : null),
+        setProperty: (k, v) => { props.set(k, v); },
+        deleteProperty: (k) => { props.delete(k); },
+        getProperties: () => { const o = {}; props.forEach((v, k) => { o[k] = v; }); return o; }
+      })
+    },
     LockService: { getScriptLock: () => ({ waitLock: () => {}, releaseLock: () => {} }) },
-    Session: { getEffectiveUser: () => ({ getEmail: () => 'yo@g.educaand.es' }), getActiveUser: () => ({ getEmail: () => '' }) },
-    Utilities: { base64Decode: () => [], newBlob: () => ({}) },
+    Session: {
+      getEffectiveUser: () => ({ getEmail: () => 'yo@g.educaand.es' }), getActiveUser: () => ({ getEmail: () => '' }),
+      getScriptTimeZone: () => 'Europe/Madrid'
+    },
+    Utilities: {
+      base64Decode: () => [], newBlob: () => ({}),
+      /* Solo hace falta el formato 'yyMMdd' que usa esta fila (178). */
+      formatDate: (d) => String(d.getFullYear()).slice(2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0')
+    },
     GmailApp: {
       createDraft: () => ({ send: () => { enviados++; return { getThread: () => ({ getId: () => 'hilo-' + enviados }), getHeader: () => '<m' + enviados + '@x>' }; } }),
       getThreadById: () => null
@@ -56,7 +72,20 @@ console.log('--- 6. el mismo envío no sale dos veces ---');
   ctx.enviarUnaVez({ para: 'familia@ejemplo.es', asunto: 'Viejo', cuerpo: 'x' });
   ctx.enviarUnaVez({ para: 'familia@ejemplo.es', asunto: 'Viejo', cuerpo: 'x' });
   await comprobar('6. sin identificador (navegador viejo), como hasta ahora', Promise.resolve(enviados), 4);
-  await comprobar('6. la respuesta dice la versión del script', Promise.resolve(/fila 130/.test(r1.version || '')), true);
+  await comprobar('6. la respuesta dice la versión del script', Promise.resolve(/fila 178/.test(r1.version || '')), true);
+
+  /* Fila 178, punto 1: pasadas las seis horas (aquí, simplemente
+     borrando la caché) el mismo idEnvio se sigue reconociendo, por la
+     memoria permanente de PropertiesService. */
+  cache.clear();
+  const enviadosAntes = enviados;
+  const r3 = ctx.enviarUnaVez(Object.assign({}, pedido));
+  await comprobar('6b. pasada la caché de seis horas, la memoria permanente evita reenviarlo',
+    Promise.resolve([enviados === enviadosAntes, r3.ok, !!r3.yaEnviado]), [true, true, true]);
+
+  ctx.limpiarEnviadosViejos();
+  await comprobar('6c. limpiarEnviadosViejos no borra el grupo de hoy',
+    Promise.resolve(ctx.PropertiesService.getScriptProperties().getProperty(ctx.grupoDeHoy()) !== null), true);
 }
 
 /* ---------- en el navegador ---------- */

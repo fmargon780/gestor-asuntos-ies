@@ -406,9 +406,9 @@ const CESO_YA = enDias(-10);
 
 await Carpetas.escribirTexto(datosPer, 'RelPerCen.csv',
   '"Empleado/a","DNI/Pasaporte","Puesto","Fecha de toma de posesión","Fecha de cese","Teléfono","Móvil avisos de emergencia","Usuario IdEA","Cuenta Google/Microsoft"\r\n' +
-  '"Aguado Ranea, Marcos Antonio","33357591R","Música P.E.S.","01/09/2011","","952276078","620177026","maguran591","maguran591@g.educaand.es"\r\n' +
-  '"Bonilla Cascado, Manuel","52561060B","Música P.E.S.","01/09/2003","' + CESA_PRONTO + '","952594821","606557122","mboncas060","mboncas060@g.educaand.es"\r\n' +
-  '"Sánchez Alegría, María José","07862312S","Dibujo P.E.S.","01/09/2005","' + CESO_YA + '","656633968","656633968","msanale312","msanale312@g.educaand.es"\r\n');
+  '"Aguado Ranea, Marcos Antonio","00000000T","Música P.E.S.","01/09/2011","","600000001","600000002","usuario1","usuario1@ejemplo.invalid"\r\n' +
+  '"Bonilla Cascado, Manuel","22222222J","Música P.E.S.","01/09/2003","' + CESA_PRONTO + '","600000003","600000004","usuario2","usuario2@ejemplo.invalid"\r\n' +
+  '"Sánchez Alegría, María José","11111111H","Dibujo P.E.S.","01/09/2005","' + CESO_YA + '","600000005","600000005","usuario3","usuario3@ejemplo.invalid"\r\n');
 
 const P = await Datos.cargar(datosPer, 'PERSONAL');
 comprobar('lee las tres fichas del RelPerCen', P.lista.length, 3);
@@ -428,7 +428,7 @@ comprobar('y se guarda la fecha del cese', mariaJose.fechaCese, CESO_YA);
 comprobar('cuenta bien cuántos siguen en el centro', P.enElCentro, 2);
 
 comprobar('el nombre del tercero lleva los cuatro últimos caracteres',
-  Nombres.terceroPersonal(marcos), 'Aguado Ranea, Marcos Antonio 591R');
+  Nombres.terceroPersonal(marcos), 'Aguado Ranea, Marcos Antonio 000T');
 
 comprobar('se puede buscar por la asignatura',
   Datos.buscar(P.lista, 'musica').length, 2);
@@ -457,12 +457,12 @@ const CAB = '"Empleado/a","DNI/Pasaporte","Puesto","Fecha de toma de posesión",
 
 /* Profesorado de hace dos cursos: uno sigue, otro se fue. */
 await Carpetas.escribirTexto(datosVarios, 'RelPerCen 24-25.csv', CAB + '\r\n' +
-  '"Aguado Ranea, Marcos Antonio","33357591R","Música P.E.S.","01/09/2011",""\r\n' +
+  '"Aguado Ranea, Marcos Antonio","00000000T","Música P.E.S.","01/09/2011",""\r\n' +
   '"Vieja Guardia, Antonia","11112233A","Latín P.E.S.","01/09/2010",""\r\n');
 
 /* Profesorado de este curso: la que se fue ya no sale. */
 await Carpetas.escribirTexto(datosVarios, 'RelPerCen 26-27.csv', CAB + '\r\n' +
-  '"Aguado Ranea, Marcos Antonio","33357591R","Jefatura de Estudios","01/09/2011",""\r\n' +
+  '"Aguado Ranea, Marcos Antonio","00000000T","Jefatura de Estudios","01/09/2011",""\r\n' +
   '"Cherino Elena, Paula","26835483A","Inglés P.E.S.","01/09/2026","31/08/2027"\r\n');
 
 /* Personal no docente de este curso, en su propio fichero. */

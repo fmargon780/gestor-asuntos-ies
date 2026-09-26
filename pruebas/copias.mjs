@@ -112,13 +112,13 @@ comprobar('la segunda vez sí se copia lo que había', copiasTrasSegunda.length,
 const carpetaCopiasAsuntos = await gestor.getDirectoryHandle('copias');
 comprobar('la copia guarda el contenido de ANTES del cambio',
   JSON.parse(await Carpetas.leerTexto(carpetaCopiasAsuntos, copiasTrasSegunda[0].nombre)),
-  { asuntos: { uno: 1 } });
+  { asuntos: { uno: 1 }, _esquema: 1 });
 
 await Copias.guardar(gestor, 'asuntos.json', { asuntos: { uno: 1, dos: 2, tres: 3 } });
 comprobar('un segundo guardado el mismo día no hace una segunda copia',
   (await Copias.listar(gestor, 'asuntos.json')).length, 1);
 comprobar('pero el fichero sí lleva el contenido nuevo',
-  await Carpetas.leerJson(gestor, 'asuntos.json'), { asuntos: { uno: 1, dos: 2, tres: 3 } });
+  await Carpetas.leerJson(gestor, 'asuntos.json'), { asuntos: { uno: 1, dos: 2, tres: 3 }, _esquema: 1 });
 
 /* ---------- como mucho 30 copias ---------- */
 const copiasCarpeta = await gestor.getDirectoryHandle('copias');

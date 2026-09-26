@@ -74,6 +74,15 @@ Tendrá que hacer esto una vez (dejarlo escrito en el mensaje final, en pocos pa
    (misma implementación, misma clave): no hay que pegar nada nuevo.
 4. Le llega el correo de prueba a la bandeja de entrada de la cuenta del centro.
 
+## Fila 178 (26-sep-2026): hay que volver a pegar el script
+
+`docs/CORREO-VERSIONES-Y-LIMPIEZA.md` cambia otra vez `apps-script/gestor-correos.gs` (memoria
+permanente de envíos, más allá de las 6 horas de `CacheService`, y `version` sube a «fila 178», que
+la app ya compara). Mismos tres pasos de «Qué verá Francisco al final»: copiar el fichero entero en
+script.google.com, «Gestionar implementaciones → lápiz → Nueva versión → Implementar», y «Probar»
+desde Ajustes → Enviar correo (la URL y la clave de siempre siguen sirviendo). Mientras no se pegue,
+Ajustes avisa en ámbar de que el script es más viejo que la app; el envío no se bloquea por eso.
+
 ## Cómo trabajar
 
 - Cambios quirúrgicos; solo estos ficheros y `docs/CONTEXTO.md` o su hijo del correo.

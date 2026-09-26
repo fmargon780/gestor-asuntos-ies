@@ -81,8 +81,8 @@ await pagina.evaluate(async () => {
 
   const per = [
     '"Empleado/a","DNI/Pasaporte","Puesto","Fecha de toma de posesión","Fecha de cese"',
-    '"Aguado Ranea, Marcos Antonio","33357591R","Música P.E.S.","01/09/2011",""',
-    '"Sánchez Alegría, María José","07862312S","Dibujo P.E.S.","01/09/2005",""'
+    '"Aguado Ranea, Marcos Antonio","00000000T","Música P.E.S.","01/09/2011",""',
+    '"Sánchez Alegría, María José","11111111H","Dibujo P.E.S.","01/09/2005",""'
   ].join('\r\n') + '\r\n';
   d._hijos.set('RelPerCen 26-27.csv', window.__disco.fich('RelPerCen 26-27.csv', per));
 });
@@ -159,7 +159,7 @@ await comprobar('los dos relacionados se han guardado en asuntos.json', pagina.e
   const clave = Object.keys(j.asuntos).find(k => k.indexOf('MATRICULA') !== -1);
   const rel = (j.asuntos[clave].relacionados || []).map(r => r.categoria + ' · ' + r.nombre);
   return rel.sort();
-}), ['PERSONAL · Aguado Ranea, Marcos Antonio 591R', 'PERSONAL · Sánchez Alegría, María José 312S']);
+}), ['PERSONAL · Aguado Ranea, Marcos Antonio 000T', 'PERSONAL · Sánchez Alegría, María José 111H']);
 
 /* 3) El propio tercero del asunto no se puede añadir como relacionado. */
 await pagina.click('#rel-anadir');
@@ -261,22 +261,22 @@ async function leerMarcadorEnPagina(categoria, tercero, nombreMarcador) {
 await esperarHasta(async (m) => {
   try {
     const cat1 = await window.__disco.archivo.getDirectoryHandle('PERSONAL');
-    const ter1 = await cat1.getDirectoryHandle('Aguado Ranea, Marcos Antonio 591R');
+    const ter1 = await cat1.getDirectoryHandle('Aguado Ranea, Marcos Antonio 000T');
     await ter1.getDirectoryHandle(m);
-    const ter2 = await cat1.getDirectoryHandle('Sánchez Alegría, María José 312S');
+    const ter2 = await cat1.getDirectoryHandle('Sánchez Alegría, María José 111H');
     await ter2.getDirectoryHandle(m);
     return true;
   } catch (e) { return false; }
 }, NOMBRE_MARCADOR);
 
 await comprobar('6) se crea la carpeta ARCHIVO/PERSONAL de Aguado, que no existía',
-  leerMarcadorEnPagina('PERSONAL', 'Aguado Ranea, Marcos Antonio 591R', NOMBRE_MARCADOR)
+  leerMarcadorEnPagina('PERSONAL', 'Aguado Ranea, Marcos Antonio 000T', NOMBRE_MARCADOR)
     .then(t => t !== null), true);
 await comprobar('y la nota dice dónde está el asunto de verdad',
-  leerMarcadorEnPagina('PERSONAL', 'Aguado Ranea, Marcos Antonio 591R', NOMBRE_MARCADOR)
+  leerMarcadorEnPagina('PERSONAL', 'Aguado Ranea, Marcos Antonio 000T', NOMBRE_MARCADOR)
     .then(t => t.indexOf('ALUMNADO / Aguilar Ponce, Marina 1140233 / ' + nombreAsuntoA) !== -1), true);
 await comprobar('lo mismo para Sánchez Alegría',
-  leerMarcadorEnPagina('PERSONAL', 'Sánchez Alegría, María José 312S', NOMBRE_MARCADOR)
+  leerMarcadorEnPagina('PERSONAL', 'Sánchez Alegría, María José 111H', NOMBRE_MARCADOR)
     .then(t => t !== null && t.indexOf('ALUMNADO / Aguilar Ponce, Marina 1140233 / ' + nombreAsuntoA) !== -1), true);
 await comprobar('en la nota no hay ningún documento del asunto: solo el fichero de texto',
   pagina.evaluate(async ([c, n, m]) => {
@@ -286,7 +286,7 @@ await comprobar('en la nota no hay ningún documento del asunto: solo el fichero
     const dentro = [];
     for await (const p of marcador.entries()) dentro.push(p[0]);
     return dentro;
-  }, ['PERSONAL', 'Aguado Ranea, Marcos Antonio 591R', NOMBRE_MARCADOR]),
+  }, ['PERSONAL', 'Aguado Ranea, Marcos Antonio 000T', NOMBRE_MARCADOR]),
   ['DONDE ESTA ESTE ASUNTO.txt']);
 
 /* 9a) La ficha de Aguado Ranea, con el asunto ya archivado, dice que
@@ -322,8 +322,8 @@ await pagina.click('#cuadro-aceptar');
 await esperarHasta(async () => {
   try {
     const cat = await window.__disco.archivo.getDirectoryHandle('PERSONAL');
-    const uno = await cat.getDirectoryHandle('Aguado Ranea, Marcos Antonio 591R');
-    const dos = await cat.getDirectoryHandle('Sánchez Alegría, María José 312S');
+    const uno = await cat.getDirectoryHandle('Aguado Ranea, Marcos Antonio 000T');
+    const dos = await cat.getDirectoryHandle('Sánchez Alegría, María José 111H');
     for await (const p of uno.entries()) if (p[0].indexOf('RELACIONADO') !== -1) return false;
     for await (const p of dos.entries()) if (p[0].indexOf('RELACIONADO') !== -1) return false;
     return true;
@@ -333,8 +333,8 @@ await esperarHasta(async () => {
 await comprobar('al reabrir, las dos notas desaparecen',
   pagina.evaluate(async () => {
     const cat = await window.__disco.archivo.getDirectoryHandle('PERSONAL');
-    const uno = await cat.getDirectoryHandle('Aguado Ranea, Marcos Antonio 591R');
-    const dos = await cat.getDirectoryHandle('Sánchez Alegría, María José 312S');
+    const uno = await cat.getDirectoryHandle('Aguado Ranea, Marcos Antonio 000T');
+    const dos = await cat.getDirectoryHandle('Sánchez Alegría, María José 111H');
     const hay1 = await uno.getDirectoryHandle('__x__').then(() => true).catch(() => false);
     let notaUno = false, notaDos = false;
     for await (const p of uno.entries()) if (p[0].indexOf('RELACIONADO') !== -1) notaUno = true;
@@ -366,7 +366,7 @@ await pagina.waitForSelector('#lista-abiertos .vacio, #lista-abiertos .tarjeta')
 await esperarHasta(async (m) => {
   try {
     const cat = await window.__disco.archivo.getDirectoryHandle('PERSONAL');
-    const ter = await cat.getDirectoryHandle('Aguado Ranea, Marcos Antonio 591R');
+    const ter = await cat.getDirectoryHandle('Aguado Ranea, Marcos Antonio 000T');
     await ter.getDirectoryHandle(m);
     return true;
   } catch (e) { return false; }
@@ -374,7 +374,7 @@ await esperarHasta(async (m) => {
 
 await pagina.evaluate(async ([m]) => {
   const cat = await window.__disco.archivo.getDirectoryHandle('PERSONAL');
-  const ter = await cat.getDirectoryHandle('Aguado Ranea, Marcos Antonio 591R');
+  const ter = await cat.getDirectoryHandle('Aguado Ranea, Marcos Antonio 000T');
   const marcador = await ter.getDirectoryHandle(m);
   marcador._hijos.set('algo que alguien ha metido.pdf', window.__disco.fich('algo que alguien ha metido.pdf', 'x'));
 }, [NOMBRE_MARCADOR]);
@@ -390,7 +390,7 @@ await pagina.click('#cuadro-aceptar');
 await esperarHasta(async () => {
   try {
     const cat = await window.__disco.archivo.getDirectoryHandle('PERSONAL');
-    const dos = await cat.getDirectoryHandle('Sánchez Alegría, María José 312S');
+    const dos = await cat.getDirectoryHandle('Sánchez Alegría, María José 111H');
     for await (const p of dos.entries()) if (p[0].indexOf('RELACIONADO') !== -1) return false;
     return true;
   } catch (e) { return false; }
@@ -398,12 +398,12 @@ await esperarHasta(async () => {
 
 await comprobar('la carpeta con el fichero de más NO se ha borrado', pagina.evaluate(async ([m]) => {
   const cat = await window.__disco.archivo.getDirectoryHandle('PERSONAL');
-  const ter = await cat.getDirectoryHandle('Aguado Ranea, Marcos Antonio 591R');
+  const ter = await cat.getDirectoryHandle('Aguado Ranea, Marcos Antonio 000T');
   return ter.getDirectoryHandle(m).then(() => true).catch(() => false);
 }, [NOMBRE_MARCADOR]), true);
 await comprobar('la del otro relacionado, sin nada de más, sí se ha borrado', pagina.evaluate(async () => {
   const cat = await window.__disco.archivo.getDirectoryHandle('PERSONAL');
-  const ter = await cat.getDirectoryHandle('Sánchez Alegría, María José 312S');
+  const ter = await cat.getDirectoryHandle('Sánchez Alegría, María José 111H');
   for await (const p of ter.entries()) if (p[0].indexOf('RELACIONADO') !== -1) return true;
   return false;
 }), false);

@@ -158,6 +158,7 @@ var CorreoCuadro = (function () {
     return '<div id="correo-formulario">' +
              '<div class="cuadro-cabecera-ruta"><span id="correo-ruta-lugar"></span></div>' +
              '<div id="correo-ruta-en-linea" class="oculto"></div>' +
+             '<div id="correo-script-viejo"></div>' +
              '<div class="correo-grid">' +
                '<div class="correo-col-izq">' +
                  bloqueDestinatarios(a, correos, persona, otroInicial, opcionesGrupo) +
@@ -316,6 +317,11 @@ var CorreoCuadro = (function () {
     $('correo-ordenador').onclick = function () { abrirDelOrdenador(); if (n().apuntarElRastro) n().apuntarElRastro(a); };
 
     engancharEnviar(a);
+
+    /* Fila 178, punto 2: solo enseña lo que CorreoEnviar ya sepa del script. */
+    var avisoScript = $('correo-script-viejo');
+    var mensajeScript = window.CorreoEnviar && CorreoEnviar.avisoScriptViejo && CorreoEnviar.avisoScriptViejo();
+    if (avisoScript) avisoScript.innerHTML = mensajeScript ? '<p class="aviso aviso-ambar">' + U.escapar(mensajeScript) + '</p>' : '';
   }
 
   /* El botón «Ruta» en la cabecera del cuadro (fila 152,

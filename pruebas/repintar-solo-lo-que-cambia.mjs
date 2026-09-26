@@ -108,8 +108,12 @@ const r1 = await pagina.evaluate(async (B) => {
 const permitidas = ['ficheros', 'leerJson:hitos.json', 'leerTexto:hitos.json', 'guardarJson:hitos.json', 'escribirTexto:hitos.json'];
 await comprobar('solo mira la carpeta y relee y escribe hitos.json',
   Promise.resolve(Object.keys(r1.cuenta).filter(k => permitidas.indexOf(k) === -1 &&
-    !/^(escribirTexto|guardarJson):hitos-\d{6}\.json$/.test(k))), []);   /* la copia del día de hitos.json */
-await comprobar('como mucho una relectura', Promise.resolve((r1.cuenta['leerJson:hitos.json'] || 0) <= 1), true);
+    /* la copia del día de hitos.json: se escribe y, desde la fila 178
+       (punto 5), se relee para comprobar que se puede leer de vuelta */
+    !/^(escribirTexto|guardarJson|leerTexto):hitos-\d{6}\.json$/.test(k))), []);
+/* Desde la fila 178 (punto 3), Copias.guardar relee el disco una vez
+   más para mirar su _esquema antes de escribir: como mucho dos. */
+await comprobar('como mucho dos relecturas', Promise.resolve((r1.cuenta['leerJson:hitos.json'] || 0) <= 2), true);
 await comprobar('la lista, oculta detrás de la ficha, queda pendiente', Promise.resolve(r1.pendiente), true);
 await comprobar('la cabecera lo enseña, sin repintar la ficha',
   pagina.locator('#ficha-acciones .marca-esperando').textContent().then(t => t.indexOf('Esperando a Familia') === 0), true);

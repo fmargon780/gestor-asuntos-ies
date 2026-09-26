@@ -186,7 +186,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 ## 8. Qué falta
 
 - El compañero: entrar en `https://asuntos.fmargon.com`, señalar sus carpetas de nuevo y coordinar tipos de asunto.
-- Envío: pegar el script nuevo (filas 117 y 130), «Nueva versión» y «Probar».
+- Envío: pegar el script nuevo (filas 117, 130 y 178), «Nueva versión» y «Probar».
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto.
 - Ver con el uso: ancho del panel/tablón, tarjetas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar curso; cuenta del centro; Ajustes: cargos y Provincia.

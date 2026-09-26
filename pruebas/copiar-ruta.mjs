@@ -139,7 +139,7 @@ await comprobar('11. al guardar, lo de delante de Dropbox queda en este ordenado
   pagina.evaluate(() => localStorage.getItem('gestor-ruta-dropbox')), 'C:\\Users\\francisco\\Dropbox');
 await pagina.waitForTimeout(300);
 await comprobar('11. y lo de detrás, en _GESTOR/rutas.json para todo el centro',
-  leerRutasJson(), { abiertos: 'IES/ASUNTOS ABIERTOS' });
+  leerRutasJson(), { abiertos: 'IES/ASUNTOS ABIERTOS', _esquema: 1 });
 await comprobar('y se copia ya la ruta completa, en formato file:///',
   pagina.evaluate(() => navigator.clipboard.readText()),
   'file:///C:/Users/francisco/Dropbox/IES/ASUNTOS%20ABIERTOS/' + encodeURIComponent(ABIERTO));
@@ -190,7 +190,7 @@ await comprobar('copia file:///home/... con ARCHIVO / categoría / tercero / nom
 await comprobarQue('12. sin abrir ningún cuadro',
   pagina.evaluate(() => document.getElementById('capa').classList.contains('oculto')));
 await comprobar('12. y rutas.json queda relleno con lo de detrás de Dropbox',
-  leerRutasJson(), { abiertos: 'IES/ASUNTOS ABIERTOS', archivo: 'ARCHIVO' });
+  leerRutasJson(), { abiertos: 'IES/ASUNTOS ABIERTOS', _esquema: 1, archivo: 'ARCHIVO' });
 
 /* ---------- 13. partir por el trozo Dropbox ---------- */
 console.log('--- 13. partir ---');

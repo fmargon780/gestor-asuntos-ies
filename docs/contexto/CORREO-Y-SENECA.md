@@ -234,6 +234,22 @@ horas en `CacheService`, con el candado del script: si llega otra vez, no envía
 tiempo límite: si vence, ámbar, «No sé si ha salido. Mira en Enviados de Gmail antes de volver a
 pulsar.». Hay que pegar el script nuevo (sirve también para lo de la fila 117).
 
+**La memoria de envíos, más allá de las 6 horas** (26-sep-2026, fila 178,
+`docs/CORREO-VERSIONES-Y-LIMPIEZA.md`): un reintento que llega después de que caduque la caché
+volvía a mandar el correo. Cada `idEnvio` que sale bien también se apunta, para siempre, en
+`PropertiesService`, agrupado por día de envío (`enviados-AAMMDD` → lista de ids); antes de enviar,
+si no está en la caché se mira ahí. `limpiarEnviadosViejos()` borra los grupos de más de 60 días en
+cada vuelta de `recogerCorreos()` (el disparador de cada minuto), así esto no crece sin fin.
+
+**La app sabe si el script está viejo** (misma fila): el script ya devolvía `version` en cada
+respuesta, pero la app no la miraba, y un script viejo con una app nueva podía fallar en silencio.
+`js/correo-enviar.js` (`CorreoEnviar.SCRIPT_ESPERADO`, la versión de este cambio) compara, tras cada
+respuesta (también la de «Probar»), la `fila N` del script contra la esperada (las filas de
+`docs/COLA.md` solo suben, así que basta comparar ese número). Si el script es más viejo: aviso
+ámbar persistente en Ajustes → Enviar correo (`CorreoEnviar.avisoScriptViejo()`) y, al abrir el
+cuadro de Correo, la misma línea (`#correo-script-viejo`, en `js/correo-cuadro.js`). Si es igual o
+más nuevo, sin aviso. «Probar» enseña la versión del script recibida en el aviso verde.
+
 - **`js/correo-adjuntos.js`** (`window.CorreoAdjuntos`, reducido a unas 100 líneas): pinta el
   bloque "Documentos de este asunto" con una casilla por fichero (desmarcadas de partida), suma
   el tamaño de lo marcado (`totalBytesDe`, `tamanoLegible`) y pasa un fichero a base64

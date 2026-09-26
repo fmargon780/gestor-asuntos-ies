@@ -229,14 +229,14 @@ function fechaParaEdad(anios) {
     matriculado: true, unidad: '3º ESO A', curso: '3º de E.S.O.', fechaNac: fechaParaEdad(13),
     campos: {
       'Sexo': 'H',
-      'Teléfono': '655645995',
-      'Teléfono personal': '655 645 995',
-      'Correo electrónico personal': 'abongar2909@g.educaand.es',
+      'Teléfono': '600000006',
+      'Teléfono personal': '600 000 006',
+      'Correo electrónico personal': 'usuario4@ejemplo.invalid',
       'Primer apellido Primer tutor': 'García',
       'Segundo apellido Primer tutor': 'Gallego',
       'Nombre Primer tutor': 'Isabel María',
       'Sexo Primer tutor': 'M',
-      'Teléfono Primer tutor': '655645995',
+      'Teléfono Primer tutor': '600000006',
       'Primer apellido Segundo tutor': 'Bonilla',
       'Segundo apellido Segundo tutor': 'Fernández',
       'Nombre Segundo tutor': 'Jesús',
@@ -272,13 +272,13 @@ function fechaParaEdad(anios) {
     tarjetas.indexOf('Sexo') === -1 && tarjetas.indexOf('Primer apellido') === -1);
   const telAlumno = caja.querySelectorAll('.vt-tarjeta-alumno .vt-dato-telefono');
   comprobar('9. el teléfono del alumno, una sola vez y en grupos de tres',
-    Array.from(telAlumno).map((d) => d.querySelector('.vt-valor').textContent), ['655 645 995']);
+    Array.from(telAlumno).map((d) => d.querySelector('.vt-valor').textContent), ['600 000 006']);
   comprobar('9. con «mismo que la tutora 1»',
     telAlumno[0].querySelector('.vt-pie').textContent, 'mismo que la tutora 1');
   comprobarQue('9. sin «Otros datos de la familia»', texto.indexOf('Otros datos de la familia') === -1);
   comprobar('9. «Copiar todo el contacto», una línea por persona', v.textoDeTodo(), [
-    'Ángel Bonilla García (3º ESO A) · 655645995 · abongar2909@g.educaand.es',
-    'Tutora 1: Isabel María García Gallego · 655645995',
+    'Ángel Bonilla García (3º ESO A) · 600000006 · usuario4@ejemplo.invalid',
+    'Tutora 1: Isabel María García Gallego · 600000006',
     'Tutor 2: Jesús Bonilla Fernández · jesus@correo.es'].join('\n'));
 }
 

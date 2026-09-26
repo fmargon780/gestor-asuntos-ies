@@ -39,9 +39,16 @@
    un correo no sale dos veces. La aplicación manda un identificador de
    envío (`idEnvio`); si llega otra vez el mismo (se cortó la red después
    de enviar y se volvió a pulsar), no se envía de nuevo: se contesta
-   como si hubiera salido bien, con `yaEnviado: true`. Se recuerda 6 horas
-   (CacheService). Una petición sin identificador se envía como siempre.
-   Versión del script: VERSION_SCRIPT, más abajo.
+   como si hubiera salido bien, con `yaEnviado: true`. Una petición sin
+   identificador se envía como siempre.
+
+   26-sep-2026, fila 178, docs/CORREO-VERSIONES-Y-LIMPIEZA.md: la caché
+   de seis horas (CacheService, su máximo) se queda corta si el
+   reintento llega más tarde. Cada `idEnvio` que sale bien también se
+   apunta para siempre en PropertiesService, agrupado por día
+   (`enviados-AAMMDD`); se mira ahí si la caché ya no lo tiene, y los
+   grupos de más de 60 días se borran solos en cada vuelta de
+   `recogerCorreos()`. Versión del script: VERSION_SCRIPT, más abajo.
    ============================================================
    Gestor de Asuntos — recogida de correos y envío desde el asunto
    Google Apps Script, en la cuenta g.educaand.es
@@ -134,6 +141,7 @@ function prepararEnvio() {
 /* ---------- la vuelta de cada minuto ---------- */
 
 function recogerCorreos() {
+  limpiarEnviadosViejos();
   var pendiente = etiqueta(ETIQUETA);
   var hecho = etiqueta(ETIQUETA_HECHO);
   var carpeta = carpetaBandeja();
@@ -362,8 +370,54 @@ function guardarHilo(hilo, carpeta, respuestaDe) {
    propia cuenta, sin mirar `para`/`cco`.
    ============================================================ */
 
-var VERSION_SCRIPT = '24-sep-2026 · fila 130';
+var VERSION_SCRIPT = '26-sep-2026 · fila 178';
 var SEGUNDOS_RECORDAR_ENVIO = 6 * 60 * 60;   /* el máximo de CacheService */
+
+/* Fila 178, punto 1: la caché solo aguanta seis horas (el máximo de
+   CacheService); un reintento más tarde mandaba el correo otra vez.
+   Cada `idEnvio` que sale bien se apunta también, para siempre (hasta
+   que caduca), en PropertiesService, agrupado por día de envío
+   ('enviados-AAMMDD' -> lista de ids). `limpiarEnviadosViejos` quita
+   los grupos de más de DIAS_RECORDAR_ENVIO_PERMANENTE días en cada
+   vuelta del disparador (recogerCorreos), así esto no crece sin fin. */
+var PREFIJO_ENVIADOS = 'enviados-';
+var DIAS_RECORDAR_ENVIO_PERMANENTE = 60;
+
+function grupoDeHoy() {
+  return PREFIJO_ENVIADOS + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyMMdd');
+}
+
+function yaEnviadoPermanente(id) {
+  var propiedades = PropertiesService.getScriptProperties().getProperties();
+  for (var clave in propiedades) {
+    if (clave.indexOf(PREFIJO_ENVIADOS) !== 0) continue;
+    var lista;
+    try { lista = JSON.parse(propiedades[clave] || '[]'); } catch (e) { lista = []; }
+    if (lista.indexOf(id) !== -1) return true;
+  }
+  return false;
+}
+
+function apuntarEnviadoPermanente(id) {
+  var propiedades = PropertiesService.getScriptProperties();
+  var clave = grupoDeHoy();
+  var lista;
+  try { lista = JSON.parse(propiedades.getProperty(clave) || '[]'); } catch (e) { lista = []; }
+  if (lista.indexOf(id) === -1) lista.push(id);
+  propiedades.setProperty(clave, JSON.stringify(lista));
+}
+
+function limpiarEnviadosViejos() {
+  var propiedades = PropertiesService.getScriptProperties();
+  var todas = propiedades.getProperties();
+  var limite = new Date();
+  limite.setDate(limite.getDate() - DIAS_RECORDAR_ENVIO_PERMANENTE);
+  var limiteAaMmDd = Utilities.formatDate(limite, Session.getScriptTimeZone(), 'yyMMdd');
+  for (var clave in todas) {
+    if (clave.indexOf(PREFIJO_ENVIADOS) !== 0) continue;
+    if (clave.slice(PREFIJO_ENVIADOS.length) < limiteAaMmDd) propiedades.deleteProperty(clave);
+  }
+}
 
 function doPost(e) {
   var resultado;
@@ -399,13 +453,17 @@ function enviarUnaVez(cuerpo) {
   candado.waitLock(30000);
   try {
     var previo = cache.get(clave);
+    if (!previo && yaEnviadoPermanente(id)) previo = JSON.stringify({ ok: true });
     if (previo) {
       var r = JSON.parse(previo);
       r.yaEnviado = true;
       return conVersion(r);
     }
     var resultado = enviarCorreo(cuerpo);
-    if (resultado && resultado.ok) cache.put(clave, JSON.stringify(resultado), SEGUNDOS_RECORDAR_ENVIO);
+    if (resultado && resultado.ok) {
+      cache.put(clave, JSON.stringify(resultado), SEGUNDOS_RECORDAR_ENVIO);
+      apuntarEnviadoPermanente(id);
+    }
     return conVersion(resultado);
   } finally {
     candado.releaseLock();

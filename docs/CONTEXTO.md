@@ -174,8 +174,10 @@ El `?v=` es imprescindible: sin él se puede recibir una copia guardada.
 - **El conector de Vercel no sirve para esto:** da 403 y 404.
 - `vercel.json` manda `Cache-Control: public, max-age=0, must-revalidate` para todo, y desde la fila
   132 `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer` y `Content-Security-Policy:
-  frame-ancestors 'none'; object-src 'none'; base-uri 'self'` (a propósito, sin política de scripts
-  ni de conexiones: la aplicación llama a Apps Script, usa `blob:` y tiene manejadores en línea).
+  frame-ancestors 'none'; object-src 'none'; base-uri 'self'; script-src 'self' blob:` (fila 178,
+  26-sep-2026: ya no hay manejadores en línea —`grep 'onclick="' index.html` da cero, son
+  propiedades—, así que se pudo añadir `script-src`; el `blob:` es por el trabajador de pdf.js.
+  Sin política de conexiones a propósito: la aplicación llama a Apps Script).
 - **El plan gratuito (Hobby) solo da 100 publicaciones al día** (fila 48, 17-sep-2026,
   `docs/NO-GASTAR-PUBLICACIONES.md`): se agotaron una vez, con `main` recibiendo 100 commits en
   un día, más de la mitad de ellos solo `docs/COLA.md` y compañía, y cada push a una rama
@@ -288,8 +290,25 @@ que si no existiera, y el siguiente guardado lo escribía encima, perdiendo todo
   cada uno. El fichero roto se aparta como `<nombre>-roto-AAMMDD-HHMM.json` y no se borra nunca.
 - En Ajustes, el bloque **Copias de seguridad** enseña cuántas copias hay de cada fichero y deja
   restaurar cualquiera a mano, por si hiciera falta sin que nada esté roto.
+- **La copia se comprueba antes de tocar el original** (fila 178, 26-sep-2026,
+  `docs/CORREO-VERSIONES-Y-LIMPIEZA.md`): tras escribir la copia del día, `Copias.guardar` la
+  relee y le hace `JSON.parse`; si falla, reintenta escribirla una vez; si sigue sin poder leerse,
+  **no llega a escribir el original** (error `CopiaNoVerificada`, `U.fallo('No he podido guardar:
+  la copia de seguridad no se ha escrito bien. Vuelve a intentarlo.')`). Solo pasa por esto la
+  primera escritura del día de cada fichero (las demás no hacen copia).
+- **`_esquema` en los ficheros que son un objeto** (misma fila): `Copias.guardar` añade
+  `_esquema: N` (`Copias.ESQUEMA`, ahora 1) a cada uno de los dieciocho que sea un objeto de
+  verdad —no una lista, como `tipos.json`, `tipos-documento.json` o `recurrentes.json`, que no
+  tienen dónde meter una clave de primer nivel, ni `guias.json` o `formularios-campos.json`, cuyas
+  claves de primer nivel son dinámicas (un tipo de asunto, la clave de un impreso) y no un sitio
+  fijo—. Si el fichero en disco trae un `_esquema` **mayor** que el de esta app, es que el otro
+  ordenador tiene una versión más nueva que ya migró el formato: no se escribe nada (error
+  `EsquemaMasNuevo`, mismo aviso que arriba pero «hay una versión más nueva de la aplicación»).
+  `App.fusionarConDisco` y las fusiones de `js/conflictos.js` (asuntos, hitos, tablón) conservan
+  el mayor de los dos `_esquema` al fusionar. `Copias.comprobarTodos` lo ignora: un fichero sin
+  `_esquema` es válido, es de antes de esta fila.
 
-Se comprueba con `pruebas/copias.mjs`.
+Se comprueba con `pruebas/copias.mjs` y `pruebas/correo-versiones-y-limpieza.mjs`.
 
 ### Copias en conflicto de Dropbox, y releer siempre
 
@@ -323,6 +342,16 @@ Si los dos ordenadores guardan casi a la vez, Dropbox no pisa nada: deja aparte 
   un alta explícita gana siempre a un borrado viejo, sin necesitar saber fechas de alta.
 
 Se comprueba con `pruebas/conflictos.mjs`.
+
+### Aviso de versión nueva
+
+La copia sin internet (`file://`, `js/actualizar-copia.js`, fila 89) se actualiza sola, o avisa con
+una franja fija arriba («Hay una versión nueva…») si no puede. La web (`https://`) no se actualizaba
+sola nunca, y tampoco avisaba: fila 178 (26-sep-2026) añadió `js/aviso-version-web.js`, con la misma
+franja (`#franja-copia`) pero sin tocar nada: cada 30 min, y al recuperar el foco (como mucho cada 10
+min), si no hay guardado en marcha (`ColaGuardado.hayGuardado()`), pide `js/version.js?v=<hora>` (sin
+caché) y compara su `App.VERSION` con la ya cargada, leyendo el texto con una expresión regular
+(nunca se ejecuta el fichero traído). Solo un botón «Recargar»; nunca recarga sola.
 
 ### Pruebas automáticas en cada subida
 

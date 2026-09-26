@@ -84,8 +84,8 @@ const cabeceras = {};
 JSON.parse(leer('vercel.json')).headers.forEach(h => h.headers.forEach(x => { cabeceras[x.key] = x.value; }));
 comprobar('3. nosniff', cabeceras['X-Content-Type-Options'], 'nosniff');
 comprobar('3. sin referer', cabeceras['Referrer-Policy'], 'no-referrer');
-comprobar('3. CSP sin marcos, objetos ni base ajena', cabeceras['Content-Security-Policy'],
-  "frame-ancestors 'none'; object-src 'none'; base-uri 'self'");
+comprobar('3. CSP sin marcos, objetos ni base ajena, y solo scripts propios', cabeceras['Content-Security-Policy'],
+  "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; script-src 'self' blob:");
 comprobar('3. y la de caché, como siempre', cabeceras['Cache-Control'], 'public, max-age=0, must-revalidate');
 
 /* ---------- 4 ---------- */
