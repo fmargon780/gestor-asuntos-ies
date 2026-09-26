@@ -124,6 +124,13 @@ la copia sin internet (que se genera del repositorio y solo se actualiza si camb
 sacada del reloj (`TZ='Europe/Madrid' date`), nunca a ojo ni sumando algo a la de antes (aviso de
 Francisco del 17-sep-2026; receta exacta en `js/version.js`).
 
+**La web también avisa de versión nueva (fila 178):** la copia sin internet ya se actualizaba sola
+(`js/actualizar-copia.js`, solo si `location.protocol === 'file:'`); ahora, en el mismo fichero, un
+segundo bloque independiente hace lo mismo para cuando NO es la copia local: cada 30 minutos, y al
+recuperar el foco de la pestaña (como mucho una vez cada 10), si no hay guardado en marcha, pide
+`js/version.js?v=<hora>` sin caché y compara. Distinta de `App.VERSION`: la misma franja de
+arriba, pero solo con «Recargar» (nunca sola: aquí no hay ninguna carpeta que actualizar).
+
 
 ## 2. Cómo trabajamos el código ← LÉELO ANTES DE TOCAR NADA
 
@@ -174,8 +181,10 @@ El `?v=` es imprescindible: sin él se puede recibir una copia guardada.
 - **El conector de Vercel no sirve para esto:** da 403 y 404.
 - `vercel.json` manda `Cache-Control: public, max-age=0, must-revalidate` para todo, y desde la fila
   132 `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer` y `Content-Security-Policy:
-  frame-ancestors 'none'; object-src 'none'; base-uri 'self'` (a propósito, sin política de scripts
-  ni de conexiones: la aplicación llama a Apps Script, usa `blob:` y tiene manejadores en línea).
+  frame-ancestors 'none'; object-src 'none'; base-uri 'self'; script-src 'self' blob:` (desde la
+  fila 178: ya no había manejadores en línea que lo impidieran —`grep 'onclick="' index.html` da
+  cero—, así que se pudo añadir `script-src`; `blob:` por el trabajador de pdf.js. Sin política de
+  conexiones a propósito: la aplicación llama a Apps Script).
 - **El plan gratuito (Hobby) solo da 100 publicaciones al día** (fila 48, 17-sep-2026,
   `docs/NO-GASTAR-PUBLICACIONES.md`): se agotaron una vez, con `main` recibiendo 100 commits en
   un día, más de la mitad de ellos solo `docs/COLA.md` y compañía, y cada push a una rama
@@ -223,12 +232,11 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `PAPELERA/` | Las carpetas y ficheros borrados, cada uno en su subcarpeta `AAMMDD-HHMM <nombre>` |
 | `PLANTILLAS/` | Los `.docx` que Francisco sube a mano, colgados de un tipo desde Ajustes › Plantillas de documento. También `logo-centro.png` (fila 149, el logo opcional del membrete; `membrete.png` de la fila 81 ya no se usa), y los `.docx` del centro que trae solo el botón "Cargar las plantillas del centro" (fila 83, `plantillas/` del repositorio): las dos son las únicas veces que la propia aplicación escribe ahí. No lleva copia de seguridad: no es uno de los dieciocho ficheros compartidos |
 | `presencia/<hueso>.json` | `{ usuario, asuntos: { <clave del asunto>: { ultima } } }`: quién tiene abierta la ficha de cada asunto, y desde cuándo. Desde la fila 176 (26-sep-2026, `docs/DATOS-ENTRE-ORDENADORES.md`), un fichero por usuario (`U.hueso`, sin tildes, mayúsculas ni espacios): cada ordenador solo escribe el suyo, así que ya no deja copias en conflicto. **A propósito, fuera de los dieciocho**: no pasa por `Copias.guardar` (nada de copia de seguridad), no entra en `Papelera`. `js/conflictos.js` sí borra sin preguntar cualquier copia en conflicto que quede dentro (dato que caduca solo). El `presencia.json` viejo (de antes de esta fila) se borra solo al entrar. Se escribe y relee directo con `Carpetas` (ver "No pisarse en un mismo asunto") |
-| `indice-archivo.json` | Desde la fila 177 (26-sep-2026, `docs/ARCHIVO-POR-CURSO-Y-RUTAS.md`), es un **resumen pequeño**: `{ version, hechoEl, hechoPor, cursos: [...], recuento: { CATEGORIA: nº de carpetas de tercero } }`. Es lo único que se lee al entrar en Archivo (`js/archivo-indice.js`, ver "El índice del ARCHIVO" y "El índice del ARCHIVO por curso académico" en `docs/contexto/ASUNTOS-ARCHIVO.md`) |
-| `indice-archivo/<curso>.json` | (Fila 177) uno por curso académico (`2025-26.json`, `2026-27.json`…): `{ version, hechoEl, hechoPor, asuntos: [{ nombre, categoria, tercero, ruta, fecha, tipo, curso, grupo, documentos, registros, sueltoEn }] }`. El curso sale de las seis primeras cifras del nombre de la carpeta (AAMMDD), nunca de lo que diga el propio nombre |
-| `rutas.json` | `{ abiertos, archivo }`: dónde están las dos carpetas DENTRO de Dropbox, con `/`, igual para los dos ordenadores (fila 161, `js/copiar-ruta.js`, botón «Ruta»; desde la fila 177 también la lee `Nombres.topes()`, a través de `RutaCarpetas.comunConocido`, para calcular el tope de largo de un nombre). Pequeño, como `margenes-pdf.json`: se relee antes de guardar y pasa por `Copias.guardar` |
+| `indice-archivo.json` | `{ version, hechoEl, hechoPor, recuento: { CATEGORIA: nº de carpetas de tercero }, asuntos: [{ nombre, categoria, tercero, ruta, fecha, tipo, curso, grupo, documentos, registros, sueltoEn }] }`: el índice guardado del ARCHIVO (`js/archivo-indice.js`, ver "El índice del ARCHIVO"). **También fuera de los dieciocho**, por el mismo motivo que `presencia.json`: se puede rehacer entero en cualquier momento con "Reconstruir el índice", así que no necesita copia de seguridad, papelera ni fusión de conflictos. Se escribe y relee directo con `Carpetas` |
+| `rutas.json` | `{ abiertos, archivo }`: dónde están las dos carpetas DENTRO de Dropbox, con `/`, igual para los dos ordenadores (fila 161, `js/copiar-ruta.js`, botón «Ruta»). Pequeño, como `margenes-pdf.json`: se relee antes de guardar y pasa por `Copias.guardar` |
 | `responsable-migrado.json` | La marca de la pasada única de la fila 159 (personas → «Administración» en guías y biblioteca; los dos hitos de firma). **Fuera de los dieciocho**, como `estado-migrado.json` |
 | `estado-migrado.json` | `{ hechoEl, hechoPor, creados, enEspera }`: la marca de que el paso único de la fila 129 ya se hizo (`js/estado-migracion.js`). **Fuera de los dieciocho**, como `presencia.json` |
-| `copias/*.json` | Copias de seguridad de los dieciocho ficheros de arriba, una por día, 30 como mucho de cada uno. También aquí, desde la fila 177, `indice-archivo-antiguo-AAMMDD.json`: el resumen del formato antiguo, apartado al migrar a un fichero por curso (no es una copia periódica, es un rastro de la migración, y no se borra sola) |
+| `copias/*.json` | Copias de seguridad de los dieciocho ficheros de arriba, una por día, 30 como mucho de cada uno |
 
 **Los CSV van en `datos`, no en `_GESTOR`.** `js/rescate-datos.js` los baja solos al entrar.
 
@@ -250,9 +258,8 @@ del anterior del MISMO fichero: `App.guardarRegistroFresco` (y con él `App.anot
 y la fusión de copias en conflicto de `asuntos.json` y `hitos.json`. Desde la fila 130
 (`docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md`) también el tablón (sus cambios, su fusión y devolver una
 nota de la papelera), los CSV de terceros (`js/datos-listas.js`, releyendo dentro de la cola),
-`borrados-listas.json` y `indice-archivo.json` (desde la fila 177, cada fichero de curso dentro de
-`indice-archivo/` también pasa por esta misma fila, con la clave del resumen: nunca se llama a
-`poner` del mismo fichero desde dentro de un `fn` que ya está en esa cola). Sin el
+`borrados-listas.json` y `indice-archivo.json`. Nunca se llama a `poner` del
+mismo fichero desde dentro de un `fn` que ya está en esa cola (se esperaría a sí mismo). Sin el
 módulo, se guarda igual, sin fila (`App.enFila`). `guardarRegistroFresco` trabaja sobre una copia
 local y solo la pasa a `App.E.registro` al terminar la escritura. `ColaGuardado.hayGuardado()`
 (también cuenta `Copias.guardar` y los traslados de carpeta) hace que presencia, el vistazo a la
@@ -287,6 +294,19 @@ que si no existiera, y el siguiente guardado lo escribía encima, perdiendo todo
   cada uno. El fichero roto se aparta como `<nombre>-roto-AAMMDD-HHMM.json` y no se borra nunca.
 - En Ajustes, el bloque **Copias de seguridad** enseña cuántas copias hay de cada fichero y deja
   restaurar cualquiera a mano, por si hiciera falta sin que nada esté roto.
+- **`_esquema` (fila 178):** de los dieciocho, los quince cuyo contenido es un objeto de forma fija
+  (`tipos.json`, `tipos-documento.json` y `recurrentes.json` son listas, y `guias.json` es un
+  diccionario dinámico por tipo: en ninguno de los cuatro cabe una clave de más sin romper algo)
+  llevan en su primer nivel `_esquema: Copias.ESQUEMA` (hoy, 1). `Copias.guardar` relee el fichero
+  antes de escribir: si en disco hay un `_esquema` **mayor** que el de esta app, no se escribe
+  (error `EsquemaMasNuevo`, `U.fallo`: "En el otro ordenador hay una versión más nueva..."). Un
+  fichero sin `_esquema` es válido (de antes de esta fila). Cada migración futura que cambie el
+  formato de alguno de estos ficheros sube `ESQUEMA`. `App.fusionarConDisco` (solo listas: no le
+  afecta) y las fusiones de `js/conflictos.js` conservan el mayor `_esquema` de los dos lados.
+- **Copia verificada (fila 178):** tras escribir la copia del día (solo la primera de cada
+  fichero), se relee y se le hace `JSON.parse`; si falla, se reintenta una vez; si sigue sin
+  poder leerse, no se escribe el original (error `CopiaNoVerificada`, `U.fallo`: "No he podido
+  guardar: la copia de seguridad no se ha escrito bien...").
 
 Se comprueba con `pruebas/copias.mjs`.
 

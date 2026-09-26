@@ -73,9 +73,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Asuntos reservados (por tipo o uno a uno): candado, sin el tercero en listas y buscador.
 - El estado es el primer hito sin terminar («Paso N de M · título», «Paso actual»): Administración o terceros; «Esperando a…» sale solo con el responsable (a mano, hasta que cambia el paso). Guías: «Administración», no personas. Vía y fecha límite.
 - Asuntos recurrentes, con aviso. Avisos de fichas huérfanas y papelera vieja.
-- Buscador de tipos y de terceros, con índice guardado del ARCHIVO, partido por curso académico
-  (selector «Curso: … ▾»; carga solo al entrar, la primera vez) y búsqueda por palabras sueltas
-  también en documentos, registro de Séneca, ficha y notas.
+- Buscador de tipos y de terceros, con índice guardado del ARCHIVO (carga solo al entrar, la
+  primera vez) y búsqueda por palabras sueltas también en documentos, registro de Séneca, ficha
+  y notas.
 - Personas (Alumnado): matriculados primero, antiguos plegados; busca por padre, madre o tutor;
   hermanos y sus asuntos en la ficha (se abren pulsando la fila); «+ Nuevo asunto para esta
   persona». La BD de alumnado (carpeta de Drive) suma sus datos:
@@ -97,8 +97,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   memoria) que se pueda aprovechar de lo leído; «Guardar» cierra el cuadro entero. Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero;
   sus adjuntos pasan también por el cuadro de nombre, uno detrás de otro.
-- Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. Carpeta y documento con tope
-  dinámico: cuenta la ruta real de Dropbox (rutas.json); sin ella, ≤150/≤120 fijos, como antes.
+- Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. Carpeta ≤150, documento ≤120.
 - Botón «Ruta» (`file:///`; ficha, Correo/Séneca): deduce Dropbox; lo de dentro, una vez para el centro. Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto (foto, cabecera fija) en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
@@ -118,12 +117,12 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   el cargo en su fecha y «el/la alumno/a» según el sexo de cada persona.
 - Tablas de datos (tutorías de Séneca, CSV/Excel) unidas por DNI, con huecos; lo que falta, en amarillo. Certificado de función tutorial
   como el del centro; renuncia a la Junta Electoral, en su hito.
-- Copias diarias (90 días), detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable de nombres. Un borrado (tipo,
+- Copias diarias (90 días) con `_esquema` y verificación tras escribir, detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable de nombres. Un borrado (tipo,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en cada subida de código (no con solo `docs/`).
-- Copia sin internet (`file://`): se actualiza sola (reintenta si se estaba publicando); si no, franja fija arriba; cada 30 min.
+- Copia sin internet (`file://`): se actualiza sola (reintenta si se estaba publicando); si no, franja fija arriba; cada 30 min. La web normal también avisa de versión nueva (fila 178), solo con «Recargar».
 - Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
-  bifurcaciones e historial. Cada hito se abre a pantalla completa (la mesa), con las acciones solo ahí («Generar documento ▾»,
+  bifurcaciones e historial (si falla su guardado al archivar, se reintenta una vez; el hito no queda huérfano de todas formas). Cada hito se abre a pantalla completa (la mesa), con las acciones solo ahí («Generar documento ▾»,
   «Comunicar ▾», «Registrar») y tres tarjetas: el guion (lista para marcar; «receta» opcional que deja el cuadro relleno; se marca
   solo al generar, registrar, comunicar o añadir), todos los documentos del asunto («Enviar ▾» por correo o Séneca) y notas.
   Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa
@@ -183,7 +182,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 ## 8. Qué falta
 
 - El compañero: entrar en `https://asuntos.fmargon.com`, señalar sus carpetas de nuevo y coordinar tipos de asunto.
-- Envío: pegar el script nuevo (filas 117 y 130), «Nueva versión» y «Probar».
+- Envío: pegar el script nuevo (filas 117, 130 y 178), «Nueva versión» y «Probar».
 - Ver si la bandeja acierta con el tipo, y si Séneca acepta el largo del asunto.
 - Ver con el uso: ancho del panel/tablón, tarjetas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar curso; cuenta del centro; Ajustes: cargos y Provincia.
