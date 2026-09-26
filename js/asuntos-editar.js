@@ -260,7 +260,7 @@ App.editarAsunto = async function (a) {
   function refrescar() {
     var r = nombreConTipoCortoAjustado(piezasDelCuadro());
     $('ed-vista').textContent = r.nombre;
-    Nombres.avisoRecorte($('ed-vista'), r.recortado);   /* fila 130 */
+    Nombres.avisoRecorte($('ed-vista'), r.recortado, r.noCabe);   /* filas 130 y 177 */
   }
 
   ['ed-fecha', 'ed-curso', 'ed-tipo', 'ed-grupo', 'ed-descripcion', 'ed-tercero']
@@ -288,8 +288,11 @@ App.editarAsunto = async function (a) {
 
   var d = piezasDelCuadro();
   if (!d.tercero) { U.aviso('Hace falta el tercero: va siempre al final del nombre.', 'malo'); return; }
-  var nombreNuevo = nombreConTipoCorto(d);
+  var ajustadoFinal = nombreConTipoCortoAjustado(d);
+  var nombreNuevo = ajustadoFinal.nombre;
   if (!nombreNuevo || nombreNuevo.length < 8) { U.aviso('Ese nombre se queda demasiado corto.', 'malo'); return; }
+  /* Fila 177: ni recortando el texto libre cabe en la ruta de Dropbox. */
+  if (ajustadoFinal.noCabe) { U.aviso('El nombre no cabe en la ruta de Dropbox: acorta el texto.', 'malo'); return; }
 
   var camposGuardados = {};
   itemsCampos.forEach(function (item, i) {
