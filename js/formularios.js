@@ -19,7 +19,7 @@
    js/membrete.js con lo suyo:
      1. El modelo: cargar/buscar/etiquetaDeVia.
      2. El editor embebido (buscador + casillas) que se pinta DENTRO
-        del `<details>` de normativa de un paso de guía
+        del `<details>` de normativa de un hito de guía
         (js/guias.js + js/hitos-normativa.js) y de la sección "Datos
         del tipo" de un tipo de asunto (js/ajustes-tipo.js).
      3. La lista de solo lectura de un hito vivo (js/hitos-panel-lista.js).
@@ -80,7 +80,7 @@ var Formularios = (function () {
   /* ==========================================================
      EL EDITOR EMBEBIDO (buscador + casillas)
 
-     Se usa en dos sitios: el editor de un paso de guía (dentro del
+     Se usa en dos sitios: el editor de un hito de guía (dentro del
      `<details>` de normativa) y la sección "Datos del tipo". Los dos
      leen lo marcado con `leerEditor`, pasándole el propio
      `.formularios-editor` (o cualquier contenedor que lo tenga
@@ -123,8 +123,8 @@ var Formularios = (function () {
     };
   }
 
-  /* Para el editor de un paso de guía (js/guias.js, síncrono: nunca se
-     espera a nada al pintar un paso). Usa lo que ya haya en `cache`;
+  /* Para el editor de un hito de guía (js/guias.js, síncrono: nunca se
+     espera a nada al pintar un hito). Usa lo que ya haya en `cache`;
      si el catálogo todavía no ha llegado (poco probable: es un
      fichero del propio sitio, pedido al cargar la página), se avisa
      y basta con volver a abrir el editor para que salga entero. El
@@ -135,17 +135,17 @@ var Formularios = (function () {
     if (!cache) cargar();   /* de fondo, para la próxima vez */
     var catalogo = cache || {};
     if (!Object.keys(catalogo).length) {
-      return '<div class="formularios-editor"><p class="suave">Catálogo de formularios: cargando o no ' +
-        'disponible. Vuelve a abrir este paso en un momento.</p></div>';
+      return '<div class="formularios-editor"><p class="suave">Catálogo de impresos: cargando o no ' +
+        'disponible. Vuelve a abrir este hito en un momento.</p></div>';
     }
     return '<div class="formularios-editor">' +
-      '<input class="campo formularios-buscar" placeholder="Buscar un formulario…">' +
+      '<input class="campo formularios-buscar" placeholder="Buscar un impreso…">' +
       '<div class="formularios-editor-lista">' + filasEditorHTML(catalogo, seleccionadas) + '</div>' +
       '</div>';
   }
 
   /* `raiz` es el nodo ya en el documento que CONTIENE el
-     `.formularios-editor` (el `d` del paso, en js/guias.js). */
+     `.formularios-editor` (el `d` del hito, en js/guias.js). */
   function engancharEmbebido(raiz) {
     if (!raiz) return;
     engancharBuscador(raiz.querySelector('.formularios-editor'));
@@ -159,11 +159,11 @@ var Formularios = (function () {
     contenedor.innerHTML = '<p class="suave">Cargando el catálogo…</p>';
     var catalogo = await cargar();
     if (!Object.keys(catalogo).length) {
-      contenedor.innerHTML = '<p class="suave">No he podido leer el catálogo de formularios.</p>';
+      contenedor.innerHTML = '<p class="suave">No he podido leer el catálogo de impresos.</p>';
       return;
     }
     contenedor.innerHTML =
-      '<input class="campo formularios-buscar" placeholder="Buscar un formulario…">' +
+      '<input class="campo formularios-buscar" placeholder="Buscar un impreso…">' +
       '<div class="formularios-editor-lista">' + filasEditorHTML(catalogo, seleccionadas) + '</div>';
     engancharBuscador(contenedor);
     Array.prototype.forEach.call(contenedor.querySelectorAll('.formularios-casilla'), function (c) {
@@ -211,7 +211,7 @@ var Formularios = (function () {
     var filas = lista.map(filaListaHTML).filter(Boolean).join('');
     if (!filas) return '';
     return '<div class="hito-formularios"><span class="hito-normativa-titulo">' +
-      U.escapar(titulo || 'Formularios') + '</span>' + filas + '</div>';
+      U.escapar(titulo || 'Impresos') + '</span>' + filas + '</div>';
   }
 
   /* ==========================================================
@@ -347,13 +347,13 @@ var Formularios = (function () {
     seccion.className = 'pantalla oculto';
     seccion.innerHTML =
       '<header class="cabecera">' +
-        '<h2>Formularios</h2>' +
+        '<h2>Impresos</h2>' +
         '<div class="acciones">' +
           '<input id="formularios-buscar-pantalla" class="campo" placeholder="Buscar por nombre o norma…">' +
           '<button type="button" id="formularios-volver" class="boton boton-volver">← Volver</button>' +
         '</div>' +
       '</header>' +
-      '<p class="explica">El catálogo de formularios e impresos oficiales del trámite de ' +
+      '<p class="explica">El catálogo de impresos del trámite de ' +
       'escolarización y convivencia, agrupado por norma.</p>' +
       '<div id="formularios-pantalla-cuerpo" class="explica">Cargando…</div>';
     contenido.appendChild(seccion);
@@ -387,7 +387,7 @@ var Formularios = (function () {
       d.id = 'bloque-formularios';
       d.innerHTML =
         '<summary>' +
-          '<span class="bloque-titulo">Formularios oficiales</span>' +
+          '<span class="bloque-titulo">Impresos</span>' +
           '<span class="bloque-pie" id="formularios-pie">El catálogo de impresos del trámite</span>' +
         '</summary>' +
         '<div class="bloque-cuerpo">' +
@@ -403,9 +403,9 @@ var Formularios = (function () {
           var catalogo = await U.mientrasGuarda(boton, function () { return actualizar(); });
           var n = Object.keys(catalogo).length;
           $('formularios-pie').textContent = n
-            ? n + ' formulario' + (n === 1 ? '' : 's') + ' en el catálogo'
+            ? n + ' impreso' + (n === 1 ? '' : 's') + ' en el catálogo'
             : 'No he podido leer el catálogo';
-          U.aviso(n ? n + ' formularios en el catálogo.' : 'No he podido leer el catálogo.', n ? 'bueno' : 'malo');
+          U.aviso(n ? n + ' impresos en el catálogo.' : 'No he podido leer el catálogo.', n ? 'bueno' : 'malo');
         } catch (e) {
           U.aviso('No he podido actualizarlo: ' + U.mensajeDeError(e), 'malo');
         }
