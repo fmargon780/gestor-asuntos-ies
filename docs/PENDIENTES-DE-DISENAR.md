@@ -9,7 +9,7 @@ Cuando Francisco pregunte por tareas pendientes de diseñar, se le lee esta list
 
 ## 1. Nombre de documento configurable por tipo de documento, tipo de asunto e hito
 
-**Fecha:** 17-sep-2026.
+**Fecha:** 17-sep-2026. **Diseñado el 26-sep-2026: es la fila 185** (`docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md`).
 
 **La idea.** Que el nombre de un documento no se escriba a mano cada vez. Que salga
 propuesto solo, según tres cosas: el tipo de documento, el tipo de asunto en el que
@@ -35,7 +35,7 @@ enorme, una fila por cada combinación.
 
 ## 2. El equipo usa el gestor sin entrar en él («camino 1»)
 
-**Fecha:** 26-sep-2026. Sale de `claude/Analisis-estabilidad-crecimiento-2026-09-26.md`
+**Fecha:** 26-sep-2026. **Diseñado el mismo día: es la fila 182** (`docs/AVISOS-A-QUIEN-LO-PIDE.md`). Sale de `claude/Analisis-estabilidad-crecimiento-2026-09-26.md`
 (proyecto de Claude). Decidido con Francisco: dirección quiere que el equipo **consulte y encargue**,
 no que tramite. La app no se abre a más usuarios; Administración sigue siendo la única que escribe.
 

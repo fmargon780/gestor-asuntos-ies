@@ -146,6 +146,11 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 | 179 | `docs/VOCABULARIO-EN-PANTALLA.md` (tanda 2 de usabilidad, parte 1: una sola palabra para cada cosa en todos los textos de pantalla —guía, hito, tarea, tercero, familia, plantilla, impreso oficial, registrar, guardar en el asunto, cambiar, quitar/borrar—; solo rótulos, ningún dato; después de la 178) | PENDIENTE (26-sep-2026) |
 | 180 | `docs/INICIO-CUATRO-BLOQUES.md` (tanda 2, parte 2: la pantalla de Inicio con cuatro bloques —Ha llegado, Me toca hoy, Esperamos a otros, Todos los asuntos abiertos—, según `docs/boceto-inicio.html`; «Qué me toca» deja de ser pantalla aparte; después de la 179) | PENDIENTE (26-sep-2026) |
 | 181 | `docs/AVISOS-MENU-Y-VOLVER.md` (tanda 2, parte 3: los avisos de arriba en una sola línea con un solo botón para callarla; el menú lateral; un solo «Volver» que siempre vuelve a la pantalla anterior, también en la mesa del hito; después de la 180) | PENDIENTE (26-sep-2026) |
+| 182 | `docs/AVISOS-A-QUIEN-LO-PIDE.md` (camino 1: casilla por hito y por tipo «avisar a quien lo pide», siempre con confirmación en el cuadro de Correo; plantillas «Aviso de avance» y «Aviso de cierre»; botón «Enviar estado» en ficha y mesa; «Preparar informe para dirección» en Cuentas; después de la 181) | PENDIENTE (26-sep-2026) |
+| 183 | `docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md` (tanda 3 de usabilidad, parte 1: buscador único de terceros en todas las categorías, la parrilla de tipos limitada a la categoría de la persona, resumen de la guía al pulsar el tipo, un solo bloque de detalles, «Crear» abre la mesa del primer hito; el camino tipo-primero sigue; después de la 182) | PENDIENTE (26-sep-2026) |
+| 184 | `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md` (tanda 3, parte 2: lista de comprobación arriba de la pantalla del tipo, todo se guarda al cambiar, plazo y campos en un solo sitio, «Documentos de este paso» y «Comunicación de este paso» pasan a tareas, copias y días de aviso juntos en El centro, pestaña «Herramientas» encima de Ajustes con Papelera, Traer el alumnado, Tablas de datos y Restaurar copia; después de la 183) | PENDIENTE (26-sep-2026) |
+| 185 | `docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md` (texto del nombre de documento en el hito de la biblioteca —heredado—, en el hito propio o en el tipo de documento, y el cuadro sale relleno; cada hito de una guía lleva etiqueta «De la biblioteca / cambiado aquí / Propio», la biblioteca se ofrece al teclear el título, pregunta clara al guardar; después de la 184) | PENDIENTE (26-sep-2026) |
+| 186 | `docs/PAPELERA-SE-VACIA-SOLA.md` (la papelera se vacía sola a los 90 días, aviso 7 días antes en la línea de avisos, constancia de cada borrado en `papelera-borrados.json` con su lista en Herramientas › Papelera; después de la 185) | PENDIENTE (26-sep-2026) |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
@@ -224,10 +229,8 @@ abierto en ellas:
   conforme Francisco los vaya trabajando de verdad, que es cuando verá si algo sobra o falta.
 - De la fila 104 (23-sep-2026): con el uso, un aviso que devuelva el asunto a "Pendiente de
   Administración" cuando vence el plazo de un hito de terceros, para reclamarlo.
-- **Del informe del 18-sep-2026: la papelera, ¿se vacía sola?** Hoy avisa a los 30 días pero no
-  borra nada sin que alguien pulse. Para datos de menores, un borrado que nunca ocurre no es lo
-  ideal. **Hay que preguntarselo a Francisco**, y apuntar lo que decida. Es la parte que quedó sin
-  hacer de la fila 68.
+- **Del informe del 18-sep-2026: la papelera, ¿se vacía sola?** Decidido con Francisco el
+  26-sep-2026: sí, a los 90 días, con aviso 7 días antes y constancia de cada borrado. Es la fila 186.
 - **Del informe del 18-sep-2026: la ficha del asunto.** Se ha rehecho tres veces en cuatro días
   (filas 51, 52 y 58). La cuarta pasada la adelantó Francisco el 24-sep-2026: es la fila 107.
 - **Del 21-sep-2026: quitar el tecleo de la clave de normativa.** En el apartado "Normativa" de un
