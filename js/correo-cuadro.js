@@ -234,7 +234,7 @@ var CorreoCuadro = (function () {
   /* La plantilla y el cuerpo del correo. */
   function bloqueCuerpo(a) {
     var opciones = (n().plantillasDelTipo && n().plantillasDelTipo(a)) || [];
-    /* Fila 164: la receta de un paso trae su plantilla (una vez). */
+    /* Fila 164: la receta de una tarea trae su plantilla (una vez). */
     var pedida = (n()._interno || {}).plantillaPedida;
     if (pedida && opciones.some(function (p) { return p.id === pedida; })) { plantillaElegida = pedida; n()._interno.plantillaPedida = ''; }
     if (!plantillaElegida && opciones.length) plantillaElegida = opciones[0].id;
@@ -257,7 +257,7 @@ var CorreoCuadro = (function () {
               U.escapar(p.nombre) + '</option>';
           }).join('') +
         '</select>' +
-        '<button type="button" class="boton boton-chico" id="correo-plantilla-editar">Editar plantilla</button>' +
+        '<button type="button" class="boton boton-chico" id="correo-plantilla-editar">Cambiar la plantilla</button>' +
         '</div>' +
         '<div id="correo-plantilla-confirmar" class="oculto"></div>'
       : '<label class="etiqueta" style="margin-top:0">Plantilla</label>' +
