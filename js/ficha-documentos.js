@@ -125,14 +125,14 @@ var FichaDocumentos = (function () {
       fila.appendChild(reg);
     }
 
-    /* «Poner nombre», siempre a la vista (fila 168): el mismo cuadro que
+    /* «Cambiar el nombre», siempre a la vista (fila 168): el mismo cuadro que
        el de la ventana de documentos, ya abierto en este documento. */
     if (!esIndice) {
       var nombrar = document.createElement('button');
       nombrar.type = 'button';
       nombrar.className = 'boton ficha-documento-nombrar';
-      nombrar.title = 'Ponerle nombre a este documento, según la norma';
-      nombrar.textContent = 'Poner nombre';
+      nombrar.title = 'Cambiarle el nombre a este documento, según la norma';
+      nombrar.textContent = 'Cambiar el nombre';
       nombrar.onclick = async function () {
         nombrar.disabled = true;
         try { await App.verDocumentos(a, { ponerNombre: f.nombre }); }
