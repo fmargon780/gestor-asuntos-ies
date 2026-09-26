@@ -63,8 +63,8 @@
     var ajustado = Nombres.montarDocumentoAjustado(datosDelFormulario(N.ultimasOpciones));
     var nombre = ajustado.nombre;
     $('doc-vista').textContent = nombre;
-    Nombres.avisoRecorte($('doc-vista'), ajustado.recortado);   /* fila 130 */
-    $('doc-guardar').disabled = nombre.length < 10;
+    Nombres.avisoRecorte($('doc-vista'), ajustado.recortado, ajustado.noCabe);   /* filas 130 y 177 */
+    $('doc-guardar').disabled = nombre.length < 10 || !!ajustado.noCabe;
   }
 
   /* La lista de "pendientesRegistro" vive en la ficha del asunto, no
@@ -92,8 +92,11 @@
        (fila 96), con el mismo aviso que al crear un asunto. */
     var falta = window.DocCampos ? DocCampos.faltaObligatorio(N.camposDelTipo(N.tipoElegido()), N.valoresDeCampos()) : '';
     if (falta) { U.aviso('Hace falta rellenar "' + falta + '".', 'malo'); return; }
-    var nombre = Nombres.montarDocumento(datosDelFormulario(opciones));
+    var ajustadoFinal = Nombres.montarDocumentoAjustado(datosDelFormulario(opciones));
+    var nombre = ajustadoFinal.nombre;
     if (!nombre) return;
+    /* Fila 177: por si acaso, se comprueba también aquí antes de guardar. */
+    if (ajustadoFinal.noCabe) { U.aviso('El nombre no cabe en la ruta de Dropbox: acorta el texto.', 'malo'); return; }
     try {
       var yaEsta = await Carpetas.ficheros(N.asuntoActual.handle);
       var repetido = yaEsta.some(function (f) {
