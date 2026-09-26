@@ -66,15 +66,20 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 (Una línea por cosa; el porqué, en `docs/contexto/` y `HISTORIA.md`.)
 
-- Categoría → tipo → tercero → nombre de carpeta, con vista previa. Nombre corto; tipo nuevo al vuelo.
+- Categoría → tipo → tercero → nombre de carpeta, con vista previa (`App.nuevoAsuntoCon` lleva lo ya sabido, sin
+  repreguntarlo; cambiar de tipo dentro de la misma categoría no borra el tercero). Nombre corto; tipo nuevo al
+  vuelo. Dar de alta un tercero lo deja elegido, sin pulsar nada más.
 - Cada tipo dice quién lo encarga (Secretaría, Dirección…): parrilla agrupada, filtro y Cuentas.
 - Asuntos reservados (por tipo o uno a uno): candado, sin el tercero en listas y buscador.
 - El estado es el primer hito sin terminar («Paso N de M · título», «Paso actual»): Administración o terceros; «Esperando a…» sale solo con el responsable (a mano, hasta que cambia el paso). Guías: «Administración», no personas. Vía y fecha límite.
 - Asuntos recurrentes, con aviso. Avisos de fichas huérfanas y papelera vieja.
-- Buscador de tipos y de terceros, con índice guardado del ARCHIVO y búsqueda por palabras
-  sueltas también en documentos, registro de Séneca, ficha y notas.
+- Buscador de tipos y de terceros, con índice guardado del ARCHIVO (carga solo al entrar, la
+  primera vez) y búsqueda por palabras sueltas también en documentos, registro de Séneca, ficha
+  y notas.
 - Personas (Alumnado): matriculados primero, antiguos plegados; busca por padre, madre o tutor;
-  hermanos en la ficha. La BD de alumnado (carpeta de Drive) suma sus datos: ficha, huecos, grupos.
+  hermanos y sus asuntos en la ficha (se abren pulsando la fila); «+ Nuevo asunto para esta
+  persona». La BD de alumnado (carpeta de Drive) suma sus datos:
+  ficha, huecos, grupos.
 - Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
   Renombrar un tipo se lleva su guía; cambiarle el tipo, la ofrece.
 - Nombre comercial de empresas; editar un tercero dado de alta a mano.
@@ -85,22 +90,28 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Panel lateral de lectura; tablón a la vista. Al crear, recuadro con lo que ya tiene el tercero; parada si es idéntico; pantalla "Duplicados".
 - Correo y mensaje de Séneca: se prepara; el correo se envía de verdad (Apps Script, con
   confirmación) y nunca dos veces.
-- "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto; con
-  tercero reconocido, también sugiere meterlo en uno que ya existe («Meter aquí»). Encima vive la
-  bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero.
+- "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto (un solo
+  botón «Crear asunto con él», que usa lo leído del documento); con tercero reconocido, también
+  sugiere meterlo en uno que ya existe («Meter aquí»). Tras meter o crear, se abre directo el
+  cuadro de ponerle nombre (no la lista), ya con la fecha, el registro y el tipo de documento (por
+  memoria) que se pueda aprovechar de lo leído; «Guardar» cierra el cuadro entero. Encima vive la
+  bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero;
+  sus adjuntos pasan también por el cuadro de nombre, uno detrás de otro.
 - Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. Carpeta ≤150, documento ≤120.
 - Botón «Ruta» (`file:///`; ficha, Correo/Séneca): deduce Dropbox; lo de dentro, una vez para el centro. Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto (foto, cabecera fija) en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
-- Registrar detecta el PDF sellado; el "SIN SELLAR" y el Word con su PDF van a «Versiones previas»
-  (plegadas); cada documento, asociable a un hito.
+- Registrar detecta el PDF sellado, y también deja el original en «Versiones previas» como "SIN
+  SELLAR" al registrar a mano un fichero distinto (igual que el Word con su PDF); las versiones
+  previas quedan plegadas; cada documento, asociable a un hito.
 - Terceros relacionados con un asunto (altas por grupo: unidad, nivel, grupo propio), destinatarios de
   correo o Séneca; generar para cada relacionado: un documento por persona y un correo a cada una.
 - Ajustes: tres pestañas y pantalla por tipo; todo plegado, con resumen; avisos de fallo, solo con fallo.
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
 - Papelera: nada se borra de golpe, con buscador por palabras. Plazo de conservación por tipo: avisa, nunca borra solo.
-- Word: lo que falta se pregunta antes; se ve en la app, con «Guardar PDF» e «Imprimir» (sin editar aún).
+- Word: lo que falta se pregunta antes; se ve en la app, con «Guardar PDF» (cierra el visor al terminar) e
+  «Imprimir» (sin editar aún).
 - Plantillas de correo (con texto propio para Séneca) y de Word por tipo, con huecos que se rellenan solos;
   también desde el cuadro de Correo/Séneca; las del centro, sacadas de los documentos del compañero (Mantenimiento). Membrete de la Junta (lo dibuja la app; logo opcional), firma de quien ocupaba
   el cargo en su fecha y «el/la alumno/a» según el sexo de cada persona.
@@ -117,12 +128,15 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa
   («✎ Cambiar el guion», sin salir a Ajustes). «Paso N de M», «Hitos N/M» y la mesa, con una sola cuenta.
   Biblioteca de hitos del centro, con guion; en Mantenimiento, cargar tipos, guías y guiones del instituto.
+  «Marcar como hecho» abre solo la mesa del hito siguiente en curso (o, sin ninguno, «Archivar el asunto» ahí
+  mismo); al completarse el guion por una acción del usuario, se pregunta una vez por sesión si darlo por hecho.
 - "Qué me toca": pendientes, filtro por responsable (una persona ve también los de Administración), "Dormidos" (sin novedades en N días). "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Formularios": catálogo buscable de
   impresos; "Preparar para el tercero" rellena solo los datos del centro (casillas con nombre legible y miniatura).
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
 - Cada documento, todo en su fila (⧉, «Poner nombre», ⋮); Separar, Unir, Sacar páginas, Ajustar tamaño
   (sello y firma) y Repartir entre terceros, en la barra del visor.
-- "Lo pide": quién pidió la gestión, por qué vía y cuándo; su correo sale en el cuadro de Correo.
+- "Quién lo pide y por qué vía": un único cuadro, tanto en Nuevo asunto como en "El encargo" de la ficha; su
+  correo sale en el cuadro de Correo.
 - Archivar/reabrir sobre un destino que ya existe fusiona. Crear, reabrir o editar deja en la ficha; Volver, a donde estaba.
 - Al archivar, la ficha baja a su carpeta (al reabrir, vuelve) y se hace el índice del expediente
   (PDF numerado; también desde el menú de la ficha).

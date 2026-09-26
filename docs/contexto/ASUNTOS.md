@@ -34,6 +34,30 @@ tipos de asunto ya no se crean solo en Ajustes. En Nuevo asunto, junto al buscad
 
 Se comprueba con `pruebas/tipo-desde-el-asunto.mjs`.
 
+### Nuevo asunto, sin repetir nada (26-sep-2026, fila 173, docs/NUEVO-ASUNTO-SIN-REPETIR.md)
+
+`App.nuevoAsuntoCon({ tercero, tipo, fecha, descripcion, viaInicial })` (`js/asuntos-nuevo.js`),
+todo opcional: lleva a Nuevo asunto (`App.ir('nuevo')`) con lo que ya se sabe, sin volver a
+pedirlo. Elige la categoría del tercero (o, sin tercero, la del tipo). Con tipo, lo elige
+(`App.elegirTipo`) y fija el tercero, sin pulsar Crear. Sin tipo, guarda el tercero en
+`App.E.nuevo.terceroPropuesto` y `App.pintarTipos` enseña, encima de la parrilla
+(`#tercero-propuesto-nuevo`), «Para: **Nombre** · Elige el tipo de asunto» con un botón «Otra
+persona» que lo olvida; al elegir tipo, si la categoría coincide, `App.elegirTipo` lo fija solo.
+`App.crearAsuntoConPropuesta` (el de "Por clasificar") pasa a usar esta función por dentro y
+luego pulsa Crear, igual que antes. `viaInicial` (`{via, viaDato}`) llega hasta "Lo pide" (ver
+más abajo); lo usa `js/bandeja-propuesta.js` para que un asunto que viene de un correo siga
+entrando con "Correo electrónico" y la dirección del remitente.
+
+- **Cambiar de tipo no borra el tercero** (`App.elegirTipo`): si ya había uno y el tipo nuevo es
+  de la misma categoría, se vuelve a fijar con `App.fijarTercero` (para que los campos del tipo
+  nuevo se rellenen con sus datos); solo se borra si cambia la categoría.
+- **Dar de alta a un tercero lo deja elegido** (`App.altaTercero`, `js/asuntos-nuevo-alta.js`): en
+  vez de relanzar la búsqueda, se llama a `App.fijarTercero` con el recién creado (el que devuelve
+  `Datos.anadirALista`, o el que ya trae el alta propia de una categoría como Administraciones);
+  si no se encuentra, se cae al camino de siempre (buscar y esperar el clic).
+
+Se comprueba con `pruebas/nuevo-asunto-sin-repetir.mjs`.
+
 ### La ficha de un asunto
 
 Al pulsar el nombre de un asunto se entra en su ficha: sus datos, el contacto del tercero, la
@@ -398,10 +422,15 @@ Toda la lógica vive en el módulo nuevo `js/lo-pide.js` (`window.LoPide`), para
   probarse sin cargar el cuadro de Correo entero (que no expone nada hacia fuera): decide qué
   casilla queda marcada.
 
-Dónde se engancha: grupo **"Lo pide (opcional)"** en `#bloque-detalles` de `js/asuntos-nuevo.js`
-(se repinta al cambiar de tercero con `App.fijarTercero`; `App.datosDelFormulario()` añade
-`loPide` solo si hay nombre). Fila **"Lo pide"** (debajo de "Vía de comunicación") y marca
-`.marca-lopide` en la cabecera de `js/ficha-asunto.js` (esta marca **no** se ha quitado en la
+Dónde se engancha: grupo **"Quién lo pide y por qué vía (opcional)"** (`#grupo-lopide`) en
+`#bloque-detalles` de `js/asuntos-nuevo.js` (se repinta al cambiar de tercero con
+`App.fijarTercero`; `App.datosDelFormulario()` añade `loPide` solo si hay nombre). Desde la fila
+173 (26-sep-2026, docs/NUEVO-ASUNTO-SIN-REPETIR.md) **es la única pregunta de vía de Nuevo
+asunto**: no hay ya un `#campo-via`/`#campo-via-dato` sueltos; `js/asuntos-nuevo-crear.js` guarda
+`ficha.via`/`viaDato` con `App.loPideNuevoControles.leerVia()`, en el mismo sitio y formato de
+siempre. La fecha de "Lo pide" nace con la de "Fecha de inicio" y la sigue mientras no se toque a
+mano (`App.fechaLoPideAuto`/`App.actualizarFechaLoPideNuevo`, `js/asuntos-nuevo-campos.js`). Y
+marca `.marca-lopide` en la cabecera de `js/ficha-asunto.js` (esta marca **no** se ha quitado en la
 fila 52: solo se quitaron `.marca-estado` y `.marca-plazo`). El botón, en asuntos abiertos, es
 desde la fila 52 (18-sep-2026) **"El encargo"**, que abre el mismo cuadro de siempre
 (`abrirLoPide(a)`) con la vía de comunicación metida dentro (ver la sección de la cabecera, más

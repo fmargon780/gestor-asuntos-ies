@@ -225,6 +225,11 @@ vuelta: mira la carpeta él solo y pregunta de qué documento es.
   su sitio en vez de añadir otra debajo. El registro de un documento (aquí y en `js/registro.js`,
   que también se ha pasado a esto) usa `campoClave: 'registroDeDocumento'`, `valorClave` el nombre
   del documento original: registrar dos veces el mismo documento deja una sola nota, no dos.
+- **El botón "Registrar" a mano hace lo mismo con el original** (26-sep-2026, fila 174,
+  docs/POR-CLASIFICAR-USA-LO-LEIDO.md, punto 6): `js/registro.js` (`guardar`) llama a las mismas
+  `RegistroSellado.nombreSinSellar`/`nombreLibreEntre` y a `VersionesPrevias.mover`, solo si el
+  fichero elegido en el selector es distinto del original (si se elige el mismo que ya estaba en
+  la carpeta, no se toca nada más). Es accesorio: si falla, el registro de arriba ya está hecho.
 - **"Datos y contacto" y la caja de notas (fila 37, 17-sep-2026,
   `docs/FICHA-DEL-ASUNTO-NUEVA.md`)**: la ficha queda izquierda Hitos y Documentos, derecha "Datos
   y contacto" (primero), Otros asuntos, Relacionados, Datos del asunto y Notas (última);

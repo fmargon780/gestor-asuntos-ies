@@ -53,6 +53,16 @@ Cambió cómo se ve, no lo que hace: cada botón llama a lo mismo que antes. **E
   informativo»/«Pedírmelo a mí», «+ Añadir un paso a la guía del tipo» (fila 120), «Cambiar la guía…»
   (con la advertencia «Vale para todos los asuntos…», luego `GuiasDelCentro.escribir`) y «Quitar este
   hito». El pie «Cambiar la guía» de `#ficha-guia-nota` no sale con la mesa abierta.
+- **«Marcar como hecho» lleva al siguiente** (26-sep-2026, fila 173, docs/NUEVO-ASUNTO-SIN-REPETIR.md,
+  punto 5): cuando el guardado termina (`HitosPanelLista.marcarDesdeCasilla`, que expone la misma
+  lógica que la casilla de la lista) y de verdad se ha marcado (nunca al desmarcar), se abre la mesa
+  del hito que haya quedado «en curso» (`EstadoHito.idActual`, incluida una pregunta sin responder).
+  Sin ninguno (todos hechos o «No aplica»), se enseña bajo el título «Todos los hitos están hechos.»
+  con un botón que pulsa el de verdad de «Archivar el asunto» de la cabecera de la ficha
+  (`#ficha-archivar button`). Cuando el guion de un hito se completa por una acción del usuario en
+  esta sesión (marcar una línea, generar, registrar, comunicar, añadir), se pregunta una vez con
+  `U.preguntar` si se da por hecho (memoria en `HitoMesa` por hito y sesión, nunca en disco; nunca al
+  abrir una mesa que ya estaba completa).
 - **Los desplegables** (`.mesa-desplegable` > `.mesa-abrir-panel` + `.mesa-panel`): dentro de la página,
   no son un `U.preguntar`. «Generar documento ▾» lleva `.mesa-plantillas` (las del paso, «Otras
   plantillas», «Buscar otra plantilla…», que rellena `js/hito-mesa-documentos.js`) y los formularios

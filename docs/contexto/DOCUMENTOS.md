@@ -273,9 +273,10 @@ palabras clave.
   puntos (`26EM0368 · 10-sep-2026 · SOLICITUD · García Pérez, Ana`, con `Nombres.codigoRegistro`
   para el código y los mismos meses abreviados que `App.VERSION`); si no hay nada que proponer, o
   el fichero no se ha podido leer, la línea se quita entera y la tarjeta se queda exactamente como
-  antes de esta fila. Cuando hay tipo **y** tercero, el botón "Aceptar" sale pegado a esa misma
-  línea —no dentro de `.acciones`, que ya tiene su lista fija de botones comprobada en
-  `pruebas/documentos-sueltos.mjs`— y llama a `App.crearAsuntoConPropuesta`.
+  antes de esta fila. Desde la fila 174 (26-sep-2026, docs/POR-CLASIFICAR-USA-LO-LEIDO.md) ya no
+  hay un botón "Aceptar" aparte: `js/documentos-sueltos-lector.js` solo ajusta el título y el
+  destacado del propio "Crear asunto con él" (`[data-accion-suelto="crear"]`, en `.acciones`,
+  `js/documentos-sueltos.js`), que ya sabe usar lo leído por su cuenta (ver más abajo).
   - **Solo se lee al abrir la pantalla**: `App.tarjetaSuelto` solo se llama con "Por clasificar" a
     la vista (desde `App.pintarSueltos` y desde `App.accionesDeSuelto`, del panel del visor), nunca
     al arrancar. Los ficheros se leen de uno en uno, con una cola en memoria (nunca en paralelo: la
@@ -301,6 +302,63 @@ palabras clave.
 Se comprueba con `pruebas/lector-documentos.mjs` (los 6 escenarios de la instrucción, sin pdf.js ni
 navegador) y con la batería completa en verde (`pruebas/documentos-sueltos.mjs`,
 `pruebas/ajustes-por-tipo.mjs` actualizada a las ocho secciones).
+
+### Lo leído viaja hasta el cuadro de nombre (26-sep-2026, fila 174, docs/POR-CLASIFICAR-USA-LO-LEIDO.md)
+
+El lector ya proponía tipo, fecha, registro y tercero (arriba), pero dos clics después la
+aplicación lo volvía a preguntar en blanco. Ahora viaja con el documento hasta el propio cuadro de
+ponerle nombre.
+
+- **`pintarFormulario(opciones)` acepta `opciones.propuesta`** (`js/documentos-formulario.js`), con
+  la misma forma que devuelve `LectorDocumentos.analizar`. Lo que ya trae el nombre del fichero
+  manda: la propuesta solo rellena lo que falte. La fecha, convertida de `dd/mm/aaaa` a ISO con
+  una función mínima propia del fichero (`isoDeFechaLector`, no una sola en `js/util.js`: mismo
+  criterio que `U.fechaCorta` con `hitos-archivo.js`/`lo-pide.js`). El registro, si el nombre no lo
+  trae, marca "Está registrado en Séneca", rellena los cuatro campos y enseña, en verde, "Leído
+  del sello de Séneca." (`#doc-registro-leido`, mismo texto que `js/registro.js`).
+- **El tipo de documento, por memoria** (el lector nunca lo lee): si el nombre tampoco lo trae, el
+  desplegable arranca en el último tipo de documento guardado en un asunto de ese mismo tipo de
+  asunto, en este ordenador (`localStorage`, clave `gestor-ultimo-tipo-doc`, `{ TIPO_ASUNTO:
+  TIPO_DOCUMENTO }`; se apunta al guardar, en `js/documentos-guardar.js`).
+- **Un solo botón para crear** (arriba): `App.empezarAsuntoCon(s)` (`js/documentos-sueltos.js`)
+  mira `LectorDeSueltos.resultadoDe(s.nombre)` al pulsarlo: con tipo y tercero, crea de un tirón
+  (`App.crearAsuntoConPropuesta`); con tercero y sin tipo, `App.nuevoAsuntoCon({ tercero, fecha })`
+  (fila 173) deja el tercero esperando; sin nada, como siempre. La fecha leída va siempre a "Fecha
+  de inicio". `js/documentos-sueltos-lector.js` ya no monta un botón "Aceptar" aparte (quitado):
+  solo ajusta el título y la clase de ese mismo botón.
+- **Tras meter o crear, directo al nombre**: `App.llevarSueltoA` (`js/documentos-sueltos.js`) y
+  `App.crearAsuntoDelFormulario` (`js/asuntos-nuevo-crear.js`) pasan siempre `{ ponerNombre:
+  s.nombre, propuesta }` a `App.verDocumentos`/`Documentos.abrir`, que ya no exige un hito para
+  saltarse la lista (antes solo lo hacía con hito). La propuesta se recoge de
+  `LectorDeSueltos.resultadoDe` **antes** de mover el fichero (el nombre no cambia mientras dura la
+  lectura, pero así no depende de en qué momento se relea la caché).
+- **"Guardar" cierra el cuadro cuando se abrió para eso** (`js/documentos-guardar.js`): con
+  `opciones.ponerNombre`, al terminar de guardar bien se recorre `N.alTerminarPonerNombre` (punto
+  previsto, un array de `fn(nombreGuardado, opciones) -> bool`) y, si ninguna toma el relevo, se
+  pulsa el "Cerrar" de verdad (`N.cerrarCuadro`). Abierto desde la lista ("Poner nombre" de una
+  fila, sin `ponerNombre`), se sigue volviendo a la lista, como siempre.
+- **Los adjuntos de un correo, uno detrás de otro** (`js/bandeja-guardar.js`): al terminar
+  `engancharCorreo`/`guardarEnAsunto`, si ha entrado algún adjunto de verdad (ni el PDF del correo
+  ni el del hilo), se abre el cuadro de nombre para el primero, con lo leído de **ese** fichero
+  (`js/bandeja-adjuntos-lector.js` ahora guarda también el análisis por nombre de fichero,
+  `BandejaAdjuntosLector.propuestaDeAdjunto(idCorreo, nombre)`, no solo el mezclado de todos). Al
+  guardar ese nombre, `opciones.serieAdjuntos = { idCorreo, restantes }` (que viaja colgado de las
+  propias opciones del formulario) hace que el punto previsto de arriba abra el siguiente con
+  `Documentos._interno.pintarFormulario` directamente (reutilizando el mismo cuadro, sin
+  cancelarlo y volver a abrirlo); al cerrar sin guardar, el enganche no llega a llamarse y la serie
+  se acaba sola. `js/bandeja-adjuntos-lector.js`, `engancharLlevarANuevo`: el guardia de "el correo
+  ya dejó algo puesto" mira también `App.E.nuevo.terceroPropuesto` (fila 173: el tercero puede
+  estar solo propuesto, sin tipo todavía, y aun así no hay que pisarlo con lo que traiga el PDF).
+- **"Registrar" iguala su camino al del sello detectado solo** (`js/registro.js`, `guardar`): si el
+  PDF sellado que se ha elegido con el selector de ficheros es distinto del original (lo normal:
+  un escaneo suelto, no el propio documento ya en la carpeta), el original pasa a "... SIN
+  SELLAR" y a «Versiones previas» (`RegistroSellado.nombreSinSellar`/`nombreLibreEntre`, ya
+  expuestas por `js/registro-sellado.js`, más `VersionesPrevias.mover`), exactamente igual que ya
+  hacía `js/registro-sellado.js` con un sello detectado sin pulsar nada. Si el fichero elegido es
+  el mismo que ya estaba en la carpeta, no se toca nada más. El movimiento es accesorio: si falla,
+  el registro ya está hecho (`U.accesorio`).
+
+Se comprueba con `pruebas/por-clasificar-usa-lo-leido.mjs` y con la batería completa en verde.
 
 ### Sugerir un asunto ya existente (21-sep-2026, fila 88, docs/POR-CLASIFICAR-ASUNTO-EXISTENTE.md)
 
