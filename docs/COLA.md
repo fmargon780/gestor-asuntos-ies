@@ -160,22 +160,20 @@ abierto en ellas:
 - Fila 76: **comprobado publicando de verdad, 25-sep-2026.** `App.VERSION` en la web sigue la hora
   real de cada publicación (`Europe/Madrid`), generada sola por el `buildCommand`, sin ningún
   commit nuevo al repositorio. Cerrado, nada pendiente.
-- Filas 147, 148 y 149 (25-sep-2026): fusionadas en `main` (`4fa0e65` y `d998333`, pruebas de
-  GitHub en verde), pero la sesión no pudo comprobar lo publicado: su red bloquea `vercel.app` y el
-  conector de Vercel da 403. Comprobar con `curl` que se sirven `js/hito-mesa-tarjetas.js` y
-  `fonts/NotoSansHK-latin-400.woff2`, y que `App.VERSION` es de después de las 07:18 del 25-sep-2026.
+- Filas 147, 148 y 149: **comprobado publicando de verdad, 26-sep-2026** (`curl`, versión
+  publicada `26-sep-2026 · 11:34`). Se sirven `js/hito-mesa-tarjetas.js` (200) y
+  `fonts/NotoSansHK-latin-400.woff2` (200). Cerrado, nada pendiente.
 - Filas 154 a 164 (25-sep-2026): **publicadas, comprobado por Francisco**: la web dice
   `25-sep-2026 · 15:16`. Justo mientras se publicaba vio «44 envolturas no se han aplicado» (el
   navegador mezcló ficheros de antes y de después); al volver a cargar, bien.
-- Filas 166 y 167 (25-sep-2026): fusionadas en `main` (`e6bf33b`, `npm test` entero en verde en local), pero
-  esta sesión no pudo comprobar lo publicado (su red bloquea `vercel.app` y el conector de Vercel da 403).
-  Comprobar que se sirven `js/tutores-legales.js` y `js/administraciones.js` y que `App.VERSION` es de
-  después de las 17:32 del 25-sep-2026.
-- Filas 168, 170 y 171 (25-sep-2026): fusionadas en `main` (`bd6f889`, PR #125, pruebas de GitHub en
-  verde), pero esta sesión no pudo comprobar lo publicado (su red no llega a la web y el conector de
-  Vercel da 403). Comprobar que se sirven `js/generar-para-relacionados.js` y `plantillas/correo-actividad.md`
-  en `plantillas/indice.json`, y que `App.VERSION` es de después de las 22:43 del 25-sep-2026.
-- Fila 132: comprobar con `curl -I` que salen las cabeceras de seguridad nuevas.
+- Filas 166 y 167: **comprobado publicando de verdad, 26-sep-2026** (`curl`). Se sirven
+  `js/tutores-legales.js` (200) y `js/administraciones.js` (200). Cerrado, nada pendiente.
+- Filas 168, 170 y 171: **comprobado publicando de verdad, 26-sep-2026** (`curl`). Se sirve
+  `js/generar-para-relacionados.js` (200) y la plantilla del certificado de actividad
+  extraescolar está en `plantillas/indice.json`. Cerrado, nada pendiente.
+- Fila 132: **comprobado con `curl -I`, 26-sep-2026.** Salen `content-security-policy`,
+  `strict-transport-security` y `x-content-type-options` en la web publicada. Cerrado, nada
+  pendiente.
 - Fila 63: comprobar que `docs/COLA.md` da error en la web publicada.
 - Numeración: `docs/PLANTILLAS-Y-FORMULARIOS-DESDE-EL-HITO.md` se presenta como «fila 146» y
   `docs/VENTANAS-QUE-CABEN.md` como «fila 142», pero ninguna de las dos está en la tabla.
