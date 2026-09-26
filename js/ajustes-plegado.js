@@ -172,7 +172,7 @@ var AjustesPlegado = (function () {
     ponerResumen(seccionDelTipo('campos'), campos.length ? plural(campos.length, 'campo', 'campos') : 'ninguno');
 
     var pasos = (window.GuiasDelCentro && GuiasDelCentro.pasosDe(tipo.tipo)) || [];
-    var textoPasos = pasos.length ? plural(pasos.length, 'paso', 'pasos') : 'sin guía';
+    var textoPasos = pasos.length ? plural(pasos.length, 'hito', 'hitos') : 'sin guía';
     var secPasos = seccionDelTipo('pasos');
     var avisoYa = secPasos && secPasos.dataset.desactualizados;
     ponerResumen(secPasos, textoPasos + (avisoYa ? ' · ' + avisoYa : ''), !!avisoYa);
@@ -181,7 +181,7 @@ var AjustesPlegado = (function () {
       GuiasBiblioteca.pasosDesactualizados(pasos).then(function (lista) {
         if (turno !== turnoPasos) return;
         var n = (lista || []).length;
-        secPasos.dataset.desactualizados = n ? '⚠ ' + plural(n, 'paso desactualizado', 'pasos desactualizados') : '';
+        secPasos.dataset.desactualizados = n ? '⚠ ' + plural(n, 'hito desactualizado', 'hitos desactualizados') : '';
         ponerResumen(secPasos, textoPasos + (n ? ' · ' + secPasos.dataset.desactualizados : ''), !!n);
       }, function () {});
     } else if (secPasos) {
