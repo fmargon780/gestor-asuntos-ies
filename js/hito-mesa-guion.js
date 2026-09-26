@@ -3,18 +3,18 @@
    guion, o la pregunta de un hito-pregunta (24-sep-2026, fila 109,
    docs/EL-HITO-A-PANTALLA-COMPLETA.md, sección 3).
 
-   - "Guion del hito", la cuenta "N de M" y una barra de progreso.
-   - Cada paso: casilla, texto en negrita, explicación en gris, su
+   - "Tareas del hito", la cuenta "N de M" y una barra de progreso.
+   - Cada tarea: casilla, texto en negrita, explicación en gris, su
      normativa como etiqueta "§ cita" y "No aplica". Desde la fila 154
      (docs/HITOS-ACCIONES-EN-EL-HITO.md), sin botones de acción: las
      acciones viven en la cabecera del hito (js/hito-mesa.js). Hecho: en
      gris, con quién y cuándo al lado; «No aplica»: tachado.
-   - "+ Añadir un paso a la guía del tipo" (fila 120, docs/GUION-DESDE-EL-HITO.md):
-     la línea va al final del guion del paso de la guía (`origenGuia`) y
+   - "+ Añadir una tarea a la guía del tipo" (fila 120, docs/GUION-DESDE-EL-HITO.md):
+     la línea va al final de las tareas del hito de la guía (`origenGuia`) y
      sale en todos los asuntos de ese tipo. No sale si el hito no viene
-     de un paso de la guía, ni si ese paso es una pregunta.
-   - "+ Añadir un paso solo para este asunto" (no toca la guía).
-   - Una pregunta del guion (fila 116, docs/PREGUNTAS-EN-EL-GUION.md): su
+     de un hito de la guía, ni si ese hito es una pregunta.
+   - "+ Añadir una tarea solo para este asunto" (no toca la guía).
+   - Una pregunta de las tareas (fila 116, docs/PREGUNTAS-EN-EL-GUION.md): su
      texto y un botón por respuesta; debajo, sangradas, las líneas de la
      elegida. Lo marcado de una respuesta que se cambió, plegado al final.
    - Un hito-pregunta enseña "¿Qué supuesto es?" con las opciones como
@@ -38,7 +38,7 @@ var HitoMesaGuion = (function () {
       : '<span class="mesa-cita">§ ' + U.escapar(n.cita) + '</span>';
   }
 
-  /* Fila 145: la acción del paso; algo 📎 que hay que reunir, sin
+  /* Fila 145: la acción de la tarea; algo 📎 que hay que reunir, sin
      acción, se añade con «Añadir documento». */
   function accionDe(g) { return g.accion || (g.reunir === 'documento' ? 'anadir' : ''); }
 
@@ -57,9 +57,9 @@ var HitoMesaGuion = (function () {
     var claveAccion = accionDe(g);
     var marcaReunir = g.reunir === 'documento' ? '<span class="guion-reunir-marca" title="Un documento que hay que reunir">📎</span>'
       : (g.reunir === 'dato' ? '<span class="guion-reunir-marca" title="Un dato que hay que reunir">✎</span>' : '');
-    /* Fila 154 (docs/HITOS-ACCIONES-EN-EL-HITO.md): los pasos ya no llevan
+    /* Fila 154 (docs/HITOS-ACCIONES-EN-EL-HITO.md): las tareas ya no llevan
        botones de acción; las acciones viven solo en la cabecera del hito.
-       Un paso hecho dice al lado, en pequeño, quién y cuándo. */
+       Una tarea hecha dice al lado, en pequeño, quién y cuándo. */
     var quienCuando = g.hecho && !g.noaplica && (g.quien || g.cuando)
       ? '<span class="guion-paso-quien">' + U.escapar([g.quien || '', fechaCorta(g.cuando)].filter(Boolean).join(' · ')) + '</span>' : '';
     return '<div class="guion-paso' + (g.hecho ? ' hecho' : '') + (g.noaplica ? ' noaplica' : '') + (g.reunir ? ' guion-reunir' : '') +
@@ -80,7 +80,7 @@ var HitoMesaGuion = (function () {
     '</div>';
   }
 
-  /* Fila 116: una pregunta del guion, con un botón por respuesta. */
+  /* Fila 116: una pregunta de las tareas, con un botón por respuesta. */
   function preguntaGuionHTML(g, abierto, siguiente) {
     return '<div class="guion-paso guion-pregunta' + (g.elegida ? ' hecho' : '') + (siguiente ? ' guion-siguiente' : '') + '" data-id="' + U.escapar(g.id) + '">' +
       '<div class="guion-paso-linea"><span class="guion-pregunta-marca">¿</span><span class="guion-paso-texto">' +
@@ -135,20 +135,20 @@ var HitoMesaGuion = (function () {
     var guion = Hitos.guionDe(a, h);
     var c = Hitos.cuentaGuion(guion);
     var pct = c.total ? Math.round(100 * c.hechos / c.total) : 0;
-    /* Fila 145: el siguiente paso, el primero sin hacer y sin «No aplica»
+    /* Fila 145: la siguiente tarea, la primera sin hacer y sin «No aplica»
        (con el hito ya hecho, ninguno). */
     var siguiente = h.estado === 'hecho' ? null : guion.filter(function (g) { return !g.hecho && !g.noaplica; })[0];
     caja.innerHTML =
-      '<div class="mesa-bloque-cabecera mesa-guion-cabecera"><span class="mesa-bloque-titulo">Qué hay que hacer</span>' +
+      '<div class="mesa-bloque-cabecera mesa-guion-cabecera"><span class="mesa-bloque-titulo">Tareas del hito</span>' +
         '<div class="mesa-barra"><span style="width:' + pct + '%"></span></div>' +
         '<span class="mesa-guion-cuenta">' + c.hechos + ' de ' + c.total + '</span></div>' +
       (guion.length ? guion.map(function (g) { return lineaHTML(g, abierto, g === siguiente); }).join('') + plegadasHTML(guion.plegadas)
-        : '<p class="explica">Este hito todavía no tiene guion. Añade el primer paso aquí abajo.</p>') +
-      (abierto ? '<button type="button" class="enlace guion-anadir-propio">+ Añadir un paso solo para este asunto</button>' : '') +
+        : '<p class="explica">Este hito todavía no tiene tareas. Añade la primera tarea aquí abajo.</p>') +
+      (abierto ? '<button type="button" class="enlace guion-anadir-propio">+ Añadir una tarea solo para este asunto</button>' : '') +
       (abierto && puedeAnadirALaGuia(a, h)
-        ? '<button type="button" class="enlace guion-cambiar-guion">✎ Cambiar el guion de este hito (para todos los asuntos de este tipo)</button>' : '');
+        ? '<button type="button" class="enlace guion-cambiar-guion">✎ Cambiar las tareas de este hito (para todos los asuntos de este tipo)</button>' : '');
 
-    /* La normativa de los pasos del guion, también en la columna de consulta. */
+    /* La normativa de las tareas del guion, también en la columna de consulta. */
     var consulta = fila.querySelector('.mesa-normativa-guion');
     if (consulta) {
       var ya = {};
@@ -170,7 +170,7 @@ var HitoMesaGuion = (function () {
       if (window.HitosPanelLista && HitosPanelLista.guardarHito) return HitosPanelLista.guardarHito(control, 'guardar el guion', hacer);
       return hacer();
     }
-    /* Fila 116: elegir (o cambiar) la respuesta de una pregunta del guion. */
+    /* Fila 116: elegir (o cambiar) la respuesta de una pregunta de las tareas. */
     Array.prototype.forEach.call(caja.querySelectorAll('.guion-pregunta .guion-respuesta'), function (b) {
       b.onclick = function () {
         var idPregunta = b.closest('.guion-pregunta').dataset.id;
@@ -193,7 +193,7 @@ var HitoMesaGuion = (function () {
         guardar(noaplica, function () { return Hitos.marcarGuion(a.nombre, h.id, id, { noaplica: !el.classList.contains('noaplica') }); });
       };
     });
-    /* Fila 145: soltar un fichero en el siguiente paso, como en la columna derecha. */
+    /* Fila 145: soltar un fichero en la siguiente tarea, como en la columna derecha. */
     var soltar = caja.querySelector('.guion-soltar');
     if (soltar) {
       soltar.ondragover = function (ev) { ev.preventDefault(); ev.stopPropagation(); soltar.classList.add('encima'); };
@@ -208,8 +208,8 @@ var HitoMesaGuion = (function () {
     }
     var propio = caja.querySelector('.guion-anadir-propio');
     if (propio) propio.onclick = async function () {
-      var ok = await U.preguntar('Añadir un paso al guion de este asunto',
-        '<input class="campo" id="guion-propio-texto" placeholder="Qué hay que hacer">' +
+      var ok = await U.preguntar('Añadir una tarea a este asunto',
+        '<input class="campo" id="guion-propio-texto" placeholder="Texto de la tarea">' +
         '<p class="nota">Solo para este asunto: la guía del tipo no cambia.</p>', 'Añadir');
       if (!ok) return;
       var t = document.getElementById('guion-propio-texto');
@@ -224,7 +224,7 @@ var HitoMesaGuion = (function () {
     return (a && ((a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo))) || '';
   }
 
-  /* El paso de la guía del que sale el hito, si lo hay y no es una pregunta. */
+  /* El hito de la guía del que sale el hito, si lo hay y no es una pregunta. */
   function pasoDeLaGuia(a, h) {
     if (!h || !h.origenGuia || !Hitos.pasoDeGuia || !window.GuiasDelCentro || !GuiasDelCentro.cambiarPasos) return null;
     var p = Hitos.pasoDeGuia(a, h);
@@ -245,12 +245,12 @@ var HitoMesaGuion = (function () {
   /* Lo escrito que no se pudo guardar: vuelve a salir al abrir el cuadro. */
   var sinGuardar = '';
 
-  /* Fila 120: la línea nueva, al final del guion del paso (fuera de las
+  /* Fila 120: la línea nueva, al final de las tareas del hito de la guía (fuera de las
      respuestas de una pregunta), sin acción ni normativa. */
   async function anadirALaGuia(a, h) {
     var tipo = tipoDe(a);
-    var esperar = U.preguntar('Añadir un paso a la guía del tipo',
-      '<input class="campo" id="guion-guia-texto" placeholder="Qué hay que hacer">' +
+    var esperar = U.preguntar('Añadir un hito a la guía del tipo',
+      '<input class="campo" id="guion-guia-texto" placeholder="Texto de la tarea">' +
       '<p class="nota">Sale en todos los asuntos de ' + U.escapar(tipo) + ', abiertos y nuevos. ' +
       'La acción, la normativa y la explicación se completan en Ajustes.</p>', 'Añadir');
     var t = document.getElementById('guion-guia-texto');
@@ -267,7 +267,7 @@ var HitoMesaGuion = (function () {
         p.guion = GuiasGuion.normalizar((p.guion || []).concat([{ texto: texto, explicacion: '', accion: '', normativa: null }]));
         return true;
       });
-      if (!hecho) { U.aviso('Ese paso ya no está en la guía del tipo.', 'ambar'); return; }
+      if (!hecho) { U.aviso('Ese hito ya no está en la guía del tipo.', 'ambar'); return; }
     } catch (e) {
       U.fallo('No he podido añadirlo a la guía', e);
       return;
@@ -282,7 +282,7 @@ var HitoMesaGuion = (function () {
 
   /* Fila 150: «✎ Cambiar el guion de este hito», en la propia mesa, sin
      salir a Ajustes. Reutiliza js/guias-guion.js (el mismo editor de
-     Ajustes), aquí solo para la lista `guion` de este paso: `leer()` para
+     Ajustes), aquí solo para la lista `guion` de este hito: `leer()` para
      recoger lo escrito, `enganchar()` para subir/bajar/quitar/preguntas,
      igual que hace js/guias-paso-bloques.js con `ctx.recoger()`/`ctx.pintar()`. */
   async function cambiarGuionDelPaso(a, h) {
@@ -302,9 +302,9 @@ var HitoMesaGuion = (function () {
       });
     }
     pintarLocal();
-    var esperar = U.preguntar('Cambiar el guion de este hito',
+    var esperar = U.preguntar('Cambiar las tareas de este hito',
       '<p class="nota">Vale para todos los asuntos de ' + U.escapar(tipo) + ', abiertos y nuevos. ' +
-      'Los pasos ya marcados en un asunto no se desmarcan.</p><div id="mesa-guion-editor"></div>', 'Guardar');
+      'Las tareas ya marcadas en un asunto no se desmarcan.</p><div id="mesa-guion-editor"></div>', 'Guardar');
     var sitio = document.getElementById('mesa-guion-editor');
     if (sitio) sitio.appendChild(caja);
     var ok = await esperar;
@@ -317,12 +317,12 @@ var HitoMesaGuion = (function () {
         pp.guion = normalizado;
         return true;
       });
-      if (!hecho) { U.aviso('Ese paso ya no está en la guía del tipo.', 'ambar'); return; }
+      if (!hecho) { U.aviso('Ese hito ya no está en la guía del tipo.', 'ambar'); return; }
     } catch (e) {
-      U.fallo('No he podido guardar el guion', e);
+      U.fallo('No he podido guardar las tareas', e);
       return;
     }
-    U.aviso('Guion actualizado.', 'bueno');
+    U.aviso('Tareas actualizadas.', 'bueno');
     if (window.HitosPanel) HitosPanel.programarRepintado();
   }
 
