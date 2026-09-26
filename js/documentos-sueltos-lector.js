@@ -30,7 +30,7 @@
    tercero reconocido, se pregunta también a
    js/documentos-sueltos-sugerencias.js (window.SugerenciasAsuntoExistente)
    si ese tercero ya tiene asuntos; si los tiene, salen debajo de la
-   línea, cada uno con su botón "Meter aquí", y "Aceptar" pasa a
+   línea, cada uno con su botón "Guardar aquí", y "Aceptar" pasa a
    llamarse "Crear asunto nuevo" y a discreto.
    ============================================================ */
 (function () {
@@ -146,10 +146,10 @@
      lo hay. */
   /* Fila 88, 21-sep-2026, docs/POR-CLASIFICAR-ASUNTO-EXISTENTE.md: una
      línea por asunto sugerido, con su marca ("otro tipo" / "archivado")
-     si la lleva, y el botón "Meter aquí" —el destacado de la línea,
+     si la lleva, y el botón "Guardar aquí" —el destacado de la línea,
      porque con una sugerencia a la vista es lo que se pulsa la mayoría
      de las veces—. Reutiliza App.meterSueltoEnAsuntoElegido
-     (js/documentos-sueltos.js): el mismo camino que "Meter en un
+     (js/documentos-sueltos.js): el mismo camino que "Guardar en un
      asunto", sin repetir el cuadro de "¿reabrir?". */
   function lineaDeSugerencia(s, sugerencia) {
     var linea = document.createElement('div');
@@ -171,7 +171,7 @@
     meter.type = 'button';
     meter.className = 'boton boton-principal';
     meter.style.marginLeft = '10px';
-    meter.textContent = 'Meter aquí';
+    meter.textContent = 'Guardar aquí';
     meter.title = 'Lleva el documento a la carpeta de ' + sugerencia.nombre;
     meter.onclick = async function (ev) {
       if (ev) ev.stopPropagation();
@@ -179,7 +179,7 @@
       try {
         await App.meterSueltoEnAsuntoElegido(s, sugerencia);
       } catch (e) {
-        U.aviso('No he podido meter el documento en ese asunto: ' + U.mensajeDeError(e), 'malo');
+        U.aviso('No he podido guardar el documento en ese asunto: ' + U.mensajeDeError(e), 'malo');
         meter.disabled = false;
       }
     };
