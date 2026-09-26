@@ -3,12 +3,12 @@
    18-sep-2026, docs/CAMPOS-CATALOGO-Y-CALCULADOS.md).
 
    Antes, la sección Campos de la pantalla de un tipo enseñaba el
-   catálogo entero desplegado, debajo de la lista de campos puestos.
-   Ahora ese catálogo se va a un panel aparte, con tres pestañas (De
-   la ficha · Míos · Calculados) y un botón "← Volver a los campos
-   del tipo". Es un panel dentro de la propia sección, no un cuadro
-   emergente: solo hay un `U.preguntar` (docs/CONTEXTO-CORTO.md) y no
-   se puede abrir un segundo mientras el primero espera.
+   catálogo entero desplegado, debajo de la lista de campos ya
+   puestos. Ahora ese catálogo se va a un panel aparte, con tres
+   pestañas (De la ficha · Míos · Calculados) y un botón "← Volver a
+   los campos del tipo". Es un panel dentro de la propia sección, no un
+   cuadro emergente: solo hay un `U.preguntar` (docs/CONTEXTO-CORTO.md)
+   y no se puede abrir un segundo mientras el primero espera.
 
    `js/ajustes-tipo.js` sigue siendo dueño de `lista` (los campos ya
    puestos en el tipo, todavía sin guardar) y de cuándo se vuelve al
@@ -167,7 +167,7 @@ var CamposCatalogo = (function () {
         f.appendChild(cambiar);
 
         var borrar = document.createElement('button');
-        borrar.type = 'button'; borrar.className = 'boton boton-peligro'; borrar.textContent = 'Borrar';
+        borrar.type = 'button'; borrar.className = 'boton boton-peligro'; borrar.textContent = 'Quitar';
         borrar.onclick = function () { borrarPropio(p, tipo, lista, opciones, cuerpo); };
         f.appendChild(borrar);
 
@@ -260,9 +260,9 @@ var CamposCatalogo = (function () {
     var otros = Campos.tiposQueUsanPropio(App.E.campos, p.id).filter(function (t) { return t !== tipo.tipo; });
     var texto = otros.length
       ? 'Se usa en ' + otros.length + (otros.length === 1 ? ' tipo más' : ' tipos más') + ' (' + otros.join(', ') +
-        '), y se quitará también de ahí. ¿Borrar "' + p.nombre + '"?'
-      : '¿Borrar el campo propio "' + p.nombre + '"?';
-    var ok = await U.preguntar('Borrar campo propio', '<p>' + U.escapar(texto) + '</p>', 'Borrar');
+        '), y se quitará también de ahí. ¿Quitar "' + p.nombre + '"?'
+      : '¿Quitar el campo propio "' + p.nombre + '"?';
+    var ok = await U.preguntar('Quitar campo propio', '<p>' + U.escapar(texto) + '</p>', 'Quitar');
     if (!ok) return;
     try {
       App.E.campos = await Campos.guardarPropios(App.E.gestor, function (propios) {
@@ -334,7 +334,7 @@ var CamposCatalogo = (function () {
         f.appendChild(duplicar);
 
         var borrar = document.createElement('button');
-        borrar.type = 'button'; borrar.className = 'boton boton-peligro'; borrar.textContent = 'Borrar';
+        borrar.type = 'button'; borrar.className = 'boton boton-peligro'; borrar.textContent = 'Quitar';
         borrar.onclick = function () { borrarCalculado(c, tipo, lista, opciones, cuerpo); };
         f.appendChild(borrar);
 
@@ -366,9 +366,9 @@ var CamposCatalogo = (function () {
     var otros = Campos.tiposQueUsanCalculado(App.E.campos, c.id).filter(function (t) { return t !== tipo.tipo; });
     var texto = otros.length
       ? 'Se usa en ' + otros.length + (otros.length === 1 ? ' tipo más' : ' tipos más') + ' (' + otros.join(', ') +
-        '), y se quitará también de ahí. ¿Borrar "' + c.nombre + '"?'
-      : '¿Borrar el campo calculado "' + c.nombre + '"?';
-    var ok = await U.preguntar('Borrar campo calculado', '<p>' + U.escapar(texto) + '</p>', 'Borrar');
+        '), y se quitará también de ahí. ¿Quitar "' + c.nombre + '"?'
+      : '¿Quitar el campo calculado "' + c.nombre + '"?';
+    var ok = await U.preguntar('Quitar campo calculado', '<p>' + U.escapar(texto) + '</p>', 'Quitar');
     if (!ok) return;
     try {
       App.E.campos = await Campos.guardarCalculados(App.E.gestor, function (calculados) {
