@@ -2,30 +2,30 @@
    guias-plegado.js — el cuadro de escribir la guía, en acordeón
    (24-sep-2026, fila 122, docs/GUIA-EN-ACORDEON.md).
 
-   Cada paso cerrado ocupa una línea: número, título y unas marcas con
-   lo que lleva dentro (Normativa, Documentos, Guion, Pregunta, Solo
+   Cada hito cerrado ocupa una línea: número, título y unas marcas con
+   lo que lleva dentro (Normativa, Documentos, Tareas, Pregunta, Solo
    informativo y el responsable). Pulsar la línea (fuera de los
-   botones) lo abre o lo cierra. Solo hay UN paso abierto en todo el
-   editor; si es un paso de una opción, el paso-pregunta que lo contiene
+   botones) lo abre o lo cierra. Solo hay UN hito abierto en todo el
+   editor; si es un hito de una opción, el hito-pregunta que lo contiene
    sigue abierto, para que se vea dónde está.
 
-   No se quita nada del DOM: un paso cerrado lleva la clase
+   No se quita nada del DOM: un hito cerrado lleva la clase
    `paso-plegado` y el CSS esconde todo lo que no sea su cabecera. Así
    recoger() de js/guias.js sigue leyendo todos los campos, abiertos o
    no, y lo que se guarda no cambia.
 
    `GuiasPlegado.crear(o)` con o = { nivel(), recoger, responsables }
    devuelve el acordeón de un editor:
-   - `abrir(id)`: ese paso queda como el abierto (sin repintar).
+   - `abrir(id)`: ese hito queda como el abierto (sin repintar).
    - `abrirAlLlegar(id)` / `alCambiarDeNivel()`: al cambiar de nivel
-     todo nace cerrado, salvo el paso al que se va desde el mapa.
+     todo nace cerrado, salvo el hito al que se va desde el mapa.
    - `aplicar()`: clases y líneas resumidas de lo que hay en pantalla;
      se llama al final de cada pintar().
    - `enganchar()`: el clic en la línea, una sola vez por cuadro.
-   - `alTitulo(id)`: el cursor en el título de ese paso.
-   - `seguir(id)`: que la pantalla siga a ese paso (al subirlo/bajarlo).
+   - `alTitulo(id)`: el cursor en el título de ese hito.
+   - `seguir(id)`: que la pantalla siga a ese hito (al subirlo/bajarlo).
    `GuiasPlegado.marcas(p, responsables)` es la parte pura: la lista de
-   marcas de un paso.
+   marcas de un hito.
    ============================================================ */
 var GuiasPlegado = (function () {
 
@@ -39,7 +39,7 @@ var GuiasPlegado = (function () {
     if (p.soloInformativo) m.push('Solo informativo');
     if (cuantos(p.normativa)) m.push('Normativa (' + cuantos(p.normativa) + ')');
     if (cuantos(p.plantillasDocumento)) m.push('Documentos (' + cuantos(p.plantillasDocumento) + ')');
-    if (cuantos(p.guion)) m.push('Guion (' + cuantos(p.guion) + ')');
+    if (cuantos(p.guion)) m.push('Tareas (' + cuantos(p.guion) + ')');
     if (p.responsable) {
       var r = (responsables || []).filter(function (x) { return x.id === p.responsable; })[0];
       m.push(r ? r.nombre : p.responsable);
@@ -49,7 +49,7 @@ var GuiasPlegado = (function () {
     return m;
   }
 
-  /* El paso `id`, en el nivel que se ve o en los pasos de sus opciones. */
+  /* El hito `id`, en el nivel que se ve o en los hitos de sus opciones. */
   function buscar(lista, id) {
     for (var i = 0; i < (lista || []).length; i++) {
       var p = lista[i];
@@ -79,7 +79,7 @@ var GuiasPlegado = (function () {
       return editores().filter(function (el) { return el.dataset.pasoId === id; })[0] || null;
     }
 
-    /* Abierto: el paso elegido y, si es de una opción, el paso-pregunta
+    /* Abierto: el hito elegido y, si es de una opción, el hito-pregunta
        de arriba que lo contiene. */
     function estaAbierto(el) {
       if (!abierto) return false;
@@ -102,7 +102,7 @@ var GuiasPlegado = (function () {
         else cab.appendChild(r);
       }
       var p = buscar(o.nivel(), el.dataset.pasoId);
-      var t = p && p.titulo ? p.titulo : 'Paso sin título';
+      var t = p && p.titulo ? p.titulo : 'Hito sin título';
       r.innerHTML = '<span class="paso-resumen-titulo' + (p && p.titulo ? '' : ' suave') + '">' + U.escapar(t) + '</span>' +
         marcas(p, o.responsables).map(function (m) {
           return '<span class="paso-marca">' + U.escapar(m) + '</span>';

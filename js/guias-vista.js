@@ -41,19 +41,19 @@
     else control = '<input type="checkbox" class="paso-casilla" data-paso="' +
                    U.escapar(p.id) + '"' + (hecho ? ' checked' : '') + '>';
 
-    /* Un paso marcado se pliega y se queda solo con su título tachado:
-       con cuatro pasos explicados, la guía se comía la pantalla. El
+    /* Un hito marcado se pliega y se queda solo con su título tachado:
+       con cuatro hitos explicados, la guía se comía la pantalla. El
        botoncito de la esquina lo vuelve a abrir para releerlo. Solo
        tiene sentido donde hay casillas, que es dentro de un asunto.
        En una pregunta no se pliega: hay que seguir viendo qué se
        preguntaba. */
     var verlo = (conCasillas && conCuerpo && !pregunta)
       ? '<button type="button" class="paso-ver" ' +
-        'title="Ver o esconder la explicación de este paso">ver</button>'
+        'title="Ver o esconder la explicación de este hito">ver</button>'
       : '';
 
     var titulo = '<span class="paso-titulo-texto">' +
-                 U.escapar(p.titulo || 'Paso ' + (i + 1)) +
+                 U.escapar(p.titulo || 'Hito ' + (i + 1)) +
                  (p.soloInformativo ? ' <span class="suave">(informativo)</span>' : '') + '</span>';
     /* La pregunta no lleva <label>: no hay casilla que marcar, y con
        label el clic en el título no haría nada. */
@@ -85,7 +85,7 @@
         '<div class="guia-ramas">' + p.opciones.map(function (o) {
           var dentro = o.pasos.length
             ? vista(o.pasos, marcados, conCasillas, elegidas)
-            : '<p class="explica">Con elegir esta opción basta: no hay más pasos.</p>';
+            : '<p class="explica">Con elegir esta opción basta: no hay más hitos.</p>';
           return '<div class="guia-rama' + (o.id === cual ? ' rama-activa' : '') +
                  '" data-opcion="' + U.escapar(o.id) + '">' + dentro + '</div>';
         }).join('') + '</div>';
@@ -114,7 +114,7 @@
     return antes;
   }
 
-  /* Los enganches de lo que se pulsa dentro de una guía: plegar un paso
+  /* Los enganches de lo que se pulsa dentro de una guía: plegar un hito
      hecho y elegir una opción. Van una sola vez sobre el documento
      entero, y no en cada sitio que pinta una guía: la guía sale en la
      ficha del asunto y en su propio cuadro, y así los dos se comportan
@@ -156,8 +156,8 @@
       if (alElegirOpcion) alElegirOpcion(String(b.dataset.paso || ''), nueva);
     });
 
-    /* Al desmarcar, el paso se abre solo otra vez: así el botón no se
-       queda diciendo "esconder" sobre un paso que ya está abierto. */
+    /* Al desmarcar, el hito se abre solo otra vez: así el botón no se
+       queda diciendo "esconder" sobre un hito que ya está abierto. */
     document.addEventListener('change', function (ev) {
       var c = ev.target;
       if (!c || !c.classList || !c.classList.contains('paso-casilla')) return;
@@ -170,10 +170,10 @@
   }
   engancharLaGuia();
 
-  /* Cuántos pasos hay y cuántos están hechos, contando solo la rama
-     elegida de cada pregunta: los pasos de la opción que no se ha
+  /* Cuántos hitos hay y cuántos están hechos, contando solo la rama
+     elegida de cada pregunta: los hitos de la opción que no se ha
      elegido no se hacen, así que tampoco se cuentan. La pregunta en sí
-     cuenta como un paso, hecho en cuanto se responde. */
+     cuenta como un hito, hecho en cuanto se responde. */
   function cuenta(lista, hechos, elegidas) {
     var pasos = G.normalizar(lista);
     var marcados = hechos || [];
@@ -202,7 +202,7 @@
   }
 
   /* La guía de un asunto, en su propio cuadro y con casillas.
-     'alMarcar' recibe la lista completa de pasos marcados cada vez
+     'alMarcar' recibe la lista completa de hitos marcados cada vez
      que se toca una casilla, para que la guarde quien la abrió. */
   async function abrir(titulo, lista, hechos, alMarcar, elegidas, alElegir) {
     var marcados = (hechos || []).slice();
@@ -219,7 +219,7 @@
     function contar() {
       var c = cuenta(pasos, marcados, elegido);
       $('guia-cuenta').textContent =
-        c.hechos + ' de ' + c.total + ' pasos hechos. ' +
+        c.hechos + ' de ' + c.total + ' hitos hechos. ' +
         'Lo que marques aquí lo ve todo el que abra la aplicación.';
     }
     contar();
