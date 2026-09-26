@@ -495,7 +495,7 @@ la propia dirección en la copia sin internet (`file://`), o de `localStorage` e
   ARCHIVO donde se pedía la de abiertos, que dejaría mal el `rutas.json` de todo el centro.
 - Se copia antes de guardar `rutas.json`: el navegador solo deja copiar justo tras el clic.
 - La prueba sirve la aplicación como `file://` desde un enlace en `…/Dropbox (Personal)/
-  ADMINISTRACIÓN/REGISTROS/Gestor de Asuntos - aplicación/» (con acentos), sin generar la copia.
+  ADMINISTRACIÓN/REGISTROS/Gestor de Asuntos - aplicación/` (con acentos), sin generar la copia.
 - Las pruebas de GitHub estaban en rojo desde la fila 152: el Chromium de Actions (headless shell) abre
   la carpeta `file://` pero no pinta su lista («addRow is not defined»). La prueba 7 de
   `pruebas/copiar-ruta.mjs` comprueba ahora que se queda en la carpeta entera (sin cortar en el `#`) y,
