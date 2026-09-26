@@ -42,6 +42,16 @@
    como si hubiera salido bien, con `yaEnviado: true`. Se recuerda 6 horas
    (CacheService). Una petición sin identificador se envía como siempre.
    Versión del script: VERSION_SCRIPT, más abajo.
+
+   26-sep-2026, fila 178, docs/CORREO-VERSIONES-Y-LIMPIEZA.md: la memoria
+   de un `idEnvio` ya no dura solo 6 horas (el máximo de CacheService):
+   además se apunta en `PropertiesService.getScriptProperties()`,
+   agrupado por día (`enviados-AAMMDD` → lista de identificadores), y los
+   grupos de más de 60 días se borran en cada pasada del disparador
+   (`recogerCorreos`). Antes de enviar se mira primero la caché y, si no
+   está, esos grupos. Si esta fecha no está en la copia pegada en
+   script.google.com, está vieja: vuelve a pegarla (Ajustes → Enviar
+   correo, en el Gestor de Asuntos).
    ============================================================
    Gestor de Asuntos — recogida de correos y envío desde el asunto
    Google Apps Script, en la cuenta g.educaand.es
@@ -85,6 +95,14 @@ var MAX_LETRAS_TEXTO = 6000;
 var MAX_ENCARGOS_POR_VUELTA = 20;
 var MAX_BYTES_ENVIO = 20 * 1024 * 1024;
 var PROPIEDAD_CLAVE = 'clave-envio';
+
+/* Fila 178: memoria permanente de los `idEnvio` ya mandados, agrupados
+   por día de envío ('enviados-AAMMDD' -> JSON con la lista de ids),
+   en PropertiesService (no caduca como CacheService, que solo aguanta
+   6 horas). Se limpian los grupos de más de DIAS_RECORDAR_ENVIO_PERMANENTE
+   días en cada pasada de recogerCorreos. */
+var PREFIJO_ENVIADOS = 'enviados-';
+var DIAS_RECORDAR_ENVIO_PERMANENTE = 60;
 
 /* ---------- lo que hay que ejecutar una sola vez ---------- */
 
@@ -134,6 +152,7 @@ function prepararEnvio() {
 /* ---------- la vuelta de cada minuto ---------- */
 
 function recogerCorreos() {
+  try { limpiarEnviosViejos(); } catch (e) { Logger.log('No he podido limpiar enviados-*: ' + e.message); }
   var pendiente = etiqueta(ETIQUETA);
   var hecho = etiqueta(ETIQUETA_HECHO);
   var carpeta = carpetaBandeja();
@@ -362,7 +381,7 @@ function guardarHilo(hilo, carpeta, respuestaDe) {
    propia cuenta, sin mirar `para`/`cco`.
    ============================================================ */
 
-var VERSION_SCRIPT = '24-sep-2026 · fila 130';
+var VERSION_SCRIPT = '26-sep-2026 · fila 178';
 var SEGUNDOS_RECORDAR_ENVIO = 6 * 60 * 60;   /* el máximo de CacheService */
 
 function doPost(e) {
@@ -389,7 +408,13 @@ function doPost(e) {
 
 /* Fila 130: con `idEnvio`, cada envío sale una sola vez. El candado del
    script evita que dos peticiones con el mismo identificador, llegadas a
-   la vez, salgan las dos. */
+   la vez, salgan las dos.
+
+   Fila 178: además de la caché (6 horas, el máximo de CacheService), se
+   mira y se apunta la memoria permanente (PropertiesService, agrupada
+   por día), que no caduca hasta los 60 días. Así un reintento de un
+   correo ya enviado hace horas (no solo minutos) sigue contestando
+   `yaEnviado: true` en vez de mandarlo otra vez. */
 function enviarUnaVez(cuerpo) {
   var id = String(cuerpo.idEnvio || '').trim();
   if (!id || cuerpo.prueba) return conVersion(enviarCorreo(cuerpo));
@@ -404,8 +429,14 @@ function enviarUnaVez(cuerpo) {
       r.yaEnviado = true;
       return conVersion(r);
     }
+    if (yaEnviadoPermanente(id)) {
+      return conVersion({ ok: true, yaEnviado: true });
+    }
     var resultado = enviarCorreo(cuerpo);
-    if (resultado && resultado.ok) cache.put(clave, JSON.stringify(resultado), SEGUNDOS_RECORDAR_ENVIO);
+    if (resultado && resultado.ok) {
+      cache.put(clave, JSON.stringify(resultado), SEGUNDOS_RECORDAR_ENVIO);
+      marcarEnviadoPermanente(id);
+    }
     return conVersion(resultado);
   } finally {
     candado.releaseLock();
@@ -415,6 +446,66 @@ function enviarUnaVez(cuerpo) {
 function conVersion(r) {
   if (r && typeof r === 'object') r.version = VERSION_SCRIPT;
   return r;
+}
+
+/* ---------- fila 178: memoria permanente de idEnvio, por día ---------- */
+
+/* 'enviados-AAMMDD', con la fecha (hora de España) del envío. */
+function claveDeEnviadosHoy() {
+  return PREFIJO_ENVIADOS + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyMMdd');
+}
+
+/* Cuántos días han pasado desde la fecha que lleva una clave
+   'enviados-AAMMDD'. 0 si la clave no tiene esa forma. */
+function diasDesdeClaveEnviados(clave) {
+  var m = String(clave || '').match(/^enviados-(\d{2})(\d{2})(\d{2})$/);
+  if (!m) return 0;
+  var fecha = new Date(2000 + parseInt(m[1], 10), parseInt(m[2], 10) - 1, parseInt(m[3], 10));
+  var hoy = new Date();
+  hoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+  return Math.round((hoy - fecha) / 86400000);
+}
+
+/* Se ejecuta en cada pasada de recogerCorreos (cada minuto): borra los
+   grupos de más de DIAS_RECORDAR_ENVIO_PERMANENTE días. */
+function limpiarEnviosViejos() {
+  var propiedades = PropertiesService.getScriptProperties();
+  var todas = propiedades.getKeys();
+  for (var i = 0; i < todas.length; i++) {
+    if (todas[i].indexOf(PREFIJO_ENVIADOS) !== 0) continue;
+    if (diasDesdeClaveEnviados(todas[i]) > DIAS_RECORDAR_ENVIO_PERMANENTE) {
+      propiedades.deleteProperty(todas[i]);
+    }
+  }
+}
+
+/* ¿Está 'id' en alguno de los grupos de los últimos
+   DIAS_RECORDAR_ENVIO_PERMANENTE días? Un grupo más viejo que eso (que
+   limpiarEnviosViejos todavía no haya llegado a borrar) no cuenta. */
+function yaEnviadoPermanente(id) {
+  var propiedades = PropertiesService.getScriptProperties();
+  var todas = propiedades.getKeys();
+  for (var i = 0; i < todas.length; i++) {
+    var clave = todas[i];
+    if (clave.indexOf(PREFIJO_ENVIADOS) !== 0) continue;
+    if (diasDesdeClaveEnviados(clave) > DIAS_RECORDAR_ENVIO_PERMANENTE) continue;
+    var lista = [];
+    try { lista = JSON.parse(propiedades.getProperty(clave) || '[]'); } catch (e) { lista = []; }
+    if (lista.indexOf(id) !== -1) return true;
+  }
+  return false;
+}
+
+/* Apunta 'id' en el grupo de hoy. */
+function marcarEnviadoPermanente(id) {
+  var propiedades = PropertiesService.getScriptProperties();
+  var clave = claveDeEnviadosHoy();
+  var lista = [];
+  try { lista = JSON.parse(propiedades.getProperty(clave) || '[]'); } catch (e) { lista = []; }
+  if (lista.indexOf(id) === -1) {
+    lista.push(id);
+    propiedades.setProperty(clave, JSON.stringify(lista));
+  }
 }
 
 function enviarCorreo(cuerpo) {
