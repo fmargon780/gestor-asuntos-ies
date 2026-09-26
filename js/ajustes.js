@@ -141,6 +141,7 @@ App.botonMenuTarjeta = function (opciones) {
       var b = document.createElement('button');
       b.type = 'button';
       b.textContent = op.texto;
+      if (op.titulo) b.title = op.titulo;
       if (op.peligro) b.className = 'boton-peligro';
       b.onclick = function (ev) { ev.stopPropagation(); cerrar(); op.onclick(); };
       menu.appendChild(b);
@@ -319,7 +320,7 @@ App.tarjetaTipoAjustes = function (tipo, mostrarCategoria) {
 
   f.appendChild(App.botonMenuTarjeta([
     { texto: 'Cambiar el nombre', onclick: function () { App.renombrarTipo(tipo); } },
-    { texto: 'Borrar', peligro: true, onclick: function () { App.borrarTipo(tipo); } }
+    { texto: 'Borrar', titulo: 'Va a la papelera', peligro: true, onclick: function () { App.borrarTipo(tipo); } }
   ]));
 
   /* Cualquier clic que no venga de un campo, un botón o el menú abre
