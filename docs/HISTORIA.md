@@ -1030,7 +1030,7 @@ Versión `App.VERSION`: `24-sep-2026 · 12:22`.
 `docs/GUIA-EN-ACORDEON.md`. Con varios pasos, el cuadro de escribir la guía salía con todos los
 campos a la vista y no se veía el trámite de un vistazo. Ahora cada paso cerrado es una línea
 (número, título, marcas) y solo hay uno abierto a la vez. Detalle en
-`docs/contexto/HITOS-Y-GUIAS.md` («El editor, en acordeón»).
+`docs/contexto/HITOS-Y-GUIAS.md» («El editor, en acordeón»).
 
 - Decisión: plegar con una clase y CSS, sin quitar nada del DOM, para que `recoger()` siga leyendo
   todos los campos y lo guardado no cambie en nada.
@@ -1166,7 +1166,7 @@ Versión publicada `App.VERSION`: `24-sep-2026 · 07:35`.
 `docs/PREGUNTAS-EN-EL-GUION.md`. Dentro de un mismo hito, lo que hay que hacer a menudo depende de
 una respuesta («¿Viene con toda la documentación?» → «Pedir que la complete»). Ahora una línea del
 guion puede ser pregunta, con un botón por respuesta y sus propias líneas. Detalle en
-`docs/contexto/HITO-MESA.md» («El guion»).
+`docs/contexto/HITO-MESA.md` («El guion»).
 
 - Se apuntó como fila 115, número que ya llevaba en curso la de enviar el correo desde el asunto;
   pasó a la 116. Mientras esa fila estaba a medias, `main` tuvo pruebas en rojo: esta esperó a que
@@ -1192,7 +1192,7 @@ círculo. Ahora cada documento va en su renglón, como mucho cinco (o los que qu
 - `js/ficha-tarjetas.js` iba a pasar de 450 líneas: los resúmenes se fueron a
   `js/ficha-tarjetas-resumen.js`. Cada renglón lleva `title` con su texto entero.
 
-Prueba nueva `pruebas/documentos-en-la-tarjeta.mjs`; `pruebas/ficha-en-tarjetas.mjs» ya no espera la
+Prueba nueva `pruebas/documentos-en-la-tarjeta.mjs`; `pruebas/ficha-en-tarjetas.mjs` ya no espera la
 línea «3 documentos». Batería completa en verde.
 Versión publicada `App.VERSION`: `24-sep-2026 · 05:53`.
 
@@ -1640,7 +1640,7 @@ hace que `Nombres.leer` se quede con el otro (Ajustes ya lo avisa en rojo).
 
 ## 23-sep-2026 — Fila 93: no salir del asunto salvo cuando el usuario lo pide
 
-`docs/QUEDARSE-EN-EL-ASUNTO-SIEMPRE.md`. Repaso completo, fichero a fichero, de todo `js/» en
+`docs/QUEDARSE-EN-EL-ASUNTO-SIEMPRE.md`. Repaso completo, fichero a fichero, de todo `js/` en
 busca de una salida indebida de la ficha (`App.ir(` hacia otra pantalla, u ocultar
 `#pantalla-asunto` fuera de las cuatro salidas permitidas): `js/nucleo.js` (dónde vive `App.ir` y
 `App.PANTALLAS`), `js/ficha-asunto.js`, `js/ficha-nombre-acciones.js`, `js/ficha-documentos.js`,
@@ -1837,7 +1837,7 @@ inyecta un `<script src="copia-datos/<ruta con / cambiado por ~>.js">` que deja 
 `window.__COPIA__`, con carga perezosa y sin duplicar la inyección si dos módulos piden la misma
 ruta a la vez. Contrato elegido: `'json'` devuelve el objeto ya interpretado, `'binario'` un
 `Uint8Array`, igual que ya hacían a mano los cinco sitios de la tabla del diseño (`js/cargar-biblioteca.js`,
-`js/formularios.js`, `js/formularios-rellenar.js`, `js/plantillas-documento.js` ×2), que pasaron a
+`js/formularios.js`, `js/formularios-rellenar.js`, `js/plantillas-documento.js» ×2), que pasaron a
 llamar a esta función en vez de a `fetch` directo. Los tres módulos que repetían casi el mismo
 `cargarPdfJs()` con `import('./lib/pdf.min.mjs')` (`js/registro-lector.js`,
 `js/preparar-documento.js`, `js/pdf-separar-unir.js`) pasaron a llamar a la función compartida
@@ -1857,7 +1857,7 @@ y escribe `version.json` con el sha256 de todo. No copia `docs/`, `pruebas/`, `h
 `raw.githubusercontent.com/fmargon780/gestor-asuntos-copia/main/` (`cache: 'no-store'`), descarga
 solo lo que cambió de sha256 (comprobando cada uno antes de escribir, `version.json` el último) y
 recarga; sin internet, un aviso discreto (`U.aviso`) y arranca igual. El identificador de la
-carpeta viaja en la misma IndexedDB que `js/almacen.js` (`gestor-asuntos` / `ajustes» /
+carpeta viaja en la misma IndexedDB que `js/almacen.js` (`gestor-asuntos` / `ajustes` /
 `copiaCarpeta`), para que lo que guarda `ABRIR EL GESTOR.html` (autónomo, con su propia capa
 mínima de IndexedDB, sin depender de ningún otro fichero de la copia) lo pueda releer luego este
 módulo. El aviso ámbar de "hace falta el permiso otra vez" reutiliza el patrón de
