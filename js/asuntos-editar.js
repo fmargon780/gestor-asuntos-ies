@@ -154,8 +154,8 @@ App.renombrarAsuntosAbiertosDelTercero = async function (categoria, textoAntes, 
   if (!afectados.length) return;
 
   var lista = afectados.map(function (c) { return '<li>' + U.escapar(c.nombre) + '</li>'; }).join('');
-  var ok = await U.preguntar('Renombrar las carpetas de sus asuntos abiertos',
-    '<p class="explica">Ya tiene Nº de identificación escolar. Se van a renombrar estas ' +
+  var ok = await U.preguntar('Cambiar el nombre de las carpetas de sus asuntos abiertos',
+    '<p class="explica">Ya tiene Nº de identificación escolar. Se van a cambiar el nombre de estas ' +
     afectados.length + ' carpetas de asuntos abiertos suyos. Las archivadas no se tocan.</p>' +
     '<ul>' + lista + '</ul>', 'Adelante');
   if (!ok) return;
@@ -201,7 +201,7 @@ App.editarAsunto = async function (a) {
   var cuadroEditar = document.querySelector('#capa .cuadro');
   if (cuadroEditar) cuadroEditar.classList.add('cuadro-alto');
 
-  var promesa = U.preguntar('Editar el asunto',
+  var promesa = U.preguntar('Cambiar el asunto',
     '<p class="explica">Al guardar se le cambia el nombre a la carpeta. ' +
     'Se copia primero y se comprueba que ha llegado todo; si algo fallara, ' +
     'la carpeta se queda como está.</p>' +
@@ -319,7 +319,7 @@ App.editarAsunto = async function (a) {
 async function guardarEdicion(a, p, d, nombreNuevo, datos) {
   if (nombreNuevo === a.nombre) {
     try { await App.anotar(a.nombre, datos); }
-    catch (e) { U.fallo('No se ha podido editar', e); return; }
+    catch (e) { U.fallo('No se ha podido cambiar', e); return; }
     U.aviso('Asunto actualizado.', 'bueno');
     try { await App.verAbiertos(); }
     catch (e2) { U.accesorio('Asunto actualizado, pero no he podido poner la lista al día. Pulsa Recargar', e2); }
@@ -333,7 +333,7 @@ async function guardarEdicion(a, p, d, nombreNuevo, datos) {
     }
     await Carpetas.renombrar(App.E.abiertos, a.nombre, nombreNuevo);
   } catch (e) {
-    U.fallo('No se ha podido editar', e);
+    U.fallo('No se ha podido cambiar', e);
     return;
   }
 
