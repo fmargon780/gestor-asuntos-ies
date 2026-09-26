@@ -47,7 +47,7 @@ App.pintarTiposDeDocumento = function () {
     f.appendChild(linea);
     f.appendChild(App.botonMenuTarjeta([
       { texto: 'Campos del nombre', onclick: function () { if (window.DocCampos) DocCampos.editar(nombre); } },
-      { texto: 'Borrar', peligro: true, onclick: function () { App.borrarTipoDocumento(nombre); } }
+      { texto: 'Borrar', titulo: 'Va a la papelera', peligro: true, onclick: function () { App.borrarTipoDocumento(nombre); } }
     ]));
     tdoc.appendChild(f);
   });
@@ -112,6 +112,7 @@ App.pintarCamposPropios = function () {
     var borrar = document.createElement('button');
     borrar.className = 'boton boton-peligro';
     borrar.textContent = 'Borrar';
+    borrar.title = 'Va a la papelera';
     borrar.onclick = function () { App.borrarCampoPropio(p); };
     f.appendChild(borrar);
     caja.appendChild(f);
@@ -194,7 +195,7 @@ App.pintarGruposPersonas = function () {
     f.appendChild(App.botonMenuTarjeta([
       { texto: 'Ver y cambiar los miembros', onclick: function () { App.editarMiembrosDeGrupo(g); } },
       { texto: 'Cambiar el nombre', onclick: function () { App.renombrarGrupo(g); } },
-      { texto: 'Borrar', peligro: true, onclick: function () { App.borrarGrupo(g); } }
+      { texto: 'Borrar', titulo: 'Va a la papelera', peligro: true, onclick: function () { App.borrarGrupo(g); } }
     ]));
     caja.appendChild(f);
   });
