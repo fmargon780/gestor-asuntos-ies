@@ -122,7 +122,7 @@ var RegistroSellado = (function () {
      nombre del documento original, el código sale del sello, y el
      nombre se monta con Nombres.montarDocumento. Sin efectos: se
      puede probar sola. */
-  function nombreParaSello(nombreOriginal, sello) {
+  function nombreParaSello(nombreOriginal, sello, asunto) {
     var previo = Documentos.leerNombre(nombreOriginal);
     if (!previo.fecha || !previo.tipo) return '';
     var codigo = Nombres.codigoRegistro({
@@ -131,7 +131,8 @@ var RegistroSellado = (function () {
     if (!codigo) return '';
     return Nombres.montarDocumento({
       fecha: previo.fecha, codigo: codigo, tipo: previo.tipo, curso: previo.curso,
-      extension: Nombres.extensionDe(nombreOriginal)
+      extension: Nombres.extensionDe(nombreOriginal),
+      tercero: asunto && asunto.tercero, nombreAsunto: asunto && asunto.nombre
     });
   }
 
@@ -173,7 +174,7 @@ var RegistroSellado = (function () {
      en el resto de la aplicación. No se crea ningún fichero nuevo de
      verdad: solo se renombran los dos que ya había. */
   async function asociar(asunto, nombrePdf, nombreDocumentoOriginal, sello) {
-    var nombreNuevo = nombreParaSello(nombreDocumentoOriginal, sello);
+    var nombreNuevo = nombreParaSello(nombreDocumentoOriginal, sello, asunto);
     if (!nombreNuevo) {
       U.aviso('Ese documento no tiene fecha ni tipo reconocibles en su nombre: no sé qué ' +
               'ponerle a la copia registrada.', 'malo');

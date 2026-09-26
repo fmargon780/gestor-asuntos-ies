@@ -27,7 +27,7 @@
     var hayCarpeta = {};
     App.E.listaAbiertos.forEach(function (a) { hayCarpeta[a.nombre] = true; });
 
-    var indice = window.IndiceArchivo ? await IndiceArchivo.leerDisco() : { ok: false };
+    var indice = window.IndiceArchivo ? await IndiceArchivo.leerDisco({ todos: true }) : { ok: false };
     if (indice.ok) {
       indice.datos.asuntos.forEach(function (e) { hayCarpeta[e.nombre] = true; });
     } else if (App.E.listaArchivo.length) {

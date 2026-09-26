@@ -82,7 +82,7 @@ var Conservacion = (function () {
 
   async function leerCumplidos() {
     if (!window.IndiceArchivo) return { ok: false, lista: [] };
-    var r = await IndiceArchivo.leerDisco();
+    var r = await IndiceArchivo.leerDisco({ todos: true });
     if (!r.ok) return { ok: false, lista: [] };
     return { ok: true, lista: cumplidos(r.datos.asuntos, tipos()) };
   }

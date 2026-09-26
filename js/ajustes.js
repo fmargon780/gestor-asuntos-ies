@@ -362,7 +362,7 @@ App.contarAsuntosConTipo = async function (nombreTipo) {
   });
   if (window.IndiceArchivo) {
     try {
-      var resultado = await IndiceArchivo.leerDisco();
+      var resultado = await IndiceArchivo.leerDisco({ todos: true });
       if (resultado.ok) {
         resultado.datos.asuntos.forEach(function (e) {
           if (e.tipo === nombreTipo) vistos[e.nombre] = true;

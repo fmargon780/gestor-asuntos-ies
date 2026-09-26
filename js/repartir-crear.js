@@ -39,8 +39,9 @@ var RepartirCrear = (function () {
       curso: U.cursoDeFecha(fecha), grupo: '', campos: [], descripcion: '', tercero: tercero }).nombre;
   }
 
-  function nombreDelDocumento(tipoDocumento, datos) {
-    return Nombres.montarDocumento({ fecha: datos.fecha, codigo: datos.codigo, tipo: tipoDocumento || 'DOCUMENTO', extension: 'pdf' });
+  function nombreDelDocumento(tipoDocumento, datos, tercero, nombreAsunto) {
+    return Nombres.montarDocumento({ fecha: datos.fecha, codigo: datos.codigo, tipo: tipoDocumento || 'DOCUMENTO',
+      extension: 'pdf', tercero: tercero, nombreAsunto: nombreAsunto });
   }
 
   /* Quién tiene ya un asunto de ese tipo, abierto o archivado. { tercero: true } */
@@ -52,7 +53,7 @@ var RepartirCrear = (function () {
     });
     if (window.IndiceArchivo) {
       try {
-        var r = await IndiceArchivo.leerDisco();
+        var r = await IndiceArchivo.leerDisco({ todos: true });
         if (r.ok) r.datos.asuntos.forEach(function (e) { if (e.tipo === tipo && e.tercero) salida[e.tercero] = true; });
       } catch (e) { /* sin índice, no se sabe: no se avisa */ }
     }
@@ -75,7 +76,7 @@ var RepartirCrear = (function () {
         abiertoEl: U.ahora(), abiertoPor: App.E.usuario, repartidoDe: origen.nombre
       });
       var doc = await PdfHerramientas.sacarPaginas(bytes, indices(trozo));
-      await Carpetas.escribirBytes(carpeta, nombreDelDocumento(op.tipoDocumento, datos), doc, 'application/pdf');
+      await Carpetas.escribirBytes(carpeta, nombreDelDocumento(op.tipoDocumento, datos, trozo.tercero, nombre), doc, 'application/pdf');
       var a = { nombre: nombre, handle: carpeta, leido: Nombres.leer(nombre, App.E.tipos),
                 ficha: App.E.registro.asuntos[nombre] || {} };
       if (window.Notas) await Notas.anadir(a, 'Viene de ' + origen.nombre + ', ' + RepartirNucleo.textoPaginas(trozo).toLowerCase());

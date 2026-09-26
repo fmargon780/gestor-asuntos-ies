@@ -22,15 +22,32 @@ un no-PDF, no hay barra. La ventana de `App.verDocumentos` se queda (tarjeta de 
 clasificar», «Nuevo asunto»). `js/copiar.js` ya no vigila la ficha (fuera su envoltura de
 `App.abrirFicha`). Se comprueba con `pruebas/documentos-en-un-solo-sitio.mjs`.
 
-### Los nombres, con tope de largo (fila 130)
+### Los nombres, con tope de largo (fila 130; contando la ruta entera, fila 177)
 
-Para no pasar del límite de rutas de Windows: la carpeta de un asunto, 150 caracteres como mucho
-(`Nombres.montarAsunto`: se recorta primero la descripción y después los campos del tipo, por el
-final; nunca la fecha, el tipo, el año, el grupo ni el tercero); el nombre de un documento, 120 más
-la extensión (`Nombres.montarDocumentoAjustado`: el texto adicional y después los campos). La
-vista previa (Nuevo asunto, Editar y el cuadro de documentos) avisa en ámbar con
-`Nombres.avisoRecorte`. Los adjuntos de la bandeja: extensión limpia de 10 caracteres como mucho, o
-ninguna. Los asuntos que ya existen no se renombran.
+Para no pasar del límite de rutas de Windows: la carpeta de un asunto y el nombre de un documento se
+recortan por tope (`Nombres.montarAsunto`/`Nombres.montarDocumentoAjustado`: se recorta primero la
+descripción/texto adicional y después los campos del tipo, por el final; nunca la fecha, el tipo, el
+año, el grupo ni el tercero). La vista previa (Nuevo asunto, Editar y el cuadro de documentos) avisa
+en ámbar con `Nombres.avisoRecorte`. Los adjuntos de la bandeja: extensión limpia de 10 caracteres
+como mucho, o ninguna. Los asuntos que ya existen no se renombran.
+
+Hasta la fila 177 el tope era fijo (150 para el asunto, 120 para el documento) y solo miraba el
+nombre. Desde el 26-sep-2026 (`docs/ARCHIVO-POR-CURSO-Y-RUTAS.md`), lo que de verdad no puede pasar
+de largo es la RUTA ENTERA dentro de Dropbox (Windows deja de sincronizarla a partir de 260
+caracteres), así que `js/nombres-topes.js` (`Nombres.topes({tercero, nombreAsunto})`) calcula el
+hueco de verdad, sumando: la raíz de Dropbox en este ordenador (45 por defecto, o lo apuntado en
+`localStorage` `gestor-ruta-dropbox` si es más largo), lo de dentro de Dropbox hasta la carpeta
+ARCHIVO (`_GESTOR/rutas.json`, vía `RutaCarpetas.comunActual()`: manda porque es más larga que la de
+abiertos), la categoría más larga (`Nombres.CATEGORIAS`), el tercero (el que se pasa, o un tamaño
+conservador si todavía no se conoce) y, para el documento, además la subcarpeta "Versiones previas"
+y — si ya se conoce, porque el asunto ya existe — el nombre real de su carpeta (más preciso que
+suponer el peor caso). Tope total: 240, con margen. `Nombres.montarAsunto`/`montarDocumentoAjustado`
+llaman a `Nombres.topes()` si está cargado; sin él (por ejemplo, en una prueba que no cargue
+`js/nombres-topes.js`), siguen con los fijos de siempre (150 y 120), que quedan como respaldo.
+`RutaCarpetas.cargarComun()` se precarga al entrar (`js/nucleo.js`) para que el primer nombre que se
+escriba ya cuente con la ruta de verdad. En Ajustes → Mantenimiento, bajo "Poner en orden las fichas
+del ARCHIVO", un aviso ámbar dice cuántas carpetas o documentos YA pasan del tope, calculado con el
+índice (`Nombres.largoRuta`, con las rutas reales de cada entrada); solo avisa, no renombra nada.
 
 ### Campos del tipo de documento en el nombre (23-sep-2026, fila 96)
 

@@ -159,7 +159,8 @@ var GenerarParaRelacionados = (function () {
         if (x.tablas && window.TablasDatos) resultado = await TablasDatos.resaltarResultado(resultado, x.tablas.faltan);
         var nombreDoc = Nombres.montarDocumento({
           fecha: fecha, tipo: plantillaDoc.tipoDocumento || 'DOCUMENTO',
-          curso: ((plantillaDoc.texto || '') + ' ' + soloElNombre(x.rel.nombre)).trim(), extension: 'docx'
+          curso: ((plantillaDoc.texto || '') + ' ' + soloElNombre(x.rel.nombre)).trim(), extension: 'docx',
+          tercero: a && a.tercero, nombreAsunto: a && a.nombre
         });
         if (yaEsta.indexOf(nombreDoc) !== -1 || hechos.some(function (d) { return d.nombre === nombreDoc; })) {
           yaEstaban.push({ rel: x.rel, nombre: nombreDoc, correo: x.valores.correo || '', valores: x.valores });

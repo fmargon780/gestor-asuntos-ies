@@ -205,6 +205,9 @@ $('btn-entrar').onclick = async function () {
     App.E.gestor = await Carpetas.crear(App.E.abiertos, App.CARPETA_GESTOR);
     App.E.datos = await Carpetas.crear(App.E.gestor, 'datos');
 
+    /* Precarga rutas.json para Nombres.topes() (fila 177), de fondo. */
+    if (window.RutaCarpetas) RutaCarpetas.cargarComun().catch(function () {});
+
     var rotos = await Copias.comprobarTodos(App.E.gestor);
     if (rotos.length) {
       App.avisoFicherosRotos(rotos);

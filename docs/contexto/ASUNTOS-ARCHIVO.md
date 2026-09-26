@@ -267,6 +267,42 @@ Se comprueba con `pruebas/archivo-indice.mjs`, en navegador de verdad con el dis
 `pruebas/navegador.mjs`, con los nueve escenarios del documento; la carga sola al entrar, en
 `pruebas/personas-archivo-y-menu.mjs` (fila 175, punto 3).
 
+### El índice, partido por curso académico (fila 177, `docs/ARCHIVO-POR-CURSO-Y-RUTAS.md`)
+
+Con varios miles de asuntos por curso, un solo `indice-archivo.json` con todos dentro pesaría
+demasiado y se reescribiría entero cada vez que se archivara un asunto más. Desde el 26-sep-2026:
+
+- `_GESTOR/indice-archivo.json` es ahora un RESUMEN pequeño: `{ version, hechoEl, cursos, recuento }`.
+  `_GESTOR/indice-archivo/<curso>.json` (uno por curso académico, `2025-26`, `2026-27`…) lleva la
+  lista de verdad, con la misma forma que antes (`{ version, hechoEl, hechoPor, recuento, asuntos }`).
+- El curso de un asunto sale de la fecha de su carpeta (AAMMDD), del 1 de septiembre al 31 de
+  agosto (`IndiceArchivo.cursoDeAAMMDD`/`cursoDeEntrada`; sin fecha reconocible, el curso actual).
+- `IndiceArchivo.leerDisco(opciones)`: sin opciones, solo el curso actual (lo que se ve en pantalla);
+  `{curso:'2025-26'}`, ese concreto; `{todos:true}`, todos los cursos juntos (lo necesitan `Cuentas`,
+  fichas huérfanas, las sugerencias de "Por clasificar", "Repartir un PDF" y el plazo de
+  conservación: miran el archivo entero, no solo el curso en pantalla).
+- `anadirEntrada`/`quitarEntrada` escriben SOLO el fichero del curso que toca (la clave de la cola
+  de `ColaGuardado` es `'indice-archivo:' + curso`, así que dos cursos distintos no se esperan entre
+  sí): archivar un asunto más ya no reescribe los demás. "Reconstruir el índice" (`guardar(datos)`)
+  reconstruye todos los cursos que aparezcan en lo recorrido, más el resumen; no borra un curso que
+  ya no tenga ningún asunto (por ejemplo, si el único se ha reabierto justo antes de reconstruir).
+- **Migración sin manos**: un `indice-archivo.json` con `asuntos` dentro (el formato de antes de esta
+  fila) se parte solo la primera vez que se lee algo de aquí en la sesión (`asegurarMigrado`): un
+  fichero por curso, fusionando con lo que ya hubiera, y el viejo se aparta a
+  `_GESTOR/copias/indice-archivo-antiguo-AAMMDD.json`. Si el otro ordenador todavía lleva la versión
+  vieja y lo vuelve a escribir en el formato antiguo, la próxima lectura lo vuelve a partir: no se
+  pierde nada, porque el índice siempre se puede reconstruir entero.
+- `js/archivo-personas.js` añade un desplegable «Curso: 2026-27 ▾ · Todos los cursos» delante del
+  buscador (`App.E.cursoArchivo`, por defecto el curso actual), que llama a `App.verArchivo` con la
+  opción que toque cada vez que cambia. La ficha de una persona sigue enseñando TODOS sus asuntos
+  archivados, de cualquier curso (`App.verAsuntosDeTercero` recorre el disco directo, sin pasar por
+  el índice: no hizo falta tocarlo).
+- `js/conflictos.js` se salta `indice-archivo/` igual que se saltaba `indice-archivo.json`: sigue
+  fuera de los dieciocho, sin copia de seguridad ni fusión de conflictos.
+
+Se comprueba sin navegador en `pruebas/archivo-por-curso-y-rutas.mjs` (migración, `anadirEntrada`
+solo toca su curso).
+
 ### Archivar sin preguntar (fila 141)
 
 `App.E.archivarSinPreguntar = true` hace que `App.cerrarAsunto` no pida confirmación: solo lo usa
