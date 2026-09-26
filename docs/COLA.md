@@ -337,31 +337,7 @@ el texto `__SEE_BELOW__`) y lo restauró en el commit siguiente, retipeado desde
 (commit `9da4f45`). La única diferencia buscada es la fila 159 y esta nota. Si algo no cuadra,
 compáralo con `git show 9da4f45:docs/COLA.md`.
 
-## Nota del 26-sep-2026: docs/HISTORIA.md pendiente (fila 172)
+## Nota del 26-sep-2026: docs/HISTORIA.md de la fila 172, ya pegado
 
-Fila 172 (buscador en la papelera) hecha y publicada (ver la tabla de arriba); `docs/CONTEXTO-CORTO.md`
-y `docs/contexto/ASUNTOS-ARCHIVO.md` ya están al día. Esta sesión no tiene `git push` de verdad
-(regla 17): `docs/HISTORIA.md` pesa más de 220 KB y no se puede retipear con fiabilidad fichero a
-fichero. Queda aquí el texto ya escrito, listo para pegar al final de `docs/HISTORIA.md` por una
-sesión que sí tenga `git push`:
-
-> **26-sep-2026, fila 172: buscador en la papelera.** Ajustes › Papelera llevaba tiempo sin forma
-> de encontrar algo concreto en una lista que no se vacía sola. Caja de búsqueda
-> (`#buscar-papelera`) encima de la lista, filtra mientras se escribe, sin botón: palabras sueltas,
-> en cualquier orden y sin tildes ni mayúsculas (`U.normalizar`), igual que el buscador de asuntos
-> abiertos y del ARCHIVO — una ficha se queda si su texto (nombre, qué era, de dónde salía, quién y
-> la fecha) contiene TODAS. La fecha entra tres veces: como se ve en pantalla ("hace N días"),
-> como `AAMMDD` y como `dd/mm/aaaa`, para que "2609" o "26/09" encuentren lo borrado ese día.
-> Contador junto a la caja ("12 de 85"; solo el total sin nada escrito); sin coincidencias, "Nada en
-> la papelera con esas palabras." El aviso ámbar de más de 30 días y su botón de borrar todo de
-> golpe se dejaron actuando sobre la papelera ENTERA, nunca sobre lo filtrado (el propio botón lo
-> deja dicho cuando hay un filtro puesto): es a propósito, así lo pedía el encargo. Lo escrito se
-> conserva al repintarse la lista (tras devolver o borrar una línea, o si llega un cambio del
-> compañero) envolviendo todo `#bloque-papelera` en `U.conservandoLoEscrito`, aunque la propia caja
-> nunca se destruye al repintar (solo se limpia `#tabla-papelera` por dentro): se ha dejado puesto
-> de todos modos, tal y como pedía el documento, por si algún día el bloque entero se repinta desde
-> fuera. Todo en `js/papelera-ajustes.js`, sin tocar `_GESTOR/papelera.json`: el filtro es solo de
-> pantalla. Prueba nueva `pruebas/papelera-buscador.mjs` (manda tres notas del tablón a la
-> papelera, comprueba que "garcia matricula" deja solo la que toca con el contador en «1 de 3», y
-> que tras «Devolver a su sitio» la caja conserva lo escrito); falla sin el arreglo (no existe
-> `#cuenta-papelera`). Batería completa en verde.
+Resuelto: una sesión con `git push` de verdad pegó la entrada en `docs/HISTORIA.md`. Nada
+pendiente de la fila 172.
