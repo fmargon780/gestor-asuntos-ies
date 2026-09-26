@@ -362,7 +362,9 @@ App.contarAsuntosConTipo = async function (nombreTipo) {
   });
   if (window.IndiceArchivo) {
     try {
-      var resultado = await IndiceArchivo.leerDisco();
+      /* Fila 177: contar los asuntos de un tipo mira todos los cursos
+         archivados, no solo el actual. */
+      var resultado = await IndiceArchivo.leerDisco({ todos: true });
       if (resultado.ok) {
         resultado.datos.asuntos.forEach(function (e) {
           if (e.tipo === nombreTipo) vistos[e.nombre] = true;
