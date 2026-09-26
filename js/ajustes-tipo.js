@@ -150,7 +150,7 @@ function construirSeccionDatos(tipo) {
   if (window.Formularios) {
     var filaFormularios = document.createElement('div');
     filaFormularios.style.marginTop = '10px';
-    filaFormularios.innerHTML = '<label class="etiqueta">Formularios oficiales de este tipo</label>';
+    filaFormularios.innerHTML = '<label class="etiqueta">Impresos de este tipo</label>';
     var contenedorFormularios = document.createElement('div');
     filaFormularios.appendChild(contenedorFormularios);
     b.cuerpo.appendChild(filaFormularios);
@@ -341,14 +341,14 @@ async function construirSeccionCampos(tipo) {
   return b.sec;
 }
 
-/* ---------- 3. Pasos del trámite ---------- */
+/* ---------- 3. Guía ---------- */
 
 function construirSeccionPasos(tipo) {
-  var b = seccionDeTipo('pasos', 'Pasos del trámite', 'La guía del tipo, con sus preguntas y bifurcaciones.');
+  var b = seccionDeTipo('pasos', 'Guía', 'La guía del tipo, con sus preguntas y bifurcaciones.');
 
   /* El aviso de la biblioteca (20-sep-2026, fila 79, apartado 4.4):
      misma clase .aviso-compartido que ya usan los campos compartidos,
-     un aviso por paso desactualizado. */
+     un aviso por hito desactualizado. */
   async function pintarAvisosBiblioteca(pasos) {
     if (!window.GuiasBiblioteca) return;
     var desactualizados;
