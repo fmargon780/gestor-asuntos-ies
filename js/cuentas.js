@@ -258,7 +258,7 @@
     var tipos = (window.App && App.E && App.E.tipos) || [];
     var abiertas = (window.Gestor ? window.Gestor.asuntos() : [])
       .map(function (a) { return entradaAbierta(a, tipos); });
-    var resultado = window.IndiceArchivo ? await IndiceArchivo.leerDisco() : { ok: false };
+    var resultado = window.IndiceArchivo ? await IndiceArchivo.leerDisco({ todos: true }) : { ok: false };
     var archivadas = resultado.ok ? resultado.datos.asuntos.map(entradaArchivada) : [];
     return { entradas: abiertas.concat(archivadas), indiceOk: resultado.ok };
   }

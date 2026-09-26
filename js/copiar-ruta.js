@@ -451,10 +451,16 @@ window.RutaCarpetas = (function () {
 
   ponerBloque();
 
+  /* Lo último leído de `_GESTOR/rutas.json` ({abiertos, archivo}), sin
+     esperar a nada: para cálculos síncronos como Nombres.topes()
+     (fila 177). Puede venir vacío si `cargarComun()` no se ha llamado
+     todavía en esta sesión. */
+  function comunActual() { return comun; }
+
   return {
     leer: leer, guardar: guardar, unir: unir, de: de, boton: boton,
     montarEnCuadro: montarEnCuadro, comoFileUrl: comoFileUrl, ponerBloque: ponerBloque,
     partir: partir, cargarComun: cargarComun, dropboxDeEsteOrdenador: dropboxDeEsteOrdenador,
-    pintarBloque: pintarBloque
+    pintarBloque: pintarBloque, comunActual: comunActual
   };
 })();

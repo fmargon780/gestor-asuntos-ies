@@ -333,6 +333,8 @@
       <header class="cabecera">
         <h2>Archivo</h2>
         <div class="acciones">
+          <!-- Fila 177: el curso académico que se está viendo (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md). -->
+          <select id="archivo-curso" class="campo oculto" title="Curso"></select>
           <input id="buscar-archivo" class="campo" placeholder="Buscar en todo el archivo">
         </div>
       </header>
@@ -823,6 +825,10 @@
      js/asuntos-archivar.js y js/archivo-personas.js, que son quienes
      lo llaman. -->
 <script src="js/archivo-indice.js"></script>
+<!-- Fila 177: recorrer el disco entero para reconstruir el índice,
+     sacado de js/archivo-indice.js (pasaba de 600 líneas). Solo llama a
+     funciones públicas de IndiceArchivo. -->
+<script src="js/archivo-indice-construir.js"></script>
 
 <!-- La comodidad de la pantalla. Va antes que la aplicación, para
      enterarse de los cambios antes de que la pantalla se mueva. -->
@@ -949,6 +955,11 @@
 <!-- Fila 98 (docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md): el botón «Ruta» que
      pone js/ficha-nombre-acciones.js, y su bloque en Ajustes → El centro. -->
 <script src="js/copiar-ruta.js"></script>
+<!-- Fila 177 (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md, punto 2): el hueco para
+     el nombre del asunto y del documento, contando la ruta entera dentro
+     de Dropbox. Va después de js/nombres.js (Nombres.CATEGORIAS) y de
+     js/copiar-ruta.js (RutaCarpetas.comunActual()). -->
+<script src="js/nombres-topes.js"></script>
 <script src="js/ficha-nombre-acciones.js"></script>
 <!-- Los documentos de la carpeta del asunto, separado de
      js/ficha-asunto.js el 17-sep-2026 (fila 26) al quitarle trabajo la

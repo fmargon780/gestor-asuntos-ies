@@ -61,6 +61,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   cuatro dígitos del asiento.
 - **No va en el nombre**: el estado del asunto ni la vía de comunicación (cambian mientras se
   tramita; van en `_GESTOR/asuntos.json`).
+- El tope de largo del nombre (antes fijo, 150/120) cuenta ahora la ruta entera dentro de Dropbox
+  (fila 177, `Nombres.topes()`, `js/nombres-topes.js`): tope total 240.
 
 ## 5. Qué está hecho
 
@@ -75,7 +77,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Asuntos recurrentes, con aviso. Avisos de fichas huérfanas y papelera vieja.
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO (carga solo al entrar, la
   primera vez) y búsqueda por palabras sueltas también en documentos, registro de Séneca, ficha
-  y notas.
+  y notas. Índice partido por curso académico (selector «Curso ▾ · Todos los cursos»); un asunto
+  más solo reescribe el fichero de su curso.
 - Personas (Alumnado): matriculados primero, antiguos plegados; busca por padre, madre o tutor;
   hermanos y sus asuntos en la ficha (se abren pulsando la fila); «+ Nuevo asunto para esta
   persona». La BD de alumnado (carpeta de Drive) suma sus datos:
@@ -97,7 +100,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   memoria) que se pueda aprovechar de lo leído; «Guardar» cierra el cuadro entero. Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero;
   sus adjuntos pasan también por el cuadro de nombre, uno detrás de otro.
-- Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. Carpeta ≤150, documento ≤120.
+- Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. Tope de carpeta y de
+  documento, según la ruta completa dentro de Dropbox (`Nombres.topes()`).
 - Botón «Ruta» (`file:///`; ficha, Correo/Séneca): deduce Dropbox; lo de dentro, una vez para el centro. Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto (foto, cabecera fija) en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.

@@ -104,7 +104,9 @@ var Registro = (function () {
     if (!codigo) return '';
     return Nombres.montarDocumento({
       fecha: estado.previo.fecha, codigo: codigo, tipo: estado.previo.tipo,
-      curso: estado.previo.curso, extension: estado.extension
+      curso: estado.previo.curso, extension: estado.extension,
+      tercero: estado.asunto && estado.asunto.tercero,
+      nombreAsunto: estado.asunto && estado.asunto.nombre
     });
   }
 
@@ -172,7 +174,7 @@ var Registro = (function () {
 
   /* ---------- elegir la copia sellada, y comprobar que se puede ---------- */
 
-  async function prepararEstado(nombreDocumento, carpetaInicio) {
+  async function prepararEstado(nombreDocumento, carpetaInicio, asunto) {
     var previo = Documentos.leerNombre(nombreDocumento);
     if (!previo.fecha || !previo.tipo) {
       U.aviso('Este documento no tiene fecha ni tipo reconocibles en su nombre: no sé qué ' +
@@ -198,7 +200,7 @@ var Registro = (function () {
     estado = {
       nombreOriginal: nombreDocumento, handle: handle,
       previo: previo, extension: Nombres.extensionDe(handle.name),
-      sello: sello
+      sello: sello, asunto: asunto
     };
     return true;
   }
@@ -276,7 +278,7 @@ var Registro = (function () {
      Registrar: no se abre un segundo U.preguntar, porque solo hay
      un cuadro de diálogo en toda la aplicación. */
   async function pintarEnContenedor(caja, asunto, nombreDocumento, alTerminar) {
-    if (!(await prepararEstado(nombreDocumento, asunto.handle))) return;
+    if (!(await prepararEstado(nombreDocumento, asunto.handle, asunto))) return;
 
     caja.innerHTML = camposHtml() +
       '<div class="cuadro-botones">' +
@@ -299,7 +301,7 @@ var Registro = (function () {
      La ficha del asunto enseña sus documentos en la propia pantalla,
      sin ningún cuadro por delante, así que aquí sí se abre uno. */
   async function abrirCuadro(asunto, nombreDocumento, alTerminar) {
-    if (!(await prepararEstado(nombreDocumento, asunto.handle))) return;
+    if (!(await prepararEstado(nombreDocumento, asunto.handle, asunto))) return;
 
     var promesa = U.preguntar('Registrar "' + nombreDocumento + '"', camposHtml(), 'Registrar');
     enganchar();

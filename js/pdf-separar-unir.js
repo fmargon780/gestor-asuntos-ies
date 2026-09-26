@@ -476,7 +476,8 @@ var PdfSepararUnir = (function () {
         fecha: $('pdf-nombre-fecha').value,
         tipo: $('pdf-nombre-tipo').value,
         curso: $('pdf-nombre-curso').value.trim(),
-        extension: 'pdf'
+        extension: 'pdf',
+        tercero: asunto && asunto.tercero, nombreAsunto: asunto && asunto.nombre
       });
     }
     function refrescar() { $('pdf-nombre-vista').textContent = nombrePropuesto() || '(falta la fecha o el tipo)'; }

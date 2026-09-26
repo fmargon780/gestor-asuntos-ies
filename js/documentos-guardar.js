@@ -54,7 +54,11 @@
       tipo: tipo,
       campos: window.DocCampos ? DocCampos.enOrden(N.camposDelTipo(tipo), N.valoresDeCampos()) : [],
       curso: $('doc-curso').value.trim(),
-      extension: Nombres.extensionDe(opciones.nombreActual)
+      extension: Nombres.extensionDe(opciones.nombreActual),
+      /* Fila 177: para el tope de la ruta, con el asunto de verdad (no
+         el peor caso) cuando ya se conoce. */
+      tercero: N.asuntoActual && N.asuntoActual.tercero,
+      nombreAsunto: N.asuntoActual && N.asuntoActual.nombre
     };
   }
 

@@ -144,9 +144,20 @@ var Nombres = (function () {
   /* Fila 130 (docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md): los nombres no
      pasan de un largo seguro (Windows no sincroniza rutas de más de 260
      caracteres). Carpeta de asunto: 150 como mucho; nombre de documento:
-     120, más la extensión. */
+     120, más la extensión. Desde la fila 177
+     (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md), estos son solo el respaldo: si
+     js/nombres-topes.js está cargado, `Nombres.topes()` calcula el hueco
+     de verdad, contando la ruta entera dentro de Dropbox. */
   var TOPE_ASUNTO = 150;
   var TOPE_DOCUMENTO = 120;
+
+  /* `Nombres.topes` lo añade js/nombres-topes.js por fuera (se carga
+     después). Sin él —por ejemplo, en una prueba que no lo cargue—, se
+     siguen usando los fijos de arriba. */
+  function topesDe(opciones) {
+    if (typeof Nombres !== 'undefined' && Nombres.topes) return Nombres.topes(opciones);
+    return { asunto: TOPE_ASUNTO, documento: TOPE_DOCUMENTO };
+  }
 
   function unir(partes) { return U.limpiarNombre(partes.filter(function (p) { return p; }).join(' ')); }
 
@@ -177,7 +188,9 @@ var Nombres = (function () {
     if (datos.grupo) antes.push(U.limpiarNombre(datos.grupo));
     var medio = (datos.campos || []).map(function (v) { return U.limpiarNombre(v); });
     if (datos.descripcion) medio.push(U.limpiarNombre(datos.descripcion));
-    return ajustarAlTope(antes, medio, [U.limpiarNombre(datos.tercero)], TOPE_ASUNTO);
+    var terceroLimpio = U.limpiarNombre(datos.tercero);
+    var tope = topesDe({ tercero: terceroLimpio }).asunto;
+    return ajustarAlTope(antes, medio, [terceroLimpio], tope);
   }
 
   /* ---------- la abreviatura del grupo ----------
@@ -464,7 +477,8 @@ var Nombres = (function () {
        tipo y el texto adicional. */
     var medio = (datos.campos || []).map(function (v) { return U.limpiarNombre(v); });
     if (datos.curso) medio.push(U.limpiarNombre(datos.curso));
-    var r = ajustarAlTope(antes, medio, [], TOPE_DOCUMENTO);
+    var tope = topesDe({ tercero: datos.tercero, nombreAsunto: datos.nombreAsunto }).documento;
+    var r = ajustarAlTope(antes, medio, [], tope);
     var ext = String(datos.extension || '').replace(/[^A-Za-z0-9]/g, '').toLowerCase();
     return { nombre: r.nombre + (ext ? '.' + ext : ''), recortado: r.recortado };
   }

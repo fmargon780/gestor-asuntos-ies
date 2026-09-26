@@ -223,7 +223,8 @@ var FormulariosRellenar = (function () {
     try { resultado = await rellenarPdf(bytesPdf, mapa, valores); }
     catch (e) { U.aviso('No he podido rellenarlo: ' + U.mensajeDeError(e), 'malo'); return; }
 
-    var nombreDoc = Nombres.montarDocumento({ fecha: U.hoyIso(), tipo: 'IMPRESO', curso: f.n, extension: 'pdf' });
+    var nombreDoc = Nombres.montarDocumento({ fecha: U.hoyIso(), tipo: 'IMPRESO', curso: f.n, extension: 'pdf',
+      tercero: asunto && asunto.tercero, nombreAsunto: asunto && asunto.nombre });
     if (nombreDoc.length > App.LARGO_MAXIMO_NOMBRE) {
       U.aviso('El nombre del impreso sale demasiado largo (más de ' + App.LARGO_MAXIMO_NOMBRE + ' letras).', 'malo');
       return;

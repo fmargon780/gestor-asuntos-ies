@@ -256,6 +256,7 @@ var FichaArchivo = (function () {
         'a su propia carpeta la ficha de cada asunto ya archivado que todavía la tenga ahí. No se ' +
         'pierde ningún dato: se copia tal cual, dentro de <code>_ficha.json</code>.</p>' +
         '<div id="fichas-archivo-cuerpo" class="explica">Comprobando…</div>' +
+        '<div id="fichas-archivo-tope" class="oculto"></div>' +
       '</div>';
     pantalla.appendChild(d);
     /* Localizar la carpeta de cada uno es un acceso a disco por
@@ -315,6 +316,31 @@ var FichaArchivo = (function () {
     cuerpo.appendChild(progreso);
   }
 
+  /* Fila 177 (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md, punto 2): cuántas
+     carpetas o documentos del archivo YA pasan del tope de ruta
+     completa, con lo que ya tiene el índice (sin bajar a disco otra
+     vez). Solo avisa; no renombra nada. 0 si falta algo de lo que
+     hace falta (índice, RutaCarpetas o Nombres.topes: por ejemplo, en
+     una prueba que no los cargue). */
+  async function contarFueraDeTope() {
+    if (!window.IndiceArchivo || !window.Nombres || !Nombres.largoRuta) return 0;
+    var r;
+    try { r = await IndiceArchivo.leerDisco({ todos: true }); } catch (e) { return 0; }
+    if (!r.ok) return 0;
+    if (window.RutaCarpetas) { try { await RutaCarpetas.cargarComun(); } catch (e) { /* lo que haya */ } }
+    var tope = Nombres.TOPE_RUTA_TOTAL || 240;
+    var n = 0;
+    (r.datos.asuntos || []).forEach(function (a) {
+      var piezas = String(a.ruta || '').split(' / ').map(function (x) { return x.trim(); }).filter(Boolean);
+      var conAsunto = piezas.concat([a.nombre]);
+      if (Nombres.largoRuta(conAsunto) > tope) n++;
+      (a.documentos || []).forEach(function (doc) {
+        if (Nombres.largoRuta(conAsunto.concat([doc])) > tope) n++;
+      });
+    });
+    return n;
+  }
+
   /* Se llama al pintar Ajustes → Mantenimiento: solo pone el número
      barato en el resumen (sin tocar disco) y, si el bloque ya estaba
      desplegado (por ejemplo, justo después de pulsar "Mover"), vuelve
@@ -327,6 +353,20 @@ var FichaArchivo = (function () {
       ? n + (n === 1 ? ' ficha por poner en orden' : ' fichas por poner en orden')
       : 'Ya está todo en orden';
     if (bloque && bloque.open) await pintarCuerpo();
+
+    var aviso = $('fichas-archivo-tope');
+    if (aviso) {
+      var fuera = await contarFueraDeTope();
+      if (fuera) {
+        aviso.className = 'aviso aviso-ambar';
+        aviso.textContent = fuera + (fuera === 1
+          ? ' carpeta o documento del archivo pasa del tope de ruta.'
+          : ' carpetas o documentos del archivo pasan del tope de ruta.');
+      } else {
+        aviso.className = 'oculto';
+        aviso.textContent = '';
+      }
+    }
   };
 
   return {

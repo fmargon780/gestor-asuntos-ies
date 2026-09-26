@@ -9,6 +9,26 @@
    PANTALLA: ARCHIVO
    ========================================================== */
 
+/* Fila 177 (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md): el curso académico que
+   se está viendo en la pantalla Archivo. null hasta la primera carga
+   (entonces se pone al curso actual); 'todos', para verlos todos. Se
+   recuerda mientras dure la sesión, para que "Actualizar" no vuelva a
+   dejarlo en el curso actual si se había elegido otro. */
+App.E.cursoArchivo = null;
+
+function pintarSelectorCurso(cursos) {
+  var sel = $('archivo-curso');
+  if (!cursos || !cursos.length) { sel.classList.add('oculto'); return; }
+  if (!App.E.cursoArchivo) App.E.cursoArchivo = IndiceArchivo.cursoActual();
+  var elegido = (App.E.cursoArchivo === 'todos' || cursos.indexOf(App.E.cursoArchivo) !== -1)
+    ? App.E.cursoArchivo : cursos[0];
+  App.E.cursoArchivo = elegido;
+  sel.innerHTML = cursos.map(function (c) {
+    return '<option value="' + c + '"' + (c === elegido ? ' selected' : '') + '>Curso: ' + c + '</option>';
+  }).join('') + '<option value="todos"' + (elegido === 'todos' ? ' selected' : '') + '>Todos los cursos</option>';
+  sel.classList.remove('oculto');
+}
+
 /* El índice (`js/archivo-indice.js`) es quien recorre el disco: aquí
    solo se orquesta. Si no hay índice usable (no existe, está roto o
    es de otra versión), se cae al recorrido de disco de siempre —
@@ -23,12 +43,15 @@ App.verArchivo = async function () {
     $('explica-archivo').textContent = 'Leyendo el archivo… ' + nombreCategoria + ' · ' + total + ' asuntos';
   };
 
-  var resultado = await IndiceArchivo.leerDisco();
+  var opciones = App.E.cursoArchivo === 'todos' ? { todos: true }
+    : App.E.cursoArchivo ? { curso: App.E.cursoArchivo } : {};
+  var resultado = await IndiceArchivo.leerDisco(opciones);
   var usable, avisoIndice = '';
   App.E.indiceSinHacer = false;
 
   if (resultado.ok) {
     usable = resultado.datos;
+    pintarSelectorCurso(resultado.cursos);
     try {
       var actual = await IndiceArchivo.recuentoActual();
       if (!IndiceArchivo.recuentosIguales(actual, usable.recuento || {})) {
@@ -39,6 +62,7 @@ App.verArchivo = async function () {
     App.E.indiceSinHacer = true;
     avisoIndice = 'El índice no está hecho.';
     usable = await IndiceArchivo.construir(progreso);
+    $('archivo-curso').classList.add('oculto');
   }
 
   var descolocados = 0;
@@ -171,6 +195,10 @@ U.envolver(App, 'App.verDocumentos', 'archivo-personas.js', function (comoEra) {
 });
 
 $('buscar-archivo').oninput = function () { App.pintarArchivo(); };
+$('archivo-curso').onchange = function () {
+  App.E.cursoArchivo = $('archivo-curso').value;
+  App.verArchivo();
+};
 
 /* Fila 175, punto 3: "Actualizar" y "Reconstruir el índice" pasan al
    menú de tres puntos, a la derecha del buscador. Mismos textos,

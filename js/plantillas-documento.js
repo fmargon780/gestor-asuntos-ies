@@ -49,12 +49,13 @@
      con el tipo de documento y el texto adicional que trae la propia
      plantilla (docs/PLANTILLAS-DE-DOCUMENTO.md, 5.3). Aparte para que
      las pruebas puedan comprobarlo sin generar un documento entero. */
-  function nombreDelDocumentoGenerado(plantillaDoc, fechaIso) {
+  function nombreDelDocumentoGenerado(plantillaDoc, fechaIso, asunto) {
     return Nombres.montarDocumento({
       fecha: fechaIso,
       tipo: plantillaDoc.tipoDocumento || 'DOCUMENTO',
       curso: plantillaDoc.texto || '',
-      extension: 'docx'
+      extension: 'docx',
+      tercero: asunto && asunto.tercero, nombreAsunto: asunto && asunto.nombre
     });
   }
 
@@ -168,7 +169,7 @@
       return;
     }
 
-    var nombreDoc = nombreDelDocumentoGenerado(plantillaDoc, U.hoyIso());
+    var nombreDoc = nombreDelDocumentoGenerado(plantillaDoc, U.hoyIso(), asunto);
     if (nombreDoc.length > App.LARGO_MAXIMO_NOMBRE) {
       U.aviso('El nombre del documento sale demasiado largo (más de ' +
         App.LARGO_MAXIMO_NOMBRE + ' letras). Acorta el texto adicional de la plantilla.', 'malo');

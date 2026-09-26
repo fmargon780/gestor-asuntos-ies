@@ -5,15 +5,38 @@
    Hasta ahora, entrar en la pantalla ARCHIVO recorría el archivo
    entero cada vez (categoría → tercero → asunto) y la búsqueda era
    un `indexOf` sobre un solo texto. Aquí vive el índice que arregla
-   eso: `_GESTOR/indice-archivo.json`, compartido entre los dos
-   ordenadores.
+   eso.
 
-   Igual que `js/presencia.js` con `presencia.json`: se lee y se
-   escribe DIRECTO con `Carpetas`, nunca con `Copias.guardar`. No
-   entra en las copias de seguridad, ni en la papelera, ni en la
-   fusión de conflictos de Dropbox: se puede rehacer entero en
-   cualquier momento con "Reconstruir el índice", así que no hace
-   falta protegerlo como a los catorce ficheros de verdad.
+   Fila 177 (26-sep-2026, docs/ARCHIVO-POR-CURSO-Y-RUTAS.md): con
+   varios miles de asuntos por curso, un solo `_GESTOR/indice-archivo.json`
+   con todos dentro pesaría demasiado, y se reescribía entero cada vez
+   que se archivaba un asunto más. Ahora vive partido:
+
+   - `_GESTOR/indice-archivo.json` es un RESUMEN pequeño:
+     `{ version, hechoEl, cursos: ['2026-27', '2025-26', …], recuento }`.
+     Es lo único que se lee al entrar en Archivo.
+   - `_GESTOR/indice-archivo/<curso>.json` (uno por curso académico,
+     '2026-27', '2025-26'…) lleva la lista de verdad, con la misma
+     forma que antes: `{ version, hechoEl, hechoPor, recuento, asuntos }`.
+   - El curso de un asunto sale de la fecha de su carpeta (AAMMDD): del
+     1 de septiembre al 31 de agosto. `anadirEntrada`/`quitarEntrada` lo
+     calculan del nombre y solo tocan el fichero de ESE curso: archivar
+     ya no reescribe miles de entradas de golpe.
+   - Un `indice-archivo.json` antiguo (con `asuntos` dentro, del formato
+     de antes de esta fila) se migra solo, la primera vez que se lee
+     algo de aquí en la sesión: se parte por curso, y el fichero viejo
+     se aparta a `_GESTOR/copias/indice-archivo-antiguo-AAMMDD.json`. Si
+     el otro ordenador todavía lleva la versión vieja y lo vuelve a
+     escribir en el formato antiguo, la próxima lectura lo vuelve a
+     partir: no se pierde nada, porque el índice siempre se puede
+     reconstruir con "Reconstruir el índice".
+
+   Igual que `js/presencia.js`: se lee y se escribe DIRECTO con
+   `Carpetas`, nunca con `Copias.guardar`. No entra en las copias de
+   seguridad, ni en la papelera, ni en la fusión de conflictos de
+   Dropbox (`js/conflictos.js` la salta, igual que el fichero de antes):
+   se puede rehacer entero en cualquier momento con "Reconstruir el
+   índice".
 
    Antes de escribir, como hace `Grupos.guardar`, se relee el disco y
    se fusiona: el compañero puede haber archivado o reabierto un
@@ -28,6 +51,12 @@
    abajo): tomados de la ficha en memoria al archivar, o releídos de
    `_ficha.json` al reconstruir el índice entero.
 
+   Fila 133 (docs/PARTIR-FICHEROS-GRANDES.md): recorrer el disco entero
+   para reconstruir el índice (`construir`, `recuentoActual`,
+   `recuentosIguales`) vive en js/archivo-indice-construir.js, cargado
+   justo después, y llama a las funciones públicas de aquí
+   (`IndiceArchivo.entradaDe`); no hace falta compartir nada por dentro.
+
    Va cargado después de `js/carpetas.js`, `js/nombres.js` y
    `js/nucleo.js` (usa `App.E`), y antes de `js/asuntos-archivar.js`
    (alta y baja al archivar/reabrir), de `js/archivo-personas.js`
@@ -36,95 +65,285 @@
 var IndiceArchivo = (function () {
 
   var FICHERO = 'indice-archivo.json';
-  /* 2 (19-sep-2026, fila 73, docs/BUSCAR-EN-LAS-NOTAS.md): las
-     entradas ahora llevan también el texto de las notas.
-     3 (19-sep-2026, fila 74, docs/CUENTAS-DE-FIN-DE-CURSO.md): además
-     llevan si el tipo se ha reconocido, quién lo pidió (categoría y
-     relación, para la pantalla "Cuentas") y las fechas de apertura y
-     cierre. Cada subida de VERSION deja sin ellas a un índice viejo,
-     que se reconstruye solo. */
-  var VERSION = 3;
+  var CARPETA = 'indice-archivo';
+  /* 2 (fila 73): el texto de las notas. 3 (fila 74): tipo reconocido,
+     quién lo pidió, fechas de apertura y cierre. 4 (fila 177): el
+     resumen del propio FICHERO cambia de forma (ya no lleva 'asuntos'),
+     y cada curso vive en su propio fichero dentro de CARPETA. Cada
+     subida de VERSION deja sin ellas a un índice viejo, que se
+     reconstruye solo. */
+  var VERSION = 4;
 
   function gestor() { return window.App && App.E && App.E.gestor; }
+  function usuario() { return (window.App && App.E && App.E.usuario) || ''; }
 
   /* ==========================================================
-     LEER Y ESCRIBIR EL FICHERO, DIRECTO (sin Copias.guardar)
+     EL CURSO ACADÉMICO DE UN ASUNTO
      ========================================================== */
 
-  /* { ok: true, datos } si el índice se puede usar; si no,
+  /* Del 1 de septiembre al 31 de agosto, como App.frescura y como
+     Cuentas. 'aammdd' es la fecha de seis cifras que ya guarda el
+     nombre de la carpeta (Nombres.leer(nombre, tipos).fecha). Sin una
+     fecha reconocible (una carpeta hecha a mano, sin las seis cifras
+     delante), al curso actual: hay que meterla en algún fichero, y
+     "actual" es la mejor suposición sin inventar una fecha. */
+  function cursoDeAnoYMes(ano, mes) {
+    var inicio = mes < 9 ? ano - 1 : ano;
+    return inicio + '-' + String((inicio + 1) % 100).padStart(2, '0');
+  }
+
+  function cursoActual() {
+    var hoy = new Date();
+    return cursoDeAnoYMes(hoy.getFullYear(), hoy.getMonth() + 1);
+  }
+
+  function cursoDeAAMMDD(aammdd) {
+    var s = String(aammdd || '');
+    if (!/^\d{6}$/.test(s)) return cursoActual();
+    var ano = 2000 + parseInt(s.slice(0, 2), 10);
+    var mes = parseInt(s.slice(2, 4), 10);
+    if (!mes || mes < 1 || mes > 12) return cursoActual();
+    return cursoDeAnoYMes(ano, mes);
+  }
+
+  function cursoDeEntrada(entrada) {
+    return cursoDeAAMMDD(entrada && entrada.fecha);
+  }
+
+  /* ==========================================================
+     LEER Y ESCRIBIR, DIRECTO (sin Copias.guardar)
+     ========================================================== */
+
+  function carpetaCursos() { return Carpetas.crear(gestor(), CARPETA); }
+
+  async function leerResumenDisco() {
+    var g = gestor();
+    if (!g) return null;
+    try { return await Carpetas.leerJson(g, FICHERO); } catch (e) { return null; }
+  }
+
+  function escribirResumenDisco(datos) {
+    return Carpetas.escribirTexto(gestor(), FICHERO, JSON.stringify(datos));
+  }
+
+  async function leerCursoDisco(curso) {
+    var c = await carpetaCursos();
+    try { return await Carpetas.leerJson(c, curso + '.json'); } catch (e) { return null; }
+  }
+
+  async function escribirCursoDisco(curso, datos) {
+    var c = await carpetaCursos();
+    await Carpetas.escribirTexto(c, curso + '.json', JSON.stringify(datos));
+  }
+
+  function unirPorNombre(a, b) {
+    var vistos = {}, salida = [];
+    (a || []).concat(b || []).forEach(function (e) {
+      if (!e || !e.nombre || vistos[e.nombre]) return;
+      vistos[e.nombre] = true;
+      salida.push(e);
+    });
+    return salida;
+  }
+
+  /* ---------- migración sin manos del formato de antes de la fila 177 ---------- */
+
+  function selloHoy() {
+    var d = new Date();
+    function dos(n) { return String(n).padStart(2, '0'); }
+    return String(d.getFullYear()).slice(2) + dos(d.getMonth() + 1) + dos(d.getDate());
+  }
+
+  var migradoComprobado = false;
+
+  async function asegurarMigrado() {
+    if (migradoComprobado) return;
+    migradoComprobado = true;
+    var g = gestor();
+    if (!g) return;
+    var actual = await leerResumenDisco();
+    if (!actual || !Array.isArray(actual.asuntos)) return;   /* ya es el resumen nuevo, o no hay nada */
+
+    var porCurso = {};
+    actual.asuntos.forEach(function (e) {
+      var curso = cursoDeEntrada(e);
+      (porCurso[curso] = porCurso[curso] || []).push(e);
+    });
+    var cursos = Object.keys(porCurso);
+    for (var i = 0; i < cursos.length; i++) {
+      var c = cursos[i];
+      var yaHabia = await leerCursoDisco(c);
+      await escribirCursoDisco(c, {
+        version: VERSION, hechoEl: actual.hechoEl || U.ahora(), hechoPor: actual.hechoPor || usuario(),
+        recuento: actual.recuento || {}, asuntos: unirPorNombre((yaHabia && yaHabia.asuntos) || [], porCurso[c])
+      });
+    }
+
+    try {
+      var copias = await Carpetas.crear(g, 'copias');
+      await Carpetas.escribirTexto(copias, 'indice-archivo-antiguo-' + selloHoy() + '.json', JSON.stringify(actual));
+    } catch (e) { /* si no se puede copiar, no pasa nada: ya está partido por curso */ }
+
+    await escribirResumenDisco({
+      version: VERSION, hechoEl: actual.hechoEl || U.ahora(),
+      cursos: cursos.sort().reverse(), recuento: actual.recuento || {}
+    });
+  }
+
+  /* ==========================================================
+     LA API PÚBLICA DE LECTURA Y ESCRITURA
+
+     { ok: true, datos } si el índice se puede usar; si no,
      { ok: false, motivo: 'no-existe' | 'roto' | 'version' | 'sin-carpeta' }.
      Los tres primeros motivos se tratan igual en la pantalla: "El
-     índice no está hecho." */
-  async function leerDisco() {
+     índice no está hecho."
+
+     Sin 'opciones', solo el curso actual. `{ curso: '2025-26' }`, ese
+     curso concreto. `{ todos: true }`, todos los cursos juntos (lo
+     necesitan Cuentas, fichas huérfanas, las sugerencias de "Por
+     clasificar", "Repartir un PDF" y el plazo de conservación: miran
+     el archivo entero, no solo el curso que se esté viendo en pantalla).
+     ========================================================== */
+
+  async function leerDisco(opciones) {
     var g = gestor();
     if (!g) return { ok: false, motivo: 'sin-carpeta' };
-    var datos;
-    try { datos = await Carpetas.leerJson(g, FICHERO); }
+    try { await asegurarMigrado(); } catch (e) { /* si falla, se sigue con lo que haya */ }
+
+    var resumen;
+    try { resumen = await leerResumenDisco(); }
     catch (e) { return { ok: false, motivo: 'roto' }; }
-    if (!datos) return { ok: false, motivo: 'no-existe' };
-    if (datos.version !== VERSION || !Array.isArray(datos.asuntos)) {
+    if (!resumen) return { ok: false, motivo: 'no-existe' };
+    if (resumen.version !== VERSION || !Array.isArray(resumen.cursos)) {
       return { ok: false, motivo: 'version' };
     }
-    return { ok: true, datos: datos };
+
+    var cursos = (opciones && opciones.todos) ? resumen.cursos.slice()
+      : [(opciones && opciones.curso) || cursoActual()];
+
+    var asuntos = [];
+    var hechoEl = resumen.hechoEl, hechoPor = '';
+    for (var i = 0; i < cursos.length; i++) {
+      if (resumen.cursos.indexOf(cursos[i]) === -1) continue;   /* ese curso no tiene nada archivado */
+      var datos;
+      try { datos = await leerCursoDisco(cursos[i]); } catch (e) { datos = null; }
+      if (!datos || !Array.isArray(datos.asuntos)) continue;
+      asuntos = asuntos.concat(datos.asuntos);
+      hechoPor = datos.hechoPor || hechoPor;
+    }
+
+    return {
+      ok: true,
+      datos: { version: VERSION, hechoEl: hechoEl, hechoPor: hechoPor, recuento: resumen.recuento || {}, asuntos: asuntos },
+      cursos: resumen.cursos.slice()
+    };
   }
 
-  function escribirDisco(datos) {
-    var g = gestor();
-    if (!g) return Promise.resolve();
-    return Carpetas.escribirTexto(g, FICHERO, JSON.stringify(datos));
-  }
-
-  /* Guarda un índice recién reconstruido ENTERO: relee el disco y
-     fusiona por nombre de carpeta de asunto, como Grupos.guardar. Lo
-     que haya en disco y no esté en lo recién construido (el compañero
-     archivó algo mientras tanto) se suma. */
-  /* Fila 130 (docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md): los tres que
-     escriben el índice, en fila con los demás guardados de este fichero. */
-  function enFila(fn) { return window.ColaGuardado ? ColaGuardado.poner(FICHERO, fn) : fn(); }
-
-  function guardar(datos) { return enFila(function () { return guardarYa(datos); }); }
-  function anadirEntrada(entrada) { return enFila(function () { return anadirEntradaYa(entrada); }); }
-  function quitarEntrada(nombre) { return enFila(function () { return quitarEntradaYa(nombre); }); }
-
-  async function guardarYa(datos) {
-    var previo = null;
-    try { previo = await Carpetas.leerJson(gestor(), FICHERO); } catch (e) { previo = null; }
-    var deDisco = (previo && Array.isArray(previo.asuntos)) ? previo.asuntos : [];
+  async function guardarCursoYa(curso, entradasNuevas, datos) {
+    var yaHabia = await leerCursoDisco(curso);
+    var deDisco = (yaHabia && yaHabia.asuntos) || [];
     var claves = {};
-    datos.asuntos.forEach(function (a) { claves[a.nombre] = true; });
+    entradasNuevas.forEach(function (a) { claves[a.nombre] = true; });
     var extra = deDisco.filter(function (a) { return !claves[a.nombre]; });
-    datos.asuntos = datos.asuntos.concat(extra);
-    await escribirDisco(datos);
+    await escribirCursoDisco(curso, {
+      version: VERSION, hechoEl: datos.hechoEl, hechoPor: datos.hechoPor,
+      recuento: datos.recuento, asuntos: entradasNuevas.concat(extra)
+    });
+  }
+
+  /* Guarda un índice recién reconstruido ENTERO (js/archivo-indice-
+     construir.js, "Reconstruir el índice"): parte 'datos.asuntos' por
+     curso y escribe cada fichero, más el resumen. Cada curso se funde
+     con lo que ya hubiera en su fichero, por si el compañero archivó
+     algo mientras se reconstruía (el mismo cuidado que antes de la
+     fila 177, ahora curso a curso). */
+  async function guardar(datos) {
+    var porCurso = {};
+    (datos.asuntos || []).forEach(function (e) {
+      var curso = cursoDeEntrada(e);
+      (porCurso[curso] = porCurso[curso] || []).push(e);
+    });
+    var cursos = Object.keys(porCurso);
+    for (var i = 0; i < cursos.length; i++) {
+      var c = cursos[i];
+      /* En la cola de ESE curso: para no pisar un anadirEntrada/
+         quitarEntrada del mismo curso que llegue justo mientras dura
+         la reconstrucción entera (que puede tardar). */
+      await enFila(function () { return guardarCursoYa(c, porCurso[c], datos); }, c);
+    }
+    /* Un curso que ya no tiene ningún asunto (el único que había se ha
+       vuelto a abrir justo antes de reconstruir) sigue en 'cursos' si
+       su fichero sigue existiendo con algo dentro: no se borra nada
+       aquí, "Reconstruir" no quita cursos, solo los pone al día. */
+    var resumenViejo = await leerResumenDisco();
+    var todos = {};
+    (resumenViejo && Array.isArray(resumenViejo.cursos) ? resumenViejo.cursos : []).forEach(function (c) { todos[c] = true; });
+    cursos.forEach(function (c) { todos[c] = true; });
+    await escribirResumenDisco({
+      version: VERSION, hechoEl: datos.hechoEl, cursos: Object.keys(todos).sort().reverse(), recuento: datos.recuento
+    });
     return datos;
   }
 
   /* Añade (o sustituye, si ya estaba) una sola entrada, sin tocar el
-     resto: para cuando se archiva un asunto (punto 6.3 del encargo).
-     Si el índice todavía no existe, no se crea uno a medias: se
-     queda sin hacer nada, como pide el encargo. */
+     resto: para cuando se archiva un asunto. Solo reescribe el fichero
+     de SU curso. Si el índice todavía no existe (el resumen no está
+     hecho), no se crea uno a medias: se queda sin hacer nada, como
+     pedía siempre el encargo. */
+  function anadirEntrada(entrada) {
+    return enFila(function () { return anadirEntradaYa(entrada); }, cursoDeEntrada(entrada));
+  }
+  function quitarEntrada(nombre) {
+    return enFila(function () { return quitarEntradaYa(nombre); }, cursoDeAAMMDD(String(nombre || '').slice(0, 6)));
+  }
+
+  /* Fila 130 (docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md): en fila con los
+     demás guardados de este fichero. Como ahora cada anadir/quitar toca
+     un curso distinto, la clave de la cola es el propio nombre del
+     fichero de curso: dos altas de cursos distintos no se esperan
+     entre sí. */
+  function enFila(fn, clave) {
+    return window.ColaGuardado ? ColaGuardado.poner('indice-archivo:' + (clave || ''), fn) : fn();
+  }
+
   async function anadirEntradaYa(entrada) {
     var g = gestor();
     if (!g) return;
-    var previo = null;
-    try { previo = await Carpetas.leerJson(g, FICHERO); } catch (e) { previo = null; }
-    if (!previo || !Array.isArray(previo.asuntos)) return;
-    previo.asuntos = previo.asuntos.filter(function (a) { return a.nombre !== entrada.nombre; });
-    previo.asuntos.push(entrada);
-    await escribirDisco(previo);
+    try { await asegurarMigrado(); } catch (e) { /* se sigue igual */ }
+    var resumen = await leerResumenDisco();
+    if (!resumen || !Array.isArray(resumen.cursos)) return;   /* el índice no está hecho: no se crea a medias */
+    var curso = cursoDeEntrada(entrada);
+
+    var previo = await leerCursoDisco(curso);
+    var asuntos = (previo && Array.isArray(previo.asuntos)) ? previo.asuntos : [];
+    asuntos = asuntos.filter(function (a) { return a.nombre !== entrada.nombre; });
+    asuntos.push(entrada);
+    await escribirCursoDisco(curso, {
+      version: VERSION, hechoEl: (previo && previo.hechoEl) || resumen.hechoEl || U.ahora(),
+      hechoPor: (previo && previo.hechoPor) || usuario(), recuento: resumen.recuento || {}, asuntos: asuntos
+    });
+
+    if (resumen.cursos.indexOf(curso) === -1) {
+      resumen.cursos.push(curso);
+      resumen.cursos.sort().reverse();
+      await escribirResumenDisco(resumen);
+    }
   }
 
   /* Quita una entrada por el nombre de su carpeta: para cuando se
-     reabre un asunto. Igual de silencioso si el índice no existe. */
+     reabre un asunto. El curso sale del propio nombre (misma cuenta
+     que al archivar): no hace falta buscar en todos los ficheros. */
   async function quitarEntradaYa(nombre) {
     var g = gestor();
     if (!g) return;
-    var previo = null;
-    try { previo = await Carpetas.leerJson(g, FICHERO); } catch (e) { previo = null; }
+    try { await asegurarMigrado(); } catch (e) { /* se sigue igual */ }
+    var curso = cursoDeAAMMDD(String(nombre || '').slice(0, 6));
+    var previo = await leerCursoDisco(curso);
     if (!previo || !Array.isArray(previo.asuntos)) return;
     var antes = previo.asuntos.length;
     previo.asuntos = previo.asuntos.filter(function (a) { return a.nombre !== nombre; });
-    if (previo.asuntos.length === antes) return;   /* no estaba: nada que escribir */
-    await escribirDisco(previo);
+    if (previo.asuntos.length === antes) return;   /* no estaba ahí: nada que escribir */
+    await escribirCursoDisco(curso, previo);
   }
 
   /* ==========================================================
@@ -237,129 +456,6 @@ var IndiceArchivo = (function () {
   }
 
   /* ==========================================================
-     RECORRER EL ARCHIVO ENTERO (construir el índice, o el
-     recuento barato para saber si se ha quedado corto)
-     ========================================================== */
-
-  /* ¿Esta carpeta, justo debajo de la categoría o de un tercero, es
-     un asunto (tiene fecha y tipo) en vez de una carpeta normal? El
-     mismo criterio para los dos casos descolocados del punto 5. */
-  function pareceAsunto(nombreCarpeta, tipos) {
-    var leido = Nombres.leer(nombreCarpeta, tipos);
-    return !!(leido.fecha && leido.tipo);
-  }
-
-  /* Recorre el archivo entero UNA VEZ y devuelve el índice completo,
-     sin guardarlo. `onProgreso(nombreCategoria, totalHastaAhora)` se
-     llama al terminar cada categoría, para la línea de estado. */
-  async function construir(onProgreso) {
-    var archivo = App.E.archivo;
-    var tipos = App.E.tipos;
-    var categorias = await Carpetas.subcarpetas(archivo);
-    var asuntos = [];
-    var recuento = {};
-
-    for (var i = 0; i < categorias.length; i++) {
-      var cat = categorias[i];
-      if (Carpetas.esCarpetaTemporalDeSincronizacion(cat.nombre)) continue;
-      var nivel2 = await Carpetas.subcarpetas(cat.handle);
-      var contadorTerceros = 0;
-
-      for (var j = 0; j < nivel2.length; j++) {
-        var item2 = nivel2[j];
-        if (Carpetas.esCarpetaTemporalDeSincronizacion(item2.nombre)) continue;
-
-        if (pareceAsunto(item2.nombre, tipos)) {
-          /* Un asunto archivado a mano justo debajo de la categoría
-             (punto 5.1 del encargo): tercero vacío. */
-          asuntos.push(await entradaDe(
-            item2.handle, item2.nombre, cat.nombre, '', cat.nombre, 'bajo la categoría', tipos));
-          continue;
-        }
-
-        contadorTerceros++;
-        var nivel3 = await Carpetas.subcarpetas(item2.handle);
-        var rutaTercero = cat.nombre + ' / ' + item2.nombre;
-
-        for (var k = 0; k < nivel3.length; k++) {
-          var item3 = nivel3[k];
-          if (Carpetas.esCarpetaTemporalDeSincronizacion(item3.nombre)) continue;
-
-          if (pareceAsunto(item3.nombre, tipos)) {
-            asuntos.push(await entradaDe(
-              item3.handle, item3.nombre, cat.nombre, item2.nombre, rutaTercero, '', tipos));
-            continue;
-          }
-
-          /* No parece un asunto: puede ser una carpeta de más que
-             esconde el asunto un nivel más adentro (punto 5.2). Se
-             mira un nivel más antes de rendirse. */
-          var nivel4 = await Carpetas.subcarpetas(item3.handle);
-          var huboAlguno = false;
-          var rutaExtra = rutaTercero + ' / ' + item3.nombre;
-          for (var m = 0; m < nivel4.length; m++) {
-            var item4 = nivel4[m];
-            if (Carpetas.esCarpetaTemporalDeSincronizacion(item4.nombre)) continue;
-            if (pareceAsunto(item4.nombre, tipos)) {
-              huboAlguno = true;
-              asuntos.push(await entradaDe(
-                item4.handle, item4.nombre, cat.nombre, item2.nombre, rutaExtra, rutaExtra, tipos));
-            }
-          }
-          if (!huboAlguno) {
-            /* Ni lo uno ni lo otro: se enseña igual, como hacía el
-               recorrido de siempre (que tampoco miraba el nombre). */
-            asuntos.push(await entradaDe(
-              item3.handle, item3.nombre, cat.nombre, item2.nombre, rutaTercero, '', tipos));
-          }
-        }
-      }
-
-      recuento[cat.nombre] = contadorTerceros;
-      if (onProgreso) onProgreso(cat.nombre, asuntos.length);
-    }
-
-    return {
-      version: VERSION, hechoEl: U.ahora(), hechoPor: (App.E && App.E.usuario) || '',
-      recuento: recuento, asuntos: asuntos
-    };
-  }
-
-  /* El recuento de ahora mismo, barato: solo categorías y carpetas de
-     tercero (un nivel), sin entrar en los asuntos. Para el punto 6.2:
-     si no cuadra con el `recuento` guardado, el índice puede haberse
-     quedado corto. */
-  async function recuentoActual() {
-    var archivo = App.E.archivo;
-    var tipos = App.E.tipos;
-    var categorias = await Carpetas.subcarpetas(archivo);
-    var recuento = {};
-    for (var i = 0; i < categorias.length; i++) {
-      var cat = categorias[i];
-      if (Carpetas.esCarpetaTemporalDeSincronizacion(cat.nombre)) continue;
-      var nivel2 = await Carpetas.subcarpetas(cat.handle);
-      var n = 0;
-      for (var j = 0; j < nivel2.length; j++) {
-        var item2 = nivel2[j];
-        if (Carpetas.esCarpetaTemporalDeSincronizacion(item2.nombre)) continue;
-        if (!pareceAsunto(item2.nombre, tipos)) n++;
-      }
-      recuento[cat.nombre] = n;
-    }
-    return recuento;
-  }
-
-  function recuentosIguales(a, b) {
-    a = a || {}; b = b || {};
-    var clavesA = Object.keys(a), clavesB = Object.keys(b);
-    if (clavesA.length !== clavesB.length) return false;
-    for (var i = 0; i < clavesA.length; i++) {
-      if ((a[clavesA[i]] || 0) !== (b[clavesA[i]] || 0)) return false;
-    }
-    return true;
-  }
-
-  /* ==========================================================
      EL TEXTO DE BÚSQUEDA DE UNA ENTRADA (punto 7 del encargo)
      ========================================================== */
 
@@ -424,11 +520,11 @@ var IndiceArchivo = (function () {
   }
 
   return {
-    FICHERO: FICHERO, VERSION: VERSION,
+    FICHERO: FICHERO, CARPETA: CARPETA, VERSION: VERSION,
+    cursoActual: cursoActual, cursoDeAAMMDD: cursoDeAAMMDD, cursoDeEntrada: cursoDeEntrada,
     leerDisco: leerDisco, guardar: guardar,
     anadirEntrada: anadirEntrada, quitarEntrada: quitarEntrada,
-    entradaDe: entradaDe, construir: construir,
-    recuentoActual: recuentoActual, recuentosIguales: recuentosIguales,
+    entradaDe: entradaDe,
     textoDeBusqueda: textoDeBusqueda, resolverHandle: resolverHandle
   };
 })();

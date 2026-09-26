@@ -5,6 +5,32 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 26-sep-2026 — Fila 177: el índice del archivo, por curso; y el largo de la ruta completa
+
+`docs/ARCHIVO-POR-CURSO-Y-RUTAS.md`. Dos cosas sin relación entre sí, del mismo encargo.
+
+1. **El índice del ARCHIVO se parte por curso académico**: `_GESTOR/indice-archivo.json` pasa a ser
+   un resumen pequeño (`{ version, hechoEl, cursos, recuento }`); la lista de verdad vive en
+   `_GESTOR/indice-archivo/<curso>.json`, uno por curso (`js/archivo-indice.js`,
+   `IndiceArchivo.leerDisco(opciones)`: sin opciones, el curso actual; `{todos:true}`, todos).
+   `anadirEntrada`/`quitarEntrada` solo reescriben el fichero de SU curso (cola de `ColaGuardado`
+   por `'indice-archivo:' + curso`): archivar un asunto más ya no reescribe miles de entradas de
+   golpe. Un índice viejo (con `asuntos` dentro) se migra solo la primera vez que se lee, y el
+   fichero viejo se aparta a `copias/indice-archivo-antiguo-AAMMDD.json`. `js/archivo-personas.js`
+   añade el desplegable «Curso ▾ · Todos los cursos» delante del buscador del ARCHIVO.
+2. **El tope de largo del nombre cuenta la ruta completa**: hasta ahora `TOPE_ASUNTO=150` y
+   `TOPE_DOCUMENTO=120` (fila 130) solo miraban el nombre. `js/nombres-topes.js`
+   (`Nombres.topes({tercero, nombreAsunto})`) calcula el hueco de verdad sumando la raíz de Dropbox
+   en este ordenador, lo de dentro de Dropbox hasta el ARCHIVO (`_GESTOR/rutas.json`, ya guardado
+   desde la fila 161), la categoría más larga, el tercero y, para el documento, la subcarpeta
+   "Versiones previas"; tope total 240. `Nombres.montarAsunto`/`montarDocumentoAjustado` lo usan si
+   está cargado, y si no, siguen con los fijos de antes (quedan de respaldo). En Ajustes →
+   Mantenimiento, bajo "Poner en orden las fichas del ARCHIVO", un aviso ámbar dice cuántas
+   carpetas o documentos YA pasan del tope, calculado con el índice; solo avisa, no renombra nada.
+   No se cambia ninguna carpeta ni nombre ya existente.
+
+Se comprueba sin navegador en `pruebas/archivo-por-curso-y-rutas.mjs`.
+
 ## 26-sep-2026 — Fila 176: los datos no se pisan entre ordenadores
 
 `docs/DATOS-ENTRE-ORDENADORES.md`, primera parte de la «tanda de estabilidad» (análisis de Claude

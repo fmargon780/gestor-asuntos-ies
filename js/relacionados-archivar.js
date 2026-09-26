@@ -142,7 +142,7 @@
 
     if (window.IndiceArchivo) {
       try {
-        var resultado = await IndiceArchivo.leerDisco();
+        var resultado = await IndiceArchivo.leerDisco({ todos: true });
         if (resultado.ok) {
           resultado.datos.asuntos.forEach(function (e) {
             if ((e.relacionados || []).some(esDeEsta)) salida.push({ nombre: e.nombre, archivado: true });
