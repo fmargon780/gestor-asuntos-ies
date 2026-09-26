@@ -481,7 +481,7 @@ await comprobar('se guarda el descarte, con quién lo hizo y los dos nombres', l
       return j.descartados[0].el;
     }),
     por: 'Francisco'
-  }] });
+  }], _esquema: 1 /* fila 178 */ });
 
 await pagina.click('#dup-pantalla-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
@@ -524,7 +524,7 @@ await comprobar('Ajustes lista el grupo descartado, con sus dos nombres',
 
 await pagina.getByRole('button', { name: 'Volver a avisar', exact: true }).click();
 await pagina.waitForTimeout(300);
-await comprobar('ya no queda ningún descarte', leerJson('no-duplicados.json'), { descartados: [] });
+await comprobar('ya no queda ningún descarte', leerJson('no-duplicados.json'), { descartados: [], _esquema: 1 /* fila 178 */ });
 await comprobar('y Ajustes lo dice',
   pagina.locator('#tabla-duplicados-descartados .vacio').textContent(), 'Ninguno.');
 
