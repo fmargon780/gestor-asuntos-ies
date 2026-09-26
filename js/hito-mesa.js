@@ -222,7 +222,7 @@ var HitoMesa = (function () {
     var cab = fila.querySelector(':scope > .hito-cuerpo > .mesa-cabecera');
     if (!cab || !h) return;
     var visibles = Hitos.visibles(hitos).filter(function (x) { return x.estado !== 'noaplica' && !x.delTipoAnterior; });
-    /* Fila 154: los números, con la misma cuenta que «Paso N de M» y la
+    /* Fila 154: los números, con la misma cuenta que «Hito N de M» y la
        pestaña «Hitos N/M» (sin los «solo informativo», que en la tira
        salen sin número). */
     var numerados = Hitos.numerados ? Hitos.numerados(hitos) : visibles;
@@ -272,7 +272,7 @@ var HitoMesa = (function () {
         '<div class="mesa-acciones">' +
           (abierto ? '<div class="mesa-desplegable"><button type="button" class="boton mesa-abrir-panel" data-panel="generar" aria-expanded="false">Generar documento ▾</button>' +
             '<div class="mesa-panel mesa-panel-generar oculto"><div class="mesa-plantillas"></div>' +
-            (window.Formularios ? Formularios.listaHTML(h.formularios, 'Formularios oficiales') : '') + '</div></div>' : '') +
+            (window.Formularios ? Formularios.listaHTML(h.formularios, 'Impresos') : '') + '</div></div>' : '') +
           (abierto && !decision ? '<div class="mesa-desplegable"><button type="button" class="boton mesa-abrir-panel" data-panel="comunicar" aria-expanded="false">Comunicar ▾</button>' +
             '<div class="mesa-panel mesa-panel-comunicar oculto"><div class="mesa-destinatarios"></div></div></div>' : '') +
           (abierto && !decision ? '<button type="button" class="boton mesa-registrar" title="Registrar un documento de este hito">Registrar</button>' : '') +
@@ -347,7 +347,7 @@ var HitoMesa = (function () {
     var mas = cab.querySelector('.mesa-mas');
     var opcionesMas = [];
     /* Fila 129: dar por hechos los anteriores (js/estado-hito.js). */
-    if (window.EstadoHito && EstadoHito.puedeSituar(hitos, h.id)) opcionesMas.push({ texto: 'Saltar a este paso…', clase: 'mesa-situar', alPulsar: function () {
+    if (window.EstadoHito && EstadoHito.puedeSituar(hitos, h.id)) opcionesMas.push({ texto: 'Saltar a este hito…', clase: 'mesa-situar', alPulsar: function () {
       EstadoHito.situar(a, h.id, mas);
     } });
     opcionesMas.push({ texto: h.soloInformativo ? 'Pedírmelo a mí' : 'Dejarlo solo informativo', alPulsar: function () {
@@ -355,7 +355,7 @@ var HitoMesa = (function () {
     } });
     /* Fila 145: lo que había debajo del guion y al pie de la mesa. */
     if (window.HitoMesaGuion && HitoMesaGuion.puedeAnadirALaGuia && HitoMesaGuion.puedeAnadirALaGuia(a, h)) {
-      opcionesMas.push({ texto: '+ Añadir un paso a la guía del tipo', clase: 'mesa-anadir-guia', alPulsar: function () { HitoMesaGuion.anadirALaGuia(a, h); } });
+      opcionesMas.push({ texto: '+ Añadir un hito a la guía del tipo', clase: 'mesa-anadir-guia', alPulsar: function () { HitoMesaGuion.anadirALaGuia(a, h); } });
     }
     if (window.GuiasDelCentro && GuiasDelCentro.escribir) opcionesMas.push({ texto: 'Cambiar la guía…', clase: 'mesa-cambiar-guia', alPulsar: function () { cambiarLaGuia(a); } });
     if (mas) FichaMenus.montar(mas, opcionesMas.concat([
@@ -367,9 +367,9 @@ var HitoMesa = (function () {
   }
 
   /* Fila 154 (docs/HITOS-ACCIONES-EN-EL-HITO.md): «Registrar» en la
-     cabecera, en vez de en un paso del guion. Con un solo documento sin
+     cabecera, en vez de en una tarea del guion. Con un solo documento sin
      registrar, lo registra; con varios, pregunta cuál; sin ninguno, lo
-     dice. Lo mismo que «Registrar» del ⋯ de un documento (marca el paso
+     dice. Lo mismo que «Registrar» del ⋯ de un documento (marca la tarea
      del guion con acción `registrar`). */
   function engancharRegistrar(boton, a, h) {
     if (!boton) return;
@@ -380,12 +380,12 @@ var HitoMesa = (function () {
       abrirTarjeta('docs');
       if (window.HitosDocumentoMenu && HitosDocumentoMenu.registrar) HitosDocumentoMenu.registrar(a, h, nombre);
     }
-    /* Fila 164: los pasos pendientes con receta de registrar, como título del menú. */
+    /* Fila 164: las tareas pendientes con receta de registrar, como título del menú. */
     var pasos = window.HitoMesaRecetas ? HitoMesaRecetas.pendientes(a, h, 'registrar') : [];
     if ((sin.length > 1 || (sin.length && pasos.length)) && window.FichaMenus) {
       FichaMenus.montar(boton, pasos.map(function (g) {
         var sentido = g.receta && g.receta.sentido ? ' (' + g.receta.sentido + ')' : '';
-        return { texto: 'Paso: ' + g.texto + sentido, deshabilitado: true, clase: 'mesa-registrar-paso', alPulsar: function () {} };
+        return { texto: 'Tarea: ' + g.texto + sentido, deshabilitado: true, clase: 'mesa-registrar-paso', alPulsar: function () {} };
       }).concat(pasos.length ? [{ raya: true }] : []).concat(sin.map(function (n) { return { texto: n, alPulsar: function () { registrar(n); } }; })));
       return;
     }
@@ -410,7 +410,7 @@ var HitoMesa = (function () {
 
   /* ---------- los dos desplegables de la cabecera (fila 145) ----------
 
-     «Generar documento ▾» (plantillas del paso y del tipo, «Buscar otra
+     «Generar documento ▾» (plantillas de la tarea y del tipo, «Buscar otra
      plantilla…» y formularios: las rellena js/hito-mesa-documentos.js) y
      «Comunicar ▾» (js/hito-mesa-comunicar.js). Van dentro de la página,
      no son un U.preguntar. Uno solo abierto; se cierran con Escape
