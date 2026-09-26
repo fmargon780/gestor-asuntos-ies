@@ -4,7 +4,16 @@
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs, como
    pruebas/archivar-atascos.mjs. Los nueve escenarios son los de la
-   sección 9 del documento. */
+   sección 9 del documento.
+
+   Fila 177 (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md): desde que el índice se
+   parte por curso académico, la vista de "Archivo" por defecto solo
+   enseña el curso ACTUAL. Los cuatro asuntos de esta prueba llevan
+   fechas dentro de ese mismo curso (nunca escritas a mano: se calculan
+   a partir de `U.cursoActual()`, que es la misma cuenta que usa la
+   aplicación, para que la prueba siga valiendo pase el tiempo que
+   pase), bien lejos del 1 de septiembre y del 31 de agosto para que
+   ningún desfase las empuje al curso de al lado. */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
@@ -46,10 +55,23 @@ async function explicaArchivo() {
   return pagina.evaluate(() => document.getElementById('explica-archivo').textContent);
 }
 
-async function nombresIndiceDeDisco() {
-  return pagina.evaluate(async () => {
-    var d = await window.Carpetas.leerJson(window.App.E.gestor, window.IndiceArchivo.FICHERO);
+/* Fila 177: el índice de verdad vive en `indice-archivo/<curso>.json`,
+   uno por curso; sin `curso`, el actual (el mismo con el que se han
+   creado los asuntos de esta prueba). */
+async function nombresIndiceDeDisco(curso) {
+  return pagina.evaluate(async (curso) => {
+    var carpeta = await window.App.E.gestor.getDirectoryHandle(window.IndiceArchivo.CARPETA).catch(function () { return null; });
+    if (!carpeta) return null;
+    var d = await window.Carpetas.leerJson(carpeta, (curso || window.__cursoActual) + '.json');
     return d ? d.asuntos.map(function (a) { return a.nombre; }).sort() : null;
+  }, curso);
+}
+
+/* El resumen pequeño de la raíz (`indice-archivo.json`): recuento y
+   lista de cursos. */
+async function leerResumenDeDisco() {
+  return pagina.evaluate(async () => {
+    return await window.Carpetas.leerJson(window.App.E.gestor, window.IndiceArchivo.FICHERO_RESUMEN);
   });
 }
 
@@ -70,13 +92,39 @@ await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
 await pagina.waitForTimeout(300);
 
-/* ---------- el archivo de mentira: dos categorías, varios asuntos ---------- */
-const NOMBRE_1 = '250915 MATRICULA 25-26 Perez Perez, Ana 1234567';
-const NOMBRE_2 = '250801 CERTIFICADO 25-26 Otro Tercero 7654321';
-const NOMBRE_3 = '250601 CONTRATO 25-26 Ruiz Soto, Pedro 1112';
-const NOMBRE_SUELTO = '250501 BECA 25-26 Suelto Directo';
+/* ---------- fechas del curso actual, calculadas, nunca a mano ----------
 
-await pagina.evaluate(async ([n1, n2, n3, n4]) => {
+   `U.cursoActual()` es la cuenta de verdad de la aplicación (1 de
+   septiembre a 31 de agosto). De ahí sale el año en que empieza el
+   curso, y las cuatro fechas de la prueba van todas entre el 15 de
+   noviembre y el 20 de febrero de ese curso: lejos de los dos bordes
+   (1-sep y 31-ago), así que ningún desfase de "hoy" las cambia de
+   curso. */
+const cursoActualTexto = await pagina.evaluate(() => window.U.cursoActual());
+const anioInicioCurso = 2000 + parseInt(cursoActualTexto.slice(0, 2), 10);
+await pagina.evaluate((c) => { window.__cursoActual = c; }, cursoActualTexto);
+
+function aammdd(d) {
+  const dos = (n) => String(n).padStart(2, '0');
+  return String(d.getFullYear()).slice(2) + dos(d.getMonth() + 1) + dos(d.getDate());
+}
+const FECHA_SUELTO = aammdd(new Date(anioInicioCurso, 10, 15));       // 15-nov
+const FECHA_3 = aammdd(new Date(anioInicioCurso, 11, 15));            // 15-dic
+const FECHA_2 = aammdd(new Date(anioInicioCurso + 1, 0, 15));         // 15-ene
+const FECHA_1 = aammdd(new Date(anioInicioCurso + 1, 1, 15));         // 15-feb
+const FECHA_5 = aammdd(new Date(anioInicioCurso + 1, 1, 20));         // 20-feb
+
+/* ---------- el archivo de mentira: dos categorías, varios asuntos ---------- */
+const NOMBRE_1 = FECHA_1 + ' MATRICULA ' + cursoActualTexto + ' Perez Perez, Ana 1234567';
+const NOMBRE_2 = FECHA_2 + ' CERTIFICADO ' + cursoActualTexto + ' Otro Tercero 7654321';
+const NOMBRE_3 = FECHA_3 + ' CONTRATO ' + cursoActualTexto + ' Ruiz Soto, Pedro 1112';
+const NOMBRE_SUELTO = FECHA_SUELTO + ' BECA ' + cursoActualTexto + ' Suelto Directo';
+/* Una marca que no es "2025" a pelo, para que el escenario 2 (buscar
+   por un texto que solo está en el nombre de un documento) no dependa
+   de un año fijo: el año de la fecha del asunto principal (FECHA_1). */
+const ANIO_INFORME = String(anioInicioCurso + 1);
+
+await pagina.evaluate(async ([n1, n2, n3, n4, fecha1, fecha2, fecha3, fechaSuelto, anioInforme]) => {
   async function crearAsunto(categoria, tercero, nombreAsunto, documentos) {
     var cat = await window.__disco.archivo.getDirectoryHandle(categoria, { create: true });
     var padre = tercero ? await cat.getDirectoryHandle(tercero, { create: true }) : cat;
@@ -87,11 +135,11 @@ await pagina.evaluate(async ([n1, n2, n3, n4]) => {
   window.__crearAsunto = crearAsunto;
 
   await crearAsunto('ALUMNADO', 'Perez Perez, Ana 1234567', n1,
-    ['250915 26EM1234 SOLICITUD.pdf', '250915 INFORME CURSO 2025.pdf']);
-  var asuntoN2 = await crearAsunto('ALUMNADO', 'Otro Tercero 7654321', n2, ['250801 CERTIFICADO.pdf']);
-  await crearAsunto('PERSONAL', 'Ruiz Soto, Pedro 1112', n3, ['250601 CONTRATO.pdf']);
+    [fecha1 + ' 26EM1234 SOLICITUD.pdf', fecha1 + ' INFORME CURSO ' + anioInforme + '.pdf']);
+  var asuntoN2 = await crearAsunto('ALUMNADO', 'Otro Tercero 7654321', n2, [fecha2 + ' CERTIFICADO.pdf']);
+  await crearAsunto('PERSONAL', 'Ruiz Soto, Pedro 1112', n3, [fecha3 + ' CONTRATO.pdf']);
   /* escenario 6: un asunto colocado directamente bajo la categoría */
-  await crearAsunto('ALUMNADO', '', n4, ['250501 BECA.pdf']);
+  await crearAsunto('ALUMNADO', '', n4, [fechaSuelto + ' BECA.pdf']);
 
   /* escenario 4: un relacionado que solo vive en la ficha, no en el
      nombre de la carpeta. Desde la fila 64
@@ -103,7 +151,7 @@ await pagina.evaluate(async ([n1, n2, n3, n4]) => {
     estado: 'cerrado', categoria: 'ALUMNADO', tercero: 'Otro Tercero 7654321',
     relacionados: [{ categoria: 'PERSONAL', nombre: 'Gomez Ruiz, Maria 5556' }]
   });
-}, [NOMBRE_1, NOMBRE_2, NOMBRE_3, NOMBRE_SUELTO]);
+}, [NOMBRE_1, NOMBRE_2, NOMBRE_3, NOMBRE_SUELTO, FECHA_1, FECHA_2, FECHA_3, FECHA_SUELTO, ANIO_INFORME]);
 
 await pagina.click('.pestana[data-pantalla="archivo"]');
 
@@ -116,15 +164,14 @@ await comprobar('7. aparecen los 4 asuntos aunque no haya índice',
 await comprobar('7. la línea de estado avisa de que el índice no está hecho',
   explicaArchivo().then((t) => t.indexOf('El índice no está hecho') !== -1), true);
 
-console.log('--- 1) reconstruir el índice: el fichero queda con todos ---');
+console.log('--- 1) reconstruir el índice: el fichero del curso queda con todos ---');
 await pagina.evaluate(async () => { await window.App.reconstruirIndiceArchivo(); });
-await comprobar('1. el fichero del índice tiene los 4 asuntos', nombresIndiceDeDisco(),
+await comprobar('1. el fichero del curso actual tiene los 4 asuntos', nombresIndiceDeDisco(),
   [NOMBRE_2, NOMBRE_3, NOMBRE_SUELTO, NOMBRE_1].sort());
-await comprobar('1. el recuento guarda las dos categorías',
-  pagina.evaluate(async () => {
-    var d = await window.Carpetas.leerJson(window.App.E.gestor, window.IndiceArchivo.FICHERO);
-    return d.recuento;
-  }), { ALUMNADO: 2, PERSONAL: 1 });
+await comprobar('1. el resumen guarda el curso actual',
+  leerResumenDeDisco().then((d) => d.cursos), [cursoActualTexto]);
+await comprobar('1. el recuento (en el resumen) guarda las dos categorías',
+  leerResumenDeDisco().then((d) => d.recuento), { ALUMNADO: 2, PERSONAL: 1 });
 await comprobar('1. la línea de estado ya no pide reconstruir',
   explicaArchivo().then((t) => t.indexOf('El índice no está hecho') === -1), true);
 
@@ -138,12 +185,12 @@ await comprobar('6. sale en la lista, con tercero vacío y sueltoEn puesto',
 await comprobar('6. la línea de estado avisa de los asuntos fuera de su sitio',
   explicaArchivo().then((t) => t.indexOf('fuera de su sitio') !== -1), true);
 
-console.log('--- 2) "matricula 2025 perez": tres palabras en tres sitios distintos, en otro orden ---');
-/* "matricula" está en el tipo, "2025" en el nombre de un documento
-   (250915 INFORME CURSO 2025.pdf), "perez" en el tercero: ni están
+console.log('--- 2) "matricula <año> perez": tres palabras en tres sitios distintos, en otro orden ---');
+/* "matricula" está en el tipo, el año en el nombre de un documento
+   (<fecha> INFORME CURSO <año>.pdf), "perez" en el tercero: ni están
    juntas ni en ese orden en ningún sitio del asunto. */
 {
-  const r = await buscarEnArchivo('matricula 2025 perez');
+  const r = await buscarEnArchivo('matricula ' + ANIO_INFORME + ' perez');
   await comprobar('2. encuentra justo un asunto', r.length, 1);
   await comprobar('2. es el asunto correcto', r[0].indexOf(NOMBRE_1) !== -1, true);
 }
@@ -182,7 +229,7 @@ await comprobar('8. el fichero del índice no se ha tocado solo (nadie lo ha rec
   nombresIndiceDeDisco(), [NOMBRE_2, NOMBRE_3, NOMBRE_SUELTO, NOMBRE_1].sort());
 
 console.log('--- 5) archivar añade la entrada al índice; reabrir la quita ---');
-const NOMBRE_5 = '250910 INFORME 25-26 Prueba Cinco 3334444';
+const NOMBRE_5 = FECHA_5 + ' INFORME ' + cursoActualTexto + ' Prueba Cinco 3334444';
 await pagina.evaluate(async ([nombre]) => {
   var carpeta = await window.__disco.abiertos.getDirectoryHandle(nombre, { create: true });
   carpeta._hijos.set('papel.txt', window.__disco.fich('papel.txt', 'contenido'));
@@ -213,12 +260,15 @@ await comprobar('5. reabrir quita la entrada del índice, sin tocar las demás',
 console.log('--- 9) escribir el índice cuando el compañero ha añadido otro asunto no lo pierde ---');
 const r9 = await pagina.evaluate(async () => {
   /* Lo que esta sesión tiene en la mano para guardar (una foto de lo
-     que había justo antes de que el compañero escribiera). */
-  var propio = JSON.parse(JSON.stringify(
-    await window.Carpetas.leerJson(window.App.E.gestor, window.IndiceArchivo.FICHERO)));
+     que había justo antes de que el compañero escribiera): el índice
+     entero, todos los cursos juntos, como lo devuelve
+     IndiceArchivo.construir() y como espera IndiceArchivo.guardar(). */
+  var leido = await window.IndiceArchivo.leerDisco({ todos: true });
+  var propio = JSON.parse(JSON.stringify(leido.datos));
 
-  /* El compañero, desde el otro ordenador, archiva algo y lo añade
-     directo al fichero mientras tanto. */
+  /* El compañero, desde el otro ordenador, archiva algo (sin fecha
+     reconocible, así que cae en el curso actual, el mismo de esta
+     prueba) y lo añade directo al fichero de ese curso mientras tanto. */
   await window.IndiceArchivo.anadirEntrada({
     nombre: 'DEL COMPAÑERO', categoria: 'OTROS', tercero: 'Nadie', ruta: 'OTROS / Nadie',
     fecha: '', tipo: '', curso: '', grupo: '', documentos: [], registros: [], sueltoEn: ''
@@ -227,7 +277,8 @@ const r9 = await pagina.evaluate(async () => {
   /* Esta sesión guarda su propia foto, sin saber nada de eso. */
   await window.IndiceArchivo.guardar(propio);
 
-  var final = await window.Carpetas.leerJson(window.App.E.gestor, window.IndiceArchivo.FICHERO);
+  var finalLeido = await window.IndiceArchivo.leerDisco({ todos: true });
+  var final = finalLeido.datos;
   return {
     tieneLoDelCompanero: final.asuntos.some(function (a) { return a.nombre === 'DEL COMPAÑERO'; }),
     tieneLoDeAntes: propio.asuntos.every(function (p) {
