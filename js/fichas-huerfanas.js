@@ -99,20 +99,20 @@
   }
 
   async function borrar(clave, ficha) {
-    var ok = await U.preguntar('Borrar la ficha',
-      '<p>Se borra la ficha huérfana de <strong>' + U.escapar(clave) + '</strong>.</p>' +
+    var ok = await U.preguntar('Quitar la ficha',
+      '<p>Se quita la ficha huérfana de <strong>' + U.escapar(clave) + '</strong>.</p>' +
       '<p class="nota">' + U.escapar(resumenNotas(ficha)) + '</p>' +
-      '<p class="nota">Antes de borrar se guarda una copia de asuntos.json en ' +
-      '_GESTOR/copias, así que se puede recuperar a mano si hiciera falta.</p>', 'Borrar');
+      '<p class="nota">Antes de quitarla se guarda una copia de asuntos.json en ' +
+      '_GESTOR/copias, así que se puede recuperar a mano si hiciera falta.</p>', 'Quitar');
     if (!ok) return;
     try {
       await App.guardarRegistroFresco(function (registro) {
         delete registro.asuntos[clave];
       });
-      U.aviso('Ficha borrada.', 'bueno');
+      U.aviso('Ficha quitada.', 'bueno');
       await App.pintarAjustes();
     } catch (e) {
-      U.aviso('No he podido borrarla: ' + U.mensajeDeError(e), 'malo');
+      U.aviso('No he podido quitarla: ' + U.mensajeDeError(e), 'malo');
     }
   }
 
@@ -131,12 +131,12 @@
     d.innerHTML =
       '<summary>' +
         '<span class="bloque-titulo">Fichas sin carpeta</span>' +
-        '<span class="bloque-pie" id="huerfanas-pie">Cuando una carpeta se ha renombrado o movido a mano</span>' +
+        '<span class="bloque-pie" id="huerfanas-pie">Cuando una carpeta ha cambiado de nombre o se ha movido a mano</span>' +
       '</summary>' +
       '<div class="bloque-cuerpo">' +
         '<p class="explica">La ficha de un asunto (su estado, sus notas, su guía) se guarda con ' +
-        'el nombre exacto de su carpeta. Si alguien renombra o mueve una carpeta desde el ' +
-        'explorador de archivos, en vez de desde "Editar", la ficha se queda huérfana: sigue en ' +
+        'el nombre exacto de su carpeta. Si alguien cambia el nombre o mueve una carpeta desde el ' +
+        'explorador de archivos, en vez de desde "Cambiar", la ficha se queda huérfana: sigue en ' +
         '<code>asuntos.json</code> pero no se ve en ningún lado. Aquí se puede enlazar con la ' +
         'carpeta que le corresponda, o borrarla si ya no hace falta.</p>' +
         '<div id="tabla-huerfanas" class="lista"></div>' +
@@ -193,7 +193,7 @@
 
       var borrarBtn = document.createElement('button');
       borrarBtn.className = 'boton boton-peligro';
-      borrarBtn.textContent = 'Borrar la ficha';
+      borrarBtn.textContent = 'Quitar la ficha';
       borrarBtn.onclick = function () { borrar(clave, ficha); };
       f.appendChild(borrarBtn);
 
