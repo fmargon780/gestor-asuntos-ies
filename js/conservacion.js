@@ -82,7 +82,9 @@ var Conservacion = (function () {
 
   async function leerCumplidos() {
     if (!window.IndiceArchivo) return { ok: false, lista: [] };
-    var r = await IndiceArchivo.leerDisco();
+    /* Fila 177: el plazo de conservación mira archivados de cualquier
+       curso, no solo el actual. */
+    var r = await IndiceArchivo.leerDisco({ todos: true });
     if (!r.ok) return { ok: false, lista: [] };
     return { ok: true, lista: cumplidos(r.datos.asuntos, tipos()) };
   }
