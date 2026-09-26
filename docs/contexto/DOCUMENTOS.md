@@ -22,15 +22,25 @@ un no-PDF, no hay barra. La ventana de `App.verDocumentos` se queda (tarjeta de 
 clasificar», «Nuevo asunto»). `js/copiar.js` ya no vigila la ficha (fuera su envoltura de
 `App.abrirFicha`). Se comprueba con `pruebas/documentos-en-un-solo-sitio.mjs`.
 
-### Los nombres, con tope de largo (fila 130)
+### Los nombres, con tope de largo (fila 130; el tope cuenta la ruta desde la fila 177)
 
-Para no pasar del límite de rutas de Windows: la carpeta de un asunto, 150 caracteres como mucho
-(`Nombres.montarAsunto`: se recorta primero la descripción y después los campos del tipo, por el
-final; nunca la fecha, el tipo, el año, el grupo ni el tercero); el nombre de un documento, 120 más
-la extensión (`Nombres.montarDocumentoAjustado`: el texto adicional y después los campos). La
-vista previa (Nuevo asunto, Editar y el cuadro de documentos) avisa en ámbar con
-`Nombres.avisoRecorte`. Los adjuntos de la bandeja: extensión limpia de 10 caracteres como mucho, o
-ninguna. Los asuntos que ya existen no se renombran.
+Para no pasar del límite de rutas de Windows: la carpeta de un asunto, hasta `Nombres.topes().asunto`
+caracteres (`Nombres.montarAsunto`: se recorta primero la descripción y después los campos del tipo,
+por el final; nunca la fecha, el tipo, el año, el grupo ni el tercero); el nombre de un documento,
+hasta `Nombres.topes().documento` más la extensión (`Nombres.montarDocumentoAjustado`: el texto
+adicional y después los campos). La vista previa (Nuevo asunto, Editar y el cuadro de documentos)
+avisa en ámbar con `Nombres.avisoRecorte`. Los adjuntos de la bandeja: extensión limpia de 10
+caracteres como mucho, o ninguna. Los asuntos que ya existen no se renombran.
+
+**Fila 177 (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md, punto 2, `js/nombres-topes.js`):** los 150/120 de
+antes eran fijos y solo miraban el nombre. Ahora `Nombres.topes(tercero, categoria)` calcula el
+hueco de verdad contando la ruta completa dentro de Dropbox (la carpeta ARCHIVO señalada en
+`_GESTOR/rutas.json`, la categoría y el tercero), con tope total 240; sin `rutas.json` todavía
+señalado, salen los 150/120 fijos de siempre. Cuando ni recortando el texto libre por completo cabe,
+`montarAsunto`/`montarDocumentoAjustado` devuelven `noCabe: true`, `avisoRecorte` pinta un aviso
+**rojo** ("El nombre no cabe en la ruta de Dropbox: acorta el texto.") y Nuevo asunto, Editar y el
+cuadro de documentos apagan su botón de guardar (y lo comprueban otra vez justo antes de escribir,
+por si acaso). Detalle completo en `docs/contexto/ASUNTOS-ARCHIVO.md`.
 
 ### Campos del tipo de documento en el nombre (23-sep-2026, fila 96)
 
@@ -380,7 +390,8 @@ dentro sin crear uno nuevo.
   grupo, el que se movió más recientemente primero (`ElegirAsunto.cuandoSeMovio`). Sin tipo
   propuesto, todos sin marca, por reciente.
 - **Archivados**: solo cuando no hay ningún abierto, y solo con el índice guardado del ARCHIVO
-  (`IndiceArchivo.leerDisco()`) — nunca recorriendo el ARCHIVO carpeta a carpeta. Sin tipo
+  (`IndiceArchivo.leerDisco({ todos: true })`, fila 177: de cualquier curso) — nunca recorriendo el
+  ARCHIVO carpeta a carpeta. Sin tipo
   propuesto, o sin índice (no hecho, roto, o de otra versión), no se sugiere ningún archivado.
   Hasta tres, del tipo propuesto, el más reciente primero (por `cerradoEl`, o si no por la fecha
   AAMMDD del nombre de la carpeta).
@@ -404,4 +415,3 @@ tercero con «otro tipo»); sin abiertos, con archivados del mismo tipo y uno de
 «archivado», y "Meter aquí" pregunta si reabrir); un abierto y un archivado del mismo tercero
 (solo sale el abierto); sin tercero reconocido (la tarjeta, igual que antes de esta fila); y que
 "Meter en un asunto" pone arriba los asuntos del tercero leído.
-
