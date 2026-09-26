@@ -205,6 +205,14 @@ $('btn-entrar').onclick = async function () {
     App.E.gestor = await Carpetas.crear(App.E.abiertos, App.CARPETA_GESTOR);
     App.E.datos = await Carpetas.crear(App.E.gestor, 'datos');
 
+    /* Fila 177 (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md, punto 2): se lee
+       `_GESTOR/rutas.json` ya de entrada, sin esperar a que alguien
+       pulse el botón «Ruta» o abra Ajustes → El centro, para que
+       `Nombres.topes()` pueda usar la ruta real desde el primer nombre
+       que se proponga. Si falla, no pasa nada: los topes se quedan
+       fijos, como siempre. */
+    if (window.RutaCarpetas) RutaCarpetas.cargarComun().catch(function () { /* se queda con los topes fijos */ });
+
     var rotos = await Copias.comprobarTodos(App.E.gestor);
     if (rotos.length) {
       App.avisoFicherosRotos(rotos);
