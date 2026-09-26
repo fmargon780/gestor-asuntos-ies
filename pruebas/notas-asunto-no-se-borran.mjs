@@ -81,7 +81,6 @@ await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 await pagina.evaluate(async (asunto) => {
   const carpeta = await window.__disco.abiertos.getDirectoryHandle(asunto, { create: true });

@@ -105,11 +105,11 @@ await pagina.evaluate(async ([n1, n2, n3, n4]) => {
   });
 }, [NOMBRE_1, NOMBRE_2, NOMBRE_3, NOMBRE_SUELTO]);
 
-await pagina.click('#btn-barra');
 await pagina.click('.pestana[data-pantalla="archivo"]');
 
 console.log('--- 7) sin fichero de índice: se enseña igual, y avisa de reconstruir ---');
-await pagina.click('#btn-recargar-archivo');
+/* La primera vez que se entra en el Archivo en la sesión ya carga
+   sola (fila 175, punto 3): no hace falta pulsar "Actualizar". */
 await pagina.waitForFunction(() => window.App.E.listaArchivo && window.App.E.listaArchivo.length > 0);
 await comprobar('7. aparecen los 4 asuntos aunque no haya índice',
   pagina.evaluate(() => window.App.E.listaArchivo.length), 4);
@@ -171,6 +171,7 @@ await pagina.evaluate(async () => {
   var cat = await window.__disco.archivo.getDirectoryHandle('ALUMNADO', { create: true });
   await cat.getDirectoryHandle('Tercero Nuevo Sin Asuntos Todavia 0000', { create: true });
 });
+await pagina.click('#pantalla-archivo .acciones .fila-menu-btn');
 await pagina.click('#btn-recargar-archivo');
 await pagina.waitForTimeout(50);
 await comprobar('8. se sigue enseñando el índice de antes (4 asuntos, no 5)',

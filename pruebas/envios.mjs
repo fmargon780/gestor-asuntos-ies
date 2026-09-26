@@ -98,7 +98,6 @@ await pagina.evaluate(async ({ conHilo, sinHilo, grande }) => {
 
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 /* ---------- el mock de la aplicación web (nunca una URL real) ---------- */
 

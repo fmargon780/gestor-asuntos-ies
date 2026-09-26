@@ -42,7 +42,6 @@ await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 /* ============================================================
    1. Crear un asunto abre su ficha
@@ -59,8 +58,9 @@ await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.fill('.alta-campo[data-campo="Nombre"]', 'Llegada Prueba, Eva');
 await pagina.fill('.alta-campo[data-campo="Nº Id. Escolar"]', '4441119');
 await pagina.click('#cuadro-aceptar');
-await pagina.waitForSelector('#resultados-tercero .resultado');
-await pagina.click('#resultados-tercero .resultado');
+/* Fila 173, punto 3: dar de alta deja el tercero elegido, sin pulsar
+   ningún resultado. */
+await pagina.waitForSelector('#tercero-elegido:not(.oculto)');
 await pagina.fill('#campo-fecha', '2026-09-10');
 await pagina.waitForTimeout(150);
 await pagina.click('#btn-crear');

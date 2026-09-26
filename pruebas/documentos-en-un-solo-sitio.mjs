@@ -69,7 +69,6 @@ await pagina.evaluate(async (datos) => {
 
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 await pagina.click('#btn-recargar');
 await pagina.waitForSelector('#lista-abiertos .tarjeta');
 await pagina.click('#lista-abiertos .nombre-pulsable');

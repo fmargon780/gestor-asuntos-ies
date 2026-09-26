@@ -119,8 +119,9 @@ await pagina.fill('#doc-curso', 'prueba');
 await pagina.waitForTimeout(150);
 const nuevo = await pagina.locator('#doc-vista').textContent();
 await pagina.click('#doc-guardar');
-await pagina.waitForSelector('#doc-cuerpo .fila-documento');
-await pagina.click('#cuadro-aceptar');
+/* Fila 174, punto 3: abierto directo para ponerle nombre, "Guardar"
+   cierra el cuadro entero, en vez de volver a la lista. */
+await pagina.waitForSelector('#capa', { state: 'hidden' });
 await pagina.waitForTimeout(700);
 const r2 = await estado();
 await comprobar('en el hito queda el nombre nuevo, y no el viejo', Promise.resolve(r2.docs), [PRIMERO, nuevo]);

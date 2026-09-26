@@ -70,7 +70,6 @@ await pagina.evaluate(async () => {
   await (await h.createWritable()).write(JSON.stringify({ fichas }));
 });
 
-await pagina.click('#btn-barra');
 await pagina.click('.pestana[data-pantalla="ajustes"]');
 await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
 await pagina.evaluate(() => {

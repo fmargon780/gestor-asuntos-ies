@@ -40,7 +40,6 @@ await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 console.log('--- categoría ALUMNADO, sin texto: el botón discreto al final de la parrilla ---');
 await pagina.click('.pestana[data-pantalla="nuevo"]');

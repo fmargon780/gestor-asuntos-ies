@@ -327,7 +327,7 @@
       }));
     }
     if (estado) {
-      barraFiltros.appendChild(etiqueta('Estado: ' + (estado === '__sin__' ? 'Sin estado' : estado),
+      barraFiltros.appendChild(etiqueta('Montón: ' + textoDelPlazo(f),
         function () {
           f.value = '';
           avisarDelCambio(f);

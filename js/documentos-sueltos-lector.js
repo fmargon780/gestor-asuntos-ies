@@ -187,7 +187,31 @@
     return linea;
   }
 
+  /* Reconfigura "Crear asunto con él" (js/documentos-sueltos.js) según lo
+     leído (fila 174, docs/POR-CLASIFICAR-USA-LO-LEIDO.md, punto 4): un
+     solo botón, que la propia App.empezarAsuntoCon ya sabe usar según lo
+     leído; aquí solo se ajustan su título y su nivel de destacado. Con
+     sugerencias a la vista pasa a discreto, como hacía "Aceptar". */
+  function actualizarBotonCrear(grupo, propuesta) {
+    var tarjeta = grupo.closest('.tarjeta-suelto');
+    var boton = tarjeta && tarjeta.querySelector('[data-accion-suelto="crear"]');
+    if (!boton) return;
+    var tipoObj = propuesta && propuesta.tipo && propuesta.tercero &&
+      (App.E.tipos || []).filter(function (t) { return t.tipo === propuesta.tipo.tipo; })[0];
+    var sugerencias = (propuesta && propuesta.sugerencias) || [];
+    if (tipoObj) {
+      boton.title = 'Crea el asunto con lo leído y mete el documento dentro';
+    } else if (propuesta && propuesta.tercero) {
+      boton.title = 'Deja el tercero elegido, a la espera de que se elija el tipo de asunto';
+    } else {
+      boton.title = '';
+    }
+    boton.className = (tipoObj || (propuesta && propuesta.tercero)) && sugerencias.length
+      ? 'boton' : 'boton boton-principal';
+  }
+
   function rellenarLinea(grupo, s, propuesta) {
+    actualizarBotonCrear(grupo, propuesta);
     grupo.className = 'tarjeta-propuesta';   /* por si venía de "Leyendo el documento…" */
     grupo.innerHTML = '';
     var texto = textoDeLaPropuesta(propuesta);
@@ -200,32 +224,6 @@
       var linea = document.createElement('div');
       linea.className = 'tarjeta-pie';
       linea.textContent = texto;
-
-      var tipoObj = propuesta.tipo && propuesta.tercero &&
-        (App.E.tipos || []).filter(function (t) { return t.tipo === propuesta.tipo.tipo; })[0];
-      if (tipoObj) {
-        var aceptar = document.createElement('button');
-        aceptar.type = 'button';
-        /* Con sugerencias a la vista, "Aceptar" pasa a "Crear asunto
-           nuevo" y a discreto: lo normal es meterlo en uno de los
-           sugeridos, no crear otro. Sin sugerencias, igual que
-           siempre. */
-        aceptar.className = sugerencias.length ? 'boton' : 'boton boton-principal';
-        aceptar.style.marginLeft = '10px';
-        aceptar.textContent = sugerencias.length ? 'Crear asunto nuevo' : 'Aceptar';
-        aceptar.title = 'Crea el asunto con lo encontrado y mete el documento dentro, sin preguntar nada más';
-        aceptar.onclick = async function (ev) {
-          if (ev) ev.stopPropagation();
-          aceptar.disabled = true;
-          try {
-            await App.crearAsuntoConPropuesta(tipoObj, propuesta.tercero.persona, s);
-          } catch (e) {
-            U.aviso('No he podido crear el asunto: ' + U.mensajeDeError(e), 'malo');
-            aceptar.disabled = false;
-          }
-        };
-        linea.appendChild(aceptar);
-      }
       grupo.appendChild(linea);
     }
 

@@ -218,8 +218,10 @@ const tarjeta2 = pagina.locator('#bandeja-correos .tarjeta-correo')
 await limpiarNuevo();
 await tarjeta2.getByRole('button', { name: 'Crear el asunto' }).click();
 await pagina.waitForTimeout(300);
+/* Fila 173: sin tipo, el tercero queda "propuesto" (esperando a que se
+   elija el tipo), no fijado todavía de un tirón. */
 await comprobar('2. la propuesta manda con quien reconoció el correo',
-  pagina.evaluate(() => App.E.nuevo.tercero && App.E.nuevo.tercero.nombre), 'Reconocida, Bea');
+  pagina.evaluate(() => App.E.nuevo.terceroPropuesto && App.E.nuevo.terceroPropuesto.nombre), 'Reconocida, Bea');
 
 /* ============================================================
    3. SIN TIPO NI TERCERO EN EL CORREO, EL PDF TRAE EL TIPO

@@ -242,10 +242,29 @@ var Registro = (function () {
         'Registrado ' + codigo + fechaSello + ' · ' + estado.nombreOriginal,
         'registroDeDocumento', estado.nombreOriginal);
       U.aviso('Documento registrado.', 'bueno');
-      /* Fila 160: un Word que ya tiene su PDF, a «Versiones previas». */
-      if (window.VersionesPrevias) await VersionesPrevias.ordenarTrasCambio(asunto.handle);
     } catch (e2) {
       U.accesorio('Documento registrado, pero no he podido apuntar la nota del registro', e2);
+    }
+    /* Fila 174, punto 6: igual que ya hace el sello detectado solo
+       (js/registro-sellado.js), el original pasa a «SIN SELLAR» y a
+       «Versiones previas» — solo si el sellado elegido es un fichero
+       distinto del original (si es el mismo, no se toca nada más). Es
+       accesorio: el registro de arriba ya está hecho. */
+    if (estado.handle.name !== estado.nombreOriginal && window.RegistroSellado && window.VersionesPrevias) {
+      try {
+        var enCarpeta = (await Carpetas.ficheros(asunto.handle)).map(function (f) { return f.nombre; })
+          .filter(function (n) { return n !== nombreNuevo; });
+        var nombreConservado = RegistroSellado.nombreLibreEntre(enCarpeta,
+          RegistroSellado.nombreSinSellar(estado.nombreOriginal));
+        await Carpetas.renombrarFichero(asunto.handle, estado.nombreOriginal, nombreConservado);
+        await VersionesPrevias.mover(asunto.handle, nombreConservado);
+      } catch (e3) {
+        U.accesorio('Documento registrado, pero no he podido apartar el original sin sellar', e3);
+      }
+    }
+    /* Fila 160: un Word que ya tiene su PDF, a «Versiones previas». */
+    if (window.VersionesPrevias) {
+      try { await VersionesPrevias.ordenarTrasCambio(asunto.handle); } catch (e4) { /* accesorio */ }
     }
     return nombreNuevo;
   }

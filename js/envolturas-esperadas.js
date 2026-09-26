@@ -67,7 +67,6 @@
     { fichero: 'rescate-datos.js', nombre: 'App.cargarTipos' },
     { fichero: 'tipos-buscador.js', nombre: 'App.pintarTipos' },
     { fichero: 'unir-asuntos.js', nombre: 'App.pintarAbiertos' },
-    { fichero: 'via-contacto.js', nombre: 'App.refrescarVista' },
     { fichero: 'via-contacto.js', nombre: 'App.editarVia' },
     { fichero: 'via-contacto.js', nombre: 'LoPide.controles' }
   ];

@@ -54,9 +54,9 @@
     };
 
     var esperar = U.preguntar('Guía de ' + nombreTipo,
-      '<p class="explica">Los pasos que hay que dar en un asunto de este tipo. ' +
-      'Van en el orden del trámite. Dentro de cada asunto salen con una casilla ' +
-      'para ir marcando lo que ya está hecho.</p>' +
+      '<p class="explica">Los pasos que hay que dar en un asunto de este tipo, en el orden ' +
+      'del trámite. En cada asunto, cada paso es un hito, con sus tareas, sus documentos y ' +
+      'su plazo.</p>' +
       '<div id="guia-camino" class="guia-camino"></div>' +
       GuiasBarra.html() +
       '<div id="guia-pasos"></div>' +
@@ -70,6 +70,27 @@
       '</div>' +
       (window.GuiasMapa ? GuiasMapa.panelHTML() : ''),
       'Guardar');
+
+    /* Fila 175, punto 7: si algún paso tiene días de plazo escritos
+       pero ningún «desde» elegido, «Guardar» no cierra el cuadro (los
+       días se perderían sin que nadie se entere, ver recoger() más
+       abajo): avisa, abre ese paso y pone el foco en su «desde». */
+    (function () {
+      var aceptar = $('cuadro-aceptar');
+      var cerrarDeVerdad = aceptar.onclick;
+      aceptar.onclick = function () {
+        var falta = pasoConDiasSinDesde();
+        if (!falta) { cerrarDeVerdad(); return; }
+        U.aviso('El paso «' + falta.titulo + '» tiene días de plazo, pero no dice desde cuándo. ' +
+          'Elige "desde" o borra los días.', 'malo');
+        plegado.abrir(falta.caja.dataset.pasoId);
+        plegado.aplicar();
+        var detalles = falta.caja.querySelector(':scope > .paso-extra');
+        if (detalles) detalles.open = true;
+        if (falta.caja.scrollIntoView) falta.caja.scrollIntoView({ block: 'nearest' });
+        falta.desdeSel.focus();
+      };
+    })();
 
     if (window.GuiasBiblioteca) {
       GuiasBiblioteca.engancharPanelTraer(cuadro, $('guia-traer-biblioteca'), function (modelo) {
@@ -120,6 +141,29 @@
     }
 
     /* ---------- la lista de pasos ---------- */
+
+    /* Fila 175, punto 7: el mismo criterio que recoger() (más abajo)
+       para saber si un paso se va a quedar sin plazo por no tener
+       «desde», pero ANTES de recoger() (que lo perdería sin avisar).
+       Solo mira el nivel que se está viendo: los demás ya pasaron por
+       este mismo aviso al salir de él (GuiasNiveles llama a recoger()
+       al cambiar de nivel). */
+    function pasoConDiasSinDesde() {
+      var cajas = Array.prototype.slice.call($('guia-pasos').children);
+      for (var k = 0; k < cajas.length; k++) {
+        var caja = cajas[k];
+        var i = parseInt(caja.dataset.pos, 10);
+        if (isNaN(i) || !nivel[i]) continue;
+        var diasInp = caja.querySelector(':scope > .paso-extra .paso-plazo-dias');
+        var desdeSel = caja.querySelector(':scope > .paso-extra .paso-plazo-desde');
+        var dias = diasInp ? parseInt(diasInp.value, 10) : NaN;
+        if (!isNaN(dias) && dias > 0 && desdeSel && !desdeSel.value) {
+          var tituloEl = caja.querySelector(':scope > .paso-cabecera .paso-titulo');
+          return { caja: caja, desdeSel: desdeSel, titulo: (tituloEl && tituloEl.value.trim()) || 'Paso sin título' };
+        }
+      }
+      return null;
+    }
 
     /* Se lee todo lo escrito antes de repintar o de guardar. Ojo con los
        selectores: los recuadros de las opciones están DENTRO del de su

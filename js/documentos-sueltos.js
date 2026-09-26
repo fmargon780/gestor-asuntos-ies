@@ -124,6 +124,7 @@ App.tarjetaSuelto = function (s, pie, esNuevo) {
 
   var crear = document.createElement('button');
   crear.className = 'boton boton-principal';
+  crear.dataset.accionSuelto = 'crear';
   crear.textContent = 'Crear asunto con él';
   crear.onclick = function () { App.empezarAsuntoCon(s); };
   acciones.appendChild(crear);
@@ -309,6 +310,10 @@ App.meterSueltoEnAsuntoElegido = async function (s, elegido, opciones) {
    el documento se queda en "Por clasificar". */
 App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
   var E = window.ElegirAsunto;
+  /* Se guarda antes de mover nada (fila 174, docs/POR-CLASIFICAR-USA-LO-
+     LEIDO.md, punto 1): el fichero cambia de sitio al entrar en el
+     asunto, y lo leído viaja con él hasta el cuadro de ponerle nombre. */
+  var propuesta = window.LectorDeSueltos ? LectorDeSueltos.resultadoDe(s.nombre) : null;
 
   var destino;
   try {
@@ -374,12 +379,13 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
     await App.verAbiertos();
 
     /* Con el documento ya dentro, el cuadro de siempre para ponerle el
-       nombre que le toca. */
+       nombre que le toca, directo (fila 174, punto 2), con lo que se
+       haya leído del documento. */
     await App.verDocumentos({
       nombre: nombreAsunto, handle: destino,
       ficha: (App.E.registro.asuntos || {})[nombreAsunto] || {},
       leido: Nombres.leer(nombreAsunto, App.E.tipos)
-    }, hito ? { hito: hito, ponerNombre: s.nombre } : opciones);
+    }, Object.assign({}, opciones, { ponerNombre: s.nombre, propuesta: propuesta }));
   } catch (e2) {
     U.accesorio('Documento metido, pero no he podido abrir el cuadro para ponerle nombre', e2);
   }
@@ -404,11 +410,39 @@ App.abrirSuelto = async function (s) {
   }
 };
 
+/* "dd/mm/aaaa" (lo que da LectorDocumentos.analizar) -> ISO, para
+   "Fecha de inicio". Cadena vacía si no se entiende (fila 173,
+   docs/NUEVO-ASUNTO-SIN-REPETIR.md: cada fichero que lo necesita tiene
+   su propia copia mínima, en vez de forzar una sola en js/util.js). */
+function isoDeFechaLector(ddmmaaaa) {
+  var p = String(ddmmaaaa || '').split('/');
+  return p.length === 3 ? p[2] + '-' + p[1] + '-' + p[0] : '';
+}
+
+/* "Crear asunto con él" usa lo que ya se ha leído del documento (fila
+   174, docs/POR-CLASIFICAR-USA-LO-LEIDO.md, punto 4): con tipo y
+   tercero claros, crea de un tirón (como hacía «Aceptar»); con tercero
+   y sin tipo, deja el tercero esperando en Nuevo asunto
+   (App.nuevoAsuntoCon, fila 173); sin nada, o sin haber terminado de
+   leer, como siempre. En los tres casos, la fecha leída va a "Fecha de
+   inicio". El título y la clase del botón los pone
+   js/documentos-sueltos-lector.js en cuanto termina de leer. */
 App.empezarAsuntoCon = function (s) {
+  var propuesta = window.LectorDeSueltos ? LectorDeSueltos.resultadoDe(s.nombre) : undefined;
+  var tipoObj = propuesta && propuesta.tipo &&
+    (App.E.tipos || []).filter(function (t) { return t.tipo === propuesta.tipo.tipo; })[0];
+  var fecha = propuesta && propuesta.fecha ? isoDeFechaLector(propuesta.fecha) : '';
+
+  if (tipoObj && propuesta.tercero) {
+    App.crearAsuntoConPropuesta(tipoObj, propuesta.tercero.persona, s);
+    return;
+  }
   App.E.pendiente = s;
   delete App.E.reciales[s.nombre];
   App.actualizarTitulo();
-  App.ir('nuevo');
+  App.nuevoAsuntoCon(propuesta && propuesta.tercero
+    ? { tercero: propuesta.tercero.persona, fecha: fecha || null }
+    : { fecha: fecha || null });
 };
 
 App.pintarPendiente = function () {

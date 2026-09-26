@@ -20,6 +20,42 @@ var HitosPanelLista = (function () {
     };
   }
 
+  /* Marca (o desmarca) un hito desde su casilla, sea la de la lista o
+     la que pulsa por debajo "Marcar como hecho" de la mesa (fila 173,
+     punto 5, js/hito-mesa.js). Devuelve si el guardado ha terminado
+     bien, para que quien llama sepa si de verdad se ha marcado. */
+  async function marcarDesdeCasilla(casillaEl, a, h) {
+    var nuevoEstado = casillaEl.checked ? 'hecho' : 'pendiente';
+    /* No se impide nunca, solo se avisa (18-sep-2026, fila 59,
+       sección 6 del encargo): si quedan casillas obligatorias sin
+       reunir y Francisco sigue igualmente, el hito se marca y se le
+       apunta una nota automática. */
+    var faltan = (nuevoEstado === 'hecho' && window.Hitos.faltanObligatorios)
+      ? Hitos.faltanObligatorios(h, a) : [];
+    if (faltan.length) {
+      var ok = await U.preguntar('Dar este hito por hecho',
+        '<p class="explica">Faltan ' + faltan.length + (faltan.length === 1 ? ' cosa' : ' cosas') +
+        ' por reunir: ' + U.escapar(faltan.map(function (r) { return r.texto; }).join(', ')) + '.</p>' +
+        '<p class="explica">¿Lo das por hecho igualmente?</p>', 'Darlo por hecho');
+      if (!ok) { casillaEl.checked = false; return false; }
+    }
+    /* La nota automática va en la misma escritura que el estado
+       (fila 100): antes eran dos, y si fallaba la segunda salía rojo
+       con el hito ya marcado. */
+    var nota = faltan.length ? 'Dado por hecho con ' + faltan.length +
+      (faltan.length === 1 ? ' cosa sin reunir.' : ' cosas sin reunir.') : '';
+    try {
+      await U.mientrasGuarda(casillaEl, function () { return Hitos.marcar(a.nombre, h.id, nuevoEstado, nota); });
+      return true;
+    } catch (e) {
+      casillaEl.checked = !casillaEl.checked;
+      U.fallo('No he podido guardar el hito', e);
+      return false;
+    } finally {
+      window.HitosPanel.programarRepintado();
+    }
+  }
+
   function bloqueDeHitos(a, hitos, ajustes, abierto, nombresDeLaCarpeta) {
     var raiz = document.createElement('div');
 
@@ -139,35 +175,7 @@ var HitosPanelLista = (function () {
     var casillaEl = div.querySelector('.hito-casilla');
     if (casillaEl) {
       casillaEl.onclick = function (ev) { ev.stopPropagation(); };
-      casillaEl.onchange = async function () {
-        var nuevoEstado = casillaEl.checked ? 'hecho' : 'pendiente';
-        /* No se impide nunca, solo se avisa (18-sep-2026, fila 59,
-           sección 6 del encargo): si quedan casillas obligatorias sin
-           reunir y Francisco sigue igualmente, el hito se marca y se le
-           apunta una nota automática. */
-        var faltan = (nuevoEstado === 'hecho' && window.Hitos.faltanObligatorios)
-          ? Hitos.faltanObligatorios(h, a) : [];
-        if (faltan.length) {
-          var ok = await U.preguntar('Dar este hito por hecho',
-            '<p class="explica">Faltan ' + faltan.length + (faltan.length === 1 ? ' cosa' : ' cosas') +
-            ' por reunir: ' + U.escapar(faltan.map(function (r) { return r.texto; }).join(', ')) + '.</p>' +
-            '<p class="explica">¿Lo das por hecho igualmente?</p>', 'Darlo por hecho');
-          if (!ok) { casillaEl.checked = false; return; }
-        }
-        /* La nota automática va en la misma escritura que el estado
-           (fila 100): antes eran dos, y si fallaba la segunda salía rojo
-           con el hito ya marcado. */
-        var nota = faltan.length ? 'Dado por hecho con ' + faltan.length +
-          (faltan.length === 1 ? ' cosa sin reunir.' : ' cosas sin reunir.') : '';
-        try {
-          await U.mientrasGuarda(casillaEl, function () { return Hitos.marcar(a.nombre, h.id, nuevoEstado, nota); });
-        } catch (e) {
-          casillaEl.checked = !casillaEl.checked;
-          U.fallo('No he podido guardar el hito', e);
-        } finally {
-          window.HitosPanel.programarRepintado();
-        }
-      };
+      casillaEl.onchange = function () { marcarDesdeCasilla(casillaEl, a, h); };
     }
     var linea = div.querySelector('.hito-linea');
     var cuerpoDiv = div.querySelector('.hito-cuerpo');
@@ -437,5 +445,8 @@ var HitosPanelLista = (function () {
     });
   }
 
-  return { bloqueDeHitos: bloqueDeHitos, cambiarRama: cambiarRama, guardarHito: guardarHito };
+  return {
+    bloqueDeHitos: bloqueDeHitos, cambiarRama: cambiarRama, guardarHito: guardarHito,
+    marcarDesdeCasilla: marcarDesdeCasilla
+  };
 })();

@@ -11,8 +11,10 @@
    si eliges Correo, los correos. Sigue pudiéndose escribir a mano
    cualquier otra cosa: el recuadro no se bloquea.
 
-   Funciona en los dos sitios donde se elige la vía: al crear un
-   asunto y en el botón de la vía de un asunto que ya existe.
+   Funciona en los sitios donde se elige la vía: dentro de "Lo pide"
+   (Nuevo asunto y "El encargo" de la ficha, los dos por la misma
+   envoltura de LoPide.controles, fila 173) y en el botón de la vía de
+   un asunto que ya existe.
    ============================================================ */
 (function () {
 
@@ -114,35 +116,6 @@
     campoDato.parentNode.insertBefore(caja, campoDato.nextSibling);
     return caja;
   }
-
-  /* ---------- al crear un asunto ---------- */
-
-  (function () {
-    var campoVia = $('campo-via');
-    var campoDato = $('campo-via-dato');
-    if (!campoVia || !campoDato) return;
-
-    var caja = null;
-
-    function mirar() {
-      if (!caja) caja = cajaDebajo(campoDato, 'via-sugerencias-nuevo');
-      var persona = App.E.nuevo.tercero;
-      var categoria = App.E.nuevo.categoria;
-      var quien = persona ? App.textoTercero(persona) : '';
-      refrescar(caja, campoDato, categoria, quien, campoVia.value);
-    }
-
-    campoVia.addEventListener('change', mirar);
-
-    /* Al cambiar de tercero o de tipo se repinta la vista previa: es
-       buen momento para repasar también las sugerencias. */
-    U.envolver(App, 'App.refrescarVista', 'via-contacto.js', function (comoEra) {
-      return function () {
-        comoEra();
-        try { mirar(); } catch (e) { /* nunca estorba */ }
-      };
-    });
-  })();
 
   /* ---------- en el cuadro de la vía de un asunto ya creado ----------
 

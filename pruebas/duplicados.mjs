@@ -68,14 +68,15 @@ function nombresDeAbiertos() {
   });
 }
 
+/* Fila 173, punto 3: dar de alta deja el tercero elegido, sin pulsar
+   ningún resultado. */
 async function darDeAltaAlumno(nombre, id) {
   await pagina.getByRole('button', { name: '+ Dar de alta un solicitante' }).click();
   await pagina.waitForSelector('#capa:not(.oculto)');
   await pagina.fill('.alta-campo[data-campo="Nombre"]', nombre);
   await pagina.fill('.alta-campo[data-campo="Nº Id. Escolar"]', id);
   await pagina.click('#cuadro-aceptar');
-  await pagina.waitForSelector('#resultados-tercero .resultado');
-  await pagina.click('#resultados-tercero .resultado');
+  await pagina.waitForSelector('#tercero-elegido:not(.oculto)');
 }
 
 async function leerJson(nombre) {
@@ -93,7 +94,6 @@ await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 await comprobar('sin duplicados de partida, el aviso no se ve',
   pagina.locator('#btn-duplicados').isHidden(), true);

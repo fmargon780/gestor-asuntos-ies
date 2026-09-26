@@ -58,7 +58,6 @@ await pagina.evaluate(async () => {
 });
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 await pagina.waitForTimeout(600);
 
 console.log('--- 1. un tipo sin organo: «Sin asignar» ---');

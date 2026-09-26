@@ -32,10 +32,6 @@ await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-/* La barra nace plegada (10-sep-2026): se abre para ver la pestaña de
-   Ajustes y el punto ámbar que cuelga de ella. */
-await pagina.click('#btn-barra');
-
 console.log('--- se prepara una ficha huérfana y una carpeta sin ficha ---');
 await pagina.evaluate(async () => {
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });

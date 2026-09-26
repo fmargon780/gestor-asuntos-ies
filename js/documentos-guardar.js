@@ -22,6 +22,20 @@
     return m ? m.value : '';
   }
 
+  /* Cierra el cuadro entero (el "Cerrar" de siempre), en vez de volver
+     a la lista de documentos (fila 174, punto 3). */
+  function cerrarCuadro() {
+    var aceptar = document.getElementById('cuadro-aceptar');
+    if (aceptar) aceptar.click();
+  }
+
+  /* Punto previsto para que otro módulo tome el relevo en vez de cerrar
+     (fila 174, punto 5: los adjuntos de un correo, uno detrás de otro):
+     `fn(nombreGuardado, opciones)` devuelve true si ha abierto otra cosa
+     y no hay que cerrar. Se prueban en orden; la primera que devuelva
+     true gana. */
+  N.alTerminarPonerNombre = [];
+
   function datosDelFormulario(opciones) {
     var registro = null;
     if ($('doc-hay-registro').checked) {
@@ -105,6 +119,13 @@
     } catch (e2) {
       U.accesorio('Documento guardado, pero no he podido apuntar si está pendiente de registro', e2);
     }
+    /* El tipo de documento elegido, para la próxima vez (fila 174,
+       punto 1): por tipo de asunto, en este ordenador. */
+    if (N.guardarUltimoTipoDocumento) {
+      var tipoGuardado = $('doc-tipo').value;
+      if (tipoGuardado === N.TIPO_NUEVO) tipoGuardado = N.ultimoTipo || '';
+      N.guardarUltimoTipoDocumento(App.tipoDeAsunto(N.asuntoActual), tipoGuardado);
+    }
     /* Este cuadro se ha abierto desde un hito (fila 103, sección 1):
        lo que se guarde queda apuntado ahí, y se marca sola la casilla
        de "Lo que hay que reunir" que le toque (no crítico: el
@@ -133,6 +154,19 @@
       }
     }
     N.soltarVisor();
+    /* Abierto directo para ponerle nombre (opciones.ponerNombre, fila
+       174, punto 3): cierra el cuadro entero al terminar, en vez de
+       volver a la lista. Abierto desde la lista ("Poner nombre" de una
+       fila), se vuelve a la lista, como siempre. */
+    if (opciones.ponerNombre) {
+      var siguiente = false;
+      for (var i = 0; i < N.alTerminarPonerNombre.length && !siguiente; i++) {
+        try { siguiente = await N.alTerminarPonerNombre[i](nombre, opciones); }
+        catch (e4) { /* un módulo roto no impide cerrar */ }
+      }
+      if (!siguiente) cerrarCuadro();
+      return;
+    }
     try { await N.pintarLista(); } catch (e3) { U.accesorio('Documento guardado, pero no he podido repintar la lista', e3); }
   }
 
@@ -140,6 +174,7 @@
     botonOpcion: botonOpcion,
     elegido: elegido,
     refrescar: refrescar,
-    guardar: guardar
+    guardar: guardar,
+    cerrarCuadro: cerrarCuadro
   });
 })();

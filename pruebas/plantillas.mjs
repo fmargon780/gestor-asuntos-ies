@@ -74,7 +74,6 @@ await pagina.evaluate(async ({ conPlantilla, sinPlantilla }) => {
 
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 async function abrirFichaDe(nombreAsunto) {
   await pagina.evaluate(() => App.ir('abiertos'));

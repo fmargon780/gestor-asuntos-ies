@@ -224,13 +224,14 @@ await comprobar('2. el documento ha entrado en la carpeta del asunto',
 await comprobar('y ya no está en la raíz',
   enLaRaiz().then(l => l.indexOf('Escrito de Ordóñez Gil, Rafael.pdf') !== -1), false);
 
-await pagina.waitForSelector('#doc-anadir');
+/* Fila 174, punto 2: se abre directo el formulario de ponerle nombre a
+   ESE documento, no la lista de la carpeta. */
+await pagina.waitForSelector('#doc-guardar');
 await comprobar('3. se abre el cuadro de ponerle nombre',
   pagina.locator('#cuadro-titulo').textContent(), OTRO);
-await comprobar('y lista los documentos que hay ahora en la carpeta',
-  pagina.locator('#doc-cuerpo .nombre-documento').allTextContents()
-    .then(l => l.sort()),
-  ['Conciliación FL.pdf', 'Escrito de Ordóñez Gil, Rafael.pdf'].sort());
+await comprobar('directo al documento que se acaba de meter',
+  pagina.locator('#doc-cuerpo').textContent()
+    .then(t => t.indexOf('Escrito de Ordóñez Gil, Rafael.pdf') !== -1), true);
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
 

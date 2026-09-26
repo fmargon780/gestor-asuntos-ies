@@ -113,7 +113,6 @@ await pagina.evaluate(async () => {
 
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 /* ================================================================
    1. Configurar SANCION con Unidad (obligatorio, al nombre) y

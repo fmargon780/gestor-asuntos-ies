@@ -32,12 +32,12 @@ App.verArchivo = async function () {
     try {
       var actual = await IndiceArchivo.recuentoActual();
       if (!IndiceArchivo.recuentosIguales(actual, usable.recuento || {})) {
-        avisoIndice = 'El índice puede no estar al día. Reconstruir el índice.';
+        avisoIndice = 'El índice puede no estar al día.';
       }
     } catch (e) { /* si falla la comprobación, se enseña el índice igual */ }
   } else {
     App.E.indiceSinHacer = true;
-    avisoIndice = 'El índice no está hecho. Reconstruir el índice.';
+    avisoIndice = 'El índice no está hecho.';
     usable = await IndiceArchivo.construir(progreso);
   }
 
@@ -73,12 +73,23 @@ App.verArchivo = async function () {
   App.E.listaArchivo = salida;
 
   var partes = [salida.length + ' asuntos archivados.'];
-  if (avisoIndice) partes.push(avisoIndice);
   if (descolocados) {
     partes.push('Hay ' + descolocados + ' asunto' + (descolocados === 1 ? '' : 's') +
       ' colocado' + (descolocados === 1 ? '' : 's') + ' fuera de su sitio.');
   }
-  $('explica-archivo').textContent = partes.join(' ');
+  var explica = $('explica-archivo');
+  explica.textContent = partes.join(' ') + (avisoIndice ? ' ' : '');
+  /* Fila 175, punto 3: el aviso lleva un botón de verdad, no solo texto
+     con pinta de botón. */
+  if (avisoIndice) {
+    explica.appendChild(document.createTextNode(avisoIndice + ' '));
+    var btnAviso = document.createElement('button');
+    btnAviso.type = 'button';
+    btnAviso.className = 'enlace';
+    btnAviso.textContent = 'Reconstruir el índice';
+    btnAviso.onclick = function () { App.reconstruirIndiceArchivo(btnAviso); };
+    explica.appendChild(btnAviso);
+  }
   App.pintarArchivo();
 };
 
@@ -87,8 +98,8 @@ App.verArchivo = async function () {
    categoría) y guarda lo encontrado. Si algo falla a mitad de camino
    (permiso, Dropbox), no se escribe nada a medias: se avisa y se deja
    el índice que hubiera. */
-App.reconstruirIndiceArchivo = async function () {
-  await U.mientrasGuarda($('btn-reconstruir-indice'), async function () {
+App.reconstruirIndiceArchivo = async function (boton) {
+  await U.mientrasGuarda(boton || null, async function () {
     try {
       var indice = await IndiceArchivo.construir(function (nombreCategoria, total) {
         $('explica-archivo').textContent = 'Leyendo el archivo… ' + nombreCategoria + ' · ' + total + ' asuntos';
@@ -160,8 +171,28 @@ U.envolver(App, 'App.verDocumentos', 'archivo-personas.js', function (comoEra) {
 });
 
 $('buscar-archivo').oninput = function () { App.pintarArchivo(); };
-$('btn-recargar-archivo').onclick = function () { App.verArchivo(); };
-$('btn-reconstruir-indice').onclick = function () { App.reconstruirIndiceArchivo(); };
+
+/* Fila 175, punto 3: "Actualizar" y "Reconstruir el índice" pasan al
+   menú de tres puntos, a la derecha del buscador. Mismos textos,
+   mismo comportamiento. */
+(function () {
+  var actualizar = document.createElement('button');
+  actualizar.type = 'button';
+  actualizar.id = 'btn-recargar-archivo';
+  actualizar.className = 'boton';
+  actualizar.textContent = 'Actualizar';
+  actualizar.onclick = function () { App.verArchivo(); };
+
+  var reconstruir = document.createElement('button');
+  reconstruir.type = 'button';
+  reconstruir.id = 'btn-reconstruir-indice';
+  reconstruir.className = 'boton';
+  reconstruir.title = 'Recorre el archivo entero una vez y guarda el índice de búsqueda';
+  reconstruir.textContent = 'Reconstruir el índice';
+  reconstruir.onclick = function () { App.reconstruirIndiceArchivo(reconstruir); };
+
+  document.querySelector('#pantalla-archivo .acciones').appendChild(U.menuDeAcciones([actualizar, reconstruir]));
+})();
 
 /* ==========================================================
    PANTALLA: PERSONAS
@@ -278,8 +309,12 @@ App.verFicha = function (p) {
     }));
   }
 
-  html += '<p class="nota"><button type="button" class="boton" id="ver-sus-asuntos">' +
-          'Ver sus asuntos</button></p><div id="asuntos-del-tercero"></div>';
+  /* Fila 175, punto 2: "+ Nuevo asunto para esta persona", junto a
+     "Cambiar los datos" (si sale). Fila 175, punto 1: "Sus asuntos"
+     sale solo, sin pulsar nada. */
+  html += '<p class="nota" id="ficha-persona-acciones"></p>' +
+          '<h4 id="titulo-sus-asuntos">Sus asuntos</h4><div id="asuntos-del-tercero">' +
+          '<p class="explica">Buscando…</p></div>';
 
   caja.innerHTML = html;
 
@@ -288,25 +323,34 @@ App.verFicha = function (p) {
       $('resto-ficha').classList.toggle('oculto');
     };
   }
-  $('ver-sus-asuntos').onclick = function () { App.verAsuntosDeTercero(p); };
   if (window.PersonasFamilias) PersonasFamilias.engancharHermanos(caja);
   if (App.FICHAS_DE_CATEGORIA[p.categoria]) App.FICHAS_DE_CATEGORIA[p.categoria].enganchar(caja, p);
   App.trasPintarFicha.forEach(function (f) {
     try { f(p, caja); } catch (e) { /* un módulo roto no tumba la ficha */ }
   });
 
+  var acciones = $('ficha-persona-acciones');
   /* Y, si es de los que se dieron de alta a mano, el botón de cambiar
      sus datos. */
   if (App.sePuedeCambiarElTercero(p)) {
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'boton';
-    b.style.marginLeft = '8px';
     b.id = 'cambiar-tercero';
     b.textContent = 'Cambiar los datos';
     b.onclick = function () { App.cambiarDatosDelTercero(p); };
-    $('ver-sus-asuntos').parentNode.appendChild(b);
+    acciones.appendChild(b);
   }
+  var nuevoAsunto = document.createElement('button');
+  nuevoAsunto.type = 'button';
+  nuevoAsunto.id = 'nuevo-asunto-persona';
+  nuevoAsunto.className = 'boton';
+  nuevoAsunto.style.marginLeft = '8px';
+  nuevoAsunto.textContent = '+ Nuevo asunto para esta persona';
+  nuevoAsunto.onclick = function () { App.nuevoAsuntoCon({ tercero: p }); };
+  acciones.appendChild(nuevoAsunto);
+
+  App.verAsuntosDeTercero(p);
 };
 
 /* ---------- cambiar los datos de un tercero ----------
@@ -376,9 +420,15 @@ App.cambiarDatosDelTercero = async function (p) {
 };
 
 /* Todos los asuntos de una persona o empresa, los abiertos y los
-   archivados, en una sola lista. */
+   archivados: sale sola al abrir la ficha (fila 175, punto 1), y cada
+   fila se puede pulsar y abre esa ficha (abiertos con
+   App.abrirFicha; archivados con OtrosDelTercero.montarArchivado,
+   igual que "Abrir el que ya existe" de un duplicado archivado,
+   js/duplicados.js). Abiertos primero, cada grupo del más reciente al
+   más antiguo. */
 App.verAsuntosDeTercero = async function (p) {
   var caja = $('asuntos-del-tercero');
+  var titulo = $('titulo-sus-asuntos');
   caja.innerHTML = '<p class="explica">Buscando…</p>';
   var texto = App.textoTercero(p);
   var clave = U.normalizar(texto);
@@ -400,12 +450,35 @@ App.verAsuntosDeTercero = async function (p) {
     });
   } catch (e) { /* todavía no tiene carpeta en el archivo */ }
 
-  salida.sort(function (a, b) { return a.nombre < b.nombre ? 1 : -1; });
+  /* Abiertos primero; dentro de cada grupo, del más reciente al más
+     antiguo (el nombre empieza por AAMMDD, así que basta con ordenar
+     al revés por nombre). */
+  salida.sort(function (a, b) {
+    if (a.donde !== b.donde) return a.donde === 'Abierto' ? -1 : 1;
+    return a.nombre < b.nombre ? 1 : -1;
+  });
+
+  if (titulo) titulo.textContent = 'Sus asuntos' + (salida.length ? ' (' + salida.length + ')' : '');
 
   if (!salida.length) {
     caja.innerHTML = '<div class="vacio">Todavía no hay ningún asunto suyo.</div>';
     return;
   }
+
+  function abrirFilaDeAsunto(a) {
+    if (a.donde === 'Abierto') {
+      var abierto = (App.E.listaAbiertos || []).filter(function (x) { return x.nombre === a.nombre; })[0];
+      if (!abierto) { U.aviso('Ya no está abierto: puede que se haya archivado desde otro ordenador.', 'malo'); return; }
+      App.abrirFicha(abierto, 'abierto');
+      return;
+    }
+    (async function () {
+      var objeto = window.OtrosDelTercero ? await OtrosDelTercero.montarArchivado(a.nombre, p.categoria, texto) : null;
+      if (!objeto) { U.aviso('No he podido abrir «' + a.nombre + '»: ya no está en el archivo.', 'malo'); return; }
+      App.abrirFicha(objeto, 'archivado');
+    })();
+  }
+
   /* Fila 64: la ficha de uno archivado ya no está en
      App.E.registro.asuntos, hay que leer su _ficha.json (se tiene el
      manejador de la propia carpeta, así que sale barato). */
@@ -417,7 +490,9 @@ App.verAsuntosDeTercero = async function (p) {
     /* Fila 129: el estado es el hito actual, o dónde se quedó al archivar. */
     var situacion = !window.EstadoHito ? '' : (a.donde === 'Abierto'
       ? EstadoHito.textoDeNombre(a.nombre) : EstadoHito.textoArchivado(ficha));
-    return '<div class="resultado"><div>' +
+    var div = document.createElement('div');
+    div.className = 'resultado';
+    div.innerHTML = '<div>' +
            /* Fila 135: aquí ya se ha elegido a la persona; el reservado se ve, con su candado. */
            (window.Reservados ? Reservados.candadoHtml({ nombre: a.nombre, leido: leido, ficha: ficha }) : '') +
            (leido.tipo ? '<span class="marca-tipo" title="' + U.escapar(leido.tipo) + '">' +
@@ -425,9 +500,12 @@ App.verAsuntosDeTercero = async function (p) {
            (situacion ? '<span class="marca-hito">' + U.escapar(situacion) + '</span>' : '') +
            U.escapar(a.nombre) + '</div>' +
            '<div class="resultado-pie">' + a.donde +
-           (leido.fecha ? '  ·  ' + U.fechaLegible(leido.fecha) : '') + '</div></div>';
+           (leido.fecha ? '  ·  ' + U.fechaLegible(leido.fecha) : '') + '</div>';
+    div.onclick = function () { abrirFilaDeAsunto(a); };
+    return div;
   }));
-  caja.innerHTML = filas.join('');
+  caja.innerHTML = '';
+  filas.forEach(function (div) { caja.appendChild(div); });
 };
 
 Nombres.opcionesCategorias($('filtro-personas'), 'lista');   /* fila 166: la lista única */

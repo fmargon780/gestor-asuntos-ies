@@ -182,8 +182,8 @@
        ya deja su propio hilo enganchado, y la respuesta entra sola. */
     sitio.innerHTML = '<strong>' + U.escapar(aviso || 'Rastro del correo') + '</strong>' +
       (I.envioRealizado ? '' :
-        '<p>Acuérdate de guardar el PDF del hilo en la carpeta del asunto, ' +
-        'con el botón "Gestionar documentos".</p>');
+        '<p>Acuérdate de guardar el PDF del hilo en el asunto: en la tarjeta ' +
+        'Documentos, "+ Añadir documento".</p>');
 
     if (!puedeEsperar) return;
     var b = document.createElement('button');

@@ -243,6 +243,7 @@
       </div>
 
       <div id="zona-asuntos">
+        <p class="explica oculto" id="buscando-en-todos">Buscando en todos los asuntos abiertos</p>
         <div id="lista-abiertos" class="lista"></div>
       </div>
     </section>
@@ -262,6 +263,7 @@
 
         <div id="bloque-tipos" class="oculto">
           <label class="etiqueta">Tipo de asunto</label>
+          <div id="tercero-propuesto-nuevo" class="aviso-en-vivo oculto"></div>
           <div class="tipos" id="tipos-lista"></div>
           <p class="nota">¿Falta un tipo? Créalo con «+ Crear tipo nuevo», aquí mismo, o ve a
              <button type="button" class="enlace" id="ir-a-ajustes">Ajustes</button>
@@ -270,7 +272,7 @@
 
         <div id="bloque-tercero" class="oculto">
           <label class="etiqueta" id="etiqueta-tercero">Tercero</label>
-          <input id="buscar-tercero" class="campo" placeholder="Escribe tres letras del nombre">
+          <input id="buscar-tercero" class="campo" placeholder="Escribe dos letras del nombre">
           <div id="resultados-tercero" class="resultados"></div>
           <div id="tercero-elegido" class="elegido oculto"></div>
         </div>
@@ -302,23 +304,15 @@
           <label class="etiqueta">Descripción corta <span class="suave">(opcional)</span></label>
           <input id="campo-descripcion" class="campo" placeholder="Por ejemplo: Cambio de optativa">
 
-          <div class="dos-columnas">
-            <div>
-              <label class="etiqueta">Vía de comunicación <span class="suave">(opcional)</span></label>
-              <select id="campo-via" class="campo"></select>
-            </div>
-          </div>
-          <input id="campo-via-dato" class="campo" placeholder="Teléfono, correo o aclaración, si lo ha dado">
-
           <label class="etiqueta">Fecha límite <span class="suave">(opcional)</span></label>
           <input id="campo-limite" type="date" class="campo">
           <p id="nota-limite" class="nota oculto"></p>
 
-          <p class="nota">El estado, la vía de comunicación y la fecha límite no salen en el nombre de la carpeta.
+          <p class="nota">El estado y la fecha límite no salen en el nombre de la carpeta.
              Se guardan en la carpeta del centro, y los ve todo el que abra la aplicación.</p>
 
           <div id="grupo-lopide">
-            <label class="etiqueta">Lo pide <span class="suave">(opcional)</span></label>
+            <label class="etiqueta">Quién lo pide y por qué vía <span class="suave">(opcional)</span></label>
             <div id="lopide-caja-nuevo"></div>
           </div>
 
@@ -340,11 +334,9 @@
         <h2>Archivo</h2>
         <div class="acciones">
           <input id="buscar-archivo" class="campo" placeholder="Buscar en todo el archivo">
-          <button id="btn-recargar-archivo" class="boton">Actualizar</button>
-          <button id="btn-reconstruir-indice" class="boton" title="Recorre el archivo entero una vez y guarda el índice de búsqueda">Reconstruir el índice</button>
         </div>
       </header>
-      <p class="explica" id="explica-archivo">Pulsa Actualizar para leer el archivo. Puede tardar unos segundos la primera vez.</p>
+      <p class="explica" id="explica-archivo">Leyendo el archivo…</p>
       <div id="lista-archivo" class="lista"></div>
     </section>
 

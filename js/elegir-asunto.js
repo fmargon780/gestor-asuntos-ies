@@ -138,7 +138,9 @@ window.ElegirAsunto = (function () {
     return lista;
   }
 
-  function filaDeAsunto(x, puntos) {
+  /* Fila 175, punto 6b: la puntuación sigue ordenando la lista (en
+     `ordenar`, más abajo); solo deja de pintarse aquí. */
+  function filaDeAsunto(x) {
     var pie = [
       (x.ficha.tercero || ''),
       (estaArchivado(x.ficha) ? 'Archivado' : 'Abierto')
@@ -148,8 +150,7 @@ window.ElegirAsunto = (function () {
              (estaArchivado(x.ficha)
                ? '<span class="marca-tipo enlace-archivado">Archivado</span>' : '') +
              U.escapar(x.nombre) +
-             '<span class="resultado-pie">' + U.escapar(pie) +
-             (puntos ? '  ·  ' + puntos + ' puntos' : '') + '</span>' +
+             '<span class="resultado-pie">' + U.escapar(pie) + '</span>' +
            '</button>';
   }
 
@@ -183,7 +184,7 @@ window.ElegirAsunto = (function () {
         (sugeridos.length
           ? '<div class="enlace-bloque"><div class="etiqueta">Podrían encajar</div>' +
             '<div class="lista enlace-lista">' +
-            sugeridos.map(function (x) { return filaDeAsunto(x, x.puntos); }).join('') +
+            sugeridos.map(function (x) { return filaDeAsunto(x); }).join('') +
             '</div></div>'
           : '') +
         '<div class="enlace-bloque"><div class="etiqueta">Todos los asuntos</div>' +
@@ -221,7 +222,7 @@ window.ElegirAsunto = (function () {
         });
         caja.innerHTML = vistos.length
           ? vistos.slice(0, CUANTOS_EN_LA_LISTA).map(function (x) {
-              return filaDeAsunto(x, 0);
+              return filaDeAsunto(x);
             }).join('')
           : '<div class="vacio">Ningún asunto con eso.</div>';
         engancharFilas(caja);

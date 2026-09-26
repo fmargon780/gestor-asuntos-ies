@@ -69,7 +69,6 @@ await pagina.evaluate(async () => {
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 /* Un asunto de verdad, creado como lo hace Francisco (con categoría y
    tercero, no una carpeta suelta puesta a mano en el disco). */
