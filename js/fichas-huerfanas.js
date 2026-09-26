@@ -27,7 +27,8 @@
     var hayCarpeta = {};
     App.E.listaAbiertos.forEach(function (a) { hayCarpeta[a.nombre] = true; });
 
-    var indice = window.IndiceArchivo ? await IndiceArchivo.leerDisco() : { ok: false };
+    /* Fila 177: una ficha huérfana puede ser de un curso cualquiera. */
+    var indice = window.IndiceArchivo ? await IndiceArchivo.leerDisco({ todos: true }) : { ok: false };
     if (indice.ok) {
       indice.datos.asuntos.forEach(function (e) { hayCarpeta[e.nombre] = true; });
     } else if (App.E.listaArchivo.length) {
