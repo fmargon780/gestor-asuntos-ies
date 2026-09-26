@@ -1,7 +1,7 @@
-# Los avisos en una línea, el menú y un solo «Volver» (fila 178)
+# Los avisos en una línea, el menú y un solo «Volver» (fila 181)
 
 Acordado con Francisco el 26-sep-2026. Diseño cerrado. Tercera y última parte de la «tanda 2».
-**Va después de la fila 177.** Referencia visual: la franja amarilla y el menú de
+**Va después de la fila 180.** Referencia visual: la franja amarilla y el menú de
 `docs/boceto-inicio.html`.
 
 ## Ficheros que se tocan

@@ -1,9 +1,9 @@
-# La pantalla de Inicio: lo que ha llegado, lo que me toca y lo que esperamos (fila 177)
+# La pantalla de Inicio: lo que ha llegado, lo que me toca y lo que esperamos (fila 180)
 
 Acordado con Francisco el 26-sep-2026. Diseño cerrado, con boceto aprobado:
 **`docs/boceto-inicio.html`** (ábrelo en el navegador antes de empezar: es la referencia de cómo
 tiene que quedar; los datos son inventados). Segunda parte de la «tanda 2». **Va después de la
-fila 176** (usa ya las palabras de `docs/VOCABULARIO.md`).
+fila 179** (usa ya las palabras de `docs/VOCABULARIO.md`).
 
 ## Qué quiere
 
@@ -35,7 +35,7 @@ quedan como están: solo cambia lo que se ve.
 ## Cómo tiene que quedar
 
 Cabecera: título **«Inicio»**, el buscador («Buscar en todos los asuntos abiertos: nombre, tipo
-o tercero») y el botón «+ Nuevo asunto». Debajo, la línea de avisos (la hace la fila 178; aquí
+o tercero») y el botón «+ Nuevo asunto». Debajo, la línea de avisos (la hace la fila 181; aquí
 deja su hueco). Después, a todo el ancho de la ventana (sin tope de ancho):
 
 **Fila de arriba, cuatro columnas**: «Ha llegado», «Me toca», «Esperamos a otros» y el tablón
@@ -109,7 +109,7 @@ dejaron abiertos.
   la pestaña «Inicio».
 - La pestaña «Asuntos abiertos» se llama **«Inicio»**.
 - El aviso de «N aspirantes sin Nº de identificación escolar» que salía en «Qué me toca» pasa a la
-  línea de avisos (fila 178); hasta entonces, déjalo encima de «Todos los asuntos abiertos».
+  línea de avisos (fila 181); hasta entonces, déjalo encima de «Todos los asuntos abiertos».
 - Cualquier enlace o botón que llevara a «Qué me toca» lleva ahora a Inicio.
 
 ## Reglas que no hay que romper

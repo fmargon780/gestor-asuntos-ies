@@ -1,4 +1,4 @@
-# Una sola palabra para cada cosa (fila 176)
+# Una sola palabra para cada cosa (fila 179)
 
 Acordado con Francisco el 26-sep-2026. Diseño cerrado. Primera parte de la «tanda 2» del análisis
 de usabilidad. **Va después de las filas 173, 174 y 175.**
