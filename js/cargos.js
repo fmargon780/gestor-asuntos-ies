@@ -345,7 +345,7 @@ window.Cargos = Cargos;
         U.escapar(cargo.nombre) + '">' +
         '<label class="etiqueta">Tratamiento</label><input id="cargo-editar-tratamiento" class="campo" value="' +
         U.escapar(cargo.tratamiento) + '" placeholder="El Director, La Secretaria…">';
-      var ok = await U.preguntar('Editar cargo', cuerpo, 'Guardar');
+      var ok = await U.preguntar('Cambiar el cargo', cuerpo, 'Guardar');
       if (!ok) return;
       try {
         await Cargos.renombrarCargo(cargo.id, $('cargo-editar-nombre').value.trim() || cargo.nombre,
