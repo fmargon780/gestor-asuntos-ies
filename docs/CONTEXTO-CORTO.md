@@ -73,9 +73,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Asuntos reservados (por tipo o uno a uno): candado, sin el tercero en listas y buscador.
 - El estado es el primer hito sin terminar («Paso N de M · título», «Paso actual»): Administración o terceros; «Esperando a…» sale solo con el responsable (a mano, hasta que cambia el paso). Guías: «Administración», no personas. Vía y fecha límite.
 - Asuntos recurrentes, con aviso. Avisos de fichas huérfanas y papelera vieja.
-- Buscador de tipos y de terceros, con índice guardado del ARCHIVO (carga solo al entrar, la
-  primera vez) y búsqueda por palabras sueltas también en documentos, registro de Séneca, ficha
-  y notas.
+- Buscador de tipos y de terceros, con índice guardado del ARCHIVO, partido por curso académico
+  (selector «Curso: … ▾»; carga solo al entrar, la primera vez) y búsqueda por palabras sueltas
+  también en documentos, registro de Séneca, ficha y notas.
 - Personas (Alumnado): matriculados primero, antiguos plegados; busca por padre, madre o tutor;
   hermanos y sus asuntos en la ficha (se abren pulsando la fila); «+ Nuevo asunto para esta
   persona». La BD de alumnado (carpeta de Drive) suma sus datos:
@@ -97,7 +97,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   memoria) que se pueda aprovechar de lo leído; «Guardar» cierra el cuadro entero. Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero;
   sus adjuntos pasan también por el cuadro de nombre, uno detrás de otro.
-- Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. Carpeta ≤150, documento ≤120.
+- Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. Carpeta y documento con tope
+  dinámico: cuenta la ruta real de Dropbox (rutas.json); sin ella, ≤150/≤120 fijos, como antes.
 - Botón «Ruta» (`file:///`; ficha, Correo/Séneca): deduce Dropbox; lo de dentro, una vez para el centro. Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto (foto, cabecera fija) en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
@@ -140,6 +141,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Archivar/reabrir sobre un destino que ya existe fusiona. Crear, reabrir o editar deja en la ficha; Volver, a donde estaba.
 - Al archivar, la ficha baja a su carpeta (al reabrir, vuelve) y se hace el índice del expediente
   (PDF numerado; también desde el menú de la ficha).
+- El índice del ARCHIVO está partido por curso académico (`indice-archivo/<curso>.json`), con
+  selector «Curso: … ▾» en la pantalla; el tope de largo de un nombre cuenta la ruta real de
+  Dropbox (`Nombres.topes`), no solo el nombre.
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -169,6 +173,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   elemento con `App.anotarLista`, nunca se sustituyen enteras; un asunto cerrado (archivado, a la
   papelera, unido o renombrado) lleva una lápida en `borrados-listas.json` y no se puede resucitar
   sin revivirla antes (fila 176).
+- El índice del ARCHIVO va partido por curso académico (`indice-archivo/<curso>.json`,
+  `IndiceArchivo.leerDisco`); `anadirEntrada`/`quitarEntrada` solo tocan el fichero del curso que
+  toca. El tope de largo de un nombre (`Nombres.topes`) cuenta la ruta real dentro de Dropbox
+  (`_GESTOR/rutas.json`), no solo el nombre suelto.
 
 ## 7. Descartado, no proponer otra vez
 
