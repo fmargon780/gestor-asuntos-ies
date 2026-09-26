@@ -16,7 +16,7 @@
      de hoy como nombre corto (fila 79, apartado 4.9) — pero solo si
      todavía no tiene nombre corto puesto (una segunda pulsación no lo
      vuelve a tocar).
-   - Un modelo que ya exista en la biblioteca, con el mismo id, se deja
+   - Un hito de la biblioteca que ya exista, con el mismo id, se deja
      como está.
    - Un tipo que ya tenga guía escrita no se toca: se avisa de cuáles
      se han saltado.
@@ -124,7 +124,7 @@ var CargarBiblioteca = (function () {
     App.E.campos = campos;
   }
 
-  /* ---------- 3. Los modelos de la biblioteca ---------- */
+  /* ---------- 3. Los hitos de la biblioteca ---------- */
 
   async function fusionarModelos(datos, resumen) {
     var biblioteca = await HitosBiblioteca.leer();
@@ -188,19 +188,19 @@ var CargarBiblioteca = (function () {
     return resumen;
   }
 
-  /* ---------- "Traer los guiones del instituto" (fila 109) ----------
+  /* ---------- "Traer las tareas del instituto" (fila 109) ----------
 
      Pone el `guion` de cada hito modelo del contenido del centro en los
      pasos de guias.json (emparejando por el modelo del que vienen,
      `origenBiblioteca.id`, o por el id del paso) y en los modelos de
      hitos-biblioteca.json (por su id), solo en los que no tengan ya uno.
-     Nunca pisa un guion escrito. Todo pasa por GuiasDelCentro.guardarPasos
+     Nunca pisa una tarea escrita. Todo pasa por GuiasDelCentro.guardarPasos
      y HitosBiblioteca.cambiar, que releen antes de escribir.
 
-     Fila 124 (docs/RENUNCIA-JUNTA-ELECTORAL.md): a un guion que YA está
-     escrito solo se le añaden las líneas que el centro marca `nueva: true`
-     y que ese guion no tenga (por su id), justo detrás de la línea que
-     las precede en el guion del centro (o al final); y las plantillas de
+     Fila 124 (docs/RENUNCIA-JUNTA-ELECTORAL.md): a una tarea que YA está
+     escrita solo se le añaden las líneas que el centro marca `nueva: true`
+     y que esa tarea no tenga (por su id), justo detrás de la línea que
+     las precede en la tarea del centro (o al final); y las plantillas de
      `plantillasDocumento` del modelo que el paso no tenga. Nada se quita
      ni se cambia de sitio. */
   async function traerGuiones() {
@@ -213,7 +213,7 @@ var CargarBiblioteca = (function () {
     var resumen = { pasos: 0, modelos: 0 };
 
     /* Fila 124: las líneas nuevas del centro y sus plantillas, sobre un
-       paso (o modelo) que ya tiene guion. Devuelve si ha cambiado algo. */
+       paso (o modelo) que ya tiene tarea. Devuelve si ha cambiado algo. */
     function completar(p, origen) {
       var cambio = false;
       var delCentro = porId[origen] || [];
@@ -289,22 +289,22 @@ window.CargarBiblioteca = CargarBiblioteca;
     d.innerHTML =
       '<summary>' +
         '<span class="bloque-titulo">Biblioteca del centro</span>' +
-        '<span class="bloque-pie">Tipos, campos y hitos modelo ya preparados para el instituto</span>' +
+        '<span class="bloque-pie">Tipos, campos e hitos de la biblioteca ya preparados para el instituto</span>' +
       '</summary>' +
       '<div class="bloque-cuerpo">' +
         '<p class="explica">Da de alta los tipos de asunto que falten, les pone el nombre corto, ' +
         'crea los campos propios que hagan falta y escribe la guía de cada uno, con sus hitos ' +
-        'modelo y su normativa. Se puede pulsar más de una vez: nada de lo que ya tengas escrito ' +
+        'de la biblioteca y su normativa. Se puede pulsar más de una vez: nada de lo que ya tengas escrito ' +
         'se toca.</p>' +
         '<button type="button" class="boton boton-principal" id="btn-cargar-biblioteca">' +
         'Cargar la biblioteca del centro</button>' +
         '<div id="resultado-cargar-biblioteca"></div>' +
-        /* Fila 109: el guion de cada hito, aparte (quien ya cargó la
-           biblioteca antes no lo tiene). */
-        '<p class="explica" style="margin-top:14px">El guion de cada hito (lo que hay que hacer dentro de él) ' +
-        'se trae aparte: solo se pone en los hitos que todavía no tengan uno. A los que ya lo tienen solo ' +
+        /* Fila 109: la tarea de cada hito, aparte (quien ya cargó la
+           biblioteca antes no la tiene). */
+        '<p class="explica" style="margin-top:14px">Las tareas de cada hito (lo que hay que hacer dentro de él) ' +
+        'se traen aparte: solo se ponen en los hitos que todavía no tengan ninguna. A los que ya las tienen solo ' +
         'se les añaden las líneas nuevas del instituto que les falten, sin tocar lo demás.</p>' +
-        '<button type="button" class="boton" id="btn-traer-guiones">Traer los guiones del instituto</button>' +
+        '<button type="button" class="boton" id="btn-traer-guiones">Traer las tareas del instituto</button>' +
         '<div id="resultado-traer-guiones"></div>' +
       '</div>';
     pantalla.appendChild(d);
@@ -321,8 +321,8 @@ window.CargarBiblioteca = CargarBiblioteca;
       (r.tiposCreados ? r.tiposCreados + ' tipo(s) nuevo(s)' : 'Ningún tipo nuevo') +
       (r.tiposRenombrados ? ', ' + r.tiposRenombrados + ' con su nombre corto puesto' : '') + '.'));
     lineas.push(filaResumen(r.modelosCreados
-      ? r.modelosCreados + ' hito(s) modelo nuevo(s) en la biblioteca.'
-      : 'Ningún hito modelo nuevo (ya estaban todos).'));
+      ? r.modelosCreados + ' hito(s) nuevo(s) en la biblioteca.'
+      : 'Ningún hito nuevo en la biblioteca (ya estaban todos).'));
     lineas.push(filaResumen(
       (r.guiasCreadas ? r.guiasCreadas + ' guía(s) escrita(s)' : 'Ninguna guía nueva') +
       (r.guiasSaltadas.length ? ' · ' + r.guiasSaltadas.length + ' saltada(s) porque ya tenían guía' : '') + '.'));
@@ -357,12 +357,12 @@ window.CargarBiblioteca = CargarBiblioteca;
     try {
       var r = await U.mientrasGuarda(boton, function () { return CargarBiblioteca.traerGuiones(); });
       var texto = (r.pasos || r.modelos)
-        ? 'He traído el guion de ' + r.pasos + ' paso(s) de las guías y de ' + r.modelos + ' hito(s) modelo de la biblioteca.'
-        : 'No había nada que traer: todos tenían ya su guion completo.';
+        ? 'He traído las tareas de ' + r.pasos + ' hito(s) de las guías y de ' + r.modelos + ' hito(s) modelo de la biblioteca.'
+        : 'No había nada que traer: todos tenían ya sus tareas completas.';
       salida.innerHTML = '<p class="explica">' + U.escapar(texto) + '</p>';
       U.aviso(texto, 'bueno');
     } catch (e) {
-      U.fallo('No he podido traer los guiones', e);
+      U.fallo('No he podido traer las tareas', e);
     }
   }
 
