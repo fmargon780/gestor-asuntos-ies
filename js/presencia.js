@@ -114,6 +114,14 @@ var Presencia = (function () {
       var asuntos = (leido && typeof leido.asuntos === 'object' && leido.asuntos) ? leido.asuntos : {};
       Object.keys(asuntos).forEach(function (clave) {
         if (!vigente(asuntos[clave])) return;
+        var ya = combinado[clave];
+        /* Si dos usuarios anuncian el mismo asunto a la vez (uno lo tenía
+           ya abierto cuando el otro entra, antes de que el primero se
+           entere y pase a modo consulta), gana el anuncio más reciente:
+           es lo mismo que hacía el `presencia.json` único de antes, donde
+           solo podía haber una señal por asunto y ganaba quien escribiera
+           el último. */
+        if (ya && ya.ultima >= asuntos[clave].ultima) return;
         combinado[clave] = { usuario: quien, ultima: asuntos[clave].ultima };
       });
     }
