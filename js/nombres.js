@@ -148,6 +148,18 @@ var Nombres = (function () {
   var TOPE_ASUNTO = 150;
   var TOPE_DOCUMENTO = 120;
 
+  /* Fila 177 (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md, punto 2): con la ruta
+     de la carpeta ARCHIVO ya señalada, el hueco de verdad lo calcula
+     `Nombres.topes()` (js/nombres-topes.js, cargado justo después de
+     este fichero), contando la ruta completa dentro de Dropbox. Sin
+     ella, se quedan los fijos de arriba, tal cual. */
+  function topesDeHoy(tercero, categoria) {
+    if (typeof window !== 'undefined' && window.Nombres && typeof window.Nombres.topes === 'function') {
+      return window.Nombres.topes(tercero, categoria);
+    }
+    return { asunto: TOPE_ASUNTO, documento: TOPE_DOCUMENTO };
+  }
+
   function unir(partes) { return U.limpiarNombre(partes.filter(function (p) { return p; }).join(' ')); }
 
   /* `antes` y `despues` no se tocan nunca; `medio` se recorta desde el
@@ -164,7 +176,13 @@ var Nombres = (function () {
       else m.splice(i, 1);
       nombre = unir(antes.concat(m, despues));
     }
-    return { nombre: nombre, recortado: recortado };
+    /* Fila 177: ni la fecha, el tipo, el año académico, el grupo ni el
+       tercero se recortan nunca, así que si ellos solos ya pasan del
+       tope (una ruta de Dropbox larga y un tercero largo, sobre todo),
+       el nombre se queda sin caber por mucho que se recorte el texto
+       libre. Quien llama tiene que avisar y no crear nada, en vez de
+       guardar un nombre que luego no sincroniza. */
+    return { nombre: nombre, recortado: recortado, noCabe: nombre.length > tope };
   }
 
   /* El nombre de la carpeta y si ha habido que recortarlo. Se recorta
@@ -177,7 +195,8 @@ var Nombres = (function () {
     if (datos.grupo) antes.push(U.limpiarNombre(datos.grupo));
     var medio = (datos.campos || []).map(function (v) { return U.limpiarNombre(v); });
     if (datos.descripcion) medio.push(U.limpiarNombre(datos.descripcion));
-    return ajustarAlTope(antes, medio, [U.limpiarNombre(datos.tercero)], TOPE_ASUNTO);
+    var tope = topesDeHoy(datos.tercero, datos.categoria).asunto;
+    return ajustarAlTope(antes, medio, [U.limpiarNombre(datos.tercero)], tope);
   }
 
   /* ---------- la abreviatura del grupo ----------
@@ -464,24 +483,34 @@ var Nombres = (function () {
        tipo y el texto adicional. */
     var medio = (datos.campos || []).map(function (v) { return U.limpiarNombre(v); });
     if (datos.curso) medio.push(U.limpiarNombre(datos.curso));
-    var r = ajustarAlTope(antes, medio, [], TOPE_DOCUMENTO);
+    var tope = topesDeHoy(datos.tercero, datos.categoria).documento;
+    var r = ajustarAlTope(antes, medio, [], tope);
     var ext = String(datos.extension || '').replace(/[^A-Za-z0-9]/g, '').toLowerCase();
-    return { nombre: r.nombre + (ext ? '.' + ext : ''), recortado: r.recortado };
+    return { nombre: r.nombre + (ext ? '.' + ext : ''), recortado: r.recortado, noCabe: r.noCabe };
   }
 
   /* La línea ámbar de la vista previa, si ha habido recorte. */
   var AVISO_RECORTE = 'Nombre demasiado largo: se ha acortado el texto libre.';
+  /* Fila 177 (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md, punto 2): ni recortando
+     el texto libre cabe en la ruta de Dropbox. En rojo, y no se crea. */
+  var AVISO_NO_CABE = 'El nombre no cabe en la ruta de Dropbox: acorta el texto.';
 
-  /* Pone (o quita) esa línea justo debajo de `el`, el nombre de la vista previa. */
-  function avisoRecorte(el, recortado) {
+  /* Pone (o quita) esa línea justo debajo de `el`, el nombre de la
+     vista previa: ámbar si solo se ha recortado, roja si ni así cabe
+     (`noCabe`, fila 177). */
+  function avisoRecorte(el, recortado, noCabe) {
     if (!el || !el.parentNode || typeof document === 'undefined') return;
     var sig = el.nextElementSibling;
     var ya = sig && sig.classList && sig.classList.contains('vista-recorte') ? sig : null;
-    if (!recortado) { if (ya) ya.parentNode.removeChild(ya); return; }
-    if (ya) return;
+    if (!recortado && !noCabe) { if (ya) ya.parentNode.removeChild(ya); return; }
+    if (ya) {
+      ya.textContent = noCabe ? AVISO_NO_CABE : AVISO_RECORTE;
+      ya.className = 'vista-recorte aviso-en-vivo ' + (noCabe ? 'aviso-rojo' : 'aviso-ambar');
+      return;
+    }
     var p = document.createElement('div');
-    p.className = 'vista-recorte aviso-en-vivo aviso-ambar';
-    p.textContent = AVISO_RECORTE;
+    p.className = 'vista-recorte aviso-en-vivo ' + (noCabe ? 'aviso-rojo' : 'aviso-ambar');
+    p.textContent = noCabe ? AVISO_NO_CABE : AVISO_RECORTE;
     el.parentNode.insertBefore(p, el.nextSibling);
   }
 
