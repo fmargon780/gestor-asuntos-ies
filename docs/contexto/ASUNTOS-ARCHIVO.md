@@ -267,6 +267,89 @@ Se comprueba con `pruebas/archivo-indice.mjs`, en navegador de verdad con el dis
 `pruebas/navegador.mjs`, con los nueve escenarios del documento; la carga sola al entrar, en
 `pruebas/personas-archivo-y-menu.mjs` (fila 175, punto 3).
 
+### El índice del ARCHIVO, partido por curso académico (fila 177, 26-sep-2026)
+
+`docs/ARCHIVO-POR-CURSO-Y-RUTAS.md`. Con unos 50 asuntos abiertos y más de 200 archivados en cuatro
+días, el archivo crece varios miles por curso: un solo `indice-archivo.json` con todos los asuntos
+juntos, reescrito entero cada vez que se archiva algo, acabaría pesando varios megabytes.
+
+- **`_GESTOR/indice-archivo.json`** (`IndiceArchivo.FICHERO_RESUMEN`) es ahora un **resumen
+  pequeño**: `{ version, hechoEl, hechoPor, cursos: ['2026-27', '2025-26', …], recuento }`. Es lo
+  único que se lee al entrar en el ARCHIVO.
+- **`_GESTOR/indice-archivo/<curso>.json`** (`IndiceArchivo.CARPETA`), un fichero por curso
+  académico, lleva el índice de verdad de ese curso: `{ version, hechoEl, hechoPor, asuntos }`,
+  con la misma estructura de entrada de siempre (ver `entradaDe`, arriba).
+- **El curso de un asunto** sale de las seis primeras cifras de su nombre de carpeta (AAMMDD), con
+  la misma cuenta de siempre (`U.cursoDeFecha`: 1 de septiembre a 31 de agosto). Sin fecha
+  reconocible, el curso actual. `IndiceArchivo._cursoDeNombre` lo calcula (privado, solo para
+  `archivo-indice-construir.js` y las pruebas).
+- **`leerDisco(opciones)`**: sin argumentos, solo el curso ACTUAL; `leerDisco({ curso: '2025-26'
+  })`, uno concreto; `leerDisco({ todos: true })`, todos los cursos juntos (misma forma que antes:
+  un solo array `asuntos`, más `cursos` y, si se ha pedido un curso, `curso`). Piden `todos: true`
+  a propósito, porque necesitan verlo todo: Cuentas (`js/cuentas.js`, que ya tiene su propio
+  selector de curso, sobre lo ya cargado), fichas huérfanas (`js/fichas-huerfanas.js`), las
+  sugerencias de "Por clasificar" del mismo tipo (`js/documentos-sueltos-sugerencias.js`), un
+  relacionado archivado (`js/relacionados-archivar.js`), quién ya tiene un asunto de un tipo
+  (`js/repartir-crear.js`, `App.contarAsuntosConTipo` en `js/ajustes.js`) y el plazo de conservación
+  (`js/conservacion.js`). Un curso sin ningún archivado todavía (empieza el curso) no es un índice
+  roto: `asuntos` sale vacío.
+- **`anadirEntrada`/`quitarEntrada`** escriben SOLO el fichero del curso que les toca (calculado del
+  propio nombre): archivar ya no reescribe miles de entradas de otros cursos.
+- **`guardar(indice)`** (lo que devuelve `construir()`, todos los cursos juntos) lo parte por curso
+  al escribir, releyendo y fusionando cada fichero de curso por separado, igual que antes se hacía
+  con el fichero entero.
+- **Migración sin manos**: si al leer el resumen resulta que todavía es el formato antiguo (trae
+  `asuntos` en vez de `cursos`), `leerDisco` lo parte solo la primera vez que se entra
+  (`migrarSiHaceFalta`), dentro de la misma fila de guardado que todo lo demás del índice. El
+  fichero viejo se aparta a `_GESTOR/copias/indice-archivo-antiguo-AAMMDD.json` antes de sustituirlo.
+  Si el otro ordenador todavía lleva la aplicación vieja y vuelve a escribir el formato antiguo
+  encima, la siguiente lectura lo vuelve a partir: no se pierde nada, el índice siempre se puede
+  rehacer entero con "Reconstruir el índice".
+- **Pantalla ARCHIVO**: un desplegable "Curso: 2026-27 ▾" (`#selector-curso-archivo`, en la cabecera,
+  junto al buscador) con los cursos del resumen (más el curso actual, por si aún no tiene nada
+  archivado) y una última opción "Todos los cursos". Por defecto, el curso actual
+  (`App.E.cursoArchivo`, `undefined` = el actual, `''` = todos). El buscador sigue buscando dentro
+  de lo cargado, sin releer nada. La ficha de una persona ("Sus asuntos", fila 175) no pasa por el
+  índice: recorre su carpeta directamente y sigue viendo todos sus archivados, de cualquier curso.
+- El índice sigue **fuera de los dieciocho** ficheros protegidos, por el mismo motivo de siempre: se
+  reconstruye entero cuando haga falta, así que ni la subcarpeta `indice-archivo/` ni el resumen
+  necesitan copia de seguridad, papelera ni fusión de conflictos.
+
+Se comprueba sin navegador en `pruebas/archivo-por-curso.mjs` (migración, `anadirEntrada` por
+curso, y los topes de `Nombres.topes()`, más abajo); `pruebas/archivo-indice.mjs` y
+`pruebas/plazo-de-conservacion.mjs` se actualizaron para el nuevo formato (fechas calculadas desde
+`U.cursoActual()`, nunca a mano, y `leerDisco({ todos: true })` donde hace falta ver más de un
+curso).
+
+### El tope de largo cuenta la ruta completa (fila 177, 26-sep-2026)
+
+`Nombres.TOPE_ASUNTO` (150) y `Nombres.TOPE_DOCUMENTO` (120) miraban solo el nombre. La ruta real de
+un documento archivado es `<Dropbox>/<ruta de ARCHIVO>/<CATEGORÍA>/<tercero>/<asunto>/Versiones
+previas/<documento>.pdf`, y puede pasar de los 260 caracteres que Windows deja sincronizar sin
+avisar.
+
+- **`Nombres.topes(tercero, categoria)`** (`js/nombres-topes.js`, cargado justo después de
+  `js/nombres.js`) calcula el hueco de verdad a partir de: la parte de dentro de Dropbox de la
+  carpeta ARCHIVO (`RutaCarpetas.comunConocido('archivo')`, de `_GESTOR/rutas.json`; es la que
+  manda, por ser la más larga), dónde está Dropbox en este ordenador (`localStorage`, o 45
+  caracteres por defecto), la categoría (la más larga de `Nombres.CATEGORIAS` si no se conoce ya) y
+  el tercero, si se conoce. Tope total: 240. **Sin `rutas.json` señalado todavía** (nadie ha abierto
+  el botón "Ruta" ni Ajustes → El centro desde que se creó, y ahora también se lee ya de entrada al
+  iniciar sesión, `js/nucleo.js`), da los fijos de siempre, tal cual.
+- **`Nombres.montarAsunto`/`montarDocumentoAjustado`** usan `Nombres.topes()` en vez de las
+  constantes fijas, y devuelven además `noCabe: true` cuando, ni recortando el texto libre por
+  completo, el nombre cabe en el tope (nunca se recorta la fecha, el tipo, el año académico, el
+  grupo ni el tercero). `Nombres.avisoRecorte(el, recortado, noCabe)` pinta el aviso ámbar de
+  siempre, o uno rojo ("El nombre no cabe en la ruta de Dropbox: acorta el texto.") si `noCabe`.
+- **Se avisa y no se deja crear**: Nuevo asunto (`js/asuntos-nuevo-crear.js`), editar un asunto
+  (`js/asuntos-editar.js`) y poner nombre a un documento (`js/documentos-guardar.js`) apagan su
+  botón de guardar y comprueban `noCabe` otra vez justo antes de escribir nada, por si el botón no
+  se hubiera apagado a tiempo.
+
+Se comprueba sin navegador en `pruebas/archivo-por-curso.mjs` (sin `rutas.json`: los topes fijos;
+con una ruta larga y un tercero largo: el tope baja y el nombre se recorta; con un tercero tan largo
+que ni así cabe: `noCabe`).
+
 ### Archivar sin preguntar (fila 141)
 
 `App.E.archivarSinPreguntar = true` hace que `App.cerrarAsunto` no pida confirmación: solo lo usa
@@ -335,7 +418,8 @@ Prueba: `pruebas/ficha-del-archivo.mjs`, sin navegador, con `js/asuntos-archivar
 19-sep-2026, fila 68, `docs/AVISOS-QUE-FALTAN.md`, 1. `window.FichasHuerfanas.calcular()`
 ya no fuerza un recorrido entero del ARCHIVO cuando no se ha leído esta sesión
 (`App.verArchivo()`, como hacía hasta esta fila): usa el índice guardado
-(`IndiceArchivo.leerDisco()`) si existe, o el ARCHIVO si ya se ha leído por otro motivo; sin
+(`IndiceArchivo.leerDisco({ todos: true })`, fila 177: de cualquier curso) si existe, o el ARCHIVO
+si ya se ha leído por otro motivo; sin
 ninguna de las dos cosas, un **cerrado** no se comprueba y no se acusa de huérfano por error (un
 **abierto** sin carpeta sí, siempre). `js/avisos-que-faltan.js` pinta con este mismo cálculo una
 línea junto a `#panel-avisos`/`#panel-frescura` en "Asuntos abiertos" que lleva al bloque de
