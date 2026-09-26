@@ -430,3 +430,114 @@
   window.ActualizarCopia = { comprobar: comprobar, _BASE_REMOTO: BASE_REMOTO,
     _cambiarBase: function (b) { BASE_REMOTO = b; } };
 })();
+
+/* ============================================================
+   fila 178, docs/CORREO-VERSIONES-Y-LIMPIEZA.md, punto 4: el aviso de
+   versión nueva, también en la web (no solo en la copia sin internet,
+   de arriba, que solo actúa con `location.protocol === 'file:'`).
+
+   Aquí no hay ninguna carpeta que tocar ni nada que actualizar sola:
+   solo se avisa, con la misma franja de arriba («Hay una versión
+   nueva. Recargar»). Nunca recarga sola.
+
+   Cada 30 minutos, y al recuperar el foco de la pestaña (como mucho
+   una vez cada 10 minutos), si no hay un guardado en marcha, se pide
+   `js/version.js?v=<hora>` (sin caché) y se compara el `App.VERSION`
+   que trae con el ya cargado. Distinto, la franja; igual, nada (y si
+   ya estaba puesta de una comprobación anterior, se quita: puede que
+   ya se haya recargado desde otra pestaña).
+
+   Se activa siempre que esto NO sea la copia sin internet (`file:`):
+   la web de verdad se sirve por `https://`, pero el servidor local con
+   el que se prueba esta aplicación (`python3 -m http.server`) la sirve
+   por `http://`, y tiene que poder probarse igual. */
+(function () {
+  if (location.protocol === 'file:') return;
+
+  var CADA_MS = 30 * 60 * 1000;
+  var MIN_ENTRE_FOCOS_MS = 10 * 60 * 1000;
+  var ultimaComprobacion = 0;
+
+  function $(id) { return document.getElementById(id); }
+
+  /* `js/version.js` es JavaScript, no JSON: se lee su texto y se saca
+     la línea `App.VERSION = '...'` con una expresión regular, sin
+     ejecutarlo (ejecutar lo que llega de una petición es innecesario
+     aquí, y así no hace falta un `<script>` nuevo por cada comprobación). */
+  function extraerVersion(texto) {
+    var m = String(texto || '').match(/App\.VERSION\s*=\s*'([^']*)'/);
+    return m ? m[1] : '';
+  }
+
+  function quitarFranjaWeb() {
+    var caja = $('franja-copia');
+    if (caja && caja.dataset.franjaWeb === '1') caja.remove();
+  }
+
+  function pintarFranjaWeb(versionNueva) {
+    if ($('franja-copia')) return;   /* ya se ve (esta u otra franja) */
+    var caja = document.createElement('div');
+    caja.id = 'franja-copia';
+    caja.dataset.franjaWeb = '1';
+    caja.setAttribute('role', 'alert');
+    caja.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:10000;display:flex;align-items:center;gap:12px;flex-wrap:wrap;' +
+      'padding:10px 48px 10px 16px;background:#fff4d6;border-bottom:2px solid #e0b34a;color:#1b2430;font-size:15px;box-shadow:0 4px 12px rgba(10,25,45,.18)';
+
+    var texto = document.createElement('span');
+    texto.innerHTML = 'Hay una versión nueva del Gestor (<strong></strong>). Esta pantalla tiene la <strong></strong>.';
+    var negritas = texto.querySelectorAll('strong');
+    negritas[0].textContent = versionNueva;
+    negritas[1].textContent = (window.App && App.VERSION) || '';
+    caja.appendChild(texto);
+
+    var boton = document.createElement('button');
+    boton.type = 'button';
+    boton.className = 'boton boton-principal';
+    boton.textContent = 'Recargar';
+    boton.onclick = function () { location.reload(); };
+    caja.appendChild(boton);
+
+    var cerrar = document.createElement('button');
+    cerrar.type = 'button';
+    cerrar.title = 'Cerrar';
+    cerrar.setAttribute('aria-label', 'Cerrar');
+    cerrar.textContent = '✕';
+    cerrar.style.cssText = 'position:absolute;right:12px;top:50%;transform:translateY(-50%);border:0;background:none;font-size:18px;cursor:pointer;color:#5d6b7a';
+    cerrar.onclick = function () { caja.remove(); };
+    caja.appendChild(cerrar);
+
+    document.body.appendChild(caja);
+  }
+
+  async function comprobarVersionWeb() {
+    if (!window.App || !App.VERSION) return;
+    if (window.ColaGuardado && ColaGuardado.hayGuardado()) return;
+    var texto;
+    try {
+      var resp = await fetch('js/version.js?v=' + Date.now(), { cache: 'no-store' });
+      if (!resp.ok) return;
+      texto = await resp.text();
+    } catch (e) { return; }   /* sin conexión ahora mismo: se prueba en la próxima vuelta */
+    var remota = extraerVersion(texto);
+    if (!remota) return;
+    if (remota === App.VERSION) { quitarFranjaWeb(); return; }
+    pintarFranjaWeb(remota);
+  }
+
+  function alRecuperarElFoco() {
+    var ahora = Date.now();
+    if (ahora - ultimaComprobacion < MIN_ENTRE_FOCOS_MS) return;
+    ultimaComprobacion = ahora;
+    comprobarVersionWeb();
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') alRecuperarElFoco();
+  });
+  window.addEventListener('focus', alRecuperarElFoco);
+
+  setInterval(function () { ultimaComprobacion = Date.now(); comprobarVersionWeb(); }, CADA_MS);
+
+  /* Para las pruebas. */
+  window.AvisoVersionWeb = { comprobar: comprobarVersionWeb, _extraerVersion: extraerVersion };
+})();

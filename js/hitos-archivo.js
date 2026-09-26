@@ -102,7 +102,7 @@
       if ('titulo' in cambios) h.titulo = String(cambios.titulo || '');
       if ('responsable' in cambios) h.responsable = String(cambios.responsable || '');
       if ('fecha' in cambios) { h.fecha = String(cambios.fecha || ''); h.fechaManual = !!cambios.fecha; }
-      /* 20-sep-2026, fila 79, apartado 4.6: "Pedírmelo a mí" / "Dejarlo
+      /* 20-sep-2026, fila 79, apartado 4.6: "Pedirmelo a mí" / "Dejarlo
          solo informativo", del menú del propio hito. Afecta solo a este
          hito de este asunto, nunca a la guía del tipo. */
       if ('soloInformativo' in cambios) h.soloInformativo = !!cambios.soloInformativo;
@@ -388,8 +388,27 @@
         var destino = await Carpetas.bajar(App.E.archivo, [ficha.categoria, ficha.tercero], true);
         var carpetaAsunto = await destino.getDirectoryHandle(clave);
         var texto = textoHistorial(clave, entrada.hitos, entrada.creados);
-        await Carpetas.escribirTexto(carpetaAsunto, NOMBRE_HISTORIAL, texto);
+        /* Fila 178: si falla, se reintenta una vez. Escriba o no, la
+           entrada de hitos.json se quita igualmente aquí abajo, en la
+           misma operación: el asunto ya está archivado (su carpeta ya
+           no existe en abiertos), así que dejar los hitos en
+           hitos.json sin dueño los deja huérfanos para siempre, no
+           solo hasta el próximo intento. El aviso (ámbar, accesorio)
+           sigue si el historial no se ha llegado a guardar. */
+        var errorHistorial = null;
+        try {
+          await Carpetas.escribirTexto(carpetaAsunto, NOMBRE_HISTORIAL, texto);
+        } catch (e1) {
+          try {
+            await Carpetas.escribirTexto(carpetaAsunto, NOMBRE_HISTORIAL, texto);
+          } catch (e2) {
+            errorHistorial = e2;
+          }
+        }
         await quitarAsunto(clave);
+        if (errorHistorial) {
+          U.accesorio('El asunto se ha archivado, pero no he podido guardar el historial de hitos', errorHistorial);
+        }
       } catch (e) {
         U.accesorio('El asunto se ha archivado, pero no he podido guardar el historial de hitos', e);
       }

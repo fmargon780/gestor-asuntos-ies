@@ -27,7 +27,7 @@
 
    Fila 176 (docs/PARTIR-FICHEROS-GRANDES.md): partido por temas, sin
    cambiar nada de lo que hacía. Aquí, las fusiones automáticas
-   (asuntos/hitos/tablon, con las lápidas de la fila 176), el cajón de
+   (asuntos/hitos/tablón, con las lápidas de la fila 176), el cajón de
    "no se fusionan solos" y su bloque de Ajustes, y la revisión
    principal. Los CSV de terceros, administraciones.json y "los
    terceros se releen solos" viven en js/conflictos-datos.js, que se
@@ -42,6 +42,17 @@
   var pendientes = [];   /* { real, nombreConflicto } de los que no se fusionan solos */
   I.pendientesPush = function (p) { pendientes.push(p); };
   I.pintarBloque = function () { pintarBloque(); };
+
+  /* Fila 178, punto 3: deja en 'destino' (el objeto que se va a guardar
+     con Copias.guardar) el mayor `_esquema` de los dos lados del
+     conflicto que se acaban de fusionar, para no perder el de un lado
+     que tuviera una versión más nueva de la aplicación. Copias.guardar
+     nunca lo baja de ESQUEMA por su cuenta, pero tampoco puede saber
+     lo que traía 'conflicto': eso solo se sabe aquí. */
+  I.conservarEsquemaMayor = function (destino, a, b) {
+    var mayor = Math.max(Number(a && a._esquema) || 0, Number(b && b._esquema) || 0);
+    if (mayor > 0) destino._esquema = mayor; else delete destino._esquema;
+  };
 
   function $(id) { return document.getElementById(id); }
 
@@ -134,6 +145,7 @@
       var a = registroReal.asuntos[k], b = conflicto.asuntos[k];
       fusion.asuntos[k] = (a && b) ? fusionarFicha(a, b) : (a || b);
     });
+    I.conservarEsquemaMayor(fusion, registroReal, conflicto);
 
     await Copias.guardar(g, App.FICHERO_ASUNTOS, fusion);
     App.E.registro = fusion;
@@ -211,6 +223,7 @@
       }
     }
 
+    I.conservarEsquemaMayor(base, base, conflicto);
     await Copias.guardar(g, 'hitos.json', base);
     await archivarConflicto(g, nombreConflicto);
     return true;
@@ -239,7 +252,9 @@
       mapa[k] = mapa[k] ? Object.assign({}, mapa[k], n) : n;
     });
 
-    await Copias.guardar(g, 'tablon.json', { notas: orden.map(function (k) { return mapa[k]; }) });
+    var fusionTablon = { notas: orden.map(function (k) { return mapa[k]; }) };
+    I.conservarEsquemaMayor(fusionTablon, real, conflicto);
+    await Copias.guardar(g, 'tablon.json', fusionTablon);
     await archivarConflicto(g, nombreConflicto);
     return true;
   }
