@@ -209,7 +209,7 @@ var FormulariosRellenar = (function () {
   async function prepararParaElTercero(asunto, clave) {
     var catalogo = await Formularios.cargar();
     var f = catalogo[clave];
-    if (!f || !f.f) { U.aviso('Este formulario no tiene PDF guardado.', 'malo'); return; }
+    if (!f || !f.f) { U.aviso('Este impreso no tiene PDF guardado.', 'malo'); return; }
 
     var bytesPdf;
     try { bytesPdf = await leerPdfDelRepositorio(f.f); }
