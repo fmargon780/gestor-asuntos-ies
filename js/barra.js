@@ -185,7 +185,7 @@
     b.className = 'pestana';
     b.type = 'button';
     b.dataset.pantalla = 'formularios';
-    b.innerHTML = '<span>Formularios</span>';
+    b.innerHTML = '<span>Impresos</span>';
     b.onclick = function () { if (window.Formularios) window.Formularios.abrir(); };
     b.addEventListener('click', function () {
       if (comoEstaba() === 'plegada') poner('plegada');

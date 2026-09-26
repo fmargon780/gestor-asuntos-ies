@@ -54,7 +54,7 @@ var AsuntoRenombrar = (function () {
         var deVieja = d.porAsunto[claveVieja];
         var deNueva = d.porAsunto[claveNueva];
         if (deVieja && deNueva && (deVieja.hitos || []).length) {
-          notaFusion = 'Al renombrar, ya había hitos con el nombre nuevo: se han juntado con ' +
+          notaFusion = 'Al cambiar el nombre, ya había hitos con el nombre nuevo: se han juntado con ' +
             'los del nombre anterior, sin perder ninguno.';
           d.porAsunto[claveNueva] = {
             creados: deNueva.creados || deVieja.creados,
@@ -179,7 +179,7 @@ var AsuntoRenombrar = (function () {
         '<span class="bloque-pie" id="hitos-huerfanos-pie">De asuntos renombrados antes de este arreglo</span>' +
       '</summary>' +
       '<div class="bloque-cuerpo">' +
-        '<p class="explica">Antes de este arreglo, renombrar un asunto no movía sus hitos: puede ' +
+        '<p class="explica">Antes de este arreglo, cambiar el nombre de un asunto no movía sus hitos: puede ' +
         'haber quedado en <code>hitos.json</code> alguna entrada con el nombre de una carpeta que ' +
         'ya no existe. No se puede adivinar a qué asunto pertenecía: aquí se cuentan y se pueden ' +
         'borrar.</p>' +
@@ -207,19 +207,19 @@ var AsuntoRenombrar = (function () {
     }
     var boton = document.createElement('button');
     boton.className = 'boton boton-peligro';
-    boton.textContent = 'Borrar ' + claves.length + (claves.length === 1 ? ' hito huérfano' : ' hitos huérfanos');
+    boton.textContent = 'Quitar ' + claves.length + (claves.length === 1 ? ' hito huérfano' : ' hitos huérfanos');
     boton.onclick = async function () {
       var lista = claves.map(function (c) { return '<li>' + U.escapar(c) + '</li>'; }).join('');
-      var ok = await U.preguntar('Borrar hitos huérfanos',
-        '<p>Se van a borrar los hitos de estas ' + claves.length + ' entradas de ' +
+      var ok = await U.preguntar('Quitar hitos huérfanos',
+        '<p>Se van a quitar los hitos de estas ' + claves.length + ' entradas de ' +
         '<code>hitos.json</code>, de asuntos que ya no existen con ese nombre:</p>' +
-        '<ul>' + lista + '</ul>', 'Borrar');
+        '<ul>' + lista + '</ul>', 'Quitar');
       if (!ok) return;
       await Hitos.cambiar(function (d) {
         claves.forEach(function (c) { delete d.porAsunto[c]; });
         return d;
       });
-      U.aviso('Hitos huérfanos borrados.', 'bueno');
+      U.aviso('Hitos huérfanos quitados.', 'bueno');
       await App.pintarHitosHuerfanos();
     };
     cuerpo.appendChild(boton);
