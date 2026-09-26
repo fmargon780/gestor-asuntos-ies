@@ -1165,3 +1165,588 @@ Versión publicada `App.VERSION`: `24-sep-2026 · 07:35`.
 
 `docs/PREGUNTAS-EN-EL-GUION.md`. Dentro de un mismo hito, lo que hay que hacer a menudo depende de
 una respuesta («¿Viene con toda la documentación?» → «Pedir que la complete»). Ahora una línea del
+guion puede ser pregunta, con un botón por respuesta y sus propias líneas. Detalle en
+`docs/contexto/HITO-MESA.md` («El guion»).
+
+- Se apuntó como fila 115, número que ya llevaba en curso la de enviar el correo desde el asunto;
+  pasó a la 116. Mientras esa fila estaba a medias, `main` tuvo pruebas en rojo: esta esperó a que
+  quedara en verde para subirse.
+- Decisión: un solo nivel; cambiar de respuesta no borra lo ya marcado de la otra, queda plegado al
+  final en gris; la pregunta cuenta como una línea (hecha al responder).
+- El marcado automático solo mira lo que se ve: nunca marca una línea de una respuesta no elegida.
+
+Prueba nueva `pruebas/preguntas-en-el-guion.mjs` (sin navegador). Batería completa en verde.
+Versión publicada `App.VERSION`: `24-sep-2026 · 07:32`.
+
+## 24-sep-2026 — Fila 114: los documentos en la tarjeta cerrada, legibles
+
+`docs/DOCUMENTOS-EN-LA-TARJETA.md`. En la tarjeta cerrada «Documentos de la carpeta» los nombres
+salían montados unos encima de otros y cortados por abajo, y la primera línea repetía el número del
+círculo. Ahora cada documento va en su renglón, como mucho cinco (o los que quepan enteros), y
+«y N más» abre la lista entera.
+
+- Causa: los renglones del resumen se encogían por debajo de su alto de línea (`flex-shrink` por
+  defecto en una columna flex con `overflow: hidden`); con `flex: none`, en todas las tarjetas.
+- Decisión: cuántos caben se mide después de pintar (alto de la caja entre el de un renglón) y se
+  vuelve a medir con `ajustarAlto()`; nunca un renglón a medias.
+- `js/ficha-tarjetas.js` iba a pasar de 450 líneas: los resúmenes se fueron a
+  `js/ficha-tarjetas-resumen.js`. Cada renglón lleva `title` con su texto entero.
+
+Prueba nueva `pruebas/documentos-en-la-tarjeta.mjs`; `pruebas/ficha-en-tarjetas.mjs` ya no espera la
+línea «3 documentos». Batería completa en verde.
+Versión publicada `App.VERSION`: `24-sep-2026 · 05:53`.
+
+## 24-sep-2026 — Fila 113: el mapa de la guía
+
+`docs/MAPA-DE-LA-GUIA.md`. Con dos niveles de preguntas, al escribir la guía cada rama se veía por
+separado y Francisco se perdía. Ahora hay un mapa de solo lectura, como un diagrama de flujo, con
+la guía entera: en Ajustes (pantalla del tipo), dentro del cuadro de escribir la guía y en la ficha
+de un asunto (con el camino elegido resaltado y el estado de cada hito). Detalle en
+`docs/contexto/HITOS-Y-GUIAS.md`.
+
+- Decisión: HTML y CSS a secas (cajas y líneas con `::before`), sin librerías, para que valga en la
+  copia sin internet.
+- Decisión: dentro del editor, el mapa es un panel del mismo cuadro, no un segundo cuadro; pulsar
+  un paso lleva a su nivel con él desplegado y resaltado.
+- `js/guias.js` pasaba de 1.200 líneas: la navegación por niveles se fue a `js/guias-niveles.js`
+  antes de añadir nada.
+- Lo que costó: la raya de las ramas se cortaba en el hueco entre una y otra.
+
+Prueba nueva `pruebas/guias-mapa.mjs` (sin navegador). Batería completa en verde.
+Versión publicada `App.VERSION`: `24-sep-2026 · 05:45`.
+
+## 24-sep-2026 — Fila 112: cabecera compacta de la ficha y del hito
+
+`docs/CABECERA-COMPACTA.md`. Con un hito abierto, lo importante empezaba a más de 500 px del borde
+de arriba, detrás de tres botones de volver, el nombre del asunto dos veces y «Hitos 2/5» dos
+veces. Ahora la cabecera del asunto va en dos líneas y el hito en una, y «GUION DEL HITO» queda a
+unos 234 px (a 1600×920; antes, 528).
+
+- Decisión: para volver se pulsa otra vez la pestaña abierta (desde un hito, a la lista de hitos;
+  desde ahí, a las tarjetas), igual que Escape. Fuera «Volver a las tarjetas», «Volver a la lista
+  de hitos» y la línea de ruta.
+- Decisión: «Archivar» sube a la primera línea (`#ficha-archivar`), y la fila de copiar y la línea
+  gris van a la derecha de la segunda, en pequeño.
+- Con la cabecera encogida al bajar, la barra de acciones sigue a la vista (lo pedía la fila 52):
+  solo se esconde la parte gris.
+- Lo que costó: la clase `.ficha-datos` ya existía para otra cosa y apilaba la línea gris; se llama
+  `.ficha-apertura`.
+
+Prueba nueva `pruebas/cabecera-compacta.mjs`; `pruebas/cabecera-del-asunto.mjs` busca «Archivar» en
+su sitio nuevo. Batería completa en verde.
+Versión publicada `App.VERSION`: `24-sep-2026 · 05:18`.
+
+## 24-sep-2026 — Fila 111: el masculino o el femenino, solo, en las plantillas
+
+`docs/GENERO-EN-PLANTILLAS.md`. Las plantillas se escriben con «el/la alumno/a», «D./Dña.»,
+«interesado/a»… y al generar el Word, el correo o el mensaje de Séneca sale solo la forma que toca
+según el sexo de cada persona. Detalle en `docs/contexto/DOCUMENTOS-PDF.md`.
+
+- Decisión: sin el dato, la forma se queda con su barra (nunca una por defecto) y el aviso ámbar dice
+  de quién falta y dónde ponerlo.
+- Decisión: para otra persona, una marca pegada detrás (`hijo/a:tutor1`, `:tutor2`, `:firmante`,
+  `:vistobueno`), fácil de escribir en Word. Los cargos con barra («Director/a») y su artículo son
+  de quien firma sin marcar nada.
+- Decisión: solo se tocan pares conocidos y terminaciones «/a», «/as»; fechas, «y/o», registros y
+  webs se quedan como están. Se resuelve antes de meter los datos, para no tocar lo que traen.
+- El sexo: columna «Sexo» del RegAlum (alumno y tutores); casilla nueva en «Datos y contacto»
+  (`_GESTOR/sexos.json`); y desplegable nuevo en cada persona de «Cargos del centro».
+- En el Word las formas dobles también llegan partidas en trozos: se juntan como los huecos.
+
+Prueba nueva `pruebas/genero.mjs` (nombres inventados). Batería completa en verde.
+Versión publicada `App.VERSION`: `24-sep-2026 · 05:00`.
+
+## 24-sep-2026 — Fila 110: tablas de datos y el certificado de función tutorial
+
+`docs/TABLAS-DE-DATOS.md`. Francisco pasaba a mano a Excel el PDF «Relación de funciones
+tutoriales» de cada curso para certificar en qué periodos fue tutor un profesor. Ahora la aplicación
+lee esos PDF de la carpeta de datos, y cualquier CSV o Excel de `datos/Tablas`, los une a cada
+persona por su DNI y los usa en huecos de plantilla: `{{ESPECIALIDAD}}`, `{{TABLA TUTORIAS}}` y los
+generales `{{DATO …}}`/`{{TABLA …}}`. Plantilla nueva «Certificado de función tutorial». Detalle en
+`docs/contexto/TABLAS-DE-DATOS.md` (hijo nuevo).
+
+- Decisión: el PDF se lee por posiciones (cada trozo va a la columna cuya cabecera empieza a su
+  izquierda), no por texto corrido: así los nombres partidos en dos líneas y «(Sustituto/a)» se
+  pegan a su fila.
+- Decisión: lo que no tiene dato no se deja en blanco: sale «[falta: …]» resaltado en amarillo en el
+  Word, y en el aviso ámbar de siempre.
+- `js/docx.js` pasaba de 580 líneas: el membrete se fue a `js/docx-imagen.js` y las tablas van en
+  `js/docx-tabla.js`, los dos sobre `Docx.interno`.
+- Lo que costó: pdf.js vacía el buffer que se le da (y el mismo PDF se quedaba luego en cero
+  bytes); y el «[falta: …]» caía en un trozo de Word con un salto de línea dentro, así que se parte
+  el texto donde está la marca en vez del trozo entero.
+
+Prueba nueva `pruebas/tablas-datos.mjs` (con nombres y DNI inventados). Batería completa en verde.
+Versión publicada `App.VERSION`: `24-sep-2026 · 04:51`.
+
+---
+
+## 24-sep-2026 — Fila 109: el hito a pantalla completa, la mesa de trabajo
+
+`docs/EL-HITO-A-PANTALLA-COMPLETA.md`. Dentro de la tarjeta de Hitos, la lista queda compacta y
+pulsar un hito abre su mesa: cabecera con etiquetas pulsables (estado, plazo en días hábiles,
+responsable), "Marcar hito como hecho", menú ⋯ y la tira de hitos; y tres columnas: el guion, los
+documentos (en tabla, con gemelos y selección de varios) con plantillas y formularios, y la
+consulta (normativa, comunicar con destinatarios, notas e historial). Detalle en
+`docs/contexto/HITO-MESA.md` (hijo nuevo: `HITOS-Y-GUIAS.md` ya pasaba de 40 KB).
+
+- Decisión: la mesa no es una pantalla nueva sino el mismo hito con su cuerpo a la vista y los demás
+  escondidos. Así todo lo que ya hacía cada botón del hito (generar, comunicar, añadir, el menú de
+  cada documento, lo que falta reunir) sigue funcionando igual, con las mismas clases, y las
+  pruebas de antes casi no han cambiado.
+- Decisión: el guion vive en la guía y en la biblioteca; en el hito solo su estado. Los pasos con
+  acción se marcan solos (generar, registrar desde el ⋯, comunicar, añadir un documento nuevo).
+- El borrador de los guiones (296 hitos modelo, 1.064 pasos) lo escribió una sesión auxiliar a partir
+  de los documentos del centro; la normativa solo repite la que ya citaba cada modelo (ninguna traía
+  enlace, así que ninguna lo lleva). Se trae a la carpeta con "Traer los guiones del instituto",
+  que nunca pisa uno escrito. Sugerencias de convertir en pregunta (no se ha cambiado nada):
+  - b11 — Imponer la corrección: quién la impone cambia según la corrección (profesor, tutor, jefatura, director); convertir en pregunta "¿Qué corrección se impone?".
+  - b144 — Resolver o remitir, según el supuesto: dos caminos (resuelve el centro / se remite fuera); convertir en pregunta "¿Lo resuelve el centro o se remite?".
+  - b160 — Resolver o remitir a quien firma: firma la Dirección o la Delegación según el permiso; convertir en pregunta "¿Quién firma este permiso?".
+  - b165 — Recibir el parte de baja: va por MUFACE o por el Régimen General según el colectivo; convertir en pregunta "¿MUFACE o Régimen General?".
+  - b180 — Publicar o remitir según proceda: dos destinos distintos; convertir en pregunta "¿Se publica o se remite?".
+  - b274 — Repartir o remitir: entrada (reparto interno) y salida (envío fuera) son caminos distintos; convertir en pregunta "¿Es entrada o salida?".
+- Lo que no se ha hecho: "Abrir para imprimir" y "Enviar por correo" en cada formulario oficial
+  (siguen sus botones de siempre); la normativa de un paso de guion es solo cita y enlace, sin el
+  bloque del sistema de normativa.
+- Lo que costó: la aplicación vuelve a abrir la misma ficha sola tras guardar algo (al cerrar el
+  cuadro de Correo, al generar), y eso devolvía la ficha a la cuadrícula de tarjetas; ahora solo
+  vuelve a la cuadrícula si se entra en otro asunto.
+
+Prueba nueva `pruebas/hito-mesa.mjs` (los ocho puntos del encargo, a 1905 y a 1280 px), foto a
+1905 px revisada. Batería completa en verde. Versión publicada `App.VERSION`: `24-sep-2026 · 04:32`.
+
+---
+
+## 24-sep-2026 — Fila 108: la ventana de contacto del alumno, en tarjetas
+
+`docs/CONTACTO-EN-TARJETAS.md`. La ventana «Ver todo» del alumno pasa de cinco columnas a una
+cabecera con etiquetas y una tarjeta por persona (el alumno, tutor 1, tutor 2), con «Correo a la
+familia» y «Copiar todo el contacto» abajo.
+
+- El fallo de fondo: `numeroDeTitulo` miraba la primera palabra «primer» del título, y en «Primer
+  apellido Segundo tutor» esa palabra es del apellido: el segundo tutor acababa dentro del primero.
+  Ahora manda el número pegado a «tutor». Y el nombre ya no sale a trozos: se monta entero.
+- `js/datos.js` pasaba de 1.100 líneas: los tutores se van a `js/datos-tutores.js`; y la ventana
+  del alumno, a `js/ficha-tercero-alumno.js`, para no pasar de 400 en `js/ficha-tercero.js`.
+- Decisión: «Correo a la familia» cierra la ventana y abre el cuadro de Correo de siempre (un solo
+  cuadro a la vez), con los correos de los tutores como destinatarios propuestos.
+
+La prueba del caso real falla con el código de antes y pasa con el nuevo; foto a 1905 px revisada.
+Batería completa en verde. Versión publicada `App.VERSION`: `24-sep-2026 · 04:08`.
+
+---
+
+## 24-sep-2026 — Fila 107: la ficha del asunto en tarjetas
+
+`docs/FICHA-EN-TARJETAS.md`. Las tres columnas dejaban lo de abajo fuera de la pantalla y el
+centro casi vacío. Ahora, debajo de la cabecera, una cuadrícula de tarjetas del mismo tamaño que
+cabe entera sin bajar, cada una con su resumen; al pulsar una se abre en grande con las demás como
+pestañas arriba y, encima, una franja con los documentos. `js/ficha-plegables.js` se retira: los
+dos plegables son ya tarjetas.
+
+- Decisión: los resúmenes se leen de lo que cada módulo ya pinta en la tarjeta (su cuerpo sigue en
+  la página, oculto), en vez de abrir en cada módulo una forma nueva de preguntarle. Así no se toca
+  cómo se pinta nada y el resumen nunca dice algo distinto de lo que se ve al abrirla.
+- Decisión: "Datos y contacto" y "Datos del trámite" enseñan su propio contenido también cerradas:
+  ya eran una línea de resumen, con sus botones de copiar.
+- Lo que costó: el alto "sin bajar" no contaba el relleno de abajo de la pantalla (60 px) y la
+  página seguía bajando un poco; y la franja no volvía a pintarse al volver a una tarjeta por su
+  pestaña (se quedaba con la huella de la vez anterior).
+- Veintidós pruebas trabajaban dentro de la ficha con todo a la vista: ahora entran con su tarjeta
+  abierta (`window.__tarjeta`) o la abren; `pruebas/ficha-disposicion.mjs` pasa de columnas a
+  tarjetas, y las de la cabecera encogida abren una tarjeta larga para tener por dónde bajar.
+
+Prueba nueva `pruebas/ficha-en-tarjetas.mjs` (a 1905 y a 1280 px), con fotos revisadas antes de
+publicar. Batería completa en verde. Versión publicada `App.VERSION`: `24-sep-2026 · 03:53`.
+
+---
+
+## 24-sep-2026 — Fila 106: quién lo pide, una sola vez en la cabecera
+
+`docs/LO-PIDE-EN-LA-CABECERA.md`. La marca de arriba dice ya `Lo pide: García, Isabel María
+(tutor legal 1)` (`LoPide.etiqueta`), y desaparece la línea gris de debajo de "El encargo", que
+repetía la relación y traía la errata "por en persona". La vía se sigue viendo, con su valor
+guardado, al abrir "El encargo" (comprobado en `pruebas/cabecera-del-asunto.mjs`). Nada cambia en
+`asuntos.json`. Versión publicada `App.VERSION`: `24-sep-2026 · 03:26`.
+
+---
+
+## 24-sep-2026 — Fila 105: Ajustes plegado
+
+`docs/AJUSTES-PLEGADO.md`. Francisco veía Ajustes con demasiadas cosas a la vez. Ahora las tres
+zonas (la pantalla de un tipo, "El centro" y "Mantenimiento") nacen plegadas, con un resumen en
+cada título ("2 campos", "sin plazo", "faltan 2 datos"…) y la memoria de lo que se dejó abierto
+en ese ordenador. Todo lo nuevo en `js/ajustes-plegado.js`; en los demás, pocas líneas.
+
+- Decisión: el bloque del RegAlum.csv viejo no se esconde nunca, porque es también donde se
+  configuran las épocas; con aviso, sube arriba y se abre. Los otros tres avisos de fallo
+  (conflictos, fichas sin carpeta) y los dos que ya existían de la misma clase (hitos huérfanos,
+  envolturas sin aplicar) solo se ven cuando hay algo.
+- Decisión: los resúmenes que dependen de datos privados de otro módulo (plantillas, recurrentes,
+  papelera) se cuentan en lo que ese módulo pinta, en vez de abrirle una puerta nueva.
+- Lo que costó: reordenar los bloques de Mantenimiento en cada repintado devolvía arriba los
+  normales, por encima del aviso que acababa de subir; el orden normal empieza ahora después de
+  los bloques con aviso. Y mover un nodo al sitio donde ya está despierta igual a los
+  observadores: solo se mueve si no está ya en su sitio.
+
+Prueba nueva `pruebas/ajustes-plegado.mjs` (falla sin el cambio); cinco pruebas que trabajan
+dentro de la pantalla de un tipo abren antes sus secciones. Batería completa en verde. Versión
+publicada `App.VERSION`: `24-sep-2026 · 03:25`.
+
+---
+
+## 23-sep-2026 — Fila 104: el estado del asunto sale del hito abierto
+
+`docs/ESTADO-POR-EL-HITO.md`. Los dos paneles de Asuntos abiertos que ya existían ("En el
+departamento" / "A la espera de terceros", que decidía a mano el estado del asunto con su casilla
+"Depende de otros") pasan a llamarse **Pendiente de Administración** y **Pendiente de terceros**,
+y el asunto se coloca solo según su hito abierto. Se aprovecharon los paneles en vez de pintar dos
+bloques nuevos dentro de la lista: ya tenían su cuenta, el buscador, los filtros y las tarjetas por
+tipo funcionando dentro de cada uno.
+
+- Cada responsable de Ajustes › Hitos lleva una casilla "Administración" (de partida, `yo` y
+  `companero`). Los papeles fijos son siempre terceros; un hito sin responsable, Administración.
+- `Hitos.aQuienLeToca` y `Hitos.ladoDelAsunto`, puras, en `js/hitos-a-quien.js` (nuevo: `js/hitos.js`
+  ya pasaba de 400 líneas). En terceros, la tarjeta dice en pequeño quién lo tiene.
+- Asuntos sin hitos: por la marca de su estado, la misma `espera` de siempre, que en Ajustes se
+  enseña ahora al revés, como "Administración", para que las dos casillas digan lo mismo.
+- Decisión: `HitosBiblioteca.naceSoloInformativo` no tenía, en la práctica, ningún "responsable de
+  Administración" configurado (nadie le pasaba ese dato); ahora admite los `ajustes` y usa la misma
+  marca, para que no haya dos sitios que digan quién es Administración. "Qué me toca" también.
+- `asuntos-lista.js` (más de 700 líneas) no se partió: el cambio allí son unas pocas líneas y todo lo
+  nuevo vive en el fichero aparte.
+
+Comprobado con `pruebas/estado-por-el-hito.mjs` (19 casos) y, a mano en un navegador local, que un
+asunto recién creado sale en Administración y, al marcar hecho su primer hito (de Dirección), pasa
+solo a terceros con "Dirección" en la tarjeta. Batería completa en verde. Versión publicada
+`App.VERSION`: `23-sep-2026 · 22:05`.
+
+---
+
+## 23-sep-2026 — Fila 103: el hito, mesa de trabajo (segunda tanda)
+
+`docs/EL-HITO-MESA-DE-TRABAJO.md`. Segunda tanda de que el hito sea la mesa de trabajo del
+asunto, sobre lo que dejó la fila 102: añadir documentos desde el propio hito, un menú para cada
+uno ya apuntado, y "Comunicar" siempre a la vista.
+
+**1. "Añadir documento"**: sustituye al botón suelto "Apuntar un documento" por un único botón que
+abre un menú pequeño (`js/hitos-anadir.js`, nuevo) con tres caminos: **Desde el ordenador** (reabre
+el cuadro de siempre de `js/documentos.js`, ahora con un `{hito}` opcional que hace que lo que se
+guarde quede apuntado solo); **Desde "Por clasificar"** (elige uno de los documentos sueltos y
+sigue el mismo camino que "Meter aquí", con el mismo `{hito}`; sin ninguno, sale deshabilitado con
+"(no hay ninguno)"); y **Uno que ya está en la carpeta** (el cuadro de siempre, sin cambios). Para
+que el segundo camino llegara con el hito hasta el final, `App.meterSueltoEnAsuntoElegido` y
+`App.llevarSueltoA` (`js/documentos-sueltos.js`) ganan un parámetro `opciones` que solo viaja, sin
+tocar su lógica.
+
+**2. El menú de tres puntos de cada documento del hito** (`js/hitos-documento-menu.js`, nuevo), en
+vez de la ✕ de siempre: Registrar (si le falta), Separar, Unir, Sacar páginas y Ajustar tamaño
+(solo PDF, mismo criterio que en la carpeta del asunto) y, siempre, "Quitar del hito" (el mismo
+efecto que la ✕: desapunta, nunca borra el fichero). Cualquier documento que salga de una de esas
+herramientas queda apuntado solo al mismo hito: una función pequeña y pura,
+`HitosDocumentoMenu.ficherosNuevos(antes, después)`, compara el contenido de la carpeta antes y
+después de la herramienta y apunta los que aparecen. Un documento "(ya no está)" solo trae "Quitar
+del hito". Después de cualquier acción, `HitosPanel.desplegarAlAbrir` deja el hito desplegado él
+solo, sin que haga falta volver a pulsar el título — un detalle que la propia prueba de navegador
+cazó (ver "Lo que costó de verdad").
+
+**3. "Comunicar" siempre visible**: antes solo salía si el paso tenía su propio texto de correo o
+de Séneca; ahora sale siempre (salvo en un hito "decision" o "noaplica", igual que "Generar
+documento"). Con texto propio, igual que hasta ahora. Sin él, el cuadro se abre con el desplegable
+de plantillas del tipo — los dos canales quedan disponibles, en vez de ninguno. Los documentos que
+el hito ya tiene en la carpeta salen premarcados en "Documentos de este asunto" del cuadro de
+Correo, por un nuevo `extra.adjuntosMarcados` que sube desde `js/hitos-comunicar.js` hasta
+`CorreoAdjuntos.pintarBloque` (`js/correo-adjuntos.js`), filtrando primero los que ya no estén.
+Cuando se prepara un correo con documentos, la constancia en el historial del hito (y en la nota
+del asunto) termina en "· con N documentos: a, b" — `CorreoNucleo.sufijoDocumentos`, una función
+pura nueva en `js/correo.js`, que reutiliza el mismo `textoDeLaNota`/`apuntarElRastro` de siempre:
+ni un camino aparte ni una copia de esa lógica.
+
+**Ficheros nuevos**: `js/hitos-anadir.js`, `js/hitos-documento-menu.js`,
+`pruebas/el-hito-mesa-de-trabajo.mjs` (puro, sin navegador). Todo lo demás, unas pocas líneas cada
+uno: `js/hitos-panel-lista.js`, `js/hitos-comunicar.js`, `js/documentos.js`,
+`js/documentos-sueltos.js`, `js/archivo-personas.js`, `js/asuntos-lista.js`,
+`js/correo-adjuntos.js`, `js/correo.js`, `index.html`.
+
+**Lo que costó de verdad**: dos cosas, ninguna en la aplicación, las dos cazadas por las propias
+pruebas antes de subir nada. La primera, al escribir la prueba de navegador del punto 2: después
+de "Quitar del hito" (que ya deja el hito desplegado solo, como se explica arriba), un clic de más
+sobre el título del hito lo volvía a plegar sin querer, y el siguiente paso de la prueba —abrir
+"Añadir documento"— se quedaba 30 segundos esperando un botón invisible. Se quitó ese clic de más
+y se dejó la razón por escrito, para que no se repita. La segunda, en la propia subida a `main`:
+la primera llamada por lotes se quedó corta sin avisar y dejó tres ficheros modificados
+(`js/archivo-personas.js`, `js/asuntos-lista.js`, `js/correo-adjuntos.js`) con su contenido
+antiguo; se detectó al comprobar cada fichero después de subir (regla 11 de `docs/COLA.md`) y se
+repitió uno a uno hasta que los doce quedaron bien. Ninguna de las dos tocó la aplicación
+publicada: la primera se cazó antes de dar la fila por buena, y la segunda antes de que Francisco
+la viera.
+
+Comprobado con `pruebas/el-hito-mesa-de-trabajo.mjs` y, en el navegador de verdad, con los
+bloques nuevos de `pruebas/hitos.mjs` y `pruebas/quedarse-en-el-asunto.mjs` y la sección 1
+reescrita de `pruebas/comunicar-desde-hito.mjs`. Batería completa en verde (106 ficheros de
+prueba). Versión publicada `App.VERSION`: `23-sep-2026 · 20:57`.
+
+---
+
+## 23-sep-2026 — Fila 102: generar documentos desde el hito
+
+`docs/DOCUMENTOS-DESDE-EL-HITO.md`. Primera tanda de que el hito sea la mesa de trabajo: las
+plantillas de documento se unen a un paso de la guía (o a un modelo de la biblioteca) en
+«Documentos de este paso», y el hito trae «Generar documento», que deja el papel apuntado a él.
+Todo lo nuevo, en dos ficheros nuevos (`js/guias-documentos.js`, `js/hitos-generar.js`); en
+`js/guias.js` y `js/plantillas-documento.js` solo unas pocas líneas.
+
+**Una decisión que el documento dejaba abierta**: `{hecho:…}` pedía la fecha en que se marcó hecho
+otro hito, «del historial». Los hitos no guardaban esa fecha en ningún sitio: desde esta fila se
+apunta `hechoEl` al marcarlo (y al elegir la opción de una pregunta). Los de antes se quedan sin
+ella: no se inventa.
+
+**De paso**: editar un modelo de la biblioteca perdía sus formularios (el editor no se los pasaba);
+«Comunicar» desde un hito no encontraba su paso si estaba dentro de una pregunta de dentro (fila
+95); y el aviso de «huecos sin dato» al generar pasa de rojo a ámbar (el documento ya está hecho).
+`pruebas/ajustes-por-tipo.mjs` buscaba la sección del plazo por el texto «Plazo», que ahora sale
+también en la tabla de huecos: busca el campo.
+
+: repintar solo lo que ha cambiado
+
+`docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md`. Tras guardar, la aplicación repintaba casi todo: cambiar el
+estado desde la ficha eran 30-40 lecturas (la lista entera aunque estuviera oculta, sus 17
+enganches, y la ficha entera). Se midió antes de tocar nada, con una prueba que cuenta llamadas a
+`Carpetas`: el mayor gasto era el observador de «Generar documento», que releía `plantillas.json`
+siete veces por tanda. Ahora el cambio de estado solo relee y escribe `asuntos.json`.
+
+Dos fallos de paso: la fila «Formularios» de la ficha no salía nunca (`filasHtml` ignoraba su
+segundo parámetro; un comentario decía que era a propósito por una prueba, que ahora cuenta solo
+las filas visibles), y `js/formularios.js` usaba `Hitos.hitosDe` como si fuera síncrona. Al
+arreglar lo segundo, su observador empezó a leer `hitos.json` en cada cambio de pantalla (antes
+fallaba en silencio): la prueba de lecturas lo cazó, y ahora solo calcula cuando la fila es nueva.
+
+Sin partir `js/ficha-asunto.js` (pasa de 1.000 líneas): los cambios han sido pocos y localizados,
+y partirlo a la vez que se cambia su repintado era arriesgar las dos cosas.
+
+: avisos que dicen la verdad, y botones que se bloquean de verdad
+
+`docs/AVISOS-QUE-DICEN-LA-VERDAD.md`. Muchas acciones guardaban lo importante y luego hacían más
+cosas en el mismo `try`: si fallaba una de las de después, salía rojo «No he podido…» con todo ya
+guardado, y al repetir, «Ya hay…». Ahora cada una separa lo principal (rojo si falla) de lo
+accesorio (ámbar), con `U.fallo` y `U.accesorio`. De paso, los ~150 avisos que pegaban `e.message`
+en inglés pasan por `U.mensajeDeError`.
+
+**El botón que se volvía a encender solo**: `aplicarModoConsulta` ponía `disabled=false` a TODOS
+los controles de la ficha cada vez que el observador veía algo nuevo, también al que decía
+«Guardando…» y a las casillas de hito de un asunto archivado. Ahora solo toca lo que él mismo
+apagó y respeta la marca `data-guardando` de `U.mientrasGuarda`.
+
+**Un cuadro sobre otro** dejaba colgada para siempre la espera del primero (un solo `#capa`):
+ahora se da por cancelado. Lo que costó: los avisos nuevos tenían que pasar por `U.aviso` (no por
+la función interna) para que las pruebas que lo sustituyen los vean; sin eso, una prueba sin
+navegador reventaba con `setTimeout is not defined`.
+
+Queda sin hacer, a propósito: partir `js/ficha-asunto.js` (pasa de 1.000 líneas), porque aquí
+solo se ha tocado en unos pocos sitios (tampoco se partió en la 101: ver su entrada).
+
+: guardar en fila y sin trabajo de más
+
+`docs/GUARDAR-EN-FILA.md`. Francisco: al grabar sale un error o la pantalla se queda congelada,
+aunque al volver a entrar sí se ha guardado. Las causas, de la revisión a fondo:
+
+- **La copia del día se rehacía en cada guardado.** `Copias` preguntaba con `Carpetas.existe`, que
+  busca una CARPETA: con un fichero siempre decía «no existe». Cada guardado releía, reescribía la
+  copia y listaba `copias/` entera. Las pruebas no lo veían porque el disco de mentira no distingue
+  carpeta de fichero; la prueba nueva sí (como el navegador de verdad).
+- **Nada ponía los guardados en fila.** Dos a la vez leían antes de que escribiera el otro, y ganaba
+  el último. `js/cola-guardado.js`: una cadena de promesas por fichero.
+- **Leer no reintentaba**, y un `NotReadableError` de Dropbox tumbaba el segundo paso.
+- **Las tareas de fondo** (presencia, vistazo a la carpeta, conflictos) se cruzaban con el guardado;
+  el vistazo, a mitad de un archivado, veía desaparecer la carpeta y sacaba de la ficha en rojo.
+- **Tres riesgos de perder datos**: un `asuntos.json` leído vacío se escribía encima; las copias en
+  conflicto se quedaban fuera al trasladar una carpeta y se borraban con el original; la fusión de
+  conflictos perdía todo lo que no fuera `asuntos`.
+
+**Lo que costó**: la guardia de «lectura vacía» comparaba al principio con lo que había en memoria,
+y una prueba (`archivo-indice.mjs`) mete fichas solo en memoria: la guardia saltaba y el archivado
+no se hacía. Se compara con lo último leído o escrito en el disco. Y otra lección de la fila 92:
+las pruebas sin navegador no cargan `js/cola-guardado.js`, así que todo lo usa con `window.` y sin
+él guarda igual.
+
+: preguntas dentro de las respuestas, sin límite de niveles
+
+`docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md`. Reabre a propósito lo que estaba descartado
+(«opciones dentro de opciones en la guía»): los procedimientos del centro lo necesitan. La línea
+sale de la lista de descartado.
+
+- **Modelo** (`js/guias.js`): `normalizarOpciones` ya no vacía `opciones` ni recorta campos en los
+  pasos de una opción; `normalizar` es recursivo. Un paso-pregunta, a cualquier nivel, sale sin
+  requisitos, comunicación, normativa ni formularios.
+- **Editor**: entrar y salir como en carpetas, dentro del mismo `U.preguntar` (solo hay uno). El
+  truco fue separar `nivel` (lo que se ve) de `pasos` (lo que se guarda), y cambiar `recoger()`
+  para que actualice los objetos por su id en vez de rehacerlos: antes rehacía los pasos de una
+  opción con cinco campos, y con preguntas de dentro eso se habría llevado sus opciones.
+- **Hitos**: `Hitos.visibles` cortaba solo la sublista de una pregunta de dentro sin responder, y
+  seguía enseñando lo de después de la de fuera. Ahora corta la lista entera. Cambiar de rama poda
+  todo el subárbol (`podar`), y `huerfanos` recoge lo trabajado de cualquier nivel.
+
+: el botón «Ruta» de la ficha del asunto
+
+`docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md`. Francisco pidió un botón que abriera la carpeta del
+asunto; el navegador no lo deja (sigue en la lista de descartado), así que se copia la ruta para
+pegarla en el explorador. Los manejadores de carpeta no saben su ruta de verdad, así que la parte
+de delante la apunta cada uno en Ajustes → El centro, y se guarda en `localStorage`, no en
+`_GESTOR`: la ruta del ordenador de Francisco no existe en el de su compañero. Módulo nuevo
+`js/copiar-ruta.js`, que se crea su propio bloque en Ajustes. `pruebas/copiar-fila.mjs` cuenta
+ahora un botón más.
+
+: campos propios en el nombre de un documento
+
+`docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md`. Cada tipo de documento puede llevar campos (texto,
+lista o fecha, obligatorios si se quiere) que entran en el nombre entre el tipo y el texto
+adicional. Módulo nuevo `js/documentos-campos.js`.
+
+**Dónde se guardan, y por qué ahí.** `tipos-documento.json` es una lista de nombres que usan la
+fusión de borrados, la papelera y la guardia de duplicados: convertirla en objetos tocaba todo
+eso. Los campos van a `campos.json`, clave `porTipoDocumento`, que ya es compartido, con copia y
+releído antes de escribir. Ojo con una trampa: `Campos.normalizar` reconstruye el objeto entero,
+así que cualquier clave nueva que no se añada ahí se borra en el siguiente guardado de otro trozo
+(la prueba lo comprueba). La clave solo se escribe cuando hay algún campo.
+
+Un campo de fecha entra como `AAMMDD`, igual que la fecha del documento.
+
+: cambiar el tipo de un asunto ofrece la guía del nuevo
+
+`docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md`. Hasta ahora, cambiar el tipo en «Editar el asunto»
+renombraba la carpeta pero dejaba los hitos del tipo viejo sin decir nada. Ahora pregunta (lo
+eligió Francisco: a veces el cambio es solo para corregir el nombre). Módulo nuevo
+`js/hitos-cambio-de-tipo.js`, llamado desde `App.editarAsunto` solo cuando carpeta y ficha ya han
+salido bien. Los hitos viejos con algo apuntado no se pierden: campo nuevo `delTipoAnterior`, que
+`Hitos.visibles` salta y `Hitos.huerfanos` pliega abajo, con la misma pantalla que los de una rama
+descartada.
+
+**Una decisión que el documento dejaba abierta**: pedía conservar los hitos «hechos o en curso»,
+pero también que con hitos intactos se sustituyeran todos. Un asunto recién creado ya tiene el
+primero en curso sin que nadie haya hecho nada, así que "en curso" solo no cuenta como trabajo; sí
+cuentan hecho, notas, documentos, requisitos marcados y una rama elegida.
+
+: el nombre corto del tipo, también en los filtros y en la tarjeta
+
+`docs/NOMBRE-CORTO-EN-LOS-FILTROS.md`. Las tarjetas «Por tipo de asunto» y la etiqueta del tipo
+en cada tarjeta enseñan ahora el nombre corto (el largo, al pasar el ratón). Dos funciones nuevas
+en `js/nombres.js`, `tipoParaVer` y `nombresDeTipo`. Se sigue agrupando por el nombre de verdad:
+la prueba monta dos tipos con el mismo nombre corto y comprueba que salen dos tarjetas y que cada
+una filtra solo lo suyo. El buscador encuentra por los dos nombres, abierto y archivado; en el
+ARCHIVO se resuelve al buscar, así que nadie tiene que reconstruir el índice. Ojo al escribir la
+prueba: la lista de tipos de partida ya trae un `TRASLADO`, y un corto igual a un tipo existente
+hace que `Nombres.leer` se quede con el otro (Ajustes ya lo avisa en rojo).
+
+## 23-sep-2026 — Fila 93: no salir del asunto salvo cuando el usuario lo pide
+
+`docs/QUEDARSE-EN-EL-ASUNTO-SIEMPRE.md`. Repaso completo, fichero a fichero, de todo `js/` en
+busca de una salida indebida de la ficha (`App.ir(` hacia otra pantalla, u ocultar
+`#pantalla-asunto` fuera de las cuatro salidas permitidas): `js/nucleo.js` (dónde vive `App.ir` y
+`App.PANTALLAS`), `js/ficha-asunto.js`, `js/ficha-nombre-acciones.js`, `js/ficha-documentos.js`,
+`js/hitos-documentos.js`, `js/hitos-panel.js`, `js/hitos-panel-lista.js`, `js/hitos-comunicar.js`,
+`js/documentos.js`, `js/documentos-sueltos.js`, `js/documentos-sueltos-lector.js`,
+`js/documentos-sueltos-sugerencias.js`, `js/registro.js`, `js/registro-sellado.js`, `js/correo.js`,
+`js/correo-adjuntos.js`, `js/plantillas-documento.js`, `js/pdf-separar-unir.js`,
+`js/preparar-documento.js`, `js/notas.js`, `js/relacionados.js`, `js/otros-del-tercero.js`,
+`js/formularios.js`, `js/formularios-rellenar.js`, `js/asuntos-lista.js`, `js/asuntos-archivar.js`,
+`js/asuntos-editar.js`, `js/asuntos-nuevo.js`, `js/asunto-renombrar.js`, `js/unir-asuntos.js`,
+`js/borrados-fusion.js`, `js/papelera.js`, `js/fichas-huerfanas.js`, `js/ficha-archivo.js`,
+`js/ficha-tercero.js`, `js/ficha-plegables.js`, `js/lo-pide.js`, `js/elegir-asunto.js`,
+`js/duplicados.js`, `js/lector.js`, `js/visor.js`, `js/vista.js`, `js/usabilidad.js`, `js/barra.js`.
+
+**No se ha encontrado ninguna salida indebida: el código ya cumplía la regla entera.** La fila 30
+(17-sep-2026) y las que la siguieron (34, 51, 52, 58...) ya habían dejado cada camino bien hecho:
+asociar un documento a un hito (`js/ficha-documentos.js`, botón "Asociar a un hito") y apuntarlo
+desde el propio hito (`js/hitos-documentos.js`, "Apuntar un documento") repintan solo su propio
+trozo, nunca navegan; marcar un hito, "Comunicar", "Documentos ▾", registrar, generar un
+documento de plantilla y separar/unir/sacar páginas de un PDF llaman todos a `App.verAbiertos()`
+(que ya reengancha sola la ficha desde la fila 30) o repintan en su sitio con
+`App.abrirFicha(a, modo)`, nunca a `App.ir(otra-pantalla)`. "Meter en un asunto"/"Meter aquí" de
+Por clasificar (`js/documentos-sueltos.js`, `js/documentos-sueltos-lector.js`) viven en la
+pantalla "Por clasificar", nunca dentro de la ficha, así que no pueden sacar de ella; y cuando el
+asunto de destino es el que antes tenía la ficha abierta, `App.verAbiertos()` no lo vuelve a
+enseñar porque `App.reengancharFicha()` comprueba primero si la ficha sigue **a la vista**
+(`#pantalla-asunto` sin `oculto`), no solo si `actual` sigue puesto.
+
+Se ha ampliado `pruebas/quedarse-en-el-asunto.mjs` con once casos más: marcar un hito, asociar un
+documento a un hito, apuntar un documento desde el hito, comunicar, "Documentos ▾", y "Meter en
+un asunto" hacia el asunto que antes tenía la ficha abierta (los seis, se quedan); y Volver,
+Editar (aunque se cancele), Borrar, Escape, y el asunto que deja de estar abierto desde el otro
+ordenador (los cinco, sí salen, con el aviso de una línea en el último caso). Quince
+comprobaciones en total, sobre las cuatro que ya había.
+
+**Lo que costó de verdad**: nada en el código de la aplicación, porque no hacía falta tocarlo. Lo
+que costó fueron las pruebas nuevas. La primera sesión que tocó esta fila no tuvo `git push` ni
+pudo montar el repositorio completo en un navegador local, así que escribió los quince casos
+nuevos sin poder correrlos, y los dejó publicados así, con una nota pidiendo a la siguiente sesión
+que los verificara. Esta segunda sesión sí ha podido clonar el repositorio (con `git clone` de
+lectura; sigue sin permiso para `git push`, así que la subida a `main` pasa igual por la
+herramienta de GitHub) y correr `npm test` de verdad en local, con `python3 -m http.server` y
+Playwright. Tres de los quince casos nuevos fallaban, los tres por errores en la propia prueba,
+nunca en la aplicación:
+
+- El caso 6 (apuntar un documento a un hito) y otros tres esperaban a que el cuadro se cerrara con
+  `pagina.waitForSelector('#capa.oculto')`. Con `.oculto { display: none !important; }`, ese
+  selector nunca puede quedar "visible" — el propio Playwright no lo resuelve nunca así, y la
+  prueba se quedaba esperando 30 segundos sin motivo. Cambiado a `pagina.waitForTimeout(400)` tras
+  el clic en Aceptar, que es el patrón que ya usan `pruebas/registro.mjs` y el resto del
+  repositorio para lo mismo. El caso 10 (que si sale hacia la lista, no hacia la ficha) se cambió
+  en su lugar a esperar `#pantalla-abiertos:not(.oculto)`, que es el estado de verdad que ese caso
+  comprueba.
+- El caso 10 ("Meter en un asunto") buscaba el asunto de pruebas por su nombre en el cuadro de
+  «Elegir el asunto», y no lo encontraba: ese asunto se había creado a mano, con una carpeta
+  directamente en el disco de mentira, sin pasar nunca por `App.anotar`, así que no tenía ninguna
+  entrada en `asuntos.json` y `ElegirAsunto.todos()` no lo veía. Arreglado dando de alta el
+  asunto con `App.anotar(nombre, {})` (sin categoría ni tercero, que es lo que necesitaba seguir
+  probando el caso 11) nada más crear la carpeta, antes del primer paso.
+- El caso 12 (el segundo asunto, para Escape/Editar/Borrar) esperaba su tarjeta con
+  `pagina.waitForSelector('.tarjeta', { hasText: 'PERMISO' })`: `waitForSelector` no admite
+  `hasText` (eso es de `locator()`), así que la opción se ignoraba y la prueba esperaba a que
+  fuera visible la primera `.tarjeta` que hubiera en toda la página — que podía ser la de un
+  documento suelto de un paso anterior, nunca la buscada. Cambiado a
+  `pagina.locator('#lista-abiertos .tarjeta', { hasText: 'PERMISO' }).first().waitFor()`.
+
+Con los tres arreglos, las quince comprobaciones de `pruebas/quedarse-en-el-asunto.mjs` pasan, y
+se ha corrido además la batería completa (`pruebas/*.mjs`, 97 ficheros): todas en verde, sin tocar
+ningún otro fichero de la aplicación.
+
+Sustituida en `docs/contexto/ASUNTOS.md` la línea vieja de la fila 30 por la lista completa y
+actual de caminos revisados (ya lo había hecho la primera sesión). Versión publicada
+`App.VERSION`: `23-sep-2026 · 15:47`.
+
+## 23-sep-2026 — Fila 92: «Reintentar is not defined», la aplicación sin poder guardar
+
+`docs/NADA-SE-GUARDA-REINTENTAR.md`. Desde la fila 90, `Carpetas.escribirTexto`/`escribirBytes`
+llamaban a `Reintentar.escritura` a pelo: en un navegador con `js/carpetas.js` nuevo y un
+`index.html` que no cargaba `js/reintentar-escritura.js`, fallaba **toda** escritura. Ahora pasan
+por `conReintento(intento)`, que sin el módulo escribe sin reintento, y
+`js/reintentar-escritura.js` se expone en `window.Reintentar`.
+
+**De dónde salía la versión a medias.** `main` estaba bien (el `<script>` estaba, antes de
+`carpetas.js`). La copia sin internet no lleva lista de ficheros escrita a mano
+(`scripts/copia-local.mjs` copia `js/` e `index.html` enteros), y `vercel.json` ya manda
+`max-age=0, must-revalidate` para todo, `index.html` incluido. Lo más probable: una copia a
+medias, en la que un `.js` nuevo llega antes que el `index.html` que lo carga (Dropbox sincroniza
+fichero a fichero al otro ordenador, y la actualización de la copia también escribe uno a uno).
+Con el arreglo, ese estado a medias ya no deja a nadie sin guardar. **No se pudo mirar lo
+publicado con `curl`**: esta sesión no tenía salida a `asuntos.fmargon.com` ni a `vercel.app`.
+
+Prueba nueva `pruebas/scripts-cargados.mjs` (sin navegador): todo `js/*.js` en `index.html` y al
+revés, el orden de los dos ficheros, y escribir con y sin `Reintentar`. Sin el arreglo, falla.
+
+De paso, `docs/COLA.md` vuelve a dar por HECHAS la 89 y la 91: el commit que apuntó las filas 92
+a 98 las había devuelto, por error, a BLOQUEADA y PENDIENTE.
+
+## 23-sep-2026 — Fila 91: la copia sin internet se actualiza de verdad (y se cierra la 89)
+
+`docs/COPIA-SE-ACTUALIZA.md`. La copia que Francisco abría en el instituto seguía en
+`21-sep-2026 · 11:32` con la publicada en `14:49`, y sin decir nada. La copia pública estaba al
+día: fallaba el ordenador. Dos agujeros, tapados los dos porque no se sabía cuál le había tocado:
+
+- **`ABRIR EL GESTOR.html` solo guardaba la carpeta la primera vez.** Si la carpeta ya tenía
+  `index.html`, iba directo a ella sin guardarla; en otro ordenador, navegador o perfil,
+  `js/actualizar-copia.js` no encontraba carpeta y se callaba. Ahora la guarda siempre y, si ya
+  está instalada, la pone al día antes de abrirla (mismo algoritmo: solo los sha256 distintos,
+  `version.json` el último). Así, volver a guardar ese fichero y abrirlo rescata una copia vieja,
+  que es la única salida para la de Francisco (su `js/actualizar-copia.js` es el viejo). Además,
