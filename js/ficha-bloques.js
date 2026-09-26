@@ -67,7 +67,7 @@
       { titulo: 'Departamento', valor: (f.departamento && f.departamento.nombre) || '' },   /* fila 167 */
       { titulo: 'En el archivo', valor: a.ruta || '' }
     ]).filter(function (x) { return x && x.valor; });
-    /* "Formularios" (20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md):
+    /* "Impresos" (20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md):
        se rellena aparte, después de pintar (js/formularios.js, que
        envuelve App.abrirFicha), porque hace falta leer los hitos del
        asunto, que es async. Nace oculta: si no hay ninguno, se queda
@@ -75,7 +75,7 @@
     if (!buenas.length) return null;
     var extraFormularios = window.Formularios
       ? '<div class="ficha-dato oculto" id="ficha-formularios-fila">' +
-        '<span>Formularios</span><span id="ficha-formularios-valor"></span></div>' : '';
+        '<span>Impresos</span><span id="ficha-formularios-valor"></span></div>' : '';
     return N.filasHtml(buenas, extraFormularios);
   }
 
@@ -215,12 +215,12 @@
 
   /* ---------- el enlace de escribir o cambiar la guía ----------
 
-     Los pasos de la guía SON los hitos (docs/HITOS-SON-LA-GUIA.md):
+     Los hitos SON la guía (docs/HITOS-SON-LA-GUIA.md):
      ya no se leen aquí como texto con casillas, eso lo pinta
      js/hitos-panel.js dentro de este mismo #ficha-guia. Esta función
      deja solo el <p class="nota" id="ficha-guia-nota"> del final, con
      el botón de escribir o cambiar la guía del tipo; es tramitando un
-     asunto cuando uno se da cuenta de qué pasos faltan, y hasta el
+     asunto cuando uno se da cuenta de qué hitos faltan, y hasta el
      10-sep-2026 había que salir a Ajustes para apuntarlos.
 
      hitos-panel.js localiza esta nota por su id y la conserva al
