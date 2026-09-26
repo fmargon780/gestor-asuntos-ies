@@ -1,15 +1,15 @@
 /* ============================================================
-   guias-guion.js — la sección «Guion de este paso» del editor de guías
+   guias-guion.js — la sección «Tareas de este hito» del editor de guías
    (24-sep-2026, fila 109, docs/EL-HITO-A-PANTALLA-COMPLETA.md, 3).
 
    El guion es lo que hay que hacer dentro del hito, paso a paso:
    `guion: [{ id, texto, explicacion, accion, normativa }]`. `accion` es
-   'generar' | 'registrar' | 'comunicar' | 'anadir' | '' (con ella, el
-   paso se marca solo cuando la aplicación ve esa acción desde el hito,
-   js/hitos-guion.js). `normativa`, la misma forma que la de un paso
-   (`{ cita, bloque, clave, url }`), o null. Nunca en un paso-pregunta.
+   'generar' | 'registrar' | 'comunicar' | 'anadir' | '' (con ella, la
+   tarea se marca sola cuando la aplicación ve esa acción desde el hito,
+   js/hitos-guion.js). `normativa`, la misma forma que la de un hito
+   (`{ cita, bloque, clave, url }`), o null. Nunca en un hito-pregunta.
 
-   Preguntas en el guion (24-sep-2026, fila 116, docs/PREGUNTAS-EN-EL-GUION.md):
+   Preguntas en las tareas (24-sep-2026, fila 116, docs/PREGUNTAS-EN-EL-GUION.md):
    una línea puede ser `{ id, texto, explicacion, pregunta: true, opciones:
    [{ id, texto, lineas: [...líneas normales...] }] }`. Un solo nivel: las
    líneas de una opción nunca son pregunta, y una pregunta no lleva
@@ -21,14 +21,14 @@
    ser una lista aparte: la casilla «Hay que reunirlo», junto a «Es una
    pregunta».
 
-   La receta de un paso (25-sep-2026, fila 164, docs/HITOS-ACCIONES-EN-EL-HITO.md,
+   La receta de una tarea (25-sep-2026, fila 164, docs/HITOS-ACCIONES-EN-EL-HITO.md,
    punto 3): la `accion` es su clase (comunicar, generar, registrar) y
    `receta` sus detalles, todos opcionales: comunicar `{ a, via,
    plantilla }` (a: tercero, tutores, tutoria, relacionados u otro; via:
    correo o seneca; plantilla: id de `plantillas.json` › `lista`);
    generar `{ plantilla }` (id de `plantillas.json` › `documentos`);
-   registrar `{ sentido }` (entrada o salida). Un paso con `accion` y sin
-   `receta` (los de la guía del instituto de antes) ya es un paso con
+   registrar `{ sentido }` (entrada o salida). Una tarea con `accion` y sin
+   `receta` (las de la guía del instituto de antes) ya es una tarea con
    receta, sin detalles: no hace falta convertir nada. Sale arriba en el
    menú del hito (js/hito-mesa-recetas.js).
 
@@ -47,7 +47,7 @@ var GuiasGuion = (function () {
 
   var A_QUIEN = [
     { valor: '', texto: 'A quien toque' }, { valor: 'tercero', texto: 'El tercero' },
-    { valor: 'tutores', texto: 'La familia (tutores legales)' }, { valor: 'tutoria', texto: 'La tutoría' },
+    { valor: 'tutores', texto: 'La familia' }, { valor: 'tutoria', texto: 'La tutoría' },
     { valor: 'relacionados', texto: 'Los relacionados' }, { valor: 'otro', texto: 'Otro' }
   ];
   var VIAS = [{ valor: '', texto: 'Correo o Séneca' }, { valor: 'correo', texto: 'Por correo' }, { valor: 'seneca', texto: 'Por Séneca' }];
@@ -93,17 +93,17 @@ var GuiasGuion = (function () {
   function recetaHTML(g) {
     var r = g.receta || {};
     if (g.accion === 'comunicar') {
-      return '<div class="guion-fila-linea guion-receta"><span class="guion-receta-titulo">Receta:</span>' +
+      return '<div class="guion-fila-linea guion-receta"><span class="guion-receta-titulo">Detalles:</span>' +
         '<select class="campo guion-receta-a">' + opcionesHTML(A_QUIEN, r.a) + '</select>' +
         '<select class="campo guion-receta-via">' + opcionesHTML(VIAS, r.via) + '</select>' +
         '<select class="campo guion-receta-plantilla">' + opcionesHTML(plantillasPara('lista', r.plantilla), r.plantilla) + '</select></div>';
     }
     if (g.accion === 'generar') {
-      return '<div class="guion-fila-linea guion-receta"><span class="guion-receta-titulo">Receta:</span>' +
+      return '<div class="guion-fila-linea guion-receta"><span class="guion-receta-titulo">Detalles:</span>' +
         '<select class="campo guion-receta-plantilla">' + opcionesHTML(plantillasPara('documentos', r.plantilla), r.plantilla) + '</select></div>';
     }
     if (g.accion === 'registrar') {
-      return '<div class="guion-fila-linea guion-receta"><span class="guion-receta-titulo">Receta:</span>' +
+      return '<div class="guion-fila-linea guion-receta"><span class="guion-receta-titulo">Detalles:</span>' +
         '<select class="campo guion-receta-sentido">' + opcionesHTML(SENTIDOS, r.sentido) + '</select></div>';
     }
     return '';
@@ -117,7 +117,7 @@ var GuiasGuion = (function () {
              clave: String(n.clave || '').trim().replace(/\s+/g, '-'), url: String(n.url || '').trim() };
   }
 
-  /* Un paso de guion sin texto no sobrevive (como un requisito). `dentro`:
+  /* Una tarea sin texto no sobrevive (como un requisito). `dentro`:
      las líneas de una opción, que nunca son pregunta. */
   function normalizar(lista, dentro) {
     return (Array.isArray(lista) ? lista : []).map(function (g) {
@@ -148,7 +148,7 @@ var GuiasGuion = (function () {
     }).filter(function (g) { return g.texto; });
   }
 
-  /* El guion en una línea de texto (para comparar con la biblioteca). */
+  /* Las tareas en una línea de texto (para comparar con la biblioteca). */
   function textoLegible(lista) {
     return (lista || []).map(function (g) {
       if (g.pregunta) {
@@ -168,7 +168,7 @@ var GuiasGuion = (function () {
         '" data-id="' + U.escapar(g.id) + '">' +
       '<div class="guion-fila-linea">' +
         '<input class="campo guion-texto" value="' + U.escapar(g.texto || '') + '" placeholder="' +
-          (pregunta ? 'La pregunta (¿Viene con toda la documentación?)' : 'Qué hay que hacer') + '">' +
+          (pregunta ? 'La pregunta (¿Viene con toda la documentación?)' : 'Texto de la tarea') + '">' +
         (pregunta ? '' : '<select class="campo guion-accion">' + ACCIONES.map(function (a) {
           return '<option value="' + a.valor + '"' + (a.valor === (g.accion || '') ? ' selected' : '') + '>' +
             U.escapar(a.texto) + '</option>';
@@ -214,11 +214,11 @@ var GuiasGuion = (function () {
   function bloqueHTML(guion) {
     var lista = guion || [];
     return '<details class="paso-guion">' +
-      '<summary>Guion de este paso' + (lista.length ? ' (' + lista.length + ')' : '') + '</summary>' +
-      '<p class="nota">Lo que hay que hacer dentro del hito. Los pasos con acción se marcan solos cuando ' +
+      '<summary>Tareas de este hito' + (lista.length ? ' (' + lista.length + ')' : '') + '</summary>' +
+      '<p class="nota">Lo que hay que hacer dentro del hito. Las tareas con acción se marcan solas cuando ' +
       'la aplicación la ve desde el hito; los demás, a mano.</p>' +
       '<div class="guion-lista">' + lista.map(function (g) { return filaHTML(g, false); }).join('') + '</div>' +
-      '<button type="button" class="boton boton-ancho guion-anadir">+ Añadir un paso al guion</button>' +
+      '<button type="button" class="boton boton-ancho guion-anadir">+ Añadir una tarea</button>' +
       '</details>';
   }
 
