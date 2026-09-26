@@ -406,29 +406,29 @@ const CESO_YA = enDias(-10);
 
 await Carpetas.escribirTexto(datosPer, 'RelPerCen.csv',
   '"Empleado/a","DNI/Pasaporte","Puesto","Fecha de toma de posesión","Fecha de cese","Teléfono","Móvil avisos de emergencia","Usuario IdEA","Cuenta Google/Microsoft"\r\n' +
-  '"Aguado Ranea, Marcos Antonio","33357591R","Música P.E.S.","01/09/2011","","952276078","620177026","maguran591","maguran591@g.educaand.es"\r\n' +
-  '"Bonilla Cascado, Manuel","52561060B","Música P.E.S.","01/09/2003","' + CESA_PRONTO + '","952594821","606557122","mboncas060","mboncas060@g.educaand.es"\r\n' +
-  '"Sánchez Alegría, María José","07862312S","Dibujo P.E.S.","01/09/2005","' + CESO_YA + '","656633968","656633968","msanale312","msanale312@g.educaand.es"\r\n');
+  '"Pérez Ejemplo, Persona Uno","00000000T","Música P.E.S.","01/09/2011","","600000001","600000002","usuario1","persona.uno@ejemplo.invalid"\r\n' +
+  '"López Ejemplo, Persona Dos","11111111H","Música P.E.S.","01/09/2003","' + CESA_PRONTO + '","600000003","600000004","usuario2","persona.dos@ejemplo.invalid"\r\n' +
+  '"García Ejemplo, Persona Tres","22222222J","Dibujo P.E.S.","01/09/2005","' + CESO_YA + '","600000005","600000005","usuario3","persona.tres@ejemplo.invalid"\r\n');
 
 const P = await Datos.cargar(datosPer, 'PERSONAL');
 comprobar('lee las tres fichas del RelPerCen', P.lista.length, 3);
 comprobar('y dice de qué fichero salen', P.fichero, 'RelPerCen.csv');
 
-const marcos = P.lista.find(x => x.nombre.indexOf('Aguado') === 0);
+const marcos = P.lista.find(x => x.nombre.indexOf('Pérez') === 0);
 comprobar('sin fecha de cese, sigue en el centro', marcos.enElCentro, true);
 comprobar('le coge el puesto', marcos.puesto, 'Música P.E.S.');
 comprobar('y viene de Séneca', marcos.deSeneca, true);
 
-const manuel = P.lista.find(x => x.nombre.indexOf('Bonilla') === 0);
+const manuel = P.lista.find(x => x.nombre.indexOf('López') === 0);
 comprobar('cesa dentro de unos días, así que todavía está', manuel.enElCentro, true);
 
-const mariaJose = P.lista.find(x => x.nombre.indexOf('Sánchez') === 0);
+const mariaJose = P.lista.find(x => x.nombre.indexOf('García') === 0);
 comprobar('cesó hace días, ya no está en el centro', mariaJose.enElCentro, false);
 comprobar('y se guarda la fecha del cese', mariaJose.fechaCese, CESO_YA);
 comprobar('cuenta bien cuántos siguen en el centro', P.enElCentro, 2);
 
 comprobar('el nombre del tercero lleva los cuatro últimos caracteres',
-  Nombres.terceroPersonal(marcos), 'Aguado Ranea, Marcos Antonio 591R');
+  Nombres.terceroPersonal(marcos), 'Pérez Ejemplo, Persona Uno 000T');
 
 comprobar('se puede buscar por la asignatura',
   Datos.buscar(P.lista, 'musica').length, 2);
@@ -457,17 +457,17 @@ const CAB = '"Empleado/a","DNI/Pasaporte","Puesto","Fecha de toma de posesión",
 
 /* Profesorado de hace dos cursos: uno sigue, otro se fue. */
 await Carpetas.escribirTexto(datosVarios, 'RelPerCen 24-25.csv', CAB + '\r\n' +
-  '"Aguado Ranea, Marcos Antonio","33357591R","Música P.E.S.","01/09/2011",""\r\n' +
-  '"Vieja Guardia, Antonia","11112233A","Latín P.E.S.","01/09/2010",""\r\n');
+  '"Pérez Ejemplo, Persona Uno","00000000T","Música P.E.S.","01/09/2011",""\r\n' +
+  '"Martín Ejemplo, Persona Cuatro","33333333P","Latín P.E.S.","01/09/2010",""\r\n');
 
 /* Profesorado de este curso: la que se fue ya no sale. */
 await Carpetas.escribirTexto(datosVarios, 'RelPerCen 26-27.csv', CAB + '\r\n' +
-  '"Aguado Ranea, Marcos Antonio","33357591R","Jefatura de Estudios","01/09/2011",""\r\n' +
-  '"Cherino Elena, Paula","26835483A","Inglés P.E.S.","01/09/2026","31/08/2027"\r\n');
+  '"Pérez Ejemplo, Persona Uno","00000000T","Jefatura de Estudios","01/09/2011",""\r\n' +
+  '"Ruiz Ejemplo, Persona Cinco","44444444A","Inglés P.E.S.","01/09/2026","31/08/2027"\r\n');
 
 /* Personal no docente de este curso, en su propio fichero. */
 await Carpetas.escribirTexto(datosVarios, 'RelPerCenNodocente 2627.csv', CAB + '\r\n' +
-  '"Ordóñez Gil, Rafael","44556677B","Ordenanza","01/09/2015",""\r\n');
+  '"Santos Ejemplo, Persona Seis","55555555K","Ordenanza","01/09/2015",""\r\n');
 
 comprobar('el curso sale del nombre del fichero',
   Datos.cursoDelFichero('RelPerCen PAS 26-27.csv'), '26-27');
@@ -491,17 +491,17 @@ comprobar('junta los tres ficheros sin repetir a nadie', V.lista.length, 4);
 comprobar('y dice cuál es el curso más reciente', V.curso, '26-27');
 comprobar('lista los tres ficheros en Ajustes', V.ficheros.length, 3);
 
-const marcosV = V.lista.find(x => x.nombre.indexOf('Aguado') === 0);
+const marcosV = V.lista.find(x => x.nombre.indexOf('Pérez') === 0);
 comprobar('quien sale en los dos cursos sigue en el centro', marcosV.enElCentro, true);
 comprobar('se le guardan los dos cursos', marcosV.cursos, ['24-25', '26-27']);
 comprobar('y vale el puesto del fichero más nuevo', marcosV.puesto, 'Jefatura de Estudios');
 
-const antonia = V.lista.find(x => x.nombre.indexOf('Vieja') === 0);
+const antonia = V.lista.find(x => x.nombre.indexOf('Martín') === 0);
 comprobar('quien solo sale en el fichero viejo ya no está', antonia.enElCentro, false);
 comprobar('y se sabe cuál fue su último curso aquí', antonia.cursoUltimo, '24-25');
-comprobar('pero se la sigue encontrando', Datos.buscar(V.lista, 'vieja').length, 1);
+comprobar('pero se la sigue encontrando', Datos.buscar(V.lista, 'martin').length, 1);
 
-const ordenanza = V.lista.find(x => x.nombre.indexOf('Ordóñez') === 0);
+const ordenanza = V.lista.find(x => x.nombre.indexOf('Santos') === 0);
 comprobar('el personal no docente entra igual', ordenanza.enElCentro, true);
 comprobar('con su puesto', ordenanza.puesto, 'Ordenanza');
 
