@@ -890,7 +890,7 @@ el tipo y volver a empezar. Cambia esa decisión de siempre.
   tercero). Si todavía no había tercero, revela ese bloque igual que siempre.
 - Escape cierra el panel, no Nuevo asunto: un `keydown` propio, en captura, con `stopPropagation`,
   mismo cuidado que `js/huecos-buscador.js` por el mismo motivo (el manejador de Escape de
-  `js/usabilidad.js` está en burbuja, sin captura).
+  `js/usabilidad.js» está en burbuja, sin captura).
 - Trampa real durante las pruebas: `document.getElementById` no encuentra nada dentro de un nodo
   todavía sin colgar del documento. `construir()` montaba el panel entero y le enganchaba los
   `onclick`/`oninput` con `$()` (que es `document.getElementById`) antes de que `repintar()`
@@ -982,7 +982,7 @@ de familias renunció por motivos laborales y el escrito se hizo a mano; ahora s
   motivo) y un recuadro final «A cumplimentar por el centro». Una hoja A4: comprobado con el `.docx`
   pasado a PDF con LibreOffice (hubo que instalar su parte de Writer en la sesión).
 - Decisión: la persona se nombra en neutro («la persona abajo firmante», «designada»), porque
-  `js/genero.js` habría cambiado «designado/a» según el sexo del tercero del asunto, que no es quien
+  `js/genero.js» habría cambiado «designado/a» según el sexo del tercero del asunto, que no es quien
   renuncia. El destinatario sí va con forma doble marcada `:firmante`, y por eso la plantilla lleva
   `firmante: direccion` (solo para el género; la firma del cargo no se pinta).
 - Los `id` de las plantillas del centro eran al azar al cargarlas, así que ningún paso de la
@@ -1030,7 +1030,7 @@ Versión `App.VERSION`: `24-sep-2026 · 12:22`.
 `docs/GUIA-EN-ACORDEON.md`. Con varios pasos, el cuadro de escribir la guía salía con todos los
 campos a la vista y no se veía el trámite de un vistazo. Ahora cada paso cerrado es una línea
 (número, título, marcas) y solo hay uno abierto a la vez. Detalle en
-`docs/contexto/HITOS-Y-GUIAS.md» («El editor, en acordeón»).
+`docs/contexto/HITOS-Y-GUIAS.md` («El editor, en acordeón»).
 
 - Decisión: plegar con una clase y CSS, sin quitar nada del DOM, para que `recoger()` siga leyendo
   todos los campos y lo guardado no cambie en nada.
@@ -1837,7 +1837,7 @@ inyecta un `<script src="copia-datos/<ruta con / cambiado por ~>.js">` que deja 
 `window.__COPIA__`, con carga perezosa y sin duplicar la inyección si dos módulos piden la misma
 ruta a la vez. Contrato elegido: `'json'` devuelve el objeto ya interpretado, `'binario'` un
 `Uint8Array`, igual que ya hacían a mano los cinco sitios de la tabla del diseño (`js/cargar-biblioteca.js`,
-`js/formularios.js`, `js/formularios-rellenar.js`, `js/plantillas-documento.js» ×2), que pasaron a
+`js/formularios.js`, `js/formularios-rellenar.js`, `js/plantillas-documento.js` ×2), que pasaron a
 llamar a esta función en vez de a `fetch` directo. Los tres módulos que repetían casi el mismo
 `cargarPdfJs()` con `import('./lib/pdf.min.mjs')` (`js/registro-lector.js`,
 `js/preparar-documento.js`, `js/pdf-separar-unir.js`) pasaron a llamar a la función compartida
