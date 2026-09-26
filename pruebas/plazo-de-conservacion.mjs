@@ -98,7 +98,9 @@ console.log('--- 1 a 4. quién ha cumplido su plazo ---');
 await comprobar('Ana (archivada en 2021) y Eva (sin fecha de cierre, aproximada); ni Luis (conservar hasta 2099) ni la COMPRA (sin plazo)',
   cumplidos(), [EVA + ' (aprox.)', ANA].sort());
 await comprobar('el índice guarda la fecha de archivo', pagina.evaluate(async (n) => {
-  const r = await IndiceArchivo.leerDisco();
+  /* Fila 177: el índice está partido por curso; Ana es de 2021 (curso
+     21-22), no del curso actual, así que hace falta pedirlos todos. */
+  const r = await IndiceArchivo.leerDisco({ todos: true });
   return r.datos.asuntos.filter(e => e.nombre === n)[0].archivadoEl;
 }, ANA), '2021-06-01');
 await comprobar('4 años sobre el 29 de febrero caen en el 28', pagina.evaluate(() => Conservacion.sumarAnios('2024-02-29', 1)), '2025-02-28');
@@ -151,7 +153,9 @@ await comprobar('está en la papelera, con su carpeta', pagina.evaluate(async (n
   const dentro = []; for await (const [k] of car.entries()) dentro.push(k);
   return [f.clase, dentro];
 }, EVA), ['archivado', ['210901 SOLICITUD.pdf']]);
-await comprobar('y fuera del índice', pagina.evaluate(async (n) => (await IndiceArchivo.leerDisco()).datos.asuntos.some(e => e.nombre === n), EVA), false);
+/* Fila 177: Eva es de 2015 (curso 15-16), no del curso actual, así
+   que hace falta pedirlos todos para comprobar de verdad. */
+await comprobar('y fuera del índice', pagina.evaluate(async (n) => (await IndiceArchivo.leerDisco({ todos: true })).datos.asuntos.some(e => e.nombre === n), EVA), false);
 await comprobar('el bloque se esconde: ya no queda ninguno', pagina.locator('#bloque-conservacion').isHidden(), true);
 
 console.log('--- y se devuelve a su sitio ---');
@@ -160,7 +164,7 @@ await comprobar('devolver sale bien', pagina.evaluate(async (n) => {
   return (await Papelera.devolver(f)).ok;
 }, EVA), true);
 await comprobar('vuelve a su carpeta del ARCHIVO', enElArchivo(), [EVA]);
-await comprobar('y a su índice', pagina.evaluate(async (n) => (await IndiceArchivo.leerDisco()).datos.asuntos.some(e => e.nombre === n), EVA), true);
+await comprobar('y a su índice', pagina.evaluate(async (n) => (await IndiceArchivo.leerDisco({ todos: true })).datos.asuntos.some(e => e.nombre === n), EVA), true);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
