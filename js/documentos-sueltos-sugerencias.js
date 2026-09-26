@@ -126,7 +126,8 @@ window.SugerenciasAsuntoExistente = (function () {
   async function sugerenciasArchivadas(categoria, documentoLeido, textoLeido, tipoPropuesto) {
     if (!tipoPropuesto || !window.IndiceArchivo) return [];
     var leido;
-    try { leido = await IndiceArchivo.leerDisco(); } catch (e) { return []; }
+    /* Fila 177: un archivado del mismo tipo puede ser de cualquier curso. */
+    try { leido = await IndiceArchivo.leerDisco({ todos: true }); } catch (e) { return []; }
     if (!leido || !leido.ok) return [];
 
     var candidatos = (leido.datos.asuntos || []).filter(function (e) {
