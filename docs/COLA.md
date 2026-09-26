@@ -142,7 +142,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 | 175 | `docs/PERSONAS-ARCHIVO-Y-MENU.md` (tanda 1, parte 3: la ficha de una persona enseña sus asuntos pulsables y «+ Nuevo asunto para esta persona»; el Archivo carga solo; el menú nace abierto en pantalla ancha; el buscador de Asuntos abiertos busca en todos los montones; cinco textos que despistan; el plazo de un paso sin «desde» ya no se pierde; después de la 173) | HECHA (26-sep-2026). `pruebas/personas-archivo-y-menu.mjs` nueva; `npm test` completo (170 ficheros) y el CI de GitHub, en verde |
 | 176 | `docs/DATOS-ENTRE-ORDENADORES.md` (tanda de estabilidad, parte 1: las listas de la ficha —hilos, relacionados, pendientes de registro, notas— se funden elemento a elemento con `App.anotarLista`; lápida para los asuntos archivados, borrados o unidos, que respetan `anotar`, `fusionarConDisco` y la fusión de conflictos; el vistazo de 20 s relee `asuntos.json` e `hitos.json` si cambiaron; la guía relee antes de escribir; presencia en un fichero por usuario y conflictos que hoy nadie recoge) | HECHA (26-sep-2026). `pruebas/datos-entre-ordenadores.mjs` nueva; `js/conflictos.js` partido en `js/conflictos-datos.js` (pasaba de 600 líneas); `npm test` completo en verde |
 | 177 | `docs/ARCHIVO-POR-CURSO-Y-RUTAS.md` (tanda de estabilidad, parte 2: índice del ARCHIVO en un fichero por curso académico con resumen en la raíz, migración sola, selector «Curso» en Archivo; los topes de largo cuentan la ruta completa dentro de Dropbox y avisan de lo que ya se pasa; después de la 176) | EN CURSO (26-sep-2026, 19:08). La retoma esta sesión: en `main` no hay ningún fichero nuevo de esta fila (ni `js/nombres-topes.js` ni `js/archivo-indice-construir.js`), así que nadie la había empezado de verdad todavía |
-| 178 | `docs/CORREO-VERSIONES-Y-LIMPIEZA.md` (tanda de estabilidad, parte 3: el script recuerda los envíos 60 días y la app comprueba su versión; `_esquema` en los ficheros compartidos; aviso de versión nueva también en la web; la copia de seguridad se verifica antes de sobrescribir; `script-src` en las cabeceras; datos de prueba inventados; hitos que no quedan huérfanos al archivar; después de la 177) | EN CURSO (26-sep-2026) |
+| 178 | `docs/CORREO-VERSIONES-Y-LIMPIEZA.md` (tanda de estabilidad, parte 3: el script recuerda los envíos 60 días y la app comprueba su versión; `_esquema` en los ficheros compartidos; aviso de versión nueva también en la web; la copia de seguridad se verifica antes de sobrescribir; `script-src` en las cabeceras; datos de prueba inventados; hitos que no quedan huérfanos al archivar; después de la 177) | HECHA (26-sep-2026). Publicado y comprobado con `curl` de forma independiente: `App.VERSION` `26-sep-2026 · 21:11`, cabecera `content-security-policy` con `script-src 'self' blob:`, y `SCRIPT_ESPERADO` de la fila 178 en `js/correo-enviar.js` publicado. `npm test` completo en verde antes de subir. Detalle en la nota de más abajo |
 | 179 | `docs/VOCABULARIO-EN-PANTALLA.md` (tanda 2 de usabilidad, parte 1: una sola palabra para cada cosa en todos los textos de pantalla —guía, hito, tarea, tercero, familia, plantilla, impreso oficial, registrar, guardar en el asunto, cambiar, quitar/borrar—; solo rótulos, ningún dato; después de la 178) | PENDIENTE (26-sep-2026) |
 | 180 | `docs/INICIO-CUATRO-BLOQUES.md` (tanda 2, parte 2: la pantalla de Inicio con cuatro bloques —Ha llegado, Me toca hoy, Esperamos a otros, Todos los asuntos abiertos—, según `docs/boceto-inicio.html`; «Qué me toca» deja de ser pantalla aparte; después de la 179) | PENDIENTE (26-sep-2026) |
 | 181 | `docs/AVISOS-MENU-Y-VOLVER.md` (tanda 2, parte 3: los avisos de arriba en una sola línea con un solo botón para callarla; el menú lateral; un solo «Volver» que siempre vuelve a la pantalla anterior, también en la mesa del hito; después de la 180) | PENDIENTE (26-sep-2026) |
@@ -320,6 +320,41 @@ horas en `main` sin ningún fichero nuevo suyo (ni `js/nombres-topes.js` ni
 `js/archivo-indice-construir.js`): nadie la había empezado de verdad todavía, pase lo que pasara en
 otra conversación. Esta sesión la retoma con el trabajo ya hecho y probado en local (código,
 pruebas y documentación), y la marca EN CURSO otra vez.
+
+## Nota del 26-sep-2026 (sesión programada, Cowork): fila 178 cerrada y publicación comprobada
+
+Esta sesión retomó la fila 178, que llevaba desde las 14:50 EN CURSO sin ningún commit de código
+(la sesión anterior se cortó tras marcarla, sin empezar de verdad: por eso se retomó, pasados los
+90 minutos sin commits nuevos de la regla de la tarea programada). El trabajo de los 8 puntos de
+`docs/CORREO-VERSIONES-Y-LIMPIEZA.md` se hizo con una sesión auxiliar, en 9 subidas entre las
+19:04 y las 19:32 (commits `1bca688d` a `833e11da`) en vez de las 2-3 que pide la regla 13: cada
+prueba y cada punto de documentación subió por separado. **Para que no se repita:** de esas 9
+subidas, solo 3 dispararon una publicación real de Vercel (`1bca688d`, `fe0097b6`, `15250de2` —
+las de código; las 6 restantes, de pruebas sueltas o de documentación, Vercel las ignora sola por
+el «ignored build step», así que no gastaron publicaciones del plan gratuito de verdad, pero si el
+código se hubiera repartido igual de suelto sí las habría gastado). La próxima vez que se delegue
+una fila en una sesión auxiliar, hay que decirle explícitamente que agrupe todo el código y las
+pruebas en una sola subida final, como pide la regla 13, no una por fichero ni una por prueba.
+
+Mientras esta fila estaba en marcha, otra sesión (no esta) trabajaba en paralelo la fila 177 (commits
+sin `Claude-Session`, de las 17:31 a las 19:28) y tuvo que restaurar `docs/HISTORIA.md` varias veces
+por subidas cortadas a la mitad (`Restaurar docs/HISTORIA.md parte 1/6` a `4/7`). Los ficheros de
+esta fila 178 no coinciden con los suyos salvo `docs/CONTEXTO.md` y `docs/CONTEXTO-CORTO.md`, que
+esta sesión volvió a bajar justo antes de subir (regla 10): no debería haber pisado nada de la fila
+177, pero conviene que quien lea esto compruebe que ambas partes siguen presentes en esos dos
+ficheros.
+
+`docs/HISTORIA.md` no se ha tocado desde esta sesión: no hay línea de la fila 178 todavía. Con el
+fichero tan grande y tan reciente de reconstruir (ver la nota de la fila 177, arriba), se deja
+pendiente para una sesión con `git push` de verdad en vez de arriesgarse a truncarlo otra vez. La
+entrada, cuando se añada: fila 178, 26-sep-2026, seis arreglos de estabilidad (envíos que no se
+repiten, versión del script y de la web comprobadas, `_esquema` en `_GESTOR`, copia verificada,
+CSP con `script-src`, hitos sin huérfanos al archivar); lo que costó de verdad fue el reparto en
+9 subidas en vez de 2-3, ya anotado arriba.
+
+Recuerda pegar el script de Gmail una vez (`docs/ENVIO-CUENTA-DEL-SCRIPT.md`): con esta fila
+publicada, la app avisará en Ajustes › Enviar correo mientras el script pegado sea el de antes de
+la fila 178.
 
 ## Nota para la próxima sesión: docs/CONTEXTO.md y docs/HISTORIA.md de las filas 53-56
 
