@@ -246,6 +246,17 @@ var Carpetas = (function () {
     catch (e) { return false; }
   }
 
+  /* Fila 176: la fecha de modificación de un fichero, para saber si el
+     otro ordenador lo ha tocado desde la última vez sin tener que leer
+     su contenido entero. 0 si no existe o no se puede mirar. */
+  async function fechaFichero(dir, nombre) {
+    try {
+      var h = await dir.getFileHandle(nombre);
+      var f = await h.getFile();
+      return f.lastModified;
+    } catch (e) { return 0; }
+  }
+
   async function copiarFicheroDentro(f, destino, nombre) {
     var salida = await destino.getFileHandle(nombre, { create: true });
     var w = await salida.createWritable();
@@ -548,7 +559,7 @@ var Carpetas = (function () {
     esCarpetaTemporalDeSincronizacion: esCarpetaTemporalDeSincronizacion,
     crear: crear, bajar: bajar, mover: mover, renombrar: renombrar, trasladar: trasladar,
     fusionarEn: fusionarEnOcupado, contarFicheros: contarFicheros,
-    existeFichero: existeFichero, nombreLibreConSufijo: nombreLibreConSufijo,
+    existeFichero: existeFichero, fechaFichero: fechaFichero, nombreLibreConSufijo: nombreLibreConSufijo,
     renombrarFichero: renombrarFichero, moverFichero: moverFichero,
     elegirFichero: elegirFichero, copiarFicheroEn: copiarFicheroEn,
     leerTexto: leerTexto, escribirTexto: escribirTexto, escribirBytes: escribirBytes,

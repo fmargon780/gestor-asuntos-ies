@@ -133,9 +133,10 @@ var Relacionados = (function () {
     var deja = await U.dejaCrear(nombre, actuales.map(function (r) { return r.nombre; }), 'relacionado');
     if (!deja) return false;
 
-    var nueva = ((a.ficha && a.ficha.relacionados) || []).concat([{ categoria: categoria, nombre: nombre }]);
+    /* Fila 176, punto 1: se funde con el disco, releído dentro de la
+       cola, en vez de mandar la lista entera calculada en memoria. */
     try {
-      await App.anotar(a.nombre, { relacionados: nueva });
+      await App.anotarLista(a.nombre, 'relacionados', { anadir: [{ categoria: categoria, nombre: nombre }] });
     } catch (e) {
       U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
       return false;
@@ -162,6 +163,7 @@ var Relacionados = (function () {
      entra. Sin efectos: se puede probar sola. */
   function combinarRelacionados(actuales, categoriaPrincipal, terceroPrincipal, candidatos) {
     var finales = actuales.slice();
+    var nuevos = [];
     var anadidos = 0, yaEstaban = 0, esPropio = 0;
     candidatos.forEach(function (c) {
       if (c.categoria === categoriaPrincipal && terceroPrincipal &&
@@ -170,10 +172,15 @@ var Relacionados = (function () {
         return r.categoria === c.categoria && U.normalizar(r.nombre) === U.normalizar(c.nombre);
       });
       if (repetido) { yaEstaban++; return; }
-      finales.push({ categoria: c.categoria, nombre: c.nombre });
+      var nuevo = { categoria: c.categoria, nombre: c.nombre };
+      finales.push(nuevo);
+      nuevos.push(nuevo);
       anadidos++;
     });
-    return { finales: finales, anadidos: anadidos, yaEstaban: yaEstaban, esPropio: esPropio };
+    /* 'nuevos' (fila 176): solo los que de verdad se añaden, para que
+       agregarVarios los funda con App.anotarLista sin repetir el
+       cálculo de 'finales' contra el disco. */
+    return { finales: finales, nuevos: nuevos, anadidos: anadidos, yaEstaban: yaEstaban, esPropio: esPropio };
   }
 
   /* El cuadro de "Añadir varios": el buscador en modo de señalar
@@ -350,7 +357,7 @@ var Relacionados = (function () {
     }
 
     try {
-      await App.anotar(a.nombre, { relacionados: resultado.finales });
+      await App.anotarLista(a.nombre, 'relacionados', { anadir: resultado.nuevos });
     } catch (e) {
       U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
       return false;

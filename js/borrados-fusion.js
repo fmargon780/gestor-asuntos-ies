@@ -44,7 +44,12 @@
 var Borrados = (function () {
 
   var FICHERO = 'borrados-listas.json';
-  var LISTAS = ['tipos', 'estados', 'tiposDocumento', 'recurrentes'];
+  /* Fila 176: 'asuntos' son las lápidas de un asunto archivado, mandado
+     a la papelera, unido con otro o renombrado (docs/DATOS-ENTRE-
+     ORDENADORES.md, punto 2): impiden que App.anotar/anotarLista lo
+     resuciten vacío si el otro ordenador escribe algo en él antes de
+     enterarse de que ha desaparecido. */
+  var LISTAS = ['tipos', 'estados', 'tiposDocumento', 'recurrentes', 'asuntos'];
   var DIAS_PARA_PURGAR = 90;
 
   function vacio() {
@@ -77,12 +82,16 @@ var Borrados = (function () {
   }
 
   /* Marca 'clave' como borrada en 'lista', con la fecha de hoy. Si ya
-     estaba marcada, se deja como estaba (la fecha del primer borrado). */
-  async function marcar(gestor, lista, clave) {
+     estaba marcada, se deja como estaba (la fecha del primer borrado).
+     'motivo' es solo informativo (fila 176: 'archivado', 'papelera',
+     'unido' o 'renombrado', para la lista 'asuntos'). */
+  async function marcar(gestor, lista, clave, motivo) {
     if (LISTAS.indexOf(lista) === -1) return;
     await conFichero(gestor, function (datos) {
       if (datos[lista].some(function (x) { return x.clave === clave; })) return;
-      datos[lista].push({ clave: clave, borradoEl: new Date().toISOString() });
+      var entrada = { clave: clave, borradoEl: new Date().toISOString() };
+      if (motivo) entrada.motivo = motivo;
+      datos[lista].push(entrada);
     });
   }
 
@@ -136,10 +145,18 @@ var Borrados = (function () {
     });
   }
 
+  /* ¿Tiene 'clave' una lápida en 'lista' ahora mismo? Fila 176: la usa
+     App.anotar/anotarLista, releyendo siempre antes de crear nada. */
+  async function estaCerrada(gestor, lista, clave) {
+    if (LISTAS.indexOf(lista) === -1) return false;
+    var datos = await leer(gestor);
+    return datos[lista].some(function (x) { return x.clave === clave; });
+  }
+
   return {
     FICHERO: FICHERO, LISTAS: LISTAS, DIAS_PARA_PURGAR: DIAS_PARA_PURGAR,
-    marcar: marcar, revivir: revivir, filtrarActivos: filtrarActivos,
-    contar: contar, purgarViejas: purgarViejas
+    leer: leer, marcar: marcar, revivir: revivir, filtrarActivos: filtrarActivos,
+    estaCerrada: estaCerrada, contar: contar, purgarViejas: purgarViejas
   };
 })();
 
@@ -154,7 +171,8 @@ App.NOMBRES_BORRADOS = {
   tipos: 'Tipos de asunto borrados',
   estados: 'Estados borrados',
   tiposDocumento: 'Tipos de documento borrados',
-  recurrentes: 'Asuntos recurrentes quitados'
+  recurrentes: 'Asuntos recurrentes quitados',
+  asuntos: 'Lápidas de asuntos cerrados'
 };
 
 App.pintarBorradosFusion = async function () {

@@ -34,8 +34,9 @@ de `App` va después del fichero que lo define.
 | `js/carpetas.js` | Habla con el selector de carpetas del navegador. Lee y escribe los JSON: `escribirTexto`/`escribirBytes` reintentan solas con `Reintentar.escritura` (fila 90). `Carpetas.esCarpetaTemporalDeSincronizacion` descarta, en un solo sitio, las carpetas y ficheros que dejan Dropbox y Drive al sincronizar; `contarFicheros`/`copiarDentro`/la fusión los saltan, y un fichero que desaparece a mitad de copia se reintenta una vez |
 | `js/copias.js` | Copia de seguridad diaria de los ficheros de `_GESTOR`, y detección de fichero roto. Se borran solas las de más de 90 días (configurable), aunque no lleguen a 30 (fila 72) |
 | `js/usuarios.js` | La lista de nombres de quien entra (`_GESTOR/usuarios.json`), para el desplegable de la pantalla de entrada (fila 72) |
-| `js/borrados-fusion.js` | `_GESTOR/borrados-listas.json`: los borrados de tipos, estados, tipos de documento y recurrentes, marcados en vez de quitados del todo, para que no reaparezcan solos al fusionar con el otro ordenador (fila 77). El bloque de Ajustes → Mantenimiento que dice cuántos hay y deja quitarlos pasados 90 días vive en el mismo fichero |
-| `js/conflictos.js` | Las copias en conflicto que deja Dropbox: fusión sola o aviso para elegir |
+| `js/borrados-fusion.js` | `_GESTOR/borrados-listas.json`: los borrados de tipos, estados, tipos de documento, recurrentes y asuntos (las lápidas de la fila 176), marcados en vez de quitados del todo, para que no reaparezcan solos al fusionar con el otro ordenador (fila 77). El bloque de Ajustes → Mantenimiento que dice cuántos hay y deja quitarlos pasados 90 días vive en el mismo fichero |
+| `js/conflictos.js` | Las copias en conflicto que deja Dropbox: fusión sola (asuntos, hitos, tablón, con las lápidas de la fila 176) o aviso para elegir; y `presencia/`, borrada sin preguntar |
+| `js/conflictos-datos.js` | Sacado de `js/conflictos.js` en la fila 176: los CSV de terceros, `administraciones.json` y "los terceros se releen solos" |
 | `js/fichas-huerfanas.js` | Fichas de `asuntos.json` cuya carpeta ya no está: enlazar o borrar |
 | `js/nombres.js` | Monta los nombres de carpetas y documentos; desde la fila 130, con tope de largo (`Nombres.montarAsunto`, 150; `Nombres.montarDocumentoAjustado`, 120 más la extensión) y la línea ámbar de la vista previa (`Nombres.avisoRecorte`) |
 | `js/plazos.js` | La fecha límite de los asuntos; desde la fila 131, cómo se cuenta un plazo de hito (`Plazos.sumarPlazo`: hábiles, lectivos o naturales, con festivos y no lectivos), `diasQueQuedan` y `textoPlazo` |
@@ -66,7 +67,7 @@ de `App` va después del fichero que lo define.
 | `js/documentos-tipo-nuevo.js` | Crear un tipo de documento sin salir del cuadro (fila 133, sacado de `js/documentos.js`) |
 | `js/documentos-campos.js` | `DocCampos` (fila 96): los campos propios de un tipo de documento (`campos.json`, `porTipoDocumento`), reconocerlos al renombrar, ponerlos en orden para el nombre y su editor en Ajustes → Tipos de documento |
 | `js/usabilidad.js` | Volver, Cancelar, etiquetas de filtros, vista compacta y Escape |
-| `js/nucleo.js` | El estado, el arranque y el cambio de pantalla |
+| `js/nucleo.js` | El estado, el arranque y el cambio de pantalla; `App.anotar`/`App.anotarLista` (las lápidas y la fusión por elemento de la fila 176) |
 | `js/version.js` | `App.VERSION`, la fecha y hora de la última publicación |
 | `js/asuntos-lista.js` | Asuntos abiertos: las tres tarjetas, las tarjetas por tipo y la lista. Al leer la carpeta, descarta las que parecen temporales de sincronización, salvo que ya tengan ficha en `asuntos.json` |
 | `js/asuntos-lista-montones.js` | Las tres tarjetas de arriba, los montones por tipo de asunto, a qué montón va cada asunto, las cuentas y el filtro por montón (fila 133, sacado de `js/asuntos-lista.js`) |
@@ -106,12 +107,13 @@ de `App` va después del fichero que lo define.
 | `js/avisos.js` | El aviso de lo que vence |
 | `js/frescura.js` | El aviso de que el RegAlum.csv está viejo, y sus épocas |
 | `js/recurrentes.js` | Los asuntos que se repiten cada mes, trimestre o curso; la sección "Se repite" de la pantalla de un tipo (`Recurrentes.pintarEnContenedor`, 17-sep-2026) |
-| `js/guias-enganche.js` | Las guías dentro de la app, y `window.GuiasDelCentro` |
+| `js/guias-enganche.js` | Las guías dentro de la app, y `window.GuiasDelCentro`; guarda tipo a tipo, releyendo antes de escribir (fila 176) |
 | `js/hitos.js`, `js/hitos-archivo.js` | El modelo de los hitos de un asunto: leer/escribir `hitos.json`, crearlos desde la guía, marcarlos, bifurcaciones, responsables y el historial al archivar; `js/hitos.js` trae también `requisitos` y `faltanObligatorios` (fila 59) |
 | `js/que-me-toca.js` | Pantalla propia "Qué me toca": cruza los hitos pendientes y en curso de todos los asuntos abiertos, en tres bloques (`css/que-me-toca.css`); arriba, el aviso de aspirantes sin Nº de identificación escolar (fila 42) |
 | `js/cuentas.js` | Pantalla propia "Cuentas" (fila 74): las cuentas de fin de curso por categoría/tipo, mes, quién lo pidió y cuánto se tarda, de los asuntos abiertos y del índice del ARCHIVO |
 | `js/cuentas-tiempos.js` | El tiempo de tramitación en Cuentas (`CuentasTiempos`, fila 140): media y máximo por tipo, «Abiertos hace más de 30 días» y los diez abiertos más antiguos (pulsar abre la ficha; reservados, tapados). Justo después de `js/cuentas.js` |
-| `js/presencia.js` | No pisarse en un mismo asunto: la señal de `_GESTOR/presencia.json`, la vigilancia y la marca de la tarjeta de la lista |
+| `js/presencia.js` | No pisarse en un mismo asunto: la señal de `_GESTOR/presencia/<usuario>.json` (un fichero por usuario desde la fila 176), la vigilancia y la marca de la tarjeta de la lista |
+| `js/vistazo-registro.js` | Fila 176: el vistazo de 20 s también relee `asuntos.json`/`hitos.json` si han cambiado por fuera, envolviendo `App.mirarLaCarpeta` |
 | `js/notas.js` | Las notas de cada asunto, con su enlace y su botón; `Notas.pintarEnFicha` es la caja de escribir directa de la ficha, con botón Guardar (se guarda al pulsarlo o al perder el foco, nunca al teclear, fila 58); `confirmarSalirDeFicha` avisa si se sale con algo sin guardar |
 | `js/registro.js` | Registrar un documento en un paso, sin nombrarlo dos veces |
 | `js/cargar-fichero.js` | `App.leerFicheroDeLaApp(ruta, tipo)` (fila 89, 21-sep-2026, docs/COPIA-SIN-INTERNET.md): lee un dato estático (JSON o binario) con `fetch` en `http(s)` y desde `copia-datos/*.js` en `file://` (la copia sin internet); `App.cargarPdfJs()`, compartida por `js/registro-lector.js`, `js/preparar-documento.js` y `js/pdf-separar-unir.js`, que en `file://` carga `js/lib/pdf.iife.js`/`pdf.worker.iife.js` con `<script>` en vez de `import()` |
@@ -271,6 +273,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/logica.mjs` | Pruebas de la lógica, sin navegador |
 | `pruebas/copias.mjs` | Prueba de las copias de seguridad y del fichero roto |
 | `pruebas/conflictos.mjs` | Prueba de las copias en conflicto de Dropbox |
+| `pruebas/datos-entre-ordenadores.mjs` | Prueba de la fila 176: anotarLista, las lápidas, el vistazo que relee, las guías tipo a tipo y la presencia por usuario (sin navegador) |
 | `pruebas/generar-para-relacionados.mjs` | Un documento para cada relacionado (fila 171): tres relacionados, uno sin DNI; lo del asunto, una vez; «Enviar a cada uno» simulado y sin repetir |
 | `pruebas/documentos-en-un-solo-sitio.mjs` | Las opciones de cada documento en su fila (⧉, «Poner nombre», ⋮ de dos) y la barra de PDF del visor (fila 168) |
 | `pruebas/huerfanas.mjs` | Prueba de las fichas sin carpeta |

@@ -35,7 +35,7 @@
   }
 
   async function fusionarFicha(seQueda, seVa, fechaTexto) {
-    await App.guardarRegistroFresco(function (registro) {
+    await App.guardarRegistroFresco(async function (registro) {
       var fichaQueda = registro.asuntos[seQueda.nombre] || {};
       var fichaVa = registro.asuntos[seVa.nombre] || {};
 
@@ -58,6 +58,9 @@
         notas: notas, pasosHechos: pasosHechos, pasosElegidos: pasosElegidos
       });
       delete registro.asuntos[seVa.nombre];
+      /* Fila 176, punto 2: la lápida de "seVa", en la misma operación
+         de la cola que borra su clave. */
+      if (window.Borrados) await Borrados.marcar(App.E.gestor, 'asuntos', seVa.nombre, 'unido');
     });
 
     /* Los hitos y la señal de presencia de "seVa" viajan con él: se

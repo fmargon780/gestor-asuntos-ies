@@ -131,8 +131,13 @@ var TiposNombre = (function () {
   async function mover(viejo, nuevo) {
     var r = vacio();
     if (!viejo || !nuevo || viejo === nuevo || !App.E.gestor) return r;
-    /* Cada parte, solo si su módulo está cargado. */
-    if (window.GuiasDelCentro) await App.enFila('guias.json', function () { return moverGuia(viejo, nuevo, r); });
+    /* Cada parte, solo si su módulo está cargado. Fila 176: guias.json ya
+       no se envuelve aquí en su propia cola, porque GuiasDelCentro.guardarPasos
+       (llamado dentro de moverGuia) ya pone cada escritura en la cola de
+       'guias.json' por su cuenta; envolverlo aquí además se esperaría a sí
+       mismo (regla de js/cola-guardado.js) y dejaba arreglar() colgado para
+       siempre. */
+    if (window.GuiasDelCentro) await moverGuia(viejo, nuevo, r);
     if (window.Campos) await App.enFila('campos.json', function () { return moverCampos(viejo, nuevo, r); });
     if (window.Plantillas) await App.enFila('plantillas.json', function () { return moverPlantillas(viejo, nuevo, r); });
     await App.enFila('recurrentes.json', function () { return moverRecurrentes(viejo, nuevo, r); });

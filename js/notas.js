@@ -139,9 +139,13 @@
 
   /* `extra` es opcional. Sirve para que una nota lleve algo más que
      su texto: el enlace al correo del que salió, y el identificador
-     de ese correo, que es lo que luego evita apuntarlo dos veces. */
+     de ese correo, que es lo que luego evita apuntarlo dos veces.
+
+     Fila 176, punto 1: se funde con el disco dentro de la cola
+     (window.Gestor.anotarLista → App.anotarLista), en vez de leerlo
+     aquí fuera (notasFrescas) y mandar la lista entera: lo que el otro
+     ordenador haya apuntado en ese minuto ya no desaparece. */
   async function anadirNota(a, texto, extra) {
-    var lista = await notasFrescas(a);
     var nota = {
       texto: texto,
       quien: window.Gestor.usuario() || '',
@@ -150,13 +154,10 @@
     if (extra) Object.keys(extra).forEach(function (k) {
       if (extra[k] !== undefined && extra[k] !== null && extra[k] !== '') nota[k] = extra[k];
     });
-    lista.push(nota);
-    await window.Gestor.anotar(a.nombre, {
-      notas: lista,
-      notaEl: U.ahora(),
-      notaPor: window.Gestor.usuario() || ''
+    await window.Gestor.anotarLista(a.nombre, 'notas', {
+      anadir: [nota], extra: { notaEl: nota.cuando, notaPor: nota.quien }
     });
-    return lista;
+    return notasFrescas(a);
   }
 
   /* Como `anadirNota`, pero para las notas que van atadas a un mismo
@@ -164,9 +165,10 @@
      (js/registro.js, js/registro-sellado.js). Si ya hay una nota con
      ese mismo `campoClave`/`valorClave` (por ejemplo, el mismo
      documento original), se sustituye en su sitio; si no, se añade al
-     final como cualquier otra. */
+     final como cualquier otra. La identidad de esta llamada es la
+     marca (`campoClave`/`valorClave`), no `cuando + texto`: así la
+     misma marca siempre sustituye, aunque el texto cambie. */
   async function sustituirNota(a, texto, campoClave, valorClave, extra) {
-    var lista = await notasFrescas(a);
     var nota = {
       texto: texto,
       quien: window.Gestor.usuario() || '',
@@ -176,17 +178,15 @@
     if (extra) Object.keys(extra).forEach(function (k) {
       if (extra[k] !== undefined && extra[k] !== null && extra[k] !== '') nota[k] = extra[k];
     });
-    var indice = -1;
-    for (var i = 0; i < lista.length; i++) {
-      if (lista[i] && lista[i][campoClave] === valorClave) { indice = i; break; }
+    function identidad(n) {
+      return (n && n[campoClave] === valorClave)
+        ? ('marca:' + campoClave + ':' + valorClave)
+        : ('nota:' + ((n && n.cuando) || '') + '|' + ((n && n.texto) || ''));
     }
-    if (indice === -1) lista.push(nota); else lista[indice] = nota;
-    await window.Gestor.anotar(a.nombre, {
-      notas: lista,
-      notaEl: U.ahora(),
-      notaPor: window.Gestor.usuario() || ''
+    await window.Gestor.anotarLista(a.nombre, 'notas', {
+      anadir: [nota], identidad: identidad, extra: { notaEl: nota.cuando, notaPor: nota.quien }
     });
-    return lista;
+    return notasFrescas(a);
   }
 
   /* ---------- la ventana ---------- */

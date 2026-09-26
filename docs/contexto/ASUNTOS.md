@@ -9,6 +9,44 @@ código comunes y la tabla de ficheros del repositorio están en el propio `docs
 
 ---
 
+### Las listas de la ficha se funden por elemento, y un asunto cerrado lleva lápida (26-sep-2026, fila 176, `docs/DATOS-ENTRE-ORDENADORES.md`)
+
+`App.anotar` (todo el objeto, campo a campo) sigue para los datos sueltos, pero las LISTAS de la
+ficha (`hilos`, `relacionados`, `pendientesRegistro`, `notas`) se guardan con **`App.anotarLista(clave,
+campo, { anadir, quitar, identidad })`** (`js/nucleo.js`): relee `asuntos.json` dentro de la propia
+cola de guardado y funde `anadir`/`quitar` sobre la lista del disco, nunca sobre una lista calculada
+en memoria de antes. `identidad` (por defecto, `App.IDENTIDAD_LISTA[campo]`: `notas` por
+`cuando+texto`, `hilos` por `id`, `relacionados` por `categoria+nombre`, `pendientesRegistro` por el
+propio nombre de fichero) decide cuándo dos elementos son el mismo: un `anadir` con la misma
+identidad que uno ya existente lo SUSTITUYE (así sirve también para "sustituir esta nota concreta",
+`js/notas.js`, `sustituirNota`), no lo duplica. `App.unirPorIdentidad(a, b, identidad)` es la unión
+pura que usan tanto `anotarLista` como `js/conflictos.js` (`fusionarFicha`) para no duplicar la
+lógica. Lo usan `js/correo-cuadro.js`, `js/bandeja-huella.js`, `js/relacionados.js`, `js/registro.js`,
+`js/documentos-guardar.js` y `js/notas.js`; `opciones.extra` mete además algún campo suelto (`notaEl`,
+`notaPor`) en la misma pasada.
+
+**Lápidas**: archivar, mandar a la papelera, unir dos asuntos o renombrar uno borran la clave vieja
+de `asuntos.json` y, en la MISMA operación de la cola, apuntan una lápida en
+`_GESTOR/borrados-listas.json` (`Borrados.marcar(gestor, 'asuntos', clave, motivo)`, `motivo`:
+`'archivado'`, `'papelera'`, `'unido'` o `'renombrado'`) — en `js/ficha-archivo.js`, `js/papelera.js`,
+`js/unir-asuntos-unir.js` y `js/asunto-renombrar.js`. Con una lápida puesta, `App.anotar` y
+`App.anotarLista` no crean nada: lanzan un error `AsuntoCerrado` («Este asunto ya está archivado en
+el otro ordenador. Recarga la lista.»), en vez de resucitar una ficha vacía si el otro ordenador
+escribe algo justo antes de enterarse. Un alta explícita gana siempre: reabrir, devolver de la
+papelera o enlazar una ficha huérfana llaman a `Borrados.revivir(gestor, 'asuntos', clave)` ANTES de
+volver a escribir esa clave. La fusión de una copia en conflicto de `asuntos.json`/`hitos.json`
+(`js/conflictos.js`) también respeta las lápidas: una clave con lápida no entra, esté en el lado que
+esté. Las lápidas caducan a los 90 días con la misma limpieza de Mantenimiento que las demás listas
+de `borrados-listas.json` (`js/borrados-fusion.js`).
+
+**El vistazo de 20 s también relee `asuntos.json`/`hitos.json`** si han cambiado por fuera (nueva
+fecha de modificación, `Carpetas.fechaFichero`) y no hay un guardado en marcha: `js/vistazo-registro.js`
+(nuevo), envolviendo `App.mirarLaCarpeta`. Antes solo se releían al entrar y en cada guardado propio;
+en una sesión larga se acababa viendo (y decidiendo con) un estado viejo aunque no llegara ningún
+documento ni carpeta nueva.
+
+Se comprueba con `pruebas/datos-entre-ordenadores.mjs` (sin navegador).
+
 ### Crear un tipo sin salir de Nuevo asunto (24-sep-2026, fila 128)
 
 `js/tipo-al-vuelo.js` (`docs/TIPO-DESDE-EL-ASUNTO.md`). Cambia una decisión de siempre: los

@@ -68,7 +68,8 @@
     { fichero: 'tipos-buscador.js', nombre: 'App.pintarTipos' },
     { fichero: 'unir-asuntos.js', nombre: 'App.pintarAbiertos' },
     { fichero: 'via-contacto.js', nombre: 'App.editarVia' },
-    { fichero: 'via-contacto.js', nombre: 'LoPide.controles' }
+    { fichero: 'via-contacto.js', nombre: 'LoPide.controles' },
+    { fichero: 'vistazo-registro.js', nombre: 'App.mirarLaCarpeta' }
   ];
 
   function clave(e) { return e.fichero + ' :: ' + e.nombre; }

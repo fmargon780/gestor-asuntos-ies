@@ -110,8 +110,11 @@ var FichaArchivo = (function () {
         var carpetaTercero = await Carpetas.bajar(App.E.archivo, [ficha.categoria, ficha.tercero], true);
         var handle = await carpetaTercero.getDirectoryHandle(clave);
         await escribir(handle, ficha);
-        await App.guardarRegistroFresco(function (registro) {
+        await App.guardarRegistroFresco(async function (registro) {
           delete registro.asuntos[clave];
+          /* Fila 176, punto 2: la lápida, en la misma operación de la
+             cola que borra la clave. */
+          if (window.Borrados) await Borrados.marcar(App.E.gestor, 'asuntos', clave, 'archivado');
         });
       } catch (e) {
         if (window.Reintentar && Reintentar.esErrorDeSincronizacion(e)) {
@@ -140,6 +143,12 @@ var FichaArchivo = (function () {
       var encontrada = await completar(a);
       var clave = a.nombre;
       var fichaGuardada = encontrada ? a.ficha : null;
+
+      /* Fila 176, punto 2: quita la lápida ANTES de que comoEra(a)
+         llame a App.anotar para poner estado 'abierto': si no, anotar
+         la encontraría cerrada y lanzaría AsuntoCerrado. Un alta
+         explícita (reabrir) gana siempre a una lápida vieja. */
+      if (window.Borrados) await Borrados.revivir(App.E.gestor, 'asuntos', clave);
 
       await comoEra(a);
 

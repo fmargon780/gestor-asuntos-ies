@@ -114,4 +114,7 @@
 
   U.parecidos = parecidos;
   U.dejaCrear = dejaCrear;
+  /* Fila 176: la usa js/presencia.js para el nombre del fichero de cada
+     usuario (_GESTOR/presencia/<hueso>.json), sin duplicar la reducción. */
+  U.hueso = hueso;
 })();

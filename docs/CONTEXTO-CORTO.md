@@ -165,6 +165,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   Ninguna tarea de fondo escribe ni mira la carpeta con un guardado en marcha.
 - Renombrar, unir o borrar un asunto (su clave cambia o desaparece) solo por `AsuntoRenombrar`
   (`js/asunto-renombrar.js`): mueve a la vez la ficha, sus hitos y su señal de presencia.
+- Las listas de la ficha (`hilos`, `relacionados`, `pendientesRegistro`, `notas`) se funden por
+  elemento con `App.anotarLista`, nunca se sustituyen enteras; un asunto cerrado (archivado, a la
+  papelera, unido o renombrado) lleva una lápida en `borrados-listas.json` y no se puede resucitar
+  sin revivirla antes (fila 176).
 
 ## 7. Descartado, no proponer otra vez
 

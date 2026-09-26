@@ -211,8 +211,8 @@ var Registro = (function () {
   async function quitarDePendientes(asunto, nombreDocumento) {
     var lista = (asunto.ficha && asunto.ficha.pendientesRegistro) || [];
     if (lista.indexOf(nombreDocumento) === -1) return;
-    var restantes = lista.filter(function (n) { return n !== nombreDocumento; });
-    await App.anotar(asunto.nombre, { pendientesRegistro: restantes });
+    /* Fila 176, punto 1: quitar solo el suyo, dentro de la cola. */
+    await App.anotarLista(asunto.nombre, 'pendientesRegistro', { quitar: [nombreDocumento] });
   }
 
   /* Devuelve el nombre nuevo si ha ido bien, o false si no se ha

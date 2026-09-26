@@ -8,15 +8,27 @@
    vez de escribir encima sin saberlo. Nunca se deja fuera a nadie: el
    botón "Tomar el mando" siempre está.
 
-   Vive en `_GESTOR/presencia.json`, EXPRESAMENTE fuera de los doce
+   Fila 176 (docs/DATOS-ENTRE-ORDENADORES.md, punto 5): vive en
+   `_GESTOR/presencia/<usuario>.json`, uno por usuario (el nombre del
+   fichero es el mismo "hueso" que usa U.parecidos: sin tildes,
+   mayúsculas ni espacios), EXPRESAMENTE fuera de los dieciocho
    ficheros protegidos (ver docs/CONTEXTO.md, "Lo que la aplicación
    guarda en _GESTOR"): se escribe muy a menudo y es un dato que
    caduca solo, así que ni necesita copia de seguridad, ni papelera, ni
    la fusión de conflictos de Dropbox de los demás (que ni lo tocan:
    `js/copias.js`, `js/papelera.js` y `js/conflictos.js` solo trabajan
-   con los ficheros que tienen apuntados, y este no está en esa
-   lista). Se lee y se escribe directo con `Carpetas`, sin pasar por
-   `Copias.guardar`.
+   con los ficheros que tienen apuntados, y esta carpeta no está en esa
+   lista; js/conflictos.js sí borra sin preguntar cualquier copia en
+   conflicto que quede dentro). Se lee y se escribe directo con
+   `Carpetas`, sin pasar por `Copias.guardar`.
+
+   Antes de esta fila era un único `_GESTOR/presencia.json` que escribían
+   los dos ordenadores cada 30 segundos: Dropbox dejaba constantemente
+   "presencia (copia en conflicto...)" que nadie limpiaba. Con un
+   fichero por ordenador (por usuario) ya no hay nada que choque: cada
+   uno solo escribe el suyo. El fichero viejo (y sus copias en
+   conflicto) se borran solos la primera vez que se entra después de
+   esta fila.
 
    Este fichero es el modelo y la vigilancia; `js/ficha-asunto.js` es
    quien pinta el aviso y apaga los controles, y `js/asuntos-lista.js`
@@ -30,7 +42,8 @@
    ============================================================ */
 var Presencia = (function () {
 
-  var FICHERO = 'presencia.json';
+  var CARPETA = 'presencia';
+  var FICHERO_VIEJO = 'presencia.json';
   var RENUEVA_MS = 30 * 1000;
   var CADUCA_MS = 3 * 60 * 1000;
   var RELEE_MS = 10 * 1000;
@@ -38,22 +51,18 @@ var Presencia = (function () {
   function gestor() { return window.Gestor && window.Gestor.carpetaGestor(); }
   function usuario() { return (window.Gestor && window.Gestor.usuario()) || ''; }
 
-  /* ==========================================================
-     EL FICHERO, LEÍDO Y ESCRITO DIRECTO (sin Copias.guardar)
-     ========================================================== */
-
-  async function leer() {
-    var g = gestor();
-    if (!g) return {};
-    var leido;
-    try { leido = await Carpetas.leerJson(g, FICHERO); } catch (e) { return {}; }
-    return (leido && typeof leido === 'object') ? leido : {};
+  /* El mismo "hueso" que usa U.parecidos (sin tildes, mayúsculas ni
+     espacios): así "Francisco" y "francisco" son el mismo fichero, y
+     nunca chocan con nada raro que traiga el nombre de quien entra. */
+  function nombreDeFichero(nombreUsuario) {
+    var h = (window.U && U.hueso) ? U.hueso(nombreUsuario) : String(nombreUsuario || '').toLowerCase();
+    return (h || 'sin-nombre') + '.json';
   }
 
-  async function escribir(mapa) {
+  async function carpeta() {
     var g = gestor();
-    if (!g) return;
-    await Carpetas.escribirTexto(g, FICHERO, JSON.stringify(mapa));
+    if (!g) return null;
+    try { return await Carpetas.crear(g, CARPETA); } catch (e) { return null; }
   }
 
   function vigente(entrada) {
@@ -62,67 +71,125 @@ var Presencia = (function () {
     return !isNaN(t) && (Date.now() - t) < CADUCA_MS;
   }
 
-  /* Quita las señales caducadas, para no dejar crecer el fichero con
-     sesiones que ya nadie va a renovar. */
-  function limpiar(mapa) {
-    var salida = {};
-    Object.keys(mapa).forEach(function (clave) {
-      if (vigente(mapa[clave])) salida[clave] = mapa[clave];
-    });
-    return salida;
+  /* ==========================================================
+     EL FICHERO PROPIO, LEÍDO Y ESCRITO DIRECTO (sin Copias.guardar)
+
+     Cada ordenador solo lee y escribe el fichero de SU usuario: ya no
+     hay nada que dos ordenadores puedan pisarse, así que no hace falta
+     ni releer antes de escribir ni fusionar nada.
+     ========================================================== */
+
+  async function leerPropio() {
+    var c = await carpeta();
+    if (!c) return {};
+    var leido;
+    try { leido = await Carpetas.leerJson(c, nombreDeFichero(usuario())); } catch (e) { return {}; }
+    var asuntos = (leido && typeof leido.asuntos === 'object' && leido.asuntos) ? leido.asuntos : {};
+    var limpio = {};
+    Object.keys(asuntos).forEach(function (clave) { if (vigente(asuntos[clave])) limpio[clave] = asuntos[clave]; });
+    return limpio;
   }
 
-  /* Relee, limpia lo caducado, pone (o pisa) la propia señal en
-     'clave' y guarda. Se relee justo antes de escribir, como todo
-     fichero compartido: si el compañero ha anunciado otro asunto
-     mientras tanto, no se pierde. */
-  async function anunciar(clave) {
-    var mapa = limpiar(await leer());
-    mapa[clave] = { usuario: usuario(), ultima: U.ahora() };
-    await escribir(mapa);
+  async function escribirPropio(asuntos) {
+    var c = await carpeta();
+    if (!c) return;
+    await Carpetas.escribirTexto(c, nombreDeFichero(usuario()), JSON.stringify({ usuario: usuario(), asuntos: asuntos }));
   }
 
-  /* Solo quita la propia señal: nunca la de otro (por si esto se
-     llama tarde, después de que alguien haya tomado el mando). */
-  async function quitar(clave) {
-    var mapa = limpiar(await leer());
-    if (mapa[clave] && mapa[clave].usuario === usuario()) {
-      delete mapa[clave];
-      await escribir(mapa);
+  /* Todos los usuarios a la vez, para saber quién está dentro de cada
+     asunto: { clave: { usuario, ultima } }. Un fichero por usuario,
+     leídos todos (son pequeños y pocos: uno por persona del centro). */
+  async function leerTodos() {
+    var c = await carpeta();
+    if (!c) return {};
+    var lista;
+    try { lista = await Carpetas.ficheros(c); } catch (e) { return {}; }
+    var combinado = {};
+    for (var i = 0; i < lista.length; i++) {
+      var nombre = lista[i].nombre;
+      if (!/\.json$/i.test(nombre) || /conflic/i.test(nombre)) continue;
+      var leido;
+      try { leido = await Carpetas.leerJson(c, nombre); } catch (e) { continue; }
+      var quien = (leido && leido.usuario) || '';
+      var asuntos = (leido && typeof leido.asuntos === 'object' && leido.asuntos) ? leido.asuntos : {};
+      Object.keys(asuntos).forEach(function (clave) {
+        if (!vigente(asuntos[clave])) return;
+        var ya = combinado[clave];
+        /* Si dos usuarios anuncian el mismo asunto a la vez (uno lo tenía
+           ya abierto cuando el otro entra, antes de que el primero se
+           entere y pase a modo consulta), gana el anuncio más reciente:
+           es lo mismo que hacía el `presencia.json` único de antes, donde
+           solo podía haber una señal por asunto y ganaba quien escribiera
+           el último. */
+        if (ya && ya.ultima >= asuntos[clave].ultima) return;
+        combinado[clave] = { usuario: quien, ultima: asuntos[clave].ultima };
+      });
     }
+    return combinado;
+  }
+
+  /* Pone (o pisa) la propia señal en 'clave' y guarda solo el fichero
+     propio. */
+  async function anunciar(clave) {
+    var asuntos = await leerPropio();
+    asuntos[clave] = { ultima: U.ahora() };
+    await escribirPropio(asuntos);
+  }
+
+  /* Solo quita la propia señal: como cada ordenador solo escribe su
+     fichero, nunca puede quitar la de otro por error. */
+  async function quitar(clave) {
+    var asuntos = await leerPropio();
+    if (asuntos[clave]) { delete asuntos[clave]; await escribirPropio(asuntos); }
   }
 
   /* Fila 62 (docs/RENOMBRAR-SIN-PERDER-HITOS.md): cuando un asunto
      cambia de clave (se renombra, se une con otro, se borra), la señal
-     de quién está dentro tiene que viajar con él. Se relee justo antes
-     de escribir, como todo lo de aquí. */
+     de quién está dentro tiene que viajar con él, en el fichero propio. */
   async function mover(claveVieja, claveNueva) {
     if (claveVieja === claveNueva) return;
-    var mapa = limpiar(await leer());
-    if (mapa[claveVieja]) {
-      mapa[claveNueva] = mapa[claveVieja];
-      delete mapa[claveVieja];
-      await escribir(mapa);
+    var asuntos = await leerPropio();
+    if (asuntos[claveVieja]) {
+      asuntos[claveNueva] = asuntos[claveVieja];
+      delete asuntos[claveVieja];
+      await escribirPropio(asuntos);
     }
   }
 
   /* Al borrar el asunto del todo (mandado a la papelera): la señal no
      tiene ya ningún sitio adonde viajar. */
   async function borrarClave(clave) {
-    var mapa = limpiar(await leer());
-    if (mapa[clave]) {
-      delete mapa[clave];
-      await escribir(mapa);
-    }
+    var asuntos = await leerPropio();
+    if (asuntos[clave]) { delete asuntos[clave]; await escribirPropio(asuntos); }
   }
 
   /* Quién tiene 'clave' ahora mismo, si no es uno mismo. Null si está
      libre, caducada, o es la propia señal. */
   async function quienEstaDentro(clave) {
-    var mapa = await leer();
+    var mapa = await leerTodos();
     var e = mapa[clave];
-    if (!vigente(e) || e.usuario === usuario()) return null;
+    if (!e || e.usuario === usuario()) return null;
     return { usuario: e.usuario };
+  }
+
+  /* El presencia.json de antes de esta fila (y sus copias en
+     conflicto), borrados solos al entrar: ya no lo escribe nadie, y
+     js/conflictos.js no lo mira porque no está en Copias.FICHEROS. Se
+     llama una sola vez por sesión, desde el envoltorio de
+     App.vigilarLaCarpeta (que también se llama una sola vez, justo
+     después de entrar): no hace falta ningún guardián propio. */
+  async function borrarFicheroViejo() {
+    var g = gestor();
+    if (!g) return;
+    try {
+      var lista = await Carpetas.ficheros(g);
+      for (var i = 0; i < lista.length; i++) {
+        var nombre = lista[i].nombre;
+        if (nombre === FICHERO_VIEJO || (/^presencia\s*\([^)]*conflic[^)]*\)\.json$/i.test(nombre))) {
+          try { await g.removeEntry(nombre); } catch (e) { /* se intenta la próxima vez */ }
+        }
+      }
+    } catch (e) { /* no crítico */ }
   }
 
   /* ==========================================================
@@ -218,7 +285,7 @@ var Presencia = (function () {
   var cache = {};
 
   async function refrescarCache() {
-    cache = limpiar(await leer());
+    cache = await leerTodos();
   }
 
   /* El usuario que tiene 'clave' ahora mismo, o '' si está libre, ha
@@ -241,10 +308,10 @@ var Presencia = (function () {
   }
 
   return {
-    FICHERO: FICHERO,
+    CARPETA: CARPETA,
     vigilar: vigilar, dejarDeVigilar: dejarDeVigilar, tomarElMando: tomarElMando,
     ocupantePor: ocupantePor, refrescarCache: refrescarCache, huella: huella,
-    mover: mover, borrarClave: borrarClave
+    mover: mover, borrarClave: borrarClave, borrarFicheroViejo: borrarFicheroViejo
   };
 })();
 window.Presencia = Presencia;
@@ -276,6 +343,7 @@ window.Presencia = Presencia;
   U.envolver(window.App, 'App.vigilarLaCarpeta', 'presencia.js', function (comoEra) {
     return function () {
       comoEra();
+      Presencia.borrarFicheroViejo();
       Presencia.refrescarCache().then(function () {
         ultimaHuella = Presencia.huella();
         if (typeof App.pintarAbiertos === 'function') App.pintarAbiertos();

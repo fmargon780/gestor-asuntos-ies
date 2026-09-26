@@ -80,10 +80,15 @@ var AsuntoRenombrar = (function () {
      tenía (igual que hacía cada sitio a mano hasta ahora). Devuelve la
      ficha final, ya guardada. */
   async function mover(claveVieja, claveNueva, datosExtra) {
-    await App.guardarRegistroFresco(function (registro) {
+    await App.guardarRegistroFresco(async function (registro) {
       var antes = registro.asuntos[claveVieja] || {};
       registro.asuntos[claveNueva] = Object.assign({}, antes, datosExtra || {});
-      if (claveVieja !== claveNueva) delete registro.asuntos[claveVieja];
+      if (claveVieja !== claveNueva) {
+        delete registro.asuntos[claveVieja];
+        /* Fila 176, punto 2: la lápida de la clave vieja, en la misma
+           operación de la cola que la borra. */
+        if (window.Borrados) await Borrados.marcar(App.E.gestor, 'asuntos', claveVieja, 'renombrado');
+      }
     });
 
     var nota = await moverHitosYPresencia(claveVieja, claveNueva);

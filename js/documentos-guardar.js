@@ -77,12 +77,14 @@
     var marcado = !$('doc-hay-registro').checked &&
       !!($('doc-pendiente-registro') && $('doc-pendiente-registro').checked);
     var lista = (N.asuntoActual.ficha && N.asuntoActual.ficha.pendientesRegistro) || [];
-    var sinElAntiguo = lista.filter(function (n) { return n !== opciones.nombreActual; });
-    var final = marcado ? sinElAntiguo.concat([nombreNuevo]) : sinElAntiguo;
-    var igual = final.length === lista.length &&
-      final.slice().sort().join('\n') === lista.slice().sort().join('\n');
-    if (igual) return;
-    await App.anotar(N.asuntoActual.nombre, { pendientesRegistro: final });
+    var estabaAntes = lista.indexOf(opciones.nombreActual) !== -1;
+    if (!estabaAntes && !marcado) return;
+    /* Fila 176, punto 1: quitar el nombre antiguo y añadir el nuevo (si
+       sigue marcado), dentro de la misma pasada de la cola. */
+    await App.anotarLista(N.asuntoActual.nombre, 'pendientesRegistro', {
+      quitar: estabaAntes ? [opciones.nombreActual] : [],
+      anadir: marcado ? [nombreNuevo] : []
+    });
   }
 
   async function guardar(opciones) {
