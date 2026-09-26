@@ -142,7 +142,9 @@
 
     if (window.IndiceArchivo) {
       try {
-        var resultado = await IndiceArchivo.leerDisco();
+        /* Fila 177: un relacionado puede haberse archivado en cualquier
+           curso, así que hace falta verlos todos, no solo el actual. */
+        var resultado = await IndiceArchivo.leerDisco({ todos: true });
         if (resultado.ok) {
           resultado.datos.asuntos.forEach(function (e) {
             if ((e.relacionados || []).some(esDeEsta)) salida.push({ nombre: e.nombre, archivado: true });
