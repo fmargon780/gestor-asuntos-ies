@@ -72,8 +72,8 @@ await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.evaluate(async () => {
   const csv = [
     'Alumno/a;Nº Id. Escolar;Curso;Unidad;Año de la matrícula;Estado Matrícula;Fecha de nacimiento;Teléfono del tutor;Correo del tutor',
-    'Aguilar Ponce, Marina;1140233;1º de E.S.O.;1º A;2026;Matriculada;14/03/2013;600111222;tutor.marina@correo.es',
-    'Bermúdez Ortiz, Álvaro;1140501;1º de E.S.O.;1º C;2026;Matriculado;02/09/2014;600333444;tutor.alvaro@correo.es'
+    'Pérez Ejemplo, Prueba Uno;0000001;1º de E.S.O.;1º A;2026;Matriculada;14/03/2013;600000001;tutor.uno@ejemplo.invalid',
+    'López Ejemplo, Prueba Dos;0000002;1º de E.S.O.;1º C;2026;Matriculado;02/09/2014;600000002;tutor.dos@ejemplo.invalid'
   ].join('\r\n') + '\r\n';
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
   const d = await g.getDirectoryHandle('datos', { create: true });
@@ -81,8 +81,8 @@ await pagina.evaluate(async () => {
 
   const per = [
     '"Empleado/a","DNI/Pasaporte","Puesto","Fecha de toma de posesión","Fecha de cese"',
-    '"Aguado Ranea, Marcos Antonio","33357591R","Música P.E.S.","01/09/2011",""',
-    '"Sánchez Alegría, María José","07862312S","Dibujo P.E.S.","01/09/2005",""'
+    '"Pérez Ejemplo, Persona Uno","00000000T","Música P.E.S.","01/09/2011",""',
+    '"López Ejemplo, Persona Dos","11111111H","Dibujo P.E.S.","01/09/2005",""'
   ].join('\r\n') + '\r\n';
   d._hijos.set('RelPerCen 26-27.csv', window.__disco.fich('RelPerCen 26-27.csv', per));
 });
@@ -107,7 +107,7 @@ async function crearAsunto(categoriaIndice, botonTipo, buscarTexto) {
   await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 }
 
-await crearAsunto(1, 'CERTIFICADO', 'alvaro');   /* asunto B: Bermúdez Ortiz */
+await crearAsunto(1, 'CERTIFICADO', 'dos');   /* asunto B: López Ejemplo, Prueba Dos */
 
 /* 1) Archivar un asunto SIN relacionados se comporta exactamente igual
    que siempre: no sale ningún cuadro de "Avisar a los relacionados". */
@@ -120,7 +120,7 @@ await pagina.waitForSelector('#lista-abiertos .vacio, #lista-abiertos .tarjeta')
 
 /* ---------- asunto A: con relacionados, para el resto de escenarios ---------- */
 
-await crearAsunto(1, 'MATRICULA', 'marina');   /* asunto A: Aguilar Ponce, Marina */
+await crearAsunto(1, 'MATRICULA', 'uno');   /* asunto A: Pérez Ejemplo, Prueba Uno */
 /* El nombre real de la carpeta, del disco: la tarjeta lleva además las
    marcas de tipo y estado pegadas en el mismo texto. */
 const nombreAsuntoA = await pagina.evaluate(async () => {
@@ -146,9 +146,9 @@ async function anadirRelacionadoBuscando(categoria, textoBuscar) {
 }
 
 /* 2) Añadir dos relacionados de PERSONAL, y que queden en asuntos.json. */
-await anadirRelacionadoBuscando('PERSONAL', 'aguado');
+await anadirRelacionadoBuscando('PERSONAL', 'persona uno');
 await pagina.waitForSelector('.relacionado-fila');
-await anadirRelacionadoBuscando('PERSONAL', 'sanchez alegria');
+await anadirRelacionadoBuscando('PERSONAL', 'persona dos');
 await pagina.waitForTimeout(200);
 await comprobar('se ven las dos filas de relacionados',
   pagina.locator('.relacionado-fila').count(), 2);
@@ -159,13 +159,13 @@ await comprobar('los dos relacionados se han guardado en asuntos.json', pagina.e
   const clave = Object.keys(j.asuntos).find(k => k.indexOf('MATRICULA') !== -1);
   const rel = (j.asuntos[clave].relacionados || []).map(r => r.categoria + ' · ' + r.nombre);
   return rel.sort();
-}), ['PERSONAL · Aguado Ranea, Marcos Antonio 591R', 'PERSONAL · Sánchez Alegría, María José 312S']);
+}), ['PERSONAL · López Ejemplo, Persona Dos 111H', 'PERSONAL · Pérez Ejemplo, Persona Uno 000T']);
 
 /* 3) El propio tercero del asunto no se puede añadir como relacionado. */
 await pagina.click('#rel-anadir');
 await pagina.waitForSelector('#rel-picker');
 await pagina.click('.categoria-mini-boton:has-text("ALUMNADO")');
-await pagina.fill('#rel-buscar', 'marina');
+await pagina.fill('#rel-buscar', 'uno');
 await pagina.waitForSelector('#rel-resultados .resultado');
 await pagina.click('#rel-resultados .resultado');
 await pagina.waitForTimeout(200);
@@ -179,7 +179,7 @@ await comprobar('y no se añade una tercera fila',
 await pagina.click('#rel-anadir');
 await pagina.waitForSelector('#rel-picker');
 await pagina.click('.categoria-mini-boton:has-text("PERSONAL")');
-await pagina.fill('#rel-buscar', 'aguado');
+await pagina.fill('#rel-buscar', 'persona uno');
 await pagina.waitForSelector('#rel-resultados .resultado');
 await pagina.click('#rel-resultados .resultado');
 await pagina.waitForTimeout(200);
@@ -261,23 +261,23 @@ async function leerMarcadorEnPagina(categoria, tercero, nombreMarcador) {
 await esperarHasta(async (m) => {
   try {
     const cat1 = await window.__disco.archivo.getDirectoryHandle('PERSONAL');
-    const ter1 = await cat1.getDirectoryHandle('Aguado Ranea, Marcos Antonio 591R');
+    const ter1 = await cat1.getDirectoryHandle('Pérez Ejemplo, Persona Uno 000T');
     await ter1.getDirectoryHandle(m);
-    const ter2 = await cat1.getDirectoryHandle('Sánchez Alegría, María José 312S');
+    const ter2 = await cat1.getDirectoryHandle('López Ejemplo, Persona Dos 111H');
     await ter2.getDirectoryHandle(m);
     return true;
   } catch (e) { return false; }
 }, NOMBRE_MARCADOR);
 
-await comprobar('6) se crea la carpeta ARCHIVO/PERSONAL de Aguado, que no existía',
-  leerMarcadorEnPagina('PERSONAL', 'Aguado Ranea, Marcos Antonio 591R', NOMBRE_MARCADOR)
+await comprobar('6) se crea la carpeta ARCHIVO/PERSONAL de Persona Uno, que no existía',
+  leerMarcadorEnPagina('PERSONAL', 'Pérez Ejemplo, Persona Uno 000T', NOMBRE_MARCADOR)
     .then(t => t !== null), true);
 await comprobar('y la nota dice dónde está el asunto de verdad',
-  leerMarcadorEnPagina('PERSONAL', 'Aguado Ranea, Marcos Antonio 591R', NOMBRE_MARCADOR)
-    .then(t => t.indexOf('ALUMNADO / Aguilar Ponce, Marina 1140233 / ' + nombreAsuntoA) !== -1), true);
-await comprobar('lo mismo para Sánchez Alegría',
-  leerMarcadorEnPagina('PERSONAL', 'Sánchez Alegría, María José 312S', NOMBRE_MARCADOR)
-    .then(t => t !== null && t.indexOf('ALUMNADO / Aguilar Ponce, Marina 1140233 / ' + nombreAsuntoA) !== -1), true);
+  leerMarcadorEnPagina('PERSONAL', 'Pérez Ejemplo, Persona Uno 000T', NOMBRE_MARCADOR)
+    .then(t => t.indexOf('ALUMNADO / Pérez Ejemplo, Prueba Uno 0000001 / ' + nombreAsuntoA) !== -1), true);
+await comprobar('lo mismo para López Ejemplo',
+  leerMarcadorEnPagina('PERSONAL', 'López Ejemplo, Persona Dos 111H', NOMBRE_MARCADOR)
+    .then(t => t !== null && t.indexOf('ALUMNADO / Pérez Ejemplo, Prueba Uno 0000001 / ' + nombreAsuntoA) !== -1), true);
 await comprobar('en la nota no hay ningún documento del asunto: solo el fichero de texto',
   pagina.evaluate(async ([c, n, m]) => {
     const cat = await window.__disco.archivo.getDirectoryHandle(c);
@@ -286,10 +286,10 @@ await comprobar('en la nota no hay ningún documento del asunto: solo el fichero
     const dentro = [];
     for await (const p of marcador.entries()) dentro.push(p[0]);
     return dentro;
-  }, ['PERSONAL', 'Aguado Ranea, Marcos Antonio 591R', NOMBRE_MARCADOR]),
+  }, ['PERSONAL', 'Pérez Ejemplo, Persona Uno 000T', NOMBRE_MARCADOR]),
   ['DONDE ESTA ESTE ASUNTO.txt']);
 
-/* 9a) La ficha de Aguado Ranea, con el asunto ya archivado, dice que
+/* 9a) La ficha de Pérez Ejemplo, con el asunto ya archivado, dice que
    está relacionado con él. Desde la fila 64
    (docs/FICHA-DEL-ARCHIVO-EN-SU-CARPETA.md) la ficha de un archivado ya
    no vive en asuntos.json, así que este cruce mira el índice del
@@ -300,10 +300,10 @@ await pagina.evaluate(async () => { await window.App.reconstruirIndiceArchivo();
 await pagina.click('.pestana[data-pantalla="personas"]');
 await pagina.selectOption('#filtro-personas', 'PERSONAL');
 await pagina.waitForTimeout(250);
-await pagina.fill('#buscar-personas', 'aguado');
+await pagina.fill('#buscar-personas', 'persona uno');
 await pagina.waitForTimeout(250);
 await pagina.click('#lista-personas .resultado');
-await comprobar('la ficha de Aguado dice que está relacionado (archivado)',
+await comprobar('la ficha de Persona Uno dice que está relacionado (archivado)',
   pagina.locator('.ficha-relacionado-de').textContent()
     .then(t => t.indexOf(nombreAsuntoA) !== -1 && t.indexOf('Archivado') !== -1), true);
 
@@ -322,8 +322,8 @@ await pagina.click('#cuadro-aceptar');
 await esperarHasta(async () => {
   try {
     const cat = await window.__disco.archivo.getDirectoryHandle('PERSONAL');
-    const uno = await cat.getDirectoryHandle('Aguado Ranea, Marcos Antonio 591R');
-    const dos = await cat.getDirectoryHandle('Sánchez Alegría, María José 312S');
+    const uno = await cat.getDirectoryHandle('Pérez Ejemplo, Persona Uno 000T');
+    const dos = await cat.getDirectoryHandle('López Ejemplo, Persona Dos 111H');
     for await (const p of uno.entries()) if (p[0].indexOf('RELACIONADO') !== -1) return false;
     for await (const p of dos.entries()) if (p[0].indexOf('RELACIONADO') !== -1) return false;
     return true;
@@ -333,8 +333,8 @@ await esperarHasta(async () => {
 await comprobar('al reabrir, las dos notas desaparecen',
   pagina.evaluate(async () => {
     const cat = await window.__disco.archivo.getDirectoryHandle('PERSONAL');
-    const uno = await cat.getDirectoryHandle('Aguado Ranea, Marcos Antonio 591R');
-    const dos = await cat.getDirectoryHandle('Sánchez Alegría, María José 312S');
+    const uno = await cat.getDirectoryHandle('Pérez Ejemplo, Persona Uno 000T');
+    const dos = await cat.getDirectoryHandle('López Ejemplo, Persona Dos 111H');
     const hay1 = await uno.getDirectoryHandle('__x__').then(() => true).catch(() => false);
     let notaUno = false, notaDos = false;
     for await (const p of uno.entries()) if (p[0].indexOf('RELACIONADO') !== -1) notaUno = true;
@@ -366,7 +366,7 @@ await pagina.waitForSelector('#lista-abiertos .vacio, #lista-abiertos .tarjeta')
 await esperarHasta(async (m) => {
   try {
     const cat = await window.__disco.archivo.getDirectoryHandle('PERSONAL');
-    const ter = await cat.getDirectoryHandle('Aguado Ranea, Marcos Antonio 591R');
+    const ter = await cat.getDirectoryHandle('Pérez Ejemplo, Persona Uno 000T');
     await ter.getDirectoryHandle(m);
     return true;
   } catch (e) { return false; }
@@ -374,7 +374,7 @@ await esperarHasta(async (m) => {
 
 await pagina.evaluate(async ([m]) => {
   const cat = await window.__disco.archivo.getDirectoryHandle('PERSONAL');
-  const ter = await cat.getDirectoryHandle('Aguado Ranea, Marcos Antonio 591R');
+  const ter = await cat.getDirectoryHandle('Pérez Ejemplo, Persona Uno 000T');
   const marcador = await ter.getDirectoryHandle(m);
   marcador._hijos.set('algo que alguien ha metido.pdf', window.__disco.fich('algo que alguien ha metido.pdf', 'x'));
 }, [NOMBRE_MARCADOR]);
@@ -390,7 +390,7 @@ await pagina.click('#cuadro-aceptar');
 await esperarHasta(async () => {
   try {
     const cat = await window.__disco.archivo.getDirectoryHandle('PERSONAL');
-    const dos = await cat.getDirectoryHandle('Sánchez Alegría, María José 312S');
+    const dos = await cat.getDirectoryHandle('López Ejemplo, Persona Dos 111H');
     for await (const p of dos.entries()) if (p[0].indexOf('RELACIONADO') !== -1) return false;
     return true;
   } catch (e) { return false; }
@@ -398,26 +398,26 @@ await esperarHasta(async () => {
 
 await comprobar('la carpeta con el fichero de más NO se ha borrado', pagina.evaluate(async ([m]) => {
   const cat = await window.__disco.archivo.getDirectoryHandle('PERSONAL');
-  const ter = await cat.getDirectoryHandle('Aguado Ranea, Marcos Antonio 591R');
+  const ter = await cat.getDirectoryHandle('Pérez Ejemplo, Persona Uno 000T');
   return ter.getDirectoryHandle(m).then(() => true).catch(() => false);
 }, [NOMBRE_MARCADOR]), true);
 await comprobar('la del otro relacionado, sin nada de más, sí se ha borrado', pagina.evaluate(async () => {
   const cat = await window.__disco.archivo.getDirectoryHandle('PERSONAL');
-  const ter = await cat.getDirectoryHandle('Sánchez Alegría, María José 312S');
+  const ter = await cat.getDirectoryHandle('López Ejemplo, Persona Dos 111H');
   for await (const p of ter.entries()) if (p[0].indexOf('RELACIONADO') !== -1) return true;
   return false;
 }), false);
 await comprobar('y se avisa de que no se ha podido borrar esa',
   pagina.locator('.mensaje.malo').last().textContent()
-    .then(t => t.indexOf('Aguado Ranea') !== -1 && t.indexOf('no la he borrado') !== -1), true);
+    .then(t => t.indexOf('Pérez Ejemplo') !== -1 && t.indexOf('no la he borrado') !== -1), true);
 
-/* 9b) Y mientras el asunto sigue abierto, la ficha de Sánchez Alegría
+/* 9b) Y mientras el asunto sigue abierto, la ficha de López Ejemplo
    también dice que está relacionada (esta vez, "Abierto"). */
 await pagina.click('.pestana[data-pantalla="personas"]');
-await pagina.fill('#buscar-personas', 'sanchez alegria');
+await pagina.fill('#buscar-personas', 'persona dos');
 await pagina.waitForTimeout(250);
 await pagina.click('#lista-personas .resultado');
-await comprobar('la ficha de Sánchez Alegría dice que está relacionada (abierto)',
+await comprobar('la ficha de López Ejemplo dice que está relacionada (abierto)',
   pagina.locator('.ficha-relacionado-de').textContent()
     .then(t => t.indexOf(nombreAsuntoA) !== -1 && t.indexOf('Abierto') !== -1), true);
 
