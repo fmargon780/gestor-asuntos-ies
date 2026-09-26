@@ -334,6 +334,12 @@
         <h2>Archivo</h2>
         <div class="acciones">
           <input id="buscar-archivo" class="campo" placeholder="Buscar en todo el archivo">
+          <!-- Fila 177 (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md, punto 1): el
+               índice del ARCHIVO está partido por curso académico; este
+               selector elige cuál se lee (o todos a la vez). Las
+               opciones las rellena js/archivo-personas.js con los
+               cursos que de verdad hay en el resumen guardado. -->
+          <select id="selector-curso-archivo" class="campo" style="width:auto" title="Curso"></select>
         </div>
       </header>
       <p class="explica" id="explica-archivo">Leyendo el archivo…</p>
@@ -768,6 +774,10 @@
 <script src="js/copias.js"></script>
 <script src="js/usuarios.js"></script>
 <script src="js/nombres.js"></script>
+<!-- Fila 177 (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md, punto 2): cuánto hueco
+     queda de verdad para un nombre, contando la ruta completa dentro de
+     Dropbox. Va justo después de js/nombres.js (le añade Nombres.topes). -->
+<script src="js/nombres-topes.js"></script>
 <script src="js/plazos.js"></script>
 <!-- Fila 102 (docs/DOCUMENTOS-DESDE-EL-HITO.md): «Documentos de este paso»
      en el editor de la guía. -->
@@ -823,6 +833,10 @@
      js/asuntos-archivar.js y js/archivo-personas.js, que son quienes
      lo llaman. -->
 <script src="js/archivo-indice.js"></script>
+<!-- Fila 177: recorrer el disco y reconstruir, partido de archivo-indice.js
+     por tamaño. Va justo después: añade construir/recuentoActual al mismo
+     IndiceArchivo. -->
+<script src="js/archivo-indice-construir.js"></script>
 
 <!-- La comodidad de la pantalla. Va antes que la aplicación, para
      enterarse de los cambios antes de que la pantalla se mueva. -->
@@ -1050,7 +1064,7 @@
      después de js/correo.js: usa `window.CorreoGrupos`, que expone,
      y js/correo.js solo llama a `window.SenecaDestinatarios` en
      tiempo de ejecución (al abrir el cuadro), así que el orden entre
-     los dos no le afecta a esa parte, pero CorreoGrupos sí tiene que
+     los dos no importa a esa parte, pero CorreoGrupos sí tiene que
      existir ya cuando se elige un grupo. -->
 <script src="js/seneca-destinatarios.js"></script>
 <!-- js/seneca-cuadro.js (fila 53, 18-sep-2026, docs/SENECA-CUADRO-ANCHO.md):
