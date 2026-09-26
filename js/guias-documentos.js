@@ -1,15 +1,15 @@
 /* ============================================================
-   guias-documentos.js — «Documentos de este paso»: qué plantillas de
-   documento van con un paso de la guía (o con un modelo de la
+   guias-documentos.js — «Documentos de este hito»: qué plantillas de
+   documento van con un hito de la guía (o con un hito de la
    biblioteca de hitos). 23-sep-2026, fila 102,
    docs/DOCUMENTOS-DESDE-EL-HITO.md.
 
-   Se guarda en el paso como `plantillasDocumento: [id, ...]` (los `id`
+   Se guarda en el hito como `plantillasDocumento: [id, ...]` (los `id`
    de plantillas.json → documentos). El hito no guarda copia: lo lee
-   de su paso al pulsar «Generar documento» (js/hitos-generar.js).
+   de su hito al pulsar «Generar documento» (js/hitos-generar.js).
 
    Lo usa js/guias.js, igual que js/guias-requisitos.js y
-   js/guias-comunicacion.js: `bloqueHTML` al pintar cada paso o subpaso
+   js/guias-comunicacion.js: `bloqueHTML` al pintar cada hito o subpaso
    que no sea pregunta, `enganchar` tras insertarlo y `leer` en
    recoger(). El catálogo de plantillas se lee UNA vez antes de abrir
    el cuadro (`precargar`, lo llaman js/guias-enganche.js y
@@ -35,14 +35,14 @@ window.GuiasDocumentos = (function () {
     (ids || []).forEach(function (id) { marcadas[id] = true; });
     var lista = catalogo();
     var cuantos = (ids || []).length;
-    var cabecera = '<summary>Documentos de este paso' +
+    var cabecera = '<summary>Documentos de este hito' +
       (cuantos ? ' <span class="suave">(' + cuantos + ')</span>' : ' <span class="suave">(opcional)</span>') +
       '</summary>';
     if (!lista) {
       /* Sin catálogo leído: se conservan las que hubiera, tal cual. */
       return '<details class="paso-documentos" data-sin-catalogo="' + U.escapar(JSON.stringify(ids || [])) + '">' +
         cabecera + '<p class="suave">No he podido leer las plantillas de documento. Lo que ya ' +
-        'estuviera unido a este paso se conserva.</p></details>';
+        'estuviera unido a este hito se conserva.</p></details>';
     }
     if (!lista.length) {
       return '<details class="paso-documentos">' + cabecera +

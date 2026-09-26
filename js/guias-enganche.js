@@ -4,7 +4,7 @@
    guias.js sabe pintar y escribir una guía, pero no sabe nada de la
    aplicación. Este fichero es el que la enchufa: guarda las guías en
    _GESTOR/guias.json, pone el botón de cada tipo en Ajustes, y la
-   enseña como recordatorio al crear un asunto. Los pasos, ya con sus
+   enseña como recordatorio al crear un asunto. Los hitos, ya con sus
    casillas, se ven y se marcan dentro de la ficha del asunto
    (js/ficha-asunto.js), no desde la tarjeta de la lista.
 
@@ -13,7 +13,7 @@
 
    Desde el 10-sep-2026 la guía también se escribe **desde la ficha de
    un asunto**, sin ir a Ajustes: es ahí, tramitando, donde uno se da
-   cuenta de qué pasos faltan. Ese botón lo pone js/ficha-asunto.js y
+   cuenta de qué hitos faltan. Ese botón lo pone js/ficha-asunto.js y
    llama aquí, a `window.GuiasDelCentro.escribir`, para que las guías se
    sigan guardando en un solo sitio.
    ============================================================ */
@@ -86,7 +86,7 @@
       return;
     }
     caja.className = 'guia-caja';
-    caja.innerHTML = '<div class="guia-rotulo">Pasos de un asunto ' + U.escapar(tipo) + '</div>' +
+    caja.innerHTML = '<div class="guia-rotulo">Hitos de un asunto ' + U.escapar(tipo) + '</div>' +
                      Guias.vista(pasos, [], false);
   }
 
@@ -119,7 +119,7 @@
         f.innerHTML = '<span class="nombre-tipo">' + U.escapar(tipo.tipo) + '</span>' +
           '<span class="suave" style="flex:1">' +
           (pasos.length
-            ? (pasos.length === 1 ? '1 paso' : pasos.length + ' pasos')
+            ? (pasos.length === 1 ? '1 hito' : pasos.length + ' hitos')
             : 'sin guía todavía') + '</span>';
 
         var b = document.createElement('button');
@@ -141,7 +141,7 @@
      haber escrito otra guía desde el otro ordenador mientras tanto, y sin
      releer se guardaría encima de la suya. Es la misma precaución que
      toma App.anotar con asuntos.json. */
-  /* `opciones.irA` (fila 113): abrir el cuadro ya en ese paso (desde el mapa). */
+  /* `opciones.irA` (fila 113): abrir el cuadro ya en ese hito (desde el mapa). */
   async function escribirGuia(nombreTipo, opciones) {
     if (!nombreTipo) return false;
     try {
@@ -150,7 +150,7 @@
     } catch (e) { /* si no se puede releer, se sigue con lo que hay */ }
 
     /* Las personas y los papeles de Ajustes › Hitos, para el
-       responsable y para «Esperamos a…» de cada paso (fila 129: ya no
+       responsable y para «Esperamos a…» de cada hito (fila 129: ya no
        hay estados escritos a mano). Si algo falla al leerlas, los
        desplegables salen vacíos y el resto del cuadro sigue igual. */
     var opcionesResp = [];
@@ -164,7 +164,7 @@
     } catch (e) { /* sin desplegable de responsable, pero se sigue */ }
 
     /* Las plantillas de documento, una vez antes de abrir el cuadro
-       (fila 102, «Documentos de este paso»). */
+       (fila 102, «Documentos de este hito»). */
     if (window.GuiasDocumentos) await GuiasDocumentos.precargar();
     var pasos = await Guias.editar(nombreTipo, pasosDe(nombreTipo), opcionesResp, [], opciones);
     if (pasos === null || pasos === false || pasos === undefined) return false;
@@ -184,8 +184,8 @@
       pintarGuiaNuevo();
       await window.Gestor.recargar();
       U.aviso(pasos.length
-        ? 'Guía de ' + nombreTipo + ' guardada: ' + pasos.length + ' pasos.' +
-          (llegados ? ' Los pasos nuevos han llegado a ' +
+        ? 'Guía de ' + nombreTipo + ' guardada: ' + pasos.length + ' hitos.' +
+          (llegados ? ' Los hitos nuevos han llegado a ' +
             (llegados === 1 ? '1 asunto abierto.' : llegados + ' asuntos abiertos.') : '')
         : nombreTipo + ' se queda sin guía.', 'bueno');
       return true;
@@ -206,7 +206,7 @@
     await guardarTipo(nombreTipo, pasosNuevos);
     var llegados = await llevarAAbiertos(nombreTipo, pasosNuevos);
     if (llegados) {
-      U.aviso('Los pasos nuevos de ' + nombreTipo + ' han llegado a ' +
+      U.aviso('Los hitos nuevos de ' + nombreTipo + ' han llegado a ' +
         (llegados === 1 ? '1 asunto abierto.' : llegados + ' asuntos abiertos.'), 'bueno');
     }
     pintarTabla();
@@ -215,7 +215,7 @@
     return llegados;
   }
 
-  /* Fila 118 (docs/GUIA-NUEVA-LLEGA-A-LOS-ASUNTOS.md): los pasos nuevos
+  /* Fila 118 (docs/GUIA-NUEVA-LLEGA-A-LOS-ASUNTOS.md): los hitos nuevos
      de la guía, a los asuntos abiertos de ese tipo que ya tienen hitos
      (js/hitos-sincronizar.js). La guía ya está guardada: si esto
      falla, ámbar, nunca rojo. Devuelve a cuántos asuntos ha llegado. */
@@ -226,7 +226,7 @@
       if (n && window.HitosPanel) HitosPanel.programarRepintado();
       return n;
     } catch (e) {
-      U.accesorio('Guía guardada, pero no he podido llevar los pasos nuevos a los asuntos abiertos', e);
+      U.accesorio('Guía guardada, pero no he podido llevar los hitos nuevos a los asuntos abiertos', e);
       return 0;
     }
   }
