@@ -141,9 +141,6 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Archivar/reabrir sobre un destino que ya existe fusiona. Crear, reabrir o editar deja en la ficha; Volver, a donde estaba.
 - Al archivar, la ficha baja a su carpeta (al reabrir, vuelve) y se hace el índice del expediente
   (PDF numerado; también desde el menú de la ficha).
-- El índice del ARCHIVO está partido por curso académico (`indice-archivo/<curso>.json`), con
-  selector «Curso: … ▾» en la pantalla; el tope de largo de un nombre cuenta la ruta real de
-  Dropbox (`Nombres.topes`), no solo el nombre.
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -173,10 +170,6 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   elemento con `App.anotarLista`, nunca se sustituyen enteras; un asunto cerrado (archivado, a la
   papelera, unido o renombrado) lleva una lápida en `borrados-listas.json` y no se puede resucitar
   sin revivirla antes (fila 176).
-- El índice del ARCHIVO va partido por curso académico (`indice-archivo/<curso>.json`,
-  `IndiceArchivo.leerDisco`); `anadirEntrada`/`quitarEntrada` solo tocan el fichero del curso que
-  toca. El tope de largo de un nombre (`Nombres.topes`) cuenta la ruta real dentro de Dropbox
-  (`_GESTOR/rutas.json`), no solo el nombre suelto.
 
 ## 7. Descartado, no proponer otra vez
 
