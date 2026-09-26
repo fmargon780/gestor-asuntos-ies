@@ -890,7 +890,7 @@ el tipo y volver a empezar. Cambia esa decisión de siempre.
   tercero). Si todavía no había tercero, revela ese bloque igual que siempre.
 - Escape cierra el panel, no Nuevo asunto: un `keydown` propio, en captura, con `stopPropagation`,
   mismo cuidado que `js/huecos-buscador.js` por el mismo motivo (el manejador de Escape de
-  `js/usabilidad.js» está en burbuja, sin captura).
+  `js/usabilidad.js` está en burbuja, sin captura).
 - Trampa real durante las pruebas: `document.getElementById` no encuentra nada dentro de un nodo
   todavía sin colgar del documento. `construir()` montaba el panel entero y le enganchaba los
   `onclick`/`oninput` con `$()` (que es `document.getElementById`) antes de que `repintar()`
@@ -982,7 +982,7 @@ de familias renunció por motivos laborales y el escrito se hizo a mano; ahora s
   motivo) y un recuadro final «A cumplimentar por el centro». Una hoja A4: comprobado con el `.docx`
   pasado a PDF con LibreOffice (hubo que instalar su parte de Writer en la sesión).
 - Decisión: la persona se nombra en neutro («la persona abajo firmante», «designada»), porque
-  `js/genero.js» habría cambiado «designado/a» según el sexo del tercero del asunto, que no es quien
+  `js/genero.js` habría cambiado «designado/a» según el sexo del tercero del asunto, que no es quien
   renuncia. El destinatario sí va con forma doble marcada `:firmante`, y por eso la plantilla lleva
   `firmante: direccion` (solo para el género; la firma del cargo no se pinta).
 - Los `id` de las plantillas del centro eran al azar al cargarlas, así que ningún paso de la
@@ -1155,7 +1155,7 @@ veía el texto entero, con las filas bloqueadas: confirmado.
   afectaría; no tiene nada que tapar.
 - El autónomo real que salía de ejemplo (una papelería, con su nombre y NIF) se cambió por uno
   inventado en `docs/PAPELERA.md`, `docs/HISTORIA-ANTERIOR.md`, `js/datos.js` y `pruebas/empresas.mjs`.
-- Queda por comprobar ya publicado: que `docs/COLA.md` da error, que la aplicación entra, y que el
+- Queda por comprobar ya publicado: que `docs/COLA.md» da error, que la aplicación entra, y que el
   siguiente cambio solo de `docs/` no publica. Lo del panel de Vercel (Analytics, registros) sigue
   pendiente de que Francisco lo mire.
 
