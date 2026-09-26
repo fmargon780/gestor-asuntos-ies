@@ -566,21 +566,14 @@ var CorreoCuadro = (function () {
   /* Deja el hilo del correo enviado enganchado al asunto (como un
      correo guardado desde la bandeja): así la respuesta del tercero
      entra sola. No crítico: si falla, el correo ya ha salido. */
+  /* Fila 176: fundido con App.anotarLista, no mandado entero. */
   async function anadirHiloAlAsunto(a, hiloId, asuntoTexto) {
-    await App.cargarRegistro();
-    var ficha = (App.E.registro.asuntos && App.E.registro.asuntos[a.nombre]) || {};
-    var hilos = Array.isArray(ficha.hilos) ? ficha.hilos.slice() : [];
-    if (hilos.some(function (h) { return h && h.id === hiloId; })) return;
-    hilos.push({
-      id: hiloId,
-      asunto: String(asuntoTexto || a.nombre).toLowerCase(),
-      visto: 1,
-      matriculas: [],
-      metidoPor: App.E.usuario,
-      metidoEl: U.ahora()
-    });
-    await App.anotar(a.nombre, { hilos: hilos });
-    if (a.ficha) a.ficha.hilos = hilos;
+    var huella = {
+      id: hiloId, asunto: String(asuntoTexto || a.nombre).toLowerCase(), visto: 1,
+      matriculas: [], metidoPor: App.E.usuario, metidoEl: U.ahora()
+    };
+    await App.anotarLista(a.nombre, 'hilos', { anadir: [huella] });
+    if (a.ficha) a.ficha.hilos = App.unirPorIdentidad(a.ficha.hilos, [huella], App.IDENTIDAD_LISTA.hilos);
     if (window.Bandeja && window.Bandeja.escribirSeguidos) await window.Bandeja.escribirSeguidos();
   }
 

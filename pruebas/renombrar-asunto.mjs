@@ -110,10 +110,20 @@ async function leerHitos() {
   const texto = (await h.getFile())._texto;
   return texto ? JSON.parse(texto) : { ajustes: {}, porAsunto: {} };
 }
-async function leerPresencia() {
-  const h = await gestor.getFileHandle('presencia.json', { create: true });
+/* Fila 176: presencia.json pasa a un fichero por usuario dentro de
+   _GESTOR/presencia; Presencia.mover solo mueve la señal del propio
+   ordenador (App.E.usuario), nunca la de otro. */
+async function leerPresenciaPropia() {
+  const p = await gestor.getDirectoryHandle('presencia', { create: true });
+  const h = await p.getFileHandle('francisco.json', { create: true });
   const texto = (await h.getFile())._texto;
-  return texto ? JSON.parse(texto) : {};
+  const d = texto ? JSON.parse(texto) : null;
+  return (d && d.asuntos) || {};
+}
+async function escribirPresenciaPropia(asuntos) {
+  const p = await gestor.getDirectoryHandle('presencia', { create: true });
+  const h = await p.getFileHandle('francisco.json', { create: true });
+  await (await h.createWritable()).write(JSON.stringify({ usuario: 'Francisco', asuntos: asuntos }));
 }
 
 /* Un hito "rico", con las seis cosas que el informe dice que se
@@ -233,14 +243,12 @@ comprobar('al devolver, los hitos vuelven enteros',
    ================================================================ */
 console.log('--- 6. la señal de presencia viaja con el renombrado ---');
 
-await (await gestor.getFileHandle('presencia.json', { create: true })).createWritable()
-  .then((w) => w.write(JSON.stringify({ 'CON PRESENCIA': { usuario: 'Ana', ultima: new Date().toISOString() } })));
+await escribirPresenciaPropia({ 'CON PRESENCIA': { ultima: new Date().toISOString() } });
 await escribirAsuntos({ asuntos: { 'CON PRESENCIA': { situacion: 'PENDIENTE' } } });
 await App.cargarRegistro();
 await AsuntoRenombrar.mover('CON PRESENCIA', 'CON PRESENCIA NUEVA', {});
-const presencia6 = await leerPresencia();
-comprobar('la señal de presencia viaja a la clave nueva',
-  presencia6['CON PRESENCIA NUEVA'] && presencia6['CON PRESENCIA NUEVA'].usuario, 'Ana');
+const presencia6 = await leerPresenciaPropia();
+comprobar('la señal de presencia viaja a la clave nueva', !!presencia6['CON PRESENCIA NUEVA'], true);
 comprobar('nada queda bajo la clave vieja', !!presencia6['CON PRESENCIA'], false);
 
 /* ================================================================

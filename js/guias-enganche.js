@@ -42,10 +42,31 @@
     }
   }
 
-  async function guardar() {
-    var g = window.Gestor.carpetaGestor();
-    if (!g) return;
-    await Copias.guardar(g, FICHERO, guias);
+  /* Fila 176, punto 4: releer justo antes de escribir y tocar solo el
+     tipo que se está guardando, dentro de la cola (como campos.json).
+     Antes, 'guardar' escribía el objeto 'guias' entero tal y como se
+     había cargado al ABRIR el editor: si los dos ordenadores editaban
+     guías de tipos distintos la misma tarde, el segundo en guardar
+     borraba la del primero, sin conflicto de Dropbox de por medio (el
+     fichero no llegaba a chocar: los dos lo escribían con datos
+     completos, solo que uno de ellos, viejo). */
+  function conFichero(cambiar) {
+    var hacer = async function () {
+      var g = window.Gestor.carpetaGestor();
+      if (!g) return;
+      var leido = await Carpetas.leerJson(g, FICHERO);
+      var datos = (leido && typeof leido === 'object') ? leido : {};
+      cambiar(datos);
+      guias = datos;
+      await Copias.guardar(g, FICHERO, datos);
+    };
+    return window.ColaGuardado ? ColaGuardado.poner(FICHERO, hacer) : hacer();
+  }
+
+  function guardarTipo(nombreTipo, pasos) {
+    return conFichero(function (datos) {
+      if (pasos && pasos.length) datos[nombreTipo] = pasos; else delete datos[nombreTipo];
+    });
   }
 
   /* ---------- la guía como recordatorio, al crear el asunto ----------
@@ -152,7 +173,7 @@
     else delete guias[nombreTipo];
 
     try {
-      await guardar();
+      await guardarTipo(nombreTipo, pasos);
     } catch (e) {
       U.aviso('No he podido guardarla: ' + U.mensajeDeError(e), 'malo');
       return false;
@@ -182,7 +203,7 @@
   async function guardarPasos(nombreTipo, pasosNuevos) {
     try { await cargar(); } catch (e) { /* se sigue con lo que hay */ }
     if (pasosNuevos.length) guias[nombreTipo] = pasosNuevos; else delete guias[nombreTipo];
-    await guardar();
+    await guardarTipo(nombreTipo, pasosNuevos);
     var llegados = await llevarAAbiertos(nombreTipo, pasosNuevos);
     if (llegados) {
       U.aviso('Los pasos nuevos de ' + nombreTipo + ' han llegado a ' +
@@ -227,12 +248,16 @@
      el otro ordenador ya le puso una, se queda la suya. Sin llevarla a
      los abiertos ni recargar: quien llama crea los hitos él mismo. */
   async function asegurarGuia(nombreTipo, pasosNuevos) {
-    try { await cargar(); } catch (e) { /* se sigue con lo que hay */ }
-    if (!pasosDe(nombreTipo).length) {
-      guias[nombreTipo] = Guias.normalizar(pasosNuevos || []);
-      await guardar();
-      try { pintarTabla(); } catch (e2) { /* solo pintar */ }
-    }
+    /* La comprobación de "¿sigue vacío?" va DENTRO de conFichero, sobre
+       el mismo releído que escribe: si se hiciera antes (con cargar())
+       y el otro ordenador acabara de ponerle una guía mientras tanto,
+       esto la pisaría igual. */
+    await conFichero(function (datos) {
+      if (!(datos[nombreTipo] && datos[nombreTipo].length)) {
+        datos[nombreTipo] = Guias.normalizar(pasosNuevos || []);
+      }
+    });
+    try { pintarTabla(); } catch (e2) { /* solo pintar */ }
     return pasosDe(nombreTipo).slice();
   }
 
@@ -246,7 +271,8 @@
     guardarPasos: guardarPasos,
     cambiarPasos: cambiarPasos,
     recargar: cargar,   /* fila 138: tras pasar «lo que hay que reunir» al guion */
-    asegurarGuia: asegurarGuia
+    asegurarGuia: asegurarGuia,
+    _guardarTipo: guardarTipo   /* para pruebas/datos-entre-ordenadores.mjs (fila 176) */
   };
 
   /* ---------- arranque ---------- */

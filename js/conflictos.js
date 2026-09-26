@@ -24,12 +24,24 @@
      fácil que se note mal. Ahí se avisa en Ajustes y se deja elegir
      con cuál de los dos quedarse; el que no se elija no se pierde,
      porque los dos se guardan antes en _GESTOR/copias.
-   ============================================================ */
+
+   Fila 176 (docs/PARTIR-FICHEROS-GRANDES.md): partido por temas, sin
+   cambiar nada de lo que hacía. Aquí, las fusiones automáticas
+   (asuntos/hitos/tablon, con las lápidas de la fila 176), el cajón de
+   "no se fusionan solos" y su bloque de Ajustes, y la revisión
+   principal. Los CSV de terceros, administraciones.json y "los
+   terceros se releen solos" viven en js/conflictos-datos.js, que se
+   carga justo después y comparte lo necesario por `Conflictos._interno`
+   (I). ============================================================ */
 (function () {
+  /* Lo que usa js/conflictos-datos.js. */
+  var I = {};
 
   var CADA_MS = 5 * 60 * 1000;
   var ultimaRevision = 0;
   var pendientes = [];   /* { real, nombreConflicto } de los que no se fusionan solos */
+  I.pendientesPush = function (p) { pendientes.push(p); };
+  I.pintarBloque = function () { pintarBloque(); };
 
   function $(id) { return document.getElementById(id); }
 
@@ -52,23 +64,29 @@
     return [f && f.editadoEl, f && f.pasosEl, ultimaNota].filter(Boolean).sort().pop() || '';
   }
 
+  /* Fila 176, punto 1: las listas que hoy funde App.anotarLista se
+     unen aquí con la MISMA identidad (App.unirPorIdentidad), en vez de
+     quedarse solo con las de la ficha que ganó por fecha: antes de este
+     arreglo, un hilo o un relacionado guardado desde el otro ordenador
+     justo antes del conflicto se perdía si su ficha no era la elegida. */
+  function unirLista(a, b, campo) {
+    return App.unirPorIdentidad(a[campo], b[campo], App.IDENTIDAD_LISTA[campo]);
+  }
+
   function fusionarFicha(a, b) {
     a = a || {}; b = b || {};
     var base = (ultimoCambio(a) >= ultimoCambio(b)) ? Object.assign({}, b, a) : Object.assign({}, a, b);
 
-    var vistas = {};
-    base.notas = (a.notas || []).concat(b.notas || []).filter(function (n) {
-      var k = (n.cuando || '') + '|' + (n.texto || '');
-      if (vistas[k]) return false;
-      vistas[k] = true;
-      return true;
-    });
+    base.notas = unirLista(a, b, 'notas');
 
     var hechos = {};
     (a.pasosHechos || []).concat(b.pasosHechos || []).forEach(function (id) { hechos[id] = true; });
     base.pasosHechos = Object.keys(hechos);
 
     base.pasosElegidos = Object.assign({}, a.pasosElegidos || {}, b.pasosElegidos || {});
+    base.hilos = unirLista(a, b, 'hilos');
+    base.relacionados = unirLista(a, b, 'relacionados');
+    base.pendientesRegistro = unirLista(a, b, 'pendientesRegistro');
     return base;
   }
 
@@ -96,12 +114,23 @@
     if (!conflicto || typeof conflicto.asuntos !== 'object') return false;
     var registroReal = (real && real.asuntos) ? real : { asuntos: {} };
 
+    /* Fila 176, punto 2: una clave con lápida (archivada, a la
+       papelera, unida o renombrada) no vuelve, esté en el lado que
+       esté: sin esto, un asunto que un ordenador acaba de cerrar
+       resucitaba en cuanto la copia en conflicto del otro (que todavía
+       lo tenía) se fusionaba. */
+    var lapidas = {};
+    if (window.Borrados) {
+      (await Borrados.leer(g)).asuntos.forEach(function (x) { lapidas[x.clave] = true; });
+    }
+
     var claves = {};
     Object.keys(registroReal.asuntos).forEach(function (k) { claves[k] = true; });
     Object.keys(conflicto.asuntos).forEach(function (k) { claves[k] = true; });
 
     var fusion = Object.assign({}, conflicto, registroReal, { asuntos: {} });
     Object.keys(claves).forEach(function (k) {
+      if (lapidas[k]) return;
       var a = registroReal.asuntos[k], b = conflicto.asuntos[k];
       fusion.asuntos[k] = (a && b) ? fusionarFicha(a, b) : (a || b);
     });
@@ -159,10 +188,18 @@
     (base.ajustes.festivos || []).concat(confAjustes.festivos || []).forEach(function (f) { festivos[f] = true; });
     base.ajustes.festivos = Object.keys(festivos).sort();
 
+    /* Fila 176, punto 2: igual que en asuntos.json, una clave con
+       lápida no vuelve a hitos.json. */
+    var lapidas = {};
+    if (window.Borrados) {
+      (await Borrados.leer(g)).asuntos.forEach(function (x) { lapidas[x.clave] = true; });
+    }
+
     var claves = {};
     Object.keys(base.porAsunto).forEach(function (k) { claves[k] = true; });
     Object.keys(confPorAsunto).forEach(function (k) { claves[k] = true; });
-    claves = Object.keys(claves);
+    claves = Object.keys(claves).filter(function (k) { return !lapidas[k]; });
+    Object.keys(lapidas).forEach(function (k) { delete base.porAsunto[k]; });
     for (var i = 0; i < claves.length; i++) {
       var clave = claves[i];
       var a = base.porAsunto[clave], b = confPorAsunto[clave];
@@ -207,94 +244,8 @@
     return true;
   }
 
-  /* ---------- los CSV de terceros dados de alta a mano (fila 130) ----------
-
-     `solicitantes.csv`, `personal.csv`, `empresas.csv` y `otros.csv`, en
-     `_GESTOR/datos`. Se unen solos: unión de filas, y dos filas iguales
-     se quedan en una. Si dos filas tienen el mismo nombre (primera
-     columna) y datos distintos, se queda la del fichero real y la otra
-     se apunta para que Francisco elija en Ajustes. Antes, el fichero
-     real se copia a `_GESTOR/copias` y la copia en conflicto se mueve
-     allí: no se pierde ninguna fila. */
-  var CSV_DE_TERCEROS = ['solicitantes.csv', 'personal.csv', 'empresas.csv', 'otros.csv',
-                         'tutores.csv'];   /* fila 166: los tutores legales ya terceros */
-
-  function ficheroRealCsv(nombreConflicto) {
-    var m = nombreConflicto.match(/^(.+?)\s*\([^)]*conflic[^)]*\)\.csv$/i);
-    return m ? m[1].trim() + '.csv' : '';
-  }
-
-  /* Función pura. `real` y `otro`: el texto de los dos CSV. Devuelve
-     { texto, anadidas, dudosas: [{ nombre, fila (objeto columna → valor) }] }. */
-  function unirCsv(real, otro) {
-    var tReal = Datos.aTabla(real || '').filas;
-    var tOtro = Datos.aTabla(otro || '').filas;
-    var cab = (tReal[0] || tOtro[0] || []).map(function (x) { return String(x).trim(); });
-    var cabOtro = (tOtro[0] || cab).map(function (x) { return String(x).trim(); });
-    function limpia(fila) { return cab.map(function (c, i) { return String(fila[i] === undefined ? '' : fila[i]).trim(); }); }
-    function delOtro(fila) {
-      return cab.map(function (c) {
-        var i = cabOtro.indexOf(c);
-        return i === -1 ? '' : String(fila[i] === undefined ? '' : fila[i]).trim();
-      });
-    }
-    var filas = tReal.slice(1).map(limpia).filter(function (f) { return f[0]; });
-    var enteras = {}, porNombre = {};
-    filas.forEach(function (f) { enteras[f.join('\u0001')] = true; porNombre[U.normalizar(f[0])] = true; });
-    var anadidas = 0, dudosas = [];
-    tOtro.slice(1).map(delOtro).forEach(function (f) {
-      if (!f[0] || enteras[f.join('\u0001')]) return;
-      if (porNombre[U.normalizar(f[0])]) {
-        var obj = {};
-        cab.forEach(function (c, i) { obj[c] = f[i]; });
-        dudosas.push({ nombre: f[0], fila: obj });
-        return;
-      }
-      enteras[f.join('\u0001')] = true;
-      porNombre[U.normalizar(f[0])] = true;
-      filas.push(f);
-      anadidas++;
-    });
-    filas.sort(function (a, b) { return U.normalizar(a[0]) < U.normalizar(b[0]) ? -1 : 1; });
-    return { texto: Datos.aCsv(cab, filas), anadidas: anadidas, dudosas: dudosas };
-  }
-
-  function categoriaDeCsv(fichero) {
-    var L = (window.Datos && Datos.LISTAS) || {};
-    return Object.keys(L).filter(function (k) { return L[k].fichero === fichero; })[0] || '';
-  }
-
-  function sello() {
-    var d = new Date();
-    function dos(n) { return String(n).padStart(2, '0'); }
-    return String(d.getFullYear()).slice(2) + dos(d.getMonth() + 1) + dos(d.getDate()) + '-' + dos(d.getHours()) + dos(d.getMinutes());
-  }
-
-  function fusionarCsv(g, dirDatos, nombreConflicto, real) {
-    var hacer = function () { return fusionarCsvYa(g, dirDatos, nombreConflicto, real); };
-    return window.ColaGuardado ? ColaGuardado.poner(real, hacer) : hacer();
-  }
-
-  async function fusionarCsvYa(g, dirDatos, nombreConflicto, real) {
-    var textoReal, textoOtro;
-    try {
-      textoReal = (await Carpetas.leerTexto(dirDatos, real)) || '';
-      textoOtro = await Carpetas.leerTexto(dirDatos, nombreConflicto);
-    } catch (e) { return null; }
-    if (textoOtro === null) return null;
-    var r = unirCsv(textoReal, textoOtro);
-    var copias = await Carpetas.crear(g, 'copias');
-    await Carpetas.escribirTexto(copias, real.replace(/\.csv$/, '') + '-antes-de-unir-' + sello() + '.csv', textoReal);
-    await Carpetas.escribirTexto(dirDatos, real, r.texto);
-    await Carpetas.moverFichero(dirDatos, nombreConflicto, copias, nombreConflicto);
-    var cat = categoriaDeCsv(real);
-    if (cat && window.Datos) Datos.olvidar(cat);
-    r.dudosas.forEach(function (d) {
-      pendientes.push({ real: real, nombreConflicto: nombreConflicto, fila: d.fila, nombre: d.nombre, categoria: cat });
-    });
-    return r;
-  }
-
+  /* Fila 130: una fila de un CSV de terceros que choca por el nombre,
+     resuelta desde js/conflictos-datos.js. */
   async function quedarseConLaFilaDelOtro(p) {
     try {
       await Datos.guardarEnLista(App.E.datos, p.categoria, p.nombre, p.fila);
@@ -305,6 +256,7 @@
       U.fallo('No he podido guardarlo', e);
     }
   }
+  I.quedarseConLaFilaDelOtro = quedarseConLaFilaDelOtro;
 
   /* ---------- los ficheros que no se fusionan solos ---------- */
 
@@ -437,7 +389,12 @@
     for (var i = 0; i < ficheros.length; i++) {
       var nombre = ficheros[i].nombre;
       var real = ficheroReal(nombre);
-      if (!real || Copias.FICHEROS.indexOf(real) === -1) continue;
+      /* Fila 176, punto 5: antes solo se miraban los conflictos de los
+         ficheros de Copias.FICHEROS; plantillas.json, envios.json,
+         rutas.json, margenes-pdf.json y cualquier otro de _GESTOR se
+         ignoraban del todo. Ahora entran en el mismo cajón de "no se
+         fusionan solos" que ya tenían tipos, estados... */
+      if (!real) continue;
 
       if (real === App.FICHERO_ASUNTOS) {
         if (await fusionarAsuntos(g, nombre)) {
@@ -459,104 +416,25 @@
       }
       if (!yaPendiente(real, nombre)) pendientes.push({ real: real, nombreConflicto: nombre });
     }
-    await revisarCsv(g);
-    try { await revisarFechasDatos(); } catch (e) { /* no crítico */ }
+    if (I.revisarCsv) { try { await I.revisarCsv(g); } catch (e) { /* a la siguiente pasada */ } }
+    try { await revisarPresencia(g); } catch (e) { /* se intenta la próxima vez */ }
+    if (I.revisarFechasDatos) { try { await I.revisarFechasDatos(); } catch (e) { /* no crítico */ } }
     pintarBloque();
   }
 
-  /* ---------- los terceros se releen solos (fila 132) ----------
-
-     La caché de `Datos` no caducaba en toda la sesión: un alta del
-     compañero o un RegAlum.csv nuevo no se veían hasta recargar. En
-     esta misma revisión (cada cinco minutos, nunca con un guardado en
-     marcha) se mira la fecha de cada CSV de `_GESTOR/datos`; si ha
-     cambiado desde la vez anterior, se olvida esa categoría. Nada más:
-     se relee la próxima vez que se pida, sin repintar nada. */
-  var fechasDatos = null;   /* { nombre: lastModified } de la pasada anterior */
-
-  function categoriaDeDatos(nombre) {
-    var cat = categoriaDeCsv(nombre);
-    if (cat) return cat;
-    var n = String(nombre).toLowerCase();
-    if (/regalum|alumn|matric/.test(n)) return 'ALUMNADO';
-    if (/relpercen|personal|profesor/.test(n)) return 'PERSONAL';
-    return '';
-  }
-
-  /* Función pura: qué categorías olvidar al pasar de `antes` a `ahora`
-     (null = todas; [] = ninguna). La primera pasada solo apunta. */
-  function categoriasCambiadas(antes, ahora) {
-    if (!antes) return [];
-    var cats = {}, todas = false;
-    Object.keys(ahora).forEach(function (n) {
-      if (antes[n] === ahora[n]) return;
-      var c = categoriaDeDatos(n);
-      if (c) cats[c] = true; else todas = true;
-    });
-    return todas ? null : Object.keys(cats);
-  }
-
-  async function revisarFechasDatos() {
-    var dirDatos = window.App && App.E && App.E.datos;
-    if (!dirDatos || !window.Datos) return;
-    if (window.ColaGuardado && ColaGuardado.hayGuardado()) return;
-    var ahora = {};
-    try {
-      var lista = await Carpetas.ficheros(dirDatos);
-      for (var i = 0; i < lista.length; i++) {
-        if (!/\.(csv|xlsx?)$/i.test(lista[i].nombre)) continue;
-        try { ahora[lista[i].nombre] = (await lista[i].handle.getFile()).lastModified; } catch (e) { /* se mira la próxima vez */ }
-      }
-    } catch (e) { return; }
-    var cambiadas = categoriasCambiadas(fechasDatos, ahora);
-    fechasDatos = ahora;
-    if (cambiadas === null) Datos.olvidar();
-    else cambiadas.forEach(function (c) { Datos.olvidar(c); });
-  }
-
-  /* Fila 167: la copia en conflicto de administraciones.json se une por
-     id dentro de la misma cola que sus guardados, y se aparta a copias. */
-  function fusionarAdministraciones(g, dirDatos, nombreConflicto) {
-    var otro = null;
-    return Administraciones.cambiar(dirDatos, async function (d) {
-      var texto = await Carpetas.leerTexto(dirDatos, nombreConflicto);
-      if (texto === null) return false;
-      try { otro = JSON.parse(texto); } catch (e) { otro = null; }
-      var unido = Administraciones.unirDatos(d, otro);
-      d.superiores = unido.superiores;
-      d.organismos = unido.organismos;
-      return true;
-    }).then(async function (hecho) {
-      if (!hecho) return false;
-      var copias = await Carpetas.crear(g, 'copias');
-      await Carpetas.moverFichero(dirDatos, nombreConflicto, copias, nombreConflicto);
-      return true;
-    });
-  }
-
-  /* Fila 130: las copias en conflicto de los CSV de terceros, en _GESTOR/datos. */
-  async function revisarCsv(g) {
-    var dirDatos = window.App && App.E && App.E.datos;
-    if (!dirDatos || !window.Datos) return;
+  /* Fila 176, punto 5: presencia.json pasa a un fichero por usuario
+     dentro de _GESTOR/presencia (js/presencia.js), que cada ordenador
+     escribe solo, así que ya no debería dejar copias en conflicto; si
+     alguna queda (o del presencia.json viejo, ya migrado), se borra sin
+     preguntar: es un dato que caduca solo, sin copia de seguridad. */
+  async function revisarPresencia(g) {
+    var carpeta;
+    try { carpeta = await Carpetas.crear(g, 'presencia'); } catch (e) { return; }
     var lista;
-    try { lista = await Carpetas.ficheros(dirDatos); } catch (e) { return; }
+    try { lista = await Carpetas.ficheros(carpeta); } catch (e) { return; }
     for (var i = 0; i < lista.length; i++) {
-      var nombre = lista[i].nombre;
-      /* Fila 167: administraciones.json, unido por id (Administraciones.unirDatos). */
-      if (/^administraciones\s*\([^)]*conflic[^)]*\)\.json$/i.test(nombre) && window.Administraciones) {
-        try { if (await fusionarAdministraciones(g, dirDatos, nombre)) U.aviso('Se han unido los cambios de los dos ordenadores en administraciones.json.'); }
-        catch (e) { /* a la siguiente pasada */ }
-        continue;
-      }
-      var real = ficheroRealCsv(nombre);
-      if (!real || CSV_DE_TERCEROS.indexOf(real) === -1) continue;
-      var r = null;
-      try { r = await fusionarCsv(g, dirDatos, nombre, real); } catch (e) { r = null; }
-      if (!r) continue;
-      U.aviso('Se han unido los cambios de los dos ordenadores en ' + real + '.' +
-        (r.dudosas.length ? ' ' + r.dudosas.length + (r.dudosas.length === 1 ? ' persona sale' : ' personas salen') +
-          ' con datos distintos en cada uno: elige en Ajustes → Mantenimiento → Conflictos de Dropbox.' : ''),
-        r.dudosas.length ? 'ambar' : '');
+      if (!ficheroReal(lista[i].nombre)) continue;
+      try { await carpeta.removeEntry(lista[i].nombre); } catch (e) { /* se intenta la próxima vez */ }
     }
   }
 
@@ -564,11 +442,12 @@
      desde otro sitio (el botón "Actualizar", por ejemplo). unirPorId
      se reutiliza también en js/asunto-renombrar.js (fila 62): fusionar
      dos listas de hitos por su identificador es el mismo problema que
-     fusionar una copia en conflicto. */
+     fusionar una copia en conflicto. js/conflictos-datos.js añade aquí
+     mismo unirCsv, fusionarCsv, categoriasCambiadas y
+     revisarFechasDatos, y rellena I.revisarCsv/I.revisarFechasDatos. */
   window.Conflictos = {
     revisar: revisar, pendientes: function () { return pendientes.slice(); }, unirPorId: unirPorId,
-    unirCsv: unirCsv, fusionarCsv: fusionarCsv,
-    categoriasCambiadas: categoriasCambiadas, revisarFechasDatos: revisarFechasDatos
+    _interno: I
   };
 
   function enganchar() {

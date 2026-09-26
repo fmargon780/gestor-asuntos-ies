@@ -133,11 +133,19 @@ Nunca se deja a nadie fuera de un asunto: lo que cambia es que, si el otro ya es
 entra en **modo consulta** (se ve todo, no se toca nada), con un aviso arriba y un botón "Tomar
 el mando" que siempre está ahí.
 
-- **`js/presencia.js`** (`window.Presencia`) es el modelo y la vigilancia. Vive en
-  `_GESTOR/presencia.json`: `{ <clave del asunto>: { usuario, ultima } }`. Se escribe y relee
-  **directo con `Carpetas`, nunca con `Copias.guardar`**: es un fichero fuera de los diecisiete
-  protegidos, a propósito (ver "Lo que la aplicación guarda en `_GESTOR`"), porque se escribe muy
-  a menudo y es un dato que caduca solo (3 minutos sin renovarse).
+- **`js/presencia.js`** (`window.Presencia`) es el modelo y la vigilancia. Desde la fila 176
+  (26-sep-2026, `docs/DATOS-ENTRE-ORDENADORES.md`, punto 5) vive en **un fichero por usuario**,
+  `_GESTOR/presencia/<hueso del usuario>.json` (`{ usuario, asuntos: { <clave>: { ultima } } }`,
+  `U.hueso`: sin tildes, mayúsculas ni espacios), en vez de un único `presencia.json` compartido:
+  antes los dos ordenadores escribían el mismo fichero cada 30 segundos, y Dropbox dejaba
+  constantemente copias en conflicto que nadie limpiaba. Ahora cada ordenador solo escribe el
+  suyo (`escribirPropio`); leer "quién está dentro de cada asunto" junta los ficheros de todos
+  (`leerTodos`). Se escribe y relee **directo con `Carpetas`, nunca con `Copias.guardar`**: es una
+  carpeta fuera de los dieciocho ficheros protegidos, a propósito (ver "Lo que la aplicación
+  guarda en `_GESTOR`"), porque se escribe muy a menudo y es un dato que caduca solo (3 minutos
+  sin renovarse). El `presencia.json` viejo (y sus copias en conflicto) se borra solo, sin
+  preguntar, la primera vez que se entra después de esta fila (`Presencia.borrarFicheroViejo`,
+  desde el mismo envoltorio de `App.vigilarLaCarpeta` de abajo).
   - `vigilar(clave, onCambio)`: comprueba si `clave` está libre; si lo está, anuncia la propia
     señal y la renueva cada 30 segundos; si no, se queda en modo consulta y relee cada 10
     segundos, por si el otro sale. Un único `setInterval` hace las dos cosas (relee siempre;
@@ -175,11 +183,12 @@ el mando" que siempre está ahí.
 - **`js/asuntos-lista.js`** no se toca por dentro: `js/presencia.js` envuelve `App.tarjetaAsunto`
   (mismo patrón que `js/puente.js`, `js/copiar.js` y el propio `js/ficha-asunto.js`) y le cuelga
   `.marca-presencia` (una letra, con el nombre completo en el `title`) delante del nombre.
-- **`js/copias.js`, `js/papelera.js` y `js/conflictos.js` no se han tocado**: los tres trabajan
-  solo con los ficheros que tienen apuntados en su propia lista, y `presencia.json` nunca entra en
-  ninguna. Si dos ordenadores escriben casi a la vez, Dropbox deja aparte una copia en conflicto
-  como con cualquier otro fichero, pero nadie la mira ni se fusiona: la próxima señal (como mucho,
-  30 segundos después) la deja atrás sola.
+- **`js/copias.js` y `js/papelera.js` no se han tocado**: los dos trabajan solo con los ficheros
+  que tienen apuntados en su propia lista, y la carpeta `presencia/` nunca entra en ninguna. Cada
+  ordenador escribe solo su propio fichero, así que ya no debería dejar copias en conflicto; si
+  alguna queda (o del `presencia.json` viejo, ya migrado), `js/conflictos.js` la borra sin
+  preguntar en su misma revisión de cada cinco minutos (fila 176, `revisarPresencia`): es un dato
+  que caduca solo, sin copia de seguridad.
 - Descartado, por ahora: una base de datos pequeña en internet para que el aviso fuera
   instantáneo (ver `docs/COLA.md`, "Lo que vendrá después").
 

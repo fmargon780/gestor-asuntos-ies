@@ -31,6 +31,9 @@ window.Gestor = {
 
   /* Apunta o cambia la ficha de un asunto en asuntos.json. */
   anotar: function (nombre, datos) { return App.anotar(nombre, datos); },
+  /* Funde una lista de la ficha (hilos, relacionados, pendientesRegistro,
+     notas...) elemento a elemento, sin sustituirla entera (fila 176). */
+  anotarLista: function (nombre, campo, opciones) { return App.anotarLista(nombre, campo, opciones); },
 
   /* Vuelve a leer la carpeta y repinta. Se llama después de crear
      carpetas desde fuera. */

@@ -147,6 +147,10 @@
   async function apuntarHuella(nombreAsunto, d) {
     if (!d || !d.id || !nombreAsunto) return;
     try {
+      /* Fila 176, punto 1: cada asunto se funde por su cuenta, dentro
+         de su propia cola (App.anotarLista relee el disco antes de
+         escribir), en vez de calcular las listas sobre una lectura
+         hecha fuera de la cola. */
       await App.cargarRegistro();
       var registro = App.E.registro.asuntos || {};
       var otros = Object.keys(registro);
@@ -154,13 +158,11 @@
         if (otros[i] === nombreAsunto) continue;
         var suyos = registro[otros[i]] && registro[otros[i]].hilos;
         if (!Array.isArray(suyos)) continue;
-        var quedan = suyos.filter(function (h) { return !h || h.id !== d.id; });
-        if (quedan.length !== suyos.length) await App.anotar(otros[i], { hilos: quedan });
+        if (suyos.some(function (h) { return h && h.id === d.id; })) {
+          await App.anotarLista(otros[i], 'hilos', { quitar: [{ id: d.id }] });
+        }
       }
 
-      await App.cargarRegistro();
-      var ficha = App.E.registro.asuntos[nombreAsunto] || {};
-      var hilos = Array.isArray(ficha.hilos) ? ficha.hilos.slice() : [];
       var huella = {
         id: d.id,
         asunto: asuntoLimpioDelCorreo(d),
@@ -169,10 +171,7 @@
         metidoPor: App.E.usuario,
         metidoEl: U.ahora()
       };
-      var sitio = -1;
-      hilos.forEach(function (h, n) { if (h && h.id === d.id) sitio = n; });
-      if (sitio === -1) hilos.push(huella); else hilos[sitio] = huella;
-      await App.anotar(nombreAsunto, { hilos: hilos });
+      await App.anotarLista(nombreAsunto, 'hilos', { anadir: [huella] });
     } catch (e) {
       U.aviso('El correo está guardado, pero no he podido apuntar el hilo: ' + U.mensajeDeError(e), 'ambar');
     }

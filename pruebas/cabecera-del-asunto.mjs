@@ -284,8 +284,9 @@ await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(200);
 await pagina.evaluate(async (rico) => {
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
-  g._hijos.set('presencia.json', window.__disco.fich('presencia.json', JSON.stringify({
-    [rico]: { usuario: 'Juan', ultima: new Date().toISOString() }
+  const p = await g.getDirectoryHandle('presencia', { create: true });
+  p._hijos.set('juan.json', window.__disco.fich('juan.json', JSON.stringify({
+    usuario: 'Juan', asuntos: { [rico]: { ultima: new Date().toISOString() } }
   })));
 }, RICO);
 await pagina.locator('.tarjeta-nombre', { hasText: RICO }).first().click();

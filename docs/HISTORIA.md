@@ -5,6 +5,53 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 26-sep-2026 — Fila 176: los datos no se pisan entre ordenadores
+
+`docs/DATOS-ENTRE-ORDENADORES.md`, primera parte de la «tanda de estabilidad» (análisis de Claude
+del 26-sep-2026). Cinco huecos por los que un dato se perdía cuando los dos ordenadores tocaban
+casi lo mismo casi a la vez, y uno por el que un asunto archivado podía resucitar. Nada cambia en
+pantalla.
+
+1. **Las listas de la ficha se funden por elemento**: `App.anotarLista(clave, campo, {anadir,
+   quitar, identidad})` (`js/nucleo.js`) relee `asuntos.json` dentro de la propia cola y funde,
+   en vez de sustituir la lista entera calculada en memoria de antes (el bug de siempre:
+   `correo-cuadro.js`, `bandeja-huella.js`, `relacionados.js`, `registro.js`,
+   `documentos-guardar.js` y `notas.js` mandaban `{hilos: listaEntera}` sobre una lectura ya
+   vieja). `App.unirPorIdentidad` es la unión pura que también usa `js/conflictos.js`
+   (`fusionarFicha`, ampliada para `hilos`/`relacionados`/`pendientesRegistro`, antes solo
+   `notas`/`pasosHechos`/`pasosElegidos`).
+2. **Lápidas**: archivar, mandar a la papelera, unir o renombrar un asunto borran su clave de
+   `asuntos.json` y, en la misma operación de la cola, marcan una lápida en
+   `_GESTOR/borrados-listas.json` (lista `asuntos`, `js/borrados-fusion.js`, motivo
+   `archivado`/`papelera`/`unido`/`renombrado`). Con lápida puesta, `App.anotar`/`App.anotarLista`
+   lanzan `AsuntoCerrado` en vez de crear la clave vacía; reabrir/devolver de la papelera/enlazar
+   una huérfana la revive ANTES de volver a escribir. La fusión de una copia en conflicto de
+   `asuntos.json`/`hitos.json` (`js/conflictos.js`) también la respeta.
+3. **El vistazo de 20 s también relee `asuntos.json`/`hitos.json`** si su fecha de modificación
+   ha cambiado y no hay guardado en marcha (`js/vistazo-registro.js`, nuevo, envolviendo
+   `App.mirarLaCarpeta`; `Carpetas.fechaFichero`, nueva). Antes solo se releían al entrar y en
+   cada guardado propio.
+4. **La guía relee antes de escribir**: `js/guias-enganche.js` guardaba el objeto `guias` entero
+   tal y como se había cargado al ABRIR el editor de un tipo; si el otro ordenador guardaba la
+   guía de OTRO tipo mientras tanto, el segundo en guardar lo borraba. Ahora cada guardado
+   (`guardarTipo`/`conFichero`) relee `guias.json`, toca solo su tipo y escribe, en la cola.
+5. **Presencia por usuario**: `_GESTOR/presencia.json` (uno solo, escrito por los dos ordenadores
+   cada 30 s) dejaba constantemente copias en conflicto que nadie limpiaba. Pasa a un fichero por
+   usuario, `_GESTOR/presencia/<hueso>.json` (`U.hueso`, nuevo en `js/util-parecidos.js`): cada
+   ordenador solo escribe el suyo. El viejo (y sus copias en conflicto) se borra solo al entrar;
+   `js/conflictos.js` borra sin preguntar cualquier copia en conflicto que quede dentro de
+   `presencia/`. `js/conflictos.js` de paso amplía su revisión a ficheros que antes ignoraba del
+   todo (`plantillas.json`, `envios.json`, `rutas.json`, `margenes-pdf.json`...): entran en el
+   mismo cajón de "no se fusionan solos" que ya tenían tipos y estados.
+
+`js/conflictos.js` pasaba de 600 líneas con estos cambios: se partió (`docs/PARTIR-FICHEROS-
+GRANDES.md`) en el mismo fichero (asuntos/hitos/tablón, lápidas, el cajón de Ajustes) y
+`js/conflictos-datos.js`, nuevo (los CSV de terceros, `administraciones.json`, "los terceros se
+releen solos"), compartiendo `Conflictos._interno`.
+
+`pruebas/datos-entre-ordenadores.mjs`, nueva, sin navegador (los cinco puntos del encargo).
+`pruebas/presencia.mjs` reescrita para el fichero por usuario. `npm test` completo en verde.
+
 ## 26-sep-2026 — Fila 175: Personas, Archivo y el menú llevan a algún sitio
 
 `docs/PERSONAS-ARCHIVO-Y-MENU.md`, tercera y última parte de la «tanda 1» del análisis de

@@ -480,12 +480,80 @@ App.conOcupado = async function (nombre, fn) {
   }
 };
 
+/* Fila 176 (docs/DATOS-ENTRE-ORDENADORES.md, punto 2): si 'clave' lleva
+   una lápida (archivada, a la papelera, unida o renombrada por
+   cualquiera de los dos ordenadores), ni App.anotar ni App.anotarLista
+   la resucitan. Lo lanza App.anotar/App.anotarLista mismos, dentro de
+   la cola, con el disco ya releído: quien llama lo enseña con
+   U.fallo/U.aviso. */
+App.comprobarNoCerrado = async function (clave) {
+  if (!window.Borrados) return;
+  if (await Borrados.estaCerrada(App.E.gestor, 'asuntos', clave)) {
+    var e = new Error('Este asunto ya está archivado en el otro ordenador. Recarga la lista.');
+    e.name = 'AsuntoCerrado';
+    throw e;
+  }
+};
+
 /* Se relee antes de escribir, por si el compañero ha tocado algo
    desde el otro ordenador mientras tanto. */
 App.anotar = async function (clave, datos) {
-  await App.guardarRegistroFresco(function (registro) {
+  await App.guardarRegistroFresco(async function (registro) {
+    await App.comprobarNoCerrado(clave);
     var antes = registro.asuntos[clave] || {};
     registro.asuntos[clave] = Object.assign(antes, datos);
+  });
+};
+
+/* Fila 176, punto 1 (docs/DATOS-ENTRE-ORDENADORES.md): funde una LISTA
+   de la ficha (hilos, relacionados, pendientesRegistro, notas...)
+   elemento a elemento, en vez de sustituirla entera: lo que el otro
+   ordenador haya añadido en ese minuto no desaparece. 'anadir' entra
+   sin repetir según 'identidad' (si ya hay uno con la misma identidad,
+   se sustituye por el nuevo: así sirve también para "sustituir esta
+   nota concreta"); 'quitar' se compara con la misma 'identidad'. */
+App.IDENTIDAD_LISTA = {
+  notas: function (n) { return (n && n.cuando || '') + '|' + (n && n.texto || ''); },
+  hilos: function (h) { return (h && h.id) || ''; },
+  relacionados: function (r) { return (r && r.categoria || '') + '|' + (r && r.nombre || ''); },
+  pendientesRegistro: function (p) { return typeof p === 'string' ? p : ((p && p.nombre) || ''); }
+};
+
+App.unirPorIdentidad = function (a, b, identidad) {
+  var vistos = {}, salida = [];
+  (a || []).concat(b || []).forEach(function (x) {
+    var id = identidad(x);
+    if (vistos[id]) return;
+    vistos[id] = true;
+    salida.push(x);
+  });
+  return salida;
+};
+
+App.anotarLista = async function (clave, campo, opciones) {
+  opciones = opciones || {};
+  var anadir = opciones.anadir || [];
+  var quitar = opciones.quitar || [];
+  var identidad = opciones.identidad || App.IDENTIDAD_LISTA[campo] || JSON.stringify;
+  await App.guardarRegistroFresco(async function (registro) {
+    await App.comprobarNoCerrado(clave);
+    var ficha = registro.asuntos[clave] || (registro.asuntos[clave] = {});
+    var lista = Array.isArray(ficha[campo]) ? ficha[campo].slice() : [];
+    if (quitar.length) {
+      var fuera = {};
+      quitar.forEach(function (x) { fuera[identidad(x)] = true; });
+      lista = lista.filter(function (x) { return !fuera[identidad(x)]; });
+    }
+    anadir.forEach(function (nuevo) {
+      var id = identidad(nuevo);
+      var sitio = -1;
+      lista.forEach(function (x, i) { if (identidad(x) === id) sitio = i; });
+      if (sitio === -1) lista.push(nuevo); else lista[sitio] = nuevo;
+    });
+    ficha[campo] = lista;
+    /* 'extra': algún otro campo suelto que cambie a la vez (notaEl,
+       notaPor...), en la misma pasada de la cola. */
+    if (opciones.extra) Object.assign(ficha, opciones.extra);
   });
 };
 

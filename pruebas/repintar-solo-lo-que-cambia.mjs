@@ -138,7 +138,9 @@ console.log('--- 3. el aviso de consulta no se repite ---');
 await comprobar('preparación: el compañero está dentro del asunto',
   pagina.evaluate(async (B) => {
     const g = App.E.gestor;
-    await Carpetas.guardarJson(g, 'presencia.json', { [B]: { usuario: 'Compañero', ultima: new Date().toISOString() } });
+    const p = await Carpetas.crear(g, 'presencia');
+    await Carpetas.guardarJson(p, U.hueso('Compañero') + '.json',
+      { usuario: 'Compañero', asuntos: { [B]: { ultima: new Date().toISOString() } } });
     await Presencia.refrescarCache();
     Presencia.vigilar(B, function () {});
     await new Promise(r => setTimeout(r, 300));

@@ -180,8 +180,11 @@ var Papelera = (function () {
 
     try {
       if (window.AsuntoRenombrar) await AsuntoRenombrar.quitar(a.nombre);
-      await App.guardarRegistroFresco(function (registro) {
+      await App.guardarRegistroFresco(async function (registro) {
         if (registro.asuntos) delete registro.asuntos[a.nombre];
+        /* Fila 176, punto 2: la lápida, en la misma operación de la
+           cola que borra la clave. */
+        if (window.Borrados) await Borrados.marcar(App.E.gestor, 'asuntos', a.nombre, 'papelera');
       });
     } catch (e3) {
       U.accesorio('El asunto está en la papelera, pero no he podido quitar su ficha o sus hitos. ' +

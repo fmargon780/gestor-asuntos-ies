@@ -107,6 +107,9 @@
     if (await Carpetas.existe(App.E.abiertos, ficha.nombre)) {
       return { ok: false, motivo: 'Ya hay un asunto abierto llamado "' + ficha.nombre + '".' };
     }
+    /* Fila 176, punto 2: un alta explícita (devolver de la papelera)
+       quita la lápida que dejó mandarAsunto. */
+    if (window.Borrados) await Borrados.revivir(App.E.gestor, 'asuntos', ficha.nombre);
     var pap = await I.carpetaPapelera();
     await Carpetas.trasladar(pap, ficha.carpeta, App.E.abiertos, ficha.nombre);
     await App.guardarRegistroFresco(function (registro) {
