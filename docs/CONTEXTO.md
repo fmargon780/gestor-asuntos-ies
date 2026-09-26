@@ -223,11 +223,12 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `PAPELERA/` | Las carpetas y ficheros borrados, cada uno en su subcarpeta `AAMMDD-HHMM <nombre>` |
 | `PLANTILLAS/` | Los `.docx` que Francisco sube a mano, colgados de un tipo desde Ajustes › Plantillas de documento. También `logo-centro.png` (fila 149, el logo opcional del membrete; `membrete.png` de la fila 81 ya no se usa), y los `.docx` del centro que trae solo el botón "Cargar las plantillas del centro" (fila 83, `plantillas/` del repositorio): las dos son las únicas veces que la propia aplicación escribe ahí. No lleva copia de seguridad: no es uno de los dieciocho ficheros compartidos |
 | `presencia/<hueso>.json` | `{ usuario, asuntos: { <clave del asunto>: { ultima } } }`: quién tiene abierta la ficha de cada asunto, y desde cuándo. Desde la fila 176 (26-sep-2026, `docs/DATOS-ENTRE-ORDENADORES.md`), un fichero por usuario (`U.hueso`, sin tildes, mayúsculas ni espacios): cada ordenador solo escribe el suyo, así que ya no deja copias en conflicto. **A propósito, fuera de los dieciocho**: no pasa por `Copias.guardar` (nada de copia de seguridad), no entra en `Papelera`. `js/conflictos.js` sí borra sin preguntar cualquier copia en conflicto que quede dentro (dato que caduca solo). El `presencia.json` viejo (de antes de esta fila) se borra solo al entrar. Se escribe y relee directo con `Carpetas` (ver "No pisarse en un mismo asunto") |
-| `indice-archivo.json` | `{ version, hechoEl, hechoPor, recuento: { CATEGORIA: nº de carpetas de tercero }, asuntos: [{ nombre, categoria, tercero, ruta, fecha, tipo, curso, grupo, documentos, registros, sueltoEn }] }`: el índice guardado del ARCHIVO (`js/archivo-indice.js`, ver "El índice del ARCHIVO"). **También fuera de los dieciocho**, por el mismo motivo que `presencia.json`: se puede rehacer entero en cualquier momento con "Reconstruir el índice", así que no necesita copia de seguridad, papelera ni fusión de conflictos. Se escribe y relee directo con `Carpetas` |
-| `rutas.json` | `{ abiertos, archivo }`: dónde están las dos carpetas DENTRO de Dropbox, con `/`, igual para los dos ordenadores (fila 161, `js/copiar-ruta.js`, botón «Ruta»). Pequeño, como `margenes-pdf.json`: se relee antes de guardar y pasa por `Copias.guardar` |
+| `indice-archivo.json` | Desde la fila 177 (26-sep-2026, `docs/ARCHIVO-POR-CURSO-Y-RUTAS.md`), es un **resumen pequeño**: `{ version, hechoEl, hechoPor, cursos: [...], recuento: { CATEGORIA: nº de carpetas de tercero } }`. Es lo único que se lee al entrar en Archivo (`js/archivo-indice.js`, ver "El índice del ARCHIVO" y "El índice del ARCHIVO por curso académico" en `docs/contexto/ASUNTOS-ARCHIVO.md`) |
+| `indice-archivo/<curso>.json` | (Fila 177) uno por curso académico (`2025-26.json`, `2026-27.json`…): `{ version, hechoEl, hechoPor, asuntos: [{ nombre, categoria, tercero, ruta, fecha, tipo, curso, grupo, documentos, registros, sueltoEn }] }`. El curso sale de las seis primeras cifras del nombre de la carpeta (AAMMDD), nunca de lo que diga el propio nombre |
+| `rutas.json` | `{ abiertos, archivo }`: dónde están las dos carpetas DENTRO de Dropbox, con `/`, igual para los dos ordenadores (fila 161, `js/copiar-ruta.js`, botón «Ruta»; desde la fila 177 también la lee `Nombres.topes()`, a través de `RutaCarpetas.comunConocido`, para calcular el tope de largo de un nombre). Pequeño, como `margenes-pdf.json`: se relee antes de guardar y pasa por `Copias.guardar` |
 | `responsable-migrado.json` | La marca de la pasada única de la fila 159 (personas → «Administración» en guías y biblioteca; los dos hitos de firma). **Fuera de los dieciocho**, como `estado-migrado.json` |
 | `estado-migrado.json` | `{ hechoEl, hechoPor, creados, enEspera }`: la marca de que el paso único de la fila 129 ya se hizo (`js/estado-migracion.js`). **Fuera de los dieciocho**, como `presencia.json` |
-| `copias/*.json` | Copias de seguridad de los dieciocho ficheros de arriba, una por día, 30 como mucho de cada uno |
+| `copias/*.json` | Copias de seguridad de los dieciocho ficheros de arriba, una por día, 30 como mucho de cada uno. También aquí, desde la fila 177, `indice-archivo-antiguo-AAMMDD.json`: el resumen del formato antiguo, apartado al migrar a un fichero por curso (no es una copia periódica, es un rastro de la migración, y no se borra sola) |
 
 **Los CSV van en `datos`, no en `_GESTOR`.** `js/rescate-datos.js` los baja solos al entrar.
 
@@ -249,8 +250,9 @@ del anterior del MISMO fichero: `App.guardarRegistroFresco` (y con él `App.anot
 y la fusión de copias en conflicto de `asuntos.json` y `hitos.json`. Desde la fila 130
 (`docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md`) también el tablón (sus cambios, su fusión y devolver una
 nota de la papelera), los CSV de terceros (`js/datos-listas.js`, releyendo dentro de la cola),
-`borrados-listas.json` y `indice-archivo.json`. Nunca se llama a `poner` del
-mismo fichero desde dentro de un `fn` que ya está en esa cola (se esperaría a sí mismo). Sin el
+`borrados-listas.json` y `indice-archivo.json` (desde la fila 177, cada fichero de curso dentro de
+`indice-archivo/` también pasa por esta misma fila, con la clave del resumen: nunca se llama a
+`poner` del mismo fichero desde dentro de un `fn` que ya está en esa cola). Sin el
 módulo, se guarda igual, sin fila (`App.enFila`). `guardarRegistroFresco` trabaja sobre una copia
 local y solo la pasa a `App.E.registro` al terminar la escritura. `ColaGuardado.hayGuardado()`
 (también cuenta `Copias.guardar` y los traslados de carpeta) hace que presencia, el vistazo a la
@@ -415,9 +417,8 @@ para el botón «Ruta»; en la copia sin internet se deduce de su dirección) y,
   cambiar de rama, o tocar el responsable/fecha/notas/documentos de un hito
   (`js/hitos-panel-lista.js`). Se comprueba con `pruebas/refresco.mjs`. Desde la fila 100 pone
   `data-guardando` en el control (el modo consulta de la ficha, `aplicarModoConsulta`, ya solo toca
-  lo que él mismo apagó y respeta esa marca) y un segundo clic mientras guarda no hace nada. Va
-  solo alrededor de la escritura, nunca del cuadro de diálogo (`App.editarPlazo(a, control)`,
-  `abrirLoPide(a, control)`; registrar desde su cuadro lo deja abierto en «Guardando…» hasta el
+  lo que él mismo apagó y respeta esa marca) y un segundo clic mientras guarda no hace nada.
+  `App.editarPlazo(a, control)`, `abrirLoPide(a, control)`; registrar desde su cuadro lo deja abierto en «Guardando…» hasta el
   final).
 - **Lo principal y lo accesorio, por separado** (fila 100, 23-sep-2026,
   `docs/AVISOS-QUE-DICEN-LA-VERDAD.md`). Si falla lo principal: `U.fallo('No he podido …', e)`,
