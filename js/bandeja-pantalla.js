@@ -143,7 +143,7 @@ var BandejaPantalla = (function () {
     }
   }
 
-  /* "Ya está en el asunto «...» · lo metió Juan el 17-sep-2026 · 09:14",
+  /* "Ya está en el asunto «...» · lo guardó Juan el 17-sep-2026 · 09:14",
      con "Abrir el asunto" (si sigue abierto) y "Quitar de mi bandeja"
      (nunca por la papelera: son copias de trabajo, el correo de verdad
      sigue en Gmail). */
@@ -154,7 +154,7 @@ var BandejaPantalla = (function () {
     div.className = 'linea-ya-guardado';
 
     var frase = 'Ya está en el asunto «' + U.escapar(encaje.nombre) + '»';
-    if (huella.metidoPor) frase += ' · lo metió ' + U.escapar(huella.metidoPor);
+    if (huella.metidoPor) frase += ' · lo guardó ' + U.escapar(huella.metidoPor);
     if (huella.metidoEl) frase += ' el ' + U.escapar(window.Bandeja.fechaHoraLegible(huella.metidoEl));
     if (archivado) frase += ' · <strong>asunto archivado</strong>';
     div.innerHTML = '<span class="ya-guardado-texto">' + frase + '</span>';
@@ -277,7 +277,7 @@ var BandejaPantalla = (function () {
     if (typeof App.elegirAsuntoDelCorreo === 'function') {
       var elegir = document.createElement('button');
       elegir.className = 'boton';
-      elegir.textContent = 'Elegir asunto';
+      elegir.textContent = 'Guardar en un asunto';
       elegir.onclick = function () { App.elegirAsuntoDelCorreo(item); };
       acciones.appendChild(elegir);
     }
