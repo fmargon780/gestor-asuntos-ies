@@ -451,10 +451,17 @@ window.RutaCarpetas = (function () {
 
   ponerBloque();
 
+  /* Lo que ya se sabe de `_GESTOR/rutas.json`, sin volver a leerlo del
+     disco (fila 177, docs/ARCHIVO-POR-CURSO-Y-RUTAS.md, punto 2: lo usa
+     `Nombres.topes()`, que tiene que ser síncrono). Vacío si `rutas.json`
+     todavía no se ha leído en esta sesión (nadie ha abierto el botón
+     «Ruta» ni el bloque de Ajustes → El centro desde que se creó `rutas.json`). */
+  function comunConocido(cual) { return comun[cual] || ''; }
+
   return {
     leer: leer, guardar: guardar, unir: unir, de: de, boton: boton,
     montarEnCuadro: montarEnCuadro, comoFileUrl: comoFileUrl, ponerBloque: ponerBloque,
     partir: partir, cargarComun: cargarComun, dropboxDeEsteOrdenador: dropboxDeEsteOrdenador,
-    pintarBloque: pintarBloque
+    pintarBloque: pintarBloque, comunConocido: comunConocido
   };
 })();
