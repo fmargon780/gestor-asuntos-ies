@@ -53,8 +53,8 @@ await pagina.click('#btn-archivo');
 await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.evaluate(async () => {
-  /* Fila 138: el paso de «lo que hay que reunir» al guion ya está hecho
-     (si no, al entrar lee guias.json y escribe su marca, justo en medio
+  /* Fila 138: el paso de «plo que hay que reunir» al guion ya está
+     hecho (si no, al entrar lee guias.json y escribe su marca, justo en medio
      de lo que se mide aquí). */
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
   for (const marca of ['reunir-migrado.json', 'notas-migrado.json', 'responsable-migrado.json']) {   /* filas 138, 139 y 159 */
@@ -108,7 +108,9 @@ const r1 = await pagina.evaluate(async (B) => {
 const permitidas = ['ficheros', 'leerJson:hitos.json', 'leerTexto:hitos.json', 'guardarJson:hitos.json', 'escribirTexto:hitos.json'];
 await comprobar('solo mira la carpeta y relee y escribe hitos.json',
   Promise.resolve(Object.keys(r1.cuenta).filter(k => permitidas.indexOf(k) === -1 &&
-    !/^(escribirTexto|guardarJson):hitos-\d{6}\.json$/.test(k))), []);   /* la copia del día de hitos.json */
+    !/^(escribirTexto|guardarJson):hitos-\d{6}\.json$/.test(k) &&
+    !/^leerTexto:hitos-\d{6}\.json$/.test(k))), []);   /* la copia del día de hitos.json, y su lectura
+      de verificación (fila 178, docs/CORREO-VERSIONES-Y-LIMPIEZA.md, punto 5) */
 await comprobar('como mucho una relectura', Promise.resolve((r1.cuenta['leerJson:hitos.json'] || 0) <= 1), true);
 await comprobar('la lista, oculta detrás de la ficha, queda pendiente', Promise.resolve(r1.pendiente), true);
 await comprobar('la cabecera lo enseña, sin repintar la ficha',
