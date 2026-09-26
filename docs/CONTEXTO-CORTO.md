@@ -99,7 +99,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ajustes: tres pestañas y pantalla por tipo; todo plegado, con resumen; avisos de fallo, solo con fallo.
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
-- Papelera: nada se borra de golpe. Plazo de conservación por tipo: avisa, nunca borra solo.
+- Papelera: nada se borra de golpe, con buscador por palabras. Plazo de conservación por tipo: avisa, nunca borra solo.
 - Word: lo que falta se pregunta antes; se ve en la app, con «Guardar PDF» e «Imprimir» (sin editar aún).
 - Plantillas de correo (con texto propio para Séneca) y de Word por tipo, con huecos que se rellenan solos;
   también desde el cuadro de Correo/Séneca; las del centro, sacadas de los documentos del compañero (Mantenimiento). Membrete de la Junta (lo dibuja la app; logo opcional), firma de quien ocupaba
