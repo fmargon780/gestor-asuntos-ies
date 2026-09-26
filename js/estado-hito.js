@@ -5,7 +5,7 @@
    El estado del asunto es su hito actual (Hitos.estadoDelAsunto, que
    cuenta en js/hitos-a-quien.js). Aquí, lo que se ve y se pulsa:
 
-     - La marca «Paso N de M · título» (o «Listo para archivar», o
+     - La marca «Hito N de M · título» (o «Listo para archivar», o
        «Sin hitos») en la tarjeta de Asuntos abiertos y en la cabecera
        de la ficha. Pulsarla abre la mesa de ese hito. En el ARCHIVO,
        «Archivado · se quedó en: …» o «Archivado · terminado».
@@ -16,9 +16,9 @@
        por Hitos.cambiar, nunca en la ficha. Se quita al llegar un
        fichero nuevo a la carpeta del asunto, al marcar hecho ese hito
        (Hitos.marcar) o a mano con «Ya ha llegado».
-     - «Saltar a este paso» (antes «Estamos en este paso»; en la lista de
+     - «Saltar a este hito» (antes «Estamos en este paso»; en la lista de
        hitos y en la mesa): da por hechos los anteriores sin terminar
-       (Hitos.situarEn). El hito actual lleva «Paso actual» (fila 162).
+       (Hitos.situarEn). El hito actual lleva «Hito actual» (fila 162).
      - La guía mínima de un tipo sin guía: Tramitar (nos toca),
        Esperar respuesta (esperamos al tercero) y Archivar (nos toca).
 
@@ -137,7 +137,7 @@ var EstadoHito = (function () {
     cont.innerHTML = marcaHTML(a, 'abierto', l);
     engancharMarca(cont, a, 'abierto');
     if (l.esperando && l.esperando.auto) {
-      /* Fila 162: la espera del responsable del paso no se quita: es el paso. */
+      /* Fila 162: la espera del responsable del hito no se quita: es el hito. */
     } else if (l.esperando) {
       cont.appendChild(boton('Ya ha llegado', 'Quitar «Esperando a…»: el asunto vuelve a su montón', 'boton-ya-llegado',
         function (ev) { yaHaLlegado(a, ev.currentTarget); }));
@@ -178,12 +178,12 @@ var EstadoHito = (function () {
     var datos = await Hitos.leer();
     var entrada = datos.porAsunto[a.nombre];
     var l = Hitos.estadoDelAsunto(entrada ? entrada.hitos : [], datos.ajustes);
-    if (!l.hito) { U.aviso('Este asunto no tiene ningún paso abierto que poner en espera.', 'ambar'); return; }
+    if (!l.hito) { U.aviso('Este asunto no tiene ningún hito abierto que poner en espera.', 'ambar'); return; }
     var defecto = ((a.ficha && a.ficha.categoria) || (a.leido && a.leido.categoria)) === 'ALUMNADO' ? 'tutor' : 'tercero';
     var ok = await U.preguntar('Esperando a…',
-      '<p class="explica">El asunto pasa a «Pendiente de terceros» aunque el paso «' + esc(l.titulo) +
+      '<p class="explica">El asunto pasa a «Pendiente de terceros» aunque el hito «' + esc(l.titulo) +
       '» sea nuestro. Vuelve solo a su montón cuando llegue un documento nuevo a su carpeta, ' +
-      'cuando se marque hecho este paso o con «Ya ha llegado».</p>' +
+      'cuando se marque hecho este hito o con «Ya ha llegado».</p>' +
       '<label class="etiqueta">A quién esperamos</label>' +
       '<select id="esperando-a" class="campo">' + aQuienSePuedeEsperar(datos.ajustes).map(function (r) {
         return '<option value="' + esc(r.id) + '"' + (r.id === defecto ? ' selected' : '') + '>' + esc(r.nombre) + '</option>';
@@ -238,7 +238,7 @@ var EstadoHito = (function () {
       if (entrada) puesto = ponerEsperaEn(entrada.hitos, d.ajustes, quien, motivo, ficheros);
       return d;
     });
-    if (!puesto) throw new Error('Este asunto no tiene ningún paso abierto que poner en espera.');
+    if (!puesto) throw new Error('Este asunto no tiene ningún hito abierto que poner en espera.');
     return puesto;
   }
 
@@ -328,7 +328,7 @@ var EstadoHito = (function () {
     }
   }
 
-  /* ---------- «Saltar a este paso» ---------- */
+  /* ---------- «Saltar a este hito» ---------- */
 
   /* Función pura: ¿hay algo antes de este hito que dar por hecho? */
   function puedeSituar(hitos, idHito) {
@@ -341,15 +341,15 @@ var EstadoHito = (function () {
     return false;
   }
 
-  /* Fila 162: «Saltar a este paso» (antes «Estamos en este paso», que
+  /* Fila 162: «Saltar a este hito» (antes «Estamos en este paso», que
      se leía como una marca de estado); el hito actual lleva en su lugar
-     la etiqueta fija «Paso actual». */
+     la etiqueta fija «Hito actual». */
   function botonSituarHTML(clase) {
-    return '<button type="button" class="boton ' + clase + '" title="Dar por hechos los pasos anteriores que sigan sin terminar">' +
-      'Saltar a este paso</button>';
+    return '<button type="button" class="boton ' + clase + '" title="Dar por hechos los hitos anteriores que sigan sin terminar">' +
+      'Saltar a este hito</button>';
   }
 
-  function etiquetaPasoActualHTML() { return '<span class="etiqueta-paso-actual">Paso actual</span>'; }
+  function etiquetaPasoActualHTML() { return '<span class="etiqueta-paso-actual">Hito actual</span>'; }
 
   /* El id del hito actual de una lista de hitos. */
   function idActual(hitos, ajustes) {
@@ -357,8 +357,8 @@ var EstadoHito = (function () {
   }
 
   async function situar(a, idHito, control) {
-    var ok = await U.preguntar('Saltar a este paso',
-      '<p class="explica">Los pasos anteriores que sigan sin terminar se dan por hechos, con una nota en ' +
+    var ok = await U.preguntar('Saltar a este hito',
+      '<p class="explica">Los hitos anteriores que sigan sin terminar se dan por hechos, con una nota en ' +
       'su historial. Las preguntas sin responder se quedan como están. No se borra nada: se puede ' +
       'deshacer hito a hito.</p>', 'Saltar aquí');
     if (!ok) return;
@@ -370,7 +370,7 @@ var EstadoHito = (function () {
       return;
     }
     var l = r && r.estado;
-    U.aviso(l && l.hito ? 'Asunto en el paso ' + l.n + ': ' + l.titulo + '.' : 'Asunto al día.', 'bueno');
+    U.aviso(l && l.hito ? 'Asunto en el hito ' + l.n + ': ' + l.titulo + '.' : 'Asunto al día.', 'bueno');
     if (window.HitosPanel) HitosPanel.programarRepintado();
     repintar();
   }

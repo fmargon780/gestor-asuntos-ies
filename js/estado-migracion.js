@@ -135,9 +135,9 @@ var EstadoMigracion = (function () {
     await Carpetas.guardarJson(g, MARCA, { hechoEl: U.ahora(), hechoPor: App.E.usuario || '', creados: cuenta.creados, enEspera: cuenta.enEspera });
     hecho = true;
     if (cuenta.creados || cuenta.enEspera) {
-      U.aviso('He puesto al día los asuntos abiertos: el estado de cada uno es ahora su paso actual' +
+      U.aviso('He puesto al día los asuntos abiertos: el estado de cada uno es ahora su hito actual' +
         (cuenta.enEspera ? ' (' + cuenta.enEspera + (cuenta.enEspera === 1 ? ' queda' : ' quedan') + ' «Esperando a» tercero)' : '') +
-        '. Usa «Saltar a este paso» para ponerlos en su sitio.', 'bueno');
+        '. Usa «Saltar a este hito» para ponerlos en su sitio.', 'bueno');
       /* La lista se repinta sola: Hitos.alCambiar (js/hitos-a-quien.js). */
     }
   }
