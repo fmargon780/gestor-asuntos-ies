@@ -1,15 +1,15 @@
 /* ============================================================
-   guias-comunicacion.js — "Comunicación de este paso" del editor de
-   un paso (18-sep-2026, fila 60, docs/COMUNICAR-DESDE-EL-HITO.md).
+   guias-comunicacion.js — "Comunicación de este hito" del editor de
+   un hito (18-sep-2026, fila 60, docs/COMUNICAR-DESDE-EL-HITO.md).
 
-   Un paso puede llevar su propio texto para correo, para Séneca, o
+   Un hito puede llevar su propio texto para correo, para Séneca, o
    para los dos, aparte de la plantilla general del tipo. Aparte de
    js/guias.js para no engordarlo (sección 6 del encargo).
 
    A diferencia de js/guias-requisitos.js, aquí no hace falta el patrón
    de "recoger(); mutar; pintar()": son solo campos de texto (asunto y
    cuerpo, por canal), y se leen en `recoger()` como el título o el
-   cuerpo del propio paso — `js/guias.js` llama a `leer(caja)` ahí.
+   cuerpo del propio hito — `js/guias.js` llama a `leer(caja)` ahí.
 
    Reutiliza el campo de texto con "Insertar hueco" de
    `js/plantillas-ajustes.js` (mismo patrón que ya usa el cuadro de una
@@ -58,12 +58,12 @@ var GuiasComunicacion = (function () {
   }
 
   /* El HTML de todo el bloque plegable, listo para insertar como hijo
-     directo del recuadro del paso (o del subpaso). `comunicacion` puede
-     venir vacío, `null` o sin definir: un paso que nunca la tuvo. */
+     directo del recuadro del hito (o del subpaso). `comunicacion` puede
+     venir vacío, `null` o sin definir: un hito que nunca la tuvo. */
   function bloqueHTML(idPaso, comunicacion) {
     var c = comunicacion || { correo: null, seneca: null };
     return '<details class="paso-comunicacion">' +
-      '<summary>Comunicación de este paso' + marcaHTML(c) + '</summary>' +
+      '<summary>Comunicación de este hito' + marcaHTML(c) + '</summary>' +
       '<div class="paso-comunicacion-pestanas">' +
         CANALES.map(function (canal, i) {
           return '<button type="button" class="boton paso-comunicacion-pestana' + (i === 0 ? ' activa' : '') +
@@ -75,8 +75,8 @@ var GuiasComunicacion = (function () {
   }
 
   /* Lee lo escrito en los dos canales, tal y como está en el DOM dentro
-     de `raiz` (el recuadro del paso o del subpaso). `idPaso` es el
-     mismo que se le dio a bloqueHTML(): sin bloque pintado (paso de
+     de `raiz` (el recuadro del hito o del subpaso). `idPaso` es el
+     mismo que se le dio a bloqueHTML(): sin bloque pintado (hito de
      pregunta, o antes de que este fichero cargara), se queda como
      estaba. */
   function leer(raiz, idPaso) {
@@ -109,7 +109,7 @@ var GuiasComunicacion = (function () {
     });
 
     /* Fila 158 (docs/INSERTAR-HUECO-EN-EL-PASO.md): se engancha ANTES de
-       que el recuadro del paso esté en la página (js/guias-paso-bloques.js
+       que el recuadro del hito esté en la página (js/guias-paso-bloques.js
        y js/guias-opciones-editor.js), así que el botón y los campos se
        buscan dentro de `raiz`, no con `document.getElementById` (que
        daba null y dejaba «Insertar hueco» sin hacer nada). */
