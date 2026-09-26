@@ -46,10 +46,12 @@ async function explicaArchivo() {
   return pagina.evaluate(() => document.getElementById('explica-archivo').textContent);
 }
 
+/* Fila 177: el índice vive partido por curso académico; {todos:true}
+   los junta todos, como necesita esta prueba (agnóstica del curso). */
 async function nombresIndiceDeDisco() {
   return pagina.evaluate(async () => {
-    var d = await window.Carpetas.leerJson(window.App.E.gestor, window.IndiceArchivo.FICHERO);
-    return d ? d.asuntos.map(function (a) { return a.nombre; }).sort() : null;
+    var r = await window.IndiceArchivo.leerDisco({ todos: true });
+    return r.ok ? r.datos.asuntos.map(function (a) { return a.nombre; }).sort() : null;
   });
 }
 
@@ -106,6 +108,13 @@ await pagina.evaluate(async ([n1, n2, n3, n4]) => {
 }, [NOMBRE_1, NOMBRE_2, NOMBRE_3, NOMBRE_SUELTO]);
 
 await pagina.click('.pestana[data-pantalla="archivo"]');
+
+/* Fila 177: por defecto se ve solo el curso actual, y esta prueba
+   archiva todo en 2025-26 (no el curso de "hoy"). Como haría quien
+   mira archivo viejo de verdad, se elige "Todos los cursos" una vez,
+   y se queda así el resto de la prueba. */
+await pagina.waitForFunction(() => window.App.E.listaArchivo && window.App.E.listaArchivo.length > 0);
+await pagina.evaluate(async () => { window.App.E.cursoArchivo = 'todos'; await window.App.verArchivo(); });
 
 console.log('--- 7) sin fichero de índice: se enseña igual, y avisa de reconstruir ---');
 /* La primera vez que se entra en el Archivo en la sesión ya carga
@@ -213,12 +222,14 @@ await comprobar('5. reabrir quita la entrada del índice, sin tocar las demás',
 console.log('--- 9) escribir el índice cuando el compañero ha añadido otro asunto no lo pierde ---');
 const r9 = await pagina.evaluate(async () => {
   /* Lo que esta sesión tiene en la mano para guardar (una foto de lo
-     que había justo antes de que el compañero escribiera). */
-  var propio = JSON.parse(JSON.stringify(
-    await window.Carpetas.leerJson(window.App.E.gestor, window.IndiceArchivo.FICHERO)));
+     que había justo antes de que el compañero escribiera), de todos
+     los cursos: `guardar` reparte por curso al escribir. */
+  var propio = (await window.IndiceArchivo.leerDisco({ todos: true })).datos;
+  propio = JSON.parse(JSON.stringify(propio));
 
   /* El compañero, desde el otro ordenador, archiva algo y lo añade
-     directo al fichero mientras tanto. */
+     directo al fichero mientras tanto (sin fecha reconocible: cae en
+     el curso actual, sea o no el mismo que el resto de esta prueba). */
   await window.IndiceArchivo.anadirEntrada({
     nombre: 'DEL COMPAÑERO', categoria: 'OTROS', tercero: 'Nadie', ruta: 'OTROS / Nadie',
     fecha: '', tipo: '', curso: '', grupo: '', documentos: [], registros: [], sueltoEn: ''
@@ -227,7 +238,7 @@ const r9 = await pagina.evaluate(async () => {
   /* Esta sesión guarda su propia foto, sin saber nada de eso. */
   await window.IndiceArchivo.guardar(propio);
 
-  var final = await window.Carpetas.leerJson(window.App.E.gestor, window.IndiceArchivo.FICHERO);
+  var final = (await window.IndiceArchivo.leerDisco({ todos: true })).datos;
   return {
     tieneLoDelCompanero: final.asuntos.some(function (a) { return a.nombre === 'DEL COMPAÑERO'; }),
     tieneLoDeAntes: propio.asuntos.every(function (p) {

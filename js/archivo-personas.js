@@ -20,7 +20,8 @@ function pintarSelectorCurso(cursos) {
   var sel = $('archivo-curso');
   if (!cursos || !cursos.length) { sel.classList.add('oculto'); return; }
   if (!App.E.cursoArchivo) App.E.cursoArchivo = IndiceArchivo.cursoActual();
-  var elegido = cursos.indexOf(App.E.cursoArchivo) !== -1 ? App.E.cursoArchivo : cursos[0];
+  var elegido = (App.E.cursoArchivo === 'todos' || cursos.indexOf(App.E.cursoArchivo) !== -1)
+    ? App.E.cursoArchivo : cursos[0];
   App.E.cursoArchivo = elegido;
   sel.innerHTML = cursos.map(function (c) {
     return '<option value="' + c + '"' + (c === elegido ? ' selected' : '') + '>Curso: ' + c + '</option>';
