@@ -10,7 +10,7 @@
        original no se toca: el navegador no puede borrar nada
        fuera de las dos carpetas señaladas.
 
-     - Poner nombre: para los que ya están dentro de la carpeta,
+     - Cambiar el nombre: para los que ya están dentro de la carpeta,
        porque han llegado por otro camino. Ese sí se renombra en
        el sitio, y es instantáneo.
 
@@ -118,7 +118,7 @@ var Documentos = (function () {
     }
     return '<p class="explica" id="doc-sin-visor">Este tipo de fichero no se puede ver aquí. ' +
            'El navegador solo sabe enseñar PDF e imágenes.<br>' +
-           'Ponle el nombre igual: lo de la derecha funciona lo mismo.</p>';
+           'Cambia el nombre igual: lo de la derecha funciona lo mismo.</p>';
   }
 
   async function pintarLista() {
@@ -139,12 +139,12 @@ var Documentos = (function () {
                  (pendiente ? '<span class="marca-sin-registrar">Sin registrar</span>' : '') +
                  '<button type="button" class="boton" data-copiar="' + i + '" ' +
                    'title="Copiar el nombre del documento, sin la extensión">Copiar nombre</button>' +
-                 '<button type="button" class="boton" data-renombrar="' + i + '">Poner nombre</button>' +
+                 '<button type="button" class="boton" data-renombrar="' + i + '">Cambiar el nombre</button>' +
                  (sinRegistro ? '<button type="button" class="boton' + (pendiente ? ' boton-ambar' : '') +
                    '" data-registrar="' + i + '" title="Dar registro de entrada o salida a este documento">' +
                    'Registrar</button>' : '') +
                  '<button type="button" class="boton boton-peligro" data-borrar="' + i +
-                   '" style="margin-left:auto">Borrar</button>' +
+                   '" style="margin-left:auto" title="Va a la papelera">Borrar</button>' +
                '</div>';
       }).join('') + '</div>';
     }
@@ -171,9 +171,9 @@ var Documentos = (function () {
       };
     });
 
-    /* Pulsar la fila del documento lo enseña igual que "Poner nombre":
-       es el visor que tiene este cuadro (17-sep-2026, fila 86). Los
-       botones de la propia fila siguen haciendo lo suyo. */
+    /* Pulsar la fila del documento lo enseña igual que "Cambiar el
+       nombre": es el visor que tiene este cuadro (17-sep-2026, fila
+       86). Los botones de la propia fila siguen haciendo lo suyo. */
     Array.prototype.forEach.call(caja.querySelectorAll('.fila-documento'), function (fila, i) {
       fila.style.cursor = 'pointer';
       fila.title = 'Pulsa para verlo';
