@@ -330,7 +330,7 @@ var CamposCalculadosEditor = (function () {
         '<p><strong>Probando con:</strong> ' + U.escapar(nombrePersona) + ' ' +
         '<button type="button" class="boton boton-chico" id="calc-probar-otro">Probar con otro</button></p>' +
         '<p><strong>Valor de partida:</strong> ' + (U.escapar(valorOrigen) || '<span class="suave">(vacío)</span>') + '</p>' +
-        '<p><strong>Receta:</strong> ' + U.escapar(Calculo.describir(receta, App.E.campos)) + '</p>' +
+        '<p><strong>Cálculo:</strong> ' + U.escapar(Calculo.describir(receta, App.E.campos)) + '</p>' +
         '<p><strong>Resultado:</strong> ' + (U.escapar(resultado) || '<span class="suave">(vacío)</span>') + '</p>';
       $(caja2, 'calc-probar-otro').onclick = function () { actualizarPreview(true); };
     }
