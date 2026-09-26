@@ -86,11 +86,49 @@
     return '';
   }
 
+  /* ---------- el buscador (fila 172, docs/PAPELERA-BUSCADOR.md) ----------
+
+     Palabras sueltas, en cualquier orden, igual que el buscador de
+     asuntos (js/asuntos-lista-pintar.js): una ficha se queda si su
+     texto de búsqueda contiene TODAS las palabras escritas, sin
+     distinguir mayúsculas ni tildes (U.normalizar). */
+
+  /* AAMMDD y dd/mm/aaaa a partir de la fecha ISO de la ficha (U.ahora()),
+     para que "2609" o "26/09" encuentren lo borrado ese día. */
+  function textoFechaBusqueda(iso) {
+    var aammdd = U.aAaMmDd(String(iso || '').slice(0, 10));
+    if (!aammdd) return '';
+    return aammdd + ' ' + U.fechaLegible(aammdd);
+  }
+
+  /* "De dónde salía": la ruta o el asunto de origen, según la clase. */
+  function origenTexto(ficha) {
+    var o = ficha.origen;
+    if (!o) return '';
+    return [o.asunto, o.ruta, o.categoria, o.tercero, o.sueltoEn].filter(Boolean).join(' ');
+  }
+
+  function textoBusqueda(ficha) {
+    return U.normalizar([
+      ficha.nombre, deDonde(ficha), origenTexto(ficha), ficha.quien || '',
+      haceCuanto(ficha.cuando), textoFechaBusqueda(ficha.cuando)
+    ].join(' '));
+  }
+
   /* ---------- el bloque de Ajustes ---------- */
 
-  App.pintarPapelera = async function () {
+  /* Lo escrito en la caja se conserva al repintarse la lista (tras
+     devolver o borrar una línea, o si llega un cambio del compañero):
+     U.conservandoLoEscrito envuelve todo el bloque, no solo la lista. */
+  App.pintarPapelera = function () {
+    return U.conservandoLoEscrito($('bloque-papelera'), pintarPapeleraDeVerdad);
+  };
+
+  async function pintarPapeleraDeVerdad() {
     var caja = $('tabla-papelera');
     var avisoViejas = $('aviso-papelera-vieja');
+    var campoBuscar = $('buscar-papelera');
+    var cuentaBuscar = $('cuenta-papelera');
     if (!caja) return;
 
     var lista;
@@ -99,15 +137,31 @@
     } catch (e) {
       caja.innerHTML = '<div class="vacio">No he podido leer la papelera: ' + U.escapar(U.mensajeDeError(e)) + '</div>';
       if (avisoViejas) avisoViejas.classList.add('oculto');
+      if (cuentaBuscar) cuentaBuscar.textContent = '';
       return;
     }
 
     if (!lista.length) {
       caja.innerHTML = '<div class="vacio">La papelera está vacía.</div>';
       if (avisoViejas) avisoViejas.classList.add('oculto');
+      if (cuentaBuscar) cuentaBuscar.textContent = '';
       return;
     }
 
+    var palabras = campoBuscar ? U.normalizar(campoBuscar.value).split(' ').filter(Boolean) : [];
+    var listaFiltrada = palabras.length
+      ? lista.filter(function (f) {
+          var busca = textoBusqueda(f);
+          return palabras.every(function (p) { return busca.indexOf(p) !== -1; });
+        })
+      : lista;
+
+    if (cuentaBuscar) {
+      cuentaBuscar.textContent = palabras.length ? (listaFiltrada.length + ' de ' + lista.length) : String(lista.length);
+    }
+
+    /* El aviso de "más de 30 días" y su botón actúan sobre la papelera
+       ENTERA, nunca sobre lo filtrado (punto 9 del encargo). */
     var viejas = lista.filter(function (f) { return diasDesde(f.cuando) > I.DIAS_AVISO; });
     if (avisoViejas) {
       if (viejas.length) {
@@ -117,7 +171,8 @@
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'boton boton-peligro';
-        btn.textContent = 'Borrar del todo lo de más de ' + I.DIAS_AVISO + ' días';
+        btn.textContent = 'Borrar del todo lo de más de ' + I.DIAS_AVISO + ' días' +
+          (palabras.length ? ' (de toda la papelera)' : '');
         btn.onclick = async function () {
           var ok = await U.preguntar('Borrar del todo',
             '<p>Se borran del todo ' + viejas.length + ' cosas de más de ' + I.DIAS_AVISO + ' días.</p>' +
@@ -138,8 +193,16 @@
     }
 
     caja.innerHTML = '';
-    lista.forEach(function (ficha) { caja.appendChild(filaDePapelera(ficha)); });
-  };
+    if (!listaFiltrada.length) {
+      caja.innerHTML = '<div class="vacio">Nada en la papelera con esas palabras.</div>';
+      return;
+    }
+    listaFiltrada.forEach(function (ficha) { caja.appendChild(filaDePapelera(ficha)); });
+  }
+
+  if ($('buscar-papelera')) {
+    $('buscar-papelera').oninput = function () { App.pintarPapelera(); };
+  }
 
   /* Ver un documento sin sacarlo de la papelera (17-sep-2026, fila 86):
      mismo camino que ya usa devolverDocumento para llegar hasta él. */
