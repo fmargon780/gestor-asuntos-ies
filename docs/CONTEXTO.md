@@ -417,8 +417,9 @@ para el botón «Ruta»; en la copia sin internet se deduce de su dirección) y,
   cambiar de rama, o tocar el responsable/fecha/notas/documentos de un hito
   (`js/hitos-panel-lista.js`). Se comprueba con `pruebas/refresco.mjs`. Desde la fila 100 pone
   `data-guardando` en el control (el modo consulta de la ficha, `aplicarModoConsulta`, ya solo toca
-  lo que él mismo apagó y respeta esa marca) y un segundo clic mientras guarda no hace nada.
-  `App.editarPlazo(a, control)`, `abrirLoPide(a, control)`; registrar desde su cuadro lo deja abierto en «Guardando…» hasta el
+  lo que él mismo apagó y respeta esa marca) y un segundo clic mientras guarda no hace nada. Va
+  solo alrededor de la escritura, nunca del cuadro de diálogo (`App.editarPlazo(a, control)`,
+  `abrirLoPide(a, control)`; registrar desde su cuadro lo deja abierto en «Guardando…» hasta el
   final).
 - **Lo principal y lo accesorio, por separado** (fila 100, 23-sep-2026,
   `docs/AVISOS-QUE-DICEN-LA-VERDAD.md`). Si falla lo principal: `U.fallo('No he podido …', e)`,
