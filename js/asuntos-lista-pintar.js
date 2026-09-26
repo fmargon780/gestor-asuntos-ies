@@ -188,7 +188,7 @@ App.tarjetaAsunto = function (a, modo) {
 
     var editar = document.createElement('button');
     editar.className = 'boton';
-    editar.textContent = 'Editar';
+    editar.textContent = 'Cambiar';
     editar.title = 'Cambiar la fecha, el tipo, la descripción o el tercero';
     editar.onclick = function () { App.editarAsunto(a); };
     acciones.appendChild(editar);
