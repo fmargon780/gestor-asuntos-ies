@@ -52,7 +52,9 @@ var RepartirCrear = (function () {
     });
     if (window.IndiceArchivo) {
       try {
-        var r = await IndiceArchivo.leerDisco();
+        /* Fila 177: quién ya tiene un asunto de este tipo se mira en
+           todos los cursos, no solo en el actual. */
+        var r = await IndiceArchivo.leerDisco({ todos: true });
         if (r.ok) r.datos.asuntos.forEach(function (e) { if (e.tipo === tipo && e.tercero) salida[e.tercero] = true; });
       } catch (e) { /* sin índice, no se sabe: no se avisa */ }
     }
