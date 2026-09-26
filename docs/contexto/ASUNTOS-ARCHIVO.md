@@ -40,6 +40,18 @@ devolver a su sitio.
   golpe. **La papelera no se vacía sola, nunca**: es una decisión de Francisco (fila 68,
   docs/AVISOS-QUE-FALTAN.md, 3), preguntada y todavía sin decidir; mientras tanto solo se ha
   hecho el aviso más insistente, nunca el borrado solo.
+- **Buscador de la papelera** (fila 172, 26-sep-2026, docs/PAPELERA-BUSCADOR.md): caja encima de
+  la lista (`#buscar-papelera`), filtra mientras se escribe, sin botón. Palabras sueltas, en
+  cualquier orden y sin tildes ni mayúsculas (`U.normalizar`), como el buscador de asuntos: una
+  ficha se queda si su texto (nombre, qué era, de dónde salía, quién y la fecha —"hace N días" y
+  también `AAMMDD`/`dd/mm/aaaa`, para que "2609" o "26/09" encuentren lo de ese día—) contiene
+  TODAS. Contador junto a la caja ("12 de 85"; solo el total sin nada escrito). Vacío el
+  filtro: "Nada en la papelera con esas palabras." El aviso ámbar de más de 30 días y su botón
+  de borrar todo de golpe siguen actuando sobre la papelera entera, nunca sobre lo filtrado (el
+  botón lo deja dicho si hay un filtro puesto). Lo escrito se conserva al repintarse la lista
+  (`U.conservandoLoEscrito`, envolviendo todo `#bloque-papelera`). No busca dentro del contenido
+  de los documentos borrados, y no toca `_GESTOR/papelera.json`: es solo de pantalla. Vive en
+  `js/papelera-ajustes.js`.
 - **El mismo aviso, también en "Asuntos abiertos"** (19-sep-2026, fila 68, 3): antes solo se veía
   entrando a propósito en Ajustes. `js/avisos-que-faltan.js` pinta una línea junto a
   `#panel-avisos`/`#panel-frescura` con cuántas cosas son y cuánto ocupan de verdad en disco
@@ -57,7 +69,7 @@ devolver a su sitio.
   (`App.tarjetaSuelto`, `App.verFicha`); donde el botón va dentro de una función privada, se ha
   tocado el fichero directamente.
 
-Se comprueba con `pruebas/papelera.mjs`.
+Se comprueba con `pruebas/papelera.mjs` y, el buscador, con `pruebas/papelera-buscador.mjs`.
 
 ### Archivar cuando el destino ya existe
 

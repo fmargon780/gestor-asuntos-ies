@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Boceto · Inicio del Gestor</title>
+<style>
+:root{--fondo:#f4f5f7;--caja:#fff;--borde:#dfe2e7;--texto:#1f2430;--suave:#6b7280;--azul:#1f5fbf;--azul-cl:#e8f0fc;--rojo:#b42318;--rojo-cl:#fdecea;--ambar:#9a6700;--ambar-cl:#fff4d6;--verde:#1a7f37;--verde-cl:#e6f4ea}
+*{box-sizing:border-box}body{margin:0;font:13px/1.35 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--fondo);color:var(--texto)}
+.app{display:grid;grid-template-columns:200px 1fr;min-height:100vh}
+nav{background:#1f2a3c;color:#dbe3f0;padding:12px 10px;display:flex;flex-direction:column;gap:2px}
+nav .marca{font-weight:700;color:#fff;padding:4px 8px 12px}
+nav a{padding:7px 10px;border-radius:6px;color:inherit;text-decoration:none;display:flex;justify-content:space-between}
+nav a.activa{background:#34445f;color:#fff;font-weight:600}
+nav .sep{border-top:1px solid #3a4a64;margin:8px 0}
+nav .pie{margin-top:auto;font-size:11px;color:#9fb0c8;padding:8px}
+.globo{background:#e5484d;color:#fff;border-radius:9px;padding:0 6px;font-size:11px}
+main{padding:12px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+header{display:flex;align-items:center;gap:10px}
+header h1{font-size:19px;margin:0;margin-right:auto}
+input.buscar{width:340px;padding:7px 10px;border:1px solid var(--borde);border-radius:6px;font:inherit}
+.btn{padding:6px 11px;border:1px solid var(--borde);background:#fff;border-radius:6px;font:inherit;cursor:pointer;white-space:nowrap}
+.btn.prin{background:var(--azul);border-color:var(--azul);color:#fff;font-weight:600}
+.btn.peq{padding:3px 8px;font-size:12px}
+.avisos{display:flex;align-items:center;gap:14px;background:var(--ambar-cl);border:1px solid #f0d9a0;border-radius:6px;padding:6px 10px;color:#5c4200}
+.avisos b{color:var(--rojo)}.avisos .dcha{margin-left:auto;display:flex;gap:6px}
+.rejilla{display:grid;grid-template-columns:1fr 1fr 1fr 250px;gap:10px;align-items:start}
+.bloque{background:var(--caja);border:1px solid var(--borde);border-radius:8px;overflow:hidden}
+.bloque h2{font-size:13px;margin:0;padding:8px 10px;border-bottom:1px solid var(--borde);display:flex;align-items:center;gap:6px;background:#fafbfc}
+.bloque h2 .n{background:var(--azul-cl);color:var(--azul);border-radius:9px;padding:0 7px;font-size:12px}
+.bloque h2 .mas{margin-left:auto;font-weight:400;color:var(--azul);font-size:12px}
+.fila{padding:7px 10px;border-bottom:1px solid #eef0f3;display:flex;flex-direction:column;gap:3px}
+.fila:last-child{border-bottom:0}
+.l1{display:flex;align-items:center;gap:6px}
+.nom{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gris{color:var(--suave);font-size:12px}
+.chip{font-size:11px;border-radius:4px;padding:1px 6px;white-space:nowrap}
+.chip.tipo{background:#eef1f5;color:#3b4556}
+.chip.rojo{background:var(--rojo-cl);color:var(--rojo);font-weight:600}
+.chip.ambar{background:var(--ambar-cl);color:var(--ambar)}
+.chip.verde{background:var(--verde-cl);color:var(--verde)}
+.chip.correo{background:#efe8fb;color:#5b2fa6}
+.chip.pdf{background:#fde8e8;color:#9b1c1c}
+.acc{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.tablon .nota{margin:8px;padding:7px 9px;border-radius:6px;font-size:12px}
+.tablon textarea{width:calc(100% - 16px);margin:8px;height:52px;border:1px solid var(--borde);border-radius:6px;font:inherit;padding:6px}
+.am{background:#fff6c7}.az{background:#e3eefc}.ro{background:#fde2e2}
+.todos{background:var(--caja);border:1px solid var(--borde);border-radius:8px;overflow:hidden}
+.todos h2{font-size:13px;margin:0;padding:8px 10px;border-bottom:1px solid var(--borde);display:flex;align-items:center;gap:8px;background:#fafbfc}
+.todos h2 .dcha{margin-left:auto;display:flex;gap:6px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid #eef0f3;white-space:nowrap}
+th{font-size:11px;color:var(--suave);font-weight:600;text-transform:uppercase;letter-spacing:.02em}
+td.nombre{white-space:normal;font-weight:600}
+.plegados{display:flex;gap:10px}
+details{background:var(--caja);border:1px solid var(--borde);border-radius:8px;padding:7px 10px;flex:1}
+summary{cursor:pointer;font-weight:600}
+.nota-boceto{font-size:12px;color:var(--suave);border-top:1px dashed var(--borde);padding-top:8px}
+</style></head><body>
+<div class="app">
+<nav>
+  <div class="marca">Gestor de Asuntos</div>
+  <a class="activa" href="#">Inicio <span class="globo">3</span></a>
+  <a href="#">Nuevo asunto</a>
+  <a href="#">Archivo</a>
+  <a href="#">Personas y empresas</a>
+  <a href="#">Impresos</a>
+  <a href="#">Cuentas</a>
+  <div class="sep"></div>
+  <a href="#">Ajustes</a>
+  <div class="pie">Sesión de Francisco · versión 26-sep-2026<br>Salir</div>
+</nav>
+
+<main>
+<header>
+  <h1>Inicio</h1>
+  <input class="buscar" placeholder="Buscar en todos los asuntos abiertos: nombre, tipo o tercero">
+  <button class="btn prin">+ Nuevo asunto</button>
+</header>
+
+<div class="avisos">
+  <span><b>3 vencidos</b> · 5 vencen esta semana · 2 asuntos que se repiten toca crearlos · papelera: 12 cosas de más de 30 días</span>
+  <span class="dcha"><button class="btn peq">Ver</button><button class="btn peq">Ocultar por hoy</button></span>
+</div>
+
+<div class="rejilla">
+
+  <section class="bloque">
+    <h2>Ha llegado <span class="n">4</span><span class="mas">Ver todo</span></h2>
+    <div class="fila">
+      <div class="l1"><span class="chip pdf">PDF</span><span class="nom">escaneo_0926_0914.pdf</span></div>
+      <div class="gris">Leído: 26EM0412 · 25-sep · Ruiz Campos, Lucía (2º ESO B)</div>
+      <div class="acc"><button class="btn peq prin">Crear asunto con él</button><button class="btn peq">Guardar en un asunto</button></div>
+    </div>
+    <div class="fila">
+      <div class="l1"><span class="chip correo">Correo</span><span class="nom">Solicitud certificado de matrícula</span></div>
+      <div class="gris">de familia.moreno@… · hoy 08:41 · 1 documento</div>
+      <div class="gris">Leído: CERTIFICADO · Moreno Vega, Pablo (1º BACH A)</div>
+      <div class="acc"><button class="btn peq prin">Crear asunto con él</button><button class="btn peq">Guardar en un asunto</button><button class="btn peq">Leer</button></div>
+    </div>
+    <div class="fila">
+      <div class="l1"><span class="chip pdf">PDF</span><span class="nom">Oficio Delegación 1478.pdf</span></div>
+      <div class="gris">Podría ir en: <b>260911 BAJA … Delegación Málaga</b></div>
+      <div class="acc"><button class="btn peq prin">Guardar aquí</button><button class="btn peq">Crear asunto con él</button></div>
+    </div>
+    <div class="fila">
+      <div class="l1"><span class="chip correo">Correo</span><span class="nom">RE: Junta electoral</span></div>
+      <div class="gris">Respuesta de <b>260915 ELECCIONES CONSEJO ESCOLAR</b></div>
+      <div class="acc"><button class="btn peq prin">Guardar en ese asunto</button></div>
+    </div>
+  </section>
+
+  <section class="bloque">
+    <h2>Me toca <span class="n">6</span><span class="mas">Ver los 6</span></h2>
+    <div class="fila">
+      <div class="l1"><span class="chip rojo">Vencido hace 2 días</span><span class="chip tipo">TRASLADO</span></div>
+      <div class="nom">Hito 2 de 5 · Pedir el expediente al centro de origen</div>
+      <div class="gris">García Luna, Irene · lo encarga Secretaría</div>
+    </div>
+    <div class="fila">
+      <div class="l1"><span class="chip rojo">Vence hoy</span><span class="chip tipo">CONVIVENCIA</span></div>
+      <div class="nom">Hito 3 de 7 · Notificar la propuesta a la familia</div>
+      <div class="gris">🔒 Reservado · lo encarga Jefatura de Estudios</div>
+    </div>
+    <div class="fila">
+      <div class="l1"><span class="chip ambar">Vence el lunes</span><span class="chip tipo">CERTIFICADO</span></div>
+      <div class="nom">Hito 1 de 4 · Generar el certificado</div>
+      <div class="gris">Santos Ortega, Mario · lo pide su familia</div>
+    </div>
+    <div class="fila">
+      <div class="l1"><span class="chip ambar">Vence el miércoles</span><span class="chip tipo">FACTURA</span></div>
+      <div class="nom">Hito 2 de 3 · Visto bueno de Dirección</div>
+      <div class="gris">Suministros Ejemplo, S.L.</div>
+    </div>
+    <div class="fila">
+      <div class="l1"><span class="chip verde">Sin prisa · 15-oct</span><span class="chip tipo">BECA</span></div>
+      <div class="nom">Hito 1 de 6 · Comprobar la documentación</div>
+      <div class="gris">Navarro Gil, Alba</div>
+    </div>
+  </section>
+
+  <section class="bloque">
+    <h2>Esperamos a otros <span class="n">5</span><span class="mas">Ver los 5</span></h2>
+    <div class="fila">
+      <div class="l1"><span class="chip rojo">21 días</span><span class="chip tipo">MATRÍCULA</span></div>
+      <div class="nom">Esperando a la familia · falta el DNI del tutor</div>
+      <div class="gris">Pérez Rico, Hugo · desde el 5-sep</div>
+    </div>
+    <div class="fila">
+      <div class="l1"><span class="chip ambar">12 días</span><span class="chip tipo">TRASLADO</span></div>
+      <div class="nom">Esperando al IES de origen · historial académico</div>
+      <div class="gris">Castro Díaz, Nerea · desde el 14-sep</div>
+    </div>
+    <div class="fila">
+      <div class="l1"><span class="chip">4 días</span><span class="chip tipo">FACTURA</span></div>
+      <div class="nom">Esperando a Dirección · firma</div>
+      <div class="gris">Papelería Modelo, S.L. · desde el 22-sep</div>
+    </div>
+    <div class="fila">
+      <div class="l1"><span class="chip">2 días</span><span class="chip tipo">CERTIFICADO</span></div>
+      <div class="nom">Esperando a la familia · recoger en ventanilla</div>
+      <div class="gris">León Marín, Sara · desde el 24-sep</div>
+    </div>
+  </section>
+
+  <aside class="bloque tablon">
+    <h2>Tablón <span class="n">3</span></h2>
+    <textarea placeholder="Llamar a…, el director dice que…"></textarea>
+    <div class="nota am"><b>Para hoy</b> · Llamar a la madre de Hugo por el DNI<br><span class="gris">por Francisco, 08:30</span></div>
+    <div class="nota az">El director quiere el listado de becas antes del viernes<br><span class="gris">por el compañero, ayer</span></div>
+    <div class="nota ro">Revisar el correo de la Delegación sobre plazas<br><span class="gris">por el compañero, 24-sep</span></div>
+  </aside>
+
+</div>
+
+<section class="todos">
+  <h2>Todos los asuntos abiertos <span class="gris">(38)</span>
+    <span class="dcha"><button class="btn peq">Filtros</button><button class="btn peq">Ordenar: lo que antes vence</button></span></h2>
+  <table>
+    <tr><th>Asunto</th><th>Tipo</th><th>Hito actual</th><th>Le toca a</th><th>Plazo</th><th>Abierto</th></tr>
+    <tr><td class="nombre">260910 TRASLADO 26-27 García Luna, Irene 1234567</td><td>TRASLADO</td><td>Hito 2 de 5 · Pedir el expediente</td><td>Administración</td><td><span class="chip rojo">Vencido</span></td><td>10-sep</td></tr>
+    <tr><td class="nombre">260905 MATRÍCULA 26-27 Pérez Rico, Hugo 2345678</td><td>MATRÍCULA</td><td>Hito 3 de 4 · Reunir la documentación</td><td>Familia</td><td><span class="chip ambar">Esta semana</span></td><td>5-sep</td></tr>
+    <tr><td class="nombre">260922 FACTURA Papelería Modelo, S.L. B00000000</td><td>FACTURA</td><td>Hito 2 de 3 · Visto bueno de Dirección</td><td>Dirección</td><td>—</td><td>22-sep</td></tr>
+    <tr><td class="nombre">260924 CERTIFICADO 26-27 León Marín, Sara 3456789</td><td>CERTIFICADO</td><td>Hito 3 de 4 · Entregar</td><td>Familia</td><td>—</td><td>24-sep</td></tr>
+  </table>
+</section>
+
+<div class="plegados">
+  <details><summary>Dormidos (2) · sin novedades desde hace más de 60 días</summary></details>
+  <details><summary>Sin fecha (4) · hitos pendientes sin plazo</summary></details>
+</div>
+
+<div class="nota-boceto">Boceto con datos inventados. Pulsar un asunto o un hito abre su mesa de trabajo. «Ver todo» abre el bloque entero.</div>
+</main>
+</div>
+</body></html>

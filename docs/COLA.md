@@ -136,7 +136,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 | 168 | `docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md` (las opciones de cada documento en su fila: «+ Añadir documento» junto al título, ⧉ detrás del nombre para copiarlo sin extensión, «Poner nombre» siempre visible, ⋮ solo con «Pasar a versiones previas» y «Borrar»; las herramientas de PDF pasan a una barra encima del documento en el visor; fuera el botón «Documentos ▾» de la ficha) | HECHA (25-sep-2026). Las herramientas de PDF usan la barra de acciones que el visor ya tenía para «Por clasificar» |
 | 170 | `docs/PLANTILLAS-DEL-COMPANERO.md` (50 plantillas ya escritas —34 de documento y 16 de correo— sacadas de los documentos del compañero, las escribe `docs/plantillas-nuevas/generar.py` en `plantillas/`; texto propio para Séneca en los correos; quitar el saludo repetido de los correos de antes; tipos y campos nuevos en la biblioteca; la Consejería por defecto) | HECHA (25-sep-2026), según su documento corregido: sin tipos ni campos nuevos y sin tocar la Consejería. Las 64 plantillas encuentran su tipo |
 | 171 | `docs/DOCUMENTO-PARA-CADA-RELACIONADO.md` (en la mesa del hito, «… para cada relacionado»: un documento por relacionado y un correo a cada uno con el suyo; para los certificados de actividad extraescolar; después de la 170) | HECHA (25-sep-2026). Lo que falta de una persona va al resumen; lo del asunto se pregunta una vez. Nunca dos veces: `idEnvio` fijo y `ficha.enviosPorPersona` |
-| 172 | `docs/PAPELERA-BUSCADOR.md` (caja de búsqueda en Ajustes › Papelera: filtra mientras se escribe, por palabras sueltas sin tildes, en nombre, qué era, de dónde salía, quién y fecha; contador «N de M») | PENDIENTE |
+| 172 | `docs/PAPELERA-BUSCADOR.md` (caja de búsqueda en Ajustes › Papelera: filtra mientras se escribe, por palabras sueltas sin tildes, en nombre, qué era, de dónde salía, quién y fecha; contador «N de M») | HECHA (26-sep-2026). `pruebas/papelera-buscador.mjs` nueva; batería completa en verde |
 | 173 | `docs/NUEVO-ASUNTO-SIN-REPETIR.md` (tanda 1 de usabilidad, parte 1: `App.nuevoAsuntoCon` con tercero que espera al tipo; cambiar de tipo no borra el tercero; el tercero recién dado de alta queda elegido; una sola pregunta de vía, dentro de «Quién lo pide y por qué vía»; «Marcar como hecho» lleva al hito siguiente; guion completo pregunta si se da por hecho; «Guardar PDF» cierra el visor de Word) | PENDIENTE |
 | 174 | `docs/POR-CLASIFICAR-USA-LO-LEIDO.md` (tanda 1, parte 2: el cuadro de «Poner nombre» nace con la fecha y el registro leídos y se abre directo tras meter o crear; guardar lo cierra; un solo botón «Crear asunto con él» que usa lo leído; los adjuntos de correo pasan por el cuadro de nombre; «Registrar» deja el original «SIN SELLAR» en «Versiones previas»; después de la 173) | PENDIENTE |
 | 175 | `docs/PERSONAS-ARCHIVO-Y-MENU.md` (tanda 1, parte 3: la ficha de una persona enseña sus asuntos pulsables y «+ Nuevo asunto para esta persona»; el Archivo carga solo; el menú nace abierto en pantalla ancha; el buscador de Asuntos abiertos busca en todos los montones; cinco textos que despistan; el plazo de un paso sin «desde» ya no se pierde; después de la 173) | PENDIENTE |
@@ -336,3 +336,32 @@ Al apuntar la fila 159, la conversación volvió a subir `docs/COLA.md` roto (co
 el texto `__SEE_BELOW__`) y lo restauró en el commit siguiente, retipeado desde el blob `fdb042d`
 (commit `9da4f45`). La única diferencia buscada es la fila 159 y esta nota. Si algo no cuadra,
 compáralo con `git show 9da4f45:docs/COLA.md`.
+
+## Nota del 26-sep-2026: docs/HISTORIA.md pendiente (fila 172)
+
+Fila 172 (buscador en la papelera) hecha y publicada (ver la tabla de arriba); `docs/CONTEXTO-CORTO.md`
+y `docs/contexto/ASUNTOS-ARCHIVO.md` ya están al día. Esta sesión no tiene `git push` de verdad
+(regla 17): `docs/HISTORIA.md` pesa más de 220 KB y no se puede retipear con fiabilidad fichero a
+fichero. Queda aquí el texto ya escrito, listo para pegar al final de `docs/HISTORIA.md` por una
+sesión que sí tenga `git push`:
+
+> **26-sep-2026, fila 172: buscador en la papelera.** Ajustes › Papelera llevaba tiempo sin forma
+> de encontrar algo concreto en una lista que no se vacía sola. Caja de búsqueda
+> (`#buscar-papelera`) encima de la lista, filtra mientras se escribe, sin botón: palabras sueltas,
+> en cualquier orden y sin tildes ni mayúsculas (`U.normalizar`), igual que el buscador de asuntos
+> abiertos y del ARCHIVO — una ficha se queda si su texto (nombre, qué era, de dónde salía, quién y
+> la fecha) contiene TODAS. La fecha entra tres veces: como se ve en pantalla ("hace N días"),
+> como `AAMMDD` y como `dd/mm/aaaa`, para que "2609" o "26/09" encuentren lo borrado ese día.
+> Contador junto a la caja ("12 de 85"; solo el total sin nada escrito); sin coincidencias, "Nada en
+> la papelera con esas palabras." El aviso ámbar de más de 30 días y su botón de borrar todo de
+> golpe se dejaron actuando sobre la papelera ENTERA, nunca sobre lo filtrado (el propio botón lo
+> deja dicho cuando hay un filtro puesto): es a propósito, así lo pedía el encargo. Lo escrito se
+> conserva al repintarse la lista (tras devolver o borrar una línea, o si llega un cambio del
+> compañero) envolviendo todo `#bloque-papelera` en `U.conservandoLoEscrito`, aunque la propia caja
+> nunca se destruye al repintar (solo se limpia `#tabla-papelera` por dentro): se ha dejado puesto
+> de todos modos, tal y como pedía el documento, por si algún día el bloque entero se repinta desde
+> fuera. Todo en `js/papelera-ajustes.js`, sin tocar `_GESTOR/papelera.json`: el filtro es solo de
+> pantalla. Prueba nueva `pruebas/papelera-buscador.mjs` (manda tres notas del tablón a la
+> papelera, comprueba que "garcia matricula" deja solo la que toca con el contador en «1 de 3», y
+> que tras «Devolver a su sitio» la caja conserva lo escrito); falla sin el arreglo (no existe
+> `#cuenta-papelera`). Batería completa en verde.

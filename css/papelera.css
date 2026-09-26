@@ -26,3 +26,13 @@
   flex-wrap: wrap;
 }
 #aviso-papelera-vieja strong { display: inline; }
+
+/* Fila 172, docs/PAPELERA-BUSCADOR.md: la caja de búsqueda y su contador. */
+.papelera-buscador {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.papelera-buscador input { flex: 1; }
+.papelera-buscador .suave { white-space: nowrap; }
