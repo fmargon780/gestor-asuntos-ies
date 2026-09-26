@@ -112,13 +112,13 @@ comprobar('la segunda vez sí se copia lo que había', copiasTrasSegunda.length,
 const carpetaCopiasAsuntos = await gestor.getDirectoryHandle('copias');
 comprobar('la copia guarda el contenido de ANTES del cambio',
   JSON.parse(await Carpetas.leerTexto(carpetaCopiasAsuntos, copiasTrasSegunda[0].nombre)),
-  { asuntos: { uno: 1 } });
+  { asuntos: { uno: 1 }, _esquema: Copias.ESQUEMA });
 
 await Copias.guardar(gestor, 'asuntos.json', { asuntos: { uno: 1, dos: 2, tres: 3 } });
 comprobar('un segundo guardado el mismo día no hace una segunda copia',
   (await Copias.listar(gestor, 'asuntos.json')).length, 1);
 comprobar('pero el fichero sí lleva el contenido nuevo',
-  await Carpetas.leerJson(gestor, 'asuntos.json'), { asuntos: { uno: 1, dos: 2, tres: 3 } });
+  await Carpetas.leerJson(gestor, 'asuntos.json'), { asuntos: { uno: 1, dos: 2, tres: 3 }, _esquema: Copias.ESQUEMA });
 
 /* ---------- como mucho 30 copias ---------- */
 const copiasCarpeta = await gestor.getDirectoryHandle('copias');
@@ -168,6 +168,95 @@ comprobar('el fichero roto se aparta con fecha y hora, y no se pierde',
 
 comprobar('restaurar sin ninguna copia dice que no hay nada que hacer',
   await Copias.restaurar(gestor, 'frescura.json'), false);
+
+/* ============================================================
+   Fila 178 (docs/CORREO-VERSIONES-Y-LIMPIEZA.md): _esquema y la
+   copia del día verificada.
+   ============================================================ */
+
+console.log('--- _esquema (punto 3) ---');
+
+/* Un fichero sin _esquema todavía (de antes de esta fila) escribe
+   bien y se lo añade. */
+await Carpetas.guardarJson(gestor, 'usuarios.json', { nombres: ['Ana'] });
+await Copias.guardar(gestor, 'usuarios.json', { nombres: ['Ana', 'Luis'] });
+comprobar('sin _esquema previo, escribe y lo añade',
+  (await Carpetas.leerJson(gestor, 'usuarios.json'))._esquema, Copias.ESQUEMA);
+
+/* El primer guardado de un fichero nuevo también lo añade. */
+await Copias.guardar(gestor, 'grupos.json', { grupos: [{ id: 'g1' }] });
+comprobar('un fichero recién creado también lleva _esquema',
+  (await Carpetas.leerJson(gestor, 'grupos.json'))._esquema, Copias.ESQUEMA);
+
+/* Si en disco hay un _esquema MAYOR (el otro ordenador tiene una
+   versión más nueva), no se escribe: EsquemaMasNuevo, y lo que había
+   no se toca. */
+const conEsquemaFuturo = { grupos: [{ id: 'del-futuro' }], _esquema: Copias.ESQUEMA + 1 };
+await Carpetas.guardarJson(gestor, 'grupos.json', conEsquemaFuturo);
+let lanzoEsquemaMasNuevo = false;
+try { await Copias.guardar(gestor, 'grupos.json', { grupos: [{ id: 'g2' }] }); }
+catch (e) { lanzoEsquemaMasNuevo = (e.name === 'EsquemaMasNuevo'); }
+comprobar('un _esquema mayor en disco no se escribe: EsquemaMasNuevo', lanzoEsquemaMasNuevo, true);
+comprobar('lo que había (del "futuro") no se ha pisado',
+  await Carpetas.leerJson(gestor, 'grupos.json'), conEsquemaFuturo);
+
+/* Sobre un _esquema igual, escribe sin problema. */
+await Copias.guardar(gestor, 'tablon.json', { notas: [], _esquema: Copias.ESQUEMA });
+comprobar('con el mismo _esquema, escribe normal',
+  (await Carpetas.leerJson(gestor, 'tablon.json')).notas, []);
+
+/* tipos.json es una lista: _esquema no le cabe (JSON.stringify lo
+   ignoraría sin avisar), así que no se le añade. */
+await Copias.guardar(gestor, 'estados.json', ['PENDIENTE', 'RESUELTO', 'DE_NUEVO']);
+comprobar('una lista no lleva _esquema (no cabría)',
+  Array.isArray(await Carpetas.leerJson(gestor, 'estados.json')), true);
+
+/* guias.json tampoco: su primer nivel es un diccionario dinámico por
+   tipo (js/cargar-biblioteca.js y otros lo recorren con for...in
+   esperando que cada clave sea un tipo con su lista de pasos; una
+   clave más, _esquema, lo rompería igual que en una lista).
+   Se deja primero en buen estado: más arriba se dejó a propósito roto
+   para la prueba de FicheroRoto, y una copia fiel de ese roto tampoco
+   se podría releer como JSON (otro motivo más para no tocarlo aquí). */
+await Carpetas.escribirTexto(gestor, 'guias.json', '{}');
+await Copias.guardar(gestor, 'guias.json', { MATRICULA: [{ id: 'p1' }] });
+comprobar('guias.json tampoco lleva _esquema (diccionario dinámico por tipo)',
+  (await Carpetas.leerJson(gestor, 'guias.json'))._esquema, undefined);
+
+console.log('--- copia del día verificada (punto 5) ---');
+
+/* Se prepara un fichero con copia todavía sin hacer hoy. */
+await Copias.guardar(gestor, 'campos.json', { propios: [], porTipo: {} });
+
+/* Se intercepta la copia del día para que, tras escribirla, no se
+   pueda releer como JSON (simulando una escritura que llega mal al
+   disco): la escritura de verdad ocurre (el fichero "existe"), pero
+   su contenido queda corrupto justo después. */
+const nombreCopiaHoy = 'campos-' + aammddHaceNDias(0) + '.json';
+const getFileDeVerdadCopias = copiasCarpeta.getFileHandle.bind(copiasCarpeta);
+copiasCarpeta.getFileHandle = async function (n, o) {
+  const h = await getFileDeVerdadCopias(n, o);
+  if (n === nombreCopiaHoy && !h.__interceptado) {
+    h.__interceptado = true;
+    const createWritableDeVerdad = h.createWritable.bind(h);
+    h.createWritable = async function () {
+      const w = await createWritableDeVerdad();
+      return {
+        async write(cosa) { await w.write(cosa); h._texto = 'ESTO NO ES JSON, A PROPÓSITO'; },
+        async close() { await w.close(); }
+      };
+    };
+  }
+  return h;
+};
+
+let lanzoCopiaNoVerificada = false;
+try { await Copias.guardar(gestor, 'campos.json', { propios: ['algo'], porTipo: {} }); }
+catch (e) { lanzoCopiaNoVerificada = (e.name === 'CopiaNoVerificada'); }
+comprobar('la copia que no se puede releer no deja escribir el original: CopiaNoVerificada',
+  lanzoCopiaNoVerificada, true);
+comprobar('el original no se ha tocado',
+  (await Carpetas.leerJson(gestor, 'campos.json')).propios, []);
 
 console.log(fallos ? '\n' + fallos + ' PRUEBAS FALLAN' : '\nTodas las pruebas pasan.');
 process.exit(fallos ? 1 : 0);

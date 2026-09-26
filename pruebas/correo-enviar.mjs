@@ -161,5 +161,68 @@ console.log('--- 4. /dev y falta de ?k= ---');
     await ejecutar(c.ctx, 'window.CorreoEnviar.problemaDeDireccion("https://script.google.com/macros/s/X/exec?k=abc")'), '');
 }
 
+/* ============================================================
+   5. (fila 178) la app compara la versión del script con
+      SCRIPT_ESPERADO, tras cada respuesta real (también «Probar»)
+   ============================================================ */
+console.log('--- 5. versión del script (fila 178) ---');
+{
+  const c = nuevoContexto();
+  comprobar('5. sin ninguna respuesta vista todavía, no se sabe: no se avisa',
+    await ejecutar(c.ctx, 'window.CorreoEnviar.scriptDesactualizado()'), false);
+
+  await ejecutar(c.ctx, 'window.CorreoEnviar.guardarUrl("https://script.google.com/macros/s/X/exec?k=abc")');
+
+  /* Con la misma versión que espera la app: no hay que avisar. */
+  c.responder({ status: 200, cuerpo: { ok: true, version: await ejecutar(c.ctx, 'window.CorreoEnviar.SCRIPT_ESPERADO') } });
+  await ejecutar(c.ctx, 'window.CorreoEnviar.probar()');
+  comprobar('5. con la misma versión, no está desactualizado',
+    await ejecutar(c.ctx, 'window.CorreoEnviar.scriptDesactualizado()'), false);
+
+  /* Con una versión de una fila anterior: sí hay que avisar. */
+  c.responder({ status: 200, cuerpo: { ok: true, version: '24-sep-2026 · fila 130' } });
+  await ejecutar(c.ctx, 'window.CorreoEnviar.probar()');
+  comprobar('5. con una versión más vieja, está desactualizado',
+    await ejecutar(c.ctx, 'window.CorreoEnviar.scriptDesactualizado()'), true);
+
+  /* Con una versión de una fila posterior (script más nuevo que la
+     app): tampoco se avisa. */
+  c.responder({ status: 200, cuerpo: { ok: true, version: '01-ene-2027 · fila 999' } });
+  await ejecutar(c.ctx, 'window.CorreoEnviar.probar()');
+  comprobar('5. con una versión más nueva, no está desactualizado',
+    await ejecutar(c.ctx, 'window.CorreoEnviar.scriptDesactualizado()'), false);
+
+  /* Una respuesta SIN "version" (script de antes de la fila 130):
+     tan vieja como se pueda estar. */
+  c.responder({ status: 200, cuerpo: { ok: true } });
+  await ejecutar(c.ctx, 'window.CorreoEnviar.probar()');
+  comprobar('5. una respuesta sin "version" cuenta como muy vieja',
+    await ejecutar(c.ctx, 'window.CorreoEnviar.scriptDesactualizado()'), true);
+
+  /* Un "ok:false" de antes de intentar enviar (clave incorrecta, sin
+     "version") no dice nada de la versión: no debe tocar lo que ya se
+     sabía. Se dejó "desactualizado" arriba; sigue igual. */
+  c.responder({ status: 200, cuerpo: { ok: false, motivo: 'La clave no es correcta.' } });
+  await ejecutar(c.ctx, 'window.CorreoEnviar.probar()');
+  comprobar('5. un "ok:false" sin "version" no cambia lo que ya se sabía',
+    await ejecutar(c.ctx, 'window.CorreoEnviar.scriptDesactualizado()'), true);
+
+  /* Y ahora una versión buena: dejar de avisar. */
+  c.responder({ status: 200, cuerpo: { ok: true, version: await ejecutar(c.ctx, 'window.CorreoEnviar.SCRIPT_ESPERADO') } });
+  await ejecutar(c.ctx, 'window.CorreoEnviar.enviar({ para: "ana@correo.es" })');
+  comprobar('5. y una llamada a "enviar" (no solo "probar") también actualiza lo que se sabe',
+    await ejecutar(c.ctx, 'window.CorreoEnviar.scriptDesactualizado()'), false);
+}
+
+console.log('--- 6. SCRIPT_ESPERADO coincide con VERSION_SCRIPT del script ---');
+{
+  const fuenteScript = fs.readFileSync(new URL('../apps-script/gestor-correos.gs', import.meta.url), 'utf8');
+  const version = (fuenteScript.match(/var VERSION_SCRIPT = '([^']*)'/) || [])[1];
+  const c = nuevoContexto();
+  comprobarQue('6. las dos versiones son la misma cadena', !!version &&
+    version === await ejecutar(c.ctx, 'window.CorreoEnviar.SCRIPT_ESPERADO'),
+    version + ' vs ' + await ejecutar(c.ctx, 'window.CorreoEnviar.SCRIPT_ESPERADO'));
+}
+
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 process.exit(fallos ? 1 : 0);
