@@ -1,21 +1,21 @@
 /* ============================================================
-   hito-mesa-recetas.js — las recetas de los pasos del guion, arriba de
+   hito-mesa-recetas.js — las recetas de las tareas del guion, arriba de
    los menús de la cabecera del hito (25-sep-2026, fila 164,
    docs/HITOS-ACCIONES-EN-EL-HITO.md, punto 3).
 
-   Un paso del guion con acción (comunicar, generar, registrar) es un
-   paso con receta; `receta` (js/guias-guion.js) dice los detalles, si
+   Una tarea del guion con acción (comunicar, generar, registrar) es una
+   tarea con receta; `receta` (js/guias-guion.js) dice los detalles, si
    los hay. Aquí:
 
-     - «Comunicar ▾»: arriba, los pasos pendientes con receta de
-       comunicar, con su texto. Al elegir uno, el cuadro de Correo o de
+     - «Comunicar ▾»: arriba, las tareas pendientes con receta de
+       comunicar, con su texto. Al elegir una, el cuadro de Correo o de
        Séneca se abre ya con los destinatarios (a quién) y la plantilla
-       de la receta, y al terminar se marca ESE paso (`idPasoGuion`,
+       de la receta, y al terminar se marca ESA tarea (`idPasoGuion`,
        js/correo-rastro.js).
-     - «Generar documento ▾»: arriba, los pasos pendientes con receta
-       de generar. Con plantilla fija, la genera y marca ese paso; sin
+     - «Generar documento ▾»: arriba, las tareas pendientes con receta
+       de generar. Con plantilla fija, la genera y marca esa tarea; sin
        ella, abre el cuadro de elegir de siempre.
-     - «Registrar»: los pasos pendientes con receta de registrar salen
+     - «Registrar»: las tareas pendientes con receta de registrar salen
        como título del menú de documentos (js/hito-mesa.js).
 
    Debajo de cada bloque sigue lo de siempre (comunicar o generar
@@ -24,9 +24,9 @@
    ============================================================ */
 var HitoMesaRecetas = (function () {
 
-  var ETIQUETA = { comunicar: 'Pasos pendientes de comunicar', generar: 'Pasos pendientes de generar' };
+  var ETIQUETA = { comunicar: 'Tareas pendientes de comunicar', generar: 'Tareas pendientes de generar' };
 
-  /* Los pasos pendientes (ni hechos ni «No aplica») con esa acción, en
+  /* Las tareas pendientes (ni hechas ni «No aplica») con esa acción, en
      el orden en que se ven. */
   function pendientes(a, h, accion) {
     if (!h || !window.Hitos || !Hitos.guionDe) return [];

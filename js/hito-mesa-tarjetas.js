@@ -2,11 +2,11 @@
    hito-mesa-tarjetas.js — las tarjetas pequeñas de la mesa del hito
    (25-sep-2026, fila 147, docs/MESA-TARJETAS-QUE-SE-ABREN.md).
 
-   La mesa tiene tres tarjetas: «Qué hay que hacer» (el guion),
+   La mesa tiene tres tarjetas: «Tareas del hito» (el guion),
    «Documentos del hito» y «Notas e historia». Una está en grande a la
    izquierda; las otras dos salen a la derecha como resumen, sin botones
    dentro. Pulsar una (o Intro/espacio con el foco) la abre en grande
-   (`HitoMesa.abrirTarjeta`), y «← Volver al guion» vuelve.
+   (`HitoMesa.abrirTarjeta`), y «← Volver a las tareas» vuelve.
 
    Aquí solo se rellenan los tres resúmenes y se enganchan los gestos;
    las tres tarjetas grandes las pinta js/hitos-panel-lista.js
@@ -19,8 +19,8 @@ var HitoMesaTarjetas = (function () {
 
   var MAX_DOCS = 5;
 
-  /* «Qué hay que hacer» · «N de M»: ✓ los hechos, ☐ los pendientes y el
-     siguiente en negrita con «→». Los «No aplica», fuera. */
+  /* «Tareas del hito» · «N de M»: ✓ las hechas, ☐ las pendientes y la
+     siguiente en negrita con «→». Las «No aplica», fuera. */
   function resumenGuion(a, h) {
     if (h.clase === 'decision') {
       var opt = (h.opciones || []).filter(function (o) { return o.id === h.elegida; })[0];
@@ -39,7 +39,7 @@ var HitoMesaTarjetas = (function () {
         var marca = g.hecho ? '✓' : (es ? '→' : '☐');
         return '<div class="mesa-resumen-linea ' + clase + '" title="' + U.escapar(g.texto || '') + '"><span class="mesa-resumen-marca">' +
           marca + '</span> ' + U.escapar(g.texto || '') + '</div>';
-      }).join('') : '<div class="mesa-resumen-vacio">Sin guion todavía.</div>'
+      }).join('') : '<div class="mesa-resumen-vacio">Sin tareas todavía.</div>'
     };
   }
 
