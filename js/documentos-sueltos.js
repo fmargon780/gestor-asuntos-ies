@@ -133,14 +133,14 @@ App.tarjetaSuelto = function (s, pie, esNuevo) {
      lo lleva allí sin crear nada. */
   var meter = document.createElement('button');
   meter.className = 'boton';
-  meter.textContent = 'Meter en un asunto';
+  meter.textContent = 'Guardar en un asunto';
   meter.title = 'Lo lleva a la carpeta de un asunto que ya existe';
   /* Apagado mientras dura todo (fila 100: se podía pulsar dos veces). */
   meter.onclick = async function () {
     if (meter.disabled) return;
     meter.disabled = true;
     try { await App.meterSueltoEnAsunto(s); }
-    catch (e) { U.fallo('No he podido meterlo en el asunto', e); }
+    catch (e) { U.fallo('No he podido guardarlo en el asunto', e); }
     finally { meter.disabled = false; }
   };
   acciones.appendChild(meter);
@@ -218,7 +218,7 @@ App.palabrasDelSuelto = function (nombre) {
    para este fichero (la pantalla de "Por clasificar" lo lee siempre
    que puede), se suma a la puntuación de siempre, sin quitar nada:
    +50 si el tercero leído es el del asunto, +10 si el tipo leído es
-   el del asunto. Así, en "Meter en un asunto", los asuntos del
+   el del asunto. Así, en "Guardar en un asunto", los asuntos del
    tercero leído salen arriba en "Podrían encajar". Sin lector
    cargado, o sin resultado todavía (o sin nada que proponer), la
    puntuación es la de siempre. */
@@ -248,7 +248,7 @@ App.meterSueltoEnAsunto = async function (s) {
   try { sugeridos = App.parecidoDelSuelto(s.nombre); } catch (e) { sugeridos = []; }
 
   var elegido = await E.elegir({
-    titulo: 'Meter el documento en un asunto',
+    titulo: 'Guardar el documento en un asunto',
     cabecera: '<p class="explica">' + U.escapar(s.nombre) +
               '<br><span class="suave">Se llevará a la carpeta del asunto que elijas, ' +
               'y después se abrirá el cuadro de ponerle nombre.</span></p>',
@@ -261,9 +261,9 @@ App.meterSueltoEnAsunto = async function (s) {
 /* El traslado propiamente dicho, una vez que ya se sabe a qué asunto
    ({nombre, ficha}): si está archivado, pregunta si reabrir antes de
    meterlo (App.llevarSueltoA, más abajo). Es lo que hace
-   App.meterSueltoEnAsunto tras "Meter en un asunto", pero se saca
+   App.meterSueltoEnAsunto tras "Guardar en un asunto", pero se saca
    aparte (21-sep-2026, fila 88, docs/POR-CLASIFICAR-ASUNTO-
-   EXISTENTE.md) porque "Meter aquí", el botón de la sugerencia que
+   EXISTENTE.md) porque "Guardar aquí", el botón de la sugerencia que
    pinta js/documentos-sueltos-sugerencias.js, ya sabe a qué asunto va
    sin pasar por el cuadro de elegir: necesita el mismo camino, sin
    repetirlo. */
@@ -282,8 +282,8 @@ App.meterSueltoEnAsuntoElegido = async function (s, elegido, opciones) {
   var que = await E.preguntarSiReabrir(elegido, {
     explica: '<p>Si el documento es de una gestión que vuelve a moverse, lo normal es ' +
              'reabrir el asunto. Si solo es papeleo que llega tarde, no hace falta.</p>',
-    reabrir: 'Reabrir y meterlo aquí',
-    sinReabrir: 'Meterlo sin reabrir'
+    reabrir: 'Reabrir y guardarlo aquí',
+    sinReabrir: 'Guardarlo sin reabrir'
   });
   if (que === 'reabrir') {
     var ficha = elegido.ficha || {};
@@ -331,7 +331,7 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
       '<p>El documento quedaría en una ruta de ' + ruta.length + ' caracteres:</p>' +
       '<p class="nota">' + U.escapar(ruta) + '</p>' +
       '<p>Las rutas muy largas dan problemas en un Dropbox sincronizado.</p>',
-      'Meterlo igual');
+      'Guardarlo igual');
     if (!seguir) return;
   }
 
@@ -371,7 +371,7 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
         if (Hitos.marcarGuionPorAccion) await Hitos.marcarGuionPorAccion(nombreAsunto, hito.id, 'anadir');   /* fila 109 */
       }
     } catch (e3) {
-      U.accesorio('Documento metido, pero no he podido apuntarlo al hito', e3);
+      U.accesorio('Documento guardado, pero no he podido apuntarlo al hito', e3);
     }
     if (window.HitosPanel) HitosPanel.desplegarAlAbrir(nombreAsunto, hito.id);
   }
@@ -387,11 +387,11 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
       leido: Nombres.leer(nombreAsunto, App.E.tipos)
     }, Object.assign({}, opciones, { ponerNombre: s.nombre, propuesta: propuesta }));
   } catch (e2) {
-    U.accesorio('Documento metido, pero no he podido abrir el cuadro para ponerle nombre', e2);
+    U.accesorio('Documento guardado, pero no he podido abrir el cuadro para ponerle nombre', e2);
   }
   /* Se queda en Por clasificar (fila 119). */
-  if (window.Navegacion) Navegacion.avisoConIr('Documento metido en ' + nombreAsunto + '.', 'bueno', nombreAsunto);
-  else U.aviso('Documento metido en ' + nombreAsunto + '.', 'bueno');
+  if (window.Navegacion) Navegacion.avisoConIr('Documento guardado en ' + nombreAsunto + '.', 'bueno', nombreAsunto);
+  else U.aviso('Documento guardado en ' + nombreAsunto + '.', 'bueno');
   /* El hito sigue desplegado al volver a la ficha. */
   if (hito && window.HitosPanel) {
     HitosPanel.desplegarAlAbrir(nombreAsunto, hito.id);
@@ -450,7 +450,7 @@ App.pintarPendiente = function () {
   if (!App.E.pendiente) { caja.classList.add('oculto'); caja.innerHTML = ''; return; }
   caja.classList.remove('oculto');
   caja.innerHTML = '<strong>Este asunto se crea con un documento.</strong>' +
-    '<p>' + U.escapar(App.E.pendiente.nombre) + ' se meterá dentro de la carpeta nueva. ' +
+    '<p>' + U.escapar(App.E.pendiente.nombre) + ' se guardará dentro de la carpeta nueva. ' +
     'Después se abrirá el cuadro para ponerle el nombre.</p>';
   var b = document.createElement('button');
   b.className = 'boton';
