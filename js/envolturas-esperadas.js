@@ -35,6 +35,7 @@
     { fichero: 'copiar.js', nombre: 'App.buscarTercero' },
     { fichero: 'copiar.js', nombre: 'App.verFicha' },
     { fichero: 'correo.js', nombre: 'App.abrirFicha' },
+    { fichero: 'correo-enviar.js', nombre: 'CorreoNucleo.abrirCuadro' },
     { fichero: 'dni.js', nombre: 'Datos.cargar' },
     { fichero: 'dni.js', nombre: 'App.pieAlumno' },
     { fichero: 'dni.js', nombre: 'Datos.destacadosAlumno' },

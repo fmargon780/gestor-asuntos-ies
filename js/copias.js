@@ -17,6 +17,26 @@
    de "el fichero existe pero no se puede interpretar" (algo grave: se
    ha estropeado). Carpetas.leerJson ya distingue las dos cosas, y aquí
    se usa esa distinción para no dejar entrar si algo está roto.
+
+   26-sep-2026, fila 178, docs/CORREO-VERSIONES-Y-LIMPIEZA.md, puntos 3
+   y 5:
+
+   - Número de esquema. Cada fichero de FICHEROS cuyo contenido sea un
+     objeto (no una lista: `tipos.json`, `tipos-documento.json` y
+     `recurrentes.json` son listas y no pueden llevar una clave de más,
+     JSON.stringify se la comería sin avisar) lleva `_esquema: ESQUEMA`
+     en su primer nivel. Antes de escribir, se relee el fichero: si en
+     disco hay un `_esquema` MAYOR que el de esta app, no se escribe
+     (`EsquemaMasNuevo`): otro ordenador tiene una versión más nueva, y
+     escribir aquí encima sería volver al formato viejo sobre datos ya
+     migrados. Un fichero sin `_esquema` es válido (es de antes de esta
+     fila): se le añade sin más.
+   - Copia verificada. Tras escribir la copia del día (solo la primera
+     de cada fichero: las demás no hacen copia), se relee y se le hace
+     JSON.parse; si falla, se reintenta una vez; si sigue sin poder
+     leerse, NO se escribe el original (`CopiaNoVerificada`): mejor
+     dejar el fichero real como estaba que fiarse de una red de
+     seguridad que no se sabe si funciona.
    ============================================================ */
 var Copias = (function () {
 
@@ -73,6 +93,10 @@ var Copias = (function () {
                    'usuarios.json', 'borrados-listas.json', 'hitos-biblioteca.json', 'cargos.json',
                    'formularios-campos.json'];
 
+  /* Fila 178: el número de esquema de hoy. Cada migración futura que
+     cambie el formato de alguno de estos ficheros lo sube. */
+  var ESQUEMA = 1;
+
   function dosDigitos(n) { return String(n).padStart(2, '0'); }
 
   function hoyAaMmDd() {
@@ -119,9 +143,24 @@ var Copias = (function () {
     }
   }
 
+  /* Fila 178: la copia recién escrita, ¿se puede releer como JSON de
+     verdad? false también si ha desaparecido entre medias. */
+  async function copiaLegible(carpeta, nombreCopia) {
+    var releido;
+    try { releido = await Carpetas.leerTexto(carpeta, nombreCopia); } catch (e) { return false; }
+    if (releido === null) return false;
+    try { JSON.parse(releido); return true; } catch (e) { return false; }
+  }
+
   /* Antes de escribir 'nombre' dentro de 'gestor', guarda una copia del
      contenido de ANTES de tocarlo, una vez por día. Si el fichero
-     todavía no existía, no hay nada que copiar. */
+     todavía no existía, no hay nada que copiar.
+
+     Fila 178: tras escribirla, se relee y se comprueba que es JSON de
+     verdad; si no, se reintenta una vez; si sigue sin poder leerse, se
+     lanza CopiaNoVerificada y NO se marca como hecha (así el próximo
+     guardado la vuelve a intentar), para que quien llama no llegue a
+     escribir el original sobre una red de seguridad que no vale. */
   async function copiarSiHaceFalta(gestor, nombre) {
     var carpeta = await carpetaCopias(gestor);
     var base = nombreSinExtension(nombre);
@@ -136,18 +175,77 @@ var Copias = (function () {
     var actual = await Carpetas.leerTexto(gestor, nombre);
     if (actual === null) return;
     await Carpetas.escribirTexto(carpeta, nombreCopia, actual);
+    var verificada = await copiaLegible(carpeta, nombreCopia);
+    if (!verificada) {
+      await Carpetas.escribirTexto(carpeta, nombreCopia, actual);
+      verificada = await copiaLegible(carpeta, nombreCopia);
+    }
+    if (!verificada) {
+      var error = new Error('No he podido guardar: la copia de seguridad no se ha escrito bien. ' +
+        'Vuelve a intentarlo.');
+      error.name = 'CopiaNoVerificada';
+      throw error;
+    }
     copiasHechas[nombreCopia] = true;
     await podar(carpeta, base);
   }
   var copiasHechas = {};
 
+  /* `guias.json` no lleva `_esquema`: a diferencia de los demás, su
+     primer nivel no es un puñado de claves fijas, sino un diccionario
+     dinámico (una entrada por cada TIPO de asunto que tenga guía), y
+     varios sitios lo recorren entero con `for...in`/`Object.keys`
+     esperando que cada clave sea un tipo con su lista de pasos
+     (js/cargar-biblioteca.js, js/hitos-administracion.js,
+     js/hitos-biblioteca.js, js/reunir-migracion.js,
+     js/tipos-nombre.js): una clave más, `_esquema`, rompería esos
+     recorridos exactamente igual que le pasaría a una lista. */
+  var SIN_ESQUEMA = ['guias.json'];
+
+  /* Fila 178, punto 3: antes de escribir uno de los FICHEROS cuyo
+     contenido sea un objeto de forma fija (nunca una lista, ahí
+     `_esquema` no cabe y JSON.stringify la ignora sin avisar; ni
+     `guias.json`, ver arriba), se relee del disco. Si trae un
+     `_esquema` mayor que el de esta app, no se escribe: se lanza
+     EsquemaMasNuevo. Si no, se deja (o se añade) `_esquema: ESQUEMA`
+     en el propio objeto que se va a guardar. */
+  async function comprobarEsquemaAntesDeEscribir(gestor, nombre, objeto) {
+    if (FICHEROS.indexOf(nombre) === -1 || SIN_ESQUEMA.indexOf(nombre) !== -1) return;
+    if (!objeto || typeof objeto !== 'object' || Array.isArray(objeto)) return;
+    /* Con Carpetas.leerTexto (+ JSON.parse aquí mismo), no con
+       Carpetas.leerJson: así esta comprobación no suma una relectura
+       más a las que ya cuentan pruebas/repintar-solo-lo-que-cambia.mjs
+       ('leerTexto:<fichero>' ya estaba permitido, por la copia del día
+       de copiarSiHaceFalta; un fichero roto no para aquí, ya lo trata
+       Copias.comprobarTodos). */
+    var actual = null;
+    try {
+      var textoActual = await Carpetas.leerTexto(gestor, nombre);
+      actual = textoActual === null ? null : JSON.parse(textoActual);
+    } catch (e) { actual = null; }
+    var esquemaEnDisco = (actual && typeof actual === 'object' && !Array.isArray(actual)) ? actual._esquema : undefined;
+    if (typeof esquemaEnDisco === 'number' && esquemaEnDisco > ESQUEMA) {
+      var error = new Error('En el otro ordenador hay una versión más nueva de la aplicación. ' +
+        'Recarga la página para ponerte al día.');
+      error.name = 'EsquemaMasNuevo';
+      throw error;
+    }
+    /* Nunca hacia abajo: una fusión (js/conflictos.js) puede haber
+       dejado ya un `_esquema` mayor que el de esta app (el del otro
+       lado del conflicto); esto solo sube el que hubiera hasta
+       ESQUEMA como mínimo, sin bajarlo nunca. */
+    objeto._esquema = Math.max(ESQUEMA, Number(objeto._esquema) || 0);
+  }
+
   /* Lo que hay que llamar en vez de Carpetas.guardarJson para los
-     ficheros compartidos: guarda la copia del día y después escribe. */
+     ficheros compartidos: guarda la copia del día (verificada) y
+     comprueba el esquema antes de escribir. */
   function guardar(gestor, nombre, objeto) {
     /* Cuenta como guardado en marcha (fila 99): las tareas de fondo
        esperan a la siguiente pasada. */
     var hacer = async function () {
       await copiarSiHaceFalta(gestor, nombre);
+      await comprobarEsquemaAntesDeEscribir(gestor, nombre, objeto);
       await Carpetas.guardarJson(gestor, nombre, objeto);
     };
     return window.ColaGuardado ? window.ColaGuardado.ocupado(hacer) : hacer();
@@ -213,6 +311,7 @@ var Copias = (function () {
 
   return {
     FICHEROS: FICHEROS,
+    ESQUEMA: ESQUEMA,
     guardar: guardar,
     comprobarTodos: comprobarTodos,
     restaurar: restaurar,

@@ -25,10 +25,79 @@
 
    Va después de js/bandeja-correos.js en index.html (mismo bloque de
    Ajustes → Mantenimiento) y antes de js/correo-cuadro.js (que lo usa).
+
+   26-sep-2026, fila 178, docs/CORREO-VERSIONES-Y-LIMPIEZA.md: el script
+   ya devolvía `version` en cada respuesta (fila 130) pero la aplicación
+   no la leía nunca, así que un script viejo con esta app nueva fallaba
+   en silencio (por ejemplo, reenviaba un correo porque no conocía
+   `idEnvio`). Ahora, tras cada respuesta (también la de «Probar»), se
+   compara con `SCRIPT_ESPERADO`: si el script es más viejo, aviso ámbar
+   persistente en Ajustes → Enviar correo y, al abrir el cuadro de
+   Correo, una línea ámbar (enganchada por `CorreoNucleo.abrirCuadro`,
+   sin tocar js/correo.js ni js/correo-cuadro.js). Si es más nuevo, o no
+   se sabe todavía, no se avisa de nada. El envío nunca se bloquea por
+   esto.
    ============================================================ */
 window.CorreoEnviar = (function () {
 
   var CLAVE_LOCAL = 'gestor-envio-correo';
+
+  /* La versión de este mismo cambio (ha de coincidir con VERSION_SCRIPT
+     de apps-script/gestor-correos.gs). */
+  var SCRIPT_ESPERADO = '26-sep-2026 · fila 178';
+  var CLAVE_VERSION_CONOCIDA = 'gestor-envio-script-version';
+
+  /* El número de fila de una versión ('24-sep-2026 · fila 130' -> 130):
+     desde que existe VERSION_SCRIPT (fila 130) siempre lo lleva, y como
+     las filas solo crecen, comparar por ese número basta para saber
+     cuál es más nueva sin tener que entender la fecha. null si el texto
+     no trae ninguna. */
+  function numeroDeFila(version) {
+    var m = String(version || '').match(/fila\s+(\d+)/);
+    return m ? parseInt(m[1], 10) : null;
+  }
+
+  /* La última versión de script que se ha visto de verdad en una
+     respuesta (localStorage: para que el aviso de Ajustes no dependa
+     de volver a pulsar «Probar» tras recargar la página). Cadena vacía
+     y distinta de null: "se ha visto una respuesta sin campo version",
+     que es un script más viejo todavía que cuando se añadió ese campo. */
+  function leerVersionConocida() {
+    try {
+      var v = window.localStorage.getItem(CLAVE_VERSION_CONOCIDA);
+      return v === null ? null : v;
+    } catch (e) { return null; }
+  }
+
+  function guardarVersionConocida(version) {
+    try { window.localStorage.setItem(CLAVE_VERSION_CONOCIDA, String(version || '')); } catch (e) { /* sin memoria: nada */ }
+  }
+
+  /* Solo se llama cuando de verdad ha llegado una respuesta del script
+     (JSON válido de una llamada que Google ha contestado), nunca ante
+     un fallo de red o de dirección: eso no dice nada de qué versión
+     tiene el script. */
+  function registrarVersionScript(version) {
+    guardarVersionConocida(version || '');
+  }
+
+  /* ¿Sabemos que el script es más viejo que esta app? Sin ninguna
+     respuesta vista todavía, no se sabe: no se avisa de nada. */
+  function scriptDesactualizado() {
+    var conocida = leerVersionConocida();
+    if (conocida === null) return false;
+    var filaConocida = numeroDeFila(conocida);
+    var filaEsperada = numeroDeFila(SCRIPT_ESPERADO);
+    if (filaEsperada === null) return false;
+    if (filaConocida === null) return true;   /* respuesta sin "version": anterior a la fila 130 */
+    return filaConocida < filaEsperada;
+  }
+
+  function textoAvisoVersion() {
+    return 'El script de Gmail es más antiguo que la app (tienes ' +
+      (leerVersionConocida() || 'una versión anterior a la fila 130') + '; hace falta ' + SCRIPT_ESPERADO +
+      '). Vuelve a pegarlo: docs/ENVIO-CUENTA-DEL-SCRIPT.md';
+  }
 
   function leerUrl() {
     try { return (window.localStorage.getItem(CLAVE_LOCAL) || '').trim(); } catch (e) { return ''; }
@@ -102,6 +171,15 @@ window.CorreoEnviar = (function () {
       return { ok: false, motivo: (datos && datos.motivo) || ('Google ha respondido con un error (' + respuesta.status + ').') };
     }
     if (!datos) return { ok: false, motivo: 'La respuesta no se ha entendido.' };
+    /* Aquí sí ha contestado el script de verdad (JSON válido, con
+       respuesta.ok). Cuando el envío ha llegado a intentarse
+       (`ok: true`, o `version` presente) se sabe algo real de la
+       versión, la traiga o no: un `ok:false` de antes de intentarlo
+       (clave equivocada, por ejemplo) no dice nada de la versión, y no
+       se toca lo que ya se supiera. */
+    if (datos.ok === true || Object.prototype.hasOwnProperty.call(datos, 'version')) {
+      registrarVersionScript(datos.version);
+    }
     return datos;
   }
 
@@ -162,6 +240,7 @@ window.CorreoEnviar = (function () {
           '<button type="button" class="boton" id="envio-correo-probar">Probar</button>' +
         '</div>' +
         '<div id="envio-correo-aviso"></div>' +
+        '<div id="envio-correo-version-aviso"></div>' +
       '</div>';
     pantalla.appendChild(d);
     return d;
@@ -174,9 +253,22 @@ window.CorreoEnviar = (function () {
     if (campo && document.activeElement !== campo) campo.value = leerUrl();
   }
 
+  /* El aviso ámbar de versión, persistente mientras el script conocido
+     siga siendo más viejo que la app (no depende de pulsar «Probar»
+     otra vez: se repinta cada vez que se repinta este bloque, con
+     window.Gestor.alRefrescar). */
+  function pintarAvisoVersion() {
+    var caja = document.getElementById('envio-correo-version-aviso');
+    if (!caja) return;
+    caja.innerHTML = scriptDesactualizado()
+      ? '<p class="aviso aviso-ambar">' + U.escapar(textoAvisoVersion()) + '</p>'
+      : '';
+  }
+
   function pintarBloqueAjustes() {
     if (!bloqueDeAjustes()) return;
     pintarResumenBloque();
+    pintarAvisoVersion();
     var guardar = document.getElementById('envio-correo-guardar');
     var probarBtn = document.getElementById('envio-correo-probar');
     var aviso = document.getElementById('envio-correo-aviso');
@@ -207,13 +299,53 @@ window.CorreoEnviar = (function () {
       await U.mientrasGuarda(probarBtn, async function () {
         var r = await probar();
         if (r && r.ok) {
-          U.aviso('Correo de prueba enviado. Revisa tu bandeja de entrada.', 'bueno');
+          U.aviso('Correo de prueba enviado. Revisa tu bandeja de entrada. (Versión del script: ' +
+            (r.version || 'anterior a la fila 130, no se sabe cuál') + ')', 'bueno');
         } else if (aviso) {
           aviso.innerHTML = '<p class="aviso aviso-rojo">' +
             U.escapar((r && r.motivo) || 'No he podido enviarlo.') + '</p>';
         }
+        pintarAvisoVersion();
       });
     };
+  }
+
+  /* ---------- la línea ámbar al abrir el cuadro de Correo/Séneca ----------
+
+     Los dos cuadros (js/correo-cuadro.js, js/seneca-cuadro.js) montan su
+     formulario dentro de #correo-caja, con #correo-formulario o
+     #seneca-formulario como raíz (fila 152, ya usado por
+     RutaCarpetas.montarEnCuadro para lo mismo). En vez de tocar esos
+     ficheros, aquí se envuelve CorreoNucleo.abrirCuadro (js/correo.js):
+     se deja que pinte lo suyo y, en cuanto el formulario está en la
+     página, se le añade la línea ámbar delante, si toca. */
+  function insertarAvisoEnCuadro(intentos) {
+    if (!scriptDesactualizado()) return;
+    var caja = document.getElementById('correo-caja');
+    if (!caja) return;
+    var raiz = caja.querySelector('#correo-formulario, #seneca-formulario');
+    if (!raiz) {
+      if (intentos > 0) setTimeout(function () { insertarAvisoEnCuadro(intentos - 1); }, 80);
+      return;
+    }
+    if (caja.querySelector('.aviso-script-antiguo')) return;
+    var linea = document.createElement('p');
+    linea.className = 'aviso aviso-ambar aviso-script-antiguo';
+    linea.textContent = textoAvisoVersion();
+    raiz.parentNode.insertBefore(linea, raiz);
+  }
+
+  var enganchadoAlCuadro = false;
+  function engancharAlCuadro() {
+    if (enganchadoAlCuadro || !window.U || typeof U.envolver !== 'function' || !window.CorreoNucleo) return;
+    enganchadoAlCuadro = true;
+    U.envolver(window.CorreoNucleo, 'CorreoNucleo.abrirCuadro', 'correo-enviar.js', function (comoEra) {
+      return function (a, deSeneca, extra) {
+        var resultado = comoEra(a, deSeneca, extra);
+        insertarAvisoEnCuadro(15);
+        return resultado;
+      };
+    });
   }
 
   /* Cierra el cuadro que hubiera abierto (el botón "Enviar" sin
@@ -241,6 +373,7 @@ window.CorreoEnviar = (function () {
      `arrancado` que lo ejecute solo una vez. */
   var enganchado = false;
   function enganchar() {
+    engancharAlCuadro();
     if (enganchado || !window.Gestor) return;
     enganchado = true;
     window.Gestor.alRefrescar.push(pintarBloqueAjustes);
@@ -256,6 +389,15 @@ window.CorreoEnviar = (function () {
     enviar: enviar,
     nuevoIdEnvio: nuevoIdEnvio, NO_SE_SI_HA_SALIDO: NO_SE_SI_HA_SALIDO,
     probar: probar,
-    irAAjustes: irAAjustes
+    irAAjustes: irAAjustes,
+    /* fila 178 */
+    SCRIPT_ESPERADO: SCRIPT_ESPERADO,
+    scriptDesactualizado: scriptDesactualizado,
+    versionConocida: leerVersionConocida,
+    /* solo para las pruebas */
+    _numeroDeFila: numeroDeFila,
+    _registrarVersionScript: registrarVersionScript,
+    _textoAvisoVersion: textoAvisoVersion,
+    _engancharAlCuadro: engancharAlCuadro
   };
 })();
