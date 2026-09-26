@@ -1,18 +1,18 @@
 /* ============================================================
    guias-opciones-editor.js — en el cuadro de escribir la guía, las
-   opciones de un paso-pregunta y los pasos de cada opción. Sacado de
+   opciones de un hito-pregunta y los hitos de cada opción. Sacado de
    js/guias.js (24-sep-2026, fila 122, docs/GUIA-EN-ACORDEON.md: aquel
    fichero pasaba de las 1.200 líneas).
 
    `GuiasOpcionesEditor.caja(c, p, i)` devuelve la caja de opciones del
-   paso `p` (posición `i` del nivel que se ve). `c` es lo que el editor
+   hito `p` (posición `i` del nivel que se ve). `c` es lo que el editor
    le presta: { nivel(), recoger, pintar, entrar(p, opcion),
    prepararRecuadro(el), restaurar(det, i, idSubpaso), plegado } (este
-   último, js/guias-plegado.js, para que un paso nuevo salga abierto).
+   último, js/guias-plegado.js, para que un hito nuevo salga abierto).
    ============================================================ */
 var GuiasOpcionesEditor = (function () {
 
-  /* Las opciones de un paso-pregunta, cada una con sus propios nivel.
+  /* Las opciones de un hito-pregunta, cada una con sus propios nivel.
      Todo lo que cambia la lista hace lo mismo: recoger lo escrito,
      tocar el array y volver a pintar. */
   function caja(c, p, i) {
@@ -23,7 +23,7 @@ var GuiasOpcionesEditor = (function () {
     var explica = document.createElement('p');
     explica.className = 'explica';
     explica.textContent = 'Dentro del asunto se elige una opción, y solo salen los ' +
-                          'pasos de la elegida.';
+                          'hitos de la elegida.';
     caja.appendChild(explica);
 
     p.opciones.forEach(function (o, j) {
@@ -41,7 +41,7 @@ var GuiasOpcionesEditor = (function () {
       quitar.type = 'button';
       quitar.className = 'boton boton-peligro';
       quitar.textContent = 'Quitar la opción';
-      quitar.title = 'Quitar esta opción y sus pasos';
+      quitar.title = 'Quitar esta opción y sus hitos';
       quitar.onclick = function () {
         recoger();
         nivel[i].opciones.splice(j, 1);
@@ -56,19 +56,19 @@ var GuiasOpcionesEditor = (function () {
         sc.dataset.id = sp.id;
         sc.dataset.pasoId = sp.id;   /* fila 122, js/guias-plegado.js */
 
-        /* Fila 95: un paso de una opción que es a su vez una pregunta
+        /* Fila 95: un hito de una opción que es a su vez una pregunta
            no se dibuja anidado (recuadros dentro de recuadros no se
            leen): una línea con su título, la marca y «Entrar», que
-           enseña los pasos de sus opciones en este mismo cuadro. */
+           enseña los hitos de sus opciones en este mismo cuadro. */
         var subPregunta = Guias.esPregunta(sp);
         sc.innerHTML =
           '<div class="paso-cabecera">' +
             '<input class="campo subpaso-titulo" value="' + U.escapar(sp.titulo) + '" ' +
-            'placeholder="' + (subPregunta ? 'La pregunta' : 'Título corto del paso') + '">' +
+            'placeholder="' + (subPregunta ? 'La pregunta' : 'Título corto del hito') + '">' +
             (subPregunta ? '<span class="marca-pregunta">pregunta</span>' : '') +
           '</div>' +
           (subPregunta ? '' : '<div class="paso-cuerpo subpaso-cuerpo" contenteditable="true" ' +
-            'data-vacio="Explicación del paso">' + Guias.limpiar(sp.cuerpo) + '</div>');
+            'data-vacio="Explicación del hito">' + Guias.limpiar(sp.cuerpo) + '</div>');
 
         if (subPregunta) {
           var entrarB = document.createElement('button');
@@ -78,7 +78,7 @@ var GuiasOpcionesEditor = (function () {
           entrarB.title = 'Ver y escribir las opciones de esta pregunta';
           entrarB.onclick = function () {
             recoger();
-            /* Se entra en el nivel donde está la pregunta (los pasos de
+            /* Se entra en el nivel donde está la pregunta (los hitos de
                esta opción): ahí se ve entera, con sus opciones. */
             c.entrar(nivel[i], nivel[i].opciones[j]);
             var aqui = document.querySelector('#guia-pasos .paso-editor[data-pos="' + k + '"]');
@@ -120,11 +120,11 @@ var GuiasOpcionesEditor = (function () {
           }
         }
 
-        /* La misma casilla que un paso de arriba (fila 95). */
+        /* La misma casilla que un hito de arriba (fila 95). */
         var filaPreg = document.createElement('label');
         filaPreg.className = 'interruptor paso-es-pregunta-fila';
         filaPreg.innerHTML = '<input type="checkbox" class="subpaso-es-pregunta"' +
-          (subPregunta ? ' checked' : '') + '><span>Este paso es una pregunta</span>';
+          (subPregunta ? ' checked' : '') + '><span>Este hito es una pregunta</span>';
         sc.appendChild(filaPreg);
         filaPreg.querySelector('.subpaso-es-pregunta').onchange = function () {
           recoger();
@@ -144,12 +144,12 @@ var GuiasOpcionesEditor = (function () {
       var mas = document.createElement('button');
       mas.type = 'button';
       mas.className = 'boton boton-ancho';
-      mas.textContent = '+ Añadir un paso a esta opción';
+      mas.textContent = '+ Añadir un hito a esta opción';
       mas.onclick = function () {
         recoger();
         var nuevo = { id: Guias.nuevoId(), titulo: '', cuerpo: '', opciones: [], requisitos: [], comunicacion: null };
         nivel[i].opciones[j].pasos.push(nuevo);
-        /* Fila 122: el paso nuevo, ya abierto y con el cursor en su título. */
+        /* Fila 122: el hito nuevo, ya abierto y con el cursor en su título. */
         if (c.plegado) c.plegado.abrir(nuevo.id);
         pintar();
         if (c.plegado) c.plegado.alTitulo(nuevo.id);

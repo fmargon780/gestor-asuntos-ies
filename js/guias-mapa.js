@@ -1,9 +1,9 @@
 /* ============================================================
    guias-mapa.js — el mapa de la guía (24-sep-2026, fila 113,
    docs/MAPA-DE-LA-GUIA.md). Un dibujo de solo lectura, como un
-   diagrama de flujo: los pasos de arriba abajo; en cada pregunta, las
+   diagrama de flujo: los hitos de arriba abajo; en cada pregunta, las
    ramas una al lado de otra, con la respuesta encima, a cualquier
-   profundidad; y después, los pasos comunes. Solo HTML y CSS
+   profundidad; y después, los hitos comunes. Solo HTML y CSS
    (css/guias-mapa.css), sin librerías: vale también sin internet.
 
    - `GuiasMapa.html(pasos, op)`: pura. `op` (opcional):
@@ -12,10 +12,10 @@
                     elegidas y las preguntas sin responder; los hitos que
                     no son de la guía salen al final, «Fuera de la guía».
        responsable  function (id) -> nombre, para la línea pequeña.
-     Cada caja pulsable lleva `.mapa-pulsable` y `data-id` (el del paso,
+     Cada caja pulsable lleva `.mapa-pulsable` y `data-id` (el del hito,
      que es también el del hito).
    - `GuiasMapa.abrirEnAjustes(nombreTipo, pasos, alPulsar)`: en un
-     cuadro grande (Ajustes → tipo → «Pasos del trámite»).
+     cuadro grande (Ajustes → tipo → «Guía»).
    - `GuiasMapa.panelHTML()` / `GuiasMapa.pintarEnPanel(panel, pasos,
      alPulsar)`: dentro del cuadro de escribir la guía (js/guias.js).
    - `GuiasMapa.abrirDeAsunto(a)`: en la ficha, con los hitos del asunto
@@ -80,8 +80,8 @@ var GuiasMapa = (function () {
     var caja = '<div class="' + clases.join(' ') + '" data-id="' + esc(p.id) + '"' +
       (pulsable ? ' role="button" tabindex="0"' : '') + ' title="' + esc(p.titulo || '') + '">' +
       (pregunta ? '<span class="mapa-marca">pregunta</span>' : '') +
-      '<span class="mapa-titulo">' + esc(p.titulo || (pregunta ? 'Pregunta sin título' : 'Paso sin título')) +
-        /* Fila 116: el guion de este paso tiene una pregunta (el mapa no dibuja el guion). */
+      '<span class="mapa-titulo">' + esc(p.titulo || (pregunta ? 'Pregunta sin título' : 'Hito sin título')) +
+        /* Fila 116: el guion de este hito tiene una pregunta (el mapa no dibuja el guion). */
         ((p.guion || []).some(function (g) { return g && g.pregunta; })
           ? ' <span class="mapa-guion-pregunta" title="El guion tiene una pregunta">¿</span>' : '') + '</span>' +
       lineaPequena(p, op) + estado + '</div>';
@@ -91,7 +91,7 @@ var GuiasMapa = (function () {
       var enEsta = conHitos ? (enCamino && !!h && elegida === o.id) : true;
       return '<div class="mapa-rama' + (conHitos && !enEsta ? ' mapa-rama-gris' : '') + (conHitos && enEsta ? ' mapa-rama-elegida' : '') + '">' +
         '<div class="mapa-respuesta">' + esc(o.titulo || 'Opción sin nombre') + '</div>' +
-        (o.pasos && o.pasos.length ? columna(o.pasos, op, enEsta) : '<div class="mapa-columna"><div class="mapa-nodo"><div class="mapa-vacio">sin pasos</div></div></div>') +
+        (o.pasos && o.pasos.length ? columna(o.pasos, op, enEsta) : '<div class="mapa-columna"><div class="mapa-nodo"><div class="mapa-vacio">sin hitos</div></div></div>') +
       '</div>';
     }).join('');
     return '<div class="mapa-nodo mapa-nodo-pregunta">' + caja + '<div class="mapa-ramas">' + ramas + '</div></div>';
@@ -102,7 +102,7 @@ var GuiasMapa = (function () {
     var conHitos = Array.isArray(op.hitos);
     var o2 = { responsable: op.responsable, hitosPorId: conHitos ? porId(op.hitos) : null };
     if (!pasos || !pasos.length) {
-      if (!conHitos || !op.hitos.length) return '<div class="mapa"><div class="vacio">Esta guía todavía no tiene pasos.</div></div>';
+      if (!conHitos || !op.hitos.length) return '<div class="mapa"><div class="vacio">Esta guía todavía no tiene hitos.</div></div>';
     }
     var salida = '<div class="mapa' + (conHitos ? ' mapa-de-asunto' : '') + '"><div class="mapa-lienzo">' +
       columna(pasos, o2, true) + '</div>';
@@ -157,7 +157,7 @@ var GuiasMapa = (function () {
     await cargarResponsables();
     var elegido = null;
     var promesa = U.preguntar('Mapa de la guía de ' + nombreTipo,
-      '<p class="explica">La guía entera de un vistazo. Pulsa un paso para escribirlo.</p>' +
+      '<p class="explica">La guía entera de un vistazo. Pulsa un hito para escribirlo.</p>' +
       '<div id="mapa-cuadro">' + html(pasos, { responsable: nombreDeResponsable }) + '</div>', 'Cerrar', true);
     var cuadro = document.querySelector('#capa .cuadro');
     if (cuadro) cuadro.classList.add('cuadro-ancho');
