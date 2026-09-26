@@ -40,6 +40,7 @@ Claude Code.
 - Nada de tareas manuales suyas: si se puede hacer desde la app, se hace desde la app.
 - Trabaja en un Chromebook Plus, en el navegador. En el trabajo tiene un monitor ancho.
 - No trabaja solo: su compañero administrativo también usa la aplicación.
+- Textos de pantalla: siempre con las palabras de `docs/VOCABULARIO.md`.
 
 ## 3. Qué es esto, y qué no
 
@@ -71,7 +72,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   vuelo. Dar de alta un tercero lo deja elegido, sin pulsar nada más.
 - Cada tipo dice quién lo encarga (Secretaría, Dirección…): parrilla agrupada, filtro y Cuentas.
 - Asuntos reservados (por tipo o uno a uno): candado, sin el tercero en listas y buscador.
-- El estado es el primer hito sin terminar («Paso N de M · título», «Paso actual»): Administración o terceros; «Esperando a…» sale solo con el responsable (a mano, hasta que cambia el paso). Guías: «Administración», no personas. Vía y fecha límite.
+- El estado es el primer hito sin terminar («Hito N de M · título», «Hito actual»): Administración o terceros; «Esperando a…» sale solo con el responsable (a mano, hasta que cambia el hito). Guías: «Administración», no personas. Vía y fecha límite.
 - Asuntos recurrentes, con aviso. Avisos de fichas huérfanas y papelera vieja.
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO (carga solo al entrar, la
   primera vez) y búsqueda por palabras sueltas también en documentos, registro de Séneca, ficha
@@ -80,19 +81,20 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   hermanos y sus asuntos en la ficha (se abren pulsando la fila); «+ Nuevo asunto para esta
   persona». La BD de alumnado (carpeta de Drive) suma sus datos:
   ficha, huecos, grupos.
-- Editar un asunto abierto (renombra su carpeta, sin perder hitos ni presencia); no en el ARCHIVO.
-  Renombrar un tipo se lleva su guía; cambiarle el tipo, la ofrece.
-- Nombre comercial de empresas; editar un tercero dado de alta a mano.
+- Cambiar un asunto abierto (le cambia el nombre a la carpeta, sin perder hitos ni presencia); no
+  en el ARCHIVO. Cambiar el nombre de un tipo se lleva su guía; cambiarle el tipo a un asunto
+  ofrece traer la guía del tipo nuevo.
+- Nombre comercial de empresas; cambiar un tercero dado de alta a mano.
 - Tutores legales (del RegAlum, sin alta) y Administraciones (organismos y centros, con departamentos) como tercero.
 - Guías del procedimiento por tipo, con preguntas dentro de las respuestas sin límite, y su mapa
   (dibujo de la guía entera; en un asunto, con el camino elegido resaltado). Se escriben en
-  acordeón: un paso abierto a la vez.
+  acordeón: un hito abierto a la vez.
 - Panel lateral de lectura; tablón a la vista. Al crear, recuadro con lo que ya tiene el tercero; parada si es idéntico; pantalla "Duplicados".
 - Correo y mensaje de Séneca: se prepara; el correo se envía de verdad (Apps Script, con
   confirmación) y nunca dos veces.
 - "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto (un solo
   botón «Crear asunto con él», que usa lo leído del documento); con tercero reconocido, también
-  sugiere meterlo en uno que ya existe («Meter aquí»). Tras meter o crear, se abre directo el
+  sugiere guardarlo en uno que ya existe («Guardar aquí»). Tras guardar o crear, se abre directo el
   cuadro de ponerle nombre (no la lista), ya con la fecha, el registro y el tipo de documento (por
   memoria) que se pueda aprovechar de lo leído; «Guardar» cierra el cuadro entero. Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero;
@@ -121,23 +123,23 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en cada subida de código (no con solo `docs/`).
 - Copia sin internet (`file://`): se actualiza sola (reintenta si se estaba publicando); si no, franja fija arriba; cada 30 min. La web normal también avisa de versión nueva (fila 178), solo con «Recargar».
-- Hitos: los pasos de la guía son los hitos de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
+- Hitos: cada hito de la guía es un hito de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
   bifurcaciones e historial (si falla su guardado al archivar, se reintenta una vez; el hito no queda huérfano de todas formas). Cada hito se abre a pantalla completa (la mesa), con las acciones solo ahí («Generar documento ▾»,
-  «Comunicar ▾», «Registrar») y tres tarjetas: el guion (lista para marcar; «receta» opcional que deja el cuadro relleno; se marca
+  «Comunicar ▾», «Registrar») y tres tarjetas: las tareas del hito (lista para marcar; «Detalles:» opcional que deja el cuadro relleno; se marca
   solo al generar, registrar, comunicar o añadir), todos los documentos del asunto («Enviar ▾» por correo o Séneca) y notas.
-  Los pasos nuevos de una guía llegan a los asuntos abiertos de su tipo; el guion se escribe también desde la mesa
-  («✎ Cambiar el guion», sin salir a Ajustes). «Paso N de M», «Hitos N/M» y la mesa, con una sola cuenta.
-  Biblioteca de hitos del centro, con guion; en Mantenimiento, cargar tipos, guías y guiones del instituto.
+  Los hitos nuevos de una guía llegan a los asuntos abiertos de su tipo; las tareas se escriben también desde la mesa
+  («✎ Cambiar las tareas», sin salir a Ajustes). «Hito N de M», «Hitos N/M» y la mesa, con una sola cuenta.
+  Biblioteca de hitos del centro, con sus tareas; en Mantenimiento, cargar tipos, guías y tareas del instituto.
   «Marcar como hecho» abre solo la mesa del hito siguiente en curso (o, sin ninguno, «Archivar el asunto» ahí
-  mismo); al completarse el guion por una acción del usuario, se pregunta una vez por sesión si darlo por hecho.
-- "Qué me toca": pendientes, filtro por responsable (una persona ve también los de Administración), "Dormidos" (sin novedades en N días). "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Formularios": catálogo buscable de
-  impresos; "Preparar para el tercero" rellena solo los datos del centro (casillas con nombre legible y miniatura).
+  mismo); al completarse las tareas por una acción del usuario, se pregunta una vez por sesión si darlo por hecho.
+- "Qué me toca": pendientes, filtro por responsable (una persona ve también los de Administración), "Dormidos" (sin novedades en N días). "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Impresos": catálogo buscable;
+  "Preparar para el tercero" rellena solo los datos del centro (casillas con nombre legible y miniatura).
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
-- Cada documento, todo en su fila (⧉, «Poner nombre», ⋮); Separar, Unir, Sacar páginas, Ajustar tamaño
+- Cada documento, todo en su fila (⧉, «Cambiar el nombre», ⋮); Separar, Unir, Sacar páginas, Ajustar tamaño
   (sello y firma) y Repartir entre terceros, en la barra del visor.
 - "Quién lo pide y por qué vía": un único cuadro, tanto en Nuevo asunto como en "El encargo" de la ficha; su
   correo sale en el cuadro de Correo.
-- Archivar/reabrir sobre un destino que ya existe fusiona. Crear, reabrir o editar deja en la ficha; Volver, a donde estaba.
+- Archivar/reabrir sobre un destino que ya existe fusiona. Crear, reabrir o cambiar deja en la ficha; Volver, a donde estaba.
 - Al archivar, la ficha baja a su carpeta (al reabrir, vuelve) y se hace el índice del expediente
   (PDF numerado; también desde el menú de la ficha).
 
@@ -187,7 +189,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ver con el uso: ancho del panel/tablón, tarjetas, aviso de "falta el DNI".
 - Comprobar "Ajustar tamaño" real; asuntos vivos al cambiar curso; cuenta del centro; Ajustes: cargos y Provincia.
 - Importar usuarios IdEA del alumnado, al reactivar a Francisco el perfil de Gestor de PASEN.
-- Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar plantillas» (50 nuevas), «Traer guiones». Ajustes › Hitos: festivos.
+- Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar plantillas» (50 nuevas), «Traer tareas». Ajustes › Hitos: festivos.
 - Antes de junio 2027: "Guardar el contacto de los asuntos abiertos" (Mantenimiento).
 - Decisión: ¿la papelera se vacía sola?
 - Antes de publicar algo importante, repasar `docs/COMPROBAR-A-MANO.md`.
