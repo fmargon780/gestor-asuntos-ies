@@ -124,7 +124,6 @@ await pagina.evaluate(async (datos) => {
 
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 const PDF_6 = await pdfDePrueba(6);
 const ESCANEO = '260917 SOLICITUD Escaneo.pdf';

@@ -60,7 +60,6 @@ await pagina.evaluate(async () => {
 });
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 /* ================================================================
    1. Borrar un documento de un asunto, desde su ficha.
@@ -330,7 +329,6 @@ console.log('--- 9. en el ARCHIVO no hay botón Borrar ---');
 
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.click('.pestana[data-pantalla="archivo"]');
-await pagina.click('#btn-recargar-archivo');
 await pagina.waitForTimeout(300);
 await comprobar('el archivo no tiene ningún botón Borrar',
   pagina.locator('#lista-archivo').getByRole('button', { name: 'Borrar' }).count(), 0);

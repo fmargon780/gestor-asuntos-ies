@@ -81,7 +81,6 @@ await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 console.log('--- el caso: el colegio, 3 relacionados, un PDF de 14 páginas ---');
 await pagina.evaluate(async ([origen, pdf, personas]) => {

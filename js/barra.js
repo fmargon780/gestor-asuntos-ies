@@ -12,18 +12,31 @@
 
    Cómo la dejó cada uno se recuerda en su navegador, así que si él
    prefiere tenerla siempre abierta, la abre una vez y se queda.
-   ============================================================ */
+
+   Fila 175, punto 4: con la ventana de 1100 px de ancho o más, sobra
+   sitio de sobra, así que si nadie ha elegido nada todavía (primera
+   vez con esta clave) nace abierta y no se pliega sola al elegir una
+   pantalla. Por debajo de 1100 px, como siempre: nace plegada. En
+   cuanto se pliega o se abre a mano, eso queda grabado y manda,
+   ancha o estrecha. Clave nueva (antes «gestor-barra») para que los
+   ordenadores que ya tenían «plegada» guardada vuelvan a empezar. */
 (function () {
 
-  var CLAVE = 'gestor-barra';       /* 'plegada' o 'abierta' */
+  var CLAVE = 'gestor-barra-2';     /* 'plegada' o 'abierta' */
+  var ANCHO_DE_SOBRA = 1100;
 
   function $(id) { return document.getElementById(id); }
+
+  function anchoDeSobra() {
+    return (window.innerWidth || (document.documentElement && document.documentElement.clientWidth) || 0) >= ANCHO_DE_SOBRA;
+  }
 
   function comoEstaba() {
     try {
       var v = window.localStorage.getItem(CLAVE);
-      return v === 'abierta' ? 'abierta' : 'plegada';
-    } catch (e) { return 'plegada'; }
+      if (v === 'abierta' || v === 'plegada') return v;
+    } catch (e) { /* sin localStorage, se sigue con el valor por defecto */ }
+    return anchoDeSobra() ? 'abierta' : 'plegada';
   }
 
   function recordar(estado) {

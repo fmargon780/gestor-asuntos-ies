@@ -271,7 +271,9 @@ await comprobar('cancelado, el documento sigue en "Por clasificar"',
 
 /* ============================================================
    ESCENARIO 1 y 6. UN ABIERTO DEL MISMO TIPO: SIN MARCA, Y
-   "CREAR ASUNTO NUEVO" PASA A SECUNDARIO
+   "CREAR ASUNTO CON ÉL" PASA A SECUNDARIO (fila 174, punto 4: un
+   solo botón, siempre en su sitio de siempre; con sugerencias a la
+   vista deja de ser el principal, como hacía "Aceptar")
    ============================================================ */
 await esperarLeido(PDF_BERMEJO, 'Bermejo Instalaciones');
 await comprobar('1. una sola sugerencia, sin marca',
@@ -280,20 +282,22 @@ await comprobar('la sugerencia es el asunto abierto de Bermejo',
   sugerenciasDe(PDF_BERMEJO).first().textContent()
     .then((t) => t.indexOf(ABIERTO_BERMEJO) !== -1 && t.indexOf('otro tipo') === -1 &&
                  t.indexOf('archivado') === -1), true);
-await comprobar('6. el botón de crear se llama "Crear asunto nuevo"',
-  tarjetaDe(PDF_BERMEJO).locator('.tarjeta-propuesta button').first().textContent(),
-  'Crear asunto nuevo');
+await comprobar('6. sigue habiendo un solo botón, "Crear asunto con él"',
+  tarjetaDe(PDF_BERMEJO).locator('[data-accion-suelto="crear"]').textContent(),
+  'Crear asunto con él');
 await comprobar('y ya no es el botón destacado (pasa a discreto)',
-  tarjetaDe(PDF_BERMEJO).locator('.tarjeta-propuesta button').first()
+  tarjetaDe(PDF_BERMEJO).locator('[data-accion-suelto="crear"]')
     .evaluate((b) => b.classList.contains('boton-principal')), false);
 await comprobar('"Meter aquí" sí es el destacado de su línea',
   sugerenciasDe(PDF_BERMEJO).first().locator('button').first()
     .evaluate((b) => b.classList.contains('boton-principal')), true);
 
 /* Pulsar "Meter aquí" mete el documento en ese asunto sin más cuadro
-   (el asunto está abierto: no hace falta preguntar si reabrir). */
+   (el asunto está abierto: no hace falta preguntar si reabrir), y abre
+   directo el formulario de ponerle nombre (fila 174, punto 2), no la
+   lista. */
 await sugerenciasDe(PDF_BERMEJO).first().locator('button').first().click();
-await pagina.waitForSelector('#doc-anadir');
+await pagina.waitForSelector('#doc-guardar');
 await comprobar('"Meter aquí" ha llevado directo al cuadro de ponerle nombre',
   pagina.locator('#cuadro-titulo').textContent(), ABIERTO_BERMEJO);
 /* Este cuadro (App.verDocumentos) no lleva botón Cancelar (se abre con

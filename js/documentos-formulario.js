@@ -22,6 +22,36 @@
      coincidir nunca con uno de verdad. */
   N.TIPO_NUEVO = '__nuevo__';
 
+  /* "dd/mm/aaaa" (lo que da LectorDocumentos.analizar) -> ISO. Cadena
+     vacía si no se entiende: cada fichero que lo necesita tiene su
+     propia copia mínima (fila 174, docs/POR-CLASIFICAR-USA-LO-LEIDO.md),
+     en vez de forzar una sola en js/util.js. */
+  function isoDeFechaLector(ddmmaaaa) {
+    var p = String(ddmmaaaa || '').split('/');
+    return p.length === 3 ? p[2] + '-' + p[1] + '-' + p[0] : '';
+  }
+
+  /* El último tipo de documento guardado en un asunto de cada tipo de
+     asunto, en este ordenador (fila 174, punto 1): cuando el lector no
+     lee el tipo de documento (nunca lo lee) y el nombre tampoco lo trae,
+     el desplegable arranca ahí en vez de en el primero de la lista. */
+  var CLAVE_ULTIMO_TIPO_DOC = 'gestor-ultimo-tipo-doc';
+  function ultimoTipoDocumento(tipoAsunto) {
+    if (!tipoAsunto) return '';
+    try {
+      var m = JSON.parse(window.localStorage.getItem(CLAVE_ULTIMO_TIPO_DOC) || '{}');
+      return m[tipoAsunto] || '';
+    } catch (e) { return ''; }
+  }
+  N.guardarUltimoTipoDocumento = function (tipoAsunto, tipoDocumento) {
+    if (!tipoAsunto || !tipoDocumento) return;
+    try {
+      var m = JSON.parse(window.localStorage.getItem(CLAVE_ULTIMO_TIPO_DOC) || '{}');
+      m[tipoAsunto] = tipoDocumento;
+      window.localStorage.setItem(CLAVE_ULTIMO_TIPO_DOC, JSON.stringify(m));
+    } catch (e) { /* sin memoria, como si no se hubiera guardado nunca */ }
+  };
+
   async function pintarFormulario(opciones) {
     var caja = $('doc-cuerpo');
     if (!caja) return;
@@ -38,8 +68,12 @@
                         : '<p class="explica">No he podido abrir el documento para verlo.</p>';
 
     var previo = N.leerNombre(opciones.nombreActual);
+    /* Lo que ya trae el nombre del fichero manda: la propuesta solo
+       rellena lo que el nombre no trae (fila 174, punto 1). */
+    var propuesta = opciones.propuesta || null;
     var hoy = U.hoyIso();
-    var fecha = previo.fecha || hoy;
+    var fechaPropuesta = propuesta && propuesta.fecha ? isoDeFechaLector(propuesta.fecha) : '';
+    var fecha = previo.fecha || fechaPropuesta || hoy;
     /* El hueco de texto libre del nombre. Antes se llamaba "Año
        académico" y se rellenaba solo con el curso que tocaba por la
        fecha. Él lo usa para otras cosas —un número de expediente, una
@@ -49,11 +83,16 @@
        campo. Lo único que se conserva es lo que ya trajera el nombre
        del propio fichero. */
     var curso = previo.curso || '';
+    /* El tipo de documento: el lector no lo lee nunca; si el nombre
+       tampoco lo trae, se arranca en el último que se guardó en un
+       asunto de este mismo tipo de asunto (fila 174, punto 1). */
+    var tipoAsunto = N.asuntoActual ? App.tipoDeAsunto(N.asuntoActual) : '';
+    var tipoInicial = previo.tipo || ultimoTipoDocumento(tipoAsunto);
     /* Los campos del tipo de documento (fila 96): los de lista que ya
        estén, tal cual, al principio del texto adicional se reconocen y
        salen de ahí; el resto se queda como texto adicional. */
     var valoresIniciales = {};
-    var camposIniciales = camposDelTipo(previo.tipo);
+    var camposIniciales = camposDelTipo(tipoInicial);
     if (camposIniciales.length) {
       var rec = DocCampos.reconocer(camposIniciales, curso);
       valoresIniciales = rec.valores;
@@ -63,6 +102,13 @@
        acaba de añadir todavía no puede estar "pendiente" de nada. */
     var pendienteInicial = opciones.modo === 'renombrar' &&
       Registro.pendiente(N.asuntoActual, opciones.nombreActual);
+
+    /* El registro: el que ya trae el nombre manda; si no, el leído del
+       sello de Séneca (misma forma que usa js/registro.js). */
+    var registroLeido = !previo.registro && propuesta && propuesta.registro ? propuesta.registro : null;
+    var registro = previo.registro || (registroLeido ? {
+      ano: registroLeido.anio, sentido: registroLeido.tipo, modo: registroLeido.serie, numero: registroLeido.numero
+    } : null);
 
     caja.innerHTML =
       '<div class="doc-partido">' +
@@ -96,45 +142,46 @@
       '</div>' +
 
       '<label class="etiqueta">Tipo de documento</label>' +
-      '<select id="doc-tipo" class="campo">' + opcionesDeTipo(previo.tipo) + '</select>' +
+      '<select id="doc-tipo" class="campo">' + opcionesDeTipo(tipoInicial) + '</select>' +
       '<div id="doc-campos-tipo"></div>' +
 
       '<label class="interruptor">' +
-        '<input type="checkbox" id="doc-hay-registro"' + (previo.registro ? ' checked' : '') + '>' +
+        '<input type="checkbox" id="doc-hay-registro"' + (registro ? ' checked' : '') + '>' +
         '<span>Está registrado en Séneca</span>' +
       '</label>' +
 
-      '<label class="interruptor' + (previo.registro ? ' oculto' : '') + '" id="doc-fila-pendiente">' +
+      '<label class="interruptor' + (registro ? ' oculto' : '') + '" id="doc-fila-pendiente">' +
         '<input type="checkbox" id="doc-pendiente-registro"' +
           (pendienteInicial ? ' checked' : '') + '>' +
         '<span>Pendiente de registro</span>' +
       '</label>' +
 
-      '<div id="doc-registro" class="' + (previo.registro ? '' : 'oculto') + '">' +
+      '<div id="doc-registro" class="' + (registro ? '' : 'oculto') + '">' +
+        (registroLeido ? '<p class="aviso-bueno" id="doc-registro-leido">Leído del sello de Séneca.</p>' : '') +
         '<div class="registro-campos">' +
           '<div>' +
             '<label class="etiqueta">Año</label>' +
             '<input id="doc-ano" class="campo" maxlength="2" value="' +
-              U.escapar(previo.registro ? previo.registro.ano : fecha.slice(2, 4)) + '">' +
+              U.escapar(registro ? registro.ano : fecha.slice(2, 4)) + '">' +
           '</div>' +
           '<div>' +
             '<label class="etiqueta">Entrada o salida</label>' +
             '<div class="opciones">' +
-              N.botonOpcion('doc-sentido', 'E', 'Entrada', !previo.registro || previo.registro.sentido !== 'S') +
-              N.botonOpcion('doc-sentido', 'S', 'Salida', !!previo.registro && previo.registro.sentido === 'S') +
+              N.botonOpcion('doc-sentido', 'E', 'Entrada', !registro || registro.sentido !== 'S') +
+              N.botonOpcion('doc-sentido', 'S', 'Salida', !!registro && registro.sentido === 'S') +
             '</div>' +
           '</div>' +
           '<div>' +
             '<label class="etiqueta">Serie</label>' +
             '<div class="opciones">' +
-              N.botonOpcion('doc-modo', 'M', 'Manual', !previo.registro || previo.registro.modo !== 'A') +
-              N.botonOpcion('doc-modo', 'A', 'Automático', !!previo.registro && previo.registro.modo === 'A') +
+              N.botonOpcion('doc-modo', 'M', 'Manual', !registro || registro.modo !== 'A') +
+              N.botonOpcion('doc-modo', 'A', 'Automático', !!registro && registro.modo === 'A') +
             '</div>' +
           '</div>' +
           '<div>' +
             '<label class="etiqueta">Número</label>' +
             '<input id="doc-numero" class="campo" maxlength="6" inputmode="numeric" value="' +
-              U.escapar(previo.registro ? previo.registro.numero : '') + '">' +
+              U.escapar(registro ? registro.numero : '') + '">' +
           '</div>' +
         '</div>' +
       '</div>' +

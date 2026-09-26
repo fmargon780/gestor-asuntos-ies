@@ -44,9 +44,8 @@ await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
 
-/* La barra nace plegada: para llegar a la pestaña Ajustes (parte B2)
-   hay que abrirla primero, como en pruebas/campos.mjs. */
-await pagina.click('#btn-barra');
+/* Fila 175: con la ventana ancha la barra nace abierta; se llega
+   directo a la pestaña Ajustes. */
 await pagina.click('.pestana[data-pantalla="ajustes"]');
 
 /* Los once bloques, abiertos de una vez: no se vuelven a cerrar en el
@@ -208,9 +207,9 @@ await pagina.evaluate(() => window.scrollTo(0, 0));
    ================================================================ */
 console.log('--- 9. el icono de Ajustes, con la barra plegada ---');
 
-/* Se abrió a mano al principio de la prueba (como en pruebas/campos.mjs),
-   así que se recuerda "abierta" y ya no se pliega sola al cambiar de
-   pantalla. Se pliega otra vez a propósito, para probar el icono. */
+/* Fila 175: con la ventana ancha nace abierta y ya no se pliega sola
+   al cambiar de pantalla. Se pliega aquí a mano, a propósito, para
+   probar el icono. */
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.click('#btn-barra');
 await pagina.waitForTimeout(150);

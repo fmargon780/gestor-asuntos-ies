@@ -9,6 +9,7 @@
 $('campo-fecha').oninput = function () {
   App.actualizarCursoNuevo();
   App.actualizarLimiteNuevo();
+  App.actualizarFechaLoPideNuevo();
   App.refrescarVista();
 };
 ['campo-curso', 'campo-descripcion'].forEach(function (id) {
@@ -108,12 +109,16 @@ App.crearAsuntoDelFormulario = async function () {
       camposParaGuardar[v.clave] = { valor: v.valor, enNombre: v.enNombre };
     });
 
+    /* La vía sale de "Lo pide" (fila 173, punto 4): un solo cuadro, un
+       solo sitio donde se pregunta. leerVia() da {via, dato} pase lo
+       que pase, aunque no se haya elegido "quién lo pide". */
+    var via = App.loPideNuevoControles ? App.loPideNuevoControles.leerVia() : { via: '', dato: '' };
     var datosNuevoAsunto = {
       estado: 'abierto', tipo: d.tipo, categoria: App.E.nuevo.categoria,
       tercero: d.tercero, curso: d.curso, grupo: d.grupo, descripcion: d.descripcion,
       campos: camposParaGuardar,
-      via: $('campo-via').value,
-      viaDato: $('campo-via-dato').value.trim(),
+      via: via.via,
+      viaDato: via.dato,
       limite: $('campo-limite').value,
       abiertoEl: U.ahora(), abiertoPor: App.E.usuario
     };
@@ -137,8 +142,11 @@ App.crearAsuntoDelFormulario = async function () {
 
   try {
     /* Si el asunto se ha empezado desde un documento suelto, ese
-       documento se mete ahora en la carpeta recién creada. */
+       documento se mete ahora en la carpeta recién creada. Lo que se
+       haya leído de él (fila 174, punto 2) se guarda antes de moverlo,
+       para que viaje con él hasta el cuadro de ponerle nombre. */
     var traido = App.E.pendiente;
+    var propuestaTraida = traido && window.LectorDeSueltos ? LectorDeSueltos.resultadoDe(traido.nombre) : null;
     /* Lo que los módulos hacen al crear (fila 166), accesorio. */
     var alCrear = (window.Gestor && Gestor.alCrearAsunto) || [], falloAlCrear = null;
     for (var ac = 0; ac < alCrear.length; ac++) {
@@ -161,8 +169,6 @@ App.crearAsuntoDelFormulario = async function () {
     U.copiar(nombre);
     App.E.nuevo = { tipo: null, categoria: null, tercero: null, configCampos: [] };
     $('campo-descripcion').value = '';
-    $('campo-via').value = '';
-    $('campo-via-dato').value = '';
     $('campo-limite').value = '';
     App.limiteNuevoAuto = '';
     $('campo-grupo').checked = false;
@@ -179,9 +185,10 @@ App.crearAsuntoDelFormulario = async function () {
     var recien = App.E.listaAbiertos.filter(function (a) { return a.nombre === nombre; })[0];
     if (!(recien && window.Navegacion && Navegacion.abrirAbierto(nombre))) App.ir('abiertos');
 
-    /* Con el documento ya dentro, se abre el cuadro de siempre para
-       ponerle el nombre que le toca (encima de la ficha nueva). */
-    if (traido && recien) await App.verDocumentos(recien);
+    /* Con el documento ya dentro, se abre directo el cuadro de ponerle
+       el nombre que le toca (fila 174, punto 2; encima de la ficha
+       nueva), con lo que se haya leído del documento. */
+    if (traido && recien) await App.verDocumentos(recien, { ponerNombre: traido.nombre, propuesta: propuestaTraida });
   } catch (e) {
     U.accesorio('Asunto creado, pero no he podido terminar de poner la pantalla al día. Pulsa Recargar', e);
   }

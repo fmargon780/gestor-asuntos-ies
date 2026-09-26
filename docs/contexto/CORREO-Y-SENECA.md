@@ -480,17 +480,29 @@ distinto del que encontró el correo, gana el del correo sin avisar de nada.
     ya lleva un buen rato montada del todo.
 - **Completar la pantalla de "Nuevo asunto"**: se envuelve `window.Bandeja.llevarANuevo` (una
   propiedad del objeto, así que no hace falta tocar `js/bandeja-correos.js`), no la función de
-  dentro. Solo se completa si, después de que el correo haya hecho lo suyo, `App.E.nuevo.tercero`
-  **y** `App.E.nuevo.tipo` siguen los dos vacíos: `App.elegirTipo`/`App.elegirCategoria` reinician
-  lo que venga detrás en su propio orden (categoría → tipo → tercero, el mismo que ya usa
-  `llevarANuevo`), así que tocar cualquiera de los dos cuando el correo ya dejó algo puesto lo
-  borraría. Con eso a medias, el dato del PDF se queda solo en la línea de la tarjeta, para que
-  Francisco lo escriba él si hace falta.
-- No se toca `apps-script/gestor-correos.gs`, ni `Bandeja.proponer`, ni `llevarANuevo` por dentro,
-  ni `js/documentos-sueltos.js`.
+  dentro (que sí se reescribió en la fila 173, docs/NUEVO-ASUNTO-SIN-REPETIR.md, para usar
+  `App.nuevoAsuntoCon`: el enganche de esta fila sigue funcionando igual, envolviendo la propiedad).
+  Solo se completa si, después de que el correo haya hecho lo suyo, `App.E.nuevo.tercero`,
+  `App.E.nuevo.tipo` **y** `App.E.nuevo.terceroPropuesto` (fila 173: el tercero puede estar solo
+  "propuesto", esperando el tipo) siguen los tres vacíos: tocar cualquiera de ellos cuando el
+  correo ya dejó algo puesto lo borraría. Con eso a medias, el dato del PDF se queda solo en la
+  línea de la tarjeta, para que Francisco lo escriba él si hace falta.
+- **Fila 174 (26-sep-2026, docs/POR-CLASIFICAR-USA-LO-LEIDO.md, punto 5)**: además del análisis
+  mezclado por correo (`resultados[id]`, arriba), se guarda también el de cada fichero por
+  separado (`porFichero[id][nombreAdjunto]`), expuesto como
+  `BandejaAdjuntosLector.propuestaDeAdjunto(idCorreo, nombreAdjunto)`. `js/bandeja-guardar.js`
+  (`engancharCorreo`/`guardarEnAsunto`) lo usa para abrir, al terminar de guardar el correo, el
+  cuadro de ponerle nombre al primer adjunto de verdad que haya entrado (nunca el PDF del correo ni
+  el del hilo), con lo leído de **ese** fichero; al guardarlo, si queda otro adjunto sin nombrar
+  del mismo correo, se abre para él (el enganche vive en
+  `Documentos._interno.alTerminarPonerNombre`, ver `docs/contexto/DOCUMENTOS.md`); al cerrar el
+  cuadro sin guardar, la serie se acaba sola.
+- No se toca `apps-script/gestor-correos.gs`, ni `Bandeja.proponer`.
 
 Se comprueba con `pruebas/bandeja-adjuntos.mjs` (en navegador de verdad, PDF real montado a mano
 como en `pruebas/dar-de-alta-desde-documento.mjs`): sin tercero en el correo, el PDF lo completa;
 con tercero ya reconocido, el PDF no lo pisa aunque traiga uno distinto; sin tipo, el PDF lo trae
 por sus palabras clave; con tipo ya puesto, el PDF no lo pisa; sin adjuntos, sin PDF entre los
 adjuntos, y con uno que no se puede leer, la tarjeta se queda exactamente como antes de esta fila.
+El paso de los adjuntos por el cuadro de nombre, con `pruebas/por-clasificar-usa-lo-leido.mjs` y la
+batería completa.

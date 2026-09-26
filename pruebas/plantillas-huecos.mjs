@@ -67,7 +67,6 @@ await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 /* --- Ajustes: desde el 17-sep-2026 (fila 39, docs/AJUSTES-POR-TIPO.md)
    las plantillas de correo de un tipo viven en su propia pantalla, no

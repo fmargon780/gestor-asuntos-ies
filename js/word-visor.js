@@ -182,6 +182,10 @@ var WordVisor = (function () {
         if (window.HitosPanel) HitosPanel.programarRepintado();
       }
     } catch (e) { U.accesorio('PDF guardado, pero no he podido apuntarlo', e); }
+    /* Fila 173, punto 7: guardado ya el PDF, se vuelve a la mesa del
+       hito sin tener que pulsar "Cerrar". Si algo principal ha fallado
+       arriba, ya se ha salido antes con `return` y el visor sigue abierto. */
+    cerrar();
   }
 
   return { abrir: abrir, cerrar: cerrar, cerrarSiAbierto: cerrarSiAbierto, abierto: abierto,

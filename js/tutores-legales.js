@@ -356,8 +356,9 @@ var TutoresLegales = (function () {
         if (!(window.Navegacion && Navegacion.abrirAbierto(a.nombre))) App.ir('abiertos');
       };
     });
-    var antes = caja.querySelector('#ver-sus-asuntos');
-    var sitio = antes ? antes.closest('p') : null;
+    /* Fila 175: el ancla pasó a "Sus asuntos" (antes, "Ver sus asuntos",
+       que ya no existe: esa lista sale sola). */
+    var sitio = caja.querySelector('#ficha-persona-acciones') || caja.querySelector('#titulo-sus-asuntos');
     if (sitio) caja.insertBefore(div, sitio); else caja.appendChild(div);
   }
 

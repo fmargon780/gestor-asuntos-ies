@@ -227,10 +227,17 @@ tabla de ficheros), y la búsqueda es por palabras sueltas.
     sabe (categoría, tercero, ruta, `sueltoEn`): el índice no puede guardar manejadores en un JSON.
 - **`App.verArchivo`** (`js/archivo-personas.js`) lee el índice; si no existe, está roto o es de
   otra versión, cae al mismo recorrido de disco de siempre (`IndiceArchivo.construir()`, sin
-  guardarlo) y avisa "El índice no está hecho. Reconstruir el índice."; si el recuento barato no
-  cuadra con el guardado, enseña el índice igual y avisa "El índice puede no estar al día." — nunca
-  se reconstruye sola. El botón **"Reconstruir el índice"**, junto a "Actualizar", llama a
-  `IndiceArchivo.construir()` + `guardar()`; si algo falla a mitad, no se escribe nada a medias.
+  guardarlo) y avisa "El índice no está hecho."; si el recuento barato no cuadra con el guardado,
+  enseña el índice igual y avisa "El índice puede no estar al día." — nunca se reconstruye sola.
+  Desde la fila 175 (`docs/PERSONAS-ARCHIVO-Y-MENU.md`, punto 3) el aviso lleva un botón de verdad
+  ("Reconstruir el índice") en vez de solo texto con pinta de botón, y `App.ir` llama a
+  `App.verArchivo` solo, sin pulsar nada, la primera vez que se entra en 'archivo' en la sesión
+  (`App.E.archivoVisitado`, en `js/nucleo.js`; `App.E.listaArchivo` no sirve de bandera porque nace
+  a `[]`). Los botones **"Actualizar"** y **"Reconstruir el índice"** viven ahora en el menú de tres
+  puntos (`U.menuDeAcciones`) a la derecha del buscador, con los mismos textos y el mismo
+  comportamiento; `App.reconstruirIndiceArchivo(boton)` acepta el botón que lo llamó (el del menú o
+  el del aviso) para el "Guardando…" de `U.mientrasGuarda`. Llama a `IndiceArchivo.construir()` +
+  `guardar()`; si algo falla a mitad, no se escribe nada a medias.
 - **`App.pintarArchivo`** ya no usa `indexOf`: normaliza lo escrito, lo parte en palabras, y un
   asunto sale si tiene TODAS en su `busca` (calculado una vez al cargar el índice, no en cada
   tecleo). Sin resultados: "Ningún asunto archivado tiene todas esas palabras." Desde la fila 73,
@@ -257,7 +264,8 @@ tabla de ficheros), y la búsqueda es por palabras sueltas.
   `a.padre` faltaba o estaba viejo (fila 45, más arriba).
 
 Se comprueba con `pruebas/archivo-indice.mjs`, en navegador de verdad con el disco de mentira de
-`pruebas/navegador.mjs`, con los nueve escenarios del documento.
+`pruebas/navegador.mjs`, con los nueve escenarios del documento; la carga sola al entrar, en
+`pruebas/personas-archivo-y-menu.mjs` (fila 175, punto 3).
 
 ### Archivar sin preguntar (fila 141)
 

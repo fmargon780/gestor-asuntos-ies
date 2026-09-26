@@ -67,7 +67,6 @@ await pagina.evaluate(async ([ana, luis, eva, compra]) => {
 }, [ANA, LUIS, EVA, COMPRA]);
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 await pagina.waitForTimeout(500);
 await pagina.evaluate(async () => { await App.reconstruirIndiceArchivo(); });
 

@@ -137,6 +137,20 @@ var HitoMesa = (function () {
     if (window.FichaTarjetas && FichaTarjetas.alCambiarLaMesa) FichaTarjetas.alCambiarLaMesa();
   }
 
+  /* Tras marcar un hito como hecho (fila 173, punto 5): al hito que
+     haya quedado en curso, con los datos recién guardados (no los del
+     último `aplicar`, que son de antes de marcar). Sin ninguno en
+     curso, `pintarCabecera` ya enseña "Todos los hitos están hechos.":
+     aquí no hay que hacer nada más. */
+  function irAlSiguienteTrasMarcar(a) {
+    if (!window.Hitos || !Hitos.ultimosLeidos || !window.EstadoHito || !EstadoHito.idActual) return;
+    var datos = Hitos.ultimosLeidos();
+    var entrada = datos && datos.porAsunto ? datos.porAsunto[a.nombre] : null;
+    var hitosFrescos = entrada ? entrada.hitos : [];
+    var siguiente = EstadoHito.idActual(hitosFrescos, datos.ajustes);
+    if (siguiente) abrir(a, siguiente);
+  }
+
   /* ---------- la cabecera de la mesa ---------- */
 
   var ESTADOS = [
@@ -181,6 +195,29 @@ var HitoMesa = (function () {
     return hacer();
   }
 
+  /* Fila 173, punto 6: la primera vez que un hito pasa a tener el guion
+     completo por una acción del usuario EN ESTA SESIÓN, se pregunta si
+     se da por hecho. Memoria en esta variable del módulo, no en disco:
+     una sola vez por hito y sesión, y nunca al abrir una mesa que ya
+     estaba completa (la primera vez que se ve un hito, se apunta su
+     estado tal cual, sin preguntar). */
+  var guionCompletoVisto = {};
+
+  async function preguntarGuionCompleto(a, h, fila) {
+    $('cuadro-cancelar').textContent = 'Todavía no';
+    var ok = await U.preguntar('Este hito ya está completo',
+      '<p>Ya están hechas todas las tareas de este hito. ¿Lo damos por hecho?</p>', 'Darlo por hecho');
+    $('cuadro-cancelar').textContent = 'Cancelar';
+    if (!ok) return;
+    var casilla = fila.querySelector(':scope > .hito-linea .hito-casilla');
+    if (!casilla || casilla.checked) return;
+    casilla.checked = true;
+    var marcado = window.HitosPanelLista && HitosPanelLista.marcarDesdeCasilla
+      ? await HitosPanelLista.marcarDesdeCasilla(casilla, a, h)
+      : false;
+    if (marcado) irAlSiguienteTrasMarcar(a);
+  }
+
   function pintarCabecera(fila, a, h, hitos, ajustes, abierto) {
     var cab = fila.querySelector(':scope > .hito-cuerpo > .mesa-cabecera');
     if (!cab || !h) return;
@@ -196,6 +233,10 @@ var HitoMesa = (function () {
     var guion = Hitos.guionDe ? Hitos.guionDe(a, h) : [];
     var cuenta = Hitos.cuentaGuion ? Hitos.cuentaGuion(guion) : { hechos: 0, total: 0 };
     var completo = cuenta.total > 0 && cuenta.hechos === cuenta.total && h.estado !== 'hecho';
+    var claveCompleto = a.nombre + '|' + h.id;
+    var completoAntes = Object.prototype.hasOwnProperty.call(guionCompletoVisto, claveCompleto)
+      ? guionCompletoVisto[claveCompleto] : completo;
+    guionCompletoVisto[claveCompleto] = completo;
 
     /* Fila 145 (docs/MESA-DEL-HITO-ENFOCADA.md): arriba, la tira de hitos a
        todo el ancho; debajo, una línea con el título, lo de plazo y
@@ -206,6 +247,11 @@ var HitoMesa = (function () {
     var estadoHTML = h.estado === 'hecho'
       ? '<button type="button" class="mesa-etq mesa-etq-estado mesa-etq-hecho">Hecho</button>'
       : '<button type="button" class="mesa-meta mesa-etq-estado">' + U.escapar(textoEstado(h.estado)) + '</button><span class="mesa-meta-punto">·</span>';
+    /* Fila 173, punto 5: sin ningún hito en curso (todos hechos o "No
+       aplica"), se enseña aquí mismo, se esté viendo el hito que se esté
+       viendo, con un atajo para archivar. */
+    var todoHecho = abierto && window.EstadoHito && EstadoHito.idActual &&
+      EstadoHito.idActual(hitos, ajustes) === null;
     cab.innerHTML =
       '<div class="mesa-tira">' + visibles.map(function (x) {
         var num = numeroDe(x) ? numeroDe(x) + '. ' : 'i · ';
@@ -235,20 +281,40 @@ var HitoMesa = (function () {
               (h.estado === 'hecho' ? 'Hecho ✓ (desmarcar)' : 'Marcar como hecho') + '</button>' : '') +
           (abierto ? '<button type="button" class="boton mesa-mas" title="Más opciones">···</button>' : '') +
         '</div>' +
-      '</div>';
+      '</div>' +
+      (todoHecho ? '<div class="mesa-todo-hecho aviso aviso-verde">Todos los hitos están hechos. ' +
+        '<button type="button" class="boton boton-principal mesa-archivar-asunto">Archivar el asunto</button></div>' : '');
 
     Array.prototype.forEach.call(cab.querySelectorAll('.mesa-tira-hito'), function (b) {
       b.onclick = function () { abrir(a, b.dataset.id); };
     });
     engancharPaneles(cab, a, h);
+    var archivarBtn = cab.querySelector('.mesa-archivar-asunto');
+    if (archivarBtn) archivarBtn.onclick = function () {
+      /* Lo mismo que el botón de la cabecera de la ficha (fila 106,
+         js/ficha-asunto.js): se pulsa el de verdad, para no repetir su
+         guardado ni su navegación al terminar. */
+      var real = document.querySelector('#ficha-archivar button');
+      if (real) { real.click(); return; }
+      U.mientrasGuarda(archivarBtn, function () { return App.cerrarAsunto(a); });
+    };
+    if (abierto && completo && !completoAntes) preguntarGuionCompleto(a, h, fila);
     if (!abierto || !window.FichaMenus) return;
 
-    /* "Marcar como hecho": la casilla de siempre, pulsada por debajo
-       (así sigue avisando de lo obligatorio sin reunir). */
+    /* "Marcar como hecho": pulsa por debajo la misma casilla de siempre
+       (así sigue avisando de lo obligatorio sin reunir), y cuando el
+       guardado termina y se ha marcado (no al desmarcar), pasa al hito
+       que haya quedado en curso (fila 173, punto 5). */
     var marcarBtn = cab.querySelector('.mesa-marcar-hecho');
-    if (marcarBtn) marcarBtn.onclick = function () {
+    if (marcarBtn) marcarBtn.onclick = async function () {
       var casilla = fila.querySelector(':scope > .hito-linea .hito-casilla');
-      if (casilla) casilla.click();
+      if (!casilla) return;
+      var seMarca = !casilla.checked;
+      casilla.checked = seMarca;
+      var ok = window.HitosPanelLista && HitosPanelLista.marcarDesdeCasilla
+        ? await HitosPanelLista.marcarDesdeCasilla(casilla, a, h)
+        : false;
+      if (ok && seMarca) irAlSiguienteTrasMarcar(a);
     };
 
     engancharRegistrar(cab.querySelector('.mesa-registrar'), a, h);

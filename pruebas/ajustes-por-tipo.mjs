@@ -61,7 +61,6 @@ await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 await pagina.click('.pestana[data-pantalla="ajustes"]');
 await pagina.waitForSelector('#tabla-tipos .tarjeta-tipo');
 

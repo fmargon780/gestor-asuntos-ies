@@ -5,6 +5,223 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 26-sep-2026 — Fila 175: Personas, Archivo y el menú llevan a algún sitio
+
+`docs/PERSONAS-ARCHIVO-Y-MENU.md`, tercera y última parte de la «tanda 1» del análisis de
+usabilidad. Va después de la 173: usa `App.nuevoAsuntoCon`. Idea de fondo: la ficha de una persona
+era un callejón sin salida, el Archivo no enseñaba nada hasta pulsar «Actualizar», el menú de la
+izquierda obligaba a dos clics para todo, y el buscador de Asuntos abiertos no encontraba lo que
+estaba en otro montón. Más unos cuantos textos que despistaban.
+
+**La ficha de una persona enseña sus asuntos, pulsables.** Se quita el botón «Ver sus asuntos»:
+`App.verFicha` (`js/archivo-personas.js`) llama a `App.verAsuntosDeTercero(p)` al pintar, y el
+bloque «Sus asuntos (N)» sale solo. Cada fila se puede pulsar: los abiertos, con
+`App.abrirFicha(abierto, 'abierto')` directamente (no `Navegacion.abrirAbierto`, que fuerza el
+origen a Asuntos abiertos — aquí tiene que quedar en Personas); los archivados, con
+`OtrosDelTercero.montarArchivado` + `App.abrirFicha(objeto, 'archivado')`, igual que «Abrir el que
+ya existe» de un duplicado archivado. Junto a «Cambiar los datos» (si sale), «+ Nuevo asunto para
+esta persona» llama a `App.nuevoAsuntoCon({ tercero: p })`. Quitar `#ver-sus-asuntos` dejó dos
+enganches colgando de un id que ya no existía: el «Borrar» de un tercero dado de alta a mano
+(`js/papelera-ajustes.js`) y «Asuntos de sus tutores» (`js/tutores-legales.js`), los dos
+retargeted al nuevo `#ficha-persona-acciones`.
+
+**El Archivo carga solo, la primera vez.** `App.ir` (`js/nucleo.js`) llama a `App.verArchivo()` al
+entrar en 'archivo' si `App.E.archivoVisitado` no está puesto (una bandera aparte:
+`App.E.listaArchivo` nace `[]`, así que no sirve para saber si ya se ha visitado). Los botones
+«Actualizar» y «Reconstruir el índice» pasan al menú de tres puntos (`U.menuDeAcciones`), y el
+aviso de índice sin hacer o desfasado lleva ahora un botón de verdad en vez de solo texto con pinta
+de botón.
+
+**El menú de la izquierda nace abierto en pantalla ancha.** `js/barra.js`: con la ventana de
+1100px o más, si no hay nada guardado todavía nace abierta y no se pliega sola al elegir una
+pantalla; por debajo, como siempre. Clave nueva, `gestor-barra-2` (antes `gestor-barra`), para que
+los dos ordenadores de Francisco, aunque tuvieran guardado «plegada», volvieran a empezar.
+
+**El buscador de Asuntos abiertos busca en todos los montones.** `js/asuntos-lista-pintar.js`
+(`App.pintarAbiertos`): con texto en el buscador, se salta el filtro de `App.deLaVista` (el montón
+elegido) — los demás filtros (plazo, «Lo encarga», el desplegable de montón) se siguen aplicando.
+Con el buscador vacío, todo como antes. Una línea «Buscando en todos los asuntos abiertos»
+(`#buscando-en-todos`, en `index.html`) avisa cuando está buscando así.
+
+**El plazo de un paso no se pierde sin avisar.** `js/guias-editor.js`: `recoger()` solo guardaba el
+plazo de un paso si tenía días Y «desde»; sin «desde», los días desaparecían en silencio. Ahora,
+antes de cerrar («Guardar», que aquí es el botón de aceptar de `U.preguntar`, envuelto con el mismo
+patrón que ya usa `js/registro.js`), `pasoConDiasSinDesde()` mira el nivel visible: si algún paso
+tiene días escritos y «desde» vacío, no cierra, avisa en rojo nombrando el paso, lo abre en el
+acordeón (`GuiasPlegado.abrir`+`aplicar`), abre su `<details>` de plazo y pone el foco en el
+desplegable.
+
+**Cinco textos que despistaban**, corregidos sin tocar el comportamiento: la etiqueta del filtro
+de montón decía el valor interno («Estado: administracion») en vez del texto elegido
+(`js/usabilidad.js`); el «· N puntos» del pie de un asunto sugerido en `js/elegir-asunto.js`, que
+solo confundía (la puntuación sigue ordenando, ya no se ve); `js/correo-rastro.js` seguía citando
+el botón «Gestionar documentos», que ya no existe; los buscadores de tercero decían «tres letras»
+pero buscan desde dos (`index.html`, `js/asuntos-nuevo-alta.js`); y el editor de guías
+(`js/guias-editor.js`) seguía hablando de pasos «con una casilla para ir marcando», de antes de que
+fueran hitos.
+
+**Lo que costó de verdad**: los ~40 ficheros de prueba que pulsaban «#btn-barra» para ver las
+pestañas, porque su viewport (casi todos ≥1280px) ahora nace ya abierto — el clic sobraba, y encima
+plegaba la barra que ya estaba abierta, escondiendo justo lo que la prueba iba a pulsar después.
+Se ha quitado ese clic (y el comentario que lo explicaba) en cada uno; solo dos quedaron aparte:
+`ajustes-agil.mjs` (pliega a propósito, más abajo, para probar el icono de Ajustes con la barra
+plegada) y `filas-estrechas.mjs` (viewport de 480px, sin cambios).
+
+Se comprueba con `pruebas/personas-archivo-y-menu.mjs` (los cinco puntos, en navegador de verdad,
+más los ya verdes `pruebas/navegador.mjs`, `pruebas/tutores-legales.mjs`,
+`pruebas/papelera.mjs`/`pruebas/papelera-buscador.mjs`, `pruebas/duplicados.mjs`,
+`pruebas/archivo-indice.mjs` y `pruebas/relacionados.mjs`) y el resto de `npm test`, en verde.
+
+---
+
+## 26-sep-2026 — Fila 174: Por clasificar usa lo que ya se ha leído
+
+`docs/POR-CLASIFICAR-USA-LO-LEIDO.md`, segunda parte de la «tanda 1» del análisis de usabilidad.
+Va después de la 173: usa `App.nuevoAsuntoCon`. Idea de fondo: el lector de documentos ya lee el
+sello de registro, la fecha y el tercero de cada PDF, y lo enseña en la tarjeta de «Por
+clasificar»; pero dos clics después la aplicación lo volvía a preguntar en blanco.
+
+**El cuadro de «Poner nombre» nace relleno** (`js/documentos-formulario.js`,
+`pintarFormulario(opciones.propuesta)`, con la misma forma que `LectorDocumentos.analizar`). Lo
+que ya trae el nombre del fichero manda; la propuesta solo rellena lo que falte: la fecha
+(convertida de `dd/mm/aaaa` a ISO con una función mínima propia del fichero, no una sola en
+`js/util.js`), y el registro, marcando «Está registrado en Séneca» con sus cuatro campos y la
+línea verde «Leído del sello de Séneca.» (mismo texto que `js/registro.js`). El tipo de documento
+—que el lector no lee nunca— arranca, si el nombre tampoco lo trae, en el último que se guardó en
+un asunto de ese mismo tipo de asunto, en este ordenador (`localStorage`,
+`gestor-ultimo-tipo-doc`).
+
+**Un solo botón para crear desde un suelto.** `App.empezarAsuntoCon` (`js/documentos-sueltos.js`)
+mira `LectorDeSueltos.resultadoDe(s.nombre)` al pulsar «Crear asunto con él»: con tipo y tercero,
+crea de un tirón (`App.crearAsuntoConPropuesta`); con tercero y sin tipo,
+`App.nuevoAsuntoCon({ tercero, fecha })` deja el tercero esperando; sin nada, como siempre, y en
+los tres casos la fecha leída va a «Fecha de inicio». Se ha quitado el botón «Aceptar»/«Crear
+asunto nuevo» que vivía aparte en `js/documentos-sueltos-lector.js`: ahora ese fichero solo ajusta
+el título y la clase (discreto con sugerencias a la vista) del mismo botón de siempre
+(`[data-accion-suelto="crear"]`).
+
+**Tras meter o crear, directo al nombre, no a la lista**, con lo leído: `App.llevarSueltoA` y
+`App.crearAsuntoDelFormulario` pasan siempre `{ ponerNombre, propuesta }` a `App.verDocumentos`
+(antes solo con un hito de por medio). «Guardar» (`js/documentos-guardar.js`) cierra el cuadro
+entero cuando se abrió así, en vez de volver a la lista — con un punto previsto,
+`N.alTerminarPonerNombre`, para que otro módulo tome el relevo en vez de cerrar — y sigue
+volviendo a la lista si se abrió desde ella (el «Poner nombre» de una fila).
+
+**Los adjuntos de un correo pasan por el cuadro, uno detrás de otro**: `js/bandeja-guardar.js`
+abre el cuadro para el primer adjunto de verdad (nunca el PDF del correo ni el del hilo) al
+terminar de guardarlo, con lo leído de **ese** fichero (`js/bandeja-adjuntos-lector.js` guarda
+ahora también el análisis por nombre, no solo el mezclado de todos); al guardar ese nombre, si
+queda otro sin nombrar, se abre para él, colgando la cola de `opciones.serieAdjuntos` y usando el
+punto previsto de arriba; al cerrar sin guardar, la serie se acaba sola. Su guardia de «el correo
+ya dejó algo puesto» tuvo que aprender a mirar también `App.E.nuevo.terceroPropuesto` (fila 173):
+sin eso, un adjunto podía pisar con otra persona un tercero que el correo ya había dejado
+esperando al tipo.
+
+**«Registrar» iguala su camino al del sello detectado solo**: si el PDF que se elige a mano es
+distinto del original, `js/registro.js` renombra el original con «SIN SELLAR» y lo manda a
+«Versiones previas» (reutilizando `RegistroSellado.nombreSinSellar`/`nombreLibreEntre`, ya
+expuestas, y `VersionesPrevias.mover`), exactamente igual que ya hacía el camino automático de
+`js/registro-sellado.js`. Si se elige el mismo fichero que ya estaba en la carpeta, no se toca
+nada más; el movimiento es accesorio.
+
+**Lo que costó de verdad**: dos sesiones distintas hicieron la fila 172 en paralelo (ver su propia
+entrada), y aquí el propio arreglo de esta fila rompió, de rebote, ocho pruebas ya existentes que
+daban por hecho el comportamiento viejo (relanzar la búsqueda tras un alta, la lista antes que el
+formulario, un botón «Aceptar» aparte, el original quedándose junto al sellado…): `aspirantes-
+numero.mjs`, `bandeja-adjuntos.mjs`, `duplicados.mjs`, `envolturas.mjs` (por quitar una envoltura
+que ya sobraba en `js/via-contacto.js`), `navegador.mjs`, `sugerir-asunto-existente.mjs`,
+`tras-cada-accion.mjs`, `word-dentro-de-la-app.mjs`, `documentos-sueltos.mjs`,
+`hito-desde-por-clasificar.mjs` y `registro.mjs` se han puesto al día con el comportamiento nuevo,
+no relajado ninguna comprobación.
+
+Prueba nueva `pruebas/por-clasificar-usa-lo-leido.mjs`: un PDF suelto con sello `26EM0368` y fecha
+10-09-2026 de un alumno conocido, con tipo reconocido por palabras clave — «Crear asunto con él»
+crea de un tirón y el cuadro de nombre sale directo, con la fecha, el registro marcado y relleno,
+y la línea verde; «Guardar» cierra el cuadro. Batería completa en verde.
+
+## 26-sep-2026 — Fila 173: Nuevo asunto, sin repetir nada
+
+`docs/NUEVO-ASUNTO-SIN-REPETIR.md`, primera parte de la «tanda 1» del análisis de usabilidad.
+Idea de fondo: la aplicación no vuelve a pedir lo que ya sabe, y después de cada acción deja al
+usuario donde lo lógico es seguir.
+
+**`App.nuevoAsuntoCon({ tercero, tipo, fecha, descripcion, viaInicial })`** (`js/asuntos-nuevo.js`),
+todo opcional: lleva a Nuevo asunto con lo ya sabido. Con tipo, lo elige y fija el tercero, sin
+pulsar Crear (igual que hacía `App.crearAsuntoConPropuesta`, que ahora usa esta función por
+dentro). Sin tipo, el tercero espera en `App.E.nuevo.terceroPropuesto` y una línea «Para: Nombre ·
+Elige el tipo de asunto» sale encima de la parrilla, con «Otra persona» para olvidarlo; al elegir
+tipo, si la categoría coincide, se fija solo.
+
+**Cambiar de tipo ya no borra el tercero** (`App.elegirTipo`): si el tipo nuevo es de la misma
+categoría, se conserva y se vuelve a fijar, para que los campos del tipo nuevo se rellenen con sus
+datos. **Dar de alta un tercero lo deja elegido** (`App.altaTercero`), en vez de relanzar la
+búsqueda y esperar el clic: se usa el objeto recién creado (el que ya devuelve `Datos.anadirALista`
+o el alta propia de una categoría como Administraciones) directamente con `App.fijarTercero`.
+
+**Una sola pregunta de vía.** Nuevo asunto preguntaba la vía dos veces: el viejo `#campo-via` +
+`#campo-via-dato`, y «Por qué vía» dentro de «Lo pide». Se han quitado los dos campos sueltos (y su
+nota) de `index.html`; el grupo pasa a llamarse «Quién lo pide y por qué vía», y
+`js/asuntos-nuevo-crear.js` guarda `ficha.via`/`viaDato` con `App.loPideNuevoControles.leerVia()` —
+que ya daba `{via, dato}` pase lo que pase, aunque no se elija «quién»—, en el mismo sitio y formato
+de siempre. La fecha de «Lo pide» nace con la de «Fecha de inicio» y la sigue mientras no se toque
+a mano. `js/via-contacto.js` pierde el bloque que enganchaba a `#campo-via` (ya muerto): los
+botones «De su ficha:» los pone la envoltura de `LoPide.controles` que ya existía para «El
+encargo», y que ahora alcanza también a Nuevo asunto sin ningún cambio en ese fichero.
+`js/bandeja-propuesta.js` (`llevarANuevo`) pasa a usar `App.nuevoAsuntoCon`, con la vía como
+`viaInicial: { via: 'CORREO', viaDato: <remitente> }` en vez de rellenar el campo suelto.
+
+**En la mesa del hito** (`js/hito-mesa.js`, `js/hitos-panel-lista.js`): «Marcar como hecho» (no
+«Desmarcar») abre, al terminar de guardarse, la mesa del hito que haya quedado en curso
+(`EstadoHito.idActual`, con los datos recién escritos, no los del último repintado); si es una
+pregunta sin responder, se abre igual. Sin ninguno en curso, bajo el título sale «Todos los hitos
+están hechos.» con un botón que pulsa el de verdad de «Archivar el asunto» de la cabecera de la
+ficha. La lógica de marcar (con el aviso de lo obligatorio) salió de la casilla de la lista a
+`HitosPanelLista.marcarDesdeCasilla`, que ahora comparten la casilla y el botón de la mesa. Cuando
+el guion de un hito llega a estar completo por una acción del usuario en esta sesión (marcar,
+generar, registrar, comunicar, añadir), se pregunta una vez «¿Lo damos por hecho?» — memoria en una
+variable de `HitoMesa`, no en disco, así que nunca se pregunta dos veces por el mismo hito ni al
+abrir una mesa que ya estaba completa.
+
+**«Guardar PDF» cierra el visor de Word** (`js/word-visor.js`): con el PDF guardado y apuntado al
+hito, se llama a `cerrar()`, para volver a la mesa sin pulsar «Cerrar» a mano. Si falla algo
+principal, el visor se queda abierto (ya se ha salido antes con `return`); con «Imprimir», tampoco
+se cierra.
+
+Prueba nueva `pruebas/nuevo-asunto-sin-repetir.mjs`: cambiar de tipo (misma categoría) conserva el
+tercero; dar de alta lo deja elegido sin pulsar nada; una sola pregunta de vía, con `ficha.via`
+guardado; y «Marcar como hecho» deja abierta la mesa del hito siguiente. Batería completa en verde.
+
+## 26-sep-2026 — Fila 172: el buscador de la papelera
+
+**Nota de sesiones en paralelo:** esta sesión ya la había empezado (y hecho, entera) cuando
+descubrió, justo antes de subir nada, que otra sesión la había hecho y fusionado en `main` en
+paralelo (misma fila, mismo documento, diseño ya cerrado). Se descartó el duplicado propio con
+`git merge` (sin perder nada: los dos diseños coincidían) y se completó solo lo que había quedado
+suelto de la versión ya fusionada: la propia entrada de este documento, que esa sesión no pudo
+subir por no tener `git push` de verdad (dejó el texto listo en `docs/COLA.md` para pegar).
+
+`docs/PAPELERA-BUSCADOR.md`. Caja de búsqueda encima de la lista del bloque Papelera de Ajustes
+(`js/papelera-ajustes.js`), con el texto de ayuda «Buscar en la papelera». Filtra mientras se
+escribe, sin botón, con el mismo criterio que ya usan los buscadores de asuntos abiertos y del
+ARCHIVO: palabras sueltas, en cualquier orden, sin distinguir mayúsculas ni tildes
+(`U.normalizar`), y una ficha se queda si las contiene todas. Busca en el nombre de lo borrado,
+qué era, de dónde salía, quién lo borró y la fecha — escrita como `AAMMDD` (`U.aAaMmDd`) y como
+`dd/mm/aaaa` (`U.fechaLegible`), para que «2609» o «26/09» encuentren lo borrado ese día.
+
+Contador «N de M» junto a la caja (solo el total, sin nada escrito); sin coincidencias, «Nada en
+la papelera con esas palabras.». El aviso ámbar de «más de 30 días» y su botón de borrado de golpe
+siguen mirando la papelera entera, no lo filtrado — el texto del botón lo dice si hay un filtro
+puesto («… (de toda la papelera)»). Lo escrito se conserva al repintarse la lista (devolver o
+borrar una fila, o un cambio del compañero) con `U.conservandoLoEscrito`, aunque en la práctica la
+caja vive fuera del trozo que se repinta y nunca se destruye.
+
+No se toca `_GESTOR/papelera.json`: el filtro es solo de pantalla, ni busca dentro del contenido
+de los documentos borrados.
+
+Prueba nueva `pruebas/papelera-buscador.mjs`: tres cosas en la papelera, dos palabras en desorden
+y sin tildes dejan solo la que toca, el contador dice «1 de 3», sin coincidencias avisa, y tras
+«Devolver a su sitio» la caja conserva lo escrito. Batería completa en verde.
+
 ## 25-sep-2026 — Fila 171: un documento para cada relacionado
 
 `docs/DOCUMENTO-PARA-CADA-RELACIONADO.md`. En la mesa del hito, junto a cada plantilla, «… para cada

@@ -100,7 +100,6 @@ await pagina.evaluate(async () => {
 
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra'); /* la barra nace plegada; se abre para ver las pestañas */
 await pagina.waitForTimeout(300);
 
 console.log('=== 1. Asuntos abiertos: se ve entera, se encoge, se despliega ===');

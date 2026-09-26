@@ -89,7 +89,6 @@ await pagina.evaluate(async () => {
 
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 /* ---------- asunto B: sin relacionados, para el escenario 1 ---------- */
 
@@ -310,8 +309,9 @@ await comprobar('la ficha de Aguado dice que está relacionado (archivado)',
 
 /* 7) Reabrir el asunto borra las dos notas, pero la lista de
    relacionados sigue en la ficha. */
+/* La primera vez que se entra en el Archivo en la sesión ya carga
+   sola (fila 175, punto 3): no hace falta pulsar "Actualizar". */
 await pagina.click('.pestana[data-pantalla="archivo"]');
-await pagina.click('#btn-recargar-archivo');
 await pagina.waitForSelector('#lista-archivo .tarjeta');
 await comprobar('las notas no aparecen como asuntos en el Archivo',
   pagina.locator('#lista-archivo .tarjeta').count(), 2);
@@ -380,6 +380,7 @@ await pagina.evaluate(async ([m]) => {
 }, [NOMBRE_MARCADOR]);
 
 await pagina.click('.pestana[data-pantalla="archivo"]');
+await pagina.click('#pantalla-archivo .acciones .fila-menu-btn');
 await pagina.click('#btn-recargar-archivo');
 await pagina.waitForSelector('#lista-archivo .tarjeta');
 await pagina.locator('#lista-archivo .tarjeta').filter({ hasText: 'MATRICULA' })

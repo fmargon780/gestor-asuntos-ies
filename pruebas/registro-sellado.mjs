@@ -89,7 +89,6 @@ await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 /* El asunto con el documento ya nombrado, y el PDF sellado suelto al
    lado, tal como llegaría de descargarlo de Séneca. */

@@ -364,9 +364,11 @@
     return function (p) {
       comoEra(p);
       if (!App.sePuedeCambiarElTercero || !App.sePuedeCambiarElTercero(p)) return;
-      var botones = $('ver-sus-asuntos');
-      if (!botones || !botones.parentNode) return;
-      var caja = botones.parentNode;
+      /* Fila 175: el botón de "Cambiar los datos" pasó a
+         #ficha-persona-acciones (antes, junto a "Ver sus asuntos",
+         que ya no existe). */
+      var caja = $('ficha-persona-acciones');
+      if (!caja) return;
       caja.appendChild(botonBorrar(async function () {
         var enUso = 0;
         try {

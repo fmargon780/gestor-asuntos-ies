@@ -33,16 +33,21 @@ Cambiar el estado con la ficha abierta hacía 30-40 lecturas de disco. Ahora sol
 **Botón de Salir** (`js/salir.js`). Al pie de la barra de la izquierda. Cierra la sesión: recarga
 la página y vuelve a la pantalla de entrada, con las carpetas ya señaladas. Pide confirmación.
 
-**La barra de la izquierda** (`js/barra.js`, `css/barra.css`). Se pliega y nace plegada; un
-botón de tres rayas la abre y la cierra; al elegir una pantalla se vuelve a plegar sola; se
-recuerda en `gestor-barra`. **Queda fija en pantalla** (`position:fixed`); el contenido se
-desplaza con `margin-left` (232px, o 52px plegada, **sin tope de ancho**: quitado en la fila 36,
-17-sep-2026, porque dejaba franjas vacías en un monitor ancho). Ajustes está en la lista de
-pestañas, separado por una línea (`.separador-lateral`); con la barra plegada, un icono de rueda
-dentada (`#btn-barra-ajustes`) lleva directo a Ajustes. El botón grande "+ Nuevo asunto" va en la
-cabecera de Asuntos abiertos, y lo pone el mismo fichero. **Se pliega sola al abrir el visor o el
-lector** (un `MutationObserver` sobre las clases `con-visor`/`con-lector` de `<body>`, sin tocar
-`gestor-barra`) y vuelve a como estaba al cerrarlo.
+**La barra de la izquierda** (`js/barra.js`, `css/barra.css`). Se pliega; un botón de tres rayas la
+abre y la cierra; se recuerda en `gestor-barra-2` (fila 175, `docs/PERSONAS-ARCHIVO-Y-MENU.md`,
+punto 4; antes `gestor-barra` — la clave cambió para que los dos ordenadores, aunque tuvieran
+guardado "plegada", volvieran a empezar). `comoEstaba()` solo lee esa clave; si no hay nada guardado
+todavía (primera vez con la clave nueva), decide por el ancho de la ventana: **1100px o más, nace
+abierta y no se pliega sola** al elegir una pantalla (sobra sitio de sobra); por debajo, como
+siempre, nace plegada y se pliega sola al elegir. En cuanto se pliega o se abre a mano queda
+grabado, y eso manda a partir de ahí, ancha o estrecha la ventana. **Queda fija en pantalla**
+(`position:fixed`); el contenido se desplaza con `margin-left` (232px, o 52px plegada, **sin tope
+de ancho**: quitado en la fila 36, 17-sep-2026, porque dejaba franjas vacías en un monitor ancho).
+Ajustes está en la lista de pestañas, separado por una línea (`.separador-lateral`); con la barra
+plegada, un icono de rueda dentada (`#btn-barra-ajustes`) lleva directo a Ajustes. El botón grande
+"+ Nuevo asunto" va en la cabecera de Asuntos abiertos, y lo pone el mismo fichero. **Se pliega sola
+al abrir el visor o el lector** (un `MutationObserver` sobre las clases `con-visor`/`con-lector` de
+`<body>`, sin tocar `gestor-barra-2`) y vuelve a como estaba al cerrarlo.
 
 **Que ninguna fila se aplaste** (`css/filas.css`, fila 36, 17-sep-2026,
 `docs/FILAS-QUE-NO-SE-ESTRUJAN.md`). Antes, una fila con texto y varios botones en línea

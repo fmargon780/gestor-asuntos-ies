@@ -541,3 +541,25 @@ Drive, nada de dirección web ni clave; la fila 142 lo hacía por dirección web
     con su valor (desplegable con los que hay), cuántos salen y «Añadirlos». Solo matriculados,
     salvo «Incluir antiguos». Quien no está en el RegAlum no se puede añadir (se cuenta aparte).
 - **Frescura**: `js/frescura.js` usa `generado` si es más reciente que el RegAlum.
+
+### Sus asuntos, en la propia ficha (26-sep-2026, fila 175, `docs/PERSONAS-ARCHIVO-Y-MENU.md`)
+
+`js/archivo-personas.js`. Ya no hay botón «Ver sus asuntos»: `App.verFicha` llama a
+`App.verAsuntosDeTercero(p)` al pintar, y el bloque («Sus asuntos (N)») sale solo, debajo de
+`#ficha-persona-acciones` (el mismo párrafo donde va, si sale, «Cambiar los datos»). Abiertos
+primero, cada grupo del más reciente al más antiguo (`Carpetas.subcarpetas` de `App.E.abiertos` y
+de la carpeta del tercero en el ARCHIVO, sin pasar por el índice).
+
+Cada fila es un `.resultado` pulsable: los abiertos, con `App.abrirFicha(abierto, 'abierto')` (NO
+`Navegacion.abrirAbierto`, que fuerza el origen a Asuntos abiertos: aquí el origen tiene que quedar
+en Personas, que es justo lo que hace `Navegacion.apuntar()` por sí sola al llamar a `abrirFicha`
+directamente); los archivados, con `OtrosDelTercero.montarArchivado` + `App.abrirFicha(objeto,
+'archivado')`, igual que «Abrir el que ya existe» de un duplicado archivado (`js/duplicados.js`).
+
+Junto a «Cambiar los datos» (si sale), el botón **«+ Nuevo asunto para esta persona»** llama a
+`App.nuevoAsuntoCon({ tercero: p })` (fila 173): categoría ya elegida, tercero propuesto, esperando
+a que se elija el tipo.
+
+Fallout: `js/papelera-ajustes.js` (el «Borrar» de un tercero dado de alta a mano) y
+`js/tutores-legales.js` («Asuntos de sus tutores») colgaban del viejo `#ver-sus-asuntos`; los dos
+se enganchan ahora a `#ficha-persona-acciones`. Se comprueba con `pruebas/personas-archivo-y-menu.mjs`.

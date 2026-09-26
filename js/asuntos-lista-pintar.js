@@ -22,10 +22,16 @@ App.pintarAbiertos = function () {
   var plazo = $('filtro-plazo').value;
   var organo = $('filtro-organo') ? $('filtro-organo').value : '';   /* fila 134 */
 
+  /* Fila 175, punto 5: con texto en el buscador, se busca en todos los
+     montones a la vez (no solo en el elegido); los demás filtros
+     (plazo, «Lo encarga», «Montón» no aplica aquí) se siguen aplicando. */
+  var buscandoEnTodos = palabras.length > 0;
+  if ($('buscando-en-todos')) $('buscando-en-todos').classList.toggle('oculto', !buscandoEnTodos);
+
   /* Primero, el montón entero: lo que pasa el buscador y los filtros.
      Sobre esto se cuentan las tarjetas de tipo. */
   var monton = App.E.listaAbiertos.filter(function (a) {
-    if (!App.deLaVista(a, App.E.vista)) return false;
+    if (!buscandoEnTodos && !App.deLaVista(a, App.E.vista)) return false;
     if (palabras.length) {
       /* Un reservado tapado solo sale por su nombre de carpeta (fila 135). */
       var busca = (window.Reservados && Reservados.tapar(a)) ? Reservados.textoDeBusqueda(a) : a.busca;

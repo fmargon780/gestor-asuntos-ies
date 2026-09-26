@@ -57,26 +57,12 @@ App.actualizarLimiteNuevo = function () {
 
 App.prepararNuevo = function () {
   if (!$('campo-fecha').value) $('campo-fecha').value = U.hoyIso();
-  App.pintarEstadoNuevo();
   App.actualizarLimiteNuevo();
   App.actualizarCursoNuevo();
   App.pintarPendiente();
   App.pintarCategorias();
   if (App.E.nuevo.categoria) App.pintarTipos();
   App.refrescarVista();
-};
-
-/* La vía de comunicación con la que nace el asunto. Desde la fila 129
-   (docs/EL-HITO-ES-EL-ESTADO.md) ya no se elige estado: el estado del
-   asunto es su hito actual. El nombre se queda por quien ya lo llama. */
-App.pintarEstadoNuevo = function () {
-  var via = $('campo-via');
-  if (!via.options.length) {
-    via.innerHTML = '<option value="">Sin indicar</option>' +
-      Nombres.VIAS.map(function (v) {
-        return '<option value="' + v.clave + '">' + U.escapar(v.texto) + '</option>';
-      }).join('');
-  }
 };
 
 /* Primero la categoría. Con cuatro botones se llega a los diez tipos
@@ -100,6 +86,7 @@ App.elegirCategoria = function (cat) {
   App.E.nuevo.categoria = cat;
   App.E.nuevo.tipo = null;
   App.E.nuevo.tercero = null;
+  App.E.nuevo.terceroPropuesto = null;
   App.pintarCategorias();
   App.pintarTipos();
   $('bloque-tipos').classList.remove('oculto');
@@ -107,7 +94,26 @@ App.elegirCategoria = function (cat) {
   $('bloque-detalles').classList.add('oculto');
 };
 
+/* «Para: Nombre del tercero» encima de la parrilla, cuando
+   App.nuevoAsuntoCon ha llegado con un tercero pero sin tipo (fila 173,
+   punto 1): espera a que se elija el tipo para fijarlo. */
+function pintarTerceroPropuesto() {
+  var caja = $('tercero-propuesto-nuevo');
+  if (!caja) return;
+  var p = App.E.nuevo.terceroPropuesto;
+  if (!p) { caja.classList.add('oculto'); caja.innerHTML = ''; return; }
+  caja.classList.remove('oculto');
+  caja.innerHTML = '<span>Para: <strong>' + U.escapar(App.textoTercero(p)) +
+    '</strong> · Elige el tipo de asunto</span> ' +
+    '<button type="button" class="enlace" id="btn-otra-persona-nuevo">Otra persona</button>';
+  $('btn-otra-persona-nuevo').onclick = function () {
+    App.E.nuevo.terceroPropuesto = null;
+    pintarTerceroPropuesto();
+  };
+}
+
 App.pintarTipos = function () {
+  pintarTerceroPropuesto();
   var caja = $('tipos-lista');
   caja.innerHTML = '';
   var deEsta = App.E.tipos.filter(function (t) { return t.categoria === App.E.nuevo.categoria; });
@@ -125,10 +131,19 @@ App.pintarTipos = function () {
   });
 };
 
+/* Cambiar de tipo no borra el tercero si sigue siendo de la misma
+   categoría (fila 173, docs/NUEVO-ASUNTO-SIN-REPETIR.md, punto 2): se
+   vuelve a fijar, para que los campos del tipo nuevo se rellenen con
+   sus datos. Solo se borra si cambia la categoría. */
 App.elegirTipo = function (t) {
+  var terceroAnterior = App.E.nuevo.tercero;
+  var seConserva = terceroAnterior && App.E.nuevo.categoria === t.categoria;
+  var propuesto = App.E.nuevo.terceroPropuesto;
+  var seAplicaPropuesto = !seConserva && propuesto && propuesto.categoria === t.categoria;
   App.E.nuevo.tipo = t.tipo;
   App.E.nuevo.categoria = t.categoria;
   App.E.nuevo.tercero = null;
+  App.E.nuevo.terceroPropuesto = null;
   App.pintarTipos();
   $('bloque-tercero').classList.remove('oculto');
   $('bloque-detalles').classList.add('oculto');
@@ -141,7 +156,49 @@ App.elegirTipo = function (t) {
   $('bloque-campos').classList.add('oculto');
   $('campos-lista-nuevo').innerHTML = '';
   App.actualizarLimiteNuevo();
-  $('buscar-tercero').focus();
+  if (seConserva) {
+    App.fijarTercero(terceroAnterior);
+  } else if (seAplicaPropuesto) {
+    App.fijarTercero(propuesto);
+  } else {
+    $('buscar-tercero').focus();
+  }
+};
+
+/* Lleva a Nuevo asunto con lo que ya se sabe, sin volver a pedirlo
+   (fila 173, docs/NUEVO-ASUNTO-SIN-REPETIR.md, punto 1). Todo opcional:
+   - con tipo: lo elige y fija el tercero, sin pulsar Crear.
+   - sin tipo: dejа el tercero esperando (App.E.nuevo.terceroPropuesto),
+     con la categoría ya elegida, hasta que se elija un tipo.
+   - fecha va a «Fecha de inicio»; descripcion, a «Descripción corta».
+   - viaInicial ({via, viaDato}), a «Lo pide» (punto 4: los asuntos que
+     llegan de la bandeja de correo siguen entrando con «Correo
+     electrónico» y la dirección del remitente). */
+App.nuevoAsuntoCon = function (opciones) {
+  opciones = opciones || {};
+  var tercero = opciones.tercero || null;
+  var tipoObj = opciones.tipo
+    ? App.E.tipos.filter(function (t) { return t.tipo === opciones.tipo; })[0] || null
+    : null;
+  var categoria = tercero ? tercero.categoria : (tipoObj ? tipoObj.categoria : null);
+
+  App.ir('nuevo');
+  App.E.nuevo.viaInicial = opciones.viaInicial || null;
+  if (categoria) App.elegirCategoria(categoria);
+
+  if (tipoObj) {
+    App.elegirTipo(tipoObj);
+    if (tercero) App.fijarTercero(tercero);
+  } else if (tercero) {
+    App.E.nuevo.terceroPropuesto = tercero;
+    App.pintarTipos();
+  }
+
+  if (opciones.fecha) $('campo-fecha').value = opciones.fecha;
+  App.actualizarCursoNuevo();
+  App.actualizarLimiteNuevo();
+  if (opciones.descripcion) $('campo-descripcion').value = opciones.descripcion;
+  App.refrescarVista();
 };
 
 /* Deja un tipo elegido, exactamente como si se hubiera pulsado su

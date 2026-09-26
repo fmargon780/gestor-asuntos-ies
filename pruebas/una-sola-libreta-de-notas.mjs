@@ -94,7 +94,6 @@ await comprobar('y el juntar no duplica aunque se lo pidan dos veces', pagina.ev
 }), 0);
 
 console.log('--- 3. la ficha ---');
-await pagina.click('#btn-barra');
 await pagina.evaluate((n) => App.abrirFicha(App.E.listaAbiertos.filter(a => a.nombre === n)[0], 'abierto'), ANA);
 await pagina.waitForSelector('#ficha-notas', { state: 'attached' });
 await esperar(() => document.querySelectorAll('#ficha-notas .nota-hito').length === 2);

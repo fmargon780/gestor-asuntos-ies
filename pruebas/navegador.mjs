@@ -168,11 +168,8 @@ await pagina.evaluate(async () => {
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
 
-/* La barra de la izquierda nace plegada (10-sep-2026), y plegada las
-   pestanas no se ven. Se abre una vez, y como se recuerda en
-   localStorage, se queda abierta el resto de la prueba. */
-await pagina.click('#btn-barra');
-
+/* Fila 175: con la ventana ancha la barra nace abierta, las pestañas
+   se ven sin tener que abrirla. */
 await comprobar('entra en la aplicación', pagina.locator('#lista-abiertos').isVisible(), true);
 await comprobar('la lista empieza vacía', pagina.locator('#lista-abiertos .vacio').count(), 1);
 
@@ -339,8 +336,9 @@ await comprobar('la carpeta ha aterrizado en el archivo', pagina.evaluate(async 
 }), ['260907 MATRICULA 26-27 2ºB Cambio de optativa Aguilar Ponce, Marina 1140233']);
 
 /* --- archivo y reapertura --- */
+/* La primera vez que se entra en el Archivo en la sesión ya carga
+   sola (fila 175, punto 3): no hace falta pulsar "Actualizar". */
 await pagina.click('.pestana[data-pantalla="archivo"]');
-await pagina.click('#btn-recargar-archivo');
 await pagina.waitForSelector('#lista-archivo .tarjeta');
 await comprobar('el archivo lo enseña', pagina.locator('#lista-archivo .tarjeta').count(), 1);
 
@@ -356,8 +354,7 @@ await comprobar('la ficha enseña el teléfono del tutor', ficha.indexOf('600111
 await comprobar('la edad sale antes que el resto del fichero',
   ficha.indexOf('Edad actual') < ficha.indexOf('Nº Id. Escolar'), true);
 
-/* --- sus asuntos --- */
-await pagina.click('#ver-sus-asuntos');
+/* --- sus asuntos (fila 175: salen solos, sin pulsar nada) --- */
 await pagina.waitForSelector('#asuntos-del-tercero .resultado');
 await comprobar('ve su asunto archivado',
   pagina.locator('#asuntos-del-tercero .resultado').count(), 1);
@@ -383,10 +380,11 @@ await pagina.fill('.alta-campo[data-campo="Nombre"]', 'Nuevo Aspirante, Lucas');
 await pagina.fill('.alta-campo[data-campo="Fecha de nacimiento"]', '10/04/2012');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
+/* Fila 173, punto 3: dar de alta deja el tercero elegido, sin pulsar
+   ningún resultado. */
 await comprobar('el solicitante aparece marcado como tal',
-  pagina.locator('#resultados-tercero .resultado-pie').first().textContent()
+  pagina.locator('#tercero-elegido .resultado-pie').first().textContent()
     .then(t => t.indexOf('Solicitante, todavía sin matricular') !== -1), true);
-await pagina.click('#resultados-tercero .resultado');
 await comprobar('al solicitante no se le ofrece grupo',
   pagina.locator('#bloque-grupo').isHidden(), true);
 await comprobar('sin Nº, el nombre de la carpeta va solo con el nombre',
@@ -609,6 +607,7 @@ await comprobar('el nombre viejo queda guardado como alias', pagina.evaluate(asy
 }), ['SANCION']);
 
 await pagina.click('.pestana[data-pantalla="archivo"]');
+await pagina.click('#pantalla-archivo .acciones .fila-menu-btn');
 await pagina.click('#btn-recargar-archivo');
 await pagina.waitForTimeout(600);
 await comprobar('el archivo enseña la carpeta vieja con el nombre nuevo',

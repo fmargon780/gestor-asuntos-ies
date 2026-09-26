@@ -234,7 +234,10 @@
         var r;
         try { r = await completado(item); } catch (e) { r = null; }
         if (!r || (!r.tercero && !r.tipo)) return;
-        if (App.E.nuevo.tercero || App.E.nuevo.tipo) return;   /* el correo ya dejó algo puesto */
+        /* El correo ya dejó algo puesto (fila 173: el tercero puede
+           estar solo "propuesto", esperando a que se elija el tipo,
+           sin tipo todavía). */
+        if (App.E.nuevo.tercero || App.E.nuevo.tipo || App.E.nuevo.terceroPropuesto) return;
         try {
           if (r.tipo) App.elegirTipo(r.tipo);
           else if (r.tercero) App.elegirCategoria(r.tercero.categoria);

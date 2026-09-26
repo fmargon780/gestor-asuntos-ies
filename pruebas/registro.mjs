@@ -117,7 +117,6 @@ await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 /* Un asunto con un documento ya dentro, sin pasar por el formulario de
    Nuevo asunto: aquí solo hace falta el asunto y el documento, no cómo
@@ -157,12 +156,22 @@ await comprobar('el nombre se monta con la fecha y el tipo del original, más el
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
 
-await comprobar('el registrado se guarda junto al original', pagina.evaluate(async (asunto) => {
-  const carpeta = await window.__disco.abiertos.getDirectoryHandle(asunto);
-  const nombres = [];
-  for await (const p of carpeta.entries()) nombres.push(p[0]);
-  return nombres.sort();
-}, NOMBRE_ASUNTO), [FACTURA, '260911 26EM1234 FACTURA Referencia 123.pdf'].sort());
+/* Fila 174, punto 6: igual que ya hace el sello detectado solo
+   (js/registro-sellado.js), el original pasa a "SIN SELLAR" y a
+   «Versiones previas» — el fichero elegido en el selector (la
+   "descarga sin nombre" de mentira, ver pruebas/navegador.mjs) es
+   distinto del original, así que sí se aparta. */
+const FACTURA_SIN_SELLAR = '260911 FACTURA Referencia 123 SIN SELLAR.pdf';
+await comprobar('el registrado se guarda, y el original pasa a "Versiones previas" como SIN SELLAR',
+  pagina.evaluate(async (asunto) => {
+    const carpeta = await window.__disco.abiertos.getDirectoryHandle(asunto);
+    const nombres = [];
+    for await (const p of carpeta.entries()) nombres.push(p[0]);
+    const previas = [];
+    for await (const p of (await carpeta.getDirectoryHandle('Versiones previas')).entries()) previas.push(p[0]);
+    return [nombres.sort(), previas];
+  }, NOMBRE_ASUNTO),
+  [['260911 26EM1234 FACTURA Referencia 123.pdf', 'Versiones previas'].sort(), [FACTURA_SIN_SELLAR]]);
 
 await comprobar('se apunta la nota con el código del registro', pagina.evaluate(async (asunto) => {
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
@@ -174,8 +183,10 @@ await comprobar('se apunta la nota con el código del registro', pagina.evaluate
 
 await comprobar('el nuevo documento, ya con registro, no lleva botón Registrar',
   filaDeDocumento('260911 26EM1234 FACTURA Referencia 123.pdf'), { pendiente: false, registrar: false });
-await comprobar('el original, sin registro en su nombre, lo sigue pudiendo llevar',
-  filaDeDocumento(FACTURA), { pendiente: false, registrar: true });
+await comprobar('el original ya no sale como documento suelto: se ha ido a "Versiones previas"',
+  filaDeDocumento(FACTURA), null);
+await comprobar('y sale plegado en «1 versión previa · ver»',
+  pagina.locator('.ficha-previas summary').textContent(), '1 versión previa · ver');
 
 console.log('--- un documento con la casilla "Pendiente de registro" ---');
 /* Desde la fila 168, «+ Añadir documento» en la cabecera del bloque va

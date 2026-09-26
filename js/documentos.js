@@ -69,9 +69,13 @@ var Documentos = (function () {
     await pintarLista();
     /* `opciones.ponerNombre` (arreglo de la fila 103): abre directamente
        el formulario de ponerle nombre a ese documento de la carpeta (el
-       que acaba de entrar desde "Por clasificar"). */
+       que acaba de entrar desde "Por clasificar"). Fila 174: se marca
+       `ponerNombre: true` en las propias opciones del formulario (para
+       que "Guardar" sepa cerrar el cuadro en vez de volver a la lista) y
+       se pasa `propuesta`, si la hay, con lo ya leído del documento. */
     if (opciones && opciones.ponerNombre) {
-      N.pintarFormulario({ modo: 'renombrar', nombreActual: opciones.ponerNombre });
+      N.pintarFormulario({ modo: 'renombrar', nombreActual: opciones.ponerNombre,
+        ponerNombre: true, propuesta: (opciones && opciones.propuesta) || null });
     }
     /* Un fichero soltado encima de la mesa del hito (fila 109): lo mismo
        que "Desde el ordenador", con el fichero ya elegido. */

@@ -131,7 +131,10 @@ await comprobar('y el Word, con su PDF, pasa a «Versiones previas»', pagina.ev
   const d = await window.__disco.abiertos.getDirectoryHandle(a1);
   try { await (await d.getDirectoryHandle('Versiones previas')).getFileHandle(n); return true; } catch (e) { return false; }
 }, [ASUNTO, word]), true);
-await pagina.click('#word-visor .word-visor-cerrar');
+/* Fila 173, punto 7: «Guardar PDF» ya deja cerrado el visor solo, sin
+   tener que pulsar «Cerrar» a mano. */
+await comprobar('«Guardar PDF» cierra el visor solo',
+  pagina.evaluate(() => document.getElementById('word-visor').classList.contains('oculto')), true);
 
 console.log('--- 4. abrir un .docx que ya está ---');
 await pagina.evaluate(() => { window.__abiertos = []; });

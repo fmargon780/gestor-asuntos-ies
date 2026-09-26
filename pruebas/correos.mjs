@@ -201,6 +201,14 @@ await comprobar('sin huella, lo reconoce por el texto del asunto',
 console.log('--- guardando el correo en el asunto ---');
 await pagina.getByRole('button', { name: 'Guardar en ese asunto' }).click();
 await pagina.waitForTimeout(1200);
+/* Fila 174, punto 5: con adjuntos de verdad, se abre el cuadro de
+   ponerles nombre (sin "Cancelar": solo "Cerrar", `#cuadro-aceptar`);
+   aquí no hace falta nombrarlos (ya han entrado con un nombre válido),
+   así que se cierra sin más. */
+if (await pagina.locator('#capa:not(.oculto)').isVisible().catch(() => false)) {
+  await pagina.click('#cuadro-aceptar');
+  await pagina.waitForSelector('#capa', { state: 'hidden' });
+}
 
 async function ficherosDelAsunto(nombre) {
   return pagina.evaluate(async (n) => {

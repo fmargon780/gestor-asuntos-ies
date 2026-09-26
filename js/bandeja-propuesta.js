@@ -118,35 +118,20 @@
     return t.length > 60 ? t.slice(0, 60).trim() : t;
   }
 
-  function ponerViaCorreo(direccion) {
-    var sel = $('campo-via');
-    if (!sel) return;
-    for (var i = 0; i < sel.options.length; i++) {
-      if (U.normalizar(sel.options[i].textContent).indexOf('correo') !== -1) {
-        sel.value = sel.options[i].value;
-        break;
-      }
-    }
-    var dato = $('campo-via-dato');
-    if (dato && !dato.value.trim()) dato.value = direccion || '';
-  }
-
   async function llevarANuevo(item) {
     var d = item.datos;
     N.ponerPendiente(item);
-    App.ir('nuevo');
 
     var p = await proponer(d);
-    if (p.categoria) App.elegirCategoria(p.categoria);
-    if (p.tipo) App.elegirTipo(p.tipo);
-    if (p.tercero) App.fijarTercero(p.tercero);
-
-    if (d.fecha) $('campo-fecha').value = d.fecha;
-    App.actualizarCursoNuevo();
-    App.actualizarLimiteNuevo();
-    if (!$('campo-descripcion').value.trim()) $('campo-descripcion').value = descripcionDe(d.asunto);
-    ponerViaCorreo(d.de && d.de.correo);
-    App.refrescarVista();
+    /* La vía sigue llegando como "Correo electrónico" y la dirección
+       del remitente, ahora dentro de "Lo pide" (fila 173, punto 4). */
+    App.nuevoAsuntoCon({
+      tercero: p.tercero,
+      tipo: p.tipo ? p.tipo.tipo : null,
+      fecha: d.fecha || null,
+      descripcion: descripcionDe(d.asunto),
+      viaInicial: { via: 'CORREO', viaDato: (d.de && d.de.correo) || '' }
+    });
     pintarAvisoPendiente();
 
     if (!p.tercero) {

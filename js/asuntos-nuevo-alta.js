@@ -59,12 +59,17 @@ App.admiteAlta = function (categoria) {
   return !!def && !def.sinAlta;
 };
 
+/* Tras dar de alta, queda elegido sin tener que volver a pulsarlo
+   (fila 173, docs/NUEVO-ASUNTO-SIN-REPETIR.md, punto 3): si estamos en
+   Nuevo asunto y en la misma categoría, se llama a App.fijarTercero con
+   el recién creado, en vez de relanzar la búsqueda y esperar el clic.
+   Si por lo que sea no se encuentra, se deja el camino de siempre. */
 App.altaTercero = async function (categoria, sugerencia) {
   if (App.ALTAS_DE_CATEGORIA[categoria]) {
     var nueva = await App.ALTAS_DE_CATEGORIA[categoria](sugerencia);
     if (!nueva) return;
     U.aviso('Dado de alta.', 'bueno');
-    if (App.E.nuevo.categoria === categoria) { $('buscar-tercero').value = nueva.nombre; App.buscarTercero(); }
+    if (App.E.nuevo.categoria === categoria) { App.fijarTercero(nueva); return; }
     return;
   }
   var def = Datos.LISTAS[categoria];
@@ -76,9 +81,14 @@ App.altaTercero = async function (categoria, sugerencia) {
   deEntrada[def.cabecera[0]] = sugerencia || '';
   var valores = await App.cuadroDeTercero(categoria, deEntrada, titulo);
   if (!valores) return;
-  await Datos.anadirALista(App.E.datos, categoria, valores);
+  var fuente = await Datos.anadirALista(App.E.datos, categoria, valores);
   U.aviso('Dado de alta.', 'bueno');
-  $('buscar-tercero').value = valores[def.cabecera[0]];
+  var nombreNuevo = valores[def.cabecera[0]];
+  if (App.E.nuevo.categoria === categoria) {
+    var creado = fuente && fuente.lista && fuente.lista.filter(function (p) { return p.nombre === nombreNuevo; })[0];
+    if (creado) { App.fijarTercero(creado); return; }
+  }
+  $('buscar-tercero').value = nombreNuevo;
   App.buscarTercero();
 };
 
@@ -150,7 +160,7 @@ App.pintarBuscadorDeTercero = function (contenedor, categoriaInicial, alElegir, 
   contenedor.innerHTML =
     '<div class="categorias-mini" id="rel-categorias"></div>' +
     '<div id="rel-buscador" class="oculto">' +
-      '<input id="rel-buscar" class="campo" placeholder="Escribe tres letras del nombre">' +
+      '<input id="rel-buscar" class="campo" placeholder="Escribe dos letras del nombre">' +
       '<div id="rel-resultados" class="resultados"></div>' +
     '</div>' +
     (multiple ? '<div id="rel-marcados-barra" class="marcados-barra oculto"></div>' : '');

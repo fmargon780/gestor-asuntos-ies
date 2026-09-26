@@ -64,10 +64,11 @@ await pagina.fill('.alta-campo[data-campo="Nombre"]', 'Pendiente De Numero, Nora
 await pagina.fill('.alta-campo[data-campo="Fecha de nacimiento"]', '02/02/2013');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(300);
+/* Fila 173, punto 3: dar de alta deja el tercero elegido, sin tener
+   que pulsarlo en los resultados. */
 await comprobar('queda marcada como solicitante, pendiente de número',
-  pagina.locator('#resultados-tercero .resultado-pie').first().textContent()
+  pagina.locator('#tercero-elegido .resultado-pie').first().textContent()
     .then(t => t.indexOf('Solicitante') !== -1 && t.indexOf('pendiente de número') !== -1), true);
-await pagina.click('#resultados-tercero .resultado');
 await comprobar('la carpeta se monta sin número, solo con el nombre',
   pagina.locator('#vista-nombre').textContent()
     .then(t => t.indexOf('Pendiente De Numero, Nora') !== -1 && !/Nora \d/.test(t)), true);

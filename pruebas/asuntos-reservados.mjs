@@ -53,7 +53,6 @@ await pagina.evaluate(async (nombres) => {
 }, [ANA, LUIS, COMPRA]);
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 await pagina.waitForTimeout(500);
 
 /* Una nota con una palabra que solo está en ella, y Luis sacado a mano del tipo reservado. */

@@ -43,7 +43,6 @@ await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 /* Las dos carpetas, con PDF de verdad (hechos con pdf-lib) y un Word. */
 await pagina.evaluate(async ([ana, luis]) => {

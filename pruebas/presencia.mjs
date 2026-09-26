@@ -44,7 +44,6 @@ await pagina.fill('#campo-usuario', 'Ana');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await pagina.click('#btn-barra');
 
 await pagina.evaluate(async () => {
   await window.__disco.abiertos.getDirectoryHandle('260901 MATRICULA 26-27 Alguien 1140233', { create: true });

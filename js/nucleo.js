@@ -31,7 +31,8 @@ App.E = {
   recienArchivados: {},
   ocupados: {},         /* asuntos con una acción larga en marcha: archivar, reabrir, renombrar, unir (fila 100) */  /* claves archivadas por este ordenador hace un instante (fila 90) */
   pendiente: null,     /* el suelto que se va a meter en el asunto que se está creando */
-  nuevo: { tipo: null, categoria: null, tercero: null }
+  nuevo: { tipo: null, categoria: null, tercero: null },
+  archivoVisitado: false   /* fila 175: el Archivo carga solo la primera vez de la sesión */
 };
 
 /* Sale de la lista única de js/nombres.js (fila 166). */
@@ -514,6 +515,9 @@ App.ir = function (cual) {
   });
   if (cual === 'abiertos' && App.pintarAbiertosSiPendiente) App.pintarAbiertosSiPendiente();
   if (cual === 'nuevo') App.prepararNuevo();
+  /* Fila 175, punto 3: el Archivo carga solo la primera vez de la
+     sesión; las siguientes, la lista ya está en memoria. */
+  if (cual === 'archivo' && !App.E.archivoVisitado) { App.E.archivoVisitado = true; App.verArchivo(); }
   if (cual === 'ajustes') {
     App.pintarAjustes();
     /* Los bloques de Ajustes que pintan los módulos (biblioteca, hitos…)
