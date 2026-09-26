@@ -2,7 +2,7 @@
    ficha-nombre-acciones.js — el menú de tres puntos del nombre del
    asunto (18-sep-2026, fila 52, docs/CABECERA-DEL-ASUNTO.md, 5).
 
-   "Editar", "Borrar" y "Copiar nombre" vivían sueltos en la barra de
+   "Cambiar", "Borrar" y "Copiar nombre" vivían sueltos en la barra de
    acciones. Aquí se juntan bajo el nombre del asunto, en un menú
    pequeño (js/ficha-menus.js) anclado al `<h2 class="ficha-nombre">`,
    con las mismas llamadas de siempre: nada de esto cambia lo que hace
@@ -58,7 +58,7 @@
     var lista = [];
     if (abierto) {
       lista.push({
-        texto: 'Editar el asunto',
+        texto: 'Cambiar el asunto',
         /* Fila 119: se queda en la ficha del asunto editado (con su
            nombre nuevo). Cancelado, en la misma ficha; si ya no está en
            abiertos, a la lista. */

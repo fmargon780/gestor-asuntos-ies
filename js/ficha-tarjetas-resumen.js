@@ -71,11 +71,11 @@ var FichaTarjetasResumen = (function () {
       return;
     }
     var hechos = filas.filter(function (h) { return h.classList.contains('hito-hecho'); }).length;
-    /* Fila 154: «Hitos N/M» dice lo mismo que «Paso N de M» de la
+    /* Fila 154: «Hitos N/M» dice lo mismo que «Hito N de M» de la
        cabecera (Hitos.estadoDelAsunto, una sola cuenta). */
     var paso = pasoDelAsunto();
     ponerCuenta('hitos', paso ? paso.n + '/' + paso.m : hechos + '/' + filas.length);
-    var partes = [{ texto: paso ? (paso.listo ? 'Todos hechos · ' + paso.m + ' de ' + paso.m : 'Paso ' + paso.n + ' de ' + paso.m)
+    var partes = [{ texto: paso ? (paso.listo ? 'Todos hechos · ' + paso.m + ' de ' + paso.m : 'Hito ' + paso.n + ' de ' + paso.m)
       : hechos + ' de ' + filas.length + (filas.length === 1 ? ' hecho' : ' hechos'), clase: 'fuerte' }];
     var siguiente = filas.filter(function (h) { return h.classList.contains('hito-encurso'); })[0] ||
                     filas.filter(function (h) { return h.classList.contains('hito-pendiente'); })[0];
