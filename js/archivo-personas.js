@@ -9,13 +9,37 @@
    PANTALLA: ARCHIVO
    ========================================================== */
 
+/* Rellena el desplegable «Curso: … ▾» con los cursos que de verdad
+   hay en el resumen guardado (`cursos`), más el curso actual (por si
+   todavía no tiene ningún archivado: siempre se puede elegir), y una
+   última opción «Todos los cursos». Conserva lo elegido si sigue
+   existiendo; si no, se queda con `seleccionado`. */
+App.pintarSelectorCursoArchivo = function (cursos, seleccionado) {
+  var sel = $('selector-curso-archivo');
+  if (!sel) return;
+  var actual = U.cursoActual();
+  var lista = (cursos || []).slice();
+  if (lista.indexOf(actual) === -1) lista.push(actual);
+  lista.sort();
+  lista.reverse();   /* el curso más reciente arriba */
+  sel.innerHTML = lista.map(function (c) {
+    return '<option value="' + c + '">Curso: ' + c + '</option>';
+  }).join('') + '<option value="">Todos los cursos</option>';
+  sel.value = seleccionado || actual;
+};
+
 /* El índice (`js/archivo-indice.js`) es quien recorre el disco: aquí
    solo se orquesta. Si no hay índice usable (no existe, está roto o
    es de otra versión), se cae al recorrido de disco de siempre —
    `IndiceArchivo.construir()` hace el mismo trabajo, solo que sin
    guardar nada — y se avisa. Si el índice existe pero un recuento
    barato (categorías y carpetas de tercero) no cuadra con el suyo, se
-   enseña igual, con otro aviso: no se reconstruye sola nunca. */
+   enseña igual, con otro aviso: no se reconstruye sola nunca.
+
+   Fila 177 (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md, punto 1): el índice
+   está partido por curso académico. `App.E.cursoArchivo` es lo que hay
+   elegido en el desplegable «Curso: … ▾»: `undefined` (todavía no se
+   ha tocado) es el curso actual; `''` es «Todos los cursos». */
 App.verArchivo = async function () {
   $('explica-archivo').textContent = 'Leyendo el archivo…';
 
@@ -23,12 +47,15 @@ App.verArchivo = async function () {
     $('explica-archivo').textContent = 'Leyendo el archivo… ' + nombreCategoria + ' · ' + total + ' asuntos';
   };
 
-  var resultado = await IndiceArchivo.leerDisco();
+  var elegido = App.E.cursoArchivo;
+  var opciones = elegido === '' ? { todos: true } : { curso: elegido || U.cursoActual() };
+  var resultado = await IndiceArchivo.leerDisco(opciones);
   var usable, avisoIndice = '';
   App.E.indiceSinHacer = false;
 
   if (resultado.ok) {
     usable = resultado.datos;
+    App.pintarSelectorCursoArchivo(usable.cursos, elegido === '' ? '' : usable.curso);
     try {
       var actual = await IndiceArchivo.recuentoActual();
       if (!IndiceArchivo.recuentosIguales(actual, usable.recuento || {})) {
@@ -39,6 +66,7 @@ App.verArchivo = async function () {
     App.E.indiceSinHacer = true;
     avisoIndice = 'El índice no está hecho.';
     usable = await IndiceArchivo.construir(progreso);
+    App.pintarSelectorCursoArchivo([], '');
   }
 
   var descolocados = 0;
@@ -171,6 +199,13 @@ U.envolver(App, 'App.verDocumentos', 'archivo-personas.js', function (comoEra) {
 });
 
 $('buscar-archivo').oninput = function () { App.pintarArchivo(); };
+
+/* Fila 177: cambiar de curso vuelve a leer el índice con el curso
+   elegido ('' es «Todos los cursos»). */
+$('selector-curso-archivo').onchange = function () {
+  App.E.cursoArchivo = $('selector-curso-archivo').value;
+  App.verArchivo();
+};
 
 /* Fila 175, punto 3: "Actualizar" y "Reconstruir el índice" pasan al
    menú de tres puntos, a la derecha del buscador. Mismos textos,
