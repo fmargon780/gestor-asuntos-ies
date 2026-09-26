@@ -15,8 +15,8 @@ nuevo: Francisco confirmó que se apuntara.
    Google responde 302 a la página de inicio de sesión (el id corto es el de "head").
 3. Con la URL de «Implementar → Gestionar implementaciones» (la de verdad, `/exec`, acceso
    «Cualquier usuario») más `?k=<clave>`, la llamada **sí llega** y la clave se acepta, pero
-   «Probar» responde **«No hay ningún destinatario.»**. Motivo: con acceso «Cualquier usuario»,
-   `Session.getActiveUser().getEmail()` devuelve cadena vacía (Google no dice al script quién
+   «Probar» responde **«No hay ningún destinatario.»**. Motivo: con acceso «Cualquier
+   usuario», `Session.getActiveUser().getEmail()` devuelve cadena vacía (Google no dice al script quién
    llama). En `enviarCorreo()` se usa para la prueba y para el «Para» cuando solo hay copia oculta.
 
 ## Qué hay que cambiar
@@ -79,3 +79,15 @@ Tendrá que hacer esto una vez (dejarlo escrito en el mensaje final, en pocos pa
 - Cambios quirúrgicos; solo estos ficheros y `docs/CONTEXTO.md` o su hijo del correo.
 - Reglas de la cola: una o dos subidas; al terminar, `CONTEXTO-CORTO.md` (sección 8: la línea de
   «Conectar el envío») y `HISTORIA.md`.
+
+## Actualización (26-sep-2026, fila 178, `docs/CORREO-VERSIONES-Y-LIMPIEZA.md`)
+
+El script vuelve a cambiar (memoria de envíos de 60 días, no solo las 6 horas de `CacheService`;
+`VERSION_SCRIPT` sube a «26-sep-2026 · fila 178»): **hay que volver a pegarlo entero** en
+script.google.com y publicar una «Nueva versión», los mismos dos pasos de siempre («Qué verá
+Francisco al final», arriba). No hace falta tocar nada más: la dirección y la clave no cambian.
+
+Desde esta fila, si el script pegado se queda atrás, el Gestor lo avisa solo: ámbar persistente en
+Ajustes → Enviar correo y, al abrir el cuadro de Correo o de Séneca, una línea ámbar con el mismo
+recado de volver a pegarlo. Sirve para saber, sin adivinar, si el pegado de esta vez (o de una
+futura) sigue pendiente.

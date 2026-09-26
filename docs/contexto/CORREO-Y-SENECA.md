@@ -28,7 +28,7 @@ de otra página.** Cada usuario tiene su propia bandeja. Desde el 20-sep-2026 (f
 correo trae su PDF, pulsar la tarjeta entera hace lo mismo que ese botón (clase
 `tarjeta-correo-pulsable`, `css/bandeja.css`, guardia de botones igual que en "Por clasificar":
 ver `docs/contexto/DOCUMENTOS.md`). Los adjuntos sueltos del correo no se enseñan por su nombre en
-ningún sitio (solo entran, ya leídos, en la línea "Del documento" de la propuesta), así que no
+ingún sitio (solo entran, ya leídos, en la línea "Del documento" de la propuesta), así que no
 hay nada más que pulsar ahí.
 
 **En pantalla** (desde el 17-sep-2026, fila 27, `docs/CORREOS-DENTRO-DE-POR-CLASIFICAR.md`) vive
@@ -226,13 +226,33 @@ dirección de un hito, solo esa), los de un grupo (en copia oculta) y a quién v
 hito. El cuadro de Correo, «Comunicar» y los destinatarios de Séneca la usan; cada uno pinta su
 cuadro como antes.
 
-**Un correo no sale dos veces** (fila 130, `docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md`). Cada cuadro de
-confirmación lleva su identificador (`CorreoEnviar.nuevoIdEnvio`, en `js/correo-cuadro.js`; volver a
-pulsar en el mismo cuadro manda el mismo). El script (`enviarUnaVez`, `VERSION_SCRIPT`) lo recuerda 6
-horas en `CacheService`, con el candado del script: si llega otra vez, no envía y contesta bien con
-`yaEnviado: true`. Sin identificador (navegador viejo), como siempre. La petición tiene 90 s de
-tiempo límite: si vence, ámbar, «No sé si ha salido. Mira en Enviados de Gmail antes de volver a
-pulsar.». Hay que pegar el script nuevo (sirve también para lo de la fila 117).
+**Un correo no sale dos veces** (fila 130, `docs/GUARDAR-Y-ENVIAR-SIN-SORPRESAS.md`; memoria
+permanente desde la fila 178). Cada cuadro de confirmación lleva su identificador
+(`CorreoEnviar.nuevoIdEnvio`, en `js/correo-cuadro.js`; volver a pulsar en el mismo cuadro manda el
+mismo). El script (`enviarUnaVez`, `VERSION_SCRIPT`) lo recuerda 6 horas en `CacheService` (rápido) y
+además, desde la fila 178, para siempre en `PropertiesService`, agrupado por día de envío
+(`enviados-AAMMDD` → lista de identificadores): antes de enviar se mira primero la caché y, si no
+está, esos grupos de los últimos 60 días; los de más de 60 días se borran solos en cada pasada del
+disparador (`recogerCorreos`, cada minuto). Si llega otra vez el mismo identificador (aunque hayan
+pasado horas, no solo las 6 de la caché), no envía y contesta bien con `yaEnviado: true`. Sin
+identificador (navegador viejo), como siempre. La petición tiene 90 s de tiempo límite: si vence,
+ámbar, «No sé si ha salido. Mira en Enviados de Gmail antes de volver a pulsar.». Hay que pegar el
+script nuevo (sirve también para lo de la fila 117 y la comprobación de versión de más abajo).
+
+**La app comprueba la versión del script (fila 178, `docs/CORREO-VERSIONES-Y-LIMPIEZA.md`):** el
+script devuelve `version` en cada respuesta desde la fila 130, pero hasta ahora la app no la leía,
+así que un script viejo con la app nueva fallaba en silencio. `js/correo-enviar.js` lleva
+`SCRIPT_ESPERADO` (el `VERSION_SCRIPT` de esta fila) y, tras cada respuesta real del script
+(también la de «Probar»), guarda la que trae en `localStorage` (persiste entre recargas) y compara
+por el número de fila (`fila N`, siempre creciente desde que existe `VERSION_SCRIPT`): si la
+conocida es de una fila menor —o la respuesta no trae `version`, un script anterior a la 130—, el
+script está desactualizado. Mientras lo esté: aviso ámbar persistente en Ajustes → Enviar correo
+(bajo el bloque de siempre) y, al abrir el cuadro de Correo o de Séneca, una línea ámbar delante del
+formulario («El script de Gmail es más antiguo que la app... Vuelve a pegarlo:
+`docs/ENVIO-CUENTA-DEL-SCRIPT.md`»), enganchada envolviendo `CorreoNucleo.abrirCuadro` (sin tocar
+`js/correo.js` ni `js/correo-cuadro.js`). Si es igual o más nueva, no se avisa de nada; sin ninguna
+respuesta vista todavía, tampoco (no se sabe). El envío nunca se bloquea por esto. «Probar» enseña
+la versión del script en su mensaje de resultado.
 
 - **`js/correo-adjuntos.js`** (`window.CorreoAdjuntos`, reducido a unas 100 líneas): pinta el
   bloque "Documentos de este asunto" con una casilla por fichero (desmarcadas de partida), suma
@@ -440,7 +460,7 @@ de "asunto del correo" con huecos (ese asunto lo monta solo `js/correo.js`), as�
 
 `js/plantillas-documento.js` tiene su propia lista de huecos (`#pd-huecos`), pero es una tabla de
 referencia con botón "Copiar" (el documento se edita en Word, fuera de la aplicación: no hay
-ningún cursor de un `<textarea>` donde insertar), en su propio bloque plegado, sin tapar ningún
+ingún cursor de un `<textarea>` donde insertar), en su propio bloque plegado, sin tapar ningún
 formulario: no es el mismo muro, y no se ha tocado.
 
 Se comprueba con `pruebas/plantillas-huecos.mjs`, en navegador de verdad.
