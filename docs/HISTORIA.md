@@ -5,6 +5,30 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 26-sep-2026 — Fila 172: el buscador de la papelera
+
+`docs/PAPELERA-BUSCADOR.md`. Caja de búsqueda encima de la lista del bloque Papelera de Ajustes
+(`js/papelera-ajustes.js`), con el texto de ayuda «Buscar en la papelera». Filtra mientras se
+escribe, sin botón, con el mismo criterio que ya usan los buscadores de asuntos abiertos y del
+ARCHIVO: palabras sueltas, en cualquier orden, sin distinguir mayúsculas ni tildes
+(`U.normalizar`), y una ficha se queda si las contiene todas. Busca en el nombre de lo borrado,
+qué era, de dónde salía, quién lo borró y la fecha — escrita como `AAMMDD` (`U.aAaMmDd`) y como
+`dd/mm/aaaa` (`U.fechaLegible`), para que «2609» o «26/09» encuentren lo borrado ese día.
+
+Contador «N de M» junto a la caja (solo el total, sin nada escrito); sin coincidencias, «Nada en
+la papelera con esas palabras.». El aviso ámbar de «más de 30 días» y su botón de borrado de golpe
+siguen mirando la papelera entera, no lo filtrado — el texto del botón lo dice si hay un filtro
+puesto («… (de toda la papelera)»). Lo escrito se conserva al repintarse la lista (devolver o
+borrar una fila, o un cambio del compañero) con `U.conservandoLoEscrito`, aunque en la práctica la
+caja vive fuera del trozo que se repinta y nunca se destruye.
+
+No se toca `_GESTOR/papelera.json`: el filtro es solo de pantalla, ni busca dentro del contenido
+de los documentos borrados.
+
+Prueba nueva `pruebas/papelera-buscador.mjs`: tres cosas en la papelera, dos palabras en desorden
+y sin tildes dejan solo la que toca, el contador dice «1 de 3», sin coincidencias avisa, y tras
+«Devolver a su sitio» la caja conserva lo escrito. Batería completa en verde.
+
 ## 25-sep-2026 — Fila 171: un documento para cada relacionado
 
 `docs/DOCUMENTO-PARA-CADA-RELACIONADO.md`. En la mesa del hito, junto a cada plantilla, «… para cada
