@@ -58,10 +58,12 @@ App.refrescarVista = function () {
   var ajustado = nombreDeCarpetaAjustado(d);
   var nombre = ajustado.nombre;
   $('vista-nombre').textContent = nombre;
-  Nombres.avisoRecorte($('vista-nombre'), ajustado.recortado);   /* fila 130 */
+  Nombres.avisoRecorte($('vista-nombre'), ajustado.recortado, ajustado.noCabe);   /* filas 130 y 177 */
   $('vista-ruta').textContent = 'En ' + App.E.abiertos.name +
     '. Al cerrarlo irá a ' + App.E.archivo.name + ' / ' + App.E.nuevo.categoria + ' / ' + d.tercero;
-  $('btn-crear').disabled = !nombre || nombre.length < 8;
+  /* Fila 177: si ni recortando el texto libre cabe en la ruta de
+     Dropbox, no se deja crear (el aviso rojo ya lo dice). */
+  $('btn-crear').disabled = !nombre || nombre.length < 8 || !!ajustado.noCabe;
 };
 
 /* Las rutas muy largas dan problemas en un Dropbox sincronizado: se
@@ -77,8 +79,15 @@ $('btn-crear').onclick = function () {
 App.crearAsuntoDelFormulario = async function () {
   if (!App.validarCamposObligatorios()) return;
   var d = App.datosDelFormulario();
-  var nombre = nombreDeCarpetaPropuesto(d);
+  var ajustado = nombreDeCarpetaAjustado(d);
+  var nombre = ajustado.nombre;
   if (!nombre) return;
+  /* Fila 177: por si acaso el botón no se hubiera vuelto a apagar a
+     tiempo, se comprueba también aquí antes de crear nada. */
+  if (ajustado.noCabe) {
+    U.aviso('El nombre no cabe en la ruta de Dropbox: acorta el texto.', 'malo');
+    return;
+  }
 
   if (nombre.length > App.LARGO_MAXIMO_NOMBRE) {
     var seguir = await U.preguntar('El nombre es muy largo',
