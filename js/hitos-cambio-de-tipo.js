@@ -5,7 +5,7 @@
 
    Lo llama App.editarAsunto (js/asuntos-editar.js) al terminar bien el
    guardado, con la clave YA nueva del asunto. Pregunta (Francisco
-   eligió preguntar: a veces se cambia el tipo solo para corregir el
+   eligió preguntar: a veces se cambia el tipo solo para cambiar el
    nombre de la carpeta) y, si dice que sí:
 
    1. Crea los hitos de la guía del tipo nuevo (Hitos.pasoAHito).
@@ -64,7 +64,7 @@ window.HitosCambioDeTipo = (function () {
         await Notas.anadir({ nombre: clave }, 'Cambiado el tipo de ' + tipoViejo + ' a ' + tipoNuevo +
           ' · ' + U.fechaLegible(U.hoyIso().replace(/-/g, '').slice(2)) +
           '. Se ha traído la guía del tipo nuevo' +
-          (conservados ? '; ' + conservados + (conservados === 1 ? ' paso viejo se queda' : ' pasos viejos se quedan') +
+          (conservados ? '; ' + conservados + (conservados === 1 ? ' hito viejo se queda' : ' hitos viejos se quedan') +
             ' abajo, como «no aplica», porque tenían algo apuntado.' : '.'));
       } catch (e) { /* no crítico */ }
     }
@@ -72,7 +72,7 @@ window.HitosCambioDeTipo = (function () {
   }
 
   /* El punto de entrada. No hace nada si el tipo no ha cambiado o si
-     el asunto no tiene hitos. Un solo U.preguntar: el cuadro de editar
+     el asunto no tiene hitos. Un solo U.preguntar: el cuadro de cambiar
      ya está cerrado cuando se llega aquí. */
   async function ofrecer(clave, tipoViejo, tipoNuevo) {
     if (!tipoViejo || !tipoNuevo || tipoViejo === tipoNuevo) return false;
@@ -80,26 +80,26 @@ window.HitosCambioDeTipo = (function () {
     if (!hitos.length) return false;
     var pasos = (window.GuiasDelCentro && GuiasDelCentro.pasosDe(tipoNuevo)) || [];
     if (!pasos.length) {
-      U.aviso('El tipo nuevo no tiene guía escrita: los pasos se quedan como estaban.', 'ambar');
+      U.aviso('El tipo nuevo no tiene guía escrita: los hitos se quedan como estaban.', 'ambar');
       return false;
     }
     /* U.preguntar no deja poner el texto de Cancelar: se pone aquí y
        se devuelve como estaba al cerrar. */
     var cancelar = document.getElementById('cuadro-cancelar');
     var textoCancelar = cancelar ? cancelar.textContent : '';
-    if (cancelar) cancelar.textContent = 'Dejar los pasos como están';
+    if (cancelar) cancelar.textContent = 'Dejar los hitos como están';
     var si = await U.preguntar('El tipo ha cambiado',
       '<p class="explica">Este asunto era <b>' + U.escapar(tipoViejo) + '</b> y ahora es <b>' +
-      U.escapar(tipoNuevo) + '</b>. Sus pasos siguen siendo los del tipo viejo. ¿Traigo la guía de <b>' +
+      U.escapar(tipoNuevo) + '</b>. Sus hitos siguen siendo los del tipo viejo. ¿Traigo la guía de <b>' +
       U.escapar(tipoNuevo) + '</b>?</p>' +
-      '<p class="explica suave">Los pasos viejos que tengan algo apuntado no se pierden: se quedan ' +
+      '<p class="explica suave">Los hitos viejos que tengan algo apuntado no se pierden: se quedan ' +
       'abajo, plegados, como «no aplica».</p>',
       'Traer la guía nueva');
     if (cancelar) cancelar.textContent = textoCancelar;
     if (!si) return false;
     var conservados = await traerGuia(clave, tipoViejo, tipoNuevo);
     U.aviso('Guía de ' + tipoNuevo + ' traída.' +
-      (conservados ? ' ' + conservados + (conservados === 1 ? ' paso viejo se queda' : ' pasos viejos se quedan') +
+      (conservados ? ' ' + conservados + (conservados === 1 ? ' hito viejo se queda' : ' hitos viejos se quedan') +
         ' abajo, como «no aplica».' : ''), 'bueno');
     return true;
   }

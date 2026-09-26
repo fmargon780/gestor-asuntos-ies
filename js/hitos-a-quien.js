@@ -68,7 +68,7 @@
     return (r && r.texto) || idResponsable;
   }
 
-  /* Los hitos que cuentan para «Paso N de M»: los visibles, sin los
+  /* Los hitos que cuentan para «Hito N de M»: los visibles, sin los
      «solo informativo», los «no aplica» ni los del tipo anterior. Fila
      154: es la única cuenta, la misma para la marca del asunto, la
      pestaña «Hitos N/M» y la tira y el «Hito N de M» de la mesa
@@ -118,14 +118,14 @@
     };
   }
 
-  /* Fila 162: «Esperando a <responsable>» sale solo cuando el paso es de
+  /* Fila 162: «Esperando a <responsable>» sale solo cuando el hito es de
      alguien que no es de Administración (y no es una pregunta ni un
-     paso marcado «Nos toca»). No se guarda: es el paso. */
+     hito marcado «Nos toca»). No se guarda: es el hito. */
   function esperaAutomatica(h, ajustes, contexto) {
     if (!h.responsable || h.clase === 'decision' || h.toca === 'nos') return null;
     if (esDeAdministracion(h.responsable, ajustes)) return null;
     return { a: h.responsable, nombre: nombreVisible(h.responsable, ajustes, contexto),
-             desde: h.desde || '', motivo: 'Es el responsable de este paso', auto: true };
+             desde: h.desde || '', motivo: 'Es el responsable de este hito', auto: true };
   }
 
   /* Fila 162: la espera puesta a mano vale solo mientras su hito sea el
@@ -146,12 +146,12 @@
     return datos;
   }
 
-  /* Función pura. El texto del estado: «Paso N de M · título», «Listo
+  /* Función pura. El texto del estado: «Hito N de M · título», «Listo
      para archivar» o «Sin hitos». */
   function textoDelEstado(r) {
     if (!r || r.sinHitos) return 'Sin hitos';
     if (r.listo) return 'Listo para archivar';
-    return 'Paso ' + (r.n || 1) + ' de ' + Math.max(r.m || 0, r.n || 1) + (r.titulo ? ' · ' + r.titulo : '');
+    return 'Hito ' + (r.n || 1) + ' de ' + Math.max(r.m || 0, r.n || 1) + (r.titulo ? ' · ' + r.titulo : '');
   }
 
   /* Función pura. El montón de un asunto: por su hito actual; sin
@@ -170,7 +170,7 @@
     return ladoDelAsunto(entrada ? entrada.hitos : [], datos ? datos.ajustes : null);
   }
 
-  /* Función pura (punto 7, «Estamos en este paso»): da por hechos todos
+  /* Función pura (punto 7, «Estamos en este hito»): da por hechos todos
      los hitos visibles anteriores a `idHito` que sigan sin terminar, con
      `nota` en su historial, y deja `idHito` en curso. Las preguntas se
      quedan como están (una sin responder corta la lista: lo que va
@@ -242,7 +242,7 @@
      window.Gestor.alRefrescar solo si han pasado dos minutos (lo que
      haya tocado el otro ordenador). Lo que cambia este ordenador llega
      solo por Hitos.alCambiar. Solo se repinta si algún asunto cambia de
-     montón, de "quién lo tiene" o de paso. */
+     montón, de "quién lo tiene" o de hito. */
   var firma = null;
   var leidoEl = 0;
 
