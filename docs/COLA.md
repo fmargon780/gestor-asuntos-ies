@@ -10,6 +10,13 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## Reglas para Claude Code
 
+0. **Una sola sesión y una sola fila** (norma del 27-sep-2026, `docs/REPARTO-DE-LA-COLA-2026-09-27.md`).
+   Nunca trabajan dos sesiones de Claude Code a la vez en este repositorio, y no hay ninguna tarea
+   programada que lance la cola: la lanza Francisco. Cada lanzamiento hace **solo la primera fila
+   PENDIENTE**, la publica, comprueba la publicación y **para**. Si al empezar hay una fila EN
+   CURSO, no se coge otra: se mira qué quedó en `main` y se termina esa. Las cláusulas comunes de
+   las filas 188 en adelante (a `main` sin pull request, como mucho tres subidas, nada se sube con
+   `npm test` en rojo) están en ese mismo documento.
 1. Lee antes `docs/CONTEXTO.md`.
 2. Coge la primera instrucción con estado **PENDIENTE**, leyendo la tabla **de arriba abajo**. Ojo:
    desde el 18-sep-2026 la tabla está en orden de trabajo, no de número, así que la primera
@@ -19,8 +26,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 3. Antes de empezar una instrucción, comprueba si ya está hecha por otro camino (mira si existen
    los ficheros o funciones que pide). Si ya está hecha, márcala **HECHA** con una nota y pasa a
    la siguiente.
-4. Al terminar una, márcala **HECHA** con la fecha, y sigue con la siguiente PENDIENTE. No pares
-   hasta que no quede ninguna. **La hora de `App.VERSION` sale del reloj de verdad**
+4. Al terminar una, márcala **HECHA** con la fecha, y **para** (regla 0): no cojas la siguiente. **La hora de `App.VERSION` sale del reloj de verdad**
    (`TZ='Europe/Madrid' date`, receta exacta en `js/version.js`), nunca a ojo: el 17-sep-2026
    salieron versiones con horas por delante de la real.
 5. Si una instrucción no puede completarse, márcala **BLOQUEADA** con el motivo en una línea y
@@ -96,18 +102,19 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## Reglas para Francisco
 
-- Mientras Claude Code está trabajando, **no se lanza otra vez**. Las instrucciones nuevas se
-  apuntan aquí y esperan.
-- Cuando Claude Code termina, se vuelve a pegar la misma línea. Si no queda nada pendiente,
-  Claude Code lo dice y no toca nada.
+- **Una sola conversación de Claude Code a la vez.** Mientras está trabajando, no se lanza otra.
+  Las instrucciones nuevas se apuntan aquí y esperan.
+- Cada lanzamiento hace **una sola fila**. Cuando Claude Code termina y la publica, se vuelve a
+  pegar la misma línea para la siguiente. Si no queda nada pendiente, Claude Code lo dice y no toca
+  nada.
 
 ## La línea para lanzar
 
-    Lee docs/CONTEXTO.md y después docs/COLA.md. Haz en orden todo lo que esté PENDIENTE, siguiendo las reglas de la cola, sin preguntarme nada. Al terminar, dime en pocas frases qué has hecho, qué versión está publicada y qué voy a ver distinto en pantalla.
+    Lee docs/CONTEXTO.md y después docs/COLA.md. Haz solo la primera fila PENDIENTE, siguiendo las reglas de la cola, sin preguntarme nada, y para. Al terminar, dime en pocas frases qué has hecho, qué versión está publicada y qué voy a ver distinto en pantalla.
 
 ## La cola
 
-Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen en `docs/`, y el detalle de cada una en
+Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026 se hace una sola fila por lanzamiento** (regla 0). Sus documentos siguen en `docs/`, y el detalle de cada una en
 `docs/HISTORIA.md`. Aquí queda solo lo que no está cerrado:
 
 | Nº | Instrucción | Estado |
@@ -141,17 +148,34 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. Sus documentos siguen 
 | 174 | `docs/POR-CLASIFICAR-USA-LO-LEIDO.md` (tanda 1, parte 2: el cuadro de «Poner nombre» nace con la fecha y el registro leídos y se abre directo tras meter o crear; guardar lo cierra; un solo botón «Crear asunto con él» que usa lo leído; los adjuntos de correo pasan por el cuadro de nombre; «Registrar» deja el original «SIN SELLAR» en «Versiones previas»; después de la 173) | HECHA (26-sep-2026). `pruebas/por-clasificar-usa-lo-leido.mjs` nueva |
 | 175 | `docs/PERSONAS-ARCHIVO-Y-MENU.md` (tanda 1, parte 3: la ficha de una persona enseña sus asuntos pulsables y «+ Nuevo asunto para esta persona»; el Archivo carga solo; el menú nace abierto en pantalla ancha; el buscador de Asuntos abiertos busca en todos los montones; cinco textos que despistan; el plazo de un paso sin «desde» ya no se pierde; después de la 173) | HECHA (26-sep-2026). `pruebas/personas-archivo-y-menu.mjs` nueva; `npm test` completo (170 ficheros) y el CI de GitHub, en verde |
 | 176 | `docs/DATOS-ENTRE-ORDENADORES.md` (tanda de estabilidad, parte 1: las listas de la ficha —hilos, relacionados, pendientes de registro, notas— se funden elemento a elemento con `App.anotarLista`; lápida para los asuntos archivados, borrados o unidos, que respetan `anotar`, `fusionarConDisco` y la fusión de conflictos; el vistazo de 20 s relee `asuntos.json` e `hitos.json` si cambiaron; la guía relee antes de escribir; presencia en un fichero por usuario y conflictos que hoy nadie recoge) | HECHA (26-sep-2026). `pruebas/datos-entre-ordenadores.mjs` nueva; `js/conflictos.js` partido en `js/conflictos-datos.js` (pasaba de 600 líneas); `npm test` completo en verde |
-| 177 | `docs/ARCHIVO-POR-CURSO-Y-RUTAS.md` (tanda de estabilidad, parte 2: índice del ARCHIVO en un fichero por curso académico con resumen en la raíz, migración sola, selector «Curso» en Archivo; los topes de largo cuentan la ruta completa dentro de Dropbox y avisan de lo que ya se pasa; después de la 176) | EN CURSO (26-sep-2026, 19:08). La retoma esta sesión: en `main` no hay ningún fichero nuevo de esta fila (ni `js/nombres-topes.js` ni `js/archivo-indice-construir.js`), así que nadie la había empezado de verdad todavía |
+| 177 | `docs/ARCHIVO-POR-CURSO-Y-RUTAS.md` (tanda de estabilidad, parte 2: índice del ARCHIVO en un fichero por curso académico con resumen en la raíz, migración sola, selector «Curso» en Archivo; los topes de largo cuentan la ruta completa dentro de Dropbox y avisan de lo que ya se pasa; después de la 176) | EN REVISIÓN (27-sep-2026): todo el trabajo está en `main` y sus pruebas pasan, pero nunca se marcó HECHA. La cierra la fila 188 |
 | 178 | `docs/CORREO-VERSIONES-Y-LIMPIEZA.md` (tanda de estabilidad, parte 3: el script recuerda los envíos 60 días y la app comprueba su versión; `_esquema` en los ficheros compartidos; aviso de versión nueva también en la web; la copia de seguridad se verifica antes de sobrescribir; `script-src` en las cabeceras; datos de prueba inventados; hitos que no quedan huérfanos al archivar; después de la 177) | HECHA (26-sep-2026). Publicado y comprobado con `curl` de forma independiente: `App.VERSION` `26-sep-2026 · 21:11`, cabecera `content-security-policy` con `script-src 'self' blob:`, y `SCRIPT_ESPERADO` de la fila 178 en `js/correo-enviar.js` publicado. `npm test` completo en verde antes de subir. Detalle en la nota de más abajo |
-| 179 | `docs/VOCABULARIO-EN-PANTALLA.md` (tanda 2 de usabilidad, parte 1: una sola palabra para cada cosa en todos los textos de pantalla —guía, hito, tarea, tercero, familia, plantilla, impreso oficial, registrar, guardar en el asunto, cambiar, quitar/borrar—; solo rótulos, ningún dato; después de la 178) | EN CURSO (26-sep-2026, 22:03) |
-| 180 | `docs/INICIO-CUATRO-BLOQUES.md` (tanda 2, parte 2: la pantalla de Inicio con cuatro bloques —Ha llegado, Me toca hoy, Esperamos a otros, Todos los asuntos abiertos—, según `docs/boceto-inicio.html`; «Qué me toca» deja de ser pantalla aparte; después de la 179) | PENDIENTE (26-sep-2026) |
-| 181 | `docs/AVISOS-MENU-Y-VOLVER.md` (tanda 2, parte 3: los avisos de arriba en una sola línea con un solo botón para callarla; el menú lateral; un solo «Volver» que siempre vuelve a la pantalla anterior, también en la mesa del hito; después de la 180) | PENDIENTE (26-sep-2026) |
-| 182 | `docs/AVISOS-A-QUIEN-LO-PIDE.md` (camino 1: casilla por hito y por tipo «avisar a quien lo pide», siempre con confirmación en el cuadro de Correo; plantillas «Aviso de avance» y «Aviso de cierre»; botón «Enviar estado» en ficha y mesa; «Preparar informe para dirección» en Cuentas; después de la 181) | PENDIENTE (26-sep-2026) |
-| 183 | `docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md` (tanda 3 de usabilidad, parte 1: buscador único de terceros en todas las categorías, la parrilla de tipos limitada a la categoría de la persona, resumen de la guía al pulsar el tipo, un solo bloque de detalles, «Crear» abre la mesa del primer hito; el camino tipo-primero sigue; después de la 182) | PENDIENTE (26-sep-2026) |
-| 184 | `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md` (tanda 3, parte 2: lista de comprobación arriba de la pantalla del tipo, todo se guarda al cambiar, plazo y campos en un solo sitio, «Documentos de este paso» y «Comunicación de este paso» pasan a tareas, copias y días de aviso juntos en El centro, pestaña «Herramientas» encima de Ajustes con Papelera, Traer el alumnado, Tablas de datos y Restaurar copia; después de la 183) | PENDIENTE (26-sep-2026) |
-| 185 | `docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md` (texto del nombre de documento en el hito de la biblioteca —heredado—, en el hito propio o en el tipo de documento, y el cuadro sale relleno; cada hito de una guía lleva etiqueta «De la biblioteca / cambiado aquí / Propio», la biblioteca se ofrece al teclear el título, pregunta clara al guardar; después de la 184) | PENDIENTE (26-sep-2026) |
-| 186 | `docs/PAPELERA-SE-VACIA-SOLA.md` (la papelera se vacía sola a los 90 días, aviso 7 días antes en la línea de avisos, constancia de cada borrado en `papelera-borrados.json` con su lista en Herramientas › Papelera; después de la 185) | PENDIENTE (26-sep-2026) |
-| 187 | `docs/COMPROBACION-AL-ENTRAR.md` (al entrar, se revisan siete cosas de la configuración de cada ordenador —carpetas de Dropbox, carpeta de la BD de alumnado, bandeja de Gmail, script de envío, ruta de Dropbox, datos del centro, copia sin internet—; todo bien: marca verde en la cabecera, sin panel; si falta algo o no se pudo comprobar: panel con «Arreglarlo» en cada fila; después de la 186) | PENDIENTE (26-sep-2026) |
+| 179 | `docs/VOCABULARIO-EN-PANTALLA.md` (tanda 2 de usabilidad, parte 1: una sola palabra para cada cosa en todos los textos de pantalla —guía, hito, tarea, tercero, familia, plantilla, impreso oficial, registrar, guardar en el asunto, cambiar, quitar/borrar—; solo rótulos, ningún dato; después de la 178) | A MEDIAS (27-sep-2026): textos cambiados en unos 43 ficheros, pruebas en rojo. Lo subido lo pone en orden la fila 188; lo que falta, filas 189 y 190 |
+| 180 | `docs/INICIO-CUATRO-BLOQUES.md` (tanda 2, parte 2: la pantalla de Inicio con cuatro bloques —Ha llegado, Me toca hoy, Esperamos a otros, Todos los asuntos abiertos—, según `docs/boceto-inicio.html`; «Qué me toca» deja de ser pantalla aparte; después de la 179) | SUSTITUIDA (27-sep-2026) por las filas 191 y 192 |
+| 181 | `docs/AVISOS-MENU-Y-VOLVER.md` (tanda 2, parte 3: los avisos de arriba en una sola línea con un solo botón para callarla; el menú lateral; un solo «Volver» que siempre vuelve a la pantalla anterior, también en la mesa del hito; después de la 180) | SUSTITUIDA (27-sep-2026) por las filas 193 y 194 |
+| 182 | `docs/AVISOS-A-QUIEN-LO-PIDE.md` (camino 1: casilla por hito y por tipo «avisar a quien lo pide», siempre con confirmación en el cuadro de Correo; plantillas «Aviso de avance» y «Aviso de cierre»; botón «Enviar estado» en ficha y mesa; «Preparar informe para dirección» en Cuentas; después de la 181) | SUSTITUIDA (27-sep-2026) por las filas 195 y 196 |
+| 183 | `docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md` (tanda 3 de usabilidad, parte 1: buscador único de terceros en todas las categorías, la parrilla de tipos limitada a la categoría de la persona, resumen de la guía al pulsar el tipo, un solo bloque de detalles, «Crear» abre la mesa del primer hito; el camino tipo-primero sigue; después de la 182) | SUSTITUIDA (27-sep-2026) por la fila 197 |
+| 184 | `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md` (tanda 3, parte 2: lista de comprobación arriba de la pantalla del tipo, todo se guarda al cambiar, plazo y campos en un solo sitio, «Documentos de este paso» y «Comunicación de este paso» pasan a tareas, copias y días de aviso juntos en El centro, pestaña «Herramientas» encima de Ajustes con Papelera, Traer el alumnado, Tablas de datos y Restaurar copia; después de la 183) | SUSTITUIDA (27-sep-2026) por las filas 198, 199 y 200 |
+| 185 | `docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md` (texto del nombre de documento en el hito de la biblioteca —heredado—, en el hito propio o en el tipo de documento, y el cuadro sale relleno; cada hito de una guía lleva etiqueta «De la biblioteca / cambiado aquí / Propio», la biblioteca se ofrece al teclear el título, pregunta clara al guardar; después de la 184) | SUSTITUIDA (27-sep-2026) por las filas 201 y 202 |
+| 186 | `docs/PAPELERA-SE-VACIA-SOLA.md` (la papelera se vacía sola a los 90 días, aviso 7 días antes en la línea de avisos, constancia de cada borrado en `papelera-borrados.json` con su lista en Herramientas › Papelera; después de la 185) | SUSTITUIDA (27-sep-2026) por la fila 203 |
+| 187 | `docs/COMPROBACION-AL-ENTRAR.md` (al entrar, se revisan siete cosas de la configuración de cada ordenador —carpetas de Dropbox, carpeta de la BD de alumnado, bandeja de Gmail, script de envío, ruta de Dropbox, datos del centro, copia sin internet—; todo bien: marca verde en la cabecera, sin panel; si falta algo o no se pudo comprobar: panel con «Arreglarlo» en cada fila; después de la 186) | SUSTITUIDA (27-sep-2026) por la fila 204 |
+| 188 | `docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 188: poner en orden lo que quedó a medias (cerrar la 177, que ya está subida; y poner al día las pruebas que la 179 dejó en rojo) | PENDIENTE (27-sep-2026) |
+| 189 | `docs/VOCABULARIO-EN-PANTALLA.md`, puntos 1 y 4, en los ficheros que faltan (ver `docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 189) | PENDIENTE (27-sep-2026) |
+| 190 | `docs/VOCABULARIO-EN-PANTALLA.md`, puntos 2, 3 y 5, y la prueba de palabras prohibidas (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 190) | PENDIENTE (27-sep-2026) |
+| 191 | `docs/INICIO-CUATRO-BLOQUES.md`, apartados 1, 2, 3, 4 y 7: los bloques de Inicio y fuera «Qué me toca» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 191) | PENDIENTE (27-sep-2026) |
+| 192 | `docs/INICIO-CUATRO-BLOQUES.md`, apartados 5 y 6: la tabla de todos los abiertos (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 192) | PENDIENTE (27-sep-2026) |
+| 193 | `docs/AVISOS-MENU-Y-VOLVER.md`, apartados 1 y 2: avisos en una línea y menú (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 193) | PENDIENTE (27-sep-2026) |
+| 194 | `docs/AVISOS-MENU-Y-VOLVER.md`, apartados 3 y 4: un solo «Volver» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 194) | PENDIENTE (27-sep-2026) |
+| 195 | `docs/AVISOS-A-QUIEN-LO-PIDE.md`, apartados 1, 2 y 3: avisar a quien lo pide y «Enviar estado» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 195) | PENDIENTE (27-sep-2026) |
+| 196 | `docs/AVISOS-A-QUIEN-LO-PIDE.md`, apartado 4: informe para dirección (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 196) | PENDIENTE (27-sep-2026) |
+| 197 | `docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md`, entero, con los ficheros que faltaban (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 197) | PENDIENTE (27-sep-2026) |
+| 198 | `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartados 1, 2, 3, 5 y 8: la pantalla del tipo (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 198) | PENDIENTE (27-sep-2026) |
+| 199 | `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartado 4: documentos y comunicaciones como tareas (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 199) | PENDIENTE (27-sep-2026) |
+| 200 | `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartados 6 y 7: El centro y la pestaña «Herramientas» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 200) | PENDIENTE (27-sep-2026) |
+| 201 | `docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md`, apartados 1 y 4: el nombre sale propuesto (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 201) | PENDIENTE (27-sep-2026) |
+| 202 | `docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md`, apartados 2 y 3: de dónde viene cada hito, y la biblioteca se ofrece sola (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 202) | PENDIENTE (27-sep-2026) |
+| 203 | `docs/PAPELERA-SE-VACIA-SOLA.md`, entero, con `js/copias.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 203) | PENDIENTE (27-sep-2026) |
+| 204 | `docs/COMPROBACION-AL-ENTRAR.md`, entero, con `js/cabecera-fija.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 204) | PENDIENTE (27-sep-2026) |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
