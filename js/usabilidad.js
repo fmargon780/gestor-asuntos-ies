@@ -246,6 +246,8 @@
     if (p && p.value) { p.value = ''; avisarDelCambio(p); }
     var o = $('filtro-organo');
     if (o && o.value) { o.value = ''; avisarDelCambio(o); }
+    var t = $('filtro-tipo-asunto');
+    if (t && t.value) { t.value = ''; avisarDelCambio(t); }
     if (q && q.value) { q.value = ''; avisarDelCambio(q); }
   }
 
@@ -263,8 +265,9 @@
     var estado = f.value;
     var plazo = p ? p.value : '';
     var o = $('filtro-organo'), organo = o ? o.value : '';   /* fila 134 */
+    var ti = $('filtro-tipo-asunto'), tipo = ti ? ti.value : '';   /* fila 192 */
     barraFiltros.innerHTML = '';
-    if (!texto && !estado && !plazo && !organo) { barraFiltros.classList.add('oculto'); return; }
+    if (!texto && !estado && !plazo && !organo && !tipo) { barraFiltros.classList.add('oculto'); return; }
     barraFiltros.classList.remove('oculto');
 
     if (texto) {
@@ -274,7 +277,7 @@
       }));
     }
     if (estado) {
-      barraFiltros.appendChild(etiqueta('Montón: ' + textoDelPlazo(f),
+      barraFiltros.appendChild(etiqueta('Situación: ' + textoDelPlazo(f),
         function () {
           f.value = '';
           avisarDelCambio(f);
@@ -295,7 +298,14 @@
       }));
     }
 
-    var cuantos = document.querySelectorAll('#lista-abiertos .tarjeta').length;
+    if (tipo) {
+      barraFiltros.appendChild(etiqueta('Tipo: ' + textoDelPlazo(ti), function () {
+        ti.value = '';
+        avisarDelCambio(ti);
+      }));
+    }
+
+    var cuantos = document.querySelectorAll('#inicio-tabla-cuerpo .inicio-tabla-fila').length;
     var total = ($('cuenta-abiertos') && $('cuenta-abiertos').textContent.trim()) || '';
     var cuenta = document.createElement('span');
     cuenta.className = 'filtros-cuenta';
@@ -311,12 +321,12 @@
     barraFiltros.appendChild(limpiar);
   }
 
-  /* Cada vez que la aplicación repinta la lista, se repasan la vista y
+  /* Cada vez que la aplicación repinta la tabla, se repasan la vista y
      las etiquetas. Así siempre dicen lo que hay de verdad en pantalla. */
-  if ($('lista-abiertos')) {
+  if ($('inicio-tabla-cuerpo')) {
     new MutationObserver(function () {
       pintarFiltros();
-    }).observe($('lista-abiertos'), { childList: true });
+    }).observe($('inicio-tabla-cuerpo'), { childList: true });
   }
 
   /* ==========================================================

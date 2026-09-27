@@ -76,7 +76,7 @@ await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(300);
 
 console.log('--- 1) al abrir la ficha, se anuncia la propia señal ---');
-await pagina.locator('#lista-abiertos .tarjeta').filter({ hasText: 'Alguien 1140233' })
+await pagina.locator('#inicio-tabla-cuerpo tr').filter({ hasText: 'Alguien 1140233' })
   .locator('.nombre-pulsable').click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(200);
@@ -98,7 +98,7 @@ console.log('--- 3) el compañero ya está dentro: modo consulta ---');
 await escribirPresenciaDe('Juan', {
   '260901 MATRICULA 26-27 Alguien 1140233': { ultima: new Date().toISOString() }
 });
-await pagina.locator('#lista-abiertos .tarjeta').filter({ hasText: 'Alguien 1140233' })
+await pagina.locator('#inicio-tabla-cuerpo tr').filter({ hasText: 'Alguien 1140233' })
   .locator('.nombre-pulsable').click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('.aviso-presencia');
@@ -134,7 +134,7 @@ console.log('--- 5) una señal caducada no cuenta como ocupado ---');
 await escribirPresenciaDe('Juan', {
   '260902 MATRICULA 26-27 Otra Persona 1140777': { ultima: new Date(Date.now() - 5 * 60 * 1000).toISOString() }
 });
-await pagina.locator('#lista-abiertos .tarjeta').filter({ hasText: 'Otra Persona 1140777' })
+await pagina.locator('#inicio-tabla-cuerpo tr').filter({ hasText: 'Otra Persona 1140777' })
   .locator('.nombre-pulsable').click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(200);
@@ -155,10 +155,10 @@ await pagina.evaluate(async () => {
 });
 await pagina.waitForTimeout(100);
 await comprobar('la tarjeta de Juan lleva la marca',
-  pagina.locator('#lista-abiertos .tarjeta').filter({ hasText: 'Alguien 1140233' })
+  pagina.locator('#inicio-tabla-cuerpo tr').filter({ hasText: 'Alguien 1140233' })
     .locator('.marca-presencia').count(), 1);
 await comprobar('la otra tarjeta no lleva ninguna',
-  pagina.locator('#lista-abiertos .tarjeta').filter({ hasText: 'Otra Persona 1140777' })
+  pagina.locator('#inicio-tabla-cuerpo tr').filter({ hasText: 'Otra Persona 1140777' })
     .locator('.marca-presencia').count(), 0);
 
 console.log('--- 7) presencia/ queda fuera de copias y papelera ---');

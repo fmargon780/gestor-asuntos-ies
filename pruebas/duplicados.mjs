@@ -107,7 +107,7 @@ const EXISTENTE = '260904 TRANSPORTE 26-27 1ºD State, Ricardo Catalán 7731644'
 const NUEVA = '260904 TRANSPORTE 26-27 State, Ricardo Catalán 7731644';
 await crearCarpeta(EXISTENTE);
 await pagina.click('#btn-recargar');
-await pagina.waitForSelector('#lista-abiertos .tarjeta');
+await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
 
 await pagina.click('.pestana[data-pantalla="nuevo"]');
 await pagina.click('#categorias-lista .categoria-boton:nth-child(1)');

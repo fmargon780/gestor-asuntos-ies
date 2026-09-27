@@ -5,6 +5,54 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 192: la pantalla de Inicio, segunda parte (la tabla y los plegados)
+
+`docs/INICIO-CUATRO-BLOQUES.md`, apartados 5 y 6. Debajo de los cuatro bloques de la fila 191,
+ahora la tabla real **«Todos los asuntos abiertos (N)»**: columnas Asunto, Tipo, Hito actual, Le
+toca a, Plazo, Abierto, y el ⋮ con «Copiar el nombre»/«Archivar». A la derecha del título,
+«Filtros» (Situación —antes «Montón»—, Plazo, Lo encarga, y el nuevo «Tipo de asunto», que
+sustituye a las tarjetas «Por tipo de asunto») y «Ordenar», siempre a la vista, fuera del panel
+plegable (así lo pedía el boceto). El buscador de la cabecera de Inicio, que ya filtraba los
+bloques 1-3, filtra también esta tabla: se abandona el filtro rico por palabras y notas
+(`a.busca`) por el mismo mecanismo simple de nombre+tipo+tercero que usan los bloques, tal y como
+pedía el propio encargo («mismo mecanismo, sin recoding»). Al final, plegados, **«Dormidos (N)»**
+y **«Sin fecha (N)»**, recuperados de la pantalla «Qué me toca» de antes de la fila 191 (se habían
+perdido al trocear aquel fichero, con un `pintar()` roto de propina que nadie llegaba a ejecutar).
+
+**Dónde vive**: la tabla no es un módulo nuevo — vive en `js/asuntos-lista-pintar.js`, que ya era
+dueño de `App.pintarAbiertos` (enganchado desde ocho sitios distintos del código). Solo
+«Dormidos»/«Sin fecha» van en un fichero nuevo, `js/inicio-plegados.js` (156 líneas), por ser de
+la misma familia de datos que `js/que-me-toca.js`. El panel de filtros de siempre
+(`#filtros-abiertos`) se traslada en bloque, con los mismos `id` de siempre: `js/vista.js`,
+`js/reservados.js` y `js/usabilidad.js` solo miran esos `id`, así que el traslado no rompe nada
+por sí solo. Se quita de verdad **`#inicio-legado`** (la lista antigua que la fila 191 dejó como
+parche siempre visible, precisamente hasta que existiera esta tabla) y los dos paneles de montón
+ya ocultos («Pendiente de Administración»/«Pendiente de terceros»); el panel «Ver todo» de «Ha
+llegado» (fila 191) **no se toca**: es un botón distinto, sin relación con el filtro «Situación»
+a pesar de lo que decía el encargo original, y lo pulsan 14 pruebas.
+
+**Cómo se hizo**: dado el tamaño (comparable a la fila 191), un agente de planificación leyó el
+encargo, el boceto y el código real (el trío `asuntos-lista*.js`, el panel de filtros, el
+`que-me-toca.js` de antes de la fila 191 recuperado del historial, y cerca de 35 ficheros de
+`pruebas/`) y entregó un plan fichero por fichero con nombres de función exactos; un segundo
+agente lo implementó, validando con `npm test` completo en verde; esta sesión revisó el diff
+entero, corrió `npm test` de forma independiente, comprobó a ojo con Playwright que la tabla y los
+plegados se ven bien (sin solapes, columnas alineadas, parecido al boceto), y verificó a mano que
+un aviso transitorio («Sin hitos» al primer pintado, hasta que `Hitos.leer()` termina) se
+autocorrige solo, como ya pasaba con las tarjetas viejas.
+
+**Una prueba nueva encontrada al validar, no una regresión de esta fila**:
+`hito-desde-por-clasificar.mjs` fallaba solo con la máquina a tope de CPU (en solitario, 3 de 3 en
+verde) — el mismo problema que ya documentó la fila 208. Va también en el `EN_SOLITARIO` de
+`pruebas/ejecutar.mjs`.
+
+**Un aviso de privacidad encontrado, no arreglado aquí (no era el encargo de esta fila), apuntado
+en `docs/COLA.md`**: si el responsable de un hito es el propio tercero, el texto «Esperando a
+…»/«Le toca a …» (en «Esperamos a otros» desde la fila 191, y ahora también en la columna «Le toca
+a» de la tabla) pone su nombre real aunque el asunto esté reservado, sin pasar por
+`Reservados.tapar`. El resto de la fila/tarjeta sí lo tapa. Pendiente de decidir cómo taparlo y en
+qué fila.
+
 ## 27-sep-2026 — Fila 207: unir dos tipos de asunto en uno
 
 `docs/UNIR-DOS-TIPOS.md`. En Ajustes › pantalla de un tipo, junto a "Cambiar el nombre", un botón

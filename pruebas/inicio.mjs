@@ -88,7 +88,7 @@ await pagina.evaluate(async ({ CLAVE_A, CLAVE_B, FECHA_AYER }) => {
     await w.close();
   }
 
-  await escribir('tipos.json', [{ tipo: 'TRASLADO', categoria: 'ALUMNADO' }]);
+  await escribir('tipos.json', [{ tipo: 'TRASLADO', categoria: 'ALUMNADO', organo: 'SECRETARIA' }]);
   await escribir('guias.json', { TRASLADO: [
     { id: 'g1', titulo: 'Pedir papeles', cuerpo: '', opciones: [], responsable: 'administracion' },
     { id: 'g2', titulo: 'Revisar el expediente', cuerpo: '', opciones: [], responsable: 'administracion' }
@@ -96,7 +96,7 @@ await pagina.evaluate(async ({ CLAVE_A, CLAVE_B, FECHA_AYER }) => {
 
   const fAsuntos = await g.getFileHandle('asuntos.json', { create: true });
   const jAsuntos = JSON.parse(await (await fAsuntos.getFile()).text() || '{"asuntos":{}}');
-  jAsuntos.asuntos[CLAVE_A] = { estado: 'abierto', tipo: 'TRASLADO', categoria: 'ALUMNADO', tercero: 'Uno Reves, Ana 1111', abiertoPor: 'Francisco' };
+  jAsuntos.asuntos[CLAVE_A] = { estado: 'abierto', tipo: 'TRASLADO', categoria: 'ALUMNADO', tercero: 'Uno Reves, Ana 1111', abiertoPor: 'Francisco', limite: FECHA_AYER };
   jAsuntos.asuntos[CLAVE_B] = { estado: 'abierto', tipo: 'TRASLADO', categoria: 'ALUMNADO', tercero: 'Familia Espera, Bea 2222', abiertoPor: 'Francisco' };
   await escribir('asuntos.json', jAsuntos);
 
@@ -114,6 +114,7 @@ await pagina.evaluate(async ({ CLAVE_A, CLAVE_B, FECHA_AYER }) => {
   });
 
   await App.cargarRegistro();
+  await App.cargarTipos();   /* recoge el "organo" de tipos.json (fila 192, sección 8b) */
 }, { CLAVE_A, CLAVE_B, FECHA_AYER });
 
 await pagina.click('#btn-recargar');
@@ -208,6 +209,148 @@ await pagina.fill('#buscar-abiertos', '');
 await pagina.waitForTimeout(400);
 await comprobar('al borrar la búsqueda, "Esperamos a otros" vuelve a tener su fila',
   pagina.locator('#inicio-esperamos-lista .inicio-fila').count(), 1);
+
+/* ================= 8. LA TABLA "TODOS LOS ASUNTOS ABIERTOS" (fila 192) ================= */
+
+console.log('--- 8. la tabla ---');
+await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
+await comprobar('las dos filas salen', pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 2);
+
+const filaA = pagina.locator('#inicio-tabla-cuerpo tr', { hasText: 'Uno Reves' });
+const filaB = pagina.locator('#inicio-tabla-cuerpo tr', { hasText: 'Familia Espera' });
+await comprobar('la fila de A: columna Tipo', filaA.locator('td').nth(1).textContent(), 'TRASLADO');
+await comprobar('la fila de A: columna Hito actual',
+  filaA.locator('td').nth(2).textContent().then(t => t.indexOf('Revisar el expediente') !== -1), true);
+await comprobar('la fila de A: columna Plazo, vencido',
+  filaA.locator('.marca-plazo').getAttribute('class').then(c => c.indexOf('plazo-vencido') !== -1), true);
+await comprobar('la fila de A: columna Abierto', filaA.locator('td').nth(5).textContent(), '01-sep-2026');
+await comprobar('la fila de B: columna Hito actual',
+  filaB.locator('td').nth(2).textContent().then(t => t.indexOf('Esperar respuesta') !== -1), true);
+await comprobar('la fila de B: columna Abierto', filaB.locator('td').nth(5).textContent(), '02-sep-2026');
+
+if (await pagina.locator('#filtros-abiertos').isHidden()) await pagina.click('#btn-filtros');
+
+console.log('--- 8b. los filtros de siempre, sobre la tabla ---');
+await pagina.selectOption('#filtro-estado', 'administracion');
+await pagina.waitForTimeout(200);
+await comprobar('Situación «Nos toca»: solo A', pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 1);
+await pagina.selectOption('#filtro-estado', 'terceros');
+await pagina.waitForTimeout(200);
+await comprobar('Situación «Esperan a terceros»: solo B', pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 1);
+await pagina.selectOption('#filtro-estado', '');
+await pagina.waitForTimeout(200);
+
+await pagina.selectOption('#filtro-plazo', 'vencidos');
+await pagina.waitForTimeout(200);
+await comprobar('Plazo «solo los vencidos»: solo A', pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 1);
+await pagina.selectOption('#filtro-plazo', 'sinplazo');
+await pagina.waitForTimeout(200);
+await comprobar('Plazo «sin plazo»: solo B', pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 1);
+await pagina.selectOption('#filtro-plazo', '');
+await pagina.waitForTimeout(200);
+
+await pagina.selectOption('#filtro-organo', 'SECRETARIA');
+await pagina.waitForTimeout(200);
+await comprobar('Lo encarga «Secretaría»: los dos (TRASLADO es de Secretaría)',
+  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 2);
+await pagina.selectOption('#filtro-organo', 'DIRECCION');
+await pagina.waitForTimeout(200);
+await comprobar('Lo encarga «Dirección»: ninguno', pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 0);
+await pagina.selectOption('#filtro-organo', '');
+await pagina.waitForTimeout(200);
+
+await comprobar('el filtro «Tipo de asunto» tiene la opción TRASLADO',
+  pagina.locator('#filtro-tipo-asunto option[value="TRASLADO"]').count(), 1);
+await pagina.selectOption('#filtro-tipo-asunto', 'TRASLADO');
+await pagina.waitForTimeout(200);
+await comprobar('Tipo de asunto «TRASLADO»: los dos', pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 2);
+await pagina.selectOption('#filtro-tipo-asunto', '');
+await pagina.waitForTimeout(200);
+
+console.log('--- 8c. "Ordenar" cambia el orden ---');
+await comprobar('por defecto (fecha, los más antiguos arriba), A antes que B',
+  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').first().textContent().then(t => t.indexOf('Uno Reves') !== -1), true);
+await pagina.selectOption('#orden-abiertos', 'tercero');
+await pagina.waitForTimeout(200);
+await comprobar('por tercero, Familia Espera (B) antes que Uno Reves (A)',
+  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').first().textContent().then(t => t.indexOf('Familia Espera') !== -1), true);
+await pagina.selectOption('#orden-abiertos', 'fecha-asc');
+await pagina.waitForTimeout(200);
+
+console.log('--- 8d. el buscador de la cabecera también filtra la tabla ---');
+await pagina.fill('#buscar-abiertos', 'Uno Reves');
+await pagina.waitForTimeout(400);
+await comprobar('con "Uno Reves" en el buscador, solo la fila de A',
+  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 1);
+await pagina.fill('#buscar-abiertos', '');
+await pagina.waitForTimeout(400);
+await comprobar('al borrar la búsqueda, vuelven las dos filas',
+  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 2);
+
+/* ================= 9. "DORMIDOS": UN ASUNTO SIN NOVEDADES ================= */
+
+console.log('--- 9. "Dormidos": un asunto sin novedades desde hace más de 60 días ---');
+const CLAVE_C = '260903 TRASLADO 26-27 Tres Dormido, Cris 3333';
+await pagina.evaluate(async ({ CLAVE_C }) => {
+  await window.__disco.abiertos.getDirectoryHandle(CLAVE_C, { create: true });
+  var notaVieja = new Date(Date.now() - 75 * 86400000).toISOString();
+  await App.anotar(CLAVE_C, {
+    tipo: 'TRASLADO', categoria: 'ALUMNADO', tercero: 'Tres Dormido, Cris 3333',
+    abiertoPor: 'Francisco', notaEl: notaVieja
+  });
+  await App.verAbiertos();
+}, { CLAVE_C });
+await pagina.waitForTimeout(400);
+await pagina.evaluate(() => window.Inicio && window.Inicio.repintar());
+await pagina.waitForSelector('#inicio-dormidos');
+
+await comprobar('el plegado "Dormidos" existe', pagina.locator('#inicio-dormidos').count(), 1);
+await comprobar('dice "Dormidos (1) · sin novedades…"',
+  pagina.locator('#inicio-dormidos summary').textContent().then(t => t.indexOf('Dormidos (1)') === 0), true);
+await comprobar('está plegado de partida',
+  pagina.evaluate(() => document.getElementById('inicio-dormidos').open), false);
+await pagina.evaluate(() => { document.getElementById('inicio-dormidos').open = true; });
+await comprobar('dentro sale el asunto C',
+  pagina.locator('#inicio-dormidos').textContent().then(t => t.indexOf('Tres Dormido') !== -1), true);
+
+/* ================= 10. "SIN FECHA": UN HITO PENDIENTE SIN PLAZO ================= */
+
+console.log('--- 10. "Sin fecha": un hito pendiente de Administración sin plazo ---');
+const CLAVE_D = '260904 TRASLADO 26-27 Cuatro Sinfecha, Dani 4444';
+await pagina.evaluate(async ({ CLAVE_D }) => {
+  await window.__disco.abiertos.getDirectoryHandle(CLAVE_D, { create: true });
+  await App.anotar(CLAVE_D, {
+    tipo: 'TRASLADO', categoria: 'ALUMNADO', tercero: 'Cuatro Sinfecha, Dani 4444', abiertoPor: 'Francisco'
+  });
+  await App.verAbiertos();
+
+  var g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+  var h = await g.getFileHandle('hitos.json');
+  var datos = JSON.parse(await (await h.getFile()).text());
+  datos.porAsunto[CLAVE_D] = { creados: '2026-09-04', hitos: [
+    { id: 'd1', titulo: 'Sin plazo todavía', estado: 'pendiente', responsable: 'administracion' }
+  ] };
+  var w = await (await g.getFileHandle('hitos.json', { create: true })).createWritable();
+  await w.write(JSON.stringify(datos));
+  await w.close();
+}, { CLAVE_D });
+await pagina.waitForTimeout(300);
+await pagina.evaluate(() => window.Inicio && window.Inicio.repintar());
+await pagina.waitForSelector('#inicio-sinfecha');
+
+await comprobar('el plegado "Sin fecha" existe', pagina.locator('#inicio-sinfecha').count(), 1);
+await comprobar('dice "Sin fecha (1) · hitos pendientes sin plazo"',
+  pagina.locator('#inicio-sinfecha summary').textContent().then(t => t.indexOf('Sin fecha (1)') === 0), true);
+await comprobar('está plegado de partida',
+  pagina.evaluate(() => document.getElementById('inicio-sinfecha').open), false);
+await pagina.evaluate(() => { document.getElementById('inicio-sinfecha').open = true; });
+await comprobar('dentro sale el hito d1',
+  pagina.locator('#inicio-sinfecha').textContent().then(t => t.indexOf('Sin plazo todavía') !== -1), true);
+
+/* ================= 11. SIN "#inicio-legado" ================= */
+
+console.log('--- 11. la zona legado ha desaparecido ---');
+await comprobar('sin "#inicio-legado"', pagina.locator('#inicio-legado').count(), 0);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

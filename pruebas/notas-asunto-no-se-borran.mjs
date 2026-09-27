@@ -89,8 +89,8 @@ await pagina.evaluate(async (asunto) => {
 }, NOMBRE_ASUNTO);
 
 await pagina.click('#btn-recargar');
-await pagina.waitForSelector('#lista-abiertos .tarjeta');
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.evaluate(() => FichaTarjetas.abrir('notas'));
 await pagina.waitForSelector('#ficha-nota-texto');

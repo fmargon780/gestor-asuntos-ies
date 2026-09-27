@@ -161,7 +161,7 @@ await pagina.evaluate(async (asunto) => {
 }, ASUNTO_TRAMITE);
 await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(300);
-await pagina.locator('.tarjeta-asunto', { hasText: 'TRAMITE' }).locator('.nombre-pulsable').click();
+await pagina.locator('#inicio-tabla-cuerpo tr', { hasText: 'TRAMITE' }).locator('.nombre-pulsable').click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));

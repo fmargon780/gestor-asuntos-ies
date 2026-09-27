@@ -130,8 +130,8 @@ const ESCANEO = '260917 SOLICITUD Escaneo.pdf';
 await dejarPdfEnAsunto(NOMBRE_ASUNTO, ESCANEO, PDF_6);
 
 await pagina.click('#btn-recargar');
-await pagina.waitForSelector('#lista-abiertos .tarjeta');
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila');
 
@@ -203,8 +203,8 @@ await comprobar('el original ha quedado apuntado en la papelera', pagina.evaluat
 
 console.log('--- Sacar páginas: el original no se toca ---');
 await pagina.click('#ficha-volver');
-await pagina.waitForSelector('#lista-abiertos .nombre-pulsable');
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.waitForSelector('#inicio-tabla-cuerpo .nombre-pulsable');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila');
 
@@ -230,7 +230,7 @@ await dejarPdfSuelto('primero.pdf', PDF_A);
 await dejarPdfSuelto('segundo.pdf', PDF_B);
 
 await pagina.click('#ficha-volver');
-await pagina.waitForSelector('#lista-abiertos .nombre-pulsable');
+await pagina.waitForSelector('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.click('#btn-recargar');
 await pagina.click('.panel[data-vista="clasificar"]');
 await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');

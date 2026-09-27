@@ -51,30 +51,33 @@ await pagina.waitForTimeout(600);
 await pagina.evaluate(() => window.App.irVista('departamento'));
 await pagina.waitForTimeout(300);
 
-await comprobar('los cuatro asuntos salen', pagina.locator('#lista-abiertos .tarjeta').count(), 4);
-await comprobar('la fila de tipos se ve', pagina.locator('#grupos-tipo').isVisible(), true);
-await comprobar('hay cuatro tarjetas (Todos + tres tipos)',
-  pagina.locator('#grupos-tipo .grupo').count(), 4);
+await comprobar('los cuatro asuntos salen', pagina.locator('#inicio-tabla-cuerpo tr').count(), 4);
+/* Fila 192: la fila de tarjetas «Por tipo de asunto» pasa a ser el
+   filtro #filtro-tipo-asunto, dentro del panel de filtros de siempre. */
+if (await pagina.locator('#filtros-abiertos').isHidden()) await pagina.click('#btn-filtros');
+await comprobar('se ve el filtro de tipo', pagina.locator('#filtro-tipo-asunto').isVisible(), true);
+await comprobar('hay cuatro opciones (Todos + tres tipos)',
+  pagina.locator('#filtro-tipo-asunto option').count(), 4);
 await comprobar('los rótulos',
-  pagina.locator('#grupos-tipo .grupo-nombre').allTextContents(),
+  pagina.locator('#filtro-tipo-asunto option').allTextContents(),
   ['Todos', 'MATRICULA', 'COMPRA', 'SANCION']);
 
-console.log('--- pulsando MATRICULA ---');
-await pagina.click('#grupos-tipo .grupo[data-tipo="MATRICULA"]');
+console.log('--- eligiendo MATRICULA ---');
+await pagina.selectOption('#filtro-tipo-asunto', 'MATRICULA');
 await pagina.waitForTimeout(300);
-await comprobar('la lista se queda con dos', pagina.locator('#lista-abiertos .tarjeta').count(), 2);
-await comprobar('la tarjeta queda marcada',
-  pagina.locator('#grupos-tipo .grupo[data-tipo="MATRICULA"]').getAttribute('class'), 'grupo activo');
+await comprobar('la lista se queda con dos', pagina.locator('#inicio-tabla-cuerpo tr').count(), 2);
+await comprobar('el filtro queda marcado',
+  pagina.locator('#filtro-tipo-asunto').inputValue(), 'MATRICULA');
 
-console.log('--- volviendo a pulsarla ---');
-await pagina.click('#grupos-tipo .grupo[data-tipo="MATRICULA"]');
+console.log('--- volviendo a "Todos" ---');
+await pagina.selectOption('#filtro-tipo-asunto', '');
 await pagina.waitForTimeout(300);
-await comprobar('vuelven los cuatro', pagina.locator('#lista-abiertos .tarjeta').count(), 4);
+await comprobar('vuelven los cuatro', pagina.locator('#inicio-tabla-cuerpo tr').count(), 4);
 
-console.log('--- pulsando COMPRA ---');
-await pagina.click('#grupos-tipo .grupo[data-tipo="COMPRA"]');
+console.log('--- eligiendo COMPRA ---');
+await pagina.selectOption('#filtro-tipo-asunto', 'COMPRA');
 await pagina.waitForTimeout(300);
-await comprobar('la lista se queda con uno', pagina.locator('#lista-abiertos .tarjeta').count(), 1);
+await comprobar('la lista se queda con uno', pagina.locator('#inicio-tabla-cuerpo tr').count(), 1);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

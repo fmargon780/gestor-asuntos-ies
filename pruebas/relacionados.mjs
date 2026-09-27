@@ -110,13 +110,15 @@ async function crearAsunto(categoriaIndice, botonTipo, buscarTexto) {
 await crearAsunto(1, 'CERTIFICADO', 'dos');   /* asunto B: López Ejemplo, Prueba Dos */
 
 /* 1) Archivar un asunto SIN relacionados se comporta exactamente igual
-   que siempre: no sale ningún cuadro de "Avisar a los relacionados". */
+   que siempre: no sale ningún cuadro de "Avisar a los relacionados".
+   Fila 192: "Archivar" vive en el menú de tres puntos de la fila. */
+await pagina.locator('#inicio-tabla-cuerpo .fila-menu-btn').first().click();
 await pagina.getByRole('button', { name: 'Archivar', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('sin relacionados, el cuadro es directamente el de archivar',
   pagina.locator('#cuadro-titulo').textContent(), 'Archivar el asunto');
 await pagina.click('#cuadro-aceptar');
-await pagina.waitForSelector('#lista-abiertos .vacio, #lista-abiertos .tarjeta');
+await pagina.waitForSelector('#inicio-tabla-cuerpo .vacio, #inicio-tabla-cuerpo tr');
 
 /* ---------- asunto A: con relacionados, para el resto de escenarios ---------- */
 
@@ -129,7 +131,7 @@ const nombreAsuntoA = await pagina.evaluate(async () => {
   return nombres.filter(n => n[0] !== '_')[0];
 });
 
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 /* "Personas y entidades relacionadas" es una tarjeta (fila 107): hay
    que abrirla en grande antes de poder pulsar nada de dentro. */
@@ -241,7 +243,7 @@ await pagina.click('#cuadro-aceptar');
    los sabe, porque el asunto se creó con la aplicación). */
 await pagina.waitForSelector('#cuadro-titulo:has-text("Archivar el asunto")');
 await pagina.click('#cuadro-aceptar');
-await pagina.waitForSelector('#lista-abiertos .vacio, #lista-abiertos .tarjeta');
+await pagina.waitForSelector('#inicio-tabla-cuerpo .vacio, #inicio-tabla-cuerpo tr');
 
 const NOMBRE_MARCADOR = '(RELACIONADO) ' + nombreAsuntoA;
 async function leerMarcadorEnPagina(categoria, tercero, nombreMarcador) {
@@ -354,12 +356,13 @@ await comprobar('pero la lista de relacionados sigue en la ficha del asunto', pa
    archiva otra vez, se le mete un fichero de más dentro de una de las
    dos notas, y se reabre. */
 await pagina.click('.pestana[data-pantalla="abiertos"]');
+await pagina.locator('#inicio-tabla-cuerpo tr', { hasText: 'MATRICULA' }).locator('.fila-menu-btn').click();
 await pagina.getByRole('button', { name: 'Archivar', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');   /* avisar a los relacionados, las dos marcadas */
 await pagina.waitForSelector('#cuadro-titulo:has-text("Archivar el asunto")');
 await pagina.click('#cuadro-aceptar');
-await pagina.waitForSelector('#lista-abiertos .vacio, #lista-abiertos .tarjeta');
+await pagina.waitForSelector('#inicio-tabla-cuerpo .vacio, #inicio-tabla-cuerpo tr');
 
 /* Archivar deja la nota de forma asíncrona, después de mover la
    carpeta: se espera a que exista antes de meterle el fichero de más. */

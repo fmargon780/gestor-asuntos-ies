@@ -45,11 +45,13 @@
 .filtro { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .filtro-rotulo { font-size: 12.5px; font-weight: 600; color: var(--tinta-suave); }
 .filtro .campo { width: 100%; }
-/* Los tres traen su ancho puesto de css/estilos.css, de cuando iban
-   sueltos en la barra. Aquí mandan la rejilla y su rótulo. */
+/* Los dos traen su ancho puesto de css/estilos.css, de cuando iban
+   sueltos en la barra. Aquí mandan la rejilla y su rótulo. «Ordenar»
+   (#orden-abiertos) vive fuera del panel desde la fila 192: su ancho
+   lo pone .inicio-orden .campo, en css/inicio.css. */
 .filtros #filtro-estado,
 .filtros #filtro-plazo,
-.filtros #orden-abiertos { width: 100%; min-width: 0; }
+.filtros #filtro-tipo-asunto { width: 100%; min-width: 0; }
 
 /* Que se lea entero lo que el buscador ofrece buscar. */
 .cabecera #buscar-abiertos { width: 300px; }

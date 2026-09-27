@@ -55,7 +55,6 @@ App.pintarSueltos = async function () {
   var rotulo = $('nuevos-sueltos');
   rotulo.textContent = cuantosNuevos === 1 ? '1 nuevo' : cuantosNuevos + ' nuevos';
   rotulo.classList.toggle('oculto', !cuantosNuevos);
-  App.pintarCuentas();
 
   /* Saber la fecha de cada documento obliga a abrirlo, así que solo se
      hace cuando esta lista está a la vista. */

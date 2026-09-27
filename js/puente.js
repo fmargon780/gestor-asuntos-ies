@@ -13,18 +13,17 @@ window.Gestor = {
   tipos: function () { return App.E.tipos.slice(); },
   usuario: function () { return App.E.usuario; },
 
-  /* Deja la lista con los asuntos que cumplan ese filtro de plazo y
-     enseña el montón del departamento, que es donde se trabaja. */
+  /* Deja la tabla "Todos los asuntos abiertos" con los asuntos que
+     cumplan ese filtro de plazo, y lleva la vista hasta ella (fila 192). */
   filtrarPorPlazo: function (valor) {
     App.$('filtro-plazo').value = valor;
     App.$('filtro-estado').value = '';
     App.$('buscar-abiertos').value = '';
     App.ir('abiertos');
-    App.irVista('departamento');
-    /* Fila 191, decisión 5: mientras no exista la tabla de la fila 192,
-       este camino revela la lista legado (la tubería vieja), que es
-       donde de verdad se aplican estos filtros. */
-    if (window.Inicio) Inicio.mostrarListaLegado(true);
+    App.pintarAbiertos();
+    if (App.$('inicio-todos-asuntos')) {
+      App.$('inicio-todos-asuntos').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   },
 
   /* Las dos carpetas y la de _GESTOR, para que un módulo pueda crear

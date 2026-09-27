@@ -13,17 +13,13 @@
         cualquier otro, ordenado por días de espera.
      4. El tablón, en su columna, sin esconderse nunca.
 
-   Los apartados 5 y 6 (la tabla "Todos los asuntos abiertos" y los
-   plegados "Dormidos"/"Sin fecha") son la fila 192, siguiente: el
-   hueco #inicio-todos-asuntos queda vacío a propósito. Mientras no
-   exista esa tabla, la lista antigua de tarjetas (#inicio-legado, con
-   sus filtros de siempre) se queda siempre a la vista, debajo de la
-   rejilla: así ningún camino que dependía de verla entera —abrir un
-   asunto de la lista, los filtros, el buscador legado— deja de
-   funcionar. "Ver los vencidos"/"Ver también los de esta semana"
-   (Gestor.filtrarPorPlazo, js/puente.js) y las vistas de montón que ya
-   no tienen botón visible (App.irVista, js/asuntos-lista-montones.js)
-   llevan la vista hasta ella con Inicio.mostrarListaLegado(true).
+   Los apartados 5 y 6 (docs/INICIO-CUATRO-BLOQUES.md: la tabla "Todos
+   los asuntos abiertos" y los plegados "Dormidos"/"Sin fecha") son la
+   fila 192: la tabla vive en el trío asuntos-lista*.js
+   (App.pintarAbiertos ya la pinta dentro de #inicio-tabla-cuerpo); los
+   plegados, en js/inicio-plegados.js (InicioPlegados.pintar), enganchados
+   aquí mismo con lo que ya calcula repintarTodo (g.sinFecha,
+   QueMeToca.reunirDormidos()).
 
    Se engancha por window.Gestor.alRefrescar, como avisos.js y
    tablon.js: nada de envolturas nuevas. Va penúltimo en index.html
@@ -384,31 +380,11 @@
     var g = QueMeToca.clasificar(items, datos.ajustes);
     pintarMeToca(g.tejado);
     pintarEsperamos(g.otros, datos.ajustes);
+    if (window.InicioPlegados) InicioPlegados.pintar(g.sinFecha, QueMeToca.reunirDormidos());
 
     await pintarHaLlegado(texto);
     if (esteTurno !== turno) return;
     await pintarAvisoAspirantes();
-  }
-
-  /* ==========================================================
-     LA ZONA "LEGADO"
-     ========================================================== */
-
-  /* La lista antigua de tarjetas (#inicio-legado) sigue siempre a la
-     vista, debajo de la rejilla nueva, mientras no exista la tabla de
-     verdad de la fila 192 (así ningún camino que dependía de verla
-     entera —los filtros, el buscador legado, abrir un asunto de la
-     lista— deja de funcionar). El tablón tampoco se esconde nunca
-     (decisión 4): vive en la rejilla, que no se toca aquí.
-
-     Lo único que hace esta función es llevar la vista hasta la lista
-     legado cuando algo la necesita de verdad (Gestor.filtrarPorPlazo,
-     en js/puente.js; una vista de montón sin botón visible, en
-     App.irVista, js/asuntos-lista-montones.js), para que no haya que
-     bajar a mano hasta encontrarla. */
-  function mostrarListaLegado(verLegado) {
-    if (!verLegado) return;
-    if ($('inicio-legado')) $('inicio-legado').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   /* ==========================================================
@@ -433,7 +409,7 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enganchar);
   else enganchar();
 
-  window.Inicio = { repintar: repintarTodo, mostrarListaLegado: mostrarListaLegado };
+  window.Inicio = { repintar: repintarTodo };
 
 })();
 

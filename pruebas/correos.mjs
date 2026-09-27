@@ -270,7 +270,7 @@ await pagina.waitForTimeout(700);
 /* El asunto está "A LA ESPERA DEL TERCERO", así que vive en esa tarjeta. */
 await pagina.evaluate(() => window.App.irVista('espera'));
 await pagina.waitForTimeout(300);
-await pagina.click('#lista-abiertos .tarjeta-nombre');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(700);
 

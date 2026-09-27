@@ -84,11 +84,13 @@ await comprobar('el primer asunto se crea sin número en el nombre',
   nombresAbiertos().then(ns => ns.some(n => /^260905 \S+( \d{2}-\d{2})? Pendiente De Numero, Nora$/.test(n))), true);
 
 /* Este primero se archiva ahora mismo, para comprobar después que el
-   renombrado no lo toca. */
+   renombrado no lo toca. Fila 192: "Archivar" vive en el menú de tres
+   puntos de la fila de la tabla. */
+await pagina.locator('#inicio-tabla-cuerpo .fila-menu-btn').first().click();
 await pagina.getByRole('button', { name: 'Archivar', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');
-await pagina.waitForSelector('#lista-abiertos .vacio');
+await pagina.waitForSelector('#inicio-tabla-cuerpo .vacio');
 const nombreArchivado = (await pagina.evaluate(async () => {
   const cat = await window.__disco.archivo.getDirectoryHandle('ALUMNADO');
   const ter = await cat.getDirectoryHandle('Pendiente De Numero, Nora');

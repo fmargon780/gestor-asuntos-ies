@@ -550,6 +550,11 @@ var AjustesPlegado = (function () {
     ordenarCentro: ordenarCentro,
     ordenarMantenimiento: ordenarMantenimiento,
     ponerResumen: ponerResumen,
+    /* Fila 192, docs/INICIO-CUATRO-BLOQUES.md: js/inicio-plegados.js
+       también necesita recordar si "Dormidos"/"Sin fecha" se dejaron
+       abiertos, con el mismo mecanismo que usan los bloques de
+       Ajustes. */
+    recordar: recordar,
     CLAVE: CLAVE
   };
 })();

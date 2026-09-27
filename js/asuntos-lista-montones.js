@@ -1,9 +1,16 @@
 /* ============================================================
-   asuntos-lista-montones.js — las tres tarjetas de arriba, los montones por tipo de asunto, a qué montón va cada asunto, las cuentas y el filtro por montón.
+   asuntos-lista-montones.js — la tarjeta "Ver todo", a qué montón va
+   cada asunto y el filtro «Situación» (antes «Montón»).
 
    Sacado tal cual de js/asuntos-lista.js en la fila 133
-   (docs/PARTIR-FICHEROS-GRANDES.md), sin cambiar nada de lo que hace.
-   Se carga justo detrás de él.
+   (docs/PARTIR-FICHEROS-GRANDES.md). Se carga justo detrás de él.
+
+   Fila 192 (docs/INICIO-CUATRO-BLOQUES.md, apartado 5): la tabla
+   "Todos los asuntos abiertos" enseña todos los asuntos a la vez, sin
+   montones. Se han quitado las tarjetas "Por tipo de asunto"
+   (App.pintarGruposTipo y compañía, pasan a ser el filtro «Tipo de
+   asunto» de js/asuntos-lista-pintar.js), las cuentas de los montones
+   (App.pintarCuentas, sin llamador) y App.deLaVista.
    ============================================================ */
 
 /* ---------- las tres tarjetas de arriba ----------
@@ -22,86 +29,44 @@ App.vistaGuardada = function () {
   return App.VISTAS.indexOf(v) !== -1 ? v : 'departamento';
 };
 
+/* Fila 192: la tabla "Todos los asuntos abiertos" enseña todos los
+   asuntos a la vez, sin montones (App.deLaVista, que filtraba por
+   App.E.vista, ha desaparecido). App.irVista se queda solo con lo que
+   sigue haciendo falta: «Ver todo» (App.E.vista === 'clasificar')
+   enseña #zona-clasificar (sueltos y correos) a pantalla completa; el
+   resto de valores de App.E.vista solo pliega la bandeja y repinta. */
 App.irVista = function (cual) {
   App.E.vista = App.VISTAS.indexOf(cual) !== -1 ? cual : 'departamento';
   try { window.localStorage.setItem('vista-abiertos', App.E.vista); } catch (e) {}
-
-  /* Al cambiar de montón se empieza viendo todos los tipos. */
-  App.tipoElegido = '';
 
   Array.prototype.forEach.call(document.querySelectorAll('.panel'), function (b) {
     b.classList.toggle('activo', b.dataset.vista === App.E.vista);
   });
   var esClasificar = App.E.vista === 'clasificar';
   $('zona-clasificar').classList.toggle('oculto', !esClasificar);
-  $('zona-asuntos').classList.toggle('oculto', esClasificar);
   /* La bandeja de correos arranca siempre plegada al entrar aquí, se
      dejara como se dejara la última vez (fila 27, 17-sep-2026): sin
      memoria en localStorage, a propósito. */
   if (esClasificar && window.BandejaPantalla) window.BandejaPantalla.plegar();
-  /* Ordenar y filtrar por estado o por plazo solo tiene sentido con asuntos. */
-  $('filtro-estado').parentNode.querySelectorAll('#filtro-estado, #filtro-plazo, #orden-abiertos')
-    .forEach(function (el) { el.classList.toggle('oculto', esClasificar); });
-  Array.prototype.forEach.call(document.querySelectorAll('.etiqueta-en-linea'), function (el) {
-    el.classList.toggle('oculto', esClasificar);
-  });
 
-  App.pintarAbiertos();
   App.pintarSueltos();
-
-  /* Fila 191: "espera" ya no tiene botón visible en Inicio (los otros
-     dos .panel se ocultan con CSS), pero sigue funcionando para quien
-     la llame a mano (o desde una prueba). Como la lista legado
-     (#inicio-legado) ya está siempre a la vista debajo de la rejilla,
-     esto solo hace falta para que le llegue el foco: mientras no
-     exista la tabla de la fila 192, Inicio.mostrarListaLegado se
-     encarga de que se vea bien. */
-  if (window.Inicio) {
-    Inicio.mostrarListaLegado(App.E.vista !== 'clasificar' && App.E.vista !== 'departamento');
-  }
 };
 
 Array.prototype.forEach.call(document.querySelectorAll('.panel'), function (b) {
   b.onclick = function () { App.irVista(b.dataset.vista); };
 });
 
-/* ---------- los montones por tipo de asunto ----------
+/* ---------- el tipo de asunto ----------
 
-   Dentro de "Pendiente de Administración" y de "Pendiente de terceros", los
-   asuntos se agrupan además por su tipo: una tarjeta pequeña por tipo,
-   encima de la lista. Al pulsar una, la lista se queda solo con los de
-   ese tipo; al volver a pulsarla, vuelven a salir todos. */
+   Fila 192: las tarjetas "Por tipo de asunto" pasan a ser el filtro
+   «Tipo de asunto» (js/asuntos-lista-pintar.js,
+   App.pintarFiltroTipoAsunto), que sigue reutilizando
+   App.montonesPorTipo tal cual. */
 
-App.tipoElegido = '';
 App.SIN_TIPO = 'Sin tipo';
 
 App.tipoDeAsunto = function (a) {
   return a.leido.tipo || (a.ficha && a.ficha.tipo) || App.SIN_TIPO;
-};
-
-/* Ojo con el nombre: `App.elegirTipo` ya existe, y es el de elegir el
-   tipo al crear un asunto nuevo (js/asuntos-nuevo.js). Aquel fichero se
-   carga después que este, así que si se repitiera el nombre este se
-   perdería sin decir nada, y las tarjetas no harían nada al pulsarlas.
-   Pasó el 10-sep-2026. */
-App.filtrarPorTipo = function (tipo) {
-  App.tipoElegido = (App.tipoElegido === tipo) ? '' : tipo;
-  App.pintarAbiertos();
-};
-
-/* La fila de tarjetas vive dentro de la zona de asuntos, justo encima
-   de la lista. Se crea la primera vez que hace falta. */
-App.cajaDeTipos = function () {
-  var caja = $('grupos-tipo');
-  if (caja) return caja;
-  var zona = $('zona-asuntos');
-  var lista = $('lista-abiertos');
-  if (!zona || !lista) return null;
-  caja = document.createElement('div');
-  caja.id = 'grupos-tipo';
-  caja.className = 'grupos-tipo oculto';
-  zona.insertBefore(caja, lista);
-  return caja;
 };
 
 /* Los montones, del más gordo al más flaco. A igualdad de asuntos, por
@@ -122,69 +87,6 @@ App.montonesPorTipo = function (lista) {
     });
 };
 
-App.tarjetaDeTipo = function (tipo, texto, cuantos, vencidos) {
-  var b = document.createElement('button');
-  b.type = 'button';
-  b.className = 'grupo' + (App.tipoElegido === tipo ? ' activo' : '');
-  b.dataset.tipo = tipo;
-  b.title = tipo
-    ? (App.tipoElegido === tipo ? 'Volver a ver todos los tipos'
-                                : 'Ver solo los asuntos de tipo ' + tipo)
-    : 'Ver todos los tipos';
-
-  var n = document.createElement('span');
-  n.className = 'grupo-nombre';
-  n.textContent = texto;
-  b.appendChild(n);
-
-  var c = document.createElement('span');
-  c.className = 'grupo-cuenta';
-  c.textContent = cuantos;
-  b.appendChild(c);
-
-  if (vencidos) {
-    var v = document.createElement('span');
-    v.className = 'grupo-vencidos';
-    v.textContent = vencidos + ' fuera de plazo';
-    b.appendChild(v);
-  }
-
-  b.onclick = function () { App.filtrarPorTipo(tipo); };
-  return b;
-};
-
-/* `lista` son los asuntos del montón de arriba, ya pasados por el
-   buscador y los filtros, pero todavía sin quedarnos con un tipo. */
-App.pintarGruposTipo = function (lista) {
-  var caja = App.cajaDeTipos();
-  if (!caja) return;
-
-  var grupos = App.montonesPorTipo(lista);
-
-  /* Con un solo tipo, las tarjetas no dicen nada que no diga ya la
-     lista de abajo. En "Por clasificar" no hay asuntos, solo papeles. */
-  if (App.E.vista === 'clasificar' || grupos.length < 2) {
-    caja.classList.add('oculto');
-    caja.innerHTML = '';
-    return;
-  }
-
-  caja.innerHTML = '';
-  caja.classList.remove('oculto');
-
-  var rotulo = document.createElement('span');
-  rotulo.className = 'grupos-rotulo';
-  rotulo.textContent = 'Por tipo de asunto';
-  caja.appendChild(rotulo);
-
-  caja.appendChild(App.tarjetaDeTipo('', 'Todos', lista.length, 0));
-  grupos.forEach(function (g) {
-    /* Se enseña el nombre corto; se agrupa y filtra por el de verdad
-       (fila 97): dos tipos con el mismo corto siguen siendo dos tarjetas. */
-    caja.appendChild(App.tarjetaDeTipo(g.tipo, Nombres.tipoParaVer(g.tipo, App.E.tipos), g.cuantos, g.vencidos));
-  });
-};
-
 /* A qué montón va un asunto (fila 104, docs/ESTADO-POR-EL-HITO.md):
    "Pendiente de Administración" o "Pendiente de terceros", según su
    hito actual (js/hitos-a-quien.js). Desde la fila 129, sin hitos va
@@ -200,22 +102,6 @@ App.diasEnEstado = function (a) {
   var d = new Date(App.ladoDe(a).desde || a.ficha.abiertoEl || '');
   if (isNaN(d.getTime())) return -1;
   return Math.floor((Date.now() - d.getTime()) / 86400000);
-};
-
-App.deLaVista = function (a, vista) {
-  var terceros = App.ladoDe(a).lado === 'terceros';
-  return vista === 'espera' ? terceros : !terceros;
-};
-
-App.pintarCuentas = function () {
-  var enEspera = App.E.listaAbiertos.filter(function (a) { return App.deLaVista(a, 'espera'); });
-  $('cuenta-clasificar').textContent = App.E.sueltos.length;
-  $('cuenta-departamento').textContent = App.E.listaAbiertos.length - enEspera.length;
-  $('cuenta-espera').textContent = enEspera.length;
-
-  var viejo = enEspera.some(function (a) { return App.diasEnEstado(a) >= App.DIAS_DE_AVISO; });
-  $('cuenta-espera').classList.toggle('cuenta-roja', viejo);
-  $('cuenta-clasificar').classList.toggle('cuenta-ambar', App.E.sueltos.length > 0);
 };
 
 /* El desplegable de arriba (fila 129): ya no filtra por estado escrito

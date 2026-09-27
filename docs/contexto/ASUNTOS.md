@@ -394,12 +394,21 @@ llama a una función, sin envolver nada:
   sin querer…») y, en la ficha, el menú de tres puntos: «Marcar como reservado» / «Quitar la
   reserva» (`opcionDelMenu`, por `App.guardarRegistroFresco`; en un tipo reservado, quitarla deja
   `false`). En modo consulta se apaga como las demás.
-- **Tarjeta** en Inicio (antes «Asuntos abiertos»; la lista de siempre, dentro de `#inicio-legado` desde la fila 191) y ARCHIVO (`enTarjeta`, al colgarla, ya pasada por sus
-  envoltorios): candado; tapada, el rótulo es «fecha TIPO curso grupo · reservado», el pie no dice
-  quién es y se quitan el trocito de nota y el botón del NIE. Se sigue abriendo.
+- **Fila de la tabla «Todos los asuntos abiertos»** (Inicio, fila 192; antes tarjeta en
+  `#inicio-legado`, fila 191): candado en la celda «Asunto» (`Reservados.candadoHtml` +
+  `nombreParaVer`, `App.filaTablaAsunto`, `js/asuntos-lista-pintar.js`). **Tarjeta** en ARCHIVO
+  (`App.tarjetaAsunto`, `enTarjeta`, al colgarla, ya pasada por sus envoltorios): candado; tapada,
+  el rótulo es «fecha TIPO curso grupo · reservado», el pie no dice quién es y se quitan el
+  trocito de nota y el botón del NIE. Se sigue abriendo.
 - **Buscadores** (abiertos y ARCHIVO): un tapado solo sale por su nombre de carpeta
-  (`textoDeBusqueda`), no por notas, documentos ni ficha.
-- **«Me toca»/«Esperamos a otros»** (Inicio, fila 191; antes «Qué me toca»): el mismo rótulo tapado y sin tercero (`nombreParaVer`). **Ficha del asunto**:
+  (`textoDeBusqueda`), no por notas, documentos ni ficha. En Inicio (bloques y tabla, fila 191/192)
+  el buscador de la cabecera usa el mismo mecanismo, nombre+tipo+tercero, ya sin tercero si está
+  tapado.
+- **«Me toca»/«Esperamos a otros»** (Inicio, fila 191; antes «Qué me toca») y la columna **«Le
+  toca a»** de la tabla (fila 192): el mismo rótulo tapado y sin tercero (`nombreParaVer`). **Ojo**
+  (aviso pendiente en `docs/COLA.md`, «Lo que queda por hablar con Francisco»): si el responsable
+  del hito es el propio tercero, el texto «Esperando a…»/«Le toca a…» sí pone su nombre real, sin
+  pasar por `Reservados.tapar` — un hueco real, no arreglado todavía. **Ficha del asunto**:
   entera, con candado en la cabecera (`ponerCandado`). **Ficha de una persona**: con candado.
 - **«Mostrar reservados»** (`#btn-mostrar-reservados`, junto a «Filtros», solo si hay algún tipo o
   asunto reservado): destapa todo, solo en esta sesión; a propósito, sin `localStorage`.

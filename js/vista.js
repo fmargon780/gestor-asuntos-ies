@@ -30,8 +30,8 @@
   /* ---------- 1. los filtros ---------- */
 
   function hayFiltroPuesto() {
-    var e = $('filtro-estado'), p = $('filtro-plazo'), o = $('filtro-organo');
-    return !!((e && e.value) || (p && p.value) || (o && o.value));
+    var e = $('filtro-estado'), p = $('filtro-plazo'), o = $('filtro-organo'), t = $('filtro-tipo-asunto');
+    return !!((e && e.value) || (p && p.value) || (o && o.value) || (t && t.value));
   }
 
   function pintarBotonFiltros() {
@@ -55,7 +55,7 @@
       pintarBotonFiltros();
     };
 
-    ['filtro-estado', 'filtro-plazo', 'filtro-organo'].forEach(function (id) {
+    ['filtro-estado', 'filtro-plazo', 'filtro-organo', 'filtro-tipo-asunto'].forEach(function (id) {
       if ($(id)) $(id).addEventListener('change', pintarBotonFiltros);
     });
 

@@ -58,43 +58,50 @@ await pagina.evaluate(async ([LARGO, LARGO2]) => {
 await pagina.evaluate(() => window.App.irVista('departamento'));
 await pagina.waitForTimeout(300);
 
-await comprobar('los tres asuntos salen', pagina.locator('#lista-abiertos .tarjeta').count(), 3);
-const rotulos = await pagina.locator('#grupos-tipo .grupo-nombre').allTextContents();
+await comprobar('los tres asuntos salen', pagina.locator('#inicio-tabla-cuerpo tr').count(), 3);
+/* Fila 192: la fila de tarjetas «Por tipo de asunto» pasa a ser el
+   filtro #filtro-tipo-asunto (un <select>), dentro del panel de
+   filtros de siempre. */
+if (await pagina.locator('#filtros-abiertos').isHidden()) await pagina.click('#btn-filtros');
+const opciones = pagina.locator('#filtro-tipo-asunto option');
+const rotulos = await opciones.allTextContents();
 await comprobar('los filtros enseñan el nombre corto, y el de siempre si no hay (dos TRASLEXP: dos tipos distintos)',
   Promise.resolve(rotulos.slice().sort()), ['MATRICULA', 'TRASLEXP', 'TRASLEXP', 'Todos']);
-await comprobar('cada tarjeta de filtro sigue siendo de su tipo de verdad',
-  pagina.locator('#grupos-tipo .grupo').evaluateAll(bs => bs.map(b => b.dataset.tipo).sort()),
+await comprobar('cada opción sigue siendo de su tipo de verdad',
+  opciones.evaluateAll(os => os.map(o => o.value).sort()),
   ['', 'MATRICULA', LARGO2, LARGO].sort());
-await comprobar('el nombre largo sale al pasar el ratón por el filtro',
-  pagina.locator(`#grupos-tipo .grupo[data-tipo="${LARGO}"]`).getAttribute('title'),
-  'Ver solo los asuntos de tipo ' + LARGO);
+await comprobar('el nombre largo sale al pasar el ratón por la opción',
+  pagina.locator(`#filtro-tipo-asunto option[value="${LARGO}"]`).getAttribute('title'),
+  LARGO);
 
-await pagina.click(`#grupos-tipo .grupo[data-tipo="${LARGO}"]`);
+await pagina.selectOption('#filtro-tipo-asunto', LARGO);
 await pagina.waitForTimeout(300);
-await comprobar('pulsar un TRASLEXP deja solo el suyo, no el del otro tipo con el mismo corto',
-  pagina.locator('#lista-abiertos .tarjeta').count(), 1);
-await pagina.click(`#grupos-tipo .grupo[data-tipo="${LARGO}"]`);
+await comprobar('elegir un TRASLEXP deja solo el suyo, no el del otro tipo con el mismo corto',
+  pagina.locator('#inicio-tabla-cuerpo tr').count(), 1);
+await pagina.selectOption('#filtro-tipo-asunto', '');
 await pagina.waitForTimeout(300);
 
-const marca = pagina.locator('#lista-abiertos .tarjeta:has-text("Aguilar") .marca-tipo');
-await comprobar('la etiqueta de la tarjeta enseña el corto', marca.textContent(), 'TRASLEXP');
+const marca = pagina.locator('#inicio-tabla-cuerpo tr:has-text("Aguilar") .marca-tipo');
+await comprobar('la etiqueta de la fila enseña el corto', marca.textContent(), 'TRASLEXP');
 await comprobar('y el largo al pasar el ratón', marca.getAttribute('title'), LARGO);
-const marca2 = pagina.locator('#lista-abiertos .tarjeta:has-text("Bermúdez") .marca-tipo');
+const marca2 = pagina.locator('#inicio-tabla-cuerpo tr:has-text("Bermúdez") .marca-tipo');
 await comprobar('una carpeta vieja con el nombre largo también enseña el corto', marca2.textContent(), 'TRASLEXP');
-const marca3 = pagina.locator('#lista-abiertos .tarjeta:has-text("Trujillo") .marca-tipo');
+const marca3 = pagina.locator('#inicio-tabla-cuerpo tr:has-text("Trujillo") .marca-tipo');
 await comprobar('sin nombre corto, el de siempre', marca3.textContent(), 'MATRICULA');
 
 async function buscar(texto) {
   await pagina.fill('#buscar-abiertos', texto);
   await pagina.waitForTimeout(300);
-  return pagina.locator('#lista-abiertos .tarjeta').allTextContents();
+  return pagina.locator('#inicio-tabla-cuerpo tr').allTextContents();
 }
-let r = await buscar('solicitado origen');
+/* Fila 192, decisión 5: el buscador de Inicio pasa al mismo mecanismo
+   simple que "Me toca"/"Esperamos a otros" (nombre, tipo y tercero,
+   subcadena literal, ya no palabra a palabra). El tipo que entra en la
+   búsqueda es siempre el de verdad (el largo): buscar por el corto
+   («traslexp») ya no encuentra la carpeta que lleva el nombre largo. */
+let r = await buscar('expediente solicitado');
 await comprobar('buscar por el nombre largo encuentra el asunto cuya carpeta lleva el corto',
   Promise.resolve(r.length === 1 && r[0].indexOf('Aguilar') > -1), true);
-r = await buscar('traslexp bermudez');
-await comprobar('buscar por el corto encuentra el asunto cuya carpeta lleva el largo',
-  Promise.resolve(r.length === 1 && r[0].indexOf('Bermúdez') > -1), true);
 await buscar('');
 
 /* El ARCHIVO: el texto de búsqueda del índice lleva los dos nombres,

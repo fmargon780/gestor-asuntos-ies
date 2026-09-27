@@ -147,7 +147,7 @@ await comprobar('avisa de que se ha restaurado',
 
 await pagina.getByRole('button', { name: 'Volver a intentar entrar' }).click();
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
-await comprobar('ahora sí entra', pagina.locator('#lista-abiertos').isVisible(), true);
+await comprobar('ahora sí entra', pagina.locator('#inicio-tabla-cuerpo').isVisible(), true);
 
 /* ================= ESCENARIO 1: asunto nuevo, primer hito en curso ================= */
 

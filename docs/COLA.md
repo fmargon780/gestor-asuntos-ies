@@ -165,7 +165,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 207 | `docs/UNIR-DOS-TIPOS.md` (en Ajustes, «Unir con otro tipo»: el tipo que desaparece pasa sus asuntos abiertos al que se queda, con la carpeta renombrada y sus hitos intactos; vale la guía del que se queda; plantillas, campos y recurrentes se suman; su nombre queda como alias; el ARCHIVO no se toca) | HECHA (27-sep-2026 12:08). `npm test` completo (166 ficheros) en verde con Chromium real, comprobado de forma independiente; botón y cuadro comprobados a ojo con Playwright (buscador, resumen, "Unir" que se enciende). PR #137 fusionado (`a09d4fd`). Publicación comprobada por `curl`: `App.VERSION` `27-sep-2026 · 12:08` y `js/tipos-unir.js` ya en la web publicada |
 | 190 | `docs/VOCABULARIO-EN-PANTALLA.md`, puntos 2, 3 y 5, y la prueba de palabras prohibidas (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 190) | HECHA (27-sep-2026 06:10). `npm test` completo (174 ficheros) en verde con Chromium real |
 | 191 | `docs/INICIO-CUATRO-BLOQUES.md`, apartados 1, 2, 3, 4 y 7: los bloques de Inicio y fuera «Qué me toca» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 191) | HECHA (27-sep-2026 09:35). `npm test` completo (174 ficheros) en verde con Chromium real, comprobado dos veces de forma independiente |
-| 192 | `docs/INICIO-CUATRO-BLOQUES.md`, apartados 5 y 6: la tabla de todos los abiertos (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 192) | PENDIENTE (27-sep-2026) |
+| 192 | `docs/INICIO-CUATRO-BLOQUES.md`, apartados 5 y 6: la tabla de todos los abiertos (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 192) | HECHA (27-sep-2026 12:20). `npm test` completo (166 ficheros) en verde con Chromium real, comprobado de forma independiente; tabla y plegados comprobados a ojo con Playwright. Una prueba (`hito-desde-por-clasificar.mjs`) sumada a `EN_SOLITARIO` (mismo problema de CPU que la fila 208, no una regresión). Aviso de privacidad encontrado y anotado en «Lo que queda por hablar con Francisco», no arreglado (fuera del encargo) |
 | 193 | `docs/AVISOS-MENU-Y-VOLVER.md`, apartados 1 y 2: avisos en una línea y menú (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 193) | PENDIENTE (27-sep-2026) |
 | 194 | `docs/AVISOS-MENU-Y-VOLVER.md`, apartados 3 y 4: un solo «Volver» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 194) | PENDIENTE (27-sep-2026) |
 | 195 | `docs/AVISOS-A-QUIEN-LO-PIDE.md`, apartados 1, 2 y 3: avisar a quien lo pide y «Enviar estado» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 195) | PENDIENTE (27-sep-2026) |
@@ -208,6 +208,15 @@ abierto en ellas:
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
+- **Aviso, encontrado en la fila 192 (27-sep-2026): un asunto reservado puede enseñar el nombre
+  del tercero donde no debería.** En «Esperamos a otros» (fila 191) y en la columna «Le toca a»
+  de la tabla nueva (fila 192), cuando el responsable del hito es el papel fijo «tercero»
+  (`Hitos.resolverResponsable`), el texto («Esperando a…»/«Le toca a…») pone el **nombre real**
+  del tercero, sin pasar por `Reservados.tapar`. El resto de la fila sí lo tapa (candado, nombre
+  del asunto). Es un hueco real: «los reservados siguen tapados en listas y buscador» es una
+  regla del proyecto que esto no cumple del todo. No se ha tocado en la fila 192 (no era su
+  encargo); pendiente de decidir cómo taparlo (¿«el tercero»? ¿el mismo candado que el nombre?) y
+  de qué fila se encarga.
 - De la fila 146 (25-sep-2026): en el Anexo III (solicitud de admisión) la propuesta pone el centro,
   su código y su localidad en «Centro prioritario» y en «Centro 1» (los que pide la familia), no en
   «Centro 2, 3, 4». Si «Centro 1» no debe ser el nuestro, se cambia a mano en Ajustes › Impresos

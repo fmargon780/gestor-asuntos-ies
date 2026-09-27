@@ -90,8 +90,8 @@ await pagina.evaluate(async (datos) => {
 }, { asunto: NOMBRE_ASUNTO, factura: FACTURA, titulo: TITULO_HITO });
 
 await pagina.click('#btn-recargar');
-await pagina.waitForSelector('#lista-abiertos .tarjeta');
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.evaluate(() => FichaTarjetas.abrir('documentos'));
 await pagina.waitForSelector('#ficha-documentos .ficha-documento');
@@ -222,8 +222,8 @@ await pagina.evaluate(async (nombre) => {
   await window.App.anotar(nombre, { categoria: 'EMPRESAS', tercero: 'Proveedor de Prueba SL 12345678A' });
 }, NOMBRE_ASUNTO);
 await pagina.evaluate(() => window.App.irVista('departamento'));
-await pagina.waitForSelector('#lista-abiertos .tarjeta');
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.getByRole('button', { name: 'Archivar el asunto', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
@@ -242,11 +242,11 @@ await pagina.evaluate(async (nombre) => {
   await window.__disco.abiertos.getDirectoryHandle(nombre, { create: true });
 }, SEGUNDO_ASUNTO);
 await pagina.click('#btn-recargar');
-await pagina.locator('#lista-abiertos .tarjeta', { hasText: 'PERMISO' }).first().waitFor();
+await pagina.locator('#inicio-tabla-cuerpo tr', { hasText: 'PERMISO' }).first().waitFor();
 
 async function abrirSegundoAsunto() {
   await pagina.click('#btn-recargar');
-  await pagina.locator('#lista-abiertos .tarjeta', { hasText: SEGUNDO_ASUNTO })
+  await pagina.locator('#inicio-tabla-cuerpo tr', { hasText: SEGUNDO_ASUNTO })
     .locator('.nombre-pulsable').click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 }
@@ -295,7 +295,7 @@ await pagina.evaluate(async (nombre) => {
   await window.__disco.abiertos.getDirectoryHandle(nombre, { create: true });
 }, TERCER_ASUNTO);
 await pagina.click('#btn-recargar');
-await pagina.locator('#lista-abiertos .tarjeta', { hasText: TERCER_ASUNTO }).locator('.nombre-pulsable').click();
+await pagina.locator('#inicio-tabla-cuerpo tr', { hasText: TERCER_ASUNTO }).locator('.nombre-pulsable').click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 
 await pagina.evaluate(async (nombre) => {

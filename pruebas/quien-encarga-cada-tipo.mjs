@@ -143,7 +143,7 @@ await pagina.click('.pestana[data-pantalla="abiertos"]');
 if (await pagina.locator('#filtros-abiertos').isHidden()) await pagina.click('#btn-filtros');
 const enLaLista = () => pagina.evaluate(() => {
   App.pintarAbiertos();
-  return Array.prototype.map.call(document.querySelectorAll('#lista-abiertos .tarjeta-asunto'),
+  return Array.prototype.map.call(document.querySelectorAll('#inicio-tabla-cuerpo tr.inicio-tabla-fila'),
     t => (t.textContent.indexOf('MATRICULA') !== -1 ? 'MATRICULA' : (t.textContent.indexOf('COMPRA') !== -1 ? 'COMPRA' : '?'))).sort();
 });
 const todos = await enLaLista();

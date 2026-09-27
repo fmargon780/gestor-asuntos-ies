@@ -156,11 +156,6 @@
   padding: 14px; text-align: center;
 }
 
-/* Los otros dos paneles de montón (fila 191, apartado 7): siguen en el
-   HTML (para no romper pruebas que los buscan por su data-vista), pero
-   ya no se ven: la propia rejilla de Inicio los sustituye. */
-.oculto-vista { display: none; }
-
 /* Con solo un panel visible, la rejilla de tres columnas de siempre
    (css/estilos.css) dejaría dos huecos vacíos: aquí solo hace falta
    sitio para el "Ver todo" restilado. */
@@ -192,16 +187,91 @@ body.con-lector #inicio-rejilla > #tablon {
   grid-column: 1 / -1;
 }
 
-/* ---------- la lista legado, debajo de la rejilla ---------- */
+/* ---------- "Todos los asuntos abiertos", la tabla (fila 192) ---------- */
 
-.legado-acciones {
+#inicio-todos-asuntos { margin-top: 6px; }
+
+.inicio-tabla-cabecera {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 16px;
   margin-bottom: 12px;
 }
-#inicio-legado { margin-top: 6px; }
-#inicio-legado.oculto,
-#inicio-todos-asuntos.oculto { display: none; }
+.inicio-tabla-cabecera h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  margin-right: auto;
+}
+.inicio-tabla-cabecera-acciones {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.inicio-orden {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.inicio-orden .filtro-rotulo { white-space: nowrap; }
+.inicio-orden .campo { width: auto; min-width: 200px; }
+
+.inicio-tabla-envoltorio {
+  overflow-x: auto;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+table.inicio-tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+.inicio-tabla th,
+.inicio-tabla td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--linea);
+  vertical-align: middle;
+}
+.inicio-tabla th {
+  font-size: 11.5px;
+  color: var(--tinta-suave);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+.inicio-tabla-fila:last-child td { border-bottom: 0; }
+.inicio-tabla-nombre {
+  font-weight: 600;
+  min-width: 260px;
+  word-break: break-word;
+}
+.inicio-tabla-nombre .nombre-pulsable { cursor: pointer; }
+.inicio-tabla-nombre .nombre-pulsable:hover { text-decoration: underline; }
+.inicio-tabla-hito { max-width: 320px; }
+.inicio-tabla-menu { width: 40px; text-align: right; }
+.inicio-tabla-fila-ocupada { opacity: .6; }
+.inicio-tabla-cuerpo .vacio,
+#inicio-tabla-cuerpo .vacio { color: var(--tinta-suave); text-align: center; padding: 18px; }
+
+/* ---------- "Dormidos"/"Sin fecha", plegados (fila 192, apartado 6) ----------
+
+   Los propios <details> los pinta js/inicio-plegados.js, reutilizando
+   .qmt-bloque/.qmt-sinfecha/.qmt-lista tal cual (css/que-me-toca.css). */
+.inicio-plegados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 20px;
+}
+.inicio-plegados .qmt-bloque {
+  flex: 1 1 320px;
+  margin-bottom: 0;
+}
 
 /* ---------- el badge rojo de vencidos, en la pestaña de la barra ---------- */
 

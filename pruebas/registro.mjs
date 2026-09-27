@@ -127,8 +127,8 @@ await pagina.evaluate(async (datos) => {
 }, { asunto: NOMBRE_ASUNTO, factura: FACTURA });
 
 await pagina.click('#btn-recargar');
-await pagina.waitForSelector('#lista-abiertos .tarjeta');
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila');
 
@@ -251,8 +251,8 @@ async function prepararDocumentoYSello(nombreOriginal, textoSello) {
   /* Se vuelve a abrir la ficha para que la lista de documentos se
      relea con el fichero recién dejado en la carpeta. */
   await pagina.click('#ficha-volver');
-  await pagina.waitForSelector('#lista-abiertos .nombre-pulsable');
-  await pagina.click('#lista-abiertos .nombre-pulsable');
+  await pagina.waitForSelector('#inicio-tabla-cuerpo .nombre-pulsable');
+  await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila');
 }

@@ -170,8 +170,8 @@ await pagina.waitForSelector('#aplicacion:not(.oculto)');
 
 /* Fila 175: con la ventana ancha la barra nace abierta, las pestañas
    se ven sin tener que abrirla. */
-await comprobar('entra en la aplicación', pagina.locator('#lista-abiertos').isVisible(), true);
-await comprobar('la lista empieza vacía', pagina.locator('#lista-abiertos .vacio').count(), 1);
+await comprobar('entra en la aplicación', pagina.locator('#inicio-tabla-cuerpo').isVisible(), true);
+await comprobar('la lista empieza vacía', pagina.locator('#inicio-tabla-cuerpo .vacio').count(), 1);
 
 /* --- nuevo asunto: primero la categoría --- */
 await pagina.click('.pestana[data-pantalla="nuevo"]');
@@ -320,13 +320,15 @@ await pagina.click('.pestana[data-pantalla="abiertos"]');
 
 /* --- cerrar el asunto --- */
 await pagina.click('.pestana[data-pantalla="abiertos"]');
+/* Fila 192: "Archivar" vive en el menú de tres puntos de la fila. */
+await pagina.locator('#inicio-tabla-cuerpo .fila-menu-btn').first().click();
 await pagina.getByRole('button', { name: 'Archivar', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('el cuadro dice a dónde va',
   pagina.locator('#cuadro-cuerpo .vista-nombre').textContent(),
   'ARCHIVO / ALUMNADO / Aguilar Ponce, Marina 1140233');
 await pagina.click('#cuadro-aceptar');
-await pagina.waitForSelector('#lista-abiertos .vacio');
+await pagina.waitForSelector('#inicio-tabla-cuerpo .vacio');
 await comprobar('la carpeta ha aterrizado en el archivo', pagina.evaluate(async () => {
   const cat = await window.__disco.archivo.getDirectoryHandle('ALUMNADO');
   const ter = await cat.getDirectoryHandle('Aguilar Ponce, Marina 1140233');
@@ -479,7 +481,7 @@ await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 /* "Documentos" ya no está en la tarjeta (10-sep-2026): está dentro de
    la ficha del asunto, en "Documentos ▾" (antes "Gestionar documentos",
    movido a la cabecera del propio bloque en la fila 52, 18-sep-2026). */
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 /* Fila 168: «+ Añadir documento», en la cabecera del bloque, va directo
    al cuadro de añadir. */

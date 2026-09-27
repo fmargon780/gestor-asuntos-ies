@@ -388,6 +388,26 @@ window.Presencia = Presencia;
       return div;
     };
   });
+
+  /* Fila 192: la lista de abiertos pasa a ser la tabla "Todos los
+     asuntos abiertos" (App.filaTablaAsunto, js/asuntos-lista-pintar.js),
+     que ya no pasa por App.tarjetaAsunto (esa sigue viva solo para el
+     ARCHIVO). Misma marca, en la celda del nombre. */
+  U.envolver(window.App, 'App.filaTablaAsunto', 'presencia.js', function (comoEra) {
+    return function (a) {
+      var tr = comoEra(a);
+      var quien = Presencia.ocupantePor(a.nombre);
+      if (!quien) return tr;
+      var nombre = tr.querySelector('.inicio-tabla-nombre .nombre-pulsable');
+      if (!nombre) return tr;
+      var marca = document.createElement('span');
+      marca.className = 'marca-presencia';
+      marca.title = quien + ' está dentro de este asunto ahora mismo';
+      marca.textContent = quien.charAt(0).toUpperCase();
+      nombre.insertBefore(marca, nombre.firstChild);
+      return tr;
+    };
+  });
 })();
 
 /* ---------- soltar la señal al cerrar la pestaña o salir ----------
