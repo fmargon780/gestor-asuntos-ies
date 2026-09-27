@@ -67,9 +67,12 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 (Una línea por cosa; el porqué, en `docs/contexto/` y `HISTORIA.md`.)
 
-- Categoría → tipo → tercero → nombre de carpeta, con vista previa (`App.nuevoAsuntoCon` lleva lo ya sabido, sin
-  repreguntarlo; cambiar de tipo dentro de la misma categoría no borra el tercero). Nombre corto; tipo nuevo al
-  vuelo. Dar de alta un tercero lo deja elegido, sin pulsar nada más.
+- Nuevo asunto empieza por la persona (fila 197): buscador único en todas las categorías, con la
+  parrilla de tipos limitada a la suya en cuanto se elige (el camino tipo-primero sigue
+  existiendo), resumen de la guía en una línea, y nombre de carpeta con vista previa
+  (`App.nuevoAsuntoCon` lleva lo ya sabido, sin repreguntarlo). Nombre corto; tipo nuevo al vuelo.
+  Dar de alta un tercero lo deja elegido, sin pulsar nada más; crear con guía abre la mesa del
+  primer hito.
 - Cada tipo dice quién lo encarga (Secretaría, Dirección…): parrilla agrupada, filtro y Cuentas.
 - Asuntos reservados (por tipo o uno a uno): candado, sin el tercero en listas y buscador.
 - El estado es el primer hito sin terminar («Hito N de M · título», «Hito actual»): Administración o terceros; «Esperando a…» sale solo con el responsable (a mano, hasta que cambia el hito). Guías: «Administración», no personas. Vía y fecha límite.

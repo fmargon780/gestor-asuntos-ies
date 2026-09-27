@@ -173,19 +173,16 @@ await pagina.waitForSelector('#aplicacion:not(.oculto)');
 await comprobar('entra en la aplicación', pagina.locator('#inicio-tabla-cuerpo').isVisible(), true);
 await comprobar('la lista empieza vacía', pagina.locator('#inicio-tabla-cuerpo .vacio').count(), 1);
 
-/* --- nuevo asunto: primero la categoría --- */
+/* --- nuevo asunto: fila 197, ahora empieza por la persona --- */
 await pagina.click('.pestana[data-pantalla="nuevo"]');
-await comprobar('salen las seis categorías',
+await comprobar('salen las seis categorías, para filtrar el buscador',
   pagina.locator('#categorias-lista .categoria-boton').count(), 6);
-await comprobar('los tipos no se ven todavía',
-  pagina.locator('#bloque-tipos').isHidden(), true);
-
-await pagina.click('#categorias-lista .categoria-boton:nth-child(1)');
-await pagina.waitForSelector('#bloque-tipos:not(.oculto)');
-await comprobar('solo salen los tipos de ALUMNADO',
-  pagina.locator('#tipos-lista .tipo-boton').count(), 14);
+await comprobar('sin persona elegida, la parrilla de tipos ya se ve, con los de ALUMNADO entre ellos',
+  pagina.locator('#tipos-lista .tipo-boton[data-categoria="ALUMNADO"]').count(), 14);
 
 await pagina.getByRole('button', { name: 'MATRICULA', exact: true }).click();
+await comprobar('al elegir un tipo sin persona, el buscador queda filtrado a su categoría',
+  pagina.locator('.categoria-boton[data-categoria="ALUMNADO"]').evaluate(b => b.classList.contains('elegido')), true);
 await pagina.fill('#buscar-tercero', 'marina');
 await pagina.waitForSelector('#resultados-tercero .resultado');
 await pagina.click('#resultados-tercero .resultado');
@@ -260,8 +257,16 @@ await pagina.click('.pestana[data-pantalla="abiertos"]');
 
 /* --- el personal sale del RelPerCen de Séneca --- */
 await pagina.click('.pestana[data-pantalla="nuevo"]');
+/* Fila 197: Trujillo (ALUMNADO) sigue elegido de la comprobación de
+   antes (nunca se llegó a crear el asunto, así que nada lo ha
+   soltado): "Cambiar" lo suelta, y con él la parrilla vuelve a
+   enseñar todos los tipos. */
+await pagina.click('#btn-cambiar-tercero');
 await pagina.click('.categoria-boton[data-categoria="PERSONAL"]');
-await pagina.click('#tipos-lista .tipo-boton');
+/* Sin persona elegida la parrilla ya no está limitada a la categoría
+   de la pastilla (esa es la del buscador), así que aquí hay que
+   elegir un tipo que sea de verdad de PERSONAL. */
+await pagina.click('#tipos-lista .tipo-boton[data-categoria="PERSONAL"]');
 await pagina.fill('#buscar-tercero', 'aguado');
 await pagina.waitForSelector('#resultados-tercero .resultado');
 await comprobar('encuentra al profesorado del RelPerCen',
@@ -367,7 +372,10 @@ await comprobar('y dice que está archivado',
 /* --- dar de alta un solicitante que aún no está en el RegAlum --- */
 await pagina.click('.pestana[data-pantalla="nuevo"]');
 await pagina.click('.categoria-boton[data-categoria="ALUMNADO"]');
-await pagina.click('#tipos-lista .tipo-boton');
+/* Fila 197: sin persona elegida la parrilla ya no está limitada a la
+   categoría de la pastilla, así que aquí hay que elegir un tipo que
+   sea de verdad de ALUMNADO. */
+await pagina.click('#tipos-lista .tipo-boton[data-categoria="ALUMNADO"]');
 await pagina.fill('#buscar-tercero', 'aspirante');
 await pagina.waitForTimeout(300);
 await comprobar('si no está, ofrece darlo de alta como solicitante',
