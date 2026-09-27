@@ -226,7 +226,7 @@ como **copia**.
   **`soloInformativo` no cuenta como cambio**: es una decisión de cada tipo, no del modelo.
 - **Solo informativo** (apartado 4.6): campo `soloInformativo` en un paso de guía, un modelo y un
   hito. Se ve en gris con la etiqueta "Informativo", no sale en "Qué me toca" ni en "Dormidos", no
-  cuenta como pendiente. Se enciende/apaga con un clic: la casilla del editor del paso, o "Pedirmelo
+  cuenta como pendiente. Se enciende/apaga con un clic: la casilla del editor del paso, o "Pedírmelo
   a mí"/"Dejarlo solo informativo" en los botones del propio hito (`Hitos.guardarCampos`, afecta solo
   a ese hito de ese asunto). Al traer un modelo, nace marcado si su responsable no es el que
   Francisco tenga configurado como Administración (`HitosBiblioteca.naceSoloInformativo`); sin poder
