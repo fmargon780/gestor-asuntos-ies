@@ -3,10 +3,9 @@
    tipo de asunto (17-sep-2026, fila 41, docs/LEER-DOCUMENTOS-POR-
    CLASIFICAR.md), en su pantalla propia (js/ajustes-tipo.js, fila 39).
 
-   Una sola casilla de texto, palabras separadas por comas, con su
-   propio botón "Guardar": mismo patrón que las demás secciones de esa
-   pantalla (js/plantillas-ajustes.js, js/plantillas-documento.js,
-   js/recurrentes.js), sacada aparte para no seguir engordando
+   Una sola casilla de texto, palabras separadas por comas. Fila 198,
+   apartado 2: se guarda sola al cambiar (como "Datos del tipo" y
+   "Plazo"), sin botón; sacada aparte para no seguir engordando
    js/ajustes-tipo.js.
 
    Se guarda como `palabrasClave` (lista de textos) dentro del propio
@@ -23,23 +22,18 @@ var PalabrasClaveTipo = (function () {
       'placeholder="Por ejemplo: matricula, escolarizacion, traslado">' +
       U.escapar((tipo.palabrasClave || []).join(', ')) + '</textarea>' +
       '<p class="nota">Palabras que aparecen en los documentos de este tipo. ' +
-      'Sin tildes ni mayúsculas, da igual.</p>' +
-      '<button type="button" class="boton boton-principal" id="tipo-palabras-clave-guardar" ' +
-      'style="margin-top:8px">Guardar palabras clave</button>';
+      'Sin tildes ni mayúsculas, da igual.</p>';
 
-    cuerpo.querySelector('#tipo-palabras-clave-guardar').onclick = async function () {
-      var boton = cuerpo.querySelector('#tipo-palabras-clave-guardar');
-      var lista = cuerpo.querySelector('#tipo-palabras-clave').value
-        .split(',').map(function (p) { return p.trim(); }).filter(Boolean);
-      await U.mientrasGuarda(boton, async function () {
-        tipo.palabrasClave = lista;
-        try {
-          await App.guardarTipos();
-          U.aviso('Palabras clave de ' + tipo.tipo + ' guardadas.', 'bueno');
-        } catch (e) {
-          U.aviso('No he podido guardarlas: ' + U.mensajeDeError(e), 'malo');
-        }
-      });
+    cuerpo.querySelector('#tipo-palabras-clave').onchange = async function (ev) {
+      var lista = ev.target.value.split(',').map(function (p) { return p.trim(); }).filter(Boolean);
+      tipo.palabrasClave = lista;
+      try {
+        await App.guardarTipos();
+        U.aviso('Palabras clave de ' + tipo.tipo + ' guardadas.', 'bueno');
+        if (window.AjustesPlegado) AjustesPlegado.resumirTipo();
+      } catch (e) {
+        U.aviso('No he podido guardarlas: ' + U.mensajeDeError(e), 'malo');
+      }
     };
   }
 

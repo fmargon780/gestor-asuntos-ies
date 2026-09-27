@@ -152,11 +152,9 @@ await pagina.evaluate(() => {
     .filter((x) => /Volver|Listo|Hecho/.test(x.textContent))[0];
   if (volver) volver.click();
 });
-await pagina.waitForSelector('#campos-guardar');
-await comprobar('antes de guardar sigue diciendo 2', resumen('campos'), '2 campos');
-await pagina.click('#campos-guardar');
+/* Fila 198, apartado 2: se guarda solo, sin botón "Guardar campos". */
 await pagina.waitForTimeout(600);
-await comprobar('al guardar pasa a 3, sin salir de la pantalla', resumen('campos'), '3 campos');
+await comprobar('el resumen pasa a 3 al añadirlo, sin salir de la pantalla', resumen('campos'), '3 campos');
 await comprobar('seguimos en la pantalla del tipo',
   pagina.locator('#pantalla-tipo-asunto').isVisible(), true);
 
@@ -187,13 +185,19 @@ await pagina.evaluate(() => App.cambiarPestanaAjustes('centro'));
 await pagina.evaluate(() => App.pintarAjustes());
 await pagina.waitForTimeout(400);
 const titulosCentro = await pagina.locator('#ajustes-tab-centro > details.bloque-ajustes > summary .bloque-titulo').allTextContents();
-/* Fila 129: "Estados del asunto" ya no existe (el estado es el hito actual). */
-await comprobar('los siete primeros, en el orden nuevo', titulosCentro.slice(0, 7), [
-  'Tipos de documento', 'Grupos de personas', 'Campos propios', 'Hitos',
+/* Fila 129: "Estados del asunto" ya no existe (el estado es el hito
+   actual). Fila 198, apartado 5: "Campos propios" ya no es un bloque
+   plegable, así que no sale aquí (se comprueba aparte, más abajo). */
+await comprobar('los seis primeros, en el orden nuevo', titulosCentro.slice(0, 6), [
+  'Tipos de documento', 'Grupos de personas', 'Hitos',
   'Datos del centro y firma', 'Cómo se abrevia cada grupo', 'Ficheros de datos']);
 await comprobar('todos plegados',
   pagina.locator('#ajustes-tab-centro details.bloque-ajustes[open]').count(), 0);
 await comprobar('ya no hay "Estados del asunto"', titulosCentro.indexOf('Estados del asunto'), -1);
+await comprobar('"Campos propios" es una sola línea con enlace, no un bloque plegable',
+  pagina.evaluate(() => !document.getElementById('campos-propios-enlace').closest('details')), true);
+await comprobar('con el enlace "Se configuran dentro de cada tipo"',
+  pagina.locator('#campos-propios-enlace').textContent(), 'Se configuran dentro de cada tipo');
 await comprobar('"Tipos de documento" dice cuántos hay',
   pagina.evaluate(() => {
     const t = document.querySelector('#ajustes-tab-centro > details.bloque-ajustes .bloque-resumen').textContent;

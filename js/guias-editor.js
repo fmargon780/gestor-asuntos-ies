@@ -57,9 +57,9 @@
     };
 
     var esperar = U.preguntar('Guía de ' + nombreTipo,
-      '<p class="explica">Los hitos que hay que dar en un asunto de este tipo, en el orden ' +
-      'del trámite. Cada hito tiene sus tareas, sus documentos y ' +
-      'su plazo.</p>' +
+      /* Fila 198, apartado 8: texto de antes de los hitos («salían con
+         una casilla para ir marcando»), ya desfasado. */
+      '<p class="explica">Cada hito de la guía es un hito del asunto, con sus tareas.</p>' +
       '<div id="guia-camino" class="guia-camino"></div>' +
       GuiasBarra.html() +
       '<div id="guia-pasos"></div>' +

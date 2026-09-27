@@ -311,11 +311,16 @@ App.tarjetaTipoAjustes = function (tipo, mostrarCategoria) {
       ? '<span class="suave tarjeta-tipo-antes">antes: ' + U.escapar(tipo.alias.join(', ')) + '</span>' : '');
   f.appendChild(linea1);
 
-  /* Los días de plazo de este tipo. En blanco, el tipo no pone fecha
-     límite y el asunto nace sin plazo. */
+  /* Los días de plazo de este tipo, solo enseñados (fila 198, apartado
+     3: el plazo se edita solo dentro de la pantalla del tipo, en
+     "Datos del tipo"). En blanco, el tipo no pone fecha límite y el
+     asunto nace sin plazo. */
   var linea2 = document.createElement('div');
   linea2.className = 'tarjeta-tipo-linea tarjeta-tipo-sub';
-  linea2.appendChild(App.construirCasillaPlazo(tipo));
+  var textoPlazo = document.createElement('span');
+  textoPlazo.className = 'suave';
+  textoPlazo.textContent = tipo.plazo ? tipo.plazo + (tipo.plazo === 1 ? ' día' : ' días') + ' de plazo' : 'sin plazo';
+  linea2.appendChild(textoPlazo);
   f.appendChild(linea2);
 
   f.appendChild(App.botonMenuTarjeta([

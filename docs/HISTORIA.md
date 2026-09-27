@@ -5,6 +5,69 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 198: la pantalla del tipo, de arriba abajo
+
+`docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartados 1, 2, 3, 5 y 8 (los apartados 4, 6 y 7 son
+las filas 199 y 200).
+
+**La lista de comprobación** (apartado 1, `js/ajustes-tipo-completo.js`, nuevo,
+`AjustesTipoCompleto`): siempre visible arriba de las dos columnas de la pantalla de un tipo
+(`#tipo-asunto-checklist`), con una línea por cosa — nombre corto, quién lo encarga, guía (con
+cuántos hitos), plantilla de documento, plantilla de correo, plazo, palabras clave y plazo de
+conservación. «Plantilla de documento»/«Plantilla de correo» solo salen si algún hito de la guía
+tiene una tarea de guion (fila 109, `js/guias-guion.js`) con `accion: 'generar'` o `'comunicar'`
+(o «avisar a quien lo pide», por hito o al cerrar el asunto) sin plantilla en su `receta`; si
+falta, dicen qué hito la necesita («el hito 2 la necesita»). Cada línea es un enlace que
+despliega la sección que toca; si todo está marcado, se pliega en una sola línea verde «Este
+tipo está completo». Se repinta sola: `AjustesTipoCompleto.pintar(tipo)` se llama al final de
+`AjustesPlegado.resumirTipo()` (fila 105), que ya se dispara al abrir la pantalla y tras
+cualquier cambio; no toca el DOM si la lista sale igual que la anterior (una firma en
+`dataset.firma`), para no entrar en bucle con el mismo `MutationObserver` que la dispara (vive
+dentro de `#pantalla-tipo-asunto`, que es justo lo que ese observador vigila).
+
+**Todo se guarda al cambiar** (apartado 2): la sección «Campos» de `js/ajustes-tipo.js` pierde su
+botón «Guardar campos» — cada casilla, cada mover, cada quitar y cada añadido desde «+ Añadir
+campo» llama a una función `guardar()` que escribe con `Campos.guardarConfigDeTipo` y avisa en
+verde; se ha podido quitar también el aviso de «salir sin guardar» al pulsar «← Volver» (variable
+`camposSinGuardar` y `envolverVolverDeTipo`, ya no hacían falta). «Palabras clave»
+(`js/ajustes-tipo-palabras-clave.js`) pierde igual su botón «Guardar palabras clave»: guarda al
+`onchange` de la casilla. Los cuadros de CREAR (plantilla, recurrente, hito) conservan su
+«Crear», porque son altas, no cambios de algo que ya existía.
+
+**El plazo, en un solo sitio editable** (apartado 3): la tarjeta de la rejilla de tipos
+(`App.tarjetaTipoAjustes`, `js/ajustes.js`) usaba la misma `App.construirCasillaPlazo` (con su
+`onchange` que guarda) que la sección «Plazo» de la pantalla del tipo — dos sitios que editaban
+lo mismo. Ahora la tarjeta solo lo enseña, con un texto ("N días de plazo" o "sin plazo"); se
+sigue editando solo en su sección de la pantalla del tipo.
+
+**Los campos, en un solo sitio** (apartado 5): «Campos propios» de «El centro»
+(`App.pintarCamposPropios`, `App.borrarCampoPropio` y el alta de `#nuevo-propio`/
+`#btn-anadir-propio`, todo en `js/ajustes-centro.js`) desaparece: pasa a ser una sola línea
+(`<div class="fila-tipo">`, sin `<details>`) con un enlace «Se configuran dentro de cada tipo»
+que lleva a la pestaña «Tipos de asunto» (`App.cambiarPestanaAjustes('tipos')`). Crear, cambiar y
+borrar un campo propio vive ya solo en «+ Añadir campo» › «Míos» de cada tipo
+(`js/campos-catalogo.js`, sin tocar). `js/ajustes-plegado.js` deja de ordenar/resumir ese bloque
+(ya no es un `.bloque-ajustes`). «Campos del nombre» de Tipos de documento no se ha tocado: es
+otra cosa (el nombre del fichero).
+
+**El texto desfasado del editor de la guía** (apartado 8, `js/guias-editor.js`): el párrafo de
+arriba del cuadro seguía sin encajar del todo con los hitos de hoy; ahora dice «Cada hito de la
+guía es un hito del asunto, con sus tareas.».
+
+Antes de tocar el fichero, se comprobó cuánto había crecido `js/ajustes-tipo.js` con las filas
+anteriores (514 líneas): al quitar el botón de Campos y sacar la lista de comprobación a su
+propio fichero nuevo, se queda en 496, sin falta de partirlo en más piezas.
+
+Se comprueba con `pruebas/ajustes-tipo-completo.mjs`, nueva (las cinco cosas de arriba, en
+navegador de verdad), y se han puesto al día `pruebas/campos.mjs`, `pruebas/campos-catalogo.mjs`,
+`pruebas/ajustes-por-tipo.mjs` y `pruebas/ajustes-plegado.mjs`, que probaban los botones
+«Guardar campos»/«Guardar palabras clave» que ya no existen, o el bloque plegable de «Campos
+propios». `npm test` entero, en verde (172 ficheros; `refresco.mjs` falló una vez solo en la
+tanda paralela completa y salió bien en solitario, fallo intermitente ya conocido de antes de
+esta fila, no de este cambio).
+
+---
+
 ## 27-sep-2026 — Fila 197: Nuevo asunto empieza por la persona
 
 `docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md`. Rediseño completo de la pantalla: en vez de

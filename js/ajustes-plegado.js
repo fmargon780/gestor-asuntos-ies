@@ -165,6 +165,10 @@ var AjustesPlegado = (function () {
     var tipo = App.E.tipoAjustesActual;
     if (!tipo) return;
 
+    /* Fila 198, apartado 1: la lista de comprobación de arriba, que se
+       repinta con lo mismo que pone al día estos resúmenes. */
+    if (window.AjustesTipoCompleto) AjustesTipoCompleto.pintar(tipo);
+
     ponerResumen(seccionDelTipo('datos'),
       tipo.categoria + (tipo.nombreCorto ? ' · ' + tipo.nombreCorto : ''));
 
@@ -235,10 +239,8 @@ var AjustesPlegado = (function () {
       var n = filasDe(det.querySelector('#tabla-grupos-personas'));
       return [n ? String(n) : 'ninguno'];
     } },
-    { id: 'campos-propios', dentro: '#tabla-propios', resumen: function () {
-      var n = ((App.E.campos && App.E.campos.propios) || []).length;
-      return [n ? String(n) : 'ninguno'];
-    } },
+    /* «Campos propios» dejó de ser un bloque plegable (fila 198,
+       apartado 5): ahora es una sola línea fija, sin `<details>`. */
     { id: 'hitos', dentro: '#tabla-responsables', resumen: function (det) {
       var r = filasDe(det.querySelector('#tabla-responsables'));
       var campo = det.querySelector('#hitos-no-lectivos');

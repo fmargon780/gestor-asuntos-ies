@@ -129,6 +129,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Terceros relacionados con un asunto (altas por grupo: unidad, nivel, grupo propio), destinatarios de
   correo o Séneca; generar para cada relacionado: un documento por persona y un correo a cada una.
 - Ajustes: tres pestañas y pantalla por tipo; todo plegado, con resumen; avisos de fallo, solo con fallo.
+  La pantalla de un tipo lleva arriba una lista de comprobación (se pliega en verde si está completo) y
+  todo se guarda al cambiar, sin botones "Guardar" propios; los campos de un tipo se gestionan solo desde
+  "+ Añadir campo"; la tarjeta de la rejilla enseña el plazo, pero no lo edita.
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
 - Papelera: nada se borra de golpe, con buscador por palabras. Plazo de conservación por tipo: avisa, nunca borra solo.

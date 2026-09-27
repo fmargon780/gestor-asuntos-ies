@@ -4,8 +4,8 @@
    comprueba el catálogo "De la ficha" y los campos propios de
    siempre; aquí se comprueba lo nuevo: las tres pestañas con su
    cuenta, la pestaña Calculados (con "Curso" de respaldo antes de
-   guardar nada), crear un campo calculado con su vista previa, y el
-   aviso al salir con campos añadidos sin guardar.
+   guardar nada), crear un campo calculado con su vista previa, y que
+   se guarda solo al añadirlo (fila 198, apartado 2), sin botón.
 
    Reutiliza el disco de mentira por defecto de pruebas/navegador.mjs
    (RegAlum con la columna Unidad y varios alumnos). */
@@ -140,29 +140,26 @@ await comprobarQue('el nuevo calculado se ha guardado en campos.json',
   }));
 
 /* ============================================================
-   4. Al crearlo, se añade solo al tipo (todavía sin guardar), y
-      "← Volver" avisa antes de perderlo
+   4. Al crearlo, se añade al tipo y se guarda solo (fila 198, apartado
+      2): sin botón "Guardar campos", "← Volver" no pregunta nada.
    ============================================================ */
-console.log('--- 4. se añade al tipo, y "Volver" avisa si no se guarda ---');
+console.log('--- 4. se añade al tipo, guardado solo, "Volver" no pregunta nada ---');
 await pagina.click('#campos-catalogo-volver');
 await pagina.waitForSelector('#campos-puestos');
-await comprobarQue('"Nivel" ya sale en los campos puestos, sin guardar todavía',
+await pagina.waitForTimeout(300);
+await comprobarQue('"Nivel" ya sale en los campos puestos',
   pagina.locator('#campos-puestos .fila-tipo').filter({ hasText: 'Nivel' }).count().then((n) => n === 1));
+await comprobarQue('y ya está guardado en campos.json, sin pulsar nada',
+  pagina.evaluate(async () => {
+    const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+    const h = await g.getFileHandle('campos.json');
+    const j = JSON.parse(await (await h.getFile()).text());
+    return (j.porTipo.MATRICULA || []).some((c) => c.origen === 'calculado');
+  }));
 
 await pagina.click('#pantalla-tipo-asunto .boton-volver');
-await pagina.waitForSelector('#capa:not(.oculto)');
-await comprobar('avisa de que hay campos sin guardar',
-  pagina.locator('#cuadro-titulo').textContent(), 'Salir sin guardar');
-await pagina.click('#cuadro-cancelar');
-await pagina.waitForSelector('#capa', { state: 'hidden' });
-await comprobarQue('cancelando, se queda en la pantalla del tipo',
-  pagina.evaluate(() => !document.getElementById('pantalla-tipo-asunto').classList.contains('oculto')));
-
-await pagina.click('#campos-guardar');
 await pagina.waitForTimeout(200);
-await pagina.click('#pantalla-tipo-asunto .boton-volver');
-await pagina.waitForTimeout(200);
-await comprobarQue('guardado ya, "Volver" no pregunta nada',
+await comprobarQue('nada que preguntar: se vuelve derecho a la lista de tipos',
   pagina.evaluate(() => !document.getElementById('pantalla-tipo-asunto').classList.contains('oculto')).then((sigue) => !sigue));
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }

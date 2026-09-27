@@ -107,6 +107,27 @@
    ============================================================ */
 #pantalla-tipo-asunto > .cabecera { padding: 0 16px; align-items: baseline; }
 
+/* La lista de comprobación de arriba (27-sep-2026, fila 198, apartado 1,
+   js/ajustes-tipo-completo.js): una línea por cosa, cada una un enlace;
+   completa, se pliega en una sola línea verde. */
+#tipo-asunto-checklist { padding: 0 16px 14px; }
+.tipo-asunto-checklist-lista {
+  display: flex; flex-direction: column; gap: 2px;
+  border: 1px solid #dde3ea; border-radius: 10px; padding: 8px 12px; background: #fbfcfd;
+}
+.tipo-asunto-checklist-item {
+  display: flex; align-items: baseline; gap: 8px;
+  font: inherit; text-align: left; background: none; border: none; cursor: pointer;
+  padding: 3px 0; color: var(--tinta);
+}
+.tipo-asunto-checklist-item:hover { text-decoration: underline; }
+.tipo-asunto-checklist-item.hecho { color: var(--tinta-suave); }
+.tipo-asunto-checklist-marca { font-size: 15px; line-height: 1; }
+.tipo-asunto-checklist-completo {
+  padding: 10px 14px; border-radius: 10px; font-weight: 600;
+  background: var(--verde); color: #1e6b3f; border: 1px solid #a9d6bb;
+}
+
 .tipo-asunto-columnas {
   display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
   padding: 0 16px 40px;

@@ -29,11 +29,16 @@ modalidad, puesto, NIF...) o creados a mano, que salen solos y ya rellenos al cr
   propia, con la sección "Campos" ya desplegada (17-sep-2026, fila 39; antes era un botón
   "Campos" que abría un cuadro aparte, `App.abrirCamposDeTipo`, retirado). Los ya puestos
   arriba (flechas para ordenar, casillas Obligatorio y Añadir al nombre, con un aviso ámbar si
-  un campo propio también lo usan otros tipos), el catálogo abajo con buscador, y un botón
-  propio "Guardar campos" (`App.construirSeccionCampos` en `js/ajustes-tipo.js`, misma lógica
-  de siempre). Un campo nuevo del catálogo nace con las dos casillas sin marcar. Bloque "Campos
-  propios" (pestaña "El centro") para verlos y borrarlos todos
-  juntos; al borrar uno en uso, avisa y dice en qué tipos está (`Campos.tiposQueUsanPropio`).
+  un campo propio también lo usan otros tipos), el catálogo abajo con buscador. Fila 198,
+  27-sep-2026 (`docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`): cada cambio (marcar una casilla,
+  mover, quitar, añadir uno del catálogo) guarda solo (`App.construirSeccionCampos` en
+  `js/ajustes-tipo.js`, `Campos.guardarConfigDeTipo`), con el mismo aviso verde de siempre; ya
+  no hay botón "Guardar campos" ni aviso de "sin guardar" al volver. Un campo nuevo del catálogo
+  nace con las dos casillas sin marcar. **El panel "+ Añadir campo" es el único sitio para
+  gestionar campos**: los propios se crean, cambian y borran desde su pestaña "Míos"
+  (`js/campos-catalogo.js`); "Campos propios" de "El centro" es ahora solo una línea con un
+  enlace "Se configuran dentro de cada tipo" (sin editor propio ahí; `js/ajustes-centro.js`). Al
+  borrar uno en uso desde "Míos", avisa y dice en qué tipos está (`Campos.tiposQueUsanPropio`).
 - **Al crear un asunto**: bloque "Datos del asunto" con los campos del tipo ya rellenos
   (`Campos.valorInicial`); un dato vacío no es un error, sale en blanco y se puede escribir a
   mano. Obligatorio bloquea hasta rellenar. La vista previa del nombre se actualiza al escribir.
@@ -72,11 +77,25 @@ tipo).
 
 **La pantalla de un tipo** (`#pantalla-tipo-asunto`, registrada en `App.PANTALLAS` igual que
 "asunto" o "que-me-toca": botón "← Volver" y Escape los pone solos `js/usabilidad.js`, porque su
-`<header class="cabecera"><h2>` tiene la misma forma que las demás pantallas). Dos columnas
-(`#tipo-asunto-col-1`/`-2`, CSS `grid-template-columns: 1fr 1fr`, una sola por debajo de 1000px),
-con ocho secciones **plegadas** (fila 105: cada una es un `<details class="bloque-ajustes">` con
-un resumen en el título, ver "Ajustes plegado" más abajo), construidas enteras por
-`App.pintarTipoDeAsunto()`:
+`<header class="cabecera"><h2>` tiene la misma forma que las demás pantallas). Arriba de todo,
+siempre visible (fila 198, 27-sep-2026, `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartado 1,
+`#tipo-asunto-checklist`, `js/ajustes-tipo-completo.js`, `AjustesTipoCompleto`): **la lista de
+comprobación** de lo que le falta al tipo — nombre corto, quién lo encarga, guía (con cuántos
+hitos), plantilla de documento (solo si algún hito tiene una tarea de guion con `accion:
+'generar'`, ver `docs/contexto/HITOS-Y-GUIAS.md`, y sin plantilla elegida en su `receta`; dice
+qué hito la necesita), plantilla de correo (igual, con `accion: 'comunicar'` o «avisar a quien lo
+pide», por hito o al cerrar el asunto), plazo, palabras clave y plazo de conservación. Cada línea
+es un enlace que despliega la sección que toca (`abrirSeccion`); las que no aplican no salen. Se
+recalcula sola: `AjustesTipoCompleto.pintar(tipo)` se llama al final de
+`AjustesPlegado.resumirTipo()` (se dispara al abrir la pantalla y tras cualquier cambio, ver
+"Ajustes plegado" más abajo), y no toca el DOM si la lista sale igual que la última vez (para no
+entrar en bucle con el mismo `MutationObserver` que la dispara). Si todo está marcado, se pliega
+en una sola línea verde «Este tipo está completo».
+
+Debajo, dos columnas (`#tipo-asunto-col-1`/`-2`, CSS `grid-template-columns: 1fr 1fr`, una sola
+por debajo de 1000px), con ocho secciones **plegadas** (fila 105: cada una es un `<details
+class="bloque-ajustes">` con un resumen en el título, ver "Ajustes plegado" más abajo),
+construidas enteras por `App.pintarTipoDeAsunto()`:
 
 1. **Datos del tipo** — nombre, categoría, alias si los tiene, botón "Cambiar el nombre" que
    llama a `App.renombrarTipo` (la misma función de siempre) y repinta la pantalla si el tipo
@@ -96,9 +115,9 @@ un resumen en el título, ver "Ajustes plegado" más abajo), construidas enteras
 2. **Campos** — es la lógica que antes vivía en `App.pintarCuadroDeCampos`, dentro de un
    `U.preguntar`; ahora se pinta en `App.construirSeccionCampos` con el `$` global sombreado por
    uno que busca dentro de su propio `cuerpo` (la sección se pinta ANTES de colgarse del
-   documento, y `document.getElementById` no ve nada suelto). El "Aceptar" del cuadro se
-   sustituye por un botón propio, "Guardar campos" (`#campos-guardar`), que llama a
-   `Campos.guardarConfigDeTipo`. Lo que se comparte, avisa: cada fila de un campo `propio` mira
+   documento, y `document.getElementById` no ve nada suelto). Fila 198: cada cambio llama a
+   `guardar()`, que escribe con `Campos.guardarConfigDeTipo` y avisa en verde; ya no hay botón
+   "Guardar campos". Lo que se comparte, avisa: cada fila de un campo `propio` mira
    `Campos.tiposQueUsanPropio` y, si lo usan otros tipos, saca una línea ámbar
    (`.aviso-compartido`) con cuántos y cuáles, sin bloquear nada.
 3. **Pasos del trámite** — vista de solo lectura con `Guias.vista(GuiasDelCentro.pasosDe(tipo),
@@ -115,15 +134,16 @@ un resumen en el título, ver "Ajustes plegado" más abajo), construidas enteras
 5. **Plantilla de documento de Word** — igual, `PlantillasDocumento.pintarDeTipo` (nueva en
    `js/plantillas-documento.js`), con el catálogo de huecos (`Plantillas.HUECOS`, botón Copiar)
    debajo de las tarjetas.
-6. **Plazo** — `App.construirCasillaPlazo(tipo)`, la misma casilla que ya llevaba la tarjeta de
-   la rejilla, sacada a función compartida para no duplicarla.
+6. **Plazo** — `App.construirCasillaPlazo(tipo)`, la misma casilla que llevaba antes también la
+   tarjeta de la rejilla. Fila 198, apartado 3: la tarjeta (`App.tarjetaTipoAjustes`) ya no la
+   edita, solo la enseña (un texto, "N días de plazo" o "sin plazo"); se edita en un solo sitio,
+   esta sección.
 7. **Palabras clave** (17-sep-2026, fila 41, docs/LEER-DOCUMENTOS-POR-CLASIFICAR.md) —
-   `PalabrasClaveTipo.pintarDeTipo(contenedor, tipo)`, nueva en `js/ajustes-tipo-palabras-clave.js`,
-   sacada aparte del mismo modo que Plantillas o Se repite, para no engordar `js/ajustes-tipo.js`
-   (429 líneas, ya por encima de las 400 antes de esta fila, mismo criterio que `js/ajustes.js` en
-   la fila 39). Una sola casilla de texto (`palabrasClave` en `tipos.json`, lista de textos, vacía
-   en los tipos que ya existían), palabras separadas por comas, con su propio botón "Guardar
-   palabras clave" (`App.guardarTipos`, la misma función de siempre). La usa
+   `PalabrasClaveTipo.pintarDeTipo(contenedor, tipo)`, en `js/ajustes-tipo-palabras-clave.js`,
+   sacada aparte del mismo modo que Plantillas o Se repite, para no engordar `js/ajustes-tipo.js`.
+   Una sola casilla de texto (`palabrasClave` en `tipos.json`, lista de textos, vacía en los tipos
+   que ya existían), palabras separadas por comas. Fila 198: se guarda sola al cambiar
+   (`App.guardarTipos`, la misma función de siempre), sin botón "Guardar palabras clave". La usa
    `js/lector-documentos.js` al proponer el tipo de un documento suelto.
 8. **Se repite** — `Recurrentes.pintarEnContenedor(contenedor, tipo.tipo)` (nueva en
    `js/recurrentes.js`): solo las filas de ESE tipo, más "+ Añadir uno" que abre `alta(tipoPreset,
@@ -133,11 +153,16 @@ un resumen en el título, ver "Ajustes plegado" más abajo), construidas enteras
 El fichero `campos.json`/`App.E.campos` se relee justo al abrir la pantalla del tipo
 (`App.abrirTipoDeAsunto`), igual que hacía el cuadro viejo.
 
-**Pestaña 2, "El centro"** (`#ajustes-tab-centro`, `js/ajustes-centro.js`): Estados del asunto,
-Tipos de documento, Campos propios, Grupos de personas, Ficheros de datos, Cómo se abrevia cada
-grupo (los seis, `<details class="bloque-ajustes">` movidos tal cual desde la vieja pantalla
-plana) y Datos del centro y firma (campos estáticos en `index.html`, rellenados y guardados por
-`PlantillasAjustes.pintarFirmaYCentro`, que ya no construye su propio HTML). El bloque "Hitos"
+**Pestaña 2, "El centro"** (`#ajustes-tab-centro`, `js/ajustes-centro.js`): Tipos de documento,
+Grupos de personas, Ficheros de datos, Cómo se abrevia cada grupo (`<details class="bloque-
+ajustes">` movidos tal cual desde la vieja pantalla plana) y Datos del centro y firma (campos
+estáticos en `index.html`, rellenados y guardados por `PlantillasAjustes.pintarFirmaYCentro`, que
+ya no construye su propio HTML). **"Campos propios"** (fila 198, apartado 5) ya no es un bloque
+plegable con editor: es una sola línea (`<div class="fila-tipo">`) con un enlace
+`#campos-propios-enlace`, «Se configuran dentro de cada tipo», que lleva a la pestaña "Tipos de
+asunto" (`App.cambiarPestanaAjustes('tipos')`); el alta, el cambio y el borrado de un campo
+propio viven solo en "+ Añadir campo" › "Míos" de cada tipo (`js/campos-catalogo.js`). El bloque
+"Hitos"
 (responsables y días no lectivos, `js/hitos-ajustes.js`) se cuelga aquí solo, sin tocarlo por
 dentro: cambia únicamente el contenedor al que apunta (`#ajustes-tab-centro` en vez de
 `#pantalla-ajustes`).
@@ -254,11 +279,13 @@ al final de su orquestador (`ordenarCentro`, `ordenarMantenimiento`).
   Se ponen al día con un `MutationObserver` sobre los cuerpos (nunca sobre el título) y tras
   cualquier `change`/clic en la pantalla (a los 250 ms y a los 1,5 s). Los pasos desactualizados
   de la biblioteca ponen "⚠ N pasos desactualizados" en ámbar. Un bloque sin forma sencilla de
-  contarse se queda solo con el título.
-- **"El centro"**, en este orden: Estados, Tipos de documento, Grupos de personas, Campos propios,
-  Hitos, Datos del centro y firma ("faltan N datos" en ámbar), Cómo se abrevia cada grupo, Ficheros
-  de datos; el resto detrás, como estaban. Cada bloque se reconoce por lo que lleva dentro
-  (`#tabla-estados`…), sin ids nuevos en `index.html`.
+  contarse se queda solo con el título. La lista de comprobación de arriba de un tipo (más
+  arriba) se repinta con este mismo disparador, al final de `resumirTipo()`.
+- **"El centro"**, en este orden: Tipos de documento, Grupos de personas, Hitos, Datos del centro
+  y firma ("faltan N datos" en ámbar), Cómo se abrevia cada grupo, Ficheros de datos; el resto
+  detrás, como estaban. Cada bloque se reconoce por lo que lleva dentro (`#tabla-grupos-
+  personas`…), sin ids nuevos en `index.html`. "Campos propios" no entra en esta lista: ya no es
+  un `<details class="bloque-ajustes">`, es una línea fija (ver más arriba).
 - **"Mantenimiento"**: conflictos de Dropbox, fichas sin carpeta, hitos huérfanos y envolturas sin
   aplicar **solo se ven con fallo** (mirando si su módulo ha pintado algo), y entonces arriba del
   todo, desplegados y en ámbar (`.bloque-con-fallo`). **Decisión**: el bloque del RegAlum.csv viejo
@@ -268,8 +295,9 @@ al final de su orquestador (`ordenarCentro`, `ordenarMantenimiento`).
   los abiertos, catálogo de formularios) van dentro de **"Herramientas"**, al final.
   `App.E.ultimaCopia` (lo apunta `App.pintarCopias`) da la fecha del resumen de Copias.
 
-Se comprueba con `pruebas/ajustes-plegado.mjs`. Las pruebas que trabajan dentro de la pantalla de
-un tipo abren antes sus secciones con esa misma clave de `localStorage`.
+Se comprueba con `pruebas/ajustes-plegado.mjs` y `pruebas/ajustes-tipo-completo.mjs` (la lista de
+comprobación, apartados 1, 2, 3, 5 y 8 de la fila 198). Las pruebas que trabajan dentro de la
+pantalla de un tipo abren antes sus secciones con esa misma clave de `localStorage`.
 
 ### Un tipo que cambia de nombre se lleva todo lo suyo (24-sep-2026, fila 126, `docs/TIPO-QUE-CAMBIA-DE-NOMBRE.md`)
 
