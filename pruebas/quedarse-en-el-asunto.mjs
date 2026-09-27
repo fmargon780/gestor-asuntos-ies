@@ -190,7 +190,7 @@ await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await comprobar('9. Volver devuelve a la lista de asuntos abiertos', pantallas(), { asunto: false, abiertos: true });
 
-console.log('--- 10. "Meter en un asunto" hacia el mismo asunto que tenía la ficha, desde Por clasificar ---');
+console.log('--- 10. "Guardar en un asunto" hacia el mismo asunto que tenía la ficha, desde Por clasificar ---');
 const SUELTO = 'Escrito para el proveedor de prueba.pdf';
 await pagina.click('.panel[data-vista="clasificar"]');
 await pagina.evaluate((nombre) => {
@@ -199,7 +199,7 @@ await pagina.evaluate((nombre) => {
 await pagina.click('#btn-recargar');
 await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');
 await pagina.locator('.tarjeta-suelto', { hasText: SUELTO })
-  .getByRole('button', { name: 'Meter en un asunto' }).click();
+  .getByRole('button', { name: 'Guardar en un asunto' }).click();
 await pagina.waitForSelector('#enlace-todos');
 await pagina.fill('#enlace-buscar', 'Proveedor de Prueba');
 await pagina.waitForTimeout(300);
@@ -209,7 +209,7 @@ await comprobar('se abre el cuadro de documentos del asunto de destino',
   pagina.locator('#cuadro-titulo').textContent(), NOMBRE_ASUNTO);
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
-await comprobar('10. "Meter en un asunto" no lleva de vuelta a la ficha de ese asunto',
+await comprobar('10. "Guardar en un asunto" no lleva de vuelta a la ficha de ese asunto',
   pantallas(), { asunto: false, abiertos: true });
 
 console.log('--- 11. Archivar SÍ devuelve a la lista ---');
@@ -264,10 +264,10 @@ console.log('--- 13. Editar NO saca de la ficha (fila 119), aunque se cancele el
 await abrirSegundoAsunto();
 await pagina.click('.ficha-nombre-menu-boton');
 await pagina.waitForSelector('.ficha-menu:not(.oculto)');
-await pagina.getByRole('button', { name: 'Editar el asunto', exact: true }).click();
+await pagina.getByRole('button', { name: 'Cambiar el asunto', exact: true }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('el cuadro de editar se llama como toca',
-  pagina.locator('#cuadro-titulo').textContent(), 'Editar el asunto');
+  pagina.locator('#cuadro-titulo').textContent(), 'Cambiar el asunto');
 await pagina.click('#cuadro-cancelar');
 await pagina.waitForTimeout(200);
 await comprobar('13. Editar deja en la ficha del asunto', pantallas(), { asunto: true, abiertos: false });

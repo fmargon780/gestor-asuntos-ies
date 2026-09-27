@@ -152,9 +152,9 @@ await comprobar('1. no sale como tarjeta normal (el hilo no es el suyo)',
   pagina.locator('#bandeja-correos .tarjeta-correo').count(), 0);
 await comprobar('3. sale como línea gris, con el nombre del asunto',
   pagina.locator('.linea-ya-guardado').filter({ hasText: A }).count(), 1);
-await comprobar('y con quién lo metió',
+await comprobar('y con quién lo guardó',
   pagina.locator('.linea-ya-guardado').filter({ hasText: A }).textContent()
-    .then(t => t.indexOf('lo metió Juan') !== -1), true);
+    .then(t => t.indexOf('lo guardó Juan') !== -1), true);
 
 await limpiarBandejaDeCorreos();
 

@@ -6,7 +6,7 @@
    pruebas/estado-por-el-hito.mjs, y se llama a sus funciones puras.
 
    Comprueba:
-   1. «Paso N de M · título», sin contar los «solo informativo»;
+   1. «Hito N de M · título», sin contar los «solo informativo»;
       «Listo para archivar» y «Sin hitos».
    2. La marca del paso («Nos toca» / «Esperamos a…») manda sobre el
       responsable; y llega de la guía a los hitos que ya existen.
@@ -17,7 +17,7 @@
    5. El paso único: un estado de terceros → «Esperando a» tercero con
       el estado viejo de motivo; uno normal → nada; sin hitos → los de
       la guía (o la mínima).
-   6. «Estamos en este paso»: da por hechos los anteriores con nota, no
+   6. «Saltar a este hito»: da por hechos los anteriores con nota, no
       se salta una pregunta sin responder, y quita la espera.
    7. En el ARCHIVO: «Archivado · se quedó en: …» / «· terminado».
    8. La fila cerrada del acordeón enseña la marca («Espera: Familia»). */
@@ -70,10 +70,10 @@ const ajustes = Hitos.normalizarAjustes(null);
 function estado(hitos) { return Hitos.estadoDelAsunto(hitos, ajustes); }
 
 /* 1 */
-comprobar('1. «Paso N de M · título», sin los informativos',
+comprobar('1. «Hito N de M · título», sin los informativos',
   estado([hito('a', { estado: 'hecho', responsable: 'yo' }), hito('i', { soloInformativo: true }),
     hito('b', { estado: 'encurso', responsable: 'yo' }), hito('c', { responsable: 'yo' })]).texto,
-  'Paso 2 de 3 · Paso b');
+  'Hito 2 de 3 · Paso b');
 comprobar('1. todos terminados: listo para archivar',
   (function () { const r = estado([hito('a', { estado: 'hecho' }), hito('b', { estado: 'noaplica' })]); return [r.texto, r.lado]; })(),
   ['Listo para archivar', 'administracion']);
@@ -123,7 +123,7 @@ hitosMinima[0].estado = 'hecho';
 Hitos.recomputeEnCurso(hitosMinima);
 comprobar('4. y sus hitos: «Esperar respuesta» es de terceros',
   (function () { const r = estado(hitosMinima); return [r.texto, r.lado, r.quien]; })(),
-  ['Paso 2 de 3 · Esperar respuesta', 'terceros', 'Tercero']);
+  ['Hito 2 de 3 · Esperar respuesta', 'terceros', 'Tercero']);
 
 /* 5 */
 const porAsunto = {
@@ -141,7 +141,7 @@ comprobar('5. estado de terceros → «Esperando a» tercero, con el estado viej
   [rA.lado, rA.esperando && rA.esperando.a, rA.esperando && rA.esperando.motivo], ['terceros', 'tercero', 'A LA ESPERA DEL TERCERO']);
 comprobar('5. estado normal y sin hitos → los de la guía mínima, sin espera',
   (function () { const r = Hitos.estadoDelAsunto(porAsunto['B-TRAMITE'].hitos, ajustes); return [r.texto, r.lado, !!r.esperando]; })(),
-  ['Paso 1 de 3 · Tramitar', 'administracion', false]);
+  ['Hito 1 de 3 · Tramitar', 'administracion', false]);
 comprobar('5. sin tipo: se queda sin hitos', !!porAsunto['C-SINTIPO'], false);
 const otraVez = EstadoMigracion.aplicar(porAsunto, ajustes, [
   { nombre: 'A-ESPERA', tipo: 'T', ficha: { situacion: 'A LA ESPERA DEL TERCERO' } }

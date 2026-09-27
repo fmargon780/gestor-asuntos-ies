@@ -121,13 +121,13 @@ await pagina.locator('.opcion-titulo').nth(0).fill('La hemos recibido en mano');
 await pagina.locator('.opcion-titulo').nth(1).fill('Nos ha llegado digitalmente');
 
 /* Dos pasos en la primera opción y uno en la segunda. */
-await pagina.locator('.opcion-editor').nth(0).getByText('+ Añadir un paso a esta opción').click();
+await pagina.locator('.opcion-editor').nth(0).getByText('+ Añadir un hito a esta opción').click();
 await pagina.waitForTimeout(250);
 await pagina.locator('.subpaso-titulo').nth(0).fill('Ponerle el sello de recibido y la firma');
-await pagina.locator('.opcion-editor').nth(0).getByText('+ Añadir un paso a esta opción').click();
+await pagina.locator('.opcion-editor').nth(0).getByText('+ Añadir un hito a esta opción').click();
 await pagina.waitForTimeout(250);
 await pagina.locator('.subpaso-titulo').nth(1).fill('Entregársela a Fátima');
-await pagina.locator('.opcion-editor').nth(1).getByText('+ Añadir un paso a esta opción').click();
+await pagina.locator('.opcion-editor').nth(1).getByText('+ Añadir un hito a esta opción').click();
 await pagina.waitForTimeout(250);
 await pagina.locator('.subpaso-titulo').nth(2).fill('A la firma digital del director');
 

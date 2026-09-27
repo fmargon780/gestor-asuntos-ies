@@ -529,9 +529,9 @@ await comprobar('y el original sigue donde estaba',
   pagina.evaluate(() => window.__disco.externo.name), 'descarga sin nombre (3).pdf');
 
 /* renombrar el que ya está dentro. Cada fila trae ahora dos botones
-   ("Copiar nombre" y "Poner nombre"), así que hay que elegir el que
+   ("Copiar nombre" y "Cambiar el nombre"), así que hay que elegir el que
    abre el formulario. */
-await pagina.getByRole('button', { name: 'Poner nombre' }).click();
+await pagina.getByRole('button', { name: 'Cambiar el nombre' }).click();
 await pagina.waitForSelector('#doc-vista');
 await comprobar('al renombrar se leen los datos del nombre que ya tenía',
   pagina.locator('#doc-vista').textContent(), '260902 26SA0087 CERTIFICADO 26-27.pdf');

@@ -1,4 +1,4 @@
-/* Prueba en navegador de verdad de "Meter en un asunto": llevar un
+/* Prueba en navegador de verdad de "Guardar en un asunto": llevar un
    documento suelto de "Por clasificar" a un asunto que ya existe.
 
    Fila 12 de docs/COLA.md (docs/DOCUMENTO-A-ASUNTO-EXISTENTE.md).
@@ -102,14 +102,14 @@ async function elUltimoAviso() {
    que sigan estando.
 
    Desde la fila 36 (docs/FILAS-QUE-NO-SE-ESTRUJAN.md, 17-sep-2026), a
-   la vista solo quedan "Crear asunto con él" y "Meter en un asunto":
+   la vista solo quedan "Crear asunto con él" y "Guardar en un asunto":
    el resto (Abrir, Separar, Unir, Sacar páginas, Ajustar tamaño y
    Borrar) vive dentro del menú de tres puntos (U.menuDeAcciones), que
    este selector también alcanza (".acciones .boton" no distingue
    profundidad), en ese orden. */
 await comprobar('1. los botones de una tarjeta de "Por clasificar"',
   tarjetaDe('Conciliación FL.pdf').locator('.acciones .boton').allTextContents(),
-  ['Crear asunto con él', 'Meter en un asunto', 'Abrir', 'Separar', 'Unir', 'Sacar páginas',
+  ['Crear asunto con él', 'Guardar en un asunto', 'Abrir', 'Separar', 'Unir', 'Sacar páginas',
     'Ajustar tamaño', 'Borrar']);
 
 /* ============================================================
@@ -148,7 +148,7 @@ await pagina.evaluate(async (n) => {
     window.__disco.fich('Conciliación FL.pdf', 'el que ya estaba dentro'));
 }, OTRO);
 
-await tarjetaDe('Conciliación FL.pdf').getByRole('button', { name: 'Meter en un asunto' }).click();
+await tarjetaDe('Conciliación FL.pdf').getByRole('button', { name: 'Guardar en un asunto' }).click();
 await pagina.waitForSelector('#enlace-todos');
 await pagina.fill('#enlace-buscar', 'Ordóñez');
 await pagina.waitForTimeout(300);
@@ -181,7 +181,7 @@ await pagina.evaluate(async (n) => {
 
 await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');
 await tarjetaDe('Otro papel cualquiera.pdf')
-  .getByRole('button', { name: 'Meter en un asunto' }).click();
+  .getByRole('button', { name: 'Guardar en un asunto' }).click();
 await pagina.waitForSelector('#enlace-todos');
 await pagina.fill('#enlace-buscar', 'Ordóñez');
 await pagina.waitForTimeout(300);
@@ -207,7 +207,7 @@ await pagina.evaluate(async (n) => {
    ============================================================ */
 await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');
 await tarjetaDe('Escrito de Ordóñez Gil, Rafael.pdf')
-  .getByRole('button', { name: 'Meter en un asunto' }).click();
+  .getByRole('button', { name: 'Guardar en un asunto' }).click();
 await pagina.waitForSelector('#enlace-todos');
 
 /* El asunto de Ordóñez sale arriba, en "Podrían encajar": su tercero

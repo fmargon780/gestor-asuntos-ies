@@ -128,10 +128,10 @@ await pagina.waitForSelector('#ficha-guia .hito[data-id="h1"] .hito-casilla');
 await pagina.click('#ficha-guia .hito[data-id="h1"] .hito-casilla');
 await pagina.waitForFunction(() => {
   const m = document.querySelector('#ficha-acciones .marca-hito');
-  return m && m.textContent === 'Paso 2 de 2 · Tramitar';
+  return m && m.textContent === 'Hito 2 de 2 · Tramitar';
 }, null, { timeout: 5000 }).then(() => {}, () => {});
-await comprobar('la cabecera pasa a «Paso 2 de 2 · Tramitar»',
-  pagina.locator('#ficha-acciones .marca-hito').textContent(), 'Paso 2 de 2 · Tramitar');
+await comprobar('la cabecera pasa a «Hito 2 de 2 · Tramitar»',
+  pagina.locator('#ficha-acciones .marca-hito').textContent(), 'Hito 2 de 2 · Tramitar');
 await comprobar('y el «Esperando a…» del hito hecho se ha quitado solo',
   pagina.locator('#ficha-acciones .marca-esperando').count(), 0);
 

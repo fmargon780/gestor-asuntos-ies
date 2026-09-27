@@ -181,18 +181,18 @@ await comprobar('y la cuenta sube',
 console.log('--- en Ajustes se ve lo mismo ---');
 /* Desde el 17-sep-2026 (fila 39, docs/AJUSTES-POR-TIPO.md) ya no hay
    una tabla de guías aparte en Ajustes: los pasos se ven en la
-   sección "Pasos del trámite" de la pantalla propia del tipo. */
+   sección «Guía» de la pantalla propia del tipo. */
 await pagina.evaluate(() => App.ir('ajustes'));
 await pagina.waitForSelector('#tabla-tipos .tarjeta-tipo');
 await pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: 'MATRICULA' })
   .locator('.tarjeta-tipo-nombre').click();
 await pagina.waitForSelector('#pantalla-tipo-asunto:not(.oculto)');
 await pagina.waitForTimeout(600);
-await comprobar('la sección "Pasos del trámite" dice "Cambiar la guía" (ya hay 2 pasos)',
-  pagina.locator('.tipo-asunto-seccion').filter({ hasText: 'Pasos del trámite' })
+await comprobar('la sección «Guía» dice "Cambiar la guía" (ya hay 2 pasos)',
+  pagina.locator('.tipo-asunto-seccion').filter({ hasText: 'Guía' })
     .getByRole('button', { name: 'Cambiar la guía' }).count(), 1);
 await comprobar('y enseña los títulos de los dos pasos',
-  pagina.locator('.tipo-asunto-seccion').filter({ hasText: 'Pasos del trámite' }).textContent()
+  pagina.locator('.tipo-asunto-seccion').filter({ hasText: 'Guía' }).textContent()
     .then(t => t.indexOf('Pedir el sobre de matrícula') !== -1 &&
                t.indexOf('Comprobar el pago de la Seguridad Escolar') !== -1), true);
 

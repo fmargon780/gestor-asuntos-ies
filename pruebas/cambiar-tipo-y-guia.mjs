@@ -1,6 +1,6 @@
 /* Prueba en navegador de verdad de la fila 94
    (docs/CAMBIAR-EL-TIPO-CAMBIA-LA-GUIA.md): al cambiar el tipo de un
-   asunto abierto en «Editar el asunto», si tiene hitos y el tipo nuevo
+   asunto abierto en «Cambiar el asunto», si tiene hitos y el tipo nuevo
    tiene guía, pregunta si traer la guía nueva.
 
    1. Hitos intactos (el primero solo "en curso", como queda al crear
@@ -73,7 +73,7 @@ async function crearAsunto(nombre, tercero) {
   }, [nombre, tercero]);
 }
 
-/* Abre «Editar el asunto» de `nombre`, cambia lo que diga `cambios`
+/* Abre «Cambiar el asunto» de `nombre`, cambia lo que diga `cambios`
    ({ tipo, descripcion }) y pulsa Guardar. No espera a nada más. */
 async function editar(nombre, cambios) {
   await pagina.evaluate((nombre) => {
@@ -121,7 +121,7 @@ await comprobar('pregunta', salePregunta(), 'pregunta');
 await comprobar('el texto nombra los dos tipos',
   pagina.locator('#cuadro-cuerpo').textContent().then(t => t.indexOf('MATRICULA') > -1 && t.indexOf('BECA') > -1), true);
 await comprobar('el botón de cancelar dice qué hace',
-  pagina.locator('#cuadro-cancelar').textContent(), 'Dejar los pasos como están');
+  pagina.locator('#cuadro-cancelar').textContent(), 'Dejar los hitos como están');
 await pagina.click('#cuadro-aceptar');
 await pagina.evaluate(() => window.__editando);
 const N1b = '260901 BECA Aguilar Ponce, Marina 1140233';
@@ -132,7 +132,7 @@ await comprobar('los hitos son solo los de BECA, el primero en curso',
 await comprobar('nota en el asunto con el cambio',
   pagina.evaluate((n) => (App.E.registro.asuntos[n].notas || []).some(x => x.texto.indexOf('Cambiado el tipo de MATRICULA a BECA') === 0), N1b), true);
 await comprobar('el texto de Cancelar vuelve a ser el de siempre',
-  pagina.locator('#cuadro-cancelar').textContent().then(t => t !== 'Dejar los pasos como están'), true);
+  pagina.locator('#cuadro-cancelar').textContent().then(t => t !== 'Dejar los hitos como están'), true);
 
 /* ---------- 2. uno hecho y otro con una nota: se quedan abajo ---------- */
 console.log('--- 2. con trabajo hecho ---');

@@ -9,8 +9,8 @@
         sale desplegada (se recuerda por sección, no por tipo).
      3. Se añade un campo y se guarda: el resumen pasa de 2 a 3 sin salir
         de la pantalla.
-     4. Un paso desactualizado pone el aviso ámbar en el título de "Pasos
-        del trámite", aun plegado.
+     4. Un hito desactualizado pone el aviso ámbar en el título de "Guía",
+        aun plegado.
      5. "El centro": bloques plegados, en el orden nuevo.
      6. "Mantenimiento": sin conflictos ni fichas sin carpeta, esos
         bloques no se ven; con una ficha sin carpeta de mentira, su
@@ -100,7 +100,7 @@ await comprobar('ninguna sale desplegada la primera vez',
   pagina.locator('#pantalla-tipo-asunto details[open]').count(), 0);
 await comprobar('"Campos" dice cuántos lleva', resumen('campos'), '2 campos');
 await comprobar('"Plazo" dice "sin plazo"', resumen('plazo'), 'sin plazo');
-await comprobar('"Pasos del trámite" dice cuántos pasos', resumen('pasos'), '2 pasos');
+await comprobar('"Guía" dice cuántos hitos', resumen('pasos'), '2 hitos');
 await comprobar('"Datos del tipo" dice la categoría', resumen('datos'), 'ALUMNADO');
 await comprobar('"Palabras clave" dice "ninguna"', resumen('palabras'), 'ninguna');
 await comprobar('"Se repite" dice "no"', resumen('repite'), 'no');
@@ -161,9 +161,9 @@ await comprobar('seguimos en la pantalla del tipo',
   pagina.locator('#pantalla-tipo-asunto').isVisible(), true);
 
 /* ================================================================
-   4. Un paso desactualizado avisa en el título, aun plegado.
+   4. Un hito desactualizado avisa en el título, aun plegado.
    ================================================================ */
-console.log('--- 4. el aviso de paso desactualizado, en el título ---');
+console.log('--- 4. el aviso de hito desactualizado, en el título ---');
 await pagina.evaluate(() => {
   window.GuiasBiblioteca.pasosDesactualizados = async (pasos) =>
     pasos.length ? [{ modelo: { nombre: pasos[0].titulo }, paso: pasos[0] }] : [];
@@ -171,9 +171,9 @@ await pagina.evaluate(() => {
 await pagina.evaluate(() => App.cerrarTipoDeAsunto());
 await abrirTipo('MATRICULA');
 await pagina.waitForTimeout(300);
-await comprobar('"Pasos del trámite" sigue plegada',
+await comprobar('"Guía" sigue plegada',
   pagina.locator('#pantalla-tipo-asunto details[data-seccion="pasos"]').evaluate((d) => d.open), false);
-await comprobar('su título avisa del paso desactualizado', resumen('pasos'), '2 pasos · ⚠ 1 paso desactualizado');
+await comprobar('su título avisa del hito desactualizado', resumen('pasos'), '2 hitos · ⚠ 1 hito desactualizado');
 await comprobar('en ámbar',
   pagina.locator('#pantalla-tipo-asunto details[data-seccion="pasos"] .bloque-resumen')
     .evaluate((s) => s.classList.contains('bloque-resumen-ambar')), true);

@@ -126,7 +126,7 @@ await comprobar('«Registrar» enseña el paso con su receta como título, y el 
   pagina.evaluate(() => {
     const menu = Array.from(document.querySelectorAll('.ficha-menu')).find((m) => m.offsetParent);
     return menu ? Array.from(menu.querySelectorAll('.ficha-menu-opcion')).map((o) => [o.textContent, o.disabled]) : null;
-  }), [['Paso: Registrar la salida (salida)', true], ['260907 SUELTO.pdf', false]]);
+  }), [['Tarea: Registrar la salida (salida)', true], ['260907 SUELTO.pdf', false]]);
 await pagina.keyboard.press('Escape');
 await pagina.mouse.click(5, 5);
 

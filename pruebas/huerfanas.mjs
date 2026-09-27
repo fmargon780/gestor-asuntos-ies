@@ -92,7 +92,7 @@ await pagina.evaluate(() => App.pintarAjustes());
 await pagina.waitForTimeout(200);
 await comprobar('sale la nueva huérfana', pagina.locator('#tabla-huerfanas .fila-tipo').count(), 1);
 
-await pagina.getByRole('button', { name: 'Borrar la ficha' }).click();
+await pagina.getByRole('button', { name: 'Quitar la ficha' }).click();
 await pagina.waitForSelector('#capa:not(.oculto)');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(300);

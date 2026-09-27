@@ -372,7 +372,7 @@ await comprobar('sin huella ni parecido, no propone ningún asunto',
   pagina.locator('#bandeja-correos .tarjeta-correo .boton-principal').textContent(),
   'Crear el asunto');
 
-await pagina.getByRole('button', { name: 'Elegir asunto' }).click();
+await pagina.getByRole('button', { name: 'Guardar en un asunto' }).click();
 await pagina.waitForSelector('#enlace-todos');
 await comprobar('el cuadro enseña todos los asuntos',
   pagina.locator('#enlace-todos .enlace-asunto').count(), 2);

@@ -169,7 +169,7 @@ await comprobar('dos niveles dentro',
 await pagina.click('#guia-pasos .paso-editor[data-pos="0"] > .paso-cabecera > .paso-numero');
 await pagina.fill('#guia-pasos .paso-editor[data-pos="0"] .paso-titulo', '¿Se puede pedir lo que falta?');
 /* un paso nuevo en la opción «No» de q3 */
-await pagina.locator('.opcion-editor').nth(1).locator('button', { hasText: '+ Añadir un paso a esta opción' }).click();
+await pagina.locator('.opcion-editor').nth(1).locator('button', { hasText: '+ Añadir un hito a esta opción' }).click();
 await pagina.locator('.opcion-editor').nth(1).locator('.subpaso-titulo').nth(1).fill('Avisar a la familia');
 
 await pagina.click('#guia-volver');
