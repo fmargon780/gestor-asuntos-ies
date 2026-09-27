@@ -39,9 +39,10 @@
       location.reload();
     };
 
-    /* Antes del rótulo de la sesión, que es el último del pie. */
+    /* Fila 193 (docs/AVISOS-MENU-Y-VOLVER.md, apartado 2): al pie, la
+       sesión y la versión primero, "Salir" el último. */
     var usuario = document.getElementById('usuario-pie');
-    if (usuario) pie.insertBefore(b, usuario);
+    if (usuario && usuario.nextSibling) pie.insertBefore(b, usuario.nextSibling);
     else pie.appendChild(b);
   }
 

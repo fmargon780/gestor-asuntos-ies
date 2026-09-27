@@ -73,7 +73,11 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Cada tipo dice quién lo encarga (Secretaría, Dirección…): parrilla agrupada, filtro y Cuentas.
 - Asuntos reservados (por tipo o uno a uno): candado, sin el tercero en listas y buscador.
 - El estado es el primer hito sin terminar («Hito N de M · título», «Hito actual»): Administración o terceros; «Esperando a…» sale solo con el responsable (a mano, hasta que cambia el hito). Guías: «Administración», no personas. Vía y fecha límite.
-- Asuntos recurrentes, con aviso. Avisos de fichas huérfanas y papelera vieja.
+- Asuntos recurrentes, con aviso. Todos los avisos de arriba de Inicio (vencidos, recurrentes,
+  duplicados, papelera vieja, fichas huérfanas, fichero de alumnado viejo, aspirantes sin
+  número), en una sola línea (`#avisos-linea`, `js/avisos-linea.js`, fila 193): un solo "Ocultar
+  por hoy" para todos. Menú: Inicio · Nuevo asunto · Archivo · Personas y empresas · Impresos ·
+  Cuentas, línea, Ajustes; al pie, sesión, versión y Salir.
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO por curso académico (selector
   «Curso», carga solo al entrar, la primera vez) y búsqueda por palabras sueltas también en
   documentos, registro de Séneca, ficha y notas.

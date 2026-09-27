@@ -330,24 +330,25 @@
      las pruebas que la buscan por esa clase.
      ========================================================== */
 
+  /* Fila 193: en vez de su propia caja fija (#inicio-aviso-aspirantes),
+     este aviso se une a los demás en la línea de arriba
+     (js/avisos-linea.js). Se le deja la misma clase de siempre
+     (qmt-aviso-aspirantes), que ya usan las pruebas. */
   async function pintarAvisoAspirantes() {
-    var caja = $('inicio-aviso-aspirantes');
-    if (!caja) return;
+    if (!window.AvisosLinea) return;
     var n = await QueMeToca.contarAspirantesSinNumero();
-    caja.innerHTML = '';
-    if (!n) return;
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'qmt-fila qmt-aviso-aspirantes';
-    b.textContent = n + ' ' + (n === 1 ? 'aspirante' : 'aspirantes') +
-      ' sin Nº de identificación escolar';
-    b.onclick = function () {
-      if ($('filtro-personas')) $('filtro-personas').value = 'ALUMNADO';
-      if ($('buscar-personas')) $('buscar-personas').value = '';
-      App.ir('personas');
-      if (App.pintarPersonas) App.pintarPersonas();
-    };
-    caja.appendChild(b);
+    AvisosLinea.registrar('aspirantes', n ? {
+      texto: n + ' ' + (n === 1 ? 'aspirante' : 'aspirantes') +
+        ' sin Nº de identificación escolar',
+      rojo: false,
+      clase: 'qmt-aviso-aspirantes',
+      onclick: function () {
+        if ($('filtro-personas')) $('filtro-personas').value = 'ALUMNADO';
+        if ($('buscar-personas')) $('buscar-personas').value = '';
+        App.ir('personas');
+        if (App.pintarPersonas) App.pintarPersonas();
+      }
+    } : null);
   }
 
   /* ==========================================================

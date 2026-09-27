@@ -232,53 +232,22 @@
     }
   }
 
-  /* ---------- el panel de la pantalla de asuntos ---------- */
+  /* ---------- el trozo de la línea de avisos de arriba ----------
+
+     Fila 193: en vez de su propia caja de color, este módulo registra
+     su trozo en js/avisos-linea.js. El clic crea directamente los que
+     tocan, como pedía el encargo ("crear los recurrentes"). */
 
   function pintarPanel() {
-    var caja = $('panel-recurrentes');
-    if (!caja) return;
+    if (!window.AvisosLinea) return;
     var toca = pendientes();
-    if (!toca.length || cerradoHoy()) {
-      caja.classList.add('oculto');
-      caja.innerHTML = '';
-      return;
-    }
-
-    caja.className = 'aviso aviso-ambar';
-    caja.innerHTML = '<strong>Toca crear ' +
-      (toca.length === 1 ? '1 asunto que se repite' : toca.length + ' asuntos que se repiten') +
-      '.</strong><ul class="recurrentes-lista">' +
-      toca.map(function (r) {
-        return '<li>' + U.escapar(r.tipo + '  ·  ' + r.tercero +
-               (r.descripcion ? '  ·  ' + r.descripcion : '')) + '</li>';
-      }).join('') + '</ul>';
-
-    var botones = document.createElement('div');
-    botones.className = 'avisos-botones';
-
-    var b = document.createElement('button');
-    b.className = 'boton boton-principal';
-    b.textContent = toca.length === 1 ? 'Crear el asunto' : 'Crear los ' + toca.length;
-    b.onclick = function () { b.disabled = true; crearLosQueTocan(); };
-    botones.appendChild(b);
-
-    var ver = document.createElement('button');
-    ver.className = 'boton';
-    ver.textContent = 'Ver la lista en Ajustes';
-    ver.onclick = function () {
-      var pestana = document.querySelector('.pestana[data-pantalla="ajustes"]');
-      if (pestana) pestana.click();
-    };
-    botones.appendChild(ver);
-
-    var ocultar = document.createElement('button');
-    ocultar.className = 'boton';
-    ocultar.textContent = 'Ocultar por hoy';
-    ocultar.onclick = function () { cerrarPorHoy(); pintarPanel(); };
-    botones.appendChild(ocultar);
-
-    caja.appendChild(botones);
-    caja.classList.remove('oculto');
+    AvisosLinea.registrar('recurrentes', toca.length ? {
+      texto: (toca.length === 1
+        ? '1 asunto que se repite toca crearlo'
+        : toca.length + ' asuntos que se repiten toca crearlos'),
+      rojo: false,
+      onclick: function () { crearLosQueTocan(); }
+    } : null);
   }
 
   /* ---------- la tabla de Ajustes ----------

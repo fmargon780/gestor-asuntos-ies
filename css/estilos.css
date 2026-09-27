@@ -376,6 +376,17 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 .aviso-ambar { background: var(--ambar); border: 1px solid var(--ambar-linea); }
 #aviso-pendiente .boton { margin-top: 10px; }
 
+/* Fila 193: todos los avisos de arriba, en una sola línea. */
+.aviso-linea { border-radius: var(--radio); padding: 10px 16px; margin-bottom: 18px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: 14px; }
+.aviso-linea-rojo { background: var(--rojo); border: 1px solid #f0b7b1; }
+.aviso-linea-ambar { background: var(--ambar); border: 1px solid var(--ambar-linea); }
+.aviso-linea-trozo { background: none; border: none; padding: 2px 4px; font: inherit; font-weight: 600;
+  color: inherit; cursor: pointer; text-decoration: underline; text-decoration-style: dotted; }
+.aviso-linea-trozo:hover { text-decoration-style: solid; }
+.aviso-linea-sep { opacity: .6; }
+.aviso-linea-ocultar { margin-left: auto; }
+
 .capa { position: fixed; inset: 0; background: rgba(15,25,40,.45); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
 .cuadro { background: var(--papel); border-radius: 12px; padding: 24px; width: 100%; max-width: 520px; box-shadow: 0 20px 60px rgba(10,25,45,.35); }
 .cuadro h3 { margin: 0 0 12px; }

@@ -5,6 +5,41 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 193: los avisos en una línea y el menú
+
+`docs/AVISOS-MENU-Y-VOLVER.md`, apartados 1 y 2. Hasta cinco cajas de color apiladas encima de
+Inicio (`js/avisos.js` con lo que vence, `js/recurrentes.js`, `js/frescura.js`,
+`js/avisos-que-faltan.js` con huérfanas y papelera vieja), más el botón de duplicados de la
+cabecera (`js/unir-asuntos.js`) y el aviso de aspirantes sin número (`js/inicio.js`), se juntan
+en **una sola franja** (`#avisos-linea`, módulo nuevo `js/avisos-linea.js`): cada módulo sigue
+calculando exactamente lo mismo, pero registra su trozo con `AvisosLinea.registrar(id, {texto,
+rojo, onclick})` en vez de pintar su propia caja. Los trozos van separados por « · », en un orden
+fijo (vencidos, próximos, recurrentes, duplicados, papelera, huérfanas, frescura, aspirantes);
+la franja es roja si algún trozo lo es, y lleva un único botón «Ocultar por hoy» a la derecha, que
+la calla el resto del día **y solo mientras el conjunto de avisos no cambie** (si aparece uno
+nuevo, vuelve a salir; `localStorage`, clave `avisos-linea-cerrada`).
+
+**Lo que se retiró de paso**: el aviso de huérfanas perdía su propia ✕ de «callar 7 días» (fila
+86) — la función que decidía eso (`AvisosQueFaltan._sePintaHuerfanas`) se deja intacta, para no
+tocar su prueba, pero en la práctica ya nadie escribe la clave que la alimentaba, así que ahora
+siempre sale mientras haya huérfanas. `js/traer-datos.js` tenía un botón propio inyectado dentro
+de la caja de frescura («Traer el fichero desde donde lo tengas»): al desaparecer esa caja, se
+sustituye por un `window.Frescura.repasar()` que vuelve a mirar la fecha del fichero sin buscar
+ningún botón en pantalla, y el trozo de frescura, cuando falta el RegAlum del todo, lleva directo
+al bloque «Ficheros de datos» de Ajustes → El centro (antes solo iba a la propia configuración de
+épocas de Mantenimiento, que es donde sigue llevando cuando el fichero solo está viejo).
+
+**Se conservan a propósito** el id `#btn-duplicados` y la clase `.qmt-aviso-aspirantes`, aunque
+ahora vivan dentro de la línea: así `pruebas/duplicados.mjs` y `pruebas/aspirantes-numero.mjs`
+siguen en verde sin tocarlos.
+
+**El menú**, apartado 2: orden Inicio · Nuevo asunto · Archivo · Personas y empresas · Impresos ·
+Cuentas (antes Cuentas iba antes que Impresos), una línea, Ajustes; al pie, sesión y versión
+primero y «Salir» el último (antes al revés). El número rojo de vencidos ya estaba en «Inicio»
+desde la fila 191.
+
+Prueba nueva: `pruebas/avisos-linea.mjs`. `npm test` completo (167 ficheros) en verde.
+
 ## 27-sep-2026 — Fila 192: la pantalla de Inicio, segunda parte (la tabla y los plegados)
 
 `docs/INICIO-CUATRO-BLOQUES.md`, apartados 5 y 6. Debajo de los cuatro bloques de la fila 191,

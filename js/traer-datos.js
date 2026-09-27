@@ -12,8 +12,9 @@
    Se pueden elegir varios de una vez: el de alumnado y los dos de
    personal salen juntos de Séneca.
 
-   El botón sale en dos sitios: en Ajustes, dentro de "Ficheros de
-   datos", y en el propio aviso rojo de cuando falta el RegAlum.
+   El botón vive en Ajustes, dentro de "Ficheros de datos"; el aviso
+   rojo de cuando falta el RegAlum (js/frescura.js) lleva directo ahí
+   (fila 193, docs/AVISOS-MENU-Y-VOLVER.md).
    ============================================================ */
 (function () {
 
@@ -77,17 +78,11 @@
   }
 
   /* Después de traer ficheros, lo leído antes ya no vale y el aviso de
-     arriba puede haber dejado de tener razón. El aviso trae su propio
-     botón de volver a mirar: se pulsa solo. */
+     arriba (fila 193: js/frescura.js) puede haber dejado de tener
+     razón: se le pide que vuelva a mirar directamente. */
   function repasarLaPantalla() {
     try { Datos.olvidar(); } catch (e) {}
-    var panel = document.getElementById('panel-frescura');
-    if (panel) {
-      var botones = panel.querySelectorAll('button');
-      for (var i = 0; i < botones.length; i++) {
-        if (botones[i].textContent.indexOf('vuelve a mirar') !== -1) { botones[i].click(); break; }
-      }
-    }
+    if (window.Frescura) window.Frescura.repasar();
     if (window.Gestor && window.Gestor.recargar) window.Gestor.recargar();
   }
 
@@ -149,34 +144,8 @@
     caja.parentNode.insertBefore(fila, caja);
   }
 
-  /* ---------- el botón del aviso de arriba ----------
-
-     El aviso se vuelve a pintar entero cada vez que cambia, así que el
-     botón se pone otra vez cada vez que eso pasa. */
-
-  function ponerEnElAviso() {
-    var panel = document.getElementById('panel-frescura');
-    if (!panel || panel.classList.contains('oculto')) return;
-    if (panel.querySelector('.btn-traer-aviso')) return;
-    var botones = panel.querySelector('.avisos-botones');
-    if (!botones) return;
-    var b = botonNuevo('Traer el fichero desde donde lo tengas', true);
-    b.className += ' btn-traer-aviso';
-    botones.insertBefore(b, botones.firstChild);
-  }
-
-  function vigilarElAviso() {
-    var sitio = document.getElementById('pantalla-abiertos') || document.body;
-    if (!sitio || typeof MutationObserver !== 'function') return;
-    new MutationObserver(function () { ponerEnElAviso(); }).observe(sitio, {
-      childList: true, subtree: true
-    });
-  }
-
   function arrancar() {
     ponerEnAjustes();
-    ponerEnElAviso();
-    vigilarElAviso();
   }
 
   arrancar();

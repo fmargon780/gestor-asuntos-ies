@@ -17,7 +17,6 @@
 (function () {
 
   var FICHERO = 'frescura.json';
-  var CLAVE_CERRADO = 'frescura-cerrado-el';
   var PREFIJO = 'RegAlum';
 
   /* La propuesta de partida. Las fechas son día-mes, sin año, porque se
@@ -160,100 +159,47 @@
     }
   }
 
-  /* ---------- el panel de arriba ---------- */
+  /* ---------- el trozo de la línea de avisos de arriba ---------- */
 
-  function hoyTexto() {
-    var d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') +
-           '-' + String(d.getDate()).padStart(2, '0');
+  function irABloque(idPestana, idBloque) {
+    App.ir('ajustes');
+    if (typeof App.cambiarPestanaAjustes === 'function') App.cambiarPestanaAjustes(idPestana);
+    var d = $(idBloque);
+    if (d) { d.open = true; d.scrollIntoView({ block: 'center' }); }
   }
 
-  function cerradoHoy() {
-    try { return window.localStorage.getItem(CLAVE_CERRADO) === hoyTexto(); } catch (e) { return false; }
-  }
+  /* Sin ningún RegAlum.csv, lo que hace falta es traerlo (fila 39,
+     bloque "Ficheros de datos", pestaña "El centro"); si solo está
+     viejo, lo que hace falta es revisar cada cuánto se avisa (este
+     mismo bloque, pestaña "Mantenimiento"). */
+  function irAMantenimiento() { irABloque('mantenimiento', 'bloque-frescura'); }
+  function irAFicherosDeDatos() { irABloque('centro', 'bloque-ficheros-datos'); }
 
-  function cerrarPorHoy() {
-    try { window.localStorage.setItem(CLAVE_CERRADO, hoyTexto()); } catch (e) {}
-  }
-
-  function caja() {
-    var c = $('panel-frescura');
-    if (c) return c;
-    var avisos = $('panel-avisos');
-    if (!avisos || !avisos.parentNode) return null;
-    c = document.createElement('div');
-    c.id = 'panel-frescura';
-    c.className = 'oculto';
-    avisos.parentNode.insertBefore(c, avisos);
-    return c;
-  }
-
-  function legible(fecha) {
-    return String(fecha.getDate()).padStart(2, '0') + '/' +
-           String(fecha.getMonth() + 1).padStart(2, '0') + '/' + fecha.getFullYear();
-  }
-
+  /* Fila 193: en vez de su propia caja de color, este módulo registra
+     su trozo en la línea de avisos de arriba (js/avisos-linea.js). */
   function pintarPanel(estado) {
-    var c = caja();
-    if (!c) return;
-
-    if (cerradoHoy()) { c.className = 'oculto'; c.innerHTML = ''; return; }
-
-    var epoca = epocaDe(new Date());
-    var texto = '';
-    var color = '';
+    if (!window.AvisosLinea) return;
 
     if (estado.falta) {
-      color = 'aviso-rojo';
-      texto = '<strong>No hay ningún RegAlum.csv en la carpeta de datos.</strong>' +
-              '<p>Sin él no salen los alumnos al crear un asunto. Descárgalo de Séneca y ' +
-              'déjalo en _GESTOR/datos, dentro de la carpeta de asuntos abiertos.</p>';
-    } else if (estado.dias > epoca.dias) {
-      color = estado.dias > epoca.dias * 2 ? 'aviso-rojo' : 'aviso-ambar';
-      texto = '<strong>El fichero de alumnado tiene ' + estado.dias + ' días.</strong>' +
-              '<p>' + U.escapar(estado.nombre) + ' es del ' + legible(estado.cuando) + '. ' +
-              'Estamos en ' + U.escapar(epoca.nombre) + ', y en esta época conviene bajarlo de ' +
-              'Séneca cada ' + epoca.dias + ' días.</p>';
-    } else {
-      c.className = 'oculto';
-      c.innerHTML = '';
+      AvisosLinea.registrar('frescura', {
+        texto: 'no hay ningún RegAlum.csv',
+        rojo: true,
+        onclick: irAFicherosDeDatos
+      });
       return;
     }
 
-    c.className = 'aviso ' + color;
-    c.innerHTML = texto;
+    var epoca = epocaDe(new Date());
+    if (estado.dias <= epoca.dias) {
+      AvisosLinea.registrar('frescura', null);
+      return;
+    }
 
-    var botones = document.createElement('div');
-    botones.className = 'avisos-botones';
-
-    var b = document.createElement('button');
-    b.className = 'boton';
-    b.textContent = 'Ocultar por hoy';
-    b.onclick = function () { cerrarPorHoy(); pintarPanel(estado); };
-    botones.appendChild(b);
-
-    /* Para cuando se acaba de bajar el fichero y se quiere ver que ya
-       está: la aplicación solo mira la carpeta al abrirse. */
-    var b3 = document.createElement('button');
-    b3.className = 'boton';
-    b3.textContent = 'Ya lo he bajado, vuelve a mirar';
-    b3.onclick = function () { repasar(); };
-    botones.appendChild(b3);
-
-    var b2 = document.createElement('button');
-    b2.className = 'boton';
-    b2.textContent = 'Cambiar cada cuánto se avisa';
-    b2.onclick = function () {
-      App.ir('ajustes');
-      /* 17-sep-2026, fila 39: este bloque vive en la pestaña
-         "Mantenimiento". */
-      if (typeof App.cambiarPestanaAjustes === 'function') App.cambiarPestanaAjustes('mantenimiento');
-      var d = $('bloque-frescura');
-      if (d) { d.open = true; d.scrollIntoView({ block: 'center' }); }
-    };
-    botones.appendChild(b2);
-
-    c.appendChild(botones);
+    AvisosLinea.registrar('frescura', {
+      texto: 'fichero de alumnado de hace ' + estado.dias + ' días',
+      rojo: estado.dias > epoca.dias * 2,
+      onclick: irAMantenimiento
+    });
   }
 
   /* ---------- el bloque de Ajustes ----------
@@ -435,4 +381,8 @@
   } else {
     enganchar();
   }
+
+  /* Para js/traer-datos.js: tras traer un fichero nuevo, vuelve a
+     mirar la fecha sin tener que buscar ningún botón en pantalla. */
+  window.Frescura = { repasar: repasar };
 })();

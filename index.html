@@ -133,13 +133,12 @@
         </div>
       </header>
 
-      <div id="panel-avisos" class="oculto"></div>
-      <div id="panel-recurrentes" class="oculto"></div>
-
-      <!-- Apartado 7 de la fila 191: el aviso de aspirantes sin Nº de
-           identificación escolar vive aquí hasta que la fila 181 lo
-           lleve a la línea de avisos de arriba. -->
-      <div id="inicio-aviso-aspirantes"></div>
+      <!-- Fila 193: todos los avisos de arriba, en una sola línea
+           (js/avisos-linea.js). Sustituye las cajas sueltas de
+           js/avisos.js, js/recurrentes.js, js/frescura.js,
+           js/avisos-que-faltan.js y el aviso de aspirantes de
+           js/inicio.js. -->
+      <div id="avisos-linea" class="oculto"></div>
 
       <!-- El único botón de montón que queda (mismo data-vista, para no
            romper pruebas que hacen .click('.panel[data-vista="clasificar"]')):
@@ -540,7 +539,7 @@
         </div>
       </details>
 
-      <details class="bloque-ajustes">
+      <details class="bloque-ajustes" id="bloque-ficheros-datos">
         <summary>
           <span class="bloque-titulo">Ficheros de datos</span>
           <span class="bloque-pie">Qué CSV hay cargados y qué columnas se reconocen</span>
@@ -901,6 +900,10 @@
 <script src="js/nucleo.js"></script>
 <script src="js/borrados-fusion.js"></script>
 <script src="js/version.js"></script>
+<!-- Todos los avisos de arriba, en una sola línea (fila 193,
+     docs/AVISOS-MENU-Y-VOLVER.md): antes que cualquiera de los
+     módulos que le pasan su trozo. -->
+<script src="js/avisos-linea.js"></script>
 <script src="js/asuntos-lista.js"></script>
 <script src="js/asuntos-lista-montones.js"></script>
 <script src="js/asuntos-lista-pintar.js"></script>

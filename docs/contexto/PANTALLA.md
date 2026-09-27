@@ -30,11 +30,29 @@ Cambiar el estado con la ficha abierta hacía 30-40 lecturas de disco. Ahora sol
 - La presencia solo avisa cuando cambia el modo o quién está dentro, y la ficha vacía el aviso
   antes de pintarlo (salía repetido cada 10 s).
 
-**Botón de Salir** (`js/salir.js`). Al pie de la barra de la izquierda. Cierra la sesión: recarga
-la página y vuelve a la pantalla de entrada, con las carpetas ya señaladas. Pide confirmación.
+**Botón de Salir** (`js/salir.js`). Al pie de la barra de la izquierda, después de la sesión y la
+versión (fila 193, 27-sep-2026, `docs/AVISOS-MENU-Y-VOLVER.md`, apartado 2). Cierra la sesión:
+recarga la página y vuelve a la pantalla de entrada, con las carpetas ya señaladas. Pide
+confirmación.
 
-**La barra de la izquierda** (`js/barra.js`, `css/barra.css`). Se pliega; un botón de tres rayas la
-abre y la cierra; se recuerda en `gestor-barra-2` (fila 175, `docs/PERSONAS-ARCHIVO-Y-MENU.md`,
+**La línea única de avisos** (`js/avisos-linea.js`, fila 193). Antes había hasta cinco cajas de
+color apiladas encima de Inicio (`js/avisos.js` con lo que vence, `js/recurrentes.js`,
+`js/frescura.js`, `js/avisos-que-faltan.js` con huérfanas y papelera vieja), más el botón de
+duplicados de la cabecera (`js/unir-asuntos.js`) y el aviso de aspirantes sin número
+(`js/inicio.js`). Ahora cada módulo sigue calculando lo mismo, pero registra su trozo con
+`AvisosLinea.registrar(id, {texto, rojo, onclick})` en vez de pintar su propia caja; el módulo
+pinta una sola franja (`#avisos-linea`), roja si algún trozo es rojo, con los trozos separados
+por " · " y un único botón "Ocultar por hoy" a la derecha (por hoy y mientras el conjunto de
+avisos no cambie: `localStorage`, clave `avisos-linea-cerrada`). Los botones de duplicados
+(`#btn-duplicados`) y de aspirantes (`.qmt-aviso-aspirantes`) conservan su id/clase de siempre
+para las pruebas, aunque ahora vivan dentro de la línea. El aviso de huérfanas perdió su propia
+✕ de 7 días (fila 86): ya solo se calla con el "Ocultar por hoy" general.
+
+**La barra de la izquierda** (`js/barra.js`, `css/barra.css`). Menú, de arriba abajo: Inicio ·
+Nuevo asunto · Archivo · Personas y empresas · Impresos · Cuentas (las dos últimas las añade
+`js/barra.js`, no están en el `index.html` de partida), una línea, Ajustes (fila 193: Impresos
+antes que Cuentas). Se pliega; un botón de tres rayas la abre y la cierra; se recuerda en
+`gestor-barra-2` (fila 175, `docs/PERSONAS-ARCHIVO-Y-MENU.md`,
 punto 4; antes `gestor-barra` — la clave cambió para que los dos ordenadores, aunque tuvieran
 guardado "plegada", volvieran a empezar). `comoEstaba()` solo lee esa clave; si no hay nada guardado
 todavía (primera vez con la clave nueva), decide por el ancho de la ventana: **1100px o más, nace

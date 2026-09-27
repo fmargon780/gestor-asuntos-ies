@@ -41,13 +41,14 @@
     return window.FichasHuerfanas ? FichasHuerfanas.calcular() : Promise.resolve([]);
   }
 
-  /* Ocultar el aviso 7 días (20-sep-2026, fila 86,
-     docs/PULSAR-PARA-ABRIR-Y-AVISO-OCULTABLE.md): preferencia de quien
-     está delante del ordenador, así que va en localStorage, no en
-     `_GESTOR`. Se guarda también cuántas fichas había: si aparecen más
-     antes de que pasen los 7 días, el aviso vuelve. */
+  /* De la fila 86 (docs/PULSAR-PARA-ABRIR-Y-AVISO-OCULTABLE.md): quedó
+     un botón propio de "callar 7 días" este aviso; desde la fila 193
+     ese hueco es el único "Ocultar por hoy" de toda la línea de
+     avisos (js/avisos-linea.js), así que aquí ya no se escribe nunca
+     `aviso-huerfanas-callado`. Se deja `sePintaHuerfanas` (y esta
+     lectura) porque las pruebas la comprueban sola, por si algún día
+     vuelve a haber un botón propio. */
   var CLAVE_HUERFANAS_CALLADO = 'aviso-huerfanas-callado';
-  var DIAS_HUERFANAS_CALLADO = 7;
 
   function guardadoHuerfanas() {
     try {
@@ -55,15 +56,6 @@
       if (!v || typeof v.hasta !== 'string' || typeof v.n !== 'number') return null;
       return v;
     } catch (e) { return null; }
-  }
-
-  function callarHuerfanas(n) {
-    try {
-      window.localStorage.setItem(CLAVE_HUERFANAS_CALLADO, JSON.stringify({
-        hasta: new Date(Date.now() + DIAS_HUERFANAS_CALLADO * 86400000).toISOString(),
-        n: n
-      }));
-    } catch (e) { /* si el navegador no deja guardarlo, el aviso sale siempre */ }
   }
 
   /* Sin pantalla, para poder probarla sola: dado cuántas fichas hay
@@ -91,20 +83,6 @@
     return { n: viejas.length, viejas: viejas };
   }
 
-  /* ---------- las cajas, junto a panel-avisos / panel-frescura ---------- */
-
-  function caja(id) {
-    var c = $(id);
-    if (c) return c;
-    var referencia = $('panel-frescura') || $('panel-avisos');
-    if (!referencia || !referencia.parentNode) return null;
-    c = document.createElement('div');
-    c.id = id;
-    c.className = 'oculto';
-    referencia.parentNode.insertBefore(c, referencia);
-    return c;
-  }
-
   function irAMantenimiento(idBloque) {
     App.ir('ajustes');
     if (typeof App.cambiarPestanaAjustes === 'function') App.cambiarPestanaAjustes('mantenimiento');
@@ -113,34 +91,17 @@
   }
 
   async function pintarHuerfanas() {
-    var c = caja('panel-huerfanas');
-    if (!c) return;
+    if (!window.AvisosLinea) return;
     var huerfanas = await calcularHuerfanas();
     if (!huerfanas.length || !sePintaHuerfanas(huerfanas.length, guardadoHuerfanas())) {
-      c.className = 'oculto'; c.innerHTML = ''; return;
+      AvisosLinea.registrar('huerfanas', null);
+      return;
     }
-
-    c.className = 'aviso aviso-ambar';
-    c.innerHTML = '<strong>Hay ' + huerfanas.length +
-      (huerfanas.length === 1 ? ' ficha sin carpeta.' : ' fichas sin carpeta.') + '</strong> ';
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'boton';
-    btn.textContent = 'Verlas';
-    btn.onclick = function () { irAMantenimiento('bloque-huerfanas'); };
-    c.appendChild(btn);
-
-    var cerrar = document.createElement('button');
-    cerrar.type = 'button';
-    cerrar.className = 'boton';
-    cerrar.title = 'Ocultar este aviso durante 7 días';
-    cerrar.textContent = '✕';
-    cerrar.onclick = function () {
-      callarHuerfanas(huerfanas.length);
-      c.className = 'oculto';
-      c.innerHTML = '';
-    };
-    c.appendChild(cerrar);
+    AvisosLinea.registrar('huerfanas', {
+      texto: huerfanas.length === 1 ? '1 ficha sin carpeta' : huerfanas.length + ' fichas sin carpeta',
+      rojo: false,
+      onclick: function () { irAMantenimiento('bloque-huerfanas'); }
+    });
   }
 
   /* Medir la papelera recorre sus ficheros: se hace como mucho cada
@@ -150,24 +111,19 @@
   var ultimaPapelera = 0;
 
   async function pintarPapeleraVieja() {
-    var c = caja('panel-papelera-vieja');
-    if (!c) return;
+    if (!window.AvisosLinea) return;
     if (ultimaPapelera && Date.now() - ultimaPapelera < CADA_MS_PAPELERA) return;
     ultimaPapelera = Date.now();
     var r = await calcularPapeleraVieja();
-    if (!r.n) { c.className = 'oculto'; c.innerHTML = ''; return; }
+    if (!r.n) { AvisosLinea.registrar('papelera-vieja', null); return; }
 
     var tamano = await Papelera.tamanoDeViejas(r.viejas);
-    c.className = 'aviso aviso-ambar';
-    c.innerHTML = '<strong>Hay ' + r.n + (r.n === 1 ? ' cosa' : ' cosas') +
-      ' en la papelera desde hace más de ' + Papelera.DIAS_AVISO + ' días' +
-      ' (' + bytesLegibles(tamano) + ').</strong> ';
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'boton';
-    btn.textContent = 'Verlas';
-    btn.onclick = function () { irAMantenimiento('bloque-papelera'); };
-    c.appendChild(btn);
+    AvisosLinea.registrar('papelera-vieja', {
+      texto: 'papelera: ' + r.n + (r.n === 1 ? ' cosa' : ' cosas') +
+        ' de más de ' + Papelera.DIAS_AVISO + ' días (' + bytesLegibles(tamano) + ')',
+      rojo: false,
+      onclick: function () { irAMantenimiento('bloque-papelera'); }
+    });
   }
 
   async function pintarTodo() {

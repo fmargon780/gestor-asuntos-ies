@@ -172,32 +172,21 @@
     return todosLosGrupos().filter(function (g) { return !estaDescartado(g); });
   }
 
-  /* ---------- el aviso de una línea, junto a "Tablón" ---------- */
+  /* ---------- el trozo de la línea de avisos de arriba ----------
 
-  var botonAviso = null;
-
-  function cajaDelAviso() {
-    if (botonAviso && botonAviso.parentNode) return botonAviso;
-    var acciones = document.querySelector('#pantalla-abiertos .cabecera .acciones');
-    if (!acciones) return null;
-    botonAviso = document.createElement('button');
-    botonAviso.type = 'button';
-    botonAviso.id = 'btn-duplicados';
-    botonAviso.className = 'boton boton-ambar oculto';
-    botonAviso.onclick = function () { I.irADuplicados(); };
-    var antesDe = $('btn-tablon') || $('btn-recargar');
-    if (antesDe && antesDe.parentNode === acciones) acciones.insertBefore(botonAviso, antesDe);
-    else acciones.appendChild(botonAviso);
-    return botonAviso;
-  }
+     Fila 193: antes era su propio botón junto a "Tablón"; ahora se
+     une a los demás avisos en js/avisos-linea.js. Se le deja el mismo
+     id de siempre (btn-duplicados), que ya usan las pruebas. */
 
   function pintarAviso() {
-    var b = cajaDelAviso();
-    if (!b) return;
+    if (!window.AvisosLinea) return;
     var n = gruposActivos().length;
-    if (!n) { b.classList.add('oculto'); return; }
-    b.textContent = '⚠ ' + (n === 1 ? '1 posible duplicado' : n + ' posibles duplicados') + ' — Revisar';
-    b.classList.remove('oculto');
+    AvisosLinea.registrar('duplicados', n ? {
+      texto: '⚠ ' + (n === 1 ? '1 posible duplicado' : n + ' posibles duplicados') + ' — Revisar',
+      rojo: false,
+      id: 'btn-duplicados',
+      onclick: function () { I.irADuplicados(); }
+    } : null);
   }
 
   U.envolver(App, 'App.pintarAbiertos', 'unir-asuntos.js', function (comoEra) {

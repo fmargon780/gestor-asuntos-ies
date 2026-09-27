@@ -11,7 +11,6 @@
 (function () {
 
   var CLAVE_DIAS = 'avisos-dias';
-  var CLAVE_CERRADO = 'avisos-cerrado-el';
   var DIAS_POR_DEFECTO = 7;
 
   function $(id) { return document.getElementById(id); }
@@ -27,21 +26,6 @@
 
   function guardarDias(n) {
     try { window.localStorage.setItem(CLAVE_DIAS, String(n)); } catch (e) {}
-  }
-
-  /* El aviso se puede cerrar, pero solo por hoy: mañana vuelve. */
-  function hoy() {
-    var d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') +
-           '-' + String(d.getDate()).padStart(2, '0');
-  }
-
-  function cerradoHoy() {
-    try { return window.localStorage.getItem(CLAVE_CERRADO) === hoy(); } catch (e) { return false; }
-  }
-
-  function cerrarPorHoy() {
-    try { window.localStorage.setItem(CLAVE_CERRADO, hoy()); } catch (e) {}
   }
 
   /* Cuenta los asuntos abiertos que ya han vencido y los que vencen
@@ -60,59 +44,25 @@
     return { vencidos: vencidos, proximos: proximos, margen: margen };
   }
 
-  function frase(c) {
-    var trozos = [];
-    if (c.vencidos) {
-      trozos.push(c.vencidos === 1 ? '1 asunto vencido' : c.vencidos + ' asuntos vencidos');
-    }
-    if (c.proximos) {
-      trozos.push(c.proximos === 1
-        ? '1 que vence en los próximos ' + c.margen + ' días'
-        : c.proximos + ' que vencen en los próximos ' + c.margen + ' días');
-    }
-    return trozos.join(' y ') + '.';
-  }
-
-  /* El panel de arriba de la pantalla de asuntos abiertos. */
+  /* Fila 193: los dos trozos de este módulo en la línea de avisos de
+     arriba (js/avisos-linea.js), en vez de su propia caja de color. */
   function pintar() {
-    var caja = $('panel-avisos');
-    if (!caja) return;
-
+    if (!window.AvisosLinea) return;
     var c = contar();
-    if ((!c.vencidos && !c.proximos) || cerradoHoy()) {
-      caja.classList.add('oculto');
-      caja.innerHTML = '';
-      return;
-    }
 
-    caja.className = 'aviso ' + (c.vencidos ? 'aviso-rojo' : 'aviso-ambar');
-    caja.innerHTML = '<strong>Tienes ' + frase(c) + '</strong>';
+    AvisosLinea.registrar('plazo-vencidos', c.vencidos ? {
+      texto: (c.vencidos === 1 ? '1 vencido' : c.vencidos + ' vencidos'),
+      rojo: true,
+      onclick: function () { window.Gestor.filtrarPorPlazo('vencidos'); }
+    } : null);
 
-    var botones = document.createElement('div');
-    botones.className = 'avisos-botones';
-
-    if (c.vencidos) {
-      var bv = document.createElement('button');
-      bv.className = 'boton boton-principal';
-      bv.textContent = 'Ver los vencidos';
-      bv.onclick = function () { window.Gestor.filtrarPorPlazo('vencidos'); };
-      botones.appendChild(bv);
-    }
-
-    var bp = document.createElement('button');
-    bp.className = 'boton';
-    bp.textContent = c.vencidos ? 'Ver también los de esta semana' : 'Ver los que vencen pronto';
-    bp.onclick = function () { window.Gestor.filtrarPorPlazo('pronto'); };
-    botones.appendChild(bp);
-
-    var bc = document.createElement('button');
-    bc.className = 'boton';
-    bc.textContent = 'Ocultar por hoy';
-    bc.onclick = function () { cerrarPorHoy(); pintar(); };
-    botones.appendChild(bc);
-
-    caja.appendChild(botones);
-    caja.classList.remove('oculto');
+    AvisosLinea.registrar('plazo-proximos', c.proximos ? {
+      texto: (c.proximos === 1
+        ? '1 vence esta semana'
+        : c.proximos + ' vencen esta semana'),
+      rojo: false,
+      onclick: function () { window.Gestor.filtrarPorPlazo('pronto'); }
+    } : null);
   }
 
   /* El ajuste de los días, en la pantalla de Ajustes. El hueco está en

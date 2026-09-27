@@ -52,12 +52,14 @@ devolver a su sitio.
   (`U.conservandoLoEscrito`, envolviendo todo `#bloque-papelera`). No busca dentro del contenido
   de los documentos borrados, y no toca `_GESTOR/papelera.json`: es solo de pantalla. Vive en
   `js/papelera-ajustes.js`.
-- **El mismo aviso, también en "Asuntos abiertos"** (19-sep-2026, fila 68, 3): antes solo se veía
-  entrando a propósito en Ajustes. `js/avisos-que-faltan.js` pinta una línea junto a
-  `#panel-avisos`/`#panel-frescura` con cuántas cosas son y cuánto ocupan de verdad en disco
+- **El mismo aviso, también en "Asuntos abiertos"** (19-sep-2026, fila 68, 3; desde la fila 193,
+  27-sep-2026, su propio trozo `papelera-vieja` de la línea única de avisos de arriba,
+  `js/avisos-linea.js`, en vez de su propia caja): antes solo se veía entrando a propósito en
+  Ajustes. `js/avisos-que-faltan.js` calcula cuántas cosas son y cuánto ocupan de verdad en disco
   (`Papelera.tamanoDeViejas`, que solo se llama aquí, nunca al pintar la lista entera de la
-  papelera). Sin botón para quitarlo sin decidir: lleva a Ajustes → Mantenimiento, al mismo
-  bloque de siempre. Se repinta al envolver `App.verAbiertos` (no en cada tecla del buscador,
+  papelera). Sin botón propio para quitarlo sin decidir: pulsarlo lleva a Ajustes →
+  Mantenimiento, al mismo bloque de siempre; solo el "Ocultar por hoy" de toda la línea lo calla.
+  Se repinta al envolver `App.verAbiertos` (no en cada tecla del buscador,
   que llama a `window.Gestor.alRefrescar` mucho más a menudo y esto cuesta disco).
 - **Devolver a su sitio**: si el asunto de un documento ya no existe, se ofrece "Por
   clasificar". Si ya hay algo con ese nombre en el destino, no se pisa nada.
@@ -421,22 +423,20 @@ ya no fuerza un recorrido entero del ARCHIVO cuando no se ha leído esta sesión
 (`IndiceArchivo.leerDisco({ todos: true })`, fila 177: de cualquier curso) si existe, o el ARCHIVO
 si ya se ha leído por otro motivo; sin
 ninguna de las dos cosas, un **cerrado** no se comprueba y no se acusa de huérfano por error (un
-**abierto** sin carpeta sí, siempre). `js/avisos-que-faltan.js` pinta con este mismo cálculo una
-línea junto a `#panel-avisos`/`#panel-frescura` en "Asuntos abiertos" que lleva al bloque de
-siempre en Ajustes → Mantenimiento; antes solo se veía entrando a propósito ahí. Se repinta al
-envolver `App.verAbiertos`, no en cada tecla del buscador.
+**abierto** sin carpeta sí, siempre). `js/avisos-que-faltan.js` calcula con este mismo cálculo su trozo `huerfanas` de la línea única
+de avisos (`js/avisos-linea.js`, fila 193) que lleva al bloque de siempre en Ajustes →
+Mantenimiento; antes solo se veía entrando a propósito ahí. Se repinta al envolver
+`App.verAbiertos`, no en cada tecla del buscador.
 
-**Se puede callar 7 días** (20-sep-2026, fila 86,
-`docs/PULSAR-PARA-ABRIR-Y-AVISO-OCULTABLE.md`). A la derecha del botón "Verlas", una ✕ con
-`title` "Ocultar este aviso durante 7 días". Al pulsarla se guarda en `localStorage` (nunca en
-`_GESTOR`: es del ordenador, no del centro), clave `aviso-huerfanas-callado`, un JSON
-`{hasta, n}` con el momento hasta el que calla y cuántas fichas había. La decisión de pintar o no
-vive en una función sin pantalla, `sePintaHuerfanas(nAhora, guardado)`
-(`window.AvisosQueFaltan._sePintaHuerfanas`, para las pruebas): sin nada guardado, o corrupto,
-sale; si `nAhora` es mayor que lo guardado (han aparecido más fichas), sale igual aunque no hayan
-pasado los 7 días; si no, sale solo cuando `Date.now()` ya ha pasado de `hasta`. Como cualquier
-`localStorage` de esta aplicación, dentro de `try/catch`: si el navegador no deja, el aviso sale
-siempre. **El aviso de la papelera vieja se queda sin ✕**: la única salida de ahí sigue siendo
-decidir, porque son datos de menores. Prueba: `pruebas/avisos-que-faltan.mjs`.
+**Callar 7 días, retirado en la fila 193** (era de la fila 86,
+`docs/PULSAR-PARA-ABRIR-Y-AVISO-OCULTABLE.md`): tenía su propia ✕, aparte del "Ocultar por hoy"
+de la caja de vencidos. Desde que todos los avisos comparten una sola línea, con un solo "Ocultar
+por hoy" para todos, esa ✕ ya no tiene sitio propio: ahora la única forma de callar este aviso es
+la general de la línea. La función sin pantalla que decidía si pintarlo o no,
+`sePintaHuerfanas(nAhora, guardado)` (`window.AvisosQueFaltan._sePintaHuerfanas`), se deja tal
+cual (nadie escribe ya la clave `aviso-huerfanas-callado`, así que en la práctica siempre sale)
+por si algún día vuelve a hacer falta un botón propio; la prueba que la comprueba sola,
+`pruebas/avisos-que-faltan.mjs`, sigue en verde. **El aviso de la papelera vieja nunca tuvo ✕**:
+la única salida de ahí siempre fue decidir, porque son datos de menores.
 
 ---
