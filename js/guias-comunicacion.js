@@ -15,12 +15,21 @@
    `js/plantillas-ajustes.js` (mismo patrón que ya usa el cuadro de una
    plantilla, sección 6 del encargo: "no escribas un editor nuevo").
 
-   CÓMO SE USA (desde js/guias.js)
+   CÓMO SE USABA (desde js/guias-editor.js, hasta la fila 199)
 
      d.insertAdjacentHTML('beforeend', GuiasComunicacion.bloqueHTML(p.id, p.comunicacion));
      GuiasComunicacion.enganchar(d, p.id);
      ...
      pasos[i].comunicacion = GuiasComunicacion.leer(caja);   // en recoger()
+
+   DESDE LA FILA 199 (27-sep-2026, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md,
+   apartado 4): «Comunicación de este paso» ya no es una sección del
+   editor — si un paso la tenía, se ha convertido en una tarea del
+   guion (js/guias-paso-tareas.js, que crea su propia plantilla de
+   correo/Séneca con ese texto) al abrir el editor. Nada de este
+   fichero lo llama ya nadie; se deja tal cual (lo siguen cargando
+   pruebas fuera del navegador, como pruebas/biblioteca-de-hitos.mjs)
+   por si algún día hiciera falta un editor parecido.
 
    Se carga después de js/guias.js y de js/plantillas-ajustes.js.
    ============================================================ */

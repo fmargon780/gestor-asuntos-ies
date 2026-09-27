@@ -14,6 +14,18 @@
    recoger(). El catálogo de plantillas se lee UNA vez antes de abrir
    el cuadro (`precargar`, lo llaman js/guias-enganche.js y
    js/guias-biblioteca.js), nunca en cada tecla.
+
+   DESDE LA FILA 199 (27-sep-2026, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md,
+   apartado 4): «Documentos de este paso» ya no es una sección del
+   editor — si un paso la tenía, se ha convertido en una tarea del
+   guion (js/guias-paso-tareas.js) al abrir el editor, sin necesitar el
+   catálogo (la tarea guarda el `id` tal cual). `bloqueHTML` y
+   `enganchar` ya no los llama nadie (se dejan, sin usar, por si algún
+   día hiciera falta un editor parecido); `leer` tampoco, porque la
+   sección ya no está en el DOM. `precargar` y `lineaHTML` siguen en
+   uso, sin cambios: la vista de solo lectura de la guía
+   (`js/guias-vista.js`) todavía enseña «Documentos: …» de lo que un
+   paso viejo, sin abrir aún en el editor, pueda conservar.
    ============================================================ */
 window.GuiasDocumentos = (function () {
 

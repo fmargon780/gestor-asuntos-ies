@@ -100,7 +100,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Tutores legales (del RegAlum, sin alta) y Administraciones (organismos y centros, con departamentos) como tercero.
 - Guías del procedimiento por tipo, con preguntas dentro de las respuestas sin límite, y su mapa
   (dibujo de la guía entera; en un asunto, con el camino elegido resaltado). Se escriben en
-  acordeón: un hito abierto a la vez.
+  acordeón: un hito abierto a la vez. «Documentos» y «Comunicación» del hito se convierten en
+  tareas del guion, solas, al abrir el editor.
 - Panel lateral de lectura; tablón a la vista. Al crear, recuadro con lo que ya tiene el tercero; parada si es idéntico; pantalla "Duplicados".
 - Correo y mensaje de Séneca: se prepara; el correo se envía de verdad (Apps Script, con
   confirmación) y nunca dos veces. Avisar a quien lo pide (fila 195): casilla por hito («al

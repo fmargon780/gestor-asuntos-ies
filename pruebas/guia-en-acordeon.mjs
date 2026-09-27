@@ -2,8 +2,8 @@
    el cuadro de escribir la guía, en acordeón.
 
    1. Al entrar, todos los pasos cerrados, cada uno en una línea con su
-      título y sus marcas (Normativa, Documentos, Guion, Pregunta, Solo
-      informativo, el responsable).
+      título y sus marcas (Normativa, Tareas, Pregunta, Solo informativo,
+      el responsable).
    2. Pulsar la línea abre el paso; pulsarla otra vez lo cierra; abrir
       otro cierra el primero.
    3. «Añadir un paso»: sale abierto, con el cursor en su título.
@@ -12,7 +12,9 @@
    6. Un paso nuevo dentro de una opción sale abierto sin cerrar el
       paso-pregunta que lo contiene; abrir otro de arriba cierra los dos.
    7. Desde el mapa (`irA`), el paso sale abierto.
-   8. «Documentos» y «Guion» con la misma caja gris y letra que los demás.
+   8. «Tareas» con la misma caja gris y letra que los demás (fila 199: el
+      paso de partida ya trae, además de su tarea, la de «Generar un
+      documento» convertida de `plantillasDocumento` al abrir el editor).
    9. Lo guardado no cambia: un paso cerrado conserva todo lo suyo.
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
@@ -77,10 +79,10 @@ async function abrirEditor(opciones) {
 console.log('--- 1. al entrar, todo cerrado ---');
 await abrirEditor();
 await comprobar('ningún paso abierto', abiertos(), []);
-await comprobar('cada línea: título y marcas',
+await comprobar('cada línea: título y marcas (fila 199: «Documentos (1)» se ha convertido en una tarea más)',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#guia-pasos > .paso-editor > .paso-cabecera > .paso-resumen'))
     .map(r => r.textContent)),
-  ['Registrar la entradaNormativa (2)Documentos (1)Tareas (1)Secretaría', '¿Cómo ha llegado?Pregunta',
+  ['Registrar la entradaNormativa (2)Tareas (2)Secretaría', '¿Cómo ha llegado?Pregunta',
    'Avisar a la familiaSolo informativo', 'Archivar']);
 await comprobar('cerrado solo se ve la línea (el campo del título y el cuerpo, escondidos)',
   pagina.evaluate(() => {
@@ -147,15 +149,17 @@ await linea(0);
 await comprobar('abrir uno de arriba cierra la pregunta y su paso', abiertos(), ['Registrar la entrada']);
 
 /* ================= 8 ================= */
-console.log('--- 8. las cajas de «Documentos» y «Guion» ---');
+console.log('--- 8. la caja de «Tareas» (fila 199: ya no hay «Documentos») ---');
+await comprobar('sin la sección «Documentos de este paso»: se ha convertido en una tarea',
+  pagina.evaluate(() => !document.querySelector('#guia-pasos > .paso-editor[data-pos="0"] > .paso-documentos')), true);
 await comprobar('misma caja gris y misma letra que «Responsable, estado y plazo»',
   pagina.evaluate(() => {
     const d = document.querySelector('#guia-pasos > .paso-editor[data-pos="0"]');
     const mira = (sel) => { const el = d.querySelector(sel); const s = getComputedStyle(el); const t = getComputedStyle(el.querySelector('summary'));
       return [s.backgroundColor, s.borderTopWidth, s.borderRadius, t.fontSize]; };
     const base = JSON.stringify(mira(':scope > .paso-extra'));
-    return [JSON.stringify(mira(':scope > .paso-documentos')) === base, JSON.stringify(mira(':scope > .paso-guion')) === base];
-  }), [true, true]);
+    return JSON.stringify(mira(':scope > .paso-guion')) === base;
+  }), true);
 
 /* ================= 9 ================= */
 console.log('--- 9. guardar ---');
@@ -163,9 +167,9 @@ await pagina.click('#cuadro-aceptar');
 const guardada = await pagina.evaluate(() => window.__guardada);
 await comprobar('los pasos, en su orden nuevo', Promise.resolve(guardada.map(p => p.titulo)),
   ['Registrar la entrada', '¿Cómo ha llegado?', 'Archivar', 'Avisar a la familia', 'Pagar']);
-await comprobar('lo de un paso cerrado no se pierde',
-  Promise.resolve([guardada[0].normativa.length, guardada[0].guion.length, guardada[0].responsable, guardada[3].soloInformativo]),
-  [2, 1, 'r1', true]);
+await comprobar('lo de un paso cerrado no se pierde (fila 199: su «Documentos» convertido cuenta como una tarea más)',
+  Promise.resolve([guardada[0].normativa.length, guardada[0].guion.length, guardada[0].plantillasDocumento.length, guardada[0].responsable, guardada[3].soloInformativo]),
+  [2, 2, 0, 'r1', true]);
 await comprobar('el paso nuevo de la opción, guardado', Promise.resolve(guardada[1].opciones[0].pasos.map(p => p.titulo)),
   ['Poner el sello', 'Escanear']);
 

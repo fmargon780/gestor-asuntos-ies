@@ -1,13 +1,17 @@
 /* ============================================================
    guias-paso-bloques.js — los bloques de dentro de un paso de la guía que
-   no es pregunta: lo que hay que reunir, comunicación, documentos, guion,
-   solo informativo, normativa y formularios, y «Guardar en la biblioteca».
+   no es pregunta: guion (tareas), solo informativo, avisar a quien lo
+   pide, normativa y formularios, y «Guardar en la biblioteca».
 
    Sacado tal cual de `pintar()` del editor (js/guias-editor.js) en la
    fila 133 (docs/PARTIR-FICHEROS-GRANDES.md), sin cambiar nada de lo que
    hace. Recibe el mismo contexto que la caja de opciones
    (js/guias-opciones-editor.js): `ctx.nivel()`, `ctx.recoger()`,
    `ctx.pintar()` y `ctx.restaurar(det, pos, idSub)`.
+
+   Desde la fila 199 ya no pinta «Comunicación de este paso» ni
+   «Documentos de este paso»: se convierten en tareas del guion al abrir
+   el editor (js/guias-paso-tareas.js).
    ============================================================ */
 var GuiasPasoBloques = (function () {
 
@@ -45,25 +49,13 @@ var GuiasPasoBloques = (function () {
        sección, js/guias-editor.js no toca los `requisitos` viejos del
        paso: se quedan en el fichero, sin leerse. */
 
-    /* "Comunicación de este paso" (18-sep-2026, fila 60,
-       docs/COMUNICAR-DESDE-EL-HITO.md): mismo criterio, solo en los
-       pasos que no son pregunta. A diferencia del bloque de arriba,
-       son solo campos de texto: no hace falta recoger()+pintar() en
-       cada tecla, basta con leerlos en recoger() como el título o
-       el cuerpo del paso. */
-    if (!pregunta && window.GuiasComunicacion) {
-      d.insertAdjacentHTML('beforeend', GuiasComunicacion.bloqueHTML(p.id, p.comunicacion));
-      ctx.restaurar(d.querySelector(':scope > .paso-comunicacion'), i, '');
-      GuiasComunicacion.enganchar(d, p.id);
-    }
+    /* «Comunicación de este paso» y «Documentos de este paso» ya no son
+       secciones propias del editor (27-sep-2026, fila 199,
+       docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md, apartado 4): si el paso
+       traía algo, se ha convertido en una tarea del guion, de abajo, al
+       abrir este mismo editor (js/guias-paso-tareas.js, llamado desde
+       js/guias-editor.js antes del primer pintar()). */
 
-    /* «Documentos de este paso» (fila 102, js/guias-documentos.js):
-       mismo criterio, solo en los pasos que no son pregunta. */
-    if (!pregunta && window.GuiasDocumentos) {
-      d.insertAdjacentHTML('beforeend', GuiasDocumentos.bloqueHTML(p.plantillasDocumento));
-      ctx.restaurar(d.querySelector(':scope > .paso-documentos'), i, '');
-      GuiasDocumentos.enganchar(d);
-    }
     /* «Guion de este paso» (fila 109, js/guias-guion.js). */
     if (!pregunta && window.GuiasGuion) {
       d.insertAdjacentHTML('beforeend', GuiasGuion.bloqueHTML(p.guion));

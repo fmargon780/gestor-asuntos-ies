@@ -192,10 +192,12 @@ var HitosBiblioteca = (function () {
     { clave: 'responsable', etiqueta: 'Responsable' },
     { clave: 'estadoAsunto', etiqueta: 'Estado del asunto' },
     { clave: 'plazo', etiqueta: 'Plazo' },
-    /* «Lo que hay que reunir» ya no se compara aparte: va en el guion (fila 138). */
-    { clave: 'comunicacion', etiqueta: 'Comunicación de este hito' },
+    /* «Lo que hay que reunir» ya no se compara aparte: va en el guion (fila 138).
+       «Comunicación de este hito» y «Documentos» tampoco, desde la fila 199
+       (docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md, apartado 4): sus dos campos se
+       convierten en tareas del guion al abrir el editor, así que comparan
+       igual que cualquier otra tarea, dentro de 'guion'. */
     { clave: 'normativa', etiqueta: 'Normativa' },
-    { clave: 'plantillasDocumento', etiqueta: 'Documentos' },
     { clave: 'guion', etiqueta: 'Tareas' },
     /* «Avisar a quien lo pide» (fila 195). */
     { clave: 'avisarLoPide', etiqueta: 'Avisar a quien lo pide' },

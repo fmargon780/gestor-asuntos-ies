@@ -26,8 +26,18 @@
      vieja no tiene por qué dejar de escribirse). */
   /* `opciones.irA` (fila 113): el id de un hito; el cuadro se abre ya en
      su nivel y con él desplegado (lo usa el mapa, js/guias-mapa.js). */
-  function editar(nombreTipo, lista, listaResponsables, listaEstados, opciones) {
+  async function editar(nombreTipo, lista, listaResponsables, listaEstados, opciones) {
     var pasos = G.normalizar(lista);
+    /* Fila 199 (docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md, apartado 4): antes
+       de pintar nada, «Documentos de este paso» y «Comunicación de este
+       paso» de cada paso (y subpaso, a cualquier profundidad) se
+       convierten en tareas del guion, sin preguntar (js/guias-paso-tareas.js).
+       Sin conversión posible (fallo al crear la plantilla de
+       comunicación), no es crítico: se reintenta la próxima vez que se
+       abra este mismo editor. */
+    if (window.GuiasPasoTareas) {
+      try { await GuiasPasoTareas.convertirGuia(pasos, nombreTipo); } catch (e) { /* se reintenta la próxima vez */ }
+    }
     /* Fila 95 (docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md): el nivel que
        se ve (la guía entera, o los hitos de una opción de una pregunta
        de dentro) y el camino hasta él, como carpetas. Todo lo que
@@ -202,14 +212,11 @@
           nivel[i].requisitos = GuiasRequisitos.leer(caja);
         }
 
-        /* "Comunicación de este hito" (18-sep-2026, fila 60): mismo
-           criterio que arriba, solo en los hitos que no son pregunta. */
-        if (window.GuiasComunicacion && caja.querySelector(':scope > .paso-comunicacion')) {
-          nivel[i].comunicacion = GuiasComunicacion.leer(caja, nivel[i].id);
-        }
-        if (window.GuiasDocumentos && caja.querySelector(':scope > .paso-documentos')) {
-          nivel[i].plantillasDocumento = GuiasDocumentos.leer(caja);   /* fila 102 */
-        }
+        /* Fila 199: «Comunicación de este hito» y «Documentos de este
+           hito» ya no son secciones del editor (se convierten en tareas
+           del guion al abrir, js/guias-paso-tareas.js), así que
+           `nivel[i].comunicacion`/`plantillasDocumento` no se vuelven a
+           leer del DOM: se quedan como los dejó la conversión. */
         if (window.GuiasGuion && caja.querySelector(':scope > .paso-guion')) nivel[i].guion = GuiasGuion.leer(caja);   /* fila 109 */
 
         /* "Solo informativo" y "Normativa" (20-sep-2026, fila 79): igual,
@@ -256,12 +263,7 @@
             var cuerpoEl = sc.querySelector(':scope > .subpaso-cuerpo');
             if (cuerpoEl) sp.cuerpo = G.limpiar(cuerpoEl.innerHTML);
             if (window.GuiasRequisitos && sc.querySelector(':scope > .paso-requisitos')) sp.requisitos = GuiasRequisitos.leer(sc);
-            if (window.GuiasComunicacion && sc.querySelector(':scope > .paso-comunicacion')) {
-              sp.comunicacion = GuiasComunicacion.leer(sc, sp.id);
-            }
-            if (window.GuiasDocumentos && sc.querySelector(':scope > .paso-documentos')) {
-              sp.plantillasDocumento = GuiasDocumentos.leer(sc);   /* fila 102 */
-            }
+            /* Fila 199: mismo criterio que arriba, para el subpaso. */
             if (window.GuiasGuion && sc.querySelector(':scope > .paso-guion')) sp.guion = GuiasGuion.leer(sc);   /* fila 109 */
             var esPreg = sc.querySelector(':scope > .paso-es-pregunta-fila .subpaso-es-pregunta');
             if (esPreg && !esPreg.checked) sp.opciones = [];

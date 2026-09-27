@@ -5,6 +5,47 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 199: documentos y comunicaciones del hito, como tareas
+
+`docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartado 4 (el único de toda la fila 184 original que
+cambia datos guardados). «Documentos de este paso» y «Comunicación de este paso» desaparecen del
+editor de la guía: su contenido pasa a ser tareas del guion del hito (`js/guias-guion.js`), el
+mismo sitio que ya lee la mesa del hito para generar un documento o comunicar (fila 164,
+`js/hito-mesa-recetas.js`) — no hacía falta un mecanismo nuevo, solo generar las tareas desde la
+conversión.
+
+**La conversión** vive en `js/guias-paso-tareas.js` (nuevo), `GuiasPasoTareas.convertirGuia(pasos,
+nombreTipo)`: se llama una vez, al abrir el cuadro de la guía entera (`js/guias-editor.js`,
+`editar()`, ahora `async`, justo después de `Guias.normalizar(lista)` y antes del primer
+`pintar()`), recorriendo todos los pasos y subpasos, a cualquier profundidad de opciones. Cada
+`id` de `plantillasDocumento` se convierte en una tarea «Generar un documento»
+(`accion: 'generar'`, `receta: { plantilla: id }`); el texto de `comunicacion` (si algún canal
+tenía cuerpo) en una tarea «Comunicar», creando antes una plantilla nueva en `plantillas.json →
+lista` con ese texto y el título del hito por nombre (una plantilla general sirve igual para
+correo y para Séneca, como las demás; sin campo de "asunto", así que el de la comunicación del
+paso no se conserva — pérdida pequeña, ya del propio modelo de plantilla, no nueva de esta fila).
+
+**Idempotente sin necesitar marcar nada**: convertir vacía `plantillasDocumento` (a `[]`) y
+`comunicacion` (a `null`) en cuanto crea su tarea, y como el editor ya no vuelve a escribir en
+esos dos campos (las secciones desaparecen de `js/guias-paso-bloques.js` y
+`js/guias-opciones-editor.js`), abrir el editor una segunda vez no encuentra nada que convertir:
+no se duplica ninguna tarea. Sin poder crear la plantilla de comunicación (sin gestor, o falla el
+guardado), no es crítico: se queda sin vaciar y se reintenta la próxima vez.
+
+Los asuntos abiertos no cambian: sigue siendo la misma guía, leída en vivo por `origenGuia`, así
+que las tareas nuevas funcionan igual que las dos secciones de antes. Solo se toca `guias.json`
+(nunca `hitos.json`); `js/hitos.js` no necesitaba tocarse (un asunto nuevo ya crea sus tareas
+bien, porque `pasoDe`/`guionDe` (`js/hitos-guion.js`) leen el guion del paso en vivo, sea de
+donde venga). `HitosBiblioteca.CAMPOS_COMPARABLES` deja de comparar `comunicacion` y
+`plantillasDocumento` sueltos (entran dentro de `guion`); no se ha tocado nada más de la
+biblioteca de hitos.
+
+Se quita `pruebas/insertar-hueco-en-el-paso.mjs` (probaba «Insertar hueco» dentro de
+«Comunicación de este paso», que ya no existe). Se actualizan `pruebas/guia-en-acordeon.mjs`
+(las marcas del acordeón y lo guardado de un paso cerrado) y `pruebas/documentos-desde-el-hito.mjs`
+(la comparación de la biblioteca ya no ve `plantillasDocumento`, y su punto 6 prueba la
+conversión, con documentos y con comunicación, y que reabrir el editor no duplica nada).
+
 ## 27-sep-2026 — Fila 198: la pantalla del tipo, de arriba abajo
 
 `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartados 1, 2, 3, 5 y 8 (los apartados 4, 6 y 7 son

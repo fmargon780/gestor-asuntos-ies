@@ -5,7 +5,8 @@
 
    1. `plantillasDocumento` se normaliza (lista buena, basura, repetidos)
       y un paso-pregunta lo descarta, a cualquier nivel.
-   2. HitosBiblioteca.diferencias detecta el cambio de plantillas.
+   2. Desde la fila 199, HitosBiblioteca.diferencias ya no compara
+      "plantillasDocumento" suelto (pasó al guion, como cualquier tarea).
    3. Agrupar «De este paso» / «Otras de este tipo», sin repetir e
       ignorando los id borrados.
    4. Los huecos nuevos: con hito, rellenos; sin hito, vacíos y fuera de
@@ -14,6 +15,13 @@
    5. El botón «Generar documento» sale en el hito cuyo paso tiene una
       plantilla, y no en uno sin ninguna; generar desde él deja el
       documento apuntado a ese hito y una nota en su historial.
+   6. Fila 199 (docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md, apartado 4): al
+      abrir el editor de un paso con «Documentos de este paso», la
+      sección ya no sale, y cada plantilla marcada se ha convertido en
+      una tarea «Generar un documento» del guion; reabrir el editor con
+      lo ya guardado no la duplica. Lo mismo con «Comunicación de este
+      paso», creando una plantilla nueva con el texto y el nombre del
+      hito cuando hace falta.
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
@@ -101,7 +109,7 @@ await comprobar('un paso-pregunta la descarta, también dentro de una opción',
 
 /* ---------- 2. la biblioteca ---------- */
 console.log('--- 2. la biblioteca ---');
-await comprobar('HitosBiblioteca.diferencias ve el cambio de plantillas, con sus nombres',
+await comprobar('HitosBiblioteca.diferencias ya no compara "plantillasDocumento" (fila 199: pasó al guion)',
   pagina.evaluate(async () => {
     await Plantillas.cargar(App.E.gestor);
     const modelo = HitosBiblioteca._normalizarModelo({ titulo: 'Recoger', plantillasDocumento: ['pd-a'] });
@@ -109,8 +117,8 @@ await comprobar('HitosBiblioteca.diferencias ve el cambio de plantillas, con sus
     const iguales = HitosBiblioteca.diferencias(paso, modelo).length;
     paso.plantillasDocumento = ['pd-a', 'pd-b', 'pd-borrada'];
     const d = HitosBiblioteca.diferencias(paso, modelo).filter(x => x.campo === 'plantillasDocumento')[0];
-    return [iguales, d && d.etiqueta, d && d.antes];
-  }), [0, 'Documentos', 'Acuse de recibo, Certificado, (plantilla borrada)']);
+    return [iguales, d];
+  }), [0, undefined]);
 
 /* ---------- 3. agrupar ---------- */
 console.log('--- 3. agrupar ---');
@@ -176,26 +184,81 @@ await comprobar('el documento está en la carpeta', Promise.resolve(r5.ficheros.
 await comprobar('apuntado a ese hito', Promise.resolve(r5.docs), [esperado]);
 await comprobar('con su nota en el hito', Promise.resolve(r5.notas), ['Generado «' + esperado + '»']);
 
-/* ---------- 6. el editor del paso ---------- */
-console.log('--- 6. «Documentos de este paso» en el editor ---');
+/* ---------- 6. «Documentos de este paso» se convierte en una tarea (fila 199) ---------- */
+console.log('--- 6. al abrir el editor, «Documentos de este paso» se convierte en una tarea ---');
 /* Fila 155: el Word recién generado se abre en grande (js/word-visor.js): se cierra. */
 await pagina.evaluate(() => window.WordVisor && WordVisor.cerrar());
 await pagina.evaluate(() => { App.volverALaLista(); });
 await pagina.evaluate(() => {
   window.__editada = Guias.editar('MATRICULA', [{ id: 'e1', titulo: 'Paso', plantillasDocumento: ['pd-a', 'pd-borrada'] }], [], []);
 });
-await pagina.waitForSelector('#guia-pasos .paso-documentos', { state: 'attached' });   /* fila 122: el paso nace cerrado */
-await comprobar('sale la sección, con la del paso marcada y la borrada tachada',
-  pagina.evaluate(() => {
-    const d = document.querySelector('#guia-pasos .paso-documentos');
-    return [d.querySelector('.guiadoc-casilla[data-id="pd-a"]').checked,
-            d.querySelector('.guiadoc-casilla[data-id="pd-b"]').checked,
-            d.textContent.indexOf('(plantilla borrada)') > -1];
-  }), [true, false, true]);
-await pagina.evaluate(() => { document.querySelector('.guiadoc-casilla[data-id="pd-b"]').click(); });
+await pagina.waitForSelector('#guia-pasos .paso-editor[data-pos="0"]');   /* fila 122: el paso nace cerrado, pero sigue en el DOM */
+await comprobar('«Documentos de este paso» ya no sale en el editor',
+  pagina.evaluate(() => !document.querySelector('#guia-pasos .paso-documentos')), true);
+await comprobar('se ha convertido en una tarea «Generar un documento» por cada plantilla marcada, con su receta',
+  pagina.evaluate(() => Array.from(document.querySelectorAll('#guia-pasos .guion-fila')).map(f => [
+    f.querySelector('.guion-fila-linea > .guion-texto').value,
+    f.querySelector('.guion-fila-linea > .guion-accion').value,
+    f.querySelector('.guion-receta-plantilla') ? f.querySelector('.guion-receta-plantilla').value : null
+  ])),
+  [['Generar un documento', 'generar', 'pd-a'], ['Generar un documento', 'generar', 'pd-borrada']]);
 await pagina.click('#cuadro-aceptar');
-await comprobar('al guardar: las marcadas, y la borrada se quita',
-  pagina.evaluate(async () => (await window.__editada)[0].plantillasDocumento), ['pd-a', 'pd-b']);
+const editada6 = await pagina.evaluate(() => window.__editada);
+await comprobar('al guardar: sin «plantillasDocumento» (movidas a tareas)',
+  Promise.resolve(editada6[0].plantillasDocumento), []);
+await comprobar('con las dos tareas, cada una con su plantilla',
+  Promise.resolve(editada6[0].guion.map(g => [g.texto, g.accion, g.receta && g.receta.plantilla])),
+  [['Generar un documento', 'generar', 'pd-a'], ['Generar un documento', 'generar', 'pd-borrada']]);
+
+/* Reabrir el editor con lo que se acaba de guardar: no duplica nada
+   (la conversión es idempotente porque «plantillasDocumento» ya se
+   vació al convertir la primera vez). */
+await pagina.evaluate((guardado) => {
+  window.__reeditada = Guias.editar('MATRICULA', guardado, [], []);
+}, editada6);
+await pagina.waitForSelector('#guia-pasos .paso-editor[data-pos="0"]');
+await comprobar('reabrir el editor no duplica la tarea',
+  pagina.evaluate(() => document.querySelectorAll('#guia-pasos .guion-fila').length), 2);
+await pagina.click('#cuadro-aceptar');
+await pagina.evaluate(() => window.__reeditada);
+
+/* «Comunicación de este paso» sigue el mismo camino, pero como el texto
+   nunca venía de una plantilla, hace falta crear una nueva. */
+console.log('--- 6b. «Comunicación de este paso» también se convierte en una tarea ---');
+await pagina.evaluate(() => { App.volverALaLista(); });
+await pagina.evaluate(() => {
+  window.__editadaCom = Guias.editar('MATRICULA', [{
+    id: 'e2', titulo: 'Avisar a la familia',
+    comunicacion: { correo: { asunto: 'Aviso', cuerpo: 'Le informamos de {nombre}.' }, seneca: { asunto: '', cuerpo: '' } }
+  }], [], []);
+});
+await pagina.waitForSelector('#guia-pasos .paso-editor[data-pos="0"]');
+await comprobar('«Comunicación de este paso» ya no sale en el editor',
+  pagina.evaluate(() => !document.querySelector('#guia-pasos .paso-comunicacion')), true);
+await pagina.click('#cuadro-aceptar');
+const editadaCom = await pagina.evaluate(() => window.__editadaCom);
+await comprobar('sin comunicación suelta, con una tarea «Comunicar» por correo',
+  Promise.resolve([editadaCom[0].comunicacion.correo.cuerpo, editadaCom[0].comunicacion.seneca.cuerpo,
+    editadaCom[0].guion.map(g => [g.texto, g.accion, g.receta && g.receta.via])]),
+  ['', '', [['Comunicar', 'comunicar', 'correo']]]);
+const idPlantillaNueva = editadaCom[0].guion[0].receta.plantilla;
+await comprobar('la plantilla nueva existe, con el nombre del hito y su texto',
+  pagina.evaluate(async (id) => {
+    const datos = await Plantillas.cargar(App.E.gestor);
+    const p = (datos.lista || []).filter(x => x.id === id)[0];
+    return p && [p.nombre, p.texto];
+  }, idPlantillaNueva),
+  ['Avisar a la familia', 'Le informamos de {nombre}.']);
+/* Reabrir con lo ya guardado: sin comunicación que convertir, no se
+   crea una segunda plantilla ni se duplica la tarea. */
+await pagina.evaluate((guardado) => {
+  window.__reeditadaCom = Guias.editar('MATRICULA', guardado, [], []);
+}, editadaCom);
+await pagina.waitForSelector('#guia-pasos .paso-editor[data-pos="0"]');
+await comprobar('reabrir no duplica la tarea «Comunicar»',
+  pagina.evaluate(() => document.querySelectorAll('#guia-pasos .guion-fila').length), 1);
+await pagina.click('#cuadro-aceptar');
+await pagina.evaluate(() => window.__reeditadaCom);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 await navegador.close();

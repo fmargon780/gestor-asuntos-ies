@@ -44,7 +44,7 @@ cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegi
   (`js/guias-opciones-editor.js`, `GuiasOpcionesEditor.caja(ctx, p, i)`).
 - **El editor, en acordeón** (fila 122, `docs/GUIA-EN-ACORDEON.md`, `js/guias-plegado.js`). Cada
   paso cerrado es una línea: número, título y marcas (`GuiasPlegado.marcas`: Pregunta, Solo
-  informativo, Normativa (N), Documentos (N), Guion (N), el responsable), con ↑ ↓ y «Quitar».
+  informativo, Normativa (N), Tareas (N), el responsable), con ↑ ↓ y «Quitar».
   Pulsar la línea (fuera de botones y campos) lo abre o lo cierra. **Un solo paso abierto** en
   todo el editor (`abierto`, un id); si es un paso de una opción, su paso-pregunta sigue abierto.
   No se quita nada del DOM: la clase `paso-plegado` y el CSS esconden todo menos la cabecera, así
@@ -55,8 +55,8 @@ cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegi
   paso», «+ Añadir un paso a esta opción», «+ Traer de la biblioteca») sale abierto con el cursor
   en su título; las flechas no abren ni cierran y la pantalla sigue al paso. No hay error al
   guardar que abrir (el punto 9 de la fila no tiene hoy a qué aplicarse: un paso vacío se descarta
-  sin avisar). «Documentos de este paso» y «Guion de este paso» toman la caja gris de los demás
-  apartados (`css/guias.css`). Prueba: `pruebas/guia-en-acordeon.mjs`.
+  sin avisar). «Tareas de este hito» (el guion) toma la caja gris de los demás apartados
+  (`css/guias.css`). Prueba: `pruebas/guia-en-acordeon.mjs`.
 
 - **Preguntas dentro de las respuestas, sin límite de niveles** (fila 95, 23-sep-2026,
   `docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md`; antes, una sola bifurcación por paso). Un paso de
@@ -94,20 +94,13 @@ cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegi
   imperativo del resto del editor: cada `+ Añadir`/quitar/mover fila hace `recoger(); mutar el
   array; pintar();`. `js/guias.js` solo llama a las dos funciones, y en `recoger()` copia lo leído a
   `pasos[i].requisitos` (o al del subpaso que toque).
-- **"Comunicación de este paso"** (18-sep-2026, fila 60, `docs/COMUNICAR-DESDE-EL-HITO.md`): un
-  paso (o un subpaso; nunca un paso-pregunta, mismo criterio que arriba) puede llevar su propio
-  texto de correo y/o de Séneca, aparte de la plantilla general del tipo —
-  `comunicacion: { correo: {asunto, cuerpo}, seneca: {asunto, cuerpo} }` —, normalizado por
+- **"Comunicación de este paso"** (18-sep-2026, fila 60 → retirada la fila 199, ver más abajo
+  "Documentos y comunicación del hito, como tareas"): así era hasta la fila 199. `comunicacion:
+  { correo: {asunto, cuerpo}, seneca: {asunto, cuerpo} }`, normalizado por
   `Guias.normalizarComunicacion` (un canal "vacío" es el que tiene el cuerpo en blanco, aunque
-  tenga asunto). **En `hitos.json` no se guarda copia**: el hito lo lee de la guía de su tipo por
-  `origenGuia` en el momento de pulsar "Comunicar" (así, si Francisco cambia el texto del paso, los
-  asuntos vivos usan el nuevo). `js/guias-comunicacion.js` (nuevo) pinta la sección plegable, con
-  dos pestañas (Correo/Séneca) y, en cada una, asunto + el mismo campo de texto con "Insertar
-  hueco" que ya montaba el cuadro de una plantilla (`PlantillasAjustes.campoDeTextoHTML`/
-  `engancharCampoDeTexto`, sacados de `js/plantillas-ajustes.js` para reutilizarlos aquí sin
-  escribir un segundo editor). A diferencia de `js/guias-requisitos.js`, son solo campos de texto:
-  no hace falta `recoger();mutar;pintar()` en cada tecla, `GuiasComunicacion.leer(caja, idPaso)` los
-  lee en el propio `recoger()` del paso, como el título o el cuerpo.
+  tenga asunto), sigue siendo la forma del campo (por si una guía todavía sin abrir en el editor lo
+  trae), pero `js/guias-comunicacion.js` ya no pinta ninguna sección: sus `bloqueHTML`/`enganchar`/
+  `leer` no los llama nadie, solo se conserva el fichero por si algo lo necesitara releer.
 - **Un `<details>` recién repintado nace cerrado** (18-sep-2026, fila 60, encontrado en el navegador
   de verdad): "+ Añadir"/quitar/mover una fila de `.paso-requisitos`, o cualquier tecla que dispare
   un `recoger();mutar;pintar()` del paso, reconstruye `#guia-pasos` entero y con él el `<details>`
@@ -118,16 +111,50 @@ cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegi
 
 Se comprueba con `pruebas/guias.mjs` y `pruebas/opciones.mjs`.
 
+### Documentos y comunicación del hito, como tareas (27-sep-2026, fila 199, `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartado 4)
+
+«Documentos de este paso» y «Comunicación de este paso» (de las dos secciones de más abajo)
+desaparecieron del editor de la guía: su contenido pasa a ser **tareas** del guion del hito
+(`js/guias-guion.js`), el mismo sitio que ya lee la mesa del hito para generar un documento o
+comunicar (`js/hito-mesa-recetas.js`, fila 164).
+
+- **La conversión** (`js/guias-paso-tareas.js`, `GuiasPasoTareas.convertirGuia(pasos, nombreTipo)`):
+  se llama una vez, al abrir el cuadro de la guía entera (`js/guias-editor.js`, `editar()`, justo
+  después de `Guias.normalizar(lista)` y antes del primer `pintar()`), sobre todos los pasos y
+  subpasos, a cualquier profundidad de opciones. Cada `id` de `plantillasDocumento` se convierte en
+  una tarea `{ accion: 'generar', receta: { plantilla: id } }` ("Generar un documento"); el texto de
+  `comunicacion` (si algún canal tenía cuerpo), en una tarea `{ accion: 'comunicar', receta: { via,
+  plantilla } }` ("Comunicar"), creando antes una plantilla nueva en `plantillas.json → lista` con
+  ese texto y el título del hito por nombre (una plantilla general sirve igual para correo y para
+  Séneca, como todas las demás; sin campo de "asunto", así que el asunto del paso no se conserva).
+  Sin gestor o si falla el guardado de la plantilla, no es crítico: `comunicacion` se queda sin
+  vaciar y se reintenta la próxima vez que se abra el editor.
+- **Idempotente**: convertir vacía `plantillasDocumento` (a `[]`) y `comunicacion` (a `null`, que
+  `Guias.normalizarComunicacion` deja como los dos canales vacíos) en cuanto crea su tarea. Como el
+  editor ya no vuelve a escribir en esos dos campos, abrir el editor una segunda vez no encuentra
+  nada que convertir: no se duplica ninguna tarea.
+- **Los asuntos abiertos no cambian**: sigue siendo la misma guía, leída en vivo por `origenGuia`
+  (`js/hitos-guion.js`, `js/hito-mesa-recetas.js`), así que las tareas nuevas funcionan ahí igual que
+  las dos secciones de antes; solo se toca `guias.json` (nunca `hitos.json`), y solo con esta
+  conversión.
+- `HitosBiblioteca.CAMPOS_COMPARABLES` ya no compara `comunicacion` ni `plantillasDocumento` sueltos:
+  el cambio de cualquiera de los dos entra dentro de la comparación de `guion` (`'Tareas'`), como
+  cualquier otra tarea.
+- Prueba: `pruebas/documentos-desde-el-hito.mjs` (6 y 6b): abrir un paso con «Documentos de este
+  paso» (o con «Comunicación de este paso») lo convierte en una tarea al abrir el editor, y reabrirlo
+  con lo ya guardado no la duplica.
+
 ### Documentos desde el hito (23-sep-2026, fila 102, `docs/DOCUMENTOS-DESDE-EL-HITO.md`)
 
-Primera tanda de que el hito sea la mesa de trabajo del asunto.
+Primera tanda de que el hito sea la mesa de trabajo del asunto. Desde la fila 199 (ver arriba),
+`plantillasDocumento` ya no se escribe desde una sección del editor: llega convertida en una tarea
+del guion; lo de abajo (el propio campo, `HitosGenerar` y el botón «Generar documento») sigue igual.
 
 - **La unión plantilla ↔ paso**: campo `plantillasDocumento: [id]` (los `id` de `plantillas.json →
   documentos`) en un paso, un subpaso o un modelo de la biblioteca; nunca en un paso-pregunta
-  (`Guias.normalizar` lo vacía). Se escribe en «Documentos de este paso» (`js/guias-documentos.js`,
-  buscador con casillas agrupadas por tipo; el catálogo se lee una vez antes de abrir el cuadro,
-  `GuiasDocumentos.precargar`). Un id borrado sale tachado y se quita al guardar. Entra en la
-  comparación de la biblioteca («Documentos»), se copia al traer un modelo y al guardarlo. El hito
+  (`Guias.normalizar` lo vacía). Un id borrado sale tachado y se quita al guardar (cuando todavía
+  llega desde un modelo de la biblioteca o de antes de la fila 199: la conversión no filtra por el
+  catálogo, convierte tal cual lo que hubiera). Se copia al traer un modelo y al guardarlo. El hito
   no guarda copia: lo lee de su paso por `origenGuia` al pulsar. Una plantilla unida al paso vale
   aunque sea de otro tipo de asunto.
 - **«Generar documento» en el hito** (`js/hitos-generar.js`, en `.hito-botones`): sale si el hito no
@@ -214,8 +241,9 @@ como **copia**.
   a campo, `GuiasBiblioteca.comparacionHTML`) y las opciones "Traer el cambio" (conserva la marca
   `soloInformativo` del tipo, nunca la pisa el modelo) / "Dejarlo como está" (calla el aviso sin
   tocar el paso). Se escribe con `GuiasDelCentro.guardarPasos(tipo, pasos)`, sin reabrir el editor.
-- **La comparación** siempre por los mismos campos (`HitosBiblioteca.diferencias`): título,
-  explicación, responsable, a quién le toca, plazo, requisitos, comunicación y normativa.
+- **La comparación** siempre por los mismos campos (`HitosBiblioteca.CAMPOS_COMPARABLES`): título,
+  explicación, responsable, a quién le toca, plazo, normativa y tareas (`guion`; desde la fila 199
+  ahí entran también los cambios de «Documentos» y «Comunicación», que se convierten en tareas).
   **`soloInformativo` no cuenta como cambio**: es una decisión de cada tipo, no del modelo.
 - **Solo informativo** (apartado 4.6): campo `soloInformativo` en un paso de guía, un modelo y un
   hito. Se ve en gris con la etiqueta "Informativo", no sale en "Qué me toca" ni en "Dormidos", no
