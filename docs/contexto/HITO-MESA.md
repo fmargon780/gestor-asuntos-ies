@@ -25,6 +25,12 @@ de un documento, generar o meter un papel en un hito) abre la mesa de ese hito
   desplegable de la cabecera (fila 145); luego, si la tarjeta en grande no es el guion, vuelve al
   guion (fila 147); luego la mesa
   (`HitoMesa.cerrarSiAbierta`); luego la tarjeta (fila 107); luego sale de la ficha.
+- **«← Volver a los hitos»** (fila 194, botón propio al principio de la tira de hitos,
+  `#mesa-volver-hitos`, con texto compacto «← Hitos» y el texto entero en el `title`; no estira
+  como las celdas de hito, `.mesa-tira-volver`): hace lo mismo que ese Escape en ese punto (cierra
+  la mesa, deja la tarjeta Hitos en grande), llamando directamente a la misma función `cerrar()`.
+  Va dentro de la tira, no en una fila propia, para no bajar «QUÉ HAY QUE HACER» de los 250 px de
+  la cabecera compacta (fila 145, `pruebas/cabecera-compacta.mjs`).
 - Con la mesa abierta, la franja de documentos de la tarjeta no sale (`FichaTarjetas.alCambiarLaMesa`).
 - Con el visor o el lector abierto, o por debajo de 1100 px, la zona derecha baja debajo del guion
   (fila 145).

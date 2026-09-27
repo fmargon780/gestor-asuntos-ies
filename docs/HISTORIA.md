@@ -5,6 +5,53 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 194: un solo «Volver», que vuelve a donde estabas
+
+`docs/AVISOS-MENU-Y-VOLVER.md`, apartados 3 y 4 (los apartados 1 y 2 ya estaban hechos, fila 193).
+Antes había cuatro «Volver» distintos: el de la ficha (`js/navegacion.js`, que se acuerda de dónde
+se vino) y los de Cuentas, Impresos y Duplicados, que iban siempre a Asuntos abiertos vinieras de
+donde vinieras; Archivo, Personas, Ajustes y Nuevo asunto no tenían botón de Volver, solo las
+pestañas de arriba (con un historial propio en `js/usabilidad.js` que llevaba la cuenta de por
+dónde se había pasado, con su propio Escape).
+
+**Se ha unificado todo en el mecanismo de la ficha**, en vez de mantener los dos en paralelo:
+`App.ir` (`js/nucleo.js`) llama ahora a `Navegacion.apuntar()` antes de cambiar de pantalla, para
+cualquier destino salvo `'asunto'` (la ficha sigue apuntando su origen a mano, como siempre, para
+no reñir con `Navegacion.trasVolverA` que usa el botón «Ir al asunto» de los avisos).
+`Navegacion.volver()` pone una bandera mientras llama a `App.ir` para que ese cambio de pantalla
+no se vuelva a apuntar encima. Con esto, cualquier pantalla que pase por `App.ir` —Cuentas,
+Impresos, Duplicados, y cualquier otra que se añada en el futuro— vuelve sola adonde estaba, sin
+tener que apuntarlo cada una a mano: solo hizo falta cambiar sus tres botones de «App.ir('abiertos')
+a pelo» por «Navegacion.volver('abiertos')» (con ese mismo valor de reserva, por si no hay origen
+apuntado).
+
+`js/usabilidad.js` se queda con la parte de pintar el botón «← Volver» en la cabecera de cada
+pantalla que no sea Inicio (`prepararCabeceras`), pero ya no lleva historial propio: se ha borrado
+entero (`historial`, `irAtras`, `pintarVolver`, el `MutationObserver` que vigilaba las pantallas).
+En Nuevo asunto, el botón llama a `cancelarNuevo` en vez de a `Navegacion.volver` a pelo, para no
+perder la limpieza del formulario ni el documento suelto pendiente. El Escape general no necesitó
+ningún cambio: ya buscaba `.boton-volver:not(.oculto)` dentro de la pantalla visible y pulsaba lo
+que encontrara; de rebote, corrige un fallo que ya existía (en Archivo/Personas/Ajustes, Escape
+podía no hacer nada si el historial viejo estaba vacío).
+
+**La mesa del hito tiene su propio «← Volver a los hitos»** (`#mesa-volver-hitos`, `js/hito-mesa.js`),
+que llama a la misma función `cerrar()` que ya usaba Escape en ese punto: cierra la mesa y deja la
+tarjeta Hitos en grande. Al principio la implementación lo puso en una fila propia encima de la
+tira de hitos, pero eso bajaba «QUÉ HAY QUE HACER» de los 250 px que exige la cabecera compacta
+(fila 145, `pruebas/cabecera-compacta.mjs`, que lo detectó). Solución final: dentro de la misma
+fila de la tira, al principio, sin estirar como las celdas de hito (`.mesa-tira-volver`), con
+texto compacto «← Hitos» y el texto entero en el `title`.
+
+**Cómo se hizo**: un agente de planificación investigó el código real (`js/navegacion.js`,
+`js/nucleo.js`, `js/usabilidad.js`, `js/cuentas.js`, `js/formularios.js`,
+`js/unir-asuntos-pantalla.js`, `js/hito-mesa.js`, `js/ajustes-tipo.js`) y entregó un plan
+fichero por fichero con las líneas exactas a cambiar, incluida la comprobación de que
+`js/ajustes-tipo.js` (la pantalla de un tipo de asunto, que también usa `.boton-volver` de
+`js/usabilidad.js`) sigue funcionando sin tocarla: su `envolverVolverDeTipo` envuelve el mismo
+`onclick`, y como la pantalla se abre siempre con `App.ir('tipo-asunto')` desde Ajustes, el origen
+que apunta `Navegacion` de forma automática ya es «ajustes», no hace falta ningún caso especial.
+Esta sesión implementó el plan y corrió `npm test` completo para comprobarlo.
+
 ## 27-sep-2026 — Fila 209: Inicio, segunda versión (pestañas y una sola tabla)
 
 `docs/INICIO-EN-PESTANAS.md`. Francisco vio la pantalla de las filas 191-193 con datos reales del

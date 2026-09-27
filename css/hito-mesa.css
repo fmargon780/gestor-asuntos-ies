@@ -61,6 +61,16 @@
 .mesa-tira-hito.hecho { color: #1f6b33; background: #f1faf3; }
 .mesa-tira-hito.actual { background: #e3eefb; color: #1d4f86; font-weight: 600; border-bottom-color: var(--azul); }
 
+/* Fila 194: «Volver a los hitos», al principio de la tira. No se
+   estira como las celdas de hito (flex: 0 0 auto), para no repetir
+   su ancho ni tocar la altura de la fila. */
+.mesa-tira-volver {
+  flex: 0 0 auto; font: inherit; font-size: 12px; cursor: pointer; white-space: nowrap;
+  border: 0; border-right: 1px solid var(--linea); border-bottom: 3px solid transparent;
+  padding: 5px 10px; background: #eef2f6; color: var(--tinta-suave);
+}
+.mesa-tira-volver:hover { background: #e3eefb; }
+
 /* Los dos desplegables: dentro de la página, debajo de su botón. */
 .mesa-desplegable { position: relative; }
 .mesa-abrir-panel.abierto { background: #e3eefb; border-color: #a9c6e6; }

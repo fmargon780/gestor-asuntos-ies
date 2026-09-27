@@ -26,6 +26,7 @@ window.Navegacion = (function () {
 
   var origen = null;          /* { pantalla, alto } */
   var forzado = null;         /* el origen de la PRÓXIMA ficha que se abra */
+  var enVolver = false;       /* fila 194: para que App.ir no reapunte al salir por Volver */
 
   function pantallaVisible() {
     var lista = (window.App && App.PANTALLAS) || [];
@@ -41,6 +42,7 @@ window.Navegacion = (function () {
   }
 
   function apuntar() {
+    if (enVolver) return;
     if (forzado) { origen = { pantalla: forzado, alto: null }; forzado = null; return; }
     var v = pantallaVisible();
     if (!v || v === 'asunto') return;          /* de ficha a ficha: el origen de la primera */
@@ -61,7 +63,9 @@ window.Navegacion = (function () {
     origen = null;
     var destino = (o && o.pantalla) || defecto || 'abiertos';
     if (!document.getElementById('pantalla-' + destino)) destino = defecto || 'abiertos';
+    enVolver = true;
     App.ir(destino);
+    enVolver = false;
     if (o && o.pantalla === destino) ponerAltura(o.alto);
   }
 

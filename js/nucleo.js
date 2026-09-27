@@ -583,6 +583,12 @@ Array.prototype.forEach.call(document.querySelectorAll('.pestana'), function (b)
 });
 
 App.ir = function (cual) {
+  /* Fila 194: se apunta de dónde se viene antes de cambiar de pantalla,
+     para que «Volver» (js/navegacion.js) sepa adónde volver desde
+     cualquier pantalla, no solo desde la ficha. La ficha apunta su
+     origen a mano (js/ficha-asunto.js) antes de llamar a App.ir('asunto'),
+     así que aquí se deja fuera para no pisarlo. */
+  if (window.Navegacion && cual !== 'asunto') Navegacion.apuntar();
   App.PANTALLAS.forEach(function (p) {
     $('pantalla-' + p).classList.toggle('oculto', p !== cual);
   });

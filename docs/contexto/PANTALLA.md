@@ -81,6 +81,17 @@ borde izquierdo se arrastra; el ancho se recuerda (`gestor-lector-ancho`); doble
 está filtrando y la tecla Escape. No toca datos. (La vista compacta/cómoda se retiró en la fila
 191: la tabla de asuntos ya era compacta.)
 
+**Un solo «Volver» en todas las pantallas, salvo Inicio** (fila 194, 27-sep-2026,
+`docs/AVISOS-MENU-Y-VOLVER.md`). `js/usabilidad.js` ya no lleva su propio historial: añade el
+botón «← Volver» a la cabecera de cada pantalla que no sea Inicio (`prepararCabeceras`, sin botón
+en `#pantalla-abiertos`) y lo engancha a `Navegacion.volver('abiertos')` — en Nuevo asunto, a
+`cancelarNuevo` en su lugar, para no perder la limpieza del formulario. `App.ir` (`js/nucleo.js`)
+llama a `Navegacion.apuntar()` antes de cambiar de pantalla para CUALQUIER destino salvo `'asunto'`
+(la ficha sigue apuntando su origen a mano, antes de llamar a `App.ir('asunto')`, ver más abajo),
+así que Cuentas, Impresos y Duplicados —y cualquier pantalla nueva que use `App.ir`— vuelven solas
+adonde estaban, sin tener que apuntarlo cada una a mano. `Navegacion.volver()` pone una bandera
+mientras llama a `App.ir` para que ese propio cambio de pantalla no vuelva a apuntarse encima.
+
 **Que de toda pantalla se pueda salir.** Con el cuadro (`#capa`) abierto, Escape lo cierra
 (cancela; si no lleva Cancelar, acepta). Con el visor de un documento abierto (`con-visor`),
 Escape lo cierra (el lector de correos vigila el suyo aparte, en `js/lector.js`). Si no hay nada
