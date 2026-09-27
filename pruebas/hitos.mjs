@@ -326,9 +326,9 @@ await comprobar('p2 pasa a estar en curso',
   pagina.locator('#ficha-guia .hito[data-id="p2"]').getAttribute('class').then(c => c.indexOf('hito-encurso') !== -1), true);
 
 console.log('--- escenario 6: el estado del asunto es el hito en curso (fila 129) ---');
-await comprobar('la cabecera enseña el paso en curso, pulsable', pagina.evaluate(() => {
+await comprobar('la cabecera enseña el hito en curso, pulsable', pagina.evaluate(() => {
   const m = document.querySelector('#ficha-acciones .marca-hito');
-  return !!m && m.tagName === 'BUTTON' && /^Paso \d+ de \d+ · /.test(m.textContent);
+  return !!m && m.tagName === 'BUTTON' && /^Hito \d+ de \d+ · /.test(m.textContent);
 }), true);
 await comprobar('y nada se escribe en el estado viejo de la ficha', pagina.evaluate((clave) => {
   return App.E.registro.asuntos[clave].situacion || '';

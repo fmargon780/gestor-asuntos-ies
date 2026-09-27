@@ -420,7 +420,7 @@ await comprobar('se crea igual que antes de este cambio',
   nombresDeAbiertos().then(n => n.indexOf('260915 MATRICULA Ramos Vidal, Elena 1150001') !== -1), true);
 
 /* ================================================================
-   9. Editar el asunto cambiando un campo renombra la carpeta y la
+   9. Cambiar el asunto cambiando un campo renombra la carpeta y la
       ficha viaja con ella.
    ================================================================ */
 console.log('--- 9. editar un asunto cambiando un campo ---');
@@ -432,7 +432,7 @@ await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 /* "Editar" vive ahora en el menú de tres puntos del nombre (18-sep-2026,
    fila 52, docs/CABECERA-DEL-ASUNTO.md). */
 await pagina.click('.ficha-nombre-menu-boton');
-await pagina.getByRole('button', { name: 'Editar el asunto', exact: true }).click();
+await pagina.getByRole('button', { name: 'Cambiar el asunto', exact: true }).click();
 await pagina.waitForSelector('#ed-campos');
 
 await comprobar('el cuadro de editar trae los mismos campos, con lo guardado',

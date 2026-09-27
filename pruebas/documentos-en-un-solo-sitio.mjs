@@ -1,10 +1,10 @@
 /* Prueba en navegador de docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md (fila 168):
    las opciones de cada documento de la ficha, en su propia fila.
 
-   - Una fila sin registro enseña ⧉, «Registrar», «Poner nombre»,
+   - Una fila sin registro enseña ⧉, «Registrar», «Cambiar el nombre»,
      «Asociar a un hito» (si hay hitos) y ⋮ con solo dos entradas.
    - ⧉ copia el nombre sin la extensión.
-   - «Poner nombre» renombra el fichero y repinta la lista.
+   - «Cambiar el nombre» renombra el fichero y repinta la lista.
    - «+ Añadir documento» está en el título y abre el cuadro de añadir.
    - No queda «Documentos ▾» en la ficha.
    - Un PDF abierto en el visor trae la barra de herramientas; un no-PDF, no. */
@@ -85,9 +85,9 @@ await comprobar('lleva ⧉ justo detrás del nombre',
     var b = f.querySelector('.ficha-documento');
     return !!(b && b.nextElementSibling && b.nextElementSibling.classList.contains('ficha-documento-copiar'));
   }), true);
-await comprobar('lleva «Registrar» y «Poner nombre» a la vista',
+await comprobar('lleva «Registrar» y «Cambiar el nombre» a la vista',
   filaDe(PDF).locator(':scope > button').allTextContents().then(ts => ts.map(t => t.trim())
-    .filter(t => t === 'Registrar' || t === 'Poner nombre')), ['Registrar', 'Poner nombre']);
+    .filter(t => t === 'Registrar' || t === 'Cambiar el nombre')), ['Registrar', 'Cambiar el nombre']);
 await filaDe(PDF).locator('.fila-menu-btn').click();
 await comprobar('el menú ⋮ trae solo «Pasar a versiones previas» y «Borrar»',
   filaDe(PDF).locator('.fila-menu button').allTextContents().then(ts => ts.map(t => t.trim())),
@@ -119,8 +119,8 @@ await comprobar('una imagen, no',
   pagina.locator('#visor-acciones .visor-barra-pdf').count(), 0);
 await pagina.click('#visor-cerrar');
 
-console.log('--- «Poner nombre» renombra y repinta ---');
-await filaDe(PDF).getByRole('button', { name: 'Poner nombre', exact: true }).click();
+console.log('--- «Cambiar el nombre» renombra y repinta ---');
+await filaDe(PDF).getByRole('button', { name: 'Cambiar el nombre', exact: true }).click();
 await pagina.waitForSelector('#doc-vista');
 await pagina.fill('#doc-fecha', '2026-09-11');
 await pagina.selectOption('#doc-tipo', 'SOLICITUD');

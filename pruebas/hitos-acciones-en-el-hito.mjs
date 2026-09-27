@@ -9,7 +9,7 @@
       da en la práctica.)
    2. Un paso hecho dice al lado quién lo hizo; uno «No aplica», tachado.
    5. Los números cuadran: con un hito «solo informativo» delante del
-      actual, la marca de la cabecera («Paso N de M»), la pestaña «Hitos
+      actual, la marca de la cabecera («Hito N de M»), la pestaña «Hitos
       N/M» y el «Hito N de M» de la mesa dicen lo mismo; y la barra del
       guion no cuenta los «No aplica» (4 pasos, uno no aplica y uno
       hecho: «1 de 3»).
@@ -87,8 +87,8 @@ await pagina.evaluate(async (a1) => {
 await pagina.waitForTimeout(900);
 
 console.log('--- 5. los números cuadran ---');
-await comprobar('la marca de la cabecera dice «Paso 3 de 4» (sin el informativo)',
-  pagina.evaluate(() => (document.querySelector('#ficha-estado-hito .marca-hito') || {}).textContent), 'Paso 3 de 4 · Comunicar');
+await comprobar('la marca de la cabecera dice «Hito 3 de 4» (sin el informativo)',
+  pagina.evaluate(() => (document.querySelector('#ficha-estado-hito .marca-hito') || {}).textContent), 'Hito 3 de 4 · Comunicar');
 await comprobar('la pestaña de hitos dice «3/4»',
   pagina.evaluate(() => (document.querySelector('.ficha-cuenta[data-cuenta-tarjeta="hitos"]') || {}).textContent), '3/4');
 

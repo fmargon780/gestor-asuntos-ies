@@ -71,8 +71,8 @@ await comprobar('es la del primero',
   pagina.locator('#lista-sueltos .tarjeta-abierta').getAttribute('data-suelto'), '260901 uno.pdf');
 await comprobar('las acciones del panel están: Crear asunto con él',
   pagina.locator('#visor-acciones').getByRole('button', { name: 'Crear asunto con él' }).count(), 1);
-await comprobar('y Meter en un asunto',
-  pagina.locator('#visor-acciones').getByRole('button', { name: 'Meter en un asunto' }).count(), 1);
+await comprobar('y Guardar en un asunto',
+  pagina.locator('#visor-acciones').getByRole('button', { name: 'Guardar en un asunto' }).count(), 1);
 /* "Borrar" vive detrás del menú de tres puntos (fila 36): mientras
    está cerrado (display:none) no cuenta como accesible para
    getByRole, así que hay que abrirlo para comprobar que está. */

@@ -119,7 +119,7 @@ await pagina.waitForTimeout(100);
    135) van entre las dos de siempre. */
 await comprobar('3. las cuatro opciones, en orden',
   pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents(),
-  ['Editar el asunto', 'Índice del expediente', 'Marcar como reservado', 'Borrar el asunto']);
+  ['Cambiar el asunto', 'Índice del expediente', 'Marcar como reservado', 'Borrar el asunto']);
 await comprobarQue('3. "Borrar el asunto" se ve en rojo',
   pagina.evaluate(() => Array.from(document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion'))
     .some((b) => b.textContent.trim() === 'Borrar el asunto' && b.classList.contains('ficha-menu-peligro'))));
@@ -296,8 +296,8 @@ await pagina.click('.ficha-nombre-menu-boton');
 await pagina.waitForTimeout(100);
 await comprobarQue('10. el menú se abre igualmente',
   pagina.evaluate(() => !document.querySelector('.ficha-menu').classList.contains('oculto')));
-await comprobar('10. "Editar el asunto" está apagado',
-  pagina.getByRole('button', { name: 'Editar el asunto', exact: true }).isDisabled(), true);
+await comprobar('10. "Cambiar el asunto" está apagado',
+  pagina.getByRole('button', { name: 'Cambiar el asunto', exact: true }).isDisabled(), true);
 await comprobar('10. "Borrar el asunto" está apagado',
   pagina.getByRole('button', { name: 'Borrar el asunto', exact: true }).isDisabled(), true);
 /* "Copiar el nombre del asunto" ya no vive en el menú (fila 58): el

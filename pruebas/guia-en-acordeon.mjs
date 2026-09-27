@@ -80,7 +80,7 @@ await comprobar('ningún paso abierto', abiertos(), []);
 await comprobar('cada línea: título y marcas',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#guia-pasos > .paso-editor > .paso-cabecera > .paso-resumen'))
     .map(r => r.textContent)),
-  ['Registrar la entradaNormativa (2)Documentos (1)Guion (1)Secretaría', '¿Cómo ha llegado?Pregunta',
+  ['Registrar la entradaNormativa (2)Documentos (1)Tareas (1)Secretaría', '¿Cómo ha llegado?Pregunta',
    'Avisar a la familiaSolo informativo', 'Archivar']);
 await comprobar('cerrado solo se ve la línea (el campo del título y el cuerpo, escondidos)',
   pagina.evaluate(() => {
@@ -113,13 +113,13 @@ await pagina.keyboard.type('Pagar');
 /* ================= 4 ================= */
 console.log('--- 4. las flechas ---');
 await linea(0);
-await pagina.click('#guia-pasos > .paso-editor[data-pos="0"] .paso-mandos button[title="Bajar este paso"]');
+await pagina.click('#guia-pasos > .paso-editor[data-pos="0"] .paso-mandos button[title="Bajar este hito"]');
 await comprobar('bajado, sigue abierto (ahora en el sitio 2)',
   pagina.evaluate(() => !document.querySelector('#guia-pasos > .paso-editor[data-pos="1"]').classList.contains('paso-plegado')), true);
 await comprobar('y es el único abierto', abiertos(), ['Registrar la entrada']);
-await pagina.click('#guia-pasos > .paso-editor[data-pos="1"] .paso-mandos button[title="Subir este paso"]');
+await pagina.click('#guia-pasos > .paso-editor[data-pos="1"] .paso-mandos button[title="Subir este hito"]');
 await comprobar('subido, sigue abierto', abiertos(), ['Registrar la entrada']);
-await pagina.click('#guia-pasos > .paso-editor[data-pos="3"] .paso-mandos button[title="Subir este paso"]');
+await pagina.click('#guia-pasos > .paso-editor[data-pos="3"] .paso-mandos button[title="Subir este hito"]');
 await comprobar('mover uno cerrado no lo abre', abiertos(), ['Registrar la entrada']);
 
 /* ================= 5 ================= */
@@ -136,7 +136,7 @@ await comprobar('y al desmarcarla, igual', abiertos(), ['Archivar']);
 console.log('--- 6. un paso dentro de una opción ---');
 await linea(1);
 await pagina.locator('#guia-pasos > .paso-editor[data-pos="1"] .opcion-editor').nth(0)
-  .locator('button', { hasText: '+ Añadir un paso a esta opción' }).click();
+  .locator('button', { hasText: '+ Añadir un hito a esta opción' }).click();
 await comprobar('el nuevo, abierto, y la pregunta que lo contiene también', abiertos(), ['¿Cómo ha llegado?', '']);
 await comprobar('con el cursor en su título',
   pagina.evaluate(() => document.activeElement === document.querySelectorAll('#guia-pasos .opcion-editor')[0].querySelectorAll('.subpaso-titulo')[1]), true);

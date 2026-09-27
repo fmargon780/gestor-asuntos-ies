@@ -15,7 +15,7 @@
      7. Escape vuelve a la lista; desde "Qué me toca" se entra directo en
         la mesa.
      8. "Traer los guiones del instituto" no pisa un guion ya escrito.
-     9. (fila 120) "+ Añadir un paso a la guía del tipo" desde la mesa: la
+     9. (fila 120) "+ Añadir un hito a la guía del tipo" desde la mesa: la
         línea va al guion del paso de la guía y sale también en otro
         asunto abierto del mismo tipo; el paso propio no toca la guía.
 
@@ -298,7 +298,7 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await comprobar('9. el aviso de hito sin guion ya no manda a Ajustes',
     pagina.evaluate(() => (document.querySelector('.hito-en-mesa .mesa-guion') || {}).textContent.indexOf('Se escribe en la guía del tipo (Ajustes)') === -1), true);
   /* Fila 145: en el menú «···» de la cabecera. */
-  await elegirDelMenu(pagina, '.hito-en-mesa .mesa-mas', 'Añadir un paso a la guía del tipo');
+  await elegirDelMenu(pagina, '.hito-en-mesa .mesa-mas', 'Añadir un hito a la guía del tipo');
   await pagina.waitForSelector('#capa:not(.oculto)');
   await pagina.fill('#guion-guia-texto', 'Pedir el certificado de empadronamiento');
   await pagina.click('#cuadro-aceptar');

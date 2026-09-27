@@ -5,6 +5,36 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 188: se cierra la 177 y se pone al día lo que dejó en rojo la 179
+
+`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 188. Primera fila trabajada con la norma nueva de
+«una sola sesión, una sola fila» (`docs/COLA.md`, regla 0).
+
+1. **Fila 177 (índice del ARCHIVO por curso y topes por ruta).** Todo el código, las pruebas y
+   casi toda la documentación ya estaban en `main` desde el 26-sep-2026 y sus pruebas pasaban; solo
+   faltaba marcarla y dos líneas de `docs/CONTEXTO-CORTO.md` (el buscador dice «índice… por curso»
+   con su selector; el aviso de aspirante sin Nº escolar dice que el tope cuenta la ruta completa,
+   no 150/120 fijos). Cerrada, sin nada pendiente.
+2. **Fila 179 (vocabulario en pantalla).** Cambió los textos de unos 43 ficheros a las palabras de
+   `docs/VOCABULARIO.md` (hito en vez de paso, tarea en vez de guion, etc.) pero no puso al día las
+   pruebas que buscaban las palabras viejas, y dejó `npm test` en rojo. Esta fila puso al día 23
+   ficheros de `pruebas/` (entre ellos `hitos.mjs`, `estado-sigue-a-los-hitos.mjs`,
+   `el-hito-es-el-estado.mjs`, `ajustes-plegado.mjs`, `ajustes-por-tipo.mjs`, `guias.mjs`,
+   `hito-mesa.mjs`, `documentos-sueltos.mjs`, `documentos-en-un-solo-sitio.mjs`, `huerfanas.mjs`,
+   `navegador.mjs`, `opciones.mjs`, `preguntas-anidadas.mjs`), sin tocar ningún texto de pantalla
+   nuevo: solo lo que las pruebas esperaban seguía diciendo lo viejo (p. ej. «Paso N de M» en vez
+   de «Hito N de M», «Meter en un asunto» en vez de «Guardar en un asunto», «Poner nombre» en vez
+   de «Cambiar el nombre», «Editar el asunto» en vez de «Cambiar el asunto», «Borrar la ficha» en
+   vez de «Quitar la ficha» en fichas huérfanas). `npm test` completo (166 ficheros) en verde.
+   La fila 179 queda **sustituida por las filas 189 y 190**, que barren el resto del vocabulario
+   (los ficheros que la 179 no llegó a tocar, y los puntos de borrar/quitar, impresos y la prueba
+   de cadenas prohibidas).
+
+**Lo que costó de verdad:** ninguna de las 23 pruebas estaba realmente rota por lógica; todas
+fallaban porque comparaban con el texto viejo tras el cambio de vocabulario de la fila 179 (algunas
+con un `getByRole`/`getByText` que además hacía saltar la prueba entera por timeout en cuanto no
+encontraba el botón renombrado, en vez de solo marcar esa comprobación como fallida).
+
 ## 26-sep-2026 — Fila 176: los datos no se pisan entre ordenadores
 
 `docs/DATOS-ENTRE-ORDENADORES.md`, primera parte de la «tanda de estabilidad» (análisis de Claude

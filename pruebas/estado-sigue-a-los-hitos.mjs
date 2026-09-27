@@ -4,15 +4,15 @@
    4 («Registro de Salida») en curso y de Administración.
 
    Primero, con las funciones de verdad en la página (sin pantalla):
-   1. El estado es «Paso 3 de 5 · Puesta a la firma», con espera automática
+   1. El estado es «Hito 3 de 5 · Puesta a la firma», con espera automática
       a Secretaría (antes ganaba el 4, por estar en curso y ser nuestro).
-   2. Al marcar el 3, «Paso 4 de 5 · Registro de Salida», sin espera.
+   2. Al marcar el 3, «Hito 4 de 5 · Registro de Salida», sin espera.
    3. Una espera a mano manda sobre la automática, y se quita de un hito
       en cuanto deja de ser el actual (limpiarEsperasViejas).
    Parte de navegador:
-   4. La cabecera de la ficha dice «Paso 3 de 5 · Puesta a la firma» y
-      «Esperando a Secretaría», sin «Ya ha llegado»; la lista lleva «Paso
-      actual» en el 3 y «Saltar a este paso» en los de después; al marcar
+   4. La cabecera de la ficha dice «Hito 3 de 5 · Puesta a la firma» y
+      «Esperando a Secretaría», sin «Ya ha llegado»; la lista lleva «Hito
+      actual» en el 3 y «Saltar a este hito» en los de después; al marcar
       el 3, la cabecera se pone al día sola. */
 import { chromium } from 'playwright';
 import fs from 'fs';
@@ -88,8 +88,8 @@ const r = await pagina.evaluate(() => {
   return out;
 });
 comprobar('1. el primer hito sin terminar, aunque otro esté en curso y sea nuestro; espera automática a Secretaría',
-  r.uno, ['Paso 3 de 5 · Puesta a la firma', 'Secretaría', true, 'terceros']);
-comprobar('2. al marcar el 3, el 4, sin espera', r.dos, ['Paso 4 de 5 · Registro de Salida', null, 'administracion']);
+  r.uno, ['Hito 3 de 5 · Puesta a la firma', 'Secretaría', true, 'terceros']);
+comprobar('2. al marcar el 3, el 4, sin espera', r.dos, ['Hito 4 de 5 · Registro de Salida', null, 'administracion']);
 comprobar('3. la espera a mano manda', r.tres, ['tercero', false]);
 comprobar('3. y se quita en cuanto ese hito deja de ser el actual', r.cuatro, true);
 
@@ -113,14 +113,14 @@ const cabecera = () => pagina.evaluate(() => [
   ((document.querySelector('#ficha-estado-hito .marca-esperando') || {}).textContent || '').replace(/ desde el .*$/, ''),
   !!document.querySelector('#ficha-estado-hito .boton-ya-llegado')]);
 comprobar('4. la cabecera: el paso 3 y «Esperando a Secretaría», sin «Ya ha llegado»', await cabecera(),
-  ['Paso 3 de 5 · Puesta a la firma', 'Esperando a Secretaría', false]);
-comprobar('4. «Paso actual» solo en el 3; «Saltar a este paso» en el 4 y el 5',
+  ['Hito 3 de 5 · Puesta a la firma', 'Esperando a Secretaría', false]);
+comprobar('4. «Hito actual» solo en el 3; «Saltar a este hito» en el 4 y el 5',
   await pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-guia .hito')).map((h) =>
     [h.dataset.id, !!h.querySelector(':scope > .hito-linea .etiqueta-paso-actual'), (h.querySelector(':scope > .hito-linea .hito-situar') || {}).textContent || ''])),
-  [['h1', false, ''], ['h2', false, ''], ['h3', true, ''], ['h4', false, 'Saltar a este paso'], ['h5', false, 'Saltar a este paso']]);
+  [['h1', false, ''], ['h2', false, ''], ['h3', true, ''], ['h4', false, 'Saltar a este hito'], ['h5', false, 'Saltar a este hito']]);
 await pagina.evaluate(async (a1) => { await Hitos.marcar(a1, 'h3', 'hecho', ''); }, ASUNTO);
 await pagina.waitForTimeout(800);
-comprobar('4. al marcar el 3, la cabecera se pone al día sola', await cabecera(), ['Paso 4 de 5 · Registro de Salida', '', false]);
+comprobar('4. al marcar el 3, la cabecera se pone al día sola', await cabecera(), ['Hito 4 de 5 · Registro de Salida', '', false]);
 
 if (errores.length) { fallos++; console.log('ERRORES:\n' + errores.join('\n')); }
 await navegador.close();

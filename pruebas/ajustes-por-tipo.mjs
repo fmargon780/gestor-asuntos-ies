@@ -117,7 +117,7 @@ await comprobar('la categoría sale al lado',
 await comprobar('la pantalla de Ajustes ha quedado oculta detrás',
   pagina.locator('#pantalla-ajustes').isHidden(), true);
 
-const SECCIONES = ['Datos del tipo', 'Campos', 'Pasos del trámite', 'Palabras clave',
+const SECCIONES = ['Datos del tipo', 'Campos', 'Guía', 'Palabras clave',
   'Plantillas de correo y de Séneca', 'Plantilla de documento de Word', 'Plazo', 'Se repite'];
 await pagina.waitForTimeout(300);
 /* Fila 105 (docs/AJUSTES-PLEGADO.md): las ocho secciones nacen
