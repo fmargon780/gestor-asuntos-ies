@@ -163,7 +163,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 189 | `docs/VOCABULARIO-EN-PANTALLA.md`, puntos 1 y 4, en los ficheros que faltan (ver `docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 189) | HECHA (27-sep-2026 05:11). `npm test` completo (173 ficheros) en verde con Chromium real |
 | 208 | `docs/PRUEBAS-MAS-RAPIDAS.md` (`npm test` lanza varias pruebas a la vez; mientras se trabaja una fila, solo las pruebas de lo tocado, y la pasada completa una sola vez al final; la app no cambia) | PENDIENTE (27-sep-2026) |
 | 207 | `docs/UNIR-DOS-TIPOS.md` (en Ajustes, «Unir con otro tipo»: el tipo que desaparece pasa sus asuntos abiertos al que se queda, con la carpeta renombrada y sus hitos intactos; vale la guía del que se queda; plantillas, campos y recurrentes se suman; su nombre queda como alias; el ARCHIVO no se toca) | PENDIENTE (27-sep-2026) |
-| 190 | `docs/VOCABULARIO-EN-PANTALLA.md`, puntos 2, 3 y 5, y la prueba de palabras prohibidas (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 190) | PENDIENTE (27-sep-2026) |
+| 190 | `docs/VOCABULARIO-EN-PANTALLA.md`, puntos 2, 3 y 5, y la prueba de palabras prohibidas (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 190) | EN CURSO (27-sep-2026 05:50) |
 | 191 | `docs/INICIO-CUATRO-BLOQUES.md`, apartados 1, 2, 3, 4 y 7: los bloques de Inicio y fuera «Qué me toca» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 191) | PENDIENTE (27-sep-2026) |
 | 192 | `docs/INICIO-CUATRO-BLOQUES.md`, apartados 5 y 6: la tabla de todos los abiertos (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 192) | PENDIENTE (27-sep-2026) |
 | 193 | `docs/AVISOS-MENU-Y-VOLVER.md`, apartados 1 y 2: avisos en una línea y menú (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 193) | PENDIENTE (27-sep-2026) |
