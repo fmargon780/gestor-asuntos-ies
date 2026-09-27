@@ -70,7 +70,7 @@ await pagina.evaluate(async () => {
   const a = App.E.listaAbiertos[0];
   await a.handle.getFileHandle('260415 FACTURA Material de oficina.pdf', { create: true });
 });
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('.ficha-documento');
 await comprobar('el documento se ve en la ficha',
@@ -160,7 +160,7 @@ await pagina.evaluate(async () => {
 });
 await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(400);
-await pagina.locator('.tarjeta-asunto').filter({ hasText: 'BECA' }).locator('.nombre-pulsable').click();
+await pagina.locator('#inicio-tabla-cuerpo tr').filter({ hasText: 'BECA' }).locator('.nombre-pulsable').click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 
 /* "Borrar" vive ahora en el menú de tres puntos del nombre (18-sep-2026,
@@ -257,7 +257,7 @@ await pagina.evaluate(async () => {
 });
 await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(300);
-await pagina.locator('.tarjeta-asunto').filter({ hasText: 'MATRICULA' }).locator('.nombre-pulsable').click();
+await pagina.locator('#inicio-tabla-cuerpo tr').filter({ hasText: 'MATRICULA' }).locator('.nombre-pulsable').click();
 await pagina.waitForSelector('.ficha-documento');
 await borrarDelMenu(pagina.locator('.ficha-documento-fila').filter({ hasText: 'SOLICITUD' }));
 await pagina.click('#cuadro-aceptar');
@@ -302,7 +302,7 @@ await pagina.evaluate(async () => {
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(300);
-await pagina.locator('.tarjeta-asunto').filter({ hasText: 'MATRICULA' }).locator('.nombre-pulsable').click();
+await pagina.locator('#inicio-tabla-cuerpo tr').filter({ hasText: 'MATRICULA' }).locator('.nombre-pulsable').click();
 await pagina.waitForSelector('.ficha-documento');
 await borrarDelMenu(pagina.locator('#ficha-documentos'));
 await pagina.click('#cuadro-aceptar');

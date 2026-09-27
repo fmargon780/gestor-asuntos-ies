@@ -141,11 +141,12 @@
            lleve a la línea de avisos de arriba. -->
       <div id="inicio-aviso-aspirantes"></div>
 
-      <!-- Los tres botones de montón SIGUEN existiendo (mismo
-           data-vista, para no romper pruebas que hacen
-           .click('.panel[data-vista=...]')). Solo se ve el de
-           "clasificar", restilado como "Ver todo (N)"; los otros dos
-           se ocultan con CSS (.oculto-vista, css/inicio.css). -->
+      <!-- El único botón de montón que queda (mismo data-vista, para no
+           romper pruebas que hacen .click('.panel[data-vista="clasificar"]')):
+           "Ver todo (N)", el bloque "Ha llegado" entero, a pantalla
+           completa. Los otros dos (Pendiente de Administración/de
+           terceros) han desaparecido con la fila 192: la tabla de abajo
+           ya enseña todos los asuntos a la vez, sin montones. -->
       <div class="paneles">
         <button type="button" class="panel" data-vista="clasificar">
           <svg class="panel-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -159,31 +160,6 @@
           </span>
           <span class="panel-cuenta" id="cuenta-clasificar">0</span>
           <span class="marca-nueva oculto" id="nuevos-sueltos"></span>
-        </button>
-
-        <button type="button" class="panel oculto-vista" data-vista="departamento">
-          <svg class="panel-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
-            <path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.2l2 2.6h8.8A1.5 1.5 0 0 1 21 9.1v9A1.5 1.5 0 0 1 19.5 19.6h-15A1.5 1.5 0 0 1 3 18.1z"/>
-          </svg>
-          <span class="panel-texto">
-            <span class="panel-nombre">Pendiente de Administración</span>
-            <span class="panel-pie">Asuntos que nos toca mover a nosotros</span>
-          </span>
-          <span class="panel-cuenta" id="cuenta-departamento">0</span>
-        </button>
-
-        <button type="button" class="panel oculto-vista" data-vista="espera">
-          <svg class="panel-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="8.5"/>
-            <path d="M12 7.3V12l3 1.8"/>
-          </svg>
-          <span class="panel-texto">
-            <span class="panel-nombre">Pendiente de terceros</span>
-            <span class="panel-pie">Esperando a que otro haga su parte</span>
-          </span>
-          <span class="panel-cuenta" id="cuenta-espera">0</span>
         </button>
       </div>
 
@@ -240,24 +216,41 @@
         <div id="lista-sueltos" class="lista"></div>
       </div>
 
-      <!-- ZONA "LEGADO": la tubería vieja, viva y (de partida) visible
-           debajo de la rejilla, para que App.pintarAbiertos siga
-           enseñando el listado completo mientras no exista la tabla
-           de verdad de la fila 192 dentro de #inicio-todos-asuntos.
-           Su propio contenido (#zona-asuntos) ya se oculta solo con
-           "Ver todo" (App.irVista('clasificar'), sin tocar esa lógica). -->
-      <div id="inicio-legado">
-        <div class="legado-acciones">
-          <button type="button" id="btn-filtros" class="boton" aria-expanded="false"
-                  aria-controls="filtros-abiertos">Filtros</button>
-          <button id="btn-recargar" class="boton">Actualizar</button>
+      <!-- LA TABLA "TODOS LOS ASUNTOS ABIERTOS" (fila 192, apartado 5):
+           el panel de filtros de siempre (#filtros-abiertos, con sus
+           mismos IDs: js/vista.js, js/reservados.js y js/usabilidad.js
+           solo miran esos IDs, así que el traslado los deja
+           funcionando gratis), con «Montón» relabelado a «Situación» y
+           un 5º filtro nuevo, «Tipo de asunto» (pasan a ser las
+           tarjetas «Por tipo de asunto» de siempre). «Ordenar» vive
+           fuera del panel plegable, siempre a la vista (boceto
+           docs/boceto-inicio.html). -->
+      <div id="inicio-todos-asuntos">
+        <div class="inicio-tabla-cabecera">
+          <h2>Todos los asuntos abiertos <span class="suave">(<span id="cuenta-lista-abiertos"></span>)</span></h2>
+          <div class="inicio-tabla-cabecera-acciones">
+            <button id="btn-recargar" class="boton">Actualizar</button>
+            <button type="button" id="btn-filtros" class="boton" aria-expanded="false"
+                    aria-controls="filtros-abiertos">Filtros</button>
+            <label class="inicio-orden">
+              <span class="filtro-rotulo">Ordenar</span>
+              <select id="orden-abiertos" class="campo">
+                <option value="fecha-asc">Fecha · los más antiguos arriba</option>
+                <option value="fecha-desc">Fecha · los más recientes arriba</option>
+                <option value="limite">Fecha límite · lo que antes vence</option>
+                <option value="estado">Hito del asunto</option>
+                <option value="tipo">Tipo de asunto</option>
+                <option value="tercero">Tercero</option>
+              </select>
+            </label>
+          </div>
         </div>
 
         <!-- Los desplegables viven aquí, plegados. Sueltos en la barra
              se salían de linea y las etiquetas acababan lejos de su campo. -->
         <div id="filtros-abiertos" class="filtros oculto">
           <label class="filtro">
-            <span class="filtro-rotulo">Montón</span>
+            <span class="filtro-rotulo">Situación</span>
             <select id="filtro-estado" class="campo">
               <option value="">Todos</option>
             </select>
@@ -284,27 +277,29 @@
             </select>
           </label>
           <label class="filtro">
-            <span class="filtro-rotulo">Ordenar por</span>
-            <select id="orden-abiertos" class="campo">
-              <option value="fecha-asc">Fecha · los más antiguos arriba</option>
-              <option value="fecha-desc">Fecha · los más recientes arriba</option>
-              <option value="limite">Fecha límite · lo que antes vence</option>
-              <option value="estado">Hito del asunto</option>
-              <option value="tipo">Tipo de asunto</option>
-              <option value="tercero">Tercero</option>
+            <span class="filtro-rotulo">Tipo de asunto</span>
+            <select id="filtro-tipo-asunto" class="campo">
+              <option value="">Todos</option>
             </select>
           </label>
         </div>
 
-        <div id="zona-asuntos">
-          <p class="explica oculto" id="buscando-en-todos">Buscando en todos los asuntos abiertos</p>
-          <div id="lista-abiertos" class="lista"></div>
+        <div class="inicio-tabla-envoltorio">
+          <table class="inicio-tabla">
+            <thead>
+              <tr>
+                <th>Asunto</th><th>Tipo</th><th>Hito actual</th><th>Le toca a</th>
+                <th>Plazo</th><th>Abierto</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="inicio-tabla-cuerpo"></tbody>
+          </table>
         </div>
       </div>
 
-      <!-- El hueco de verdad para la fila 192 (la tabla "Todos los
-           asuntos abiertos"), VACÍO a propósito. -->
-      <div id="inicio-todos-asuntos"></div>
+      <!-- "Dormidos" y "Sin fecha", plegados (fila 192, apartado 6,
+           js/inicio-plegados.js). -->
+      <div id="inicio-plegados" class="inicio-plegados"></div>
 
     </section>
 
@@ -1313,6 +1308,10 @@
 
 <!-- Y ahora sí, a arrancar. -->
 <script src="js/inicio.js"></script>
+<!-- Fila 192, apartado 6: "Dormidos"/"Sin fecha", plegados al final de
+     Inicio. Después de js/inicio.js (lo llama desde repintarTodo) y de
+     js/ajustes-plegado.js (AjustesPlegado.recordar, más arriba). -->
+<script src="js/inicio-plegados.js"></script>
 
 <!-- Fila 70, docs/ENVOLTURAS-COMPROBADAS.md: EL ÚLTIMO de todos los
      <script>, sin excepción. Cuando este fichero se ejecuta, todos los

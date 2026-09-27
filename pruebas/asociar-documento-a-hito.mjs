@@ -79,8 +79,8 @@ await pagina.evaluate(async ({ asunto, docA, docB }) => {
 }, { asunto: NOMBRE_ASUNTO, docA: DOC_A, docB: DOC_B });
 
 await pagina.click('#btn-recargar');
-await pagina.waitForSelector('#lista-abiertos .tarjeta');
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForSelector('#ficha-guia .hito');

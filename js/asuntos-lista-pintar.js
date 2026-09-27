@@ -1,75 +1,68 @@
 /* ============================================================
-   asuntos-lista-pintar.js — pintar la lista de asuntos abiertos y la tarjeta de cada asunto.
+   asuntos-lista-pintar.js — pintar la tabla "Todos los asuntos
+   abiertos" y la tarjeta de cada asunto del ARCHIVO.
+
+   Hasta la fila 192 (docs/INICIO-CUATRO-BLOQUES.md, apartado 5), aquí
+   se pintaba la lista de tarjetas de "Asuntos abiertos" (un montón a
+   la vez). Ahora App.pintarAbiertos pinta la TABLA de Inicio
+   (#inicio-tabla-cuerpo, App.filaTablaAsunto), sin montones: todos los
+   asuntos abiertos a la vez, con los filtros de siempre (Situación,
+   Plazo, Lo encarga, Tipo de asunto) y el buscador de la cabecera,
+   reutilizando el mismo mecanismo simple de nombre+tipo+tercero que
+   "Me toca"/"Esperamos a otros" (js/inicio.js, decisión 5 de la fila
+   192): se abandona el filtro rico por palabras+notas.
+
+   App.tarjetaAsunto, más abajo, sigue viva solo para el ARCHIVO
+   (js/archivo-personas.js).
 
    Sacado tal cual de js/asuntos-lista.js en la fila 133
-   (docs/PARTIR-FICHEROS-GRANDES.md), sin cambiar nada de lo que hace.
-   Se carga justo detrás de él.
+   (docs/PARTIR-FICHEROS-GRANDES.md). Se carga justo detrás de él.
    ============================================================ */
+
+/* Nombre, tipo y tercero de un asunto, ya normalizados: tapado, sin el
+   tercero (Reservados.textoDeBusqueda), igual que en js/inicio.js
+   (App.textoDelAsunto de ese fichero). Se repite aquí, pequeña, para no
+   depender del orden de carga entre los dos ficheros. */
+App.textoBusquedaSimple = function (a) {
+  if (window.Reservados && Reservados.tapar(a)) return Reservados.textoDeBusqueda(a);
+  var tercero = window.QueMeToca ? QueMeToca.terceroDe(a) : '';
+  return U.normalizar([a.nombre, a.leido && a.leido.tipo, tercero].filter(Boolean).join(' '));
+};
 
 App.pintarAbiertos = function () {
   if (window.Reservados) Reservados.pintarBoton();   /* «Mostrar reservados» (fila 135) */
   if (!App.listaALaVista()) { App.E.listaPendiente = true; return; }
   App.E.listaPendiente = false;
-  App.pintarCuentas();
-  /* Varias palabras sueltas, en cualquier orden (fila 73,
-     docs/BUSCAR-EN-LAS-NOTAS.md, punto 2.1): mismo criterio que ya
-     usa el buscador del ARCHIVO (App.pintarArchivo). */
-  var palabras = U.normalizar($('buscar-abiertos').value).split(' ').filter(Boolean);
+  App.pintarFiltroTipoAsunto(App.E.listaAbiertos);
+
+  var texto = U.normalizar($('buscar-abiertos').value);
   var rotulo = $('cuenta-lista-abiertos');
   var orden = App.ordenElegido();
   $('orden-abiertos').value = orden;
   var filtro = $('filtro-estado').value;
   var plazo = $('filtro-plazo').value;
   var organo = $('filtro-organo') ? $('filtro-organo').value : '';   /* fila 134 */
+  var tipo = $('filtro-tipo-asunto') ? $('filtro-tipo-asunto').value : '';   /* fila 192 */
 
-  /* Fila 175, punto 5: con texto en el buscador, se busca en todos los
-     montones a la vez (no solo en el elegido); los demás filtros
-     (plazo, «Lo encarga», «Montón» no aplica aquí) se siguen aplicando. */
-  var buscandoEnTodos = palabras.length > 0;
-  if ($('buscando-en-todos')) $('buscando-en-todos').classList.toggle('oculto', !buscandoEnTodos);
-
-  /* Primero, el montón entero: lo que pasa el buscador y los filtros.
-     Sobre esto se cuentan las tarjetas de tipo. */
-  var monton = App.E.listaAbiertos.filter(function (a) {
-    if (!buscandoEnTodos && !App.deLaVista(a, App.E.vista)) return false;
-    if (palabras.length) {
-      /* Un reservado tapado solo sale por su nombre de carpeta (fila 135). */
-      var busca = (window.Reservados && Reservados.tapar(a)) ? Reservados.textoDeBusqueda(a) : a.busca;
-      if (!palabras.every(function (p) { return busca.indexOf(p) !== -1; })) return false;
-    }
+  var lista = App.E.listaAbiertos.filter(function (a) {
+    if (texto && App.textoBusquedaSimple(a).indexOf(texto) === -1) return false;
     if (!Plazos.pasaFiltro(a.ficha.limite || '', plazo)) return false;
     if (organo && window.TiposOrgano && !TiposOrgano.pasaFiltro(App.tipoDeAsunto(a), organo)) return false;
+    if (tipo && App.tipoDeAsunto(a) !== tipo) return false;
     return App.pasaFiltroMonton(a, filtro);
   });
 
-  /* Si el tipo elegido ya no está en el montón, se vuelve a todos: si
-     no, la lista se quedaría vacía sin que se vea por qué. */
-  if (App.tipoElegido && !monton.some(function (a) {
-    return App.tipoDeAsunto(a) === App.tipoElegido;
-  })) App.tipoElegido = '';
-
-  App.pintarGruposTipo(monton);
-
-  var lista = App.tipoElegido
-    ? monton.filter(function (a) { return App.tipoDeAsunto(a) === App.tipoElegido; })
-    : monton;
-
   lista.sort(App.ORDENES[orden]);
   if (rotulo) rotulo.textContent = lista.length;
-  var caja = $('lista-abiertos');
+  var caja = $('inicio-tabla-cuerpo');
   var alto = window.scrollY;   /* fila 119: la lista se queda a la misma altura */
   caja.innerHTML = '';
   if (!lista.length) {
-    caja.innerHTML = '<div class="vacio">' + App.textoVacio() + '</div>';
+    caja.innerHTML = '<tr><td colspan="7" class="vacio">' + App.textoVacio() + '</td></tr>';
     App.avisarALosModulos();
     return;
   }
-  lista.forEach(function (a) {
-    var tapado = window.Reservados && Reservados.tapar(a);
-    a._fragmento = tapado ? null : App.fragmentoDeNota(a, palabras);
-    var tarjeta = App.tarjetaAsunto(a, 'abierto');
-    caja.appendChild(window.Reservados ? Reservados.enTarjeta(tarjeta, a) : tarjeta);
-  });
+  lista.forEach(function (a) { caja.appendChild(App.filaTablaAsunto(a)); });
   if (window.scrollY !== alto) window.scrollTo(0, alto);
   App.avisarALosModulos();
 };
@@ -101,12 +94,11 @@ App.ICONO_DOCUMENTO =
 
 App.textoVacio = function () {
   if (!App.E.listaAbiertos.length) return 'No hay asuntos abiertos. Crea el primero en "Nuevo asunto".';
-  if (App.tipoElegido) return 'No queda ningún asunto de tipo ' + App.tipoElegido + ' en este montón.';
   if ($('buscar-abiertos').value.trim() || $('filtro-estado').value || $('filtro-plazo').value ||
-      ($('filtro-organo') && $('filtro-organo').value)) {
+      ($('filtro-organo') && $('filtro-organo').value) ||
+      ($('filtro-tipo-asunto') && $('filtro-tipo-asunto').value)) {
     return 'Ningún asunto coincide con lo que buscas.';
   }
-  if (App.E.vista === 'espera') return 'No hay nada esperando a terceros. Mejor así.';
   return 'Nada pendiente de gestionar aquí ahora mismo.';
 };
 
@@ -237,6 +229,115 @@ App.verDocumentos = async function (a, opciones) {
   await Documentos.abrir(a, opciones);
 };
 
+/* ============================================================
+   LA TABLA "TODOS LOS ASUNTOS ABIERTOS" (fila 192, apartado 5)
+   ============================================================ */
+
+/* El filtro «Tipo de asunto» (antes las tarjetas «Por tipo de
+   asunto», App.pintarGruposTipo): mismos montones
+   (App.montonesPorTipo), un <select> en vez de tarjetas. Guarda y
+   restaura el valor elegido, igual que App.pintarFiltroEstado. */
+App.pintarFiltroTipoAsunto = function (lista) {
+  var sel = $('filtro-tipo-asunto');
+  if (!sel) return;
+  var antes = sel.value;
+  var grupos = App.montonesPorTipo(lista);
+  sel.innerHTML = ['<option value="">Todos</option>'].concat(
+    grupos.map(function (g) {
+      var texto = Nombres.tipoParaVer(g.tipo, App.E.tipos);
+      return '<option value="' + U.escapar(g.tipo) + '" title="' + U.escapar(g.tipo) + '">' +
+        U.escapar(texto) + '</option>';
+    })
+  ).join('');
+  sel.value = antes;
+  if (sel.selectedIndex === -1) sel.value = '';
+};
+
+/* El <tr> de un asunto en la tabla: Asunto (pulsable, con candado si
+   es reservado), Tipo (con el nombre largo al pasar el ratón, como
+   antes), Hito actual (EstadoHito.marcaHTML, clic incluido), Le toca a
+   (quién tiene ahora el hito, o Administración), Plazo, Abierto y, al
+   final, el menú de tres puntos con «Copiar el nombre» y «Archivar». */
+App.filaTablaAsunto = function (a) {
+  var tr = document.createElement('tr');
+  tr.className = 'inicio-tabla-fila';
+
+  var tapado = window.Reservados && Reservados.tapar(a);
+  if (tapado) tr.classList.add('inicio-tabla-fila-tapada');
+  var candado = window.Reservados ? Reservados.candadoHtml(a) : '';
+  var nombreVer = window.Reservados ? Reservados.nombreParaVer(a) : a.nombre;
+
+  var tdNombre = document.createElement('td');
+  tdNombre.className = 'inicio-tabla-nombre';
+  var spanNombre = document.createElement('span');
+  /* «.tarjeta-nombre» se mantiene (además de «.nombre-pulsable», la
+     nueva) por compatibilidad: es como muchas pruebas de pruebas/
+     encuentran y pulsan el nombre de un asunto abierto, sin acotar por
+     «#lista-abiertos» (que ya no existe). */
+  spanNombre.className = 'nombre-pulsable tarjeta-nombre';
+  spanNombre.title = 'Abrir la ficha de este asunto';
+  spanNombre.innerHTML = candado + U.escapar(nombreVer);
+  spanNombre.onclick = function () { App.abrirFicha(a, 'abierto'); };
+  tdNombre.appendChild(spanNombre);
+  tr.appendChild(tdNombre);
+
+  var tdTipo = document.createElement('td');
+  if (a.leido.tipo) {
+    tdTipo.innerHTML = '<span class="marca-tipo" title="' + U.escapar(a.leido.tipo) + '">' +
+      U.escapar(Nombres.tipoParaVer(a.leido.tipo, App.E.tipos)) + '</span>';
+  }
+  tr.appendChild(tdTipo);
+
+  var lado = App.ladoDe(a);
+  var tdHito = document.createElement('td');
+  tdHito.className = 'inicio-tabla-hito';
+  tdHito.innerHTML = window.EstadoHito ? EstadoHito.marcaHTML(a, 'abierto', lado) : '';
+  tr.appendChild(tdHito);
+  if (window.EstadoHito) EstadoHito.engancharMarca(tdHito, a, 'abierto');
+
+  var tdQuien = document.createElement('td');
+  var quien = lado.esperando ? lado.esperando.nombre
+    : (lado.lado === 'terceros' ? lado.quien : 'Administración');
+  tdQuien.textContent = quien || '';
+  tr.appendChild(tdQuien);
+
+  var p = App.plazoDe(a);
+  var tdPlazo = document.createElement('td');
+  tdPlazo.innerHTML = p ? '<span class="marca-plazo ' + p.clase + '">' + U.escapar(p.texto) + '</span>' : '';
+  tr.appendChild(tdPlazo);
+
+  var tdAbierto = document.createElement('td');
+  tdAbierto.textContent = a.leido.fecha ? U.fechaCorta(U.fechaLegible(a.leido.fecha)) : '';
+  tr.appendChild(tdAbierto);
+
+  var tdMenu = document.createElement('td');
+  tdMenu.className = 'inicio-tabla-menu';
+  var copiar = document.createElement('button');
+  copiar.type = 'button';
+  copiar.textContent = 'Copiar el nombre';
+  copiar.onclick = function () {
+    U.copiar(a.nombre).then(function (ok) { if (ok) U.aviso('Nombre copiado.', 'bueno'); });
+  };
+  var archivar = document.createElement('button');
+  archivar.type = 'button';
+  archivar.textContent = 'Archivar';
+  archivar.onclick = async function () {
+    await U.mientrasGuarda(archivar, function () { return App.cerrarAsunto(a); });
+  };
+  tdMenu.appendChild(U.menuDeAcciones([copiar, archivar]));
+  tr.appendChild(tdMenu);
+
+  /* Con una acción larga en marcha sobre este asunto (fila 100,
+     App.conOcupado), la fila sale con sus botones apagados aunque se
+     repinte. */
+  if (App.E.ocupados && App.E.ocupados[a.nombre]) {
+    tr.classList.add('inicio-tabla-fila-ocupada');
+    Array.prototype.forEach.call(tr.querySelectorAll('button'), function (b) { b.disabled = true; });
+  }
+
+  return tr;
+};
+
 $('buscar-abiertos').oninput = function () {
   App.pintarAbiertos();
   App.pintarSueltos();
@@ -244,6 +345,7 @@ $('buscar-abiertos').oninput = function () {
 $('filtro-estado').onchange = function () { App.pintarAbiertos(); };
 $('filtro-plazo').onchange = function () { App.pintarAbiertos(); };
 if ($('filtro-organo')) $('filtro-organo').onchange = function () { App.pintarAbiertos(); };
+if ($('filtro-tipo-asunto')) $('filtro-tipo-asunto').onchange = function () { App.pintarAbiertos(); };
 
 $('orden-abiertos').onchange = function () {
   try { window.localStorage.setItem('orden-abiertos', this.value); } catch (e) {}

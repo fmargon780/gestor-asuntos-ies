@@ -59,6 +59,11 @@
     { fichero: 'plantillas-documento.js', nombre: 'App.abrirFicha' },
     { fichero: 'presencia.js', nombre: 'App.vigilarLaCarpeta' },
     { fichero: 'presencia.js', nombre: 'App.tarjetaAsunto' },
+    /* Fila 192, docs/INICIO-CUATRO-BLOQUES.md: la marca de presencia en
+       la tabla "Todos los asuntos abiertos" (App.tarjetaAsunto ya solo
+       sirve al ARCHIVO). No había más remedio: es la única forma de
+       que presencia.js siga sin saber cómo se pinta nada. */
+    { fichero: 'presencia.js', nombre: 'App.filaTablaAsunto' },
     { fichero: 'puente.js', nombre: 'App.tarjetaAsunto' },
     { fichero: 'relacionados-archivar.js', nombre: 'App.cerrarAsunto' },
     { fichero: 'relacionados-archivar.js', nombre: 'App.reabrirAsunto' },

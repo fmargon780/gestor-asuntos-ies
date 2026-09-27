@@ -80,10 +80,10 @@ await pagina.evaluate(async (datos) => {
 }, { a: A, b: B, c: C, d: D, tercero: TERCERO });
 
 await pagina.click('#btn-recargar');
-await pagina.waitForSelector('#lista-abiertos .tarjeta');
+await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
 
 async function abrirDesdeLaLista(nombre) {
-  await pagina.locator('#lista-abiertos .nombre-pulsable', { hasText: nombre }).click();
+  await pagina.locator('#inicio-tabla-cuerpo .nombre-pulsable', { hasText: nombre }).click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 }
 

@@ -259,8 +259,9 @@ ajustes y usa su cabecera). No sabe nada de ninguna pantalla en concreto:
   `css/estilos.css`. `z-index: 20`, por debajo de `.capa` (50) y `.mensajes` (60). Encogida: el
   título baja de 21px a 17px, se esconde el `.explica` que venga justo después de la cabecera
   (la regla `header.cabecera.encogida .filtros` sigue en `css/cabecera-fija.css`, pero desde la
-  fila 191 `.filtros` ya no vive dentro de la cabecera de Inicio, sino en `#inicio-legado`: no
-  tiene efecto ahí, queda pendiente de revisar si hace falta quitarla o repensarla), y el margen de abajo baja a 6px (reducir
+  fila 191 `.filtros` ya no vive dentro de la cabecera de Inicio: primero en `#inicio-legado`,
+  y desde la fila 192 en `#inicio-todos-asuntos`; sigue sin tener efecto ahí, queda pendiente de
+  revisar si hace falta quitarla o repensarla), y el margen de abajo baja a 6px (reducir
   el alto de la cabecera sola no basta si el hueco de debajo no se achica también: quien mueve el
   contenido es ese margen, no un padding nuevo, que solo la agrandaría). `.tarjeta` lleva
   `scroll-margin-top: 90px` para que la cabecera pegada no tape lo que se salta con

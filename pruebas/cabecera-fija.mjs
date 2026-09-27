@@ -127,14 +127,14 @@ await subirYEsperar(0);
 const alturaCabeceraAntes = await pagina.evaluate(() =>
   document.querySelector('#pantalla-abiertos header.cabecera').getBoundingClientRect().height +
   parseFloat(getComputedStyle(document.querySelector('#pantalla-abiertos header.cabecera')).marginBottom));
-const topAntes = await pagina.evaluate(() => document.querySelector('#lista-abiertos .tarjeta').getBoundingClientRect().top);
+const topAntes = await pagina.evaluate(() => document.querySelector('#inicio-tabla-cuerpo tr').getBoundingClientRect().top);
 
 await subirYEsperar(150);
 await pagina.waitForTimeout(300); /* deja terminar la transición CSS */
 const alturaCabeceraDespues = await pagina.evaluate(() =>
   document.querySelector('#pantalla-abiertos header.cabecera').getBoundingClientRect().height +
   parseFloat(getComputedStyle(document.querySelector('#pantalla-abiertos header.cabecera')).marginBottom));
-const topDespues = await pagina.evaluate(() => document.querySelector('#lista-abiertos .tarjeta').getBoundingClientRect().top);
+const topDespues = await pagina.evaluate(() => document.querySelector('#inicio-tabla-cuerpo tr').getBoundingClientRect().top);
 
 await comprobarQue('la cabecera de verdad ha encogido de alto (hueco reservado más pequeño)',
   Promise.resolve(alturaCabeceraAntes - alturaCabeceraDespues > 5));
@@ -290,7 +290,7 @@ await subirYEsperar(0);
 console.log('=== 6. La ficha de un asunto: se encoge, y el repintado no pierde el estado ===');
 await pagina.evaluate(() => App.ir('abiertos'));
 await pagina.waitForTimeout(200);
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(300);
 

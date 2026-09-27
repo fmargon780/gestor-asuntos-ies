@@ -65,8 +65,8 @@ await pagina.evaluate(async (datos) => {
 }, { asunto: NOMBRE_ASUNTO, documento: DOCUMENTO });
 
 await pagina.click('#btn-recargar');
-await pagina.waitForSelector('#lista-abiertos .tarjeta');
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila');
 

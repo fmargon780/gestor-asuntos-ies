@@ -167,7 +167,7 @@ function scriptDeDiscoDeMentira() {
   await pagina.waitForSelector('#btn-entrar:not([disabled])');
   await pagina.click('#btn-entrar');
   await pagina.waitForSelector('#aplicacion:not(.oculto)');
-  await comprobarAsync('entra en la aplicación', pagina.locator('#lista-abiertos').isVisible(), true);
+  await comprobarAsync('entra en la aplicación', pagina.locator('#inicio-tabla-cuerpo').isVisible(), true);
   await comprobarAsync('se lee "copia sin internet" ya dentro',
     pagina.locator('#usuario-pie').textContent().then((t) => t.indexOf('copia sin internet') !== -1), true);
 

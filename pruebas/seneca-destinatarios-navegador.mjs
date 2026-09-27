@@ -98,7 +98,7 @@ await pagina.click('#btn-crear');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 
 /* "Mensaje Séneca" vive ahora dentro de "Comunicar" (18-sep-2026, fila 52,

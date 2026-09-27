@@ -102,8 +102,8 @@ await pagina.evaluate(async (datos) => {
 });
 
 await pagina.click('#btn-recargar');
-await pagina.waitForSelector('#lista-abiertos .tarjeta');
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('#ficha-documentos .ficha-documento-fila');
 
@@ -161,8 +161,8 @@ await pagina.evaluate(async (datos) => {
   pdf: pdfConTexto('2026/29700692/A000000000099SALIDAFecha: 01/09/2026 09:00:00')
 });
 await pagina.click('#ficha-volver');
-await pagina.waitForSelector('#lista-abiertos .nombre-pulsable');
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.waitForSelector('#inicio-tabla-cuerpo .nombre-pulsable');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('.aviso-sello');
 
@@ -180,8 +180,8 @@ await comprobar('el PDF descartado sigue en la carpeta, tal cual',
 /* Se vuelve a abrir la ficha: al haberlo descartado, no debe volver a
    salir el aviso para el mismo fichero. */
 await pagina.click('#ficha-volver');
-await pagina.waitForSelector('#lista-abiertos .nombre-pulsable');
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.waitForSelector('#inicio-tabla-cuerpo .nombre-pulsable');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(500);
 await comprobar('al volver a entrar, no vuelve a preguntar por el mismo PDF',

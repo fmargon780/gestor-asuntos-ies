@@ -71,8 +71,8 @@ async function crearAsuntoAbierto(nombre, tercero) {
    3,5 s de esperas reales) hayan podido terminar. */
 async function archivarDesdeLaFicha(nombre) {
   await pagina.click('#btn-recargar');
-  await pagina.waitForSelector('#lista-abiertos .tarjeta');
-  await pagina.click(`#lista-abiertos .tarjeta:has-text("${nombre}") .nombre-pulsable`);
+  await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
+  await pagina.click(`#inicio-tabla-cuerpo tr:has-text("${nombre}") .nombre-pulsable`);
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.click('button:has-text("Archivar el asunto")');
   await pagina.waitForSelector('#capa:not(.oculto)');

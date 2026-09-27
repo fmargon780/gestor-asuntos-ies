@@ -89,7 +89,7 @@ console.log('--- 1) poner el asunto «Esperando a…» ---');
 /* Desde la fila 129 (docs/EL-HITO-ES-EL-ESTADO.md) ya no hay desplegable
    de estado: lo que se toca en la cabecera es «Esperando a…». Tiene que
    verse en la ficha y en la tarjeta sin recargar. */
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('#ficha-acciones .boton-esperando');
 await pagina.click('#ficha-acciones .boton-esperando');
@@ -100,14 +100,20 @@ await comprobar('la ficha ya enseña «Esperando a…», sin recargar',
   pagina.locator('#ficha-acciones .marca-esperando').textContent().then(t => t.indexOf('Esperando a ') === 0), true);
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(200);
-await comprobar('el asunto se ha ido de «Pendiente de Administración», sin recargar',
-  pagina.locator('#lista-abiertos .tarjeta-asunto').count(), 0);
-await pagina.evaluate(() => window.App.irVista('espera'));
+/* Fila 192: la tabla enseña todos los asuntos a la vez, sin montones;
+   lo que antes se veía al cambiar de montón ahora se ve con el filtro
+   «Situación», sin recargar. */
+if (await pagina.locator('#filtros-abiertos').isHidden()) await pagina.click('#btn-filtros');
+await pagina.selectOption('#filtro-estado', 'administracion');
 await pagina.waitForTimeout(200);
-await comprobar('y su tarjeta, en «Pendiente de terceros», lo dice',
-  pagina.locator('#lista-abiertos .tarjeta .marca-esperando').first().textContent().then(t => t.indexOf('Esperando a ') === 0), true);
+await comprobar('con «Situación: Nos toca», ya no sale (sin recargar)',
+  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 0);
+await pagina.selectOption('#filtro-estado', '');
+await pagina.waitForTimeout(200);
+await comprobar('en la fila (todos los asuntos), la marca «Esperando a…» ya se ve, sin recargar',
+  pagina.locator('#inicio-tabla-cuerpo tr .marca-esperando').first().textContent().then(t => t.indexOf('Esperando a ') === 0), true);
 /* Se deja como estaba: «Ya ha llegado», y de vuelta al montón de siempre. */
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#ficha-acciones .boton-ya-llegado');
 await pagina.click('#ficha-acciones .boton-ya-llegado');
 await pagina.waitForSelector('#ficha-acciones .boton-esperando');
@@ -116,7 +122,7 @@ await pagina.evaluate(() => window.App.irVista('departamento'));
 await pagina.waitForTimeout(200);
 
 console.log('--- 2) marcar un hito (paso de la guía) como hecho ---');
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForSelector('.hito');
 await comprobar('empieza en 0 de 2', pagina.locator('.hitos-cuenta').textContent()
@@ -140,7 +146,7 @@ await comprobar('el hito queda pintado como hecho, sin recargar',
 console.log('--- 3) archivar el asunto ---');
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(200);
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 const btnArchivar = pagina.getByRole('button', { name: 'Archivar el asunto', exact: true });
 await btnArchivar.click();
@@ -149,9 +155,9 @@ await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
 await comprobar('vuelve solo a la lista de abiertos', pagina.locator('#pantalla-abiertos').isVisible(), true);
 await comprobar('el asunto ya no sale en abiertos, sin recargar',
-  pagina.locator('#lista-abiertos .tarjeta').count(), 0);
+  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 0);
 await comprobar('y la lista dice que está vacía',
-  pagina.locator('#lista-abiertos .vacio').count(), 1);
+  pagina.locator('#inicio-tabla-cuerpo .vacio').count(), 1);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

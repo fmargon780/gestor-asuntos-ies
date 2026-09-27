@@ -145,29 +145,26 @@ await comprobar('3. la lista está pintada (sin archivados todavía, pero sin "P
   pagina.locator('#explica-archivo').textContent().then(t => t.indexOf('Pulsa Actualizar') === -1), true);
 
 /* ================================================================
-   4) El buscador de Asuntos abiertos busca en todos los montones.
+   4) El buscador de Asuntos abiertos filtra la tabla "Todos los
+      asuntos abiertos" (fila 192: sin montones, los dos asuntos de
+      la persona salen siempre a la vez; el buscador los reduce por
+      nombre, tipo o tercero, igual que en los bloques de arriba).
    ================================================================ */
-console.log('--- 4. el buscador de Asuntos abiertos busca en todos los montones ---');
+console.log('--- 4. el buscador de Asuntos abiertos filtra la tabla (fila 192, sin montones) ---');
 
 await pagina.click('.pestana[data-pantalla="abiertos"]');
-await pagina.evaluate(() => window.App.irVista('departamento'));
-await pagina.waitForTimeout(150);
-await comprobar('4. sin buscar, en "Nos toca" solo sale el de MATRICULA',
-  pagina.locator('#lista-abiertos .tarjeta').count(), 1);
-await comprobar('4. la línea de "buscando en todos" no se ve',
-  pagina.locator('#buscando-en-todos').isVisible(), false);
+await comprobar('4. sin buscar, salen los dos asuntos de la persona (ya no hay montón que los separe)',
+  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 2);
 
-await pagina.fill('#buscar-abiertos', 'Buscada');
+await pagina.fill('#buscar-abiertos', 'CERTIFICADO');
 await pagina.waitForTimeout(250);
-await comprobar('4. buscando, salen los dos asuntos (el de "Nos toca" y el de "Esperan a terceros")',
-  pagina.locator('#lista-abiertos .tarjeta').count(), 2);
-await comprobar('4. avisa de que busca en todos los montones',
-  pagina.locator('#buscando-en-todos').isVisible(), true);
+await comprobar('4. buscando por el tipo, solo el CERTIFICADO',
+  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 1);
 
 await pagina.fill('#buscar-abiertos', '');
 await pagina.waitForTimeout(150);
-await comprobar('4. al vaciar el buscador, vuelve a filtrar por el montón elegido',
-  pagina.locator('#lista-abiertos .tarjeta').count(), 1);
+await comprobar('4. al vaciar el buscador, vuelven los dos',
+  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 2);
 
 /* ================================================================
    5) El plazo de un paso no se pierde sin avisar.

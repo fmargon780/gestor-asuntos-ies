@@ -51,7 +51,7 @@ if (PALABRAS.length) {
    que corran sin competir por CPU, al final, después de todas las
    demás. Si alguna prueba futura tuviera el mismo problema, su nombre
    va también aquí. */
-const EN_SOLITARIO = ['documentos-sueltos.mjs', 'repintar-solo-lo-que-cambia.mjs'];
+const EN_SOLITARIO = ['documentos-sueltos.mjs', 'repintar-solo-lo-que-cambia.mjs', 'hito-desde-por-clasificar.mjs'];
 
 function tope() {
   const n = parseInt(process.env.PRUEBAS_A_LA_VEZ, 10);

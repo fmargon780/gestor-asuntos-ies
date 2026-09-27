@@ -69,7 +69,6 @@ App.verAbiertosPorTurno = async function (yaLeido) {
 
   $('cuenta-abiertos').textContent = App.E.listaAbiertos.length || '';
   App.pintarFiltroEstado();
-  App.pintarCuentas();
   App.pintarAbiertos();
   await App.pintarSueltos();
 };

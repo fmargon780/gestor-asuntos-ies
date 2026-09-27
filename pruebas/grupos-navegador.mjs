@@ -180,7 +180,7 @@ async function crearAsunto(categoriaIndice, botonTipo, buscarTexto) {
 /* El tercero principal es de PERSONAL (Aguado Ranea), para no chocar
    con los miembros del grupo, que son de ALUMNADO. */
 await crearAsunto(2, 'PERMISO', 'aguado');
-await pagina.click('#lista-abiertos .nombre-pulsable');
+await pagina.click('#inicio-tabla-cuerpo .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 /* "Personas y entidades relacionadas" es una tarjeta (fila 107). */
 await pagina.evaluate(() => FichaTarjetas.abrir('relacionados'));
