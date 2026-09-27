@@ -309,6 +309,8 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 }
 .tipo-boton:hover { border-color: var(--azul); color: var(--azul); }
 .tipo-boton.elegido { background: var(--azul); border-color: var(--azul); color: #fff; }
+.tipo-boton:focus { outline: none; }
+.tipo-boton:focus-visible { outline: 2px solid var(--azul); outline-offset: 1px; }
 
 .categorias { display: flex; flex-wrap: wrap; gap: 10px; }
 .categoria-boton {

@@ -178,6 +178,18 @@
     return r;
   }
 
+  /* Fila 207 (docs/UNIR-DOS-TIPOS.md): un asunto que ha pasado de tipo
+     al unir dos tipos en uno lleva `ficha.tipoUnidoDe` con el nombre del
+     tipo que desapareció. Sus hitos son los de aquella guía, no los de
+     la guía del tipo que se queda: no se le ofrece la guía nueva, así
+     que tampoco debe recibir sus pasos nuevos, ni ahora ni más adelante
+     (si Francisco vuelve a cambiar esa guía la semana que viene). */
+  function tieneTipoUnido(clave) {
+    var registro = window.App && App.E && App.E.registro;
+    var ficha = registro && registro.asuntos && registro.asuntos[clave];
+    return !!(ficha && ficha.tipoUnidoDe);
+  }
+
   /* Al guardar la guía de un tipo: todos los asuntos abiertos de ese
      tipo que ya tienen hitos, en UNA sola escritura de hitos.json, por
      la cola de guardado. Devuelve a cuántos asuntos ha llegado algo. */
@@ -186,7 +198,7 @@
     var claves = Gestor.asuntos().filter(function (a) {
       var t = (window.App && typeof App.tipoDeAsunto === 'function')
         ? App.tipoDeAsunto(a) : ((a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '');
-      return t === tipo;
+      return t === tipo && !tieneTipoUnido(a.nombre);
     }).map(function (a) { return a.nombre; });
     if (!claves.length) return 0;
     var llegados = 0;
@@ -213,6 +225,7 @@
      escribe si de verdad falta algo, mirándolo antes en memoria. */
   async function completarAsunto(clave, entradaLeida, pasos) {
     if (!entradaLeida || !(entradaLeida.hitos || []).length || !(pasos || []).length) return null;
+    if (tieneTipoUnido(clave)) return null;
     var previa = pasosQueFaltan(entradaLeida.hitos, pasos, entradaLeida.pasosConocidos);
     if (!previa.anadidos && !previa.retocados) return null;
     var resultado = null, anadidos = 0;

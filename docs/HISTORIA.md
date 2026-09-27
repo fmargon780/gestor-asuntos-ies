@@ -5,6 +5,53 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 207: unir dos tipos de asunto en uno
+
+`docs/UNIR-DOS-TIPOS.md`. En Ajustes › pantalla de un tipo, junto a "Cambiar el nombre", un botón
+nuevo **"Unir con otro tipo"**: se elige, con buscador, el tipo con el que se queda; el tipo cuya
+pantalla está abierta desaparece. Un solo `U.preguntar` con el buscador y el resumen de la
+confirmación juntos (el resumen aparece al elegir, y "Unir" se enciende entonces).
+
+Nuevo módulo `js/tipos-unir.js` (`TiposUnir.unir(desaparece, seQueda)`). Reutiliza de
+`js/tipos-nombre.js` lo que vale igual (`moverPlantillas`, `moverRecurrentes`, la normalización de
+nombres), pero la guía y los campos llevan su propia regla, distinta de `TiposNombre.mover` (que
+sirve para renombrar un tipo, no para unir dos): la guía se queda siempre la del tipo que se
+queda, salvo que esté vacía o sea la mínima; los campos propios se **suman** por nombre, sin
+comparar cuál tipo tiene más. El orden es siempre el mismo: primero todo lo de `_GESTOR` (guía,
+campos, plantillas, recurrentes, palabras clave, alias, la lápida de borrado); si algo de eso
+falla, aviso rojo y no se toca ningún asunto. Después, los asuntos abiertos del tipo que
+desaparece, uno detrás de otro, por el mismo camino que "Cambiar" un asunto (`Carpetas.renombrar`
++ `AsuntoRenombrar.mover`, sin ofrecer la guía nueva): si alguno no se puede renombrar (ya existe
+una carpeta con ese nombre), se salta y sale en el aviso ámbar final, sin parar a los demás. El
+ARCHIVO no se toca nunca.
+
+**`tipoUnidoDe`**: cada asunto pasado lleva este campo en su ficha, con el nombre del tipo que
+desapareció. Hacía falta porque el reparto de hitos nuevos de una guía a los asuntos abiertos de
+su tipo (`js/hitos-sincronizar.js`, `Hitos.llevarGuiaAAbiertos` y `Hitos.completarAsuntoConGuia`,
+la red de seguridad al abrir la ficha) SÍ alcanzaba a los asuntos recién unidos, y no debía: sus
+hitos son los de la guía de antes, no los de la guía nueva del tipo que se queda. Las dos
+funciones saltan ahora los asuntos con `tipoUnidoDe`, para siempre, no solo la primera vez.
+
+Si el tipo que desaparece era reservado y el que se queda no, cada asunto pasado queda marcado
+reservado uno a uno (fila 135), para que no se destape nada.
+
+**Cómo se hizo:** un agente implementó el módulo, el botón y la prueba (`pruebas/tipos-unir.mjs`,
+de lógica con jsdom, sin navegador de verdad, siguiendo el patrón de
+`pruebas/cargar-biblioteca.mjs`) con instrucciones detalladas de qué reutilizar de
+`js/tipos-nombre.js` y qué no; esta sesión revisó el diff entero, corrió `npm test` completo de
+forma independiente en verde (166 ficheros), y comprobó a ojo con Playwright el botón y el cuadro
+de verdad en un navegador (buscador, resumen que aparece al elegir, "Unir" que se enciende).
+
+**Un arreglo de paso, visto en esa comprobación visual:** los botones de tipo del buscador
+(`.tipo-boton`, ya existentes, reutilizados aquí) se quedaban con el marco del foco del navegador
+después de un clic con el ratón, el mismo problema ya arreglado hoy en "Ver todo" de Inicio (fila
+191). Mismo arreglo: el marco solo sale navegando con el teclado (`:focus-visible`), en
+`css/estilos.css`, para todos los sitios que usan `.tipo-boton` (también el de "Nuevo asunto").
+
+**Ficheros que crecen por encima de 400 líneas:** `js/ajustes-tipo.js` pasa de 467 a 479 líneas
+con el botón nuevo (ya pasaba de 400 antes de esta fila). Por debajo del límite duro de 600: no se
+ha partido.
+
 ## 27-sep-2026 — Fila 208: las pruebas, varias a la vez; y dos arreglos de la fila 191
 
 `docs/PRUEBAS-MAS-RAPIDAS.md`. `pruebas/ejecutar.mjs`, reescrito: levanta el mismo servidor local

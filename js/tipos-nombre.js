@@ -272,7 +272,13 @@ var TiposNombre = (function () {
 
   return {
     mover: mover, arreglar: arreglar, nombresDe: nombresDe, tipoPorNombre: tipoPorNombre,
-    hayAlgo: hayAlgo, textoDe: textoDe, repetidas: repetidas, quitarRepetidas: quitarRepetidas
+    hayAlgo: hayAlgo, textoDe: textoDe, repetidas: repetidas, quitarRepetidas: quitarRepetidas,
+    /* Fila 207 (docs/UNIR-DOS-TIPOS.md): js/tipos-unir.js reutiliza `n`
+       (la normalización de nombres) y `moverPlantillas`/`moverRecurrentes`
+       tal cual, sin cambiar lo que hacen para App.renombrarTipo. La guía
+       y los campos, al unir dos tipos, llevan su propia regla, distinta
+       de moverGuia/moverCampos de aquí arriba. */
+    n: n, moverPlantillas: moverPlantillas, moverRecurrentes: moverRecurrentes
   };
 })();
 window.TiposNombre = TiposNombre;
