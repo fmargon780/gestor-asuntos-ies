@@ -5,6 +5,80 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 199: documentos y comunicaciones del hito, como tareas (y una corrección)
+
+`docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartado 4. «Documentos de este paso» y «Comunicación
+de este paso» desaparecen del editor de una guía; su contenido se convierte, al abrir el editor,
+en tareas del guion del hito. Implementada por otra sesión (commit `0dc4e71`, sin acceso a un
+checkout completo del repositorio ni a Playwright, solo a la herramienta de subir ficheros de
+GitHub uno a uno) mientras esta sesión trabajaba la misma fila en paralelo — la regla 0 de
+`docs/COLA.md` ("una sola sesión y una sola fila") se saltó sin que ninguna de las dos lo supiera;
+la de esta sesión se descartó al comprobar que la otra ya había fusionado y publicado. **Esta
+entrada documenta la implementación de esa sesión y la corrección que le ha hecho esta, sobre lo
+ya publicado**, tras encontrar que no cumplía dos decisiones que Francisco había dado
+explícitamente a esta sesión antes de que se descubriera la colisión.
+
+**La migración** (`js/guias-editor.js`, `convertirDocumentosYComunicacionPuro`/
+`convertirDocumentosYComunicacion`, llamada al principio de `editar()`, antes de pintar nada):
+recorre los pasos a cualquier profundidad (bajando por `opciones[j].pasos` en cada nivel de
+pregunta). Por cada paso con contenido real que convertir: cada id de `plantillasDocumento` se
+convierte en una tarea `{accion:'generar', receta:{plantilla:id}}` con el título «Generar un
+documento → nombre» (el nombre de verdad si `Plantillas.documentoPorId` lo encuentra, o el propio
+id si no); el texto de `comunicacion` se convierte en una o dos tareas `{accion:'comunicar',
+receta:{a:'', via, plantilla}}`, con una plantilla nueva en `plantillas.json → lista`. Tras
+convertir, `plantillasDocumento` y `comunicacion` quedan vacíos: idempotente, abrir el editor una
+segunda vez no encuentra nada que migrar.
+
+**Lo que no cumplía las decisiones de Francisco, y se ha corregido aquí:**
+1. **El asunto de correo escrito a mano se perdía.** Francisco había decidido (respondiendo a esta
+   sesión, antes de la colisión) que un `comunicacion.correo.asunto`/`seneca.asunto` personalizado
+   pasara como primera línea del cuerpo de la plantilla nueva, para no perder nada sin decirlo. La
+   implementación publicada no lo leía en ningún sitio: se perdía sin más. Corregido
+   (`textoDelCanal`): con asunto, `asunto.trim() + '\n\n' + cuerpo`; sin él, el cuerpo tal cual.
+2. **Con los dos canales (correo y Séneca) con texto DISTINTO, solo salía una tarea, no dos.**
+   Francisco había decidido explícitamente "los dos, como dos avisos", nunca uno solo. La
+   implementación publicada creaba una plantilla con `texto`+`textoSeneca` (bien) pero solo UNA
+   tarea con `via:''`; como `js/hito-mesa-recetas.js` usa `receta.via || canales[0] || 'correo'`
+   y `canales[0]` es siempre `'correo'` tras la migración (el hito se queda sin comunicación propia
+   que ofrezca solo un canal), esa tarea única SIEMPRE se disparaba por correo: el aviso de Séneca
+   quedaba guardado en la plantilla pero sin ninguna tarea propia que lo lance. Corregido: con los
+   dos canales distintos, dos tareas (`via:'correo'` y `via:'seneca'`), las dos con la misma
+   plantilla — sin duplicar la plantilla, que ya podía llevar un texto por canal
+   (`js/correo.js` usa `textoSeneca` para Séneca si lo hay, y si no, cae a `texto`).
+3. **Un fallo real, no relacionado con lo anterior, encontrado al revisar el punto 2**: con un
+   SOLO canal con texto (por ejemplo, solo Séneca), la tarea también salía con `via:''`, que se
+   dispara por correo por defecto — así, un aviso escrito solo para Séneca se habría enviado por
+   correo, con el texto de Séneca. Corregido: con un solo canal, la tarea lleva ESE `via` exacto
+   (`'correo'` o `'seneca'`), nunca vacío.
+4. **La limpieza del editor se quedó a medias.** La sesión que implementó esto no tenía Playwright
+   ni un checkout completo, así que solo tocó `js/guias-paso-bloques.js` (los pasos de arriba, sin
+   pregunta): los SUBPASOS (dentro de una opción de una pregunta) seguían pintando las secciones
+   viejas «Comunicación de este paso»/«Documentos de este paso» en `js/guias-opciones-editor.js`
+   (vacías tras la migración de datos, pero visibles); `js/guias-comunicacion.js` (128 líneas) y
+   parte de `js/guias-documentos.js` (`bloqueHTML`/`enganchar`) se quedaban sin ningún sitio que
+   los llamara, código muerto; y el `<script src="js/guias-comunicacion.js">` seguía en
+   `index.html`. Completado aquí: subpasos sin esas secciones, `js/guias-comunicacion.js` borrado
+   entero, `js/guias-documentos.js` reducido a `precargar`/`lineaHTML` (lo que sigue usando la
+   vista de solo lectura), CSS muerto (`.paso-comunicacion*`, `.paso-documentos`) quitado, y los
+   comentarios de `js/hitos-biblioteca.js`/`js/plantillas-ajustes.js` que mencionaban el fichero
+   borrado, puestos al día.
+
+**Pruebas**: `pruebas/documentos-comunicacion-a-tareas.mjs` (de la sesión que lo implementó,
+lógica con jsdom, sin navegador) ampliada con los casos 7 (vía correcta con un solo canal) y 8 (el
+asunto no se pierde; con los dos canales iguales, una sola tarea con `via:''`), y sus casos 2 y 3
+corregidos para esperar el comportamiento arreglado. `pruebas/guia-en-acordeon.mjs` y
+`pruebas/documentos-desde-el-hito.mjs` (que ya probaban parte de esto, pero nadie las había puesto
+al día tras la fusión: no estaban en la lista de ficheros tocados) corregidas para reflejar la
+migración real en vez de la sección de editor ya retirada, y para que `HitosBiblioteca.diferencias`
+ya no espere comparar `plantillasDocumento`. `pruebas/insertar-hueco-en-el-paso.mjs` (probaba
+"Insertar hueco" de la sección de comunicación del editor, que ya no existe en ningún paso ni
+subpaso) borrada entera. `npm test` completo (171 ficheros), en verde, comprobado dos veces de
+forma independiente con `CHROMIUM_PATH=/opt/pw-browsers/chromium` (el entorno de esta sesión
+necesita esa variable para encontrar el Chromium de verdad; sin ella, Playwright busca una
+revisión que no está instalada y casi toda la tanda falla por eso, no por la aplicación).
+
+---
+
 ## 27-sep-2026 — Fila 198: la pantalla del tipo, con lista de comprobación y guardado al cambiar
 
 `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartados 1, 2, 3, 5 y 8 (los apartados 4, 6 y 7 —hitos

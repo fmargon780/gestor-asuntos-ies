@@ -218,12 +218,12 @@
   }
 
   /* Un campo de texto con su botón "Insertar hueco" (18-sep-2026, fila
-     60, docs/COMUNICAR-DESDE-EL-HITO.md, 4): lo que hasta hoy solo
-     montaba el cuadro de una plantilla, ahora también lo usa la
-     sección "Comunicación de este paso" del editor de un paso de la
-     guía (js/guias-comunicacion.js), con sus propios ids. `otrosCampos`
-     son campos adicionales (por ejemplo, el de asunto) que también
-     pueden recibir el hueco desde el mismo botón. */
+     60, docs/COMUNICAR-DESDE-EL-HITO.md, 4): el cuadro de una
+     plantilla. `otrosCampos` son campos adicionales (por ejemplo, el
+     de asunto) que también pueden recibir el hueco desde el mismo
+     botón. (Hasta la fila 199 también lo usaba «Comunicación de este
+     paso» del editor de la guía, `js/guias-comunicacion.js`, ya
+     borrado: esa sección se convierte ahora en tareas del guion.) */
   function campoDeTextoHTML(idTexto, idBoton, etiqueta, valor, filas) {
     return '<div class="etiqueta-con-boton">' +
       '<label class="etiqueta">' + U.escapar(etiqueta) + '</label>' +
@@ -442,8 +442,6 @@
     cargar: cargar,
     pintarDeTipo: pintarDeTipo,
     abrirCuadroDePlantilla: abrirCuadroDePlantilla,
-    /* Para "Comunicación de este paso" (js/guias-comunicacion.js, fila
-       60): el mismo campo de texto con "Insertar hueco" de aquí. */
     campoDeTextoHTML: campoDeTextoHTML,
     engancharCampoDeTexto: engancharCampoDeTexto,
     /* Fila 151: el editor de plantilla dentro del cuadro de Correo o de

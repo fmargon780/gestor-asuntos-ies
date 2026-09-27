@@ -100,17 +100,9 @@ var GuiasOpcionesEditor = (function () {
 
         if (!subPregunta) {
           c.prepararRecuadro(sc.querySelector('.subpaso-cuerpo'));
-          /* Fila 138: sin «Lo que hay que reunir» aparte (va en el guion). */
-          if (window.GuiasComunicacion) {
-            sc.insertAdjacentHTML('beforeend', GuiasComunicacion.bloqueHTML(sp.id, sp.comunicacion));
-            c.restaurar(sc.querySelector(':scope > .paso-comunicacion'), i, sp.id);
-            GuiasComunicacion.enganchar(sc, sp.id);
-          }
-          if (window.GuiasDocumentos) {
-            sc.insertAdjacentHTML('beforeend', GuiasDocumentos.bloqueHTML(sp.plantillasDocumento));
-            c.restaurar(sc.querySelector(':scope > .paso-documentos'), i, sp.id);
-            GuiasDocumentos.enganchar(sc);
-          }
+          /* Fila 138: sin «Lo que hay que reunir» aparte (va en el guion).
+             Fila 199: igual con «Comunicación» y «Documentos» de este
+             subpaso (convertidas en tareas del guion al abrir el editor). */
           if (window.GuiasGuion) {   /* fila 109 */
             sc.insertAdjacentHTML('beforeend', GuiasGuion.bloqueHTML(sp.guion));
             c.restaurar(sc.querySelector(':scope > .paso-guion'), i, sp.id);

@@ -13,10 +13,17 @@
       «Generar un documento → nombre», con la receta apuntando a su id,
       y el paso se queda sin `plantillasDocumento`.
    2. Un texto de comunicación (correo) se convierte en una tarea
-      «Comunicar → título del hito», con una plantilla NUEVA (con ese
-      mismo texto) y el paso se queda sin `comunicacion`.
-   3. Con texto de correo Y de Séneca distintos, la plantilla nueva
-      lleva los dos (`texto` y `textoSeneca`).
+      «Comunicar → título del hito» con `via:'correo'` (no `''`: con
+      solo un canal, dejar `via` vacío haría que
+      `js/hito-mesa-recetas.js` la disparase por el canal por defecto,
+      que no tiene por qué ser el que de verdad tiene texto), con una
+      plantilla NUEVA (con ese mismo texto) y el paso se queda sin
+      `comunicacion`.
+   3. Con texto de correo Y de Séneca DISTINTOS: una sola plantilla
+      nueva con los dos (`texto` y `textoSeneca`), pero DOS tareas
+      «Comunicar» (`via:'correo'` y `via:'seneca'`, decidido con
+      Francisco el 27-sep-2026: "los dos, como dos avisos", nunca uno
+      solo aunque compartan plantilla).
    4. Repetir la conversión sobre el resultado no crea nada más
       (idempotente): ni tareas nuevas ni plantillas nuevas.
    5. Un paso sin nada que convertir (sin plantillasDocumento ni
@@ -24,7 +31,13 @@
    6. La conversión entra también en los subpasos de una pregunta, a
       cualquier profundidad, y nunca en el propio paso-pregunta.
    7. Un paso con solo texto de Séneca (sin correo) también se
-      convierte, usando ese texto como `texto` de la nueva plantilla. */
+      convierte, usando ese texto como `texto` de la nueva plantilla,
+      con `via:'seneca'` (no `'correo'` por defecto).
+   8. Un asunto de correo escrito a mano (`comunicacion.correo.asunto`)
+      pasa como primera línea del cuerpo de la plantilla nueva, en vez
+      de perderse (decidido con Francisco el 27-sep-2026). Con los dos
+      canales iguales (mismo asunto y cuerpo), una sola tarea con
+      `via:''` (vale para cualquiera). */
 import { JSDOM } from 'jsdom';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -78,26 +91,29 @@ console.log('--- 2. un texto de comunicación (correo) se convierte en tarea, co
   var idNuevo = idsDePrueba();
   var nuevas = convertir(pasos, 'MATRICULA', 'ALUMNADO', { idPlantilla: idNuevo });
   comprobar('crea una sola plantilla nueva', nuevas.length, 1);
-  comprobar('la plantilla nueva lleva el tipo, la categoría, el nombre del hito y el texto de correo',
+  comprobar('la plantilla nueva lleva el tipo, la categoría, el nombre del hito y el texto de correo, con el asunto delante',
     nuevas[0], { id: 'pl-prueba-1', tipo: 'MATRICULA', categoria: 'ALUMNADO', nombre: 'Avisar a la familia',
-                 texto: 'Le informamos de que...' });
+                 texto: 'Aviso\n\nLe informamos de que...' });
   comprobar('el paso se queda sin texto de comunicación',
     pasos[0].comunicacion, { correo: { asunto: '', cuerpo: '' }, seneca: { asunto: '', cuerpo: '' } });
   comprobar('sale una tarea "Comunicar" con el título del hito',
     pasos[0].guion.map(function (g) { return g.texto; }),
     ['Comunicar → Avisar a la familia']);
-  comprobar('la tarea lleva accion "comunicar" y la receta con la plantilla nueva',
+  comprobar('la tarea lleva accion "comunicar" y la receta con via "correo" (no vacío) y la plantilla nueva',
     [pasos[0].guion[0].accion, pasos[0].guion[0].receta],
-    ['comunicar', { a: '', via: '', plantilla: 'pl-prueba-1' }]);
+    ['comunicar', { a: '', via: 'correo', plantilla: 'pl-prueba-1' }]);
 })();
 
-console.log('--- 3. con texto de correo y de Séneca distintos, los dos se guardan ---');
+console.log('--- 3. con texto de correo y de Séneca distintos, los dos se guardan y salen dos tareas ---');
 (function () {
   var pasos = Guias.normalizar([{ id: 'h3', titulo: 'Comunicar el cierre', cuerpo: '',
     comunicacion: { correo: { asunto: '', cuerpo: 'Texto de correo.' }, seneca: { asunto: '', cuerpo: 'Texto de Séneca, distinto.' } } }]);
   var nuevas = convertir(pasos, 'BAJA', 'PERSONAL', { idPlantilla: idsDePrueba() });
-  comprobar('la plantilla lleva los dos textos', [nuevas[0].texto, nuevas[0].textoSeneca],
-    ['Texto de correo.', 'Texto de Séneca, distinto.']);
+  comprobar('una sola plantilla nueva, con los dos textos', [nuevas.length, nuevas[0].texto, nuevas[0].textoSeneca],
+    [1, 'Texto de correo.', 'Texto de Séneca, distinto.']);
+  comprobar('salen DOS tareas "comunicar" (correo y Séneca), las dos con la misma plantilla',
+    pasos[0].guion.map(function (g) { return [g.accion, g.receta.via, g.receta.plantilla]; }),
+    [['comunicar', 'correo', nuevas[0].id], ['comunicar', 'seneca', nuevas[0].id]]);
 })();
 
 console.log('--- 4. repetir la conversión no duplica nada ---');
@@ -149,6 +165,24 @@ console.log('--- 7. solo texto de Séneca (sin correo) también se convierte ---
   var nuevas = convertir(pasos, 'MATRICULA', 'ALUMNADO', { idPlantilla: idsDePrueba() });
   comprobar('la plantilla usa el texto de Séneca como texto principal, sin textoSeneca aparte',
     [nuevas[0].texto, nuevas[0].textoSeneca], ['Texto solo de Séneca.', undefined]);
+  comprobar('la tarea lleva via "seneca" (no "correo" por defecto: se enviaría por el canal equivocado)',
+    pasos[0].guion[0].receta.via, 'seneca');
+})();
+
+console.log('--- 8. un asunto escrito a mano no se pierde: primera línea del cuerpo nuevo ---');
+(function () {
+  var pasos = Guias.normalizar([{ id: 'h8', titulo: 'Con asunto propio', cuerpo: '',
+    comunicacion: { correo: { asunto: 'Aviso importante', cuerpo: 'Cuerpo del correo.' }, seneca: { asunto: '', cuerpo: '' } } }]);
+  var nuevas = convertir(pasos, 'MATRICULA', 'ALUMNADO', { idPlantilla: idsDePrueba() });
+  comprobar('el asunto pasa como primera línea del cuerpo, con una línea en blanco detrás',
+    nuevas[0].texto, 'Aviso importante\n\nCuerpo del correo.');
+
+  var pasosIguales = Guias.normalizar([{ id: 'h9', titulo: 'Mismo asunto y cuerpo en los dos canales', cuerpo: '',
+    comunicacion: { correo: { asunto: 'Aviso', cuerpo: 'Mismo texto.' }, seneca: { asunto: 'Aviso', cuerpo: 'Mismo texto.' } } }]);
+  var nuevas2 = convertir(pasosIguales, 'MATRICULA', 'ALUMNADO', { idPlantilla: idsDePrueba() });
+  comprobar('con los dos canales iguales (asunto y cuerpo), una sola tarea con via vacía',
+    [pasosIguales[0].guion.length, pasosIguales[0].guion[0].receta.via, 'textoSeneca' in nuevas2[0]],
+    [1, '', false]);
 })();
 
 console.log(fallos ? '\n' + fallos + ' comprobaciones han fallado.' : '\nTodo bien.');

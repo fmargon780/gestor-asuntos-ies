@@ -12,10 +12,11 @@
    27-sep-2026, fila 199 (docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md,
    apartado 4): «Comunicación de este paso» y «Documentos de este paso»
    ya no se pintan aquí. Su contenido pasa a tareas del guion, en la
-   conversión automática de `js/guias-editor.js` (`convertirDocumentosYComunicacionPuro`,
-   llamada al abrir el editor); `js/guias-comunicacion.js` y
-   `js/guias-documentos.js` siguen existiendo, pero ya no los llama este
-   fichero.
+   conversión automática de `js/guias-editor.js`
+   (`convertirDocumentosYComunicacionPuro`, llamada al abrir el
+   editor); `js/guias-comunicacion.js` se borró (ya no lo llamaba
+   nadie); `js/guias-documentos.js` sigue existiendo, para el catálogo
+   de plantillas de documento, pero ya no lo llama este fichero.
    ============================================================ */
 var GuiasPasoBloques = (function () {
 
