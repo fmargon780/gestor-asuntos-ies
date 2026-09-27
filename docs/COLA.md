@@ -167,7 +167,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 191 | `docs/INICIO-CUATRO-BLOQUES.md`, apartados 1, 2, 3, 4 y 7: los bloques de Inicio y fuera «Qué me toca» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 191) | HECHA (27-sep-2026 09:35). `npm test` completo (174 ficheros) en verde con Chromium real, comprobado dos veces de forma independiente |
 | 192 | `docs/INICIO-CUATRO-BLOQUES.md`, apartados 5 y 6: la tabla de todos los abiertos (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 192) | HECHA (27-sep-2026 13:35). `npm test` completo (166 ficheros) en verde con Chromium real, comprobado de forma independiente; tabla y plegados comprobados a ojo con Playwright. Una prueba (`hito-desde-por-clasificar.mjs`) sumada a `EN_SOLITARIO` (mismo problema de CPU que la fila 208, no una regresión). Aviso de privacidad encontrado y anotado en «Lo que queda por hablar con Francisco», no arreglado (fuera del encargo). PR #139 fusionado (`4bc7a0a`). Publicación comprobada por `curl`: `App.VERSION` `27-sep-2026 · 13:35` y `js/inicio-plegados.js` ya en la web publicada |
 | 193 | `docs/AVISOS-MENU-Y-VOLVER.md`, apartados 1 y 2: avisos en una línea y menú (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 193) | HECHA (27-sep-2026 16:52). `npm test` completo (167 ficheros) en verde con Chromium real, comprobado de forma independiente; franja de avisos y menú comprobados a ojo con Playwright. La CI de GitHub Actions falló primero por contención de CPU en dos pruebas ajenas a esta fila (`ajustes-por-tipo.mjs`, `mesa-comunicar-del-paso-y-guion.mjs`, sumadas a `EN_SOLITARIO`), arreglado y vuelto a pasar en verde. PR #141 fusionado (`9ef8aab`). Publicación comprobada por `curl`: `App.VERSION` `27-sep-2026 · 16:52` y `js/avisos-linea.js` ya en la web publicada (una primera lectura mostró una versión vieja por caché transitoria del despliegue, repetida un instante después salió correcta) |
-| 209 | `docs/INICIO-EN-PESTANAS.md` (Inicio, segunda versión: pestañas arriba —«En Administración», «En espera», «Todos los abiertos», «Dormidos»— y una sola tabla para las cuatro, con «Ha llegado» y el tablón en una columna izquierda estrecha; manda sobre las filas 191/192 en lo que diga distinto, tras verlas con datos reales) | HECHA (27-sep-2026 16:20). `npm test` completo (167 ficheros) en verde con Chromium real, comprobado de forma independiente; cuatro pestañas y filtrado por aviso comprobados a ojo con Playwright, sin errores de consola (confirma que no hay cascada de repintado). Arreglado de paso el aviso de privacidad pendiente de la fila 192 («Le toca a» con un reservado) |
+| 209 | `docs/INICIO-EN-PESTANAS.md` (Inicio, segunda versión, boceto `docs/boceto-inicio-2.html`: «Ha llegado» y tablón a la izquierda; a la derecha pestañas «En Administración» —con o sin fecha—, «En espera», «Todos los abiertos», «Dormidos» sobre una sola tabla con Tercero y fecha de Inicio en vez del nombre de la carpeta; Responsable dentro de «Filtros»; los avisos filtran la tabla. Manda sobre `docs/INICIO-CUATRO-BLOQUES.md`) | HECHA (27-sep-2026 16:20). `npm test` completo (167 ficheros) en verde con Chromium real, comprobado de forma independiente; cuatro pestañas y filtrado por aviso comprobados a ojo con Playwright, sin errores de consola (confirma que no hay cascada de repintado). Arreglado de paso el aviso de privacidad pendiente de la fila 192 («Le toca a» con un reservado). **Nota**: esta fila fue añadida a la tabla dos veces, por dos sesiones distintas a la vez (ver aviso más abajo en "Lo que queda por hablar con Francisco") |
 | 194 | `docs/AVISOS-MENU-Y-VOLVER.md`, apartados 3 y 4: un solo «Volver» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 194) | PENDIENTE (27-sep-2026) |
 | 195 | `docs/AVISOS-A-QUIEN-LO-PIDE.md`, apartados 1, 2 y 3: avisar a quien lo pide y «Enviar estado» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 195) | PENDIENTE (27-sep-2026) |
 | 196 | `docs/AVISOS-A-QUIEN-LO-PIDE.md`, apartado 4: informe para dirección (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 196) | PENDIENTE (27-sep-2026) |
@@ -209,6 +209,16 @@ abierto en ellas:
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
+- **Aviso importante (27-sep-2026, ~16:56): dos sesiones de Claude Code han trabajado en este
+  repositorio a la vez, saltándose la regla 0 de esta cola.** Mientras esta sesión implementaba
+  la fila 209, otra sesión distinta (`Claude-Session:
+  https://claude.ai/code/session_01DD2HGPqEfkgTHMpP4VgcjA`, atribuida a "Claude Opus 5.5") subió
+  directamente a `main` (commit `5e688cc`, sin pull request) un cambio en `docs/COLA.md` que
+  volvía a poner la fila 209 en PENDIENTE con su propio texto y reescribía la fila 193. Solo tocó
+  `docs/COLA.md` (nada de código), así que no ha habido conflicto de verdad en el trabajo, y esta
+  sesión ha conservado la fila 209 como HECHA (con su implementación real, probada) al fusionar.
+  Pero si esa otra sesión sigue activa, podría estar a punto de implementar la fila 209 por su
+  cuenta, por duplicado. Conviene comprobar si esa sesión sigue en marcha y pararla si es así.
 - ~~Aviso, encontrado en la fila 192: un asunto reservado puede enseñar el nombre del tercero
   donde no debería («Le toca a»/«Esperando a…»).~~ **Arreglado en la fila 209** (27-sep-2026):
   `App.textoLeTocaA` (`js/asuntos-lista-pintar.js`) pone el nombre genérico del papel
@@ -433,7 +443,7 @@ o con el commit padre de `e018732`: la única diferencia buscada es la fila 151 
 Al apuntar la fila 159, la conversación volvió a subir `docs/COLA.md` roto (commit `0ce55fe`, con
 el texto `__SEE_BELOW__`) y lo restauró en el commit siguiente, retipeado desde el blob `fdb042d`
 (commit `9da4f45`). La única diferencia buscada es la fila 159 y esta nota. Si algo no cuadra,
-compáralo con `git show 9da4f45:docs/COLA.md`.
+compara con `git show 9da4f45:docs/COLA.md`.
 
 ## Nota del 26-sep-2026: docs/HISTORIA.md de la fila 172, ya pegado
 
