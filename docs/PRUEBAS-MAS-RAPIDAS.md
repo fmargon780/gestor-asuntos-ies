@@ -4,13 +4,8 @@
 
 ## Antes de empezar
 
-Esta fila aún no está en la tabla de `docs/COLA.md` (la conversación que la escribió no podía
-subir un fichero tan grande sin riesgo de cortarlo). Lo primero: apuntarla en la tabla, justo
-encima de la fila 190, así:
-
-    | 208 | `docs/PRUEBAS-MAS-RAPIDAS.md` (`npm test` lanza varias pruebas a la vez; mientras se trabaja una fila, solo las pruebas de lo tocado, y la pasada completa una sola vez al final; la app no cambia) | EN CURSO (27-sep-2026) |
-
-Y seguir las reglas de la cola como con cualquier otra fila.
+Esta fila ya está en la tabla de `docs/COLA.md`, la primera PENDIENTE (apuntada el 27-sep-2026).
+Se trabaja como cualquier otra fila, siguiendo las reglas de la cola.
 
 ## El problema
 
