@@ -56,9 +56,9 @@ Conviven cero sistemas: `ficha.situacion` se queda quieta en `asuntos.json` (no 
   `hitos.json` avisa), solo si cambia (la firma incluye, desde la fila 162, quién espera y si es
   automático: cambiar el responsable también la repinta).
 - **El filtro** de Asuntos abiertos filtra por montón (`App.FILTROS_MONTON`: nos toca, esperan a
-  terceros, con «Esperando a…», listos para archivar, sin hitos); ordenar por «Paso del asunto»
+  terceros, con «Esperando a…», listos para archivar, sin hitos); ordenar por «Hito del asunto»
   va por `n/m`.
-- **«Saltar a este paso»** (antes «Estamos en este paso», fila 162; en la fila de cada hito y en
+- **«Saltar a este hito»** (antes «Estamos en este paso», fila 162; en la fila de cada hito y en
   el ··· de la mesa, solo si hay algo antes sin terminar y no es el actual): `Hitos.situarEn(clave, id)` → `Hitos.situarLista` (pura) da por
   hechos, en una escritura, los visibles anteriores sin terminar (las preguntas se quedan como
   están; tras una sin responder no hay nada visible), con la nota «Dado por hecho al situar el

@@ -133,7 +133,7 @@ window.HitosDocumentoMenu = (function () {
        siempre, que ya cambia su nombre también en el hito) y moverlo a
        otro hito. */
     if (!falta && window.Documentos && Documentos.abrir) {
-      opciones.push({ texto: 'Renombrar', alPulsar: function () { Documentos.abrir(a, { hito: hito, ponerNombre: nombre }); } });
+      opciones.push({ texto: 'Cambiar el nombre', alPulsar: function () { Documentos.abrir(a, { hito: hito, ponerNombre: nombre }); } });
     }
     if (window.HitoMesaDocumentos && HitoMesaDocumentos.moverAOtroHito) {
       opciones.push({ texto: 'Mover a otro hito', alPulsar: function () {

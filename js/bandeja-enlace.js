@@ -119,7 +119,7 @@
     try { sugeridos = await podrianEncajar(d); } catch (e) { sugeridos = []; }
 
     var elegido = await E.elegir({
-      titulo: 'Elegir el asunto de este correo',
+      titulo: 'Guardar este correo en un asunto',
       cabecera: '<p class="explica">' + U.escapar(sinElRe(d.asunto || '(sin asunto)')) +
                 '<br><span class="suave">de ' +
                 U.escapar((d.de && (d.de.nombre || d.de.correo)) || 'remitente desconocido') +

@@ -357,7 +357,7 @@ window.CargarBiblioteca = CargarBiblioteca;
     try {
       var r = await U.mientrasGuarda(boton, function () { return CargarBiblioteca.traerGuiones(); });
       var texto = (r.pasos || r.modelos)
-        ? 'He traído las tareas de ' + r.pasos + ' hito(s) de las guías y de ' + r.modelos + ' hito(s) modelo de la biblioteca.'
+        ? 'He traído las tareas de ' + r.pasos + ' hito(s) de las guías y de ' + r.modelos + ' hito(s) de la biblioteca.'
         : 'No había nada que traer: todos tenían ya sus tareas completas.';
       salida.innerHTML = '<p class="explica">' + U.escapar(texto) + '</p>';
       U.aviso(texto, 'bueno');

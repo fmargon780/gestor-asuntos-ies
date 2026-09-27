@@ -528,7 +528,7 @@ está descartado a propósito (`docs/CONTEXTO-CORTO.md`, sección 7).
     `AcroForm` (fila 146) para que todos los visores enseñen lo rellenado; pdf-lib ya la quita él
     solo al leer el formulario (comprobado con los impresos de `formularios/`: siguen con todas sus
     casillas).
-  - **Ajustes → El centro → "Impresos oficiales"** (desde la fila 146, 25-sep-2026,
+  - **Ajustes → El centro → "Impresos"** (desde la fila 146, 25-sep-2026,
     `docs/IMPRESOS-CASILLAS-LEGIBLES.md`, en `js/formularios-ajustes.js`): un bloque plegado por
     impreso con PDF (`f`). Su resumen: «N casillas del centro puestas», «Sin casillas del centro» (leído
     en esta sesión, sin ninguna) o «Sin leer todavía». Dentro, el botón **"Leer las casillas del PDF"**

@@ -178,7 +178,7 @@ window.ElegirAsunto = (function () {
       var cuadro = document.querySelector('#capa .cuadro');
       if (cuadro) cuadro.classList.add('cuadro-medio');
 
-      $('cuadro-titulo').textContent = o.titulo || 'Elegir el asunto';
+      $('cuadro-titulo').textContent = o.titulo || 'Guardar en un asunto';
       $('cuadro-cuerpo').innerHTML =
         (o.cabecera || '') +
         (sugeridos.length

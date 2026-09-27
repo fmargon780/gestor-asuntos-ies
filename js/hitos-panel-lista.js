@@ -214,7 +214,7 @@ var HitosPanelLista = (function () {
        rellena js/hito-mesa-tarjetas.js. Las plantillas, los formularios y
        «Comunicar» van a los desplegables de la cabecera (fila 145). */
     var tarjeta = window.HitoMesa && HitoMesa.tarjetaDe ? HitoMesa.tarjetaDe(a.nombre, h.id) : 'guion';
-    var volver = '<button type="button" class="enlace mesa-volver-guion">← Volver al guion</button>';
+    var volver = '<button type="button" class="enlace mesa-volver-guion">← Volver a las tareas</button>';
     var grandeGuion = '<section class="mesa-grande mesa-grande-guion" data-tarjeta="guion">' +
       (h.cuerpo ? '<div class="hito-explicacion">' + h.cuerpo + '</div>' : '') +
       '<div class="mesa-guion"></div>' +
@@ -270,7 +270,7 @@ var HitosPanelLista = (function () {
         '<div class="mesa-resumen-cuerpo"></div></div>';
     };
     var colDerecha = '<div class="mesa-col mesa-col-derecha">' +
-      resumen('guion', 'Qué hay que hacer') + resumen('docs', 'Documentos del hito') + resumen('notas', 'Notas e historia') +
+      resumen('guion', 'Tareas del hito') + resumen('docs', 'Documentos del hito') + resumen('notas', 'Notas e historia') +
       (window.HitosNormativa ? '<details class="mesa-bloque mesa-normativa' + (cuantasNormas ? '' : ' oculto') + '">' +
         '<summary class="mesa-bloque-titulo">Normativa (<span class="mesa-normativa-cuenta">' + cuantasNormas + '</span>)</summary>' +
         HitosNormativa.listaHTML(h.normativa) + '<div class="mesa-normativa-guion"></div></details>' : '') +
