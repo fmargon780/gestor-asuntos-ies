@@ -74,6 +74,19 @@ function construirSeccionDatos(tipo) {
   cambiar.onclick = function () { App.renombrarTipo(tipo); };
   b.cuerpo.appendChild(cambiar);
 
+  /* Unir con otro tipo (27-sep-2026, fila 207, docs/UNIR-DOS-TIPOS.md):
+     el cuadro y la lógica viven en js/tipos-unir.js. */
+  if (window.TiposUnir) {
+    var unirBtn = document.createElement('button');
+    unirBtn.type = 'button';
+    unirBtn.className = 'boton';
+    unirBtn.style.marginTop = '10px';
+    unirBtn.style.marginLeft = '8px';
+    unirBtn.textContent = 'Unir con otro tipo';
+    unirBtn.onclick = function () { App.unirTipoConOtro(tipo); };
+    b.cuerpo.appendChild(unirBtn);
+  }
+
   /* El nombre corto (20-sep-2026, fila 79, apartado 4.9): lo que entra
      en el nombre de la carpeta de los asuntos nuevos y de la ficha en
      construcción; vacío, se usa el nombre de arriba, igual que hoy.

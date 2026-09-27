@@ -83,7 +83,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   ficha, huecos, grupos.
 - Cambiar un asunto abierto (le cambia el nombre a la carpeta, sin perder hitos ni presencia); no
   en el ARCHIVO. Cambiar el nombre de un tipo se lleva su guía; cambiarle el tipo a un asunto
-  ofrece traer la guía del tipo nuevo.
+  ofrece traer la guía del tipo nuevo. «Unir con otro tipo» (fila 207): el tipo se funde en otro
+  (guía, campos, plantillas, recurrentes, alias); sus asuntos abiertos pasan al que se queda, sin
+  recibir su guía nueva; el ARCHIVO no se toca.
 - Nombre comercial de empresas; cambiar un tercero dado de alta a mano.
 - Tutores legales (del RegAlum, sin alta) y Administraciones (organismos y centros, con departamentos) como tercero.
 - Guías del procedimiento por tipo, con preguntas dentro de las respuestas sin límite, y su mapa

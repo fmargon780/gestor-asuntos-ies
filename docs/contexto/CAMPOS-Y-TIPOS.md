@@ -80,7 +80,16 @@ un resumen en el título, ver "Ajustes plegado" más abajo), construidas enteras
 
 1. **Datos del tipo** — nombre, categoría, alias si los tiene, botón "Cambiar el nombre" que
    llama a `App.renombrarTipo` (la misma función de siempre) y repinta la pantalla si el tipo
-   abierto es el que cambió. Debajo, el **nombre corto** (20-sep-2026, fila 79, apartado 4.9,
+   abierto es el que cambió. Junto a él, **"Unir con otro tipo"** (27-sep-2026, fila 207,
+   `docs/UNIR-DOS-TIPOS.md`, `js/tipos-unir.js`): un `U.preguntar` con buscador para elegir el
+   tipo que se queda; el tipo abierto desaparece. `TiposUnir.unir` mueve guía (se queda la del
+   tipo elegido, salvo que esté vacía o sea la mínima), campos (se suman por nombre, sin
+   comparar tamaño — regla distinta de `App.renombrarTipo`), plantillas, recurrentes,
+   `repartirTipo`, palabras clave y alias, y pone la lápida de borrado al tipo que desaparece.
+   Los asuntos abiertos del tipo que desaparece pasan al que se queda con su carpeta renombrada
+   (mismo camino que "Cambiar" un asunto), marcados `tipoUnidoDe` en su ficha para que
+   `js/hitos-sincronizar.js` no les lleve los pasos nuevos de la guía del tipo que se queda. El
+   ARCHIVO no se toca. Debajo, el **nombre corto** (20-sep-2026, fila 79, apartado 4.9,
    `Nombres.tipoParaCarpeta`): lo que entra en el nombre de la carpeta de los asuntos nuevos en
    vez del nombre de arriba; vacío, se comporta como hoy. Aviso ámbar si pasa de 16 caracteres,
    rojo si otro tipo ya lo usa (`U.parecidos`). Cambiarlo no toca ninguna carpeta ya creada.
