@@ -212,7 +212,7 @@ await pagina.waitForTimeout(300);
 
 console.log('--- 5. "Dormidos": C, sin novedades desde hace 75 días ---');
 await pagina.click('.inicio-pestana[data-pestana="dorm"]');
-await pagina.waitForSelector('#inicio-tabla-cuerpo .inicio-tabla-fila');
+await pagina.waitForSelector('#inicio-tabla-cuerpo .inicio-tabla-fila[data-asunto="' + CLAVE_C + '"]');
 await comprobar('una fila en "Dormidos"', pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 1);
 await comprobar('es C', pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').first().getAttribute('data-asunto'), CLAVE_C);
 await comprobar('el número junto al nombre de la pestaña',
