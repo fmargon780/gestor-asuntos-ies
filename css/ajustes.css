@@ -327,3 +327,6 @@ details.tipo-asunto-seccion .bloque-pie { display: inline; margin-bottom: 0; }
 .impreso-casilla:has(.impreso-mini.grande) { flex-wrap: wrap; }
 .impreso-grupo { margin-top: 8px; }
 .impreso-grupo > summary { cursor: pointer; font-size: 13px; color: var(--tinta-suave); }
+
+/* «Al cerrar el asunto, avisar a quien lo pide» (27-sep-2026, fila 195). */
+.tipo-avisar-lopide-cierre-plantilla { margin-top: 6px; }

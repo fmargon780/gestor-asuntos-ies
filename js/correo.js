@@ -231,6 +231,13 @@
     documentoSenecaActual = (extra && extra.documentoSeneca) || '';
     /* Fila 164: la plantilla de la receta de un paso, ya elegida. */
     I.plantillaPedida = (extra && extra.plantilla) || '';
+    /* Fila 195 (docs/AVISOS-A-QUIEN-LO-PIDE.md): el hito desde el que
+       se avisa o se pide "Enviar estado", para que {{HITO}}, {{HITON}}
+       y {{HITOSM}} salgan resueltos en la plantilla. `avisoLoPide`
+       cambia el botón de cerrar a "Esta vez no" (con lo mismo se
+       archiva o se marca el hito: no vuelve a preguntar). */
+    I.hitoActual = (extra && extra.hito) || null;
+    I.avisoLoPide = !!(extra && extra.avisoLoPide);
     if (window.SenecaDestinatarios) SenecaDestinatarios.limpiar();
     I.yaApuntado = false;
     I.algoCambiado = false;
@@ -246,11 +253,12 @@
       cuadroEl.classList.toggle('cuadro-correo', !I.porSeneca);
     }
     var esperar = U.preguntar(I.porSeneca ? 'Mensaje por Séneca' : 'Correo de este asunto',
-      '<div id="correo-caja"><p class="explica">Preparando…</p></div>', 'Cerrar', true);
+      '<div id="correo-caja"><p class="explica">Preparando…</p></div>',
+      I.avisoLoPide ? 'Esta vez no' : 'Cerrar', true);
     var persona = null;
     try { persona = await buscarPersona(a); } catch (e) { persona = null; }
     try { plantillasDatos = await Plantillas.cargar(App.E.gestor); } catch (e) { plantillasDatos = null; }
-    try { valoresActuales = await Plantillas.valoresDeAsunto(a); } catch (e) { valoresActuales = null; }
+    try { valoresActuales = await Plantillas.valoresDeAsunto(a, { hito: I.hitoActual }); } catch (e) { valoresActuales = null; }
     await pintarCuadro(a, persona);
     await esperar;
     if (cuadroEl) { cuadroEl.classList.remove('cuadro-seneca'); cuadroEl.classList.remove('cuadro-correo'); }

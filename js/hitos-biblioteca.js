@@ -196,10 +196,20 @@ var HitosBiblioteca = (function () {
     { clave: 'comunicacion', etiqueta: 'Comunicación de este hito' },
     { clave: 'normativa', etiqueta: 'Normativa' },
     { clave: 'plantillasDocumento', etiqueta: 'Documentos' },
-    { clave: 'guion', etiqueta: 'Tareas' }
+    { clave: 'guion', etiqueta: 'Tareas' },
+    /* «Avisar a quien lo pide» (fila 195). */
+    { clave: 'avisarLoPide', etiqueta: 'Avisar a quien lo pide' },
+    { clave: 'avisarLoPidePlantilla', etiqueta: 'Plantilla del aviso' }
   ];
 
   function textoLegibleDe(clave, valor) {
+    if (clave === 'avisarLoPide') return valor ? 'Sí' : 'No';
+    if (clave === 'avisarLoPidePlantilla') {
+      if (!valor) return '(vacío)';
+      var pl = window.Plantillas && window.Plantillas.enMemoria ? Plantillas.enMemoria() : null;
+      var encontrada = pl ? (pl.lista || []).filter(function (p) { return p.id === valor; })[0] : null;
+      return encontrada ? encontrada.nombre : valor;
+    }
     if (valor === null || valor === undefined || valor === '') return '(vacío)';
     if (clave === 'plazo') {
       return valor.dias ? ((typeof Plazos !== 'undefined' && Plazos.textoPlazo ? Plazos.textoPlazo(valor) : valor.dias + ' días') + ' desde otro hito') : '(vacío)';

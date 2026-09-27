@@ -82,6 +82,33 @@ var GuiasPasoBloques = (function () {
         '<span>Solo informativo: se ve, pero no reclama trabajo</span>';
       d.appendChild(filaInf);
 
+      /* «Avisar a quien lo pide» (fila 195, docs/AVISOS-A-QUIEN-LO-PIDE.md,
+         punto 1): casilla + plantilla, un campo más del paso. */
+      if (window.AvisosLoPide) {
+        var filaAviso = document.createElement('label');
+        filaAviso.className = 'interruptor paso-avisar-lopide-fila';
+        filaAviso.innerHTML = '<input type="checkbox" class="paso-avisar-lopide"' +
+          (p.avisarLoPide ? ' checked' : '') + '>' +
+          '<span>Al terminar este hito, avisar a quien lo pide</span>';
+        d.appendChild(filaAviso);
+
+        var cajaAviso = document.createElement('div');
+        cajaAviso.className = 'paso-avisar-lopide-plantilla' + (p.avisarLoPide ? '' : ' oculto');
+        cajaAviso.innerHTML = '<label class="etiqueta-en-linea">Con la plantilla:</label>' +
+          '<select class="campo paso-avisar-lopide-select"><option value="">Cargando…</option></select>';
+        d.appendChild(cajaAviso);
+
+        filaAviso.querySelector('.paso-avisar-lopide').onchange = function () {
+          cajaAviso.classList.toggle('oculto', !this.checked);
+        };
+
+        AvisosLoPide.opcionesPlantillaHTML(ctx.nombreTipo, p.avisarLoPidePlantilla, AvisosLoPide.NOMBRE_AVANCE)
+          .then(function (html) {
+            if (!cajaAviso.isConnected) return;
+            cajaAviso.querySelector('.paso-avisar-lopide-select').innerHTML = html;
+          });
+      }
+
       if (window.HitosNormativa) {
         /* Formularios oficiales (20-sep-2026, fila 82,
            docs/FORMULARIOS-OFICIALES.md): el buscador se pinta

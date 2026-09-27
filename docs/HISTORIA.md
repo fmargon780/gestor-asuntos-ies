@@ -5,6 +5,60 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 195: avisar a quien lo pide, y «Enviar estado»
+
+`docs/AVISOS-A-QUIEN-LO-PIDE.md`, apartados 1, 2 y 3. El resto del centro no entra en el gestor:
+pide y consulta por correo, y Administración sigue siendo la única que escribe. Módulo nuevo
+`js/avisos-lo-pide.js` (`window.AvisosLoPide`): abre el cuadro de Correo ya relleno; **nunca envía
+nada por su cuenta** — sigue mandando `js/correo-cuadro.js`, con «Enviar».
+
+**Dónde se configura**: dos campos más de un paso de guía (`avisarLoPide`,
+`avisarLoPidePlantilla`), con el mismo trato que `soloInformativo` (entran en
+`CAMPOS_COMPARABLES` de `js/hitos-biblioteca.js`, llegan al hito por `js/hitos.js`); y dos del tipo
+(`avisarLoPideCierre`, `avisarLoPideCierrePlantilla`, en Ajustes › el tipo). Las plantillas «Aviso
+de avance» y «Aviso de cierre» se crean solas, la primera vez que hacen falta, **sin categoría ni
+tipo**: se cambió `Plantillas.deTipo` para que eso signifique «vale para cualquier asunto» (ninguna
+plantilla de antes se queda nunca sin uno de los dos, así que no cambia nada de lo que ya había).
+
+**Cuándo salta**: al marcar un hito hecho con la casilla encendida
+(`js/hitos-panel-lista.js`, `marcarDesdeCasilla`, el único punto por el que pasan la lista, la
+mesa y el guion completo) o al archivar un asunto de un tipo con la suya (`avisos-lo-pide.js`
+envuelve `App.cerrarAsunto` por fuera de la envoltura de `js/ficha-archivo.js`, así que se ejecuta
+primero: avisa antes de mover la carpeta). Sin «Lo pide» con correo, nunca pasa nada. El botón de
+cerrar dice **«Esta vez no»** mientras no se haya enviado nada de verdad (cambia solo a «Cerrar»
+tras un envío real); se cierre como se cierre, el hito queda marcado (`avisoLoPideHecho`) y no
+vuelve a preguntar por ese mismo hito.
+
+**«Enviar estado»**: el mismo cuadro con «Aviso de avance» y el hito actual, sin marcar nada.
+Costó encontrarle sitio: la barra de acciones de la ficha está fijada en **cinco** elementos
+exactos (prueba `cabecera-del-asunto.mjs`) y la de la mesa en **cinco** botones exactos (prueba
+`mesa-del-hito-enfocada.mjs`), así que un botón nuevo suelto rompía alguna de las dos en cada
+intento. Solución: dentro de «El encargo» (un segundo botón en el mismo cuadro, que sigue
+contando como un solo elemento de la barra) y dentro del menú «···» de la mesa (una lista, no un
+botón fijo). Lo mismo pasó con «← Volver a los hitos» (fila 194) y con la cabecera de la mesa sin
+ningún margen de sobra (fila 50): la primera versión, en su propia línea, rompía
+`cabecera-compacta.mjs` en cuanto se sumaba «Enviar estado» al lado.
+
+**Dos huecos nuevos**: `{{HITON}}`/`{{HITOSM}}` (el número del hito actual y el total), resueltos
+por `Plantillas.valoresDeAsunto(a, { hito })` — `js/correo.js` pasa ahora el hito
+(`I.hitoActual`) a esa llamada, cosa que no hacía hasta esta fila (el «Comunicar» de un hito
+resolvía su texto por su cuenta, sin pasar por el catálogo general de huecos).
+
+**Un fallo de los que enseñan algo**: la primera versión de `avisos-lo-pide.js` declaraba
+`var AvisosLoPide = (function () { ...; window.AvisosLoPide = {...}; })();` — en un `<script>`
+normal, un `var` de nivel superior TAMBIÉN crea la propiedad global del mismo nombre, así que en
+cuanto la función terminaba (devolviendo `undefined`, sin `return`), esa asignación de fuera
+pisaba el `window.AvisosLoPide` que se acababa de poner con tanto cuidado dentro. Sin ningún error
+en la consola: el módulo cargaba bien, solo que el aviso nunca llegaba a ver la luz. Arreglado
+quitando el `var` de fuera.
+
+Prueba nueva: `pruebas/avisos-a-quien-lo-pide.mjs`. `npm test` completo (169 ficheros) en verde.
+
+**Cómo llegó aquí**: implementado por otra sesión de Claude Code en paralelo (PR cerrado
+fmargon780/gestor-asuntos-ies#147, ver el aviso en `docs/COLA.md`); esta sesión lo revisó, lo
+adaptó al `main` de después de las filas 193/194 (ya publicadas con otra implementación de
+«Volver») y comprobó `npm test` completo antes de fusionarlo.
+
 ## 27-sep-2026 — Fila 194: un solo «Volver», que vuelve a donde estabas
 
 `docs/AVISOS-MENU-Y-VOLVER.md`, apartados 3 y 4 (los apartados 1 y 2 ya estaban hechos, fila 193).
