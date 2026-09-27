@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Boceto Inicio 2</title>
+<style>
+:root{--azul:#1f4e79;--fondo:#f1f4f8;--borde:#dde3ea;--gris:#667085;--rojo:#c0392b;--ambar:#b7791f;--verde:#2f855a}
+*{box-sizing:border-box}body{margin:0;font:14px/1.35 system-ui,Roboto,Arial,sans-serif;background:var(--fondo);color:#1d2939}
+a{color:var(--azul);font-weight:600;text-decoration:none;cursor:pointer}
+.cab{display:flex;gap:12px;align-items:center;padding:10px 16px}
+.cab h1{margin:0;font-size:22px}.cab input{flex:1;padding:8px 10px;border:1px solid var(--borde);border-radius:6px;font-size:14px}
+.btn{background:var(--azul);color:#fff;border:0;border-radius:6px;padding:8px 14px;font-weight:600;cursor:pointer}
+.avisos{margin:0 16px 8px;padding:6px 10px;background:#fff7e6;border-left:4px solid var(--ambar);border-radius:4px;font-size:13px}
+.avisos a.on{background:var(--azul);color:#fff;border-radius:4px;padding:0 5px}
+.avisos .ocultar{float:right;color:var(--gris);font-weight:400}
+.cuerpo{display:grid;grid-template-columns:380px 1fr;gap:12px;padding:0 16px 16px}
+.caja{background:#fff;border:1px solid var(--borde);border-radius:8px}
+.pestanas{display:flex;align-items:center;gap:4px;padding:8px 10px;border-bottom:1px solid var(--borde);position:relative}
+.pes{padding:6px 12px;border-radius:6px;font-weight:600;cursor:pointer;color:var(--gris)}
+.pes b{display:inline-block;min-width:22px;text-align:center;background:#e8eef5;border-radius:10px;padding:0 6px;margin-left:4px;color:var(--azul)}
+.pes.on{background:var(--azul);color:#fff}.pes.on b{background:#fff}
+.der{margin-left:auto;display:flex;gap:12px;align-items:center;font-size:13px}
+.panel{display:none;position:absolute;right:10px;top:44px;z-index:5;background:#fff;border:1px solid var(--borde);border-radius:8px;box-shadow:0 6px 20px #0002;padding:12px;width:300px}
+.panel.on{display:block}
+.panel label{display:flex;justify-content:space-between;align-items:center;margin:6px 0;font-size:13px;color:var(--gris)}
+.panel select{width:170px;padding:4px;border:1px solid var(--borde);border-radius:5px}
+.chip{display:none;margin:8px 10px 0;font-size:13px}.chip.on{display:block}
+.chip span{background:#e8eef5;color:var(--azul);border-radius:12px;padding:2px 10px;font-weight:600}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:12px;color:var(--gris);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--borde)}
+td{padding:6px 8px;border-bottom:1px solid #eef1f5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0}
+tr:hover td{background:#f6f9fc;cursor:pointer}
+.et{display:inline-block;padding:1px 7px;border-radius:10px;font-size:12px;font-weight:600}
+.v{background:#fde8e6;color:var(--rojo)}.h{background:#fff1d6;color:var(--ambar)}.ok{background:#e3f4ea;color:var(--verde)}.sp{background:#eef1f5;color:var(--gris)}
+.tipo{background:#e8eef5;color:var(--azul)}.gris{color:var(--gris)}
+.lado{display:flex;flex-direction:column;gap:12px}
+.tit{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--borde);font-weight:700}
+.tit a{margin-left:auto;font-size:13px}
+.llega{padding:6px 12px;border-bottom:1px solid #eef1f5}
+.llega .n{display:flex;gap:6px;align-items:center;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.llega .l{font-size:12px;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acc{display:flex;gap:10px;font-size:13px;margin-top:2px}
+.pdf{background:#fff1d6;color:var(--ambar)}.mail{background:#efe7fb;color:#6b3fa0}
+.tablon{padding:8px 12px}.tablon textarea{width:100%;height:44px;border:1px solid var(--borde);border-radius:5px;padding:6px}
+.nota{background:#fffbe6;border-radius:5px;padding:6px 8px;margin-top:6px;font-size:13px}
+.pie{padding:6px 12px;font-size:13px;color:var(--gris)}
+</style></head><body>
+
+<div class="cab"><h1>Inicio</h1><input placeholder="Buscar en todos los asuntos abiertos: nombre, tipo o tercero"><button class="btn">+ Nuevo asunto</button></div>
+<div class="avisos">
+ <a data-aviso="venc">2 hitos vencidos</a> · <a data-aviso="asp">1 aspirante sin Nº de identificación escolar</a> · <a data-aviso="rec">1 asunto recurrente por abrir</a>
+ <a class="ocultar">Ocultar por hoy</a>
+</div>
+
+<div class="cuerpo">
+ <div class="lado">
+  <div class="caja">
+   <div class="tit">Ha llegado <span class="et tipo">4</span><a>Ver todo</a></div>
+   <div class="llega"><div class="n"><span class="et pdf">PDF</span>Scan2026-09-25_130754.pdf</div><div class="l">25-sep · 13:08</div><div class="acc"><a>Crear asunto</a><a>Guardar en un asunto</a><a>⋮</a></div></div>
+   <div class="llega"><div class="n"><span class="et pdf">PDF</span>Scan2026-09-24_121429.pdf</div><div class="l">24-sep · 12:14</div><div class="acc"><a>Crear asunto</a><a>Guardar en un asunto</a><a>⋮</a></div></div>
+   <div class="llega"><div class="n"><span class="et mail">Correo</span>ADMISION 26-27 3º ESO Klabbers, Luca</div><div class="l">02-sep · 11 mensajes · 2 documentos · es de ese asunto</div><div class="acc"><a>Guardar en ese asunto</a><a>Leer</a><a>⋮</a></div></div>
+   <div class="llega"><div class="n"><span class="et mail">Correo</span>ADMISION 26-27 3º ESO Klabbers, Luca</div><div class="l">02-sep · 10 mensajes · 2 documentos · es de ese asunto</div><div class="acc"><a>Guardar en ese asunto</a><a>Leer</a><a>⋮</a></div></div>
+  </div>
+  <div class="caja">
+   <div class="tit">Tablón <span class="et tipo">1</span><a>Ver las hechas (6)</a></div>
+   <div class="tablon"><textarea placeholder="Llamar a…, el director dice que…"></textarea>
+   <div class="nota">Llamar a la familia de Klabbers antes del viernes.</div></div>
+  </div>
+ </div>
+
+ <div class="caja">
+  <div class="pestanas">
+   <span class="pes on" data-pes="adm">En Administración <b>5</b></span>
+   <span class="pes" data-pes="esp">En espera <b>4</b></span>
+   <span class="pes" data-pes="todos">Todos los abiertos <b>9</b></span>
+   <span class="pes" data-pes="dorm">Dormidos <b>0</b></span>
+   <div class="der"><a id="bfil">Filtros ▾</a><a title="Plazo · Fecha de inicio · Tercero · Tipo">Ordenar: plazo ▾</a></div>
+   <div class="panel" id="panel">
+    <label>Responsable <select><option>Todos</option><option>Francisco</option><option>Compañero</option></select></label>
+    <label>Plazo <select><option>Cualquiera</option><option>Vencidos</option><option>Esta semana</option><option>Sin plazo</option></select></label>
+    <label>Lo encarga <select><option>Todos</option><option>Secretaría</option><option>Dirección</option><option>Jefatura de Estudios</option></select></label>
+    <label>Tipo de asunto <select><option>Todos</option><option>ADMISION</option><option>IPASEN</option></select></label>
+    <label>Reservados <select><option>Se ven</option><option>Ocultos</option></select></label>
+   </div>
+  </div>
+  <div class="chip" id="chip">Filtrado por: <span id="chiptxt"></span> <a id="quitar">✕ Quitar</a></div>
+  <table>
+   <colgroup><col style="width:130px"><col><col style="width:150px"><col style="width:28%"><col style="width:130px"><col style="width:70px"></colgroup>
+   <thead><tr><th>Plazo</th><th>Tercero</th><th>Tipo</th><th>Hito actual</th><th>Le toca a</th><th>Inicio ▾</th></tr></thead>
+   <tbody id="filas">
+   <tr data-g="adm" data-venc><td><span class="et v">Vencido hace 2 d</span></td><td><b>Pérez Ruiz, Marta 12450011</b></td><td><span class="et tipo">TÍTULO</span></td><td>1 de 2 · Pedir el pago de la tasa</td><td>Administración</td><td class="gris">20-sep</td></tr>
+   <tr data-g="adm" data-venc><td><span class="et v">Vencido hace 1 d</span></td><td><b>Bravo Escribano, Ana 7576326</b></td><td><span class="et tipo">CONVALIDACION</span></td><td>3 de 4 · Grabar en Séneca</td><td>Francisco</td><td class="gris">23-sep</td></tr>
+   <tr data-g="adm"><td><span class="et ok">Vence el lunes</span></td><td><b>Ayuntamiento de Alhaurín el Grande</b></td><td><span class="et tipo">CESIÓN ESPACIOS</span></td><td>1 de 3 · Contestar la solicitud</td><td>Administración</td><td class="gris">27-sep</td></tr>
+   <tr data-g="adm"><td><span class="et sp">Sin plazo</span></td><td><b>Mostazo Moreno, Susana Milagros 583S</b></td><td><span class="et tipo">FUNCIÓN TUTORIAL</span></td><td>2 de 3 · Preparar el certificado</td><td>Administración</td><td class="gris">25-sep</td></tr>
+   <tr data-g="adm"><td><span class="et sp">Sin plazo</span></td><td><b>🔒 Reservado</b></td><td><span class="et tipo">EXPEDIENTE</span></td><td>1 de 6 · Abrir el expediente</td><td>Compañero</td><td class="gris">25-sep</td></tr>
+   <tr data-g="esp" data-asp><td><span class="et h">4 días</span></td><td><b>Klabbers, Luca 12447115</b> <span class="gris">· 3º ESO</span></td><td><span class="et tipo">ADMISION</span></td><td>Resolver o remitir, según el supuesto</td><td>Dirección</td><td class="gris">23-sep</td></tr>
+   <tr data-g="esp"><td><span class="et h">4 días</span></td><td><b>Bravo Escribano, Ana 7576326</b></td><td><span class="et tipo">CONVALIDACION</span></td><td>Comunicar a la familia y a la tutoría</td><td>Secretaría</td><td class="gris">23-sep</td></tr>
+   <tr data-g="esp"><td><span class="et sp">3 días</span></td><td><b>Giraldo Rivera, Tomás David 12464702</b></td><td><span class="et tipo">IPASEN</span></td><td>Comprobar los datos en Séneca</td><td>Secretaría</td><td class="gris">24-sep</td></tr>
+   <tr data-g="esp"><td><span class="et sp">2 días</span></td><td><b>Mostazo Moreno, Susana Milagros 583S</b></td><td><span class="et tipo">FUNCIÓN TUTORIAL</span></td><td>Puesta a la firma</td><td>Secretaría</td><td class="gris">25-sep</td></tr>
+   </tbody>
+  </table>
+  <div class="pie">Pulsa las pestañas, los avisos de arriba y «Filtros» para ver cómo funciona.</div>
+ </div>
+</div>
+
+<script>
+let pes='adm',aviso=null;
+const txt={venc:'hitos vencidos',asp:'aspirante sin Nº de identificación escolar',rec:'asunto recurrente por abrir'};
+function pintar(){
+ document.querySelectorAll('#filas tr').forEach(tr=>{
+  let ver=pes==='todos'||tr.dataset.g===pes;
+  if(aviso){ver=aviso==='venc'?tr.hasAttribute('data-venc'):aviso==='asp'?tr.hasAttribute('data-asp'):false;}
+  tr.style.display=ver?'':'none';});
+ document.querySelectorAll('.pes').forEach(p=>p.classList.toggle('on',!aviso&&p.dataset.pes===pes));
+ document.querySelectorAll('[data-aviso]').forEach(a=>a.classList.toggle('on',a.dataset.aviso===aviso));
+ chip.classList.toggle('on',!!aviso);chiptxt.textContent=aviso?txt[aviso]:'';
+}
+document.querySelectorAll('.pes').forEach(p=>p.onclick=()=>{pes=p.dataset.pes;aviso=null;pintar();});
+document.querySelectorAll('[data-aviso]').forEach(a=>a.onclick=()=>{aviso=aviso===a.dataset.aviso?null:a.dataset.aviso;pintar();});
+quitar.onclick=()=>{aviso=null;pintar();};
+bfil.onclick=()=>panel.classList.toggle('on');
+pintar();
+</script>
+</body></html>
