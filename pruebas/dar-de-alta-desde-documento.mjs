@@ -83,15 +83,15 @@ await pagina.click('.panel[data-vista="clasificar"]');
 await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');
 
 console.log('--- el botón de alta sale con la razón social y el NIF ---');
-await pagina.waitForSelector('.boton-dar-de-alta', { timeout: 15000 });
+await pagina.waitForSelector('#lista-sueltos .boton-dar-de-alta', { timeout: 15000 });
 await comprobar('el botón dice la razón social y el NIF',
-  pagina.locator('.boton-dar-de-alta').textContent(),
+  pagina.locator('#lista-sueltos .boton-dar-de-alta').textContent(),
   'Dar de alta: Instalaciones Bermejo, S.L. — B29123456');
 await comprobar('no sale "Aceptar": no hay tipo ni tercero claros todavía',
-  pagina.locator('.tarjeta-propuesta .boton-principal').count(), 1);   /* solo el de alta */
+  pagina.locator('#lista-sueltos .tarjeta-propuesta .boton-principal').count(), 1);   /* solo el de alta */
 
 console.log('--- lo pulsa: se abre el alta ya existente, con los datos escritos ---');
-await pagina.click('.boton-dar-de-alta');
+await pagina.click('#lista-sueltos .boton-dar-de-alta');
 await pagina.waitForSelector('#capa:not(.oculto)');
 await comprobar('el título dice que es un alta de empresa',
   pagina.locator('#cuadro-titulo').textContent(), 'Dar de alta en EMPRESAS');
@@ -126,9 +126,9 @@ await comprobar('ahora sí está escrito en empresas.csv', pagina.evaluate(async
 }), true);
 
 console.log('--- la tarjeta se actualiza sola, sin volver a leer el PDF ---');
-await comprobar('el botón de alta ya no sale', pagina.locator('.boton-dar-de-alta').count(), 0);
+await comprobar('el botón de alta ya no sale', pagina.locator('#lista-sueltos .boton-dar-de-alta').count(), 0);
 await comprobar('la línea de la propuesta ya trae el tercero',
-  pagina.locator('.tarjeta-propuesta').first().textContent()
+  pagina.locator('#lista-sueltos .tarjeta-propuesta').first().textContent()
     .then(t => t.indexOf('Instalaciones Bermejo, S.L.') !== -1), true);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }

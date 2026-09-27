@@ -248,6 +248,9 @@ var BandejaPantalla = (function () {
 
     var acciones = document.createElement('div');
     acciones.className = 'acciones';
+    /* El resto de acciones, en el menú ⋮ de la fila (fila 191): mismo
+       patrón que App.tarjetaSuelto en js/documentos-sueltos.js. */
+    var enMenu = [];
 
     if (yaEsta && window.Bandeja.estaArchivado(yaEsta.ficha)) {
       /* Si contestan a un asunto archivado, la gestión ha vuelto a
@@ -311,18 +314,20 @@ var BandejaPantalla = (function () {
       ver.className = 'boton';
       ver.textContent = 'Abrir en Gmail';
       ver.onclick = function () { window.open(window.Bandeja.enlaceAGmail(d), '_blank'); };
-      acciones.appendChild(ver);
+      enMenu.push(ver);
     }
 
     var fuera = document.createElement('button');
     fuera.className = 'boton';
     fuera.textContent = 'Descartar';
     fuera.onclick = function () { window.Bandeja.descartar(item); };
-    acciones.appendChild(fuera);
+    enMenu.push(fuera);
+
+    acciones.appendChild(U.menuDeAcciones(enMenu));
 
     div.appendChild(acciones);
     return div;
   }
 
-  return { pintar: pintar, plegar: plegar };
+  return { pintar: pintar, plegar: plegar, tarjeta: tarjeta };
 })();

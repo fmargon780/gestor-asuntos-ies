@@ -296,6 +296,16 @@
       while (cola.length) {
         var nombre = cola.shift();
         delete enCola[nombre];
+        /* Fila 191: `App.tarjetaSuelto` ya no se llama solo con "Por
+           clasificar" a la vista (js/inicio.js también la usa para "Ha
+           llegado", en cada repintado de Inicio). Entre soltar la
+           marca de la cola y que `procesarUno` termine de verdad, un
+           segundo `encolar` del mismo fichero (otro repintado mientras
+           este seguía leyendo) puede colarse: si para entonces ya está
+           resuelto, se salta, para no pisar `resultados[nombre]` con
+           un análisis nuevo que no sabe nada de lo que haya cambiado
+           mientras tanto (por ejemplo, un alta recién guardada). */
+        if (resultados.hasOwnProperty(nombre)) continue;
         await procesarUno(nombre);
       }
     } finally {

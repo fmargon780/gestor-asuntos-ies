@@ -149,15 +149,20 @@
 
   /* ---------- la columna ---------- */
 
+  /* Fila 191: el tablón cuelga de la rejilla nueva de Inicio
+     (#inicio-rejilla), como cuarta columna; si por lo que fuera esa
+     rejilla no existiera todavía, se cuelga de #pantalla-abiertos como
+     antes, para no romper nada. El grid de cuatro columnas lo pone
+     ahora css/inicio.css directamente sobre #inicio-rejilla: aquí ya no
+     se marca ninguna clase de "con-tablon". */
   function columna() {
     var c = $('tablon');
     if (c) return c;
-    var pantalla = $('pantalla-abiertos');
-    if (!pantalla) return null;
-    pantalla.classList.add('con-tablon');
+    var padre = $('inicio-rejilla') || $('pantalla-abiertos');
+    if (!padre) return null;
     c = document.createElement('aside');
     c.id = 'tablon';
-    pantalla.appendChild(c);
+    padre.appendChild(c);
     return c;
   }
 

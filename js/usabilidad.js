@@ -70,13 +70,6 @@
     if (c) c.type = 'search';
   });
 
-  /* El botón de vista, en la barra de Asuntos abiertos. */
-  var btnVista = document.createElement('button');
-  btnVista.type = 'button';
-  btnVista.className = 'boton';
-  btnVista.id = 'btn-vista';
-  if ($('btn-recargar')) $('btn-recargar').parentNode.insertBefore(btnVista, $('btn-recargar'));
-
   /* La barra que dice qué se está filtrando, justo debajo de la
      cabecera de Asuntos abiertos. */
   var barraFiltros = document.createElement('div');
@@ -221,52 +214,6 @@
   }
 
   /* ==========================================================
-     4. VISTA COMPACTA DE LOS ASUNTOS ABIERTOS
-
-     Cada asunto en una línea. El nombre de la carpeta ya lleva la
-     fecha, el tipo y el tercero, así que con esa línea y la etiqueta
-     del estado se sabe lo del día a día. Al pulsar en una fila, esa
-     fila se abre y enseña el pie y los botones.
-     ========================================================== */
-
-  /* Esta clave se llamaba 'vista-abiertos', que es la que usa la
-     aplicación para recordar cuál de las tres tarjetas está elegida.
-     Aquí es otra cosa, así que tiene su propio nombre.
-
-     De partida, filas cómodas: es como se ha venido usando. Quien
-     quiera la de una línea, la pide con el botón. */
-  function esCompacta() {
-    return recordado('vista-filas') === 'compacta';
-  }
-
-  function pintarVista() {
-    var lista = $('lista-abiertos');
-    var compacta = esCompacta();
-    if (lista) lista.classList.toggle('lista-compacta', compacta);
-    btnVista.textContent = compacta ? 'Vista cómoda' : 'Vista compacta';
-    btnVista.title = compacta
-      ? 'Pasar a filas altas, con los datos y los botones siempre a la vista'
-      : 'Pasar a filas de una línea, para ver muchos asuntos de golpe';
-  }
-
-  btnVista.onclick = function () {
-    recordar('vista-filas', esCompacta() ? 'comoda' : 'compacta');
-    pintarVista();
-  };
-
-  /* Pulsar el nombre abre y cierra la fila. La escucha está en la
-     lista entera, así que sigue valiendo cada vez que se repinta. */
-  if ($('lista-abiertos')) {
-    $('lista-abiertos').addEventListener('click', function (ev) {
-      if (!esCompacta()) return;
-      var texto = ev.target.closest ? ev.target.closest('.tarjeta-texto') : null;
-      if (!texto) return;
-      var tarjeta = texto.closest('.tarjeta');
-      if (tarjeta) tarjeta.classList.toggle('abierta');
-    });
-  }
-
-  /* ==========================================================
      5. LO QUE SE ESTÁ FILTRANDO
 
      Una lista corta sin saber por qué es un susto. Cada filtro puesto
@@ -368,7 +315,6 @@
      las etiquetas. Así siempre dicen lo que hay de verdad en pantalla. */
   if ($('lista-abiertos')) {
     new MutationObserver(function () {
-      pintarVista();
       pintarFiltros();
     }).observe($('lista-abiertos'), { childList: true });
   }
@@ -457,7 +403,6 @@
   }
 
   /* ========================================================== */
-  pintarVista();
   pintarVolver();
 
 })();

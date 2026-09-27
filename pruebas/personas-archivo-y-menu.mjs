@@ -150,7 +150,7 @@ await comprobar('3. la lista está pintada (sin archivados todavía, pero sin "P
 console.log('--- 4. el buscador de Asuntos abiertos busca en todos los montones ---');
 
 await pagina.click('.pestana[data-pantalla="abiertos"]');
-await pagina.click('.panel[data-vista="departamento"]');
+await pagina.evaluate(() => window.App.irVista('departamento'));
 await pagina.waitForTimeout(150);
 await comprobar('4. sin buscar, en "Nos toca" solo sale el de MATRICULA',
   pagina.locator('#lista-abiertos .tarjeta').count(), 1);

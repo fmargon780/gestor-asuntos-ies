@@ -102,7 +102,7 @@ await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(200);
 await comprobar('el asunto se ha ido de «Pendiente de Administración», sin recargar',
   pagina.locator('#lista-abiertos .tarjeta-asunto').count(), 0);
-await pagina.click('.panel[data-vista="espera"]');
+await pagina.evaluate(() => window.App.irVista('espera'));
 await pagina.waitForTimeout(200);
 await comprobar('y su tarjeta, en «Pendiente de terceros», lo dice',
   pagina.locator('#lista-abiertos .tarjeta .marca-esperando').first().textContent().then(t => t.indexOf('Esperando a ') === 0), true);
@@ -112,7 +112,7 @@ await pagina.waitForSelector('#ficha-acciones .boton-ya-llegado');
 await pagina.click('#ficha-acciones .boton-ya-llegado');
 await pagina.waitForSelector('#ficha-acciones .boton-esperando');
 await pagina.click('#ficha-volver');
-await pagina.click('.panel[data-vista="departamento"]');
+await pagina.evaluate(() => window.App.irVista('departamento'));
 await pagina.waitForTimeout(200);
 
 console.log('--- 2) marcar un hito (paso de la guía) como hecho ---');

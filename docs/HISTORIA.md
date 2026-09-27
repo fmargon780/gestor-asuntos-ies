@@ -5,6 +5,64 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 191: la pantalla de Inicio, primera parte (los bloques)
+
+`docs/INICIO-CUATRO-BLOQUES.md`, apartados 1, 2, 3, 4 y 7 (los apartados 5 y 6 —la tabla «Todos
+los asuntos abiertos» y los plegados «Dormidos»/«Sin fecha»— quedan para la fila 192). «Asuntos
+abiertos» pasa a llamarse **«Inicio»** y enseña, todo a la vez, sin elegir montón: **«Ha
+llegado»** (documentos sueltos y correos de la bandeja juntos, los más nuevos arriba), **«Me
+toca»** (un hito por asunto, el que le toca a Administración, ordenado por plazo, con filtro de
+responsable), **«Esperamos a otros»** (un hito por asunto, ordenado por días de espera) y el
+**tablón**, que ya nunca se esconde. «Qué me toca» deja de ser una pantalla aparte: sus cálculos
+(`js/que-me-toca.js`) se reutilizan tal cual, solo cambia quién los pinta. El badge rojo de
+vencidos pasa de «Qué me toca» a la propia pestaña «Inicio». Nuevo fichero `css/inicio.css` (la
+rejilla de cuatro columnas, con `@container` en 1100 y 620 px) y `js/documentos-vigilancia.js`
+(la vigilancia de la carpeta, sacada de `js/documentos-sueltos.js` para que no pasara de 600
+líneas). Quitada la vista compacta/cómoda (`js/usabilidad.js`): la nueva pantalla ya es compacta.
+
+**Cómo se hizo (una tanda larga, con Francisco pidiendo encadenar toda la cola sin pararse a
+preguntar entre fila y fila, salvo que algo falle):** un agente de planificación leyó el encargo
+completo, el boceto y todo el código relacionado, y entregó un plan fichero a fichero; un segundo
+agente lo implementó de verdad (código, CSS, la prueba nueva y las pruebas viejas que dependían de
+la pantalla que desaparece), validando él mismo con `npm test` completo en verde dos veces
+seguidas; esta sesión revisó el diff, corrió `npm test` una tercera vez de forma independiente
+(174 ficheros, en verde) y comprobó a ojo, con una captura de pantalla de verdad, que la rejilla
+se ve como el boceto.
+
+**Una decisión real, tomada sobre la marcha (no estaba en el plan original):** el hueco
+`#inicio-legado` (la lista de siempre, con sus filtros) se dejó **siempre a la vista**, debajo de
+la rejilla nueva, en vez de escondido por defecto como proponía el plan. Al probarlo, esconderlo
+rompía decenas de pruebas que abren o filtran esa lista directamente; y además, mientras la fila
+192 no traiga la tabla de verdad, esconder la única forma de ver «todos los asuntos abiertos» le
+habría quitado a Francisco una pantalla que necesita a diario. Los botones que antes escondían o
+mostraban esa lista (`Gestor.filtrarPorPlazo`, las vistas de montón sin botón visible) ahora hacen
+`scrollIntoView` hasta ella, en vez de revelarla.
+
+**Un arreglo real, fuera de la lista de ficheros del plan:** `js/documentos-sueltos-lector.js`
+tenía una condición de carrera que solo se notaba ahora que `App.tarjetaSuelto` se pinta dos veces
+(en «Ha llegado» y en «Ver todo»): un suelto podía encolarse dos veces para su lectura, y la
+segunda lectura pisaba el resultado de la primera justo cuando esta acababa de detectar un alta
+reciente, dejando el botón «Dar de alta» sin desaparecer nunca. Arreglo de una línea: si al llegar
+su turno el fichero ya está resuelto, se salta.
+
+**Lo que queda pendiente para la fila 192 (a propósito, no es un olvido):** `#inicio-todos-asuntos`
+está vacío; `bloqueDormidos()` sigue escrita en `js/que-me-toca.js` pero nadie la llama todavía
+(su botón interno «Ocultar por 30 días» llama a un `pintar()` que ya no existe en ese fichero:
+quien reconecte esa función en la fila 192 tiene que revisarlo).
+
+**Otro hallazgo, sin arreglar a propósito (fuera del alcance de esta fila):** la regla CSS
+`header.cabecera.encogida .filtros` (`css/cabecera-fija.css`) ya no tiene ningún efecto en Inicio,
+porque `.filtros` (`#filtros-abiertos`) vive ahora dentro de `#inicio-legado`, fuera de la
+cabecera. No rompe nada (el panel de filtros ya nace plegado con su propio botón «Filtros»), pero
+es una regla muerta que convendría revisar o quitar cuando se retoque esa zona.
+
+`docs/CONTEXTO-CORTO.md`, `docs/contexto/PANTALLA.md`, `docs/contexto/ASUNTOS.md` y
+`docs/CONTEXTO.md` puestos al día con el cambio de nombre de la pantalla y de sus piezas
+("Asuntos abiertos" → "Inicio", "Por clasificar" → "Ver todo", "Qué me toca" → "Me toca"/"Esperamos
+a otros"); de paso, dos restos de vocabulario viejo que no eran de esta fila ("Meter en un
+asunto"/"Poner nombre" en `docs/contexto/ASUNTOS.md`, ya corregidos en el código desde las filas
+179 y 168 pero no en la documentación).
+
 ## 27-sep-2026 — Fila 190: vocabulario, tercera parte: borrar o quitar, e impresos
 
 `docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 190: `docs/VOCABULARIO-EN-PANTALLA.md`, puntos 2,

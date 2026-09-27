@@ -1,16 +1,15 @@
 /* ============================================================
-   vista.js — la pantalla de asuntos abiertos, ordenada.
+   vista.js — la pantalla de Inicio, ordenada.
 
-   Dos cosas, y nada más:
+   Los tres desplegables (estado, plazo y orden) viven plegados detrás
+   del botón "Filtros". Sueltos en la barra se salían de línea y cada
+   etiqueta acababa lejos de su campo.
 
-   1. Los tres desplegables (estado, plazo y orden) viven plegados
-      detrás del botón "Filtros". Sueltos en la barra se salían de
-      línea y cada etiqueta acababa lejos de su campo.
-
-   2. El tablón de notas se ve siempre, salvo cuando hay algo abierto
-      en el panel de la derecha y no cabe. El botón "Tablón" de la
-      cabecera lo esconde y lo trae de vuelta, pero al volver a la
-      pantalla de asuntos vuelve a salir: si no se ve, no se mira.
+   El tablón de notas ya no se esconde nunca (fila 191, decisión 4): el
+   reflujo de "3 columnas + tablón abajo" cuando hay un panel a la
+   derecha abierto (visor o lector) lo resuelve el CSS de css/inicio.css
+   sobre las clases `con-visor`/`con-lector` que ya ponen js/visor.js y
+   js/lector.js en <body>, sin código aquí.
 
    El ancho lo lleva css/vista.css, que mide la zona de trabajo y no la
    ventana: por eso vale igual con el panel de lectura abierto.
@@ -63,118 +62,6 @@
     pintarBotonFiltros();
   }
 
-  /* ---------- 2. el tablón ---------- */
-
-  var manual = null;        /* lo que él ha pedido a mano, si ha pedido algo */
-  var escondiaAntes = null; /* lo que decía el automático la última vez */
-  var boton = null;
-
-  /* El automático: cuándo estorba el tablón.
-
-     Palabras suyas (10-sep-2026): "por defecto, al entrar y al volver
-     a Asuntos abiertos, el tablón debe estar desplegado; si no, se me
-     olvidará mirarlo". Así que ahora solo se quita cuando de verdad no
-     cabe: con algo abierto en el panel de la derecha.
-
-     Hay DOS paneles a la derecha, y los dos cuentan:
-       - `con-lector`, el de leer un correo (js/lector.js).
-       - `con-visor`, el de ver un documento (js/visor.js).
-     La primera versión solo miraba el del correo, y al abrir un
-     documento el tablón se quedaba puesto, estrujando la pantalla.
-
-     Antes se quitaba también al elegir una de las tres tarjetas de
-     arriba, y como siempre hay una elegida, el tablón no salía nunca
-     solo. Había que pedirlo con el botón cada vez. */
-  var PANELES_DE_LA_DERECHA = ['con-lector', 'con-visor'];
-
-  function estorba() {
-    return PANELES_DE_LA_DERECHA.some(function (c) {
-      return document.body.classList.contains(c);
-    });
-  }
-
-  function pendientes() {
-    var t = $('tablon');
-    if (!t) return 0;
-    return t.querySelectorAll('.papel:not(.papel-hecha)').length;
-  }
-
-  function pintarTablon() {
-    var pantalla = $('pantalla-abiertos');
-    if (!pantalla) return;
-
-    var auto = estorba();
-    if (escondiaAntes !== null && auto !== escondiaAntes) manual = null;
-    escondiaAntes = auto;
-
-    var seVe = manual === null ? !auto : manual;
-    pantalla.classList.toggle('sin-tablon', !seVe);
-
-    if (!boton) return;
-    var cuantas = pendientes();
-    var texto = seVe ? 'Ocultar el tablón' : 'Tablón';
-    var marca = (!seVe && cuantas) ? '<span class="cuenta-tablon">' + cuantas + '</span>' : '';
-    var quiere = texto + marca;
-    if (boton.innerHTML !== quiere) boton.innerHTML = quiere;
-    boton.title = seVe
-      ? 'Quitar de la vista las notas rápidas'
-      : 'Ver las notas rápidas';
-  }
-
-  function engancharTablon() {
-    var pantalla = $('pantalla-abiertos');
-    if (!pantalla) return;
-
-    boton = document.createElement('button');
-    boton.type = 'button';
-    boton.id = 'btn-tablon';
-    boton.className = 'boton';
-    boton.textContent = 'Tablón';
-    boton.onclick = function () {
-      var seVe = !pantalla.classList.contains('sin-tablon');
-      manual = !seVe;
-      pintarTablon();
-    };
-    var recargar = $('btn-recargar');
-    if (recargar && recargar.parentNode) recargar.parentNode.insertBefore(boton, recargar);
-
-    /* Lo que cambia la situación: abrir o cerrar un correo o un
-       documento en el panel de la derecha. */
-    new MutationObserver(pintarTablon)
-      .observe(document.body, { attributes: true, attributeFilter: ['class'] });
-
-    /* Al volver a la pantalla de asuntos, el tablón vuelve a estar
-       desplegado aunque él lo hubiera escondido antes con el botón.
-       Es lo que hace que no se le olvide mirarlo.
-
-       Se mira solo si la pantalla ha pasado de escondida a la vista.
-       La clase de la pantalla también cambia cuando se esconde el
-       tablón, y sin esta comprobación el tablón se volvería a abrir
-       él solo en cuanto él lo cerrara. */
-    var seVeiaLaPantalla = !pantalla.classList.contains('oculto');
-    new MutationObserver(function () {
-      var seVe = !pantalla.classList.contains('oculto');
-      if (seVe === seVeiaLaPantalla) return;
-      seVeiaLaPantalla = seVe;
-      if (!seVe || manual === null) return;
-      manual = null;
-      pintarTablon();
-    }).observe(pantalla, { attributes: true, attributeFilter: ['class'] });
-
-    /* El tablón se crea solo cuando la aplicación arranca, y se repinta
-       cada vez que se apunta una nota: hay que mirarlo para la cuenta. */
-    new MutationObserver(function () {
-      var t = $('tablon');
-      if (t && !t.dataset.vigilado) {
-        t.dataset.vigilado = '1';
-        new MutationObserver(pintarTablon).observe(t, { childList: true, subtree: true });
-      }
-      pintarTablon();
-    }).observe(pantalla, { childList: true });
-
-    pintarTablon();
-  }
-
   /* ---------- arranque ---------- */
 
   function enganchar() {
@@ -182,7 +69,6 @@
     if (!$('pantalla-abiertos')) return;
     enganchado = true;
     engancharFiltros();
-    engancharTablon();
   }
 
   enganchar();

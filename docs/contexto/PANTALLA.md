@@ -14,7 +14,7 @@ Cambiar el estado con la ficha abierta hacía 30-40 lecturas de disco. Ahora sol
   `alRefrescar` los lanza la lista, con la ficha delante no corre ninguno.
 - **Los enganches no leen del disco en cada pasada**: los que solo pintan algo de Ajustes (biblioteca,
   hitos) se saltan si Ajustes no se ve (`App.pantallaALaVista`) y se les avisa al entrar en Ajustes;
-  la cuenta de «Qué me toca» solo relee `hitos.json` si este ordenador ha cambiado algún hito
+  el badge rojo de vencidos de Inicio (fila 191; antes, la cuenta de «Qué me toca») solo relee `hitos.json` si este ordenador ha cambiado algún hito
   (`Hitos.ultimoCambioLocal`) o han pasado dos minutos; los envíos, una vez por minuto; medir la
   papelera vieja, cada diez minutos.
 - **Tras cambiar estado, plazo, vía o encargo** (y tras marcar un hito que cambia el estado, o tocar
@@ -45,7 +45,7 @@ grabado, y eso manda a partir de ahí, ancha o estrecha la ventana. **Queda fija
 de ancho**: quitado en la fila 36, 17-sep-2026, porque dejaba franjas vacías en un monitor ancho).
 Ajustes está en la lista de pestañas, separado por una línea (`.separador-lateral`); con la barra
 plegada, un icono de rueda dentada (`#btn-barra-ajustes`) lleva directo a Ajustes. El botón grande
-"+ Nuevo asunto" va en la cabecera de Asuntos abiertos, y lo pone el mismo fichero. **Se pliega sola
+"+ Nuevo asunto" va en la cabecera de Inicio (antes «Asuntos abiertos», fila 191), y lo pone el mismo fichero. **Se pliega sola
 al abrir el visor o el lector** (un `MutationObserver` sobre las clases `con-visor`/`con-lector` de
 `<body>`, sin tocar `gestor-barra-2`) y vuelve a como estaba al cerrarlo.
 
@@ -66,8 +66,8 @@ apaga igual que a los demás sin necesitar ningún caso especial. En `js/ficha-d
 (`filaDeDocumento`) solo quedan a la vista el nombre y "Registrar" (cuando sale); Copiar (que lo
 sigue añadiendo `js/copiar.js`, por envoltura, buscando el `.fila-menu` ya montado), Separar,
 Unir, Sacar páginas y Borrar van al menú. En `js/documentos-sueltos.js` (`App.tarjetaSuelto`, las
-tarjetas de "Por clasificar") quedan a la vista "Crear asunto con él" y "Meter en un asunto";
-Abrir, Separar, Unir, Sacar páginas y Borrar (que lo sigue añadiendo `js/papelera.js`, por
+tarjetas de "Ha llegado" y "Ver todo", antes "Por clasificar"; fila 191) quedan a la vista "Crear
+asunto con él" y "Guardar en un asunto"; Abrir, Separar, Unir, Sacar páginas y Borrar (que lo sigue añadiendo `js/papelera.js`, por
 envoltura) van al menú — `App.accionesDeSuelto` (fila 25, reutilizado dentro del visor) busca
 "Abrir" por su texto en cualquier profundidad, ya no solo entre los hijos directos. Se comprueba
 con `pruebas/filas-estrechas.mjs`, en navegador de verdad.
@@ -78,7 +78,8 @@ borde izquierdo se arrastra; el ancho se recuerda (`gestor-lector-ancho`); doble
 `Lector.abrir({ titulo, pie, blob, botones })`.
 
 **Comodidades de pantalla** (`js/usabilidad.js`): botón Volver, Cancelar, etiquetas de lo que se
-está filtrando, vista compacta y la tecla Escape. No toca datos.
+está filtrando y la tecla Escape. No toca datos. (La vista compacta/cómoda se retiró en la fila
+191: la tabla de asuntos ya era compacta.)
 
 **Que de toda pantalla se pueda salir.** Con el cuadro (`#capa`) abierto, Escape lo cierra
 (cancela; si no lleva Cancelar, acepta). Con el visor de un documento abierto (`con-visor`),
@@ -93,7 +94,7 @@ el Escape general de aquí se dispara también y hace algo de más.
 
 ### Adónde lleva la aplicación después de cada acción (fila 119, 24-sep-2026, `docs/TRAS-CADA-ACCION.md`)
 
-- **Crear un asunto abre su ficha** (formulario, «Por clasificar» con «Aceptar», «Crear el asunto»
+- **Crear un asunto abre su ficha** (formulario, «Ver todo» —antes «Por clasificar»— con «Aceptar», «Crear el asunto»
   de la bandeja, que pasan todos por `App.crearAsuntoDelFormulario`, y un recurrente cuando solo
   toca uno). Desde un documento suelto, el cuadro de ponerle nombre se abre encima de la ficha.
   «Crear los que tocan» con varios no abre nada.
@@ -102,9 +103,9 @@ el Escape general de aquí se dispara también y hace algo de más.
   que queda; cancelado, se queda en la misma ficha). Archivar y Borrar siguen saliendo a la lista.
 - **«Volver» (y Escape) vuelve a la pantalla de la que se vino** (`js/navegacion.js`):
   `App.abrirFicha` llama a `Navegacion.apuntar()` antes de cambiar de pantalla (pantalla visible
-  y `scrollY`; de ficha a ficha se conserva el origen de la primera; desde «Nuevo», Asuntos
-  abiertos) y `volverALaLista` a `Navegacion.volver(defecto)`. Un solo nivel, sin pila.
-  `Navegacion.abrirAbierto(nombre)` abre por nombre con Asuntos abiertos de origen.
+  y `scrollY`; de ficha a ficha se conserva el origen de la primera; desde «Nuevo», Inicio)
+  y `volverALaLista` a `Navegacion.volver(defecto)`. Un solo nivel, sin pila.
+  `Navegacion.abrirAbierto(nombre)` abre por nombre con Inicio de origen.
 - **La lista vuelve a la misma altura** (la ventana es la que se desplaza): al volver, y al
   repintar `App.pintarAbiertos`/`App.pintarArchivo`, que guardan y devuelven `scrollY`.
 - **Aviso con «Ir al asunto»** cuando lo lógico es quedarse: `U.aviso(texto, clase, { boton,
@@ -206,10 +207,10 @@ en un panel que abre el botón "Filtros", recordado en `gestor-filtros`.
 ### La cabecera se queda arriba, y se encoge (fila 46, 17/18-sep-2026; sin temblor, fila 50,
 ### 18-sep-2026, docs/CABECERA-NO-TIEMBLA.md)
 
-`js/cabecera-fija.js` (`window.CabeceraFija`) es un único mecanismo para las siete pantallas
-(ficha del asunto, asuntos abiertos —incluido "Por clasificar", misma pantalla—, archivo,
-personas y empresas, ajustes, qué me toca, duplicados; papelera vive dentro de ajustes y usa su
-cabecera). No sabe nada de ninguna pantalla en concreto:
+`js/cabecera-fija.js` (`window.CabeceraFija`) es un único mecanismo para las seis pantallas
+(ficha del asunto, Inicio —incluido "Ver todo", misma pantalla; ya no hay «qué me toca» aparte
+desde la fila 191—, archivo, personas y empresas, ajustes, duplicados; papelera vive dentro de
+ajustes y usa su cabecera). No sabe nada de ninguna pantalla en concreto:
 
 - Busca, dentro de `section.pantalla` sin la clase `oculto`, su `header.cabecera` o
   `header.ficha-cabecera`, y le pone o quita la clase `encogida` según `window.scrollY`, con
@@ -256,8 +257,10 @@ cabecera). No sabe nada de ninguna pantalla en concreto:
   shorthand `margin`, para no pisar el `margin-bottom` que ya ponía cada pantalla) para llegar de
   borde a borde; en pantalla estrecha (900px) pasan a -16px/16px, como `.contenido` en
   `css/estilos.css`. `z-index: 20`, por debajo de `.capa` (50) y `.mensajes` (60). Encogida: el
-  título baja de 21px a 17px, se esconden `.filtros` (dentro de la cabecera de Asuntos abiertos) y
-  el `.explica` que venga justo después de la cabecera, y el margen de abajo baja a 6px (reducir
+  título baja de 21px a 17px, se esconde el `.explica` que venga justo después de la cabecera
+  (la regla `header.cabecera.encogida .filtros` sigue en `css/cabecera-fija.css`, pero desde la
+  fila 191 `.filtros` ya no vive dentro de la cabecera de Inicio, sino en `#inicio-legado`: no
+  tiene efecto ahí, queda pendiente de revisar si hace falta quitarla o repensarla), y el margen de abajo baja a 6px (reducir
   el alto de la cabecera sola no basta si el hueco de debajo no se achica también: quien mueve el
   contenido es ese margen, no un padding nuevo, que solo la agrandaría). `.tarjeta` lleva
   `scroll-margin-top: 90px` para que la cabecera pegada no tape lo que se salta con
@@ -270,7 +273,7 @@ cabecera). No sabe nada de ninguna pantalla en concreto:
   `js/cabecera-fija.js` en cada repintado (el alto real de la cabecera, encogida o no) sobre
   `document.documentElement`, así las pestañas se quedan pegadas justo debajo sin hueco ni solape,
   sea cual sea el estado de la cabecera.
-- Caso especial, "Por clasificar": con un documento abierto en el panel de la derecha
+- Caso especial, "Ver todo" (antes "Por clasificar"): con un documento abierto en el panel de la derecha
   (`.tarjeta-abierta`, la pone `js/documentos-sueltos.js`, sin tocar ese fichero ni
   `js/visor.js`), la cabecera encogida de `#pantalla-abiertos` añade un bloque `.cabecera-viendo`
   ("Viendo: `<nombre>`" + botón "Ir a su fila", `scrollIntoView`) que crea `js/cabecera-fija.js`;
@@ -289,7 +292,7 @@ cabecera). No sabe nada de ninguna pantalla en concreto:
   contenido movido, no el valor final de `scrollY`), cambiar de pantalla deja la anterior limpia y
   la nueva funciona igual (incluidas las pestañas pegadas de Ajustes), el ancho sigue al de
   `.contenido` con `con-lector`, el repintado de la ficha no pierde el estado encogido, el caso de
-  "Por clasificar", y que `js/barra.js` sigue encontrando su selector. Fila 50, dos casos más: en
+  "Ver todo", y que `js/barra.js` sigue encontrando su selector. Fila 50, dos casos más: en
   una pantalla corta (se calcula el alto de sobra que hace falta y se recorta la ventana a esa
   medida, en vez de fiarlo a un tamaño de pantalla concreto) cruzar el umbral no deja el estado
   temblando; y el candado de 400 ms, manejado a mano con `window.CabeceraFija.evaluar()` para
