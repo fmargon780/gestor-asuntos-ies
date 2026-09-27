@@ -146,6 +146,16 @@ await comprobar('la franja vuelve a salir, aunque sea el mismo día',
 await comprobar('con el trozo nuevo',
   pagina.locator('[data-aviso="huerfanas"]').textContent(), '1 ficha sin carpeta');
 
+/* ================= 5. UN SOLO "VOLVER" (FILA 194) ================= */
+
+console.log('--- 5. Cuentas vuelve a la pantalla de la que se vino, no siempre a Inicio ---');
+await pagina.click('.pestana[data-pantalla="personas"]');
+await pagina.waitForSelector('#pantalla-personas:not(.oculto)');
+await pagina.click('#pestana-cuentas');
+await pagina.waitForSelector('#pantalla-cuentas:not(.oculto)');
+await pagina.click('#cuentas-volver');
+await comprobar('vuelve a Personas, no a Inicio', pagina.locator('#pantalla-personas').isVisible(), true);
+
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 await navegador.close();

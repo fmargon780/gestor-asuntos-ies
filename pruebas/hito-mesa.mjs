@@ -250,6 +250,14 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await comprobar('7. desde "En Administración" (Inicio), directo en la mesa del hito',
     pagina.locator('#ficha-guia.con-mesa .hito-en-mesa[data-id="m1"]').isVisible(), true);
 
+  /* 7b. Fila 194: «← Volver a los hitos» hace lo mismo que Escape. */
+  await pagina.click('#mesa-volver-hitos');
+  await pagina.waitForTimeout(200);
+  await comprobar('7b. «← Volver a los hitos» cierra la mesa',
+    pagina.evaluate(() => !document.getElementById('ficha-guia').classList.contains('con-mesa')), true);
+  await comprobar('7b. y deja la tarjeta Hitos en grande',
+    pagina.evaluate(() => FichaTarjetas.abierta()), 'hitos');
+
   /* 8. */
   const r8 = await pagina.evaluate(async () => {
     const g = App.E.gestor;

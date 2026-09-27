@@ -253,7 +253,13 @@ var HitoMesa = (function () {
     var todoHecho = abierto && window.EstadoHito && EstadoHito.idActual &&
       EstadoHito.idActual(hitos, ajustes) === null;
     cab.innerHTML =
-      '<div class="mesa-tira">' + visibles.map(function (x) {
+      '<div class="mesa-tira">' +
+        /* Fila 194: «Volver a los hitos», dentro de la misma fila de la
+           tira (sin fila propia, para no bajar «QUÉ HAY QUE HACER»,
+           fila 145: la cabecera se midió a propósito para que quepa en
+           250 px). No estira como los botones de hito (flex: 0 0 auto). */
+        '<button type="button" class="mesa-tira-volver" id="mesa-volver-hitos" title="← Volver a los hitos">← Hitos</button>' +
+        visibles.map(function (x) {
         var num = numeroDe(x) ? numeroDe(x) + '. ' : 'i · ';
         return '<button type="button" class="mesa-tira-hito' + (x.id === h.id ? ' actual' : '') +
           (x.estado === 'hecho' ? ' hecho' : '') + '" data-id="' + U.escapar(x.id) + '" title="' + U.escapar(num + (x.titulo || '')) + '">' +
@@ -288,6 +294,8 @@ var HitoMesa = (function () {
     Array.prototype.forEach.call(cab.querySelectorAll('.mesa-tira-hito'), function (b) {
       b.onclick = function () { abrir(a, b.dataset.id); };
     });
+    var volverHitos = cab.querySelector('#mesa-volver-hitos');
+    if (volverHitos) volverHitos.onclick = cerrar;
     engancharPaneles(cab, a, h);
     var archivarBtn = cab.querySelector('.mesa-archivar-asunto');
     if (archivarBtn) archivarBtn.onclick = function () {

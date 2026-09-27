@@ -28,7 +28,7 @@
       '<header class="cabecera">' +
         '<h2>Posibles duplicados</h2>' +
         '<div class="acciones">' +
-          '<button type="button" id="dup-pantalla-volver" class="boton">← Volver a asuntos abiertos</button>' +
+          '<button type="button" id="dup-pantalla-volver" class="boton boton-volver">← Volver</button>' +
         '</div>' +
       '</header>' +
       '<p class="explica">Asuntos que coinciden en tercero, tipo y año académico, y que parece que ' +
@@ -36,7 +36,7 @@
       'para esta comparación.</p>' +
       '<div id="duplicados-lista"></div>';
     contenido.appendChild(seccion);
-    $('dup-pantalla-volver').onclick = function () { App.ir('abiertos'); };
+    $('dup-pantalla-volver').onclick = function () { if (window.Navegacion) Navegacion.volver('abiertos'); else App.ir('abiertos'); };
     I.pantallaConstruida = true;
   }
 

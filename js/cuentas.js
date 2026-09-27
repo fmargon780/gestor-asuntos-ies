@@ -245,7 +245,7 @@
         'recorrer el ARCHIVO.</p>' +
       '<div id="cuentas-cuerpo"><div class="vacio">Cargando…</div></div>';
     contenido.appendChild(seccion);
-    $('cuentas-volver').onclick = function () { App.ir('abiertos'); };
+    $('cuentas-volver').onclick = function () { if (window.Navegacion) Navegacion.volver('abiertos'); else App.ir('abiertos'); };
     $('cuentas-curso').onchange = function () { pintar(); };
     $('cuentas-copiar').onclick = function () { copiarTabla(); };
     construida = true;

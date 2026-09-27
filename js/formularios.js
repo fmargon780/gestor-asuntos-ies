@@ -357,7 +357,7 @@ var Formularios = (function () {
       'escolarización y convivencia, agrupado por norma.</p>' +
       '<div id="formularios-pantalla-cuerpo" class="explica">Cargando…</div>';
     contenido.appendChild(seccion);
-    document.getElementById('formularios-volver').onclick = function () { App.ir('abiertos'); };
+    document.getElementById('formularios-volver').onclick = function () { if (window.Navegacion) Navegacion.volver('abiertos'); else App.ir('abiertos'); };
     document.getElementById('formularios-buscar-pantalla').oninput = function () { pintarPantalla(); };
     if (App.PANTALLAS.indexOf('formularios') === -1) App.PANTALLAS.push('formularios');
     pantallaConstruida = true;
