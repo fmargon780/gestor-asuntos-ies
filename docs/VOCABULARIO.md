@@ -23,6 +23,8 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | Eliminar algo que va a la papelera | **borrar** | |
 | Eliminar algo que no va a la papelera (sacar de una lista) | **quitar** | |
 | Dejar un cuadro sin hacer nada | **cancelar** | dejarlo |
+| El bloque de hitos que le tocan a Administración, con o sin fecha | **En Administración** | Me toca |
+| El bloque de asuntos cuyo hito actual espera a otro responsable | **En espera** | Esperamos a otros |
 
 La diferencia entre plantilla e impreso: si la app lo rellena y lo genera, es plantilla; si se
 entrega para que alguien lo rellene, es impreso (aunque la app ponga los datos del centro).

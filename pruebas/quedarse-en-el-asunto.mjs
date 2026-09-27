@@ -246,8 +246,9 @@ await pagina.locator('#inicio-tabla-cuerpo tr', { hasText: 'PERMISO' }).first().
 
 async function abrirSegundoAsunto() {
   await pagina.click('#btn-recargar');
-  await pagina.locator('#inicio-tabla-cuerpo tr', { hasText: SEGUNDO_ASUNTO })
-    .locator('.nombre-pulsable').click();
+  /* Fila 209: la tabla ya no enseña el nombre entero de la carpeta; se
+     encuentra la fila por `data-asunto`, que siempre lo lleva. */
+  await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + SEGUNDO_ASUNTO + '"] .nombre-pulsable').click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 }
 
@@ -295,7 +296,7 @@ await pagina.evaluate(async (nombre) => {
   await window.__disco.abiertos.getDirectoryHandle(nombre, { create: true });
 }, TERCER_ASUNTO);
 await pagina.click('#btn-recargar');
-await pagina.locator('#inicio-tabla-cuerpo tr', { hasText: TERCER_ASUNTO }).locator('.nombre-pulsable').click();
+await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + TERCER_ASUNTO + '"] .nombre-pulsable').click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 
 await pagina.evaluate(async (nombre) => {

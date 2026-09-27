@@ -166,8 +166,8 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 190 | `docs/VOCABULARIO-EN-PANTALLA.md`, puntos 2, 3 y 5, y la prueba de palabras prohibidas (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 190) | HECHA (27-sep-2026 06:10). `npm test` completo (174 ficheros) en verde con Chromium real |
 | 191 | `docs/INICIO-CUATRO-BLOQUES.md`, apartados 1, 2, 3, 4 y 7: los bloques de Inicio y fuera «Qué me toca» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 191) | HECHA (27-sep-2026 09:35). `npm test` completo (174 ficheros) en verde con Chromium real, comprobado dos veces de forma independiente |
 | 192 | `docs/INICIO-CUATRO-BLOQUES.md`, apartados 5 y 6: la tabla de todos los abiertos (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 192) | HECHA (27-sep-2026 13:35). `npm test` completo (166 ficheros) en verde con Chromium real, comprobado de forma independiente; tabla y plegados comprobados a ojo con Playwright. Una prueba (`hito-desde-por-clasificar.mjs`) sumada a `EN_SOLITARIO` (mismo problema de CPU que la fila 208, no una regresión). Aviso de privacidad encontrado y anotado en «Lo que queda por hablar con Francisco», no arreglado (fuera del encargo). PR #139 fusionado (`4bc7a0a`). Publicación comprobada por `curl`: `App.VERSION` `27-sep-2026 · 13:35` y `js/inicio-plegados.js` ya en la web publicada |
-| 193 | `docs/AVISOS-MENU-Y-VOLVER.md`, apartados 1 y 2: avisos en una línea y menú (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 193) | HECHA (27-sep-2026 12:26). `npm test` completo (167 ficheros) en verde con Chromium real, comprobado de forma independiente; franja de avisos y menú comprobados a ojo con Playwright |
-| 209 | `docs/INICIO-EN-PESTANAS.md` (Inicio, segunda versión, boceto `docs/boceto-inicio-2.html`: «Ha llegado» y tablón a la izquierda; a la derecha pestañas «En Administración» —con o sin fecha—, «En espera», «Todos los abiertos», «Dormidos» sobre una sola tabla con Tercero y fecha de Inicio en vez del nombre de la carpeta; Responsable dentro de «Filtros»; los avisos filtran la tabla. Manda sobre `docs/INICIO-CUATRO-BLOQUES.md`. **Va la primera**, antes de la 194) | PENDIENTE (27-sep-2026) |
+| 193 | `docs/AVISOS-MENU-Y-VOLVER.md`, apartados 1 y 2: avisos en una línea y menú (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 193) | HECHA (27-sep-2026 16:52). `npm test` completo (167 ficheros) en verde con Chromium real, comprobado de forma independiente; franja de avisos y menú comprobados a ojo con Playwright. La CI de GitHub Actions falló primero por contención de CPU en dos pruebas ajenas a esta fila (`ajustes-por-tipo.mjs`, `mesa-comunicar-del-paso-y-guion.mjs`, sumadas a `EN_SOLITARIO`), arreglado y vuelto a pasar en verde. PR #141 fusionado (`9ef8aab`). Publicación comprobada por `curl`: `App.VERSION` `27-sep-2026 · 16:52` y `js/avisos-linea.js` ya en la web publicada (una primera lectura mostró una versión vieja por caché transitoria del despliegue, repetida un instante después salió correcta) |
+| 209 | `docs/INICIO-EN-PESTANAS.md` (Inicio, segunda versión, boceto `docs/boceto-inicio-2.html`: «Ha llegado» y tablón a la izquierda; a la derecha pestañas «En Administración» —con o sin fecha—, «En espera», «Todos los abiertos», «Dormidos» sobre una sola tabla con Tercero y fecha de Inicio en vez del nombre de la carpeta; Responsable dentro de «Filtros»; los avisos filtran la tabla. Manda sobre `docs/INICIO-CUATRO-BLOQUES.md`) | HECHA (27-sep-2026 16:20). `npm test` completo (167 ficheros) en verde con Chromium real, comprobado de forma independiente; cuatro pestañas y filtrado por aviso comprobados a ojo con Playwright, sin errores de consola (confirma que no hay cascada de repintado). Arreglado de paso el aviso de privacidad pendiente de la fila 192 («Le toca a» con un reservado). **Nota**: esta fila fue añadida a la tabla dos veces, por dos sesiones distintas a la vez (ver aviso más abajo en "Lo que queda por hablar con Francisco") |
 | 194 | `docs/AVISOS-MENU-Y-VOLVER.md`, apartados 3 y 4: un solo «Volver» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 194) | PENDIENTE (27-sep-2026) |
 | 195 | `docs/AVISOS-A-QUIEN-LO-PIDE.md`, apartados 1, 2 y 3: avisar a quien lo pide y «Enviar estado» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 195) | PENDIENTE (27-sep-2026) |
 | 196 | `docs/AVISOS-A-QUIEN-LO-PIDE.md`, apartado 4: informe para dirección (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 196) | PENDIENTE (27-sep-2026) |
@@ -209,15 +209,20 @@ abierto en ellas:
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
-- **Aviso, encontrado en la fila 192 (27-sep-2026): un asunto reservado puede enseñar el nombre
-  del tercero donde no debería.** En «Esperamos a otros» (fila 191) y en la columna «Le toca a»
-  de la tabla nueva (fila 192), cuando el responsable del hito es el papel fijo «tercero»
-  (`Hitos.resolverResponsable`), el texto («Esperando a…»/«Le toca a…») pone el **nombre real**
-  del tercero, sin pasar por `Reservados.tapar`. El resto de la fila sí lo tapa (candado, nombre
-  del asunto). Es un hueco real: «los reservados siguen tapados en listas y buscador» es una
-  regla del proyecto que esto no cumple del todo. No se ha tocado en la fila 192 (no era su
-  encargo); pendiente de decidir cómo taparlo (¿«el tercero»? ¿el mismo candado que el nombre?) y
-  de qué fila se encarga.
+- **Aviso importante (27-sep-2026, ~16:56): dos sesiones de Claude Code han trabajado en este
+  repositorio a la vez, saltándose la regla 0 de esta cola.** Mientras esta sesión implementaba
+  la fila 209, otra sesión distinta (`Claude-Session:
+  https://claude.ai/code/session_01DD2HGPqEfkgTHMpP4VgcjA`, atribuida a "Claude Opus 5.5") subió
+  directamente a `main` (commit `5e688cc`, sin pull request) un cambio en `docs/COLA.md` que
+  volvía a poner la fila 209 en PENDIENTE con su propio texto y reescribía la fila 193. Solo tocó
+  `docs/COLA.md` (nada de código), así que no ha habido conflicto de verdad en el trabajo, y esta
+  sesión ha conservado la fila 209 como HECHA (con su implementación real, probada) al fusionar.
+  Pero si esa otra sesión sigue activa, podría estar a punto de implementar la fila 209 por su
+  cuenta, por duplicado. Conviene comprobar si esa sesión sigue en marcha y pararla si es así.
+- ~~Aviso, encontrado en la fila 192: un asunto reservado puede enseñar el nombre del tercero
+  donde no debería («Le toca a»/«Esperando a…»).~~ **Arreglado en la fila 209** (27-sep-2026):
+  `App.textoLeTocaA` (`js/asuntos-lista-pintar.js`) pone el nombre genérico del papel
+  («Familia», «Tercero», «Relacionado») en vez del nombre real, si el asunto está tapado.
 - De la fila 146 (25-sep-2026): en el Anexo III (solicitud de admisión) la propuesta pone el centro,
   su código y su localidad en «Centro prioritario» y en «Centro 1» (los que pide la familia), no en
   «Centro 2, 3, 4». Si «Centro 1» no debe ser el nuestro, se cambia a mano en Ajustes › Impresos

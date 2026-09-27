@@ -149,16 +149,16 @@
 
   /* ---------- la columna ---------- */
 
-  /* Fila 191: el tablón cuelga de la rejilla nueva de Inicio
-     (#inicio-rejilla), como cuarta columna; si por lo que fuera esa
-     rejilla no existiera todavía, se cuelga de #pantalla-abiertos como
-     antes, para no romper nada. El grid de cuatro columnas lo pone
-     ahora css/inicio.css directamente sobre #inicio-rejilla: aquí ya no
-     se marca ninguna clase de "con-tablon". */
+  /* Fila 209, docs/INICIO-EN-PESTANAS.md: el tablón cuelga de la
+     columna izquierda de Inicio (#inicio-lado, debajo de "Ha
+     llegado"); si por lo que fuera esa columna no existiera todavía,
+     se cuelga de #pantalla-abiertos como antes, para no romper nada.
+     El grid de dos columnas lo pone css/inicio.css directamente sobre
+     el contenedor de #inicio-lado/#inicio-derecha. */
   function columna() {
     var c = $('tablon');
     if (c) return c;
-    var padre = $('inicio-rejilla') || $('pantalla-abiertos');
+    var padre = $('inicio-lado') || $('pantalla-abiertos');
     if (!padre) return null;
     c = document.createElement('aside');
     c.id = 'tablon';

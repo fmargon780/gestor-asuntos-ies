@@ -28,35 +28,44 @@
     try { window.localStorage.setItem(CLAVE_DIAS, String(n)); } catch (e) {}
   }
 
+  function esVencido(a) {
+    var p = Plazos.de((a.ficha && a.ficha.limite) || '');
+    return !!(p && p.dias <= 0);
+  }
+  function esProximo(a, margen) {
+    var p = Plazos.de((a.ficha && a.ficha.limite) || '');
+    return !!(p && p.dias > 0 && p.dias <= margen);
+  }
+
   /* Cuenta los asuntos abiertos que ya han vencido y los que vencen
      dentro del plazo de aviso. Los dos montones son distintos: un asunto
-     vencido no se cuenta otra vez como próximo. */
+     vencido no se cuenta otra vez como próximo. Fila 209: además de la
+     cuenta, las dos listas de asuntos (para que el aviso, al pulsarlo,
+     filtre la tabla de Inicio). */
   function contar() {
     var asuntos = (window.Gestor && window.Gestor.asuntos) ? window.Gestor.asuntos() : [];
     var margen = diasDeAviso();
-    var vencidos = 0, proximos = 0;
-    asuntos.forEach(function (a) {
-      var p = Plazos.de((a.ficha && a.ficha.limite) || '');
-      if (!p) return;
-      if (p.dias <= 0) vencidos++;
-      else if (p.dias <= margen) proximos++;
-    });
-    return { vencidos: vencidos, proximos: proximos, margen: margen };
+    var listaVencidos = asuntos.filter(esVencido);
+    var listaProximos = asuntos.filter(function (a) { return esProximo(a, margen); });
+    return { vencidos: listaVencidos.length, proximos: listaProximos.length, margen: margen,
+             listaVencidos: listaVencidos, listaProximos: listaProximos };
   }
 
   /* Fila 193, apartado 1: ya no pinta su propia caja. Cada montón (los
      vencidos, los que vencen pronto) es un trozo de la franja única de
-     js/avisos-linea.js, con la misma acción que tenía su botón de
-     antes. Solo el de vencidos pone la franja en rojo (docs/AVISOS-
-     MENU-Y-VOLVER.md: "roja si hay algo vencido..."). */
+     js/avisos-linea.js. Solo el de vencidos pone la franja en rojo
+     (docs/AVISOS-MENU-Y-VOLVER.md: "roja si hay algo vencido..."). Fila
+     209: el botón ya no lleva a #filtro-plazo (window.Gestor.filtrarPorPlazo
+     se deja sin borrar, por si otro documento lo referencia, pero ya no
+     tiene llamador): el filtro-de-tabla de la propia franja
+     (AvisosLinea → InicioTabla.filtrarPorAviso) es el único mecanismo. */
   function pintar() {
     if (!window.AvisosLinea) return;
     var c = contar();
 
     AvisosLinea.registrar('vencidos',
       c.vencidos ? (c.vencidos === 1 ? '1 vencido' : c.vencidos + ' vencidos') : '',
-      true,
-      function () { window.Gestor.filtrarPorPlazo('vencidos'); });
+      true, undefined, c.listaVencidos);
 
     var textoProximos = '';
     if (c.proximos) {
@@ -66,8 +75,7 @@
             ? '1 vence en los próximos ' + c.margen + ' días'
             : c.proximos + ' vencen en los próximos ' + c.margen + ' días');
     }
-    AvisosLinea.registrar('proximos', textoProximos, false,
-      function () { window.Gestor.filtrarPorPlazo('pronto'); });
+    AvisosLinea.registrar('proximos', textoProximos, false, undefined, c.listaProximos);
   }
 
   /* El ajuste de los días, en la pantalla de Ajustes. El hueco está en

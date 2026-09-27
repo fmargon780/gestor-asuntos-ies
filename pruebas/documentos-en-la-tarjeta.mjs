@@ -71,7 +71,7 @@ async function preparar(ancho, alto) {
 async function abrirFicha(pagina) {
   await pagina.evaluate(() => App.ir('abiertos'));
   await pagina.waitForTimeout(200);
-  await pagina.locator('.tarjeta-nombre', { hasText: ASUNTO }).first().click();
+  await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ASUNTO + '"] .nombre-pulsable').first().click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
   await pagina.waitForTimeout(500);

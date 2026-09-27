@@ -52,7 +52,7 @@ if (PALABRAS.length) {
    demás. Si alguna prueba futura tuviera el mismo problema, su nombre
    va también aquí. */
 const EN_SOLITARIO = ['documentos-sueltos.mjs', 'repintar-solo-lo-que-cambia.mjs', 'hito-desde-por-clasificar.mjs',
-  'ajustes-por-tipo.mjs', 'mesa-comunicar-del-paso-y-guion.mjs'];
+  'ajustes-por-tipo.mjs', 'mesa-comunicar-del-paso-y-guion.mjs', 'tras-cada-accion.mjs'];
 
 function tope() {
   const n = parseInt(process.env.PRUEBAS_A_LA_VEZ, 10);

@@ -72,7 +72,9 @@ async function crearAsuntoAbierto(nombre, tercero) {
 async function archivarDesdeLaFicha(nombre) {
   await pagina.click('#btn-recargar');
   await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
-  await pagina.click(`#inicio-tabla-cuerpo tr:has-text("${nombre}") .nombre-pulsable`);
+  /* Fila 209: la tabla ya no lleva el nombre entero de la carpeta en
+     ninguna celda; se busca la fila por `data-asunto`. */
+  await pagina.click(`#inicio-tabla-cuerpo tr[data-asunto="${nombre}"] .nombre-pulsable`);
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.click('button:has-text("Archivar el asunto")');
   await pagina.waitForSelector('#capa:not(.oculto)');

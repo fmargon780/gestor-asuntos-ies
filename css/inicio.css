@@ -1,28 +1,30 @@
 /* ============================================================
-   inicio.css — la pantalla de Inicio (27-sep-2026, fila 191,
-   docs/INICIO-CUATRO-BLOQUES.md, apartados 1, 2, 3, 4 y 7).
+   inicio.css — la pantalla de Inicio (27-sep-2026, fila 209,
+   docs/INICIO-EN-PESTANAS.md; sustituye a la fila 191,
+   docs/INICIO-CUATRO-BLOQUES.md, en todo lo que decía distinto).
 
-   La rejilla de cuatro columnas ("Ha llegado", "Me toca", "Esperamos a
-   otros" y el tablón) y sus filas, calcadas de css/que-me-toca.css
-   (.qmt-bloque-titulo, .qmt-lista, .qmt-fila). El aviso de aspirantes
-   (antes .qmt-aviso-aspirantes, css/que-me-toca.css) es desde la fila
-   193 un trozo más de .avisos-linea, más abajo en este mismo fichero.
-
-   Los colores de plazo son los de siempre: .marca-plazo, .plazo-vencido,
-   .plazo-cerca y .plazo-lejos vienen de css/plazos.css y se reutilizan
-   tal cual, sin inventar otra escala.
+   Dos columnas: izquierda estrecha ("Ha llegado" + el tablón),
+   derecha las pestañas y la tabla única. Los colores de plazo son los
+   de siempre: .marca-plazo, .plazo-vencido, .plazo-cerca y
+   .plazo-lejos vienen de css/plazos.css y se reutilizan tal cual.
    ============================================================ */
 
-#inicio-rejilla {
+#inicio-cuerpo {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 250px;
+  grid-template-columns: 380px 1fr;
   gap: 14px;
   align-items: start;
   margin-bottom: 20px;
 }
 
+.inicio-lado {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 .inicio-bloque,
-#inicio-rejilla > #tablon {
+.inicio-lado > #tablon {
   background: var(--papel);
   border: 1px solid var(--linea);
   border-radius: var(--radio);
@@ -39,27 +41,6 @@
   margin: 0 0 10px;
 }
 
-.inicio-ver-mas {
-  margin-left: auto;
-  font: inherit;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--azul);
-  background: none;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-}
-.inicio-ver-mas:hover { text-decoration: underline; }
-
-.inicio-bloque-filtro {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-.inicio-bloque-filtro #inicio-me-toca-responsable { width: 160px; min-width: 0; }
-
 .inicio-lista {
   display: flex;
   flex-direction: column;
@@ -67,64 +48,49 @@
 }
 .inicio-lista .vacio { padding: 8px 2px; }
 
-.inicio-fila {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: 100%;
-  text-align: left;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  background: var(--papel);
-  border: 1px solid var(--linea);
-  border-left: 4px solid var(--azul);
-  border-radius: 8px;
-  padding: 8px 12px;
-}
-.inicio-fila:hover { border-color: #b9c6d6; }
-.inicio-fila.plazo-vencido { border-left-color: var(--rojo-linea); }
-.inicio-fila.plazo-cerca { border-left-color: var(--ambar-linea); }
-.inicio-fila.plazo-lejos { border-left-color: var(--tinta-suave); }
-
-.inicio-fila-l1 {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-.inicio-fila-titulo {
-  font-weight: 600;
-  font-size: 13.5px;
-  word-break: break-word;
-}
-.inicio-fila-gris {
-  color: var(--tinta-suave);
-  font-size: 12.5px;
-  word-break: break-word;
-}
-
-/* Los días de espera de "Esperamos a otros": rojo desde 15 días, ámbar
-   desde 7, reutilizando los mismos tonos que .plazo-vencido/.plazo-cerca
-   (css/plazos.css), sin inventar otra paleta. */
-.marca-plazo.inicio-dias-rojo { background: #fdecec; color: #a4302a; border-color: #f2c4c0; }
-.marca-plazo.inicio-dias-ambar { background: #fff4d6; color: #8a6100; border-color: #e6c377; }
-.inicio-fila.inicio-dias-rojo { border-left-color: var(--rojo-linea); }
-.inicio-fila.inicio-dias-ambar { border-left-color: var(--ambar-linea); }
-
 /* Las tarjetas de "Ha llegado" (App.tarjetaSuelto / BandejaPantalla.tarjeta)
    son las mismas que en "Ver todo" y en la bandeja, aquí recortadas para
-   caber compactas: menos aire, letra algo más pequeña. */
+   caber compactas: menos aire, letra algo más pequeña, y solo un par
+   de acciones a la vista + el menú ⋮ (el resto de botones, que ya
+   viven detrás del menú en el modo normal, siguen ahí). */
 .inicio-fila-compacta {
   padding: 8px 10px;
   font-size: 12.5px;
 }
-.inicio-fila-compacta .tarjeta-nombre { font-size: 13px; }
+.inicio-fila-compacta .tarjeta-nombre {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .inicio-fila-compacta .tarjeta-pie,
 .inicio-fila-compacta .tarjeta-adjuntos-correo,
-.inicio-fila-compacta .propuesta-correo { font-size: 11.5px; margin-top: 2px; }
-.inicio-fila-compacta .acciones { margin-top: 6px; gap: 6px; }
-.inicio-fila-compacta .boton { padding: 5px 9px; font-size: 12px; }
+.inicio-fila-compacta .propuesta-correo {
+  font-size: 11.5px;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.inicio-fila-compacta .acciones {
+  margin-top: 6px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+/* Los botones de "Ha llegado", como enlaces pequeños en una línea
+   (boceto docs/boceto-inicio-2.html): sin fondo ni borde, azules,
+   subrayado al pasar el ratón. */
+.inicio-fila-compacta .acciones .boton {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--azul);
+}
+.inicio-fila-compacta .acciones .boton:hover { text-decoration: underline; }
+.inicio-fila-compacta .acciones .fila-menu-btn { background: none; border: 0; box-shadow: none; }
 
 /* ---------- "Ver todo (N)": el panel de "clasificar" reaprovechado,
    ya no como la tarjeta grande de montón que era ---------- */
@@ -147,15 +113,6 @@
   color: var(--azul);
 }
 
-/* Mensaje de "no hay nada" en "Me toca"/"Esperamos a otros" (antes se
-   quedaba en blanco, sin decir nada, y parecía roto). Mismo aspecto
-   que .tablon-vacio (css/tablon.css), sin copiar sus reglas. */
-.inicio-lista-vacia {
-  color: var(--tinta-suave); font-size: 13px; line-height: 1.5;
-  border: 1px dashed var(--linea); border-radius: 8px;
-  padding: 14px; text-align: center;
-}
-
 /* Con solo un panel visible, la rejilla de tres columnas de siempre
    (css/estilos.css) dejaría dos huecos vacíos: aquí solo hace falta
    sitio para el "Ver todo" restilado. */
@@ -164,32 +121,21 @@
   margin: 0 0 12px;
 }
 
-/* ---------- reflujo con poco ancho ---------- */
+/* ---------- reflujo con poco ancho: una sola columna, la izquierda
+   primero (orden natural del DOM) ---------- */
 
-@container (max-width: 1100px) {
-  #inicio-rejilla { grid-template-columns: 1fr 1fr; }
-  #inicio-rejilla > #tablon { grid-column: 1 / -1; }
-}
-@container (max-width: 620px) {
-  #inicio-rejilla { grid-template-columns: 1fr; }
+@container (max-width: 1000px) {
+  #inicio-cuerpo { grid-template-columns: 1fr; }
 }
 
-/* ---------- con el panel de la derecha abierto (visor o lector) ----------
+/* ---------- el badge rojo de vencidos, en la pestaña lateral "Inicio" ---------- */
 
-   El tablón nunca se esconde (fila 191, decisión 4): la fila de arriba
-   pasa a tres columnas y el tablón baja debajo de ellas. */
-body.con-visor #inicio-rejilla,
-body.con-lector #inicio-rejilla {
-  grid-template-columns: 1fr 1fr 1fr;
-}
-body.con-visor #inicio-rejilla > #tablon,
-body.con-lector #inicio-rejilla > #tablon {
-  grid-column: 1 / -1;
+.pestana .cuenta.cuenta-roja {
+  background: var(--rojo-linea);
+  color: #fff;
 }
 
-/* ---------- "Todos los asuntos abiertos", la tabla (fila 192) ---------- */
-
-#inicio-todos-asuntos { margin-top: 6px; }
+/* ---------- las pestañas de la tabla (fila 209, apartado 4) ---------- */
 
 .inicio-tabla-cabecera {
   display: flex;
@@ -198,17 +144,55 @@ body.con-lector #inicio-rejilla > #tablon {
   gap: 10px 16px;
   margin-bottom: 12px;
 }
-.inicio-tabla-cabecera h2 {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-  margin-right: auto;
+
+.inicio-pestanas {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
 }
+.inicio-pestana {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--tinta-suave);
+  font: inherit;
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.inicio-pestana:hover { background: var(--fondo-hover, #f1f4f8); }
+.inicio-pestana.activa {
+  background: var(--azul);
+  color: #fff;
+}
+.inicio-pestana .cuenta {
+  display: inline-block;
+  min-width: 20px;
+  text-align: center;
+  background: var(--fondo-hover, #eef1f5);
+  color: var(--azul);
+  border-radius: 10px;
+  padding: 0 6px;
+  font-size: 12px;
+}
+.inicio-pestana .cuenta:empty { display: none; }
+.inicio-pestana.activa .cuenta { background: rgba(255, 255, 255, .25); color: #fff; }
+.inicio-pestana .cuenta.cuenta-roja {
+  background: var(--rojo-linea);
+  color: #fff;
+}
+
 .inicio-tabla-cabecera-acciones {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
+  margin-left: auto;
 }
 .inicio-orden {
   display: flex;
@@ -217,6 +201,40 @@ body.con-lector #inicio-rejilla > #tablon {
 }
 .inicio-orden .filtro-rotulo { white-space: nowrap; }
 .inicio-orden .campo { width: auto; min-width: 200px; }
+
+/* ---------- el chip "Filtrado por…" (fila 209, apartado 7) ---------- */
+
+#inicio-filtrado-por {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 13.5px;
+}
+#inicio-filtrado-por-texto {
+  background: var(--fondo-hover, #eef1f5);
+  color: var(--azul);
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-weight: 600;
+}
+#inicio-quitar-filtro {
+  background: none;
+  border: 0;
+  color: var(--tinta-suave);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+#inicio-quitar-filtro:hover { text-decoration: underline; }
+
+/* El trozo activo de la franja de avisos (js/avisos-linea.js), cuando
+   coincide con el chip de arriba. */
+.avisos-linea-trozo-activo { text-decoration-color: currentColor !important; font-weight: 700; }
+
+/* ---------- la tabla ---------- */
+
+#inicio-todos-asuntos { margin-top: 6px; }
 
 .inicio-tabla-envoltorio {
   overflow-x: auto;
@@ -236,6 +254,8 @@ table.inicio-tabla {
   border-bottom: 1px solid var(--linea);
   vertical-align: middle;
 }
+.inicio-th-pulsable { cursor: pointer; }
+.inicio-th-pulsable:hover { color: var(--azul); }
 .inicio-tabla th {
   font-size: 11.5px;
   color: var(--tinta-suave);
@@ -245,40 +265,26 @@ table.inicio-tabla {
   white-space: nowrap;
 }
 .inicio-tabla-fila:last-child td { border-bottom: 0; }
-.inicio-tabla-nombre {
+.inicio-tabla-fila { cursor: pointer; }
+.inicio-tabla-fila:hover td { background: var(--fondo-hover, #f6f9fc); }
+.inicio-tabla-tercero {
   font-weight: 600;
-  min-width: 260px;
+  min-width: 220px;
   word-break: break-word;
 }
-.inicio-tabla-nombre .nombre-pulsable { cursor: pointer; }
-.inicio-tabla-nombre .nombre-pulsable:hover { text-decoration: underline; }
+.inicio-tabla-tercero .nombre-pulsable { cursor: pointer; }
+.inicio-tabla-tercero .nombre-pulsable:hover { text-decoration: underline; }
 .inicio-tabla-hito { max-width: 320px; }
 .inicio-tabla-menu { width: 40px; text-align: right; }
 .inicio-tabla-fila-ocupada { opacity: .6; }
 .inicio-tabla-cuerpo .vacio,
 #inicio-tabla-cuerpo .vacio { color: var(--tinta-suave); text-align: center; padding: 18px; }
 
-/* ---------- "Dormidos"/"Sin fecha", plegados (fila 192, apartado 6) ----------
-
-   Los propios <details> los pinta js/inicio-plegados.js, reutilizando
-   .qmt-bloque/.qmt-sinfecha/.qmt-lista tal cual (css/que-me-toca.css). */
-.inicio-plegados {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-top: 20px;
-}
-.inicio-plegados .qmt-bloque {
-  flex: 1 1 320px;
-  margin-bottom: 0;
-}
-
-/* ---------- el badge rojo de vencidos, en la pestaña de la barra ---------- */
-
-.pestana .cuenta.cuenta-roja {
-  background: var(--rojo-linea);
-  color: #fff;
-}
+/* Los días de espera de "En espera": rojo desde 15 días, ámbar desde
+   7, reutilizando los mismos tonos que .plazo-vencido/.plazo-cerca
+   (css/plazos.css), sin inventar otra paleta. */
+.marca-plazo.inicio-dias-rojo { background: #fdecec; color: #a4302a; border-color: #f2c4c0; }
+.marca-plazo.inicio-dias-ambar { background: #fff4d6; color: #8a6100; border-color: #e6c377; }
 
 /* ---------- la franja única de avisos (fila 193, apartado 1,
    docs/AVISOS-MENU-Y-VOLVER.md) ----------

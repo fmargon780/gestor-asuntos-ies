@@ -101,17 +101,37 @@
     pintar();
   }
 
+  /* Fila 209, docs/INICIO-EN-PESTANAS.md, apartado 7: si el aviso lleva
+     una lista de asuntos, pulsarlo filtra la tabla de Inicio (el
+     "chip" de InicioTabla, js/inicio-tabla.js) en vez de (o antes de)
+     lo que hiciera su `alPulsar` de siempre. Con la lista vacía (no se
+     ha encontrado ningún asunto para este aviso), `alPulsar` sigue
+     siendo la única acción: así un aviso como "aspirantes" no se queda
+     mudo cuando no hay ningún asunto suyo que filtrar. */
+  function alPulsarTrozo(id) {
+    var p = piezas[id];
+    if (!p) return;
+    if (p.asuntos && p.asuntos.length && window.InicioTabla && InicioTabla.filtrarPorAviso) {
+      InicioTabla.filtrarPorAviso(id, p.texto, p.asuntos);
+      return;
+    }
+    if (typeof p.alPulsar === 'function') p.alPulsar();
+  }
+
   function trozoDe(id) {
     var p = piezas[id];
     var trozo;
-    if (typeof p.alPulsar === 'function') {
+    var pulsable = typeof p.alPulsar === 'function' || (p.asuntos && p.asuntos.length);
+    if (pulsable) {
       trozo = document.createElement('button');
       trozo.type = 'button';
-      trozo.onclick = p.alPulsar;
+      trozo.onclick = function () { alPulsarTrozo(id); };
     } else {
       trozo = document.createElement('span');
     }
-    trozo.className = 'avisos-linea-trozo';
+    trozo.className = 'avisos-linea-trozo' +
+      (window.InicioTabla && InicioTabla.avisoActivo && InicioTabla.avisoActivo() &&
+       InicioTabla.avisoActivo().id === id ? ' avisos-linea-trozo-activo' : '');
     trozo.dataset.aviso = id;
     trozo.textContent = p.texto;
     return trozo;
@@ -154,8 +174,12 @@
     caja.appendChild(ocultar);
   }
 
-  function registrar(id, texto, urgente, alPulsar) {
-    if (texto) piezas[id] = { texto: texto, urgente: !!urgente, alPulsar: alPulsar };
+  /* `asuntos` (fila 209, opcional, 5º parámetro: nunca rompe a quien
+     llama con los cuatro de siempre): null o la lista de objetos-asunto
+     (como App.E.listaAbiertos) que este aviso deja filtrar en la tabla
+     de Inicio al pulsarlo. */
+  function registrar(id, texto, urgente, alPulsar, asuntos) {
+    if (texto) piezas[id] = { texto: texto, urgente: !!urgente, alPulsar: alPulsar, asuntos: asuntos || null };
     else delete piezas[id];
     pintar();
   }
@@ -173,6 +197,11 @@
 
   window.AvisosLinea = {
     registrar: registrar,
+    /* Repinta la franja con lo que ya hay guardado en `piezas`, sin
+       recalcular ningún aviso (fila 209): lo usa js/inicio-tabla.js
+       después de cambiar el chip "Filtrado por…", para que el trozo
+       activo (.avisos-linea-trozo-activo) se ponga al día. */
+    refrescar: pintar,
     /* para las pruebas */
     _idsActivos: idsActivos,
     _sigueOculta: sigueOculta

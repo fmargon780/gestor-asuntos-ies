@@ -326,8 +326,8 @@
   }
 
   U.envolver(App, 'App.tarjetaSuelto', 'documentos-sueltos-lector.js', function (comoEra) {
-    return function (s, pie, esNuevo) {
-      var div = comoEra(s, pie, esNuevo);
+    return function (s, pie, esNuevo, compacta) {
+      var div = comoEra(s, pie, esNuevo, compacta);
       if (!esPdf(s.nombre)) return div;   /* Word, imagen, hoja de cálculo... ni se intenta leer */
 
       var contenedorTexto = div.querySelector('.tarjeta-texto');

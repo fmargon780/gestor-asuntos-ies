@@ -129,8 +129,23 @@ await comprobar('el aviso cuenta el aspirante sin número',
   pagina.locator('[data-aviso="aspirantes"]').textContent()
     .then(t => t.indexOf('1 aspirante sin Nº de identificación escolar') !== -1), true);
 
-console.log('--- escribe el número: renombra el abierto, no el archivado ---');
+console.log('--- pulsar el aviso filtra la tabla (fila 209): hay un asunto suyo abierto ---');
 await pagina.click('[data-aviso="aspirantes"]');
+await pagina.waitForTimeout(300);
+await comprobar('sale el chip "Filtrado por…" (el aspirante tiene un asunto abierto)',
+  pagina.locator('#inicio-filtrado-por').isVisible(), true);
+await pagina.click('#inicio-quitar-filtro');
+await pagina.waitForTimeout(200);
+
+console.log('--- escribe el número: renombra el abierto, no el archivado ---');
+/* Ir a Personas y empresas, filtrado por Alumnado: lo mismo que hacía
+   pulsar el aviso antes de la fila 209 (ahora ese pulsar filtra la
+   tabla, porque el aspirante tiene un asunto abierto). */
+await pagina.evaluate(() => {
+  document.getElementById('filtro-personas').value = 'ALUMNADO';
+  App.ir('personas');
+  if (App.pintarPersonas) App.pintarPersonas();
+});
 await pagina.waitForSelector('#pantalla-personas:not(.oculto)');
 await pagina.waitForTimeout(300);
 await pagina.click('#lista-personas .resultado');

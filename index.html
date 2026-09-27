@@ -166,32 +166,128 @@
         </button>
       </div>
 
-      <!-- LA REJILLA NUEVA: "Ha llegado", "Me toca", "Esperamos a
-           otros" y el tablón (js/tablon.js lo cuelga aquí). -->
-      <div id="inicio-rejilla" class="inicio-rejilla">
+      <!-- LAS DOS COLUMNAS (fila 209, docs/INICIO-EN-PESTANAS.md):
+           izquierda, estrecha, "Ha llegado" + el tablón (js/tablon.js
+           cuelga #tablon de #inicio-lado); derecha, las pestañas y la
+           tabla única (#inicio-todos-asuntos, más abajo). Por debajo de
+           1000px de ancho, una sola columna (css/inicio.css). -->
+      <div id="inicio-cuerpo" class="inicio-cuerpo">
+      <div id="inicio-lado" class="inicio-lado">
 
         <section id="inicio-ha-llegado" class="inicio-bloque">
           <h3 class="inicio-bloque-titulo">Ha llegado <span class="cuenta-lista" id="inicio-ha-llegado-n"></span></h3>
           <div class="inicio-lista" id="inicio-ha-llegado-lista"></div>
         </section>
 
-        <section id="inicio-me-toca" class="inicio-bloque">
-          <h3 class="inicio-bloque-titulo">Me toca <span class="cuenta-lista" id="inicio-me-toca-n"></span>
-            <button type="button" class="inicio-ver-mas oculto" id="inicio-me-toca-ver">Ver los N</button></h3>
-          <div class="inicio-bloque-filtro">
-            <label class="etiqueta-en-linea" for="inicio-me-toca-responsable">Responsable</label>
-            <select id="inicio-me-toca-responsable" class="campo"><option value="">Todos</option></select>
-          </div>
-          <div class="inicio-lista" id="inicio-me-toca-lista"></div>
-        </section>
+      </div>
 
-        <section id="inicio-esperamos" class="inicio-bloque">
-          <h3 class="inicio-bloque-titulo">Esperamos a otros <span class="cuenta-lista" id="inicio-esperamos-n"></span>
-            <button type="button" class="inicio-ver-mas oculto" id="inicio-esperamos-ver">Ver los N</button></h3>
-          <div class="inicio-lista" id="inicio-esperamos-lista"></div>
-        </section>
+      <!-- LA DERECHA: la barra de pestañas + Filtros/Ordenar y la
+           tabla única para las cuatro (js/inicio-tabla.js,
+           js/asuntos-lista-pintar.js). -->
+      <div id="inicio-derecha" class="inicio-derecha">
+
+        <div id="inicio-todos-asuntos">
+          <div class="inicio-tabla-cabecera">
+            <!-- Las cuatro pestañas (fila 209, apartado 4): mismo patrón
+                 que las de Ajustes (.pestana-ajustes), con un número y,
+                 en "En Administración", el rojo de los vencidos. -->
+            <div id="inicio-pestanas" class="inicio-pestanas" role="tablist">
+              <button type="button" class="inicio-pestana" data-pestana="adm">En Administración
+                <span class="cuenta cuenta-lista"></span>
+                <span class="cuenta cuenta-roja oculto"></span></button>
+              <button type="button" class="inicio-pestana" data-pestana="esp">En espera
+                <span class="cuenta cuenta-lista"></span></button>
+              <button type="button" class="inicio-pestana" data-pestana="todos">Todos los abiertos
+                <span class="cuenta cuenta-lista"></span></button>
+              <button type="button" class="inicio-pestana" data-pestana="dorm">Dormidos
+                <span class="cuenta cuenta-lista"></span></button>
+            </div>
+            <div class="inicio-tabla-cabecera-acciones">
+              <span class="suave">(<span id="cuenta-lista-abiertos"></span>)</span>
+              <button id="btn-recargar" class="boton">Actualizar</button>
+              <button type="button" id="btn-filtros" class="boton" aria-expanded="false"
+                      aria-controls="filtros-abiertos">Filtros</button>
+              <label class="inicio-orden">
+                <span class="filtro-rotulo">Ordenar</span>
+                <select id="orden-abiertos" class="campo">
+                  <option value="fecha-asc">Fecha de inicio · los más antiguos arriba</option>
+                  <option value="fecha-desc">Fecha de inicio · los más recientes arriba</option>
+                  <option value="limite">Plazo · lo que antes vence</option>
+                  <option value="tipo">Tipo de asunto</option>
+                  <option value="tercero">Tercero</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <!-- Los desplegables viven aquí, plegados. Sueltos en la barra
+               se salían de linea y las etiquetas acababan lejos de su
+               campo. «Responsable» (fila 209, apartado 6): vivía a la
+               vista, encima de "Me toca"; ahora es un filtro más, y
+               solo afecta a "En Administración"/"En espera". -->
+          <div id="filtros-abiertos" class="filtros oculto">
+            <label class="filtro">
+              <span class="filtro-rotulo">Responsable</span>
+              <select id="inicio-me-toca-responsable" class="campo"><option value="">Todos</option></select>
+            </label>
+            <label class="filtro">
+              <span class="filtro-rotulo">Situación</span>
+              <select id="filtro-estado" class="campo">
+                <option value="">Todos</option>
+              </select>
+            </label>
+            <label class="filtro">
+              <span class="filtro-rotulo">Plazo</span>
+              <select id="filtro-plazo" class="campo">
+                <option value="">Todos los plazos</option>
+                <option value="vencidos">Solo los vencidos</option>
+                <option value="pronto">Vencidos y de esta semana</option>
+                <option value="conplazo">Solo los que tienen plazo</option>
+                <option value="sinplazo">Solo los que no tienen plazo</option>
+              </select>
+            </label>
+            <label class="filtro">
+              <span class="filtro-rotulo">Lo encarga</span>
+              <select id="filtro-organo" class="campo">
+                <option value="">Todos</option>
+                <option value="SECRETARIA">Secretaría</option>
+                <option value="DIRECCION">Dirección</option>
+                <option value="JEFATURA">Jefatura de Estudios</option>
+                <option value="VARIOS">Varios</option>
+                <option value="SIN">Sin asignar</option>
+              </select>
+            </label>
+            <label class="filtro">
+              <span class="filtro-rotulo">Tipo de asunto</span>
+              <select id="filtro-tipo-asunto" class="campo">
+                <option value="">Todos</option>
+              </select>
+            </label>
+          </div>
+
+          <!-- El chip "Filtrado por…" (fila 209, apartado 7): sale al
+               pulsar un aviso de la franja de arriba que lleve asuntos
+               detrás (js/avisos-linea.js → InicioTabla.filtrarPorAviso). -->
+          <div id="inicio-filtrado-por" class="oculto">
+            Filtrado por: <span id="inicio-filtrado-por-texto"></span>
+            <button type="button" id="inicio-quitar-filtro">✕ Quitar</button>
+          </div>
+
+          <div class="inicio-tabla-envoltorio">
+            <table class="inicio-tabla">
+              <thead>
+                <tr>
+                  <th>Plazo</th><th>Tercero</th><th>Tipo</th><th>Hito actual</th>
+                  <th>Le toca a</th><th id="th-inicio">Inicio</th><th></th>
+                </tr>
+              </thead>
+              <tbody id="inicio-tabla-cuerpo"></tbody>
+            </table>
+          </div>
+        </div>
 
       </div>
+      </div><!-- /#inicio-cuerpo -->
 
       <!-- "Ver todo" (el panel de "clasificar" reaprovechado) activa esto
            con App.irVista('clasificar'), reutilizando #zona-clasificar
@@ -218,91 +314,6 @@
 
         <div id="lista-sueltos" class="lista"></div>
       </div>
-
-      <!-- LA TABLA "TODOS LOS ASUNTOS ABIERTOS" (fila 192, apartado 5):
-           el panel de filtros de siempre (#filtros-abiertos, con sus
-           mismos IDs: js/vista.js, js/reservados.js y js/usabilidad.js
-           solo miran esos IDs, así que el traslado los deja
-           funcionando gratis), con «Montón» relabelado a «Situación» y
-           un 5º filtro nuevo, «Tipo de asunto» (pasan a ser las
-           tarjetas «Por tipo de asunto» de siempre). «Ordenar» vive
-           fuera del panel plegable, siempre a la vista (boceto
-           docs/boceto-inicio.html). -->
-      <div id="inicio-todos-asuntos">
-        <div class="inicio-tabla-cabecera">
-          <h2>Todos los asuntos abiertos <span class="suave">(<span id="cuenta-lista-abiertos"></span>)</span></h2>
-          <div class="inicio-tabla-cabecera-acciones">
-            <button id="btn-recargar" class="boton">Actualizar</button>
-            <button type="button" id="btn-filtros" class="boton" aria-expanded="false"
-                    aria-controls="filtros-abiertos">Filtros</button>
-            <label class="inicio-orden">
-              <span class="filtro-rotulo">Ordenar</span>
-              <select id="orden-abiertos" class="campo">
-                <option value="fecha-asc">Fecha · los más antiguos arriba</option>
-                <option value="fecha-desc">Fecha · los más recientes arriba</option>
-                <option value="limite">Fecha límite · lo que antes vence</option>
-                <option value="estado">Hito del asunto</option>
-                <option value="tipo">Tipo de asunto</option>
-                <option value="tercero">Tercero</option>
-              </select>
-            </label>
-          </div>
-        </div>
-
-        <!-- Los desplegables viven aquí, plegados. Sueltos en la barra
-             se salían de linea y las etiquetas acababan lejos de su campo. -->
-        <div id="filtros-abiertos" class="filtros oculto">
-          <label class="filtro">
-            <span class="filtro-rotulo">Situación</span>
-            <select id="filtro-estado" class="campo">
-              <option value="">Todos</option>
-            </select>
-          </label>
-          <label class="filtro">
-            <span class="filtro-rotulo">Plazo</span>
-            <select id="filtro-plazo" class="campo">
-              <option value="">Todos los plazos</option>
-              <option value="vencidos">Solo los vencidos</option>
-              <option value="pronto">Vencidos y de esta semana</option>
-              <option value="conplazo">Solo los que tienen plazo</option>
-              <option value="sinplazo">Solo los que no tienen plazo</option>
-            </select>
-          </label>
-          <label class="filtro">
-            <span class="filtro-rotulo">Lo encarga</span>
-            <select id="filtro-organo" class="campo">
-              <option value="">Todos</option>
-              <option value="SECRETARIA">Secretaría</option>
-              <option value="DIRECCION">Dirección</option>
-              <option value="JEFATURA">Jefatura de Estudios</option>
-              <option value="VARIOS">Varios</option>
-              <option value="SIN">Sin asignar</option>
-            </select>
-          </label>
-          <label class="filtro">
-            <span class="filtro-rotulo">Tipo de asunto</span>
-            <select id="filtro-tipo-asunto" class="campo">
-              <option value="">Todos</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="inicio-tabla-envoltorio">
-          <table class="inicio-tabla">
-            <thead>
-              <tr>
-                <th>Asunto</th><th>Tipo</th><th>Hito actual</th><th>Le toca a</th>
-                <th>Plazo</th><th>Abierto</th><th></th>
-              </tr>
-            </thead>
-            <tbody id="inicio-tabla-cuerpo"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- "Dormidos" y "Sin fecha", plegados (fila 192, apartado 6,
-           js/inicio-plegados.js). -->
-      <div id="inicio-plegados" class="inicio-plegados"></div>
 
     </section>
 
@@ -1317,10 +1328,11 @@
 
 <!-- Y ahora sí, a arrancar. -->
 <script src="js/inicio.js"></script>
-<!-- Fila 192, apartado 6: "Dormidos"/"Sin fecha", plegados al final de
-     Inicio. Después de js/inicio.js (lo llama desde repintarTodo) y de
-     js/ajustes-plegado.js (AjustesPlegado.recordar, más arriba). -->
-<script src="js/inicio-plegados.js"></script>
+<!-- Fila 209, docs/INICIO-EN-PESTANAS.md: las pestañas y la tabla
+     única de Inicio ("En Administración"/"En espera"/"Todos los
+     abiertos"/"Dormidos"). Después de js/inicio.js (lo llama desde
+     repintarTodo). Sustituye a js/inicio-plegados.js (fila 192). -->
+<script src="js/inicio-tabla.js"></script>
 
 <!-- Fila 70, docs/ENVOLTURAS-COMPROBADAS.md: EL ÚLTIMO de todos los
      <script>, sin excepción. Cuando este fichero se ejecuta, todos los

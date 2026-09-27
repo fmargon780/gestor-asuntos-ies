@@ -100,20 +100,32 @@ await comprobar('el trozo de recurrentes dice lo que toca crear',
 await comprobar('la franja es roja: hay algo vencido',
   pagina.locator('#avisos-linea').getAttribute('class').then((c) => c.indexOf('aviso-rojo') !== -1), true);
 
-/* ================= 2. PULSAR "VENCIDOS" FILTRA, COMO SU BOTÓN DE ANTES ================= */
+/* ================= 2. PULSAR "VENCIDOS" FILTRA LA TABLA (fila 209) ================= */
 
-console.log('--- 2. pulsar "vencidos" filtra la tabla, como hacía su botón de antes ---');
+console.log('--- 2. pulsar "vencidos" filtra la tabla con el chip "Filtrado por…" ---');
 await pagina.click('[data-aviso="vencidos"]');
 await pagina.waitForTimeout(300);
-await comprobar('el filtro de plazo pasa a "vencidos"', pagina.locator('#filtro-plazo').inputValue(), 'vencidos');
+await comprobar('sale el chip "Filtrado por…"', pagina.locator('#inicio-filtrado-por').isVisible(), true);
+await comprobar('con el texto del aviso', pagina.locator('#inicio-filtrado-por-texto').textContent(), '1 vencido');
 await comprobar('la tabla solo enseña un asunto',
   pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 1);
 await comprobar('y es el asunto vencido',
   pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').first().textContent()
     .then((t) => t.indexOf('Proveedor Vencido') !== -1), true);
 
-await pagina.evaluate(() => { document.getElementById('filtro-plazo').value = ''; App.pintarAbiertos(); });
+console.log('--- 2b. "Quitar" (o repulsar el aviso) lo devuelve ---');
+await pagina.click('#inicio-quitar-filtro');
 await pagina.waitForTimeout(200);
+await comprobar('el chip desaparece', pagina.locator('#inicio-filtrado-por').isHidden(), true);
+await comprobar('la tabla vuelve a enseñar el único asunto que hay',
+  pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 1);
+
+await pagina.click('[data-aviso="vencidos"]');
+await pagina.waitForTimeout(200);
+await comprobar('vuelve a filtrar', pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 1);
+await pagina.click('[data-aviso="vencidos"]');
+await pagina.waitForTimeout(200);
+await comprobar('pulsarlo otra vez lo quita también', pagina.locator('#inicio-filtrado-por').isHidden(), true);
 
 /* ================= 3. "OCULTAR POR HOY" LA QUITA ================= */
 

@@ -126,7 +126,9 @@ await comprobar('2. ninguna carpeta cambia', r2.carpetasIguales, true);
 console.log('--- 3. el departamento en el asunto ---');
 await pagina.evaluate(() => App.ir('abiertos'));
 await pagina.waitForTimeout(200);
-await pagina.locator('.tarjeta-nombre', { hasText: ABIERTO_DELEGACION }).first().click();
+/* Fila 209: se busca la fila por `data-asunto` (la tabla ya no lleva
+   el nombre entero de la carpeta en ninguna celda). */
+await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ABIERTO_DELEGACION + '"] .nombre-pulsable').first().click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(500);
 await comprobar('3. sale en «Datos del trámite»', pagina.evaluate(() =>

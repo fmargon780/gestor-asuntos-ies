@@ -62,7 +62,7 @@ await pagina.waitForTimeout(300);
 
 await pagina.evaluate(() => App.ir('abiertos'));
 await pagina.waitForTimeout(200);
-await pagina.locator('.tarjeta-nombre', { hasText: ASUNTO }).first().click();
+await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ASUNTO + '"] .nombre-pulsable').first().click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(300);
 

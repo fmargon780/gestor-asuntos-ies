@@ -80,19 +80,28 @@
     return d === null ? 0 : Math.max(0, -d);
   }
 
+  /* Fila 209, docs/INICIO-EN-PESTANAS.md: "En Administración" ya no
+     exige fecha (antes se iba a `sinFecha`, un bloque aparte que ya no
+     existe: ahora esos hitos entran en `tejado`, con "Sin plazo", y el
+     orden los deja al final). Un hito sin responsable también es de
+     Administración, igual que Hitos.esDeAdministracion (sin
+     responsable, true) y App.ladoDe (sin hitos, Administración). */
   function clasificar(items, ajustes) {
-    var tejado = [], otros = [], sinFecha = [];
+    var tejado = [], otros = [];
     items.forEach(function (it) {
       var h = it.hito;
-      if (esMio(h.responsable, ajustes) && h.fecha) tejado.push(it);
-      else if (h.responsable && !esMio(h.responsable, ajustes)) otros.push(it);
-      else sinFecha.push(it);
+      if (esMio(h.responsable, ajustes) || !h.responsable) tejado.push(it);
+      else otros.push(it);
     });
+    /* Vencidos y con fecha, por plazo; los "Sin plazo" (null), al final. */
     tejado.sort(function (a, b) {
-      return (Plazos.diasHasta(a.hito.fecha) || 0) - (Plazos.diasHasta(b.hito.fecha) || 0);
+      var da = Plazos.diasHasta(a.hito.fecha), db = Plazos.diasHasta(b.hito.fecha);
+      if (da === null) return db === null ? 0 : 1;
+      if (db === null) return -1;
+      return da - db;
     });
     otros.sort(function (a, b) { return diasParado(b.hito) - diasParado(a.hito); });
-    return { tejado: tejado, otros: otros, sinFecha: sinFecha };
+    return { tejado: tejado, otros: otros };
   }
 
   function vencidos(items) {
@@ -240,11 +249,15 @@
      fecha límite ni responsable, mientras queden aspirantes dados de
      alta sin número. Se pulsa y lleva a Personas y empresas, en
      Alumnado, donde salen marcados como "Solicitante". */
-  async function contarAspirantesSinNumero() {
+  async function reunirAspirantesSinNumero() {
     try {
       var datos = await Datos.cargar(App.E.datos, 'ALUMNADO');
-      return (datos.lista || []).filter(function (p) { return p.solicitante && !p.id; }).length;
-    } catch (e) { return 0; }
+      return (datos.lista || []).filter(function (p) { return p.solicitante && !p.id; });
+    } catch (e) { return []; }
+  }
+
+  async function contarAspirantesSinNumero() {
+    return (await reunirAspirantesSinNumero()).length;
   }
 
   /* ---------- la cuenta de la barra, siempre al día ----------
@@ -301,6 +314,7 @@
     reunir: reunir, clasificar: clasificar, esMio: esMio, diasParado: diasParado,
     vencidos: vencidos, unoPorAsunto: unoPorAsunto,
     contarAspirantesSinNumero: contarAspirantesSinNumero,
+    reunirAspirantesSinNumero: reunirAspirantesSinNumero,
     reunirDormidos: reunirDormidos,
     leerFiltroResponsable: leerFiltro, guardarFiltroResponsable: guardarFiltro,
     abrirMesaDelHito: abrirMesaDelHito,

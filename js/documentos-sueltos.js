@@ -89,7 +89,15 @@ App.pintarSueltos = async function () {
   caja.appendChild(nueva);
 };
 
-App.tarjetaSuelto = function (s, pie, esNuevo) {
+/* `compacta` (opcional, fila 209, docs/INICIO-EN-PESTANAS.md): la fila
+   corta de "Ha llegado" en Inicio (js/inicio.js). El reparto de
+   acciones a la vista ("Crear asunto con él"/"Guardar en un asunto")
+   frente a las del menú ⋮ (Abrir, Separar, Unir, Sacar páginas,
+   Ajustar tamaño) ya es el que pide el boceto compacto: solo cambia,
+   en ese modo, el texto de "Crear asunto con él" (más corto). El modo
+   normal ("Ver todo"/zona-clasificar) sigue llamando sin este 4º
+   parámetro, con su texto de siempre. */
+App.tarjetaSuelto = function (s, pie, esNuevo, compacta) {
   var div = document.createElement('div');
   var abierta = window.Visor && Visor.marcadorAbierto() === marcadorDeSuelto(s.nombre);
   div.className = 'tarjeta tarjeta-suelto' + (esNuevo ? ' tarjeta-nueva' : '') +
@@ -131,7 +139,7 @@ App.tarjetaSuelto = function (s, pie, esNuevo) {
   var crear = document.createElement('button');
   crear.className = 'boton boton-principal';
   crear.dataset.accionSuelto = 'crear';
-  crear.textContent = 'Crear asunto con él';
+  crear.textContent = compacta ? 'Crear asunto' : 'Crear asunto con él';
   crear.onclick = function () { App.empezarAsuntoCon(s); };
   acciones.appendChild(crear);
 

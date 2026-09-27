@@ -190,7 +190,13 @@ var BandejaPantalla = (function () {
     App.abrirFicha(a, 'abierto');
   }
 
-  function tarjeta(item) {
+  /* `compacta` (opcional, fila 209, docs/INICIO-EN-PESTANAS.md): la fila
+     corta de "Ha llegado" en Inicio (js/inicio.js). Solo cambia el
+     texto de "Leer el correo" (más corto); el resto ya reparte bien
+     entre lo que va a la vista y lo que va al menú ⋮. El modo normal
+     (la bandeja a pantalla completa, "Por clasificar") sigue llamando
+     sin este 2º parámetro. */
+  function tarjeta(item, compacta) {
     var d = item.datos;
     var div = document.createElement('div');
     div.className = 'tarjeta tarjeta-correo';
@@ -294,7 +300,7 @@ var BandejaPantalla = (function () {
     if ((d.pdf || d.pdfMensaje) && window.Lector) {
       var leer = document.createElement('button');
       leer.className = 'boton';
-      leer.textContent = 'Leer el correo';
+      leer.textContent = compacta ? 'Leer' : 'Leer el correo';
       leer.onclick = function () { window.Bandeja.leerElCorreo(d); };
       acciones.appendChild(leer);
 

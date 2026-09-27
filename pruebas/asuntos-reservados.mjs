@@ -84,58 +84,59 @@ await comprobar('se guarda en tipos.json', pagina.evaluate(async () => {
 }), true);
 
 await pagina.click('.pestana[data-pantalla="abiertos"]');
-/* Fila 192: la lista de tarjetas es ahora la tabla "Todos los asuntos
-   abiertos" (#inicio-tabla-cuerpo); el nombre vive en su propia celda
-   (.inicio-tabla-nombre, antes .tarjeta-nombre). Ya no hay un "pie"
-   separado: se mira la fila entera para comprobar que no dice quién es. */
-const tarjeta = (nombreBuscado) => pagina.evaluate((n) => {
+/* Fila 209, docs/INICIO-EN-PESTANAS.md: la lista de tarjetas es ahora
+   la tabla única de Inicio (#inicio-tabla-cuerpo); el nombre del
+   tercero vive en su propia celda (.inicio-tabla-tercero, antes
+   .inicio-tabla-nombre/.tarjeta-nombre), y tapada dice simplemente
+   «🔒 Reservado», sin fecha, tipo ni curso (esos ya son columnas
+   propias: Tipo, Inicio…). `data-asunto` en la fila lleva siempre el
+   nombre real de la carpeta (es un dato interno, nunca se enseña), así
+   que sirve para encontrar la fila de un asunto sin depender de si
+   está tapado o no. */
+const tarjeta = (nombreCarpeta) => pagina.evaluate((n) => {
   App.pintarAbiertos();
-  const t = Array.prototype.filter.call(document.querySelectorAll('#inicio-tabla-cuerpo tr'),
-    x => x.dataset.prueba === n || x.textContent.indexOf(n) !== -1)[0];
-  return t ? { nombre: t.querySelector('.inicio-tabla-nombre').textContent, fila: t.textContent } : null;
-}, nombreBuscado);
+  const t = document.querySelector('#inicio-tabla-cuerpo tr[data-asunto="' + n + '"]');
+  return t ? { tercero: t.querySelector('.inicio-tabla-tercero').textContent, fila: t.textContent } : null;
+}, nombreCarpeta);
 const tarjetas = () => pagina.evaluate(() => {
   App.pintarAbiertos();
-  return Array.prototype.map.call(document.querySelectorAll('#inicio-tabla-cuerpo tr .inicio-tabla-nombre'), x => x.textContent);
+  return Array.prototype.map.call(document.querySelectorAll('#inicio-tabla-cuerpo tr .inicio-tabla-tercero'), x => x.textContent);
 });
-const todas = await tarjetas();
-const deAna = todas.filter(t => t.indexOf('1234') !== -1 || (t.indexOf('MATRICULA') !== -1 && t.indexOf('Gómez') === -1));
-await comprobar('la de Ana, tapada: con candado, tipo y curso, sin su nombre',
-  deAna.map(t => [t.indexOf('🔒') !== -1, t.indexOf('MATRICULA') !== -1, t.indexOf('26-27') !== -1, t.indexOf('Pérez') === -1, t.indexOf('1234') === -1]),
-  [[true, true, true, true, true]]);
-await comprobar('el resto de la fila tampoco dice quién es', pagina.evaluate(() => Array.prototype.filter.call(
-  document.querySelectorAll('#inicio-tabla-cuerpo tr'), function (tr) {
-    var nombre = tr.querySelector('.inicio-tabla-nombre');
-    return nombre && nombre.textContent.indexOf('🔒') !== -1 && tr.textContent.indexOf('Pérez') !== -1;
-  }).length), 0);
+const filaDeAna = await tarjeta(ANA);
+await comprobar('la de Ana, tapada: candado y "Reservado", sin su nombre ni el curso',
+  filaDeAna && [filaDeAna.tercero.indexOf('🔒') !== -1, filaDeAna.tercero.indexOf('Reservado') !== -1,
+    filaDeAna.tercero.indexOf('Pérez') === -1, filaDeAna.tercero.indexOf('26-27') === -1],
+  [true, true, true, true]);
+await comprobar('el resto de la fila tampoco dice quién es',
+  filaDeAna && filaDeAna.fila.indexOf('Pérez') === -1, true);
 console.log('--- 2. reservado: false en un tipo reservado ---');
 await comprobar('la de Luis se ve entera, sin candado',
-  tarjeta('Gómez').then(t => t && [t.nombre.indexOf('Gómez, Luis') !== -1, t.nombre.indexOf('🔒') === -1]), [true, true]);
+  tarjeta(LUIS).then(t => t && [t.tercero.indexOf('Gómez, Luis') !== -1, t.tercero.indexOf('🔒') === -1]), [true, true]);
 await comprobar('«Mostrar reservados» ya sale', pagina.locator('#btn-mostrar-reservados').isHidden(), false);
 
 console.log('--- 3. el buscador ---');
 await pagina.fill('#buscar-abiertos', 'expulsion');
 await pagina.dispatchEvent('#buscar-abiertos', 'input');
-await comprobar('por una palabra de la nota, no sale', tarjetas().then(l => l.length), 0);
+await comprobar('por una palabra de la nota, no sale', tarjeta(ANA).then(t => t === null), true);
 await pagina.fill('#buscar-abiertos', 'perez');
 await pagina.dispatchEvent('#buscar-abiertos', 'input');
 await comprobar('por su nombre de carpeta sí sale, pero tapado',
-  tarjetas().then(l => l.map(t => [t.indexOf('🔒') !== -1, t.indexOf('Pérez') === -1])), [[true, true]]);
+  tarjeta(ANA).then(t => t && [t.tercero.indexOf('🔒') !== -1, t.tercero.indexOf('Pérez') === -1]), [true, true]);
 
 console.log('--- 4. «Mostrar reservados» ---');
 await pagina.fill('#buscar-abiertos', '');
 await pagina.dispatchEvent('#buscar-abiertos', 'input');
 await pagina.click('#btn-mostrar-reservados');
 await comprobar('destapado: se ve el nombre, con candado',
-  tarjetas().then(l => l.filter(t => t.indexOf('Pérez, Ana') !== -1).map(t => t.indexOf('🔒') !== -1)), [true]);
+  tarjeta(ANA).then(t => t && [t.tercero.indexOf('Pérez, Ana') !== -1, t.tercero.indexOf('🔒') !== -1]), [true, true]);
 /* Fila 192, decisión 5: el buscador de Inicio deja de mirar las notas
-   (mismo mecanismo simple que "Me toca"/"Esperamos a otros": nombre,
+   (mismo mecanismo simple que "En Administración"/"En espera": nombre,
    tipo y tercero). "expulsion" solo estaba en la nota, así que ya no
    sale ni destapado. pruebas/buscar-en-notas.mjs sigue comprobando la
    búsqueda en notas por su cuenta, sin pasar por esta pantalla. */
 await pagina.fill('#buscar-abiertos', 'expulsion');
 await pagina.dispatchEvent('#buscar-abiertos', 'input');
-await comprobar('ya no busca en las notas (decisión 5 de la fila 192)', tarjetas().then(l => l.length), 0);
+await comprobar('ya no busca en las notas (decisión 5 de la fila 192)', tarjeta(ANA).then(t => t === null), true);
 await pagina.fill('#buscar-abiertos', '');
 await pagina.dispatchEvent('#buscar-abiertos', 'input');
 await comprobar('no se apunta en ningún sitio del navegador',

@@ -427,7 +427,11 @@ console.log('--- 9. editar un asunto cambiando un campo ---');
 
 const NOMBRE_ORIGINAL = '260911 SANCION 1º Bach A Ciencias Ramos Vidal, Elena 1150001';
 await pagina.click('.pestana[data-pantalla="abiertos"]');
-await pagina.locator('#inicio-tabla-cuerpo tr').filter({ hasText: NOMBRE_ORIGINAL }).locator('.nombre-pulsable').click();
+/* Fila 209: la tabla ya no enseña el nombre entero de la carpeta en
+   ninguna celda (solo el Tercero, el Tipo y la fecha de Inicio, por
+   separado): se encuentra la fila por `data-asunto`, que siempre lleva
+   el nombre real de la carpeta. */
+await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + NOMBRE_ORIGINAL + '"] .nombre-pulsable').click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 /* "Editar" vive ahora en el menú de tres puntos del nombre (18-sep-2026,
    fila 52, docs/CABECERA-DEL-ASUNTO.md). */
