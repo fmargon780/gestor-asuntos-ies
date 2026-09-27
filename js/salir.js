@@ -39,10 +39,10 @@
       location.reload();
     };
 
-    /* Antes del rótulo de la sesión, que es el último del pie. */
-    var usuario = document.getElementById('usuario-pie');
-    if (usuario) pie.insertBefore(b, usuario);
-    else pie.appendChild(b);
+    /* Después del rótulo de la sesión y la versión (fila 193, apartado 2,
+       docs/AVISOS-MENU-Y-VOLVER.md): el pie del menú lleva, en este
+       orden, la sesión, la versión y, al final, Salir. */
+    pie.appendChild(b);
   }
 
   /* El <script> va al final del body, así que la barra ya está puesta.

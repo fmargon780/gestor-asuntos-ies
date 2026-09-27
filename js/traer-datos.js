@@ -77,17 +77,15 @@
   }
 
   /* Después de traer ficheros, lo leído antes ya no vale y el aviso de
-     arriba puede haber dejado de tener razón. El aviso trae su propio
-     botón de volver a mirar: se pulsa solo. */
+     arriba puede haber dejado de tener razón. Fila 193: el botón de
+     "vuelve a mirar" ya no vive en el aviso (que ahora es un trozo más
+     de la franja de js/avisos-linea.js), sino en el propio bloque de
+     Mantenimiento (js/frescura.js, #btn-frescura-repasar): se pulsa
+     solo, igual que antes. */
   function repasarLaPantalla() {
     try { Datos.olvidar(); } catch (e) {}
-    var panel = document.getElementById('panel-frescura');
-    if (panel) {
-      var botones = panel.querySelectorAll('button');
-      for (var i = 0; i < botones.length; i++) {
-        if (botones[i].textContent.indexOf('vuelve a mirar') !== -1) { botones[i].click(); break; }
-      }
-    }
+    var boton = document.getElementById('btn-frescura-repasar');
+    if (boton) boton.click();
     if (window.Gestor && window.Gestor.recargar) window.Gestor.recargar();
   }
 
@@ -151,18 +149,21 @@
 
   /* ---------- el botón del aviso de arriba ----------
 
-     El aviso se vuelve a pintar entero cada vez que cambia, así que el
-     botón se pone otra vez cada vez que eso pasa. */
+     Fila 193, apartado 1: el aviso de fichero viejo ya no tiene caja
+     propia, es el trozo "frescura" de la franja única de
+     js/avisos-linea.js (#avisos-linea). La franja se vuelve a pintar
+     entera cada vez que cambia, así que el botón se pone otra vez
+     cada vez que eso pasa, igual que antes. */
 
   function ponerEnElAviso() {
-    var panel = document.getElementById('panel-frescura');
-    if (!panel || panel.classList.contains('oculto')) return;
-    if (panel.querySelector('.btn-traer-aviso')) return;
-    var botones = panel.querySelector('.avisos-botones');
-    if (!botones) return;
-    var b = botonNuevo('Traer el fichero desde donde lo tengas', true);
+    var caja = document.getElementById('avisos-linea');
+    if (!caja || caja.classList.contains('oculto')) return;
+    if (!caja.querySelector('[data-aviso="frescura"]')) return;
+    if (caja.querySelector('.btn-traer-aviso')) return;
+    var b = botonNuevo('Traer el fichero desde donde lo tengas', false);
     b.className += ' btn-traer-aviso';
-    botones.insertBefore(b, botones.firstChild);
+    var ocultar = document.getElementById('avisos-linea-ocultar');
+    if (ocultar) caja.insertBefore(b, ocultar); else caja.appendChild(b);
   }
 
   function vigilarElAviso() {

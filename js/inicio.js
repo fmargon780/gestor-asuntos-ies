@@ -324,30 +324,22 @@
   /* ==========================================================
      EL AVISO DE ASPIRANTES SIN Nº DE IDENTIFICACIÓN ESCOLAR
 
-     Venía de la vieja pantalla "Qué me toca" (bloqueAspirantes): se
-     queda con la MISMA clase CSS (qmt-aviso-aspirantes, encima de
-     qmt-fila para el aspecto), para no tocar css/que-me-toca.css ni
-     las pruebas que la buscan por esa clase.
+     Fila 193, apartado 1: era la única caja que ya salía en una franja
+     encima de la rejilla (fila 191); ahora es un trozo más de la
+     franja única de js/avisos-linea.js, con la misma acción de
+     siempre (ir a Personas y empresas, filtrado por Alumnado).
      ========================================================== */
 
   async function pintarAvisoAspirantes() {
-    var caja = $('inicio-aviso-aspirantes');
-    if (!caja) return;
+    if (!window.AvisosLinea) return;
     var n = await QueMeToca.contarAspirantesSinNumero();
-    caja.innerHTML = '';
-    if (!n) return;
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'qmt-fila qmt-aviso-aspirantes';
-    b.textContent = n + ' ' + (n === 1 ? 'aspirante' : 'aspirantes') +
-      ' sin Nº de identificación escolar';
-    b.onclick = function () {
+    var texto = n ? (n + ' ' + (n === 1 ? 'aspirante' : 'aspirantes') + ' sin Nº de identificación escolar') : '';
+    AvisosLinea.registrar('aspirantes', texto, false, function () {
       if ($('filtro-personas')) $('filtro-personas').value = 'ALUMNADO';
       if ($('buscar-personas')) $('buscar-personas').value = '';
       App.ir('personas');
       if (App.pintarPersonas) App.pintarPersonas();
-    };
-    caja.appendChild(b);
+    });
   }
 
   /* ==========================================================

@@ -3,14 +3,13 @@
    "los duplicados, a su propia pantalla").
 
    Antes de esto, los grupos que parecían el mismo asunto salían en
-   franjas amarillas encima de la lista de Asuntos abiertos. Ahora
-   tienen su propia pantalla, a la que se llega desde el aviso de una
-   línea que hay junto al botón "Tablón".
+   franjas amarillas encima de la lista de Asuntos abiertos. Luego
+   tuvieron su propia pantalla, a la que se llegaba desde un aviso de
+   una línea junto al botón "Tablón" (#btn-duplicados); desde la fila
+   193 ese aviso es un trozo más de la franja única de
+   css/inicio.css (.avisos-linea), y se sigue llegando igual a esta
+   misma pantalla.
    ============================================================ */
-
-#btn-duplicados {
-  white-space: nowrap;
-}
 
 #duplicados-lista {
   display: flex;

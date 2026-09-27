@@ -5,6 +5,40 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 193: los avisos, en una sola línea; y el orden del menú
+
+`docs/AVISOS-MENU-Y-VOLVER.md`, apartados 1 y 2 (los apartados 3 y 4 —un solo «Volver», la mesa
+del hito— son la fila 194, siguiente). Hasta hoy, hasta cinco cajas de color se apilaban en
+Inicio (alumnado desfasado, fichas sin carpeta, papelera vieja, vencimientos, recurrentes), más
+dos botones sueltos (posibles duplicados, en la cabecera; aspirantes sin número), cada uno con su
+propia forma de "ocultar". Ahora, una sola franja de una línea debajo de la cabecera de Inicio:
+«3 vencidos · 5 vencen esta semana · 2 asuntos que se repiten toca crearlos · 4 posibles
+duplicados · papelera: 12 cosas de más de 30 días · fichero de alumnado de hace 20 días», cada
+trozo pulsable (hace lo mismo que hacía el botón de su caja de antes). Roja si hay algo vencido o
+falta el fichero de alumnado; ámbar si no. Un solo «Ocultar por hoy», a la derecha: esconde toda
+la franja hasta el día siguiente, o antes si aparece un aviso nuevo que no estaba (se guarda el
+conjunto de avisos activos al ocultar; cualquiera nuevo la hace volver).
+
+**El contrato**: `AvisosLinea.registrar(id, texto, urgente, alPulsar)` (`js/avisos-linea.js`,
+nuevo, 181 líneas, enganchado por `window.Gestor.alRefrescar`, como los demás módulos de avisos).
+Cada módulo de aviso (`js/avisos.js`, `js/frescura.js`, `js/avisos-que-faltan.js`,
+`js/recurrentes.js`, `js/unir-asuntos.js`, `js/inicio.js`) sigue calculando exactamente lo mismo
+de siempre: solo deja de pintar su propia caja y le pasa su trozo a la franja, con `texto: ''`
+para quitarlo cuando ya no aplica. El orden de los trozos es fijo (no el de llegada), para que la
+franja no salte de sitio entre repintados.
+
+**El menú**, orden y nombres del boceto: Inicio · Nuevo asunto · Archivo · Personas y empresas ·
+Impresos · Cuentas, línea, Ajustes (antes «Cuentas» iba delante de «Impresos»); al pie, la
+sesión, la versión y, al final, «Salir» (antes iba al revés).
+
+**Un detalle no previsto en el encargo, encontrado al implementar**: `js/traer-datos.js` (el
+botón "Traer el fichero desde donde lo tengas") se enganchaba al panel viejo de frescura
+(`#panel-frescura`), que desaparece con esta fila; se adaptó para engancharse a la franja nueva
+(`#avisos-linea`, buscando el trozo `[data-aviso="frescura"]`), sin cambiar lo que hace el botón.
+
+`npm test` completo (167 ficheros: 166 que había + `pruebas/avisos-linea.mjs`, nueva) en verde,
+comprobado de forma independiente; la franja y el menú comprobados a ojo con Playwright.
+
 ## 27-sep-2026 — Fila 192: la pantalla de Inicio, segunda parte (la tabla y los plegados)
 
 `docs/INICIO-CUATRO-BLOQUES.md`, apartados 5 y 6. Debajo de los cuatro bloques de la fila 191,

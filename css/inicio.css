@@ -4,9 +4,9 @@
 
    La rejilla de cuatro columnas ("Ha llegado", "Me toca", "Esperamos a
    otros" y el tablón) y sus filas, calcadas de css/que-me-toca.css
-   (.qmt-bloque-titulo, .qmt-lista, .qmt-fila), que se queda como está
-   para el aviso de aspirantes que se muda aquí (misma clase,
-   qmt-aviso-aspirantes, sin tocar su CSS).
+   (.qmt-bloque-titulo, .qmt-lista, .qmt-fila). El aviso de aspirantes
+   (antes .qmt-aviso-aspirantes, css/que-me-toca.css) es desde la fila
+   193 un trozo más de .avisos-linea, más abajo en este mismo fichero.
 
    Los colores de plazo son los de siempre: .marca-plazo, .plazo-vencido,
    .plazo-cerca y .plazo-lejos vienen de css/plazos.css y se reutilizan
@@ -278,4 +278,54 @@ table.inicio-tabla {
 .pestana .cuenta.cuenta-roja {
   background: var(--rojo-linea);
   color: #fff;
+}
+
+/* ---------- la franja única de avisos (fila 193, apartado 1,
+   docs/AVISOS-MENU-Y-VOLVER.md) ----------
+
+   Debajo de la cabecera de Inicio: un trozo por aviso, separados por
+   " · " (.avisos-linea-sep), cada uno pulsable (.avisos-linea-trozo),
+   con un solo "Ocultar por hoy" a la derecha. Mismo color de fondo que
+   los avisos de siempre (.aviso-rojo/.aviso-ambar, css/estilos.css),
+   sin el margen-padding de caja apilada: aquí todo en una línea. */
+
+.avisos-linea {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  border-radius: var(--radio);
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  font-size: 13.5px;
+}
+
+.avisos-linea-texto {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.avisos-linea-trozo {
+  font: inherit;
+  color: inherit;
+}
+button.avisos-linea-trozo {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 0, 0, .25);
+}
+button.avisos-linea-trozo:hover {
+  text-decoration-color: currentColor;
+}
+
+.avisos-linea-sep {
+  color: var(--tinta-suave);
+}
+
+.avisos-linea-ocultar {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }

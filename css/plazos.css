@@ -40,13 +40,8 @@
   #filtro-plazo { width: 100%; }
 }
 
-/* ---------- el aviso de lo que vence ----------
-   Va arriba de la pantalla de asuntos abiertos, antes de las tres
-   tarjetas, y solo aparece cuando hay algo que decir. */
-#panel-avisos { margin: 4px 0 18px; }
-.avisos-botones { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-
-/* ---------- los asuntos que se repiten ---------- */
-#panel-recurrentes { margin: 4px 0 18px; }
-.recurrentes-lista { margin: 8px 0 0; padding-left: 20px; font-size: 13px; }
+/* El aviso de lo que vence y el de los asuntos que se repiten ya no
+   pintan su propia caja (fila 193, apartado 1, docs/AVISOS-MENU-Y-
+   VOLVER.md): son trozos de la franja única, css/inicio.css
+   (.avisos-linea). */
 .recurrente-pie { flex: 1; font-size: 12px; }
