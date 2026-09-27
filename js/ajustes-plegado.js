@@ -361,26 +361,9 @@ var AjustesPlegado = (function () {
       if (!caja || !caja.children.length) return [''];
       return [/Sin señalar/.test(caja.textContent || '') ? 'sin señalar' : 'señalada'];
     } },
-    { id: 'copias', dentro: '#tabla-copias', resumen: function () {
-      var u = App.E.ultimaCopia;
-      return [u ? 'la última, del ' + U.fechaLegible(u) : ''];
-    } },
-    { id: 'papelera', dentro: '#tabla-papelera', resumen: function (det) {
-      var n = filasDe(det.querySelector('#tabla-papelera'), '.fila-tipo');
-      var aviso = det.querySelector('#aviso-papelera-vieja');
-      var viejas = 0;
-      if (aviso && !aviso.classList.contains('oculto')) {
-        var m = (aviso.textContent || '').match(/(\d+)/);
-        viejas = m ? parseInt(m[1], 10) : 0;
-      }
-      if (viejas) return [plural(n, 'cosa', 'cosas') + ' · ' + viejas + ' de más de 30 días', true];
-      return [n ? plural(n, 'cosa', 'cosas') : 'vacía'];
-    } },
-    { id: 'avisos', dentro: '#avisos-dias', resumen: function (det) {
-      var c = det.querySelector('#avisos-dias');
-      var v = c ? parseInt(c.value, 10) : NaN;
-      return [isNaN(v) ? '' : 'con ' + plural(v, 'día', 'días') + ' de antelación'];
-    } },
+    /* Fila 200: "copias" (restaurar) y "papelera" se fueron a
+       Herramientas; "avisos" (avisos-dias) se fue a Ajustes → El
+       centro, junto con "Asuntos dormidos" ("Días de aviso"). */
     { id: 'duplicados', dentro: '#tabla-duplicados-descartados', resumen: function (det) {
       var n = filasDe(det.querySelector('#tabla-duplicados-descartados'));
       return [n ? String(n) : 'ninguno'];

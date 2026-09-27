@@ -7,10 +7,11 @@
    1. Fichas sin carpeta (huérfanas): antes solo se veían entrando a
       propósito en Ajustes → Mantenimiento. Ahora hay una línea aquí
       que lleva directo a ese bloque.
-   2. La papelera vieja: el aviso ya existía dentro de la papelera de
-      Ajustes; aquí sale también en la pantalla principal, con cuántas
-      cosas son y cuánto ocupan, y sin botón para quitarlo sin decidir
-      (la única acción sigue siendo borrarlo del todo, en Ajustes).
+   2. La papelera vieja: el aviso ya existía dentro de la papelera
+      (fila 200: Herramientas, antes Ajustes → Mantenimiento); aquí
+      sale también en la pantalla principal, con cuántas cosas son y
+      cuánto ocupan, y sin botón para quitarlo sin decidir (la única
+      acción sigue siendo borrarlo del todo, en Herramientas).
 
    Las dos comprobaciones cuestan un poco de disco (leer el índice del
    ARCHIVO, o el propio papelera.json), así que **no se enganchan al
@@ -90,6 +91,14 @@
     if (bloque) bloque.open = true;
   }
 
+  /* Fila 200: la papelera vive en Herramientas, no ya en Ajustes →
+     Mantenimiento. */
+  function irAHerramientas(idBloque) {
+    App.ir('herramientas');
+    var bloque = $(idBloque);
+    if (bloque) bloque.open = true;
+  }
+
   async function pintarHuerfanas() {
     if (!window.AvisosLinea) return;
     var huerfanas = await calcularHuerfanas();
@@ -122,7 +131,7 @@
       texto: 'papelera: ' + r.n + (r.n === 1 ? ' cosa' : ' cosas') +
         ' de más de ' + Papelera.DIAS_AVISO + ' días (' + bytesLegibles(tamano) + ')',
       rojo: false,
-      onclick: function () { irAMantenimiento('bloque-papelera'); }
+      onclick: function () { irAHerramientas('bloque-papelera'); }
     });
   }
 

@@ -2,19 +2,27 @@
    ajustes-mantenimiento.js — la pestaña "Mantenimiento" de Ajustes
    (17-sep-2026, fila 39, docs/AJUSTES-POR-TIPO.md).
 
-   Lo que no relaciona nada con nada: los avisos de vencimiento (de
-   este ordenador), las carpetas señaladas y el nombre de usuario, las
-   copias de seguridad y la papelera, sacados tal cual de
-   js/ajustes.js. La carpeta de la bandeja de correo (js/bandeja-
-   correos.js), el aviso de RegAlum.csv viejo (js/frescura.js), los
-   conflictos de Dropbox (js/conflictos.js), los duplicados
-   descartados (js/unir-asuntos.js) y las fichas sin carpeta (js/
-   fichas-huerfanas.js) se enganchan solos, como ya hacían: solo se ha
-   cambiado a qué contenedor apuntan (`#ajustes-tab-mantenimiento` en
-   vez de `#pantalla-ajustes`), no cómo funcionan por dentro.
+   Lo que no relaciona nada con nada: las carpetas señaladas y el
+   nombre de usuario, sacados tal cual de js/ajustes.js. La carpeta de
+   la bandeja de correo (js/bandeja-correos.js), el aviso de
+   RegAlum.csv viejo (js/frescura.js), los conflictos de Dropbox
+   (js/conflictos.js), los duplicados descartados (js/unir-asuntos.js)
+   y las fichas sin carpeta (js/fichas-huerfanas.js) se enganchan
+   solos, como ya hacían: solo se ha cambiado a qué contenedor
+   apuntan (`#ajustes-tab-mantenimiento` en vez de `#pantalla-
+   ajustes`), no cómo funcionan por dentro.
+
+   Fila 200 (docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md, apartado 6 y 7):
+   "Avisos de vencimiento" se fue a Ajustes → El centro, junto con
+   "Asuntos dormidos" ("Días de aviso"). "Copias de seguridad" se
+   partió: la caducidad se fue también a El centro, y la lista para
+   restaurar (`App.pintarCopias`, aquí abajo) es ahora Herramientas →
+   "Restaurar una copia de seguridad" (js/herramientas.js la llama, en
+   vez de `App.pintarAjustesMantenimiento`). "Papelera" y "Tablas de
+   datos" se fueron también a Herramientas.
    ============================================================ */
 
-/* ---------- Copias de seguridad ---------- */
+/* ---------- Restaurar una copia de seguridad ---------- */
 
 App.pintarCopias = async function () {
   var caja = $('tabla-copias');
@@ -95,14 +103,11 @@ $('btn-olvidar').onclick = async function () {
 App.pintarAjustesMantenimiento = async function () {
   App.pintarCarpetasDeEsteOrdenador();
   if (window.SenecaAyudante) SenecaAyudante.insertarEnlace($('ayudante-seneca-ajustes'));
-  await App.pintarCopias();
   if (typeof App.pintarFichasHuerfanas === 'function') await App.pintarFichasHuerfanas();
   if (typeof App.pintarHitosHuerfanos === 'function') await App.pintarHitosHuerfanos();
   if (typeof App.pintarFichasDelArchivo === 'function') await App.pintarFichasDelArchivo();
   if (typeof App.pintarContactoGuardado === 'function') await App.pintarContactoGuardado();
-  if (typeof App.pintarPapelera === 'function') await App.pintarPapelera();
   if (typeof App.pintarEnvolturas === 'function') App.pintarEnvolturas();
-  if (window.TablasDatosPantalla) await TablasDatosPantalla.pintar();   /* fila 110 */
   if (window.Conservacion) await Conservacion.pintar();   /* fila 136: plazo de conservación cumplido */
   /* Fila 105: los avisos de fallo arriba (solo si hay), Herramientas
      al final y el resumen de cada título. */

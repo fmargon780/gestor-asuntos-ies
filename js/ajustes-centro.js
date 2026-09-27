@@ -16,6 +16,14 @@
    no lectivos de los hitos son el bloque "Hitos" de js/hitos-ajustes.js,
    que se engancha aquí igual que antes: crea su `<details>` dentro de
    `#ajustes-tab-centro` en vez de dentro de `#pantalla-ajustes`.
+
+   Fila 200 (docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md, apartado 6):
+   "Caducidad de las copias de seguridad" y "Asuntos dormidos", que ya
+   vivían aquí, se fusionaron con lo que antes estaba en Mantenimiento
+   ("Copias de seguridad" y "Avisos de vencimiento") en dos secciones
+   únicas: "Copias de seguridad" y "Días de aviso". Solo cambió el
+   `index.html` (los textos y qué campos van juntos); esta función no
+   ha cambiado.
    ============================================================ */
 
 /* ---------- estados del asunto ----------
@@ -415,7 +423,10 @@ if ($('margen-firma')) $('margen-firma').onchange = guardarMargenesPdf;
    Mismo patrón que App.diasDormido()/App.guardarDiasDormido() en
    js/que-me-toca.js. js/copias.js lee este mismo valor directamente de
    App.E.registro.ajustesAvisos para podar las copias; aquí solo está el
-   campo de Ajustes y el guardado. */
+   campo de Ajustes y el guardado. Fila 200: el campo vive ahora dentro
+   de la sección "Copias de seguridad" (fusionada con la que antes
+   estaba en Mantenimiento); el "avisos-dias" de "Días de aviso" lo
+   sigue rellenando js/avisos.js por su cuenta, como siempre. */
 
 App.diasCaducidadCopias = function () {
   var n = App.E.registro.ajustesAvisos && App.E.registro.ajustesAvisos.diasCaducidadCopias;

@@ -80,7 +80,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   duplicados, papelera vieja, fichas huérfanas, fichero de alumnado viejo, aspirantes sin
   número), en una sola línea (`#avisos-linea`, `js/avisos-linea.js`, fila 193): un solo "Ocultar
   por hoy" para todos. Menú: Inicio · Nuevo asunto · Archivo · Personas y empresas · Impresos ·
-  Cuentas, línea, Ajustes; al pie, sesión, versión y Salir. Un solo «← Volver» (y Escape) en todas
+  Cuentas · Herramientas, línea, Ajustes; al pie, sesión, versión y Salir. Un solo «← Volver» (y Escape) en todas
   las pantallas salvo Inicio, que vuelve a la de origen, no siempre a Inicio (`js/navegacion.js`
   envuelve `App.ir`, fila 194); la mesa del hito lleva su propio «← Volver a los hitos», dentro de
   la tira.
@@ -132,7 +132,12 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Ajustes: tres pestañas y pantalla por tipo; todo plegado, con resumen; avisos de fallo, solo con fallo.
   La pantalla de un tipo lleva arriba una lista de comprobación (se pliega en verde si está completo) y
   todo se guarda al cambiar, sin botones "Guardar" propios; los campos de un tipo se gestionan solo desde
-  "+ Añadir campo"; la tarjeta de la rejilla enseña el plazo, pero no lo edita.
+  "+ Añadir campo"; la tarjeta de la rejilla enseña el plazo, pero no lo edita. En El centro, "Días de
+  aviso" (vencimientos y asuntos dormidos) y "Copias de seguridad" (su caducidad) son cada una una sola
+  sección. Mantenimiento se queda solo con lo que es mantenimiento de verdad (conflictos, fichas sin
+  carpeta, plantillas del centro, ordenar el archivo…): Papelera, Traer el alumnado (Séneca y la BD de
+  alumnado, juntos) y Tablas de datos, además de Restaurar una copia de seguridad, viven en "Herramientas"
+  (menú lateral, fila 200).
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
 - Papelera: nada se borra de golpe, con buscador por palabras. Plazo de conservación por tipo: avisa, nunca borra solo.

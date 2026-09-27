@@ -10,7 +10,12 @@
      enseña en el ordenador. Se señala en Ajustes › El centro › «Carpeta
      de la base de datos de alumnado» y se recuerda en este ordenador
      (Almacen, `alumnado-bd-carpeta`), como las del Dropbox.
-   - Traer: al entrar y con «Traer el alumnado ahora» (Mantenimiento).
+   - Traer: al entrar y con «Traer el alumnado ahora» (Herramientas,
+     fila 200, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md, apartado 7; antes
+     estaba en Mantenimiento). Junto a ese botón se cuelga también, en
+     el mismo bloque, el de «Traer ficheros de Séneca» (js/traer-
+     datos.js), que antes vivía en Ajustes → El centro → Ficheros de
+     datos.
      Si la carpeta está señalada y su `ALUMNADO-BD.json` es más nuevo
      (`generado`) que la copia, se valida y se copia a
      `_GESTOR/datos/ALUMNADO-BD.json` por ColaGuardado. Sin carpeta (el
@@ -245,11 +250,15 @@ var AlumnadoBD = (function () {
       $('alumnado-bd-senalar').onclick = senalarCarpeta;
       $('alumnado-bd-olvidar').onclick = olvidarCarpeta;
     }
-    var mant = $('ajustes-tab-mantenimiento');
-    if (mant && !$('bloque-alumnado-bd-traer')) {
-      mant.appendChild(bloque('bloque-alumnado-bd-traer', 'Traer el alumnado', 'De la carpeta de la base de datos de alumnado',
+    /* Fila 200: este bloque vive en la pantalla "Herramientas" (menú
+       lateral), no ya en Ajustes → Mantenimiento. */
+    var herramientas = $('pantalla-herramientas');
+    if (herramientas && !$('bloque-alumnado-bd-traer')) {
+      var det = bloque('bloque-alumnado-bd-traer', 'Traer el alumnado', 'De la carpeta de la base de datos de alumnado y de los ficheros de Séneca',
         '<p class="explica alumnado-bd-copia" id="alumnado-bd-copia"></p>' +
-        '<button type="button" class="boton" id="alumnado-bd-traer">Traer el alumnado ahora</button>'));
+        '<button type="button" class="boton" id="alumnado-bd-traer">Traer el alumnado ahora</button>');
+      var ancla = $('bloque-restaurar-copia');
+      if (ancla) herramientas.insertBefore(det, ancla); else herramientas.appendChild(det);
       $('alumnado-bd-traer').onclick = function () {
         return U.mientrasGuarda($('alumnado-bd-traer'), async function () {
           if (!(await carpeta())) { U.aviso('Primero señala la carpeta en Ajustes › El centro › Carpeta de la base de datos de alumnado.', 'ambar'); return; }
@@ -257,6 +266,9 @@ var AlumnadoBD = (function () {
           pintarCopia();
         });
       };
+      /* El botón «Traer ficheros de Séneca» (js/traer-datos.js) se
+         cuelga en el mismo bloque, justo detrás de este. */
+      if (window.TraerDatos) TraerDatos.ponerEnAjustes();
     }
     var p = $('alumnado-bd-carpeta');
     if (p) {

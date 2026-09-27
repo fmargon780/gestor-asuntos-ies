@@ -2,9 +2,11 @@
    tablas-datos-pantalla.js — lo que se ve de las tablas de datos
    (24-sep-2026, fila 110, docs/TABLAS-DE-DATOS.md):
 
-   - Ajustes → Mantenimiento, bloque «Tablas de datos» (solo lectura):
-     cada tabla, de qué ficheros sale, qué cursos cubre y cuántas filas;
-     los ficheros que no se han podido leer, con el motivo; «Volver a leer».
+   - Herramientas, bloque «Tablas de datos» (solo lectura; fila 200,
+     docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md, apartado 7; antes vivía en
+     Ajustes → Mantenimiento): cada tabla, de qué ficheros sale, qué
+     cursos cubre y cuántas filas; los ficheros que no se han podido
+     leer, con el motivo; «Volver a leer».
    - Ficha del tercero, plegable «Datos de las tablas»: por cada tabla con
      filas de esa persona, una tablita compacta. Sin ninguna, no se pinta.
 
@@ -16,7 +18,9 @@
   function bloque() {
     var ya = $('bloque-tablas-datos');
     if (ya) return ya;
-    var pantalla = $('ajustes-tab-mantenimiento');
+    /* Fila 200: la pantalla "Herramientas" (menú lateral), no ya
+       Ajustes → Mantenimiento. */
+    var pantalla = $('pantalla-herramientas');
     if (!pantalla) return null;
     var d = document.createElement('details');
     d.className = 'bloque-ajustes';
@@ -31,7 +35,8 @@
         '<div id="tablas-datos-lista" class="lista"></div>' +
         '<button type="button" class="boton" id="tablas-datos-releer" style="margin-top:8px">Volver a leer</button>' +
       '</div>';
-    pantalla.appendChild(d);
+    var ancla = $('bloque-restaurar-copia');
+    if (ancla) pantalla.insertBefore(d, ancla); else pantalla.appendChild(d);
     $('tablas-datos-releer').onclick = async function () {
       TablasDatos.olvidar();
       await U.mientrasGuarda($('tablas-datos-releer'), function () { return pintar(); });

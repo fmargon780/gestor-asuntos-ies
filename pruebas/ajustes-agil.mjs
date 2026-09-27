@@ -175,9 +175,11 @@ await comprobar('las tres primeras tarjetas están en la misma fila (al menos 3 
    Desde el 17-sep-2026 (fila 39, docs/AJUSTES-POR-TIPO.md) los once
    bloques de antes están repartidos en tres pestañas, así que para
    una página larga de verdad hace falta estar en la que más lleva:
-   "Mantenimiento" (Avisos, Carpetas, Copias, Papelera, y los que se
-   enganchan solos: bandeja, RegAlum viejo, conflictos, duplicados
-   descartados, fichas huérfanas).
+   "Mantenimiento" (Carpetas, el ayudante de Séneca, Borrados que se
+   fusionan, y los que se enganchan solos: bandeja, RegAlum viejo,
+   conflictos, duplicados descartados, fichas huérfanas, hitos
+   huérfanos, envolturas, plazo de conservación, versiones previas…
+   Desde la fila 200, Copias y Papelera se fueron a "Herramientas").
    ================================================================ */
 console.log('--- 8. la barra queda fija, aunque la página sea larga ---');
 

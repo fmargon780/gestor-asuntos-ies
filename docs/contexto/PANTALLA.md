@@ -49,9 +49,22 @@ para las pruebas, aunque ahora vivan dentro de la línea. El aviso de huérfanas
 ✕ de 7 días (fila 86): ya solo se calla con el "Ocultar por hoy" general.
 
 **La barra de la izquierda** (`js/barra.js`, `css/barra.css`). Menú, de arriba abajo: Inicio ·
-Nuevo asunto · Archivo · Personas y empresas · Impresos · Cuentas (las dos últimas las añade
-`js/barra.js`, no están en el `index.html` de partida), una línea, Ajustes (fila 193: Impresos
-antes que Cuentas). Se pliega; un botón de tres rayas la abre y la cierra; se recuerda en
+Nuevo asunto · Archivo · Personas y empresas · Impresos · Cuentas · Herramientas (Impresos y
+Cuentas las añade `js/barra.js`, justo detrás de Personas y empresas; no están en el
+`index.html` de partida. Herramientas sí está, fija, justo delante de la línea), una línea,
+Ajustes (fila 193: Impresos antes que Cuentas; fila 200: Herramientas, encima de la línea).
+**Herramientas** (`#pantalla-herramientas`, `js/herramientas.js`, fila 200,
+`docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`) es una pantalla más, con el mismo patrón que las
+demás (`App.PANTALLAS`, `#pantalla-<nombre>`, `.oculto`), no una pestaña de Ajustes: trae, en
+este orden, Papelera, Traer el alumnado (los CSV de Séneca y la base de datos de alumnado,
+juntos en un solo bloque), Tablas de datos y Restaurar una copia de seguridad — las cuatro,
+sacadas tal cual de donde vivían antes (Ajustes → Mantenimiento las tres primeras, salvo Traer
+el alumnado que además absorbió el botón de Séneca que estaba en Ajustes → El centro →
+"Ficheros de datos"; Restaurar una copia era la vieja "Copias de seguridad" de Mantenimiento).
+En Ajustes → El centro, "Asuntos dormidos" y "Avisos de vencimiento" (esta última venía de
+Mantenimiento) se fundieron en "Días de aviso", y "Caducidad de las copias de seguridad" se
+fundió con la vieja "Copias de seguridad" de Mantenimiento en una sola sección "Copias de
+seguridad" (sin la lista para restaurar, que es la de Herramientas). Se pliega; un botón de tres rayas la abre y la cierra; se recuerda en
 `gestor-barra-2` (fila 175, `docs/PERSONAS-ARCHIVO-Y-MENU.md`,
 punto 4; antes `gestor-barra` — la clave cambió para que los dos ordenadores, aunque tuvieran
 guardado "plegada", volvieran a empezar). `comoEstaba()` solo lee esa clave; si no hay nada guardado

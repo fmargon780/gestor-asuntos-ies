@@ -576,7 +576,10 @@ App.refrescarFichas = function () {
    NAVEGACIÓN
    ========================================================== */
 
-App.PANTALLAS = ['abiertos', 'nuevo', 'archivo', 'personas', 'ajustes'];
+/* Fila 200 (docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md, apartado 7):
+   "herramientas" es una pantalla más, con el mismo patrón que las
+   demás (#pantalla-<nombre>, .oculto). */
+App.PANTALLAS = ['abiertos', 'nuevo', 'archivo', 'personas', 'herramientas', 'ajustes'];
 
 Array.prototype.forEach.call(document.querySelectorAll('.pestana'), function (b) {
   b.onclick = function () { App.ir(b.dataset.pantalla); };
@@ -594,6 +597,9 @@ App.ir = function (cual) {
   /* Fila 175, punto 3: el Archivo carga solo la primera vez de la
      sesión; las siguientes, la lista ya está en memoria. */
   if (cual === 'archivo' && !App.E.archivoVisitado) { App.E.archivoVisitado = true; App.verArchivo(); }
+  /* Fila 200: Papelera, Traer el alumnado, Tablas de datos y Restaurar
+     una copia de seguridad, cada uno pintado por su propio módulo. */
+  if (cual === 'herramientas' && typeof App.pintarHerramientas === 'function') App.pintarHerramientas();
   if (cual === 'ajustes') {
     App.pintarAjustes();
     /* Los bloques de Ajustes que pintan los módulos (biblioteca, hitos…)

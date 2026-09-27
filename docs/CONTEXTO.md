@@ -295,8 +295,10 @@ que si no existiera, y el siguiente guardado lo escribía encima, perdiendo todo
 - Al pulsar Entrar se comprueban los dieciocho ficheros (`Copias.comprobarTodos`). Si alguno está
   roto, **no se entra**: sale un aviso en rojo con un botón para restaurar la última copia de
   cada uno. El fichero roto se aparta como `<nombre>-roto-AAMMDD-HHMM.json` y no se borra nunca.
-- En Ajustes, el bloque **Copias de seguridad** enseña cuántas copias hay de cada fichero y deja
-  restaurar cualquiera a mano, por si hiciera falta sin que nada esté roto.
+- En Herramientas (menú lateral; fila 200, antes en Ajustes → Mantenimiento), el bloque
+  **Restaurar una copia de seguridad** enseña cuántas copias hay de cada fichero y deja
+  restaurar cualquiera a mano, por si hiciera falta sin que nada esté roto. Ajustes → El centro
+  se queda con su caducidad, en la sección **Copias de seguridad**.
 - **`_esquema` (fila 178):** de los dieciocho, los quince cuyo contenido es un objeto de forma fija
   (`tipos.json`, `tipos-documento.json` y `recurrentes.json` son listas, y `guias.json` es un
   diccionario dinámico por tipo: en ninguno de los cuatro cabe una clave de más sin romper algo)
@@ -564,4 +566,4 @@ para el botón «Ruta»; en la copia sin internet se deduce de su dirección) y,
     desde la fila 77, 20-sep-2026: ver "Copias en conflicto de Dropbox" arriba.)
 19. `js/papelera.js` no sabe devolver una plantilla de correo borrada (clase `'plantilla'`, no
     estaba en el encargo de las plantillas): si hace falta, se copia a mano desde el bloque
-    Papelera de Ajustes.
+    Papelera de Herramientas (fila 200; antes en Ajustes → Mantenimiento).

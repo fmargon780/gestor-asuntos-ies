@@ -129,7 +129,14 @@
      Fila 193 (docs/AVISOS-MENU-Y-VOLVER.md, apartado 2): el orden del
      menú es Inicio · Nuevo asunto · Archivo · Personas y empresas ·
      Impresos · Cuentas, así que Impresos se pone primero, justo detrás
-     de "Personas y empresas", y Cuentas detrás de Impresos. */
+     de "Personas y empresas", y Cuentas detrás de Impresos.
+
+     Fila 200 (docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md, apartado 7):
+     "Herramientas" va detrás de Cuentas, justo encima de la línea y de
+     "Ajustes". Es un botón fijo del propio index.html (no lo pone
+     este fichero): como Impresos y Cuentas se insertan siempre justo
+     detrás de "Personas y empresas", terminan colándose por delante de
+     "Herramientas" sin tocar nada aquí. */
 
   function ponerLaEntradaDeFormularios() {
     if ($('pestana-formularios')) return;

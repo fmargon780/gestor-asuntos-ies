@@ -12,9 +12,13 @@
    Se pueden elegir varios de una vez: el de alumnado y los dos de
    personal salen juntos de Séneca.
 
-   El botón vive en Ajustes, dentro de "Ficheros de datos"; el aviso
-   rojo de cuando falta el RegAlum (js/frescura.js) lleva directo ahí
-   (fila 193, docs/AVISOS-MENU-Y-VOLVER.md).
+   El botón vive en Herramientas, dentro de "Traer el alumnado" (fila
+   200, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md, apartado 7; antes
+   vivía en Ajustes → El centro → "Ficheros de datos"). Lo cuelga
+   js/alumnado-bd.js, justo después de crear ese bloque, llamando a
+   `TraerDatos.ponerEnAjustes()`; el aviso rojo de cuando falta el
+   RegAlum (js/frescura.js) sigue llevando a "Ficheros de datos", que
+   ahora solo enseña el estado, sin este botón.
    ============================================================ */
 (function () {
 
@@ -127,30 +131,28 @@
     return b;
   }
 
-  /* ---------- el botón de Ajustes ---------- */
+  /* ---------- el botón de Herramientas ----------
+
+     Fila 200: el sitio de siempre («Traer el alumnado ahora», de
+     js/alumnado-bd.js) es la áncora; se llama desde ahí, no solo,
+     porque ese bloque se cuelga él mismo la primera vez que se pinta
+     Ajustes o Herramientas. */
 
   function ponerEnAjustes() {
-    var caja = document.getElementById('estado-datos');
-    if (!caja || document.getElementById('btn-traer-datos')) return;
+    var ancla = document.getElementById('alumnado-bd-traer');
+    if (!ancla || document.getElementById('btn-traer-datos')) return;
     var fila = document.createElement('div');
     fila.className = 'alta-tipo';
-    var b = botonNuevo('Traer ficheros de Séneca', true);
+    var b = botonNuevo('Traer ficheros de Séneca', false);
     b.id = 'btn-traer-datos';
     fila.appendChild(b);
     var nota = document.createElement('span');
     nota.className = 'suave';
     nota.textContent = 'Elige el fichero donde lo tengas bajado; se copia solo a _GESTOR/datos.';
     fila.appendChild(nota);
-    caja.parentNode.insertBefore(fila, caja);
+    ancla.parentNode.insertBefore(fila, ancla.nextSibling);
   }
 
-  function arrancar() {
-    ponerEnAjustes();
-  }
-
-  arrancar();
-  if (!document.getElementById('btn-traer-datos')) {
-    document.addEventListener('DOMContentLoaded', arrancar);
-  }
+  window.TraerDatos = { ponerEnAjustes: ponerEnAjustes };
 
 })();

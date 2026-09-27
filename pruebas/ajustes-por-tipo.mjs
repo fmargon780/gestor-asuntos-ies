@@ -87,9 +87,9 @@ await comprobar('"El centro" trae Campos propios, Grupos y Datos del centro, y y
 await pagina.click('[data-ajustes-pestana="mantenimiento"]');
 await comprobar('"Mantenimiento" pasa a verse', pagina.locator('#ajustes-tab-mantenimiento').isVisible(), true);
 await pagina.evaluate(() => document.querySelectorAll('#ajustes-tab-mantenimiento details').forEach((d) => { d.open = true; }));
-await comprobar('"Mantenimiento" trae Copias, Papelera y las carpetas de este ordenador',
+await comprobar('"Mantenimiento" trae las carpetas de este ordenador, y ya no Copias ni Papelera (fila 200: pasaron a Herramientas)',
   pagina.locator('#ajustes-tab-mantenimiento').textContent().then((t) =>
-    t.indexOf('Copias de seguridad') !== -1 && t.indexOf('Papelera') !== -1 &&
+    t.indexOf('Copias de seguridad') === -1 && t.indexOf('Papelera') === -1 &&
     t.indexOf('Carpetas de este ordenador') !== -1), true);
 
 /* Se vuelve a "Tipos de asunto" y se cambia a EMPRESAS, para abrir

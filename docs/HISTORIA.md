@@ -5,6 +5,54 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 200: El centro y la pestaña «Herramientas»
+
+`docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartados 6 y 7 (los dos últimos de la fila 184
+original).
+
+**Apartado 6, juntar lo que va junto en El centro.** «Asuntos dormidos» y «Avisos de vencimiento»
+(esta última vivía en Mantenimiento) se funden en una sola sección «Días de aviso», dentro de
+Ajustes → El centro; cada campo sigue guardándose donde siempre (`avisos-dias` en `localStorage`,
+de este ordenador, `js/avisos.js`; `dias-dormido` en `App.E.registro.ajustesAvisos`, de todo el
+centro, `js/que-me-toca.js`). «Caducidad de las copias de seguridad» (El centro) y «Copias de
+seguridad» (Mantenimiento, con la lista para restaurar) se funden en una sola sección «Copias de
+seguridad» en El centro, que se queda solo con la caducidad (`App.pintarDiasCaducidadCopias`,
+`js/ajustes-centro.js`, sin cambios); la lista para restaurar pasa al apartado 7.
+
+**Apartado 7, la pantalla «Herramientas».** Nueva pantalla del menú lateral (`#pantalla-
+herramientas`, `js/herramientas.js`), con el mismo patrón que las demás (`App.PANTALLAS`,
+`App.ir`, `js/nucleo.js`): un botón fijo en `index.html`, justo encima de la línea y de
+«Ajustes» (Impresos y Cuentas, que `js/barra.js` inserta justo detrás de «Personas y empresas»,
+quedan por delante sin tocar nada de ese fichero). Contiene, en este orden, los cuatro bloques
+que vivían en Ajustes, movidos tal cual, sin reescribir su lógica: **Papelera**
+(`js/papelera-ajustes.js`, solo cambia de `index.html` dónde está el `<details>`), **Traer el
+alumnado** (`js/alumnado-bd.js`: cambia el contenedor de destino de `#ajustes-tab-mantenimiento`
+a `#pantalla-herramientas`, insertando antes de «Restaurar…»; el pie del bloque ahora dice
+también «y de los ficheros de Séneca», porque **Traer ficheros de Séneca**
+(`js/traer-datos.js`) se cuelga en el mismo bloque, justo detrás del botón «Traer el alumnado
+ahora» — antes vivía en Ajustes → El centro → «Ficheros de datos»; su función `ponerEnAjustes`
+ya no se llama sola al cargar el script, sino que se expone como `TraerDatos.ponerEnAjustes()` y
+la llama `js/alumnado-bd.js` justo después de crear su propio bloque, porque el suyo ya no existe
+al arrancar la página), **Tablas de datos** (`js/tablas-datos-pantalla.js`: mismo cambio de
+contenedor) y **Restaurar una copia de seguridad** (antes «Copias de seguridad» de
+Mantenimiento, con su `<details>` movido de sitio en `index.html` y renombrado; la pinta
+`App.pintarCopias`, `js/ajustes-mantenimiento.js`, sin cambios). El orquestador nuevo,
+`App.pintarHerramientas` (`js/herramientas.js`), llama a los cuatro en orden cuando se entra en
+la pantalla; `js/ajustes-mantenimiento.js` ya no los llama desde `App.pintarAjustesMantenimiento`.
+
+Enlaces que llevaban a estos bloques dentro de Ajustes se actualizaron: el aviso de «papelera
+vieja» (`js/avisos-que-faltan.js`) ahora abre Herramientas, no Ajustes → Mantenimiento (`irAHerramientas`, nueva, junto a la `irAMantenimiento` que sigue usando el aviso de fichas sin
+carpeta, que no se movió). `js/ajustes-plegado.js` pierde las entradas de «copias» y «papelera»
+de su lista de bloques de Mantenimiento (ya no están ahí); Ajustes se queda con Tipos de asunto,
+Tipos de documento, El centro, Hitos y Mantenimiento (conflictos, fichas sin carpeta, cargar
+plantillas del centro, ordenar el archivo…).
+
+Pruebas actualizadas para el nuevo sitio de la papelera: `pruebas/papelera.mjs`,
+`pruebas/papelera-buscador.mjs` (navegan a la pestaña «Herramientas» en vez de a Ajustes →
+Mantenimiento) y `pruebas/ajustes-por-tipo.mjs` (Mantenimiento ya no trae «Copias de seguridad»
+ni «Papelera»); `pruebas/alumnado-desde-la-bd.mjs` comprueba el bloque «Traer» dentro de
+`#pantalla-herramientas`, con el botón de Séneca también ahí. `npm test` completo en verde.
+
 ## 27-sep-2026 — Fila 199: documentos y comunicaciones del hito, como tareas
 
 `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartado 4 (el único de toda la fila 184 original que
