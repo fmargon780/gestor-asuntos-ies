@@ -5,6 +5,36 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 196: el informe para dirección
+
+`docs/AVISOS-A-QUIEN-LO-PIDE.md`, apartado 4. Módulo nuevo `js/cuentas-informe.js`
+(`window.CuentasInforme`): botón «Preparar informe para dirección» en Cuentas, junto a «← Volver».
+Abre el cuadro de Correo de siempre, pero **sin destinatario** (un asunto de mentira,
+`{ nombre, ficha: {}, leido: {} }`, para que `CorreoCuadro` no intente adivinar a quién escribir)
+y con el asunto y el cuerpo ya fijados (`extra.asuntoListo`/`extra.medioListo`, el mismo mecanismo
+que ya usaba «Comunicar» de un hito).
+
+Los cinco apartados, reutilizando lo que Cuentas ya calculaba: `Cuentas._porOrgano` (por quién lo
+encarga), el mismo cálculo de vencidos que `js/avisos.js`, el mismo de «Esperando a otros» que
+Inicio (`QueMeToca`), `Cuentas._tiempoDeTramite` (el quinto, opcional: solo si hay archivados con
+las dos fechas), y uno nuevo — cerrados desde el último informe, comparando `cerradoEl` de cada
+archivado con `_GESTOR/informes.json` (`{ ultimoEnviado }`; sin fichero, los últimos 30 días).
+`Cuentas.cargar` pasa de privada a exportada, para no duplicar la lógica de juntar abiertos y
+archivados.
+
+`informes.json` solo se pone al día **si el correo ha salido de verdad**
+(`CorreoNucleo._interno.envioRealizado`, mirado después de que el cuadro se cierre, no al
+abrirlo): así, abrirlo y cerrarlo sin mandar nada no adelanta la fecha y no se pierden cierres de
+en medio. Sin recordatorio automático, como pedía el encargo: solo el botón.
+
+**Un detalle menor, dejado tal cual**: al enviarlo, `js/correo-rastro.js` intenta apuntar el
+rastro en «el asunto» de siempre (el informe no lo es) y no lo encuentra; el propio módulo ya
+tiene su `try/catch` para esto (fila 115) y se limita a enseñar un aviso ámbar pequeño, contenido,
+dentro del cuadro, sin tocar nada más. No se ha tocado `correo-rastro.js` para este caso: es un
+mensaje de una vez, sin coste real, y tocar ese fichero para un caso tan puntual no compensaba.
+
+Prueba nueva: `pruebas/cuentas-informe.mjs`. `npm test` completo (170 ficheros) en verde.
+
 ## 27-sep-2026 — Fila 195: avisar a quien lo pide, y «Enviar estado»
 
 `docs/AVISOS-A-QUIEN-LO-PIDE.md`, apartados 1, 2 y 3. El resto del centro no entra en el gestor:

@@ -393,6 +393,9 @@
 
   window.Cuentas = {
     abrir: abrir,
+    /* Fila 196: para js/cuentas-informe.js, sin repetir la lógica de
+       juntar abiertos y archivados. */
+    cargar: cargar,
     /* para las pruebas (sin DOM ni disco: pruebas/cuentas.mjs) */
     _entradaAbierta: entradaAbierta, _entradaArchivada: entradaArchivada,
     _cursosDeEntradas: cursosDeEntradas, _porTipo: porTipo, _porMes: porMes,

@@ -98,7 +98,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   el cuadro sale relleno, con «Enviar» o «Esta vez no» (no vuelve a preguntar por ese hito).
   «Enviar estado»: en «El encargo» de la ficha y en «···» de la mesa, el mismo cuadro con «Aviso
   de avance» y el hito actual, sin escribir nada. Plantillas «Aviso de avance»/«Aviso de cierre»
-  se crean solas, válidas para cualquier tipo.
+  se crean solas, válidas para cualquier tipo. «Preparar informe para dirección» (Cuentas, fila
+  196): cuadro sin destinatario, con por-órgano, vencidos, esperando a otros, cerrados desde el
+  último informe (`_GESTOR/informes.json`) y tiempo medio.
 - "Ver todo" (antes "Por clasificar"; fila 191, se abre desde "Ha llegado" de Inicio): cada documento suelto se abre, se borra, o crea/entra en un asunto (un solo
   botón «Crear asunto con él», que usa lo leído del documento); con tercero reconocido, también
   sugiere guardarlo en uno que ya existe («Guardar aquí»). Tras guardar o crear, se abre directo el

@@ -361,6 +361,43 @@ Correo ya relleno; **nunca envía nada por su cuenta** — sigue mandando `js/co
 - Sin «Lo pide» con correo, no pasa nunca nada: ni al marcar, ni al archivar, ni con «Enviar
   estado» (avisa en rojo y no abre el cuadro). Prueba: `pruebas/avisos-a-quien-lo-pide.mjs`.
 
+### «Preparar informe para dirección» (27-sep-2026, fila 196,
+### docs/AVISOS-A-QUIEN-LO-PIDE.md, apartado 4)
+
+Botón en Cuentas (`js/cuentas-informe.js`, `window.CuentasInforme`), junto a «← Volver». Abre el
+cuadro de Correo **sin destinatario** (lo elige quien lo manda: `a` es un asunto de mentira,
+`{ nombre, ficha: {}, leido: {} }`, así que `CorreoCuadro` no encuentra a nadie de Séneca y deja
+«Para» vacío) y **sin ninguna plantilla**: el asunto del correo (`{{ASUNTO}}` sin elección, fila
+55) y el cuerpo entero se fijan con `extra.asuntoListo`/`extra.medioListo`, que ya usa el
+«Comunicar» de un hito.
+
+Los cinco apartados, todos «con lo que Cuentas ya sabe»:
+
+1. **Por quién lo encarga**: `Cuentas._porOrgano` (ya existía), solo los que tienen algún abierto.
+2. **Vencidos**: los asuntos abiertos con `Plazos.de(ficha.limite)` en negativo — el mismo cálculo
+   que `js/avisos.js`. Reservados sin el tercero (`Reservados.tapar`).
+3. **Esperando a otros más de 15 días**: `QueMeToca.reunir`/`clasificar`/`diasParado`, el mismo
+   cálculo que «Esperamos a otros» de Inicio.
+4. **Cerrados desde el último informe**: se compara `cerradoEl` de cada archivado
+   (`Cuentas.cargar().entradas`) con la fecha guardada en `_GESTOR/informes.json`
+   (`{ ultimoEnviado }`); sin fichero (la primera vez), los últimos 30 días.
+5. **Tiempo medio de tramitación**: `Cuentas._tiempoDeTramite` del curso actual, si hay algún
+   archivado con las dos fechas; si no, esa línea no sale (es la única de las cinco marcada como
+   opcional en el propio encargo).
+
+`_GESTOR/informes.json` solo se escribe **si se ha enviado de verdad** (se mira
+`CorreoNucleo._interno.envioRealizado` después de que el cuadro se cierre, no solo al abrirlo):
+abrir el cuadro y cerrarlo sin mandar nada no adelanta la fecha, así que el próximo informe no
+se come de en medio los asuntos que se cerraron mientras tanto. `Cuentas.cargar` (antes privada)
+se exporta para no repetir la lógica de juntar abiertos y archivados. Sin recordatorio
+automático: solo este botón. Prueba: `pruebas/cuentas-informe.mjs`.
+
+Nota conocida: al enviarlo, `js/correo-rastro.js` intenta apuntar el rastro en «el asunto» de
+siempre y no lo encuentra (el informe no es un asunto de verdad): sale un aviso ámbar pequeño,
+contenido, dentro del propio cuadro («No he podido apuntarlo en el asunto…»), sin afectar al
+envío ni a nada más. No se ha tocado `correo-rastro.js` para evitarlo: es un mensaje de una vez,
+sin coste real.
+
 ### Plantillas de correo y de mensaje de Séneca
 
 Una plantilla es **solo el cuerpo del medio**: el saludo y la despedida los sigue poniendo
