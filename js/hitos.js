@@ -126,6 +126,15 @@ var Hitos = (function () {
       opciones: [], elegida: null
     };
     if (h && h.delTipoAnterior) salida.delTipoAnterior = String(h.delTipoAnterior);
+    /* «Avisar a quien lo pide» (fila 195, docs/AVISOS-A-QUIEN-LO-PIDE.md):
+       los dos campos del paso, solo si están encendidos (un hito de
+       antes de esta fila se comporta como si no avisara), y la marca
+       de que ya se ha preguntado por este hito, solo si la hay. */
+    if (h && h.avisarLoPide) {
+      salida.avisarLoPide = true;
+      salida.avisarLoPidePlantilla = String(h.avisarLoPidePlantilla || '');
+    }
+    if (h && h.avisoLoPideHecho) salida.avisoLoPideHecho = true;
     /* La fecha en que se dio por hecho (fila 102, para {hecho:...}).
        Solo si la hay: los hitos de antes no la tienen, y no se inventa. */
     if (h && h.hechoEl) salida.hechoEl = String(h.hechoEl);
@@ -196,15 +205,26 @@ var Hitos = (function () {
 
   function vacio() { return normalizar(null); }
 
+  /* La lectura pasa por la misma cola que el guardado (`cambiar`,
+     más abajo): sin esto, una lectura lanzada mientras una escritura
+     de hitos.json todavía está en marcha (una migración en segundo
+     plano, al entrar en Ajustes) puede coger el fichero a medio
+     escribir ("no se puede leer"), aunque nadie haya tocado nada de
+     verdad. Encontrado en la fila 197 al sumar más trabajo asíncrono
+     a la pantalla de Ajustes: el fallo ya podía pasar antes, solo que
+     con menos probabilidad. */
   async function leer() {
     var g = gestor();
     if (!g) return vacio();
-    var leido = normalizar(await Carpetas.leerJson(g, FICHERO));
-    var n = Object.keys(leido.porAsunto).length;
-    if (n) vistosConDatos = n;
-    ultimos = leido;
-    alLeer.forEach(function (f) { try { f(leido); } catch (e) { /* solo pintar */ } });
-    return leido;
+    var hacerlo = async function () {
+      var leido = normalizar(await Carpetas.leerJson(g, FICHERO));
+      var n = Object.keys(leido.porAsunto).length;
+      if (n) vistosConDatos = n;
+      ultimos = leido;
+      alLeer.forEach(function (f) { try { f(leido); } catch (e) { /* solo pintar */ } });
+      return leido;
+    };
+    return window.ColaGuardado ? window.ColaGuardado.poner(FICHERO, hacerlo) : hacerlo();
   }
 
   /* Como todo fichero compartido: se relee justo antes de escribir, y
@@ -454,6 +474,10 @@ var Hitos = (function () {
       soloInformativo: esDecision ? false : !!p.soloInformativo,
       normativa: esDecision ? [] : (p.normativa || []),
       formularios: esDecision ? [] : (p.formularios || []),
+      /* «Avisar a quien lo pide» (fila 195): igual que los dos de
+         arriba, solo de los pasos de arriba, nunca de una pregunta. */
+      avisarLoPide: esDecision ? false : !!p.avisarLoPide,
+      avisarLoPidePlantilla: esDecision ? '' : (p.avisarLoPidePlantilla || ''),
       opciones: esDecision ? p.opciones.map(function (o) {
         return { id: o.id, texto: o.titulo, hitos: (o.pasos || []).map(pasoAHito) };
       }) : [],

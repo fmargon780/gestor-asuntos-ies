@@ -160,8 +160,16 @@ await pagina.waitForSelector('#resultados-tercero .resultado');
 await pagina.click('#resultados-tercero .resultado');
 await pagina.fill('#campo-fecha', '2026-09-07');
 await pagina.click('#btn-crear');
-/* Fila 119: crear abre la ficha del asunto; se vuelve a la lista. */
+/* Fila 119: crear abre la ficha del asunto; se vuelve a la lista.
+   Fila 197, punto 4: con guía, crear abre directamente la mesa del
+   primer hito; como el resto de esta prueba trabaja con la lista de
+   hitos de siempre (las casillas), se cierra («← Volver a los
+   hitos») antes de seguir: la mesa se queda recordada por asunto
+   (js/hito-mesa.js) y, sin cerrarla, reabriría sola en cada repintado
+   posterior. */
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await pagina.waitForSelector('#mesa-volver-hitos');
+await pagina.click('#mesa-volver-hitos');
 await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await pagina.waitForTimeout(400);

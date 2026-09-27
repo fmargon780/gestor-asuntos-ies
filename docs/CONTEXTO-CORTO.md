@@ -67,9 +67,12 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 (Una línea por cosa; el porqué, en `docs/contexto/` y `HISTORIA.md`.)
 
-- Categoría → tipo → tercero → nombre de carpeta, con vista previa (`App.nuevoAsuntoCon` lleva lo ya sabido, sin
-  repreguntarlo; cambiar de tipo dentro de la misma categoría no borra el tercero). Nombre corto; tipo nuevo al
-  vuelo. Dar de alta un tercero lo deja elegido, sin pulsar nada más.
+- Nuevo asunto empieza por la persona (fila 197): buscador único en todas las categorías, con la
+  parrilla de tipos limitada a la suya en cuanto se elige (el camino tipo-primero sigue
+  existiendo), resumen de la guía en una línea, y nombre de carpeta con vista previa
+  (`App.nuevoAsuntoCon` lleva lo ya sabido, sin repreguntarlo). Nombre corto; tipo nuevo al vuelo.
+  Dar de alta un tercero lo deja elegido, sin pulsar nada más; crear con guía abre la mesa del
+  primer hito.
 - Cada tipo dice quién lo encarga (Secretaría, Dirección…): parrilla agrupada, filtro y Cuentas.
 - Asuntos reservados (por tipo o uno a uno): candado, sin el tercero en listas y buscador.
 - El estado es el primer hito sin terminar («Hito N de M · título», «Hito actual»): Administración o terceros; «Esperando a…» sale solo con el responsable (a mano, hasta que cambia el hito). Guías: «Administración», no personas. Vía y fecha límite.
@@ -93,7 +96,14 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   acordeón: un hito abierto a la vez.
 - Panel lateral de lectura; tablón a la vista. Al crear, recuadro con lo que ya tiene el tercero; parada si es idéntico; pantalla "Duplicados".
 - Correo y mensaje de Séneca: se prepara; el correo se envía de verdad (Apps Script, con
-  confirmación) y nunca dos veces.
+  confirmación) y nunca dos veces. Avisar a quien lo pide (fila 195): casilla por hito («al
+  terminar») y por tipo («al cerrar»), con su plantilla; al marcar el hito hecho o al archivar,
+  el cuadro sale relleno, con «Enviar» o «Esta vez no» (no vuelve a preguntar por ese hito).
+  «Enviar estado»: en «El encargo» de la ficha y en «···» de la mesa, el mismo cuadro con «Aviso
+  de avance» y el hito actual, sin escribir nada. Plantillas «Aviso de avance»/«Aviso de cierre»
+  se crean solas, válidas para cualquier tipo. «Preparar informe para dirección» (Cuentas, fila
+  196): cuadro sin destinatario, con por-órgano, vencidos, esperando a otros, cerrados desde el
+  último informe (`_GESTOR/informes.json`) y tiempo medio.
 - "Ver todo" (antes "Por clasificar"; fila 191, se abre desde "Ha llegado" de Inicio): cada documento suelto se abre, se borra, o crea/entra en un asunto (un solo
   botón «Crear asunto con él», que usa lo leído del documento); con tercero reconocido, también
   sugiere guardarlo en uno que ya existe («Guardar aquí»). Tras guardar o crear, se abre directo el

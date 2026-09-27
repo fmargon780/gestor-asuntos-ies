@@ -224,6 +224,14 @@ como **copia**.
   a ese hito de ese asunto). Al traer un modelo, nace marcado si su responsable no es el que
   Francisco tenga configurado como Administración (`HitosBiblioteca.naceSoloInformativo`); sin poder
   determinarlo, nace sin marcar.
+- **Avisar a quien lo pide** (27-sep-2026, fila 195, docs/AVISOS-A-QUIEN-LO-PIDE.md): dos campos
+  más de un paso de guía y de un hito, `avisarLoPide` y `avisarLoPidePlantilla` (la plantilla de
+  correo elegida), con el mismo trato que `soloInformativo`: entran en `CAMPOS_COMPARABLES`, y un
+  hito de antes de esta fila se comporta como si no avisara. Se enciende en el editor del paso
+  (`js/guias-paso-bloques.js`), con un desplegable «Con la plantilla:» que trae las de correo del
+  tipo (`AvisosLoPide.opcionesPlantillaHTML`). Al marcar el hito hecho con la casilla encendida
+  (`js/hitos-panel-lista.js`), se abre el cuadro de Correo con esa plantilla; detalle completo en
+  `docs/contexto/CORREO-Y-SENECA.md`.
 - **Normativa** (apartado 4.7, `js/hitos-normativa.js`; enlace retocado la fila 87,
   `docs/ENLACE-AL-ARTICULO-DE-NORMATIVA.md`): campo `normativa`, lista de
   `{ cita, bloque, clave, url }`. Con `clave`, el enlace abre la vista de un solo artículo del

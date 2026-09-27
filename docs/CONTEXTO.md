@@ -51,7 +51,9 @@ señalarlas.
 
 Decisiones de diseño:
 
-- Primero se elige la categoría (ALUMNADO, PERSONAL, EMPRESAS, OTROS), y después el tipo.
+- Nuevo asunto empieza por la persona (fila 197): un buscador único busca en todas las
+  categorías a la vez, y la parrilla de tipos se limita a la suya en cuanto se elige; el camino
+  «tipo primero» sigue existiendo, para quien prefiera empezar por ahí.
 - Los tipos de asunto se crean en Ajustes o, con nombre, nombre corto y categoría, desde Nuevo
   asunto («+ Crear tipo nuevo», `js/tipo-al-vuelo.js`, fila 128); la guía, los campos y las
   plantillas, siempre en Ajustes. Los de DOCUMENTO sí se crean al vuelo, desde el propio cuadro.
@@ -227,6 +229,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `grupos.json` | `{ grupos: [{ id, nombre, miembros: [{ categoria, nombre }], creadoPor, creadoEl }] }`: los grupos propios de personas, gestionados en `js/grupos.js` (ver "Grupos de personas") |
 | `usuarios.json` | `{ nombres: [...] }`: los nombres ya usados para entrar, para el desplegable de la pantalla de entrada (`js/usuarios.js`, fila 72). Comparación exacta a propósito: "Francisco" y "francisco" quedan como dos nombres |
 | `borrados-listas.json` | `{ tipos, estados, tiposDocumento, recurrentes, asuntos }`: cada uno, un array de `{ clave, borradoEl }` con lo borrado de esa lista (`js/borrados-fusion.js`, fila 77). `asuntos` (fila 176, `docs/DATOS-ENTRE-ORDENADORES.md`) son las lápidas de un asunto archivado, mandado a la papelera, unido o renombrado (`{ clave, borradoEl, motivo }`): mientras dure, `App.anotar`/`App.anotarLista` no dejan crear esa clave. No se enseña en ningún sitio salvo Ajustes → Mantenimiento (cuántos hay y quitarlos pasados 90 días) |
+| `informes.json` | `{ ultimoEnviado: 'AAAA-MM-DD' }` (fila 196, `docs/AVISOS-A-QUIEN-LO-PIDE.md`): la fecha del último «Preparar informe para dirección» (`js/cuentas-informe.js`) enviado de verdad, para contar solo los asuntos cerrados desde entonces; sin fichero, se cuentan los últimos 30 días |
 | `datos/*.csv` | Alumnado (Séneca), personal, empresas y otros; `tutores.csv` (fila 166), los tutores legales que ya son tercero de un asunto |
 | `datos/administraciones.json` | Los organismos y centros educativos, su «Depende de» y su árbol de departamentos (fila 167, `docs/contexto/TUTORES-Y-ADMINISTRACIONES.md`). Fuera de los dieciocho: su propia cola y su copia del día |
 | `PAPELERA/` | Las carpetas y ficheros borrados, cada uno en su subcarpeta `AAMMDD-HHMM <nombre>` |

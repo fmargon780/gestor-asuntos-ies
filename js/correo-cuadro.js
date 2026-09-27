@@ -541,6 +541,10 @@ var CorreoCuadro = (function () {
       }
 
       documentosAdjuntados = datos.adjuntos.slice();
+      /* Fila 195 (docs/AVISOS-A-QUIEN-LO-PIDE.md): tras enviar de
+         verdad, "Esta vez no" ya no pinta nada. */
+      var interno = n()._interno;
+      if (interno && interno.avisoLoPide && $('cuadro-aceptar')) $('cuadro-aceptar').textContent = 'Cerrar';
       if (respuesta.hilo) { try { await anadirHiloAlAsunto(a, respuesta.hilo, datos.asunto); } catch (e) { /* accesorio */ } }
       if (n().marcarEnvioRealizado) n().marcarEnvioRealizado();
       if (n().apuntarElRastro) n().apuntarElRastro(a);

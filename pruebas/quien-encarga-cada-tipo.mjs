@@ -110,17 +110,28 @@ await pagina.waitForSelector('#tipo-al-vuelo-panel.oculto', { state: 'attached' 
 await comprobar('el tipo nuevo se guarda con su órgano', organoEnDisco('GUARDIA DE RECREO'), 'JEFATURA');
 
 console.log('--- 3. la parrilla de Nuevo asunto, agrupada ---');
+/* Fila 197 (docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md): sin persona elegida
+   la parrilla ya no está limitada a una categoría (pulsar una
+   pastilla solo filtra el buscador de la izquierda), así que agrupa
+   TODOS los tipos: se descartan aquí los grupos que no traen ninguno
+   de los tres tipos de la prueba, en vez de dar por hecho que solo
+   existen esos tres rótulos. */
 await pagina.fill('#buscar-tipo', '');
 await pagina.dispatchEvent('#buscar-tipo', 'input');
-await pagina.click('#btn-ver-tipos');
+/* Fila 197: sin persona elegida ya no hay "Ver todos" que pulsar (el
+   tope de "los más usados" no aplica con todas las categorías a la
+   vez, js/tipos-buscador.js): todos los tipos ya están a la vista. */
 const grupos = () => pagina.evaluate(() => {
   const salida = [];
   let actual = null;
   Array.prototype.forEach.call(document.getElementById('tipos-lista').children, (el) => {
     if (el.classList.contains('tipos-grupo-organo')) { actual = { grupo: el.textContent, tipos: [] }; salida.push(actual); }
-    else if (el.classList.contains('tipo-boton') && actual && ['MATRICULA', 'GUARDIA DE RECREO', 'BECA'].indexOf(el.textContent) !== -1) actual.tipos.push(el.textContent);
+    else if (el.classList.contains('tipo-boton') && actual) {
+      const nombre = el.dataset.tipo || el.textContent;
+      if (['MATRICULA', 'GUARDIA DE RECREO', 'BECA'].indexOf(nombre) !== -1) actual.tipos.push(nombre);
+    }
   });
-  return salida.map(g => g.grupo + ': ' + g.tipos.join(', '));
+  return salida.filter(g => g.tipos.length).map(g => g.grupo + ': ' + g.tipos.join(', '));
 });
 await comprobar('los rótulos, en su orden, y cada tipo bajo el suyo', grupos(),
   ['Secretaría: MATRICULA', 'Jefatura de Estudios: GUARDIA DE RECREO', 'Sin asignar: BECA']);
@@ -129,7 +140,11 @@ await comprobar('al buscar, solo se ve el rótulo del grupo con resultados',
   pagina.evaluate(() => Array.prototype.filter.call(document.querySelectorAll('#tipos-lista .tipos-grupo-organo'),
     r => !r.classList.contains('oculto')).map(r => r.textContent)), ['Secretaría']);
 await pagina.fill('#buscar-tipo', '');
-await pagina.click('.categoria-boton[data-categoria="EMPRESAS"]');
+
+/* Con una persona elegida, la parrilla sí queda limitada a su
+   categoría (fila 197, punto 2): así se prueba el caso de una sola
+   categoría, sin dar el camino viejo (pastilla = gate) por bueno. */
+await pagina.evaluate(() => { App.E.nuevo.tercero = { nombre: 'Papeles del Sur SL', categoria: 'EMPRESAS', campos: {} }; App.pintarTipos(); });
 await comprobar('en una categoría con todos del mismo órgano, sin rótulos',
   pagina.evaluate(() => document.querySelectorAll('#tipos-lista .tipos-grupo-organo').length),
   await pagina.evaluate(() => {
@@ -137,6 +152,7 @@ await comprobar('en una categoría con todos del mismo órgano, sin rótulos',
     App.E.tipos.filter(t => t.categoria === 'EMPRESAS').forEach(t => { o[TiposOrgano.deTipo(t)] = true; });
     return Object.keys(o).length < 2 ? 0 : Object.keys(o).length;
   }));
+await pagina.evaluate(() => { App.E.nuevo.tercero = null; App.pintarTipos(); });
 
 console.log('--- 4. el filtro «Lo encarga» ---');
 await pagina.click('.pestana[data-pantalla="abiertos"]');

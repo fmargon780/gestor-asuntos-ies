@@ -315,6 +315,89 @@ mentira) y `pruebas/correo-enviar.mjs` (`leerUrl`/`guardarUrl`/`enviar`/`probar`
 prepararon esta fila: no hay cuenta de Google en ese entorno; los pasos que Francisco tiene que
 comprobar a mano están en `docs/COMPROBAR-A-MANO.md`.
 
+### Avisar a quien lo pide, y «Enviar estado» (27-sep-2026, fila 195,
+### docs/AVISOS-A-QUIEN-LO-PIDE.md, apartados 1, 2 y 3)
+
+El resto del centro no entra en el gestor: pide y consulta por correo, y Administración sigue
+siendo la única que escribe. `js/avisos-lo-pide.js` (`window.AvisosLoPide`) abre el cuadro de
+Correo ya relleno; **nunca envía nada por su cuenta** — sigue mandando `js/correo-cuadro.js`, con
+«Enviar».
+
+- **Dos campos por hito** (`avisarLoPide`, `avisarLoPidePlantilla`), como cualquier otro campo del
+  paso de la guía (junto a `soloInformativo`, `normativa`…): viven en `js/guias-paso-bloques.js`
+  (la casilla «Al terminar este hito, avisar a quien lo pide» y el desplegable «Con la plantilla:»),
+  se leen en `js/guias-editor.js` (`recoger`), llegan al hito de un asunto por `js/hitos.js`
+  (`normalizarHito`, `pasoAHito`) y entran en `CAMPOS_COMPARABLES` de `js/hitos-biblioteca.js`. Un
+  hito de antes de esta fila se comporta como si no avisara.
+- **Un campo por tipo** (`avisarLoPideCierre`, `avisarLoPideCierrePlantilla`), en Ajustes › el
+  tipo › Datos del tipo (`js/ajustes-tipo.js`): «Al cerrar el asunto, avisar a quien lo pide».
+- **Al marcar un hito hecho** con su casilla encendida (`js/hitos-panel-lista.js`,
+  `marcarDesdeCasilla`, el único punto por el que pasan la lista, la mesa y el guion completo):
+  si el asunto tiene «Lo pide» con correo (`LoPide.correoDe`), se abre el cuadro con la plantilla
+  del hito. El botón de cerrar dice **«Esta vez no»** en vez de «Cerrar» mientras no se haya
+  enviado (se cambia a «Cerrar» tras un envío real, en `js/correo-cuadro.js`); se cierre como se
+  cierre, se marca `avisoLoPideHecho` en el propio hito (`Hitos.cambiar`) y no se vuelve a
+  preguntar por ese mismo hito.
+- **Al archivar** un asunto de un tipo con su casilla encendida: igual, con «Aviso de cierre»,
+  **antes** de mover la carpeta — `js/avisos-lo-pide.js` envuelve `App.cerrarAsunto` por fuera de
+  la envoltura de `js/ficha-archivo.js` (cargado después en `index.html`, así queda por fuera y
+  se ejecuta primero); se archiva igual, decida lo que decida el cuadro.
+- **«Enviar estado»**: el mismo cuadro, con «Aviso de avance» y el hito actual (para
+  `{{HITO}}`/`{{HITON}}`/`{{HITOSM}}`), sin marcar nada ni impedir que se vuelva a abrir. Vive
+  dentro de «El encargo» de la ficha (`js/ficha-bloques.js`, solo si «Lo pide» tiene correo, para
+  no tocar los cinco elementos fijos de `#ficha-acciones`) y en el menú «···» de la mesa del hito
+  (`js/hito-mesa.js`, por el mismo motivo: la cabecera de la mesa no tiene margen de sobra —
+  fila 50 — y `.mesa-acciones` está fijado a cinco botones — prueba
+  `mesa-del-hito-enfocada.mjs`).
+- **Las dos plantillas** («Aviso de avance», «Aviso de cierre») se crean solas, la primera vez
+  que hacen falta (`AvisosLoPide.asegurarPlantillas`, como «Cargar las plantillas del centro»),
+  **sin categoría ni tipo**: `Plantillas.deTipo` (`js/plantillas.js`) trata una plantilla sin
+  `categoria` o sin `tipo` como válida para cualquier asunto — ninguna plantilla de antes de esta
+  fila se queda nunca sin uno de los dos, así que esto no cambia nada de lo que ya había.
+- **Dos huecos nuevos** en el catálogo (`Plantillas.HUECOS`, js/plantillas.js): `{{HITON}}` y
+  `{{HITOSM}}` (el número del hito actual y el total, con la misma cuenta que «Hito N de M»),
+  resueltos por `Plantillas.valoresDeAsunto(a, { hito })` — `js/correo.js` ahora pasa el hito
+  (`I.hitoActual`) a esa llamada, cosa que no hacía hasta esta fila.
+- Sin «Lo pide» con correo, no pasa nunca nada: ni al marcar, ni al archivar, ni con «Enviar
+  estado» (avisa en rojo y no abre el cuadro). Prueba: `pruebas/avisos-a-quien-lo-pide.mjs`.
+
+### «Preparar informe para dirección» (27-sep-2026, fila 196,
+### docs/AVISOS-A-QUIEN-LO-PIDE.md, apartado 4)
+
+Botón en Cuentas (`js/cuentas-informe.js`, `window.CuentasInforme`), junto a «← Volver». Abre el
+cuadro de Correo **sin destinatario** (lo elige quien lo manda: `a` es un asunto de mentira,
+`{ nombre, ficha: {}, leido: {} }`, así que `CorreoCuadro` no encuentra a nadie de Séneca y deja
+«Para» vacío) y **sin ninguna plantilla**: el asunto del correo (`{{ASUNTO}}` sin elección, fila
+55) y el cuerpo entero se fijan con `extra.asuntoListo`/`extra.medioListo`, que ya usa el
+«Comunicar» de un hito.
+
+Los cinco apartados, todos «con lo que Cuentas ya sabe»:
+
+1. **Por quién lo encarga**: `Cuentas._porOrgano` (ya existía), solo los que tienen algún abierto.
+2. **Vencidos**: los asuntos abiertos con `Plazos.de(ficha.limite)` en negativo — el mismo cálculo
+   que `js/avisos.js`. Reservados sin el tercero (`Reservados.tapar`).
+3. **Esperando a otros más de 15 días**: `QueMeToca.reunir`/`clasificar`/`diasParado`, el mismo
+   cálculo que «Esperamos a otros» de Inicio.
+4. **Cerrados desde el último informe**: se compara `cerradoEl` de cada archivado
+   (`Cuentas.cargar().entradas`) con la fecha guardada en `_GESTOR/informes.json`
+   (`{ ultimoEnviado }`); sin fichero (la primera vez), los últimos 30 días.
+5. **Tiempo medio de tramitación**: `Cuentas._tiempoDeTramite` del curso actual, si hay algún
+   archivado con las dos fechas; si no, esa línea no sale (es la única de las cinco marcada como
+   opcional en el propio encargo).
+
+`_GESTOR/informes.json` solo se escribe **si se ha enviado de verdad** (se mira
+`CorreoNucleo._interno.envioRealizado` después de que el cuadro se cierre, no solo al abrirlo):
+abrir el cuadro y cerrarlo sin mandar nada no adelanta la fecha, así que el próximo informe no
+se come de en medio los asuntos que se cerraron mientras tanto. `Cuentas.cargar` (antes privada)
+se exporta para no repetir la lógica de juntar abiertos y archivados. Sin recordatorio
+automático: solo este botón. Prueba: `pruebas/cuentas-informe.mjs`.
+
+Nota conocida: al enviarlo, `js/correo-rastro.js` intenta apuntar el rastro en «el asunto» de
+siempre y no lo encuentra (el informe no es un asunto de verdad): sale un aviso ámbar pequeño,
+contenido, dentro del propio cuadro («No he podido apuntarlo en el asunto…»), sin afectar al
+envío ni a nada más. No se ha tocado `correo-rastro.js` para evitarlo: es un mensaje de una vez,
+sin coste real.
+
 ### Plantillas de correo y de mensaje de Séneca
 
 Una plantilla es **solo el cuerpo del medio**: el saludo y la despedida los sigue poniendo

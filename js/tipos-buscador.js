@@ -97,23 +97,34 @@
     }
     if (caja) caja.classList.remove('oculto');
 
-    /* Primero los más usados; a igualdad de uso, por orden alfabético. */
+    /* Primero los más usados; a igualdad de uso, por orden alfabético.
+       Fila 197: sin persona elegida cada botón lleva también su
+       categoría, en un <small> (`b.dataset.tipo` es el nombre de
+       verdad, sin ella). */
     botones.sort(function (a, b) {
-      var na = a.textContent.trim(), nb = b.textContent.trim();
+      var na = a.dataset.tipo || a.textContent.trim(), nb = b.dataset.tipo || b.textContent.trim();
       var ca = cuenta[na] || 0, cb = cuenta[nb] || 0;
       if (cb !== ca) return cb - ca;
       return na < nb ? -1 : 1;
     });
     botones.forEach(function (b) { lista.appendChild(b); });
 
+    /* Fila 197: sin persona elegida la parrilla enseña TODOS los
+       tipos, de todas las categorías (hasta 40 y más); el tope de "los
+       más usados de partida" tiene sentido para los 10-30 de una sola
+       categoría, no para esconder la mayoría de un catálogo entero
+       detrás de "Ver todos". Con persona elegida (una sola categoría),
+       el tope de siempre sigue igual. */
+    var todasCategorias = lista.classList.contains('tipos-todas-categorias');
+
     var ensenados = 0;
     botones.forEach(function (b) {
-      var texto = U.normalizar(b.textContent);
+      var texto = U.normalizar(b.dataset.tipo || b.textContent);
       var cabe = !q || texto.indexOf(q) !== -1;
 
       /* Sin buscar nada, solo los más usados, salvo que se pida verlos
          todos. El que ya está elegido no se esconde nunca. */
-      if (cabe && !q && !verTodos &&
+      if (cabe && !q && !verTodos && !todasCategorias &&
           ensenados >= CUANTOS_DE_PARTIDA && !b.classList.contains('elegido')) {
         cabe = false;
       }
@@ -124,7 +135,7 @@
     vacio.classList.toggle('oculto', ensenados > 0);
 
     var sobran = botones.length - CUANTOS_DE_PARTIDA;
-    if (q || sobran <= 0) {
+    if (q || sobran <= 0 || todasCategorias) {
       botonVerTodos.classList.add('oculto');
     } else {
       botonVerTodos.classList.remove('oculto');

@@ -113,12 +113,19 @@
      mientras se guarda. */
   async function abrirLoPide(a, control) {
     var tieneDato = !!(a.ficha.loPide && a.ficha.loPide.nombre);
+    var tieneCorreo = tieneDato && window.LoPide && !!LoPide.correoDe(a.ficha);
     var pieQuitar = tieneDato
       ? '<button type="button" class="boton" id="lopide-quitar" style="margin-top:10px">Quitar el dato</button>'
       : '';
+    /* «Enviar estado» (fila 195, docs/AVISOS-A-QUIEN-LO-PIDE.md, punto
+       3): junto a "El encargo", sin tocar la barra de acciones (que
+       se queda en sus cinco elementos de siempre). */
+    var pieEnviarEstado = (tieneCorreo && window.AvisosLoPide)
+      ? '<button type="button" class="boton" id="lopide-enviar-estado" style="margin-top:10px">Enviar estado</button>'
+      : '';
     var promesa = U.preguntar('El encargo',
       '<p class="explica">Quién ha pedido esta gestión, por qué vía y en qué fecha.</p>' +
-      '<div id="lopide-caja-ficha"><p class="nota">Cargando…</p></div>' + pieQuitar, 'Guardar');
+      '<div id="lopide-caja-ficha"><p class="nota">Cargando…</p></div>' + pieQuitar + pieEnviarEstado, 'Guardar');
     var caja = $('lopide-caja-ficha');
     var aceptar = $('cuadro-aceptar');
     aceptar.disabled = true;
@@ -133,6 +140,10 @@
     var btnQuitar = $('lopide-quitar');
     if (btnQuitar) {
       btnQuitar.onclick = function () { quitado = true; $('cuadro-cancelar').click(); };
+    }
+    var btnEnviarEstado = $('lopide-enviar-estado');
+    if (btnEnviarEstado) {
+      btnEnviarEstado.onclick = function () { AvisosLoPide.enviarEstado(a); };
     }
 
     var ok = await promesa;

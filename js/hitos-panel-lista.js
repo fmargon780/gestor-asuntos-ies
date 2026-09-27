@@ -46,6 +46,13 @@ var HitosPanelLista = (function () {
       (faltan.length === 1 ? ' cosa sin reunir.' : ' cosas sin reunir.') : '';
     try {
       await U.mientrasGuarda(casillaEl, function () { return Hitos.marcar(a.nombre, h.id, nuevoEstado, nota); });
+      /* «Avisar a quien lo pide» (fila 195): solo al marcar hecho, con
+         el hito ya actualizado en memoria. Un aviso roto no debe
+         impedir que el hito quede marcado. */
+      if (nuevoEstado === 'hecho' && window.AvisosLoPide) {
+        h.estado = 'hecho';
+        try { await AvisosLoPide.alMarcarHecho(a, h); } catch (e) { /* ver arriba */ }
+      }
       return true;
     } catch (e) {
       casillaEl.checked = !casillaEl.checked;

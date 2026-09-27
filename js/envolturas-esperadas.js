@@ -28,6 +28,7 @@
      Ajustes → Mantenimiento. */
   var ESPERADAS = [
     { fichero: 'archivo-personas.js', nombre: 'App.verDocumentos' },
+    { fichero: 'avisos-lo-pide.js', nombre: 'App.cerrarAsunto' },
     { fichero: 'avisos-que-faltan.js', nombre: 'App.verAbiertos' },
     { fichero: 'bandeja-adjuntos-lector.js', nombre: 'window.Bandeja.llevarANuevo' },
     { fichero: 'copiar.js', nombre: 'App.tarjetaAsunto' },

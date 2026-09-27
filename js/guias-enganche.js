@@ -71,23 +71,45 @@
 
   /* ---------- la guía como recordatorio, al crear el asunto ----------
 
-     Aquí sale sin casillas: todavía no hay asunto que marcar. Es para
-     ver de un vistazo en qué se está metiendo uno. */
+     Fila 197 (docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md, punto 2): al pulsar
+     un tipo, arriba de la parrilla sale el resumen de su guía en una
+     línea (Guias.resumenDeTipo); pulsable, despliega la guía entera
+     -lo que antes se enseñaba siempre al fondo del formulario, en el
+     mismo `#guia-nuevo`- y se vuelve a plegar. */
 
   function pintarGuiaNuevo() {
     var caja = $('guia-nuevo');
-    if (!caja) return;
+    var resumenCaja = $('guia-resumen-nuevo');
+    if (!caja || !resumenCaja) return;
+    caja.className = 'oculto';
+    caja.innerHTML = '';
+
     var elegido = document.querySelector('#tipos-lista .tipo-boton.elegido');
-    var tipo = elegido ? elegido.textContent.trim() : '';
-    var pasos = pasosDe(tipo);
-    if (!pasos.length) {
-      caja.className = 'oculto';
-      caja.innerHTML = '';
+    var tipo = elegido ? (elegido.dataset.tipo || elegido.textContent.trim()) : '';
+    if (!tipo) {
+      resumenCaja.className = 'guia-resumen oculto';
+      resumenCaja.textContent = '';
+      resumenCaja.onclick = null;
       return;
     }
-    caja.className = 'guia-caja';
-    caja.innerHTML = '<div class="guia-rotulo">Hitos de un asunto ' + U.escapar(tipo) + '</div>' +
-                     Guias.vista(pasos, [], false);
+
+    var tipoObj = (window.App && App.E.tipos || []).filter(function (t) { return t.tipo === tipo; })[0] || { tipo: tipo };
+    var resumen = Guias.resumenDeTipo(tipoObj);
+    resumenCaja.className = 'guia-resumen' + (resumen.pasos.length ? '' : ' guia-resumen-vacia');
+    resumenCaja.textContent = resumen.texto;
+
+    if (!resumen.pasos.length) { resumenCaja.onclick = null; return; }
+    resumenCaja.onclick = function () {
+      var abierta = !caja.classList.contains('oculto');
+      if (abierta) {
+        caja.className = 'oculto';
+        caja.innerHTML = '';
+      } else {
+        caja.className = 'guia-caja';
+        caja.innerHTML = '<div class="guia-rotulo">Hitos de un asunto ' + U.escapar(tipo) + '</div>' +
+                         Guias.vista(resumen.pasos, [], false);
+      }
+    };
   }
 
   /* ---------- la tabla de Ajustes ---------- */

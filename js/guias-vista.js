@@ -253,11 +253,37 @@
     return marcados;
   }
 
+  /* ==========================================================
+     EL RESUMEN DE UNA LÍNEA (fila 197, docs/NUEVO-ASUNTO-PERSONA-
+     PRIMERO.md, punto 2): «7 hitos · 3 documentos · plazo de 20 días ·
+     lo encarga Jefatura», que sale al pulsar un tipo en Nuevo asunto
+     (js/guias-enganche.js pinta y pliega/despliega; aquí solo se
+     calcula el texto y se devuelven los pasos ya normalizados, para no
+     tener que normalizarlos otra vez al desplegar la guía entera).
+     `t` es el objeto del tipo (con `.tipo`, `.categoria`, `.plazo` y,
+     si lo tiene, `.organo`). */
+  function resumenDeTipo(t) {
+    var pasos = G.normalizar((window.GuiasDelCentro && GuiasDelCentro.pasosDe(t.tipo)) || []);
+    if (!pasos.length) {
+      return { pasos: pasos, texto: 'Sin guía: el asunto se crea sin hitos.' };
+    }
+    var documentos = 0;
+    pasos.forEach(function (p) { documentos += (p.plantillasDocumento || []).length; });
+    var trozos = [pasos.length + (pasos.length === 1 ? ' hito' : ' hitos')];
+    if (documentos) trozos.push(documentos + (documentos === 1 ? ' documento' : ' documentos'));
+    var dias = window.App && App.plazoDeTipo ? App.plazoDeTipo(t.tipo) : null;
+    if (dias) trozos.push('plazo de ' + dias + (dias === 1 ? ' día' : ' días'));
+    var organo = window.TiposOrgano ? TiposOrgano.deTipo(t) : '';
+    if (organo) trozos.push('lo encarga ' + TiposOrgano.texto(organo));
+    return { pasos: pasos, texto: trozos.join(' · ') };
+  }
+
   Object.assign(G, {
     vista: vista,
     hechosDe: hechosDe,
     cuenta: cuenta,
     cuandoSeElige: cuandoSeElige,
-    abrir: abrir
+    abrir: abrir,
+    resumenDeTipo: resumenDeTipo
   });
 })();

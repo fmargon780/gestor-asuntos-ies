@@ -85,6 +85,13 @@ var Plantillas = (function () {
     { clave: 'quienlopiderelacion', etiqueta: 'Quien lo pide: qué es del interesado' },
     { clave: 'quienlopidevia', etiqueta: 'Quien lo pide: por dónde lo pidió' },
     { clave: 'quienlopidefecha', etiqueta: 'Quien lo pide: fecha' },
+    /* «Avisar a quien lo pide» (27-sep-2026, fila 195,
+       docs/AVISOS-A-QUIEN-LO-PIDE.md): el número del hito actual y
+       cuántos hay en total, para las plantillas "Aviso de avance" y
+       "Aviso de cierre". Solo se rellenan cuando se avisa desde un
+       hito concreto (`Plantillas.valoresDeAsunto(a, {hito})`). */
+    { clave: 'hiton', etiqueta: 'Número del hito actual' },
+    { clave: 'hitosm', etiqueta: 'Total de hitos del asunto' },
     /* "Pedir lo que falta" (18-sep-2026, fila 59, docs/REQUISITOS-DE-HITO.md,
        sección 7): un hueco distinto, con doble llave a propósito, para
        que se note que no es un dato del asunto como los demás, sino un
@@ -216,10 +223,16 @@ var Plantillas = (function () {
     return window.TiposNombre ? TiposNombre.nombresDe(tipo) : [U.normalizar(tipo || '')];
   }
 
+  /* Fila 195 (docs/AVISOS-A-QUIEN-LO-PIDE.md): una plantilla sin
+     categoría ni tipo ("Aviso de avance", "Aviso de cierre") vale para
+     cualquier asunto — ninguna plantilla de antes de esta fila se
+     queda nunca sin categoría o sin tipo, así que esto no cambia lo
+     que ya había. */
   function deTipo(datos, categoria, tipo) {
     var nombres = nombresDelTipo(tipo);
     return ((datos && datos.lista) || []).filter(function (p) {
-      return p.categoria === categoria && (p.tipo === tipo || nombres.indexOf(U.normalizar(p.tipo || '')) !== -1);
+      if (p.categoria && p.categoria !== categoria) return false;
+      return !p.tipo || p.tipo === tipo || nombres.indexOf(U.normalizar(p.tipo || '')) !== -1;
     });
   }
 
@@ -289,7 +302,7 @@ var Plantillas = (function () {
   /* Resuelve un hueco ya reconocido (o "{campo:...}"), y apunta en
      `faltan` si no hay dato. Común a la llave sencilla y a la doble
      (`resolverHuecosDobles`, más abajo). */
-  var SIN_FALTA = ['hito', 'plazo del hito'];
+  var SIN_FALTA = ['hito', 'plazo del hito', 'hiton', 'hitosm'];
 
   /* Fila 155 (docs/WORD-DENTRO-DE-LA-APP.md, A): lo escrito a mano en
      «Faltan datos para este documento», por el mismo nombre con el que
