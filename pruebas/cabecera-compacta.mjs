@@ -86,7 +86,7 @@ async function preparar(ancho, alto) {
     window.Docx.rellenar = async () => ({ blob: new Blob(['doc']), faltan: [] });
     await App.verAbiertos();
   }, [ASUNTO, DOCS]);
-  await pagina.locator('.tarjeta-nombre', { hasText: ASUNTO }).first().click();
+  await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ASUNTO + '"] .nombre-pulsable').first().click();
   await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
   await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
   await pagina.waitForTimeout(400);

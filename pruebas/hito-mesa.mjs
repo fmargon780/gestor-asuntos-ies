@@ -92,7 +92,9 @@ async function preparar(ancho, alto) {
     window.Docx.rellenar = async () => ({ blob: new Blob(['doc']), faltan: [] });
     await App.verAbiertos();
   }, [ASUNTO, DOCS]);
-  await pagina.locator('.tarjeta-nombre', { hasText: ASUNTO }).first().click();
+  /* Fila 209: la celda de la tabla ya no lleva el nombre entero de la
+     carpeta (solo el tercero); se busca por `data-asunto`. */
+  await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ASUNTO + '"] .nombre-pulsable').first().click();
   await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
   await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
   await pagina.waitForTimeout(400);
@@ -239,12 +241,13 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
     pagina.evaluate(() => FichaTarjetas.abierta()), 'hitos');
   await pagina.click('.pestana[data-pantalla="abiertos"]');
   await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+  await pagina.click('.inicio-pestana[data-pestana="adm"]');
   await pagina.evaluate(() => window.Inicio && window.Inicio.repintar());
-  await pagina.waitForSelector('#inicio-me-toca-lista .inicio-fila[data-hito="m1"]', { state: 'attached' });   /* la lista se pinta un momento después */
-  await pagina.evaluate(() => document.querySelector('#inicio-me-toca-lista .inicio-fila[data-hito="m1"]').click());
+  await pagina.waitForSelector('#inicio-tabla-cuerpo tr[data-hito="m1"]', { state: 'attached' });   /* la lista se pinta un momento después */
+  await pagina.evaluate(() => document.querySelector('#inicio-tabla-cuerpo tr[data-hito="m1"]').click());
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.waitForTimeout(700);
-  await comprobar('7. desde "Me toca" (Inicio), directo en la mesa del hito',
+  await comprobar('7. desde "En Administración" (Inicio), directo en la mesa del hito',
     pagina.locator('#ficha-guia.con-mesa .hito-en-mesa[data-id="m1"]').isVisible(), true);
 
   /* 8. */

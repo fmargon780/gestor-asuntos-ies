@@ -104,7 +104,7 @@ async function leerRutasJson() {
 async function abrirAbierto() {
   await pagina.evaluate(() => App.ir('abiertos'));
   await pagina.waitForTimeout(150);
-  await pagina.locator('.tarjeta-nombre', { hasText: ABIERTO }).first().click();
+  await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ABIERTO + '"] .nombre-pulsable').first().click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.waitForSelector('.ficha-copiar-fila');
 }

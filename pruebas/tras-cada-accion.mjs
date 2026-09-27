@@ -73,9 +73,9 @@ await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await comprobar('1. «Volver» desde ahí lleva a Asuntos abiertos, no al formulario', visible('abiertos'), true);
 
 /* ============================================================
-   2. Volver desde una fila de "Me toca" (Inicio, fila 191)
+   2. Volver desde una fila de "En Administración" (Inicio, fila 209)
    ============================================================ */
-console.log('--- 2. volver desde una fila de "Me toca" ---');
+console.log('--- 2. volver desde una fila de "En Administración" ---');
 await pagina.evaluate(async () => {
   var nombre = App.E.listaAbiertos[0].nombre;
   var ayer = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
@@ -88,8 +88,9 @@ await pagina.evaluate(async () => {
   });
   if (window.Inicio) await window.Inicio.repintar();
 });
-await pagina.waitForSelector('#inicio-me-toca-lista .inicio-fila');
-await pagina.click('#inicio-me-toca-lista .inicio-fila');
+await pagina.click('.inicio-pestana[data-pestana="adm"]');
+await pagina.waitForSelector('#inicio-tabla-cuerpo tr[data-hito="me-toca-1"]');
+await pagina.click('#inicio-tabla-cuerpo tr[data-hito="me-toca-1"]');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(150);
@@ -99,6 +100,11 @@ await comprobar('2. vuelve a Inicio', visible('abiertos'), true);
    3. La lista conserva la altura
    ============================================================ */
 console.log('--- 3. la lista conserva la altura ---');
+/* La sección 2 ha dejado activa la pestaña "En Administración" (fila
+   209): esta prueba necesita "Todos los abiertos", la única con
+   sesenta filas de sobra para hacer scroll de verdad. */
+await pagina.click('.inicio-pestana[data-pestana="todos"]');
+await pagina.waitForTimeout(150);
 await pagina.evaluate(async () => {
   for (let i = 10; i < 70; i++) {
     await window.__disco.abiertos.getDirectoryHandle('2609' + i + ' CONSULTA Relleno Número ' + i, { create: true });

@@ -333,8 +333,8 @@
   }
 
   U.envolver(App, 'App.tarjetaSuelto', 'papelera.js', function (comoEra) {
-    return function (s, pie, esNuevo) {
-      var div = comoEra(s, pie, esNuevo);
+    return function (s, pie, esNuevo, compacta) {
+      var div = comoEra(s, pie, esNuevo, compacta);
       var acciones = div.querySelector('.acciones');
       if (!acciones) return div;
       var borrar = botonBorrar(async function () {

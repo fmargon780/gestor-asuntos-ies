@@ -74,7 +74,7 @@ await pagina.waitForTimeout(300);
 async function abrirFicha(nombre) {
   await pagina.evaluate(() => App.ir('abiertos'));
   await pagina.waitForTimeout(200);
-  await pagina.locator('.tarjeta-nombre', { hasText: nombre }).first().click();
+  await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + nombre + '"] .nombre-pulsable').first().click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.waitForTimeout(400);
 }

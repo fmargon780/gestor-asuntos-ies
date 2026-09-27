@@ -117,7 +117,7 @@ await pagina.route(URL_ENVIO.split('?')[0] + '**', async (route) => {
 async function abrirCorreoDe(nombreAsunto) {
   await pagina.evaluate(() => App.ir('abiertos'));
   await pagina.waitForTimeout(200);
-  await pagina.locator('.tarjeta-nombre', { hasText: nombreAsunto }).click();
+  await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + nombreAsunto + '"] .nombre-pulsable').click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   /* Fila 154: con hitos, «Comunicar» de arriba va escondido (vive en la mesa del hito); su menú se pulsa por debajo. */
   await pagina.waitForSelector('.boton-comunicar', { state: 'attached' });

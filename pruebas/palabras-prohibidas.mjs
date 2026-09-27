@@ -19,7 +19,9 @@ const PROHIBIDAS = [
   'Receta:',
   'Formularios oficiales',
   'Poner nombre',
-  'Editar el asunto'
+  'Editar el asunto',
+  'Me toca',
+  'Esperamos a otros'
 ];
 
 /* El código no usa comentarios de línea (`//`): basta con quitar los de bloque. */

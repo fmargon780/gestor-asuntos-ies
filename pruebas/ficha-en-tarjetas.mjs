@@ -78,7 +78,10 @@ async function preparar(ancho, alto) {
 async function abrirFicha(pagina) {
   await pagina.evaluate(() => App.ir('abiertos'));
   await pagina.waitForTimeout(200);
-  await pagina.locator('.tarjeta-nombre', { hasText: ASUNTO }).first().click();
+  /* Fila 209: la celda de la tabla ya no lleva el nombre entero de la
+     carpeta (solo el tercero); se busca por `data-asunto`, que sí lo
+     lleva siempre. */
+  await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ASUNTO + '"] .nombre-pulsable').first().click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
   await pagina.waitForTimeout(500);
@@ -198,8 +201,10 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
 
   /* 7. */
   await pagina.keyboard.press('Escape');
-  /* m1 necesita responsable y fecha para salir en "Me toca" (Inicio,
-     fila 191): esta guía no le pone ninguno de los dos. */
+  /* m1 necesita responsable de Administración para salir en "En
+     Administración" (Inicio, fila 209): esta guía no se lo pone. La
+     fecha ya no hace falta desde la fila 209 (sale igual, con "Sin
+     plazo"), pero se le pone también para comprobar el hito vencido. */
   await pagina.evaluate(async (asunto) => {
     var hoy = new Date().toISOString().slice(0, 10);
     await Hitos.cambiar(function (datos) {
@@ -211,13 +216,14 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   }, ASUNTO);
   await pagina.click('.pestana[data-pantalla="abiertos"]');
   await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+  await pagina.click('.inicio-pestana[data-pestana="adm"]');
   await pagina.evaluate(() => window.Inicio && window.Inicio.repintar());
   /* La lista se pinta un momento después de verse la pantalla (lee los hitos). */
-  await pagina.waitForSelector('#inicio-me-toca-lista .inicio-fila[data-hito="m1"]', { state: 'attached' });
-  await pagina.evaluate(() => document.querySelector('#inicio-me-toca-lista .inicio-fila[data-hito="m1"]').click());
+  await pagina.waitForSelector('#inicio-tabla-cuerpo tr[data-hito="m1"]', { state: 'attached' });
+  await pagina.evaluate(() => document.querySelector('#inicio-tabla-cuerpo tr[data-hito="m1"]').click());
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.waitForTimeout(600);
-  await comprobar('7. desde "Me toca" (Inicio), entra con Hitos en grande', abierta(pagina), 'hitos');
+  await comprobar('7. desde "En Administración" (Inicio), entra con Hitos en grande', abierta(pagina), 'hitos');
   await comprobar('7. y el hito desplegado',
     pagina.locator('#ficha-guia .hito[data-id="m1"] .hito-cuerpo').isVisible(), true);
 

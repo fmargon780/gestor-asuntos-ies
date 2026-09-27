@@ -392,13 +392,14 @@ window.Presencia = Presencia;
   /* Fila 192: la lista de abiertos pasa a ser la tabla "Todos los
      asuntos abiertos" (App.filaTablaAsunto, js/asuntos-lista-pintar.js),
      que ya no pasa por App.tarjetaAsunto (esa sigue viva solo para el
-     ARCHIVO). Misma marca, en la celda del nombre. */
+     ARCHIVO). Misma marca, en la celda del tercero (antes «Asunto»;
+     fila 209, docs/INICIO-EN-PESTANAS.md). */
   U.envolver(window.App, 'App.filaTablaAsunto', 'presencia.js', function (comoEra) {
-    return function (a) {
-      var tr = comoEra(a);
+    return function (a, opciones) {
+      var tr = comoEra(a, opciones);
       var quien = Presencia.ocupantePor(a.nombre);
       if (!quien) return tr;
-      var nombre = tr.querySelector('.inicio-tabla-nombre .nombre-pulsable');
+      var nombre = tr.querySelector('.inicio-tabla-tercero .nombre-pulsable');
       if (!nombre) return tr;
       var marca = document.createElement('span');
       marca.className = 'marca-presencia';

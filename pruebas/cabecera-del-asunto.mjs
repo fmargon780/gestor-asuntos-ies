@@ -69,7 +69,7 @@ await pagina.waitForTimeout(300);
 async function abrirFicha(nombre) {
   await pagina.evaluate(() => App.ir('abiertos'));
   await pagina.waitForTimeout(200);
-  await pagina.locator('.tarjeta-nombre', { hasText: nombre }).first().click();
+  await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + nombre + '"] .nombre-pulsable').first().click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.waitForTimeout(300);
 }
@@ -289,7 +289,7 @@ await pagina.evaluate(async (rico) => {
     usuario: 'Juan', asuntos: { [rico]: { ultima: new Date().toISOString() } }
   })));
 }, RICO);
-await pagina.locator('.tarjeta-nombre', { hasText: RICO }).first().click();
+await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + RICO + '"] .nombre-pulsable').first().click();
 await pagina.waitForSelector('.aviso-presencia');
 
 await pagina.click('.ficha-nombre-menu-boton');

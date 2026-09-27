@@ -58,7 +58,9 @@ await pagina.waitForSelector('#aplicacion:not(.oculto)');
 await pagina.waitForTimeout(300);
 await pagina.evaluate(() => App.ir('abiertos'));
 await pagina.waitForTimeout(200);
-await pagina.locator('.tarjeta-nombre', { hasText: ASUNTO }).first().click();
+/* Fila 209: la tabla ya no lleva el nombre entero de la carpeta en
+   ninguna celda; se busca la fila por `data-asunto`. */
+await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ASUNTO + '"] .nombre-pulsable').first().click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(300);
 

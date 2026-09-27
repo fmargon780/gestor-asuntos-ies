@@ -29,29 +29,46 @@ App.textoBusquedaSimple = function (a) {
   return U.normalizar([a.nombre, a.leido && a.leido.tipo, tercero].filter(Boolean).join(' '));
 };
 
+/* La lista de "Todos los abiertos", filtrada y SIN ordenar todavía
+   (fila 209, docs/INICIO-EN-PESTANAS.md): la usa App.pintarAbiertos
+   para pintar la pestaña, y js/inicio-tabla.js para el número de su
+   pestaña aunque no sea la activa ahora mismo, sin repintar la tabla
+   dos veces. Incluye el filtro-de-aviso (el chip "Filtrado por…") si
+   hay uno activo (js/inicio-tabla.js, InicioTabla.avisoActivo). */
+App.listaAbiertosFiltrada = function () {
+  var texto = U.normalizar($('buscar-abiertos').value);
+  var filtro = $('filtro-estado').value;
+  var plazo = $('filtro-plazo').value;
+  var organo = $('filtro-organo') ? $('filtro-organo').value : '';   /* fila 134 */
+  var tipo = $('filtro-tipo-asunto') ? $('filtro-tipo-asunto').value : '';   /* fila 192 */
+  var aviso = (window.InicioTabla && InicioTabla.avisoActivo) ? InicioTabla.avisoActivo() : null;
+
+  return App.E.listaAbiertos.filter(function (a) {
+    if (texto && App.textoBusquedaSimple(a).indexOf(texto) === -1) return false;
+    if (!Plazos.pasaFiltro(a.ficha.limite || '', plazo)) return false;
+    if (organo && window.TiposOrgano && !TiposOrgano.pasaFiltro(App.tipoDeAsunto(a), organo)) return false;
+    if (tipo && App.tipoDeAsunto(a) !== tipo) return false;
+    if (aviso && !aviso.nombres.has(a.nombre)) return false;
+    return App.pasaFiltroMonton(a, filtro);
+  });
+};
+
+/* Pinta la pestaña "Todos los abiertos" (fila 209): sigue siendo LA
+   función que la pinta de verdad, con su nombre de siempre, porque
+   js/unir-asuntos.js la envuelve (U.envolver(App, 'App.pintarAbiertos', ...))
+   para repintar el aviso de duplicados detrás de cada pintado.
+   js/inicio-tabla.js la llama cuando esa es la pestaña activa. */
 App.pintarAbiertos = function () {
   if (window.Reservados) Reservados.pintarBoton();   /* «Mostrar reservados» (fila 135) */
   if (!App.listaALaVista()) { App.E.listaPendiente = true; return; }
   App.E.listaPendiente = false;
   App.pintarFiltroTipoAsunto(App.E.listaAbiertos);
 
-  var texto = U.normalizar($('buscar-abiertos').value);
   var rotulo = $('cuenta-lista-abiertos');
   var orden = App.ordenElegido();
   $('orden-abiertos').value = orden;
-  var filtro = $('filtro-estado').value;
-  var plazo = $('filtro-plazo').value;
-  var organo = $('filtro-organo') ? $('filtro-organo').value : '';   /* fila 134 */
-  var tipo = $('filtro-tipo-asunto') ? $('filtro-tipo-asunto').value : '';   /* fila 192 */
 
-  var lista = App.E.listaAbiertos.filter(function (a) {
-    if (texto && App.textoBusquedaSimple(a).indexOf(texto) === -1) return false;
-    if (!Plazos.pasaFiltro(a.ficha.limite || '', plazo)) return false;
-    if (organo && window.TiposOrgano && !TiposOrgano.pasaFiltro(App.tipoDeAsunto(a), organo)) return false;
-    if (tipo && App.tipoDeAsunto(a) !== tipo) return false;
-    return App.pasaFiltroMonton(a, filtro);
-  });
-
+  var lista = App.listaAbiertosFiltrada();
   lista.sort(App.ORDENES[orden]);
   if (rotulo) rotulo.textContent = lista.length;
   var caja = $('inicio-tabla-cuerpo');
@@ -62,7 +79,7 @@ App.pintarAbiertos = function () {
     App.avisarALosModulos();
     return;
   }
-  lista.forEach(function (a) { caja.appendChild(App.filaTablaAsunto(a)); });
+  lista.forEach(function (a) { caja.appendChild(App.filaTablaAsunto(a, { pestana: 'todos' })); });
   if (window.scrollY !== alto) window.scrollTo(0, alto);
   App.avisarALosModulos();
 };
@@ -253,34 +270,108 @@ App.pintarFiltroTipoAsunto = function (lista) {
   if (sel.selectedIndex === -1) sel.value = '';
 };
 
-/* El <tr> de un asunto en la tabla: Asunto (pulsable, con candado si
-   es reservado), Tipo (con el nombre largo al pasar el ratón, como
-   antes), Hito actual (EstadoHito.marcaHTML, clic incluido), Le toca a
-   (quién tiene ahora el hito, o Administración), Plazo, Abierto y, al
-   final, el menú de tres puntos con «Copiar el nombre» y «Archivar». */
-App.filaTablaAsunto = function (a) {
+/* Los días de espera de la pestaña "En espera" (fila 209; antes
+   filaEsperamos, js/inicio.js): rojo desde 15 días, ámbar desde 7. */
+var DIAS_ESPERA_ROJO = 15;
+var DIAS_ESPERA_AMBAR = 7;
+function claseDias(dias) {
+  if (dias >= DIAS_ESPERA_ROJO) return 'inicio-dias-rojo';
+  if (dias >= DIAS_ESPERA_AMBAR) return 'inicio-dias-ambar';
+  return '';
+}
+
+/* La columna "Le toca a", para las cuatro pestañas (fila 209, apartado
+   3bis de docs/INICIO-EN-PESTANAS.md): arregla la fuga de privacidad
+   que tenía filaEsperamos en js/inicio.js (llamaba a
+   Hitos.resolverResponsable directamente, que para el papel "tercero"
+   devuelve el nombre real, sin pasar por Reservados). `lado.quien` y
+   `lado.esperando.nombre` ya vienen de Hitos.ladoDeAsunto →
+   nombreVisible (js/hitos-a-quien.js), que para los tres papeles fijos
+   (tercero, tutor, relacionado) da siempre un nombre genérico del
+   papel, nunca el nombre real de la persona: así que hoy no hay fuga
+   por ese camino. Aun así, si el asunto está tapado y quien "le toca"
+   es uno de esos tres papeles, se fuerza aquí el nombre genérico (en
+   vez de fiarse de lo que traiga `lado`), para que un cambio futuro en
+   cómo se calcula `lado` no pueda volver a abrir la fuga. */
+var PAPEL_GENERICO = { tercero: 'Tercero', tutor: 'Familia', relacionado: 'Relacionado' };
+
+App.textoLeTocaA = function (a, lado) {
+  if (!lado || lado.lado !== 'terceros') return 'Administración';
+  var tapado = window.Reservados && Reservados.tapar(a);
+  var idResp = lado.esperando ? lado.esperando.a : '';
+  if (tapado && PAPEL_GENERICO[idResp]) return PAPEL_GENERICO[idResp];
+  return lado.esperando ? lado.esperando.nombre : (lado.quien || '');
+};
+
+/* El <tr> de un asunto en la tabla única de Inicio (fila 209): Plazo,
+   Tercero (pulsable, con candado si es reservado), Tipo, Hito actual
+   (EstadoHito.marcaHTML, clic incluido), Le toca a, Inicio (fecha de
+   apertura) y, al final, el menú de tres puntos con «Copiar el
+   nombre» y «Archivar».
+
+   `opciones`: { pestana: 'adm'|'esp'|'todos'|'dorm', hito, dias }.
+   - pestana 'adm': `hito` es el hito de Administración de este asunto
+     (para la columna Plazo y para pulsar la fila, que abre su mesa).
+   - pestana 'esp': `hito` es el hito que espera a otro, `dias` los que
+     lleva esperando (columna Plazo).
+   - pestana 'dorm': `dias` son los que lleva sin novedades (para la
+     columna Plazo, solo si el asunto no tiene plazo propio). */
+App.filaTablaAsunto = function (a, opciones) {
+  opciones = opciones || {};
+  var pestana = opciones.pestana || 'todos';
+
   var tr = document.createElement('tr');
   tr.className = 'inicio-tabla-fila';
+  tr.dataset.asunto = a.nombre;
+  if (opciones.hito) tr.dataset.hito = opciones.hito.id;
 
   var tapado = window.Reservados && Reservados.tapar(a);
   if (tapado) tr.classList.add('inicio-tabla-fila-tapada');
-  var candado = window.Reservados ? Reservados.candadoHtml(a) : '';
-  var nombreVer = window.Reservados ? Reservados.nombreParaVer(a) : a.nombre;
 
-  var tdNombre = document.createElement('td');
-  tdNombre.className = 'inicio-tabla-nombre';
-  var spanNombre = document.createElement('span');
+  /* ---------- Plazo ---------- */
+  var tdPlazo = document.createElement('td');
+  if (pestana === 'adm' && opciones.hito) {
+    var pm = Plazos.etiquetaMeToca(opciones.hito.fecha);
+    var textoPlazo = pm.clase ? pm.texto : 'Sin plazo';   /* "Sin fecha" → "Sin plazo" */
+    tdPlazo.innerHTML = '<span class="marca-plazo' + (pm.clase ? ' ' + pm.clase : '') + '">' +
+      U.escapar(textoPlazo) + '</span>';
+  } else if (pestana === 'esp' && typeof opciones.dias === 'number') {
+    var claseEspera = claseDias(opciones.dias);
+    var textoEspera = opciones.dias === 1 ? '1 día' : opciones.dias + ' días';
+    tdPlazo.innerHTML = '<span class="marca-plazo' + (claseEspera ? ' ' + claseEspera : '') + '">' +
+      U.escapar(textoEspera) + '</span>';
+  } else {
+    var p = App.plazoDe(a);
+    if (p) {
+      tdPlazo.innerHTML = '<span class="marca-plazo ' + p.clase + '">' + U.escapar(p.texto) + '</span>';
+    } else if (pestana === 'dorm' && typeof opciones.dias === 'number') {
+      tdPlazo.innerHTML = '<span class="marca-plazo">Sin novedades desde hace ' + opciones.dias + ' días</span>';
+    }
+  }
+  tr.appendChild(tdPlazo);
+
+  /* ---------- Tercero ---------- */
+  var tdTercero = document.createElement('td');
+  tdTercero.className = 'inicio-tabla-tercero';
+  var spanTercero = document.createElement('span');
   /* «.tarjeta-nombre» se mantiene (además de «.nombre-pulsable», la
      nueva) por compatibilidad: es como muchas pruebas de pruebas/
-     encuentran y pulsan el nombre de un asunto abierto, sin acotar por
-     «#lista-abiertos» (que ya no existe). */
-  spanNombre.className = 'nombre-pulsable tarjeta-nombre';
-  spanNombre.title = 'Abrir la ficha de este asunto';
-  spanNombre.innerHTML = candado + U.escapar(nombreVer);
-  spanNombre.onclick = function () { App.abrirFicha(a, 'abierto'); };
-  tdNombre.appendChild(spanNombre);
-  tr.appendChild(tdNombre);
+     encuentran y pulsan el asunto abierto, sin acotar por columna. */
+  spanTercero.className = 'nombre-pulsable tarjeta-nombre';
+  spanTercero.title = pestana === 'adm' ? 'Abrir este hito' : 'Abrir la ficha de este asunto';
+  /* El candado se enseña siempre que el asunto sea reservado
+     (Reservados.es), tapado o no; lo que cambia con `tapado` es si se
+     enseña también el tercero de verdad o el texto genérico. */
+  var candadoTercero = window.Reservados ? Reservados.candadoHtml(a) : '';
+  if (tapado) {
+    spanTercero.innerHTML = candadoTercero + '<b>Reservado</b>';
+  } else {
+    spanTercero.innerHTML = candadoTercero + '<b>' + U.escapar(QueMeToca.terceroDe(a) || a.nombre) + '</b>';
+  }
+  tdTercero.appendChild(spanTercero);
+  tr.appendChild(tdTercero);
 
+  /* ---------- Tipo ---------- */
   var tdTipo = document.createElement('td');
   if (a.leido.tipo) {
     tdTipo.innerHTML = '<span class="marca-tipo" title="' + U.escapar(a.leido.tipo) + '">' +
@@ -288,6 +379,7 @@ App.filaTablaAsunto = function (a) {
   }
   tr.appendChild(tdTipo);
 
+  /* ---------- Hito actual ---------- */
   var lado = App.ladoDe(a);
   var tdHito = document.createElement('td');
   tdHito.className = 'inicio-tabla-hito';
@@ -295,21 +387,17 @@ App.filaTablaAsunto = function (a) {
   tr.appendChild(tdHito);
   if (window.EstadoHito) EstadoHito.engancharMarca(tdHito, a, 'abierto');
 
+  /* ---------- Le toca a ---------- */
   var tdQuien = document.createElement('td');
-  var quien = lado.esperando ? lado.esperando.nombre
-    : (lado.lado === 'terceros' ? lado.quien : 'Administración');
-  tdQuien.textContent = quien || '';
+  tdQuien.textContent = App.textoLeTocaA(a, lado);
   tr.appendChild(tdQuien);
 
-  var p = App.plazoDe(a);
-  var tdPlazo = document.createElement('td');
-  tdPlazo.innerHTML = p ? '<span class="marca-plazo ' + p.clase + '">' + U.escapar(p.texto) + '</span>' : '';
-  tr.appendChild(tdPlazo);
+  /* ---------- Inicio ---------- */
+  var tdInicio = document.createElement('td');
+  tdInicio.textContent = a.leido.fecha ? U.fechaCorta(U.fechaLegible(a.leido.fecha)) : '';
+  tr.appendChild(tdInicio);
 
-  var tdAbierto = document.createElement('td');
-  tdAbierto.textContent = a.leido.fecha ? U.fechaCorta(U.fechaLegible(a.leido.fecha)) : '';
-  tr.appendChild(tdAbierto);
-
+  /* ---------- ⋮ ---------- */
   var tdMenu = document.createElement('td');
   tdMenu.className = 'inicio-tabla-menu';
   var copiar = document.createElement('button');
@@ -327,6 +415,17 @@ App.filaTablaAsunto = function (a) {
   tdMenu.appendChild(U.menuDeAcciones([copiar, archivar]));
   tr.appendChild(tdMenu);
 
+  /* Pulsar la fila entera (para que "Le toca a" e "Inicio" también
+     abran, no solo el nombre): en "En Administración", la mesa del
+     hito; en las demás, la ficha. Los botones de dentro (el menú, el
+     propio "Hito actual") paran la propagación o quedan fuera de esta
+     comprobación, así que no abren nada por debajo. */
+  tr.onclick = function (ev) {
+    if (ev.target.closest('button, .inicio-tabla-menu, a, input, select, textarea')) return;
+    if (pestana === 'adm' && opciones.hito) QueMeToca.abrirMesaDelHito(a, opciones.hito);
+    else App.abrirFicha(a, 'abierto');
+  };
+
   /* Con una acción larga en marcha sobre este asunto (fila 100,
      App.conOcupado), la fila sale con sus botones apagados aunque se
      repinte. */
@@ -338,17 +437,44 @@ App.filaTablaAsunto = function (a) {
   return tr;
 };
 
+/* Fila 209: la tabla es una sola, pero solo una pestaña está activa
+   cada vez (js/inicio-tabla.js, InicioTabla). Estos filtros (Situación,
+   Plazo, Lo encarga, Tipo de asunto, el buscador y "Ordenar") solo
+   afectan de verdad a la pestaña "Todos los abiertos" (App.pintarAbiertos,
+   sin cambios en su filtrado), pero repintar SIEMPRE esa pestaña
+   directamente, sin mirar cuál está activa, dejaría la tabla enseñando
+   "Todos los abiertos" aunque las pestañas siguieran marcando otra
+   como activa. Por eso pasan por InicioTabla.pintar(), que repinta la
+   pestaña que de verdad está activa (y esa, si es "todos", ya llama a
+   App.pintarAbiertos() por dentro). */
+function repintarLaPestanaActiva() {
+  if (window.InicioTabla) InicioTabla.pintar();
+  else App.pintarAbiertos();
+}
+
 $('buscar-abiertos').oninput = function () {
-  App.pintarAbiertos();
+  repintarLaPestanaActiva();
   App.pintarSueltos();
 };
-$('filtro-estado').onchange = function () { App.pintarAbiertos(); };
-$('filtro-plazo').onchange = function () { App.pintarAbiertos(); };
-if ($('filtro-organo')) $('filtro-organo').onchange = function () { App.pintarAbiertos(); };
-if ($('filtro-tipo-asunto')) $('filtro-tipo-asunto').onchange = function () { App.pintarAbiertos(); };
+$('filtro-estado').onchange = function () { repintarLaPestanaActiva(); };
+$('filtro-plazo').onchange = function () { repintarLaPestanaActiva(); };
+if ($('filtro-organo')) $('filtro-organo').onchange = function () { repintarLaPestanaActiva(); };
+if ($('filtro-tipo-asunto')) $('filtro-tipo-asunto').onchange = function () { repintarLaPestanaActiva(); };
 
 $('orden-abiertos').onchange = function () {
   try { window.localStorage.setItem('orden-abiertos', this.value); } catch (e) {}
-  App.pintarAbiertos();
+  repintarLaPestanaActiva();
 };
+
+/* Pulsar la cabecera "Inicio" de la tabla ordena por fecha de inicio,
+   y otra vez, al revés (fila 209, boceto docs/boceto-inicio-2.html). */
+if ($('th-inicio')) {
+  $('th-inicio').classList.add('inicio-th-pulsable');
+  $('th-inicio').onclick = function () {
+    var nuevo = App.ordenElegido() === 'fecha-asc' ? 'fecha-desc' : 'fecha-asc';
+    $('orden-abiertos').value = nuevo;
+    try { window.localStorage.setItem('orden-abiertos', nuevo); } catch (e) {}
+    repintarLaPestanaActiva();
+  };
+}
 $('btn-recargar').onclick = function () { App.verAbiertos(); };

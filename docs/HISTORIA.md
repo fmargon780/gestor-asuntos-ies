@@ -5,6 +5,64 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 209: Inicio, segunda versión (pestañas y una sola tabla)
+
+`docs/INICIO-EN-PESTANAS.md`. Francisco vio la pantalla de las filas 191-193 con datos reales del
+centro y no le servía: "Me toca" salía casi siempre vacío porque solo contaba hitos **con
+fecha** (echaba de menos el trabajo de Administración sin plazo, que antes sí salía en el montón
+"Pendiente de Administración"); las tarjetas ocupaban demasiado; la tabla de abajo quedaba tan
+lejos que no se usaba. Manda sobre las filas 191/192 en todo lo que decía distinto.
+
+**Cómo queda**: dos columnas. Izquierda, estrecha (380px): "Ha llegado" compacto (tres líneas por
+fila, acciones como enlaces) y el tablón, sin esconderse nunca. Derecha: cuatro pestañas sobre
+**una sola tabla compartida** —**"En Administración"** (antes "Me toca"; ahora sin exigir fecha:
+`QueMeToca.clasificar` ya no descarta los hitos sin plazo, salen al final con "Sin plazo"),
+**"En espera"** (antes "Esperamos a otros"), **"Todos los abiertos"**, **"Dormidos"** ("Sin
+fecha" desaparece como bloque propio: esos hitos ya salían en "En Administración")—, con columnas
+Plazo, Tercero (ya no el nombre entero de la carpeta), Tipo, Hito actual, Le toca a, Inicio y el
+⋮. Filtros (Situación, Plazo, Lo encarga, Tipo de asunto y ahora también **Responsable**, que
+vivía a la vista) y "Ordenar" (gobierna "Todos los abiertos"; las otras tres llevan su orden
+natural: vencidos primero, o más días esperando/dormido arriba). Pulsar una fila en "En
+Administración" abre la mesa del hito; en las demás, la ficha completa.
+
+**Los avisos de la franja (fila 193) filtran la tabla**: pulsar "3 vencidos" dentro de la franja
+deja la tabla solo con esos asuntos, con «Filtrado por: 3 vencidos ✕ Quitar» encima; volver a
+pulsarlo, "Quitar" o cambiar de pestaña lo quita. `AvisosLinea.registrar` gana un 5º parámetro
+opcional, `asuntos` (nunca rompe a quien no lo pasa): `js/avisos.js` (vencidos, próximos) y el
+aviso de aspirantes sin número (emparejado por nombre normalizado con los asuntos abiertos) lo
+usan; "duplicados"/"recurrentes" no (los recurrentes ni siquiera existen todavía como asunto).
+
+**De paso se arregla un aviso de privacidad pendiente desde la fila 192**: si el responsable de
+un hito era el propio tercero (o tutor, o relacionado), "Esperando a…"/"Le toca a…" ponía su
+nombre real aunque el asunto estuviera reservado. `App.textoLeTocaA` (nuevo, en
+`js/asuntos-lista-pintar.js`) pone ahora el nombre genérico del papel («Familia», «Tercero»,
+«Relacionado») cuando el asunto está tapado.
+
+**Módulo nuevo `js/inicio-tabla.js`** (263 líneas): pestañas + el orquestador de la tabla única.
+`js/inicio-plegados.js` (fila 192) se borra: ya no tiene función. `js/inicio.js` baja de 408 a
+236 líneas (se queda con el buscador, "Ha llegado", el badge de vencidos y el aviso de
+aspirantes).
+
+**Un fallo real encontrado y arreglado al implementar, no previsto por el plan**: enganchar el
+repintado entero de Inicio a `window.Gestor.alRefrescar` y que ese mismo repintado, para la
+pestaña "Todos los abiertos", llame a `App.pintarAbiertos()` —que siempre termina en
+`App.avisarALosModulos()`, que vuelve a recorrer TODO `alRefrescar`, el propio repintado
+incluido— formaba una cascada infinita de verdad: la pantalla se quedaba colgada al entrar (la
+pestaña por defecto es "Todos los abiertos"). Arreglado con un cerrojo (`repintando`) en
+`js/inicio.js`: una llamada que llega mientras ya hay una en marcha se descarta, porque la que
+está en marcha va a reflejar el estado actual en cuanto termine.
+
+**Cómo se hizo**: dado el tamaño (mayor que la fila 192), un agente de planificación leyó el
+encargo, el boceto y el código real de las filas 191/192/193 (todo ya en `main`) y entregó un
+plan fichero por fichero con nombres de función exactos, incluida la decisión de que la pestaña
+por defecto sea "Todos los abiertos" (no "En Administración", como en el boceto) para no romper
+~25 pruebas que pulsan una fila esperando abrir la ficha, no la mesa del hito; un segundo agente
+lo implementó, validando con `npm test` completo en verde y encontrando por su cuenta el fallo de
+la cascada infinita; esta sesión revisó el diff entero (con especial atención al arreglo de la
+cascada y al de privacidad, verificados contra el código real), corrió `npm test` de forma
+independiente (167/167 en verde) y comprobó a ojo con Playwright las cuatro pestañas, la tabla y
+el filtrado por aviso.
+
 ## 27-sep-2026 — Fila 193: los avisos, en una sola línea; y el orden del menú
 
 `docs/AVISOS-MENU-Y-VOLVER.md`, apartados 1 y 2 (los apartados 3 y 4 —un solo «Volver», la mesa

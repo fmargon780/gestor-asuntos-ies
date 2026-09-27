@@ -83,7 +83,9 @@ await pagina.click('#btn-recargar');
 await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
 
 async function abrirDesdeLaLista(nombre) {
-  await pagina.locator('#inicio-tabla-cuerpo .nombre-pulsable', { hasText: nombre }).click();
+  /* Fila 209: la tabla ya no lleva el nombre entero de la carpeta en
+     ninguna celda; se busca la fila por `data-asunto`. */
+  await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + nombre + '"] .nombre-pulsable').click();
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 }
 

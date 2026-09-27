@@ -225,8 +225,9 @@ Datos del trámite) son los de siempre, y los sigue pintando el mismo módulo.
   que pulsan por debajo el mismo `button.ficha-documento` de la lista (sin repintar). En Hitos, los
   del hito desplegado (`.hito-cuerpo` visible → sus `.hito-documento[data-doc]`); si no hay, todos.
   El chip del documento a la vista (`Visor.nombreAbierto()`, nuevo), marcado.
-- **Qué se recuerda**: al entrar, siempre la cuadrícula; desde "Me toca" (Inicio, fila 191;
-  antes "Qué me toca"), `FichaTarjetas.abrirAlEntrar('hitos')` antes de `App.abrirFicha`. Un repintado de la misma ficha
+- **Qué se recuerda**: al entrar, siempre la cuadrícula; desde la pestaña "En Administración" de
+  Inicio (fila 209; antes "Me toca"/"Qué me toca"), `FichaTarjetas.abrirAlEntrar('hitos')` antes
+  de `App.abrirFicha`. Un repintado de la misma ficha
   mantiene la tarjeta abierta (el estado vive en el módulo) y `U.conservandoLoEscrito` lo escrito.
 - En modo consulta, las pestañas, los chips y los nombres del resumen siguen activos
   (`esControlDeSoloLectura`).
@@ -394,21 +395,21 @@ llama a una función, sin envolver nada:
   sin querer…») y, en la ficha, el menú de tres puntos: «Marcar como reservado» / «Quitar la
   reserva» (`opcionDelMenu`, por `App.guardarRegistroFresco`; en un tipo reservado, quitarla deja
   `false`). En modo consulta se apaga como las demás.
-- **Fila de la tabla «Todos los asuntos abiertos»** (Inicio, fila 192; antes tarjeta en
-  `#inicio-legado`, fila 191): candado en la celda «Asunto» (`Reservados.candadoHtml` +
-  `nombreParaVer`, `App.filaTablaAsunto`, `js/asuntos-lista-pintar.js`). **Tarjeta** en ARCHIVO
-  (`App.tarjetaAsunto`, `enTarjeta`, al colgarla, ya pasada por sus envoltorios): candado; tapada,
-  el rótulo es «fecha TIPO curso grupo · reservado», el pie no dice quién es y se quitan el
-  trocito de nota y el botón del NIE. Se sigue abriendo.
+- **Fila de la tabla única de Inicio** (fila 209, sobre las cuatro pestañas —«En Administración»,
+  «En espera», «Todos los abiertos», «Dormidos»—; antes tarjeta en `#inicio-legado`, fila 191):
+  candado en la celda «Tercero» (`Reservados.candadoHtml`; tapada, «🔒 Reservado», sin fecha/tipo
+  ni curso —esas ya son columnas propias—, `App.filaTablaAsunto`, `js/asuntos-lista-pintar.js`).
+  **Tarjeta** en ARCHIVO (`App.tarjetaAsunto`, `enTarjeta`, al colgarla, ya pasada por sus
+  envoltorios): candado; tapada, el rótulo es «fecha TIPO curso grupo · reservado», el pie no dice
+  quién es y se quitan el trocito de nota y el botón del NIE. Se sigue abriendo.
 - **Buscadores** (abiertos y ARCHIVO): un tapado solo sale por su nombre de carpeta
-  (`textoDeBusqueda`), no por notas, documentos ni ficha. En Inicio (bloques y tabla, fila 191/192)
-  el buscador de la cabecera usa el mismo mecanismo, nombre+tipo+tercero, ya sin tercero si está
-  tapado.
-- **«Me toca»/«Esperamos a otros»** (Inicio, fila 191; antes «Qué me toca») y la columna **«Le
-  toca a»** de la tabla (fila 192): el mismo rótulo tapado y sin tercero (`nombreParaVer`). **Ojo**
-  (aviso pendiente en `docs/COLA.md`, «Lo que queda por hablar con Francisco»): si el responsable
-  del hito es el propio tercero, el texto «Esperando a…»/«Le toca a…» sí pone su nombre real, sin
-  pasar por `Reservados.tapar` — un hueco real, no arreglado todavía. **Ficha del asunto**:
+  (`textoDeBusqueda`), no por notas, documentos ni ficha. En Inicio el buscador de la cabecera usa
+  el mismo mecanismo, nombre+tipo+tercero, ya sin tercero si está tapado.
+- **La columna «Le toca a»** de la tabla (y su equivalente en «En espera»/«En Administración»):
+  el mismo rótulo tapado y sin tercero (`nombreParaVer`). Si el responsable del hito es un papel
+  fijo (tercero, tutor, relacionado), `App.textoLeTocaA` (fila 209, arreglado un hueco de
+  privacidad de la fila 192) pone el nombre genérico del papel («Familia», «Tercero»,
+  «Relacionado») en vez del nombre real, cuando el asunto está tapado. **Ficha del asunto**:
   entera, con candado en la cabecera (`ponerCandado`). **Ficha de una persona**: con candado.
 - **«Mostrar reservados»** (`#btn-mostrar-reservados`, junto a «Filtros», solo si hay algún tipo o
   asunto reservado): destapa todo, solo en esta sesión; a propósito, sin `localStorage`.
