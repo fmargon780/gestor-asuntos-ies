@@ -102,18 +102,25 @@ cuadro de la guía; dentro de un asunto, ya como hitos, solo se ve la rama elegi
   `Guias.normalizarComunicacion` (un canal "vacío" es el que tiene el cuerpo en blanco, aunque
   tenga asunto)—, pero ya no se escribe a mano: al abrir el editor de un tipo,
   `js/guias-editor.js` (`convertirDocumentosYComunicacionPuro`, llamada al principio de
-  `editar()`) convierte solo, sin preguntar, el texto que hubiera en cada paso o subpaso en una
-  tarea del guion «Comunicar → título del hito», con una plantilla nueva en
-  `plantillas.json → lista` (el texto de correo en `texto`; si el de Séneca es distinto, en
-  `textoSeneca`), y deja `comunicacion` vacía. Repetirlo no duplica nada. `js/guias-comunicacion.js`
-  conserva su modelo (`bloqueHTML`/`leer`/`enganchar`, con sus dos pestañas Correo/Séneca y el
-  botón "Insertar hueco" de `js/plantillas-ajustes.js`), pero ya no lo llama
-  `js/guias-paso-bloques.js`: solo queda por si algún dato viejo llegara todavía sin convertir.
+  `editar()`) convierte solo, sin preguntar, el texto que hubiera en cada paso o subpaso en una o
+  dos tareas del guion «Comunicar → título del hito», con una plantilla nueva en
+  `plantillas.json → lista`, y deja `comunicacion` vacía (idempotente: repetirlo no duplica nada).
+  Un asunto de correo escrito a mano pasa como primera línea del cuerpo (con una línea en blanco
+  detrás), en vez de perderse. Con los dos canales iguales, una sola tarea con `via:''` (vale para
+  cualquiera). Con los dos DISTINTOS: una sola plantilla (`texto` para correo, `textoSeneca` para
+  Séneca — el mismo campo que ya usa `js/correo.js` para llevar un texto por canal en una
+  plantilla), pero **dos** tareas, `via:'correo'` y `via:'seneca'`, decidido con Francisco:
+  "los dos, como dos avisos", nunca uno solo. Con un solo canal, una tarea con ESE `via` exacto
+  (nunca `''`: dejarlo vacío haría que `js/hito-mesa-recetas.js` la disparase por el canal por
+  defecto —correo— aunque el texto fuera solo de Séneca, un fallo real de la primera versión,
+  corregido de paso el mismo día). `js/guias-comunicacion.js` (el editor viejo de esta sección, con
+  sus dos pestañas Correo/Séneca) se borró: ya no lo llamaba nadie. Prueba:
+  `pruebas/documentos-comunicacion-a-tareas.mjs`.
 - **Un `<details>` recién repintado nace cerrado** (18-sep-2026, fila 60, encontrado en el navegador
-  de verdad): "+ Añadir"/quitar/mover una fila de `.paso-requisitos`, o cualquier tecla que dispare
-  un `recoger();mutar;pintar()` del paso, reconstruye `#guia-pasos` entero y con él el `<details>`
-  de `.paso-extra`/`.paso-requisitos`/`.paso-comunicacion`, que se cerraba solo justo después de
-  tocarlo. `pintar()` apunta, antes de vaciar la caja, qué `<details>` estaban abiertos
+  de verdad): "+ Añadir"/quitar/mover una fila de `.paso-requisitos` o `.paso-guion`, o cualquier
+  tecla que dispare un `recoger();mutar;pintar()` del paso, reconstruye `#guia-pasos` entero y con
+  él el `<details>` de `.paso-extra`/`.paso-requisitos`/`.paso-guion`, que se cerraba solo justo
+  después de tocarlo. `pintar()` apunta, antes de vaciar la caja, qué `<details>` estaban abiertos
   (`detallesAbiertos`, clave: posición del paso + id del subpaso + su clase) y los vuelve a abrir
   al repintar (`restaurarAbierto`, llamado tanto desde `pintar()` como desde `cajaDeOpciones()`).
 
@@ -129,11 +136,11 @@ Primera tanda de que el hito sea la mesa de trabajo del asunto.
   fila 199, 27-sep-2026, `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartado 4)**: cada `id` que
   hubiera se convierte solo, al abrir el editor del tipo, en una tarea del guion «Generar un
   documento → nombre», con `receta: { plantilla: id }`, y `plantillasDocumento` se vacía
-  (`js/guias-editor.js`, `convertirDocumentosYComunicacionPuro`). `js/guias-documentos.js` conserva
-  su modelo (buscador con casillas agrupadas por tipo, `GuiasDocumentos.precargar` para el
-  catálogo), pero ya no lo llama `js/guias-paso-bloques.js`. La comparación de la biblioteca ya no
-  mira este campo aparte: lo que antes comparaba «Documentos» ahora es parte de «Tareas» (`guion`,
-  ver más abajo). El hito no guarda copia: lo lee de su paso por `origenGuia` al pulsar. Una
+  (`js/guias-editor.js`, `convertirDocumentosYComunicacionPuro`). El buscador con casillas
+  agrupadas por tipo que tenía `js/guias-documentos.js` se borró con la sección; queda
+  `precargar`/`lineaHTML` (el catálogo para la vista de solo lectura). La comparación de la
+  biblioteca ya no mira este campo aparte: lo que antes comparaba «Documentos» ahora es parte de
+  «Tareas» (`guion`, ver más abajo). El hito no guarda copia: lo lee de su paso por `origenGuia` al pulsar. Una
   plantilla unida al paso vale aunque sea de otro tipo de asunto.
 - **«Generar documento» en el hito** (`js/hitos-generar.js`, en `.hito-botones`): sale si el hito no
   es pregunta ni «no aplica» y hay alguna plantilla (del paso o del tipo). Con una sola, genera; con

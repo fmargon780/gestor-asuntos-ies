@@ -16,11 +16,11 @@
    panel de "traer", el botón "Guardar en la biblioteca", el cuadro de
    comparación y el bloque de Ajustes — vive en js/guias-biblioteca.js.
 
-   Se carga después de js/guias.js, js/guias-requisitos.js y
-   js/guias-comunicacion.js: reutiliza Guias.normalizarRequisitos,
-   Guias.normalizarComunicacion y Guias.normalizarNormativa para que un
-   modelo tenga exactamente la misma forma que un paso de guía, en los
-   dos sentidos, sin inventar una forma nueva.
+   Se carga después de js/guias.js y js/guias-requisitos.js: reutiliza
+   Guias.normalizarRequisitos, Guias.normalizarComunicacion y
+   Guias.normalizarNormativa para que un modelo tenga exactamente la
+   misma forma que un paso de guía, en los dos sentidos, sin inventar
+   una forma nueva.
    ============================================================ */
 var HitosBiblioteca = (function () {
 

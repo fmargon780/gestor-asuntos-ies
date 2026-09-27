@@ -5,7 +5,8 @@
 
    1. `plantillasDocumento` se normaliza (lista buena, basura, repetidos)
       y un paso-pregunta lo descarta, a cualquier nivel.
-   2. HitosBiblioteca.diferencias detecta el cambio de plantillas.
+   2. Desde la fila 199 (27-sep-2026), HitosBiblioteca.diferencias ya NO
+      compara `plantillasDocumento` (va con el guion, que sí se compara).
    3. Agrupar «De este paso» / «Otras de este tipo», sin repetir e
       ignorando los id borrados.
    4. Los huecos nuevos: con hito, rellenos; sin hito, vacíos y fuera de
@@ -14,6 +15,9 @@
    5. El botón «Generar documento» sale en el hito cuyo paso tiene una
       plantilla, y no en uno sin ninguna; generar desde él deja el
       documento apuntado a ese hito y una nota en su historial.
+   6. Desde la fila 199, «Documentos de este paso» ya no se edita en el
+      editor: al abrirlo, cada id de `plantillasDocumento` se convierte
+      solo en una tarea del guion "generar" y el campo queda vacío.
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
@@ -101,7 +105,7 @@ await comprobar('un paso-pregunta la descarta, también dentro de una opción',
 
 /* ---------- 2. la biblioteca ---------- */
 console.log('--- 2. la biblioteca ---');
-await comprobar('HitosBiblioteca.diferencias ve el cambio de plantillas, con sus nombres',
+await comprobar('desde la fila 199, HitosBiblioteca.diferencias ya NO compara plantillasDocumento (va con el guion)',
   pagina.evaluate(async () => {
     await Plantillas.cargar(App.E.gestor);
     const modelo = HitosBiblioteca._normalizarModelo({ titulo: 'Recoger', plantillasDocumento: ['pd-a'] });
@@ -109,8 +113,8 @@ await comprobar('HitosBiblioteca.diferencias ve el cambio de plantillas, con sus
     const iguales = HitosBiblioteca.diferencias(paso, modelo).length;
     paso.plantillasDocumento = ['pd-a', 'pd-b', 'pd-borrada'];
     const d = HitosBiblioteca.diferencias(paso, modelo).filter(x => x.campo === 'plantillasDocumento')[0];
-    return [iguales, d && d.etiqueta, d && d.antes];
-  }), [0, 'Documentos', 'Acuse de recibo, Certificado, (plantilla borrada)']);
+    return [iguales, d];
+  }), [0, undefined]);
 
 /* ---------- 3. agrupar ---------- */
 console.log('--- 3. agrupar ---');
@@ -177,25 +181,24 @@ await comprobar('apuntado a ese hito', Promise.resolve(r5.docs), [esperado]);
 await comprobar('con su nota en el hito', Promise.resolve(r5.notas), ['Generado «' + esperado + '»']);
 
 /* ---------- 6. el editor del paso ---------- */
-console.log('--- 6. «Documentos de este paso» en el editor ---');
+console.log('--- 6. «Documentos de este paso» ya no se edita: se migra a tareas (fila 199) ---');
 /* Fila 155: el Word recién generado se abre en grande (js/word-visor.js): se cierra. */
 await pagina.evaluate(() => window.WordVisor && WordVisor.cerrar());
 await pagina.evaluate(() => { App.volverALaLista(); });
 await pagina.evaluate(() => {
   window.__editada = Guias.editar('MATRICULA', [{ id: 'e1', titulo: 'Paso', plantillasDocumento: ['pd-a', 'pd-borrada'] }], [], []);
 });
-await pagina.waitForSelector('#guia-pasos .paso-documentos', { state: 'attached' });   /* fila 122: el paso nace cerrado */
-await comprobar('sale la sección, con la del paso marcada y la borrada tachada',
-  pagina.evaluate(() => {
-    const d = document.querySelector('#guia-pasos .paso-documentos');
-    return [d.querySelector('.guiadoc-casilla[data-id="pd-a"]').checked,
-            d.querySelector('.guiadoc-casilla[data-id="pd-b"]').checked,
-            d.textContent.indexOf('(plantilla borrada)') > -1];
-  }), [true, false, true]);
-await pagina.evaluate(() => { document.querySelector('.guiadoc-casilla[data-id="pd-b"]').click(); });
+await pagina.waitForSelector('#guia-pasos .paso-editor');
+await comprobar('la sección "Documentos de este paso" ya no existe',
+  pagina.evaluate(() => document.querySelector('#guia-pasos .paso-documentos')), null);
 await pagina.click('#cuadro-aceptar');
-await comprobar('al guardar: las marcadas, y la borrada se quita',
-  pagina.evaluate(async () => (await window.__editada)[0].plantillasDocumento), ['pd-a', 'pd-b']);
+await comprobar('al abrir el editor, cada id se ha convertido en una tarea "generar" y plantillasDocumento queda vacío',
+  pagina.evaluate(async () => {
+    const p = (await window.__editada)[0];
+    return [p.plantillasDocumento, p.guion.map(g => [g.accion, g.texto, g.receta])];
+  }),
+  [[], [['generar', 'Generar un documento → Acuse de recibo', { plantilla: 'pd-a' }],
+        ['generar', 'Generar un documento → pd-borrada', { plantilla: 'pd-borrada' }]]]);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 await navegador.close();

@@ -27,15 +27,33 @@
          «Generar un documento → nombre», con `receta: { plantilla:
          id }`, y `plantillasDocumento` se vacía;
        - si `comunicacion` tiene texto (correo o Séneca), se convierte
-         en una tarea «Comunicar → título del hito» con una plantilla
-         NUEVA (nunca había una: el texto vivía suelto en el paso), y
-         `comunicacion` se vacía. El texto de correo manda; si el de
-         Séneca es distinto, se guarda aparte (`textoSeneca`, igual
-         que hace ya `js/plantillas-ajustes.js`).
+         en una o dos tareas «Comunicar» con una plantilla NUEVA (nunca
+         había una: el texto vivía suelto en el paso), y `comunicacion`
+         se vacía. Un asunto escrito a mano pasa como primera línea del
+         cuerpo (27-sep-2026, corrección de fila 199, decidido con
+         Francisco: nada se pierde sin decirlo). Con los dos canales
+         iguales, una tarea con `via:''` (vale para cualquiera). Con
+         los dos DISTINTOS, una sola plantilla (`texto`+`textoSeneca`,
+         igual que ya hace `js/plantillas-ajustes.js`) pero DOS tareas,
+         una `via:'correo'` y otra `via:'seneca'` — decidido con
+         Francisco: "los dos, como dos avisos", nunca uno solo. Con un
+         solo canal, una tarea con ESE `via` exacto: dejarlo en `''`
+         haría que `js/hito-mesa-recetas.js` la disparase por correo
+         por defecto aunque el texto fuera solo de Séneca (un fallo
+         real, corregido de paso).
      Repetirlo no duplica nada: sin `plantillasDocumento` ni texto de
      comunicación que convertir, no toca el paso. Devuelve las filas
      de plantilla nuevas que hay que guardar en `plantillas.json`.
      ========================================================== */
+  function textoDelCanal(asunto, cuerpo) {
+    var a = String(asunto || '').trim();
+    return a ? (a + '\n\n' + cuerpo) : cuerpo;
+  }
+
+  function tareaComunicar(idPlantilla, via, nombrePlantilla) {
+    return { id: G.nuevoId(), texto: 'Comunicar → ' + nombrePlantilla, explicacion: '',
+             accion: 'comunicar', receta: { a: '', via: via, plantilla: idPlantilla }, normativa: null };
+  }
   function convertirDocumentosYComunicacionPuro(pasos, nombreTipo, categoria, opciones) {
     opciones = opciones || {};
     var idPlantilla = opciones.idPlantilla || function () { return G.nuevoId(); };
@@ -59,20 +77,24 @@
         p.plantillasDocumento = [];
       }
       var c = p.comunicacion;
-      var textoCorreo = c && c.correo && String(c.correo.cuerpo || '').trim();
-      var textoSeneca = c && c.seneca && String(c.seneca.cuerpo || '').trim();
-      if (textoCorreo || textoSeneca) {
+      var tieneCorreo = !!(c && c.correo && String(c.correo.cuerpo || '').trim());
+      var tieneSeneca = !!(c && c.seneca && String(c.seneca.cuerpo || '').trim());
+      if (tieneCorreo || tieneSeneca) {
+        var textoCorreo = tieneCorreo ? textoDelCanal(c.correo.asunto, c.correo.cuerpo) : '';
+        var textoSeneca = tieneSeneca ? textoDelCanal(c.seneca.asunto, c.seneca.cuerpo) : '';
         var idNuevo = idPlantilla();
         var nombrePlantilla = p.titulo || 'Comunicación sin título';
         var fila = { id: idNuevo, tipo: nombreTipo, categoria: categoria || '', nombre: nombrePlantilla,
-                     texto: textoCorreo || textoSeneca };
-        if (textoCorreo && textoSeneca && textoSeneca !== textoCorreo) fila.textoSeneca = textoSeneca;
-        nuevasPlantillas.push(fila);
+                     texto: tieneCorreo ? textoCorreo : textoSeneca };
         p.guion = Array.isArray(p.guion) ? p.guion : [];
-        p.guion.push({
-          id: G.nuevoId(), texto: 'Comunicar → ' + nombrePlantilla, explicacion: '',
-          accion: 'comunicar', receta: { a: '', via: '', plantilla: idNuevo }, normativa: null
-        });
+        if (tieneCorreo && tieneSeneca && textoCorreo.trim() !== textoSeneca.trim()) {
+          fila.textoSeneca = textoSeneca;
+          p.guion.push(tareaComunicar(idNuevo, 'correo', nombrePlantilla));
+          p.guion.push(tareaComunicar(idNuevo, 'seneca', nombrePlantilla));
+        } else {
+          p.guion.push(tareaComunicar(idNuevo, tieneCorreo && tieneSeneca ? '' : (tieneCorreo ? 'correo' : 'seneca'), nombrePlantilla));
+        }
+        nuevasPlantillas.push(fila);
         p.comunicacion = { correo: { asunto: '', cuerpo: '' }, seneca: { asunto: '', cuerpo: '' } };
       }
     }
@@ -307,14 +329,6 @@
           nivel[i].requisitos = GuiasRequisitos.leer(caja);
         }
 
-        /* "Comunicación de este hito" (18-sep-2026, fila 60): mismo
-           criterio que arriba, solo en los hitos que no son pregunta. */
-        if (window.GuiasComunicacion && caja.querySelector(':scope > .paso-comunicacion')) {
-          nivel[i].comunicacion = GuiasComunicacion.leer(caja, nivel[i].id);
-        }
-        if (window.GuiasDocumentos && caja.querySelector(':scope > .paso-documentos')) {
-          nivel[i].plantillasDocumento = GuiasDocumentos.leer(caja);   /* fila 102 */
-        }
         if (window.GuiasGuion && caja.querySelector(':scope > .paso-guion')) nivel[i].guion = GuiasGuion.leer(caja);   /* fila 109 */
 
         /* "Solo informativo" y "Normativa" (20-sep-2026, fila 79): igual,
@@ -361,12 +375,6 @@
             var cuerpoEl = sc.querySelector(':scope > .subpaso-cuerpo');
             if (cuerpoEl) sp.cuerpo = G.limpiar(cuerpoEl.innerHTML);
             if (window.GuiasRequisitos && sc.querySelector(':scope > .paso-requisitos')) sp.requisitos = GuiasRequisitos.leer(sc);
-            if (window.GuiasComunicacion && sc.querySelector(':scope > .paso-comunicacion')) {
-              sp.comunicacion = GuiasComunicacion.leer(sc, sp.id);
-            }
-            if (window.GuiasDocumentos && sc.querySelector(':scope > .paso-documentos')) {
-              sp.plantillasDocumento = GuiasDocumentos.leer(sc);   /* fila 102 */
-            }
             if (window.GuiasGuion && sc.querySelector(':scope > .paso-guion')) sp.guion = GuiasGuion.leer(sc);   /* fila 109 */
             var esPreg = sc.querySelector(':scope > .paso-es-pregunta-fila .subpaso-es-pregunta');
             if (esPreg && !esPreg.checked) sp.opciones = [];

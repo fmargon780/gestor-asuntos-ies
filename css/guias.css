@@ -288,22 +288,6 @@
 .requisito-mandos { display: flex; gap: 4px; margin-left: auto; }
 .requisito-mandos .boton { padding: 4px 8px; }
 
-/* ---------- "comunicación de este paso" (18-sep-2026, fila 60) ---------- */
-
-.paso-comunicacion {
-  margin-top: 10px;
-  border: 1px solid var(--linea);
-  border-radius: 8px;
-  padding: 8px 10px;
-  background: var(--fondo);
-}
-.paso-comunicacion > summary { cursor: pointer; font-size: 13px; color: var(--tinta-suave); }
-.paso-comunicacion-pestanas { display: flex; gap: 6px; margin-top: 8px; }
-.paso-comunicacion-pestana.activa { border-color: #1e7a46; background: var(--verde); }
-.paso-comunicacion-panel { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
-.paso-comunicacion-panel.oculto { display: none; }
-.paso-comunicacion-panel .etiqueta { margin: 4px 0 0; font-size: 12px; }
-
 /* ---------- "solo informativo" (20-sep-2026, fila 79, apartado 4.6) ---------- */
 
 .paso-solo-informativo-fila { margin-top: 10px; }
@@ -443,9 +427,9 @@
   white-space: nowrap;
 }
 
-/* «Documentos de este paso» y «Guion de este paso», con la misma caja
-   gris y la misma letra que los demás apartados del paso. */
-.paso-documentos,
+/* «Guion de este paso», la misma caja gris y la misma letra que los
+   demás apartados del paso (hasta la fila 199, también «Documentos de
+   este paso», ya retirada: sus tareas se migran al guion). */
 .paso-guion {
   margin-top: 10px;
   border: 1px solid var(--linea);
@@ -453,7 +437,6 @@
   padding: 8px 10px;
   background: var(--fondo);
 }
-.paso-documentos > summary,
 .paso-guion > summary { cursor: pointer; font-size: 13px; color: var(--tinta-suave); }
 
 /* Fila 138: «Hay que reunirlo» en una línea del guion. */
