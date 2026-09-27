@@ -122,7 +122,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   como el del centro; renuncia a la Junta Electoral, en su hito.
 - Copias diarias (90 días) con `_esquema` y verificación tras escribir, detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable de nombres. Un borrado (tipo,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
-- Pruebas automáticas en cada subida de código (no con solo `docs/`).
+- Pruebas automáticas en cada subida de código (no con solo `docs/`); en paralelo (`pruebas/ejecutar.mjs`, fila 208). Mientras se trabaja una fila, solo las pruebas de lo tocado (`node pruebas/ejecutar.mjs <palabra>`); la pasada completa, una vez al final.
 - Copia sin internet (`file://`): se actualiza sola (reintenta si se estaba publicando); si no, franja fija arriba; cada 30 min. La web normal también avisa de versión nueva (fila 178), solo con «Recargar».
 - Hitos: cada hito de la guía es un hito de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
   bifurcaciones e historial (si falla su guardado al archivar, se reintenta una vez; el hito no queda huérfano de todas formas). Cada hito se abre a pantalla completa (la mesa), con las acciones solo ahí («Generar documento ▾»,

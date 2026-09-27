@@ -268,7 +268,7 @@ de `App` va después del fichero que lo define.
 | `js/inicio.js` | La última línea: `App.arrancar()` |
 | `js/envolturas-esperadas.js` | El **último** `<script>` de todos (fila 70): compara `U.envolturasAplicadas()` con la lista de las 42 que tienen que estar, y avisa en rojo en la pantalla de entrada si falta alguna (`window.EnvolturasEsperadas`) |
 | `package.json` | Las dependencias de las pruebas (`playwright`, `jsdom`) y `npm test`; `esbuild` (fila 89) para `npm run copia-local` |
-| `pruebas/ejecutar.mjs` | Levanta el servidor local y ejecuta todas las pruebas de esta carpeta |
+| `pruebas/ejecutar.mjs` | Levanta el servidor local y ejecuta las pruebas de esta carpeta varias a la vez (fila 208); con palabras en la línea de comandos, solo las que coinciden en el nombre |
 | `.github/workflows/pruebas.yml` | Ejecuta `npm test` en cada subida y cada pull request a `main` |
 | `pruebas/logica.mjs` | Pruebas de la lógica, sin navegador |
 | `pruebas/copias.mjs` | Prueba de las copias de seguridad y del fichero roto |

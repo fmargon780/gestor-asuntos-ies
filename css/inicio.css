@@ -137,12 +137,23 @@
   background: none;
 }
 .panel[data-vista="clasificar"]:hover { border-color: var(--linea); background: var(--papel); }
+.panel[data-vista="clasificar"]:focus { outline: none; }
+.panel[data-vista="clasificar"]:focus-visible { outline: 2px solid var(--azul); outline-offset: 1px; }
 .panel[data-vista="clasificar"] .panel-icono,
 .panel[data-vista="clasificar"] .panel-pie { display: none; }
 .panel[data-vista="clasificar"] .panel-nombre {
   font-size: 13.5px;
   font-weight: 600;
   color: var(--azul);
+}
+
+/* Mensaje de "no hay nada" en "Me toca"/"Esperamos a otros" (antes se
+   quedaba en blanco, sin decir nada, y parecía roto). Mismo aspecto
+   que .tablon-vacio (css/tablon.css), sin copiar sus reglas. */
+.inicio-lista-vacia {
+  color: var(--tinta-suave); font-size: 13px; line-height: 1.5;
+  border: 1px dashed var(--linea); border-radius: 8px;
+  padding: 14px; text-align: center;
 }
 
 /* Los otros dos paneles de montón (fila 191, apartado 7): siguen en el

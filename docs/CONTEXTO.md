@@ -346,10 +346,14 @@ Se comprueba con `pruebas/conflictos.mjs`.
 ### Pruebas automáticas en cada subida
 
 `package.json` trae `playwright` y `jsdom`; `npm test` (ejecuta `pruebas/ejecutar.mjs`) levanta
-el servidor local y corre todas las pruebas de `pruebas/` una tras otra, fallando si falla
-cualquiera. `.github/workflows/pruebas.yml` lo lanza en cada subida y en cada pull request a
-`main`, con Ubuntu, Node 20 y Chromium instalado por Playwright. Desde la fila 148 no se lanza si el
-cambio solo toca `docs/` (`paths-ignore`), y dos subidas seguidas cancelan la primera
+el servidor local y corre las pruebas de `pruebas/` varias a la vez (fila 208, `PRUEBAS_A_LA_VEZ`
+o `os.availableParallelism() - 1`, entre 2 y 6), fallando si falla cualquiera; con palabras en la
+línea de comandos (`node pruebas/ejecutar.mjs hito mesa`) solo corren las que coinciden en el
+nombre, para probar rápido lo que se está tocando mientras se trabaja una fila. Las que necesitan
+tiempos finos y no aguantan ir muy cargadas de CPU están en el `EN_SOLITARIO` del propio fichero, y
+corren solas, en serie, al final. `.github/workflows/pruebas.yml` lo lanza en cada subida y en cada
+pull request a `main`, con Ubuntu, Node 20 y Chromium instalado por Playwright. Desde la fila 148 no
+se lanza si el cambio solo toca `docs/` (`paths-ignore`), y dos subidas seguidas cancelan la primera
 (`concurrency`, `cancel-in-progress`).
 
 **Una prueba no se fía de un aviso que ya estaba a la vista** (fila 148): el «Asunto archivado.» del
