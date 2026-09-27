@@ -279,10 +279,11 @@ function documentoXml(cuerpoParrafos) {
   comprobar('6. una entrada no tocada llega verbatim', contentTypesFinal, CONTENT_TYPES);
 
   /* Comprobación externa del formato ZIP: se guarda en una carpeta
-     temporal del sistema y se puede abrir con `unzip`/`zipinfo`
-     (herramienta de línea de comandos), no solo con el propio lector
-     de js/docx.js. Ver el informe final. */
-  const rutaDePrueba = path.join(os.tmpdir(), 'plantilla-de-prueba.docx');
+     temporal propia del sistema (fila 208: nunca la misma ruta que
+     otra prueba, aunque vaya a la vez) y se puede abrir con
+     `unzip`/`zipinfo` (herramienta de línea de comandos), no solo con
+     el propio lector de js/docx.js. Ver el informe final. */
+  const rutaDePrueba = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'plantilla-de-prueba-')), 'plantilla.docx');
   fs.writeFileSync(rutaDePrueba, Buffer.from(salida));
   console.log('   (fichero de prueba guardado en ' + rutaDePrueba + ')');
 }

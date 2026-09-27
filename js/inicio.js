@@ -215,6 +215,12 @@
     var visibles = verTodo ? lista : lista.slice(0, opciones.tope);
 
     caja.innerHTML = '';
+    if (!visibles.length) {
+      var vacio = document.createElement('div');
+      vacio.className = 'inicio-lista-vacia';
+      vacio.textContent = opciones.vacio;
+      caja.appendChild(vacio);
+    }
     visibles.forEach(function (it) { caja.appendChild(opciones.fila(it)); });
 
     if (verMas) {
@@ -228,7 +234,7 @@
   function pintarMeToca(lista) {
     pintarBloqueDeHitos(lista, {
       idLista: 'inicio-me-toca-lista', idCuenta: 'inicio-me-toca-n', idVerMas: 'inicio-me-toca-ver',
-      tope: TOPE_ME_TOCA, fila: filaMeToca,
+      tope: TOPE_ME_TOCA, fila: filaMeToca, vacio: 'Nada pendiente por ahora.',
       verTodo: function () { return verTodoMeToca; },
       marcarVerTodo: function () { verTodoMeToca = true; }
     });
@@ -238,6 +244,7 @@
     pintarBloqueDeHitos(lista, {
       idLista: 'inicio-esperamos-lista', idCuenta: 'inicio-esperamos-n', idVerMas: 'inicio-esperamos-ver',
       tope: TOPE_ESPERAMOS, fila: function (it) { return filaEsperamos(it, ajustes); },
+      vacio: 'No se espera a nadie por ahora.',
       verTodo: function () { return verTodoEsperamos; },
       marcarVerTodo: function () { verTodoEsperamos = true; }
     });

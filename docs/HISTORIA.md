@@ -5,6 +5,45 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 208: las pruebas, varias a la vez; y dos arreglos de la fila 191
+
+`docs/PRUEBAS-MAS-RAPIDAS.md`. `pruebas/ejecutar.mjs`, reescrito: levanta el mismo servidor local
+de siempre, pero lanza las pruebas de `pruebas/` varias a la vez (un tope de procesos que van
+cogiendo la siguiente de la lista), con la salida de cada una guardada entera e impresa de un
+tirón al terminar, para que no se mezcle con la de las demás. Cuántas a la vez:
+`PRUEBAS_A_LA_VEZ`, o si no está puesta, `os.availableParallelism() - 1` (deja un núcleo libre
+para el propio proceso y el servidor), entre 2 y 6. Con palabras en la línea de comandos (`node
+pruebas/ejecutar.mjs hito mesa`) solo corren las que coinciden en el nombre, para probar rápido
+lo que se está tocando mientras se trabaja una fila. La app no cambia nada: solo el fichero que
+lanza las pruebas.
+
+**Resultado:** `npm test` completo (165 ficheros), tres veces seguidas, en verde (277.0 / 274.9 /
+273.7 s). Antes, una tras otra: más de 20 minutos (con esta máquina, de 4 núcleos).
+
+**Dos pruebas de tiempos finos no aguantaban la máquina a tope de CPU:** `documentos-sueltos.mjs`
+(el aviso de "el disco se ha puesto tonto" salía tapado por el de "he puesto al día los asuntos
+abiertos", de `js/estado-migracion.js`, con los seis navegadores del primer intento a la vez) y
+`repintar-solo-lo-que-cambia.mjs` (esperaba como mucho una relectura de `hitos.json` y, bajo
+carga, a veces salían dos). En solitario, las dos pasan 3 de 3. En vez de tocar la app o aflojar
+lo que comprueban, van en el `EN_SOLITARIO` del propio `pruebas/ejecutar.mjs`: corren solas, en
+serie, después de todas las demás, sin competir por CPU. Con esto y con dejar un núcleo libre
+(antes se usaban los 4 enteros), las tres pasadas de validación salieron limpias.
+
+Se tocó también `pruebas/plantillas-documento.mjs`: un nombre de fichero temporal fijo (no
+`fs.mkdtempSync`) que, si dos pruebas se cruzaran, podría pisarse; puesto con carpeta propia, por
+si acaso, aunque en la auditoría no llegó a fallar.
+
+**De paso, dos arreglos en la pantalla de Inicio (fila 191)**, al verlos Francisco en una
+captura de pantalla real y decir que "sale todo muy raro": "Me toca" se quedaba en blanco, sin
+ningún aviso, cuando no había nada pendiente (ahora dice "Nada pendiente por ahora.", y
+"Esperamos a otros" tiene el mismo mensaje para cuando le toque estar vacío); y el botón "Ver
+todo" se quedaba con el marco negro del foco del navegador después de pulsarlo, por su estilo
+nuevo, más plano y transparente, que antes lo disimulaba. Se quita ese marco con el clic del
+ratón y se deja solo para quien navega con el teclado (`:focus-visible`), como ya hacen otros
+botones parecidos de la app.
+
+---
+
 ## 27-sep-2026 — Fila 191: la pantalla de Inicio, primera parte (los bloques)
 
 `docs/INICIO-CUATRO-BLOQUES.md`, apartados 1, 2, 3, 4 y 7 (los apartados 5 y 6 —la tabla «Todos
