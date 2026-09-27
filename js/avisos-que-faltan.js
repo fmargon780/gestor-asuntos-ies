@@ -91,19 +91,12 @@
     return { n: viejas.length, viejas: viejas };
   }
 
-  /* ---------- las cajas, junto a panel-avisos / panel-frescura ---------- */
+  /* ---------- los trozos de la franja de avisos ----------
 
-  function caja(id) {
-    var c = $(id);
-    if (c) return c;
-    var referencia = $('panel-frescura') || $('panel-avisos');
-    if (!referencia || !referencia.parentNode) return null;
-    c = document.createElement('div');
-    c.id = id;
-    c.className = 'oculto';
-    referencia.parentNode.insertBefore(c, referencia);
-    return c;
-  }
+     Fila 193, apartado 1: ya no pintan su propia caja junto a
+     panel-avisos/panel-frescura. Cada uno es un trozo de
+     js/avisos-linea.js, que al pulsarlo lleva a su bloque de
+     Mantenimiento (lo que hacía el botón "Verlas" de antes). */
 
   function irAMantenimiento(idBloque) {
     App.ir('ajustes');
@@ -113,34 +106,13 @@
   }
 
   async function pintarHuerfanas() {
-    var c = caja('panel-huerfanas');
-    if (!c) return;
+    if (!window.AvisosLinea) return;
     var huerfanas = await calcularHuerfanas();
-    if (!huerfanas.length || !sePintaHuerfanas(huerfanas.length, guardadoHuerfanas())) {
-      c.className = 'oculto'; c.innerHTML = ''; return;
-    }
-
-    c.className = 'aviso aviso-ambar';
-    c.innerHTML = '<strong>Hay ' + huerfanas.length +
-      (huerfanas.length === 1 ? ' ficha sin carpeta.' : ' fichas sin carpeta.') + '</strong> ';
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'boton';
-    btn.textContent = 'Verlas';
-    btn.onclick = function () { irAMantenimiento('bloque-huerfanas'); };
-    c.appendChild(btn);
-
-    var cerrar = document.createElement('button');
-    cerrar.type = 'button';
-    cerrar.className = 'boton';
-    cerrar.title = 'Ocultar este aviso durante 7 días';
-    cerrar.textContent = '✕';
-    cerrar.onclick = function () {
-      callarHuerfanas(huerfanas.length);
-      c.className = 'oculto';
-      c.innerHTML = '';
-    };
-    c.appendChild(cerrar);
+    var activo = huerfanas.length && sePintaHuerfanas(huerfanas.length, guardadoHuerfanas());
+    var texto = activo
+      ? (huerfanas.length === 1 ? '1 ficha sin carpeta' : huerfanas.length + ' fichas sin carpeta')
+      : '';
+    AvisosLinea.registrar('huerfanas', texto, false, function () { irAMantenimiento('bloque-huerfanas'); });
   }
 
   /* Medir la papelera recorre sus ficheros: se hace como mucho cada
@@ -150,24 +122,17 @@
   var ultimaPapelera = 0;
 
   async function pintarPapeleraVieja() {
-    var c = caja('panel-papelera-vieja');
-    if (!c) return;
+    if (!window.AvisosLinea) return;
     if (ultimaPapelera && Date.now() - ultimaPapelera < CADA_MS_PAPELERA) return;
     ultimaPapelera = Date.now();
     var r = await calcularPapeleraVieja();
-    if (!r.n) { c.className = 'oculto'; c.innerHTML = ''; return; }
-
-    var tamano = await Papelera.tamanoDeViejas(r.viejas);
-    c.className = 'aviso aviso-ambar';
-    c.innerHTML = '<strong>Hay ' + r.n + (r.n === 1 ? ' cosa' : ' cosas') +
-      ' en la papelera desde hace más de ' + Papelera.DIAS_AVISO + ' días' +
-      ' (' + bytesLegibles(tamano) + ').</strong> ';
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'boton';
-    btn.textContent = 'Verlas';
-    btn.onclick = function () { irAMantenimiento('bloque-papelera'); };
-    c.appendChild(btn);
+    var texto = '';
+    if (r.n) {
+      var tamano = await Papelera.tamanoDeViejas(r.viejas);
+      texto = 'papelera: ' + r.n + (r.n === 1 ? ' cosa' : ' cosas') +
+        ' de más de ' + Papelera.DIAS_AVISO + ' días (' + bytesLegibles(tamano) + ')';
+    }
+    AvisosLinea.registrar('papelera-vieja', texto, false, function () { irAMantenimiento('bloque-papelera'); });
   }
 
   async function pintarTodo() {

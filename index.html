@@ -133,13 +133,16 @@
         </div>
       </header>
 
-      <div id="panel-avisos" class="oculto"></div>
-      <div id="panel-recurrentes" class="oculto"></div>
-
-      <!-- Apartado 7 de la fila 191: el aviso de aspirantes sin Nº de
-           identificación escolar vive aquí hasta que la fila 181 lo
-           lleve a la línea de avisos de arriba. -->
-      <div id="inicio-aviso-aspirantes"></div>
+      <!-- Fila 193, apartado 1 (docs/AVISOS-MENU-Y-VOLVER.md): todos los
+           avisos de arriba, en una sola línea. Antes había aquí varias
+           cajas de color (avisos.js, frescura.js, recurrentes.js,
+           avisos-que-faltan.js) y el aviso de aspirantes; cada una
+           sigue calculando lo mismo, pero le pasa su trozo a
+           js/avisos-linea.js (AvisosLinea.registrar) en vez de pintar
+           su propia caja. El botón de "posibles duplicados" que vivía
+           en la cabecera (js/unir-asuntos.js) también es un trozo más
+           de esta franja. -->
+      <div id="avisos-linea" class="oculto"></div>
 
       <!-- El único botón de montón que queda (mismo data-vista, para no
            romper pruebas que hacen .click('.panel[data-vista="clasificar"]')):
@@ -939,6 +942,12 @@
 <!-- Las Administraciones como tercero (fila 167): datos y ficha. Después de js/puente.js, js/archivo-personas.js y js/asuntos-nuevo-campos.js (sus puntos previstos). -->
 <script src="js/administraciones.js"></script>
 <script src="js/administraciones-ficha.js"></script>
+
+<!-- Fila 193, apartado 1 (docs/AVISOS-MENU-Y-VOLVER.md): todos los
+     avisos de arriba, en una sola línea. Después de js/puente.js (se
+     engancha a window.Gestor.alRefrescar), antes de los módulos de
+     abajo, que le pasan su trozo con AvisosLinea.registrar. -->
+<script src="js/avisos-linea.js"></script>
 
 <!-- Los módulos que se enganchan al puente. -->
 <script src="js/avisos.js"></script>

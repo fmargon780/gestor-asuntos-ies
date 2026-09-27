@@ -117,7 +117,7 @@
     else barra.insertBefore(b, barra.firstChild);
   }
 
-  /* ---------- la entrada de "Cuentas" (fila 74) ----------
+  /* ---------- la entrada de "Impresos" (fila 82) ----------
 
      Un botón .pestana más, junto a los que ya hay. Como se añade
      aquí y no está en el index.html de partida, el bucle de
@@ -126,36 +126,16 @@
      hace solo App.ir, que vuelve a mirar los .pestana que haya cada
      vez que se llama (js/nucleo.js).
 
-     Fila 191: la pestaña "Qué me toca" que iba justo antes de esta
-     desapareció (esa pantalla ya no existe), así que la referencia se
-     queda solo con la de "personas". */
-
-  function ponerLaEntradaDeCuentas() {
-    if ($('pestana-cuentas')) return;
-    var referencia = document.querySelector('.pestana[data-pantalla="personas"]');
-    if (!referencia || !referencia.parentNode) return;
-
-    var b = document.createElement('button');
-    b.id = 'pestana-cuentas';
-    b.className = 'pestana';
-    b.type = 'button';
-    b.dataset.pantalla = 'cuentas';
-    b.innerHTML = '<span>Cuentas</span>';
-    b.onclick = function () { if (window.Cuentas) window.Cuentas.abrir(); };
-    b.addEventListener('click', function () {
-      if (comoEstaba() === 'plegada') poner('plegada');
-    });
-    referencia.parentNode.insertBefore(b, referencia.nextSibling);
-  }
-
-  /* ---------- la entrada de "Formularios" (fila 82) ----------
-
-     Igual que las de "Qué me toca" y "Cuentas", justo detrás de ella. */
+     Fila 193, apartado 2 (docs/AVISOS-MENU-Y-VOLVER.md): orden del
+     boceto: Inicio, Nuevo asunto, Archivo, Personas y empresas,
+     Impresos, Cuentas. Esta va siempre pegada a "Personas y
+     empresas" (la referencia fija), y "Cuentas" mira si esta ya
+     existe para colgarse justo detrás: así el orden sale bien sin
+     que importe qué función arranca primero. */
 
   function ponerLaEntradaDeFormularios() {
     if ($('pestana-formularios')) return;
-    var referencia = $('pestana-cuentas') ||
-      document.querySelector('.pestana[data-pantalla="personas"]');
+    var referencia = document.querySelector('.pestana[data-pantalla="personas"]');
     if (!referencia || !referencia.parentNode) return;
 
     var b = document.createElement('button');
@@ -165,6 +145,31 @@
     b.dataset.pantalla = 'formularios';
     b.innerHTML = '<span>Impresos</span>';
     b.onclick = function () { if (window.Formularios) window.Formularios.abrir(); };
+    b.addEventListener('click', function () {
+      if (comoEstaba() === 'plegada') poner('plegada');
+    });
+    referencia.parentNode.insertBefore(b, referencia.nextSibling);
+  }
+
+  /* ---------- la entrada de "Cuentas" (fila 74) ----------
+
+     Igual que la de "Impresos", pegada justo detrás de ella (o de
+     "Personas y empresas" si por lo que fuera esta se llamara antes
+     de que exista "Impresos"). */
+
+  function ponerLaEntradaDeCuentas() {
+    if ($('pestana-cuentas')) return;
+    var referencia = $('pestana-formularios') ||
+      document.querySelector('.pestana[data-pantalla="personas"]');
+    if (!referencia || !referencia.parentNode) return;
+
+    var b = document.createElement('button');
+    b.id = 'pestana-cuentas';
+    b.className = 'pestana';
+    b.type = 'button';
+    b.dataset.pantalla = 'cuentas';
+    b.innerHTML = '<span>Cuentas</span>';
+    b.onclick = function () { if (window.Cuentas) window.Cuentas.abrir(); };
     b.addEventListener('click', function () {
       if (comoEstaba() === 'plegada') poner('plegada');
     });
@@ -222,8 +227,8 @@
   function arrancar() {
     ponerElBoton();
     ponerElBotonDeAjustes();
-    ponerLaEntradaDeCuentas();
     ponerLaEntradaDeFormularios();
+    ponerLaEntradaDeCuentas();
     ponerElDeNuevoAsunto();
     poner(comoEstaba());
     vigilarPaneles();

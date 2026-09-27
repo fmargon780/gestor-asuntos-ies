@@ -126,11 +126,11 @@ console.log('--- Inicio avisa mientras queda pendiente ---');
 await pagina.evaluate(() => window.Inicio && window.Inicio.repintar());
 await pagina.waitForTimeout(300);
 await comprobar('el aviso cuenta el aspirante sin número',
-  pagina.locator('.qmt-aviso-aspirantes').textContent()
+  pagina.locator('[data-aviso="aspirantes"]').textContent()
     .then(t => t.indexOf('1 aspirante sin Nº de identificación escolar') !== -1), true);
 
 console.log('--- escribe el número: renombra el abierto, no el archivado ---');
-await pagina.click('.qmt-aviso-aspirantes');
+await pagina.click('[data-aviso="aspirantes"]');
 await pagina.waitForSelector('#pantalla-personas:not(.oculto)');
 await pagina.waitForTimeout(300);
 await pagina.click('#lista-personas .resultado');
@@ -164,7 +164,7 @@ await comprobar('la carpeta archivada no se toca', pagina.evaluate(async (nombre
 console.log('--- ya no queda ningún aspirante pendiente ---');
 await pagina.evaluate(() => window.Inicio && window.Inicio.repintar());
 await pagina.waitForTimeout(300);
-await comprobar('el aviso desaparece', pagina.locator('.qmt-aviso-aspirantes').count(), 0);
+await comprobar('el aviso desaparece', pagina.locator('[data-aviso="aspirantes"]').count(), 0);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

@@ -14,8 +14,9 @@
      - con un candidato archivado, "Abrir el que ya existe" lleva a su
        carpeta en el ARCHIVO;
      - ya no hay franja encima de la lista de asuntos abiertos: en su
-       lugar, un aviso de una sola línea junto al botón "Tablón", que
-       lleva a la pantalla de Duplicados;
+       lugar, un trozo más de la franja única de avisos de Inicio
+       (fila 193, js/avisos-linea.js), que lleva a la pantalla de
+       Duplicados;
      - esa pantalla enseña cada grupo en columnas, con el nombre como
        enlace a la ficha, sus documentos (se abren en el visor) y sus
        últimas notas;
@@ -96,7 +97,7 @@ await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
 
 await comprobar('sin duplicados de partida, el aviso no se ve',
-  pagina.locator('#btn-duplicados').isHidden(), true);
+  pagina.locator('[data-aviso="duplicados"]').count(), 0);
 
 /* ============================================================
    1. EL CASO REAL: mismo tercero, tipo y curso, solo cambia el grupo
@@ -238,9 +239,9 @@ await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-asunto.oculto', { state: 'attached' });
 
 /* ============================================================
-   5. EL AVISO JUNTO A "TABLÓN": YA NO HAY FRANJA
+   5. EL AVISO, UN TROZO MÁS DE LA FRANJA DE INICIO: YA NO HAY FRANJA
    ============================================================ */
-console.log('--- el aviso de una línea junto a Tablón, sin franja encima de la lista ---');
+console.log('--- el aviso, un trozo de la franja de Inicio, sin franja encima de la lista ---');
 
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.click('#btn-recargar');
@@ -249,9 +250,9 @@ await pagina.waitForTimeout(300);
 await comprobar('ya no existe ninguna franja encima de la lista',
   pagina.locator('#franja-unir').count(), 0);
 await comprobar('el aviso se ve, con el grupo de TRANSPORTE',
-  pagina.locator('#btn-duplicados').isVisible(), true);
+  pagina.locator('[data-aviso="duplicados"]').isVisible(), true);
 await comprobar('dice cuántos posibles duplicados hay',
-  pagina.locator('#btn-duplicados').textContent(), '⚠ 1 posible duplicado — Revisar');
+  pagina.locator('[data-aviso="duplicados"]').textContent(), '1 posible duplicado');
 
 /* ============================================================
    6. LA PANTALLA DE DUPLICADOS: COLUMNAS, DOCUMENTOS Y NOTAS
@@ -284,7 +285,7 @@ await pagina.evaluate(async (datos) => {
 }, { existente: EXISTENTE, nueva: NUEVA });
 
 await pagina.click('#btn-recargar');
-await pagina.click('#btn-duplicados');
+await pagina.click('[data-aviso="duplicados"]');
 await pagina.waitForSelector('#pantalla-duplicados:not(.oculto)');
 await comprobar('se sale de la pantalla de asuntos abiertos',
   pagina.locator('#pantalla-abiertos').isHidden(), true);
@@ -328,7 +329,7 @@ console.log('--- unir, desde la pantalla de Duplicados ---');
 
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.click('#btn-recargar');
-await pagina.click('#btn-duplicados');
+await pagina.click('[data-aviso="duplicados"]');
 await pagina.waitForSelector('#pantalla-duplicados:not(.oculto)');
 
 await pagina.getByRole('button', { name: 'Unir', exact: true }).click();
@@ -379,8 +380,8 @@ await comprobar('los pasos hechos se copian del otro, porque este no tenía ning
 await comprobar('tras unir, la pantalla de Duplicados se queda al día, sin ese grupo',
   pagina.locator('#duplicados-lista .vacio').textContent(),
   'No hay ningún posible duplicado ahora mismo.');
-await comprobar('y el aviso de la cabecera se esconde',
-  pagina.locator('#btn-duplicados').isHidden(), true);
+await comprobar('y el aviso desaparece de la franja',
+  pagina.locator('[data-aviso="duplicados"]').count(), 0);
 
 await pagina.click('#dup-pantalla-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
@@ -401,8 +402,8 @@ await pagina.evaluate(async (datos) => {
 }, { a: SANC_A, b: SANC_B });
 
 await pagina.click('#btn-recargar');
-await pagina.waitForSelector('#btn-duplicados:not(.oculto)');
-await pagina.click('#btn-duplicados');
+await pagina.waitForSelector('[data-aviso="duplicados"]');
+await pagina.click('[data-aviso="duplicados"]');
 await pagina.waitForSelector('#pantalla-duplicados:not(.oculto)');
 
 await pagina.getByRole('button', { name: 'Unir', exact: true }).click();
@@ -461,8 +462,8 @@ const DESC_B = '260908 BECA 26-27 Distinto, Marta 1112223';
 await crearCarpeta(DESC_A);
 await crearCarpeta(DESC_B);
 await pagina.click('#btn-recargar');
-await pagina.waitForSelector('#btn-duplicados:not(.oculto)');
-await pagina.click('#btn-duplicados');
+await pagina.waitForSelector('[data-aviso="duplicados"]');
+await pagina.click('[data-aviso="duplicados"]');
 await pagina.waitForSelector('#pantalla-duplicados:not(.oculto)');
 
 await pagina.getByRole('button', { name: 'No son el mismo', exact: true }).click();
@@ -486,7 +487,7 @@ await comprobar('se guarda el descarte, con quién lo hizo y los dos nombres', l
 await pagina.click('#dup-pantalla-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await comprobar('el aviso ya no sale: el único grupo estaba descartado',
-  pagina.locator('#btn-duplicados').isHidden(), true);
+  pagina.locator('[data-aviso="duplicados"]').count(), 0);
 
 /* ============================================================
    10. EL GRUPO DESCARTADO VUELVE A AVISAR SI CAMBIA QUIÉN LO FORMA
@@ -499,8 +500,8 @@ await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(300);
 
 await comprobar('con un tercer miembro el grupo ya no es el que se descartó, y vuelve a avisar',
-  pagina.locator('#btn-duplicados').isVisible(), true);
-await pagina.click('#btn-duplicados');
+  pagina.locator('[data-aviso="duplicados"]').isVisible(), true);
+await pagina.click('[data-aviso="duplicados"]');
 await pagina.waitForSelector('#pantalla-duplicados:not(.oculto)');
 await comprobar('el grupo sale con los tres asuntos',
   pagina.locator('.columna-duplicado').count(), 3);

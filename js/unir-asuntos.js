@@ -172,32 +172,18 @@
     return todosLosGrupos().filter(function (g) { return !estaDescartado(g); });
   }
 
-  /* ---------- el aviso de una línea, junto a "Tablón" ---------- */
+  /* ---------- el trozo de la franja de avisos ----------
 
-  var botonAviso = null;
-
-  function cajaDelAviso() {
-    if (botonAviso && botonAviso.parentNode) return botonAviso;
-    var acciones = document.querySelector('#pantalla-abiertos .cabecera .acciones');
-    if (!acciones) return null;
-    botonAviso = document.createElement('button');
-    botonAviso.type = 'button';
-    botonAviso.id = 'btn-duplicados';
-    botonAviso.className = 'boton boton-ambar oculto';
-    botonAviso.onclick = function () { I.irADuplicados(); };
-    var antesDe = $('btn-tablon') || $('btn-recargar');
-    if (antesDe && antesDe.parentNode === acciones) acciones.insertBefore(botonAviso, antesDe);
-    else acciones.appendChild(botonAviso);
-    return botonAviso;
-  }
+     Fila 193, apartado 1: el botón que vivía suelto en la cabecera
+     ("⚠ N posibles duplicados — Revisar") es ahora un trozo más de la
+     franja única de js/avisos-linea.js; pulsarlo hace lo mismo de
+     siempre, I.irADuplicados(). */
 
   function pintarAviso() {
-    var b = cajaDelAviso();
-    if (!b) return;
+    if (!window.AvisosLinea) return;
     var n = gruposActivos().length;
-    if (!n) { b.classList.add('oculto'); return; }
-    b.textContent = '⚠ ' + (n === 1 ? '1 posible duplicado' : n + ' posibles duplicados') + ' — Revisar';
-    b.classList.remove('oculto');
+    var texto = n ? (n === 1 ? '1 posible duplicado' : n + ' posibles duplicados') : '';
+    AvisosLinea.registrar('duplicados', texto, false, function () { I.irADuplicados(); });
   }
 
   U.envolver(App, 'App.pintarAbiertos', 'unir-asuntos.js', function (comoEra) {

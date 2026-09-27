@@ -232,53 +232,27 @@
     }
   }
 
-  /* ---------- el panel de la pantalla de asuntos ---------- */
+  /* ---------- el trozo de la franja de avisos ----------
+
+     Fila 193, apartado 1: ya no pinta su propia caja. Un solo trozo
+     ("recurrentes") en js/avisos-linea.js; pulsarlo hace lo que hacía
+     el botón principal de antes, "Crear los N", con guarda para no
+     lanzar una segunda creación mientras la primera todavía está en
+     marcha (antes lo hacía deshabilitando el propio botón). */
+
+  var creandoDesdeLaLinea = false;
 
   function pintarPanel() {
-    var caja = $('panel-recurrentes');
-    if (!caja) return;
+    if (!window.AvisosLinea) return;
     var toca = pendientes();
-    if (!toca.length || cerradoHoy()) {
-      caja.classList.add('oculto');
-      caja.innerHTML = '';
-      return;
-    }
-
-    caja.className = 'aviso aviso-ambar';
-    caja.innerHTML = '<strong>Toca crear ' +
-      (toca.length === 1 ? '1 asunto que se repite' : toca.length + ' asuntos que se repiten') +
-      '.</strong><ul class="recurrentes-lista">' +
-      toca.map(function (r) {
-        return '<li>' + U.escapar(r.tipo + '  ·  ' + r.tercero +
-               (r.descripcion ? '  ·  ' + r.descripcion : '')) + '</li>';
-      }).join('') + '</ul>';
-
-    var botones = document.createElement('div');
-    botones.className = 'avisos-botones';
-
-    var b = document.createElement('button');
-    b.className = 'boton boton-principal';
-    b.textContent = toca.length === 1 ? 'Crear el asunto' : 'Crear los ' + toca.length;
-    b.onclick = function () { b.disabled = true; crearLosQueTocan(); };
-    botones.appendChild(b);
-
-    var ver = document.createElement('button');
-    ver.className = 'boton';
-    ver.textContent = 'Ver la lista en Ajustes';
-    ver.onclick = function () {
-      var pestana = document.querySelector('.pestana[data-pantalla="ajustes"]');
-      if (pestana) pestana.click();
-    };
-    botones.appendChild(ver);
-
-    var ocultar = document.createElement('button');
-    ocultar.className = 'boton';
-    ocultar.textContent = 'Ocultar por hoy';
-    ocultar.onclick = function () { cerrarPorHoy(); pintarPanel(); };
-    botones.appendChild(ocultar);
-
-    caja.appendChild(botones);
-    caja.classList.remove('oculto');
+    var texto = toca.length
+      ? (toca.length === 1 ? '1 asunto que se repite toca crearlo' : toca.length + ' asuntos que se repiten toca crearlos')
+      : '';
+    AvisosLinea.registrar('recurrentes', texto, false, function () {
+      if (creandoDesdeLaLinea) return;
+      creandoDesdeLaLinea = true;
+      crearLosQueTocan().finally(function () { creandoDesdeLaLinea = false; });
+    });
   }
 
   /* ---------- la tabla de Ajustes ----------
