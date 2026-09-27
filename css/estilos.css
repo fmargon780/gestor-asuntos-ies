@@ -312,6 +312,57 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 .tipo-boton:focus { outline: none; }
 .tipo-boton:focus-visible { outline: 2px solid var(--azul); outline-offset: 1px; }
 
+/* Fila 197 (docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md): los dos bloques de
+   "Nuevo asunto" (persona / tipo) a la vista a la vez, lado a lado en
+   pantalla ancha; se apilan en estrecha (misma regla de .dos-paneles,
+   de más abajo). El de la persona lleva más ancho: es el que tiene
+   una lista de resultados con un botón de copiar el Nº de
+   identificación escolar (js/copiar.js) al final de la línea, y con
+   las dos columnas iguales ese botón puede quedar justo en el centro
+   de la tarjeta, el punto donde cae un clic sin más precisión. */
+.nuevo-dos-bloques {
+  display: grid; grid-template-columns: 3fr 2fr; gap: 18px; align-items: start; margin-bottom: 18px;
+}
+@media (max-width: 900px) {
+  .nuevo-dos-bloques { grid-template-columns: 1fr; }
+}
+
+/* El resumen de la guía, en una línea, encima de la parrilla de tipos:
+   pulsable, despliega la guía entera (#guia-nuevo) debajo. */
+.guia-resumen {
+  display: block; width: 100%; text-align: left; font: inherit; font-size: 13px;
+  color: var(--tinta-suave); background: #f7f9fc; border: 1px solid var(--linea);
+  border-radius: 8px; padding: 8px 12px; margin: 8px 0; cursor: pointer;
+}
+.guia-resumen:hover { border-color: var(--azul); color: var(--azul); }
+.guia-resumen-vacia { cursor: default; }
+.guia-resumen-vacia:hover { border-color: var(--linea); color: var(--tinta-suave); }
+
+/* Sin persona elegida, la parrilla enseña todos los tipos: cada botón
+   lleva su categoría en pequeño, en un <small aria-hidden> (el nombre
+   accesible del botón sigue siendo solo el tipo). */
+.tipos-todas-categorias .tipo-boton small {
+  display: block; font-size: 10px; font-weight: 400; color: var(--tinta-suave); margin-top: 2px;
+}
+.tipos-todas-categorias .tipo-boton.elegido small { color: #cfe0ee; }
+
+/* El botón de copiar el Nº de identificación escolar (js/copiar.js),
+   dentro de un resultado del buscador único: a la derecha del todo,
+   lejos del centro de la tarjeta (donde cae un clic sin más
+   precisión, `pagina.click('...resultado')` en las pruebas), pase lo
+   que pase con el largo del nombre del grupo o del curso delante.
+   Solo aquí: en Personas (#lista-personas) se deja como está. */
+#resultados-tercero .boton-nie-chico { float: right; }
+
+/* La etiqueta de categoría de un resultado del buscador único, detrás
+   del nombre, en la misma línea (nunca "float": cambiaría el alto de
+   la tarjeta y, con él, el punto donde cae un clic en su centro —
+   justo lo que usan las pruebas con `pagina.click('...resultado')`). */
+.resultado-categoria {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  color: var(--tinta-suave); margin-left: 8px;
+}
+
 .categorias { display: flex; flex-wrap: wrap; gap: 10px; }
 .categoria-boton {
   font: inherit; font-size: 15px; font-weight: 600;

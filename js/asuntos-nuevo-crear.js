@@ -53,7 +53,18 @@ App.datosDelFormulario = function () {
 };
 
 App.refrescarVista = function () {
-  if (!App.E.nuevo.tipo || !App.E.nuevo.tercero) return;
+  /* Fila 197: con persona primero, el bloque de detalles (y "Crear el
+     asunto" dentro de él) puede estar a la vista con solo la persona
+     elegida, todavía sin tipo. "Crear" solo se activa con los dos
+     (docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md, punto 4), así que aquí se
+     apaga explícitamente en vez de dejarlo como estaba (encendido, de
+     fábrica, en el HTML). */
+  if (!App.E.nuevo.tipo || !App.E.nuevo.tercero) {
+    $('vista-nombre').textContent = '';
+    $('vista-ruta').textContent = '';
+    $('btn-crear').disabled = true;
+    return;
+  }
   var d = App.datosDelFormulario();
   var ajustado = nombreDeCarpetaAjustado(d);
   var nombre = ajustado.nombre;
@@ -100,7 +111,7 @@ App.crearAsuntoDelFormulario = async function () {
   /* Lo principal: la carpeta y su ficha. Lo de después (meter el
      documento traído, limpiar el formulario, la lista, el cuadro de
      documentos) es accesorio: si falla, ámbar (fila 100). */
-  var carpeta, terceroCreado = null;
+  var carpeta, terceroCreado = null, primerHitoId = null;
   try {
     if (await Carpetas.existe(App.E.abiertos, nombre)) {
       U.aviso('Ya hay un asunto abierto con ese mismo nombre.', 'malo');
@@ -142,6 +153,12 @@ App.crearAsuntoDelFormulario = async function () {
     }
     await App.anotar(nombre, datosNuevoAsunto);
     terceroCreado = App.E.nuevo.tercero;
+    /* Fila 197, punto 4: App.anotar ya ha creado los hitos de la guía
+       (envoltura de js/hitos.js), así que el primero ya existe aquí. */
+    try {
+      var hitosCreados = window.Hitos ? await Hitos.hitosDe(nombre) : [];
+      if (hitosCreados && hitosCreados.length) primerHitoId = hitosCreados[0].id;
+    } catch (e1b) { /* sin mesa que abrir; se sigue con la ficha */ }
   } catch (e1) {
     U.accesorio('La carpeta está creada, pero no he podido guardar su ficha. Ábrela y vuelve a ' +
       'poner el estado', e1);
@@ -183,15 +200,26 @@ App.crearAsuntoDelFormulario = async function () {
     $('campo-grupo').checked = false;
     App.loPideNuevoControles = null;
     $('lopide-caja-nuevo').innerHTML = '';
-    $('bloque-tipos').classList.add('oculto');
     $('bloque-grupo').classList.add('oculto');
     $('bloque-campos').classList.add('oculto');
     $('campos-lista-nuevo').innerHTML = '';
-    $('bloque-tercero').classList.add('oculto');
     $('bloque-detalles').classList.add('oculto');
+    /* Fila 197: los dos bloques de arriba ya no se esconden entre un
+       asunto y el siguiente (persona y tipo están siempre a la vista),
+       así que aquí hay que dejarlos limpios a mano: sin ellos, el
+       tercero recién creado se seguiría viendo en la próxima visita. */
+    $('tercero-elegido').classList.add('oculto');
+    $('tercero-elegido').innerHTML = '';
+    App.pintarCategorias();
+    App.pintarTipos();
     await App.verAbiertos();
-    /* Fila 119: se abre la ficha del recién creado; si no aparece, la lista. */
+    /* Fila 197, punto 4: si el tipo tenía guía, directo a la mesa de su
+       primer hito; si no, la ficha, como hasta ahora (fila 119). */
     var recien = App.E.listaAbiertos.filter(function (a) { return a.nombre === nombre; })[0];
+    if (primerHitoId && recien) {
+      if (window.HitosPanel) HitosPanel.desplegarAlAbrir(recien.nombre, primerHitoId);
+      if (window.FichaTarjetas) FichaTarjetas.abrirAlEntrar('hitos');
+    }
     if (!(recien && window.Navegacion && Navegacion.abrirAbierto(nombre))) App.ir('abiertos');
 
     /* Con el documento ya dentro, se abre directo el cuadro de ponerle

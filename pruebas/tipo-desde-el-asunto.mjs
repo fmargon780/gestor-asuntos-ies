@@ -43,10 +43,13 @@ await pagina.waitForSelector('#aplicacion:not(.oculto)');
 
 console.log('--- categoría ALUMNADO, sin texto: el botón discreto al final de la parrilla ---');
 await pagina.click('.pestana[data-pantalla="nuevo"]');
+/* Fila 197: sin persona elegida la parrilla enseña todos los tipos, no
+   solo los de ALUMNADO; la pastilla ahora es solo el filtro del
+   buscador de la izquierda. */
 await pagina.click('.categoria-boton[data-categoria="ALUMNADO"]');
 await pagina.waitForSelector('#tipos-lista .tipo-boton');
-await comprobar('salen los 14 tipos de partida de ALUMNADO',
-  pagina.locator('#tipos-lista .tipo-boton').count(), 14);
+await comprobar('salen los 14 tipos de partida de ALUMNADO, entre todos los demás',
+  pagina.locator('#tipos-lista .tipo-boton[data-categoria="ALUMNADO"]').count(), 14);
 await comprobar('el botón "+ Crear tipo nuevo" está, discreto, dentro de la parrilla',
   pagina.locator('#tipos-lista #btn-crear-tipo-al-vuelo').count(), 1);
 await comprobar('discreto: sin la clase de botón destacado',
@@ -80,7 +83,7 @@ await comprobar('el tipo se ha guardado, con su nombre corto',
 await comprobar('queda elegido en Nuevo asunto',
   pagina.evaluate(() => App.E.nuevo.tipo), 'EVACUACION');
 await comprobar('su botón sale marcado en la parrilla',
-  pagina.locator('#tipos-lista .tipo-boton.elegido').textContent(), 'EVACUACION');
+  pagina.locator('#tipos-lista .tipo-boton.elegido').getAttribute('data-tipo'), 'EVACUACION');
 await comprobar('se pasa solo al bloque de elegir tercero',
   pagina.locator('#bloque-tercero').isHidden(), false);
 await comprobar('aviso verde de que se ha creado',

@@ -312,23 +312,25 @@
       <div id="aviso-pendiente" class="aviso aviso-ambar oculto"></div>
 
       <div class="formulario">
-        <label class="etiqueta">¿De qué es el asunto?</label>
-        <div class="categorias" id="categorias-lista"></div>
+        <div class="nuevo-dos-bloques">
+          <div id="bloque-tercero">
+            <label class="etiqueta" id="etiqueta-tercero">Con quién es el asunto</label>
+            <input id="buscar-tercero" class="campo" placeholder="Escribe dos letras del nombre">
+            <div class="categorias" id="categorias-lista"></div>
+            <div id="resultados-tercero" class="resultados"></div>
+            <div id="tercero-elegido" class="elegido oculto"></div>
+          </div>
 
-        <div id="bloque-tipos" class="oculto">
-          <label class="etiqueta">Tipo de asunto</label>
-          <div id="tercero-propuesto-nuevo" class="aviso-en-vivo oculto"></div>
-          <div class="tipos" id="tipos-lista"></div>
-          <p class="nota">¿Falta un tipo? Créalo con «+ Crear tipo nuevo», aquí mismo, o ve a
-             <button type="button" class="enlace" id="ir-a-ajustes">Ajustes</button>
-             para completar su guía, sus campos y sus plantillas.</p>
-        </div>
-
-        <div id="bloque-tercero" class="oculto">
-          <label class="etiqueta" id="etiqueta-tercero">Tercero</label>
-          <input id="buscar-tercero" class="campo" placeholder="Escribe dos letras del nombre">
-          <div id="resultados-tercero" class="resultados"></div>
-          <div id="tercero-elegido" class="elegido oculto"></div>
+          <div id="bloque-tipos">
+            <label class="etiqueta">Qué tipo de asunto</label>
+            <div id="tercero-propuesto-nuevo" class="aviso-en-vivo oculto"></div>
+            <button type="button" id="guia-resumen-nuevo" class="guia-resumen oculto"></button>
+            <div id="guia-nuevo" class="oculto"></div>
+            <div class="tipos" id="tipos-lista"></div>
+            <p class="nota">¿Falta un tipo? Créalo con «+ Crear tipo nuevo», aquí mismo, o ve a
+               <button type="button" class="enlace" id="ir-a-ajustes">Ajustes</button>
+               para completar su guía, sus campos y sus plantillas.</p>
+          </div>
         </div>
 
         <div id="bloque-detalles" class="oculto">
@@ -369,8 +371,6 @@
             <label class="etiqueta">Quién lo pide y por qué vía <span class="suave">(opcional)</span></label>
             <div id="lopide-caja-nuevo"></div>
           </div>
-
-          <div id="guia-nuevo" class="oculto"></div>
 
           <div class="vista-previa">
             <div class="vista-rotulo">Se creará esta carpeta</div>

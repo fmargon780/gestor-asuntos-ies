@@ -51,7 +51,9 @@ señalarlas.
 
 Decisiones de diseño:
 
-- Primero se elige la categoría (ALUMNADO, PERSONAL, EMPRESAS, OTROS), y después el tipo.
+- Nuevo asunto empieza por la persona (fila 197): un buscador único busca en todas las
+  categorías a la vez, y la parrilla de tipos se limita a la suya en cuanto se elige; el camino
+  «tipo primero» sigue existiendo, para quien prefiera empezar por ahí.
 - Los tipos de asunto se crean en Ajustes o, con nombre, nombre corto y categoría, desde Nuevo
   asunto («+ Crear tipo nuevo», `js/tipo-al-vuelo.js`, fila 128); la guía, los campos y las
   plantillas, siempre en Ajustes. Los de DOCUMENTO sí se crean al vuelo, desde el propio cuadro.

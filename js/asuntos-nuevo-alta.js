@@ -59,6 +59,52 @@ App.admiteAlta = function (categoria) {
   return !!def && !def.sinAlta;
 };
 
+/* Fila 197 (docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md): sin ninguna
+   pastilla de categoría pulsada, "+ Dar de alta" no sabe en cuál
+   meter a la persona nueva, así que pide la categoría enseñando un
+   botón por cada una que admita alta (App.botonAlta, con una sola
+   categoría ya fijada, sigue igual que siempre). */
+App.botonesAlta = function (texto) {
+  return Nombres.CATEGORIAS.filter(App.admiteAlta).map(function (cat) {
+    var b = document.createElement('button');
+    b.className = 'boton';
+    b.style.marginTop = '6px';
+    b.style.marginRight = '6px';
+    b.textContent = cat === 'ALUMNADO'
+      ? '+ Dar de alta un solicitante'
+      : '+ Dar de alta en ' + Nombres.textoCategoria(cat, 'lista');
+    b.onclick = function () { App.altaTercero(cat, texto); };
+    return b;
+  });
+};
+
+/* Fila 197: el buscador único de "Nuevo asunto" busca en varias
+   categorías a la vez. Carga cada una con Datos.cargar y filtra con
+   Datos.buscar, tal cual App.buscarPersonas hace con una sola
+   (js/archivo-personas.js); no se reinventa esa lógica, solo se repite
+   por categoría. En ALUMNADO, matriculados y solicitantes antes que
+   los antiguos, el mismo criterio que ya usa Personas
+   (js/personas-familias.js, PersonasFamilias.pintar). */
+App.buscarEnCategorias = async function (texto, categorias, topePorCategoria) {
+  var salida = [];
+  for (var i = 0; i < categorias.length; i++) {
+    var categoria = categorias[i];
+    try {
+      var fuente = await Datos.cargar(App.E.datos, categoria);
+      var encontrados = Datos.buscar(fuente.lista, texto, topePorCategoria);
+      if (categoria === 'ALUMNADO') {
+        var actuales = encontrados.filter(function (p) { return p.matriculado || p.solicitante; });
+        var antiguos = encontrados.filter(function (p) { return !p.matriculado && !p.solicitante; });
+        encontrados = actuales.concat(antiguos);
+      }
+      salida.push({ categoria: categoria, fuente: fuente, resultados: encontrados });
+    } catch (e) {
+      salida.push({ categoria: categoria, fuente: null, resultados: [] });
+    }
+  }
+  return salida;
+};
+
 /* Tras dar de alta, queda elegido sin tener que volver a pulsarlo
    (fila 173, docs/NUEVO-ASUNTO-SIN-REPETIR.md, punto 3): si estamos en
    Nuevo asunto y en la misma categoría, se llama a App.fijarTercero con

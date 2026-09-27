@@ -61,12 +61,16 @@ App.prepararNuevo = function () {
   App.actualizarCursoNuevo();
   App.pintarPendiente();
   App.pintarCategorias();
-  if (App.E.nuevo.categoria) App.pintarTipos();
+  App.pintarTipos();
   App.refrescarVista();
 };
 
-/* Primero la categoría. Con cuatro botones se llega a los diez tipos
-   que hacen falta, en vez de enseñar los cuarenta de golpe. */
+/* Fila 197 (docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md): las pastillas de
+   categoría ya no eligen antes de nada (los dos bloques, persona y
+   tipo, están a la vista los dos a la vez): son solo un filtro del
+   buscador único de la izquierda. Pulsar una la enciende o la apaga
+   (App.E.nuevo.categoria = esa categoría, o null si estaba encendida);
+   ninguna encendida busca en todas. */
 App.pintarCategorias = function () {
   var caja = $('categorias-lista');
   caja.innerHTML = '';
@@ -77,21 +81,21 @@ App.pintarCategorias = function () {
     b.setAttribute('data-categoria', cat);
     b.innerHTML = U.escapar(cat) +
       '<small>' + U.escapar(App.DESCRIPCION_CATEGORIA[cat]) + ' · ' + cuantos + ' tipos</small>';
-    b.onclick = function () { App.elegirCategoria(cat); };
+    b.onclick = function () {
+      App.elegirCategoria(App.E.nuevo.categoria === cat ? null : cat);
+      App.buscarTercero();
+    };
     caja.appendChild(b);
   });
 };
 
+/* Fija el filtro de categoría del buscador (null = todas) y repinta
+   las pastillas. Ya NO toca el tipo ni el tercero elegidos: eso lo
+   decide cada camino por su cuenta (elegirTipo, marcarTipoElegido,
+   fijarTercero, nuevoAsuntoCon). */
 App.elegirCategoria = function (cat) {
-  App.E.nuevo.categoria = cat;
-  App.E.nuevo.tipo = null;
-  App.E.nuevo.tercero = null;
-  App.E.nuevo.terceroPropuesto = null;
+  App.E.nuevo.categoria = cat || null;
   App.pintarCategorias();
-  App.pintarTipos();
-  $('bloque-tipos').classList.remove('oculto');
-  $('bloque-tercero').classList.add('oculto');
-  $('bloque-detalles').classList.add('oculto');
 };
 
 /* «Para: Nombre del tercero» encima de la parrilla, cuando
@@ -112,56 +116,80 @@ function pintarTerceroPropuesto() {
   };
 }
 
+/* La categoría a la que se limita la parrilla: la de la persona
+   elegida, o la de la que está propuesta y esperando tipo (fila 173).
+   Sin persona (ni propuesta), null: se ven todos los tipos. */
+function categoriaDeLaParrilla() {
+  if (App.E.nuevo.tercero) return App.E.nuevo.tercero.categoria;
+  if (App.E.nuevo.terceroPropuesto) return App.E.nuevo.terceroPropuesto.categoria;
+  return null;
+}
+
+/* Fila 197: con persona elegida, solo los tipos de su categoría (como
+   antes); sin persona, todos, con la categoría de cada uno en pequeño
+   (vía `data-categoria`, que css/estilos.css enseña con ::after, sin
+   tocar el nombre accesible del botón, que sigue siendo solo el
+   tipo). */
 App.pintarTipos = function () {
   pintarTerceroPropuesto();
   var caja = $('tipos-lista');
   caja.innerHTML = '';
-  var deEsta = App.E.tipos.filter(function (t) { return t.categoria === App.E.nuevo.categoria; });
+  var categoriaPersona = categoriaDeLaParrilla();
+  var deEsta = categoriaPersona
+    ? App.E.tipos.filter(function (t) { return t.categoria === categoriaPersona; })
+    : App.E.tipos.slice();
+  caja.classList.toggle('tipos-todas-categorias', !categoriaPersona);
   if (!deEsta.length) {
-    caja.innerHTML = '<div class="vacio">Esta categoría no tiene ningún tipo todavía. ' +
-                     'Se añaden en Ajustes.</div>';
+    caja.innerHTML = '<div class="vacio">' + (categoriaPersona
+      ? 'Esta categoría no tiene ningún tipo todavía. Se añaden en Ajustes.'
+      : 'Todavía no hay ningún tipo de asunto. Se añaden en Ajustes.') + '</div>';
     return;
   }
   deEsta.forEach(function (t) {
     var b = document.createElement('button');
     b.className = 'tipo-boton' + (App.E.nuevo.tipo === t.tipo ? ' elegido' : '');
-    b.textContent = t.tipo;
+    b.setAttribute('data-categoria', t.categoria);
+    /* `data-tipo`: el nombre de verdad, sin la categoría, para quien lo
+       lea del DOM en vez del estado (js/tipos-buscador.js,
+       js/tipos-organo.js, js/guias-enganche.js). `aria-hidden` en la
+       etiqueta: el nombre ACCESIBLE del botón (el que usa
+       getByRole/exact en las pruebas) sigue siendo solo el tipo,
+       aunque se vea también la categoría. */
+    b.dataset.tipo = t.tipo;
+    b.innerHTML = U.escapar(t.tipo) +
+      (categoriaPersona ? '' : ' <small aria-hidden="true">' + U.escapar(t.categoria) + '</small>');
     b.onclick = function () { App.elegirTipo(t); };
     caja.appendChild(b);
   });
 };
 
-/* Cambiar de tipo no borra el tercero si sigue siendo de la misma
-   categoría (fila 173, docs/NUEVO-ASUNTO-SIN-REPETIR.md, punto 2): se
+/* Fila 197: con persona ya elegida, un tipo siempre es de su misma
+   categoría (la parrilla solo enseña esos), así que nunca se borra: se
    vuelve a fijar, para que los campos del tipo nuevo se rellenen con
-   sus datos. Solo se borra si cambia la categoría. */
+   sus datos (fila 173, docs/NUEVO-ASUNTO-SIN-REPETIR.md, punto 2). Sin
+   persona, elegir un tipo deja el buscador de la izquierda filtrado a
+   su categoría (el camino «tipo primero»), y si había una persona
+   propuesta de su misma categoría (fila 173, punto 1), se aplica. */
 App.elegirTipo = function (t) {
-  var terceroAnterior = App.E.nuevo.tercero;
-  var seConserva = terceroAnterior && App.E.nuevo.categoria === t.categoria;
+  var terceroActual = App.E.nuevo.tercero;
   var propuesto = App.E.nuevo.terceroPropuesto;
-  var seAplicaPropuesto = !seConserva && propuesto && propuesto.categoria === t.categoria;
+  var seAplicaPropuesto = !terceroActual && propuesto && propuesto.categoria === t.categoria;
   App.E.nuevo.tipo = t.tipo;
-  App.E.nuevo.categoria = t.categoria;
-  App.E.nuevo.tercero = null;
+  App.elegirCategoria(t.categoria);
   App.E.nuevo.terceroPropuesto = null;
   App.pintarTipos();
-  $('bloque-tercero').classList.remove('oculto');
-  $('bloque-detalles').classList.add('oculto');
   App.loPideNuevoControles = null;
-  $('etiqueta-tercero').textContent = Nombres.textoCategoria(t.categoria, 'tercero');
-  $('buscar-tercero').value = '';
-  $('resultados-tercero').innerHTML = '';
-  $('tercero-elegido').classList.add('oculto');
   App.E.nuevo.configCampos = [];
   $('bloque-campos').classList.add('oculto');
   $('campos-lista-nuevo').innerHTML = '';
   App.actualizarLimiteNuevo();
-  if (seConserva) {
-    App.fijarTercero(terceroAnterior);
+  if (terceroActual) {
+    App.fijarTercero(terceroActual);
   } else if (seAplicaPropuesto) {
     App.fijarTercero(propuesto);
   } else {
-    $('buscar-tercero').focus();
+    App.buscarTercero();
+    App.refrescarVista();
   }
 };
 
@@ -210,12 +238,8 @@ App.nuevoAsuntoCon = function (opciones) {
    App.elegirTipo; si ya estaba a la vista, se deja tal cual. */
 App.marcarTipoElegido = function (t) {
   App.E.nuevo.tipo = t.tipo;
-  App.E.nuevo.categoria = t.categoria;
+  if (!App.E.nuevo.tercero) App.elegirCategoria(t.categoria);
   App.pintarTipos();
-  if ($('bloque-tercero').classList.contains('oculto')) {
-    $('bloque-tercero').classList.remove('oculto');
-    $('etiqueta-tercero').textContent = Nombres.textoCategoria(t.categoria, 'tercero');
-  }
   App.actualizarLimiteNuevo();
   App.refrescarVista();
 };
@@ -228,37 +252,53 @@ $('buscar-tercero').oninput = function () {
   App.temporizador = setTimeout(App.buscarTercero, 180);
 };
 
+/* Fila 197: el buscador único de "Nuevo asunto" busca en todas las
+   categorías a la vez (o solo en la que esté marcada como filtro,
+   App.E.nuevo.categoria), mezclando los resultados con su etiqueta de
+   categoría a la derecha (css .resultado-categoria). La carga y la
+   búsqueda de cada categoría, y el orden de ALUMNADO (matriculados
+   antes que antiguos), viven en App.buscarEnCategorias
+   (js/asuntos-nuevo-alta.js), para reusar Datos.cargar/Datos.buscar
+   sin repetirlos aquí. */
 App.buscarTercero = async function () {
-  if (!App.E.nuevo.categoria) return;
   var texto = $('buscar-tercero').value;
   var caja = $('resultados-tercero');
   if (U.normalizar(texto).length < 2) { caja.innerHTML = ''; return; }
   caja.innerHTML = '<div class="explica">Buscando…</div>';
-  var fuente = await Datos.cargar(App.E.datos, App.E.nuevo.categoria);
-  var encontrados = Datos.buscar(fuente.lista, texto, 30);
+
+  var filtro = App.E.nuevo.categoria;
+  var categorias = filtro ? [filtro] : Nombres.CATEGORIAS.slice();
+  var porCategoria = await App.buscarEnCategorias(texto, categorias, filtro ? 30 : 8);
   caja.innerHTML = '';
 
-  if (!encontrados.length) {
+  var total = 0;
+  porCategoria.forEach(function (p) { total += p.resultados.length; });
+
+  if (!total) {
     var vacio = document.createElement('div');
     vacio.className = 'vacio';
-    if (App.E.nuevo.categoria === 'ALUMNADO') {
-      vacio.innerHTML = (fuente.fichero
-        ? 'Nadie con ese nombre en ' + U.escapar(fuente.fichero) + '.'
+    var fuenteUnica = filtro && porCategoria[0] && porCategoria[0].fuente;
+    if (filtro === 'ALUMNADO') {
+      vacio.innerHTML = (fuenteUnica && fuenteUnica.fichero
+        ? 'Nadie con ese nombre en ' + U.escapar(fuenteUnica.fichero) + '.'
         : 'Todavía no está el fichero RegAlum.csv en la carpeta _GESTOR/datos.') +
         '<br>Si es un solicitante que aún no se ha matriculado, dale de alta aquí.';
-    } else if (App.E.nuevo.categoria === 'PERSONAL') {
-      vacio.innerHTML = fuente.fichero
-        ? 'Nadie con ese nombre en ' + U.escapar(fuente.fichero) +
+    } else if (filtro === 'PERSONAL') {
+      vacio.innerHTML = fuenteUnica && fuenteUnica.fichero
+        ? 'Nadie con ese nombre en ' + U.escapar(fuenteUnica.fichero) +
           ' ni en las altas a mano.'
         : 'Todavía no hay ningún fichero RelPerCen en la carpeta _GESTOR/datos.';
-    } else if (App.E.nuevo.categoria === 'TUTORES LEGALES') {
+    } else if (filtro === 'TUTORES LEGALES') {
       vacio.textContent = 'Nadie con ese nombre entre los tutores legales del RegAlum.csv. ' +
         'Busca por su nombre, su DNI, su teléfono o su correo.';
-    } else {
+    } else if (filtro) {
       vacio.textContent = 'No está en la lista todavía.';
+    } else {
+      vacio.textContent = 'Nadie con ese nombre en ninguna categoría.';
     }
     caja.appendChild(vacio);
-    if (App.admiteAlta(App.E.nuevo.categoria)) caja.appendChild(App.botonAlta(texto));
+    if (filtro) { if (App.admiteAlta(filtro)) caja.appendChild(App.botonAlta(texto)); }
+    else App.botonesAlta(texto).forEach(function (b) { caja.appendChild(b); });
     return;
   }
 
@@ -266,16 +306,23 @@ App.buscarTercero = async function () {
     var d = document.createElement('div');
     d.className = App.claseDeResultado(p);
     if (p.id) d.dataset.nie = p.id;
-    d.innerHTML = '<div>' + U.escapar(p.nombre) + '</div>' +
+    d.innerHTML = '<div>' + U.escapar(p.nombre) +
+                  '<span class="resultado-categoria">' + U.escapar(Nombres.textoCategoria(p.categoria, 'lista')) + '</span></div>' +
                   '<div class="resultado-pie">' + U.escapar(App.pieDe(p)) + '</div>';
     d.onclick = function () { App.fijarTercero(p); };
     return d;
   }
-  /* Fila 167: una categoría con su propia lista (Administraciones, agrupada). */
-  var propia = App.LISTAS_DE_CATEGORIA && App.LISTAS_DE_CATEGORIA[App.E.nuevo.categoria];
-  if (propia) propia(caja, { lista: encontrados }, '', tarjeta);
-  else encontrados.forEach(function (p) { caja.appendChild(tarjeta(p)); });
-  if (App.admiteAlta(App.E.nuevo.categoria)) caja.appendChild(App.botonAlta(texto));
+
+  porCategoria.forEach(function (p) {
+    if (!p.resultados.length) return;
+    /* Fila 167: una categoría con su propia lista (Administraciones, agrupada). */
+    var propia = App.LISTAS_DE_CATEGORIA && App.LISTAS_DE_CATEGORIA[p.categoria];
+    if (propia) propia(caja, { lista: p.resultados }, '', tarjeta);
+    else p.resultados.forEach(function (r) { caja.appendChild(tarjeta(r)); });
+  });
+
+  if (filtro) { if (App.admiteAlta(filtro)) caja.appendChild(App.botonAlta(texto)); }
+  else App.botonesAlta(texto).forEach(function (b) { caja.appendChild(b); });
 };
 
 /* La fila de un resultado se marca cuando abrirle un asunto casi

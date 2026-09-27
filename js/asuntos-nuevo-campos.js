@@ -143,8 +143,22 @@ App.validarCamposObligatorios = function () {
    desplegable «Departamento» de Administraciones): `fn(persona, caja)`. */
 App.alFijarTercero = [];
 
+/* Fila 197: fijar el tercero es el momento en que se sabe de verdad la
+   categoría del asunto (punto 5 del documento: la categoría del
+   asunto es la del tercero), así que se deja como filtro del buscador
+   (App.elegirCategoria) y se repinta la parrilla de tipos, que a
+   partir de ahora solo enseña los de esa categoría. */
 App.fijarTercero = function (p) {
   App.E.nuevo.tercero = p;
+  App.elegirCategoria(p.categoria);
+  /* Un tipo ya elegido de otra categoría (persona anterior, u otro
+     camino) deja de valer para esta persona: se olvida, en vez de
+     dejar un asunto a medio montar con tipo y categoría distintos. */
+  var tipoActual = App.E.tipos.filter(function (t) { return t.tipo === App.E.nuevo.tipo; })[0];
+  if (App.E.nuevo.tipo && (!tipoActual || tipoActual.categoria !== p.categoria)) {
+    App.E.nuevo.tipo = null;
+  }
+  App.pintarTipos();
   var texto = App.textoTercero(p);
   $('resultados-tercero').innerHTML = '';
   $('buscar-tercero').value = '';
@@ -157,6 +171,7 @@ App.fijarTercero = function (p) {
     App.E.nuevo.tercero = null;
     caja.classList.add('oculto');
     $('bloque-detalles').classList.add('oculto');
+    App.pintarTipos();
     $('buscar-tercero').focus();
   };
 

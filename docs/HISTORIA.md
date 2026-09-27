@@ -5,6 +5,72 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 197: Nuevo asunto empieza por la persona
+
+`docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md`. Rediseño completo de la pantalla: en vez de
+categoría → tipo → tercero en orden fijo, dos bloques a la vista a la vez
+(`.nuevo-dos-bloques`, 3fr/2fr, apilados por debajo de 900 px), rellenables en cualquier
+orden, con los detalles debajo a todo el ancho.
+
+**El buscador único** (`App.buscarTercero`, `js/asuntos-nuevo.js`) busca en las seis
+categorías a la vez, o solo en la marcada como filtro (`App.E.nuevo.categoria`, ya no gate,
+solo filtro: las pastillas ya no eligen antes de nada). La carga y el filtrado, categoría por
+categoría, en `App.buscarEnCategorias` (`js/asuntos-nuevo-alta.js`), nuevo, sin tocar
+`App.pintarBuscadorDeTercero` (el buscador reutilizable de Relacionados y los grupos, que
+sigue siendo categoría-primero). ALUMNADO: matriculados y solicitantes antes que los
+antiguos, mismo criterio que `js/personas-familias.js`. «+ Dar de alta»: con filtro, el botón
+de siempre; sin filtro, uno por categoría (`App.botonesAlta`), porque ya no hay una categoría
+única que suponer.
+
+**La parrilla de tipos** (`App.pintarTipos`) se limita a la categoría de la persona elegida
+(o propuesta, fila 173) como antes; sin persona, enseña TODOS los tipos, cada botón con su
+categoría en un `<small aria-hidden="true">` — así el nombre accesible del botón (el que usan
+`getByRole`/`exact` en un montón de pruebas, y «+ Crear tipo nuevo») sigue siendo solo el
+tipo. `data-tipo` en el propio botón da el nombre de verdad a quien lo lee del DOM en vez del
+estado: hubo que corregir tres sitios que leían `textContent` dándolo por el nombre limpio
+(`js/tipos-buscador.js`, el orden por uso y el filtro de búsqueda; `js/tipos-organo.js`, el
+agrupado por órgano; `js/guias-enganche.js`, qué guía enseñar) para que no se rompieran con la
+categoría añadida. `js/tipos-buscador.js` también deja de aplicar el tope de «los más usados
+de partida» cuando se ven todas las categorías a la vez (`.tipos-todas-categorias`): con hasta
+40 tipos de golpe, ese tope escondía la mayoría detrás de «Ver todos», justo lo contrario de
+lo que pide el documento.
+
+**El resumen de la guía en una línea** (`Guias.resumenDeTipo`, nuevo en `js/guias-vista.js`):
+hitos, documentos, plazo y quién lo encarga, o «Sin guía» sin ella. Pulsable: despliega y
+pliega el mismo `#guia-nuevo` que antes vivía siempre abierto al fondo del formulario, ahora
+movido arriba de la parrilla (`js/guias-enganche.js`, `pintarGuiaNuevo` reescrita).
+
+**Tras crear, si el tipo tiene guía, se entra directo en la mesa del primer hito**
+(`App.crearAsuntoDelFormulario`, `js/asuntos-nuevo-crear.js`): el mismo camino que ya usaba
+"Qué me toca" (`HitosPanel.desplegarAlAbrir` + `FichaTarjetas.abrirAlEntrar('hitos')`, antes
+de `Navegacion.abrirAbierto`), con el hito que `App.anotar` ya ha creado un instante antes
+(envoltura de `js/hitos.js`). Se decidió no tocar `js/hito-mesa.js` para esto —ya iba camino
+de las 600 líneas, y el patrón ya existía entero en `js/que-me-toca.js`— así que el documento
+se cumple sin ese fichero, pese a estar en su lista de «ficheros que se tocan».
+
+**Dos cosas que costaron de verdad, encontradas con las pruebas, no a ojo:**
+
+1. Un `<small>` con la categoría dentro del botón del tipo cambia su nombre ACCESIBLE (lo que
+   Chromium expone a `getByRole`), aunque esté marcado `aria-hidden="true"` — Chromium sí
+   respeta `aria-hidden` para excluirlo del nombre calculado, pero antes de dar con eso se
+   probó (mal) con `content: attr(...)` en un `::after` de CSS puro, que SÍ entra en el nombre
+   accesible por defecto: rompía cerca de veinte pruebas con `getByRole(..., exact: true)`.
+2. El botón de copiar el Nº de identificación escolar (`js/copiar.js`, dentro de cada
+   resultado del buscador) para su propio clic (`stopPropagation`); con las dos columnas al
+   50 %, la tarjeta del resultado se queda tan estrecha que el CENTRO de la tarjeta —donde cae
+   un clic sin más precisión, como hace media docena de pruebas ya escritas— puede caer encima
+   de ese botón en vez de en el nombre. Arreglado con dos cambios a la vez: la columna de la
+   persona lleva más ancho que la del tipo (3fr/2fr, no 50/50) y, solo dentro de este
+   buscador (`#resultados-tercero`), ese botón se flota a la derecha del todo, lejos de ese
+   centro pase lo que pase con el largo del nombre delante.
+
+Prueba nueva: `pruebas/nuevo-asunto-persona-primero.mjs`. Puestas al día para el camino nuevo:
+`nuevo-asunto-sin-repetir.mjs`, `tipo-desde-el-asunto.mjs`, `quien-encarga-cada-tipo.mjs`,
+`navegador.mjs` y `hitos.mjs` (esta última, además, tuvo que aprender a cerrar la mesa
+—«← Volver a los hitos»— después de crear con guía: la mesa se recuerda por asunto y no se
+cierra sola con un repintado, y el resto de la prueba trabajaba con la lista de hitos de
+siempre). `npm test` completo (171 ficheros) en verde, dos veces seguidas.
+
 ## 27-sep-2026 — Fila 196: el informe para dirección
 
 `docs/AVISOS-A-QUIEN-LO-PIDE.md`, apartado 4. Módulo nuevo `js/cuentas-informe.js`

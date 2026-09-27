@@ -67,8 +67,9 @@ tipos de asunto ya no se crean solo en Ajustes. En Nuevo asunto, junto al buscad
   «Usar este», que deja elegido el que ya había.
 - Deja el tipo elegido con `App.marcarTipoElegido` (`js/asuntos-nuevo.js`), no con
   `App.elegirTipo`: a diferencia de éste, no toca el tercero ni lo ya escrito (descripción,
-  campos), por si se está reconsiderando el tipo con el formulario ya avanzado. Si el tercero
-  todavía no se había elegido, revela ese bloque igual que `App.elegirTipo`.
+  campos), por si se está reconsiderando el tipo con el formulario ya avanzado. Sin tercero
+  elegido, deja como filtro del buscador la categoría del tipo nuevo (fila 197); con tercero, no
+  toca el filtro (ya es el de su categoría).
 
 Se comprueba con `pruebas/tipo-desde-el-asunto.mjs`.
 
@@ -86,15 +87,79 @@ luego pulsa Crear, igual que antes. `viaInicial` (`{via, viaDato}`) llega hasta 
 más abajo); lo usa `js/bandeja-propuesta.js` para que un asunto que viene de un correo siga
 entrando con "Correo electrónico" y la dirección del remitente.
 
-- **Cambiar de tipo no borra el tercero** (`App.elegirTipo`): si ya había uno y el tipo nuevo es
-  de la misma categoría, se vuelve a fijar con `App.fijarTercero` (para que los campos del tipo
-  nuevo se rellenen con sus datos); solo se borra si cambia la categoría.
+- **Cambiar de tipo no borra el tercero** (`App.elegirTipo`): con persona elegida, la parrilla
+  solo enseña los tipos de su categoría (ver más abajo, fila 197), así que un tipo nuevo SIEMPRE
+  es de la misma categoría, y `App.fijarTercero` se vuelve a llamar para que los campos del tipo
+  nuevo se rellenen con sus datos; nunca se borra por su cuenta (si `App.fijarTercero` se llama con
+  una persona de otra categoría, esa función es la que suelta el tipo si ya no vale, no
+  `elegirTipo`).
 - **Dar de alta a un tercero lo deja elegido** (`App.altaTercero`, `js/asuntos-nuevo-alta.js`): en
   vez de relanzar la búsqueda, se llama a `App.fijarTercero` con el recién creado (el que devuelve
   `Datos.anadirALista`, o el que ya trae el alta propia de una categoría como Administraciones);
   si no se encuentra, se cae al camino de siempre (buscar y esperar el clic).
 
 Se comprueba con `pruebas/nuevo-asunto-sin-repetir.mjs`.
+
+### Nuevo asunto empieza por la persona (27-sep-2026, fila 197, `docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md`)
+
+Rediseño de la pantalla, sustituyendo el camino «categoría → tipo → tercero» de las filas
+anteriores: **dos bloques a la vista a la vez**, `#bloque-tercero` (izquierda, «Con quién es el
+asunto») y `#bloque-tipos` (derecha, «Qué tipo de asunto»), uno al lado del otro en pantalla
+ancha (`.nuevo-dos-bloques`, 3fr/2fr: el de la persona necesita más ancho para que el botón de
+copiar el Nº de identificación escolar no quede en el centro de la tarjeta) y apilados por debajo
+de 900 px; debajo de los dos, a todo el ancho, `#bloque-detalles`. Se rellenan en el orden que se
+quiera; ninguno de los dos bloques se esconde nunca (los `.oculto` de antes sobre `#bloque-tercero`
+y `#bloque-tipos` se han quitado del HTML y del JS).
+
+- **El buscador único** (`App.buscarTercero`, `js/asuntos-nuevo.js`): busca en TODAS las
+  categorías a la vez (o solo en la que esté marcada como filtro, `App.E.nuevo.categoria`), con
+  `App.buscarEnCategorias(texto, categorias, tope)` (`js/asuntos-nuevo-alta.js`), que carga cada
+  categoría con `Datos.cargar` y filtra con `Datos.buscar`, una por una — sin tocar
+  `App.pintarBuscadorDeTercero`, el buscador reutilizable de siempre (`js/relacionados.js`, los
+  grupos), que sigue siendo categoría-primero para esos usos. En ALUMNADO, matriculados y
+  solicitantes antes que los antiguos (mismo criterio que `js/personas-familias.js` en Personas).
+  Cada resultado lleva su categoría detrás del nombre (`.resultado-categoria`, nunca `float`: eso
+  cambiaría el alto de la tarjeta y con él el punto donde cae un clic sin más precisión); el botón
+  de copiar el Nº de identificación escolar se flota a la derecha solo dentro de este buscador
+  (`#resultados-tercero .boton-nie-chico`), lejos de ese mismo centro.
+- **Las pastillas de categoría, debajo del buscador, ya no eligen antes de nada**: son un filtro
+  (`App.elegirCategoria(cat)` fija o suelta `App.E.nuevo.categoria`; ya no toca tipo ni tercero).
+  «+ Dar de alta»: con un filtro puesto, el botón de siempre (`App.botonAlta`); sin filtro, un
+  botón por cada categoría que admita alta (`App.botonesAlta`, `js/asuntos-nuevo-alta.js`) — es
+  la manera de «pedir la categoría» que pide el documento, sin un segundo cuadro.
+- **La parrilla de tipos** (`App.pintarTipos`): con persona elegida (`App.E.nuevo.tercero`) o
+  propuesta y esperando tipo (`App.E.nuevo.terceroPropuesto`, fila 173), solo los tipos de su
+  categoría, como antes. Sin ninguna de las dos, TODOS los tipos, cada botón con su categoría en
+  un `<small aria-hidden="true">` (el nombre accesible del botón, el que usan `getByRole`/`exact`
+  en las pruebas y "+ Crear tipo nuevo", sigue siendo solo el tipo; `data-tipo` en el propio
+  botón es el nombre de verdad para quien lo lee del DOM: `js/tipos-buscador.js` —que además deja
+  de aplicar el tope de "los más usados de partida" cuando se ven todas las categorías a la vez,
+  `.tipos-todas-categorias`— y `js/tipos-organo.js`). Elegir un tipo sin persona deja el buscador
+  filtrado a esa categoría (`App.elegirTipo` llama a `App.elegirCategoria`): el camino «tipo
+  primero» sigue existiendo entero.
+- **El resumen de la guía, en una línea** (`Guias.resumenDeTipo`, `js/guias-vista.js`; lo pinta y
+  lo pliega/despliega `js/guias-enganche.js`, `pintarGuiaNuevo`): «N hitos · N documentos · plazo
+  de N días · lo encarga X», o «Sin guía: el asunto se crea sin hitos» sin guía. Pulsable: abre y
+  cierra `#guia-nuevo` (el mismo bloque que antes vivía siempre desplegado al fondo del
+  formulario, ahora movido arriba de la parrilla y plegado de partida).
+- **Al fijar el tercero** (`App.fijarTercero`, `js/asuntos-nuevo-campos.js`) se deja su categoría
+  como filtro del buscador y se repinta la parrilla; un tipo ya elegido de otra categoría se
+  suelta (nunca un asunto a medio montar con tipo y categoría distintas).
+- **«Crear el asunto»** se apaga explícitamente si falta el tipo o el tercero
+  (`App.refrescarVista`, `js/asuntos-nuevo-crear.js`): con persona primero puede haber tercero sin
+  tipo (el bloque de detalles ya a la vista), y antes el botón se quedaba encendido de fábrica.
+- **Tras crear, si el tipo tiene guía, se entra directo en la mesa del primer hito**
+  (`App.crearAsuntoDelFormulario`): mismo camino que "Qué me toca"
+  (`HitosPanel.desplegarAlAbrir` + `FichaTarjetas.abrirAlEntrar('hitos')` antes de
+  `Navegacion.abrirAbierto`), con el primer hito que `App.anotar` ya ha creado (envoltura de
+  `js/hitos.js`) en el momento de guardar la ficha. Sin guía, la ficha, como hasta ahora (fila
+  119). La mesa de un hito se recuerda por asunto (`js/hito-mesa.js`) y no se cierra sola con un
+  repintado: quien reabra ese mismo asunto más tarde para trabajar con la lista de hitos, no la
+  mesa, tiene que cerrarla con «← Volver a los hitos» (`.mesa-volver`).
+
+Se comprueba con `pruebas/nuevo-asunto-persona-primero.mjs`, y con las pruebas viejas de este
+formulario puestas al día para el camino nuevo (`nuevo-asunto-sin-repetir.mjs`,
+`tipo-desde-el-asunto.mjs`, `quien-encarga-cada-tipo.mjs`, `navegador.mjs`, `hitos.mjs`…).
 
 ### La ficha de un asunto
 
