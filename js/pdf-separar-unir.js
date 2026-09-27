@@ -174,7 +174,7 @@ var PdfSepararUnir = (function () {
     var cortes = {};
     var cuadro = document.querySelector('#capa .cuadro');
     cuadro.classList.add('cuadro-ancho');
-    $('cuadro-cancelar').textContent = 'Dejarlo';
+    $('cuadro-cancelar').textContent = 'Cancelar';
 
     var promesa = U.preguntar('Separar "' + contexto.nombre + '"',
       '<p class="explica" id="pdf-resumen">' + U.escapar(resumenDeCortes(total, [])) + '</p>' +
@@ -468,7 +468,7 @@ var PdfSepararUnir = (function () {
       '<div class="vista-previa"><div class="vista-rotulo">Se guardará así</div>' +
         '<div id="pdf-nombre-vista" class="vista-nombre"></div></div>';
 
-    $('cuadro-cancelar').textContent = 'Dejarlo';
+    $('cuadro-cancelar').textContent = 'Cancelar';
     var promesa = U.preguntar(titulo, cuerpo, 'Guardar y seguir');
 
     function nombrePropuesto() {

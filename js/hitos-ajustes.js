@@ -171,7 +171,7 @@
       etiqueta.appendChild(texto);
       f.appendChild(etiqueta);
       var ren = document.createElement('button');
-      ren.type = 'button'; ren.className = 'boton'; ren.textContent = 'Renombrar';
+      ren.type = 'button'; ren.className = 'boton'; ren.textContent = 'Cambiar el nombre';
       ren.onclick = function () { renombrar(r); };
       f.appendChild(ren);
       var b = document.createElement('button');

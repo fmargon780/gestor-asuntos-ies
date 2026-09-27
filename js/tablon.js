@@ -388,7 +388,7 @@
           return lista;
         });
       }, true));
-      botones.appendChild(boton('Dejarlo', function () { editando = ''; pintar(); }));
+      botones.appendChild(boton('Cancelar', function () { editando = ''; pintar(); }));
       d.appendChild(botones);
       return d;
     }

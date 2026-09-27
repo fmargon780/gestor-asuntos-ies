@@ -113,7 +113,7 @@
     var editar = document.createElement('button');
     editar.type = 'button';
     editar.className = 'boton';
-    editar.textContent = 'Editar';
+    editar.textContent = 'Cambiar';
     editar.onclick = function () { abrirCuadroDePlantilla(p, null, refrescarSeccionActual); };
     acciones.appendChild(editar);
 

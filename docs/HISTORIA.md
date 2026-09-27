@@ -5,6 +5,44 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 189: vocabulario, los textos que la 179 no llegó a tocar
+
+`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 189: `docs/VOCABULARIO-EN-PANTALLA.md`, puntos 1 y 4,
+en los ficheros que la fila 179 dejó fuera (comparados con `git diff --stat 21980a1 6032d39`).
+
+Cambios de texto (ningún nombre interno, clase CSS ni id): en `js/hitos-panel-lista.js`, «Volver al
+guion» → «Volver a las tareas» y el título de la tarjeta «Qué hay que hacer» → «Tareas del hito»;
+en `js/hitos-biblioteca.js`, las etiquetas de la comparación con la biblioteca «Comunicación de este
+paso» → «Comunicación de este hito», «Guion» → «Tareas» y «… días desde otro paso» → «… días desde
+otro hito»; en `js/nombres.js`, el nombre del tercero de la categoría OTROS «Con quién es el asunto»
+→ «Tercero»; en `js/bandeja-enlace.js` y `js/elegir-asunto.js`, el título del cuadro de guardar un
+correo o un documento en un asunto, que aún decía «Elegir…», pasa a «Guardar…»; en `index.html`, el
+orden «Paso del asunto» → «Hito del asunto» y el bloque de Ajustes «Impresos oficiales» → «Impresos»
+(ya eran «Impresos» en el propio `js/formularios-ajustes.js` desde la fila 146: solo faltaba el
+título de la ficha en Ajustes).
+
+Del grep final por todo `js/` para lo que se hubiera escapado de la fila 179 (fuera ya de la lista
+de la 189, pero de la misma tanda de vocabulario): en `js/cargar-biblioteca.js`, «hito(s) modelo de
+la biblioteca» → «hito(s) de la biblioteca» (la palabra «modelo» está prohibida por
+`docs/VOCABULARIO.md`); en `js/pdf-separar-unir.js` y `js/tablon.js`, el botón que cancela un cuadro
+o deja de editar una nota, que aún decía «Dejarlo», pasa a «Cancelar»; en `js/hitos-ajustes.js` y
+`js/hitos-documento-menu.js`, «Renombrar» → «Cambiar el nombre»; en `js/plantillas-ajustes.js` y
+`js/plantillas-documento-ajustes.js`, el «Editar» de la tarjeta de una plantilla → «Cambiar». La
+prueba `pruebas/hitos.mjs` esperaba el «Renombrar» del menú de un documento: puesta al día a
+«Cambiar el nombre».
+
+`docs/contexto/DOCUMENTOS-PDF.md`, `docs/contexto/ESTADO-DEL-ASUNTO.md` y
+`docs/contexto/FICHEROS-DEL-REPOSITORIO.md` puestos al día con las mismas palabras nuevas
+(«Impresos», «Hito del asunto», «Saltar a este hito»). `npm test` completo (173 ficheros) en verde,
+con Chromium real (`CHROMIUM_PATH=/opt/pw-browsers/chromium`); `pruebas/correos.mjs` falló una vez
+por un `timeout` de Playwright esperando un botón durante una tanda completa muy cargada, y pasó
+limpio tanto suelto como en una segunda tanda completa: no era un fallo de este cambio.
+
+Quedan «Editar»/«Renombrar»/«Dejarlo»/«interesado» sueltos en algunos ficheros fuera de esta tanda
+(por ejemplo `js/lo-pide.js`, con «El propio interesado») que ninguna de las dos listas (la del
+documento de la fila 179 ni la de la 189) llegó a nombrar: se dejan para cuando toque esa pantalla,
+no en esta fila, para no salirse de lo pedido.
+
 ## 27-sep-2026 — Fila 188: se cierra la 177 y se pone al día lo que dejó en rojo la 179
 
 `docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 188. Primera fila trabajada con la norma nueva de

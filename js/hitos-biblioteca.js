@@ -193,16 +193,16 @@ var HitosBiblioteca = (function () {
     { clave: 'estadoAsunto', etiqueta: 'Estado del asunto' },
     { clave: 'plazo', etiqueta: 'Plazo' },
     /* «Lo que hay que reunir» ya no se compara aparte: va en el guion (fila 138). */
-    { clave: 'comunicacion', etiqueta: 'Comunicación de este paso' },
+    { clave: 'comunicacion', etiqueta: 'Comunicación de este hito' },
     { clave: 'normativa', etiqueta: 'Normativa' },
     { clave: 'plantillasDocumento', etiqueta: 'Documentos' },
-    { clave: 'guion', etiqueta: 'Guion' }
+    { clave: 'guion', etiqueta: 'Tareas' }
   ];
 
   function textoLegibleDe(clave, valor) {
     if (valor === null || valor === undefined || valor === '') return '(vacío)';
     if (clave === 'plazo') {
-      return valor.dias ? ((typeof Plazos !== 'undefined' && Plazos.textoPlazo ? Plazos.textoPlazo(valor) : valor.dias + ' días') + ' desde otro paso') : '(vacío)';
+      return valor.dias ? ((typeof Plazos !== 'undefined' && Plazos.textoPlazo ? Plazos.textoPlazo(valor) : valor.dias + ' días') + ' desde otro hito') : '(vacío)';
     }
     if (clave === 'requisitos') {
       var lista = valor || [];

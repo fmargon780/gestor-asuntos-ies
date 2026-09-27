@@ -81,7 +81,7 @@ var Nombres = (function () {
                          tercero: 'Tutor o tutora legal' },
     'PERSONAL': { lista: 'Personal', descripcion: 'Profesorado y personal del centro', tercero: 'Persona del centro' },
     'EMPRESAS': { lista: 'Empresas', descripcion: 'Proveedores y empresas', tercero: 'Empresa' },
-    'OTROS': { lista: 'Otros', descripcion: 'Todo lo demás', tercero: 'Con quién es el asunto' },
+    'OTROS': { lista: 'Otros', descripcion: 'Todo lo demás', tercero: 'Tercero' },
     'ADMINISTRACIONES': { lista: 'Administraciones', descripcion: 'Organismos y centros educativos',
                           tercero: 'Organismo o centro educativo' }
   };
