@@ -234,6 +234,31 @@ var Plazos = (function () {
     return { texto: texto, clase: dias <= DIAS_AMBAR_VENCIMIENTO ? 'vencimiento-cerca' : '' };
   }
 
+  /* ---------- la etiqueta de "Me toca" de la pantalla de Inicio
+     (27-sep-2026, fila 191, docs/INICIO-CUATRO-BLOQUES.md) ----------
+
+     Parecida a `de()`, pero con los textos que pide el boceto:
+     "Vencido hace N días", "Vence hoy", "Vence el <día de la semana>"
+     (dentro de la semana) y "Sin prisa · <fecha corta>" el resto. Sin
+     fecha: "Sin fecha", sin clase de color. */
+  var DIAS_SEMANA = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+
+  function etiquetaMeToca(fecha) {
+    var dias = diasHasta(fecha);
+    if (dias === null) return { texto: 'Sin fecha', clase: '' };
+    if (dias < 0) {
+      var v = -dias;
+      return { texto: 'Vencido hace ' + v + ' día' + (v === 1 ? '' : 's'), clase: 'plazo-vencido' };
+    }
+    if (dias === 0) return { texto: 'Vence hoy', clase: 'plazo-vencido' };
+    if (dias <= 6) {
+      var d = new Date();
+      d.setDate(d.getDate() + dias);
+      return { texto: 'Vence el ' + DIAS_SEMANA[d.getDay()], clase: 'plazo-cerca' };
+    }
+    return { texto: 'Sin prisa · ' + fechaCortaSinAno(fecha), clase: 'plazo-lejos' };
+  }
+
   return {
     DIAS_CERCA: DIAS_CERCA,
     sumarDias: sumarDias, sumarDiasHabiles: sumarDiasHabiles,
@@ -241,6 +266,7 @@ var Plazos = (function () {
     CUENTAS: CUENTAS, cuentaValida: cuentaValida, sumarPlazo: sumarPlazo,
     diasQueQuedan: diasQueQuedan, textoPlazo: textoPlazo, textoDias: textoDias,
     de: de, pasaFiltro: pasaFiltro,
-    etiquetaVencimiento: etiquetaVencimiento
+    etiquetaVencimiento: etiquetaVencimiento,
+    etiquetaMeToca: etiquetaMeToca
   };
 })();

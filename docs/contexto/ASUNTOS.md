@@ -81,7 +81,7 @@ pedirlo. Elige la categoría del tercero (o, sin tercero, la del tipo). Con tipo
 `App.E.nuevo.terceroPropuesto` y `App.pintarTipos` enseña, encima de la parrilla
 (`#tercero-propuesto-nuevo`), «Para: **Nombre** · Elige el tipo de asunto» con un botón «Otra
 persona» que lo olvida; al elegir tipo, si la categoría coincide, `App.elegirTipo` lo fija solo.
-`App.crearAsuntoConPropuesta` (el de "Por clasificar") pasa a usar esta función por dentro y
+`App.crearAsuntoConPropuesta` (el de "Ha llegado"/"Ver todo", antes "Por clasificar") pasa a usar esta función por dentro y
 luego pulsa Crear, igual que antes. `viaInicial` (`{via, viaDato}`) llega hasta "Lo pide" (ver
 más abajo); lo usa `js/bandeja-propuesta.js` para que un asunto que viene de un correo siga
 entrando con "Correo electrónico" y la dirección del remitente.
@@ -126,7 +126,7 @@ su nombre, en la lista fresca— y repintarla en su sitio, con dos funciones pú
 
 **Repintar solo si algo ha cambiado de verdad** (fila 34, 17-sep-2026,
 `docs/NOTAS-DEL-ASUNTO-NO-SE-BORRAN.md`). Bastaba con que el compañero dejara un papel suelto en
-"Por clasificar" para que `App.reengancharFicha()` rehiciera la ficha entera con `innerHTML`,
+la carpeta (fila 191: se ve en "Ha llegado", de Inicio) para que `App.reengancharFicha()` rehiciera la ficha entera con `innerHTML`,
 tirando por el camino cualquier nota a medio escribir. Ahora compara una huella de texto del
 asunto, partida en dos mitades —ficha e hitos—: si las dos son iguales, la pantalla se deja
 quieta; si solo cambian los hitos, le pide el repintado al panel de hitos en vez de rehacer la
@@ -151,10 +151,10 @@ sola la ficha, más arriba) o `App.abrirFicha(a, modo)` bastan para repintar sin
 otra pantalla: guardar o registrar un documento, generar uno desde plantilla, separar/unir/sacar
 páginas de un PDF, marcar un hito, asociar un documento a un hito desde el propio documento
 (`js/ficha-documentos.js`, "Asociar a un hito") o apuntarlo desde el propio hito
-(`js/hitos-documentos.js`, "Apuntar un documento"), "Comunicar", «+ Añadir documento» y «Poner nombre» de la lista de documentos, y "Meter en un
-asunto"/"Meter aquí" de Por clasificar (`js/documentos-sueltos.js`,
-`js/documentos-sueltos-lector.js`) — estos dos últimos, además, viven siempre en la pantalla "Por
-clasificar", nunca dentro de la ficha, así que no pueden sacar de ella; y cuando el asunto de
+(`js/hitos-documentos.js`, "Apuntar un documento"), "Comunicar", «+ Añadir documento» y «Cambiar el nombre» de la lista de documentos, y "Guardar en un
+asunto"/"Guardar aquí" de "Ha llegado" y "Ver todo" (antes "Por clasificar"; fila 191, `js/documentos-sueltos.js`,
+`js/documentos-sueltos-lector.js`) — estos dos últimos, además, viven siempre en Inicio, nunca
+dentro de la ficha, así que no pueden sacar de ella; y cuando el asunto de
 destino es el que antes tenía la ficha abierta, `App.reengancharFicha()` no la vuelve a enseñar,
 porque comprueba primero si la ficha sigue **a la vista** (`#pantalla-asunto` sin `oculto`), no
 solo si `actual` sigue puesto. Repaso completo de todo `js/` en busca de una salida indebida
@@ -225,8 +225,8 @@ Datos del trámite) son los de siempre, y los sigue pintando el mismo módulo.
   que pulsan por debajo el mismo `button.ficha-documento` de la lista (sin repintar). En Hitos, los
   del hito desplegado (`.hito-cuerpo` visible → sus `.hito-documento[data-doc]`); si no hay, todos.
   El chip del documento a la vista (`Visor.nombreAbierto()`, nuevo), marcado.
-- **Qué se recuerda**: al entrar, siempre la cuadrícula; desde "Qué me toca",
-  `FichaTarjetas.abrirAlEntrar('hitos')` antes de `App.abrirFicha`. Un repintado de la misma ficha
+- **Qué se recuerda**: al entrar, siempre la cuadrícula; desde "Me toca" (Inicio, fila 191;
+  antes "Qué me toca"), `FichaTarjetas.abrirAlEntrar('hitos')` antes de `App.abrirFicha`. Un repintado de la misma ficha
   mantiene la tarjeta abierta (el estado vive en el módulo) y `U.conservandoLoEscrito` lo escrito.
 - En modo consulta, las pestañas, los chips y los nombres del resumen siguen activos
   (`esControlDeSoloLectura`).
@@ -394,12 +394,12 @@ llama a una función, sin envolver nada:
   sin querer…») y, en la ficha, el menú de tres puntos: «Marcar como reservado» / «Quitar la
   reserva» (`opcionDelMenu`, por `App.guardarRegistroFresco`; en un tipo reservado, quitarla deja
   `false`). En modo consulta se apaga como las demás.
-- **Tarjeta** en Asuntos abiertos y ARCHIVO (`enTarjeta`, al colgarla, ya pasada por sus
+- **Tarjeta** en Inicio (antes «Asuntos abiertos»; la lista de siempre, dentro de `#inicio-legado` desde la fila 191) y ARCHIVO (`enTarjeta`, al colgarla, ya pasada por sus
   envoltorios): candado; tapada, el rótulo es «fecha TIPO curso grupo · reservado», el pie no dice
   quién es y se quitan el trocito de nota y el botón del NIE. Se sigue abriendo.
 - **Buscadores** (abiertos y ARCHIVO): un tapado solo sale por su nombre de carpeta
   (`textoDeBusqueda`), no por notas, documentos ni ficha.
-- **«Qué me toca»**: el mismo rótulo tapado y sin tercero (`nombreParaVer`). **Ficha del asunto**:
+- **«Me toca»/«Esperamos a otros»** (Inicio, fila 191; antes «Qué me toca»): el mismo rótulo tapado y sin tercero (`nombreParaVer`). **Ficha del asunto**:
   entera, con candado en la cabecera (`ponerCandado`). **Ficha de una persona**: con candado.
 - **«Mostrar reservados»** (`#btn-mostrar-reservados`, junto a «Filtros», solo si hay algún tipo o
   asunto reservado): destapa todo, solo en esta sesión; a propósito, sin `localStorage`.
@@ -526,7 +526,7 @@ Se comprueba con `pruebas/duplicados.mjs`.
 
 ### La pantalla propia "Duplicados"
 
-- Aviso de una línea junto al botón Actualizar de Asuntos abiertos: `⚠ N posible(s)
+- Aviso de una línea junto al botón Actualizar de Inicio (antes «Asuntos abiertos»): `⚠ N posible(s)
   duplicado(s) — Revisar` (`#btn-duplicados`, oculto sin ninguno).
 - Pantalla propia "Duplicados" (no está en la barra lateral), con botón Volver. Cada grupo en
   columnas: nombre de la carpeta (enlaza a su ficha), fecha de apertura / estado / vía / fecha

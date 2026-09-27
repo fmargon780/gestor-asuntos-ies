@@ -11,7 +11,7 @@
      - al escribir el número, se renombran solas las carpetas de sus
        asuntos ABIERTOS (con la lista antes y "Adelante"), y las
        archivadas no se tocan;
-     - "Qué me toca" avisa mientras queden aspirantes sin número. */
+     - Inicio avisa mientras queden aspirantes sin número. */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
@@ -120,8 +120,8 @@ const nombreAbierto = (await nombresAbiertos())[0];
 await comprobar('el segundo asunto también se crea sin número',
   /^260910 \S+( \d{2}-\d{2})? Pendiente De Numero, Nora$/.test(nombreAbierto), true);
 
-console.log('--- "Qué me toca" avisa mientras queda pendiente ---');
-await pagina.evaluate(() => window.QueMeToca.abrir());
+console.log('--- Inicio avisa mientras queda pendiente ---');
+await pagina.evaluate(() => window.Inicio && window.Inicio.repintar());
 await pagina.waitForTimeout(300);
 await comprobar('el aviso cuenta el aspirante sin número',
   pagina.locator('.qmt-aviso-aspirantes').textContent()
@@ -160,7 +160,7 @@ await comprobar('la carpeta archivada no se toca', pagina.evaluate(async (nombre
 }, nombreArchivado), true);
 
 console.log('--- ya no queda ningún aspirante pendiente ---');
-await pagina.evaluate(() => window.QueMeToca.abrir());
+await pagina.evaluate(() => window.Inicio && window.Inicio.repintar());
 await pagina.waitForTimeout(300);
 await comprobar('el aviso desaparece', pagina.locator('.qmt-aviso-aspirantes').count(), 0);
 

@@ -117,44 +117,22 @@
     else barra.insertBefore(b, barra.firstChild);
   }
 
-  /* ---------- la entrada de "Qué me toca" (fila 16) ----------
+  /* ---------- la entrada de "Cuentas" (fila 74) ----------
 
-     Un botón .pestana más, junto a los que ya hay, con su cuenta de
-     vencidos (js/que-me-toca.js la mantiene al día). Como se añade
+     Un botón .pestana más, junto a los que ya hay. Como se añade
      aquí y no está en el index.html de partida, el bucle de
      nucleo.js que pone el onclick a los .pestana ya existentes no lo
      alcanza: se le pone a mano. El resaltado como "activa" sí lo
      hace solo App.ir, que vuelve a mirar los .pestana que haya cada
-     vez que se llama (js/nucleo.js). */
+     vez que se llama (js/nucleo.js).
 
-  function ponerLaEntradaDeQueMeToca() {
-    if ($('pestana-que-me-toca')) return;
-    var referencia = document.querySelector('.pestana[data-pantalla="personas"]');
-    if (!referencia || !referencia.parentNode) return;
-
-    var b = document.createElement('button');
-    b.id = 'pestana-que-me-toca';
-    b.className = 'pestana';
-    b.type = 'button';
-    b.dataset.pantalla = 'que-me-toca';
-    b.innerHTML = '<span>Qué me toca</span><span class="cuenta oculto" id="cuenta-que-me-toca"></span>';
-    b.onclick = function () { if (window.QueMeToca) window.QueMeToca.abrir(); };
-    b.addEventListener('click', function () {
-      if (comoEstaba() === 'plegada') poner('plegada');
-    });
-    referencia.parentNode.insertBefore(b, referencia.nextSibling);
-  }
-
-  /* ---------- la entrada de "Cuentas" (fila 74) ----------
-
-     Igual que la de "Qué me toca", justo detrás de ella: un botón
-     .pestana más, añadido a mano porque tampoco está en el
-     index.html de partida. */
+     Fila 191: la pestaña "Qué me toca" que iba justo antes de esta
+     desapareció (esa pantalla ya no existe), así que la referencia se
+     queda solo con la de "personas". */
 
   function ponerLaEntradaDeCuentas() {
     if ($('pestana-cuentas')) return;
-    var referencia = $('pestana-que-me-toca') ||
-      document.querySelector('.pestana[data-pantalla="personas"]');
+    var referencia = document.querySelector('.pestana[data-pantalla="personas"]');
     if (!referencia || !referencia.parentNode) return;
 
     var b = document.createElement('button');
@@ -176,7 +154,7 @@
 
   function ponerLaEntradaDeFormularios() {
     if ($('pestana-formularios')) return;
-    var referencia = $('pestana-cuentas') || $('pestana-que-me-toca') ||
+    var referencia = $('pestana-cuentas') ||
       document.querySelector('.pestana[data-pantalla="personas"]');
     if (!referencia || !referencia.parentNode) return;
 
@@ -244,7 +222,6 @@
   function arrancar() {
     ponerElBoton();
     ponerElBotonDeAjustes();
-    ponerLaEntradaDeQueMeToca();
     ponerLaEntradaDeCuentas();
     ponerLaEntradaDeFormularios();
     ponerElDeNuevoAsunto();

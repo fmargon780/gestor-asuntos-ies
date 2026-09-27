@@ -183,7 +183,7 @@ await pagina.waitForTimeout(300);
 await comprobar('al pulsarla se despliega',
   pagina.locator('#btn-correos-sin-clasificar').getAttribute('aria-expanded'), 'true');
 
-await pagina.click('.panel[data-vista="departamento"]');
+await pagina.evaluate(() => window.App.irVista('departamento'));
 await pagina.waitForTimeout(200);
 await pagina.click('.panel[data-vista="clasificar"]');
 await pagina.waitForTimeout(200);
@@ -199,7 +199,7 @@ await comprobar('sin huella, lo reconoce por el texto del asunto',
   'Respuesta de' + ASUNTO);
 
 console.log('--- guardando el correo en el asunto ---');
-await pagina.getByRole('button', { name: 'Guardar en ese asunto' }).click();
+await pagina.locator('#bandeja-correos').getByRole('button', { name: 'Guardar en ese asunto' }).click();
 await pagina.waitForTimeout(1200);
 /* Fila 174, punto 5: con adjuntos de verdad, se abre el cuadro de
    ponerles nombre (sin "Cancelar": solo "Cerrar", `#cuadro-aceptar`);
@@ -252,7 +252,7 @@ await comprobar('y el hilo entra en seguidos.json',
 console.log('--- el mismo correo otra vez ---');
 await dejarElCorreo(correoDeMentira());
 await mirarLaBandeja();
-await pagina.getByRole('button', { name: 'Guardar en ese asunto' }).click();
+await pagina.locator('#bandeja-correos').getByRole('button', { name: 'Guardar en ese asunto' }).click();
 await pagina.waitForTimeout(1000);
 
 await comprobar('no se repiten los ficheros', ficherosDelAsunto(), [
@@ -268,7 +268,7 @@ console.log('--- la ficha del asunto ---');
 await pagina.evaluate(() => { App.verAbiertos(); });
 await pagina.waitForTimeout(700);
 /* El asunto está "A LA ESPERA DEL TERCERO", así que vive en esa tarjeta. */
-await pagina.click('.panel[data-vista="espera"]');
+await pagina.evaluate(() => window.App.irVista('espera'));
 await pagina.waitForTimeout(300);
 await pagina.click('#lista-abiertos .tarjeta-nombre');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
@@ -325,7 +325,7 @@ await comprobar('6. pintar la bandeja no escribe en asuntos.json',
   textoDeAsuntosJson().then(t => t === antesDePintar), true);
 
 /* --- 3. guardar dos veces el mismo hilo no duplica la entrada --- */
-await pagina.getByRole('button', { name: 'Guardar en ese asunto' }).click();
+await pagina.locator('#bandeja-correos').getByRole('button', { name: 'Guardar en ese asunto' }).click();
 await pagina.waitForTimeout(1100);
 await comprobar('3. el hilo no se duplica: se actualiza `visto`',
   fichaDelAsunto(ASUNTO).then(f => (f.hilos || []).map(h => ({ id: h.id, asunto: h.asunto, visto: h.visto }))),
@@ -372,7 +372,7 @@ await comprobar('sin huella ni parecido, no propone ningún asunto',
   pagina.locator('#bandeja-correos .tarjeta-correo .boton-principal').textContent(),
   'Crear el asunto');
 
-await pagina.getByRole('button', { name: 'Guardar en un asunto' }).click();
+await pagina.locator('#bandeja-correos').getByRole('button', { name: 'Guardar en un asunto' }).click();
 await pagina.waitForSelector('#enlace-todos');
 await comprobar('el cuadro enseña todos los asuntos',
   pagina.locator('#enlace-todos .enlace-asunto').count(), 2);

@@ -92,7 +92,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Panel lateral de lectura; tablón a la vista. Al crear, recuadro con lo que ya tiene el tercero; parada si es idéntico; pantalla "Duplicados".
 - Correo y mensaje de Séneca: se prepara; el correo se envía de verdad (Apps Script, con
   confirmación) y nunca dos veces.
-- "Por clasificar": cada documento suelto se abre, se borra, o crea/entra en un asunto (un solo
+- "Ver todo" (antes "Por clasificar"; fila 191, se abre desde "Ha llegado" de Inicio): cada documento suelto se abre, se borra, o crea/entra en un asunto (un solo
   botón «Crear asunto con él», que usa lo leído del documento); con tercero reconocido, también
   sugiere guardarlo en uno que ya existe («Guardar aquí»). Tras guardar o crear, se abre directo el
   cuadro de ponerle nombre (no la lista), ya con la fecha, el registro y el tipo de documento (por
@@ -133,7 +133,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   Biblioteca de hitos del centro, con sus tareas; en Mantenimiento, cargar tipos, guías y tareas del instituto.
   «Marcar como hecho» abre solo la mesa del hito siguiente en curso (o, sin ninguno, «Archivar el asunto» ahí
   mismo); al completarse las tareas por una acción del usuario, se pregunta una vez por sesión si darlo por hecho.
-- "Qué me toca": pendientes, filtro por responsable (una persona ve también los de Administración), "Dormidos" (sin novedades en N días). "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Impresos": catálogo buscable;
+- "Inicio" (antes "Asuntos abiertos"; fila 191): a la vez, sin elegir montón, "Ha llegado" (sueltos y correos juntos), "Me toca" (un hito por asunto, filtro por responsable) y "Esperamos a otros"; el tablón, al lado, sin esconderse nunca. Debajo, de momento, la lista de siempre con sus filtros de toda la vida, hasta que la fila 192 traiga la tabla «Todos los asuntos abiertos»; "Dormidos" y "Sin fecha" quedan sin sitio hasta esa misma fila. "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Impresos": catálogo buscable;
   "Preparar para el tercero" rellena solo los datos del centro (casillas con nombre legible y miniatura).
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".
 - Cada documento, todo en su fila (⧉, «Cambiar el nombre», ⋮); Separar, Unir, Sacar páginas, Ajustar tamaño

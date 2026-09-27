@@ -44,6 +44,7 @@
 <link rel="stylesheet" href="css/que-me-toca.css">
 <link rel="stylesheet" href="css/plantillas-documento.css">
 <link rel="stylesheet" href="css/pdf-separar-unir.css">
+<link rel="stylesheet" href="css/inicio.css">
 <link rel="stylesheet" href="css/filas.css">
 <link rel="stylesheet" href="css/cabecera-fija.css">
 <link rel="stylesheet" href="css/personas.css">
@@ -110,7 +111,7 @@
 
   <nav class="lateral">
     <div class="marca">Gestor de Asuntos</div>
-    <button class="pestana activa" data-pantalla="abiertos"><span>Asuntos abiertos</span><span class="cuenta" id="cuenta-abiertos"></span></button>
+    <button class="pestana activa" data-pantalla="abiertos"><span>Inicio</span><span class="cuenta" id="cuenta-abiertos"></span><span class="cuenta cuenta-roja oculto" id="cuenta-vencidos-inicio"></span></button>
     <button class="pestana" data-pantalla="nuevo"><span>Nuevo asunto</span></button>
     <button class="pestana" data-pantalla="archivo"><span>Archivo</span></button>
     <button class="pestana" data-pantalla="personas"><span>Personas y empresas</span></button>
@@ -125,9 +126,128 @@
 
     <section id="pantalla-abiertos" class="pantalla">
       <header class="cabecera">
-        <h2>Asuntos abiertos</h2>
+        <h2>Inicio</h2>
         <div class="acciones">
-          <input id="buscar-abiertos" class="campo" placeholder="Buscar por nombre, tipo o tercero">
+          <input id="buscar-abiertos" class="campo"
+                 placeholder="Buscar en todos los asuntos abiertos: nombre, tipo o tercero">
+        </div>
+      </header>
+
+      <div id="panel-avisos" class="oculto"></div>
+      <div id="panel-recurrentes" class="oculto"></div>
+
+      <!-- Apartado 7 de la fila 191: el aviso de aspirantes sin Nº de
+           identificación escolar vive aquí hasta que la fila 181 lo
+           lleve a la línea de avisos de arriba. -->
+      <div id="inicio-aviso-aspirantes"></div>
+
+      <!-- Los tres botones de montón SIGUEN existiendo (mismo
+           data-vista, para no romper pruebas que hacen
+           .click('.panel[data-vista=...]')). Solo se ve el de
+           "clasificar", restilado como "Ver todo (N)"; los otros dos
+           se ocultan con CSS (.oculto-vista, css/inicio.css). -->
+      <div class="paneles">
+        <button type="button" class="panel" data-vista="clasificar">
+          <svg class="panel-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
+            <path d="M13.8 3H7A1.5 1.5 0 0 0 5.5 4.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.7z"/>
+            <path d="M13.8 3v4.7h4.7"/>
+          </svg>
+          <span class="panel-texto">
+            <span class="panel-nombre">Ver todo</span>
+            <span class="panel-pie">Documentos que todavía no tienen asunto</span>
+          </span>
+          <span class="panel-cuenta" id="cuenta-clasificar">0</span>
+          <span class="marca-nueva oculto" id="nuevos-sueltos"></span>
+        </button>
+
+        <button type="button" class="panel oculto-vista" data-vista="departamento">
+          <svg class="panel-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.2l2 2.6h8.8A1.5 1.5 0 0 1 21 9.1v9A1.5 1.5 0 0 1 19.5 19.6h-15A1.5 1.5 0 0 1 3 18.1z"/>
+          </svg>
+          <span class="panel-texto">
+            <span class="panel-nombre">Pendiente de Administración</span>
+            <span class="panel-pie">Asuntos que nos toca mover a nosotros</span>
+          </span>
+          <span class="panel-cuenta" id="cuenta-departamento">0</span>
+        </button>
+
+        <button type="button" class="panel oculto-vista" data-vista="espera">
+          <svg class="panel-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="8.5"/>
+            <path d="M12 7.3V12l3 1.8"/>
+          </svg>
+          <span class="panel-texto">
+            <span class="panel-nombre">Pendiente de terceros</span>
+            <span class="panel-pie">Esperando a que otro haga su parte</span>
+          </span>
+          <span class="panel-cuenta" id="cuenta-espera">0</span>
+        </button>
+      </div>
+
+      <!-- LA REJILLA NUEVA: "Ha llegado", "Me toca", "Esperamos a
+           otros" y el tablón (js/tablon.js lo cuelga aquí). -->
+      <div id="inicio-rejilla" class="inicio-rejilla">
+
+        <section id="inicio-ha-llegado" class="inicio-bloque">
+          <h3 class="inicio-bloque-titulo">Ha llegado <span class="cuenta-lista" id="inicio-ha-llegado-n"></span></h3>
+          <div class="inicio-lista" id="inicio-ha-llegado-lista"></div>
+        </section>
+
+        <section id="inicio-me-toca" class="inicio-bloque">
+          <h3 class="inicio-bloque-titulo">Me toca <span class="cuenta-lista" id="inicio-me-toca-n"></span>
+            <button type="button" class="inicio-ver-mas oculto" id="inicio-me-toca-ver">Ver los N</button></h3>
+          <div class="inicio-bloque-filtro">
+            <label class="etiqueta-en-linea" for="inicio-me-toca-responsable">Responsable</label>
+            <select id="inicio-me-toca-responsable" class="campo"><option value="">Todos</option></select>
+          </div>
+          <div class="inicio-lista" id="inicio-me-toca-lista"></div>
+        </section>
+
+        <section id="inicio-esperamos" class="inicio-bloque">
+          <h3 class="inicio-bloque-titulo">Esperamos a otros <span class="cuenta-lista" id="inicio-esperamos-n"></span>
+            <button type="button" class="inicio-ver-mas oculto" id="inicio-esperamos-ver">Ver los N</button></h3>
+          <div class="inicio-lista" id="inicio-esperamos-lista"></div>
+        </section>
+
+      </div>
+
+      <!-- "Ver todo" (el panel de "clasificar" reaprovechado) activa esto
+           con App.irVista('clasificar'), reutilizando #zona-clasificar
+           TAL CUAL (mismo contenido interno de siempre), con un
+           "← Volver" nuevo para no depender de los botones ocultos. -->
+      <div id="zona-clasificar" class="oculto">
+        <div class="sueltos-cabecera">
+          <button type="button" id="btn-ha-llegado-volver" class="boton boton-volver">← Volver</button>
+          <p class="explica">Documentos sueltos en la carpeta de asuntos abiertos, todavía sin
+             carpeta propia. Aquí es donde aparece lo que os deja el equipo directivo.</p>
+          <button id="btn-sueltos-visto" class="boton oculto">Ya los he visto</button>
+        </div>
+
+        <!-- La bandeja de correos (js/bandeja-correos.js, js/bandeja-pantalla.js),
+             plegada detrás de esta barra y siempre arrancando así (fila 27,
+             17-sep-2026, docs/CORREOS-DENTRO-DE-POR-CLASIFICAR.md). Los dos
+             elementos nacen aquí, ya no los crea JavaScript. -->
+        <div id="correos-sin-clasificar" class="oculto">
+          <button type="button" id="btn-correos-sin-clasificar" class="boton" aria-expanded="false">
+            Correos sin clasificar (<span id="cuenta-correos-sin-clasificar">0</span>)
+          </button>
+          <div id="bandeja-correos" class="oculto"></div>
+        </div>
+
+        <div id="lista-sueltos" class="lista"></div>
+      </div>
+
+      <!-- ZONA "LEGADO": la tubería vieja, viva y (de partida) visible
+           debajo de la rejilla, para que App.pintarAbiertos siga
+           enseñando el listado completo mientras no exista la tabla
+           de verdad de la fila 192 dentro de #inicio-todos-asuntos.
+           Su propio contenido (#zona-asuntos) ya se oculta solo con
+           "Ver todo" (App.irVista('clasificar'), sin tocar esa lógica). -->
+      <div id="inicio-legado">
+        <div class="legado-acciones">
           <button type="button" id="btn-filtros" class="boton" aria-expanded="false"
                   aria-controls="filtros-abiertos">Filtros</button>
           <button id="btn-recargar" class="boton">Actualizar</button>
@@ -175,77 +295,17 @@
             </select>
           </label>
         </div>
-      </header>
 
-      <div id="panel-avisos" class="oculto"></div>
-      <div id="panel-recurrentes" class="oculto"></div>
-
-      <div class="paneles">
-        <button type="button" class="panel" data-vista="clasificar">
-          <svg class="panel-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
-            <path d="M13.8 3H7A1.5 1.5 0 0 0 5.5 4.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.7z"/>
-            <path d="M13.8 3v4.7h4.7"/>
-          </svg>
-          <span class="panel-texto">
-            <span class="panel-nombre">Por clasificar</span>
-            <span class="panel-pie">Documentos que todavía no tienen asunto</span>
-          </span>
-          <span class="panel-cuenta" id="cuenta-clasificar">0</span>
-          <span class="marca-nueva oculto" id="nuevos-sueltos"></span>
-        </button>
-
-        <button type="button" class="panel" data-vista="departamento">
-          <svg class="panel-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
-            <path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.2l2 2.6h8.8A1.5 1.5 0 0 1 21 9.1v9A1.5 1.5 0 0 1 19.5 19.6h-15A1.5 1.5 0 0 1 3 18.1z"/>
-          </svg>
-          <span class="panel-texto">
-            <span class="panel-nombre">Pendiente de Administración</span>
-            <span class="panel-pie">Asuntos que nos toca mover a nosotros</span>
-          </span>
-          <span class="panel-cuenta" id="cuenta-departamento">0</span>
-        </button>
-
-        <button type="button" class="panel" data-vista="espera">
-          <svg class="panel-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="8.5"/>
-            <path d="M12 7.3V12l3 1.8"/>
-          </svg>
-          <span class="panel-texto">
-            <span class="panel-nombre">Pendiente de terceros</span>
-            <span class="panel-pie">Esperando a que otro haga su parte</span>
-          </span>
-          <span class="panel-cuenta" id="cuenta-espera">0</span>
-        </button>
-      </div>
-
-      <div id="zona-clasificar" class="oculto">
-        <div class="sueltos-cabecera">
-          <p class="explica">Documentos sueltos en la carpeta de asuntos abiertos, todavía sin
-             carpeta propia. Aquí es donde aparece lo que os deja el equipo directivo.</p>
-          <button id="btn-sueltos-visto" class="boton oculto">Ya los he visto</button>
+        <div id="zona-asuntos">
+          <p class="explica oculto" id="buscando-en-todos">Buscando en todos los asuntos abiertos</p>
+          <div id="lista-abiertos" class="lista"></div>
         </div>
-
-        <!-- La bandeja de correos (js/bandeja-correos.js, js/bandeja-pantalla.js),
-             plegada detrás de esta barra y siempre arrancando así (fila 27,
-             17-sep-2026, docs/CORREOS-DENTRO-DE-POR-CLASIFICAR.md). Los dos
-             elementos nacen aquí, ya no los crea JavaScript. -->
-        <div id="correos-sin-clasificar" class="oculto">
-          <button type="button" id="btn-correos-sin-clasificar" class="boton" aria-expanded="false">
-            Correos sin clasificar (<span id="cuenta-correos-sin-clasificar">0</span>)
-          </button>
-          <div id="bandeja-correos" class="oculto"></div>
-        </div>
-
-        <div id="lista-sueltos" class="lista"></div>
       </div>
 
-      <div id="zona-asuntos">
-        <p class="explica oculto" id="buscando-en-todos">Buscando en todos los asuntos abiertos</p>
-        <div id="lista-abiertos" class="lista"></div>
-      </div>
+      <!-- El hueco de verdad para la fila 192 (la tabla "Todos los
+           asuntos abiertos"), VACÍO a propósito. -->
+      <div id="inicio-todos-asuntos"></div>
+
     </section>
 
     <section id="pantalla-asunto" class="pantalla oculto">
@@ -858,6 +918,10 @@
      js/papelera.js, que envuelve la tarjeta del documento suelto. -->
 <script src="js/elegir-asunto.js"></script>
 <script src="js/documentos-sueltos.js"></script>
+<!-- Fila 191: "mirar cada poco si ha llegado algo" (App.mirando,
+     App.vigilarLaCarpeta, App.mirarLaCarpeta, App.actualizarTitulo),
+     sacado de documentos-sueltos.js para que no pasara de 600 líneas. -->
+<script src="js/documentos-vigilancia.js"></script>
 <!-- Archivar y reabrir un asunto, sacado de documentos-sueltos.js el
      17-sep-2026 (fila 32). Va antes que js/relacionados.js y
      js/hitos-archivo.js, que envuelven App.cerrarAsunto/App.reabrirAsunto. -->
@@ -900,12 +964,13 @@
      App.cerrarAsunto/App.reabrirAsunto detrás de esa envoltura. -->
 <script src="js/hitos.js"></script>
 <script src="js/hitos-administracion.js"></script>
-<!-- "Qué me toca" (fila 16): cruza los hitos de todos los asuntos
-     abiertos. Vive entera en su fichero, como "Duplicados"
-     (js/unir-asuntos.js); usa Hitos.leer/visibles y, en el click de
-     cada fila, window.HitosPanel.desplegarAlAbrir (definido más abajo,
-     en js/hitos-panel.js), así que el orden entre ambos no importa:
-     solo se llama dentro de un onclick, ya con todo cargado. -->
+<!-- Los cálculos de "qué toca" a cada asunto abierto (fila 16; ya no
+     es una pantalla propia desde la fila 191, docs/INICIO-CUATRO-
+     BLOQUES.md): cruza los hitos `pendiente`/`encurso` de todos los
+     asuntos abiertos. Usa Hitos.leer/visibles y, al abrir la mesa de
+     un hito, window.HitosPanel.desplegarAlAbrir (definido más abajo,
+     en js/hitos-panel.js), así que el orden entre ambos no importa: se
+     llama solo desde js/inicio.js, ya con todo cargado. -->
 <script src="js/que-me-toca.js"></script>
 <!-- "Cuentas" (fila 74): las cuentas de fin de curso, por tipo, mes y
      quién lo pidió. Va después de js/nombres.js y de js/archivo-indice.js

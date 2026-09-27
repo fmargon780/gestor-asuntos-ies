@@ -91,15 +91,15 @@ await pagina.click('.panel[data-vista="clasificar"]');
 await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');
 
 console.log('--- lo leído deja el botón listo para crear de un tirón ---');
-await pagina.waitForSelector('[data-accion-suelto="crear"][title]', { timeout: 15000 });
+await pagina.waitForSelector('#lista-sueltos [data-accion-suelto="crear"][title]', { timeout: 15000 });
 await comprobar('el título dice que crea con lo leído',
-  pagina.locator('[data-accion-suelto="crear"]').getAttribute('title'),
+  pagina.locator('#lista-sueltos [data-accion-suelto="crear"]').getAttribute('title'),
   'Crea el asunto con lo leído y mete el documento dentro');
 await comprobar('sigue siendo el botón principal (sin sugerencias)',
-  pagina.locator('[data-accion-suelto="crear"]').evaluate((b) => b.classList.contains('boton-principal')), true);
+  pagina.locator('#lista-sueltos [data-accion-suelto="crear"]').evaluate((b) => b.classList.contains('boton-principal')), true);
 
 console.log('--- "Crear asunto con él": crea de un tirón y abre el nombre directo ---');
-await pagina.click('[data-accion-suelto="crear"]');
+await pagina.click('#lista-sueltos [data-accion-suelto="crear"]');
 await pagina.waitForSelector('#doc-guardar', { timeout: 15000 });
 await comprobar('la fecha leída va a la fecha del documento',
   pagina.locator('#doc-fecha').inputValue(), '2026-09-10');

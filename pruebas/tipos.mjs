@@ -48,7 +48,7 @@ await pagina.evaluate(async () => {
 await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(600);
 
-await pagina.click('.panel[data-vista="departamento"]');
+await pagina.evaluate(() => window.App.irVista('departamento'));
 await pagina.waitForTimeout(300);
 
 await comprobar('los cuatro asuntos salen', pagina.locator('#lista-abiertos .tarjeta').count(), 4);

@@ -156,7 +156,7 @@ await senalarLaBandeja();
    para lo mismo. */
 async function esperarLinea(id) {
   await pagina.waitForFunction((id) => {
-    const el = document.querySelector('[data-adjuntos-de="' + id + '"]');
+    const el = document.querySelector('#bandeja-correos [data-adjuntos-de="' + id + '"]');
     return !el || el.textContent !== 'Leyendo los documentos…';
   }, id, { timeout: 15000 });
 }
@@ -184,7 +184,7 @@ await mirarLaBandeja();
 await esperarLinea('correo1');
 
 await comprobar('1. la línea del documento trae el nombre de la alumna',
-  pagina.locator('[data-adjuntos-de="correo1"]').textContent()
+  pagina.locator('#bandeja-correos [data-adjuntos-de="correo1"]').textContent()
     .then(t => (t || '').indexOf('Con Dni, Ana') !== -1), true);
 
 await limpiarNuevo();
@@ -211,7 +211,7 @@ await mirarLaBandeja();
 await esperarLinea('correo2');
 
 await comprobar('2. no aparece ninguna línea de documento: nada nuevo que enseñar',
-  pagina.locator('[data-adjuntos-de="correo2"]').count(), 0);
+  pagina.locator('#bandeja-correos [data-adjuntos-de="correo2"]').count(), 0);
 
 const tarjeta2 = pagina.locator('#bandeja-correos .tarjeta-correo')
   .filter({ hasText: 'Un correo cualquiera' }).nth(1);
@@ -237,7 +237,7 @@ await mirarLaBandeja();
 await esperarLinea('correo3');
 
 await comprobar('3. la línea del documento trae el tipo',
-  pagina.locator('[data-adjuntos-de="correo3"]').textContent()
+  pagina.locator('#bandeja-correos [data-adjuntos-de="correo3"]').textContent()
     .then(t => (t || '').indexOf('BAJA MEDICA') !== -1), true);
 
 const tarjeta3 = pagina.locator('#bandeja-correos .tarjeta-correo')
@@ -262,7 +262,7 @@ await mirarLaBandeja();
 await esperarLinea('correo4');
 
 await comprobar('4. no aparece ninguna línea de documento: nada nuevo que enseñar',
-  pagina.locator('[data-adjuntos-de="correo4"]').count(), 0);
+  pagina.locator('#bandeja-correos [data-adjuntos-de="correo4"]').count(), 0);
 
 const tarjeta4 = pagina.locator('#bandeja-correos .tarjeta-correo')
   .filter({ hasText: 'Solicitud de plaza' });
@@ -279,7 +279,7 @@ await pagina.evaluate(() => App.ir('abiertos'));
 await dejarElCorreo(correoDeMentira('correo5'));
 await mirarLaBandeja();
 
-await comprobar('5. no sale ninguna línea de documento', pagina.locator('[data-adjuntos-de="correo5"]').count(), 0);
+await comprobar('5. no sale ninguna línea de documento', pagina.locator('#bandeja-correos [data-adjuntos-de="correo5"]').count(), 0);
 
 /* ============================================================
    6. UN ADJUNTO QUE NO ES PDF: NI SE INTENTA LEER
@@ -290,7 +290,7 @@ await dejarElCorreo(correoDeMentira('correo6', { adjuntos: ['correo6 - foto.jpg'
 await mirarLaBandeja();
 await esperarLinea('correo6');
 
-await comprobar('6. no sale ninguna línea de documento', pagina.locator('[data-adjuntos-de="correo6"]').count(), 0);
+await comprobar('6. no sale ninguna línea de documento', pagina.locator('#bandeja-correos [data-adjuntos-de="correo6"]').count(), 0);
 
 /* ============================================================
    7. UN ADJUNTO ILEGIBLE: LA TARJETA QUEDA COMO HOY
@@ -308,11 +308,12 @@ await pagina.evaluate(() => {
 await mirarLaBandeja();
 await esperarLinea('correo7');
 
-await comprobar('7. no sale ninguna línea de documento', pagina.locator('[data-adjuntos-de="correo7"]').count(), 0);
+await comprobar('7. no sale ninguna línea de documento', pagina.locator('#bandeja-correos [data-adjuntos-de="correo7"]').count(), 0);
 await comprobar('7. y el correo sigue en la bandeja, con su botón de siempre',
   pagina.locator('#bandeja-correos .tarjeta-correo').count(), 7);
-await pagina.locator('#bandeja-correos .tarjeta-correo').last()
-  .getByRole('button', { name: 'Descartar' }).click();
+var ultimaTarjeta = pagina.locator('#bandeja-correos .tarjeta-correo').last();
+await ultimaTarjeta.locator('.fila-menu-btn').click();
+await ultimaTarjeta.getByRole('button', { name: 'Descartar' }).click();
 await pagina.waitForSelector('#cuadro-titulo');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(300);

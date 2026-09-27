@@ -48,6 +48,17 @@ App.irVista = function (cual) {
 
   App.pintarAbiertos();
   App.pintarSueltos();
+
+  /* Fila 191: "espera" ya no tiene botón visible en Inicio (los otros
+     dos .panel se ocultan con CSS), pero sigue funcionando para quien
+     la llame a mano (o desde una prueba). Como la lista legado
+     (#inicio-legado) ya está siempre a la vista debajo de la rejilla,
+     esto solo hace falta para que le llegue el foco: mientras no
+     exista la tabla de la fila 192, Inicio.mostrarListaLegado se
+     encarga de que se vea bien. */
+  if (window.Inicio) {
+    Inicio.mostrarListaLegado(App.E.vista !== 'clasificar' && App.E.vista !== 'departamento');
+  }
 };
 
 Array.prototype.forEach.call(document.querySelectorAll('.panel'), function (b) {

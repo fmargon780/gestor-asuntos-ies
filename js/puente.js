@@ -21,6 +21,10 @@ window.Gestor = {
     App.$('buscar-abiertos').value = '';
     App.ir('abiertos');
     App.irVista('departamento');
+    /* Fila 191, decisión 5: mientras no exista la tabla de la fila 192,
+       este camino revela la lista legado (la tubería vieja), que es
+       donde de verdad se aplican estos filtros. */
+    if (window.Inicio) Inicio.mostrarListaLegado(true);
   },
 
   /* Las dos carpetas y la de _GESTOR, para que un módulo pueda crear

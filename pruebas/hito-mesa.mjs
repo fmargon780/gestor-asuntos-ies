@@ -237,14 +237,14 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
     pagina.evaluate(() => !document.getElementById('ficha-guia').classList.contains('con-mesa')), true);
   await comprobar('7. con la tarjeta de Hitos todavía abierta',
     pagina.evaluate(() => FichaTarjetas.abierta()), 'hitos');
-  await pagina.evaluate(() => document.querySelector('.pestana[data-pantalla="que-me-toca"]').click());
-  await pagina.waitForSelector('#pantalla-que-me-toca:not(.oculto)');
-  await pagina.waitForTimeout(300);
-  await pagina.waitForSelector('.qmt-fila[data-hito="m1"]', { state: 'attached' });   /* la lista se pinta un momento después */
-  await pagina.evaluate(() => document.querySelector('.qmt-fila[data-hito="m1"]').click());
+  await pagina.click('.pestana[data-pantalla="abiertos"]');
+  await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+  await pagina.evaluate(() => window.Inicio && window.Inicio.repintar());
+  await pagina.waitForSelector('#inicio-me-toca-lista .inicio-fila[data-hito="m1"]', { state: 'attached' });   /* la lista se pinta un momento después */
+  await pagina.evaluate(() => document.querySelector('#inicio-me-toca-lista .inicio-fila[data-hito="m1"]').click());
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.waitForTimeout(700);
-  await comprobar('7. desde "Qué me toca", directo en la mesa del hito',
+  await comprobar('7. desde "Me toca" (Inicio), directo en la mesa del hito',
     pagina.locator('#ficha-guia.con-mesa .hito-en-mesa[data-id="m1"]').isVisible(), true);
 
   /* 8. */

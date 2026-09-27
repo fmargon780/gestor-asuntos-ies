@@ -222,7 +222,7 @@ function sugerenciasDe(nombre) {
 }
 async function esperarLeido(nombre, contiene) {
   await pagina.waitForFunction(([n, c]) => {
-    const els = Array.from(document.querySelectorAll('.tarjeta-suelto'));
+    const els = Array.from(document.querySelectorAll('#lista-sueltos .tarjeta-suelto'));
     const fila = els.find((e) => e.textContent.indexOf(n) !== -1);
     if (!fila) return false;
     const prop = fila.querySelector('.tarjeta-propuesta');

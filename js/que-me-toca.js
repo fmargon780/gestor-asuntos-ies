@@ -1,31 +1,18 @@
 /* ============================================================
-   que-me-toca.js — pantalla "Qué me toca" (16-sep-2026, fila 16).
+   que-me-toca.js — los cálculos de "qué toca" a cada asunto abierto
+   (16-sep-2026, fila 16; ya no es una pantalla propia desde la fila
+   191, docs/INICIO-CUATRO-BLOQUES.md: sus tres bloques viven ahora
+   dentro de Inicio, "Ha llegado / Me toca / Esperamos a otros").
 
    Los hitos de la fila 15 (js/hitos.js) se ven dentro de cada asunto,
-   uno a uno. Esta pantalla los cruza todos: los hitos `pendiente` y
-   `encurso` de TODOS los asuntos abiertos, sin tener que entrar en
-   ellos. Se calcula leyendo Hitos.leer() una vez y
-   window.Gestor.asuntos(), cruzando por la clave del asunto.
+   uno a uno. Aquí se cruzan todos: los hitos `pendiente` y `encurso`
+   de TODOS los asuntos abiertos, sin tener que entrar en ellos. Se
+   calcula leyendo Hitos.leer() una vez y window.Gestor.asuntos(),
+   cruzando por la clave del asunto.
 
-   Vive entera en su propio fichero, con el mismo patrón que la
-   pantalla "Duplicados" en js/unir-asuntos.js: no está en index.html
-   más que su <script> y su <link>, se registra con App.PANTALLAS.push
-   y la sección se crea a mano, ya al cargar el script (App.ir espera
-   que #pantalla-<nombre> ya exista).
-
-   A diferencia de "Duplicados", esta SÍ tiene entrada en la barra de
-   la izquierda (js/barra.js la añade y le pone la cuenta de vencidos).
-
-   Los tres bloques (sección 2 de docs/QUE-ME-TOCA.md):
-     - "En tu tejado": responsable de Administración (fila 104) CON fecha límite,
-       ordenados por Plazos.diasHasta (los vencidos arriba). El color
-       es el de siempre: se reutiliza Plazos.de/.marca-plazo tal cual
-       (css/plazos.css), sin inventar otra escala.
-     - "Esperando a otros": cualquier otro responsable (tenga fecha o
-       no: se ordena por días parado desde `desde`, no por fecha).
-     - "Sin fecha": el resto —sin fecha límite, o sin un responsable
-       que encaje arriba—, plegado con <details>. Así no se pierde
-       nada: cada hito sale en un bloque, y solo en uno.
+   Este fichero es puro cálculo, sin pantalla propia: js/inicio.js lo
+   usa para pintar "Me toca" y "Esperamos a otros", con `reunir`,
+   `unoPorAsunto`, `clasificar` y `abrirMesaDelHito`.
    ============================================================ */
 (function () {
 
@@ -115,97 +102,14 @@
     }).length;
   }
 
-  /* ==========================================================
-     LA PANTALLA
-     ========================================================== */
-
-  App.PANTALLAS.push('que-me-toca');
-
-  var construida = false;
-
-  function construirPantalla() {
-    if (construida) return;
-    var contenido = document.querySelector('main.contenido');
-    if (!contenido) return;
-    var seccion = document.createElement('section');
-    seccion.id = 'pantalla-que-me-toca';
-    seccion.className = 'pantalla oculto';
-    seccion.innerHTML =
-      '<header class="cabecera">' +
-        '<h2>Qué me toca</h2>' +
-        '<div class="acciones">' +
-          '<label class="etiqueta-en-linea" for="qmt-responsable">Responsable</label>' +
-          '<select id="qmt-responsable" class="campo"><option value="">Todos</option></select>' +
-          '<button type="button" id="qmt-volver" class="boton boton-volver">← Volver</button>' +
-        '</div>' +
-      '</header>' +
-      '<p class="explica">Los hitos pendientes y en curso de todos los asuntos abiertos, cruzados ' +
-        'en una sola pantalla.</p>' +
-      '<div id="qmt-cuerpo"></div>';
-    contenido.appendChild(seccion);
-    $('qmt-volver').onclick = function () { App.ir('abiertos'); };
-    $('qmt-responsable').onchange = function () {
-      guardarFiltro(this.value);
-      pintar();
-    };
-    construida = true;
-  }
-  construirPantalla();
-
-  function abrir() {
-    construirPantalla();
-    App.ir('que-me-toca');
-    pintar();
-  }
-
-  /* ---------- pintar el filtro y la cuenta de la barra ---------- */
-
-  function pintarFiltro(ajustes) {
-    var sel = $('qmt-responsable');
-    if (!sel) return;
-    var actual = leerFiltro();
-    sel.innerHTML = ['<option value="">Todos</option>'].concat(
-      (ajustes.responsables || []).map(function (r) {
-        return '<option value="' + U.escapar(r.id) + '">' + U.escapar(r.nombre) + '</option>';
-      })
-    ).join('');
-    sel.value = actual;
-    if (sel.value !== actual) sel.value = '';   /* el guardado ya no existe */
-  }
+  /* ---------- la cuenta de vencidos ---------- */
 
   function pintarCuenta(items) {
-    var el = $('cuenta-que-me-toca');
+    var el = $('cuenta-vencidos-inicio');
     if (!el) return;
     var n = vencidos(items);
     el.textContent = n ? String(n) : '';
     el.classList.toggle('oculto', !n);
-  }
-
-  /* ---------- una fila, un hito ---------- */
-
-  function filaDeHito(it, extraHtml) {
-    var h = it.hito, a = it.asunto;
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'qmt-fila';
-    b.dataset.asunto = a.nombre;
-    b.dataset.hito = h.id;
-    /* Fila 135: un reservado, con candado y sin el nombre del tercero. */
-    var tapado = window.Reservados && Reservados.tapar(a);
-    var tercero = tapado ? '' : terceroDe(a);
-    b.innerHTML =
-      '<span class="qmt-fila-titulo">' + U.escapar(h.titulo || '(sin título)') + '</span>' +
-      '<span class="qmt-fila-asunto">' + (window.Reservados ? Reservados.candadoHtml(a) : '') +
-        U.escapar(window.Reservados ? Reservados.nombreParaVer(a) : a.nombre) + '</span>' +
-      (tercero ? '<span class="qmt-fila-tercero">' + U.escapar(tercero) + '</span>' : '') +
-      (extraHtml || '');
-    b.onclick = function () {
-      if (window.HitosPanel) window.HitosPanel.desplegarAlAbrir(a.nombre, h.id);
-      /* Con la tarjeta de Hitos abierta en grande (fila 107). */
-      if (window.FichaTarjetas) FichaTarjetas.abrirAlEntrar('hitos');
-      App.abrirFicha(a, 'abierto');
-    };
-    return b;
   }
 
   /* ---------- los asuntos dormidos (19-sep-2026, fila 68,
@@ -343,113 +247,6 @@
     } catch (e) { return 0; }
   }
 
-  function bloqueAspirantes(n) {
-    if (!n) return null;
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'qmt-fila qmt-aviso-aspirantes';
-    b.textContent = n + ' ' + (n === 1 ? 'aspirante' : 'aspirantes') +
-      ' sin Nº de identificación escolar';
-    b.onclick = function () {
-      if ($('filtro-personas')) $('filtro-personas').value = 'ALUMNADO';
-      if ($('buscar-personas')) $('buscar-personas').value = '';
-      App.ir('personas');
-      if (App.pintarPersonas) App.pintarPersonas();
-    };
-    return b;
-  }
-
-  /* ---------- los tres bloques ---------- */
-
-  function bloqueTejado(lista) {
-    if (!lista.length) return null;
-    var d = document.createElement('div');
-    d.className = 'qmt-bloque qmt-bloque-tejado';
-    d.innerHTML = '<h3 class="qmt-bloque-titulo">En tu tejado ' +
-      '<span class="cuenta-lista">' + lista.length + '</span></h3>';
-    var caja = document.createElement('div');
-    caja.className = 'qmt-lista';
-    lista.forEach(function (it) {
-      var p = Plazos.de(it.hito.fecha);
-      var fila = filaDeHito(it, '<span class="marca-plazo ' + p.clase + '">' + U.escapar(p.texto) + '</span>');
-      fila.classList.add(p.clase);
-      caja.appendChild(fila);
-    });
-    d.appendChild(caja);
-    return d;
-  }
-
-  function textoParado(dias, desde) {
-    if (!desde) return 'sin empezar todavía';
-    if (dias === 0) return 'parado desde hoy';
-    return dias === 1 ? 'lleva 1 día parado' : 'lleva ' + dias + ' días parado';
-  }
-
-  function bloqueOtros(lista, ajustes) {
-    if (!lista.length) return null;
-    var d = document.createElement('div');
-    d.className = 'qmt-bloque qmt-bloque-otros';
-    d.innerHTML = '<h3 class="qmt-bloque-titulo">Esperando a otros ' +
-      '<span class="cuenta-lista">' + lista.length + '</span></h3>';
-    var caja = document.createElement('div');
-    caja.className = 'qmt-lista';
-    lista.forEach(function (it) {
-      var h = it.hito;
-      var contexto = contextoResponsable(it.asunto);
-      var r = Hitos.resolverResponsable(h.responsable, ajustes, contexto);
-      var quien = r ? r.texto : h.responsable;
-      var dias = diasParado(h);
-      var extra = '<span class="qmt-fila-espera" data-dias="' + dias + '">Espera a ' +
-        U.escapar(quien) + ' · ' + textoParado(dias, h.desde) + '</span>';
-      caja.appendChild(filaDeHito(it, extra));
-    });
-    d.appendChild(caja);
-    return d;
-  }
-
-  function bloqueSinFecha(lista) {
-    if (!lista.length) return null;
-    var det = document.createElement('details');
-    det.className = 'qmt-bloque qmt-sinfecha';
-    det.innerHTML = '<summary>Sin fecha <span class="cuenta-lista">' + lista.length + '</span></summary>';
-    var caja = document.createElement('div');
-    caja.className = 'qmt-lista';
-    lista.forEach(function (it) { caja.appendChild(filaDeHito(it)); });
-    det.appendChild(caja);
-    return det;
-  }
-
-  /* ---------- el repintado entero ---------- */
-
-  async function pintar() {
-    var caja = $('qmt-cuerpo');
-    if (!caja) return;
-    var datos = await reunir();
-    pintarFiltro(datos.ajustes);
-    pintarCuenta(datos.items);
-
-    var filtro = leerFiltro();
-    /* Fila 159: al filtrar por una persona, también los de «Administración». */
-    var items = filtro ? datos.items.filter(function (it) {
-      return window.HitosAdministracion ? HitosAdministracion.cuentaPara(it.hito.responsable, filtro, datos.ajustes)
-        : it.hito.responsable === filtro;
-    }) : datos.items;
-    var g = clasificar(items, datos.ajustes);
-    var nAspirantes = await contarAspirantesSinNumero();
-
-    var bloques = [bloqueAspirantes(nAspirantes), bloqueTejado(g.tejado),
-                   bloqueOtros(g.otros, datos.ajustes), bloqueDormidos(reunirDormidos()),
-                   bloqueSinFecha(g.sinFecha)]
-      .filter(function (b) { return b; });
-
-    caja.innerHTML = '';
-    if (!bloques.length) {
-      caja.innerHTML = '<div class="vacio">No hay ningún hito pendiente en los asuntos abiertos.</div>';
-      return;
-    }
-    bloques.forEach(function (b) { caja.appendChild(b); });
-  }
-
   /* ---------- la cuenta de la barra, siempre al día ----------
 
      Igual que el aviso de duplicados (js/unir-asuntos.js): enganchado
@@ -475,8 +272,42 @@
     else enganchar();
   })();
 
+  /* ---------- un hito por asunto ----------
+
+     El PRIMERO en el orden de reunir() (el de la guía), ANTES de
+     ordenar por fecha o por días parados: así "Me toca" y "Esperamos a
+     otros" enseñan un solo hito por asunto, el que de verdad toca
+     ahora. */
+  function unoPorAsunto(items) {
+    var visto = {};
+    return items.filter(function (it) {
+      if (visto[it.asunto.nombre]) return false;
+      visto[it.asunto.nombre] = true;
+      return true;
+    });
+  }
+
+  /* Abre la ficha del asunto con la mesa de ese hito ya desplegada
+     (lo que hacía filaDeHito, ahora pulsando una fila de "Me toca" en
+     Inicio: js/inicio.js). */
+  function abrirMesaDelHito(a, h) {
+    if (window.HitosPanel) window.HitosPanel.desplegarAlAbrir(a.nombre, h.id);
+    /* Con la tarjeta de Hitos abierta en grande (fila 107). */
+    if (window.FichaTarjetas) FichaTarjetas.abrirAlEntrar('hitos');
+    App.abrirFicha(a, 'abierto');
+  }
+
   window.QueMeToca = {
-    abrir: abrir,
+    reunir: reunir, clasificar: clasificar, esMio: esMio, diasParado: diasParado,
+    vencidos: vencidos, unoPorAsunto: unoPorAsunto,
+    contarAspirantesSinNumero: contarAspirantesSinNumero,
+    reunirDormidos: reunirDormidos,
+    leerFiltroResponsable: leerFiltro, guardarFiltroResponsable: guardarFiltro,
+    abrirMesaDelHito: abrirMesaDelHito,
+    /* Pequeñas ayudas que también usa js/inicio.js para pintar "Me
+       toca" y "Esperamos a otros" (el tercero de un asunto, y el
+       contexto que necesita Hitos.resolverResponsable). */
+    terceroDe: terceroDe, contextoResponsable: contextoResponsable,
     /* para las pruebas */
     _reunirDormidos: reunirDormidos
   };

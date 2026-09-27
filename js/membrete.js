@@ -312,14 +312,14 @@ window.Membrete = Membrete;
   }
 
   async function quitarLogo() {
-    var ok = await U.preguntar('Quitar el logo del centro', '<p>Va a la papelera. Los documentos saldrán con la derecha del membrete en blanco.</p>', 'Quitar');
+    var ok = await U.preguntar('Borrar el logo del centro', '<p>Va a la papelera. Los documentos saldrán con la derecha del membrete en blanco.</p>', 'Borrar');
     if (!ok) return;
     try {
       await Membrete.quitarLogo();
       logoActual = null;
       pintarEstadoLogo();
-      U.aviso('Logo quitado.', 'bueno');
-    } catch (e) { U.fallo('No he podido quitar el logo', e); return; }
+      U.aviso('Logo borrado.', 'bueno');
+    } catch (e) { U.fallo('No he podido borrar el logo', e); return; }
     await refrescarVistaPrevia();
   }
 

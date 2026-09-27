@@ -55,7 +55,7 @@ await pagina.evaluate(async ([LARGO, LARGO2]) => {
   for (const n of nombres) await window.__disco.abiertos.getDirectoryHandle(n, { create: true });
   await App.verAbiertos();
 }, [LARGO, LARGO2]);
-await pagina.click('.panel[data-vista="departamento"]');
+await pagina.evaluate(() => window.App.irVista('departamento'));
 await pagina.waitForTimeout(300);
 
 await comprobar('los tres asuntos salen', pagina.locator('#lista-abiertos .tarjeta').count(), 3);

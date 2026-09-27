@@ -2,7 +2,8 @@
    adónde lleva la aplicación después de cada acción.
 
    1. Crear un asunto (formulario «Nuevo asunto») abre su ficha.
-   2. «Volver» desde una ficha abierta en «Qué me toca» vuelve a «Qué me toca».
+   2. «Volver» desde una ficha abierta desde una fila de "Me toca" (en
+      Inicio, fila 191) vuelve a Inicio.
    3. La lista de abiertos conserva la altura tras abrir una ficha y volver.
    4. Reabrir un asunto desde su ficha del ARCHIVO abre su ficha de abierto.
    5. Meter un documento de «Por clasificar» en un asunto deja el aviso con
@@ -72,16 +73,27 @@ await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await comprobar('1. «Volver» desde ahí lleva a Asuntos abiertos, no al formulario', visible('abiertos'), true);
 
 /* ============================================================
-   2. Volver a «Qué me toca»
+   2. Volver desde una fila de "Me toca" (Inicio, fila 191)
    ============================================================ */
-console.log('--- 2. volver a «Qué me toca» ---');
-await pagina.evaluate(() => App.ir('que-me-toca'));
-await pagina.evaluate(() => { App.abrirFicha(App.E.listaAbiertos[0], 'abierto'); });
+console.log('--- 2. volver desde una fila de "Me toca" ---');
+await pagina.evaluate(async () => {
+  var nombre = App.E.listaAbiertos[0].nombre;
+  var ayer = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  await Hitos.cambiar(function (datos) {
+    datos.porAsunto[nombre] = { creados: U.ahora(), hitos: [
+      { id: 'me-toca-1', titulo: 'Revisar la solicitud', estado: 'encurso',
+        responsable: 'administracion', fecha: ayer }
+    ] };
+    return datos;
+  });
+  if (window.Inicio) await window.Inicio.repintar();
+});
+await pagina.waitForSelector('#inicio-me-toca-lista .inicio-fila');
+await pagina.click('#inicio-me-toca-lista .inicio-fila');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(150);
-await comprobar('2. vuelve a «Qué me toca»', visible('que-me-toca'), true);
-await comprobar('2. y no a la lista', visible('abiertos'), false);
+await comprobar('2. vuelve a Inicio', visible('abiertos'), true);
 
 /* ============================================================
    3. La lista conserva la altura

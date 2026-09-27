@@ -198,14 +198,26 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
 
   /* 7. */
   await pagina.keyboard.press('Escape');
-  await pagina.evaluate(() => document.querySelector('.pestana[data-pantalla="que-me-toca"]').click());
-  await pagina.waitForSelector('#pantalla-que-me-toca:not(.oculto)');
+  /* m1 necesita responsable y fecha para salir en "Me toca" (Inicio,
+     fila 191): esta guía no le pone ninguno de los dos. */
+  await pagina.evaluate(async (asunto) => {
+    var hoy = new Date().toISOString().slice(0, 10);
+    await Hitos.cambiar(function (datos) {
+      var e = datos.porAsunto[asunto];
+      var h = e && e.hitos.filter(function (x) { return x.id === 'm1'; })[0];
+      if (h) { h.responsable = 'administracion'; h.fecha = hoy; }
+      return datos;
+    });
+  }, ASUNTO);
+  await pagina.click('.pestana[data-pantalla="abiertos"]');
+  await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+  await pagina.evaluate(() => window.Inicio && window.Inicio.repintar());
   /* La lista se pinta un momento después de verse la pantalla (lee los hitos). */
-  await pagina.waitForSelector('.qmt-fila[data-hito="m1"]', { state: 'attached' });
-  await pagina.evaluate(() => document.querySelector('.qmt-fila[data-hito="m1"]').click());
+  await pagina.waitForSelector('#inicio-me-toca-lista .inicio-fila[data-hito="m1"]', { state: 'attached' });
+  await pagina.evaluate(() => document.querySelector('#inicio-me-toca-lista .inicio-fila[data-hito="m1"]').click());
   await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
   await pagina.waitForTimeout(600);
-  await comprobar('7. desde "Qué me toca", entra con Hitos en grande', abierta(pagina), 'hitos');
+  await comprobar('7. desde "Me toca" (Inicio), entra con Hitos en grande', abierta(pagina), 'hitos');
   await comprobar('7. y el hito desplegado',
     pagina.locator('#ficha-guia .hito[data-id="m1"] .hito-cuerpo').isVisible(), true);
 

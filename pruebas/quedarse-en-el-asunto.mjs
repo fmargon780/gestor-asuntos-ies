@@ -198,7 +198,7 @@ await pagina.evaluate((nombre) => {
 }, SUELTO);
 await pagina.click('#btn-recargar');
 await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');
-await pagina.locator('.tarjeta-suelto', { hasText: SUELTO })
+await pagina.locator('#lista-sueltos .tarjeta-suelto', { hasText: SUELTO })
   .getByRole('button', { name: 'Guardar en un asunto' }).click();
 await pagina.waitForSelector('#enlace-todos');
 await pagina.fill('#enlace-buscar', 'Proveedor de Prueba');
@@ -221,7 +221,7 @@ console.log('--- 11. Archivar SÍ devuelve a la lista ---');
 await pagina.evaluate(async (nombre) => {
   await window.App.anotar(nombre, { categoria: 'EMPRESAS', tercero: 'Proveedor de Prueba SL 12345678A' });
 }, NOMBRE_ASUNTO);
-await pagina.click('.panel[data-vista="departamento"]');
+await pagina.evaluate(() => window.App.irVista('departamento'));
 await pagina.waitForSelector('#lista-abiertos .tarjeta');
 await pagina.click('#lista-abiertos .nombre-pulsable');
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
