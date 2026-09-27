@@ -248,6 +248,14 @@ var Campos = (function () {
     return actual;
   }
 
+  /* No se pone aquí en la cola de `campos.json` (`ColaGuardado`, fila
+     99): `js/tipos-nombre.js` ya llama a esta función varias veces
+     seguidas desde DENTRO de su propia fila (`App.enFila('campos.json',
+     ...)`), y una cola dentro de otra cola del mismo fichero se
+     bloquearía esperándose a sí misma (aviso de cola-guardado.js). Quien
+     pueda llamarla varias veces seguidas sin ese envoltorio (fila 198,
+     apartado 2: guardar en cada cambio de la sección Campos de
+     js/ajustes-tipo.js) se pone en la cola él mismo, por fuera. */
   async function guardarConfigDeTipo(gestor, claveTipo, listaCampos) {
     var actual = await leer(gestor);
     actual.porTipo = actual.porTipo || {};

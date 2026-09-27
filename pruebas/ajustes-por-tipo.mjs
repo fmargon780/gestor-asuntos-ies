@@ -163,7 +163,7 @@ await pagina.click('#campos-catalogo-volver');
 await pagina.waitForSelector('#campos-puestos');
 await comprobar('el campo elegido pasa a la lista de puestos',
   pagina.locator('#campos-puestos .fila-tipo').count(), 1);
-await pagina.click('#campos-guardar');
+/* Fila 198, apartado 2: se guarda solo, sin botón "Guardar campos". */
 await pagina.waitForTimeout(300);
 await comprobar('se guarda un campo de COMPRA en campos.json',
   leerJson('campos.json').then((j) => (j.porTipo.COMPRA || []).length), 1);

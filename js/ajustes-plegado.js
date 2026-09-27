@@ -164,6 +164,9 @@ var AjustesPlegado = (function () {
   function resumirTipo() {
     var tipo = App.E.tipoAjustesActual;
     if (!tipo) return;
+    /* Fila 198, apartado 1: la lista de comprobación de arriba se
+       calcula al mismo tiempo que estos resúmenes. */
+    if (window.ListaComprobacionTipo) ListaComprobacionTipo.pintar(tipo);
 
     ponerResumen(seccionDelTipo('datos'),
       tipo.categoria + (tipo.nombreCorto ? ' · ' + tipo.nombreCorto : ''));
@@ -233,10 +236,6 @@ var AjustesPlegado = (function () {
     } },
     { id: 'grupos-personas', dentro: '#tabla-grupos-personas', resumen: function (det) {
       var n = filasDe(det.querySelector('#tabla-grupos-personas'));
-      return [n ? String(n) : 'ninguno'];
-    } },
-    { id: 'campos-propios', dentro: '#tabla-propios', resumen: function () {
-      var n = ((App.E.campos && App.E.campos.propios) || []).length;
       return [n ? String(n) : 'ninguno'];
     } },
     { id: 'hitos', dentro: '#tabla-responsables', resumen: function (det) {
@@ -544,9 +543,22 @@ var AjustesPlegado = (function () {
   }
   arrancar();
 
+  /* Fila 198, apartado 1: abre y despliega la sección que toca, desde
+     una línea de la lista de comprobación. Al poner `det.open = true`
+     a mano, el `toggle` que ya engancha `seccion()` apunta sola la
+     memoria de "abierto" en localStorage, como si Francisco la hubiera
+     pulsado. */
+  function abrirSeccionTipo(id) {
+    var det = seccionDelTipo(id);
+    if (!det) return;
+    det.open = true;
+    det.scrollIntoView({ block: 'center' });
+  }
+
   return {
     seccion: seccion,
     resumirTipo: resumirTipo,
+    abrirSeccionTipo: abrirSeccionTipo,
     ordenarCentro: ordenarCentro,
     ordenarMantenimiento: ordenarMantenimiento,
     ponerResumen: ponerResumen,

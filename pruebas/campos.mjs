@@ -158,6 +158,8 @@ await comprobar('los dos campos quedan puestos, en orden',
   pagina.locator('#campos-puestos .fila-tipo .nombre-tipo').allTextContents(),
   ['Unidad', 'Modalidad de Bachillerato']);
 
+/* Fila 198, apartado 2, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md: no hay
+   botón "Guardar campos", se guarda solo al marcar cada casilla. */
 const filaUnidad = pagina.locator('#campos-puestos .fila-tipo').filter({ hasText: 'Unidad' });
 await filaUnidad.locator('label:has-text("Obligatorio") input').check();
 await filaUnidad.locator('label:has-text("Añadir al nombre") input').check();
@@ -168,8 +170,7 @@ await pagina.locator('.tipo-asunto-seccion').filter({ hasText: 'Campos' }).scree
   path: path.join(CARPETA_CAPTURAS, 'campos-cuadro-ajustes.png')
 });
 
-await pagina.click('#campos-guardar');
-await pagina.waitForTimeout(300);
+await pagina.waitForTimeout(500);
 
 await comprobar('campos.json guarda la configuración de SANCION', leerJson('campos.json').then(j => j.porTipo.SANCION), [
   { origen: 'fichero', columna: 'Unidad', obligatorio: true, enNombre: true },
@@ -327,26 +328,14 @@ await comprobar('1ºA dice 1º', pagina.evaluate(() => Campos.calcularCurso('1º
 await comprobar('un espacio sobrante se limpia', pagina.evaluate(() => Campos.calcularCurso('2ºFPB B')), '2ºFPB');
 
 /* ================================================================
-   7. Un campo propio de lista cerrada sale como desplegable, y su
-      valor entra en el nombre.
+   7. Un campo propio de lista cerrada, creado desde dentro de un
+      tipo (fila 198, apartado 5: los campos propios se crean desde
+      "+ Añadir campo" › "Míos", no desde "El centro"), sale como
+      desplegable, y su valor entra en el nombre.
    ================================================================ */
-console.log('--- 7. un campo propio de lista cerrada ---');
+console.log('--- 7. un campo propio de lista cerrada, creado desde dentro de un tipo ---');
 
-/* El catálogo de campos propios vive en "El centro" desde la fila 39
-   (docs/AJUSTES-POR-TIPO.md). */
 await pagina.click('.pestana[data-pantalla="ajustes"]');
-await pagina.click('[data-ajustes-pestana="centro"]');
-await pagina.fill('#nuevo-propio', 'Trimestre');
-await pagina.selectOption('#nueva-clase-propio', 'lista');
-await pagina.click('#btn-anadir-propio');
-await pagina.waitForSelector('#propio-valores-alta');
-await pagina.fill('#propio-valores-alta', '1º\n2º\n3º');
-await pagina.click('#cuadro-aceptar');
-await pagina.waitForTimeout(200);
-await comprobar('el campo propio queda en la lista',
-  pagina.locator('#tabla-propios .fila-tipo').filter({ hasText: 'Trimestre' }).locator('.suave').textContent(),
-  '1º, 2º, 3º');
-
 await pagina.click('[data-ajustes-pestana="tipos"]');
 const tarjetaSancion2 = pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: 'SANCION' });
 await tarjetaSancion2.locator('.tarjeta-tipo-nombre').click();
@@ -355,14 +344,25 @@ await pagina.waitForSelector('#campos-puestos');
 await pagina.click('#campos-btn-anadir');
 await pagina.waitForSelector('.pestana-categoria[data-pestana="mios"]');
 await pagina.click('.pestana-categoria[data-pestana="mios"]');
-await pagina.locator('#campos-mios-lista .fila-tipo').filter({ hasText: 'Trimestre' })
-  .getByRole('button', { name: 'Añadir' }).click();
+await pagina.click('#campos-mios-crear');
+await pagina.waitForSelector('#propio-nombre');
+await pagina.fill('#propio-nombre', 'Trimestre');
+await pagina.selectOption('#propio-clase', 'lista');
+await pagina.fill('#propio-valores', '1º\n2º\n3º');
+await pagina.click('#propio-crear');
+await pagina.waitForTimeout(300);
+
+await comprobar('el campo propio queda creado, con sus valores', leerJson('campos.json').then(j =>
+  (j.propios || []).some(p => p.nombre === 'Trimestre' && p.clase === 'lista' && p.valores.join(',') === '1º,2º,3º')),
+  true);
+await comprobar('y ya queda puesto en SANCION, guardado solo (sin botón)', leerJson('campos.json').then(j =>
+  (j.porTipo.SANCION || []).some(c => c.origen === 'propio')), true);
+
 await pagina.click('#campos-catalogo-volver');
 await pagina.waitForSelector('#campos-puestos');
 await pagina.locator('#campos-puestos .fila-tipo').filter({ hasText: 'Trimestre' })
   .locator('label:has-text("Añadir al nombre") input').check();
-await pagina.click('#campos-guardar');
-await pagina.waitForTimeout(200);
+await pagina.waitForTimeout(300);
 
 await pagina.click('.pestana[data-pantalla="nuevo"]');
 await pagina.click('.categoria-boton[data-categoria="ALUMNADO"]');
