@@ -156,6 +156,41 @@ function construirSeccionDatos(tipo) {
     'Lleva la firma digital del director', 'Deja libre la banda de abajo al preparar el documento.'));
   b.cuerpo.appendChild(interruptores);
 
+  /* «Al cerrar el asunto, avisar a quien lo pide» (fila 195,
+     docs/AVISOS-A-QUIEN-LO-PIDE.md, punto 1). */
+  if (window.AvisosLoPide) {
+    var filaAvisoCierre = document.createElement('label');
+    filaAvisoCierre.className = 'interruptor';
+    filaAvisoCierre.style.marginTop = '10px';
+    filaAvisoCierre.innerHTML = '<input type="checkbox" class="tipo-avisar-lopide-cierre"' +
+      (tipo.avisarLoPideCierre ? ' checked' : '') + '>' +
+      '<span>Al cerrar el asunto, avisar a quien lo pide</span>';
+    b.cuerpo.appendChild(filaAvisoCierre);
+
+    var cajaAvisoCierre = document.createElement('div');
+    cajaAvisoCierre.className = 'tipo-avisar-lopide-cierre-plantilla' + (tipo.avisarLoPideCierre ? '' : ' oculto');
+    cajaAvisoCierre.innerHTML = '<label class="etiqueta-en-linea">Con la plantilla:</label>' +
+      '<select class="campo tipo-avisar-lopide-cierre-select"><option value="">Cargando…</option></select>';
+    b.cuerpo.appendChild(cajaAvisoCierre);
+
+    var casillaAvisoCierre = filaAvisoCierre.querySelector('.tipo-avisar-lopide-cierre');
+    var selectAvisoCierre = cajaAvisoCierre.querySelector('.tipo-avisar-lopide-cierre-select');
+    casillaAvisoCierre.onchange = async function () {
+      tipo.avisarLoPideCierre = casillaAvisoCierre.checked;
+      cajaAvisoCierre.classList.toggle('oculto', !casillaAvisoCierre.checked);
+      await App.guardarTipos();
+    };
+    selectAvisoCierre.onchange = async function () {
+      tipo.avisarLoPideCierrePlantilla = selectAvisoCierre.value;
+      await App.guardarTipos();
+    };
+    AvisosLoPide.opcionesPlantillaHTML(tipo.tipo, tipo.avisarLoPideCierrePlantilla, AvisosLoPide.NOMBRE_CIERRE)
+      .then(function (html) {
+        if (!selectAvisoCierre.isConnected) return;
+        selectAvisoCierre.innerHTML = html;
+      });
+  }
+
   /* Formularios oficiales del tipo (20-sep-2026, fila 82,
      docs/FORMULARIOS-OFICIALES.md): además de los que lleve cada hito,
      un tipo puede necesitar un impreso sin que dependa de ningún paso

@@ -126,6 +126,15 @@ var Hitos = (function () {
       opciones: [], elegida: null
     };
     if (h && h.delTipoAnterior) salida.delTipoAnterior = String(h.delTipoAnterior);
+    /* «Avisar a quien lo pide» (fila 195, docs/AVISOS-A-QUIEN-LO-PIDE.md):
+       los dos campos del paso, solo si están encendidos (un hito de
+       antes de esta fila se comporta como si no avisara), y la marca
+       de que ya se ha preguntado por este hito, solo si la hay. */
+    if (h && h.avisarLoPide) {
+      salida.avisarLoPide = true;
+      salida.avisarLoPidePlantilla = String(h.avisarLoPidePlantilla || '');
+    }
+    if (h && h.avisoLoPideHecho) salida.avisoLoPideHecho = true;
     /* La fecha en que se dio por hecho (fila 102, para {hecho:...}).
        Solo si la hay: los hitos de antes no la tienen, y no se inventa. */
     if (h && h.hechoEl) salida.hechoEl = String(h.hechoEl);
@@ -454,6 +463,10 @@ var Hitos = (function () {
       soloInformativo: esDecision ? false : !!p.soloInformativo,
       normativa: esDecision ? [] : (p.normativa || []),
       formularios: esDecision ? [] : (p.formularios || []),
+      /* «Avisar a quien lo pide» (fila 195): igual que los dos de
+         arriba, solo de los pasos de arriba, nunca de una pregunta. */
+      avisarLoPide: esDecision ? false : !!p.avisarLoPide,
+      avisarLoPidePlantilla: esDecision ? '' : (p.avisarLoPidePlantilla || ''),
       opciones: esDecision ? p.opciones.map(function (o) {
         return { id: o.id, texto: o.titulo, hitos: (o.pasos || []).map(pasoAHito) };
       }) : [],

@@ -276,7 +276,21 @@
             (h.opciones || []).forEach(function (o) { recorrer(o.hitos); });
           });
         })(lista);
-      } catch (e) { /* sin hitos legibles, los {hecho:...} se quedan vacíos */ }
+        /* Fila 195: {{HITON}} y {{HITOSM}} — "el hito N de M", con la
+           misma cuenta que "Hito N de M" de la ficha (js/hitos.js,
+           Hitos.numerados: sin los "solo informativo"). */
+        if (window.Hitos && Hitos.numerados) {
+          var numerados = Hitos.numerados(lista || []);
+          var pos = -1;
+          for (var ni = 0; ni < numerados.length; ni++) {
+            if (numerados[ni].id === hito.id) { pos = ni; break; }
+          }
+          if (pos !== -1) {
+            valores.hiton = String(pos + 1);
+            valores.hitosm = String(numerados.length);
+          }
+        }
+      } catch (e) { /* sin hitos legibles, los {hecho:...} y {{HITON}} se quedan vacíos */ }
     }
 
     /* {{FORMULARIOS}} (20-sep-2026, fila 83, docs/PLANTILLAS-DEL-CENTRO.md,

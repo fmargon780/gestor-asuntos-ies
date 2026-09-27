@@ -308,6 +308,11 @@
 
 .paso-solo-informativo-fila { margin-top: 10px; }
 
+/* ---------- «avisar a quien lo pide» (27-sep-2026, fila 195) ---------- */
+
+.paso-avisar-lopide-fila { margin-top: 10px; }
+.paso-avisar-lopide-plantilla { margin-top: 6px; }
+
 /* ---------- "normativa" (20-sep-2026, fila 79, apartado 4.7) ---------- */
 
 .paso-normativa {

@@ -368,6 +368,12 @@ var HitoMesa = (function () {
       opcionesMas.push({ texto: '+ Añadir un hito a la guía del tipo', clase: 'mesa-anadir-guia', alPulsar: function () { HitoMesaGuion.anadirALaGuia(a, h); } });
     }
     if (window.GuiasDelCentro && GuiasDelCentro.escribir) opcionesMas.push({ texto: 'Cambiar la guía…', clase: 'mesa-cambiar-guia', alPulsar: function () { cambiarLaGuia(a); } });
+    /* «Enviar estado» (fila 195, docs/AVISOS-A-QUIEN-LO-PIDE.md, punto
+       3): en el menú «···», que ya crece sin romper el ancho fijo de
+       la cabecera (fila 50, docs/CABECERA-NO-TIEMBLA.md). */
+    if (window.AvisosLoPide) {
+      opcionesMas.push({ texto: 'Enviar estado', clase: 'mesa-enviar-estado', alPulsar: function () { AvisosLoPide.enviarEstado(a); } });
+    }
     if (mas) FichaMenus.montar(mas, opcionesMas.concat([
       { raya: true },
       { texto: 'Quitar este hito', clase: 'ficha-menu-peligro', alPulsar: function () {

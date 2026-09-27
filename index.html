@@ -1122,6 +1122,12 @@
 <script src="js/correo-grupos.js"></script>
 <script src="js/correo-rastro.js"></script>
 <script src="js/hitos-comunicar.js"></script>
+<!-- js/avisos-lo-pide.js (fila 195, docs/AVISOS-A-QUIEN-LO-PIDE.md):
+     avisar a quien lo pide y "Enviar estado". Va después de
+     js/correo.js (usa CorreoNucleo.abrirCuadro) y de
+     js/ficha-archivo.js (envuelve App.cerrarAsunto por fuera de esa
+     envoltura, para avisar antes de mover la carpeta). -->
+<script src="js/avisos-lo-pide.js"></script>
 <!-- js/seneca-destinatarios.js (fila 47, docs/DESTINATARIOS-EN-SENECA.md):
      la lista de usuarios IdEA del cuadro de Séneca, en chips. Va
      después de js/correo.js: usa `window.CorreoGrupos`, que expone,

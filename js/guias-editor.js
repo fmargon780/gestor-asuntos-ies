@@ -50,7 +50,10 @@
     var opcionesCtx = {
       nivel: function () { return nivel; }, recoger: recoger, pintar: pintar,
       entrar: function (p, op) { entrar(p, op); }, prepararRecuadro: prepararRecuadro,
-      restaurar: function (det, pos, idSub) { restaurarAbierto(det, abiertos, pos, idSub); }, plegado: plegado
+      restaurar: function (det, pos, idSub) { restaurarAbierto(det, abiertos, pos, idSub); }, plegado: plegado,
+      /* Fila 195: para el desplegable "Con la plantilla:" de "Avisar
+         a quien lo pide" (js/guias-paso-bloques.js). */
+      nombreTipo: nombreTipo
     };
 
     var esperar = U.preguntar('Guía de ' + nombreTipo,
@@ -213,6 +216,13 @@
            solo en los hitos que no son pregunta. */
         var soloInfEl = caja.querySelector(':scope > .paso-solo-informativo-fila .paso-solo-informativo');
         if (soloInfEl) nivel[i].soloInformativo = soloInfEl.checked;
+        /* «Avisar a quien lo pide» (fila 195). */
+        var avisoLoPideEl = caja.querySelector(':scope > .paso-avisar-lopide-fila .paso-avisar-lopide');
+        if (avisoLoPideEl) {
+          nivel[i].avisarLoPide = avisoLoPideEl.checked;
+          var avisoSelEl = caja.querySelector(':scope > .paso-avisar-lopide-plantilla .paso-avisar-lopide-select');
+          nivel[i].avisarLoPidePlantilla = avisoSelEl ? avisoSelEl.value : '';
+        }
         if (window.HitosNormativa && caja.querySelector(':scope > .paso-normativa')) {
           nivel[i].normativa = HitosNormativa.leer(caja);
         }
