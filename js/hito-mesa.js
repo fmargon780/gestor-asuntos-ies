@@ -253,7 +253,14 @@ var HitoMesa = (function () {
     var todoHecho = abierto && window.EstadoHito && EstadoHito.idActual &&
       EstadoHito.idActual(hitos, ajustes) === null;
     cab.innerHTML =
-      '<div class="mesa-tira">' + visibles.map(function (x) {
+      /* Fila 194 (docs/AVISOS-MENU-Y-VOLVER.md, apartado 4): mismo
+         efecto que el primer Escape en la mesa (cerrarSiAbierta). Va
+         dentro de la propia tira, como su primera celda, para que
+         "la tira ocupa todo el ancho" (fila 145) siga siendo verdad
+         sin añadir una línea nueva (fila 50, cabecera compacta). */
+      '<div class="mesa-tira">' +
+        '<button type="button" class="mesa-tira-hito mesa-volver">← Volver a los hitos</button>' +
+        visibles.map(function (x) {
         var num = numeroDe(x) ? numeroDe(x) + '. ' : 'i · ';
         return '<button type="button" class="mesa-tira-hito' + (x.id === h.id ? ' actual' : '') +
           (x.estado === 'hecho' ? ' hecho' : '') + '" data-id="' + U.escapar(x.id) + '" title="' + U.escapar(num + (x.titulo || '')) + '">' +
@@ -284,6 +291,9 @@ var HitoMesa = (function () {
       '</div>' +
       (todoHecho ? '<div class="mesa-todo-hecho aviso aviso-verde">Todos los hitos están hechos. ' +
         '<button type="button" class="boton boton-principal mesa-archivar-asunto">Archivar el asunto</button></div>' : '');
+
+    var volverBtn = cab.querySelector('.mesa-volver');
+    if (volverBtn) volverBtn.onclick = function () { cerrarSiAbierta(); };
 
     Array.prototype.forEach.call(cab.querySelectorAll('.mesa-tira-hito'), function (b) {
       b.onclick = function () { abrir(a, b.dataset.id); };

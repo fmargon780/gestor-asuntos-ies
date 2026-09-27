@@ -1,17 +1,21 @@
 /* ============================================================
    navegacion.js — adónde lleva la aplicación después de cada acción
-   (24-sep-2026, fila 119, docs/TRAS-CADA-ACCION.md).
+   (24-sep-2026, fila 119, docs/TRAS-CADA-ACCION.md; generalizado a
+   todas las pantallas en la fila 194, 27-sep-2026,
+   docs/AVISOS-MENU-Y-VOLVER.md, apartados 3 y 4).
 
    Dos cosas, y nada de pila de historial (un solo nivel de memoria):
 
-   - La pantalla de ORIGEN de una ficha: App.abrirFicha (js/ficha-asunto.js)
-     llama a Navegacion.apuntar() antes de cambiar de pantalla, y
-     «Volver» (y Escape, que pulsa el mismo botón) llama a
-     Navegacion.volver(): se vuelve a «Qué me toca», «Duplicados», el
-     ARCHIVO con su búsqueda, Ajustes… en vez de siempre a la lista. Si
-     la ficha se abre desde otra ficha (otros del mismo tercero), se
+   - La pantalla de ORIGEN: desde la fila 194, `App.ir` está envuelto
+     aquí mismo, así que CUALQUIER cambio de pantalla apunta de dónde
+     se viene, no solo el de abrir una ficha. Un solo «← Volver» (y
+     Escape, que pulsa el mismo botón) llama a Navegacion.volver(): se
+     vuelve a «Qué me toca», «Duplicados», el ARCHIVO con su
+     búsqueda, Ajustes… en vez de siempre a Asuntos abiertos. Si la
+     ficha se abre desde otra ficha (otros del mismo tercero), se
      conserva el origen de la primera. Desde «Nuevo asunto», el origen es
-     Asuntos abiertos.
+     Asuntos abiertos. Sin origen apuntado (o si la pantalla guardada ya
+     no existe), se va a Asuntos abiertos.
    - La ALTURA de la lista al salir de ella (la ventana es la que se
      desplaza, ver css/cabecera-fija.css): al volver, se deja donde
      estaba en vez de arriba del todo.
@@ -20,7 +24,7 @@
    Asuntos abiertos por su nombre, con Asuntos abiertos de origen (tras
    crear, reabrir o editar, y el botón «Ir al asunto» de los avisos).
 
-   Se carga justo después de js/ficha-asunto.js. No envuelve nada.
+   Se carga justo después de js/ficha-asunto.js.
    ============================================================ */
 window.Navegacion = (function () {
 
@@ -46,6 +50,21 @@ window.Navegacion = (function () {
     if (!v || v === 'asunto') return;          /* de ficha a ficha: el origen de la primera */
     if (v === 'nuevo') { origen = { pantalla: 'abiertos', alto: null }; return; }
     origen = { pantalla: v, alto: altoActual() };
+  }
+
+  /* Fila 194 (docs/AVISOS-MENU-Y-VOLVER.md, apartado 3): antes solo
+     App.abrirFicha llamaba a apuntar() antes de cambiar de pantalla.
+     Envolviendo App.ir aquí, TODAS las pantallas quedan apuntadas de
+     la misma forma, sin que cada una tenga que acordarse de llamar a
+     nada. Si la pantalla de destino ya es la que se ve, no hay
+     navegación de verdad: no se toca el origen. */
+  if (window.App && typeof App.ir === 'function' && window.U && typeof U.envolver === 'function') {
+    U.envolver(App, 'App.ir', 'navegacion.js', function (comoEra) {
+      return function (cual) {
+        if (pantallaVisible() !== cual) apuntar();
+        return comoEra(cual);
+      };
+    });
   }
 
   function ponerAltura(alto) {

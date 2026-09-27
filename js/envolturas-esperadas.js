@@ -53,6 +53,7 @@
     { fichero: 'hitos-archivo.js', nombre: 'App.reabrirAsunto' },
     { fichero: 'hitos-panel.js', nombre: 'App.abrirFicha' },
     { fichero: 'hitos.js', nombre: 'App.anotar' },
+    { fichero: 'navegacion.js', nombre: 'App.ir' },
     { fichero: 'otros-del-tercero.js', nombre: 'App.abrirFicha' },
     { fichero: 'papelera.js', nombre: 'App.tarjetaSuelto' },
     { fichero: 'papelera.js', nombre: 'App.verFicha' },

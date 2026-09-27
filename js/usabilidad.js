@@ -32,33 +32,32 @@
      Se añaden desde aquí para no repetirlos en el html.
      ========================================================== */
 
-  var PANTALLAS = [];
-  Array.prototype.forEach.call(document.querySelectorAll('.pestana[data-pantalla]'), function (b) {
-    if (PANTALLAS.indexOf(b.dataset.pantalla) === -1) PANTALLAS.push(b.dataset.pantalla);
-  });
-
   /* Cada cabecera se parte en dos: a la izquierda el botón de Volver y
-     el título; a la derecha, lo que ya hubiera. */
+     el título; a la derecha, lo que ya hubiera. Fila 194
+     (docs/AVISOS-MENU-Y-VOLVER.md, apartado 3): visible en todas las
+     pantallas salvo Inicio, y siempre a la vista (no depende de si
+     hay o no un origen guardado: sin él, Navegacion.volver va a
+     Inicio). Llama al mismo mecanismo que ya usa la ficha
+     (js/navegacion.js), no a un historial propio de este fichero. */
   function prepararCabeceras() {
     Array.prototype.forEach.call(document.querySelectorAll('.pantalla .cabecera'), function (cab) {
       var titulo = cab.querySelector('h2');
-      if (!titulo) return;
+      if (!titulo || cab.closest('#pantalla-abiertos')) return;
       var izq = document.createElement('div');
       izq.className = 'cabecera-izq';
       var volver = document.createElement('button');
       volver.type = 'button';
-      volver.className = 'boton boton-volver oculto';
+      volver.className = 'boton boton-volver';
       volver.textContent = '← Volver';
       volver.title = 'Volver a la pantalla anterior';
-      volver.onclick = irAtras;
+      volver.onclick = function () {
+        if (window.Navegacion) Navegacion.volver('abiertos');
+        else { var p = document.querySelector('.pestana[data-pantalla="abiertos"]'); if (p) p.click(); }
+      };
       cab.insertBefore(izq, titulo);
       izq.appendChild(volver);
       izq.appendChild(titulo);
     });
-  }
-
-  function botonesVolver() {
-    return document.querySelectorAll('.boton-volver');
   }
 
   prepararCabeceras();
@@ -116,56 +115,14 @@
   /* ==========================================================
      2. VOLVER
 
-     Se apunta por dónde se va pasando mirando la propia pantalla, no
-     los clics: así también cuentan los saltos que da la aplicación
-     sola, como el de "Crear asunto con él".
+     Desde la fila 194 esto ya no tiene código propio: el botón que
+     pone prepararCabeceras() llama directamente a Navegacion.volver()
+     (js/navegacion.js), que apunta de dónde se viene envolviendo
+     App.ir. Antes había aquí un historial de hasta 20 pantallas,
+     propio de este fichero y solo de las pestañas de la barra: se
+     retira porque duplicaba lo que ya hacía la ficha, y no llegaba a
+     "Nuevo asunto", "Cuentas", "Impresos" ni "Duplicados" (fila 194).
      ========================================================== */
-
-  var historial = [];
-  var pantallaAhora = null;
-  var volviendo = false;
-
-  function cualSeVe() {
-    for (var i = 0; i < PANTALLAS.length; i++) {
-      var p = $('pantalla-' + PANTALLAS[i]);
-      if (p && !p.classList.contains('oculto')) return PANTALLAS[i];
-    }
-    return null;
-  }
-
-  function pintarVolver() {
-    Array.prototype.forEach.call(botonesVolver(), function (b) {
-      b.classList.toggle('oculto', !historial.length);
-    });
-  }
-
-  function miraSiHaCambiado() {
-    var ahora = cualSeVe();
-    if (ahora === pantallaAhora) return;
-    if (pantallaAhora && !volviendo) {
-      historial.push(pantallaAhora);
-      if (historial.length > 20) historial.shift();
-    }
-    pantallaAhora = ahora;
-    volviendo = false;
-    pintarVolver();
-  }
-
-  function irAtras() {
-    if (!historial.length) return;
-    var destino = historial.pop();
-    var pestana = document.querySelector('.pestana[data-pantalla="' + destino + '"]');
-    if (!pestana) return;
-    volviendo = true;
-    pestana.click();
-  }
-
-  var vigilante = new MutationObserver(miraSiHaCambiado);
-  PANTALLAS.forEach(function (p) {
-    var caja = $('pantalla-' + p);
-    if (caja) vigilante.observe(caja, { attributes: true, attributeFilter: ['class'] });
-  });
-  pantallaAhora = cualSeVe();
 
   /* ==========================================================
      3. CANCELAR EL ASUNTO QUE SE ESTABA CREANDO
@@ -188,7 +145,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('.categoria-boton.elegido'),
       function (b) { b.classList.remove('elegido'); });
 
-    if (historial.length) irAtras();
+    if (window.Navegacion) Navegacion.volver('abiertos');
     else {
       var p = document.querySelector('.pestana[data-pantalla="abiertos"]');
       if (p) p.click();
@@ -411,8 +368,5 @@
       if (primero) { try { primero.focus(); } catch (e) {} }
     }).observe($('capa'), { attributes: true, attributeFilter: ['class'] });
   }
-
-  /* ========================================================== */
-  pintarVolver();
 
 })();

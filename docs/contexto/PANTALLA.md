@@ -99,6 +99,20 @@ borde izquierdo se arrastra; el ancho se recuerda (`gestor-lector-ancho`); doble
 está filtrando y la tecla Escape. No toca datos. (La vista compacta/cómoda se retiró en la fila
 191: la tabla de asuntos ya era compacta.)
 
+**Un solo «Volver», que vuelve a donde estaba** (fila 194, 27-sep-2026,
+`docs/AVISOS-MENU-Y-VOLVER.md`, apartados 3 y 4). Antes había cuatro mecanismos distintos: el de
+la ficha (`js/navegacion.js`), un historial propio de `js/usabilidad.js` (hasta 20 pantallas, pero
+solo de las que tienen pestaña en la barra) y tres botones sueltos (Cuentas, Impresos,
+Duplicados) que llevaban siempre a Asuntos abiertos. Ahora `js/navegacion.js` envuelve `App.ir`
+(con `U.envolver`): **cualquier** cambio de pantalla apunta de dónde se viene, no solo el de abrir
+una ficha. El historial de `js/usabilidad.js` se retiró entero; su botón `.boton-volver` (que
+`prepararCabeceras()` sigue poniendo en la cabecera de cada pantalla salvo Inicio) y los tres
+botones sueltos llaman todos a `Navegacion.volver('abiertos')`. La mesa del hito lleva su propio
+«← Volver a los hitos», con el mismo efecto que el primer Escape ahí
+(`HitoMesa.cerrarSiAbierta`): va dentro de la propia tira de hitos, como su primera celda
+(`.mesa-tira-hito.mesa-volver`), porque ni la cabecera de la mesa tiene margen de sobra (fila 50)
+ni la tira puede dejar de ocupar todo el ancho (fila 145). Prueba: `pruebas/un-solo-volver.mjs`.
+
 **Que de toda pantalla se pueda salir.** Con el cuadro (`#capa`) abierto, Escape lo cierra
 (cancela; si no lleva Cancelar, acepta). Con el visor de un documento abierto (`con-visor`),
 Escape lo cierra (el lector de correos vigila el suyo aparte, en `js/lector.js`). Si no hay nada

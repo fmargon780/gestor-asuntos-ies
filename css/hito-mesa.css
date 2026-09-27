@@ -61,6 +61,13 @@
 .mesa-tira-hito.hecho { color: #1f6b33; background: #f1faf3; }
 .mesa-tira-hito.actual { background: #e3eefb; color: #1d4f86; font-weight: 600; border-bottom-color: var(--azul); }
 
+/* Fila 194 (docs/AVISOS-MENU-Y-VOLVER.md, apartado 4): "← Volver a los
+   hitos", como la primera celda de la propia tira (así "la tira ocupa
+   todo el ancho" sigue siendo verdad, y no se añade ninguna línea que
+   baje el guion, ver docs/CABECERA-NO-TIEMBLA.md). */
+.mesa-tira-hito.mesa-volver { flex: 0 0 auto; font-weight: 600; background: #eef1f5; }
+.mesa-tira-hito.mesa-volver:hover { background: #e3e8ef; }
+
 /* Los dos desplegables: dentro de la página, debajo de su botón. */
 .mesa-desplegable { position: relative; }
 .mesa-abrir-panel.abierto { background: #e3eefb; border-color: #a9c6e6; }

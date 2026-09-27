@@ -5,6 +5,37 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 194: un solo «Volver»
+
+`docs/AVISOS-MENU-Y-VOLVER.md`, apartados 3 y 4. Había cuatro mecanismos distintos de «Volver»: el
+de la ficha (`js/navegacion.js`, un solo nivel de memoria, con la altura de la lista), el
+historial genérico de `js/usabilidad.js` (hasta 20 pantallas, pero solo de las que tienen pestaña
+en la barra: nunca vio "Nuevo asunto", "Cuentas", "Impresos", "Duplicados" ni la ficha), y los
+botones propios de Cuentas, Impresos y Duplicados, que llevaban siempre a Asuntos abiertos
+pasara lo que pasara.
+
+**La solución**: generalizar el mecanismo de la ficha a todas las pantallas. `js/navegacion.js`
+envuelve ahora `App.ir` (con `U.envolver`): cualquier cambio de pantalla apunta de dónde se
+viene, no solo el de abrir una ficha (que ya no necesita su propia llamada a
+`Navegacion.apuntar()`, se quita de `js/ficha-asunto.js`). El historial de 20 pantallas de
+`js/usabilidad.js` se retira entero (`cualSeVe`, `pintarVolver`, `miraSiHaCambiado`, `irAtras`, el
+`MutationObserver` y el array `historial`); su botón «← Volver», que ya se ponía solo en la
+cabecera de cada pantalla, ahora llama directo a `Navegacion.volver('abiertos')`, y deja de salir
+en Inicio (antes lo llevaba también, aunque casi nunca visible). Los tres botones que llevaban
+siempre a `App.ir('abiertos')` a pelo (Cuentas, Impresos, Duplicados) pasan a llamar a
+`Navegacion.volver('abiertos')` también.
+
+**La mesa del hito** (apartado 4): «← Volver a los hitos», con el mismo efecto que el primer
+Escape ahí (`HitoMesa.cerrarSiAbierta`). Sitio complicado: la cabecera de la mesa no tenía ni un
+píxel de margen (fila 50, `docs/CABECERA-NO-TIEMBLA.md`, prueba `cabecera-compacta.mjs`, «QUÉ HAY
+QUE HACER» a 250 px del borde o menos) y la tira de hitos tiene que ocupar todo el ancho (fila
+145, prueba `mesa-del-hito-enfocada.mjs`). La solución que no rompía ninguna de las dos: el botón
+va **dentro** de la propia tira, como su primera celda (`.mesa-tira-hito.mesa-volver`), así que
+`.mesa-tira` sigue midiendo el ancho entero y no se añade ninguna línea nueva que empuje el guion
+hacia abajo.
+
+Prueba nueva: `pruebas/un-solo-volver.mjs`. `npm test` completo (168 ficheros) en verde.
+
 ## 27-sep-2026 — Fila 193: los avisos en una línea y el menú
 
 `docs/AVISOS-MENU-Y-VOLVER.md`, apartados 1 y 2. Hasta cinco cajas de color apiladas encima de

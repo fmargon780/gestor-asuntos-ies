@@ -77,7 +77,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   duplicados, papelera vieja, fichas huérfanas, fichero de alumnado viejo, aspirantes sin
   número), en una sola línea (`#avisos-linea`, `js/avisos-linea.js`, fila 193): un solo "Ocultar
   por hoy" para todos. Menú: Inicio · Nuevo asunto · Archivo · Personas y empresas · Impresos ·
-  Cuentas, línea, Ajustes; al pie, sesión, versión y Salir.
+  Cuentas, línea, Ajustes; al pie, sesión, versión y Salir. Un solo «← Volver» (y Escape) en todas
+  las pantallas salvo Inicio, que vuelve a la de origen, no siempre a Inicio (`js/navegacion.js`
+  envuelve `App.ir`, fila 194); la mesa del hito lleva su propio «← Volver a los hitos», dentro de
+  la tira.
 - Buscador de tipos y de terceros, con índice guardado del ARCHIVO por curso académico (selector
   «Curso», carga solo al entrar, la primera vez) y búsqueda por palabras sueltas también en
   documentos, registro de Séneca, ficha y notas.

@@ -64,7 +64,9 @@
     if (window.Notas) window.Notas.olvidarBorrador();
     /* Al entrar, siempre la cuadrícula de tarjetas (fila 107). */
     FichaTarjetas.alEntrar(a);
-    if (window.Navegacion) Navegacion.apuntar();   /* fila 119: de dónde se viene */
+    /* Fila 194: App.ir ya apunta de dónde se viene por su cuenta
+       (js/navegacion.js envuelve App.ir), así que no hace falta
+       llamar aquí a Navegacion.apuntar() aparte. */
     App.ir('asunto');
     pintar();
 
