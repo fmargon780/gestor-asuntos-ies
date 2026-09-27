@@ -13,7 +13,7 @@ Conviven cero sistemas: `ficha.situacion` se queda quieta en `asuntos.json` (no 
 
 - **El único que decide**: `Hitos.estadoDelAsunto(hitos, ajustes, contexto)` (`js/hitos.js`), que
   llama a `Hitos.ladoDelAsunto` (`js/hitos-a-quien.js`, pura). Devuelve `{ lado, quien, hito,
-  desde, titulo, n, m, esperando, listo, sinHitos, texto }`. `texto`: «Paso N de M · título»
+  desde, titulo, n, m, esperando, listo, sinHitos, texto }`. `texto`: «Hito N de M · título»
   (M = visibles sin «solo informativo», «no aplica» ni del tipo anterior; fila 154: es la única
   cuenta, `Hitos.numerados`, que usan también la pestaña «Hitos N/M» de la ficha y la tira y el
   «Hito N de M» de la mesa, donde un informativo sale sin número, «i ·»), «Listo para archivar»

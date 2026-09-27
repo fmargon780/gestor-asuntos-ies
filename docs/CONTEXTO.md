@@ -60,7 +60,7 @@ Decisiones de diseño:
 - Además de arrastrar un documento a la carpeta, se puede elegir desde la app en la carpeta
   donde esté: se guarda una copia ya con el nombre montado, y el original se queda donde estaba.
 
-**Estado del asunto.** Es su hito actual («Paso N de M · título»), y de él sale solo si va en
+**Estado del asunto.** Es su hito actual («Hito N de M · título»), y de él sale solo si va en
 "Pendiente de Administración" o en "Pendiente de terceros" (fila 129,
 `docs/contexto/ESTADO-DEL-ASUNTO.md`). Ya no hay estados escritos a mano: `estados.json` se sigue
 leyendo pero no se enseña ni se edita.
@@ -371,8 +371,9 @@ una carpeta a mano, por fuera de la aplicación, la ficha se queda huérfana: si
 - En Ajustes, el bloque **Fichas sin carpeta** (`js/fichas-huerfanas.js`) calcula, al abrirlo,
   qué claves de `asuntos.json` no tienen carpeta ni en abiertos ni en el archivo.
 - Cada huérfana se enseña con su estado y un resumen de sus notas, y dos botones: **Enlazar con
-  una carpeta** (con las carpetas de abiertos y archivo sin ficha) y **Borrar la ficha** (con
-  confirmación; guarda copia antes, como todo lo que toca `asuntos.json`).
+  una carpeta** (con las carpetas de abiertos y archivo sin ficha) y **Quitar la ficha** (con
+  confirmación; guarda copia antes, como todo lo que toca `asuntos.json`; no va a la papelera, solo
+  desaparece de `asuntos.json`).
 - Un punto ámbar en el botón de Ajustes de la barra avisa de que hay huérfanas.
 
 Se comprueba con `pruebas/huerfanas.mjs`.

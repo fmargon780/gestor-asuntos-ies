@@ -5,6 +5,43 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 190: vocabulario, tercera parte: borrar o quitar, e impresos
+
+`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 190: `docs/VOCABULARIO-EN-PANTALLA.md`, puntos 2,
+3 y 5, y la prueba nueva de cadenas prohibidas.
+
+**Punto 2 (Borrar/Quitar).** Se buscaron todos los botones y cuadros con «Borrar» o «Quitar» en
+todo `js/` e `index.html`, y se cruzaron con los ficheros que de verdad mandan algo a la papelera
+(`grep` de `Papelera.mandar*`, `Papelera.preguntarBorrar` y `Papelera.botonBorrar`: dieciséis
+ficheros). Solo uno no cumplía: `js/membrete.js`, cuyo cuadro para quitar el logo del centro
+manda de verdad a la papelera (`Papelera.mandarFichero`) pero decía «Quitar» en el título, en el
+botón y en los avisos; ahora los tres dicen «Borrar» (el botón de `index.html`, que abre este
+cuadro, ya decía «Borrar el logo» desde la fila 179: solo el cuadro se había quedado atrás). El
+resto de «Quitar» (quitar un hito, un documento de un hito, un campo propio, un filtro…) no toca
+la papelera y se queda como está, que es lo que le corresponde.
+
+**Punto 3 (impresos «de la Junta»/«del centro»).** El catálogo (`datos/formularios.json`,
+`js/formularios.js`) no distingue quién ha hecho el impreso: su único campo de origen, `via`, dice
+cómo se consigue o se usa (`descarga`, `centro`, `protocolo`, `seneca`), no quién lo diseñó, y hoy
+todo el catálogo sale de anexos de una Orden de la Consejería. Sin ese dato no se inventa la
+etiqueta: queda anotado en `docs/COLA.md`, en «Lo que queda por hablar con Francisco».
+
+**Punto 5 (la regla, para el futuro).** La línea de `docs/CONTEXTO-CORTO.md` («Textos de
+pantalla: siempre con las palabras de `docs/VOCABULARIO.md`») ya la había puesto la fila 179; esta
+fila puso al día dos referencias que se le habían quedado atrás con la palabra vieja:
+`docs/CONTEXTO.md` («Paso N de M» → «Hito N de M», y «Borrar la ficha» → «Quitar la ficha» en
+fichas huérfanas, que no pasa por la papelera) y `docs/contexto/ESTADO-DEL-ASUNTO.md` (el mismo
+«Paso N de M» del campo `texto`).
+
+**La prueba nueva**, `pruebas/palabras-prohibidas.mjs` (sin navegador): busca en `index.html` y en
+todo `js/*.js`, fuera de los comentarios, las siete cadenas del apartado «Prueba» del documento
+(«Paso actual», «Qué hay que hacer», «Meter en un asunto», «Receta:», «Formularios oficiales»,
+«Poner nombre», «Editar el asunto»). Al quitar los comentarios de bloque comprueba con un
+lookbehind que la cadena no sea el final de un identificador más largo (por ejemplo,
+`normalizarReceta:`, que no tiene nada que ver con el texto «Receta:» de pantalla, disparaba un
+falso positivo antes de añadir esa comprobación). `npm test` completo (174 ficheros) en verde,
+con Chromium real.
+
 ## 27-sep-2026 — Fila 189: vocabulario, los textos que la 179 no llegó a tocar
 
 `docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 189: `docs/VOCABULARIO-EN-PANTALLA.md`, puntos 1 y 4,
