@@ -168,8 +168,8 @@ await pagina.click('#btn-crear');
    (js/hito-mesa.js) y, sin cerrarla, reabriría sola en cada repintado
    posterior. */
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
-await pagina.waitForSelector('.mesa-volver');
-await pagina.click('.mesa-volver');
+await pagina.waitForSelector('#mesa-volver-hitos');
+await pagina.click('#mesa-volver-hitos');
 await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await pagina.waitForTimeout(400);

@@ -205,15 +205,26 @@ var Hitos = (function () {
 
   function vacio() { return normalizar(null); }
 
+  /* La lectura pasa por la misma cola que el guardado (`cambiar`,
+     más abajo): sin esto, una lectura lanzada mientras una escritura
+     de hitos.json todavía está en marcha (una migración en segundo
+     plano, al entrar en Ajustes) puede coger el fichero a medio
+     escribir ("no se puede leer"), aunque nadie haya tocado nada de
+     verdad. Encontrado en la fila 197 al sumar más trabajo asíncrono
+     a la pantalla de Ajustes: el fallo ya podía pasar antes, solo que
+     con menos probabilidad. */
   async function leer() {
     var g = gestor();
     if (!g) return vacio();
-    var leido = normalizar(await Carpetas.leerJson(g, FICHERO));
-    var n = Object.keys(leido.porAsunto).length;
-    if (n) vistosConDatos = n;
-    ultimos = leido;
-    alLeer.forEach(function (f) { try { f(leido); } catch (e) { /* solo pintar */ } });
-    return leido;
+    var hacerlo = async function () {
+      var leido = normalizar(await Carpetas.leerJson(g, FICHERO));
+      var n = Object.keys(leido.porAsunto).length;
+      if (n) vistosConDatos = n;
+      ultimos = leido;
+      alLeer.forEach(function (f) { try { f(leido); } catch (e) { /* solo pintar */ } });
+      return leido;
+    };
+    return window.ColaGuardado ? window.ColaGuardado.poner(FICHERO, hacerlo) : hacerlo();
   }
 
   /* Como todo fichero compartido: se relee justo antes de escribir, y
