@@ -123,9 +123,11 @@ await comprobar('se guarda en localStorage (gestor-ajustes-plegado)',
   pagina.evaluate(() => JSON.parse(localStorage.getItem('gestor-ajustes-plegado'))['tipo:campos']), true);
 
 /* ================================================================
-   3. Añadir un campo y guardar pone al día el resumen.
+   3. Añadir un campo se guarda solo, sin ningún botón "Guardar" (fila
+      198, apartado 2, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md), y el
+      resumen se pone al día con el mismo debounce.
    ================================================================ */
-console.log('--- 3. el resumen se pone al día al guardar ---');
+console.log('--- 3. añadir un campo se guarda solo, y el resumen se pone al día ---');
 await pagina.evaluate(() => App.cerrarTipoDeAsunto());
 await abrirTipo('MATRICULA');
 await pagina.click('#campos-btn-anadir');
@@ -146,19 +148,24 @@ const anadido = await pagina.evaluate(() => {
   return true;
 });
 await comprobar('el catálogo deja añadir un campo', anadido, true);
-await pagina.waitForTimeout(200);
 await pagina.evaluate(() => {
   const volver = Array.from(document.querySelectorAll('#pantalla-tipo-asunto details[data-seccion="campos"] button'))
     .filter((x) => /Volver|Listo|Hecho/.test(x.textContent))[0];
   if (volver) volver.click();
 });
-await pagina.waitForSelector('#campos-guardar');
-await comprobar('antes de guardar sigue diciendo 2', resumen('campos'), '2 campos');
-await pagina.click('#campos-guardar');
-await pagina.waitForTimeout(600);
-await comprobar('al guardar pasa a 3, sin salir de la pantalla', resumen('campos'), '3 campos');
+/* Ya no hay `#campos-guardar` que pulsar: se espera el debounce de
+   `AjustesPlegado.resumirTipo()` (250-1500 ms) y se comprueba el
+   resultado final directamente. */
+await pagina.waitForTimeout(1700);
+await comprobar('el resumen pasa de 2 a 3 solo, sin pulsar nada ni salir de la pantalla', resumen('campos'), '3 campos');
 await comprobar('seguimos en la pantalla del tipo',
   pagina.locator('#pantalla-tipo-asunto').isVisible(), true);
+await comprobar('y ya está guardado de verdad en campos.json', pagina.evaluate(async () => {
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+  const h = await g.getFileHandle('campos.json');
+  const j = JSON.parse(await (await h.getFile()).text());
+  return (j.porTipo.MATRICULA || []).length;
+}), 3);
 
 /* ================================================================
    4. Un hito desactualizado avisa en el título, aun plegado.
@@ -187,10 +194,16 @@ await pagina.evaluate(() => App.cambiarPestanaAjustes('centro'));
 await pagina.evaluate(() => App.pintarAjustes());
 await pagina.waitForTimeout(400);
 const titulosCentro = await pagina.locator('#ajustes-tab-centro > details.bloque-ajustes > summary .bloque-titulo').allTextContents();
-/* Fila 129: "Estados del asunto" ya no existe (el estado es el hito actual). */
-await comprobar('los siete primeros, en el orden nuevo', titulosCentro.slice(0, 7), [
-  'Tipos de documento', 'Grupos de personas', 'Campos propios', 'Hitos',
+/* Fila 129: "Estados del asunto" ya no existe (el estado es el hito actual).
+   Fila 198, apartado 5, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md: "Campos
+   propios" ya no lleva una tabla que contar y ordenar (se queda con un
+   enlace fijo a Tipos de asunto), así que sale de este reordenado
+   automático de más uso a menos uso. */
+await comprobar('los seis primeros, en el orden nuevo', titulosCentro.slice(0, 6), [
+  'Tipos de documento', 'Grupos de personas', 'Hitos',
   'Datos del centro y firma', 'Cómo se abrevia cada grupo', 'Ficheros de datos']);
+await comprobar('"Campos propios" sigue en "El centro", solo que ya no se reordena',
+  titulosCentro.indexOf('Campos propios') !== -1, true);
 await comprobar('todos plegados',
   pagina.locator('#ajustes-tab-centro details.bloque-ajustes[open]').count(), 0);
 await comprobar('ya no hay "Estados del asunto"', titulosCentro.indexOf('Estados del asunto'), -1);

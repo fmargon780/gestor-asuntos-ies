@@ -165,10 +165,10 @@ App.filaEstado = function (titulo, valor) {
   return d;
 };
 
-/* La casilla de días de plazo de un tipo: la usan tanto la tarjeta de
-   la rejilla (compacta) como la sección "Plazo" de la pantalla del
-   tipo (js/ajustes-tipo.js). Una sola función, para no duplicar el
-   onchange que guarda. */
+/* La casilla de días de plazo de un tipo: la usa la sección "Plazo" de
+   la pantalla del tipo (js/ajustes-tipo.js), el único sitio donde se
+   edita (fila 198, apartado 3: la tarjeta de la rejilla solo lo
+   enseña, de solo lectura, en App.tarjetaTipoAjustes). */
 App.construirCasillaPlazo = function (tipo, conTexto) {
   var etiqueta = document.createElement('label');
   etiqueta.className = 'plazo-tipo';
@@ -311,11 +311,18 @@ App.tarjetaTipoAjustes = function (tipo, mostrarCategoria) {
       ? '<span class="suave tarjeta-tipo-antes">antes: ' + U.escapar(tipo.alias.join(', ')) + '</span>' : '');
   f.appendChild(linea1);
 
-  /* Los días de plazo de este tipo. En blanco, el tipo no pone fecha
-     límite y el asunto nace sin plazo. */
+  /* Los días de plazo de este tipo, de solo lectura: se edita en un
+     único sitio, la sección "Plazo" de su pantalla (fila 198, apartado
+     3, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md). En blanco, el tipo no
+     pone fecha límite y el asunto nace sin plazo. */
   var linea2 = document.createElement('div');
   linea2.className = 'tarjeta-tipo-linea tarjeta-tipo-sub';
-  linea2.appendChild(App.construirCasillaPlazo(tipo));
+  var textoPlazo = document.createElement('span');
+  textoPlazo.className = 'suave';
+  textoPlazo.textContent = tipo.plazo
+    ? tipo.plazo + (tipo.plazo === 1 ? ' día de plazo' : ' días de plazo')
+    : 'Sin plazo';
+  linea2.appendChild(textoPlazo);
   f.appendChild(linea2);
 
   f.appendChild(App.botonMenuTarjeta([
@@ -326,7 +333,7 @@ App.tarjetaTipoAjustes = function (tipo, mostrarCategoria) {
   /* Cualquier clic que no venga de un campo, un botón o el menú abre
      la pantalla del tipo. */
   f.addEventListener('click', function (e) {
-    if (e.target.closest('input, button, .plazo-tipo, .tarjeta-tipo-menu-envoltorio')) return;
+    if (e.target.closest('input, button, .tarjeta-tipo-menu-envoltorio')) return;
     App.abrirTipoDeAsunto(tipo);
   });
   f.addEventListener('keydown', function (e) {

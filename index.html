@@ -521,19 +521,8 @@
           <span class="bloque-pie">Datos que no vienen en ningún fichero, como el trimestre</span>
         </summary>
         <div class="bloque-cuerpo">
-      <p class="explica">Además de los datos que ya trae el alumnado, el personal y las empresas,
-         aquí puedes crear tus propios campos: texto libre o una lista cerrada de valores.
-         Un campo propio vale para cualquier tipo de asunto: se asocia desde la pantalla
-         de cada tipo, en la pestaña "Tipos de asunto".</p>
-      <div class="alta-tipo">
-        <input id="nuevo-propio" class="campo" placeholder="NOMBRE DEL CAMPO" style="max-width:260px">
-        <select id="nueva-clase-propio" class="campo" style="max-width:180px">
-          <option value="texto">Texto libre</option>
-          <option value="lista">Lista cerrada</option>
-        </select>
-        <button id="btn-anadir-propio" class="boton">Añadir</button>
-      </div>
-      <div id="tabla-propios" class="lista"></div>
+      <p class="explica">Se configuran dentro de cada tipo: abre un tipo de asunto y usa "+ Añadir
+         campo" › "Míos". <button type="button" class="enlace" id="campos-propios-enlace">Ir a Tipos de asunto</button></p>
         </div>
       </details>
 
@@ -804,6 +793,10 @@
         <h2 id="tipo-asunto-nombre"></h2>
         <span class="marca-categoria" id="tipo-asunto-categoria"></span>
       </header>
+      <!-- Fila 198, apartado 1: la lista de comprobación, siempre
+           visible encima de las secciones. La pinta js/ajustes-tipo-
+           comprobacion.js. -->
+      <div id="tipo-asunto-comprobacion"></div>
       <div id="tipo-asunto-cuerpo" class="tipo-asunto-columnas">
         <div class="tipo-asunto-columna" id="tipo-asunto-col-1"></div>
         <div class="tipo-asunto-columna" id="tipo-asunto-col-2"></div>
@@ -1325,6 +1318,12 @@
 <script src="js/campos-calculados-editor.js"></script>
 <script src="js/ajustes-tipo.js"></script>
 <script src="js/ajustes-tipo-palabras-clave.js"></script>
+<!-- Fila 198, apartado 1, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md: la
+     lista de comprobación de arriba de la pantalla del tipo. Después de
+     js/guias-enganche.js, js/guias-guion.js, js/tipos-organo.js y
+     js/conservacion.js (todos ya cargados más arriba), y antes de
+     js/ajustes-plegado.js, cuyo `resumirTipo()` la llama. -->
+<script src="js/ajustes-tipo-comprobacion.js"></script>
 <script src="js/ajustes-centro.js"></script>
 <script src="js/ajustes-mantenimiento.js"></script>
 <!-- «Pasar a Administraciones» (fila 167), en Mantenimiento. -->

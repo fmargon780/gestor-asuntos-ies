@@ -92,83 +92,15 @@ $('btn-anadir-tipo-doc').onclick = async function () {
   U.aviso('Tipo de documento añadido.', 'bueno');
 };
 
-/* ---------- el bloque de Campos propios ---------- */
+/* ---------- el bloque de Campos propios ----------
 
-App.pintarCamposPropios = function () {
-  var caja = $('tabla-propios');
-  if (!caja) return;
-  caja.innerHTML = '';
-  var propios = (App.E.campos && App.E.campos.propios) || [];
-  if (!propios.length) {
-    caja.innerHTML = '<div class="vacio">Ningún campo propio todavía.</div>';
-    return;
-  }
-  propios.forEach(function (p) {
-    var f = document.createElement('div');
-    f.className = 'fila-tipo';
-    f.innerHTML = '<span class="nombre-tipo">' + U.escapar(p.nombre) + '</span>' +
-      '<span class="suave" style="flex:1">' +
-      (p.clase === 'lista' ? U.escapar(p.valores.join(', ')) : 'Texto libre') + '</span>';
-    var borrar = document.createElement('button');
-    borrar.className = 'boton boton-peligro';
-    borrar.textContent = 'Borrar';
-    borrar.title = 'Va a la papelera';
-    borrar.onclick = function () { App.borrarCampoPropio(p); };
-    f.appendChild(borrar);
-    caja.appendChild(f);
-  });
-};
-
-/* ---------- borrar un campo propio, con papelera (11-sep-2026) ----------
-
-   Si está asociado a algún tipo, no se borra: se dice a cuáles. */
-App.borrarCampoPropio = async function (p) {
-  var enUso = Campos.tiposQueUsanPropio(App.E.campos, p.id);
-  if (enUso.length) {
-    await U.preguntar('No se puede borrar',
-      '<p>Lo usan estos tipos: <strong>' + enUso.map(U.escapar).join(', ') + '</strong>.</p>' +
-      '<p class="nota">Quítalo primero de esos tipos, en su pantalla de "Campos".</p>', 'Vale', true);
-    return;
-  }
-  var ok = await window.Papelera.preguntarBorrar(p.nombre);
-  if (!ok) return;
-  try {
-    App.E.campos = await Campos.guardarPropios(App.E.gestor, function (lista) {
-      return lista.filter(function (x) { return x.id !== p.id; });
-    });
-    await window.Papelera.mandarDato('campo-propio', p.nombre, null, { propio: p });
-    App.pintarCamposPropios();
-    U.aviso('Campo propio mandado a la papelera.', 'bueno');
-  } catch (e) {
-    U.aviso('No he podido mandarlo a la papelera: ' + U.mensajeDeError(e), 'malo');
-  }
-};
-
-$('btn-anadir-propio').onclick = async function () {
-  var nombre = $('nuevo-propio').value.trim();
-  if (!nombre) return;
-  var clase = $('nueva-clase-propio').value === 'lista' ? 'lista' : 'texto';
-  var hay = (App.E.campos.propios || []).map(function (p) { return p.nombre; });
-  if (!await U.dejaCrear(nombre, hay, 'campo propio')) return;
-
-  var valores = [];
-  if (clase === 'lista') {
-    var ok = await U.preguntar('Valores de ' + nombre,
-      '<label class="etiqueta">Uno por línea, en el orden en que quieras que salgan</label>' +
-      '<textarea id="propio-valores-alta" class="campo" rows="4"></textarea>', 'Guardar');
-    if (!ok) return;
-    valores = $('propio-valores-alta').value.split('\n').map(function (v) { return v.trim(); }).filter(Boolean);
-  }
-  var nuevo = { id: 'p' + Date.now() + Math.floor(Math.random() * 1000),
-                nombre: nombre, clase: clase, valores: valores };
-  App.E.campos = await Campos.guardarPropios(App.E.gestor, function (propios) {
-    propios.push(nuevo);
-    return propios;
-  });
-  $('nuevo-propio').value = '';
-  App.pintarCamposPropios();
-  U.aviso('Campo propio añadido.', 'bueno');
-};
+   Fila 198, apartado 5, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md: los
+   campos propios se crean y se borran desde dentro de cada tipo ("+
+   Añadir campo" › "Míos", js/campos-catalogo.js), no aquí. Este bloque
+   se queda solo con un enlace a "Tipos de asunto". */
+if ($('campos-propios-enlace')) {
+  $('campos-propios-enlace').onclick = function () { App.cambiarPestanaAjustes('tipos'); };
+}
 
 /* ---------- Grupos de personas (17-sep-2026, fila 21,
    docs/GRUPOS-DE-PERSONAS.md) ---------- */
@@ -516,7 +448,6 @@ App.pintarDiasCaducidadCopias = function () {
 
 App.pintarAjustesCentro = async function () {
   App.pintarTiposDeDocumento();
-  App.pintarCamposPropios();
   App.pintarGruposPersonas();
   await App.pintarMargenesPdf();
   await App.pintarFicherosDeDatos();

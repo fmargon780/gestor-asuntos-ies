@@ -5,6 +5,78 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 27-sep-2026 — Fila 198: la pantalla del tipo, con lista de comprobación y guardado al cambiar
+
+`docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartados 1, 2, 3, 5 y 8 (los apartados 4, 6 y 7 —hitos
+con tareas, juntar bloques de El centro, pestaña «Herramientas»— quedan para las filas 199 y 200).
+
+**1. La lista de comprobación** (`#tipo-asunto-comprobacion`, `js/ajustes-tipo-comprobacion.js`,
+nuevo, `window.ListaComprobacionTipo`): arriba de las ocho secciones, una línea por cada cosa que
+conviene rellenar en un tipo — Nombre corto (siempre marcado: el tipo siempre tiene nombre, con o
+sin nombre corto explícito), Quién lo encarga, Guía (N hitos), Plantilla de documento (solo si
+algún hito de la guía tiene una tarea «Generar un documento»; incompleta, dice «el hito N la
+necesita»), Plantilla de correo (solo si algún hito tiene «Comunicar», o si «Al cerrar el asunto,
+avisar a quien lo pide» está activo; sin su plantilla, «Falta la plantilla del aviso al cerrar» si
+es por el interruptor, o «el hito N la necesita» si es por un hito), Plazo, Palabras clave y Plazo
+de conservación. Cada línea es un botón que llama a la `AjustesPlegado.abrirSeccionTipo(id)` nueva
+(pone `det.open = true` y hace scroll; el `toggle` que ya engancha `seccion()` apunta sola la
+memoria de «abierto»). Con todo lo aplicable marcado, se pliega en la línea verde `.aviso-bueno`
+de siempre, «Este tipo está completo». Se calcula llamando a `ListaComprobacionTipo.pintar(tipo)`
+desde `AjustesPlegado.resumirTipo()` (una línea nueva, justo al principio): así se recalcula al
+pintar la pantalla y, por el mecanismo que ya tenía «Ajustes plegado» (`MutationObserver` +
+`change`/clic, con debounce de 250 ms y 1,5 s), tras cualquier guardado. Para no entrar en bucle
+con ese mismo `MutationObserver`, solo se reescribe el contenedor cuando la lista calculada cambia
+de verdad (una «firma» en `cont.dataset.firma`, mismo patrón que `ponerResumen()`).
+
+**2. Todo se guarda al cambiar.** Desaparecen los botones «Guardar campos»
+(`js/ajustes-tipo.js`) y «Guardar palabras clave» (`js/ajustes-tipo-palabras-clave.js`): cada
+casilla, flecha, «Quitar» o cambio en el catálogo (`js/campos-catalogo.js`, que ya llamaba a
+`opciones.onCambio()` en todos los sitios) llama directamente a `guardarCampos()`; el textarea de
+palabras clave se guarda en su propio `onchange`, calcado del patrón de «Nombre corto». Con eso,
+la variable `camposSinGuardar` y `envolverVolverDeTipo()` (el aviso de «Salir sin guardar» al
+pulsar «← Volver») sobraban: código muerto, fuera. Los cuadros de crear (plantilla, recurrente,
+campo calculado, campo propio) conservan su botón de alta, porque son altas, no guardados de lo ya
+puesto.
+
+**3. El plazo, en un solo sitio.** `App.tarjetaTipoAjustes` (`js/ajustes.js`) ya no pinta
+`App.construirCasillaPlazo(tipo)` (un input editable) en la tarjeta de la rejilla: pinta un
+`<span>` de solo texto («N días de plazo» o «Sin plazo»). Se edita solo en la sección «Plazo» de
+la pantalla del tipo. El guardia de clic de la tarjeta pierde `.plazo-tipo` (ya no hace falta:
+nada editable que proteger ahí).
+
+**5. Los campos, en un solo sitio.** «Campos propios» de «El centro» (`js/ajustes-centro.js`,
+`index.html`) pierde su formulario de alta y su tabla (`App.pintarCamposPropios`,
+`App.borrarCampoPropio`, el wiring de `#btn-anadir-propio`, todo fuera): se queda como un
+`<details>` con una sola línea, «Se configuran dentro de cada tipo: abre un tipo de asunto y usa
+"+ Añadir campo" › "Míos"», con un enlace que llama a `App.cambiarPestanaAjustes('tipos')`. Sale
+también de la lista de bloques que reordena `AjustesPlegado` (`js/ajustes-plegado.js`, ya no tiene
+tabla que contar).
+
+**8. El texto desfasado.** En el editor de la guía (`js/guias-editor.js`), el párrafo de encima
+del primer hito («Los hitos que hay que dar en un asunto de este tipo, en el orden del
+trámite…», de antes de que existieran los hitos de verdad) pasa a «Cada hito de la guía es un
+hito del asunto, con sus tareas.»
+
+**Pruebas**: nueva `pruebas/lista-comprobacion-tipo.mjs` (un tipo recién creado, la casilla de
+plantilla de documento que aparece y se completa, las palabras clave que se guardan solas, cada
+línea abriendo su sección, la línea verde al completar todo). Puestas al día
+`pruebas/campos.mjs`, `pruebas/campos-catalogo.mjs`, `pruebas/ajustes-por-tipo.mjs` y
+`pruebas/ajustes-plegado.mjs` (sin el clic a `#campos-guardar`, que ya no existe; el campo propio
+de las pruebas se crea ahora desde dentro de un tipo, no desde «El centro»; «← Volver» ya no
+pregunta nada tras crear un campo calculado, porque queda guardado solo).
+
+**Un bloqueo real encontrado y arreglado al revisar el apartado 2**: guardar en cada cambio (en
+vez de con un solo clic final) hace mucho más probable que dos guardados de `campos.json` se
+disparen casi a la vez (dos casillas seguidas). La primera versión puso `Campos.guardarConfigDeTipo`
+en la cola de `campos.json` (`ColaGuardado`, fila 99) por dentro, pero `js/tipos-nombre.js` ya la
+llama dos veces seguidas desde DENTRO de su propia fila del mismo fichero (`App.enFila('campos.json',
+...)`, al renombrar un tipo): una cola dentro de otra cola del mismo fichero se queda esperándose a
+sí misma para siempre (aviso explícito de `js/cola-guardado.js`). Se vio al renombrar un tipo en
+`pruebas/tipos-nombre.mjs`, que se quedaba colgada 15 s. Arreglado poniendo la cola en el sitio que
+la necesita (`guardarCampos()`, `js/ajustes-tipo.js`) en vez de en la función compartida.
+
+---
+
 ## 27-sep-2026 — Fila 197: Nuevo asunto empieza por la persona
 
 `docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md`. Rediseño completo de la pantalla: en vez de

@@ -15,10 +15,14 @@
    que ya existe (`js/campos.js` a través de la lógica que vivía en
    `App.pintarCuadroDeCampos`, `js/guias-enganche.js`, `js/plantillas-
    ajustes.js`, `js/plantillas-documento.js`, `js/recurrentes.js`) y lo
-   pinta dentro de su hueco. El único editor que no sabía vivir fuera
-   de `U.preguntar` era el de Campos: aquí se le cambia el "Aceptar"
-   del cuadro por un botón "Guardar campos" propio de la sección,
-   porque una pantalla entera no tiene un botón de aceptar común.
+   pinta dentro de su hueco.
+
+   Todo se guarda al cambiar (fila 198, apartado 2, 27-sep-2026,
+   docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md): ni la sección Campos ni la
+   de Palabras clave (js/ajustes-tipo-palabras-clave.js) tienen ya un
+   botón "Guardar" propio, como tampoco lo tienen "Datos del tipo" ni
+   "Plazo". Arriba de las secciones, la lista de comprobación (js/
+   ajustes-tipo-comprobacion.js) dice qué falta por rellenar.
    ============================================================ */
 
 if (App.PANTALLAS.indexOf('tipo-asunto') === -1) App.PANTALLAS.push('tipo-asunto');
@@ -220,32 +224,10 @@ function construirSeccionDatos(tipo) {
    formulario de campo propio) se ha ido a js/campos-catalogo.js, que
    pinta un panel de tres pestañas donde estaba la sección al pulsar
    "+ Añadir campo". Aquí solo queda la lista de campos ya puestos
-   (con sus casillas, las flechas de orden y Quitar), ese botón y
-   "Guardar campos": `lista` se sigue mutando en el sitio y solo se
-   escribe en `campos.json` al pulsar ese botón. */
-
-/* Si se han añadido (o quitado, al borrar un propio/calculado que
-   este tipo tuviera puesto) campos sin guardar, avisa antes de volver
-   a la lista de tipos (sección 3 del encargo). Variable del fichero,
-   no de la función: `construirSeccionCampos` se vuelve a llamar
-   entera cada vez que se abre la pantalla de un tipo, y el botón
-   "← Volver" de la cabecera (que pone js/usabilidad.js, siempre el
-   mismo nodo del DOM) solo se puede envolver una vez. */
-var camposSinGuardar = false;
-
-function envolverVolverDeTipo() {
-  var volver = document.querySelector('#pantalla-tipo-asunto .boton-volver');
-  if (!volver || volver.dataset.avisaCampos) return;
-  volver.dataset.avisaCampos = '1';
-  var original = volver.onclick;
-  volver.onclick = function (ev) {
-    if (!camposSinGuardar) { if (original) original(ev); return; }
-    ev.preventDefault();
-    U.preguntar('Salir sin guardar',
-      '<p>Has añadido campos y no los has guardado. ¿Salir sin guardarlos?</p>', 'Salir sin guardarlos')
-      .then(function (ok) { if (ok) { camposSinGuardar = false; if (original) original(ev); } });
-  };
-}
+   (con sus casillas, las flechas de orden y Quitar) y ese botón:
+   `lista` se sigue mutando en el sitio, y se guarda sola en
+   `campos.json` en cuanto cambia algo (fila 198, apartado 2: una sola
+   forma de guardar en toda la pantalla, sin botón "Guardar campos"). */
 
 async function construirSeccionCampos(tipo) {
   var b = seccionDeTipo('campos', 'Campos',
@@ -261,8 +243,6 @@ async function construirSeccionCampos(tipo) {
   function $(id) { return cuerpo.querySelector('#' + id); }
 
   var lista = ((App.E.campos.porTipo || {})[tipo.tipo] || []).map(function (c) { return Object.assign({}, c); });
-  camposSinGuardar = false;
-  envolverVolverDeTipo();
 
   function textoOrigen(c) {
     return c.origen === 'fichero' ? 'del fichero' : (c.origen === 'calculado' ? 'calculado' : 'propio');
@@ -273,11 +253,9 @@ async function construirSeccionCampos(tipo) {
       '<div id="campos-puestos" class="lista"></div>' +
       '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">' +
       '<button type="button" class="boton" id="campos-btn-anadir">+ Añadir campo</button>' +
-      '<button type="button" class="boton boton-principal" id="campos-guardar">Guardar campos</button>' +
       '</div>';
     pintarPuestos();
     $('campos-btn-anadir').onclick = abrirCatalogo;
-    $('campos-guardar').onclick = guardarCampos;
   }
 
   function pintarPuestos() {
@@ -300,7 +278,7 @@ async function construirSeccionCampos(tipo) {
       var cOblig = document.createElement('input');
       cOblig.type = 'checkbox';
       cOblig.checked = !!c.obligatorio;
-      cOblig.onchange = function () { c.obligatorio = cOblig.checked; camposSinGuardar = true; };
+      cOblig.onchange = function () { c.obligatorio = cOblig.checked; guardarCampos(); };
       oblig.appendChild(cOblig);
       var tOblig = document.createElement('span');
       tOblig.textContent = 'Obligatorio';
@@ -312,7 +290,7 @@ async function construirSeccionCampos(tipo) {
       var cEnNom = document.createElement('input');
       cEnNom.type = 'checkbox';
       cEnNom.checked = c.enNombre !== false;
-      cEnNom.onchange = function () { c.enNombre = cEnNom.checked; camposSinGuardar = true; };
+      cEnNom.onchange = function () { c.enNombre = cEnNom.checked; guardarCampos(); };
       enNom.appendChild(cEnNom);
       var tEnNom = document.createElement('span');
       tEnNom.textContent = 'Añadir al nombre';
@@ -333,7 +311,7 @@ async function construirSeccionCampos(tipo) {
 
       var quitar = document.createElement('button');
       quitar.type = 'button'; quitar.className = 'boton boton-peligro'; quitar.textContent = 'Quitar';
-      quitar.onclick = function () { lista.splice(i, 1); camposSinGuardar = true; pintarPuestos(); };
+      quitar.onclick = function () { lista.splice(i, 1); pintarPuestos(); guardarCampos(); };
       f.appendChild(quitar);
 
       envoltorio.appendChild(f);
@@ -361,23 +339,30 @@ async function construirSeccionCampos(tipo) {
     var j = i + salto;
     if (j < 0 || j >= lista.length) return;
     var g = lista[i]; lista[i] = lista[j]; lista[j] = g;
-    camposSinGuardar = true;
     pintarPuestos();
+    guardarCampos();
   }
 
   function abrirCatalogo() {
     cuerpo.innerHTML = '';
     if (!window.CamposCatalogo) { pintarListado(); return; }
     CamposCatalogo.abrir(cuerpo, tipo, lista, {
-      onCambio: function () { camposSinGuardar = true; },
+      onCambio: function () { guardarCampos(); },
       onVolver: pintarListado
     });
   }
 
+  /* Se guarda sola en cuanto algo cambia (fila 198, apartado 2): la
+     llaman todos los onchange/onclick de arriba, sin botón propio. */
+  /* En fila (fila 99, `App.enFila`/`ColaGuardado`, sobre `campos.json`):
+     un cambio seguido de otro (dos casillas, dos "Quitar") puede
+     disparar dos llamadas casi a la vez, y sin cola una podía leer el
+     fichero a medio escribir de la otra. */
   async function guardarCampos() {
     try {
-      App.E.campos = await Campos.guardarConfigDeTipo(App.E.gestor, tipo.tipo, lista);
-      camposSinGuardar = false;
+      App.E.campos = await App.enFila('campos.json', function () {
+        return Campos.guardarConfigDeTipo(App.E.gestor, tipo.tipo, lista);
+      });
       U.aviso('Campos de ' + tipo.tipo + ' guardados.', 'bueno');
       AjustesPlegado.resumirTipo();
     } catch (e) {

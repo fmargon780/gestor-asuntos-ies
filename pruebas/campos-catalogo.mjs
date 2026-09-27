@@ -140,30 +140,28 @@ await comprobarQue('el nuevo calculado se ha guardado en campos.json',
   }));
 
 /* ============================================================
-   4. Al crearlo, se añade solo al tipo (todavía sin guardar), y
-      "← Volver" avisa antes de perderlo
+   4. Al crearlo, se añade solo al tipo y se guarda sin ningún botón
+      (fila 198, apartado 2, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md):
+      "← Volver" ya no pregunta nada, porque nunca queda nada suelto.
    ============================================================ */
-console.log('--- 4. se añade al tipo, y "Volver" avisa si no se guarda ---');
+console.log('--- 4. se añade al tipo y se guarda solo; "← Volver" no pregunta nada ---');
 await pagina.click('#campos-catalogo-volver');
 await pagina.waitForSelector('#campos-puestos');
-await comprobarQue('"Nivel" ya sale en los campos puestos, sin guardar todavía',
+await comprobarQue('"Nivel" ya sale en los campos puestos',
   pagina.locator('#campos-puestos .fila-tipo').filter({ hasText: 'Nivel' }).count().then((n) => n === 1));
+await pagina.waitForTimeout(300);
+await comprobarQue('y ya queda guardado en campos.json, sin pulsar nada más',
+  pagina.evaluate(async () => {
+    const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+    const h = await g.getFileHandle('campos.json');
+    const j = JSON.parse(await (await h.getFile()).text());
+    return (j.porTipo.MATRICULA || []).some((c) => c.origen === 'calculado');
+  }));
 
 await pagina.click('#pantalla-tipo-asunto .boton-volver');
-await pagina.waitForSelector('#capa:not(.oculto)');
-await comprobar('avisa de que hay campos sin guardar',
-  pagina.locator('#cuadro-titulo').textContent(), 'Salir sin guardar');
-await pagina.click('#cuadro-cancelar');
-await pagina.waitForSelector('#capa', { state: 'hidden' });
-await comprobarQue('cancelando, se queda en la pantalla del tipo',
-  pagina.evaluate(() => !document.getElementById('pantalla-tipo-asunto').classList.contains('oculto')));
-
-await pagina.click('#campos-guardar');
 await pagina.waitForTimeout(200);
-await pagina.click('#pantalla-tipo-asunto .boton-volver');
-await pagina.waitForTimeout(200);
-await comprobarQue('guardado ya, "Volver" no pregunta nada',
-  pagina.evaluate(() => !document.getElementById('pantalla-tipo-asunto').classList.contains('oculto')).then((sigue) => !sigue));
+await comprobarQue('"← Volver" no pregunta nada: ya estaba todo guardado',
+  pagina.evaluate(() => document.getElementById('pantalla-tipo-asunto').classList.contains('oculto')));
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

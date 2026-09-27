@@ -117,6 +117,27 @@
 }
 .tipo-asunto-columna { display: flex; flex-direction: column; gap: 16px; }
 
+/* Fila 198, apartado 1: la lista de comprobación de arriba de la
+   pantalla del tipo. Cada línea es un botón (abre y despliega la
+   sección que toca); si todo está marcado, `js/ajustes-tipo-
+   comprobacion.js` la sustituye por la línea verde `.aviso-bueno`. */
+#tipo-asunto-comprobacion { padding: 0 16px; margin-bottom: 4px; }
+#tipo-asunto-comprobacion:empty { display: none; }
+.tipo-comprobacion {
+  border: 1px solid #dde3ea; border-radius: 10px; background: #fff;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.tipo-comprobacion-fila {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  font: inherit; font-size: 13px; text-align: left; background: none; border: 0;
+  border-bottom: 1px solid #eef1f5; padding: 8px 14px; cursor: pointer; color: var(--tinta, #1b2733);
+}
+.tipo-comprobacion-fila:last-child { border-bottom: 0; }
+.tipo-comprobacion-fila:hover { background: #f4f7fa; }
+.tipo-comprobacion-marca { font-weight: 700; width: 16px; text-align: center; color: #8a6100; }
+.tipo-comprobacion-hecha .tipo-comprobacion-marca { color: #1e7a46; }
+.tipo-comprobacion-hecha .tipo-comprobacion-texto { color: var(--tinta-suave, #5d6b7a); }
+
 .tipo-asunto-seccion {
   border: 1px solid #dde3ea; border-radius: 10px; background: #fff;
   padding: 14px 16px;
