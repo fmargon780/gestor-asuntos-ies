@@ -12,6 +12,107 @@
   function $(id) { return document.getElementById(id); }
 
   /* ==========================================================
+     DOCUMENTOS Y COMUNICACIÓN DE UN HITO PASAN A TAREAS
+
+     27-sep-2026, fila 199, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md,
+     apartado 4. «Documentos de este paso» y «Comunicación de este
+     paso» ya no se editan aparte (fuera de js/guias-paso-bloques.js):
+     su contenido pasa a tareas del guion, la primera vez que se abre
+     el editor de un tipo que todavía las tuviera.
+
+     `convertirDocumentosYComunicacionPuro` es la parte sin E/S (fácil
+     de probar): recorre `pasos` (y sus subpasos, a cualquier
+     profundidad) y, en cada uno:
+       - cada `id` de `plantillasDocumento` se convierte en una tarea
+         «Generar un documento → nombre», con `receta: { plantilla:
+         id }`, y `plantillasDocumento` se vacía;
+       - si `comunicacion` tiene texto (correo o Séneca), se convierte
+         en una tarea «Comunicar → título del hito» con una plantilla
+         NUEVA (nunca había una: el texto vivía suelto en el paso), y
+         `comunicacion` se vacía. El texto de correo manda; si el de
+         Séneca es distinto, se guarda aparte (`textoSeneca`, igual
+         que hace ya `js/plantillas-ajustes.js`).
+     Repetirlo no duplica nada: sin `plantillasDocumento` ni texto de
+     comunicación que convertir, no toca el paso. Devuelve las filas
+     de plantilla nuevas que hay que guardar en `plantillas.json`.
+     ========================================================== */
+  function convertirDocumentosYComunicacionPuro(pasos, nombreTipo, categoria, opciones) {
+    opciones = opciones || {};
+    var idPlantilla = opciones.idPlantilla || function () { return G.nuevoId(); };
+    var nombreDocumento = opciones.nombreDocumento || function (id) { return id; };
+    var nuevasPlantillas = [];
+
+    function convertirUno(p) {
+      if (!p) return;
+      if (G.esPregunta(p)) {
+        (p.opciones || []).forEach(function (o) { (o && o.pasos || []).forEach(convertirUno); });
+        return;
+      }
+      if (Array.isArray(p.plantillasDocumento) && p.plantillasDocumento.length) {
+        p.guion = Array.isArray(p.guion) ? p.guion : [];
+        p.plantillasDocumento.forEach(function (id) {
+          p.guion.push({
+            id: G.nuevoId(), texto: 'Generar un documento → ' + nombreDocumento(id),
+            explicacion: '', accion: 'generar', receta: { plantilla: id }, normativa: null
+          });
+        });
+        p.plantillasDocumento = [];
+      }
+      var c = p.comunicacion;
+      var textoCorreo = c && c.correo && String(c.correo.cuerpo || '').trim();
+      var textoSeneca = c && c.seneca && String(c.seneca.cuerpo || '').trim();
+      if (textoCorreo || textoSeneca) {
+        var idNuevo = idPlantilla();
+        var nombrePlantilla = p.titulo || 'Comunicación sin título';
+        var fila = { id: idNuevo, tipo: nombreTipo, categoria: categoria || '', nombre: nombrePlantilla,
+                     texto: textoCorreo || textoSeneca };
+        if (textoCorreo && textoSeneca && textoSeneca !== textoCorreo) fila.textoSeneca = textoSeneca;
+        nuevasPlantillas.push(fila);
+        p.guion = Array.isArray(p.guion) ? p.guion : [];
+        p.guion.push({
+          id: G.nuevoId(), texto: 'Comunicar → ' + nombrePlantilla, explicacion: '',
+          accion: 'comunicar', receta: { a: '', via: '', plantilla: idNuevo }, normativa: null
+        });
+        p.comunicacion = { correo: { asunto: '', cuerpo: '' }, seneca: { asunto: '', cuerpo: '' } };
+      }
+    }
+
+    (pasos || []).forEach(convertirUno);
+    return nuevasPlantillas;
+  }
+
+  /* La parte con E/S: guarda en `plantillas.json` las que haga falta.
+     Sin `App.E.gestor` (sin carpeta señalada, por ejemplo en una
+     prueba) no se convierte nada: se deja para la próxima vez que se
+     abra el editor con la carpeta a mano. `Plantillas.documentoPorId`
+     trabaja con lo último leído (`GuiasDocumentos.precargar`, ya
+     llamado por `js/guias-enganche.js` justo antes de abrir el
+     editor); sin nada leído, se usa el propio id como nombre. */
+  async function convertirDocumentosYComunicacion(pasos, nombreTipo, categoria) {
+    if (!window.Plantillas || !window.App || !App.E || !App.E.gestor) return;
+    var nuevas;
+    try {
+      nuevas = convertirDocumentosYComunicacionPuro(pasos, nombreTipo, categoria, {
+        idPlantilla: Plantillas.idNuevo,
+        nombreDocumento: function (id) {
+          var d = Plantillas.documentoPorId(id);
+          return (d && (d.nombre || d.fichero)) || id;
+        }
+      });
+    } catch (e) { return; }
+    if (!nuevas.length) return;
+    try {
+      await Plantillas.guardar(App.E.gestor, function (actual) {
+        nuevas.forEach(function (f) { actual.lista.push(f); });
+        return actual;
+      });
+    } catch (e) {
+      U.accesorio('He convertido documentos y comunicación de este hito a tareas, pero no he ' +
+        'podido guardar su plantilla de comunicación', e);
+    }
+  }
+
+  /* ==========================================================
      ESCRIBIR LA GUÍA
 
      Un recuadro por hito, y una sola barra de formato arriba que
@@ -28,6 +129,12 @@
      su nivel y con él desplegado (lo usa el mapa, js/guias-mapa.js). */
   function editar(nombreTipo, lista, listaResponsables, listaEstados, opciones) {
     var pasos = G.normalizar(lista);
+    var tipoInfo = ((window.App && App.E && App.E.tipos) || []).filter(function (t) { return t.tipo === nombreTipo; })[0];
+    return convertirDocumentosYComunicacion(pasos, nombreTipo, tipoInfo ? tipoInfo.categoria : '')
+      .catch(function () { /* sin poder convertir ahora, se abre el editor igual */ })
+      .then(function () { return abrirCuadro(); });
+
+    function abrirCuadro() {
     /* Fila 95 (docs/PREGUNTAS-DENTRO-DE-LAS-RESPUESTAS.md): el nivel que
        se ve (la guía entera, o los hitos de una opción de una pregunta
        de dentro) y el camino hasta él, como carpetas. Todo lo que
@@ -438,9 +545,12 @@
       }
       return G.normalizar(pasos);
     });
+    }   /* fin de abrirCuadro() */
   }
 
   Object.assign(G, {
-    editar: editar
+    editar: editar,
+    /* Para las pruebas (pruebas/documentos-comunicacion-a-tareas.mjs). */
+    _convertirDocumentosYComunicacion: convertirDocumentosYComunicacionPuro
   });
 })();

@@ -1,13 +1,21 @@
 /* ============================================================
    guias-paso-bloques.js — los bloques de dentro de un paso de la guía que
-   no es pregunta: lo que hay que reunir, comunicación, documentos, guion,
-   solo informativo, normativa y formularios, y «Guardar en la biblioteca».
+   no es pregunta: lo que hay que reunir, guion, solo informativo,
+   normativa y formularios, y «Guardar en la biblioteca».
 
    Sacado tal cual de `pintar()` del editor (js/guias-editor.js) en la
    fila 133 (docs/PARTIR-FICHEROS-GRANDES.md), sin cambiar nada de lo que
    hace. Recibe el mismo contexto que la caja de opciones
    (js/guias-opciones-editor.js): `ctx.nivel()`, `ctx.recoger()`,
    `ctx.pintar()` y `ctx.restaurar(det, pos, idSub)`.
+
+   27-sep-2026, fila 199 (docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md,
+   apartado 4): «Comunicación de este paso» y «Documentos de este paso»
+   ya no se pintan aquí. Su contenido pasa a tareas del guion, en la
+   conversión automática de `js/guias-editor.js` (`convertirDocumentosYComunicacionPuro`,
+   llamada al abrir el editor); `js/guias-comunicacion.js` y
+   `js/guias-documentos.js` siguen existiendo, pero ya no los llama este
+   fichero.
    ============================================================ */
 var GuiasPasoBloques = (function () {
 
@@ -45,25 +53,11 @@ var GuiasPasoBloques = (function () {
        sección, js/guias-editor.js no toca los `requisitos` viejos del
        paso: se quedan en el fichero, sin leerse. */
 
-    /* "Comunicación de este paso" (18-sep-2026, fila 60,
-       docs/COMUNICAR-DESDE-EL-HITO.md): mismo criterio, solo en los
-       pasos que no son pregunta. A diferencia del bloque de arriba,
-       son solo campos de texto: no hace falta recoger()+pintar() en
-       cada tecla, basta con leerlos en recoger() como el título o
-       el cuerpo del paso. */
-    if (!pregunta && window.GuiasComunicacion) {
-      d.insertAdjacentHTML('beforeend', GuiasComunicacion.bloqueHTML(p.id, p.comunicacion));
-      ctx.restaurar(d.querySelector(':scope > .paso-comunicacion'), i, '');
-      GuiasComunicacion.enganchar(d, p.id);
-    }
+    /* «Comunicación de este paso» y «Documentos de este paso» (fila 199):
+       ya no tienen sección propia aquí. Su contenido, si lo hubiera,
+       se convierte solo en tareas del guion al abrir el editor
+       (js/guias-editor.js), antes de llegar a pintar() . */
 
-    /* «Documentos de este paso» (fila 102, js/guias-documentos.js):
-       mismo criterio, solo en los pasos que no son pregunta. */
-    if (!pregunta && window.GuiasDocumentos) {
-      d.insertAdjacentHTML('beforeend', GuiasDocumentos.bloqueHTML(p.plantillasDocumento));
-      ctx.restaurar(d.querySelector(':scope > .paso-documentos'), i, '');
-      GuiasDocumentos.enganchar(d);
-    }
     /* «Guion de este paso» (fila 109, js/guias-guion.js). */
     if (!pregunta && window.GuiasGuion) {
       d.insertAdjacentHTML('beforeend', GuiasGuion.bloqueHTML(p.guion));

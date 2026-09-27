@@ -185,7 +185,13 @@ var HitosBiblioteca = (function () {
 
   /* Los campos que se comparan entre un paso y su modelo (apartado 4.3
      y 4.4). `soloInformativo` queda fuera a propósito: "no cuenta como
-     cambio del modelo" (es una decisión de cada tipo, no del modelo). */
+     cambio del modelo" (es una decisión de cada tipo, no del modelo).
+     Fila 199 (27-sep-2026, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md,
+     apartado 4): `comunicacion` y `plantillasDocumento` ya no se
+     comparan aparte — ese contenido vive en tareas del guion (`guion`,
+     que sí sigue comparándose), y un paso o un modelo de antes de esta
+     fila puede llegar con esos dos campos todavía con algo dentro, sin
+     que cuente como diferencia. */
   var CAMPOS_COMPARABLES = [
     { clave: 'titulo', etiqueta: 'Título' },
     { clave: 'cuerpo', modeloClave: 'explicacion', etiqueta: 'Explicación' },
@@ -193,9 +199,7 @@ var HitosBiblioteca = (function () {
     { clave: 'estadoAsunto', etiqueta: 'Estado del asunto' },
     { clave: 'plazo', etiqueta: 'Plazo' },
     /* «Lo que hay que reunir» ya no se compara aparte: va en el guion (fila 138). */
-    { clave: 'comunicacion', etiqueta: 'Comunicación de este hito' },
     { clave: 'normativa', etiqueta: 'Normativa' },
-    { clave: 'plantillasDocumento', etiqueta: 'Documentos' },
     { clave: 'guion', etiqueta: 'Tareas' },
     /* «Avisar a quien lo pide» (fila 195). */
     { clave: 'avisarLoPide', etiqueta: 'Avisar a quien lo pide' },
@@ -348,7 +352,7 @@ var HitosBiblioteca = (function () {
 
      Función pura: nace marcado cuando el responsable del hito NO es
      Administración/Secretaría. `idResponsableAdministracion` es el que
-     Francisco tenga configurado como propio del puesto en Ajustes › El
+     Francisco tenga configurado como propio del puesto en Ajustes → El
      centro (`js/hitos-ajustes.js`); sin poder determinarlo, nace sin
      marcar (mejor de menos que reclamar trabajo de más por error).
      ========================================================== */
