@@ -48,6 +48,56 @@ var GuiasPasoBloques = (function () {
   }
 
   function anadir(d, p, i, pregunta, ctx) {
+    /* «De dónde viene» (28-sep-2026, fila 201,
+       docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md, apartado 2): una etiqueta
+       fija junto al título, plegado el hito o no (no vive dentro de
+       ningún `<details>`, así que el CSS del acordeón, fila 122, no la
+       esconde). Pulsarla, si viene de la biblioteca, abre el nombre
+       del modelo y «Ver en la biblioteca». */
+    if (window.GuiasBiblioteca) {
+      var cabecera = d.querySelector(':scope > .paso-cabecera');
+      if (cabecera) {
+        cabecera.insertAdjacentHTML('beforeend', GuiasBiblioteca.chipOrigenHTML(p));
+        GuiasBiblioteca.engancharChipOrigen(cabecera, p);
+      }
+    }
+
+    /* Apartado 3, punto 1: mientras se escribe el título de un hito
+       propio (sin origenBiblioteca todavía), si se parece a algo de la
+       biblioteca, se dice debajo con «Usarlo» (sustituye el paso a
+       medio escribir por el modelo elegido, como «+ Traer de la
+       biblioteca»). Si no se pulsa, el paso sigue siendo propio. */
+    if (!p.origenBiblioteca && window.GuiasBiblioteca && window.HitosBiblioteca) {
+      (function (indice) {
+        var tituloInput = d.querySelector(':scope > .paso-cabecera > .paso-titulo');
+        if (!tituloInput) return;
+        var aviso = document.createElement('div');
+        aviso.className = 'paso-titulo-parecido oculto';
+        tituloInput.insertAdjacentElement('afterend', aviso);
+        var espera = null;
+        tituloInput.addEventListener('input', function () {
+          clearTimeout(espera);
+          var texto = tituloInput.value.trim();
+          if (texto.length < 3) { aviso.classList.add('oculto'); aviso.innerHTML = ''; return; }
+          espera = setTimeout(async function () {
+            var modelos = await GuiasBiblioteca.modelosParecidosATitulo(texto);
+            if (!aviso.isConnected || tituloInput.value.trim() !== texto) return;
+            if (!modelos.length) { aviso.classList.add('oculto'); aviso.innerHTML = ''; return; }
+            var modelo = modelos[0];
+            aviso.classList.remove('oculto');
+            aviso.innerHTML = 'En la biblioteca hay «' + U.escapar(modelo.nombre) + '» · ' +
+              '<button type="button" class="enlace paso-titulo-usarlo">Usarlo</button>';
+            aviso.querySelector('.paso-titulo-usarlo').onclick = function () {
+              ctx.recoger();
+              ctx.nivel()[indice] = HitosBiblioteca.modeloAPaso(modelo);
+              ctx.plegado.abrir(ctx.nivel()[indice].id);
+              ctx.pintar();
+            };
+          }, 250);
+        });
+      })(i);
+    }
+
     /* "Lo que hay que reunir" ya no es una sección aparte (fila 138,
        docs/UNA-SOLA-LISTA-EN-EL-HITO.md): es la casilla «Hay que
        reunirlo» de cada línea del guion (js/guias-guion.js). Sin la
@@ -134,6 +184,32 @@ var GuiasPasoBloques = (function () {
           campos: [filaTextoDoc.querySelector('.paso-texto-documentos')]
         });
       }
+      /* Apartado 3, punto 4: la guardia de parecidos, también aquí. */
+      if (window.GuiasBiblioteca) {
+        var campoTextoDoc = filaTextoDoc.querySelector('.paso-texto-documentos');
+        var avisoTextoDoc = document.createElement('div');
+        avisoTextoDoc.className = 'paso-texto-documentos-parecido oculto';
+        campoTextoDoc.insertAdjacentElement('afterend', avisoTextoDoc);
+        var esperaTextoDoc = null;
+        campoTextoDoc.addEventListener('input', function () {
+          clearTimeout(esperaTextoDoc);
+          var texto = campoTextoDoc.value.trim();
+          if (!texto) { avisoTextoDoc.classList.add('oculto'); avisoTextoDoc.innerHTML = ''; return; }
+          esperaTextoDoc = setTimeout(async function () {
+            var parecido = await GuiasBiblioteca.textoDocumentosParecido(texto, { pasoId: p.id });
+            if (!avisoTextoDoc.isConnected || campoTextoDoc.value.trim() !== texto) return;
+            if (!parecido) { avisoTextoDoc.classList.add('oculto'); avisoTextoDoc.innerHTML = ''; return; }
+            avisoTextoDoc.classList.remove('oculto');
+            avisoTextoDoc.innerHTML = 'Ese mismo texto ya lo tiene ' + U.escapar(parecido.origen) + ' · ' +
+              '<button type="button" class="enlace paso-texto-documentos-copiar">Copiarlo tal cual</button>';
+            avisoTextoDoc.querySelector('.paso-texto-documentos-copiar').onclick = function () {
+              campoTextoDoc.value = parecido.texto;
+              avisoTextoDoc.classList.add('oculto');
+              avisoTextoDoc.innerHTML = '';
+            };
+          }, 400);
+        });
+      }
 
       if (window.HitosNormativa) {
         /* Formularios oficiales (20-sep-2026, fila 82,
@@ -174,7 +250,7 @@ var GuiasPasoBloques = (function () {
             var mandosDelPaso = d.querySelector('.paso-mandos');
             if (!mandosDelPaso) return;
             mandosDelPaso.insertAdjacentHTML('beforeend', GuiasBiblioteca.botonHTML());
-            GuiasBiblioteca.engancharBoton(d, pasoActual, modelo, diffs, function (origenNuevo) {
+            GuiasBiblioteca.engancharBoton(d, pasoActual, modelo, diffs, ctx.nombreTipo, function (origenNuevo) {
               ctx.recoger();
               ctx.nivel()[indice].origenBiblioteca = origenNuevo;
               ctx.pintar();
