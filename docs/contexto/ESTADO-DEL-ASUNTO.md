@@ -108,3 +108,23 @@ Se comprueba con `pruebas/el-hito-es-el-estado.mjs` y `pruebas/estado-por-el-hit
   con ese id o ese título (`faltanPorTitulo`; lo mismo en «Cargar… del instituto»).
 - **«Qué me toca»** (`cuentaPara`): al filtrar por una persona salen sus hitos y los de Administración;
   por Administración, solo esos. En «En tu tejado» ya contaban (es de Administración).
+
+## Una Administración como responsable (fila 205, `docs/RESPONSABLE-UNA-ADMINISTRACION.md`)
+
+`js/responsable-organismo.js` (`window.ResponsableOrganismo`). Al final de la lista de responsables sale
+«Una Administración…» (mesa del hito, `js/hito-mesa.js`; «Responsable por defecto» del editor de guías y
+de modelos de la biblioteca, `js/guias-editor.js`). Abre un buscador con lo dado de alta en la categoría
+`ADMINISTRACIONES` (reutiliza `AdministracionesFicha.pintarLista`); en la mesa es un cuadro, en el editor
+de guías va en línea para no cerrar el editor. Si el organismo tiene departamentos, se puede elegir uno.
+
+- **Se guarda** `adm:<id del organismo>` o `adm:<id>:<id del departamento>` en `responsable`, y una copia
+  del nombre en `responsableNombre` (hitos, pasos de guía y modelos de la biblioteca). Se lee el nombre de
+  ahora («Nombre corto», con departamento «Nombre corto · Departamento»); si el organismo ya no está,
+  la copia; los normalizadores la recuerdan en `ResponsableOrganismo.copia`.
+- **Nunca es de Administración**: `Hitos.esDeAdministracion` da no para cualquier `adm:…`; el asunto va a
+  «Pendiente de terceros» y la cabecera dice «Esperando a <nombre>» (la espera automática de la fila 162).
+  `Hitos.resolverResponsable` lo resuelve por `ResponsableOrganismo.resolver`.
+- **Filtro «Responsable» de Inicio** (`js/inicio-tabla.js`): además de los de Ajustes, los organismos que
+  son responsables de algún hito abierto (`ResponsableOrganismo.usadosEn`).
+- Las listas fijas (`Hitos.RESPONSABLES_DEFECTO`, `Hitos.PAPELES`) y Ajustes › Hitos no cambian.
+  Prueba: `pruebas/responsable-organismo.mjs`.
