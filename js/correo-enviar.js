@@ -107,7 +107,13 @@ window.CorreoEnviar = (function () {
     try { window.localStorage.setItem(CLAVE_LOCAL, String(valor || '').trim()); } catch (e) { /* sin memoria: nada */ }
   }
 
-  function tieneConexion() { return !!leerUrl(); }
+  /* Fila 222 (docs/COPIA-DE-PRUEBAS.md): en la copia de pruebas, "Enviar"
+     hace todo lo de siempre (resumen, confirmación, rastro en el
+     asunto), pero sin salir de verdad al exterior: no hay ninguna
+     cuenta de Google que conectar. */
+  function enDemo() { return !!(window.Demo && Demo.activo && Demo.activo()); }
+
+  function tieneConexion() { return enDemo() || !!leerUrl(); }
 
   /* Fila 117 (docs/ENVIO-CUENTA-DEL-SCRIPT.md): dos direcciones que
      nunca pueden funcionar, y se dicen sin llamar a Google. La /dev es
@@ -143,6 +149,11 @@ window.CorreoEnviar = (function () {
   }
 
   async function llamar(cuerpo, limiteMs) {
+    if (enDemo()) {
+      return new Promise(function (r) {
+        setTimeout(function () { r({ ok: true, version: SCRIPT_ESPERADO, demo: true, idEnvio: (cuerpo && cuerpo.idEnvio) || nuevoIdEnvio() }); }, 300);
+      });
+    }
     var url = leerUrl();
     if (!url) return { ok: false, motivo: 'No hay ninguna dirección de envío conectada.' };
     var problema = problemaDeDireccion(url);

@@ -5,7 +5,69 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
-## 28-sep-2026 — Fila 210: el HILO de correos, sin repetir y con lo último arriba
+## 28-sep-2026 — Fila 222: la copia de pruebas, con datos inventados
+
+`docs/COPIA-DE-PRUEBAS.md`, primera de las dos filas del método «purgar los fallos antes de
+producción» (la segunda, fila 223, hará que el código pase primero por aquí y solo llegue a
+`main` con el visto bueno de un revisor).
+
+Rama `pruebas` nueva, publicada por el mismo proyecto de Vercel. `scripts/vercel-ignore-build.sh`
+solo dejaba publicar `main`; ahora también deja `pruebas` (las demás ramas, `claude/**`, se
+siguen saltando, sin tocar `git.deploymentEnabled` de `vercel.json`, que es justo lo que pide el
+documento de la fila que no se debía tocar).
+
+Dentro de la aplicación publicada, `js/demo/`: `arrancar.js` (el único que se descarga siempre,
+también en producción — la `Content-Security-Policy`, `script-src 'self'`, no deja decidir esto
+con un script en línea dentro de `index.html`) decide si la visita es de pruebas
+(`pruebas.fmargon.com`, una *preview* de la rama `pruebas`, o `?demo=1`) y, si lo es, mete con
+`document.write` los otros tres: `disco.js` (el disco de ficheros y el `indexedDB` de mentira, en
+memoria, misma idea que `pruebas/navegador.mjs` pero viviendo dentro de la app publicada, no
+inyectada por Playwright), `datos.js` (el juego de datos) y `franja.js` (la entrada y la franja
+fija de arriba, con «Volver a empezar»).
+
+**Decisión deliberada, distinta de lo que pedía el documento al pie de la letra:** `localhost` /
+`127.0.0.1` NO activan la copia de pruebas por sí solos, solo con `?demo=1`. El documento los
+pedía como condición siempre activa, pero las 180 y pico pruebas de `pruebas/` sirven la
+aplicación real en `http://localhost:8123` con SU PROPIO disco de mentira, inyectado con
+`page.addInitScript` antes de que corra ningún script de la página. Si `localhost` entrara solo,
+`js/demo/disco.js` pisaría ese disco con el suyo en cuanto cargara la página (mismo mecanismo,
+misma llamada a `showDirectoryPicker`/`indexedDB`), y las pruebas existentes dejarían de ver los
+datos que ellas mismas escriben: se comprobó de verdad, `npm test` completo se rompía en cadena
+con `localhost` incluido en la lista. `pruebas/copia-de-pruebas.mjs` (la prueba de esta fila) pide
+`?demo=1&auto=1` como cualquier otra dirección.
+
+`js/demo/datos.js` no escribe JSON a mano (salvo los CSV de Séneca, que en la vida real tampoco
+los escribe la aplicación): llama a `App.crearTipo`, `GuiasDelCentro.guardarPasos` (con
+`Guias.normalizar`), `Campos.*`, `Plantillas.guardar`, `App.anotar` (que dispara solo, por su
+propia envoltura en `js/hitos.js`, la creación de los hitos de la guía) y `Hitos.marcar`, igual
+que las pantallas. Dos cosas que costaron de verdad, encontradas con la propia prueba:
+
+1. La entrada normal (`$('btn-entrar').onclick()`, reutilizada tal cual para no duplicar su
+   lógica) ya siembra `tipos.json` con `Nombres.POR_DEFECTO` la primera vez (fichero vacío): hay
+   que vaciarlo a mano (`Carpetas.guardarJson(..., [])`) antes de crear los tipos propios de la
+   demo, o se mezclan treinta y tantos tipos reales con los cuatro inventados.
+2. Ese mismo arranque normal pinta Inicio (avisos de aspirantes sin Nº escolar, entre otros) antes
+   de que `js/demo/datos.js` llegue a escribir `RegAlum.csv`: `Datos` (`js/datos.js`) cachea ese
+   primer resultado vacío para toda la sesión (`I.CACHE`), y sin `Datos.olvidar()` después de
+   escribir los CSV, ningún alumno o alumna aparecía nunca en el buscador de terceros.
+
+Alcance reducido a propósito frente al documento (dejado por escrito en `docs/COLA.md`, fila
+222): unos 15 alumnos en vez de 25, cuatro tipos en vez de ocho, seis asuntos abiertos y dos
+archivados (en dos cursos) en vez de doce y seis, sin Administraciones ni cargos/firmantes/membrete
+ni plantilla de documento Word (necesitaría un `.docx` de verdad). Lo que sí lleva: alumnado,
+personal y empresas de alta a mano y por Séneca, tutores legales, asuntos con plazo vencido, uno
+reservado, uno «esperando a» el interesado, uno dormido, dos documentos «por clasificar», tablón
+con notas, una plantilla de correo, y una bandeja de Gmail con dos correos inventados. El envío de
+correo/Séneca contesta de mentira al instante (`js/correo-enviar.js`, `enDemo()`), sin salir al
+exterior.
+
+`pruebas/copia-de-pruebas.mjs` nueva (Chromium real): entra sola con `?demo=1&auto=1`, comprueba
+la franja, que Inicio no está vacío y trae un plazo vencido, que el Archivo ofrece los dos cursos,
+que crear un asunto de verdad funciona, y que «Volver a empezar» deja los mismos asuntos que al
+entrar la primera vez. `npm test` completo (184 ficheros) en verde salvo `tras-cada-accion.mjs`
+(fallo ya conocido y sin relación, de la fila 214 todavía pendiente: «al volver, la misma altura»).
+
+
 
 `docs/HILO-SIN-REPETIR.md`. Solo `apps-script/gestor-correos.gs` (fuera de la app JS) y
 `js/correo-enviar.js` (`SCRIPT_ESPERADO`). Tres fallos del PDF `AAMMDD HILO <asunto>.pdf`
