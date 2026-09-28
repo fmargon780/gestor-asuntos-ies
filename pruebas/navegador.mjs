@@ -537,4 +537,106 @@ await comprobar('el código del registro se monta entero',
 
 await pagina.click('#doc-guardar');
 await pagina.waitForSelector('#doc-cuerpo .fila-documento');
-await comprobar('el documento se ha guardado en la carpeta del asunto
+await comprobar('el documento se ha guardado en la carpeta del asunto', pagina.evaluate(async () => {
+  const nombres = [];
+  for await (const p of window.__disco.abiertos.entries()) nombres.push(p[0]);
+  const carpeta = nombres.find(n => n.indexOf('BECA') !== -1);
+  const h = await window.__disco.abiertos.getDirectoryHandle(carpeta);
+  const dentro = [];
+  for await (const p of h.entries()) dentro.push(p[0]);
+  return dentro;
+}), ['260902 26SA0087 CERTIFICADO 26-27.pdf']);
+await comprobar('y el original sigue donde estaba',
+  pagina.evaluate(() => window.__disco.externo.name), 'descarga sin nombre (3).pdf');
+
+/* renombrar el que ya está dentro. Cada fila trae ahora dos botones
+   ("Copiar nombre" y "Cambiar el nombre"), así que hay que elegir el que
+   abre el formulario. */
+await pagina.getByRole('button', { name: 'Cambiar el nombre' }).click();
+await pagina.waitForSelector('#doc-vista');
+await comprobar('al renombrar se leen los datos del nombre que ya tenía',
+  pagina.locator('#doc-vista').textContent(), '260902 26SA0087 CERTIFICADO 26-27.pdf');
+await pagina.uncheck('#doc-hay-registro');
+await pagina.waitForTimeout(150);
+await pagina.click('#doc-guardar');
+await pagina.waitForSelector('#doc-cuerpo .fila-documento');
+await comprobar('quitar el registro cambia el nombre del fichero', pagina.evaluate(async () => {
+  const nombres = [];
+  for await (const p of window.__disco.abiertos.entries()) nombres.push(p[0]);
+  const carpeta = nombres.find(n => n.indexOf('BECA') !== -1);
+  const h = await window.__disco.abiertos.getDirectoryHandle(carpeta);
+  const dentro = [];
+  for await (const p of h.entries()) dentro.push(p[0]);
+  return dentro;
+}), ['260902 CERTIFICADO 26-27.pdf']);
+await pagina.click('#cuadro-aceptar');
+
+/* ================= CAMBIAR EL NOMBRE DE UN TIPO ================= */
+/* una carpeta ya archivada con el nombre viejo, que NO se debe tocar */
+await pagina.evaluate(async () => {
+  const cat = await window.__disco.archivo.getDirectoryHandle('ALUMNADO', { create: true });
+  const ter = await cat.getDirectoryHandle('Solano Vega, Ruth 1138002', { create: true });
+  await ter.getDirectoryHandle('250401 SANCION 24-25 Solano Vega, Ruth 1138002', { create: true });
+});
+
+/* y una abierta con el nombre viejo, que SÍ se renombra */
+await pagina.click('.pestana[data-pantalla="nuevo"]');
+await pagina.click('#categorias-lista .categoria-boton:nth-child(1)');
+await clicTipo('SANCION');
+await pagina.fill('#buscar-tercero', 'solano');
+await pagina.waitForSelector('#resultados-tercero .resultado');
+await pagina.click('#resultados-tercero .resultado');
+await pagina.fill('#campo-fecha', '2026-09-03');
+await pagina.click('#btn-crear');
+/* Fila 119: crear abre la ficha del asunto; se vuelve a la lista. */
+await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
+await pagina.click('#ficha-volver');
+await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
+
+await pagina.click('.pestana[data-pantalla="ajustes"]');
+/* Se busca por nombre en vez de fiarse de la categoría marcada: el
+   tipo EVACUACION de más arriba dejó Ajustes mirando OTROS, y el
+   buscador de docs/AJUSTES-AGIL.md es justo para esto. */
+await pagina.fill('#buscar-tipos', 'sancion');
+await pagina.waitForSelector('#tabla-tipos .tarjeta-tipo');
+const tarjetaSancion = pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: 'SANCION' });
+await tarjetaSancion.locator('.tarjeta-tipo-menu-btn').click();
+await tarjetaSancion.getByRole('button', { name: 'Cambiar el nombre' }).click();
+await pagina.waitForSelector('#tipo-nuevo-nombre');
+await pagina.fill('#tipo-nuevo-nombre', 'expediente disciplinario');
+await pagina.click('#cuadro-aceptar');
+await pagina.waitForTimeout(900);
+
+await comprobar('la carpeta abierta se ha renombrado', pagina.evaluate(async () => {
+  const n = [];
+  for await (const p of window.__disco.abiertos.entries()) n.push(p[0]);
+  return n.filter(x => x.indexOf('EXPEDIENTE DISCIPLINARIO') !== -1).length;
+}), 1);
+await comprobar('la carpeta archivada NO se ha tocado', pagina.evaluate(async () => {
+  const cat = await window.__disco.archivo.getDirectoryHandle('ALUMNADO');
+  const ter = await cat.getDirectoryHandle('Solano Vega, Ruth 1138002');
+  const n = [];
+  for await (const p of ter.entries()) n.push(p[0]);
+  return n.filter(x => x.indexOf('SANCION') !== -1).length;
+}), 1);
+await comprobar('el nombre viejo queda guardado como alias', pagina.evaluate(async () => {
+  const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
+  const h = await g.getFileHandle('tipos.json');
+  const t = JSON.parse(await (await h.getFile()).text());
+  const x = t.find(y => y.tipo === 'EXPEDIENTE DISCIPLINARIO');
+  return x && x.alias;
+}), ['SANCION']);
+
+await pagina.click('.pestana[data-pantalla="archivo"]');
+await pagina.click('#pantalla-archivo .acciones .fila-menu-btn');
+await pagina.click('#btn-recargar-archivo');
+await pagina.waitForTimeout(600);
+await comprobar('el archivo enseña la carpeta vieja con el nombre nuevo',
+  pagina.locator('#lista-archivo .tarjeta').filter({ hasText: '250401 SANCION' })
+    .locator('.marca-tipo').textContent(), 'EXPEDIENTE DISCIPLINARIO');
+
+await comprobar('sin errores de consola', Promise.resolve(errores), []);
+
+await navegador.close();
+console.log(fallos ? '\n' + fallos + ' PRUEBAS FALLAN' : '\nTodas las pruebas del navegador pasan.');
+process.exit(fallos ? 1 : 0);
