@@ -36,6 +36,9 @@ línea por cada fila que queda (la EN CURSO y todas las PENDIENTE), con los minu
 para cada una entera (programar, pruebas, publicar y comprobar) y el motivo en pocas palabras.
 Borra las filas ya HECHAS. Esa subida tiene que llegar a `main`, no solo a la rama de trabajo: la
 página de estado de Francisco lee `main`. No es una subida más: va en la misma de la marca.
+Al marcar una fila HECHA, escribe siempre la hora junto a la fecha, en hora de Madrid:
+`HECHA (28-sep-2026 14:05)`. Así la página de estado puede calcular lo que tardó de verdad cada
+fila. No cambies las filas ya escritas.
 
 ## Regla general de publicación (manda sobre cualquier otra regla)
 
