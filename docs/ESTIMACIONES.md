@@ -14,3 +14,4 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 | 206 | 70 | `docs/HITOS-DESDE-EL-ASUNTO.md`: crear/cambiar/borrar hitos desde la mesa de un asunto, con «Colocar después de», la definición de «hito vacío» y la propagación opcional a la guía del tipo |
 | 210 | 30 | `docs/HILO-SIN-REPETIR.md`: solo `apps-script/gestor-correos.gs` (fuera de la app JS), tres arreglos contenidos (orden, quitar citas repetidas, adjuntos sin duplicar) |
 | 213 | 60 | `docs/BOTON-DE-SOPORTE.md`: botón y ventana nuevos con captura pegada, campo en Ajustes, script de Google nuevo (`apps-script/soporte.gs`) que escribe en Drive y en la cola de GitHub, guía de puesta en marcha y pruebas de los dos lados |
+| 214 | 25 | `docs/HA-LLEGADO-A-LA-VISTA.md`: arreglo pequeño en `App.irVista` y `css/inicio.css` (esconder la tabla mientras se ve «Ver todo» y subir la pantalla), más su prueba con una tabla larga |
