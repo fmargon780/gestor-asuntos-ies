@@ -232,7 +232,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 219 | Cuando se modifica un asunto el campo Tercero debería ser un buscador o desplegable del campo tercero, no un texto libre como ahora. | IDEA (28-sep-2026): apuntada por Francisco desde el Centro de mando |
 | 204 | `docs/COMPROBACION-AL-ENTRAR.md`, entero, con `js/cabecera-fija.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 204) | PENDIENTE (27-sep-2026) |
 | 217 | `docs/CORREO-OTRA-CUENTA-ABIERTA.md` (enviar correo con otra cuenta de Google abierta en el navegador: aviso claro en vez de «Failed to fetch» y, si Google lo deja, que el envío funcione igual usando la forma general de la dirección del script) | PENDIENTE (28-sep-2026) |
-| 224 | Mira cuanto texto (3 frases largas) para añadir una tarea a un hito. Este tipo de cosas son las que hacen inteligible una app. Es necesario simplificar y hacer intuitivo. [recorte: https://claude.ai/artifact/7pDUJyXkUbPwuccZRx6J7E · 7814fd52fd6b881cf292b4994f9f2b88] | IDEA (28-sep-2026): apuntada por Francisco desde el Centro de mando |
+| 224 | `docs/TAREAS-DEL-HITO-SENCILLAS.md` (tareas del hito sin texto de sobra: una caja «Nueva tarea…» que añade solo a este asunto, «⋮» por tarea con Anotar/Cambiar/Pasar a la guía/Borrar, y el menú «Hito ▾» con Crear · Cambiar · Borrar) | PENDIENTE (28-sep-2026) |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
