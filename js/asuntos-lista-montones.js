@@ -44,14 +44,42 @@ App.vistaGuardada = function () {
    el botón de siempre (o cualquier otro sitio que llame sin este
    parámetro) sigue enseñando las dos juntas, como toda la vida. */
 App.irVista = function (cual, soloQue) {
-  App.E.vista = App.VISTAS.indexOf(cual) !== -1 ? cual : 'departamento';
+  var estabaEnClasificar = App.E.vista === 'clasificar';
+  var vistaNueva = App.VISTAS.indexOf(cual) !== -1 ? cual : 'departamento';
+  var esClasificar = vistaNueva === 'clasificar';
+
+  /* Fila 214: guardar el desplazamiento de antes de entrar en
+     "clasificar" ANTES de esconder #inicio-cuerpo (más abajo, con la
+     clase "viendo-clasificar"): en cuanto la tabla desaparece, la
+     página se queda sin alto de sobra y el navegador recorta scrollY
+     él solo al nuevo máximo (le pasa lo mismo a la cabecera fija, fila
+     50, docs/CABECERA-NO-TIEMBLA.md); leído después, ya habría llegado
+     recortado a 0. */
+  if (esClasificar && !estabaEnClasificar) App.E.scrollAlEntrarClasificar = window.scrollY;
+
+  App.E.vista = vistaNueva;
   try { window.localStorage.setItem('vista-abiertos', App.E.vista); } catch (e) {}
 
   Array.prototype.forEach.call(document.querySelectorAll('.panel'), function (b) {
     b.classList.toggle('activo', b.dataset.vista === App.E.vista);
   });
-  var esClasificar = App.E.vista === 'clasificar';
   $('zona-clasificar').classList.toggle('oculto', !esClasificar);
+
+  /* "clasificar" sustituye del todo a la vista de Inicio
+     (css/inicio.css, #pantalla-abiertos.viendo-clasificar), en vez de
+     enseñarse debajo de la tabla, fuera de la pantalla. Al entrar, la
+     página sube arriba del todo; al salir, se devuelve el
+     desplazamiento guardado, después de repintar (el alto de la
+     página cambia al volver a enseñar la tabla). */
+  var pantalla = $('pantalla-abiertos');
+  if (pantalla) pantalla.classList.toggle('viendo-clasificar', esClasificar);
+  if (esClasificar && !estabaEnClasificar) {
+    window.scrollTo(0, 0);
+  } else if (!esClasificar && estabaEnClasificar) {
+    var y = App.E.scrollAlEntrarClasificar || 0;
+    App.E.scrollAlEntrarClasificar = null;
+    requestAnimationFrame(function () { window.scrollTo(0, y); });
+  }
 
   if (esClasificar) {
     App.E.soloQueClasificar = (soloQue === 'correos' || soloQue === 'documentos') ? soloQue : '';

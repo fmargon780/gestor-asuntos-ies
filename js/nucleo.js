@@ -590,6 +590,14 @@ Array.prototype.forEach.call(document.querySelectorAll('.pestana'), function (b)
 });
 
 App.ir = function (cual) {
+  /* Fila 214: de qué pantalla del menú se viene, para saber si se
+     vuelve a Inicio desde otra (no desde una ficha, que esconde
+     #pantalla-abiertos por su cuenta y no cuenta como ninguna de
+     App.PANTALLAS: Navegacion.pantallaVisible() da '' con la ficha
+     abierta). Se mira antes de que las líneas de abajo cambien qué
+     pantalla está a la vista. */
+  var pantallaDeAntes = window.Navegacion ? Navegacion.pantallaVisible() : '';
+
   /* Fila 194: se apunta de dónde se viene antes de cambiar de pantalla,
      para que «Volver» (js/navegacion.js) sepa adónde volver desde
      cualquier pantalla, no solo desde la ficha. La ficha apunta su
@@ -602,6 +610,14 @@ App.ir = function (cual) {
   Array.prototype.forEach.call(document.querySelectorAll('.pestana'), function (b) {
     b.classList.toggle('activa', b.dataset.pantalla === cual);
   });
+  /* Fila 214: volver a Inicio desde otra pantalla del menú (Archivo,
+     Ajustes…) lo deja normal, sin la zona de "clasificar" a la vista
+     si se había dejado a medias; volver desde una ficha (abierta desde
+     dentro de "clasificar" o no) no toca nada de esto. */
+  if (cual === 'abiertos' && pantallaDeAntes && pantallaDeAntes !== 'abiertos' &&
+      App.E.vista === 'clasificar' && App.irVista) {
+    App.irVista('departamento');
+  }
   if (cual === 'abiertos' && App.pintarAbiertosSiPendiente) App.pintarAbiertosSiPendiente();
   /* Fila 212, docs/INICIO-A-TODO-EL-ANCHO.md, apartado 4: los filtros
      de Inicio empiezan siempre cerrados al entrar. */
