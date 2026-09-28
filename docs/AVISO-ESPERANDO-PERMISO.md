@@ -1,6 +1,9 @@
-# Fila 224 — Aviso «esperando tu respuesta» para el Centro de mando
+# Aviso «esperando tu respuesta» para el Centro de mando
 
 Diseñada con Francisco en una conversación de Cowork el 28-sep-2026. Diseño cerrado.
+
+**Número de fila:** el siguiente libre en `docs/COLA.md` cuando se apunte (no es el 224: ese
+número lo cogió una idea apuntada desde el Centro de mando). Se apunta justo después de la 214.
 
 ## Para qué
 
