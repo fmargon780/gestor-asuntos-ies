@@ -237,17 +237,21 @@ abierto en ellas:
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
-- **De la fila 222 (28-sep-2026), dos acciones que solo puede hacer Francisco desde el panel de
-  Vercel** (esta sesión no tiene acceso al proyecto por la herramienta de Vercel):
-  1. **Asignar el dominio**: proyecto `gestor-de-asuntos` → Settings → Domains → Add
-     `pruebas.fmargon.com` → asignarlo a la rama `pruebas`. Mientras tanto, la copia de pruebas
-     vive en `https://gestor-de-asuntos-git-pruebas-fmargon780s-projects.vercel.app`.
-  2. **Quitar la protección de esa *preview*** para que el revisor de la fila 223 y el propio
-     Francisco desde el móvil puedan entrar sin iniciar sesión en Vercel: Settings → Deployment
-     Protection → Vercel Authentication, y ponerlo en "Only Production Deployments" (o añadir un
-     *bypass* para la rama `pruebas`). Ahora mismo esa dirección pide una cuenta de Vercel con
-     permiso en el proyecto (redirige a `vercel.com/sso-api`), así que nadie más que Francisco
-     puede entrar en ella todavía; el dominio propio del punto 1 no cambia esto por sí solo.
+- **De la fila 222 (28-sep-2026), hecho después con la herramienta de Vercel** (en la primera
+  pasada esta sesión no la veía; en una sesión posterior, sin pasar `teamId`, sí): dominio
+  `pruebas.fmargon.com` asignado al proyecto `gestor-de-asuntos`, a la rama `pruebas`
+  (`add_project_domain`, `verified: true`, el DNS de `fmargon.com` ya está en Vercel). El proyecto
+  ya tenía `ssoProtection.deploymentType: "all_except_custom_domains"` (la protección de Vercel
+  Authentication no se ha tocado, y no hacía falta): con eso, un dominio propio como este queda
+  FUERA de esa protección, así que `https://pruebas.fmargon.com` no debería pedir cuenta de
+  Vercel (solo la sigue pidiendo la dirección `.vercel.app` de la *preview*,
+  `gestor-de-asuntos-git-pruebas-fmargon780s-projects.vercel.app`, que no es un dominio propio).
+  **Sin comprobar por `curl`**: la política de red de este entorno en la nube deniega las
+  conexiones salientes a `pruebas.fmargon.com` (no está en su lista de dominios permitidos; sí
+  lo está `*.vercel.app`), así que ni siquiera llega a intentarlo contra Vercel. Pide a Francisco
+  que entre él mismo en `https://pruebas.fmargon.com` y diga si le pide iniciar sesión; si una
+  sesión futura necesita comprobarlo por su cuenta, hay que añadir `fmargon.com` a los dominios
+  permitidos del entorno (menú del entorno en la barra de título → Edit → Acceso a la red).
 - **El tope diario de despliegues de Vercel es de toda la cuenta, no de este proyecto** (28-sep-2026,
   fila 211, `docs/PUBLICAR-SIN-PARAR.md`). Comprobado con `list_deployments`: el 28-sep-2026, en la
   misma franja horaria, `gestor-de-asuntos` tuvo 28 despliegues y el proyecto `partituras-de-caja-clara`
