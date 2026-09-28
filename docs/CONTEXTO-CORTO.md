@@ -158,6 +158,12 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   Los hitos nuevos de una guía llegan a los asuntos abiertos de su tipo; las tareas se escriben también desde la mesa
   («✎ Cambiar las tareas», sin salir a Ajustes). «Hito N de M», «Hitos N/M» y la mesa, con una sola cuenta.
   Biblioteca de hitos del centro, con sus tareas; en Mantenimiento, cargar tipos, guías y tareas del instituto.
+  Cada hito de una guía dice de dónde viene, siempre a la vista: etiqueta «De la biblioteca», «De la biblioteca ·
+  cambiado aquí» o «Propio de este tipo» (fila 202); pulsarla enseña el modelo y «Ver en la biblioteca». Al
+  escribir el título de un hito nuevo, si se parece a uno de la biblioteca lo dice con «Usarlo»; al guardar uno
+  cambiado, una sola pregunta («¿Solo para este tipo, o también para la biblioteca?», con cuántos tipos más lo
+  usan); «Guardar en la biblioteca» avisa si ya hay uno parecido. El texto para los documentos de un hito o de un
+  tipo de documento avisa si otro sitio ya tiene el mismo texto, y ofrece copiarlo.
   En el editor de un hito, "Comunicación"/"Documentos" ya no son secciones propias (fila 199): al abrir el
   editor, cada plantilla de documento marcada y el texto de comunicación (correo/Séneca, con plantilla nueva
   si hace falta, sin perder un asunto escrito a mano) se convierten solos en tareas del guion, sin duplicar.
