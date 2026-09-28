@@ -273,6 +273,11 @@ de `App` va después del fichero que lo define.
 | `js/estado-hito.js` | La marca «Paso N de M · título» en la tarjeta y en la ficha, «Esperando a…» / «Ya ha llegado», «Estamos en este paso» y la guía mínima (`EstadoHito`, fila 129) |
 | `js/estado-migracion.js` | El paso único de los estados escritos a mano a los hitos, con marca `_GESTOR/estado-migrado.json` (`EstadoMigracion`, fila 129) |
 | `css/hitos.css` | El aspecto de la lista de hitos en la ficha del asunto, y del bloque de Ajustes |
+| `css/demo.css` | La franja fija de la copia de pruebas (fila 222); solo se pide cuando `js/demo/arrancar.js` decide que la visita es de pruebas |
+| `js/demo/arrancar.js` | Fila 222, `docs/COPIA-DE-PRUEBAS.md`: el único fichero de `js/demo/` que se carga siempre (también en producción, por la `Content-Security-Policy`). Decide si la visita es de pruebas (`pruebas.fmargon.com`, una *preview* de la rama `pruebas`, o `?demo=1`) y, si lo es, mete el resto de `js/demo/` con `document.write` |
+| `js/demo/disco.js` | El disco y el almacén de mentira (`window.Demo`: `activar`/`activo`/`disco`/`reiniciar`), misma idea que `pruebas/navegador.mjs` pero dentro de la aplicación publicada |
+| `js/demo/datos.js` | El juego de datos inventados de la copia de pruebas, creado llamando a las mismas funciones que usan las pantallas (`App.crearTipo`, `GuiasDelCentro.guardarPasos`, `App.anotar`, `Hitos.marcar`, `Plantillas.guardar`...), nunca escrito a mano en JSON |
+| `js/demo/franja.js` | La entrada de la copia de pruebas («Entrar con datos de demostración», o sola con `?demo=1&auto=1`) y la franja fija de arriba con «Volver a empezar» |
 | `js/inicio.js` | La última línea: `App.arrancar()` |
 | `js/envolturas-esperadas.js` | El **último** `<script>` de todos (fila 70): compara `U.envolturasAplicadas()` con la lista de las 42 que tienen que estar, y avisa en rojo en la pantalla de entrada si falta alguna (`window.EnvolturasEsperadas`) |
 | `package.json` | Las dependencias de las pruebas (`playwright`, `jsdom`) y `npm test`; `esbuild` (fila 89) para `npm run copia-local` |

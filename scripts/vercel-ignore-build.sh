@@ -5,7 +5,10 @@
 #
 # Sale con 0 para saltarse la publicación, con 1 para publicar.
 # Ante cualquier duda, publica (sale 1).
-if [ "$VERCEL_GIT_COMMIT_REF" != "main" ]; then
+# Fila 222 (docs/COPIA-DE-PRUEBAS.md): la rama "pruebas" también publica
+# (es la copia de pruebas, pruebas.fmargon.com); las demás ramas de
+# trabajo (claude/**) se siguen saltando, como hasta ahora.
+if [ "$VERCEL_GIT_COMMIT_REF" != "main" ] && [ "$VERCEL_GIT_COMMIT_REF" != "pruebas" ]; then
   exit 0
 fi
 

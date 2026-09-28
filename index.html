@@ -1391,6 +1391,15 @@
      carga el contenido de la biblioteca del centro, en Mantenimiento. -->
 <script src="js/cargar-biblioteca.js"></script>
 
+<!-- Fila 222, docs/COPIA-DE-PRUEBAS.md: decide si esta visita es la copia
+     de pruebas y, si lo es, mete el resto de js/demo/ con document.write
+     (la Content-Security-Policy no deja hacerlo en línea). Va aquí,
+     justo antes de arrancar, porque necesita que todos los módulos de
+     arriba (Guias, Hitos, Campos, Plantillas, Nombres, Carpetas...) ya
+     estén cargados, y antes de que App.arrancar() (al final de
+     js/inicio.js) llame a Almacen.leer, que usa indexedDB. -->
+<script src="js/demo/arrancar.js"></script>
+
 <!-- Y ahora sí, a arrancar. -->
 <script src="js/inicio.js"></script>
 <!-- Fila 209, docs/INICIO-EN-PESTANAS.md: las pestañas y la tabla

@@ -49,6 +49,21 @@ Las carpetas señaladas y el nombre de usuario se guardan en el navegador (Index
 sección 6) **atados a la dirección de la web**: si la dirección cambia, hay que volver a
 señalarlas.
 
+**Copia de pruebas** (fila 222, 28-sep-2026, `docs/COPIA-DE-PRUEBAS.md`): la rama `pruebas` del
+mismo repositorio y del mismo proyecto de Vercel se publica en **https://pruebas.fmargon.com**
+(o, mientras no se asigne el dominio a mano, en la dirección automática de su *preview*). Ahí no
+se señala ninguna carpeta: «Entrar con datos de demostración» (o `?demo=1&auto=1`) activa, dentro
+de la propia aplicación publicada, un disco y un almacén de mentira en memoria (`js/demo/disco.js`,
+misma idea que `pruebas/navegador.mjs`) y construye un juego de datos inventados llamando a las
+mismas funciones que usan las pantallas (`js/demo/datos.js`: nunca JSON escrito a mano). Nada se
+guarda de verdad: recargar, o «Volver a empezar», deja todo como al principio. `js/demo/arrancar.js`
+es el único fichero de esa carpeta que se descarga siempre (la Content-Security-Policy no deja
+decidirlo con un script en línea); el resto (`disco.js`, `datos.js`, `franja.js`, `css/demo.css`)
+solo se pide cuando la visita es de pruebas, así que en `asuntos.fmargon.com` no se descarga nada
+de ellos. Es la primera de las dos filas del método «purgar los fallos antes de producción»: la
+segunda, `docs/REVISOR-ANTES-DE-PUBLICAR.md` (fila 223), hará que el código se trabaje primero en
+esta rama y solo pase a `main` con el visto bueno de un revisor.
+
 Decisiones de diseño:
 
 - Nuevo asunto empieza por la persona (fila 197): un buscador único busca en todas las

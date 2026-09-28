@@ -25,6 +25,11 @@ Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
 - **Un solo proyecto de Vercel** (`gestor-de-asuntos`). No crear otro.
 - **Cada dirección es un sitio distinto para el navegador**: al cambiarla hay que volver a
   señalar las carpetas y entrar. Los ajustes del centro viven en `_GESTOR`.
+- Copia de pruebas con datos inventados (fila 222): rama `pruebas`, dirección
+  **https://pruebas.fmargon.com** (o, mientras no se asigne el dominio a mano en Vercel, la
+  dirección automática de la *preview* de esa rama). «Entrar con datos de demostración», o
+  `?demo=1&auto=1` directo: sin señalar ninguna carpeta, nada se guarda, y producción nunca la
+  carga.
 
 ## 2. Quién es Francisco, y cómo escribirle
 
@@ -185,6 +190,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Archivar/reabrir sobre un destino que ya existe fusiona. Crear, reabrir o cambiar deja en la ficha; Volver, a donde estaba.
 - Al archivar, la ficha baja a su carpeta (al reabrir, vuelve) y se hace el índice del expediente
   (PDF numerado; también desde el menú de la ficha).
+- Copia de pruebas (fila 222, `docs/COPIA-DE-PRUEBAS.md`): rama `pruebas`, con «Entrar con datos
+  de demostración» (disco de mentira en memoria, datos inventados creados con las mismas
+  funciones de las pantallas); «Volver a empezar» deja todo como al principio. En producción no
+  se carga nada de `js/demo/` salvo el guion que decide si toca.
 
 ## 6. Reglas de código que no se pueden olvidar
 
