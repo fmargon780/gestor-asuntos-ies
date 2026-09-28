@@ -1,68 +1,108 @@
 /* ============================================================
-   tablon.css — el tablón de notas rápidas, a la derecha de los
-   asuntos abiertos.
+   tablon.css — el tablón de notas rápidas (28-sep-2026, fila 212,
+   docs/INICIO-A-TODO-EL-ANCHO.md): ya no es una columna a la derecha
+   de los asuntos abiertos; vive compacto en la propia cabecera de
+   Inicio (css/inicio.css, `.inicio-tablon-hueco`), con la lista entera
+   por encima de la página (`.tablon-overlay`) cuando hace falta.
    ============================================================ */
 
-/* La pantalla pasa a tener dos columnas: los asuntos a la izquierda y
-   el tablón a la derecha. Las filas van sin separación para que las
-   piezas de la izquierda queden como estaban. */
-#pantalla-abiertos.con-tablon {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  column-gap: 24px;
-  row-gap: 0;
-  align-items: start;
-}
-#pantalla-abiertos.con-tablon > * { grid-column: 1; min-width: 0; }
-#pantalla-abiertos.con-tablon > #tablon {
-  grid-column: 2;
-  grid-row: 1 / span 30;
-  align-self: start;
-  position: sticky;
-  top: 22px;
-}
-
-#tablon {
-  background: var(--papel);
-  border: 1px solid var(--linea);
-  border-radius: var(--radio);
-  box-shadow: var(--sombra);
-  padding: 14px 15px 16px;
-  max-height: calc(100vh - 60px);
-  overflow-y: auto;
+#tablon.tablon-compacto {
+  position: relative;   /* para anclar el overlay dentro (position: absolute) */
+  width: 100%;
 }
 
 .tablon-cabecera {
   display: flex; align-items: center; gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
 }
-.tablon-titulo { font-weight: 600; font-size: 16px; }
+.tablon-titulo { font-weight: 600; font-size: 13.5px; }
+.tablon-cabecera .cuenta-lista { font-size: 12px; }
 
-/* ---------- escribir una nota ---------- */
+/* ---------- escribir una nota: una línea cerrada, se abre con el
+   resto al pulsarla (js/tablon-compacto.js, `formulario`) ---------- */
 
-.tablon-nueva { margin-bottom: 14px; }
-.tablon-nueva textarea { resize: vertical; font-size: 14px; }
+.tablon-nueva textarea {
+  width: 100%; resize: none; font-size: 13px;
+  padding: 5px 8px;
+}
+.tablon-nueva-abierta textarea { resize: vertical; }
 .tablon-fila {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 8px; margin-top: 8px;
+  gap: 8px; margin-top: 6px;
 }
 .tablon-colores { display: flex; gap: 6px; }
 .tablon-color {
-  width: 20px; height: 20px; padding: 0;
+  width: 18px; height: 18px; padding: 0;
   border: 1px solid rgba(0,0,0,.18); border-radius: 50%;
   cursor: pointer; background: #fff;
 }
 .tablon-color.elegido { box-shadow: 0 0 0 2px var(--azul); }
-.tablon-fecha { width: 145px; font-size: 13px; padding: 6px 8px; }
-.tablon-pegar { width: 100%; margin-top: 8px; padding: 8px; }
+.tablon-fecha { width: 130px; font-size: 12.5px; padding: 5px 7px; }
+.tablon-pegar { width: 100%; margin-top: 6px; padding: 6px; font-size: 13px; }
 
 .tablon-vacio {
-  color: var(--tinta-suave); font-size: 13px; line-height: 1.5;
-  border: 1px dashed var(--linea); border-radius: 8px;
-  padding: 14px; text-align: center;
+  color: var(--tinta-suave); font-size: 12.5px; line-height: 1.4;
+  padding: 6px 2px;
 }
 
-.tablon-ver-hechas { display: block; margin: 12px auto 0; font-size: 13px; }
+.tablon-ver-mas, .tablon-ver-hechas { display: block; margin: 6px auto 0; font-size: 12.5px; }
+
+/* ---------- cada fila compacta (fila 212): una línea, cortada con
+   «…», con el menú de siempre a la derecha ---------- */
+
+.tablon-fila-compacta {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 2px; margin-top: 2px;
+  border-left: 3px solid; border-radius: 3px;
+  padding-left: 6px; cursor: pointer;
+  font-size: 12.5px;
+}
+.tablon-fila-compacta.color-amarillo { border-color: #e3d074; }
+.tablon-fila-compacta.color-azul     { border-color: #a9c9e6; }
+.tablon-fila-compacta.color-verde    { border-color: #a7d8b8; }
+.tablon-fila-compacta.color-rosa     { border-color: #f0b8c8; }
+.tablon-fila-compacta:hover { background: var(--fondo-hover, #f6f9fc); }
+.tablon-fila-compacta-texto {
+  flex: 1 1 auto; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tablon-fila-compacta-fecha {
+  flex: 0 0 auto; font-size: 11px; font-weight: 600; color: var(--tinta-suave);
+}
+.tablon-fila-compacta-fecha.papel-hoy { color: var(--azul); }
+.tablon-fila-compacta-fecha.papel-atrasada { color: var(--rojo-linea, #a4302a); }
+.tablon-fila-compacta-privada { flex: 0 0 auto; font-size: 11px; }
+.tablon-fila-compacta .fila-menu-btn { background: none; border: 0; box-shadow: none; padding: 2px 4px; }
+
+/* ---------- la lista entera, por encima de la página ("y N más" /
+   "Ver las hechas"; fila 212, apartado 3) ---------- */
+
+.tablon-overlay {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 40;
+  width: 340px;
+  max-width: calc(100vw - 24px);
+  max-height: 70vh;
+  overflow-y: auto;
+  margin-top: 6px;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  box-shadow: 0 8px 24px rgba(20, 30, 45, .18);
+  padding: 12px 14px 14px;
+}
+.tablon-overlay-cabecera {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.tablon-overlay-cabecera .tablon-titulo { font-size: 15px; }
+.tablon-overlay-cerrar {
+  background: none; border: 0; cursor: pointer;
+  font-size: 14px; color: var(--tinta-suave); padding: 2px 6px;
+}
+.tablon-overlay-cerrar:hover { color: inherit; }
 
 /* ---------- la nota que solo ve quien la escribió ---------- */
 
@@ -81,7 +121,7 @@
   color: #6b6650;
 }
 
-/* ---------- cada papel ---------- */
+/* ---------- cada papel (dentro del overlay) ---------- */
 
 .papel {
   border: 1px solid; border-radius: 8px;
@@ -115,11 +155,3 @@
 
 .papel-botones { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
 .papel-boton { padding: 3px 7px; font-size: 11.5px; border-radius: 6px; }
-
-/* En pantalla estrecha el tablón se va abajo, a lo ancho. */
-@media (max-width: 1100px) {
-  #pantalla-abiertos.con-tablon { display: block; }
-  #pantalla-abiertos.con-tablon > #tablon {
-    position: static; max-height: none; margin-top: 24px;
-  }
-}
