@@ -105,6 +105,14 @@ El texto adicional del nombre («matrícula 2º ESO B») se escribía a mano cad
     obliga a nada. Lo que la fila 174 ya rellena (fecha y número de registro leídos del PDF) manda
     sobre esto y no se toca.
 
+**La guardia de parecidos** (28-sep-2026, fila 202, docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md, apartado
+3, punto 4): al escribir el «Texto por defecto» de un tipo de documento (`App.
+editarTextoPorDefectoDocumento`, `js/ajustes-centro.js`), si otro hito, otro modelo de la biblioteca
+o el «Texto por defecto» de otro tipo de documento ya tiene ese mismo texto (salvo tildes,
+mayúsculas y espacios), avisa de dónde sale y ofrece copiarlo tal cual
+(`GuiasBiblioteca.textoDocumentosParecido`, detalle completo en `docs/contexto/HITOS-Y-GUIAS.md`).
+Mismo aviso al escribir el texto de un hito, en el editor de la guía.
+
 Se comprueba con `pruebas/texto-del-documento-propuesto.mjs` (parte 1, sin navegador, la regla de
 prioridad; parte 2, en navegador: el editor del paso, la biblioteca, `Hitos.pasoAHito` y las cuatro
 combinaciones del cuadro — con texto e hito propios, solo con el tipo, sin nada, y sin ningún hito).
