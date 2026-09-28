@@ -63,8 +63,13 @@ App.refrescarVista = function () {
     $('vista-nombre').textContent = '';
     $('vista-ruta').textContent = '';
     $('btn-crear').disabled = true;
+    /* Fila 215: el botón está siempre a la vista; en gris, dice qué falta. */
+    $('btn-crear').textContent = !App.E.nuevo.tercero && !App.E.nuevo.tipo
+      ? 'Falta elegir la persona y el tipo de asunto'
+      : (!App.E.nuevo.tercero ? 'Falta elegir la persona' : 'Falta elegir el tipo de asunto');
     return;
   }
+  $('btn-crear').textContent = 'Crear el asunto';
   var d = App.datosDelFormulario();
   var ajustado = nombreDeCarpetaAjustado(d);
   var nombre = ajustado.nombre;
