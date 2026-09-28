@@ -34,8 +34,16 @@ App.vistaGuardada = function () {
    App.E.vista, ha desaparecido). App.irVista se queda solo con lo que
    sigue haciendo falta: «Ver todo» (App.E.vista === 'clasificar')
    enseña #zona-clasificar (sueltos y correos) a pantalla completa; el
-   resto de valores de App.E.vista solo pliega la bandeja y repinta. */
-App.irVista = function (cual) {
+   resto de valores de App.E.vista solo pliega la bandeja y repinta.
+
+   `soloQue` (fila 212, docs/INICIO-A-TODO-EL-ANCHO.md, opcional, nunca
+   rompe a quien llama con un solo parámetro): 'correos' o 'documentos'
+   deja #zona-clasificar enseñando solo esa parte, con un enlace "Ver
+   también…" para volver a las dos juntas (App.pintarSoloQueClasificar,
+   más abajo). Lo usan los dos enlaces de "Ha llegado" (js/inicio.js);
+   el botón de siempre (o cualquier otro sitio que llame sin este
+   parámetro) sigue enseñando las dos juntas, como toda la vida. */
+App.irVista = function (cual, soloQue) {
   App.E.vista = App.VISTAS.indexOf(cual) !== -1 ? cual : 'departamento';
   try { window.localStorage.setItem('vista-abiertos', App.E.vista); } catch (e) {}
 
@@ -44,12 +52,38 @@ App.irVista = function (cual) {
   });
   var esClasificar = App.E.vista === 'clasificar';
   $('zona-clasificar').classList.toggle('oculto', !esClasificar);
-  /* La bandeja de correos arranca siempre plegada al entrar aquí, se
-     dejara como se dejara la última vez (fila 27, 17-sep-2026): sin
-     memoria en localStorage, a propósito. */
-  if (esClasificar && window.BandejaPantalla) window.BandejaPantalla.plegar();
+
+  if (esClasificar) {
+    App.E.soloQueClasificar = (soloQue === 'correos' || soloQue === 'documentos') ? soloQue : '';
+    App.pintarSoloQueClasificar();
+    /* La bandeja de correos arranca siempre plegada al entrar aquí, se
+       dejara como se dejara la última vez (fila 27, 17-sep-2026): sin
+       memoria en localStorage, a propósito. Con "solo correos" (fila
+       212) arranca desplegada, porque es lo único que hay que ver. */
+    if (window.BandejaPantalla) {
+      if (App.E.soloQueClasificar === 'correos') window.BandejaPantalla.desplegar();
+      else window.BandejaPantalla.plegar();
+    }
+  }
 
   App.pintarSueltos();
+};
+
+/* El enlace "Ver también los correos"/"Ver también los documentos" de
+   la cabecera de #zona-clasificar, y las clases que esconden la mitad
+   que no toca. Aparte de App.irVista (al entrar), lo repinta
+   js/inicio.js cada vez que cambian las cuentas de "Ha llegado". */
+App.pintarSoloQueClasificar = function () {
+  var zona = $('zona-clasificar');
+  var enlace = $('sueltos-ver-tambien');
+  if (!zona || !enlace) return;
+  var cual = App.E.soloQueClasificar || '';
+  zona.classList.toggle('solo-correos', cual === 'correos');
+  zona.classList.toggle('solo-documentos', cual === 'documentos');
+  enlace.classList.toggle('oculto', !cual);
+  if (!cual) return;
+  enlace.textContent = cual === 'correos' ? 'Ver también los documentos' : 'Ver también los correos';
+  enlace.onclick = function () { App.irVista('clasificar'); };
 };
 
 Array.prototype.forEach.call(document.querySelectorAll('.panel'), function (b) {
