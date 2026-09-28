@@ -172,6 +172,7 @@ App.fijarTercero = function (p) {
     caja.classList.add('oculto');
     $('bloque-detalles').classList.add('oculto');
     App.pintarTipos();
+    App.refrescarVista();   /* fila 215: el botón vuelve a decir qué falta */
     $('buscar-tercero').focus();
   };
 
