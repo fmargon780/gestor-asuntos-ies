@@ -260,6 +260,40 @@ como **copia**.
   `docs/contexto/DOCUMENTOS.md`, «El nombre y el registro de un documento»): nunca obligan a nada,
   siempre se pueden cambiar antes de guardar. Un hito de una opción de una pregunta, ninguno de los
   dos (igual que `soloInformativo`).
+- **De dónde viene cada hito, y la biblioteca se ofrece sola** (28-sep-2026, fila 202,
+  docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md, apartados 2 y 3; código nuevo repartido en
+  `js/guias-biblioteca-guardias.js`, `js/guias-biblioteca-ajustes.js` y `js/guias-paso-bloques.js`,
+  sacados de `js/guias-biblioteca.js` que volvía a pasar de 400 líneas):
+  - **La etiqueta de origen** (`GuiasBiblioteca.chipOrigenHTML`/`engancharChipOrigen`), junto al
+    título de cada paso, siempre a la vista (no dentro de ningún `<details>`, así que el acordeón
+    del paso no la esconde): «De la biblioteca» (`origenBiblioteca` sin `divergido`), «De la
+    biblioteca · cambiado aquí» (con `divergido`) o «Propio de este tipo» (sin `origenBiblioteca`).
+    Pulsarla, si viene de la biblioteca, abre un panel con el nombre del modelo y «Ver en la
+    biblioteca», que llama a `GuiasBiblioteca.editarModeloPorId` (el mismo editor que «Cambiar» del
+    bloque de Ajustes; al abrirlo, el cuadro de la guía que estuviera abierto se da por cancelado,
+    como pulsar Cancelar, porque solo puede haber un `#capa`).
+  - **La biblioteca se ofrece sola al escribir el título** (`GuiasBiblioteca.
+    modelosParecidosATitulo`, con `U.parecidos`): desde tres letras, si hay un modelo parecido, sale
+    debajo del campo «En la biblioteca hay "…" · Usarlo»; pulsar «Usarlo» sustituye el paso a medio
+    escribir por `HitosBiblioteca.modeloAPaso(modelo)`, igual que «+ Traer de la biblioteca». Si no
+    se pulsa, el paso sigue siendo propio.
+  - **La pregunta de una sola frase** al guardar un paso que ha cambiado (sustituye a "Solo en este
+    tipo"/"Subir también" de más arriba): «¿Este cambio es solo para <TIPO>, o también para la
+    biblioteca? (lo usan N tipos más)» → «Solo aquí» / «También en la biblioteca»
+    (`GuiasBiblioteca.preguntaCambioSoloAqui`/`otrosTiposQueUsan`, que relee `guias.json` entero para
+    contar los tipos, como ya hacía `borrarModelo`).
+  - **«Guardar en la biblioteca» avisa de un modelo parecido** por el título (`U.parecidos`) antes de
+    crear uno nuevo: «Ya hay uno parecido: "…". ¿Crear otro o usar ese?»; «Usar ese» liga el paso al
+    modelo existente con `divergido: true` (conserva lo escrito aquí, no lo pisa con el modelo).
+  - **La guardia de parecidos del texto de los documentos** (`GuiasBiblioteca.
+    textoDocumentosParecido(texto, evitar)`): al escribir el texto de un hito
+    (`js/guias-paso-bloques.js`) o el «Texto por defecto» de un tipo de documento
+    (`js/ajustes-centro.js`, `App.editarTextoPorDefectoDocumento`), compara (con `U.normalizar`, salvo
+    tildes/mayúsculas/espacios) contra cualquier otro hito de `guias.json`, cualquier modelo de la
+    biblioteca y el «Texto por defecto» de cualquier otro tipo de documento; si hay uno igual, avisa
+    de dónde sale («Ese mismo texto ya lo tiene…») y ofrece copiarlo tal cual. `evitar` (`{pasoId}`,
+    `{modeloId}` o `{tipoDocumento}`) es el propio sitio donde se escribe, para no avisar de que se
+    parece a sí mismo.
 - **Normativa** (apartado 4.7, `js/hitos-normativa.js`; enlace retocado la fila 87,
   `docs/ENLACE-AL-ARTICULO-DE-NORMATIVA.md`): campo `normativa`, lista de
   `{ cita, bloque, clave, url }`. Con `clave`, el enlace abre la vista de un solo artículo del
