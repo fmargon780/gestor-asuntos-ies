@@ -165,11 +165,16 @@
     });
     caja.appendChild(texto);
 
+    /* Fila 212 (docs/INICIO-A-TODO-EL-ANCHO.md, apartado 2): "Ocultar
+       por hoy" pasa de botón de texto a una ✕ pequeña, porque el cuadro
+       ya no ocupa todo el ancho: solo mide lo que mide su texto. */
     var ocultar = document.createElement('button');
     ocultar.type = 'button';
     ocultar.id = 'avisos-linea-ocultar';
-    ocultar.className = 'boton avisos-linea-ocultar';
-    ocultar.textContent = 'Ocultar por hoy';
+    ocultar.className = 'avisos-linea-ocultar';
+    ocultar.title = 'Ocultar por hoy';
+    ocultar.setAttribute('aria-label', 'Ocultar por hoy');
+    ocultar.textContent = '✕';
     ocultar.onclick = ocultarPorHoy;
     caja.appendChild(ocultar);
   }
