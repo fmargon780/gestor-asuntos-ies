@@ -16,7 +16,13 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
    PENDIENTE**, la publica, comprueba la publicación y **para**. Si al empezar hay una fila EN
    CURSO, no se coge otra: se mira qué quedó en `main` y se termina esa. Las cláusulas comunes de
    las filas 188 en adelante (a `main` sin pull request, como mucho tres subidas, nada se sube con
-   `npm test` en rojo) están en ese mismo documento.
+   `npm test` en rojo) están en ese mismo documento. **«Comprueba la publicación» no es lo mismo que
+   «espera a que Vercel publique»** (28-sep-2026, `docs/PUBLICAR-SIN-PARAR.md`): si Vercel no
+   publica por una causa ajena a este repositorio (tope diario de despliegues, publicación que no
+   arranca, cola de más de 20 minutos), la fila se deja **SIN PUBLICACIÓN COMPROBADA** y la sesión
+   para con normalidad, sin quedarse esperando; el siguiente lanzamiento sigue con la fila
+   siguiente. Solo una publicación **rota por el código de esta fila** (la construcción falla, la
+   web da error, falta un fichero) sigue obligando a arreglarla antes de seguir.
 1. Lee antes `docs/CONTEXTO.md`.
 2. Coge la primera instrucción con estado **PENDIENTE**, leyendo la tabla **de arriba abajo**. Ojo:
    desde el 18-sep-2026 la tabla está en orden de trabajo, no de número, así que la primera
@@ -93,12 +99,18 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     ejemplo `js/version.js?v=<algo distinto>`). Si `App.VERSION` publicada se queda atrás varios
     minutos, puede que Vercel no haya llegado a lanzar la publicación de los últimos commits (sin
     error visible: sencillamente no hay ninguna `deployment` para esos SHA). Pasó el 24-sep-2026
-    con la fila 63 (`216bff3a`, ~40 min sin publicarse). Si tienes acceso a la herramienta MCP de
-    Vercel, `list_deployments` con el `sha` del commit lo confirma, y un `create_deployment` con
-    `deploymentId` de la última publicación buena y `withLatestCommit: true` (`target: production`)
-    fuerza una nueva publicación desde el commit actual de `main` sin tocar el repositorio. Si no
-    tienes esa herramienta, déjalo anotado aquí para que otra sesión lo compruebe: no reintentes
-    subidas del mismo fichero pensando que el problema está en el contenido.
+    con la fila 63 (`216bff3a`, ~40 min sin publicarse), y el 28-sep-2026 con el tope diario de
+    despliegues agotado (`docs/PUBLICAR-SIN-PARAR.md`, fila 211: el tope es de toda la cuenta de
+    Vercel, no solo de este proyecto, y otro proyecto de Francisco puede agotarlo él solo). Si
+    tienes acceso a la herramienta MCP de Vercel, `list_deployments` con el `sha` del commit lo
+    confirma. **Como mucho un `create_deployment` a mano por sesión** (con `deploymentId` de la
+    última publicación buena y `withLatestCommit: true`, `target: production`, para forzar una
+    publicación desde el commit actual de `main` sin tocar el repositorio): si responde 402
+    «Resource is limited», no se reintenta, se apunta el motivo y la fila queda **SIN PUBLICACIÓN
+    COMPROBADA** (regla 0) en vez de bloquear la cola. Si no tienes esa herramienta, déjalo anotado
+    aquí igualmente. Al empezar la siguiente fila, comprueba primero las filas SIN PUBLICACIÓN
+    COMPROBADA que hubiera: si la web ya sirve una `App.VERSION` igual o posterior a la suya, pásalas
+    a HECHA en la misma subida que marca la nueva fila EN CURSO.
 
 ## Reglas para Francisco
 
@@ -174,9 +186,9 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 197 | `docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md`, entero, con los ficheros que faltaban (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 197) | HECHA y publicada (27-sep-2026 20:53). Buscador único en las seis categorías, parrilla de tipos limitada a la categoría de la persona (o todos con etiqueta, sin ella), resumen de la guía en una línea, y «Crear» abre la mesa del primer hito. Prueba nueva `pruebas/nuevo-asunto-persona-primero.mjs`; varias pruebas viejas puestas al día. Trabajo original de otra sesión (PR cerrado #147), revisado, adaptado al `main` de después de las filas 193-196 y comprobado por esta sesión antes de fusionar: detalle en `docs/HISTORIA.md`. `npm test` completo (170 ficheros) en verde, comprobado dos veces de forma independiente. PR #150 fusionado (`86b47a6`). Publicación comprobada por `curl`: `App.VERSION` `27-sep-2026 · 20:53`, `js/avisos-lo-pide.js` y `js/cuentas-informe.js` ya en la web publicada. **Nota**: el despliegue automático de Vercel no arrancó solo para este commit (más de 20 minutos sin ninguna publicación en marcha, ni cancelada ni en cola, algo que no había pasado en ninguna fila anterior de esta sesión); se lanzó a mano con la herramienta de Vercel (`create_deployment`) apuntando al commit fusionado, y desde ahí terminó con normalidad. Conviene que Francisco lo tenga en cuenta por si vuelve a pasar |
 | 198 | `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartados 1, 2, 3, 5 y 8: la pantalla del tipo (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 198) | HECHA y publicada (27-sep-2026 22:12). Lista de comprobación nueva arriba de la pantalla del tipo (`js/ajustes-tipo-comprobacion.js`); todo se guarda al cambiar, sin botones «Guardar campos»/«Guardar palabras clave»; el plazo se edita solo en «Datos del tipo» (tarjeta de la rejilla de solo lectura); los campos propios se crean y borran solo desde dentro de cada tipo; texto desfasado del editor de la guía actualizado. Implementado por un agente siguiendo un plan detallado, revisado por esta sesión: se encontró y arregló un bloqueo real (cola de `campos.json` anidada dentro de otra cola del mismo fichero, en `js/tipos-nombre.js` al renombrar un tipo), detectado porque `pruebas/tipos-nombre.mjs` se quedaba colgada 15 s de forma repetible (3/3, no CPU). `npm test` completo (171 ficheros) en verde, comprobado dos veces de forma independiente, más una prueba de estrés de escrituras concurrentes en `campos.json`. PR #152 fusionado (`8ca0fa7`). Publicación comprobada por `curl`: `App.VERSION` `27-sep-2026 · 22:12` y `js/ajustes-tipo-comprobacion.js` ya en la web publicada |
 | 199 | `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartado 4: documentos y comunicaciones como tareas (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 199) | HECHA y publicada (28-sep-2026 01:59). Implementada por otra sesión (`0dc4e71`) en paralelo a esta (regla 0 saltada sin que ninguna lo supiera); esta sesión, al descubrirlo, revisó lo ya publicado y corrigió dos cosas que no cumplían decisiones ya dadas por Francisco (el asunto de correo escrito a mano se perdía; con correo y Séneca con texto distinto solo salía un aviso, no dos) y un tercer fallo real (un solo canal con texto se disparaba por el canal equivocado), más la limpieza del editor que se había quedado a medias (subpasos, `js/guias-comunicacion.js` borrado, `js/guias-documentos.js` recortado). PR #154, fusionado (`218248b`). Detalle completo en `docs/HISTORIA.md`. `npm test` completo (171 ficheros) en verde, comprobado dos veces de forma independiente (`CHROMIUM_PATH=/opt/pw-browsers/chromium`, necesario en el entorno de esta sesión). Publicación comprobada por `curl`: `App.VERSION` `28-sep-2026 · 01:59`, `js/guias-editor.js` con `textoDelCanal`/`tareaComunicar` (la corrección) ya en la web publicada, y `js/guias-comunicacion.js` da 404 (borrado de verdad); confirmado también con la herramienta de Vercel (`list_deployments`, commit `218248b`, `READY`, producción; la publicación automática no se disparó sola —tardanza ya vista otras veces— y se lanzó a mano con `create_deployment`) |
-| 200 | `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartados 6 y 7: El centro y la pestaña «Herramientas» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 200) | SIN PUBLICACIÓN COMPROBADA (28-sep-2026). Código fusionado en `main` (PR #156, commit `8d4efc8`), `npm test` completo en verde (172 ficheros) en esta sesión. La publicación de Vercel no se ha podido comprobar: no ha llegado a `list_deployments` ningún despliegue para `8d4efc8` (ni siquiera en cola), y `curl` contra la web publicada sigue sirviendo `App.VERSION` `28-sep-2026 · 01:59` (de antes de esta fila) y `js/herramientas.js` da 404. Al intentar disparar un despliegue a mano con la herramienta de Vercel, la API respondió 402 «Resource is limited» (tope diario de 100 despliegues por API agotado, se restablece hacia las 03:08 del 29-sep-2026 según la propia respuesta). **Decisión de Francisco (28-sep-2026)**: mientras Vercel esté bloqueado, la cola sigue fila a fila (programar, probar, fusionar), dejando cada una SIN PUBLICACIÓN COMPROBADA en vez de parar; cuando se levante el tope se comprueban todas de golpe y se pasan a HECHA |
-| 201 | `docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md`, apartados 1 y 4: el nombre sale propuesto (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 201) | SIN PUBLICACIÓN COMPROBADA (28-sep-2026). Código fusionado en `main` (PR #159, commit `176649a`), `npm test` completo en verde (173 ficheros). Sigue sin poderse comprobar la publicación de Vercel: la web sigue sirviendo `App.VERSION` `28-sep-2026 · 01:59` (de antes de la fila 200), por el mismo tope diario agotado. La cola sigue (norma de `docs/PUBLICAR-SIN-PARAR.md`, fila 211): esta fila y la 200 se comprobarán juntas en cuanto Vercel vuelva a publicar |
-| 211 | `docs/PUBLICAR-SIN-PARAR.md` (el tope diario de Vercel no para la cola; investigar qué gastó las 100 publicaciones del 28-sep-2026 y cortar lo que sobre) | EN CURSO (28-sep-2026) |
+| 200 | `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartados 6 y 7: El centro y la pestaña «Herramientas» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 200) | HECHA y publicada (28-sep-2026 04:04). Quedó SIN PUBLICACIÓN COMPROBADA por el tope diario de Vercel (402, `docs/PUBLICAR-SIN-PARAR.md`); Vercel volvió a publicar solo, sin que hiciera falta ningún despliegue a mano. Comprobado por `curl`: `App.VERSION` `28-sep-2026 · 04:04`, `js/herramientas.js` ya responde 200 (antes 404). PR #156 (commit `8d4efc8`), fusionado en el despliegue `dpl_AUvDC2B97z8EKHKZZHmrafAy5Tgs` (commit `176649a`, `READY`, producción, confirmado con `list_deployments`) |
+| 201 | `docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md`, apartados 1 y 4: el nombre sale propuesto (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 201) | HECHA y publicada (28-sep-2026 04:04). Igual que la 200: quedó sin comprobar por el tope diario de Vercel, que se recuperó solo. Comprobado por `curl`: `App.VERSION` `28-sep-2026 · 04:04` y `js/documentos-formulario.js` ya trae `propuestaDesdeHito`. PR #159 fusionado en `176649a`, publicado en `dpl_AUvDC2B97z8EKHKZZHmrafAy5Tgs` (`READY`, producción) |
+| 211 | `docs/PUBLICAR-SIN-PARAR.md` (el tope diario de Vercel no para la cola; investigar qué gastó las 100 publicaciones del 28-sep-2026 y cortar lo que sobre) | HECHA (28-sep-2026 04:09). Reglas 0 y 19 de esta cola puestas al día con el mismo texto que `CLAUDE.md`. Investigado con `list_deployments`: el tope es de toda la cuenta de Vercel; el mismo día, el proyecto `partituras-de-caja-clara` (otra sesión) gastó tantos despliegues como este. Este repositorio ya tenía el `ignoreCommand`/`git.deploymentEnabled` que pide `docs/NO-GASTAR-PUBLICACIONES.md`: nada que cortar por este lado. Detalle y lo que queda por decidir con Francisco (separar cuentas, plan, coordinación) en `docs/HISTORIA.md` y en «Lo que queda por hablar con Francisco». Solo documentación: sin código que publicar en Vercel |
 | 202 | `docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md`, apartados 2 y 3: de dónde viene cada hito, y la biblioteca se ofrece sola (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 202) | PENDIENTE (27-sep-2026) |
 | 203 | `docs/PAPELERA-SE-VACIA-SOLA.md`, entero, con `js/copias.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 203) | PENDIENTE (27-sep-2026) |
 | 204 | `docs/COMPROBACION-AL-ENTRAR.md`, entero, con `js/cabecera-fija.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 204) | PENDIENTE (27-sep-2026) |
@@ -211,6 +223,18 @@ abierto en ellas:
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
+- **El tope diario de despliegues de Vercel es de toda la cuenta, no de este proyecto** (28-sep-2026,
+  fila 211, `docs/PUBLICAR-SIN-PARAR.md`). Comprobado con `list_deployments`: el 28-sep-2026, en la
+  misma franja horaria, `gestor-de-asuntos` tuvo 28 despliegues y el proyecto `partituras-de-caja-clara`
+  (otra app de Francisco, sesión de Claude Code aparte) tuvo también 28, varios de ellos anotando
+  «límite diario agotado» por su cuenta, dos veces en el mismo día. Este repositorio ya tenía puesto
+  lo que pide `docs/NO-GASTAR-PUBLICACIONES.md` (`vercel.json`: `ignoreCommand` que salta la
+  publicación si el commit solo toca `docs/`/`pruebas/`/`.github/`/`*.md`, y
+  `git.deploymentEnabled.claude/**: false` para no publicar previews de las ramas de trabajo), así
+  que no hay más que cortar por este lado. Lo que sí decide Francisco: si quiere separar los dos
+  proyectos en cuentas de Vercel distintas, subir de plan, o coordinar de alguna forma cuándo
+  trabaja cada cola, para que una no le quite el cupo a la otra un día muy activo en las dos a la
+  vez.
 - ~~Aviso importante (27-sep-2026, ~16:56): dos sesiones de Claude Code han trabajado en este
   repositorio a la vez, saltándose la regla 0 de esta cola.~~ **Resuelto (27-sep-2026, ~17:08),
   hablado con Francisco.** Fueron tres sesiones a la vez, no dos: además de la que subió

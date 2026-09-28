@@ -5,6 +5,50 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 28-sep-2026 — Fila 211: el tope de Vercel no para la cola
+
+`docs/PUBLICAR-SIN-PARAR.md`. El 28-sep-2026 de madrugada Vercel dejó de publicar
+`gestor-de-asuntos`: la API respondió 402 «Resource is limited» (`api-deployments-free-per-day`,
+tope de 100 publicaciones al día del plan gratuito). Con la norma de entonces («si no se puede
+comprobar, no se empieza otra fila»), la cola se habría quedado parada por algo que no tiene nada
+que ver con el código. Francisco decidió, y ya está escrito en `CLAUDE.md`: el tope de Vercel no
+para la cola. Se sigue trabajando, la fila queda **SIN PUBLICACIÓN COMPROBADA** con el motivo, y al
+empezar la siguiente se comprueban las que quedaron así (si la web ya sirve una `App.VERSION` igual
+o posterior, pasan a HECHA sin gastar una subida más).
+
+**Qué gastó las 100 publicaciones del día (punto 2 del encargo).** Con `list_deployments`: en la
+misma franja horaria, `gestor-de-asuntos` tuvo 28 despliegues y **el proyecto
+`partituras-de-caja-clara`** (otra aplicación de Francisco, con su propia sesión de Claude Code
+trabajando en paralelo) tuvo también 28, con varios commits suyos («límite diario agotado») que
+dejan ver que agotó el tope por su cuenta **dos veces en el mismo día**. El tope de despliegues por
+API es de toda la cuenta de Vercel, no de un proyecto: cuando dos aplicaciones se desarrollan a la
+vez con mucha actividad, se reparten el mismo cupo de 100. No hubo ningún despliegue con
+`githubCommitRef` distinto de `main` (las previews de las ramas `claude/**` están apagadas,
+`vercel.json`, `git.deploymentEnabled`) ni ninguno lanzado a mano por la API de esta sesión salvo
+el intento que dio 402 y no se reintentó.
+
+**Qué había que cortar (punto 3).** Revisado `vercel.json` y `scripts/vercel-ignore-build.sh`: este
+repositorio **ya tenía puesto**, desde antes de esta fila, exactamente lo que pide
+`docs/NO-GASTAR-PUBLICACIONES.md` — `ignoreCommand` que salta la publicación si el commit solo toca
+`docs/`, `pruebas/`, `.github/` o un `.md`, y las previews de rama apagadas. No hay más que recortar
+por el lado de este proyecto: el gasto de esta sesión y de las anteriores en `gestor-de-asuntos` ya
+es el mínimo razonable. Lo que sobra viene del otro proyecto y de que los dos compartan cupo; queda
+anotado en «Lo que queda por hablar con Francisco» (`docs/COLA.md`), porque decidir qué hacer con
+eso —separar cuentas, subir de plan, coordinar horarios— no es algo que esta fila pueda decidir
+sola.
+
+**Lo que sí se ha hecho**: `docs/COLA.md`, reglas 0 y 19, con el mismo texto que `CLAUDE.md` (no
+parar la cola por una causa ajena; como mucho un `create_deployment` a mano por sesión; comprobar
+las filas SIN PUBLICACIÓN COMPROBADA al empezar la siguiente). De paso, Vercel volvió a publicar
+solo mientras se investigaba esta fila (sin que hiciera falta ningún despliegue a mano): las filas
+200 y 201, que se habían quedado SIN PUBLICACIÓN COMPROBADA por este mismo motivo, se han podido
+comprobar y pasar a HECHA en el mismo commit que cierra esta fila 211.
+
+No hace falta ninguna prueba nueva en `pruebas/`: esta fila no cambia nada de cómo publica
+`gestor-de-asuntos` (el `ignoreCommand` ya estaba bien), solo la documentación de la cola.
+
+---
+
 ## 28-sep-2026 — Fila 201: el texto y el tipo de un documento, ya propuestos (apartados 1 y 4)
 
 `docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md`, apartados 1 («Dónde se escribe el texto») y 4 («El cuadro

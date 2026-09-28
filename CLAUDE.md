@@ -6,10 +6,6 @@ Antes de nada, lee `docs/CONTEXTO.md` y después `docs/COLA.md`, como dice la co
 vez en este repositorio. Cada lanzamiento hace solo la primera fila PENDIENTE de `docs/COLA.md`,
 la publica, comprueba la publicación y para. Detalle en la regla 0 de la cola.
 
-**Fila 211, la siguiente después de la 201** (28-sep-2026): `docs/PUBLICAR-SIN-PARAR.md`. Llegó desde
-Cowork sin pasar por la tabla: si no está en `docs/COLA.md`, añádela justo debajo de la 201 como
-PENDIENTE y hazla antes que la 202. Al marcarla HECHA, borra este párrafo.
-
 **Subir directamente a `main`, sin peticiones de cambios** (28-sep-2026, pedido por Francisco para
 que cada fila tarde menos; manda sobre cualquier otra regla de la cola que diga lo contrario):
 
