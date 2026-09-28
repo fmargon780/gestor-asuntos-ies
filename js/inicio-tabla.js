@@ -104,12 +104,14 @@
      filtro más de #filtros-abiertos, y solo afecta a "En
      Administración"/"En espera" (las dos pestañas que pasan por
      QueMeToca.clasificar). */
-  function pintarFiltroResponsable(ajustes) {
+  function pintarFiltroResponsable(ajustes, hitosAbiertos) {
     var sel = $('inicio-me-toca-responsable');
     if (!sel) return;
     var actual = QueMeToca.leerFiltroResponsable();
+    /* Fila 205: además, las Administraciones que son responsables de algún hito abierto. */
+    var organismos = window.ResponsableOrganismo ? ResponsableOrganismo.usadosEn(hitosAbiertos) : [];
     sel.innerHTML = ['<option value="">Todos</option>'].concat(
-      (ajustes.responsables || []).map(function (r) {
+      (ajustes.responsables || []).concat(organismos).map(function (r) {
         return '<option value="' + U.escapar(r.id) + '">' + U.escapar(r.nombre) + '</option>';
       })
     ).join('');
@@ -127,6 +129,7 @@
     var datos = await QueMeToca.reunir();
     var items = QueMeToca.unoPorAsunto(datos.items);
     var filtroResp = QueMeToca.leerFiltroResponsable();
+    var hitosAbiertos = items.map(function (it) { return it.hito; });   /* fila 205: para el filtro, antes de filtrar */
     if (filtroResp) {
       items = items.filter(function (it) {
         return window.HitosAdministracion
@@ -138,7 +141,7 @@
 
     var g = QueMeToca.clasificar(items, datos.ajustes);
     var dormidos = QueMeToca.reunirDormidos().filter(function (it) { return coincideAsunto(it.asunto, texto); });
-    return { ajustes: datos.ajustes, adm: g.tejado, esp: g.otros, dorm: dormidos };
+    return { ajustes: datos.ajustes, adm: g.tejado, esp: g.otros, dorm: dormidos, hitosAbiertos: hitosAbiertos };
   }
 
   function listaDe(pestana, r) {
@@ -211,7 +214,7 @@
     var r = await calcular(texto);
     if (esteTurno !== turno) return;
 
-    pintarFiltroResponsable(r.ajustes);
+    pintarFiltroResponsable(r.ajustes, r.hitosAbiertos);
     pintarPestanas(r);
     pintarChip();
 

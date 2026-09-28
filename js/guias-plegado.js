@@ -42,7 +42,7 @@ var GuiasPlegado = (function () {
     if (cuantos(p.guion)) m.push('Tareas (' + cuantos(p.guion) + ')');
     if (p.responsable) {
       var r = (responsables || []).filter(function (x) { return x.id === p.responsable; })[0];
-      m.push(r ? r.nombre : p.responsable);
+      m.push(r ? r.nombre : (window.ResponsableOrganismo && ResponsableOrganismo.esOrganismo(p.responsable) ? ResponsableOrganismo.nombreDe(p.responsable, p.responsableNombre) : p.responsable));
     }
     /* Fila 129: «Nos toca» o «Espera: Familia» (js/guias-toca.js). */
     if (window.GuiasToca && GuiasToca.marca(p, responsables)) m.push(GuiasToca.marca(p, responsables));

@@ -39,6 +39,7 @@
   function esDeAdministracion(idResponsable, ajustes) {
     if (!idResponsable) return true;
     if (esPapel(idResponsable)) return false;
+    if (window.ResponsableOrganismo && ResponsableOrganismo.esOrganismo(idResponsable)) return false;   /* fila 205: otra Administración, nunca la casa */
     var aj = Hitos.normalizarAjustes(ajustes);
     var r = aj.responsables.filter(function (x) { return x.id === idResponsable; })[0];
     return !!(r && r.administracion);

@@ -100,7 +100,7 @@
   function guardarCampos(clave, idHito, cambios) {
     return editar(clave, idHito, function (h) {
       if ('titulo' in cambios) h.titulo = String(cambios.titulo || '');
-      if ('responsable' in cambios) h.responsable = String(cambios.responsable || '');
+      if ('responsable' in cambios) { h.responsable = String(cambios.responsable || ''); if (window.ResponsableOrganismo && ResponsableOrganismo.esOrganismo(h.responsable)) h.responsableNombre = ResponsableOrganismo.copia(h.responsable, cambios.responsableNombre); else delete h.responsableNombre; }   /* fila 205 */
       if ('fecha' in cambios) { h.fecha = String(cambios.fecha || ''); h.fechaManual = !!cambios.fecha; }
       /* 20-sep-2026, fila 79, apartado 4.6: "Pedirmelo a mí" / "Dejarlo
          solo informativo", del menú del propio hito. Afecta solo a este
@@ -220,6 +220,7 @@
 
   function resolverResponsable(idResponsable, ajustes, contexto) {
     if (!idResponsable) return null;
+    if (window.ResponsableOrganismo && ResponsableOrganismo.esOrganismo(idResponsable)) return ResponsableOrganismo.resolver(idResponsable);   /* fila 205 */
     var persona = (ajustes.responsables || []).filter(function (r) { return r.id === idResponsable; })[0];
     if (persona) return { texto: persona.nombre, resuelto: true };
     var papel = PAPELES.filter(function (p) { return p.id === idResponsable; })[0];

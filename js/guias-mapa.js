@@ -149,6 +149,7 @@ var GuiasMapa = (function () {
   }
   function nombreDeResponsable(id) {
     var r = (responsables || []).filter(function (x) { return x.id === id; })[0];
+    if (!r && window.ResponsableOrganismo && ResponsableOrganismo.esOrganismo(id)) return ResponsableOrganismo.nombreDe(id, '');   /* fila 205 */
     return r ? r.nombre : '';
   }
 
