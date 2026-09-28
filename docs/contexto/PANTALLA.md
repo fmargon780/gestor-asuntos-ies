@@ -379,3 +379,4 @@ se lleva escrito en la nota nueva vive también en variables del módulo (`borra
 foco estaba en ese campo o en el de una nota que se está cambiando (`editando`), junto con
 `selectionStart`/`selectionEnd`, y al terminar le devuelve el foco y el cursor al campo nuevo. Se
 comprueba con `pruebas/tablon-no-se-borra.mjs`.
+
