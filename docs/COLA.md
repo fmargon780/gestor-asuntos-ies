@@ -192,7 +192,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 201 | `docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md`, apartados 1 y 4: el nombre sale propuesto (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 201) | HECHA y publicada (28-sep-2026 04:04). Igual que la 200: quedó sin comprobar por el tope diario de Vercel, que se recuperó solo. Comprobado por `curl`: `App.VERSION` `28-sep-2026 · 04:04` y `js/documentos-formulario.js` ya trae `propuestaDesdeHito`. PR #159 fusionado en `176649a`, publicado en `dpl_AUvDC2B97z8EKHKZZHmrafAy5Tgs` (`READY`, producción) |
 | 211 | `docs/PUBLICAR-SIN-PARAR.md` (el tope diario de Vercel no para la cola; investigar qué gastó las 100 publicaciones del 28-sep-2026 y cortar lo que sobre) | HECHA (28-sep-2026 04:09). Reglas 0 y 19 de esta cola puestas al día con el mismo texto que `CLAUDE.md`. Investigado con `list_deployments`: el tope es de toda la cuenta de Vercel; el mismo día, el proyecto `partituras-de-caja-clara` (otra sesión) gastó tantos despliegues como este. Este repositorio ya tenía el `ignoreCommand`/`git.deploymentEnabled` que pide `docs/NO-GASTAR-PUBLICACIONES.md`: nada que cortar por este lado. Detalle y lo que queda por decidir con Francisco (separar cuentas, plan, coordinación) en `docs/HISTORIA.md` y en «Lo que queda por hablar con Francisco». Solo documentación: sin código que publicar en Vercel |
 | 202 | `docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md`, apartados 2 y 3: de dónde viene cada hito, y la biblioteca se ofrece sola (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 202) | HECHA (28-sep-2026 06:00). Vercel publicó solo, sin despliegue a mano: comprobado por `curl`, `App.VERSION` `28-sep-2026 · 05:48` y `js/guias-biblioteca-guardias.js` responde 200 con el contenido nuevo (antes 404); confirmado también con `list_deployments` (commit `7e73954`, `READY`, producción). Cierra el AVISO de la sesión anterior. |
-| 212 | `docs/INICIO-A-TODO-EL-ANCHO.md` (Inicio, tercera versión, sobre la fila 209: fuera la columna izquierda; una fila con «Ha llegado: N correos · N documentos por clasificar» —cada trozo abre «Ver todo» solo con eso— y los avisos en un cuadro ámbar pequeño con ✕; el tablón compacto arriba a la derecha, en la cabecera; filtros plegados al entrar) | EN CURSO (28-sep-2026 06:00) |
+| 212 | `docs/INICIO-A-TODO-EL-ANCHO.md` (Inicio, tercera versión, sobre la fila 209: fuera la columna izquierda; una fila con «Ha llegado: N correos · N documentos por clasificar» —cada trozo abre «Ver todo» solo con eso— y los avisos en un cuadro ámbar pequeño con ✕; el tablón compacto arriba a la derecha, en la cabecera; filtros plegados al entrar) | HECHA (28-sep-2026 07:22). `npm test` completo (178 ficheros) en verde con Chromium real (una prueba nueva, `hito-mesa.mjs` sumada a `EN_SOLITARIO`: fallaba a la segunda pasada por contención de CPU, sola pasa). Sin `git push` de verdad: subido con la herramienta MCP de GitHub, fichero a fichero, cada uno comprobado con `git hash-object` contra lo subido (regla 11/12; `docs/contexto/PANTALLA.md` necesitó una segunda subida por un salto de línea final que faltaba en la primera, detectado así antes de publicarse). `js/tablon.js` se partió en dos (`js/tablon.js`, solo datos, y `js/tablon-compacto.js`, la pantalla) para no pasar de 600 líneas. Publicación comprobada por `curl`: `App.VERSION` `28-sep-2026 · 07:09`, `js/tablon-compacto.js` responde 200, `index.html` sin `#inicio-lado` y con `#inicio-tablon-hueco`, `js/nucleo.js`/`js/vista.js` con `Vista.cerrarFiltros`. Detalle completo (para pegar en `docs/HISTORIA.md`) en la nota al final de este documento. |
 | 205 | `docs/RESPONSABLE-UNA-ADMINISTRACION.md` (responsable de un hito: «Una Administración…», para elegir un organismo dado de alta, como la Delegación Territorial; el asunto pasa a «Esperando a…» ese organismo) | PENDIENTE (27-sep-2026) |
 | 203 | `docs/PAPELERA-SE-VACIA-SOLA.md`, entero, con `js/copias.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 203) | PENDIENTE (27-sep-2026) |
 | 206 | `docs/HITOS-DESDE-EL-ASUNTO.md` (crear, cambiar y borrar hitos desde la mesa de un asunto, con «Colocar después de»; cada cambio pregunta si va también a la guía, ya marcado, y llega a los asuntos abiertos del tipo donde el hito esté vacío; solo se borran hitos vacíos) | PENDIENTE (27-sep-2026) |
@@ -533,5 +533,73 @@ rota). El despliegue automático de Vercel no arrancó para ninguno de los commi
 Vercel (agotado también por otro proyecto, `docs/PUBLICAR-SIN-PARAR.md`): la fila queda **SIN
 PUBLICACIÓN COMPROBADA**, pendiente de que la próxima sesión compruebe si Vercel ha publicado
 sola.
+
+---
+
+## Nota del 28-sep-2026 (sesión Cowork, fila 212): sin `git push`, entrada de docs/HISTORIA.md lista para pegar
+
+Como la fila 202: esta sesión tampoco tiene `git push` de verdad (mismo motivo: el proxy de git
+deniega el repositorio). Todo el trabajo se subió con la herramienta MCP de GitHub, fichero a
+fichero, cada uno comprobado con `git hash-object` contra lo subido antes de seguir (regla 11/12).
+`docs/HISTORIA.md` no se ha tocado, por la regla 17: la entrada, para que una sesión con `git push`
+de verdad la pegue, es esta:
+
+---
+
+## Fila 212 (28-sep-2026): Inicio, tercera versión: los asuntos a todo el ancho
+
+`docs/INICIO-A-TODO-EL-ANCHO.md`, sobre la fila 209 (`docs/INICIO-EN-PESTANAS.md`). Fuera la
+columna izquierda de Inicio y el botón grande «Ver todo (N)»: las pestañas y la tabla única
+ocupan todo el ancho. Justo debajo de la cabecera, una sola fila: a la izquierda «Ha llegado: N
+correos · N documentos por clasificar» (`js/inicio.js`), cada trozo un enlace que abre «Ver todo»
+enseñando solo esa mitad (`App.irVista('clasificar', 'correos'|'documentos')`, nuevo segundo
+parámetro en `js/asuntos-lista-montones.js`; `App.pintarSoloQueClasificar` pone las clases
+`solo-correos`/`solo-documentos` en `#zona-clasificar` y el enlace «Ver también…» para volver a
+las dos juntas); el número de documentos se resalta si hay alguno nuevo. A la derecha, el cuadro
+de avisos de la fila 193 (`js/avisos-linea.js`), que deja de ocupar todo el ancho y cambia su
+botón «Ocultar por hoy» por una ✕ pequeña.
+
+El tablón (`js/tablon.js`) deja de ser una columna: cuelga de `#inicio-tablon-hueco`, dentro de la
+propia cabecera de Inicio, entre «+ Nuevo asunto» y el buscador. Compacto: el campo de la nota
+nueva nace de una línea y se abre con el resto de opciones al pulsarlo o si ya hay algo escrito;
+las notas pendientes se ven en fila, cortadas con «…», como mucho tres; con más, o con alguna
+hecha, «y N más»/«Ver las hechas» despliegan la lista entera (con el «papel» de siempre, editable)
+por encima de la página (`.tablon-overlay`, `position: absolute`), que se cierra con su ✕, con
+Escape o pulsando fuera. Al pasar de 600 líneas, `js/tablon.js` se partió en dos: él mismo se
+queda solo con los datos (leer, `cambiar()`, quién soy, qué notas veo; expone `window.Tablon`) y
+el fichero nuevo `js/tablon-compacto.js` (cargado justo detrás) se queda con toda la pantalla
+(expone `window.TablonVista`, con `pintar()` y `ocupado()`, esta última la consulta `js/tablon.js`
+antes de releer en cada vuelta de `window.Gestor.alRefrescar` para no repintar mientras se escribe
+o se edita).
+
+Los filtros de Inicio («Filtros», `js/vista.js`) empiezan siempre cerrados al entrar (antes se
+recordaban abiertos de una vez para la siguiente, en `localStorage`: eso desaparece; `Vista.
+cerrarFiltros()`, llamado desde `App.ir` en `js/nucleo.js` cada vez que se entra en Inicio) y el
+botón dice «Filtros (N)» con alguno puesto.
+
+Se conserva, invisible a ojo pero pulsable (`css/inicio.css`, `.panel-legado-oculto`, `position:
+fixed` en una esquina), el botón `.panel[data-vista="clasificar"]` de siempre: varias pruebas de
+`pruebas/` lo pulsan para abrir «Ver todo» con las dos mitades juntas, comportamiento que se
+mantiene sin cambiarlas.
+
+Ficheros nuevos: `js/tablon-compacto.js`, `pruebas/inicio-a-todo-el-ancho.mjs` (la prueba nueva
+que pide el encargo). Modificados: `index.html`, `js/inicio.js`, `js/asuntos-lista-montones.js`,
+`js/avisos-linea.js`, `js/bandeja-pantalla.js` (`BandejaPantalla.desplegar`, para «solo correos»),
+`js/tablon.js`, `js/vista.js`, `js/nucleo.js`, `css/inicio.css`, `css/tablon.css`,
+`pruebas/inicio.mjs` (puesta al día contra la columna izquierda que desaparece),
+`pruebas/ejecutar.mjs` (`hito-mesa.mjs` a `EN_SOLITARIO`). `npm test` completo (178 ficheros) en
+verde con Chromium real.
+
+Lo que costó de verdad: sin `git push`, dieciocho ficheros subidos y comprobados uno a uno con la
+herramienta MCP de GitHub (delegado en un agente auxiliar con la lista exacta de rutas y sha
+antiguos, y la misma comprobación por hash); `docs/contexto/PANTALLA.md` necesitó una segunda
+subida por un salto de línea final que faltaba en la primera, detectado por el hash antes de
+llegar a publicarse mal. A media subida, otra conversación (de diseño, no de la cola) pasó la fila
+213 de IDEA a PENDIENTE y añadió su fila a `docs/ESTIMACIONES.md`: no hubo choque porque tocaba
+filas distintas de la tabla; se fusionó solo al volver a bajar `main`. El botón «Ver todo» grande
+desaparece de la pantalla pero se conserva invisible para las pruebas antiguas
+(`.panel-legado-oculto`): un primer intento con `position: absolute` sin `top`/`left` (para que
+quedara "en su sitio de siempre") lo dejaba a veces debajo de otro elemento, que le robaba el
+click a Playwright; con `position: fixed` en una esquina de la pantalla, sin ese problema.
 
 ---
