@@ -5,6 +5,34 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 28-sep-2026 — Fila 210: el HILO de correos, sin repetir y con lo último arriba
+
+`docs/HILO-SIN-REPETIR.md`. Solo `apps-script/gestor-correos.gs` (fuera de la app JS) y
+`js/correo-enviar.js` (`SCRIPT_ESPERADO`). Tres fallos del PDF `AAMMDD HILO <asunto>.pdf`
+(`hiloEnPdf`): repetía cada mensaje dentro de todos los siguientes (la cita que Gmail/Outlook
+añaden al responder), iba del más antiguo al más nuevo (Francisco quería lo contrario), y
+`guardarHilo` guardaba otra vez los adjuntos de los mensajes ya vistos cada vez que un hilo
+seguido crecía.
+
+Arreglo: función nueva `soloLoNuevo(texto)` corta el cuerpo justo antes de la primera cita —
+cabecera de Gmail en español (`… escribió:`, en una o dos líneas) o en inglés (`On … wrote:`),
+cabecera de Outlook (`-----Mensaje original-----` o un bloque `De:`/`Enviado:`), o un bloque
+final de líneas `>` — sin cortar nunca un reenvío (`---------- Forwarded message ---------`,
+`---------- Mensaje reenviado ---------`: el `De:`/`Enviado:` del propio reenvío no cuenta como
+cita) y sin dejar el mensaje vacío si al cortar no quedara nada. `hiloEnPdf` recorre los mensajes
+al revés (el más nuevo arriba) aplicando `soloLoNuevo` a todos, incluido el primero. `guardarHilo`
+gana un parámetro `desde` (el número de mensajes ya vistos): solo guarda los adjuntos de los
+mensajes con índice `>= desde`; `recogerCorreos` pasa `0` (todos, como antes) y
+`seguirHilosConocidos` pasa el `vistoLocal` que ya calculaba. `VERSION_SCRIPT`/`SCRIPT_ESPERADO` a
+`27-sep-2026 · fila 210`.
+
+Prueba nueva `pruebas/hilo-sin-repetir.mjs` (mismo patrón que `pruebas/envio-apps-script.mjs`, con
+`vm` y Gmail/Utilities/Drive de mentira): las cuatro cabeceras de cita, que no corta un reenvío,
+que un mensaje enteramente citado se deja tal cual, el orden y la ausencia de repetidos en
+`hiloEnPdf`, y que `guardarHilo` reparte los adjuntos según `desde`.
+
+---
+
 ## 28-sep-2026 — Fila 216: los filtros de Inicio valen en las cuatro pestañas
 
 `docs/FILTROS-EN-TODAS-LAS-PESTANAS.md`. Causa real: desde la fila 209 (pestañas), los cinco

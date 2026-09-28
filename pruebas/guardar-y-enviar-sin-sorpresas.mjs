@@ -83,7 +83,7 @@ console.log('--- 6. el mismo envío no sale dos veces ---');
   ctx.enviarUnaVez({ para: 'familia@ejemplo.es', asunto: 'Viejo', cuerpo: 'x' });
   ctx.enviarUnaVez({ para: 'familia@ejemplo.es', asunto: 'Viejo', cuerpo: 'x' });
   await comprobar('6. sin identificador (navegador viejo), como hasta ahora', Promise.resolve(enviados), 4);
-  await comprobar('6. la respuesta dice la versión del script', Promise.resolve(/fila 178/.test(r1.version || '')), true);
+  await comprobar('6. la respuesta dice la versión del script', Promise.resolve(/fila 210/.test(r1.version || '')), true);
 
   console.log('--- 7. memoria permanente más allá de las 6 horas (fila 178) ---');
   const clavesHoy = () => Object.keys(propiedades).filter((k) => k.indexOf('enviados-') === 0);

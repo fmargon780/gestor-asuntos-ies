@@ -137,8 +137,11 @@ tú". Y las matrículas de todos los mensajes del hilo: `matriculas` (sin repeti
 
 - `AAMMDD CORREO <asunto recortado>.pdf` — el mensaje nuevo, él solo (campo `pdfMensaje`).
 - `AAMMDD HILO <asunto recortado>.pdf` — el hilo entero (campo `pdf`). **Se sustituye**: el
-  anterior del mismo hilo va a la papelera, no se acumulan copias del hilo completo.
-- `AAMMDD ADJUNTO <nombre>` — cada documento adjunto.
+  anterior del mismo hilo va a la papelera, no se acumulan copias del hilo completo. Del más
+  nuevo al más antiguo, y cada mensaje sin el trozo citado de los anteriores (fila 210).
+- `AAMMDD ADJUNTO <nombre>` — cada documento adjunto. En un hilo seguido que ya vivía en el
+  asunto, solo entran los adjuntos de los mensajes nuevos, no los de los que ya se habían
+  guardado (fila 210).
 
 En un hilo de un solo mensaje no hay `pdf`: ese PDF entra ya como `CORREO`. La ficha del asunto
 reconoce los tres por su nombre (`DE_CORREO`, en `js/ficha-asunto.js`) y los enseña en el grupo

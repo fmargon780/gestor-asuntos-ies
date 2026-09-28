@@ -52,6 +52,12 @@
    está, esos grupos. Si esta fecha no está en la copia pegada en
    script.google.com, está vieja: vuelve a pegarla (Ajustes → Enviar
    correo, en el Gestor de Asuntos).
+
+   27-sep-2026, fila 210, docs/HILO-SIN-REPETIR.md: el HILO en PDF va
+   del mensaje más nuevo al más antiguo, y cada mensaje sale sin el
+   trozo citado de los anteriores (`soloLoNuevo`). `guardarHilo` ya no
+   repite los adjuntos de los mensajes que un hilo seguido ya había
+   guardado: solo los del mensaje `desde` en adelante.
    ============================================================
    Gestor de Asuntos — recogida de correos y envío desde el asunto
    Google Apps Script, en la cuenta g.educaand.es
@@ -161,7 +167,7 @@ function recogerCorreos() {
   for (var i = 0; i < hilos.length; i++) {
     var hilo = hilos[i];
     try {
-      guardarHilo(hilo, carpeta, null);
+      guardarHilo(hilo, carpeta, null, 0);
       hilo.removeLabel(pendiente);
       hilo.addLabel(hecho);
     } catch (e) {
@@ -202,7 +208,7 @@ function seguirHilosConocidos(carpeta) {
       var cuantosMensajes = hilo.getMessageCount();
       var visto = vistoLocal(idLocal, s.visto);
       if (cuantosMensajes <= visto) continue;    /* nada nuevo */
-      guardarHilo(hilo, carpeta, s.id);
+      guardarHilo(hilo, carpeta, s.id, visto);
       guardarVistoLocal(idLocal, cuantosMensajes);
     } catch (e) {
       Logger.log('El hilo seguido ' + s.id + ' no se ha podido mirar: ' + e.message);
@@ -279,7 +285,8 @@ function limpiarRestos(carpeta, id) {
 
 /* ---------- guardar un hilo ---------- */
 
-function guardarHilo(hilo, carpeta, respuestaDe) {
+function guardarHilo(hilo, carpeta, respuestaDe, desde) {
+  desde = desde || 0;
   var mensajes = hilo.getMessages();
   var primero = mensajes[0];
   var ultimo = mensajes[mensajes.length - 1];
@@ -335,8 +342,10 @@ function guardarHilo(hilo, carpeta, respuestaDe) {
     } catch (e) { /* si falla, queda el hilo entero, que lo lleva dentro */ }
   }
 
-  /* Los documentos que traiga el correo. */
-  for (var m = 0; m < mensajes.length; m++) {
+  /* Los documentos que traiga el correo. Solo los de los mensajes
+     nuevos (fila 210): un hilo seguido que ya guardó los primeros no
+     vuelve a traer sus adjuntos cada vez que crece. */
+  for (var m = desde; m < mensajes.length; m++) {
     var trae = mensajes[m].getAttachments();
     for (var a = 0; a < trae.length; a++) {
       try {
@@ -381,7 +390,7 @@ function guardarHilo(hilo, carpeta, respuestaDe) {
    propia cuenta, sin mirar `para`/`cco`.
    ============================================================ */
 
-var VERSION_SCRIPT = '26-sep-2026 · fila 178';
+var VERSION_SCRIPT = '27-sep-2026 · fila 210';
 var SEGUNDOS_RECORDAR_ENVIO = 6 * 60 * 60;   /* el máximo de CacheService */
 
 function doPost(e) {
@@ -784,23 +793,100 @@ function escapar(v) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-/* El hilo entero en un PDF sencillo: cabecera de cada mensaje y su texto. */
+/* El hilo entero en un PDF sencillo: el mensaje más nuevo arriba, cada
+   uno con su cabecera (De, Para, Fecha) y solo lo que ese mensaje añade
+   de nuevo (fila 210, docs/HILO-SIN-REPETIR.md): sin el trozo citado de
+   los mensajes anteriores. */
 function hiloEnPdf(hilo, mensajes) {
   var html = '<meta charset="utf-8">' +
     '<div style="font-family:Arial,sans-serif;font-size:12px;color:#1b2430">' +
     '<h2 style="margin:0 0 12px">' + escapar(hilo.getFirstMessageSubject()) + '</h2>';
-  for (var i = 0; i < mensajes.length; i++) {
+  for (var i = mensajes.length - 1; i >= 0; i--) {
     var m = mensajes[i];
     html += '<div style="border-top:1px solid #dde3ea;padding:10px 0">' +
       '<div style="color:#5d6b7a"><strong>De:</strong> ' + escapar(m.getFrom()) + '<br>' +
       '<strong>Para:</strong> ' + escapar(m.getTo()) + '<br>' +
       '<strong>Fecha:</strong> ' + escapar(m.getDate()) + '</div>' +
       '<pre style="white-space:pre-wrap;font-family:Arial,sans-serif;font-size:12px">' +
-      escapar(m.getPlainBody()) + '</pre></div>';
+      escapar(soloLoNuevo(m.getPlainBody())) + '</pre></div>';
   }
   html += '</div>';
   var nombre = hilo.getId() + ' - correo.pdf';
   return Utilities.newBlob(html, 'text/html', nombre).getAs('application/pdf').setName(nombre);
+}
+
+/* ---------- fila 210: solo lo nuevo de cada mensaje del HILO ----------
+
+   El cuerpo de un mensaje de respuesta arrastra, debajo, la cita del
+   mensaje anterior que Gmail u Outlook añaden solos. `soloLoNuevo`
+   corta el texto justo antes de esa cita, para que el HILO en PDF no
+   repita cada mensaje dentro de todos los siguientes. */
+
+var RE_MARCA_REENVIO = /^-{2,}\s*(forwarded message|mensaje reenviado)\s*-{2,}$/i;
+var RE_CITA_GMAIL_ES = /escribi[oó]:\s*$/i;
+var RE_CITA_GMAIL_EN = /^on\s.*\bwrote:\s*$/i;
+var RE_CABECERA_OUTLOOK = /^-{2,}\s*(mensaje original|original message)\s*-{2,}$/i;
+var RE_DE_O_FROM = /^(de|from)\s*:/i;
+var RE_ENVIADO_O_FECHA = /^(enviado|sent|fecha|date)\s*:/i;
+
+function soloLoNuevo(texto) {
+  var original = String(texto || '').replace(/\r/g, '');
+  var lineas = original.split('\n');
+  var corte = puntoDeCorteDeLaCita(lineas);
+  if (corte === -1) return original;
+
+  var recortadas = lineas.slice(0, corte);
+  while (recortadas.length && !recortadas[recortadas.length - 1].trim()) recortadas.pop();
+  var recortado = recortadas.join('\n');
+  return recortado.trim() ? recortado : original;   /* mejor repetido que perdido */
+}
+
+function puntoDeCorteDeLaCita(lineas) {
+  for (var i = 0; i < lineas.length; i++) {
+    if (esInicioDeCitaEnLaLinea(lineas, i)) return i;
+  }
+  return inicioDelBloqueFinalDeCitas(lineas);
+}
+
+function esInicioDeCitaEnLaLinea(lineas, i) {
+  var una = lineas[i].trim();
+  var dos = (una + ' ' + (lineas[i + 1] || '').trim()).trim();
+  if (RE_CITA_GMAIL_ES.test(una) || RE_CITA_GMAIL_ES.test(dos)) return true;
+  if ((/^on\s/i.test(una) && RE_CITA_GMAIL_EN.test(una)) ||
+      (/^on\s/i.test(dos) && RE_CITA_GMAIL_EN.test(dos))) return true;
+  if (RE_CABECERA_OUTLOOK.test(una)) return true;
+  if (RE_DE_O_FROM.test(una) && !cercaDeUnReenvio(lineas, i)) {
+    for (var j = i + 1; j <= i + 4 && j < lineas.length; j++) {
+      if (RE_ENVIADO_O_FECHA.test(lineas[j].trim())) return true;
+    }
+  }
+  return false;
+}
+
+/* El «De:»/«From:» de un reenvío (el que trae el propio mensaje
+   reenviado) no es una cita: lo reenviado es contenido nuevo para el
+   hilo, y no hay que cortarlo. */
+function cercaDeUnReenvio(lineas, i) {
+  for (var j = Math.max(0, i - 3); j < i; j++) {
+    if (RE_MARCA_REENVIO.test(lineas[j].trim())) return true;
+  }
+  return false;
+}
+
+/* Un bloque final de líneas que empiezan por «>» (líneas en blanco de
+   por medio no lo interrumpen). Si el mensaje entero es ese bloque, el
+   corte cae en la línea 0. */
+function inicioDelBloqueFinalDeCitas(lineas) {
+  var i = lineas.length - 1;
+  while (i >= 0 && !lineas[i].trim()) i--;   /* líneas en blanco del final */
+  var hayCita = false;
+  while (i >= 0) {
+    var t = lineas[i].trim();
+    if (t.indexOf('>') === 0) { hayCita = true; i--; continue; }
+    if (!t) { i--; continue; }
+    break;
+  }
+  return hayCita ? i + 1 : -1;
 }
 
 /* Un solo mensaje en PDF: el último del hilo, el que acaba de llegar

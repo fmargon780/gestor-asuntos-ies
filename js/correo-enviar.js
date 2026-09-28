@@ -44,7 +44,7 @@ window.CorreoEnviar = (function () {
 
   /* La versión de este mismo cambio (ha de coincidir con VERSION_SCRIPT
      de apps-script/gestor-correos.gs). */
-  var SCRIPT_ESPERADO = '26-sep-2026 · fila 178';
+  var SCRIPT_ESPERADO = '27-sep-2026 · fila 210';
   var CLAVE_VERSION_CONOCIDA = 'gestor-envio-script-version';
 
   /* El número de fila de una versión ('24-sep-2026 · fila 130' -> 130):
