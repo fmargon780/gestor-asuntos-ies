@@ -191,7 +191,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 200 | `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartados 6 y 7: El centro y la pestaña «Herramientas» (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 200) | HECHA y publicada (28-sep-2026 04:04). Quedó SIN PUBLICACIÓN COMPROBADA por el tope diario de Vercel (402, `docs/PUBLICAR-SIN-PARAR.md`); Vercel volvió a publicar solo, sin que hiciera falta ningún despliegue a mano. Comprobado por `curl`: `App.VERSION` `28-sep-2026 · 04:04`, `js/herramientas.js` ya responde 200 (antes 404). PR #156 (commit `8d4efc8`), fusionado en el despliegue `dpl_AUvDC2B97z8EKHKZZHmrafAy5Tgs` (commit `176649a`, `READY`, producción, confirmado con `list_deployments`) |
 | 201 | `docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md`, apartados 1 y 4: el nombre sale propuesto (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 201) | HECHA y publicada (28-sep-2026 04:04). Igual que la 200: quedó sin comprobar por el tope diario de Vercel, que se recuperó solo. Comprobado por `curl`: `App.VERSION` `28-sep-2026 · 04:04` y `js/documentos-formulario.js` ya trae `propuestaDesdeHito`. PR #159 fusionado en `176649a`, publicado en `dpl_AUvDC2B97z8EKHKZZHmrafAy5Tgs` (`READY`, producción) |
 | 211 | `docs/PUBLICAR-SIN-PARAR.md` (el tope diario de Vercel no para la cola; investigar qué gastó las 100 publicaciones del 28-sep-2026 y cortar lo que sobre) | HECHA (28-sep-2026 04:09). Reglas 0 y 19 de esta cola puestas al día con el mismo texto que `CLAUDE.md`. Investigado con `list_deployments`: el tope es de toda la cuenta de Vercel; el mismo día, el proyecto `partituras-de-caja-clara` (otra sesión) gastó tantos despliegues como este. Este repositorio ya tenía el `ignoreCommand`/`git.deploymentEnabled` que pide `docs/NO-GASTAR-PUBLICACIONES.md`: nada que cortar por este lado. Detalle y lo que queda por decidir con Francisco (separar cuentas, plan, coordinación) en `docs/HISTORIA.md` y en «Lo que queda por hablar con Francisco». Solo documentación: sin código que publicar en Vercel |
-| 202 | `docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md`, apartados 2 y 3: de dónde viene cada hito, y la biblioteca se ofrece sola (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 202) | EN CURSO (28-sep-2026 04:13) |
+| 202 | `docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md`, apartados 2 y 3: de dónde viene cada hito, y la biblioteca se ofrece sola (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 202) | SIN PUBLICACIÓN COMPROBADA (28-sep-2026 05:35). `npm test` completo (177 ficheros) en verde con Chromium real (`refresco.mjs` sumada a `EN_SOLITARIO`, fallaba solo por contención de CPU, sola pasa). Ficheros nuevos `js/guias-biblioteca-guardias.js` y `js/guias-biblioteca-ajustes.js` (se partió `js/guias-biblioteca.js`, volvía a pasar de 400 líneas); etiqueta de origen en cada paso de la guía (`js/guias-paso-bloques.js`), buscador de parecidos al escribir el título, «lo usan N tipos más» y la pregunta de una sola frase al guardar un cambio, guardia de parecidos del texto de los documentos (hito y tipo de documento, `js/ajustes-centro.js`). Subido a `main` en varias llamadas de la herramienta MCP de GitHub (esta sesión no tiene `git push` de verdad: "access denied by the git proxy", repositorio no autorizado para este canal), cada fichero comprobado byte a byte contra lo subido antes de seguir (regla 11/12). Vercel no ha lanzado ningún despliegue para estos commits (ni `READY` ni `CANCELED`: sencillamente no aparecen en `list_deployments`), y el único `create_deployment` a mano permitido por sesión respondió 402 «Resource is limited» (tope diario de toda la cuenta, agotado también por otro proyecto, `docs/PUBLICAR-SIN-PARAR.md`): no se reintenta. `App.VERSION` publicada sigue en `28-sep-2026 · 05:11` (la del commit de Francisco anterior a esta fila), y `js/guias-biblioteca-guardias.js` da 404. Queda para la próxima sesión comprobar si Vercel ha publicado sola. |
 | 212 | `docs/INICIO-A-TODO-EL-ANCHO.md` (Inicio, tercera versión, sobre la fila 209: fuera la columna izquierda; una fila con «Ha llegado: N correos · N documentos por clasificar» —cada trozo abre «Ver todo» solo con eso— y los avisos en un cuadro ámbar pequeño con ✕; el tablón compacto arriba a la derecha, en la cabecera; filtros plegados al entrar) | PENDIENTE (28-sep-2026) |
 | 205 | `docs/RESPONSABLE-UNA-ADMINISTRACION.md` (responsable de un hito: «Una Administración…», para elegir un organismo dado de alta, como la Delegación Territorial; el asunto pasa a «Esperando a…» ese organismo) | PENDIENTE (27-sep-2026) |
 | 203 | `docs/PAPELERA-SE-VACIA-SOLA.md`, entero, con `js/copias.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 203) | PENDIENTE (27-sep-2026) |
@@ -489,3 +489,49 @@ compara con `git show 9da4f45:docs/COLA.md`.
 
 Resuelto: una sesión con `git push` de verdad pegó la entrada en `docs/HISTORIA.md`. Nada
 pendiente de la fila 172.
+
+## Nota del 28-sep-2026 (sesión Cowork, fila 202): sin `git push`, entrada de docs/HISTORIA.md lista para pegar
+
+Esta sesión no tiene `git push` de verdad: el proxy de git deniega el repositorio («not in
+this session's authorized repository set»), así que todo el trabajo de la fila 202 se subió con
+la herramienta MCP de GitHub, fichero a fichero (`push_files`/`create_or_update_file`),
+comprobando cada uno con `git hash-object` contra lo subido antes de seguir (regla 11/12): una
+vez hizo falta corregir una línea mal transcrita en `js/ajustes-centro.js` (detectada así, sin
+llegar a publicarse). `docs/HISTORIA.md` (más de 200 KB) no se ha tocado, por la regla 17: la
+entrada, para que una sesión con `git push` de verdad la pegue, es esta:
+
+---
+
+## Fila 202 (28-sep-2026): de dónde viene cada hito, y la biblioteca se ofrece sola
+
+`docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md`, apartados 2 y 3 (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`,
+fila 202). Cada hito de una guía lleva ahora una etiqueta fija junto al título («De la
+biblioteca», «De la biblioteca · cambiado aquí», «Propio de este tipo»), pulsable si viene de la
+biblioteca para ver el modelo y «Ver en la biblioteca». Al escribir el título de un hito nuevo,
+si se parece a uno de la biblioteca (`U.parecidos`), se ofrece «Usarlo». Al guardar un hito
+cambiado, la pregunta se reescribe en una sola frase con «Solo aquí»/«También en la biblioteca» y
+cuántos tipos más lo usan. «Guardar en la biblioteca» avisa si ya hay un modelo parecido por el
+título. El texto para los documentos (de un hito o de un tipo de documento) pasa por una guardia
+de parecidos que avisa si otro sitio ya tiene el mismo texto y ofrece copiarlo tal cual.
+
+Ficheros nuevos: `js/guias-biblioteca-guardias.js`, `js/guias-biblioteca-ajustes.js`
+(`js/guias-biblioteca.js` volvía a pasar de 400 líneas, se partió en tres, los tres extienden el
+mismo `GuiasBiblioteca`). Modificados: `js/guias-paso-bloques.js`, `js/guias-editor.js` (pasa
+`nombreTipo` a `revisarAlGuardar`), `js/ajustes-centro.js` (guardia de parecidos en el «Texto por
+defecto»), `css/guias.css`, `index.html` (los dos scripts nuevos), `pruebas/ejecutar.mjs`
+(`refresco.mjs` a `EN_SOLITARIO`: fallaba solo por contención de CPU junto a otras, sola pasa 1/1).
+Pruebas nuevas: `pruebas/guardia-parecidos-documentos.mjs` (jsdom, sin navegador),
+`pruebas/guia-origen-biblioteca.mjs` (navegador de verdad). `npm test` completo (177 ficheros) en
+verde con Chromium real.
+
+Lo que costó de verdad: sin `git push`, cada fichero se subió y se comprobó por separado con la
+herramienta MCP de GitHub; una vez hizo falta corregir una línea mal transcrita en
+`js/ajustes-centro.js` (se detectó comparando el hash antes de seguir, sin llegar a publicarse
+rota). El despliegue automático de Vercel no arrancó para ninguno de los commits de esta fila
+(ni `READY` ni `CANCELED`: no aparecen en `list_deployments`), y el `create_deployment` a mano
+(uno por sesión) respondió 402 «Resource is limited» por el tope diario de toda la cuenta de
+Vercel (agotado también por otro proyecto, `docs/PUBLICAR-SIN-PARAR.md`): la fila queda **SIN
+PUBLICACIÓN COMPROBADA**, pendiente de que la próxima sesión compruebe si Vercel ha publicado
+sola.
+
+---
