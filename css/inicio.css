@@ -1,131 +1,115 @@
 /* ============================================================
-   inicio.css — la pantalla de Inicio (27-sep-2026, fila 209,
-   docs/INICIO-EN-PESTANAS.md; sustituye a la fila 191,
-   docs/INICIO-CUATRO-BLOQUES.md, en todo lo que decía distinto).
+   inicio.css — la pantalla de Inicio (28-sep-2026, fila 212,
+   docs/INICIO-A-TODO-EL-ANCHO.md; sobre la fila 209,
+   docs/INICIO-EN-PESTANAS.md, en todo lo que decía distinto).
 
-   Dos columnas: izquierda estrecha ("Ha llegado" + el tablón),
-   derecha las pestañas y la tabla única. Los colores de plazo son los
-   de siempre: .marca-plazo, .plazo-vencido, .plazo-cerca y
-   .plazo-lejos vienen de css/plazos.css y se reutilizan tal cual.
+   Sin columna izquierda: las pestañas y la tabla única ocupan todo el
+   ancho. Los colores de plazo son los de siempre: .marca-plazo,
+   .plazo-vencido, .plazo-cerca y .plazo-lejos vienen de
+   css/plazos.css y se reutilizan tal cual.
    ============================================================ */
 
-#inicio-cuerpo {
-  display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 14px;
-  align-items: start;
-  margin-bottom: 20px;
+#inicio-cuerpo { margin-bottom: 20px; }
+
+/* ---------- el hueco del tablón, en la propia cabecera ----------
+
+   Entre "+ Nuevo asunto" (lo cuelga js/barra.js justo detrás del
+   <h2>) y el buscador (.acciones). css/tablon.css pone el tamaño y el
+   aspecto de #tablon en sí; aquí solo el hueco que lo aloja dentro de
+   la cabecera, que ya es flex con flex-wrap (css/estilos.css,
+   .cabecera). */
+.inicio-tablon-hueco {
+  flex: 1 1 320px;
+  min-width: 220px;
+  max-width: 380px;
 }
 
-.inicio-lado {
+/* Por debajo de 900px de zona de trabajo (apartado 3), el tablón baja
+   a su propia línea, debajo de la cabecera: se le da todo el ancho y
+   se manda al final del flex (después de .acciones), en vez de
+   quedarse encajado entre el título y el buscador. */
+@container (max-width: 900px) {
+  .inicio-tablon-hueco { flex-basis: 100%; max-width: none; order: 5; }
+}
+
+/* ---------- la fila de "Ha llegado" + el cuadro de avisos (fila 212,
+   apartado 2) ---------- */
+
+.inicio-fila-superior {
   display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.inicio-bloque,
-.inicio-lado > #tablon {
-  background: var(--papel);
-  border: 1px solid var(--linea);
-  border-radius: var(--radio);
-  box-shadow: var(--sombra);
-  padding: 14px 15px 16px;
-}
-
-.inicio-bloque-titulo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  margin: 0 0 10px;
-}
-
-.inicio-lista {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.inicio-lista .vacio { padding: 8px 2px; }
-
-/* Las tarjetas de "Ha llegado" (App.tarjetaSuelto / BandejaPantalla.tarjeta)
-   son las mismas que en "Ver todo" y en la bandeja, aquí recortadas para
-   caber compactas: menos aire, letra algo más pequeña, y solo un par
-   de acciones a la vista + el menú ⋮ (el resto de botones, que ya
-   viven detrás del menú en el modo normal, siguen ahí). */
-.inicio-fila-compacta {
-  padding: 8px 10px;
-  font-size: 12.5px;
-}
-.inicio-fila-compacta .tarjeta-nombre {
-  font-size: 13px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.inicio-fila-compacta .tarjeta-pie,
-.inicio-fila-compacta .tarjeta-adjuntos-correo,
-.inicio-fila-compacta .propuesta-correo {
-  font-size: 11.5px;
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.inicio-fila-compacta .acciones {
-  margin-top: 6px;
-  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
   flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-bottom: 14px;
 }
-/* Los botones de "Ha llegado", como enlaces pequeños en una línea
-   (boceto docs/boceto-inicio-2.html): sin fondo ni borde, azules,
-   subrayado al pasar el ratón. */
-.inicio-fila-compacta .acciones .boton {
+
+.inicio-ha-llegado-linea {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-top: 6px;
+  font-size: 13.5px;
+}
+.inicio-ha-llegado-etiqueta { color: var(--tinta-suave); }
+.inicio-ha-llegado-vacio { color: var(--tinta-suave); }
+
+.inicio-ha-llegado-trozo {
+  font: inherit;
   background: none;
   border: 0;
-  box-shadow: none;
   padding: 0;
-  font-size: 12.5px;
-  font-weight: 600;
+  cursor: pointer;
   color: var(--azul);
 }
-.inicio-fila-compacta .acciones .boton:hover { text-decoration: underline; }
-.inicio-fila-compacta .acciones .fila-menu-btn { background: none; border: 0; box-shadow: none; }
+.inicio-ha-llegado-trozo:hover strong { text-decoration: underline; }
 
-/* ---------- "Ver todo (N)": el panel de "clasificar" reaprovechado,
-   ya no como la tarjeta grande de montón que era ---------- */
-
-.panel[data-vista="clasificar"] {
-  display: inline-flex;
-  padding: 6px 10px;
-  box-shadow: none;
-  border-color: transparent;
-  background: none;
-}
-.panel[data-vista="clasificar"]:hover { border-color: var(--linea); background: var(--papel); }
-.panel[data-vista="clasificar"]:focus { outline: none; }
-.panel[data-vista="clasificar"]:focus-visible { outline: 2px solid var(--azul); outline-offset: 1px; }
-.panel[data-vista="clasificar"] .panel-icono,
-.panel[data-vista="clasificar"] .panel-pie { display: none; }
-.panel[data-vista="clasificar"] .panel-nombre {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--azul);
+/* Si hay algo nuevo desde la última vez, el número va resaltado
+   (la marca que antes llevaba #nuevos-sueltos). */
+.inicio-ha-llegado-nuevo strong {
+  background: var(--ambar, #fff4d6);
+  border: 1px solid var(--ambar-linea, #e6c377);
+  border-radius: 20px;
+  padding: 1px 9px;
 }
 
-/* Con solo un panel visible, la rejilla de tres columnas de siempre
-   (css/estilos.css) dejaría dos huecos vacíos: aquí solo hace falta
-   sitio para el "Ver todo" restilado. */
-#pantalla-abiertos .paneles {
-  display: block;
-  margin: 0 0 12px;
+/* El cuadro de avisos (fila 193/212): ya no ocupa todo el ancho, solo
+   lo que mide su texto, a la derecha de "Ha llegado". */
+.inicio-fila-superior .avisos-linea { flex: 0 1 auto; margin: 0; }
+
+/* ---------- elemento de compatibilidad (index.html): invisible a
+   ojo, pero con tamaño real para que Playwright lo pueda pulsar
+   (varias pruebas de pruebas/ siguen usando este selector) ---------- */
+
+.panel-legado-oculto {
+  /* `fixed` en una esquina, con hueco real: `absolute` sin `top`/`left`
+     se queda en su "posición estática", que puede caer debajo de otro
+     elemento (el envoltorio de la tabla lo tapaba y el click no le
+     llegaba). Aquí, ancho en su propio plano, nunca lo tapa nada. */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 0;
+  opacity: .01;
+  z-index: 9999;
+  white-space: nowrap;
 }
 
-/* ---------- reflujo con poco ancho: una sola columna, la izquierda
-   primero (orden natural del DOM) ---------- */
+/* ---------- "Ha llegado", en #zona-clasificar (fila 212) ----------
 
-@container (max-width: 1000px) {
-  #inicio-cuerpo { grid-template-columns: 1fr; }
+   Al llegar desde uno de los dos enlaces de la línea de arriba, se
+   enseña solo esa mitad (App.pintarSoloQueClasificar, en
+   js/asuntos-lista-montones.js). */
+
+#zona-clasificar.solo-correos #lista-sueltos,
+#zona-clasificar.solo-correos #nuevos-sueltos,
+#zona-clasificar.solo-correos #btn-sueltos-visto,
+#zona-clasificar.solo-documentos #correos-sin-clasificar {
+  display: none;
 }
 
 /* ---------- el badge rojo de vencidos, en la pestaña lateral "Inicio" ---------- */
@@ -286,24 +270,27 @@ table.inicio-tabla {
 .marca-plazo.inicio-dias-rojo { background: #fdecec; color: #a4302a; border-color: #f2c4c0; }
 .marca-plazo.inicio-dias-ambar { background: #fff4d6; color: #8a6100; border-color: #e6c377; }
 
-/* ---------- la franja única de avisos (fila 193, apartado 1,
-   docs/AVISOS-MENU-Y-VOLVER.md) ----------
+/* ---------- el cuadro único de avisos (fila 193, apartado 1,
+   docs/AVISOS-MENU-Y-VOLVER.md; fila 212, apartado 2: pequeño, no a
+   todo el ancho) ----------
 
-   Debajo de la cabecera de Inicio: un trozo por aviso, separados por
-   " · " (.avisos-linea-sep), cada uno pulsable (.avisos-linea-trozo),
-   con un solo "Ocultar por hoy" a la derecha. Mismo color de fondo que
-   los avisos de siempre (.aviso-rojo/.aviso-ambar, css/estilos.css),
-   sin el margen-padding de caja apilada: aquí todo en una línea. */
+   Un trozo por aviso, separados por " · " (.avisos-linea-sep), cada
+   uno pulsable (.avisos-linea-trozo), con una ✕ pequeña a la derecha
+   para "Ocultar por hoy". Mismo color de fondo que los avisos de
+   siempre (.aviso-rojo/.aviso-ambar, css/estilos.css). El cuadro mide
+   lo que mide su texto (.inicio-fila-superior .avisos-linea, arriba),
+   nunca todo el ancho; si no caben en una línea, se parte en dos
+   (flex-wrap), sin invadir "Ha llegado". */
 
 .avisos-linea {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
   flex-wrap: wrap;
   border-radius: var(--radio);
-  padding: 8px 12px;
-  margin-bottom: 14px;
-  font-size: 13.5px;
+  padding: 6px 8px 6px 12px;
+  font-size: 13px;
+  max-width: 480px;
 }
 
 .avisos-linea-texto {
@@ -333,5 +320,15 @@ button.avisos-linea-trozo:hover {
 
 .avisos-linea-ocultar {
   flex: 0 0 auto;
-  white-space: nowrap;
+  width: 20px;
+  height: 20px;
+  line-height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, .08);
+  color: inherit;
+  font-size: 12px;
+  cursor: pointer;
 }
+.avisos-linea-ocultar:hover { background: rgba(0, 0, 0, .16); }
