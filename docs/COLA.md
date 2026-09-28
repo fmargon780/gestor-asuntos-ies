@@ -206,6 +206,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 218 | En la ventana principal no veo como filtrar por el tercero del asunto. | IDEA (28-sep-2026): apuntada por Francisco desde el Centro de mando |
 | 219 | Cuando se modifica un asunto el campo Tercero debería ser un buscador o desplegable del campo tercero, no un texto libre como ahora. | IDEA (28-sep-2026): apuntada por Francisco desde el Centro de mando |
 | 217 | `docs/CORREO-OTRA-CUENTA-ABIERTA.md` (enviar correo con otra cuenta de Google abierta en el navegador: aviso claro en vez de «Failed to fetch» y, si Google lo deja, que el envío funcione igual usando la forma general de la dirección del script) | PENDIENTE (28-sep-2026) |
+| 221 | Descubro que al generar un certificado de función tutorial no detecta que el profesor ejerció la función tutorial en 2013-2014. Si aparecen otros años. Nombre Pareja De Vicente, Rosa María | IDEA (28-sep-2026): apuntada por Francisco desde el Centro de mando |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
