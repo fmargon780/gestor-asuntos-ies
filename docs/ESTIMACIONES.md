@@ -4,7 +4,7 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 `CLAUDE.md`). Minutos por fila entera: programar, pruebas, publicar y comprobar. La página
 «Estado de la cola» de Francisco lee esta tabla desde `main`.
 
-Última puesta al día: 28-sep-2026 07:22
+Última puesta al día: 28-sep-2026 07:33
 
 | Nº | Minutos | Motivo |
 |---|---|---|
