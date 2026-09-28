@@ -1,8 +1,11 @@
 /* Prueba en navegador de verdad de la pantalla de Inicio (27-sep-2026,
-   fila 209, docs/INICIO-EN-PESTANAS.md): dos columnas ("Ha llegado" +
-   el tablón, siempre a la vista, a la izquierda; pestañas y una sola
-   tabla a la derecha) en vez de los tres bloques + tablón + tabla de
-   abajo + plegados de la fila 191/192 (docs/INICIO-CUATRO-BLOQUES.md).
+   fila 209, docs/INICIO-EN-PESTANAS.md, y 28-sep-2026, fila 212,
+   docs/INICIO-A-TODO-EL-ANCHO.md, que le quita la columna izquierda):
+   pestañas y una sola tabla, a todo el ancho, en vez de los tres
+   bloques + tablón + tabla de abajo + plegados de la fila 191/192
+   (docs/INICIO-CUATRO-BLOQUES.md). "Ha llegado" y el tablón, y el
+   resto de la fila 212, se comprueban en
+   pruebas/inicio-a-todo-el-ancho.mjs.
 
    No hace falta pasar por una guía ni por Hitos.marcar para levantar
    los datos: basta con las carpetas de los asuntos, su ficha en
@@ -127,7 +130,7 @@ await pagina.evaluate(async ({ CLAVE_A, CLAVE_B, CLAVE_C, CLAVE_D, FECHA_AYER, D
 await pagina.click('#btn-recargar');
 await pagina.waitForTimeout(500);
 await pagina.evaluate(() => window.Inicio && window.Inicio.repintar());
-await pagina.waitForSelector('#inicio-ha-llegado-lista .tarjeta-suelto');
+await pagina.waitForSelector('#inicio-ha-llegado-linea .inicio-ha-llegado-trozo');
 await pagina.waitForSelector('#tablon');
 
 /* ================= 1. LA PESTAÑA DICE "INICIO"; SIN "ME TOCA" ================= */
@@ -142,15 +145,15 @@ await comprobar('ni "Esperamos a otros"',
 await comprobar('sí "En Administración" y "En espera"',
   pagina.locator('#inicio-pestanas').textContent().then(t => t.indexOf('En Administración') !== -1 && t.indexOf('En espera') !== -1), true);
 
-/* ================= 2. "HA LLEGADO" Y EL TABLÓN, A LA IZQUIERDA, SIEMPRE A LA VISTA ================= */
+/* ================= 2. "HA LLEGADO" Y EL TABLÓN, EN LA CABECERA ================= */
 
-console.log('--- 2. "Ha llegado" y el tablón, a la izquierda, sin pulsar nada ---');
-await comprobar('"Ha llegado" se ve', pagina.locator('#inicio-ha-llegado').isVisible(), true);
-await comprobar('el suelto sale en "Ha llegado"',
-  pagina.locator('#inicio-ha-llegado-lista').textContent().then(t => t.indexOf('escaneo del director.pdf') !== -1), true);
+console.log('--- 2. "Ha llegado" (fila 212) y el tablón, en la cabecera, sin pulsar nada ---');
+await comprobar('"Ha llegado" se ve', pagina.locator('#inicio-ha-llegado-linea').isVisible(), true);
+await comprobar('dice "1 documento por clasificar" (el suelto de la fila 212)',
+  pagina.locator('#inicio-ha-llegado-linea').textContent().then(t => t.indexOf('1 documento por clasificar') !== -1), true);
 await comprobar('el tablón se ve', pagina.locator('#tablon').isVisible(), true);
-await comprobar('los dos viven en la misma columna izquierda',
-  pagina.evaluate(() => document.getElementById('inicio-lado').contains(document.getElementById('tablon'))), true);
+await comprobar('el tablón vive en el hueco de la cabecera (fila 212), no en una columna aparte',
+  pagina.evaluate(() => document.getElementById('inicio-tablon-hueco').contains(document.getElementById('tablon'))), true);
 await comprobar('al entrar, la pestaña activa es "Todos los abiertos"',
   pagina.locator('.inicio-pestana.activa').getAttribute('data-pestana'), 'todos');
 await comprobar('con las cuatro filas', pagina.locator('#inicio-tabla-cuerpo .inicio-tabla-fila').count(), 4);
@@ -272,10 +275,14 @@ await pagina.waitForTimeout(200);
 
 /* ================= 10. SIN "#inicio-legado" NI LOS PLEGADOS VIEJOS ================= */
 
-console.log('--- 10. sin la zona legado ni los plegados "Dormidos"/"Sin fecha" de antes ---');
+console.log('--- 10. sin la zona legado, los plegados "Dormidos"/"Sin fecha" de antes, ni la columna izquierda de la fila 209 ---');
 await comprobar('sin "#inicio-legado"', pagina.locator('#inicio-legado').count(), 0);
 await comprobar('sin "#inicio-plegados"', pagina.locator('#inicio-plegados').count(), 0);
 await comprobar('sin "#inicio-sinfecha"', pagina.locator('#inicio-sinfecha').count(), 0);
+await comprobar('sin "#inicio-lado" (fila 212: la columna izquierda desaparece)',
+  pagina.locator('#inicio-lado').count(), 0);
+await comprobar('sin el botón grande "Ver todo (N)" de las filas 191/209 (".paneles")',
+  pagina.locator('.paneles').count(), 0);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
