@@ -35,9 +35,12 @@ troceado). Es justo el caso que la propia sección 5 de `docs/REVISOR-ANTES-DE-P
 revisor (guion, rama `pruebas`, DEVUELTA) queda escrito y en vigor; lo único que falta es que
 Francisco (o una sesión con permiso para tocar su propia configuración) cree ese fichero a mano.
 
-Ficheros: nada de `js/`, `css/` ni `pruebas/`, así que no hay pruebas nuevas que correr ni
-publicación de Vercel que comprobar (`git diff` de esta fila solo toca `docs/`, `CLAUDE.md` y
-`scripts/vercel-ignore-build.sh`; este último no cambia lo que ya se salta, solo añade `.claude`).
+Ficheros: nada de `js/`, `css/` ni `pruebas/`, así que no hay pruebas nuevas que correr. Pero
+tocar el propio `scripts/vercel-ignore-build.sh` (para añadirle `.claude` a lo que se salta) sí
+cuenta como cambio fuera de `docs/`/`*.md`/`.github` a ojos del propio script, y disparó una
+publicación de verdad: comprobado por `curl`, `App.VERSION` pasó a `28-sep-2026 · 20:01` (la hora
+que pone sola el `buildCommand` al publicar), sin nada roto — no hay ningún cambio de aplicación
+que ver, solo la hora nueva.
 
 ## 28-sep-2026 — Fila 222: la copia de pruebas, con datos inventados
 
