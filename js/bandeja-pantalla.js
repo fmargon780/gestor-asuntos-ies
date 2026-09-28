@@ -45,6 +45,17 @@ var BandejaPantalla = (function () {
     aplicarPlegado();
   }
 
+  /* Fila 212 (docs/INICIO-A-TODO-EL-ANCHO.md): al entrar en "Ver todo"
+     desde "N correos" (solo la bandeja, sin la lista de documentos), la
+     bandeja arranca desplegada, porque es lo único que hay que ver.
+     Con pintar() entero, no solo aplicarPlegado(): esa función solo AÑADE
+     la clase "oculto" cuando está plegada, nunca la quita (quien la
+     quita es pintarCaja(), dentro de pintar()). */
+  function desplegar() {
+    plegado = false;
+    pintar();
+  }
+
   function alternar() {
     plegado = !plegado;
     pintar();
@@ -335,5 +346,5 @@ var BandejaPantalla = (function () {
     return div;
   }
 
-  return { pintar: pintar, plegar: plegar, tarjeta: tarjeta };
+  return { pintar: pintar, plegar: plegar, desplegar: desplegar, tarjeta: tarjeta };
 })();
