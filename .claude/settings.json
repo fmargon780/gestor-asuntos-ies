@@ -26,5 +26,40 @@
       "mcp__Vercel__*"
     ],
     "deny": []
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "S=\"$CLAUDE_PROJECT_DIR/scripts/aviso-esperando.sh\"; [ -x \"$S\" ] && \"$S\" esperando >/dev/null 2>&1; exit 0",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -f \"${TMPDIR:-/tmp}/aviso-esperando.flag\" ] || exit 0; S=\"$CLAUDE_PROJECT_DIR/scripts/aviso-esperando.sh\"; [ -x \"$S\" ] && \"$S\" libre >/dev/null 2>&1; exit 0",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -f \"${TMPDIR:-/tmp}/aviso-esperando.flag\" ] || exit 0; S=\"$CLAUDE_PROJECT_DIR/scripts/aviso-esperando.sh\"; [ -x \"$S\" ] && \"$S\" libre >/dev/null 2>&1; exit 0",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
   }
 }
