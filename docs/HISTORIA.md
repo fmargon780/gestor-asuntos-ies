@@ -68,6 +68,15 @@ se crea de principio a fin. Comprobado que la prueba detecta la regresión de ve
 mano solo `App.prepararNuevo` a como estaba antes de esta fila, la prueba dio 9 fallos; restaurado
 el arreglo, vuelve a estar en verde.
 
+**La pasada completa (179 ficheros) encontró dos fallos más, los dos esperables con este cambio.**
+`pruebas/navegador.mjs` tenía el mismo caso que la fila 163: pulsaba «Cambiar» a propósito porque
+«Trujillo (ALUMNADO) sigue elegido de la comprobación de antes» al volver a "Nuevo asunto" desde
+Personas — con el formulario preparado desde cero, ya no sigue elegido, así que ese «Cambiar» de
+más se ha quitado; el resto del fichero (más de 70 comprobaciones) sigue igual y en verde,
+comprobado dos veces en solitario. `pruebas/responsable-organismo.mjs` falló solo
+en la pasada completa (contención de CPU, no tiene nada que ver con "Nuevo asunto"; en solitario, 1
+de 1 en verde): sumada a `EN_SOLITARIO`, como las demás de esa lista.
+
 ## 28-sep-2026 — Fila 215: la categoría guía Nuevo asunto (cerrando lo que dejó la sesión anterior)
 
 `docs/NUEVO-ASUNTO-CATEGORIA-GUIA.md`. Francisco devolvió la fila a PENDIENTE porque una sesión

@@ -268,11 +268,9 @@ await pagina.click('.pestana[data-pantalla="abiertos"]');
 
 /* --- el personal sale del RelPerCen de Séneca --- */
 await pagina.click('.pestana[data-pantalla="nuevo"]');
-/* Fila 197: Trujillo (ALUMNADO) sigue elegido de la comprobación de
-   antes (nunca se llegó a crear el asunto, así que nada lo ha
-   soltado): "Cambiar" lo suelta, y con él la parrilla vuelve a
-   enseñar todos los tipos. */
-await pagina.click('#btn-cambiar-tercero');
+/* Fila 220: cada entrada a "Nuevo asunto" prepara el formulario desde
+   cero, así que Trujillo (ALUMNADO, elegido en la comprobación de
+   antes) ya no sigue puesto al volver: no hace falta "Cambiar". */
 await pagina.click('.categoria-boton[data-categoria="PERSONAL"]');
 /* Sin persona elegida la parrilla ya no está limitada a la categoría
    de la pastilla (esa es la del buscador), así que aquí hay que

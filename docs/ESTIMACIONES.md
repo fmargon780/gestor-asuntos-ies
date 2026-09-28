@@ -4,11 +4,10 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 `CLAUDE.md`). Minutos por fila entera: programar, pruebas, publicar y comprobar. La página
 «Estado de la cola» de Francisco lee esta tabla desde `main`.
 
-Última puesta al día: 28-sep-2026 (fila 220, EN CURSO)
+Última puesta al día: 28-sep-2026 (fila 220, HECHA)
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 220 | 60 | `docs/CREAR-ASUNTO-DESDE-TODOS-LOS-SITIOS.md`: recorrer las 6-7 entradas a «Nuevo asunto», unificar la preparación del formulario, buscar la causa del comportamiento irregular y del bloqueo, y una prueba nueva que pasa por todas las entradas |
 | 206 | 70 | `docs/HITOS-DESDE-EL-ASUNTO.md`: crear/cambiar/borrar hitos desde la mesa de un asunto, con «Colocar después de», la definición de «hito vacío» y la propagación opcional a la guía del tipo |
 | 203 | 45 | `docs/PAPELERA-SE-VACIA-SOLA.md`: borrado automático a los 90 días con aviso a los 7, fichero nuevo de constancia (`papelera-borrados.json`) y cuidado de que dos ordenadores no se pisen |
 | 210 | 30 | `docs/HILO-SIN-REPETIR.md`: solo `apps-script/gestor-correos.gs` (fuera de la app JS), tres arreglos contenidos (orden, quitar citas repetidas, adjuntos sin duplicar) |
