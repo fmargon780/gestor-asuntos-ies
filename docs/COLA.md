@@ -195,10 +195,10 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 212 | `docs/INICIO-A-TODO-EL-ANCHO.md` (Inicio, tercera versión, sobre la fila 209: fuera la columna izquierda; una fila con «Ha llegado: N correos · N documentos por clasificar» —cada trozo abre «Ver todo» solo con eso— y los avisos en un cuadro ámbar pequeño con ✕; el tablón compacto arriba a la derecha, en la cabecera; filtros plegados al entrar) | EN CURSO (28-sep-2026 06:00) |
 | 205 | `docs/RESPONSABLE-UNA-ADMINISTRACION.md` (responsable de un hito: «Una Administración…», para elegir un organismo dado de alta, como la Delegación Territorial; el asunto pasa a «Esperando a…» ese organismo) | PENDIENTE (27-sep-2026) |
 | 203 | `docs/PAPELERA-SE-VACIA-SOLA.md`, entero, con `js/copias.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 203) | PENDIENTE (27-sep-2026) |
-| 204 | `docs/COMPROBACION-AL-ENTRAR.md`, entero, con `js/cabecera-fija.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 204) | PENDIENTE (27-sep-2026) |
 | 206 | `docs/HITOS-DESDE-EL-ASUNTO.md` (crear, cambiar y borrar hitos desde la mesa de un asunto, con «Colocar después de»; cada cambio pregunta si va también a la guía, ya marcado, y llega a los asuntos abiertos del tipo donde el hito esté vacío; solo se borran hitos vacíos) | PENDIENTE (27-sep-2026) |
 | 210 | `docs/HILO-SIN-REPETIR.md` (el PDF del HILO de correos: lo último arriba, sin citas repetidas, y adjuntos sin repetir) | PENDIENTE (27-sep-2026) |
 | 213 | `docs/BOTON-DE-SOPORTE.md` (botón «Soporte» en una esquina: error o mejora, texto y captura opcional; buzón en un script de Google que guarda el aviso en Drive y apunta una IDEA sin datos en la cola; más `docs/PONER-EN-MARCHA-SOPORTE.md` para Francisco) | PENDIENTE (28-sep-2026) |
+| 204 | `docs/COMPROBACION-AL-ENTRAR.md`, entero, con `js/cabecera-fija.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 204) | PENDIENTE (27-sep-2026) |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
