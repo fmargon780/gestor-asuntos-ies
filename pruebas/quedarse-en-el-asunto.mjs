@@ -192,11 +192,14 @@ await comprobar('9. Volver devuelve a la lista de asuntos abiertos', pantallas()
 
 console.log('--- 10. "Guardar en un asunto" hacia el mismo asunto que tenía la ficha, desde Por clasificar ---');
 const SUELTO = 'Escrito para el proveedor de prueba.pdf';
-await pagina.click('.panel[data-vista="clasificar"]');
 await pagina.evaluate((nombre) => {
   window.__disco.abiertos._hijos.set(nombre, window.__disco.fich(nombre, 'un escrito cualquiera'));
 }, SUELTO);
+/* Fila 214: "Actualizar" (#btn-recargar) vive dentro de #inicio-cuerpo,
+   que "clasificar" esconde: hay que pulsarlo antes de entrar, no
+   después (App.irVista repinta la lista con lo ya releído al entrar). */
 await pagina.click('#btn-recargar');
+await pagina.click('.panel[data-vista="clasificar"]');
 await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');
 await pagina.locator('#lista-sueltos .tarjeta-suelto', { hasText: SUELTO })
   .getByRole('button', { name: 'Guardar en un asunto' }).click();

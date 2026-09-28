@@ -589,13 +589,19 @@ Array.prototype.forEach.call(document.querySelectorAll('.pestana'), function (b)
   b.onclick = function () { App.ir(b.dataset.pantalla); };
 });
 
+/* Fila 214: pantallas del menú de verdad (los botones .pestana), las
+   únicas cuya vuelta a Inicio deja "clasificar" atrás si se había
+   dejado a medias. App.PANTALLAS también lleva pantallas que no son
+   del menú (la ficha, "asunto", empuja la suya con App.PANTALLAS.push
+   en js/ficha-asunto.js, y lo mismo tipo-asunto/cuentas/formularios/
+   duplicados): volver de esas es un «Volver» normal, no un «ir a
+   Inicio desde el menú», y no debe tocar "clasificar". */
+var MENU_PANTALLAS = ['nuevo', 'archivo', 'personas', 'herramientas', 'ajustes'];
+
 App.ir = function (cual) {
-  /* Fila 214: de qué pantalla del menú se viene, para saber si se
-     vuelve a Inicio desde otra (no desde una ficha, que esconde
-     #pantalla-abiertos por su cuenta y no cuenta como ninguna de
-     App.PANTALLAS: Navegacion.pantallaVisible() da '' con la ficha
-     abierta). Se mira antes de que las líneas de abajo cambien qué
-     pantalla está a la vista. */
+  /* De qué pantalla se viene, para la comprobación de más abajo. Se
+     mira antes de que las líneas de abajo cambien qué pantalla está a
+     la vista. */
   var pantallaDeAntes = window.Navegacion ? Navegacion.pantallaVisible() : '';
 
   /* Fila 194: se apunta de dónde se viene antes de cambiar de pantalla,
@@ -610,11 +616,11 @@ App.ir = function (cual) {
   Array.prototype.forEach.call(document.querySelectorAll('.pestana'), function (b) {
     b.classList.toggle('activa', b.dataset.pantalla === cual);
   });
-  /* Fila 214: volver a Inicio desde otra pantalla del menú (Archivo,
+  /* Fila 214: volver a Inicio desde otra pantalla del MENÚ (Archivo,
      Ajustes…) lo deja normal, sin la zona de "clasificar" a la vista
-     si se había dejado a medias; volver desde una ficha (abierta desde
-     dentro de "clasificar" o no) no toca nada de esto. */
-  if (cual === 'abiertos' && pantallaDeAntes && pantallaDeAntes !== 'abiertos' &&
+     si se había dejado a medias; volver desde la ficha de un asunto
+     (abierta desde dentro de "clasificar" o no) no toca nada de esto. */
+  if (cual === 'abiertos' && MENU_PANTALLAS.indexOf(pantallaDeAntes) !== -1 &&
       App.E.vista === 'clasificar' && App.irVista) {
     App.irVista('departamento');
   }

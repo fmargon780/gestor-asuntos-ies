@@ -264,7 +264,11 @@ await dejarPdfSuelto('choque (unido).pdf', await pdfDePrueba(1));   /* ya ocupa 
 const PDF_E = await pdfDePrueba(1);
 await dejarPdfSuelto('otro-mas.pdf', PDF_E);
 
-await pagina.click('#btn-recargar');
+/* Fila 214: "Actualizar" (#btn-recargar) vive dentro de #inicio-cuerpo,
+   que "clasificar" esconde, y esta parte de la prueba sigue dentro
+   (no ha vuelto a Inicio desde la línea 235): App.verAbiertos es lo
+   mismo que hace ese botón, sin depender de que esté a la vista. */
+await pagina.evaluate(() => App.verAbiertos());
 await pagina.waitForSelector('#lista-sueltos .tarjeta-suelto');
 await pulsarDelMenu(tarjetaSueltaDe('choque.pdf'), 'Unir');
 await pagina.waitForSelector('#unir-lista .unir-fila');
