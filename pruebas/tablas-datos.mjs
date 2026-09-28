@@ -104,6 +104,34 @@ await comprobar('1. sin el punto suelto',
 await comprobar('1. el segundo bloque, con su grupo',
   Promise.resolve(filas1[filas1.length - 1].grupo), 'Pedagogía Terapéutica, Audición y Lenguaje o Diversificación');
 
+/* ---------- 1b. el texto del margen no se come la fila (fila 221) ---------- */
+console.log('--- 1b. el margen «Ref.Doc.: RelFunTut» no descarta la fila ---');
+const filas1b = await pagina.evaluate(async () => {
+  const PDFLib = await PdfHerramientas.cargarPdfLib();
+  const doc = await PDFLib.PDFDocument.create();
+  const fuente = await doc.embedFont(PDFLib.StandardFonts.Helvetica);
+  const p = doc.addPage([595, 842]);
+  let y = 800;
+  function linea(trozos, salto) {
+    trozos.forEach(([x, t]) => p.drawText(t, { x, y, size: 8, font: fuente }));
+    y -= (salto || 12.8);
+  }
+  const X = { unidad: 51, nombre: 126, dni: 290, periodo: 370 };
+  linea([[40, 'Relación de funciones tutoriales']]);
+  linea([[40, 'D./Dña. Directora del centro certifica que durante el curso escolar 2013/2014 han ejercido:']], 20);
+  linea([[40, 'Funciones tutoriales procedentes de tutorías de unidades']]);
+  linea([[X.unidad, 'Unidad'], [X.nombre, 'Empleado/a'], [X.dni, 'D.N.I.'], [X.periodo, 'Periodo']]);
+  const yFila = y;
+  linea([[X.unidad, '1º ESO A'], [X.nombre, 'Pareja de Vicente, Rosa María'], [X.dni, '11223344X'], [X.periodo, '01/09/2013 - 31/08/2014']]);
+  /* El texto vertical del margen, a la misma altura (±3) que la fila de arriba. */
+  p.drawText('Ref.Doc.: RelFunTut', { x: 20, y: yFila - 2.4, size: 8, font: fuente });
+  const bytes = await doc.save();
+  return await TablasDatosLeer.tutoriasDePdf(bytes, 'Función Tutorial 2013-2014.pdf');
+});
+await comprobar('1b. una sola fila, no descartada por el margen', Promise.resolve(filas1b.length), 1);
+await comprobar('1b. la fila, entera', Promise.resolve(filas1b[0]), { curso: '2013/2014', grupo: '1º ESO A',
+  nombre: 'Pareja de Vicente, Rosa María', dni: '11223344X', desde: '2013-09-01', hasta: '2014-08-31', clave: '11223344' });
+
 /* ---------- 2 y 3. los huecos en un .docx ---------- */
 console.log('--- 2 y 3. {{TABLA TUTORIAS}} y {{ESPECIALIDAD}} en el certificado ---');
 const r23 = await pagina.evaluate(async () => {

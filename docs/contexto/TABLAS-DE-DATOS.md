@@ -18,7 +18,9 @@ caracteres, por esos 4 y el nombre.
   «procedentes de tutorías de unidades»; bloque 2, «Pedagogía Terapéutica… Diversificación», con
   grupo «Pedagogía Terapéutica, Audición y Lenguaje o Diversificación». Una línea sin DNI ni periodo
   se pega al nombre de la fila de arriba (nombres partidos, «(Sustituto/a)», que se quita); un punto
-  suelto tras el apellido se quita; cabeceras y pies («Pág.», «Ref.Doc.»…) se ignoran. Curso: «curso
+  suelto tras el apellido se quita; los pies y el margen («Pág.», «Ref.Doc.»…) se quitan **trozo a
+  trozo, antes de agrupar en líneas** (fila 221): si no, un trozo suelto del margen a la misma
+  altura que una fila de datos entra en su línea y la hace descartar entera. Curso: «curso
   escolar 2025/2026» del texto, o del nombre del fichero. Fila: `{ curso, grupo, nombre, dni, desde,
   hasta, clave }`, sin duplicados exactos (el mismo PDF bajado dos veces). **Ojo**: pdf.js vacía el
   buffer que se le da; se le pasa siempre una copia.

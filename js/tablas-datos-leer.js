@@ -73,7 +73,11 @@ var TablasDatosLeer = (function () {
      { curso, grupo, nombre, dni, desde, hasta, clave }. `nombreFichero`
      sirve para el curso si el texto no lo dice. */
   function tutoriasDeTrozos(trozos, nombreFichero) {
-    var lineas = lineasDe(trozos);
+    /* Los pies y el margen (número de página, «Ref.Doc.», código de centro…) se quitan trozo a
+       trozo, antes de agrupar en líneas: si no, un trozo del margen a la misma altura que una
+       fila de datos se cuela en su línea y la hace descartar entera (fila 221). */
+    var utiles = trozos.filter(function (t) { return !RE_IGNORAR.test(String(t.str || '').trim()); });
+    var lineas = lineasDe(utiles);
     var todo = lineas.map(function (l) { return l.texto; }).join(' ');
     var m = todo.match(/curso escolar\s+(\d{4})\s*\/\s*(\d{4})/i);
     var curso = m ? m[1] + '/' + m[2] : cursoDeNombre(nombreFichero);

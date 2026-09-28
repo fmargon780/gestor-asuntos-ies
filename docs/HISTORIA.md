@@ -5,6 +5,29 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 28-sep-2026 — Fila 221: el texto del margen ya no se come una fila de tutorías
+
+`docs/TUTORIAS-TEXTO-DEL-MARGEN.md`. Causa real, comprobada con el PDF de Pareja de Vicente, Rosa
+María: los PDF «Relación de funciones tutoriales» de Séneca llevan en el margen izquierdo un texto,
+`Ref.Doc.: RelFunTut`, que a veces cae a la misma altura (±3) que una fila de datos; `lineasDe` los
+agrupaba en la misma línea y, como el texto del margen quedaba el primero al ordenar por x, la línea
+entera («Ref.Doc.: RelFunTut 1º ESO A …») casaba con `RE_IGNORAR` y `tutoriasDeTrozos` la tiraba
+entera, con la persona y su periodo dentro.
+
+Arreglo de una línea de más: en `js/tablas-datos-leer.js`, `tutoriasDeTrozos` filtra ahora los
+trozos que casan con `RE_IGNORAR` **antes** de pasarlos a `lineasDe` (trozo a trozo, no línea a
+línea), así que el texto del margen desaparece sin llevarse la fila de al lado. El descarte de
+líneas que solo traigan cabecera o pie se mantiene igual, por si algún trozo suelto no encaja en
+ninguna columna. No hizo falta la segunda parte del documento (descartar también los trozos
+girados): al filtrar por el propio texto, la orientación del trozo es indiferente.
+
+Prueba nueva en `pruebas/tablas-datos.mjs` («1b.»): un PDF con la disposición exacta del caso real
+(cabecera en `x` 51/126/290/370, fila cada 12,8 de altura, `Ref.Doc.: RelFunTut` en `x` 20 a 2,4 por
+debajo de la fila), nombre y DNI inventados. Sale la fila entera, con su grupo, nombre, DNI y
+periodo.
+
+---
+
 ## 28-sep-2026 — Fila 206: crear, cambiar y borrar hitos desde el asunto
 
 `docs/HITOS-DESDE-EL-ASUNTO.md`. Fichero nuevo `js/hitos-desde-el-asunto.js`
