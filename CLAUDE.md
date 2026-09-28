@@ -40,6 +40,12 @@ Al marcar una fila HECHA, escribe siempre la hora junto a la fecha, en hora de M
 `HECHA (28-sep-2026 14:05)`. Así la página de estado puede calcular lo que tardó de verdad cada
 fila. No cambies las filas ya escritas.
 
+**Ideas y diseño** (28-sep-2026, decidido por Francisco): en `docs/COLA.md` puede haber filas
+con estado IDEA o EN DISEÑO. No son trabajo para Claude Code: nunca se cogen, ni se marcan, ni
+se estiman en `docs/ESTIMACIONES.md`, ni se mueven, ni se borran. «La primera PENDIENTE» se
+cuenta saltándolas. Solo una conversación de diseño las pasa a PENDIENTE, cuando Francisco
+cierra el diseño.
+
 ## Regla general de publicación (manda sobre cualquier otra regla)
 
 Acordada con Francisco el 26-sep-2026 para todos sus proyectos. Ese día, en otro proyecto,

@@ -1,5 +1,7 @@
 # Cola de instrucciones para Claude Code
 
+Estados: PENDIENTE / EN CURSO / HECHA / BLOQUEADA / IDEA / EN DISEÑO. IDEA: apuntada por Francisco, sin diseñar. EN DISEÑO: se está diseñando en una conversación de Cowork; lleva el enlace. Claude Code no toca ninguna de las dos.
+
 Aquí se apuntan, en orden, las instrucciones pendientes. Cada una es un documento de `docs/`.
 Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente, de arriba abajo.
 
