@@ -220,10 +220,64 @@
   background: var(--papel);
 }
 
-.paso-cabecera { display: flex; align-items: center; gap: 8px; }
+.paso-cabecera { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .paso-cabecera .paso-titulo { flex: 1; }
 .paso-mandos { display: flex; gap: 4px; }
 .paso-mandos .boton { padding: 6px 9px; }
+
+/* ---------- de dónde viene el hito (28-sep-2026, fila 201, apartado 2,
+   docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md): la etiqueta, siempre a la
+   vista (nunca dentro de un `<details>`), y su panel al pulsarla. ---------- */
+.chip-origen {
+  font-size: 11px;
+  border-radius: 999px;
+  padding: 2px 10px;
+  border: 1px solid var(--linea);
+  background: var(--fondo);
+  color: var(--tinta-suave);
+  white-space: nowrap;
+  cursor: default;
+}
+.chip-origen:disabled { opacity: 1; }
+.chip-origen-biblioteca, .chip-origen-cambiado { cursor: pointer; }
+.chip-origen-biblioteca { background: var(--azul-claro); border-color: var(--azul); color: var(--azul); }
+.chip-origen-cambiado { background: var(--ambar); border-color: var(--ambar-linea); color: var(--tinta); }
+.chip-origen-panel {
+  flex-basis: 100%;
+  margin-top: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  background: var(--papel);
+  font-size: 13px;
+}
+.chip-origen-panel.oculto { display: none; }
+.chip-origen-panel p { margin: 0 0 6px; }
+
+/* ---------- apartado 3, punto 1: la biblioteca se ofrece sola al
+   escribir el título de un hito nuevo. ---------- */
+.paso-titulo-parecido {
+  flex-basis: 100%;
+  font-size: 13px;
+  color: var(--tinta-suave);
+}
+.paso-titulo-parecido.oculto { display: none; }
+
+/* ---------- apartado 3, punto 3: la ayuda bajo "Guardar en la
+   biblioteca", y la pregunta de una sola frase al guardar un cambio. ---------- */
+.paso-guardar-biblioteca-ayuda { font-size: 12px; margin-top: 2px; }
+.biblioteca-panel-fila-pregunta { font-weight: 600; margin: 0 0 8px; }
+.biblioteca-panel-fila-parecido { margin-top: 8px; }
+.biblioteca-parecido-texto { margin: 0 0 8px; }
+
+/* ---------- apartado 3, punto 4: la guardia de parecidos del texto de
+   los documentos. ---------- */
+.paso-texto-documentos-parecido {
+  font-size: 13px;
+  color: var(--tinta-suave);
+  margin-top: 4px;
+}
+.paso-texto-documentos-parecido.oculto { display: none; }
 
 .paso-cuerpo {
   margin-top: 8px;
