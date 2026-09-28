@@ -5,6 +5,54 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 28-sep-2026 — Fila 206: crear, cambiar y borrar hitos desde el asunto
+
+`docs/HITOS-DESDE-EL-ASUNTO.md`. Fichero nuevo `js/hitos-desde-el-asunto.js`
+(`window.HitosDesdeElAsunto`): en el «···» de la mesa, «+ Crear un hito», «Cambiar este hito» y
+«Borrar este hito» (apagado, con el motivo en el `title`, si el hito tiene trabajo apuntado). Los
+tres llevan «Colocar después de», Responsable (el mismo desplegable de la guía, con «Una
+Administración…» de la fila 205 de balde, por reusar la clase `paso-responsable`) y Plazo (días +
+cómo se cuentan + desde qué hito): sin guía, se guarda igual en el propio hito
+(`Hitos.guardarCampos` gana el campo `plazo`). Una casilla «También en la guía de <tipo>» decide si
+el cambio entra en `guias.json` y llega a los asuntos abiertos del tipo, pero solo a los hitos
+**vacíos** (`HitosDesdeElAsunto.estaVacio`, la misma idea que `HitosCambioDeTipo.tieneAlgo` en
+negativo: distinto de hecho, sin tareas marcadas ni propias, sin notas, sin documentos, sin rama
+elegida y sin fecha puesta a mano). Al crear, el reparto a los abiertos (el asunto actual incluido)
+lo hace solo, de balde, el mecanismo ya existente de la fila 118
+(`GuiasDelCentro.guardarPasos` → `Hitos.llevarGuiaAAbiertos`); al cambiar o borrar hitos que YA
+EXISTEN en cada asunto hizo falta reparto propio (`propagarCambio`/`propagarBorrado`, cada uno un
+solo `Hitos.cambiar`).
+
+**Dos simplificaciones a propósito, por el tiempo que hubiera costado hacerlo entero.** Primera,
+como ya justificaba `Hitos.mover` ("complicaría las bifurcaciones sin que Francisco lo haya
+pedido"): «Colocar después de» solo ofrece los hitos de **nivel superior** del asunto, nunca los de
+dentro de una rama de un hito-pregunta, y lo mismo para los pasos de la guía. Borrar un hito de
+dentro de una rama sigue funcionando («en este asunto», con `Hitos.quitarHito`, que ya busca a
+cualquier profundidad), pero la casilla «también en la guía» no sale si el paso de origen está
+dentro de una opción — con ello se pierde el aviso de "la respuesta se quedará sin hitos" que pedía
+el documento original para ese caso, que no llega a darse nunca con esta limitación. Segunda: "el
+responsable puesto a mano" no se distingue en `estaVacio` de uno que vino de la guía (no hay campo
+que lo diga); al cambiar un hito vacío se sobrescribe igual, como ya hacía el editor de la guía con
+los pasos nuevos antes de esta fila. Las dos quedan escritas también como comentario en el propio
+fichero.
+
+Cambios quirúrgicos en ficheros compartidos: `js/guias-plazo.js` gana `htmlConId`/`leerSelect` (el
+mismo desplegable de "cómo se cuentan los días", pero con un id propio, fuera del `.paso-extra` del
+editor de la guía); `js/hitos-archivo.js` (`Hitos.guardarCampos`) gana el campo `plazo`;
+`js/ficha-menus.js` gana `title` en una opción del menú (para el motivo de "Borrar este hito"
+apagado); `js/hitos-panel.js` (`pedirYAnadirHito`) y "+ Añadir un hito" de la lista abren ahora el
+mismo cuadro de «Crear un hito». «+ Añadir un hito a la guía del tipo» del «···» (fila 120) se
+renombra a «+ Añadir una tarea a la guía del tipo», sin más cambios: seguía añadiendo una línea del
+guion, nunca un hito entero, y con las dos frases tan parecidas en el mismo menú confundía.
+`pruebas/hito-mesa.mjs` puesta al día con el texto nuevo.
+
+Prueba nueva `pruebas/hitos-desde-el-asunto.mjs`, con tres asuntos abiertos del mismo tipo (uno
+«actual», uno vacío, uno con trabajo apuntado en el hito de prueba): crear con guía (llega en su
+sitio a los tres) y crear solo en el asunto (no toca ni la guía ni los otros); cambiar título y
+moverlo (el vacío se cambia y se mueve, el que tiene trabajo no se toca); borrar (apagado con
+trabajo; con la casilla, se va de la guía y del asunto vacío, se queda en el que tenía trabajo).
+`npm test` completo en verde antes de subir.
+
 ## 28-sep-2026 — Fila 220: el mismo formulario, preparado desde cero, desde todos los sitios
 
 `docs/CREAR-ASUNTO-DESDE-TODOS-LOS-SITIOS.md`. Tras la fila 215, Francisco veía el formulario de

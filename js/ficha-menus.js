@@ -9,7 +9,7 @@
    cualquier otro que hubiera quedado abierto.
 
    No sabe nada de asuntos ni de correo: monta el botón disparador con
-   la lista que le pasen (`{texto, clase, deshabilitado, raya,
+   la lista que le pasen (`{texto, clase, deshabilitado, title, raya,
    alPulsar}`) y ya está. Iguales en espíritu a `U.menuDeAcciones`
    (js/util.js), que hace lo mismo para el menú de tres puntos de un
    documento: se escribe aparte porque esta fila lo pide como fichero
@@ -66,6 +66,7 @@ var FichaMenus = (function () {
       item.className = 'ficha-menu-opcion' + (o.clase ? ' ' + o.clase : '');
       item.textContent = o.texto;
       item.disabled = !!o.deshabilitado;
+      if (o.title) item.title = o.title;   /* fila 206: el motivo de una opción apagada */
       item.onclick = function () {
         cerrar();
         o.alPulsar();

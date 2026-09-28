@@ -102,6 +102,10 @@
       if ('titulo' in cambios) h.titulo = String(cambios.titulo || '');
       if ('responsable' in cambios) { h.responsable = String(cambios.responsable || ''); if (window.ResponsableOrganismo && ResponsableOrganismo.esOrganismo(h.responsable)) h.responsableNombre = ResponsableOrganismo.copia(h.responsable, cambios.responsableNombre); else delete h.responsableNombre; }   /* fila 205 */
       if ('fecha' in cambios) { h.fecha = String(cambios.fecha || ''); h.fechaManual = !!cambios.fecha; }
+      /* Fila 206 (docs/HITOS-DESDE-EL-ASUNTO.md): el plazo (días +
+         cómo se cuentan + desde qué hito) de un hito que no viene de
+         la guía, o que se cambia solo en este asunto. */
+      if ('plazo' in cambios) h.plazo = cambios.plazo || null;
       /* 20-sep-2026, fila 79, apartado 4.6: "Pedirmelo a mí" / "Dejarlo
          solo informativo", del menú del propio hito. Afecta solo a este
          hito de este asunto, nunca a la guía del tipo. */

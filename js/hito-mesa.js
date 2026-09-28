@@ -367,8 +367,15 @@ var HitoMesa = (function () {
       var b = fila.querySelector('.hito-solo-informativo'); if (b) b.click();
     } });
     /* Fila 145: lo que había debajo del guion y al pie de la mesa. */
+    /* Fila 206 (docs/HITOS-DESDE-EL-ASUNTO.md): crear, cambiar y borrar
+       hitos enteros desde aquí mismo, sin salir a Ajustes. Nunca en un
+       hito-pregunta (las preguntas se siguen escribiendo en Ajustes). */
+    if (window.HitosDesdeElAsunto && !decision) {
+      opcionesMas.push({ texto: '+ Crear un hito', clase: 'mesa-hda-crear', alPulsar: function () { HitosDesdeElAsunto.abrirCrear(a, h.id); } });
+      opcionesMas.push({ texto: 'Cambiar este hito', clase: 'mesa-hda-cambiar', alPulsar: function () { HitosDesdeElAsunto.abrirCambiar(a, h); } });
+    }
     if (window.HitoMesaGuion && HitoMesaGuion.puedeAnadirALaGuia && HitoMesaGuion.puedeAnadirALaGuia(a, h)) {
-      opcionesMas.push({ texto: '+ Añadir un hito a la guía del tipo', clase: 'mesa-anadir-guia', alPulsar: function () { HitoMesaGuion.anadirALaGuia(a, h); } });
+      opcionesMas.push({ texto: '+ Añadir una tarea a la guía del tipo', clase: 'mesa-anadir-guia', alPulsar: function () { HitoMesaGuion.anadirALaGuia(a, h); } });
     }
     if (window.GuiasDelCentro && GuiasDelCentro.escribir) opcionesMas.push({ texto: 'Cambiar la guía…', clase: 'mesa-cambiar-guia', alPulsar: function () { cambiarLaGuia(a); } });
     /* «Enviar estado» (fila 195, docs/AVISOS-A-QUIEN-LO-PIDE.md, punto
@@ -377,11 +384,12 @@ var HitoMesa = (function () {
     if (window.AvisosLoPide) {
       opcionesMas.push({ texto: 'Enviar estado', clase: 'mesa-enviar-estado', alPulsar: function () { AvisosLoPide.enviarEstado(a); } });
     }
-    if (mas) FichaMenus.montar(mas, opcionesMas.concat([
+    var puedeBorrar = !decision && window.HitosDesdeElAsunto && HitosDesdeElAsunto.estaVacio(h, a);
+    if (mas) FichaMenus.montar(mas, opcionesMas.concat(decision ? [] : [
       { raya: true },
-      { texto: 'Quitar este hito', clase: 'ficha-menu-peligro', alPulsar: function () {
-        var b = fila.querySelector('.hito-quitar'); if (b) b.click();
-      } }
+      { texto: 'Borrar este hito', clase: 'ficha-menu-peligro', deshabilitado: !puedeBorrar,
+        title: puedeBorrar ? '' : 'Tiene trabajo: no se puede borrar',
+        alPulsar: function () { if (window.HitosDesdeElAsunto) HitosDesdeElAsunto.abrirBorrar(a, h); } }
     ]));
   }
 

@@ -429,6 +429,12 @@ responsable, notas y documentos apuntados. Ya no hay guía con casillas aparte (
   "En curso" solo no cuenta como trabajo (lo pone la aplicación sola al crear los hitos).
   `visibles` los salta y `huerfanos` los pliega abajo. Nota en el asunto. Solo se pregunta si la
   carpeta y la ficha ya han salido bien. Prueba: `pruebas/cambiar-tipo-y-guia.mjs`.
+- **Crear, cambiar y borrar hitos desde el asunto** (28-sep-2026, fila 206,
+  `docs/HITOS-DESDE-EL-ASUNTO.md`, `js/hitos-desde-el-asunto.js`): desde el «···» de la mesa,
+  «+ Crear un hito», «Cambiar este hito» y «Borrar este hito» (apagado si el hito tiene trabajo),
+  con una casilla «También en la guía» que reparte el cambio a los asuntos abiertos del tipo, pero
+  solo a los que están vacíos. Detalle completo en `docs/contexto/HITO-MESA.md`, junto al resto del
+  «···» de la mesa.
 - **Un solo hito en curso a la vez**: al marcar uno hecho, el siguiente pendiente de la lista
   visible pasa a "en curso" solo (`Hitos.recomputeEnCurso`).
 - **Documentos apuntados** (fila 31, 17-sep-2026, `docs/APUNTAR-DOCUMENTO-A-HITO.md`; desde la

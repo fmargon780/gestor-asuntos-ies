@@ -56,9 +56,51 @@ Cambió cómo se ve, no lo que hace: cada botón llama a lo mismo que antes. **E
   registra; con varios, menú para elegir; sin ninguno, aviso ámbar; es `HitosDocumentoMenu.registrar`,
   lo mismo que el ⋯ del documento, y abre antes la tarjeta de documentos), «Marcar como hecho» (principal; pulsa la casilla de siempre, que avisa de lo obligatorio; con el hito
   hecho, «Hecho ✓ (desmarcar)») y «···»: «Estamos en este paso…» (fila 129, si se puede), «Dejarlo solo
-  informativo»/«Pedírmelo a mí», «+ Añadir un paso a la guía del tipo» (fila 120), «Cambiar la guía…»
-  (con la advertencia «Vale para todos los asuntos…», luego `GuiasDelCentro.escribir`) y «Quitar este
-  hito». El pie «Cambiar la guía» de `#ficha-guia-nota` no sale con la mesa abierta.
+  informativo»/«Pedírmelo a mí», **«+ Crear un hito» y «Cambiar este hito»** (fila 206, no en un
+  hito-pregunta: ver más abajo), «+ Añadir una tarea a la guía del tipo» (fila 120: sigue siendo una
+  tarea del guion, no un hito entero; renombrado en la fila 206 para no confundir los dos), «Cambiar la
+  guía…» (con la advertencia «Vale para todos los asuntos…», luego `GuiasDelCentro.escribir`) y **«Borrar
+  este hito»** (fila 206: apagado, con el motivo en el `title`, si el hito no está vacío). El pie
+  «Cambiar la guía» de `#ficha-guia-nota` no sale con la mesa abierta.
+
+### Crear, cambiar y borrar hitos desde el asunto (28-sep-2026, fila 206, `docs/HITOS-DESDE-EL-ASUNTO.md`)
+
+`js/hitos-desde-el-asunto.js` (`window.HitosDesdeElAsunto`), sin engancharse a nada: escribir y
+corregir la guía de un tipo desde un asunto concreto, sin salir a Ajustes. Los tres cuadros («+ Crear
+un hito», «Cambiar este hito», «Borrar este hito») llevan Título, «Colocar después de», Responsable
+(el mismo desplegable de la guía, con «Una Administración…» de la fila 205) y Plazo (días + cómo se
+cuentan + desde qué hito, `js/guias-plazo.js`, con id propio, `GuiasPlazo.htmlConId`/`leerSelect`):
+sin guía, el plazo se guarda igual en el propio hito (`Hitos.guardarCampos` gana el campo `plazo`,
+que `Hitos.aplicarPlazosDependientes` ya sabe recalcular tenga o no origen en la guía).
+
+Una casilla **«También en la guía de <tipo corto>»** (marcada por defecto) decide si el cambio entra
+en `_GESTOR/guias.json` y llega, en el sitio exacto elegido, a los asuntos abiertos del mismo tipo —
+pero solo a los hitos **vacíos** (`HitosDesdeElAsunto.estaVacio(h, aOClave)`: sin nada que perder —
+distinto de hecho, sin ninguna tarea marcada ni con valor, sin tareas propias, sin notas (las del
+hito y las del asunto, con su etiqueta), sin documentos, sin rama elegida y sin una fecha puesta a
+mano; «en curso» solo no cuenta como trabajo, igual que `HitosCambioDeTipo.tieneAlgo` en negativo).
+Un hito con trabajo nunca se toca; el aviso de después dice cuántos asuntos han recibido el cambio y,
+si alguno se ha quedado sin tocar, cuántos por tener trabajo. Al crear, el reparto a los abiertos lo
+hace solo el mecanismo ya existente de la fila 118 (`GuiasDelCentro.guardarPasos` →
+`Hitos.llevarGuiaAAbiertos`, que ya incluye el propio asunto); al cambiar o borrar, que si tocan
+hitos que YA EXISTEN en cada asunto, hace falta el reparto propio de este fichero
+(`propagarCambio`/`propagarBorrado`, dentro de un solo `Hitos.cambiar`).
+
+**Simplificación a propósito** (como ya hace `Hitos.mover`, "complicaría las bifurcaciones sin que
+Francisco lo haya pedido"): «Colocar después de» solo ofrece los hitos de **nivel superior** del
+asunto (`HitosDesdeElAsunto.nivelSuperior`, nunca los de dentro de una rama de un hito-pregunta), y
+lo mismo para los pasos de la guía (`pasoEsDeNivelSuperior`); si el hito elegido es propio (sin
+`origenGuia`), el paso nuevo va detrás del hito anterior que sí venga de la guía
+(`pasoAnclaDeHito`). Borrar un hito de dentro de una rama sigue funcionando siempre «en este asunto»
+(`Hitos.quitarHito`, que ya busca a cualquier profundidad), pero la casilla de la guía no sale si el
+paso de origen está dentro de una opción de una pregunta: se pierde así el aviso de «la respuesta se
+quedará sin hitos» de esos casos (quedan para una fila aparte si hace falta con el uso).
+
+«+ Añadir un hito» de la lista de hitos (`HitosPanel.pedirYAnadirHito`) abre el mismo cuadro de «Crear
+un hito», con «Colocar después de» ya puesto en el último. Prueba:
+`pruebas/hitos-desde-el-asunto.mjs` (crear con guía y solo en el asunto, que llega al asunto abierto
+vacío y no al que tiene trabajo; cambiar título y moverlo, igual; borrar, con el mismo criterio, y
+apagado si el hito no está vacío).
 - **«Marcar como hecho» lleva al siguiente** (26-sep-2026, fila 173, docs/NUEVO-ASUNTO-SIN-REPETIR.md,
   punto 5): cuando el guardado termina (`HitosPanelLista.marcarDesdeCasilla`, que expone la misma
   lógica que la casilla de la lista) y de verdad se ha marcado (nunca al desmarcar), se abre la mesa

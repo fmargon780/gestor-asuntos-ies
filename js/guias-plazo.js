@@ -13,8 +13,16 @@
 var GuiasPlazo = (function () {
 
   function html(p) {
+    return htmlConId(p, '');
+  }
+
+  /* Igual que html(p), pero con un id propio (28-sep-2026, fila 206,
+     docs/HITOS-DESDE-EL-ASUNTO.md): lo usa el cuadro de crear/cambiar
+     un hito desde el asunto, fuera del `.paso-extra` del editor de la
+     guía, para poder leer el valor con un simple getElementById. */
+  function htmlConId(p, id) {
     var actual = Plazos.cuentaValida(p && p.plazo && p.plazo.cuenta);
-    return '<select class="campo paso-plazo-cuenta" title="Cómo se cuentan los días">' +
+    return '<select' + (id ? ' id="' + id + '"' : '') + ' class="campo paso-plazo-cuenta" title="Cómo se cuentan los días">' +
       Plazos.CUENTAS.map(function (c) {
         return '<option value="' + c.valor + '"' + (c.valor === actual ? ' selected' : '') + '>' +
           U.escapar(c.texto) + '</option>';
@@ -22,10 +30,13 @@ var GuiasPlazo = (function () {
   }
 
   function leer(caja) {
-    var sel = caja.querySelector(':scope > .paso-extra .paso-plazo-cuenta');
+    return leerSelect(caja.querySelector(':scope > .paso-extra .paso-plazo-cuenta'));
+  }
+
+  function leerSelect(sel) {
     return Plazos.cuentaValida(sel && sel.value);
   }
 
-  return { html: html, leer: leer };
+  return { html: html, htmlConId: htmlConId, leer: leer, leerSelect: leerSelect };
 })();
 window.GuiasPlazo = GuiasPlazo;

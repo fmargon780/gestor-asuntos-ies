@@ -375,7 +375,11 @@
     return b;
   }
 
+  /* Fila 206 (docs/HITOS-DESDE-EL-ASUNTO.md): el mismo cuadro de «Crear
+     un hito» de la mesa, con «Colocar después de» ya puesto en el
+     último (`undefined`: ver HitosDesdeElAsunto.abrirCrear). */
   async function pedirYAnadirHito(a) {
+    if (window.HitosDesdeElAsunto) { await HitosDesdeElAsunto.abrirCrear(a); return; }
     var ok = await U.preguntar('Añadir un hito',
       '<label class="etiqueta">Título</label>' +
       '<input id="hito-nuevo-titulo" class="campo" placeholder="Por ejemplo: Firma del director">',
