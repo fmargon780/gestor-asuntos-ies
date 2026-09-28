@@ -202,7 +202,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 214 | El botón para levantar la vista de los documentos por clasificar no funciona. | IDEA (28-sep-2026): apuntada por Francisco desde el Centro de mando |
 | 204 | `docs/COMPROBACION-AL-ENTRAR.md`, entero, con `js/cabecera-fija.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 204) | PENDIENTE (27-sep-2026) |
 | 216 | `docs/FILTROS-EN-TODAS-LAS-PESTANAS.md` (los cinco filtros de Inicio —Responsable, Situación, Plazo, Lo encarga y Tipo de asunto— valen en las cuatro pestañas, y el número de cada pestaña cuenta lo filtrado) | PENDIENTE (28-sep-2026) |
-| 217 | El envío del primer correo electrónico de hoy ha dado el siguiente mensaje de error: No he podido enviarlo: No he podido contactar con Google: Failed to fetch | IDEA (28-sep-2026): apuntada por Francisco desde el Centro de mando |
+| 217 | `docs/CORREO-OTRA-CUENTA-ABIERTA.md` (enviar correo con otra cuenta de Google abierta en el navegador: aviso claro en vez de «Failed to fetch» y, si Google lo deja, que el envío funcione igual usando la forma general de la dirección del script) | PENDIENTE (28-sep-2026) |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
@@ -610,3 +610,4 @@ quedara "en su sitio de siempre") lo dejaba a veces debajo de otro elemento, que
 click a Playwright; con `position: fixed` en una esquina de la pantalla, sin ese problema.
 
 ---
+
