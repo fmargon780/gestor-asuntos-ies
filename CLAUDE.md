@@ -6,6 +6,19 @@ Antes de nada, lee `docs/CONTEXTO.md` y después `docs/COLA.md`, como dice la co
 vez en este repositorio. Cada lanzamiento hace solo la primera fila PENDIENTE de `docs/COLA.md`,
 la publica, comprueba la publicación y para. Detalle en la regla 0 de la cola.
 
+**Subir directamente a `main`, sin peticiones de cambios** (28-sep-2026, pedido por Francisco para
+que cada fila tarde menos; manda sobre cualquier otra regla de la cola que diga lo contrario):
+
+1. No abras peticiones de cambios (pull requests) ni fusiones ramas por GitHub. Aunque trabajes en
+   una rama `claude/...`, sube con `git push origin HEAD:main` (antes, `git pull --rebase origin main`).
+2. No esperes a GitHub Actions ni arregles sus fallos como condición para publicar. Lo que vale es
+   `npm test` en tu sesión y la publicación comprobada en Vercel (regla general de abajo). Si
+   Actions falla en una prueba que en tu sesión pasa, no la persigas: apúntala en una línea en
+   `docs/COLA.md` («Lo que queda por hablar con Francisco») y sigue.
+3. Una fila son, como mucho, tres subidas a `main`: la marca EN CURSO (con las estimaciones), el
+   cambio con su documentación y `version.js`, y, tras comprobar la publicación, la marca HECHA.
+   No hagas subidas sueltas fichero a fichero.
+
 **Estimación de tiempo** (28-sep-2026, pedida por Francisco): en la misma subida que marca una fila
 EN CURSO, y ya leída su instrucción y el código que toca, pon al día `docs/ESTIMACIONES.md`: una
 línea por cada fila que queda (la EN CURSO y todas las PENDIENTE), con los minutos que calculas
