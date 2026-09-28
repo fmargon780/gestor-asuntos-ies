@@ -5,6 +5,55 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 28-sep-2026 — Fila 225: aviso «esperando tu respuesta», y un revisor sin pantalla que mirar
+
+`scripts/aviso-esperando.sh` (hooks de `.claude/settings.json`, ya puestos por la fila 224 desde
+Cowork): con `esperando`, deja en la rama `avisos` de GitHub un `ESPERANDO.json` con la fila EN
+CURSO de `docs/COLA.md` y si el aviso habla de un permiso o de una pregunta; con `libre`, solo si
+hay marca local, dice que ya no espera y la borra. El JSON se construye con `node -e` (para no
+pelear con el escapado de comillas en bash, y sin depender de `jq`) y se escribe en `avisos` con
+las órdenes de bajo nivel de git (`hash-object` → `mktree` → `commit-tree` → `push -f`): ningún
+paso toca la copia de trabajo ni el índice, así que la rama en la que trabaja la sesión queda
+intacta siempre. Cada aviso es un commit suelto, sin padre: la rama no guarda historial, solo el
+último estado.
+
+**El bug real, cazado por la propia prueba antes de subir nada:** con `node -e código -- args`,
+`process.argv` no lleva hueco para "el fichero del script" (no lo hay): `argv[1]` ya es el primer
+argumento, no `argv[2]` como con un script normal. La primera versión leía en `argv[2]`/`argv[3]`,
+así que `modo` siempre salía vacío y el script escribía "libre" también cuando le tocaba escribir
+"esperando". `pruebas/aviso-esperando.mjs` (contra un `origin` de mentira, nunca este
+repositorio) lo cazó a la primera pasada, con fallos claros («sale: "libre", debía: "esperando"»);
+comprobado además, aparte, que revertir el arreglo hace que la prueba vuelva a fallar (regla de
+"la prueba tiene que fallar sin el arreglo, antes de darla por buena", pensada para fotos de
+pantalla pero que valió igual aquí).
+
+**Validación de verdad, sin querer:** al ejecutar el script a mano contra el repositorio real
+(paso pedido por la propia lista «Cómo sabemos que está bien»), esta misma sesión, con sus propios
+hooks activos, disparó `PostToolUse` justo después de la llamada manual con `esperando`: como la
+marca local seguía puesta, `PostToolUse` llamó a `libre` por su cuenta, y la rama `avisos` de
+GitHub acabó en `"estado":"libre"` sin que nadie lo pidiera dos veces a mano. Es la prueba de que
+el cableado de los hooks (fila 224) funciona de punta a punta con el script de verdad (fila 225),
+no solo en la prueba de mentira.
+
+**El revisor, sin pantalla que mirar.** El propio documento de la fila avisa: "esta fila no cambia
+nada de lo que ve la usuaria de la aplicación", así que su lista «Cómo sabemos que está bien» son
+cinco hechos de git y de GitHub (el script existe y su prueba pasa, la rama `avisos` termina en
+"libre", la rama de trabajo no lleva ningún commit de `avisos`, Vercel no ha publicado la rama
+`avisos`, `.claude/settings.json` no ha cambiado), ninguno mirable con Playwright contra
+`?demo=1`. En vez de forzar al revisor a entrar en una copia de pruebas donde no hay nada distinto
+que ver, se lanzó igualmente un agente aparte, con contexto limpio (sin ver el código ni el
+diff), pero con Bash/git y la herramienta de Vercel en vez de un navegador, comprobando los cinco
+hechos por sí mismo contra el repositorio real. APROBADA, los cinco puntos bien. Sigue siendo el
+mismo principio (una comprobación independiente, sin ver el propio trabajo), adaptado a una fila
+sin interfaz.
+
+`scripts/` se publica a propósito (`.vercelignore`, fila 63), y no está en la lista de exclusiones
+de `scripts/vercel-ignore-build.sh` (que solo salta `docs/`, `pruebas/`, `.github/`, `*.md` y
+`.claude/`): añadir `scripts/aviso-esperando.sh` sí gastó una publicación de Vercel en `pruebas` y
+otra en `main`, aunque la aplicación no cambie nada para la usuaria.
+
+---
+
 ## 28-sep-2026 — Fila 214: «Ha llegado» sustituye la vista de Inicio (primera fila con el revisor de verdad)
 
 Primera fila que sigue el método entero de la fila 223: rama `pruebas`, revisor con contexto
