@@ -4,11 +4,10 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 `CLAUDE.md`). Minutos por fila entera: programar, pruebas, publicar y comprobar. La página
 «Estado de la cola» de Francisco lee esta tabla desde `main`.
 
-Última puesta al día: 28-sep-2026 (fila 206, EN CURSO)
+Última puesta al día: 28-sep-2026 (fila 206, HECHA)
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 206 | 90 | `docs/HITOS-DESDE-EL-ASUNTO.md`: fichero nuevo `js/hitos-desde-el-asunto.js` con los tres cuadros, `estaVacio`, la posición «Colocar después de» y el reparto a la guía y a los asuntos abiertos; tocar `js/hito-mesa.js`, `js/hitos-panel.js` y `js/hitos-archivo.js` (plazo en `guardarCampos`); prueba nueva y cuatro documentos de contexto |
 | 203 | 45 | `docs/PAPELERA-SE-VACIA-SOLA.md`: borrado automático a los 90 días con aviso a los 7, fichero nuevo de constancia (`papelera-borrados.json`) y cuidado de que dos ordenadores no se pisen |
 | 210 | 30 | `docs/HILO-SIN-REPETIR.md`: solo `apps-script/gestor-correos.gs` (fuera de la app JS), tres arreglos contenidos (orden, quitar citas repetidas, adjuntos sin duplicar) |
 | 213 | 60 | `docs/BOTON-DE-SOPORTE.md`: botón y ventana nuevos con captura pegada, campo en Ajustes, script de Google nuevo (`apps-script/soporte.gs`) que escribe en Drive y en la cola de GitHub, guía de puesta en marcha y pruebas de los dos lados |
