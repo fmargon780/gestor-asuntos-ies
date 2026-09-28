@@ -6,6 +6,13 @@ Antes de nada, lee `docs/CONTEXTO.md` y después `docs/COLA.md`, como dice la co
 vez en este repositorio. Cada lanzamiento hace solo la primera fila PENDIENTE de `docs/COLA.md`,
 la publica, comprueba la publicación y para. Detalle en la regla 0 de la cola.
 
+**Estimación de tiempo** (28-sep-2026, pedida por Francisco): en la misma subida que marca una fila
+EN CURSO, y ya leída su instrucción y el código que toca, pon al día `docs/ESTIMACIONES.md`: una
+línea por cada fila que queda (la EN CURSO y todas las PENDIENTE), con los minutos que calculas
+para cada una entera (programar, pruebas, publicar y comprobar) y el motivo en pocas palabras.
+Borra las filas ya HECHAS. Esa subida tiene que llegar a `main`, no solo a la rama de trabajo: la
+página de estado de Francisco lee `main`. No es una subida más: va en la misma de la marca.
+
 ## Regla general de publicación (manda sobre cualquier otra regla)
 
 Acordada con Francisco el 26-sep-2026 para todos sus proyectos. Ese día, en otro proyecto,
