@@ -201,6 +201,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 204 | `docs/COMPROBACION-AL-ENTRAR.md`, entero, con `js/cabecera-fija.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 204) | PENDIENTE (27-sep-2026) |
 | 214 | El botón para levantar la vista de los documentos por clasificar no funciona. | IDEA (28-sep-2026): apuntada por Francisco desde el Centro de mando |
 | 215 | La nueva forma de crear un asunto no funciona. No hay botón de aceptar la selección (Tipo de tercero + Tipo de asunto). La lista de tipo de asuntos no filtra por el tipo de tercero elegido. La lista de tipo de asuntos es enorme. Elegido el tipo de tercero no me ofrece buscar el tercero. | IDEA (28-sep-2026): apuntada por Francisco desde el Centro de mando |
+| 216 | Los filtros de la vista principal no están funcionando | IDEA (28-sep-2026): apuntada por Francisco desde el Centro de mando |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
