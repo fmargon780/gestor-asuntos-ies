@@ -5,6 +5,36 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 28-sep-2026 — Fila 215: la categoría guía Nuevo asunto (cerrando lo que dejó la sesión anterior)
+
+`docs/NUEVO-ASUNTO-CATEGORIA-GUIA.md`. Francisco devolvió la fila a PENDIENTE porque una sesión
+anterior se paró a medias, con tres commits sueltos en `main` (`js/tipos-buscador.js` con los 8
+más usados y el tope, el texto del botón «Falta elegir…» en `js/asuntos-nuevo-crear.js`, y una
+línea en `js/asuntos-nuevo-campos.js`) pero sin la pieza central del encargo: la pastilla de
+categoría seguía sin filtrar la parrilla de tipos.
+
+**Lo que faltaba de verdad.** `categoriaDeLaParrilla()` (`js/asuntos-nuevo.js`) solo miraba el
+tercero elegido o propuesto: nunca la pastilla (`App.E.nuevo.categoria`), así que pulsarla solo
+filtraba el buscador de personas (comportamiento de la fila 197), nunca la parrilla. Se añadió la
+pastilla como tercer criterio (tercero → propuesto → pastilla → ninguna) y el `onclick` de la
+pastilla pasó a llamar también a `App.pintarTipos()` (antes solo a `App.buscarTercero()`), con
+`.focus()` sobre `#buscar-tercero` para dejar el cursor listo, como pide el documento.
+
+**El botón siempre a la vista.** `#bloque-detalles` (donde vive `#btn-crear`) se escondía entero
+hasta fijar el tercero (fila 197). Se quitó el `oculto` inicial del HTML y las dos llamadas que lo
+volvían a esconder (al cambiar de tercero, al terminar de crear): `App.refrescarVista` lo deja
+visible siempre, tanto si falta algo (botón en gris, con el texto de lo que falta) como si no.
+
+**El buscador, debajo de las pastillas.** Las pastillas y el buscador único intercambiaron su
+orden en `index.html` (antes el buscador iba primero, con las pastillas «debajo del buscador» según
+dejó escrito la fila 197): ahora las pastillas van arriba y el buscador justo debajo, para que el
+cursor recién puesto ahí con `.focus()` tenga sentido visual.
+
+Publicado y comprobado: ver la nota de cierre en `docs/COLA.md`. Prueba de navegador
+`pruebas/nuevo-asunto-categoria-guia.mjs` (ya la había dejado escrita la sesión anterior, con todo
+el comportamiento pedido; solo hacía falta el código que la pasara). `npm test` completo en verde
+antes de subir.
+
 ## 28-sep-2026 — Fila 211: el tope de Vercel no para la cola
 
 `docs/PUBLICAR-SIN-PARAR.md`. El 28-sep-2026 de madrugada Vercel dejó de publicar

@@ -53,12 +53,11 @@ App.datosDelFormulario = function () {
 };
 
 App.refrescarVista = function () {
-  /* Fila 197: con persona primero, el bloque de detalles (y "Crear el
-     asunto" dentro de él) puede estar a la vista con solo la persona
-     elegida, todavía sin tipo. "Crear" solo se activa con los dos
-     (docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md, punto 4), así que aquí se
-     apaga explícitamente en vez de dejarlo como estaba (encendido, de
-     fábrica, en el HTML). */
+  /* Fila 215 (docs/NUEVO-ASUNTO-CATEGORIA-GUIA.md): "Crear el asunto"
+     está siempre a la vista, así que bloque-detalles ya no se esconde
+     mientras falte persona o tipo (antes, fila 197): se deja siempre
+     visible, aquí, cada vez que se repinta. */
+  $('bloque-detalles').classList.remove('oculto');
   if (!App.E.nuevo.tipo || !App.E.nuevo.tercero) {
     $('vista-nombre').textContent = '';
     $('vista-ruta').textContent = '';
@@ -208,7 +207,9 @@ App.crearAsuntoDelFormulario = async function () {
     $('bloque-grupo').classList.add('oculto');
     $('bloque-campos').classList.add('oculto');
     $('campos-lista-nuevo').innerHTML = '';
-    $('bloque-detalles').classList.add('oculto');
+    /* Fila 215: bloque-detalles ya no se esconde entre un asunto y el
+       siguiente (el botón "Crear" tiene que seguir a la vista); lo
+       deja como corresponde el propio App.refrescarVista de más abajo. */
     /* Fila 197: los dos bloques de arriba ya no se esconden entre un
        asunto y el siguiente (persona y tipo están siempre a la vista),
        así que aquí hay que dejarlos limpios a mano: sin ellos, el

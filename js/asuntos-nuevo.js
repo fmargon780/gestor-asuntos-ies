@@ -70,7 +70,12 @@ App.prepararNuevo = function () {
    tipo, están a la vista los dos a la vez): son solo un filtro del
    buscador único de la izquierda. Pulsar una la enciende o la apaga
    (App.E.nuevo.categoria = esa categoría, o null si estaba encendida);
-   ninguna encendida busca en todas. */
+   ninguna encendida busca en todas.
+
+   Fila 215 (docs/NUEVO-ASUNTO-CATEGORIA-GUIA.md): además del
+   buscador, la pastilla filtra también la parrilla de tipos
+   (categoriaDeLaParrilla), así que aquí se repinta y se deja el
+   cursor en el buscador de personas, justo debajo. */
 App.pintarCategorias = function () {
   var caja = $('categorias-lista');
   caja.innerHTML = '';
@@ -83,7 +88,9 @@ App.pintarCategorias = function () {
       '<small>' + U.escapar(App.DESCRIPCION_CATEGORIA[cat]) + ' · ' + cuantos + ' tipos</small>';
     b.onclick = function () {
       App.elegirCategoria(App.E.nuevo.categoria === cat ? null : cat);
+      App.pintarTipos();
       App.buscarTercero();
+      $('buscar-tercero').focus();
     };
     caja.appendChild(b);
   });
@@ -116,13 +123,15 @@ function pintarTerceroPropuesto() {
   };
 }
 
-/* La categoría a la que se limita la parrilla: la de la persona
-   elegida, o la de la que está propuesta y esperando tipo (fila 173).
-   Sin persona (ni propuesta), null: se ven todos los tipos. */
+/* La categoría a la que se limita la parrilla, por este orden (fila
+   215): la de la persona elegida; si no, la de la que está propuesta
+   y esperando tipo (fila 173); si no, la pastilla pulsada
+   (App.E.nuevo.categoria); si no hay nada de eso, null y se ven todos
+   los tipos. */
 function categoriaDeLaParrilla() {
   if (App.E.nuevo.tercero) return App.E.nuevo.tercero.categoria;
   if (App.E.nuevo.terceroPropuesto) return App.E.nuevo.terceroPropuesto.categoria;
-  return null;
+  return App.E.nuevo.categoria || null;
 }
 
 /* Fila 197: con persona elegida, solo los tipos de su categoría (como

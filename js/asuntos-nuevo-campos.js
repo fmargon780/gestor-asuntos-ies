@@ -170,9 +170,8 @@ App.fijarTercero = function (p) {
   $('btn-cambiar-tercero').onclick = function () {
     App.E.nuevo.tercero = null;
     caja.classList.add('oculto');
-    $('bloque-detalles').classList.add('oculto');
     App.pintarTipos();
-    App.refrescarVista();   /* fila 215: el botón vuelve a decir qué falta */
+    App.refrescarVista();   /* fila 215: bloque-detalles sigue a la vista; el botón dice qué falta */
     $('buscar-tercero').focus();
   };
 
@@ -200,8 +199,7 @@ App.fijarTercero = function (p) {
     try { f(p, caja); } catch (e) { /* un módulo roto no frena el alta del asunto */ }
   });
 
-  $('bloque-detalles').classList.remove('oculto');
-  App.refrescarVista();
+  App.refrescarVista();   /* deja bloque-detalles a la vista (fila 215) */
 };
 
 /* "Lo pide (opcional)": quién ha pedido esta gestión, por qué vía y en

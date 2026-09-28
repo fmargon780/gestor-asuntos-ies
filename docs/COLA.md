@@ -338,6 +338,7 @@ abierto en ellas:
   centro (sin anexo del BOJA) y un campo nuevo en el catálogo que diga de quién es cada uno.
 
 - **Prueba `pruebas/tras-cada-accion.mjs` en rojo** (28-sep-2026, fila 205): los pasos «3. al volver, la misma altura» y «3. y repintar la lista no la sube arriba» fallan también en solitario y también sobre el `main` de antes de la fila 205 (`53bb4fc`); viene de la fila 212 (Inicio a todo el ancho) o de antes. Sin arreglar por no ser de esta fila.
+- **`pruebas/opciones.mjs` y `pruebas/tras-cada-accion.mjs` en rojo en la pasada completa de la fila 215** (28-sep-2026), las dos en verde al repetirlas cada una por su cuenta justo después: contención de CPU de la máquina de esta sesión, no una regresión de esta fila (que no toca ni hitos con preguntas ni el scroll de Inicio).
 - **Fila 205, entrada de `docs/HISTORIA.md` pendiente** (regla 17, sin `git push`): 28-sep-2026, una Administración (organismo o centro dado de alta) como responsable de un hito: `adm:<id>[:<dep>]` + `responsableNombre` solo en el hito; nunca de Administración; filtro de Inicio; `docs/FICHEROS-DEL-REPOSITORIO.md` sin la fila de `js/responsable-organismo.js`. Lo que costó: un primer intento guardaba `responsableNombre: ''` en todo hito y rompía `renombrar-asunto.mjs` (los hitos se comparan enteros): ahora el campo solo existe si el responsable es un organismo.
 
 ## Descartado, no proponer otra vez (del informe del 18-sep-2026)
