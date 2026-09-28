@@ -351,7 +351,12 @@ var HitoMesa = (function () {
       return { texto: r.nombre, alPulsar: function () {
         guardar(null, 'guardar el responsable', function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: r.id }); });
       } };
-    })));
+    })).concat(window.ResponsableOrganismo ? [{ texto: ResponsableOrganismo.TEXTO, clase: 'mesa-resp-administracion', alPulsar: async function () {
+      /* Fila 205: una Administración dada de alta (Delegación, otro centro…) como responsable. */
+      var r = await ResponsableOrganismo.elegir();
+      if (!r) return;
+      guardar(null, 'guardar el responsable', function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: r.id, responsableNombre: r.nombre }); });
+    } }] : []));
     var mas = cab.querySelector('.mesa-mas');
     var opcionesMas = [];
     /* Fila 129: dar por hechos los anteriores (js/estado-hito.js). */

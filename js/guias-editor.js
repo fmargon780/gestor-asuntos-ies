@@ -250,7 +250,7 @@
           opcionesResp.map(function (r) {
             return '<option value="' + U.escapar(r.id) + '"' + (r.id === p.responsable ? ' selected' : '') +
               '>' + U.escapar(r.nombre) + '</option>';
-          }).join('') + '</select>' +
+          }).join('') + (window.ResponsableOrganismo ? ResponsableOrganismo.opcionesExtra(p) : '') + '</select>' +
           /* Fila 129: a quién le toca este hito (js/guias-toca.js). */
           (window.GuiasToca ? GuiasToca.html(p, opcionesResp) : '') +
           '<label class="etiqueta">Plazo</label>' +

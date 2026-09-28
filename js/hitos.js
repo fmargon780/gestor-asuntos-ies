@@ -133,6 +133,8 @@ var Hitos = (function () {
       opciones: [], elegida: null
     };
     if (h && h.delTipoAnterior) salida.delTipoAnterior = String(h.delTipoAnterior);
+    /* Fila 205: una Administración como responsable (`adm:…`) lleva una copia de su nombre; en los demás hitos, nada. */
+    if (h && window.ResponsableOrganismo && ResponsableOrganismo.esOrganismo(h.responsable)) salida.responsableNombre = ResponsableOrganismo.copia(h.responsable, h.responsableNombre);
     /* «Avisar a quien lo pide» (fila 195, docs/AVISOS-A-QUIEN-LO-PIDE.md):
        los dos campos del paso, solo si están encendidos (un hito de
        antes de esta fila se comporta como si no avisara), y la marca
