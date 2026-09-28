@@ -135,63 +135,42 @@
     <section id="pantalla-abiertos" class="pantalla">
       <header class="cabecera">
         <h2>Inicio</h2>
+        <!-- El tablón compacto (fila 212, docs/INICIO-A-TODO-EL-ANCHO.md):
+             en el hueco libre entre "+ Nuevo asunto" (lo cuelga js/barra.js
+             justo detrás del <h2>) y el buscador. js/tablon.js cuelga
+             #tablon aquí dentro. -->
+        <div id="inicio-tablon-hueco" class="inicio-tablon-hueco"></div>
         <div class="acciones">
           <input id="buscar-abiertos" class="campo"
                  placeholder="Buscar en todos los asuntos abiertos: nombre, tipo o tercero">
         </div>
       </header>
 
-      <!-- Fila 193, apartado 1 (docs/AVISOS-MENU-Y-VOLVER.md): todos los
-           avisos de arriba, en una sola línea. Antes había aquí varias
-           cajas de color (avisos.js, frescura.js, recurrentes.js,
-           avisos-que-faltan.js) y el aviso de aspirantes; cada una
-           sigue calculando lo mismo, pero le pasa su trozo a
-           js/avisos-linea.js (AvisosLinea.registrar) en vez de pintar
-           su propia caja. El botón de "posibles duplicados" que vivía
-           en la cabecera (js/unir-asuntos.js) también es un trozo más
-           de esta franja. -->
-      <div id="avisos-linea" class="oculto"></div>
-
-      <!-- El único botón de montón que queda (mismo data-vista, para no
-           romper pruebas que hacen .click('.panel[data-vista="clasificar"]')):
-           "Ver todo (N)", el bloque "Ha llegado" entero, a pantalla
-           completa. Los otros dos (Pendiente de Administración/de
-           terceros) han desaparecido con la fila 192: la tabla de abajo
-           ya enseña todos los asuntos a la vez, sin montones. -->
-      <div class="paneles">
-        <button type="button" class="panel" data-vista="clasificar">
-          <svg class="panel-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
-            <path d="M13.8 3H7A1.5 1.5 0 0 0 5.5 4.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.7z"/>
-            <path d="M13.8 3v4.7h4.7"/>
-          </svg>
-          <span class="panel-texto">
-            <span class="panel-nombre">Ver todo</span>
-            <span class="panel-pie">Documentos que todavía no tienen asunto</span>
-          </span>
-          <span class="panel-cuenta" id="cuenta-clasificar">0</span>
-          <span class="marca-nueva oculto" id="nuevos-sueltos"></span>
-        </button>
+      <!-- Fila 212 (docs/INICIO-A-TODO-EL-ANCHO.md, apartado 2): una sola
+           fila justo debajo de la cabecera, en vez de la franja de avisos
+           sola y del botón "Ver todo (N)" (que desaparece: los enlaces de
+           "Ha llegado" hacen ahora lo suyo). A la izquierda, lo que ha
+           llegado (js/inicio.js); a la derecha, el cuadro pequeño de
+           avisos (js/avisos-linea.js, fila 193). -->
+      <div id="inicio-fila-superior" class="inicio-fila-superior">
+        <div id="inicio-ha-llegado-linea" class="inicio-ha-llegado-linea"></div>
+        <div id="avisos-linea" class="oculto"></div>
       </div>
 
-      <!-- LAS DOS COLUMNAS (fila 209, docs/INICIO-EN-PESTANAS.md):
-           izquierda, estrecha, "Ha llegado" + el tablón (js/tablon.js
-           cuelga #tablon de #inicio-lado); derecha, las pestañas y la
-           tabla única (#inicio-todos-asuntos, más abajo). Por debajo de
-           1000px de ancho, una sola columna (css/inicio.css). -->
+      <!-- Elemento de compatibilidad, invisible a ojo (css/inicio.css):
+           varias pruebas de pruebas/ siguen pulsando
+           ".panel[data-vista=\"clasificar\"]" para abrir "Ver todo" con
+           documentos y correos juntos (comportamiento de siempre, sin
+           filtrar por uno solo). El botón grande de antes ha
+           desaparecido de la vista; este sigue haciendo lo mismo. -->
+      <button type="button" class="panel panel-legado-oculto" data-vista="clasificar"
+              aria-hidden="true" tabindex="-1"></button>
+
+      <!-- LA TABLA ÚNICA, A TODO EL ANCHO (fila 212, sobre la fila 209,
+           docs/INICIO-EN-PESTANAS.md): fuera la columna izquierda de
+           "Ha llegado" (ahora es la línea de arriba); las pestañas y la
+           tabla única (#inicio-todos-asuntos) ocupan todo el ancho. -->
       <div id="inicio-cuerpo" class="inicio-cuerpo">
-      <div id="inicio-lado" class="inicio-lado">
-
-        <section id="inicio-ha-llegado" class="inicio-bloque">
-          <h3 class="inicio-bloque-titulo">Ha llegado <span class="cuenta-lista" id="inicio-ha-llegado-n"></span></h3>
-          <div class="inicio-lista" id="inicio-ha-llegado-lista"></div>
-        </section>
-
-      </div>
-
-      <!-- LA DERECHA: la barra de pestañas + Filtros/Ordenar y la
-           tabla única para las cuatro (js/inicio-tabla.js,
-           js/asuntos-lista-pintar.js). -->
       <div id="inicio-derecha" class="inicio-derecha">
 
         <div id="inicio-todos-asuntos">
@@ -304,9 +283,14 @@
       <div id="zona-clasificar" class="oculto">
         <div class="sueltos-cabecera">
           <button type="button" id="btn-ha-llegado-volver" class="boton boton-volver">← Volver</button>
+          <!-- Fila 212: si se llega desde "N correos" o "N documentos por
+               clasificar" (js/inicio.js), App.irVista deja aquí el enlace
+               para ver también lo otro (App.pintarSoloQueClasificar). -->
+          <button type="button" id="sueltos-ver-tambien" class="enlace oculto"></button>
           <p class="explica">Documentos sueltos en la carpeta de asuntos abiertos, todavía sin
              carpeta propia. Aquí es donde aparece lo que os deja el equipo directivo.</p>
           <button id="btn-sueltos-visto" class="boton oculto">Ya los he visto</button>
+          <span class="marca-nueva oculto" id="nuevos-sueltos"></span>
         </div>
 
         <!-- La bandeja de correos (js/bandeja-correos.js, js/bandeja-pantalla.js),
@@ -1178,6 +1162,7 @@
 <script src="js/tipo-al-vuelo.js"></script>
 <script src="js/via-contacto.js"></script>
 <script src="js/tablon.js"></script>
+<script src="js/tablon-compacto.js"></script>
 <script src="js/copiar.js"></script>
 <!-- js/cargos.js (fila 81, 20-sep-2026, docs/FIRMANTES-Y-MEMBRETE.md): los
      cargos del centro y quién los ha ocupado, con fechas. Va antes que
