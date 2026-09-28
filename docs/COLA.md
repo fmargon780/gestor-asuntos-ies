@@ -204,6 +204,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 216 | `docs/FILTROS-EN-TODAS-LAS-PESTANAS.md` (los cinco filtros de Inicio —Responsable, Situación, Plazo, Lo encarga y Tipo de asunto— valen en las cuatro pestañas, y el número de cada pestaña cuenta lo filtrado) | PENDIENTE (28-sep-2026) |
 | 217 | `docs/CORREO-OTRA-CUENTA-ABIERTA.md` (enviar correo con otra cuenta de Google abierta en el navegador: aviso claro en vez de «Failed to fetch» y, si Google lo deja, que el envío funcione igual usando la forma general de la dirección del script) | PENDIENTE (28-sep-2026) |
 | 218 | En la ventana principal no veo como filtrar por el tercero del asunto. | IDEA (28-sep-2026): apuntada por Francisco desde el Centro de mando |
+| 219 | Cuando se modifica un asunto el campo Tercero debería ser un buscador o desplegable del campo tercero, no un texto libre como ahora. | IDEA (28-sep-2026): apuntada por Francisco desde el Centro de mando |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
