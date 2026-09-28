@@ -16,7 +16,7 @@
    ============================================================ */
 (function () {
 
-  var CUANTOS_DE_PARTIDA = 10;
+  var CUANTOS_DE_PARTIDA = 8;   /* fila 215: los 8 más usados, con o sin categoría */
 
   var caja = null;
   var campo = null;
@@ -109,14 +109,11 @@
     });
     botones.forEach(function (b) { lista.appendChild(b); });
 
-    /* Fila 197: sin persona elegida la parrilla enseña TODOS los
-       tipos, de todas las categorías (hasta 40 y más); el tope de "los
-       más usados de partida" tiene sentido para los 10-30 de una sola
-       categoría, no para esconder la mayoría de un catálogo entero
-       detrás de "Ver todos". Con persona elegida (una sola categoría),
-       el tope de siempre sigue igual. */
-    var todasCategorias = lista.classList.contains('tipos-todas-categorias');
-
+    /* Fila 215 (docs/NUEVO-ASUNTO-CATEGORIA-GUIA.md): la lista es corta
+       siempre: los 8 más usados y «Ver todos (N)», tanto con categoría
+       (por pastilla o por persona) como sin ella (entonces son los 8
+       más usados de todas, cada uno con su categoría). Antes, sin
+       categoría se enseñaban todos (fila 197). */
     var ensenados = 0;
     botones.forEach(function (b) {
       var texto = U.normalizar(b.dataset.tipo || b.textContent);
@@ -124,7 +121,7 @@
 
       /* Sin buscar nada, solo los más usados, salvo que se pida verlos
          todos. El que ya está elegido no se esconde nunca. */
-      if (cabe && !q && !verTodos && !todasCategorias &&
+      if (cabe && !q && !verTodos &&
           ensenados >= CUANTOS_DE_PARTIDA && !b.classList.contains('elegido')) {
         cabe = false;
       }
@@ -135,7 +132,7 @@
     vacio.classList.toggle('oculto', ensenados > 0);
 
     var sobran = botones.length - CUANTOS_DE_PARTIDA;
-    if (q || sobran <= 0 || todasCategorias) {
+    if (q || sobran <= 0) {
       botonVerTodos.classList.add('oculto');
     } else {
       botonVerTodos.classList.remove('oculto');
