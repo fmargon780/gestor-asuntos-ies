@@ -169,11 +169,12 @@
      que esté. */
 
   function irAMantenimiento() {
-    App.ir('ajustes');
-    /* 17-sep-2026, fila 39: este bloque vive en la pestaña
-       "Mantenimiento". */
-    if (typeof App.cambiarPestanaAjustes === 'function') App.cambiarPestanaAjustes('mantenimiento');
-    var d = $('bloque-frescura');
+    /* Fila 200, apartado 7, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md:
+       tiene más sentido llevar directo a la herramienta para traer un
+       fichero nuevo que a la pantalla de configurar cada cuánto avisar
+       (#bloque-frescura, que se queda en Ajustes → Mantenimiento). */
+    App.ir('herramientas');
+    var d = $('bloque-traer-alumnado');
     if (d) { d.open = true; d.scrollIntoView({ block: 'center' }); }
   }
 

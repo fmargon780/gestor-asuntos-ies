@@ -112,15 +112,15 @@ await comprobar('se apunta una nota en el asunto',
   pagina.locator('#ficha-notas').textContent().then(t => t.indexOf('mandó a la papelera') !== -1), true);
 
 /* ================================================================
-   2. Devolverlo desde Ajustes › Papelera.
+   2. Devolverlo desde Herramientas › Papelera.
    ================================================================ */
 console.log('--- 2. devolver el documento a su sitio ---');
 
-await pagina.click('.pestana[data-pantalla="ajustes"]');
-/* 17-sep-2026, fila 39: la Papelera vive en la pestaña "Mantenimiento". */
-await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
+/* Fila 200: la Papelera vive en la pestaña "Herramientas" (antes en
+   Ajustes → Mantenimiento). */
+await pagina.click('.pestana[data-pantalla="herramientas"]');
 await pagina.evaluate(() => {
-  document.querySelectorAll('#pantalla-ajustes details').forEach((d) => { d.open = true; });
+  document.querySelectorAll('#pantalla-herramientas details').forEach((d) => { d.open = true; });
 });
 await pagina.waitForSelector('#tabla-papelera .fila-papelera');
 await comprobar('la papelera enseña la ficha', pagina.locator('#tabla-papelera .fila-papelera').count(), 1);
@@ -189,7 +189,7 @@ await comprobar('la ficha ya no está en asuntos.json', pagina.evaluate(async ()
   return !!j.asuntos['260801 BECA 26-27 Trujillo Sanz, Hugo 5566'];
 }), false);
 
-await pagina.click('.pestana[data-pantalla="ajustes"]');
+await pagina.click('.pestana[data-pantalla="herramientas"]');
 await pagina.waitForSelector('#tabla-papelera .fila-papelera');
 const fichaAsunto = pagina.locator('#tabla-papelera .fila-papelera').filter({ hasText: 'BECA' });
 await comprobar('la papelera enseña el asunto', fichaAsunto.count(), 1);
@@ -270,8 +270,7 @@ await pagina.evaluate(async () => {
   const nombre = App.E.listaAbiertos.find(x => x.nombre.indexOf('MATRICULA') !== -1).nombre;
   await window.__disco.abiertos.removeEntry(nombre, { recursive: true });
 });
-await pagina.click('.pestana[data-pantalla="ajustes"]');
-await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
+await pagina.click('.pestana[data-pantalla="herramientas"]');
 await pagina.waitForSelector('#tabla-papelera .fila-papelera');
 const fichaDoc = pagina.locator('#tabla-papelera .fila-papelera').filter({ hasText: 'SOLICITUD' });
 await fichaDoc.getByRole('button', { name: 'Devolver a su sitio' }).click();
@@ -311,7 +310,7 @@ await pagina.evaluate(async () => {
   const a = App.E.listaAbiertos.find(x => x.nombre.indexOf('MATRICULA') !== -1);
   await a.handle.getFileHandle('260415 FACTURA Material de oficina.pdf', { create: true });
 });
-await pagina.click('.pestana[data-pantalla="ajustes"]');
+await pagina.click('.pestana[data-pantalla="herramientas"]');
 await pagina.waitForSelector('#tabla-papelera .fila-papelera');
 const fichaChoque = pagina.locator('#tabla-papelera .fila-papelera').filter({ hasText: 'FACTURA' }).first();
 await fichaChoque.getByRole('button', { name: 'Devolver a su sitio' }).click();
@@ -352,9 +351,9 @@ await pagina.evaluate(async () => {
   });
   await (await h.createWritable()).write(JSON.stringify(j));
 });
-await pagina.click('.pestana[data-pantalla="ajustes"]');
+await pagina.click('.pestana[data-pantalla="herramientas"]');
 await pagina.click('.pestana[data-pantalla="abiertos"]');
-await pagina.click('.pestana[data-pantalla="ajustes"]');
+await pagina.click('.pestana[data-pantalla="herramientas"]');
 await pagina.waitForSelector('#tabla-papelera .fila-papelera');
 await comprobar('la ficha de hace 60 días sigue en la papelera',
   pagina.locator('#tabla-papelera .fila-papelera').filter({ hasText: 'una nota de hace tiempo' }).count(), 1);

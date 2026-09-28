@@ -5,6 +5,71 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 28-sep-2026 — Fila 200: juntar lo que va junto en El centro, y la pestaña «Herramientas»
+
+`docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartados 6 y 7 (los otros seis, de filas anteriores).
+
+**Apartado 6.** En Ajustes → El centro, "Asuntos dormidos" y "Avisos de vencimiento" (que vivía en
+Mantenimiento) se juntan en una sola sección, "Días de aviso", con los mismos dos campos de
+siempre (`#dias-dormido`, `#avisos-dias`) sin tocar por dentro. "Caducidad de las copias" y
+"Copias de seguridad" (que vivía en Mantenimiento) se juntan en una sola sección, "Copias de
+seguridad", también en El centro.
+
+**Una decisión de diseño, porque el encargo se pisa en un punto**: el apartado 6 pide juntar
+"Copias de seguridad" entera en El centro, pero el apartado 7 pide llevar a Herramientas
+"Restaurar una copia de seguridad" — que es justo la parte interactiva (la lista con los botones
+"Restaurar la última copia", `#tabla-copias`) de ese mismo bloque. No pueden estar las dos cosas
+enteras a la vez en dos sitios, así que el bloque "Copias de seguridad" de Mantenimiento se ha
+partido: su párrafo explicativo (que se guarda una copia diaria, hasta 30, dónde se guardan) se
+funde con "Caducidad de las copias" en la sección nueva de El centro, titulada "Copias de
+seguridad" (ese título se queda aquí, no se repite en Herramientas); la lista con los botones de
+restaurar se va entera a Herramientas, en un bloque titulado "Restaurar una copia de seguridad"
+(el nombre que usa el propio encargo para nombrarlo, ya que "Copias de seguridad" se ha quedado en
+El centro). Así ninguna de las dos secciones queda vacía ni duplicada, y cada apartado del encargo
+queda cumplido literalmente.
+
+**Apartado 7.** Pestaña nueva "Herramientas" en el menú lateral, justo encima de "Ajustes"
+(`App.PANTALLAS` en `js/nucleo.js`; el botón se pone en `index.html` justo detrás de "Personas y
+empresas", que es donde `js/barra.js` ya inserta "Impresos" y "Cuentas", así que el orden final
+sale solo: Inicio · Nuevo asunto · Archivo · Personas y empresas · Impresos · Cuentas ·
+Herramientas, línea, Ajustes). Contiene, tal cual estaban, cuatro bloques que vivían en Ajustes →
+Mantenimiento: **Papelera** (`#bloque-papelera`, cortado y pegado sin tocar nada de dentro),
+**Traer el alumnado** (bloque nuevo con dos botones que antes vivían en dos sitios distintos: el
+de "Traer ficheros de Séneca" de `js/traer-datos.js`, que colgaba junto a "Ficheros de datos" en
+El centro, y el de "Traer el alumnado ahora" de `js/alumnado-bd.js`, que tenía su propio
+`<details>` en Mantenimiento — los dos cuelgan ahora, cada uno sin su envoltorio propio, dentro de
+dos huecos del mismo bloque, para que salgan juntos bajo un solo título), **Tablas de datos**
+(`js/tablas-datos-pantalla.js` cuelga ahora su `<details>` de un hueco de Herramientas en vez de
+Mantenimiento) y **Restaurar una copia de seguridad** (explicado arriba). El orquestador nuevo,
+`App.pintarHerramientas` (`js/herramientas.js`), no tiene lógica propia: solo llama a
+`App.pintarPapelera`, `App.pintarCopias`, `TablasDatosPantalla.pintar` y `AlumnadoBD.pintarAjustes`
+cada vez que se entra en la pantalla; esas cuatro llamadas se han quitado de
+`App.pintarAjustesMantenimiento` (`js/ajustes-mantenimiento.js`), que se queda con lo que sí es
+mantenimiento de verdad. Los dos avisos de la franja de arriba que llevaban a Mantenimiento ahora
+llevan a Herramientas: el de la papelera vieja (`js/avisos-que-faltan.js`, función nueva
+`irAHerramientas`) abre `#bloque-papelera`; el de alumnado desfasado (`js/frescura.js`,
+`irAMantenimiento`, sin cambiar de nombre) abre ahora `#bloque-traer-alumnado` en vez de
+`#bloque-frescura` (que se queda en Mantenimiento): tiene más sentido llevar directo a la
+herramienta para traer un fichero nuevo que a la pantalla de configurar cada cuánto avisar.
+
+Ficheros tocados: `index.html`, `js/nucleo.js`, `js/ajustes-mantenimiento.js`,
+`js/tablas-datos-pantalla.js`, `js/traer-datos.js`, `js/alumnado-bd.js`, `js/avisos-que-faltan.js`,
+`js/frescura.js`; fichero nuevo `js/herramientas.js`. `js/ajustes-centro.js` no ha hecho falta
+tocarlo: el campo `#dias-caducidad-copias` sigue con el mismo id, solo cambia de envoltorio en el
+HTML.
+No se ha tocado ningún fichero de `_GESTOR` ni su formato: solo cambia dónde se pinta cada cosa.
+
+Prueba nueva `pruebas/herramientas.mjs`. Se han tenido que arreglar cuatro pruebas existentes que
+navegaban a Ajustes → Mantenimiento para encontrar la Papelera o "Traer el alumnado" (que ya no
+están ahí): `pruebas/papelera.mjs` y `pruebas/papelera-buscador.mjs` (varios puntos, ahora entran
+en Herramientas), `pruebas/alumnado-desde-la-bd.mjs` (busca `#alumnado-bd-traer` dentro de
+`#herramientas-traer-alumnado-bd`, no ya de `#ajustes-tab-mantenimiento`) y
+`pruebas/ajustes-por-tipo.mjs` (comprueba que Mantenimiento YA NO trae Copias ni Papelera, en vez
+de que las trajera). `npm test` entero, tres tandas independientes seguidas: 171/171, 172/172 y
+172/172 (la primera es antes de añadir la prueba nueva).
+
+---
+
 ## 27-sep-2026 — Fila 199: documentos y comunicaciones del hito, como tareas (y una corrección)
 
 `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartado 4. «Documentos de este paso» y «Comunicación

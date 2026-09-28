@@ -87,10 +87,13 @@ await comprobar('"El centro" trae Campos propios, Grupos y Datos del centro, y y
 await pagina.click('[data-ajustes-pestana="mantenimiento"]');
 await comprobar('"Mantenimiento" pasa a verse', pagina.locator('#ajustes-tab-mantenimiento').isVisible(), true);
 await pagina.evaluate(() => document.querySelectorAll('#ajustes-tab-mantenimiento details').forEach((d) => { d.open = true; }));
-await comprobar('"Mantenimiento" trae Copias, Papelera y las carpetas de este ordenador',
+/* Fila 200: Copias y Papelera se han ido a la pestaña "Herramientas";
+   Mantenimiento se queda con las carpetas de este ordenador y lo demás
+   que sí es mantenimiento de verdad. */
+await comprobar('"Mantenimiento" trae las carpetas de este ordenador, y ya no Copias ni Papelera',
   pagina.locator('#ajustes-tab-mantenimiento').textContent().then((t) =>
-    t.indexOf('Copias de seguridad') !== -1 && t.indexOf('Papelera') !== -1 &&
-    t.indexOf('Carpetas de este ordenador') !== -1), true);
+    t.indexOf('Carpetas de este ordenador') !== -1 &&
+    t.indexOf('Copias de seguridad') === -1 && t.indexOf('Papelera') === -1), true);
 
 /* Se vuelve a "Tipos de asunto" y se cambia a EMPRESAS, para abrir
    luego COMPRA: así la prueba 4 puede comprobar de verdad que la

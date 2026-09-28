@@ -245,11 +245,17 @@ var AlumnadoBD = (function () {
       $('alumnado-bd-senalar').onclick = senalarCarpeta;
       $('alumnado-bd-olvidar').onclick = olvidarCarpeta;
     }
-    var mant = $('ajustes-tab-mantenimiento');
+    /* Fila 200, apartado 7: este botón ya no crea su propio <details>
+       en Ajustes → Mantenimiento; se cuelga, sin envoltorio propio,
+       dentro del bloque "Traer el alumnado" de Herramientas (junto al
+       botón de Séneca de js/traer-datos.js). */
+    var mant = $('herramientas-traer-alumnado-bd');
     if (mant && !$('bloque-alumnado-bd-traer')) {
-      mant.appendChild(bloque('bloque-alumnado-bd-traer', 'Traer el alumnado', 'De la carpeta de la base de datos de alumnado',
-        '<p class="explica alumnado-bd-copia" id="alumnado-bd-copia"></p>' +
-        '<button type="button" class="boton" id="alumnado-bd-traer">Traer el alumnado ahora</button>'));
+      var envoltorio = document.createElement('div');
+      envoltorio.id = 'bloque-alumnado-bd-traer';
+      envoltorio.innerHTML = '<p class="explica alumnado-bd-copia" id="alumnado-bd-copia"></p>' +
+        '<button type="button" class="boton" id="alumnado-bd-traer">Traer el alumnado ahora</button>';
+      mant.appendChild(envoltorio);
       $('alumnado-bd-traer').onclick = function () {
         return U.mientrasGuarda($('alumnado-bd-traer'), async function () {
           if (!(await carpeta())) { U.aviso('Primero señala la carpeta en Ajustes › El centro › Carpeta de la base de datos de alumnado.', 'ambar'); return; }
