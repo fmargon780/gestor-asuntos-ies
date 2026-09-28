@@ -30,12 +30,15 @@ de las filas 179 a 187**: dice qué trozo de cada uno se hace en cada fila nueva
 
 Aunque el documento de la fila no las diga:
 
-- **Sube directamente a `main`, sin pull request.**
-- **Como mucho tres subidas por fila**: una para marcar EN CURSO; una con todo el código y todas
-  las pruebas juntas; y, si hace falta, una con la documentación. Nada de una subida por fichero.
-  Si la sesión no tiene `git push` y solo puede subir con la herramienta de GitHub, usa
-  `push_files` con todos los ficheros de código y pruebas en una sola llamada (o en dos si son
-  muchos), nunca uno a uno.
+- **Sube a `pruebas`, y a `main` solo con el revisor** (28-sep-2026,
+  `docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223: sustituye el «sube directamente a `main`» de
+  cuando se escribió este reparto). Sin pull request abierta: si el entorno obliga a una, se
+  fusiona al momento.
+- **Como mucho tres subidas por fila**: una a `main` para marcar EN CURSO; una a `pruebas` con
+  todo el código y todas las pruebas juntas; y, con la aprobación del revisor, una de `pruebas` a
+  `main` con la documentación y la marca HECHA. Nada de una subida por fichero. Si la sesión no
+  tiene `git push` y solo puede subir con la herramienta de GitHub, usa `push_files` con todos los
+  ficheros de código y pruebas en una sola llamada (o en dos si son muchos), nunca uno a uno.
 - **Nada se sube hasta que `npm test` entero está en verde en local.** Subir la mitad y seguir
   trabajando está prohibido: la web publica cada subida.
 - **No leas el repositorio entero.** Solo los ficheros de la lista, y `grep` para lo demás.

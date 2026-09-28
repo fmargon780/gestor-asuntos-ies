@@ -5,6 +5,40 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 28-sep-2026 — Fila 223: el revisor, nada llega a producción sin pasar su lista
+
+Segunda fila del método «purgar los fallos antes de producción» (la primera, fila 222, hizo la
+copia de pruebas). Diseñada con Francisco en Cowork el mismo día. El porqué, con sus palabras: «en
+el diseño es donde tiene que ser incisivo; después la operativa debe ser muy fluida», y cambió esa
+misma tarde la norma «Subir directamente a `main`» que él mismo había pedido por la mañana, al ver
+que los fallos le salían en producción.
+
+Esta fila no toca la aplicación: solo el método de trabajo. Cambios: `CLAUDE.md` (el bloque «Subir
+directamente a `main`» pasa a «Trabajar en `pruebas`; a `main` solo con el revisor», y bloque nuevo
+«El revisor»); `docs/COLA.md` (estado DEVUELTA nuevo; regla 0 con la rama `pruebas`, DEVUELTA antes
+que PENDIENTE y una conversación nueva por fila; regla 2 con la lista «Cómo sabemos que está bien»
+y el enlace a la conversación en el EN CURSO; regla 13 con el reparto de subidas nuevo; regla 19
+con el `curl` doble); `docs/REPARTO-DE-LA-COLA-2026-09-27.md`; `docs/CONTEXTO-CORTO.md`;
+`docs/AHORRO-CUOTA.md`; documento nuevo `docs/REVISOR-GUION.md` (el guion fijo que se le pasa,
+siempre igual, al agente que hace de revisor); `scripts/vercel-ignore-build.sh` con `.claude`
+añadido a lo que no publica (`CLAUDE.md` y el resto de `.md` ya estaban cubiertos por `*.md`).
+
+**Bloqueo real, no de la instrucción sino del propio Claude Code:** el documento pedía crear
+`.claude/settings.json` con una lista de permisos concedidos de una vez (`Bash(git *)`,
+`Bash(npm *)`, herramientas MCP de GitHub y Vercel, etc.), para que ninguna sesión futura se parara
+a pedir permiso. El clasificador de modo automático de esta sesión rechazó la escritura de ese
+fichero con el motivo «Self-Modification»: una sesión no puede concederse permisos nuevos a sí
+misma escribiendo su propio fichero de permisos, por ningún camino (ni con otra herramienta, ni
+troceado). Es justo el caso que la propia sección 5 de `docs/REVISOR-ANTES-DE-PUBLICAR.md` preveía
+(«un aviso del entorno, no de Claude Code»): se anota en «Lo que queda por hablar con Francisco» de
+`docs/COLA.md`, con el texto exacto del aviso, y se sigue con el resto de la fila. El método del
+revisor (guion, rama `pruebas`, DEVUELTA) queda escrito y en vigor; lo único que falta es que
+Francisco (o una sesión con permiso para tocar su propia configuración) cree ese fichero a mano.
+
+Ficheros: nada de `js/`, `css/` ni `pruebas/`, así que no hay pruebas nuevas que correr ni
+publicación de Vercel que comprobar (`git diff` de esta fila solo toca `docs/`, `CLAUDE.md` y
+`scripts/vercel-ignore-build.sh`; este último no cambia lo que ya se salta, solo añade `.claude`).
+
 ## 28-sep-2026 — Fila 222: la copia de pruebas, con datos inventados
 
 `docs/COPIA-DE-PRUEBAS.md`, primera de las dos filas del método «purgar los fallos antes de

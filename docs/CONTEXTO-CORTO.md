@@ -155,7 +155,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   como el del centro; renuncia a la Junta Electoral, en su hito.
 - Copias diarias (90 días) con `_esquema` y verificación tras escribir, detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable de nombres. Un borrado (tipo,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
-- Pruebas automáticas en cada subida de código (no con solo `docs/`); en paralelo (`pruebas/ejecutar.mjs`, fila 208). Mientras se trabaja una fila, solo las pruebas de lo tocado (`node pruebas/ejecutar.mjs <palabra>`); la pasada completa, una vez al final.
+- Pruebas automáticas en cada subida de código (no con solo `docs/`); en paralelo (`pruebas/ejecutar.mjs`, fila 208). Mientras se trabaja una fila, solo las pruebas de lo tocado (`node pruebas/ejecutar.mjs <palabra>`); la pasada completa, una vez al final, antes de subir a `pruebas` (el código nunca sube directo a `main`: pasa antes por el revisor, fila 223).
 - Copia sin internet (`file://`): se actualiza sola (reintenta si se estaba publicando); si no, franja fija arriba; cada 30 min. La web normal también avisa de versión nueva (fila 178), solo con «Recargar».
 - Hitos: cada hito de la guía es un hito de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
   bifurcaciones e historial (si falla su guardado al archivar, se reintenta una vez; el hito no queda huérfano de todas formas). Cada hito se abre a pantalla completa (la mesa), con las acciones solo ahí («Generar documento ▾»,
@@ -198,10 +198,11 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 - El repositorio es la versión buena; Vercel publica solo la app (`.vercelignore`: sin `docs/` ni `pruebas/`) y pone
   sola la hora de la versión al publicar; la de `js/version.js` (hora real) es la de la copia sin internet.
-- **Permiso permanente de Francisco**: un pull request (sesiones desde la nube) lo fusiona Claude
-  Code solo, en verde y sin conflictos (nota al final de `docs/COLA.md`).
-- **Comprobar siempre lo publicado con `curl`.**
-- Vercel: 100 publicaciones/día; `vercel.json` salta los commits de solo `docs/`, `pruebas/`, `.github/` o `.md`; máx. dos subidas por fila.
+- **Permiso permanente de Francisco**: una petición de cambios hacia `pruebas`, o hacia `main` tras
+  la aprobación del revisor, la fusiona Claude Code solo, sin esperar a nadie
+  (`docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223).
+- **Comprobar siempre lo publicado con `curl`: la copia de pruebas antes del revisor, `main` después.**
+- Vercel: 100 publicaciones/día; `vercel.json` salta los commits de solo `docs/`, `pruebas/`, `.github/` o `.md`; máx. tres subidas por fila (a `pruebas`, y a `main` solo con el revisor).
 - Antes de colgar una función de `App`, mirar que el nombre esté libre. Un solo cuadro (`U.preguntar`) a la vez.
 - Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV.
 - Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o uno nuevo. Sin remedio, con `U.envolver`, apuntado en `js/envolturas-esperadas.js`.

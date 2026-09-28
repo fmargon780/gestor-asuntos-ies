@@ -2,33 +2,37 @@
 
 Antes de nada, lee `docs/CONTEXTO.md` y después `docs/COLA.md`, como dice la cola.
 
-**Una sola sesión y una sola fila** (27-sep-2026): nunca trabajan dos sesiones de Claude Code a la
-vez en este repositorio. Cada lanzamiento hace solo la primera fila PENDIENTE de `docs/COLA.md`,
-la publica, comprueba la publicación y para. Detalle en la regla 0 de la cola.
+**Una sola sesión, una sola fila, una conversación nueva por fila** (27-sep-2026, ampliado el
+28-sep-2026 por la fila 223): nunca trabajan dos sesiones de Claude Code a la vez en este
+repositorio. Cada lanzamiento hace, en una conversación nueva, solo la primera fila **DEVUELTA**
+(si la hay) o si no la primera **PENDIENTE** de `docs/COLA.md`, la lleva hasta el final (revisor
+incluido) y para. Detalle en la regla 0 de la cola y en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
 
-**Subir directamente a `main`, sin dejar peticiones de cambios abiertas** (28-sep-2026, pedido
-por Francisco para que cada fila tarde menos; manda sobre cualquier otra regla de la cola que
-diga lo contrario):
+**Trabajar en `pruebas`; a `main` solo con el revisor** (28-sep-2026 por la tarde, sustituye la
+norma de esa misma mañana «Subir directamente a `main`»: Francisco la cambió al ver que los
+fallos le salían en producción; detalle y porqué en `docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223,
+y en el bloque «El revisor» de abajo):
 
-1. Sube siempre a `main`. Primero `git pull --rebase origin main` y después
-   `git push origin HEAD:main`.
-2. Si git rechaza la subida a `main` (a veces el entorno solo te deja subir a tu rama
-   `claude/...`): sube a tu rama `claude/...`, abre una petición de cambios (pull request)
-   contra `main` y fusiónala tú mismo en ese momento con la herramienta de GitHub
-   (`merge_pull_request`), sin esperar a GitHub Actions ni a que nadie la revise. Es el único
-   uso permitido de las peticiones de cambios: nunca dejes una abierta.
+1. Al empezar una fila, nivelar `pruebas` con `main` (`git fetch`; `git push --force origin
+   main:pruebas`, o sin `git push`: una petición de cambios de `main` a `pruebas` fusionada al
+   momento). Todo el trabajo de código de la fila sube a `pruebas`, nunca directo a `main`. Las
+   subidas que solo tocan `docs/` (EN CURSO, estimaciones, HECHA) siguen yendo directas a `main`:
+   no publican nada.
+2. Si git rechaza la subida a `pruebas` (a veces el entorno solo deja subir a tu rama
+   `claude/...`): sube a tu rama, abre una petición de cambios contra `pruebas` y fusiónala tú
+   mismo en ese momento con la herramienta de GitHub (`merge_pull_request`), sin esperar a nadie.
+   Nunca dejes una petición de cambios abierta.
 3. Nunca subas ficheros de código uno a uno con las herramientas de ficheros de GitHub
-   (`create_or_update_file` o `push_files`): los ficheros grandes se cortan al subir y dejan
-   `main` roto. Si git no puede subir de ninguna manera, para: deja la fila EN CURSO y dilo en
-   tu mensaje final.
+   (`create_or_update_file` o `push_files`): los ficheros grandes se cortan al subir. Si git no
+   puede subir de ninguna manera, para: deja la fila EN CURSO y dilo en tu mensaje final.
 4. No esperes a GitHub Actions ni arregles sus fallos como condición para publicar. Lo que vale es
    `npm test` en tu sesión y la publicación comprobada en Vercel (regla general de abajo). Si
    Actions falla en una prueba que en tu sesión pasa, no la persigas: apúntala en una línea en
    `docs/COLA.md` («Lo que queda por hablar con Francisco») y sigue.
-5. Una fila son, como mucho, tres subidas a `main` (cada subida puede ser la subida a tu rama y
-   su fusión inmediata, regla 2): la marca EN CURSO (con las estimaciones), el cambio con su
-   documentación y `version.js`, y, tras comprobar la publicación, la marca HECHA. No hagas
-   subidas sueltas fichero a fichero.
+5. Con la aprobación del revisor, `pruebas` pasa a `main` (`git push origin pruebas:main` si es
+   avance limpio; si no, fusión y subida; sin `git push`, petición de cambios `pruebas` → `main`
+   fusionada al momento). Publicaciones de Vercel por fila: como mucho tres (una o dos a
+   `pruebas`, una a `main`). No hagas subidas sueltas fichero a fichero.
 
 **Pruebas: parciales mientras trabajas, completas una sola vez** (28-sep-2026, pedido por
 Francisco; manda sobre cualquier otra regla de la cola que pida más pasadas completas):
@@ -56,6 +60,23 @@ con estado IDEA o EN DISEÑO. No son trabajo para Claude Code: nunca se cogen, n
 se estiman en `docs/ESTIMACIONES.md`, ni se mueven, ni se borran. «La primera PENDIENTE» se
 cuenta saltándolas. Solo una conversación de diseño las pasa a PENDIENTE, cuando Francisco
 cierra el diseño.
+
+**El revisor** (28-sep-2026, `docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223): antes de tocar
+`main`, cada tarea PENDIENTE lleva su sección «Cómo sabemos que está bien» (si una fila anterior a
+la 223 no la tiene, la sesión la escribe al cogerla, a partir del propio documento). Con el cambio
+ya publicado en `pruebas` y comprobado por `curl`, la propia sesión lanza un agente aparte, con
+contexto limpio (sin ver el código ni el diff), que entra por Playwright en la copia de pruebas
+publicada con `?demo=1` y pasa esa lista, con el guion fijo de `docs/REVISOR-GUION.md`. Un punto
+**[SOLO FRANCISCO]** no lo pasa el revisor: queda NO COMPROBADO, se copia a
+`docs/COMPROBAR-A-MANO.md` y se avisa a Francisco en una línea al terminar. **APROBADA**: se
+publica en `main` (regla general de abajo) y la fila se marca HECHA. **RECHAZADA** la primera vez:
+se arregla solo lo que dice el informe, se sube a `pruebas` otra vez y se llama a un revisor nuevo
+desde cero, sin contarle qué se arregló. **RECHAZADA** la segunda vez: la fila pasa a **DEVUELTA**
+con el informe, `main` no se toca, y la sesión para (mensaje que empieza por «DEVUELTA:»). El
+siguiente lanzamiento coge primero las filas DEVUELTA, antes que cualquier PENDIENTE; DEVUELTA dos
+lanzamientos seguidos pasa a BLOQUEADA. Nada de esto se para a pedir permiso ni a preguntarle nada
+a Francisco: las decisiones a mitad camino las toma la sesión y las deja escritas en la nota de la
+fila. Detalle completo, y los permisos que hacen falta, en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
 
 ## Regla general de publicación (manda sobre cualquier otra regla)
 

@@ -1,6 +1,10 @@
 # Cola de instrucciones para Claude Code
 
-Estados: PENDIENTE / EN CURSO / HECHA / BLOQUEADA / IDEA / EN DISEÑO. IDEA: apuntada por Francisco, sin diseñar. EN DISEÑO: se está diseñando en una conversación de Cowork; lleva el enlace. Claude Code no toca ninguna de las dos.
+Estados: PENDIENTE / EN CURSO / HECHA / BLOQUEADA / DEVUELTA / IDEA / EN DISEÑO. IDEA: apuntada por
+Francisco, sin diseñar. EN DISEÑO: se está diseñando en una conversación de Cowork; lleva el
+enlace. DEVUELTA: el revisor la rechazó dos veces (`docs/REVISOR-ANTES-DE-PUBLICAR.md`); el
+siguiente lanzamiento la retoma antes que cualquier PENDIENTE. Claude Code no toca IDEA ni EN
+DISEÑO.
 
 Aquí se apuntan, en orden, las instrucciones pendientes. Cada una es un documento de `docs/`.
 Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente, de arriba abajo.
@@ -12,25 +16,38 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## Reglas para Claude Code
 
-0. **Una sola sesión y una sola fila** (norma del 27-sep-2026, `docs/REPARTO-DE-LA-COLA-2026-09-27.md`).
-   Nunca trabajan dos sesiones de Claude Code a la vez en este repositorio, y no hay ninguna tarea
-   programada que lance la cola: la lanza Francisco. Cada lanzamiento hace **solo la primera fila
-   PENDIENTE**, la publica, comprueba la publicación y **para**. Si al empezar hay una fila EN
-   CURSO, no se coge otra: se mira qué quedó en `main` y se termina esa. Las cláusulas comunes de
-   las filas 188 en adelante (a `main` sin pull request, como mucho tres subidas, nada se sube con
-   `npm test` en rojo) están en ese mismo documento. **«Comprueba la publicación» no es lo mismo que
-   «espera a que Vercel publique»** (28-sep-2026, `docs/PUBLICAR-SIN-PARAR.md`): si Vercel no
-   publica por una causa ajena a este repositorio (tope diario de despliegues, publicación que no
-   arranca, cola de más de 20 minutos), la fila se deja **SIN PUBLICACIÓN COMPROBADA** y la sesión
-   para con normalidad, sin quedarse esperando; el siguiente lanzamiento sigue con la fila
-   siguiente. Solo una publicación **rota por el código de esta fila** (la construcción falla, la
-   web da error, falta un fichero) sigue obligando a arreglarla antes de seguir.
+0. **Una sola sesión, una sola fila, una conversación nueva por fila** (norma del 27-sep-2026,
+   `docs/REPARTO-DE-LA-COLA-2026-09-27.md`; ampliada el 28-sep-2026 por
+   `docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223). Nunca trabajan dos sesiones de Claude Code a la
+   vez en este repositorio, y no hay ninguna tarea programada que lance la cola: la lanza
+   Francisco. Cada lanzamiento hace, en una conversación de Claude Code nueva, **solo la primera
+   fila DEVUELTA** (si la hay) **o, si no hay ninguna, la primera fila PENDIENTE**: la trabaja en
+   la rama `pruebas`, la pasa por el revisor y solo con su APROBADA la publica en `main` (detalle
+   en `docs/REVISOR-ANTES-DE-PUBLICAR.md`), comprueba la publicación y **para**. Si una fila queda
+   DEVUELTA o BLOQUEADA, la conversación también acaba ahí. Si al empezar hay una fila EN CURSO
+   **con conversación enlazada de menos de 90 minutos**, no se coge otra: esa conversación sigue
+   con ella. Una fila EN CURSO sin enlace, o con uno de más de 90 minutos, se considera abandonada:
+   el siguiente lanzamiento la retoma, en conversación nueva, mirando qué quedó en `pruebas` (no en
+   `main`). Las cláusulas comunes de las filas 188 en adelante (como mucho tres subidas, nada se
+   sube con `npm test` en rojo) están en `docs/REPARTO-DE-LA-COLA-2026-09-27.md`. **«Comprueba la
+   publicación» no es lo mismo que «espera a que Vercel publique»** (28-sep-2026,
+   `docs/PUBLICAR-SIN-PARAR.md`): si Vercel no publica por una causa ajena a este repositorio (tope
+   diario de despliegues, publicación que no arranca, cola de más de 20 minutos), la fila se deja
+   **SIN PUBLICACIÓN COMPROBADA** y la sesión para con normalidad, sin quedarse esperando; el
+   siguiente lanzamiento sigue con la fila siguiente. Solo una publicación **rota por el código de
+   esta fila** (la construcción falla, la web da error, falta un fichero) sigue obligando a
+   arreglarla antes de seguir.
 1. Lee antes `docs/CONTEXTO.md`.
-2. Coge la primera instrucción con estado **PENDIENTE**, leyendo la tabla **de arriba abajo**. Ojo:
-   desde el 18-sep-2026 la tabla está en orden de trabajo, no de número, así que la primera
-   PENDIENTE no tiene por qué ser la del número más bajo. Cámbiala a **EN CURSO** con la fecha y
-   sube ese cambio en el primer commit del trabajo. Así, si otra sesión abre esta cola, sabe que
-   ya hay alguien con ella y no la repite.
+2. Coge la primera instrucción con estado **DEVUELTA**, y si no hay ninguna, la primera con estado
+   **PENDIENTE**, leyendo la tabla **de arriba abajo** (saltando IDEA y EN DISEÑO). Ojo: desde el
+   18-sep-2026 la tabla está en orden de trabajo, no de número, así que la primera PENDIENTE no
+   tiene por qué ser la del número más bajo. Si es una PENDIENTE de antes de la fila 223 y no lleva
+   sección «Cómo sabemos que está bien», escríbela a partir del propio documento
+   (`docs/REVISOR-ANTES-DE-PUBLICAR.md`, sección 1) en esta misma subida. Cámbiala a **EN CURSO
+   (fecha hora) · conversación: <enlace de esta sesión, o «sin enlace» si no lo tienes, nunca
+   inventado>** (formato de la sección 5 bis de `docs/REVISOR-ANTES-DE-PUBLICAR.md`) y sube ese
+   cambio, a `main` (no publica nada), en el primer commit del trabajo. Así, si otra sesión abre
+   esta cola, sabe que ya hay alguien con ella y no la repite.
 3. Antes de empezar una instrucción, comprueba si ya está hecha por otro camino (mira si existen
    los ficheros o funciones que pide). Si ya está hecha, márcala **HECHA** con una nota y pasa a
    la siguiente.
@@ -64,14 +81,16 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     (`get_file_contents` o `git show origin/main:<ruta>`) y compara el tamaño con el de antes: si
     ha quedado más corto de lo esperado, esa sesión no puede con ese fichero de una vez, y hay que
     dejarlo apuntado aquí en vez de reintentarlo mil veces.
-13. **Como máximo dos subidas por fila.** Cada push que llega a GitHub le cuesta una publicación
-    a Vercel, y el plan gratuito solo da 100 al día: el 17-sep-2026 se agotaron y la web se quedó
-    sin actualizar hasta el día siguiente. Una subida para marcar la fila **EN CURSO** (regla 2) y
-    una sola al terminar, con el código, las pruebas, `docs/COLA.md`, `docs/CONTEXTO-CORTO.md`,
-    `docs/CONTEXTO.md` y `docs/HISTORIA.md` en el mismo commit. Nada de un commit por fichero, ni
-    de "completa el commit anterior": se prepara todo y se sube una vez. Ver
-    `docs/NO-GASTAR-PUBLICACIONES.md`. (Desde la fila 65, la documentación puede ir en una subida
-    aparte: tres por fila en vez de dos.)
+13. **El reparto de las subidas, con el revisor de por medio** (28-sep-2026,
+    `docs/REVISOR-ANTES-DE-PUBLICAR.md`, sustituye el reparto de abajo). Cada push que llega a
+    GitHub le cuesta una publicación a Vercel, y el plan gratuito solo da 100 al día: el
+    17-sep-2026 se agotaron y la web se quedó sin actualizar hasta el día siguiente. Como mucho
+    tres publicaciones por fila: una subida a `main` para marcar **EN CURSO** (regla 2, no
+    publica nada); una subida a `pruebas` con el código, las pruebas y su documentación juntos
+    (dos si hace falta corregir tras una RECHAZADA del revisor); y, con la aprobación, una subida
+    de `pruebas` a `main` con la marca **HECHA**, `docs/CONTEXTO-CORTO.md`, `docs/CONTEXTO.md` y
+    `docs/HISTORIA.md`. Nada de un commit por fichero, ni de "completa el commit anterior": se
+    prepara todo y se sube una vez por destino. Ver `docs/NO-GASTAR-PUBLICACIONES.md`.
 14. **Nunca uses `$(cat fichero)` ni ninguna sustitución de shell como valor de `content` al
     subir un fichero: el servidor no lo ejecuta, lo sube tal cual, como texto literal.** El
     17-sep-2026 esto dejó `docs/COLA.md` en 35 bytes con el comando sin ejecutar. El contenido
@@ -97,7 +116,10 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     de commit en el parámetro `content`, y `docs/COLA.md` se quedó en 83 bytes. Antes de cada
     llamada, comprueba que `content` es el documento entero y `message` es la frase del commit:
     son dos parámetros distintos, nunca el mismo texto.
-19. **Tras fusionar o subir, comprueba con `curl` que lo publicado coincide con `main`** (por
+19. **Desde la fila 223, el `curl` se hace dos veces**: la copia de pruebas
+    (`pruebas.fmargon.com` o su dirección automática) antes de llamar al revisor, y producción
+    (`main`) después de que apruebe (`docs/REVISOR-ANTES-DE-PUBLICAR.md`, sección 2). **Tras
+    fusionar o subir, comprueba con `curl` que lo publicado coincide con lo subido** (por
     ejemplo `js/version.js?v=<algo distinto>`). Si `App.VERSION` publicada se queda atrás varios
     minutos, puede que Vercel no haya llegado a lanzar la publicación de los últimos commits (sin
     error visible: sencillamente no hay ninguna `deployment` para esos SHA). Pasó el 24-sep-2026
@@ -201,7 +223,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 216 | `docs/FILTROS-EN-TODAS-LAS-PESTANAS.md` (los cinco filtros de Inicio —Responsable, Situación, Plazo, Lo encarga y Tipo de asunto— valen en las cuatro pestañas, y el número de cada pestaña cuenta lo filtrado) | HECHA (28-sep-2026 16:06). `App.pasaFiltrosInicio(asunto, hito)` común a `App.listaAbiertosFiltrada` e `InicioTabla.calcular`; `Hitos.hitoActualDeAsunto` da el hito actual con su `responsable` fuera de "En Administración"/"En espera". "Filtros (N)" cuenta ya los cinco y "Limpiar todo" limpia también Responsable. `npm test` completo (181 ficheros) en verde. Prueba nueva `pruebas/filtros-en-todas-las-pestanas.mjs`. Publicación comprobada por `curl`: `App.VERSION` `28-sep-2026 · 16:07` y `js/inicio-tabla.js`/`js/hitos-a-quien.js`/`js/asuntos-lista-pintar.js` ya con `pasaFiltrosInicio`/`hitoActualDeAsunto` en la web publicada; confirmado también con `list_deployments` (commit `bb44787`, `READY`, producción) |
 | 222 | `docs/COPIA-DE-PRUEBAS.md` (la copia de pruebas: rama `pruebas` publicada en pruebas.fmargon.com, con «Entrar con datos de demostración» —datos inventados, nada se guarda— para que el revisor y Francisco prueben sin tocar producción) | HECHA (28-sep-2026 18:49), con alcance reducido y dos cosas pendientes de Francisco (detalle abajo). Rama `pruebas` nueva, empujada a GitHub; `scripts/vercel-ignore-build.sh` ya deja publicarla (antes solo `main`). Dentro de la app, `js/demo/` (`arrancar.js`, el único que se descarga siempre, decide si la visita es de pruebas y mete los demás con `document.write`, por la Content-Security-Policy): disco e `indexedDB` de mentira en memoria (`disco.js`), el juego de datos inventado creado llamando a las funciones de las pantallas —`App.crearTipo`, `GuiasDelCentro.guardarPasos`, `App.anotar`, `Hitos.marcar`, `Plantillas.guardar`— nunca JSON a mano (`datos.js`), y la entrada («Entrar con datos de demostración» o `?demo=1&auto=1`) con la franja fija y «Volver a empezar» (`franja.js`). `js/correo-enviar.js` contesta de mentira al instante en demo. Alcance reducido a propósito frente al documento (detalle en `docs/HISTORIA.md`): unos 15 alumnos en vez de 25, cuatro tipos en vez de ocho, seis asuntos abiertos y dos archivados en dos cursos en vez de doce y seis, sin Administraciones ni plantilla de documento Word. `pruebas/copia-de-pruebas.mjs` nueva; `npm test` completo (184 ficheros) en verde salvo `tras-cada-accion.mjs` (fallo ya conocido de la fila 214, sin relación). Publicación de `main` comprobada por `curl`: `App.VERSION` `28-sep-2026 · 18:49`, y `js/demo/arrancar.js`/`css/demo.css`/`js/demo/disco.js` (200) y `js/correo-enviar.js` con `enDemo` ya en la web publicada. La publicación de la propia rama `pruebas` (`https://gestor-de-asuntos-git-pruebas-fmargon780s-projects.vercel.app`, la dirección automática de su *preview*, ya que esta sesión no tiene acceso al proyecto por la herramienta de Vercel: `list_projects`/`get_project` no ven `gestor-de-asuntos` con el mismo `teamId` que usan las sesiones anteriores) SÍ existe (confirmado con `curl -I`: redirige a `vercel.com/sso-api`), pero no se ha podido comprobar su contenido: la protección de *Vercel Authentication* de las *preview* pide iniciar sesión en Vercel, y esta sesión no tiene esa sesión. Comprobado en su lugar, a fondo, en local (`http://localhost:8123/?demo=1`, con Chromium real): franja, Inicio con datos, Archivo en dos cursos, crear un asunto de verdad, y «Volver a empezar». Quedan dos acciones, solo de Francisco, en «Lo que queda por hablar con Francisco» |
 | 210 | `docs/HILO-SIN-REPETIR.md` (el PDF del HILO de correos: lo último arriba, sin citas repetidas, y adjuntos sin repetir) | HECHA (28-sep-2026 18:14). Cerrada al empezar la fila 222: quedó SIN PUBLICACIÓN COMPROBADA por el tope diario de Vercel; comprobado por `curl` que `js/correo-enviar.js` publicado ya trae `SCRIPT_ESPERADO = '27-sep-2026 · fila 210'` (`App.VERSION` publicada `28-sep-2026 · 18:01`, posterior al commit `ca381d7`) |
-| 223 | `docs/REVISOR-ANTES-DE-PUBLICAR.md` (el método nuevo: cada tarea lleva su lista «Cómo sabemos que está bien», se trabaja en `pruebas`, un revisor sin ver el código la pasa en la copia de pruebas y solo con su APROBADA se publica en `main`; RECHAZADA dos veces = DEVUELTA; permisos concedidos de una vez en `.claude/settings.json` para que nada se pare a preguntar; necesita la 222) | PENDIENTE (28-sep-2026) |
+| 223 | `docs/REVISOR-ANTES-DE-PUBLICAR.md` (el método nuevo: cada tarea lleva su lista «Cómo sabemos que está bien», se trabaja en `pruebas`, un revisor sin ver el código la pasa en la copia de pruebas y solo con su APROBADA se publica en `main`; RECHAZADA dos veces = DEVUELTA; permisos concedidos de una vez en `.claude/settings.json` para que nada se pare a preguntar; necesita la 222) | HECHA (28-sep-2026 19:59) · conversación: https://claude.ai/code/session_01YGQUWCtpDqaDJU8Pj3Afbg. Solo documentos: `CLAUDE.md`, reglas de la cola (estado DEVUELTA, reglas 0/2/13/19), `docs/REPARTO-DE-LA-COLA-2026-09-27.md`, `docs/CONTEXTO-CORTO.md`, `docs/AHORRO-CUOTA.md`, `docs/REVISOR-GUION.md` nuevo y `scripts/vercel-ignore-build.sh` (`.claude` añadido a lo que no publica). Sin código ni `pruebas/`: no hay publicación de Vercel que comprobar. **`.claude/settings.json` NO se ha podido crear**: el propio Claude Code lo rechazó por «Self-Modification» (una sesión no puede concederse permisos a sí misma); detalle y el texto exacto del aviso en «Lo que queda por hablar con Francisco», más abajo. El resto del método (rama `pruebas`, revisor, DEVUELTA) queda escrito y listo para la siguiente fila |
 | 214 | `docs/HA-LLEGADO-SUSTITUYE-LA-VISTA.md` (los enlaces «N correos · N documentos por clasificar» de Inicio sustituyen la tabla por esa lista, arriba, en vez de dejarla abajo del todo; «← Volver a Inicio» devuelve la misma pestaña, filtros y punto de la página) | PENDIENTE (28-sep-2026) |
 | 203 | `docs/PAPELERA-SE-VACIA-SOLA.md`, entero, con `js/copias.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 203) | PENDIENTE (27-sep-2026) |
 | 213 | `docs/BOTON-DE-SOPORTE.md` (botón «Soporte» en una esquina: error o mejora, texto y captura opcional; buzón en un script de Google que guarda el aviso en Drive y apunta una IDEA sin datos en la cola; más `docs/PONER-EN-MARCHA-SOPORTE.md` para Francisco) | PENDIENTE (28-sep-2026) |
@@ -237,6 +259,19 @@ abierto en ellas:
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
+- **Fila 223: falta `.claude/settings.json`, y ninguna sesión de Claude Code puede crearlo.** El
+  documento (`docs/REVISOR-ANTES-DE-PUBLICAR.md`, sección 5) pide ese fichero con los permisos
+  concedidos de una vez, para que nada se pare a preguntar. Esta sesión lo intentó y el propio
+  Claude Code lo rechazó, con este aviso exacto: «Permission for this action was denied by the
+  Claude Code auto mode classifier. Reason: [Self-Modification]. […] This denial applies to the
+  outcome, not only this exact command: don't pursue the same outcome through another tool,
+  interpreter, host, encoding, sub-agent or later turn […]». Es una protección contra que una
+  sesión se conceda permisos a sí misma, no algo que dependa de la instrucción ni de cómo se pida:
+  ninguna sesión futura de Claude Code en este repositorio va a poder crear ese fichero por su
+  cuenta. Hace falta que Francisco lo cree a mano (o lo pida desde fuera de una sesión de Claude
+  Code) con el contenido exacto de la sección 5 de `docs/REVISOR-ANTES-DE-PUBLICAR.md`. Mientras
+  tanto, el método del revisor funciona igual: solo significa que alguna sesión podría pararse a
+  pedir un permiso puntual en vez de tenerlo ya concedido.
 - **Cerrado (28-sep-2026): la fila 222 ya no tiene nada pendiente.** Dominio
   `pruebas.fmargon.com` asignado al proyecto `gestor-de-asuntos`, a la rama `pruebas`
   (`add_project_domain`, `verified: true`). La protección de Vercel Authentication no hizo falta

@@ -16,5 +16,5 @@ BASE="${VERCEL_GIT_PREVIOUS_SHA:-HEAD^}"
 git cat-file -e "$BASE^{commit}" 2>/dev/null || exit 1
 
 git diff --quiet "$BASE" HEAD -- . \
-  ":(exclude)docs" ":(exclude)pruebas" ":(exclude).github" ":(exclude)*.md" \
+  ":(exclude)docs" ":(exclude)pruebas" ":(exclude).github" ":(exclude)*.md" ":(exclude).claude" \
   && exit 0 || exit 1

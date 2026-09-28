@@ -12,15 +12,17 @@ Francisco paga la cuota y se le agotó el 97% en tres días. Estas reglas no son
   No recorras el repositorio entero ni abras ficheros "por si acaso".
 - Si la instrucción no dice qué ficheros tocar, es un fallo de la instrucción: apúntalo y
   búscalos con un `grep` concreto, no leyendo carpetas enteras.
+- **Si la instrucción no lleva la sección «Cómo sabemos que está bien», escríbela tú**, a partir
+  del propio documento, antes de empezar (`docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223).
 
 ## Al escribir
 
-- **Sube directamente a la rama `main`.** No abras una pull request y no crees una rama nueva.
-  Una PR en borrador deja el trabajo sin publicar y obliga a otra intervención.
+- **Sube el código a la rama `pruebas`; a `main` solo llega tras la aprobación del revisor**
+  (28-sep-2026, `docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223). No dejes una pull request abierta.
   **Excepción**: si el propio entorno de ejecución (por ejemplo, Claude Code en la nube) obliga a
-  trabajar en una rama concreta y a abrir pull request, eso manda sobre esta regla; dilo claro en
-  el mensaje final, para que Francisco sepa que hace falta fusionar el pull request antes de que
-  Vercel publique nada.
+  trabajar en una rama `claude/...` y a abrir pull request, ábrela contra `pruebas` (o contra
+  `main`, ya aprobada por el revisor) y fusiónala tú mismo al momento; dilo claro en el mensaje
+  final si algo se queda a medias.
 - **Cambios quirúrgicos.** No reescribas un fichero entero para cambiar unas líneas.
   La regla de "fichero entero, siempre" es para lo que se le enseña a Francisco, no para ti.
 - **Si tienes que tocar un fichero que pasa de unas 400 líneas, pártelo** en dos, por módulos.
