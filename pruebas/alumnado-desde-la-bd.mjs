@@ -228,7 +228,7 @@ await comprobar('«Por datos del alumnado» en pantalla: elegir los dos datos y 
   }), ['Salen 1', ['Primera, Lucía']]);
 
 console.log('--- Ajustes ---');
-await comprobar('Ajustes: la carpeta en El centro (sin caja de dirección) y «Traer» en Mantenimiento',
+await comprobar('Ajustes: la carpeta en El centro (sin caja de dirección) y «Traer» en Herramientas (fila 200)',
   pagina.evaluate(async () => {
     await App.pintarAjustes();
     await new Promise((r) => setTimeout(r, 300));
@@ -236,7 +236,7 @@ await comprobar('Ajustes: la carpeta en El centro (sin caja de dirección) y «T
       centro: !!document.querySelector('#ajustes-tab-centro #bloque-alumnado-bd'),
       carpeta: document.getElementById('alumnado-bd-carpeta').textContent,
       sinDireccion: !document.getElementById('alumnado-bd-url'),
-      traer: !!document.querySelector('#ajustes-tab-mantenimiento #alumnado-bd-traer'),
+      traer: !!document.querySelector('#herramientas-traer-alumnado-bd #alumnado-bd-traer'),
       copia: document.getElementById('alumnado-bd-copia').textContent,
       web: window.__llamadasWeb
     };

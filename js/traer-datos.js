@@ -130,10 +130,15 @@
     return b;
   }
 
-  /* ---------- el botón de Ajustes ---------- */
+  /* ---------- el botón de Ajustes ----------
+
+     Fila 200, apartado 7, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md: ya
+     no se mete junto a "Ficheros de datos" (El centro), sino dentro
+     del bloque "Traer el alumnado" de la pestaña "Herramientas", junto
+     al botón de la BD de alumnado (js/alumnado-bd.js). */
 
   function ponerEnAjustes() {
-    var caja = document.getElementById('estado-datos');
+    var caja = document.getElementById('herramientas-traer-seneca');
     if (!caja || document.getElementById('btn-traer-datos')) return;
     var fila = document.createElement('div');
     fila.className = 'alta-tipo';
@@ -144,7 +149,7 @@
     nota.className = 'suave';
     nota.textContent = 'Elige el fichero donde lo tengas bajado; se copia solo a _GESTOR/datos.';
     fila.appendChild(nota);
-    caja.parentNode.insertBefore(fila, caja);
+    caja.appendChild(fila);
   }
 
   /* ---------- el botón del aviso de arriba ----------

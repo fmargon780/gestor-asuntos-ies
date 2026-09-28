@@ -49,6 +49,38 @@ plegada, un icono de rueda dentada (`#btn-barra-ajustes`) lleva directo a Ajuste
 al abrir el visor o el lector** (un `MutationObserver` sobre las clases `con-visor`/`con-lector` de
 `<body>`, sin tocar `gestor-barra-2`) y vuelve a como estaba al cerrarlo.
 
+**El menú, de arriba abajo** (fila 200, 28-sep-2026, `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`,
+apartado 7): Inicio · Nuevo asunto · Archivo · Personas y empresas · Impresos · Cuentas (estos dos
+últimos los inserta `js/barra.js` justo detrás de "Personas y empresas") · **Herramientas** ·
+línea · Ajustes. `App.PANTALLAS` (`js/nucleo.js`) lleva `'herramientas'` justo antes de
+`'ajustes'`; `App.ir('herramientas')` llama a `App.pintarHerramientas` (`js/herramientas.js`, un
+fichero nuevo, sin lógica propia: solo reenvía a los módulos de siempre).
+
+**Herramientas** (`#pantalla-herramientas`) es lo que se usa de vez en cuando, no un ajuste de
+verdad: **Papelera** (`#bloque-papelera`, tal cual estaba, `js/papelera-ajustes.js`), **Traer el
+alumnado** (un solo bloque con dos botones: el de Séneca de `js/traer-datos.js` dentro de
+`#herramientas-traer-seneca`, y el de la BD de alumnado de `js/alumnado-bd.js` dentro de
+`#herramientas-traer-alumnado-bd`), **Tablas de datos** (`js/tablas-datos-pantalla.js`, que ahora
+cuelga su `<details>` de `#herramientas-tablas-datos-hueco` en vez de `#ajustes-tab-mantenimiento`)
+y **Restaurar una copia de seguridad** (`#tabla-copias`, `App.pintarCopias` en
+`js/ajustes-mantenimiento.js`, sin cambios por dentro). Los dos avisos de la franja de arriba que
+antes llevaban a Ajustes → Mantenimiento («papelera: N cosas...», «fichero de alumnado de hace N
+días») llevan ahora aquí: `js/avisos-que-faltan.js` (función nueva `irAHerramientas`, calcada a
+`irAMantenimiento` pero sin pasar por Ajustes) y `js/frescura.js` (su `irAMantenimiento` ya lleva a
+Herramientas y abre `#bloque-traer-alumnado`, no `#bloque-frescura`, que se queda en Mantenimiento).
+
+**Ajustes → El centro** tiene ahora **"Días de aviso"** (asuntos dormidos + antelación de
+vencimiento, mismos campos `#dias-dormido` y `#avisos-dias` de siempre) y **"Copias de
+seguridad"** (la caducidad, `#dias-caducidad-copias`, con el texto explicativo de cómo y cuándo se
+guardan; la lista para restaurar vive en Herramientas) como una sola sección cada una, en vez de
+repartidas entre El centro y Mantenimiento.
+
+**Ajustes → Mantenimiento** se queda con lo que es mantenimiento de verdad: carpetas de este
+ordenador, el ayudante de Séneca, borrados que se fusionan, conflictos de Dropbox, fichas sin
+carpeta, hitos huérfanos, fichas del archivo, contacto guardado, envolturas esperadas, el
+RegAlum.csv viejo (`#bloque-frescura`, las épocas de aviso), conservación, cargar la biblioteca y
+las plantillas del centro, y "Pasar a Administraciones".
+
 **Que ninguna fila se aplaste** (`css/filas.css`, fila 36, 17-sep-2026,
 `docs/FILAS-QUE-NO-SE-ESTRUJAN.md`). Antes, una fila con texto y varios botones en línea
 (`display:flex` sin `flex-wrap`) dejaba que el texto fuera el único que cediera: con el panel de

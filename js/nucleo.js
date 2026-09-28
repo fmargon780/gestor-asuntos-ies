@@ -576,7 +576,7 @@ App.refrescarFichas = function () {
    NAVEGACIÓN
    ========================================================== */
 
-App.PANTALLAS = ['abiertos', 'nuevo', 'archivo', 'personas', 'ajustes'];
+App.PANTALLAS = ['abiertos', 'nuevo', 'archivo', 'personas', 'herramientas', 'ajustes'];
 
 Array.prototype.forEach.call(document.querySelectorAll('.pestana'), function (b) {
   b.onclick = function () { App.ir(b.dataset.pantalla); };
@@ -608,4 +608,6 @@ App.ir = function (cual) {
     if (App.avisarALosModulos) App.avisarALosModulos();
   }
   if (cual === 'personas') App.pintarPersonas();
+  /* Fila 200, apartado 7, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md. */
+  if (cual === 'herramientas') App.pintarHerramientas();
 };

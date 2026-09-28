@@ -3,7 +3,8 @@
 
    Sin el arreglo esta prueba falla desde el primer paso: no existe
    #buscar-papelera ni #cuenta-papelera en el bloque Papelera de
-   Ajustes, y escribir en la caja no filtra nada.
+   Herramientas (fila 200; antes en Ajustes → Mantenimiento), y
+   escribir en la caja no filtra nada.
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs, igual que
    pruebas/papelera.mjs. Aquí se manda a la papelera notas del tablón
@@ -70,10 +71,11 @@ await pagina.evaluate(async () => {
   await (await h.createWritable()).write(JSON.stringify({ fichas }));
 });
 
-await pagina.click('.pestana[data-pantalla="ajustes"]');
-await pagina.evaluate(() => App.cambiarPestanaAjustes('mantenimiento'));
+/* Fila 200: la Papelera vive en la pestaña "Herramientas", no ya en
+   Ajustes → Mantenimiento. */
+await pagina.click('.pestana[data-pantalla="herramientas"]');
 await pagina.evaluate(() => {
-  document.querySelectorAll('#pantalla-ajustes details').forEach((d) => { d.open = true; });
+  document.querySelectorAll('#pantalla-herramientas details').forEach((d) => { d.open = true; });
 });
 await pagina.waitForSelector('#tabla-papelera .fila-papelera');
 await comprobar('las tres cosas salen en la papelera', pagina.locator('#tabla-papelera .fila-papelera').count(), 3);

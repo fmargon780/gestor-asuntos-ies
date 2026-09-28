@@ -115,6 +115,14 @@
     <button class="pestana" data-pantalla="nuevo"><span>Nuevo asunto</span></button>
     <button class="pestana" data-pantalla="archivo"><span>Archivo</span></button>
     <button class="pestana" data-pantalla="personas"><span>Personas y empresas</span></button>
+    <!-- Fila 200, apartado 7 (docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md):
+         js/barra.js inserta "Impresos" y "Cuentas" justo detrás del
+         botón de "Personas y empresas" (referencia.parentNode.
+         insertBefore(b, referencia.nextSibling)), así que puesto aquí
+         "Herramientas" queda detrás de esos dos al cargar la página:
+         Inicio · Nuevo asunto · Archivo · Personas y empresas ·
+         Impresos · Cuentas · Herramientas, línea, Ajustes. -->
+    <button class="pestana" data-pantalla="herramientas"><span>Herramientas</span></button>
     <div class="separador-lateral"></div>
     <button class="pestana" data-pantalla="ajustes"><span>Ajustes</span></button>
     <div class="lateral-pie">
@@ -429,6 +437,73 @@
       </div>
     </section>
 
+    <!-- Fila 200, apartado 7 (docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md):
+         la pestaña "Herramientas": lo que se usa de vez en cuando, no
+         un ajuste de verdad. Cuatro bloques que vivían en
+         Ajustes → Mantenimiento. Los pinta App.pintarHerramientas
+         (js/herramientas.js), cada vez que se entra en esta pantalla. -->
+    <section id="pantalla-herramientas" class="pantalla oculto">
+      <header class="cabecera"><h2>Herramientas</h2></header>
+
+      <div id="herramientas-lista">
+
+      <details class="bloque-ajustes" id="bloque-papelera">
+        <summary>
+          <span class="bloque-titulo">Papelera</span>
+          <span class="bloque-pie">Lo borrado se guarda aquí hasta que tú lo quites</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <div class="papelera-buscador">
+        <input id="buscar-papelera" class="campo" placeholder="Buscar en la papelera">
+        <span id="cuenta-papelera" class="suave"></span>
+      </div>
+      <div id="aviso-papelera-vieja" class="aviso aviso-ambar oculto"></div>
+      <div id="tabla-papelera" class="lista"></div>
+        </div>
+      </details>
+
+      <!-- "Traer el alumnado": dos botones que viven hoy en dos ficheros
+           distintos (js/traer-datos.js, el de Séneca; js/alumnado-bd.js,
+           el de la BD de alumnado), bajo un solo título; cada uno mete
+           su fila en su propio hueco de aquí dentro. -->
+      <details class="bloque-ajustes" id="bloque-traer-alumnado">
+        <summary>
+          <span class="bloque-titulo">Traer el alumnado</span>
+          <span class="bloque-pie">Ficheros de Séneca y datos de la base de datos de alumnado</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <div id="herramientas-traer-seneca"></div>
+      <div id="herramientas-traer-alumnado-bd"></div>
+        </div>
+      </details>
+
+      <!-- "Tablas de datos": js/tablas-datos-pantalla.js crea aquí dentro
+           su propio <details id="bloque-tablas-datos"> la primera vez
+           que pinta (fila 110, docs/TABLAS-DE-DATOS.md). -->
+      <div id="herramientas-tablas-datos-hueco"></div>
+
+      <!-- "Restaurar una copia de seguridad": es el bloque "Copias de
+           seguridad" de siempre (#tabla-copias, App.pintarCopias), solo
+           que aquí sin su párrafo largo (que se ha quedado en El centro,
+           junto con la caducidad) y con el título cambiado, porque
+           "Copias de seguridad" ya nombra la sección de El centro
+           (docs/HISTORIA.md, fila 200, explica por qué). -->
+      <details class="bloque-ajustes">
+        <summary>
+          <span class="bloque-titulo">Restaurar una copia de seguridad</span>
+          <span class="bloque-pie">Por si algún fichero compartido se estropea</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">De cada fichero compartido, la última copia guardada (como mucho las
+         últimas 30 de cada uno). El texto sobre cómo y cuándo se guardan, y la caducidad, están
+         en Ajustes → El centro → Copias de seguridad.</p>
+      <div id="tabla-copias" class="lista"></div>
+        </div>
+      </details>
+
+      </div>
+    </section>
+
     <section id="pantalla-ajustes" class="pantalla oculto">
       <header class="cabecera"><h2>Ajustes</h2></header>
 
@@ -464,10 +539,14 @@
       <!-- Fila 129 (docs/EL-HITO-ES-EL-ESTADO.md): la rejilla "Estados del asunto"
            ya no existe: el estado del asunto es su hito actual. -->
 
+      <!-- Fila 200, apartado 6 (docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md):
+           "Asuntos dormidos" y "Avisos de vencimiento" (que vivía en
+           Mantenimiento) juntos en una sola sección; sus dos campos
+           (#dias-dormido, #avisos-dias) siguen tal cual por dentro. -->
       <details class="bloque-ajustes">
         <summary>
-          <span class="bloque-titulo">Asuntos dormidos</span>
-          <span class="bloque-pie">A partir de cuántos días sin novedades avisar, en "Qué me toca"</span>
+          <span class="bloque-titulo">Días de aviso</span>
+          <span class="bloque-pie">Cuándo avisar de asuntos dormidos y de lo que está por vencer</span>
         </summary>
         <div class="bloque-cuerpo">
       <p class="explica">Un asunto abierto en el que no se ha escrito una nota, ni se ha cambiado
@@ -478,18 +557,35 @@
         <input id="dias-dormido" type="number" min="1" class="campo campo-plazo">
         <span class="suave">días</span>
       </div>
+      <p class="explica">Al abrir la aplicación sale un aviso arriba con lo que ha vencido
+         y lo que está a punto de vencer. Aquí eliges con cuánta antelación quieres el aviso.
+         Esto es solo de este ordenador.</p>
+      <div class="alta-tipo">
+        <label class="etiqueta-en-linea" for="avisos-dias">Avisar con</label>
+        <input id="avisos-dias" type="number" min="0" class="campo campo-plazo">
+        <span class="suave">días de antelación</span>
+      </div>
         </div>
       </details>
 
+      <!-- Fila 200, apartado 6: "Caducidad de las copias" y el texto
+           explicativo de "Copias de seguridad" (que vivía en
+           Mantenimiento) juntos aquí. La lista con los botones de
+           restaurar se ha ido entera a Herramientas → "Restaurar una
+           copia de seguridad" (decisión de diseño explicada en
+           docs/HISTORIA.md, fila 200). -->
       <details class="bloque-ajustes">
         <summary>
-          <span class="bloque-titulo">Caducidad de las copias de seguridad</span>
-          <span class="bloque-pie">A partir de cuántos días se borran solas, aunque no lleguen a 30</span>
+          <span class="bloque-titulo">Copias de seguridad</span>
+          <span class="bloque-pie">Una copia diaria de cada fichero compartido, y cuándo se borran solas</span>
         </summary>
         <div class="bloque-cuerpo">
-      <p class="explica">La aplicación guarda hasta 30 copias de cada fichero compartido (una por
-         día). Además de ese número, las copias más viejas que esto se borran solas, aunque no se
-         hayan llegado a las 30: la lista completa está en Ajustes → Mantenimiento.</p>
+      <p class="explica">Antes de escribir cualquiera de los ficheros que se comparten con el
+         resto de ordenadores, la aplicación guarda una copia de cómo estaba, una vez al día.
+         Se guardan en <code>_GESTOR/copias</code>: como mucho las últimas 30 de cada uno. Si
+         algún fichero se estropea, al entrar la aplicación lo dice y ofrece restaurar la
+         última copia; para restaurar una copia, ve a Herramientas → Restaurar una copia de
+         seguridad.</p>
       <div class="alta-tipo">
         <label class="etiqueta-en-linea" for="dias-caducidad-copias">Borrar las de más de</label>
         <input id="dias-caducidad-copias" type="number" min="1" class="campo campo-plazo">
@@ -687,22 +783,8 @@
 
       <div id="ajustes-tab-mantenimiento" class="ajustes-tab oculto">
 
-      <details class="bloque-ajustes">
-        <summary>
-          <span class="bloque-titulo">Avisos de vencimiento</span>
-          <span class="bloque-pie">Con cuánta antelación avisar de lo que vence</span>
-        </summary>
-        <div class="bloque-cuerpo">
-      <p class="explica">Al abrir la aplicación sale un aviso arriba con lo que ha vencido
-         y lo que está a punto de vencer. Aquí eliges con cuánta antelación quieres el aviso.
-         Esto es solo de este ordenador.</p>
-      <div class="alta-tipo">
-        <label class="etiqueta-en-linea" for="avisos-dias">Avisar con</label>
-        <input id="avisos-dias" type="number" min="0" class="campo campo-plazo">
-        <span class="suave">días de antelación</span>
-      </div>
-        </div>
-      </details>
+      <!-- Fila 200, apartado 6: "Avisos de vencimiento" (su campo
+           #avisos-dias) se ha ido a El centro → "Días de aviso". -->
 
       <details class="bloque-ajustes">
         <summary>
@@ -728,22 +810,11 @@
         </div>
       </details>
 
-      <details class="bloque-ajustes">
-        <summary>
-          <span class="bloque-titulo">Copias de seguridad</span>
-          <span class="bloque-pie">Una copia diaria de cada fichero compartido, por si alguno se estropea</span>
-        </summary>
-        <div class="bloque-cuerpo">
-      <p class="explica">Antes de escribir cualquiera de los ficheros que se comparten con el
-         resto de ordenadores, la aplicación guarda una copia de cómo estaba, una vez al día.
-         Se guardan en <code>_GESTOR/copias</code>: como mucho las últimas 30 de cada uno, y las
-         que pasen de la caducidad (configurable en Ajustes → El centro, 90 días por defecto) se
-         borran aunque no se hayan llegado a las 30. Si algún fichero se estropea, al entrar la
-         aplicación lo dice y ofrece restaurar la última copia; aquí puedes restaurar cualquiera
-         de las otras, por si hiciera falta.</p>
-      <div id="tabla-copias" class="lista"></div>
-        </div>
-      </details>
+      <!-- Fila 200, apartado 6 y 7: "Copias de seguridad" se ha partido:
+           su párrafo explicativo se ha ido a El centro → "Copias de
+           seguridad" (junto con la caducidad); la lista con los botones
+           de restaurar (#tabla-copias) se ha ido entera a Herramientas
+           → "Restaurar una copia de seguridad". -->
 
       <!-- fila 77, docs/DETALLES-DE-MANTENIMIENTO.md, punto 3: los
            tipos, estados, tipos de documento y recurrentes que se
@@ -766,20 +837,8 @@
         </div>
       </details>
 
-      <details class="bloque-ajustes" id="bloque-papelera">
-        <summary>
-          <span class="bloque-titulo">Papelera</span>
-          <span class="bloque-pie">Lo borrado se guarda aquí hasta que tú lo quites</span>
-        </summary>
-        <div class="bloque-cuerpo">
-      <div class="papelera-buscador">
-        <input id="buscar-papelera" class="campo" placeholder="Buscar en la papelera">
-        <span id="cuenta-papelera" class="suave"></span>
-      </div>
-      <div id="aviso-papelera-vieja" class="aviso aviso-ambar oculto"></div>
-      <div id="tabla-papelera" class="lista"></div>
-        </div>
-      </details>
+      <!-- Fila 200, apartado 7: "Papelera" se ha ido entera a
+           Herramientas. -->
 
       </div>
     </section>
@@ -1327,6 +1386,11 @@
 <script src="js/ajustes-tipo-comprobacion.js"></script>
 <script src="js/ajustes-centro.js"></script>
 <script src="js/ajustes-mantenimiento.js"></script>
+<!-- Fila 200, apartado 7, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md: la
+     pestaña "Herramientas". Solo llama a los módulos de siempre, así
+     que basta con que esté cargado antes de que se pueda pulsar esa
+     pestaña. -->
+<script src="js/herramientas.js"></script>
 <!-- «Pasar a Administraciones» (fila 167), en Mantenimiento. -->
 <script src="js/administraciones-traer.js"></script>
 <!-- Fila 105, 24-sep-2026, docs/AJUSTES-PLEGADO.md: todo Ajustes plegado,

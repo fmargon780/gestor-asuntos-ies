@@ -105,6 +105,15 @@
     if (bloque) bloque.open = true;
   }
 
+  /* Fila 200, apartado 7, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md: la
+     papelera se ha ido a la pestaña "Herramientas", calcada a
+     irAMantenimiento pero sin pasar por Ajustes. */
+  function irAHerramientas(idBloque) {
+    App.ir('herramientas');
+    var bloque = $(idBloque);
+    if (bloque) bloque.open = true;
+  }
+
   async function pintarHuerfanas() {
     if (!window.AvisosLinea) return;
     var huerfanas = await calcularHuerfanas();
@@ -132,7 +141,7 @@
       texto = 'papelera: ' + r.n + (r.n === 1 ? ' cosa' : ' cosas') +
         ' de más de ' + Papelera.DIAS_AVISO + ' días (' + bytesLegibles(tamano) + ')';
     }
-    AvisosLinea.registrar('papelera-vieja', texto, false, function () { irAMantenimiento('bloque-papelera'); });
+    AvisosLinea.registrar('papelera-vieja', texto, false, function () { irAHerramientas('bloque-papelera'); });
   }
 
   async function pintarTodo() {

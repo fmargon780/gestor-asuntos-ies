@@ -95,14 +95,14 @@ $('btn-olvidar').onclick = async function () {
 App.pintarAjustesMantenimiento = async function () {
   App.pintarCarpetasDeEsteOrdenador();
   if (window.SenecaAyudante) SenecaAyudante.insertarEnlace($('ayudante-seneca-ajustes'));
-  await App.pintarCopias();
+  /* Fila 200, apartado 7: Copias de seguridad, Papelera y Tablas de
+     datos se pintan ahora desde la pestaña "Herramientas"
+     (App.pintarHerramientas, js/herramientas.js), no desde aquí. */
   if (typeof App.pintarFichasHuerfanas === 'function') await App.pintarFichasHuerfanas();
   if (typeof App.pintarHitosHuerfanos === 'function') await App.pintarHitosHuerfanos();
   if (typeof App.pintarFichasDelArchivo === 'function') await App.pintarFichasDelArchivo();
   if (typeof App.pintarContactoGuardado === 'function') await App.pintarContactoGuardado();
-  if (typeof App.pintarPapelera === 'function') await App.pintarPapelera();
   if (typeof App.pintarEnvolturas === 'function') App.pintarEnvolturas();
-  if (window.TablasDatosPantalla) await TablasDatosPantalla.pintar();   /* fila 110 */
   if (window.Conservacion) await Conservacion.pintar();   /* fila 136: plazo de conservación cumplido */
   /* Fila 105: los avisos de fallo arriba (solo si hay), Herramientas
      al final y el resumen de cada título. */

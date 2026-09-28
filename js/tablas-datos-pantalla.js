@@ -16,7 +16,9 @@
   function bloque() {
     var ya = $('bloque-tablas-datos');
     if (ya) return ya;
-    var pantalla = $('ajustes-tab-mantenimiento');
+    /* Fila 200, apartado 7: este bloque vive ahora en la pestaña
+       "Herramientas", no en Ajustes → Mantenimiento. */
+    var pantalla = $('herramientas-tablas-datos-hueco');
     if (!pantalla) return null;
     var d = document.createElement('details');
     d.className = 'bloque-ajustes';
