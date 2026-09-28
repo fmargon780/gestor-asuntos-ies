@@ -112,6 +112,13 @@ var Hitos = (function () {
          hito de arriba, nunca en el de una opción (igual que en su paso
          de guía). */
       soloInformativo: !!(h && h.soloInformativo),
+      /* 28-sep-2026, fila 201, docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md,
+         apartado 1: el texto y el tipo de documento que propone este
+         hito al añadir o nombrar un documento desde él (apartado 4,
+         js/documentos-formulario.js). Igual que `soloInformativo`:
+         solo en el hito de arriba, nunca en el de una opción. */
+      textoDocumentos: esDecision ? '' : String((h && h.textoDocumentos) || ''),
+      tipoDocumento: esDecision ? '' : String((h && h.tipoDocumento) || ''),
       normativa: (window.Guias ? Guias.normalizarNormativa(h && h.normativa) : []),
       /* 20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md: claves del
          catálogo de `js/formularios.js`. Mismo criterio que `normativa`:
@@ -474,6 +481,9 @@ var Hitos = (function () {
       soloInformativo: esDecision ? false : !!p.soloInformativo,
       normativa: esDecision ? [] : (p.normativa || []),
       formularios: esDecision ? [] : (p.formularios || []),
+      /* Fila 201: igual que los de arriba, solo de los pasos de arriba. */
+      textoDocumentos: esDecision ? '' : (p.textoDocumentos || ''),
+      tipoDocumento: esDecision ? '' : (p.tipoDocumento || ''),
       /* «Avisar a quien lo pide» (fila 195): igual que los dos de
          arriba, solo de los pasos de arriba, nunca de una pregunta. */
       avisarLoPide: esDecision ? false : !!p.avisarLoPide,

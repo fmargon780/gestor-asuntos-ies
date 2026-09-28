@@ -89,6 +89,13 @@ var HitosBiblioteca = (function () {
       requisitos: window.Guias ? Guias.normalizarRequisitos(m && m.requisitos) : [],
       comunicacion: window.Guias ? Guias.normalizarComunicacion(m && m.comunicacion) : null,
       soloInformativo: !!(m && m.soloInformativo),
+      /* 28-sep-2026, fila 201, docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md,
+         apartado 1: el texto y el tipo de documento que se proponen al
+         añadir o nombrar un documento desde este hito (apartado 4,
+         js/documentos-formulario.js). Los mismos huecos que una
+         plantilla ({nombre}, {curso}, {grupo}, {tipo}, {campo:...}…). */
+      textoDocumentos: String((m && m.textoDocumentos) || ''),
+      tipoDocumento: String((m && m.tipoDocumento) || ''),
       normativa: window.Guias ? Guias.normalizarNormativa(m && m.normativa) : [],
       /* 20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md. */
       formularios: Array.isArray(m && m.formularios) ? m.formularios.map(String) : [],
@@ -154,6 +161,7 @@ var HitosBiblioteca = (function () {
       requisitos: paso.requisitos, comunicacion: paso.comunicacion,
       soloInformativo: paso.soloInformativo, normativa: paso.normativa,
       formularios: paso.formularios,
+      textoDocumentos: paso.textoDocumentos, tipoDocumento: paso.tipoDocumento,
       plantillasDocumento: paso.plantillasDocumento,
       guion: paso.guion,
       actualizadoPor: usuario || ''
@@ -173,6 +181,7 @@ var HitosBiblioteca = (function () {
       soloInformativo: modelo.soloInformativo,
       normativa: (modelo.normativa || []).map(function (n) { return Object.assign({}, n); }),
       formularios: (modelo.formularios || []).slice(),
+      textoDocumentos: modelo.textoDocumentos || '', tipoDocumento: modelo.tipoDocumento || '',
       plantillasDocumento: (modelo.plantillasDocumento || []).slice(),
       guion: JSON.parse(JSON.stringify(modelo.guion || [])),   /* entero, con sus preguntas (fila 116) */
       origenBiblioteca: { id: modelo.id, revision: modelo.revision, divergido: false }
@@ -203,7 +212,10 @@ var HitosBiblioteca = (function () {
     { clave: 'guion', etiqueta: 'Tareas' },
     /* «Avisar a quien lo pide» (fila 195). */
     { clave: 'avisarLoPide', etiqueta: 'Avisar a quien lo pide' },
-    { clave: 'avisarLoPidePlantilla', etiqueta: 'Plantilla del aviso' }
+    { clave: 'avisarLoPidePlantilla', etiqueta: 'Plantilla del aviso' },
+    /* Fila 201: el texto y el tipo de documento propuestos (apartado 1). */
+    { clave: 'textoDocumentos', modeloClave: 'textoDocumentos', etiqueta: 'Texto de los documentos de este hito' },
+    { clave: 'tipoDocumento', modeloClave: 'tipoDocumento', etiqueta: 'Tipo de documento habitual' }
   ];
 
   function textoLegibleDe(clave, valor) {

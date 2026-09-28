@@ -5,6 +5,84 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 28-sep-2026 — Fila 201: el texto y el tipo de un documento, ya propuestos (apartados 1 y 4)
+
+`docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md`, apartados 1 («Dónde se escribe el texto») y 4 («El cuadro
+de "Cambiar el nombre" sale relleno»). Los apartados 2 y 3 (la etiqueta de origen de cada hito y la
+biblioteca ofreciéndose sola al escribir) quedan para la fila 202, siguiente en la cola.
+
+**El modelo.** Dos campos nuevos, `textoDocumentos` y `tipoDocumento`, en un paso de guía y en un
+modelo de la biblioteca (`js/guias.js`, `normalizarExtra`; `js/hitos-biblioteca.js`,
+`normalizarModelo`/`pasoAModelo`/`modeloAPaso`/`CAMPOS_COMPARABLES`) y en el hito vivo
+(`js/hitos.js`, `normalizarHito`/`pasoAHito`). Mismo trato que `soloInformativo`: solo existen en
+el paso de arriba, nunca en el de una opción de una pregunta (`Guias.normalizar` los vacía en un
+paso-pregunta; `Hitos.pasoAHito` no los copia si `esDecision`). Se editan en el editor del paso
+(`js/guias-paso-bloques.js`, junto a "Solo informativo"; se leen en `js/guias-editor.js`,
+`recoger()`) con un patrón de solo texto (sin `pintar()` en cada tecla, como pide el encargo): un
+campo de texto libre, «Insertar hueco» (`HuecosBuscador.montar`, con el catálogo completo de
+`Plantillas.HUECOS`, el mismo botón que ya usan las plantillas de correo — nada nuevo que
+mantener), y un desplegable con `App.E.tiposDocumento`.
+
+**Una aclaración sobre los huecos del encargo.** El documento original habla de `{{TERCERO}}`,
+`{{CURSO}}`, `{{GRUPO}}` y `{{TIPO}}`: son nombres ilustrativos, no la sintaxis real. El catálogo
+de verdad (`Plantillas.HUECOS`, `js/plantillas.js`) los llama `nombre` (el tercero), `curso`,
+`grupo` y `tipo`, con una sola llave (`{nombre}`) o con doble llave y mayúsculas sueltas
+(`{{NOMBRE}}`, que `Plantillas.rellenar` reconoce igual, sin espacios ni tildes). Se ha reutilizado
+tal cual ese catálogo y ese motor (`Plantillas.rellenar`/`Plantillas.valoresDeAsunto`), como pedía
+el encargo ("no inventes uno nuevo"), en vez de dar de alta un hueco literal llamado `tercero`.
+
+**Dónde se guarda el "Texto por defecto" de un tipo de documento (apartado 1, punto 2).** El
+encargo decía "se guarda en `tipos-documento.json`", pero ese fichero sigue siendo, hoy, una lista
+plana de nombres (`App.E.tiposDocumento`, un array de strings, fusionado y borrado como tal en
+`js/nucleo.js`): no hay ahí ningún sitio donde colgar un texto por tipo. Se ha guardado donde ya
+vive lo que es "de un tipo de documento pero no es solo su nombre" —los campos del nombre de la
+fila 96—: `_GESTOR/campos.json`, clave nueva `textoPorTipoDocumento` (hermana de
+`porTipoDocumento`, indexada igual, solo con el texto si no está vacío;
+`Campos.textoPorDefectoDeDocumento`/`guardarTextoPorDefectoDeDocumento`, `js/campos.js`). Se edita
+en Ajustes → El centro → Tipos de documento, menú ⋮ → «Texto por defecto» (nueva entrada, junto a
+«Campos del nombre»; `App.editarTextoPorDefectoDocumento`, `js/ajustes-centro.js` — el fichero que
+de verdad edita un tipo de documento, no `js/documentos-tipo-nuevo.js`, que solo sirve para crear
+uno sin salir del cuadro de nombrar, como decía el propio encargo que podía pasar).
+
+**Dónde se propone (apartado 4).** Un solo sitio: `js/documentos-formulario.js`
+(`Documentos._interno.pintarFormulario`), con una función pura nueva y sin DOM,
+`N.propuestaDesdeHito({ delNombre, delHito, delTipo })` (lo que ya trae el nombre manda; si no, el
+hito; si no, el tipo de documento o la memoria; si no, vacío), fácil de probar sin navegador. Los
+tres caminos que cita el encargo —"Añadir documento" de la mesa (`js/hitos-anadir.js`), "Cambiar el
+nombre" del menú de un documento del hito (`js/hitos-documento-menu.js`) y "Meter aquí" desde "Por
+clasificar" eligiendo un hito (`App.llevarSueltoA`, `js/documentos-sueltos.js`)— ya le pasaban el
+hito a `Documentos.abrir`/`App.verDocumentos` desde antes de esta fila (quedó apuntado en
+`Documentos._interno.hitoActual` desde la fila 103), así que **no ha hecho falta tocar ninguno de
+los tres**: solo investigarlos, como pedía el encargo, para confirmar que el hito ya llegaba. Por
+el mismo motivo, `js/documentos-guardar.js` tampoco se ha tocado: `guardar()` ya lee el valor final
+de los campos del formulario, sin que le importe quién los rellenó antes. El texto del hito y el
+del tipo se rellenan con `Plantillas.rellenar(texto, await Plantillas.valoresDeAsunto(asunto,
+{ hito }))`, con un `try/catch` que, si algo falla, deja el texto tal cual estaba escrito (mejor
+que perderlo). "Desde 'Por clasificar' o sin ningún hito de por medio": `hitoActual` es `null`, así
+que solo puede proponerse el texto del tipo de documento, nunca el de un hito, sin condición extra
+que escribir.
+
+**Ficheros tocados:** `js/hitos-biblioteca.js`, `js/guias.js`, `js/hitos.js`,
+`js/guias-paso-bloques.js`, `js/guias-editor.js`, `js/campos.js`, `js/ajustes-centro.js`,
+`js/documentos-formulario.js`. `js/documentos-tipo-nuevo.js`, `js/documentos-guardar.js`,
+`js/hitos-anadir.js` y `js/hito-mesa-documentos.js` se han leído (como pedía el encargo) pero no se
+han tocado, por lo dicho arriba.
+
+**Prueba:** `pruebas/texto-del-documento-propuesto.mjs`. Parte 1, sin navegador: la regla de
+prioridad pura. Parte 2, en navegador: el editor de un paso pinta y lee los dos campos nuevos, y un
+paso-pregunta no los lleva; un modelo de la biblioteca los hereda y se comparan igual que los demás
+campos; `Hitos.pasoAHito` los copia (o no, si es pregunta); y las cuatro combinaciones del cuadro
+de "Cambiar el nombre" —texto y tipo propios del hito, solo el tipo (con el texto del tipo de
+documento), sin nada en ninguno de los dos, y sin ningún hito de por medio (con la memoria de la
+fila 174 eligiendo el tipo)—.
+
+**Nota sobre dos documentos ya por encima de su tope:** al tocar `docs/CONTEXTO-CORTO.md` (14.000
+caracteres) y `docs/contexto/HITOS-Y-GUIAS.md` (40 KB) para esta fila, los dos ya estaban por
+encima de su límite antes de este cambio (algo más de 19.900 y 54 KB respectivamente). No es cosa
+de esta fila arreglarlo —tocaría partir `HITOS-Y-GUIAS.md`, como se hizo con otros documentos
+grandes (`docs/PARTIR-FICHEROS-GRANDES.md`)—, así que se deja apuntado aquí para que se decida
+cuándo hacerlo, en vez de callarlo.
+
 ## 28-sep-2026 — Fila 200: juntar lo que va junto en El centro, y la pestaña «Herramientas»
 
 `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartados 6 y 7 (los otros seis, de filas anteriores).

@@ -342,6 +342,13 @@
           var avisoSelEl = caja.querySelector(':scope > .paso-avisar-lopide-plantilla .paso-avisar-lopide-select');
           nivel[i].avisarLoPidePlantilla = avisoSelEl ? avisoSelEl.value : '';
         }
+        /* «Texto para los documentos de este hito» y «Tipo de documento
+           que suele salir de aquí» (fila 201): igual, solo en los hitos
+           que no son pregunta. */
+        var textoDocEl = caja.querySelector(':scope > .paso-texto-documentos-fila .paso-texto-documentos');
+        if (textoDocEl) nivel[i].textoDocumentos = textoDocEl.value.trim();
+        var tipoDocEl = caja.querySelector(':scope > .paso-texto-documentos-fila .paso-tipo-documento');
+        if (tipoDocEl) nivel[i].tipoDocumento = tipoDocEl.value;
         if (window.HitosNormativa && caja.querySelector(':scope > .paso-normativa')) {
           nivel[i].normativa = HitosNormativa.leer(caja);
         }

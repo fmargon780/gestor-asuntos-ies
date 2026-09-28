@@ -104,6 +104,37 @@ var GuiasPasoBloques = (function () {
           });
       }
 
+      /* «Texto para los documentos de este hito» y «Tipo de documento
+         que suele salir de aquí» (28-sep-2026, fila 201,
+         docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md, apartado 1): rellenan de
+         antemano el cuadro de «Cambiar el nombre» al añadir o nombrar
+         un documento desde este hito (apartado 4). Campo de solo texto,
+         sin necesidad de repintar en cada tecla: `recoger()` lo lee
+         directamente del DOM, como el resto del paso. */
+      var filaTextoDoc = document.createElement('div');
+      filaTextoDoc.className = 'paso-texto-documentos-fila';
+      filaTextoDoc.innerHTML =
+        '<div class="etiqueta-con-boton">' +
+          '<label class="etiqueta">Texto para los documentos de este hito ' +
+            '<span class="suave">(opcional)</span></label>' +
+          '<button type="button" class="boton boton-hueco paso-texto-documentos-boton">Insertar hueco</button>' +
+        '</div>' +
+        '<input class="campo paso-texto-documentos" value="' + U.escapar(p.textoDocumentos || '') + '">' +
+        '<label class="etiqueta">Tipo de documento que suele salir de aquí ' +
+          '<span class="suave">(opcional)</span></label>' +
+        '<select class="campo paso-tipo-documento"><option value="">(sin elegir)</option>' +
+        ((window.App && App.E && App.E.tiposDocumento) || []).map(function (t) {
+          return '<option value="' + U.escapar(t) + '"' + (t === p.tipoDocumento ? ' selected' : '') + '>' +
+            U.escapar(t) + '</option>';
+        }).join('') + '</select>';
+      d.appendChild(filaTextoDoc);
+      if (window.HuecosBuscador) {
+        HuecosBuscador.montar({
+          boton: filaTextoDoc.querySelector('.paso-texto-documentos-boton'),
+          campos: [filaTextoDoc.querySelector('.paso-texto-documentos')]
+        });
+      }
+
       if (window.HitosNormativa) {
         /* Formularios oficiales (20-sep-2026, fila 82,
            docs/FORMULARIOS-OFICIALES.md): el buscador se pinta

@@ -148,6 +148,13 @@ var Guias = (function () {
          de las plantillas de documento (plantillas.json → documentos)
          unidas a este paso. Sin repetir; vacío si no es lista. */
       plantillasDocumento: listaDeIds(p && p.plantillasDocumento),
+      /* 28-sep-2026, fila 201, docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md,
+         apartado 1: el texto y el tipo de documento que se proponen al
+         añadir o nombrar un documento desde este hito. Igual que
+         `soloInformativo` y compañía: solo en los pasos de arriba,
+         nunca en un paso-pregunta (se vacían más abajo). */
+      textoDocumentos: String((p && p.textoDocumentos) || ''),
+      tipoDocumento: String((p && p.tipoDocumento) || ''),
       origenBiblioteca: (p && p.origenBiblioteca && p.origenBiblioteca.id)
         ? { id: p.origenBiblioteca.id, revision: parseInt(p.origenBiblioteca.revision, 10) || 1,
             divergido: !!p.origenBiblioteca.divergido }
@@ -204,6 +211,8 @@ var Guias = (function () {
         salida.plantillasDocumento = [];
         salida.guion = [];
         salida.soloInformativo = false;
+        salida.textoDocumentos = '';
+        salida.tipoDocumento = '';
       }
       return salida;
     }).filter(function (p) {
