@@ -96,10 +96,36 @@ App.editarTextoPorDefectoDocumento = async function (nombre) {
       '<label class="etiqueta">Texto por defecto</label>' +
       '<button type="button" class="boton boton-hueco" id="tdoc-insertar-hueco">Insertar hueco</button>' +
     '</div>' +
-    '<input id="tdoc-texto-defecto" class="campo" value="' + U.escapar(textoActual) + '">',
+    '<input id="tdoc-texto-defecto" class="campo" value="' + U.escapar(textoActual) + '">' +
+    '<div id="tdoc-texto-defecto-parecido" class="nota oculto"></div>',
     'Guardar');
   if (window.HuecosBuscador) {
     HuecosBuscador.montar({ boton: $('tdoc-insertar-hueco'), campos: [$('tdoc-texto-defecto')] });
+  }
+  /* Apartado 3, punto 4 (fila 201): la guardia de parecidos, también
+     aquí (el hueso de la guardia vive en GuiasBiblioteca). */
+  if (window.GuiasBiblioteca) {
+    var campoTexto = $('tdoc-texto-defecto');
+    var avisoParecido = $('tdoc-texto-defecto-parecido');
+    var esperaParecido = null;
+    campoTexto.oninput = function () {
+      clearTimeout(esperaParecido);
+      var texto = campoTexto.value.trim();
+      if (!texto) { avisoParecido.classList.add('oculto'); avisoParecido.innerHTML = ''; return; }
+      esperaParecido = setTimeout(async function () {
+        var parecido = await GuiasBiblioteca.textoDocumentosParecido(texto, { tipoDocumento: nombre });
+        if (!avisoParecido.isConnected || campoTexto.value.trim() !== texto) return;
+        if (!parecido) { avisoParecido.classList.add('oculto'); avisoParecido.innerHTML = ''; return; }
+        avisoParecido.classList.remove('oculto');
+        avisoParecido.innerHTML = 'Ese mismo texto ya lo tiene ' + U.escapar(parecido.origen) + ' · ' +
+          '<button type="button" class="enlace" id="tdoc-texto-defecto-copiar">Copiarlo tal cual</button>';
+        $('tdoc-texto-defecto-copiar').onclick = function () {
+          campoTexto.value = parecido.texto;
+          avisoParecido.classList.add('oculto');
+          avisoParecido.innerHTML = '';
+        };
+      }, 400);
+    };
   }
   var ok = await promesa;
   if (!ok) return;
@@ -131,7 +157,7 @@ $('btn-anadir-tipo-doc').onclick = async function () {
   U.aviso('Tipo de documento añadido.', 'bueno');
 };
 
-/* ---------- el bloque de Campos propios ----------
+/* ---------- el bloque de Campos propios
 
    Fila 198, apartado 5, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md: los
    campos propios se crean y se borran desde dentro de cada tipo ("+
