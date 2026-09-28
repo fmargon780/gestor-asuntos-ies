@@ -199,6 +199,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 210 | `docs/HILO-SIN-REPETIR.md` (el PDF del HILO de correos: lo último arriba, sin citas repetidas, y adjuntos sin repetir) | PENDIENTE (27-sep-2026) |
 | 213 | `docs/BOTON-DE-SOPORTE.md` (botón «Soporte» en una esquina: error o mejora, texto y captura opcional; buzón en un script de Google que guarda el aviso en Drive y apunta una IDEA sin datos en la cola; más `docs/PONER-EN-MARCHA-SOPORTE.md` para Francisco) | PENDIENTE (28-sep-2026) |
 | 204 | `docs/COMPROBACION-AL-ENTRAR.md`, entero, con `js/cabecera-fija.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 204) | PENDIENTE (27-sep-2026) |
+| 214 | El botón para levantar la vista de los documentos por clasificar no funciona. | IDEA (28-sep-2026): apuntada por Francisco desde el Centro de mando |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
