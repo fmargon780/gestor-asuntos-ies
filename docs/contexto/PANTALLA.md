@@ -160,15 +160,15 @@ el Escape general de aquí se dispara también y hace algo de más.
   (`OtrosDelTercero.montarArchivado`); si no se puede, el ARCHIVO con la búsqueda puesta.
 - Prueba: `pruebas/tras-cada-accion.mjs`.
 
-### El tablón, desplegado por defecto
+### El tablón, en la cabecera, siempre a la vista
 
-El tablón se ve siempre. Solo se quita cuando hay algo abierto en el panel de la derecha (no
-cabe), y por debajo de 900px de zona de trabajo. El botón "Tablón" de la cabecera lo esconde y lo
-trae de vuelta a mano; al volver a la pantalla, vuelve a estar desplegado.
-
-**Hay DOS paneles a la derecha, no uno**: leer un correo pone `con-lector`, ver un documento pone
-`con-visor`. En `js/vista.js` la lista se llama `PANELES_DE_LA_DERECHA`: **un tercer panel debe
-apuntarse ahí.**
+Desde la fila 212 (28-sep-2026, `docs/INICIO-A-TODO-EL-ANCHO.md`) el tablón ya no vive en una
+columna del grid de Inicio: cuelga de `#inicio-tablon-hueco`, dentro de `.cabecera`, y por eso no
+le afecta que se abra el panel de la derecha (`con-visor`/`con-lector`) ni el ancho de la zona de
+trabajo. Sigue sin esconderse nunca (decisión de la fila 191); por debajo de unos 900px de zona de
+trabajo baja a su propia línea, debajo de la cabecera (`css/inicio.css`, `@container`). No hay
+ningún botón "Tablón" que lo esconda a mano (fila 191, decisión 4; comprobado en
+`pruebas/tablon.mjs`).
 
 ### No pisarse en un mismo asunto
 
@@ -241,11 +241,13 @@ Se comprueba con `pruebas/presencia.mjs`.
 ### La pantalla se mide a sí misma
 
 `css/vista.css` pone `container-type: inline-size` en `.contenido`: las reglas miran el ancho
-real del contenido, no el de la ventana. Bajo 1000px las tres tarjetas sueltan su frase
-explicativa; bajo 900 se quita el tablón y la cabecera baja de línea; bajo 620 todo a una
-columna. El tope de 1180px de `css/estilos.css` se anula en `css/vista.css`; conservan tope
-propio Nuevo asunto (940px) y Ajustes (1600px). Los filtros (estado, plazo, orden) van plegados
-en un panel que abre el botón "Filtros", recordado en `gestor-filtros`.
+real del contenido, no el de la ventana. Bajo unos 900px de zona de trabajo, el tablón (en la
+cabecera de Inicio desde la fila 212) baja a su propia línea, debajo del resto de la cabecera
+(nunca se quita: `css/inicio.css`). El tope de 1180px de `css/estilos.css` se anula en
+`css/vista.css`; conservan tope propio Nuevo asunto (940px) y Ajustes (1600px). Los filtros
+(estado, plazo, órgano, tipo de asunto) van plegados en un panel que abre el botón "Filtros"
+(«Filtros (N)» con alguno puesto); desde la fila 212 empieza siempre cerrado al entrar en Inicio,
+sin memoria en `localStorage` (antes, `gestor-filtros`).
 
 ### La cabecera se queda arriba, y se encoge (fila 46, 17/18-sep-2026; sin temblor, fila 50,
 ### 18-sep-2026, docs/CABECERA-NO-TIEMBLA.md)
@@ -292,10 +294,9 @@ ajustes y usa su cabecera). No sabe nada de ninguna pantalla en concreto:
   cualquier otro repintado) no lo pierde.
 - El ancho lo da la ventana normal: `.lateral` está fija y `.contenido` va en el flujo normal, así
   que basta con `position: sticky; top: 0;` (sin ningún contenedor con `overflow`) para que la
-  cabecera pegada mida siempre como su padre de verdad — con el tablón (grid de
-  `#pantalla-abiertos.con-tablon`), con `con-visor` o con `con-lector` (`css/visor.css`,
-  `css/lector.css`, que cambian el padding/margin de `#aplicacion`), sin nada especial que
-  escribir para eso.
+  cabecera pegada mida siempre como su padre de verdad — con `con-visor` o con `con-lector`
+  (`css/visor.css`, `css/lector.css`, que cambian el padding/margin de `#aplicacion`), sin nada
+  especial que escribir para eso.
 - `css/cabecera-fija.css`: `margin-left/right: -32px` y `padding-left/right: 32px` (a mano, no el
   shorthand `margin`, para no pisar el `margin-bottom` que ya ponía cada pantalla) para llegar de
   borde a borde; en pantalla estrecha (900px) pasan a -16px/16px, como `.contenido` en
@@ -345,12 +346,30 @@ ajustes y usa su cabecera). No sabe nada de ninguna pantalla en concreto:
 
 ### El tablón de notas rápidas
 
-Columna a la derecha de asuntos abiertos, para lo que aún no es un asunto. Color, autor, fecha y
-opcionalmente "para el día X". Botones: Hecha, Cambiar, A asunto y Borrar. Se guarda en
-`_GESTOR/tablon.json`. Las notas "Solo para mí" salen únicamente en el tablón de quien las
-escribió (no es un secreto: el fichero sigue en la carpeta compartida). Desde la fila 130, cada
-cambio (y la fusión de una copia en conflicto, y devolver una nota de la papelera) va por
-`ColaGuardado.poner('tablon.json', …)`: dos cambios seguidos ya no se pisan.
+Ya NO es una columna (fila 212, 28-sep-2026, `docs/INICIO-A-TODO-EL-ANCHO.md`): `#tablon` cuelga
+de `#inicio-tablon-hueco`, dentro de la propia cabecera de Inicio, entre "+ Nuevo asunto" y el
+buscador. Sigue sin esconderse nunca. Para lo que aún no es un asunto: color, autor, fecha y
+opcionalmente "para el día X". Se guarda en `_GESTOR/tablon.json`. Las notas "Solo para mí" salen
+únicamente en el tablón de quien las escribió (no es un secreto: el fichero sigue en la carpeta
+compartida). Desde la fila 130, cada cambio (y la fusión de una copia en conflicto, y devolver una
+nota de la papelera) va por `ColaGuardado.poner('tablon.json', …)`: dos cambios seguidos ya no se
+pisan.
+
+**Partido en dos ficheros** (fila 212, para no pasar de 600 líneas): `js/tablon.js` es solo datos
+(leer, `cambiar()`, quién soy, qué notas veo) y expone `window.Tablon`; `js/tablon-compacto.js`
+(cargado justo detrás) es toda la pantalla y expone `window.TablonVista` (`pintar()`, `ocupado()`,
+esta última la consulta `js/tablon.js` antes de releer en cada vuelta de
+`window.Gestor.alRefrescar`, para no repintar mientras se escribe o se edita).
+
+**Compacto**: el campo de la nota nueva nace de una línea ("Escribir una nota…", mismo
+`<textarea id="tablon-texto">` de siempre); al pulsarlo (o si ya hay algo escrito o una fecha
+puesta) se abre con el resto de opciones (colores, fecha, "Solo para mí", "Pegar la nota").
+Las notas pendientes se ven en fila, cortadas con «…», como mucho tres (`TOPE_COMPACTO`); sus
+botones (Hecha, Cambiar, A asunto, Borrar) viven detrás del menú de siempre (`U.menuDeAcciones`),
+no a la vista. Con más de tres, o con alguna hecha, "y N más"/"Ver las hechas" abren
+`.tablon-overlay`: la lista entera (con el "papel" de siempre, editable), por encima de la
+página (`position: absolute`, sin empujar nada), que se cierra con su ✕, con Escape o pulsando
+fuera.
 
 **No se borra mientras se escribe** (fila 33, 17-sep-2026, `docs/TABLON-NO-SE-BORRA.md`): lo que
 se lleva escrito en la nota nueva vive también en variables del módulo (`borrador`,
@@ -360,4 +379,3 @@ se lleva escrito en la nota nueva vive también en variables del módulo (`borra
 foco estaba en ese campo o en el de una nota que se está cambiando (`editando`), junto con
 `selectionStart`/`selectionEnd`, y al terminar le devuelve el foco y el cursor al campo nuevo. Se
 comprueba con `pruebas/tablon-no-se-borra.mjs`.
-
