@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(npm *)",
+      "Bash(node *)",
+      "Bash(npx *)",
+      "Bash(curl *)",
+      "Bash(TZ=*)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(grep *)",
+      "Bash(mkdir *)",
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Agent",
+      "WebFetch(domain:pruebas.fmargon.com)",
+      "WebFetch(domain:asuntos.fmargon.com)",
+      "WebFetch(domain:*.vercel.app)",
+      "mcp__github__*",
+      "mcp__GitHub__*",
+      "mcp__vercel__*",
+      "mcp__Vercel__*"
+    ],
+    "deny": []
+  }
+}
