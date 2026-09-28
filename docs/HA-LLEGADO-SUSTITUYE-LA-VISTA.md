@@ -50,3 +50,22 @@ botón de compatibilidad `.panel[data-vista="clasificar"]` («Ver todo», las do
 
 Pulsa «2 correos» o «1 documento por clasificar» y la tabla de asuntos se sustituye por esa
 lista, arriba. Con «← Volver a Inicio» vuelve a Inicio tal como lo dejó.
+
+## Cómo sabemos que está bien
+
+Escrita por la sesión que coge esta fila (28-sep-2026), a partir de este mismo documento: es
+anterior a la fila 223 y no la traía.
+
+1. En Inicio, con correos o documentos por clasificar, pulsar «N correos» o «N documentos por
+   clasificar»: la lista sustituye a la tabla de asuntos, arriba de la pantalla, sin tener que
+   bajar para verla.
+2. Con esa lista abierta, pulsar «← Volver a Inicio»: se vuelve a la misma pestaña y los mismos
+   filtros que había antes de entrar.
+3. Cambiar de pestaña y bajar la página antes de pulsar «N correos» o «N documentos», entrar y
+   pulsar «← Volver a Inicio»: se recupera esa misma pestaña y el mismo punto de la pantalla en
+   el que se estaba.
+4. Dentro de esa lista, clasificar el último correo o documento pendiente: la pantalla se queda
+   ahí (con el aviso de que no queda nada), sin saltar sola a Inicio, hasta pulsar «← Volver a
+   Inicio».
+5. Ir a otra pantalla desde el menú (por ejemplo Archivo) y volver a Inicio: Inicio aparece
+   normal, sin la lista de clasificar a la vista.
