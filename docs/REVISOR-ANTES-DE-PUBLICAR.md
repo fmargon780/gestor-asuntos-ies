@@ -116,6 +116,28 @@ Vale para este proyecto; cuando lleve una semana funcionando, Francisco lo exten
   aviso del entorno, no de Claude Code), lo apunta en «Lo que queda por hablar con Francisco» de
   `docs/COLA.md` con el texto exacto del aviso, y sigue por otro camino si lo hay.
 
+## 5 bis. Una conversación por fila, y la fila dice cuál
+
+Pedido por Francisco el 28-sep-2026, al cerrar esta fila: el Centro de mando se confunde a menudo
+sobre qué tarea se está ejecutando. Dos reglas, las dos obligatorias:
+
+- **Cada fila se trabaja en una conversación de Claude Code nueva.** Una conversación = una fila.
+  Al terminar (HECHA, DEVUELTA, BLOQUEADA o SIN PUBLICACIÓN COMPROBADA), la conversación se acaba;
+  la siguiente fila es otra conversación, no la misma con `/clear`. Si una sesión ve que la fila
+  que le toca es DEVUELTA, también la coge en conversación nueva: parte de la rama `pruebas` y del
+  informe apuntado en la fila, no de la memoria de la sesión anterior.
+- **La marca EN CURSO lleva el enlace a la conversación**, igual que ya lo lleva EN DISEÑO. Formato
+  exacto, en la columna de estado: `EN CURSO (28-sep-2026 16:10) · conversación:
+  https://claude.ai/code/session_…`. El enlace es la dirección de la línea `Claude-Session` que el
+  sistema da para los commits; si la sesión no la tiene, pone `· conversación: sin enlace` y no
+  inventa uno. Al pasar a HECHA o DEVUELTA, el enlace se queda en la nota de la fila, para que
+  el Centro de mando pueda abrir la conversación que hizo el trabajo. Una fila EN CURSO **sin**
+  enlace se considera abandonada por otra sesión a los 90 minutos de su hora, y el siguiente
+  lanzamiento la retoma (mirando qué quedó en `pruebas`, no en `main`).
+
+Esto entra también en la regla 2 de `docs/COLA.md` y en el bloque «Una sola sesión y una sola
+fila» de `CLAUDE.md` (sección 6).
+
 ## 6. Lo que cambia en los documentos de reglas
 
 Todo con cambios quirúrgicos (sustituir la línea vieja, no añadir debajo), y sin leer más que
@@ -126,8 +148,9 @@ lo que se toca:
   reescribe con el reparto nuevo. Bloque nuevo «El revisor» con las secciones 3, 4 y 5 resumidas
   en diez líneas y el enlace a este documento. La regla general de publicación se queda igual.
 - `docs/COLA.md`: cabecera de estados (añadir DEVUELTA); regla 0 (la fila se hace en `pruebas`,
-  se revisa, y solo entonces se publica; DEVUELTA antes que PENDIENTE); regla 2 (escribir la lista
-  si falta, en la subida de EN CURSO); regla 13 (reparto de las subidas); regla 19 (el `curl`
+  se revisa, y solo entonces se publica; DEVUELTA antes que PENDIENTE; una conversación nueva por
+  fila); regla 2 (escribir la lista si falta, en la subida de EN CURSO; EN CURSO con el enlace a
+  la conversación, formato de la sección 5 bis); regla 13 (reparto de las subidas); regla 19 (el `curl`
   se hace dos veces: copia de pruebas antes del revisor, producción después). La «línea para
   lanzar» se queda igual: el método está en las reglas, no en la línea.
 - `docs/REPARTO-DE-LA-COLA-2026-09-27.md`: las cláusulas comunes «a `main` sin pull request»
