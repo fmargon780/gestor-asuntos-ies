@@ -18,3 +18,4 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 | 216 | 35 | `docs/FILTROS-EN-TODAS-LAS-PESTANAS.md`: una función común de filtros para `js/asuntos-lista-pintar.js` y `js/inicio-tabla.js`, cuenta de «Filtros (N)» en `js/vista.js` y una prueba nueva que recorre cuatro pestañas por cinco filtros |
 | 217 | 30 | `docs/CORREO-OTRA-CUENTA-ABIERTA.md`: solo `js/correo-enviar.js` (aviso nuevo y un segundo intento con la forma general de la dirección) y sus pruebas en `pruebas/correo-enviar.mjs` |
 | 220 | 60 | `docs/CREAR-ASUNTO-DESDE-TODOS-LOS-SITIOS.md`: recorrer las 6-7 entradas a «Nuevo asunto», unificar la preparación del formulario, buscar la causa del comportamiento irregular y del bloqueo, y una prueba nueva que pasa por todas las entradas |
+| 221 | 20 | `docs/TUTORIAS-TEXTO-DEL-MARGEN.md`: causa ya localizada; cambio de pocas líneas en `js/tablas-datos-leer.js` y un caso nuevo en `pruebas/tablas-datos.mjs` |
