@@ -5,6 +5,69 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 28-sep-2026 — Fila 220: el mismo formulario, preparado desde cero, desde todos los sitios
+
+`docs/CREAR-ASUNTO-DESDE-TODOS-LOS-SITIOS.md`. Tras la fila 215, Francisco veía el formulario de
+«Nuevo asunto» «unas veces sí y otras no» con lo nuevo, según por dónde entrara, y a veces «Crear
+el asunto» se quedaba sin poderse pulsar sin decir por qué.
+
+**La causa real, una sola.** `App.ir('nuevo')` (`js/nucleo.js`) ya era, de hecho, el único camino a
+esta pantalla: las seis entradas (el botón de la barra, la pestaña, una nota del tablón «A
+asunto», «+ Nuevo asunto para esta persona», un documento suelto «Crear asunto con él», y la
+propuesta de la bandeja de correos) pasan todas por ahí, directas o dentro de
+`App.nuevoAsuntoCon`/`App.crearAsuntoConPropuesta`. El problema no era que faltara un camino único:
+era que `App.prepararNuevo`, lo único que corre en ese punto, solo repintaba — nunca limpiaba
+`App.E.nuevo` ni los campos del formulario. Lo que quedara de la visita anterior (otro tipo, otro
+tercero, otros campos propios de ese tipo, una descripción larga escrita a mano) seguía ahí,
+mezclándose con lo que trajera la entrada nueva. Con una descripción heredada larga, el nombre de
+la carpeta podía dejar de caber en la ruta de Dropbox (aviso rojo de las filas 130/177) y «Crear el
+asunto» se quedaba en gris sin que se notara por qué: eso es lo que se veía como «se bloquea».
+
+**El arreglo.** `App.prepararNuevo` sustituye `App.E.nuevo` entero por `App.nuevoEnBlanco()` (una
+sola forma en blanco, que ahora también usa `App.crearAsuntoDelFormulario` al terminar de crear, en
+vez de repetirla a mano) y vacía a mano los campos del formulario (`buscar-tercero`,
+`resultados-tercero`, `tercero-elegido`, `campo-curso`, `campo-descripcion`, `campo-limite`,
+`campo-grupo`, `bloque-campos`/`campos-lista-nuevo`, `lopide-caja-nuevo`, el resumen de la guía) y
+pone `campo-fecha` a hoy. Lo único que no se toca es `App.E.pendiente` (el documento suelto que
+viaja con el asunto): quien lo trae lo deja puesto ANTES de llamar a `App.ir('nuevo')`, y eso sigue
+igual.
+
+**Una de las pistas del propio encargo, confirmada: la pastilla no mandaba.**
+`categoriaDeLaParrilla()` daba prioridad al tercero elegido o propuesto sobre la pastilla pulsada:
+con una persona ya elegida de otra categoría, pulsar una pastilla no cambiaba nada visible, y
+parecía que el botón no hacía nada. El `onclick` de la pastilla pasa a llamar a
+`App.pulsarCategoriaNuevo(cat)`, que antes de fijar la categoría olvida cualquier tercero, tercero
+propuesto o tipo de OTRA categoría — igual que `App.fijarTercero` ya olvidaba un tipo que dejaba de
+encajar. Así, la pastilla que se pulsa manda siempre.
+
+**Un segundo bug real, más pequeño, de la misma familia.** `js/bandeja-adjuntos-lector.js`
+completa en segundo plano lo que la bandeja de correos no supo rellenar, leyendo el PDF adjunto; si
+esa lectura termina después de que el usuario ya se haya ido a «Nuevo asunto» para OTRO asunto,
+antes se colaba igual (solo miraba si `App.E.nuevo` ya tenía algo puesto, no de qué visita era). Se
+añadió `App.E.nuevoVisita` (en `App.E`, sube uno en cada `App.prepararNuevo`): antes de tocar el
+formulario, esa lectura comprueba que sigue siendo la misma visita.
+
+**Una tensión de diseño real, resuelta a favor de la fila 220 (y anotada por si Francisco la echa
+en falta).** La fila 163 (`docs/AVISO-DE-PARECIDOS-AL-CREAR.md`) dejaba, a propósito, que al pulsar
+un asunto parecido desde el recuadro de duplicados, ver su ficha, y volver a la pestaña «Nuevo
+asunto», lo escrito siguiera ahí (`pruebas/duplicados.mjs`, prueba 163). Es justo el tipo de resto
+de una visita anterior que esta fila pide quitar, así que con `App.prepararNuevo` preparando el
+formulario desde cero sin excepciones, ese detalle de la 163 desapareció: al volver, el formulario
+está en blanco, no como se dejó. La prueba se puso al día para comprobar el comportamiento nuevo en
+vez del viejo. Si Francisco echa en falta poder ver un duplicado sin perder lo escrito, es un hueco
+para hablarlo aparte (un `App.ir('nuevo')` que preparara desde cero por defecto pero con una opción
+explícita "sin limpiar" para ese caso muy concreto), no algo que se ha intentado adivinar aquí.
+
+**Prueba nueva**, `pruebas/crear-asunto-desde-todos-los-sitios.mjs`: recorre el botón de la barra y
+«+ Nuevo asunto para esta persona» dos veces, alternando entre los dos y dejando el formulario
+"sucio" (tipo, tercero, un campo propio y una descripción larga) entre una entrada y la siguiente;
+después, una pasada por el tablón («A asunto») y por `App.nuevoAsuntoCon` (el camino que comparten
+la bandeja de correos y «Crear asunto con él» de un documento suelto). En todas: las pastillas
+encima del buscador, la pastilla manda sobre lo anterior, «Crear el asunto» a la vista, y el asunto
+se crea de principio a fin. Comprobado que la prueba detecta la regresión de verdad: revertido a
+mano solo `App.prepararNuevo` a como estaba antes de esta fila, la prueba dio 9 fallos; restaurado
+el arreglo, vuelve a estar en verde.
+
 ## 28-sep-2026 — Fila 215: la categoría guía Nuevo asunto (cerrando lo que dejó la sesión anterior)
 
 `docs/NUEVO-ASUNTO-CATEGORIA-GUIA.md`. Francisco devolvió la fila a PENDIENTE porque una sesión

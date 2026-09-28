@@ -72,7 +72,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   existiendo), resumen de la guía en una línea, y nombre de carpeta con vista previa
   (`App.nuevoAsuntoCon` lleva lo ya sabido, sin repreguntarlo). Nombre corto; tipo nuevo al vuelo.
   Dar de alta un tercero lo deja elegido, sin pulsar nada más; crear con guía abre la mesa del
-  primer hito.
+  primer hito. El formulario se prepara desde cero cada vez que se entra, sin excepción, desde
+  cualquiera de sus seis entradas (fila 220, `App.prepararNuevo`): nunca queda nada de la vez
+  anterior, y la pastilla de categoría manda siempre sobre un tercero o tipo que ya no encaje.
 - Cada tipo dice quién lo encarga (Secretaría, Dirección…): parrilla agrupada, filtro y Cuentas.
 - Asuntos reservados (por tipo o uno a uno): candado, sin el tercero en listas y buscador.
 - El estado es el primer hito sin terminar («Hito N de M · título», «Hito actual»): Administración o terceros; «Esperando a…» sale solo con el responsable (a mano, hasta que cambia el hito). Guías: «Administración», no personas. El responsable también puede ser «Una Administración…» dada de alta (`adm:<id>[:<dep>]` + `responsableNombre`; `js/responsable-organismo.js`, fila 205): nunca de Administración, el asunto espera a ese organismo. Vía y fecha límite.

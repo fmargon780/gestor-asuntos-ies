@@ -197,7 +197,7 @@ App.crearAsuntoDelFormulario = async function () {
     U.aviso('Asunto creado.', 'bueno');
     if (falloAlCrear) U.accesorio('Asunto creado, pero no he podido guardar los datos del tercero', falloAlCrear);
     U.copiar(nombre);
-    App.E.nuevo = { tipo: null, categoria: null, tercero: null, configCampos: [] };
+    App.E.nuevo = App.nuevoEnBlanco();   /* fila 220: la misma forma en blanco que App.prepararNuevo */
     $('campo-descripcion').value = '';
     $('campo-limite').value = '';
     App.limiteNuevoAuto = '';

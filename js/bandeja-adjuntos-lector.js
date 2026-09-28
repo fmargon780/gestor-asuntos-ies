@@ -231,9 +231,17 @@
     U.envolver(window.Bandeja, 'window.Bandeja.llevarANuevo', 'bandeja-adjuntos-lector.js', function (comoEra) {
       var nueva = async function (item) {
         await comoEra(item);
+        /* Fila 220: esta lectura del PDF sigue en marcha después de que
+           "Nuevo asunto" ya esté en pantalla; si mientras tanto el
+           usuario se ha ido a otra cosa (o ha vuelto a entrar a "Nuevo
+           asunto" para OTRO asunto), App.prepararNuevo ya ha subido
+           App.E.nuevoVisita: esto llega tarde y no debe tocar el
+           formulario de una visita que ya no es esta. */
+        var visita = App.E.nuevoVisita;
         var r;
         try { r = await completado(item); } catch (e) { r = null; }
         if (!r || (!r.tercero && !r.tipo)) return;
+        if (visita !== App.E.nuevoVisita) return;
         /* El correo ya dejó algo puesto (fila 173: el tercero puede
            estar solo "propuesto", esperando a que se elija el tipo,
            sin tipo todavía). */

@@ -125,18 +125,25 @@ buscador único justo debajo (`#buscar-tercero`) y sus resultados.
   de copiar el Nº de identificación escolar se flota a la derecha solo dentro de este buscador
   (`#resultados-tercero .boton-nie-chico`), lejos de ese mismo centro.
 - **Las pastillas de categoría ya no eligen antes de nada**: son un filtro (`App.elegirCategoria(cat)`
-  fija o suelta `App.E.nuevo.categoria`; nunca toca tipo ni tercero). Pulsar una filtra a la vez el
-  buscador y la parrilla de tipos (fila 215: el `onclick` de la pastilla llama también a
-  `App.pintarTipos()`, no solo a `App.buscarTercero()`) y deja el cursor en el buscador de
-  personas, justo debajo. «+ Dar de alta»: con un filtro puesto, el botón de siempre
+  fija o suelta `App.E.nuevo.categoria`; nunca toca tipo ni tercero por su cuenta). Pulsar una
+  filtra a la vez el buscador y la parrilla de tipos (fila 215: el `onclick` de la pastilla llama
+  también a `App.pintarTipos()`, no solo a `App.buscarTercero()`) y deja el cursor en el buscador
+  de personas, justo debajo. «+ Dar de alta»: con un filtro puesto, el botón de siempre
   (`App.botonAlta`); sin filtro, un botón por cada categoría que admita alta (`App.botonesAlta`,
   `js/asuntos-nuevo-alta.js`) — es la manera de «pedir la categoría» que pide el documento, sin un
-  segundo cuadro.
+  segundo cuadro. **La pastilla que se pulsa manda siempre** (fila 220,
+  `docs/CREAR-ASUNTO-DESDE-TODOS-LOS-SITIOS.md`): el `onclick` de verdad es
+  `App.pulsarCategoriaNuevo(cat)`, que antes de fijar la categoría olvida cualquier tercero, tercero
+  propuesto o tipo de OTRA categoría (igual que `App.fijarTercero` olvida un tipo que ya no encaja).
+  Antes, con un tercero ya elegido de otra categoría, pulsar la pastilla no cambiaba nada visible
+  (`categoriaDeLaParrilla()` daba prioridad al tercero) y parecía que el botón no hacía nada.
 - **La parrilla de tipos** (`App.pintarTipos`, con `categoriaDeLaParrilla()` interna): la
   categoría que la limita sale, por este orden (fila 215), de la persona elegida
   (`App.E.nuevo.tercero`), si no de la propuesta y esperando tipo (`App.E.nuevo.terceroPropuesto`,
   fila 173), si no de la pastilla pulsada (`App.E.nuevo.categoria`), y si no hay nada de eso, null
-  (todos los tipos). Con categoría, solo los suyos; sin ella, todos, cada botón con la suya en un
+  (todos los tipos); ese orden sigue igual, pero desde la fila 220 `App.pulsarCategoriaNuevo` limpia
+  antes lo que no encaje con la pastilla pulsada, así que en la práctica la pastilla gana siempre.
+  Con categoría, solo los suyos; sin ella, todos, cada botón con la suya en un
   `<small aria-hidden="true">` (el nombre accesible del botón, el que usan `getByRole`/`exact` en
   las pruebas y "+ Crear tipo nuevo", sigue siendo solo el tipo; `data-tipo` en el propio botón es
   el nombre de verdad para quien lo lee del DOM: `js/tipos-buscador.js` y `js/tipos-organo.js`).
@@ -172,6 +179,49 @@ formulario puestas al día para el camino nuevo (`nuevo-asunto-sin-repetir.mjs`,
 `tipo-desde-el-asunto.mjs`, `quien-encarga-cada-tipo.mjs`, `navegador.mjs`, `hitos.mjs`…). Lo de la
 fila 215 (pastilla que también filtra los tipos, lista corta con «Ver todos» con o sin categoría, y
 el botón siempre a la vista), en `pruebas/nuevo-asunto-categoria-guia.mjs`.
+
+### El mismo formulario, preparado desde cero, desde todos los sitios (28-sep-2026, fila 220, `docs/CREAR-ASUNTO-DESDE-TODOS-LOS-SITIOS.md`)
+
+Tras la fila 215, Francisco veía el formulario «unas veces sí y otras no» con lo nuevo, según por
+dónde entrara, y a veces «Crear el asunto» se quedaba sin poderse pulsar sin decir por qué. La causa
+real: `App.prepararNuevo` (lo único que corre en cada `App.ir('nuevo')`, el único camino a esta
+pantalla, directo o dentro de `App.nuevoAsuntoCon`/`App.crearAsuntoConPropuesta`) solo repintaba,
+sin limpiar `App.E.nuevo` ni los campos del formulario: lo que quedara de la visita anterior (otro
+tipo, otro tercero, otros campos propios, una descripción larga escrita a mano…) seguía ahí,
+mezclándose con lo que trajera la entrada nueva. Con una descripción larga heredada, el nombre de
+la carpeta podía dejar de caber en la ruta de Dropbox (aviso rojo de la fila 130/177) y el botón se
+quedaba en gris sin que se notara por qué: eso es lo que se veía como «se bloquea».
+
+- **Las entradas a «Nuevo asunto»** (comprobado con `grep` de `App.ir('nuevo')`, `App.nuevoAsuntoCon`
+  y `App.prepararNuevo`; todas pasan por `App.ir('nuevo')`, así que ninguna necesita cambiar su
+  propio camino): el botón de la barra (`js/barra.js`, `#btn-nuevo-asunto`); la pestaña de siempre
+  (`.pestana[data-pantalla="nuevo"]`); una nota del tablón, «A asunto» (`js/tablon-compacto.js`,
+  `pasarAAsunto`); «+ Nuevo asunto para esta persona» (`js/archivo-personas.js`); un documento
+  suelto, «Crear asunto con él» (`js/documentos-sueltos.js`, `App.empezarAsuntoCon`, y
+  `App.crearAsuntoConPropuesta` cuando ya trae tipo y tercero reconocidos); y la propuesta de la
+  bandeja de correos (`js/bandeja-propuesta.js`, `llevarANuevo`).
+- **`App.prepararNuevo` prepara el formulario de verdad, desde cero, cada vez**: `App.E.nuevo` se
+  sustituye entero por `App.nuevoEnBlanco()` (la misma forma en blanco que usa
+  `App.crearAsuntoDelFormulario` al terminar, un solo sitio para esa forma) y se vacían a mano
+  `#buscar-tercero`, `#resultados-tercero`, `#tercero-elegido`, `#campo-curso`,
+  `#campo-descripcion`, `#campo-limite`, `#campo-grupo`, `#bloque-campos`/`#campos-lista-nuevo`,
+  `#lopide-caja-nuevo` y el resumen de la guía (`#guia-resumen-nuevo`/`#guia-nuevo`, que solo se
+  repinta solo con un clic de verdad sobre un tipo, `js/guias-enganche.js`); `#campo-fecha` vuelve a
+  hoy. Lo único que **no** se toca es `App.E.pendiente` (el documento suelto que viaja con el
+  asunto): quien lo trae lo deja puesto ANTES de llamar a `App.ir('nuevo')`, y así sigue.
+- **La pastilla de categoría manda siempre** sobre lo que hubiera antes (detalle más arriba,
+  `App.pulsarCategoriaNuevo`).
+- **Un aviso pendiente de otra visita no puede colarse tarde**: `App.E.nuevoVisita` (en `App.E`,
+  `js/nucleo.js`) sube uno cada vez que `App.prepararNuevo` corre. La lectura del PDF de un adjunto
+  de correo (`js/bandeja-adjuntos-lector.js`) puede terminar después de que el usuario ya se haya
+  ido a otra cosa (o vuelto a entrar para OTRO asunto): antes de tocar el formulario, comprueba que
+  `App.E.nuevoVisita` sigue siendo el mismo de cuando empezó a leer; si no, no hace nada.
+
+Se comprueba con `pruebas/crear-asunto-desde-todos-los-sitios.mjs` (recorre las entradas de la
+lista de arriba, alternando entre ellas, dejando cada vez el formulario "sucio" antes de la
+siguiente) y con `pruebas/duplicados.mjs` puesta al día (fila 163: volver a «Nuevo asunto» desde la
+ficha de un posible duplicado ya no conserva lo escrito, a propósito — es la misma preparación
+desde cero que pide esta fila, sin excepción para esa pantalla).
 
 ### La ficha de un asunto
 

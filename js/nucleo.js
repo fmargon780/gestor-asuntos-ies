@@ -32,6 +32,13 @@ App.E = {
   ocupados: {},         /* asuntos con una acción larga en marcha: archivar, reabrir, renombrar, unir (fila 100) */  /* claves archivadas por este ordenador hace un instante (fila 90) */
   pendiente: null,     /* el suelto que se va a meter en el asunto que se está creando */
   nuevo: { tipo: null, categoria: null, tercero: null },
+  /* Cuántas veces se ha preparado "Nuevo asunto" desde cero en esta
+     sesión (fila 220, docs/CREAR-ASUNTO-DESDE-TODOS-LOS-SITIOS.md):
+     App.prepararNuevo la sube en cada visita; lo mira quien complete
+     algo en segundo plano para ese formulario (la lectura de un
+     adjunto de correo, js/bandeja-adjuntos-lector.js) para no tocar un
+     formulario que ya es de otra visita. */
+  nuevoVisita: 0,
   archivoVisitado: false   /* fila 175: el Archivo carga solo la primera vez de la sesión */
 };
 

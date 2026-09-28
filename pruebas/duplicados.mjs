@@ -603,9 +603,17 @@ await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await comprobar('163 pulsar un abierto del recuadro abre su ficha', pagina.locator('.ficha-nombre-texto').textContent(), P_ROJO);
 await pagina.click('.pestana[data-pantalla="nuevo"]');
 await pagina.waitForTimeout(400);
-await comprobar('163 y al volver a «Nuevo asunto», lo escrito sigue ahí',
+/* Fila 220 (docs/CREAR-ASUNTO-DESDE-TODOS-LOS-SITIOS.md): "Nuevo
+   asunto" se prepara desde cero cada vez que se entra, sin excepción
+   (App.ir('nuevo') es el único camino, también al volver desde la
+   ficha del duplicado). Antes de esta fila, al volver se encontraba lo
+   escrito tal cual: era justo el tipo de resto de la visita anterior
+   que la 220 pide quitar, aunque aquí viniera de una pantalla a
+   propósito con un diseño distinto (fila 163). */
+const hoyPreparado = await pagina.evaluate(() => U.hoyIso());
+await comprobar('163 → 220: al volver a «Nuevo asunto» el formulario está en blanco, no como se dejó',
   pagina.evaluate(() => [document.getElementById('campo-descripcion').value, document.getElementById('campo-fecha').value, App.E.nuevo.tipo, !!App.E.nuevo.tercero]),
-  ['texto a mano', '2026-08-30', 'TRANSPORTE', true]);
+  ['', hoyPreparado, null, false]);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

@@ -55,10 +55,66 @@ App.actualizarLimiteNuevo = function () {
   }
 };
 
+/* El estado en blanco de "Nuevo asunto": una sola forma, para que
+   App.prepararNuevo (al entrar) y App.crearAsuntoDelFormulario (al
+   terminar, js/asuntos-nuevo-crear.js) dejen siempre exactamente lo
+   mismo detrás (fila 220). */
+App.nuevoEnBlanco = function () {
+  return { tipo: null, categoria: null, tercero: null, terceroPropuesto: null,
+           configCampos: [], viaInicial: null, departamento: null };
+};
+
+/* Fila 220 (docs/CREAR-ASUNTO-DESDE-TODOS-LOS-SITIOS.md): preparar el
+   formulario desde cero cada vez que se entra. App.ir('nuevo') es el
+   único camino a esta pantalla (directo, o dentro de
+   App.nuevoAsuntoCon/App.crearAsuntoConPropuesta): así que esta es la
+   única función que lo prepara, y ninguna entrada puede pintar nada
+   por su cuenta ni saltársela.
+
+   Antes de esta fila solo se repintaba, sin limpiar lo que hubiera
+   quedado de la visita anterior (tipo, tercero, categoría, campos
+   propios, lo escrito a mano): esa era la causa de "unas veces sí y
+   otras no" según por dónde se entrara, y a veces de que "Crear el
+   asunto" se quedara sin poderse pulsar sin decir por qué (por
+   ejemplo, una descripción larga de la vez anterior que, sumada al
+   tercero y tipo nuevos, ya no cabía en la ruta de Dropbox).
+
+   App.E.pendiente (el documento suelto que viaja con el asunto que se
+   está creando) no se toca aquí a propósito: quien lo trae lo deja
+   puesto ANTES de llamar a App.ir('nuevo') (js/documentos-sueltos.js,
+   js/asuntos-nuevo-crear.js). */
 App.prepararNuevo = function () {
-  if (!$('campo-fecha').value) $('campo-fecha').value = U.hoyIso();
-  App.actualizarLimiteNuevo();
+  App.E.nuevoVisita++;
+  App.E.nuevo = App.nuevoEnBlanco();
+  App.loPideNuevoControles = null;
+  App.limiteNuevoAuto = '';
+  App.fechaLoPideAuto = '';
+  App.cursoNuevoAuto = '';
+
+  $('buscar-tercero').value = '';
+  $('resultados-tercero').innerHTML = '';
+  $('tercero-elegido').classList.add('oculto');
+  $('tercero-elegido').innerHTML = '';
+  $('campo-fecha').value = U.hoyIso();
+  $('campo-curso').value = '';
+  $('campo-descripcion').value = '';
+  $('campo-limite').value = '';
+  $('campo-grupo').checked = false;
+  $('bloque-grupo').classList.add('oculto');
+  $('bloque-campos').classList.add('oculto');
+  $('campos-lista-nuevo').innerHTML = '';
+  $('lopide-caja-nuevo').innerHTML = '';
+  /* El resumen de la guía (js/guias-enganche.js) se engancha por el
+     clic de verdad sobre un botón de tipo (delegado en #tipos-lista):
+     al repintar la parrilla desde aquí, sin ningún tipo elegido, no
+     hay clic que lo repinte solo, así que se deja limpio a mano. */
+  var resumenGuia = $('guia-resumen-nuevo');
+  if (resumenGuia) { resumenGuia.className = 'guia-resumen oculto'; resumenGuia.textContent = ''; resumenGuia.onclick = null; }
+  var cajaGuia = $('guia-nuevo');
+  if (cajaGuia) { cajaGuia.className = 'oculto'; cajaGuia.innerHTML = ''; }
+
   App.actualizarCursoNuevo();
+  App.actualizarLimiteNuevo();
   App.pintarPendiente();
   App.pintarCategorias();
   App.pintarTipos();
@@ -86,14 +142,40 @@ App.pintarCategorias = function () {
     b.setAttribute('data-categoria', cat);
     b.innerHTML = U.escapar(cat) +
       '<small>' + U.escapar(App.DESCRIPCION_CATEGORIA[cat]) + ' · ' + cuantos + ' tipos</small>';
-    b.onclick = function () {
-      App.elegirCategoria(App.E.nuevo.categoria === cat ? null : cat);
-      App.pintarTipos();
-      App.buscarTercero();
-      $('buscar-tercero').focus();
-    };
+    b.onclick = function () { App.pulsarCategoriaNuevo(cat); };
     caja.appendChild(b);
   });
+};
+
+/* Pulsar una pastilla es una decisión explícita de categoría: manda
+   siempre sobre la parrilla de tipos (fila 220), aunque ya hubiera una
+   persona elegida o propuesta de otra categoría. Antes,
+   categoriaDeLaParrilla() daba prioridad al tercero sobre la pastilla:
+   con una persona ya elegida, pulsar una pastilla de otra categoría no
+   cambiaba nada visible, y parecía que el botón no hacía nada. Ahora
+   se olvida, igual que un tipo de otra categoría se olvida al fijar un
+   tercero nuevo (App.fijarTercero). */
+App.pulsarCategoriaNuevo = function (cat) {
+  var nueva = App.E.nuevo.categoria === cat ? null : cat;
+  if (nueva) {
+    if (App.E.nuevo.tercero && App.E.nuevo.tercero.categoria !== nueva) {
+      App.E.nuevo.tercero = null;
+      $('tercero-elegido').classList.add('oculto');
+      $('tercero-elegido').innerHTML = '';
+    }
+    if (App.E.nuevo.terceroPropuesto && App.E.nuevo.terceroPropuesto.categoria !== nueva) {
+      App.E.nuevo.terceroPropuesto = null;
+    }
+    if (App.E.nuevo.tipo) {
+      var t = App.E.tipos.filter(function (x) { return x.tipo === App.E.nuevo.tipo; })[0];
+      if (!t || t.categoria !== nueva) App.E.nuevo.tipo = null;
+    }
+  }
+  App.elegirCategoria(nueva);
+  App.pintarTipos();
+  App.buscarTercero();
+  App.refrescarVista();
+  $('buscar-tercero').focus();
 };
 
 /* Fija el filtro de categoría del buscador (null = todas) y repinta
