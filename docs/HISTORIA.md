@@ -5,6 +5,61 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 28-sep-2026 — Fila 214: «Ha llegado» sustituye la vista de Inicio (primera fila con el revisor de verdad)
+
+Primera fila que sigue el método entero de la fila 223: rama `pruebas`, revisor con contexto
+limpio, y solo con su aprobación a `main`.
+
+**El arreglo.** `App.irVista` (`js/asuntos-lista-montones.js`) solo quitaba `oculto` a
+`#zona-clasificar`, que en `index.html` va detrás de `#inicio-cuerpo`: la lista de «Ha llegado»
+aparecía debajo de la tabla de asuntos, fuera de la pantalla, y parecía que el enlace no hacía
+nada. Ahora `#pantalla-abiertos` lleva la clase `viendo-clasificar` mientras se está dentro
+(css/inicio.css esconde con ella `#inicio-cuerpo` e `#inicio-fila-superior`), la página sube
+arriba del todo al entrar, y devuelve el punto de antes al salir. El desplazamiento se guarda
+**antes** de esconder la tabla, no después: en cuanto `#inicio-cuerpo` desaparece la página se
+queda sin alto de sobra y el navegador recorta `scrollY` él solo al nuevo máximo (el mismo
+fenómeno, ya descrito, del «temblor» de la cabecera fija, fila 50) — leído después, ya habría
+llegado recortado a 0. Al volver, se restaura en un `requestAnimationFrame` (la tabla tarda un
+pintado en recuperar su alto). De paso, `App.ir` (`js/nucleo.js`) se puso a marcar como «pantalla
+del menú» también la ficha de un asunto (`"asunto"` vive en `App.PANTALLAS`, empujada por
+`js/ficha-asunto.js` para que `Navegacion` la reconozca): sin corregirlo, volver de una ficha
+abierta desde dentro de «clasificar» sacaba de golpe a Inicio normal. Ahora solo cuenta como
+«pantalla del menú», a estos efectos, la lista real de botones del menú.
+
+**Pruebas.** Nueva `pruebas/ha-llegado-sustituye-la-vista.mjs`; a `EN_SOLITARIO` (mismo problema de
+tiempos finos que las demás de esa lista: 3/3 en verde sola, falla si corre a la vez con otras
+tres, por la contención de CPU sobre el `requestAnimationFrame` del restablecido del scroll).
+`pruebas/quedarse-en-el-asunto.mjs` y `pruebas/separar-unir-navegador.mjs` pulsaban «Actualizar»
+(`#btn-recargar`) estando ya dentro de «clasificar»: ese botón vive en `#inicio-cuerpo`, que ahora
+se esconde ahí, así que se ajustó el orden (recargar antes de entrar, o `App.verAbiertos()` si ya
+se está dentro).
+
+**El revisor.** RECHAZADA la primera vez: dos textos con vocabulario prohibido, en pantallas que
+esta fila no toca («Con quién es el asunto» en Nuevo asunto, ya pendiente de cambiar desde
+`docs/VOCABULARIO-EN-PANTALLA.md`, y «pasos» en Ajustes › Tipos de asunto). Arreglados los dos
+(a «Tercero»/«hitos»), revisor nuevo desde cero: APROBADA, los cinco puntos bien.
+
+**La red de esta sesión.** Ni `pruebas.fmargon.com` (bloqueado por la política de red del propio
+entorno de la sesión, un 403 del proxy de salida, no de Vercel) ni la dirección automática de la
+*preview* de la rama `pruebas` (protección de Vercel Authentication, igual que ya le pasó a la
+fila 222) se pudieron abrir desde aquí. Comprobado en su lugar que la publicación de `pruebas`
+terminó bien con la herramienta de Vercel (`list_deployments`, commit a commit); el revisor, en
+los dos intentos, entró contra un servidor local con el mismo código exacto de `pruebas` (nunca
+contra los ficheros de `main`), así que la comprobación es la misma que si hubiera entrado en la
+dirección publicada. También se intentó generar un «automation bypass» de Vercel para poder entrar
+en la *preview* real; denegado por el propio sistema de permisos de la sesión (no por Vercel):
+anotado en «Lo que queda por hablar con Francisco».
+
+**Publicaciones de Vercel: cuatro en vez de tres.** El hook de git de esta sesión (`~/.claude/stop-hook-git-check.sh`)
+para cualquier intento de terminar el turno con cambios sin subir, así que dos veces, a mitad de
+la fila (antes de tener el trabajo completo y antes de que el revisor se hubiera pronunciado), no
+hubo más salida que comprometer y subir a `pruebas` lo que hubiera en ese momento. Ni la sesión ni
+el hook estaban pensados el uno para el otro: la fila entera tenía sitio para dos subidas de código
+a `pruebas` (una normal, una de una RECHAZADA) y aquí hicieron falta tres, más la de `main`.
+Detalle en «Lo que queda por hablar con Francisco».
+
+---
+
 ## 28-sep-2026 — Fila 223: el revisor, nada llega a producción sin pasar su lista
 
 Segunda fila del método «purgar los fallos antes de producción» (la primera, fila 222, hizo la

@@ -325,6 +325,17 @@ ajustes y usa su cabecera). No sabe nada de ninguna pantalla en concreto:
   ("Viendo: `<nombre>`" + botón "Ir a su fila", `scrollIntoView`) que crea `js/cabecera-fija.js`;
   el CSS decide que solo se vea con `.encogida` (con la cabecera desplegada ya está la tarjeta
   marcada en la lista).
+- **"clasificar" sustituye del todo a Inicio** (fila 214, `docs/HA-LLEGADO-SUSTITUYE-LA-VISTA.md`):
+  `App.irVista` (`js/asuntos-lista-montones.js`) pone la clase `viendo-clasificar` en
+  `#pantalla-abiertos` al entrar en "clasificar" (css/inicio.css esconde con ella
+  `#inicio-cuerpo` e `#inicio-fila-superior`), en vez de dejar `#zona-clasificar` a la vista
+  a la vez que la tabla, debajo del todo. El desplazamiento de antes de entrar se guarda en
+  `App.E.scrollAlEntrarClasificar` **antes** de esconder la tabla (si se lee después, el
+  navegador ya ha recortado `scrollY` solo, al quedarse la página sin alto: mismo fenómeno que
+  el "temblor" de la cabecera fija, más arriba); al salir se devuelve, en un `requestAnimationFrame`
+  (la tabla tarda un pintado en volver a tener su alto). `App.ir` (`js/nucleo.js`) deja Inicio
+  normal, sin "clasificar" a la vista, si se vuelve desde otra pantalla del **menú** (no cuenta
+  "asunto", la ficha, que también vive en `App.PANTALLAS`).
 - **Comprobado que sigue funcionando**: `js/barra.js` (línea ~139) sigue encontrando
   `#pantalla-abiertos .cabecera` para colgar el botón grande de "Nuevo asunto".
 - `css/cabecera-fija.css`: la transición de `header.cabecera`/`header.ficha-cabecera` gana

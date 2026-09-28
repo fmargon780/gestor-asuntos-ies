@@ -110,7 +110,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   se crean solas, válidas para cualquier tipo. «Preparar informe para dirección» (Cuentas, fila
   196): cuadro sin destinatario, con por-órgano, vencidos, esperando a otros, cerrados desde el
   último informe (`_GESTOR/informes.json`) y tiempo medio.
-- "Ver todo" (antes "Por clasificar"; fila 191, se abre desde "Ha llegado" de Inicio, entero o solo con correos/solo con documentos —fila 212—, con «Ver también…» para pasar a las dos juntas): cada documento suelto se abre, se borra, o crea/entra en un asunto (un solo
+- "Ver todo" (antes "Por clasificar"; fila 191, se abre desde "Ha llegado" de Inicio, entero o solo con correos/solo con documentos —fila 212—, con «Ver también…» para pasar a las dos juntas; fila 214, sustituye del todo a la tabla de asuntos —arriba, sin tener que bajar—, con «← Volver a Inicio» que deja Inicio tal como estaba, misma pestaña y mismo punto de la página): cada documento suelto se abre, se borra, o crea/entra en un asunto (un solo
   botón «Crear asunto con él», que usa lo leído del documento); con tercero reconocido, también
   sugiere guardarlo en uno que ya existe («Guardar aquí»). Tras guardar o crear, se abre directo el
   cuadro de ponerle nombre (no la lista), ya con la fecha, el registro y el tipo de documento (por
