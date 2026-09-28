@@ -6,6 +6,10 @@ Antes de nada, lee `docs/CONTEXTO.md` y después `docs/COLA.md`, como dice la co
 vez en este repositorio. Cada lanzamiento hace solo la primera fila PENDIENTE de `docs/COLA.md`,
 la publica, comprueba la publicación y para. Detalle en la regla 0 de la cola.
 
+**Fila 211, la siguiente después de la 201** (28-sep-2026): `docs/PUBLICAR-SIN-PARAR.md`. Llegó desde
+Cowork sin pasar por la tabla: si no está en `docs/COLA.md`, añádela justo debajo de la 201 como
+PENDIENTE y hazla antes que la 202. Al marcarla HECHA, borra este párrafo.
+
 **Subir directamente a `main`, sin peticiones de cambios** (28-sep-2026, pedido por Francisco para
 que cada fila tarde menos; manda sobre cualquier otra regla de la cola que diga lo contrario):
 
@@ -50,14 +54,23 @@ verde», porque solo se probaba en el entorno de trabajo. Para que no pase:
    pruebas, compilar) es necesario, pero no basta. Hay que comprobar al menos una de estas dos
    cosas: (a) la dirección publicada sirve la versión nueva; (b) la plataforma de publicación
    dice que la publicación de ese commit terminó bien.
-2. **Al empezar cualquier sesión, lo primero:** comprobar que la última publicación salió bien.
-   Si no salió, arreglarla es lo único que se hace hasta que vuelva a publicar. Nada nuevo
-   encima de una publicación rota.
-3. **Si no puedes comprobarlo desde tu sesión:** la fila no se marca HECHA. Se deja como
-   **SIN PUBLICACIÓN COMPROBADA**, no se empieza otra fila, y tu mensaje final empieza
-   exactamente con: «AVISO: no he podido comprobar que los cambios estén publicados.» Esto
-   sustituye el «déjalo anotado para que otra sesión lo compruebe» de la regla 19 de
-   `docs/COLA.md`.
+2. **Al empezar cualquier sesión, lo primero:** comprobar la última publicación. Hay dos casos
+   (28-sep-2026, `docs/PUBLICAR-SIN-PARAR.md`):
+   - **Rota por nuestro código** (la construcción falla, la web da error, falta un fichero que
+     debería estar): arreglarla es lo único que se hace. Nada nuevo encima de una publicación rota.
+   - **Vercel no publica por una causa ajena** (tope diario, 402 «Resource is limited»,
+     publicación que no arranca, cola de más de 20 minutos): no es una publicación rota. **Se
+     sigue trabajando.**
+   Además, las filas SIN PUBLICACIÓN COMPROBADA se comprueban ahora: si la web ya sirve una
+   `App.VERSION` igual o posterior a la suya, pasan a HECHA en la misma subida que marca la nueva
+   fila EN CURSO.
+3. **Si no puedes comprobarlo por una causa ajena:** la fila no se marca HECHA. Se deja como
+   **SIN PUBLICACIÓN COMPROBADA**, con el motivo en una línea, y la sesión termina con normalidad
+   (regla 0: para, y el siguiente lanzamiento coge la siguiente PENDIENTE). El tope de Vercel
+   **no para la cola**. Tu mensaje final empieza exactamente con: «AVISO: no he podido comprobar
+   que los cambios estén publicados.» **Como mucho un `create_deployment` a mano por sesión**; si
+   responde 402, no se reintenta. Esto sustituye el «déjalo anotado para que otra sesión lo
+   compruebe» de la regla 19 de `docs/COLA.md`.
 4. **Si Francisco dice que no ve un cambio,** lo primero es comprobar si se publicó. Nunca
    suponer que es la caché del navegador sin haberlo comprobado.
 5. **«En verde»** en un mensaje a Francisco solo se dice si la publicación también lo está.
