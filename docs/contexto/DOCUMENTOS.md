@@ -64,6 +64,51 @@ No son los campos del tipo de ASUNTO, que siguen fuera del nombre de los documen
 Se comprueba con `pruebas/campos-del-documento.mjs` (montaje sin navegador, cuadro y editor en
 navegador de verdad).
 
+### El texto adicional y el tipo, ya propuestos (28-sep-2026, fila 201,
+### docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md, apartados 1 y 4)
+
+El texto adicional del nombre («matrícula 2º ESO B») se escribía a mano cada vez en el cuadro de
+"Cambiar el nombre". Ahora se puede fijar de antemano, en dos sitios, y el cuadro sale ya relleno.
+
+- **Dónde se escribe** (apartado 1), por orden de prioridad:
+  1. **El hito** (de la biblioteca o propio de una guía): campos `textoDocumentos` y
+     `tipoDocumento` del paso (ver "El texto y el tipo de documento de este hito" en
+     `docs/contexto/HITOS-Y-GUIAS.md`). Con huecos, como una plantilla.
+  2. **El tipo de documento** (Ajustes → El centro → Tipos de documento, menú ⋮ → «Texto por
+     defecto»): `Campos.textoPorDefectoDeDocumento`/`guardarTextoPorDefectoDeDocumento`
+     (`js/campos.js`), guardado en `_GESTOR/campos.json`, clave `textoPorTipoDocumento` (indexada
+     por el nombre del tipo de documento, igual que `porTipoDocumento`, la de los campos del
+     nombre de la fila 96). También con huecos.
+  3. Nada en ninguno de los dos: el cuadro sale vacío, como antes de esta fila.
+- **Dónde se propone** (apartado 4), en `js/documentos-formulario.js`
+  (`Documentos._interno.pintarFormulario`), que es el único sitio por el que pasan los tres
+  caminos de añadir o nombrar un documento desde un hito ("Añadir documento" de la mesa,
+  `js/hitos-anadir.js`; "Cambiar el nombre" del menú de tres puntos de un documento del hito,
+  `js/hitos-documento-menu.js`; "Meter aquí" desde "Por clasificar" eligiendo un hito,
+  `App.llevarSueltoA`): los tres ya le pasaban el hito a `Documentos.abrir`/`App.verDocumentos`
+  desde antes de esta fila (`Documentos._interno.hitoActual`), así que no ha hecho falta tocarlos.
+  - **El tipo de documento**: `N.propuestaDesdeHito({ delNombre, delHito, delTipo })` (función
+    pura, sin DOM ni async, para poder probarla sin navegador) — lo que ya trae el nombre del
+    fichero manda (fila 174: `previo.tipo`); si no, el `tipoDocumento` del hito; si no,
+    `ultimoTipoDocumento` (la memoria de la fila 174); si no, el primero de la lista, como siempre.
+  - **El texto adicional**: la misma función, con `previo.curso` (lo que ya trae el nombre),
+    el `textoDocumentos` del hito (con sus huecos ya resueltos por `Plantillas.rellenar`, con
+    `Plantillas.valoresDeAsunto(asunto, { hito })`) y el `textoPorDefectoDeDocumento` del tipo YA
+    ELEGIDO (también con huecos, con los mismos valores). Si `Plantillas.rellenar` no llega a
+    ejecutarse (sin asunto, o un fallo), el texto se queda tal cual está escrito, sin cortar el
+    cuadro.
+  - Sin ningún hito de por medio (o desde "Por clasificar"): `N.hitoActual` es `null`, así que solo
+    puede salir el texto del tipo de documento; nunca el de un hito, porque no hay ninguno.
+  - Los campos del nombre del propio tipo de documento (fila 96, `js/documentos-campos.js`) siguen
+    reconociéndose al principio del texto adicional ya propuesto, exactamente como antes.
+  - Siempre se puede cambiar el tipo o el texto antes de guardar: esto solo rellena el cuadro, no
+    obliga a nada. Lo que la fila 174 ya rellena (fecha y número de registro leídos del PDF) manda
+    sobre esto y no se toca.
+
+Se comprueba con `pruebas/texto-del-documento-propuesto.mjs` (parte 1, sin navegador, la regla de
+prioridad; parte 2, en navegador: el editor del paso, la biblioteca, `Hitos.pasoAHito` y las cuatro
+combinaciones del cuadro — con texto e hito propios, solo con el tipo, sin nada, y sin ningún hito).
+
 ### Registrar un documento en un paso
 
 Botón **Registrar**, en cada documento que aún no lleve las cuatro piezas del registro en su

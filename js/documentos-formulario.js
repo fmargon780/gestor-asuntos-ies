@@ -52,6 +52,20 @@
     } catch (e) { /* sin memoria, como si no se hubiera guardado nunca */ }
   };
 
+  /* La regla de prioridad del apartado 4 (28-sep-2026, fila 201,
+     docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md): pura, sin DOM ni async, para
+     poder probarla sin navegador. Vale tanto para el tipo de documento
+     como para el texto adicional: "lo que ya trae el nombre" manda
+     sobre "lo del hito", que manda sobre "lo del tipo de documento (o
+     la memoria, para el tipo)"; sin ninguno de los tres, vacío. Quien
+     llama ya tiene que traer `delHito`/`delTipo` con sus huecos
+     rellenos (`Plantillas.rellenar`): esta función no sabe nada de
+     plantillas ni de asuntos. */
+  N.propuestaDesdeHito = function (datos) {
+    var d = datos || {};
+    return String(d.delNombre || d.delHito || d.delTipo || '');
+  };
+
   async function pintarFormulario(opciones) {
     var caja = $('doc-cuerpo');
     if (!caja) return;
@@ -74,20 +88,44 @@
     var hoy = U.hoyIso();
     var fechaPropuesta = propuesta && propuesta.fecha ? isoDeFechaLector(propuesta.fecha) : '';
     var fecha = previo.fecha || fechaPropuesta || hoy;
-    /* El hueco de texto libre del nombre. Antes se llamaba "Año
-       académico" y se rellenaba solo con el curso que tocaba por la
-       fecha. Él lo usa para otras cosas —un número de expediente, una
-       referencia de la factura— y ese relleno automático estorbaba:
-       había que borrarlo cada vez. Desde el 10-sep-2026 se llama
-       **Texto adicional**, nace vacío y no depende de ningún otro
-       campo. Lo único que se conserva es lo que ya trajera el nombre
-       del propio fichero. */
-    var curso = previo.curso || '';
-    /* El tipo de documento: el lector no lo lee nunca; si el nombre
-       tampoco lo trae, se arranca en el último que se guardó en un
-       asunto de este mismo tipo de asunto (fila 174, punto 1). */
+    /* El tipo de documento: si el nombre no lo trae, el del hito desde
+       el que se añade o nombra el documento, si lo tiene (fila 201,
+       apartado 4); si no, el último que se guardó en un asunto de este
+       mismo tipo de asunto (fila 174, punto 1); si no, el primero de la
+       lista, como siempre (lo decide `opcionesDeTipo` al no marcar
+       ninguna opción). */
     var tipoAsunto = N.asuntoActual ? App.tipoDeAsunto(N.asuntoActual) : '';
-    var tipoInicial = previo.tipo || ultimoTipoDocumento(tipoAsunto);
+    var hito = N.hitoActual;
+    var tipoInicial = N.propuestaDesdeHito({
+      delNombre: previo.tipo,
+      delHito: hito ? hito.tipoDocumento : '',
+      delTipo: ultimoTipoDocumento(tipoAsunto)
+    });
+    /* El texto adicional del nombre (fila 201, apartado 4): el que ya
+       trae el nombre manda (igual que siempre); si no, el del hito, con
+       sus huecos ya rellenos (apartado 1: el mismo motor que una
+       plantilla, `Plantillas.rellenar`); si no, el del tipo de
+       documento ya elegido, también con sus huecos; si no, vacío. Antes
+       se llamaba "Año académico" y se rellenaba solo con el curso que
+       tocaba por la fecha; desde el 10-sep-2026 es texto libre, y desde
+       esta fila puede venir ya escrito de otro sitio, pero se sigue
+       pudiendo cambiar antes de guardar. */
+    var textoDelTipoBruto = (window.Campos && window.Campos.textoPorDefectoDeDocumento && window.App && App.E)
+      ? Campos.textoPorDefectoDeDocumento(App.E.campos, tipoInicial) : '';
+    var textoDelHitoBruto = (hito && hito.textoDocumentos) || '';
+    var textoRelleno = { delHito: textoDelHitoBruto, delTipo: textoDelTipoBruto };
+    if ((textoDelHitoBruto || textoDelTipoBruto) && window.Plantillas && N.asuntoActual) {
+      try {
+        var valoresHuecos = await Plantillas.valoresDeAsunto(N.asuntoActual, { hito: hito, conLoQueFalta: false });
+        if (textoDelHitoBruto) textoRelleno.delHito = Plantillas.rellenar(textoDelHitoBruto, valoresHuecos).texto;
+        if (textoDelTipoBruto) textoRelleno.delTipo = Plantillas.rellenar(textoDelTipoBruto, valoresHuecos).texto;
+      } catch (e) { /* sin poder rellenar los huecos, se deja el texto tal cual está escrito */ }
+    }
+    var curso = N.propuestaDesdeHito({
+      delNombre: previo.curso,
+      delHito: textoRelleno.delHito,
+      delTipo: textoRelleno.delTipo
+    });
     /* Los campos del tipo de documento (fila 96): los de lista que ya
        estén, tal cual, al principio del texto adicional se reconocen y
        salen de ahí; el resto se queda como texto adicional. */

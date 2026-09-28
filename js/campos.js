@@ -69,6 +69,19 @@
    `clase` es 'texto', 'lista' (usa `valores`) o 'fecha'. Un campo sin
    nombre no sobrevive. Solo se escribe la clave cuando hay alguno.
 
+   `textoPorTipoDocumento` (28-sep-2026, fila 201,
+   docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md) es otra cosa más: el «Texto
+   por defecto» de un tipo de DOCUMENTO, el segundo sitio (después del
+   hito) de donde puede salir ya escrito el texto adicional del nombre
+   de un documento. Se indexa igual que `porTipoDocumento`, por el
+   nombre del tipo de documento, y admite los mismos huecos que una
+   plantilla ({nombre}, {curso}, {grupo}, {tipo}, {campo:...}…):
+
+       "textoPorTipoDocumento": { "FACTURA": "{campo:Proveedor}" }
+
+   Solo se escribe la clave cuando hay alguno, y solo si el texto no
+   está vacío.
+
    Si el fichero no existe, todo funciona como hoy: un tipo sin campos
    configurados se comporta exactamente igual que antes de este
    cambio. `campos.json` entra en las copias de seguridad y en la
@@ -179,6 +192,20 @@ var Campos = (function () {
       if (lista.length) porTipoDocumento[tipoDoc] = lista;
     });
     if (Object.keys(porTipoDocumento).length) salida.porTipoDocumento = porTipoDocumento;
+
+    /* Fila 201 (docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md, apartado 1): el
+       «Texto por defecto» de un tipo de documento, con los mismos
+       huecos que una plantilla ({nombre}, {curso}, {grupo}, {tipo},
+       {campo:...}…). Solo se propone cuando el hito no trae ya el suyo
+       propio (ver js/documentos-formulario.js). Solo si hay alguno,
+       como `porTipoDocumento`. */
+    var origenTextoDoc = (c.textoPorTipoDocumento && typeof c.textoPorTipoDocumento === 'object') ? c.textoPorTipoDocumento : {};
+    var textoPorTipoDocumento = {};
+    Object.keys(origenTextoDoc).forEach(function (tipoDoc) {
+      var t = String(origenTextoDoc[tipoDoc] || '').trim();
+      if (t) textoPorTipoDocumento[tipoDoc] = t;
+    });
+    if (Object.keys(textoPorTipoDocumento).length) salida.textoPorTipoDocumento = textoPorTipoDocumento;
     return salida;
   }
 
@@ -285,6 +312,25 @@ var Campos = (function () {
   function camposDeDocumento(config, tipoDoc) {
     var m = (config && config.porTipoDocumento) || {};
     return m[tipoDoc] || [];
+  }
+
+  /* El «Texto por defecto» de UN tipo de documento (fila 201). Relee
+     antes de escribir y solo toca su trozo, como guardarCamposDeDocumento. */
+  async function guardarTextoPorDefectoDeDocumento(gestor, tipoDoc, texto) {
+    var actual = await leer(gestor);
+    var mapa = Object.assign({}, actual.textoPorTipoDocumento || {});
+    var limpio = String(texto || '').trim();
+    if (limpio) mapa[tipoDoc] = limpio;
+    else delete mapa[tipoDoc];
+    if (Object.keys(mapa).length) actual.textoPorTipoDocumento = mapa;
+    else delete actual.textoPorTipoDocumento;
+    await Copias.guardar(gestor, FICHERO, actual);
+    return actual;
+  }
+
+  function textoPorDefectoDeDocumento(config, tipoDoc) {
+    var m = (config && config.textoPorTipoDocumento) || {};
+    return m[tipoDoc] || '';
   }
 
   /* ---------- identidad de un campo ----------
@@ -492,6 +538,8 @@ var Campos = (function () {
     guardarPropios: guardarPropios, guardarCalculados: guardarCalculados,
     guardarConfigDeTipo: guardarConfigDeTipo,
     guardarCamposDeDocumento: guardarCamposDeDocumento, camposDeDocumento: camposDeDocumento,
+    guardarTextoPorDefectoDeDocumento: guardarTextoPorDefectoDeDocumento,
+    textoPorDefectoDeDocumento: textoPorDefectoDeDocumento,
     normalizarListaDeDocumento: normalizarListaDeDocumento,
     claveDeCampo: claveDeCampo, nombreDeCampo: nombreDeCampo,
     CALCULADOS: CALCULADOS, calcularCurso: calcularCurso,

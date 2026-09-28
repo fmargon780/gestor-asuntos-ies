@@ -110,7 +110,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   cuadro de ponerle nombre (no la lista), ya con la fecha, el registro y el tipo de documento (por
   memoria) que se pueda aprovechar de lo leído; «Guardar» cierra el cuadro entero. Encima vive la
   bandeja de Gmail (etiqueta `GESTOR`), que lee el PDF y propone tipo, fecha, registro y tercero;
-  sus adjuntos pasan también por el cuadro de nombre, uno detrás de otro.
+  sus adjuntos pasan también por el cuadro de nombre, uno detrás de otro. Desde un hito (fila 201):
+  el cuadro sale con el tipo de documento y el texto adicional (huecos ya rellenos) que tenga ESE
+  hito si los tiene, si no los del tipo de documento elegido («Texto por defecto», Ajustes); sin
+  hito o sin ninguno de los dos, como antes.
 - Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. El tope de carpeta y de
   documento cuenta la ruta completa dentro de Dropbox (`Nombres.topes()`), no solo el nombre.
 - Botón «Ruta» (`file:///`; ficha, Correo/Séneca): deduce Dropbox; lo de dentro, una vez para el centro. Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en

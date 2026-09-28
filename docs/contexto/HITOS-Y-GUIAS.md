@@ -246,6 +246,20 @@ como **copia**.
   tipo (`AvisosLoPide.opcionesPlantillaHTML`). Al marcar el hito hecho con la casilla encendida
   (`js/hitos-panel-lista.js`), se abre el cuadro de Correo con esa plantilla; detalle completo en
   `docs/contexto/CORREO-Y-SENECA.md`.
+- **El texto y el tipo de documento de este hito** (28-sep-2026, fila 201,
+  docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md, apartado 1): dos campos más de un paso de guía y de un
+  modelo de la biblioteca, `textoDocumentos` y `tipoDocumento`, con el mismo trato que
+  `soloInformativo`: solo en el paso de arriba, nunca en uno de una opción (`Guias.normalizarExtra`
+  los vacía en un paso-pregunta), entran en `CAMPOS_COMPARABLES` y `Hitos.pasoAHito` los copia al
+  hito vivo. Se editan en el editor del paso (`js/guias-paso-bloques.js`), junto a «Solo
+  informativo»: **«Texto para los documentos de este hito»** (con «Insertar hueco», mismo catálogo
+  y motor que una plantilla, `Plantillas.rellenar`/`HuecosBuscador`: `{nombre}` el tercero,
+  `{curso}`, `{grupo}`, `{tipo}`, `{campo:...}`…) y, al lado, **«Tipo de documento que suele salir
+  de aquí»** (desplegable con `App.E.tiposDocumento`, opcional). Solo rellenan de antemano el
+  cuadro de "Cambiar el nombre" al añadir o nombrar un documento desde ese hito (fila 174,
+  `docs/contexto/DOCUMENTOS.md`, «El nombre y el registro de un documento»): nunca obligan a nada,
+  siempre se pueden cambiar antes de guardar. Un hito de una opción de una pregunta, ninguno de los
+  dos (igual que `soloInformativo`).
 - **Normativa** (apartado 4.7, `js/hitos-normativa.js`; enlace retocado la fila 87,
   `docs/ENLACE-AL-ARTICULO-DE-NORMATIVA.md`): campo `normativa`, lista de
   `{ cita, bloque, clave, url }`. Con `clave`, el enlace abre la vista de un solo artículo del

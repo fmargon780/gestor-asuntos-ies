@@ -40,13 +40,18 @@ App.pintarTiposDeDocumento = function () {
     linea.className = 'tarjeta-tipo-linea';
     /* Los campos del nombre (fila 96, js/documentos-campos.js). */
     var susCampos = window.DocCampos ? DocCampos.campos(nombre) : [];
+    /* El «Texto por defecto» (fila 201, docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md). */
+    var textoDefecto = (window.Campos && Campos.textoPorDefectoDeDocumento)
+      ? Campos.textoPorDefectoDeDocumento(App.E.campos, nombre) : '';
     linea.innerHTML = '<span class="tarjeta-tipo-nombre">' + U.escapar(nombre) + '</span>' +
       (susCampos.length ? '<span class="suave"> · ' + susCampos.map(function (c) {
         return U.escapar(c.nombre) + (c.obligatorio ? ' *' : '');
-      }).join(', ') + '</span>' : '');
+      }).join(', ') + '</span>' : '') +
+      (textoDefecto ? '<span class="suave"> · texto: ' + U.escapar(textoDefecto) + '</span>' : '');
     f.appendChild(linea);
     f.appendChild(App.botonMenuTarjeta([
       { texto: 'Campos del nombre', onclick: function () { if (window.DocCampos) DocCampos.editar(nombre); } },
+      { texto: 'Texto por defecto', onclick: function () { App.editarTextoPorDefectoDocumento(nombre); } },
       { texto: 'Borrar', titulo: 'Va a la papelera', peligro: true, onclick: function () { App.borrarTipoDocumento(nombre); } }
     ]));
     tdoc.appendChild(f);
@@ -71,6 +76,40 @@ App.borrarTipoDocumento = async function (nombre) {
     U.aviso('Tipo de documento mandado a la papelera.', 'bueno');
   } catch (e) {
     U.aviso('No he podido mandarlo a la papelera: ' + U.mensajeDeError(e), 'malo');
+  }
+};
+
+/* El «Texto por defecto» de un tipo de documento (28-sep-2026, fila
+   201, docs/NOMBRE-DE-DOCUMENTO-PROPUESTO.md, apartado 1): el segundo
+   sitio, después del hito, de donde puede salir ya escrito el texto
+   adicional del nombre de un documento. Mismo patrón que
+   App.renombrarGrupo: un solo campo, U.preguntar. */
+App.editarTextoPorDefectoDocumento = async function (nombre) {
+  var textoActual = (window.Campos && Campos.textoPorDefectoDeDocumento)
+    ? Campos.textoPorDefectoDeDocumento(App.E.campos, nombre) : '';
+  var promesa = U.preguntar('Texto por defecto: ' + nombre,
+    '<p class="explica">Se propone en el cuadro de "Cambiar el nombre" cuando el hito desde el que se ' +
+    'añade el documento no trae ya el suyo propio (o al añadirlo sin ningún hito de por medio). ' +
+    'Admite los mismos huecos que una plantilla: {nombre} (el tercero), {curso}, {grupo}, {tipo}, ' +
+    '{campo:Nombre del campo}…</p>' +
+    '<div class="etiqueta-con-boton">' +
+      '<label class="etiqueta">Texto por defecto</label>' +
+      '<button type="button" class="boton boton-hueco" id="tdoc-insertar-hueco">Insertar hueco</button>' +
+    '</div>' +
+    '<input id="tdoc-texto-defecto" class="campo" value="' + U.escapar(textoActual) + '">',
+    'Guardar');
+  if (window.HuecosBuscador) {
+    HuecosBuscador.montar({ boton: $('tdoc-insertar-hueco'), campos: [$('tdoc-texto-defecto')] });
+  }
+  var ok = await promesa;
+  if (!ok) return;
+  var nuevo = $('tdoc-texto-defecto').value.trim();
+  try {
+    App.E.campos = await Campos.guardarTextoPorDefectoDeDocumento(App.E.gestor, nombre, nuevo);
+    App.pintarTiposDeDocumento();
+    U.aviso('Texto por defecto guardado.', 'bueno');
+  } catch (e) {
+    U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
   }
 };
 
