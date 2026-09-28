@@ -20,38 +20,40 @@
 
   function $(id) { return document.getElementById(id); }
 
-  function recordar(clave, valor) {
-    try { window.localStorage.setItem(clave, valor); } catch (e) {}
-  }
-  function recordado(clave) {
-    try { return window.localStorage.getItem(clave); } catch (e) { return null; }
-  }
-
   /* ---------- 1. los filtros ---------- */
 
-  function hayFiltroPuesto() {
+  /* Los cuatro que cuenta "Filtros (N)" (fila 212, docs/INICIO-A-TODO-
+     EL-ANCHO.md, apartado 4): los mismos que ya avisaban con el punto
+     azul (#btn-filtros.tiene-filtros, css/vista.css). "Responsable"
+     (dentro del mismo panel) no entra en la cuenta: es un filtro de
+     "En Administración"/"En espera", no de la tabla en general. */
+  function filtrosPuestos() {
     var e = $('filtro-estado'), p = $('filtro-plazo'), o = $('filtro-organo'), t = $('filtro-tipo-asunto');
-    return !!((e && e.value) || (p && p.value) || (o && o.value) || (t && t.value));
+    return [e, p, o, t].filter(function (campo) { return campo && campo.value; }).length;
   }
 
   function pintarBotonFiltros() {
     var b = $('btn-filtros'), caja = $('filtros-abiertos');
     if (!b || !caja) return;
     var abierto = !caja.classList.contains('oculto');
+    var n = filtrosPuestos();
     b.setAttribute('aria-expanded', abierto ? 'true' : 'false');
-    b.classList.toggle('tiene-filtros', hayFiltroPuesto());
+    b.classList.toggle('tiene-filtros', n > 0);
+    b.textContent = n ? 'Filtros (' + n + ')' : 'Filtros';
     b.title = abierto ? 'Esconder los filtros' : 'Filtrar y ordenar la lista';
   }
 
+  /* Fila 212, apartado 4: el panel de "Filtros" empieza SIEMPRE cerrado
+     al entrar en Inicio (antes se recordaba abierto de una vez para la
+     siguiente, en `localStorage`: eso desaparece). */
   function engancharFiltros() {
     var b = $('btn-filtros'), caja = $('filtros-abiertos');
     if (!b || !caja) return;
 
-    if (recordado('gestor-filtros') === 'abiertos') caja.classList.remove('oculto');
+    caja.classList.add('oculto');
 
     b.onclick = function () {
       var abierto = caja.classList.toggle('oculto') === false;
-      recordar('gestor-filtros', abierto ? 'abiertos' : 'plegados');
       pintarBotonFiltros();
     };
 
@@ -59,6 +61,17 @@
       if ($(id)) $(id).addEventListener('change', pintarBotonFiltros);
     });
 
+    pintarBotonFiltros();
+  }
+
+  /* Cierra el panel de "Filtros" (fila 212, apartado 4): lo llama
+     js/nucleo.js (App.ir) cada vez que se entra en Inicio, no solo al
+     cargar la página, para que empiece cerrado siempre que se entra,
+     aunque se hubiera dejado abierto la vez anterior. */
+  function cerrarFiltros() {
+    var caja = $('filtros-abiertos');
+    if (!caja) return;
+    caja.classList.add('oculto');
     pintarBotonFiltros();
   }
 
@@ -73,5 +86,7 @@
 
   enganchar();
   if (!enganchado) document.addEventListener('DOMContentLoaded', enganchar);
+
+  window.Vista = { cerrarFiltros: cerrarFiltros };
 
 })();
