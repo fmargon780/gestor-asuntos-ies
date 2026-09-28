@@ -556,7 +556,7 @@
          ha resuelto y ocultado #capa), así que aquí sí se puede volver
          a abrir un cuadro, uno por cada hito cambiado. */
       if (window.GuiasBiblioteca) {
-        try { await GuiasBiblioteca.revisarAlGuardar(pasos); } catch (e) { /* no crítico: se guarda igual */ }
+        try { await GuiasBiblioteca.revisarAlGuardar(pasos, nombreTipo); } catch (e) { /* no crítico: se guarda igual */ }
       }
       return G.normalizar(pasos);
     });
