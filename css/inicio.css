@@ -99,6 +99,19 @@
   white-space: nowrap;
 }
 
+/* ---------- "clasificar" sustituye del todo a Inicio (fila 214) ----------
+
+   Antes, #zona-clasificar se enseñaba a la vez que #inicio-cuerpo (y
+   #inicio-fila-superior): la lista quedaba abajo del todo, fuera de la
+   pantalla, y parecía que "N correos"/"N documentos por clasificar" no
+   hacía nada. App.irVista (js/asuntos-lista-montones.js) pone esta
+   clase en #pantalla-abiertos al entrar en "clasificar", y la quita al
+   volver. */
+#pantalla-abiertos.viendo-clasificar #inicio-fila-superior,
+#pantalla-abiertos.viendo-clasificar #inicio-cuerpo {
+  display: none;
+}
+
 /* ---------- "Ha llegado", en #zona-clasificar (fila 212) ----------
 
    Al llegar desde uno de los dos enlaces de la línea de arriba, se
