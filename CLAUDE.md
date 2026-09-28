@@ -6,18 +6,29 @@ Antes de nada, lee `docs/CONTEXTO.md` y después `docs/COLA.md`, como dice la co
 vez en este repositorio. Cada lanzamiento hace solo la primera fila PENDIENTE de `docs/COLA.md`,
 la publica, comprueba la publicación y para. Detalle en la regla 0 de la cola.
 
-**Subir directamente a `main`, sin peticiones de cambios** (28-sep-2026, pedido por Francisco para
-que cada fila tarde menos; manda sobre cualquier otra regla de la cola que diga lo contrario):
+**Subir directamente a `main`, sin dejar peticiones de cambios abiertas** (28-sep-2026, pedido
+por Francisco para que cada fila tarde menos; manda sobre cualquier otra regla de la cola que
+diga lo contrario):
 
-1. No abras peticiones de cambios (pull requests) ni fusiones ramas por GitHub. Aunque trabajes en
-   una rama `claude/...`, sube con `git push origin HEAD:main` (antes, `git pull --rebase origin main`).
-2. No esperes a GitHub Actions ni arregles sus fallos como condición para publicar. Lo que vale es
+1. Sube siempre a `main`. Primero `git pull --rebase origin main` y después
+   `git push origin HEAD:main`.
+2. Si git rechaza la subida a `main` (a veces el entorno solo te deja subir a tu rama
+   `claude/...`): sube a tu rama `claude/...`, abre una petición de cambios (pull request)
+   contra `main` y fusiónala tú mismo en ese momento con la herramienta de GitHub
+   (`merge_pull_request`), sin esperar a GitHub Actions ni a que nadie la revise. Es el único
+   uso permitido de las peticiones de cambios: nunca dejes una abierta.
+3. Nunca subas ficheros de código uno a uno con las herramientas de ficheros de GitHub
+   (`create_or_update_file` o `push_files`): los ficheros grandes se cortan al subir y dejan
+   `main` roto. Si git no puede subir de ninguna manera, para: deja la fila EN CURSO y dilo en
+   tu mensaje final.
+4. No esperes a GitHub Actions ni arregles sus fallos como condición para publicar. Lo que vale es
    `npm test` en tu sesión y la publicación comprobada en Vercel (regla general de abajo). Si
    Actions falla en una prueba que en tu sesión pasa, no la persigas: apúntala en una línea en
    `docs/COLA.md` («Lo que queda por hablar con Francisco») y sigue.
-3. Una fila son, como mucho, tres subidas a `main`: la marca EN CURSO (con las estimaciones), el
-   cambio con su documentación y `version.js`, y, tras comprobar la publicación, la marca HECHA.
-   No hagas subidas sueltas fichero a fichero.
+5. Una fila son, como mucho, tres subidas a `main` (cada subida puede ser la subida a tu rama y
+   su fusión inmediata, regla 2): la marca EN CURSO (con las estimaciones), el cambio con su
+   documentación y `version.js`, y, tras comprobar la publicación, la marca HECHA. No hagas
+   subidas sueltas fichero a fichero.
 
 **Pruebas: parciales mientras trabajas, completas una sola vez** (28-sep-2026, pedido por
 Francisco; manda sobre cualquier otra regla de la cola que pida más pasadas completas):
