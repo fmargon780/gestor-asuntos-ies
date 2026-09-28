@@ -201,7 +201,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 213 | `docs/BOTON-DE-SOPORTE.md` (botón «Soporte» en una esquina: error o mejora, texto y captura opcional; buzón en un script de Google que guarda el aviso en Drive y apunta una IDEA sin datos en la cola; más `docs/PONER-EN-MARCHA-SOPORTE.md` para Francisco) | PENDIENTE (28-sep-2026) |
 | 214 | El botón para levantar la vista de los documentos por clasificar no funciona. | IDEA (28-sep-2026): apuntada por Francisco desde el Centro de mando |
 | 204 | `docs/COMPROBACION-AL-ENTRAR.md`, entero, con `js/cabecera-fija.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 204) | PENDIENTE (27-sep-2026) |
-| 216 | Los filtros de la vista principal no están funcionando | IDEA (28-sep-2026): apuntada por Francisco desde el Centro de mando |
+| 216 | `docs/FILTROS-EN-TODAS-LAS-PESTANAS.md` (los cinco filtros de Inicio —Responsable, Situación, Plazo, Lo encarga y Tipo de asunto— valen en las cuatro pestañas, y el número de cada pestaña cuenta lo filtrado) | PENDIENTE (28-sep-2026) |
 | 217 | El envío del primer correo electrónico de hoy ha dado el siguiente mensaje de error: No he podido enviarlo: No he podido contactar con Google: Failed to fetch | IDEA (28-sep-2026): apuntada por Francisco desde el Centro de mando |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
