@@ -596,6 +596,9 @@ App.ir = function (cual) {
     b.classList.toggle('activa', b.dataset.pantalla === cual);
   });
   if (cual === 'abiertos' && App.pintarAbiertosSiPendiente) App.pintarAbiertosSiPendiente();
+  /* Fila 212, docs/INICIO-A-TODO-EL-ANCHO.md, apartado 4: los filtros
+     de Inicio empiezan siempre cerrados al entrar. */
+  if (cual === 'abiertos' && window.Vista && Vista.cerrarFiltros) Vista.cerrarFiltros();
   if (cual === 'nuevo') App.prepararNuevo();
   /* Fila 175, punto 3: el Archivo carga solo la primera vez de la
      sesión; las siguientes, la lista ya está en memoria. */
