@@ -245,7 +245,8 @@ real del contenido, no el de la ventana. Bajo unos 900px de zona de trabajo, el 
 cabecera de Inicio desde la fila 212) baja a su propia línea, debajo del resto de la cabecera
 (nunca se quita: `css/inicio.css`). El tope de 1180px de `css/estilos.css` se anula en
 `css/vista.css`; conservan tope propio Nuevo asunto (940px) y Ajustes (1600px). Los filtros
-(estado, plazo, órgano, tipo de asunto) van plegados en un panel que abre el botón "Filtros"
+(responsable, estado, plazo, órgano, tipo de asunto; los cinco valen en las cuatro pestañas desde
+la fila 216, docs/FILTROS-EN-TODAS-LAS-PESTANAS.md) van plegados en un panel que abre el botón "Filtros"
 («Filtros (N)» con alguno puesto); desde la fila 212 empieza siempre cerrado al entrar en Inicio,
 sin memoria en `localStorage` (antes, `gestor-filtros`).
 

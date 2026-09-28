@@ -171,6 +171,20 @@
     return ladoDelAsunto(entrada ? entrada.hitos : [], datos ? datos.ajustes : null);
   }
 
+  /* El hito actual de un asunto (aQuienLeToca), como el objeto completo
+     (con su `responsable`), no solo su id: lo usa el filtro
+     «Responsable» de Inicio en «Todos los abiertos» y «Dormidos» (fila
+     216, docs/FILTROS-EN-TODAS-LAS-PESTANAS.md), que no vienen ya con un
+     hito de QueMeToca.clasificar a mano. null sin hito actual. Para la
+     lista, sin ir al disco, igual que ladoDeAsunto. */
+  function hitoActualDeAsunto(a) {
+    var datos = Hitos.ultimosLeidos();
+    var entrada = datos && datos.porAsunto[a.nombre];
+    if (!entrada) return null;
+    var idActual = aQuienLeToca(entrada.hitos, datos.ajustes).hito;
+    return idActual ? Hitos.buscar(entrada.hitos, idActual) : null;
+  }
+
   /* Función pura (punto 7, «Estamos en este hito»): da por hechos todos
      los hitos visibles anteriores a `idHito` que sigan sin terminar, con
      `nota` en su historial, y deja `idHito` en curso. Las preguntas se
@@ -231,6 +245,7 @@
   Object.assign(Hitos, {
     esDeAdministracion: esDeAdministracion, aQuienLeToca: aQuienLeToca,
     ladoDelAsunto: ladoDelAsunto, ladoDeAsunto: ladoDeAsunto,
+    hitoActualDeAsunto: hitoActualDeAsunto,
     textoDelEstado: textoDelEstado, nombreDeEspera: nombreVisible,
     situarLista: situarLista, situarEn: situarEn, quitarEspera: quitarEspera,
     marcarAdministracion: marcarAdministracion, numerados: contables,

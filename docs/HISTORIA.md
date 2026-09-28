@@ -5,6 +5,39 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 28-sep-2026 — Fila 216: los filtros de Inicio valen en las cuatro pestañas
+
+`docs/FILTROS-EN-TODAS-LAS-PESTANAS.md`. Causa real: desde la fila 209 (pestañas), los cinco
+filtros de "Filtros" se repartían mal. `App.listaAbiertosFiltrada` (js/asuntos-lista-pintar.js)
+aplicaba Situación/Plazo/Lo encarga/Tipo de asunto, pero solo la pintaba "Todos los abiertos".
+`InicioTabla.calcular` (js/inicio-tabla.js) aplicaba Responsable, pero solo a "En
+Administración"/"En espera"; "Dormidos" no aplicaba ninguno. Y `js/vista.js` no contaba
+Responsable en "Filtros (N)".
+
+Arreglo: una sola función, `App.pasaFiltrosInicio(asunto, hito)` (js/asuntos-lista-pintar.js), con
+los cinco filtros; la usan tanto `App.listaAbiertosFiltrada` como `InicioTabla.calcular` (para
+"adm", "esp" y "dorm"). El filtro Responsable necesita el hito actual del asunto: en "En
+Administración"/"En espera" ya viene de `QueMeToca.clasificar`; en "Todos los abiertos" y
+"Dormidos" se calcula con una función nueva, `Hitos.hitoActualDeAsunto(a)` (js/hitos-a-quien.js),
+que reutiliza `Hitos.aQuienLeToca` + `Hitos.buscar` (ya usado igual en `js/estado-hito.js`) para
+dar el hito entero (con su `responsable`), no solo su id. Sin hito actual, el asunto no pasa si
+hay un responsable elegido. `js/vista.js` (`filtrosPuestos`) cuenta ya los cinco; el filtro
+Responsable repinta con `App.repintarLaPestanaActiva` (expuesta desde js/asuntos-lista-pintar.js),
+igual que los demás, en vez de con su `pintar()` propio; y "Limpiar todo"
+(js/usabilidad.js) también limpia Responsable, con su propia etiqueta en la barra de filtros
+puestos.
+
+Prueba nueva `pruebas/filtros-en-todas-las-pestanas.mjs`: cinco asuntos (dos en "En
+Administración", dos en "En espera", uno solo en "Dormidos", más uno de "En Administración" que
+también está dormido), comprobando los cinco filtros en las cuatro pestañas, "Filtros (N)" con
+Responsable y "Limpiar todo". Tuvo que apuntar a mano la marca de `EstadoMigracion`
+(`_GESTOR/estado-migrado.json`): sin ella, a los 3&nbsp;s de entrar crea sola hitos para el asunto
+sin hitos.json (a propósito, para probar "sin hito actual"), contaminando a mitad de la prueba
+"En Administración" y el filtro "Sin hitos" de "Dormidos" — nada que ver con esta fila, pero hizo
+falta para que la prueba no dependiera de cuánto tarda en correr.
+
+---
+
 ## 28-sep-2026 — Fila 221: el texto del margen ya no se come una fila de tutorías
 
 `docs/TUTORIAS-TEXTO-DEL-MARGEN.md`. Causa real, comprobada con el PDF de Pareja de Vicente, Rosa

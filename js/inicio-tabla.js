@@ -101,9 +101,10 @@
   /* ---------- el filtro «Responsable», dentro de «Filtros» ----------
 
      Vivía a la vista, encima de "Me toca" (js/inicio.js). Ahora es un
-     filtro más de #filtros-abiertos, y solo afecta a "En
-     Administración"/"En espera" (las dos pestañas que pasan por
-     QueMeToca.clasificar). */
+     filtro más de #filtros-abiertos, y vale en las cuatro pestañas
+     (fila 216, docs/FILTROS-EN-TODAS-LAS-PESTANAS.md): App.pasaFiltrosInicio
+     lo aplica también en "Todos los abiertos" y "Dormidos", con el hito
+     actual del asunto (Hitos.hitoActualDeAsunto). */
   function pintarFiltroResponsable(ajustes, hitosAbiertos) {
     var sel = $('inicio-me-toca-responsable');
     if (!sel) return;
@@ -117,9 +118,12 @@
     ).join('');
     sel.value = actual;
     if (sel.value !== actual) sel.value = '';   /* el guardado ya no existe */
+    /* Fila 216, punto 4: repinta la pestaña que está a la vista con el
+       mismo mecanismo que los demás filtros, no con un pintar() propio. */
     sel.onchange = function () {
       QueMeToca.guardarFiltroResponsable(this.value);
-      pintar();
+      if (window.App && App.repintarLaPestanaActiva) App.repintarLaPestanaActiva();
+      else pintar();
     };
   }
 
@@ -128,19 +132,17 @@
   async function calcular(texto) {
     var datos = await QueMeToca.reunir();
     var items = QueMeToca.unoPorAsunto(datos.items);
-    var filtroResp = QueMeToca.leerFiltroResponsable();
     var hitosAbiertos = items.map(function (it) { return it.hito; });   /* fila 205: para el filtro, antes de filtrar */
-    if (filtroResp) {
-      items = items.filter(function (it) {
-        return window.HitosAdministracion
-          ? HitosAdministracion.cuentaPara(it.hito.responsable, filtroResp, datos.ajustes)
-          : it.hito.responsable === filtroResp;
-      });
-    }
     items = items.filter(function (it) { return coincideAsunto(it.asunto, texto); });
+    /* Fila 216: los cinco filtros de "Filtros" (Responsable incluido),
+       los mismos que "Todos los abiertos", con el hito actual ya
+       conocido (App.pasaFiltrosInicio). */
+    items = items.filter(function (it) { return App.pasaFiltrosInicio(it.asunto, it.hito); });
 
     var g = QueMeToca.clasificar(items, datos.ajustes);
-    var dormidos = QueMeToca.reunirDormidos().filter(function (it) { return coincideAsunto(it.asunto, texto); });
+    var dormidos = QueMeToca.reunirDormidos()
+      .filter(function (it) { return coincideAsunto(it.asunto, texto); })
+      .filter(function (it) { return App.pasaFiltrosInicio(it.asunto); });
     return { ajustes: datos.ajustes, adm: g.tejado, esp: g.otros, dorm: dormidos, hitosAbiertos: hitosAbiertos };
   }
 

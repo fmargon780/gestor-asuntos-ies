@@ -202,6 +202,8 @@
     if (o && o.value) { o.value = ''; avisarDelCambio(o); }
     var t = $('filtro-tipo-asunto');
     if (t && t.value) { t.value = ''; avisarDelCambio(t); }
+    var r = $('inicio-me-toca-responsable');   /* fila 216 */
+    if (r && r.value) { r.value = ''; avisarDelCambio(r); }
     if (q && q.value) { q.value = ''; avisarDelCambio(q); }
   }
 
@@ -220,8 +222,9 @@
     var plazo = p ? p.value : '';
     var o = $('filtro-organo'), organo = o ? o.value : '';   /* fila 134 */
     var ti = $('filtro-tipo-asunto'), tipo = ti ? ti.value : '';   /* fila 192 */
+    var r = $('inicio-me-toca-responsable'), resp = r ? r.value : '';   /* fila 216 */
     barraFiltros.innerHTML = '';
-    if (!texto && !estado && !plazo && !organo && !tipo) { barraFiltros.classList.add('oculto'); return; }
+    if (!texto && !estado && !plazo && !organo && !tipo && !resp) { barraFiltros.classList.add('oculto'); return; }
     barraFiltros.classList.remove('oculto');
 
     if (texto) {
@@ -256,6 +259,13 @@
       barraFiltros.appendChild(etiqueta('Tipo: ' + textoDelPlazo(ti), function () {
         ti.value = '';
         avisarDelCambio(ti);
+      }));
+    }
+
+    if (resp) {
+      barraFiltros.appendChild(etiqueta('Responsable: ' + textoDelPlazo(r), function () {
+        r.value = '';
+        avisarDelCambio(r);
       }));
     }
 

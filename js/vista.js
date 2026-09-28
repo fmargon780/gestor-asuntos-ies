@@ -22,14 +22,15 @@
 
   /* ---------- 1. los filtros ---------- */
 
-  /* Los cuatro que cuenta "Filtros (N)" (fila 212, docs/INICIO-A-TODO-
-     EL-ANCHO.md, apartado 4): los mismos que ya avisaban con el punto
-     azul (#btn-filtros.tiene-filtros, css/vista.css). "Responsable"
-     (dentro del mismo panel) no entra en la cuenta: es un filtro de
-     "En Administración"/"En espera", no de la tabla en general. */
+  /* Los cinco que cuenta "Filtros (N)" (fila 212, docs/INICIO-A-TODO-
+     EL-ANCHO.md, apartado 4; Responsable sumado en la fila 216,
+     docs/FILTROS-EN-TODAS-LAS-PESTANAS.md): los mismos que avisan con el
+     punto azul (#btn-filtros.tiene-filtros, css/vista.css), y valen
+     igual en las cuatro pestañas. */
   function filtrosPuestos() {
     var e = $('filtro-estado'), p = $('filtro-plazo'), o = $('filtro-organo'), t = $('filtro-tipo-asunto');
-    return [e, p, o, t].filter(function (campo) { return campo && campo.value; }).length;
+    var r = $('inicio-me-toca-responsable');
+    return [e, p, o, t, r].filter(function (campo) { return campo && campo.value; }).length;
   }
 
   function pintarBotonFiltros() {
@@ -57,7 +58,7 @@
       pintarBotonFiltros();
     };
 
-    ['filtro-estado', 'filtro-plazo', 'filtro-organo', 'filtro-tipo-asunto'].forEach(function (id) {
+    ['filtro-estado', 'filtro-plazo', 'filtro-organo', 'filtro-tipo-asunto', 'inicio-me-toca-responsable'].forEach(function (id) {
       if ($(id)) $(id).addEventListener('change', pintarBotonFiltros);
     });
 

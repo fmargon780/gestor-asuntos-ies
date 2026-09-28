@@ -29,6 +29,37 @@ App.textoBusquedaSimple = function (a) {
   return U.normalizar([a.nombre, a.leido && a.leido.tipo, tercero].filter(Boolean).join(' '));
 };
 
+/* Los cinco filtros de "Filtros" en Inicio (Responsable, Situación,
+   Plazo, Lo encarga y Tipo de asunto), en un solo sitio (fila 216,
+   docs/FILTROS-EN-TODAS-LAS-PESTANAS.md): los usan tanto
+   App.listaAbiertosFiltrada ("Todos los abiertos") como
+   InicioTabla.calcular ("En Administración", "En espera" y "Dormidos").
+   `hito` es el hito actual del asunto si ya se conoce (el de
+   QueMeToca.clasificar, en "En Administración"/"En espera"); si no se
+   pasa, se calcula aquí (Hitos.hitoActualDeAsunto), pero solo si hace
+   falta para el filtro de Responsable, para que también valga en
+   "Todos los abiertos" y "Dormidos". Un asunto sin hito actual no pasa
+   si hay un responsable elegido. */
+App.pasaFiltrosInicio = function (a, hito) {
+  var filtro = $('filtro-estado').value;
+  var plazo = $('filtro-plazo').value;
+  var organo = $('filtro-organo') ? $('filtro-organo').value : '';   /* fila 134 */
+  var tipo = $('filtro-tipo-asunto') ? $('filtro-tipo-asunto').value : '';   /* fila 192 */
+  var resp = window.QueMeToca ? QueMeToca.leerFiltroResponsable() : '';
+
+  if (!Plazos.pasaFiltro(a.ficha.limite || '', plazo)) return false;
+  if (organo && window.TiposOrgano && !TiposOrgano.pasaFiltro(App.tipoDeAsunto(a), organo)) return false;
+  if (tipo && App.tipoDeAsunto(a) !== tipo) return false;
+  if (!App.pasaFiltroMonton(a, filtro)) return false;
+  if (resp) {
+    if (hito === undefined && window.Hitos && Hitos.hitoActualDeAsunto) hito = Hitos.hitoActualDeAsunto(a);
+    if (!hito || !window.HitosAdministracion) return false;
+    var ajustes = (window.Hitos && Hitos.ultimosLeidos && Hitos.ultimosLeidos()) ? Hitos.ultimosLeidos().ajustes : null;
+    if (!HitosAdministracion.cuentaPara(hito.responsable, resp, ajustes)) return false;
+  }
+  return true;
+};
+
 /* La lista de "Todos los abiertos", filtrada y SIN ordenar todavía
    (fila 209, docs/INICIO-EN-PESTANAS.md): la usa App.pintarAbiertos
    para pintar la pestaña, y js/inicio-tabla.js para el número de su
@@ -37,19 +68,12 @@ App.textoBusquedaSimple = function (a) {
    hay uno activo (js/inicio-tabla.js, InicioTabla.avisoActivo). */
 App.listaAbiertosFiltrada = function () {
   var texto = U.normalizar($('buscar-abiertos').value);
-  var filtro = $('filtro-estado').value;
-  var plazo = $('filtro-plazo').value;
-  var organo = $('filtro-organo') ? $('filtro-organo').value : '';   /* fila 134 */
-  var tipo = $('filtro-tipo-asunto') ? $('filtro-tipo-asunto').value : '';   /* fila 192 */
   var aviso = (window.InicioTabla && InicioTabla.avisoActivo) ? InicioTabla.avisoActivo() : null;
 
   return App.E.listaAbiertos.filter(function (a) {
     if (texto && App.textoBusquedaSimple(a).indexOf(texto) === -1) return false;
-    if (!Plazos.pasaFiltro(a.ficha.limite || '', plazo)) return false;
-    if (organo && window.TiposOrgano && !TiposOrgano.pasaFiltro(App.tipoDeAsunto(a), organo)) return false;
-    if (tipo && App.tipoDeAsunto(a) !== tipo) return false;
     if (aviso && !aviso.nombres.has(a.nombre)) return false;
-    return App.pasaFiltroMonton(a, filtro);
+    return App.pasaFiltrosInicio(a);
   });
 };
 
@@ -451,6 +475,9 @@ function repintarLaPestanaActiva() {
   if (window.InicioTabla) InicioTabla.pintar();
   else App.pintarAbiertos();
 }
+/* La usa también el filtro Responsable (js/inicio-tabla.js), que no
+   vive en este fichero: fila 216, punto 4. */
+App.repintarLaPestanaActiva = repintarLaPestanaActiva;
 
 $('buscar-abiertos').oninput = function () {
   repintarLaPestanaActiva();
