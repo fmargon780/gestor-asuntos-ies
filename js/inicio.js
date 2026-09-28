@@ -1,17 +1,20 @@
 /* ============================================================
-   inicio.js — la pantalla de Inicio (27-sep-2026, fila 209,
-   docs/INICIO-EN-PESTANAS.md; sustituye a la fila 191,
-   docs/INICIO-CUATRO-BLOQUES.md, en todo lo que decía distinto).
+   inicio.js — la pantalla de Inicio (28-sep-2026, fila 212,
+   docs/INICIO-A-TODO-EL-ANCHO.md; sobre la fila 209,
+   docs/INICIO-EN-PESTANAS.md, en todo lo que decía distinto).
 
-   Dos columnas: la izquierda, estrecha, con "Ha llegado" (aquí mismo,
-   compacto) y el tablón (js/tablon.js); la derecha, las pestañas y la
-   tabla única de Inicio (js/inicio-tabla.js, InicioTabla). Este
-   fichero se queda con:
+   Sin columna izquierda: las pestañas y la tabla única de Inicio
+   (js/inicio-tabla.js, InicioTabla) ocupan todo el ancho. "Ha
+   llegado" pasa a ser una sola línea, justo debajo de la cabecera,
+   junto al cuadro de avisos (js/avisos-linea.js); el tablón
+   (js/tablon.js) se va a la propia cabecera. Este fichero se queda
+   con:
 
      1. El buscador de la cabecera (para "Ha llegado"; InicioTabla y
         App.pintarAbiertos se buscan a sí mismos con el mismo campo).
-     2. "Ha llegado": los documentos sueltos y los correos de la
-        bandeja, juntos, en fila compacta.
+     2. "Ha llegado": «N correos · N documentos por clasificar», cada
+        trozo un enlace que abre «Ver todo» enseñando solo esa parte
+        (App.irVista('clasificar', 'correos'|'documentos')).
      3. El badge rojo de vencidos de la pestaña lateral "Inicio".
      4. El aviso de aspirantes sin Nº de identificación escolar, con
         la lista de asuntos que le corresponden (para que, al
@@ -22,14 +25,12 @@
 
    Los bloques "Me toca"/"Esperamos a otros" (fila 191) y los plegados
    "Dormidos"/"Sin fecha" (fila 192, js/inicio-plegados.js, borrado en
-   esta fila) pasan a ser pestañas de InicioTabla. Va penúltimo en
-   index.html (justo antes de js/inicio-tabla.js y de
-   js/envolturas-esperadas.js), para tener ya a mano todo lo que usa
-   (QueMeToca, Bandeja, BandejaPantalla, App.tarjetaSuelto…).
+   esa fila) son pestañas de InicioTabla. Va penúltimo en index.html
+   (justo antes de js/inicio-tabla.js y de js/envolturas-esperadas.js),
+   para tener ya a mano todo lo que usa (QueMeToca, Bandeja,
+   BandejaPantalla, App.tarjetaSuelto…).
    ============================================================ */
 (function () {
-
-  var TOPE_HA_LLEGADO = 6;
 
   function $(id) { return document.getElementById(id); }
 
@@ -59,82 +60,69 @@
   }
 
   /* ==========================================================
-     "HA LLEGADO": SUELTOS Y CORREOS, JUNTOS, COMPACTOS
+     "HA LLEGADO": UNA SOLA LÍNEA, CON DOS ENLACES (fila 212,
+     docs/INICIO-A-TODO-EL-ANCHO.md, apartado 2)
      ========================================================== */
 
-  async function reunirHaLlegado(texto) {
-    var sueltos = (App.E.sueltos || []).filter(function (s) {
-      return coincideTexto(texto, [s.nombre]);
-    });
-    var items = [];
-    for (var i = 0; i < sueltos.length; i++) {
-      var s = sueltos[i];
-      var fecha = await App.fechaDeSuelto(s);
-      items.push({ tipo: 'suelto', suelto: s, fecha: fecha });
-    }
-
+  function contarCorreos(texto) {
     var correos = window.Bandeja ? window.Bandeja.correos() : null;
-    if (Array.isArray(correos)) {
-      correos.filter(function (item) {
-        var d = item.datos;
-        return coincideTexto(texto, [d.asunto, d.de && (d.de.nombre || d.de.correo)]);
-      }).forEach(function (item) {
-        var d = item.datos;
-        var f = new Date(String(d.fecha || '') + 'T00:00:00');
-        items.push({ tipo: 'correo', item: item, fecha: isNaN(f.getTime()) ? null : f });
-      });
-    }
-
-    items.sort(function (a, b) {
-      var ta = a.fecha ? a.fecha.getTime() : 0;
-      var tb = b.fecha ? b.fecha.getTime() : 0;
-      return tb - ta;
-    });
-    return items;
+    if (!Array.isArray(correos)) return 0;
+    return correos.filter(function (item) {
+      var d = item.datos;
+      return coincideTexto(texto, [d.asunto, d.de && (d.de.nombre || d.de.correo)]);
+    }).length;
   }
 
-  /* Fila compacta (fila 209, apartado 3 de docs/INICIO-EN-PESTANAS.md):
-     el 4º parámetro `compacta` de App.tarjetaSuelto/BandejaPantalla.tarjeta
-     recorta a un par de acciones visibles + el menú ⋮, sin tocar el modo
-     normal de "Ver todo"/la bandeja a pantalla completa. */
-  function nodoDeHaLlegado(it) {
-    var nodo;
-    if (it.tipo === 'suelto') {
-      var s = it.suelto;
-      var pie = it.fecha ? 'Puesto ahí el ' + it.fecha.toLocaleDateString('es-ES') + ' a las ' +
-        String(it.fecha.getHours()).padStart(2, '0') + ':' + String(it.fecha.getMinutes()).padStart(2, '0') : '';
-      nodo = App.tarjetaSuelto(s, pie, !!App.E.reciales[s.nombre], true);
-    } else {
-      nodo = window.BandejaPantalla ? window.BandejaPantalla.tarjeta(it.item, true) : document.createElement('div');
-    }
-    nodo.classList.add('inicio-fila-compacta');
-    return nodo;
+  function contarSueltos(texto) {
+    return (App.E.sueltos || []).filter(function (s) {
+      return coincideTexto(texto, [s.nombre]);
+    }).length;
   }
 
-  async function pintarHaLlegado(texto) {
-    var caja = $('inicio-ha-llegado-lista');
+  function trozoHaLlegado(n, singular, plural, soloQue, resaltar) {
+    if (!n) return null;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'enlace inicio-ha-llegado-trozo' + (resaltar ? ' inicio-ha-llegado-nuevo' : '');
+    b.innerHTML = '<strong>' + n + ' ' + (n === 1 ? singular : plural) + '</strong>';
+    b.onclick = function () { App.irVista('clasificar', soloQue); };
+    return b;
+  }
+
+  function pintarHaLlegado(texto) {
+    var caja = $('inicio-ha-llegado-linea');
     if (!caja) return;
-    var items = await reunirHaLlegado(texto);
-    var n = items.length;
 
-    var cuenta = $('inicio-ha-llegado-n');
-    if (cuenta) cuenta.textContent = n ? String(n) : '';
-
-    /* El botón "Ver todo" reaprovechado (.panel[data-vista="clasificar"])
-       enseña el mismo número: sueltos + correos, coherente con "Ha
-       llegado". */
-    var cuentaClasificar = $('cuenta-clasificar');
-    if (cuentaClasificar) {
-      cuentaClasificar.textContent = String(n);
-      cuentaClasificar.classList.toggle('cuenta-ambar', n > 0);
-    }
+    var nCorreos = contarCorreos(texto);
+    var nSueltos = contarSueltos(texto);
+    var hayNuevos = Object.keys(App.E.reciales || {}).length > 0;
 
     caja.innerHTML = '';
-    if (!n) {
-      caja.innerHTML = '<div class="vacio">No ha llegado nada nuevo.</div>';
+    if (!nCorreos && !nSueltos) {
+      caja.innerHTML = '<span class="inicio-ha-llegado-vacio">No ha llegado nada.</span>';
+      /* Si #zona-clasificar está a la vista con un filtro puesto (se ha
+         llegado desde uno de los dos enlaces y, mientras tanto, ha
+         dejado de haber nada de esa clase), se pone al día. */
+      if (App.pintarSoloQueClasificar) App.pintarSoloQueClasificar();
       return;
     }
-    items.slice(0, TOPE_HA_LLEGADO).forEach(function (it) { caja.appendChild(nodoDeHaLlegado(it)); });
+
+    var etiqueta = document.createElement('span');
+    etiqueta.className = 'inicio-ha-llegado-etiqueta';
+    etiqueta.textContent = 'Ha llegado: ';
+    caja.appendChild(etiqueta);
+
+    var trozos = [
+      trozoHaLlegado(nCorreos, 'correo', 'correos', 'correos', false),
+      trozoHaLlegado(nSueltos, 'documento por clasificar', 'documentos por clasificar', 'documentos', hayNuevos)
+    ].filter(Boolean);
+
+    trozos.forEach(function (trozo, i) {
+      if (i) caja.appendChild(document.createTextNode(' · '));
+      caja.appendChild(trozo);
+    });
+
+    if (App.pintarSoloQueClasificar) App.pintarSoloQueClasificar();
   }
 
   /* ==========================================================
@@ -186,7 +174,7 @@
 
   async function repintarTodo() {
     if (repintando) return;
-    if (!$('inicio-lado') || !window.QueMeToca) return;
+    if (!$('inicio-ha-llegado-linea') || !window.QueMeToca) return;
     repintando = true;
     try {
       var esteTurno = ++turno;
