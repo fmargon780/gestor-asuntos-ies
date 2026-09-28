@@ -16,6 +16,7 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 | 213 | 60 | `docs/BOTON-DE-SOPORTE.md`: botón y ventana nuevos con captura pegada, campo en Ajustes, script de Google nuevo (`apps-script/soporte.gs`) que escribe en Drive y en la cola de GitHub, guía de puesta en marcha y pruebas de los dos lados |
 | 214 | 25 | `docs/HA-LLEGADO-A-LA-VISTA.md`: arreglo pequeño en `App.irVista` y `css/inicio.css` (esconder la tabla mientras se ve «Ver todo» y subir la pantalla), más su prueba con una tabla larga |
 | 215 | 35 | `docs/NUEVO-ASUNTO-CATEGORIA-GUIA.md`: ajustes en el formulario de Nuevo asunto ya hecho (filtro de tipos por la pastilla, 8 más usados + «Ver todos», botón siempre visible con lo que falta) y poner al día sus pruebas |
+| 217 | 30 | `docs/CORREO-OTRA-CUENTA-ABIERTA.md`: solo `js/correo-enviar.js` (aviso nuevo y un segundo intento con la forma general de la dirección) y sus pruebas en `pruebas/correo-enviar.mjs` |
 |---|---|---|
 | 203 | 45 | `docs/PAPELERA-SE-VACIA-SOLA.md`: borrado automático a los 90 días con aviso a los 7, fichero nuevo de constancia (`papelera-borrados.json`) y cuidado de que dos ordenadores no se pisen |
 | 204 | 70 | `docs/COMPROBACION-AL-ENTRAR.md`: siete comprobaciones distintas, un panel nuevo, marca en la cabecera, «Arreglarlo» que lleva a cada sitio exacto y `localStorage` de lo omitido; la fila más grande de las que quedan |
