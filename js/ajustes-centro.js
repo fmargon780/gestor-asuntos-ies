@@ -157,7 +157,7 @@ $('btn-anadir-tipo-doc').onclick = async function () {
   U.aviso('Tipo de documento añadido.', 'bueno');
 };
 
-/* ---------- el bloque de Campos propios
+/* ---------- el bloque de Campos propios ----------
 
    Fila 198, apartado 5, docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md: los
    campos propios se crean y se borran desde dentro de cada tipo ("+
