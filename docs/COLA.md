@@ -237,21 +237,16 @@ abierto en ellas:
 
 ## Lo que queda por hablar con Francisco (no son filas de la cola)
 
-- **De la fila 222 (28-sep-2026), hecho después con la herramienta de Vercel** (en la primera
-  pasada esta sesión no la veía; en una sesión posterior, sin pasar `teamId`, sí): dominio
+- **Cerrado (28-sep-2026): la fila 222 ya no tiene nada pendiente.** Dominio
   `pruebas.fmargon.com` asignado al proyecto `gestor-de-asuntos`, a la rama `pruebas`
-  (`add_project_domain`, `verified: true`, el DNS de `fmargon.com` ya está en Vercel). El proyecto
-  ya tenía `ssoProtection.deploymentType: "all_except_custom_domains"` (la protección de Vercel
-  Authentication no se ha tocado, y no hacía falta): con eso, un dominio propio como este queda
-  FUERA de esa protección, así que `https://pruebas.fmargon.com` no debería pedir cuenta de
-  Vercel (solo la sigue pidiendo la dirección `.vercel.app` de la *preview*,
-  `gestor-de-asuntos-git-pruebas-fmargon780s-projects.vercel.app`, que no es un dominio propio).
-  **Sin comprobar por `curl`**: la política de red de este entorno en la nube deniega las
-  conexiones salientes a `pruebas.fmargon.com` (no está en su lista de dominios permitidos; sí
-  lo está `*.vercel.app`), así que ni siquiera llega a intentarlo contra Vercel. Pide a Francisco
-  que entre él mismo en `https://pruebas.fmargon.com` y diga si le pide iniciar sesión; si una
-  sesión futura necesita comprobarlo por su cuenta, hay que añadir `fmargon.com` a los dominios
-  permitidos del entorno (menú del entorno en la barra de título → Edit → Acceso a la red).
+  (`add_project_domain`, `verified: true`). La protección de Vercel Authentication no hizo falta
+  tocarla (`ssoProtection.deploymentType: "all_except_custom_domains"` ya excluye los dominios
+  propios): confirmado por Francisco que `https://pruebas.fmargon.com` entra directo, sin pedir
+  iniciar sesión. Nota para sesiones futuras: esta sesión no pudo comprobarlo por `curl` porque la
+  política de red del entorno no deja salir a `pruebas.fmargon.com` (sí a `*.vercel.app`); si hace
+  falta comprobarlo por herramienta en vez de preguntarle a Francisco, hay que añadir
+  `fmargon.com` a los dominios permitidos del entorno (menú del entorno en la barra de título →
+  Edit → Acceso a la red).
 - **El tope diario de despliegues de Vercel es de toda la cuenta, no de este proyecto** (28-sep-2026,
   fila 211, `docs/PUBLICAR-SIN-PARAR.md`). Comprobado con `list_deployments`: el 28-sep-2026, en la
   misma franja horaria, `gestor-de-asuntos` tuvo 28 despliegues y el proyecto `partituras-de-caja-clara`
