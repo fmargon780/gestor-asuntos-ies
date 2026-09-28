@@ -19,6 +19,17 @@ que cada fila tarde menos; manda sobre cualquier otra regla de la cola que diga 
    cambio con su documentación y `version.js`, y, tras comprobar la publicación, la marca HECHA.
    No hagas subidas sueltas fichero a fichero.
 
+**Pruebas: parciales mientras trabajas, completas una sola vez** (28-sep-2026, pedido por
+Francisco; manda sobre cualquier otra regla de la cola que pida más pasadas completas):
+
+1. Mientras programas, pasa solo las pruebas de lo que tocas: `npm test -- <palabra> [<palabra>…]`
+   (el ejecutor lanza las que llevan esas palabras en el nombre), más las pruebas nuevas de la fila.
+2. La pasada completa (`npm test` sin palabras) se hace **una sola vez**, justo antes de la subida
+   del cambio. Si sale en verde, se sube; no se repite «para confirmar».
+3. Si en esa pasada falla una prueba: arréglalo y repite **solo esa prueba y las de lo que hayas
+   vuelto a tocar**, no las 170. Si la que falla no tiene nada que ver con tu cambio y en solitario
+   pasa, es de las de tiempos finos: añádela a `EN_SOLITARIO` y sigue, sin investigarla más.
+
 **Estimación de tiempo** (28-sep-2026, pedida por Francisco): en la misma subida que marca una fila
 EN CURSO, y ya leída su instrucción y el código que toca, pon al día `docs/ESTIMACIONES.md`: una
 línea por cada fila que queda (la EN CURSO y todas las PENDIENTE), con los minutos que calculas
