@@ -59,6 +59,60 @@ guía (se esconde solo aquí) y el menú «Hito ▾». Puestas al día `pruebas/
 desde el «⋮» de la tarea, en vez del enlace suelto de antes). `npm test` completo (189 ficheros) en
 verde.
 
+**El revisor (`docs/REVISOR-ANTES-DE-PUBLICAR.md`), dos pasadas.** Primera, RECHAZADA: el punto 6
+de la lista pedía que «Crear» (menú «Hito ▾») empezara por un buscador de la biblioteca de hitos
+(sección 3 del propio encargo), y esta sesión no lo había construido, solo el resto de la fila.
+Informe completo:
+
+```
+RECHAZADA
+1. Abrir un asunto con datos de demostración, abrir la mesa de un hito sin tareas: bajo «Tareas del
+   hito» no hay ninguna frase ni enlace, solo la caja «Nueva tarea… (escribe y pulsa Intro)». —
+   BIEN: en el CERTIFICADO de Espejo Montes, Carla, hito 1 "Preparar el certificado", bajo "TAREAS
+   DEL HITO" solo se ve la barra "0 de 0" y la caja "Nueva tarea… (escribe y pulsa Intro)".
+2. Escribir «Revisar DNI o NIE» y pulsar Intro… — BIEN: tras Intro la tarea aparece con la etiqueta
+   "solo aquí", la caja queda vacía y con el foco; en el otro CERTIFICADO del mismo hito (Herrera
+   Lozano, Diego) la tarea no aparecía (0 de 0).
+3. En esa tarea, «⋮» → «Pasar a la guía» y confirmar… — BIEN: al confirmar la etiqueta "solo aquí"
+   desaparece, y en el otro asunto la tarea ya aparece sin etiqueta.
+4. En una tarea de la guía, pulsar «⋮»… — BIEN: el menú muestra exactamente Anotar/Cambiar
+   aquí/Cambiar en la guía/Borrar; tras «Cambiar aquí» el texto cambió solo en un asunto.
+5. En una tarea, pulsar «⋮» → «Anotar»… — BIEN: 💬 con la nota visible, y la misma línea en la
+   tarjeta "NOTAS E HISTORIA".
+6. Pulsar «Hito ▾»… Pulsar «Crear» y escribir parte del título de un hito de la biblioteca: sale
+   debajo para elegirlo. — MAL: «Crear», «Cambiar» y «Borrar» arriba, correcto; pero escribiendo
+   «Firma» o «Visto bueno» (hitos que sí existen en la biblioteca del centro) en el campo Título
+   del cuadro «Crear un hito» no sale ninguna sugerencia debajo: ni visualmente ni en el DOM,
+   comprobado esperando hasta 2,5 s.
+a/b/c — BIEN.
+```
+
+Arreglado (solo eso, sección 3 del encargo): «Crear» pasa a empezar por «Título, o busca en la
+biblioteca» (`js/hitos-desde-el-asunto.js`); al escribir, `HitosBiblioteca.leer()` se filtra por
+todas las palabras sueltas del título (como `js/plantilla-buscar.js`, «Buscar otra plantilla…») y
+los que casan salen debajo, hasta 8; elegir uno pone su título en la caja y, al crear, usa
+`HitosBiblioteca.modeloAPaso(modelo)` entero (guion, responsable, plazo, normativa… incluidos) en
+vez del hito en blanco de siempre — lo mismo que hace «Usarlo» en el editor de la guía de Ajustes
+(`js/guias-paso-bloques.js`), aquí para la mesa. Un modelo de la biblioteca siempre entra también
+en la guía (no tiene sentido «solo aquí»): la casilla «También en la guía» no se mira si se ha
+elegido uno. Prueba nueva («E») en `pruebas/hitos-desde-el-asunto.mjs`, con una biblioteca de
+mentira (`hitos-biblioteca.json`) de un solo modelo.
+
+Segunda pasada del revisor, desde cero (sin contarle qué se había arreglado): **APROBADA** (6
+puntos, 0 solo Francisco). El punto 6 esta vez: «al pulsar "Crear" y escribir "Firma" en "Título, o
+busca en la biblioteca", sale debajo la sugerencia "Firma de Secretaría"». Los demás puntos,
+repetidos con otro asunto (Aguilar Ponce, Pablo), igual de bien. El revisor anotó, por su cuenta,
+que en un momento usó `grep` sobre el código fuente para localizar un selector, se dio cuenta y
+dejó de hacerlo antes de que influyera en ningún veredicto: todas las comprobaciones, hechas solo
+con el navegador.
+
+**Publicación**: fusionado en `main` (`15f23af`, tras nivelar con la fila 227 y las estimaciones que
+Francisco había tocado mientras tanto). Vercel no llegó a publicar el commit por sí solo; el único
+`create_deployment` a mano de esta sesión respondió 402 «Resource is limited» (tope diario de toda
+la cuenta agotado, no de este proyecto: `docs/PUBLICAR-SIN-PARAR.md`). Sin reintentar, la fila queda
+**SIN PUBLICACIÓN COMPROBADA**: el siguiente lanzamiento la cierra en cuanto la web sirva la
+`App.VERSION` de este commit.
+
 ## 28-sep-2026 — Fila 225: aviso «esperando tu respuesta», y un revisor sin pantalla que mirar
 
 `scripts/aviso-esperando.sh` (hooks de `.claude/settings.json`, ya puestos por la fila 224 desde
