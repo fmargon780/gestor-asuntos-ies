@@ -6,6 +6,11 @@ para ir tachando.
 
 ---
 
+- [ ] **Comprobación al entrar, con lo de verdad (fila 204, `docs/COMPROBACION-AL-ENTRAR.md`).**
+      (1) Con las carpetas de Dropbox y la bandeja de verdad: quitar el permiso de la carpeta de la
+      bandeja en Chrome y recargar; al entrar, la bandeja sale en «Falta» y «Arreglarlo» lleva al
+      bloque de la bandeja en Ajustes › Mantenimiento. (2) En la copia sin internet
+      (`ABRIR EL GESTOR.html`) aparece la fila «Copia sin internet al día»; en la web, no.
 - [ ] **La ruta copiada por el botón «Ruta», en el ordenador del instituto (fila 227,
       `docs/RUTA-NORMAL-DE-WINDOWS.md`).** Pulsar «Ruta» en la ficha de un asunto (o en el cuadro
       de Correo o de Séneca) y pegar lo copiado en la barra del explorador de archivos de Windows,
