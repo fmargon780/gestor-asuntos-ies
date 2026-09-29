@@ -333,21 +333,21 @@ await comprobar('el archivo no tiene ningún botón Borrar',
   pagina.locator('#lista-archivo').getByRole('button', { name: 'Borrar' }).count(), 0);
 
 /* ================================================================
-   10. La papelera no se vacía sola.
+   10. Lo de hace 85 días sigue (90 de plazo) y avisa (fila 203).
    ================================================================ */
-console.log('--- 10. la papelera no se vacía sola ---');
+console.log('--- 10. lo de hace 85 días sigue y avisa ---');
 
 await pagina.evaluate(async () => {
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
   const h = await g.getFileHandle('papelera.json');
   const j = JSON.parse(await (await h.getFile()).text());
-  const hace60dias = new Date(Date.now() - 60 * 86400000).toISOString();
+  const hace85dias = new Date(Date.now() - 85 * 86400000).toISOString();
   j.fichas.push({
     id: 'vieja1', clase: 'nota-tablon', nombre: 'una nota de hace tiempo', carpeta: null,
     origen: null, datos: { id: 'x', texto: 'una nota de hace tiempo', color: 'amarillo',
-      autor: 'Francisco', creado: hace60dias, para: '', privada: false, hecha: false,
+      autor: 'Francisco', creado: hace85dias, para: '', privada: false, hecha: false,
       hechaPor: '', hechaEl: '' },
-    quien: 'Francisco', cuando: hace60dias
+    quien: 'Francisco', cuando: hace85dias
   });
   await (await h.createWritable()).write(JSON.stringify(j));
 });
@@ -355,10 +355,12 @@ await pagina.click('.pestana[data-pantalla="herramientas"]');
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 await pagina.click('.pestana[data-pantalla="herramientas"]');
 await pagina.waitForSelector('#tabla-papelera .fila-papelera');
-await comprobar('la ficha de hace 60 días sigue en la papelera',
+await comprobar('la ficha de hace 85 días sigue en la papelera',
   pagina.locator('#tabla-papelera .fila-papelera').filter({ hasText: 'una nota de hace tiempo' }).count(), 1);
-await comprobar('el aviso de más de 30 días sale',
-  pagina.locator('#aviso-papelera-vieja').isHidden(), false);
+await comprobar('la fila dice cuándo se borra, en rojo (le quedan 5 días)',
+  pagina.locator('#tabla-papelera .fila-papelera').filter({ hasText: 'una nota de hace tiempo' }).locator('.papelera-se-borra-pronto').count(), 1);
+await comprobar('y ya no sale el aviso de «más de 30 días»',
+  pagina.locator('#aviso-papelera-vieja').isHidden(), true);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

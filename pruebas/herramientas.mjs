@@ -54,16 +54,16 @@ await pagina.evaluate(async () => {
     await d.removeEntry('RegAlum.csv');
   } catch (e) { /* ya no estaba, mejor todavía */ }
 
-  const hace60dias = new Date(Date.now() - 60 * 86400000).toISOString();
+  const hace85dias = new Date(Date.now() - 85 * 86400000).toISOString();
   const h = await g.getFileHandle('papelera.json', { create: true });
   await (await h.createWritable()).write(JSON.stringify({
     fichas: [{
       id: 'vieja1', clase: 'nota-tablon', nombre: 'Nota vieja para probar el aviso', carpeta: null,
       origen: null, datos: {
         id: 'vieja1', texto: 'Nota vieja para probar el aviso', color: 'amarillo',
-        autor: 'Francisco', creado: hace60dias, para: '', privada: false, hecha: false, hechaPor: '', hechaEl: ''
+        autor: 'Francisco', creado: hace85dias, para: '', privada: false, hecha: false, hechaPor: '', hechaEl: ''
       },
-      quien: 'Francisco', cuando: hace60dias
+      quien: 'Francisco', cuando: hace85dias
     }]
   }));
 });
