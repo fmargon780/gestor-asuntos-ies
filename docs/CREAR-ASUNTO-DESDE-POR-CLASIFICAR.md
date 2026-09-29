@@ -17,6 +17,18 @@ Captura del caso: una factura, `AmazonBusiness_Invoice_ES61X3IQIAEUD.pdf`, con e
 «Este asunto se crea con un documento» arriba (recorte en el Centro de mando,
 `c602051bf31a715f910e9c1add9d7853`).
 
+### Cómo se reproduce (lo ha encontrado Francisco, 29-sep-2026)
+
+- Recién entrado en la aplicación, «Crear asunto con él» **funciona bien**.
+- Si pulsa **«Cancelar»** en «Nuevo asunto» y vuelve a pulsar «Crear asunto con él», el
+  formulario **ya sale sin** categoría, buscador ni parrilla.
+- Si sale de la aplicación y vuelve a entrar, funciona otra vez; tras cancelar, vuelve a fallar.
+
+Es decir: **lo que deja «Cancelar» estropea la siguiente entrada**. Empezar por ahí: qué hace
+«Cancelar» (el de abajo y el de arriba a la derecha) con el estado del formulario, qué esconde o
+quita que `App.prepararNuevo` no vuelve a poner, y si la fila 220 lo dejó cubierto solo para
+otras entradas. Mirar también «← Volver», que puede tener el mismo fallo.
+
 ## Lo que tiene que pasar (decidido con Francisco)
 
 - Desde un documento de «Por clasificar», «Nuevo asunto» sale **siempre completo**, igual que
@@ -66,8 +78,9 @@ Captura del caso: una factura, `AmazonBusiness_Invoice_ES61X3IQIAEUD.pdf`, con e
    con el buscador.
 3. En un documento con persona y tipo reconocidos: el asunto se crea o el formulario sale con los
    dos elegidos; en ningún caso sale sin buscador ni parrilla.
-4. Pulsar «Crear asunto con él» en un documento, volver con «Cancelar» y repetir con otro
-   documento distinto, cinco veces seguidas: siempre sale completo.
+4. Pulsar «Crear asunto con él» en un documento, salir con «Cancelar» y volver a pulsarlo, en el
+   mismo documento y en otro distinto, cinco veces seguidas, sin recargar la página: siempre sale
+   completo. Lo mismo saliendo con «← Volver» y con el «Cancelar» de arriba a la derecha.
 5. Elegir persona y tipo y pulsar «Crear el asunto»: se crea la carpeta, el documento queda dentro
    y se abre el cuadro para ponerle nombre.
 6. «+ Nuevo asunto» de la barra sigue saliendo completo y vacío, como antes.
