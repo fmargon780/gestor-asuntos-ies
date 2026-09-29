@@ -272,6 +272,8 @@ de `App` va después del fichero que lo define.
 | `js/papelera.js` | Borrar con papelera: mandar (también un asunto del ARCHIVO, `mandarArchivado`, fila 136), devolver, borrar del todo y el bloque de Ajustes |
 | `js/papelera-ajustes.js` | El bloque «Papelera»: cuánto ocupa, cuánto hace, cada fila y sus botones (fila 133, sacado de `js/papelera.js`); el bloque vive ahora en la pestaña "Herramientas", no en Ajustes → Mantenimiento (fila 200) |
 | `js/papelera-devolver.js` | Devolver a su sitio lo que está en la papelera, y borrarlo del todo (fila 133, sacado de `js/papelera.js`) |
+| `js/papelera-vaciado.js` | La papelera se vacía sola (fila 203): plazos, aviso, vaciado diario, constancia en `papelera-borrados.json` y «Borrados del todo» |
+| `pruebas/papelera-vaciado.mjs` | Prueba (sin navegador, fila 203): plazos, aviso, vaciado, dos ordenadores, borrado que falla, constancia |
 | `css/papelera.css` | El bloque de la papelera en Ajustes, y su icono por clase |
 | `js/hitos-ajustes.js` | El bloque "Hitos" de Ajustes: responsables (con su marca "Administración", fila 104) y días no lectivos |
 | `js/hitos-a-quien.js` | El estado del asunto es su hito actual (filas 104 y 129): `Hitos.esDeAdministracion`, `Hitos.aQuienLeToca`, `Hitos.ladoDelAsunto`, `Hitos.textoDelEstado`, `Hitos.situarEn` y el repintado de la lista cuando un asunto cambia de montón o de paso |
