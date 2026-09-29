@@ -11,6 +11,7 @@ revisor: los minutos de abajo cuentan la fila entera, revisor incluido (uno o do
 
 | Nº | Minutos | Motivo |
 |---|---|---|
+| 231 | 45 | `docs/CREAR-ASUNTO-DESDE-POR-CLASIFICAR.md`: reproducir con varios documentos sueltos, encontrar por qué «Nuevo asunto» sale sin buscador ni parrilla, arreglarlo en `js/documentos-sueltos.js` o `App.prepararNuevo`, y ampliar la prueba de la fila 220 |
 | 226 | 90 | `docs/COLA-POR-DEBAJO-DE-40-KB.md`: sacar de la tabla lo HECHA/DESCARTADA/SUSTITUIDA (salvo lo de hoy/ayer) a `docs/HISTORIA.md`, resumir las notas largas de abajo, y dejar la norma de mantenerla por debajo de 40 KB; solo documentación, sin publicar |
 | 203 | 55 | `docs/PAPELERA-SE-VACIA-SOLA.md`: borrado automático a los 90 días con aviso a los 7, fichero nuevo de constancia (`papelera-borrados.json`) y cuidado de que dos ordenadores no se pisen |
 | 213 | 70 | `docs/BOTON-DE-SOPORTE.md`: botón y ventana nuevos con captura pegada, campo en Ajustes, script de Google nuevo (`apps-script/soporte.gs`) que escribe en Drive y en la cola de GitHub, guía de puesta en marcha y pruebas de los dos lados |
