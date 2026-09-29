@@ -41,6 +41,25 @@ mano, deja la descripción intacta y la persona nueva elegida, y «Nuevo asunto�
 y sin relación, en `EN_SOLITARIO`: falla también en solitario, siempre en el mismo paso de altura
 de scroll de tiempos finos). Prueba nueva `pruebas/tercero-con-buscador-al-cambiar.mjs`.
 
+**El revisor: APROBADA, con un NO COMPROBADO por la propia demo.** El agente aparte no pudo entrar
+en `pruebas.fmargon.com` (403 del proxy de salida de esta sesión) ni en la *preview* de la rama
+(Vercel no llegó a publicarla: el tope diario de despliegues, de toda la cuenta, estaba agotado por
+otro proyecto de Francisco —`normativa-escolarizacion`— que publicó unas diez veces en la hora
+anterior; `create_deployment` a mano respondió 402), así que entró contra un servidor local con el
+código exacto de `pruebas` (mismo commit), como ya pasó en las filas 214 y 227. Informe: APROBADA
+(6 puntos, 0 solo Francisco). El punto 6 (el selector de departamento con un organismo de
+Administraciones) salió NO COMPROBADO porque los datos de demostración (`js/demo/datos.js`, fila
+222) no traen ningún organismo dado de alta — no es un `[SOLO FRANCISCO]` de verdad, solo un hueco
+de esos datos; queda comprobado en su lugar por `pruebas/tercero-con-buscador-al-cambiar.mjs`
+(sección 6, con un organismo y su departamento de verdad, en verde). Conviene que una fila futura
+añada un organismo de Administraciones a los datos de demostración, para que el revisor pueda
+probar este punto sin depender de otra prueba.
+
+Fusionado en `main` (`fb82a2b`, tras fusionar de paso dos ideas nuevas de Francisco —228 y 229—
+sin tocarlas). Por el mismo tope de cuenta, Vercel tampoco ha lanzado ningún despliegue para estos
+commits de `main`: la fila queda **SIN PUBLICACIÓN COMPROBADA**, no HECHA, hasta que un lanzamiento
+futuro lo compruebe (regla 2 de la publicación general de `CLAUDE.md`).
+
 ---
 
 ## 29-sep-2026 — Fila 224: tareas del hito, sin texto de sobra
