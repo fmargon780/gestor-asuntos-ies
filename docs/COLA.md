@@ -235,6 +235,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 213 | `docs/BOTON-DE-SOPORTE.md` (botón «Soporte» en una esquina: error o mejora, texto y captura opcional; buzón en un script de Google que guarda el aviso en Drive y apunta una IDEA sin datos en la cola; más `docs/PONER-EN-MARCHA-SOPORTE.md` para Francisco) | PENDIENTE (28-sep-2026) |
 | 204 | `docs/COMPROBACION-AL-ENTRAR.md`, entero, con `js/cabecera-fija.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 204) | PENDIENTE (27-sep-2026) |
 | 217 | `docs/CORREO-OTRA-CUENTA-ABIERTA.md` (enviar correo con otra cuenta de Google abierta en el navegador: aviso claro en vez de «Failed to fetch» y, si Google lo deja, que el envío funcione igual usando la forma general de la dirección del script) | PENDIENTE (28-sep-2026) |
+| 228 | El botón Cambiar del menú Hito no modifica se previamente se ha escrito en su descripción. [recorte: https://claude.ai/artifact/7pDUJyXkUbPwuccZRx6J7E · 770511d544b41e6484d15e64fc5e042b] | IDEA (29-sep-2026): apuntada por Francisco desde el Centro de mando |
 
 **Compactado el 25-sep-2026.** Las notas largas de las filas HECHAS (63, 76 y de la 104 a la 146)
 salieron de aquí: están todas en `docs/HISTORIA.md` y en el historial de git. Lo que quedaba
