@@ -125,12 +125,18 @@
      docs/REPINTAR-SOLO-LO-QUE-CAMBIA.md). */
   var CADA_MS_PAPELERA = 10 * 60 * 1000;
   var ultimaPapelera = 0;
+  var ultimaPapeleraN = 0;
+  /* Fila 203: si la última vez no había nada que avisar, se vuelve a mirar
+     enseguida (pudo llegar algo justo después: la primera vista es previa
+     a que se cargue todo); con algo apuntado, cada diez minutos. */
+  var CADA_MS_PAPELERA_VACIA = 5 * 1000;
 
   async function pintarPapeleraVieja() {
     if (!window.AvisosLinea) return;
-    if (ultimaPapelera && Date.now() - ultimaPapelera < CADA_MS_PAPELERA) return;
+    if (ultimaPapelera && Date.now() - ultimaPapelera < (ultimaPapeleraN ? CADA_MS_PAPELERA : CADA_MS_PAPELERA_VACIA)) return;
     ultimaPapelera = Date.now();
     var r = await calcularPorBorrar();
+    ultimaPapeleraN = r.n;
     var texto = '';
     if (r.n) {
       texto = r.n + (r.n === 1 ? ' cosa se borrará' : ' cosas se borrarán') + ' del todo el ' +
@@ -159,6 +165,12 @@
   window.AvisosQueFaltan = {
     /* para las pruebas */
     _calcularHuerfanas: calcularHuerfanas,
+    /* Fila 203: repinta ya el aviso de la papelera (tras devolver, borrar o
+       vaciar), sin esperar al plazo entre vistazos. */
+    repintarPapelera: function () {
+      ultimaPapelera = 0;
+      return pintarPapeleraVieja().catch(function () { /* un aviso roto no tumba nada */ });
+    },
     _calcularPorBorrar: calcularPorBorrar,
     _bytesLegibles: bytesLegibles,
     _sePintaHuerfanas: sePintaHuerfanas

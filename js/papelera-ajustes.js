@@ -264,6 +264,7 @@
       if (!ok) return;
       try {
         await I.borrarDelTodo(ficha);
+        if (window.AvisosQueFaltan) AvisosQueFaltan.repintarPapelera();
         U.aviso('Borrado del todo.', 'bueno');
         App.pintarPapelera();
       } catch (e) {
@@ -278,6 +279,7 @@
   async function pulsarDevolver(ficha) {
     var r = await I.devolver(ficha);
     if (r.ok) {
+      if (window.AvisosQueFaltan) AvisosQueFaltan.repintarPapelera();
       App.pintarPapelera();
       if (typeof App.verAbiertos === 'function') { try { await App.verAbiertos(); } catch (e) {} }
       /* Fila 119: un asunto devuelto, con «Ir al asunto» (ya con la lista al día). */

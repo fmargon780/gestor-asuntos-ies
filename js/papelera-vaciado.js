@@ -187,6 +187,7 @@
     ultimoVaciado = hoy;
     var r = await vaciarLoVencido();
     if (r.borradas) {
+      if (window.AvisosQueFaltan) AvisosQueFaltan.repintarPapelera();
       U.aviso(r.borradas + (r.borradas === 1 ? ' cosa' : ' cosas') + ' de la papelera se ha borrado del todo ' +
         '(llevaba más de ' + diasPapelera() + ' días).', 'bueno');
       if (typeof App.pintarPapelera === 'function') { try { App.pintarPapelera(); } catch (e) { /* idem */ } }

@@ -284,6 +284,7 @@
     /* Lo de hace 95 días ya toca borrarlo: se hace ahora, como haría el
        vaciado al entrar, para que el registro de lo borrado tenga algo. */
     if (Papelera.vaciarLoVencido) await Papelera.vaciarLoVencido();
+    if (window.AvisosQueFaltan) await AvisosQueFaltan.repintarPapelera();
   }
 
   /* ---------- documentos por clasificar ---------- */
