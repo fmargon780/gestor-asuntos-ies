@@ -71,7 +71,10 @@ fs.writeFileSync(path.join(repo, 'docs/COLA.md'), [
   '| 203 | otra fila | PENDIENTE (27-sep-2026) |',
   '',
 ].join('\n'));
-git(['add', 'docs/COLA.md'], repo);
+fs.writeFileSync(path.join(repo, 'vercel.json'), JSON.stringify({ git: { deploymentEnabled: { avisos: false } } }));
+fs.mkdirSync(path.join(repo, 'scripts'));
+fs.writeFileSync(path.join(repo, 'scripts/vercel-ignore-build.sh'), '#!/bin/bash\nexit 0\n');
+git(['add', 'docs/COLA.md', 'vercel.json', 'scripts/vercel-ignore-build.sh'], repo);
 git(['commit', '-q', '-m', 'inicial'], repo);
 git(['remote', 'add', 'origin', bare], repo);
 const ramaInicial = git(['rev-parse', '--abbrev-ref', 'HEAD'], repo);
@@ -90,6 +93,17 @@ comprobar('1. ESPERANDO.json: la fila EN CURSO del docs/COLA.md de mentira', avi
 comprobar('1. ESPERANDO.json: motivo permiso (el mensaje habla de "permission")', aviso1 && aviso1.motivo, 'permiso');
 comprobar('1. ESPERANDO.json: mensaje recortado', aviso1 && aviso1.mensaje, 'Claude needs your permission to use the Bash tool');
 comprobar('1. ESPERANDO.json: desde, en ISO y UTC', typeof (aviso1 && aviso1.desde) === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(aviso1.desde), true);
+
+/* 1d. el árbol de avisos lleva también vercel.json y el script del
+   ignoreCommand (sin ellos, Vercel no tiene con qué decidir que esa
+   rama no debe publicar: comprobado publicando de verdad) */
+const ficherosDeAvisos = git(['ls-tree', '-r', '--name-only', 'avisos'], bare).split('\n').sort();
+comprobar('1d. el árbol de avisos lleva ESPERANDO.json, vercel.json y el script', ficherosDeAvisos,
+  ['ESPERANDO.json', 'scripts/vercel-ignore-build.sh', 'vercel.json']);
+comprobar('1d. el vercel.json de avisos es una copia fiel del de la copia de trabajo',
+  git(['show', 'avisos:vercel.json'], bare), fs.readFileSync(path.join(repo, 'vercel.json'), 'utf8'));
+comprobar('1d. y el script, también',
+  git(['show', 'avisos:scripts/vercel-ignore-build.sh'], bare), fs.readFileSync(path.join(repo, 'scripts/vercel-ignore-build.sh'), 'utf8').trim());
 
 /* motivo "pregunta" cuando el mensaje no habla de permiso */
 const bare2 = path.join(raizTmp, 'origin2.git');

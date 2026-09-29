@@ -77,27 +77,54 @@ process.stdout.write(JSON.stringify(salida));
 # Escribe el JSON recibido como ESPERANDO.json en la rama "avisos" del
 # remoto "origin", con las órdenes de bajo nivel de git: no toca el índice
 # ni la rama en la que está la copia de trabajo, ni siquiera lee el HEAD
-# actual.
+# actual (solo lee tres ficheros que ya existen, nunca escribe en ellos).
 #
-# Cada aviso encadena con el anterior cuando puede (se trae con "git
-# fetch" antes, sin tocar nada de la copia de trabajo): a Vercel un
-# "push -f" a un commit sin ningún padre le parece el primer envío de
-# una rama nueva, y el primer envío de una rama siempre construye,
-# ignoreCommand incluido, aunque esa rama esté fuera de
-# git.deploymentEnabled (comprobado publicando de verdad, tres veces
-# seguidas, en la fila 225). Con padre, a partir del segundo aviso deja
-# de parecer una rama nueva. El primer aviso de la vida del repositorio
-# sigue sin padre (no hay nada que encadenar): esa única vez sí puede
-# publicar, y no hay forma de evitarlo desde aquí.
+# El árbol de "avisos" lleva también vercel.json y
+# scripts/vercel-ignore-build.sh (una copia de los de la propia subida,
+# tal como están en ese momento): sin ellos, Vercel no tiene ningún
+# ignoreCommand que ejecutar PARA ESE COMMIT EN CONCRETO (lee la
+# configuración del propio commit que despliega, no una copia guardada
+# aparte), y construye siempre, aunque "avisos" esté en
+# git.deploymentEnabled (comprobado publicando de verdad, con el árbol
+# llevando solo ESPERANDO.json: construyó tres veces seguidas, con y sin
+# esa marca, encadenado o no). Con los dos ficheros presentes,
+# ignoreCommand ya puede mirar la rama por su nombre y saltarse la
+# publicación, como hace con cualquier otra rama que no sea "main" ni
+# "pruebas". Cada aviso encadena además con el anterior cuando puede (se
+# trae con "git fetch" antes de comitear, sin tocar nada de la copia de
+# trabajo), para que el propio historial de la rama tenga sentido; el
+# primer aviso de la vida del repositorio, sin nada que encadenar, sigue
+# sin padre.
 escribir_avisos() {
   local payload="$1"
   [ -n "$REPO_ROOT" ] || return 1
   [ -n "$payload" ] || return 1
 
-  local blob tree padre commit
-  blob="$(printf '%s' "$payload" | git -C "$REPO_ROOT" hash-object -w --stdin 2>/dev/null)" || return 1
-  [ -n "$blob" ] || return 1
-  tree="$(printf '100644 blob %s\tESPERANDO.json\n' "$blob" | git -C "$REPO_ROOT" mktree 2>/dev/null)" || return 1
+  local blob_json blob_vercel blob_script scripts_tree tree padre commit entradas
+  blob_json="$(printf '%s' "$payload" | git -C "$REPO_ROOT" hash-object -w --stdin 2>/dev/null)" || return 1
+  [ -n "$blob_json" ] || return 1
+  entradas="100644 blob $blob_json$(printf '\t')ESPERANDO.json"
+
+  if [ -f "$REPO_ROOT/vercel.json" ]; then
+    blob_vercel="$(git -C "$REPO_ROOT" hash-object -w "$REPO_ROOT/vercel.json" 2>/dev/null)"
+    if [ -n "$blob_vercel" ]; then
+      entradas="$entradas
+100644 blob $blob_vercel$(printf '\t')vercel.json"
+    fi
+  fi
+
+  if [ -f "$REPO_ROOT/scripts/vercel-ignore-build.sh" ]; then
+    blob_script="$(git -C "$REPO_ROOT" hash-object -w "$REPO_ROOT/scripts/vercel-ignore-build.sh" 2>/dev/null)"
+    if [ -n "$blob_script" ]; then
+      scripts_tree="$(printf '100755 blob %s\tvercel-ignore-build.sh\n' "$blob_script" | git -C "$REPO_ROOT" mktree 2>/dev/null)"
+      if [ -n "$scripts_tree" ]; then
+        entradas="$entradas
+040000 tree $scripts_tree$(printf '\t')scripts"
+      fi
+    fi
+  fi
+
+  tree="$(printf '%s\n' "$entradas" | git -C "$REPO_ROOT" mktree 2>/dev/null)" || return 1
   [ -n "$tree" ] || return 1
 
   padre=""
