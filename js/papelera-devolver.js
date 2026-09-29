@@ -248,14 +248,25 @@
 
   /* ---------- borrar del todo ---------- */
 
-  async function borrarDelTodo(ficha) {
+  /* Fila 203: `como` es 'a mano' (por defecto) o 'automatico'; cada
+     borrado deja su rastro en papelera-borrados.json. Si la carpeta no
+     se puede quitar (Dropbox la tiene cogida), se lanza el error y la
+     ficha se queda en la papelera: el vaciado automático lo reintenta al
+     día siguiente. */
+  async function borrarDelTodo(ficha, como) {
     if (ficha.carpeta) {
       try {
         var pap = await I.carpetaPapelera();
         await pap.removeEntry(ficha.carpeta, { recursive: true });
-      } catch (e) { /* si ya no está, no pasa nada */ }
+      } catch (e) {
+        if (!e || e.name !== 'NotFoundError') throw e;   /* si ya no está, no pasa nada */
+      }
     }
     await quitarDeIndice(ficha.id);
+    if (I.apuntarBorrado) {
+      try { await I.apuntarBorrado(ficha, como || 'a mano'); }
+      catch (e) { U.accesorio('Borrado del todo, pero no he podido dejar constancia', e); }
+    }
   }
 
   Object.assign(Papelera, {

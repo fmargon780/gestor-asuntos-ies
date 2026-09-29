@@ -434,7 +434,7 @@
       <details class="bloque-ajustes" id="bloque-papelera">
         <summary>
           <span class="bloque-titulo">Papelera</span>
-          <span class="bloque-pie">Lo borrado se guarda aquí hasta que tú lo quites</span>
+          <span class="bloque-pie">Lo borrado se guarda aquí hasta que se vacía solo, a los 90 días</span>
         </summary>
         <div class="bloque-cuerpo">
       <div class="papelera-buscador">
@@ -443,6 +443,17 @@
       </div>
       <div id="aviso-papelera-vieja" class="aviso aviso-ambar oculto"></div>
       <div id="tabla-papelera" class="lista"></div>
+      <details class="papelera-borrados" id="papelera-borrados">
+        <summary id="papelera-borrados-titulo">Borrados del todo (0)</summary>
+        <p class="explica">Solo el rastro de lo que se borró del todo (a mano o solo, al cumplirse el
+           plazo); el contenido no se guarda.</p>
+        <div class="papelera-buscador">
+          <input id="buscar-borrados" class="campo" placeholder="Buscar en lo borrado del todo">
+          <span id="cuenta-borrados" class="suave"></span>
+        </div>
+        <div id="tabla-borrados" class="lista"></div>
+        <button type="button" class="boton boton-peligro" id="btn-vaciar-registro">Vaciar el registro</button>
+      </details>
         </div>
       </details>
 
@@ -548,6 +559,18 @@
         <label class="etiqueta-en-linea" for="avisos-dias">Avisar con</label>
         <input id="avisos-dias" type="number" min="0" class="campo campo-plazo">
         <span class="suave">días de antelación</span>
+      </div>
+      <p class="explica">La papelera se vacía sola: lo que lleva en ella más de estos días se borra
+         del todo, y antes se avisa en Inicio. Es de todo el centro.</p>
+      <div class="alta-tipo">
+        <label class="etiqueta-en-linea" for="dias-papelera">La papelera se vacía a los</label>
+        <input id="dias-papelera" type="number" min="1" class="campo campo-plazo">
+        <span class="suave">días</span>
+      </div>
+      <div class="alta-tipo">
+        <label class="etiqueta-en-linea" for="dias-aviso-papelera">Avisar</label>
+        <input id="dias-aviso-papelera" type="number" min="0" class="campo campo-plazo">
+        <span class="suave">días antes</span>
       </div>
         </div>
       </details>
@@ -1336,8 +1359,9 @@
 <script src="js/papelera.js"></script>
 <script src="js/papelera-devolver.js"></script>
 <script src="js/papelera-ajustes.js"></script>
+<script src="js/papelera-vaciado.js"></script>
 <!-- Fila 68 (docs/AVISOS-QUE-FALTAN.md), 1 y 3: va después de
-     js/papelera.js (Papelera.leer/_diasDesde/DIAS_AVISO/tamanoDeViejas)
+     js/papelera.js y js/papelera-vaciado.js (Papelera.leer/loQueSeBorraPronto/fechaBreve)
      y de js/archivo-indice.js (window.IndiceArchivo), y envuelve
      App.verAbiertos, ya definido en js/asuntos-lista.js. -->
 <script src="js/avisos-que-faltan.js"></script>

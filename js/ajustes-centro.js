@@ -509,6 +509,37 @@ App.pintarDiasCaducidadCopias = function () {
   };
 };
 
+/* ---------- la papelera se vacía sola (fila 203, docs/PAPELERA-SE-VACIA-SOLA.md) ----------
+
+   Los dos días viven en `ajustesAvisos`, como los demás; js/papelera-vaciado.js
+   los lee directamente de ahí (Papelera.diasPapelera / Papelera.diasAviso). */
+
+App.pintarDiasPapelera = function () {
+  [
+    { id: 'dias-papelera', clave: 'diasPapelera', minimo: 1, valor: function () { return Papelera.diasPapelera(); },
+      aviso: function (n) { return 'La papelera se vaciará a los ' + n + ' días.'; } },
+    { id: 'dias-aviso-papelera', clave: 'diasAvisoPapelera', minimo: 0, valor: function () { return Papelera.diasAviso(); },
+      aviso: function (n) { return 'Se avisará ' + n + ' días antes de borrar.'; } }
+  ].forEach(function (c) {
+    var campo = $(c.id);
+    if (!campo || !window.Papelera || !Papelera.diasPapelera) return;
+    campo.value = String(c.valor());
+    campo.onchange = async function () {
+      var n = parseInt(campo.value, 10);
+      if (isNaN(n) || n < c.minimo) { campo.value = String(c.valor()); return; }
+      try {
+        await App.guardarRegistroFresco(function (registro) {
+          registro.ajustesAvisos = registro.ajustesAvisos || {};
+          registro.ajustesAvisos[c.clave] = n;
+        });
+        U.aviso(c.aviso(n), 'bueno');
+      } catch (e) {
+        U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
+      }
+    };
+  });
+};
+
 /* ---------- el orquestador de esta pestaña ---------- */
 
 App.pintarAjustesCentro = async function () {
@@ -518,6 +549,7 @@ App.pintarAjustesCentro = async function () {
   await App.pintarFicherosDeDatos();
   if (typeof App.pintarDiasDormido === 'function') App.pintarDiasDormido();
   App.pintarDiasCaducidadCopias();
+  App.pintarDiasPapelera();
   /* 20-sep-2026, fila 81, docs/FIRMANTES-Y-MEMBRETE.md. */
   if (window.Cargos && Cargos.pintarEnAjustes) await Cargos.pintarEnAjustes();
   if (window.Membrete && Membrete.pintarEnAjustes) await Membrete.pintarEnAjustes();

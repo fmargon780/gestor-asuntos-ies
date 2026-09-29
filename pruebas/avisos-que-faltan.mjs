@@ -7,7 +7,7 @@
    nucleo.js, archivo-indice.js, fichas-huerfanas.js, papelera.js,
    avisos-que-faltan.js y que-me-toca.js.
 
-   `window.FichasHuerfanas.calcular`, `AvisosQueFaltan._calcularPapeleraVieja`
+   `window.FichasHuerfanas.calcular`, `AvisosQueFaltan._calcularPorBorrar`
    y `QueMeToca._reunirDormidos` se exponen solo para estas pruebas. */
 import fs from 'node:fs';
 import vm from 'node:vm';
@@ -51,7 +51,7 @@ contexto.window.Gestor = {
   usuario: function () { return App.E.usuario; }
 };
 
-for (const f of ['archivo-indice.js', 'fichas-huerfanas.js', 'papelera.js', 'papelera-devolver.js', 'papelera-ajustes.js',
+for (const f of ['archivo-indice.js', 'fichas-huerfanas.js', 'papelera.js', 'papelera-devolver.js', 'papelera-ajustes.js', 'papelera-vaciado.js',
                   'avisos-que-faltan.js', 'que-me-toca.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
@@ -216,16 +216,17 @@ comprobar('pasados los 30 días, vuelve a salir',
 /* ================================================================
    5. La papelera con algo de hace 40 días saca el aviso.
    ================================================================ */
-console.log('--- 5. aviso de la papelera vieja ---');
+console.log('--- 5. aviso de lo que se borrará de la papelera (fila 203) ---');
 
 await Carpetas.escribirTexto(gestor, 'papelera.json', JSON.stringify({
   fichas: [
     { id: 'b1', clase: 'nota-tablon', nombre: 'una nota', cuando: haceNDias(40) },
-    { id: 'b2', clase: 'nota-tablon', nombre: 'otra nota', cuando: haceNDias(2) }
+    { id: 'b2', clase: 'nota-tablon', nombre: 'otra nota', cuando: haceNDias(2) },
+    { id: 'b3', clase: 'nota-tablon', nombre: 'una casi al borde', cuando: haceNDias(85) }
   ]
 }));
-const r = await AvisosQueFaltan._calcularPapeleraVieja();
-comprobar('solo la de hace 40 días cuenta como vieja', r.n, 1);
+const r = await AvisosQueFaltan._calcularPorBorrar();
+comprobar('solo la de hace 85 días (90 de plazo, 7 de aviso) sale en el aviso', r.n, 1);
 comprobar('bytesLegibles no revienta con 0', AvisosQueFaltan._bytesLegibles(0), '0 KB');
 
 /* ================================================================

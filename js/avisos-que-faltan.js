@@ -7,10 +7,9 @@
    1. Fichas sin carpeta (huérfanas): antes solo se veían entrando a
       propósito en Ajustes → Mantenimiento. Ahora hay una línea aquí
       que lleva directo a ese bloque.
-   2. La papelera vieja: el aviso ya existía dentro de la papelera de
-      Ajustes; aquí sale también en la pantalla principal, con cuántas
-      cosas son y cuánto ocupan, y sin botón para quitarlo sin decidir
-      (la única acción sigue siendo borrarlo del todo, en Ajustes).
+   2. La papelera: desde la fila 203 avisa de lo que se borrará del todo
+      pronto («12 cosas se borrarán del todo el 3-oct · Ver»); «Ver»
+      abre Herramientas › Papelera filtrada a esas cosas.
 
    Las dos comprobaciones cuestan un poco de disco (leer el índice del
    ARCHIVO, o el propio papelera.json), así que **no se enganchan al
@@ -19,10 +18,8 @@
    se llama al entrar en la pantalla, al pulsar "Actualizar" y tras
    crear/cerrar/archivar un asunto.
 
-   La parte 3 del encargo (si la papelera debería vaciarse ella sola)
-   es una decisión de Francisco, no de quien programe, y el propio
-   encargo pide preguntársela antes de tocar esa parte: se deja sin
-   hacer, apuntada en docs/HISTORIA.md y en docs/CONTEXTO-CORTO.md.
+   La parte 3 (que la papelera se vacíe sola) se hizo en la fila 203:
+   js/papelera-vaciado.js.
 
    La parte 2 (el bloque "Dormidos") vive en js/que-me-toca.js, no
    aquí: ese fichero ya tiene los otros tres bloques de esa pantalla.
@@ -83,12 +80,11 @@
     return (n / (1024 * 1024)).toFixed(1).replace('.0', '') + ' MB';
   }
 
-  async function calcularPapeleraVieja() {
-    if (!window.Papelera) return { n: 0, viejas: [] };
-    var lista;
-    try { lista = await Papelera.leer(); } catch (e) { return { n: 0, viejas: [] }; }
-    var viejas = lista.filter(function (f) { return Papelera._diasDesde(f.cuando) > Papelera.DIAS_AVISO; });
-    return { n: viejas.length, viejas: viejas };
+  /* Fila 203 (docs/PAPELERA-SE-VACIA-SOLA.md): ya no es «papelera vieja de
+     más de 30 días» sino lo que se va a borrar del todo pronto. */
+  async function calcularPorBorrar() {
+    if (!window.Papelera || !Papelera.loQueSeBorraPronto) return { n: 0, lista: [], primera: null };
+    return await Papelera.loQueSeBorraPronto();
   }
 
   /* ---------- los trozos de la franja de avisos ----------
@@ -134,14 +130,17 @@
     if (!window.AvisosLinea) return;
     if (ultimaPapelera && Date.now() - ultimaPapelera < CADA_MS_PAPELERA) return;
     ultimaPapelera = Date.now();
-    var r = await calcularPapeleraVieja();
+    var r = await calcularPorBorrar();
     var texto = '';
     if (r.n) {
-      var tamano = await Papelera.tamanoDeViejas(r.viejas);
-      texto = 'papelera: ' + r.n + (r.n === 1 ? ' cosa' : ' cosas') +
-        ' de más de ' + Papelera.DIAS_AVISO + ' días (' + bytesLegibles(tamano) + ')';
+      texto = r.n + (r.n === 1 ? ' cosa se borrará' : ' cosas se borrarán') + ' del todo el ' +
+        Papelera.fechaBreve(r.primera);
     }
-    AvisosLinea.registrar('papelera-vieja', texto, false, function () { irAHerramientas('bloque-papelera'); });
+    AvisosLinea.registrar('papelera-vieja', texto, false, function () {
+      if (Papelera.filtrarPronto) Papelera.filtrarPronto(true);
+      irAHerramientas('bloque-papelera');
+      if (typeof App.pintarPapelera === 'function') App.pintarPapelera();
+    });
   }
 
   async function pintarTodo() {
@@ -160,7 +159,7 @@
   window.AvisosQueFaltan = {
     /* para las pruebas */
     _calcularHuerfanas: calcularHuerfanas,
-    _calcularPapeleraVieja: calcularPapeleraVieja,
+    _calcularPorBorrar: calcularPorBorrar,
     _bytesLegibles: bytesLegibles,
     _sePintaHuerfanas: sePintaHuerfanas
   };

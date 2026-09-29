@@ -120,6 +120,10 @@
   /* Lo escrito en la caja se conserva al repintarse la lista (tras
      devolver o borrar una línea, o si llega un cambio del compañero):
      U.conservandoLoEscrito envuelve todo el bloque, no solo la lista. */
+  /* Fila 203: «Ver» del aviso de Inicio deja solo lo que está a punto de borrarse. */
+  var soloPronto = false;
+  Papelera.filtrarPronto = function (si) { soloPronto = !!si; };
+
   App.pintarPapelera = function () {
     return U.conservandoLoEscrito($('bloque-papelera'), pintarPapeleraDeVerdad);
   };
@@ -130,6 +134,8 @@
     var campoBuscar = $('buscar-papelera');
     var cuentaBuscar = $('cuenta-papelera');
     if (!caja) return;
+
+    if (I.pintarBorrados) { try { await I.pintarBorrados(); } catch (e0) { /* el registro es aparte */ } }
 
     var lista;
     try {
@@ -160,32 +166,24 @@
       cuentaBuscar.textContent = palabras.length ? (listaFiltrada.length + ' de ' + lista.length) : String(lista.length);
     }
 
-    /* El aviso de "más de 30 días" y su botón actúan sobre la papelera
-       ENTERA, nunca sobre lo filtrado (punto 9 del encargo). */
-    var viejas = lista.filter(function (f) { return diasDesde(f.cuando) > I.DIAS_AVISO; });
+    /* Fila 203: el aviso de «más de 30 días» y su botón ya no existen; lo
+       sustituye el aviso de Inicio («N cosas se borrarán del todo el …»),
+       cuyo «Ver» deja aquí solo esas cosas, con este letrero para volver. */
+    if (soloPronto) {
+      listaFiltrada = listaFiltrada.filter(Papelera.seBorraPronto);
+      if (cuentaBuscar) cuentaBuscar.textContent = listaFiltrada.length + ' de ' + lista.length;
+    }
     if (avisoViejas) {
-      if (viejas.length) {
+      if (soloPronto) {
         avisoViejas.classList.remove('oculto');
-        avisoViejas.innerHTML = '<strong>Hay ' + viejas.length + ' cosa' + (viejas.length === 1 ? '' : 's') +
-          ' en la papelera desde hace más de ' + I.DIAS_AVISO + ' días.</strong> ';
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'boton boton-peligro';
-        btn.textContent = 'Borrar del todo lo de más de ' + I.DIAS_AVISO + ' días' +
-          (palabras.length ? ' (de toda la papelera)' : '');
-        btn.onclick = async function () {
-          var ok = await U.preguntar('Borrar del todo',
-            '<p>Se borran del todo ' + viejas.length + ' cosas de más de ' + I.DIAS_AVISO + ' días.</p>' +
-            '<p class="nota">Esto sí lo quita de verdad. Dropbox aún lo guarda 30 días más en su ' +
-            'propia papelera.</p>', 'Borrar del todo');
-          if (!ok) return;
-          for (var i = 0; i < viejas.length; i++) {
-            try { await I.borrarDelTodo(viejas[i]); } catch (e) { /* seguimos con las demás */ }
-          }
-          U.aviso('Borradas del todo.', 'bueno');
-          App.pintarPapelera();
-        };
-        avisoViejas.appendChild(btn);
+        avisoViejas.innerHTML = '<strong>Solo lo que se borra del todo en los próximos ' +
+          Papelera.diasAviso() + ' días.</strong> ';
+        var btnTodo = document.createElement('button');
+        btnTodo.type = 'button';
+        btnTodo.className = 'boton';
+        btnTodo.textContent = 'Ver toda la papelera';
+        btnTodo.onclick = function () { soloPronto = false; App.pintarPapelera(); };
+        avisoViejas.appendChild(btnTodo);
       } else {
         avisoViejas.classList.add('oculto');
         avisoViejas.innerHTML = '';
@@ -241,7 +239,9 @@
     texto.style.flex = '1';
     texto.innerHTML = '<span class="nombre-tipo">' + U.escapar(ficha.nombre) + '</span>' +
       '<br><span class="suave">' + U.escapar(deDonde(ficha)) + '  ·  ' +
-      U.escapar(ficha.quien || 'alguien') + '  ·  ' + U.escapar(haceCuanto(ficha.cuando)) + '</span>';
+      U.escapar(ficha.quien || 'alguien') + '  ·  ' + U.escapar(haceCuanto(ficha.cuando)) + '  ·  ' +
+      '<span class="papelera-se-borra' + (Papelera.seBorraPronto(ficha) ? ' papelera-se-borra-pronto' : '') + '">Se borra el ' +
+      U.escapar(Papelera.fechaBreve(Papelera.fechaDeBorrado(ficha))) + '</span></span>';
     f.appendChild(texto);
 
     var devolver_ = document.createElement('button');
@@ -402,6 +402,8 @@
     botonBorrar: botonBorrar,
     haceCuanto: haceCuanto,
     tamanoDeViejas: tamanoDeViejas,
-    _diasDesde: diasDesde
+    _diasDesde: diasDesde,
+    _deDonde: deDonde,
+    _origenTexto: origenTexto
   });
 })();

@@ -259,6 +259,33 @@
     });
   }
 
+  /* ---------- la papelera (fila 203) ----------
+
+     Cuatro notas del tablón mandadas a la papelera con la función de
+     verdad y luego con la fecha de entrada cambiada: una de hace 95
+     días (pasada de plazo: se vacía sola), una de hace 85 (sale en el
+     aviso, con la fecha de borrado en rojo), una de hace 60 y una de
+     ayer. */
+  async function crearPapelera() {
+    if (!window.Papelera || !Papelera._interno) return;
+    var I = Papelera._interno;
+    var notas = [[95, 'Nota de septiembre pasado'], [85, 'Recordatorio de la reunión de tutores'],
+                 [60, 'Pedir fotocopias de las llaves'], [1, 'Aviso del simulacro']];
+    for (var i = 0; i < notas.length; i++) {
+      var nota = { id: U.nuevoId('n'), texto: notas[i][1], color: 'amarillo', autor: App.E.usuario || 'Revisor',
+        creado: U.ahora(), para: '', privada: false, hecha: false, hechaPor: '', hechaEl: '' };
+      var ficha = await Papelera.mandarDato('nota-tablon', notas[i][1], null, nota);
+      var cuando = new Date(Date.now() - notas[i][0] * 86400000).toISOString();
+      await I.cambiar(function (l) {
+        l.forEach(function (f) { if (f.id === ficha.id) f.cuando = cuando; });
+        return l;
+      });
+    }
+    /* Lo de hace 95 días ya toca borrarlo: se hace ahora, como haría el
+       vaciado al entrar, para que el registro de lo borrado tenga algo. */
+    if (Papelera.vaciarLoVencido) await Papelera.vaciarLoVencido();
+  }
+
   /* ---------- documentos por clasificar ---------- */
 
   var PDF_DE_MENTIRA = [
@@ -323,6 +350,7 @@
     await crearAsuntosAbiertos(tipos);
     await crearArchivados(tipos);
     await crearTablon();
+    await crearPapelera();
     await crearSueltos();
     await crearBandeja(disco);
   }

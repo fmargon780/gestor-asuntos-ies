@@ -37,7 +37,6 @@ var Papelera = (function () {
 
   var FICHERO = 'papelera.json';
   var CARPETA = 'PAPELERA';
-  var DIAS_AVISO = 30;
 
   function $(id) { return document.getElementById(id); }
 
@@ -271,14 +270,14 @@ var Papelera = (function () {
   }
 
   Object.assign(I, {
-    DIAS_AVISO: DIAS_AVISO, gestor: gestor, quienSoy: quienSoy, leer: leer, cambiar: cambiar,
+    gestor: gestor, quienSoy: quienSoy, leer: leer, cambiar: cambiar,
     carpetaPapelera: carpetaPapelera, buscarCarpetaDeAsunto: buscarCarpetaDeAsunto,
     mandarFichero: mandarFichero,   /* fila 137: el índice del expediente viejo, sin nota en el asunto */
     mandarDato: mandarDato, mandarSuelto: mandarSuelto
   });
 
   return {
-    FICHERO: FICHERO, CARPETA: CARPETA, DIAS_AVISO: DIAS_AVISO,
+    FICHERO: FICHERO, CARPETA: CARPETA,
     leer: leer,
     mandarDocumentoDeAsunto: mandarDocumentoDeAsunto,
     mandarSuelto: mandarSuelto,

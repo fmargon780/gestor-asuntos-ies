@@ -86,12 +86,14 @@ var Copias = (function () {
      centro y quién los ha ocupado, ver js/cargos.js) es el
      decimoséptimo. `formularios-campos.json` (20-sep-2026, fila 84,
      qué casilla de cada impreso recibe qué dato del centro, ver
-     js/formularios-rellenar.js) es el decimoctavo. */
+     js/formularios-rellenar.js) es el decimoctavo. `papelera-borrados.json` (fila 203, el rastro de lo
+     borrado del todo de la papelera, ver js/papelera-vaciado.js) es el
+     decimonoveno. */
   var FICHEROS = ['asuntos.json', 'guias.json', 'tipos.json', 'estados.json',
                    'tipos-documento.json', 'tablon.json', 'recurrentes.json', 'frescura.json',
                    'campos.json', 'papelera.json', 'no-duplicados.json', 'hitos.json', 'grupos.json',
                    'usuarios.json', 'borrados-listas.json', 'hitos-biblioteca.json', 'cargos.json',
-                   'formularios-campos.json'];
+                   'formularios-campos.json', 'papelera-borrados.json'];
 
   /* Fila 178: el número de esquema de hoy. Cada migración futura que
      cambie el formato de alguno de estos ficheros lo sube. */

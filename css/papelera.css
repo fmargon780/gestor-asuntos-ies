@@ -36,3 +36,9 @@
 }
 .papelera-buscador input { flex: 1; }
 .papelera-buscador .suave { white-space: nowrap; }
+
+/* Fila 203: cuándo se borra del todo (rojo cuando falta poco) y el registro de lo ya borrado. */
+.papelera-se-borra { white-space: nowrap; }
+.papelera-se-borra-pronto { color: var(--rojo-linea); font-weight: 600; }
+.papelera-borrados { margin-top: 16px; }
+.papelera-borrados > summary { cursor: pointer; font-weight: 600; margin-bottom: 8px; }
