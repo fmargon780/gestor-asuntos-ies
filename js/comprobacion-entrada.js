@@ -154,14 +154,14 @@
     }
     if (!copia) {
       return resultado('alumnado', T, 'falta', 'No hay carpeta señalada ni copia de la base de datos de alumnado: ' +
-        'el alumnado sale solo del RegAlum.csv, con menos datos.', arreglar);
+        'el alumnado sale solo del listado de matrícula, con menos datos.', arreglar);
     }
     /* Sin carpeta pero con copia (el caso del compañero): bien, salvo copia más vieja que el RegAlum. */
     var deLaCopia = new Date(copia.generado);
     var reg = App.E.datos ? await Carpetas.fechaFichero(App.E.datos, 'RegAlum.csv') : 0;
     if (reg && !isNaN(deLaCopia.getTime()) && deLaCopia.getTime() < reg) {
       return resultado('alumnado', T, 'falta', 'Se usa la copia de la base de datos de alumnado, pero es más vieja ' +
-        'que el RegAlum.csv. Hay que traerla de nuevo desde el otro ordenador.', arreglar, true);
+        'que el listado de matrícula. Hay que traerla de nuevo desde el otro ordenador.', arreglar, true);
     }
     return resultado('alumnado', T, 'bien', 'Se usa la copia que hay guardada.');
   }
