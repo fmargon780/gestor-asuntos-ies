@@ -59,3 +59,16 @@ Chromebook no tiene el Dropbox del centro).
 Pulsa «Ruta», el aviso verde le enseña `C:\Users\…\la carpeta del asunto`, lo pega en la barra
 del explorador de archivos (o en la ventana de adjuntar de Séneca) y se abre la carpeta. Lo único
 que tiene que comprobar él, en el instituto, es eso: que se abre.
+
+## Cómo sabemos que está bien
+
+1. Abrir la ficha de un asunto y pulsar «Ruta»: el aviso verde enseña una ruta con `\` (o `/` si
+   la copia es de Linux), nunca `file:///` ni códigos como `%20` o `%C3%93`.
+2. Si la ruta es larga, el aviso la enseña partida en varias líneas, nunca cortada con «…».
+3. Sin ninguna ruta apuntada todavía, pulsar «Ruta» sigue pidiendo la carpeta (pregunta en la
+   ficha, o un formulario dentro del propio cuadro en Correo y en Séneca) y, al guardar, copia ya
+   la ruta completa con el mismo formato.
+4. El botón «Ruta» funciona igual, con el mismo formato de ruta, desde la ficha del asunto y
+   desde los cuadros de Correo y de Mensaje de Séneca.
+5. [SOLO FRANCISCO] Pegar la ruta copiada en la barra del explorador de archivos de Windows, o en
+   la ventana de adjuntar de Séneca, abre la carpeta de verdad.
