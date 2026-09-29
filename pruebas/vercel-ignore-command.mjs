@@ -36,5 +36,19 @@ comprobar('5. y su Cache-Control de siempre',
   (json.headers[0].headers || []).some((h) => h.key === 'Cache-Control' &&
     h.value === 'public, max-age=0, must-revalidate'), true);
 
+/* Fila 225: la rama "avisos" (docs/AVISO-ESPERANDO-PERMISO.md) no puede
+   publicar nunca. El ignoreCommand ya la salta por nombre (no es "main"
+   ni "pruebas"), pero Vercel construye igualmente el primer empuje de un
+   ref nuevo (o de un ref que un "push -f" a un commit sin padre deja como
+   si fuera nuevo cada vez, que es justo como escribe esa rama
+   scripts/aviso-esperando.sh): comprobado publicando de verdad, tras la
+   fila 225, que un empuje real a "avisos" sí construyó (estado READY, no
+   CANCELED). `git.deploymentEnabled` es la marca del propio Vercel, mirada
+   antes de intentar nada: no depende de si el ref es nuevo. */
+comprobar('6. "avisos" nunca publica (git.deploymentEnabled), pase lo que pase con ignoreCommand',
+  json.git && json.git.deploymentEnabled && json.git.deploymentEnabled.avisos, false);
+comprobar('6b. las ramas de trabajo "claude/**" tampoco (ya estaba)',
+  json.git && json.git.deploymentEnabled && json.git.deploymentEnabled['claude/**'], false);
+
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 process.exit(fallos ? 1 : 0);
