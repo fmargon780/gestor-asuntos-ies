@@ -43,14 +43,39 @@ cinco hechos de git y de GitHub (el script existe y su prueba pasa, la rama `avi
 `?demo=1`. En vez de forzar al revisor a entrar en una copia de pruebas donde no hay nada distinto
 que ver, se lanzó igualmente un agente aparte, con contexto limpio (sin ver el código ni el
 diff), pero con Bash/git y la herramienta de Vercel en vez de un navegador, comprobando los cinco
-hechos por sí mismo contra el repositorio real. APROBADA, los cinco puntos bien. Sigue siendo el
-mismo principio (una comprobación independiente, sin ver el propio trabajo), adaptado a una fila
-sin interfaz.
+hechos por sí mismo contra el repositorio real. Le salieron los cinco puntos bien, pero con la
+rama `avisos` recién creada y sin que hubiera pasado tiempo de sobra para que el despliegue de
+Vercel se registrara: el punto 4 resultó ser falso en cuanto se miró con más calma (detalle justo
+abajo). Sigue siendo el mismo principio (una comprobación independiente, sin ver el propio
+trabajo), adaptado a una fila sin interfaz; lo que falló fue el momento en que se miró, no el
+método.
 
-`scripts/` se publica a propósito (`.vercelignore`, fila 63), y no está en la lista de exclusiones
-de `scripts/vercel-ignore-build.sh` (que solo salta `docs/`, `pruebas/`, `.github/`, `*.md` y
+**El hallazgo real, después de dar la fila por hecha: `avisos` sí publica.** `scripts/` se publica
+a propósito (`.vercelignore`, fila 63), y no está en la lista de exclusiones de
+`scripts/vercel-ignore-build.sh` (que solo salta `docs/`, `pruebas/`, `.github/`, `*.md` y
 `.claude/`): añadir `scripts/aviso-esperando.sh` sí gastó una publicación de Vercel en `pruebas` y
-otra en `main`, aunque la aplicación no cambie nada para la usuaria.
+otra en `main`, esperado y sin sorpresa. La sorpresa llegó después, comprobando con calma el punto
+4 de la lista: un `git fetch origin avisos` mostraba `ESPERANDO.json` bien, pero la propia
+herramienta de Vercel (`list_deployments` filtrado por `branch: avisos`) enseñó un despliegue de
+verdad, en estado `READY`, con su propio alias de *preview* (nunca `pruebas.fmargon.com` ni
+producción). Dos arreglos, los dos probados publicando de verdad y los dos sin efecto:
+`git.deploymentEnabled` con `"avisos": false` en `vercel.json` (la misma marca que ya usa
+`"claude/**"`, sobre la que esta sesión no encontró ninguna prueba real de que funcione: ese
+patrón nunca ha tenido ninguna rama que empujar de verdad para comprobarlo) no cortó nada, ni
+subido a `pruebas` ni ya en `main`; y encadenar cada aviso con el anterior (`git fetch` + `git
+commit-tree -p <padre>`, por si un commit sin padre le parecía a Vercel "primer envío de una rama
+nueva, construir sí o sí") tampoco. La rama `avisos` solo lleva `ESPERANDO.json` en su árbol —sin
+`vercel.json` ni `scripts/`—, así que es posible que ni el `ignoreCommand` ni `deploymentEnabled`
+lleguen a mirarse siquiera para ella; sin acceso a los registros de compilación de Vercel desde
+esta sesión (la herramienta de logs dio 404 con varios despliegues de los que sí existían de
+sobra), y sin permiso para borrar la rama y comprobar si una de verdad nueva se comporta distinto
+(`Bash` lo bloqueó como «Git Destructive»), el porqué exacto queda sin encontrar. Se deja el
+encadenado puesto (mejora razonable en sí misma) y se documenta como límite conocido, no como
+fallo: cada aviso de verdad cuesta una publicación rápida (unos 5 s, medida con la propia
+herramienta de Vercel) que nunca toca lo que ve la usuaria, dentro del cupo de 100 al día de toda
+la cuenta (`docs/PUBLICAR-SIN-PARAR.md`). Anotado para Francisco, con la vía más prometedora
+(restringir por rama desde el propio panel de Vercel, Project Settings → Git, en vez de desde
+`vercel.json`), en «Lo que queda por hablar con Francisco» de `docs/COLA.md`.
 
 ---
 
