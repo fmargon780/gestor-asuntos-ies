@@ -86,3 +86,23 @@ final.
 papelera se vacía sola?»). Quitar el punto correspondiente de «Lo que queda por hablar con
 Francisco» en `docs/COLA.md`. Entrada en `docs/HISTORIA.md`. Sube directamente a `main`, sin pull
 request, en como mucho dos subidas.
+
+## Cómo sabemos que está bien
+
+Escrita al coger la fila (el documento es anterior a la 223). Los datos de demostración traen
+papelera con cosas de distinta antigüedad.
+
+1. Abrir Ajustes › El centro › «Días de aviso»: salen «La papelera se vacía a los 90 días» y
+   «Avisar 7 días antes». Cambiar el 90 por 60 y recargar: sigue en 60.
+2. Abrir Herramientas › Papelera: cada fila dice cuándo se borra del todo («Se borra el 3-oct»), y en
+   rojo las que faltan menos de 7 días. Ya no sale el aviso de «más de 30 días» ni su botón.
+3. En Inicio, la línea de avisos dice «N cosas se borrarán del todo el …» con «Ver»; al pulsarlo se
+   abre Herramientas › Papelera solo con esas cosas.
+4. Pulsar «Devolver a su sitio» en una de ellas: vuelve a su sitio y deja de contarse en el aviso.
+5. Pulsar «Borrar del todo» en otra: desaparece, y al abrir «Borrados del todo (N)», al final de la
+   papelera, sale apuntada como «a mano», sin su contenido. El buscador de ese desplegable encuentra
+   por nombre.
+6. Lo que ya pasó de su fecha (de hace más de 90 días) ya no está en la papelera al entrar, y
+   aparece en «Borrados del todo» como «automático» («la aplicación»).
+7. **[SOLO FRANCISCO]** Con la carpeta real de Dropbox en dos ordenadores a la vez: que no se pisen
+   al vaciar, y que el fichero `papelera-borrados.json` viaje bien.
