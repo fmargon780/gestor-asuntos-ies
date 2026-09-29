@@ -6,6 +6,11 @@ para ir tachando.
 
 ---
 
+- [ ] **La ruta copiada por el botón «Ruta», en el ordenador del instituto (fila 227,
+      `docs/RUTA-NORMAL-DE-WINDOWS.md`).** Pulsar «Ruta» en la ficha de un asunto (o en el cuadro
+      de Correo o de Séneca) y pegar lo copiado en la barra del explorador de archivos de Windows,
+      y también en la ventana «Abrir archivo» al adjuntar en Séneca. Ver: que en los dos sitios se
+      abre la carpeta de verdad, sin buscar nada ni dar error.
 - [ ] **El ayudante de Séneca, contra Séneca de verdad.** Pulsarlo dentro de un mensaje de Séneca
       de verdad, con una lista de destinatarios copiada. Ver: que los destinatarios entran uno a
       uno, y que al final dice bien quién se ha quedado sin entrar (si alguno).

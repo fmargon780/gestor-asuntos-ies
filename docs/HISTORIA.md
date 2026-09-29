@@ -113,6 +113,71 @@ la cuenta agotado, no de este proyecto: `docs/PUBLICAR-SIN-PARAR.md`). Sin reint
 **SIN PUBLICACIÓN COMPROBADA**: el siguiente lanzamiento la cierra en cuanto la web sirva la
 `App.VERSION` de este commit.
 
+**Cerrada (29-sep-2026 06:23) al empezar la fila 227**: la publicación automática de `main` sí
+llegó a arrancar sola con el commit de la fila 227 (que incluye este), sin necesidad de forzar
+nada. Detalle en la entrada de la fila 227, más abajo.
+
+## 29-sep-2026 — Fila 227: el botón «Ruta» copia la ruta normal, nunca `file:///`
+
+`docs/RUTA-NORMAL-DE-WINDOWS.md`: en el ordenador del instituto (Windows, con Dropbox), pegar la
+ruta que copiaba el botón «Ruta» no abría la carpeta. La causa (fila 152,
+`docs/RUTA-QUE-NO-VA-A-BING.md`): `comoFileUrl` (`js/copiar-ruta.js`) construía una dirección
+`file:///C:/Users/.../ADMINISTRACI%C3%93N/...`, con cada trozo pasado por `encodeURIComponent`. Ni
+el explorador de archivos de Windows ni la ventana «Abrir archivo» de Séneca o del correo
+descodifican bien eso, sobre todo las tildes.
+
+**El cambio**: `RutaCarpetas.de()` ya no llama a `comoFileUrl` (quitada del todo, sin uso en
+ningún otro sitio); en su lugar usa `RutaCarpetas.unir()`, que ya existía para juntar la ruta
+apuntada con el nombre de la carpeta, con el separador de la base (`\` en Windows y en red, `/` en
+Linux), sin codificar nada. `sinFileUrl()` (que convierte una `file:` antigua a ruta normal, para
+poder partirla por el trozo `Dropbox`) tenía un descuido para este cambio: en el caso de una unidad
+de Windows devolvía la ruta con `/` en vez de `\` (nadie lo notaba porque `comoFileUrl` volvía a
+trocear y recomponer con el separador que quisiera); arreglado añadiendo el mismo
+`.replace(/\//g, '\\')` que ya llevaba el caso de red. El aviso verde, tras copiar, enseña la ruta
+(`copiarConAviso`, que envuelve `U.copiar` con un `U.aviso('Ruta copiada: ' + texto, 'bueno')`): no
+hacía falta ninguna regla nueva de CSS para partirla en varias líneas, el `.mensaje` de siempre ya
+envuelve el texto largo dentro de su `max-width: 380px`.
+
+`pruebas/copiar-ruta.mjs` puesta al día: los mismos casos de siempre (Windows, red, Linux, con
+espacios/`#`/coma/acentos) pero con la ruta normal en vez de `file:///`, más el aviso verde. Se
+quitó la prueba que hacía navegar Chromium de verdad a la `file:///` copiada para comprobar que el
+`#` no cortaba la ruta: sin URLs `file://` de por medio, ya no hay nada que codificar mal, así que
+esa prueba dejó de tener sentido (no protegía nada que pudiera romperse). `npm test` completo (186
+ficheros) en verde.
+
+**El revisor, a la primera, pero sin la copia de pruebas publicada.** Nada más terminar el código
+y subirlo a `pruebas`, ni la publicación automática de Vercel para esa rama ni un
+`create_deployment` a mano (402 «Resource is limited») llegaron a arrancar: el tope diario de
+despliegues de toda la cuenta (`docs/PUBLICAR-SIN-PARAR.md`, ya visto ese mismo día con la fila
+224) seguía agotado. Igual que la fila 214 con su propio bloqueo de red, esta sesión montó un
+servidor local (`python3 -m http.server 8123`) con el código exacto de `pruebas` (mismo commit) y
+lanzó ahí al revisor, con `?demo=1&auto=1`. Informe:
+
+```
+APROBADA
+1. Abrir la ficha de un asunto y pulsar «Ruta»: el aviso verde enseña una ruta con \ (o / si la
+   copia es de Linux), nunca file:/// ni códigos como %20 o %C3%93. — BIEN: en la ficha de
+   «Suministros Escolares Dobla, S.L.», el aviso mostró
+   C:\Users\Profesorado Núñez\Dropbox (Centro)\...\ASUNTOS ABIERTOS\260731 FACTURA Suministros
+   Escolares Dobla, S.L. B12345678, con \, tildes y espacios tal cual.
+2. Ruta larga, partida en varias líneas, nunca cortada con «…». — BIEN: seis líneas completas.
+3. Sin ruta apuntada, «Ruta» la sigue pidiendo (ficha, o en línea en Correo/Séneca) y copia ya
+   completa al guardar. — BIEN, probado en los tres sitios.
+4. El botón funciona igual desde la ficha y desde Correo/Séneca. — BIEN, misma ruta en los tres.
+5. [SOLO FRANCISCO] Pegar la ruta en Windows o en Séneca abre la carpeta de verdad. — NO
+   COMPROBADO.
+a/b/c — BIEN.
+```
+
+Publicado directo a `main` (avance limpio, `4aa4f55`, que de paso arregla la hora de
+`js/version.js`, olvidada al escribir el código: quedó con la de la fila anterior a esta). Esta vez
+la publicación automática de `main` sí arrancó sola pese al tope diario, algo que no había pasado
+con la fila 224 unas horas antes: el tope parece afectar solo a `create_deployment` por la API
+(usado a mano), no a las publicaciones que dispara el propio GitHub. Comprobado por `curl`,
+`App.VERSION` `29-sep-2026 · 06:23`, `js/copiar-ruta.js` publicado sin `comoFileUrl` y con
+`sinFileUrl(base)`/`copiarConAviso`; confirmado con `list_deployments` (commit `4aa4f55`, `READY`,
+producción). El punto [SOLO FRANCISCO] pasa a `docs/COMPROBAR-A-MANO.md`.
+
 ## 28-sep-2026 — Fila 225: aviso «esperando tu respuesta», y un revisor sin pantalla que mirar
 
 `scripts/aviso-esperando.sh` (hooks de `.claude/settings.json`, ya puestos por la fila 224 desde
