@@ -195,6 +195,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 228 | El botón Cambiar del menú Hito no modifica se previamente se ha escrito en su descripción. [recorte: https://claude.ai/artifact/7pDUJyXkUbPwuccZRx6J7E · 770511d544b41e6484d15e64fc5e042b] | IDEA (29-sep-2026): apuntada por Francisco desde el Centro de mando |
 | 229 | Ventajas e inconvenientes de convertir la zona de tareas de un hito en un registro de lo que ocurre, en vez de una lista que nos recuerde que hay que tener en cuenta. O un modelo global para todo esto [recorte: https://claude.ai/artifact/7pDUJyXkUbPwuccZRx6J7E · 2201e4cccd4d17ffe9428499544f420e] | IDEA (29-sep-2026): apuntada por Francisco desde el Centro de mando |
 | 217 | `docs/CORREO-OTRA-CUENTA-ABIERTA.md` (enviar correo con otra cuenta de Google abierta en el navegador: aviso claro en vez de «Failed to fetch» y, si Google lo deja, que el envío funcione igual usando la forma general de la dirección del script) | PENDIENTE (28-sep-2026) |
+| 231 | Crear un asunto desde un documento en la bandeja Por clasificar a veces va bien, pero otras (no entiendo la lógica) no deja elegir tercero, tipo de asunto, etc. Ver imagen [recorte: https://claude.ai/artifact/7pDUJyXkUbPwuccZRx6J7E · c602051bf31a715f910e9c1add9d7853] | IDEA (29-sep-2026): apuntada por Francisco desde el Centro de mando |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
