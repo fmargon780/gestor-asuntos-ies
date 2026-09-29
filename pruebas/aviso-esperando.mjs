@@ -128,6 +128,16 @@ comprobar('2b. ESPERANDO.json pasa a estado libre', aviso2 && aviso2.estado, 'li
 comprobar('2b. ESPERANDO.json: fila vacía en libre', aviso2 && aviso2.fila, '');
 comprobar('2b. "libre" borra la marca local', fs.existsSync(flag), false);
 
+/* 2c. el segundo aviso encadena con el primero (Vercel trata el primer
+   envío de una rama nueva como "hay que publicar sí o sí", ignoreCommand
+   incluido; con padre deja de parecer una rama nueva desde el segundo) */
+const padreAntes = git(['rev-parse', 'avisos'], bare);
+ejecutarScript('esperando', { repo, tmpdir: flagDir, mensaje: 'un aviso más, para comprobar el padre' });
+const commitNuevo = git(['rev-parse', 'avisos'], bare);
+const padreDelNuevo = git(['rev-parse', commitNuevo + '^'], bare);
+comprobar('2c. el commit nuevo de avisos tiene un padre (no es huérfano)', typeof padreDelNuevo === 'string' && padreDelNuevo.length === 40, true);
+comprobar('2c. y ese padre es el aviso anterior', padreDelNuevo, padreAntes);
+
 /* 3. la copia de trabajo y su rama quedan intactas */
 const statusFinal = git(['status', '--porcelain'], repo);
 const headFinal = git(['rev-parse', 'HEAD'], repo);

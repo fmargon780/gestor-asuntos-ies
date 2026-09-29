@@ -77,22 +77,52 @@ process.stdout.write(JSON.stringify(salida));
 # Escribe el JSON recibido como ESPERANDO.json en la rama "avisos" del
 # remoto "origin", con las órdenes de bajo nivel de git: no toca el índice
 # ni la rama en la que está la copia de trabajo, ni siquiera lee el HEAD
-# actual. Cada aviso es un commit suelto, sin padre.
+# actual.
+#
+# Cada aviso encadena con el anterior cuando puede (se trae con "git
+# fetch" antes, sin tocar nada de la copia de trabajo): a Vercel un
+# "push -f" a un commit sin ningún padre le parece el primer envío de
+# una rama nueva, y el primer envío de una rama siempre construye,
+# ignoreCommand incluido, aunque esa rama esté fuera de
+# git.deploymentEnabled (comprobado publicando de verdad, tres veces
+# seguidas, en la fila 225). Con padre, a partir del segundo aviso deja
+# de parecer una rama nueva. El primer aviso de la vida del repositorio
+# sigue sin padre (no hay nada que encadenar): esa única vez sí puede
+# publicar, y no hay forma de evitarlo desde aquí.
 escribir_avisos() {
   local payload="$1"
   [ -n "$REPO_ROOT" ] || return 1
   [ -n "$payload" ] || return 1
 
-  local blob tree commit
+  local blob tree padre commit
   blob="$(printf '%s' "$payload" | git -C "$REPO_ROOT" hash-object -w --stdin 2>/dev/null)" || return 1
   [ -n "$blob" ] || return 1
   tree="$(printf '100644 blob %s\tESPERANDO.json\n' "$blob" | git -C "$REPO_ROOT" mktree 2>/dev/null)" || return 1
   [ -n "$tree" ] || return 1
-  commit="$(GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-aviso-esperando}" \
-            GIT_AUTHOR_EMAIL="${GIT_AUTHOR_EMAIL:-aviso-esperando@localhost}" \
-            GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-aviso-esperando}" \
-            GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-aviso-esperando@localhost}" \
-            git -C "$REPO_ROOT" commit-tree "$tree" -m "aviso" 2>/dev/null)" || return 1
+
+  padre=""
+  if command -v timeout >/dev/null 2>&1; then
+    timeout 10 git -C "$REPO_ROOT" fetch origin avisos >/dev/null 2>&1
+  else
+    git -C "$REPO_ROOT" fetch origin avisos >/dev/null 2>&1
+  fi
+  padre="$(git -C "$REPO_ROOT" rev-parse --verify -q FETCH_HEAD 2>/dev/null)" || padre=""
+
+  commit=""
+  if [ -n "$padre" ]; then
+    commit="$(GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-aviso-esperando}" \
+              GIT_AUTHOR_EMAIL="${GIT_AUTHOR_EMAIL:-aviso-esperando@localhost}" \
+              GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-aviso-esperando}" \
+              GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-aviso-esperando@localhost}" \
+              git -C "$REPO_ROOT" commit-tree "$tree" -p "$padre" -m "aviso" 2>/dev/null)" || commit=""
+  fi
+  if [ -z "$commit" ]; then
+    commit="$(GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-aviso-esperando}" \
+              GIT_AUTHOR_EMAIL="${GIT_AUTHOR_EMAIL:-aviso-esperando@localhost}" \
+              GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-aviso-esperando}" \
+              GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-aviso-esperando@localhost}" \
+              git -C "$REPO_ROOT" commit-tree "$tree" -m "aviso" 2>/dev/null)" || return 1
+  fi
   [ -n "$commit" ] || return 1
 
   if command -v timeout >/dev/null 2>&1; then
