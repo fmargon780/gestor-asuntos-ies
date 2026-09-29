@@ -162,7 +162,16 @@ window.ElegirAsunto = (function () {
      fila, y Cancelar es el de siempre.
 
      opciones = { titulo, cabecera (HTML), sugeridos: [{nombre, ficha,
-     puntos}] }. Devuelve {nombre, ficha} o null si se cancela.
+     puntos}], crearNuevo: { texto, alPulsar } (opcional: botón «No está,
+     crear uno nuevo», fila 230) }. Devuelve {nombre, ficha} o null si
+     se cancela (con ✕, Cancelar o Escape).
+
+     Escape (fila 230): además de la escucha general de
+     js/usabilidad.js, el cuadro escucha la suya en captura mientras
+     está abierto, para que ninguna otra pieza (el visor, el lector)
+     se la quede, y recupera el cursor si el foco se fue a un marco
+     (el PDF del visor): dentro de un marco las teclas no llegan a la
+     página. Un solo Escape cierra solo este cuadro.
      ========================================================== */
 
   function elegir(opciones) {
@@ -176,7 +185,7 @@ window.ElegirAsunto = (function () {
       var todos = todosLosAsuntos();
       var capa = $('capa');
       var cuadro = document.querySelector('#capa .cuadro');
-      if (cuadro) cuadro.classList.add('cuadro-medio');
+      if (cuadro) cuadro.classList.add('cuadro-medio', 'cuadro-elegir');
 
       $('cuadro-titulo').textContent = o.titulo || 'Guardar en un asunto';
       $('cuadro-cuerpo').innerHTML =
@@ -194,14 +203,61 @@ window.ElegirAsunto = (function () {
       $('cuadro-aceptar').classList.add('oculto');
       capa.classList.remove('oculto');
 
+      var equis = document.createElement('button');
+      equis.type = 'button';
+      equis.className = 'elegir-cerrar';
+      equis.id = 'elegir-cerrar';
+      equis.title = 'Cerrar';
+      equis.setAttribute('aria-label', 'Cerrar');
+      equis.textContent = '✕';
+      if (cuadro) cuadro.appendChild(equis);
+
+      var crear = null;
+      if (o.crearNuevo && o.crearNuevo.alPulsar) {
+        crear = document.createElement('button');
+        crear.type = 'button';
+        crear.id = 'elegir-crear';
+        crear.className = 'boton elegir-crear';
+        crear.textContent = o.crearNuevo.texto || 'No está: crear un asunto nuevo';
+        var pie = document.querySelector('#capa .cuadro-botones');
+        if (pie) pie.insertBefore(crear, pie.firstChild);
+      }
+
+      function alPulsarTecla(ev) {
+        if (ev.key !== 'Escape') return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        ev.stopImmediatePropagation();
+        cancelar();
+      }
+      function alPerderElFoco() {
+        setTimeout(function () {
+          if (resuelto || !document.activeElement || document.activeElement.tagName !== 'IFRAME') return;
+          try { window.focus(); if ($('enlace-buscar')) $('enlace-buscar').focus(); } catch (e) {}
+        }, 0);
+      }
+      document.addEventListener('keydown', alPulsarTecla, true);
+      window.addEventListener('blur', alPerderElFoco);
+
       function cerrar() {
+        document.removeEventListener('keydown', alPulsarTecla, true);
+        window.removeEventListener('blur', alPerderElFoco);
         capa.classList.add('oculto');
         $('cuadro-aceptar').classList.remove('oculto');
         $('cuadro-cancelar').onclick = null;
-        if (cuadro) cuadro.classList.remove('cuadro-medio');
+        if (cuadro) cuadro.classList.remove('cuadro-medio', 'cuadro-elegir');
+        if (equis.parentNode) equis.parentNode.removeChild(equis);
+        if (crear && crear.parentNode) crear.parentNode.removeChild(crear);
       }
+      function cancelar() { cerrar(); unaVez(null); }
 
-      $('cuadro-cancelar').onclick = function () { cerrar(); unaVez(null); };
+      $('cuadro-cancelar').onclick = cancelar;
+      equis.onclick = cancelar;
+      if (crear) crear.onclick = function () {
+        cerrar();
+        unaVez(null);
+        try { o.crearNuevo.alPulsar(); } catch (e) { console.error(e); }
+      };
 
       function engancharFilas(caja) {
         Array.prototype.forEach.call(caja.querySelectorAll('.enlace-asunto'), function (b) {
@@ -265,13 +321,37 @@ window.ElegirAsunto = (function () {
       $('cuadro-aceptar').classList.add('oculto');
       capa.classList.remove('oculto');
 
+      var cuadro2 = document.querySelector('#capa .cuadro');
+      var equis = document.createElement('button');
+      equis.type = 'button';
+      equis.className = 'elegir-cerrar';
+      equis.id = 'elegir-cerrar';
+      equis.title = 'Cerrar';
+      equis.setAttribute('aria-label', 'Cerrar');
+      equis.textContent = '✕';
+      if (cuadro2) { cuadro2.classList.add('cuadro-elegir'); cuadro2.appendChild(equis); }
+
+      function alPulsarTecla(ev) {
+        if (ev.key !== 'Escape') return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        ev.stopImmediatePropagation();
+        cancelar();
+      }
+      document.addEventListener('keydown', alPulsarTecla, true);
+
       function cerrar() {
+        document.removeEventListener('keydown', alPulsarTecla, true);
         capa.classList.add('oculto');
         $('cuadro-aceptar').classList.remove('oculto');
         $('cuadro-cancelar').onclick = null;
+        if (cuadro2) cuadro2.classList.remove('cuadro-elegir');
+        if (equis.parentNode) equis.parentNode.removeChild(equis);
       }
+      function cancelar() { cerrar(); unaVez(null); }
 
-      $('cuadro-cancelar').onclick = function () { cerrar(); unaVez(null); };
+      $('cuadro-cancelar').onclick = cancelar;
+      equis.onclick = cancelar;
       $('enlace-reabrir').onclick = function () { cerrar(); unaVez('reabrir'); };
       $('enlace-sin-reabrir').onclick = function () { cerrar(); unaVez('guardar'); };
     });

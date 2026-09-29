@@ -191,7 +191,13 @@ asunto"). Se carga antes que `js/documentos-sueltos.js`, `js/bandeja-enlace.js` 
 - `elegir({titulo, cabecera, sugeridos})` monta el cuadro sobre `#capa`, con "Podrían encajar"
   arriba (solo si hay) y "Todos los asuntos" debajo, con buscador (`#enlace-buscar`,
   `#enlace-todos`), abiertos primero y archivados después con su etiqueta. Devuelve
-  `{nombre, ficha}` o `null`. **La puntuación no se calcula aquí**: cada sitio mide su propio
+  `{nombre, ficha}` o `null`. Fila 230: lleva una ✕ (`#elegir-cerrar`) arriba a la derecha y el
+  pie («Cancelar») fijos —solo se desplaza el cuerpo, clase `.cuadro-elegir` en
+  `css/bandeja.css`—; Escape cierra solo este cuadro (escucha propia en captura mientras está
+  abierto, y si el foco se fue a un marco como el PDF del visor, devuelve el cursor al
+  buscador); y la opción `crearNuevo: {texto, alPulsar}` pone a la izquierda del pie «No está:
+  crear un asunto nuevo…» (`App.empezarAsuntoCon` en el documento suelto,
+  `Bandeja.llevarANuevo` en el correo). **La puntuación no se calcula aquí**: cada sitio mide su propio
   parecido y le pasa `sugeridos` ya hecho, porque de un correo se sabe mucho más que del nombre
   de un fichero.
 - `preguntarSiReabrir(elAsunto, {explica, reabrir, sinReabrir})` es el cuadro de "Ese asunto

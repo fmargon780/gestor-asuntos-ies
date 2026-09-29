@@ -124,7 +124,9 @@
                 '<br><span class="suave">de ' +
                 U.escapar((d.de && (d.de.nombre || d.de.correo)) || 'remitente desconocido') +
                 '</span></p>',
-      sugeridos: sugeridos
+      sugeridos: sugeridos,
+      crearNuevo: { texto: 'No está: crear un asunto nuevo con este correo',
+                    alPulsar: function () { window.Bandeja.llevarANuevo(item); } }
     });
     if (!elegido) return;
 
