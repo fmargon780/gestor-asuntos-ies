@@ -194,7 +194,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 217 | `docs/CORREO-OTRA-CUENTA-ABIERTA.md` (enviar correo con otra cuenta de Google abierta en el navegador: aviso claro en vez de «Failed to fetch» y, si Google lo deja, que el envío funcione igual usando la forma general de la dirección del script) | PENDIENTE (28-sep-2026) |
 | 228 | El botón Cambiar del menú Hito no modifica se previamente se ha escrito en su descripción. [recorte: https://claude.ai/artifact/7pDUJyXkUbPwuccZRx6J7E · 770511d544b41e6484d15e64fc5e042b] | IDEA (29-sep-2026): apuntada por Francisco desde el Centro de mando |
 | 229 | Ventajas e inconvenientes de convertir la zona de tareas de un hito en un registro de lo que ocurre, en vez de una lista que nos recuerde que hay que tener en cuenta. O un modelo global para todo esto [recorte: https://claude.ai/artifact/7pDUJyXkUbPwuccZRx6J7E · 2201e4cccd4d17ffe9428499544f420e] | IDEA (29-sep-2026): apuntada por Francisco desde el Centro de mando |
-| 230 | Al intentar guardar un documento en un asunto previo desde la bandeja Por Clasificar, si no encuentro el asunto en el quiero guardarlo, no tengo opción de salir y la tecla escape no hace nada. [recorte: https://claude.ai/artifact/7pDUJyXkUbPwuccZRx6J7E · 3544093f216b5d075d75b4a1f3b2b52d] | EN DISEÑO (29-sep-2026) · conversación: https://claude.ai/code/session_018mMqD399uscbGzihnMMaRQ |
+| 230 | `docs/SALIR-DE-ELEGIR-ASUNTO.md` (en «Guardar en un asunto», de documentos sueltos y de correos: ✕ arriba y «Cancelar» siempre a la vista, Escape que cierra de verdad —buscar la causa— y botón «No está: crear un asunto nuevo con él») | PENDIENTE (29-sep-2026) |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
@@ -218,6 +218,9 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 - Prueba `pruebas/tras-cada-accion.mjs`: dos pasos («al volver, la misma altura» y «repintar la
   lista no la sube arriba») fallan también en solitario desde antes de la fila 205; sin arreglar
   todavía.
+- 29-sep-2026: `docs/VISTO-BUENO-DE-FRANCISCO.md` se escribió como «fila 230» y tiene estimación, pero
+  no tiene fila en esta tabla (el número 230 lo lleva `docs/SALIR-DE-ELEGIR-ASUNTO.md`); falta
+  confirmar con Francisco si se apunta con número nuevo.
 - `docs/HISTORIA.md` podría seguir sin la entrada de las filas 53-56 (18-sep-2026: cuadro de
   Séneca en dos columnas, el ayudante fiable, el asunto sin elección, los campos calculados);
   comprobar y pegarla si falta.
