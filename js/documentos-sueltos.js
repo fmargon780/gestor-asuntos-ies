@@ -266,7 +266,9 @@ App.meterSueltoEnAsunto = async function (s) {
     cabecera: '<p class="explica">' + U.escapar(s.nombre) +
               '<br><span class="suave">Se llevará a la carpeta del asunto que elijas, ' +
               'y después se abrirá el cuadro de ponerle nombre.</span></p>',
-    sugeridos: sugeridos
+    sugeridos: sugeridos,
+    crearNuevo: { texto: 'No está: crear un asunto nuevo con él',
+                  alPulsar: function () { App.empezarAsuntoCon(s); } }
   });
   if (!elegido) return;
   await App.meterSueltoEnAsuntoElegido(s, elegido);

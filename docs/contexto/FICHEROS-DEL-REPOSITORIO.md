@@ -319,6 +319,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/duplicados.mjs` | Prueba de que no se dupliquen los asuntos, y de unir los que ya existían |
 | `pruebas/ajustes-agil.mjs` | Prueba de las pestañas, el buscador cruzado, el aviso en vivo y la barra fija |
 | `pruebas/papelera.mjs` | Prueba de borrar con papelera, devolver y borrar del todo |
+| `pruebas/salir-de-elegir-asunto.mjs` | Prueba de la fila 230: ✕, Cancelar, Escape y «No está: crear un asunto nuevo» de «Guardar en un asunto» (documento y correo) |
 | `pruebas/documentos-sueltos.mjs` | Prueba de "Meter en un asunto": un documento suelto a un asunto que ya existe |
 | `pruebas/lector-documentos.mjs` | `LectorDocumentos.analizar`, puro, sin pdf.js ni navegador: sello, DNI de un tercero, dos terceros o dos tipos empatados, DNI con la letra mal, texto vacío (17-sep-2026, fila 41) |
 | `pruebas/sugerir-asunto-existente.mjs` | Prueba de "Podría ir en...": un abierto del mismo tipo, cuatro abiertos (dos del tipo, dos de otro), archivados sin abiertos, un abierto con un archivado, sin tercero reconocido, y que "Meter en un asunto" pone arriba los del tercero leído (21-sep-2026, fila 88) |

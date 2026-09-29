@@ -48,6 +48,32 @@
 
 .enlace-archivado { margin-right: 6px; }
 
+/* «Guardar en un asunto» (fila 230): título y pie de botones fijos; solo
+   se desplaza el cuerpo (y cada lista por dentro), así «Cancelar» y la ✕
+   no salen nunca de la vista. Mismo patrón que .cuadro-correo. */
+.cuadro-elegir {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.cuadro-elegir #cuadro-titulo { flex: 0 0 auto; padding-right: 36px; }
+.cuadro-elegir #cuadro-cuerpo {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+.cuadro-elegir .cuadro-botones { flex: 0 0 auto; justify-content: space-between; }
+.cuadro-elegir .cuadro-botones .elegir-crear { margin-right: auto; }
+.elegir-cerrar {
+  position: absolute; top: 12px; right: 12px;
+  width: 30px; height: 30px; padding: 0;
+  border: 0; border-radius: 6px; background: none;
+  font-size: 18px; line-height: 1; cursor: pointer; color: inherit;
+}
+.elegir-cerrar:hover { background: rgba(0,0,0,.08); }
+
 /* ---------- "ya está en el asunto" (fila 18, un mismo correo en dos
    buzones): una línea, no una tarjeta, para que no se confunda con lo
    que sí hay que atender. ---------- */
