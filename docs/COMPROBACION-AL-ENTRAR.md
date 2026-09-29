@@ -102,3 +102,35 @@ imposible o absurda con el código de hoy, se ajusta con el mismo espíritu y se
 - Subir a `main` sin abrir pull request (o, si la sesión lo obliga, según la nota de
   `docs/COLA.md`). Como mucho dos subidas.
 - Una sola pasada de `npm test` al final, en verde.
+
+## Cómo sabemos que está bien
+
+1. Abrir la copia de pruebas con `?demo=1&auto=1` y esperar unos segundos: la aplicación entra sola
+   y, abajo a la izquierda de la barra lateral, aparece una marca pequeña que dice «✓ Todo
+   configurado» o «⚠ N por configurar» (con un número). No sale ningún cuadro que tape la pantalla.
+2. Pulsar esa marca: se abre un cuadro titulado «Comprobación al entrar» con una fila por cosa
+   revisada (carpetas, alumnado, bandeja, envío de correo, ruta de Dropbox, datos del centro,
+   cargos, festivos). Cada fila dice «Bien», «Falta» o «Sin comprobar» y, si no está bien, una
+   frase en lenguaje llano; abajo, «Volver a comprobar» y «Ahora no». Ninguna frase lleva nombres
+   de ficheros ni de claves.
+3. En una fila que falta, pulsar «Arreglarlo»: el cuadro se cierra y la aplicación queda en
+   Ajustes, con la pestaña y el bloque donde se configura esa cosa abiertos y a la vista.
+4. Volver a pulsar la marca y, en una fila que falta, pulsar «No lo uso en este ordenador»: la
+   fila pasa a «No se usa aquí» con un enlace «Volver a revisarla», y el número de la marca baja
+   en uno. Pulsar «Volver a revisarla» la devuelve a «Falta».
+5. Pulsar «Ahora no»: el cuadro se cierra, y el botón de cerrar de los demás cuadros de la
+   aplicación (por ejemplo, el de Nuevo asunto → crear) vuelve a decir «Cancelar».
+6. [SOLO FRANCISCO] Con las carpetas de Dropbox y la bandeja de verdad: quitar el permiso de la
+   carpeta de la bandeja en Chrome y recargar; al entrar sale el cuadro con la bandeja en «Falta»
+   y «Arreglarlo» lleva al bloque de la bandeja en Ajustes › Mantenimiento.
+7. [SOLO FRANCISCO] En la copia sin internet (`ABRIR EL GESTOR.html`): aparece la fila «Copia
+   sin internet al día»; en la web, esa fila no sale.
+
+Notas de lo decidido al programar (29-sep-2026): la marca vive en la barra lateral (fija en todas
+las pantallas) en vez de dentro de cada cabecera; la comprobación de «Envío de correo» no envía ni
+llama a Google (no hay forma de preguntarle al script sin mandar un correo): mira que haya
+dirección guardada, que sea válida y que el script no sea más viejo que la aplicación; los «datos
+del centro» se reparten en tres filas (datos, cargos, festivos) que solo se ven como fallo si
+faltan; «Arreglarlo» de la ruta lleva al bloque «Rutas de las carpetas» de Ajustes › El centro. En
+la copia de pruebas y bajo un navegador automatizado el cuadro no sale solo (solo la marca), para
+no tapar a quien esté probando otra cosa.

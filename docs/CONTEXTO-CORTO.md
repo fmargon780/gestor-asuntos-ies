@@ -71,6 +71,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 (Una línea por cosa; el porqué, en `docs/contexto/` y `HISTORIA.md`.)
 
+- Comprobación al entrar (fila 204): marca en la barra lateral («✓ Todo configurado» / «⚠ N por
+  configurar») y panel con «Arreglarlo» para las cosas que se configuran una vez por ordenador.
 - Nuevo asunto empieza por la persona (fila 197): buscador único en todas las categorías, con la
   parrilla de tipos limitada a la suya en cuanto se elige (el camino tipo-primero sigue
   existiendo), resumen de la guía en una línea, y nombre de carpeta con vista previa

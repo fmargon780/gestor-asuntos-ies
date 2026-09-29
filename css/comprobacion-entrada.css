@@ -1,0 +1,34 @@
+/* ============================================================
+   comprobacion-entrada.css — la marca de la barra lateral y el
+   panel de «Comprobación al entrar» (fila 204).
+   ============================================================ */
+
+.comprobacion-marca {
+  display: block; width: calc(100% - 8px); margin: 0 4px 6px;
+  font: inherit; font-size: 12px; text-align: left; cursor: pointer;
+  border-radius: 8px; padding: 6px 10px; border: 1px solid transparent;
+}
+.comprobacion-marca.comprobacion-bien { background: rgba(120, 200, 150, .18); color: #bfeccf; }
+.comprobacion-marca.comprobacion-ambar { background: var(--ambar); color: #6b4a00; border-color: var(--ambar-linea); }
+.comprobacion-marca.comprobacion-roja { background: var(--rojo); color: #8a2a20; border-color: var(--rojo-linea); }
+
+.comprobacion-lista { list-style: none; margin: 0; padding: 0; max-height: 60vh; overflow: auto; }
+.comprobacion-fila {
+  display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap;
+  padding: 10px 8px; border-bottom: 1px solid var(--linea);
+}
+.comprobacion-punto { width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; flex: none; background: #9aa5b1; }
+.comprobacion-bien .comprobacion-punto { background: #2e9d5b; }
+.comprobacion-ambar .comprobacion-punto { background: var(--ambar-linea); }
+.comprobacion-roja .comprobacion-punto { background: var(--rojo-linea); }
+.comprobacion-gris .comprobacion-punto,
+.comprobacion-omitida .comprobacion-punto { background: #9aa5b1; }
+.comprobacion-texto { flex: 1; min-width: 200px; font-size: 14px; }
+.comprobacion-estado { color: var(--tinta-suave); font-size: 12px; margin-left: 6px; }
+.comprobacion-omitida .comprobacion-texto,
+.comprobacion-gris .comprobacion-texto { color: var(--tinta-suave); }
+.comprobacion-botones { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.comprobacion-enlace {
+  background: none; border: 0; padding: 0; font: inherit; font-size: 12px;
+  color: var(--azul); text-decoration: underline; cursor: pointer;
+}

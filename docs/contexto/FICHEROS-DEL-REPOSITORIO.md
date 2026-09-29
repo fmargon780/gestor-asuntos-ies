@@ -261,6 +261,10 @@ de `App` va después del fichero que lo define.
 | `js/vista.js` | Los filtros plegados y cuándo se ve el tablón |
 | `js/cabecera-fija.js` | La cabecera de la pantalla visible (`header.cabecera` o `header.ficha-cabecera`) se queda pegada arriba (`position: sticky`) y se encoge con el scroll, con histéresis; en "Por clasificar", con un documento abierto, añade "Viendo: …" e "Ir a su fila" (`window.CabeceraFija`) |
 | `css/cabecera-fija.css` | El aspecto de la cabecera pegada: fondo opaco de borde a borde, título más pequeño encogida, qué se esconde |
+| `js/comprobacion-entrada.js` | Las comprobaciones de «Comprobación al entrar» (fila 204): carpetas, base de alumnado, bandeja, envío de correo, ruta de Dropbox, datos del centro, cargos, festivos y copia sin internet; cada una devuelve `{ id, titulo, estado, frase, arreglar }`; solo lee; lo omitido en este ordenador, en `localStorage` |
+| `js/comprobacion-entrada-ver.js` | La marca de la barra lateral («✓ Todo configurado» / «⚠ N por configurar»), el panel con `U.preguntar` y su enganche a `Gestor.alRefrescar` (una vez por entrada) |
+| `css/comprobacion-entrada.css` | El aspecto de la marca y de las filas del panel |
+| `pruebas/comprobacion-entrada.mjs` | Falta casi todo (panel solo, «Arreglarlo» lleva al bloque), «No lo uso en este ordenador», todo bien (marca verde) y una comprobación imposible (gris con motivo) |
 | `css/personas.css` | Personas y empresas (fila 125): la ficha fija al bajar, la tarjeta marcada, las tarjetas de «Familias» y el bloque «Antiguos (N)» |
 | `css/estado-hito.css` | La marca del hito actual (`.marca-hito`) y «Esperando a…» (`.marca-esperando`), en la tarjeta y en la ficha (fila 129) |
 | `css/administraciones.css` | El árbol de departamentos, el desplegable del asunto nuevo y «Pasar a Administraciones» (fila 167) |

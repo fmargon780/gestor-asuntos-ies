@@ -238,6 +238,19 @@ el mando" que siempre está ahí.
 
 Se comprueba con `pruebas/presencia.mjs`.
 
+### Comprobación al entrar (fila 204, 29-sep-2026, `docs/COMPROBACION-AL-ENTRAR.md`)
+
+Al entrar (una sola vez, 2,5 s después de tener datos y `_GESTOR`, enganchada a
+`Gestor.alRefrescar`) `js/comprobacion-entrada.js` revisa en segundo plano lo que se configura una
+vez por ordenador: carpetas, base de alumnado, bandeja, envío de correo, ruta de Dropbox, datos del
+centro, cargos, festivos y (solo en `file://`) la copia sin internet. Cada comprobación devuelve
+`{ id, titulo, estado, frase, arreglar }` y tiene 8 s de tiempo máximo; solo lee. La marca
+`#comprobacion-marca` va en `.lateral-pie` (barra fija) y el panel usa `U.preguntar`
+(`js/comprobacion-entrada-ver.js`). «Arreglarlo» lleva a Ajustes con `llevarA(selector)`: abre la
+pestaña y los `details` que contienen ese elemento. Lo omitido, en `localStorage`
+(`gestor-comprobacion-omitidas`). En la copia de pruebas y con `navigator.webdriver` el panel no sale
+solo (salvo `window.__COMPROBACION_ABRIR_PANEL__`, que usa `pruebas/comprobacion-entrada.mjs`).
+
 ### La pantalla se mide a sí misma
 
 `css/vista.css` pone `container-type: inline-size` en `.contenido`: las reglas miran el ancho
