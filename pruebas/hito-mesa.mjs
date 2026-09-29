@@ -15,9 +15,10 @@
      7. Escape vuelve a la lista; desde "Qué me toca" se entra directo en
         la mesa.
      8. "Traer los guiones del instituto" no pisa un guion ya escrito.
-     9. (fila 120) "+ Añadir una tarea a la guía del tipo" desde la mesa: la
-        línea va al guion del paso de la guía y sale también en otro
-        asunto abierto del mismo tipo; el paso propio no toca la guía.
+     9. (fila 224) La caja «Nueva tarea…» añade solo a este asunto; su
+        «⋮» → «Pasar a la guía» lleva la línea al guion del paso de la
+        guía y sale también en otro asunto abierto del mismo tipo; una
+        segunda tarea nueva, sin pasarla, no toca la guía.
 
    Con FOTOS=<carpeta>, deja una foto de la mesa a 1905 px. */
 import { chromium } from 'playwright';
@@ -308,13 +309,22 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   if (!(await pagina.locator('#ficha-guia.con-mesa .hito-en-mesa[data-id="m1"]').isVisible())) await abrirMesa(pagina, 'm1');
   await comprobar('9. el aviso de hito sin guion ya no manda a Ajustes',
     pagina.evaluate(() => (document.querySelector('.hito-en-mesa .mesa-guion') || {}).textContent.indexOf('Se escribe en la guía del tipo (Ajustes)') === -1), true);
-  /* Fila 145: en el menú «···» de la cabecera. */
-  await elegirDelMenu(pagina, '.hito-en-mesa .mesa-mas', 'Añadir una tarea a la guía del tipo');
+  /* Fila 224: la caja «Nueva tarea…» añade solo a este asunto. */
+  await pagina.fill('.hito-en-mesa .guion-nueva-tarea', 'Pedir el certificado de empadronamiento');
+  await pagina.press('.hito-en-mesa .guion-nueva-tarea', 'Enter');
+  await pagina.waitForSelector('.hito-en-mesa .guion-paso .guion-tarea-propia');
+  await comprobar('9. la caja queda vacía tras Intro',
+    pagina.inputValue('.hito-en-mesa .guion-nueva-tarea'), '');
+  await comprobar('9. la tarea sale con la etiqueta «solo aquí»',
+    pagina.locator('.hito-en-mesa .guion-paso', { hasText: 'Pedir el certificado de empadronamiento' })
+      .locator('.guion-tarea-propia').isVisible(), true);
+  const filaTarea = pagina.locator('.hito-en-mesa .guion-paso', { hasText: 'Pedir el certificado de empadronamiento' });
+  await filaTarea.locator('.guion-tarea-menu-boton').click();
+  await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Pasar a la guía' }).click();
   await pagina.waitForSelector('#capa:not(.oculto)');
-  await pagina.fill('#guion-guia-texto', 'Pedir el certificado de empadronamiento');
   await pagina.click('#cuadro-aceptar');
   await pagina.waitForFunction(() => Array.prototype.some.call(document.querySelectorAll('.mensaje'),
-    (m) => m.textContent.indexOf('Añadido a la guía de') !== -1));
+    (m) => m.textContent.indexOf('Pasado a la guía de') !== -1));
   await pagina.waitForTimeout(500);
   const r9 = await pagina.evaluate(async (otro) => {
     const guias = await Carpetas.leerJson(App.E.gestor, 'guias.json');
@@ -328,15 +338,16 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
     Promise.resolve([r9.ultima.texto, r9.ultima.accion, !!r9.ultima.id]), ['Pedir el certificado de empadronamiento', '', true]);
   await comprobar('9. y sale en el otro asunto abierto del mismo tipo',
     Promise.resolve(r9.enOtro.indexOf('Pedir el certificado de empadronamiento') !== -1), true);
+  await comprobar('9. la línea ya no lleva «solo aquí» y sigue sin marcar',
+    pagina.locator('.hito-en-mesa .guion-paso', { hasText: 'Pedir el certificado de empadronamiento' })
+      .locator('.guion-tarea-propia').count(), 0);
   await comprobar('9. la mesa sigue abierta en el mismo hito, con la línea sin marcar',
     pagina.locator('.hito-en-mesa[data-id="m1"] .guion-paso', { hasText: 'Pedir el certificado de empadronamiento' })
       .locator('.guion-casilla').isChecked(), false);
-  await pagina.locator('.hito-en-mesa .guion-anadir-propio').click();
-  await pagina.waitForSelector('#capa:not(.oculto)');
-  await pagina.fill('#guion-propio-texto', 'Solo para Ana');
-  await pagina.click('#cuadro-aceptar');
+  await pagina.fill('.hito-en-mesa .guion-nueva-tarea', 'Solo para Ana');
+  await pagina.press('.hito-en-mesa .guion-nueva-tarea', 'Enter');
   await pagina.waitForTimeout(800);
-  await comprobar('9. el paso propio no toca la guía', pagina.evaluate(async () => {
+  await comprobar('9. la tarea que no se pasa no toca la guía', pagina.evaluate(async () => {
     const guias = await Carpetas.leerJson(App.E.gestor, 'guias.json');
     const m1 = guias.MATRICULA.filter((p) => p.id === 'm1')[0];
     return m1.guion.length;

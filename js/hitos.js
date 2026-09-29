@@ -150,6 +150,9 @@ var Hitos = (function () {
     /* El estado del guion (fila 109, js/hitos-guion.js): solo si lo hay. */
     if (h && h.guionHecho && typeof h.guionHecho === 'object') salida.guionHecho = h.guionHecho;
     if (h && Array.isArray(h.guionPropio) && h.guionPropio.length) salida.guionPropio = h.guionPropio;
+    /* Fila 224: las tareas de la guía escondidas en este asunto («Cambiar
+       aquí» o «Borrar»), solo si hay alguna. */
+    if (h && Array.isArray(h.guionOcultos) && h.guionOcultos.length) salida.guionOcultos = h.guionOcultos;
     /* Fila 116: la respuesta a cada pregunta del guion, solo si la hay. */
     if (h && h.guionElegido && typeof h.guionElegido === 'object' && Object.keys(h.guionElegido).length) salida.guionElegido = h.guionElegido;
     /* Fila 129 (docs/EL-HITO-ES-EL-ESTADO.md), solo si los hay: la marca

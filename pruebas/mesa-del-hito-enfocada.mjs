@@ -116,7 +116,7 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await comprobar('2. en la cabecera, exactamente los cinco botones',
     pagina.evaluate(() => Array.from(document.querySelectorAll('.hito-en-mesa .mesa-acciones button'))
       .filter((b) => b.offsetParent && !b.closest('.mesa-panel') && !b.closest('.ficha-menu')).map((b) => b.textContent.trim())),
-    ['Generar documento ▾', 'Comunicar ▾', 'Registrar', 'Marcar como hecho', '···']);
+    ['Generar documento ▾', 'Comunicar ▾', 'Registrar', 'Marcar como hecho', 'Hito ▾']);
   await comprobar('2. plazo y responsable, en texto pequeño y pulsable (no etiquetas de color)',
     pagina.evaluate(() => ['.mesa-etq-plazo', '.mesa-etq-resp'].map((s) => {
       const e = document.querySelector('.hito-en-mesa ' + s);

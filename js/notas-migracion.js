@@ -43,6 +43,12 @@ var NotasHito = (function () {
     return notasDe(a).filter(function (n) { return n && n.hito === idHito; });
   }
 
+  /* Fila 224: las notas de una tarea del guion («Anotar»), las que
+     llevan su `tarea` (el id de la tarea en el momento de escribirla). */
+  function delTarea(a, idTarea) {
+    return notasDe(a).filter(function (n) { return n && n.tarea === idTarea; });
+  }
+
   function etiquetaHtml(n) {
     if (!n || !n.hito) return '';
     return '<button type="button" class="nota-hito" data-hito="' + U.escapar(n.hito) + '" title="Abrir la mesa de este hito">⚑ ' +
@@ -65,6 +71,20 @@ var NotasHito = (function () {
     var lista = await Notas.anadir(a, t, { hito: h.id, hitoTitulo: h.titulo || '' });
     if (a.ficha) a.ficha.notas = lista;
     /* La lista de notas de la ficha, al día (la mesa va encima de ella). */
+    if (window.FichaNucleo && FichaNucleo.pintarNotas && document.getElementById('ficha-notas')) {
+      try { FichaNucleo.pintarNotas(a, true); } catch (e) { /* solo pintar */ }
+    }
+    return lista;
+  }
+
+  /* Fila 224: «Anotar» desde una tarea del guion. Igual que
+     `anadirDesdeHito`, con `tarea`/`tareaTexto` además de `hito`, para
+     que la tarea pueda enseñar su 💬 y sus notas propias. */
+  async function anadirDesdeTarea(a, h, tarea, texto) {
+    var t = String(texto || '').trim();
+    if (!t || !window.Notas) return null;
+    var lista = await Notas.anadir(a, t, { hito: h.id, hitoTitulo: h.titulo || '', tarea: tarea.id, tareaTexto: tarea.texto || '' });
+    if (a.ficha) a.ficha.notas = lista;
     if (window.FichaNucleo && FichaNucleo.pintarNotas && document.getElementById('ficha-notas')) {
       try { FichaNucleo.pintarNotas(a, true); } catch (e) { /* solo pintar */ }
     }
@@ -194,7 +214,7 @@ var NotasHito = (function () {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enganchar);
   else enganchar();
 
-  return { MARCA: MARCA, esAutomatica: esAutomatica, delHito: delHito, etiquetaHtml: etiquetaHtml, idsConNotas: idsConNotas,
-           anadirDesdeHito: anadirDesdeHito, aMano: aMano, juntar: juntar, hacer: hacer };
+  return { MARCA: MARCA, esAutomatica: esAutomatica, delHito: delHito, delTarea: delTarea, etiquetaHtml: etiquetaHtml, idsConNotas: idsConNotas,
+           anadirDesdeHito: anadirDesdeHito, anadirDesdeTarea: anadirDesdeTarea, aMano: aMano, juntar: juntar, hacer: hacer };
 })();
 window.NotasHito = NotasHito;

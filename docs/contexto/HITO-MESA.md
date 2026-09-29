@@ -55,13 +55,14 @@ Cambió cómo se ve, no lo que hace: cada botón llama a lo mismo que antes. **E
   **«Registrar»** (fila 154, no en un hito-pregunta: con un documento del hito sin registro, lo
   registra; con varios, menú para elegir; sin ninguno, aviso ámbar; es `HitosDocumentoMenu.registrar`,
   lo mismo que el ⋯ del documento, y abre antes la tarjeta de documentos), «Marcar como hecho» (principal; pulsa la casilla de siempre, que avisa de lo obligatorio; con el hito
-  hecho, «Hecho ✓ (desmarcar)») y «···»: «Estamos en este paso…» (fila 129, si se puede), «Dejarlo solo
-  informativo»/«Pedírmelo a mí», **«+ Crear un hito» y «Cambiar este hito»** (fila 206, no en un
-  hito-pregunta: ver más abajo), «+ Añadir una tarea a la guía del tipo» (fila 120: sigue siendo una
-  tarea del guion, no un hito entero; renombrado en la fila 206 para no confundir los dos), «Cambiar la
-  guía…» (con la advertencia «Vale para todos los asuntos…», luego `GuiasDelCentro.escribir`) y **«Borrar
-  este hito»** (fila 206: apagado, con el motivo en el `title`, si el hito no está vacío). El pie
-  «Cambiar la guía» de `#ficha-guia-nota` no sale con la mesa abierta.
+  hecho, «Hecho ✓ (desmarcar)») y **«Hito ▾»** (fila 224, `docs/TAREAS-DEL-HITO-SENCILLAS.md`, antes
+  «···»): arriba, sin repetir la palabra, **Crear · Cambiar · Borrar** (fila 206, no en un
+  hito-pregunta: ver más abajo; mismas funciones, solo el texto cambia), y debajo de una raya
+  «Saltar a este hito…» (fila 129, si se puede), «Dejarlo solo informativo»/«Pedírmelo a mí», «Cambiar
+  la guía…» (con la advertencia «Vale para todos los asuntos…», luego `GuiasDelCentro.escribir`) y
+  «Enviar estado» (fila 195). «+ Añadir una tarea a la guía del tipo» (fila 120) ya no vive aquí:
+  es «Pasar a la guía» de cada tarea «solo aquí» (ver «El guion» más abajo). El pie «Cambiar la
+  guía» de `#ficha-guia-nota` no sale con la mesa abierta.
 
 ### Crear, cambiar y borrar hitos desde el asunto (28-sep-2026, fila 206, `docs/HITOS-DESDE-EL-ASUNTO.md`)
 
@@ -156,8 +157,10 @@ Cuál se ve lo dice `data-tarjeta` de `.mesa-columnas` (solo CSS: cambiar no rep
   `.guion-siguiente`: fondo ámbar claro, título más grande y su explicación; si su acción es añadir un
   documento (o es una línea 📎), una zona pequeña para soltar el PDF. Los demás pendientes: explicación
   en gris pequeño. «No aplica» solo al pasar el ratón o con el foco (siempre en pantallas
-  táctiles). Al pie, «+ Añadir un paso solo para este asunto» y, si el hito viene de un paso de la
-  guía, «✎ Cambiar el guion de este hito (para todos los asuntos de este tipo)».
+  táctiles). **Sin frases al pie** (fila 224, `docs/TAREAS-DEL-HITO-SENCILLAS.md`): al final de la
+  lista, una sola caja «Nueva tarea… (escribe y pulsa Intro)» que añade solo a este asunto
+  (`Hitos.anadirGuionPropio`). Cada tarea lleva su «⋮» (💬 además si tiene notas,
+  `js/hito-mesa-tarea-menu.js`): ver «El guion» más abajo.
 
   **El «Comunicar» de un paso** (fila 150) ya no existe desde la fila 154: se comunica desde «Comunicar
   ▾» de la cabecera, que marca el primer paso pendiente con esa acción (`Hitos.marcarGuionPorAccion`).
@@ -251,9 +254,11 @@ La tabla de documentos, los gemelos, la selección y «Comunicar» funcionan com
 - **En la biblioteca**: `guion` en cada modelo (`HitosBiblioteca.normalizarModelo`), copiado al traer
   un modelo (`modeloAPaso`) y al subirlo (`pasoAModelo`), y comparado en `diferencias` ("Guion").
 - **En el hito** solo el estado (`js/hitos-guion.js`, sobre `window.Hitos`): `guionHecho: { id: {
-  hecho, noaplica, quien, cuando } }` y `guionPropio: [{ id, texto }]` (`normalizarHito` los
-  conserva). `Hitos.guionDe(a, h)` junta el guion del paso (por `origenGuia`) con eso; un paso que
-  desaparece de la guía deja de verse.
+  hecho, noaplica, quien, cuando } }`, `guionPropio: [{ id, texto, enLugarDe? }]` y `guionOcultos:
+  [id...]` (fila 224: los ids de la guía que no se ven en este asunto; `enLugarDe`, si una propia
+  sustituye a una de ellas en su mismo sitio; `normalizarHito` conserva los tres, solo si no están
+  vacíos). `Hitos.guionDe(a, h)` junta el guion del paso (por `origenGuia`) con eso; un paso que
+  desaparece de la guía deja de verse, igual que uno escondido sin sustituta.
 - **Preguntas en el guion** (24-sep-2026, fila 116, `docs/PREGUNTAS-EN-EL-GUION.md`): una línea
   puede ser `{ id, texto, explicacion, pregunta: true, opciones: [{ id, texto, lineas: [...] }] }`.
   Un solo nivel (`GuiasGuion.normalizar(lista, dentro)` quita la marca dentro de una opción) y sin
@@ -266,16 +271,33 @@ La tabla de documentos, los gemelos, la selección y «Comunicar» funcionan com
   mesa (`js/hito-mesa-guion.js`), un botón por respuesta, las líneas de la elegida sangradas y lo
   plegado al final, en gris. La biblioteca copia y compara el guion entero
   (`GuiasGuion.textoLegible`). En el mapa, «¿» en la caja de un paso cuyo guion tiene pregunta.
-- **Escribir el guion desde la mesa** (24-sep-2026, fila 120, `docs/GUION-DESDE-EL-HITO.md`): bajo
-  el guion, «+ Añadir un paso a la guía del tipo» (solo si el hito tiene `origenGuia`, su paso sigue
-  en la guía y no es una pregunta; nunca en modo consulta) y «+ Añadir un paso solo para este
-  asunto» (`guionPropio`, como antes). El primero añade la línea al final del `guion` del paso de la
-  guía (fuera de las respuestas, `accion: ''`, sin normativa ni explicación, id de
-  `GuiasGuion.normalizar`) con `GuiasDelCentro.cambiarPasos(tipo, fn)` (relee `guias.json`, cambia
-  una copia y guarda por `guardarPasos`); como `Hitos.guionDe` lee el paso en vivo, sale en todos
-  los asuntos de ese tipo. La biblioteca no se toca. Aviso verde «Añadido a la guía de <tipo
-  corto>»; si falla, rojo, y lo escrito vuelve a salir al abrir el cuadro. El aviso de hito sin
-  guion dice ya «Añade el primer paso aquí abajo».
+- **El «⋮» de cada tarea** (29-sep-2026, fila 224, `docs/TAREAS-DEL-HITO-SENCILLAS.md`,
+  `js/hito-mesa-tarea-menu.js`): sustituye a «+ Añadir un paso a la guía del tipo» y a «✎ Cambiar el
+  guion de este hito» (fila 120), que ya no viven al pie de la tarjeta. Sin el `guion-paso-plegada`
+  ni en una pregunta.
+  - **Anotar**: una línea para escribir debajo de la tarea; la nota va a la libreta única del
+    asunto (`NotasHito.anadirDesdeTarea`, con `hito`/`hitoTitulo` como siempre y además
+    `tarea`/`tareaTexto`) con el nombre de la tarea delante («Revisar DNI o NIE: …»). La tarea
+    lleva entonces un 💬 (con el número si hay más de una) que despliega o pliega sus notas
+    (`NotasHito.delTarea`).
+  - **Cambiar aquí** (tarea de la guía) / **Cambiar** (tarea «solo aquí»): el texto se edita en la
+    propia línea (Intro guarda, Escape cancela). De la guía: `Hitos.cambiarGuionAqui(clave, idHito,
+    original, texto)` esconde el id original en `guionOcultos` y pone una propia con `enLugarDe` en
+    su mismo sitio, con su marca de hecha; desde ese momento lleva «solo aquí». «Solo aquí»:
+    `Hitos.cambiarGuionPropioTexto`, sin más.
+  - **Cambiar en la guía** (tarea de la guía): `HitoMesaGuion.cambiarGuionDelPaso(a, h, idResaltar)`,
+    el mismo editor de siempre (`js/guias-guion.js`) con esa tarea a la vista y resaltada
+    (`.guion-fila-resaltada`); el título de la ventana dice «Cambiar en la guía de <tipo>».
+  - **Pasar a la guía** (tarea «solo aquí»): confirmación de una línea y, aceptada, la tarea (texto,
+    explicación, acción, normativa, reunir/obligatorio) se añade al final del `guion` del paso de
+    la guía con `GuiasDelCentro.cambiarPasos` (id nuevo de `GuiasGuion.normalizar`, como antes),
+    y `Hitos.pasarGuionPropioAGuia` quita la propia de este asunto y traslada su marca de hecha (si
+    la tenía) al id nuevo. Como `Hitos.guionDe` lee el paso en vivo, sale ya en todos los asuntos
+    abiertos de ese tipo. La biblioteca no se toca.
+  - **Borrar**: `Hitos.borrarGuionPropio` (una «solo aquí», desaparece de este asunto; si sustituía
+    a una de la guía, esa se queda escondida) o `Hitos.ocultarGuionDeGuia` (una de la guía, sin
+    sustituta: solo se esconde en `guionOcultos`, la guía no cambia). Si la tarea estaba hecha, «No
+    aplica» o tenía notas, una confirmación de una línea.
 - **Se marca solo** (`Hitos.marcarGuionPorAccion(a | clave, idHito, accion)`, el primer paso sin
   marcar con esa acción, en el orden en que se ven, nunca de una respuesta no elegida; si falla, ámbar con `U.accesorio`): `generar` en
   `js/plantillas-documento.js` (generar con hito); `registrar` al terminar el registro desde el ⋯
@@ -313,12 +335,15 @@ generar ese fichero con `herramientas/cargar-biblioteca.mjs`, los guiones se per
 
 Se comprueba con `pruebas/hito-mesa.mjs`, `pruebas/mesa-del-hito-enfocada.mjs`, `pruebas/mesa-tarjetas-que-se-abren.mjs`
 (a 1905×1000 y 1280×800; con `CAPTURAS=1`, fotos en `pruebas/capturas/`), `pruebas/mesa-comunicar-del-paso-y-guion.mjs`
-(el «Comunicar» de un paso, visible con dos vías, marca el paso pulsado; y «✎ Cambiar el guion») y
+(el «Comunicar» de un paso, visible con dos vías, marca el paso pulsado; y «Cambiar en la guía») y
 `pruebas/enviar-documento-por-seneca.mjs` («Enviar ▾» de un documento, por correo o por Séneca, y el guion al
 terminar) y `pruebas/hitos-acciones-en-el-hito.mjs` (fila 154: sin botones en los pasos, «Registrar» en la
-cabecera, «Comunicar» de arriba escondido, quién al lado del paso hecho, y los tres números iguales) y
+cabecera, «Comunicar» de arriba escondido, quién al lado del paso hecho, y los tres números iguales),
 `pruebas/hitos-recetas.mjs` (fila 164: la receta de comunicar abre el cuadro con su plantilla y marca ese
-paso; los documentos de otros hitos; el editor de la receta; generar y registrar). Las pruebas que abrían varios hitos seguidos cierran antes la mesa (`HitoMesa.cerrar()`).
+paso; los documentos de otros hitos; el editor de la receta; generar y registrar) y
+`pruebas/tareas-del-hito-sencillas.mjs` (fila 224: la caja «Nueva tarea…», «Cambiar aquí», «Anotar» con su
+💬, «Borrar» de una tarea de la guía y el botón «Hito ▾»). Las pruebas que abrían varios hitos seguidos
+cierran antes la mesa (`HitoMesa.cerrar()`).
 
 ### Una sola lista: lo que hay que reunir, en el guion (25-sep-2026, fila 138, `docs/UNA-SOLA-LISTA-EN-EL-HITO.md`)
 

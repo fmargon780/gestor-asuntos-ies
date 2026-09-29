@@ -45,8 +45,12 @@
 .mesa-meta.mesa-etq-rojo { color: #a4302a; font-weight: 600; }
 .mesa-meta.mesa-etq-ambar { color: #8a6100; font-weight: 600; }
 .mesa-meta-punto { font-size: 12px; color: var(--tinta-suave); }
-.mesa-acciones { display: flex; gap: 8px; align-items: center; margin-left: auto; flex-wrap: wrap; }
+.mesa-acciones { display: flex; gap: 6px; align-items: center; margin-left: auto; flex-wrap: wrap; }
 .mesa-acciones .boton { padding-top: 6px; padding-bottom: 6px; }
+/* Fila 224: «Hito ▾» es más ancho que los «···» de antes; menos relleno
+   a los lados y un hueco algo más justo entre botones, para no romper
+   el presupuesto de 250 px de docs/CABECERA-COMPACTA.md (fila 112). */
+.mesa-acciones .mesa-mas { padding-left: 6px; padding-right: 6px; }
 
 /* La tira de hitos: todo el ancho, celdas iguales. */
 .mesa-tira { display: flex; gap: 0; border: 1px solid var(--linea); border-radius: 8px; overflow: hidden; }
@@ -227,8 +231,23 @@ details.mesa-normativa > summary { cursor: pointer; }
 .mesa-chip:has(input:checked) { background: #e3eefb; border-color: #a9c6e6; }
 .mesa-comunicar-botones { display: flex; gap: 6px; flex-wrap: wrap; }
 .hito-nota.hito-nota-auto { background: none; padding-left: 0; color: var(--tinta-suave); }
-.guion-anadir-propio { font-size: 12px; align-self: flex-start; margin-top: 6px; }
 .mesa-normativa .hito-normativa-titulo { font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--tinta-suave); }
+
+/* ---------- tareas del hito, sin texto de sobra (fila 224) ---------- */
+.guion-tarea-propia {
+  font-size: 11px; color: var(--tinta-suave); background: var(--fondo); border-radius: 10px;
+  padding: 1px 7px; white-space: nowrap;
+}
+.guion-tarea-notas-boton, .guion-tarea-menu-boton {
+  flex: 0 0 auto; border: 0; background: none; cursor: pointer; color: var(--tinta-suave); font-size: 13px; padding: 2px 4px;
+}
+.guion-tarea-notas-boton:hover, .guion-tarea-menu-boton:hover { color: var(--tinta); }
+.guion-tarea-editar, .guion-tarea-anotar { margin: 4px 0 0 24px; max-width: 420px; }
+.guion-tarea-editar input, .guion-tarea-anotar textarea { width: 100%; }
+.guion-tarea-editar .nota, .guion-tarea-anotar .nota { margin: 2px 0 0; font-size: 11px; }
+.guion-tarea-notas-lista { margin: 4px 0 0 24px; display: flex; flex-direction: column; gap: 4px; }
+.guion-tarea-nota { background: var(--fondo); border-radius: 8px; padding: 4px 8px; font-size: 12.5px; }
+.guion-nueva-tarea { width: 100%; margin-top: 8px; }
 
 /* ---------- preguntas dentro del guion (fila 116) ---------- */
 .guion-pregunta .guion-paso-linea { display: flex; align-items: baseline; gap: 6px; }

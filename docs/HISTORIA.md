@@ -5,6 +5,60 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 29-sep-2026 — Fila 224: tareas del hito, sin texto de sobra
+
+Diseñado con Francisco en Cowork el 28-sep-2026: la tarjeta «Tareas del hito» tenía tres frases
+largas para añadir o cambiar una tarea. Ahora: sin ninguna frase al pie, una sola caja «Nueva
+tarea… (escribe y pulsa Intro)» que añade solo a este asunto, y un «⋮» en cada tarea.
+
+**Dato nuevo en el hito** (`js/hitos-guion.js`): `guionOcultos: [id...]` (las tareas de la guía
+que no se ven en este asunto) y, en `guionPropio`, un `enLugarDe` opcional (la propia que sustituye,
+en su mismo sitio, a una de la guía). `unir()` (antes: guía primero, propias al final) ahora, al
+recorrer el guion de la guía, sustituye en el sitio cada línea escondida por su sustituta si la
+tiene, o la salta si no; las propias sin `enLugarDe` siguen yendo al final, como antes. **Se olvidó
+un detalle al escribirlo la primera vez**: `Hitos.normalizarHito` (`js/hitos.js`) guarda cada campo
+del hito con una lista blanca fija (así lleva desde la fila 109), y `guionOcultos` no estaba en
+ella: la primera prueba en el navegador guardaba bien en memoria pero perdía el campo al escribir
+`hitos.json` de verdad. Se ve enseguida en cuanto se prueba con el disco de mentira real (nunca
+solo con `jsdom`); arreglado añadiendo la misma línea condicional que ya llevaba `guionPropio`.
+
+Cinco acciones nuevas en `Hitos` (`cambiarGuionAqui`, `cambiarGuionPropioTexto`,
+`borrarGuionPropio`, `ocultarGuionDeGuia`, `pasarGuionPropioAGuia`), todas sobre el mismo
+`editarHito` de siempre. El «⋮» de cada tarea (`js/hito-mesa-tarea-menu.js`, fichero nuevo:
+`js/hito-mesa-guion.js` ya iba por 332 líneas y esto no cabía sin pasar de 600) las llama según la
+tarea sea de la guía (Anotar · Cambiar aquí · Cambiar en la guía · Borrar) o «solo aquí» (Anotar ·
+Cambiar · Pasar a la guía · Borrar). «Anotar» reutiliza la libreta única del asunto
+(`NotasHito.anadirDesdeTarea`, fila 139, con `tarea`/`tareaTexto` además de `hito`/`hitoTitulo`): el
+texto guardado empieza por el nombre de la tarea, y la tarea gana un 💬 que despliega sus notas
+(`NotasHito.delTarea`). «Pasar a la guía» reutiliza el mismo `GuiasDelCentro.cambiarPasos` que ya
+usaba la vieja «+ Añadir una tarea a la guía del tipo» (fila 120, que desaparece: como
+`Hitos.guionDe` lee el paso de la guía en vivo, basta con añadir la línea para que salga en todos
+los asuntos abiertos del tipo, sin ninguna comprobación de «hito vacío»: no hace falta, es
+puramente aditivo). «Cambiar en la guía» reutiliza el editor de siempre
+(`HitoMesaGuion.cambiarGuionDelPaso`, que gana un `idResaltar` opcional para marcar y centrar esa
+fila, `.guion-fila-resaltada`) con el título cambiado a «Cambiar en la guía de <tipo>».
+
+Todo el repintado de la tarjeta va envuelto en `U.conservandoLoEscrito` (antes no hacía falta: no
+había ningún campo que sobreviviera a un repintado), así la caja «Nueva tarea…» y los cuadros de
+edición o de anotar en línea no pierden el foco ni lo escrito si algo repinta por detrás.
+
+El menú «···» de la cabecera del hito pasa a decir **«Hito ▾»**, con Crear · Cambiar · Borrar
+arriba (antes al fondo o repartidos, fila 206) y las demás opciones de siempre debajo de una raya.
+**Costó un ajuste de CSS**: «Hito ▾» es bastante más ancho que los tres puntos de antes, y
+`pruebas/cabecera-compacta.mjs` (fila 112) mide que «QUÉ HAY QUE HACER» quede a 250 px o menos del
+borde de arriba — el ensanche bastaba para que el grupo de cinco botones de la cabecera dejara de
+caber en una sola línea y se fuera a una segunda, bajando esa medida a 283 px. Arreglado con menos
+relleno lateral en ese botón y algo menos de hueco entre los cinco (`css/hito-mesa.css`); queda en
+247 px, con poco margen: si algún botón de esa fila crece más adelante, puede volver a romperse.
+
+`pruebas/tareas-del-hito-sencillas.mjs`, nueva: sin frases al pie, «Cambiar aquí» (no toca la guía
+ni el otro asunto abierto), «Anotar» (el 💬 y el texto de la nota), «Borrar» de una tarea de la
+guía (se esconde solo aquí) y el menú «Hito ▾». Puestas al día `pruebas/hito-mesa.mjs` (la sección
+9: Intro en la caja añade «solo aquí», su «⋮» → «Pasar a la guía»), `pruebas/hitos-desde-el-asunto.mjs`
+(los tres textos del menú) y `pruebas/mesa-comunicar-del-paso-y-guion.mjs` («Cambiar en la guía»
+desde el «⋮» de la tarea, en vez del enlace suelto de antes). `npm test` completo (189 ficheros) en
+verde.
+
 ## 28-sep-2026 — Fila 225: aviso «esperando tu respuesta», y un revisor sin pantalla que mirar
 
 `scripts/aviso-esperando.sh` (hooks de `.claude/settings.json`, ya puestos por la fila 224 desde

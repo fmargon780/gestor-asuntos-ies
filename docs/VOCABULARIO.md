@@ -25,6 +25,8 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | Dejar un cuadro sin hacer nada | **cancelar** | dejarlo |
 | El bloque de hitos que le tocan a Administración, con o sin fecha | **En Administración** | Me toca |
 | El bloque de asuntos cuyo hito actual espera a otro responsable | **En espera** | Esperamos a otros |
+| Una tarea que existe solo en este asunto, no en la guía | **solo aquí** | propia, propio del asunto |
+| Escribir una nota desde una tarea del hito | **Anotar** | apuntar, comentar |
 
 La diferencia entre plantilla e impreso: si la app lo rellena y lo genera, es plantilla; si se
 entrega para que alguien lo rellene, es impreso (aunque la app ponga los datos del centro).

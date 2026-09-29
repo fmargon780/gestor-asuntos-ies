@@ -121,7 +121,7 @@ async function elegirDelMenu(texto) {
 /* ========== A. Crear con guía: en su sitio, y llega a otro abierto ========== */
 
 await abrirMesaDe('Actual', 'c1');
-await elegirDelMenu('+ Crear un hito');
+await elegirDelMenu('Crear');
 await pagina.fill('#hda-titulo', 'Recabar la documentación');
 await pagina.selectOption('#hda-despues', 'c1');
 await pagina.click('#cuadro-aceptar');
@@ -151,7 +151,7 @@ await pagina.evaluate(async ([a3, id]) => {
 
 await volver();
 await abrirMesaDe('Actual', 'c1');
-await elegirDelMenu('+ Crear un hito');
+await elegirDelMenu('Crear');
 await pagina.fill('#hda-titulo', 'Nota solo mía');
 await pagina.uncheck('#hda-tambien-guia');
 await pagina.click('#cuadro-aceptar');
@@ -168,7 +168,7 @@ await comprobar('B. ni al otro asunto abierto',
 
 await volver();
 await abrirMesaDe('Actual', idNuevo);
-await elegirDelMenu('Cambiar este hito');
+await elegirDelMenu('Cambiar');
 await pagina.fill('#hda-titulo', 'Recabar y comprobar la documentación');
 await pagina.selectOption('#hda-despues', '');   /* Al principio */
 await pagina.click('#cuadro-aceptar');
@@ -192,13 +192,13 @@ await comprobar('C. la guía también cambia y se mueve',
 await volver();
 await abrirMesaDe('Trabajo', idNuevo);
 await abrirMas();
-await comprobar('D. «Borrar este hito» apagado en el que tiene trabajo',
-  pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Borrar este hito' }).isDisabled(), true);
+await comprobar('D. «Borrar» apagado en el que tiene trabajo',
+  pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Borrar' }).first().isDisabled(), true);
 await pagina.keyboard.press('Escape');
 await volver();
 
 await abrirMesaDe('Actual', idNuevo);
-await elegirDelMenu('Borrar este hito');
+await elegirDelMenu('Borrar');
 await pagina.waitForSelector('#hda-tambien-guia');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);

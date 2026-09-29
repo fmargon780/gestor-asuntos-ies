@@ -285,7 +285,7 @@ var HitoMesa = (function () {
           (abierto && !decision
             ? '<button type="button" class="boton' + (h.estado === 'hecho' ? '' : ' boton-principal') + (completo ? ' mesa-hecho-resaltado' : '') + ' mesa-marcar-hecho">' +
               (h.estado === 'hecho' ? 'Hecho ✓ (desmarcar)' : 'Marcar como hecho') + '</button>' : '') +
-          (abierto ? '<button type="button" class="boton mesa-mas" title="Más opciones">···</button>' : '') +
+          (abierto ? '<button type="button" class="boton mesa-mas" title="Crear, cambiar o borrar el hito">Hito ▾</button>' : '') +
         '</div>' +
       '</div>' +
       (todoHecho ? '<div class="mesa-todo-hecho aviso aviso-verde">Todos los hitos están hechos. ' +
@@ -359,6 +359,21 @@ var HitoMesa = (function () {
     } }] : []));
     var mas = cab.querySelector('.mesa-mas');
     var opcionesMas = [];
+    /* Fila 224 (docs/TAREAS-DEL-HITO-SENCILLAS.md): arriba, sin repetir la
+       palabra, Crear · Cambiar · Borrar (antes «+ Crear un hito»,
+       «Cambiar este hito» y «Borrar este hito», al final; fila 206).
+       Nunca en un hito-pregunta (las preguntas se siguen escribiendo en
+       Ajustes). Las demás opciones se quedan debajo de una raya, con su
+       texto de siempre: esta fila no las mueve. */
+    if (window.HitosDesdeElAsunto && !decision) {
+      opcionesMas.push({ texto: 'Crear', clase: 'mesa-hda-crear', alPulsar: function () { HitosDesdeElAsunto.abrirCrear(a, h.id); } });
+      opcionesMas.push({ texto: 'Cambiar', clase: 'mesa-hda-cambiar', alPulsar: function () { HitosDesdeElAsunto.abrirCambiar(a, h); } });
+      var puedeBorrar = HitosDesdeElAsunto.estaVacio(h, a);
+      opcionesMas.push({ texto: 'Borrar', clase: 'ficha-menu-peligro', deshabilitado: !puedeBorrar,
+        title: puedeBorrar ? '' : 'Tiene trabajo: no se puede borrar',
+        alPulsar: function () { HitosDesdeElAsunto.abrirBorrar(a, h); } });
+      opcionesMas.push({ raya: true });
+    }
     /* Fila 129: dar por hechos los anteriores (js/estado-hito.js). */
     if (window.EstadoHito && EstadoHito.puedeSituar(hitos, h.id)) opcionesMas.push({ texto: 'Saltar a este hito…', clase: 'mesa-situar', alPulsar: function () {
       EstadoHito.situar(a, h.id, mas);
@@ -366,31 +381,14 @@ var HitoMesa = (function () {
     opcionesMas.push({ texto: h.soloInformativo ? 'Pedírmelo a mí' : 'Dejarlo solo informativo', alPulsar: function () {
       var b = fila.querySelector('.hito-solo-informativo'); if (b) b.click();
     } });
-    /* Fila 145: lo que había debajo del guion y al pie de la mesa. */
-    /* Fila 206 (docs/HITOS-DESDE-EL-ASUNTO.md): crear, cambiar y borrar
-       hitos enteros desde aquí mismo, sin salir a Ajustes. Nunca en un
-       hito-pregunta (las preguntas se siguen escribiendo en Ajustes). */
-    if (window.HitosDesdeElAsunto && !decision) {
-      opcionesMas.push({ texto: '+ Crear un hito', clase: 'mesa-hda-crear', alPulsar: function () { HitosDesdeElAsunto.abrirCrear(a, h.id); } });
-      opcionesMas.push({ texto: 'Cambiar este hito', clase: 'mesa-hda-cambiar', alPulsar: function () { HitosDesdeElAsunto.abrirCambiar(a, h); } });
-    }
-    if (window.HitoMesaGuion && HitoMesaGuion.puedeAnadirALaGuia && HitoMesaGuion.puedeAnadirALaGuia(a, h)) {
-      opcionesMas.push({ texto: '+ Añadir una tarea a la guía del tipo', clase: 'mesa-anadir-guia', alPulsar: function () { HitoMesaGuion.anadirALaGuia(a, h); } });
-    }
     if (window.GuiasDelCentro && GuiasDelCentro.escribir) opcionesMas.push({ texto: 'Cambiar la guía…', clase: 'mesa-cambiar-guia', alPulsar: function () { cambiarLaGuia(a); } });
     /* «Enviar estado» (fila 195, docs/AVISOS-A-QUIEN-LO-PIDE.md, punto
-       3): en el menú «···», que ya crece sin romper el ancho fijo de
+       3): en el menú «Hito ▾», que ya crece sin romper el ancho fijo de
        la cabecera (fila 50, docs/CABECERA-NO-TIEMBLA.md). */
     if (window.AvisosLoPide) {
       opcionesMas.push({ texto: 'Enviar estado', clase: 'mesa-enviar-estado', alPulsar: function () { AvisosLoPide.enviarEstado(a); } });
     }
-    var puedeBorrar = !decision && window.HitosDesdeElAsunto && HitosDesdeElAsunto.estaVacio(h, a);
-    if (mas) FichaMenus.montar(mas, opcionesMas.concat(decision ? [] : [
-      { raya: true },
-      { texto: 'Borrar este hito', clase: 'ficha-menu-peligro', deshabilitado: !puedeBorrar,
-        title: puedeBorrar ? '' : 'Tiene trabajo: no se puede borrar',
-        alPulsar: function () { if (window.HitosDesdeElAsunto) HitosDesdeElAsunto.abrirBorrar(a, h); } }
-    ]));
+    if (mas) FichaMenus.montar(mas, opcionesMas);
   }
 
   /* Fila 154 (docs/HITOS-ACCIONES-EN-EL-HITO.md): «Registrar» en la

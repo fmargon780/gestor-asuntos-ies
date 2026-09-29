@@ -9,7 +9,12 @@
    para los asuntos vivos. En el hito solo se guarda el estado:
 
      guionHecho:  { <id>: { hecho, noaplica, quien, cuando } }
-     guionPropio: [{ id, texto }]   (lo añadido solo a este asunto)
+     guionPropio: [{ id, texto, enLugarDe? }]   (lo añadido solo a este asunto;
+                   `enLugarDe` si sustituye, en su mismo sitio, a una tarea de
+                   la guía cambiada con «Cambiar aquí»)
+     guionOcultos: [id, id...]   (tareas de la guía que no se ven en este
+                   asunto: la de «Cambiar aquí» —con su sustituta en
+                   guionPropio— y la de «Borrar» —sin sustituta—)
      guionElegido: { <idPregunta>: <idOpcion> }   (fila 116: la respuesta
                    a cada pregunta del guion, docs/PREGUNTAS-EN-EL-GUION.md)
 
@@ -23,6 +28,20 @@
      Hitos.marcarGuionPorAccion(a, idHito, accion)  (el primer paso sin marcar con esa acción)
      Hitos.anadirGuionPropio(clave, idHito, texto)
      Hitos.elegirEnGuion(clave, idHito, idPregunta, idOpcion)   (fila 116)
+
+   Fila 224 (docs/TAREAS-DEL-HITO-SENCILLAS.md): el «⋮» de cada tarea.
+     Hitos.cambiarGuionAqui(clave, idHito, original, nuevoTexto)   («Cambiar aquí»
+                   de una tarea de la guía: la esconde con guionOcultos y pone
+                   una propia en su mismo sitio, con su marca de hecha)
+     Hitos.cambiarGuionPropioTexto(clave, idHito, idPropio, nuevoTexto)  («Cambiar»
+                   de una tarea «solo aquí», sea o no una sustituta)
+     Hitos.borrarGuionPropio(clave, idHito, idPropio)   («Borrar» de una tarea
+                   «solo aquí»: desaparece de este asunto)
+     Hitos.ocultarGuionDeGuia(clave, idHito, idOriginal)   («Borrar» de una
+                   tarea de la guía: se esconde solo en este asunto, sin sustituta)
+     Hitos.pasarGuionPropioAGuia(clave, idHito, idPropio, idNuevo)   («Pasar a
+                   la guía»: quita la propia y traslada su marca de hecha al id
+                   nuevo que ya se ha añadido a la guía)
 
    Fila 138 (docs/UNA-SOLA-LISTA-EN-EL-HITO.md): una línea puede ser algo
    que hay que reunir (`reunir`, `obligatorio`; en el estado, `valor` o
@@ -68,10 +87,21 @@
   }
 
   /* Puro: junta el guion del paso y el propio del asunto con el estado
-     guardado en el hito. */
+     guardado en el hito. Fila 224: una tarea de la guía escondida
+     (`guionOcultos`) con una sustituta en `guionPropio` (`enLugarDe`)
+     sale en su mismo sitio, con la sustituta; sin sustituta, desaparece
+     (era un «Borrar» de una tarea de la guía). Las de `guionPropio`
+     que no sustituyen a ninguna son las «solo aquí» de siempre: van al
+     final. */
   function unir(guionDelPaso, hito) {
     var estado = (hito && hito.guionHecho) || {};
     var elegido = (hito && hito.guionElegido) || {};
+    var ocultos = {};
+    ((hito && hito.guionOcultos) || []).forEach(function (id) { ocultos[id] = true; });
+    var propios = (hito && hito.guionPropio) || [];
+    var sustitutas = {};
+    propios.forEach(function (g) { if (g.enLugarDe) sustitutas[g.enLugarDe] = g; });
+
     function linea(g, propio, deOpcion) {
       var x = Object.assign({}, g, estado[g.id] || {});
       return { id: g.id, texto: x.texto || '', explicacion: x.explicacion || '', accion: x.accion || '',
@@ -84,9 +114,17 @@
                /* Fila 164: la receta del paso (sus detalles), si la lleva. */
                receta: g.receta || null };
     }
+    /* La línea de la guía en su sitio: la propia (si «Cambiar aquí» la
+       sustituyó), o la de siempre; null si un «Borrar» la escondió sin
+       sustituta. */
+    function lineaDeGuia(g, deOpcion) {
+      if (!ocultos[g.id]) return linea(g, false, deOpcion);
+      var sust = sustitutas[g.id];
+      return sust ? linea(Object.assign({ explicacion: '', accion: '', normativa: null }, sust), true, deOpcion) : null;
+    }
     var lista = [], plegadas = [];
     (guionDelPaso || []).forEach(function (g) {
-      if (!g.pregunta) { lista.push(linea(g, false)); return; }
+      if (!g.pregunta) { var l = lineaDeGuia(g); if (l) lista.push(l); return; }
       var opciones = g.opciones || [];
       var op = opciones.filter(function (o) { return o.id === elegido[g.id]; })[0] || null;
       lista.push({ id: g.id, texto: g.texto || '', explicacion: g.explicacion || '', accion: '', normativa: null,
@@ -95,13 +133,15 @@
                    deOpcion: null });
       opciones.forEach(function (o) {
         (o.lineas || []).forEach(function (x) {
-          var l = linea(x, false, { pregunta: g.id, opcion: o.id, respuesta: o.texto || '' });
-          if (op && o.id === op.id) lista.push(l);
-          else if (l.hecho || l.noaplica) plegadas.push(l);
+          var deOpcion = { pregunta: g.id, opcion: o.id, respuesta: o.texto || '' };
+          var lx = lineaDeGuia(x, deOpcion);
+          if (!lx) return;
+          if (op && o.id === op.id) lista.push(lx);
+          else if (lx.hecho || lx.noaplica) plegadas.push(lx);
         });
       });
     });
-    ((hito && hito.guionPropio) || []).forEach(function (g) {
+    propios.filter(function (g) { return !g.enLugarDe; }).forEach(function (g) {
       lista.push(linea(Object.assign({ explicacion: '', accion: '', normativa: null }, g), true));
     });
     lista.plegadas = plegadas;
@@ -192,6 +232,80 @@
     if (!texto) return Promise.resolve(null);
     return editarHito(clave, idHito, function (h) {
       h.guionPropio = (h.guionPropio || []).concat([{ id: U.nuevoId('gp'), texto: texto }]);
+    });
+  }
+
+  /* Fila 224: «Cambiar aquí» de una tarea de la guía. `original` es la
+     línea tal como la da `guionDe` (con su hecho/noaplica/valor de
+     antes): la sustituta nace ya con esa marca, y el original se
+     esconde. */
+  function cambiarGuionAqui(clave, idHito, original, nuevoTexto) {
+    var texto = String(nuevoTexto || '').trim();
+    if (!texto || !original || !original.id) return Promise.resolve(null);
+    return editarHito(clave, idHito, function (h) {
+      var ocultos = h.guionOcultos || [];
+      if (ocultos.indexOf(original.id) === -1) ocultos = ocultos.concat([original.id]);
+      h.guionOcultos = ocultos;
+      var nuevoId = U.nuevoId('gp');
+      h.guionPropio = (h.guionPropio || []).concat([{
+        id: nuevoId, texto: texto, enLugarDe: original.id,
+        explicacion: original.explicacion || '', accion: original.accion || '',
+        normativa: original.normativa || null, reunir: original.reunir || '',
+        obligatorio: !!original.obligatorio, receta: original.receta || null
+      }]);
+      h.guionHecho = h.guionHecho || {};
+      if (original.hecho || original.noaplica || original.valor || original.documento) {
+        h.guionHecho[nuevoId] = { hecho: original.hecho, noaplica: original.noaplica, quien: original.quien,
+          cuando: original.cuando, valor: original.valor, documento: original.documento };
+      }
+      delete h.guionHecho[original.id];
+    });
+  }
+
+  /* «Cambiar» de una tarea «solo aquí» (sustituta o no): solo el texto. */
+  function cambiarGuionPropioTexto(clave, idHito, idPropio, nuevoTexto) {
+    var texto = String(nuevoTexto || '').trim();
+    if (!texto) return Promise.resolve(null);
+    return editarHito(clave, idHito, function (h) {
+      h.guionPropio = (h.guionPropio || []).map(function (g) {
+        return g.id === idPropio ? Object.assign({}, g, { texto: texto }) : g;
+      });
+    });
+  }
+
+  /* «Borrar» de una tarea «solo aquí»: desaparece de este asunto. Si era
+     una sustituta, el original de la guía se queda escondido (ya no
+     interesaba tal como estaba escrito). */
+  function borrarGuionPropio(clave, idHito, idPropio) {
+    return editarHito(clave, idHito, function (h) {
+      h.guionPropio = (h.guionPropio || []).filter(function (g) { return g.id !== idPropio; });
+      if (h.guionHecho) delete h.guionHecho[idPropio];
+    });
+  }
+
+  /* «Borrar» de una tarea de la guía, sin sustituta: se esconde solo en
+     este asunto. */
+  function ocultarGuionDeGuia(clave, idHito, idOriginal) {
+    return editarHito(clave, idHito, function (h) {
+      var ocultos = h.guionOcultos || [];
+      if (ocultos.indexOf(idOriginal) === -1) ocultos = ocultos.concat([idOriginal]);
+      h.guionOcultos = ocultos;
+      if (h.guionHecho) delete h.guionHecho[idOriginal];
+    });
+  }
+
+  /* «Pasar a la guía»: la línea ya se ha añadido a la guía (con `idNuevo`,
+     GuiasDelCentro.cambiarPasos); aquí se quita la propia y su marca de
+     hecha (si tenía) pasa al id nuevo, solo en este asunto. */
+  function pasarGuionPropioAGuia(clave, idHito, idPropio, idNuevo) {
+    return editarHito(clave, idHito, function (h) {
+      var estadoAntes = (h.guionHecho && h.guionHecho[idPropio]) || null;
+      h.guionPropio = (h.guionPropio || []).filter(function (g) { return g.id !== idPropio; });
+      if (h.guionHecho) delete h.guionHecho[idPropio];
+      if (estadoAntes && (estadoAntes.hecho || estadoAntes.noaplica || estadoAntes.valor || estadoAntes.documento)) {
+        h.guionHecho = h.guionHecho || {};
+        h.guionHecho[idNuevo] = estadoAntes;
+      }
     });
   }
 
@@ -293,6 +407,11 @@
   Hitos.marcarGuion = marcarGuion;
   Hitos.marcarGuionPorAccion = marcarGuionPorAccion;
   Hitos.anadirGuionPropio = anadirGuionPropio;
+  Hitos.cambiarGuionAqui = cambiarGuionAqui;
+  Hitos.cambiarGuionPropioTexto = cambiarGuionPropioTexto;
+  Hitos.borrarGuionPropio = borrarGuionPropio;
+  Hitos.ocultarGuionDeGuia = ocultarGuionDeGuia;
+  Hitos.pasarGuionPropioAGuia = pasarGuionPropioAGuia;
   Hitos.elegirEnGuion = elegirEnGuion;
   Hitos.pasoDeGuia = pasoDe;
   Hitos.ACCIONES_GUION = ACCIONES;

@@ -5,8 +5,9 @@
       ya no llevan botón «Comunicar»: se comunica desde «Comunicar ▾» de la
       cabecera del hito, y al terminar por Séneca se marca el primer paso
       pendiente con acción de comunicar (g1), no el segundo.
-   3. «✎ Cambiar el guion de este hito» edita la guía del tipo desde la
-      propia mesa, y el cambio se ve en otro asunto abierto del mismo tipo. */
+   3. (fila 224) El «⋮» de una tarea de la guía → «Cambiar en la guía»
+      abre el mismo editor de siempre, con esa tarea resaltada, y el
+      cambio se ve en otro asunto abierto del mismo tipo. */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
@@ -98,14 +99,17 @@ await comprobar('2. se marca el primer paso pendiente con acción de comunicar (
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForFunction(() => document.getElementById('capa').classList.contains('oculto'));
 
-/* 3. «✎ Cambiar el guion de este hito» desde la mesa. */
+/* 3. El «⋮» de la tarea g1 → «Cambiar en la guía», desde la mesa. */
 await pagina.waitForTimeout(300);
-await comprobar('3. el enlace para cambiar el guion está en la mesa',
-  pagina.evaluate(() => !!document.querySelector('.hito-en-mesa .guion-cambiar-guion')), true);
+const filaG1 = pagina.locator('.hito-en-mesa .guion-paso[data-id="g1"]');
+await comprobar('3. la tarea de la guía lleva su «⋮»', filaG1.locator('.guion-tarea-menu-boton').count(), 1);
 /* El desplegable «Comunicar ▾» sigue abierto encima del guion: se cierra antes. */
 await pagina.evaluate(() => HitoMesa.cerrarPanelSiAbierto());
-await pagina.click('.hito-en-mesa .guion-cambiar-guion', { force: true });
+await filaG1.locator('.guion-tarea-menu-boton').click();
+await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Cambiar en la guía' }).click();
 await pagina.waitForSelector('#capa:not(.oculto) .paso-guion .guion-fila');
+await comprobar('3. la tarea sale resaltada en el editor',
+  pagina.evaluate(() => !!document.querySelector('#capa .paso-guion .guion-fila[data-id="g1"].guion-fila-resaltada')), true);
 await pagina.fill('#capa .paso-guion .guion-fila[data-id="g1"] .guion-texto', 'Avisar a la tutoría (por iPasen)');
 await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
 await pagina.waitForTimeout(400);

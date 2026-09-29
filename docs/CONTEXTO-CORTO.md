@@ -161,8 +161,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   bifurcaciones e historial (si falla su guardado al archivar, se reintenta una vez; el hito no queda huérfano de todas formas). Cada hito se abre a pantalla completa (la mesa), con las acciones solo ahí («Generar documento ▾»,
   «Comunicar ▾», «Registrar») y tres tarjetas: las tareas del hito (lista para marcar; «Detalles:» opcional que deja el cuadro relleno; se marca
   solo al generar, registrar, comunicar o añadir), todos los documentos del asunto («Enviar ▾» por correo o Séneca) y notas.
-  Los hitos nuevos de una guía llegan a los asuntos abiertos de su tipo; las tareas se escriben también desde la mesa
-  («✎ Cambiar las tareas», sin salir a Ajustes). «Hito N de M», «Hitos N/M» y la mesa, con una sola cuenta.
+  Los hitos nuevos de una guía llegan a los asuntos abiertos de su tipo. Sin frases al pie (fila 224): una
+  caja «Nueva tarea…» añade solo a este asunto, y cada tarea lleva su «⋮» (Anotar, con 💬; Cambiar aquí/Cambiar en
+  la guía o Cambiar; Pasar a la guía o Borrar, según sea de la guía o «solo aquí»). «Hito N de M», «Hitos N/M» y la mesa, con una sola cuenta.
   Biblioteca de hitos del centro, con sus tareas; en Mantenimiento, cargar tipos, guías y tareas del instituto.
   Cada hito de una guía dice de dónde viene, siempre a la vista: etiqueta «De la biblioteca», «De la biblioteca ·
   cambiado aquí» o «Propio de este tipo» (fila 202); pulsarla enseña el modelo y «Ver en la biblioteca». Al
@@ -175,7 +176,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   si hace falta, sin perder un asunto escrito a mano) se convierten solos en tareas del guion, sin duplicar.
   «Marcar como hecho» abre solo la mesa del hito siguiente en curso (o, sin ninguno, «Archivar el asunto» ahí
   mismo); al completarse las tareas por una acción del usuario, se pregunta una vez por sesión si darlo por hecho.
-  Desde la mesa, en «···» (fila 206): «+ Crear un hito», «Cambiar este hito» y «Borrar este hito» (apagado con
+  Desde la mesa, en «Hito ▾» (fila 206, texto puesto al día en la 224): Crear, Cambiar y Borrar (apagado con
   trabajo apuntado, `HitosDesdeElAsunto.estaVacio`), cada uno con «Colocar después de» (nivel superior del
   asunto) y una casilla «También en la guía de <tipo>»: marcada, entra en la guía y llega a los asuntos
   abiertos del tipo, pero solo a los hitos vacíos; uno con trabajo no se toca.

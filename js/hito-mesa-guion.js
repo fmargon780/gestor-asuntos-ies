@@ -9,11 +9,16 @@
      (docs/HITOS-ACCIONES-EN-EL-HITO.md), sin botones de acción: las
      acciones viven en la cabecera del hito (js/hito-mesa.js). Hecho: en
      gris, con quién y cuándo al lado; «No aplica»: tachado.
-   - "+ Añadir una tarea a la guía del tipo" (fila 120, docs/GUION-DESDE-EL-HITO.md):
-     la línea va al final de las tareas del hito de la guía (`origenGuia`) y
-     sale en todos los asuntos de ese tipo. No sale si el hito no viene
-     de un hito de la guía, ni si ese hito es una pregunta.
-   - "+ Añadir una tarea solo para este asunto" (no toca la guía).
+   - Fila 224 (docs/TAREAS-DEL-HITO-SENCILLAS.md): sin frases al pie. Al
+     final de la lista, una sola caja «Nueva tarea… (escribe y pulsa
+     Intro)»: añade solo a este asunto (`Hitos.anadirGuionPropio`, como
+     antes «+ Añadir una tarea solo para este asunto»). Cada tarea lleva
+     su «⋮» (js/hito-mesa-tarea-menu.js): Anotar, Cambiar (aquí o no) y
+     Borrar o Pasar a la guía, según sea «solo aquí» o de la guía. «+
+     Añadir una tarea a la guía del tipo» (fila 120) pasa a ser «Pasar a
+     la guía» de una tarea «solo aquí»; «✎ Cambiar las tareas de este
+     hito» pasa a ser «Cambiar en la guía» de una tarea de la guía,
+     resaltándola en el mismo editor.
    - Una pregunta de las tareas (fila 116, docs/PREGUNTAS-EN-EL-GUION.md): su
      texto y un botón por respuesta; debajo, sangradas, las líneas de la
      elegida. Lo marcado de una respuesta que se cambió, plegado al final.
@@ -49,7 +54,7 @@ var HitoMesaGuion = (function () {
     return parseInt(p[2], 10) + '-' + MESES[parseInt(p[1], 10) - 1];
   }
 
-  function pasoHTML(g, abierto, siguiente) {
+  function pasoHTML(g, abierto, siguiente, a, h) {
     var marcado = g.hecho || g.noaplica;
     var titulo = marcado ? (g.noaplica ? 'No aplica' : 'Hecho') + (g.quien ? ' por ' + g.quien : '') +
       (g.cuando ? ' el ' + String(g.cuando).slice(0, 10) : '') +
@@ -62,12 +67,19 @@ var HitoMesaGuion = (function () {
        Una tarea hecha dice al lado, en pequeño, quién y cuándo. */
     var quienCuando = g.hecho && !g.noaplica && (g.quien || g.cuando)
       ? '<span class="guion-paso-quien">' + U.escapar([g.quien || '', fechaCorta(g.cuando)].filter(Boolean).join(' · ')) + '</span>' : '';
+    /* Fila 224: «solo aquí» (una tarea propia, sustituya o no a una de
+       la guía) y el «⋮»/💬 de cada tarea, solo con el hito abierto. */
+    var etiquetaPropia = g.propio ? '<span class="guion-tarea-propia" title="Solo existe en este asunto">solo aquí</span>' : '';
+    var botonesTarea = (abierto && window.HitoMesaTareaMenu) ? HitoMesaTareaMenu.botonesHTML(g, a) : '';
+    var debajoTarea = (abierto && window.HitoMesaTareaMenu) ? HitoMesaTareaMenu.debajoHTML(g, a) : '';
     return '<div class="guion-paso' + (g.hecho ? ' hecho' : '') + (g.noaplica ? ' noaplica' : '') + (g.reunir ? ' guion-reunir' : '') +
         (siguiente ? ' guion-siguiente' : '') + '" data-id="' +
         U.escapar(g.id) + '"' + (titulo ? ' title="' + U.escapar(titulo) + '"' : '') + '>' +
       '<div class="guion-paso-fila"><label class="guion-paso-linea"><input type="checkbox" class="guion-casilla"' + (g.hecho ? ' checked' : '') +
         (abierto ? '' : ' disabled') + '>' + marcaReunir + '<span class="guion-paso-texto">' + U.escapar(g.texto) + '</span>' +
-        (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + '</label>' + quienCuando + '</div>' +
+        (g.reunir && g.obligatorio ? ' <strong class="guion-obligatorio">obligatorio</strong>' : '') + etiquetaPropia + '</label>' +
+        quienCuando + botonesTarea + '</div>' +
+      debajoTarea +
       (g.explicacion ? '<div class="guion-paso-explicacion">' + U.escapar(g.explicacion) + '</div>' : '') +
       (g.reunir === 'dato' ? '<input class="campo guion-dato" value="' + U.escapar(g.valor || '') + '" placeholder="Escríbelo aquí"' +
         (abierto ? '' : ' disabled') + '>' : '') +
@@ -94,9 +106,9 @@ var HitoMesaGuion = (function () {
     '</div>';
   }
 
-  function lineaHTML(g, abierto, siguiente) {
+  function lineaHTML(g, abierto, siguiente, a, h) {
     if (g.pregunta) return preguntaGuionHTML(g, abierto, siguiente);
-    var html = pasoHTML(g, abierto, siguiente);
+    var html = pasoHTML(g, abierto, siguiente, a, h);
     return g.deOpcion ? html.replace('class="guion-paso', 'class="guion-paso guion-de-opcion') : html;
   }
 
@@ -132,6 +144,13 @@ var HitoMesaGuion = (function () {
       });
       return;
     }
+    /* Fila 224: el repintado de esta tarjeta no puede tirar lo que se
+       esté escribiendo (la caja «Nueva tarea…», o el texto o la nota de
+       una tarea en edición), ni el foco ni el cursor. */
+    U.conservandoLoEscrito(caja, function () { pintarGuion(caja, fila, a, h, abierto); });
+  }
+
+  function pintarGuion(caja, fila, a, h, abierto) {
     var guion = Hitos.guionDe(a, h);
     var c = Hitos.cuentaGuion(guion);
     var pct = c.total ? Math.round(100 * c.hechos / c.total) : 0;
@@ -142,11 +161,8 @@ var HitoMesaGuion = (function () {
       '<div class="mesa-bloque-cabecera mesa-guion-cabecera"><span class="mesa-bloque-titulo">Tareas del hito</span>' +
         '<div class="mesa-barra"><span style="width:' + pct + '%"></span></div>' +
         '<span class="mesa-guion-cuenta">' + c.hechos + ' de ' + c.total + '</span></div>' +
-      (guion.length ? guion.map(function (g) { return lineaHTML(g, abierto, g === siguiente); }).join('') + plegadasHTML(guion.plegadas)
-        : '<p class="explica">Este hito todavía no tiene tareas. Añade la primera tarea aquí abajo.</p>') +
-      (abierto ? '<button type="button" class="enlace guion-anadir-propio">+ Añadir una tarea solo para este asunto</button>' : '') +
-      (abierto && puedeAnadirALaGuia(a, h)
-        ? '<button type="button" class="enlace guion-cambiar-guion">✎ Cambiar las tareas de este hito (para todos los asuntos de este tipo)</button>' : '');
+      guion.map(function (g) { return lineaHTML(g, abierto, g === siguiente, a, h); }).join('') + plegadasHTML(guion.plegadas) +
+      (abierto ? '<input class="campo guion-nueva-tarea" id="guion-nueva-tarea" placeholder="Nueva tarea… (escribe y pulsa Intro)">' : '');
 
     /* La normativa de las tareas del guion, también en la columna de consulta. */
     var consulta = fila.querySelector('.mesa-normativa-guion');
@@ -177,6 +193,8 @@ var HitoMesaGuion = (function () {
         guardar(b, function () { return Hitos.elegirEnGuion(a.nombre, h.id, idPregunta, b.dataset.opcion); });
       };
     });
+    var porId = {};
+    guion.forEach(function (g) { porId[g.id] = g; });
     Array.prototype.forEach.call(caja.querySelectorAll('.guion-paso:not(.guion-pregunta):not(.guion-paso-plegada)'), function (el) {
       var id = el.dataset.id;
       var casilla = el.querySelector('.guion-casilla');
@@ -192,6 +210,12 @@ var HitoMesaGuion = (function () {
       if (noaplica) noaplica.onclick = function () {
         guardar(noaplica, function () { return Hitos.marcarGuion(a.nombre, h.id, id, { noaplica: !el.classList.contains('noaplica') }); });
       };
+      /* Fila 224: el «⋮» (Anotar, Cambiar…, Borrar/Pasar a la guía) y el
+         💬 de esta tarea. */
+      var g = porId[id];
+      if (g && window.HitoMesaTareaMenu) {
+        HitoMesaTareaMenu.engancharFila(el, a, h, g, function () { pintar(fila, a, h, abierto); });
+      }
     });
     /* Fila 145: soltar un fichero en la siguiente tarea, como en la columna derecha. */
     var soltar = caja.querySelector('.guion-soltar');
@@ -206,18 +230,19 @@ var HitoMesaGuion = (function () {
         if (ficheros && ficheros.length && window.Documentos && Documentos.abrir) Documentos.abrir(a, { hito: h, ficheroSoltado: ficheros[0] });
       };
     }
-    var propio = caja.querySelector('.guion-anadir-propio');
-    if (propio) propio.onclick = async function () {
-      var ok = await U.preguntar('Añadir una tarea a este asunto',
-        '<input class="campo" id="guion-propio-texto" placeholder="Texto de la tarea">' +
-        '<p class="nota">Solo para este asunto: la guía del tipo no cambia.</p>', 'Añadir');
-      if (!ok) return;
-      var t = document.getElementById('guion-propio-texto');
-      var texto = t ? t.value : '';
+    /* Fila 224: «Nueva tarea…», al pie de la lista. Intro añade solo a
+       este asunto, vacía la caja y deja el foco para escribir otra
+       (U.conservandoLoEscrito, más arriba, se encarga del foco tras el
+       repintado). */
+    var nueva = caja.querySelector('#guion-nueva-tarea');
+    if (nueva) nueva.onkeydown = function (ev) {
+      if (ev.key !== 'Enter') return;
+      ev.preventDefault();
+      var texto = nueva.value.trim();
+      if (!texto) return;
+      nueva.value = '';
       guardar(null, function () { return Hitos.anadirGuionPropio(a.nombre, h.id, texto); });
     };
-    var cambiarGuion = caja.querySelector('.guion-cambiar-guion');
-    if (cambiarGuion) cambiarGuion.onclick = function () { cambiarGuionDelPaso(a, h); };
   }
 
   function tipoDe(a) {
@@ -242,50 +267,16 @@ var HitoMesaGuion = (function () {
     return null;
   }
 
-  /* Lo escrito que no se pudo guardar: vuelve a salir al abrir el cuadro. */
-  var sinGuardar = '';
-
-  /* Fila 120: la línea nueva, al final de las tareas del hito de la guía (fuera de las
-     respuestas de una pregunta), sin acción ni normativa. */
-  async function anadirALaGuia(a, h) {
-    var tipo = tipoDe(a);
-    var esperar = U.preguntar('Añadir un hito a la guía del tipo',
-      '<input class="campo" id="guion-guia-texto" placeholder="Texto de la tarea">' +
-      '<p class="nota">Sale en todos los asuntos de ' + U.escapar(tipo) + ', abiertos y nuevos. ' +
-      'La acción, la normativa y la explicación se completan en Ajustes.</p>', 'Añadir');
-    var t = document.getElementById('guion-guia-texto');
-    if (t && sinGuardar) t.value = sinGuardar;
-    var ok = await esperar;
-    if (!ok) return;
-    var texto = String((t && t.value) || '').trim();
-    if (!texto) return;
-    sinGuardar = texto;
-    try {
-      var hecho = await GuiasDelCentro.cambiarPasos(tipo, function (pasos) {
-        var p = buscarPaso(pasos, h.origenGuia);
-        if (!p || (p.opciones && p.opciones.length)) return false;
-        p.guion = GuiasGuion.normalizar((p.guion || []).concat([{ texto: texto, explicacion: '', accion: '', normativa: null }]));
-        return true;
-      });
-      if (!hecho) { U.aviso('Ese hito ya no está en la guía del tipo.', 'ambar'); return; }
-    } catch (e) {
-      U.fallo('No he podido añadirlo a la guía', e);
-      return;
-    }
-    sinGuardar = '';
-    var t2 = (App.E.tipos || []).filter(function (x) { return x.tipo === tipo; })[0];
-    U.aviso('Añadido a la guía de ' + (Nombres.tipoParaCarpeta ? Nombres.tipoParaCarpeta(t2) || tipo : tipo), 'bueno');
-    if (window.HitosPanel) HitosPanel.programarRepintado();
-  }
-
   function puedeAnadirALaGuia(a, h) { return !!pasoDeLaGuia(a, h); }
 
-  /* Fila 150: «✎ Cambiar el guion de este hito», en la propia mesa, sin
+  /* Fila 150: el editor de tareas de siempre, en la propia mesa, sin
      salir a Ajustes. Reutiliza js/guias-guion.js (el mismo editor de
      Ajustes), aquí solo para la lista `guion` de este hito: `leer()` para
      recoger lo escrito, `enganchar()` para subir/bajar/quitar/preguntas,
-     igual que hace js/guias-paso-bloques.js con `ctx.recoger()`/`ctx.pintar()`. */
-  async function cambiarGuionDelPaso(a, h) {
+     igual que hace js/guias-paso-bloques.js con `ctx.recoger()`/`ctx.pintar()`.
+     Fila 224: se abre desde el «⋮» de una tarea de la guía («Cambiar en
+     la guía»), con `idResaltar` a la vista y resaltada. */
+  async function cambiarGuionDelPaso(a, h, idResaltar) {
     var p = pasoDeLaGuia(a, h);
     if (!p || !window.GuiasGuion) return;
     var tipo = tipoDe(a);
@@ -300,9 +291,13 @@ var HitoMesaGuion = (function () {
         mutador(lista);
         pintarLocal();
       });
+      if (idResaltar) {
+        var fila = caja.querySelector('.guion-fila[data-id="' + idResaltar + '"]');
+        if (fila) { fila.classList.add('guion-fila-resaltada'); fila.scrollIntoView({ block: 'center' }); }
+      }
     }
     pintarLocal();
-    var esperar = U.preguntar('Cambiar las tareas de este hito',
+    var esperar = U.preguntar('Cambiar en la guía de ' + U.escapar(tipo),
       '<p class="nota">Vale para todos los asuntos de ' + U.escapar(tipo) + ', abiertos y nuevos. ' +
       'Las tareas ya marcadas en un asunto no se desmarcan.</p><div id="mesa-guion-editor"></div>', 'Guardar');
     var sitio = document.getElementById('mesa-guion-editor');
@@ -326,7 +321,7 @@ var HitoMesaGuion = (function () {
     if (window.HitosPanel) HitosPanel.programarRepintado();
   }
 
-  return { pintar: pintar, puedeAnadirALaGuia: puedeAnadirALaGuia, anadirALaGuia: anadirALaGuia,
-           cambiarGuionDelPaso: cambiarGuionDelPaso };
+  return { pintar: pintar, puedeAnadirALaGuia: puedeAnadirALaGuia,
+           cambiarGuionDelPaso: cambiarGuionDelPaso, buscarPasoDeGuia: buscarPaso };
 })();
 window.HitoMesaGuion = HitoMesaGuion;
