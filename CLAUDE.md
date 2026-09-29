@@ -61,6 +61,16 @@ se estiman en `docs/ESTIMACIONES.md`, ni se mueven, ni se borran. «La primera P
 cuenta saltándolas. Solo una conversación de diseño las pasa a PENDIENTE, cuando Francisco
 cierra el diseño.
 
+**`docs/COLA.md` por debajo de 40 KB, siempre** (29-sep-2026, fila 226,
+`docs/COLA-POR-DEBAJO-DE-40-KB.md`): las filas HECHA (salvo las de hoy y de ayer, que se quedan
+hasta el día siguiente para el «Terminado hoy» del Centro de mando), DESCARTADA y SUSTITUIDA salen
+de la tabla de `docs/COLA.md`; su texto completo, sin tocar, va a `docs/HISTORIA.md` (o a
+`docs/COLA-CERRADAS.md` si aquel se hace inmanejable). Las notas largas de debajo de la tabla,
+igual: lo resuelto a `docs/HISTORIA.md`, lo que sigue abierto, resumido en una o dos líneas en
+`docs/COLA.md` o en un documento propio de `docs/`. Toda sesión que deje `docs/COLA.md` por
+encima de 40 KB (`wc -c`) lo reduce en esa misma subida, con estos mismos criterios; es una subida
+solo de `docs/`, va directa a `main` (regla de arriba) y no publica nada.
+
 **El revisor** (28-sep-2026, `docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223): antes de tocar
 `main`, cada tarea PENDIENTE lleva su sección «Cómo sabemos que está bien» (si una fila anterior a
 la 223 no la tiene, la sesión la escribe al cogerla, a partir del propio documento). Con el cambio
