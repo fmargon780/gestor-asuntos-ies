@@ -1,34 +1,36 @@
-/* Prueba en navegador de verdad de las filas 98 y 152 de docs/COLA.md
-   (docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md, docs/RUTA-QUE-NO-VA-A-BING.md):
-   el botón «Ruta» de la ficha del asunto y de los cuadros de Comunicar.
+/* Prueba en navegador de verdad de las filas 98, 152 y 227 de docs/COLA.md
+   (docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md, docs/RUTA-QUE-NO-VA-A-BING.md,
+   docs/RUTA-NORMAL-DE-WINDOWS.md): el botón «Ruta» de la ficha del asunto
+   y de los cuadros de Comunicar.
 
    1. Sin ruta apuntada: ya NO copia el nombre suelto (eso es lo que
       buscaba Bing). Pide la ruta en ese momento; al guardar, copia ya
-      la ruta completa, en formato `file:///`.
-   2. Con ruta de Windows, asunto abierto: `file:///C:/...`.
-   3. Asunto archivado, con ruta estilo Linux: `file:///home/...`.
+      la ruta completa, en formato normal (fila 227: nunca `file:///`).
+   2. Con ruta de Windows, asunto abierto: `C:\...`, con `\`.
+   3. Asunto archivado, con ruta estilo Linux: `/home/...`, con `/`.
    4. La ruta se guarda en este ordenador (localStorage), no en _GESTOR.
    5. En modo consulta el botón sigue encendido.
-   6. La conversión a `file:///` con rutas de Windows, de red (`\\`) y
-      de Linux, con espacios, `#`, coma y acentos.
-   7. Chromium abre de verdad una carpeta con esos caracteres al navegar
-      a la ruta copiada (no una búsqueda): prueba con el sistema de
-      ficheros real, no con el disco de mentira de la aplicación.
-   8. Sin ruta, desde el cuadro de Séneca: el campo sale en línea y no
+   6. La ruta normal con casos difíciles: Windows con espacios, red
+      (`\\`), Linux, con `#`, coma y acentos tal cual (sin codificar);
+      una base `file:` antigua se convierte a ruta normal, con `\` si
+      es de Windows, antes de unir.
+   7. Sin ruta, desde el cuadro de Séneca: el campo sale en línea y no
       se pierde el cuerpo ni el «Para» (Correo).
-   9. El botón «Ruta» sale en el cuadro de Correo y en el de Séneca,
+   8. El botón «Ruta» sale en el cuadro de Correo y en el de Séneca,
       abiertos desde la ficha y desde la mesa del hito («Comunicar ▾»).
-   10. Sigue en verde pruebas/seneca-cuadro-ancho.mjs (prueba aparte).
+   9. Sigue en verde pruebas/seneca-cuadro-ancho.mjs (prueba aparte).
    Fila 161 (docs/RUTA-SIN-PREGUNTAR.md): la ruta se parte por el trozo
    `Dropbox`: lo de detrás, en `_GESTOR/rutas.json` para todo el centro;
    lo de delante, deducido (copia sin internet) o en este ordenador.
-   11. El cuadro nombra la carpeta que pide; al pegar, se parte bien.
-   12. En la web, con una ruta completa antigua: no pregunta y rellena
+   10. El cuadro nombra la carpeta que pide; al pegar, se parte bien.
+   11. En la web, con una ruta completa antigua: no pregunta y rellena
        `rutas.json`.
-   13. `partir` con `Dropbox (Personal)`, acentos y `file:`.
-   14. Servida como `file://` desde `.../Dropbox (Personal)/ADMINISTRACIÓN/
+   12. `partir` con `Dropbox (Personal)`, acentos y `file:`.
+   13. Servida como `file://` desde `.../Dropbox (Personal)/ADMINISTRACIÓN/
        REGISTROS/Gestor de Asuntos - aplicación/`, con `rutas.json`
-       relleno: «Ruta» copia la ruta completa sin abrir ningún cuadro.
+       relleno: «Ruta» copia la ruta completa (normal, con `/`) sin
+       abrir ningún cuadro.
+   14. El aviso verde, tras copiar, enseña la ruta copiada (fila 227).
 
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
@@ -119,6 +121,13 @@ async function copiarRuta() {
   return texto;
 }
 
+/* 14. El aviso verde de «mensajes» con la ruta copiada: el último (los
+   de antes pueden seguir en pantalla, sin borrarse todavía). */
+async function avisoConRuta() {
+  return pagina.evaluate(() => Array.from(document.querySelectorAll('#mensajes .mensaje.bueno'))
+    .map((m) => m.textContent).filter((t) => t.indexOf('Ruta copiada: ') === 0).pop() || '');
+}
+
 /* ---------- 1. sin ruta apuntada: ya no copia el nombre suelto ---------- */
 console.log('--- 1. sin ruta apuntada (ficha) ---');
 await abrirAbierto();
@@ -127,7 +136,7 @@ await comprobar('el botón «Ruta» va detrás de «Asunto»',
     .map(b => b.textContent.trim()).slice(0, 2)), ['Asunto', 'Ruta']);
 await pagina.click('.ficha-copiar-fila .boton-copiar-fila:has-text("Ruta")');
 await pagina.waitForSelector('#capa:not(.oculto) #ruta-pedida-ficha');
-await comprobarQue('11. pide la ruta en un cuadro que nombra la carpeta, con su nota',
+await comprobarQue('10. pide la ruta en un cuadro que nombra la carpeta, con su nota',
   pagina.evaluate(() => document.getElementById('cuadro-titulo').textContent === 'Ruta de la carpeta ASUNTOS ABIERTOS' &&
     /ruta de la carpeta ASUNTOS ABIERTOS de este ordenador/.test(document.querySelector('#capa .etiqueta').textContent) &&
     /explorador de archivos/.test(document.querySelector('#capa .nota').textContent)));
@@ -135,19 +144,21 @@ await pagina.evaluate(() => navigator.clipboard.writeText('(nada)'));
 await pagina.fill('#ruta-pedida-ficha', 'C:\\Users\\francisco\\Dropbox\\IES\\ASUNTOS ABIERTOS\\');
 await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
 await pagina.waitForFunction(() => document.getElementById('capa').classList.contains('oculto'));
-await comprobar('11. al guardar, lo de delante de Dropbox queda en este ordenador',
+await comprobar('10. al guardar, lo de delante de Dropbox queda en este ordenador',
   pagina.evaluate(() => localStorage.getItem('gestor-ruta-dropbox')), 'C:\\Users\\francisco\\Dropbox');
 await pagina.waitForTimeout(300);
-await comprobar('11. y lo de detrás, en _GESTOR/rutas.json para todo el centro',
+await comprobar('10. y lo de detrás, en _GESTOR/rutas.json para todo el centro',
   leerRutasJson(), { abiertos: 'IES/ASUNTOS ABIERTOS' });
-await comprobar('y se copia ya la ruta completa, en formato file:///',
-  pagina.evaluate(() => navigator.clipboard.readText()),
-  'file:///C:/Users/francisco/Dropbox/IES/ASUNTOS%20ABIERTOS/' + encodeURIComponent(ABIERTO));
+const RUTA_ABIERTO = 'C:\\Users\\francisco\\Dropbox\\IES\\ASUNTOS ABIERTOS\\' + ABIERTO;
+await comprobar('y se copia ya la ruta completa, con \\ (nunca file:///)',
+  pagina.evaluate(() => navigator.clipboard.readText()), RUTA_ABIERTO);
+await comprobar('14. el aviso verde enseña la ruta copiada',
+  avisoConRuta(), 'Ruta copiada: ' + RUTA_ABIERTO);
 
 /* ---------- 2. ruta de Windows ya apuntada, asunto abierto ---------- */
 console.log('--- 2. ruta de Windows ---');
-await comprobar('con la ruta ya guardada, copia file:/// entero',
-  copiarRuta(), 'file:///C:/Users/francisco/Dropbox/IES/ASUNTOS%20ABIERTOS/' + encodeURIComponent(ABIERTO));
+await comprobar('con la ruta ya guardada, copia la ruta normal entera',
+  copiarRuta(), RUTA_ABIERTO);
 await comprobar('la parte de este ordenador no va a la carpeta compartida',
   pagina.evaluate(async () => {
     const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
@@ -168,7 +179,7 @@ await comprobar('lleva la clase que el modo consulta deja encendida (copiar no c
 
 /* ---------- 3. archivado, ruta estilo Linux ---------- */
 console.log('--- 3. archivado ---');
-/* 12. En la web, sin la parte de este ordenador pero con una ruta
+/* 11. En la web, sin la parte de este ordenador pero con una ruta
    completa antigua: no pregunta, y `rutas.json` se rellena solo. */
 await pagina.evaluate(() => {
   localStorage.removeItem('gestor-ruta-dropbox');
@@ -185,51 +196,59 @@ await pagina.evaluate(async ([ARCHIVADO, TERCERO]) => {
   }, 'archivado');
 }, [ARCHIVADO, TERCERO]);
 await pagina.waitForSelector('.ficha-copiar-fila');
-await comprobar('copia file:///home/... con ARCHIVO / categoría / tercero / nombre',
-  copiarRuta(), 'file:///home/francisco/Dropbox/ARCHIVO/ALUMNADO/' + encodeURIComponent(TERCERO) + '/' + encodeURIComponent(ARCHIVADO));
-await comprobarQue('12. sin abrir ningún cuadro',
+const RUTA_ARCHIVADO = '/home/francisco/Dropbox/ARCHIVO/ALUMNADO/' + TERCERO + '/' + ARCHIVADO;
+await comprobar('copia /home/... con ARCHIVO / categoría / tercero / nombre, con /',
+  copiarRuta(), RUTA_ARCHIVADO);
+await comprobarQue('11. sin abrir ningún cuadro',
   pagina.evaluate(() => document.getElementById('capa').classList.contains('oculto')));
-await comprobar('12. y rutas.json queda relleno con lo de detrás de Dropbox',
+await comprobar('11. y rutas.json queda relleno con lo de detrás de Dropbox',
   leerRutasJson(), { abiertos: 'IES/ASUNTOS ABIERTOS', archivo: 'ARCHIVO' });
+await comprobar('14. el aviso verde enseña también esta ruta',
+  avisoConRuta(), 'Ruta copiada: ' + RUTA_ARCHIVADO);
 
-/* ---------- 13. partir por el trozo Dropbox ---------- */
-console.log('--- 13. partir ---');
+/* ---------- 12. partir por el trozo Dropbox ---------- */
+console.log('--- 12. partir ---');
 await comprobar('Windows con Dropbox (Personal) y acentos',
   pagina.evaluate(() => RutaCarpetas.partir('C:\\Users\\José\\Dropbox (Personal)\\ADMINISTRACIÓN\\ASUNTOS ABIERTOS\\')),
   { dropbox: 'C:\\Users\\José\\Dropbox (Personal)', comun: 'ADMINISTRACIÓN/ASUNTOS ABIERTOS' });
-await comprobar('una ruta file: codificada',
+await comprobar('una ruta file: codificada, convertida a ruta normal con \\',
   pagina.evaluate(() => RutaCarpetas.partir('file:///C:/Users/x/Dropbox/ADMINISTRACI%C3%93N/ARCHIVO')),
-  { dropbox: 'C:/Users/x/Dropbox', comun: 'ADMINISTRACIÓN/ARCHIVO' });
+  { dropbox: 'C:\\Users\\x\\Dropbox', comun: 'ADMINISTRACIÓN/ARCHIVO' });
 await comprobar('sin trozo Dropbox: null',
   pagina.evaluate(() => RutaCarpetas.partir('D:\\Datos\\ASUNTOS')), null);
 await comprobar('un trozo que solo empieza por Dropbox no vale',
   pagina.evaluate(() => RutaCarpetas.partir('/home/x/DropboxViejo/ARCHIVO')), null);
 
-/* ---------- 6. la conversión a file:///, con casos difíciles ---------- */
-console.log('--- 6. conversión a file:/// ---');
-await comprobar('Windows, con espacios',
-  pagina.evaluate(() => RutaCarpetas.comoFileUrl('C:\\Users\\x\\Dropbox\\ASUNTOS ABIERTOS', ['Una carpeta'])),
-  'file:///C:/Users/x/Dropbox/ASUNTOS%20ABIERTOS/Una%20carpeta');
-await comprobar('de red (\\\\servidor)',
-  pagina.evaluate(() => RutaCarpetas.comoFileUrl('\\\\servidor\\recurso', ['X'])),
-  'file://servidor/recurso/X');
-await comprobar('Linux',
-  pagina.evaluate(() => RutaCarpetas.comoFileUrl('/home/francisco', ['Y'])),
-  'file:///home/francisco/Y');
-await comprobar('con #, coma y acentos, todo codificado',
-  pagina.evaluate(() => RutaCarpetas.comoFileUrl('/home/francisco', ['Núñez, José #1'])),
-  'file:///home/francisco/' + encodeURIComponent('Núñez, José #1'));
-await comprobar('una ruta ya en formato file: se respeta tal cual',
-  pagina.evaluate(() => RutaCarpetas.comoFileUrl('file:///srv/asuntos/', ['X', 'Y'])),
-  'file:///srv/asuntos/X/Y');
+/* ---------- 6. la ruta normal, con casos difíciles ---------- */
+console.log('--- 6. la ruta normal (nunca file:///) ---');
+await comprobar('Windows, con espacios: tal cual, con \\',
+  pagina.evaluate(() => RutaCarpetas.unir('C:\\Users\\x\\Dropbox\\ASUNTOS ABIERTOS', ['Una carpeta'])),
+  'C:\\Users\\x\\Dropbox\\ASUNTOS ABIERTOS\\Una carpeta');
+await comprobar('de red (\\\\servidor), con \\',
+  pagina.evaluate(() => RutaCarpetas.unir('\\\\servidor\\recurso', ['X'])),
+  '\\\\servidor\\recurso\\X');
+await comprobar('Linux, con /',
+  pagina.evaluate(() => RutaCarpetas.unir('/home/francisco', ['Y'])),
+  '/home/francisco/Y');
+await comprobar('con #, coma y acentos, tal cual, sin codificar',
+  pagina.evaluate(() => RutaCarpetas.unir('/home/francisco', ['Núñez, José #1'])),
+  '/home/francisco/Núñez, José #1');
+await comprobar('una ruta ya en formato file: (Windows) se convierte a ruta normal con \\',
+  pagina.evaluate(() => RutaCarpetas.sinFileUrl('file:///C:/Users/x/Dropbox/ADMINISTRACI%C3%93N/ARCHIVO')),
+  'C:\\Users\\x\\Dropbox\\ADMINISTRACIÓN\\ARCHIVO');
+await comprobar('una ruta ya en formato file: (Linux) se respeta con /',
+  pagina.evaluate(() => RutaCarpetas.sinFileUrl('file:///srv/asuntos/')), '/srv/asuntos/');
 await comprobar('un archivado sin ruta del índice usa categoría y tercero',
   pagina.evaluate(() => RutaCarpetas.de({ nombre: 'N', categoria: 'PERSONAL', tercero: 'T' }, 'archivado').texto),
-  'file:///home/francisco/Dropbox/ARCHIVO/PERSONAL/T/N');
+  '/home/francisco/Dropbox/ARCHIVO/PERSONAL/T/N');
 await comprobar('una ruta de red (\\\\servidor) va con \\ (RutaCarpetas.unir, sin tocar)',
   pagina.evaluate(() => RutaCarpetas.unir('\\\\servidor\\compartida', ['ALUMNADO', 'X'])), '\\\\servidor\\compartida\\ALUMNADO\\X');
+await comprobar('parte común guardada con / sobre una base de Windows: todo con \\',
+  pagina.evaluate(() => RutaCarpetas.unir('C:\\Users\\x\\Dropbox', 'ADMINISTRACIÓN/ASUNTOS ABIERTOS'.split('/'))),
+  'C:\\Users\\x\\Dropbox\\ADMINISTRACIÓN\\ASUNTOS ABIERTOS');
 
-/* ---------- 8 y 9. el botón «Ruta» en los cuadros de Comunicar ---------- */
-console.log('--- 8 y 9. el botón «Ruta» en los cuadros ---');
+/* ---------- 7 y 8. el botón «Ruta» en los cuadros de Comunicar ---------- */
+console.log('--- 7 y 8. el botón «Ruta» en los cuadros ---');
 await pagina.evaluate(() => { localStorage.removeItem('gestor-ruta-dropbox'); localStorage.removeItem('gestor-ruta-archivo'); });
 await abrirAbierto();
 
@@ -253,7 +272,7 @@ await pagina.click('#correo-ruta-lugar .boton-copiar-fila');
 await pagina.waitForSelector('#correo-ruta-en-linea:not(.oculto) input');
 await comprobarQue('pedir la ruta sale EN LÍNEA (no un segundo cuadro)',
   pagina.evaluate(() => document.getElementById('capa').querySelectorAll('.cuadro').length === 1));
-await comprobarQue('11. en línea, también nombra la carpeta',
+await comprobarQue('10. en línea, también nombra la carpeta',
   pagina.evaluate(() => /ASUNTOS ABIERTOS/.test(document.querySelector('#correo-ruta-en-linea .etiqueta').textContent)));
 await pagina.fill('#correo-ruta-en-linea input', '/home/francisco/Dropbox/OTRA/');
 await pagina.click('#ruta-en-linea-guardar');
@@ -296,8 +315,8 @@ await comprobarQue('no se pierde lo escrito a mano en el mensaje de Séneca',
 await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
 await pagina.waitForFunction(() => document.getElementById('capa').classList.contains('oculto'));
 
-/* ---------- 9 (mesa del hito): el botón «Ruta» también ahí ---------- */
-console.log('--- 9. desde la mesa del hito ---');
+/* ---------- 8 (mesa del hito): el botón «Ruta» también ahí ---------- */
+console.log('--- 8. desde la mesa del hito ---');
 await pagina.waitForSelector('#ficha-guia .hito', { state: 'attached' });
 await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
 await pagina.waitForTimeout(300);
@@ -314,39 +333,10 @@ await comprobarQue('el botón «Ruta» sale también abierto desde «Comunicar �
 await pagina.evaluate(() => document.getElementById('cuadro-aceptar').click());
 await pagina.waitForFunction(() => document.getElementById('capa').classList.contains('oculto'));
 
-/* ---------- 7. Chromium abre de verdad una carpeta con esos caracteres,
-   no una búsqueda: carpeta real en el disco, no el de mentira de la
-   app. Al final, porque navegar de verdad reinicia el disco de mentira
-   (`preparacion` se vuelve a ejecutar en cada navegación). */
-console.log('--- 7. abre de verdad la carpeta, con # sin romper la ruta ---');
-const base = fs.mkdtempSync(path.join(os.tmpdir(), 'gestor-ruta-'));
-const nombreDificil = 'Carpeta con espacios, café #1';
-const carpetaReal = path.join(base, nombreDificil);
-fs.mkdirSync(carpetaReal);
-fs.writeFileSync(path.join(carpetaReal, 'marca-de-la-prueba.txt'), 'hola');
-const urlReal = await pagina.evaluate(([base, nombre]) => RutaCarpetas.comoFileUrl(base, [nombre]), [base, nombreDificil]);
-const erroresDelListado = errores.length;
-await pagina.goto(urlReal);
-await comprobarQue('la URL codifica el # (si no, la ruta se cortaría ahí)', urlReal.indexOf('%23') > -1);
-/* El Chromium de GitHub Actions (headless shell) abre la carpeta pero no
-   pinta su lista (sus propios scripts fallan: «addRow is not defined»),
-   así que se comprueba que se ha quedado en esa carpeta entera, sin
-   cortar en el # ni buscar nada; y, si pinta la lista, que sale el fichero. */
-await comprobarQue('Chromium abre la carpeta de verdad (la ruta entera, no una búsqueda)',
-  Promise.resolve(pagina.url().startsWith('file://') &&
-    decodeURIComponent(new URL(pagina.url()).pathname).replace(/\/+$/, '') === carpetaReal.replace(/\/+$/, '')));
-const conLista = await pagina.evaluate(() => !!document.querySelector('#tbody, table'));
-if (conLista && errores.length === erroresDelListado) {
-  await comprobarQue('y se ve el fichero de dentro',
-    pagina.locator('body', { hasText: 'marca-de-la-prueba.txt' }).count().then(n => n > 0));
-}
-errores.splice(erroresDelListado);
-fs.rmSync(base, { recursive: true, force: true });
-
-/* ---------- 14. la copia sin internet, servida como file:// desde
+/* ---------- 13. la copia sin internet, servida como file:// desde
    dentro de Dropbox: la parte de este ordenador sale de su dirección
-   y «Ruta» copia sin preguntar. ---------- */
-console.log('--- 14. copia sin internet (file://) ---');
+   y «Ruta» copia sin preguntar, con la ruta normal (con /). ---------- */
+console.log('--- 13. copia sin internet (file://) ---');
 const raiz = new URL('..', import.meta.url).pathname;
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'gestor-161-'));
 const dentro = path.join(tmp, 'Users', 'Propietario', 'Dropbox (Personal)', 'ADMINISTRACIÓN', 'REGISTROS');
@@ -382,13 +372,12 @@ await abrirAbierto();
 await pagina.click('.ficha-copiar-fila .boton-copiar-fila:has-text("Ruta")');
 await pagina.waitForFunction(() => window.__copiado !== null);
 const baseEsperada = path.join(tmp, 'Users', 'Propietario', 'Dropbox (Personal)');
-await comprobar('14. copia la ruta completa, deducida de la propia dirección',
+await comprobar('13. copia la ruta completa, deducida de la propia dirección, con / y sin codificar',
   pagina.evaluate(() => window.__copiado),
-  'file:///' + baseEsperada.split('/').filter(Boolean).map(encodeURIComponent).join('/') +
-  '/ADMINISTRACI%C3%93N/ASUNTOS%20ABIERTOS/' + encodeURIComponent(ABIERTO));
-await comprobarQue('14. sin abrir ningún cuadro',
+  baseEsperada + '/ADMINISTRACIÓN/ASUNTOS ABIERTOS/' + ABIERTO);
+await comprobarQue('13. sin abrir ningún cuadro',
   pagina.evaluate(() => document.getElementById('capa').classList.contains('oculto')));
-await comprobar('14. en Ajustes, «Dropbox en este ordenador» sale deducido, sin campo',
+await comprobar('13. en Ajustes, «Dropbox en este ordenador» sale deducido, sin campo',
   pagina.evaluate(async () => { await RutaCarpetas.pintarBloque(); return [!!document.getElementById('ruta-dropbox'),
     (document.getElementById('ruta-dropbox-deducida') || {}).textContent.indexOf('Dropbox (Personal)') > -1]; }), [false, true]);
 fs.rmSync(tmp, { recursive: true, force: true });

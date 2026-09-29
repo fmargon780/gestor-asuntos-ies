@@ -101,3 +101,10 @@ Si alguno de estos ficheros pasa de 600 líneas al tocarlo, se parte por temas.
 - El botón «Ruta» también arriba en el cuadro de Correo y en el de Mensaje de Séneca.
 - Lo copiado empieza por `file:///`. Pegado en el navegador, abre la carpeta; nunca Bing.
 - Si en ese ordenador o en la copia sin internet falta la ruta, se la pide una vez allí mismo.
+
+**Sustituido (29-sep-2026, fila 227, `docs/RUTA-NORMAL-DE-WINDOWS.md`):** el formato `file:///`
+de esta fila no lo entendían ni el explorador de archivos de Windows ni la ventana «Abrir archivo»
+de Séneca o del correo (sobre todo las tildes, codificadas como `%C3%93`). Desde la fila 227 el
+botón «Ruta» copia la ruta normal, tal como se escribe en el explorador (`C:\...`, `\\servidor\...`
+o `/home/...`), sin `file:///` ni codificar. Lo demás de esta fila (deducir y guardar la ruta,
+pedirla si falta, dónde sale el botón) sigue igual.

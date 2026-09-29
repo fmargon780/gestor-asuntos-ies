@@ -2,7 +2,8 @@
    copiar-ruta.js — el botón «Ruta» de la ficha del asunto, y también
    de los cuadros de Correo y de Mensaje de Séneca (23-sep-2026, fila
    98, docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md; 25-sep-2026, fila 152,
-   docs/RUTA-QUE-NO-VA-A-BING.md).
+   docs/RUTA-QUE-NO-VA-A-BING.md; 29-sep-2026, fila 227,
+   docs/RUTA-NORMAL-DE-WINDOWS.md).
 
    Abrir la carpeta desde la web sigue sin poderse (lo tiene prohibido
    el navegador, y está en la lista de descartado). Tampoco da la ruta
@@ -13,25 +14,29 @@
    Se guarda en ESTE ordenador (localStorage), nunca en `_GESTOR`: la
    ruta del ordenador de Francisco no es la de su compañero.
 
-   Qué copia (fila 152): la ruta entera, en formato `file:///`, para
-   que el navegador la abra siempre como carpeta y nunca la busque en
-   Bing (antes se copiaba con `\` o `/` a pelo, y sin ruta apuntada
-   solo el nombre de la carpeta, que es justo lo que Bing buscaba):
+   Qué copia (fila 227, sustituye el `file:///` de la fila 152): la
+   ruta normal, tal como se escribe en el explorador de archivos, con
+   el separador de la base apuntada (`\` en Windows y en red, `/` en
+   Linux), sin `file:///` ni `encodeURIComponent`:
      - abierto:   ruta de abiertos + nombre de la carpeta
      - archivado: ruta del ARCHIVO + lo de en medio (`a.ruta` del índice,
        "CATEGORIA / Tercero", o categoría y tercero si no está) + nombre
-   Cada trozo va codificado (`encodeURIComponent`): espacios, `#`, `%`,
-   comas y acentos no rompen la ruta. La ruta en Ajustes sigue
-   apuntándose como siempre (`C:\...`, `\\servidor\...` o `/home/...`):
-   la conversión a `file:///` se hace solo al copiar. Si alguien ya
-   apunta ahí una `file:...`, se respeta tal cual.
+   El `file:///` de la fila 152 no lo entendían ni el explorador de
+   Windows ni la ventana «Abrir archivo» de Séneca o del correo
+   (sobre todo las tildes, codificadas como `%C3%93`): con la ruta
+   normal, pegarla ahí abre la carpeta de verdad. La ruta en Ajustes
+   sigue apuntándose como siempre (`C:\...`, `\\servidor\...` o
+   `/home/...`); si alguien la apuntó en su día como `file:...`, se
+   convierte a ruta normal antes de copiar (`sinFileUrl`).
 
    Sin ruta apuntada, **ya no se copia nada a medias** (antes copiaba
    el nombre suelto): se pide la ruta en ese momento y se copia ya
    completa. Desde la ficha del asunto, con `U.preguntar` (no hay
    ningún otro cuadro abierto); desde dentro del cuadro de Correo o de
    Séneca, en línea, dentro del propio cuadro (nunca un segundo
-   `U.preguntar`), sin perder lo escrito.
+   `U.preguntar`), sin perder lo escrito. El aviso verde, tras copiar,
+   enseña la ruta copiada (fila 227): sirve para ver de un vistazo qué
+   parte está mal si algo no cuadra.
 
    Fila 161 (25-sep-2026, docs/RUTA-SIN-PREGUNTAR.md): la ruta se
    parte en dos. Lo de DENTRO de Dropbox es igual en los dos
@@ -86,12 +91,13 @@ window.RutaCarpetas = (function () {
 
   function esTrozoDropbox(t) { return t === 'Dropbox' || /^Dropbox \(/.test(t); }
 
-  /* Una ruta en `file:` pasa a ruta normal, para poder partirla. */
+  /* Una ruta en `file:` pasa a ruta normal (fila 227: con el separador
+     que toque, nunca mezclado), para poder partirla o copiarla. */
   function sinFileUrl(ruta) {
     if (!/^file:/i.test(ruta)) return ruta;
     var r = ruta.replace(/^file:/i, '');
     try { r = decodeURIComponent(r); } catch (e) { /* se queda como está */ }
-    if (/^\/\/\/[A-Za-z]:/.test(r)) return r.slice(3);
+    if (/^\/\/\/[A-Za-z]:/.test(r)) return r.slice(3).replace(/\//g, '\\');
     if (/^\/\/\//.test(r)) return r.slice(2);
     if (/^\/\//.test(r)) return '\\\\' + r.slice(2).replace(/\//g, '\\');
     return r;
@@ -235,44 +241,27 @@ window.RutaCarpetas = (function () {
     return [categoria, tercero].filter(Boolean);
   }
 
-  /* ---------- convertir a `file:///`, que el navegador siempre abre
-     como carpeta (fila 152) ---------- */
-
-  function esFileUrl(base) { return /^file:/i.test(base); }
-  function esRed(base) { return /^\\\\/.test(base); }
-  function esWindows(base) { return /^[A-Za-z]:/.test(base); }
-  function trozo(t) { return encodeURIComponent(String(t)); }
-
-  function comoFileUrl(base, piezas) {
-    var restos = piezas.filter(Boolean).map(trozo);
-    if (esFileUrl(base)) {
-      return [base.replace(/[\/]+$/, '')].concat(restos).join('/');
-    }
-    if (esRed(base)) {
-      var partesRed = base.replace(/^\\\\/, '').split(/[\\\/]+/).filter(Boolean).map(trozo);
-      return 'file://' + partesRed.concat(restos).join('/');
-    }
-    if (esWindows(base)) {
-      var unidad = base.slice(0, 2);
-      var partesWin = base.slice(2).split(/[\\\/]+/).filter(Boolean).map(trozo);
-      return 'file:///' + unidad + '/' + partesWin.concat(restos).join('/');
-    }
-    var partesLinux = base.split(/[\\\/]+/).filter(Boolean).map(trozo);
-    return 'file:///' + partesLinux.concat(restos).join('/');
-  }
-
   /* { texto, completa }: completa es false si falta la ruta apuntada.
-     `texto` es la URL `file:///...`, lista para pegar en el navegador
-     o en el explorador de archivos; sin ruta apuntada, vacío: ya no se
-     copia el nombre suelto (fila 152, antes de esto Bing lo buscaba). */
+     `texto` es la ruta normal, lista para pegar en el explorador de
+     archivos (fila 227: nunca `file:///`); sin ruta apuntada, vacío:
+     ya no se copia el nombre suelto (fila 152, antes de esto Bing lo
+     buscaba). */
   function de(a, modo) {
     var archivado = modo === 'archivado';
     var base = rutaDe(archivado ? 'archivo' : 'abiertos').ruta;
     if (!base) return { texto: '', completa: false };
     return {
-      texto: comoFileUrl(base, (archivado ? piezasDelArchivo(a) : []).concat([a.nombre])),
+      texto: unir(sinFileUrl(base), (archivado ? piezasDelArchivo(a) : []).concat([a.nombre])),
       completa: true
     };
+  }
+
+  /* Copia `texto` y, si sale bien, enseña el aviso verde con la ruta
+     copiada (fila 227): sirve para ver de un vistazo qué parte está
+     mal si algo no cuadra al pegarla. */
+  function copiarConAviso(texto, boton) {
+    return U.copiar(texto, boton, { avisoFallo: 'No he podido copiarlo. Es ' + texto + '.' })
+      .then(function (ok) { if (ok) U.aviso('Ruta copiada: ' + texto, 'bueno'); return ok; });
   }
 
   /* ---------- pedir la ruta cuando falta (fila 152) ----------
@@ -317,7 +306,7 @@ window.RutaCarpetas = (function () {
       guardar(cual, valor);
     }
     var r = de(a, modo);
-    if (r.completa) U.copiar(r.texto, boton, { avisoFallo: 'No he podido copiarlo. Es ' + r.texto + '.' });
+    if (r.completa) copiarConAviso(r.texto, boton);
     if (paraElCentro) {
       guardarComun(paraElCentro, true).catch(function (e) {
         U.accesorio('Copiado, pero no he podido guardar la ruta para todo el centro', e);
@@ -378,7 +367,7 @@ window.RutaCarpetas = (function () {
         else pedirRutaConPreguntar(a, modo, b);
         return;
       }
-      U.copiar(r.texto, b, { avisoFallo: 'No he podido copiarlo. Es ' + r.texto + '.' });
+      copiarConAviso(r.texto, b);
     };
     return b;
   }
@@ -460,7 +449,7 @@ window.RutaCarpetas = (function () {
 
   return {
     leer: leer, guardar: guardar, unir: unir, de: de, boton: boton,
-    montarEnCuadro: montarEnCuadro, comoFileUrl: comoFileUrl, ponerBloque: ponerBloque,
+    montarEnCuadro: montarEnCuadro, ponerBloque: ponerBloque, sinFileUrl: sinFileUrl,
     partir: partir, cargarComun: cargarComun, dropboxDeEsteOrdenador: dropboxDeEsteOrdenador,
     pintarBloque: pintarBloque, comunConocido: comunConocido
   };

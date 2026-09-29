@@ -423,11 +423,13 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
 - **La fila de copiar de un gesto** (18-sep-2026, fila 58, `js/ficha-nombre-acciones.js`,
   `ponerFilaDeCopiar`): debajo del `<h2>`, siempre a la vista, sin menú — Asunto, Ruta, NIE, Nombre
   y DNI/CIF, en ese orden; un botón sin dato no se pone. **«Ruta»** (fila 98,
-  `docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md`, `js/copiar-ruta.js`, `RutaCarpetas.boton`; formato
-  `file:///` desde la fila 152, `docs/RUTA-QUE-NO-VA-A-BING.md`) copia la ruta de la carpeta, en
-  formato `file:///` (para que el navegador la abra siempre como carpeta y nunca la busque en
-  Bing): la de abiertos (o la del ARCHIVO + `a.ruta` del índice, o categoría y tercero), más el
-  nombre, cada trozo codificado (`RutaCarpetas.comoFileUrl`). **Desde la fila 161**
+  `docs/COPIAR-LA-RUTA-DE-LA-CARPETA.md`, `js/copiar-ruta.js`, `RutaCarpetas.boton`; ruta normal
+  desde la fila 227, `docs/RUTA-NORMAL-DE-WINDOWS.md`, que sustituye el `file:///` de la fila 152,
+  `docs/RUTA-QUE-NO-VA-A-BING.md`) copia la ruta de la carpeta, en formato normal, con el separador
+  de la base (`\` en Windows y en red, `/` en Linux), sin `file:///` ni codificar (el explorador de
+  Windows y la ventana «Abrir archivo» no descodificaban bien las tildes): la de abiertos (o la del
+  ARCHIVO + `a.ruta` del índice, o categoría y tercero), más el nombre (`RutaCarpetas.unir`). El
+  aviso verde, tras copiar, enseña la ruta. **Desde la fila 161**
   (`docs/RUTA-SIN-PREGUNTAR.md`) la ruta de la carpeta sale de dos mitades: lo de dentro de Dropbox,
   una vez para todo el centro en `_GESTOR/rutas.json` (`{ abiertos, archivo }`, con `/`; se relee
   en cada clic y se rellena solo con una ruta completa antigua de `localStorage` si su último trozo

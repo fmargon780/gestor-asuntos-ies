@@ -122,7 +122,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   hito o sin ninguno de los dos, como antes.
 - Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. El tope de carpeta y de
   documento cuenta la ruta completa dentro de Dropbox (`Nombres.topes()`), no solo el nombre.
-- Botón «Ruta» (`file:///`; ficha, Correo/Séneca): deduce Dropbox; lo de dentro, una vez para el centro. Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en
+- Botón «Ruta» (copia la ruta normal, con `\` o `/` según la base, nunca `file:///`; ficha, Correo/Séneca): deduce Dropbox; lo de dentro, una vez para el centro. Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto (foto, cabecera fija) en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
 - Registrar detecta el PDF sellado, y también deja el original en «Versiones previas» como "SIN
