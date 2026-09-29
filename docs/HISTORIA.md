@@ -5,6 +5,24 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 29-sep-2026 — Fila 203: la papelera se vacía sola a los 90 días
+
+Cerrada la pregunta que arrastraba la cola desde el 18-sep («¿la papelera se vacía sola?»): a los 90
+días, con aviso a los 7 y constancia de cada borrado (`js/papelera-vaciado.js`,
+`_GESTOR/papelera-borrados.json`; detalle técnico en `docs/contexto/ASUNTOS-ARCHIVO.md`). Cambios de
+paso: el aviso de «más de 30 días» y su botón de borrar todo desaparecen; `borrarDelTodo` ya no traga
+errores (para que un borrado que falla se reintente al día siguiente); la demo trae una papelera con
+cosas de 95, 85, 60 y 1 día. El primer revisor rechazó la fila con un solo fallo: el aviso de Inicio no
+salía porque la primera vista (previa a cargar la demo) apuntaba «nada que avisar» y el plazo entre
+vistazos (10 min) no se volvía a mirar; arreglado (5 s si no había nada) y con
+`AvisosQueFaltan.repintarPapelera()` tras devolver, borrar o vaciar. Segundo revisor: APROBADA
+(6 puntos BIEN, el 7, **solo Francisco**, en `docs/COMPROBAR-A-MANO.md`). `npm test` completo: 190
+ficheros; falló `tras-cada-accion.mjs` (conocido, de altura de pantalla) y dos que dependían del aviso
+viejo, ya ajustadas. Observaciones del revisor fuera de esta fila: «Interesado» sigue saliendo donde
+el vocabulario pide «tercero»; «1 tipos» en Nuevo asunto; un texto técnico de envolturas en Ajustes.
+
+---
+
 ## 29-sep-2026 — Fila 226: `docs/COLA.md` por debajo de 40 KB, siempre
 
 `docs/COLA-POR-DEBAJO-DE-40-KB.md` (diseño cerrado con Francisco el 29-sep-2026). `docs/COLA.md`

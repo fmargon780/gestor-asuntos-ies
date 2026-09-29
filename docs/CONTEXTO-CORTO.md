@@ -150,7 +150,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   crearlos: dentro de cada tipo, "+ Añadir campo".
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
-- Papelera: nada se borra de golpe, con buscador por palabras. Plazo de conservación por tipo: avisa, nunca borra solo.
+- Papelera: se vacía sola a los 90 días (avisa 7 antes, deja constancia en `papelera-borrados.json`; fila 203), con buscador por palabras. Plazo de conservación por tipo: avisa, nunca borra solo.
 - Word: lo que falta se pregunta antes; se ve en la app, con «Guardar PDF» (cierra el visor al terminar) e
   «Imprimir» (sin editar aún).
 - Plantillas de correo (con texto propio para Séneca) y de Word por tipo, con huecos que se rellenan solos;
@@ -249,7 +249,6 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Importar usuarios IdEA del alumnado, al reactivar a Francisco el perfil de Gestor de PASEN.
 - Mantenimiento: "Poner en orden las fichas del ARCHIVO", «Cargar plantillas» (50 nuevas), «Traer tareas». Ajustes › Hitos: festivos.
 - Antes de junio 2027: "Guardar el contacto de los asuntos abiertos" (Mantenimiento).
-- Decisión: ¿la papelera se vacía sola?
 - Antes de publicar algo importante, repasar `docs/COMPROBAR-A-MANO.md`.
 
 ## 9. Cuándo leer `CONTEXTO.md` (y sus hijos) entero

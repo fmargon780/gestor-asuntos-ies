@@ -36,10 +36,18 @@ devolver a su sitio.
   los dos a la vez).
 - **Bloque Papelera de Ajustes** (el último): qué era, nombre, de dónde salía, quién y cuándo
   ("hace N días"), y botones **Devolver a su sitio** / **Borrar del todo** (con su propia
-  confirmación). Aviso ámbar si algo lleva más de 30 días, con botón para borrarlo todo de
-  golpe. **La papelera no se vacía sola, nunca**: es una decisión de Francisco (fila 68,
-  docs/AVISOS-QUE-FALTAN.md, 3), preguntada y todavía sin decidir; mientras tanto solo se ha
-  hecho el aviso más insistente, nunca el borrado solo.
+  confirmación). **La papelera se vacía sola** (fila 203, `docs/PAPELERA-SE-VACIA-SOLA.md`,
+  `js/papelera-vaciado.js`): a los N días (90; Ajustes › El centro › «Días de aviso», en
+  `ajustesAvisos.diasPapelera`), con aviso M días antes (7, `diasAvisoPapelera`). Cada fila dice
+  «Se borra el 3-oct» (en rojo dentro del aviso). En Inicio, el trozo «N cosas se borrarán del todo
+  el …» abre Herramientas › Papelera filtrada a esas (`Papelera.filtrarPronto`, «Ver toda la
+  papelera» vuelve). Vaciado: al entrar y una vez al día (por `Gestor.alRefrescar`, sin guardado en
+  marcha), de una en una y releyendo `papelera.json` antes de cada una; si falla (Dropbox lo tiene
+  cogido) se deja para el día siguiente, y aviso ámbar a los tres días fallando (`localStorage`).
+  Constancia: `_GESTOR/papelera-borrados.json` (`{ borrados: [{ nombre, queEra, deDonde, entroEl,
+  borradoEl, como: 'automatico'|'a mano', quien }] }`, sin contenido, con copia de seguridad),
+  desplegable «Borrados del todo (N)» con buscador y «Vaciar el registro de antes de <hace 2
+  años>». `borrarDelTodo(ficha, como)` ya no traga errores que no sean «no está».
 - **Buscador de la papelera** (fila 172, 26-sep-2026, docs/PAPELERA-BUSCADOR.md): caja encima de
   la lista (`#buscar-papelera`), filtra mientras se escribe, sin botón. Palabras sueltas, en
   cualquier orden y sin tildes ni mayúsculas (`U.normalizar`), como el buscador de asuntos: una

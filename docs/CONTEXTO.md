@@ -235,6 +235,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `tablon.json` | Las notas rápidas del tablón, con su marca de privada |
 | `campos.json` | Los campos propios y los campos configurados de cada tipo de asunto; y, en `porTipoDocumento` (fila 96), los campos de un tipo de documento que entran en el nombre del fichero; y, en `textoPorTipoDocumento` (fila 201), el «Texto por defecto» de un tipo de documento para el texto adicional del nombre (con huecos; `tipos-documento.json` sigue siendo solo una lista de nombres, sin tocar) |
 | `papelera.json` | El índice de la papelera: qué se ha borrado, de dónde y cuándo |
+| `papelera-borrados.json` | `{ borrados: [...] }`: el rastro de lo borrado del todo de la papelera, sin contenido (fila 203) |
 | `no-duplicados.json` | Grupos de posibles duplicados descartados con "No son el mismo", por la firma de sus nombres |
 | `envios.json` | **Es una lista, no un objeto.** Los encargos vivos de "mandar documentos por correo": `{ id, asunto, para, creado }` |
 | `plantillas.json` | `{ firma, centro, localidad, direccion, codigo, provincia, cargo, consejeria, lista: [{ id, tipo, categoria, nombre, texto }], documentos: [{ id, tipo, categoria, nombre, fichero, tipoDocumento, texto, firmante, vistoBueno, conLogoCentro }] }`: `lista` para el correo y el mensaje de Séneca, `documentos` para las plantillas de Word. `consejeria` es del membrete (con `centro`; fila 149: lo dibuja la app, `membreteCaja` ya se ignora) y `conLogoCentro` dice si esa plantilla lleva el logo del centro (sin la clave, sí); `firmante`/`vistoBueno` de cada plantilla de documento son el `id` de un cargo de `cargos.json`; `provincia` (fila 84) solo se usa para el hueco `{{PROVINCIA}}` de un impreso oficial |
@@ -254,7 +255,7 @@ Dentro de la carpeta de asuntos abiertos, y por tanto compartido:
 | `rutas.json` | `{ abiertos, archivo }`: dónde están las dos carpetas DENTRO de Dropbox, con `/`, igual para los dos ordenadores (fila 161, `js/copiar-ruta.js`, botón «Ruta»). Pequeño, como `margenes-pdf.json`: se relee antes de guardar y pasa por `Copias.guardar` |
 | `responsable-migrado.json` | La marca de la pasada única de la fila 159 (personas → «Administración» en guías y biblioteca; los dos hitos de firma). **Fuera de los dieciocho**, como `estado-migrado.json` |
 | `estado-migrado.json` | `{ hechoEl, hechoPor, creados, enEspera }`: la marca de que el paso único de la fila 129 ya se hizo (`js/estado-migracion.js`). **Fuera de los dieciocho**, como `presencia.json` |
-| `copias/*.json` | Copias de seguridad de los dieciocho ficheros de arriba, una por día, 30 como mucho de cada uno |
+| `copias/*.json` | Copias de seguridad de los diecinueve ficheros de arriba, una por día, 30 como mucho de cada uno |
 
 **Los CSV van en `datos`, no en `_GESTOR`.** `js/rescate-datos.js` los baja solos al entrar.
 
@@ -267,7 +268,7 @@ Cada nota de `asuntos.json` es `{ texto, quien, cuando }`, y las de correo lleva
 la aplicación escribe `seguidos.json` para el recolector de Apps Script.
 
 **Todo fichero compartido se relee justo antes de escribirlo.** Son dos ordenadores sobre la
-misma carpeta: sin releer, el último en guardar borra lo del otro. Lo hacen los dieciocho ficheros de
+misma carpeta: sin releer, el último en guardar borra lo del otro. Lo hacen los diecinueve ficheros de
 arriba.
 
 **Y en este ordenador, de uno en uno** (fila 99, 23-sep-2026, `docs/GUARDAR-EN-FILA.md`,

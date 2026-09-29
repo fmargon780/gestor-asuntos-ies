@@ -85,6 +85,11 @@ para ir tachando.
       4. En un asunto, «Añadir relacionados» → Alumnado → «Por datos del alumnado»: elegir Curso y
          Centro de procedencia y comprobar que salen los que deben.
 
+## Fila 203 (papelera que se vacía sola)
+
+- [ ] Con la carpeta real de Dropbox en dos ordenadores a la vez: que no se pisen al vaciar la papelera
+  (cada uno relee `papelera.json` antes de borrar) y que `papelera-borrados.json` viaje bien.
+
 ## Por qué esta lista y no una prueba automática
 
 Todas las pruebas de navegador de este repositorio sustituyen el acceso a carpetas por uno de
