@@ -4,7 +4,7 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 `CLAUDE.md`). Minutos por fila entera: programar, pruebas, publicar y comprobar. La página
 «Estado de la cola» de Francisco lee esta tabla desde `main`.
 
-Última puesta al día: 29-sep-2026 (fila 224, EN CURSO)
+Última puesta al día: 29-sep-2026 (fila 224, HECHA)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por `pruebas` y el
 revisor: los minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
@@ -15,5 +15,5 @@ revisor: los minutos de abajo cuentan la fila entera, revisor incluido (uno o do
 | 213 | 70 | `docs/BOTON-DE-SOPORTE.md`: botón y ventana nuevos con captura pegada, campo en Ajustes, script de Google nuevo (`apps-script/soporte.gs`) que escribe en Drive y en la cola de GitHub, guía de puesta en marcha y pruebas de los dos lados |
 | 204 | 80 | `docs/COMPROBACION-AL-ENTRAR.md`: siete comprobaciones distintas, un panel nuevo, marca en la cabecera, «Arreglarlo» que lleva a cada sitio exacto y `localStorage` de lo omitido; la fila más grande de las que quedan |
 | 217 | 35 | `docs/CORREO-OTRA-CUENTA-ABIERTA.md`: solo `js/correo-enviar.js` (aviso nuevo y un segundo intento con la forma general de la dirección) y sus pruebas en `pruebas/correo-enviar.mjs` |
-| 224 | 60 | `docs/TAREAS-DEL-HITO-SENCILLAS.md`: caja única de nueva tarea, menú «⋮» por tarea con cinco acciones (anotar, cambiar aquí o en la guía, pasar a la guía, borrar), menú «Hito ▾» y buscador de biblioteca al crear; varias pruebas que buscan los textos viejos |
 | 219 | 50 | `docs/TERCERO-CON-BUSCADOR-AL-CAMBIAR.md`: buscador de terceros de «Nuevo asunto» dentro del cuadro «Cambiar el asunto», alta desde ahí sin ensuciar «Nuevo asunto», aviso de categoría, departamento de Administraciones y prueba nueva |
+| 227 | 25 | `docs/RUTA-NORMAL-DE-WINDOWS.md`: solo `js/copiar-ruta.js` (copiar la ruta normal en vez de `file:///`, aviso con la ruta) y `pruebas/copiar-ruta.mjs` |
