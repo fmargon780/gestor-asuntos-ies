@@ -8,7 +8,11 @@
    C. Cambiar (con guía): se cambia y se mueve en el vacío; el que
       tiene trabajo no se toca.
    D. Borrar: apagado con trabajo; con la casilla, se va de la guía y
-      del abierto vacío, se queda en el que tiene trabajo. */
+      del abierto vacío, se queda en el que tiene trabajo.
+   E. (fila 224) Crear buscando en la biblioteca: al escribir parte de
+      un título que ya existe ahí, sale para elegirlo; al elegirlo, el
+      hito nace con lo del modelo (aquí, su responsable) y también en
+      la guía. */
 import { chromium } from 'playwright';
 import fs from 'fs';
 
@@ -23,6 +27,13 @@ const GUIAS = {
   CONVALIDACION: [
     { id: 'c1', titulo: 'Comunicar', cuerpo: '', opciones: [] },
     { id: 'c2', titulo: 'Resolver', cuerpo: '', opciones: [] }
+  ]
+};
+const BIBLIOTECA = {
+  version: 1,
+  modelos: [
+    { id: 'm1', nombre: 'Firma de Secretaría', titulo: 'Firma de Secretaría', responsable: 'secretaria',
+      guion: [{ id: 'bg1', texto: 'Comprobar el sello', explicacion: '', accion: '' }] }
   ]
 };
 
@@ -45,12 +56,14 @@ await pagina.click('#btn-abiertos');
 await pagina.click('#btn-archivo');
 await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
-await pagina.evaluate(async ([guias, a1, a2, a3]) => {
+await pagina.evaluate(async ([guias, biblioteca, a1, a2, a3]) => {
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
-  const h = await g.getFileHandle('guias.json', { create: true });
-  const w = await h.createWritable(); await w.write(JSON.stringify(guias)); await w.close();
+  for (const [n, t] of [['guias.json', guias], ['hitos-biblioteca.json', biblioteca]]) {
+    const h = await g.getFileHandle(n, { create: true });
+    const w = await h.createWritable(); await w.write(JSON.stringify(t)); await w.close();
+  }
   for (const n of [a1, a2, a3]) await window.__disco.abiertos.getDirectoryHandle(n, { create: true });
-}, [GUIAS, ASUNTO_1, ASUNTO_2, ASUNTO_3]);
+}, [GUIAS, BIBLIOTECA, ASUNTO_1, ASUNTO_2, ASUNTO_3]);
 await pagina.click('#btn-entrar');
 await pagina.waitForSelector('#aplicacion:not(.oculto)');
 await pagina.evaluate(async ([a1, a2, a3]) => {
@@ -207,6 +220,32 @@ await comprobar('D. se va de este asunto', leerHitos(ASUNTO_1).then((hs) => hs.s
 await comprobar('D. se va del asunto vacío', leerHitos(ASUNTO_2).then((hs) => hs.some((h) => h.id === idNuevo)), false);
 await comprobar('D. se queda en el que tenía trabajo', leerHitos(ASUNTO_3).then((hs) => hs.some((h) => h.id === idNuevo)), true);
 await comprobar('D. se va de la guía', leerGuia().then((g) => g.some((p) => p.id === idNuevo)), false);
+
+/* ========== E. Crear buscando en la biblioteca (fila 224) ========== */
+
+await volver();
+await abrirMesaDe('Actual', 'c1');
+await elegirDelMenu('Crear');
+await pagina.fill('#hda-titulo', 'Firma');
+await pagina.waitForSelector('.hda-biblioteca-resultados:not(.oculto) .hda-biblioteca-opcion');
+await comprobar('E. sale el modelo de la biblioteca que casa con lo escrito',
+  pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('.hda-biblioteca-opcion'), (b) => b.textContent)),
+  ['Firma de Secretaría']);
+await pagina.click('.hda-biblioteca-opcion');
+await comprobar('E. al elegirlo, el título del campo pasa a ser el suyo',
+  pagina.inputValue('#hda-titulo'), 'Firma de Secretaría');
+await pagina.click('#cuadro-aceptar');
+await pagina.waitForTimeout(400);
+
+const trasBiblioteca = await leerHitos(ASUNTO_1);
+const nuevoDeBiblioteca = trasBiblioteca.filter((h) => h.titulo === 'Firma de Secretaría')[0];
+await comprobar('E. el hito nace con el título del modelo', Promise.resolve(!!nuevoDeBiblioteca), true);
+await comprobar('E. nace también en la guía', Promise.resolve(!!(nuevoDeBiblioteca && nuevoDeBiblioteca.origenGuia)), true);
+await comprobar('E. y con el responsable del modelo', pagina.evaluate(async (idOrigen) => {
+  const g = await Carpetas.leerJson(App.E.gestor, 'guias.json');
+  const p = g.CONVALIDACION.filter((x) => x.id === idOrigen)[0];
+  return p ? p.responsable : null;
+}, nuevoDeBiblioteca.origenGuia), 'secretaria');
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 await pagina.close();

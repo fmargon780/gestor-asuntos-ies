@@ -186,3 +186,12 @@
 }
 .hito-normativa-linea { font-size: 13px; }
 a.hito-normativa-linea { color: var(--azul); }
+
+/* Fila 224 (docs/TAREAS-DEL-HITO-SENCILLAS.md, sección 3): los hitos de
+   la biblioteca que casan con el título escrito en «Crear un hito». */
+.hda-biblioteca-resultados {
+  display: flex; flex-direction: column; gap: 2px; margin: 4px 0 8px;
+  border: 1px solid var(--linea); border-radius: 8px; padding: 4px; background: var(--fondo);
+}
+.hda-biblioteca-resultados.oculto { display: none; }
+.hda-biblioteca-opcion { text-align: left; padding: 4px 6px; }

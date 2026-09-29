@@ -158,8 +158,9 @@ window.HitosDesdeElAsunto = (function () {
           U.escapar(x.titulo || '(sin título)') + '</option>';
       }).join('');
     return (
-      '<label class="etiqueta">Título</label>' +
+      '<label class="etiqueta">' + (opts.esCrear ? 'Título, o busca en la biblioteca' : 'Título') + '</label>' +
       '<input id="hda-titulo" class="campo" value="' + U.escapar(opts.titulo || '') + '" placeholder="Por ejemplo: Firma del director">' +
+      (opts.esCrear ? '<div id="hda-biblioteca-resultados" class="hda-biblioteca-resultados oculto"></div>' : '') +
       '<label class="etiqueta">Colocar después de</label>' +
       '<select id="hda-despues" class="campo">' + opcionesColocar + '</select>' +
       '<label class="etiqueta">Responsable <span class="suave">(opcional)</span></label>' +
@@ -293,6 +294,67 @@ window.HitosDesdeElAsunto = (function () {
      + CREAR UN HITO
      ========================================================== */
 
+  /* Fila 224 (docs/TAREAS-DEL-HITO-SENCILLAS.md, sección 3): mientras se
+     escribe el título en «Crear un hito», los hitos de la biblioteca que
+     casen (por palabras sueltas, como los demás buscadores) salen debajo
+     para elegirlo, igual que «Usarlo» en el editor de la guía
+     (js/guias-paso-bloques.js). `alElegir(modelo)` se llama al pulsar
+     uno; `alEscribir()`, en cada tecla, para olvidar la elección si se
+     sigue escribiendo. Sin ella, la ventana sigue como siempre: lo
+     escrito es el título de un hito nuevo. */
+  function engancharBusquedaBiblioteca(alElegir, alEscribir) {
+    var campo = $('hda-titulo');
+    var resultados = $('hda-biblioteca-resultados');
+    if (!campo || !resultados || !window.HitosBiblioteca) return;
+    var espera = null;
+    campo.addEventListener('input', function () {
+      alEscribir();
+      clearTimeout(espera);
+      var texto = campo.value.trim();
+      if (texto.length < 2) { resultados.classList.add('oculto'); resultados.innerHTML = ''; return; }
+      espera = setTimeout(async function () {
+        var biblioteca;
+        try { biblioteca = await HitosBiblioteca.leer(); } catch (e) { return; }
+        if (!resultados.isConnected || campo.value.trim() !== texto) return;
+        var palabras = U.normalizar(texto).split(' ').filter(Boolean);
+        var encontrados = (biblioteca.modelos || []).filter(function (m) {
+          var t = U.normalizar(m.nombre || '');
+          return palabras.every(function (w) { return t.indexOf(w) !== -1; });
+        }).slice(0, 8);
+        if (!encontrados.length) { resultados.classList.add('oculto'); resultados.innerHTML = ''; return; }
+        resultados.classList.remove('oculto');
+        resultados.innerHTML = encontrados.map(function (m) {
+          return '<button type="button" class="enlace hda-biblioteca-opcion" data-id="' + U.escapar(m.id) + '">' +
+            U.escapar(m.nombre) + '</button>';
+        }).join('');
+        Array.prototype.forEach.call(resultados.querySelectorAll('.hda-biblioteca-opcion'), function (b) {
+          b.onclick = function () {
+            var modelo = encontrados.filter(function (m) { return m.id === b.dataset.id; })[0];
+            if (!modelo) return;
+            campo.value = modelo.titulo || modelo.nombre;
+            resultados.classList.add('oculto');
+            resultados.innerHTML = '';
+            alElegir(modelo);
+          };
+        });
+      }, 200);
+    });
+  }
+
+  /* Crea el hito a partir del modelo elegido (siempre con guía: un
+     modelo de la biblioteca es, por naturaleza, cosa de la guía). */
+  async function crearDesdeBiblioteca(a, tipo, nivel, datos, modelo) {
+    var idPasoAncla = pasoAnclaDeHito(nivel, datos.colocarDespuesDe);
+    await GuiasDelCentro.recargar();
+    var pasos = JSON.parse(JSON.stringify(GuiasDelCentro.pasosDe(tipo)));
+    var nuevoPaso = HitosBiblioteca.modeloAPaso(modelo);
+    colocarTrasAncla(pasos, nuevoPaso, idPasoAncla);
+    var llegados = await GuiasDelCentro.guardarPasos(tipo, pasos);
+    var otros = Math.max(0, llegados - 1);
+    U.aviso('Hito creado desde la biblioteca, también en la guía de ' + nombreCortoDe(tipo) + '.' +
+      (otros ? ' Ha llegado también a ' + (otros === 1 ? '1 asunto abierto más' : otros + ' asuntos abiertos más') + '.' : ''), 'bueno');
+  }
+
   /* `idAnclaPorDefecto`: qué sale ya elegido en "Colocar después de"
      ('' vale para "Al principio"; `undefined` coloca al final, para
      el botón "+ Añadir un hito" de la lista y el de la mesa). */
@@ -303,16 +365,21 @@ window.HitosDesdeElAsunto = (function () {
     var ancla = idAnclaPorDefecto;
     if (ancla === undefined) ancla = nivel.length ? nivel[nivel.length - 1].id : '';
     var responsables = await opcionesResponsable();
-    var ok = await U.preguntar('Crear un hito',
+    var modeloElegido = null;
+    var esperar = U.preguntar('Crear un hito',
       cuerpoFormulario({
         nivel: nivel, colocarActual: ancla, responsables: responsables, responsable: '', plazo: null,
-        mostrarCasilla: !!tipo, casillaMarcada: true, tipoCorto: nombreCortoDe(tipo)
+        mostrarCasilla: !!tipo, casillaMarcada: true, tipoCorto: nombreCortoDe(tipo), esCrear: true
       }), 'Crear');
+    if (tipo) engancharBusquedaBiblioteca(function (modelo) { modeloElegido = modelo; }, function () { modeloElegido = null; });
+    var ok = await esperar;
     if (!ok) return;
     var datos = leerFormulario();
     if (!datos.titulo) { U.aviso('Hace falta un título.', 'ambar'); return; }
     try {
-      if (datos.tambienGuia && tipo) {
+      if (modeloElegido && tipo) {
+        await crearDesdeBiblioteca(a, tipo, nivel, datos, modeloElegido);
+      } else if (datos.tambienGuia && tipo) {
         await crearConGuia(a, tipo, nivel, datos);
       } else {
         await crearSoloAsunto(a, nivel, datos);
