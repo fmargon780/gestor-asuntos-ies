@@ -58,24 +58,33 @@ otra en `main`, esperado y sin sorpresa. La sorpresa llegó después, comproband
 4 de la lista: un `git fetch origin avisos` mostraba `ESPERANDO.json` bien, pero la propia
 herramienta de Vercel (`list_deployments` filtrado por `branch: avisos`) enseñó un despliegue de
 verdad, en estado `READY`, con su propio alias de *preview* (nunca `pruebas.fmargon.com` ni
-producción). Dos arreglos, los dos probados publicando de verdad y los dos sin efecto:
-`git.deploymentEnabled` con `"avisos": false` en `vercel.json` (la misma marca que ya usa
-`"claude/**"`, sobre la que esta sesión no encontró ninguna prueba real de que funcione: ese
-patrón nunca ha tenido ninguna rama que empujar de verdad para comprobarlo) no cortó nada, ni
-subido a `pruebas` ni ya en `main`; y encadenar cada aviso con el anterior (`git fetch` + `git
-commit-tree -p <padre>`, por si un commit sin padre le parecía a Vercel "primer envío de una rama
-nueva, construir sí o sí") tampoco. La rama `avisos` solo lleva `ESPERANDO.json` en su árbol —sin
-`vercel.json` ni `scripts/`—, así que es posible que ni el `ignoreCommand` ni `deploymentEnabled`
-lleguen a mirarse siquiera para ella; sin acceso a los registros de compilación de Vercel desde
-esta sesión (la herramienta de logs dio 404 con varios despliegues de los que sí existían de
-sobra), y sin permiso para borrar la rama y comprobar si una de verdad nueva se comporta distinto
-(`Bash` lo bloqueó como «Git Destructive»), el porqué exacto queda sin encontrar. Se deja el
-encadenado puesto (mejora razonable en sí misma) y se documenta como límite conocido, no como
-fallo: cada aviso de verdad cuesta una publicación rápida (unos 5 s, medida con la propia
-herramienta de Vercel) que nunca toca lo que ve la usuaria, dentro del cupo de 100 al día de toda
-la cuenta (`docs/PUBLICAR-SIN-PARAR.md`). Anotado para Francisco, con la vía más prometedora
-(restringir por rama desde el propio panel de Vercel, Project Settings → Git, en vez de desde
-`vercel.json`), en «Lo que queda por hablar con Francisco» de `docs/COLA.md`.
+producción). Dos arreglos por código, probados publicando de verdad, sin efecto por sí solos:
+`git.deploymentEnabled` con `"avisos": false` en `vercel.json`, y encadenar cada aviso con el
+anterior (`git fetch` + `git commit-tree -p <padre>`, por si un commit sin padre le parecía a
+Vercel "primer envío de una rama nueva, construir sí o sí"). Sin acceso a los registros de
+compilación de Vercel desde esta sesión (la herramienta de logs dio 404), ni permiso para borrar
+la rama y comprobar una hipótesis más (`Bash` lo bloqueó como «Git Destructive»), quedó anotado
+como límite conocido para que Francisco lo mirara desde el propio panel.
+
+**El motivo de verdad, encontrado entre los dos:** en «Project Settings → Build & Deployment →
+Ignored Build Step» del panel de Vercel, Francisco vio "Behavior: Automatic" con un aviso
+"Overridden" (que resultó ser normal, el comando coincidía con el de siempre) y, debajo, un
+desplegable de comportamiento. Con "Automatic", Vercel decide por su cuenta si ejecuta el
+`ignoreCommand`, y para una rama sin nada más que `ESPERANDO.json` en su árbol, sencillamente no
+lo ejecutaba: construía siempre, sin más. Cambiar a mano ese desplegable a **"Run my Bash
+script"** lo demostró al instante: el siguiente aviso de prueba pasó de `READY` a **`ERROR`**
+(`"errorCode": "ENOENT"`, `"errorMessage": "bash: scripts/vercel-ignore-build.sh: No such file or
+directory"`, `"errorStep": "ignoreStep"`) — la prueba de que Vercel ya intentaba ejecutar el
+script, y de que el motivo de fondo era justo el que se sospechaba: la rama `avisos` nunca llevó
+`vercel.json` ni `scripts/vercel-ignore-build.sh` en su árbol, así que no había ignoreCommand que
+ejecutar para ese commit en concreto (Vercel lee la configuración del propio commit que despliega,
+no una copia guardada aparte de las otras ramas). Con el desplegable ya en "Run my Bash script",
+esta sesión metió una copia de esos dos ficheros (los de la propia subida, por `hash-object`) en
+el árbol de cada aviso, junto a `ESPERANDO.json`. Con las dos partes juntas —el ajuste del panel
+más la copia de los ficheros—, dos avisos de verdad seguidos ya no aparecen en Vercel ni como
+publicación ni como error: nada, ni una entrada. `pruebas/aviso-esperando.mjs` comprueba que el
+árbol lleva los tres ficheros, copia fiel de los de la copia de trabajo. Cerrado de verdad, sin
+límite conocido pendiente.
 
 ---
 
