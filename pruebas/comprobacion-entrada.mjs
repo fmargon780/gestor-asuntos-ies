@@ -63,6 +63,17 @@ await comprobar('el botón de cerrar dice «Ahora no»', pagina.locator('#cuadro
 const faltan = await pagina.locator('.comprobacion-fila:has-text("Falta")').count();
 await comprobar('la marca cuenta lo que falta', pagina.locator('#comprobacion-marca').textContent(), '⚠ ' + faltan + ' por configurar');
 
+console.log('--- «Arreglarlo» de los festivos deja el bloque Hitos abierto (fila 204, revisor 2) ---');
+await pagina.click('.comprobacion-fila[data-id="centro-festivos"] [data-arreglar]');
+await pagina.waitForSelector('#capa.oculto', { state: 'attached' });
+await pagina.waitForTimeout(2500);
+await comprobar('el bloque Hitos sigue abierto tras asentarse la pantalla',
+  pagina.evaluate(() => { const d = document.getElementById('bloque-hitos'); return !!d && d.open; }), true);
+await comprobar('y los festivos están a la vista', pagina.locator('#hitos-festivos').isVisible(), true);
+
+await pagina.click('#comprobacion-marca');
+await pagina.waitForSelector('#capa:not(.oculto)');
+
 console.log('--- «Arreglarlo» lleva al bloque de Ajustes ---');
 await pagina.click('.comprobacion-fila[data-id="bandeja"] [data-arreglar]');
 await pagina.waitForSelector('#capa.oculto', { state: 'attached' });

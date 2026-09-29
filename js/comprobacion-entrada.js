@@ -77,8 +77,16 @@
         }
         var tab = el.closest('.ajustes-tab');
         if (tab && App.cambiarPestanaAjustes) App.cambiarPestanaAjustes(tab.id.replace('ajustes-tab-', ''));
-        var d = el.closest('details');
-        while (d) { d.open = true; d = d.parentElement && d.parentElement.closest('details'); }
+        /* Algunos bloques (Hitos) se pliegan solos al terminar de cargar
+           (js/ajustes-plegado.js recoloca lo que recordaba): se vuelve a
+           abrir un par de veces más, hasta que asienten. */
+        function abrir() {
+          var d = el.closest('details');
+          while (d) { if (!d.open) d.open = true; d = d.parentElement && d.parentElement.closest('details'); }
+        }
+        abrir();
+        setTimeout(abrir, 400);
+        setTimeout(abrir, 1500);
         setTimeout(function () { if (el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 60);
       })();
     };
