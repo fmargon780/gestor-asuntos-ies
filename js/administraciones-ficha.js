@@ -289,16 +289,41 @@ var AdministracionesFicha = (function () {
     };
   }
 
-  function htmlEditar(a) {
-    var o = A.organismoDelAsunto(a);
+  /* El desplegable en sí, a partir de un organismo ya resuelto (no de
+     un asunto): lo usa htmlEditar (el organismo de hoy) y, desde la
+     fila 219 (docs/TERCERO-CON-BUSCADOR-AL-CAMBIAR.md), el buscador de
+     «Cambiar el asunto» cuando se elige otro tercero (el organismo
+     recién elegido, no el del asunto). */
+  function htmlDepartamento(o, elegido) {
     if (!o || !A.aplanar(o).length) return '';
-    var elegido = (a.ficha && a.ficha.departamento && a.ficha.departamento.id) || '';
     return '<label class="etiqueta">Departamento <span class="suave">(opcional; no va en el nombre)</span></label>' +
-      '<select id="ed-departamento" class="campo">' + opcionesDepartamento(o, elegido) + '</select>';
+      '<select id="ed-departamento" class="campo">' + opcionesDepartamento(o, elegido || '') + '</select>';
   }
 
-  /* undefined si no había desplegable (no se toca lo guardado). */
-  function leerEditar(a) {
+  /* El organismo de una persona del buscador (fila 219): mismo camino
+     que `alFijarTercero`, para rehacer el desplegable al elegir otro
+     tercero sin pasar por App.E.nuevo. null si no es de esta categoría. */
+  function organismoDePersona(p) {
+    if (!p || p.categoria !== CAT) return null;
+    return A.organismoPorId(A.enMemoria(), p.idOrganismo);
+  }
+
+  function htmlEditar(a) {
+    var o = A.organismoDelAsunto(a);
+    var elegido = (a.ficha && a.ficha.departamento && a.ficha.departamento.id) || '';
+    return htmlDepartamento(o, elegido);
+  }
+
+  /* undefined si no había desplegable y no se ha elegido otro tercero
+     (no se toca lo guardado). Con `organismoNuevo` (fila 219: se ha
+     elegido otro tercero en el buscador), se lee del desplegable
+     rehecho para ESE organismo; `null` (tercero nuevo que no es de
+     Administraciones) limpia el departamento guardado. */
+  function leerEditar(a, organismoNuevo) {
+    if (organismoNuevo !== undefined) {
+      var selNuevo = $('ed-departamento');
+      return organismoNuevo ? A.departamentoParaFicha(organismoNuevo, selNuevo ? selNuevo.value : '') : null;
+    }
     var sel = $('ed-departamento');
     if (!sel) return undefined;
     var o = A.organismoDelAsunto(a);
@@ -317,6 +342,7 @@ var AdministracionesFicha = (function () {
   return {
     darDeAlta: darDeAlta, htmlFicha: htmlFicha, pintarLista: pintarLista,
     htmlEditar: htmlEditar, leerEditar: leerEditar, alFijarTercero: alFijarTercero,
+    htmlDepartamento: htmlDepartamento, organismoDePersona: organismoDePersona,
     renombrarAbiertos: renombrarAbiertos
   };
 })();

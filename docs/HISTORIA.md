@@ -5,6 +5,44 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 29-sep-2026 — Fila 219: el tercero de «Cambiar el asunto», con buscador
+
+`docs/TERCERO-CON-BUSCADOR-AL-CAMBIAR.md`. Antes, el tercero de «Cambiar el asunto» era un campo
+de texto libre (`#ed-tercero`): se podía escribir cualquier cosa, sin encaje con nadie dado de
+alta, y el asunto se desligaba de su persona (buscador, ficha del tercero, «Asuntos de…»). Ahora
+es el mismo buscador de «Nuevo asunto» (`App.buscarEnCategorias`, `App.claseDeResultado`,
+`App.pieDe`, `App.LISTAS_DE_CATEGORIA`, `App.textoTercero`), en todas las categorías a la vez y
+sin pastillas — nuevo `App.montarTerceroEditar` en `js/asuntos-editar-tercero.js`. Sin tocarlo, el
+tercero de siempre sigue igual (útil para un asunto antiguo que ya no aparece en ninguna lista de
+hoy); al elegir a alguien, un aviso ámbar si su categoría no es la del tipo (sin bloquear guardar),
+y el desplegable de departamento de Administraciones se rehace para el organismo recién elegido.
+
+**El obstáculo real: dos cuadros no pueden esperar respuesta a la vez.** El botón «Dar de alta»
+del buscador tenía que abrir su propio cuadro (`App.cuadroDeTercero`, o el de Administraciones)
+sin perder lo que ya se hubiera cambiado en «Cambiar el asunto» — pero los dos son `U.preguntar`
+(`js/util.js`), que solo deja un cuadro pendiente a la vez (`cuadroEsperando`): abrir un segundo
+mientras el primero espera le roba la respuesta al de fuera (`cerrarSinTocar`, pensado para que un
+cuadro nuevo sustituya a uno que ya no importa, no para anidar). Con `App.editarAsunto` tal cual
+estaba, esto habría resuelto su promesa como si se hubiera pulsado Cancelar, y el código de después
+habría vuelto a la lista con el cuadro de alta todavía abierto en pantalla: un fallo real, no solo
+en teoría, comprobado a mano quitando el arreglo. `js/relacionados.js` (`Relacionados.elegirTercero`)
+ya evita esto mismo cerrando su propio cuadro antes de llamar al de alta, pero ese buscador no usa
+`U.preguntar` para sí mismo, así que no tenía nada que perder. Aquí sí: la solución fue convertir
+`App.editarAsunto` en un bucle sobre `abrirCuadroDeEdicion(a, p, base)`; el botón de alta guarda un
+snapshot de todo lo tocado y pulsa el propio «Cancelar» del cuadro (ordenado, sin robar nada —
+`cerrar(false)` limpia `cuadroEsperando` de verdad); con el camino libre, se llama a
+`App.altaTercero` (con un tercer parámetro opcional `alDarDeAlta`, sin tocar su comportamiento de
+siempre en «Nuevo asunto» ni en Personas) y se vuelve a abrir el mismo cuadro con el snapshot, más
+la persona recién creada ya elegida. Comprobado de verdad con Playwright (no solo razonado): dar de
+alta a un solicitante nuevo desde dentro de «Cambiar el asunto», con una descripción ya escrita a
+mano, deja la descripción intacta y la persona nueva elegida, y «Nuevo asunto» sigue en blanco.
+
+`npm test` completo (187 ficheros) en verde salvo `tras-cada-accion.mjs` (fallo previo ya conocido
+y sin relación, en `EN_SOLITARIO`: falla también en solitario, siempre en el mismo paso de altura
+de scroll de tiempos finos). Prueba nueva `pruebas/tercero-con-buscador-al-cambiar.mjs`.
+
+---
+
 ## 29-sep-2026 — Fila 224: tareas del hito, sin texto de sobra
 
 Diseñado con Francisco en Cowork el 28-sep-2026: la tarjeta «Tareas del hito» tenía tres frases

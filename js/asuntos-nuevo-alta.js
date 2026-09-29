@@ -109,12 +109,20 @@ App.buscarEnCategorias = async function (texto, categorias, topePorCategoria) {
    (fila 173, docs/NUEVO-ASUNTO-SIN-REPETIR.md, punto 3): si estamos en
    Nuevo asunto y en la misma categoría, se llama a App.fijarTercero con
    el recién creado, en vez de relanzar la búsqueda y esperar el clic.
-   Si por lo que sea no se encuentra, se deja el camino de siempre. */
-App.altaTercero = async function (categoria, sugerencia) {
+   Si por lo que sea no se encuentra, se deja el camino de siempre.
+
+   `alDarDeAlta(nueva)` (fila 219): con él, ese es el único sitio que
+   decide qué hacer con la persona recién dada de alta (o `null` si no
+   se ha podido encontrar tras guardarla) — para reusar el alta desde
+   un buscador que no es el de «Nuevo asunto» (el de «Cambiar el
+   asunto», js/asuntos-editar-tercero.js) sin tocar App.E.nuevo ni
+   #buscar-tercero. Sin él, el comportamiento de siempre. */
+App.altaTercero = async function (categoria, sugerencia, alDarDeAlta) {
   if (App.ALTAS_DE_CATEGORIA[categoria]) {
     var nueva = await App.ALTAS_DE_CATEGORIA[categoria](sugerencia);
     if (!nueva) return;
     U.aviso('Dado de alta.', 'bueno');
+    if (alDarDeAlta) { alDarDeAlta(nueva); return; }
     if (App.E.nuevo.categoria === categoria) { App.fijarTercero(nueva); return; }
     return;
   }
@@ -130,10 +138,9 @@ App.altaTercero = async function (categoria, sugerencia) {
   var fuente = await Datos.anadirALista(App.E.datos, categoria, valores);
   U.aviso('Dado de alta.', 'bueno');
   var nombreNuevo = valores[def.cabecera[0]];
-  if (App.E.nuevo.categoria === categoria) {
-    var creado = fuente && fuente.lista && fuente.lista.filter(function (p) { return p.nombre === nombreNuevo; })[0];
-    if (creado) { App.fijarTercero(creado); return; }
-  }
+  var creado = fuente && fuente.lista && fuente.lista.filter(function (p) { return p.nombre === nombreNuevo; })[0];
+  if (alDarDeAlta) { alDarDeAlta(creado || null); return; }
+  if (App.E.nuevo.categoria === categoria && creado) { App.fijarTercero(creado); return; }
   $('buscar-tercero').value = nombreNuevo;
   App.buscarTercero();
 };

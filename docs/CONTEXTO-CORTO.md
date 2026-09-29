@@ -91,7 +91,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   persona». La BD de alumnado (carpeta de Drive) suma sus datos:
   ficha, huecos, grupos.
 - Cambiar un asunto abierto (le cambia el nombre a la carpeta, sin perder hitos ni presencia); no
-  en el ARCHIVO. Cambiar el nombre de un tipo se lleva su guía; cambiarle el tipo a un asunto
+  en el ARCHIVO. El tercero de «Cambiar el asunto» se elige con el mismo buscador de «Nuevo
+  asunto» (fila 219, todas las categorías, con alta desde ahí): sin tocarlo, el tercero no cambia
+  aunque no encaje con nadie de las listas de hoy; elegir uno de otra categoría que el tipo solo
+  avisa, no bloquea. Cambiar el nombre de un tipo se lleva su guía; cambiarle el tipo a un asunto
   ofrece traer la guía del tipo nuevo. «Unir con otro tipo» (fila 207): el tipo se funde en otro
   (guía, campos, plantillas, recurrentes, alias); sus asuntos abiertos pasan al que se queda, sin
   recibir su guía nueva; el ARCHIVO no se toca.

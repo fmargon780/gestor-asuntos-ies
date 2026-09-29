@@ -175,14 +175,44 @@ App.renombrarAsuntosAbiertosDelTercero = async function (categoria, textoAntes, 
     (renombrados === 1 ? '' : 's') + '.', 'bueno');
 };
 
+/* Fila 219, punto 4: dar de alta a alguien nuevo desde el buscador de
+   este cuadro no puede abrir un segundo U.preguntar mientras el de
+   «Cambiar el asunto» sigue esperando (se roban uno a otro, ver
+   js/asuntos-editar-tercero.js). En vez de eso, abrirCuadroDeEdicion
+   cierra su propio cuadro con el botón Cancelar de siempre (ordenado,
+   sin robar nada) y devuelve `{ pedirAlta, snapshot }`; App.editarAsunto
+   hace el alta ya con el camino libre y vuelve a abrir el mismo cuadro
+   con `snapshot` (todo lo que se hubiera tocado, más el recién creado
+   ya elegido). */
 App.editarAsunto = async function (a) {
   var p = App.piezasDelAsunto(a);
-  var bloqueCampos = App.pintarCamposEditar(p.tipo, p.campos);
+  var base = null;   /* null = valores del propio asunto (p); si no, un snapshot de una vuelta anterior */
+
+  while (true) {
+    var r = await abrirCuadroDeEdicion(a, p, base);
+    if (r.pedirAlta) {
+      var creada = null;
+      await App.altaTercero(r.pedirAlta.categoria, r.pedirAlta.texto, function (nueva) { creada = nueva; });
+      base = r.snapshot;
+      if (creada) base.terceroElegido = creada;
+      continue;
+    }
+    if (!r.ok) return;
+    /* Mientras se guarda, el asunto está ocupado (fila 100): ni
+       archivar ni volver a editar hasta que termine. Devuelve el
+       nombre con que queda el asunto si ha salido bien (fila 119). */
+    return await App.conOcupado(a.nombre, function () { return guardarEdicion(a, p, r.d, r.nombreNuevo, r.datos); });
+  }
+};
+
+async function abrirCuadroDeEdicion(a, p, base) {
+  var v = base || p;   /* de dónde salen los valores de partida del cuadro */
+  var bloqueCampos = App.pintarCamposEditar(v.tipo, base ? base.campos : p.campos);
 
   var hayTipo = App.E.tipos.some(function (t) { return t.tipo === p.tipo; });
   var opciones = '';
   if (p.tipo && !hayTipo) {
-    opciones += '<option value="' + U.escapar(p.tipo) + '" selected>' +
+    opciones += '<option value="' + U.escapar(p.tipo) + '"' + (v.tipo === p.tipo ? ' selected' : '') + '>' +
                 U.escapar(p.tipo) + ' (no está en la lista)</option>';
   }
   Nombres.CATEGORIAS.forEach(function (cat) {
@@ -191,7 +221,7 @@ App.editarAsunto = async function (a) {
     opciones += '<optgroup label="' + cat + '">' +
       deEsta.map(function (t) {
         return '<option value="' + U.escapar(t.tipo) + '"' +
-               (t.tipo === p.tipo ? ' selected' : '') + '>' + U.escapar(t.tipo) + '</option>';
+               (t.tipo === v.tipo ? ' selected' : '') + '>' + U.escapar(t.tipo) + '</option>';
       }).join('') + '</optgroup>';
   });
 
@@ -201,26 +231,32 @@ App.editarAsunto = async function (a) {
   var cuadroEditar = document.querySelector('#capa .cuadro');
   if (cuadroEditar) cuadroEditar.classList.add('cuadro-alto');
 
+  var terceroElegidoInicial = base ? base.terceroElegido : null;
+  var departamentoInicialHtml = (terceroElegidoInicial && window.AdministracionesFicha)
+    ? AdministracionesFicha.htmlDepartamento(AdministracionesFicha.organismoDePersona(terceroElegidoInicial), '')
+    : (window.AdministracionesFicha ? AdministracionesFicha.htmlEditar(a) : '');   /* fila 167 */
+
   var promesa = U.preguntar('Cambiar el asunto',
     '<p class="explica">Al guardar se le cambia el nombre a la carpeta. ' +
     'Se copia primero y se comprueba que ha llegado todo; si algo fallara, ' +
     'la carpeta se queda como está.</p>' +
     '<div class="dos-columnas">' +
       '<div><label class="etiqueta">Fecha de inicio</label>' +
-      '<input id="ed-fecha" type="date" class="campo" value="' + U.escapar(p.fecha) + '"></div>' +
+      '<input id="ed-fecha" type="date" class="campo" value="' + U.escapar(v.fecha) + '"></div>' +
       '<div><label class="etiqueta">Año académico <span class="suave">(opcional)</span></label>' +
-      '<input id="ed-curso" class="campo" value="' + U.escapar(p.curso) + '" placeholder="26-27"></div>' +
+      '<input id="ed-curso" class="campo" value="' + U.escapar(v.curso) + '" placeholder="26-27"></div>' +
     '</div>' +
     '<label class="etiqueta">Tipo de asunto</label>' +
     '<select id="ed-tipo" class="campo">' + opciones + '</select>' +
+    '<p id="ed-aviso-categoria" class="aviso aviso-ambar oculto"></p>' +   /* fila 219, punto 6 */
     '<label class="etiqueta">Grupo <span class="suave">(opcional)</span></label>' +
-    '<input id="ed-grupo" class="campo" value="' + U.escapar(p.grupo) + '" placeholder="1ºA">' +
+    '<input id="ed-grupo" class="campo" value="' + U.escapar(v.grupo) + '" placeholder="1ºA">' +
     bloqueCampos.html +
     '<label class="etiqueta">Descripción corta <span class="suave">(opcional)</span></label>' +
-    '<input id="ed-descripcion" class="campo" value="' + U.escapar(p.descripcion) + '">' +
+    '<input id="ed-descripcion" class="campo" value="' + U.escapar(v.descripcion) + '">' +
     '<label class="etiqueta">Tercero</label>' +
-    '<input id="ed-tercero" class="campo" value="' + U.escapar(p.tercero) + '">' +
-    (window.AdministracionesFicha ? AdministracionesFicha.htmlEditar(a) : '') +   /* fila 167 */
+    '<div id="ed-tercero-caja"></div>' +   /* fila 219: buscador, ya no texto libre */
+    '<div id="ed-departamento-caja">' + departamentoInicialHtml + '</div>' +
     '<div class="vista-previa">' +
       '<div class="vista-rotulo">Se llamará</div>' +
       '<div id="ed-vista" class="vista-nombre"></div>' +
@@ -245,7 +281,12 @@ App.editarAsunto = async function (a) {
       .map(function (v) { return v.valor; });
   }
 
+  /* Sin elegir otro tercero en el buscador, el nombre sigue con el
+     texto de siempre (punto 3 de la fila 219): guardar sin tocarlo no
+     cambia el tercero, aunque sea un asunto antiguo que ya no
+     encuentre a nadie parecido en las listas de hoy. */
   function piezasDelCuadro() {
+    var elegido = controlesTercero.terceroElegido();
     return {
       fecha: $('ed-fecha').value,
       tipo: $('ed-tipo').value,
@@ -253,17 +294,76 @@ App.editarAsunto = async function (a) {
       grupo: $('ed-grupo').value.trim(),
       campos: camposParaNombre(),
       descripcion: $('ed-descripcion').value.trim(),
-      tercero: $('ed-tercero').value.trim()
+      tercero: elegido ? App.textoTercero(elegido) : p.tercero
     };
+  }
+
+  /* Punto 6 de la fila 219: si el tercero elegido es de otra categoría
+     que el tipo, un aviso ámbar junto al tipo, sin impedir guardar. */
+  function refrescarAvisoCategoria() {
+    var caja = $('ed-aviso-categoria');
+    var elegido = controlesTercero.terceroElegido();
+    var tipo = $('ed-tipo').value;
+    var categoriaTipo = tipo && Nombres.categoriaDeTipo(App.E.tipos, tipo);
+    if (!elegido || !categoriaTipo || categoriaTipo === elegido.categoria) {
+      caja.classList.add('oculto');
+      caja.textContent = '';
+      return;
+    }
+    caja.classList.remove('oculto');
+    caja.textContent = 'Este tipo es de ' + Nombres.textoCategoria(categoriaTipo, 'lista') + '; ' +
+      App.textoTercero(elegido) + ' es de ' + Nombres.textoCategoria(elegido.categoria, 'lista') +
+      '. Cambia el tipo si no encaja.';
+  }
+
+  /* Punto 7: el desplegable de departamento se rehace para el
+     organismo recién elegido (o desaparece si ya no es de
+     Administraciones). Solo al elegir otro tercero, nunca en cada
+     tecla de los demás campos: si no, se perdería lo ya elegido en el
+     propio desplegable. Sin tocar el tercero se deja tal cual se montó
+     al abrir el cuadro. */
+  function refrescarDepartamento() {
+    if (!window.AdministracionesFicha) return;
+    var elegido = controlesTercero.terceroElegido();
+    if (!elegido) return;
+    var o = AdministracionesFicha.organismoDePersona(elegido);
+    $('ed-departamento-caja').innerHTML = AdministracionesFicha.htmlDepartamento(o, '');
   }
 
   function refrescar() {
     var r = nombreConTipoCortoAjustado(piezasDelCuadro());
     $('ed-vista').textContent = r.nombre;
     Nombres.avisoRecorte($('ed-vista'), r.recortado, r.noCabe);   /* filas 130 y 177 */
+    refrescarAvisoCategoria();
   }
 
-  ['ed-fecha', 'ed-curso', 'ed-tipo', 'ed-grupo', 'ed-descripcion', 'ed-tercero']
+  /* Punto 4: «Dar de alta» no llama a App.altaTercero desde aquí (ver
+     la cabecera de js/asuntos-editar-tercero.js): se guarda qué se
+     pedía y se cierra este cuadro con su propio Cancelar, ordenado. */
+  var pedirAltaPendiente = null, snapshotPendiente = null;
+  function snapshotDelCuadro() {
+    var camposObjeto = {};
+    itemsCampos.forEach(function (item, i) {
+      camposObjeto[item.clave] = { valor: valorEditado(item, i), enNombre: enNombreEditado(i) };
+    });
+    return {
+      fecha: $('ed-fecha').value, tipo: $('ed-tipo').value, curso: $('ed-curso').value.trim(),
+      grupo: $('ed-grupo').value.trim(), descripcion: $('ed-descripcion').value.trim(),
+      campos: camposObjeto, terceroElegido: controlesTercero.terceroElegido()
+    };
+  }
+  function pedirAlta(categoria, texto) {
+    pedirAltaPendiente = { categoria: categoria, texto: texto };
+    snapshotPendiente = snapshotDelCuadro();
+    $('cuadro-cancelar').click();
+  }
+
+  var controlesTercero = App.montarTerceroEditar($('ed-tercero-caja'), p.tercero, function () {
+    refrescar();
+    refrescarDepartamento();
+  }, pedirAlta, terceroElegidoInicial);
+
+  ['ed-fecha', 'ed-curso', 'ed-tipo', 'ed-grupo', 'ed-descripcion']
     .forEach(function (id) { $(id).oninput = refrescar; $(id).onchange = refrescar; });
   itemsCampos.forEach(function (item, i) {
     var el = $('ed-campo-' + i);
@@ -275,24 +375,25 @@ App.editarAsunto = async function (a) {
 
   var ok = await promesa;
   if (cuadroEditar) cuadroEditar.classList.remove('cuadro-alto');
-  if (!ok) return;
+  if (pedirAltaPendiente) return { pedirAlta: pedirAltaPendiente, snapshot: snapshotPendiente };
+  if (!ok) return { ok: false };
 
   /* Obligatorio quiere decir que el asunto no se guarda sin él, igual
      que al crearlo. */
   for (var i = 0; i < itemsCampos.length; i++) {
     if (itemsCampos[i].cfg.obligatorio && !valorEditado(itemsCampos[i], i)) {
       U.aviso('Hace falta rellenar "' + itemsCampos[i].nombre + '".', 'malo');
-      return;
+      return { ok: false };
     }
   }
 
   var d = piezasDelCuadro();
-  if (!d.tercero) { U.aviso('Hace falta el tercero: va siempre al final del nombre.', 'malo'); return; }
+  if (!d.tercero) { U.aviso('Hace falta el tercero: va siempre al final del nombre.', 'malo'); return { ok: false }; }
   var ajustadoFinal = nombreConTipoCortoAjustado(d);
   var nombreNuevo = ajustadoFinal.nombre;
-  if (!nombreNuevo || nombreNuevo.length < 8) { U.aviso('Ese nombre se queda demasiado corto.', 'malo'); return; }
+  if (!nombreNuevo || nombreNuevo.length < 8) { U.aviso('Ese nombre se queda demasiado corto.', 'malo'); return { ok: false }; }
   /* Fila 177: ni recortando el texto libre cabe en la ruta de Dropbox. */
-  if (ajustadoFinal.noCabe) { U.aviso('El nombre no cabe en la ruta de Dropbox: acorta el texto.', 'malo'); return; }
+  if (ajustadoFinal.noCabe) { U.aviso('El nombre no cabe en la ruta de Dropbox: acorta el texto.', 'malo'); return { ok: false }; }
 
   var camposGuardados = {};
   itemsCampos.forEach(function (item, i) {
@@ -305,14 +406,20 @@ App.editarAsunto = async function (a) {
     campos: camposGuardados,
     editadoEl: U.ahora(), editadoPor: App.E.usuario
   };
-  var departamento = window.AdministracionesFicha ? AdministracionesFicha.leerEditar(a) : undefined;
+  /* Punto 8 de la fila 219: sin tocar el tercero, nada de esto se toca
+     (App.anotar solo funde las claves presentes en `datos`). Al elegir
+     otro, se pone al día igual que al crear un asunto nuevo: la foto
+     de contacto (fila 66) y el departamento (fila 167, del organismo
+     recién elegido, o se limpia si ya no es de Administraciones). */
+  var elegido = controlesTercero.terceroElegido();
+  if (elegido) datos.contacto = Datos.fotoDeContacto(elegido, elegido.categoria);
+  var organismoNuevo = (elegido !== null && window.AdministracionesFicha)
+    ? AdministracionesFicha.organismoDePersona(elegido) : undefined;
+  var departamento = window.AdministracionesFicha ? AdministracionesFicha.leerEditar(a, organismoNuevo) : undefined;
   if (departamento !== undefined) datos.departamento = departamento;   /* fila 167; null lo quita */
 
-  /* Mientras se guarda, el asunto está ocupado (fila 100): ni
-     archivar ni volver a editar hasta que termine. */
-  /* Devuelve el nombre con que queda el asunto si ha salido bien (fila 119). */
-  return await App.conOcupado(a.nombre, function () { return guardarEdicion(a, p, d, nombreNuevo, datos); });
-};
+  return { ok: true, d: d, nombreNuevo: nombreNuevo, datos: datos };
+}
 
 /* Lo principal (la carpeta y la ficha) y lo accesorio (la lista, la
    guía) por separado (fila 100, docs/AVISOS-QUE-DICEN-LA-VERDAD.md). */

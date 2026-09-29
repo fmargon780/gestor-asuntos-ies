@@ -9,6 +9,37 @@ código comunes y la tabla de ficheros del repositorio están en el propio `docs
 
 ---
 
+### El tercero de «Cambiar el asunto», con buscador (29-sep-2026, fila 219, `docs/TERCERO-CON-BUSCADOR-AL-CAMBIAR.md`)
+
+`js/asuntos-editar.js` ya no deja escribir el tercero a mano (`#ed-tercero`, texto libre): el campo
+es ahora `#ed-tercero-caja`, montado por `App.montarTerceroEditar` (`js/asuntos-editar-tercero.js`),
+el mismo buscador de «Nuevo asunto» (`App.buscarEnCategorias`, `App.claseDeResultado`, `App.pieDe`,
+`App.LISTAS_DE_CATEGORIA`, `App.textoTercero`), en todas las categorías a la vez y sin pastillas.
+Al abrir, el tercero de hoy sale como «elegido» (texto tal cual, sin buscarle encaje: puede ser un
+asunto antiguo que ya no aparece en ninguna lista); sin tocarlo, `piezasDelCuadro().tercero` sigue
+siendo ese texto. Al elegir a alguien, el nombre de la carpeta pasa a `App.textoTercero(elegido)`
+(el mismo formato que usa «Nuevo asunto»); si su categoría no es la del tipo elegido
+(`Nombres.categoriaDeTipo`), un aviso ámbar junto al tipo (`#ed-aviso-categoria`) que no bloquea
+guardar. Con Administraciones, el desplegable de departamento (`AdministracionesFicha.htmlDepartamento`/
+`organismoDePersona`, ya no solo `htmlEditar`/`leerEditar` del asunto) se rehace para el organismo
+recién elegido, o desaparece si ya no toca; al guardar, `ficha.contacto` (`Datos.fotoDeContacto`) y
+`ficha.departamento` se ponen al día igual que al crear, solo si el tercero ha cambiado de verdad.
+
+**«Dar de alta» desde este buscador no abre un segundo `U.preguntar`**: el cuadro «Cambiar el
+asunto» ya es uno (`U.preguntar` solo deja uno pendiente a la vez, `cuadroEsperando` en
+`js/util.js`; abrir otro dentro le roba la respuesta al de fuera, viendo cómo ya evita esto
+`Relacionados.elegirTercero` en `js/relacionados.js`, cerrando su propio buscador antes de llamar a
+`App.cuadroDeTercero`). Aquí, en vez de eso, `App.editarAsunto` es un bucle sobre
+`abrirCuadroDeEdicion(a, p, base)`: un botón de alta llama a `alPedirAlta(categoria, texto)`, que
+guarda un snapshot de todo lo tocado (fecha, tipo, curso, grupo, descripción, campos, tercero
+elegido) y pulsa el propio «Cancelar» del cuadro (ordenado, sin robar nada); con el camino ya libre,
+`App.editarAsunto` llama a `App.altaTercero(categoria, texto, alDarDeAlta)` (ahora con un tercer
+parámetro opcional, sin tocar su comportamiento de siempre en «Nuevo asunto» ni en Personas) y
+vuelve a abrir el mismo cuadro con el snapshot, más la persona recién creada ya elegida. Nunca toca
+`App.E.nuevo` ni `#buscar-tercero`/`#resultados-tercero` (los de «Nuevo asunto» siguen en blanco).
+
+Se comprueba con `pruebas/tercero-con-buscador-al-cambiar.mjs`.
+
 ### Las listas de la ficha se funden por elemento, y un asunto cerrado lleva lápida (26-sep-2026, fila 176, `docs/DATOS-ENTRE-ORDENADORES.md`)
 
 `App.anotar` (todo el objeto, campo a campo) sigue para los datos sueltos, pero las LISTAS de la
