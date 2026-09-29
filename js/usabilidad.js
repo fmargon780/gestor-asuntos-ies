@@ -137,7 +137,11 @@
     });
     if ($('campo-grupo')) $('campo-grupo').checked = false;
     if ($('resultados-tercero')) $('resultados-tercero').innerHTML = '';
-    ['bloque-tipos', 'bloque-tercero', 'bloque-grupo', 'bloque-detalles', 'tercero-elegido']
+    /* Fila 231: solo se esconde lo que empieza escondido. bloque-tipos,
+       bloque-tercero y bloque-detalles están siempre a la vista desde las
+       filas 197 y 215; esconderlos aquí dejaba la siguiente entrada a
+       Nuevo asunto sin buscador ni parrilla. */
+    ['bloque-grupo', 'tercero-elegido']
       .forEach(function (id) { if ($(id)) $(id).classList.add('oculto'); });
     Array.prototype.forEach.call(document.querySelectorAll('.categoria-boton.elegido'),
       function (b) { b.classList.remove('elegido'); });
