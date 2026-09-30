@@ -7,23 +7,27 @@
    tarjeta («+ Añadir una tarea solo para este asunto», «✎ Cambiar las
    tareas de este hito…»). Ahora cada tarea lleva su propio «⋮»:
 
-     De la guía: Anotar · Cambiar aquí · Cambiar en la guía · Borrar
+     De la guía: Anotar · Cambiar · Borrar · Abrir en la guía
      «Solo aquí»: Anotar · Cambiar · Pasar a la guía · Borrar
+
+   Fila 235 (docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md): «Cambiar», «Borrar»
+   (de una tarea de la guía) y «Pasar a la guía» abren, al aceptar, el
+   emergente «¿Dónde se guarda?» (js/donde-se-guarda-tareas.js); ya no
+   hay «Cambiar aquí» ni «Cambiar en la guía». «Abrir en la guía» es el
+   editor de siempre (lo que hacía «Cambiar en la guía»).
 
    - «Anotar» abre una línea para escribir debajo de la tarea; la nota
      va a la libreta única del asunto (NotasHito.anadirDesdeTarea, fila
      139) con el nombre de la tarea delante. Con notas, la tarea lleva
      un 💬 que las despliega.
-   - «Cambiar aquí» / «Cambiar»: el texto se edita en la propia línea
-     (Hitos.cambiarGuionAqui / Hitos.cambiarGuionPropioTexto,
-     js/hitos-guion.js).
-   - «Cambiar en la guía»: el editor de siempre
+   - «Cambiar»: el texto se edita en la propia línea; Intro abre el
+     emergente (DondeSeGuardaTareas.cambiar).
+   - «Abrir en la guía»: el editor de siempre
      (HitoMesaGuion.cambiarGuionDelPaso), con la tarea ya resaltada.
-   - «Pasar a la guía»: añade la tarea al final del guion del paso de
-     la guía (Hitos.pasarGuionPropioAGuia) y dispersa la marca de hecha
-     si la tenía.
-   - «Borrar»: Hitos.borrarGuionPropio (una «solo aquí») o
-     Hitos.ocultarGuionDeGuia (una de la guía, sin sustituta).
+   - «Pasar a la guía»: el mismo emergente con «A la guía» marcada
+     (DondeSeGuardaTareas.pasar).
+   - «Borrar»: de una tarea de la guía, el emergente; de una «solo aquí»,
+     se borra como siempre (Hitos.borrarGuionPropio).
 
    El estado de qué tarea está editándose, anotándose o con las notas
    desplegadas vive aquí (vista, no se guarda en disco): `estadoDe(id)`.
@@ -88,63 +92,30 @@ var HitoMesaTareaMenu = (function () {
 
   /* ---------- acciones ---------- */
 
-  async function pasarALaGuia(a, h, g, repintar) {
-    var tipo = tipoDe(a);
-    if (!tipo || !window.GuiasDelCentro || !window.GuiasGuion) return;
-    var ok = await U.preguntar('Pasar a la guía',
-      '<p>¿Pasar «' + U.escapar(g.texto) + '» a la guía de ' + U.escapar(nombreCortoDe(tipo)) +
-      '? Llegará a los asuntos abiertos de este tipo.</p>', 'Pasar a la guía');
-    if (!ok) return;
-    var nuevoId = null;
-    try {
-      var hecho = await GuiasDelCentro.cambiarPasos(tipo, function (pasos) {
-        var p = HitoMesaGuion.buscarPasoDeGuia(pasos, h.origenGuia);
-        if (!p || (p.opciones && p.opciones.length)) return false;
-        var nueva = { texto: g.texto, explicacion: g.explicacion || '', accion: g.accion || '', normativa: g.normativa || null };
-        if (g.reunir) { nueva.reunir = g.reunir; nueva.obligatorio = !!g.obligatorio; }
-        p.guion = GuiasGuion.normalizar((p.guion || []).concat([nueva]));
-        nuevoId = p.guion[p.guion.length - 1].id;
-        return true;
-      });
-      if (!hecho) { U.aviso('Ese hito ya no está en la guía del tipo.', 'ambar'); return; }
-    } catch (err) {
-      U.fallo('No he podido pasarlo a la guía', err);
-      return;
-    }
-    try {
-      await Hitos.pasarGuionPropioAGuia(a.nombre, h.id, g.id, nuevoId);
-    } catch (err) {
-      U.accesorio('Pasado a la guía, pero no he podido dejarlo así en este asunto', err);
-    }
-    U.aviso('Pasado a la guía de ' + nombreCortoDe(tipo) + '.', 'bueno');
-    if (window.HitosPanel) HitosPanel.programarRepintado();
+  function pasarALaGuia(a, h, g) {
+    return DondeSeGuardaTareas.pasar(a, h, g).then(function (ok) {
+      if (ok) delete estado[g.id];
+    });
   }
 
   async function borrar(a, h, g) {
-    var notas = notasDe(a, g);
-    var necesitaConfirmar = g.hecho || g.noaplica || notas.length;
-    if (necesitaConfirmar) {
-      var ok = await U.preguntar('Borrar esta tarea', '<p>' + U.escapar(g.texto) + '</p>', 'Borrar');
-      if (!ok) return;
+    if (g.propio) {
+      var notas = notasDe(a, g);
+      if (g.hecho || g.noaplica || notas.length) {
+        var ok = await U.preguntar('Borrar esta tarea', '<p>' + U.escapar(g.texto) + '</p>', 'Borrar');
+        if (!ok) return;
+      }
     }
-    try {
-      if (g.propio) await Hitos.borrarGuionPropio(a.nombre, h.id, g.id);
-      else await Hitos.ocultarGuionDeGuia(a.nombre, h.id, g.id);
-    } catch (err) {
-      U.fallo('No he podido borrar la tarea', err);
-      return;
-    }
-    delete estado[g.id];
-    if (window.HitosPanel) HitosPanel.programarRepintado();
+    var borrada = await DondeSeGuardaTareas.borrar(a, h, g);
+    if (borrada) delete estado[g.id];
   }
 
+  /* Intro en la línea editada: abre «¿Dónde se guarda?». Si se cancela,
+     la línea sigue en edición con lo escrito. */
   function guardarTexto(a, h, g, texto) {
-    var p = g.propio ? Hitos.cambiarGuionPropioTexto(a.nombre, h.id, g.id, texto)
-                      : Hitos.cambiarGuionAqui(a.nombre, h.id, g, texto);
-    return p.then(function () {
-      delete estado[g.id];
-      if (window.HitosPanel) HitosPanel.programarRepintado();
-    }).catch(function (err) { U.fallo('No he podido guardar el cambio', err); });
+    return DondeSeGuardaTareas.cambiar(a, h, g, texto).then(function (ok) {
+      if (ok) delete estado[g.id];
+    });
   }
 
   function guardarNota(a, h, g, texto) {
@@ -164,15 +135,15 @@ var HitoMesaTareaMenu = (function () {
     var lista = [
       { texto: 'Anotar', alPulsar: function () { e(g.id).anotando = true; repintar(); } }
     ];
+    lista.push({ texto: 'Cambiar', alPulsar: function () { e(g.id).editando = true; repintar(); } });
     if (g.propio) {
-      lista.push({ texto: 'Cambiar', alPulsar: function () { e(g.id).editando = true; repintar(); } });
-      lista.push({ texto: 'Pasar a la guía', alPulsar: function () { pasarALaGuia(a, h, g, repintar); } });
-    } else {
-      lista.push({ texto: 'Cambiar aquí', alPulsar: function () { e(g.id).editando = true; repintar(); } });
-      lista.push({ texto: 'Cambiar en la guía', deshabilitado: !HitoMesaGuion.puedeAnadirALaGuia(a, h),
-        alPulsar: function () { HitoMesaGuion.cambiarGuionDelPaso(a, h, g.id); } });
+      lista.push({ texto: 'Pasar a la guía', alPulsar: function () { pasarALaGuia(a, h, g); } });
     }
     lista.push({ texto: 'Borrar', clase: 'ficha-menu-peligro', alPulsar: function () { borrar(a, h, g); } });
+    if (!g.propio) {
+      lista.push({ texto: 'Abrir en la guía', deshabilitado: !HitoMesaGuion.puedeAnadirALaGuia(a, h),
+        alPulsar: function () { HitoMesaGuion.cambiarGuionDelPaso(a, h, g.id); } });
+    }
     return lista;
   }
 

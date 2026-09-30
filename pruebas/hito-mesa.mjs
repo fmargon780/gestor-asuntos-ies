@@ -15,7 +15,8 @@
      7. Escape vuelve a la lista; desde "Qué me toca" se entra directo en
         la mesa.
      8. "Traer los guiones del instituto" no pisa un guion ya escrito.
-     9. (fila 224) La caja «Nueva tarea…» añade solo a este asunto; su
+     9. (filas 224 y 235) La caja «Nueva tarea…» pregunta «¿Dónde se
+        guarda?» (aquí, «Solo en este asunto»); su
         «⋮» → «Pasar a la guía» lleva la línea al guion del paso de la
         guía y sale también en otro asunto abierto del mismo tipo; una
         segunda tarea nueva, sin pasarla, no toca la guía.
@@ -312,6 +313,10 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   /* Fila 224: la caja «Nueva tarea…» añade solo a este asunto. */
   await pagina.fill('.hito-en-mesa .guion-nueva-tarea', 'Pedir el certificado de empadronamiento');
   await pagina.press('.hito-en-mesa .guion-nueva-tarea', 'Enter');
+  /* Fila 235: Intro abre «¿Dónde se guarda?»; aquí, «Solo en este asunto». */
+  await pagina.waitForSelector('#capa:not(.oculto) input[name="dsg-donde"]');
+  await pagina.check('input[name="dsg-donde"][value="aqui"]');
+  await pagina.click('#cuadro-aceptar');
   await pagina.waitForSelector('.hito-en-mesa .guion-paso .guion-tarea-propia');
   await comprobar('9. la caja queda vacía tras Intro',
     pagina.inputValue('.hito-en-mesa .guion-nueva-tarea'), '');
@@ -321,10 +326,10 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   const filaTarea = pagina.locator('.hito-en-mesa .guion-paso', { hasText: 'Pedir el certificado de empadronamiento' });
   await filaTarea.locator('.guion-tarea-menu-boton').click();
   await pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion', { hasText: 'Pasar a la guía' }).click();
-  await pagina.waitForSelector('#capa:not(.oculto)');
-  await pagina.click('#cuadro-aceptar');
+  await pagina.waitForSelector('#capa:not(.oculto) input[name="dsg-donde"]');
+  await pagina.click('#cuadro-aceptar');   /* «A la guía» viene marcada */
   await pagina.waitForFunction(() => Array.prototype.some.call(document.querySelectorAll('.mensaje'),
-    (m) => m.textContent.indexOf('Pasado a la guía de') !== -1));
+    (m) => m.textContent.indexOf('Guardado en la guía de') !== -1));
   await pagina.waitForTimeout(500);
   const r9 = await pagina.evaluate(async (otro) => {
     const guias = await Carpetas.leerJson(App.E.gestor, 'guias.json');
@@ -346,6 +351,9 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
       .locator('.guion-casilla').isChecked(), false);
   await pagina.fill('.hito-en-mesa .guion-nueva-tarea', 'Solo para Ana');
   await pagina.press('.hito-en-mesa .guion-nueva-tarea', 'Enter');
+  await pagina.waitForSelector('#capa:not(.oculto) input[name="dsg-donde"]');
+  await pagina.check('input[name="dsg-donde"][value="aqui"]');
+  await pagina.click('#cuadro-aceptar');
   await pagina.waitForTimeout(800);
   await comprobar('9. la tarea que no se pasa no toca la guía', pagina.evaluate(async () => {
     const guias = await Carpetas.leerJson(App.E.gestor, 'guias.json');

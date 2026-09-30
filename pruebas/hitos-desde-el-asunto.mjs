@@ -137,6 +137,14 @@ await abrirMesaDe('Actual', 'c1');
 await elegirDelMenu('Crear');
 await pagina.fill('#hda-titulo', 'Recabar la documentación');
 await pagina.selectOption('#hda-despues', 'c1');
+/* Fila 235: ya no hay casilla; el bloque «¿Dónde se guarda?» sale con la guía marcada. */
+await comprobar('A. sin la casilla vieja «También en la guía»',
+  pagina.evaluate(() => !document.querySelector('#hda-tambien-guia')), true);
+await comprobar('A. «A la guía de …» marcada, y dice a cuántos abiertos llega',
+  pagina.evaluate(() => ({
+    marcada: document.querySelector('input[name="dsg-donde"]:checked').value,
+    nota: (document.querySelector('.dsg-nota') || {}).textContent
+  })), { marcada: 'guia', nota: 'Llegará a 2 asuntos abiertos de este tipo.' });
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
 
@@ -166,7 +174,7 @@ await volver();
 await abrirMesaDe('Actual', 'c1');
 await elegirDelMenu('Crear');
 await pagina.fill('#hda-titulo', 'Nota solo mía');
-await pagina.uncheck('#hda-tambien-guia');
+await pagina.check('input[name="dsg-donde"][value="aqui"]');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
 
@@ -212,7 +220,10 @@ await volver();
 
 await abrirMesaDe('Actual', idNuevo);
 await elegirDelMenu('Borrar');
-await pagina.waitForSelector('#hda-tambien-guia');
+await pagina.waitForSelector('input[name="dsg-donde"]');
+await comprobar('D. «Borrar» lleva las dos opciones, con «A la guía» marcada',
+  pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('input[name="dsg-donde"]'), (r) => r.value + (r.checked ? '*' : ''))),
+  ['guia*', 'aqui']);
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
 

@@ -5,6 +5,23 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 30-sep-2026 — Fila 235: «¿Dónde se guarda?» al aceptar
+
+Nació del aviso de soporte de Francisco («Ficha de un asunto»): al crear un hito en un tipo que ya tenía
+guía no se ofrecía actualizar la guía, y había que ir a buscar el botón. Ahora todo cambio de hitos o
+tareas hecho desde un asunto pregunta antes de guardarse: «A la guía de <tipo>» (marcada, con a cuántos
+asuntos abiertos llega) o «Solo en este asunto», con el mismo bloque para hitos y tareas
+(`js/donde-se-guarda.js`, `js/donde-se-guarda-tareas.js`, `js/hitos-desde-el-asunto-guia.js`). Decisiones
+de la sesión: los ids de las tareas de un hito propio se conservan al llevarlo a la guía (así lo marcado no
+se pierde y no hay que rehacer `guionHecho`); el hito se enlaza con el paso nuevo antes de guardar la guía,
+para que el reparto de la fila 118 no lo duplique; «Deshacer» compara la guía y los demás asuntos con una
+instantánea y, si algo cambió por otro lado, no lo pisa. Cambia a propósito la fila 206 (la casilla
+«También en la guía» desaparece) y la 224 (Intro en «Nueva tarea…» ya no guarda sin preguntar). El fallo de
+«no me carga el mapa previo» no se pudo reproducir con datos de demostración; se blindó la lectura de la
+guía (si falla, conserva la última buena en memoria).
+
+---
+
 ## 30-sep-2026 — Fila 213: el botón de soporte
 
 Botón «Soporte» en todas las pantallas (`js/soporte.js`, `css/soporte.css`) y buzón en un script de
