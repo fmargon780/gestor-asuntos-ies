@@ -202,6 +202,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 235 | `docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md` (al crear, cambiar o borrar un hito o una tarea desde un asunto, antes de guardar se elige «A la guía de <tipo>» —marcada— o «Solo en este asunto», con a cuántos asuntos abiertos llega y «Deshacer» después; una tarea de un hito que no está en la guía se lleva el hito entero; arreglar que «Cambiar la guía…» no cargue la guía previa) | PENDIENTE (30-sep-2026) |
 | 236 | Aviso de usuario: error en «Ficha de un asunto» | IDEA (30-sep-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1t7c1_HorW4YhcHtITGhkxvkTx73kYXrg/view?usp=drivesdk |
 | 237 | Aviso de usuario: error en «Ficha de un asunto» | DESCARTADA (30-sep-2026): descartada por Francisco desde el Centro de mando |
+| 238 | `docs/CERTIFICADO-CONSEJO-ESCOLAR.md` (tipo de asunto «Certificado miembro Consejo Escolar»: tabla nueva con los CSV del Consejo que da Séneca, botón para subirlos, y un certificado con todos los periodos de la persona, firmado por Secretaría con V.º B.º de Dirección) | PENDIENTE (30-sep-2026) |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
