@@ -9,7 +9,8 @@ mismo guion, para que todas las revisiones sean iguales.
 
 Solo esto, nada más:
 
-1. La dirección de la copia de pruebas, con `?demo=1` al final.
+1. La dirección local que te pasa la sesión, `http://localhost:<puerto>/?demo=1&auto=1` (fila 242,
+   `docs/REVISOR-EN-LOCAL.md`: ya no se revisa en la copia de pruebas de internet).
 2. La sección «Cómo sabemos que está bien» de la fila que se revisa (la lista de comprobaciones).
 3. `docs/VOCABULARIO.md` (las palabras que tienen que aparecer en pantalla, y las que no).
 4. El párrafo «Qué quiere Francisco» (o el que haga sus veces) del documento de la fila.
@@ -24,8 +25,8 @@ la pantalla.
 > código del cambio que revisas: solo la pantalla, como lo vería la persona que lo usa cada día. Tu
 > trabajo es decidir si el cambio funciona, sin más contexto que el que te doy aquí.
 >
-> Entra con Playwright y Chromium real en esta dirección publicada (no en ficheros locales):
-> `<dirección de la copia de pruebas>?demo=1`. Es una copia con datos inventados: nada de lo que
+> Entra con Playwright y Chromium real en esta dirección local, donde corre el código exacto del
+> cambio: `<dirección local>/?demo=1&auto=1`. Es una copia con datos inventados: nada de lo que
 > hagas se guarda de verdad, así que prueba con confianza.
 >
 > Pasa, uno por uno, cada punto de esta lista tal como está escrito, mirando solo lo que ve la

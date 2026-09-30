@@ -8,31 +8,31 @@ repositorio. Cada lanzamiento hace, en una conversación nueva, solo la primera 
 (si la hay) o si no la primera **PENDIENTE** de `docs/COLA.md`, la lleva hasta el final (revisor
 incluido) y para. Detalle en la regla 0 de la cola y en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
 
-**Trabajar en `pruebas`; a `main` solo con el revisor** (28-sep-2026 por la tarde, sustituye la
-norma de esa misma mañana «Subir directamente a `main`»: Francisco la cambió al ver que los
-fallos le salían en producción; detalle y porqué en `docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223,
-y en el bloque «El revisor» de abajo):
+**Trabajar en la rama de la fila; a `main` solo con el revisor** (30-sep-2026, fila 242,
+`docs/REVISOR-EN-LOCAL.md`: sustituye la norma «Trabajar en `pruebas`» del 28-sep-2026; las
+sesiones no entran en `pruebas.fmargon.com`, el tope de Vercel es de toda la cuenta y nivelar
+`pruebas` a la fuerza perdió trabajo):
 
-1. Al empezar una fila, nivelar `pruebas` con `main` (`git fetch`; `git push --force origin
-   main:pruebas`, o sin `git push`: una petición de cambios de `main` a `pruebas` fusionada al
-   momento). Todo el trabajo de código de la fila sube a `pruebas`, nunca directo a `main`. Las
-   subidas que solo tocan `docs/` (EN CURSO, estimaciones, HECHA) siguen yendo directas a `main`:
-   no publican nada.
-2. Si git rechaza la subida a `pruebas` (a veces el entorno solo deja subir a tu rama
-   `claude/...`): sube a tu rama, abre una petición de cambios contra `pruebas` y fusiónala tú
-   mismo en ese momento con la herramienta de GitHub (`merge_pull_request`), sin esperar a nadie.
-   Nunca dejes una petición de cambios abierta.
+1. Cada fila trabaja en su propia rama `fila-<nº>`, creada desde `main` al empezar (o en la rama
+   `claude/...` que el entorno permita). **Nunca se nivela ninguna rama a la fuerza** si tiene
+   commits que no están en `main`. La rama de una fila no se borra hasta que su trabajo está en
+   `main`. Las subidas que solo tocan `docs/` (EN CURSO, estimaciones, HECHA) van directas a
+   `main`: no publican nada.
+2. Nada se sube a `pruebas` para revisarlo y nada espera a Vercel antes del revisor. Si git rechaza
+   la subida a tu rama, sube a una `claude/...`, abre una petición de cambios y fusiónala tú mismo
+   al momento (`merge_pull_request`). Nunca dejes una petición de cambios abierta.
 3. Nunca subas ficheros de código uno a uno con las herramientas de ficheros de GitHub
    (`create_or_update_file` o `push_files`): los ficheros grandes se cortan al subir. Si git no
    puede subir de ninguna manera, para: deja la fila EN CURSO y dilo en tu mensaje final.
 4. No esperes a GitHub Actions ni arregles sus fallos como condición para publicar. Lo que vale es
-   `npm test` en tu sesión y la publicación comprobada en Vercel (regla general de abajo). Si
-   Actions falla en una prueba que en tu sesión pasa, no la persigas: apúntala en una línea en
-   `docs/COLA.md` («Lo que queda por hablar con Francisco») y sigue.
-5. Con la aprobación del revisor, `pruebas` pasa a `main` (`git push origin pruebas:main` si es
-   avance limpio; si no, fusión y subida; sin `git push`, petición de cambios `pruebas` → `main`
-   fusionada al momento). Publicaciones de Vercel por fila: como mucho tres (una o dos a
-   `pruebas`, una a `main`). No hagas subidas sueltas fichero a fichero.
+   `npm test` en tu sesión y la publicación comprobada (regla general de abajo). Si Actions falla
+   en una prueba que en tu sesión pasa, apúntala en una línea en `docs/COLA.md` («Lo que queda por
+   hablar con Francisco») y sigue.
+5. Con la aprobación del revisor, la rama de la fila se fusiona en `main` (avance limpio o fusión
+   normal; sin `git push`, petición de cambios fusionada al momento): es la única publicación de
+   código de la fila. Después, `pruebas` se pone igual que `main` (`git push --force origin
+   main:pruebas`) solo si antes `git merge-base --is-ancestor origin/pruebas origin/main` lo
+   confirma; si no, no se toca y se apunta en una línea. No es un paso: nadie la espera.
 
 **Pruebas: parciales mientras trabajas, completas una sola vez** (28-sep-2026, pedido por
 Francisco; manda sobre cualquier otra regla de la cola que pida más pasadas completas):
@@ -74,13 +74,14 @@ solo de `docs/`, va directa a `main` (regla de arriba) y no publica nada.
 **El revisor** (28-sep-2026, `docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223): antes de tocar
 `main`, cada tarea PENDIENTE lleva su sección «Cómo sabemos que está bien» (si una fila anterior a
 la 223 no la tiene, la sesión la escribe al cogerla, a partir del propio documento). Con el cambio
-ya publicado en `pruebas` y comprobado por `curl`, la propia sesión lanza un agente aparte, con
-contexto limpio (sin ver el código ni el diff), que entra por Playwright en la copia de pruebas
-publicada con `?demo=1` y pasa esa lista, con el guion fijo de `docs/REVISOR-GUION.md`. Un punto
+hecho en la rama de la fila, la propia sesión arranca un servidor local con ese código y lanza un
+agente aparte, con contexto limpio (sin ver el código ni el diff), que entra por Playwright en
+`http://localhost:<puerto>/?demo=1&auto=1` y pasa esa lista, con el guion fijo de
+`docs/REVISOR-GUION.md` (fila 242). Un punto
 **[SOLO FRANCISCO]** no lo pasa el revisor: queda NO COMPROBADO, se copia a
 `docs/COMPROBAR-A-MANO.md` y se avisa a Francisco en una línea al terminar. **APROBADA**: se
 publica en `main` (regla general de abajo) y la fila se marca HECHA. **RECHAZADA** la primera vez:
-se arregla solo lo que dice el informe, se sube a `pruebas` otra vez y se llama a un revisor nuevo
+se arregla solo lo que dice el informe, se rearranca el servidor local y se llama a un revisor nuevo
 desde cero, sin contarle qué se arregló. **RECHAZADA** la segunda vez: la fila pasa a **DEVUELTA**
 con el informe, `main` no se toca, y la sesión para (mensaje que empieza por «DEVUELTA:»). El
 siguiente lanzamiento coge primero las filas DEVUELTA, antes que cualquier PENDIENTE; DEVUELTA dos
@@ -95,9 +96,11 @@ ninguna publicación salió bien durante horas y se marcaron filas como HECHAS �
 verde», porque solo se probaba en el entorno de trabajo. Para que no pase:
 
 1. **Una fila solo es HECHA cuando está publicada y comprobada.** Probar en tu entorno (tipos,
-   pruebas, compilar) es necesario, pero no basta. Hay que comprobar al menos una de estas dos
-   cosas: (a) la dirección publicada sirve la versión nueva; (b) la plataforma de publicación
-   dice que la publicación de ese commit terminó bien.
+   pruebas, compilar) es necesario, pero no basta. Hacen falta las dos cosas (fila 242,
+   `docs/REVISOR-EN-LOCAL.md`): (a) **el commit de la fila está en `main`**
+   (`git merge-base --is-ancestor <sha> origin/main`; «la web sirve una versión posterior» no lo
+   demuestra); y (b) Vercel lo ha publicado (la dirección sirve la versión nueva, o la
+   plataforma dice que ese commit terminó bien).
 2. **Al empezar cualquier sesión, lo primero:** comprobar la última publicación. Hay dos casos
    (28-sep-2026, `docs/PUBLICAR-SIN-PARAR.md`):
    - **Rota por nuestro código** (la construcción falla, la web da error, falta un fichero que
@@ -119,6 +122,8 @@ verde», porque solo se probaba en el entorno de trabajo. Para que no pase:
    suponer que es la caché del navegador sin haberlo comprobado.
 5. **«En verde»** en un mensaje a Francisco solo se dice si la publicación también lo está.
 
-Cómo se comprueba en este proyecto: se publica en Vercel. `App.VERSION` de la web publicada
-(`js/version.js?v=<algo distinto>`) tiene que ser de después de tu subida; con la herramienta
-de Vercel, `list_deployments` con el `sha` del commit. Detalle en la regla 19 de `docs/COLA.md`.
+Cómo se comprueba en este proyecto: se publica en Vercel. Por el primer camino que funcione:
+a) `curl` a `js/version.js?v=<algo distinto>` de `asuntos.fmargon.com` o
+`gestor-de-asuntos.vercel.app`: `App.VERSION` igual o posterior a la de la fila; b) el estado
+«Vercel» del commit en GitHub (`success`); c) `list_deployments` con el `sha`. Detalle en la regla
+19 de `docs/COLA.md`.

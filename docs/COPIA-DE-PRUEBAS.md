@@ -4,6 +4,9 @@ Fila 222 de la cola. Diseñada con Francisco el 28-sep-2026 (conversación de Co
 primera de las dos filas del método nuevo «purgar los fallos antes de producción»; la segunda es
 `docs/REVISOR-ANTES-DE-PUBLICAR.md` (fila 223), que no tiene sentido sin esta.
 
+> Fila 242 (30-sep-2026): la copia en internet ya no es un paso de la cola; se nivela con `main` después
+> de cada publicación, para que Francisco la mire si quiere (`docs/REVISOR-EN-LOCAL.md`).
+
 ## Qué quiere Francisco
 
 Una dirección aparte, **https://pruebas.fmargon.com**, donde vive la versión que se está

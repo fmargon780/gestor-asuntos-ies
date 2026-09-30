@@ -4134,3 +4134,28 @@ servidor de pruebas mal configurado. Y el puerto `1` (usado a mano para simular 
 ahí") es de los que Chrome bloquea siempre por seguridad (`ERR_UNSAFE_PORT`): la prueba final abre
 y cierra un servidor real para quedarse con un puerto libre de verdad, en vez de inventarse uno.
 
+
+## 30-sep-2026 · Fila 242: el revisor prueba en local; la copia de pruebas en internet deja de ser un paso
+
+Francisco: «no para de haber problemas en la fase de revisión; falla Vercel, falla el dominio».
+Desde la fila 223 casi ninguna fila salió limpia, y no por el código de la aplicación:
+
+1. Las sesiones de Claude Code no pueden entrar en `pruebas.fmargon.com` (403 de su red, y además
+   pide «Vercel Authentication»).
+2. El tope de 100 publicaciones diarias de Vercel es de toda la cuenta y otros proyectos lo agotan;
+   cada subida a `pruebas` gastaba una más. Las filas 219, 204 y 213 acabaron con el revisor contra
+   un servidor local con el código exacto, y eso sí funcionó: es ahora la norma.
+3. Se perdió trabajo y se marcaron HECHAS filas que no estaban en producción: el commit `8d9deba`
+   de la fila 231 quedó fuera de toda rama al nivelar `pruebas` con `main` a la fuerza; el de la 229
+   (`84def1e`, fusión `ca6c95d`) no está en `main` aunque la fila figuraba HECHA «porque la web
+   sirve una versión posterior» (comprobación falsa: una versión posterior de otra fila no prueba
+   que el código de esta esté publicado); el de la 235 (`341a22b`) está en `pruebas`, sin revisar.
+
+Lo que cambia (`docs/REVISOR-EN-LOCAL.md`): cada fila trabaja en su rama `fila-<nº>` y nunca se
+nivela una rama a la fuerza con commits que no estén en `main`; el revisor entra siempre en local
+(`http://localhost:<puerto>/?demo=1&auto=1`); nada espera a Vercel antes del revisor; una sola
+publicación de código por fila (la fusión en `main`); `pruebas` se nivela con `main` solo después y
+solo si `origin/pruebas` ya es ancestro de `origin/main`; y una fila solo es HECHA con su commit en
+`main` y publicado por Vercel. Las filas 235, 229 y 231 vuelven a PENDIENTE, con su SHA de rescate
+(los cuatro SHA responden en GitHub). Reglas tocadas: `CLAUDE.md`, reglas 0, 13 y 19 de
+`docs/COLA.md`, `docs/REVISOR-GUION.md`, `docs/COPIA-DE-PRUEBAS.md`, `docs/CONTEXTO-CORTO.md`.

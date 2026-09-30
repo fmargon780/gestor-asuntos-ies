@@ -1,5 +1,7 @@
 # El revisor: nada llega a producción sin pasar su lista
 
+> Secciones 2 y 3 sustituidas por `docs/REVISOR-EN-LOCAL.md` (fila 242, 30-sep-2026).
+
 Fila 223 de la cola. Diseñada con Francisco el 28-sep-2026 (conversación de Cowork). Segunda fila
 del método «purgar los fallos antes de producción»; necesita hecha la 222
 (`docs/COPIA-DE-PRUEBAS.md`). Esta fila **no toca la aplicación**: cambia cómo se trabaja la cola.

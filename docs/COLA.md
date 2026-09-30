@@ -23,12 +23,12 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
    vez en este repositorio, y no hay ninguna tarea programada que lance la cola: la lanza
    Francisco. Cada lanzamiento hace, en una conversación de Claude Code nueva, **solo la primera
    fila DEVUELTA** (si la hay) **o, si no hay ninguna, la primera fila PENDIENTE**: la trabaja en
-   la rama `pruebas`, la pasa por el revisor y solo con su APROBADA la publica en `main` (detalle
+   su rama `fila-<nº>`, la pasa por el revisor (en local, fila 242) y solo con su APROBADA la publica en `main` (detalle
    en `docs/REVISOR-ANTES-DE-PUBLICAR.md`), comprueba la publicación y **para**. Si una fila queda
    DEVUELTA o BLOQUEADA, la conversación también acaba ahí. Si al empezar hay una fila EN CURSO
    **con conversación enlazada de menos de 90 minutos**, no se coge otra: esa conversación sigue
    con ella. Una fila EN CURSO sin enlace, o con uno de más de 90 minutos, se considera abandonada:
-   el siguiente lanzamiento la retoma, en conversación nueva, mirando qué quedó en `pruebas` (no en
+   el siguiente lanzamiento la retoma, en conversación nueva, mirando qué quedó en su rama `fila-<nº>` (no en
    `main`). Las cláusulas comunes de las filas 188 en adelante (como mucho tres subidas, nada se
    sube con `npm test` en rojo) están en `docs/REPARTO-DE-LA-COLA-2026-09-27.md`. **«Comprueba la
    publicación» no es lo mismo que «espera a que Vercel publique»** (28-sep-2026,
@@ -82,16 +82,12 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     (`get_file_contents` o `git show origin/main:<ruta>`) y compara el tamaño con el de antes: si
     ha quedado más corto de lo esperado, esa sesión no puede con ese fichero de una vez, y hay que
     dejarlo apuntado aquí en vez de reintentarlo mil veces.
-13. **El reparto de las subidas, con el revisor de por medio** (28-sep-2026,
-    `docs/REVISOR-ANTES-DE-PUBLICAR.md`, sustituye el reparto de abajo). Cada push que llega a
-    GitHub le cuesta una publicación a Vercel, y el plan gratuito solo da 100 al día: el
-    17-sep-2026 se agotaron y la web se quedó sin actualizar hasta el día siguiente. Como mucho
-    tres publicaciones por fila: una subida a `main` para marcar **EN CURSO** (regla 2, no
-    publica nada); una subida a `pruebas` con el código, las pruebas y su documentación juntos
-    (dos si hace falta corregir tras una RECHAZADA del revisor); y, con la aprobación, una subida
-    de `pruebas` a `main` con la marca **HECHA**, `docs/CONTEXTO-CORTO.md`, `docs/CONTEXTO.md` y
-    `docs/HISTORIA.md`. Nada de un commit por fichero, ni de "completa el commit anterior": se
-    prepara todo y se sube una vez por destino. Ver `docs/NO-GASTAR-PUBLICACIONES.md`.
+13. **El reparto de las subidas** (30-sep-2026, fila 242, `docs/REVISOR-EN-LOCAL.md`). Cada push a
+    `main` con código le cuesta una publicación a Vercel, y el plan gratuito solo da 100 al día,
+    de toda la cuenta. **Una sola publicación de código por fila**: la fusión de su rama
+    `fila-<nº>` en `main` tras la APROBADA del revisor (más la de `pruebas` al nivelarla después).
+    Las subidas de solo `docs/` (marca EN CURSO, estimaciones, HECHA) van directas a `main` y no
+    publican nada. Nada de un commit por fichero. Ver `docs/NO-GASTAR-PUBLICACIONES.md`.
 
 14. **Nunca uses `$(cat fichero)` ni ninguna sustitución de shell como valor de `content` al
     subir un fichero: el servidor no lo ejecuta, lo sube tal cual, como texto literal.** El
@@ -118,25 +114,19 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     de commit en el parámetro `content`, y `docs/COLA.md` se quedó en 83 bytes. Antes de cada
     llamada, comprueba que `content` es el documento entero y `message` es la frase del commit:
     son dos parámetros distintos, nunca el mismo texto.
-19. **Desde la fila 223, el `curl` se hace dos veces**: la copia de pruebas
-    (`pruebas.fmargon.com` o su dirección automática) antes de llamar al revisor, y producción
-    (`main`) después de que apruebe (`docs/REVISOR-ANTES-DE-PUBLICAR.md`, sección 2). **Tras
-    fusionar o subir, comprueba con `curl` que lo publicado coincide con lo subido** (por
-    ejemplo `js/version.js?v=<algo distinto>`). Si `App.VERSION` publicada se queda atrás varios
-    minutos, puede que Vercel no haya llegado a lanzar la publicación de los últimos commits (sin
-    error visible: sencillamente no hay ninguna `deployment` para esos SHA). Pasó el 24-sep-2026
-    con la fila 63 (`216bff3a`, ~40 min sin publicarse), y el 28-sep-2026 con el tope diario de
-    despliegues agotado (`docs/PUBLICAR-SIN-PARAR.md`, fila 211: el tope es de toda la cuenta de
-    Vercel, no solo de este proyecto, y otro proyecto de Francisco puede agotarlo él solo). Si
-    tienes acceso a la herramienta MCP de Vercel, `list_deployments` con el `sha` del commit lo
-    confirma. **Como mucho un `create_deployment` a mano por sesión** (con `deploymentId` de la
-    última publicación buena y `withLatestCommit: true`, `target: production`, para forzar una
-    publicación desde el commit actual de `main` sin tocar el repositorio): si responde 402
-    «Resource is limited», no se reintenta, se apunta el motivo y la fila queda **SIN PUBLICACIÓN
-    COMPROBADA** (regla 0) en vez de bloquear la cola. Si no tienes esa herramienta, déjalo anotado
-    aquí igualmente. Al empezar la siguiente fila, comprueba primero las filas SIN PUBLICACIÓN
-    COMPROBADA que hubiera: si la web ya sirve una `App.VERSION` igual o posterior a la suya, pásalas
-    a HECHA en la misma subida que marca la nueva fila EN CURSO.
+19. **Una fila solo es HECHA con las dos cosas** (fila 242, `docs/REVISOR-EN-LOCAL.md`, sección 2):
+    (1) su commit está en `main` (`git merge-base --is-ancestor <sha-de-la-fila> origin/main`, o
+    que aparezca en el historial de `main`); sin esto, nunca HECHA, lo diga la web o no; y (2)
+    Vercel lo ha publicado, por el primer camino que funcione: a) `curl` a
+    `https://asuntos.fmargon.com/js/version.js?v=<algo>` o a
+    `https://gestor-de-asuntos.vercel.app/js/version.js?v=<algo>`: `App.VERSION` igual o posterior
+    a la de la fila; b) el estado «Vercel» del commit en GitHub (`success`); c) `list_deployments`
+    con el `sha`. Si ninguno funciona, la fila queda **SIN PUBLICACIÓN COMPROBADA** con el SHA de
+    `main` en la nota, y la sesión para con normalidad. **Como mucho un `create_deployment` a mano
+    por sesión**; si responde 402, no se reintenta (el tope es de toda la cuenta de Vercel,
+    `docs/PUBLICAR-SIN-PARAR.md`). Al empezar cada sesión se revisan las filas SIN PUBLICACIÓN
+    COMPROBADA con estas mismas dos condiciones: **«la web sirve una versión posterior» solo vale
+    si además el commit de la fila está en `main`.**
 
 20. **`docs/COLA.md` por debajo de 40 KB, siempre** (fila 226, `docs/COLA-POR-DEBAJO-DE-40-KB.md`).
     Las filas **HECHA** (salvo las de hoy y las de ayer, que se quedan hasta el día siguiente para
@@ -189,13 +179,14 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 219 | `docs/TERCERO-CON-BUSCADOR-AL-CAMBIAR.md` (en «Cambiar el asunto», el tercero se elige con el buscador de «Nuevo asunto», en todas las categorías, con alta desde ahí; sin texto libre; aviso ámbar sin bloquear si el tipo no encaja con la categoría) | HECHA (29-sep-2026 07:52; publicación comprobada el 30-sep-2026: la web sirve una versión posterior) · conversación: https://claude.ai/code/session_018J7kDfWtuu4KAgmdkjRtpQ. Programada, probada y revisada entera: `npm test` completo (187 ficheros) en verde salvo `tras-cada-accion.mjs` (fallo previo ya conocido y sin relación, `EN_SOLITARIO`). El revisor (agente aparte, contexto limpio) no pudo entrar en `pruebas.fmargon.com` (403 del proxy de salida de esta sesión) ni en la *preview* de la rama (Vercel no llegó a publicarla: automático sin disparar, y `create_deployment` a mano respondió 402, tope diario agotado — comprobado que otro proyecto de Francisco, `normativa-escolarizacion`, publicó unas 10 veces en la última hora, así que el tope es suyo, no de este repositorio); entró en su lugar contra un servidor local con el código exacto de `pruebas` (mismo commit, `?demo=1&auto=1`). Informe: **APROBADA** (6 puntos, 0 solo Francisco). El punto 6 (selector de departamento con un organismo de Administraciones) salió NO COMPROBADO porque los datos de demostración no traen ningún organismo dado de alta — no es un `[SOLO FRANCISCO]`: comprobado en su lugar, de forma independiente, con datos reales dentro de esta misma sesión (`pruebas/tercero-con-buscador-al-cambiar.mjs`, sección 6, en verde). Fusionado en `main` (`fb82a2b`, tras fusionar de paso dos ideas nuevas de Francisco —228 y 229— sin tocarlas). Por la misma causa (tope diario de toda la cuenta), Vercel no ha lanzado todavía ningún despliegue para los commits de `main` de esta fila: comprobado por `curl` (`App.VERSION` sigue en la de la fila 227) y con `list_deployments` (nada nuevo tras `fb82a2b`). El siguiente lanzamiento comprueba de nuevo antes de coger otra fila (regla 19). |
 | 226 | \docs/COLA-POR-DEBAJO-DE-40-KB.md` (la lista de tareas por debajo de 40 KB: las terminadas pasan al historial y se reduce sola cuando crece) | HECHA (29-sep-2026 08:21). De 110 KB a 25 KB. Detalle en `docs/HISTORIA.md` |
 | 230 | `docs/SALIR-DE-ELEGIR-ASUNTO.md` (en «Guardar en un asunto», de documentos sueltos y de correos: ✕ arriba y «Cancelar» siempre a la vista, Escape que cierra de verdad —buscar la causa— y botón «No está: crear un asunto nuevo con él») | HECHA (29-sep-2026 10:32). Aprobada por Francisco a mano en la copia de pruebas (sin revisor automático). Detalle en `docs/contexto/DOCUMENTOS.md` |
-| 231 | `docs/CREAR-ASUNTO-DESDE-POR-CLASIFICAR.md` (crear un asunto desde un documento de «Por clasificar»: el formulario sale siempre completo —categoría, buscador de personas y tipos—, con lo reconocido ya elegido y cambiable; buscar por qué unas veces sale sin ellos) | HECHA (29-sep-2026 11:20; publicación comprobada el 30-sep-2026: la web sirve una versión posterior) · conversación: https://claude.ai/code/session_018zE6iZoJHP7aSaXTtfweTg. Programada y probada (npm test: 188 de 189; la que falla pasa en solitario). Código en la rama `pruebas` (commit 8d9deba), NO en `main`. Causa: «Cancelar» y «← Volver» escondían bloque-tipos, bloque-tercero y bloque-detalles y prepararNuevo no los volvía a enseñar. Desde esta sesión no se llega a pruebas.fmargon.com (proxy 403) ni a la API de Vercel (403): sin comprobar la publicación ni pasar el revisor. Falta: comprobar pruebas, pasar el revisor (o Francisco a mano) y pasar `pruebas` a `main`. **Aviso 30-sep-2026:** al nivelar `pruebas` con `main` (regla de CLAUDE.md) el commit 8d9deba dejó de estar en ninguna rama y ya no se puede recuperar: hay que rehacer el arreglo (la causa está descrita arriba). |
 | 204 | `docs/COMPROBACION-AL-ENTRAR.md`, entero, con `js/cabecera-fija.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 204) | HECHA (29-sep-2026 13:22; publicación comprobada el 30-sep-2026: la web sirve una versión posterior) · conversación: https://claude.ai/code/session_01GNtC3HC3kYpKqfymmKJuTX. Arreglado «Arreglarlo» de festivos (el bloque Hitos se replegaba solo tras cargar; `llevarA` lo reabre hasta que asienta; prueba nueva que fallaba antes y pasa ahora). Revisor 3 (contexto limpio, contra servidor local con `?demo=1&auto=1`): APROBADA; puntos 6 y 7 SOLO FRANCISCO, en `docs/COMPROBAR-A-MANO.md`. Subido a `main` (commit 8762f47). No he podido comprobar la publicación: asuntos.fmargon.com da 403 de red desde la sesión y Vercel no lista proyectos. Pasa a HECHA cuando la web sirva `App.VERSION` posterior a 29-sep-2026 13:22. |
 | 203 | `docs/PAPELERA-SE-VACIA-SOLA.md`, entero, con `js/copias.js` (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 203) | HECHA (29-sep-2026 22:10) · conversación: https://claude.ai/code/session_01B4NoHyUUC2AAP2xp6vEeD2. Revisor: APROBADA a la segunda (6 puntos, 1 solo Francisco; la primera rechazó el aviso de Inicio, que no salía). Publicada en `main` (commit 3710463). Detalle en `docs/HISTORIA.md` |
 | 213 | `docs/BOTON-DE-SOPORTE.md` (botón «Soporte» en una esquina: error o mejora, texto y captura opcional; buzón en un script de Google que guarda el aviso en Drive y apunta una IDEA sin datos en la cola; más `docs/PONER-EN-MARCHA-SOPORTE.md` para Francisco) | HECHA (30-sep-2026 04:33) · conversación: https://claude.ai/code/session_019Nv6KhPdNkfsWuifmtR7j6. Revisor: APROBADA (6 puntos, 3 solo Francisco; contra servidor local con el código exacto de `pruebas`, `?demo=1&auto=1`, porque desde la sesión no se llega a `pruebas.fmargon.com` ni la *preview* deja entrar). `npm test` completo: 188 de 192; `tras-cada-accion` (conocida), `ha-llegado-sustituye-la-vista` y `mesa-comunicar-del-paso-y-guion` pasan en solitario, y `hitos-no-huerfanos-al-archivar` dependía de que el aviso ámbar del punto 1 ya se hubiera ido (4,5 s): la prueba ahora lo quita antes del punto 2. Falta la puesta en marcha de Francisco: `docs/PONER-EN-MARCHA-SOPORTE.md`. Detalle en `docs/HISTORIA.md` |
 | 228 | El botón Cambiar del menú Hito no modifica se previamente se ha escrito en su descripción. [recorte: https://claude.ai/artifact/7pDUJyXkUbPwuccZRx6J7E · 770511d544b41e6484d15e64fc5e042b] | IDEA (29-sep-2026): apuntada por Francisco desde el Centro de mando |
-| 229 | `docs/REGISTRO-DEL-ASUNTO.md` (el registro del asunto: una sola lista por fechas con lo que ha pasado —lo que anota la aplicación sola y lo que se escribe a mano—, entera en la ficha y solo lo suyo en la mesa de cada hito; caja «Anotar algo que ha pasado…»; las líneas a mano se cambian o se borran, las automáticas no; la lista de tareas no cambia) | HECHA (30-sep-2026 09:32; publicación comprobada el 30-sep-2026: la web sirve una versión posterior) · conversación: https://claude.ai/code/session_011vNjLkBFMRhcMGy2s4chtA. Programada y probada (`npm test`: 190 de 193; fallan `ha-llegado-sustituye-la-vista` —también sin mis cambios—, y las otras dos pasan en solitario). Código en la rama `pruebas` (commit ca6c95d), NO en `main`. Desde esta sesión no se llega a pruebas.fmargon.com (proxy 403) ni a la API de Vercel (403): sin comprobar la publicación ni pasar el revisor. Falta: comprobar pruebas, pasar el revisor (o Francisco a mano) y pasar `pruebas` a `main`. **Ojo:** no nivelar `pruebas` con `main` antes de eso (se perdería el código). |
-| 235 | `docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md` (al crear, cambiar o borrar un hito o una tarea desde un asunto, antes de guardar se elige «A la guía de <tipo>» —marcada— o «Solo en este asunto», con a cuántos asuntos abiertos llega y «Deshacer» después; una tarea de un hito que no está en la guía se lleva el hito entero; arreglar que «Cambiar la guía…» no cargue la guía previa) | EN CURSO (30-sep-2026) · conversación: https://claude.ai/code/session_01W9Rf1ZvS4R9dpyV1oq2Xg2. Código terminado y subido a `pruebas` (341a22b; `npm test` 193 pruebas en verde), sin pasar aún por el revisor ni publicado en `main`: esta sesión no puede entrar en pruebas.fmargon.com (el proxy lo bloquea) ni listar despliegues de Vercel (403). El siguiente lanzamiento la retoma desde `pruebas`: comprobar la publicación, lanzar el revisor y, si aprueba, pasar a `main`. |
+| 242 | `docs/REVISOR-EN-LOCAL.md` (el revisor prueba siempre en local; cada fila trabaja en su rama `fila-<nº>`, nada espera a Vercel antes del revisor; HECHA solo con el commit en `main` y publicado; rescate de las filas 235, 229 y 231) | EN CURSO (30-sep-2026 22:40) · conversación: https://claude.ai/code/session_01LiVig4TNYmadfjYvyM5nGb |
+| 235 | `docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md` (al crear, cambiar o borrar un hito o una tarea desde un asunto, antes de guardar se elige «A la guía de <tipo>» —marcada— o «Solo en este asunto», con a cuántos asuntos abiertos llega y «Deshacer» después; una tarea de un hito que no está en la guía se lleva el hito entero; arreglar que «Cambiar la guía…» no cargue la guía previa) | PENDIENTE (30-sep-2026) · Rescate: el código está en `pruebas` (`341a22b`). Crear `fila-235` desde ese commit (o traerlo sobre `main` actual), revisor en local, publicar. |
+| 229 | `docs/REGISTRO-DEL-ASUNTO.md` (el registro del asunto: una sola lista por fechas con lo que ha pasado —lo que anota la aplicación sola y lo que se escribe a mano—, entera en la ficha y solo lo suyo en la mesa de cada hito; caja «Anotar algo que ha pasado…»; las líneas a mano se cambian o se borran, las automáticas no; la lista de tareas no cambia) | PENDIENTE (30-sep-2026) · Rescate: el código está en `84def1e` (fusión `ca6c95d`), no en `main`. Traerlo a una rama `fila-229` desde `main` actual (cherry-pick o fusión), resolver choques, pasar pruebas y revisor, publicar. |
+| 231 | `docs/CREAR-ASUNTO-DESDE-POR-CLASIFICAR.md` (crear un asunto desde un documento de «Por clasificar»: el formulario sale siempre completo —categoría, buscador de personas y tipos—, con lo reconocido ya elegido y cambiable; buscar por qué unas veces sale sin ellos) | PENDIENTE (30-sep-2026) · Rescate: el código está en `8d9deba`, no en `main` (el commit sigue en GitHub: se pide por su SHA). Igual que la 229. Causa ya hallada: «Cancelar» y «← Volver» escondían bloque-tipos, bloque-tercero y bloque-detalles y `prepararNuevo` no los volvía a enseñar. |
 | 239 | `docs/NOMBRES-FIJOS-CON-NUMERO.md` (nombres de estructura fija: carpeta `AAMMDD A26-0137 TIPO Tercero` y documento `AAMMDD TIPO D26-01234.ext`, con número único anual de asunto y de documento; fuera del nombre año, grupo, campos, texto libre y registros; «_Previas»; nombre corto de tipos hasta 25 con lista para acortar; medidor de margen de ruta en Ajustes; lo existente no se toca) | PENDIENTE (30-sep-2026) |
 | 233 | Aviso de usuario: mejora en «Ficha de un asunto» | IDEA (30-sep-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1-YBvHiT3clJmKCKz66UxPj0LxTZNY-wP/view?usp=drivesdk |
 | 234 | Aviso de usuario: mejora en «Ficha de un asunto» | IDEA (30-sep-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1IWkPcRKm7X_zNIqENKdNy9G6F6aTIMY1/view?usp=drivesdk |
@@ -216,12 +207,6 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 - Fila 223: `.claude/settings.json` sigue sin poder crearlo ninguna sesión de Claude Code (lo
   deniega el propio clasificador, «Self-Modification»); hace falta que Francisco lo cree a mano,
   con el contenido de la sección 5 de `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
-- Fila 214: `pruebas.fmargon.com` puede dar 403 de red, o pedir «Vercel Authentication», según la
-  sesión; decisión pendiente (dar de alta el dominio en la política de red de las sesiones, o
-  revisar `ssoProtection` del proyecto).
-- Fila 214: el hook `~/.claude/stop-hook-git-check.sh` de alguna sesión puede forzar una subida a
-  `pruebas` de más de las tres previstas por fila; decisión pendiente sobre si el hook debe conocer
-  el método del revisor.
 - `docs/CONTEXTO-CORTO.md` sigue por encima de los 14.000 caracteres; hace falta una sesión aparte
   que lo compacte de verdad.
 - Vercel: el tope diario de despliegues es de toda la cuenta, no solo de este proyecto; Francisco

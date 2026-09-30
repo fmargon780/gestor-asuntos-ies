@@ -25,7 +25,7 @@ Al terminar cualquier instrucción de la cola (`docs/COLA.md`):
 - **Un solo proyecto de Vercel** (`gestor-de-asuntos`). No crear otro.
 - **Cada dirección es un sitio distinto para el navegador**: al cambiarla hay que volver a
   señalar las carpetas y entrar. Los ajustes del centro viven en `_GESTOR`.
-- Copia de pruebas con datos inventados (fila 222): rama `pruebas`, dirección
+- Copia de pruebas con datos inventados (fila 222; no es un paso de la cola desde la 242): rama `pruebas`, dirección
   **https://pruebas.fmargon.com** (dominio ya asignado a esa rama en Vercel). «Entrar con datos
   de demostración», o `?demo=1&auto=1` directo: sin señalar ninguna carpeta, nada se guarda, y
   producción nunca la carga.
@@ -160,7 +160,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   como el del centro; renuncia a la Junta Electoral, en su hito.
 - Copias diarias (90 días) con `_esquema` y verificación tras escribir, detección de fichero roto, fusión de conflictos de Dropbox. Entrada: desplegable de nombres. Un borrado (tipo,
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
-- Pruebas automáticas en cada subida de código (no con solo `docs/`); en paralelo (`pruebas/ejecutar.mjs`, fila 208). Mientras se trabaja una fila, solo las pruebas de lo tocado (`node pruebas/ejecutar.mjs <palabra>`); la pasada completa, una vez al final, antes de subir a `pruebas` (el código nunca sube directo a `main`: pasa antes por el revisor, fila 223).
+- Pruebas automáticas en cada subida de código (no con solo `docs/`); en paralelo (`pruebas/ejecutar.mjs`, fila 208). Mientras se trabaja una fila, solo las pruebas de lo tocado (`node pruebas/ejecutar.mjs <palabra>`); la pasada completa, una vez al final, antes de fusionar en `main` (el código pasa antes por el revisor, en local, fila 242).
 - Copia sin internet (`file://`): se actualiza sola (reintenta si se estaba publicando); si no, franja fija arriba; cada 30 min. La web normal también avisa de versión nueva (fila 178), solo con «Recargar».
 - Hitos: cada hito de la guía es un hito de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
   bifurcaciones e historial (si falla su guardado al archivar, se reintenta una vez; el hito no queda huérfano de todas formas). Cada hito se abre a pantalla completa (la mesa), con las acciones solo ahí («Generar documento ▾»,
@@ -212,8 +212,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - **Permiso permanente de Francisco**: una petición de cambios hacia `pruebas`, o hacia `main` tras
   la aprobación del revisor, la fusiona Claude Code solo, sin esperar a nadie
   (`docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223).
-- **Comprobar siempre lo publicado con `curl`: la copia de pruebas antes del revisor, `main` después.**
-- Vercel: 100 publicaciones/día; `vercel.json` salta los commits de solo `docs/`, `pruebas/`, `.github/` o `.md`; máx. tres subidas por fila (a `pruebas`, y a `main` solo con el revisor).
+- **Una fila es HECHA solo con las dos cosas** (fila 242): su commit está en `main` (`git merge-base --is-ancestor`) y Vercel lo ha publicado (`curl` a `js/version.js`, estado «Vercel» del commit o `list_deployments`).
+- Vercel: 100 publicaciones/día; `vercel.json` salta los commits de solo `docs/`, `pruebas/`, `.github/` o `.md`; una sola publicación de código por fila (la de `main`, tras el revisor en local).
 - Antes de colgar una función de `App`, mirar que el nombre esté libre. Un solo cuadro (`U.preguntar`) a la vez.
 - Ojo con `p.campos`: solo trae columnas con datos; para saber si existe, mirar la cabecera del CSV.
 - Un módulo nuevo **no envuelve**: se engancha por un punto previsto (`window.Gestor.alRefrescar`) o uno nuevo. Sin remedio, con `U.envolver`, apuntado en `js/envolturas-esperadas.js`.
