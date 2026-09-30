@@ -4,7 +4,7 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 `CLAUDE.md`). Minutos por fila entera: programar, pruebas, publicar y comprobar. La página
 «Estado de la cola» de Francisco lee esta tabla desde `main`.
 
-Última puesta al día: 30-sep-2026 (fila 235 PENDIENTE)
+Última puesta al día: 30-sep-2026 (fila 238 PENDIENTE)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por `pruebas` y el
 revisor: los minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
@@ -15,3 +15,4 @@ revisor: los minutos de abajo cuentan la fila entera, revisor incluido (uno o do
 | 217 | 35 | `docs/CORREO-OTRA-CUENTA-ABIERTA.md`: solo `js/correo-enviar.js` (aviso nuevo y un segundo intento con la forma general de la dirección) y sus pruebas en `pruebas/correo-enviar.mjs` |
 | 229 | 150 | `docs/REGISTRO-DEL-ASUNTO.md`: módulo nuevo que junta las notas del asunto y la historia de cada hito en una sola lista, tarjeta «Registro» en la ficha y en la mesa, líneas automáticas que falten, «⋮» de Cambiar/Borrar en las escritas a mano, pruebas nuevas y datos de demostración |
 | 235 | 120 | `docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md`: el bloque «¿Dónde se guarda?» común para hitos y tareas (sustituye la casilla y los menús «Cambiar aquí / Cambiar en la guía»), llevar a la guía un hito propio con sus tareas, «Deshacer» en el aviso, buscar por qué «Cambiar la guía…» sale sin la guía previa, y poner al día las pruebas de las filas 206 y 224 |
+| 238 | 130 | `docs/CERTIFICADO-CONSEJO-ESCOLAR.md`: lector de los CSV del Consejo Escolar y su tabla unida por nombre, botón para subir ficheros con avisos, hueco `{{TABLA CONSEJO ESCOLAR}}`, plantilla y tipo nuevos en la biblioteca, datos de demostración y prueba nueva |
