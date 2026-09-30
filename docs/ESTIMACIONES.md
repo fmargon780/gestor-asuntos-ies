@@ -13,3 +13,4 @@ revisor: los minutos de abajo cuentan la fila entera, revisor incluido (uno o do
 |---|---|---|
 | 231 | 45 | `docs/CREAR-ASUNTO-DESDE-POR-CLASIFICAR.md`: reproducir con varios documentos sueltos, encontrar por qué «Nuevo asunto» sale sin buscador ni parrilla, arreglarlo en `js/documentos-sueltos.js` o `App.prepararNuevo`, y ampliar la prueba de la fila 220 |
 | 217 | 35 | `docs/CORREO-OTRA-CUENTA-ABIERTA.md`: solo `js/correo-enviar.js` (aviso nuevo y un segundo intento con la forma general de la dirección) y sus pruebas en `pruebas/correo-enviar.mjs` |
+| 229 | 150 | `docs/REGISTRO-DEL-ASUNTO.md`: módulo nuevo que junta las notas del asunto y la historia de cada hito en una sola lista, tarjeta «Registro» en la ficha y en la mesa, líneas automáticas que falten, «⋮» de Cambiar/Borrar en las escritas a mano, pruebas nuevas y datos de demostración |
