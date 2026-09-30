@@ -6,6 +6,12 @@ para ir tachando.
 
 ---
 
+- [ ] **El botón «Soporte», con el buzón de verdad (fila 213, `docs/BOTON-DE-SOPORTE.md`).**
+      Primero, los cinco pasos de `docs/PONER-EN-MARCHA-SOPORTE.md`. Después: (1) pegar una
+      captura con Ctrl+V en la ventana: se ve en pequeño, se quita con «Quitar la captura»; (2)
+      enviar un aviso: sale «Recibido. Gracias», está entero en Drive (`SOPORTE-AVISOS`) y hay una
+      IDEA nueva en el Centro de mando sin el texto escrito; (3) en la copia sin internet
+      (`ABRIR EL GESTOR.html`) el botón y la ventana funcionan igual y la app arranca como siempre.
 - [ ] **Comprobación al entrar, con lo de verdad (fila 204, `docs/COMPROBACION-AL-ENTRAR.md`).**
       (1) Con las carpetas de Dropbox y la bandeja de verdad: quitar el permiso de la carpeta de la
       bandeja en Chrome y recargar; al entrar, la bandeja sale en «Falta» y «Arreglarlo» lleva al
