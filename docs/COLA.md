@@ -199,7 +199,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 232 | `docs/ENLACE-A-NORMATIVA-CORRECTO.md` (los enlaces a la normativa abren siempre el artículo, `normativa.fmargon.com/norma#r=<clave>`; cambiar la dirección por defecto de `vercel.app`) | PENDIENTE (29-sep-2026) |
 | 233 | Aviso de usuario: mejora en «Ficha de un asunto» | IDEA (30-sep-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1-YBvHiT3clJmKCKz66UxPj0LxTZNY-wP/view?usp=drivesdk |
 | 234 | Aviso de usuario: mejora en «Ficha de un asunto» | IDEA (30-sep-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1IWkPcRKm7X_zNIqENKdNy9G6F6aTIMY1/view?usp=drivesdk |
-| 235 | Aviso de usuario: error en «Ficha de un asunto» | IDEA (30-sep-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1B2T6PvlnFLSwVqz8J9l8EBEZAjzHwacH/view?usp=drivesdk |
+| 235 | Aviso de usuario: error en «Ficha de un asunto» | EN DISEÑO (30-sep-2026) · conversación: https://claude.ai/code/session_014M8xUwnCrQfjimwQCKQfDS · enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1B2T6PvlnFLSwVqz8J9l8EBEZAjzHwacH/view?usp=drivesdk |
 | 236 | Aviso de usuario: error en «Ficha de un asunto» | IDEA (30-sep-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1t7c1_HorW4YhcHtITGhkxvkTx73kYXrg/view?usp=drivesdk |
 | 237 | Aviso de usuario: error en «Ficha de un asunto» | IDEA (30-sep-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/11fQAdmvLZcI0fptJcPtMlbrLEreS0CbT/view?usp=drivesdk |
 
