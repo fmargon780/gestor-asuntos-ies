@@ -203,7 +203,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 236 | Aviso de usuario: error en «Ficha de un asunto» | IDEA (30-sep-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1t7c1_HorW4YhcHtITGhkxvkTx73kYXrg/view?usp=drivesdk |
 | 237 | Aviso de usuario: error en «Ficha de un asunto» | DESCARTADA (30-sep-2026): descartada por Francisco desde el Centro de mando |
 | 232 | `docs/ENLACE-A-NORMATIVA-CORRECTO.md` (los enlaces a la normativa abren siempre el artículo, `normativa.fmargon.com/norma#r=<clave>`; cambiar la dirección por defecto de `vercel.app`) | PENDIENTE (29-sep-2026) |
-| 239 | Analizar un sistema de nombres cortos de carpetas y documentos por problemas en Dropbox | IDEA (30-sep-2026): apuntada por Francisco desde el Centro de mando |
+| 239 | `docs/NOMBRES-FIJOS-CON-NUMERO.md` (nombres de estructura fija: carpeta `AAMMDD A26-0137 TIPO Tercero` y documento `AAMMDD TIPO D26-01234.ext`, con número único anual de asunto y de documento; fuera del nombre año, grupo, campos, texto libre y registros; «_Previas»; nombre corto de tipos hasta 25 con lista para acortar; medidor de margen de ruta en Ajustes; lo existente no se toca) | PENDIENTE (30-sep-2026) |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
