@@ -62,6 +62,7 @@ var FichaDocumentos = (function () {
     var ext = Nombres.extensionDe(f.nombre);
     var sinSellar = esSinSellar(f.nombre);
     var hitoDelDoc = hitoDe[f.nombre] || null;
+    var lineaDeDatos = window.DocumentosDatos ? DocumentosDatos.resumen(DocumentosDatos.deFichero(a && a.ficha, f.nombre)) : '';
     /* Fila 137: el índice del expediente no se registra ni se asocia a hitos. */
     var esIndice = !!(window.IndiceExpediente && IndiceExpediente.es(f.nombre));
     var b = document.createElement('button');
@@ -75,7 +76,9 @@ var FichaDocumentos = (function () {
        copiar, y un tercer `<span>` aquí se lo llevaría por delante. */
     b.innerHTML = (ext ? '<span class="marca-ext">' + U.escapar(ext.toUpperCase()) + '</span>' : '') +
                   '<span>' + U.escapar(f.nombre) + '</span>' +
-                  (hitoDelDoc ? '<div class="ficha-documento-hito">' + U.escapar(hitoDelDoc.titulo) + '</div>' : '');
+                  (hitoDelDoc ? '<div class="ficha-documento-hito">' + U.escapar(hitoDelDoc.titulo) + '</div>' : '') +
+                  /* Fila 239: lo que ya no entra en el nombre (registro, campos, texto), de la ficha. */
+                  (lineaDeDatos ? '<div class="ficha-documento-datos">' + U.escapar(lineaDeDatos) + '</div>' : '');
     b.onclick = function () { abrirDocumento(f, a); };
 
     var fila = document.createElement('div');
@@ -103,7 +106,7 @@ var FichaDocumentos = (function () {
        del visor (`barraPdf`). */
     var enMenu = [];
 
-    if (window.Registro && !esIndice && !Registro.tieneRegistro(f.nombre)) {
+    if (window.Registro && !esIndice && !Registro.tieneRegistro(f.nombre, a)) {
       var pendiente = Registro.pendiente(a, f.nombre);
       if (pendiente) {
         var marca = document.createElement('span');

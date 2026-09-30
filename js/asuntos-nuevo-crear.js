@@ -28,9 +28,33 @@ function nombreDeCarpetaPropuesto(d) { return nombreDeCarpetaAjustado(d).nombre;
 /* { nombre, recortado } (fila 130: la carpeta no pasa de 150 caracteres). */
 function nombreDeCarpetaAjustado(d) {
   var tipo = App.E.tipos.filter(function (t) { return t.tipo === d.tipo; })[0];
-  var copia = Object.assign({}, d, { tipo: tipo ? Nombres.tipoParaCarpeta(tipo) : d.tipo });
+  /* Fila 239 (docs/NOMBRES-FIJOS-CON-NUMERO.md): un asunto nuevo lleva
+     siempre su número (`AAMMDD A26-0137 TIPO Tercero`, sin recortar).
+     Mientras el número no se ha calculado, no hay nombre. */
+  if (!App.E.nuevo.numero) return { nombre: '', recortado: false, noCabe: false, sinNumero: true };
+  var copia = Object.assign({}, d, {
+    tipo: tipo ? Nombres.tipoParaCarpeta(tipo) : d.tipo,
+    numero: App.E.nuevo.numero, categoria: App.E.nuevo.categoria
+  });
   return Nombres.montarAsunto(copia);
 }
+
+/* El siguiente número de asunto, SIN gastarlo, para enseñar el nombre
+   exacto en la vista previa. Se pide una vez por formulario y, al
+   llegar, se repinta la vista. */
+App.pedirNumeroNuevo = function () {
+  var formulario = App.E.nuevo;
+  if (formulario.numero || formulario.pidiendoNumero) return;
+  formulario.pidiendoNumero = true;
+  Numeros.proximo('asuntos').then(function (n) {
+    formulario.numero = n;
+  }, function (e) {
+    formulario.fallaNumero = U.mensajeDeError(e);
+  }).then(function () {
+    formulario.pidiendoNumero = false;
+    if (App.E.nuevo === formulario) App.refrescarVista();
+  });
+};
 
 App.datosDelFormulario = function () {
   var camposParaNombre = App.valoresCamposActuales()
@@ -70,6 +94,15 @@ App.refrescarVista = function () {
   }
   $('btn-crear').textContent = 'Crear el asunto';
   var d = App.datosDelFormulario();
+  if (!App.E.nuevo.numero) {
+    $('vista-nombre').textContent = App.E.nuevo.fallaNumero ? '' : 'Calculando el número del asunto…';
+    $('vista-ruta').textContent = App.E.nuevo.fallaNumero
+      ? 'No he podido calcular el número del asunto: ' + App.E.nuevo.fallaNumero : '';
+    $('btn-crear').disabled = true;
+    Nombres.avisoRecorte($('vista-nombre'), false, false);
+    if (!App.E.nuevo.fallaNumero) App.pedirNumeroNuevo();
+    return;
+  }
   var ajustado = nombreDeCarpetaAjustado(d);
   var nombre = ajustado.nombre;
   $('vista-nombre').textContent = nombre;
@@ -94,13 +127,18 @@ $('btn-crear').onclick = function () {
 App.crearAsuntoDelFormulario = async function () {
   if (!App.validarCamposObligatorios()) return;
   var d = App.datosDelFormulario();
+  /* Fila 239: por si se pulsa antes de que la vista previa haya calculado el número. */
+  if (!App.E.nuevo.numero) {
+    try { App.E.nuevo.numero = await Numeros.proximo('asuntos'); }
+    catch (eNum) { U.fallo('No he podido calcular el número del asunto', eNum); return; }
+  }
   var ajustado = nombreDeCarpetaAjustado(d);
   var nombre = ajustado.nombre;
   if (!nombre) return;
   /* Fila 177: por si acaso el botón no se hubiera vuelto a apagar a
      tiempo, se comprueba también aquí antes de crear nada. */
   if (ajustado.noCabe) {
-    U.aviso('El nombre no cabe en la ruta de Dropbox: acorta el texto.', 'malo');
+    U.aviso(Nombres.AVISO_NO_CABE, 'malo');
     return;
   }
 
@@ -110,6 +148,24 @@ App.crearAsuntoDelFormulario = async function () {
       '<p class="nota">' + U.escapar(nombre) + '</p>' +
       '<p>Las rutas muy largas dan problemas en un Dropbox sincronizado.</p>', 'Crear igual');
     if (!seguir) return;
+  }
+
+  /* Fila 239: el número se gasta ahora, releyendo el disco. Si el otro
+     ordenador se ha quedado el que enseñaba la vista previa, el nombre
+     cambia: se enseña y hay que volver a pulsar «Crear» (el nombre que
+     se guarda es siempre el que se ve). */
+  try {
+    var reserva = await Numeros.reservar('asuntos', App.E.nuevo.numero);
+    if (reserva.cambio) {
+      App.E.nuevo.numero = reserva.numero;
+      App.refrescarVista();
+      U.aviso('Otro ordenador acaba de usar ese número: el asunto pasa a llamarse ' +
+        nombreDeCarpetaAjustado(App.datosDelFormulario()).nombre + '. Revísalo y pulsa «Crear el asunto» otra vez.', 'ambar');
+      return;
+    }
+  } catch (eRes) {
+    U.fallo('No he podido reservar el número del asunto', eRes);
+    return;
   }
 
   /* Lo principal: la carpeta y su ficha. Lo de después (meter el
@@ -140,6 +196,7 @@ App.crearAsuntoDelFormulario = async function () {
     var datosNuevoAsunto = {
       estado: 'abierto', tipo: d.tipo, categoria: App.E.nuevo.categoria,
       tercero: d.tercero, curso: d.curso, grupo: d.grupo, descripcion: d.descripcion,
+      numero: App.E.nuevo.numero,   /* fila 239: nunca cambia */
       campos: camposParaGuardar,
       via: via.via,
       viaDato: via.dato,

@@ -57,7 +57,7 @@ const contenido = (a1) => pagina.evaluate(async (a1) => {
   const d = await window.__disco.abiertos.getDirectoryHandle(a1);
   const arriba = [], previas = [];
   for await (const [k, v] of d.entries()) if (v.kind === 'file') arriba.push(k);
-  try { const p = await d.getDirectoryHandle('Versiones previas'); for await (const [k] of p.entries()) previas.push(k); } catch (e) { /* no está */ }
+  try { const p = await d.getDirectoryHandle('_Previas'); for await (const [k] of p.entries()) previas.push(k); } catch (e) { /* no está */ }
   return { arriba: arriba.sort(), previas: previas.sort() };
 }, a1);
 

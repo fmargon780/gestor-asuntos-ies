@@ -81,7 +81,7 @@ await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await comprobar('el primer asunto se crea sin número en el nombre',
-  nombresAbiertos().then(ns => ns.some(n => /^260905 \S+( \d{2}-\d{2})? Pendiente De Numero, Nora$/.test(n))), true);
+  nombresAbiertos().then(ns => ns.some(n => /^260905 A\d{2}-\d{4} \S+ Pendiente De Numero, Nora$/.test(n))), true);
 
 /* Este primero se archiva ahora mismo, para comprobar después que el
    renombrado no lo toca. Fila 192: "Archivar" vive en el menú de tres
@@ -120,7 +120,7 @@ await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 const nombreAbierto = (await nombresAbiertos())[0];
 await comprobar('el segundo asunto también se crea sin número',
-  /^260910 \S+( \d{2}-\d{2})? Pendiente De Numero, Nora$/.test(nombreAbierto), true);
+  /^260910 A\d{2}-\d{4} \S+ Pendiente De Numero, Nora$/.test(nombreAbierto), true);
 
 console.log('--- Inicio avisa mientras queda pendiente ---');
 await pagina.evaluate(() => window.Inicio && window.Inicio.repintar());

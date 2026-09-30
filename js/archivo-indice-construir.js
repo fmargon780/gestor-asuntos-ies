@@ -53,6 +53,22 @@
     return salida;
   }
 
+  /* Fila 239: los documentos con número guardan su registro de Séneca en
+     la ficha, no en el nombre; se suman a los que salen de los nombres. */
+  function registrosDeFicha(ficha) {
+    var salida = [];
+    var docs = (ficha && ficha.documentos) || {};
+    Object.keys(docs).forEach(function (n) {
+      ((docs[n] && docs[n].registros) || []).forEach(function (r) { if (r && r.codigo) salida.push(r.codigo); });
+    });
+    return salida;
+  }
+
+  function sinRepetir(lista) {
+    var vistos = {};
+    return lista.filter(function (x) { if (vistos[x]) return false; vistos[x] = true; return true; });
+  }
+
   /* ==========================================================
      UNA ENTRADA DEL ÍNDICE
      ========================================================== */
@@ -91,8 +107,9 @@
     return {
       nombre: nombre, categoria: categoria, tercero: tercero, ruta: ruta,
       fecha: leido.fecha || '', tipo: leido.tipo || '', reconocido: !!leido.reconocido,
-      curso: cursoGrupo.curso, grupo: cursoGrupo.grupo,
-      documentos: documentos, registros: registrosDeNombres(documentos),
+      curso: cursoGrupo.curso || ficha.curso || '', grupo: cursoGrupo.grupo || ficha.grupo || '',   /* fila 239: sin ellos en el nombre, de la ficha */
+      documentos: documentos, registros: sinRepetir(registrosDeNombres(documentos).concat(registrosDeFicha(ficha))),
+      numero: ficha.numero || leido.numero || '',   /* fila 239 */
       sueltoEn: sueltoEn || '',
       situacion: ficha.situacion || '', via: ficha.via || '', viaDato: ficha.viaDato || '',
       /* Fila 129: dónde se quedó al archivar (js/hitos-archivo.js). */

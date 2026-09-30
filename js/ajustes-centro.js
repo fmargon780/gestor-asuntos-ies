@@ -47,11 +47,14 @@ App.pintarTiposDeDocumento = function () {
       (susCampos.length ? '<span class="suave"> · ' + susCampos.map(function (c) {
         return U.escapar(c.nombre) + (c.obligatorio ? ' *' : '');
       }).join(', ') + '</span>' : '') +
-      (textoDefecto ? '<span class="suave"> · texto: ' + U.escapar(textoDefecto) + '</span>' : '');
+      (textoDefecto ? '<span class="suave"> · texto: ' + U.escapar(textoDefecto) + '</span>' : '') +
+      (window.TiposDocumentoCortos && TiposDocumentoCortos.de(nombre)
+        ? '<span class="suave"> · corto: ' + U.escapar(TiposDocumentoCortos.de(nombre)) + '</span>' : '');
     f.appendChild(linea);
     f.appendChild(App.botonMenuTarjeta([
       { texto: 'Campos del nombre', onclick: function () { if (window.DocCampos) DocCampos.editar(nombre); } },
       { texto: 'Texto por defecto', onclick: function () { App.editarTextoPorDefectoDocumento(nombre); } },
+      { texto: 'Nombre corto', onclick: function () { if (window.TiposDocumentoCortos) TiposDocumentoCortos.editar(nombre); } },
       { texto: 'Borrar', titulo: 'Va a la papelera', peligro: true, onclick: function () { App.borrarTipoDocumento(nombre); } }
     ]));
     tdoc.appendChild(f);

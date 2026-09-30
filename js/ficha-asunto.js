@@ -86,6 +86,7 @@
   function marcasDeFicha(a, tipo) {
     var lp = a.ficha.loPide;
     return (tipo ? '<span class="marca-tipo">' + U.escapar(tipo) + '</span>' : '') +
+      (a.ficha.numero ? '<span class="marca-numero" title="Número del asunto">' + U.escapar(a.ficha.numero) + '</span>' : '') +   /* fila 239 */
       (lp && lp.nombre
         ? '<span class="marca-lopide">Lo pide: ' + U.escapar(LoPide.etiqueta(lp)) + '</span>' : '');
   }

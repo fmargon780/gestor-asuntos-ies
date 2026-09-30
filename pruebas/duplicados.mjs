@@ -105,7 +105,8 @@ await comprobar('sin duplicados de partida, el aviso no se ve',
 console.log('--- el caso real: TRANSPORTE con y sin grupo en el nombre ---');
 
 const EXISTENTE = '260904 TRANSPORTE 26-27 1ºD State, Ricardo Catalán 7731644';
-const NUEVA = '260904 TRANSPORTE 26-27 State, Ricardo Catalán 7731644';
+/* Fila 239: el asunto nuevo lleva su número (el primero: A<año>-0001) y no lleva el año académico. */
+const NUEVA = '260904 A' + String(new Date().getFullYear()).slice(2) + '-0001 TRANSPORTE State, Ricardo Catalán 7731644';
 await crearCarpeta(EXISTENTE);
 await pagina.click('#btn-recargar');
 await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
@@ -166,7 +167,7 @@ await pagina.click('#btn-crear');
 await pagina.waitForTimeout(400);
 await comprobar('con el curso distinto no sale el cuadro', pagina.locator('#capa').isHidden(), true);
 await comprobar('la carpeta se crea directamente', nombresDeAbiertos().then(n =>
-  n.some(x => x.indexOf('MATRICULA') !== -1 && x.indexOf('26-27') !== -1 && x.indexOf('Negativo Prueba') !== -1)), true);
+  n.some(x => x.indexOf('MATRICULA') !== -1 && /A\d{2}-\d{4}/.test(x) && x.indexOf('Negativo Prueba') !== -1)), true);
 
 /* ============================================================
    3. VARIOS CANDIDATOS ABIERTOS: el más reciente, y "Abrir"
@@ -292,7 +293,7 @@ await comprobar('se sale de la pantalla de asuntos abiertos',
 await comprobar('el grupo se ve con sus dos columnas',
   pagina.locator('.columna-duplicado').count(), 2);
 await comprobar('el nombre de cada asunto sale como enlace',
-  pagina.locator('.columna-nombre').allTextContents(), [EXISTENTE, NUEVA]);
+  pagina.locator('.columna-nombre').allTextContents(), [NUEVA, EXISTENTE]);   /* por nombre: fila 239, el número va delante del tipo */
 
 const columnaExistente = pagina.locator('.columna-duplicado').filter({ hasText: EXISTENTE });
 await pagina.waitForFunction(() =>

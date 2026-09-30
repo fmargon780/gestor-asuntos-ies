@@ -30,8 +30,8 @@ var Registro = (function () {
 
   /* ¿Este nombre de documento ya lleva las cuatro piezas del
      registro? Se apoya en lo que ya sabe leer documentos.js. */
-  function tieneRegistro(nombre) {
-    return !!(Documentos.leerNombre(nombre).registro);
+  function tieneRegistro(nombre, asunto) {
+    return !!(Documentos.leerNombre(nombre, asunto && asunto.ficha).registro);
   }
 
   /* ¿Este documento está marcado como pendiente de registro en la
@@ -94,14 +94,21 @@ var Registro = (function () {
     );
   }
 
-  function nombrePropuesto() {
-    var codigo = Nombres.codigoRegistro({
+  function registroDelFormulario() {
+    return {
       ano: $('reg-ano').value.trim(),
       sentido: elegido('reg-sentido'),
       modo: elegido('reg-modo'),
       numero: $('reg-numero').value.trim()
-    });
+    };
+  }
+
+  function nombrePropuesto() {
+    var codigo = Nombres.codigoRegistro(registroDelFormulario());
     if (!codigo) return '';
+    /* Fila 239: un documento con número de documento conserva su nombre;
+       el registro va a la ficha, no al nombre. */
+    if (estado.previo.numero) return estado.nombreOriginal;
     return Nombres.montarDocumento({
       fecha: estado.previo.fecha, codigo: codigo, tipo: estado.previo.tipo,
       curso: estado.previo.curso, extension: estado.extension
@@ -172,8 +179,8 @@ var Registro = (function () {
 
   /* ---------- elegir la copia sellada, y comprobar que se puede ---------- */
 
-  async function prepararEstado(nombreDocumento, carpetaInicio) {
-    var previo = Documentos.leerNombre(nombreDocumento);
+  async function prepararEstado(nombreDocumento, carpetaInicio, asuntoDe) {
+    var previo = Documentos.leerNombre(nombreDocumento, asuntoDe && asuntoDe.ficha);
     if (!previo.fecha || !previo.tipo) {
       U.aviso('Este documento no tiene fecha ni tipo reconocibles en su nombre: no sé qué ' +
               'ponerle a la copia registrada.', 'malo');
@@ -217,7 +224,53 @@ var Registro = (function () {
 
   /* Devuelve el nombre nuevo si ha ido bien, o false si no se ha
      guardado (número vacío, nombre repetido, o un fallo del disco). */
+  /* Fila 239: un documento con número (`AAMMDD TIPO D26-01234`). La copia
+     sellada y el original son el mismo documento, con el mismo número y el
+     mismo nombre: el original pasa a «_Previas» como «SIN SELLAR» y la
+     sellada ocupa su sitio. El registro se apunta en la ficha (se pueden
+     añadir varios: entrada y salida, en el mismo papel). */
+  async function guardarNumerado(asunto) {
+    var registro = registroDelFormulario();
+    registro.codigo = Nombres.codigoRegistro(registro);
+    if (!registro.codigo) { U.aviso('Escribe un número de registro.', 'malo'); return false; }
+    var nombre = estado.nombreOriginal;
+    var otroFichero = estado.handle.name !== nombre;
+    try {
+      if (otroFichero) {
+        var enCarpeta = (await Carpetas.ficheros(asunto.handle)).map(function (f) { return f.nombre; });
+        var conservado = window.RegistroSellado
+          ? RegistroSellado.nombreLibreEntre(enCarpeta, RegistroSellado.nombreSinSellar(nombre))
+          : nombre.replace(/(\.[A-Za-z0-9]+)$/, ' SIN SELLAR$1');
+        await Carpetas.renombrarFichero(asunto.handle, nombre, conservado);
+        if (window.VersionesPrevias) {
+          try { await VersionesPrevias.mover(asunto.handle, conservado); } catch (eMover) { /* se queda arriba */ }
+        }
+        await Carpetas.copiarFicheroEn(asunto.handle, estado.handle, nombre);
+      }
+    } catch (e) {
+      U.fallo('No he podido registrarlo', e);
+      return false;
+    }
+    try {
+      await DocumentosDatos.anotar(asunto.nombre, estado.previo.numero, {
+        tipo: estado.previo.tipo, fecha: estado.previo.fecha, anadirRegistro: registro
+      });
+      var fechaSello = estado.sello && estado.sello.fecha ? ' el ' + estado.sello.fecha : '';
+      await quitarDePendientes(asunto, nombre);
+      await window.Notas.sustituir(asunto, 'Registrado ' + registro.codigo + fechaSello + ' · ' + nombre,
+        'registroDeDocumento', nombre);
+      U.aviso('Documento registrado.', 'bueno');
+    } catch (e2) {
+      U.accesorio('Documento registrado, pero no he podido apuntar su registro en la ficha', e2);
+    }
+    if (window.VersionesPrevias) {
+      try { await VersionesPrevias.ordenarTrasCambio(asunto.handle); } catch (e4) { /* accesorio */ }
+    }
+    return nombre;
+  }
+
   async function guardar(asunto) {
+    if (estado.previo.numero) return guardarNumerado(asunto);
     var nombreNuevo = nombrePropuesto();
     if (!nombreNuevo) { U.aviso('Escribe un número de registro.', 'malo'); return false; }
     try {
@@ -276,7 +329,7 @@ var Registro = (function () {
      Registrar: no se abre un segundo U.preguntar, porque solo hay
      un cuadro de diálogo en toda la aplicación. */
   async function pintarEnContenedor(caja, asunto, nombreDocumento, alTerminar) {
-    if (!(await prepararEstado(nombreDocumento, asunto.handle))) return;
+    if (!(await prepararEstado(nombreDocumento, asunto.handle, asunto))) return;
 
     caja.innerHTML = camposHtml() +
       '<div class="cuadro-botones">' +
@@ -299,7 +352,7 @@ var Registro = (function () {
      La ficha del asunto enseña sus documentos en la propia pantalla,
      sin ningún cuadro por delante, así que aquí sí se abre uno. */
   async function abrirCuadro(asunto, nombreDocumento, alTerminar) {
-    if (!(await prepararEstado(nombreDocumento, asunto.handle))) return;
+    if (!(await prepararEstado(nombreDocumento, asunto.handle, asunto))) return;
 
     var promesa = U.preguntar('Registrar "' + nombreDocumento + '"', camposHtml(), 'Registrar');
     enganchar();

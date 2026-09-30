@@ -129,7 +129,7 @@ await comprobar('y es un PDF de verdad', pagina.evaluate(async ([a1, n]) => {
 /* Fila 160: con su PDF, el Word pasa a «Versiones previas». */
 await comprobar('y el Word, con su PDF, pasa a «Versiones previas»', pagina.evaluate(async ([a1, n]) => {
   const d = await window.__disco.abiertos.getDirectoryHandle(a1);
-  try { await (await d.getDirectoryHandle('Versiones previas')).getFileHandle(n); return true; } catch (e) { return false; }
+  try { await (await d.getDirectoryHandle('_Previas')).getFileHandle(n); return true; } catch (e) { return false; }
 }, [ASUNTO, word]), true);
 /* Fila 173, punto 7: «Guardar PDF» ya deja cerrado el visor solo, sin
    tener que pulsar «Cerrar» a mano. */
@@ -139,7 +139,7 @@ await comprobar('«Guardar PDF» cierra el visor solo',
 console.log('--- 4. abrir un .docx que ya está ---');
 await pagina.evaluate(() => { window.__abiertos = []; });
 await pagina.evaluate(async ([a1, n]) => {
-  const d = await (await window.__disco.abiertos.getDirectoryHandle(a1)).getDirectoryHandle('Versiones previas');
+  const d = await (await window.__disco.abiertos.getDirectoryHandle(a1)).getDirectoryHandle('_Previas');
   await Visor.abrir(await d.getFileHandle(n), n);
 }, [ASUNTO, word]);
 await pagina.waitForSelector('#word-visor:not(.oculto) section.docx', { timeout: 20000 });

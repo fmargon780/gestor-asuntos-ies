@@ -134,7 +134,7 @@ await pagina.waitForSelector('#capa', { state: 'hidden' });
 await pagina.waitForTimeout(400);
 await comprobar('la lista trae el nombre nuevo',
   pagina.locator('#ficha-documentos .ficha-documento').allTextContents()
-    .then(ts => ts.some(t => t.indexOf('260911 SOLICITUD Renombrado.pdf') !== -1)), true);
+    .then(ts => ts.some(t => /260911 SOLICITUD D\d{2}-\d{5}\.pdf/.test(t))), true);
 await comprobar('y ya no el viejo',
   pagina.locator('#ficha-documentos .ficha-documento').allTextContents()
     .then(ts => ts.some(t => t.indexOf(PDF) !== -1)), false);

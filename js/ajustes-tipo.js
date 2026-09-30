@@ -99,7 +99,7 @@ function construirSeccionDatos(tipo) {
   filaCorto.style.marginTop = '10px';
   filaCorto.innerHTML =
     '<label class="etiqueta">Nombre corto <span class="suave">(para el nombre de la carpeta)</span></label>' +
-    '<input class="campo tipo-nombre-corto" placeholder="Igual que el nombre de arriba">' +
+    '<input class="campo tipo-nombre-corto" maxlength="25" placeholder="Igual que el nombre de arriba">' +
     '<div class="aviso-en-vivo" id="tipo-nombre-corto-aviso"></div>' +
     '<p class="nota">Lo que entra en el nombre de la carpeta y de los asuntos que se creen a partir ' +
     'de ahora. Si lo dejas vacío, se usa el nombre de arriba. Cambiarlo no toca ninguna carpeta ya creada.</p>';
@@ -115,9 +115,11 @@ function construirSeccionDatos(tipo) {
     avisoCorto.innerHTML = '';
     avisoCorto.className = 'aviso-en-vivo';
     if (!texto) return;
-    if (texto.length > 16) {
-      avisoCorto.className = 'aviso-en-vivo aviso-en-vivo-ambar';
-      avisoCorto.textContent = 'Lleva ' + texto.length + ' caracteres: para una carpeta corta, conviene menos.';
+    /* Fila 239: tope de 25 caracteres, con contador. */
+    avisoCorto.textContent = texto.length + ' de 25 caracteres';
+    if (texto.length > 25) {
+      avisoCorto.className = 'aviso-en-vivo aviso-en-vivo-malo';
+      avisoCorto.textContent = 'Lleva ' + texto.length + ' caracteres: el máximo es 25.';
     }
     var otros = App.E.tipos.filter(function (t) { return t !== tipo; }).map(efectivoDe);
     var cerca = U.parecidos(texto, otros);
@@ -135,6 +137,12 @@ function construirSeccionDatos(tipo) {
   campoCorto.onchange = async function () {
     var texto = U.limpiarNombre(campoCorto.value).toUpperCase();
     if (texto === (tipo.nombreCorto || '')) return;
+    if (texto.length > 25) {
+      U.aviso('El nombre corto no puede pasar de 25 caracteres.', 'malo');
+      campoCorto.value = tipo.nombreCorto || '';
+      pintarAvisoCorto();
+      return;
+    }
     var otros = App.E.tipos.filter(function (t) { return t !== tipo; }).map(efectivoDe);
     if (texto && otros.some(function (o) { return U.normalizar(o) === U.normalizar(texto); })) {
       U.aviso('Ya lo usa otro tipo: no puede repetirse.', 'malo');

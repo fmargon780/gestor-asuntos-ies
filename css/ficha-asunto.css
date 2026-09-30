@@ -231,6 +231,13 @@
   color: var(--tinta-suave);
   margin-top: 2px;
 }
+/* Fila 239: registro, campos y texto adicional de un documento con número, de la ficha. */
+.ficha-documento-datos {
+  flex-basis: 100%;
+  font-size: 11px;
+  color: var(--tinta-suave);
+  margin-top: 2px;
+}
 /* La etiqueta PDF o JPG no se parte en dos líneas cuando el nombre es
    largo: se queda entera a la izquierda. */
 .ficha-documentos .marca-ext { flex: 0 0 auto; margin-right: 0; }

@@ -38,7 +38,7 @@ de `App` va después del fichero que lo define.
 | `js/conflictos.js` | Las copias en conflicto que deja Dropbox: fusión sola (asuntos, hitos, tablón, con las lápidas de la fila 176) o aviso para elegir; y `presencia/`, borrada sin preguntar |
 | `js/conflictos-datos.js` | Sacado de `js/conflictos.js` en la fila 176: los CSV de terceros, `administraciones.json` y "los terceros se releen solos" |
 | `js/fichas-huerfanas.js` | Fichas de `asuntos.json` cuya carpeta ya no está: enlazar o borrar |
-| `js/nombres.js` | Monta los nombres de carpetas y documentos; desde la fila 130, con tope de largo (`Nombres.montarAsunto`, 150; `Nombres.montarDocumentoAjustado`, 120 más la extensión) y la línea ámbar de la vista previa (`Nombres.avisoRecorte`) |
+| `js/nombres.js` | Monta los nombres de carpetas y documentos; desde la fila 239, con número y estructura fija sin recorte (`datos.numero`/`datos.numeroDoc`); y, para los de antes, desde la fila 130, con tope de largo (`Nombres.montarAsunto`, 150; `Nombres.montarDocumentoAjustado`, 120 más la extensión) y la línea ámbar de la vista previa (`Nombres.avisoRecorte`) |
 | `js/plazos.js` | La fecha límite de los asuntos; desde la fila 131, cómo se cuenta un plazo de hito (`Plazos.sumarPlazo`: hábiles, lectivos o naturales, con festivos y no lectivos), `diasQueQuedan` y `textoPlazo` |
 | `js/guias.js` | Pintar y escribir una guía, con sus preguntas y opciones; en el editor de cada paso llama a `js/hitos-normativa.js` para "Normativa" y a `js/guias-biblioteca.js` para traer/guardar en la biblioteca (fila 79) |
 | `js/guias-editor.js` | Escribir la guía: el cuadro del editor (fila 133, sacado de `js/guias.js`); desde la fila 199, al abrir el editor convierte «Documentos de este paso»/«Comunicación de este paso» a tareas del guion (`convertirDocumentosYComunicacionPuro`/`convertirDocumentosYComunicacion`), idempotente |
@@ -188,7 +188,11 @@ de `App` va después del fichero que lo define.
 | `js/visor.js` | El panel de la derecha para ver un documento (`con-visor`); marcador y acciones opcionales para que quien lo abre sepa qué se está viendo (la ficha del asunto pone ahí la barra de PDF, fila 168). Desde la fila 155, un `.docx` va a `js/word-visor.js` y lo que no sabe enseñar se baja con su nombre |
 | `js/word-visor.js` | `WordVisor` (fila 155): el Word en grande dentro de la aplicación, con «Guardar PDF» en la carpeta del asunto e «Imprimir» (`css/word-visor.css`) |
 | `js/duplicados-aviso.js` | `DuplicadosAviso` (fila 163): el recuadro de «Nuevo asunto» con lo que ya tiene el tercero (mismo tipo en rojo, archivados a 15 días, el resto en gris); lo llama `js/duplicados.js` |
-| `js/versiones-previas.js` | `VersionesPrevias` (fila 160): la subcarpeta «Versiones previas» de cada asunto (mover, sacar, listar, qué va allí) y el botón de Ajustes › Mantenimiento |
+| `js/versiones-previas.js` | `VersionesPrevias` (fila 160): la subcarpeta de previas de cada asunto, `_Previas` (fila 239) o la «Versiones previas» de antes (mover, sacar, listar, qué va allí) y el botón de Ajustes › Mantenimiento |
+| `js/numeros.js` | `Numeros` (fila 239): el número único de asunto (`A26-0137`) y de documento (`D26-01234`), el contador de `_GESTOR/numeros.json` y el número de cada fichero de origen |
+| `js/tipos-cortos.js` | `TiposDocumentoCortos` (nombre corto de los tipos de documento) y `TiposLargos` (los tipos de más de 25 y su lista «Arreglarlo»), fila 239 |
+| `js/documentos-datos.js` | `DocumentosDatos` (fila 239): registro, campos y texto de cada documento con número, en `ficha.documentos` |
+| `js/largo-de-rutas.js` | `LargoDeRutas` (fila 239): el bloque «Largo de las rutas» de Ajustes → El centro |
 | `js/word-faltan.js` | `WordFaltan` (fila 155): «Faltan datos para este documento», antes de guardar el Word |
 | `js/lib/docx-preview.min.js`, `js/lib/jszip.min.js`, `js/lib/html2canvas.min.js` | Librerías del visor de Word (fila 155): docx-preview 0.4.1 (Apache-2.0), JSZip 3.10.1 (MIT o GPL-3.0), html2canvas 1.4.1 (MIT); se cargan al abrir el primer Word |
 | `js/tipos-organo.js` | Quién encarga cada tipo (`TiposOrgano`, fila 134): el dato `organo` de `tipos.json`, su desplegable en la pantalla de un tipo, el bloque de Ajustes «Quién encarga cada tipo», la parrilla agrupada de Nuevo asunto, el filtro «Lo encarga» y lo que usa Cuentas. Antes de `js/tipos-buscador.js` |

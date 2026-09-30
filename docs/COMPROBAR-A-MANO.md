@@ -96,6 +96,13 @@ para ir tachando.
 - [ ] Con la carpeta real de Dropbox en dos ordenadores a la vez: que no se pisen al vaciar la papelera
   (cada uno relee `papelera.json` antes de borrar) y que `papelera-borrados.json` viaje bien.
 
+## Fila 239 (nombres fijos con número)
+
+- [ ] Con sus carpetas reales de Dropbox, guardar el documento que le dio el error «El nombre no cabe en la
+  ruta de Dropbox»: se guarda sin aviso rojo (se llama `AAMMDD TIPO D26-NNNNN.ext`) y Ajustes → El centro →
+  «Largo de las rutas» enseña el margen real (en verde, o el aviso de qué ocupa más). Mirar también, con dos
+  ordenadores a la vez, que crear un asunto en cada uno da números distintos.
+
 ## Por qué esta lista y no una prueba automática
 
 Todas las pruebas de navegador de este repositorio sustituyen el acceso a carpetas por uno de

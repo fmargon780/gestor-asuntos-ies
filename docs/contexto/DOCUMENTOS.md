@@ -22,32 +22,21 @@ un no-PDF, no hay barra. La ventana de `App.verDocumentos` se queda (tarjeta de 
 clasificar», «Nuevo asunto»). `js/copiar.js` ya no vigila la ficha (fuera su envoltura de
 `App.abrirFicha`). Se comprueba con `pruebas/documentos-en-un-solo-sitio.mjs`.
 
-### Los nombres, con tope de largo (fila 130; el tope cuenta la ruta desde la fila 177)
+### Los nombres, con tope de largo (fila 130/177; sustituido en los nombres nuevos por la fila 239)
 
-Para no pasar del límite de rutas de Windows: la carpeta de un asunto, hasta `Nombres.topes().asunto`
-caracteres (`Nombres.montarAsunto`: se recorta primero la descripción y después los campos del tipo,
-por el final; nunca la fecha, el tipo, el año, el grupo ni el tercero); el nombre de un documento,
-hasta `Nombres.topes().documento` más la extensión (`Nombres.montarDocumentoAjustado`: el texto
-adicional y después los campos). La vista previa (Nuevo asunto, Editar y el cuadro de documentos)
-avisa en ámbar con `Nombres.avisoRecorte`. Los adjuntos de la bandeja: extensión limpia de 10
-caracteres como mucho, o ninguna. Los asuntos que ya existen no se renombran.
-
-**Fila 177 (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md, punto 2, `js/nombres-topes.js`):** los 150/120 de
-antes eran fijos y solo miraban el nombre. Ahora `Nombres.topes(tercero, categoria)` calcula el
-hueco de verdad contando la ruta completa dentro de Dropbox (la carpeta ARCHIVO señalada en
-`_GESTOR/rutas.json`, la categoría y el tercero), con tope total 240; sin `rutas.json` todavía
-señalado, salen los 150/120 fijos de siempre. Cuando ni recortando el texto libre por completo cabe,
-`montarAsunto`/`montarDocumentoAjustado` devuelven `noCabe: true`, `avisoRecorte` pinta un aviso
-**rojo** ("El nombre no cabe en la ruta de Dropbox: acorta el texto.") y Nuevo asunto, Editar y el
-cuadro de documentos apagan su botón de guardar (y lo comprueban otra vez justo antes de escribir,
-por si acaso). Detalle completo en `docs/contexto/ASUNTOS-ARCHIVO.md`.
+Desde la fila 239 los nombres nuevos tienen estructura fija con número (`docs/contexto/NOMBRES-FIJOS.md`)
+y **no se recortan**: solo se comprueba que la ruta completa cabe (`Nombres.cabeEnRuta`, aviso rojo
+`Nombres.AVISO_NO_CABE`). El tope con recorte de las filas 130 y 177 (`Nombres.topes()`, 150/120 o el hueco
+de la ruta, `avisoRecorte` ámbar) vale solo para los nombres de antes, sin número: se recorta primero el texto
+libre y después los campos, nunca la fecha, el tipo, el año, el grupo ni el tercero. Los adjuntos de la
+bandeja: extensión limpia de 10 caracteres como mucho, o ninguna. Los asuntos que ya existen no se renombran.
 
 ### Campos del tipo de documento en el nombre (23-sep-2026, fila 96)
 
 `docs/CAMPOS-EN-EL-NOMBRE-DEL-DOCUMENTO.md`, `js/documentos-campos.js` (`window.DocCampos`). Cada
 tipo de DOCUMENTO puede llevar campos propios (texto, lista cerrada o fecha; obligatorios si se
 quiere), que entran en el nombre **entre el tipo y el texto adicional**:
-`AAMMDD [REGISTRO] TIPO [CAMPOS] [TEXTO ADICIONAL].ext` (`Nombres.montarDocumento`, `datos.campos`).
+`AAMMDD [REGISTRO] TIPO [CAMPOS] [TEXTO ADICIONAL].ext` (`Nombres.montarDocumento`, `datos.campos`) en los documentos de antes; desde la fila 239 los campos van a la ficha (`DocumentosDatos`).
 No son los campos del tipo de ASUNTO, que siguen fuera del nombre de los documentos.
 
 - Se configuran en Ajustes → El centro → Tipos de documento, menú ⋮ → «Campos del nombre»

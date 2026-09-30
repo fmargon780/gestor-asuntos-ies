@@ -174,7 +174,8 @@ await pagina.click('#ficha-volver');
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await pagina.waitForTimeout(400);
 
-const CLAVE = '260907 MATRICULA 26-27 Aguilar Ponce, Marina 1140233';
+/* Fila 239: los asuntos nuevos llevan su número (A<año>-0001 el primero). */
+const CLAVE = '260907 A' + String(new Date().getFullYear()).slice(2) + '-0001 MATRICULA Aguilar Ponce, Marina 1140233';
 
 async function abrirFicha() {
   await pagina.evaluate((clave) => {

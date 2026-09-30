@@ -81,7 +81,29 @@
     var visor = fichero ? N.visorDe(fichero, opciones.nombreActual)
                         : '<p class="explica">No he podido abrir el documento para verlo.</p>';
 
-    var previo = N.leerNombre(opciones.nombreActual);
+    var previo = N.leerNombre(opciones.nombreActual, N.asuntoActual && N.asuntoActual.ficha);
+    /* Fila 239 (docs/NOMBRES-FIJOS-CON-NUMERO.md): un documento que ya
+       tiene número lo conserva; uno que entra ahora en la carpeta
+       (añadido desde el ordenador o traído de «Por clasificar») recibe el
+       siguiente, o el que ya se dio a ese mismo fichero si se guarda en
+       otro asunto. Cambiar el nombre a un documento de antes (que ya
+       sigue la norma de siempre: fecha y tipo), sin número, sigue con la
+       estructura de siempre. */
+    if (opciones.numeroDoc === undefined) {
+      opciones.numeroDoc = previo.numero || '';
+      opciones.numeroNuevo = false;
+      opciones.claveOrigen = Numeros.claveDeOrigen({ name: opciones.nombreActual, size: fichero ? fichero.size : 0, lastModified: fichero ? fichero.lastModified : 0 });
+      if (!opciones.numeroDoc && (opciones.modo === 'anadir' || (opciones.ponerNombre && !previo.fecha))) {
+        var yaDado = Numeros.deOrigen(opciones.claveOrigen);
+        try {
+          opciones.numeroDoc = yaDado || await Numeros.proximo('documentos');
+          opciones.numeroNuevo = !yaDado;
+        } catch (eNum) {
+          opciones.numeroDoc = '';
+          U.aviso('No he podido calcular el número del documento: ' + U.mensajeDeError(eNum), 'malo');
+        }
+      }
+    }
     /* Lo que ya trae el nombre del fichero manda: la propuesta solo
        rellena lo que el nombre no trae (fila 174, punto 1). */
     var propuesta = opciones.propuesta || null;
@@ -131,7 +153,9 @@
        salen de ahí; el resto se queda como texto adicional. */
     var valoresIniciales = {};
     var camposIniciales = camposDelTipo(tipoInicial);
-    if (camposIniciales.length) {
+    if (previo.numero && previo.valoresDeCampos) {
+      valoresIniciales = previo.valoresDeCampos;   /* fila 239: salen de la ficha, no del texto */
+    } else if (camposIniciales.length) {
       var rec = DocCampos.reconocer(camposIniciales, curso);
       valoresIniciales = rec.valores;
       curso = rec.resto;

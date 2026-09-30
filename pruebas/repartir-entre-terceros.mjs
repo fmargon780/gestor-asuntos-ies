@@ -163,10 +163,16 @@ const archivado = (tercero) => pagina.evaluate(async (tercero) => {
   }
   return out;
 }, tercero);
+/* Fila 239: cada asunto nuevo lleva su número (por orden de creación) y todas las copias del mismo
+   documento llevan el MISMO número de documento; el registro del original va a la ficha, no al nombre. */
+const AA = String(new Date().getFullYear()).slice(2);
+const NUMERO_DOC = 'D' + AA + '-00001';
+let ordenAsunto = 0;
 for (const [tercero, desde] of [['Gómez Ruiz, Luis 2222222', 3], ['Sanz Mora, Eva 3333333', 7], ['Pérez López, Ana 1111111', 11]]) {
-  await comprobarP('archivado en la carpeta de ' + tercero.split(',')[0] + ', con su trozo de 4 páginas, el registro del original y «Viene de…»',
-    archivado(tercero), [{ asunto: '260915 CUESTIONARIO ALTAS CAPACIDADES 26-27 ' + tercero,
-      pdfs: ['260915 26EM0123 CUESTIONARIO.pdf'], pags: 4, viene: true }]);
+  ordenAsunto++;
+  await comprobarP('archivado en la carpeta de ' + tercero.split(',')[0] + ', con su trozo de 4 páginas, el número de documento del original y «Viene de…»',
+    archivado(tercero), [{ asunto: '260915 A' + AA + '-000' + ordenAsunto + ' CUESTIONARIO ALTAS CAPACIDADES ' + tercero,
+      pdfs: ['260915 CUESTIONARIO ' + NUMERO_DOC + '.pdf'], pags: 4, viene: true }]);
 }
 const origen = () => pagina.evaluate(async ([origen]) => {
   const c = await window.__disco.abiertos.getDirectoryHandle(origen);
@@ -177,7 +183,7 @@ const origen = () => pagina.evaluate(async ([origen]) => {
            nota: (f.notas || []).some(n => /^Reparto de /.test(n.texto) && /Páginas 3–6 → Gómez Ruiz, Luis 2222222 \(asunto /.test(n.texto)) };
 }, [ORIGEN]);
 await comprobarP('en el origen: el PDF completo sigue, el oficio es un documento propio; la nota y los repartos, en su ficha', origen(), {
-  ficheros: ['260915 26EM0123 OFICIO.pdf', PDF],
+  ficheros: [PDF, '260915 OFICIO ' + NUMERO_DOC + '.pdf'],
   repartos: [[PDF, 'origen:true Gómez Ruiz:true Sanz Mora:true Pérez López:true']],
   nota: true
 });

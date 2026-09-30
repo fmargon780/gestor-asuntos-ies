@@ -91,6 +91,111 @@
     return { asunto: topeAsunto, documento: topeDocumento };
   }
 
+  /* ============================================================
+     FILA 239 (docs/NOMBRES-FIJOS-CON-NUMERO.md): la estructura fija.
+
+     El nombre de un asunto nuevo (`AAMMDD A26-0137 TIPO Tercero`) y el
+     de un documento nuevo (`AAMMDD TIPO D26-01234.ext`) tienen un largo
+     conocido de antemano y NUNCA se recortan. Lo único que se mira es si
+     la ruta completa cabe, con el peor documento posible dentro:
+
+       <Dropbox>/<ARCHIVO>/<CATEGORÍA>/<tercero>/<asunto>/_Previas/<documento>
+
+     Sin `_GESTOR/rutas.json` señalado todavía no hay con qué calcular:
+     se da por bueno (`conocido: false`). El mismo cálculo, con los peores
+     casos de todo el centro, lo enseña Ajustes → El centro («Largo de las
+     rutas», `Nombres.medidor`).
+     ============================================================ */
+  var SUBCARPETA_PREVIAS = '_Previas';
+  var LARGO_EXTENSION = 5;          /* «.docx» */
+  var LARGO_NUMERO_DOCUMENTO = 9;   /* D26-01234 */
+  var LARGO_FECHA = 6;              /* AAMMDD */
+
+  /* El documento más largo que puede salir: fecha, tipo corto, número y
+     extensión, con un espacio entre cada pieza. */
+  function peorDocumento(largoTipoDocumento) {
+    return LARGO_FECHA + 1 + largoTipoDocumento + 1 + LARGO_NUMERO_DOCUMENTO + LARGO_EXTENSION;
+  }
+
+  function largoDelTipoDeDocumentoMasLargo() {
+    var lista = (window.App && App.E && App.E.tiposDocumento) || [];
+    var mayor = 0;
+    lista.forEach(function (t) {
+      var c = (window.Nombres && Nombres.cortoDeTipoDocumento) ? Nombres.cortoDeTipoDocumento(t) : t;
+      if (String(c).length > mayor) mayor = String(c).length;
+    });
+    return mayor || 12;
+  }
+
+  /* Cuántos caracteres de la ruta quedan libres con este asunto dentro
+     (el peor documento incluido). `cabe` es false si son menos de cero. */
+  function cabeEnRuta(nombreAsunto, tercero, categoria, largoTipoDocumento) {
+    var comun = (window.RutaCarpetas && RutaCarpetas.comunConocido) ? RutaCarpetas.comunConocido('archivo') : '';
+    if (!comun) return { conocido: false, cabe: true, margen: null };
+    var cat = categoria || categoriaMasLarga();
+    var piezas = [comun, cat, tercero || cat, nombreAsunto, SUBCARPETA_PREVIAS,
+      'x'.repeat(peorDocumento(largoTipoDocumento || largoDelTipoDeDocumentoMasLargo()))];
+    var ocupado = raizDeEsteOrdenador() + piezas.join('/').length;
+    var margen = TOPE_TOTAL_RUTA - ocupado;
+    return { conocido: true, cabe: margen >= 0, margen: margen };
+  }
+
+  function terceroMasLargo(lista, categoria) {
+    var mayor = '';
+    (lista || []).forEach(function (p) {
+      var t = (window.App && App.textoTercero) ? App.textoTercero(Object.assign({ categoria: categoria }, p)) : String(p.nombre || '');
+      if (t.length > mayor.length) mayor = t;
+    });
+    return mayor;
+  }
+
+  /* El peor caso de todo el centro, para Ajustes y la comprobación al
+     entrar. Asíncrono: recorre los catálogos de terceros. Nunca lanza. */
+  async function medidor() {
+    var comun = (window.RutaCarpetas && RutaCarpetas.comunConocido) ? RutaCarpetas.comunConocido('archivo') : '';
+    var categoria = categoriaMasLarga();
+    var tercero = '';
+    var categoriaDelTercero = categoria;
+    try {
+      var cats = (window.Nombres && Nombres.CATEGORIAS) || [];
+      for (var i = 0; i < cats.length; i++) {
+        var fuente = (window.Datos && App.E && App.E.datos) ? await Datos.cargar(App.E.datos, cats[i]) : null;
+        var t = fuente ? terceroMasLargo(fuente.lista, cats[i]) : '';
+        if (t.length > tercero.length) { tercero = t; categoriaDelTercero = cats[i]; }
+      }
+    } catch (e) { /* sin catálogo: se sigue con lo que haya */ }
+
+    var tipos = (window.App && App.E && App.E.tipos) || [];
+    var tipoAsunto = '';
+    tipos.forEach(function (t) {
+      var n = Nombres.tipoParaCarpeta(t);
+      if (n.length > tipoAsunto.length) tipoAsunto = n;
+    });
+    var largoTipoDoc = largoDelTipoDeDocumentoMasLargo();
+    var asuntoPeor = [ 'x'.repeat(LARGO_FECHA), 'A00-0000', tipoAsunto.toUpperCase(), tercero ].filter(Boolean).join(' ');
+    var r = cabeEnRuta(asuntoPeor, tercero, categoria, largoTipoDoc);
+    var partes = [
+      { clave: 'dropbox', texto: 'dónde está Dropbox en este ordenador', largo: raizDeEsteOrdenador() },
+      { clave: 'archivo', texto: 'la ruta de la carpeta ARCHIVO', largo: comun.length + 1 },
+      { clave: 'categoria', texto: 'la categoría más larga', largo: categoria.length + 1 },
+      { clave: 'tercero', texto: 'el tercero más largo (' + tercero + ')', largo: tercero.length + 1 },
+      { clave: 'tipo', texto: 'el tipo de asunto más largo (' + tipoAsunto + ')', largo: tipoAsunto.length },
+      { clave: 'previas', texto: 'la subcarpeta de previas', largo: SUBCARPETA_PREVIAS.length + 1 },
+      { clave: 'documento', texto: 'el tipo de documento más largo', largo: largoTipoDoc }
+    ];
+    var masOcupa = partes.slice().sort(function (a, b) { return b.largo - a.largo; })[0];
+    return {
+      conocido: r.conocido, margen: r.margen, tope: TOPE_TOTAL_RUTA,
+      categoria: categoria, tercero: tercero, categoriaDelTercero: categoriaDelTercero,
+      tipoAsunto: tipoAsunto, largoTipoDocumento: largoTipoDoc, previas: SUBCARPETA_PREVIAS,
+      peorAsunto: asuntoPeor, peorDocumento: peorDocumento(largoTipoDoc),
+      partes: partes, masOcupa: masOcupa
+    };
+  }
+
   window.Nombres = window.Nombres || {};
   window.Nombres.topes = topes;
+  window.Nombres.cabeEnRuta = cabeEnRuta;
+  window.Nombres.medidor = medidor;
+  window.Nombres.SUBCARPETA_PREVIAS = SUBCARPETA_PREVIAS;
 })();

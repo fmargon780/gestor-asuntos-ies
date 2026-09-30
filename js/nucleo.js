@@ -236,6 +236,7 @@ $('btn-entrar').onclick = async function () {
 
     await App.cargarTipos();
     await App.cargarTiposDocumento();
+    if (window.TiposDocumentoCortos) await TiposDocumentoCortos.cargar();   /* fila 239 */
     await App.cargarCampos();
     if (window.Grupos) await Grupos.cargar();
     await App.cargarRegistro();

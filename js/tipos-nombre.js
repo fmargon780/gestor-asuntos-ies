@@ -318,7 +318,9 @@ App.renombrarTipo = async function (tipo) {
   var cambiadas = 0, fallos = [];
   for (var i = 0; i < afectadas.length; i++) {
     var a = afectadas[i];
-    var nombreCarpeta = a.nombre.replace(a.nombre.slice(7, 7 + nombreViejo.length), nombreNuevo);
+    /* Fila 239: con número de asunto, el tipo va detrás de `AAMMDD A26-0137 `. */
+    var desde = a.leido.numero ? 7 + a.leido.numero.length + 1 : 7;
+    var nombreCarpeta = a.nombre.slice(0, desde) + nombreNuevo + a.nombre.slice(desde + nombreViejo.length);
     try {
       await Carpetas.renombrar(App.E.abiertos, a.nombre, nombreCarpeta);
       var ficha = App.E.registro.asuntos[a.nombre];

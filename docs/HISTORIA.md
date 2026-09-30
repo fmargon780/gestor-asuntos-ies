@@ -5,6 +5,25 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 30-sep-2026 — Fila 239: nombres fijos con número de asunto y de documento
+
+Motivo: «El nombre no cabe en la ruta de Dropbox: acorta el texto» no dejaba guardar un documento, porque los
+nombres llevaban piezas de largo libre. Ahora un asunto nuevo se llama `AAMMDD A26-0137 TIPO Tercero` y un
+documento nuevo `AAMMDD TIPO D26-01234.ext`, sin recorte; año académico, grupo, campos, texto libre, registro
+de Séneca y texto adicional viven en la ficha (`ficha.documentos[<número>]`). Contador anual en
+`_GESTOR/numeros.json` con comprobación entre ordenadores. «_Previas» para lo nuevo (las «Versiones previas»
+de antes se siguen leyendo). Tope de 25 en los nombres cortos (los que ya pasan no se bloquean: lista
+«Arreglarlo»), nombre corto también para los tipos de documento, y el medidor «Largo de las rutas» en Ajustes.
+Detalle técnico: `docs/contexto/NOMBRES-FIJOS.md`. Decisiones de la sesión: (1) lo de antes no se renombra ni
+recibe número; un documento que ya sigue la norma de antes y se vuelve a nombrar conserva su estructura;
+(2) el mismo fichero añadido a dos asuntos comparte número por una memoria de este ordenador (nombre, tamaño y
+fecha del fichero de origen), y repartir entre terceros da un solo número de documento a todas sus copias;
+(3) «generar para relacionados» ya no puede reconocer «ya estaba» por el nombre: lo reconoce por la ficha
+(plantilla + persona + día); (4) registrar un documento con número deja al original como `… SIN SELLAR` en
+previas y al sellado con el mismo nombre; (5) las pruebas que comprobaban nombres de antes se han puesto al día.
+
+---
+
 ## 30-sep-2026 — Fila 213: el botón de soporte
 
 Botón «Soporte» en todas las pantallas (`js/soporte.js`, `css/soporte.css`) y buzón en un script de

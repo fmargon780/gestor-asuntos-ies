@@ -21,6 +21,7 @@ que cambie algo general).
 | `docs/contexto/TUTORES-Y-ADMINISTRACIONES.md` | La lista única de categorías y sus puntos previstos; los tutores legales (fila 166) y las Administraciones (fila 167) como tercero |
 | `docs/contexto/DOCUMENTOS.md` | El nombre y el registro de un documento, el código de verificación, "Por clasificar" |
 | `docs/contexto/DOCUMENTOS-PDF.md` | Generar el documento de Word, separar/unir un PDF y ajustar su tamaño |
+| `docs/contexto/NOMBRES-FIJOS.md` | Los nombres de carpeta y de documento con número único (`A26-0137`, `D26-01234`), los datos del documento en la ficha, `_Previas`, nombres cortos de 25 y el largo de las rutas (fila 239) |
 | `docs/contexto/WORD-EN-LA-APP.md` | Lo que falta antes de generar un Word, el Word dentro de la aplicación («Guardar PDF», «Imprimir», fila 155) y la subcarpeta «Versiones previas» (fila 160) |
 | `docs/contexto/TABLAS-DE-DATOS.md` | Las tablas de datos (tutorías de Séneca, `datos/Tablas`), sus huecos y el certificado de función tutorial (fila 110) |
 | `docs/contexto/CORREO-Y-SENECA.md` | La bandeja de Gmail, sus adjuntos, las plantillas de correo y el cuadro de Séneca |

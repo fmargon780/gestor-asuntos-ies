@@ -102,6 +102,18 @@ var GenerarParaRelacionados = (function () {
     });
   }
 
+  /* Fila 239: si este documento (misma plantilla, misma persona y mismo día) ya
+     se generó y sigue en la carpeta, su nombre; si no, ''. */
+  function nombreYaGenerado(a, nombresEnCarpeta, clave, fecha) {
+    var docs = (a.ficha && a.ficha.documentos) || {};
+    var numeros = Object.keys(docs).filter(function (n) { return docs[n].generadoDe === clave && docs[n].fecha === fecha; });
+    for (var i = 0; i < numeros.length; i++) {
+      var hallado = nombresEnCarpeta.filter(function (f) { return f.indexOf(numeros[i]) !== -1; })[0];
+      if (hallado) return hallado;
+    }
+    return '';
+  }
+
   /* ---------- generar el lote ---------- */
 
   async function generar(a, plantillaDoc, h) {
@@ -157,18 +169,34 @@ var GenerarParaRelacionados = (function () {
           resultado = await Docx.rellenar(x.buffer, Object.assign({}, x.valores, { aMano: aMano }));
         }
         if (x.tablas && window.TablasDatos) resultado = await TablasDatos.resaltarResultado(resultado, x.tablas.faltan);
-        var nombreDoc = Nombres.montarDocumento({
-          fecha: fecha, tipo: plantillaDoc.tipoDocumento || 'DOCUMENTO',
-          curso: ((plantillaDoc.texto || '') + ' ' + soloElNombre(x.rel.nombre)).trim(), extension: 'docx'
-        });
-        if (yaEsta.indexOf(nombreDoc) !== -1 || hechos.some(function (d) { return d.nombre === nombreDoc; })) {
-          yaEstaban.push({ rel: x.rel, nombre: nombreDoc, correo: x.valores.correo || '', valores: x.valores });
+        /* Fila 239: cada documento lleva su número, y la persona (antes en
+           el nombre) va a la ficha. Para no repetirlo si se vuelve a pulsar,
+           se recuerda de quién y de qué plantilla salió. */
+        var textoDoc = ((plantillaDoc.texto || '') + ' ' + soloElNombre(x.rel.nombre)).trim();
+        var claveGenerado = (plantillaDoc.id || plantillaDoc.nombre || plantillaDoc.tipoDocumento || '') + '|' +
+          (x.rel.categoria || '') + '|' + x.rel.nombre;
+        var yaHecho = nombreYaGenerado(a, yaEsta, claveGenerado, fecha);
+        if (yaHecho || hechos.some(function (d) { return d.claveGenerado === claveGenerado; })) {
+          yaEstaban.push({ rel: x.rel, nombre: yaHecho, correo: x.valores.correo || '', valores: x.valores });
           continue;
         }
+        var numeroDoc = (await Numeros.reservar('documentos', '')).numero;
+        var nombreDoc = Nombres.montarDocumento({
+          fecha: fecha, tipo: plantillaDoc.tipoDocumento || 'DOCUMENTO',
+          curso: textoDoc, extension: 'docx', numeroDoc: numeroDoc
+        });
         await I.guardarBlobEnCarpeta(a.handle, nombreDoc, resultado.blob);
+        if (window.DocumentosDatos) {
+          try {
+            await DocumentosDatos.anotar(a.nombre, numeroDoc, {
+              tipo: plantillaDoc.tipoDocumento || 'DOCUMENTO', fecha: fecha, registros: [], campos: [],
+              texto: textoDoc, generadoDe: claveGenerado, hito: h && h.id ? h.id : ''
+            });
+          } catch (eDatos) { /* accesorio */ }
+        }
         var faltanDeEl = resultado.faltan.filter(function (f) { return esDeLaPersona(f, etiquetas); });
         if (faltanDeEl.length) faltasPorPersona.push({ rel: x.rel, faltan: faltanDeEl });
-        hechos.push({ rel: x.rel, nombre: nombreDoc, correo: x.valores.correo || '', valores: x.valores });
+        hechos.push({ rel: x.rel, nombre: nombreDoc, correo: x.valores.correo || '', valores: x.valores, claveGenerado: claveGenerado });
       } catch (e) {
         fallidos.push({ rel: x.rel, motivo: U.mensajeDeError(e) });
       }

@@ -283,6 +283,33 @@
     return resultado('centro-festivos', T, 'bien', 'Apuntados.');
   }
 
+  /* Fila 239 (docs/NOMBRES-FIJOS-CON-NUMERO.md, apartados 5 y 6). */
+  async function tiposLargos() {
+    var T = 'Nombres cortos de los tipos';
+    if (!window.TiposLargos) return resultado('tipos-largos', T, 'omitida', '');
+    var largos = TiposLargos.lista();
+    if (!largos.length) return resultado('tipos-largos', T, 'bien', 'Ningún tipo pasa de ' + TiposLargos.TOPE + ' caracteres.');
+    return resultado('tipos-largos', T, 'falta', largos.length + (largos.length === 1 ? ' tipo pasa' : ' tipos pasan') +
+      ' de ' + TiposLargos.TOPE + ' caracteres en el nombre que entra en las carpetas y los documentos. Se siguen usando ' +
+      'con su nombre entero, pero conviene ponerles un nombre corto.', function () {
+      var cerrar = document.getElementById('cuadro-cancelar');
+      if (cerrar && !document.getElementById('capa').classList.contains('oculto')) cerrar.click();
+      TiposLargos.abrir();
+    }, true);
+  }
+
+  async function largoDeRutas() {
+    var T = 'Largo de las rutas';
+    if (!window.Nombres || !Nombres.medidor) return resultado('largo-rutas', T, 'omitida', '');
+    var m = await Nombres.medidor();
+    if (!m.conocido) return resultado('largo-rutas', T, 'bien', 'Todavía no se puede calcular: hay que apuntar antes la ruta de la carpeta ARCHIVO.');
+    if (m.margen < 0) {
+      return resultado('largo-rutas', T, 'falta', 'El caso más largo no cabe en la ruta de Dropbox: se pasa ' + (-m.margen) +
+        ' caracteres. Lo que más ocupa es ' + m.masOcupa.texto + '.', llevarA('#largo-rutas-margen'));
+    }
+    return resultado('largo-rutas', T, 'bien', 'Quedan ' + m.margen + ' caracteres de margen.');
+  }
+
   async function copiaSinInternet() {
     var T = 'Copia sin internet al día';
     if (window.location.protocol !== 'file:') return null;   /* en la web, esta fila no sale */
@@ -313,6 +340,8 @@
     ['centro-datos', 'Datos del centro', datosDelCentro],
     ['centro-cargos', 'Cargos: Dirección y Secretaría', cargos],
     ['centro-festivos', 'Festivos del curso', festivos],
+    ['tipos-largos', 'Nombres cortos de los tipos', tiposLargos],
+    ['largo-rutas', 'Largo de las rutas', largoDeRutas],
     ['copia', 'Copia sin internet al día', copiaSinInternet]
   ];
 

@@ -57,6 +57,8 @@ await pagina.addInitScript(() => {
 });
 await pagina.goto(process.env.DIRECCION || 'http://localhost:8123/index.html');
 
+/* Fila 239: los asuntos nuevos llevan su número (A<año>-<cuatro cifras>), por orden de creación. */
+const num = (n) => 'A' + String(new Date().getFullYear()).slice(2) + '-' + String(n).padStart(4, '0');
 let fallos = 0;
 async function comprobar(titulo, promesa, esperado) {
   const real = await promesa;
@@ -223,15 +225,15 @@ await pagina.locator('.formulario').screenshot({
   path: path.join(CARPETA_CAPTURAS, 'campos-datos-del-asunto.png')
 });
 
-await comprobar('el nombre lleva los dos campos, en el orden de Ajustes',
+await comprobar('el nombre ya no lleva los campos (van a la ficha): fecha, número, tipo y tercero',
   pagina.locator('#vista-nombre').textContent(),
-  '260911 SANCION 1º Bach A Ciencias Ramos Vidal, Elena 1150001');
+  ('260911 ' + num(1) + ' SANCION Ramos Vidal, Elena 1150001'));
 
 await crearAsunto();
 await comprobar('la carpeta se crea con ese nombre', nombresDeAbiertos(),
-  ['260911 SANCION 1º Bach A Ciencias Ramos Vidal, Elena 1150001']);
+  [('260911 ' + num(1) + ' SANCION Ramos Vidal, Elena 1150001')]);
 await comprobar('la ficha guarda los dos valores', leerJson('asuntos.json').then(j =>
-  j.asuntos['260911 SANCION 1º Bach A Ciencias Ramos Vidal, Elena 1150001'].campos), {
+  j.asuntos[('260911 ' + num(1) + ' SANCION Ramos Vidal, Elena 1150001')].campos), {
   'fichero:Unidad': { valor: '1º Bach A', enNombre: true },
   'fichero:Modalidad de Bachillerato': { valor: 'Ciencias', enNombre: true }
 });
@@ -258,15 +260,15 @@ await pagina.evaluate(() => {
 });
 await pagina.waitForTimeout(150);
 
-await comprobar('el nombre ya no lleva la modalidad',
+await comprobar('el nombre sigue igual sin la modalidad',
   pagina.locator('#vista-nombre').textContent(),
-  '260911 SANCION 1º Bach A Ramos Vidal, Elena 1150001');
+  ('260911 ' + num(2) + ' SANCION Ramos Vidal, Elena 1150001'));
 
 await crearAsunto();
 await comprobar('la carpeta se crea sin la modalidad en el nombre',
-  nombresDeAbiertos().then(n => n.indexOf('260911 SANCION 1º Bach A Ramos Vidal, Elena 1150001') !== -1), true);
+  nombresDeAbiertos().then(n => n.indexOf(('260911 ' + num(2) + ' SANCION Ramos Vidal, Elena 1150001')) !== -1), true);
 await comprobar('pero el valor de la modalidad se ha guardado igual', leerJson('asuntos.json').then(j =>
-  j.asuntos['260911 SANCION 1º Bach A Ramos Vidal, Elena 1150001'].campos['fichero:Modalidad de Bachillerato']),
+  j.asuntos[('260911 ' + num(2) + ' SANCION Ramos Vidal, Elena 1150001')].campos['fichero:Modalidad de Bachillerato']),
   { valor: 'Ciencias', enNombre: false });
 
 /* ================================================================
@@ -290,12 +292,11 @@ await comprobar('la modalidad sale en blanco, no es un error',
   pagina.evaluate(() => document.querySelectorAll('#campos-lista-nuevo .campo-fila')[1]
     .querySelector('input,select').value), '');
 await comprobar('el nombre no lleva doble espacio',
-  pagina.locator('#vista-nombre').textContent(),
-  '260912 SANCION 1º A Ferrer Nuño, Iker 1150002');
+  pagina.locator('#vista-nombre').textContent().then(t => /^260912 A\d{2}-\d{4} SANCION Ferrer Nuño, Iker 1150002$/.test(t)), true);
 
 await crearAsunto();
 await comprobar('deja crear el asunto igual',
-  nombresDeAbiertos().then(n => n.indexOf('260912 SANCION 1º A Ferrer Nuño, Iker 1150002') !== -1), true);
+  nombresDeAbiertos().then(n => n.some(x => /^260912 A\d{2}-\d{4} SANCION Ferrer Nuño, Iker 1150002$/.test(x))), true);
 
 /* ================================================================
    5. Con Unidad obligatoria y vacía, no deja crear y dice qué falta.
@@ -396,13 +397,12 @@ await pagina.evaluate(() => {
 });
 await pagina.waitForTimeout(150);
 
-await comprobar('su valor entra en el nombre',
-  pagina.locator('#vista-nombre').textContent(),
-  '260914 SANCION 1º A 2º Ferrer Nuño, Iker 1150002');
+await comprobar('su valor ya no entra en el nombre (va a la ficha)',
+  pagina.locator('#vista-nombre').textContent().then(t => /^260914 A\d{2}-\d{4} SANCION Ferrer Nuño, Iker 1150002$/.test(t)), true);
 
 await crearAsunto();
-await comprobar('la carpeta lleva el trimestre elegido',
-  nombresDeAbiertos().then(n => n.indexOf('260914 SANCION 1º A 2º Ferrer Nuño, Iker 1150002') !== -1), true);
+await comprobar('la carpeta se crea con su número y sin el trimestre; el trimestre queda en la ficha',
+  nombresDeAbiertos().then(n => n.some(x => /^260914 A\d{2}-\d{4} SANCION Ferrer Nuño, Iker 1150002$/.test(x))), true);
 
 /* ================================================================
    8. Un tipo sin campos configurados crea el asunto exactamente
@@ -423,12 +423,11 @@ await pagina.fill('#campo-fecha', '2026-09-15');
 await pagina.fill('#campo-curso', '');
 await pagina.uncheck('#campo-grupo').catch(() => {});
 await pagina.waitForTimeout(150);
-await comprobar('el nombre se monta como siempre, sin ningún campo de más',
-  pagina.locator('#vista-nombre').textContent(),
-  '260915 MATRICULA Ramos Vidal, Elena 1150001');
+await comprobar('el nombre lleva fecha, número, tipo y tercero, sin ningún campo de más',
+  pagina.locator('#vista-nombre').textContent().then(t => /^260915 A\d{2}-\d{4} MATRICULA Ramos Vidal, Elena 1150001$/.test(t)), true);
 await crearAsunto();
-await comprobar('se crea igual que antes de este cambio',
-  nombresDeAbiertos().then(n => n.indexOf('260915 MATRICULA Ramos Vidal, Elena 1150001') !== -1), true);
+await comprobar('se crea con su número',
+  nombresDeAbiertos().then(n => n.some(x => /^260915 A\d{2}-\d{4} MATRICULA Ramos Vidal, Elena 1150001$/.test(x))), true);
 
 /* ================================================================
    9. Cambiar el asunto cambiando un campo renombra la carpeta y la
@@ -436,7 +435,7 @@ await comprobar('se crea igual que antes de este cambio',
    ================================================================ */
 console.log('--- 9. editar un asunto cambiando un campo ---');
 
-const NOMBRE_ORIGINAL = '260911 SANCION 1º Bach A Ciencias Ramos Vidal, Elena 1150001';
+const NOMBRE_ORIGINAL = ('260911 ' + num(1) + ' SANCION Ramos Vidal, Elena 1150001');
 await pagina.click('.pestana[data-pantalla="abiertos"]');
 /* Fila 209: la tabla ya no enseña el nombre entero de la carpeta en
    ninguna celda (solo el Tercero, el Tipo y la fecha de Inicio, por
@@ -464,18 +463,16 @@ await pagina.fill('#ed-campo-0', '2º Bach B');
 await pagina.waitForTimeout(150);
 await comprobar('la vista previa recoge el cambio',
   pagina.locator('#ed-vista').textContent(),
-  '260911 SANCION 2º Bach B Ciencias Ramos Vidal, Elena 1150001');
+  ('260911 ' + num(1) + ' SANCION Ramos Vidal, Elena 1150001'));
 
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
 
 const nombresTrasEditar = await nombresDeAbiertos();
-await comprobar('la carpeta vieja ya no está',
-  nombresTrasEditar.indexOf(NOMBRE_ORIGINAL) === -1, true);
-await comprobar('la carpeta nueva sí está',
-  nombresTrasEditar.indexOf('260911 SANCION 2º Bach B Ciencias Ramos Vidal, Elena 1150001') !== -1, true);
+await comprobar('los campos ya no entran en el nombre: la carpeta sigue con su nombre y su número',
+  nombresTrasEditar.indexOf(NOMBRE_ORIGINAL) !== -1, true);
 await comprobar('la ficha ha viajado con el campo cambiado', leerJson('asuntos.json').then(j => {
-  const f = j.asuntos['260911 SANCION 2º Bach B Ciencias Ramos Vidal, Elena 1150001'];
+  const f = j.asuntos[('260911 ' + num(1) + ' SANCION Ramos Vidal, Elena 1150001')];
   return f && f.campos && f.campos['fichero:Unidad'];
 }), { valor: '2º Bach B', enNombre: true });
 

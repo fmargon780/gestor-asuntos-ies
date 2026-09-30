@@ -146,9 +146,12 @@
 
   async function crearAsunto(tipoObj, categoria, tercero, fecha, extra) {
     extra = extra || {};
+    /* Fila 239: los asuntos de la demostración llevan número (estructura
+       fija); uno, `sinNumero`, se deja como los de antes para ver los dos. */
+    var numero = extra.sinNumero ? '' : (await Numeros.reservar('asuntos', '')).numero;
     var montado = Nombres.montarAsunto({
       fecha: fecha, tipo: Nombres.tipoParaCarpeta(tipoObj), categoria: categoria,
-      curso: '', grupo: '', campos: [], descripcion: extra.descripcion || '', tercero: tercero
+      curso: '', grupo: '', campos: [], descripcion: extra.descripcion || '', tercero: tercero, numero: numero
     });
     var nombre = montado.nombre;
     await Carpetas.crear(App.E.abiertos, nombre);
@@ -156,9 +159,25 @@
       estado: 'abierto', tipo: tipoObj.tipo, categoria: categoria, tercero: tercero,
       descripcion: extra.descripcion || '', abiertoEl: extra.abiertoEl || U.ahora(),
       abiertoPor: App.E.usuario || 'Revisor'
-    }, extra.datos || {});
+    }, numero ? { numero: numero } : {}, extra.datos || {});
     await App.anotar(nombre, datos);
     return nombre;
+  }
+
+  /* Fila 239: un documento con número (su registro vive en la ficha) y uno de
+     antes (con el registro en el nombre), para ver los dos. */
+  async function crearDocumentosDeDemostracion(asuntoNombre) {
+    var carpeta = await Carpetas.crear(App.E.abiertos, asuntoNombre);
+    var fecha = hace(4);
+    var numeroDoc = (await Numeros.reservar('documentos', '')).numero;
+    var nombreNuevo = Nombres.montarDocumento({ fecha: fecha, tipo: 'SOLICITUD', extension: 'pdf', numeroDoc: numeroDoc });
+    await Carpetas.escribirBytes(carpeta, nombreNuevo, PDF_DE_MENTIRA, 'application/pdf');
+    await DocumentosDatos.anotar(asuntoNombre, numeroDoc, {
+      tipo: 'SOLICITUD', fecha: fecha, texto: 'Curso 26-27', campos: [], valores: {},
+      registros: [{ ano: fecha.slice(2, 4), sentido: 'E', modo: 'M', numero: '0123', codigo: Nombres.codigoRegistro({ ano: fecha.slice(2, 4), sentido: 'E', modo: 'M', numero: '0123' }) }]
+    });
+    var antiguo = Nombres.montarDocumento({ fecha: hace(9), codigo: fecha.slice(2, 4) + 'EM0098', tipo: 'INFORME', curso: 'Antiguo', extension: 'pdf' });
+    await Carpetas.escribirBytes(carpeta, antiguo, PDF_DE_MENTIRA, 'application/pdf');
   }
 
   async function marcarPrimerHito(nombre, estado, nota) {
@@ -186,6 +205,7 @@
       abiertoEl: hace(5) + 'T09:00:00.000Z'
     });
     await marcarPrimerHito(pabloClave, 'hecho', 'Documentación recibida y comprobada.');
+    await crearDocumentosDeDemostracion(pabloClave);
 
     /* 3. con la fecha límite ya vencida. */
     await crearAsunto(tipos.CERTIFICADO, 'ALUMNADO', carla, hace(20), {
@@ -205,18 +225,20 @@
     });
     await marcarPrimerHito(martaClave, 'hecho', 'Parte de baja recibido.');
 
-    /* 6. dormido: abierto hace tiempo, sin ningún hito tocado. */
+    /* 6. dormido: abierto hace tiempo, sin ningún hito tocado. Sin número:
+       es un asunto «de antes», con la estructura de nombre de siempre. */
     await crearAsunto(tipos.FACTURA, 'EMPRESAS', dobla, hace(60), {
-      abiertoEl: hace(60) + 'T09:00:00.000Z'
+      abiertoEl: hace(60) + 'T09:00:00.000Z', sinNumero: true
     });
   }
 
   /* ---------- archivo ---------- */
 
-  async function archivarDeMentira(tipoObj, categoria, tercero, fecha) {
+  async function archivarDeMentira(tipoObj, categoria, tercero, fecha, conNumero) {
+    var numero = conNumero ? (await Numeros.reservar('asuntos', '')).numero : '';
     var montado = Nombres.montarAsunto({
       fecha: fecha, tipo: Nombres.tipoParaCarpeta(tipoObj), categoria: categoria,
-      curso: '', grupo: '', campos: [], descripcion: '', tercero: tercero
+      curso: '', grupo: '', campos: [], descripcion: '', tercero: tercero, numero: numero
     });
     var nombre = montado.nombre;
     var destino = await Carpetas.bajar(App.E.archivo, [categoria, tercero], true);
@@ -229,7 +251,7 @@
     var elena = Nombres.terceroAlumno({ nombre: 'Moya Santana, Elena', id: '2099998' });
 
     /* del curso actual (una fecha reciente, dentro del mismo curso académico) */
-    await archivarDeMentira(tipos.CERTIFICADO, 'ALUMNADO', sara, hace(10));
+    await archivarDeMentira(tipos.CERTIFICADO, 'ALUMNADO', sara, hace(10), true);
     /* de un curso anterior */
     var fechaCursoAnterior = (HOY.getFullYear() - 1) + '-10-05';
     await archivarDeMentira(tipos.MATRICULA, 'ALUMNADO', elena, fechaCursoAnterior);

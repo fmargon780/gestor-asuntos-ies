@@ -168,7 +168,8 @@ var TiposUnir = (function () {
     return {
       fecha: fecha, curso: f.curso || '', grupo: f.grupo || '',
       campos: (f.campos && typeof f.campos === 'object') ? f.campos : {},
-      descripcion: f.descripcion || '', tercero: f.tercero || ''
+      descripcion: f.descripcion || '', tercero: f.tercero || '',
+      numero: f.numero || (a.leido && a.leido.numero) || ''   /* fila 239 */
     };
   }
 
@@ -177,7 +178,7 @@ var TiposUnir = (function () {
     var datos = {
       fecha: p.fecha, tipo: Nombres.tipoParaCarpeta(seQueda), curso: p.curso, grupo: p.grupo,
       campos: App.valoresGuardadosParaNombre(seQueda.tipo, p.campos),
-      descripcion: p.descripcion, tercero: p.tercero
+      descripcion: p.descripcion, tercero: p.tercero, numero: p.numero
     };
     return Nombres.montarAsunto(datos).nombre;
   }

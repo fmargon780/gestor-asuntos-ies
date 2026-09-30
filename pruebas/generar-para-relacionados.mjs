@@ -123,8 +123,13 @@ await comprobar('el lote termina bien, con tres', lote && lote.hechos, 3);
 const tras = await ficherosDelAsunto();
 await comprobar('tres Word en la carpeta', tras.filter((n) => /\.docx$/.test(n)).length, 3);
 for (const quien of ['Prueba Uno, Ana', 'Prueba Dos, Luis', 'Prueba Tres, Eva']) {
-  const nombre = tras.filter((n) => n.indexOf(quien) !== -1)[0];
-  await comprobar('el fichero de «' + quien + '» lleva su nombre al final', !!nombre && / CERTIFICADO participacion /.test(nombre), true);
+  /* Fila 239: el nombre ya no lleva a la persona (`AAMMDD TIPO D<año>-<cinco cifras>.docx`): está en el
+     texto adicional que la ficha guarda de cada documento, con su número. */
+  const docsFicha = await pagina.evaluate((a1) => App.E.registro.asuntos[a1].documentos || {}, ASUNTO);
+  const numeroDeEl = Object.keys(docsFicha).filter((k) => (docsFicha[k].texto || '').indexOf(quien) !== -1)[0];
+  const nombre = tras.filter((n) => numeroDeEl && n.indexOf(numeroDeEl) !== -1)[0];
+  await comprobar('el documento de «' + quien + '» lleva su número y la ficha guarda su nombre', !!nombre && / CERTIFICADO D\d{2}-\d{5}\.docx$/.test(nombre) &&
+    /participacion/.test(docsFicha[numeroDeEl].texto), true);
   const texto = await pagina.evaluate(async ([a1, n]) => {
     const d = await window.__disco.abiertos.getDirectoryHandle(a1);
     const buf = await (await (await d.getFileHandle(n)).getFile()).arrayBuffer();
@@ -166,7 +171,7 @@ await pagina.evaluate(() => window.__lote);
 await pagina.waitForTimeout(300);
 await comprobar('sale un correo a cada uno', enviados.map((e) => e.para).sort(), ['ana@ejemplo.es', 'eva@ejemplo.es']);
 await comprobar('cada uno con su documento', enviados.every((e) => e.adjuntos.length === 1 &&
-  e.adjuntos[0].nombre.indexOf(e.para === 'ana@ejemplo.es' ? 'Prueba Uno, Ana' : 'Prueba Tres, Eva') !== -1), true);
+  /^\d{6} CERTIFICADO D\d{2}-\d{5}\.docx$/.test(e.adjuntos[0].nombre)), true);
 await comprobar('con el saludo a esa persona', enviados.every((e) => /^Hola, (Ana|Eva) Prueba/.test(e.cuerpo)), true);
 
 await lanzarOtraVez();

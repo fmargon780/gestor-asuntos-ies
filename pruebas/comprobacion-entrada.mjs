@@ -56,7 +56,7 @@ await pagina.waitForSelector('#aplicacion:not(.oculto)');
 console.log('--- 1. falta casi todo: sale el panel solo ---');
 await pagina.waitForSelector('#capa:not(.oculto)', { timeout: 10000 });
 await comprobar('el panel se titula «Comprobación al entrar»', pagina.locator('#cuadro-titulo').textContent(), 'Comprobación al entrar');
-await comprobar('hay una fila por cosa (ocho en la web: sin la de la copia)', pagina.locator('.comprobacion-fila').count(), 8);
+await comprobar('hay una fila por cosa (diez en la web: sin la de la copia; la 239 añade los nombres cortos y el largo de las rutas)', pagina.locator('.comprobacion-fila').count(), 10);
 await comprobar('la de carpetas está bien', pagina.locator('.comprobacion-fila[data-id="carpetas"]').textContent().then((t) => /Bien/.test(t)), true);
 await comprobar('la de la bandeja falta', pagina.locator('.comprobacion-fila[data-id="bandeja"]').textContent().then((t) => /Falta/.test(t) && /Arreglarlo/.test(t)), true);
 await comprobar('el botón de cerrar dice «Ahora no»', pagina.locator('#cuadro-cancelar').textContent(), 'Ahora no');

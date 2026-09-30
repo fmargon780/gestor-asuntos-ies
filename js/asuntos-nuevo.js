@@ -61,7 +61,8 @@ App.actualizarLimiteNuevo = function () {
    mismo detrás (fila 220). */
 App.nuevoEnBlanco = function () {
   return { tipo: null, categoria: null, tercero: null, terceroPropuesto: null,
-           configCampos: [], viaInicial: null, departamento: null };
+           configCampos: [], viaInicial: null, departamento: null,
+           numero: '', pidiendoNumero: false, fallaNumero: '' };   /* fila 239: el número de asunto previsto */
 };
 
 /* Fila 220 (docs/CREAR-ASUNTO-DESDE-TODOS-LOS-SITIOS.md): preparar el
@@ -119,6 +120,8 @@ App.prepararNuevo = function () {
   App.pintarCategorias();
   App.pintarTipos();
   App.refrescarVista();
+  /* Fila 239: el número del asunto se calcula ya, para que esté cuando se elija la persona y el tipo. */
+  if (App.pedirNumeroNuevo) App.pedirNumeroNuevo();
 };
 
 /* Fila 197 (docs/NUEVO-ASUNTO-PERSONA-PRIMERO.md): las pastillas de

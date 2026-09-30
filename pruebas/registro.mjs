@@ -168,10 +168,10 @@ await comprobar('el registrado se guarda, y el original pasa a "Versiones previa
     const nombres = [];
     for await (const p of carpeta.entries()) nombres.push(p[0]);
     const previas = [];
-    for await (const p of (await carpeta.getDirectoryHandle('Versiones previas')).entries()) previas.push(p[0]);
+    for await (const p of (await carpeta.getDirectoryHandle('_Previas')).entries()) previas.push(p[0]);
     return [nombres.sort(), previas];
   }, NOMBRE_ASUNTO),
-  [['260911 26EM1234 FACTURA Referencia 123.pdf', 'Versiones previas'].sort(), [FACTURA_SIN_SELLAR]]);
+  [['260911 26EM1234 FACTURA Referencia 123.pdf', '_Previas'].sort(), [FACTURA_SIN_SELLAR]]);
 
 await comprobar('se apunta la nota con el código del registro', pagina.evaluate(async (asunto) => {
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');
@@ -207,7 +207,9 @@ await comprobar('la marca ámbar sale también dentro de "Gestionar documentos"'
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(300);
 
-const SOLICITUD = '260911 SOLICITUD Prueba pendiente.pdf';
+/* Fila 239: un documento añadido desde el ordenador es nuevo: lleva su número (el primero) y el texto adicional
+   va a la ficha. */
+const SOLICITUD = '260911 SOLICITUD D' + String(new Date().getFullYear()).slice(2) + '-00001.pdf';
 await comprobar('la marca ámbar y el botón destacado salen en la ficha',
   filaDeDocumento(SOLICITUD), { pendiente: true, registrar: true });
 
@@ -225,7 +227,7 @@ await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
 
 await comprobar('al registrarlo, la marca de pendiente desaparece',
-  filaDeDocumento('260911 26SA0099 SOLICITUD Prueba pendiente.pdf'), { pendiente: false, registrar: false });
+  filaDeDocumento(SOLICITUD), { pendiente: false, registrar: false });
 
 await comprobar('y se ha quitado de "pendientesRegistro" en la ficha del asunto', pagina.evaluate(async (asunto) => {
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');

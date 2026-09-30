@@ -166,7 +166,7 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   await comprobar('3. generar marca solo el paso «generar» del guion',
     leerHito(pagina, 'm1').then((h) => Object.keys(h.guionHecho || {}).filter((k) => h.guionHecho[k].hecho)), ['g2']);
   await comprobar('3. y la cuenta del guion lo dice', pagina.locator('.hito-en-mesa .mesa-guion-cuenta').textContent(), '1 de 3');
-  const generado = await pagina.evaluate(() => PlantillasDocumento.nombreDelDocumentoGenerado(Plantillas.documentoPorId('pd-b'), U.hoyIso()));
+  const generado = await pagina.evaluate(() => PlantillasDocumento.nombreDelDocumentoGenerado(Plantillas.documentoPorId('pd-b'), U.hoyIso(), 'D' + U.hoyIso().slice(2, 4) + '-00001'));
   await comprobar('3. el documento generado sale en la tabla',
     pagina.locator('.hito-en-mesa .hito-documento[data-doc="' + generado + '"]').count(), 1);
   await comprobar('3. el PDF enseña su .docx gemelo colgando, sin fila propia',

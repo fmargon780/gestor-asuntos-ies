@@ -25,7 +25,14 @@
    ============================================================ */
 var VersionesPrevias = (function () {
 
-  var CARPETA = 'Versiones previas';
+  /* Fila 239 (docs/NOMBRES-FIJOS-CON-NUMERO.md, apartado 4): lo nuevo va a
+     «_Previas». Las «Versiones previas» que ya existen se siguen
+     reconociendo y leyendo (no se renombran solas); si un asunto ya
+     tiene una, lo nuevo va a esa misma, para no tener dos. */
+  var CARPETA_NUEVA = '_Previas';
+  var CARPETA_ANTIGUA = 'Versiones previas';
+  var CARPETA = CARPETA_ANTIGUA;   /* el nombre de siempre, para quien lo use */
+  function esCarpetaDePrevias(nombre) { return nombre === CARPETA_NUEVA || nombre === CARPETA_ANTIGUA; }
   var RE_SIN_SELLAR = / SIN SELLAR(\s*\(\d+\))?$/i;
   var RE_REGISTRO = /\b\d{2}[ES][MA]\d{4}\b/;
 
@@ -38,17 +45,38 @@ var VersionesPrevias = (function () {
     return sinExtension(n).replace(RE_SIN_SELLAR, '').replace(RE_REGISTRO, '').replace(/\s+/g, ' ').trim().toLowerCase();
   }
 
+  async function existente(dirAsunto, nombre) {
+    try { return await dirAsunto.getDirectoryHandle(nombre); } catch (e) { return null; }
+  }
+
+  /* La subcarpeta de previas del asunto: la que ya exista (`_Previas`
+     antes que «Versiones previas»); sin ninguna, y con `crear`, `_Previas`. */
   async function carpeta(dirAsunto, crear) {
     if (!dirAsunto) return null;
-    try { return await dirAsunto.getDirectoryHandle(CARPETA, crear ? { create: true } : undefined); }
+    var h = (await existente(dirAsunto, CARPETA_NUEVA)) || (await existente(dirAsunto, CARPETA_ANTIGUA));
+    if (h || !crear) return h;
+    try { return await dirAsunto.getDirectoryHandle(CARPETA_NUEVA, { create: true }); }
     catch (e) { return null; }
   }
 
-  /* Los ficheros de «Versiones previas» ([{ nombre, handle }]); sin la carpeta, []. */
+  /* Cómo se llama la subcarpeta que se usaría ahora en este asunto. */
+  async function nombreDeCarpeta(dirAsunto) {
+    if (await existente(dirAsunto, CARPETA_NUEVA)) return CARPETA_NUEVA;
+    if (await existente(dirAsunto, CARPETA_ANTIGUA)) return CARPETA_ANTIGUA;
+    return CARPETA_NUEVA;
+  }
+
+  /* Los ficheros de las subcarpetas de previas ([{ nombre, handle }]), de las dos
+     si hay las dos; sin ninguna, []. */
   async function listar(dirAsunto) {
-    var sub = await carpeta(dirAsunto, false);
-    if (!sub) return [];
-    try { return await Carpetas.ficheros(sub); } catch (e) { return []; }
+    var salida = [];
+    var nombres = [CARPETA_NUEVA, CARPETA_ANTIGUA];
+    for (var i = 0; i < nombres.length; i++) {
+      var sub = dirAsunto ? await existente(dirAsunto, nombres[i]) : null;
+      if (!sub) continue;
+      try { salida = salida.concat(await Carpetas.ficheros(sub)); } catch (e) { /* esa, no */ }
+    }
+    return salida;
   }
 
   async function nombreLibre(dir, nombre) {
@@ -65,8 +93,13 @@ var VersionesPrevias = (function () {
 
   /* Lo devuelve a la carpeta del asunto. */
   async function sacar(dirAsunto, nombre) {
-    var sub = await carpeta(dirAsunto, false);
-    if (!sub) throw new Error('No está en «Versiones previas».');
+    var sub = null;
+    var candidatas = [CARPETA_NUEVA, CARPETA_ANTIGUA];
+    for (var i = 0; i < candidatas.length && !sub; i++) {
+      var h = await existente(dirAsunto, candidatas[i]);
+      if (h && await Carpetas.existeFichero(h, nombre)) sub = h;
+    }
+    if (!sub) throw new Error('No está en la subcarpeta de versiones previas.');
     var destino = await nombreLibre(dirAsunto, nombre);
     await Carpetas.moverFichero(sub, nombre, dirAsunto, destino);
     return destino;
@@ -104,7 +137,12 @@ var VersionesPrevias = (function () {
 
   /* Abrir uno de «Versiones previas» en el visor de siempre. */
   async function abrir(a, nombre) {
-    var sub = await carpeta(a && a.handle, false);
+    var sub = null;
+    var candidatas = [CARPETA_NUEVA, CARPETA_ANTIGUA];
+    for (var i = 0; i < candidatas.length && !sub; i++) {
+      var d = a && a.handle ? await existente(a.handle, candidatas[i]) : null;
+      if (d && await Carpetas.existeFichero(d, nombre)) sub = d;
+    }
     try {
       var h = await sub.getFileHandle(nombre);
       if (window.Visor) Visor.abrir(h, nombre, { asunto: a, carpeta: a.handle });
@@ -129,12 +167,12 @@ var VersionesPrevias = (function () {
         var terceros = await Carpetas.subcarpetas(categorias[i].handle);
         for (var j = 0; j < terceros.length; j++) {
           (await Carpetas.subcarpetas(terceros[j].handle)).forEach(function (s) {
-            if (s.nombre !== CARPETA) salida.push(s);
+            if (!esCarpetaDePrevias(s.nombre)) salida.push(s);
           });
         }
       }
     }
-    return salida.filter(function (s) { return s.nombre !== CARPETA; });
+    return salida.filter(function (s) { return !esCarpetaDePrevias(s.nombre); });
   }
 
   async function ordenarTodo(boton) {
@@ -191,7 +229,8 @@ var VersionesPrevias = (function () {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enganchar);
   else enganchar();
 
-  return { CARPETA: CARPETA, listar: listar, bloque: bloque, mover: mover, sacar: sacar, queMover: queMover,
+  return { CARPETA: CARPETA, CARPETA_NUEVA: CARPETA_NUEVA, CARPETA_ANTIGUA: CARPETA_ANTIGUA, nombreDeCarpeta: nombreDeCarpeta,
+           esCarpetaDePrevias: esCarpetaDePrevias, listar: listar, bloque: bloque, mover: mover, sacar: sacar, queMover: queMover,
            ordenarAsunto: ordenarAsunto, ordenarTrasCambio: ordenarTrasCambio, abrir: abrir,
            ordenarTodo: ordenarTodo, claveGemelo: claveGemelo, esSinSellar: esSinSellar };
 })();

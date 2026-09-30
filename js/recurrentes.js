@@ -162,7 +162,7 @@
   /* El nombre se monta igual que los demás: la fecha del día en que se
      crea, el tipo, el año académico si el recurrente lo lleva, el texto
      libre y el tercero al final. */
-  function nombreDe(r, fecha) {
+  function nombreDe(r, fecha, numero) {
     /* El nombre corto del tipo (20-sep-2026, fila 79, apartado 4.9):
        `r.tipo` se queda con el nombre de siempre (es el que guarda el
        propio recurrente y el que se usa luego para crear el asunto,
@@ -175,13 +175,17 @@
       curso: r.curso || U.cursoDeFecha(fecha),
       grupo: '',
       descripcion: r.descripcion || '',
-      tercero: r.tercero
+      tercero: r.tercero,
+      numero: numero || '',   /* fila 239: estructura fija con el número del asunto */
+      categoria: r.categoria
     });
   }
 
   async function crearUno(r) {
     var hoy = U.hoyIso();
-    var nombre = nombreDe(r, hoy);
+    /* Fila 239: cada asunto nuevo lleva su número; se gasta al crearlo. */
+    var numero = (await Numeros.reservar('asuntos', '')).numero;
+    var nombre = nombreDe(r, hoy, numero);
     if (!nombre) throw new Error('el nombre sale vacío');
 
     var abiertos = window.Gestor.carpetaAbiertos();
@@ -194,6 +198,7 @@
       estado: 'abierto', tipo: r.tipo, categoria: r.categoria,
       tercero: r.tercero, curso: r.curso || U.cursoDeFecha(hoy),
       grupo: '', descripcion: r.descripcion || '',
+      numero: numero,   /* fila 239 */
       via: '', viaDato: '',
       recurrente: r.id,
       abiertoEl: U.ahora(), abiertoPor: window.Gestor.usuario()

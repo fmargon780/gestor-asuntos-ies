@@ -122,9 +122,12 @@ var RegistroSellado = (function () {
      nombre del documento original, el código sale del sello, y el
      nombre se monta con Nombres.montarDocumento. Sin efectos: se
      puede probar sola. */
-  function nombreParaSello(nombreOriginal, sello) {
-    var previo = Documentos.leerNombre(nombreOriginal);
+  function nombreParaSello(nombreOriginal, sello, ficha) {
+    var previo = Documentos.leerNombre(nombreOriginal, ficha);
     if (!previo.fecha || !previo.tipo) return '';
+    /* Fila 239: con número de documento, el sellado conserva el nombre
+       del original (el registro va a la ficha). */
+    if (previo.numero) return nombreOriginal;
     var codigo = Nombres.codigoRegistro({
       ano: sello.anio, sentido: sello.tipo, modo: sello.serie, numero: sello.numero
     });
@@ -172,7 +175,55 @@ var RegistroSellado = (function () {
      volver a escanear. Si ese nombre ya existe, se numera "(2)", como
      en el resto de la aplicación. No se crea ningún fichero nuevo de
      verdad: solo se renombran los dos que ya había. */
+  /* Fila 239: el original tiene número de documento. El original y el
+     sellado son el mismo documento (mismo número, mismo nombre): el
+     original pasa a «SIN SELLAR» en la subcarpeta de previas y el
+     sellado ocupa su sitio. El registro se apunta en la ficha. */
+  async function asociarNumerado(asunto, nombrePdf, nombreDocumentoOriginal, sello, previo) {
+    var codigo = Nombres.codigoRegistro({ ano: sello.anio, sentido: sello.tipo, modo: sello.serie, numero: sello.numero });
+    if (!codigo) {
+      U.aviso('No he podido leer el número de registro del sello.', 'malo');
+      return false;
+    }
+    try {
+      var yaEsta = await Carpetas.ficheros(asunto.handle);
+      var nombres = yaEsta.map(function (f) { return f.nombre; }).filter(function (n) { return n !== nombrePdf; });
+      var extSellado = Nombres.extensionDe(nombrePdf);
+      var extOriginal = Nombres.extensionDe(nombreDocumentoOriginal);
+      var base = extOriginal ? nombreDocumentoOriginal.slice(0, -(extOriginal.length + 1)) : nombreDocumentoOriginal;
+      var nombreFinal = base + (extSellado ? '.' + extSellado : '');
+      var nombreConservado = nombreLibreEntre(nombres, nombreSinSellar(nombreDocumentoOriginal));
+      await Carpetas.renombrarFichero(asunto.handle, nombreDocumentoOriginal, nombreConservado);
+      var aPrevias = false;
+      if (window.VersionesPrevias) {
+        try { await VersionesPrevias.mover(asunto.handle, nombreConservado); aPrevias = true; } catch (e3) { aPrevias = false; }
+      }
+      if (nombreFinal !== nombrePdf) await Carpetas.renombrarFichero(asunto.handle, nombrePdf, nombreFinal);
+      if (window.VersionesPrevias) await VersionesPrevias.ordenarTrasCambio(asunto.handle);
+      await DocumentosDatos.anotar(asunto.nombre, previo.numero, {
+        tipo: previo.tipo, fecha: previo.fecha,
+        anadirRegistro: { ano: sello.anio, sentido: sello.tipo, modo: sello.serie, numero: sello.numero, codigo: codigo }
+      });
+      var fechaSello = sello.fecha ? ' el ' + sello.fecha : '';
+      await window.Notas.sustituir(asunto,
+        'Registrado ' + codigo + fechaSello + ' · ' + nombreDocumentoOriginal + '. Se conserva el original sin sellar.',
+        'registroDeDocumento', nombreDocumentoOriginal);
+      var carpetaPrevias = window.VersionesPrevias && VersionesPrevias.nombreDeCarpeta
+        ? await VersionesPrevias.nombreDeCarpeta(asunto.handle) : '_Previas';
+      U.aviso(aPrevias ? 'Documento registrado. El original sin sellar se conserva en «' + carpetaPrevias + '».'
+        : 'Documento registrado. El original sin sellar se conserva en la carpeta.', 'bueno');
+      return true;
+    } catch (e) {
+      U.aviso('No he podido colocarlo: ' + U.mensajeDeError(e), 'malo');
+      return false;
+    }
+  }
+
   async function asociar(asunto, nombrePdf, nombreDocumentoOriginal, sello) {
+    var previoNumerado = Documentos.leerNombre(nombreDocumentoOriginal, asunto && asunto.ficha);
+    if (previoNumerado.numero && previoNumerado.fecha && previoNumerado.tipo) {
+      return asociarNumerado(asunto, nombrePdf, nombreDocumentoOriginal, sello, previoNumerado);
+    }
     var nombreNuevo = nombreParaSello(nombreDocumentoOriginal, sello);
     if (!nombreNuevo) {
       U.aviso('Ese documento no tiene fecha ni tipo reconocibles en su nombre: no sé qué ' +

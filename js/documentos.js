@@ -133,7 +133,7 @@ var Documentos = (function () {
     if (lista.length) {
       html += '<div class="lista-documentos">' + lista.map(function (f, i) {
         var pendiente = Registro.pendiente(N.asuntoActual, f.nombre);
-        var sinRegistro = !Registro.tieneRegistro(f.nombre);
+        var sinRegistro = !Registro.tieneRegistro(f.nombre, N.asuntoActual);
         return '<div class="fila-documento">' +
                  '<span class="nombre-documento">' + U.escapar(f.nombre) + '</span>' +
                  (pendiente ? '<span class="marca-sin-registrar">Sin registrar</span>' : '') +
@@ -225,8 +225,8 @@ var Documentos = (function () {
 
   /* Lee un nombre de documento que ya siga la norma, para rellenar el
      formulario con lo que se pueda aprovechar. */
-  function leerNombre(nombre) {
-    var salida = { fecha: '', registro: null, tipo: '', curso: '' };
+  function leerNombre(nombre, ficha) {
+    var salida = { fecha: '', registro: null, tipo: '', curso: '', numero: '' };
     var sinExtension = String(nombre || '').replace(/\.[A-Za-z0-9]{1,8}$/, '');
     var m = sinExtension.match(/^(\d{2})(\d{2})(\d{2})\s+(.*)$/);
     if (!m) return salida;
@@ -239,16 +239,29 @@ var Documentos = (function () {
       resto = reg[5];
     }
 
-    var tipos = N.ctx.tipos().slice().sort(function (a, b) { return b.length - a.length; });
+    /* Fila 239: los documentos nuevos se llaman `AAMMDD TIPO D26-01234`,
+       con el tipo por su nombre corto si lo tiene. Se reconocen los dos
+       nombres (largo y corto); el tipo que sale es siempre el largo. */
+    var candidatos = N.ctx.tipos().map(function (t) { return { texto: t, tipo: t }; });
+    if (window.TiposDocumentoCortos) {
+      N.ctx.tipos().forEach(function (t) {
+        var c = TiposDocumentoCortos.de(t);
+        if (c && U.normalizar(c) !== U.normalizar(t)) candidatos.push({ texto: c, tipo: t });
+      });
+    }
+    candidatos.sort(function (a, b) { return b.texto.length - a.texto.length; });
     var seSabeElTipo = false;
-    for (var i = 0; i < tipos.length; i++) {
-      if (U.normalizar(resto).indexOf(U.normalizar(tipos[i])) === 0) {
-        salida.tipo = tipos[i];
-        resto = resto.slice(tipos[i].length).trim();
+    for (var i = 0; i < candidatos.length; i++) {
+      if (U.normalizar(resto).indexOf(U.normalizar(candidatos[i].texto)) === 0) {
+        salida.tipo = candidatos[i].tipo;
+        resto = resto.slice(candidatos[i].texto.length).trim();
         seSabeElTipo = true;
         break;
       }
     }
+    /* El número de documento, justo detrás del tipo. */
+    var mn = resto.match(/^(D\d{2}-\d{5})(?:\s+(.*))?$/);
+    if (mn) { salida.numero = mn[1]; resto = mn[2] || ''; }
     /* Lo que quede después del tipo es el texto adicional, sea lo que
        sea: un curso, una referencia de la factura, un expediente. Antes
        aquí solo se admitía algo con forma de año académico, porque el
@@ -258,6 +271,11 @@ var Documentos = (function () {
        es el propio tipo sin identificar, y meterlo aquí sacaría un texto
        cualquiera donde no toca. */
     salida.curso = seSabeElTipo ? resto.trim() : '';
+    /* Con número, lo que dice la ficha manda (registro, campos, texto). */
+    if (salida.numero && window.DocumentosDatos) {
+      var f = ficha || (N.asuntoActual && N.asuntoActual.ficha) || null;
+      DocumentosDatos.enriquecer(salida, f);
+    }
     return salida;
   }
 

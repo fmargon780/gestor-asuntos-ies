@@ -190,6 +190,18 @@ var Nombres = (function () {
      tipo, por el final. Nunca la fecha, el tipo, el año académico, el
      grupo ni el tercero con su número. */
   function montarAsunto(datos) {
+    /* Fila 239 (docs/NOMBRES-FIJOS-CON-NUMERO.md): con número de asunto,
+       la estructura es fija, `AAMMDD A26-0137 TIPO Tercero`, y NUNCA se
+       recorta: año académico, grupo, campos y texto libre no entran en
+       el nombre (siguen en la ficha). Sin número (asuntos de antes), la
+       estructura de siempre. */
+    if (datos.numero) {
+      var fijo = unir([U.aAaMmDd(datos.fecha), datos.numero, U.limpiarNombre(datos.tipo).toUpperCase(),
+        U.limpiarNombre(datos.tercero)]);
+      var cabe = typeof window !== 'undefined' && window.Nombres && typeof window.Nombres.cabeEnRuta === 'function'
+        ? window.Nombres.cabeEnRuta(fijo, datos.tercero, datos.categoria) : { cabe: true };
+      return { nombre: fijo, recortado: false, noCabe: !cabe.cabe, margen: cabe.margen };
+    }
     var antes = [U.aAaMmDd(datos.fecha), U.limpiarNombre(datos.tipo).toUpperCase()];
     if (datos.curso) antes.push(U.limpiarNombre(datos.curso));
     if (datos.grupo) antes.push(U.limpiarNombre(datos.grupo));
@@ -287,7 +299,10 @@ var Nombres = (function () {
   function leer(nombre, tipos) {
     var m = String(nombre).match(/^(\d{6})\s+(.*)$/);
     if (!m) return { fecha: '', tipo: '', resto: nombre, reconocido: false };
-    var fecha = m[1], resto = m[2];
+    var fecha = m[1], resto = m[2], numero = '';
+    /* Fila 239: los asuntos nuevos llevan su número justo después de la fecha. */
+    var mn = resto.match(/^(A\d{2}-\d{4})\s+(.*)$/);
+    if (mn) { numero = mn[1]; resto = mn[2]; }
 
     var candidatos = [];
     (tipos || []).forEach(function (t) {
@@ -309,7 +324,7 @@ var Nombres = (function () {
     for (var i = 0; i < candidatos.length; i++) {
       var t = candidatos[i].texto;
       if (U.normalizar(resto).indexOf(U.normalizar(t) + ' ') === 0) {
-        return { fecha: fecha, tipo: candidatos[i].tipo, categoria: candidatos[i].categoria,
+        return { fecha: fecha, numero: numero, tipo: candidatos[i].tipo, categoria: candidatos[i].categoria,
                  nombreViejo: candidatos[i].porAlias ? t : '',
                  resto: resto.slice(t.length).trim(), reconocido: true };
       }
@@ -317,8 +332,8 @@ var Nombres = (function () {
     /* No está en la lista de tipos: nos quedamos con la primera palabra en
        mayúsculas, que es lo que se ha venido usando siempre. */
     var m2 = resto.match(/^([A-ZÁÉÍÓÚÜÑ0-9._-]{2,})\s+(.*)$/);
-    if (m2) return { fecha: fecha, tipo: m2[1], resto: m2[2], reconocido: false };
-    return { fecha: fecha, tipo: '', resto: resto, reconocido: false };
+    if (m2) return { fecha: fecha, numero: numero, tipo: m2[1], resto: m2[2], reconocido: false };
+    return { fecha: fecha, numero: numero, tipo: '', resto: resto, reconocido: false };
   }
 
   /* Cómo se escribe cada clase de tercero dentro del nombre. */
@@ -469,12 +484,28 @@ var Nombres = (function () {
     return ano + (r.sentido === 'S' ? 'S' : 'E') + (r.modo === 'A' ? 'A' : 'M') + numero;
   }
 
+  /* El nombre corto de un tipo de documento (fila 239): lo que entra en
+     el nombre del fichero. Sin nombre corto, el tipo entero. */
+  function cortoDeTipoDocumento(tipo) {
+    var c = (typeof window !== 'undefined' && window.TiposDocumentoCortos) ? window.TiposDocumentoCortos.de(tipo) : '';
+    return c || String(tipo || '');
+  }
+
   function montarDocumento(datos) { return montarDocumentoAjustado(datos).nombre; }
 
   /* El nombre del documento y si ha habido que recortarlo (fila 130): se
      recorta el texto adicional (`curso`) y, si no basta, los campos del
      tipo por el final. La fecha, el registro y el tipo no se tocan. */
   function montarDocumentoAjustado(datos) {
+    /* Fila 239: con número de documento, `AAMMDD TIPO D26-01234.ext`; el
+       registro, los campos y el texto adicional no entran en el nombre
+       (viven en la ficha del asunto). Sin número, la de siempre. */
+    if (datos.numeroDoc) {
+      var extFija = String(datos.extension || '').replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+      var cortoTipo = cortoDeTipoDocumento(datos.tipo);
+      var nomFijo = unir([U.aAaMmDd(datos.fecha), U.limpiarNombre(cortoTipo).toUpperCase(), datos.numeroDoc]);
+      return { nombre: nomFijo + (extFija ? '.' + extFija : ''), recortado: false, noCabe: false };
+    }
     var antes = [U.aAaMmDd(datos.fecha)];
     if (datos.codigo) antes.push(U.limpiarNombre(datos.codigo));
     antes.push(U.limpiarNombre(datos.tipo).toUpperCase());
@@ -493,7 +524,8 @@ var Nombres = (function () {
   var AVISO_RECORTE = 'Nombre demasiado largo: se ha acortado el texto libre.';
   /* Fila 177 (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md, punto 2): ni recortando
      el texto libre cabe en la ruta de Dropbox. En rojo, y no se crea. */
-  var AVISO_NO_CABE = 'El nombre no cabe en la ruta de Dropbox: acorta el texto.';
+  var AVISO_NO_CABE = 'El nombre no cabe en la ruta de Dropbox: el tercero o el tipo son demasiado largos. ' +
+    'Mira Ajustes → El centro → Largo de las rutas, o ponle al tipo un nombre corto más breve.';
 
   /* Pone (o quita) esa línea justo debajo de `el`, el nombre de la
      vista previa: ámbar si solo se ha recortado, roja si ni así cabe
@@ -537,8 +569,8 @@ var Nombres = (function () {
     TIPOS_DOCUMENTO_POR_DEFECTO: TIPOS_DOCUMENTO_POR_DEFECTO,
     codigoRegistro: codigoRegistro, montarDocumento: montarDocumento,
     montarAsunto: montarAsunto, montarDocumentoAjustado: montarDocumentoAjustado,
-    TOPE_ASUNTO: TOPE_ASUNTO, TOPE_DOCUMENTO: TOPE_DOCUMENTO, AVISO_RECORTE: AVISO_RECORTE, avisoRecorte: avisoRecorte,
-    extensionDe: extensionDe,
+    TOPE_ASUNTO: TOPE_ASUNTO, TOPE_DOCUMENTO: TOPE_DOCUMENTO, AVISO_RECORTE: AVISO_RECORTE, AVISO_NO_CABE: AVISO_NO_CABE, avisoRecorte: avisoRecorte,
+    extensionDe: extensionDe, cortoDeTipoDocumento: cortoDeTipoDocumento,
     terceroAlumno: terceroAlumno, terceroDeResto: terceroDeResto,
     cursoYGrupoDeResto: cursoYGrupoDeResto,
     terceroPersonal: terceroPersonal, terceroEmpresa: terceroEmpresa

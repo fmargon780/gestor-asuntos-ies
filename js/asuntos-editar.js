@@ -43,7 +43,11 @@ App.piezasDelAsunto = function (a) {
     grupo: a.ficha.grupo || '',
     campos: (a.ficha.campos && typeof a.ficha.campos === 'object') ? a.ficha.campos : {},
     descripcion: a.ficha.descripcion || '',
-    tercero: a.ficha.tercero || ''
+    tercero: a.ficha.tercero || '',
+    /* Fila 239: el número de asunto no cambia nunca; sin número (asunto
+       de antes), la estructura de siempre. */
+    numero: a.ficha.numero || a.leido.numero || '',
+    categoria: a.ficha.categoria || ''
   };
   var comprobacion = nombreConTipoCorto(Object.assign({}, deFicha,
     { campos: App.valoresGuardadosParaNombre(deFicha.tipo, deFicha.campos) }));
@@ -64,7 +68,9 @@ App.piezasDelAsunto = function (a) {
     grupo: grupo,
     campos: deFicha.campos,
     descripcion: '',
-    tercero: U.limpiarNombre(resto)
+    tercero: U.limpiarNombre(resto),
+    numero: a.ficha.numero || a.leido.numero || '',   /* fila 239 */
+    categoria: a.ficha.categoria || ''
   };
 };
 
@@ -294,7 +300,9 @@ async function abrirCuadroDeEdicion(a, p, base) {
       grupo: $('ed-grupo').value.trim(),
       campos: camposParaNombre(),
       descripcion: $('ed-descripcion').value.trim(),
-      tercero: elegido ? App.textoTercero(elegido) : p.tercero
+      tercero: elegido ? App.textoTercero(elegido) : p.tercero,
+      numero: p.numero,   /* fila 239: el mismo de siempre */
+      categoria: elegido ? elegido.categoria : p.categoria
     };
   }
 
@@ -393,7 +401,7 @@ async function abrirCuadroDeEdicion(a, p, base) {
   var nombreNuevo = ajustadoFinal.nombre;
   if (!nombreNuevo || nombreNuevo.length < 8) { U.aviso('Ese nombre se queda demasiado corto.', 'malo'); return { ok: false }; }
   /* Fila 177: ni recortando el texto libre cabe en la ruta de Dropbox. */
-  if (ajustadoFinal.noCabe) { U.aviso('El nombre no cabe en la ruta de Dropbox: acorta el texto.', 'malo'); return { ok: false }; }
+  if (ajustadoFinal.noCabe) { U.aviso(Nombres.AVISO_NO_CABE, 'malo'); return { ok: false }; }
 
   var camposGuardados = {};
   itemsCampos.forEach(function (item, i) {

@@ -49,12 +49,13 @@
      con el tipo de documento y el texto adicional que trae la propia
      plantilla (docs/PLANTILLAS-DE-DOCUMENTO.md, 5.3). Aparte para que
      las pruebas puedan comprobarlo sin generar un documento entero. */
-  function nombreDelDocumentoGenerado(plantillaDoc, fechaIso) {
+  function nombreDelDocumentoGenerado(plantillaDoc, fechaIso, numeroDoc) {
     return Nombres.montarDocumento({
       fecha: fechaIso,
       tipo: plantillaDoc.tipoDocumento || 'DOCUMENTO',
       curso: plantillaDoc.texto || '',
-      extension: 'docx'
+      extension: 'docx',
+      numeroDoc: numeroDoc || ''   /* fila 239: con número, estructura fija */
     });
   }
 
@@ -168,7 +169,11 @@
       return;
     }
 
-    var nombreDoc = nombreDelDocumentoGenerado(plantillaDoc, U.hoyIso());
+    /* Fila 239: un documento generado es nuevo: recibe su número de documento. */
+    var numeroDoc = '';
+    try { numeroDoc = (await Numeros.reservar('documentos', '')).numero; }
+    catch (eNum) { U.aviso('No he podido dar número al documento: ' + U.mensajeDeError(eNum), 'malo'); return; }
+    var nombreDoc = nombreDelDocumentoGenerado(plantillaDoc, U.hoyIso(), numeroDoc);
     if (nombreDoc.length > App.LARGO_MAXIMO_NOMBRE) {
       U.aviso('El nombre del documento sale demasiado largo (más de ' +
         App.LARGO_MAXIMO_NOMBRE + ' letras). Acorta el texto adicional de la plantilla.', 'malo');
@@ -189,6 +194,14 @@
       return;
     }
 
+    if (window.DocumentosDatos) {
+      try {
+        await DocumentosDatos.anotar(asunto.nombre, numeroDoc, {
+          tipo: plantillaDoc.tipoDocumento || 'DOCUMENTO', fecha: U.hoyIso(), registros: [],
+          campos: [], texto: plantillaDoc.texto || '', hito: hito && hito.id ? hito.id : ''
+        });
+      } catch (eDatos) { /* accesorio: el documento ya está guardado */ }
+    }
     if (window.Notas) {
       try { await Notas.anadir(asunto, 'Generado ' + nombreDoc); } catch (e) { /* ya está guardado */ }
     }

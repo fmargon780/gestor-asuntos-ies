@@ -401,6 +401,9 @@ App.filaTablaAsunto = function (a, opciones) {
     tdTipo.innerHTML = '<span class="marca-tipo" title="' + U.escapar(a.leido.tipo) + '">' +
       U.escapar(Nombres.tipoParaVer(a.leido.tipo, App.E.tipos)) + '</span>';
   }
+  /* Fila 239: el número del asunto, junto al tipo. */
+  var numeroDeAsunto = (a.ficha && a.ficha.numero) || (a.leido && a.leido.numero) || '';
+  if (numeroDeAsunto) tdTipo.innerHTML += '<span class="marca-numero" title="Número del asunto">' + U.escapar(numeroDeAsunto) + '</span>';
   tr.appendChild(tdTipo);
 
   /* ---------- Hito actual ---------- */

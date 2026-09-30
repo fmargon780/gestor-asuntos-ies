@@ -45,7 +45,8 @@ Las pruebas que generaban un Word y seguían trabajando detrás cierran antes el
 
 ## «Versiones previas» (fila 160, `docs/VERSIONES-PREVIAS.md`, `js/versiones-previas.js`)
 
-Aquí porque `docs/contexto/DOCUMENTOS-PDF.md` pasa de 40 KB. Subcarpeta `Versiones previas` en la
+Aquí porque `docs/contexto/DOCUMENTOS-PDF.md` pasa de 40 KB. Subcarpeta `_Previas` (fila 239; antes
+`Versiones previas`, que se sigue leyendo y, si el asunto ya la tiene, se sigue usando) en la
 carpeta de cada asunto, creada solo cuando hace falta:
 
 - **Qué va**: el «SIN SELLAR» al registrar un documento sellado (`RegistroSellado.asociar`), siempre; y

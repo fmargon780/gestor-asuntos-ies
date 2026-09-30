@@ -200,9 +200,11 @@ await pagina.click('#resultados-tercero .resultado');
 await pagina.fill('#campo-fecha', '2026-09-07');
 await pagina.fill('#campo-curso', '26-27');
 await pagina.fill('#campo-descripcion', 'Cambio de optativa');
+/* Fila 239: `AAMMDD A<año>-0001 TIPO Tercero`; el año académico, el grupo y la descripción ya no entran. */
+const NOMBRE_NUEVO = '260907 A' + String(new Date().getFullYear()).slice(2) + '-0001 MATRICULA Aguilar Ponce, Marina 1140233';
 await comprobar('el nombre se monta sin el grupo',
   pagina.locator('#vista-nombre').textContent(),
-  '260907 MATRICULA 26-27 Cambio de optativa Aguilar Ponce, Marina 1140233');
+  NOMBRE_NUEVO);   /* fila 239: estructura fija, sin curso, grupo ni descripción */
 
 /* --- el interruptor del grupo --- */
 await comprobar('el interruptor del grupo se ofrece',
@@ -210,9 +212,9 @@ await comprobar('el interruptor del grupo se ofrece',
 await comprobar('y dice qué grupo pondría',
   pagina.locator('#grupo-vista').textContent(), '(2ºB)');
 await pagina.check('#campo-grupo');
-await comprobar('al encenderlo el grupo entra en el nombre',
+await comprobar('al encenderlo el grupo, el nombre sigue igual (el grupo va a la ficha)',
   pagina.locator('#vista-nombre').textContent(),
-  '260907 MATRICULA 26-27 2ºB Cambio de optativa Aguilar Ponce, Marina 1140233');
+  NOMBRE_NUEVO);
 
 await pagina.click('#btn-crear');
 /* Fila 119: crear abre la ficha del asunto; se vuelve a la lista. */
@@ -223,7 +225,7 @@ await comprobar('la carpeta existe en el disco', pagina.evaluate(async () => {
   const nombres = [];
   for await (const p of window.__disco.abiertos.entries()) nombres.push(p[0]);
   return nombres.filter(n => n[0] !== '_');
-}), ['260907 MATRICULA 26-27 2ºB Cambio de optativa Aguilar Ponce, Marina 1140233']);
+}), [NOMBRE_NUEVO]);
 await comprobar('el contador del menú marca uno',
   pagina.locator('#cuenta-abiertos').textContent(), '1');
 
@@ -349,7 +351,7 @@ await comprobar('la carpeta ha aterrizado en el archivo', pagina.evaluate(async 
   const n = [];
   for await (const p of ter.entries()) n.push(p[0]);
   return n;
-}), ['260907 MATRICULA 26-27 2ºB Cambio de optativa Aguilar Ponce, Marina 1140233']);
+}), [NOMBRE_NUEVO]);
 
 /* --- archivo y reapertura --- */
 /* La primera vez que se entra en el Archivo en la sesión ya carga
@@ -519,8 +521,10 @@ await comprobar('y es un PDF, así que se enseña en un marco',
 await pagina.fill('#doc-fecha', '2026-09-07');
 await pagina.fill('#doc-curso', '26-27');
 await pagina.waitForTimeout(100);
-await comprobar('sin registro, el nombre sale sin código',
-  pagina.locator('#doc-vista').textContent(), '260907 SOLICITUD 26-27.pdf');
+/* Fila 239: `AAMMDD TIPO D<año>-<cinco cifras>.ext`; el registro, los campos y el texto van a la ficha. */
+const DOC = 'D' + String(new Date().getFullYear()).slice(2) + '-00001';
+await comprobar('sin registro, el nombre lleva fecha, tipo y número de documento',
+  pagina.locator('#doc-vista').textContent(), '260907 SOLICITUD ' + DOC + '.pdf');
 
 await pagina.fill('#doc-fecha', '2026-09-02');
 await pagina.selectOption('#doc-tipo', 'CERTIFICADO');
@@ -530,8 +534,8 @@ await pagina.check('input[name="doc-sentido"][value="S"]');
 await pagina.check('input[name="doc-modo"][value="A"]');
 await pagina.fill('#doc-numero', '87');
 await pagina.waitForTimeout(150);
-await comprobar('el código del registro se monta entero',
-  pagina.locator('#doc-vista').textContent(), '260902 26SA0087 CERTIFICADO 26-27.pdf');
+await comprobar('el registro ya no entra en el nombre: va a la ficha',
+  pagina.locator('#doc-vista').textContent(), '260902 CERTIFICADO ' + DOC + '.pdf');
 
 await pagina.click('#doc-guardar');
 await pagina.waitForSelector('#doc-cuerpo .fila-documento');
@@ -543,7 +547,7 @@ await comprobar('el documento se ha guardado en la carpeta del asunto', pagina.e
   const dentro = [];
   for await (const p of h.entries()) dentro.push(p[0]);
   return dentro;
-}), ['260902 26SA0087 CERTIFICADO 26-27.pdf']);
+}), ['260902 CERTIFICADO ' + DOC + '.pdf']);
 await comprobar('y el original sigue donde estaba',
   pagina.evaluate(() => window.__disco.externo.name), 'descarga sin nombre (3).pdf');
 
@@ -552,13 +556,14 @@ await comprobar('y el original sigue donde estaba',
    abre el formulario. */
 await pagina.getByRole('button', { name: 'Cambiar el nombre' }).click();
 await pagina.waitForSelector('#doc-vista');
-await comprobar('al renombrar se leen los datos del nombre que ya tenía',
-  pagina.locator('#doc-vista').textContent(), '260902 26SA0087 CERTIFICADO 26-27.pdf');
+await comprobar('al renombrar se leen los datos del nombre y de la ficha; el registro sale marcado',
+  pagina.locator('#doc-vista').textContent().then(async (t) => [t, await pagina.locator('#doc-numero').inputValue()]),
+  ['260902 CERTIFICADO ' + DOC + '.pdf', '87']);
 await pagina.uncheck('#doc-hay-registro');
 await pagina.waitForTimeout(150);
 await pagina.click('#doc-guardar');
 await pagina.waitForSelector('#doc-cuerpo .fila-documento');
-await comprobar('quitar el registro cambia el nombre del fichero', pagina.evaluate(async () => {
+await comprobar('quitar el registro no cambia el nombre del fichero (mismo número)', pagina.evaluate(async () => {
   const nombres = [];
   for await (const p of window.__disco.abiertos.entries()) nombres.push(p[0]);
   const carpeta = nombres.find(n => n.indexOf('BECA') !== -1);
@@ -566,7 +571,9 @@ await comprobar('quitar el registro cambia el nombre del fichero', pagina.evalua
   const dentro = [];
   for await (const p of h.entries()) dentro.push(p[0]);
   return dentro;
-}), ['260902 CERTIFICADO 26-27.pdf']);
+}), ['260902 CERTIFICADO ' + DOC + '.pdf']);
+await comprobar('y la ficha ya no guarda el registro',
+  pagina.evaluate((d) => { const n = Object.keys(App.E.registro.asuntos).filter(x => x.indexOf('BECA') !== -1)[0]; return App.E.registro.asuntos[n].documentos[d].registros; }, DOC), []);
 await pagina.click('#cuadro-aceptar');
 
 /* ================= CAMBIAR EL NOMBRE DE UN TIPO ================= */

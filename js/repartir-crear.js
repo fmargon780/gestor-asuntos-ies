@@ -26,21 +26,38 @@ var RepartirCrear = (function () {
   function datosDelOriginal(nombre) {
     var l = (window.Documentos && Documentos.leerNombre) ? Documentos.leerNombre(nombre) : { fecha: '', registro: null };
     var r = l.registro;
-    return { fecha: l.fecha || U.hoyIso(), codigo: r ? r.ano + r.sentido + r.modo + r.numero : '' };
+    return { fecha: l.fecha || U.hoyIso(), codigo: r ? r.ano + r.sentido + r.modo + r.numero : '',
+             registro: r || null, numeroDoc: l.numero || '' };
   }
 
   function tipoPorNombre(nombre) {
     return (App.E.tipos || []).filter(function (t) { return t.tipo === nombre; })[0] || null;
   }
 
-  function nombreDelAsunto(tipo, tercero, fecha) {
+  function nombreDelAsunto(tipo, tercero, fecha, numero, categoria) {
     var t = tipoPorNombre(tipo);
     return Nombres.montarAsunto({ fecha: fecha, tipo: t ? Nombres.tipoParaCarpeta(t) : tipo,
-      curso: U.cursoDeFecha(fecha), grupo: '', campos: [], descripcion: '', tercero: tercero }).nombre;
+      curso: U.cursoDeFecha(fecha), grupo: '', campos: [], descripcion: '', tercero: tercero,
+      numero: numero || '', categoria: categoria }).nombre;
   }
 
+  /* Fila 239: todas las copias de un mismo documento (las que se quedan
+     en el asunto de origen y las de los asuntos nuevos) llevan el mismo
+     número de documento: `datos.numeroDoc`, dado una sola vez por reparto. */
   function nombreDelDocumento(tipoDocumento, datos) {
-    return Nombres.montarDocumento({ fecha: datos.fecha, codigo: datos.codigo, tipo: tipoDocumento || 'DOCUMENTO', extension: 'pdf' });
+    return Nombres.montarDocumento({ fecha: datos.fecha, codigo: datos.codigo, tipo: tipoDocumento || 'DOCUMENTO',
+      extension: 'pdf', numeroDoc: datos.numeroDoc || '' });
+  }
+
+  /* Los datos del documento, para la ficha del asunto donde queda (fila 239). */
+  async function apuntarDocumento(asuntoNombre, tipoDocumento, datos) {
+    if (!datos.numeroDoc || !window.DocumentosDatos) return;
+    try {
+      await DocumentosDatos.anotar(asuntoNombre, datos.numeroDoc, {
+        tipo: tipoDocumento || 'DOCUMENTO', fecha: datos.fecha,
+        registros: datos.registro ? [datos.registro] : []
+      });
+    } catch (e) { /* accesorio: el documento ya está guardado */ }
   }
 
   /* Quién tiene ya un asunto de ese tipo, abierto o archivado. { tercero: true } */
@@ -66,18 +83,23 @@ var RepartirCrear = (function () {
   /* Crea, guarda, anota y archiva el asunto de un trozo. Nunca lanza:
      devuelve { ok, asunto, motivo }. */
   async function crearUno(origen, bytes, trozo, persona, op, datos) {
-    var nombre = nombreDelAsunto(op.tipo, trozo.tercero, datos.fecha);
-    var carpeta;
+    var carpeta, nombre = '';
     try {
+      /* Fila 239: cada asunto nuevo, con su número. */
+      var numero = (await Numeros.reservar('asuntos', '')).numero;
+      var categoria = (persona && persona.categoria) || 'ALUMNADO';
+      nombre = nombreDelAsunto(op.tipo, trozo.tercero, datos.fecha, numero, categoria);
       if (await Carpetas.existe(App.E.abiertos, nombre)) return { ok: false, asunto: nombre, motivo: 'ya hay un asunto abierto con ese nombre' };
       carpeta = await Carpetas.crear(App.E.abiertos, nombre);
       await App.anotar(nombre, {
         estado: 'abierto', tipo: op.tipo, categoria: (persona && persona.categoria) || 'ALUMNADO',
         tercero: trozo.tercero, curso: U.cursoDeFecha(datos.fecha), grupo: '', descripcion: '', campos: {},
+        numero: numero,
         abiertoEl: U.ahora(), abiertoPor: App.E.usuario, repartidoDe: origen.nombre
       });
       var doc = await PdfHerramientas.sacarPaginas(bytes, indices(trozo));
       await Carpetas.escribirBytes(carpeta, nombreDelDocumento(op.tipoDocumento, datos), doc, 'application/pdf');
+      await apuntarDocumento(nombre, op.tipoDocumento, datos);
       var a = { nombre: nombre, handle: carpeta, leido: Nombres.leer(nombre, App.E.tipos),
                 ficha: App.E.registro.asuntos[nombre] || {} };
       if (window.Notas) await Notas.anadir(a, 'Viene de ' + origen.nombre + ', ' + RepartirNucleo.textoPaginas(trozo).toLowerCase());
@@ -102,6 +124,7 @@ var RepartirCrear = (function () {
       var nombre = nombreDelDocumento(op.tipoDocumentoOrigen, datos);
       if (await Carpetas.existeFichero(origen.handle, nombre)) nombre = await Carpetas.nombreLibreConSufijo(origen.handle, nombre);
       await Carpetas.escribirBytes(origen.handle, nombre, doc, 'application/pdf');
+      await apuntarDocumento(origen.nombre, op.tipoDocumentoOrigen, datos);
       return { ok: true, documento: nombre };
     } catch (e) {
       return { ok: false, motivo: U.mensajeDeError(e) };
@@ -115,6 +138,8 @@ var RepartirCrear = (function () {
   async function repartir(origen, fichero, trozos, op, progreso) {
     var bytes = new Uint8Array(await (await fichero.handle.getFile()).arrayBuffer());
     var datos = datosDelOriginal(fichero.nombre);
+    /* Fila 239: un solo número de documento para todas las copias. */
+    datos.numeroDoc = datos.numeroDoc || (await Numeros.reservar('documentos', '')).numero;
     var porHacer = trozos.filter(function (t) { return !t.hecho && (t.quedarse || (t.tercero && !(op.noCrear || {})[t.tercero])); });
     var resultados = [], hechos = 0;
     for (var i = 0; i < trozos.length; i++) {

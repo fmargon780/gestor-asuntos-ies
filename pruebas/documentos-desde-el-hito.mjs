@@ -175,7 +175,7 @@ const r5 = await pagina.evaluate(async (A) => {
   const c = await window.__disco.abiertos.getDirectoryHandle(A);
   return { ficheros: Array.from(c._hijos.keys()), docs: h2.documentos, notas: h2.notas.map(n => n.texto) };
 }, A);
-const esperado = await pagina.evaluate(() => PlantillasDocumento.nombreDelDocumentoGenerado(Plantillas.documentoPorId('pd-b'), U.hoyIso()));
+const esperado = await pagina.evaluate(() => PlantillasDocumento.nombreDelDocumentoGenerado(Plantillas.documentoPorId('pd-b'), U.hoyIso(), 'D' + U.hoyIso().slice(2, 4) + '-00001'));
 await comprobar('el documento está en la carpeta', Promise.resolve(r5.ficheros.indexOf(esperado) > -1), true);
 await comprobar('apuntado a ese hito', Promise.resolve(r5.docs), [esperado]);
 await comprobar('con su nota en el hito', Promise.resolve(r5.notas), ['Generado «' + esperado + '»']);

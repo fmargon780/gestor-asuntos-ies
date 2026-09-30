@@ -187,7 +187,7 @@ const r4 = await pagina.evaluate(async (nombre) => {
   const h = (await Hitos.hitosDe(nombre)).filter(x => x.id === 'b2')[0];
   return h ? h.documentos : null;
 }, nuevoNombre);
-const esperado = await pagina.evaluate(() => PlantillasDocumento.nombreDelDocumentoGenerado(Plantillas.documentoPorId('pd-otra'), U.hoyIso()));
+const esperado = await pagina.evaluate(() => PlantillasDocumento.nombreDelDocumentoGenerado(Plantillas.documentoPorId('pd-otra'), U.hoyIso(), 'D' + U.hoyIso().slice(2, 4) + '-00001'));
 await comprobar('4. y la genera, apuntada a este hito', Promise.resolve(r4), [esperado]);
 await comprobar('4. el cuadro de «Generar documento» también la busca, en el mismo cuadro',
   pagina.evaluate(async () => {

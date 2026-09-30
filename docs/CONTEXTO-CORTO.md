@@ -56,12 +56,16 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 4. Las reglas de nombres
 
-- Carpeta de asunto: `AAMMDD TIPO [AÑO ACADÉMICO] [GRUPO] [campos del tipo] [texto libre]
-  Tercero`. El tercero va siempre al final.
+- Carpeta de asunto nueva (fila 239): `AAMMDD A26-0137 TIPO Tercero`, con número único anual de
+  asunto, sin año académico, grupo, campos ni texto libre (van a la ficha) y sin recorte. Los asuntos
+  de antes conservan `AAMMDD TIPO [AÑO ACADÉMICO] [GRUPO] [campos] [texto libre] Tercero`.
 - Tercero: alumnado `Apellido1 Apellido2, Nombre` + Nº de identificación escolar; personal y
   tutores legales igual + 4 últimos caracteres del documento; empresas **razón social** (nunca el
   nombre comercial) + NIF; Administraciones, nombre corto estable (centros, + su código).
-- Documento: `AAMMDD [REGISTRO] TIPO [TEXTO ADICIONAL].ext`, con la fecha del propio documento.
+- Documento nuevo (fila 239): `AAMMDD TIPO D26-01234.ext`, con la fecha del propio documento y número
+  único anual; el registro, los campos y el texto adicional van a la ficha. Los de antes:
+  `AAMMDD [REGISTRO] TIPO [TEXTO ADICIONAL].ext`. Nombre corto de tipo: 25 caracteres como mucho.
+  Detalle en `docs/contexto/NOMBRES-FIJOS.md`.
 - Registro de Séneca: `26EM1234` = año + E/S (entrada/salida) + M/A (serie manual/automática) +
   cuatro dígitos del asiento.
 - **No va en el nombre**: el estado del asunto ni la vía de comunicación (cambian mientras se
@@ -125,8 +129,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   el cuadro sale con el tipo de documento y el texto adicional (huecos ya rellenos) que tenga ESE
   hito si los tiene, si no los del tipo de documento elegido («Texto por defecto», Ajustes); sin
   hito o sin ninguno de los dos, como antes.
-- Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. El tope de carpeta y de
-  documento cuenta la ruta completa dentro de Dropbox (`Nombres.topes()`), no solo el nombre.
+- Aspirante sin Nº escolar: al escribirlo, se renombran sus carpetas. El largo de la ruta
+  completa dentro de Dropbox se comprueba con `Nombres.cabeEnRuta` y se enseña en Ajustes → El centro (fila 239).
 - Botón «Ruta» (copia la ruta normal, con `\` o `/` según la base, nunca `file:///`; ficha, Correo/Séneca): deduce Dropbox; lo de dentro, una vez para el centro. Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto (foto, cabecera fija) en tarjetas (una se abre en grande; se vuelve
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.

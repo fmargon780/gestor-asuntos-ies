@@ -125,7 +125,15 @@ await comprobar('el documento ha quedado en la carpeta del asunto, ya con el reg
     const ficheros = [];
     for await (const [k] of c.entries()) ficheros.push(k);
     return ficheros;
-  }), ['260910 26EM0368 SOLICITUD.pdf']);
+  }).then(f => f.length === 1 && /^260910 SOLICITUD D\d{2}-\d{5}\.pdf$/.test(f[0])), true);
+/* Fila 239: el registro leído ya no entra en el nombre: va a la ficha del asunto. */
+await comprobar('y el registro leído queda en la ficha, con el número del documento',
+  pagina.evaluate(() => {
+    const nombre = Object.keys(App.E.registro.asuntos).filter((n) => n.indexOf('Con Dni, Ana') !== -1)[0];
+    const docs = App.E.registro.asuntos[nombre].documentos || {};
+    const d = docs[Object.keys(docs)[0]];
+    return d ? d.registros.map((r) => r.codigo) : null;
+  }), ['26EM0368']);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

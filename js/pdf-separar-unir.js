@@ -468,6 +468,12 @@ var PdfSepararUnir = (function () {
       '<div class="vista-previa"><div class="vista-rotulo">Se guardará así</div>' +
         '<div id="pdf-nombre-vista" class="vista-nombre"></div></div>';
 
+    /* Fila 239: el resultado es un documento nuevo, con su número. Se
+       calcula antes de abrir el cuadro para que la vista previa enseñe el
+       nombre exacto, y se gasta al guardar. */
+    var numeroDoc = '';
+    try { numeroDoc = await Numeros.proximo('documentos'); } catch (eNum) { numeroDoc = ''; }
+
     $('cuadro-cancelar').textContent = 'Cancelar';
     var promesa = U.preguntar(titulo, cuerpo, 'Guardar y seguir');
 
@@ -476,7 +482,8 @@ var PdfSepararUnir = (function () {
         fecha: $('pdf-nombre-fecha').value,
         tipo: $('pdf-nombre-tipo').value,
         curso: $('pdf-nombre-curso').value.trim(),
-        extension: 'pdf'
+        extension: 'pdf',
+        numeroDoc: numeroDoc
       });
     }
     function refrescar() { $('pdf-nombre-vista').textContent = nombrePropuesto() || '(falta la fecha o el tipo)'; }
@@ -490,7 +497,18 @@ var PdfSepararUnir = (function () {
     if (!ok) return null;
 
     var nombreNuevo = nombrePropuesto();
+    var valFecha = $('pdf-nombre-fecha').value, valTipo = $('pdf-nombre-tipo').value, valTexto = $('pdf-nombre-curso').value.trim();
     if (!nombreNuevo) { U.aviso('Falta la fecha o el tipo.', 'malo'); return null; }
+    if (numeroDoc) {
+      try {
+        var reserva = await Numeros.reservar('documentos', numeroDoc);
+        if (reserva.cambio) {
+          numeroDoc = reserva.numero;
+          nombreNuevo = nombrePropuesto();
+          U.aviso('Otro ordenador acaba de usar ese número: el documento se guarda como ' + nombreNuevo + '.', 'ambar');
+        }
+      } catch (eRes) { U.fallo('No he podido reservar el número del documento', eRes); return null; }
+    }
 
     var yaEsta = (await Carpetas.ficheros(asunto.handle)).map(function (f) { return f.nombre; });
     if (PdfHerramientas.hayColision(yaEsta, nombreNuevo)) {
@@ -499,6 +517,13 @@ var PdfSepararUnir = (function () {
     }
 
     await Carpetas.escribirBytes(asunto.handle, nombreNuevo, bytes, 'application/pdf');
+    if (numeroDoc && window.DocumentosDatos) {
+      try {
+        await DocumentosDatos.anotar(asunto.nombre, numeroDoc, {
+          tipo: valTipo, fecha: valFecha, registros: [], campos: [], texto: valTexto
+        });
+      } catch (eDatos) { /* accesorio */ }
+    }
     return nombreNuevo;
   }
 

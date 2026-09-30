@@ -130,7 +130,8 @@ async function hitosDeSiguenAhi(clave) {
 
 console.log('--- 1. el historial no se puede guardar (ni con el reintento) ---');
 await crearAsunto('uno', '2026-09-07');
-const CLAVE1 = '260907 MATRICULA 26-27 Ejemplo Prueba, Alumno Uno 9000001';
+const AA = String(new Date().getFullYear()).slice(2);   /* fila 239: los asuntos nuevos llevan su número */
+const CLAVE1 = '260907 A' + AA + '-0001 MATRICULA Ejemplo Prueba, Alumno Uno 9000001';
 
 await comprobar('el asunto nace con su hito', hitosDeSiguenAhi(CLAVE1), true);
 
@@ -164,7 +165,7 @@ await pagina.evaluate(() => document.querySelectorAll('#mensajes .mensaje').forE
 
 console.log('--- 2. un solo fallo: el reintento lo arregla ---');
 await crearAsunto('dos', '2026-09-08');
-const CLAVE2 = '260908 MATRICULA 26-27 Ejemplo Prueba, Alumno Dos 9000002';
+const CLAVE2 = '260908 A' + AA + '-0002 MATRICULA Ejemplo Prueba, Alumno Dos 9000002';
 
 /* El intento normal falla una vez; el reintento de hitos-archivo.js
    (la fila 178) ya no encuentra ningún fallo pendiente y sale bien. */

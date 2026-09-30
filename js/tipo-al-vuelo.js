@@ -46,7 +46,8 @@
       '<div class="aviso-en-vivo" id="tipo-al-vuelo-aviso"></div>' +
       '<label class="etiqueta" for="tipo-al-vuelo-corto">Nombre corto ' +
         '<span class="suave">(opcional)</span></label>' +
-      '<input class="campo" id="tipo-al-vuelo-corto" placeholder="Igual que el nombre de arriba">' +
+      '<input class="campo" id="tipo-al-vuelo-corto" maxlength="25" placeholder="Igual que el nombre de arriba">' +
+      '<div class="nota" id="tipo-al-vuelo-corto-cuenta">0 de 25 caracteres</div>' +
       '<label class="etiqueta" for="tipo-al-vuelo-categoria">Categoría</label>' +
       '<select class="campo" id="tipo-al-vuelo-categoria">' +
         Nombres.CATEGORIAS.map(function (c) { return '<option value="' + c + '">' + c + '</option>'; }).join('') +
@@ -67,6 +68,9 @@
        repintar()): buscar dentro de él, no con $() (document.getElementById,
        que solo encuentra lo que ya cuelga del documento). */
     panel.querySelector('#tipo-al-vuelo-nombre').oninput = pintarAviso;
+    panel.querySelector('#tipo-al-vuelo-corto').oninput = function () {
+      $('tipo-al-vuelo-corto-cuenta').textContent = U.limpiarNombre($('tipo-al-vuelo-corto').value).length + ' de 25 caracteres';
+    };
     panel.querySelector('#tipo-al-vuelo-cancelar').onclick = function () { cerrar(); };
     panel.querySelector('#tipo-al-vuelo-crear').onclick = function () { crear(); };
   }
@@ -138,6 +142,12 @@
     var categoria = $('tipo-al-vuelo-categoria').value;
     var nombreCorto = U.limpiarNombre($('tipo-al-vuelo-corto').value).toUpperCase();
     var hay = App.E.tipos.map(function (t) { return t.tipo; });
+    /* Fila 239: lo que entra en el nombre de las carpetas no pasa de 25. */
+    if ((nombreCorto || nombre).length > 25) {
+      U.aviso('El nombre que entra en las carpetas no puede pasar de 25 caracteres: pon un nombre corto más breve.', 'malo');
+      $('tipo-al-vuelo-corto').focus();
+      return;
+    }
 
     await U.mientrasGuarda($('tipo-al-vuelo-crear'), async function () {
       if (!await U.dejaCrear(nombre, hay, 'tipo')) return;

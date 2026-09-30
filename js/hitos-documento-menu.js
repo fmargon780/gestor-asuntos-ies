@@ -109,7 +109,7 @@ window.HitosDocumentoMenu = (function () {
   function opcionesDelMenu(a, hito, nombre, falta) {
     var opciones = [];
     if (!falta) {
-      if (window.Registro && !Registro.tieneRegistro(nombre)) {
+      if (window.Registro && !Registro.tieneRegistro(nombre, a)) {
         opciones.push({ texto: 'Registrar', alPulsar: function () { accionRegistrar(a, hito, nombre); } });
       }
       if (window.PdfSepararUnir && window.PdfHerramientas && PdfHerramientas.esPdf(nombre, '')) {

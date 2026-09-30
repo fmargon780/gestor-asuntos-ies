@@ -65,6 +65,8 @@ async function pulsarDelMenu(locatorFila, texto) {
   await locatorFila.locator('.fila-menu').getByRole('button', { name: texto, exact: true }).click();
 }
 
+/* Fila 239: los documentos nuevos se llaman `AAMMDD TIPO D<año>-<cinco cifras>.pdf`; el texto adicional
+   que se escribe en el cuadro va a la ficha, así que los trozos se reconocen por su número (el 1 al 4, por orden). */
 /* Un PDF de `n` páginas, montado en el propio navegador con la
    pdf-lib ya vendida en el repositorio. Devuelve un array normal de
    números (se serializa bien entre Node y la página). */
@@ -181,14 +183,14 @@ await pagina.waitForTimeout(400);
 const NOMBRES_TRAS_SEPARAR = await nombresDe(NOMBRE_ASUNTO);
 comprobar('el original ya no está, y hay tres trozos nuevos',
   Promise.resolve(NOMBRES_TRAS_SEPARAR.indexOf(ESCANEO) === -1 &&
-    NOMBRES_TRAS_SEPARAR.some(n => n.indexOf('Escaneo trozo 1') !== -1) &&
-    NOMBRES_TRAS_SEPARAR.some(n => n.indexOf('Escaneo trozo 2') !== -1) &&
-    NOMBRES_TRAS_SEPARAR.some(n => n.indexOf('Escaneo trozo 3') !== -1)),
+    NOMBRES_TRAS_SEPARAR.some(n => n.indexOf('-00001.') !== -1) &&
+    NOMBRES_TRAS_SEPARAR.some(n => n.indexOf('-00002.') !== -1) &&
+    NOMBRES_TRAS_SEPARAR.some(n => n.indexOf('-00003.') !== -1)),
   true);
 
-const TROZO_1 = NOMBRES_TRAS_SEPARAR.find(n => n.indexOf('Escaneo trozo 1') !== -1);
-const TROZO_2 = NOMBRES_TRAS_SEPARAR.find(n => n.indexOf('Escaneo trozo 2') !== -1);
-const TROZO_3 = NOMBRES_TRAS_SEPARAR.find(n => n.indexOf('Escaneo trozo 3') !== -1);
+const TROZO_1 = NOMBRES_TRAS_SEPARAR.find(n => n.indexOf('-00001.') !== -1);
+const TROZO_2 = NOMBRES_TRAS_SEPARAR.find(n => n.indexOf('-00002.') !== -1);
+const TROZO_3 = NOMBRES_TRAS_SEPARAR.find(n => n.indexOf('-00003.') !== -1);
 await comprobar('el trozo 1 tiene 2 páginas', paginasDe(NOMBRE_ASUNTO, TROZO_1), 2);
 await comprobar('el trozo 2 tiene 3 páginas', paginasDe(NOMBRE_ASUNTO, TROZO_2), 3);
 await comprobar('el trozo 3 tiene 1 página', paginasDe(NOMBRE_ASUNTO, TROZO_3), 1);
@@ -220,7 +222,7 @@ await pagina.waitForTimeout(400);
 const NOMBRES_TRAS_SACAR = await nombresDe(NOMBRE_ASUNTO);
 await comprobar('el original de "sacar páginas" sigue en la carpeta', Promise.resolve(
   NOMBRES_TRAS_SACAR.indexOf(TROZO_2) !== -1), true);
-const SACADO = NOMBRES_TRAS_SACAR.find(n => n.indexOf('Pagina suelta') !== -1);
+const SACADO = NOMBRES_TRAS_SACAR.find(n => n.indexOf('-00004.') !== -1);
 await comprobar('la copia sacada tiene 1 página', paginasDe(NOMBRE_ASUNTO, SACADO), 1);
 
 console.log('--- Unir, en Por clasificar ---');

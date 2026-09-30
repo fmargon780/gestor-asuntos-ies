@@ -223,7 +223,11 @@ var FormulariosRellenar = (function () {
     try { resultado = await rellenarPdf(bytesPdf, mapa, valores); }
     catch (e) { U.aviso('No he podido rellenarlo: ' + U.mensajeDeError(e), 'malo'); return; }
 
-    var nombreDoc = Nombres.montarDocumento({ fecha: U.hoyIso(), tipo: 'IMPRESO', curso: f.n, extension: 'pdf' });
+    /* Fila 239: un impreso preparado es un documento nuevo, con su número. */
+    var numeroDoc = '';
+    try { numeroDoc = (await Numeros.reservar('documentos', '')).numero; }
+    catch (eNum) { U.aviso('No he podido dar número al documento: ' + U.mensajeDeError(eNum), 'malo'); return; }
+    var nombreDoc = Nombres.montarDocumento({ fecha: U.hoyIso(), tipo: 'IMPRESO', curso: f.n, extension: 'pdf', numeroDoc: numeroDoc });
     if (nombreDoc.length > App.LARGO_MAXIMO_NOMBRE) {
       U.aviso('El nombre del impreso sale demasiado largo (más de ' + App.LARGO_MAXIMO_NOMBRE + ' letras).', 'malo');
       return;
@@ -243,6 +247,11 @@ var FormulariosRellenar = (function () {
       return;
     }
 
+    if (window.DocumentosDatos) {
+      try {
+        await DocumentosDatos.anotar(asunto.nombre, numeroDoc, { tipo: 'IMPRESO', fecha: U.hoyIso(), registros: [], campos: [], texto: f.n || '' });
+      } catch (eDatos) { /* accesorio */ }
+    }
     if (window.Notas) {
       try { await Notas.anadir(asunto, 'Preparado el impreso ' + nombreDoc); } catch (e) { /* ya está guardado */ }
     }

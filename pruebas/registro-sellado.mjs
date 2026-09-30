@@ -131,10 +131,10 @@ await comprobar('el PDF sellado se ha renombrado, y el original se conserva como
     const nombres = [];
     for await (const p of carpeta.entries()) nombres.push(p[0]);
     const previas = [];
-    for await (const p of (await carpeta.getDirectoryHandle('Versiones previas')).entries()) previas.push(p[0]);
+    for await (const p of (await carpeta.getDirectoryHandle('_Previas')).entries()) previas.push(p[0]);
     return [nombres.sort(), previas];
   }, NOMBRE_ASUNTO),
-  [['260911 26EM0368 SOLICITUD Prueba del sello.pdf', 'Versiones previas'], [SIN_SELLAR]]);
+  [['260911 26EM0368 SOLICITUD Prueba del sello.pdf', '_Previas'], [SIN_SELLAR]]);
 
 await comprobar('el aviso ha desaparecido', pagina.locator('.aviso-sello').count(), 0);
 

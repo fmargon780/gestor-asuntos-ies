@@ -54,8 +54,27 @@
       tipo: tipo,
       campos: window.DocCampos ? DocCampos.enOrden(N.camposDelTipo(tipo), N.valoresDeCampos()) : [],
       curso: $('doc-curso').value.trim(),
-      extension: Nombres.extensionDe(opciones.nombreActual)
+      extension: Nombres.extensionDe(opciones.nombreActual),
+      numeroDoc: opciones.numeroDoc || ''   /* fila 239: con número, estructura fija */
     };
+  }
+
+  /* Fila 239: los datos que ya no entran en el nombre, a la ficha del asunto. */
+  function datosParaLaFicha(opciones) {
+    var d = datosDelFormulario(opciones);
+    var tipo = d.tipo;
+    var registro = null;
+    if ($('doc-hay-registro').checked) {
+      registro = { ano: $('doc-ano').value.trim(), sentido: elegido('doc-sentido'), modo: elegido('doc-modo'), numero: $('doc-numero').value.trim() };
+      registro.codigo = Nombres.codigoRegistro(registro);
+    }
+    var datos = {
+      tipo: tipo, fecha: d.fecha,
+      registros: registro && registro.codigo ? [registro] : [],
+      campos: d.campos, valores: N.valoresDeCampos(), texto: d.curso
+    };
+    if (N.hitoActual && N.hitoActual.id) datos.hito = N.hitoActual.id;
+    return datos;
   }
 
   function refrescar() {
@@ -96,7 +115,23 @@
     var nombre = ajustadoFinal.nombre;
     if (!nombre) return;
     /* Fila 177: por si acaso, se comprueba también aquí antes de guardar. */
-    if (ajustadoFinal.noCabe) { U.aviso('El nombre no cabe en la ruta de Dropbox: acorta el texto.', 'malo'); return; }
+    if (ajustadoFinal.noCabe) { U.aviso(Nombres.AVISO_NO_CABE, 'malo'); return; }
+    /* Fila 239: el número de documento se gasta ahora, releyendo el disco.
+       Si otro ordenador se ha quedado el que enseñaba la vista previa, el
+       nombre cambia: se enseña y hay que volver a pulsar «Guardar». */
+    if (opciones.numeroNuevo) {
+      try {
+        var reserva = await Numeros.reservar('documentos', opciones.numeroDoc);
+        opciones.numeroDoc = reserva.numero;
+        opciones.numeroNuevo = false;
+        if (reserva.cambio) {
+          refrescar();
+          U.aviso('Otro ordenador acaba de usar ese número: el documento pasa a llamarse ' +
+            Nombres.montarDocumentoAjustado(datosDelFormulario(opciones)).nombre + '. Revísalo y pulsa «Guardar» otra vez.', 'ambar');
+          return;
+        }
+      } catch (eRes) { U.fallo('No he podido reservar el número del documento', eRes); return; }
+    }
     try {
       var yaEsta = await Carpetas.ficheros(N.asuntoActual.handle);
       var repetido = yaEsta.some(function (f) {
@@ -109,6 +144,10 @@
       if (opciones.modo === 'anadir') {
         await Carpetas.copiarFicheroEn(N.asuntoActual.handle, opciones.handle, nombre);
         U.aviso('Documento guardado en la carpeta.', 'bueno');
+      } else if (nombre === opciones.nombreActual) {
+        /* Fila 239: con la estructura fija, cambiar el registro, los campos o
+           el texto no cambia el nombre: solo se pone al día la ficha. */
+        U.aviso('Datos del documento guardados.', 'bueno');
       } else {
         await Carpetas.renombrarFichero(N.asuntoActual.handle, opciones.nombreActual, nombre);
         U.aviso('Documento renombrado.', 'bueno');
@@ -119,6 +158,14 @@
     }
     /* El documento ya está en la carpeta con su nombre: lo de después
        es accesorio, y si falla, ámbar (fila 100). */
+    if (opciones.numeroDoc) {
+      try {
+        await DocumentosDatos.anotar(N.asuntoActual.nombre, opciones.numeroDoc, datosParaLaFicha(opciones));
+        Numeros.recordarOrigen(opciones.claveOrigen, opciones.numeroDoc);
+      } catch (eDatos) {
+        U.accesorio('Documento guardado, pero no he podido apuntar su registro y sus datos en la ficha', eDatos);
+      }
+    }
     try {
       await actualizarPendiente(opciones, nombre);
     } catch (e2) {
