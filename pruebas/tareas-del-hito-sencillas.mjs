@@ -3,7 +3,7 @@
    frases de sobra, la caja «Nueva tarea…» y el «⋮» de cada tarea.
 
    1. Un hito sin tareas no enseña ninguna frase, solo la caja.
-   2. «Cambiar aquí» de una tarea de la guía: cambia solo en este
+   2. «Cambiar» (fila 235: Intro abre «¿Dónde se guarda?») de una tarea de la guía, «Solo en este asunto»: cambia solo en este
       asunto, con «solo aquí»; la guía y el otro asunto abierto no se
       tocan.
    3. «Anotar»: la nota entra en la libreta con el nombre de la tarea
@@ -114,12 +114,16 @@ await pagina.click('#ficha-volver');
 await pagina.waitForTimeout(300);
 await abrirMesaDe('Sola Uno', 'c1');
 await abrirMenuDeTarea('g1');
-await comprobar('2. la tarea de la guía trae Anotar/Cambiar aquí/Cambiar en la guía/Borrar',
+await comprobar('2. la tarea de la guía trae Anotar/Cambiar/Borrar/Abrir en la guía',
   pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('.ficha-menu:not(.oculto) .ficha-menu-opcion'), (b) => b.textContent)),
-  ['Anotar', 'Cambiar aquí', 'Cambiar en la guía', 'Borrar']);
-await elegirDelMenu('Cambiar aquí');
+  ['Anotar', 'Cambiar', 'Borrar', 'Abrir en la guía']);
+await elegirDelMenu('Cambiar');
 await pagina.fill('.hito-en-mesa .guion-paso[data-id="g1"] .guion-tarea-editar-texto', 'Avisar a la tutoría (por iPasen)');
 await pagina.press('.hito-en-mesa .guion-paso[data-id="g1"] .guion-tarea-editar-texto', 'Enter');
+/* Fila 235: Intro abre «¿Dónde se guarda?»; aquí, «Solo en este asunto». */
+await pagina.waitForSelector('#capa:not(.oculto) input[name="dsg-donde"]');
+await pagina.check('input[name="dsg-donde"][value="aqui"]');
+await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(500);
 await comprobar('2. el texto cambia en este asunto y lleva «solo aquí»',
   pagina.locator('.hito-en-mesa .guion-paso', { hasText: 'Avisar a la tutoría (por iPasen)' }).locator('.guion-tarea-propia').isVisible(), true);
@@ -158,7 +162,8 @@ await comprobar('3. y el texto guardado empieza por el nombre de la tarea',
    (la de la prueba 3), pide confirmación de una línea. */
 await abrirMenuDeTarea('g2');
 await elegirDelMenu('Borrar');
-await pagina.waitForSelector('#capa:not(.oculto)');
+await pagina.waitForSelector('#capa:not(.oculto) input[name="dsg-donde"]');
+await pagina.check('input[name="dsg-donde"][value="aqui"]');
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(500);
 await comprobar('4. desaparece de este asunto',

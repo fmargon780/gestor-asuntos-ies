@@ -297,3 +297,12 @@ details.mesa-normativa > summary { cursor: pointer; }
 .mesa-previas summary, .ficha-previas summary { cursor: pointer; }
 .mesa-previa-fila, .ficha-previa-fila { display: flex; align-items: center; gap: 10px; padding: 3px 0 3px 14px; }
 .mesa-previa-nombre, .ficha-previa-nombre { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+
+/* Fila 235 (docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md): el bloque «¿Dónde se
+   guarda?» de los cuadros de hitos y del emergente de las tareas. */
+.dsg { margin-top: 12px; }
+.dsg-opcion { display: flex; align-items: center; gap: 6px; padding: 4px 0; cursor: pointer; }
+.dsg-opcion.dsg-apagada { color: #8a94a0; cursor: default; }
+.dsg-notas { margin: 0 0 4px 22px; }
+.dsg-nota { display: block; font-size: 12px; color: #5d6b7a; }
+.dsg-tarea { margin: 0 0 8px; font-weight: 600; }

@@ -37,7 +37,10 @@
       var leido = await Carpetas.leerJson(g, FICHERO);
       guias = (leido && typeof leido === 'object') ? leido : {};
     } catch (e) {
-      guias = {};
+      /* Fila 235: si la lectura falla, se queda la última guía buena en
+         memoria (antes se vaciaba, y lo siguiente que se guardara desde
+         un asunto partía de una guía en blanco). */
+      if (!guias || typeof guias !== 'object') guias = {};
       U.aviso('No he podido leer las guías: ' + U.mensajeDeError(e), 'malo');
     }
   }

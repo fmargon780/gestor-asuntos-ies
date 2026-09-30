@@ -171,8 +171,10 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   «Comunicar ▾», «Registrar») y tres tarjetas: las tareas del hito (lista para marcar; «Detalles:» opcional que deja el cuadro relleno; se marca
   solo al generar, registrar, comunicar o añadir), todos los documentos del asunto («Enviar ▾» por correo o Séneca) y notas.
   Los hitos nuevos de una guía llegan a los asuntos abiertos de su tipo. Sin frases al pie (fila 224): una
-  caja «Nueva tarea…» añade solo a este asunto, y cada tarea lleva su «⋮» (Anotar, con 💬; Cambiar aquí/Cambiar en
-  la guía o Cambiar; Pasar a la guía o Borrar, según sea de la guía o «solo aquí»). «Hito N de M», «Hitos N/M» y la mesa, con una sola cuenta.
+  caja «Nueva tarea…», y cada tarea lleva su «⋮» (Anotar, con 💬; Cambiar; Borrar; Abrir en la guía, o Pasar a la guía si es «solo aquí»).
+  Todo cambio de hitos o tareas desde un asunto pregunta antes «¿Dónde se guarda?» (fila 235): «A la guía de <tipo>» (marcada, dice a cuántos
+  abiertos llega) o «Solo en este asunto»; el aviso verde de después lleva «Deshacer». Un hito solo de este asunto se lleva entero a la guía
+  con sus tareas. «Hito N de M», «Hitos N/M» y la mesa, con una sola cuenta.
   Biblioteca de hitos del centro, con sus tareas; en Mantenimiento, cargar tipos, guías y tareas del instituto.
   Cada hito de una guía dice de dónde viene, siempre a la vista: etiqueta «De la biblioteca», «De la biblioteca ·
   cambiado aquí» o «Propio de este tipo» (fila 202); pulsarla enseña el modelo y «Ver en la biblioteca». Al

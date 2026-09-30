@@ -74,7 +74,7 @@ cuentan + desde qué hito, `js/guias-plazo.js`, con id propio, `GuiasPlazo.htmlC
 sin guía, el plazo se guarda igual en el propio hito (`Hitos.guardarCampos` gana el campo `plazo`,
 que `Hitos.aplicarPlazosDependientes` ya sabe recalcular tenga o no origen en la guía).
 
-Una casilla **«También en la guía de <tipo corto>»** (marcada por defecto) decide si el cambio entra
+El bloque **«¿Dónde se guarda?»** (fila 235, ver más abajo; antes, una casilla «También en la guía de <tipo corto>» marcada por defecto) decide si el cambio entra
 en `_GESTOR/guias.json` y llega, en el sitio exacto elegido, a los asuntos abiertos del mismo tipo —
 pero solo a los hitos **vacíos** (`HitosDesdeElAsunto.estaVacio(h, aOClave)`: sin nada que perder —
 distinto de hecho, sin ninguna tarea marcada ni con valor, sin tareas propias, sin notas (las del
@@ -280,15 +280,15 @@ La tabla de documentos, los gemelos, la selección y «Comunicar» funcionan com
     `tarea`/`tareaTexto`) con el nombre de la tarea delante («Revisar DNI o NIE: …»). La tarea
     lleva entonces un 💬 (con el número si hay más de una) que despliega o pliega sus notas
     (`NotasHito.delTarea`).
-  - **Cambiar aquí** (tarea de la guía) / **Cambiar** (tarea «solo aquí»): el texto se edita en la
-    propia línea (Intro guarda, Escape cancela). De la guía: `Hitos.cambiarGuionAqui(clave, idHito,
+  - **Cambiar** (fila 235; antes «Cambiar aquí» / «Cambiar en la guía»): el texto se edita en la
+    propia línea (Intro abre «¿Dónde se guarda?», Escape cancela). «Solo en este asunto», de la guía: `Hitos.cambiarGuionAqui(clave, idHito,
     original, texto)` esconde el id original en `guionOcultos` y pone una propia con `enLugarDe` en
     su mismo sitio, con su marca de hecha; desde ese momento lleva «solo aquí». «Solo aquí»:
     `Hitos.cambiarGuionPropioTexto`, sin más.
-  - **Cambiar en la guía** (tarea de la guía): `HitoMesaGuion.cambiarGuionDelPaso(a, h, idResaltar)`,
+  - **Abrir en la guía** (tarea de la guía; antes «Cambiar en la guía»): `HitoMesaGuion.cambiarGuionDelPaso(a, h, idResaltar)`,
     el mismo editor de siempre (`js/guias-guion.js`) con esa tarea a la vista y resaltada
     (`.guion-fila-resaltada`); el título de la ventana dice «Cambiar en la guía de <tipo>».
-  - **Pasar a la guía** (tarea «solo aquí»): confirmación de una línea y, aceptada, la tarea (texto,
+  - **Pasar a la guía** (tarea «solo aquí»): el emergente «¿Dónde se guarda?» con «A la guía» marcada y, aceptado, la tarea (texto,
     explicación, acción, normativa, reunir/obligatorio) se añade al final del `guion` del paso de
     la guía con `GuiasDelCentro.cambiarPasos` (id nuevo de `GuiasGuion.normalizar`, como antes),
     y `Hitos.pasarGuionPropioAGuia` quita la propia de este asunto y traslada su marca de hecha (si
@@ -371,3 +371,40 @@ guion, y un modelo viejo se convierte al meterlo en una guía (`ReunirMigracion.
 El bloque «Notas» de la mesa enseña las notas del asunto escritas desde este hito, y lo que se
 escribe ahí se guarda como nota del asunto con su etiqueta; debajo, «Historia», lo automático del
 hito. Ver «Una sola libreta de notas» en `docs/contexto/ASUNTOS.md`.
+
+## «¿Dónde se guarda?» al crear, cambiar o borrar (30-sep-2026, fila 235, `docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md`)
+
+Todo cambio de hitos o de tareas hecho desde un asunto pregunta, antes de guardarse, dónde se guarda. La
+pregunta es siempre la misma y sale sola, sin ir a buscarla:
+
+- **`js/donde-se-guarda.js`** (`DondeSeGuarda`): el bloque (`bloqueHTML`, `textoConsecuencia`, puras) con dos
+  radios `name="dsg-donde"`: «A la guía de <tipo corto>» (marcada siempre al abrirse) y «Solo en este
+  asunto». Debajo de la primera, en letra pequeña: «Llegará a N asuntos abiertos de este tipo.» (N = los
+  demás abiertos del tipo, `otrosAbiertos`), «No hay más asuntos abiertos de este tipo. Valdrá para los
+  próximos.» si N es 0, «En M no se tocará, porque ya tienen trabajo.» y, si el hito no está en la guía,
+  «El hito "X" todavía no está en la guía: irá con sus N tareas.». Sin tipo no hay bloque (se guarda solo
+  en el asunto); dentro de una pregunta, «A la guía» sale apagada con el motivo. Teclado: flechas cambian
+  la opción, Intro acepta, Escape cancela sin guardar (`js/usabilidad.js`). `preguntar` es el emergente
+  pequeño de las tareas.
+- **Hitos** (`js/hitos-desde-el-asunto.js`): los tres cuadros ya no llevan la casilla; el bloque va al pie y
+  el botón dice «Guardar» («Borrar» en el de borrar). «Cambiar» un hito propio del asunto también ofrece
+  «A la guía». `js/hitos-desde-el-asunto-guia.js` (`HitosDesdeElAsuntoGuia`): `llevarHitoEntero` (un hito
+  sin paso en la guía entra con título, plazo, responsable y todas sus tareas —con los mismos ids, así que
+  lo marcado no se pierde—, detrás del hito anterior que venga de la guía; se enlaza primero aquí para que
+  el reparto de la fila 118 no lo repita), `instantanea` + `deshacer` + `avisarConDeshacer`.
+- **Tareas** (`js/donde-se-guarda-tareas.js`, `DondeSeGuardaTareas.nueva/cambiar/pasar/borrar`): Intro en
+  «Nueva tarea…» abre el emergente; Escape deja lo escrito; la caja se vacía al elegir. A la guía = tocar
+  el `guion` del paso (`GuiasDelCentro.cambiarPasos`), que llega solo a los demás asuntos; un hito propio
+  se lleva entero. Borrar una tarea de la guía deja «solo aquí», en los abiertos donde estaba hecha, esa
+  tarea (`conservarHechas`). Borrar una «solo aquí» no pregunta.
+- **El aviso de después**: «Guardado en la guía de <tipo> y en N asuntos abiertos.» (más «En M no se ha
+  tocado porque ya tenían trabajo.») con botón **«Deshacer»** (8 s, `U.aviso` con acción) o «Guardado solo
+  en este asunto.». «Deshacer» devuelve la guía y los demás asuntos a la instantánea de antes y deja el
+  cambio en este asunto como «solo aquí»; si algo ha cambiado por otro lado, no lo pisa y avisa en ámbar.
+- **«No me carga el mapa previo»** (punto 6 del documento): con datos de demostración no se reprodujo
+  (`pruebas/donde-se-guarda.mjs`, 6b y 7: tras crear un hito «solo en este asunto» o en la guía, «Cambiar la
+  guía…», «Ver mapa» y el mapa del asunto enseñan la guía previa entera). Único punto débil encontrado y
+  arreglado: `GuiasDelCentro.recargar()` vaciaba la guía en memoria si la lectura fallaba (ahora conserva
+  la última buena).
+- Pruebas: `pruebas/donde-se-guarda.mjs` (nueva), y puestas al día `pruebas/hitos-desde-el-asunto.mjs`,
+  `pruebas/tareas-del-hito-sencillas.mjs` y `pruebas/hito-mesa.mjs`.

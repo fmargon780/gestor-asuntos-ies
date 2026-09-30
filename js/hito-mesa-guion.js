@@ -11,8 +11,9 @@
      gris, con quién y cuándo al lado; «No aplica»: tachado.
    - Fila 224 (docs/TAREAS-DEL-HITO-SENCILLAS.md): sin frases al pie. Al
      final de la lista, una sola caja «Nueva tarea… (escribe y pulsa
-     Intro)»: añade solo a este asunto (`Hitos.anadirGuionPropio`, como
-     antes «+ Añadir una tarea solo para este asunto»). Cada tarea lleva
+     Intro)». Desde la fila 235 (docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md)
+     Intro abre «¿Dónde se guarda?» (js/donde-se-guarda-tareas.js): a la
+     guía o solo a este asunto (`Hitos.anadirGuionPropio`). Cada tarea lleva
      su «⋮» (js/hito-mesa-tarea-menu.js): Anotar, Cambiar (aquí o no) y
      Borrar o Pasar a la guía, según sea «solo aquí» o de la guía. «+
      Añadir una tarea a la guía del tipo» (fila 120) pasa a ser «Pasar a
@@ -236,12 +237,22 @@ var HitoMesaGuion = (function () {
        repintado). */
     var nueva = caja.querySelector('#guion-nueva-tarea');
     if (nueva) nueva.onkeydown = function (ev) {
-      if (ev.key !== 'Enter') return;
+      if (ev.key !== 'Enter' || ev.isComposing) return;
       ev.preventDefault();
       var texto = nueva.value.trim();
-      if (!texto) return;
-      nueva.value = '';
-      guardar(null, function () { return Hitos.anadirGuionPropio(a.nombre, h.id, texto); });
+      if (!texto || nueva.dataset.preguntando) return;
+      /* Fila 235: Intro abre «¿Dónde se guarda?»; Escape deja lo escrito
+         en la caja. La caja se vacía en cuanto hay una respuesta que
+         guarda (antes del repintado, para que no vuelva el texto). */
+      nueva.dataset.preguntando = '1';
+      DondeSeGuardaTareas.nueva(a, h, texto, function () {
+        var actual = document.getElementById('guion-nueva-tarea');
+        if (actual && actual.value.trim() === texto) actual.value = '';
+      }).then(function () {
+        var actual = document.getElementById('guion-nueva-tarea');
+        if (actual) { delete actual.dataset.preguntando; actual.focus(); }
+        delete nueva.dataset.preguntando;
+      });
     };
   }
 

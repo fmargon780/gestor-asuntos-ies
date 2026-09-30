@@ -3,13 +3,17 @@
    mesa de un asunto, sin salir a Ajustes (28-sep-2026, fila 206,
    docs/HITOS-DESDE-EL-ASUNTO.md).
 
-   Tres cuadros, en el menú «···» de la cabecera de la mesa
-   (js/hito-mesa.js): «+ Crear un hito», «Cambiar este hito» y «Borrar
-   este hito». Cada uno lleva una casilla «También en la guía de
-   <tipo>» (si tiene sentido): marcada, el cambio entra en
+   Tres cuadros, en el menú «Hito ▾» de la cabecera de la mesa
+   (js/hito-mesa.js): «Crear», «Cambiar» y «Borrar». Desde la fila 235
+   (docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md) cada uno lleva, al pie, el
+   bloque «¿Dónde se guarda?» de js/donde-se-guarda.js («A la guía de
+   <tipo>», marcada, o «Solo en este asunto»), en vez de la casilla
+   «También en la guía de <tipo>». A la guía: el cambio entra en
    `_GESTOR/guias.json` y llega también a los asuntos abiertos del
    mismo tipo, pero solo a los hitos que están «vacíos» (sin trabajo
-   apuntado, `estaVacio`); un hito con trabajo nunca se toca.
+   apuntado, `estaVacio`); un hito con trabajo nunca se toca. Llevar a
+   la guía un hito propio del asunto, y el «Deshacer» del aviso de
+   después, viven en js/hitos-desde-el-asunto-guia.js.
 
    Simplificación a propósito, como ya hace `Hitos.mover`
    ("complicaría las bifurcaciones sin que Francisco lo haya pedido"):
@@ -129,7 +133,7 @@ window.HitosDesdeElAsunto = (function () {
       colocarDespuesDe: ($('hda-despues') || {}).value || '',
       responsable: ($('hda-responsable') || {}).value || '',
       plazo: plazoDelFormulario(),
-      tambienGuia: !!($('hda-tambien-guia') && $('hda-tambien-guia').checked)
+      tambienGuia: window.DondeSeGuarda ? DondeSeGuarda.elegido() === 'guia' : false
     };
   }
 
@@ -177,21 +181,42 @@ window.HitosDesdeElAsunto = (function () {
         '<span class="suave">desde</span>' +
         '<select id="hda-plazo-desde" class="campo">' + opcionesDesde + '</select>' +
       '</div>' +
-      (opts.mostrarCasilla
-        ? '<label><input type="checkbox" id="hda-tambien-guia"' + (opts.casillaMarcada ? ' checked' : '') +
-          '> También en la guía de ' + U.escapar(opts.tipoCorto) + '</label>'
-        : '')
+      (opts.bloque || '')
     );
   }
 
   function tipoDe(a) {
-    return (window.App && typeof App.tipoDeAsunto === 'function') ? App.tipoDeAsunto(a)
+    var t = (window.App && typeof App.tipoDeAsunto === 'function') ? App.tipoDeAsunto(a)
       : ((a.leido && a.leido.tipo) || (a.ficha && a.ficha.tipo) || '');
+    return (window.App && t === App.SIN_TIPO) ? '' : t;   /* fila 235: sin tipo no hay guía */
   }
 
   function nombreCortoDe(tipo) {
     return (window.Nombres && window.App) ? Nombres.tipoParaVer(tipo, App.E.tipos) : tipo;
   }
+
+  /* El bloque «¿Dónde se guarda?» de los tres cuadros (fila 235). `o`:
+     { a, tipo, idOrigen, hitoNuevo, apagada }. Sin tipo, no sale. */
+  async function bloqueDe(o) {
+    if (!o.tipo || !window.DondeSeGuarda) return '';
+    var otros = DondeSeGuarda.otrosAbiertos(o.a).length;
+    var trabajo = 0;
+    if (o.idOrigen && !o.apagada && window.HitosDesdeElAsuntoGuia) {
+      try { trabajo = await HitosDesdeElAsuntoGuia.conTrabajo(o.tipo, o.idOrigen, o.a.nombre); } catch (e) { trabajo = 0; }
+    }
+    return DondeSeGuarda.bloqueHTML({
+      tipoCorto: nombreCortoDe(o.tipo), otros: otros, conTrabajo: trabajo,
+      hitoNuevo: o.hitoNuevo || null, apagada: o.apagada || ''
+    });
+  }
+
+  function enganchar() {
+    if (!window.DondeSeGuarda) return;
+    DondeSeGuarda.enganchar();
+    DondeSeGuarda.introAcepta($('hda-titulo'));
+  }
+
+  var MOTIVO_EN_PREGUNTA = 'Este hito está dentro de una pregunta: en la guía se cambia desde Ajustes.';
 
   function pasoEsDeNivelSuperior(pasos, idPaso) {
     return (pasos || []).some(function (p) { return p.id === idPaso; });
@@ -205,6 +230,15 @@ window.HitosDesdeElAsunto = (function () {
     return Gestor.asuntos().filter(function (a) {
       return tipoDe(a) === tipo && !(a.ficha && a.ficha.tipoUnidoDe);
     }).map(function (a) { return a.nombre; });
+  }
+
+  /* Fila 235: la frase verde de después y su «Deshacer». `base` es lo
+     que se dice si el cambio se queda solo en este asunto. */
+  async function avisarGuia(tipo, a, antes, r, aqui) {
+    var otros = Math.max(0, (r.tocados || 0) - 1);
+    await HitosDesdeElAsuntoGuia.avisarConDeshacer(
+      HitosDesdeElAsuntoGuia.textoGuardado(nombreCortoDe(tipo), otros, r.saltados || 0),
+      { tipo: tipo, claveActual: a.nombre, antes: antes, aqui: aqui });
   }
 
   /* ==========================================================
@@ -276,16 +310,6 @@ window.HitosDesdeElAsunto = (function () {
     return { tocados: tocados, saltados: saltados };
   }
 
-  function avisoReparto(base, r) {
-    if (!r.tocados && !r.saltados) { U.aviso(base, 'bueno'); return; }
-    var otros = Math.max(0, r.tocados - 1);
-    var texto = base + (otros
-      ? ' también en la guía y en ' + (otros === 1 ? '1 asunto abierto más' : otros + ' asuntos abiertos más') + '.'
-      : ' también en la guía.');
-    if (r.saltados) texto += ' En ' + (r.saltados === 1 ? '1 no se ha tocado' : r.saltados + ' no se ha tocado') + ' porque ya tenía trabajo.';
-    U.aviso(texto, 'bueno');
-  }
-
   function repintar() {
     if (window.HitosPanel) HitosPanel.programarRepintado();
   }
@@ -345,14 +369,13 @@ window.HitosDesdeElAsunto = (function () {
      modelo de la biblioteca es, por naturaleza, cosa de la guía). */
   async function crearDesdeBiblioteca(a, tipo, nivel, datos, modelo) {
     var idPasoAncla = pasoAnclaDeHito(nivel, datos.colocarDespuesDe);
-    await GuiasDelCentro.recargar();
+    var antes = await HitosDesdeElAsuntoGuia.instantanea(tipo, a.nombre);
     var pasos = JSON.parse(JSON.stringify(GuiasDelCentro.pasosDe(tipo)));
     var nuevoPaso = HitosBiblioteca.modeloAPaso(modelo);
     colocarTrasAncla(pasos, nuevoPaso, idPasoAncla);
     var llegados = await GuiasDelCentro.guardarPasos(tipo, pasos);
-    var otros = Math.max(0, llegados - 1);
-    U.aviso('Hito creado desde la biblioteca, también en la guía de ' + nombreCortoDe(tipo) + '.' +
-      (otros ? ' Ha llegado también a ' + (otros === 1 ? '1 asunto abierto más' : otros + ' asuntos abiertos más') + '.' : ''), 'bueno');
+    await avisarGuia(tipo, a, antes, { tocados: llegados, saltados: 0 },
+      function () { return HitosDesdeElAsuntoGuia.desenlazar(a.nombre, nuevoPaso.id); });
   }
 
   /* `idAnclaPorDefecto`: qué sale ya elegido en "Colocar después de"
@@ -369,8 +392,9 @@ window.HitosDesdeElAsunto = (function () {
     var esperar = U.preguntar('Crear un hito',
       cuerpoFormulario({
         nivel: nivel, colocarActual: ancla, responsables: responsables, responsable: '', plazo: null,
-        mostrarCasilla: !!tipo, casillaMarcada: true, tipoCorto: nombreCortoDe(tipo), esCrear: true
-      }), 'Crear');
+        bloque: await bloqueDe({ a: a, tipo: tipo }), esCrear: true
+      }), 'Guardar');
+    enganchar();
     if (tipo) engancharBusquedaBiblioteca(function (modelo) { modeloElegido = modelo; }, function () { modeloElegido = null; });
     var ok = await esperar;
     if (!ok) return;
@@ -406,19 +430,18 @@ window.HitosDesdeElAsunto = (function () {
       return d;
     });
     if (resultado) await Hitos.aplicarEstadoDelHito(a.nombre, resultado);
-    U.aviso('Hito creado.', 'bueno');
+    U.aviso('Guardado solo en este asunto.', 'bueno');
   }
 
   async function crearConGuia(a, tipo, nivel, datos) {
     var idPasoAncla = pasoAnclaDeHito(nivel, datos.colocarDespuesDe);
-    await GuiasDelCentro.recargar();
+    var antes = await HitosDesdeElAsuntoGuia.instantanea(tipo, a.nombre);
     var pasos = JSON.parse(JSON.stringify(GuiasDelCentro.pasosDe(tipo)));
     var nuevoPaso = Guias.normalizar([{ titulo: datos.titulo, responsable: datos.responsable, plazo: datos.plazo }])[0];
     colocarTrasAncla(pasos, nuevoPaso, idPasoAncla);
     var llegados = await GuiasDelCentro.guardarPasos(tipo, pasos);
-    var otros = Math.max(0, llegados - 1);
-    U.aviso('Hito creado, también en la guía de ' + nombreCortoDe(tipo) + '.' +
-      (otros ? ' Ha llegado también a ' + (otros === 1 ? '1 asunto abierto más' : otros + ' asuntos abiertos más') + '.' : ''), 'bueno');
+    await avisarGuia(tipo, a, antes, { tocados: llegados, saltados: 0 },
+      function () { return HitosDesdeElAsuntoGuia.desenlazar(a.nombre, nuevoPaso.id); });
   }
 
   /* ==========================================================
@@ -432,24 +455,37 @@ window.HitosDesdeElAsunto = (function () {
     var tipo = tipoDe(a);
     var pasos = tipo ? GuiasDelCentro.pasosDe(tipo) : [];
     var conGuia = !!(h.origenGuia && esNivelSuperior && pasoEsDeNivelSuperior(pasos, h.origenGuia));
+    /* Fila 235: un hito que solo existe en este asunto también puede ir
+       a la guía (con sus tareas); uno dentro de una pregunta, no. */
+    var esPropio = !!(tipo && !conGuia && esNivelSuperior && h.clase !== 'decision' && window.HitosDesdeElAsuntoGuia);
     var colocarActual = '';
     if (esNivelSuperior) {
       var i = nivel.map(function (x) { return x.id; }).indexOf(h.id);
       colocarActual = i > 0 ? nivel[i - 1].id : '';
     }
     var responsables = await opcionesResponsable();
-    var ok = await U.preguntar('Cambiar este hito',
+    var bloque = await bloqueDe({
+      a: a, tipo: tipo, idOrigen: conGuia ? h.origenGuia : '',
+      hitoNuevo: esPropio ? { titulo: h.titulo, tareas: (h.guionPropio || []).filter(function (g) { return !g.enLugarDe; }).length } : null,
+      apagada: (tipo && !conGuia && !esPropio) ? (h.clase === 'decision' && esNivelSuperior
+        ? 'Una pregunta con sus respuestas: en la guía se cambia desde Ajustes.' : MOTIVO_EN_PREGUNTA) : ''
+    });
+    var esperar = U.preguntar('Cambiar este hito',
       cuerpoFormulario({
         idPropio: h.id, nivel: esNivelSuperior ? nivel : [], colocarActual: colocarActual,
         responsables: responsables, responsable: h.responsable || '', plazo: h.plazo || null,
-        titulo: h.titulo, mostrarCasilla: conGuia, casillaMarcada: true, tipoCorto: nombreCortoDe(tipo)
+        titulo: h.titulo, bloque: bloque
       }), 'Guardar');
+    enganchar();
+    var ok = await esperar;
     if (!ok) return;
     var datos = leerFormulario();
     if (!datos.titulo) { U.aviso('Hace falta un título.', 'ambar'); return; }
     try {
       if (conGuia && datos.tambienGuia) {
         await cambiarConGuia(a, h, tipo, nivel, datos);
+      } else if (esPropio && datos.tambienGuia) {
+        await cambiarYLlevarALaGuia(a, h, tipo, esNivelSuperior, datos);
       } else {
         await cambiarSoloAsunto(a, h, esNivelSuperior, datos);
       }
@@ -459,7 +495,7 @@ window.HitosDesdeElAsunto = (function () {
     }
   }
 
-  async function cambiarSoloAsunto(a, h, esNivelSuperior, datos) {
+  async function cambiarSoloAsunto(a, h, esNivelSuperior, datos, callado) {
     await Hitos.guardarCampos(a.nombre, h.id, {
       titulo: datos.titulo, responsable: datos.responsable, plazo: datos.plazo
     });
@@ -472,12 +508,23 @@ window.HitosDesdeElAsunto = (function () {
         return d;
       });
     }
-    U.aviso('Hito cambiado.', 'bueno');
+    if (!callado) U.aviso('Guardado solo en este asunto.', 'bueno');
+  }
+
+  /* Fila 235: el hito propio se cambia aquí y entra en la guía con todas
+     sus tareas (js/hitos-desde-el-asunto-guia.js). «Deshacer» lo deja
+     como era justo después del cambio, solo en este asunto. */
+  async function cambiarYLlevarALaGuia(a, h, tipo, esNivelSuperior, datos) {
+    await cambiarSoloAsunto(a, h, esNivelSuperior, datos, true);
+    var antes = await HitosDesdeElAsuntoGuia.instantanea(tipo, a.nombre);
+    var r = await HitosDesdeElAsuntoGuia.llevarHitoEntero(a, h);
+    await avisarGuia(tipo, a, antes, { tocados: DondeSeGuarda.otrosAbiertos(a).length + 1, saltados: 0 },
+      function () { return HitosDesdeElAsuntoGuia.dejarComoEstaba(a.nombre, r.hitoAntes); });
   }
 
   async function cambiarConGuia(a, h, tipo, nivel, datos) {
     var idPasoAncla = pasoAnclaDeHito(nivel, datos.colocarDespuesDe);
-    await GuiasDelCentro.recargar();
+    var antes = await HitosDesdeElAsuntoGuia.instantanea(tipo, a.nombre);
     var pasos = JSON.parse(JSON.stringify(GuiasDelCentro.pasosDe(tipo)));
     var paso = pasos.filter(function (p) { return p.id === h.origenGuia; })[0];
     if (!paso) { await cambiarSoloAsunto(a, h, true, datos); return; }
@@ -489,7 +536,7 @@ window.HitosDesdeElAsunto = (function () {
     var r = await propagarCambio(tipo, h.origenGuia,
       { titulo: datos.titulo, responsable: datos.responsable, plazo: datos.plazo },
       idPasoAncla, a.nombre);
-    avisoReparto('Hito cambiado', r);
+    await avisarGuia(tipo, a, antes, r, null);
   }
 
   /* ==========================================================
@@ -501,27 +548,27 @@ window.HitosDesdeElAsunto = (function () {
     var tipo = tipoDe(a);
     var pasos = tipo ? GuiasDelCentro.pasosDe(tipo) : [];
     var conGuia = !!(h.origenGuia && pasoEsDeNivelSuperior(pasos, h.origenGuia));
-    var ok = await U.preguntar('Borrar este hito',
-      '<p><strong>' + U.escapar(h.titulo || '') + '</strong></p>' +
-      (conGuia
-        ? '<label><input type="checkbox" id="hda-tambien-guia" checked> También en la guía de ' +
-          U.escapar(nombreCortoDe(tipo)) + '</label>'
-        : ''),
-      'Borrar');
+    var bloque = (conGuia || (tipo && h.origenGuia))
+      ? await bloqueDe({ a: a, tipo: tipo, idOrigen: conGuia ? h.origenGuia : '', apagada: conGuia ? '' : MOTIVO_EN_PREGUNTA })
+      : '';
+    var esperar = U.preguntar('Borrar este hito',
+      '<p><strong>' + U.escapar(h.titulo || '') + '</strong></p>' + bloque, 'Borrar');
+    enganchar();
+    var ok = await esperar;
     if (!ok) return;
-    var tambienGuia = conGuia && !!($('hda-tambien-guia') && $('hda-tambien-guia').checked);
+    var tambienGuia = conGuia && window.DondeSeGuarda && DondeSeGuarda.elegido() === 'guia';
     try {
       if (tambienGuia) {
-        await GuiasDelCentro.recargar();
+        var antes = await HitosDesdeElAsuntoGuia.instantanea(tipo, a.nombre);
         var pasosCopia = JSON.parse(JSON.stringify(GuiasDelCentro.pasosDe(tipo)));
         var i = pasosCopia.map(function (p) { return p.id; }).indexOf(h.origenGuia);
         if (i !== -1) pasosCopia.splice(i, 1);
         await GuiasDelCentro.guardarPasos(tipo, pasosCopia);
         var r = await propagarBorrado(tipo, h.origenGuia, a.nombre);
-        avisoReparto('Hito borrado', { tocados: r.tocados, saltados: r.saltados });
+        await avisarGuia(tipo, a, antes, r, null);
       } else {
         await Hitos.quitarHito(a.nombre, h.id);
-        U.aviso('Hito borrado.', 'bueno');
+        U.aviso('Guardado solo en este asunto.', 'bueno');
       }
       if (window.HitoMesa) HitoMesa.cerrar();
       repintar();
@@ -532,6 +579,7 @@ window.HitosDesdeElAsunto = (function () {
 
   return {
     estaVacio: estaVacio,
+    clavesAbiertasDelTipo: clavesAbiertasDelTipo,
     nivelSuperior: nivelSuperior,
     colocarTrasAncla: colocarTrasAncla,
     pasoAnclaDeHito: pasoAnclaDeHito,
