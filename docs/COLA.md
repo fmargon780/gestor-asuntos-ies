@@ -197,6 +197,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 229 | Ventajas e inconvenientes de convertir la zona de tareas de un hito en un registro de lo que ocurre, en vez de una lista que nos recuerde que hay que tener en cuenta. O un modelo global para todo esto [recorte: https://claude.ai/artifact/7pDUJyXkUbPwuccZRx6J7E · 2201e4cccd4d17ffe9428499544f420e] | IDEA (29-sep-2026): apuntada por Francisco desde el Centro de mando |
 | 217 | `docs/CORREO-OTRA-CUENTA-ABIERTA.md` (enviar correo con otra cuenta de Google abierta en el navegador: aviso claro en vez de «Failed to fetch» y, si Google lo deja, que el envío funcione igual usando la forma general de la dirección del script) | PENDIENTE (28-sep-2026) |
 | 232 | `docs/ENLACE-A-NORMATIVA-CORRECTO.md` (los enlaces a la normativa abren siempre el artículo, `normativa.fmargon.com/norma#r=<clave>`; cambiar la dirección por defecto de `vercel.app`) | PENDIENTE (29-sep-2026) |
+| 233 | Aviso de usuario: mejora en «Ajustes» | IDEA (30-sep-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1kgp3pu03k--IE89JkrzvFPtQQZ_W2NZb/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
