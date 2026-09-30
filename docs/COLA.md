@@ -197,6 +197,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 229 | `docs/REGISTRO-DEL-ASUNTO.md` (el registro del asunto: una sola lista por fechas con lo que ha pasado —lo que anota la aplicación sola y lo que se escribe a mano—, entera en la ficha y solo lo suyo en la mesa de cada hito; caja «Anotar algo que ha pasado…»; las líneas a mano se cambian o se borran, las automáticas no; la lista de tareas no cambia) | EN CURSO (30-sep-2026 09:00) · conversación: https://claude.ai/code/session_011vNjLkBFMRhcMGy2s4chtA |
 | 217 | `docs/CORREO-OTRA-CUENTA-ABIERTA.md` (enviar correo con otra cuenta de Google abierta en el navegador: aviso claro en vez de «Failed to fetch» y, si Google lo deja, que el envío funcione igual usando la forma general de la dirección del script) | PENDIENTE (28-sep-2026) |
 | 232 | `docs/ENLACE-A-NORMATIVA-CORRECTO.md` (los enlaces a la normativa abren siempre el artículo, `normativa.fmargon.com/norma#r=<clave>`; cambiar la dirección por defecto de `vercel.app`) | PENDIENTE (29-sep-2026) |
+| 233 | Aviso de usuario: mejora en «Ficha de un asunto» | IDEA (30-sep-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1-YBvHiT3clJmKCKz66UxPj0LxTZNY-wP/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
