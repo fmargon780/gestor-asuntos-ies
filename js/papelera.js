@@ -234,7 +234,7 @@ var Papelera = (function () {
     await mandarFichero(a.handle, nombreFichero, 'documento', { asunto: a.nombre });
     if (window.Notas) {
       try {
-        await window.Notas.anadir(a, (quienSoy() || 'Alguien') + ' mandó a la papelera: ' + nombreFichero);
+        await window.Notas.anadirAuto(a, (quienSoy() || 'Alguien') + ' mandó a la papelera: ' + nombreFichero);
       } catch (e) { /* si no se puede apuntar la nota, el borrado ya se ha hecho */ }
     }
   }

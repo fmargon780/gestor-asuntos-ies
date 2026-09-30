@@ -318,6 +318,14 @@ var Hitos = (function () {
      justo debajo (sección 4 del encargo).
      ========================================================== */
 
+  /* Fila 229: las líneas que la aplicación deja sola al marcar (hito dado por hecho o
+     reabierto, tarea marcada) no cuentan como «algo apuntado» al cambiar de rama o de
+     tipo: marcar un hito hecho no debe impedir descartarlo. */
+  var LINEA_DE_MARCAR = /^(Dado por hecho$|Reabierto$|Tarea )/;
+  function notasPropias(h) {
+    return ((h && h.notas) || []).filter(function (n) { return !LINEA_DE_MARCAR.test(String((n && n.texto) || '')); });
+  }
+
   function buscar(lista, id) {
     for (var i = 0; i < (lista || []).length; i++) {
       var h = lista[i];
@@ -379,7 +387,7 @@ var Hitos = (function () {
     var out = [];
     (lista || []).forEach(function (x) {
       if (x.clase === 'decision') {
-        if (x.estado === 'noaplica' && ((x.notas && x.notas.length) || (x.documentos && x.documentos.length))) out.push(x);
+        if (x.estado === 'noaplica' && (notasPropias(x).length || (x.documentos && x.documentos.length))) out.push(x);
         x.opciones.forEach(function (o) { out = out.concat(descartados(o.hitos)); });
       } else if (x.estado === 'noaplica') {
         out.push(x);
@@ -627,7 +635,7 @@ var Hitos = (function () {
     nuevoId: nuevoId, normalizarHito: normalizarHito, normalizarAjustes: normalizarAjustes,
     leer: leer, cambiar: cambiar, hitosDe: hitosDe,
     buscar: buscar, visibles: visibles, huerfanos: huerfanos, cuenta: cuenta,
-    faltanObligatorios: faltanObligatorios,
+    faltanObligatorios: faltanObligatorios, notasPropias: notasPropias,
     recomputeEnCurso: recomputeEnCurso, aplicarEstadoDelHito: aplicarEstadoDelHito,
     aplicarPlazosDependientes: aplicarPlazosDependientes, estadoDelAsunto: estadoDelAsunto,
     pasoAHito: pasoAHito, crearDesdeGuia: crearDesdeGuia, listaImportando: listaImportando,

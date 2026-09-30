@@ -173,6 +173,8 @@ App.cerrarAsunto = async function (a) {
       estado: 'cerrado', categoria: categoria, tercero: tercero,
       cerradoEl: U.ahora(), cerradoPor: App.E.usuario, ficheros: totalFicheros
     });
+    /* Fila 229: la línea del registro, antes de que la ficha baje a la carpeta. */
+    if (window.RegistroAsunto) await RegistroAsunto.auto(a, 'Asunto archivado');
   } catch (e) {
     U.accesorio('La carpeta ya está en el archivo, pero no he podido apuntar el cierre en su ficha. ' +
       'Pulsa Recargar', e);

@@ -329,7 +329,7 @@ var HitoMesa = (function () {
 
     FichaMenus.montar(cab.querySelector('.mesa-etq-estado'), ESTADOS.map(function (e) {
       return { texto: e.texto, alPulsar: function () {
-        guardar(null, 'cambiar el estado', function () { return Hitos.marcar(a.nombre, h.id, e.valor, ''); });
+        guardar(null, 'cambiar el estado', function () { return Hitos.marcar(a.nombre, h.id, e.valor, window.RegistroAsunto ? RegistroAsunto.notaDeEstado(h.estado, e.valor) : ''); });
       } };
     }));
     FichaMenus.montar(cab.querySelector('.mesa-etq-plazo'), [

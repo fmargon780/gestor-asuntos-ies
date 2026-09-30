@@ -80,7 +80,7 @@ var RepartirCrear = (function () {
       await Carpetas.escribirBytes(carpeta, nombreDelDocumento(op.tipoDocumento, datos), doc, 'application/pdf');
       var a = { nombre: nombre, handle: carpeta, leido: Nombres.leer(nombre, App.E.tipos),
                 ficha: App.E.registro.asuntos[nombre] || {} };
-      if (window.Notas) await Notas.anadir(a, 'Viene de ' + origen.nombre + ', ' + RepartirNucleo.textoPaginas(trozo).toLowerCase());
+      if (window.Notas) await Notas.anadirAuto(a, 'Viene de ' + origen.nombre + ', ' + RepartirNucleo.textoPaginas(trozo).toLowerCase());
       a.ficha = App.E.registro.asuntos[nombre] || a.ficha;
       App.E.archivarSinPreguntar = true;
       try { await App.cerrarAsunto(a); } finally { App.E.archivarSinPreguntar = false; }
@@ -153,7 +153,7 @@ var RepartirCrear = (function () {
       });
       if (window.Notas && lineas.length) {
         var a = { nombre: origen.nombre, ficha: App.E.registro.asuntos[origen.nombre] || {} };
-        await Notas.anadir(a, 'Reparto de ' + fichero.nombre + ':\n' + lineas.join('\n'));
+        await Notas.anadirAuto(a, 'Reparto de ' + fichero.nombre + ':\n' + lineas.join('\n'));
       }
     } catch (e) {
       U.accesorio('Reparto hecho, pero no he podido apuntarlo en el asunto de origen', e);

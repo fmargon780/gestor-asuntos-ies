@@ -137,7 +137,8 @@
     }
     try {
       var texto = textoDeLaNota();
-      await window.Notas.anadir(a, texto);
+      /* Fila 229: al hito si viene de uno (su historia), si no, al asunto. */
+      if (!(I.comunicarHitoActual && window.Hitos && typeof Hitos.anadirNota === 'function')) await window.Notas.anadirAuto(a, texto);
       /* "Comunicar" desde un hito (fila 60, sección 5.3): la misma
          línea, además, en el historial del propio hito. No crítico: si
          falla, el mensaje ya se ha preparado y la nota ya ha quedado. */

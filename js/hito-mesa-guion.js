@@ -35,6 +35,13 @@
    ============================================================ */
 var HitoMesaGuion = (function () {
 
+  /* Fila 229: marcar, desmarcar o «No aplica» de una tarea deja su línea
+     en el registro del hito (accesorio: si falla, ámbar). */
+  function apuntarTarea(a, h, tarea, que) {
+    if (!window.RegistroAsunto || !tarea) return Promise.resolve();
+    return RegistroAsunto.auto(a, 'Tarea ' + (que === 'no aplica' ? '«' + tarea.texto + '»: no aplica' : que + ': ' + tarea.texto), h);
+  }
+
   function enlaceNormativa(n) {
     if (!n || !n.cita) return '';
     var url = n.url || '';
@@ -199,7 +206,12 @@ var HitoMesaGuion = (function () {
       var id = el.dataset.id;
       var casilla = el.querySelector('.guion-casilla');
       casilla.onchange = function () {
-        guardar(casilla, function () { return Hitos.marcarGuion(a.nombre, h.id, id, { hecho: casilla.checked }); });
+        var hecha = casilla.checked;
+        guardar(casilla, function () {
+          return Hitos.marcarGuion(a.nombre, h.id, id, { hecho: hecha }).then(function (r) {
+            return apuntarTarea(a, h, porId[id], hecha ? 'hecha' : 'sin hacer').then(function () { return r; });
+          });
+        });
       };
       /* Fila 138: un dato se marca al escribirlo. */
       var dato = el.querySelector('.guion-dato');
@@ -208,7 +220,12 @@ var HitoMesaGuion = (function () {
       };
       var noaplica = el.querySelector('.guion-noaplica');
       if (noaplica) noaplica.onclick = function () {
-        guardar(noaplica, function () { return Hitos.marcarGuion(a.nombre, h.id, id, { noaplica: !el.classList.contains('noaplica') }); });
+        var ahoraNoAplica = !el.classList.contains('noaplica');
+        guardar(noaplica, function () {
+          return Hitos.marcarGuion(a.nombre, h.id, id, { noaplica: ahoraNoAplica }).then(function (r) {
+            return apuntarTarea(a, h, porId[id], ahoraNoAplica ? 'no aplica' : 'sin hacer').then(function () { return r; });
+          });
+        });
       };
       /* Fila 224: el «⋮» (Anotar, Cambiar…, Borrar/Pasar a la guía) y el
          💬 de esta tarea. */

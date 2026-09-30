@@ -109,7 +109,6 @@ details.mesa-normativa > summary { cursor: pointer; }
 .mesa-normativa .hito-normativa-titulo { display: none; }
 .mesa-normativa.oculto { display: none; }
 .hito-en-mesa .nota-nueva textarea { resize: none; overflow: hidden; min-height: 110px; }
-.mesa-historia .hito-nota { font-size: 12px; }
 
 /* ---------- las tres tarjetas (fila 147, docs/MESA-TARJETAS-QUE-SE-ABREN.md) ----------
    Una en grande a la izquierda y las otras dos, de resumen, a la derecha.
@@ -146,11 +145,6 @@ details.mesa-normativa > summary { cursor: pointer; }
 .mesa-resumen-mas, .mesa-resumen-vacio { font-size: 12px; color: var(--tinta-suave); }
 .mesa-resumen-pie { font-size: 11px; color: var(--tinta-suave); margin-top: 2px; }
 
-/* Notas e historia, en grande: dos columnas (3 a 2); por debajo de 1100 px, una. */
-.mesa-notas-columnas { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; align-items: start; }
-.mesa-notas-columnas .mesa-bloque + .mesa-bloque { border-top: 0; padding-top: 0; }
-.mesa-grande-notas .hito-historia-titulo { margin-top: 0; }
-@media (max-width: 1100px) { .mesa-notas-columnas { grid-template-columns: minmax(0, 1fr); } }
 
 /* El guion */
 .mesa-guion-cuenta { font-size: 12px; color: var(--tinta-suave); white-space: nowrap; }

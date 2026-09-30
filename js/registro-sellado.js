@@ -206,7 +206,7 @@ var RegistroSellado = (function () {
       await window.Notas.sustituir(asunto,
         'Registrado ' + codigo + fechaSello + ' · ' + nombreDocumentoOriginal +
         '. Se conserva el original sin sellar.',
-        'registroDeDocumento', nombreDocumentoOriginal);
+        'registroDeDocumento', nombreDocumentoOriginal, { auto: true });
 
       U.aviso(aPrevias ? 'Documento registrado. El original sin sellar se conserva en «Versiones previas».'
         : 'Documento registrado. El original sin sellar se conserva en la carpeta.', 'bueno');

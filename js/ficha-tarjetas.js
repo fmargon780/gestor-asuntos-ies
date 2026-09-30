@@ -37,7 +37,7 @@ var FichaTarjetas = (function () {
     { id: 'documentos', titulo: 'Documentos de la carpeta' },
     { id: 'contacto', titulo: 'Datos y contacto', siempre: true },
     { id: 'tramite', titulo: 'Datos del trámite', siempre: true },
-    { id: 'notas', titulo: 'Notas' },
+    { id: 'notas', titulo: 'Registro' },
     { id: 'otros', titulo: 'Otros asuntos de este tercero' },
     { id: 'relacionados', titulo: 'Personas y entidades relacionadas' }
   ];
@@ -75,7 +75,7 @@ var FichaTarjetas = (function () {
         /* "Datos y contacto" trae su propio título (js/ficha-tercero.js). */
         tarjeta('contacto', '', '<div id="ficha-contacto-caja"></div>') +
         (tramite ? tarjeta('tramite', 'Datos del trámite', tramite) : '') +
-        tarjeta('notas', 'Notas', '<div id="ficha-notas"></div>',
+        tarjeta('notas', 'Registro', '<div id="ficha-notas"></div>',
                 '<span class="ficha-cuenta" data-cuenta-tarjeta="notas"></span>') +
         tarjeta('otros', 'Otros asuntos de este tercero', '<div id="ficha-otros" class="explica">Buscando…</div>',
                 '<span class="ficha-cuenta" data-cuenta-tarjeta="otros"></span>') +
