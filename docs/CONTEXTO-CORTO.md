@@ -199,6 +199,11 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   de demostración» (disco de mentira en memoria, datos inventados creados con las mismas
   funciones de las pantallas); «Volver a empezar» deja todo como al principio. En producción no
   se carga nada de `js/demo/` salvo el guion que decide si toca.
+- Botón «Soporte» (fila 213, `docs/BOTON-DE-SOPORTE.md`): abajo a la derecha, en todas las pantallas;
+  manda «Algo no funciona» / «Propongo una mejora» (texto, captura opcional, pantalla, quién, versión,
+  últimos errores) a un script de Google (`apps-script/soporte.gs`) cuya dirección se pone en Ajustes →
+  El centro (`ajustesAvisos.urlSoporte`). Guarda el aviso en Drive y apunta una IDEA sin datos del
+  usuario en la cola. Pendiente de Francisco: `docs/PONER-EN-MARCHA-SOPORTE.md`.
 
 ## 6. Reglas de código que no se pueden olvidar
 

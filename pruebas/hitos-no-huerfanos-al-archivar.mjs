@@ -155,6 +155,10 @@ await comprobar('1. el asunto ha quedado archivado de todas formas', pagina.eval
 await comprobar('1. se han intentado exactamente dos escrituras (una y su reintento)',
   pagina.evaluate(() => window.__llamadasHistorial), 2);
 await pagina.evaluate(() => window.__deshacerFalloHistorial());
+/* El aviso ámbar del punto 1 puede seguir a la vista (dura 4,5 s): se quita, para
+   que el punto 2 solo vea avisos suyos ("una prueba no se fía de un aviso que ya
+   estaba a la vista"). */
+await pagina.evaluate(() => document.querySelectorAll('#mensajes .mensaje').forEach((m) => m.remove()));
 
 /* ================= 2. el historial falla una vez y el reintento lo arregla ================= */
 

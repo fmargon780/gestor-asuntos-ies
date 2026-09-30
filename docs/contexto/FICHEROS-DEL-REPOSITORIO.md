@@ -246,6 +246,7 @@ de `App` va después del fichero que lo define.
 | `scripts/aviso-esperando.sh` | Hook de Claude Code (fila 225, `docs/AVISO-ESPERANDO-PERMISO.md`), llamado por `.claude/settings.json`: con `esperando`, deja en la rama `avisos` (fichero `ESPERANDO.json`, con órdenes de bajo nivel de git, sin tocar la copia de trabajo) la fila EN CURSO de `docs/COLA.md` y si el mensaje habla de permiso o de una pregunta, para que el Centro de mando no dé la sesión por parada; con `libre`, solo si hay marca local, apunta que ya no espera. Nunca falla (sale siempre con 0) ni imprime nada |
 | `scripts/plantillas-copia/ABRIR EL GESTOR.html` | Plantilla del instalador/actualizador autónomo (fila 89) que `scripts/copia-local.mjs` copia tal cual a `copia-local/ABRIR EL GESTOR.html`: elige la carpeta con `showDirectoryPicker`, descarga la copia de `raw.githubusercontent.com/fmargon780/gestor-asuntos-copia` y guarda el identificador de la carpeta en la misma IndexedDB que `js/almacen.js`. Desde la fila 91 la guarda siempre, y si la carpeta ya tiene `index.html` la pone al día (mismo algoritmo) antes de abrirla: es el camino para rescatar una copia vieja. Solo acepta una carpeta vacía, con `index.html` o con un fichero que empiece por `ABRIR EL GESTOR` |
 | `js/salir.js` | El botón de Salir del pie de la barra |
+| `js/soporte.js` | El botón «Soporte» y su ventana: error o mejora, texto, captura opcional (Ctrl+V, arrastrar o elegir; se reduce a 1.500 px JPEG), errores de la consola, envío al buzón y el campo «Buzón de soporte» de Ajustes (`ajustesAvisos.urlSoporte`) (fila 213) |
 | `js/rescate-datos.js` | Recoge los CSV que se hayan quedado un piso más arriba |
 | `js/traer-datos.js` | El botón de traer los CSV de Séneca desde donde estén; en Ajustes, cuelga ahora dentro de `#herramientas-traer-seneca`, en el bloque "Traer el alumnado" de Herramientas (fila 200; antes junto a "Ficheros de datos" en El centro) |
 | `js/lector.js` | El panel de la derecha para leer, con su borde para estirarlo |
@@ -268,6 +269,7 @@ de `App` va después del fichero que lo define.
 | `css/personas.css` | Personas y empresas (fila 125): la ficha fija al bajar, la tarjeta marcada, las tarjetas de «Familias» y el bloque «Antiguos (N)» |
 | `css/estado-hito.css` | La marca del hito actual (`.marca-hito`) y «Esperando a…» (`.marca-esperando`), en la tarjeta y en la ficha (fila 129) |
 | `css/administraciones.css` | El árbol de departamentos, el desplegable del asunto nuevo y «Pasar a Administraciones» (fila 167) |
+| `css/soporte.css` | El botón «Soporte» (abajo a la derecha, se aparta del lector) y su ventana (fila 213) |
 | `js/dni.js` | El DNI del alumnado, el aviso de que falta y la búsqueda por DNI |
 | `js/papelera.js` | Borrar con papelera: mandar (también un asunto del ARCHIVO, `mandarArchivado`, fila 136), devolver, borrar del todo y el bloque de Ajustes |
 | `js/papelera-ajustes.js` | El bloque «Papelera»: cuánto ocupa, cuánto hace, cada fila y sus botones (fila 133, sacado de `js/papelera.js`); el bloque vive ahora en la pestaña "Herramientas", no en Ajustes → Mantenimiento (fila 200) |
@@ -326,6 +328,8 @@ de `App` va después del fichero que lo define.
 | `pruebas/ajustes-agil.mjs` | Prueba de las pestañas, el buscador cruzado, el aviso en vivo y la barra fija |
 | `pruebas/papelera.mjs` | Prueba de borrar con papelera, devolver y borrar del todo |
 | `pruebas/salir-de-elegir-asunto.mjs` | Prueba de la fila 230: ✕, Cancelar, Escape y «No está: crear un asunto nuevo» de «Guardar en un asunto» (documento y correo) |
+| `pruebas/soporte.mjs` | Prueba en navegador (fila 213): botón, validación, buzón sin configurar, dirección en Ajustes, envío con buzón de mentira, fallo sin perder el texto, captura reducida, cierre |
+| `pruebas/soporte-script.mjs` | Prueba (con `vm`, fila 213): `apps-script/soporte.gs` con Drive y GitHub falsos: rechazos, carpeta, fila de la cola sin datos del usuario, conflicto y reintento |
 | `pruebas/documentos-sueltos.mjs` | Prueba de "Meter en un asunto": un documento suelto a un asunto que ya existe |
 | `pruebas/lector-documentos.mjs` | `LectorDocumentos.analizar`, puro, sin pdf.js ni navegador: sello, DNI de un tercero, dos terceros o dos tipos empatados, DNI con la letra mal, texto vacío (17-sep-2026, fila 41) |
 | `pruebas/sugerir-asunto-existente.mjs` | Prueba de "Podría ir en...": un abierto del mismo tipo, cuatro abiertos (dos del tipo, dos de otro), archivados sin abiertos, un abierto con un archivado, sin tercero reconocido, y que "Meter en un asunto" pone arriba los del tercero leído (21-sep-2026, fila 88) |
@@ -390,6 +394,8 @@ de `App` va después del fichero que lo define.
 | `pruebas/guias-mapa.mjs` | Prueba (sin navegador, fila 113, 24-sep-2026): `GuiasMapa.html` con una guía de dos niveles de preguntas, sin y con hitos (camino resaltado, ramas en gris, «Fuera de la guía»), y `GuiasNiveles.caminoHasta` |
 | `pruebas/documentos-en-la-tarjeta.mjs` | Prueba (navegador de verdad, fila 114, 24-sep-2026): con 8 documentos, la tarjeta cerrada enseña como mucho 5 nombres y «y N más», sin la línea «8 documentos», sin renglones aplastados ni cortados, con `title`, y «y N más» abre la tarjeta |
 | `apps-script/gestor-correos.gs` | El script de Gmail: recoger correos, y, desde la fila 115, la aplicación web (`doPost`) que el navegador llama directamente para enviar de verdad (`enviarCorreo`, `hiloParaResponder`, `prepararEnvio`) |
+| `apps-script/soporte.gs` | El buzón de soporte (fila 213): `doPost` guarda el aviso en Drive (`SOPORTE-AVISOS/<app>`) y apunta una IDEA en `docs/COLA.md` con la API de GitHub (`GITHUB_TOKEN` en las propiedades del script); `prepararTodo` |
+| `docs/BOTON-DE-SOPORTE.md`, `docs/PONER-EN-MARCHA-SOPORTE.md` | El diseño de la fila 213 y los cinco pasos de Francisco para poner en marcha el buzón |
 | `pruebas/preguntas-en-el-guion.mjs` | Prueba (sin navegador, fila 116, 24-sep-2026): preguntas en el guion de un hito — normalizar (un solo nivel), `guionDe` sin y con respuesta, cambiar de respuesta con líneas marcadas (plegadas), la cuenta y el marcado automático dentro de la respuesta elegida |
 | `docs/CONTEXTO-CORTO.md` | Para decidir: se lee siempre |
 | `docs/CONTEXTO.md` | Este documento, para programar |

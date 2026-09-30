@@ -51,6 +51,7 @@
 <link rel="stylesheet" href="css/personas.css">
 <link rel="stylesheet" href="css/estado-hito.css">
 <link rel="stylesheet" href="css/administraciones.css">
+<link rel="stylesheet" href="css/soporte.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -575,6 +576,25 @@
         </div>
       </details>
 
+      <!-- Fila 213, docs/BOTON-DE-SOPORTE.md: dónde está el buzón al que
+           manda sus avisos el botón «Soporte». Se guarda en _GESTOR. -->
+      <details class="bloque-ajustes" id="bloque-soporte">
+        <summary>
+          <span class="bloque-titulo">Buzón de soporte</span>
+          <span class="bloque-pie">A dónde llegan los avisos del botón «Soporte»</span>
+        </summary>
+        <div class="bloque-cuerpo">
+      <p class="explica">El botón «Soporte» (abajo a la derecha) manda los avisos de error y las
+         propuestas de mejora a un buzón de Google. Pega aquí su dirección (empieza por
+         https://script.google.com). Es de todo el centro: vale igual en los dos ordenadores.
+         Los pasos para ponerlo en marcha están en <code>docs/PONER-EN-MARCHA-SOPORTE.md</code>.</p>
+      <div class="alta-tipo">
+        <label class="etiqueta-en-linea" for="soporte-url">Dirección del buzón de soporte</label>
+        <input id="soporte-url" type="url" class="campo" placeholder="https://script.google.com/macros/s/…/exec">
+      </div>
+        </div>
+      </details>
+
       <!-- Fila 200, apartado 6: "Caducidad de las copias" y el texto
            explicativo de "Copias de seguridad" (que vivía en
            Mantenimiento) juntos aquí. La lista con los botones de
@@ -977,6 +997,9 @@
 <script src="js/nucleo.js"></script>
 <script src="js/borrados-fusion.js"></script>
 <script src="js/version.js"></script>
+<!-- Fila 213, docs/BOTON-DE-SOPORTE.md: el botón «Soporte». Va justo después de
+     la versión para recoger cuanto antes los errores de la consola. -->
+<script src="js/soporte.js"></script>
 <script src="js/asuntos-lista.js"></script>
 <script src="js/asuntos-lista-montones.js"></script>
 <script src="js/asuntos-lista-pintar.js"></script>

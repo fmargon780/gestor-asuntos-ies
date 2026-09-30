@@ -200,6 +200,8 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
+- Fila 213 (botón de soporte): hasta que Francisco siga `docs/PONER-EN-MARCHA-SOPORTE.md` (permiso de GitHub, script de Google, dirección en Ajustes → El centro), el botón se ve pero avisa de que el buzón no está configurado (30-sep-2026).
+
 - `pruebas/tras-cada-accion.mjs` falla en la sesión de Claude Code (punto 3, «al volver, la misma altura»), también sin los cambios de la fila 230: parece depender de la altura de pantalla del entorno (29-sep-2026).
 
 - Fila 223: `.claude/settings.json` sigue sin poder crearlo ninguna sesión de Claude Code (lo

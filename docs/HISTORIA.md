@@ -5,6 +5,18 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 30-sep-2026 — Fila 213: el botón de soporte
+
+Botón «Soporte» en todas las pantallas (`js/soporte.js`, `css/soporte.css`) y buzón en un script de
+Google (`apps-script/soporte.gs`, no en Vercel: la red del IES bloquea `vercel.app`, Google no). Cada
+aviso se guarda entero en Drive y apunta una IDEA en la cola sin ningún dato del usuario (repositorio
+público). La dirección del buzón se guarda en `ajustesAvisos.urlSoporte`. Decisiones de la sesión: la
+pantalla viaja solo por su nombre (nunca el título, que en una ficha sería el asunto); si GitHub falla, el
+aviso queda en Drive y se contesta ok. Pasos de Francisco en `docs/PONER-EN-MARCHA-SOPORTE.md`.
+Sustituye a la vieja «Soporte App-to-All» (su Supabase, sin tocar).
+
+---
+
 ## 29-sep-2026 — Fila 203: la papelera se vacía sola a los 90 días
 
 Cerrada la pregunta que arrastraba la cola desde el 18-sep («¿la papelera se vacía sola?»): a los 90

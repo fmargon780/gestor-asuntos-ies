@@ -110,3 +110,49 @@ hacerlo.
   que se descarga de `fmargon780/gestor-asuntos-copia`, que sí tiene que seguir público. Solo
   habría que cambiar el enlace a `gestor-correos.gs` de `js/correo-enviar.js`. Se decidirá
   aparte con Francisco.)
+
+## Cómo sabemos que está bien
+
+1. Abrir la copia de pruebas con datos de demostración y entrar: abajo a la derecha, en Inicio y en
+   cualquier otra pantalla, hay un botón pequeño «Soporte» que no tapa ningún otro botón.
+2. Pulsar «Soporte»: se abre una ventana con dos opciones («Algo no funciona» y «Propongo una
+   mejora»), un recuadro de texto, una zona para pegar una captura, y «Cancelar» y «Enviar». Con ✕,
+   con «Cancelar» y con la tecla Escape la ventana se cierra.
+3. Pulsar «Enviar» sin elegir nada, y luego eligiendo «Algo no funciona» sin escribir texto: la
+   ventana sigue abierta y dice en cada caso qué falta.
+4. Elegir «Propongo una mejora», escribir «Prueba de la revisión» y pulsar «Enviar» (sin haber
+   puesto todavía ninguna dirección de buzón): sale un aviso rojo que dice que el buzón de soporte
+   aún no está configurado, y el texto «Prueba de la revisión» sigue en el recuadro.
+5. Ir a Ajustes → El centro, abrir «Buzón de soporte», escribir `http://no-vale` y salir del campo: la
+   dirección no se guarda (dice que tiene que empezar por https://). Escribir
+   `https://buzon.invalido/exec` y salir del campo: dice que se ha guardado, y al salir de Ajustes y
+   volver a entrar el campo la sigue mostrando.
+6. Con esa dirección puesta, volver al botón «Soporte», escribir un texto y pulsar «Enviar»: como
+   el buzón de esa dirección no existe, sale un aviso rojo de que no se ha podido contactar con el
+   buzón, y el texto sigue en el recuadro para reintentar (no se pierde).
+7. **[SOLO FRANCISCO]** Pegar de verdad una captura con Ctrl+V dentro de la ventana: se ve en
+   pequeño, se puede quitar con «Quitar la captura» y, al enviar de verdad, llega a Drive.
+8. **[SOLO FRANCISCO]** Con el buzón de verdad puesto en marcha (`docs/PONER-EN-MARCHA-SOPORTE.md`),
+   enviar un aviso: sale «Recibido. Gracias», el aviso completo está en Drive (`SOPORTE-AVISOS`) y
+   aparece una fila IDEA nueva en el Centro de mando, sin el texto que se escribió.
+9. **[SOLO FRANCISCO]** En la copia sin internet del centro (`file://`), el botón y la ventana
+    funcionan igual y la app arranca como siempre.
+
+## Cómo se hizo (30-sep-2026)
+
+- Botón y ventana: `js/soporte.js` y `css/soporte.css`. Se carga justo después de `js/version.js`
+  para recoger cuanto antes los errores de la consola (`window.onerror`, promesas rechazadas y
+  `console.error`; se guardan los 10 últimos y solo viajan en «Algo no funciona»).
+- La dirección del buzón vive en `registro.ajustesAvisos.urlSoporte` (`asuntos.json`, compartido por
+  los dos ordenadores), como los demás días de aviso. El campo está en Ajustes → El centro → «Buzón de
+  soporte»; solo se admite una dirección que empiece por `https://`.
+- Decisión de la sesión: la pantalla que viaja es solo su **nombre** (Inicio, Archivo…), sacado del
+  identificador de la pantalla, nunca el título que se ve (en la ficha sería el nombre del asunto y
+  de la persona, y la fila de la cola es pública). El script además la limpia y la corta.
+- Decisión de la sesión: si el aviso llega a Drive pero GitHub falla (permiso caducado, tres
+  conflictos seguidos), el buzón contesta `ok` con `colaApuntada: false`: el aviso no se pierde y la
+  persona no ve un error que no puede arreglar. Sin `GITHUB_TOKEN`, igual.
+- El nombre de quien avisa: el usuario que ha entrado; si no lo hay (pantalla de entrada), se pide una
+  vez y se recuerda en ese ordenador (`localStorage`, `gestor-soporte-nombre`).
+- El buzón: `apps-script/soporte.gs`. Pruebas: `pruebas/soporte.mjs` (botón, ventana, Ajustes, envío
+  con un buzón de mentira) y `pruebas/soporte-script.mjs` (el script con Drive y GitHub falsos).
