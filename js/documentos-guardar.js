@@ -150,7 +150,7 @@
         U.aviso('Datos del documento guardados.', 'bueno');
       } else {
         await Carpetas.renombrarFichero(N.asuntoActual.handle, opciones.nombreActual, nombre);
-        U.aviso('Documento renombrado.', 'bueno');
+        U.aviso('Nombre del documento cambiado.', 'bueno');
       }
     } catch (e) {
       U.fallo('No he podido guardarlo', e);

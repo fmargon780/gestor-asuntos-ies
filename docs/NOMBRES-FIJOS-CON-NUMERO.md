@@ -123,7 +123,8 @@ documento con número, y alguno antiguo sin número, para que el revisor vea los
 1. En la copia de pruebas, crear un asunto nuevo: la carpeta se llama `AAMMDD A26-NNNN TIPO Tercero`,
    sin año académico, grupo, campos ni texto libre, y la vista previa enseña exactamente ese nombre.
 2. Crear otro asunto del mismo tipo, mismo tercero y mismo día: sale con el número siguiente y no hay
-   ningún aviso de duplicado de nombre.
+   ningún error de nombre repetido («Ya hay un asunto abierto con ese mismo nombre»). El aviso suave de siempre
+   «¿Esto no lo hicimos ya?» (mismo tercero y tipo) puede salir: se elige «Crear otro de todas formas» y se crea.
 3. Guardar un documento en ese asunto: se llama `AAMMDD TIPO D26-NNNNN.ext`; su fila enseña el
    registro, los campos y el texto adicional, y el buscador lo encuentra por el registro.
 4. Registrar a mano un fichero distinto (sellado): el sellado y el sin sellar llevan el mismo número;

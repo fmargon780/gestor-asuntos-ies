@@ -142,7 +142,7 @@ var TiposLargos = (function () {
     var promesa = U.preguntar('Tipos con el nombre demasiado largo',
       '<p class="explica">El nombre corto de un tipo entra en el nombre de las carpetas y de los documentos nuevos, ' +
       'y no puede pasar de ' + TOPE + ' caracteres. Los que ya existen se siguen usando con su nombre entero; ' +
-      'acortarlos no renombra nada. Se guarda al salir de cada casilla.</p>' +
+      'acortarlos no cambia el nombre de nada de lo que ya existe. Se guarda al salir de cada casilla.</p>' +
       '<div id="tipos-largos-lista">' + todos.map(fila).join('') + '</div>', 'Cerrar', true);
     Array.prototype.forEach.call(document.querySelectorAll('.tipo-largo-corto'), function (campo) {
       var i = Number(campo.dataset.i);
