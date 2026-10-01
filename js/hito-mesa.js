@@ -291,7 +291,12 @@ var HitoMesa = (function () {
         '</div>' +
       '</div>' +
       (todoHecho ? '<div class="mesa-todo-hecho aviso aviso-verde">Todos los hitos están hechos. ' +
-        '<button type="button" class="boton boton-principal mesa-archivar-asunto">Archivar el asunto</button></div>' : '');
+        /* Fila 249: en un tipo que hay que liquidar, no se archiva: se pasa a «Por liquidar». */
+        (window.PorLiquidar && PorLiquidar.exige(a) && PorLiquidar.estaPorLiquidar(a)
+          ? 'El asunto está en «Por liquidar».'
+          : '<button type="button" class="boton boton-principal mesa-archivar-asunto">' +
+            (window.PorLiquidar ? PorLiquidar.textoDelBoton(a) : 'Archivar el asunto') + '</button>') +
+        '</div>' : '');
 
     Array.prototype.forEach.call(cab.querySelectorAll('.mesa-tira-hito'), function (b) {
       b.onclick = function () { abrir(a, b.dataset.id); };

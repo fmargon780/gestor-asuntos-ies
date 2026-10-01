@@ -167,8 +167,13 @@ function construirSeccionDatos(tipo) {
   interruptores.appendChild(App.construirInterruptorDeTipo(tipo, 'llevaFirma', false,
     'Lleva la firma digital del director', 'Deja libre la banda de abajo al preparar el documento.'));
   /* Fila 249 (docs/POR-LIQUIDAR.md): al terminar, el asunto pasa a «Por liquidar» en vez de archivarse. */
-  interruptores.appendChild(App.construirInterruptorDeTipo(tipo, 'liquidar', false,
-    'Hay que liquidarlo antes de archivar', 'Al terminar, el asunto pasa a «Por liquidar» en vez de archivarse.'));
+  var filaLiquidar = App.construirInterruptorDeTipo(tipo, 'liquidar', false,
+    'Hay que liquidarlo antes de archivar', 'Al terminar, el asunto pasa a «Por liquidar» en vez de archivarse.');
+  /* Con el cambio, la pestaña «Por liquidar» de Inicio sale o se va sin esperar a otro repintado. */
+  filaLiquidar.querySelector('input').addEventListener('change', function () {
+    if (window.InicioTabla) InicioTabla.pintar();
+  });
+  interruptores.appendChild(filaLiquidar);
   b.cuerpo.appendChild(interruptores);
 
   /* «Al cerrar el asunto, avisar a quien lo pide» (fila 195,

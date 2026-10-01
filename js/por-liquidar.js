@@ -62,8 +62,10 @@ window.PorLiquidar = (function () {
     });
   }
 
-  function repintar() {
+  function repintar(a) {
     if (window.Inicio && Inicio.repintar) Inicio.repintar();
+    /* La ficha abierta cambia su botón («Pasar a Por liquidar» / «Archivar el asunto»). */
+    try { if (a && App.repintarAccionesFicha) App.repintarAccionesFicha(a.nombre); } catch (e) { /* solo pintar */ }
   }
 
   /* ==========================================================
@@ -76,13 +78,13 @@ window.PorLiquidar = (function () {
     await App.anotar(a.nombre, { porLiquidar: estado });
     if (a.ficha) a.ficha.porLiquidar = estado;
     if (window.RegistroAsunto) await RegistroAsunto.auto(a, 'Pasa a Por liquidar');
-    repintar();
+    repintar(a);
   }
 
   async function quitar(a) {
     await App.anotar(a.nombre, { porLiquidar: null });
     if (a.ficha) a.ficha.porLiquidar = null;
-    repintar();
+    repintar(a);
   }
 
   /* Lo que llaman los botones «Archivar el asunto» / «Archivar»: para un

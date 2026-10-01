@@ -206,7 +206,7 @@
     Array.prototype.forEach.call(cont.querySelectorAll('.inicio-pestana'), function (b) {
       var p = b.dataset.pestana;
       /* Fila 249: «Por liquidar» solo existe si algún tipo lo pide (o aún quedan asuntos en ella). */
-      if (p === 'liq') b.classList.toggle('oculto', !(window.PorLiquidar && (PorLiquidar.hayTipos() || (r.liq || []).length)));
+      if (p === 'liq') b.classList.toggle('oculto', !(window.PorLiquidar && PorLiquidar.hayTipos()));
       b.classList.toggle('activa', !filtroAviso && p === pestanaActual);
       var n = b.querySelector('.cuenta-lista');
       if (n) n.textContent = cuentas[p] || 0;
@@ -235,7 +235,7 @@
     pintarChip();
 
     /* Fila 249: sin tipos que liquidar, la pestaña no existe: se vuelve a «Todos los abiertos». */
-    if (pestanaActual === 'liq' && !(window.PorLiquidar && (PorLiquidar.hayTipos() || r.liq.length))) {
+    if (pestanaActual === 'liq' && !(window.PorLiquidar && PorLiquidar.hayTipos())) {
       pestanaActual = 'todos';
       pintarPestanas(r);
     }

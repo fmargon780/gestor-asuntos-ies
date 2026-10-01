@@ -99,8 +99,12 @@ await pagina.waitForTimeout(800);
 await comprobar('4. aviso verde «Pasa a Por liquidar» con «Deshacer»',
   pagina.evaluate(() => [...document.querySelectorAll('.mensaje')].map((m) => m.textContent).filter((t) => /Por liquidar/.test(t)).length > 0 && !!document.querySelector('.mensaje-boton')), true);
 await comprobar('4. el asunto está en «Por liquidar»', pagina.evaluate((c) => PorLiquidar.estaPorLiquidar(Gestor.asuntos().filter((a) => a.nombre === c)[0]), claveEsteban), true);
+await comprobar('4. en la mesa no sale «Archivar el asunto»',
+  pagina.evaluate(() => { const t = document.querySelector('.mesa-todo-hecho'); return { aviso: !!t, archivar: /Archivar el asunto/.test(document.querySelector('#ficha-guia').textContent.replace(/Archivar el asunto\s*$/, '') && (t ? t.textContent : '')) }; }),
+  { aviso: true, archivar: false });
 await pagina.click('.mensaje-boton');
 await pagina.waitForTimeout(800);
+await comprobar('4. tras «Deshacer», la ficha abierta sigue diciendo «Pasar a Por liquidar»', pagina.locator('#ficha-archivar button').textContent(), 'Pasar a Por liquidar');
 await comprobar('4. «Deshacer»: ya no está en «Por liquidar»', pagina.evaluate((c) => PorLiquidar.estaPorLiquidar(Gestor.asuntos().filter((a) => a.nombre === c)[0]), claveEsteban), false);
 await comprobar('4. y su hito vuelve a estar sin hacer',
   pagina.evaluate(async (c) => { const hs = await Hitos.hitosDe(c); return hs[0].estado !== 'hecho'; }, claveEsteban), true);
@@ -219,6 +223,11 @@ await comprobar('8. al marcarla se guarda en el tipo', pagina.evaluate(() => App
 await pagina.click('.pestana[data-pantalla="abiertos"]').catch(() => pagina.evaluate(() => App.verAbiertos()));
 await pagina.waitForTimeout(600);
 await comprobar('8. y la pestaña «Por liquidar» vuelve a salir', cuentaPestana('liq'), '0');
+await casilla.evaluate((el) => { el.checked = false; el.dispatchEvent(new Event('change')); });
+await pagina.waitForTimeout(400);
+await pagina.click('.pestana[data-pantalla="abiertos"]');
+await pagina.waitForTimeout(600);
+await comprobar('8. desmarcada otra vez desde Ajustes, la pestaña se va aunque queden asuntos', cuentaPestana('liq'), null);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 await pagina.close();
