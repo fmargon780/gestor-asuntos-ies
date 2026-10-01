@@ -111,7 +111,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   acordeón: un hito abierto a la vez.
 - Panel lateral de lectura; tablón a la vista. Al crear, recuadro con lo que ya tiene el tercero; parada si es idéntico; pantalla "Duplicados".
 - Correo y mensaje de Séneca: se prepara; el correo se envía de verdad (Apps Script, con
-  confirmación) y nunca dos veces. Avisar a quien lo pide (fila 195): casilla por hito («al
+  confirmación) y nunca dos veces; al enviar queda un PDF `CORREO` en el asunto (fila 236). Avisar a quien lo pide (fila 195): casilla por hito («al
   terminar») y por tipo («al cerrar»), con su plantilla; al marcar el hito hecho o al archivar,
   el cuadro sale relleno, con «Enviar» o «Esta vez no» (no vuelve a preguntar por ese hito).
   «Enviar estado»: en «El encargo» de la ficha y en «···» de la mesa, el mismo cuadro con «Aviso

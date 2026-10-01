@@ -4248,3 +4248,11 @@ con aviso en llano). Ventana ancha (900 px), cuadro de 14 renglones que crece al
 cinco apartados y contador «N palabras». `VERSION_SCRIPT` = «1-oct-2026 · fila 240»: **Francisco tiene
 que volver a pegar `soporte.gs`** (hasta entonces el servidor sigue cortando en 5.000). Pruebas:
 `pruebas/soporte.mjs` y `pruebas/soporte-script.mjs`.
+
+## 1-oct-2026 · fila 236 · El correo enviado se guarda en PDF en el asunto
+
+Al enviar con «Confirmar y enviar» (`js/correo-cuadro.js`) se llama a `CorreoEnviadoPdf.alEnviar`
+(`js/correo-enviado-pdf.js`, pdf-lib): PDF `AAMMDD CORREO <asunto>.pdf` con cabecera, texto y lista de
+adjuntos, que la ficha reconoce como «Llegado por correo». Con `yaEnviado`, solo si no estaba; si falla,
+ámbar. Prueba `pruebas/correo-enviado-pdf.mjs`. La respuesta que llegue por la bandeja crea el HILO como
+siempre.

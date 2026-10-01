@@ -131,3 +131,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 240 — soporte con texto sin límite (1-oct-2026)
 
 - Pegar `apps-script/soporte.gs` entero en el proyecto «Gestor - Soporte» (pasos en `docs/PONER-EN-MARCHA-SOPORTE.md`), guardar, y mandar un aviso largo (más de 5.000 caracteres): llega entero al `.txt` de Drive y la fila IDEA de la cola no lleva el texto. Hasta que se pegue, el servidor sigue rechazando los de más de 5.000.
+
+## Fila 236 — el correo enviado, en PDF (1-oct-2026)
+
+- Enviar un correo real desde la app: aparece el `CORREO` en el asunto. Cuando el destinatario conteste y la respuesta entre por la bandeja y se guarde en el asunto, aparece el HILO como siempre y el `CORREO` del envío sigue en su sitio.
