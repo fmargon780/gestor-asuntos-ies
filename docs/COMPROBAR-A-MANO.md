@@ -111,3 +111,7 @@ Eso prueba bien **cómo reacciona** la aplicación a un fichero que falta, a una
 un permiso perdido — pero no prueba que Dropbox, Séneca o Google **de verdad** se comporten como
 se espera. Eso solo se ve entrando de verdad, y por eso esta lista existe: no para sustituir las
 pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
+
+## Fila 229 — el registro del asunto (1-oct-2026)
+
+- Abrir un asunto de verdad que ya tuviera notas e historia de antes: están todas en el «Registro» de la ficha, ninguna se ha perdido, y el compañero las ve igual desde su ordenador.
