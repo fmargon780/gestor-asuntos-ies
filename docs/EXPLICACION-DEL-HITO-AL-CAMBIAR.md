@@ -88,8 +88,9 @@ siempre.
 2. Cambiar una palabra de la explicación, dejar «A la guía de <tipo>» marcada y Guardar: la mesa
    enseña el texto nuevo, con las viñetas. En Ajustes → la guía de ese tipo, el hito tiene el
    texto nuevo. Otro asunto abierto del mismo tipo con ese hito vacío también lo tiene.
-3. Pulsar «Deshacer» en el aviso verde: la explicación vuelve a la de antes, aquí, en la guía y en
-   el otro asunto.
+3. Pulsar «Deshacer» en el aviso verde: la explicación vuelve a la de antes en la guía y en el
+   otro asunto; aquí se queda el cambio, como «solo en este asunto» (igual que el título,
+   `docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md`, punto 5).
 4. Cambiar la explicación eligiendo «Solo en este asunto»: cambia aquí; la guía y el otro asunto
    siguen con la de antes. Recargar la página: el cambio sigue aquí.
 5. «Hito ▾» → «Crear»: sale el cuadro «Explicación» vacío. Escribir un título y una explicación
