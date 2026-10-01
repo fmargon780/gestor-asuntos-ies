@@ -4192,3 +4192,13 @@ solo si `origin/pruebas` ya es ancestro de `origin/main`; y una fila solo es HEC
 `main` y publicado por Vercel. Las filas 235, 229 y 231 vuelven a PENDIENTE, con su SHA de rescate
 (los cuatro SHA responden en GitHub). Reglas tocadas: `CLAUDE.md`, reglas 0, 13 y 19 de
 `docs/COLA.md`, `docs/REVISOR-GUION.md`, `docs/COPIA-DE-PRUEBAS.md`, `docs/CONTEXTO-CORTO.md`.
+
+## 1-oct-2026 — Fila 231: «Nuevo asunto» sale siempre completo
+
+Causa: al cancelar o volver, `js/usabilidad.js` escondía `bloque-tipos`, `bloque-tercero` y
+`bloque-detalles` (siempre a la vista desde las filas 197 y 215) y `App.prepararNuevo` no los volvía
+a enseñar, así que la siguiente entrada (p. ej. «Crear asunto con él») salía sin buscador ni
+parrilla. Arreglo: usabilidad.js solo esconde lo que empieza escondido, y `prepararNuevo` enseña
+siempre las tres partes. Rescatado de `8d9deba` sobre `main` actual; prueba
+`pruebas/crear-asunto-desde-por-clasificar.mjs`. Revisor local APROBADA. Observación del revisor (no
+bloquea): con un documento con solo el tipo reconocido, el formulario no deja el tipo marcado.
