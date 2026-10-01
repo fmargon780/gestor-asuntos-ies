@@ -191,6 +191,10 @@ de `App` va después del fichero que lo define.
 | `js/hitos-generar.js` | «Generar documento» dentro de un hito (fila 102): elige entre las plantillas del paso y las del tipo y llama a `PlantillasDocumento.generar(..., { hito })`; cargado justo después de `js/plantillas-documento.js` |
 | `js/visor.js` | El panel de la derecha para ver un documento (`con-visor`); marcador y acciones opcionales para que quien lo abre sepa qué se está viendo (la ficha del asunto pone ahí la barra de PDF, fila 168). Desde la fila 155, un `.docx` va a `js/word-visor.js` y lo que no sabe enseñar se baja con su nombre |
 | `js/word-visor.js` | `WordVisor` (fila 155): el Word en grande dentro de la aplicación, con «Guardar PDF» en la carpeta del asunto e «Imprimir» (`css/word-visor.css`) |
+| `js/exportar-datos.js` | `ExportarAsuntos` (fila 241): lo que se ve en Inicio y los archivados que cumplen los mismos filtros (índice del ARCHIVO), una fila neutra por asunto, el catálogo de columnas (y campos propios), la tabla con sumas, números a la española, columnas recordadas |
+| `js/exportar-hoja.js` | `ExportarHoja` (fila 241): el `.xlsx` de «Exportar ▾ → Hoja de cálculo», escrito con JSZip (pestañas «Asuntos» e «Hitos») |
+| `js/exportar-informe.js` | `ExportarInforme` (fila 241): el informe en PDF dentro de la aplicación (membrete, tabla paginada, hitos, totales; «Guardar PDF», «Imprimir», `css/exportar.css`) |
+| `js/exportar-ventana.js` | El botón «Exportar ▾» de Inicio y su ventana de columnas (fila 241) |
 | `js/duplicados-aviso.js` | `DuplicadosAviso` (fila 163): el recuadro de «Nuevo asunto» con lo que ya tiene el tercero (mismo tipo en rojo, archivados a 15 días, el resto en gris); lo llama `js/duplicados.js` |
 | `js/versiones-previas.js` | `VersionesPrevias` (fila 160): la subcarpeta de previas de cada asunto, `_Previas` (fila 239) o la «Versiones previas» de antes (mover, sacar, listar, qué va allí) y el botón de Ajustes › Mantenimiento |
 | `js/numeros.js` | `Numeros` (fila 239): el número único de asunto (`A26-0137`) y de documento (`D26-01234`), el contador de `_GESTOR/numeros.json` y el número de cada fichero de origen |

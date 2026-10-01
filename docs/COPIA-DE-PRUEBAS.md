@@ -73,6 +73,8 @@ Qué tiene que haber (nombres claramente inventados; nada de personas reales):
   tercero, uno esperando a una Administración, uno reservado, dos del mismo tercero (para ver la
   parada de duplicados), uno con relacionados por grupo, uno con hilo de correo ya registrado.
 - 6 asuntos archivados en dos cursos (`2025-2026` y `2026-2027`), con su ficha e índice.
+- Fila 241: el tipo `SEGURO ESCOLAR` (campo propio «Importe»), con dos cobros abiertos y tres ya
+  archivados (1,12 € cada uno), para probar «Exportar ▾» con totales.
 - 4 documentos PDF pequeños generados al vuelo con `pdf-lib` (ya está en `js/lib/`): dos dentro
   de asuntos (uno registrado con sello simulado en «Versiones previas»), dos «por clasificar».
 - Tablón con 2 notas. Ajustes del centro rellenos (nombre del centro, cargos, firmantes, días de
