@@ -196,10 +196,11 @@ var Nombres = (function () {
        el nombre (siguen en la ficha). Sin número (asuntos de antes), la
        estructura de siempre. */
     if (datos.numero) {
+      var corto = acortarNombrePila(datos.tercero);
       var fijo = unir([U.aAaMmDd(datos.fecha), datos.numero, U.limpiarNombre(datos.tipo).toUpperCase(),
-        U.limpiarNombre(datos.tercero)]);
+        corto]);
       var cabe = typeof window !== 'undefined' && window.Nombres && typeof window.Nombres.cabeEnRuta === 'function'
-        ? window.Nombres.cabeEnRuta(fijo, datos.tercero, datos.categoria) : { cabe: true };
+        ? window.Nombres.cabeEnRuta(fijo, corto, datos.categoria) : { cabe: true };
       return { nombre: fijo, recortado: false, noCabe: !cabe.cabe, margen: cabe.margen };
     }
     var antes = [U.aAaMmDd(datos.fecha), U.limpiarNombre(datos.tipo).toUpperCase()];
@@ -334,6 +335,61 @@ var Nombres = (function () {
     var m2 = resto.match(/^([A-ZÁÉÍÓÚÜÑ0-9._-]{2,})\s+(.*)$/);
     if (m2) return { fecha: fecha, numero: numero, tipo: m2[1], resto: m2[2], reconocido: false };
     return { fecha: fecha, numero: numero, tipo: '', resto: resto, reconocido: false };
+  }
+
+  /* ---------- nombres de pila largos (fila 247, docs/NOMBRES-DE-PILA-LARGOS.md) ----------
+
+     Un tercero «Apellido1 Apellido2, Nombre… <número>» cuyo nombre (sin el
+     número ni los 4 caracteres del documento) pasa de 40 caracteres se
+     escribe, SOLO en nombres de carpetas, con el primer nombre de pila
+     entero y los demás en inicial con punto; las partículas (de, del, la,
+     los…) se quitan. Los apellidos y el número no se tocan. El nombre
+     completo sigue en la ficha, en los buscadores y en los documentos. */
+  var TOPE_NOMBRE_LARGO = 40;
+  var PARTICULAS = { de: 1, del: 1, la: 1, las: 1, los: 1, y: 1 };
+
+  /* PURA. Parte «Apellidos, Nombres 1234567» en { apellidos, pilas, id }. */
+  function partirTercero(t) {
+    var texto = U.limpiarNombre(t);
+    var coma = texto.indexOf(',');
+    if (coma < 0) return null;
+    var apellidos = texto.slice(0, coma).trim();
+    var piezas = texto.slice(coma + 1).trim().split(/\s+/).filter(Boolean);
+    var id = '';
+    if (piezas.length > 1 && /^[0-9A-Za-z]{4,}$/.test(piezas[piezas.length - 1]) && /\d/.test(piezas[piezas.length - 1])) {
+      id = piezas.pop();
+    }
+    return { apellidos: apellidos, pilas: piezas, id: id };
+  }
+
+  /* PURA. El tercero como se escribe en una carpeta. */
+  function acortarNombrePila(t) {
+    var p = partirTercero(t);
+    if (!p || !p.pilas.length) return U.limpiarNombre(t);
+    if ((p.apellidos + ', ' + p.pilas.join(' ')).length <= TOPE_NOMBRE_LARGO) return U.limpiarNombre(t);
+    var utiles = p.pilas.slice(1).filter(function (x) { return !PARTICULAS[x.toLowerCase()]; });
+    var cortas = [p.pilas[0]].concat(utiles.map(function (x) { return x.charAt(0).toUpperCase() + '.'; }));
+    return U.limpiarNombre(p.apellidos + ', ' + cortas.join(' ') + (p.id ? ' ' + p.id : ''));
+  }
+
+  /* PURA. Lo que identifica a la persona en forma corta o larga: número
+     (o 4 caracteres) + apellidos, sin tildes ni mayúsculas. */
+  function claveDeTercero(t) {
+    var p = partirTercero(t);
+    if (!p || !p.id) return '';
+    var ap = p.apellidos.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ');
+    return p.id.toUpperCase() + '|' + ap;
+  }
+
+  /* PURA. De las carpetas de tercero que ya hay, la de la misma persona (si
+     hay) o, si no, el nombre corto. */
+  function carpetaDeTercero(tercero, existentes) {
+    var clave = claveDeTercero(tercero);
+    if (clave) {
+      var lista = existentes || [];
+      for (var i = 0; i < lista.length; i++) if (claveDeTercero(lista[i]) === clave) return lista[i];
+    }
+    return acortarNombrePila(tercero);
   }
 
   /* Cómo se escribe cada clase de tercero dentro del nombre. */
@@ -571,6 +627,7 @@ var Nombres = (function () {
     montarAsunto: montarAsunto, montarDocumentoAjustado: montarDocumentoAjustado,
     TOPE_ASUNTO: TOPE_ASUNTO, TOPE_DOCUMENTO: TOPE_DOCUMENTO, AVISO_RECORTE: AVISO_RECORTE, AVISO_NO_CABE: AVISO_NO_CABE, avisoRecorte: avisoRecorte,
     extensionDe: extensionDe, cortoDeTipoDocumento: cortoDeTipoDocumento,
+    acortarNombrePila: acortarNombrePila, claveDeTercero: claveDeTercero, carpetaDeTercero: carpetaDeTercero,
     terceroAlumno: terceroAlumno, terceroDeResto: terceroDeResto,
     cursoYGrupoDeResto: cursoYGrupoDeResto,
     terceroPersonal: terceroPersonal, terceroEmpresa: terceroEmpresa

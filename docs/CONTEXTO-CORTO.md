@@ -65,6 +65,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Documento nuevo (fila 239): `AAMMDD TIPO D26-01234.ext`, con la fecha del propio documento y número
   único anual; el registro, los campos y el texto adicional van a la ficha. Los de antes:
   `AAMMDD [REGISTRO] TIPO [TEXTO ADICIONAL].ext`. Nombre corto de tipo: 25 caracteres como mucho.
+  Nombres de pila de más de 40 caracteres: primero entero y el resto en inicial (solo en carpetas).
   Detalle en `docs/contexto/NOMBRES-FIJOS.md`.
 - Registro de Séneca: `26EM1234` = año + E/S (entrada/salida) + M/A (serie manual/automática) +
   cuatro dígitos del asiento.

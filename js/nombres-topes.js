@@ -144,6 +144,7 @@
     var mayor = '';
     (lista || []).forEach(function (p) {
       var t = (window.App && App.textoTercero) ? App.textoTercero(Object.assign({ categoria: categoria }, p)) : String(p.nombre || '');
+      if (window.Nombres && Nombres.acortarNombrePila) t = Nombres.acortarNombrePila(t);
       if (t.length > mayor.length) mayor = t;
     });
     return mayor;
