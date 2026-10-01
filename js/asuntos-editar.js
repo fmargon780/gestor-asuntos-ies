@@ -112,7 +112,7 @@ App.pintarCamposEditar = function (tipo, guardados, ficha) {
       if (p) cfgParaPintar = Object.assign({}, cfg, { clase: p.clase, valores: p.valores });
     }
     return { cfg: cfgParaPintar, clave: clave, nombre: Campos.nombreDeCampo(cfg, App.E.campos),
-             valor: g.valor || '', enNombre: cfg.soloAqui ? false : g.enNombre !== false, soloAqui: !!cfg.soloAqui };
+             valor: g.valor || '', enNombre: cfg.soloAqui ? false : (g.enNombre !== undefined ? g.enNombre !== false : cfg.enNombre !== false), soloAqui: !!cfg.soloAqui };
   });
 
   var filas = items.map(function (it, i) {
