@@ -60,6 +60,7 @@ de `App` va después del fichero que lo define.
 | `js/datos-listas.js` | Escribe las listas de terceros dados de alta a mano (`anadirALista`, `guardarEnLista`, `quitarDeLista`, `apartarSolicitantesAnteriores`, colgadas de `Datos`), cada una por `ColaGuardado` y releyendo el CSV dentro (fila 130, sacadas de `js/datos.js`) |
 | `js/datos-tutores.js` | `Datos.tutoresDe`: los tutores legales de un alumno agrupados por persona, con su nombre entero, sexo e iniciales (sacado de `js/datos.js` en la fila 108) |
 | `js/personas-familias.js` | Personas y empresas, Alumnado (fila 125): matriculados primero y «Antiguos (N)» plegado, buscar por padre/madre/tutor legal (bloque «Familias»), hermanos en el centro en la ficha y la tarjeta de quien se está viendo marcada. Lo llama `js/archivo-personas.js` |
+| `pruebas/sello-documento-nuevo.mjs` | Prueba (navegador de verdad, fila 233): «Es un documento nuevo» en el aviso del sello |
 | `js/campos-clases.js` | Las cinco clases de un campo propio y cómo se lee, se enseña y se pinta su valor (`CamposClases`, fila 244, funciones puras salvo los controles). Carga antes que `js/campos.js` |
 | `pruebas/campos-importe-numero-fecha.mjs` | Prueba (navegador de verdad, fila 244): clases, controles y ámbar, cambio de clase, plantilla y exportar |
 | `js/campos.js` | Los campos de cada tipo de asunto: catálogo, cálculo y guardado |
