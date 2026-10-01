@@ -123,3 +123,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 238 — certificado de miembro del Consejo Escolar (1-oct-2026)
 
 - Con los ficheros reales de Séneca (`RegMieConEsc …`) subidos con «Añadir ficheros del Consejo Escolar» (Herramientas → Tablas de datos), generar el certificado de una persona conocida: coincide con la hoja «Consejo Escolar - Historial de miembros 2002-2025» (periodos, cargos y ceses).
+
+## Fila 217 — correo con otra cuenta de Google abierta (1-oct-2026)
+
+- Con la cuenta personal abierta en el navegador, pulsar «Probar» en Ajustes › Enviar correo: debe llegar el correo de prueba; si no, debe salir el aviso claro («Google no ha dejado pasar el envío…»).

@@ -271,6 +271,15 @@ la versión del script en su mensaje de resultado.
   "Volver" no pierde nada de lo escrito a mano. **"Confirmar y enviar"** (`confirmarEnvio`) pasa
   los documentos marcados a base64 y llama a `CorreoEnviar.enviar(...)` con `para`, `cco`,
   `asunto`, `cuerpo`, `hilo` y `adjuntos`.
+- **Otra cuenta de Google abierta (fila 217, `docs/CORREO-OTRA-CUENTA-ABIERTA.md`)**: con la
+  dirección del script «de dominio» (`/a/g.educaand.es/macros/s/<id>/exec` o
+  `/a/macros/g.educaand.es/s/<id>/exec`) y otra cuenta abierta, Google redirige al inicio de sesión
+  sin CORS y `fetch` da `TypeError`. `CorreoEnviar.llamar` prueba primero la forma general
+  (`formaGeneral`: `/macros/s/<id>/exec` + `?k=`); solo si esa acaba en `TypeError` repite UNA vez
+  con la guardada (mismo cuerpo e `idEnvio`; un solo reloj de `LIMITE_MS` para todo). Si la general
+  contesta bien, pasa a ser la dirección guardada; si falla y la de dominio sí, se recuerda en
+  `localStorage` (`gestor-envio-general-no-vale`). Si fallan las dos, `textoNoHaPasado` (con el
+  dominio sacado de la dirección, `dominioDe`); tiempo agotado y errores HTTP no se repiten.
 - **`js/correo-enviar.js`** (nuevo, `window.CorreoEnviar`): guarda la dirección de la aplicación
   web **en este navegador** (`localStorage`, nunca en `_GESTOR`: cada persona conecta su propia
   cuenta de Google, igual que `js/copiar-ruta.js` con la ruta de las carpetas) y hace la llamada
