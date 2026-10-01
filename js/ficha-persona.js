@@ -212,7 +212,10 @@ var FichaPersona = (function () {
     var resumenDatos = '';
     if (App.FICHAS_DE_CATEGORIA[p.categoria]) {
       cuerpo.innerHTML = App.FICHAS_DE_CATEGORIA[p.categoria].html(p);
-      resumenDatos = nif;
+      /* El resumen: los dos primeros datos que no sean el nombre. */
+      resumenDatos = Object.keys(p.campos || {}).map(function (c) { return String(p.campos[c] || ''); })
+        .filter(function (v) { return v && U.normalizar(v) !== U.normalizar(p.nombre); })
+        .slice(0, 2).map(function (v) { return recortar(v, 40); }).join(' · ') || p.nif || p.documento || '';
     } else {
       /* Sin repetir lo que ya dice la cabecera: el nombre y el NIF. */
       var filas = Object.keys(p.campos || {}).map(function (c) { return { titulo: c, valor: p.campos[c] }; })
