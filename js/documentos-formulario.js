@@ -199,7 +199,7 @@
         '<div>' +
           '<label class="etiqueta">Texto adicional <span class="suave">(opcional)</span></label>' +
           '<input id="doc-curso" class="campo" value="' + U.escapar(curso) + '">' +
-          '<p class="nota">Lo que quieras añadir al nombre: el curso, una referencia…</p>' +
+          '<p class="nota">Va a la ficha del documento, no a su nombre: el curso, una referencia…</p>' +
         '</div>' +
       '</div>' +
 

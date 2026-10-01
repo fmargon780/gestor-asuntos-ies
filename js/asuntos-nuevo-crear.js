@@ -15,7 +15,6 @@ $('campo-fecha').oninput = function () {
 ['campo-curso', 'campo-descripcion'].forEach(function (id) {
   $(id).oninput = function () { App.refrescarVista(); };
 });
-$('campo-grupo').onchange = function () { App.refrescarVista(); };
 
 /* El nombre de la carpeta lleva el nombre corto del tipo si lo tiene
    (20-sep-2026, fila 79, apartado 4.9): `d.tipo` no se toca, porque
@@ -57,15 +56,13 @@ App.pedirNumeroNuevo = function () {
 };
 
 App.datosDelFormulario = function () {
-  var camposParaNombre = App.valoresCamposActuales()
-    .filter(function (v) { return v.enNombre && v.valor; })
-    .map(function (v) { return v.texto || v.valor; });   /* fila 244: lo que se ve, no lo que se guarda */
+  var camposParaNombre = [];   /* fila 251: los campos no entran en ningún nombre */
   var loPide = App.loPideNuevoControles ? App.loPideNuevoControles.leer() : null;
   var d = {
     fecha: $('campo-fecha').value,
     tipo: App.E.nuevo.tipo || '',
     curso: $('campo-curso').value.trim(),
-    grupo: $('campo-grupo').checked ? App.grupoDelTercero() : '',
+    grupo: '',   /* fila 251: el grupo ya no se ofrece para el nombre */
     campos: camposParaNombre,
     descripcion: $('campo-descripcion').value.trim(),
     tercero: App.E.nuevo.tercero ? App.textoTercero(App.E.nuevo.tercero) : ''
@@ -260,10 +257,8 @@ App.crearAsuntoDelFormulario = async function () {
     $('campo-descripcion').value = '';
     $('campo-limite').value = '';
     App.limiteNuevoAuto = '';
-    $('campo-grupo').checked = false;
     App.loPideNuevoControles = null;
     $('lopide-caja-nuevo').innerHTML = '';
-    $('bloque-grupo').classList.add('oculto');
     $('bloque-campos').classList.add('oculto');
     $('campos-lista-nuevo').innerHTML = '';
     /* Fila 215: bloque-detalles ya no se esconde entre un asunto y el

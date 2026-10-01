@@ -209,14 +209,8 @@ await comprobar('el nombre se monta sin el grupo',
   NOMBRE_NUEVO);   /* fila 239: estructura fija, sin curso, grupo ni descripción */
 
 /* --- el interruptor del grupo --- */
-await comprobar('el interruptor del grupo se ofrece',
-  pagina.locator('#bloque-grupo').isHidden(), false);
-await comprobar('y dice qué grupo pondría',
-  pagina.locator('#grupo-vista').textContent(), '(2ºB)');
-await pagina.check('#campo-grupo');
-await comprobar('al encenderlo el grupo, el nombre sigue igual (el grupo va a la ficha)',
-  pagina.locator('#vista-nombre').textContent(),
-  NOMBRE_NUEVO);
+await comprobar('ya no hay interruptor del grupo (fila 251)',
+  pagina.locator('#bloque-grupo, #campo-grupo').count(), 0);
 
 await pagina.click('#btn-crear');
 /* Fila 119: crear abre la ficha del asunto; se vuelve a la lista. */
@@ -238,8 +232,6 @@ await clicTipo('CERTIFICADO');
 await pagina.fill('#buscar-tercero', 'solano');
 await pagina.waitForSelector('#resultados-tercero .resultado');
 await pagina.click('#resultados-tercero .resultado');
-await comprobar('el grupo de Bachillerato lleva la etapa',
-  pagina.locator('#grupo-vista').textContent(), '(1ºBachA)');
 
 /* --- un alumno que ya no está matriculado no da grupo --- */
 await pagina.click('.pestana[data-pantalla="nuevo"]');
@@ -251,8 +243,6 @@ await comprobar('el buscador avisa de que ya no está matriculado',
   pagina.locator('#resultados-tercero .resultado-pie').first().textContent()
     .then(t => t.indexOf('No matriculado este curso') !== -1 && t.indexOf('24-25') !== -1), true);
 await pagina.click('#resultados-tercero .resultado');
-await comprobar('y no se ofrece ponerle el grupo',
-  pagina.locator('#bloque-grupo').isHidden(), true);
 await comprobar('el nombre se monta sin grupo ninguno',
   pagina.locator('#vista-nombre').textContent()
     .then(t => t.indexOf('4ºD') === -1), true);
@@ -292,8 +282,6 @@ await pagina.click('#resultados-tercero .resultado');
 await comprobar('el nombre lleva los cuatro últimos caracteres del DNI',
   pagina.locator('#vista-nombre').textContent()
     .then(t => t.indexOf('Aguado Ranea, Marcos Antonio 591R') !== -1), true);
-await comprobar('al personal no se le ofrece grupo',
-  pagina.locator('#bloque-grupo').isHidden(), true);
 
 await pagina.click('#btn-cambiar-tercero');
 await pagina.fill('#buscar-tercero', 'ordonez');
@@ -408,8 +396,6 @@ await pagina.waitForTimeout(400);
 await comprobar('el solicitante aparece marcado como tal',
   pagina.locator('#tercero-elegido .resultado-pie').first().textContent()
     .then(t => t.indexOf('Solicitante, todavía sin matricular') !== -1), true);
-await comprobar('al solicitante no se le ofrece grupo',
-  pagina.locator('#bloque-grupo').isHidden(), true);
 await comprobar('sin Nº, el nombre de la carpeta va solo con el nombre',
   pagina.locator('#vista-nombre').textContent()
     .then(t => t.indexOf('Nuevo Aspirante, Lucas') !== -1), true);

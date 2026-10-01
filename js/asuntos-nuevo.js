@@ -100,8 +100,6 @@ App.prepararNuevo = function () {
   $('campo-curso').value = '';
   $('campo-descripcion').value = '';
   $('campo-limite').value = '';
-  $('campo-grupo').checked = false;
-  $('bloque-grupo').classList.add('oculto');
   /* Fila 231: pase lo que pase antes (Cancelar, Volver), las tres partes
      fijas del formulario salen siempre a la vista. */
   ['bloque-tercero', 'bloque-tipos', 'bloque-detalles'].forEach(function (id) {

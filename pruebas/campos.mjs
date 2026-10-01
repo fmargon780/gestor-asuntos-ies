@@ -175,9 +175,8 @@ await comprobar('los dos campos quedan puestos, en orden',
    botón "Guardar campos", se guarda solo al marcar cada casilla. */
 const filaUnidad = pagina.locator('#campos-puestos .fila-tipo').filter({ hasText: 'Unidad' });
 await filaUnidad.locator('label:has-text("Obligatorio") input').check();
-await filaUnidad.locator('label:has-text("Añadir al nombre") input').check();
-const filaModalidad = pagina.locator('#campos-puestos .fila-tipo').filter({ hasText: 'Modalidad' });
-await filaModalidad.locator('label:has-text("Añadir al nombre") input').check();
+await comprobar('los campos puestos ya no ofrecen «Añadir al nombre» (fila 251)',
+  pagina.locator('#campos-puestos label:has-text("Añadir al nombre")').count(), 0);
 
 await pagina.locator('.tipo-asunto-seccion').filter({ hasText: 'Campos' }).screenshot({
   path: path.join(CARPETA_CAPTURAS, 'campos-cuadro-ajustes.png')
@@ -186,8 +185,8 @@ await pagina.locator('.tipo-asunto-seccion').filter({ hasText: 'Campos' }).scree
 await pagina.waitForTimeout(500);
 
 await comprobar('campos.json guarda la configuración de SANCION', leerJson('campos.json').then(j => j.porTipo.SANCION), [
-  { origen: 'fichero', columna: 'Unidad', obligatorio: true, enNombre: true },
-  { origen: 'fichero', columna: 'Modalidad de Bachillerato', obligatorio: false, enNombre: true }
+  { origen: 'fichero', columna: 'Unidad', obligatorio: true, enNombre: false },
+  { origen: 'fichero', columna: 'Modalidad de Bachillerato', obligatorio: false, enNombre: false }
 ]);
 
 /* ================================================================
@@ -234,8 +233,8 @@ await comprobar('la carpeta se crea con ese nombre', nombresDeAbiertos(),
   [('260911 ' + num(1) + ' SANCION Ramos Vidal, Elena 1150001')]);
 await comprobar('la ficha guarda los dos valores', leerJson('asuntos.json').then(j =>
   j.asuntos[('260911 ' + num(1) + ' SANCION Ramos Vidal, Elena 1150001')].campos), {
-  'fichero:Unidad': { valor: '1º Bach A', enNombre: true },
-  'fichero:Modalidad de Bachillerato': { valor: 'Ciencias', enNombre: true }
+  'fichero:Unidad': { valor: '1º Bach A', enNombre: false },
+  'fichero:Modalidad de Bachillerato': { valor: 'Ciencias', enNombre: false }
 });
 
 /* ================================================================
@@ -254,10 +253,8 @@ await pagina.waitForSelector('#bloque-campos:not(.oculto)');
 await pagina.fill('#campo-fecha', '2026-09-11');
 await pagina.fill('#campo-curso', '');
 
-await pagina.evaluate(() => {
-  const filas = document.querySelectorAll('#campos-lista-nuevo .campo-fila');
-  filas[1].querySelector('.interruptor-fila input').click();
-});
+await comprobar('los campos de Nuevo asunto no llevan «Añadir al nombre»',
+  pagina.locator('#campos-lista-nuevo .interruptor-fila').count(), 0);
 await pagina.waitForTimeout(150);
 
 await comprobar('el nombre sigue igual sin la modalidad',
@@ -372,8 +369,6 @@ await comprobar('y ya queda puesto en SANCION, guardado solo (sin botón)', leer
 
 await pagina.click('#campos-catalogo-volver');
 await pagina.waitForSelector('#campos-puestos');
-await pagina.locator('#campos-puestos .fila-tipo').filter({ hasText: 'Trimestre' })
-  .locator('label:has-text("Añadir al nombre") input').check();
 await pagina.waitForTimeout(300);
 
 await pagina.click('.pestana[data-pantalla="nuevo"]');
@@ -421,7 +416,6 @@ await pagina.waitForTimeout(200);
 await comprobar('el bloque de campos no se enseña', pagina.locator('#bloque-campos').isHidden(), true);
 await pagina.fill('#campo-fecha', '2026-09-15');
 await pagina.fill('#campo-curso', '');
-await pagina.uncheck('#campo-grupo').catch(() => {});
 await pagina.waitForTimeout(150);
 await comprobar('el nombre lleva fecha, número, tipo y tercero, sin ningún campo de más',
   pagina.locator('#vista-nombre').textContent().then(t => /^260915 A\d{2}-\d{4} MATRICULA Ramos Vidal, Elena 1150001$/.test(t)), true);
@@ -474,7 +468,7 @@ await comprobar('los campos ya no entran en el nombre: la carpeta sigue con su n
 await comprobar('la ficha ha viajado con el campo cambiado', leerJson('asuntos.json').then(j => {
   const f = j.asuntos[('260911 ' + num(1) + ' SANCION Ramos Vidal, Elena 1150001')];
   return f && f.campos && f.campos['fichero:Unidad'];
-}), { valor: '2º Bach B', enNombre: true });
+}), { valor: '2º Bach B', enNombre: false });
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

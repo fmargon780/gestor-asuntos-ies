@@ -24,10 +24,10 @@ escritura); el ARCHIVO no se toca, porque lo guardado allí se lee igual por la 
 ficha (que en un asunto abierto sale siempre), «+ Añadir campo» (`js/campo-desde-el-asunto.js`) abre el
 panel de `js/campos-catalogo.js` (con `textoVolver`, sin los campos que el asunto ya tiene), pide el
 valor y el bloque «¿Dónde se guarda?» de `js/donde-se-guarda.js` (`opcionTipo`, `vacio`). «En el tipo»
-añade la entrada a `porTipo` (al final, sin Obligatorio ni Añadir al nombre) y el valor a
+añade la entrada a `porTipo` (al final, sin Obligatorio) y el valor a
 `ficha.campos`; «Solo en este asunto» guarda además la entrada en `ficha.camposPropiosDelAsunto`.
 `Campos.camposDeAsunto(listaDelTipo, ficha)` (pura) da los del tipo más los «solo aquí» (`soloAqui:
-true`; sin Obligatorio ni Añadir al nombre; si el tipo ya tiene el mismo, vale el del tipo): la usan la
+true`; sin Obligatorio; si el tipo ya tiene el mismo, vale el del tipo): la usan la
 ficha, «Cambiar el asunto» y `js/plantillas-valores.js`. Un «solo aquí» lleva «⋮» → «Pasar al tipo» /
 «Quitar». El aviso de después lleva «Deshacer» (no pisa un tipo que haya cambiado). Sin tipo se guarda
 «solo aquí» sin preguntar; en el ARCHIVO y en modo consulta no sale el botón.
@@ -54,7 +54,7 @@ modalidad, puesto, NIF...) o creados a mano, que salen solos y ya rellenos al cr
 - **Configurar los campos de un tipo**: pulsando su tarjeta en Ajustes se abre su pantalla
   propia, con la sección "Campos" ya desplegada (17-sep-2026, fila 39; antes era un botón
   "Campos" que abría un cuadro aparte, `App.abrirCamposDeTipo`, retirado). Los ya puestos
-  arriba (flechas para ordenar, casillas Obligatorio y Añadir al nombre, con un aviso ámbar si
+  arriba (flechas para ordenar, casilla Obligatorio, con un aviso ámbar si
   un campo propio también lo usan otros tipos), el catálogo abajo con buscador
   (`App.construirSeccionCampos` en `js/ajustes-tipo.js`). Desde la fila 198 (27-sep-2026,
   `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartado 2) **no hay botón "Guardar campos"**: cada
@@ -356,3 +356,9 @@ guía por el `id` del paso (`origenGuia`), que se conserva.
   Después quita las repetidas.
 
 Se comprueba con `pruebas/tipos-nombre.mjs`.
+
+**Los campos no entran en ningún nombre (fila 251).** No hay casilla «Añadir al nombre» (Ajustes de un
+tipo, Nuevo asunto, Cambiar el asunto) ni interruptor «Añadir el grupo al nombre». `enNombre` sigue en los
+datos guardados por compatibilidad: al crear siempre es `false`; en «Cambiar el asunto», la marca guardada
+de un asunto de antes se conserva y el nombre se rehace con los valores guardados (editar un campo no
+renombra la carpeta). El texto adicional de un documento va a la ficha del documento, no a su nombre.

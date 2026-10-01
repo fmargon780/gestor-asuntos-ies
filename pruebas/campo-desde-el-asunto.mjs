@@ -179,7 +179,7 @@ await comprobar('5. en «Cambiar el asunto» sale también, sin «Añadir al nom
     const r = App.pintarCamposEditar('CONVALIDACION', App.E.registro.asuntos[n].campos, App.E.registro.asuntos[n]);
     return { items: r.items.map((i) => i.nombre + ':' + i.valor + ':' + i.soloAqui),
       sinCasilla: r.html.indexOf('ed-campo-1-en') === -1, conCasilla: r.html.indexOf('ed-campo-0-en') !== -1 };
-  }, ASUNTO_1), { items: ['Trimestre:2º:false', 'Observaciones:Falta el sello:true'], sinCasilla: true, conCasilla: true });
+  }, ASUNTO_1), { items: ['Trimestre:2º:false', 'Observaciones:Falta el sello:true'], sinCasilla: true, conCasilla: false });
 
 /* 6. «Deshacer». */
 await pagina.waitForTimeout(8500);
