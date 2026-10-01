@@ -34,6 +34,17 @@ window.BuscarOCrear = (function () {
     return nombres.filter(function (n) { return coincide(n, texto, cerca); });
   }
 
+  /* Los que se parecen de verdad: los de U.parecidos y, además, los
+     mismos con las palabras en otro orden («MÉDICA BAJA» y «BAJA MEDICA»). */
+  function cercanos(nombre, nombres) {
+    var lista = U.parecidos(nombre, nombres).map(function (p) { return p.nombre; });
+    var clave = palabras(nombre).sort().join(' ');
+    nombres.forEach(function (n) {
+      if (lista.indexOf(n) === -1 && palabras(nombre).length > 1 && palabras(n).sort().join(' ') === clave) lista.push(n);
+    });
+    return lista;
+  }
+
   /* opciones: { zona, texto, nombres, queEs, detalle(nombre), ver(nombre), crear(nombre) } */
   function pintarZona(o) {
     var zona = o.zona;
@@ -66,7 +77,7 @@ window.BuscarOCrear = (function () {
      igualmente; false = cancelar. Si se pulsa uno de la lista, se
      cancela y se llama a `ver(nombre)`. Sin parecidos no pregunta. */
   function confirmarParecidos(nombre, nombres, queEs, ver) {
-    var cerca = U.parecidos(nombre, nombres).slice(0, 4);
+    var cerca = cercanos(nombre, nombres).slice(0, 4).map(function (n) { return { nombre: n }; });
     if (!cerca.length) return Promise.resolve(true);
     var promesa = U.preguntar('¿Seguro que no es ninguno de estos?',
       '<p>Vas a crear ' + U.escapar(queEs) + ' <strong>' + U.escapar(nombre) + '</strong>.</p>' +

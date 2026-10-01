@@ -85,8 +85,12 @@ await pagina.fill('#buscar-tipos', 'matriculas');
 await pagina.waitForTimeout(150);
 await comprobar('«matriculas» sale como ya existente (mismo nombre, plural)',
   zona.textContent().then(t => t.indexOf('Ya existe') !== -1), true);
-await pagina.fill('#buscar-tipos', 'matricula alumnado extra');
-await pagina.waitForTimeout(150);
+await pagina.fill('#buscar-tipos', 'Posesión Toma');
+await botonCrear.click();
+await pagina.waitForSelector('#capa:not(.oculto)');
+await comprobar('otro orden de palabras también pregunta «¿Seguro…?»',
+  pagina.locator('#cuadro-cuerpo [data-bc-ir="TOMA POSESION"]').count(), 1);
+await pagina.click('#cuadro-cancelar');
 await pagina.fill('#buscar-tipos', 'MATRICLUA');
 await pagina.waitForTimeout(150);
 await botonCrear.click();
