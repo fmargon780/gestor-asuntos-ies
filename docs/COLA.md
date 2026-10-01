@@ -207,6 +207,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 246 | Solo documentos (decisión de Francisco, 1-oct-2026): anular `docs/VISTO-BUENO-DE-FRANCISCO.md` (con la APROBADA del revisor se publica en `main` sin esperar a Francisco) y cambiar la regla 0 para poder hacer varias filas seguidas en una conversación, mirando `docs/PARAR.md` entre fila y fila | HECHA (1-oct-2026 04:02) · conversación: https://claude.ai/code/session_01P1CEMANePuqUD1BvqQcrRL. Solo documentación, directa a `main`; no publica nada. |
 | 233 | `docs/SELLO-DOCUMENTO-NUEVO.md` (aviso de un papel con sello: tercer botón «Es un documento nuevo», que abre el cuadro de poner nombre con el registro y su fecha leídos del sello, tipo propuesto, asociado al hito en curso, nombre de la fila 239 con el registro en la ficha, y la tarea de registro/descarga del hito marcada sola) | PENDIENTE (1-oct-2026) |
 | 247 | Aviso de usuario: mejora en «Inicio» | IDEA (1-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1F9nlRXkO45yDLpPhg8RBXk-rCHrFqSYe/view?usp=drivesdk |
+| 248 | Aviso de usuario: mejora en «Inicio» | IDEA (1-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1B2dse7PTlLdgdkbKja86eVterWdozhpQ/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
