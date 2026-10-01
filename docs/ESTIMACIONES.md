@@ -12,6 +12,5 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 250 | 60 | Dos pantallas de Ajustes con la misma caja; aprovecha `U.parecidos` y `U.dejaCrear`; prueba nueva |
 | 251 | 40 | Quitar una casilla en cuatro pantallas, cambiar dos textos y comprobar que `enNombre` ya no decide nada |
 | 252 | 150 | Módulo nuevo de ficha en tarjetas para Personas y «Ver todo», reparto de datos del RegAlum y de la base por tarjeta, todas las categorías, tres pruebas al día y una nueva |
