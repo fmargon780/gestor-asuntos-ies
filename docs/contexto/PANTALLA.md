@@ -263,6 +263,24 @@ la fila 216, docs/FILTROS-EN-TODAS-LAS-PESTANAS.md) van plegados en un panel que
 («Filtros (N)» con alguno puesto); desde la fila 212 empieza siempre cerrado al entrar en Inicio,
 sin memoria en `localStorage` (antes, `gestor-filtros`).
 
+**Fechas y «Exportar ▾»** (fila 241, `docs/EXPORTAR-ASUNTOS.md`): sexto filtro, «Fechas» (Desde y Hasta,
+`#filtro-fecha-desde` / `#filtro-fecha-hasta`), sobre la fecha de inicio de la carpeta (AAMMDD); los dos
+extremos entran, un asunto sin fecha no pasa si hay alguno puesto, y cuenta como UN filtro en «Filtros (N)»
+(`App.fechasDelFiltro`, `App.pasaFiltroFechas`, `App.textoDeFechas` en `js/asuntos-lista-pintar.js`).
+Junto a «Filtros», `#btn-exportar` («Exportar ▾»: «Hoja de cálculo» e «Informe en PDF») abre una ventana
+(`js/exportar-ventana.js`, un solo `U.preguntar`) con «Incluir también los archivados», las columnas
+(las de la ficha y los campos propios de los tipos que salen; se recuerdan por ordenador y por destino en
+`gestor-exportar-columnas-hoja|pdf`) y, en el PDF, «Incluir los hitos». Se exporta lo que se ve: las filas de
+`#inicio-tabla-cuerpo` en su orden. Los datos (`js/exportar-datos.js`, `ExportarAsuntos`): una fila neutra por
+asunto; los archivados se leen del índice del ARCHIVO por curso (solo los cursos que tocan el rango de fechas;
+sin índice, se construye al momento) y de su `_ficha.json`/historial; con Responsable puesto no entra ningún
+archivado (no tiene hito actual); una columna es «de cantidades» por su contenido, no por su nombre; un reservado
+sale con «Reservado» en Tercero, Nombre de la carpeta y Quién lo pide, sin notas y sin campos de fichero/calculados.
+La hoja (`js/exportar-hoja.js`, `ExportarHoja`) es un `.xlsx` escrito con JSZip (pestañas «Asuntos», con la línea de
+total, y «Hitos»). El informe (`js/exportar-informe.js`, `ExportarInforme`, `css/exportar.css`) usa la capa del
+Word: membrete de la Junta, tabla paginada midiendo (apaisada con más de 5 columnas), «Guardar PDF» (imagen de
+cada página a 200 ppp, se descarga), «Imprimir» y «Cerrar». Prueba: `pruebas/exportar-asuntos.mjs`.
+
 ### La cabecera se queda arriba, y se encoge (fila 46, 17/18-sep-2026; sin temblor, fila 50,
 ### 18-sep-2026, docs/CABECERA-NO-TIEMBLA.md)
 

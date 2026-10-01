@@ -1,0 +1,57 @@
+/* ============================================================
+   exportar.css — «Exportar ▾» de Inicio, su ventana y el informe
+   (fila 241, docs/EXPORTAR-ASUNTOS.md). El informe usa la capa del
+   Word (css/word-visor.css) y aquí solo se le añade lo suyo.
+   ============================================================ */
+.exportar-envoltorio { position: relative; display: inline-block; }
+.exportar-menu { position: absolute; right: 0; top: calc(100% + 4px); z-index: 30; display: flex; flex-direction: column;
+  min-width: 190px; background: #fff; border: 1px solid #d7dde5; border-radius: 6px; box-shadow: 0 4px 14px rgba(0, 0, 0, .15); padding: 4px; }
+.exportar-menu.oculto { display: none; }
+.exportar-menu button { text-align: left; background: none; border: 0; padding: 8px 10px; border-radius: 4px; cursor: pointer; font: inherit; }
+.exportar-menu button:hover, .exportar-menu button:focus-visible { background: #eef3f9; }
+
+.filtro-fechas { display: flex; flex-direction: column; gap: 4px; }
+.filtro-fechas-par { display: flex; flex-wrap: wrap; gap: 8px; }
+.filtro-fechas .filtro-fecha { display: flex; align-items: center; gap: 6px; }
+.filtro-fechas .filtro-fecha-rotulo { font-size: 12px; color: #667; }
+
+/* La ventana de exportar. */
+.exportar-casilla { display: block; margin: 4px 0; cursor: pointer; }
+.exportar-archivados { margin: 10px 0; font-weight: 600; }
+.exportar-nota { color: #667; }
+.exportar-grupo { margin: 12px 0 4px; font-weight: 600; color: #445; }
+.exportar-columnas { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0 12px; max-height: 40vh; overflow: auto; }
+
+/* El informe: páginas A4 en pantalla. */
+.exportar-hoja { background: #e9edf2; }
+.exportar-pagina { position: relative; box-sizing: border-box; background: #fff; margin: 0 auto 16px; overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .18); color: #222; font-family: Arial, Helvetica, sans-serif; font-size: 12px; }
+.exportar-membrete { display: block; width: 100%; height: auto; margin-bottom: 10px; }
+.exportar-membrete-texto { font-size: 18px; color: #017836; margin-bottom: 10px; }
+.exportar-titulo { font-size: 20px; margin: 6px 0 2px; }
+.exportar-fecha { margin: 0 0 4px; color: #555; }
+.exportar-filtros { margin: 0 0 12px; color: #555; font-size: 11px; }
+.exportar-tabla { width: 100%; border-collapse: collapse; font-size: 11px; }
+.exportar-tabla th { text-align: left; border-bottom: 1.5px solid #222; padding: 4px 6px; }
+.exportar-tabla td { padding: 4px 6px; border-bottom: 1px solid #ccc; vertical-align: top; }
+.exportar-tabla .exportar-derecha { text-align: right; }
+.exportar-hitos td { font-size: 9.5px; color: #444; padding: 2px 6px 6px 22px; border-bottom: 1px solid #ccc; }
+.exportar-archivado td { background: #f6f7f9; }
+.exportar-totales { margin-top: 14px; padding-top: 8px; border-top: 1.5px solid #222; }
+.exportar-totales p { margin: 2px 0; }
+.exportar-pie { position: absolute; left: 0; right: 0; bottom: 18px; padding: 0 48px; display: flex; justify-content: space-between; font-size: 9px; color: #666; }
+body.con-exportar-visor { overflow: hidden; }
+
+@media print {
+  body.con-exportar-visor > *:not(#exportar-visor) { display: none !important; }
+  body.con-exportar-visor #exportar-visor { position: static; background: #fff; display: block; }
+  body.con-exportar-visor .word-visor-barra { display: none; }
+  body.con-exportar-visor .exportar-hoja { overflow: visible; padding: 0; background: #fff; }
+  body.con-exportar-visor .exportar-pagina { box-shadow: none; margin: 0; page-break-after: always; }
+}
+
+/* En la copia de pruebas hay una franja fija arriba: el informe empieza debajo, para no taparle los botones. */
+.exportar-visor { top: var(--franja-demo-alto, 0px); }
+.filtros .filtro-fechas { grid-column: span 2; }
+.filtro-fechas-par { flex-wrap: nowrap; }
+.filtro-fechas .campo { width: auto; min-width: 0; }

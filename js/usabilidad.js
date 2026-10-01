@@ -180,7 +180,7 @@
      ========================================================== */
 
   function avisarDelCambio(campo) {
-    campo.dispatchEvent(new Event(campo.tagName === 'SELECT' ? 'change' : 'input',
+    campo.dispatchEvent(new Event((campo.tagName === 'SELECT' || campo.type === 'date') ? 'change' : 'input',
                                   { bubbles: true }));
   }
 
@@ -208,6 +208,9 @@
     if (t && t.value) { t.value = ''; avisarDelCambio(t); }
     var r = $('inicio-me-toca-responsable');   /* fila 216 */
     if (r && r.value) { r.value = ''; avisarDelCambio(r); }
+    var fd = $('filtro-fecha-desde'), fh = $('filtro-fecha-hasta');   /* fila 241 */
+    if (fd && fd.value) { fd.value = ''; avisarDelCambio(fd); }
+    if (fh && fh.value) { fh.value = ''; avisarDelCambio(fh); }
     if (q && q.value) { q.value = ''; avisarDelCambio(q); }
   }
 
@@ -227,8 +230,10 @@
     var o = $('filtro-organo'), organo = o ? o.value : '';   /* fila 134 */
     var ti = $('filtro-tipo-asunto'), tipo = ti ? ti.value : '';   /* fila 192 */
     var r = $('inicio-me-toca-responsable'), resp = r ? r.value : '';   /* fila 216 */
+    var fd = $('filtro-fecha-desde'), fh = $('filtro-fecha-hasta');   /* fila 241 */
+    var fDesde = fd ? fd.value : '', fHasta = fh ? fh.value : '';
     barraFiltros.innerHTML = '';
-    if (!texto && !estado && !plazo && !organo && !tipo && !resp) { barraFiltros.classList.add('oculto'); return; }
+    if (!texto && !estado && !plazo && !organo && !tipo && !resp && !fDesde && !fHasta) { barraFiltros.classList.add('oculto'); return; }
     barraFiltros.classList.remove('oculto');
 
     if (texto) {
@@ -270,6 +275,13 @@
       barraFiltros.appendChild(etiqueta('Responsable: ' + textoDelPlazo(r), function () {
         r.value = '';
         avisarDelCambio(r);
+      }));
+    }
+
+    if (fDesde || fHasta) {
+      barraFiltros.appendChild(etiqueta('Fechas: ' + App.textoDeFechas(fDesde, fHasta), function () {
+        if (fd.value) { fd.value = ''; avisarDelCambio(fd); }
+        if (fh.value) { fh.value = ''; avisarDelCambio(fh); }
       }));
     }
 

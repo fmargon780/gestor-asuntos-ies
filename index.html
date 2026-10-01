@@ -39,6 +39,7 @@
 <link rel="stylesheet" href="css/hitos.css">
 <link rel="stylesheet" href="css/hito-mesa.css">
 <link rel="stylesheet" href="css/word-visor.css">
+<link rel="stylesheet" href="css/exportar.css">
 <link rel="stylesheet" href="css/guias-mapa.css">
 <link rel="stylesheet" href="css/formularios.css">
 <link rel="stylesheet" href="css/que-me-toca.css">
@@ -196,6 +197,14 @@
               <button id="btn-recargar" class="boton">Actualizar</button>
               <button type="button" id="btn-filtros" class="boton" aria-expanded="false"
                       aria-controls="filtros-abiertos">Filtros</button>
+              <span class="exportar-envoltorio" id="exportar-envoltorio">
+                <button type="button" id="btn-exportar" class="boton" aria-haspopup="true"
+                        aria-expanded="false" title="Sacar a una hoja de cálculo o a un informe lo que se ve">Exportar ▾</button>
+                <span id="exportar-menu" class="exportar-menu oculto">
+                  <button type="button" id="btn-exportar-hoja">Hoja de cálculo</button>
+                  <button type="button" id="btn-exportar-pdf">Informe en PDF</button>
+                </span>
+              </span>
               <label class="inicio-orden">
                 <span class="filtro-rotulo">Ordenar</span>
                 <select id="orden-abiertos" class="campo">
@@ -211,7 +220,7 @@
 
           <!-- Los desplegables viven aquí, plegados. Sueltos en la barra
                se salían de linea y las etiquetas acababan lejos de su
-               campo. Los cinco valen igual en las cuatro pestañas (fila
+               campo. Los seis valen igual en las cuatro pestañas (fila
                216, docs/FILTROS-EN-TODAS-LAS-PESTANAS.md). -->
           <div id="filtros-abiertos" class="filtros oculto">
             <label class="filtro">
@@ -251,6 +260,15 @@
                 <option value="">Todos</option>
               </select>
             </label>
+            <div class="filtro filtro-fechas" id="filtro-fechas">
+              <span class="filtro-rotulo">Fechas</span>
+              <span class="filtro-fechas-par">
+                <label class="filtro-fecha"><span class="filtro-fecha-rotulo">Desde</span>
+                  <input type="date" id="filtro-fecha-desde" class="campo" aria-label="Fechas: desde"></label>
+                <label class="filtro-fecha"><span class="filtro-fecha-rotulo">Hasta</span>
+                  <input type="date" id="filtro-fecha-hasta" class="campo" aria-label="Fechas: hasta"></label>
+              </span>
+            </div>
           </div>
 
           <!-- El chip "Filtrado por…" (fila 209, apartado 7): sale al
@@ -1282,6 +1300,10 @@
 <script src="js/docx.js"></script>
 <script src="js/word-faltan.js"></script>
 <script src="js/word-visor.js"></script>
+<script src="js/exportar-datos.js"></script>      <!-- fila 241: los datos de la exportación; antes de js/exportar-ventana.js -->
+<script src="js/exportar-hoja.js"></script>
+<script src="js/exportar-informe.js"></script>
+<script src="js/exportar-ventana.js"></script>
 <!-- Fila 110: el membrete (sacado de docx.js) y las tablas de Word. -->
 <script src="js/docx-imagen.js"></script>
 <script src="js/docx-tabla.js"></script>

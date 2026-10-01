@@ -22,7 +22,7 @@
 
   /* ---------- 1. los filtros ---------- */
 
-  /* Los cinco que cuenta "Filtros (N)" (fila 212, docs/INICIO-A-TODO-
+  /* Los seis (Fechas, uno solo) que cuenta "Filtros (N)" (fila 212, docs/INICIO-A-TODO-
      EL-ANCHO.md, apartado 4; Responsable sumado en la fila 216,
      docs/FILTROS-EN-TODAS-LAS-PESTANAS.md): los mismos que avisan con el
      punto azul (#btn-filtros.tiene-filtros, css/vista.css), y valen
@@ -30,7 +30,8 @@
   function filtrosPuestos() {
     var e = $('filtro-estado'), p = $('filtro-plazo'), o = $('filtro-organo'), t = $('filtro-tipo-asunto');
     var r = $('inicio-me-toca-responsable');
-    return [e, p, o, t, r].filter(function (campo) { return campo && campo.value; }).length;
+    var fechas = ($('filtro-fecha-desde') && $('filtro-fecha-desde').value) || ($('filtro-fecha-hasta') && $('filtro-fecha-hasta').value);   /* fila 241: «Fechas» cuenta como uno */
+    return [e, p, o, t, r].filter(function (campo) { return campo && campo.value; }).length + (fechas ? 1 : 0);
   }
 
   function pintarBotonFiltros() {
@@ -58,7 +59,7 @@
       pintarBotonFiltros();
     };
 
-    ['filtro-estado', 'filtro-plazo', 'filtro-organo', 'filtro-tipo-asunto', 'inicio-me-toca-responsable'].forEach(function (id) {
+    ['filtro-estado', 'filtro-plazo', 'filtro-organo', 'filtro-tipo-asunto', 'inicio-me-toca-responsable', 'filtro-fecha-desde', 'filtro-fecha-hasta'].forEach(function (id) {
       if ($(id)) $(id).addEventListener('change', pintarBotonFiltros);
     });
 

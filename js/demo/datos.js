@@ -124,7 +124,21 @@
       { titulo: 'Tramitar el pago', cuerpo: '<p>Pasarla a Secretaría para su pago.</p>', responsable: 'yo' }
     ], 30);
 
-    return { MATRICULA: matricula, CERTIFICADO: certificado, 'BAJA MEDICA': bajaMedica, FACTURA: factura };
+    /* Fila 241: un tipo con un campo propio de cantidad («Importe»), para
+       probar «Exportar ▾» con sumas: el cobro del seguro escolar. */
+    var seguro = await crearTipoConGuia('SEGURO ESCOLAR', 'ALUMNADO', [
+      { titulo: 'Cobrar el seguro escolar', cuerpo: '<p>Cobrar y dar el recibo.</p>', responsable: 'yo' }
+    ], null);
+    await Campos.guardarPropios(App.E.gestor, function (lista) {
+      lista.push({ id: 'p-importe', nombre: 'Importe', clase: 'texto', valores: [] });
+      return lista;
+    });
+    await Campos.guardarConfigDeTipo(App.E.gestor, 'SEGURO ESCOLAR',
+      [{ origen: 'propio', id: 'p-importe', obligatorio: false, enNombre: false }]);
+    App.E.campos = await Campos.leer(App.E.gestor);
+
+    return { MATRICULA: matricula, CERTIFICADO: certificado, 'BAJA MEDICA': bajaMedica, FACTURA: factura,
+             'SEGURO ESCOLAR': seguro };
   }
 
   /* ---------- plantilla de correo ---------- */
@@ -237,6 +251,18 @@
     });
     await marcarPrimerHito(martaClave, 'hecho', 'Parte de baja recibido.');
 
+    /* 6b. fila 241: dos cobros del seguro escolar todavía abiertos, con su importe. */
+    var alvaro = Nombres.terceroAlumno({ nombre: 'Bermúdez Ortiz, Álvaro', id: '2100003' });
+    var noa = Nombres.terceroAlumno({ nombre: 'Castro Reina, Noa', id: '2100004' });
+    await crearAsunto(tipos['SEGURO ESCOLAR'], 'ALUMNADO', alvaro, hace(1), {
+      abiertoEl: hace(1) + 'T09:00:00.000Z',
+      datos: { campos: { 'propio:p-importe': { valor: '1,12', enNombre: false } } }
+    });
+    await crearAsunto(tipos['SEGURO ESCOLAR'], 'ALUMNADO', noa, hace(1), {
+      abiertoEl: hace(1) + 'T09:00:00.000Z',
+      datos: { campos: { 'propio:p-importe': { valor: '1,12', enNombre: false } } }
+    });
+
     /* 6. dormido: abierto hace tiempo, sin ningún hito tocado. Sin número:
        es un asunto «de antes», con la estructura de nombre de siempre. */
     await crearAsunto(tipos.FACTURA, 'EMPRESAS', dobla, hace(60), {
@@ -246,7 +272,7 @@
 
   /* ---------- archivo ---------- */
 
-  async function archivarDeMentira(tipoObj, categoria, tercero, fecha, conNumero) {
+  async function archivarDeMentira(tipoObj, categoria, tercero, fecha, conNumero, ficha) {
     var numero = conNumero ? (await Numeros.reservar('asuntos', '')).numero : '';
     var montado = Nombres.montarAsunto({
       fecha: fecha, tipo: Nombres.tipoParaCarpeta(tipoObj), categoria: categoria,
@@ -254,7 +280,9 @@
     });
     var nombre = montado.nombre;
     var destino = await Carpetas.bajar(App.E.archivo, [categoria, tercero], true);
-    await Carpetas.crear(destino, nombre);
+    var carpeta = await Carpetas.crear(destino, nombre);
+    /* Fila 241: la ficha del archivado, en su carpeta, como la dejaría el archivado de verdad. */
+    if (ficha && window.FichaArchivo) await FichaArchivo.escribir(carpeta, ficha);
     return nombre;
   }
 
@@ -267,6 +295,20 @@
     /* de un curso anterior */
     var fechaCursoAnterior = (HOY.getFullYear() - 1) + '-10-05';
     await archivarDeMentira(tipos.MATRICULA, 'ALUMNADO', elena, fechaCursoAnterior);
+
+    /* Fila 241: tres cobros del seguro escolar ya archivados (se archivan en el momento). */
+    var cobros = [
+      [Nombres.terceroAlumno({ nombre: 'Delgado Prieto, Iker', id: '2100005' }), 3, '1,12'],
+      [Nombres.terceroAlumno({ nombre: 'Fuentes Calvo, Rubén', id: '2100007' }), 4, '1,12'],
+      [Nombres.terceroAlumno({ nombre: 'Gallardo Reyes, Vera', id: '2100008' }), 4, '1,12']
+    ];
+    for (var i = 0; i < cobros.length; i++) {
+      await archivarDeMentira(tipos['SEGURO ESCOLAR'], 'ALUMNADO', cobros[i][0], hace(cobros[i][1]), true, {
+        estado: 'cerrado', tipo: 'SEGURO ESCOLAR', categoria: 'ALUMNADO', tercero: cobros[i][0],
+        abiertoEl: hace(cobros[i][1]) + 'T09:00:00.000Z', cerradoEl: hace(cobros[i][1]) + 'T09:05:00.000Z',
+        campos: { 'propio:p-importe': { valor: cobros[i][2], enNombre: false } }
+      });
+    }
 
     if (window.IndiceArchivo) {
       var construido = await IndiceArchivo.construir();

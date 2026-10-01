@@ -29,8 +29,45 @@ App.textoBusquedaSimple = function (a) {
   return U.normalizar([a.nombre, a.leido && a.leido.tipo, tercero].filter(Boolean).join(' '));
 };
 
-/* Los cinco filtros de "Filtros" en Inicio (Responsable, Situación,
-   Plazo, Lo encarga y Tipo de asunto), en un solo sitio (fila 216,
+/* Fila 241 (docs/EXPORTAR-ASUNTOS.md): el filtro «Fechas» (Desde, Hasta),
+   sobre la fecha de inicio del asunto (la del nombre de la carpeta,
+   AAMMDD). Los dos extremos entran; cualquiera puede ir vacío. */
+App.fechasDelFiltro = function () {
+  var d = $('filtro-fecha-desde'), h = $('filtro-fecha-hasta');
+  return { desde: d ? d.value : '', hasta: h ? h.value : '' };
+};
+
+/* AAMMDD (el nombre de la carpeta) → 'AAAA-MM-DD', o '' si no es una fecha. */
+App.fechaIsoDeNombre = function (aammdd) {
+  var m = String(aammdd || '').match(/^(\d{2})(\d{2})(\d{2})$/);
+  return m ? '20' + m[1] + '-' + m[2] + '-' + m[3] : '';
+};
+
+/* ¿La fecha de inicio (ISO) cae dentro de Desde–Hasta? Sin ningún
+   extremo, todo pasa; con alguno, un asunto sin fecha no pasa. */
+App.pasaFiltroFechas = function (iso, desde, hasta) {
+  if (!desde && !hasta) return true;
+  if (!iso) return false;
+  if (desde && iso < desde) return false;
+  if (hasta && iso > hasta) return false;
+  return true;
+};
+
+/* «del 1-oct-2026 al 31-oct-2026», «desde el 1-oct-2026», «hasta el 31-oct-2026». */
+App.textoDeFechas = function (desde, hasta) {
+  var MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  function bonita(iso) {
+    var m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    return m ? parseInt(m[3], 10) + '-' + MESES[parseInt(m[2], 10) - 1] + '-' + m[1] : String(iso || '');
+  }
+  if (desde && hasta) return 'del ' + bonita(desde) + ' al ' + bonita(hasta);
+  if (desde) return 'desde el ' + bonita(desde);
+  if (hasta) return 'hasta el ' + bonita(hasta);
+  return '';
+};
+
+/* Los seis filtros de "Filtros" en Inicio (Responsable, Situación,
+   Plazo, Lo encarga, Tipo de asunto y Fechas), en un solo sitio (fila 216,
    docs/FILTROS-EN-TODAS-LAS-PESTANAS.md): los usan tanto
    App.listaAbiertosFiltrada ("Todos los abiertos") como
    InicioTabla.calcular ("En Administración", "En espera" y "Dormidos").
@@ -50,6 +87,8 @@ App.pasaFiltrosInicio = function (a, hito) {
   if (!Plazos.pasaFiltro(a.ficha.limite || '', plazo)) return false;
   if (organo && window.TiposOrgano && !TiposOrgano.pasaFiltro(App.tipoDeAsunto(a), organo)) return false;
   if (tipo && App.tipoDeAsunto(a) !== tipo) return false;
+  var fechas = App.fechasDelFiltro();
+  if (!App.pasaFiltroFechas(App.fechaIsoDeNombre(a.leido && a.leido.fecha), fechas.desde, fechas.hasta)) return false;   /* fila 241 */
   if (!App.pasaFiltroMonton(a, filtro)) return false;
   if (resp) {
     if (hito === undefined && window.Hitos && Hitos.hitoActualDeAsunto) hito = Hitos.hitoActualDeAsunto(a);
@@ -137,7 +176,8 @@ App.textoVacio = function () {
   if (!App.E.listaAbiertos.length) return 'No hay asuntos abiertos. Crea el primero en "Nuevo asunto".';
   if ($('buscar-abiertos').value.trim() || $('filtro-estado').value || $('filtro-plazo').value ||
       ($('filtro-organo') && $('filtro-organo').value) ||
-      ($('filtro-tipo-asunto') && $('filtro-tipo-asunto').value)) {
+      ($('filtro-tipo-asunto') && $('filtro-tipo-asunto').value) ||
+      App.fechasDelFiltro().desde || App.fechasDelFiltro().hasta) {
     return 'Ningún asunto coincide con lo que buscas.';
   }
   return 'Nada pendiente de gestionar aquí ahora mismo.';
@@ -490,6 +530,9 @@ $('filtro-estado').onchange = function () { repintarLaPestanaActiva(); };
 $('filtro-plazo').onchange = function () { repintarLaPestanaActiva(); };
 if ($('filtro-organo')) $('filtro-organo').onchange = function () { repintarLaPestanaActiva(); };
 if ($('filtro-tipo-asunto')) $('filtro-tipo-asunto').onchange = function () { repintarLaPestanaActiva(); };
+['filtro-fecha-desde', 'filtro-fecha-hasta'].forEach(function (id) {   /* fila 241 */
+  if ($(id)) $(id).onchange = function () { repintarLaPestanaActiva(); };
+});
 
 $('orden-abiertos').onchange = function () {
   try { window.localStorage.setItem('orden-abiertos', this.value); } catch (e) {}
