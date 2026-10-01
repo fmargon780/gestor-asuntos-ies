@@ -29,10 +29,24 @@ App.pintarTiposDeDocumento = function () {
   var tdoc = $('tabla-tipos-documento');
   if (!tdoc) return;
   tdoc.innerHTML = '';
+  var buscado = $('buscar-tipos-doc') ? $('buscar-tipos-doc').value : '';
+  var lista = U.normalizar(buscado).length >= 2
+    ? BuscarOCrear.coincidencias(buscado, App.E.tiposDocumento) : App.E.tiposDocumento;
+  /* Fila 250: el botón de crear, al final de la lista, solo con texto. */
+  BuscarOCrear.pintarZona({
+    zona: $('crear-tipo-doc-zona'), texto: buscado, nombres: App.E.tiposDocumento,
+    ver: function (n) {
+      $('buscar-tipos-doc').value = n;
+      App.pintarTiposDeDocumento();
+    },
+    crear: function (n) { App.crearTipoDocumentoDesdeCaja(n); }
+  });
   if (!App.E.tiposDocumento.length) {
     tdoc.innerHTML = '<div class="vacio">Todavía no hay ningún tipo de documento.</div>';
+  } else if (!lista.length) {
+    tdoc.innerHTML = '<div class="vacio">Nada encontrado con ese texto.</div>';
   }
-  App.E.tiposDocumento.forEach(function (nombre) {
+  lista.forEach(function (nombre) {
     var f = document.createElement('div');
     f.className = 'tarjeta-tipo';
     f.dataset.tipoDoc = nombre;
@@ -142,20 +156,17 @@ App.editarTextoPorDefectoDocumento = async function (nombre) {
   }
 };
 
-$('nuevo-tipo-doc').oninput = function () {
-  App.pintarAvisoSimple('nuevo-tipo-doc', 'aviso-nuevo-tipo-doc', 'btn-anadir-tipo-doc',
-    function () { return App.E.tiposDocumento; });
-};
+$('buscar-tipos-doc').oninput = function () { App.pintarTiposDeDocumento(); };
 
-$('btn-anadir-tipo-doc').onclick = async function () {
-  var nombre = U.limpiarNombre($('nuevo-tipo-doc').value).toUpperCase();
-  if (!nombre) return;
-  if (!await U.dejaCrear(nombre, App.E.tiposDocumento, 'tipo de documento')) return;
+/* «Ninguno es el que busco: crear «…»» (fila 250): con parecidos,
+   una pregunta más; sin categoría, se crea directamente. */
+App.crearTipoDocumentoDesdeCaja = async function (nombre) {
+  var ver = function (n) { $('buscar-tipos-doc').value = n; App.pintarTiposDeDocumento(); };
+  if (!await BuscarOCrear.confirmarParecidos(nombre, App.E.tiposDocumento, 'el tipo de documento', ver)) return;
   await Borrados.revivir(App.E.gestor, 'tiposDocumento', nombre);
   App.E.tiposDocumento.push(nombre);
   await App.guardarTiposDocumento();
-  $('nuevo-tipo-doc').value = '';
-  $('nuevo-tipo-doc').oninput();
+  $('buscar-tipos-doc').value = '';
   App.pintarTiposDeDocumento();
   U.aviso('Tipo de documento añadido.', 'bueno');
 };

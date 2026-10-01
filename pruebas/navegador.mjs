@@ -466,9 +466,11 @@ await comprobar('y abrevia bien el de Bachillerato',
     .locator('.nombre-tipo').textContent(), '1ºBachA');
 
 await pagina.evaluate(() => App.cambiarPestanaAjustes('tipos'));
-await pagina.fill('#nuevo-tipo', 'evacuacion');
-await pagina.selectOption('#nueva-categoria', 'OTROS');
-await pagina.click('#btn-anadir-tipo');
+await pagina.fill('#buscar-tipos', 'evacuacion');
+await pagina.click('#crear-tipo-zona [data-bc="crear"]');
+await pagina.waitForSelector('#bc-categoria');
+await pagina.selectOption('#bc-categoria', 'OTROS');
+await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(300);
 await comprobar('el tipo nuevo se guarda en mayúsculas', pagina.evaluate(async () => {
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR');

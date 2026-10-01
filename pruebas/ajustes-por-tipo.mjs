@@ -99,8 +99,8 @@ await comprobar('"Mantenimiento" trae las carpetas de este ordenador, y ya no Co
    luego COMPRA: así la prueba 4 puede comprobar de verdad que la
    categoría sobrevive a entrar y salir de un tipo. */
 await pagina.click('[data-ajustes-pestana="tipos"]');
-await pagina.selectOption('#nueva-categoria', 'EMPRESAS');
-await comprobar('la categoría EMPRESAS queda puesta', pagina.locator('#nueva-categoria').inputValue(), 'EMPRESAS');
+await pagina.locator('.pestana-categoria').filter({ hasText: 'EMPRESAS' }).click();
+await comprobar('la categoría EMPRESAS queda puesta', pagina.locator('.pestana-categoria.activa').textContent().then(t => t.indexOf('EMPRESAS') !== -1), true);
 await pagina.fill('#buscar-tipos', '');
 
 /* ================================================================
@@ -180,7 +180,7 @@ await pagina.click('#pantalla-tipo-asunto .boton-volver');
 await pagina.waitForSelector('#pantalla-ajustes:not(.oculto)');
 
 await comprobar('la pestaña "Tipos de asunto" sigue activa', pagina.locator('.pestana-ajustes.activa').textContent(), 'Tipos de asunto');
-await comprobar('la categoría sigue en EMPRESAS', pagina.locator('#nueva-categoria').inputValue(), 'EMPRESAS');
+await comprobar('la categoría sigue en EMPRESAS', pagina.locator('.pestana-categoria.activa').textContent().then(t => t.indexOf('EMPRESAS') !== -1), true);
 await comprobar('COMPRA sigue en la rejilla',
   pagina.locator('#tabla-tipos .tarjeta-tipo-nombre').allTextContents().then((n) => n.indexOf('COMPRA') !== -1), true);
 
@@ -207,7 +207,7 @@ await tarjetaCompra.locator('.tarjeta-tipo-nombre').click();
 await pagina.waitForSelector('#pantalla-tipo-asunto:not(.oculto)');
 await pagina.keyboard.press('Escape');
 await pagina.waitForSelector('#pantalla-ajustes:not(.oculto)');
-await comprobar('Escape también deja la categoría en EMPRESAS', pagina.locator('#nueva-categoria').inputValue(), 'EMPRESAS');
+await comprobar('Escape también deja la categoría en EMPRESAS', pagina.locator('.pestana-categoria.activa').textContent().then(t => t.indexOf('EMPRESAS') !== -1), true);
 
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');

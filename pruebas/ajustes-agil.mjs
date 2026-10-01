@@ -63,7 +63,7 @@ const nombresVisibles = () => pagina.locator('#tabla-tipos .tarjeta-tipo-nombre'
    ================================================================ */
 console.log('--- 1. la lista obedece a la categoría elegida ---');
 
-await comprobar('el desplegable empieza en ALUMNADO', pagina.locator('#nueva-categoria').inputValue(), 'ALUMNADO');
+await comprobar('la pestaña empieza en ALUMNADO', pagina.locator('.pestana-categoria.activa').textContent().then(t => t.indexOf('ALUMNADO') !== -1), true);
 await comprobar('se ve MATRICULA (ALUMNADO)', nombresVisibles().then(n => n.indexOf('MATRICULA') !== -1), true);
 await comprobar('no se ve ningún tipo de PERSONAL', nombresVisibles().then(n => n.indexOf('TOMA POSESION') === -1), true);
 
@@ -73,7 +73,7 @@ await comprobar('no se ve ningún tipo de PERSONAL', nombresVisibles().then(n =>
    ================================================================ */
 console.log('--- 2. cambiar el desplegable cambia la lista y la pestaña ---');
 
-await pagina.selectOption('#nueva-categoria', 'PERSONAL');
+await pagina.locator('.pestana-categoria').filter({ hasText: 'PERSONAL' }).click();
 await comprobar('ahora se ve TOMA POSESION (PERSONAL)', nombresVisibles().then(n => n.indexOf('TOMA POSESION') !== -1), true);
 await comprobar('y ya no se ve MATRICULA', nombresVisibles().then(n => n.indexOf('MATRICULA') === -1), true);
 await comprobar('la pestaña PERSONAL queda marcada',
@@ -85,7 +85,7 @@ await comprobar('la pestaña PERSONAL queda marcada',
 console.log('--- 3. la pestaña manda también sobre el desplegable ---');
 
 await pagina.locator('.pestana-categoria').filter({ hasText: 'EMPRESAS' }).click();
-await comprobar('el desplegable pasa a EMPRESAS', pagina.locator('#nueva-categoria').inputValue(), 'EMPRESAS');
+await comprobar('la pestaña EMPRESAS queda marcada', pagina.locator('.pestana-categoria.activa').textContent().then(t => t.indexOf('EMPRESAS') !== -1), true);
 await comprobar('se ve COMPRA (EMPRESAS)', nombresVisibles().then(n => n.indexOf('COMPRA') !== -1), true);
 
 /* ================================================================
@@ -113,38 +113,36 @@ await comprobar('al vaciar el buscador, vuelve la categoría marcada (EMPRESAS)'
   nombresVisibles().then(n => n.indexOf('COMPRA') !== -1 && n.indexOf('BECA') === -1), true);
 
 /* ================================================================
-   5. Escribir el nombre exacto de un tipo que ya existe: el botón
-      Añadir se apaga y sale la línea roja con su categoría.
+   5. Escribir el nombre exacto de un tipo que ya existe: no sale el botón
+      de crear y sale la línea roja con su categoría.
    ================================================================ */
-console.log('--- 5. aviso en vivo: nombre exactamente igual ---');
+console.log('--- 5. caja única: nombre exactamente igual ---');
 
-await pagina.fill('#nuevo-tipo', 'MATRICULA');
+await pagina.fill('#buscar-tipos', 'MATRICULA');
 await pagina.waitForTimeout(120);
-await comprobar('el botón Añadir se apaga', pagina.locator('#btn-anadir-tipo').isDisabled(), true);
+await comprobar('no sale el botón de crear', pagina.locator('#crear-tipo-zona [data-bc="crear"]').count(), 0);
 await comprobar('la línea roja dice dónde está',
-  pagina.locator('#aviso-nuevo-tipo').textContent().then(t =>
+  pagina.locator('#crear-tipo-zona').textContent().then(t =>
     t.indexOf('Ya existe') !== -1 && t.indexOf('MATRICULA') !== -1 && t.indexOf('ALUMNADO') !== -1), true);
 await comprobar('el aviso es de los rojos',
-  pagina.locator('#aviso-nuevo-tipo').evaluate(el => el.classList.contains('aviso-en-vivo-malo')), true);
+  pagina.locator('#crear-tipo-zona .aviso-en-vivo').evaluate(el => el.classList.contains('aviso-en-vivo-malo')), true);
 
 /* ================================================================
-   6. Un nombre parecido, no igual: línea ámbar, y el botón sigue
-      encendido (es un aviso, no una prohibición).
+   6. Un nombre parecido, no igual: el botón de crear sale (con la
+      pregunta de después) y el parecido está en la lista.
    ================================================================ */
-console.log('--- 6. aviso en vivo: nombre parecido ---');
+console.log('--- 6. caja única: nombre parecido ---');
 
-await pagina.fill('#nuevo-tipo', 'MATRICLUA');
+await pagina.fill('#buscar-tipos', 'MATRICLUA');
 await pagina.waitForTimeout(120);
-await comprobar('el botón Añadir sigue encendido', pagina.locator('#btn-anadir-tipo').isDisabled(), false);
-await comprobar('la línea ámbar avisa del parecido',
-  pagina.locator('#aviso-nuevo-tipo').textContent().then(t => t.indexOf('Se parece a') !== -1 && t.indexOf('MATRICULA') !== -1), true);
-await comprobar('el aviso es de los ámbar',
-  pagina.locator('#aviso-nuevo-tipo').evaluate(el => el.classList.contains('aviso-en-vivo-ambar')), true);
+await comprobar('el botón de crear sale',
+  pagina.locator('#crear-tipo-zona [data-bc="crear"]').textContent(), 'Ninguno es el que busco: crear «MATRICLUA»');
+await comprobar('MATRICULA sale en la lista', nombresVisibles().then(n => n.indexOf('MATRICULA') !== -1), true);
 
-await pagina.fill('#nuevo-tipo', '');
+await pagina.fill('#buscar-tipos', '');
 await pagina.waitForTimeout(120);
-await comprobar('con el campo vacío no sale ningún aviso',
-  pagina.locator('#aviso-nuevo-tipo').textContent(), '');
+await comprobar('con la caja vacía no sale ningún botón de crear',
+  pagina.locator('#crear-tipo-zona').textContent(), '');
 
 /* ================================================================
    7. Con veinte tipos en una categoría, la rejilla saca al menos
