@@ -143,6 +143,13 @@ tú". Y las matrículas de todos los mensajes del hilo: `matriculas` (sin repeti
   asunto, solo entran los adjuntos de los mensajes nuevos, no los de los que ya se habían
   guardado (fila 210).
 
+- **Al enviar desde la app** (fila 236, `docs/CORREO-ENVIADO-EN-PDF.md`, `js/correo-enviado-pdf.js`):
+  tras un envío con `ok` (y con `yaEnviado` solo si no está ya) se guarda `AAMMDD CORREO <asunto
+  recortado>.pdf` con De (si se sabe), Para, Copia oculta, fecha y hora, Asunto, el texto tal como
+  salió y «Adjuntos:» con sus nombres (no se copian). Mismo nombre que el de la bandeja; si existe,
+  el siguiente libre `(2)`. Si falla, aviso ámbar «El correo ha salido, pero no he podido guardar su
+  PDF…». Nunca en «Abrir en Gmail», «Abrir en el correo del ordenador» ni en Séneca.
+
 En un hilo de un solo mensaje no hay `pdf`: ese PDF entra ya como `CORREO`. La ficha del asunto
 reconoce los tres por su nombre (`DE_CORREO`, en `js/ficha-asunto.js`) y los enseña en el grupo
 "Llegados por correo".

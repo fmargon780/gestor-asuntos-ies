@@ -548,6 +548,8 @@ var CorreoCuadro = (function () {
       if (respuesta.hilo) { try { await anadirHiloAlAsunto(a, respuesta.hilo, datos.asunto); } catch (e) { /* accesorio */ } }
       if (n().marcarEnvioRealizado) n().marcarEnvioRealizado();
       if (n().apuntarElRastro) n().apuntarElRastro(a);
+      /* Fila 236 (docs/CORREO-ENVIADO-EN-PDF.md): el correo enviado, como PDF en el asunto. */
+      if (window.CorreoEnviadoPdf) await CorreoEnviadoPdf.alEnviar(a, datos, respuesta);
 
       var resumen = $('correo-resumen');
       if (resumen) {
