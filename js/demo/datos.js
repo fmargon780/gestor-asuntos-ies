@@ -291,8 +291,8 @@
     });
 
     /* 6c. fila 238: un certificado de miembro del Consejo Escolar. */
-    await crearAsunto(tipos['CERTIFICADO MIEMBRO CONSEJO ESCOLAR'], 'PERSONAL', marta, hace(3), {
-      abiertoEl: hace(3) + 'T09:00:00.000Z'
+    await crearAsunto(tipos['CERTIFICADO MIEMBRO CONSEJO ESCOLAR'], 'PERSONAL', marta, hace(0), {
+      abiertoEl: new Date().toISOString()
     });
 
     /* 6. dormido: abierto hace tiempo, sin ningún hito tocado. Sin número:
