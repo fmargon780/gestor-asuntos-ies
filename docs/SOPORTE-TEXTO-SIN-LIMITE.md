@@ -65,3 +65,17 @@ que pegar `apps-script/soporte.gs` entero en el proyecto «Gestor - Soporte» de
 https://script.google.com y guardar (pasos en `docs/PONER-EN-MARCHA-SOPORTE.md`). Hasta que lo
 pegue, el servidor seguirá rechazando textos de más de 5.000 caracteres («El texto es demasiado
 largo»); el texto no se pierde porque se queda en la ventana.
+
+## Cómo sabemos que está bien
+
+1. El botón «Soporte» abre una ventana ancha (unos 900 px en pantalla grande), con el cuadro de texto
+   alto (unos 14 renglones) y, en gris, el guion «Cuéntalo con todo el detalle que quieras; no hay
+   límite de tamaño. Te sugerimos:» con sus cinco apartados; al empezar a escribir, el guion desaparece.
+2. Debajo del cuadro sale «N palabras» (sin tope), que sube al escribir; con una sola, «1 palabra».
+3. Al escribir un texto largo, el cuadro crece solo hasta ocupar casi toda la altura de la ventana;
+   a partir de ahí, barra de desplazamiento dentro del cuadro, y «Enviar», el nombre y la captura
+   siguen a la vista.
+4. Un texto de 50.000 caracteres se envía y llega entero; ya no sale «El texto es demasiado largo».
+5. Si el buzón falla, el texto se queda en la ventana para reintentar.
+6. [SOLO FRANCISCO] Con `soporte.gs` pegado en el proyecto «Gestor - Soporte», un aviso largo llega a
+   Drive entero y la fila IDEA de `docs/COLA.md` no lleva el texto.

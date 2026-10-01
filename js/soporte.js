@@ -28,7 +28,6 @@ window.Soporte = (function () {
   var APP = 'Gestor de Asuntos';
   var REPO = 'fmargon780/gestor-asuntos-ies';
   var CLAVE_NOMBRE = 'gestor-soporte-nombre';
-  var MAX_TEXTO = 5000;
   var ANCHO_MAXIMO = 1500;
   var LIMITE_MS = 45000;
   var MAX_ERRORES = 10;
@@ -185,7 +184,36 @@ window.Soporte = (function () {
     return e;
   }
 
+  /* Fila 240. El guion gris: no obliga a nada, solo sugiere qué contar. */
+  var GUION = 'Cuéntalo con todo el detalle que quieras; no hay límite de tamaño. Te sugerimos:\n\n' +
+    '· Qué pasa o qué propones\n· En qué pantalla o en qué paso\n' +
+    '· Qué esperabas que pasara, o cómo lo harías tú\n· Casos y ejemplos concretos\n' +
+    '· Otras posibilidades o variantes que se te ocurran';
+
+  /* PURA. Cuántas palabras tiene un texto. */
+  function contarPalabras(t) {
+    var m = String(t || '').match(/\S+/g);
+    return m ? m.length : 0;
+  }
+
+  /* PURA. «0 palabras», «1 palabra», «N palabras». */
+  function textoPalabras(n) { return n + (n === 1 ? ' palabra' : ' palabras'); }
+
+  /* El cuadro crece con lo escrito hasta ocupar casi toda la altura de la
+     ventana (deja sitio a la cabecera, el nombre, la captura y los botones,
+     que siguen a la vista); a partir de ahí, barra de desplazamiento dentro. */
+  function altoMaximo() { return Math.max(260, (window.innerHeight || 800) - 400); }
+  function crecer(texto) {
+    texto.style.height = 'auto';
+    texto.style.height = Math.min(texto.scrollHeight + 2, altoMaximo()) + 'px';
+  }
+  function alCambiarVentana() {
+    var t = document.getElementById('soporte-texto');
+    if (t && t.value) crecer(t);
+  }
+
   function cerrar() {
+    window.removeEventListener('resize', alCambiarVentana);
     var capa = document.getElementById('capa-soporte');
     if (capa) capa.remove();
     document.removeEventListener('keydown', alTeclear, true);
@@ -263,7 +291,7 @@ window.Soporte = (function () {
     boton.textContent = 'Enviando…';
     decir('');
     var datos = {
-      app: APP, repo: REPO, tipo: estado.tipo, texto: texto.slice(0, MAX_TEXTO),
+      app: APP, repo: REPO, tipo: estado.tipo, texto: texto,
       pantalla: estado.pantalla, quien: quien, fecha: fechaHora(),
       version: (window.App && App.VERSION) || ''
     };
@@ -318,9 +346,19 @@ window.Soporte = (function () {
 
     var texto = el('textarea', 'campo soporte-texto');
     texto.id = 'soporte-texto';
-    texto.rows = 5; texto.maxLength = MAX_TEXTO;
-    texto.placeholder = 'Cuéntalo con tus palabras: qué estabas haciendo y qué ha pasado, o qué te gustaría.';
+    /* Fila 240 (docs/SOPORTE-TEXTO-SIN-LIMITE.md): sin límite de tamaño, abre alto
+       (14 renglones), crece solo al escribir y lleva un guion gris que sugiere qué contar. */
+    texto.rows = 14;
+    texto.placeholder = GUION;
     cuadro.appendChild(texto);
+    var palabras = el('p', 'suave soporte-pie soporte-palabras', textoPalabras(0));
+    palabras.id = 'soporte-palabras';
+    cuadro.appendChild(palabras);
+    texto.addEventListener('input', function () {
+      crecer(texto);
+      palabras.textContent = textoPalabras(contarPalabras(texto.value));
+    });
+    window.addEventListener('resize', alCambiarVentana);
 
     if (!quienSabido()) {
       var nombre = el('input', 'campo soporte-nombre');
@@ -411,7 +449,7 @@ window.Soporte = (function () {
   else ponerBoton();
 
   return {
-    abrir: abrir, cerrar: cerrar, enviar: enviar, direccion: direccion, pintarAjustes: pintarAjustes,
+    contarPalabras: contarPalabras, textoPalabras: textoPalabras, GUION: GUION, abrir: abrir, cerrar: cerrar, enviar: enviar, direccion: direccion, pintarAjustes: pintarAjustes,
     errores: function () { return errores.slice(); }, reducir: reducir
   };
 })();

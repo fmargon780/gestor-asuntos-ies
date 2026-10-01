@@ -202,6 +202,41 @@ await comprobar('7. mejora: sin errores y sin captura', [m.errores === undefined
 await comprobar('pantalla en Ajustes se llama Ajustes',
   pagina.evaluate(() => { App.ir('ajustes'); return Soporte.abrir && document.querySelector('.pantalla:not(.oculto)').id; }), 'pantalla-ajustes');
 
+/* 11. Fila 240 (docs/SOPORTE-TEXTO-SIN-LIMITE.md): sin límite, cuadro grande con guion. */
+modo = 'bien';
+await pagina.evaluate(() => App.ir('abiertos'));
+await pagina.waitForTimeout(200);
+await abrir();
+await comprobar('11. el cuadro no tiene tope de tamaño y abre con 14 renglones',
+  pagina.evaluate(() => { const t = document.getElementById('soporte-texto'); return [t.maxLength, t.rows]; }), [-1, 14]);
+await comprobarQue('11. el guion gris sugiere qué contar',
+  pagina.evaluate(() => { const p = document.getElementById('soporte-texto').placeholder;
+    return p.indexOf('Cuéntalo con todo el detalle que quieras; no hay límite de tamaño. Te sugerimos:') === 0 &&
+      ['· Qué pasa o qué propones', '· En qué pantalla o en qué paso', '· Qué esperabas que pasara, o cómo lo harías tú',
+       '· Casos y ejemplos concretos', '· Otras posibilidades o variantes que se te ocurran'].every((l) => p.indexOf(l) > -1); }));
+await comprobar('11. el contador empieza en «0 palabras»', pagina.locator('#soporte-palabras').textContent(), '0 palabras');
+await comprobar('11. la ventana es ancha (hasta unos 900 px)',
+  pagina.evaluate(() => Math.round(document.querySelector('.soporte-cuadro').getBoundingClientRect().width)), 900);
+const alto0 = await pagina.evaluate(() => document.getElementById('soporte-texto').getBoundingClientRect().height);
+await pagina.fill('#soporte-texto', 'una palabra');
+await comprobar('11. «N palabras», y «1 palabra» en singular',
+  [await pagina.locator('#soporte-palabras').textContent(), await pagina.evaluate(() => Soporte.textoPalabras(1)), await pagina.evaluate(() => Soporte.contarPalabras('uno dos\ntres  cuatro'))],
+  ['2 palabras', '1 palabra', 4]);
+await pagina.fill('#soporte-texto', Array.from({ length: 60 }, (_, i) => 'Línea ' + i + ' de un texto largo').join('\n'));
+const medidas = await pagina.evaluate(() => ({
+  alto: document.getElementById('soporte-texto').getBoundingClientRect().height,
+  maximo: innerHeight - 400,
+  botones: document.getElementById('soporte-enviar').getBoundingClientRect().bottom <= innerHeight }));
+await comprobarQue('11. crece al escribir, sin pasar de casi toda la altura, y los botones siguen a la vista',
+  medidas.alto > alto0 && medidas.alto <= medidas.maximo + 2 && medidas.botones, JSON.stringify([alto0, medidas]));
+/* Un texto de 50.000 caracteres se envía y llega entero. */
+const largo = 'palabra '.repeat(6250);   /* 50.000 caracteres */
+await pagina.click('.soporte-tipo[data-tipo="mejora"]');
+await pagina.fill('#soporte-texto', largo);
+await pagina.click('#soporte-enviar');
+await pagina.waitForSelector('#capa-soporte', { state: 'detached' });
+await comprobar('11. un texto de 50.000 caracteres llega entero', (recibidos[recibidos.length - 1] || {}).texto.length, largo.trim().length);
+
 /* La petición cortada a propósito (punto 10) deja su propio aviso. */
 const propios = errores.filter(t => t.indexOf('ERR_FAILED') === -1);
 if (propios.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + propios.join('\n')); }

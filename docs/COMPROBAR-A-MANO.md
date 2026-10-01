@@ -127,3 +127,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 217 — correo con otra cuenta de Google abierta (1-oct-2026)
 
 - Con la cuenta personal abierta en el navegador, pulsar «Probar» en Ajustes › Enviar correo: debe llegar el correo de prueba; si no, debe salir el aviso claro («Google no ha dejado pasar el envío…»).
+
+## Fila 240 — soporte con texto sin límite (1-oct-2026)
+
+- Pegar `apps-script/soporte.gs` entero en el proyecto «Gestor - Soporte» (pasos en `docs/PONER-EN-MARCHA-SOPORTE.md`), guardar, y mandar un aviso largo (más de 5.000 caracteres): llega entero al `.txt` de Drive y la fila IDEA de la cola no lleva el texto. Hasta que se pegue, el servidor sigue rechazando los de más de 5.000.

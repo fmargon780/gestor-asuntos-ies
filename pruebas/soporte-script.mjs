@@ -101,6 +101,21 @@ function comprobar(titulo, real, esperado) {
   comprobar('doGet contesta', JSON.parse(m.contexto.doGet().t).ok, true);
 }
 
+/* Fila 240: sin tope de texto. Uno de 50.000 caracteres se guarda entero, sin cortes. */
+{
+  const m = montar({ cola: COLA, respuestasPut: [] });
+  const largo = 'palabra '.repeat(6250) + 'FINAL-DEL-TEXTO';
+  const r = envio(m, { ...BUENO, texto: largo });
+  comprobar('1b. un texto de 50.000 caracteres se acepta', r.ok, true);
+  const txt = m.ficheros.find((f) => f.nombre.endsWith('.txt'));
+  comprobar('1b. el .txt lo guarda entero, sin cortes', txt && txt.contenido.indexOf(largo) > -1, true);
+  comprobar('1b. ya no existe «El texto es demasiado largo»', r.motivo === undefined && !/demasiado largo/.test(JSON.stringify(r)), true);
+  const colaTexto = JSON.stringify(m.cola());
+  comprobar('1b. la cola sigue sin llevar el texto del usuario', colaTexto.indexOf('palabra palabra') === -1 && colaTexto.indexOf('FINAL-DEL-TEXTO') === -1, true);
+  const enorme = envio(montar({ cola: COLA, respuestasPut: [] }), 'x'.repeat(6000001));
+  comprobar('1b. el único tope es el del mensaje entero, dicho en llano', /demasiado grande/.test(enorme.motivo), true);
+}
+
 /* 2 y 3. Un aviso bueno con captura. */
 {
   const m = montar({ cola: COLA, respuestasPut: [] });
