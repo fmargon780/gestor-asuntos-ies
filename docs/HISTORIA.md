@@ -4202,3 +4202,14 @@ parrilla. Arreglo: usabilidad.js solo esconde lo que empieza escondido, y `prepa
 siempre las tres partes. Rescatado de `8d9deba` sobre `main` actual; prueba
 `pruebas/crear-asunto-desde-por-clasificar.mjs`. Revisor local APROBADA. Observación del revisor (no
 bloquea): con un documento con solo el tipo reconocido, el formulario no deja el tipo marcado.
+
+## 1-oct-2026 · fila 245 · Añadir un campo desde un asunto abierto
+
+«+ Añadir campo» en «Datos del trámite» de la ficha (el bloque sale siempre en un asunto abierto, aunque
+sea solo con el botón): abre el panel de Ajustes (`js/campos-catalogo.js`, con `textoVolver`), pide el
+valor y «¿Dónde se guarda?» (`DondeSeGuarda` con `opcionTipo` y `vacio`): «En el tipo» (marcada; entra en
+`porTipo`, vacío en los demás) o «Solo en este asunto» (`ficha.camposPropiosDelAsunto`, con marca «solo
+aquí», «⋮» Pasar al tipo / Quitar). `Campos.camposDeAsunto` une los del tipo y los «solo aquí». Aviso
+con «Deshacer» (8 s). Módulo nuevo `js/campo-desde-el-asunto.js`; prueba
+`pruebas/campo-desde-el-asunto.mjs`. Ajustadas `ficha-disposicion` (el bloque sale con el botón) y
+`ficha-en-tarjetas` (a 800 de alto, 2 nombres de documento caben en la tarjeta, no 3).

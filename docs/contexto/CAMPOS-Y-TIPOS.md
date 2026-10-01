@@ -6,6 +6,18 @@ Documento hijo de `docs/CONTEXTO.md` (fila 65, `docs/DOCUMENTOS-QUE-QUEPAN.md`, 
 
 ### Los campos de cada tipo de asunto
 
+**Desde un asunto abierto (fila 245, `docs/CAMPO-DESDE-EL-ASUNTO.md`)**: en «Datos del trámite» de la
+ficha (que en un asunto abierto sale siempre), «+ Añadir campo» (`js/campo-desde-el-asunto.js`) abre el
+panel de `js/campos-catalogo.js` (con `textoVolver`, sin los campos que el asunto ya tiene), pide el
+valor y el bloque «¿Dónde se guarda?» de `js/donde-se-guarda.js` (`opcionTipo`, `vacio`). «En el tipo»
+añade la entrada a `porTipo` (al final, sin Obligatorio ni Añadir al nombre) y el valor a
+`ficha.campos`; «Solo en este asunto» guarda además la entrada en `ficha.camposPropiosDelAsunto`.
+`Campos.camposDeAsunto(listaDelTipo, ficha)` (pura) da los del tipo más los «solo aquí» (`soloAqui:
+true`; sin Obligatorio ni Añadir al nombre; si el tipo ya tiene el mismo, vale el del tipo): la usan la
+ficha, «Cambiar el asunto» y `js/plantillas-valores.js`. Un «solo aquí» lleva «⋮» → «Pasar al tipo» /
+«Quitar». El aviso de después lleva «Deshacer» (no pisa un tipo que haya cambiado). Sin tipo se guarda
+«solo aquí» sin preguntar; en el ARCHIVO y en modo consulta no sale el botón.
+
 Cada tipo de asunto puede llevar sus propios campos: datos ya presentes en los ficheros (unidad,
 modalidad, puesto, NIF...) o creados a mano, que salen solos y ya rellenos al crear el asunto.
 

@@ -115,7 +115,7 @@ await comprobar('5. "Datos del trámite" sale, con la referencia del campo propi
      enseña si hay alguno (fila 101). */
   pagina.locator('.ficha-bloque', { hasText: 'Datos del trámite' }).locator('.ficha-dato:not(.oculto)').allTextContents(),
   ['Referencia expedienteREF-2026-01', 'Vía de comunicaciónCorreo electrónico: tutor@correo.es',
-   'Lo pideAna Ruiz (madre) · por teléfono · 1-sep-2026']);
+   'Lo pideAna Ruiz (madre) · por teléfono · 1-sep-2026', '+ Añadir campo']);   /* fila 245: el botón */
 await comprobarQue('5. no trae Tipo, Tercero, Estado ni Fecha límite',
   pagina.evaluate(() => {
     const texto = Array.from(document.querySelectorAll('.ficha-bloque'))
@@ -167,10 +167,12 @@ await comprobarQue('el bloque de Documentos lleva la clase "vacio"',
 /* ============================================================
    4. EL ASUNTO SIN CAMPOS PROPIOS, SIN VÍA Y SIN LO PIDE
    ============================================================ */
-console.log('--- 4. sin campos propios, sin vía y sin lo pide: sin "Datos del trámite" ---');
+console.log('--- 4. sin campos propios, sin vía y sin lo pide: "Datos del trámite" solo con el botón ---');
 await abrirFicha(MINIMO);
-await comprobar('no sale "Datos del trámite"',
-  pagina.locator('.ficha-bloque .ficha-titulo', { hasText: 'Datos del trámite' }).count(), 0);
+/* Fila 245: en un asunto abierto el bloque sale siempre, solo con «+ Añadir campo». */
+await comprobar('"Datos del trámite" solo trae «+ Añadir campo»',
+  pagina.locator('.ficha-bloque', { hasText: 'Datos del trámite' }).locator('.ficha-dato:not(.oculto)').allTextContents(),
+  ['+ Añadir campo']);
 await comprobarQue('con un documento dentro, el bloque de Documentos no lleva "vacio"',
   pagina.evaluate(() => {
     const doc = document.getElementById('ficha-documentos');

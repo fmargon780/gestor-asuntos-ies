@@ -343,6 +343,26 @@ var Campos = (function () {
     return c.origen + ':' + c.id;
   }
 
+  /* Los campos de UN asunto (fila 245, docs/CAMPO-DESDE-EL-ASUNTO.md):
+     los del tipo (`listaDelTipo`, lo que hay en `porTipo`) más los «solo
+     aquí» de su ficha (`ficha.camposPropiosDelAsunto`, la misma forma que
+     una entrada de `porTipo`). PURA. Los «solo aquí» llevan `soloAqui:
+     true`, nunca son obligatorios ni van al nombre, y si el tipo ya tiene
+     el mismo campo (alguien lo añadió luego desde Ajustes) vale el del
+     tipo: deja de ser «solo aquí» sin perder su valor. */
+  function camposDeAsunto(listaDelTipo, ficha) {
+    var salida = (listaDelTipo || []).slice();
+    var vistas = {};
+    salida.forEach(function (c) { vistas[claveDeCampo(c)] = true; });
+    ((ficha && ficha.camposPropiosDelAsunto) || []).forEach(function (c) {
+      var k = claveDeCampo(c);
+      if (!c || vistas[k]) return;
+      vistas[k] = true;
+      salida.push(Object.assign({}, c, { obligatorio: false, enNombre: false, soloAqui: true }));
+    });
+    return salida;
+  }
+
   /* El nombre que se enseña. Para uno "de fichero" es el propio título
      de la columna; para uno calculado o propio, hay que mirarlo en su
      tabla. */
@@ -541,7 +561,7 @@ var Campos = (function () {
     guardarTextoPorDefectoDeDocumento: guardarTextoPorDefectoDeDocumento,
     textoPorDefectoDeDocumento: textoPorDefectoDeDocumento,
     normalizarListaDeDocumento: normalizarListaDeDocumento,
-    claveDeCampo: claveDeCampo, nombreDeCampo: nombreDeCampo,
+    claveDeCampo: claveDeCampo, nombreDeCampo: nombreDeCampo, camposDeAsunto: camposDeAsunto,
     CALCULADOS: CALCULADOS, calcularCurso: calcularCurso,
     RECETA_CURSO_DE_FABRICA: RECETA_CURSO_DE_FABRICA,
     catalogoDeCategoria: catalogoDeCategoria, valorInicial: valorInicial,

@@ -45,7 +45,8 @@ window.DondeSeGuarda = (function () {
   }
 
   /* PURA. Las líneas de letra pequeña de debajo de «A la guía».
-     o = { otros, conTrabajo, hitoNuevo: { titulo, tareas } | null, apagada: texto | '' } */
+     o = { otros, conTrabajo, hitoNuevo: { titulo, tareas } | null, apagada: texto | '' }
+     Fila 245: con `o.vacio` (un campo nuevo) la frase acaba en «, vacío». */
   function textoConsecuencia(o) {
     if (o.apagada) return [o.apagada];
     var lineas = [];
@@ -57,7 +58,8 @@ window.DondeSeGuarda = (function () {
     if (!o.otros) {
       lineas.push('No hay más asuntos abiertos de este tipo. Valdrá para los próximos.');
     } else {
-      lineas.push('Llegará a ' + (o.otros === 1 ? '1 asunto abierto' : o.otros + ' asuntos abiertos') + ' de este tipo.');
+      lineas.push('Llegará a ' + (o.otros === 1 ? '1 asunto abierto' : o.otros + ' asuntos abiertos') + ' de este tipo' +
+        (o.vacio ? ', vacío.' : '.'));
       if (o.conTrabajo) {
         lineas.push('En ' + o.conTrabajo + ' no se tocará, porque ya ' + (o.conTrabajo === 1 ? 'tiene' : 'tienen') + ' trabajo.');
       }
@@ -65,7 +67,9 @@ window.DondeSeGuarda = (function () {
     return lineas;
   }
 
-  /* PURA. El bloque entero. o = lo de `textoConsecuencia` + tipoCorto. */
+  /* PURA. El bloque entero. o = lo de `textoConsecuencia` + tipoCorto.
+     Fila 245: `o.opcionTipo` cambia el texto de la primera opción («En el
+     tipo X», para un campo); su valor sigue siendo 'guia'. */
   function bloqueHTML(o) {
     var apagada = !!o.apagada;
     var notas = textoConsecuencia(o).map(function (t) {
@@ -75,7 +79,7 @@ window.DondeSeGuarda = (function () {
       '<div class="etiqueta">¿Dónde se guarda?</div>' +
       '<label class="dsg-opcion' + (apagada ? ' dsg-apagada' : '') + '">' +
         '<input type="radio" name="dsg-donde" value="guia"' + (apagada ? ' disabled' : ' checked') + '> ' +
-        '<span>A la guía de ' + U.escapar(o.tipoCorto || '') + '</span></label>' +
+        '<span>' + U.escapar(o.opcionTipo || ('A la guía de ' + (o.tipoCorto || ''))) + '</span></label>' +
       '<div class="dsg-notas">' + notas + '</div>' +
       '<label class="dsg-opcion"><input type="radio" name="dsg-donde" value="aqui"' + (apagada ? ' checked' : '') + '> ' +
         '<span>Solo en este asunto</span></label>' +

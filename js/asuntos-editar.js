@@ -95,8 +95,10 @@ App.valoresGuardadosParaNombre = function (tipo, camposGuardados) {
    enseñando el del tipo con el que se abrió: cambiar el tipo de un
    asunto ya abierto es raro, y no merece la pena releer el catálogo
    de otra categoría en mitad de la edición. */
-App.pintarCamposEditar = function (tipo, guardados) {
+App.pintarCamposEditar = function (tipo, guardados, ficha) {
   var config = (App.E.campos && App.E.campos.porTipo && App.E.campos.porTipo[tipo]) || [];
+  /* Fila 245: más los «solo aquí» de la ficha del asunto. */
+  config = Campos.camposDeAsunto(config, ficha);
   if (!config.length) return { html: '', items: [] };
 
   var items = config.map(function (cfg) {
@@ -110,7 +112,7 @@ App.pintarCamposEditar = function (tipo, guardados) {
       if (p) cfgParaPintar = Object.assign({}, cfg, { clase: p.clase, valores: p.valores });
     }
     return { cfg: cfgParaPintar, clave: clave, nombre: Campos.nombreDeCampo(cfg, App.E.campos),
-             valor: g.valor || '', enNombre: g.enNombre !== false };
+             valor: g.valor || '', enNombre: cfg.soloAqui ? false : (g.enNombre !== undefined ? g.enNombre !== false : cfg.enNombre !== false), soloAqui: !!cfg.soloAqui };
   });
 
   var filas = items.map(function (it, i) {
@@ -123,10 +125,12 @@ App.pintarCamposEditar = function (tipo, guardados) {
         }).join('') + '</select>'
       : '<input id="' + idBase + '" class="campo" value="' + U.escapar(it.valor) + '">';
     return '<div class="campo-fila">' +
-      '<label class="etiqueta">' + U.escapar(it.nombre) + (it.cfg.obligatorio ? ' *' : '') + '</label>' +
+      '<label class="etiqueta">' + U.escapar(it.nombre) + (it.cfg.obligatorio ? ' *' : '') +
+        (it.soloAqui ? ' <span class="marca-solo-aqui">solo aquí</span>' : '') + '</label>' +
       control +
+      (it.soloAqui ? '' :
       '<label class="interruptor interruptor-fila"><input type="checkbox" id="' + idBase + '-en"' +
-        (it.enNombre ? ' checked' : '') + '><span>Añadir al nombre</span></label>' +
+        (it.enNombre ? ' checked' : '') + '><span>Añadir al nombre</span></label>') +
       '</div>';
   }).join('');
 
@@ -213,7 +217,7 @@ App.editarAsunto = async function (a) {
 
 async function abrirCuadroDeEdicion(a, p, base) {
   var v = base || p;   /* de dónde salen los valores de partida del cuadro */
-  var bloqueCampos = App.pintarCamposEditar(v.tipo, base ? base.campos : p.campos);
+  var bloqueCampos = App.pintarCamposEditar(v.tipo, base ? base.campos : p.campos, a.ficha);
 
   var hayTipo = App.E.tipos.some(function (t) { return t.tipo === p.tipo; });
   var opciones = '';

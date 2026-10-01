@@ -152,7 +152,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   verde. Todo se guarda al cambiar, sin botones "Guardar" sueltos (fila 198); el plazo, de solo
   lectura en la tarjeta de la rejilla; los campos propios y calculados, un único sitio para
   crearlos: dentro de cada tipo, "+ Añadir campo".
-- Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa.
+- Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa; también
+  desde la ficha (fila 245): «+ Añadir campo» con «En el tipo» o «Solo en este asunto» (`ficha.camposPropiosDelAsunto`).
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
 - Papelera: se vacía sola a los 90 días (avisa 7 antes, deja constancia en `papelera-borrados.json`; fila 203), con buscador por palabras. Plazo de conservación por tipo: avisa, nunca borra solo.
 - Word: lo que falta se pregunta antes; se ve en la app, con «Guardar PDF» (cierra el visor al terminar) e
