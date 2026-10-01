@@ -210,7 +210,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   manda «Algo no funciona» / «Propongo una mejora» (texto, captura opcional, pantalla, quién, versión,
   últimos errores) a un script de Google (`apps-script/soporte.gs`) cuya dirección se pone en Ajustes →
   El centro (`ajustesAvisos.urlSoporte`). Guarda el aviso en Drive y apunta una IDEA sin datos del
-  usuario en la cola. Pendiente de Francisco: `docs/PONER-EN-MARCHA-SOPORTE.md`.
+  usuario en la cola. Texto sin límite de tamaño, cuadro grande que crece al escribir, con guion gris y contador de palabras (fila 240). Pendiente de Francisco: `docs/PONER-EN-MARCHA-SOPORTE.md` (y volver a pegar `soporte.gs` tras la fila 240).
 
 ## 6. Reglas de código que no se pueden olvidar
 

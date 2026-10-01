@@ -30,7 +30,7 @@
    solo no sale todavía en el Centro de mando.
    ============================================================ */
 
-var VERSION_SCRIPT = '30-sep-2026 · fila 213';
+var VERSION_SCRIPT = '1-oct-2026 · fila 240';
 
 /* Los repositorios que pueden mandar avisos. Lo que venga de otro se
    rechaza. Cuando se ponga el botón en las demás apps, se añaden aquí. */
@@ -41,7 +41,6 @@ var FICHERO_COLA = 'docs/COLA.md';
 var RAMA_COLA = 'main';
 var MAX_CUERPO = 6000000;      /* caracteres del POST entero */
 var MAX_CAPTURA = 5000000;     /* caracteres de la captura en base64 */
-var MAX_TEXTO = 5000;
 var MAX_ERRORES = 6000;
 var INTENTOS_COLA = 3;
 var MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
@@ -57,7 +56,7 @@ function doPost(e) {
     var contenido = (e && e.postData && e.postData.contents) || '';
     if (!contenido) return respuesta({ ok: false, motivo: 'No ha llegado nada.' });
     if (contenido.length > MAX_CUERPO) {
-      return respuesta({ ok: false, motivo: 'El aviso es demasiado grande. Prueba sin la captura.' });
+      return respuesta({ ok: false, motivo: 'El aviso es demasiado grande (el texto y la captura juntos). Prueba sin la captura o acórtalo un poco.' });
     }
     var datos;
     try { datos = JSON.parse(contenido); }
@@ -107,7 +106,6 @@ function validar(d) {
   if (REPOS_PERMITIDOS.indexOf(d.repo) === -1) return 'Este repositorio no puede mandar avisos.';
   if (d.tipo !== 'error' && d.tipo !== 'mejora') return 'Falta decir si es un error o una mejora.';
   if (typeof d.texto !== 'string' || !d.texto.trim()) return 'Falta el texto del aviso.';
-  if (d.texto.length > MAX_TEXTO) return 'El texto es demasiado largo.';
   if (typeof d.app !== 'string' || !d.app.trim()) return 'Falta el nombre de la app.';
   if (d.captura !== undefined && d.captura !== null && d.captura !== '') {
     if (typeof d.captura !== 'string' || d.captura.length > MAX_CAPTURA) return 'La captura es demasiado grande.';

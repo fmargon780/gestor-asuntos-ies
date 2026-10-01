@@ -4240,3 +4240,11 @@ de `index.html`); `Plantillas.direccionDeNormativa` sustituye la dirección viej
 leer `plantillas.json`. `HitosBiblioteca.enlaceDeNormativa` convierte una `url` del propio sistema de
 normativa a `<base>/norma#r=<clave>` (sin clave o `/oposicion`, sin enlace). Pruebas en
 `pruebas/biblioteca-de-hitos.mjs` y `pruebas/plantillas.mjs`.
+
+## 1-oct-2026 · fila 240 · Soporte: texto sin límite y cuadro grande con guion
+
+Se quita el tope de 5.000 caracteres de `js/soporte.js` y `apps-script/soporte.gs` (queda `MAX_CUERPO`,
+con aviso en llano). Ventana ancha (900 px), cuadro de 14 renglones que crece al escribir, guion gris con
+cinco apartados y contador «N palabras». `VERSION_SCRIPT` = «1-oct-2026 · fila 240»: **Francisco tiene
+que volver a pegar `soporte.gs`** (hasta entonces el servidor sigue cortando en 5.000). Pruebas:
+`pruebas/soporte.mjs` y `pruebas/soporte-script.mjs`.
