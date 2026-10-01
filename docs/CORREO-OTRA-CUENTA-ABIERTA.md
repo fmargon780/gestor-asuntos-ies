@@ -93,3 +93,17 @@ anotado en «Lo que queda por hablar con Francisco» de `docs/COLA.md`.
 Si vuelve a tener abierta su cuenta personal, lo normal será que el correo salga igual. Si Google
 no lo deja pasar, verá un aviso en castellano que le dice que entre con la cuenta del centro y
 vuelva a pulsar «Enviar».
+
+## Cómo sabemos que está bien
+
+1. Con un `fetch` que se rechaza con `TypeError`, el motivo es el aviso nuevo en castellano, con el
+   dominio de la dirección guardada («g.educaand.es»), y no aparece «Failed to fetch».
+2. Sin dominio en la dirección, la frase dice «Entra con la cuenta de Google del centro».
+3. Dirección de dominio: se prueba primero la forma general; si responde bien, una sola llamada y
+   la dirección guardada pasa a ser la general.
+4. Forma general con `TypeError` y dominio bien: dos llamadas con el mismo `idEnvio`, y queda
+   recordado que la general no vale en este ordenador.
+5. Tiempo agotado o respuesta HTTP de error: una sola llamada, sin repetir. Dirección ya general:
+   una sola llamada.
+6. «Probar» de Ajustes › Enviar correo enseña el mismo aviso. [SOLO FRANCISCO] Con la cuenta
+   personal abierta, «Probar» envía el correo, o sale el aviso claro.
