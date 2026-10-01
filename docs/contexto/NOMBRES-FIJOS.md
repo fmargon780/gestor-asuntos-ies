@@ -67,3 +67,15 @@ rutas» (verde; ámbar por debajo de 20; rojo si no cabe, y entonces entra en la
 con lo que más ocupa).
 
 Pruebas: `pruebas/nombres-fijos-con-numero.mjs`.
+
+## Nombres de pila largos (fila 247)
+
+`Nombres.acortarNombrePila(tercero)` (pura): si «Apellidos, Nombres» (sin el número ni los 4 caracteres) pasa
+de 40, deja el primer nombre entero y los demás en inicial con punto (`García López, María C. J. R. 1234567`);
+quita partículas (`de`, `del`, `la`, `las`, `los`, `y`). Sin coma (empresas) no toca nada. Se usa SOLO al
+componer nombres de carpeta: `montarAsunto` y la carpeta del tercero al archivar (`App.cerrarAsunto`).
+`ficha.tercero`, buscadores y documentos siguen con el nombre completo mientras el asunto está abierto; al
+archivar, `ficha.tercero` pasa a ser el nombre de la carpeta. `Nombres.claveDeTercero` (número + apellidos sin
+tildes) reconoce a la misma persona en forma larga o corta, y `Nombres.carpetaDeTercero(tercero, existentes)`
+devuelve la carpeta que ya exista de esa persona o, si no, la corta. No se renombra nada existente. El medidor
+calcula con el nombre ya acortado. Pruebas: `pruebas/nombres-de-pila-largos.mjs`.

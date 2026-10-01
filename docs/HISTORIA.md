@@ -5,6 +5,14 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 1-oct-2026 — Fila 247: nombres de pila largos
+
+Una alumna con cuatro nombres de pila no cabía en la ruta. Ahora, en nombres de carpeta, los nombres de pila de
+más de 40 caracteres dejan el primero entero y el resto en inicial; la misma persona se reconoce en forma corta
+o larga y reutiliza su carpeta. Detalle en `docs/contexto/NOMBRES-FIJOS.md`.
+
+---
+
 ## 30-sep-2026 — Fila 239: nombres fijos con número de asunto y de documento
 
 Motivo: «El nombre no cabe en la ruta de Dropbox: acorta el texto» no dejaba guardar un documento, porque los

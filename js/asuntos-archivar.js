@@ -90,6 +90,13 @@ App.cerrarAsunto = async function (a) {
     if (!tercero) { U.aviso('Hace falta el nombre de la carpeta del tercero.', 'malo'); return; }
   }
 
+  /* Fila 247: nombre de pila largo → forma corta, salvo que la persona ya
+     tenga carpeta (larga o corta): entonces va a esa. */
+  try {
+    var dirCategoria = await Carpetas.bajar(App.E.archivo, [categoria], false);
+    tercero = window.Nombres.carpetaDeTercero(tercero, await Carpetas.subcarpetas(dirCategoria));
+  } catch (e) { if (window.Nombres && Nombres.acortarNombrePila) tercero = Nombres.acortarNombrePila(tercero); }
+
   var yaExiste = false;
   try {
     var carpetaDelTercero = await Carpetas.bajar(App.E.archivo, [categoria, tercero], false);
