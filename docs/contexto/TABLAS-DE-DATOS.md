@@ -24,6 +24,25 @@ caracteres, por esos 4 y el nombre.
   escolar 2025/2026» del texto, o del nombre del fichero. Fila: `{ curso, grupo, nombre, dni, desde,
   hasta, clave }`, sin duplicados exactos (el mismo PDF bajado dos veces). **Ojo**: pdf.js vacía el
   buffer que se le da; se le pasa siempre una copia.
+- **CONSEJO ESCOLAR** (fila 238, `docs/CERTIFICADO-CONSEJO-ESCOLAR.md`, `js/tablas-datos-consejo.js`,
+  `TablasDatosConsejo`): los CSV de Séneca `RegMieConEsc <año>-<año>.csv` (con o sin prefijo de
+  números y guiones bajos), de la carpeta de datos o de `datos/Tablas/`, unidos en una tabla, una fila
+  por nombramiento: `{ apellidos, nombre, sector, cargo, desde, hasta, periodos, nato, reciente,
+  claveNombre, orden }`. Columnas por su título (Sector, Miembro/s, «Nombramiento», «Cese»; el HTML
+  pegado se quita). Cargo = el del paréntesis del sector o, si no, el del miembro (en frase); nombres
+  en mayúsculas a tipo título. Mismo nombramiento en dos ficheros = una fila; el cese, el del fichero
+  más reciente que lo traiga; los natos (sin fecha), una fila por persona y cargo con sus periodos.
+  Se une a la persona **por el nombre** (`claveNombre`: sin tildes, comas ni orden, «Mª» = «María»).
+  Avisos ámbar (en `errores`, fichero «Consejo Escolar»): fecha posterior al periodo del fichero,
+  mismo contenido en dos periodos, ceses distintos según el fichero. En Herramientas → «Tablas de
+  datos», «Añadir ficheros del Consejo Escolar» los copia a `datos/Tablas/` con nombre limpio
+  (pregunta antes de sustituir; uno sin las columnas, aviso ámbar y no se copia).
+  `{{TABLA CONSEJO ESCOLAR}}`: Sector · Cargo · Nombramiento · Cese; sin cese en el Consejo más
+  reciente, «Hasta la actualidad»; en uno antiguo, `[falta: Cese]` en amarillo y en «faltan»; nato,
+  «Cursos …» y sin cese; persona sin filas, `[falta: Consejo Escolar]`. Tipo **CERTIFICADO MIEMBRO
+  CONSEJO ESCOLAR** (corto `CertConsEsc`, PERSONAL) con el campo propio «DNI para el certificado»,
+  que `{{DNI}}` usa si el tercero no trae documento; plantilla
+  `plantillas/certificado-miembro-consejo-escolar.md`.
 - **Profesorado**: no se lee otra vez, sale de `Datos` (los `RelPerCen`, `cargarPersonal`).
 - **Cualquier CSV o Excel de `datos/Tablas/`**: una tabla por fichero (su nombre, en mayúsculas y sin
   extensión: `Departamentos.csv` → `DEPARTAMENTOS`), con su cabecera tal cual. La columna del DNI se

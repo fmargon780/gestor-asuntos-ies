@@ -119,3 +119,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 241 — exportar asuntos (1-oct-2026)
 
 - Con los datos reales del seguro escolar: en Inicio, Filtros → Tipo de asunto «Seguro escolar» y Fechas del periodo; Exportar ▾ → Informe en PDF, marcar «Incluir también los archivados» y la columna «Importe»: el número de cobros y el total coinciden con lo cobrado.
+
+## Fila 238 — certificado de miembro del Consejo Escolar (1-oct-2026)
+
+- Con los ficheros reales de Séneca (`RegMieConEsc …`) subidos con «Añadir ficheros del Consejo Escolar» (Herramientas → Tablas de datos), generar el certificado de una persona conocida: coincide con la hoja «Consejo Escolar - Historial de miembros 2002-2025» (periodos, cargos y ceses).

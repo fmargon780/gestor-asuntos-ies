@@ -196,6 +196,11 @@ Campos: Colectivo
 Encarga: Secretaría
 Campos: Cursos que pide
 
+### CertConsEsc — CERTIFICADO MIEMBRO CONSEJO ESCOLAR
+Encarga: Secretaría
+Campos: DNI para el certificado
+NUEVO
+
 ### INSUFICIENCIA HORARIA — Insuficiencia de horario y reubicación
 Encarga: Secretaría
 NUEVO

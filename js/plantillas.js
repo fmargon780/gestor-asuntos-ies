@@ -138,6 +138,7 @@ var Plantillas = (function () {
        la de quien da el visto bueno, buscados en el personal por su nombre. */
     { clave: 'especialidad firmante', etiqueta: 'Especialidad de quien firma (del RelPerCen)' },
     { clave: 'especialidad visto bueno', etiqueta: 'Especialidad de quien da el visto bueno (del RelPerCen)' },
+    { clave: '{TABLA CONSEJO ESCOLAR}', etiqueta: 'Tabla de periodos como miembro del Consejo Escolar: sector, cargo, nombramiento y cese' },
     { clave: '{TABLA TUTORIAS}', etiqueta: 'Tabla de periodos de tutoría: cargo, curso, toma de posesión y cese' },
     { clave: '{DATO tabla: columna}', etiqueta: 'Un dato suelto de una tabla de datos (el de su curso más reciente)' },
     { clave: '{TABLA tabla: columna | columna}', etiqueta: 'Una tabla de datos entera, con esas columnas' }
