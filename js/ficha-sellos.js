@@ -54,12 +54,17 @@
           ' (' + sentido + (s.fecha ? ', ' + U.escapar(s.fecha) : '') + ').</strong>' +
         '<p>¿De qué documento es el registro? <span class="suave">(' + U.escapar(d.nombre) + ')</span></p>' +
         '<div class="sello-fila">' +
-          '<select class="campo sello-elegir">' +
-            '<option value="">Elige un documento…</option>' +
-            elegibles.map(function (n) {
-              return '<option value="' + U.escapar(n) + '">' + U.escapar(n) + '</option>';
-            }).join('') +
-          '</select>' +
+          /* Fila 233: «Es un documento nuevo» va el primero, y sin ningún documento de la
+             aplicación en la carpeta no sale un desplegable vacío. */
+          '<button type="button" class="boton boton-principal sello-nuevo">Es un documento nuevo</button>' +
+          (elegibles.length
+            ? '<select class="campo sello-elegir">' +
+                '<option value="">Elige un documento…</option>' +
+                elegibles.map(function (n) {
+                  return '<option value="' + U.escapar(n) + '">' + U.escapar(n) + '</option>';
+                }).join('') +
+              '</select>'
+            : '') +
           '<button type="button" class="boton sello-no-es">No es un registro</button>' +
         '</div>' +
       '</div>';
@@ -70,7 +75,10 @@
       var sel = div.querySelector('.sello-elegir');
       var noEs = div.querySelector('.sello-no-es');
 
-      sel.onchange = async function () {
+      var nuevo = div.querySelector('.sello-nuevo');
+      nuevo.onclick = function () { esDocumentoNuevo(a, d, nuevo); };
+
+      if (sel) sel.onchange = async function () {
         if (!sel.value) return;
         var original = sel.value;
         try {
@@ -99,6 +107,53 @@
         pintarSellos(a);
       };
     });
+  }
+
+  /* Fila 233 (docs/SELLO-DOCUMENTO-NUEVO.md): el papel sellado es un documento nuevo, sin ningún
+     documento anterior en la carpeta. Se abre el mismo cuadro de poner nombre de siempre, ya con
+     el sello leído (registro y fecha) y asociado al hito en curso. Al guardar: la nota «Registrado
+     …» del asunto y la tarea de registro del hito, marcada sola. Cerrar sin guardar no cambia nada. */
+  async function esDocumentoNuevo(a, d, boton) {
+    var antes = [];
+    try { antes = (await Carpetas.ficheros(a.handle)).map(function (f) { return f.nombre; }); } catch (e) { antes = []; }
+    var hito = null;
+    try {
+      await Hitos.leer();
+      hito = Hitos.hitoActualDeAsunto ? Hitos.hitoActualDeAsunto(a) : null;
+    } catch (e1) { hito = null; }
+    boton.disabled = true;
+    try {
+      await App.verDocumentos(a, { ponerNombre: d.nombre, propuesta: { fecha: d.sello.fecha, registro: d.sello }, hito: hito });
+    } finally { boton.disabled = false; }
+    if (N.actual !== a) return;
+    var despues = [];
+    try { despues = (await Carpetas.ficheros(a.handle)).map(function (f) { return f.nombre; }); } catch (e2) { despues = []; }
+    var nombreNuevo = despues.filter(function (n) { return antes.indexOf(n) === -1; })[0];
+    if (nombreNuevo && despues.indexOf(d.nombre) === -1) {
+      await alGuardarComoNuevo(a, d, nombreNuevo, hito);
+    }
+    N.pintarDocumentos(a);
+    pintarSellos(a);
+  }
+
+  async function alGuardarComoNuevo(a, d, nombreNuevo, hito) {
+    var s = d.sello;
+    try {
+      var codigo = Nombres.codigoRegistro({ ano: s.anio, sentido: s.tipo, modo: s.serie, numero: s.numero });
+      if (window.Notas && codigo) {
+        await window.Notas.sustituir(a, 'Registrado ' + codigo + (s.fecha ? ' el ' + s.fecha : '') + ' · ' + nombreNuevo,
+          'registroDeDocumento', nombreNuevo, { auto: true });
+        a.ficha.notas = await window.Notas.frescas(a);
+        N.pintarNotas(a, N.modoActual === 'abierto');
+      }
+    } catch (e) { U.accesorio('Documento guardado, pero no he podido apuntar el registro en las notas', e); }
+    /* La tarea de registro o de descarga del hito, si la tiene y está sin marcar. */
+    if (hito && hito.id && Hitos.marcarGuionPorAccion) {
+      try {
+        var paso = await Hitos.marcarGuionPorAccion(a, hito.id, 'registrar');
+        if (!paso) await Hitos.marcarGuionPorAccion(a, hito.id, 'anadir');
+      } catch (e2) { /* no crítico */ }
+    }
   }
 
   Object.assign(N, {

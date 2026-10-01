@@ -233,6 +233,24 @@
     await Carpetas.escribirBytes(carpeta, antiguo, PDF_DE_MENTIRA, 'application/pdf');
   }
 
+  /* Fila 233: un PDF con el sello de registro de Séneca suelto en la carpeta, sin ningún
+     documento anterior (el certificado firmado y descargado), para probar «Es un documento
+     nuevo» en el aviso ámbar de la ficha. */
+  async function crearSelladoSuelto(asuntoNombre) {
+    try {
+      var PDFLib = await PdfHerramientas.cargarPdfLib();
+      var doc = await PDFLib.PDFDocument.create();
+      var fuente = await doc.embedFont(PDFLib.StandardFonts.Helvetica);
+      var pagina = doc.addPage([595, 842]);
+      pagina.drawText('Certificado firmado por la Direccion (copia de pruebas)', { x: 50, y: 780, size: 12, font: fuente });
+      var d = new Date(Date.now() - 86400000);
+      var fecha = String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+      pagina.drawText(d.getFullYear() + '/29700692/M000000000657SALIDA Fecha: ' + fecha + ' 10:15:00', { x: 50, y: 40, size: 9, font: fuente });
+      var carpeta = await App.E.abiertos.getDirectoryHandle(asuntoNombre);
+      await Carpetas.escribirBytes(carpeta, '29700692 - Fuente Lucena.pdf', await doc.save(), 'application/pdf');
+    } catch (e) { /* sin el PDF de ejemplo, la demostración sigue igual */ }
+  }
+
   async function marcarPrimerHito(nombre, estado, nota) {
     var hitos = await Hitos.hitosDe(nombre);
     if (hitos && hitos[0]) await Hitos.marcar(nombre, hitos[0].id, estado, nota || '');
@@ -273,10 +291,11 @@
     }
 
     /* 3. con la fecha límite ya vencida. */
-    await crearAsunto(tipos.CERTIFICADO, 'ALUMNADO', carla, hace(20), {
+    var carlaClave = await crearAsunto(tipos.CERTIFICADO, 'ALUMNADO', carla, hace(20), {
       abiertoEl: hace(20) + 'T09:00:00.000Z',
       datos: { limite: hace(6), limiteEl: hace(20) + 'T09:00:00.000Z', limitePor: 'Revisor' }
     });
+    await crearSelladoSuelto(carlaClave);
 
     /* 4. reservado (no enseña el nombre del tercero en las listas). */
     await crearAsunto(tipos.CERTIFICADO, 'ALUMNADO', diego, hace(2), {

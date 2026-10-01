@@ -4275,3 +4275,10 @@ estaba guardado (cambio de clase), se queda tal cual y sale en ámbar. Cambiar l
 los asuntos abiertos tras una pregunta; el ARCHIVO se lee por la clase al enseñarlo, sin reescribirlo. Demo:
 «Importe de la factura» (texto libre, con `125,5`, `-80` y «unos 30 euros») y «Fecha de la factura». Prueba
 `pruebas/campos-importe-numero-fecha.mjs`.
+
+## 1-oct-2026 · fila 233 · Un papel con sello que es un documento nuevo
+
+El aviso ámbar de un PDF sellado suelto (`js/ficha-sellos.js`) gana «Es un documento nuevo» (el primero; sin
+documentos de la aplicación, sin desplegable): abre el cuadro de poner nombre con el sello leído, asociado al
+hito en curso; al guardar, nota «Registrado …» y tarea de registro del hito marcada sola. La demostración trae un
+PDF sellado suelto en el certificado de Carla. Prueba `pruebas/sello-documento-nuevo.mjs`.

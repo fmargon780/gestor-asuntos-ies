@@ -463,3 +463,16 @@ tercero con «otro tipo»); sin abiertos, con archivados del mismo tipo y uno de
 «archivado», y "Meter aquí" pregunta si reabrir); un abierto y un archivado del mismo tercero
 (solo sale el abierto); sin tercero reconocido (la tarjeta, igual que antes de esta fila); y que
 "Meter en un asunto" pone arriba los asuntos del tercero leído.
+
+### «Es un documento nuevo» en el aviso del sello (fila 233, `docs/SELLO-DOCUMENTO-NUEVO.md`)
+
+El aviso ámbar de un PDF con sello suelto (`js/ficha-sellos.js`) lleva un tercer botón, **«Es un documento
+nuevo»** (el primero; sin documentos de la aplicación en la carpeta no sale el desplegable). Abre el cuadro de
+poner nombre de siempre (`App.verDocumentos(a, { ponerNombre, propuesta: { fecha, registro: sello }, hito })`),
+ya con «Está registrado en Séneca», las cuatro piezas y la fecha del sello, el tipo propuesto, y asociado al
+hito en curso (`Hitos.hitoActualDeAsunto`). Al guardar (el suelto ya no está y hay un nombre nuevo):
+`Notas.sustituir` «Registrado 26SM0657 el dd/mm/aaaa · <documento>» y la primera tarea sin marcar de acción
+`registrar` del hito (si no, `anadir`) queda hecha (`Hitos.marcarGuionPorAccion`). Cerrar sin guardar no cambia
+nada. Prueba `pruebas/sello-documento-nuevo.mjs`; demostración: el certificado de Espejo Montes, Carla trae un
+PDF sellado suelto.
+
