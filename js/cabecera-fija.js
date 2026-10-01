@@ -225,6 +225,28 @@
         '--cabecera-fija-alto', Math.round(cabeceraActual.getBoundingClientRect().height) + 'px'
       );
     } catch (e) { /* medir el alto es solo para Ajustes; sin él no pasa nada */ }
+    titulosDeInicioFijos(pantalla);
+  }
+
+  /* Fila 243 (docs/TITULOS-DE-LA-TABLA-FIJOS.md): en Inicio, las pestañas y la
+     fila de títulos de la tabla se quedan fijas debajo de la cabecera
+     encogida. El `top` de cada una sale de la altura real de lo de encima
+     (variables CSS, css/inicio.css). Si la tabla no cabe en el ancho (ventana
+     estrecha), conserva su desplazamiento lateral (`.desborda`) y los
+     títulos no se fijan: un contenedor con scroll lateral anula `sticky`. */
+  function titulosDeInicioFijos(pantalla) {
+    if (!pantalla || pantalla.id !== 'pantalla-abiertos') return;
+    try {
+      var pestanas = pantalla.querySelector('#inicio-pestanas');
+      if (pestanas && pestanas.offsetParent) {
+        document.documentElement.style.setProperty('--inicio-pestanas-alto', Math.round(pestanas.getBoundingClientRect().height) + 'px');
+      }
+      var envoltorio = pantalla.querySelector('.inicio-tabla-envoltorio');
+      var tabla = envoltorio && envoltorio.querySelector('table');
+      if (envoltorio && tabla && envoltorio.offsetParent) {
+        envoltorio.classList.toggle('desborda', tabla.offsetWidth > envoltorio.clientWidth + 1);
+      }
+    } catch (e) { /* solo es un aspecto: sin él, la tabla se ve como siempre */ }
   }
 
   var pendienteRealineacion = false;

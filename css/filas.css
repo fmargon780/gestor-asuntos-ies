@@ -41,7 +41,7 @@
 }
 .fila-menu-btn:hover { background: #eef1f5; color: var(--tinta); }
 .fila-menu {
-  position: absolute; top: 36px; right: 0; z-index: 9;
+  position: absolute; top: 36px; right: 0; z-index: 30;   /* fila 243: por encima de las pestañas y los títulos fijos de Inicio (18-20) */
   background: var(--papel); border: 1px solid var(--linea); border-radius: 8px;
   box-shadow: var(--sombra); min-width: 190px; padding: 4px;
   display: flex; flex-direction: column; gap: 2px;
