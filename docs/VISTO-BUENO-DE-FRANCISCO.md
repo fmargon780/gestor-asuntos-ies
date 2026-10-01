@@ -1,3 +1,5 @@
+**ANULADO el 1-oct-2026 por Francisco: no se aplica.**
+
 # El visto bueno de Francisco antes de publicar
 
 Fila 230 de la cola. Diseñada con Francisco el 29-sep-2026 (conversación de Cowork). Tercera fila
