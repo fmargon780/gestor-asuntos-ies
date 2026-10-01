@@ -4256,3 +4256,10 @@ Al enviar con «Confirmar y enviar» (`js/correo-cuadro.js`) se llama a `CorreoE
 adjuntos, que la ficha reconoce como «Llegado por correo». Con `yaEnviado`, solo si no estaba; si falla,
 ámbar. Prueba `pruebas/correo-enviado-pdf.mjs`. La respuesta que llegue por la bandeja crea el HILO como
 siempre.
+
+## 1-oct-2026 · fila 243 · Títulos de la tabla de Inicio fijos al bajar
+
+Las pestañas y la fila de títulos de la tabla de Inicio se quedan pegadas bajo la cabecera encogida
+(`css/inicio.css`; `js/cabecera-fija.js` mide `--inicio-pestanas-alto` y marca `.desborda` si la tabla no
+cabe, para conservar su scroll lateral). `overflow-x: clip` sustituye a `auto` mientras la tabla cabe.
+Prueba `pruebas/titulos-de-la-tabla-fijos.mjs`.

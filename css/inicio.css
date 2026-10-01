@@ -233,8 +233,32 @@
 
 #inicio-todos-asuntos { margin-top: 6px; }
 
+/* Fila 243 (docs/TITULOS-DE-LA-TABLA-FIJOS.md): las pestañas y los títulos de las
+   columnas se quedan fijos bajo la cabecera encogida (js/cabecera-fija.js pone
+   --cabecera-fija-alto y --inicio-pestanas-alto). Fondo opaco, para que las filas
+   no se transparenten, y una línea suave donde acaba lo fijo. z-index por debajo
+   de la cabecera (20) y por encima de las filas. */
+.inicio-tabla-cabecera {
+  position: sticky;
+  top: var(--cabecera-fija-alto, 0px);
+  z-index: 19;
+  background: var(--fondo);
+  padding: 6px 0;
+}
+.inicio-tabla thead th {
+  position: sticky;
+  top: calc(var(--cabecera-fija-alto, 0px) + var(--inicio-pestanas-alto, 0px));
+  z-index: 18;
+  background: var(--papel);
+  box-shadow: 0 1px 0 var(--linea);
+}
+/* Un contenedor con `overflow-x: auto` anula `sticky`: solo se usa cuando la tabla
+   no cabe (ventana estrecha), y entonces los títulos van con la tabla. */
+.inicio-tabla-envoltorio { overflow-x: clip; }
+.inicio-tabla-envoltorio.desborda { overflow-x: auto; }
+.inicio-tabla-envoltorio.desborda .inicio-tabla thead th { position: static; box-shadow: none; }
+
 .inicio-tabla-envoltorio {
-  overflow-x: auto;
   background: var(--papel);
   border: 1px solid var(--linea);
   border-radius: var(--radio);

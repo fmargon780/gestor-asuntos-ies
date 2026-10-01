@@ -423,3 +423,12 @@ foco estaba en ese campo o en el de una nota que se está cambiando (`editando`)
 `selectionStart`/`selectionEnd`, y al terminar le devuelve el foco y el cursor al campo nuevo. Se
 comprueba con `pruebas/tablon-no-se-borra.mjs`.
 
+### Títulos de la tabla de Inicio fijos (fila 243, `docs/TITULOS-DE-LA-TABLA-FIJOS.md`)
+
+En Inicio, al bajar, se quedan pegadas bajo la cabecera encogida las cuatro pestañas
+(`.inicio-tabla-cabecera`, `position: sticky; top: var(--cabecera-fija-alto)`, z-index 19) y la fila de
+títulos (`.inicio-tabla thead th`, `top: calc(var(--cabecera-fija-alto) + var(--inicio-pestanas-alto))`,
+z-index 18), con fondo opaco. `js/cabecera-fija.js` (`titulosDeInicioFijos`) pone
+`--inicio-pestanas-alto` y la clase `.desborda` del envoltorio cuando la tabla no cabe en el ancho:
+`overflow-x: clip` (que no anula `sticky`) es lo normal; con `.desborda`, `overflow-x: auto` (scroll
+lateral de siempre) y los títulos dejan de fijarse. El Archivo no tiene fila de títulos: no se toca.
