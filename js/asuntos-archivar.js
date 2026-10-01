@@ -94,8 +94,8 @@ App.cerrarAsunto = async function (a) {
      tenga carpeta (larga o corta): entonces va a esa. */
   try {
     var dirCategoria = await Carpetas.bajar(App.E.archivo, [categoria], false);
-    tercero = Nombres.carpetaDeTercero(tercero, await Carpetas.subcarpetas(dirCategoria));
-  } catch (e) { tercero = Nombres.acortarNombrePila(tercero); }
+    tercero = window.Nombres.carpetaDeTercero(tercero, await Carpetas.subcarpetas(dirCategoria));
+  } catch (e) { if (window.Nombres && Nombres.acortarNombrePila) tercero = Nombres.acortarNombrePila(tercero); }
 
   var yaExiste = false;
   try {
