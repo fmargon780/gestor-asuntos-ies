@@ -115,3 +115,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 229 — el registro del asunto (1-oct-2026)
 
 - Abrir un asunto de verdad que ya tuviera notas e historia de antes: están todas en el «Registro» de la ficha, ninguna se ha perdido, y el compañero las ve igual desde su ordenador.
+
+## Fila 241 — exportar asuntos (1-oct-2026)
+
+- Con los datos reales del seguro escolar: en Inicio, Filtros → Tipo de asunto «Seguro escolar» y Fechas del periodo; Exportar ▾ → Informe en PDF, marcar «Incluir también los archivados» y la columna «Importe»: el número de cobros y el total coinciden con lo cobrado.
