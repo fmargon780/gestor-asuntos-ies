@@ -139,3 +139,5 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 248 — «Qué hay de nuevo» (1-oct-2026)
 
 - Cuando se publique la siguiente tarea con un cambio visible, al recargar sale la ventana solo con esa novedad.
+
+- Fila 249 (Por liquidar): liquidar un asunto reservado de verdad y mirar que en el PDF LIQUIDACION sale «(reservado)» en vez del tercero.

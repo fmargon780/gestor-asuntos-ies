@@ -11,4 +11,3 @@ revisor: los minutos de abajo cuentan la fila entera, revisor incluido (uno o do
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 249 | 120 | `docs/POR-LIQUIDAR.md`: casilla del tipo en `js/ajustes-tipo.js`, pestaña «Por liquidar» en Inicio con casillas, suma de importes y filtros, paso a «Por liquidar» desde la mesa y la ficha con «Deshacer», cuadro «Liquidar», PDF LIQUIDACIÓN con pdf-lib, archivado en lote, datos de demostración y prueba nueva `pruebas/por-liquidar.mjs` |
