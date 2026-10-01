@@ -237,7 +237,7 @@
   function titulosDeInicioFijos(pantalla) {
     if (!pantalla || pantalla.id !== 'pantalla-abiertos') return;
     try {
-      var pestanas = pantalla.querySelector('.inicio-tabla-cabecera');
+      var pestanas = pantalla.querySelector('#inicio-pestanas');
       if (pestanas && pestanas.offsetParent) {
         document.documentElement.style.setProperty('--inicio-pestanas-alto', Math.round(pestanas.getBoundingClientRect().height) + 'px');
       }
