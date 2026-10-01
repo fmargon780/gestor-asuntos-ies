@@ -156,8 +156,10 @@ var FichaPersona = (function () {
         var e = reparto[id];
         if (!e || (!e.filas.length && !e.tablas.length)) return;
         def.cuerpo = cuerpoDe(e, pie); def.resumen = resumenDe(id, e);
+        /* La cabecera ya dice el grupo y si está matriculado: el título, el curso. */
         if (id === 'matricula') {
-          def.resumen = [p.matriculado ? p.unidad : '', p.matriculado ? 'Matriculado' : (p.solicitante ? 'Solicitante' : 'No matriculado')].filter(Boolean).join(' · ');
+          var fc = e.filas.filter(function (f) { return U.normalizar(f.titulo) === 'curso'; })[0];
+          def.resumen = fc ? recortar(fc.valor, 40) : def.resumen;
         }
       }
       rejilla.appendChild(tarjeta(p.categoria, recuerdo, def));
@@ -167,7 +169,8 @@ var FichaPersona = (function () {
   function pintarPersonal(p, o, raiz, rejilla) {
     var dp = Datos.destacadosPersona(p);
     var dni = p.documento || '';
-    var puesto = dp.destacados.filter(function (f) { return f.titulo !== 'DNI'; });
+    /* El puesto, la situación y el DNI ya están en la cabecera. */
+    var puesto = dp.destacados.filter(function (f) { return ['DNI', 'Puesto', 'Situación'].indexOf(f.titulo) === -1; });
     var cab = document.createElement('div');
     cab.innerHTML = cabeceraSimple(p, [p.puesto, p.enElCentro ? 'En el centro' : 'Ya no está en el centro'].filter(Boolean).join(' · '), dni);
     var cabecera = cab.firstChild;
@@ -193,21 +196,33 @@ var FichaPersona = (function () {
 
   function pintarOtra(p, o, raiz, rejilla) {
     var cab = document.createElement('div');
-    cab.innerHTML = cabeceraSimple(p, '', '');
+    var nif = p.nif || p.documento || '';
+    cab.innerHTML = cabeceraSimple(p, '', nif);
     var cabecera = cab.firstChild;
     var ac = document.createElement('div'); ac.id = 'ficha-persona-acciones'; ac.className = 'fp-acciones';
     cabecera.appendChild(ac);
     raiz.insertBefore(cabecera, rejilla);
+    conCopiar(raiz, '#vt-dni', nif);
+    if (nif) { var chip = raiz.querySelector('#vt-dni'); if (chip) chip.firstChild.textContent = 'NIF ' + nif + ' '; }
 
     var recuerdo = leerRecuerdo(p.categoria);
     var cuerpo = document.createElement('div');
+    var resumenDatos = '';
     if (App.FICHAS_DE_CATEGORIA[p.categoria]) {
       cuerpo.innerHTML = App.FICHAS_DE_CATEGORIA[p.categoria].html(p);
+      resumenDatos = nif;
     } else {
-      cuerpo.innerHTML = filasHtml(Object.keys(p.campos || {}).map(function (c) { return { titulo: c, valor: p.campos[c] }; }));
+      /* Sin repetir lo que ya dice la cabecera: el nombre y el NIF. */
+      var filas = Object.keys(p.campos || {}).map(function (c) { return { titulo: c, valor: p.campos[c] }; })
+        .filter(function (f) {
+          var v = U.normalizar(f.valor);
+          return v && v !== U.normalizar(p.nombre) && v !== U.normalizar(nif);
+        });
+      cuerpo.innerHTML = filasHtml(filas);
+      resumenDatos = filas.slice(0, 2).map(function (f) { return recortar(f.valor, 40); }).join(' · ');
     }
     rejilla.appendChild(tarjeta(p.categoria, recuerdo, { id: 'datos', titulo: 'Datos', abierta: true,
-      resumen: p.documento || p.nif || '', cuerpo: cuerpo }));
+      resumen: resumenDatos, cuerpo: cuerpo }));
     rejilla.appendChild(tarjeta(p.categoria, recuerdo, { id: 'asuntos', titulo: 'Sus asuntos', abierta: true,
       cuerpo: tarjetaDeAsuntos(), tituloId: 'titulo-sus-asuntos', resumenId: 'fp-resumen-asuntos' }));
   }

@@ -185,7 +185,25 @@ var FichaTerceroAlumno = (function () {
 
   /* ---------- «Copiar todo el contacto» ---------- */
 
-  function textoDeTodo(persona, alumno, tutores) {
+  /* Los «otros datos de la familia» que son un teléfono o un correo (Séneca a
+     veces los trae sin número de tutor: «Teléfono del tutor», «Correo del tutor»). */
+  function otrosDeContacto(otros) {
+    return (otros || []).filter(function (f) { return f && f.valor && /telefono|movil|correo|e-?mail/.test(U.normalizar(f.titulo)); });
+  }
+
+  /* Todos los correos de la familia: los de cada tutor y los sueltos. */
+  function correosDeFamilia(tutores, otros) {
+    var lista = [];
+    function meter(c) { c = String(c || '').trim(); if (c && lista.indexOf(c) === -1) lista.push(c); }
+    tutores.forEach(function (t) { t.correos.forEach(meter); });
+    otrosDeContacto(otros).forEach(function (f) {
+      if (!/correo|e-?mail/.test(U.normalizar(f.titulo))) return;
+      String(f.valor).split(/[;,\s]+/).forEach(function (c) { if (c.indexOf('@') !== -1) meter(c); });
+    });
+    return lista;
+  }
+
+  function textoDeTodo(persona, alumno, tutores, otros) {
     var lineas = [];
     var nombre = Datos.nombreNatural(persona.nombre) + (persona.matriculado && persona.unidad ? ' (' + persona.unidad + ')' : '');
     lineas.push([nombre].concat(alumno.telefonos.map(soloDigitos), alumno.correos).join(' · '));
@@ -193,6 +211,7 @@ var FichaTerceroAlumno = (function () {
       lineas.push([etiquetaDeTutor(t) + ': ' + (t.nombre || etiquetaDeTutor(t))]
         .concat(t.telefonos.map(soloDigitos), t.correos).join(' · '));
     });
+    otrosDeContacto(otros).forEach(function (f) { lineas.push(f.titulo + ': ' + f.valor); });
     return lineas.join('\n');
   }
 
@@ -207,10 +226,9 @@ var FichaTerceroAlumno = (function () {
   function familia(persona, a, alPedirCorreo) {
     var tutores = Datos.tutoresDe(persona);
     var alumno = contactoDelAlumno(persona);
-    var correosFamilia = [];
-    tutores.forEach(function (t) { t.correos.forEach(function (c) { if (correosFamilia.indexOf(c) === -1) correosFamilia.push(c); }); });
     var otrosFamilia = (tutores.otros || []).slice();
     tutores.forEach(function (t) { otrosFamilia = otrosFamilia.concat(t.otros || []); });
+    var correosFamilia = correosDeFamilia(tutores, otrosFamilia);
 
     var nodo = document.createElement('div');
     var caja = document.createElement('div');
@@ -229,8 +247,13 @@ var FichaTerceroAlumno = (function () {
       return '';
     }
 
-    caja.appendChild(tarjeta('vt-tarjeta-alumno',
-      '<div class="vt-tarjeta-titulo"><span class="vt-icono">👤</span>El alumno</div>', alumno, igualA));
+    /* Fila 252: sin teléfono ni correo del alumno, no hay tarjeta «El alumno» (el DNI ya está en la cabecera). */
+    if (alumno.telefonos.length || alumno.correos.length) {
+      caja.appendChild(tarjeta('vt-tarjeta-alumno',
+        '<div class="vt-tarjeta-titulo"><span class="vt-icono">👤</span>El alumno</div>',
+        /* El DNI ya está en la cabecera: no se repite aquí. */
+        Object.assign({}, alumno, { documento: '' }), igualA));
+    }
     tutores.forEach(function (t) {
       var etiqueta = etiquetaDeTutor(t);
       caja.appendChild(tarjeta('vt-tarjeta-tutor vt-tarjeta-tutor' + t.numero,
@@ -272,7 +295,7 @@ var FichaTerceroAlumno = (function () {
     var copiar = document.createElement('button');
     copiar.type = 'button'; copiar.className = 'boton'; copiar.id = 'vt-copiar-todo';
     copiar.textContent = 'Copiar todo el contacto';
-    copiar.onclick = function () { U.copiar(textoDeTodo(persona, alumno, tutores), copiar); };
+    copiar.onclick = function () { U.copiar(textoDeTodo(persona, alumno, tutores, otrosFamilia), copiar); };
     botones.appendChild(copiar);
     nodo.appendChild(botones);
 
@@ -282,10 +305,15 @@ var FichaTerceroAlumno = (function () {
          primero.telefonos[0] ? telefonoLegible(primero.telefonos[0]) : primero.correos[0]].filter(Boolean).join(' · ')
       : [alumno.telefonos[0] && telefonoLegible(alumno.telefonos[0]), alumno.correos[0]].filter(Boolean).join(' · ');
 
+    if (!resumen) {
+      resumen = otrosDeContacto(otrosFamilia).slice(0, 2).map(function (f) {
+        return /telefono|movil/.test(U.normalizar(f.titulo)) ? telefonoLegible(f.valor) : f.valor;
+      }).join(' · ');
+    }
     if (!resumen) resumen = tutores.length ? tutores.length + (tutores.length === 1 ? ' tutor' : ' tutores') : (alumno.documento ? 'DNI ' + alumno.documento : '');
     var vacia = !tutores.length && !alumno.telefonos.length && !alumno.correos.length && !otrosFamilia.length;
     return { nodo: nodo, resumen: resumen, vacia: vacia, correosFamilia: correosFamilia, tutores: tutores,
-             textoDeTodo: function () { return textoDeTodo(persona, alumno, tutores); } };
+             textoDeTodo: function () { return textoDeTodo(persona, alumno, tutores, otrosFamilia); } };
   }
 
   /* Pone el DNI y el NIE de la cabecera con su botón de copiar. */
@@ -305,8 +333,9 @@ var FichaTerceroAlumno = (function () {
   function ventana(persona, resumen, a) {
     var tutores = Datos.tutoresDe(persona);
     var alumno = contactoDelAlumno(persona);
-    var correosFamilia = [];
-    tutores.forEach(function (t) { t.correos.forEach(function (c) { if (correosFamilia.indexOf(c) === -1) correosFamilia.push(c); }); });
+    var otrosFamilia = (tutores.otros || []).slice();
+    tutores.forEach(function (t) { otrosFamilia = otrosFamilia.concat(t.otros || []); });
+    var correosFamilia = correosDeFamilia(tutores, otrosFamilia);
     var irACorreo = false;
 
     var html = '<div id="fp-ventana"></div>';
@@ -330,7 +359,7 @@ var FichaTerceroAlumno = (function () {
     }
 
     return { html: html, titulo: 'Datos y contacto', montar: montar, alCerrar: alCerrar,
-             tutores: tutores, textoDeTodo: function () { return textoDeTodo(persona, alumno, tutores); } };
+             tutores: tutores, textoDeTodo: function () { return textoDeTodo(persona, alumno, tutores, otrosFamilia); } };
   }
 
   return { ventana: ventana, familia: familia, cabeceraHtml: cabeceraHtml, montarCabecera: montarCabecera,

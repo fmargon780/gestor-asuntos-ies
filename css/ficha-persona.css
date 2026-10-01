@@ -27,3 +27,16 @@
 .fp-cuerpo .vt-tarjeta { min-width: 0; }
 .fp-cuerpo .vt-dato { min-width: 0; flex-wrap: wrap; }
 .fp-cuerpo .vt-valor { white-space: normal; overflow-wrap: anywhere; overflow: visible; }
+
+/* Tarjeta estrecha: la etiqueta de cada dato va encima del valor, para que
+   un correo o un teléfono no se parta a mitad de palabra. */
+.fp-tarjeta { container-type: inline-size; }
+@container (max-width: 420px) {
+  .fp-cuerpo .ficha-dato { grid-template-columns: 1fr; gap: 0; }
+  .fp-cuerpo .ficha-dato span:first-child { font-size: 12px; }
+}
+.fp-cuerpo .ficha-dato span:last-child { overflow-wrap: anywhere; }
+
+/* Dentro de las tarjetas pequeñas del alumno y de los tutores, la etiqueta va encima. */
+.fp-cuerpo .vt-tarjeta .ficha-dato { grid-template-columns: 1fr; gap: 0; }
+.fp-cuerpo .vt-tarjeta .ficha-dato span:first-child { font-size: 12px; }

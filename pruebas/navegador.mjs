@@ -254,7 +254,7 @@ await pagina.waitForTimeout(250);
 await pagina.click('#lista-personas .resultado');
 const fichaHugo = await pagina.locator('#ficha-persona').textContent();
 await comprobar('la ficha dice que no está matriculado',
-  fichaHugo.indexOf('No está matriculado este curso') !== -1, true);
+  fichaHugo.indexOf('No matriculado') !== -1, true);   /* fila 252: lo dice la cabecera */
 await comprobar('y de cuándo fue su última matrícula',
   fichaHugo.indexOf('24-25') !== -1, true);
 

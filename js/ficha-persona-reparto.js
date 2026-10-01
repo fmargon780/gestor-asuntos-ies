@@ -29,7 +29,8 @@ var FichaPersonaReparto = (function () {
     { re: /tutor|padre|madre|responsable|familia/, tarjeta: null },
     { re: /telefono|movil|correo|e-?mail/, tarjeta: null },
     { re: /^(primer|segundo) apellido$|^apellidos?$/, tarjeta: null },
-    { re: /^edad|^fecha de nacimiento$/, tarjeta: null },   /* la cabecera ya dice la edad y la fecha de nacimiento */
+    { re: /^edad|^fecha de nacimiento$/, tarjeta: null },
+    { re: /^matricula$|^grupo$|^unidad$|estado.*matricula/, tarjeta: null },   /* la cabecera ya dice el grupo y si está matriculado */   /* la cabecera ya dice la edad y la fecha de nacimiento */
     { re: /^matricula$|^grupo$|^curso$|ultima matricula|^unidad|estado.*matricula|ano de la matricula|ensenanza/, tarjeta: 'matricula' },
     { re: /nacimiento|nacionalidad|sexo|genero|domicilio|direccion|localidad|provincia|codigo postal|^c\.? ?p\.?$/, tarjeta: 'datos' }
   ];
@@ -67,8 +68,9 @@ var FichaPersonaReparto = (function () {
     dest.destacados.concat(dest.resto).forEach(function (f) {
       if (!f || f.valor === '' || f.valor === undefined || f.valor === null) return;
       var id = tarjetaDeTitulo(f.titulo);
-      if (!id || vistos[claveDeTitulo(f.titulo)]) return;   /* el primero manda: una sola vez */
+      if (vistos[claveDeTitulo(f.titulo)]) return;   /* el primero manda: una sola vez */
       vistos[claveDeTitulo(f.titulo)] = true;
+      if (!id) return;
       de(id).filas.push({ titulo: f.titulo, valor: String(f.valor) });
     });
 

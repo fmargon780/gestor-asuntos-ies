@@ -50,9 +50,10 @@ await pagina.fill('#campo-usuario', 'Francisco');
 await pagina.waitForSelector('#btn-entrar:not([disabled])');
 await pagina.evaluate(async (bd) => {
   const csv = [
-    'Alumno/a;Nº Id. Escolar;Curso;Unidad;Año de la matrícula;Estado Matrícula;Fecha de nacimiento;Teléfono;Domicilio;Nombre Primer tutor;Primer apellido Primer tutor;Teléfono Primer tutor;Observaciones',
-    'Primera, Lucía;9990001;1º de E.S.O.;1º ESO C;2026;Matriculada;04/03/2014;600000001;Calle Inventada 1;Rosa;Modelo;600000002;Sin observaciones raras',
-    'Antiguo, Pablo;9990002;4º de E.S.O.;4º ESO A;2025;Matriculado;05/06/2010;600000003;Calle Inventada 2;;;;'
+    'Alumno/a;Nº Id. Escolar;Curso;Unidad;Año de la matrícula;Estado Matrícula;Fecha de nacimiento;Teléfono;Domicilio;Nombre Primer tutor;Primer apellido Primer tutor;Teléfono Primer tutor;Observaciones;Teléfono del tutor;Correo del tutor',
+    'Primera, Lucía;9990001;1º de E.S.O.;1º ESO C;2026;Matriculada;04/03/2014;600000001;Calle Inventada 1;Rosa;Modelo;600000002;Sin observaciones raras;;',
+    'Tercera, Ana;9990003;2º de E.S.O.;2º ESO A;2026;Matriculada;01/02/2013;;Calle Inventada 3;;;;;600111222;tutor.largo.de.prueba@correo-demo.es',
+    'Antiguo, Pablo;9990002;4º de E.S.O.;4º ESO A;2025;Matriculado;05/06/2010;600000003;Calle Inventada 2;;;;;;'
   ].join('\r\n') + '\r\n';
   const g = await window.__disco.abiertos.getDirectoryHandle('_GESTOR', { create: true });
   const d = await g.getDirectoryHandle('datos', { create: true });
@@ -95,6 +96,31 @@ await comprobar('Materias: «2 materias» y la tabla',
 await comprobar('la fecha de los datos al pie de la tarjeta de la base de datos',
   pagina.locator('[data-tarjeta="materias"] .nota').textContent(), 'Datos de la base de datos de alumnado del 20-09-2099');
 
+console.log('--- Los repetidos y el contacto (revisor, 2.ª vuelta) ---');
+await comprobar('la tarjeta Matrícula no repite el grupo ni el estado de la cabecera; su título dice el curso',
+  pagina.evaluate(() => { const t = document.querySelector('[data-tarjeta="matricula"]'); const x = t.textContent;
+    return [x.indexOf('Grupo') === -1, x.indexOf('Estado Matrícula') === -1, t.querySelector('.fp-resumen').textContent]; }),
+  [true, true, '1º de E.S.O.']);
+await comprobar('«Familia y contacto» no repite el DNI de la cabecera ni la edad ni el nacimiento en Datos',
+  pagina.evaluate(() => document.querySelectorAll('#ficha-persona .vt-dato-dni').length), 0);
+
+await pagina.fill('#buscar-personas', 'tercera');
+await pagina.waitForTimeout(300);
+await pagina.locator('#lista-personas [data-persona]').filter({ hasText: 'Tercera' }).first().click();
+await pagina.waitForSelector('#ficha-persona [data-tarjeta="familia"]');
+await comprobar('teléfono y correo del tutor sin número: la tarjeta Familia tiene resumen',
+  pagina.locator('#ficha-persona [data-tarjeta="familia"] .fp-resumen').textContent(), '600 111 222 · tutor.largo.de.prueba@correo-demo.es');
+await comprobar('«Copiar todo el contacto» lleva también el teléfono y el correo del tutor',
+  pagina.evaluate(() => { const p = App.personasCargadas.lista.find(x => x.id === '9990003'); const t = FichaTerceroAlumno.ventana(p, null, null).textoDeTodo(); return [t.indexOf('600111222') !== -1, t.indexOf('tutor.largo.de.prueba@correo-demo.es') !== -1]; }),
+  [true, true]);
+await comprobar('el correo largo se lee entero en la tarjeta (no se parte letra a letra)',
+  pagina.evaluate(() => { const el = Array.from(document.querySelectorAll('#ficha-persona .fp-cuerpo .ficha-dato span:last-child')).find(e => e.textContent.indexOf('@') !== -1); return el.getBoundingClientRect().height < 60; }),
+  true);
+await pagina.fill('#buscar-personas', 'primera');
+await pagina.waitForTimeout(300);
+await pagina.locator('#lista-personas [data-persona]').filter({ hasText: 'Primera' }).first().click();
+await pagina.waitForSelector('#ficha-persona [data-tarjeta="familia"]');
+
 console.log('--- 3. dos columnas con ancho; sin barra horizontal ---');
 await comprobar('dos columnas', pagina.evaluate(() => getComputedStyle(document.querySelector('#ficha-persona .fp-tarjetas')).gridTemplateColumns.split(' ').length), 2);
 await comprobar('sin barra horizontal', pagina.evaluate(() => { const f = document.getElementById('ficha-persona'); return f.scrollWidth <= f.clientWidth + 1; }), true);
@@ -112,6 +138,7 @@ await comprobar('Datos personales lleva el domicilio y el lugar, y no repite la 
 console.log('--- 6. se recuerda lo abierto, por categoría ---');
 await pagina.locator('[data-tarjeta="trayectoria"] > summary').click();
 await pagina.locator('[data-tarjeta="asuntos"] > summary').click();
+await pagina.waitForTimeout(150);
 await pagina.reload();
 await pagina.waitForSelector('#aplicacion:not(.oculto)', { state: 'attached' }).catch(() => {});
 await comprobar('la clave guardada recuerda las dos cosas', pagina.evaluate(() => JSON.parse(localStorage.getItem('gestor.fichaPersona.abiertas')).ALUMNADO),
