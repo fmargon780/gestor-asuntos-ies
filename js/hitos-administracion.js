@@ -24,6 +24,10 @@
        «Administración». Los hitos de los asuntos ya creados no se tocan.
        Y, en la biblioteca de hitos, «Firma de Secretaría» y «Visto bueno
        de Dirección» si no hay ya uno con ese título.
+     - Fila 234 (docs/RESPONSABLE-SECRETARIA-CON-VB.md): segundo responsable
+       fijo, «Secretaría con V.º B.º de Dirección» (id `secretaria-vb-direccion`,
+       del centro, SIN la marca de Administración), detrás de «Administración».
+       Al filtrar por Secretaría o por Dirección, sus hitos también salen.
      - «Qué me toca» (`cuentaPara`): al filtrar por una persona salen
        sus hitos y los de «Administración»; por «Administración», solo
        esos.
@@ -34,6 +38,8 @@ var HitosAdministracion = (function () {
 
   var ID = 'administracion';
   var NOMBRE = 'Administración';
+  var ID_VB = 'secretaria-vb-direccion';
+  var NOMBRE_VB = 'Secretaría con V.º B.º de Dirección';
   var MARCA = 'responsable-migrado.json';
   var CARGOS = ['direccion', 'jefatura', 'jefaturadeestudios', 'secretaria', 'vicedireccion'];
   /* Los dos hitos de la biblioteca del centro para los certificados que
@@ -65,8 +71,9 @@ var HitosAdministracion = (function () {
   function hueso(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z]/g, ''); }
 
   function asegurar(responsables) {
-    var lista = (responsables || []).filter(function (r) { return r.id !== ID; });
-    return [{ id: ID, nombre: NOMBRE, clase: 'centro', administracion: true, fijo: true }].concat(lista);
+    var lista = (responsables || []).filter(function (r) { return r.id !== ID && r.id !== ID_VB; });
+    return [{ id: ID, nombre: NOMBRE, clase: 'centro', administracion: true, fijo: true },
+      { id: ID_VB, nombre: NOMBRE_VB, clase: 'centro', administracion: false, fijo: true }].concat(lista);
   }
 
   function esCargo(r) { return CARGOS.indexOf(hueso(r.id)) !== -1 || CARGOS.indexOf(hueso(r.nombre)) !== -1; }
@@ -81,8 +88,13 @@ var HitosAdministracion = (function () {
   function cuentaPara(idResponsable, filtro, ajustes) {
     if (!filtro) return true;
     if (idResponsable === filtro) return true;
-    if (idResponsable !== ID) return false;
     var r = ((ajustes && ajustes.responsables) || []).filter(function (x) { return x.id === filtro; })[0];
+    if (idResponsable === ID_VB) {
+      /* Fila 234: cuenta para Secretaría y para Dirección (por id o por nombre). */
+      return !!r && (hueso(r.id) === 'secretaria' || hueso(r.nombre) === 'secretaria' ||
+        hueso(r.id) === 'direccion' || hueso(r.nombre) === 'direccion');
+    }
+    if (idResponsable !== ID) return false;
     return esPersona(r);
   }
 
@@ -149,7 +161,7 @@ var HitosAdministracion = (function () {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enganchar);
   else enganchar();
 
-  return { ID: ID, NOMBRE: NOMBRE, MARCA: MARCA, asegurar: asegurar, esPersona: esPersona, esCargo: esCargo,
+  return { ID: ID, NOMBRE: NOMBRE, ID_VB: ID_VB, NOMBRE_VB: NOMBRE_VB, MARCA: MARCA, asegurar: asegurar, esPersona: esPersona, esCargo: esCargo,
            paraGuia: paraGuia, cuentaPara: cuentaPara, hacer: hacer, MODELOS_FIRMA: MODELOS_FIRMA,
            faltanPorTitulo: faltanPorTitulo, anadirModelosDeFirma: anadirModelosDeFirma };
 })();
