@@ -166,6 +166,9 @@ function construirSeccionDatos(tipo) {
     'Lleva el sello de registro de Séneca', 'Deja libre la banda de arriba al preparar el documento.'));
   interruptores.appendChild(App.construirInterruptorDeTipo(tipo, 'llevaFirma', false,
     'Lleva la firma digital del director', 'Deja libre la banda de abajo al preparar el documento.'));
+  /* Fila 249 (docs/POR-LIQUIDAR.md): al terminar, el asunto pasa a «Por liquidar» en vez de archivarse. */
+  interruptores.appendChild(App.construirInterruptorDeTipo(tipo, 'liquidar', false,
+    'Hay que liquidarlo antes de archivar', 'Al terminar, el asunto pasa a «Por liquidar» en vez de archivarse.'));
   b.cuerpo.appendChild(interruptores);
 
   /* «Al cerrar el asunto, avisar a quien lo pide» (fila 195,

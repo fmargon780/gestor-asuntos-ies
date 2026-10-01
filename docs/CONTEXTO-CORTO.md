@@ -195,6 +195,15 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   asunto), «Explicación» del hito con viñetas (fila 228; Crear y Cambiar) y «¿Dónde se guarda?» («A la guía de
   <tipo>», marcada, o «Solo en este asunto»): a la guía, llega a los asuntos abiertos del tipo, pero solo a los
   hitos vacíos; uno con trabajo no se toca.
+- **Por liquidar** (fila 249, `docs/POR-LIQUIDAR.md`, `js/por-liquidar.js` y `js/por-liquidar-liquidar.js`): casilla por tipo
+  «Hay que liquidarlo antes de archivar» (`tipo.liquidar`, Ajustes). Un asunto de esos tipos, en vez de archivarse, pasa a
+  `ficha.porLiquidar = { desde, auto }` (botón «Pasar a Por liquidar» en la ficha y el ⋮ de la tabla, o solo, al dar por hecho
+  su último hito, con «Deshacer»; `auto` vuelve solo a su pestaña si un hito se desmarca o se añade). Quinta pestaña de Inicio
+  «Por liquidar» (solo si hay tipos con la casilla), con casillas, «Marcados: N asuntos · Total: X €» (primer campo propio de
+  clase Importe del tipo) y «Liquidar»: cuadro (fecha, Entrega, Recibe = quien ocupa Secretaría, nota) que guarda en cada
+  asunto el PDF `AAMMDD LIQUIDACION D26-…pdf` (tipo de documento LIQUIDACION, pdf-lib, con membrete), apunta la línea en el
+  registro y archiva por `App.cerrarAsunto` sin preguntar. Sale de «En Administración», «En espera» y «Dormidos»; filtro de
+  Situación «Por liquidar» y columna de exportar «Por liquidar desde».
 - "Inicio" (antes "Asuntos abiertos"; fila 212, tercera versión, sobre la fila 209): sin columna izquierda, a todo el ancho. Justo debajo de la cabecera, una fila: a la izquierda «Ha llegado: N correos · N documentos por clasificar» (cada trozo abre «Ver todo» solo con esa mitad, con «Ver también…» para volver a las dos; el número de documentos se resalta si hay alguno nuevo); a la derecha, el cuadro de avisos. El tablón (compacto: una línea para escribir, hasta tres notas, «y N más»/«Ver las hechas» las despliega por encima de la página) vive en la propia cabecera, entre «+ Nuevo asunto» y el buscador. Debajo, cuatro pestañas —"En Administración" (el hito que le toca a Administración, con o sin fecha; el rojo de vencidos), "En espera" (espera a otro responsable), "Todos los abiertos", "Dormidos"— sobre una sola tabla: Plazo, Tercero (candado si reservado), Tipo, Hito actual, Le toca a, Inicio, y el ⋮ con Copiar el nombre/Archivar. Filtros (Responsable/Situación/Plazo/Lo encarga/Tipo de asunto), valen en las cuatro pestañas, plegado al entrar («Filtros (N)» si hay alguno puesto), y "Ordenar" (gobierna "Todos los abiertos"; las demás llevan su orden natural). El buscador de la cabecera filtra "Ha llegado" y la tabla. Los avisos del cuadro que llevan asuntos detrás (vencidos, aspirantes...) filtran la tabla al pulsarlos, con «Filtrado por: … ✕ Quitar». "Cuentas": por tipo (con tiempos de tramitación), mes y quién los pidió, y los abiertos más antiguos. "Impresos": catálogo buscable;
   "Preparar para el tercero" rellena solo los datos del centro (casillas con nombre legible y miniatura).
 - No pisarse en un asunto: modo consulta si el compañero ya está dentro, con "Tomar el mando".

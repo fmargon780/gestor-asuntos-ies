@@ -317,10 +317,12 @@
 
     /* "Comunicar" (js/correo.js) entra aquí, y "Archivar"/"Reabrir" se
        queda el último, pegado al borde derecho. */
-    var cerrar = boton(abierto ? 'Archivar el asunto' : 'Reabrir el asunto',
-      abierto ? 'Llevar la carpeta al ARCHIVO' : '', async function (ev) {
+    /* Fila 249: en un tipo que hay que liquidar, el botón dice «Pasar a Por liquidar». */
+    var pasaAPorLiquidar = abierto && window.PorLiquidar && PorLiquidar.exige(a) && !PorLiquidar.estaPorLiquidar(a);
+    var cerrar = boton(abierto ? (pasaAPorLiquidar ? 'Pasar a Por liquidar' : 'Archivar el asunto') : 'Reabrir el asunto',
+      abierto ? (pasaAPorLiquidar ? 'Dejarlo en la pestaña «Por liquidar» de Inicio' : 'Llevar la carpeta al ARCHIVO') : '', async function (ev) {
       await U.mientrasGuarda(ev.currentTarget, function () {
-        return abierto ? App.cerrarAsunto(a) : App.reabrirAsunto(a);
+        return abierto ? (pasaAPorLiquidar ? PorLiquidar.archivarOPasar(a) : App.cerrarAsunto(a)) : App.reabrirAsunto(a);
       });
       /* Reabierto: a su ficha de asunto abierto (fila 119). */
       if (!abierto && window.Navegacion && Navegacion.abrirAbierto(a.nombre)) return;

@@ -29,6 +29,7 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | Escribir una nota desde una tarea del hito | **Anotar** | apuntar, comentar |
 | La clase de un campo propio con cifras en euros / con cifras / con día | **Importe en euros**, **Número**, **Fecha** (junto a «Texto libre» y «Lista cerrada») | cantidad, moneda, numérico |
 | El código único de un asunto (`A26-0137`) o de un documento (`D26-01234`) | **número del asunto**, **número del documento** | código, referencia, expediente |
+| Un asunto terminado de un tipo que hay que liquidar antes de archivar / el paso de entregar lo cobrado | **Por liquidar** (pestaña de Inicio), **Liquidar**, **liquidación** (el PDF) | pendiente de cobro, cierre de caja |
 
 La diferencia entre plantilla e impreso: si la app lo rellena y lo genera, es plantilla; si se
 entrega para que alguien lo rellene, es impreso (aunque la app ponga los datos del centro).

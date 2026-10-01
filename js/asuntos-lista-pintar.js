@@ -475,9 +475,11 @@ App.filaTablaAsunto = function (a, opciones) {
   };
   var archivar = document.createElement('button');
   archivar.type = 'button';
-  archivar.textContent = 'Archivar';
+  /* Fila 249: en un tipo que hay que liquidar, «Pasar a Por liquidar». */
+  var pasaAPorLiquidar = window.PorLiquidar && PorLiquidar.exige(a) && !PorLiquidar.estaPorLiquidar(a);
+  archivar.textContent = pasaAPorLiquidar ? 'Pasar a Por liquidar' : 'Archivar';
   archivar.onclick = async function () {
-    await U.mientrasGuarda(archivar, function () { return App.cerrarAsunto(a); });
+    await U.mientrasGuarda(archivar, function () { return pasaAPorLiquidar ? PorLiquidar.archivarOPasar(a) : App.cerrarAsunto(a); });
   };
   tdMenu.appendChild(U.menuDeAcciones([copiar, archivar]));
   tr.appendChild(tdMenu);

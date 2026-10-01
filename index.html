@@ -191,6 +191,10 @@
                 <span class="cuenta cuenta-lista"></span></button>
               <button type="button" class="inicio-pestana" data-pestana="dorm">Dormidos
                 <span class="cuenta cuenta-lista"></span></button>
+              <!-- Fila 249, docs/POR-LIQUIDAR.md: la quinta, solo si algún tipo
+                   lleva «Hay que liquidarlo antes de archivar». -->
+              <button type="button" class="inicio-pestana oculto" data-pestana="liq">Por liquidar
+                <span class="cuenta cuenta-lista"></span></button>
             </div>
             <div class="inicio-tabla-cabecera-acciones">
               <span class="suave">(<span id="cuenta-lista-abiertos"></span>)</span>
@@ -279,14 +283,21 @@
             <button type="button" id="inicio-quitar-filtro">✕ Quitar</button>
           </div>
 
+          <!-- Fila 249: en «Por liquidar», el total de lo marcado y el botón «Liquidar». -->
+          <div id="inicio-liquidar-barra" class="inicio-liquidar-barra oculto">
+            <span id="inicio-liquidar-marcados" class="inicio-liquidar-marcados"></span>
+            <button type="button" id="inicio-liquidar-boton" class="boton boton-principal" disabled>Liquidar</button>
+          </div>
+
           <div class="inicio-tabla-envoltorio">
             <table class="inicio-tabla">
-              <thead>
+              <thead id="inicio-thead-normal">
                 <tr>
                   <th>Plazo</th><th>Tercero</th><th>Tipo</th><th>Hito actual</th>
                   <th>Le toca a</th><th id="th-inicio">Inicio</th><th></th>
                 </tr>
               </thead>
+              <thead id="inicio-thead-liquidar" class="oculto"></thead>
               <tbody id="inicio-tabla-cuerpo"></tbody>
             </table>
           </div>
@@ -1504,6 +1515,10 @@
      abiertos"/"Dormidos"). Después de js/inicio.js (lo llama desde
      repintarTodo). Sustituye a js/inicio-plegados.js (fila 192). -->
 <script src="js/inicio-tabla.js"></script>
+<!-- Fila 249, docs/POR-LIQUIDAR.md: los asuntos «Por liquidar» (la pestaña de Inicio)
+     y el cuadro «Liquidar» con su PDF. Después de js/inicio-tabla.js. -->
+<script src="js/por-liquidar.js"></script>
+<script src="js/por-liquidar-liquidar.js"></script>
 
 <!-- Fila 70, docs/ENVOLTURAS-COMPROBADAS.md: EL ÚLTIMO de todos los
      <script>, sin excepción. Cuando este fichero se ejecuta, todos los
