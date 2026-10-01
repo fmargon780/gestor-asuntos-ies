@@ -2,11 +2,14 @@
 
 Antes de nada, lee `docs/CONTEXTO.md` y después `docs/COLA.md`, como dice la cola.
 
-**Una sola sesión, una sola fila, una conversación nueva por fila** (27-sep-2026, ampliado el
-28-sep-2026 por la fila 223): nunca trabajan dos sesiones de Claude Code a la vez en este
-repositorio. Cada lanzamiento hace, en una conversación nueva, solo la primera fila **DEVUELTA**
-(si la hay) o si no la primera **PENDIENTE** de `docs/COLA.md`, la lleva hasta el final (revisor
-incluido) y para. Detalle en la regla 0 de la cola y en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
+**Una sola sesión a la vez, una fila tras otra** (27-sep-2026, cambiado el 1-oct-2026): nunca
+trabajan dos sesiones de Claude Code a la vez en este repositorio ni dos filas a la vez. Por
+defecto, cada lanzamiento hace, en una conversación nueva, solo la primera fila **DEVUELTA** (si la
+hay) o si no la primera **PENDIENTE** de `docs/COLA.md`, la lleva hasta el final (revisor incluido)
+y para. Si la frase de lanzamiento pide varias («las N primeras filas PENDIENTE» o «todas»), la
+misma conversación las hace de una en una, en el orden de la cola, cada una completa (EN CURSO,
+revisor, publicación comprobada, HECHA) antes de empezar la siguiente; antes de empezar cada fila
+nueva mira `docs/PARAR.md` en `main`: si dice PARAR, lo cambia a SEGUIR, lo sube y para. Detalle en la regla 0 de la cola y en `docs/REVISOR-ANTES-DE-PUBLICAR.md`.
 
 **Trabajar en la rama de la fila; a `main` solo con el revisor** (30-sep-2026, fila 242,
 `docs/REVISOR-EN-LOCAL.md`: sustituye la norma «Trabajar en `pruebas`» del 28-sep-2026; las
@@ -80,7 +83,9 @@ agente aparte, con contexto limpio (sin ver el código ni el diff), que entra po
 `docs/REVISOR-GUION.md` (fila 242). Un punto
 **[SOLO FRANCISCO]** no lo pasa el revisor: queda NO COMPROBADO, se copia a
 `docs/COMPROBAR-A-MANO.md` y se avisa a Francisco en una línea al terminar. **APROBADA**: se
-publica en `main` (regla general de abajo) y la fila se marca HECHA. **RECHAZADA** la primera vez:
+publica en `main` (regla general de abajo) y la fila se marca HECHA. Con la APROBADA del revisor se publica en `main` sin esperar a Francisco (1-oct-2026:
+`docs/VISTO-BUENO-DE-FRANCISCO.md` está ANULADO; nada pasa a esperar su revisión ni existe el estado
+EN EL PAQUETE). **RECHAZADA** la primera vez:
 se arregla solo lo que dice el informe, se rearranca el servidor local y se llama a un revisor nuevo
 desde cero, sin contarle qué se arregló. **RECHAZADA** la segunda vez: la fila pasa a **DEVUELTA**
 con el informe, `main` no se toca, y la sesión para (mensaje que empieza por «DEVUELTA:»). El

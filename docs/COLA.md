@@ -17,12 +17,17 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 
 ## Reglas para Claude Code
 
-0. **Una sola sesión, una sola fila, una conversación nueva por fila** (norma del 27-sep-2026,
+0. **Una sola sesión a la vez, una fila tras otra** (norma del 27-sep-2026, cambiada el 1-oct-2026,
    `docs/REPARTO-DE-LA-COLA-2026-09-27.md`; ampliada el 28-sep-2026 por
    `docs/REVISOR-ANTES-DE-PUBLICAR.md`, fila 223). Nunca trabajan dos sesiones de Claude Code a la
    vez en este repositorio, y no hay ninguna tarea programada que lance la cola: la lanza
-   Francisco. Cada lanzamiento hace, en una conversación de Claude Code nueva, **solo la primera
-   fila DEVUELTA** (si la hay) **o, si no hay ninguna, la primera fila PENDIENTE**: la trabaja en
+   Francisco. Por defecto, cada lanzamiento hace, en una conversación de Claude Code nueva, **solo la
+   primera fila DEVUELTA** (si la hay) **o, si no hay ninguna, la primera fila PENDIENTE**. Si la
+   frase de lanzamiento pide varias («las N primeras filas PENDIENTE» o «todas»), la misma
+   conversación las hace **de una en una**, en el orden de la cola, cada una completa (EN CURSO,
+   revisor, publicación comprobada, HECHA) antes de empezar la siguiente; y **antes de empezar cada
+   fila nueva** mira `docs/PARAR.md` en `main`: si dice PARAR, lo cambia a SEGUIR, lo sube y para.
+   Cada fila la trabaja en
    su rama `fila-<nº>`, la pasa por el revisor (en local, fila 242) y solo con su APROBADA la publica en `main` (detalle
    en `docs/REVISOR-ANTES-DE-PUBLICAR.md`), comprueba la publicación y **para**. Si una fila queda
    DEVUELTA o BLOQUEADA, la conversación también acaba ahí. Si al empezar hay una fila EN CURSO
@@ -52,7 +57,7 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
 3. Antes de empezar una instrucción, comprueba si ya está hecha por otro camino (mira si existen
    los ficheros o funciones que pide). Si ya está hecha, márcala **HECHA** con una nota y pasa a
    la siguiente.
-4. Al terminar una, márcala **HECHA** con la fecha, y **para** (regla 0): no cojas la siguiente. **La hora de `App.VERSION` sale del reloj de verdad**
+4. Al terminar una, márcala **HECHA** con la fecha y **para**, salvo que el lanzamiento pida varias filas (regla 0). **La hora de `App.VERSION` sale del reloj de verdad**
    (`TZ='Europe/Madrid' date`, receta exacta en `js/version.js`), nunca a ojo: el 17-sep-2026
    salieron versiones con horas por delante de la real.
 5. Si una instrucción no puede completarse, márcala **BLOQUEADA** con el motivo en una línea y
@@ -200,7 +205,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 243 | Aviso de usuario: mejora en «Inicio» | IDEA (30-sep-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1ssmMXfC2WNLnt8Nkge6_aEMdT_XCRZut/view?usp=drivesdk |
 | 244 | Aviso de usuario: mejora en «Ajustes de un tipo de asunto» | IDEA (1-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/16f35pXwBGSFUtf3epTcps7MgaCE1osQU/view?usp=drivesdk |
 | 245 | `docs/CAMPO-DESDE-EL-ASUNTO.md` (añadir un campo desde un asunto abierto: «+ Añadir campo» en la ficha con el mismo panel de Ajustes, su valor en el mismo paso, y «¿Dónde se guarda?» —«En el tipo» marcada o «Solo en este asunto»— con «Deshacer»; los «solo aquí» con «⋮» Pasar al tipo / Quitar) | PENDIENTE (1-oct-2026) |
-| 246 | Solo documentos (decisión de Francisco, 1-oct-2026): anular `docs/VISTO-BUENO-DE-FRANCISCO.md` (con la APROBADA del revisor se publica en `main` sin esperar a Francisco) y cambiar la regla 0 para poder hacer varias filas seguidas en una conversación, mirando `docs/PARAR.md` entre fila y fila | EN CURSO (1-oct-2026 04:02) · conversación: https://claude.ai/code/session_01P1CEMANePuqUD1BvqQcrRL |
+| 246 | Solo documentos (decisión de Francisco, 1-oct-2026): anular `docs/VISTO-BUENO-DE-FRANCISCO.md` (con la APROBADA del revisor se publica en `main` sin esperar a Francisco) y cambiar la regla 0 para poder hacer varias filas seguidas en una conversación, mirando `docs/PARAR.md` entre fila y fila | HECHA (1-oct-2026 04:02) · conversación: https://claude.ai/code/session_01P1CEMANePuqUD1BvqQcrRL. Solo documentación, directa a `main`; no publica nada. |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
@@ -224,9 +229,6 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 - Prueba `pruebas/tras-cada-accion.mjs`: dos pasos («al volver, la misma altura» y «repintar la
   lista no la sube arriba») fallan también en solitario desde antes de la fila 205; sin arreglar
   todavía.
-- 29-sep-2026: `docs/VISTO-BUENO-DE-FRANCISCO.md` se escribió como «fila 230» y tiene estimación, pero
-  no tiene fila en esta tabla (el número 230 lo lleva `docs/SALIR-DE-ELEGIR-ASUNTO.md`); falta
-  confirmar con Francisco si se apunta con número nuevo.
 - `docs/HISTORIA.md` podría seguir sin la entrada de las filas 53-56 (18-sep-2026: cuadro de
   Séneca en dos columnas, el ayudante fiable, el asunto sin elección, los campos calculados);
   comprobar y pegarla si falta.
