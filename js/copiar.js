@@ -156,7 +156,7 @@
       var r = comoEra.apply(this, arguments);
       if (!p || p.categoria !== 'ALUMNADO' || !p.id) return r;
       var caja = document.getElementById('ficha-persona');
-      if (!caja || caja.querySelector('.boton-nie')) return r;
+      if (!caja || caja.querySelector('.boton-nie') || caja.querySelector('#vt-nie')) return r;   /* fila 252: la cabecera ya lo trae */
       var fila = document.createElement('div');
       fila.className = 'fila-nie';
       fila.appendChild(botonDeNie(p.id));

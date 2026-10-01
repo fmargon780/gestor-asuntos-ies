@@ -358,8 +358,9 @@ var TutoresLegales = (function () {
     });
     /* Fila 175: el ancla pasó a "Sus asuntos" (antes, "Ver sus asuntos",
        que ya no existe: esa lista sale sola). */
-    var sitio = caja.querySelector('#ficha-persona-acciones') || caja.querySelector('#titulo-sus-asuntos');
-    if (sitio) caja.insertBefore(div, sitio); else caja.appendChild(div);
+    /* Fila 252: dentro de la tarjeta «Sus asuntos», encima de la lista. */
+    var destino = caja.querySelector('#asuntos-del-tercero');
+    if (destino && destino.parentNode) destino.parentNode.insertBefore(div, destino); else caja.appendChild(div);
   }
 
   /* ---------- los enganches ---------- */

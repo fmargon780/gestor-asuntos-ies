@@ -1,0 +1,22 @@
+/* ============================================================
+   ficha-persona.css — la ficha de una persona en tarjetas (fila 252,
+   docs/FICHA-DE-PERSONA-EN-TARJETAS.md). El JS: js/ficha-persona.js.
+   Una columna; dos cuando la propia ficha mide lo bastante (460 px: dos tarjetas de 220) (consulta
+   de contenedor, no de ventana: sirve igual en Personas y en «Ver todo»).
+   ============================================================ */
+.fp-raiz { container-type: inline-size; }
+.fp-cabecera .fp-acciones, .vt-cabecera .fp-acciones { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+.fp-cabecera h4.vt-nombre { margin: 0; }
+.fp-tarjetas { display: grid; grid-template-columns: 1fr; gap: 10px; align-items: start; }
+@container (min-width: 460px) { .fp-tarjetas { grid-template-columns: 1fr 1fr; } }
+.fp-tarjeta { border: 1px solid var(--linea); border-radius: 10px; background: var(--papel); padding: 0; min-width: 0; }
+.fp-tarjeta > summary {
+  cursor: pointer; padding: 8px 12px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap;
+  font-weight: 700; font-size: 14px; color: #1d4f86; list-style: revert;
+}
+.fp-resumen { font-weight: 400; font-size: 12px; color: var(--tinta-suave); min-width: 0; }
+.fp-cuerpo { padding: 0 12px 10px; min-width: 0; }
+.fp-cuerpo .nota { margin: 8px 0 0; font-size: 12px; color: var(--tinta-suave); }
+.fp-cuerpo .vt-tarjetas { margin-bottom: 8px; }
+.fp-hermanos { margin: 4px 0 8px; }
+.fp-ventana .fp-tarjetas { margin-top: 8px; }

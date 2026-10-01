@@ -108,6 +108,13 @@ var FichaTerceroAlumno = (function () {
     return '<span class="vt-circulo ' + clase + '">' + U.escapar(iniciales || '?') + '</span>';
   }
 
+  function dniDe(persona) {
+    var d = window.Dni ? window.Dni.de(persona) : '';
+    if (d) return d;
+    var fila = Datos.destacadosAlumno(persona).destacados.filter(function (f) { return U.normalizar(f.titulo) === 'dni'; })[0];
+    return fila ? fila.valor : '';
+  }
+
   function cabeceraHtml(persona, resumen) {
     var nombre = Datos.nombreNatural(persona.nombre);
     var sexo = sexoDelAlumno(persona);
@@ -131,6 +138,7 @@ var FichaTerceroAlumno = (function () {
         (persona.matriculado && persona.unidad ? '<span class="vt-etq vt-etq-azul">' + U.escapar(persona.unidad) + '</span>' : '') +
         '<span class="vt-etq ' + estado.clase + '">' + U.escapar(estado.texto) + '</span>' +
         (persona.id ? '<span class="vt-etq vt-etq-gris" id="vt-nie">NIE ' + U.escapar(persona.id) + ' </span>' : '') +
+        (dniDe(persona) ? '<span class="vt-etq vt-etq-gris" id="vt-dni">DNI ' + U.escapar(dniDe(persona)) + ' </span>' : '') +
       '</div>' +
     '</div>';
   }
@@ -188,81 +196,130 @@ var FichaTerceroAlumno = (function () {
     return lineas.join('\n');
   }
 
-  /* ---------- la ventana ---------- */
+  /* ---------- la familia y el contacto (tarjeta 1 de la ficha) ---------- */
 
-  /* Devuelve { html, titulo, montar(raiz), alCerrar() } para
-     js/ficha-tercero.js. `a` es el asunto de la ficha (para «Correo a la
-     familia»); sin él, ese botón no sale. */
-  function ventana(persona, resumen, a) {
+  /* Fila 252: lo que antes era el cuerpo de «Ver todo» (el alumno, cada
+     tutor, otros datos de la familia, hermanos y los dos botones), como un
+     bloque para la tarjeta «Familia y contacto» de js/ficha-persona.js.
+     `alPedirCorreo`: qué hacer al pulsar «Correo a la familia» (sale solo
+     con asunto `a`). Devuelve { nodo, resumen, correosFamilia, tutores,
+     textoDeTodo }. */
+  function familia(persona, a, alPedirCorreo) {
     var tutores = Datos.tutoresDe(persona);
     var alumno = contactoDelAlumno(persona);
-    var dest = Datos.destacadosAlumno(persona);
     var correosFamilia = [];
     tutores.forEach(function (t) { t.correos.forEach(function (c) { if (correosFamilia.indexOf(c) === -1) correosFamilia.push(c); }); });
     var otrosFamilia = (tutores.otros || []).slice();
     tutores.forEach(function (t) { otrosFamilia = otrosFamilia.concat(t.otros || []); });
+
+    var nodo = document.createElement('div');
+    var caja = document.createElement('div');
+    caja.className = 'vt-tarjetas';
+    caja.id = 'vt-tarjetas';
+    nodo.appendChild(caja);
+
+    /* «mismo que la tutora 1», para el teléfono o el correo del alumno. */
+    function igualA(valor, clase) {
+      for (var i = 0; i < tutores.length; i++) {
+        var t = tutores[i];
+        var lista = clase === 'telefono' ? t.telefonos.map(soloDigitos) : t.correos;
+        var buscado = clase === 'telefono' ? soloDigitos(valor) : valor;
+        if (lista.indexOf(buscado) !== -1) return 'mismo que ' + conArticulo(etiquetaDeTutor(t));
+      }
+      return '';
+    }
+
+    caja.appendChild(tarjeta('vt-tarjeta-alumno',
+      '<div class="vt-tarjeta-titulo"><span class="vt-icono">👤</span>El alumno</div>', alumno, igualA));
+    tutores.forEach(function (t) {
+      var etiqueta = etiquetaDeTutor(t);
+      caja.appendChild(tarjeta('vt-tarjeta-tutor vt-tarjeta-tutor' + t.numero,
+        '<div class="vt-tutor-cabecera">' + circulo(t.iniciales, 'vt-circulo-tutor' + t.numero) +
+          '<div><div class="vt-tutor-nombre">' + U.escapar(t.nombre || etiqueta) + '</div>' +
+          '<span class="vt-etq-chica">' + U.escapar(etiqueta) + '</span></div>' +
+        '</div>', t, null));
+    });
+    if (otrosFamilia.length) {
+      var otros = document.createElement('div');
+      otros.className = 'vt-tarjeta vt-tarjeta-otros';
+      otros.innerHTML = '<div class="vt-tarjeta-titulo">Otros datos de la familia</div>' + filasHtml(otrosFamilia);
+      caja.appendChild(otros);
+    }
+
+    /* Fila 125: «Hermanos en el centro» (si ya se cargó la lista de Personas). */
+    if (window.PersonasFamilias) {
+      var hh = PersonasFamilias.filasConHermanos([], persona, function (filas) {
+        return filas.map(function (f) { return '<div class="ficha-dato"><span>' + U.escapar(f.titulo) + '</span><span>' + U.escapar(f.valor) + '</span></div>'; }).join('');
+      });
+      if (hh) {
+        var h = document.createElement('div');
+        h.className = 'ficha-datos fp-hermanos';
+        h.innerHTML = hh;
+        nodo.appendChild(h);
+        PersonasFamilias.engancharHermanos(nodo);
+      }
+    }
+
+    var botones = document.createElement('div');
+    botones.className = 'vt-botones';
+    if (a && correosFamilia.length && window.CorreoNucleo) {
+      var bc = document.createElement('button');
+      bc.type = 'button'; bc.className = 'boton'; bc.id = 'vt-correo-familia';
+      bc.textContent = 'Correo a la familia';
+      bc.onclick = function () { if (alPedirCorreo) alPedirCorreo(correosFamilia); };
+      botones.appendChild(bc);
+    }
+    var copiar = document.createElement('button');
+    copiar.type = 'button'; copiar.className = 'boton'; copiar.id = 'vt-copiar-todo';
+    copiar.textContent = 'Copiar todo el contacto';
+    copiar.onclick = function () { U.copiar(textoDeTodo(persona, alumno, tutores), copiar); };
+    botones.appendChild(copiar);
+    nodo.appendChild(botones);
+
+    var primero = tutores[0];
+    var resumen = primero
+      ? etiquetaDeTutor(primero) + ': ' + (primero.nombre || '') + (primero.telefonos[0] ? ' · ' + telefonoLegible(primero.telefonos[0]) : '')
+      : [alumno.telefonos[0] && telefonoLegible(alumno.telefonos[0]), alumno.correos[0]].filter(Boolean).join(' · ');
+
+    var vacia = !tutores.length && !alumno.telefonos.length && !alumno.correos.length && !otrosFamilia.length;
+    return { nodo: nodo, resumen: resumen, vacia: vacia, correosFamilia: correosFamilia, tutores: tutores,
+             textoDeTodo: function () { return textoDeTodo(persona, alumno, tutores); } };
+  }
+
+  /* Pone el DNI y el NIE de la cabecera con su botón de copiar. */
+  function montarCabecera(raiz, persona) {
+    var nie = raiz.querySelector('#vt-nie');
+    if (nie && !nie.querySelector('.dato-copiable')) nie.appendChild(botonCopiar(persona.id, 'Copiar el Nº de identificación escolar'));
+    var dni = raiz.querySelector('#vt-dni');
+    if (dni && !dni.querySelector('.dato-copiable')) dni.appendChild(botonCopiar(dniDe(persona), 'Copiar el DNI'));
+  }
+
+  /* ---------- la ventana «Ver todo» ---------- */
+
+  /* Devuelve { html, titulo, montar(raiz), alCerrar() } para
+     js/ficha-tercero.js. Desde la fila 252 pinta la misma ficha que
+     Personas y empresas (js/ficha-persona.js), sin «Sus asuntos». `a` es
+     el asunto de la ficha (para «Correo a la familia»). */
+  function ventana(persona, resumen, a) {
+    var tutores = Datos.tutoresDe(persona);
+    var alumno = contactoDelAlumno(persona);
+    var correosFamilia = [];
+    tutores.forEach(function (t) { t.correos.forEach(function (c) { if (correosFamilia.indexOf(c) === -1) correosFamilia.push(c); }); });
     var irACorreo = false;
 
-    var html =
-      cabeceraHtml(persona, resumen) +
-      '<div class="vt-tarjetas" id="vt-tarjetas"></div>' +
-      '<div class="vt-abajo">' +
-        '<div class="vt-botones">' +
-          (a && correosFamilia.length && window.CorreoNucleo
-            ? '<button type="button" class="boton" id="vt-correo-familia">Correo a la familia</button>' : '') +
-          '<button type="button" class="boton" id="vt-copiar-todo">Copiar todo el contacto</button>' +
-        '</div>' +
-        '<details class="vertodo-resto"><summary>Todo lo que trae Séneca</summary>' + filasHtml(dest.resto) + '</details>' +
-      '</div>';
+    var html = '<div id="fp-ventana"></div>';
 
     function montar(raiz) {
-      var caja = raiz.querySelector('#vt-tarjetas');
+      var caja = raiz.querySelector('#fp-ventana');
       if (!caja) return;
-      var nie = raiz.querySelector('#vt-nie');
-      if (nie) nie.appendChild(botonCopiar(persona.id, 'Copiar el Nº de identificación escolar'));
-
-      /* «mismo que la tutora 1», para el teléfono o el correo del alumno. */
-      function igualA(valor, clase) {
-        for (var i = 0; i < tutores.length; i++) {
-          var t = tutores[i];
-          var lista = clase === 'telefono' ? t.telefonos.map(soloDigitos) : t.correos;
-          var buscado = clase === 'telefono' ? soloDigitos(valor) : valor;
-          if (lista.indexOf(buscado) !== -1) return 'mismo que ' + conArticulo(etiquetaDeTutor(t));
-        }
-        return '';
-      }
-
-      caja.appendChild(tarjeta('vt-tarjeta-alumno',
-        '<div class="vt-tarjeta-titulo"><span class="vt-icono">👤</span>El alumno</div>', alumno, igualA));
-      tutores.forEach(function (t) {
-        var etiqueta = etiquetaDeTutor(t);
-        caja.appendChild(tarjeta('vt-tarjeta-tutor vt-tarjeta-tutor' + t.numero,
-          '<div class="vt-tutor-cabecera">' + circulo(t.iniciales, 'vt-circulo-tutor' + t.numero) +
-            '<div><div class="vt-tutor-nombre">' + U.escapar(t.nombre || etiqueta) + '</div>' +
-            '<span class="vt-etq-chica">' + U.escapar(etiqueta) + '</span></div>' +
-          '</div>', t, null));
-      });
-      if (otrosFamilia.length) {
-        var otros = document.createElement('div');
-        otros.className = 'vt-tarjeta vt-tarjeta-otros';
-        otros.innerHTML = '<div class="vt-tarjeta-titulo">Otros datos de la familia</div>' + filasHtml(otrosFamilia);
-        caja.appendChild(otros);
-      }
-      /* Fila 144: los datos de la base de datos de alumnado, una tarjeta por apartado. */
-      if (window.AlumnadoBDVer) AlumnadoBDVer.tarjetas(persona).forEach(function (t) { caja.appendChild(t); });
-
-      var copiar = raiz.querySelector('#vt-copiar-todo');
-      if (copiar) copiar.onclick = function () {
-        U.copiar(textoDeTodo(persona, alumno, tutores), copiar);
-      };
-      var correo = raiz.querySelector('#vt-correo-familia');
-      if (correo) correo.onclick = function () {
-        /* Un solo cuadro a la vez (U.preguntar): se cierra esta ventana y,
-           al cerrarse, se abre el de Correo (alCerrar). */
-        irACorreo = true;
-        var cerrar = document.getElementById('cuadro-aceptar');
-        if (cerrar) cerrar.click();
-      };
+      FichaPersona.pintar(caja, persona, { ventana: true, asunto: a, resumen: resumen,
+        alPedirCorreo: function () {
+          /* Un solo cuadro a la vez (U.preguntar): se cierra esta ventana y,
+             al cerrarse, se abre el de Correo (alCerrar). */
+          irACorreo = true;
+          var cerrar = document.getElementById('cuadro-aceptar');
+          if (cerrar) cerrar.click();
+        } });
     }
 
     function alCerrar() {
@@ -274,5 +331,6 @@ var FichaTerceroAlumno = (function () {
              tutores: tutores, textoDeTodo: function () { return textoDeTodo(persona, alumno, tutores); } };
   }
 
-  return { ventana: ventana, telefonoLegible: telefonoLegible, etiquetaDeTutor: etiquetaDeTutor };
+  return { ventana: ventana, familia: familia, cabeceraHtml: cabeceraHtml, montarCabecera: montarCabecera,
+           telefonoLegible: telefonoLegible, etiquetaDeTutor: etiquetaDeTutor };
 })();

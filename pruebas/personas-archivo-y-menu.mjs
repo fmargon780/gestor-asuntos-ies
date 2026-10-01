@@ -120,7 +120,7 @@ await pagina.waitForTimeout(150);
 await comprobar('1. al volver, se está en Personas, con la misma persona elegida',
   pagina.locator('.pestana[data-pantalla="personas"]').evaluate(el => el.classList.contains('activa')), true);
 await comprobar('1. la ficha de Ana sigue enseñada',
-  pagina.locator('#ficha-persona h4').first().textContent().then(t => t.indexOf('Buscada') !== -1), true);
+  pagina.locator('#ficha-persona .vt-nombre').first().textContent().then(t => t.indexOf('Buscada') !== -1), true);
 
 /* ================================================================
    2) "+ Nuevo asunto para esta persona".

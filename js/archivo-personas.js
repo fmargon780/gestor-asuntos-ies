@@ -304,60 +304,9 @@ App.verFicha = function (p) {
   var caja = $('ficha-persona');
   if (window.PersonasFamilias) PersonasFamilias.marcarVista(p);   /* fila 125 */
 
-  function pintarFilas(filas) {
-    return filas.map(function (f) {
-      return '<div class="ficha-dato"><span>' + U.escapar(f.titulo) + '</span><span>' +
-             U.escapar(f.valor) + '</span></div>';
-    }).join('');
-  }
+  /* Fila 252: cabecera y tarjetas plegables (js/ficha-persona.js). */
+  FichaPersona.pintar(caja, p, {});
 
-  var html = '<h4>' + U.escapar(p.nombre) + '</h4>';
-
-  if (p.categoria === 'ALUMNADO') {
-    /* Lo que se consulta a diario va arriba: la edad de hoy, si sigue
-       matriculado, el grupo y los datos de contacto de los tutores
-       legales. El resto del fichero de Séneca sigue estando, más abajo. */
-    var d = Datos.destacadosAlumno(p);
-    /* «Hermanos en el centro», justo después de «Curso» (fila 125). */
-    html += window.PersonasFamilias
-      ? PersonasFamilias.filasConHermanos(d.destacados, p, pintarFilas) : pintarFilas(d.destacados);
-    if (d.resto.length) {
-      html += '<p class="nota"><button type="button" class="enlace" id="ver-resto">' +
-              'Ver los demás datos del fichero (' + d.resto.length + ')</button></p>' +
-              '<div id="resto-ficha" class="oculto">' + pintarFilas(d.resto) + '</div>';
-    }
-  } else if (p.categoria === 'PERSONAL') {
-    /* Igual que en el alumnado: arriba el puesto, si sigue en el centro
-       y por dónde se le localiza; el resto del fichero, debajo. */
-    var dp = Datos.destacadosPersona(p);
-    html += pintarFilas(dp.destacados);
-    if (dp.resto.length) {
-      html += '<p class="nota"><button type="button" class="enlace" id="ver-resto">' +
-              'Ver los demás datos del fichero (' + dp.resto.length + ')</button></p>' +
-              '<div id="resto-ficha" class="oculto">' + pintarFilas(dp.resto) + '</div>';
-    }
-  } else if (App.FICHAS_DE_CATEGORIA[p.categoria]) {
-    html += App.FICHAS_DE_CATEGORIA[p.categoria].html(p);
-  } else {
-    html += pintarFilas(Object.keys(p.campos).map(function (c) {
-      return { titulo: c, valor: p.campos[c] };
-    }));
-  }
-
-  /* Fila 175, punto 2: "+ Nuevo asunto para esta persona", junto a
-     "Cambiar los datos" (si sale). Fila 175, punto 1: "Sus asuntos"
-     sale solo, sin pulsar nada. */
-  html += '<p class="nota" id="ficha-persona-acciones"></p>' +
-          '<h4 id="titulo-sus-asuntos">Sus asuntos</h4><div id="asuntos-del-tercero">' +
-          '<p class="explica">Buscando…</p></div>';
-
-  caja.innerHTML = html;
-
-  if ($('ver-resto')) {
-    $('ver-resto').onclick = function () {
-      $('resto-ficha').classList.toggle('oculto');
-    };
-  }
   if (window.PersonasFamilias) PersonasFamilias.engancharHermanos(caja);
   if (App.FICHAS_DE_CATEGORIA[p.categoria]) App.FICHAS_DE_CATEGORIA[p.categoria].enganchar(caja, p);
   App.trasPintarFicha.forEach(function (f) {
@@ -494,6 +443,14 @@ App.verAsuntosDeTercero = async function (p) {
   });
 
   if (titulo) titulo.textContent = 'Sus asuntos' + (salida.length ? ' (' + salida.length + ')' : '');
+  var resumenAsuntos = $('fp-resumen-asuntos');
+  if (resumenAsuntos) {
+    var nAbiertos = salida.filter(function (x) { return x.donde === 'Abierto'; }).length;
+    var nArchivados = salida.length - nAbiertos;
+    resumenAsuntos.textContent = salida.length
+      ? nAbiertos + (nAbiertos === 1 ? ' abierto' : ' abiertos') + ' · ' + nArchivados + (nArchivados === 1 ? ' archivado' : ' archivados')
+      : 'ninguno';
+  }
 
   if (!salida.length) {
     caja.innerHTML = '<div class="vacio">Todavía no hay ningún asunto suyo.</div>';

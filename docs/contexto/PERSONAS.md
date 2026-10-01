@@ -563,3 +563,16 @@ a que se elija el tipo.
 Fallout: `js/papelera-ajustes.js` (el «Borrar» de un tercero dado de alta a mano) y
 `js/tutores-legales.js` («Asuntos de sus tutores») colgaban del viejo `#ver-sus-asuntos`; los dos
 se enganchan ahora a `#ficha-persona-acciones`. Se comprueba con `pruebas/personas-archivo-y-menu.mjs`.
+
+## La ficha en tarjetas (fila 252)
+
+`FichaPersona.pintar(caja, persona, { ventana, asunto, resumen, alPedirCorreo })` (`js/ficha-persona.js`) pinta
+la cabecera (`FichaTerceroAlumno.cabeceraHtml` para el alumnado, con NIE y DNI copiables) y las tarjetas
+`.fp-tarjeta[data-tarjeta]` en una rejilla `.fp-tarjetas` (dos columnas desde 460 px de ancho de la propia ficha,
+consulta de contenedor). Qué dato va a qué tarjeta: `FichaPersonaReparto.alumno` (tablas `APARTADO_A_TARJETA` y
+`REGLAS_DE_TITULO`; un apartado desconocido de la base va a «Otros datos del fichero»; un dato en las dos fuentes sale
+una vez). «Familia y contacto» es `FichaTerceroAlumno.familia` (alumno, tutores, hermanos, «Correo a la familia»,
+«Copiar todo el contacto»). Ids que otros módulos usan: `#ficha-persona-acciones`, `#titulo-sus-asuntos`,
+`#asuntos-del-tercero`, `#vt-nie`. Lo abierto/cerrado: `localStorage` `gestor.fichaPersona.abiertas`
+(por categoría y tarjeta; solo al pulsar la persona). Personal y las demás categorías: cabecera y tarjetas «Puesto y
+contacto»/«Datos», «Sus asuntos», «Otros datos del fichero».
