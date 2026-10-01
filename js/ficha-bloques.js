@@ -39,11 +39,15 @@
     var config = (App.E.campos && App.E.campos.porTipo && App.E.campos.porTipo[tipo]) || [];
     var vistos = {};
     var salida = [];
-    config.forEach(function (cfg) {
+    /* Fila 245: los del tipo y, detrás, los «solo aquí» de este asunto
+       (salen aunque no tengan valor, para poder quitarlos o pasarlos al tipo). */
+    Campos.camposDeAsunto(config, a.ficha).forEach(function (cfg) {
       var clave = Campos.claveDeCampo(cfg);
       vistos[clave] = true;
       var g = guardados[clave];
-      if (g && g.valor) salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: g.valor });
+      if (cfg.soloAqui) {
+        salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: (g && g.valor) || '', soloAqui: true, clave: clave });
+      } else if (g && g.valor) salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: g.valor });
     });
     Object.keys(guardados).forEach(function (clave) {
       if (vistos[clave]) return;
@@ -66,17 +70,20 @@
       { titulo: 'Lo pide', valor: window.LoPide ? LoPide.texto(f) : '' },
       { titulo: 'Departamento', valor: (f.departamento && f.departamento.nombre) || '' },   /* fila 167 */
       { titulo: 'En el archivo', valor: a.ruta || '' }
-    ]).filter(function (x) { return x && x.valor; });
+    ]).filter(function (x) { return x && (x.valor || x.soloAqui); });
     /* "Impresos" (20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md):
        se rellena aparte, después de pintar (js/formularios.js, que
        envuelve App.abrirFicha), porque hace falta leer los hitos del
        asunto, que es async. Nace oculta: si no hay ninguno, se queda
        así, sin que nada la muestre. */
-    if (!buenas.length) return null;
+    /* Fila 245: en un asunto abierto el bloque sale siempre, aunque sea
+       solo con el botón «+ Añadir campo». */
+    var anadir = (N.modoActual === 'abierto' && window.CampoDesdeElAsunto) ? CampoDesdeElAsunto.filaAnadirHtml() : '';
+    if (!buenas.length && !anadir) return null;
     var extraFormularios = window.Formularios
       ? '<div class="ficha-dato oculto" id="ficha-formularios-fila">' +
         '<span>Impresos</span><span id="ficha-formularios-valor"></span></div>' : '';
-    return N.filasHtml(buenas, extraFormularios);
+    return N.filasHtml(buenas, extraFormularios + anadir);
   }
 
   /* ---------- "Lo pide": quién ha pedido esta gestión ----------

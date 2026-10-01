@@ -183,6 +183,21 @@
 .ficha-datos .ficha-dato span:first-child { color: var(--tinta-suave); }
 .ficha-datos .ficha-dato span:last-child { word-break: break-word; }
 
+/* Fila 245 (docs/CAMPO-DESDE-EL-ASUNTO.md): campos «solo aquí» de un asunto
+   y el botón «+ Añadir campo». */
+.marca-solo-aqui {
+  display: inline-block; font-size: 11px; line-height: 1.4; padding: 0 6px; margin-left: 4px;
+  border: 1px solid var(--linea); border-radius: 8px; color: var(--tinta-suave);
+}
+.campo-aqui-menu {
+  border: 0; background: none; cursor: pointer; font-size: 16px; line-height: 1; padding: 0 6px;
+  color: var(--tinta-suave); border-radius: 6px;
+}
+.campo-aqui-menu:hover { background: #f0f3f7; }
+.ficha-datos .ficha-dato-anadir { border-bottom: 0; padding-top: 8px; }
+/* En modo consulta (el compañero tiene el mando) no se puede añadir ni tocar nada. */
+.ficha-consulta .ficha-dato-anadir, .ficha-consulta .campo-aqui-menu { display: none; }
+
 .ficha-persona-nombre { margin: 0 0 8px; font-size: 15px; }
 
 .ficha-documentos { display: flex; flex-direction: column; gap: 6px; }

@@ -67,7 +67,7 @@ var CamposCatalogo = (function () {
         pestanaHtml('calculados', 'Calculados', calculados.length) +
       '</div>' +
       '<button type="button" class="boton" id="campos-catalogo-volver" style="margin:10px 0">' +
-      '← Volver a los campos del tipo</button>' +
+      U.escapar(opciones.textoVolver || '← Volver a los campos del tipo') + '</button>' +
       '<div id="campos-catalogo-cuerpo"></div>';
 
     Array.prototype.forEach.call(cuerpo.querySelectorAll('.pestana-categoria'), function (b) {

@@ -137,7 +137,7 @@
     var guardados = (a.ficha && a.ficha.campos) || {};
     var config = (App.E.campos && App.E.campos.porTipo && App.E.campos.porTipo[tipoDelAsunto(a)]) || [];
     var salida = {};
-    config.forEach(function (cfg) {
+    Campos.camposDeAsunto(config, a.ficha).forEach(function (cfg) {   /* fila 245: con los «solo aquí» */
       var g = guardados[Campos.claveDeCampo(cfg)];
       if (g && g.valor) salida[Campos.nombreDeCampo(cfg, App.E.campos)] = g.valor;
     });

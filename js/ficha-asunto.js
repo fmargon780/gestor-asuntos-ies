@@ -155,6 +155,15 @@
        "Formularios", async, y solo la enseña cuando de verdad hay
        alguno: nace oculta (`extra`). */
     return '<div class="ficha-datos" id="ficha-datos-tramite">' + buenas.map(function (f) {
+      /* Fila 245: un campo «solo aquí» lleva su marca y su «⋮»
+         (js/campo-desde-el-asunto.js). */
+      if (f.soloAqui) {
+        return '<div class="ficha-dato ficha-dato-aqui"><span>' + U.escapar(f.titulo) +
+          ' <span class="marca-solo-aqui">solo aquí</span></span><span>' +
+          (f.valor ? U.escapar(f.valor) : '<span class="suave">sin valor</span>') +
+          ' <button type="button" class="campo-aqui-menu" data-clave="' + U.escapar(f.clave || '') +
+          '" data-nombre="' + U.escapar(f.titulo) + '" title="Más opciones">⋮</button></span></div>';
+      }
       return '<div class="ficha-dato"><span>' + U.escapar(f.titulo) + '</span>' +
              '<span>' + U.escapar(f.valor) + '</span></div>';
     }).join('') + (extra || '') + '</div>';
@@ -253,6 +262,7 @@
     N.asegurarObservadorConsulta();
     N.aplicarModoConsulta();
     FichaTarjetas.alPintar(caja, a);
+    if (window.CampoDesdeElAsunto) CampoDesdeElAsunto.alPintar(caja, a);   /* fila 245 */
   }
 
 
