@@ -25,8 +25,8 @@
 (function () {
 
   var CLAVE_PESTANA = 'gestor-inicio-pestana';
-  var PESTANAS = ['adm', 'esp', 'todos', 'dorm'];
-  var ROTULOS = { adm: 'En Administración', esp: 'En espera', todos: 'Todos los abiertos', dorm: 'Dormidos' };
+  var PESTANAS = ['adm', 'esp', 'todos', 'dorm', 'liq'];
+  var ROTULOS = { adm: 'En Administración', esp: 'En espera', todos: 'Todos los abiertos', dorm: 'Dormidos', liq: 'Por liquidar' };
 
   function $(id) { return document.getElementById(id); }
 
@@ -139,17 +139,29 @@
        conocido (App.pasaFiltrosInicio). */
     items = items.filter(function (it) { return App.pasaFiltrosInicio(it.asunto, it.hito); });
 
+    /* Fila 249: un asunto que entró solo en «Por liquidar» y tiene ahora un
+       hito pendiente vuelve a su pestaña; los que se quedan en «Por liquidar»
+       salen de «En Administración», «En espera» y «Dormidos». */
+    if (window.PorLiquidar) {
+      for (var k = 0; k < items.length; k++) await PorLiquidar.destapar(items[k].asunto);
+      items = items.filter(function (it) { return !PorLiquidar.estaPorLiquidar(it.asunto); });
+    }
     var g = QueMeToca.clasificar(items, datos.ajustes);
     var dormidos = QueMeToca.reunirDormidos()
+      .filter(function (it) { return !(window.PorLiquidar && PorLiquidar.estaPorLiquidar(it.asunto)); })
       .filter(function (it) { return coincideAsunto(it.asunto, texto); })
       .filter(function (it) { return App.pasaFiltrosInicio(it.asunto); });
-    return { ajustes: datos.ajustes, adm: g.tejado, esp: g.otros, dorm: dormidos, hitosAbiertos: hitosAbiertos };
+    var porLiquidar = window.PorLiquidar ? PorLiquidar.lista()
+      .filter(function (a) { return coincideAsunto(a, texto); })
+      .filter(function (a) { return App.pasaFiltrosInicio(a); }) : [];
+    return { ajustes: datos.ajustes, adm: g.tejado, esp: g.otros, dorm: dormidos, liq: porLiquidar, hitosAbiertos: hitosAbiertos };
   }
 
   function listaDe(pestana, r) {
     if (pestana === 'adm') return r.adm;
     if (pestana === 'esp') return r.esp;
     if (pestana === 'dorm') return r.dorm;
+    if (pestana === 'liq') return r.liq;
     return [];
   }
 
@@ -186,13 +198,15 @@
     var cont = $('inicio-pestanas');
     if (!cont) return;
     var cuentas = {
-      adm: r.adm.length, esp: r.esp.length, dorm: r.dorm.length,
+      adm: r.adm.length, esp: r.esp.length, dorm: r.dorm.length, liq: (r.liq || []).length,
       todos: App.listaAbiertosFiltrada ? App.listaAbiertosFiltrada().length : 0
     };
     var vencidosAdm = window.QueMeToca ? QueMeToca.vencidos(r.adm) : 0;
 
     Array.prototype.forEach.call(cont.querySelectorAll('.inicio-pestana'), function (b) {
       var p = b.dataset.pestana;
+      /* Fila 249: «Por liquidar» solo existe si algún tipo lo pide (o aún quedan asuntos en ella). */
+      if (p === 'liq') b.classList.toggle('oculto', !(window.PorLiquidar && PorLiquidar.hayTipos()));
       b.classList.toggle('activa', !filtroAviso && p === pestanaActual);
       var n = b.querySelector('.cuenta-lista');
       if (n) n.textContent = cuentas[p] || 0;
@@ -220,9 +234,18 @@
     pintarPestanas(r);
     pintarChip();
 
+    /* Fila 249: sin tipos que liquidar, la pestaña no existe: se vuelve a «Todos los abiertos». */
+    if (pestanaActual === 'liq' && !(window.PorLiquidar && PorLiquidar.hayTipos())) {
+      pestanaActual = 'todos';
+      pintarPestanas(r);
+    }
+    if (window.PorLiquidar && pestanaActual !== 'liq') PorLiquidar.soltarTabla();
+
     var alto = window.scrollY;   /* fila 119: la lista se queda a la misma altura */
     if (pestanaActual === 'todos') {
       App.pintarAbiertos();
+    } else if (pestanaActual === 'liq') {
+      PorLiquidar.pintarTabla(r.liq);
     } else {
       pintarTabla(listaDe(pestanaActual, r), pestanaActual);
     }

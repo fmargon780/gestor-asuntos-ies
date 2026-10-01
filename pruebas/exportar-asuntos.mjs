@@ -1,7 +1,7 @@
 /* Fila 241 (1-oct-2026, docs/EXPORTAR-ASUNTOS.md): el filtro «Fechas» de
    Inicio y «Exportar ▾» (hoja de cálculo e informe en PDF). Con Chromium
    real y los datos inventados de la copia de pruebas (?demo=1&auto=1):
-   hay cobros del seguro escolar (tipo con campo «Importe»), dos abiertos
+   hay cobros del seguro escolar (tipo con campo «Importe»), cuatro abiertos (tres ya «Por liquidar», fila 249)
    y tres archivados, y un asunto reservado (CERTIFICADO de Herrera). */
 import { chromium } from 'playwright';
 import { createRequire } from 'node:module';
@@ -72,12 +72,12 @@ await pagina.fill('#filtro-fecha-desde', isoHaceDias(6));
 await pagina.fill('#filtro-fecha-hasta', isoHaceDias(1));
 await pagina.waitForFunction((n) => document.querySelectorAll('#inicio-tabla-cuerpo tr[data-asunto]').length < n, cuentaTodos);
 await comprobar('con Desde y Hasta solo salen los asuntos iniciados entre esos días (los dos extremos entran)',
-  pagina.locator('#inicio-tabla-cuerpo tr[data-asunto]').count(), 4);
+  pagina.locator('#inicio-tabla-cuerpo tr[data-asunto]').count(), 5);
 await comprobar('«Filtros (1)» cuenta Fechas como uno', pagina.locator('#btn-filtros').textContent(), 'Filtros (1)');
 await comprobar('la línea de filtros dice «Fechas: del … al …»',
   pagina.locator('#barra-filtros, .filtros-barra, .chip').allTextContents().then((t) => t.join(' ').indexOf('Fechas: del ') !== -1), true);
 await comprobar('las cuatro pestañas cuentan solo lo de las fechas',
-  pagina.locator('.inicio-pestana[data-pestana="todos"] .cuenta-lista').textContent(), '4');
+  pagina.locator('.inicio-pestana[data-pestana="todos"] .cuenta-lista').textContent(), '5');
 await pagina.click('.boton-limpiar');
 await pagina.waitForFunction((n) => document.querySelectorAll('#inicio-tabla-cuerpo tr[data-asunto]').length === n, cuentaTodos);
 await comprobar('«Limpiar todo» quita las fechas', pagina.locator('#filtro-fecha-desde').inputValue(), '');
@@ -112,7 +112,7 @@ await comprobar('las fechas son fechas (número de serie con formato), no texto'
 /* ================= INFORME EN PDF, CON ARCHIVADOS ================= */
 
 await pagina.selectOption('#filtro-tipo-asunto', 'SEGURO ESCOLAR');
-await pagina.waitForFunction(() => document.querySelectorAll('#inicio-tabla-cuerpo tr[data-asunto]').length === 2);
+await pagina.waitForFunction(() => document.querySelectorAll('#inicio-tabla-cuerpo tr[data-asunto]').length === 4);
 await abrirExportar('pdf');
 await comprobar('se recuerda la última elección de columnas, por separado para el PDF (la hoja no la cambió)',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#exp-columnas input:checked')).map((c) => c.dataset.col)),
@@ -137,8 +137,8 @@ await comprobar('lleva el membrete (imagen o, sin ella, el rótulo de la Junta)'
   pagina.locator('#exportar-visor .exportar-membrete, #exportar-visor .exportar-membrete-texto').count().then((n) => n > 0), true);
 await comprobar('sale el asunto archivado, marcado «Archivado»', (informe.match(/Archivado/g) || []).length >= 3, true);
 await comprobar('y los abiertos, marcados «Abierto»', (informe.match(/Abierto/g) || []).length >= 2, true);
-await comprobar('al final, «5 asuntos»', informe.indexOf('5 asuntos') !== -1, true);
-await comprobar('y el total del importe, a la española', informe.indexOf('Total Importe: 5,60 €') !== -1, true);
+await comprobar('al final, «7 asuntos»', informe.indexOf('7 asuntos') !== -1, true);
+await comprobar('y el total del importe, a la española', informe.indexOf('Total Importe: 6,72 €') !== -1, true);
 await comprobar('con «Incluir los hitos», debajo de cada asunto salen sus hitos', pagina.locator('#exportar-visor .exportar-hitos').count().then((n) => n > 0), true);
 await comprobar('la línea de filtros dice la pestaña, el tipo y que incluye los archivados',
   pagina.locator('#exportar-visor .exportar-filtros').textContent().then((t) => t.indexOf('Tipo:') !== -1 && t.indexOf('Incluye también los archivados') !== -1), true);

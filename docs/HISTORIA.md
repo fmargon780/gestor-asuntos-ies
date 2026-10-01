@@ -4308,6 +4308,8 @@ PDF sellado suelto en el certificado de Carla. Prueba `pruebas/sello-documento-n
 Explicación del hito (`cuerpo`) en «Hito ▾» → Crear y Cambiar (`#hda-cuerpo`, barra de la guía, «¿Dónde se guarda?», biblioteca, Deshacer). Prueba `pruebas/explicacion-del-hito-al-cambiar.mjs`. Revisor APROBADA; en `main` por la petición de cambios 180.
 
 
+## 1-oct-2026 · fila 249
+«Por liquidar»: casilla por tipo (`tipo.liquidar`), estado `ficha.porLiquidar`, quinta pestaña de Inicio con casillas y total de importes, y «Liquidar» (PDF LIQUIDACION por asunto, registro, archivado en lote). Decisiones: el tipo de documento se llama LIQUIDACION (sin tilde, como en el nombre del fichero); el PDF es el mismo para toda la tanda; un asunto que entró solo vuelve a su pestaña al repintar si tiene hito pendiente. Datos de demostración: seguro escolar con Importe en euros, tres asuntos en «Por liquidar» y uno abierto; Secretaría con ocupante. Prueba `pruebas/por-liquidar.mjs`; `pruebas/exportar-asuntos.mjs` puesta al día con los asuntos nuevos de la demostración.
 ## Filas cerradas movidas desde la cola (1-oct-2026)
 
 | 199 | `docs/AJUSTES-DEL-TIPO-Y-HERRAMIENTAS.md`, apartado 4: documentos y comunicaciones como tareas (`docs/REPARTO-DE-LA-COLA-2026-09-27.md`, fila 199) | HECHA (28-sep-2026 01:59). Detalle en `docs/HISTORIA.md` |

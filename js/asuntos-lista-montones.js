@@ -174,7 +174,8 @@ App.FILTROS_MONTON = [
   { valor: 'terceros', texto: 'Esperan a terceros' },
   { valor: 'esperando', texto: 'Con «Esperando a…»' },
   { valor: 'listo', texto: 'Listos para archivar' },
-  { valor: 'sinhitos', texto: 'Sin hitos' }
+  { valor: 'sinhitos', texto: 'Sin hitos' },
+  { valor: 'porliquidar', texto: 'Por liquidar' }   /* fila 249 */
 ];
 
 App.pintarFiltroEstado = function () {
@@ -189,6 +190,7 @@ App.pintarFiltroEstado = function () {
 
 App.pasaFiltroMonton = function (a, filtro) {
   if (!filtro) return true;
+  if (filtro === 'porliquidar') return !!(window.PorLiquidar && PorLiquidar.estaPorLiquidar(a));
   var l = App.ladoDe(a);
   if (filtro === 'esperando') return !!l.esperando;
   if (filtro === 'listo') return !!l.listo;

@@ -151,12 +151,15 @@
       { titulo: 'Cobrar el seguro escolar', cuerpo: '<p>Cobrar y dar el recibo.</p>', responsable: 'yo' }
     ], null);
     await Campos.guardarPropios(App.E.gestor, function (lista) {
-      lista.push({ id: 'p-importe', nombre: 'Importe', clase: 'texto', valores: [] });
+      lista.push({ id: 'p-importe', nombre: 'Importe', clase: 'importe', valores: [] });
       return lista;
     });
     await Campos.guardarConfigDeTipo(App.E.gestor, 'SEGURO ESCOLAR',
       [{ origen: 'propio', id: 'p-importe', obligatorio: false, enNombre: false }]);
     App.E.campos = await Campos.leer(App.E.gestor);
+    /* Fila 249: el seguro escolar hay que liquidarlo antes de archivarlo. */
+    seguro.liquidar = true;
+    await App.guardarTipos();
 
     /* Fila 244: la factura lleva «Importe de la factura» (Texto libre, para probar el cambio
        de clase a Importe en euros) y «Fecha de la factura» (clase Fecha). */
@@ -314,12 +317,25 @@
     /* 6b. fila 241: dos cobros del seguro escolar todavía abiertos, con su importe. */
     var alvaro = Nombres.terceroAlumno({ nombre: 'Bermúdez Ortiz, Álvaro', id: '2100003' });
     var noa = Nombres.terceroAlumno({ nombre: 'Castro Reina, Noa', id: '2100004' });
-    await crearAsunto(tipos['SEGURO ESCOLAR'], 'ALUMNADO', alvaro, hace(1), {
+    /* Fila 249: los tres primeros, ya terminados y en «Por liquidar» (el último sin
+       importe); el cuarto sigue abierto, para dar por hecho su último hito. */
+    var porLiquidar = { desde: hace(1), auto: false };
+    var claveAlvaro = await crearAsunto(tipos['SEGURO ESCOLAR'], 'ALUMNADO', alvaro, hace(1), {
       abiertoEl: hace(1) + 'T09:00:00.000Z',
-      datos: { campos: { 'propio:p-importe': { valor: '1,12', enNombre: false } } }
+      datos: { porLiquidar: porLiquidar, campos: { 'propio:p-importe': { valor: '1,12', enNombre: false } } }
     });
-    await crearAsunto(tipos['SEGURO ESCOLAR'], 'ALUMNADO', noa, hace(1), {
+    var claveNoa = await crearAsunto(tipos['SEGURO ESCOLAR'], 'ALUMNADO', noa, hace(1), {
       abiertoEl: hace(1) + 'T09:00:00.000Z',
+      datos: { porLiquidar: porLiquidar, campos: { 'propio:p-importe': { valor: '1,12', enNombre: false } } }
+    });
+    var claveDuarte = await crearAsunto(tipos['SEGURO ESCOLAR'], 'ALUMNADO', Nombres.terceroAlumno({ nombre: 'Duarte Gil, Pilar', id: '2100020' }), hace(1), {
+      abiertoEl: hace(1) + 'T09:00:00.000Z', datos: { porLiquidar: porLiquidar }
+    });
+    await marcarPrimerHito(claveAlvaro, 'hecho', 'Cobrado.');
+    await marcarPrimerHito(claveNoa, 'hecho', 'Cobrado.');
+    await marcarPrimerHito(claveDuarte, 'hecho', 'Cobrado.');
+    await crearAsunto(tipos['SEGURO ESCOLAR'], 'ALUMNADO', Nombres.terceroAlumno({ nombre: 'Esteban Roca, Iván', id: '2100021' }), hace(0), {
+      abiertoEl: new Date().toISOString(),
       datos: { campos: { 'propio:p-importe': { valor: '1,12', enNombre: false } } }
     });
 
@@ -499,6 +515,8 @@
     App.E.tipos = [];
     await Carpetas.guardarJson(App.E.gestor, App.FICHERO_TIPOS, []);
     await escribirDatos();
+    /* Fila 249: quien ocupa Secretaría, para «Recibe» al liquidar. */
+    try { if (window.Cargos) await Cargos.anadirOcupante('secretaria', 'Reyes Palma, Fernando', '2020-09-01', 'H'); } catch (e) { /* sin cargo, «Recibe» sale vacío */ }
     /* La entrada normal ya ha podido leer (y guardar en caché, vacíos)
        los CSV de personas al pintar Inicio, antes de que estos
        existieran: se tira esa caché para que la próxima lectura sí los

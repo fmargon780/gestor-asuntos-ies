@@ -55,6 +55,12 @@ var HitosPanelLista = (function () {
         h.estado = 'hecho';
         try { await AvisosLoPide.alMarcarHecho(a, h); } catch (e) { /* ver arriba */ }
       }
+      /* Fila 249 (docs/POR-LIQUIDAR.md): el último hito hecho de un tipo que hay que
+         liquidar pasa el asunto a «Por liquidar»; desmarcar uno lo devuelve. */
+      if (window.PorLiquidar) {
+        if (nuevoEstado === 'hecho') await PorLiquidar.alMarcarHecho(a, h);
+        else await PorLiquidar.alDesmarcar(a);
+      }
       return true;
     } catch (e) {
       casillaEl.checked = !casillaEl.checked;

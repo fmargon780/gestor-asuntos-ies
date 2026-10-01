@@ -81,6 +81,7 @@ var ExportarAsuntos = (function () {
     { id: 'leToca', titulo: 'Le toca a', clase: 'texto', defecto: true, valor: function (r) { return r.leToca; } },
     { id: 'inicio', titulo: 'Inicio', clase: 'fecha', defecto: true, valor: function (r) { return r.inicio; } },
     { id: 'situacion', titulo: 'Situación (abierto o archivado)', clase: 'texto', valor: function (r) { return r.situacion; } },
+    { id: 'porLiquidarDesde', titulo: 'Por liquidar desde', clase: 'fecha', valor: function (r) { return r.porLiquidarDesde || ''; } },   /* fila 249 */
     { id: 'numero', titulo: 'Número de asunto', clase: 'texto', valor: function (r) { return r.numero; } },
     { id: 'tipoLargo', titulo: 'Tipo (nombre completo)', clase: 'texto', valor: function (r) { return r.tipo; } },
     { id: 'organo', titulo: 'Lo encarga', clase: 'texto', valor: function (r) { return r.organo; } },
@@ -209,6 +210,7 @@ var ExportarAsuntos = (function () {
       loPide: (ficha.loPide && ficha.loPide.nombre) || '',
       via: textoDeVia(ficha), reservado: reservado,
       archivadoEl: '', nDocumentos: null,
+      porLiquidarDesde: (ficha.porLiquidar && /^\d{4}-\d{2}-\d{2}/.test(ficha.porLiquidar.desde || '')) ? ficha.porLiquidar.desde.slice(0, 10) : '',
       notas: window.Notas && Notas.textoParaBuscar ? Notas.textoParaBuscar(ficha) : '',
       campos: camposDeFicha(ficha, reservado),
       hitos: hitosParaSacar(hitos, ajustes)

@@ -379,3 +379,12 @@ button.avisos-linea-trozo:hover {
   cursor: pointer;
 }
 .avisos-linea-ocultar:hover { background: rgba(0, 0, 0, .16); }
+
+/* Fila 249 (docs/POR-LIQUIDAR.md): la pestaña «Por liquidar». */
+.inicio-liquidar-barra { display: flex; align-items: center; gap: 14px; flex: 0 0 100%; margin: 0 0 10px; }
+.inicio-liquidar-barra.oculto { display: none; }
+.inicio-liquidar-marcados { font-weight: 600; }
+.inicio-tabla .liq-casilla { width: 34px; text-align: center; }
+.inicio-tabla .liq-importe { text-align: right; white-space: nowrap; }
+.inicio-tabla .liq-importe-ambar { color: var(--ambar-linea, #b26a00); }
+.liq-lista { margin: 4px 0 0; padding-left: 18px; max-height: 160px; overflow-y: auto; font-size: 13px; }
