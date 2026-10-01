@@ -171,10 +171,10 @@ await comprobar('la ficha en tarjetas (fila 252): cada dato en la suya, una sola
     caja.remove();
     return salida;
   }), {
-    tarjetas: ['matricula:Matrícula', 'trayectoria:Trayectoria', 'procedencia:Procedencia y NEAE', 'datos:Datos personales', 'otros:Otros datos del fichero'],
-    datos: ['Edad actual=12 años', 'Matrícula=Matriculado en el curso 26-27', 'Grupo=1º ESO C', 'Curso=1º de E.S.O.', 'Año de la matrícula=2026',
+    tarjetas: ['matricula:Matrícula', 'trayectoria:Trayectoria', 'procedencia:Procedencia y NEAE', 'otros:Otros datos del fichero'],
+    datos: ['Matrícula=Matriculado en el curso 26-27', 'Grupo=1º ESO C', 'Curso=1º de E.S.O.', 'Año de la matrícula=2026',
       'Estado Matrícula=Matriculada', 'PIL=No', 'Centro de procedencia=CEIP Inventado Uno', 'Fecha de alta=01-09-2026',
-      'Fecha de nacimiento=04/03/2014', 'Marca rara=violeta'],
+      'Marca rara=violeta'],
     materias: ['Lengua inventadaMatriculada', 'Matemáticas inventadasMatriculada'],
     pie: 'Datos de la base de datos de alumnado del 20-09-2099',
     viejaSinSalir: true

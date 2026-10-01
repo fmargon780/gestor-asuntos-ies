@@ -29,7 +29,8 @@ var FichaPersonaReparto = (function () {
     { re: /tutor|padre|madre|responsable|familia/, tarjeta: null },
     { re: /telefono|movil|correo|e-?mail/, tarjeta: null },
     { re: /^(primer|segundo) apellido$|^apellidos?$/, tarjeta: null },
-    { re: /^edad|^matricula$|^grupo$|^curso$|ultima matricula|^unidad|estado.*matricula|ano de la matricula|ensenanza/, tarjeta: 'matricula' },
+    { re: /^edad|^fecha de nacimiento$/, tarjeta: null },   /* la cabecera ya dice la edad y la fecha de nacimiento */
+    { re: /^matricula$|^grupo$|^curso$|ultima matricula|^unidad|estado.*matricula|ano de la matricula|ensenanza/, tarjeta: 'matricula' },
     { re: /nacimiento|nacionalidad|sexo|genero|domicilio|direccion|localidad|provincia|codigo postal|^c\.? ?p\.?$/, tarjeta: 'datos' }
   ];
 

@@ -20,3 +20,10 @@
 .fp-cuerpo .vt-tarjetas { margin-bottom: 8px; }
 .fp-hermanos { margin: 4px 0 8px; }
 .fp-ventana .fp-tarjetas { margin-top: 8px; }
+
+/* Dentro de una tarjeta, el alumno y los tutores se apilan o se reparten
+   según quepan; nunca en columna estrecha (el teléfono y el correo no se parten). */
+.fp-cuerpo .vt-tarjetas { grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.fp-cuerpo .vt-tarjeta { min-width: 0; }
+.fp-cuerpo .vt-dato { min-width: 0; flex-wrap: wrap; }
+.fp-cuerpo .vt-valor { white-space: normal; overflow-wrap: anywhere; overflow: visible; }

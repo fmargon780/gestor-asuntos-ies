@@ -105,8 +105,8 @@ await comprobar('«Curso» sale una sola vez en toda la ficha',
 await comprobar('«Marca rara» (apartado nuevo) y las observaciones, en «Otros datos del fichero»',
   pagina.evaluate(() => { const t = document.querySelector('[data-tarjeta="otros"]').textContent; return [t.indexOf('Marca rara') !== -1, t.indexOf('Observaciones') !== -1]; }),
   [true, true]);
-await comprobar('Datos personales lleva el domicilio, el nacimiento y el lugar',
-  pagina.evaluate(() => { const t = document.querySelector('[data-tarjeta="datos"]').textContent; return [t.indexOf('Calle Inventada 1') !== -1, t.indexOf('04/03/2014') !== -1, t.indexOf('Villa Inventada') !== -1]; }),
+await comprobar('Datos personales lleva el domicilio y el lugar, y no repite la fecha de nacimiento (la cabecera la dice)',
+  pagina.evaluate(() => { const t = document.querySelector('[data-tarjeta="datos"]').textContent; return [t.indexOf('Calle Inventada 1') !== -1, t.indexOf('04/03/2014') === -1, t.indexOf('Villa Inventada') !== -1]; }),
   [true, true, true]);
 
 console.log('--- 6. se recuerda lo abierto, por categoría ---');

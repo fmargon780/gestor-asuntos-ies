@@ -156,6 +156,9 @@ var FichaPersona = (function () {
         var e = reparto[id];
         if (!e || (!e.filas.length && !e.tablas.length)) return;
         def.cuerpo = cuerpoDe(e, pie); def.resumen = resumenDe(id, e);
+        if (id === 'matricula') {
+          def.resumen = [p.matriculado ? p.unidad : '', p.matriculado ? 'Matriculado' : (p.solicitante ? 'Solicitante' : 'No matriculado')].filter(Boolean).join(' · ');
+        }
       }
       rejilla.appendChild(tarjeta(p.categoria, recuerdo, def));
     });

@@ -278,9 +278,11 @@ var FichaTerceroAlumno = (function () {
 
     var primero = tutores[0];
     var resumen = primero
-      ? etiquetaDeTutor(primero) + ': ' + (primero.nombre || '') + (primero.telefonos[0] ? ' · ' + telefonoLegible(primero.telefonos[0]) : '')
+      ? [etiquetaDeTutor(primero) + (primero.nombre ? ': ' + primero.nombre : ''),
+         primero.telefonos[0] ? telefonoLegible(primero.telefonos[0]) : primero.correos[0]].filter(Boolean).join(' · ')
       : [alumno.telefonos[0] && telefonoLegible(alumno.telefonos[0]), alumno.correos[0]].filter(Boolean).join(' · ');
 
+    if (!resumen) resumen = tutores.length ? tutores.length + (tutores.length === 1 ? ' tutor' : ' tutores') : (alumno.documento ? 'DNI ' + alumno.documento : '');
     var vacia = !tutores.length && !alumno.telefonos.length && !alumno.correos.length && !otrosFamilia.length;
     return { nodo: nodo, resumen: resumen, vacia: vacia, correosFamilia: correosFamilia, tutores: tutores,
              textoDeTodo: function () { return textoDeTodo(persona, alumno, tutores); } };
