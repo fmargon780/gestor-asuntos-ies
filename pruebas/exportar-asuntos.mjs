@@ -148,7 +148,7 @@ await comprobar('«Cerrar» cierra el visor', pagina.locator('#exportar-visor').
 /* ================= ASUNTO RESERVADO ================= */
 
 await pagina.selectOption('#filtro-tipo-asunto', 'CERTIFICADO');
-await pagina.waitForFunction(() => document.querySelectorAll('#inicio-tabla-cuerpo tr[data-asunto]').length === 4);
+await pagina.waitForFunction(() => document.querySelectorAll('#inicio-tabla-cuerpo tr[data-asunto]').length === 2);
 await abrirExportar('pdf');
 await pagina.check('#exp-columnas input[data-col="carpeta"]');
 await pagina.check('#exp-columnas input[data-col="loPide"]');
