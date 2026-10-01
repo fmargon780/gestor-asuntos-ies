@@ -199,6 +199,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 241 | `docs/EXPORTAR-ASUNTOS.md` (filtro «Fechas» en Inicio; «Exportar ▾» a hoja de cálculo o informe en PDF de lo que se ve, con columnas a elegir —campos propios incluidos—, archivados opcionales con los mismos filtros, hitos, número de asuntos y sumas; reservados sin el tercero) | PENDIENTE (1-oct-2026) |
 | 243 | Aviso de usuario: mejora en «Inicio» | IDEA (30-sep-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1ssmMXfC2WNLnt8Nkge6_aEMdT_XCRZut/view?usp=drivesdk |
 | 244 | Aviso de usuario: mejora en «Ajustes de un tipo de asunto» | IDEA (1-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/16f35pXwBGSFUtf3epTcps7MgaCE1osQU/view?usp=drivesdk |
+| 245 | Aviso de usuario: mejora en «Ajustes de un tipo de asunto» | IDEA (1-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1CDISgGbu-whXMwTabSBEiAXaOyASlnKE/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
