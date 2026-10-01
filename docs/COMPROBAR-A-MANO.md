@@ -135,3 +135,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 236 — el correo enviado, en PDF (1-oct-2026)
 
 - Enviar un correo real desde la app: aparece el `CORREO` en el asunto. Cuando el destinatario conteste y la respuesta entre por la bandeja y se guarde en el asunto, aparece el HILO como siempre y el `CORREO` del envío sigue en su sitio.
+
+## Fila 248 — «Qué hay de nuevo» (1-oct-2026)
+
+- Cuando se publique la siguiente tarea con un cambio visible, al recargar sale la ventana solo con esa novedad.
