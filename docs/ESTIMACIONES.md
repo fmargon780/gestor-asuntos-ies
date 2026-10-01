@@ -4,7 +4,7 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 `CLAUDE.md`). Minutos por fila entera: programar, pruebas, publicar y comprobar. La página
 «Estado de la cola» de Francisco lee esta tabla desde `main`.
 
-Última puesta al día: 01-oct-2026 (fila 234 PENDIENTE)
+Última puesta al día: 01-oct-2026 (fila 236 PENDIENTE)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por `pruebas` y el
 revisor: los minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
@@ -20,3 +20,4 @@ revisor: los minutos de abajo cuentan la fila entera, revisor incluido (uno o do
 | 244 | 90 | `docs/CAMPOS-IMPORTE-NUMERO-FECHA.md`: tres clases nuevas en `js/campos.js` y `js/campos-catalogo.js`, controles y ámbar en Nuevo asunto, Cambiar el asunto y ficha, conversión de valores al cambiar de clase (abiertos e índice del ARCHIVO), clase declarada en `js/exportar-datos.js`, datos de demostración y prueba nueva |
 | 247 | 50 | `docs/NOMBRES-DE-PILA-LARGOS.md`: acortar nombres de pila de más de 40 caracteres en `js/nombres.js` (alumnado, personal, tutores), reutilizar la carpeta de tercero ya existente con el nombre largo, medidor de rutas, persona de demostración y prueba nueva `pruebas/nombres-de-pila-largos.mjs` |
 | 234 | 45 | `docs/RESPONSABLE-SECRETARIA-CON-VB.md`: responsable fijo nuevo en `js/hitos-administracion.js` (`asegurar`, `cuentaPara`), fila fija en `js/hitos-ajustes.js`, «Esperando a…» y filtro de Inicio, asunto de demostración y prueba nueva `pruebas/responsable-secretaria-con-vb.mjs` |
+| 236 | 50 | `docs/CORREO-ENVIADO-EN-PDF.md`: PDF del correo enviado con pdf-lib en `js/correo-enviado-pdf.js` (nuevo), llamada tras el envío en `js/correo-cuadro.js`, nombre como el CORREO de la bandeja, ámbar si falla, envío simulado en demo y prueba nueva `pruebas/correo-enviado-pdf.mjs` |
