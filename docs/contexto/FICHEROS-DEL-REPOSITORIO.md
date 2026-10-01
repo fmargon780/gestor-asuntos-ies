@@ -239,6 +239,8 @@ de `App` va después del fichero que lo define.
 | `js/docx-tabla.js` | `Docx.ponerTabla`, `Docx.resaltarFaltas` y `Docx.textoDelDocumento`: las tablas de datos en un Word y lo que falta en amarillo (fila 110) |
 | `js/genero.js` | El masculino o el femenino en las plantillas: `Genero.resolver` (formas dobles como «alumno/a», marcas `:tutor1`/`:firmante`…), los sexos de cada persona (`sexosDeAsunto`, `_GESTOR/sexos.json`) y la casilla Sexo de «Datos y contacto» (fila 111) |
 | `js/tablas-datos-leer.js` | Leer las tablas de datos: el PDF de funciones tutoriales de Séneca por posiciones, y CSV/Excel de `datos/Tablas` (fila 110) |
+| `js/tablas-datos-consejo.js` | La tabla CONSEJO ESCOLAR (`TablasDatosConsejo`, fila 238): leer los CSV `RegMieConEsc`, unirlos en una fila por nombramiento y sus celdas para el Word. Carga después de `js/tablas-datos-cursos.js` |
+| `pruebas/consejo-escolar.mjs` | Prueba (navegador de verdad, fila 238): leer, unir, tabla por nombre, Word, subir ficheros y `{{DNI}}` de reserva |
 | `js/tablas-datos-cursos.js` | Entender el campo «Cursos que pide» («2017/18, 19-20», «2017-2018 a 2019-2020»…) para filtrar `{{TABLA TUTORIAS}}` (`TablasDatosCursos`, fila 123) |
 | `js/tablas-datos.js` | Las tablas de datos con caché, unidas a la persona por su DNI, y los huecos `{{ESPECIALIDAD}}`, `{{ESPECIALIDAD FIRMANTE}}`, `{{TABLA …}}`, `{{DATO …}}` (filas 110 y 123) |
 | `js/tablas-datos-pantalla.js` | El bloque «Tablas de datos» y «Datos de las tablas» en la ficha del tercero (fila 110); el bloque cuelga ahora de `#herramientas-tablas-datos-hueco`, en la pestaña "Herramientas" (fila 200; antes en Ajustes → Mantenimiento) |

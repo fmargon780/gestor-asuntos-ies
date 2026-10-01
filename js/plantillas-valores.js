@@ -248,6 +248,12 @@
       consejeria: datosCentro.consejeria || I.POR_DEFECTO_CONSEJERIA || '',
       campos: camposDelAsuntoDe(a)
     };
+    /* Fila 238: sin documento en el tercero, el campo «DNI para el certificado». */
+    if (!valores.dni) {
+      Object.keys(valores.campos || {}).forEach(function (k) {
+        if (U.normalizar(k) === 'dni para el certificado' && valores.campos[k]) valores.dni = String(valores.campos[k]).trim();
+      });
+    }
     /* Fila 167: {departamento}, {departamentocorreo} y {organismooficial}. */
     var deAdministracion = window.Administraciones ? Administraciones.valoresDe(a)
       : { departamento: '', departamentocorreo: '', organismooficial: '' };

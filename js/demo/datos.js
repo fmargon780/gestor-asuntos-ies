@@ -82,6 +82,26 @@
       ['Copistería Central', 'Copistería Central', '99887766X', 'Nuria Paz', '950333000', 'info@copicentral-demo.es']
     ]));
 
+    /* Fila 238: dos ficheros del Consejo Escolar (como los da Séneca: el de
+       2024-2025 con Cese antes que Nombramiento y un asterisco en HTML pegado
+       a la cabecera), en `Tablas`. Nombres inventados. */
+    var tablas = await d.getDirectoryHandle('Tablas', { create: true });
+    await Carpetas.escribirTexto(tablas, 'RegMieConEsc 2024-2025.csv', [
+      'Sector;Miembro;Cese;"Nombramiento<font class=""asterisco""> *</font>"',
+      'Profesorado;OTERO CAMPOS, MARTA;;15/10/2022',
+      'Profesorado;Reyes Palma, Fernando;30/06/2025;15/10/2021',
+      'Equipo Directivo;Uceda Molina, Patricia (DIRECTOR/A);;',
+      'Padres y madres;Ponce Duarte, Rocío (REPRESENTANTE DE LA A.M.P.A. MAYORITARIA);;01/11/2023',
+      'Personal de administración y servicios;Vidal Cano, Ramón;;10/11/2023', ''
+    ].join('\r\n'));
+    await Carpetas.escribirTexto(tablas, 'RegMieConEsc 2025-2026.csv', [
+      'Sector;Miembro;"Nombramiento<font class=""asterisco""> *</font>";Cese',
+      'Profesorado;Otero Campos, Marta;15/10/2022;',
+      'Profesorado (Impulsor de medidas de Igualdad);Otero Campos, Marta;01/10/2025;',
+      'Equipo Directivo;Uceda Molina, Patricia (DIRECTOR/A);;',
+      'Personal de administración y servicios;Vidal Cano, Ramón;10/11/2023;', ''
+    ].join('\r\n'));
+
     /* tutores.csv: tutores legales ya dados de alta como tercero. */
     await Carpetas.escribirTexto(d, 'tutores.csv', csv([
       ['Nombre', 'Documento', 'Teléfono', 'Teléfono 2', 'Correo', 'Correo 2', 'Domicilio', 'Hijos'],
@@ -137,8 +157,15 @@
       [{ origen: 'propio', id: 'p-importe', obligatorio: false, enNombre: false }]);
     App.E.campos = await Campos.leer(App.E.gestor);
 
+    /* Fila 238: el tipo del certificado de miembro del Consejo Escolar. */
+    var consejo = await crearTipoConGuia('CERTIFICADO MIEMBRO CONSEJO ESCOLAR', 'PERSONAL', [
+      { titulo: 'Preparar el certificado', cuerpo: '<p>Con la plantilla del tipo.</p>', responsable: 'yo' }
+    ], null);
+    consejo.nombreCorto = 'CertConsEsc';
+    await App.guardarTipos();
+
     return { MATRICULA: matricula, CERTIFICADO: certificado, 'BAJA MEDICA': bajaMedica, FACTURA: factura,
-             'SEGURO ESCOLAR': seguro };
+             'SEGURO ESCOLAR': seguro, 'CERTIFICADO MIEMBRO CONSEJO ESCOLAR': consejo };
   }
 
   /* ---------- plantilla de correo ---------- */
@@ -261,6 +288,11 @@
     await crearAsunto(tipos['SEGURO ESCOLAR'], 'ALUMNADO', noa, hace(1), {
       abiertoEl: hace(1) + 'T09:00:00.000Z',
       datos: { campos: { 'propio:p-importe': { valor: '1,12', enNombre: false } } }
+    });
+
+    /* 6c. fila 238: un certificado de miembro del Consejo Escolar. */
+    await crearAsunto(tipos['CERTIFICADO MIEMBRO CONSEJO ESCOLAR'], 'PERSONAL', marta, hace(0), {
+      abiertoEl: new Date().toISOString()
     });
 
     /* 6. dormido: abierto hace tiempo, sin ningún hito tocado. Sin número:

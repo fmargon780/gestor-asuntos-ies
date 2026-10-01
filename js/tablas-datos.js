@@ -72,12 +72,15 @@ var TablasDatos = (function () {
 
     var sub = null;
     try { sub = await dir.getDirectoryHandle('Tablas'); } catch (e) { sub = null; }
+    /* Fila 238: los CSV del Consejo Escolar, de la carpeta de datos y de Tablas. */
+    await cargarConsejo(salida, dir, lista, sub);
     if (sub) {
       var enSub = [];
       try { enSub = await Carpetas.ficheros(sub); } catch (e) { enSub = []; }
       for (var j = 0; j < enSub.length; j++) {
         var f2 = enSub[j].nombre;
         if (!/\.(csv|xlsx)$/i.test(f2)) continue;
+        if (window.TablasDatosConsejo && TablasDatosConsejo.esFicheroDelConsejo(f2)) continue;   /* fila 238 */
         try {
           var t = /\.csv$/i.test(f2) ? L.deCsv(await Carpetas.leerTexto(sub, f2)) : await L.deXlsx(await leerBytes(sub, f2));
           if (!t.cabecera.length) throw new Error('Está vacío.');
@@ -91,6 +94,32 @@ var TablasDatos = (function () {
     if (window.AlumnadoBDVer) { try { await AlumnadoBDVer.comoTabla(salida); } catch (e) { salida.errores.push({ fichero: 'ALUMNADO-BD.json', motivo: U.mensajeDeError(e) }); } }
     CACHE = salida;
     return salida;
+  }
+
+  /* Fila 238 (js/tablas-datos-consejo.js): una sola tabla, CONSEJO ESCOLAR, con todos los ficheros. */
+  async function cargarConsejo(salida, dir, listaDatos, sub) {
+    var C = window.TablasDatosConsejo;
+    if (!C) return;
+    var cand = [];
+    listaDatos.forEach(function (f) { if (C.esFicheroDelConsejo(f.nombre)) cand.push({ dir: dir, nombre: f.nombre }); });
+    if (sub) {
+      var enSub = [];
+      try { enSub = await Carpetas.ficheros(sub); } catch (e) { enSub = []; }
+      enSub.forEach(function (f) { if (C.esFicheroDelConsejo(f.nombre)) cand.push({ dir: sub, nombre: f.nombre }); });
+    }
+    var leidos = [];
+    for (var i = 0; i < cand.length; i++) {
+      try {
+        var r = C.leerTexto(await Carpetas.leerTexto(cand[i].dir, cand[i].nombre), cand[i].nombre);
+        if (!r.ok) throw new Error(r.motivo);
+        leidos.push({ fichero: cand[i].nombre, periodo: r.periodo, filas: r.filas });
+      } catch (e) { salida.errores.push({ fichero: cand[i].nombre, motivo: U.mensajeDeError(e) }); }
+    }
+    if (!leidos.length) return;
+    var u = C.unir(leidos);
+    salida.tablas[C.NOMBRE_TABLA] = { nombre: C.NOMBRE_TABLA, ficheros: leidos.map(function (x) { return x.fichero; }),
+      cursos: u.periodos, cabecera: C.COLUMNAS, filas: u.filas };
+    u.avisos.forEach(function (a) { salida.errores.push({ fichero: 'Consejo Escolar', motivo: a }); });
   }
 
   function olvidar() { CACHE = null; }
@@ -111,6 +140,8 @@ var TablasDatos = (function () {
      últimos caracteres, por esos 4 y el nombre normalizado. */
   function esDeLaPersona(fila, persona) {
     if (fila.idEscolar) return !!persona && String(persona.idEscolar || persona.id || '').trim() === fila.idEscolar;
+    /* Fila 238: el Consejo Escolar se une por el nombre (Séneca no da el DNI). */
+    if (fila.claveNombre) return !!persona && TablasDatosConsejo.claveNombre(persona.nombre) === fila.claveNombre;
     var doc = String((persona && (persona.documento || persona.dni)) || '');
     var clave = L.clave(doc);
     if (clave.length > 4) return fila.clave === clave;
@@ -126,11 +157,12 @@ var TablasDatos = (function () {
     var t = d.tablas[nombreTabla(nombre)];
     if (!t || !persona) return [];
     return t.filas.filter(function (f) { return esDeLaPersona(f, persona); })
-      .sort(function (a, b) { return String(a.curso || '').localeCompare(String(b.curso || '')) || String(a.desde || '').localeCompare(String(b.desde || '')); });
+      .sort(function (a, b) { return (a.orden ? String(a.orden).localeCompare(String(b.orden || '')) : 0) || String(a.curso || '').localeCompare(String(b.curso || '')) || String(a.desde || '').localeCompare(String(b.desde || '')); });
   }
 
   /* Una fila como lista de celdas, con las columnas pedidas. */
-  function celdasDe(tabla, fila, columnas) {
+  function celdasDe(tabla, fila, columnas, ctx) {
+    if (tabla === 'CONSEJO ESCOLAR') return TablasDatosConsejo.celdas(fila, columnas, ctx);   /* fila 238 */
     if (tabla === 'TUTORIAS') {
       var desde = fechaLegible(fila.desde), hasta = fechaLegible(fila.hasta);
       var mapa = { 'curso escolar': fila.curso, 'curso': String(fila.curso || '').replace('/', '-'), 'grupo': fila.grupo,
@@ -212,13 +244,14 @@ var TablasDatos = (function () {
         var nombre = nombreTabla(tabla[1]);
         var columnas = tabla[2] ? tabla[2].split('|').map(function (c) { return c.trim(); }).filter(Boolean)
           : (nombre === 'TUTORIAS' ? COLUMNAS_TUTORIAS : ((await cargar()).tablas[nombre] || { cabecera: [] }).cabecera);
+        if (nombre === 'CONSEJO ESCOLAR' && !tabla[2]) columnas = TablasDatosConsejo.COLUMNAS;
         var filas = await filasDe(nombre, persona);
         if (nombre === 'TUTORIAS' && filas.length) filas = filtrarPorCursos(filas, valores, faltan);
         if (filas.length) {
-          var r = await Docx.ponerTabla(buffer, h, columnas, filas.map(function (f) { return celdasDe(nombre, f, columnas); }));
+          var r = await Docx.ponerTabla(buffer, h, columnas, filas.map(function (f) { return celdasDe(nombre, f, columnas, { faltan: faltan }); }));
           buffer = r.bytes;
         } else {
-          var etiqueta = 'Tabla ' + tabla[1].trim();
+          var etiqueta = nombre === 'CONSEJO ESCOLAR' ? 'Consejo Escolar' : 'Tabla ' + tabla[1].trim();   /* fila 238 */
           faltan.push(etiqueta);
           valores.datosTablas[U.normalizar(h)] = Docx.MARCA_FALTA(etiqueta);
         }

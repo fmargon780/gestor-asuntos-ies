@@ -4213,3 +4213,13 @@ aquí», «⋮» Pasar al tipo / Quitar). `Campos.camposDeAsunto` une los del ti
 con «Deshacer» (8 s). Módulo nuevo `js/campo-desde-el-asunto.js`; prueba
 `pruebas/campo-desde-el-asunto.mjs`. Ajustadas `ficha-disposicion` (el bloque sale con el botón) y
 `ficha-en-tarjetas` (a 800 de alto, 2 nombres de documento caben en la tarjeta, no 3).
+
+## 1-oct-2026 · fila 238 · Certificado de miembro del Consejo Escolar
+
+Tabla nueva `CONSEJO ESCOLAR` de `TablasDatos` (`js/tablas-datos-consejo.js`): los CSV `RegMieConEsc`
+de Séneca, una fila por nombramiento, unida a la persona por el nombre (Séneca no da el DNI). Botón
+«Añadir ficheros del Consejo Escolar» (Herramientas), avisos ámbar, hueco `{{TABLA CONSEJO ESCOLAR}}`,
+`{{DNI}}` con el campo de reserva «DNI para el certificado», tipo CERTIFICADO MIEMBRO CONSEJO ESCOLAR
+(`CertConsEsc`) en la biblioteca y plantilla nueva. Demostración con dos ficheros inventados y un asunto.
+Prueba `pruebas/consejo-escolar.mjs`. El punto 8 de la lista (con los ficheros reales) queda en
+`docs/COMPROBAR-A-MANO.md`.

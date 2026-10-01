@@ -31,14 +31,57 @@
         '<code>_GESTOR/datos/Tablas</code>. Se unen a cada persona por su DNI y sirven para los huecos ' +
         '<code>{{ESPECIALIDAD}}</code>, <code>{{TABLA TUTORIAS}}</code>, <code>{{DATO …}}</code> y <code>{{TABLA …}}</code>.</p>' +
         '<div id="tablas-datos-lista" class="lista"></div>' +
-        '<button type="button" class="boton" id="tablas-datos-releer" style="margin-top:8px">Volver a leer</button>' +
+        '<button type="button" class="boton" id="tablas-datos-releer" style="margin-top:8px">Volver a leer</button> ' +
+        /* Fila 238: los CSV del Consejo Escolar que da Séneca. */
+        '<button type="button" class="boton" id="tablas-datos-consejo" style="margin-top:8px">Añadir ficheros del Consejo Escolar</button>' +
+        '<input type="file" id="tablas-datos-consejo-ficheros" accept=".csv" multiple class="oculto">' +
       '</div>';
     pantalla.appendChild(d);
     $('tablas-datos-releer').onclick = async function () {
       TablasDatos.olvidar();
       await U.mientrasGuarda($('tablas-datos-releer'), function () { return pintar(); });
     };
+    $('tablas-datos-consejo').onclick = function () { $('tablas-datos-consejo-ficheros').click(); };
+    $('tablas-datos-consejo-ficheros').onchange = async function (ev) {
+      var elegidos = Array.prototype.slice.call(ev.target.files || []);
+      ev.target.value = '';
+      if (elegidos.length) await anadirFicherosDelConsejo(elegidos);
+    };
     return d;
+  }
+
+  /* CSV de Séneca: UTF-8 si lo es, y si no Latin-1. */
+  function decodificar(bytes) {
+    try { return new TextDecoder('utf-8', { fatal: true }).decode(bytes); }
+    catch (e) { return new TextDecoder('windows-1252').decode(bytes); }
+  }
+
+  /* Fila 238: copia cada fichero a `datos/Tablas/` con su nombre limpio
+     (`RegMieConEsc 2024-2025.csv`; si ya está, pregunta antes de sustituirlo) y
+     vuelve a leer. Un fichero que no trae las columnas, aviso ámbar y no se copia. */
+  async function anadirFicherosDelConsejo(ficheros) {
+    if (!App.E.datos) { U.aviso('Primero hay que señalar la carpeta de datos.', 'ambar'); return; }
+    var C = window.TablasDatosConsejo;
+    var puestos = 0;
+    try {
+      var sub = await App.E.datos.getDirectoryHandle('Tablas', { create: true });
+      for (var i = 0; i < ficheros.length; i++) {
+        var f = ficheros[i];
+        var bytes = new Uint8Array(await f.arrayBuffer());
+        var r = C.leerTexto(decodificar(bytes), f.name);
+        if (!r.ok) { U.aviso('«' + f.name + '» no parece del Consejo Escolar: ' + r.motivo + ' No lo he añadido.', 'ambar'); continue; }
+        var nombre = C.nombreLimpio(f.name, r.periodo);
+        if (await Carpetas.existeFichero(sub, nombre)) {
+          var ok = await U.preguntar('Sustituir el fichero', '<p>Ya hay «' + U.escapar(nombre) + '». ¿Lo sustituyo por el nuevo?</p>', 'Sustituir');
+          if (!ok) continue;
+        }
+        await Carpetas.escribirBytes(sub, nombre, bytes, 'text/csv');
+        puestos++;
+      }
+    } catch (e) { U.fallo('No he podido añadir los ficheros', e); }
+    TablasDatos.olvidar();
+    await pintar();
+    if (puestos) U.aviso(puestos === 1 ? 'Fichero del Consejo Escolar añadido.' : puestos + ' ficheros del Consejo Escolar añadidos.', 'bueno');
   }
 
   async function pintar() {
@@ -77,7 +120,7 @@
       var t = d.tablas[nombre];
       var filas = await TablasDatos.filasDe(nombre, persona);
       if (!filas.length) continue;
-      var columnas = nombre === 'TUTORIAS' ? TablasDatos.COLUMNAS_TUTORIAS : t.cabecera;
+      var columnas = nombre === 'TUTORIAS' ? TablasDatos.COLUMNAS_TUTORIAS : t.cabecera;   /* la del Consejo: Sector, Cargo, Nombramiento, Cese */
       html += '<div class="tablas-ficha-tabla"><div class="suave">' + U.escapar(nombre === 'TUTORIAS' ? 'Tutorías' : nombre) + '</div>' +
         '<table class="tablas-ficha"><tr>' + columnas.map(function (c) { return '<th>' + U.escapar(c) + '</th>'; }).join('') + '</tr>' +
         filas.map(function (f) {
