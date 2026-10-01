@@ -33,7 +33,14 @@ var Plantillas = (function () {
   /* 20-sep-2026, fila 79, apartado 4.7: la dirección base del sistema
      de normativa del centro, para montar el enlace de una referencia.
      Vacía, las citas se ven sin enlace y no se rompe nada. */
-  var POR_DEFECTO_NORMATIVA = 'https://normativa-escolarizacion.vercel.app';
+  var POR_DEFECTO_NORMATIVA = 'https://normativa.fmargon.com';   /* fila 232: la red del IES bloquea vercel.app */
+
+  /* Fila 232 (docs/ENLACE-A-NORMATIVA-CORRECTO.md): quien ya tenga guardada la
+     dirección vieja de `vercel.app` la ve sustituida por la buena. PURA. */
+  function direccionDeNormativa(valor) {
+    var v = String(valor || '').trim();
+    return /^https?:\/\/normativa-escolarizacion\.vercel\.app(?:[\/?#]|$)/i.test(v) ? POR_DEFECTO_NORMATIVA : v;
+  }
   /* Fila 149 (docs/MEMBRETE-LETRA-DEL-MANUAL.md): la Consejería del
      membrete, si Ajustes la deja vacía (nombre vigente desde julio de 2026). */
   var POR_DEFECTO_CONSEJERIA = 'Consejería de Educación';
@@ -160,7 +167,7 @@ var Plantillas = (function () {
          casillas de PDF por su nombre, no huecos de texto). */
       provincia: l.provincia || '',
       cargo: l.cargo || '',
-      direccionNormativa: (typeof l.direccionNormativa === 'string') ? l.direccionNormativa : POR_DEFECTO_NORMATIVA,
+      direccionNormativa: (typeof l.direccionNormativa === 'string') ? direccionDeNormativa(l.direccionNormativa) : POR_DEFECTO_NORMATIVA,
       /* El membrete (fila 149): lo dibuja entero js/membrete.js; aquí solo
          el nombre de la Consejería (el del centro es `centro`). Las claves
          `membreteCaja` que queden de la fila 81 se ignoran. */
@@ -401,7 +408,7 @@ var Plantillas = (function () {
   var API = {
     ARCHIVO: ARCHIVO, HUECOS: HUECOS,
     POR_DEFECTO_FIRMA: POR_DEFECTO_FIRMA, POR_DEFECTO_CENTRO: POR_DEFECTO_CENTRO,
-    POR_DEFECTO_NORMATIVA: POR_DEFECTO_NORMATIVA, POR_DEFECTO_CONSEJERIA: POR_DEFECTO_CONSEJERIA,
+    POR_DEFECTO_NORMATIVA: POR_DEFECTO_NORMATIVA, direccionDeNormativa: direccionDeNormativa, POR_DEFECTO_CONSEJERIA: POR_DEFECTO_CONSEJERIA,
     cargar: cargar, cargarReciente: cargarReciente, olvidar: olvidar, guardar: guardar,
     documentoPorId: documentoPorId, enMemoria: function () { return cache; },
     deTipo: deTipo, idNuevo: idNuevo, rellenar: rellenar, tieneLoQueFalta: tieneLoQueFalta,

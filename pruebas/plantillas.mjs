@@ -225,6 +225,18 @@ await comprobar('lo copiado no pasa de 4.000 letras',
   pagina.evaluate(() => navigator.clipboard.readText()).then(t => t.length),
   4000);
 
+/* Fila 232 (docs/ENLACE-A-NORMATIVA-CORRECTO.md): la dirección del sistema de normativa. */
+await comprobar('la dirección de normativa por defecto es la de fmargon.com',
+  pagina.evaluate(() => Plantillas.POR_DEFECTO_NORMATIVA), 'https://normativa.fmargon.com');
+await comprobar('la dirección vieja de vercel.app guardada se sustituye; una propia, o vacía, se respeta',
+  pagina.evaluate(() => [Plantillas.direccionDeNormativa('https://normativa-escolarizacion.vercel.app'),
+    Plantillas.direccionDeNormativa('https://normativa-escolarizacion.vercel.app/'),
+    Plantillas.direccionDeNormativa('https://otra.example.es'), Plantillas.direccionDeNormativa('')]),
+  ['https://normativa.fmargon.com', 'https://normativa.fmargon.com', 'https://otra.example.es', '']);
+await comprobar('un plantillas.json con la dirección vieja se lee ya con la buena',
+  pagina.evaluate(() => Plantillas._interno.limpio({ direccionNormativa: 'https://normativa-escolarizacion.vercel.app' }).direccionNormativa),
+  'https://normativa.fmargon.com');
+
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 await navegador.close();

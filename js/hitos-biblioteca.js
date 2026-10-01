@@ -66,8 +66,26 @@ var HitosBiblioteca = (function () {
       var base = direccionBase.replace(/\/$/, '').replace(/\/norma$/, '');
       return base + '/norma#r=' + encodeURIComponent(ref.clave);
     }
-    if (!ref.clave && ref.url) return ref.url;
+    if (!ref.clave && ref.url) return enlaceDeUrlDeNormativa(ref.url, direccionBase) || (esDeNormativa(ref.url) ? '' : ref.url);
     return '';
+  }
+
+  /* Fila 232 (docs/ENLACE-A-NORMATIVA-CORRECTO.md): una `url` guardada que es
+     del propio sistema de normativa (`vercel.app` o `normativa.fmargon.com`).
+     PURA. */
+  var RE_NORMATIVA = /^https?:\/\/(?:normativa-escolarizacion\.vercel\.app|normativa\.fmargon\.com)(?:[\/?#]|$)/i;
+  function esDeNormativa(url) { return RE_NORMATIVA.test(String(url || '').trim()); }
+
+  /* Si la url es del sistema de normativa: `<base>/norma#r=<clave>` cuando se
+     saca la clave del `#r=`; sin clave (solo la base) o hacia `/oposicion`, ''.
+     Si no es de ese sitio, '' (el llamante usa la url tal cual). */
+  function enlaceDeUrlDeNormativa(url, direccionBase) {
+    url = String(url || '').trim();
+    if (!esDeNormativa(url)) return '';
+    var m = url.match(/#r=([^&#]+)/);
+    if (!m || /^https?:\/\/[^\/]+\/oposicion/i.test(url)) return '';
+    var base = String(direccionBase || 'https://normativa.fmargon.com').replace(/\/$/, '').replace(/\/norma$/, '');
+    return base + '/norma#r=' + m[1];
   }
 
   /* ==========================================================
@@ -383,7 +401,7 @@ var HitosBiblioteca = (function () {
 
   return {
     FICHERO: FICHERO, BLOQUES_NORMATIVA: BLOQUES_NORMATIVA, nombreDeBloque: nombreDeBloque,
-    enlaceDeNormativa: enlaceDeNormativa,
+    enlaceDeNormativa: enlaceDeNormativa, esDeNormativa: esDeNormativa,
     leer: leer, cambiar: cambiar, buscar: buscar,
     esPasoValido: esPasoValido, modeloAPaso: modeloAPaso,
     diferencias: diferencias,

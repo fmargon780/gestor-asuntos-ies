@@ -234,11 +234,13 @@ hito de un asunto. Es una lista; cada entrada tiene cuatro datos, todos texto:
 - **`bloque`** y **`clave`** apuntan al sistema de normativa del centro
   (`fmargon780/normativa-escolarizacion`). El enlace se monta así:
 
-        <dirección base> + "/" + bloque + "#r=" + clave
+        <dirección base> + "/norma#r=" + clave        (desde la fila 87; el bloque ya no entra)
 
-  Ejemplo: `https://normativa-escolarizacion.vercel.app/convivencia#r=ROC-40.1`
+  Ejemplo: `https://normativa.fmargon.com/norma#r=ROC-40.1`
 - **`url`** es para las normas que **no** están en ese sistema: un enlace directo al texto oficial
-  del BOJA o del BOE. Solo se usa si no hay `bloque` y `clave`.
+  del BOJA o del BOE. Solo se usa si no hay `bloque` y `clave`. Si la `url` guardada es del propio
+  sistema de normativa (fila 232), se convierte a `<base>/norma#r=<clave>` (la clave, del `#r=`); si es
+  solo la base, o `/oposicion`, no hay enlace.
 - Si una entrada no tiene ni claves ni `url`, la cita se ve como texto, sin enlace. No es un
   error.
 
@@ -255,7 +257,7 @@ espacio, conviértelo a guion al guardar, sin avisar.
 **Dónde se pone la dirección base.** En Ajustes → El centro, junto a los demás Datos del centro
 (donde ya vive la firma del director, `PlantillasAjustes.pintarFirmaYCentro`), un campo nuevo:
 **"Dirección del sistema de normativa"**. Valor de partida:
-`https://normativa-escolarizacion.vercel.app`, sin barra final. Si el campo está vacío, las citas
+`https://normativa.fmargon.com` (fila 232: la red del IES bloquea `vercel.app`; la dirección vieja guardada se sustituye al leer), sin barra final. Si el campo está vacío, las citas
 se ven sin enlace y no se rompe nada.
 
 **Aviso, para que no sorprenda:** hoy el sistema de normativa todavía **no** abre el artículo con

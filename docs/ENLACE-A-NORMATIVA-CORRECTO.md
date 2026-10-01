@@ -21,3 +21,14 @@ redirige a `/norma#r=<clave>`. La oposición vive aparte, en `/oposicion`, con c
 gestor nunca debe enlazar ahí.
 
 Comprobación: en un hito, la cita con clave `ROC-40` abre `https://normativa.fmargon.com/norma#r=ROC-40`.
+
+## Cómo sabemos que está bien
+
+1. En un hito, la cita con clave `ROC-40` abre `https://normativa.fmargon.com/norma#r=ROC-40`.
+2. En Ajustes → El centro, el campo «Dirección del sistema de normativa» enseña
+   `https://normativa.fmargon.com` (placeholder y valor de partida), y una dirección vieja de
+   `vercel.app` guardada antes aparece ya sustituida.
+3. Una cita que solo trae una `url` vieja de `vercel.app` con `#r=<clave>` abre
+   `https://normativa.fmargon.com/norma#r=<clave>`; una que es solo la base, o `/oposicion`, se ve
+   como texto, sin enlace.
+4. Una cita con una `url` de otro sitio (BOE, BOJA) se abre tal cual.
