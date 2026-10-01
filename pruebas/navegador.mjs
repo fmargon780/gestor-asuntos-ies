@@ -4,6 +4,8 @@ import { chromium } from 'playwright';
 
 const preparacion = `
 (function () {
+  /* Fila 248: la ventana «Qué hay de nuevo» no tapa las pruebas (la suya, pruebas/novedades.mjs, pone __pruebaNovedades). */
+  try { if (!window.__pruebaNovedades && localStorage.getItem('gestor.novedadesVistas') === null) localStorage.setItem('gestor.novedadesVistas', 'todo'); } catch (e) { /* sin almacenamiento */ }
   /* ---- almacén de mentira, en memoria ---- */
   const guardado = new Map();
   Object.defineProperty(window, 'indexedDB', { configurable: true, value: {

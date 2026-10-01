@@ -33,6 +33,7 @@ function isoHaceDias(n) {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
+await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); } catch (e) { /* sin almacenamiento */ }");   /* fila 248: la ventana «Qué hay de nuevo» no tapa la prueba */
 await pagina.goto(DIRECCION);
 await pagina.waitForSelector('#aplicacion:not(.oculto)', { timeout: 20000 });
 await pagina.waitForSelector('#inicio-tabla-cuerpo tr[data-asunto]', { timeout: 20000 });
