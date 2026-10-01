@@ -4,7 +4,7 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 `CLAUDE.md`). Minutos por fila entera: programar, pruebas, publicar y comprobar. La página
 «Estado de la cola» de Francisco lee esta tabla desde `main`.
 
-Última puesta al día: 01-oct-2026 (fila 217 HECHA)
+Última puesta al día: 01-oct-2026 (fila 232 HECHA)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por `pruebas` y el
 revisor: los minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
