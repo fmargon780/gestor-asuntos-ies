@@ -207,7 +207,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 233 | `docs/SELLO-DOCUMENTO-NUEVO.md` (aviso de un papel con sello: tercer botón «Es un documento nuevo», que abre el cuadro de poner nombre con el registro y su fecha leídos del sello, tipo propuesto, asociado al hito en curso, nombre de la fila 239 con el registro en la ficha, y la tarea de registro/descarga del hito marcada sola) | PENDIENTE (1-oct-2026) |
 | 247 | `docs/NOMBRES-DE-PILA-LARGOS.md` (aviso de usuario: en carpetas y ficheros, el nombre de una persona de más de 40 caracteres deja el primer nombre de pila entero y los demás en inicial; alumnado, personal y tutores; el nombre completo sigue en fichas y documentos; quien ya tiene carpeta con el nombre largo sigue usando esa carpeta) | PENDIENTE (1-oct-2026) |
 | 234 | `docs/RESPONSABLE-SECRETARIA-CON-VB.md` (aviso de usuario: responsable fijo nuevo «Secretaría con V.º B.º de Dirección» en todos los desplegables de responsable de un hito; «Esperando a…» con ese nombre; en los filtros cuenta para Secretaría y para Dirección) | PENDIENTE (1-oct-2026) |
-| 248 | Aviso de usuario: mejora en «Inicio» | IDEA (1-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1B2dse7PTlLdgdkbKja86eVterWdozhpQ/view?usp=drivesdk |
+| 248 | `docs/NOVEDADES-AL-RECARGAR.md` (aviso de usuario: al entrar con una versión nueva sale «Qué hay de nuevo», una línea por cambio visible desde la última vez en ese ordenador, con «Entendido»; se vuelve a ver pulsando la versión de la barra lateral; regla 21 nueva para que cada fila deje su línea) | PENDIENTE (1-oct-2026) |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
