@@ -263,6 +263,10 @@ $('btn-entrar').onclick = async function () {
     await App.verAbiertos();
     App.irVista(App.E.vista);
     App.vigilarLaCarpeta();
+    if (window.NovedadesVentana) {   /* fila 248 */
+      NovedadesVentana.hacerPulsable();
+      NovedadesVentana.alEntrar();
+    }
   } catch (e) {
     U.aviso('No he podido entrar: ' + U.mensajeDeError(e), 'malo');
   }

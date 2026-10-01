@@ -213,6 +213,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   últimos errores) a un script de Google (`apps-script/soporte.gs`) cuya dirección se pone en Ajustes →
   El centro (`ajustesAvisos.urlSoporte`). Guarda el aviso en Drive y apunta una IDEA sin datos del
   usuario en la cola. Texto sin límite de tamaño, cuadro grande que crece al escribir, con guion gris y contador de palabras (fila 240). Pendiente de Francisco: `docs/PONER-EN-MARCHA-SOPORTE.md` (y volver a pegar `soporte.gs` tras la fila 240).
+- «Qué hay de nuevo» (fila 248): `js/novedades.js` (lista `window.NOVEDADES`, lo más nuevo primero) y `js/novedades-ventana.js`; al entrar sale lo que este ordenador no ha visto (`localStorage` `gestor.novedadesVistas`), y el número de versión de la barra lateral la vuelve a abrir.
 
 ## 6. Reglas de código que no se pueden olvidar
 
@@ -243,6 +244,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   elemento con `App.anotarLista`, nunca se sustituyen enteras; un asunto cerrado (archivado, a la
   papelera, unido o renombrado) lleva una lápida en `borrados-listas.json` y no se puede resucitar
   sin revivirla antes (fila 176).
+- Novedades visibles (fila 248): al terminar una fila que cambia algo que se ve en pantalla, añade su línea al principio de `js/novedades.js` en el mismo commit del código; si no cambia nada visible, no se añade.
 
 ## 7. Descartado, no proponer otra vez
 

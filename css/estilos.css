@@ -561,3 +561,11 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 .cuentas-aviso-ambar strong { color: var(--rojo-linea); }
 .cuentas-antiguos .cuentas-antiguo { cursor: pointer; }
 .cuentas-antiguos .cuentas-antiguo:hover td { background: var(--azul-claro); }
+
+/* Fila 248: «Qué hay de nuevo» y el número de versión pulsable. */
+.version-pulsable { cursor: pointer; text-decoration: underline dotted; }
+.version-pulsable:hover { color: #fff; }
+.novedades-lista { margin: 0 0 8px; padding-left: 18px; }
+.novedades-lista li { margin: 4px 0; }
+.novedad-fecha { font-weight: 600; margin-right: 4px; }
+#novedades-mas { background: none; border: 0; padding: 0; color: inherit; text-decoration: underline; cursor: pointer; font: inherit; }

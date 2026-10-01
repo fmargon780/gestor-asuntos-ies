@@ -143,6 +143,11 @@ Francisco lanza siempre la misma línea; Claude Code hace lo que esté pendiente
     40 KB (`wc -c`) lo reduce en esa misma subida**, con estos mismos criterios; es una subida solo
     de `docs/`, va directa a `main` (no publica nada).
 
+21. **Novedades visibles** (fila 248, `docs/NOVEDADES-AL-RECARGAR.md`). Al terminar una fila que
+    cambia algo que se ve en pantalla, añade su línea al principio de `js/novedades.js` en el mismo
+    commit del código (no aparte: cada subida de código es una publicación). Si la fila no cambia
+    nada visible, no se añade.
+
 ## Reglas para Francisco
 
 - **Una sola conversación de Claude Code a la vez.** Mientras está trabajando, no se lanza otra.

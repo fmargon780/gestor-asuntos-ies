@@ -5,6 +5,12 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 1-oct-2026 — Fila 248: «Qué hay de nuevo» al cargar una versión nueva
+
+Ventana al entrar con las novedades que ese ordenador no ha visto (`js/novedades.js` + `js/novedades-ventana.js`), y el número de versión de la barra lateral la vuelve a abrir. Regla 21 de la cola: cada fila con cambio visible añade su línea.
+
+---
+
 ## 1-oct-2026 — Fila 234: responsable «Secretaría con V.º B.º de Dirección»
 
 Responsable fijo nuevo en todos los desplegables de responsable; va a «En espera» y cuenta al filtrar por Secretaría y por Dirección. Detalle en `docs/contexto/ESTADO-DEL-ASUNTO.md`.

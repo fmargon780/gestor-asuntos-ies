@@ -145,6 +145,8 @@ de `App` va después del fichero que lo define.
 | `js/ficha-sellos.js` | Un papel que ya trae el sello del registro, avisado arriba de la ficha (fila 133, sacado de `js/ficha-asunto.js`) |
 | `js/ficha-menus.js` | El menú pequeño reutilizable de la cabecera (abrir, cerrar con Escape/al pulsar fuera, uno solo a la vez): lo usan los tres puntos del nombre y "Comunicar" (18-sep-2026, fila 52) |
 | `js/ficha-nombre-acciones.js` | El menú de tres puntos del `<h2>` del nombre del asunto (Editar, Borrar, fila 52) y, debajo, la fila de copiar de un gesto (Asunto, Ruta, NIE, Nombre, DNI/CIF, filas 58 y 98) |
+| `js/novedades.js` | Fila 248: la lista `window.NOVEDADES` de «Qué hay de nuevo», solo datos. |
+| `js/novedades-ventana.js` | `NovedadesVentana` (fila 248): la ventana al entrar, y el número de versión pulsable. |
 | `js/hitos-administracion.js` | `HitosAdministracion` (fila 159): el responsable fijo «Administración», qué es una persona, lo que ofrece la guía, la pasada única de guías y biblioteca (`responsable-migrado.json`) y el filtro de «Qué me toca» |
 | `js/hito-mesa-recetas.js` | `HitoMesaRecetas` (fila 164): los pasos pendientes con receta (comunicar, generar), arriba de los menús de la cabecera del hito; al elegir uno, el cuadro relleno y se marca ese paso |
 | `js/copiar-ruta.js` | `RutaCarpetas` (filas 98, 152 y 161): el botón «Ruta» (ficha y cuadros de Correo/Séneca) y el bloque «Rutas de las carpetas» de Ajustes → El centro; lo de dentro de Dropbox en `_GESTOR/rutas.json`, lo de este ordenador deducido o en `localStorage` |
@@ -339,6 +341,7 @@ de `App` va después del fichero que lo define.
 | `pruebas/versiones-previas.mjs` | Prueba (fila 160): registrar deja el «SIN SELLAR» en «Versiones previas», el Word con PDF va y sin PDF no, la ficha las pliega y no las cuenta, el índice no las ve, y ordenar dos veces no cambia nada la segunda |
 | `pruebas/responsable-administracion.mjs` | Prueba (fila 159): «Administración» fija, la guía sin las personas, la pasada única (guía y biblioteca sí, hitos no), los dos hitos de firma sin duplicar y el filtro de «Qué me toca» |
 | `pruebas/responsable-secretaria-con-vb.mjs` | Prueba (fila 234): el responsable fijo «Secretaría con V.º B.º de Dirección», lo que ofrece la guía y el filtro. |
+| `pruebas/novedades.mjs` | Prueba (fila 248): la ventana «Qué hay de nuevo». |
 | `pruebas/word-dentro-de-la-app.mjs` | Prueba (fila 155): el cuadro de lo que falta antes de guardar (y «Cancelar» sin nada), el Word dentro de la aplicación, «Guardar PDF» en la carpeta, un .docx de la ficha sin `window.open` y otro fichero bajado con su nombre |
 | `pruebas/estado-sigue-a-los-hitos.mjs` | Prueba (fila 162): el caso de Francisco (paso 3 de Secretaría, paso 4 en curso nuestro): «Paso 3 de 5» con espera automática a Secretaría, la espera a mano que se quita al cambiar de paso, «Paso actual» y «Saltar a este paso», y la cabecera al día sola |
 | `pruebas/hitos-recetas.mjs` | Prueba (navegador de verdad, fila 164): la receta de comunicar (cuadro con su vía y plantilla, marca ese paso), las de generar y registrar en sus menús, el editor de la receta y los documentos de otros hitos en la mesa |
