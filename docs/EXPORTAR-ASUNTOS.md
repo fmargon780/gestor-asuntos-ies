@@ -73,7 +73,10 @@ Una sola ventana (`U.preguntar` o el cuadro que use la app; un solo cuadro a la 
 - Pestaña «Hitos»: **siempre**, una fila por cada hito de cada asunto exportado: número de asunto,
   tercero, tipo, nº y título del hito, estado, responsable, plazo, fecha en que se terminó.
 - Al final de la pestaña «Asuntos»: una línea con el número de asuntos y, debajo de cada columna
-  de cantidades (campos numéricos o de importe), su suma.
+  de cantidades, su suma. **Una columna es de cantidades por su contenido, nunca por su nombre**
+  (el campo puede llamarse «Importe», «Importe cobrado» o como sea): lo es si el campo es de tipo
+  número o, si los campos no tienen tipo, si todos sus valores no vacíos se leen como número
+  («12», «12,50», «12,50 €», «1.234,00»).
 - Si no hay librería para escribir `.xlsx`, se añade una pequeña dentro de `lib/` (sin depender
   de internet al usarla: la copia sin internet tiene que seguir funcionando).
 
