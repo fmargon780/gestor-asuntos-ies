@@ -4232,3 +4232,11 @@ una vez con la guardada (mismo `idEnvio`). La general que funciona pasa a ser la
 falla se recuerda en `localStorage`. Si fallan las dos, aviso en castellano con el dominio de la dirección
 en vez de «Failed to fetch». Pruebas en `pruebas/correo-enviar.mjs` (sección 7). El envío real con una cuenta
 personal abierta, solo Francisco (`docs/COMPROBAR-A-MANO.md`).
+
+## 1-oct-2026 · fila 232 · Enlaces a la normativa: siempre el artículo
+
+`POR_DEFECTO_NORMATIVA` (`js/plantillas.js`) pasa a `https://normativa.fmargon.com` (también el placeholder
+de `index.html`); `Plantillas.direccionDeNormativa` sustituye la dirección vieja de `vercel.app` guardada al
+leer `plantillas.json`. `HitosBiblioteca.enlaceDeNormativa` convierte una `url` del propio sistema de
+normativa a `<base>/norma#r=<clave>` (sin clave o `/oposicion`, sin enlace). Pruebas en
+`pruebas/biblioteca-de-hitos.mjs` y `pruebas/plantillas.mjs`.

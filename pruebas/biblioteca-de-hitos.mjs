@@ -224,6 +224,19 @@ comprobar('sin clave y sin url, no hay enlace',
 comprobar('con clave pero con la dirección base vacía, tampoco hay enlace',
   HitosBiblioteca.enlaceDeNormativa({ cita: 'x', bloque: '', clave: 'ROC-40', url: '' }, ''), '');
 
+/* Fila 232 (docs/ENLACE-A-NORMATIVA-CORRECTO.md): una url guardada del propio
+   sistema de normativa se convierte; solo la base, no hay enlace; /oposicion, nunca. */
+comprobar('una url vieja de vercel.app con #r= se convierte a /norma#r=',
+  HitosBiblioteca.enlaceDeNormativa({ cita: 'x', bloque: '', clave: '', url: 'https://normativa-escolarizacion.vercel.app/convivencia#r=ROC-40.1' }, BASE),
+  'https://normativa.fmargon.com/norma#r=ROC-40.1');
+comprobar('una url de normativa.fmargon.com con #r= se monta con la base de Ajustes',
+  HitosBiblioteca.enlaceDeNormativa({ cita: 'x', bloque: '', clave: '', url: 'https://normativa.fmargon.com/convivencia#r=ROC-40' }, BASE + '/norma'),
+  'https://normativa.fmargon.com/norma#r=ROC-40');
+comprobar('una url que es solo la base del sistema de normativa: sin enlace',
+  HitosBiblioteca.enlaceDeNormativa({ cita: 'x', bloque: '', clave: '', url: 'https://normativa-escolarizacion.vercel.app' }, BASE), '');
+comprobar('una url de /oposicion nunca se enlaza',
+  HitosBiblioteca.enlaceDeNormativa({ cita: 'x', bloque: '', clave: '', url: 'https://normativa.fmargon.com/oposicion#r=T1' }, BASE), '');
+
 /* ================= 9 · un espacio en la clave se guarda como guion ================= */
 console.log('--- 9. un espacio en la clave se guarda como guion ---');
 const normativaConEspacio = Guias.normalizarNormativa([{ cita: 'ROC, art. 40', bloque: 'convivencia', clave: 'ROC 40.1', url: '' }]);
