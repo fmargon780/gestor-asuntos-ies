@@ -11,6 +11,5 @@ revisor: los minutos de abajo cuentan la fila entera, revisor incluido (uno o do
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 247 | 50 | `docs/NOMBRES-DE-PILA-LARGOS.md`: acortar nombres de pila de más de 40 caracteres en `js/nombres.js` (alumnado, personal, tutores), reutilizar la carpeta de tercero ya existente con el nombre largo, medidor de rutas, persona de demostración y prueba nueva `pruebas/nombres-de-pila-largos.mjs` |
 | 234 | 45 | `docs/RESPONSABLE-SECRETARIA-CON-VB.md`: responsable fijo nuevo en `js/hitos-administracion.js` (`asegurar`, `cuentaPara`), fila fija en `js/hitos-ajustes.js`, «Esperando a…» y filtro de Inicio, asunto de demostración y prueba nueva `pruebas/responsable-secretaria-con-vb.mjs` |
 | 248 | 60 | `docs/NOVEDADES-AL-RECARGAR.md`: `js/novedades.js` (datos, con el relleno de las filas desde el 29-sep-2026) y `js/novedades-ventana.js` (ventana tras entrar, lo visto en `localStorage`, versión pulsable), carga en `index.html` y en la copia sin internet, regla 21 en la cola y prueba nueva `pruebas/novedades.mjs` |
