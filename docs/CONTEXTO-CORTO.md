@@ -154,6 +154,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   crearlos: dentro de cada tipo, "+ Añadir campo".
 - Campos propios y calculados por tipo de asunto, rellenos solos al crear, con vista previa; también
   desde la ficha (fila 245): «+ Añadir campo» con «En el tipo» o «Solo en este asunto» (`ficha.camposPropiosDelAsunto`).
+  Un campo propio tiene clase: Texto libre, Lista cerrada, Importe en euros, Número o Fecha (fila 244, `js/campos-clases.js`): se guarda como número/ISO y se ve `1.234,50 €`, `1.234,5`, `01/10/2026`; al cambiar de clase los valores se convierten y lo que no se entiende queda en ámbar.
   Campos propios por tipo de DOCUMENTO, que entran solos en su nombre.
 - Papelera: se vacía sola a los 90 días (avisa 7 antes, deja constancia en `papelera-borrados.json`; fila 203), con buscador por palabras. Plazo de conservación por tipo: avisa, nunca borra solo.
 - Word: lo que falta se pregunta antes; se ve en la app, con «Guardar PDF» (cierra el visor al terminar) e

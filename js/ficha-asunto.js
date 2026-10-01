@@ -160,12 +160,12 @@
       if (f.soloAqui) {
         return '<div class="ficha-dato ficha-dato-aqui"><span>' + U.escapar(f.titulo) +
           ' <span class="marca-solo-aqui">solo aquí</span></span><span>' +
-          (f.valor ? U.escapar(f.valor) : '<span class="suave">sin valor</span>') +
+          (f.valor ? (f.ambar ? '<span class="ficha-valor-ambar" title="' + U.escapar(f.ayuda || '') + '">' + U.escapar(f.valor) + '</span>' : U.escapar(f.valor)) : '<span class="suave">sin valor</span>') +
           ' <button type="button" class="campo-aqui-menu" data-clave="' + U.escapar(f.clave || '') +
           '" data-nombre="' + U.escapar(f.titulo) + '" title="Más opciones">⋮</button></span></div>';
       }
-      return '<div class="ficha-dato"><span>' + U.escapar(f.titulo) + '</span>' +
-             '<span>' + U.escapar(f.valor) + '</span></div>';
+      return '<div class="ficha-dato' + (f.ambar ? ' ficha-dato-ambar' : '') + '"><span>' + U.escapar(f.titulo) + '</span>' +
+             '<span' + (f.ambar ? ' title="' + U.escapar(f.ayuda || '') + '"' : '') + '>' + U.escapar(f.valor) + '</span></div>';
     }).join('') + (extra || '') + '</div>';
   }
 

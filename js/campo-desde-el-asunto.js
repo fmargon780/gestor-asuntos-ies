@@ -105,16 +105,13 @@ window.CampoDesdeElAsunto = (function () {
   /* ---------- 2 y 3. el valor y «¿Dónde se guarda?» ---------- */
 
   /* { valor, donde: 'tipo' | 'aqui' } o null (Escape o Cancelar). */
-  async function pedirValorYDonde(a, tipo, cfg, categoria) {
+  async function pedirValorYDonde(a, tipo, cfg, categoria, previo) {
     var nombre = Campos.nombreDeCampo(cfg, App.E.campos);
     var propio = cfg.origen === 'propio' ? Campos.propioDe(cfg.id, App.E.campos) : null;
-    var inicial = await valorDePartida(a, cfg, categoria);
-    var control = (propio && propio.clase === 'lista')
-      ? '<select id="cad-valor" class="campo"><option value="">Sin elegir</option>' +
-        (propio.valores || []).map(function (v) {
-          return '<option value="' + U.escapar(v) + '"' + (v === inicial ? ' selected' : '') + '>' + U.escapar(v) + '</option>';
-        }).join('') + '</select>'
-      : '<input id="cad-valor" class="campo" autocomplete="off" value="' + U.escapar(inicial) + '">';
+    var inicial = previo !== undefined ? previo : await valorDePartida(a, cfg, categoria);
+    /* Fila 244: el control según la clase (lista, fecha, importe, número o texto). */
+    var clase = (propio && propio.clase) || 'texto';
+    var control = CamposClases.htmlControl('cad-valor', clase, propio && propio.valores, inicial);
     var tipoCorto = tipo ? DondeSeGuarda.nombreCortoDe(tipo) : '';
     var bloque = tipo ? DondeSeGuarda.bloqueHTML({
       tipoCorto: tipoCorto, opcionTipo: 'En el tipo ' + tipoCorto, vacio: true,
@@ -126,10 +123,18 @@ window.CampoDesdeElAsunto = (function () {
     if (tipo) DondeSeGuarda.enganchar();
     var campo = $('cad-valor');
     DondeSeGuarda.introAcepta(campo);
+    CamposClases.engancharControl(campo, clase);
     if (campo) campo.focus();
     var ok = await espera;
     if (!ok) return null;
-    return { valor: (campo.value || '').trim(), donde: tipo && DondeSeGuarda.elegido() === 'guia' ? 'tipo' : 'aqui' };
+    var leido = CamposClases.leerControl(campo, clase);
+    var donde = tipo && DondeSeGuarda.elegido() === 'guia' ? 'tipo' : 'aqui';
+    if (!leido.ok) {
+      /* Un importe, número o fecha que no se entiende no se guarda: se vuelve a pedir, con lo escrito. */
+      U.aviso('Revisa «' + nombre + '»: ' + CamposClases.avisoDeAmbar(clase) + '.', 'ambar');
+      return pedirValorYDonde(a, tipo, cfg, categoria, leido.texto);
+    }
+    return { valor: leido.valor, donde: donde };
   }
 
   /* ---------- lo que se escribe ---------- */

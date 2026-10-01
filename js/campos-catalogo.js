@@ -148,7 +148,7 @@ var CamposCatalogo = (function () {
         var f = document.createElement('div');
         f.className = 'fila-tipo';
         f.innerHTML = '<span class="nombre-tipo">' + U.escapar(p.nombre) + '</span>' +
-          '<span class="suave">' + (p.clase === 'lista' ? 'lista: ' + p.valores.join(', ') : 'texto libre') + '</span>';
+          '<span class="suave">' + (p.clase === 'lista' ? 'lista: ' + p.valores.join(', ') : (window.CamposClases ? CamposClases.nombreDe(p.clase).toLowerCase() : 'texto libre')) + '</span>';
 
         var anadir = document.createElement('button');
         anadir.type = 'button'; anadir.className = 'boton'; anadir.textContent = 'Añadir';
@@ -188,8 +188,10 @@ var CamposCatalogo = (function () {
       '<input id="propio-nombre" class="campo" autocomplete="off" value="' + (existente ? U.escapar(existente.nombre) : '') + '">' +
       '<label class="etiqueta">Clase</label>' +
       '<select id="propio-clase" class="campo">' +
-      '<option value="texto"' + (existente && existente.clase !== 'lista' ? ' selected' : '') + '>Texto libre</option>' +
-      '<option value="lista"' + (existente && existente.clase === 'lista' ? ' selected' : '') + '>Lista cerrada</option></select>' +
+      /* Fila 244: Texto libre · Lista cerrada · Importe en euros · Número · Fecha. */
+      CamposClases.CLASES.map(function (c) {
+        return '<option value="' + c.id + '"' + ((existente ? existente.clase : 'texto') === c.id ? ' selected' : '') + '>' + c.nombre + '</option>';
+      }).join('') + '</select>' +
       '<div id="propio-valores-caja"' + (existente && existente.clase === 'lista' ? '' : ' class="oculto"') + '>' +
       '<label class="etiqueta">Valores, uno por línea</label>' +
       '<textarea id="propio-valores" class="campo" rows="3">' +
@@ -229,12 +231,17 @@ var CamposCatalogo = (function () {
       U.mientrasGuarda($(d, 'propio-crear'), async function () {
         var nombre = $(d, 'propio-nombre').value.trim();
         if (!nombre) return;
-        var clase = $(d, 'propio-clase').value === 'lista' ? 'lista' : 'texto';
+        var clase = CamposClases.esValida($(d, 'propio-clase').value) ? $(d, 'propio-clase').value : 'texto';
         var valores = clase === 'lista'
           ? $(d, 'propio-valores').value.split('\n').map(function (v) { return v.trim(); }).filter(Boolean)
           : [];
         try {
           if (existente) {
+            /* Fila 244: cambiar la clase de un campo ya creado convierte sus valores. */
+            if ((existente.clase || 'texto') !== clase) {
+              var seguir = await cambiarClase(existente, clase, valores);
+              if (!seguir) return;
+            }
             App.E.campos = await Campos.guardarPropios(App.E.gestor, function (propios) {
               var p = propios.filter(function (x) { return x.id === existente.id; })[0];
               if (p) { p.nombre = nombre; p.clase = clase; p.valores = valores; }
@@ -254,6 +261,44 @@ var CamposCatalogo = (function () {
     };
     avisoPropio();
     $(d, 'propio-nombre').focus();
+  }
+
+  /* ---------- cambiar la clase de un campo ya creado (fila 244) ----------
+
+     Recorre los asuntos abiertos que tengan ese campo y pasa cada valor a la
+     clase nueva (`CamposClases.convertir`): lo que se entiende se guarda ya en
+     la clase nueva; lo que no, se deja tal cual (saldrá en ámbar en la ficha).
+     El ARCHIVO no se toca: lo guardado allí se lee igual por la clase al
+     enseñarlo. Una sola pregunta antes. Devuelve false si se cancela. */
+  async function cambiarClase(p, claseNueva, valores) {
+    var clave = 'propio:' + p.id;
+    var asuntos = (App.E.registro && App.E.registro.asuntos) || {};
+    var pasan = 0, noEntiendo = 0;
+    Object.keys(asuntos).forEach(function (nombre) {
+      var g = asuntos[nombre] && asuntos[nombre].campos && !Array.isArray(asuntos[nombre].campos) && asuntos[nombre].campos[clave];
+      if (!g || !String(g.valor || '').trim()) return;
+      if (CamposClases.convertir(claseNueva, g.valor, valores).entendido) pasan++; else noEntiendo++;
+    });
+    if (pasan + noEntiendo) {
+      var texto = 'Vas a cambiar «' + p.nombre + '» a ' + CamposClases.nombreDe(claseNueva) + '. ' +
+        pasan + (pasan === 1 ? ' valor se pasará solo' : ' valores se pasarán solos') +
+        (noEntiendo ? '; ' + noEntiendo + (noEntiendo === 1 ? ' no se entiende y quedará' : ' no se entienden y quedarán') + ' en ámbar para ' + (noEntiendo === 1 ? 'corregirlo' : 'corregirlos') + ' a mano' : '') +
+        '. ¿Seguimos?';
+      var ok = await U.preguntar('Cambiar la clase del campo', '<p>' + U.escapar(texto) + '</p>', 'Seguir');
+      if (!ok) return false;
+    }
+    if (pasan) {
+      await App.guardarRegistroFresco(async function (registro) {
+        Object.keys(registro.asuntos || {}).forEach(function (nombre) {
+          var f = registro.asuntos[nombre];
+          var g = f && f.campos && !Array.isArray(f.campos) && f.campos[clave];
+          if (!g || !String(g.valor || '').trim()) return;
+          var c = CamposClases.convertir(claseNueva, g.valor, valores);
+          if (c.entendido) g.valor = c.valor;
+        });
+      });
+    }
+    return true;
   }
 
   async function borrarPropio(p, tipo, lista, opciones, cuerpo) {

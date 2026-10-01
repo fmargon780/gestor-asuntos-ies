@@ -27,6 +27,7 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | El bloque de asuntos cuyo hito actual espera a otro responsable | **En espera** | Esperamos a otros |
 | Una tarea que existe solo en este asunto, no en la guía | **solo aquí** | propia, propio del asunto |
 | Escribir una nota desde una tarea del hito | **Anotar** | apuntar, comentar |
+| La clase de un campo propio con cifras en euros / con cifras / con día | **Importe en euros**, **Número**, **Fecha** (junto a «Texto libre» y «Lista cerrada») | cantidad, moneda, numérico |
 | El código único de un asunto (`A26-0137`) o de un documento (`D26-01234`) | **número del asunto**, **número del documento** | código, referencia, expediente |
 
 La diferencia entre plantilla e impreso: si la app lo rellena y lo genera, es plantilla; si se

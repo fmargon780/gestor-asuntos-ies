@@ -82,9 +82,9 @@ App.valoresGuardadosParaNombre = function (tipo, camposGuardados) {
   var config = (App.E.campos && App.E.campos.porTipo && App.E.campos.porTipo[tipo]) || [];
   var guardados = camposGuardados || {};
   return config
-    .map(function (cfg) { return guardados[Campos.claveDeCampo(cfg)]; })
-    .filter(function (g) { return g && g.enNombre && g.valor; })
-    .map(function (g) { return g.valor; });
+    .map(function (cfg) { var g = guardados[Campos.claveDeCampo(cfg)]; return g && { g: g, clase: Campos.claseDeCampo(cfg, App.E.campos) }; })
+    .filter(function (x) { return x && x.g.enNombre && x.g.valor; })
+    .map(function (x) { return Campos.mostrarValor(x.clase, x.g.valor); });   /* fila 244: lo que se ve */
 };
 
 /* Los campos del cuadro de editar: los mismos que tiene puestos el
@@ -112,18 +112,14 @@ App.pintarCamposEditar = function (tipo, guardados, ficha) {
       if (p) cfgParaPintar = Object.assign({}, cfg, { clase: p.clase, valores: p.valores });
     }
     return { cfg: cfgParaPintar, clave: clave, nombre: Campos.nombreDeCampo(cfg, App.E.campos),
-             valor: g.valor || '', enNombre: cfg.soloAqui ? false : (g.enNombre !== undefined ? g.enNombre !== false : cfg.enNombre !== false), soloAqui: !!cfg.soloAqui };
+             valor: g.valor || '', enNombre: cfg.soloAqui ? false : (g.enNombre !== undefined ? g.enNombre !== false : cfg.enNombre !== false), soloAqui: !!cfg.soloAqui,
+             clase: (cfg.origen === 'propio' && cfgParaPintar.clase) ? cfgParaPintar.clase : 'texto' };
   });
 
   var filas = items.map(function (it, i) {
     var idBase = 'ed-campo-' + i;
-    var control = (it.cfg.origen === 'propio' && it.cfg.clase === 'lista')
-      ? '<select id="' + idBase + '" class="campo"><option value="">Sin elegir</option>' +
-        (it.cfg.valores || []).map(function (v) {
-          return '<option value="' + U.escapar(v) + '"' + (v === it.valor ? ' selected' : '') + '>' +
-                 U.escapar(v) + '</option>';
-        }).join('') + '</select>'
-      : '<input id="' + idBase + '" class="campo" value="' + U.escapar(it.valor) + '">';
+    /* Fila 244: el control según la clase (lista, fecha, importe, número o texto). */
+    var control = CamposClases.htmlControl(idBase, it.clase, it.cfg.valores, it.valor);
     return '<div class="campo-fila">' +
       '<label class="etiqueta">' + U.escapar(it.nombre) + (it.cfg.obligatorio ? ' *' : '') +
         (it.soloAqui ? ' <span class="marca-solo-aqui">solo aquí</span>' : '') + '</label>' +
@@ -275,7 +271,15 @@ async function abrirCuadroDeEdicion(a, p, base) {
 
   var itemsCampos = bloqueCampos.items;
 
+  /* Fila 244: `valorEditado` es lo que se guarda (importe `1234.50`, fecha `AAAA-MM-DD`); `textoEditado`,
+     lo que se ve y va al nombre; `valorBruto`, lo escrito tal cual (para volver a pintarlo). */
   function valorEditado(item, i) {
+    return CamposClases.leerControl($('ed-campo-' + i), item.clase).valor;
+  }
+  function textoEditado(item, i) {
+    return CamposClases.leerControl($('ed-campo-' + i), item.clase).texto;
+  }
+  function valorBruto(i) {
     var el = $('ed-campo-' + i);
     return el ? (el.value || '').trim() : '';
   }
@@ -286,7 +290,7 @@ async function abrirCuadroDeEdicion(a, p, base) {
 
   function camposParaNombre() {
     return itemsCampos
-      .map(function (item, i) { return { valor: valorEditado(item, i), enNombre: enNombreEditado(i) }; })
+      .map(function (item, i) { return { valor: textoEditado(item, i), enNombre: enNombreEditado(i) }; })
       .filter(function (v) { return v.enNombre && v.valor; })
       .map(function (v) { return v.valor; });
   }
@@ -356,7 +360,7 @@ async function abrirCuadroDeEdicion(a, p, base) {
   function snapshotDelCuadro() {
     var camposObjeto = {};
     itemsCampos.forEach(function (item, i) {
-      camposObjeto[item.clave] = { valor: valorEditado(item, i), enNombre: enNombreEditado(i) };
+      camposObjeto[item.clave] = { valor: valorBruto(i), enNombre: enNombreEditado(i) };
     });
     return {
       fecha: $('ed-fecha').value, tipo: $('ed-tipo').value, curso: $('ed-curso').value.trim(),
@@ -380,7 +384,7 @@ async function abrirCuadroDeEdicion(a, p, base) {
   itemsCampos.forEach(function (item, i) {
     var el = $('ed-campo-' + i);
     var enEl = $('ed-campo-' + i + '-en');
-    if (el) { el.oninput = refrescar; el.onchange = refrescar; }
+    if (el) { el.oninput = refrescar; el.onchange = refrescar; CamposClases.engancharControl(el, item.clase, refrescar); }
     if (enEl) enEl.onchange = refrescar;
   });
   refrescar();
@@ -395,6 +399,14 @@ async function abrirCuadroDeEdicion(a, p, base) {
   for (var i = 0; i < itemsCampos.length; i++) {
     if (itemsCampos[i].cfg.obligatorio && !valorEditado(itemsCampos[i], i)) {
       U.aviso('Hace falta rellenar "' + itemsCampos[i].nombre + '".', 'malo');
+      return { ok: false };
+    }
+  }
+
+  /* Fila 244: un importe, número o fecha que no se entiende no se guarda hasta corregirlo. */
+  for (var j = 0; j < itemsCampos.length; j++) {
+    if (!CamposClases.leerControl($('ed-campo-' + j), itemsCampos[j].clase).ok) {
+      U.aviso('Revisa "' + itemsCampos[j].nombre + '": ' + CamposClases.avisoDeAmbar(itemsCampos[j].clase) + '.', 'malo');
       return { ok: false };
     }
   }

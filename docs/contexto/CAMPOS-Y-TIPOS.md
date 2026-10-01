@@ -6,6 +6,20 @@ Documento hijo de `docs/CONTEXTO.md` (fila 65, `docs/DOCUMENTOS-QUE-QUEPAN.md`, 
 
 ### Los campos de cada tipo de asunto
 
+**Clases de un campo propio (fila 244, `docs/CAMPOS-IMPORTE-NUMERO-FECHA.md`, `js/campos-clases.js`,
+`CamposClases`, funciones puras)**: `texto`, `lista`, `importe`, `numero`, `fecha` (`Campos.normalizarPropio` las
+acepta). `leer(clase, texto)` → `{ ok, valor }` (importe `1234.50`, número `1234.5`, fecha `AAAA-MM-DD`; coma o
+punto decimal, `1.200` = mil doscientos, negativos); `mostrar` → `1.234,50 €` / `1.234,5` / `01/10/2026` (lo que
+no encaja, tal cual: va en ámbar, `noEncaja`). Todo lo que enseña un valor pasa por ahí: la ficha
+(`filasDeCampos`, con `.ficha-dato-ambar`), los huecos de plantilla (`camposDelAsuntoDe`), el nombre
+(`valoresGuardadosParaNombre` y la vista previa de Nuevo asunto), «Cambiar el asunto», el paso del valor de la
+fila 245 y la exportación (`claseDeclarada`: importe → número con ` €` y suma, sin lo que está en ámbar; fecha →
+fecha). `htmlControl`/`leerControl`/`engancharControl` pintan y leen el control (lista, calendario, caja con
+`inputmode="decimal"`, ámbar con «Escribe solo la cifra, por ejemplo 125,50»); un valor que no se entiende no se
+guarda hasta corregirlo. **Cambiar la clase** de un campo ya creado (`CamposCatalogo.cambiarClase`): una pregunta
+con cuántos valores pasan y cuántos no se entienden; convierte los de los asuntos **abiertos** (una sola
+escritura); el ARCHIVO no se toca, porque lo guardado allí se lee igual por la clase al enseñarlo.
+
 **Desde un asunto abierto (fila 245, `docs/CAMPO-DESDE-EL-ASUNTO.md`)**: en «Datos del trámite» de la
 ficha (que en un asunto abierto sale siempre), «+ Añadir campo» (`js/campo-desde-el-asunto.js`) abre el
 panel de `js/campos-catalogo.js` (con `textoVolver`, sin los campos que el asunto ya tiene), pide el
