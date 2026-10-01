@@ -391,7 +391,13 @@ App.cambiarDatosDelTercero = async function (p) {
     : 'Cambiado.', 'bueno');
 
   Datos.olvidar(p.categoria);
-  App.pintarPersonas();
+  await App.pintarPersonas();
+  /* Fila 252: la ficha abierta se pone al día con lo que se acaba de guardar. */
+  try {
+    var nombreNuevo = puestos[def.cabecera[0]] || nombreAntes;
+    var nuevo = ((App.personasCargadas && App.personasCargadas.lista) || []).filter(function (x) { return x.nombre === nombreNuevo; })[0];
+    if (nuevo) App.verFicha(nuevo);
+  } catch (e) { /* la ficha se pondrá al día al elegir otra vez a la persona */ }
 
   if (esAspiranteConNumeroNuevo && App.renombrarAsuntosAbiertosDelTercero) {
     var textoAntes = App.textoTercero({ categoria: 'ALUMNADO', nombre: nombreAntes, id: '' });

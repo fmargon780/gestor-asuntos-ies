@@ -171,6 +171,7 @@ var FichaPersona = (function () {
     var dni = p.documento || '';
     /* El puesto, la situación y el DNI ya están en la cabecera. */
     var puesto = dp.destacados.filter(function (f) { return ['DNI', 'Puesto', 'Situación'].indexOf(f.titulo) === -1; });
+    var restoPersonal = dp.resto.filter(function (f) { return U.normalizar(f.valor) !== U.normalizar(p.nombre); });   /* el nombre ya está arriba */
     var cab = document.createElement('div');
     cab.innerHTML = cabeceraSimple(p, [p.puesto, p.enElCentro ? 'En el centro' : 'Ya no está en el centro'].filter(Boolean).join(' · '), dni);
     var cabecera = cab.firstChild;
@@ -187,16 +188,17 @@ var FichaPersona = (function () {
     }
     rejilla.appendChild(tarjeta(p.categoria, recuerdo, { id: 'asuntos', titulo: 'Sus asuntos', abierta: true,
       cuerpo: tarjetaDeAsuntos(), tituloId: 'titulo-sus-asuntos', resumenId: 'fp-resumen-asuntos' }));
-    if (dp.resto.length) {
+    if (restoPersonal.length) {
       rejilla.appendChild(tarjeta(p.categoria, recuerdo, { id: 'otros', titulo: 'Otros datos del fichero', abierta: false,
-        resumen: dp.resto.length + (dp.resto.length === 1 ? ' dato' : ' datos'),
-        cuerpo: cuerpoDe({ filas: dp.resto, tablas: [] }) }));
+        resumen: restoPersonal.length + (restoPersonal.length === 1 ? ' dato' : ' datos'),
+        cuerpo: cuerpoDe({ filas: restoPersonal, tablas: [] }) }));
     }
   }
 
   function pintarOtra(p, o, raiz, rejilla) {
     var cab = document.createElement('div');
-    var nif = p.nif || p.documento || '';
+    /* Con ficha propia de la categoría (tutores, Administraciones), su NIF ya está en «Datos». */
+    var nif = App.FICHAS_DE_CATEGORIA[p.categoria] ? '' : (p.nif || p.documento || '');
     cab.innerHTML = cabeceraSimple(p, '', nif);
     var cabecera = cab.firstChild;
     var ac = document.createElement('div'); ac.id = 'ficha-persona-acciones'; ac.className = 'fp-acciones';
