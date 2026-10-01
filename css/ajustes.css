@@ -209,6 +209,8 @@
 .pestana-categoria.activa .pestana-cuenta { background: rgba(255,255,255,.25); color: #fff; }
 
 .buscar-tipos { flex: 1 1 260px; max-width: 340px; }
+/* Fila 250: el botón «Ninguno es el que busco: crear…», al final de la lista. */
+.crear-o-buscar-zona { margin: 12px 0; }
 
 .tipos-buscando-info { margin: -4px 0 10px; font-size: 13px; }
 

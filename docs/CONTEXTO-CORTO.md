@@ -144,7 +144,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   **Herramientas**, línea, Ajustes. Herramientas (fila 200) es lo que se usa de vez en cuando, no
   un ajuste: Papelera, Traer el alumnado (Séneca y BD de alumnado), Tablas de datos, Restaurar una
   copia de seguridad — los cuatro vivían antes en Ajustes → Mantenimiento.
-- Ajustes: tres pestañas y pantalla por tipo; todo plegado, con resumen; avisos de fallo, solo con
+- Ajustes: tres pestañas y pantalla por tipo; tipos de asunto y de documento se crean desde una sola caja «Buscar o crear» (fila 250); todo plegado, con resumen; avisos de fallo, solo con
   fallo. En El centro, "Días de aviso" (dormidos + vencimiento) y "Copias de seguridad" (con la
   caducidad; la lista para restaurar está en Herramientas) son una sola sección cada una (fila
   200). La pantalla de un tipo lleva arriba una lista de comprobación (Nombre corto, Quién lo

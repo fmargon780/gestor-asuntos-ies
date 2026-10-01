@@ -12,8 +12,7 @@ categorías o la lista de categorías.
 `OTROS`, `TUTORES LEGALES`, `ADMINISTRACIONES`. Las nuevas van **al final** a propósito: las pruebas
 y la costumbre reconocen los botones por su sitio. Al lado, `Nombres.TEXTOS_CATEGORIA` con cómo se
 nombra cada una (`lista`, `descripcion`, `tercero`), `Nombres.textoCategoria(cat, que)` y
-`Nombres.opcionesCategorias(select, que)`, que rellena los desplegables `#filtro-personas` y
-`#nueva-categoria` (en `index.html` ya no hay ninguna `<option>` de categoría escrita a mano).
+`Nombres.opcionesCategorias(select, que)`, que rellena el desplegable `#filtro-personas` (en `index.html` ya no hay ninguna `<option>` de categoría escrita a mano).
 `App.DESCRIPCION_CATEGORIA` y la etiqueta del buscador de Nuevo asunto salen de ahí. La bandeja
 (`js/bandeja-propuesta.js`) y el editor de campos calculados leen también `Nombres.CATEGORIAS`.
 `pruebas/tutores-legales.mjs` falla si vuelve a aparecer una lista a mano.

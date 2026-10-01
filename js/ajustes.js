@@ -25,9 +25,8 @@
    pestañas arriba y un buscador que sí mira en las cuatro (docs/
    AJUSTES-AGIL.md).
 
-   `App.E.categoriaAjustes` es la categoría que se está viendo: la
-   misma que trae puesta el desplegable `#nueva-categoria`, así que
-   una nueva alta va siempre a la que se está mirando. Se recuerda en
+   `App.E.categoriaAjustes` es la categoría que se está viendo; es la
+   que trae marcada el cuadro de categoría al crear un tipo (fila 250). Se recuerda en
    `localStorage`, clave `gestor-ajustes-categoria`. */
 
 App.CLAVE_CATEGORIA_AJUSTES = 'gestor-ajustes-categoria';
@@ -44,7 +43,6 @@ App.cambiarCategoriaAjustes = function (cat) {
   if (Nombres.CATEGORIAS.indexOf(cat) === -1) return;
   App.E.categoriaAjustes = cat;
   try { window.localStorage.setItem(App.CLAVE_CATEGORIA_AJUSTES, cat); } catch (e) {}
-  $('nueva-categoria').value = cat;
   $('buscar-tipos').value = '';
   App.pintarTiposAjustes();
 };
@@ -221,71 +219,6 @@ App.construirInterruptorDeTipo = function (tipo, campo, porDefecto, texto, ayuda
   return etiqueta;
 };
 
-/* ---------- el aviso en vivo al escribir un nombre nuevo (A4 y A7) ----------
-
-   Uno para tipos (que además dice de qué categoría es el que ya
-   existe, y ofrece "Verlo"), y uno más sencillo, igual para estados y
-   para tipos de documento (usado desde js/ajustes-centro.js). Mismo
-   criterio de "igual" o "parecido" que ya vive en `U.parecidos` /
-   `U.dejaCrear` (js/util.js): no se inventa una comparación nueva. */
-
-App.pintarAvisoNuevoTipo = function () {
-  var campo = $('nuevo-tipo'), aviso = $('aviso-nuevo-tipo'), boton = $('btn-anadir-tipo');
-  if (!campo || !aviso || !boton) return;
-  var nombre = U.limpiarNombre(campo.value).toUpperCase();
-  if (!nombre) { aviso.className = 'aviso-en-vivo'; aviso.innerHTML = ''; boton.disabled = false; return; }
-
-  var nombres = App.E.tipos.map(function (t) { return t.tipo; });
-  var cerca = U.parecidos(nombre, nombres);
-  var mismo = cerca.filter(function (p) { return p.igual; })[0];
-  if (mismo) {
-    var tipoExistente = App.E.tipos.filter(function (t) { return t.tipo === mismo.nombre; })[0];
-    aviso.className = 'aviso-en-vivo aviso-en-vivo-malo';
-    aviso.innerHTML = 'Ya existe: ' + U.escapar(mismo.nombre) + ', en ' + U.escapar(tipoExistente.categoria) +
-      '. <button type="button" class="enlace" id="aviso-nuevo-tipo-verlo">Verlo</button>';
-    boton.disabled = true;
-    $('aviso-nuevo-tipo-verlo').onclick = function () { App.verTipoEnAjustes(tipoExistente); };
-    return;
-  }
-  boton.disabled = false;
-  if (cerca.length) {
-    aviso.className = 'aviso-en-vivo aviso-en-vivo-ambar';
-    aviso.textContent = 'Se parece a: ' + cerca.slice(0, 3).map(function (p) {
-      var t = App.E.tipos.filter(function (x) { return x.tipo === p.nombre; })[0];
-      return p.nombre + (t ? ' (' + t.categoria + ')' : '');
-    }).join(', ');
-  } else {
-    aviso.className = 'aviso-en-vivo'; aviso.innerHTML = '';
-  }
-};
-
-/* Uno genérico para estados y tipos de documento: no llevan categoría,
-   así que el aviso es más corto. */
-App.pintarAvisoSimple = function (idCampo, idAviso, idBoton, listaDeNombres) {
-  var campo = $(idCampo), aviso = $(idAviso), boton = $(idBoton);
-  if (!campo || !aviso || !boton) return;
-  var nombre = U.limpiarNombre(campo.value).toUpperCase();
-  if (!nombre) { aviso.className = 'aviso-en-vivo'; aviso.innerHTML = ''; boton.disabled = false; return; }
-
-  var cerca = U.parecidos(nombre, listaDeNombres());
-  var mismo = cerca.filter(function (p) { return p.igual; })[0];
-  if (mismo) {
-    aviso.className = 'aviso-en-vivo aviso-en-vivo-malo';
-    aviso.textContent = 'Ya existe: ' + mismo.nombre;
-    boton.disabled = true;
-    return;
-  }
-  boton.disabled = false;
-  if (cerca.length) {
-    aviso.className = 'aviso-en-vivo aviso-en-vivo-ambar';
-    aviso.textContent = 'Se parece a: ' + cerca.slice(0, 3).map(function (p) { return p.nombre; }).join(', ');
-  } else {
-    aviso.className = 'aviso-en-vivo'; aviso.innerHTML = '';
-  }
-};
-
-$('nuevo-tipo').oninput = App.pintarAvisoNuevoTipo;
-
 /* Cambiarle el nombre a un tipo de asunto (`App.renombrarTipo`) vive en
    js/tipos-nombre.js desde la fila 126: se lleva también su guía, sus
    campos, sus plantillas y sus recurrentes. */
@@ -455,7 +388,6 @@ App.pintarTiposAjustes = function () {
   var caja = $('tabla-tipos');
   var info = $('tipos-buscando-info');
   if (!caja) return;
-  $('nueva-categoria').value = App.E.categoriaAjustes;
 
   var buscado = U.normalizar($('buscar-tipos').value || '');
   var enBusqueda = buscado.length >= 2;
@@ -463,7 +395,8 @@ App.pintarTiposAjustes = function () {
 
   var items;
   if (enBusqueda) {
-    items = App.E.tipos.filter(function (t) { return U.normalizar(t.tipo).indexOf(buscado) !== -1; });
+    var cercanos = BuscarOCrear.coincidencias($('buscar-tipos').value, App.E.tipos.map(function (t) { return t.tipo; }));
+    items = App.E.tipos.filter(function (t) { return cercanos.indexOf(t.tipo) !== -1; });
     info.textContent = 'Buscando en todas las categorías · ' + items.length +
       (items.length === 1 ? ' resultado' : ' resultados');
     info.classList.remove('oculto');
@@ -472,6 +405,18 @@ App.pintarTiposAjustes = function () {
     info.classList.add('oculto');
     info.textContent = '';
   }
+
+  /* Fila 250: el botón de crear, al final de la lista, solo con texto. */
+  BuscarOCrear.pintarZona({
+    zona: $('crear-tipo-zona'), texto: $('buscar-tipos').value,
+    nombres: App.E.tipos.map(function (t) { return t.tipo; }),
+    detalle: function (n) {
+      var t = App.E.tipos.filter(function (x) { return x.tipo === n; })[0];
+      return t ? t.categoria : '';
+    },
+    ver: function (n) { App.verTipoPorNombre(n); },
+    crear: function (n) { App.crearTipoDesdeCaja(n); }
+  });
 
   caja.innerHTML = '';
   if (!items.length) {
@@ -483,8 +428,6 @@ App.pintarTiposAjustes = function () {
   items.forEach(function (tipo) { caja.appendChild(App.tarjetaTipoAjustes(tipo, enBusqueda)); });
 };
 
-Nombres.opcionesCategorias($('nueva-categoria'), 'clave');   /* fila 166: la lista única */
-$('nueva-categoria').onchange = function () { App.cambiarCategoriaAjustes($('nueva-categoria').value); };
 $('buscar-tipos').oninput = function () { App.pintarTiposAjustes(); };
 
 /* Guarda un tipo nuevo: la parte de después de la guardia de nombres
@@ -502,20 +445,24 @@ App.crearTipo = async function (datos) {
   return tipo;
 };
 
-/* Al añadir se pasa la misma guardia que a estados y tipos de
-   documento (js/ajustes-centro.js): si el nombre ya está escrito de
-   otra manera no se crea, y si solo se parece a otro se avisa antes.
-   Esta lista la comparten los dos ordenadores del centro, y dos
-   nombres para la misma cosa ensucian el archivo para siempre. */
-$('btn-anadir-tipo').onclick = async function () {
-  var nombre = U.limpiarNombre($('nuevo-tipo').value).toUpperCase();
-  if (!nombre) return;
+/* Ir a un tipo ya existente, por su nombre (el «Verlo» de la caja
+   «Buscar o crear» y los parecidos del cuadro de confirmación). */
+App.verTipoPorNombre = function (nombre) {
+  var t = App.E.tipos.filter(function (x) { return x.tipo === nombre; })[0];
+  if (t) App.verTipoEnAjustes(t);
+};
+
+/* «Ninguno es el que busco: crear «…»» (fila 250, docs/BUSCAR-O-CREAR-EN-AJUSTES.md):
+   si hay parecidos, una pregunta más; después la categoría, con la de
+   la pestaña que se está viendo ya marcada. Guarda con `App.crearTipo`. */
+App.crearTipoDesdeCaja = async function (nombre) {
   var hay = App.E.tipos.map(function (t) { return t.tipo; });
-  if (!await U.dejaCrear(nombre, hay, 'tipo')) return;
-  await App.crearTipo({ nombre: nombre, categoria: $('nueva-categoria').value });
-  $('nuevo-tipo').value = '';
-  App.pintarAvisoNuevoTipo();
-  App.pintarTiposAjustes();
+  if (!await BuscarOCrear.confirmarParecidos(nombre, hay, 'el tipo', App.verTipoPorNombre)) return;
+  var categoria = await BuscarOCrear.preguntarCategoria(nombre, App.E.categoriaAjustes);
+  if (!categoria) return;
+  await App.crearTipo({ nombre: nombre, categoria: categoria });
+  $('buscar-tipos').value = '';
+  App.cambiarCategoriaAjustes(categoria);
   U.aviso('Tipo añadido.', 'bueno');
 };
 

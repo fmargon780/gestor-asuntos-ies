@@ -82,8 +82,10 @@ await pagina.waitForSelector('#tabla-tipos .tarjeta-tipo');
    ================================================================ */
 console.log('--- 1. un tipo recién creado ---');
 
-await pagina.fill('#nuevo-tipo', TIPO);
-await pagina.click('#btn-anadir-tipo');
+await pagina.fill('#buscar-tipos', TIPO);
+await pagina.click('#crear-tipo-zona [data-bc="crear"]');
+await pagina.waitForSelector('#capa:not(.oculto)');
+await pagina.click('#cuadro-aceptar');
 await pagina.fill('#buscar-tipos', TIPO);
 const tarjeta = pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: TIPO });
 await tarjeta.locator('.tarjeta-tipo-nombre').click();

@@ -216,21 +216,25 @@ dos: se vuelve a la lista con la misma categoría y el mismo texto de búsqueda 
 
 **Bloque "Tipos de asunto"** (ahora en la pestaña 1, `js/ajustes.js`, `css/ajustes.css`):
 
-- **Una sola categoría a la vez.** `#tabla-tipos` obedece al desplegable `#nueva-categoria`, se
+- **Una sola categoría a la vez.** `#tabla-tipos` obedece a la pestaña elegida, que se
   recuerda en `localStorage` (`gestor-ajustes-categoria`). Estado en `App.E.categoriaAjustes`,
-  se cambia con `App.cambiarCategoriaAjustes(cat)` (sincroniza desplegable y pestañas).
+  se cambia con `App.cambiarCategoriaAjustes(cat)`.
 - **Cuatro pestañas** (`App.pintarPestanasTipos`): ALUMNADO · PERSONAL · EMPRESAS · OTROS, con
-  su cuenta; pestaña y desplegable van siempre de acuerdo.
+  su cuenta.
 - **Buscador cruzado** (`#buscar-tipos`): con dos letras o más, `App.pintarTiposAjustes` mira
   las cuatro categorías a la vez, cada resultado con su etiqueta (`.marca-categoria`). Mientras
   se busca, las pestañas se apagan (`.apagadas`) y sale "Buscando en todas las categorías · N
   resultados" (`#tipos-buscando-info`).
-- **Aviso en vivo** al escribir un nombre nuevo (`App.pintarAvisoNuevoTipo`, `oninput` de
-  `#nuevo-tipo`, sobre `U.parecidos`/`U.dejaCrear`): si ya existe, línea roja "Ya existe: X, en
-  CATEGORIA", botón Añadir apagado y enlace "Verlo" (`App.verTipoEnAjustes`) que cambia de
-  categoría y destella la tarjeta; si solo se parece, línea ámbar con los parecidos, sin apagar
-  el botón. Igual, más simple, para estados (`#aviso-nuevo-estado`) y tipos de documento
-  (`#aviso-nuevo-tipo-doc`), con `App.pintarAvisoSimple`.
+- **Una sola caja «Buscar o crear»** (fila 250, `js/buscar-o-crear.js`, `BuscarOCrear`): ya no
+  hay «TIPO NUEVO», desplegable de categoría ni «Añadir». `#buscar-tipos` filtra la rejilla
+  (`BuscarOCrear.coincidencias`: subcadena, todas las palabras en cualquier orden, o parecido de
+  `U.parecidos`). Debajo de la rejilla, `#crear-tipo-zona` lleva, solo con texto, el botón
+  «Ninguno es el que busco: crear «…»» (`[data-bc="crear"]`), o, si el nombre ya existe,
+  «Ya existe: X, en CATEGORIA» con «Verlo» (`App.verTipoEnAjustes`). Al crear
+  (`App.crearTipoDesdeCaja`): con parecidos, «¿Seguro que no es ninguno de estos?» (pulsable cada
+  uno) y «Crearlo igualmente»; después, el cuadro «¿En qué categoría?» (`#bc-categoria`, la de la
+  pestaña marcada). Guarda con `App.crearTipo`. Igual en tipos de documento (`#buscar-tipos-doc`,
+  `#crear-tipo-doc-zona`, `App.crearTipoDocumentoDesdeCaja`), sin categoría.
 - **Rejilla de tarjetas**, no filas: `#tabla-tipos`, `#tabla-estados` y `#tabla-tipos-documento`
   son `.rejilla-tipos` de tarjetas `.tarjeta-tipo` (`grid-template-columns:
   repeat(auto-fill,minmax(300px,1fr))`), cada una con un menú de tres puntos
