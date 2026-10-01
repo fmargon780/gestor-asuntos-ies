@@ -135,7 +135,6 @@
     ['campo-descripcion', 'campo-via-dato', 'buscar-tercero'].forEach(function (id) {
       if ($(id)) $(id).value = '';
     });
-    if ($('campo-grupo')) $('campo-grupo').checked = false;
     if ($('resultados-tercero')) $('resultados-tercero').innerHTML = '';
     /* Fila 231: solo se esconde lo que empieza escondido. bloque-tipos,
        bloque-tercero y bloque-detalles están siempre a la vista desde las

@@ -247,7 +247,7 @@ function construirSeccionDatos(tipo) {
 
 async function construirSeccionCampos(tipo) {
   var b = seccionDeTipo('campos', 'Campos',
-    'Los campos de este tipo, en el orden en que saldrán en el formulario y en el nombre de la carpeta.');
+    'Los campos de este tipo, en el orden en que saldrán en el formulario. Sirven para clasificar el asunto: salen en la ficha y al exportar; no entran en ningún nombre.');
   var cuerpo = b.cuerpo;
 
   /* `$` global (js/util.js) busca con `document.getElementById`, y
@@ -300,18 +300,6 @@ async function construirSeccionCampos(tipo) {
       tOblig.textContent = 'Obligatorio';
       oblig.appendChild(tOblig);
       f.appendChild(oblig);
-
-      var enNom = document.createElement('label');
-      enNom.className = 'interruptor interruptor-fila';
-      var cEnNom = document.createElement('input');
-      cEnNom.type = 'checkbox';
-      cEnNom.checked = c.enNombre !== false;
-      cEnNom.onchange = function () { c.enNombre = cEnNom.checked; guardarCampos(); };
-      enNom.appendChild(cEnNom);
-      var tEnNom = document.createElement('span');
-      tEnNom.textContent = 'Añadir al nombre';
-      enNom.appendChild(tEnNom);
-      f.appendChild(enNom);
 
       var subir = document.createElement('button');
       subir.type = 'button'; subir.className = 'boton'; subir.textContent = '▲';

@@ -15,8 +15,8 @@
    dato viene vacío -la modalidad de un alumno de la ESO-, el campo
    sale vacío y se puede escribir a mano: no es un error.
 
-   Cada uno lleva al lado su "Añadir al nombre", que nace como esté
-   puesto en Ajustes pero se puede cambiar aquí, solo para este asunto. */
+   Los campos son etiquetas del asunto (fila 251): salen en la ficha y
+   al exportar, y no entran en ningún nombre. */
 
 App.filaCampoNuevo = function (item) {
   var cfg = item.cfg;
@@ -40,20 +40,7 @@ App.filaCampoNuevo = function (item) {
   CamposClases.engancharControl(entrada, clase, App.refrescarVista);
   item.clase = clase;
 
-  var interruptor = document.createElement('label');
-  interruptor.className = 'interruptor interruptor-fila';
-  var casilla = document.createElement('input');
-  casilla.type = 'checkbox';
-  casilla.checked = cfg.enNombre !== false;
-  casilla.onchange = App.refrescarVista;
-  interruptor.appendChild(casilla);
-  var span = document.createElement('span');
-  span.textContent = 'Añadir al nombre';
-  interruptor.appendChild(span);
-  fila.appendChild(interruptor);
-
   item.entradaEl = entrada;
-  item.casillaEl = casilla;
   return fila;
 };
 
@@ -98,13 +85,6 @@ App.pintarCamposDelTipo = function () {
     contenedor.appendChild(App.filaCampoNuevo(item));
   });
 
-  /* Si el tipo ya trae la unidad o el curso calculado, el interruptor
-     viejo de "Añadir el grupo" se esconde: si no, el grupo saldría dos
-     veces en el nombre. */
-  if (Campos.usaUnidadOCurso(lista, App.E.campos)) {
-    $('bloque-grupo').classList.add('oculto');
-    $('campo-grupo').checked = false;
-  }
 };
 
 /* Los valores tal y como están ahora mismo en la pantalla, uno por
@@ -115,9 +95,8 @@ App.valoresCamposActuales = function () {
     /* Fila 244: `valor` es lo que se guarda (importe `1234.50`, fecha `AAAA-MM-DD`);
        `texto`, lo que se ve y va al nombre (`1.234,50 €`, `01/10/2026`). */
     var lc = CamposClases.leerControl(item.entradaEl, item.clase || 'texto');
-    var enNombre = !!(item.casillaEl && item.casillaEl.checked);
     return { clave: item.clave, nombre: item.nombre, valor: lc.valor, texto: lc.texto, ok: lc.ok,
-             enNombre: enNombre, obligatorio: !!item.cfg.obligatorio };
+             enNombre: false, obligatorio: !!item.cfg.obligatorio };
   });
 };
 
@@ -178,17 +157,6 @@ App.fijarTercero = function (p) {
     $('buscar-tercero').focus();
   };
 
-  /* El grupo solo tiene sentido en el alumnado, y solo en quien sigue
-     matriculado este curso. Al que ya no está no se le ofrece. */
-  var grupo = (p.categoria === 'ALUMNADO' && p.matriculado)
-    ? Nombres.grupoCompacto(p.unidad, p.curso) : '';
-  if (grupo) {
-    $('grupo-vista').textContent = '(' + grupo + ')';
-    $('bloque-grupo').classList.remove('oculto');
-  } else {
-    $('campo-grupo').checked = false;
-    $('bloque-grupo').classList.add('oculto');
-  }
   var avisa = (p.categoria === 'ALUMNADO' && !p.matriculado) ||
               (p.categoria === 'PERSONAL' && !p.enElCentro);
   if (avisa) {

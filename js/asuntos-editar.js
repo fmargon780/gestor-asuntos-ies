@@ -112,7 +112,7 @@ App.pintarCamposEditar = function (tipo, guardados, ficha) {
       if (p) cfgParaPintar = Object.assign({}, cfg, { clase: p.clase, valores: p.valores });
     }
     return { cfg: cfgParaPintar, clave: clave, nombre: Campos.nombreDeCampo(cfg, App.E.campos),
-             valor: g.valor || '', enNombre: cfg.soloAqui ? false : (g.enNombre !== undefined ? g.enNombre !== false : cfg.enNombre !== false), soloAqui: !!cfg.soloAqui,
+             valor: g.valor || '', enNombre: cfg.soloAqui ? false : !!g.enNombre, soloAqui: !!cfg.soloAqui,
              clase: (cfg.origen === 'propio' && cfgParaPintar.clase) ? cfgParaPintar.clase : 'texto' };
   });
 
@@ -124,9 +124,6 @@ App.pintarCamposEditar = function (tipo, guardados, ficha) {
       '<label class="etiqueta">' + U.escapar(it.nombre) + (it.cfg.obligatorio ? ' *' : '') +
         (it.soloAqui ? ' <span class="marca-solo-aqui">solo aquí</span>' : '') + '</label>' +
       control +
-      (it.soloAqui ? '' :
-      '<label class="interruptor interruptor-fila"><input type="checkbox" id="' + idBase + '-en"' +
-        (it.enNombre ? ' checked' : '') + '><span>Añadir al nombre</span></label>') +
       '</div>';
   }).join('');
 
@@ -283,14 +280,16 @@ async function abrirCuadroDeEdicion(a, p, base) {
     var el = $('ed-campo-' + i);
     return el ? (el.value || '').trim() : '';
   }
+  /* Fila 251: los campos no entran en ningún nombre. Lo que un asunto de
+     antes ya llevara en el suyo se queda como estaba (la marca guardada
+     no se toca, y el valor que cuenta es el guardado, no el editado). */
   function enNombreEditado(i) {
-    var el = $('ed-campo-' + i + '-en');
-    return !!(el && el.checked);
+    return !!itemsCampos[i].enNombre;
   }
 
   function camposParaNombre() {
     return itemsCampos
-      .map(function (item, i) { return { valor: textoEditado(item, i), enNombre: enNombreEditado(i) }; })
+      .map(function (item, i) { return { valor: item.valor ? Campos.mostrarValor(item.clase, item.valor) : '', enNombre: enNombreEditado(i) }; })
       .filter(function (v) { return v.enNombre && v.valor; })
       .map(function (v) { return v.valor; });
   }
@@ -383,9 +382,7 @@ async function abrirCuadroDeEdicion(a, p, base) {
     .forEach(function (id) { $(id).oninput = refrescar; $(id).onchange = refrescar; });
   itemsCampos.forEach(function (item, i) {
     var el = $('ed-campo-' + i);
-    var enEl = $('ed-campo-' + i + '-en');
     if (el) { el.oninput = refrescar; el.onchange = refrescar; CamposClases.engancharControl(el, item.clase, refrescar); }
-    if (enEl) enEl.onchange = refrescar;
   });
   refrescar();
 

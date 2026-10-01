@@ -413,7 +413,7 @@ var Campos = (function () {
   }
 
   /* Se aplica sobre la forma COMPACTA del grupo (`Nombres.grupoCompacto`,
-     la misma que usa el interruptor "Añadir el grupo al nombre"), no
+     la misma que usa el nombre del grupo), no
      sobre la Unidad tal cual la escribe Séneca: así da "1ºBach" y no
      "1º Bach", con el hueco de en medio. */
   var CALCULADOS = [
