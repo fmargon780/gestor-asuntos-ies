@@ -89,6 +89,7 @@ Se comprueba con `pruebas/el-hito-es-el-estado.mjs` y `pruebas/estado-por-el-hit
 
 ## El responsable fijo «Administración» (fila 159, `docs/RESPONSABLE-ADMINISTRACION.md`)
 
+Fila 234: `asegurar` añade también «Secretaría con V.º B.º de Dirección» (`ID_VB`, del centro, sin marca de Administración, fija); `cuentaPara` la cuenta para Secretaría y para Dirección.
 `js/hitos-administracion.js` (`HitosAdministracion`, justo después de `js/hitos.js`):
 
 - `Hitos.normalizarAjustes` pone siempre, la primera, `{ id: 'administracion', nombre: 'Administración',

@@ -144,7 +144,7 @@
     f.className = 'fila-tipo';
     f.innerHTML = '<span class="nombre-tipo">' + U.escapar(r.nombre) + '</span>' +
       '<span class="suave" style="flex:1">' + (esPapel ? 'Papel · se resuelve solo · siempre terceros'
-        : (r.fijo ? 'Fijo · el puesto, para las guías · siempre de Administración' : 'Persona del centro')) + '</span>';
+        : (r.fijo ? (r.administracion ? 'Fijo · el puesto, para las guías · siempre de Administración' : 'Fijo · lo firma Secretaría con el visto bueno de Dirección') : 'Persona del centro')) + '</span>';
     /* Fila 159: «Administración» es fija: ni se quita, ni se renombra, ni pierde la marca. */
     if (!esPapel && !r.fijo) {
       /* Fila 104: si es de Administración. Decide en qué montón de

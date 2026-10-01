@@ -89,10 +89,10 @@ await comprobar('Hitos.esDeAdministracion la cuenta como de Administración',
 console.log('--- 2. lo que ofrece la guía ---');
 await comprobar('«Responsable por defecto»: Administración y los cargos, sin las personas',
   pagina.evaluate(async () => HitosAdministracion.paraGuia((await Hitos.leer()).ajustes).map((r) => r.id)),
-  ['administracion', 'direccion', 'jefatura', 'secretaria']);
+  ['administracion', 'secretaria-vb-direccion', 'direccion', 'jefatura', 'secretaria']);
 await comprobar('en un asunto concreto siguen las personas',
   pagina.evaluate(async () => (await Hitos.leer()).ajustes.responsables.map((r) => r.id)),
-  ['administracion', 'yo', 'companero', 'direccion', 'jefatura', 'secretaria']);
+  ['administracion', 'secretaria-vb-direccion', 'yo', 'companero', 'direccion', 'jefatura', 'secretaria']);
 
 console.log('--- 3. la pasada única ---');
 await comprobar('en la guía, el paso de una persona pasa a Administración; el de un cargo, no',

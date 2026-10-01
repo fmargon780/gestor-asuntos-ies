@@ -172,7 +172,8 @@
 
     /* Fila 238: el tipo del certificado de miembro del Consejo Escolar. */
     var consejo = await crearTipoConGuia('CERTIFICADO MIEMBRO CONSEJO ESCOLAR', 'PERSONAL', [
-      { titulo: 'Preparar el certificado', cuerpo: '<p>Con la plantilla del tipo.</p>', responsable: 'yo' }
+      { titulo: 'Preparar el certificado', cuerpo: '<p>Con la plantilla del tipo.</p>', responsable: 'yo' },
+      { titulo: 'Firmar el certificado', cuerpo: '<p>Lo firma Secretaría con el visto bueno de Dirección.</p>', responsable: 'secretaria-vb-direccion' }
     ], null);
     consejo.nombreCorto = 'CertConsEsc';
     await App.guardarTipos();
@@ -323,9 +324,11 @@
     });
 
     /* 6c. fila 238: un certificado de miembro del Consejo Escolar. */
-    await crearAsunto(tipos['CERTIFICADO MIEMBRO CONSEJO ESCOLAR'], 'PERSONAL', marta, hace(0), {
+    var consejoClave = await crearAsunto(tipos['CERTIFICADO MIEMBRO CONSEJO ESCOLAR'], 'PERSONAL', marta, hace(0), {
       abiertoEl: new Date().toISOString()
     });
+    /* Fila 234: su hito actual es de «Secretaría con V.º B.º de Dirección». */
+    await marcarPrimerHito(consejoClave, 'hecho', 'Certificado preparado.');
 
     /* 6. dormido: abierto hace tiempo, sin ningún hito tocado. Sin número:
        es un asunto «de antes», con la estructura de nombre de siempre. */
