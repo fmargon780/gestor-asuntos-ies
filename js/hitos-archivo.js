@@ -100,6 +100,8 @@
   function guardarCampos(clave, idHito, cambios) {
     return editar(clave, idHito, function (h) {
       if ('titulo' in cambios) h.titulo = String(cambios.titulo || '');
+      /* Fila 228: la explicación del hito (con formato), limpiada como la de la guía. */
+      if ('cuerpo' in cambios) h.cuerpo = window.Guias ? Guias.limpiar(cambios.cuerpo || '') : String(cambios.cuerpo || '');
       if ('responsable' in cambios) { h.responsable = String(cambios.responsable || ''); if (window.ResponsableOrganismo && ResponsableOrganismo.esOrganismo(h.responsable)) h.responsableNombre = ResponsableOrganismo.copia(h.responsable, cambios.responsableNombre); else delete h.responsableNombre; }   /* fila 205 */
       if ('fecha' in cambios) { h.fecha = String(cambios.fecha || ''); h.fechaManual = !!cambios.fecha; }
       /* Fila 206 (docs/HITOS-DESDE-EL-ASUNTO.md): el plazo (días +

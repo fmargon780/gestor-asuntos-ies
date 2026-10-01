@@ -195,3 +195,9 @@ a.hito-normativa-linea { color: var(--azul); }
 }
 .hda-biblioteca-resultados.oculto { display: none; }
 .hda-biblioteca-opcion { text-align: left; padding: 4px 6px; }
+
+/* Fila 228 (docs/EXPLICACION-DEL-HITO-AL-CAMBIAR.md): la caja «Explicación»
+   de «Crear» y «Cambiar» crece con el texto hasta unas 12 líneas y luego se
+   desplaza por dentro; el cuadro cabe en la pantalla y «Guardar» no se va. */
+.hda-cuerpo { max-height: 19em; overflow-y: auto; margin-bottom: 4px; }
+.cuadro-hda .cuadro-botones { position: sticky; bottom: 0; background: inherit; padding-top: 8px; }

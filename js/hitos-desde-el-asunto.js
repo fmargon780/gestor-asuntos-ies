@@ -127,9 +127,20 @@ window.HitosDesdeElAsunto = (function () {
     return (!isNaN(dias) && dias > 0) ? { dias: dias, desde: desde, cuenta: cuenta } : null;
   }
 
+  /* Fila 228 (docs/EXPLICACION-DEL-HITO-AL-CAMBIAR.md): la explicación del
+     hito (`cuerpo`), con su formato, limpiada igual que en el editor de la
+     guía; vacía si no dice nada. */
+  function cuerpoDelFormulario() {
+    var caja = $('hda-cuerpo');
+    if (!caja || !window.Guias) return '';
+    var html = Guias.limpiar(caja.innerHTML);
+    return Guias.tieneTexto(html) ? html : '';
+  }
+
   function leerFormulario() {
     return {
       titulo: (($('hda-titulo') || {}).value || '').trim(),
+      cuerpo: cuerpoDelFormulario(),
       colocarDespuesDe: ($('hda-despues') || {}).value || '',
       responsable: ($('hda-responsable') || {}).value || '',
       plazo: plazoDelFormulario(),
@@ -165,6 +176,11 @@ window.HitosDesdeElAsunto = (function () {
       '<label class="etiqueta">' + (opts.esCrear ? 'Título, o busca en la biblioteca' : 'Título') + '</label>' +
       '<input id="hda-titulo" class="campo" value="' + U.escapar(opts.titulo || '') + '" placeholder="Por ejemplo: Firma del director">' +
       (opts.esCrear ? '<div id="hda-biblioteca-resultados" class="hda-biblioteca-resultados oculto"></div>' : '') +
+      (window.Guias && window.GuiasBarra
+        ? '<label class="etiqueta">Explicación <span class="suave">(opcional)</span></label>' + GuiasBarra.html() +
+          '<div id="hda-cuerpo" class="paso-cuerpo hda-cuerpo" contenteditable="true" data-vacio="Explicación del hito">' +
+          Guias.limpiar(opts.cuerpo || '') + '</div>'
+        : '') +
       '<label class="etiqueta">Colocar después de</label>' +
       '<select id="hda-despues" class="campo">' + opcionesColocar + '</select>' +
       '<label class="etiqueta">Responsable <span class="suave">(opcional)</span></label>' +
@@ -210,7 +226,33 @@ window.HitosDesdeElAsunto = (function () {
     });
   }
 
+  /* La caja de la explicación (fila 228): misma barra de formato que la
+     guía, al pegar solo el texto, y el cuadro acotado al alto de la
+     pantalla (la caja crece con el texto y el cuadro se desplaza por
+     dentro, con «Guardar» siempre a la vista). */
+  function engancharCuerpo() {
+    var caja = $('hda-cuerpo');
+    if (!caja) return;
+    var cuadro = document.querySelector('#capa .cuadro');
+    if (cuadro) cuadro.classList.add('cuadro-alto', 'cuadro-hda');
+    GuiasBarra.reiniciar();
+    GuiasBarra.enganchar();
+    caja.onfocus = function () { GuiasBarra.escribiendoEn(caja); };
+    caja.onpaste = function (ev) {
+      ev.preventDefault();
+      var t = (ev.clipboardData || window.clipboardData).getData('text/plain');
+      document.execCommand('insertText', false, t);
+    };
+  }
+
+  function soltarCuerpo() {
+    var cuadro = document.querySelector('#capa .cuadro');
+    if (cuadro) cuadro.classList.remove('cuadro-alto', 'cuadro-hda');
+    if (window.GuiasBarra) GuiasBarra.reiniciar();
+  }
+
   function enganchar() {
+    engancharCuerpo();
     if (!window.DondeSeGuarda) return;
     DondeSeGuarda.enganchar();
     DondeSeGuarda.introAcepta($('hda-titulo'));
@@ -242,7 +284,7 @@ window.HitosDesdeElAsunto = (function () {
   }
 
   /* ==========================================================
-     PROPAGAR UN CAMBIO (título/responsable/plazo/posición) A LOS
+     PROPAGAR UN CAMBIO (título/explicación/responsable/plazo/posición) A LOS
      ASUNTOS ABIERTOS: en el propio (siempre) y en los demás, solo si
      el hito sigue vacío. Nunca toca el ARCHIVO ni la biblioteca.
      ========================================================== */
@@ -261,6 +303,7 @@ window.HitosDesdeElAsunto = (function () {
         var esActual = clave === claveActual;
         if (!esActual && !estaVacio(h, clave)) { saltados++; return; }
         h.titulo = campos.titulo;
+        h.cuerpo = campos.cuerpo;
         h.responsable = campos.responsable;
         if (window.ResponsableOrganismo && ResponsableOrganismo.esOrganismo(h.responsable)) {
           h.responsableNombre = ResponsableOrganismo.copia(h.responsable, null);
@@ -356,6 +399,8 @@ window.HitosDesdeElAsunto = (function () {
             var modelo = encontrados.filter(function (m) { return m.id === b.dataset.id; })[0];
             if (!modelo) return;
             campo.value = modelo.titulo || modelo.nombre;
+            var caja = $('hda-cuerpo');
+            if (caja && window.Guias) caja.innerHTML = Guias.limpiar(modelo.explicacion || '');   /* fila 228 */
             resultados.classList.add('oculto');
             resultados.innerHTML = '';
             alElegir(modelo);
@@ -372,6 +417,9 @@ window.HitosDesdeElAsunto = (function () {
     var antes = await HitosDesdeElAsuntoGuia.instantanea(tipo, a.nombre);
     var pasos = JSON.parse(JSON.stringify(GuiasDelCentro.pasosDe(tipo)));
     var nuevoPaso = HitosBiblioteca.modeloAPaso(modelo);
+    /* Fila 228: si se ha cambiado la explicación antes de guardar, el paso
+       lleva el texto cambiado; la biblioteca no se toca. */
+    if (window.Guias && typeof datos.cuerpo === 'string') nuevoPaso.cuerpo = datos.cuerpo;
     colocarTrasAncla(pasos, nuevoPaso, idPasoAncla);
     var llegados = await GuiasDelCentro.guardarPasos(tipo, pasos);
     await avisarGuia(tipo, a, antes, { tocados: llegados, saltados: 0 },
@@ -397,8 +445,9 @@ window.HitosDesdeElAsunto = (function () {
     enganchar();
     if (tipo) engancharBusquedaBiblioteca(function (modelo) { modeloElegido = modelo; }, function () { modeloElegido = null; });
     var ok = await esperar;
+    var datos = ok ? leerFormulario() : null;
+    soltarCuerpo();
     if (!ok) return;
-    var datos = leerFormulario();
     if (!datos.titulo) { U.aviso('Hace falta un título.', 'ambar'); return; }
     try {
       if (modeloElegido && tipo) {
@@ -418,7 +467,7 @@ window.HitosDesdeElAsunto = (function () {
     /* normalizarHito ya copia el nombre del organismo si el responsable
        es uno (mismo criterio que `pasoAHito`). */
     var nuevo = Hitos.normalizarHito({
-      titulo: datos.titulo, responsable: datos.responsable, clase: 'paso', estado: 'pendiente'
+      titulo: datos.titulo, cuerpo: datos.cuerpo, responsable: datos.responsable, clase: 'paso', estado: 'pendiente'
     });
     nuevo.plazo = datos.plazo;
     var resultado = null;
@@ -437,7 +486,7 @@ window.HitosDesdeElAsunto = (function () {
     var idPasoAncla = pasoAnclaDeHito(nivel, datos.colocarDespuesDe);
     var antes = await HitosDesdeElAsuntoGuia.instantanea(tipo, a.nombre);
     var pasos = JSON.parse(JSON.stringify(GuiasDelCentro.pasosDe(tipo)));
-    var nuevoPaso = Guias.normalizar([{ titulo: datos.titulo, responsable: datos.responsable, plazo: datos.plazo }])[0];
+    var nuevoPaso = Guias.normalizar([{ titulo: datos.titulo, cuerpo: datos.cuerpo, responsable: datos.responsable, plazo: datos.plazo }])[0];
     colocarTrasAncla(pasos, nuevoPaso, idPasoAncla);
     var llegados = await GuiasDelCentro.guardarPasos(tipo, pasos);
     await avisarGuia(tipo, a, antes, { tocados: llegados, saltados: 0 },
@@ -474,12 +523,13 @@ window.HitosDesdeElAsunto = (function () {
       cuerpoFormulario({
         idPropio: h.id, nivel: esNivelSuperior ? nivel : [], colocarActual: colocarActual,
         responsables: responsables, responsable: h.responsable || '', plazo: h.plazo || null,
-        titulo: h.titulo, bloque: bloque
+        titulo: h.titulo, cuerpo: h.cuerpo, bloque: bloque
       }), 'Guardar');
     enganchar();
     var ok = await esperar;
+    var datos = ok ? leerFormulario() : null;
+    soltarCuerpo();
     if (!ok) return;
-    var datos = leerFormulario();
     if (!datos.titulo) { U.aviso('Hace falta un título.', 'ambar'); return; }
     try {
       if (conGuia && datos.tambienGuia) {
@@ -497,7 +547,7 @@ window.HitosDesdeElAsunto = (function () {
 
   async function cambiarSoloAsunto(a, h, esNivelSuperior, datos, callado) {
     await Hitos.guardarCampos(a.nombre, h.id, {
-      titulo: datos.titulo, responsable: datos.responsable, plazo: datos.plazo
+      titulo: datos.titulo, cuerpo: datos.cuerpo, responsable: datos.responsable, plazo: datos.plazo
     });
     if (esNivelSuperior) {
       await Hitos.cambiar(function (d) {
@@ -529,12 +579,13 @@ window.HitosDesdeElAsunto = (function () {
     var paso = pasos.filter(function (p) { return p.id === h.origenGuia; })[0];
     if (!paso) { await cambiarSoloAsunto(a, h, true, datos); return; }
     paso.titulo = datos.titulo;
+    paso.cuerpo = datos.cuerpo;
     paso.responsable = datos.responsable;
     paso.plazo = datos.plazo;
     colocarTrasAncla(pasos, paso, idPasoAncla);
     await GuiasDelCentro.guardarPasos(tipo, pasos);
     var r = await propagarCambio(tipo, h.origenGuia,
-      { titulo: datos.titulo, responsable: datos.responsable, plazo: datos.plazo },
+      { titulo: datos.titulo, cuerpo: datos.cuerpo, responsable: datos.responsable, plazo: datos.plazo },
       idPasoAncla, a.nombre);
     await avisarGuia(tipo, a, antes, r, null);
   }

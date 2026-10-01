@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '228', fecha: '2026-10-01', texto: 'Al cambiar o crear un hito desde un asunto, también se puede escribir su explicación, con viñetas.' },
   { id: '248', fecha: '2026-10-01', texto: 'Al entrar con una versión nueva sale esta ventana, «Qué hay de nuevo», y se vuelve a ver pulsando el número de versión de la barra lateral.' },
   { id: '247', fecha: '2026-10-01', texto: 'Los nombres de pila muy largos se acortan en los nombres de carpeta (el primero entero, los demás con su inicial).' },
   { id: '234', fecha: '2026-10-01', texto: 'Nuevo responsable de un hito: «Secretaría con V.º B.º de Dirección».' },

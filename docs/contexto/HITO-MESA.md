@@ -393,6 +393,13 @@ pregunta es siempre la misma y sale sola, sin ir a buscarla:
   sin paso en la guía entra con título, plazo, responsable y todas sus tareas —con los mismos ids, así que
   lo marcado no se pierde—, detrás del hito anterior que venga de la guía; se enlaza primero aquí para que
   el reparto de la fila 118 no lo repita), `instantanea` + `deshacer` + `avisarConDeshacer`.
+  **Explicación del hito** (fila 228, `docs/EXPLICACION-DEL-HITO-AL-CAMBIAR.md`): «Crear» y «Cambiar» llevan la
+  caja `#hda-cuerpo` (`contenteditable`, misma barra `GuiasBarra` y mismo limpiado `Guias.limpiar` que
+  `.paso-cuerpo` de la guía; vacía si no dice nada). Campo `cuerpo` en `Hitos.guardarCampos` («solo aquí»), en
+  el paso de la guía y en `propagarCambio`; con la biblioteca, la caja se rellena con `modelo.explicacion` y el
+  paso nuevo lleva el texto cambiado. `llevarHitoEntero` se lleva también el `cuerpo`. «Deshacer» deja guía y
+  otros asuntos como estaban; aquí se queda. El cuadro lleva `cuadro-alto cuadro-hda` (botones fijos abajo).
+  Prueba: `pruebas/explicacion-del-hito-al-cambiar.mjs`.
 - **Tareas** (`js/donde-se-guarda-tareas.js`, `DondeSeGuardaTareas.nueva/cambiar/pasar/borrar`): Intro en
   «Nueva tarea…» abre el emergente; Escape deja lo escrito; la caja se vacía al elegir. A la guía = tocar
   el `guion` del paso (`GuiasDelCentro.cambiarPasos`), que llega solo a los demás asuntos; un hito propio
