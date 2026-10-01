@@ -139,7 +139,7 @@
     var salida = {};
     Campos.camposDeAsunto(config, a.ficha).forEach(function (cfg) {   /* fila 245: con los «solo aquí» */
       var g = guardados[Campos.claveDeCampo(cfg)];
-      if (g && g.valor) salida[Campos.nombreDeCampo(cfg, App.E.campos)] = g.valor;
+      if (g && g.valor) salida[Campos.nombreDeCampo(cfg, App.E.campos)] = Campos.mostrarValor(Campos.claseDeCampo(cfg, App.E.campos), g.valor);   /* fila 244: ya con su clase (1.234,50 €, 01/10/2026) */
     });
     return salida;
   }

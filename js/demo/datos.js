@@ -157,6 +157,18 @@
       [{ origen: 'propio', id: 'p-importe', obligatorio: false, enNombre: false }]);
     App.E.campos = await Campos.leer(App.E.gestor);
 
+    /* Fila 244: la factura lleva «Importe de la factura» (Texto libre, para probar el cambio
+       de clase a Importe en euros) y «Fecha de la factura» (clase Fecha). */
+    await Campos.guardarPropios(App.E.gestor, function (lista) {
+      lista.push({ id: 'p-importe-factura', nombre: 'Importe de la factura', clase: 'texto', valores: [] });
+      lista.push({ id: 'p-fecha-factura', nombre: 'Fecha de la factura', clase: 'fecha', valores: [] });
+      return lista;
+    });
+    await Campos.guardarConfigDeTipo(App.E.gestor, 'FACTURA', [
+      { origen: 'propio', id: 'p-importe-factura', obligatorio: false, enNombre: false },
+      { origen: 'propio', id: 'p-fecha-factura', obligatorio: false, enNombre: false }]);
+    App.E.campos = await Campos.leer(App.E.gestor);
+
     /* Fila 238: el tipo del certificado de miembro del Consejo Escolar. */
     var consejo = await crearTipoConGuia('CERTIFICADO MIEMBRO CONSEJO ESCOLAR', 'PERSONAL', [
       { titulo: 'Preparar el certificado', cuerpo: '<p>Con la plantilla del tipo.</p>', responsable: 'yo' }
@@ -298,7 +310,22 @@
     /* 6. dormido: abierto hace tiempo, sin ningún hito tocado. Sin número:
        es un asunto «de antes», con la estructura de nombre de siempre. */
     await crearAsunto(tipos.FACTURA, 'EMPRESAS', dobla, hace(60), {
-      abiertoEl: hace(60) + 'T09:00:00.000Z', sinNumero: true
+      abiertoEl: hace(60) + 'T09:00:00.000Z', sinNumero: true,
+      datos: { campos: { 'propio:p-importe-factura': { valor: '125,5', enNombre: false },
+                         'propio:p-fecha-factura': { valor: hace(58), enNombre: false } } }
+    });
+
+    /* 6d. fila 244: dos facturas más, con un importe negativo y uno que no es una cifra
+       («unos 30 euros»), para probar el cambio de clase de «Importe de la factura». */
+    var mante = Nombres.terceroEmpresa({ nombre: 'Mantenimientos del Sur, S.A.', nif: 'A87654321' });
+    var copi = Nombres.terceroEmpresa({ nombre: 'Copistería Central', nif: '99887766X' });
+    await crearAsunto(tipos.FACTURA, 'EMPRESAS', mante, hace(0), {
+      abiertoEl: new Date().toISOString(),
+      datos: { campos: { 'propio:p-importe-factura': { valor: '-80', enNombre: false } } }
+    });
+    await crearAsunto(tipos.FACTURA, 'EMPRESAS', copi, hace(0), {
+      abiertoEl: new Date().toISOString(),
+      datos: { campos: { 'propio:p-importe-factura': { valor: 'unos 30 euros', enNombre: false } } }
     });
   }
 

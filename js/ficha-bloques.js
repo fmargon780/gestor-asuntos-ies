@@ -45,9 +45,14 @@
       var clave = Campos.claveDeCampo(cfg);
       vistos[clave] = true;
       var g = guardados[clave];
+      /* Fila 244: el valor, ya con su clase (importe, número, fecha); si no encaja, en ámbar con el texto original. */
+      var clase = Campos.claseDeCampo(cfg, App.E.campos);
+      var visto = (g && g.valor) ? Campos.mostrarValor(clase, g.valor) : '';
+      var ambar = !!(g && g.valor && window.CamposClases && CamposClases.noEncaja(clase, g.valor));
+      var ayuda = ambar ? CamposClases.ayudaDeAmbar(clase) : '';
       if (cfg.soloAqui) {
-        salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: (g && g.valor) || '', soloAqui: true, clave: clave });
-      } else if (g && g.valor) salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: g.valor });
+        salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: visto, soloAqui: true, clave: clave, ambar: ambar, ayuda: ayuda });
+      } else if (g && g.valor) salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: visto, ambar: ambar, ayuda: ayuda });
     });
     Object.keys(guardados).forEach(function (clave) {
       if (vistos[clave]) return;

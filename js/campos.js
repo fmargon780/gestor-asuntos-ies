@@ -102,7 +102,7 @@ var Campos = (function () {
     return {
       id: String((p && p.id) || ''),
       nombre: String((p && p.nombre) || ''),
-      clase: (p && p.clase === 'lista') ? 'lista' : 'texto',
+      clase: (p && window.CamposClases && CamposClases.esValida(p.clase)) ? p.clase : ((p && p.clase === 'lista') ? 'lista' : 'texto'),   /* fila 244: cinco clases */
       valores: (p && Array.isArray(p.valores)) ? p.valores.map(String).filter(Boolean) : []
     };
   }
@@ -363,6 +363,16 @@ var Campos = (function () {
     return salida;
   }
 
+  /* Fila 244 (js/campos-clases.js): la clase de un campo (solo los propios la
+     tienen; el resto, texto) y cómo se lee y se enseña su valor. */
+  function claseDeCampo(c, config) {
+    if (!c || c.origen !== 'propio') return 'texto';
+    var p = ((config && config.propios) || []).filter(function (x) { return x.id === c.id; })[0];
+    return (p && p.clase) || 'texto';
+  }
+  function leerValor(clase, texto) { return window.CamposClases ? CamposClases.leer(clase, texto) : { ok: true, valor: String(texto || '').trim() }; }
+  function mostrarValor(clase, valor) { return window.CamposClases ? CamposClases.mostrar(clase, valor) : String(valor || ''); }
+
   /* El nombre que se enseña. Para uno "de fichero" es el propio título
      de la columna; para uno calculado o propio, hay que mirarlo en su
      tabla. */
@@ -562,6 +572,7 @@ var Campos = (function () {
     textoPorDefectoDeDocumento: textoPorDefectoDeDocumento,
     normalizarListaDeDocumento: normalizarListaDeDocumento,
     claveDeCampo: claveDeCampo, nombreDeCampo: nombreDeCampo, camposDeAsunto: camposDeAsunto,
+    claseDeCampo: claseDeCampo, leerValor: leerValor, mostrarValor: mostrarValor,
     CALCULADOS: CALCULADOS, calcularCurso: calcularCurso,
     RECETA_CURSO_DE_FABRICA: RECETA_CURSO_DE_FABRICA,
     catalogoDeCategoria: catalogoDeCategoria, valorInicial: valorInicial,

@@ -59,7 +59,7 @@ App.pedirNumeroNuevo = function () {
 App.datosDelFormulario = function () {
   var camposParaNombre = App.valoresCamposActuales()
     .filter(function (v) { return v.enNombre && v.valor; })
-    .map(function (v) { return v.valor; });
+    .map(function (v) { return v.texto || v.valor; });   /* fila 244: lo que se ve, no lo que se guarda */
   var loPide = App.loPideNuevoControles ? App.loPideNuevoControles.leer() : null;
   var d = {
     fecha: $('campo-fecha').value,

@@ -279,6 +279,14 @@ var ExportarAsuntos = (function () {
     return '';
   }
 
+  /* Fila 244: la clase que Francisco le puso a un campo propio (importe, numero, fecha), por su
+     nombre; '' si es texto, lista o no es un campo propio. */
+  function claseDeclaradaDe(nombre) {
+    var propios = (window.App && App.E && App.E.campos && App.E.campos.propios) || [];
+    var p = propios.filter(function (x) { return x.nombre === nombre; })[0];
+    return (p && (p.clase === 'importe' || p.clase === 'numero' || p.clase === 'fecha')) ? p.clase : '';
+  }
+
   /* Las columnas que lleva cada campo propio de los tipos que salen. */
   function columnasDeCampos(registros, tipos) {
     var nombres = [];
@@ -292,7 +300,7 @@ var ExportarAsuntos = (function () {
     });
     (registros || []).forEach(function (r) { Object.keys(r.campos || {}).forEach(meter); });
     return nombres.map(function (n) {
-      return { id: PREFIJO_CAMPO + n, titulo: n, clase: 'texto', esCampo: true, nombreCampo: n, oculta: undefined };
+      return { id: PREFIJO_CAMPO + n, titulo: n, clase: 'texto', esCampo: true, nombreCampo: n, oculta: undefined, claseDeclarada: claseDeclaradaDe(n) };
     });
   }
 
@@ -304,8 +312,16 @@ var ExportarAsuntos = (function () {
   function tabla(registros, columnas) {
     var cols = columnas.map(function (c) {
       var clase = c.clase;
-      if (c.esCampo) clase = esDeCantidades(c, registros) ? 'numero' : 'texto';
-      return { id: c.id, titulo: c.titulo, clase: clase, sufijo: clase === 'numero' ? sufijoDeMoneda(c, registros) : '', _c: c };
+      var sufijo;
+      if (c.esCampo && c.claseDeclarada) {
+        /* Fila 244: la clase declarada manda, no la que se adivina por el contenido. */
+        clase = c.claseDeclarada === 'fecha' ? 'fecha' : 'numero';
+        sufijo = c.claseDeclarada === 'importe' ? ' €' : '';
+      } else {
+        if (c.esCampo) clase = esDeCantidades(c, registros) ? 'numero' : 'texto';
+        sufijo = clase === 'numero' ? sufijoDeMoneda(c, registros) : '';
+      }
+      return { id: c.id, titulo: c.titulo, clase: clase, sufijo: sufijo, _c: c };
     });
     var sumas = {};
     var filas = registros.map(function (r) {
@@ -319,7 +335,8 @@ var ExportarAsuntos = (function () {
         }
         if (c.clase === 'fecha') {
           var iso = String(bruto || '');
-          return /^\d{4}-\d{2}-\d{2}$/.test(iso) ? { k: 'fecha', v: iso } : { k: 'texto', v: bruto === RESERVADO ? RESERVADO : '' };
+          /* Fila 244: una fecha de campo que no encaja sale como texto en su celda (no se pierde). */
+          return /^\d{4}-\d{2}-\d{2}$/.test(iso) ? { k: 'fecha', v: iso } : { k: 'texto', v: bruto === RESERVADO ? RESERVADO : (c._c.esCampo ? iso : '') };
         }
         return { k: 'texto', v: bruto === null || bruto === undefined ? '' : String(bruto) };
       });

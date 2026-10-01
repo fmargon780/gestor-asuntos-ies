@@ -4263,3 +4263,15 @@ Las pestañas y la fila de títulos de la tabla de Inicio se quedan pegadas bajo
 (`css/inicio.css`; `js/cabecera-fija.js` mide `--inicio-pestanas-alto` y marca `.desborda` si la tabla no
 cabe, para conservar su scroll lateral). `overflow-x: clip` sustituye a `auto` mientras la tabla cabe.
 Prueba `pruebas/titulos-de-la-tabla-fijos.mjs`.
+
+## 1-oct-2026 · fila 244 · Campos de clase Importe en euros, Número y Fecha
+
+Un campo propio puede ser Texto libre, Lista cerrada, Importe en euros, Número o Fecha
+(`js/campos-clases.js`). Se guarda como número con dos decimales / número / `AAAA-MM-DD` y se ve
+`1.234,50 €` / `1.234,5` / `01/10/2026` en Nuevo asunto, Cambiar el asunto, la ficha, el paso del valor de la
+fila 245, los huecos de plantilla, el nombre y la exportación (la clase declarada manda: importes con € y suma,
+sin lo que está en ámbar; fechas como fecha). Un valor que no se entiende no se guarda hasta corregirlo; si ya
+estaba guardado (cambio de clase), se queda tal cual y sale en ámbar. Cambiar la clase convierte los valores de
+los asuntos abiertos tras una pregunta; el ARCHIVO se lee por la clase al enseñarlo, sin reescribirlo. Demo:
+«Importe de la factura» (texto libre, con `125,5`, `-80` y «unos 30 euros») y «Fecha de la factura». Prueba
+`pruebas/campos-importe-numero-fecha.mjs`.

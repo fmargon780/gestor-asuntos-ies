@@ -28,22 +28,17 @@ App.filaCampoNuevo = function (item) {
   etiqueta.textContent = item.nombre + (cfg.obligatorio ? ' *' : '');
   fila.appendChild(etiqueta);
 
-  var entrada;
-  if (cfg.origen === 'propio' && cfg.clase === 'lista') {
-    entrada = document.createElement('select');
-    entrada.className = 'campo';
-    entrada.innerHTML = '<option value="">Sin elegir</option>' +
-      (cfg.valores || []).map(function (v) {
-        return '<option value="' + U.escapar(v) + '">' + U.escapar(v) + '</option>';
-      }).join('');
-  } else {
-    entrada = document.createElement('input');
-    entrada.className = 'campo';
-    entrada.value = item.valorInicial || '';
-  }
+  /* Fila 244: el control según la clase del campo (lista, fecha, importe, número o texto). */
+  var clase = (cfg.origen === 'propio' && cfg.clase) ? cfg.clase : 'texto';
+  var molde = document.createElement('div');
+  molde.innerHTML = CamposClases.htmlControl('', clase, cfg.valores, item.valorInicial || '');
+  var entrada = molde.firstChild;
+  entrada.removeAttribute('id');
   entrada.oninput = App.refrescarVista;
   entrada.onchange = App.refrescarVista;
   fila.appendChild(entrada);
+  CamposClases.engancharControl(entrada, clase, App.refrescarVista);
+  item.clase = clase;
 
   var interruptor = document.createElement('label');
   interruptor.className = 'interruptor interruptor-fila';
@@ -117,9 +112,11 @@ App.pintarCamposDelTipo = function () {
    como para lo que se guarda en la ficha del asunto. */
 App.valoresCamposActuales = function () {
   return (App.E.nuevo.configCampos || []).map(function (item) {
-    var valor = (item.entradaEl ? item.entradaEl.value : '').trim();
+    /* Fila 244: `valor` es lo que se guarda (importe `1234.50`, fecha `AAAA-MM-DD`);
+       `texto`, lo que se ve y va al nombre (`1.234,50 €`, `01/10/2026`). */
+    var lc = CamposClases.leerControl(item.entradaEl, item.clase || 'texto');
     var enNombre = !!(item.casillaEl && item.casillaEl.checked);
-    return { clave: item.clave, nombre: item.nombre, valor: valor,
+    return { clave: item.clave, nombre: item.nombre, valor: lc.valor, texto: lc.texto, ok: lc.ok,
              enNombre: enNombre, obligatorio: !!item.cfg.obligatorio };
   });
 };
@@ -132,6 +129,12 @@ App.validarCamposObligatorios = function () {
     var item = items[i];
     if (item.cfg.obligatorio && !(item.entradaEl.value || '').trim()) {
       U.aviso('Hace falta rellenar "' + item.nombre + '".', 'malo');
+      item.entradaEl.focus();
+      return false;
+    }
+    /* Fila 244: un importe, número o fecha que no se entiende no se guarda hasta corregirlo. */
+    if (!CamposClases.leerControl(item.entradaEl, item.clase || 'texto').ok) {
+      U.aviso('Revisa "' + item.nombre + '": ' + CamposClases.avisoDeAmbar(item.clase) + '.', 'malo');
       item.entradaEl.focus();
       return false;
     }
