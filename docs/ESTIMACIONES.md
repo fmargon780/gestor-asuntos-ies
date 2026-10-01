@@ -11,5 +11,4 @@ revisor: los minutos de abajo cuentan la fila entera, revisor incluido (uno o do
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 234 | 45 | `docs/RESPONSABLE-SECRETARIA-CON-VB.md`: responsable fijo nuevo en `js/hitos-administracion.js` (`asegurar`, `cuentaPara`), fila fija en `js/hitos-ajustes.js`, «Esperando a…» y filtro de Inicio, asunto de demostración y prueba nueva `pruebas/responsable-secretaria-con-vb.mjs` |
 | 248 | 60 | `docs/NOVEDADES-AL-RECARGAR.md`: `js/novedades.js` (datos, con el relleno de las filas desde el 29-sep-2026) y `js/novedades-ventana.js` (ventana tras entrar, lo visto en `localStorage`, versión pulsable), carga en `index.html` y en la copia sin internet, regla 21 en la cola y prueba nueva `pruebas/novedades.mjs` |
