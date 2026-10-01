@@ -29,6 +29,7 @@ function nuevoContexto() {
   const almacen = new Map();
   const peticiones = [];
   let proximaRespuesta = { status: 200, cuerpo: { ok: true } };
+  const cola = [];   /* fila 217: respuestas una a una; { rechazar: 'TypeError' | 'AbortError' } hace que fetch se rechace */
 
   const documentoFalso = {
     getElementById: () => null,
@@ -47,7 +48,12 @@ function nuevoContexto() {
     App: { E: {}, ir: () => {}, cambiarPestanaAjustes: () => {} },
     fetch: async (url, opciones) => {
       peticiones.push({ url: url, opciones: opciones });
-      const r = proximaRespuesta;
+      const r = cola.length ? cola.shift() : proximaRespuesta;
+      if (r.rechazar) {
+        const e = r.rechazar === 'AbortError' ? new Error('abortado') : new TypeError('Failed to fetch');
+        if (r.rechazar === 'AbortError') e.name = 'AbortError';
+        throw e;
+      }
       return {
         ok: r.status >= 200 && r.status < 300,
         status: r.status,
@@ -62,7 +68,8 @@ function nuevoContexto() {
   return {
     ctx: ctx,
     peticiones: peticiones,
-    responder: (r) => { proximaRespuesta = r; }
+    responder: (r) => { proximaRespuesta = r; },
+    encolar: (...rs) => { rs.forEach((r) => cola.push(r)); }
   };
 }
 
@@ -212,6 +219,79 @@ console.log('--- 5. versión del script (fila 178) ---');
   await ejecutar(c.ctx, 'window.CorreoEnviar.enviar({ para: "ana@correo.es" })');
   comprobar('5. y una llamada a "enviar" (no solo "probar") también actualiza lo que se sabe',
     await ejecutar(c.ctx, 'window.CorreoEnviar.scriptDesactualizado()'), false);
+}
+
+console.log('--- 7. fila 217: otra cuenta de Google abierta ---');
+const DOMINIO1 = 'https://script.google.com/a/g.educaand.es/macros/s/ID123/exec?k=abc';
+const DOMINIO2 = 'https://script.google.com/a/macros/g.educaand.es/s/ID123/exec?k=abc';
+const GENERAL = 'https://script.google.com/macros/s/ID123/exec?k=abc';
+{
+  const c = nuevoContexto();
+  comprobar('7. formaGeneral de las dos formas de dominio, con su ?k=',
+    await ejecutar(c.ctx, `[window.CorreoEnviar.formaGeneral("${DOMINIO1}"), window.CorreoEnviar.formaGeneral("${DOMINIO2}"), window.CorreoEnviar.formaGeneral("${GENERAL}")]`),
+    [GENERAL, GENERAL, '']);
+  comprobar('7. el dominio sale de la propia dirección',
+    await ejecutar(c.ctx, `[window.CorreoEnviar.dominioDe("${DOMINIO1}"), window.CorreoEnviar.dominioDe("${DOMINIO2}"), window.CorreoEnviar.dominioDe("${GENERAL}")]`),
+    ['g.educaand.es', 'g.educaand.es', '']);
+}
+{
+  const c = nuevoContexto();
+  await ejecutar(c.ctx, `window.CorreoEnviar.guardarUrl("${GENERAL}")`);
+  c.encolar({ rechazar: 'TypeError' });
+  const r = await ejecutar(c.ctx, 'window.CorreoEnviar.enviar({ para: "a@b.es" })');
+  comprobar('7. fetch rechazado: el aviso nuevo, con el dominio vacío → «cuenta de Google del centro»', r.ok, false);
+  comprobarQue('7. sin «Failed to fetch» ni inglés', r.motivo.indexOf('Failed') === -1 && r.motivo.indexOf('Entra con la cuenta de Google del centro y vuelve a pulsar «Enviar».') !== -1, r.motivo);
+  comprobar('7. dirección ya general: una sola llamada', c.peticiones.length, 1);
+}
+{
+  const c = nuevoContexto();
+  await ejecutar(c.ctx, `window.CorreoEnviar.guardarUrl("${DOMINIO1}")`);
+  c.encolar({ rechazar: 'TypeError' }, { rechazar: 'TypeError' });
+  const r = await ejecutar(c.ctx, 'window.CorreoEnviar.enviar({ para: "a@b.es" })');
+  comprobarQue('7. el aviso con el dominio sacado de la dirección, en castellano',
+    r.motivo.indexOf('Google no ha dejado pasar el envío.') === 0 && r.motivo.indexOf('Entra con la cuenta del centro (g.educaand.es) y vuelve a pulsar «Enviar».') !== -1 &&
+    r.motivo.indexOf('mira que haya conexión a internet.') !== -1 && r.motivo.indexOf('Failed') === -1, r.motivo);
+  comprobar('7. dos llamadas: primero la general, luego la de dominio', c.peticiones.map((p) => p.url), [GENERAL, DOMINIO1]);
+  comprobar('7. con el mismo cuerpo (mismo idEnvio)', c.peticiones[0].opciones.body === c.peticiones[1].opciones.body, true);
+}
+{
+  const c = nuevoContexto();
+  await ejecutar(c.ctx, `window.CorreoEnviar.guardarUrl("${DOMINIO2}")`);
+  c.responder({ status: 200, cuerpo: { ok: true, version: '27-sep-2026 · fila 210' } });
+  const r = await ejecutar(c.ctx, 'window.CorreoEnviar.enviar({ para: "a@b.es" })');
+  comprobar('7. dirección de dominio: primero la general, y si responde bien, una sola llamada', [r.ok, c.peticiones.map((p) => p.url)], [true, [GENERAL]]);
+  comprobar('7. y la dirección guardada pasa a ser la general', await ejecutar(c.ctx, 'window.CorreoEnviar.leerUrl()'), GENERAL);
+}
+{
+  const c = nuevoContexto();
+  await ejecutar(c.ctx, `window.CorreoEnviar.guardarUrl("${DOMINIO1}")`);
+  c.encolar({ rechazar: 'TypeError' }, { status: 200, cuerpo: { ok: true } });
+  const r = await ejecutar(c.ctx, 'window.CorreoEnviar.enviar({ para: "a@b.es" })');
+  comprobar('7. general rechazada y la de dominio bien: dos llamadas', [r.ok, c.peticiones.map((p) => p.url)], [true, [GENERAL, DOMINIO1]]);
+  comprobar('7. se deja la de dominio guardada', await ejecutar(c.ctx, 'window.CorreoEnviar.leerUrl()'), DOMINIO1);
+  await ejecutar(c.ctx, 'window.CorreoEnviar.enviar({ para: "a@b.es" })');
+  comprobar('7. y recordado que la general no vale: la siguiente va directa a la de dominio', c.peticiones.slice(2).map((p) => p.url), [DOMINIO1]);
+}
+{
+  const c = nuevoContexto();
+  await ejecutar(c.ctx, `window.CorreoEnviar.guardarUrl("${DOMINIO1}")`);
+  c.encolar({ rechazar: 'AbortError' });
+  const r = await ejecutar(c.ctx, 'window.CorreoEnviar.enviar({ para: "a@b.es" })');
+  comprobar('7. tiempo agotado: una sola llamada, «no sé si ha salido»', [r.sinSaber, c.peticiones.length], [true, 1]);
+}
+{
+  const c = nuevoContexto();
+  await ejecutar(c.ctx, `window.CorreoEnviar.guardarUrl("${DOMINIO1}")`);
+  c.responder({ status: 500, cuerpo: {} });
+  const r = await ejecutar(c.ctx, 'window.CorreoEnviar.enviar({ para: "a@b.es" })');
+  comprobar('7. respuesta HTTP de error de Google: una sola llamada, sin repetir', [r.ok, c.peticiones.length, await ejecutar(c.ctx, 'window.CorreoEnviar.leerUrl()')], [false, 1, DOMINIO1]);
+}
+{
+  const c = nuevoContexto();
+  await ejecutar(c.ctx, `window.CorreoEnviar.guardarUrl("${DOMINIO1}")`);
+  c.encolar({ rechazar: 'TypeError' }, { rechazar: 'TypeError' });
+  const r = await ejecutar(c.ctx, 'window.CorreoEnviar.probar()');
+  comprobarQue('7. «Probar» enseña el mismo aviso', r.ok === false && r.motivo.indexOf('Google no ha dejado pasar el envío.') === 0, r.motivo);
 }
 
 console.log('--- 6. SCRIPT_ESPERADO coincide con VERSION_SCRIPT del script ---');

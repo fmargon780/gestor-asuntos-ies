@@ -148,6 +148,61 @@ window.CorreoEnviar = (function () {
     return 'env-' + Date.now().toString(36) + '-' + trozo() + trozo() + trozo();
   }
 
+  /* Fila 217 (docs/CORREO-OTRA-CUENTA-ABIERTA.md). Con la dirección del
+     script «de dominio» (`/a/g.educaand.es/macros/s/<id>/exec` o
+     `/a/macros/g.educaand.es/s/<id>/exec`), si en el navegador hay abierta
+     otra cuenta de Google, Google responde con una redirección al inicio de
+     sesión sin cabeceras CORS y `fetch` se rechaza con `TypeError`. La forma
+     general (`/macros/s/<id>/exec`) no pide sesión con acceso «Cualquier
+     usuario»: se prueba primero. */
+  var CLAVE_GENERAL_NO_VALE = 'gestor-envio-general-no-vale';
+
+  var RE_DOMINIO = /^(https?:\/\/script\.google\.com)\/a\/(?:macros\/([^\/?#]+)|([^\/?#]+)\/macros)\/s\/([^\/?#]+)(\/exec)?([?#].*)?$/;
+
+  /* PURA. La dirección general con el mismo <id> y la misma consulta, o '' si no es de dominio. */
+  function formaGeneral(url) {
+    var m = String(url || '').trim().match(RE_DOMINIO);
+    return m ? m[1] + '/macros/s/' + m[4] + (m[5] || '') + (m[6] || '') : '';
+  }
+
+  /* PURA. «g.educaand.es» de una dirección de dominio, o ''. */
+  function dominioDe(url) {
+    var m = String(url || '').trim().match(RE_DOMINIO);
+    return m ? (m[2] || m[3] || '') : '';
+  }
+
+  /* PURA. El aviso cuando Google no deja pasar la llamada. */
+  function textoNoHaPasado(url) {
+    var d = dominioDe(url);
+    return 'Google no ha dejado pasar el envío. Lo más habitual es que en este navegador esté abierta otra cuenta de Google. ' +
+      (d ? 'Entra con la cuenta del centro (' + d + ')' : 'Entra con la cuenta de Google del centro') +
+      ' y vuelve a pulsar «Enviar». Si sigue fallando, mira que haya conexión a internet.';
+  }
+
+  function generalNoVale() {
+    try { return window.localStorage.getItem(CLAVE_GENERAL_NO_VALE) === '1'; } catch (e) { return false; }
+  }
+  function recordarGeneralNoVale() {
+    try { window.localStorage.setItem(CLAVE_GENERAL_NO_VALE, '1'); } catch (e) { /* sin memoria: nada */ }
+  }
+
+  /* Una llamada a `url`: { abortado } si vence el tiempo, { red: true } si
+     `fetch` se rechaza (TypeError), o { respuesta } si Google contesta. */
+  async function unIntento(url, cuerpo, corte) {
+    try {
+      var respuesta = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(cuerpo),
+        signal: corte ? corte.signal : undefined
+      });
+      return { respuesta: respuesta };
+    } catch (e) {
+      if (e && e.name === 'AbortError') return { abortado: true };
+      return { red: true, error: e };
+    }
+  }
+
   async function llamar(cuerpo, limiteMs) {
     if (enDemo()) {
       return new Promise(function (r) {
@@ -158,22 +213,23 @@ window.CorreoEnviar = (function () {
     if (!url) return { ok: false, motivo: 'No hay ninguna dirección de envío conectada.' };
     var problema = problemaDeDireccion(url);
     if (problema) return { ok: false, motivo: problema };
-    var respuesta;
+    /* Un solo reloj para todo el envío, con sus dos intentos como mucho. */
     var corte = (typeof AbortController === 'function') ? new AbortController() : null;
     var reloj = corte ? setTimeout(function () { corte.abort(); }, limiteMs || LIMITE_MS) : null;
-    try {
-      respuesta = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(cuerpo),
-        signal: corte ? corte.signal : undefined
-      });
-    } catch (e) {
-      if (reloj) clearTimeout(reloj);
-      if (e && e.name === 'AbortError') return { ok: false, sinSaber: true, motivo: NO_SE_SI_HA_SALIDO };
-      return { ok: false, motivo: 'No he podido contactar con Google: ' + (window.U ? U.mensajeDeError(e) : e.message) };
+    var general = formaGeneral(url);
+    var pruebaGeneral = !!general && !generalNoVale();
+    var usada = pruebaGeneral ? general : url;
+    var intento = await unIntento(usada, cuerpo, corte);
+    if (intento.red && pruebaGeneral) {
+      /* Mismo cuerpo, mismo idEnvio: si el primero hubiera llegado, el script descarta el duplicado. */
+      intento = await unIntento(url, cuerpo, corte);
+      usada = url;
+      if (!intento.red && !intento.abortado) recordarGeneralNoVale();
     }
     if (reloj) clearTimeout(reloj);
+    if (intento.abortado) return { ok: false, sinSaber: true, motivo: NO_SE_SI_HA_SALIDO };
+    if (intento.red) return { ok: false, motivo: textoNoHaPasado(url) };
+    var respuesta = intento.respuesta;
     var texto = '';
     try { texto = await respuesta.text(); } catch (e) { /* sin cuerpo */ }
     var datos = null;
@@ -182,6 +238,8 @@ window.CorreoEnviar = (function () {
       return { ok: false, motivo: (datos && datos.motivo) || ('Google ha respondido con un error (' + respuesta.status + ').') };
     }
     if (!datos) return { ok: false, motivo: 'La respuesta no se ha entendido.' };
+    /* La general ha contestado bien: de ahora en adelante, esa. */
+    if (pruebaGeneral && usada === general) guardarUrl(general);
     /* Aquí sí ha contestado el script de verdad (JSON válido, con
        respuesta.ok). Cuando el envío ha llegado a intentarse
        (`ok: true`, o `version` presente) se sabe algo real de la
@@ -397,6 +455,7 @@ window.CorreoEnviar = (function () {
     leerUrl: leerUrl,
     guardarUrl: guardarUrl,
     problemaDeDireccion: problemaDeDireccion,
+    formaGeneral: formaGeneral, dominioDe: dominioDe, textoNoHaPasado: textoNoHaPasado,   /* fila 217 */
     enviar: enviar,
     nuevoIdEnvio: nuevoIdEnvio, NO_SE_SI_HA_SALIDO: NO_SE_SI_HA_SALIDO,
     probar: probar,
