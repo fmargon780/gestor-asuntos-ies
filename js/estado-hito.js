@@ -81,6 +81,8 @@ var EstadoHito = (function () {
     var clase = l.listo ? ' marca-hito-listo' : l.sinHitos ? ' marca-hito-sin'
       : (l.lado === 'terceros' ? ' marca-hito-terceros' : '');
     var texto = l.texto || Hitos.textoDelEstado(l);
+    /* Fila 249: un asunto ya «Por liquidar» no está «listo para archivar». */
+    if (l.listo && window.PorLiquidar && PorLiquidar.estaPorLiquidar(a)) texto = 'Por liquidar';
     var html = l.hito
       ? '<button type="button" class="marca-hito' + clase + '" data-hito="' + esc(l.hito) +
         '" title="Abrir este hito">' + esc(texto) + '</button>'

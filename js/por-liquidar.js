@@ -100,7 +100,7 @@ window.PorLiquidar = (function () {
   }
 
   function textoDelBoton(a) {
-    return exige(a) && !estaPorLiquidar(a) ? 'Pasar a Por liquidar' : 'Archivar el asunto';
+    return exige(a) ? (estaPorLiquidar(a) ? 'Ir a Por liquidar' : 'Pasar a Por liquidar') : 'Archivar el asunto';
   }
 
   /* Tras dar por hecho un hito (js/hitos-panel-lista.js): si era el

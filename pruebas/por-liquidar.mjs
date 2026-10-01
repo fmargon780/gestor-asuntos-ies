@@ -102,6 +102,11 @@ await comprobar('4. el asunto está en «Por liquidar»', pagina.evaluate((c) =>
 await comprobar('4. en la mesa no sale «Archivar el asunto»',
   pagina.evaluate(() => { const t = document.querySelector('.mesa-todo-hecho'); return { aviso: !!t, archivar: /Archivar el asunto/.test(document.querySelector('#ficha-guia').textContent.replace(/Archivar el asunto\s*$/, '') && (t ? t.textContent : '')) }; }),
   { aviso: true, archivar: false });
+await comprobar('4. y en la cabecera de la ficha: «Por liquidar», ni «Listo para archivar» ni «Archivar el asunto»',
+  pagina.evaluate(() => {
+    const m = [...document.querySelectorAll('#pantalla-ficha .marca-hito, #ficha-asunto-cuerpo .marca-hito, #ficha-guia .marca-hito')].map((e) => e.textContent).join(' / ') + ' ' + document.querySelector('#ficha-asunto-cuerpo .ficha-marcas').textContent;
+    return { marca: /Por liquidar/.test(m), listo: /Listo para archivar/.test(m), boton: document.querySelector('#ficha-archivar button').textContent };
+  }), { marca: true, listo: false, boton: 'Ir a Por liquidar' });
 await pagina.click('.mensaje-boton');
 await pagina.waitForTimeout(800);
 await comprobar('4. tras «Deshacer», la ficha abierta sigue diciendo «Pasar a Por liquidar»', pagina.locator('#ficha-archivar button').textContent(), 'Pasar a Por liquidar');

@@ -319,10 +319,14 @@
        queda el último, pegado al borde derecho. */
     /* Fila 249: en un tipo que hay que liquidar, el botón dice «Pasar a Por liquidar». */
     var pasaAPorLiquidar = abierto && window.PorLiquidar && PorLiquidar.exige(a) && !PorLiquidar.estaPorLiquidar(a);
-    var cerrar = boton(abierto ? (pasaAPorLiquidar ? 'Pasar a Por liquidar' : 'Archivar el asunto') : 'Reabrir el asunto',
-      abierto ? (pasaAPorLiquidar ? 'Dejarlo en la pestaña «Por liquidar» de Inicio' : 'Llevar la carpeta al ARCHIVO') : '', async function (ev) {
+    var yaPorLiquidar = abierto && window.PorLiquidar && PorLiquidar.exige(a) && PorLiquidar.estaPorLiquidar(a);
+    var cerrar = boton(abierto ? (pasaAPorLiquidar ? 'Pasar a Por liquidar' : yaPorLiquidar ? 'Ir a Por liquidar' : 'Archivar el asunto') : 'Reabrir el asunto',
+      abierto ? (pasaAPorLiquidar ? 'Dejarlo en la pestaña «Por liquidar» de Inicio' : yaPorLiquidar ? 'Se liquida y se archiva desde la pestaña «Por liquidar» de Inicio' : 'Llevar la carpeta al ARCHIVO') : '', async function (ev) {
       await U.mientrasGuarda(ev.currentTarget, function () {
-        return abierto ? (pasaAPorLiquidar ? PorLiquidar.archivarOPasar(a) : App.cerrarAsunto(a)) : App.reabrirAsunto(a);
+        if (!abierto) return App.reabrirAsunto(a);
+        if (pasaAPorLiquidar) return PorLiquidar.archivarOPasar(a);
+        if (yaPorLiquidar) { if (window.InicioTabla) InicioTabla.cambiar('liq'); return Promise.resolve(); }
+        return App.cerrarAsunto(a);
       });
       /* Reabierto: a su ficha de asunto abierto (fila 119). */
       if (!abierto && window.Navegacion && Navegacion.abrirAbierto(a.nombre)) return;
