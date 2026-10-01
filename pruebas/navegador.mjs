@@ -359,8 +359,8 @@ await pagina.click('#lista-personas .resultado');
 const ficha = await pagina.locator('#ficha-persona').textContent();
 await comprobar('la ficha calcula la edad de hoy', ficha.indexOf('13 años') !== -1, true);
 await comprobar('la ficha enseña el teléfono del tutor', ficha.indexOf('600111222') !== -1, true);
-await comprobar('la edad sale antes que el resto del fichero',
-  ficha.indexOf('Edad actual') < ficha.indexOf('Nº Id. Escolar'), true);
+await comprobar('la edad sale antes que los datos personales (fila 252: tarjeta Matrícula antes que Datos personales)',
+  ficha.indexOf('Edad actual') !== -1 && ficha.indexOf('Edad actual') < ficha.indexOf('Fecha de nacimiento'), true);
 
 /* --- sus asuntos (fila 175: salen solos, sin pulsar nada) --- */
 await pagina.waitForSelector('#asuntos-del-tercero .resultado');
