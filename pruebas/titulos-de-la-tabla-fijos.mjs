@@ -110,6 +110,7 @@ await comprobar('7. aun así las pestañas siguen pegadas bajo la cabecera', Pro
 console.log('--- 8. con los datos de la demostración (nombres y hitos de verdad), a 1280 px ---');
 const demo = await navegador.newPage({ viewport: { width: 1280, height: 700 } });
 demo.on('pageerror', e => errores.push('EXCEPCIÓN: ' + e.message));
+await demo.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); } catch (e) { /* sin almacenamiento */ }");   /* fila 248: la ventana «Qué hay de nuevo» no tapa la prueba */
 await demo.goto(new URL('?demo=1&auto=1', process.env.DIRECCION || 'http://localhost:8123/index.html').href);
 await demo.waitForSelector('#inicio-tabla-cuerpo tr', { timeout: 30000 });
 await demo.evaluate(async () => {

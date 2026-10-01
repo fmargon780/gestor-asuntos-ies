@@ -21,6 +21,7 @@ async function comprobar(titulo, promesa, esperado) {
   else console.log('bien   ' + titulo);
 }
 
+await pagina.addInitScript("try { localStorage.setItem('gestor.novedadesVistas', 'todo'); } catch (e) { /* sin almacenamiento */ }");   /* fila 248: la ventana «Qué hay de nuevo» no tapa la prueba */
 await pagina.goto(DIRECCION);
 
 /* Entra sola, sin pulsar nada: la franja aparece y la pantalla de
