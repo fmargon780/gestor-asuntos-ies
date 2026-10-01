@@ -143,7 +143,10 @@ await pagina.evaluate(async ([a, pdf]) => {
   c._hijos.set('260901 SOLICITUD D26-90001.pdf', window.__disco.fich('260901 SOLICITUD D26-90001.pdf', 'otro'));
   c._hijos.set('otro sellado.pdf', window.__disco.fich('otro sellado.pdf', pdf, 'application/pdf'));
 }, [ASUNTO, pdfConTexto('2026/29700692/M000000000700ENTRADAFecha: 01/10/2026 09:00:00')]);
-await pagina.click('#ficha-volver');
+/* Al marcarse la última tarea del hito, la aplicación pregunta si se da por hecho (cosa de siempre): se deja sin hacer. */
+await pagina.waitForTimeout(1500);
+if (await pagina.locator('#capa:not(.oculto)').count()) await pagina.click('#cuadro-cancelar');
+await pagina.evaluate(() => App.ir('abiertos'));
 await pagina.waitForSelector('#pantalla-abiertos:not(.oculto)');
 await pagina.click('#btn-recargar');
 await pagina.waitForSelector('#inicio-tabla-cuerpo tr');
