@@ -211,7 +211,7 @@ var GenerarParaRelacionados = (function () {
   async function apuntar(a, h, plantillaDoc, hechos) {
     if (!hechos.length) return;
     try {
-      if (window.Notas) await Notas.anadir(a, 'Generados ' + hechos.length + ' «' + (plantillaDoc.nombre || plantillaDoc.tipoDocumento) + '», uno por relacionado');
+      if (window.Notas && !(h && window.Hitos)) await Notas.anadirAuto(a, 'Generados ' + hechos.length + ' «' + (plantillaDoc.nombre || plantillaDoc.tipoDocumento) + '», uno por relacionado');
       if (h && window.Hitos) {
         for (var i = 0; i < hechos.length; i++) await Hitos.anadirDocumento(a.nombre, h.id, hechos[i].nombre);
         await Hitos.anadirNota(a.nombre, h.id, 'Generados ' + hechos.length + ' documentos, uno por relacionado');
@@ -336,7 +336,7 @@ var GenerarParaRelacionados = (function () {
         await App.cargarRegistro();
         var actual = (App.E.registro.asuntos && App.E.registro.asuntos[a.nombre]) || {};
         await App.anotar(a.nombre, { enviosPorPersona: (actual.enviosPorPersona || []).concat(enviados) });
-        if (window.Notas) await Notas.anadir(a, 'Correo enviado a ' + enviados.map(function (e) { return e.correo; }).join(', ') + ', cada uno con su documento');
+        if (window.Notas) await Notas.anadirAuto(a, 'Correo enviado a ' + enviados.map(function (e) { return e.correo; }).join(', ') + ', cada uno con su documento');
       } catch (e) { U.accesorio('Enviados, pero no he podido apuntarlo en el asunto', e); }
     }
     if (fallos.length) U.aviso((enviados.length ? enviados.length + ' enviados. ' : '') + 'No he podido enviar a: ' + fallos.join(', ') + '.', 'malo');

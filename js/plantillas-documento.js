@@ -202,8 +202,10 @@
         });
       } catch (eDatos) { /* accesorio: el documento ya está guardado */ }
     }
-    if (window.Notas) {
-      try { await Notas.anadir(asunto, 'Generado ' + nombreDoc); } catch (e) { /* ya está guardado */ }
+    /* Fila 229: la línea del registro va al hito si lo hay (su historia), y
+       si no, a la libreta del asunto: nunca las dos. */
+    if (window.Notas && !(hito && window.Hitos)) {
+      try { await Notas.anadirAuto(asunto, 'Generado ' + nombreDoc); } catch (e) { /* ya está guardado */ }
     }
 
     /* El documento ya está en la carpeta: con amarillo, nunca rojo, si

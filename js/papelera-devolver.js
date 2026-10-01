@@ -71,7 +71,7 @@
     if (window.Notas) {
       try {
         var falso = { nombre: ficha.origen.asunto, handle: sitio.handle };
-        await window.Notas.anadir(falso, (I.quienSoy() || 'Alguien') + ' devolvió de la papelera: ' + ficha.nombre);
+        await window.Notas.anadirAuto(falso, (I.quienSoy() || 'Alguien') + ' devolvió de la papelera: ' + ficha.nombre);
       } catch (e) { /* no pasa nada si la nota no se puede apuntar */ }
     }
     return { ok: true };

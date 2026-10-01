@@ -175,7 +175,7 @@ var WordVisor = (function () {
       try { FichaDocumentos.pintar(mismo.asunto); } catch (e) { /* solo pintar */ }
     }
     try {
-      if (mismo.asunto && window.Notas) await Notas.anadir(mismo.asunto, 'PDF guardado ' + nombre);
+      if (mismo.asunto && window.Notas && !(mismo.hito && window.Hitos)) await Notas.anadirAuto(mismo.asunto, 'PDF guardado ' + nombre);
       if (mismo.asunto && mismo.hito && window.Hitos) {
         await Hitos.anadirDocumento(mismo.asunto.nombre, mismo.hito.id, nombre);
         await Hitos.anadirNota(mismo.asunto.nombre, mismo.hito.id, 'PDF guardado «' + nombre + '»');

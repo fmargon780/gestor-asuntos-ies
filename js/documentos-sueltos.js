@@ -379,6 +379,8 @@ App.llevarSueltoA = async function (s, nombreAsunto, ficha, opciones) {
      cuadro sin ponerle otro. Si se le pone nombre, js/documentos.js
      cambia el viejo por el nuevo en el hito. */
   var hito = opciones && opciones.hito;
+  /* Fila 229: guardado en el asunto, queda su línea en el registro. */
+  if (window.RegistroAsunto) await RegistroAsunto.auto({ nombre: nombreAsunto }, 'Documento guardado «' + s.nombre + '»', hito);
   if (hito && window.Hitos) {
     try {
       await Hitos.anadirDocumento(nombreAsunto, hito.id, s.nombre);

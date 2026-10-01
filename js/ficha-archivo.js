@@ -158,6 +158,8 @@ var FichaArchivo = (function () {
         await App.guardarRegistroFresco(function (registro) {
           registro.asuntos[clave] = Object.assign({}, fichaGuardada, registro.asuntos[clave]);
         });
+        /* Fila 229: la línea del registro, ya con la ficha de antes recuperada. */
+        if (window.RegistroAsunto) await RegistroAsunto.auto({ nombre: clave }, 'Asunto reabierto');
         var carpetaAbierta = await App.E.abiertos.getDirectoryHandle(clave);
         await borrar(carpetaAbierta);
       } catch (e) {

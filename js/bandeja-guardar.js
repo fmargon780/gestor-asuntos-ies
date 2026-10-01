@@ -84,7 +84,7 @@
     try {
       var apunte = notaDelCorreo(d, 'Correo de',
         reabierto ? '\nCon este correo se ha reabierto el asunto.' : '');
-      await window.Notas.anadir({ nombre: elAsunto.nombre, ficha: {} },
+      await window.Notas.anadirAuto({ nombre: elAsunto.nombre, ficha: {} },
         apunte.texto, apunte.extra);
     } catch (e) { /* la nota es lo menos importante */ }
     await N.apuntarHuella(elAsunto.nombre, d);
@@ -332,7 +332,7 @@
 
     try {
       var apunte = notaDelCorreo(d, 'Asunto abierto con el correo de');
-      await window.Notas.anadir({ nombre: nombreAsunto, ficha: {} },
+      await window.Notas.anadirAuto({ nombre: nombreAsunto, ficha: {} },
         apunte.texto, apunte.extra);
     } catch (e) { /* la nota es lo menos importante de todo esto */ }
 

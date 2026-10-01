@@ -133,13 +133,15 @@ var FichaTarjetasResumen = (function () {
   function resumirNotas() {
     var a = c.asunto();
     var ficha = a && ((App.E.registro && App.E.registro.asuntos && App.E.registro.asuntos[a.nombre]) || a.ficha);
-    var notas = (ficha && ficha.notas) || [];
+    /* Fila 229: el registro del asunto (notas y lo automático de los hitos). */
+    var notas = window.RegistroAsunto
+      ? RegistroAsunto.lineas({ nombre: a && a.nombre, ficha: ficha }) : ((ficha && ficha.notas) || []).slice().reverse();
     ponerCuenta('notas', notas.length ? String(notas.length) : '');
-    if (!notas.length) { ponerResumen('notas', [{ texto: 'ninguna todavía' }], true); return; }
-    var n = notas[notas.length - 1];
+    if (!notas.length) { ponerResumen('notas', [{ texto: 'sin nada todavía' }], true); return; }
+    var n = notas[0];
     var cuando = n.cuando ? U.fechaLegible(U.aAaMmDd(String(n.cuando).slice(0, 10))) : '';
     ponerResumen('notas', [
-      { texto: plural(notas.length, 'nota', 'notas'), clase: 'fuerte' },
+      { texto: plural(notas.length, 'línea', 'líneas'), clase: 'fuerte' },
       { texto: [n.quien, cuando].filter(Boolean).join(' · '), clase: 'suave' },
       { texto: String(n.texto || '').replace(/\s+/g, ' ').trim() }
     ], false);

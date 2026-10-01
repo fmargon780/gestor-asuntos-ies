@@ -179,7 +179,7 @@
   function podar(lista, quedados, conNotas) {
     return (lista || []).filter(function (x) {
       /* Fila 139: también cuentan sus notas, que viven en el asunto. */
-      var suyo = (x.notas && x.notas.length) || (x.documentos && x.documentos.length) || (conNotas && conNotas[x.id]);
+      var suyo = Hitos.notasPropias(x).length || (x.documentos && x.documentos.length) || (conNotas && conNotas[x.id]);
       var dentro = false;
       if (x.clase === 'decision') {
         x.opciones.forEach(function (o) {
@@ -355,6 +355,18 @@
       ''
     ];
     hitos.forEach(function (h, i) { lineas = lineas.concat(lineasDeHito(h, i + 1)); lineas.push(''); });
+    /* Fila 229: el registro del asunto entero, en el mismo orden que en pantalla
+       (lo más reciente arriba): las notas del asunto y lo automático de los hitos. */
+    if (window.RegistroAsunto) {
+      var registro = RegistroAsunto.lineas({ nombre: clave, ficha: ficha }, { hitos: RegistroAsunto.aplanar(hitos) });
+      if (registro.length) {
+        lineas.push('REGISTRO DEL ASUNTO');
+        registro.forEach(function (l) {
+          lineas.push('  ' + fechaCorta(l.cuando) + ' · ' + (l.quien || '?') + (l.hitoTitulo ? ' · ' + l.hitoTitulo : '') + ': ' + l.texto);
+        });
+        lineas.push('');
+      }
+    }
     return lineas.join('\n') + MARCA + JSON.stringify({ creados: creados || '', hitos: hitos });
   }
 

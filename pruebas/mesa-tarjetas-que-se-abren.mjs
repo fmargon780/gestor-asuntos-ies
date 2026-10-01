@@ -135,7 +135,7 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
       const t = document.querySelector('.hito-en-mesa .mesa-resumen[data-tarjeta="notas"]');
       return [t.querySelector('.mesa-resumen-nota').textContent, t.querySelector('.mesa-resumen-pie').textContent.indexOf('Última: Ana') === 0,
         t.querySelector('.mesa-resumen-cuenta').textContent];
-    }), ['Traen el certificado el lunes', true, '· 2 notas']);
+    }), ['Traen el certificado el lunes', true, '· 2 líneas']);
   if (fotos) await capturar(pagina, 'mesa-tarjeta-guion');
 
   /* 2. */
@@ -200,11 +200,10 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
     }), [true, '']);
   await comprobar('4. y la tarjeta sigue en grande',
     queSeVe(pagina).then((v) => v.grande), ['notas']);
-  await comprobar('4. notas e historia, en dos columnas (una sola por debajo de 1100 px)',
-    pagina.evaluate(() => {
-      const r = Array.from(document.querySelectorAll('.hito-en-mesa .mesa-notas-columnas > .mesa-bloque')).map((e) => e.getBoundingClientRect());
-      return Math.abs(r[0].top - r[1].top) < 2 && r[0].width > r[1].width;
-    }), true);
+  await comprobar('4. «Registro»: una sola lista por fechas, sin columna de Historia (fila 229)',
+    pagina.evaluate(() => [document.querySelectorAll('.hito-en-mesa .mesa-grande-notas .hito-notas').length,
+      document.querySelectorAll('.hito-en-mesa .mesa-historia, .hito-en-mesa .mesa-notas-columnas').length,
+      document.querySelector('.hito-en-mesa .mesa-grande-notas .mesa-grande-titulo').textContent]), [1, 0, 'Registro']);
   if (fotos) await capturar(pagina, 'mesa-tarjeta-notas');
   await pagina.locator('.hito-en-mesa .mesa-resumen[data-tarjeta="docs"]').click();
   await comprobar('4. la pequeña de Notas trae la nueva',

@@ -160,6 +160,13 @@
     return notasFrescas(a);
   }
 
+  /* Fila 229: una línea que anota la aplicación sola (no la escribe la
+     persona): lleva `auto: true`, se pinta en gris y no se puede cambiar
+     ni borrar (js/registro-asunto.js). */
+  function anadirAuto(a, texto, extra) {
+    return anadirNota(a, texto, Object.assign({ auto: true }, extra || {}));
+  }
+
   /* Como `anadirNota`, pero para las notas que van atadas a un mismo
      hecho y no deben acumularse: el registro de un documento
      (js/registro.js, js/registro-sellado.js). Si ya hay una nota con
@@ -191,7 +198,14 @@
 
   /* ---------- la ventana ---------- */
 
-  function pintarLista(notas) {
+  /* Fila 229: con el asunto, se pinta el registro (notas y lo automático de
+     los hitos, fundidos y por fecha); sin él, la lista de notas de siempre. */
+  function pintarRegistro(a, notas, editable) {
+    return RegistroAsunto.html(RegistroAsunto.lineas(a, { notas: notas }), { editable: editable });
+  }
+
+  function pintarLista(notas, a, editable) {
+    if (a && window.RegistroAsunto) return pintarRegistro(a, notas, editable);
     if (!notas.length) {
       return '<div class="vacio">Todavía no hay ninguna nota en este asunto.</div>';
     }
@@ -230,7 +244,7 @@
           '</div>'
         : '<p class="explica">Este asunto está archivado. Sus notas se leen, ' +
           'pero ya no se escriben.</p>') +
-      '<div id="notas-lista" class="notas-lista">' + pintarLista(notas) + '</div>';
+      '<div id="notas-lista" class="notas-lista" data-clave="' + U.escapar(a.nombre) + '">' + pintarLista(notas, a, sePuedeEscribir) + '</div>';
 
     var esperar = U.preguntar('Notas de ' + a.nombre, cuerpo, 'Cerrar', true);
 
@@ -248,7 +262,7 @@
         try {
           notas = await anadirNota(a, texto);
           campo.value = '';
-          $('notas-lista').innerHTML = pintarLista(notas);
+          $('notas-lista').innerHTML = pintarLista(notas, a, true);
           $('nota-aviso').textContent = notas.length === 1
             ? '1 nota guardada.'
             : notas.length + ' notas guardadas.';
@@ -355,7 +369,7 @@
         .then(function (lista) {
           borradorUltimoGuardado = texto;
           var listaCaja = $('ficha-notas-lista');
-          if (listaCaja) listaCaja.innerHTML = pintarLista(lista);
+          if (listaCaja) listaCaja.innerHTML = pintarLista(lista, a, true);
           if (aviso) {
             aviso.textContent = lista.length === 1 ? '1 nota guardada.' : lista.length + ' notas guardadas.';
           }
@@ -378,15 +392,15 @@
       (abierto
         ? '<div class="nota-nueva">' +
             '<textarea id="ficha-nota-texto" class="campo" rows="2" ' +
-              'placeholder="Qué ha pasado hoy en este asunto"></textarea>' +
+              'placeholder="Anotar algo que ha pasado…"></textarea>' +
             '<div class="nota-botonera">' +
-              '<span class="nota-aviso" id="ficha-nota-aviso">Se guarda al pulsar Guardar, o al ' +
-                'salir del recuadro si hay algo escrito.</span>' +
+              '<span class="nota-aviso" id="ficha-nota-aviso">Intro guarda; Mayúsculas+Intro, otra línea.</span>' +
               '<button type="button" id="ficha-nota-guardar" class="boton boton-principal">Guardar</button>' +
             '</div>' +
           '</div>'
-        : '<p class="explica">Asunto archivado: las notas se leen, pero ya no se escriben.</p>') +
-      '<div id="ficha-notas-lista" class="notas-lista">' + pintarLista(notas) + '</div>';
+        : '<p class="explica">Asunto archivado: el registro se lee, pero ya no se escribe.</p>') +
+      '<div id="ficha-notas-lista" class="notas-lista" data-clave="' + U.escapar(a.nombre) + '">' +
+        pintarLista(notas, a, abierto) + '</div>';
 
     if (!abierto) return;
 
@@ -400,11 +414,16 @@
     campo.onblur = function () {
       if ((campo.value || '').trim()) guardarBorrador(a, campo, aviso, alGuardar);
     };
-    /* Control + Intro sigue guardando al momento, como antes. */
+    /* Intro guarda al momento (Mayúsculas+Intro, otra línea; Control+Intro
+       sigue valiendo, como antes). */
     campo.onkeydown = function (ev) {
-      if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) {
+      if (ev.key === 'Enter' && !ev.shiftKey) {
         ev.preventDefault();
-        guardarBorrador(a, campo, aviso, alGuardar);
+        /* Guardada con Intro, la caja queda vacía y la siguiente línea es otra. */
+        var escrito = (campo.value || '').trim();
+        guardarBorrador(a, campo, aviso, alGuardar).then(function () {
+          if (escrito && (campo.value || '').trim() === escrito) { campo.value = ''; olvidarBorrador(); }
+        });
       }
     };
   }
@@ -459,6 +478,7 @@
     de: notasDe,
     frescas: notasFrescas,
     anadir: anadirNota,
+    anadirAuto: anadirAuto,
     sustituir: sustituirNota,
     pintar: pintarLista,
     cuando: cuando,

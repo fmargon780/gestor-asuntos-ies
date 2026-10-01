@@ -44,6 +44,8 @@ var HitosPanelLista = (function () {
        con el hito ya marcado. */
     var nota = faltan.length ? 'Dado por hecho con ' + faltan.length +
       (faltan.length === 1 ? ' cosa sin reunir.' : ' cosas sin reunir.') : '';
+    /* Fila 229: darlo por hecho y reabrirlo dejan su línea en el registro. */
+    if (!nota && window.RegistroAsunto) nota = RegistroAsunto.notaDeEstado(h.estado, nuevoEstado);
     try {
       await U.mientrasGuarda(casillaEl, function () { return Hitos.marcar(a.nombre, h.id, nuevoEstado, nota); });
       /* «Avisar a quien lo pide» (fila 195): solo al marcar hecho, con
@@ -244,29 +246,20 @@ var HitosPanelLista = (function () {
         (abierto ? '<div class="mesa-soltar">Suelta aquí un documento del ordenador: va a este hito</div>' : '') +
       '</section>';
 
-    /* Fila 139 (docs/UNA-SOLA-LIBRETA-DE-NOTAS.md): las notas son las del
-       asunto escritas desde este hito (js/notas-migracion.js); la historia
-       automática del hito se queda aparte, a la derecha (fila 147). */
-    var notas = (window.NotasHito ? NotasHito.delHito(a, h.id) : []).slice().reverse();
-    var historia = (h.notas || []).slice().reverse();
+    /* Fila 229 (docs/REGISTRO-DEL-ASUNTO.md): «Registro», una sola lista por
+       fechas con las líneas de este hito: las que se han anotado (notas del
+       asunto escritas desde aquí, js/notas-migracion.js) y lo que apunta la
+       aplicación sola (`h.notas`), en gris. */
+    var lineasHito = window.RegistroAsunto ? RegistroAsunto.lineas(a, { hito: h.id, hitos: [h] }) : [];
     var grandeNotas = '<section class="mesa-grande mesa-grande-notas" data-tarjeta="notas">' +
-      '<div class="mesa-bloque-cabecera"><span class="mesa-grande-titulo">Notas e historia</span>' + volver + '</div>' +
-      '<div class="mesa-notas-columnas">' +
-        '<div class="mesa-bloque mesa-notas">' +
-          (abierto ? '<div class="nota-nueva">' +
-            '<textarea class="campo hito-nota-texto" rows="5" placeholder="Escribe una nota; Intro guarda (Mayúsculas+Intro, otra línea)"></textarea>' +
-            '<button type="button" class="boton hito-nota-anadir oculto">Añadir nota</button></div>' : '') +
-          '<div class="hito-notas">' + notas.map(function (n) {
-            return '<div class="hito-nota"><strong>' + U.escapar(n.quien || '') + '</strong> · ' +
-              U.escapar((n.cuando || '').slice(0, 10)) + '<br>' + U.escapar(n.texto) + '</div>';
-          }).join('') + '</div>' +
+      '<div class="mesa-bloque-cabecera"><span class="mesa-grande-titulo">Registro</span>' + volver + '</div>' +
+      '<div class="mesa-bloque mesa-notas">' +
+        (abierto ? '<div class="nota-nueva">' +
+          '<textarea class="campo hito-nota-texto" rows="5" placeholder="Anotar algo que ha pasado… (Intro guarda; Mayúsculas+Intro, otra línea)"></textarea>' +
+          '<button type="button" class="boton hito-nota-anadir oculto">Añadir nota</button></div>' : '') +
+        '<div class="hito-notas registro-lista" data-clave="' + U.escapar(a.nombre) + '">' +
+          (window.RegistroAsunto ? RegistroAsunto.html(lineasHito, { editable: abierto, conEtiqueta: false, clase: 'hito-nota' }) : '') +
         '</div>' +
-        '<div class="mesa-bloque mesa-historia"><span class="mesa-bloque-titulo hito-historia-titulo">Historia</span>' +
-          '<div class="hito-notas hito-historia">' + (historia.length ? historia.map(function (n) {
-            var auto = !window.NotasHito || NotasHito.esAutomatica(n.texto);
-            return '<div class="hito-nota' + (auto ? ' hito-nota-auto' : '') + '"><strong>' + U.escapar(n.quien || '') + '</strong> · ' +
-              U.escapar((n.cuando || '').slice(0, 10)) + '<br>' + U.escapar(n.texto) + '</div>';
-          }).join('') : '<p class="mesa-sin-docs">Nada todavía.</p>') + '</div></div>' +
       '</div>' +
     '</section>';
 
@@ -277,7 +270,7 @@ var HitosPanelLista = (function () {
         '<div class="mesa-resumen-cuerpo"></div></div>';
     };
     var colDerecha = '<div class="mesa-col mesa-col-derecha">' +
-      resumen('guion', 'Tareas del hito') + resumen('docs', 'Documentos del hito') + resumen('notas', 'Notas e historia') +
+      resumen('guion', 'Tareas del hito') + resumen('docs', 'Documentos del hito') + resumen('notas', 'Registro') +
       (window.HitosNormativa ? '<details class="mesa-bloque mesa-normativa' + (cuantasNormas ? '' : ' oculto') + '">' +
         '<summary class="mesa-bloque-titulo">Normativa (<span class="mesa-normativa-cuenta">' + cuantasNormas + '</span>)</summary>' +
         HitosNormativa.listaHTML(h.normativa) + '<div class="mesa-normativa-guion"></div></details>' : '') +
@@ -395,7 +388,7 @@ var HitosPanelLista = (function () {
     if (idOpcion === h.elegida) return;
     var opt = h.opciones.filter(function (o) { return o.id === h.elegida; })[0];
     var conAlgo = ((opt && opt.hitos) || []).filter(function (x) {
-      return (x.notas && x.notas.length) || (x.documentos && x.documentos.length);
+      return Hitos.notasPropias(x).length || (x.documentos && x.documentos.length);
     });
     if (conAlgo.length) {
       var ok = await U.preguntar('Cambiar de rama',
@@ -433,7 +426,7 @@ var HitosPanelLista = (function () {
         var opt = h.opciones.filter(function (o) { return o.id === h.elegida; })[0];
         var conNotas = window.NotasHito ? NotasHito.idsConNotas(a.nombre) : {};   /* fila 139 */
         var conAlgo = ((opt && opt.hitos) || []).filter(function (x) {
-          return (x.notas && x.notas.length) || (x.documentos && x.documentos.length) || conNotas[x.id];
+          return Hitos.notasPropias(x).length || (x.documentos && x.documentos.length) || conNotas[x.id];
         });
         if (conAlgo.length) {
           var ok = await U.preguntar('Cambiar de rama',

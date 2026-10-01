@@ -213,6 +213,8 @@ App.crearAsuntoDelFormulario = async function () {
       datosNuevoAsunto.contacto = Datos.fotoDeContacto(App.E.nuevo.tercero, App.E.nuevo.categoria);
     }
     await App.anotar(nombre, datosNuevoAsunto);
+    /* Fila 229: la primera línea del registro (accesorio). */
+    if (window.RegistroAsunto) await RegistroAsunto.auto({ nombre: nombre }, 'Asunto creado');
     terceroCreado = App.E.nuevo.tercero;
     /* Fila 197, punto 4: App.anotar ya ha creado los hitos de la guía
        (envoltura de js/hitos.js), así que el primero ya existe aquí. */

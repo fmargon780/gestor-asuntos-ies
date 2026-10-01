@@ -253,7 +253,7 @@ var FormulariosRellenar = (function () {
       } catch (eDatos) { /* accesorio */ }
     }
     if (window.Notas) {
-      try { await Notas.anadir(asunto, 'Preparado el impreso ' + nombreDoc); } catch (e) { /* ya está guardado */ }
+      try { await Notas.anadirAuto(asunto, 'Preparado el impreso ' + nombreDoc); } catch (e) { /* ya está guardado */ }
     }
 
     U.aviso(
