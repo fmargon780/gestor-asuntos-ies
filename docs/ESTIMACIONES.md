@@ -11,4 +11,3 @@ revisor: los minutos de abajo cuentan la fila entera, revisor incluido (uno o do
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 248 | 60 | `docs/NOVEDADES-AL-RECARGAR.md`: `js/novedades.js` (datos, con el relleno de las filas desde el 29-sep-2026) y `js/novedades-ventana.js` (ventana tras entrar, lo visto en `localStorage`, versión pulsable), carga en `index.html` y en la copia sin internet, regla 21 en la cola y prueba nueva `pruebas/novedades.mjs` |
