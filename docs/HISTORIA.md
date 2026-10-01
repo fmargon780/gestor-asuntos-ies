@@ -4302,3 +4302,7 @@ El aviso ámbar de un PDF sellado suelto (`js/ficha-sellos.js`) gana «Es un doc
 documentos de la aplicación, sin desplegable): abre el cuadro de poner nombre con el sello leído, asociado al
 hito en curso; al guardar, nota «Registrado …» y tarea de registro del hito marcada sola. La demostración trae un
 PDF sellado suelto en el certificado de Carla. Prueba `pruebas/sello-documento-nuevo.mjs`.
+
+
+## 1-oct-2026 · fila 228
+Explicación del hito (`cuerpo`) en «Hito ▾» → Crear y Cambiar (`#hda-cuerpo`, barra de la guía, «¿Dónde se guarda?», biblioteca, Deshacer). Prueba `pruebas/explicacion-del-hito-al-cambiar.mjs`. Revisor APROBADA; en `main` por la petición de cambios 180.
