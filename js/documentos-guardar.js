@@ -171,6 +171,10 @@
     } catch (e2) {
       U.accesorio('Documento guardado, pero no he podido apuntar si está pendiente de registro', e2);
     }
+    /* Fila 229: guardado en el asunto, queda su línea en el registro. */
+    if (opciones.modo === 'anadir' && window.RegistroAsunto) {
+      await RegistroAsunto.auto(N.asuntoActual, 'Documento guardado «' + nombre + '»', N.hitoActual);
+    }
     /* El tipo de documento elegido, para la próxima vez (fila 174,
        punto 1): por tipo de asunto, en este ordenador. */
     if (N.guardarUltimoTipoDocumento) {

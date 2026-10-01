@@ -543,6 +543,37 @@ cada hito de `hitos.json` (las automáticas se reconocen por su forma fija: «Co
 enviado a», «Dado por hecho», «Generado «»…) pasan al asunto, por fecha, y después se quitan del
 hito. Primero `asuntos.json`, luego `hitos.json`; repetirlo no duplica (texto, quién y cuándo).
 
+### El registro del asunto (30-sep-2026, fila 229, `docs/REGISTRO-DEL-ASUNTO.md`)
+
+La tarjeta «Notas» de la ficha pasa a llamarse **«Registro»**: una sola lista por fechas (lo más
+reciente arriba) con lo que ha pasado en el asunto. Es una **vista** (`js/registro-asunto.js`,
+`RegistroAsunto.lineas(a, { hito, hitos, notas })`): no cambia dónde se guarda nada ni migra nada.
+Junta dos fuentes: las notas de la libreta (`ficha.notas` de `asuntos.json`, escritas a mano o con
+`auto: true`) y `h.notas` de cada hito de `hitos.json` (siempre automáticas). Una línea es
+automática si lleva `auto`, `correo`, `registroDeDocumento`, o su texto tiene una de las formas
+fijas antiguas (`AUTO_ANTIGUA`, más `NotasHito.esAutomatica`); las automáticas se pintan en gris y
+más pequeñas y **no llevan «⋮»**. Las escritas a mano de la libreta llevan «⋮» con «Cambiar»
+(edición en la propia línea) y «Borrar» (confirma), por `App.anotarLista` con `quitar` + `anadir`
+(identidad `cuando|texto`); en modo consulta no hay «⋮» ni caja.
+
+- **Caja «Anotar algo que ha pasado…»** (ficha y mesa): Intro guarda y deja la caja vacía,
+  Mayúsculas+Intro salta de línea. Desde la mesa la línea lleva el hito; desde la ficha, no. El
+  botón «Guardar» y el guardado al salir del recuadro de la ficha siguen como antes.
+- **Escribir una línea automática**: `RegistroAsunto.auto(a, texto, hito)` (accesorio: ámbar si
+  falla). Con hito, va a la historia de ese hito (`Hitos.anadirNota`); sin él, a la libreta con
+  `Notas.anadirAuto` (`auto: true`). Nunca las dos: donde antes se escribía en las dos sitios
+  (generar, comunicar/correo, PDF guardado) ahora va solo al hito si lo hay. Líneas nuevas: tarea
+  marcada/sin hacer/«no aplica» (`js/hito-mesa-guion.js`), hito dado por hecho o reabierto
+  (`Hitos.marcar`), documento guardado (`js/documentos-guardar.js`, `js/documentos-sueltos.js`),
+  asunto creado, archivado y reabierto (`js/asuntos-nuevo-crear.js`, `js/asuntos-archivar.js`,
+  `js/ficha-archivo.js`; la de reabrir va **después** de recuperar la ficha del archivo).
+- **La ficha se repinta** cuando cambian los hitos (`Hitos.alCambiar`/`alLeer`) solo si las líneas
+  son otras (`data-f` de cada línea), para no tirar lo que se esté escribiendo.
+- **El historial del archivo** (`HISTORIAL DE TRAMITACION.txt`) lleva, además de los hitos, un
+  bloque «REGISTRO DEL ASUNTO» con las mismas líneas y en el mismo orden que en pantalla.
+- **Resumen**: la tarjeta de la ficha y la pequeña de la mesa dicen «N líneas»; vacío, «Sin nada
+  todavía».
+
 ### Asuntos reservados (25-sep-2026, fila 135, `docs/ASUNTOS-RESERVADOS.md`)
 
 Para que un expediente disciplinario o de salud no se vea **sin querer**; la carpeta sigue viéndose

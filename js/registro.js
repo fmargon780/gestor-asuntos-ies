@@ -293,7 +293,7 @@ var Registro = (function () {
       await quitarDePendientes(asunto, estado.nombreOriginal);
       await window.Notas.sustituir(asunto,
         'Registrado ' + codigo + fechaSello + ' · ' + estado.nombreOriginal,
-        'registroDeDocumento', estado.nombreOriginal);
+        'registroDeDocumento', estado.nombreOriginal, { auto: true });
       U.aviso('Documento registrado.', 'bueno');
     } catch (e2) {
       U.accesorio('Documento registrado, pero no he podido apuntar la nota del registro', e2);

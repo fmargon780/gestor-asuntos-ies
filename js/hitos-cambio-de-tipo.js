@@ -24,7 +24,7 @@ window.HitosCambioDeTipo = (function () {
      pendiente sola, al crear los hitos, sin que nadie haya hecho nada. */
   function tieneAlgo(h, conNotas) {
     if (h.estado === 'hecho') return true;
-    if (h.notas && h.notas.length) return true;
+    if (Hitos.notasPropias(h).length) return true;
     if (conNotas && conNotas[h.id]) return true;   /* fila 139: sus notas, en el asunto */
     if (h.documentos && h.documentos.length) return true;
     if ((h.requisitos || []).some(function (r) { return r.hecho || r.valor || r.documento; })) return true;
@@ -61,7 +61,7 @@ window.HitosCambioDeTipo = (function () {
     if (resultado && Hitos.aplicarEstadoDelHito) await Hitos.aplicarEstadoDelHito(clave, resultado);
     if (window.Notas) {
       try {
-        await Notas.anadir({ nombre: clave }, 'Cambiado el tipo de ' + tipoViejo + ' a ' + tipoNuevo +
+        await Notas.anadirAuto({ nombre: clave }, 'Cambiado el tipo de ' + tipoViejo + ' a ' + tipoNuevo +
           ' · ' + U.fechaLegible(U.hoyIso().replace(/-/g, '').slice(2)) +
           '. Se ha traído la guía del tipo nuevo' +
           (conservados ? '; ' + conservados + (conservados === 1 ? ' hito viejo se queda' : ' hitos viejos se quedan') +

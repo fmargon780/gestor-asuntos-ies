@@ -97,8 +97,10 @@ console.log('--- 3. la ficha ---');
 await pagina.evaluate((n) => App.abrirFicha(App.E.listaAbiertos.filter(a => a.nombre === n)[0], 'abierto'), ANA);
 await pagina.waitForSelector('#ficha-notas', { state: 'attached' });
 await esperar(() => document.querySelectorAll('#ficha-notas .nota-hito').length === 2);
-await comprobar('dos notas con la etiqueta del hito', pagina.evaluate(() =>
-  Array.prototype.map.call(document.querySelectorAll('#ficha-notas .nota-hito'), b => b.textContent)), ['⚑ Recoger los papeles', '⚑ Recoger los papeles']);
+/* Fila 229: el registro suma la línea automática del hito a las dos notas. */
+await comprobar('tres líneas con la etiqueta del hito', pagina.evaluate(() =>
+  Array.prototype.map.call(document.querySelectorAll('#ficha-notas .nota-hito'), b => b.textContent)),
+  ['⚑ Recoger los papeles', '⚑ Recoger los papeles', '⚑ Recoger los papeles']);
 await pagina.evaluate(() => document.querySelector('#ficha-notas .nota-hito').click());
 await esperar(() => HitoMesa.estaAbierta && HitoMesa.estaAbierta());
 await comprobar('pulsar la etiqueta abre la mesa de ese hito', pagina.evaluate(() => {
@@ -110,13 +112,13 @@ console.log('--- 4. la mesa ---');
 const mesa = () => pagina.evaluate(() => {
   const b = document.querySelector('#ficha-guia .hito[data-id="h1"] .mesa-notas');
   return {
-    notas: Array.prototype.map.call(b.querySelectorAll('.hito-notas:not(.hito-historia) .hito-nota'), x => x.textContent.split('\n').pop().replace(/^.*· \d{4}-\d{2}-\d{2}/, '')),
-    /* Fila 145: «Historia» es su propio bloque, debajo de «Notas». */
-    historia: Array.prototype.map.call(b.closest('.hito').querySelectorAll('.mesa-historia .hito-historia .hito-nota'), x => x.classList.contains('hito-nota-auto'))
+    notas: Array.prototype.map.call(b.querySelectorAll('.hito-notas .registro-linea'), x => x.querySelector('.nota-texto').textContent),
+    auto: Array.prototype.map.call(b.querySelectorAll('.hito-notas .registro-linea'), x => x.classList.contains('registro-auto'))
   };
 });
-await comprobar('solo las notas de ese hito (la más nueva arriba), y la historia aparte', mesa(), {
-  notas: ['Trae la solicitud el lunes', 'Ha llamado la madre'], historia: [true]
+/* Fila 229: una sola lista por fechas, con lo automático en gris. */
+await comprobar('solo las líneas de ese hito, en una lista (la más nueva arriba)', mesa(), {
+  notas: ['Trae la solicitud el lunes', AUTO, 'Ha llamado la madre'], auto: [false, true, false]
 });
 
 console.log('--- 5. escribir en la mesa ---');

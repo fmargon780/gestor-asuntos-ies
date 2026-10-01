@@ -93,7 +93,7 @@ var AsuntoRenombrar = (function () {
 
     var nota = await moverHitosYPresencia(claveVieja, claveNueva);
     if (nota && window.Notas) {
-      try { await Notas.anadir({ nombre: claveNueva }, nota); } catch (e) { /* no crítico */ }
+      try { await Notas.anadirAuto({ nombre: claveNueva }, nota); } catch (e) { /* no crítico */ }
     }
     return App.E.registro.asuntos[claveNueva];
   }

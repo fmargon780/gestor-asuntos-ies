@@ -3,7 +3,7 @@
    (25-sep-2026, fila 147, docs/MESA-TARJETAS-QUE-SE-ABREN.md).
 
    La mesa tiene tres tarjetas: «Tareas del hito» (el guion),
-   «Documentos del hito» y «Notas e historia». Una está en grande a la
+   «Documentos del hito» y «Registro». Una está en grande a la
    izquierda; las otras dos salen a la derecha como resumen, sin botones
    dentro. Pulsar una (o Intro/espacio con el foco) la abre en grande
    (`HitoMesa.abrirTarjeta`), y «← Volver a las tareas» vuelve.
@@ -68,24 +68,20 @@ var HitoMesaTarjetas = (function () {
 
   function primeraLinea(t) { return String(t || '').split('\n')[0]; }
 
-  /* «Notas e historia» · «N notas»: la primera línea de la última nota y
-     quién y cuándo; sin notas, lo último de la historia. */
+  /* «Registro» · «N líneas»: la primera línea de la última y quién y
+     cuándo (fila 229); sin nada, «Sin nada todavía». */
   function resumenNotas(a, h) {
-    var notas = window.NotasHito ? NotasHito.delHito(a, h.id) : [];
-    var historia = h.notas || [];
-    var ultima = notas[notas.length - 1];
+    var lineas = window.RegistroAsunto ? RegistroAsunto.lineas(a, { hito: h.id, hitos: [h] }) : [];
+    var ultima = lineas[0];
     var html;
     if (ultima) {
-      html = '<div class="mesa-resumen-linea mesa-resumen-nota">' + U.escapar(primeraLinea(ultima.texto)) + '</div>' +
+      html = '<div class="mesa-resumen-linea mesa-resumen-nota' + (ultima.auto ? ' mesa-resumen-historia' : '') + '">' +
+        U.escapar(primeraLinea(ultima.texto)) + '</div>' +
         '<div class="mesa-resumen-pie">Última: ' + U.escapar(ultima.quien || '') + ' · ' + U.escapar(dia(ultima.cuando)) + '</div>';
-    } else if (historia.length) {
-      var h1 = historia[historia.length - 1];
-      html = '<div class="mesa-resumen-linea mesa-resumen-historia">' + U.escapar(primeraLinea(h1.texto)) + '</div>' +
-        '<div class="mesa-resumen-pie">Sin notas · ' + U.escapar(dia(h1.cuando)) + '</div>';
     } else {
-      html = '<div class="mesa-resumen-vacio">Sin notas</div>';
+      html = '<div class="mesa-resumen-vacio">Sin nada todavía</div>';
     }
-    return { cuenta: notas.length + (notas.length === 1 ? ' nota' : ' notas'), html: html };
+    return { cuenta: lineas.length ? lineas.length + (lineas.length === 1 ? ' línea' : ' líneas') : '', html: html };
   }
 
   function rellenar(fila, cual, r) {

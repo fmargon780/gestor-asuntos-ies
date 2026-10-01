@@ -131,7 +131,7 @@ apagado si el hito no está vacío).
 
 Rejilla `2fr 1fr` a todo el ancho (con la mesa abierta, `.contenido` pierde su ancho máximo). Con el
 visor o el lector abiertos, o por debajo de 1100 px, la derecha baja. La mesa tiene tres tarjetas:
-«Qué hay que hacer», «Documentos del hito» y «Notas e historia». **Una está en grande** a la
+«Qué hay que hacer», «Documentos del hito» y «Registro». **Una está en grande** a la
 izquierda (`.mesa-col-grande`, secciones `.mesa-grande[data-tarjeta="guion|docs|notas"]`, las tres
 siempre en el DOM: los botones del guion pulsan los de siempre por debajo) y **las otras dos, de
 resumen**, a la derecha (`.mesa-resumen`, en `.mesa-col-derecha`, con «Normativa (N)» plegada al pie).
@@ -196,9 +196,8 @@ Cuál se ve lo dice `data-tarjeta` de `.mesa-columnas` (solo CSS: cambiar no rep
   estado «Registrado»/«Sin registrar», Abrir `.mesa-doc-abrir`, Enviar y ⋯), los gemelos debajo de su
   documento (`.mesa-doc-gemelo-fila`, sangrados, con su «Abrir») y, al pie, una zona de soltar de
   ancho completo. Soltar funciona sobre esta tarjeta y sobre toda la columna derecha.
-- **Notas e historia en grande**: dos columnas (3 a 2; una por debajo de 1100 px). A la izquierda, la
-  caja de cinco líneas que crece (Intro guarda, Mayúsculas+Intro salta) y las notas, lo más nuevo
-  arriba; a la derecha, «Historia», lo automático en gris pequeño.
+- **Registro en grande**: la caja de cinco líneas que crece (Intro guarda, Mayúsculas+Intro salta) y,
+  debajo, una sola lista por fechas, lo más nuevo arriba, con lo automático en gris pequeño (fila 229).
 - **Modo consulta**: se puede cambiar de tarjeta y abrir documentos (`js/ficha-consulta.js` deja
   encendidos `.mesa-volver-guion`, `.mesa-doc-abrir` y `.mesa-doc-gemelo`).
 
@@ -366,11 +365,13 @@ en los ficheros, sin leerse; un hito del ARCHIVO que aún los traiga los enseña
 contenido del instituto (`datos-biblioteca/biblioteca-centro.json`) ya los trae como líneas del
 guion, y un modelo viejo se convierte al meterlo en una guía (`ReunirMigracion.pasoAGuion`).
 
-### Las notas de la mesa (25-sep-2026, fila 139)
+### El registro de la mesa (30-sep-2026, fila 229; antes «Notas e historia»)
 
-El bloque «Notas» de la mesa enseña las notas del asunto escritas desde este hito, y lo que se
-escribe ahí se guarda como nota del asunto con su etiqueta; debajo, «Historia», lo automático del
-hito. Ver «Una sola libreta de notas» en `docs/contexto/ASUNTOS.md`.
+La tarjeta «Registro» de la mesa enseña, en **una sola lista** por fechas (ya no hay dos columnas,
+«notas» e «Historia»), solo las líneas de este hito: las notas del asunto escritas desde aquí
+(`ficha.notas` con su `hito`) y lo automático del hito (`h.notas`, en gris). Encima, la caja
+«Anotar algo que ha pasado…» (Intro guarda). Ver «El registro del asunto» en
+`docs/contexto/ASUNTOS.md`.
 
 ## «¿Dónde se guarda?» al crear, cambiar o borrar (30-sep-2026, fila 235, `docs/GUARDAR-EN-LA-GUIA-AL-ACEPTAR.md`)
 

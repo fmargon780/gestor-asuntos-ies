@@ -206,6 +206,18 @@
     });
     await marcarPrimerHito(pabloClave, 'hecho', 'Documentación recibida y comprobada.');
     await crearDocumentosDeDemostracion(pabloClave);
+    /* Fila 229: un registro con líneas de los dos tipos (escritas a mano y automáticas)
+       en dos hitos distintos, y alguna sin hito. */
+    var hitosPablo = await Hitos.hitosDe(pabloClave);
+    if (hitosPablo.length > 1) {
+      await Notas.anadir({ nombre: pabloClave }, 'Llama la madre: traerá la matrícula firmada el viernes.',
+        { hito: hitosPablo[0].id, hitoTitulo: hitosPablo[0].titulo || '' });
+      await Notas.anadir({ nombre: pabloClave }, 'Pasa por secretaría a recoger el impreso.');
+      await Notas.anadir({ nombre: pabloClave }, 'Dice la directora que se admite fuera de plazo.',
+        { hito: hitosPablo[1].id, hitoTitulo: hitosPablo[1].titulo || '' });
+      await Hitos.anadirNota(pabloClave, hitosPablo[1].id, 'Generado «Justificante de matrícula»');
+      await Hitos.anadirNota(pabloClave, hitosPablo[1].id, 'Tarea hecha: Comprobar la documentación');
+    }
 
     /* 3. con la fecha límite ya vencida. */
     await crearAsunto(tipos.CERTIFICADO, 'ALUMNADO', carla, hace(20), {

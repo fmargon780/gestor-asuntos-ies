@@ -75,7 +75,7 @@ window.HitosDesdeElAsunto = (function () {
     });
     if (algunoMarcado) return false;
     if (h.guionPropio && h.guionPropio.length) return false;
-    if (h.notas && h.notas.length) return false;
+    if (Hitos.notasPropias(h).length) return false;
     if (h.documentos && h.documentos.length) return false;
     var clave = (aOClave && aOClave.nombre) ? aOClave.nombre : aOClave;
     var conNotas = (clave && window.NotasHito) ? NotasHito.idsConNotas(clave) : {};
