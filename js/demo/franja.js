@@ -41,7 +41,7 @@
       /* Fila 260: con «solo consultar» puesto, los datos se montan con la protección parada y después
          se entra otra vez ya protegido, con el contador de escrituras a cero. */
       var soloConsulta = !!(window.SoloConsulta && SoloConsulta.activo());
-      if (soloConsulta) SoloConsulta.pausar(true);
+      if (soloConsulta) { SoloConsulta.pausar(true); document.body.classList.add('demo-montando'); }
       await $('btn-entrar').onclick();
       await Demo.datos.construir(disco);
       if (window.Gestor && window.Gestor.recargar) await window.Gestor.recargar();
@@ -51,6 +51,7 @@
         SoloConsulta.pausar(false);
         Demo.reiniciarEscrituras();
         await $('btn-entrar').onclick();
+        document.body.classList.remove('demo-montando');
       }
       if (typeof App.irVista === 'function') App.irVista(App.E.vista || 'departamento');
 

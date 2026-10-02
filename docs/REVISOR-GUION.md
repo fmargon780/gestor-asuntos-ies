@@ -78,6 +78,8 @@ la pantalla.
 > Con un solo MAL en toda la lista, el informe es RECHAZADA. Con todos BIEN o NO COMPROBADO, es
 > APROBADA.
 
+**En solo consulta** (fila 260), la copia de pruebas monta primero sus datos y entra después ya protegida: tarda unos 6 s. Espera a que salga el aviso fijo (`#franja-solo-consulta`) antes de medir nada.
+
 ## Qué hace la sesión con el informe
 
 Ver `docs/REVISOR-ANTES-DE-PUBLICAR.md`, sección 4: APROBADA pasa a `main`; RECHAZADA la primera
