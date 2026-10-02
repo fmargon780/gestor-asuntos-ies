@@ -5,6 +5,12 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 2-oct-2026 — Fila 259: control del registro de entrada y de salida
+
+Francisco quería la mayor seguridad posible de que no se escapa ningún asunto que pase por los registros de Séneca. Herramientas → «Control del registro»: se suben a mano los dos CSV de Séneca (el libro se sabe por las columnas, no por el nombre), se revisan desde una fecha, y cada apunte sale en «Sin asunto», «Con asunto», «No necesitan asunto» o «Anulados»; el emparejado se calcula cada vez. Inicio avisa de los apuntes sin asunto y de cuándo toca volver a subir (7 días por defecto, en Ajustes). Detalle en `docs/CONTROL-DEL-REGISTRO.md` y `docs/contexto/DOCUMENTOS.md`.
+
+---
+
 ## 1-oct-2026 — Fila 248: «Qué hay de nuevo» al cargar una versión nueva
 
 Ventana al entrar con las novedades que ese ordenador no ha visto (`js/novedades.js` + `js/novedades-ventana.js`), y el número de versión de la barra lateral la vuelve a abrir. Regla 21 de la cola: cada fila con cambio visible añade su línea.

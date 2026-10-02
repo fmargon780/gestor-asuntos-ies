@@ -160,3 +160,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 
 - En casa, en el Chromebook: marcar «En este ordenador, solo consultar» en la pantalla de entrada, entrar y mirar unos minutos (Inicio, un asunto, un documento). Después, en Drive («Ordenadores» → la carpeta → `_GESTOR`), ningún fichero tiene fecha de modificación posterior a la hora de entrada.
 
+
+## Fila 259 — control del registro (2-oct-2026)
+
+- Herramientas → «Control del registro»: poner «Revisar desde el día…» y subir los dos listados reales de Séneca (entrada y salida). Comprobar que se leen enteros (eñes y acentos bien) y que los códigos (`26EM0427`…) coinciden con los de los documentos ya registrados en los asuntos. Mirar que «Con asunto» y «Sin asunto» tienen sentido con lo que se conoce. Los documentos de asuntos abiertos anteriores a la fila 239 (registro en el nombre del fichero) no se miran: esos apuntes pueden salir «Sin asunto» aunque el documento exista; se arreglan con «Es de este asunto…».

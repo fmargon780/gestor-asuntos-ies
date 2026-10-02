@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '259', fecha: '2026-10-02', texto: 'Herramientas → Control del registro: sube los listados de Séneca y mira qué apuntes no tienen asunto; Inicio avisa de los que faltan y de cuándo toca volver a subirlos.' },
   { id: '257', fecha: '2026-10-02', texto: 'Cambiar el asunto: el tipo se busca escribiendo, en una línea como el tercero, y el cuadro cabe entero en pantalla.' },
   { id: '260', fecha: '2026-10-02', texto: 'En un ordenador que trabaja sobre una copia de las carpetas se puede marcar «En este ordenador, solo consultar»: la aplicación no guarda nada ahí.' },
   { id: '255', fecha: '2026-10-02', texto: 'Campos de un hito: en la pantalla de cada hito hay «+ Añadir campo»; se rellenan ahí y salen también en la ficha, debajo del nombre de su hito.' },

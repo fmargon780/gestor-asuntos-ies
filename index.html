@@ -55,6 +55,7 @@
 <link rel="stylesheet" href="css/estado-hito.css">
 <link rel="stylesheet" href="css/administraciones.css">
 <link rel="stylesheet" href="css/soporte.css">
+<link rel="stylesheet" href="css/control-registro.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -461,7 +462,23 @@
     <section id="pantalla-herramientas" class="pantalla oculto">
       <header class="cabecera"><h2>Herramientas</h2></header>
 
+      <div id="control-registro-vista" class="oculto"></div>
+
       <div id="herramientas-lista">
+
+      <!-- Fila 259 (docs/CONTROL-DEL-REGISTRO.md): el control del registro de entrada y de salida.
+           La vista a todo el ancho (#control-registro-vista) la pinta js/control-registro-pantalla.js
+           y sustituye a esta lista mientras está abierta. -->
+      <details class="bloque-ajustes" id="bloque-control-registro">
+        <summary>
+          <span class="bloque-titulo">Control del registro</span>
+          <span class="bloque-pie">Los apuntes del registro de entrada y de salida de Séneca que no están en ningún asunto</span>
+        </summary>
+        <div class="bloque-cuerpo">
+          <p class="explica">Sube los dos listados de Séneca y mira qué apuntes no tienen asunto.</p>
+          <button type="button" class="boton" id="control-registro-abrir" data-solo-lectura>Abrir el control del registro</button>
+        </div>
+      </details>
 
       <details class="bloque-ajustes" id="bloque-papelera">
         <summary>
@@ -598,6 +615,13 @@
         <label class="etiqueta-en-linea" for="dias-aviso-papelera">Avisar</label>
         <input id="dias-aviso-papelera" type="number" min="0" class="campo campo-plazo">
         <span class="suave">días antes</span>
+      </div>
+      <p class="explica">El control del registro (Herramientas) avisa en Inicio cuando hace más de estos
+         días que no se suben los listados de Séneca. Es de todo el centro.</p>
+      <div class="alta-tipo">
+        <label class="etiqueta-en-linea" for="dias-registro">Registro de Séneca sin revisar:</label>
+        <input id="dias-registro" type="number" min="1" class="campo campo-plazo">
+        <span class="suave">días</span>
       </div>
         </div>
       </details>
@@ -1499,6 +1523,9 @@
      pestaña "Herramientas". Solo llama a los módulos de siempre, así
      que basta con que esté cargado antes de que se pueda pulsar esa
      pestaña. -->
+<script src="js/control-registro.js"></script>
+<script src="js/control-registro-pantalla.js"></script>
+<script src="js/control-registro-avisos.js"></script>
 <script src="js/herramientas.js"></script>
 <!-- «Pasar a Administraciones» (fila 167), en Mantenimiento. -->
 <script src="js/administraciones-traer.js"></script>

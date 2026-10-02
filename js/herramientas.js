@@ -12,6 +12,8 @@
    con ellos. Se llama desde App.ir (js/nucleo.js). */
 
 App.pintarHerramientas = async function () {
+  /* Fila 259: al entrar se ve la lista de bloques; el control del registro se abre con su botón. */
+  if (window.ControlRegistroPantalla) ControlRegistroPantalla.cerrar();
   if (typeof App.pintarPapelera === 'function') await App.pintarPapelera();
   if (typeof App.pintarCopias === 'function') await App.pintarCopias();
   if (window.TablasDatosPantalla) await TablasDatosPantalla.pintar();

@@ -1,0 +1,32 @@
+/* El control del registro de entrada y de salida (fila 259, docs/CONTROL-DEL-REGISTRO.md):
+   una tabla de trabajo a todo el ancho, densa. */
+#control-registro-vista { width: 100%; }
+.cr-barra { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.cr-titulo { margin: 0; font-size: 18px; }
+.cr-fila { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin: 6px 0; }
+.cr-desde { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; }
+.cr-aviso { margin: 6px 0; padding: 6px 10px; font-size: 13.5px; }
+.cr-pestanas { display: flex; gap: 4px; margin: 10px 0 0; border-bottom: 2px solid var(--linea); }
+.cr-pestana { border: 1px solid var(--linea); border-bottom: 0; background: var(--fondo); padding: 7px 16px; cursor: pointer;
+  border-radius: 8px 8px 0 0; font-size: 14px; color: var(--tinta); }
+.cr-pestana.activa { background: var(--papel); font-weight: 600; color: var(--azul); }
+.cr-cuerpo { padding-top: 8px; }
+.cr-cuerpo h4 { margin: 6px 0; font-size: 15px; }
+.cr-tabla { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--papel); }
+.cr-tabla th, .cr-tabla td { text-align: left; padding: 3px 8px; border-bottom: 1px solid var(--linea); vertical-align: top; }
+.cr-tabla th { background: var(--fondo); font-weight: 600; white-space: nowrap; }
+.cr-cod { font-family: ui-monospace, Consolas, monospace; white-space: nowrap; }
+.cr-extracto { min-width: 260px; }
+.cr-incompleto { background: var(--ambar); border: 1px solid var(--ambar-linea); border-radius: 4px; padding: 0 5px; font-size: 11.5px; }
+.cr-nota { color: var(--tinta-suave); font-size: 12px; }
+.cr-acciones { white-space: nowrap; }
+.cr-acciones .boton { padding: 2px 8px; font-size: 12.5px; }
+.cr-mas { display: inline-block; position: relative; }
+.cr-mas > summary { cursor: pointer; padding: 0 8px; list-style: none; font-size: 16px; }
+.cr-mas > summary::-webkit-details-marker { display: none; }
+.cr-menu { position: absolute; right: 0; z-index: 5; background: var(--papel); border: 1px solid var(--linea); border-radius: 8px;
+  padding: 6px; box-shadow: var(--sombra); display: flex; flex-direction: column; gap: 4px; }
+.cr-plegado { margin: 10px 0; }
+.cr-plegado > summary { cursor: pointer; font-weight: 600; font-size: 14px; padding: 4px 0; }
+.cr-clases { margin: 4px 0 8px; font-size: 13px; }
+.cr-clase { display: inline-block; background: var(--azul-claro); border-radius: 6px; padding: 1px 8px; margin-right: 6px; }
