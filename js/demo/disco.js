@@ -39,6 +39,10 @@
      Misma forma que exige la File System Access API de verdad: basta
      con que `js/carpetas.js` no note la diferencia. */
 
+  /* Fila 260: cuántas veces se ha escrito, borrado o creado algo en el disco de mentira
+     (la prueba de «solo consultar» comprueba que sigue en 0). */
+  var escrituras = 0;
+
   function dir(nombre) {
     var hijos = new Map();
     return {
@@ -50,6 +54,7 @@
       getDirectoryHandle: function (n, o) {
         if (!hijos.has(n)) {
           if (!o || !o.create) { var e = new Error('no existe: ' + n); e.name = 'NotFoundError'; return Promise.reject(e); }
+          escrituras++;
           hijos.set(n, dir(n));
         }
         var h = hijos.get(n);
@@ -59,13 +64,14 @@
       getFileHandle: function (n, o) {
         if (!hijos.has(n)) {
           if (!o || !o.create) { var e = new Error('no existe: ' + n); e.name = 'NotFoundError'; return Promise.reject(e); }
+          escrituras++;
           hijos.set(n, fich(n, ''));
         }
         var h = hijos.get(n);
         if (h.kind !== 'file') { var e2 = new Error(n + ' no es un fichero'); e2.name = 'TypeMismatchError'; return Promise.reject(e2); }
         return Promise.resolve(h);
       },
-      removeEntry: function (n) { hijos.delete(n); return Promise.resolve(); },
+      removeEntry: function (n) { escrituras++; hijos.delete(n); return Promise.resolve(); },
       entries: function () {
         var it = hijos.entries();
         var iter = {};
@@ -86,6 +92,7 @@
       return Promise.resolve(new File([bytes], nombre, { type: tipo || 'text/plain', lastModified: Date.now() }));
     };
     f.createWritable = function () {
+      escrituras++;
       return Promise.resolve({
         write: function (c) {
           if (typeof c === 'string') { f._texto = c; return Promise.resolve(); }
@@ -188,6 +195,8 @@
     activo: function () { return activo; },
     disco: function () { return raiz; },
     ficheroDeMentira: fich,
-    reiniciar: reiniciar
+    reiniciar: reiniciar,
+    escrituras: function () { return escrituras; },
+    reiniciarEscrituras: function () { escrituras = 0; }
   };
 })();

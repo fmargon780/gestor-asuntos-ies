@@ -41,3 +41,6 @@ body.demo-activo .arranque {
 }
 
 #btn-demo-entrar { margin-top: 10px; }
+
+/* Fila 260: con «solo consultar», los datos se montan antes y la pantalla no se enseña hasta estar protegida (unos 6 s). */
+body.demo-montando #aplicacion { visibility: hidden; }

@@ -68,6 +68,8 @@
     /* Fila 147: cambiar de tarjeta en la mesa y abrir un documento solo miran. */
     if (el.classList.contains('mesa-volver-guion') || el.classList.contains('mesa-doc-abrir') || el.classList.contains('mesa-doc-gemelo')) return true;   /* fila 129: abre la mesa del hito */
     if (el.classList.contains('boton-presencia-tomar')) return true;
+    if ((el.classList.contains('mesa-tira-volver') || el.classList.contains('mesa-tira-hito')) && window.SoloConsulta && SoloConsulta.activo()) return true;   /* fila 260: navegar entre hitos */
+    if (el.classList.contains('tercero-vertodo') && window.SoloConsulta && SoloConsulta.activo()) return true;   /* fila 260: «Ver todo» solo mira */
     /* El disparador de los tres puntos del nombre (18-sep-2026, fila
        52, docs/CABECERA-DEL-ASUNTO.md, 5): en modo consulta el menú se
        tiene que poder abrir igual, porque una de sus opciones —copiar
@@ -88,7 +90,7 @@
   function aplicarModoConsulta() {
     var raiz = $('ficha-asunto-cuerpo');
     if (!raiz) return;
-    var enConsulta = !!N.ocupacionActual;
+    var enConsulta = !!N.ocupacionActual || !!(window.SoloConsulta && SoloConsulta.activo());   /* fila 260: siempre en solo consulta */
     raiz.classList.toggle('ficha-consulta', enConsulta);
     /* Solo toca lo que él mismo apaga (fila 100): antes ponía
        disabled=false en TODO, y volvía a encender un botón que estaba
@@ -96,7 +98,10 @@
     Array.prototype.forEach.call(raiz.querySelectorAll('button, select, input, textarea'), function (el) {
       if (el.dataset.guardando) return;
       if (enConsulta && !esControlDeSoloLectura(el)) {
-        if (!el.disabled) { el.disabled = true; el.dataset.apagadoPorConsulta = '1'; }
+        if (!el.disabled) {
+          el.disabled = true; el.dataset.apagadoPorConsulta = '1';
+          if (window.SoloConsulta && SoloConsulta.activo()) el.title = 'Solo consulta';   /* fila 260: el motivo */
+        }
       } else if (el.dataset.apagadoPorConsulta) {
         el.disabled = false;
         delete el.dataset.apagadoPorConsulta;

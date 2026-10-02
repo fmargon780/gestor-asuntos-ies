@@ -4344,3 +4344,8 @@ La tarjeta «Datos del trámite» pasa a «Campos del asunto», con «+ Añadir 
 ## 2-oct-2026 — fila 255: campos de un hito
 
 Un campo de un hito es un campo del asunto con la marca del hito: tarjeta «Campos de este hito» en la mesa (se rellenan ahí), «+ Añadir campo» con «Ya están en este asunto» y «¿Dónde se guarda?», rótulo del hito en la ficha, desplegable «Hito» en Ajustes, Nuevo asunto sin esos campos y, al borrar un paso de la guía, sus campos pasan a ser del asunto. Un solo valor por asunto (limitación aceptada). Demo: «Fecha de la factura» en el hito «Tramitar el pago» de FACTURA.
+
+## 2-oct-2026 — fila 260: solo consultar en este ordenador
+
+En casa, Francisco trabaja sobre una COPIA de las carpetas del centro (en Drive); lo que cambiaba allí llegaba al Dropbox a trozos, por dos sincronizadores a la vez, mientras el compañero trabajaba: cambios que no aparecían, fichas sin carpeta y números de asunto repartidos por separado. Ni «solo miro» valía: al abrirse, la aplicación guarda cosas sola. Protección: casilla «En este ordenador, solo consultar» (en el navegador, nunca en `_GESTOR`); con ella, las carpetas van envueltas y rechazan cualquier escritura (`js/solo-consulta.js`). La solución de fondo (conectar en casa al Dropbox del centro) sigue sin diseñar en `docs/PENDIENTES-DE-DISENAR.md`.
+

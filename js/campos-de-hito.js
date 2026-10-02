@@ -73,7 +73,7 @@ window.CamposDeHito = (function () {
     });
   }
 
-  function enConsulta() { return !!(window.FichaNucleo && FichaNucleo.ocupacionActual); }
+  function enConsulta() { return !!(window.FichaNucleo && FichaNucleo.ocupacionActual) || !!(window.SoloConsulta && SoloConsulta.activo()); }
 
   /* ---------- la tarjeta de la mesa ---------- */
 
