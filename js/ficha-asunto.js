@@ -71,7 +71,7 @@
     /* Solo se vigila la presencia en un asunto abierto: en el ARCHIVO
        no hay nada que tramitar, así que nadie puede "pisarse". */
     if (!window.Presencia) return;
-    if (N.modoActual !== 'abierto') { Presencia.dejarDeVigilar(); return; }
+    if (N.modoActual !== 'abierto' || (window.SoloConsulta && SoloConsulta.activo())) { Presencia.dejarDeVigilar(); return; }   /* fila 260: en solo consulta no se escribe la presencia */
     Presencia.vigilar(a.nombre, function (cambio) {
       if (N.actual !== a) return;   /* se ha cambiado de ficha mientras tanto */
       N.ocupacionActual = cambio.modo === 'consulta' ? { usuario: cambio.usuario } : null;

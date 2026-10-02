@@ -104,6 +104,12 @@
         <input id="campo-usuario" class="campo" placeholder="Tu nombre" style="max-width:220px">
       </div>
 
+      <label class="interruptor solo-consulta-casilla">
+        <input type="checkbox" id="check-solo-consulta">
+        <span>En este ordenador, solo consultar</span>
+      </label>
+      <p class="nota">La aplicación no guardará nada en las carpetas. Para cuando este ordenador trabaja sobre una copia.</p>
+
       <button id="btn-entrar" class="boton boton-principal boton-ancho" disabled>Entrar</button>
       <p class="nota">Nada de lo que hagas aquí sale de este ordenador.
          La aplicación trabaja directamente sobre tus carpetas.</p>
@@ -839,6 +845,12 @@
         <div class="bloque-cuerpo">
       <div id="estado-carpetas" class="lista"></div>
       <button id="btn-olvidar" class="boton">Volver a elegir las carpetas</button>
+      <!-- Fila 260: la misma casilla que en la pantalla de entrada. Al cambiarla, la aplicación se recarga. -->
+      <label class="interruptor solo-consulta-casilla" style="margin-top:12px">
+        <input type="checkbox" id="ajustes-solo-consulta">
+        <span>En este ordenador, solo consultar</span>
+      </label>
+      <p class="nota">La aplicación no guardará nada en las carpetas. Para cuando este ordenador trabaja sobre una copia.</p>
         </div>
       </details>
 
@@ -926,6 +938,7 @@
 
 <!-- Piezas sueltas: cada una hace su trabajo y no sabe de las demás. -->
 <script src="js/util.js"></script>
+<script src="js/solo-consulta.js"></script>
 <script src="js/util-parecidos.js"></script>
 <script src="js/buscar-o-crear.js"></script>
 <script src="js/util-pantalla.js"></script>

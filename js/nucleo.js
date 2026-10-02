@@ -200,6 +200,11 @@ $('btn-archivo').onclick = function () {
 
 $('btn-entrar').onclick = async function () {
   try {
+    /* Fila 260: en solo consulta, las dos carpetas van protegidas (js/solo-consulta.js). */
+    if (window.SoloConsulta) {
+      App.E.abiertos = SoloConsulta.proteger(App.E.abiertos);
+      App.E.archivo = SoloConsulta.proteger(App.E.archivo);
+    }
     var ok1 = await Carpetas.permiso(App.E.abiertos, true);
     var ok2 = await Carpetas.permiso(App.E.archivo, true);
     if (!ok1 || !ok2) {
@@ -232,7 +237,7 @@ $('btn-entrar').onclick = async function () {
        usuarios.json a medio escribir y darlo por roto (pasó de
        verdad, fila 72). Se espera, para no dejarlo escribiendo de
        fondo mientras ya se está leyendo el resto de ficheros. */
-    if (window.Usuarios) await Usuarios.anadirSiHaceFalta(App.E.gestor, App.E.usuario);
+    if (window.Usuarios && !(window.SoloConsulta && SoloConsulta.activo())) await Usuarios.anadirSiHaceFalta(App.E.gestor, App.E.usuario);   /* fila 260: en solo consulta no se apunta el nombre */
 
     await App.cargarTipos();
     await App.cargarTiposDocumento();
@@ -263,6 +268,7 @@ $('btn-entrar').onclick = async function () {
     await App.verAbiertos();
     App.irVista(App.E.vista);
     App.vigilarLaCarpeta();
+    if (window.SoloConsulta) SoloConsulta.alEntrar();   /* fila 260 */
     if (window.NovedadesVentana) {   /* fila 248 */
       NovedadesVentana.hacerPulsable();
       NovedadesVentana.alEntrar();

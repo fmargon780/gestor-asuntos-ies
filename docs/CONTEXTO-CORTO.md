@@ -76,6 +76,8 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 (Una línea por cosa; el porqué, en `docs/contexto/` y `HISTORIA.md`.)
 
+- Solo consulta (fila 260): casilla «En este ordenador, solo consultar» en la entrada y en Ajustes → Mantenimiento (`localStorage`, nunca `_GESTOR`); las carpetas van protegidas (`js/solo-consulta.js`, `SoloConsulta.proteger`: rechazan escribir, crear, borrar y mover con error `SoloConsulta`), aviso fijo arriba con «Quitar», controles que cambian algo apagados, ficha siempre en modo consulta.
+
 - Comprobación al entrar (fila 204): marca en la barra lateral («✓ Todo configurado» / «⚠ N por
   configurar») y panel con «Arreglarlo» para las cosas que se configuran una vez por ordenador.
 - Nuevo asunto empieza por la persona (fila 197): buscador único en todas las categorías, con la
@@ -233,6 +235,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 
 ## 6. Reglas de código que no se pueden olvidar
 
+- Todo código nuevo que escriba en las carpetas **de fondo** (sin que lo pida un botón) mira antes `SoloConsulta.activo()` y se salta (fila 260).
 - El repositorio es la versión buena; Vercel publica solo la app (`.vercelignore`: sin `docs/` ni `pruebas/`) y pone
   sola la hora de la versión al publicar; la de `js/version.js` (hora real) es la de la copia sin internet.
 - **Permiso permanente de Francisco**: una petición de cambios hacia `pruebas`, o hacia `main` tras

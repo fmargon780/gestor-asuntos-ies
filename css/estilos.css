@@ -569,3 +569,20 @@ h3 { margin: 30px 0 8px; font-size: 16px; }
 .novedades-lista li { margin: 4px 0; }
 .novedad-fecha { font-weight: 600; margin-right: 4px; }
 #novedades-mas { background: none; border: 0; padding: 0; color: inherit; text-decoration: underline; cursor: pointer; font: inherit; }
+
+/* Fila 260 (docs/SOLO-CONSULTA-EN-ESTE-ORDENADOR.md): el aviso fijo de «solo consulta» y la casilla de entrada. */
+:root { --franja-consulta-alto: 0px; }
+#franja-solo-consulta {
+  position: fixed; top: var(--franja-demo-alto, 0px); left: 0; right: 0; z-index: 69;
+  display: flex; align-items: center; justify-content: center; gap: 14px; padding: 7px 16px;
+  background: #fff4d6; color: #1b2430; font-size: 14px; border-bottom: 2px solid #e0b34a;
+}
+#franja-solo-consulta .boton { padding: 3px 10px; font-size: 12.5px; }
+body.solo-consulta { padding-top: var(--franja-consulta-alto); }
+body.solo-consulta.demo-activo { padding-top: calc(var(--franja-demo-alto, 0px) + var(--franja-consulta-alto)); }
+body.solo-consulta .lateral { top: var(--franja-consulta-alto); height: calc(100vh - var(--franja-consulta-alto)); }
+body.solo-consulta.demo-activo .lateral {
+  top: calc(var(--franja-demo-alto, 0px) + var(--franja-consulta-alto));
+  height: calc(100vh - var(--franja-demo-alto, 0px) - var(--franja-consulta-alto));
+}
+.solo-consulta-casilla { margin: 14px 0 0; display: flex; gap: 8px; align-items: center; }

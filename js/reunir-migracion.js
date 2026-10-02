@@ -167,6 +167,7 @@ var ReunirMigracion = (function () {
 
   function intentar() {
     if (hecho || corriendo) return;
+    if (window.SoloConsulta && SoloConsulta.activo()) return;   /* fila 260: en solo consulta no se migra nada */
     if (!window.Gestor || !Gestor.carpetaGestor() || !App.E || !App.E.listaAbiertos) return;
     corriendo = true;
     /* Un poco después de entrar, como js/estado-migracion.js: que las guías ya estén leídas. */

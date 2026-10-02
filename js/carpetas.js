@@ -11,16 +11,19 @@ var Carpetas = (function () {
     return typeof window.showDirectoryPicker === 'function';
   }
 
+  /* Fila 260: en un ordenador de solo consulta, las carpetas se piden solo para leer. */
+  function modo() { return (window.SoloConsulta && SoloConsulta.activo()) ? 'read' : 'readwrite'; }
+
   /* Abre el cuadro de Windows para señalar una carpeta. */
   function elegir(id) {
-    return window.showDirectoryPicker({ id: id, mode: 'readwrite' });
+    return window.showDirectoryPicker({ id: id, mode: modo() });
   }
 
   /* ¿Seguimos teniendo permiso sobre esta carpeta?
      'pedir' a true muestra el cuadro del navegador; solo vale si el
      usuario acaba de pulsar algo. */
   function permiso(dir, pedir) {
-    var opciones = { mode: 'readwrite' };
+    var opciones = { mode: modo() };
     return dir.queryPermission(opciones).then(function (estado) {
       if (estado === 'granted') return true;
       if (!pedir) return false;

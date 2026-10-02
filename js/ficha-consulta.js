@@ -88,7 +88,7 @@
   function aplicarModoConsulta() {
     var raiz = $('ficha-asunto-cuerpo');
     if (!raiz) return;
-    var enConsulta = !!N.ocupacionActual;
+    var enConsulta = !!N.ocupacionActual || !!(window.SoloConsulta && SoloConsulta.activo());   /* fila 260: siempre en solo consulta */
     raiz.classList.toggle('ficha-consulta', enConsulta);
     /* Solo toca lo que él mismo apaga (fila 100): antes ponía
        disabled=false en TODO, y volvía a encender un botón que estaba

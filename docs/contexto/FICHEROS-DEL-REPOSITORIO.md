@@ -451,3 +451,6 @@ de `App` va después del fichero que lo define.
 | `docs/CLAVE-COPIA-PUBLICA.md` | Pasos para Francisco (fila 89): crear el repositorio público, el token de grano fino y el secreto `COPIA_TOKEN` |
 | `docs/INSTALAR-COPIA.md` | Pasos para Francisco (filas 89 y 91): guardar `ABRIR EL GESTOR.html` en el Dropbox del centro y abrirlo; y lo mismo si la copia se ha quedado vieja |
 | `README.md` | — |
+| `js/solo-consulta.js` | Fila 260: «En este ordenador, solo consultar»: la marca (`localStorage`), `proteger` (carpetas que rechazan escribir con error `SoloConsulta`), el aviso fijo con «Quitar» y el apagado de los controles que cambian algo |
+| `pruebas/solo-consulta.mjs` | Prueba de la fila 260: cero escrituras en el disco de demostración, el cierre aguanta, aviso fijo, controles apagados, «Quitar» |
+

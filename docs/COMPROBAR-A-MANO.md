@@ -149,3 +149,8 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 255 — campos de un hito (2-oct-2026)
 
 - Con un tipo real, añadir un campo desde la pantalla de un hito, rellenarlo, mirar la ficha (rótulo del hito), exportar con su columna y generar un documento con su hueco: sale igual que un campo del asunto. No se ha probado con datos reales del centro.
+
+## Fila 260 — solo consultar (2-oct-2026)
+
+- En casa, en el Chromebook: marcar «En este ordenador, solo consultar» en la pantalla de entrada, entrar y mirar unos minutos (Inicio, un asunto, un documento). Después, en Drive («Ordenadores» → la carpeta → `_GESTOR`), ningún fichero tiene fecha de modificación posterior a la hora de entrada.
+

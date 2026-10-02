@@ -38,9 +38,20 @@
       $('campo-usuario').value = 'Revisor';
       App.revisarArranque();
 
+      /* Fila 260: con «solo consultar» puesto, los datos se montan con la protección parada y después
+         se entra otra vez ya protegido, con el contador de escrituras a cero. */
+      var soloConsulta = !!(window.SoloConsulta && SoloConsulta.activo());
+      if (soloConsulta) SoloConsulta.pausar(true);
       await $('btn-entrar').onclick();
       await Demo.datos.construir(disco);
       if (window.Gestor && window.Gestor.recargar) await window.Gestor.recargar();
+      if (soloConsulta) {
+        /* Que acaben las tareas de fondo de la primera entrada (migraciones a los 2-3 s) antes de proteger. */
+        await new Promise(function (ok) { setTimeout(ok, 4500); });
+        SoloConsulta.pausar(false);
+        Demo.reiniciarEscrituras();
+        await $('btn-entrar').onclick();
+      }
       if (typeof App.irVista === 'function') App.irVista(App.E.vista || 'departamento');
 
       ponerFranja();
