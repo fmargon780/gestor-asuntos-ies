@@ -12,4 +12,3 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 259 | 150 | Módulo nuevo entero (leer dos CSV, emparejar con abiertos y ARCHIVO, pantalla con cuatro apartados, avisos de Inicio, Ajustes) y prueba nueva |
