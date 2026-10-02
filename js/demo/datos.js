@@ -170,7 +170,9 @@
     });
     await Campos.guardarConfigDeTipo(App.E.gestor, 'FACTURA', [
       { origen: 'propio', id: 'p-importe-factura', obligatorio: false, enNombre: false },
-      { origen: 'propio', id: 'p-fecha-factura', obligatorio: false, enNombre: false }]);
+      /* Fila 255: «Fecha de la factura» es un campo del hito «Tramitar el pago». */
+      { origen: 'propio', id: 'p-fecha-factura', obligatorio: false, enNombre: false,
+        hito: GuiasDelCentro.pasosDe('FACTURA')[1].id }]);
     App.E.campos = await Campos.leer(App.E.gestor);
 
     /* Fila 238: el tipo del certificado de miembro del Consejo Escolar. */

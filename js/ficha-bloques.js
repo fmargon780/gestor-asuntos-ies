@@ -51,8 +51,8 @@
       var ambar = !!(g && g.valor && window.CamposClases && CamposClases.noEncaja(clase, g.valor));
       var ayuda = ambar ? CamposClases.ayudaDeAmbar(clase) : '';
       if (cfg.soloAqui) {
-        salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: visto, soloAqui: true, clave: clave, ambar: ambar, ayuda: ayuda });
-      } else if (g && g.valor) salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: visto, ambar: ambar, ayuda: ayuda });
+        salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: visto, soloAqui: true, clave: clave, ambar: ambar, ayuda: ayuda, hito: cfg.hito });
+      } else if (g && g.valor) salida.push({ titulo: Campos.nombreDeCampo(cfg, App.E.campos), valor: visto, ambar: ambar, ayuda: ayuda, hito: cfg.hito });
     });
     Object.keys(guardados).forEach(function (clave) {
       if (vistos[clave]) return;
@@ -68,14 +68,39 @@
      Solo quedan los campos propios del tipo, la vía, "Lo pide" y en
      qué carpeta del ARCHIVO está. Sin ninguna fila, devuelve null: el
      bloque entero no se pinta, ni el título ni la tarjeta. */
+  /* Fila 255: los campos de un hito van después de los del asunto, cada grupo con el
+     título de su hito (en el orden de los hitos). Un campo con valor cuyo hito ya no
+     existe se queda con los del asunto; sin valor, no sale. */
+  function conRotulosDeHito(a, filas) {
+    if (!window.CamposDeHito || !filas.some(function (f) { return f.hito; })) return filas;
+    var hitos = CamposDeHito.hitosDelAsunto(a.nombre);
+    if (!hitos) {
+      /* Los hitos todavía no se han leído: se leen y la ficha se repinta una vez. */
+      if (window.Hitos && !N.__hitosPedidos) {
+        N.__hitosPedidos = true;
+        Hitos.leer().then(function () { N.__hitosPedidos = false; if (N.pintar) N.pintar(); }, function () { N.__hitosPedidos = false; });
+      }
+      return filas.map(function (f) { return Object.assign({}, f, { hito: undefined }); });
+    }
+    var reparto = CamposDeHito.repartir(filas, hitos, function (f) { return !!f.valor; });
+    var salida = reparto.sinHito.slice();
+    reparto.porHito.forEach(function (g) {
+      var conValor = g.campos.filter(function (f) { return f.valor; });   /* sin valor se rellena en su hito */
+      if (!conValor.length) return;
+      salida.push({ rotulo: g.hito.titulo });
+      conValor.forEach(function (f) { salida.push(f); });
+    });
+    return salida;
+  }
+
   function datosDelAsunto(a) {
     var f = a.ficha || {};
-    var buenas = filasDeCampos(a).concat([
+    var buenas = conRotulosDeHito(a, filasDeCampos(a)).concat([
       { titulo: 'Vía de comunicación', valor: App.textoVia(f) },
       { titulo: 'Lo pide', valor: window.LoPide ? LoPide.texto(f) : '' },
       { titulo: 'Departamento', valor: (f.departamento && f.departamento.nombre) || '' },   /* fila 167 */
       { titulo: 'En el archivo', valor: a.ruta || '' }
-    ]).filter(function (x) { return x && (x.valor || x.soloAqui); });
+    ]).filter(function (x) { return x && (x.valor || x.soloAqui || x.rotulo); });
     /* "Impresos" (20-sep-2026, fila 82, docs/FORMULARIOS-OFICIALES.md):
        se rellena aparte, después de pintar (js/formularios.js, que
        envuelve App.abrirFicha), porque hace falta leer los hitos del

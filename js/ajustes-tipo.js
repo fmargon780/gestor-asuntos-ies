@@ -291,8 +291,25 @@ async function construirSeccionCampos(tipo) {
       f.innerHTML = '<span class="nombre-tipo">' + U.escapar(Campos.nombreDeCampo(c, App.E.campos)) +
         '</span><span class="suave">' + textoOrigen(c) + '</span>';
 
+      /* Fila 255: el hito del campo («Ninguno» = un campo del asunto). */
+      var pasosGuia = window.CamposDeHito ? CamposDeHito.pasosDeLaGuia(tipo.tipo) : [];
+      if (pasosGuia.length) {
+        var selH = document.createElement('select');
+        selH.className = 'campo campo-hito-select';
+        selH.title = 'Hito de este campo';
+        selH.innerHTML = '<option value="">Ninguno (del asunto)</option>' + pasosGuia.map(function (p) {
+          return '<option value="' + U.escapar(p.id) + '"' + (c.hito === p.id ? ' selected' : '') + '>' + U.escapar(p.titulo) + '</option>';
+        }).join('');
+        selH.onchange = function () {
+          if (selH.value) { c.hito = selH.value; c.obligatorio = false; } else { delete c.hito; }
+          pintarPuestos();
+          guardarCampos();
+        };
+        f.appendChild(selH);
+      }
+
       var oblig = document.createElement('label');
-      oblig.className = 'interruptor interruptor-fila';
+      oblig.className = 'interruptor interruptor-fila' + (c.hito ? ' oculto' : '');
       var cOblig = document.createElement('input');
       cOblig.type = 'checkbox';
       cOblig.checked = !!c.obligatorio;

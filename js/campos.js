@@ -142,7 +142,10 @@ var Campos = (function () {
     var salida = { origen: origen };
     if (origen === 'fichero') salida.columna = String((c && c.columna) || '');
     else salida.id = String((c && c.id) || '');
-    salida.obligatorio = !!(c && c.obligatorio);
+    /* Fila 255: `hito` (opcional) es el `id` del paso de la guía al que pertenece el campo. */
+    var hito = String((c && c.hito) || '');
+    if (hito) salida.hito = hito;
+    salida.obligatorio = !!(c && c.obligatorio) && !hito;   /* un campo de un hito no se pide al crear */
     salida.enNombre = !!(c && c.enNombre);
     return salida;
   }
@@ -353,11 +356,22 @@ var Campos = (function () {
   function camposDeAsunto(listaDelTipo, ficha) {
     var salida = (listaDelTipo || []).slice();
     var vistas = {};
-    salida.forEach(function (c) { vistas[claveDeCampo(c)] = true; });
+    salida.forEach(function (c, i) { vistas[claveDeCampo(c)] = i + 1; });
     ((ficha && ficha.camposPropiosDelAsunto) || []).forEach(function (c) {
       var k = claveDeCampo(c);
-      if (!c || vistas[k]) return;
-      vistas[k] = true;
+      if (!c) return;
+      if (vistas[k]) {
+        /* Fila 255: un campo del tipo sin hito al que este asunto le ha puesto hito
+           (solo en la ficha): vale el del tipo, con la marca de hito de aquí. */
+        var del = salida[vistas[k] - 1];
+        if (c.hito !== undefined && c.hito !== (del.hito || '')) {
+          var puesto = Object.assign({}, del);
+          if (c.hito) puesto.hito = c.hito; else delete puesto.hito;   /* `hito: ''`: sin hito, solo en este asunto */
+          salida[vistas[k] - 1] = puesto;
+        }
+        return;
+      }
+      vistas[k] = salida.length + 1;
       salida.push(Object.assign({}, c, { obligatorio: false, enNombre: false, soloAqui: true }));
     });
     return salida;

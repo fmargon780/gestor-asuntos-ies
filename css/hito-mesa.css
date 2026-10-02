@@ -300,3 +300,16 @@ details.mesa-normativa > summary { cursor: pointer; }
 .dsg-notas { margin: 0 0 4px 22px; }
 .dsg-nota { display: block; font-size: 12px; color: #5d6b7a; }
 .dsg-tarea { margin: 0 0 8px; font-weight: 600; }
+
+/* Fila 255 (docs/CAMPOS-DE-UN-HITO.md): la tarjeta «Campos de este hito», en la columna de la derecha. */
+.mesa-campos-hito {
+  background: var(--papel); border: 1px solid var(--linea); border-radius: 8px; padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.mesa-campos-hito .mesa-bloque-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mesa-campos-hito-vacia { padding: 8px 12px; }
+.mesa-campo-hito-anadir { padding: 3px 10px; font-size: 12px; }
+.mesa-campos-hito .mesa-campo-hito { background: none; border: 0; padding: 2px 0; gap: 6px 10px; }
+.mesa-campos-hito .mesa-campo-hito > .etiqueta { flex: 0 0 100%; font-size: 12px; }
+.mesa-campos-hito .mesa-campo-hito > .campo { flex: 1 1 140px; }
+.ficha-consulta .mesa-campo-hito-anadir, .ficha-consulta .campo-hito-menu { display: none; }

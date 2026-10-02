@@ -53,7 +53,14 @@ App.pintarCamposDelTipo = function () {
   var contenedor = $('campos-lista-nuevo');
   var tipo = App.E.nuevo.tipo;
   var persona = App.E.nuevo.tercero;
-  var lista = (App.E.campos && App.E.campos.porTipo && App.E.campos.porTipo[tipo]) || [];
+  var todos = (App.E.campos && App.E.campos.porTipo && App.E.campos.porTipo[tipo]) || [];
+  /* Fila 255: los campos de un hito no se piden al crear (se rellenan cuando llega su
+     hito); solo se guarda su valor de partida, si lo tiene (de fichero o calculado). */
+  var lista = todos.filter(function (c) { return !c.hito; });
+  App.E.nuevo.camposDeHito = todos.filter(function (c) { return c.hito; }).map(function (cfg) {
+    return { clave: Campos.claveDeCampo(cfg), nombre: Campos.nombreDeCampo(cfg, App.E.campos),
+             valor: String(Campos.valorInicial(cfg, persona, App.E.campos) || '') };
+  });
 
   if (!lista.length) {
     caja.classList.add('oculto');
@@ -91,13 +98,16 @@ App.pintarCamposDelTipo = function () {
    campo configurado. Sirve tanto para la vista previa y la validación
    como para lo que se guarda en la ficha del asunto. */
 App.valoresCamposActuales = function () {
+  var deHito = (App.E.nuevo.camposDeHito || []).filter(function (x) { return x.valor; }).map(function (x) {
+    return { clave: x.clave, nombre: x.nombre, valor: x.valor, texto: x.valor, ok: true, enNombre: false, obligatorio: false };
+  });
   return (App.E.nuevo.configCampos || []).map(function (item) {
     /* Fila 244: `valor` es lo que se guarda (importe `1234.50`, fecha `AAAA-MM-DD`);
        `texto`, lo que se ve y va al nombre (`1.234,50 €`, `01/10/2026`). */
     var lc = CamposClases.leerControl(item.entradaEl, item.clase || 'texto');
     return { clave: item.clave, nombre: item.nombre, valor: lc.valor, texto: lc.texto, ok: lc.ok,
              enNombre: false, obligatorio: !!item.cfg.obligatorio };
-  });
+  }).concat(deHito);
 };
 
 /* Antes de crear: si falta un campo obligatorio, no se crea, se dice

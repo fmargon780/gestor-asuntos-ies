@@ -4340,3 +4340,7 @@ Explicación del hito (`cuerpo`) en «Hito ▾» → Crear y Cambiar (`#hda-cuer
 ## 2-oct-2026 — fila 254: «Campos del asunto» y la ventana ancha
 
 La tarjeta «Datos del trámite» pasa a «Campos del asunto», con «+ Añadir campo» en su título; la ventana de elegir campo es ancha, con una franja fija (pestañas, buscador, «Volver») y los campos en columnas. El fallo contado por Francisco («al aceptar no pasa nada») no se pudo reproducir en local (campos de fichero, calculados, propios de cada clase, «En el tipo» y «Solo en este asunto», tipo sin configurar y asunto sin tipo, todos bien). Se dejó protegido el camino entero: aviso rojo si algo falla, ámbar si tarda más de 6 s o si solo falla el repintado, y aviso rojo si el panel no puede leer el catálogo (antes quedaba vacío y mudo). Punto en `docs/COMPROBAR-A-MANO.md`.
+
+## 2-oct-2026 — fila 255: campos de un hito
+
+Un campo de un hito es un campo del asunto con la marca del hito: tarjeta «Campos de este hito» en la mesa (se rellenan ahí), «+ Añadir campo» con «Ya están en este asunto» y «¿Dónde se guarda?», rótulo del hito en la ficha, desplegable «Hito» en Ajustes, Nuevo asunto sin esos campos y, al borrar un paso de la guía, sus campos pasan a ser del asunto. Un solo valor por asunto (limitación aceptada). Demo: «Fecha de la factura» en el hito «Tramitar el pago» de FACTURA.

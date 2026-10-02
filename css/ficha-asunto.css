@@ -296,3 +296,8 @@
 .parecido-otros-bloque > strong, .parecido-otro { color: var(--tinta-suave); }
 .parecido-etiqueta { font-size: 11px; padding: 0 6px; border-radius: 8px; background: #eef1f5; color: #5d6b7a; }
 .parecidos-pie { margin: 4px 0 0; }
+
+/* Fila 255: el título de un hito, encima de sus campos en «Campos del asunto». */
+.ficha-dato-hito { border-bottom: 0; padding-top: 10px; }
+.ficha-rotulo-hito { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: var(--tinta-suave); }
+.marca-hito { font-size: 11px; color: var(--tinta-suave); margin-left: 4px; }
