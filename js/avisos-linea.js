@@ -55,7 +55,8 @@
      encargo: vencidos, próximos, recurrentes, duplicados, papelera,
      fichero de alumnado, fichas sin carpeta, aspirantes. */
   var ORDEN = ['vencidos', 'proximos', 'recurrentes', 'duplicados',
-    'papelera-vieja', 'frescura', 'huerfanas', 'aspirantes'];
+    'papelera-vieja', 'frescura', 'huerfanas', 'aspirantes',
+    'registro-sin-asunto', 'registro-atrasado'];   /* fila 259 */
 
   var piezas = {};   /* id -> { texto, urgente, alPulsar } */
 

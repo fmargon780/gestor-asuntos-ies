@@ -455,4 +455,8 @@ de `App` va después del fichero que lo define.
 | `README.md` | — |
 | `js/solo-consulta.js` | Fila 260: «En este ordenador, solo consultar»: la marca (`localStorage`), `proteger` (carpetas que rechazan escribir con error `SoloConsulta`), el aviso fijo con «Quitar» y el apagado de los controles que cambian algo |
 | `pruebas/solo-consulta.mjs` | Prueba de la fila 260: cero escrituras en el disco de demostración, el cierre aguanta, aviso fijo, controles apagados, «Quitar» |
-
+| `js/control-registro.js` | Fila 259: control del registro de entrada y de salida, sin pantalla: leer los CSV de Séneca (`leerCsv`), guardar apuntes y decisiones en `_GESTOR` (`control-registro.json`, `control-registro/<año>.json`), emparejar con los asuntos (`clasificar`), huecos de numeración y avisos |
+| `js/control-registro-pantalla.js` | Fila 259: la vista «Control del registro» dentro de Herramientas (subir listados, «Revisar desde», pestañas Entrada y Salida, apartados plegados y acciones) |
+| `js/control-registro-avisos.js` | Fila 259: los dos trozos de Inicio («N apuntes de registro sin asunto», «Registro sin revisar desde…») y el campo «Registro de Séneca sin revisar» de Ajustes → Días de aviso |
+| `css/control-registro.css` | Fila 259: la tabla de trabajo del control del registro |
+| `pruebas/control-registro.mjs` | Prueba de la fila 259, sin navegador: lectura de los CSV (`pruebas/control-registro-entrada.csv` y `-salida.csv`, inventados, en Latin-1), subir sin duplicar, emparejado, decisiones, huecos y avisos |

@@ -476,3 +476,6 @@ hito en curso (`Hitos.hitoActualDeAsunto`). Al guardar (el suelto ya no está y 
 nada. Prueba `pruebas/sello-documento-nuevo.mjs`; demostración: el certificado de Espejo Montes, Carla trae un
 PDF sellado suelto.
 
+## El control del registro (fila 259)
+
+`js/control-registro.js` compara los listados de Séneca (el registro de entrada y el de salida) con lo que la aplicación conoce. El código de un apunte sale de `Nombres.codigoRegistro` (`2026/29700692/M000000000427` → `26EM0427`), igual que el de los documentos. Un apunte se empareja con un asunto, por este orden: (1) algún documento lleva su código (`ficha.documentos[n].registros[].codigo` en los abiertos, `registros` del índice del ARCHIVO en los archivados); (2) el número del asunto (`A26-0024`) en el extracto; (3) el extracto es el nombre de la carpeta; (4) decisión a mano. Limitación: de un asunto **abierto**, los documentos de antes de la fila 239 (registro en el nombre del fichero) no se miran, porque habría que recorrer el disco; esos apuntes se emparejan por los caminos 2 a 4. Detalle en `docs/CONTROL-DEL-REGISTRO.md`.

@@ -234,6 +234,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   El centro (`ajustesAvisos.urlSoporte`). Guarda el aviso en Drive y apunta una IDEA sin datos del
   usuario en la cola. Texto sin límite de tamaño, cuadro grande que crece al escribir, con guion gris y contador de palabras (fila 240). Pendiente de Francisco: `docs/PONER-EN-MARCHA-SOPORTE.md` (y volver a pegar `soporte.gs` tras la fila 240).
 - «Qué hay de nuevo» (fila 248): `js/novedades.js` (lista `window.NOVEDADES`, lo más nuevo primero) y `js/novedades-ventana.js`; al entrar sale lo que este ordenador no ha visto (`localStorage` `gestor.novedadesVistas`), y el número de versión de la barra lateral la vuelve a abrir.
+- **Control del registro (fila 259, `docs/CONTROL-DEL-REGISTRO.md`)**: Herramientas → «Control del registro»: se suben los listados CSV de Séneca (entrada y salida, Latin-1) y se ven los **apuntes** sin asunto desde la fecha «Revisar desde»; decisiones «No necesita asunto» / «Esta clase nunca lleva asunto» / «Es de este asunto…»; avisos en Inicio (`AvisosLinea` «registro-sin-asunto» y «registro-atrasado», días en Ajustes → Días de aviso, `ajustesAvisos.diasRegistro`, 7). Código en `js/control-registro*.js`.
 
 ## 6. Reglas de código que no se pueden olvidar
 

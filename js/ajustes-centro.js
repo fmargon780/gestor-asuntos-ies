@@ -564,6 +564,7 @@ App.pintarAjustesCentro = async function () {
   if (typeof App.pintarDiasDormido === 'function') App.pintarDiasDormido();
   App.pintarDiasCaducidadCopias();
   App.pintarDiasPapelera();
+  if (window.ControlRegistroAvisos) ControlRegistroAvisos.pintarAjustes();   /* fila 259 */
   /* Fila 213, docs/BOTON-DE-SOPORTE.md: la dirección del buzón de soporte. */
   if (window.Soporte) Soporte.pintarAjustes();
   /* 20-sep-2026, fila 81, docs/FIRMANTES-Y-MEMBRETE.md. */
