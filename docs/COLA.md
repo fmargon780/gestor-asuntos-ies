@@ -199,6 +199,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 256 | `docs/LISTA-A-LA-MISMA-ALTURA-AL-VOLVER.md` (al volver de una ficha a «Todos los abiertos» la lista queda unos 36 px más abajo que antes; arreglar en la aplicación —navegación y cabecera fija— sin relajar la prueba `tras-cada-accion.mjs`) | EN CURSO (2-oct-2026 07:25) · conversación: https://claude.ai/code/session_01SiRknmaWipWcJ1RW53oHro |
 | 257 | Aviso de usuario: mejora en «Inicio» (buscar el tipo de asunto en «Cambiar el asunto» y donde proceda) | EN DISEÑO (2-oct-2026) · conversación: https://claude.ai/code/session_019GXGHu7VGFSZBNdeoyiX1y · aviso completo: https://drive.google.com/file/d/1AuJUMwypI6RyDEnfsAWZrSdUynNPtGg9/view?usp=drivesdk |
 | 258 | Aviso de usuario: mejora en «Inicio» | DESCARTADA (2-oct-2026): descartada por Francisco desde el Centro de mando |
+| 259 | Aviso de usuario: mejora en «Inicio» | IDEA (2-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1OLb3cTYpVrrM4ZTYPMt2mMkI9pwu1pEn/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
