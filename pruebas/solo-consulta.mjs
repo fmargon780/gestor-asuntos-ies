@@ -64,6 +64,16 @@ await comprobar('4. la ficha está en modo consulta (sin «Tomar el mando» ni a
     presencia: !!document.querySelector('#ficha-presencia.aviso') })), { consulta: true, presencia: false });
 await comprobar('4. «Ver todo» solo mira: sigue encendido',
   pagina.evaluate(() => { const b = document.getElementById('tercero-ver-todo'); return b ? !b.disabled : 'sin botón'; }).then((x) => x === 'sin botón' || x), true);
+await comprobar('4. los apagados de la ficha dicen «Solo consulta»',
+  pagina.evaluate(() => { const b = Array.prototype.filter.call(document.querySelectorAll('#ficha-asunto-cuerpo button[disabled]'), (x) => x.dataset.apagadoPorConsulta); return b.length > 0 && b.every((x) => x.title === 'Solo consulta'); }), true);
+await pagina.evaluate(() => FichaTarjetas.abrir('hitos'));
+await pagina.waitForTimeout(400);
+if (!(await pagina.locator('#ficha-guia.con-mesa .hito-en-mesa').count())) await pagina.locator('#ficha-guia .hito .hito-titulo').first().click();
+await pagina.waitForSelector('#ficha-guia.con-mesa .hito-en-mesa');
+await comprobar('4. en la mesa, «← Hitos» y la tira de hitos siguen encendidos',
+  pagina.evaluate(() => ({ volver: !document.getElementById('mesa-volver-hitos').disabled,
+    tira: Array.prototype.every.call(document.querySelectorAll('.mesa-tira-hito'), (b) => !b.disabled) })), { volver: true, tira: true });
+await pagina.evaluate(() => HitoMesa.cerrar());
 await pagina.evaluate(() => App.ir('ajustes'));
 await pagina.waitForTimeout(500);
 await comprobar('4. en Ajustes se cambia nada salvo la casilla',

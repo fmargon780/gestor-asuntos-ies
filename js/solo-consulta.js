@@ -165,7 +165,7 @@ window.SoloConsulta = (function () {
   var CONCRETOS = ['.pestana[data-pantalla="nuevo"]', '#btn-nuevo-asunto', '#tablon-texto', '#tablon-para'].join(',');
   var CAJAS = ['#pantalla-nuevo', '#pantalla-ajustes', '#pantalla-tipo-asunto', '#pantalla-herramientas', '#tablon']
     .map(function (x) { return x + ' input, ' + x + ' select, ' + x + ' textarea'; }).join(',');
-  var ACCION = /^(\+ ?)?(Archivar|Pasar a Por liquidar|Liquidar|Guardar|Guardar aquí|Guardar en un asunto|Guardar PDF|Crear|Crear asunto con él|Crear el asunto|Borrar|Quitar|Cambiar el nombre|Reabrir|Enviar|Enviar estado|Añadir|Anotar|Marcar|Publicar|Restaurar|Traer|Importar|Subir|Vaciar|Duplicar|Renombrar|Probar|Arreglarlo|Actualizar|Nuevo asunto|Nuevo asunto para esta persona|Tomar el mando)/i;
+  var ACCION = /^(\+ ?)?(Archivar|Pasar a Por liquidar|Liquidar|Guardar|Guardar aquí|Guardar en un asunto|Guardar PDF|Crear|Crear asunto con él|Crear el asunto|Borrar|Quitar|Cambiar el nombre|Reabrir|Enviar|Enviar estado|Añadir|Anotar|Marcar|Publicar|Restaurar|Traer|Importar|Subir|Vaciar|Duplicar|Renombrar|Probar|Arreglarlo|Actualizar|Nuevo asunto|Nuevo asunto para esta persona|Tomar el mando|Hecha$|A asunto$|Separar|Unir$|Sacar páginas|Ajustar tamaño|Repartir entre terceros|Cambiar$)/i;
   /* Lo que se queda encendido aunque caiga en algo de arriba. */
   var DEJAR = ['#ajustes-solo-consulta', '#franja-solo-consulta-quitar', '#cuadro-cancelar', '#cuadro-aceptar',
     '[data-solo-lectura]', '.ficha-menu-boton', '#ficha-volver', '.boton-volver', '#btn-soporte'].join(',');
@@ -180,8 +180,8 @@ window.SoloConsulta = (function () {
   function apagarControles() {
     Array.prototype.forEach.call(document.querySelectorAll(CONCRETOS + ',' + CAJAS), apagarUno);
     /* Los botones de acción de las pantallas normales (la ficha y la mesa se apagan solas: js/ficha-consulta.js). */
-    Array.prototype.forEach.call(document.querySelectorAll('#aplicacion button'), function (b) {
-      if (b.closest('#ficha-asunto-cuerpo') || b.closest('.ajustes-tab-botones')) return;
+    Array.prototype.forEach.call(document.querySelectorAll('button'), function (b) {
+      if (b.closest('#ficha-asunto-cuerpo') || b.closest('#arranque')) return;
       var t = (b.textContent || '').replace(/\s+/g, ' ').trim();
       if (t && ACCION.test(t)) apagarUno(b);
     });
