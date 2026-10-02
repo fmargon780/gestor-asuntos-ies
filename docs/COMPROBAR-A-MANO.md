@@ -6,6 +6,12 @@ para ir tachando.
 
 ---
 
+- [ ] **Buzón de soporte para todas las apps (fila 261, `docs/BUZON-PARA-TODAS-LAS-APPS.md`).**
+      Volver a pegar `apps-script/soporte.gs`, ejecutar `prepararTodo` (autorizar el permiso de
+      correo y leer el registro: ningún repositorio en «OJO»; llega el correo de prueba) e
+      «Implementar» → «Administrar implementaciones» → «Nueva versión». Después, enviar un aviso
+      desde Ausencias y Guardias: aparece una IDEA nueva de esa app en el Centro de mando. Si aún
+      tenías pendiente el pegado de la fila 240, es el mismo pegado.
 - [ ] **El botón «Soporte», con el buzón de verdad (fila 213, `docs/BOTON-DE-SOPORTE.md`).**
       Primero, los cinco pasos de `docs/PONER-EN-MARCHA-SOPORTE.md`. Después: (1) pegar una
       captura con Ctrl+V en la ventana: se ve en pequeño, se quita con «Quitar la captura»; (2)
