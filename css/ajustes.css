@@ -178,9 +178,11 @@
 .campos-catalogo-rejilla .nombre-tipo {
   min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.campos-catalogo-rejilla-ancha { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
-.campos-catalogo-rejilla-ancha .fila-tipo { flex-wrap: wrap; }
-.campos-catalogo-rejilla-ancha .nombre-tipo { flex: 1 1 100%; }
+.campos-catalogo-rejilla-ancha { grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); }
+#campos-calc-lista.campos-catalogo-rejilla-ancha { grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)); }
+.campos-catalogo-rejilla-ancha .fila-tipo .boton { padding: 3px 8px; font-size: 12px; flex: none; }
+.campos-catalogo-rejilla-ancha .nombre-tipo { flex: 1 1 auto; min-width: 60px; }
+.campos-catalogo-rejilla-ancha .suave { flex: 0 1 90px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .campos-catalogo-rejilla .suave { font-size: 12px; }
 @media (max-width: 700px) {
   .campos-catalogo-rejilla, .campos-catalogo-rejilla-ancha { grid-template-columns: 1fr; }

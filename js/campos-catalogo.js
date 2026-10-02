@@ -91,8 +91,20 @@ var CamposCatalogo = (function () {
 
     var interior = $(cuerpo, 'campos-catalogo-cuerpo');
     if (pestanaActual === 'ficha') pintarFicha(interior, deFicha, lista, opciones);
-    else if (pestanaActual === 'mios') pintarMios(interior, tipo, mios, lista, opciones, cuerpo);
-    else pintarCalculados(interior, tipo, calculados, lista, opciones, cuerpo);
+    else {
+      if (pestanaActual === 'mios') pintarMios(interior, tipo, mios, lista, opciones, cuerpo);
+      else pintarCalculados(interior, tipo, calculados, lista, opciones, cuerpo);
+      /* Fila 254: el buscador también está en «Míos» y «Calculados»: esconde las filas que no casan. */
+      var hueco = cuerpo.querySelector('#campos-catalogo-buscar-hueco');
+      hueco.innerHTML = '<input id="campos-catalogo-buscar" class="campo" placeholder="Buscar un campo…">';
+      hueco.querySelector('input').oninput = function () {
+        var q = U.normalizar(this.value || '');
+        Array.prototype.forEach.call(interior.querySelectorAll('.fila-tipo'), function (f) {
+          var n = f.querySelector('.nombre-tipo');
+          f.style.display = (!q || U.normalizar(n ? n.textContent : '').indexOf(q) !== -1) ? '' : 'none';
+        });
+      };
+    }
   }
 
   function pestanaHtml(id, etiqueta, cuenta) {
