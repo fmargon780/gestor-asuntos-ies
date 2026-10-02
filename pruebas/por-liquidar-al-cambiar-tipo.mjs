@@ -64,6 +64,19 @@ await comprobar('4. un asunto de seguro escolar con un hito por hacer no pasa (e
   pagina.evaluate(async () => { const a = Gestor.asuntos().filter((x) => /SEGURO ESCOLAR/.test(x.nombre) && !PorLiquidar.estaPorLiquidar(x) && x.nombre.indexOf('A26-0801') === -1)[0]; if (!a) return 'no hay'; const antes = PorLiquidar.estaPorLiquidar(a); const hs = await Hitos.hitosDe(a.nombre); const pendiente = hs.some((h) => h.estado !== 'hecho'); await PorLiquidar.alCambiarTipo(a.nombre, 'FACTURA', 'SEGURO ESCOLAR'); return [antes, pendiente, PorLiquidar.estaPorLiquidar(a)]; }),
   [false, true, false]);
 
+/* Un asunto con todos sus hitos hechos, pero de otra guía: el tipo nuevo trae pasos que aún no tiene
+   (se le añadirán al abrir su ficha), así que no pasa. */
+await pagina.evaluate(async () => {
+  const n = '261002 A26-0805 SEGURO ESCOLAR Alta Cinco, Lía 7770005';
+  await App.E.abiertos.getDirectoryHandle(n, { create: true });
+  await App.anotar(n, { abiertoEl: U.ahora(), tipo: 'SEGURO ESCOLAR', categoria: 'ALUMNADO', tercero: 'Alta Cinco, Lía 7770005', curso: '26-27', grupo: '', descripcion: '', campos: {} });
+  await App.verAbiertos();
+  const base = (await Hitos.hitosDe('261002 A26-0801 SEGURO ESCOLAR Alta Cero, Ana 7770001'))[0];
+  await Hitos.cambiar((d) => { d.porAsunto[n] = { creados: '2026-10-02', hitos: [Object.assign({}, base, { id: 'otra-1', origenGuia: 'otra-1', estado: 'hecho' })], pasosConocidos: ['otra-1'] }; return d; });
+  await PorLiquidar.alCambiarTipo(n, 'FACTURA', 'SEGURO ESCOLAR');
+});
+await comprobar('3. con todos sus hitos hechos pero faltándole pasos de la guía del tipo nuevo, no pasa', estado('A26-0805'), false);
+
 console.log('--- 5. al marcar la casilla en un tipo ---');
 await comprobar('5. PRUEBA LIQ sin casilla: ninguno en «Por liquidar»', Promise.all([estado('A26-0802'), estado('A26-0803'), estado('A26-0804')]), [false, false, false]);
 await pagina.evaluate(() => document.querySelectorAll('.mensaje').forEach((m) => m.remove()));

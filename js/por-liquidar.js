@@ -153,9 +153,16 @@ window.PorLiquidar = (function () {
      tipo de un asunto, marcar la casilla en un tipo y la pasada al
      entrar. Si le quedan hitos por hacer, no se toca. */
 
-  async function sinNadaPorHacer(a, datos) {
+  /* Los pasos de la guía del tipo cuentan: si el asunto aún no los tiene (se
+     crean o se completan al abrir su ficha, js/hitos-sincronizar.js), le quedan
+     cosas por hacer aunque ahora no lo parezca. Un asunto cuyo tipo vino de unir
+     dos tipos (`tipoUnidoDe`) no recibe los pasos de la guía nueva. */
+  function sinNadaPorHacer(a, datos) {
     var entrada = datos.porAsunto && datos.porAsunto[a.nombre];
-    if (!entrada || !entrada.hitos || !entrada.hitos.length) return true;
+    var pasos = (window.GuiasDelCentro && GuiasDelCentro.pasosDe(nombreDeTipo(a))) || [];
+    var recibePasos = pasos.length && !(a.ficha && a.ficha.tipoUnidoDe);
+    if (!entrada || !entrada.hitos || !entrada.hitos.length) return !recibePasos;
+    if (recibePasos && Hitos.pasosQueFaltan && Hitos.pasosQueFaltan(entrada.hitos, pasos, entrada.pasosConocidos).anadidos) return false;
     return !!Hitos.aQuienLeToca(entrada.hitos, datos.ajustes).listo;
   }
 
@@ -167,7 +174,7 @@ window.PorLiquidar = (function () {
     if (!candidatos.length) return pasados;
     var datos = await Hitos.leer();
     for (var i = 0; i < candidatos.length; i++) {
-      if (!await sinNadaPorHacer(candidatos[i], datos)) continue;
+      if (!sinNadaPorHacer(candidatos[i], datos)) continue;
       await pasar(candidatos[i], { auto: true, sinRepintar: true });
       pasados.push(candidatos[i]);
     }
