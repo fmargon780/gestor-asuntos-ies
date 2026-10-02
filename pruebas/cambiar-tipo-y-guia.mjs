@@ -80,8 +80,13 @@ async function editar(nombre, cambios) {
     const a = App.E.listaAbiertos.filter(x => x.nombre === nombre)[0];
     window.__editando = App.editarAsunto(a);
   }, nombre);
-  await pagina.waitForSelector('#capa:not(.oculto) #ed-tipo');
-  if (cambios.tipo) await pagina.selectOption('#ed-tipo', cambios.tipo);
+  await pagina.waitForSelector('#capa:not(.oculto) #ed-tipo-cambiar');
+  /* Fila 257: el tipo ya no es un desplegable: «Cambiar», escribir y elegir. */
+  if (cambios.tipo) {
+    await pagina.click('#ed-tipo-cambiar');
+    await pagina.fill('#ed-tipo-buscar', cambios.tipo);
+    await pagina.click('.tipo-resultado[data-tipo="' + cambios.tipo + '"]');
+  }
   if (cambios.descripcion) await pagina.fill('#ed-descripcion', cambios.descripcion);
   await pagina.click('#cuadro-aceptar');
 }

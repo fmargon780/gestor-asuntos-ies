@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '257', fecha: '2026-10-02', texto: 'Cambiar el asunto: el tipo se busca escribiendo, en una línea como el tercero, y el cuadro cabe entero en pantalla.' },
   { id: '260', fecha: '2026-10-02', texto: 'En un ordenador que trabaja sobre una copia de las carpetas se puede marcar «En este ordenador, solo consultar»: la aplicación no guarda nada ahí.' },
   { id: '255', fecha: '2026-10-02', texto: 'Campos de un hito: en la pantalla de cada hito hay «+ Añadir campo»; se rellenan ahí y salen también en la ficha, debajo del nombre de su hito.' },
   { id: '254', fecha: '2026-10-02', texto: 'En la ficha de un asunto, la tarjeta se llama ahora «Campos del asunto», con «+ Añadir campo» siempre a la vista; la ventana para elegir un campo es ancha y en columnas, y si algo falla al añadirlo, el aviso lo dice.' },

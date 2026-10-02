@@ -137,7 +137,7 @@ App.pintarCamposEditar = function (tipo, guardados, ficha, nombreAsunto) {
 
   return {
     html: '<label class="etiqueta">Datos del asunto</label>' +
-          '<div id="ed-campos" class="campos-lista">' + filas + '</div>',
+          '<div id="ed-campos" class="campos-lista' + (items.length > 1 ? ' campos-en-dos' : '') + '">' + filas + '</div>',
     items: items
   };
 };
@@ -208,6 +208,12 @@ App.editarAsunto = async function (a) {
       if (creada) base.terceroElegido = creada;
       continue;
     }
+    if (r.pedirTipo) {
+      var creado = await TipoEnLinea.crearDesdeEdicion(r.pedirTipo.nombre, r.pedirTipo.categoria);
+      base = r.snapshot;
+      if (creado) base.tipo = creado;
+      continue;
+    }
     if (!r.ok) return;
     /* Mientras se guarda, el asunto está ocupado (fila 100): ni
        archivar ni volver a editar hasta que termine. Devuelve el
@@ -220,27 +226,11 @@ async function abrirCuadroDeEdicion(a, p, base) {
   var v = base || p;   /* de dónde salen los valores de partida del cuadro */
   var bloqueCampos = App.pintarCamposEditar(v.tipo, base ? base.campos : p.campos, a.ficha, a.nombre);
 
-  var hayTipo = App.E.tipos.some(function (t) { return t.tipo === p.tipo; });
-  var opciones = '';
-  if (p.tipo && !hayTipo) {
-    opciones += '<option value="' + U.escapar(p.tipo) + '"' + (v.tipo === p.tipo ? ' selected' : '') + '>' +
-                U.escapar(p.tipo) + ' (no está en la lista)</option>';
-  }
-  Nombres.CATEGORIAS.forEach(function (cat) {
-    var deEsta = App.E.tipos.filter(function (t) { return t.categoria === cat; });
-    if (!deEsta.length) return;
-    opciones += '<optgroup label="' + cat + '">' +
-      deEsta.map(function (t) {
-        return '<option value="' + U.escapar(t.tipo) + '"' +
-               (t.tipo === v.tipo ? ' selected' : '') + '>' + U.escapar(t.tipo) + '</option>';
-      }).join('') + '</optgroup>';
-  });
-
   /* Con los campos del tipo de más, el cuadro puede quedarse más alto
      que la pantalla: se deja bajar por dentro, para que el botón de
      Guardar siga alcanzable. */
   var cuadroEditar = document.querySelector('#capa .cuadro');
-  if (cuadroEditar) cuadroEditar.classList.add('cuadro-alto');
+  if (cuadroEditar) cuadroEditar.classList.add('cuadro-alto', 'cuadro-editar');   /* fila 257: más ancho y compacto */
 
   var terceroElegidoInicial = base ? base.terceroElegido : null;
   var departamentoInicialHtml = (terceroElegidoInicial && window.AdministracionesFicha)
@@ -251,20 +241,22 @@ async function abrirCuadroDeEdicion(a, p, base) {
     '<p class="explica">Al guardar se le cambia el nombre a la carpeta. ' +
     'Se copia primero y se comprueba que ha llegado todo; si algo fallara, ' +
     'la carpeta se queda como está.</p>' +
-    '<div class="dos-columnas">' +
+    /* Fila 257: fecha, grupo y año en una fila; el tipo, en una línea con «Cambiar» (js/tipo-en-linea.js). */
+    '<div class="tres-columnas">' +
       '<div><label class="etiqueta">Fecha de inicio</label>' +
       '<input id="ed-fecha" type="date" class="campo" value="' + U.escapar(v.fecha) + '"></div>' +
+      '<div><label class="etiqueta">Grupo <span class="suave">(opcional)</span></label>' +
+      '<input id="ed-grupo" class="campo" value="' + U.escapar(v.grupo) + '" placeholder="1ºA"></div>' +
       '<div><label class="etiqueta">Año académico <span class="suave">(opcional)</span></label>' +
       '<input id="ed-curso" class="campo" value="' + U.escapar(v.curso) + '" placeholder="26-27"></div>' +
     '</div>' +
-    '<label class="etiqueta">Tipo de asunto</label>' +
-    '<select id="ed-tipo" class="campo">' + opciones + '</select>' +
-    '<p id="ed-aviso-categoria" class="aviso aviso-ambar oculto"></p>' +   /* fila 219, punto 6 */
-    '<label class="etiqueta">Grupo <span class="suave">(opcional)</span></label>' +
-    '<input id="ed-grupo" class="campo" value="' + U.escapar(v.grupo) + '" placeholder="1ºA">' +
-    bloqueCampos.html +
     '<label class="etiqueta">Descripción corta <span class="suave">(opcional)</span></label>' +
     '<input id="ed-descripcion" class="campo" value="' + U.escapar(v.descripcion) + '">' +
+    '<label class="etiqueta">Tipo de asunto</label>' +
+    '<input id="ed-tipo" type="hidden" value="' + U.escapar(v.tipo) + '">' +
+    '<div id="ed-tipo-caja"></div>' +
+    '<p id="ed-aviso-categoria" class="aviso aviso-ambar oculto"></p>' +   /* fila 219, punto 6 */
+    bloqueCampos.html +
     '<label class="etiqueta">Tercero</label>' +
     '<div id="ed-tercero-caja"></div>' +   /* fila 219: buscador, ya no texto libre */
     '<div id="ed-departamento-caja">' + departamentoInicialHtml + '</div>' +
@@ -381,6 +373,22 @@ async function abrirCuadroDeEdicion(a, p, base) {
     $('cuadro-cancelar').click();
   }
 
+  /* Fila 257: «Ninguno es el que busco: crear…» se hace igual que el alta
+     de tercero: este cuadro se cierra solo, se crea el tipo y se vuelve a
+     abrir con todo lo escrito y el tipo nuevo ya elegido. */
+  var pedirTipoPendiente = null;
+  function pedirTipoNuevo(nombre) {
+    var actual = $('ed-tipo').value;
+    pedirTipoPendiente = { nombre: nombre, categoria: Nombres.categoriaDeTipo(App.E.tipos, actual) || p.categoria };
+    snapshotPendiente = snapshotDelCuadro();
+    $('cuadro-cancelar').click();
+  }
+  TipoEnLinea.montar($('ed-tipo-caja'), {
+    prefijo: 'ed-tipo', tipo: v.tipo, categoria: null,
+    alElegir: function (t) { $('ed-tipo').value = t.tipo; refrescar(); },
+    alCrear: pedirTipoNuevo
+  });
+
   var controlesTercero = App.montarTerceroEditar($('ed-tercero-caja'), p.tercero, function () {
     refrescar();
     refrescarDepartamento();
@@ -395,8 +403,9 @@ async function abrirCuadroDeEdicion(a, p, base) {
   refrescar();
 
   var ok = await promesa;
-  if (cuadroEditar) cuadroEditar.classList.remove('cuadro-alto');
+  if (cuadroEditar) cuadroEditar.classList.remove('cuadro-alto', 'cuadro-editar');
   if (pedirAltaPendiente) return { pedirAlta: pedirAltaPendiente, snapshot: snapshotPendiente };
+  if (pedirTipoPendiente) return { pedirTipo: pedirTipoPendiente, snapshot: snapshotPendiente };
   if (!ok) return { ok: false };
 
   /* Obligatorio quiere decir que el asunto no se guarda sin él, igual

@@ -19,6 +19,7 @@ de `App` va después del fichero que lo define.
 | `css/vista.css` | El ancho de la pantalla, los filtros plegados y las tarjetas por tipo |
 | `css/guias.css` | La guía: pasos, plegado, preguntas y opciones |
 | `css/tipos-buscador.css` | Las listas de resultados, y la marca naranja del que ya no está |
+| `css/tipo-en-linea.css` | El tipo en una línea con buscador y el cuadro «Cambiar el asunto» compacto y ancho (fila 257) |
 | `css/tipo-al-vuelo.css` | El botón y el panel de "+ Crear tipo nuevo" en Nuevo asunto (fila 128) |
 | `css/tipos-organo.css` | Los rótulos por órgano de la parrilla de tipos y el bloque «Quién encarga cada tipo» (fila 134) |
 | `css/reservados.css` | El candado, la tarjeta tapada y «Mostrar reservados» (fila 135) |
@@ -218,6 +219,7 @@ de `App` va después del fichero que lo define.
 | `js/notas-migracion.js` | Una sola libreta de notas por asunto (`NotasHito`, fila 139): la etiqueta del hito en las notas, las notas de un hito en su mesa, escribir desde la mesa, qué hitos tienen notas, y el paso de las notas a mano de los hitos al asunto, una vez (marca `_GESTOR/notas-migrado.json`) |
 | `js/registro-asunto.js` | El registro del asunto (`RegistroAsunto`, fila 229): una vista que junta las notas del asunto (`ficha.notas`) y lo automático de cada hito (`h.notas`) en una sola lista por fechas, `lineas`, `html`, `auto` (línea automática accesoria) y el «⋮» Cambiar/Borrar de lo escrito a mano |
 | `js/tipos-buscador.js` | Buscar el tipo de asunto por letras, y los más usados arriba. Al final de `aplicar()` agrupa por órgano (`TiposOrgano.agruparParrilla`, fila 134) y llama a `TipoAlVuelo.repintar()` si existe (fila 128): puntos enganchados, no envolturas |
+| `js/tipo-en-linea.js` | El tipo de asunto en una línea con «Cambiar» y buscador de hasta 8 (fila 257, `docs/TIPO-EN-UNA-LINEA-AL-CAMBIAR.md`): `TipoEnLinea.montar`, `crearDesdeEdicion` y `App.pintarLineaDeTipo` («Nuevo asunto» con el tipo reconocido) |
 | `js/tipo-al-vuelo.js` | "+ Crear tipo nuevo" sin salir de Nuevo asunto (fila 128, `docs/TIPO-DESDE-EL-ASUNTO.md`): el botón (destacado bajo el buscador con texto escrito, discreto al final de la parrilla sin texto) y el panel de cuatro datos (nombre, nombre corto, categoría y, desde la fila 134, quién lo encarga). Guarda con `App.crearTipo` y deja elegido con `App.marcarTipoElegido` |
 | `js/via-contacto.js` | Los teléfonos y correos del tercero, como botones |
 | `js/tablon.js` | El tablón de notas rápidas: leer, `cambiar()` (por `ColaGuardado`), quién soy y qué notas veo. Expone `window.Tablon` (`_cambiar`, para las pruebas). Desde la fila 212, toda la pantalla vive en `js/tablon-compacto.js` (este fichero pasaba de 600 líneas) |

@@ -9,6 +9,21 @@ código comunes y la tabla de ficheros del repositorio están en el propio `docs
 
 ---
 
+### El tipo de «Cambiar el asunto», en una línea con buscador (2-oct-2026, fila 257, `docs/TIPO-EN-UNA-LINEA-AL-CAMBIAR.md`)
+
+`#ed-tipo` es ahora un `<input type="hidden">` con el nombre del tipo; la línea con «Cambiar» (`#ed-tipo-caja`,
+ids `ed-tipo-cambiar/-buscar/-resultados/-dejar/-crear`) la monta `TipoEnLinea.montar`
+(`js/tipo-en-linea.js`, estado propio como el del tercero). «Cambiar» abre una caja vacía; al escribir salen
+hasta 8 tipos (`BuscarOCrear.coincidencias` sobre nombre, nombre corto y alias; los más usados primero con
+`App.usosDeTipos`, de `js/tipos-buscador.js`) de todas las categorías, y «y N más: sigue escribiendo». Elegir
+(ratón o flechas e Intro) vuelve a la línea y llama a `refrescar`; ✕ y Esc (oyente en captura, antes que el de
+`js/usabilidad.js`) dejan el que había. «Ninguno es el que busco: crear «…»» cierra este cuadro como el alta de
+tercero (`pedirTipo` en `App.editarAsunto`), crea con `TipoEnLinea.crearDesdeEdicion` (parecidos, categoría del
+tipo que tenía, `App.crearTipo`) y reabre con el snapshot y el tipo nuevo. En «Nuevo asunto», `App.nuevoAsuntoCon`
+con `tipo` pone `App.E.nuevo.tipoEnLinea` y `App.pintarLineaDeTipo` (llamada desde `App.pintarTipos`) enseña
+`#tipo-linea-nuevo` en vez del buscador y la parrilla; en blanco no cambia. El cuadro (`cuadro-editar`,
+`css/tipo-en-linea.css`) es ancho, con Fecha · Grupo · Año en una fila y los campos en dos columnas.
+
 ### El tercero de «Cambiar el asunto», con buscador (29-sep-2026, fila 219, `docs/TERCERO-CON-BUSCADOR-AL-CAMBIAR.md`)
 
 `js/asuntos-editar.js` ya no deja escribir el tercero a mano (`#ed-tercero`, texto libre): el campo

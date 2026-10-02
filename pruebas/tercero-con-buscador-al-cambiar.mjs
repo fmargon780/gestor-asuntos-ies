@@ -98,7 +98,7 @@ async function abrirEditar(nombre) {
     const a = App.E.listaAbiertos.filter(x => x.nombre === nombre)[0];
     window.__editando = App.editarAsunto(a);
   }, nombre);
-  await pagina.waitForSelector('#capa:not(.oculto) #ed-tipo');
+  await pagina.waitForSelector('#capa:not(.oculto) #ed-tipo-cambiar');
 }
 function terminaEditar() { return pagina.evaluate(() => window.__editando); }
 function nombresAbiertos() {
@@ -190,7 +190,7 @@ await pagina.click('#cuadro-aceptar');   /* el nombre ya viene relleno con lo bu
 
 /* El cuadro «Cambiar el asunto» se vuelve a abrir solo, con la recién
    creada ya elegida. */
-await pagina.waitForSelector('#capa:not(.oculto) #ed-tipo');
+await pagina.waitForSelector('#capa:not(.oculto) #ed-tipo-cambiar');
 await comprobar('4. la recién creada queda elegida en el mismo cuadro',
   pagina.locator('#ed-tercero-caja .elegido').textContent().then(t => t.indexOf('Zapata Nueva, Sonia') !== -1), true);
 await comprobar('4. lo ya cambiado (la descripción) no se ha perdido',

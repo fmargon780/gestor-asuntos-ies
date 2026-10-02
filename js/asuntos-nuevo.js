@@ -62,7 +62,8 @@ App.actualizarLimiteNuevo = function () {
 App.nuevoEnBlanco = function () {
   return { tipo: null, categoria: null, tercero: null, terceroPropuesto: null,
            configCampos: [], viaInicial: null, departamento: null,
-           numero: '', pidiendoNumero: false, fallaNumero: '' };   /* fila 239: el número de asunto previsto */
+           numero: '', pidiendoNumero: false, fallaNumero: '',
+           tipoEnLinea: false };   /* fila 257: llega con el tipo reconocido → línea «Tipo de asunto: X · Cambiar» */   /* fila 239: el número de asunto previsto */
 };
 
 /* Fila 220 (docs/CREAR-ASUNTO-DESDE-TODOS-LOS-SITIOS.md): preparar el
@@ -221,6 +222,7 @@ function categoriaDeLaParrilla() {
   if (App.E.nuevo.terceroPropuesto) return App.E.nuevo.terceroPropuesto.categoria;
   return App.E.nuevo.categoria || null;
 }
+App.categoriaDeLaParrilla = categoriaDeLaParrilla;   /* fila 257: js/tipo-en-linea.js */
 
 /* Fila 197: con persona elegida, solo los tipos de su categoría (como
    antes); sin persona, todos, con la categoría de cada uno en pequeño
@@ -229,6 +231,7 @@ function categoriaDeLaParrilla() {
    tipo). */
 App.pintarTipos = function () {
   pintarTerceroPropuesto();
+  if (App.pintarLineaDeTipo) App.pintarLineaDeTipo();   /* fila 257: js/tipo-en-linea.js */
   var caja = $('tipos-lista');
   caja.innerHTML = '';
   var categoriaPersona = categoriaDeLaParrilla();
@@ -313,6 +316,8 @@ App.nuevoAsuntoCon = function (opciones) {
 
   if (tipoObj) {
     App.elegirTipo(tipoObj);
+    App.E.nuevo.tipoEnLinea = true;   /* fila 257: el tipo ya viene reconocido: una línea con «Cambiar», no la parrilla */
+    App.pintarTipos();
     if (tercero) App.fijarTercero(tercero);
   } else if (tercero) {
     App.E.nuevo.terceroPropuesto = tercero;

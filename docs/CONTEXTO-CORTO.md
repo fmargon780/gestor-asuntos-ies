@@ -103,7 +103,9 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   en el ARCHIVO. El tercero de «Cambiar el asunto» se elige con el mismo buscador de «Nuevo
   asunto» (fila 219, todas las categorías, con alta desde ahí): sin tocarlo, el tercero no cambia
   aunque no encaje con nadie de las listas de hoy; elegir uno de otra categoría que el tipo solo
-  avisa, no bloquea. Cambiar el nombre de un tipo se lleva su guía; cambiarle el tipo a un asunto
+  avisa, no bloquea. El tipo de ese cuadro es una línea con «Cambiar» (fila 257, `js/tipo-en-linea.js`):
+  caja vacía, hasta 8 tipos parecidos de todas las categorías al escribir, ✕/Esc para dejar el que había y
+  «crear» si ninguno encaja; igual en «Nuevo asunto» cuando llega con el tipo reconocido. Cambiar el nombre de un tipo se lleva su guía; cambiarle el tipo a un asunto
   ofrece traer la guía del tipo nuevo. «Unir con otro tipo» (fila 207): el tipo se funde en otro
   (guía, campos, plantillas, recurrentes, alias); sus asuntos abiertos pasan al que se queda, sin
   recibir su guía nueva; el ARCHIVO no se toca.
