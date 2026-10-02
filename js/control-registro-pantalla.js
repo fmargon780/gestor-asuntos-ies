@@ -65,7 +65,7 @@ var ControlRegistroPantalla = (function () {
   function celdaAsunto(x) {
     var a = x.asunto;
     var nombre = (window.Reservados ? Reservados.candadoHtml(a) + esc(Reservados.nombreParaVer(a)) : esc(a.nombre));
-    return '<button type="button" class="enlace cr-asunto" data-accion="abrir-asunto" data-nombre="' + esc(a.nombre) + '">' + nombre + '</button>' +
+    return '<button type="button" class="enlace cr-asunto" data-accion="abrir-asunto" data-solo-lectura data-nombre="' + esc(a.nombre) + '">' + nombre + '</button>' +
       (a.abierto ? '' : ' <span class="suave">(archivado)</span>') +
       (x.nota ? '<div class="cr-nota">el registro no está apuntado en el asunto</div>' : '');
   }
@@ -145,7 +145,7 @@ var ControlRegistroPantalla = (function () {
     var g = cl[E.pestana];
     var abiertos = Array.prototype.map.call(vista.querySelectorAll('.cr-plegado[open] > summary'), function (x) { return x.textContent.replace(/ \(\d+\)$/, ''); });
     vista.innerHTML =
-      '<div class="cr-barra"><button type="button" class="boton" data-accion="volver">← Volver</button>' +
+      '<div class="cr-barra"><button type="button" class="boton" data-accion="volver" data-solo-lectura>← Volver</button>' +
         '<h3 class="cr-titulo">Control del registro</h3></div>' +
       '<div class="cr-fila">' +
         '<button type="button" class="boton boton-principal" data-accion="subir"' + off + '>Subir listados de Séneca</button>' +
@@ -159,7 +159,7 @@ var ControlRegistroPantalla = (function () {
       huecos.map(function (h) { return '<div class="aviso aviso-ambar cr-aviso cr-hueco">' + esc(ControlRegistro.textoHueco(h)) + '</div>'; }).join('') +
       '<div class="cr-pestanas">' +
         ['E', 'S'].map(function (l) {
-          return '<button type="button" class="cr-pestana' + (l === E.pestana ? ' activa' : '') + '" data-accion="pestana" data-libro="' + l + '">' +
+          return '<button type="button" class="cr-pestana' + (l === E.pestana ? ' activa' : '') + '" data-accion="pestana" data-solo-lectura data-libro="' + l + '">' +
             (l === 'E' ? 'Entrada' : 'Salida') + ' (' + cl[l].sin.length + ' sin asunto)</button>';
         }).join('') +
       '</div>' +
@@ -223,7 +223,7 @@ var ControlRegistroPantalla = (function () {
       ['E', 'S'].forEach(function (l) {
         var x = r.porLibro[l];
         if (!x) return;
-        partes.push((l === 'E' ? 'Entrada' : 'Salida') + ': ' + x.total + ' apuntes, ' + x.nuevos + ' nuevos' +
+        partes.push((l === 'E' ? 'Entrada' : 'Salida') + ': ' + x.total + (x.total === 1 ? ' apunte, ' : ' apuntes, ') + x.nuevos + (x.nuevos === 1 ? ' nuevo' : ' nuevos') +
           (x.fuera ? ' (' + x.fuera + ' anteriores a la fecha, dejados fuera)' : '') + '.');
       });
       E.avisoSubida = esc(partes.join(' '));
@@ -238,18 +238,24 @@ var ControlRegistroPantalla = (function () {
     return cod ? E.estado.apuntes[cod] : null;
   }
 
-  /* Un tercero ya conocido que encaje con el remitente o destinatario, si se puede saber. */
-  function terceroQueEncaja(parte) {
-    var lista = window.App && App.personasCargadas;
-    if (!Array.isArray(lista) || !parte) return null;
+  /* Un tercero ya conocido que encaje con el remitente o destinatario (en cualquier categoría), si hay uno solo. */
+  async function terceroQueEncaja(parte) {
     var h = ControlRegistro.hueso(parte);
-    var hallado = lista.filter(function (p) { return p && p.nombre && ControlRegistro.hueso(p.nombre) === h; });
-    return hallado.length === 1 ? hallado[0] : null;
+    if (!h || !window.Datos || !App.E.datos) return null;
+    var hallados = [];
+    var categorias = ['ALUMNADO', 'PERSONAL', 'EMPRESAS', 'OTROS'];
+    for (var i = 0; i < categorias.length; i++) {
+      try {
+        var f = await Datos.cargar(App.E.datos, categorias[i]);
+        ((f && f.lista) || []).forEach(function (p) { if (p && p.nombre && ControlRegistro.hueso(p.nombre) === h) hallados.push(p); });
+      } catch (e) { /* esa categoría no se puede leer: se sigue con las demás */ }
+    }
+    return hallados.length === 1 ? hallados[0] : null;
   }
 
   async function crearAsunto(a) {
     var opciones = { fecha: a.fecha };
-    var t = terceroQueEncaja(a.parte);
+    var t = await terceroQueEncaja(a.parte);
     if (t) opciones.tercero = t;
     cerrar();
     App.nuevoAsuntoCon(opciones);
