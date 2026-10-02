@@ -194,9 +194,10 @@
   color: var(--tinta-suave); border-radius: 6px;
 }
 .campo-aqui-menu:hover { background: #f0f3f7; }
-.ficha-datos .ficha-dato-anadir { border-bottom: 0; padding-top: 8px; }
+/* Fila 254: «+ Añadir campo» en el título de la tarjeta «Campos del asunto». */
+.ficha-campo-anadir { margin-left: 8px; padding: 3px 10px; font-size: 12px; }
 /* En modo consulta (el compañero tiene el mando) no se puede añadir ni tocar nada. */
-.ficha-consulta .ficha-dato-anadir, .ficha-consulta .campo-aqui-menu { display: none; }
+.ficha-consulta .ficha-campo-anadir, .ficha-consulta .campo-aqui-menu { display: none; }
 
 .ficha-persona-nombre { margin: 0 0 8px; font-size: 15px; }
 

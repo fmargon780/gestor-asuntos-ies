@@ -120,7 +120,7 @@ for (const [ancho, alto] of [[1905, 1000], [1280, 800]]) {
   /* Desde la fila 114, sin la línea «3 documentos» (el número va en el círculo): sus nombres. */
   await comprobar('1. Documentos enseña sus nombres',
     pagina.locator('.ficha-tarjeta[data-tarjeta="documentos"] .ficha-tarjeta-resumen .ficha-resumen-doc').allTextContents(),
-    /* Fila 245: «Datos del trámite» sale siempre (con «+ Añadir campo»); a 800 de alto cada tarjeta es más baja y caben dos nombres. */
+    /* Fila 245: «Campos del asunto» sale siempre (con «+ Añadir campo»); a 800 de alto cada tarjeta es más baja y caben dos nombres. */
     alto < 900 ? [DOCS[0], 'y 2 más'] : DOCS);
   await comprobar('1. Notas enseña la última',
     pagina.locator('.ficha-tarjeta[data-tarjeta="notas"] .ficha-tarjeta-resumen').textContent().then((t) => t.indexOf('Llamó la madre') !== -1), true);

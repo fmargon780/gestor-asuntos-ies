@@ -1,7 +1,7 @@
 /* Prueba en navegador de verdad de la fila 245 de docs/COLA.md
    (docs/CAMPO-DESDE-EL-ASUNTO.md): añadir un campo desde un asunto abierto.
 
-   1. «+ Añadir campo» en «Datos del trámite»: abre el panel de Ajustes.
+   1. «+ Añadir campo» en «Campos del asunto»: abre el panel de Ajustes.
    2. Elegir un campo, su valor, «¿Dónde se guarda?» («En el tipo …» marcada,
       «Llegará a N … vacío»), aviso verde con «Deshacer».
    3. El campo entra en el tipo, sin «Obligatorio» ni «Añadir al nombre».
@@ -109,9 +109,12 @@ await comprobar('0. el aviso de después',
 
 /* 1. El botón y el panel. */
 await abrirFichaDe('Sola Uno');
-await comprobar('1. el bloque «Datos del trámite» sale con solo el botón',
+await comprobar('1. la tarjeta «Campos del asunto» lleva el botón en su título (fila 254)',
   pagina.evaluate(() => ({ boton: document.getElementById('ficha-campo-anadir').textContent,
-    titulo: !!document.querySelector('.ficha-tarjeta[data-tarjeta="tramite"]') })), { boton: '+ Añadir campo', titulo: true });
+    enTitulo: !!document.querySelector('.ficha-tarjeta[data-tarjeta="tramite"] > .ficha-titulo #ficha-campo-anadir'),
+    titulo: (document.querySelector('.ficha-tarjeta[data-tarjeta="tramite"] > .ficha-titulo').firstChild.textContent.trim()),
+    viejo: document.body.textContent.indexOf('Datos del trámite') !== -1 })),
+  { boton: '+ Añadir campo', enTitulo: true, titulo: 'Campos del asunto', viejo: false });
 await pagina.click('#ficha-campo-anadir');
 await pagina.waitForSelector('#capa:not(.oculto) #campos-catalogo-pestanas');
 await comprobar('1. sale el mismo panel de Ajustes, con sus tres pestañas',
@@ -267,9 +270,68 @@ await pagina.evaluate(() => { FichaNucleo.ocupacionActual = { usuario: 'Compañe
 await pagina.waitForTimeout(400);
 await comprobar('10. en modo consulta el botón y los «⋮» no se ven',
   pagina.evaluate(() => ({
-    boton: getComputedStyle(document.getElementById('ficha-campo-anadir').closest('.ficha-dato')).display,
+    boton: getComputedStyle(document.getElementById('ficha-campo-anadir')).display,
     menu: Array.prototype.every.call(document.querySelectorAll('.campo-aqui-menu'), (b) => getComputedStyle(b.closest('.ficha-menu-envoltorio') || b).display === 'none' || getComputedStyle(b).display === 'none')
   })), { boton: 'none', menu: true });
+
+/* 11. Fila 254: pulsar el botón no abre ni cierra la tarjeta. */
+await pagina.evaluate((n) => { FichaNucleo.ocupacionActual = null; App.abrirFicha(App.E.listaAbiertos.filter((x) => x.nombre === n)[0], 'abierto'); }, ASUNTO_1);
+await pagina.waitForSelector('#ficha-campo-anadir');
+await pagina.waitForTimeout(400);
+await pagina.click('#ficha-campo-anadir');
+await pagina.waitForSelector('#capa:not(.oculto) #campos-catalogo-pestanas');
+await comprobar('11. el botón no abre la tarjeta en grande',
+  pagina.evaluate(() => document.getElementById('ficha-tarjetas').dataset.abierta || ''), '');
+
+/* 12. La ventana ancha: 1280 de ancho, tres columnas o más, solo baja la rejilla. */
+await pagina.setViewportSize({ width: 1280, height: 800 });
+await pagina.evaluate(() => {
+  App.E.campos.propios = App.E.campos.propios.concat(Array.from({ length: 40 }, (_, i) => ({ id: 'z' + i, nombre: 'Campo de relleno número ' + i + ' con un nombre largo largo largo', clase: 'texto', valores: [] })));
+});
+await pagina.click('#campos-catalogo-pestanas [data-pestana="mios"]');
+await pagina.waitForSelector('#campos-mios-lista .fila-tipo');
+await pagina.waitForTimeout(300);
+const medida = () => pagina.evaluate(() => {
+  const c = document.querySelector('#capa .cuadro');
+  const rej = document.getElementById('campos-mios-lista');
+  const cuerpo = document.getElementById('campos-catalogo-cuerpo');
+  const f = document.querySelector('.campos-catalogo-franja').getBoundingClientRect();
+  const antes = f.top;
+  cuerpo.scrollTop = 300;
+  const despues = document.querySelector('.campos-catalogo-franja').getBoundingClientRect().top;
+  const nombre = document.querySelector('#campos-mios-lista .nombre-tipo');
+  return { ancho: Math.round(c.getBoundingClientRect().width),
+    columnas: getComputedStyle(rej).gridTemplateColumns.split(' ').length,
+    cabeEnPantalla: c.getBoundingClientRect().height <= window.innerHeight,
+    soloBajaLaRejilla: cuerpo.scrollHeight > cuerpo.clientHeight && antes === despues && cuerpo.scrollTop > 0,
+    nombreCortado: nombre.scrollWidth > nombre.clientWidth ? nombre.title.length > 0 : true,
+    franjaUnaLinea: f.height < 90 };
+});
+const m1280 = await medida();
+await comprobar('12. a 1280: ventana ancha, 3 columnas o más, solo baja la rejilla',
+  Promise.resolve([m1280.ancho >= 1150, m1280.columnas >= 3, m1280.cabeEnPantalla, m1280.soloBajaLaRejilla, m1280.nombreCortado, m1280.franjaUnaLinea]),
+  [true, true, true, true, true, true]);
+await pagina.setViewportSize({ width: 600, height: 800 });
+await pagina.waitForTimeout(200);
+await comprobar('12. a 600: una sola columna',
+  pagina.evaluate(() => getComputedStyle(document.getElementById('campos-mios-lista')).gridTemplateColumns.split(' ').length), 1);
+await pagina.setViewportSize({ width: 1500, height: 1000 });
+await pagina.click('#campos-catalogo-volver');
+
+/* 13. Un fallo al guardar nunca se queda en silencio (aviso rojo, y el campo no sale). */
+await pagina.evaluate(() => {
+  window.__guardarOrig = Campos.guardarConfigDeTipo;
+  Campos.guardarConfigDeTipo = async () => { throw new Error('disco roto'); };
+});
+await pagina.evaluate(() => document.querySelectorAll('#mensajes .mensaje').forEach((m) => m.remove()));
+await elegirPropio('número 5 con');
+await pagina.fill('#cad-valor', 'x');
+await pagina.click('#cuadro-aceptar');
+await pagina.waitForTimeout(800);
+await comprobar('13. con el guardado roto sale un aviso rojo que dice qué ha fallado',
+  pagina.evaluate(() => Array.prototype.map.call(document.querySelectorAll('#mensajes .mensaje.malo'), (m) => m.textContent.indexOf('No he podido añadir el campo') === 0)), [true]);
+await comprobar('13. y el campo no aparece en la ficha', filasDatos().then((f) => f.some((x) => x.indexOf('Campo de relleno') === 0)), false);
+await pagina.evaluate(() => { Campos.guardarConfigDeTipo = window.__guardarOrig; });
 
 await comprobar('sin errores en la consola', Promise.resolve(errores), []);
 await pagina.close();

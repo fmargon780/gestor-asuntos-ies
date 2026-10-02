@@ -62,7 +62,7 @@
     return salida;
   }
 
-  /* "Datos del trámite" (18-sep-2026, fila 51, docs/FICHA-DISPOSICION.md,
+  /* "Campos del asunto", antes "Datos del trámite" (18-sep-2026, fila 51, docs/FICHA-DISPOSICION.md,
      5): ya no repite nada que se vea en otro sitio de la pantalla
      (cabecera, marcas, "Datos y contacto", la línea gris de arriba).
      Solo quedan los campos propios del tipo, la vía, "Lo pide" y en
@@ -83,12 +83,13 @@
        así, sin que nada la muestre. */
     /* Fila 245: en un asunto abierto el bloque sale siempre, aunque sea
        solo con el botón «+ Añadir campo». */
-    var anadir = (N.modoActual === 'abierto' && window.CampoDesdeElAsunto) ? CampoDesdeElAsunto.filaAnadirHtml() : '';
-    if (!buenas.length && !anadir) return null;
+    /* Fila 254: el botón «+ Añadir campo» vive en el título de la tarjeta
+       (js/ficha-tarjetas.js); aquí solo se decide que la tarjeta salga. */
+    if (!buenas.length && !(N.modoActual === 'abierto' && window.CampoDesdeElAsunto)) return null;
     var extraFormularios = window.Formularios
       ? '<div class="ficha-dato oculto" id="ficha-formularios-fila">' +
         '<span>Impresos</span><span id="ficha-formularios-valor"></span></div>' : '';
-    return N.filasHtml(buenas, extraFormularios + anadir);
+    return N.filasHtml(buenas, extraFormularios);
   }
 
   /* ---------- "Lo pide": quién ha pedido esta gestión ----------

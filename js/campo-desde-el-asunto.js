@@ -2,7 +2,7 @@
    campo-desde-el-asunto.js — añadir un campo desde un asunto abierto
    (1-oct-2026, fila 245, docs/CAMPO-DESDE-EL-ASUNTO.md).
 
-   En «Datos del trámite» de la ficha, el botón «+ Añadir campo» abre el
+   En la tarjeta «Campos del asunto» de la ficha (antes «Datos del trámite»), el botón «+ Añadir campo» abre el
    mismo panel que «+ Añadir campo» de Ajustes del tipo
    (js/campos-catalogo.js, sin los campos que el asunto ya tiene). Elegido
    el campo se pide su valor en el mismo paso y el bloque «¿Dónde se
@@ -86,7 +86,7 @@ window.CampoDesdeElAsunto = (function () {
     var elegido = null;
     var capa = document.querySelector('#capa .cuadro');
     var espera = U.preguntar('Añadir un campo', '<div id="cad-panel"></div>', 'Cerrar');
-    if (capa) capa.classList.add('cuadro-alto');
+    if (capa) capa.classList.add('cuadro-campos');
     CamposCatalogo.abrir($('cad-panel'), { tipo: tipo, categoria: categoria }, lista, {
       textoVolver: '← Volver',
       onCambio: function () {
@@ -98,7 +98,7 @@ window.CampoDesdeElAsunto = (function () {
       onVolver: function () { $('cuadro-cancelar').click(); }
     });
     await espera;
-    if (capa) capa.classList.remove('cuadro-alto');
+    if (capa) capa.classList.remove('cuadro-campos');
     return elegido;
   }
 
@@ -108,7 +108,8 @@ window.CampoDesdeElAsunto = (function () {
   async function pedirValorYDonde(a, tipo, cfg, categoria, previo) {
     var nombre = Campos.nombreDeCampo(cfg, App.E.campos);
     var propio = cfg.origen === 'propio' ? Campos.propioDe(cfg.id, App.E.campos) : null;
-    var inicial = previo !== undefined ? previo : await valorDePartida(a, cfg, categoria);
+    var inicial = previo !== undefined ? previo
+      : await vigilar(valorDePartida(a, cfg, categoria), 'Estoy preparando el campo «' + nombre + '»…', 2500);
     /* Fila 244: el control según la clase (lista, fecha, importe, número o texto). */
     var clase = (propio && propio.clase) || 'texto';
     var control = CamposClases.htmlControl('cad-valor', clase, propio && propio.valores, inicial);
@@ -172,7 +173,21 @@ window.CampoDesdeElAsunto = (function () {
     });
   }
 
+  /* Fila 254: nada de lo que tarde se queda en silencio. Si `promesa` no ha
+     acabado en `ms`, sale un aviso ámbar; al acabar (bien o mal) ya no. */
+  function vigilar(promesa, texto, ms) {
+    var t = setTimeout(function () { U.aviso(texto, 'ambar'); }, ms);
+    return promesa.then(function (r) { clearTimeout(t); return r; }, function (e) { clearTimeout(t); throw e; });
+  }
+
+  /* Volver a pintar la ficha es lo de después: si falla, el campo ya está
+     guardado y el aviso es ámbar (principal y accesorio por separado). */
   function repintar(a) {
+    try { repintarYa(a); }
+    catch (e) { U.accesorio('El campo se ha guardado, pero no he podido refrescar la ficha', e); }
+  }
+
+  function repintarYa(a) {
     var N = window.FichaNucleo;
     if (N && N.actual && N.actual.nombre === a.nombre) {
       var fresca = App.E.registro && App.E.registro.asuntos && App.E.registro.asuntos[a.nombre];
@@ -217,16 +232,16 @@ window.CampoDesdeElAsunto = (function () {
       U.accesorio('El campo ya está en el tipo, pero no he podido guardar su valor en este asunto', e);
       return;
     }
-    repintar(a);
     U.aviso(textoAlTipo(tipoCorto, otros), 'bueno', {
       boton: 'Deshacer', alPulsar: function () { deshacer(a, tipo, entrada, antes, tipoCorto); }
     });
+    repintar(a);
   }
 
   async function guardarSoloAqui(a, entrada, valor) {
     await escribirEnAsunto(a, Campos.claveDeCampo(entrada), { valor: valor, anadir: entrada });
-    repintar(a);
     U.aviso('Campo añadido solo a este asunto.', 'bueno');
+    repintar(a);
   }
 
   /* ---------- el botón «+ Añadir campo» ---------- */
@@ -240,8 +255,9 @@ window.CampoDesdeElAsunto = (function () {
       var r = await pedirValorYDonde(a, tipo, cfg, categoria);
       if (!r) return;
       var entrada = entradaLimpia(cfg);
-      if (r.donde === 'tipo') await guardarEnElTipo(a, tipo, entrada, r.valor);
-      else await guardarSoloAqui(a, entrada, r.valor);
+      var guardando = r.donde === 'tipo' ? guardarEnElTipo(a, tipo, entrada, r.valor) : guardarSoloAqui(a, entrada, r.valor);
+      await vigilar(guardando, 'Sigo guardando el campo «' + Campos.nombreDeCampo(cfg, App.E.campos) +
+        '». Si tarda mucho, mira que Dropbox no esté sincronizando.', 6000);
     } catch (e) {
       U.fallo('No he podido añadir el campo', e);
     }
@@ -270,11 +286,14 @@ window.CampoDesdeElAsunto = (function () {
 
   /* ---------- lo que pinta la ficha ---------- */
 
-  /* La fila del botón, al final de «Datos del trámite» (solo en un asunto
-     abierto; en modo consulta la ficha apaga los botones sola). */
-  function filaAnadirHtml() {
-    return '<div class="ficha-dato ficha-dato-anadir"><span></span><span>' +
-      '<button type="button" class="boton" id="ficha-campo-anadir">+ Añadir campo</button></span></div>';
+  /* El botón, en el título de la tarjeta «Campos del asunto» (fila 254):
+     siempre a la vista, solo en un asunto abierto (en modo consulta la
+     ficha apaga los botones sola). Pulsarlo no abre ni cierra la tarjeta
+     (js/ficha-tarjetas.js no hace caso a los botones). */
+  function botonTituloHtml() {
+    var N = window.FichaNucleo;
+    if (N && N.modoActual !== 'abierto') return '';
+    return ' <button type="button" class="boton ficha-campo-anadir" id="ficha-campo-anadir">+ Añadir campo</button>';
   }
 
   /* Tras pintar la ficha: engancha el botón y los «⋮». */
@@ -295,7 +314,7 @@ window.CampoDesdeElAsunto = (function () {
 
   return {
     textoAlTipo: textoAlTipo,
-    filaAnadirHtml: filaAnadirHtml,
+    botonTituloHtml: botonTituloHtml,
     alPintar: alPintar,
     abrir: abrir
   };
