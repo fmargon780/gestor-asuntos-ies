@@ -12,5 +12,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 257 | 100 | Fichero nuevo con la línea del tipo y su buscador, crear tipo desde el cuadro sin dos cuadros a la vez, cuadro «Cambiar el asunto» recolocado, la línea en «Nuevo asunto» con tipo reconocido, una prueba nueva y dos adaptadas |
 | 261 | 70 | Solo el script del buzón y sus documentos: lista de repositorios, fila IDEA según la forma de cada cola, captura y errores tolerantes, correo si no se apunta en la cola, `prepararTodo` para todos, y la prueba del script ampliada |
