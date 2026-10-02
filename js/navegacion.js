@@ -50,11 +50,48 @@ window.Navegacion = (function () {
     origen = { pantalla: v, alto: altoActual() };
   }
 
+  /* Fila 256 (docs/LISTA-A-LA-MISMA-ALTURA-AL-VOLVER.md): la pantalla de destino se
+     termina de pintar a trozos durante un rato (la lista, la franja de avisos, la
+     cabecera que se encoge) y el «scroll anchoring» del navegador movía `scrollY`
+     unos 40 px con cada trozo: la lista volvía más abajo de donde estaba. Mientras
+     dura el regreso (casi un segundo) se apaga el anclaje y se devuelve la página a
+     la altura guardada cada vez que se aparta, salvo que la persona toque la pantalla
+     (rueda, tacto, tecla o ratón): entonces se le devuelve el anclaje y se la deja en
+     paz. `alturaPedida()` dice esa altura a quien repinta la pantalla en ese rato
+     (js/inicio.js), porque el `scrollY` de entonces ya puede venir movido. */
+  var VIGILAR_MS = 900;
+  var pedida = null;   /* { alto, hasta } */
+  var vigilanciaActual = null;
+  var paso = window.requestAnimationFrame ? function (f) { window.requestAnimationFrame(f); } : function (f) { setTimeout(f, 16); };
+
+  function alturaPedida() {
+    return (pedida && Date.now() < pedida.hasta) ? pedida.alto : null;
+  }
+
   function ponerAltura(alto) {
     if (alto === null || alto === undefined) return;
+    if (vigilanciaActual) vigilanciaActual();   /* una sola a la vez */
+    var raiz = document.documentElement;
+    var anclajeAntes = raiz.style.overflowAnchor;
+    var terminada = false;
+    var eventos = ['wheel', 'touchstart', 'keydown', 'mousedown'];
+    function parar() {
+      if (terminada) return;
+      terminada = true;
+      vigilanciaActual = null;
+      raiz.style.overflowAnchor = anclajeAntes;
+      eventos.forEach(function (e) { window.removeEventListener(e, parar, true); });
+    }
+    pedida = { alto: alto, hasta: Date.now() + VIGILAR_MS };
+    raiz.style.overflowAnchor = 'none';
+    eventos.forEach(function (e) { window.addEventListener(e, parar, { capture: true, passive: true }); });
+    vigilanciaActual = parar;
     window.scrollTo(0, alto);
-    /* Por si la lista termina de pintarse un momento después. */
-    setTimeout(function () { if (Math.abs(altoActual() - alto) > 2) window.scrollTo(0, alto); }, 60);
+    (function vigilar() {
+      if (terminada) return;
+      if (Math.abs(altoActual() - alto) > 2) window.scrollTo(0, alto);
+      if (Date.now() < pedida.hasta) paso(vigilar); else parar();
+    })();
   }
 
   /* `defecto`: adónde ir si no se sabe de dónde se vino. */
@@ -108,6 +145,7 @@ window.Navegacion = (function () {
     abrirAbierto: abrirAbierto,
     avisoConIr: avisoConIr,
     pantallaVisible: pantallaVisible,
+    alturaPedida: alturaPedida,
     origen: function () { return origen; }
   };
 })();
