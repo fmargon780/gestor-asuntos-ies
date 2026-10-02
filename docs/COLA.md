@@ -200,7 +200,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 257 | `docs/TIPO-EN-UNA-LINEA-AL-CAMBIAR.md` (aviso de usuario: en «Cambiar el asunto» el tipo se ve en una línea con «Cambiar», como el tercero; al pulsarlo, caja vacía y, al escribir, hasta 8 tipos parecidos de todas las categorías, con ✕ para dejar el que había y «crear» si no hay ninguno; lo mismo en «Nuevo asunto» cuando llega con el tipo ya reconocido —en blanco no cambia—; y el cuadro «Cambiar el asunto» compacto, con Fecha, Grupo y Año académico en una fila, sin barra de desplazamiento) | PENDIENTE (2-oct-2026) · aviso completo: https://drive.google.com/file/d/1AuJUMwypI6RyDEnfsAWZrSdUynNPtGg9/view?usp=drivesdk |
 | 258 | Aviso de usuario: mejora en «Inicio» | DESCARTADA (2-oct-2026): descartada por Francisco desde el Centro de mando |
 | 259 | Aviso de usuario: mejora en «Inicio» | IDEA (2-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1OLb3cTYpVrrM4ZTYPMt2mMkI9pwu1pEn/view?usp=drivesdk |
-| 260 | Aviso de usuario: error en «Inicio» | IDEA (2-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1ZGg_naix3qbZwLjUg_RGJThsf849f5xC/view?usp=drivesdk |
+| 260 | Aviso de usuario: error en «Inicio» (lo cambiado desde casa no aparece en el centro y salen fichas sin carpeta) | EN DISEÑO (2-oct-2026) · conversación: https://claude.ai/code/session_01E63qqkFLfZHv6uG6HpagmA · enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1ZGg_naix3qbZwLjUg_RGJThsf849f5xC/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
