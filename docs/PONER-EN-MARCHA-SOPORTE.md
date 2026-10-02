@@ -12,8 +12,12 @@ completo con su enlace.
 
 1. Entra en https://github.com/settings/personal-access-tokens/new (con tu cuenta `fmargon780`).
 2. Nombre: `Soporte del Gestor`. Caducidad: la más larga que te deje (un año).
-3. «Repository access» → «Only select repositories» → elige **`fmargon780/gestor-asuntos-ies`** y
-   ninguno más. (Más adelante se añaden aquí los repositorios de las demás apps.)
+3. «Repository access» → «Only select repositories» → elige **todos** los repositorios de la lista
+   del buzón (están en `REPOS_PERMITIDOS`, arriba de `apps-script/soporte.gs`): `gestor-asuntos-ies`,
+   `bd-alumnado-ies`, `ausencias-guardias-ies`, `normativa-escolarizacion`,
+   `migracion-dropbox-drive`, `Disciplina-IES`, `club-tolox-corre`, `comparador-listas`,
+   `Partituras-de-Caja-Clara`, `Cancionero-Parroquia`, `Parroquia_Conteo_Colectas` y
+   `ERP-Nutricion`. (El buzón ya acepta avisos de todos; cada app los manda cuando tenga su botón.)
 4. «Permissions» → «Repository permissions» → **Contents: Read and write**. Nada más.
 5. «Generate token» y **copia el texto que empieza por `github_pat_`**. Solo se enseña una vez.
 
@@ -27,10 +31,13 @@ completo con su enlace.
 4. En la rueda de la izquierda, «Configuración del proyecto» → abajo, «Propiedades de la
    secuencia de comandos» → «Añadir propiedad»: nombre **`GITHUB_TOKEN`**, valor: el texto
    `github_pat_…` del paso 1. Guarda.
-5. Arriba, elige la función **`prepararTodo`** y pulsa «Ejecutar». Google pedirá permisos (Drive y
-   conexión externa): autorízalos. Al terminar, en «Registro de ejecución» tiene que salir
-   «Carpeta de avisos lista» y «Permiso de GitHub bien». Si dice «OJO», el permiso del paso 1 está
-   mal (repositorio o «Contents» sin escritura).
+5. Arriba, elige la función **`prepararTodo`** y pulsa «Ejecutar». Google pedirá permisos (Drive,
+   conexión externa y enviar correo): autorízalos. Al terminar, en «Registro de ejecución» sale
+   «Carpeta de avisos lista», una línea por cada repositorio («Bien: …», «Sin cola: …» o «OJO: …») y
+   un resumen. Los que digan **«OJO»** son los repositorios a los que le falta permiso al paso 1
+   (añádelos al permiso en GitHub). «Sin cola» quiere decir que el permiso llega pero ese repositorio
+   aún no tiene su lista de tareas: no es un problema. Te llega también un correo de prueba con el
+   mismo resumen.
 
 ## 3. Publicarlo como aplicación web
 
@@ -61,6 +68,13 @@ buzón no ha contestado bien, casi seguro que en el paso 3 no elegiste «Cualqui
 
 ## Cuando cambie el script
 
-Si alguna vez se cambia `apps-script/soporte.gs`, hay que pegarlo otra vez en el proyecto y
-«Implementar» → «Administrar implementaciones» → lápiz → «Nueva versión» (la dirección `/exec`
-no cambia).
+Si alguna vez se cambia `apps-script/soporte.gs`, hay que:
+
+1. Pegarlo otra vez en el proyecto (borrando antes todo el contenido del fichero de código) y guardar.
+2. Ejecutar **`prepararTodo`**, autorizar el permiso nuevo si lo pide (el de correo) y leer el
+   registro: los repositorios con «OJO» son los que le faltan al permiso de GitHub.
+3. «Implementar» → «Administrar implementaciones» → lápiz → «Nueva versión» (la dirección `/exec`
+   no cambia).
+
+**Si un aviso se guarda en Drive pero no sale en el Centro de mando,** te llega un correo (como mucho
+uno por app y día) con el motivo y el enlace al aviso; no lleva el texto de quien lo escribió.
