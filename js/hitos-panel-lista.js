@@ -277,6 +277,8 @@ var HitosPanelLista = (function () {
     };
     var colDerecha = '<div class="mesa-col mesa-col-derecha">' +
       resumen('guion', 'Tareas del hito') + resumen('docs', 'Documentos del hito') + resumen('notas', 'Registro') +
+      /* Fila 255 (docs/CAMPOS-DE-UN-HITO.md): los campos de este hito, para rellenar ahí mismo. */
+      (window.CamposDeHito ? CamposDeHito.tarjetaHtml(a, h, abierto) : '') +
       (window.HitosNormativa ? '<details class="mesa-bloque mesa-normativa' + (cuantasNormas ? '' : ' oculto') + '">' +
         '<summary class="mesa-bloque-titulo">Normativa (<span class="mesa-normativa-cuenta">' + cuantasNormas + '</span>)</summary>' +
         HitosNormativa.listaHTML(h.normativa) + '<div class="mesa-normativa-guion"></div></details>' : '') +
@@ -345,6 +347,7 @@ var HitosPanelLista = (function () {
     if (window.HitosAnadir) HitosAnadir.engancharBoton(div, a, h);   /* fila 103 */
     if (window.HitosComunicar) HitosComunicar.engancharBoton(div, a, h);
     if (window.HitosGenerar) HitosGenerar.engancharBoton(div, a, h);   /* fila 102 */
+    if (window.CamposDeHito) CamposDeHito.enganchar(div, a, h, abierto);   /* fila 255 */
     var resp = div.querySelector('.hito-campo-responsable');
     if (resp) resp.onchange = function () {
       return guardarHito(resp, 'guardar el responsable', function () { return Hitos.guardarCampos(a.nombre, h.id, { responsable: resp.value }); });

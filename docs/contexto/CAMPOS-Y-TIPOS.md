@@ -364,3 +364,16 @@ tipo, Nuevo asunto, Cambiar el asunto) ni interruptor «Añadir el grupo al nomb
 datos guardados por compatibilidad: al crear siempre es `false`; en «Cambiar el asunto», la marca guardada
 de un asunto de antes se conserva y el nombre se rehace con los valores guardados (editar un campo no
 renombra la carpeta). El texto adicional de un documento va a la ficha del documento, no a su nombre.
+
+**Campos de un hito (fila 255, `docs/CAMPOS-DE-UN-HITO.md`, `js/campos-de-hito.js`)**: un campo de un hito es
+un campo del asunto con la marca `hito` (el id del paso de la guía, o el del hito si es «solo de este
+asunto») en su entrada de `porTipo` o de `ficha.camposPropiosDelAsunto`; el valor sigue en `ficha.campos`
+(uno solo por asunto). `Campos.camposDeAsunto` deja que la ficha ponga o quite (`hito: ''`) la marca de un
+campo del tipo solo en ese asunto. `CamposDeHito.repartir` (pura) separa sin hito / por hito; con la marca
+rota, con valor se ve con los del asunto y sin valor no se ve. La mesa lleva la tarjeta «Campos de este
+hito» (rellenar en el sitio, «⋮» «Quitar de este hito», «+ Añadir campo» que abre `CampoDesdeElAsunto.abrir(a, hito)`
+con «Ya están en este asunto» arriba y la frase «El hito «…» lo tendrá en N asuntos…»). La ficha pone el
+título del hito sobre sus campos con valor; Nuevo asunto no los pide (guarda solo su valor de partida);
+Ajustes → Campos tiene el desplegable «Hito» (sin «Obligatorio» si hay hito); al guardarse la guía
+(`guardarPasos`), los campos de un paso borrado pasan a ser del asunto (`limpiarMarcas`).
+

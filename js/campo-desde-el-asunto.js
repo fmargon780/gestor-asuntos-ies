@@ -46,8 +46,9 @@ window.CampoDesdeElAsunto = (function () {
 
   /* La entrada tal como se guarda en la configuración de un tipo: sin lo
      que solo vale dentro de la ficha (`soloAqui`). */
-  function entradaLimpia(c) {
+  function entradaLimpia(c, marcaDeHito) {
     var e = c.origen === 'fichero' ? { origen: 'fichero', columna: c.columna } : { origen: c.origen, id: c.id };
+    if (marcaDeHito || c.hito) e.hito = marcaDeHito || c.hito;   /* fila 255 */
     e.obligatorio = false;
     e.enNombre = false;
     return e;
@@ -80,15 +81,23 @@ window.CampoDesdeElAsunto = (function () {
 
   /* ---------- 1. elegir el campo (el panel de Ajustes) ---------- */
 
-  async function elegirCampo(a, tipo, categoria) {
+  async function elegirCampo(a, tipo, categoria, hito) {
     var lista = Campos.camposDeAsunto(configDelTipo(tipo), fichaFresca(a)).map(copia);
     var inicial = lista.length;
     var elegido = null;
     var capa = document.querySelector('#capa .cuadro');
-    var espera = U.preguntar('Añadir un campo', '<div id="cad-panel"></div>', 'Cerrar');
+    var espera = U.preguntar(hito ? 'Añadir un campo al hito «' + hito.titulo + '»' : 'Añadir un campo',
+      '<div id="cad-panel"></div>', 'Cerrar');
     if (capa) capa.classList.add('cuadro-campos');
     CamposCatalogo.abrir($('cad-panel'), { tipo: tipo, categoria: categoria }, lista, {
       textoVolver: '← Volver',
+      /* Fila 255: desde un hito, arriba los campos del asunto que no son de ningún hito. */
+      yaEstan: hito ? lista.filter(function (c) { return !c.hito; }) : null,
+      onYaEsta: function (c) {
+        if (elegido) return;
+        elegido = Object.assign({}, c, { yaEsta: true });
+        $('cuadro-cancelar').click();
+      },
       onCambio: function () {
         if (lista.length < inicial) { inicial = lista.length; return; }   /* se ha borrado un campo propio */
         if (elegido || lista.length === inicial) return;
@@ -104,8 +113,23 @@ window.CampoDesdeElAsunto = (function () {
 
   /* ---------- 2 y 3. el valor y «¿Dónde se guarda?» ---------- */
 
+  function opcionesDeDonde(a, tipoCorto, hito) {
+    return { tipoCorto: tipoCorto, opcionTipo: 'En el tipo ' + tipoCorto, vacio: true,
+      otros: DondeSeGuarda.otrosAbiertos(a).length, hitoCampo: hito ? { titulo: hito.titulo } : null };
+  }
+
+  /* Un campo que ya estaba en el asunto y se lleva a un hito: no hay valor que pedir,
+     solo «¿Dónde se guarda?». 'tipo', 'aqui' o null (se cancela). */
+  async function pedirSoloDonde(a, tipo, cfg, hito) {
+    if (!tipo || !hito.enGuia) return 'aqui';
+    var r = await DondeSeGuarda.preguntar(Object.assign({
+      titulo: 'Llevar «' + Campos.nombreDeCampo(cfg, App.E.campos) + '» al hito «' + hito.titulo + '»', aceptar: 'Guardar'
+    }, opcionesDeDonde(a, DondeSeGuarda.nombreCortoDe(tipo), hito)));
+    return r === null ? null : (r === 'guia' ? 'tipo' : 'aqui');
+  }
+
   /* { valor, donde: 'tipo' | 'aqui' } o null (Escape o Cancelar). */
-  async function pedirValorYDonde(a, tipo, cfg, categoria, previo) {
+  async function pedirValorYDonde(a, tipo, cfg, categoria, previo, hito) {
     var nombre = Campos.nombreDeCampo(cfg, App.E.campos);
     var propio = cfg.origen === 'propio' ? Campos.propioDe(cfg.id, App.E.campos) : null;
     var inicial = previo !== undefined ? previo
@@ -114,14 +138,12 @@ window.CampoDesdeElAsunto = (function () {
     var clase = (propio && propio.clase) || 'texto';
     var control = CamposClases.htmlControl('cad-valor', clase, propio && propio.valores, inicial);
     var tipoCorto = tipo ? DondeSeGuarda.nombreCortoDe(tipo) : '';
-    var bloque = tipo ? DondeSeGuarda.bloqueHTML({
-      tipoCorto: tipoCorto, opcionTipo: 'En el tipo ' + tipoCorto, vacio: true,
-      otros: DondeSeGuarda.otrosAbiertos(a).length
-    }) : '';
+    var conPregunta = !!tipo && (!hito || hito.enGuia);   /* fila 255: un hito solo de este asunto no pregunta */
+    var bloque = conPregunta ? DondeSeGuarda.bloqueHTML(opcionesDeDonde(a, tipoCorto, hito)) : '';
     var espera = U.preguntar('Añadir el campo «' + nombre + '»',
       '<label class="etiqueta">' + U.escapar(nombre) + ' <span class="suave">(se puede dejar vacío)</span></label>' +
       control + bloque, 'Guardar');
-    if (tipo) DondeSeGuarda.enganchar();
+    if (conPregunta) DondeSeGuarda.enganchar();
     var campo = $('cad-valor');
     DondeSeGuarda.introAcepta(campo);
     CamposClases.engancharControl(campo, clase);
@@ -129,11 +151,11 @@ window.CampoDesdeElAsunto = (function () {
     var ok = await espera;
     if (!ok) return null;
     var leido = CamposClases.leerControl(campo, clase);
-    var donde = tipo && DondeSeGuarda.elegido() === 'guia' ? 'tipo' : 'aqui';
+    var donde = conPregunta && DondeSeGuarda.elegido() === 'guia' ? 'tipo' : 'aqui';
     if (!leido.ok) {
       /* Un importe, número o fecha que no se entiende no se guarda: se vuelve a pedir, con lo escrito. */
       U.aviso('Revisa «' + nombre + '»: ' + CamposClases.avisoDeAmbar(clase) + '.', 'ambar');
-      return pedirValorYDonde(a, tipo, cfg, categoria, leido.texto);
+      return pedirValorYDonde(a, tipo, cfg, categoria, leido.texto, hito);
     }
     return { valor: leido.valor, donde: donde };
   }
@@ -141,18 +163,39 @@ window.CampoDesdeElAsunto = (function () {
   /* ---------- lo que se escribe ---------- */
 
   /* El campo entra en la configuración del tipo (al final, sin
-     «Obligatorio» ni «Añadir al nombre»). Devuelve las claves que tenía el
-     tipo antes, para «Deshacer». */
+     «Obligatorio» ni «Añadir al nombre»). Si ya estaba y ahora se le pone hito
+     (fila 255), se le pone la marca, sin duplicarlo. Devuelve cómo estaba la
+     lista del tipo antes y cómo queda, para «Deshacer». */
   function anadirAlTipo(tipo, entrada) {
     var clave = Campos.claveDeCampo(entrada);
-    var antes = null;
+    var res = null;
     return App.enFila('campos.json', async function () {
       var actual = await Campos.leer(App.E.gestor);
       var lista = (actual.porTipo && actual.porTipo[tipo]) || [];
-      antes = lista.map(Campos.claveDeCampo);
-      if (antes.indexOf(clave) !== -1) return actual;
-      return Campos.guardarConfigDeTipo(App.E.gestor, tipo, lista.concat([entrada]));
-    }).then(function (config) { App.E.campos = config; return antes; });
+      var antes = copia(lista);
+      var i = -1;
+      lista.forEach(function (c, k) { if (Campos.claveDeCampo(c) === clave) i = k; });
+      var nueva;
+      if (i === -1) nueva = lista.concat([entrada]);
+      else if (entrada.hito && !lista[i].hito) {
+        nueva = lista.map(function (c, k) { return k === i ? Object.assign({}, c, { hito: entrada.hito, obligatorio: false }) : c; });
+      } else { res = { antes: antes, despues: antes }; return actual; }
+      var config = await Campos.guardarConfigDeTipo(App.E.gestor, tipo, nueva);
+      res = { antes: antes, despues: copia((config.porTipo && config.porTipo[tipo]) || []) };
+      return config;
+    }).then(function (config) { App.E.campos = config; return res; });
+  }
+
+  /* Fila 255: a un campo del tipo se le quita la marca de hito (pasa a ser del asunto). */
+  function quitarHitoEnElTipo(tipo, clave) {
+    return App.enFila('campos.json', async function () {
+      var actual = await Campos.leer(App.E.gestor);
+      var lista = ((actual.porTipo && actual.porTipo[tipo]) || []).map(function (c) {
+        if (Campos.claveDeCampo(c) !== clave) return c;
+        var n = Object.assign({}, c); delete n.hito; return n;
+      });
+      return Campos.guardarConfigDeTipo(App.E.gestor, tipo, lista);
+    }).then(function (config) { App.E.campos = config; });
   }
 
   /* Una sola escritura de la ficha del asunto, releída del disco justo
@@ -167,9 +210,12 @@ window.CampoDesdeElAsunto = (function () {
       if (o.borrarValor) delete campos[clave];
       else if (o.valor !== undefined) campos[clave] = { valor: o.valor, enNombre: false };
       ficha.campos = campos;
-      var lista = (ficha.camposPropiosDelAsunto || []).filter(function (c) { return Campos.claveDeCampo(c) !== clave; });
-      if (o.anadir) lista.push(o.anadir);
-      if (lista.length) ficha.camposPropiosDelAsunto = lista; else delete ficha.camposPropiosDelAsunto;
+      /* Fila 255: guardar solo un valor no toca la lista de «solo aquí». */
+      if (o.anadir || o.quitar) {
+        var lista = (ficha.camposPropiosDelAsunto || []).filter(function (c) { return Campos.claveDeCampo(c) !== clave; });
+        if (o.anadir) lista.push(o.anadir);
+        if (lista.length) ficha.camposPropiosDelAsunto = lista; else delete ficha.camposPropiosDelAsunto;
+      }
     });
   }
 
@@ -198,17 +244,15 @@ window.CampoDesdeElAsunto = (function () {
 
   /* ---------- «Deshacer» ---------- */
 
-  async function deshacer(a, tipo, entrada, antes, tipoCorto) {
+  async function deshacer(a, tipo, entrada, cambio, tipoCorto) {
     var clave = Campos.claveDeCampo(entrada);
     var parcial = false;
     try {
       await App.enFila('campos.json', async function () {
         var actual = await Campos.leer(App.E.gestor);
         var lista = (actual.porTipo && actual.porTipo[tipo]) || [];
-        var claves = lista.map(Campos.claveDeCampo);
-        var esperado = antes.concat([clave]);
-        if (JSON.stringify(claves) !== JSON.stringify(esperado)) { parcial = true; return; }
-        App.E.campos = await Campos.guardarConfigDeTipo(App.E.gestor, tipo, lista.slice(0, antes.length));
+        if (JSON.stringify(lista) !== JSON.stringify(cambio.despues)) { parcial = true; return; }
+        App.E.campos = await Campos.guardarConfigDeTipo(App.E.gestor, tipo, cambio.antes);
       });
       await escribirEnAsunto(a, clave, { anadir: entrada });
     } catch (e) { U.fallo('No he podido deshacerlo', e); return; }
@@ -225,7 +269,7 @@ window.CampoDesdeElAsunto = (function () {
     var clave = Campos.claveDeCampo(entrada);
     var tipoCorto = DondeSeGuarda.nombreCortoDe(tipo);
     var otros = DondeSeGuarda.otrosAbiertos(a).length;
-    var antes = await anadirAlTipo(tipo, entrada);
+    var cambio = await anadirAlTipo(tipo, entrada);
     try {
       await escribirEnAsunto(a, clave, { valor: valor, quitar: true });
     } catch (e) {
@@ -233,29 +277,37 @@ window.CampoDesdeElAsunto = (function () {
       return;
     }
     U.aviso(textoAlTipo(tipoCorto, otros), 'bueno', {
-      boton: 'Deshacer', alPulsar: function () { deshacer(a, tipo, entrada, antes, tipoCorto); }
+      boton: 'Deshacer', alPulsar: function () { deshacer(a, tipo, entrada, cambio, tipoCorto); }
     });
     repintar(a);
   }
 
-  async function guardarSoloAqui(a, entrada, valor) {
+  async function guardarSoloAqui(a, entrada, valor, hito) {
     await escribirEnAsunto(a, Campos.claveDeCampo(entrada), { valor: valor, anadir: entrada });
-    U.aviso('Campo añadido solo a este asunto.', 'bueno');
+    U.aviso(hito ? 'Campo añadido al hito «' + hito.titulo + '», solo en este asunto.' : 'Campo añadido solo a este asunto.', 'bueno');
     repintar(a);
   }
 
   /* ---------- el botón «+ Añadir campo» ---------- */
 
-  async function abrir(a) {
+  /* `hito` (fila 255): { marca, titulo, enGuia } si se abre desde la pantalla de un hito. */
+  async function abrir(a, hito) {
     try {
       var tipo = tipoDe(a);
       var categoria = categoriaDe(a, tipo);
-      var cfg = await elegirCampo(a, tipo, categoria);
+      var cfg = await elegirCampo(a, tipo, categoria, hito);
       if (!cfg) return;
-      var r = await pedirValorYDonde(a, tipo, cfg, categoria);
-      if (!r) return;
-      var entrada = entradaLimpia(cfg);
-      var guardando = r.donde === 'tipo' ? guardarEnElTipo(a, tipo, entrada, r.valor) : guardarSoloAqui(a, entrada, r.valor);
+      var r;
+      if (cfg.yaEsta) {
+        var donde = await pedirSoloDonde(a, tipo, cfg, hito);
+        if (!donde) return;
+        r = { valor: undefined, donde: donde };
+      } else {
+        r = await pedirValorYDonde(a, tipo, cfg, categoria, undefined, hito);
+        if (!r) return;
+      }
+      var entrada = entradaLimpia(cfg, hito && hito.marca);
+      var guardando = r.donde === 'tipo' ? guardarEnElTipo(a, tipo, entrada, r.valor) : guardarSoloAqui(a, entrada, r.valor, hito);
       await vigilar(guardando, 'Sigo guardando el campo «' + Campos.nombreDeCampo(cfg, App.E.campos) +
         '». Si tarda mucho, mira que Dropbox no esté sincronizando.', 6000);
     } catch (e) {
@@ -316,6 +368,8 @@ window.CampoDesdeElAsunto = (function () {
     textoAlTipo: textoAlTipo,
     botonTituloHtml: botonTituloHtml,
     alPintar: alPintar,
-    abrir: abrir
+    abrir: abrir,
+    _i: { escribirEnAsunto: escribirEnAsunto, entradaLimpia: entradaLimpia, configDelTipo: configDelTipo,
+          repintar: repintar, quitarHitoEnElTipo: quitarHitoEnElTipo, pasarAlTipo: pasarAlTipo, quitar: quitar }
   };
 })();

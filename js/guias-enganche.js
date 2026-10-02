@@ -229,6 +229,11 @@
     try { await cargar(); } catch (e) { /* se sigue con lo que hay */ }
     if (pasosNuevos.length) guias[nombreTipo] = pasosNuevos; else delete guias[nombreTipo];
     await guardarTipo(nombreTipo, pasosNuevos);
+    /* Fila 255: los campos de un paso que ya no está pasan a ser del asunto. */
+    if (window.CamposDeHito) {
+      try { await CamposDeHito.limpiarMarcas(nombreTipo, pasosNuevos); }
+      catch (e) { U.accesorio('La guía se ha guardado, pero no he podido soltar los campos de un hito borrado', e); }
+    }
     var llegados = await llevarAAbiertos(nombreTipo, pasosNuevos);
     if (llegados) {
       U.aviso('Los hitos nuevos de ' + nombreTipo + ' han llegado a ' +

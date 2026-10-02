@@ -118,11 +118,35 @@ var CamposCatalogo = (function () {
   /* ---------- pestaña "De la ficha" ---------- */
 
   function pintarFicha(interior, deFicha, lista, opciones) {
-    interior.innerHTML = '<div id="campos-catalogo-ficha-lista" class="campos-catalogo-rejilla"></div>';
+    /* Fila 255: desde un hito, arriba «Ya están en este asunto» (los campos del asunto sin hito). */
+    var yaEstan = (opciones.yaEstan || []);
+    interior.innerHTML = (yaEstan.length
+      ? '<div class="campos-catalogo-grupo" id="campos-catalogo-yaestan"><div class="etiqueta">Ya están en este asunto</div>' +
+        '<div class="campos-catalogo-rejilla" id="campos-catalogo-yaestan-lista"></div></div>' : '') +
+      '<div id="campos-catalogo-ficha-lista" class="campos-catalogo-rejilla"></div>';
+    var cajaYa = interior.querySelector('#campos-catalogo-yaestan-lista');
+    function pintarYaEstan(filtro) {
+      if (!cajaYa) return;
+      var q = U.normalizar(filtro || '');
+      cajaYa.innerHTML = '';
+      yaEstan.forEach(function (c) {
+        var nombre = Campos.nombreDeCampo(c, App.E.campos);
+        if (q && U.normalizar(nombre).indexOf(q) === -1) return;
+        var f = document.createElement('div');
+        f.className = 'fila-tipo';
+        f.innerHTML = '<span class="nombre-tipo" title="' + U.escapar(nombre) + '">' + U.escapar(nombre) + '</span>';
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'boton'; b.textContent = 'Añadir';
+        b.onclick = function () { if (opciones.onYaEsta) opciones.onYaEsta(c); };
+        f.appendChild(b);
+        cajaYa.appendChild(f);
+      });
+      cajaYa.parentNode.classList.toggle('oculto', !cajaYa.children.length);
+    }
     var hueco = interior.parentNode.querySelector('#campos-catalogo-buscar-hueco');
     hueco.innerHTML = '<input id="campos-catalogo-buscar" class="campo" placeholder="Buscar un campo…">';
     var buscar = hueco.querySelector('#campos-catalogo-buscar');
-    function repintarLista() { pintarListaFicha($(interior, 'campos-catalogo-ficha-lista'), deFicha, buscar.value, lista, opciones); }
+    function repintarLista() { pintarYaEstan(buscar.value); pintarListaFicha($(interior, 'campos-catalogo-ficha-lista'), deFicha, buscar.value, lista, opciones); }
     buscar.oninput = repintarLista;
     repintarLista();
   }

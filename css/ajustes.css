@@ -381,3 +381,7 @@ details.tipo-asunto-seccion .bloque-pie { display: inline; margin-bottom: 0; }
 
 /* «Al cerrar el asunto, avisar a quien lo pide» (27-sep-2026, fila 195). */
 .tipo-avisar-lopide-cierre-plantilla { margin-top: 6px; }
+
+/* Fila 255: «Ya están en este asunto», arriba de la lista de campos cuando se abre desde un hito. */
+.campos-catalogo-grupo { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--linea); }
+.campos-catalogo-grupo .etiqueta { margin: 0 0 6px; }

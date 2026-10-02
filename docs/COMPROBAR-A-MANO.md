@@ -145,3 +145,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 254 — añadir un campo desde la ficha (2-oct-2026)
 
 - No se ha podido reproducir el «no pasa nada» que contó Francisco (todas las combinaciones pasan en local). En un asunto real del centro, pulsar «+ Añadir campo» en la tarjeta «Campos del asunto», elegir un campo y guardar: si no se añade, ahora tiene que salir un aviso rojo (o ámbar si tarda) que diga qué ha fallado; contar cuál.
+
+## Fila 255 — campos de un hito (2-oct-2026)
+
+- Con un tipo real, añadir un campo desde la pantalla de un hito, rellenarlo, mirar la ficha (rótulo del hito), exportar con su columna y generar un documento con su hueco: sale igual que un campo del asunto. No se ha probado con datos reales del centro.

@@ -95,7 +95,14 @@ App.valoresGuardadosParaNombre = function (tipo, camposGuardados) {
    enseñando el del tipo con el que se abrió: cambiar el tipo de un
    asunto ya abierto es raro, y no merece la pena releer el catálogo
    de otra categoría en mitad de la edición. */
-App.pintarCamposEditar = function (tipo, guardados, ficha) {
+/* Fila 255: el título del hito de un campo (en pequeño junto al nombre), de lo último leído. */
+function tituloDeHito(nombreAsunto, marca) {
+  var hitos = (window.CamposDeHito && nombreAsunto) ? CamposDeHito.hitosDelAsunto(nombreAsunto) : null;
+  var h = (hitos || []).filter(function (x) { return x.origenGuia === marca || x.id === marca; })[0];
+  return h ? h.titulo : 'hito';
+}
+
+App.pintarCamposEditar = function (tipo, guardados, ficha, nombreAsunto) {
   var config = (App.E.campos && App.E.campos.porTipo && App.E.campos.porTipo[tipo]) || [];
   /* Fila 245: más los «solo aquí» de la ficha del asunto. */
   config = Campos.camposDeAsunto(config, ficha);
@@ -122,7 +129,8 @@ App.pintarCamposEditar = function (tipo, guardados, ficha) {
     var control = CamposClases.htmlControl(idBase, it.clase, it.cfg.valores, it.valor);
     return '<div class="campo-fila">' +
       '<label class="etiqueta">' + U.escapar(it.nombre) + (it.cfg.obligatorio ? ' *' : '') +
-        (it.soloAqui ? ' <span class="marca-solo-aqui">solo aquí</span>' : '') + '</label>' +
+        (it.soloAqui ? ' <span class="marca-solo-aqui">solo aquí</span>' : '') +
+        (it.cfg.hito ? ' <span class="marca-hito">' + U.escapar(tituloDeHito(nombreAsunto, it.cfg.hito)) + '</span>' : '') + '</label>' +
       control +
       '</div>';
   }).join('');
@@ -210,7 +218,7 @@ App.editarAsunto = async function (a) {
 
 async function abrirCuadroDeEdicion(a, p, base) {
   var v = base || p;   /* de dónde salen los valores de partida del cuadro */
-  var bloqueCampos = App.pintarCamposEditar(v.tipo, base ? base.campos : p.campos, a.ficha);
+  var bloqueCampos = App.pintarCamposEditar(v.tipo, base ? base.campos : p.campos, a.ficha, a.nombre);
 
   var hayTipo = App.E.tipos.some(function (t) { return t.tipo === p.tipo; });
   var opciones = '';

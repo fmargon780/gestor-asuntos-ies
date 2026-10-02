@@ -50,6 +50,12 @@ window.DondeSeGuarda = (function () {
   function textoConsecuencia(o) {
     if (o.apagada) return [o.apagada];
     var lineas = [];
+    /* Fila 255: un campo que se añade a un hito. */
+    if (o.hitoCampo) {
+      return [o.otros
+        ? 'El hito «' + o.hitoCampo.titulo + '» lo tendrá en ' + (o.otros === 1 ? '1 asunto abierto' : o.otros + ' asuntos abiertos') + ' de este tipo, vacío.'
+        : 'No hay más asuntos abiertos de este tipo. Valdrá para los próximos.'];
+    }
     if (o.hitoNuevo) {
       var n = o.hitoNuevo.tareas || 0;
       lineas.push('El hito «' + (o.hitoNuevo.titulo || '') + '» todavía no está en la guía: irá con ' +

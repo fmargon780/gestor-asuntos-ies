@@ -157,6 +157,7 @@
     return '<div class="ficha-datos" id="ficha-datos-tramite">' + buenas.map(function (f) {
       /* Fila 245: un campo «solo aquí» lleva su marca y su «⋮»
          (js/campo-desde-el-asunto.js). */
+      if (f.rotulo) return '<div class="ficha-dato ficha-dato-hito"><span class="ficha-rotulo-hito">' + U.escapar(f.rotulo) + '</span><span></span></div>';
       if (f.soloAqui) {
         return '<div class="ficha-dato ficha-dato-aqui"><span>' + U.escapar(f.titulo) +
           ' <span class="marca-solo-aqui">solo aquí</span></span><span>' +

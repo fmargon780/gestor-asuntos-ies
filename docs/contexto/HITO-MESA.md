@@ -416,3 +416,5 @@ pregunta es siempre la misma y sale sola, sin ir a buscarla:
   la última buena).
 - Pruebas: `pruebas/donde-se-guarda.mjs` (nueva), y puestas al día `pruebas/hitos-desde-el-asunto.mjs`,
   `pruebas/tareas-del-hito-sencillas.mjs` y `pruebas/hito-mesa.mjs`.
+
+**Campos de este hito (fila 255)**: en la columna derecha, debajo de los tres resúmenes, la tarjeta `.mesa-campos-hito` (la pinta `CamposDeHito.tarjetaHtml` desde `cuerpoDeHito`, se engancha en `engancharCuerpo`): los campos del hito con su control según la clase, guardados al cambiar, con «⋮» y «+ Añadir campo» en el título; sin campos, una tarjeta pequeña con solo el botón; en modo consulta y en el ARCHIVO, solo lectura.
