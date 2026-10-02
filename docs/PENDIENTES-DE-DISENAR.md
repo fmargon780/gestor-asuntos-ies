@@ -29,3 +29,45 @@ la entrada de encargos con datos (un formulario que llegue por correo con etique
 se espera a la cuenta de correo común del centro.
 
 **Va después** de la tanda de estabilidad (filas 176-178) y de las tandas 2 y 3 de usabilidad.
+
+---
+
+## 2. Trabajar desde casa: la aplicación conectada directamente al Dropbox del centro
+
+**Fecha:** 2-oct-2026. Sale del aviso de la fila 260 (`docs/SOLO-CONSULTA-EN-ESTE-ORDENADOR.md`,
+que es la protección de mientras tanto). **Sin diseñar.** Elegido por Francisco como camino de
+fondo, a la espera de una conversación suya en el centro.
+
+**El problema.** En casa (Chromebook) Francisco no tiene el Dropbox del centro. Trabajaba sobre
+una copia de las dos carpetas en su Google Drive, que sube su ordenador del centro con «Drive para
+ordenadores». Lo de casa solo llega al centro si ese ordenador está encendido, y llega a trozos,
+mezclado con lo que hace el compañero. El 2-oct-2026 hubo cambios que no aparecían, fichas sin
+carpeta y números de asunto repartidos por separado en cada copia.
+
+**La idea.** Desde casa, la aplicación entra en el Dropbox del centro por internet (con permiso de
+Dropbox dado una vez), sin carpeta local, sin la copia de Drive y sin depender de ningún ordenador
+encendido. Una sola copia de los datos: la del centro.
+
+**Lo que falta saber o decidir antes de escribir nada:**
+
+1. **El permiso.** Francisco no tiene la contraseña del Dropbox del centro. Puede pedir a quien la
+   tiene un paso de una sola vez, sin que le den la contraseña (no pudo ser el 2-oct-2026). Dos
+   formas: compartir las dos carpetas (asuntos vivos y ARCHIVO) con una cuenta de Dropbox de
+   Francisco, o autorizar la aplicación en la cuenta del centro. Hay que saber antes cómo está
+   montada esa cuenta (una cuenta común o un equipo de Dropbox) y cuánto ocupan las dos carpetas:
+   en una cuenta gratuita caben 2 GB y las carpetas compartidas cuentan.
+2. **Dar de alta la aplicación en Dropbox** (una clave de aplicación): un paso de puesta en marcha
+   de Francisco, una vez, con su guía paso a paso.
+3. **Cómo se hace por dentro.** Hoy 43 ficheros de `js/` usan directamente los manejadores de
+   carpetas del navegador. El disco de demostración (`js/demo/disco.js`) ya imita esos manejadores
+   en memoria: un «disco de Dropbox» con la misma forma parece viable, pero no está comprobado a
+   fondo (velocidad al listar muchas carpetas, límites de Dropbox, ficheros grandes). Es un trabajo
+   grande, de varias filas.
+4. **Qué pasa con lo demás:** el centro sigue con sus carpetas locales y la copia sin internet; el
+   modo «solo consulta» de la fila 260 se queda para quien trabaje sobre una copia.
+
+**Caminos que se vieron y no se eligieron:** manejar a distancia el ordenador del centro desde el
+Chromebook (no hay que programar nada, pero el ordenador tiene que estar encendido y la red del
+centro puede bloquearlo); dejar la copia de Drive solo para consultar (es la fila 260).
+
+**Mientras tanto:** en casa, solo consulta, y nunca cambiar nada sobre la copia de Drive.
