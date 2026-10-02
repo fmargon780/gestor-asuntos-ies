@@ -131,7 +131,7 @@ await pagina.waitForTimeout(200);
 await pagina.locator('#inicio-tabla-cuerpo tr[data-asunto="' + ABIERTO_DELEGACION + '"] .nombre-pulsable').first().click();
 await pagina.waitForSelector('#pantalla-asunto:not(.oculto)');
 await pagina.waitForTimeout(500);
-await comprobar('3. sale en «Datos del trámite»', pagina.evaluate(() =>
+await comprobar('3. sale en «Campos del asunto»', pagina.evaluate(() =>
   Array.from(document.querySelectorAll('#pantalla-asunto .ficha-dato')).some((f) => /Departamento/.test(f.textContent) && /Sección de Escolarización/.test(f.textContent))), true);
 await comprobar('3. y en «Datos y contacto»', pagina.evaluate(() =>
   Array.from(document.querySelectorAll('.tercero-detalle')).some((p) => /Departamento: Sección de Escolarización/.test(p.textContent))), true);

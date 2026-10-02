@@ -39,7 +39,15 @@ var CamposCatalogo = (function () {
     pintar(cuerpo, tipo, lista, opciones);
   }
 
-  async function pintar(cuerpo, tipo, lista, opciones) {
+  /* Fila 254: un fallo al pintar (leer el catálogo del disco, por ejemplo)
+     nunca deja el panel vacío y mudo: aviso rojo. */
+  function pintar(cuerpo, tipo, lista, opciones) {
+    return pintarYa(cuerpo, tipo, lista, opciones).catch(function (e) {
+      U.fallo('No he podido abrir la lista de campos', e);
+    });
+  }
+
+  async function pintarYa(cuerpo, tipo, lista, opciones) {
     var usadas = clavesUsadas(lista);
     var catalogoEntero = await Campos.catalogoDeCategoria(App.E.datos, tipo.categoria, App.E.campos);
     var deFicha = catalogoEntero.filter(function (c) { return c.origen === 'fichero' && !usadas[Campos.claveDeCampo(c)]; });
@@ -60,15 +68,21 @@ var CamposCatalogo = (function () {
     }).map(function () { return Campos.RECETA_CURSO_DE_FABRICA; });
     var calculados = calculadosDeUsuario2.concat(calculadosDeFabrica2);
 
+    /* Fila 254: pestañas, buscador y «Volver» en una sola franja que no se
+       desplaza; debajo, solo el cuerpo (la rejilla de campos) baja. */
+    cuerpo.classList.add('campos-catalogo');
     cuerpo.innerHTML =
-      '<div class="pestanas-categoria" id="campos-catalogo-pestanas">' +
-        pestanaHtml('ficha', 'De la ficha', deFicha.length) +
-        pestanaHtml('mios', 'Míos', mios.length) +
-        pestanaHtml('calculados', 'Calculados', calculados.length) +
+      '<div class="campos-catalogo-franja">' +
+        '<div class="pestanas-categoria" id="campos-catalogo-pestanas">' +
+          pestanaHtml('ficha', 'De la ficha', deFicha.length) +
+          pestanaHtml('mios', 'Míos', mios.length) +
+          pestanaHtml('calculados', 'Calculados', calculados.length) +
+        '</div>' +
+        '<span id="campos-catalogo-buscar-hueco" class="campos-catalogo-buscar-hueco"></span>' +
+        '<button type="button" class="boton campos-catalogo-volver" id="campos-catalogo-volver">' +
+        U.escapar(opciones.textoVolver || '← Volver a los campos del tipo') + '</button>' +
       '</div>' +
-      '<button type="button" class="boton" id="campos-catalogo-volver" style="margin:10px 0">' +
-      U.escapar(opciones.textoVolver || '← Volver a los campos del tipo') + '</button>' +
-      '<div id="campos-catalogo-cuerpo"></div>';
+      '<div id="campos-catalogo-cuerpo" class="campos-catalogo-cuerpo"></div>';
 
     Array.prototype.forEach.call(cuerpo.querySelectorAll('.pestana-categoria'), function (b) {
       b.onclick = function () { pestanaActual = b.dataset.pestana; pintar(cuerpo, tipo, lista, opciones); };
@@ -77,8 +91,20 @@ var CamposCatalogo = (function () {
 
     var interior = $(cuerpo, 'campos-catalogo-cuerpo');
     if (pestanaActual === 'ficha') pintarFicha(interior, deFicha, lista, opciones);
-    else if (pestanaActual === 'mios') pintarMios(interior, tipo, mios, lista, opciones, cuerpo);
-    else pintarCalculados(interior, tipo, calculados, lista, opciones, cuerpo);
+    else {
+      if (pestanaActual === 'mios') pintarMios(interior, tipo, mios, lista, opciones, cuerpo);
+      else pintarCalculados(interior, tipo, calculados, lista, opciones, cuerpo);
+      /* Fila 254: el buscador también está en «Míos» y «Calculados»: esconde las filas que no casan. */
+      var hueco = cuerpo.querySelector('#campos-catalogo-buscar-hueco');
+      hueco.innerHTML = '<input id="campos-catalogo-buscar" class="campo" placeholder="Buscar un campo…">';
+      hueco.querySelector('input').oninput = function () {
+        var q = U.normalizar(this.value || '');
+        Array.prototype.forEach.call(interior.querySelectorAll('.fila-tipo'), function (f) {
+          var n = f.querySelector('.nombre-tipo');
+          f.style.display = (!q || U.normalizar(n ? n.textContent : '').indexOf(q) !== -1) ? '' : 'none';
+        });
+      };
+    }
   }
 
   function pestanaHtml(id, etiqueta, cuenta) {
@@ -92,10 +118,10 @@ var CamposCatalogo = (function () {
   /* ---------- pestaña "De la ficha" ---------- */
 
   function pintarFicha(interior, deFicha, lista, opciones) {
-    interior.innerHTML =
-      '<input id="campos-catalogo-buscar" class="campo" placeholder="Buscar un campo…" style="margin-bottom:8px">' +
-      '<div id="campos-catalogo-ficha-lista" class="campos-catalogo-rejilla"></div>';
-    var buscar = $(interior, 'campos-catalogo-buscar');
+    interior.innerHTML = '<div id="campos-catalogo-ficha-lista" class="campos-catalogo-rejilla"></div>';
+    var hueco = interior.parentNode.querySelector('#campos-catalogo-buscar-hueco');
+    hueco.innerHTML = '<input id="campos-catalogo-buscar" class="campo" placeholder="Buscar un campo…">';
+    var buscar = hueco.querySelector('#campos-catalogo-buscar');
     function repintarLista() { pintarListaFicha($(interior, 'campos-catalogo-ficha-lista'), deFicha, buscar.value, lista, opciones); }
     buscar.oninput = repintarLista;
     repintarLista();
@@ -112,7 +138,7 @@ var CamposCatalogo = (function () {
     visibles.slice(0, 120).forEach(function (c) {
       var f = document.createElement('div');
       f.className = 'fila-tipo';
-      f.innerHTML = '<span class="nombre-tipo">' + U.escapar(c.nombre) + '</span>';
+      f.innerHTML = '<span class="nombre-tipo" title="' + U.escapar(c.nombre) + '">' + U.escapar(c.nombre) + '</span>';
       var anadir = document.createElement('button');
       anadir.type = 'button'; anadir.className = 'boton'; anadir.textContent = 'Añadir';
       anadir.onclick = function () {
@@ -134,7 +160,7 @@ var CamposCatalogo = (function () {
 
   function pintarMios(interior, tipo, mios, lista, opciones, cuerpo) {
     var usadas = clavesUsadas(lista);
-    interior.innerHTML = '<div id="campos-mios-lista" class="lista"></div>' +
+    interior.innerHTML = '<div id="campos-mios-lista" class="lista campos-catalogo-rejilla campos-catalogo-rejilla-ancha"></div>' +
       '<div id="campos-propio-nuevo" style="margin-top:8px"></div>' +
       '<button type="button" class="boton" id="campos-mios-crear" style="margin-top:8px">+ Crear un campo propio</button>';
 
@@ -147,7 +173,7 @@ var CamposCatalogo = (function () {
         var yaPuesto = usadas['propio:' + p.id];
         var f = document.createElement('div');
         f.className = 'fila-tipo';
-        f.innerHTML = '<span class="nombre-tipo">' + U.escapar(p.nombre) + '</span>' +
+        f.innerHTML = '<span class="nombre-tipo" title="' + U.escapar(p.nombre) + '">' + U.escapar(p.nombre) + '</span>' +
           '<span class="suave">' + (p.clase === 'lista' ? 'lista: ' + p.valores.join(', ') : (window.CamposClases ? CamposClases.nombreDe(p.clase).toLowerCase() : 'texto libre')) + '</span>';
 
         var anadir = document.createElement('button');
@@ -338,7 +364,7 @@ var CamposCatalogo = (function () {
 
   function pintarCalculados(interior, tipo, calculados, lista, opciones, cuerpo) {
     var usadas = clavesUsadas(lista);
-    interior.innerHTML = '<div id="campos-calc-lista" class="lista"></div>' +
+    interior.innerHTML = '<div id="campos-calc-lista" class="lista campos-catalogo-rejilla campos-catalogo-rejilla-ancha"></div>' +
       '<div id="campos-calc-editor" style="margin-top:8px"></div>' +
       '<button type="button" class="boton" id="campos-calc-crear" style="margin-top:8px">+ Crear un campo calculado</button>';
 
@@ -351,7 +377,7 @@ var CamposCatalogo = (function () {
         var yaPuesto = usadas['calculado:' + c.id];
         var f = document.createElement('div');
         f.className = 'fila-tipo';
-        f.innerHTML = '<span class="nombre-tipo">' + U.escapar(c.nombre) + '</span>' +
+        f.innerHTML = '<span class="nombre-tipo" title="' + U.escapar(c.nombre) + '">' + U.escapar(c.nombre) + '</span>' +
           '<span class="suave">' + U.escapar((window.Calculo && Calculo.describir(c, App.E.campos)) || '') + '</span>';
 
         var anadir = document.createElement('button');

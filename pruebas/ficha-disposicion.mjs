@@ -86,7 +86,7 @@ console.log('--- el asunto con de todo ---');
 await abrirFicha(RICO);
 
 /* Fila 107 (docs/FICHA-EN-TARJETAS.md): las tres columnas pasan a una
-   cuadrícula de tarjetas; con "Datos del trámite", cuatro arriba. */
+   cuadrícula de tarjetas; con "Campos del asunto", cuatro arriba. */
 await comprobar('1. el orden de las tarjetas',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-tarjetas .ficha-tarjeta')).map((t) => t.dataset.tarjeta)),
   ['hitos', 'documentos', 'contacto', 'tramite', 'notas', 'otros', 'relacionados']);
@@ -110,16 +110,16 @@ await comprobarQue('3. no trae la fecha límite', Promise.resolve(subtitulo.inde
 await comprobar('4. "Datos del asunto" ya no existe',
   pagina.locator('.ficha-bloque .ficha-titulo', { hasText: 'Datos del asunto' }).count(), 0);
 
-await comprobar('5. "Datos del trámite" sale, con la referencia del campo propio',
+await comprobar('5. "Campos del asunto" sale, con la referencia del campo propio',
   /* Solo las que se ven: la fila «Formularios» nace oculta y solo se
      enseña si hay alguno (fila 101). */
-  pagina.locator('.ficha-bloque', { hasText: 'Datos del trámite' }).locator('.ficha-dato:not(.oculto)').allTextContents(),
+  pagina.locator('.ficha-bloque', { hasText: 'Campos del asunto' }).locator('.ficha-dato:not(.oculto)').allTextContents(),
   ['Referencia expedienteREF-2026-01', 'Vía de comunicaciónCorreo electrónico: tutor@correo.es',
-   'Lo pideAna Ruiz (madre) · por teléfono · 1-sep-2026', '+ Añadir campo']);   /* fila 245: el botón */
+   'Lo pideAna Ruiz (madre) · por teléfono · 1-sep-2026']);   /* fila 254: el botón vive en el título */
 await comprobarQue('5. no trae Tipo, Tercero, Estado ni Fecha límite',
   pagina.evaluate(() => {
     const texto = Array.from(document.querySelectorAll('.ficha-bloque'))
-      .filter((b) => b.querySelector('.ficha-titulo') && b.querySelector('.ficha-titulo').textContent.indexOf('Datos del trámite') !== -1)
+      .filter((b) => b.querySelector('.ficha-titulo') && b.querySelector('.ficha-titulo').textContent.indexOf('Campos del asunto') !== -1)
       .map((b) => b.textContent).join(' ');
     return ['Tipo', 'Tercero', 'Estado', 'Fecha límite'].every((t) => texto.indexOf(t) === -1);
   }));
@@ -167,12 +167,15 @@ await comprobarQue('el bloque de Documentos lleva la clase "vacio"',
 /* ============================================================
    4. EL ASUNTO SIN CAMPOS PROPIOS, SIN VÍA Y SIN LO PIDE
    ============================================================ */
-console.log('--- 4. sin campos propios, sin vía y sin lo pide: "Datos del trámite" solo con el botón ---');
+console.log('--- 4. sin campos propios, sin vía y sin lo pide: "Campos del asunto" solo con el botón ---');
 await abrirFicha(MINIMO);
-/* Fila 245: en un asunto abierto el bloque sale siempre, solo con «+ Añadir campo». */
-await comprobar('"Datos del trámite" solo trae «+ Añadir campo»',
-  pagina.locator('.ficha-bloque', { hasText: 'Datos del trámite' }).locator('.ficha-dato:not(.oculto)').allTextContents(),
-  ['+ Añadir campo']);
+/* Fila 254: en un asunto abierto la tarjeta sale siempre, sin filas y con «+ Añadir campo» en el título. */
+await comprobar('"Campos del asunto" sale sin filas y con «+ Añadir campo» en el título',
+  pagina.evaluate(() => {
+    const t = document.querySelector('.ficha-tarjeta[data-tarjeta="tramite"]');
+    return t ? { filas: t.querySelectorAll('.ficha-dato:not(.oculto)').length,
+      boton: (t.querySelector('.ficha-titulo #ficha-campo-anadir') || {}).textContent } : null;
+  }), { filas: 0, boton: '+ Añadir campo' });
 await comprobarQue('con un documento dentro, el bloque de Documentos no lleva "vacio"',
   pagina.evaluate(() => {
     const doc = document.getElementById('ficha-documentos');
@@ -192,7 +195,7 @@ async function columnas() {
 
 await pagina.setViewportSize({ width: 1600, height: 900 });
 await pagina.waitForTimeout(200);
-await comprobar('a 1600px, con "Datos del trámite", cuatro columnas', columnas(), 4);
+await comprobar('a 1600px, con "Campos del asunto", cuatro columnas', columnas(), 4);
 await pagina.setViewportSize({ width: 1000, height: 900 });
 await pagina.waitForTimeout(200);
 await comprobar('por debajo de 1100px, dos columnas', columnas(), 2);

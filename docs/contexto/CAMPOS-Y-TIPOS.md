@@ -20,12 +20,14 @@ guarda hasta corregirlo. **Cambiar la clase** de un campo ya creado (`CamposCata
 con cuántos valores pasan y cuántos no se entienden; convierte los de los asuntos **abiertos** (una sola
 escritura); el ARCHIVO no se toca, porque lo guardado allí se lee igual por la clase al enseñarlo.
 
-**Desde un asunto abierto (fila 245, `docs/CAMPO-DESDE-EL-ASUNTO.md`)**: en «Datos del trámite» de la
-ficha (que en un asunto abierto sale siempre), «+ Añadir campo» (`js/campo-desde-el-asunto.js`) abre el
+**La ventana de elegir campo (fila 254)** es ancha (`.cuadro-campos`, `min(1400px, 94vw)`): una franja fija con pestañas, buscador y «Volver», y debajo una rejilla de una línea por campo (`.campos-catalogo-rejilla`, 3+ columnas a 1280 px, 1 bajo 700 px) que es lo único que se desplaza; en Ajustes es el mismo panel.
+
+**Desde un asunto abierto (fila 245, `docs/CAMPO-DESDE-EL-ASUNTO.md`)**: en la tarjeta «Campos del asunto» de la
+ficha (antes «Datos del trámite»; en un asunto abierto sale siempre; fila 254), «+ Añadir campo», siempre a la vista en su título (`js/campo-desde-el-asunto.js`, `botonTituloHtml`), abre el
 panel de `js/campos-catalogo.js` (con `textoVolver`, sin los campos que el asunto ya tiene), pide el
 valor y el bloque «¿Dónde se guarda?» de `js/donde-se-guarda.js` (`opcionTipo`, `vacio`). «En el tipo»
 añade la entrada a `porTipo` (al final, sin Obligatorio) y el valor a
-`ficha.campos`; «Solo en este asunto» guarda además la entrada en `ficha.camposPropiosDelAsunto`.
+`ficha.campos`; todo el camino va protegido (aviso rojo si falla, ámbar si tarda más de 6 s o falla solo el repintado; `vigilar`) y el panel avisa si no puede pintarse; «Solo en este asunto» guarda además la entrada en `ficha.camposPropiosDelAsunto`.
 `Campos.camposDeAsunto(listaDelTipo, ficha)` (pura) da los del tipo más los «solo aquí» (`soloAqui:
 true`; sin Obligatorio; si el tipo ya tiene el mismo, vale el del tipo): la usan la
 ficha, «Cambiar el asunto» y `js/plantillas-valores.js`. Un «solo aquí» lleva «⋮» → «Pasar al tipo» /

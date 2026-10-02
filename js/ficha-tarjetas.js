@@ -5,7 +5,7 @@
    Debajo de la cabecera de la ficha, en vez de tres columnas, una
    cuadrícula de tarjetas del mismo tamaño que llena el alto visible sin
    desplazarse: Hitos, Documentos de la carpeta, Datos y contacto (y
-   Datos del trámite, si lo hay) arriba; Notas, Otros asuntos de este
+   Campos del asunto, si lo hay) arriba; Notas, Otros asuntos de este
    tercero y Personas y entidades relacionadas abajo.
 
    - Cada tarjeta cerrada enseña un resumen. Los resúmenes se sacan de
@@ -36,7 +36,7 @@ var FichaTarjetas = (function () {
     { id: 'hitos', titulo: 'Hitos' },
     { id: 'documentos', titulo: 'Documentos de la carpeta' },
     { id: 'contacto', titulo: 'Datos y contacto', siempre: true },
-    { id: 'tramite', titulo: 'Datos del trámite', siempre: true },
+    { id: 'tramite', titulo: 'Campos del asunto', siempre: true },
     { id: 'notas', titulo: 'Registro' },
     { id: 'otros', titulo: 'Otros asuntos de este tercero' },
     { id: 'relacionados', titulo: 'Personas y entidades relacionadas' }
@@ -74,7 +74,8 @@ var FichaTarjetas = (function () {
                 '<span class="ficha-cuenta" id="ficha-cuenta-docs"></span>') +
         /* "Datos y contacto" trae su propio título (js/ficha-tercero.js). */
         tarjeta('contacto', '', '<div id="ficha-contacto-caja"></div>') +
-        (tramite ? tarjeta('tramite', 'Datos del trámite', tramite) : '') +
+        (tramite ? tarjeta('tramite', 'Campos del asunto', tramite,
+          window.CampoDesdeElAsunto ? CampoDesdeElAsunto.botonTituloHtml() : '') : '') +
         tarjeta('notas', 'Registro', '<div id="ficha-notas"></div>',
                 '<span class="ficha-cuenta" data-cuenta-tarjeta="notas"></span>') +
         tarjeta('otros', 'Otros asuntos de este tercero', '<div id="ficha-otros" class="explica">Buscando…</div>',

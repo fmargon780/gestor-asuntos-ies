@@ -12,6 +12,7 @@ Esto es solo para lo que se **ve**. Los nombres internos (variables, funciones, 
 | El modelo de tramitación de un tipo de asunto | **guía** | «pasos del trámite» |
 | Cada paso de la guía, y de un asunto concreto | **hito** («Hito 3 de 7», «Hito actual») | paso, «Paso N de M», «Paso actual» |
 | Cada línea dentro de un hito | **tarea** | paso del guion, guion, receta, «qué hay que hacer», «cosas por reunir» |
+| La tarjeta de la ficha de un asunto donde viven sus campos (fila 254) | **Campos del asunto** (con «+ Añadir campo») | «Datos del trámite» |
 | La lista de tareas de un hito | **tareas del hito** | guion |
 | Un hito guardado para reutilizar en varias guías | **hito de la biblioteca** | modelo, hito modelo |
 | La persona o entidad de un asunto | **tercero** | interesado, «con quién es el asunto» |

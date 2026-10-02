@@ -158,11 +158,36 @@
 /* ---------- el panel de "+ Añadir campo" (fila 56, 18-sep-2026,
    docs/CAMPOS-CATALOGO-Y-CALCULADOS.md), js/campos-catalogo.js y
    js/campos-calculados-editor.js ---------- */
+/* Fila 254 (docs/CAMPOS-ARREGLO-Y-VENTANA-ANCHA.md): una línea por campo,
+   en columnas; los nombres largos se cortan con puntos suspensivos (el
+   nombre entero, en el `title`). En «Míos» y «Calculados», cada fila lleva
+   además sus botones, así que las columnas son algo más anchas y la fila
+   puede partirse. */
+.campos-catalogo-franja {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin-bottom: 10px;
+}
+.campos-catalogo-buscar-hueco { flex: 1 1 220px; min-width: 160px; }
+.campos-catalogo-buscar-hueco .campo { margin: 0; width: 100%; }
+.campos-catalogo-volver { margin-left: auto; }
 .campos-catalogo-rejilla {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 8px;
 }
+.campos-catalogo-rejilla .fila-tipo { flex-wrap: nowrap; gap: 8px; padding: 6px 10px; min-width: 0; }
+.campos-catalogo-rejilla .nombre-tipo {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.campos-catalogo-rejilla-ancha { grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); }
+#campos-calc-lista.campos-catalogo-rejilla-ancha { grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)); }
+.campos-catalogo-rejilla-ancha .fila-tipo .boton { padding: 3px 8px; font-size: 12px; flex: none; }
+.campos-catalogo-rejilla-ancha .nombre-tipo { flex: 1 1 auto; min-width: 60px; }
+.campos-catalogo-rejilla-ancha .suave { flex: 0 1 90px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.campos-catalogo-rejilla .suave { font-size: 12px; }
+@media (max-width: 700px) {
+  .campos-catalogo-rejilla, .campos-catalogo-rejilla-ancha { grid-template-columns: 1fr; }
+}
+#campos-propio-nuevo, #campos-calc-editor { max-width: 700px; }
 .campos-propio-form, .campos-calc-form {
   margin: 8px 0; padding: 10px 12px;
   border: 1px solid #d7dee6; border-radius: 8px; background: #f7f9fb;

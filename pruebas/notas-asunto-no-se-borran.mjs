@@ -204,7 +204,7 @@ console.log('--- 7. la ficha en tarjetas (fila 107, 24-sep-2026): el orden ---')
    comprobación de las tres columnas de la fila 51. */
 await comprobar('7. el orden de las tarjetas',
   pagina.evaluate(() => Array.from(document.querySelectorAll('#ficha-tarjetas .ficha-tarjeta')).map((t) => t.dataset.tarjeta)),
-  /* Fila 245: «Datos del trámite» sale siempre en un asunto abierto (con «+ Añadir campo»). */
+  /* Fila 245: «Campos del asunto» sale siempre en un asunto abierto (con «+ Añadir campo»). */
   ['hitos', 'documentos', 'contacto', 'tramite', 'notas', 'otros', 'relacionados']);
 
 console.log('--- 8. la nota ya no se guarda sola mientras se escribe (fila 58) ---');
