@@ -14,5 +14,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 |---|---|---|
 | 254 | 75 | Buscar y arreglar por qué no se añade el campo desde la ficha (hay que reproducirlo), cambio de nombre de la tarjeta con el botón en su título, y la ventana de elegir campo ancha y en columnas, con su prueba ampliada |
 | 255 | 130 | Campos de un hito: marca de hito en los campos del tipo y de «solo aquí», tarjeta nueva en la mesa con rellenado en el sitio, ventana con «Ya están en este asunto», rótulos por hito en la ficha, desplegable «Hito» en Ajustes y una prueba nueva |
-| 256 | 45 | Un solo fallo reproducible con prueba hecha; hay que entender cabecera fija y navegación; revisor en local |
 | 257 | 100 | Fichero nuevo con la línea del tipo y su buscador, crear tipo desde el cuadro sin dos cuadros a la vez, cuadro «Cambiar el asunto» recolocado, la línea en «Nuevo asunto» con tipo reconocido, una prueba nueva y dos adaptadas |
