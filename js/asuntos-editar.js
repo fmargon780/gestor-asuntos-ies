@@ -452,6 +452,7 @@ async function guardarEdicion(a, p, d, nombreNuevo, datos) {
     try { await App.verAbiertos(); }
     catch (e2) { U.accesorio('Asunto actualizado, pero no he podido poner la lista al día. Pulsa Recargar', e2); }
     await ofrecerGuiaNueva(a.nombre, p.tipo, d.tipo);
+    if (window.PorLiquidar) await PorLiquidar.alCambiarTipo(a.nombre, p.tipo, d.tipo);   /* fila 253 */
     return a.nombre;
   }
   try {
@@ -481,6 +482,7 @@ async function guardarEdicion(a, p, d, nombreNuevo, datos) {
   try { await App.verAbiertos(); }
   catch (e3) { U.accesorio('Asunto editado, pero no he podido poner la lista al día. Pulsa Recargar', e3); }
   await ofrecerGuiaNueva(nombreNuevo, p.tipo, d.tipo);
+  if (window.PorLiquidar) await PorLiquidar.alCambiarTipo(nombreNuevo, p.tipo, d.tipo);   /* fila 253 */
   return nombreNuevo;
 }
 

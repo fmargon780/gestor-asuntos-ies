@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '253', fecha: '2026-10-02', texto: 'Los asuntos que cambias a un tipo que hay que liquidar, si ya no tienen nada por hacer, pasan solos a Por liquidar; también al marcar la casilla del tipo en Ajustes.' },
   { id: '252', fecha: '2026-10-01', texto: 'La ficha de una persona, en Personas y empresas, va ahora en tarjetas plegables con su resumen (familia, asuntos, matrícula, materias…); lo mismo sale en «Ver todo» dentro de un asunto.' },
   { id: '251', fecha: '2026-10-01', texto: 'Los campos ya no ofrecen «Añadir al nombre»: son etiquetas del asunto, salen en la ficha y al exportar.' },
   { id: '250', fecha: '2026-10-01', texto: 'Ajustes: para crear un tipo de asunto o de documento, primero se busca; si no está, se crea desde la misma caja.' },

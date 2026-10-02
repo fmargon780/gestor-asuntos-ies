@@ -227,7 +227,8 @@ await pagina.waitForTimeout(500);
 await comprobar('8. al marcarla se guarda en el tipo', pagina.evaluate(() => App.E.tipos.filter((t) => t.tipo === 'SEGURO ESCOLAR')[0].liquidar), true);
 await pagina.click('.pestana[data-pantalla="abiertos"]').catch(() => pagina.evaluate(() => App.verAbiertos()));
 await pagina.waitForTimeout(600);
-await comprobar('8. y la pestaña «Por liquidar» vuelve a salir', cuentaPestana('liq'), '0');
+/* Fila 253: al marcar la casilla, el asunto que no tiene nada por hacer pasa solo. */
+await comprobar('8. y la pestaña «Por liquidar» vuelve a salir', cuentaPestana('liq'), '1');
 await casilla.evaluate((el) => { el.checked = false; el.dispatchEvent(new Event('change')); });
 await pagina.waitForTimeout(400);
 await pagina.click('.pestana[data-pantalla="abiertos"]');

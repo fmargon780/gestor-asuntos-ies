@@ -172,6 +172,8 @@ function construirSeccionDatos(tipo) {
   /* Con el cambio, la pestaña «Por liquidar» de Inicio sale o se va sin esperar a otro repintado. */
   filaLiquidar.querySelector('input').addEventListener('change', function () {
     if (window.InicioTabla) InicioTabla.pintar();
+    /* Fila 253: con la casilla marcada, sus asuntos abiertos sin nada por hacer pasan ya. */
+    if (window.PorLiquidar) PorLiquidar.alMarcarCasilla(tipo);
   });
   interruptores.appendChild(filaLiquidar);
   b.cuerpo.appendChild(interruptores);

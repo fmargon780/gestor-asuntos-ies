@@ -318,6 +318,8 @@ App.unirTipoConOtro = async function (tipo) {
   await App.verAbiertos();
   App.cerrarTipoDeAsunto();
   App.pintarAjustes();
+  /* Fila 253: los asuntos que han pasado al tipo que se queda y hay que liquidar. */
+  if (window.PorLiquidar && elegido.liquidar) await PorLiquidar.alMarcarCasilla(elegido);
 
   var pasados = resultado.asuntos.pasados, saltados = resultado.asuntos.saltados || [];
   var base = 'Unidos. ' + pasados + (pasados === 1 ? ' asunto abierto pasado a «' : ' asuntos abiertos pasados a «') +

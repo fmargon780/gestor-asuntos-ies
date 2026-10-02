@@ -78,7 +78,7 @@ window.PorLiquidar = (function () {
     await App.anotar(a.nombre, { porLiquidar: estado });
     if (a.ficha) a.ficha.porLiquidar = estado;
     if (window.RegistroAsunto) await RegistroAsunto.auto(a, 'Pasa a Por liquidar');
-    repintar(a);
+    if (!o.sinRepintar) repintar(a);
   }
 
   async function quitar(a) {
@@ -142,6 +142,94 @@ window.PorLiquidar = (function () {
     if (a.ficha) a.ficha.porLiquidar = null;
     return true;
   }
+
+  /* ==========================================================
+     LA REGLA DE LA FILA 253 (docs/POR-LIQUIDAR-AL-CAMBIAR-TIPO.md)
+     ==========================================================
+
+     Un asunto abierto, de un tipo que hay que liquidar, que no está ya
+     en «Por liquidar» y no tiene ningún hito por hacer (todos hechos, o
+     ninguno) pasa solo, como automático. La usan tres sitios: cambiar el
+     tipo de un asunto, marcar la casilla en un tipo y la pasada al
+     entrar. Si le quedan hitos por hacer, no se toca. */
+
+  async function sinNadaPorHacer(a, datos) {
+    var entrada = datos.porAsunto && datos.porAsunto[a.nombre];
+    if (!entrada || !entrada.hitos || !entrada.hitos.length) return true;
+    return !!Hitos.aQuienLeToca(entrada.hitos, datos.ajustes).listo;
+  }
+
+  /* Devuelve los asuntos que han pasado. */
+  async function revisar(asuntos) {
+    var pasados = [];
+    if (!hayTipos()) return pasados;
+    var candidatos = (asuntos || []).filter(function (a) { return a && exige(a) && !estaPorLiquidar(a); });
+    if (!candidatos.length) return pasados;
+    var datos = await Hitos.leer();
+    for (var i = 0; i < candidatos.length; i++) {
+      if (!await sinNadaPorHacer(candidatos[i], datos)) continue;
+      await pasar(candidatos[i], { auto: true, sinRepintar: true });
+      pasados.push(candidatos[i]);
+    }
+    if (pasados.length) repintar(pasados[0]);
+    return pasados;
+  }
+
+  async function quitarTodos(asuntos) {
+    for (var i = 0; i < asuntos.length; i++) await quitar(asuntos[i]);
+  }
+
+  /* 1. Tras cambiar el tipo de un asunto abierto (js/asuntos-editar.js), ya con
+     la guía nueva ofrecida: si cumple la regla, pasa, con «Deshacer». */
+  async function alCambiarTipo(nombre, tipoViejo, tipoNuevo) {
+    if (tipoViejo === tipoNuevo) return;
+    try {
+      var a = (window.Gestor ? Gestor.asuntos() : []).filter(function (x) { return x.nombre === nombre; })[0];
+      if (!a) return;
+      var pasados = await revisar([a]);
+      if (!pasados.length) return;
+      U.aviso('Pasa a Por liquidar.', 'bueno', {
+        boton: 'Deshacer',
+        alPulsar: function () { quitarTodos(pasados).catch(function (e) { U.fallo('No he podido deshacerlo', e); }); }
+      });
+    } catch (e) {
+      U.accesorio('El tipo está cambiado, pero no he podido pasar el asunto a Por liquidar', e);
+    }
+  }
+
+  /* 2. Tras marcar la casilla en un tipo (Ajustes): pasan todos sus asuntos abiertos
+     que cumplan la regla; un solo aviso, sin aviso si no pasa ninguno. */
+  async function alMarcarCasilla(tipo) {
+    try {
+      if (!tipo || !tipo.liquidar) return;
+      var suyos = (window.Gestor ? Gestor.asuntos() : []).filter(function (a) { return nombreDeTipo(a) === tipo.tipo; });
+      var pasados = await revisar(suyos);
+      if (!pasados.length) return;
+      U.aviso(pasados.length + (pasados.length === 1 ? ' asunto pasa a Por liquidar.' : ' asuntos pasan a Por liquidar.'), 'bueno', {
+        boton: 'Deshacer',
+        alPulsar: function () { quitarTodos(pasados).catch(function (e) { U.fallo('No he podido deshacerlo', e); }); }
+      });
+    } catch (e) {
+      U.accesorio('La casilla está marcada, pero no he podido pasar sus asuntos a Por liquidar', e);
+    }
+  }
+
+  /* 3. Una pasada al entrar, en segundo plano y sin aviso verde. Nunca con un
+     guardado en marcha (ColaGuardado); si falla, solo ámbar. */
+  var yaMirado = false;
+  function alEntrar() {
+    if (yaMirado || !window.App || !App.E || !App.E.registro || !App.E.listaAbiertos || !App.E.listaAbiertos.length) return;
+    yaMirado = true;
+    var intentos = 0;
+    (function turno() {
+      setTimeout(async function () {
+        if (window.ColaGuardado && ColaGuardado.hayGuardado() && ++intentos < 10) return turno();
+        try { await revisar(Gestor.asuntos()); }
+        catch (e) { U.accesorio('No he podido mirar qué asuntos pasan a Por liquidar', e); }
+      }, 2500);
+    })();
+  }
+  if (window.Gestor && Gestor.alRefrescar) Gestor.alRefrescar.push(alEntrar);
 
   /* ==========================================================
      EL IMPORTE DE CADA ASUNTO
@@ -338,11 +426,13 @@ window.PorLiquidar = (function () {
 
   return {
     exige: exige, hayTipos: hayTipos, estaPorLiquidar: estaPorLiquidar, tipoDe: tipoDe, lista: lista,
+    revisar: revisar, alCambiarTipo: alCambiarTipo, alMarcarCasilla: alMarcarCasilla,
     pasar: pasar, quitar: quitar, destapar: destapar, archivarOPasar: archivarOPasar,
     textoDelBoton: textoDelBoton, alMarcarHecho: alMarcarHecho, alDesmarcar: alDesmarcar,
     importeDe: importeDe, campoImporte: campoImporte, sumar: sumar, euros: euros,
     pintarTabla: pintarTabla, soltarTabla: soltarTabla, desmarcar: desmarcar,
     /* para las pruebas */
-    _textoDeMarcados: textoDeMarcados
+    _textoDeMarcados: textoDeMarcados,
+    _alEntrar: function () { yaMirado = false; alEntrar(); }
   };
 })();
