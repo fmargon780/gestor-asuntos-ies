@@ -62,6 +62,8 @@ await pagina.waitForTimeout(800);
 await comprobar('4. la ficha está en modo consulta (sin «Tomar el mando» ni aviso de presencia)',
   pagina.evaluate(() => ({ consulta: document.getElementById('ficha-asunto-cuerpo').classList.contains('ficha-consulta'),
     presencia: !!document.querySelector('#ficha-presencia.aviso') })), { consulta: true, presencia: false });
+await comprobar('4. «Ver todo» solo mira: sigue encendido',
+  pagina.evaluate(() => { const b = document.getElementById('tercero-ver-todo'); return b ? !b.disabled : 'sin botón'; }).then((x) => x === 'sin botón' || x), true);
 await pagina.evaluate(() => App.ir('ajustes'));
 await pagina.waitForTimeout(500);
 await comprobar('4. en Ajustes se cambia nada salvo la casilla',
