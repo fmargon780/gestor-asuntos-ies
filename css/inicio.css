@@ -388,3 +388,10 @@ button.avisos-linea-trozo:hover {
 .inicio-tabla .liq-importe { text-align: right; white-space: nowrap; }
 .inicio-tabla .liq-importe-ambar { color: var(--ambar-linea, #b26a00); }
 .liq-lista { margin: 4px 0 0; padding-left: 18px; max-height: 160px; overflow-y: auto; font-size: 13px; }
+
+/* Fila 256 (docs/LISTA-A-LA-MISMA-ALTURA-AL-VOLVER.md): Inicio devuelve la
+   altura de la lista él mismo (al volver de una ficha, al repintar). El «scroll
+   anchoring» del navegador, además, movía la página unos 40 px cada vez que la
+   franja de avisos, el filtro de responsable o la cabecera cambiaban de alto
+   por encima de la lista, y la lista quedaba más abajo que antes. Aquí se apaga. */
+#pantalla-abiertos { overflow-anchor: none; }

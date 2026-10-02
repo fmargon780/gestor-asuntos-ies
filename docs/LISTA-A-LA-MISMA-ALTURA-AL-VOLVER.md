@@ -45,3 +45,12 @@ sin buscarla. Hoy es un salto pequeño pero se nota.
 3. Repintar la lista (cambiar de pestaña de Inicio y volver) no la sube arriba.
 4. La cabecera sigue encogiéndose al bajar y desplegándose al subir, sin parpadeos ni saltos.
 5. `pruebas/tras-cada-accion.mjs` pasa 5 veces seguidas en solitario, y la pasada completa no la rompe.
+
+## Qué se encontró y cómo se arregló (2-oct-2026)
+
+No era la navegación ni la cabecera fija: era el **«scroll anchoring»** del navegador. Cada vez que Inicio se
+repintaba (al volver de una ficha y en cada repintado posterior), la franja de avisos, el filtro de
+responsable y la cabecera cambiaban de alto por encima de la lista; el navegador, para que lo que se ve no
+salte, sumaba esos píxeles (unos 41) al desplazamiento, justo después de que `InicioTabla.pintar` hubiera
+devuelto la lista a su altura. Con el anclaje apagado (`overflow-anchor: none`) en `#pantalla-abiertos`
+(`css/inicio.css`), la altura guardada se respeta. Cada repintado de Inicio ya no empuja la lista 41 px.

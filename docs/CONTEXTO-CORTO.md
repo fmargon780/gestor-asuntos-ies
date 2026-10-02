@@ -144,6 +144,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   **Herramientas**, línea, Ajustes. Herramientas (fila 200) es lo que se usa de vez en cuando, no
   un ajuste: Papelera, Traer el alumnado (Séneca y BD de alumnado), Tablas de datos, Restaurar una
   copia de seguridad — los cuatro vivían antes en Ajustes → Mantenimiento.
+- Inicio no usa el «scroll anchoring» del navegador (`#pantalla-abiertos { overflow-anchor: none }`, fila 256): la altura de la lista la devuelven `InicioTabla.pintar` y `Navegacion.volver`; con el anclaje puesto cada repintado la empujaba ~41 px.
 - Ficha de una persona (fila 252): cabecera + tarjetas plegables con resumen (`js/ficha-persona.js`, reparto de datos en `js/ficha-persona-reparto.js`; alumnado: Familia y contacto, Sus asuntos, Matrícula, Materias, Trayectoria, Procedencia y NEAE, Datos personales, Otros datos); la usan Personas y empresas y «Ver todo» del alumno; lo abierto se recuerda en `localStorage` (`gestor.fichaPersona.abiertas`).
 - Ajustes: tres pestañas y pantalla por tipo; tipos de asunto y de documento se crean desde una sola caja «Buscar o crear» (fila 250); todo plegado, con resumen; avisos de fallo, solo con
   fallo. En El centro, "Días de aviso" (dormidos + vencimiento) y "Copias de seguridad" (con la
