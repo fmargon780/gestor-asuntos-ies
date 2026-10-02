@@ -149,13 +149,15 @@ function hace(dias) {
 
 /* ================================================================
    1. Avisa cuando toca: un mensual creado hace 40 días ya tocaría
-   otra vez; uno de hace 5 días, no.
+   otra vez; uno de hace 5 días, no. (El de hace 5 días lleva el día 28:
+   con el día 1 la prueba dependía de la fecha de hoy, porque el 1 del mes
+   siguiente puede estar ya pasado: fallaba del 1 al 5 de cada mes.)
    ================================================================ */
 console.log('--- 1. avisa cuando toca ---');
 
 await Carpetas.escribirTexto(gestor, 'recurrentes.json', JSON.stringify([
   { id: 'r1', tipo: 'FACTURA', categoria: 'EMPRESAS', tercero: 'Proveedor Uno, SL', periodo: 'mensual', dia: 1, ultima: hace(40), parado: false },
-  { id: 'r2', tipo: 'FACTURA', categoria: 'EMPRESAS', tercero: 'Proveedor Dos, SL', periodo: 'mensual', dia: 1, ultima: hace(5), parado: false }
+  { id: 'r2', tipo: 'FACTURA', categoria: 'EMPRESAS', tercero: 'Proveedor Dos, SL', periodo: 'mensual', dia: 28, ultima: hace(5), parado: false }
 ]));
 await Recurrentes._cargar();
 const toca1 = Recurrentes._pendientes();

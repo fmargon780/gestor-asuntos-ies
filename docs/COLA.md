@@ -199,6 +199,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
+- (2-oct-2026) Revisadas las pruebas que fallaban en las pasadas completas: `recurrentes.mjs` ya está arreglada (el caso «hace 5 días» dependía de la fecha y fallaba del 1 al 5 de cada mes); `por-liquidar.mjs` y `mesa-comunicar-del-paso-y-guion.mjs` solo fallan con la máquina cargada y pasan en solitario (la primera pasa a `EN_SOLITARIO`). Sigue abierta `tras-cada-accion.mjs` punto 3: no es de tiempos, **al volver de una ficha a «Todos los abiertos» la lista queda unos 36 px más abajo que antes (1236 en vez de 1200)**; ya pasaba antes de la fila 243. Es un fallo pequeño de la aplicación (`js/navegacion.js` + `js/cabecera-fija.js`), pendiente de una fila si Francisco quiere arreglarlo. `ha-llegado-sustituye-la-vista.mjs` ya pasa.
 - (1-oct-2026) En `main`, sin tocar nada, fallan `recurrentes.mjs` (dos asuntos tocan en vez de uno) y `ha-llegado-sustituye-la-vista.mjs` (punto de la página): dependen de la fecha o del tamaño de pantalla; no son de ninguna fila.
 
 - Fila 241 (1-oct-2026): en la pasada completa fallan `recurrentes.mjs` y `tras-cada-accion.mjs`; fallan igual en `main` sin el cambio de la fila 241 (no es suyo), conviene mirarlas en una fila aparte.
