@@ -12,7 +12,6 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 253 | 60 | Una regla en `js/por-liquidar.js` llamada desde tres sitios (cambio de tipo, casilla de Ajustes, pasada al entrar), aviso con «Deshacer» y una prueba nueva |
 | 254 | 75 | Buscar y arreglar por qué no se añade el campo desde la ficha (hay que reproducirlo), cambio de nombre de la tarjeta con el botón en su título, y la ventana de elegir campo ancha y en columnas, con su prueba ampliada |
 | 255 | 130 | Campos de un hito: marca de hito en los campos del tipo y de «solo aquí», tarjeta nueva en la mesa con rellenado en el sitio, ventana con «Ya están en este asunto», rótulos por hito en la ficha, desplegable «Hito» en Ajustes y una prueba nueva |
 | 256 | 45 | Un solo fallo reproducible con prueba hecha; hay que entender cabecera fija y navegación; revisor en local |
