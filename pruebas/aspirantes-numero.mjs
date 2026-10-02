@@ -164,6 +164,9 @@ await comprobar('el cuadro de renombrado lista solo el asunto abierto',
 await pagina.click('#cuadro-aceptar');
 await pagina.waitForTimeout(400);
 
+await comprobar('la ficha abierta se pone al día con lo guardado (fila 252): ya lleva el Nº escolar nuevo',
+  pagina.locator('#ficha-persona').textContent().then(t => t.indexOf('1170444') !== -1), true);
+
 await comprobar('la carpeta del asunto abierto se renombra con el número',
   nombresAbiertos().then(ns => ns.some(n => n.indexOf('Pendiente De Numero, Nora 1170444') !== -1)), true);
 await comprobar('el asunto viejo ya no está con su nombre de antes',

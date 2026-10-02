@@ -151,7 +151,7 @@ await comprobar('si el archivo es más viejo que el RegAlum, no manda (solo rell
   }), [false, true, '4º ESO A', 'CEIP Inventado Uno']);
 
 console.log('--- la ficha ---');
-await comprobar('una tarjeta plegada por apartado, cada tipo a su manera y la fecha al pie',
+await comprobar('la ficha en tarjetas (fila 252): cada dato en la suya, una sola vez, y la fecha al pie',
   pagina.evaluate(async () => {
     const f = await Datos.cargar(App.E.datos, 'ALUMNADO');
     const l = f.lista.find((x) => x.id === '9990001');
@@ -160,21 +160,20 @@ await comprobar('una tarjeta plegada por apartado, cada tipo a su manera y la fe
     caja.innerHTML = v.html;
     document.body.appendChild(caja);
     v.montar(caja);
-    const ts = Array.from(caja.querySelectorAll('.vt-tarjeta-bd'));
+    const ts = Array.from(caja.querySelectorAll('.fp-tarjeta'));
     const salida = {
-      apartados: ts.map((t) => t.querySelector('summary span').textContent),
-      plegadas: ts.every((t) => !t.open),
-      datos: Array.from(caja.querySelectorAll('.vt-tarjeta-bd .ficha-dato')).map((d) => d.children[0].textContent + '=' + d.children[1].textContent),
-      materias: Array.from(caja.querySelectorAll('.vt-tarjeta-bd .bd-tabla tbody tr')).map((tr) => tr.textContent),
-      pie: ts[0] && ts[0].querySelector('.nota').textContent,
-      viejaSinSalir: !caja.querySelector('.vt-tarjeta-academica')
+      tarjetas: ts.map((t) => t.dataset.tarjeta + ':' + t.querySelector('.fp-titulo').textContent),
+      datos: Array.from(caja.querySelectorAll('.fp-tarjeta .ficha-dato')).map((d) => d.children[0].textContent + '=' + d.children[1].textContent),
+      materias: Array.from(caja.querySelectorAll('.fp-tarjeta .bd-tabla tbody tr')).map((tr) => tr.textContent),
+      pie: (caja.querySelector('.fp-tarjeta .nota') || {}).textContent,
+      viejaSinSalir: !caja.querySelector('.vt-tarjeta-academica') && !caja.querySelector('.vt-tarjeta-bd')
     };
     caja.remove();
     return salida;
   }), {
-    apartados: ['Matrícula', 'Procedencia', 'Historia', 'Jefatura'],
-    plegadas: true,
-    datos: ['Curso=1º ESO', 'Unidad=1º ESO B', 'Centro de procedencia=CEIP Inventado Uno', 'Fecha de alta=01-09-2026', 'PIL=No', 'Marca rara=violeta'],
+    tarjetas: ['matricula:Matrícula', 'trayectoria:Trayectoria', 'procedencia:Procedencia y NEAE', 'otros:Otros datos del fichero'],
+    datos: ['Curso=1º de E.S.O.', 'Año de la matrícula=2026', 'PIL=No', 'Centro de procedencia=CEIP Inventado Uno', 'Fecha de alta=01-09-2026',
+      'Marca rara=violeta'],
     materias: ['Lengua inventadaMatriculada', 'Matemáticas inventadasMatriculada'],
     pie: 'Datos de la base de datos de alumnado del 20-09-2099',
     viejaSinSalir: true

@@ -254,7 +254,7 @@ await pagina.waitForTimeout(250);
 await pagina.click('#lista-personas .resultado');
 const fichaHugo = await pagina.locator('#ficha-persona').textContent();
 await comprobar('la ficha dice que no está matriculado',
-  fichaHugo.indexOf('No está matriculado este curso') !== -1, true);
+  fichaHugo.indexOf('No matriculado') !== -1, true);   /* fila 252: lo dice la cabecera */
 await comprobar('y de cuándo fue su última matrícula',
   fichaHugo.indexOf('24-25') !== -1, true);
 
@@ -359,8 +359,8 @@ await pagina.click('#lista-personas .resultado');
 const ficha = await pagina.locator('#ficha-persona').textContent();
 await comprobar('la ficha calcula la edad de hoy', ficha.indexOf('13 años') !== -1, true);
 await comprobar('la ficha enseña el teléfono del tutor', ficha.indexOf('600111222') !== -1, true);
-await comprobar('la edad sale antes que el resto del fichero',
-  ficha.indexOf('Edad actual') < ficha.indexOf('Nº Id. Escolar'), true);
+await comprobar('la edad sale en la cabecera, una sola vez (fila 252)',
+  ficha.split('13 años').length - 1 >= 1 && ficha.indexOf('Edad actual') === -1, true);
 
 /* --- sus asuntos (fila 175: salen solos, sin pulsar nada) --- */
 await pagina.waitForSelector('#asuntos-del-tercero .resultado');

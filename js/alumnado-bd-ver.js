@@ -248,7 +248,7 @@ var AlumnadoBDVer = (function () {
   }
 
   return {
-    texto: texto, tarjetas: tarjetas, comoTabla: comoTabla, huecos: huecos,
+    texto: texto, vacio: vacio, apartados: apartados, tablaHtml: tablaHtml, tarjetas: tarjetas, comoTabla: comoTabla, huecos: huecos,
     filtrar: filtrar, valoresDe: valoresDe, pintarGrupo: pintarGrupo, TABLA: TABLA
   };
 })();
