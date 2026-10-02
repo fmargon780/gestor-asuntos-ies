@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="css/visor.css">
 <link rel="stylesheet" href="css/tipos-buscador.css">
 <link rel="stylesheet" href="css/tipo-al-vuelo.css">
+<link rel="stylesheet" href="css/tipo-en-linea.css">
 <link rel="stylesheet" href="css/tipos-organo.css">
 <link rel="stylesheet" href="css/reservados.css">
 <link rel="stylesheet" href="css/conservacion.css">
@@ -370,6 +371,7 @@
             <div id="tercero-propuesto-nuevo" class="aviso-en-vivo oculto"></div>
             <button type="button" id="guia-resumen-nuevo" class="guia-resumen oculto"></button>
             <div id="guia-nuevo" class="oculto"></div>
+            <div id="tipo-linea-nuevo" class="oculto"></div>   <!-- fila 257: js/tipo-en-linea.js -->
             <div class="tipos" id="tipos-lista"></div>
             <p class="nota">¿Falta un tipo? Créalo con «+ Crear tipo nuevo», aquí mismo, o ve a
                <button type="button" class="enlace" id="ir-a-ajustes">Ajustes</button>
@@ -1074,6 +1076,8 @@
      de js/asuntos-nuevo(-alta).js y App.textoTercero de
      js/asuntos-nuevo-campos.js. Va después de los tres. -->
 <script src="js/asuntos-editar-tercero.js"></script>
+<!-- El tipo en una línea con buscador (fila 257): usa BuscarOCrear y App.crearTipo, solo al ejecutarse. -->
+<script src="js/tipo-en-linea.js"></script>
 <script src="js/archivo-personas.js"></script>
 <script src="js/ajustes.js"></script>
 <script src="js/tipos-nombre.js"></script>

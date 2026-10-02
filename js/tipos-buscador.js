@@ -57,6 +57,9 @@
     return cuenta;
   }
 
+  /* Fila 257: lo usa js/tipo-en-linea.js para ordenar por uso. */
+  App.usosDeTipos = usos;
+
   function preparar() {
     var lista = $('tipos-lista');
     if (!lista) return;
