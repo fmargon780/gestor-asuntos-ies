@@ -176,12 +176,19 @@
     if (repintando) return;
     if (!$('inicio-ha-llegado-linea') || !window.QueMeToca) return;
     repintando = true;
+    var guarda = null;
     try {
       var esteTurno = ++turno;
       var texto = textoBuscado();
 
       var datos = await QueMeToca.reunir();
       if (esteTurno !== turno) return;
+      /* Fila 256 (docs/LISTA-A-LA-MISMA-ALTURA-AL-VOLVER.md): la franja de avisos,
+         «Ha llegado» y el filtro de responsable cambian de alto por encima de la
+         lista mientras se repinta, y el «scroll anchoring» del navegador movía
+         la lista esos píxeles (unos 41) cada vez. Se apunta la altura (a estas
+         alturas, quien navega ya la ha puesto) y se devuelve al terminar. */
+      guarda = guardarAltura();
       pintarCuentaVencidos(datos.items);
 
       if (window.InicioTabla) await InicioTabla.pintar();
@@ -191,8 +198,44 @@
       if (esteTurno !== turno) return;
       await pintarAvisoAspirantes();
     } finally {
+      if (guarda) guarda.devolver();
       repintando = false;
     }
+  }
+
+  /* Apunta `scrollY`, apaga el anclaje del navegador mientras Inicio se repinta y,
+     con `devolver()`, deja la lista donde estaba salvo que la persona haya tocado la
+     pantalla (rueda, tacto, tecla o ratón) entre medias: entonces se le devuelve el
+     anclaje y se la deja en paz. Se vuelve a mirar en los dos cuadros siguientes,
+     que es cuando el navegador termina de recolocar la página. El anclaje solo se
+     apaga durante el repintado: el resto del tiempo lo necesita la cabecera fija
+     (js/cabecera-fija.js) para no dar saltos al encogerse. */
+  function guardarAltura() {
+    var raiz = document.documentElement;
+    var anclajeAntes = raiz.style.overflowAnchor;
+    var pedida = window.Navegacion && Navegacion.alturaPedida ? Navegacion.alturaPedida() : null;
+    var alto = pedida !== null ? pedida : window.scrollY, tocada = false, activa = true;
+    var eventos = ['wheel', 'touchstart', 'keydown', 'mousedown'];
+    function soltar() {
+      if (!activa) return;
+      activa = false;
+      raiz.style.overflowAnchor = anclajeAntes;
+      eventos.forEach(function (e) { window.removeEventListener(e, tocar, true); });
+    }
+    function tocar() { tocada = true; soltar(); }
+    raiz.style.overflowAnchor = 'none';
+    eventos.forEach(function (e) { window.addEventListener(e, tocar, { capture: true, passive: true }); });
+    function poner() { if (!tocada && Math.abs(window.scrollY - alto) > 2) window.scrollTo(0, alto); }
+    var paso = window.requestAnimationFrame ? function (f) { window.requestAnimationFrame(f); } : function (f) { setTimeout(f, 16); };
+    return {
+      devolver: function () {
+        poner();
+        paso(function () {
+          poner();
+          paso(function () { poner(); soltar(); });
+        });
+      }
+    };
   }
 
   /* ==========================================================

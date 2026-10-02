@@ -45,3 +45,19 @@ sin buscarla. Hoy es un salto pequeño pero se nota.
 3. Repintar la lista (cambiar de pestaña de Inicio y volver) no la sube arriba.
 4. La cabecera sigue encogiéndose al bajar y desplegándose al subir, sin parpadeos ni saltos.
 5. `pruebas/tras-cada-accion.mjs` pasa 5 veces seguidas en solitario, y la pasada completa no la rompe.
+
+## Qué se encontró y cómo se arregló (2-oct-2026)
+
+No era la navegación ni la cabecera fija por sí solas: era el **«scroll anchoring»** del navegador. Al volver de una
+ficha, y en cada repintado posterior de Inicio, la franja de avisos, «Ha llegado», el filtro de responsable y la
+cabecera cambian de alto por encima de la lista; el navegador, para que lo que se ve no salte, sumaba esos píxeles
+(unos 41) al desplazamiento justo después de que se hubiera devuelto la lista a su altura. Apagar el anclaje para
+toda la pantalla no vale: la cabecera fija lo necesita para no dar un brinco al encogerse
+(`pruebas/cabecera-fija.mjs`). Así que se apaga **solo mientras dura el regreso o el repintado**:
+
+- `Navegacion.ponerAltura` (`js/navegacion.js`): casi un segundo con el anclaje apagado, devolviendo la página a
+  la altura guardada cada vez que se aparta, y diciendo esa altura con `Navegacion.alturaPedida()`.
+- `repintarTodo` de `js/inicio.js` (`guardarAltura`): durante cada repintado de Inicio, anclaje apagado y, al
+  terminar, la altura que tenía la lista (o la pedida por la navegación) devuelta, también en los dos cuadros
+  siguientes.
+- En ambos, si la persona toca la pantalla (rueda, tacto, tecla o ratón) se le devuelve el anclaje y se la deja en paz.

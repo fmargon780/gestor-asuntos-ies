@@ -128,6 +128,9 @@ const cerca = (y) => Math.abs(y - alto) <= 12;
 await comprobar('3. al volver, la misma altura', pagina.evaluate(() => window.scrollY).then(cerca), true);
 await pagina.evaluate(() => App.pintarAbiertos());
 await comprobar('3. y repintar la lista no la sube arriba', pagina.evaluate(() => window.scrollY).then(cerca), true);
+/* Fila 256: un repintado periódico de Inicio tampoco la mueve (el «scroll anchoring» la empujaba ~40 px cada vez). */
+await pagina.waitForTimeout(1300);
+await comprobar('3. pasado más de un segundo (otro repintado de Inicio), sigue a la misma altura', pagina.evaluate(() => window.scrollY).then(cerca), true);
 await pagina.evaluate(() => window.scrollTo(0, 0));
 
 /* ============================================================
