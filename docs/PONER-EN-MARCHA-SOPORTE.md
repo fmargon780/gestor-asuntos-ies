@@ -16,8 +16,8 @@ completo con su enlace.
    del buzón (están en `REPOS_PERMITIDOS`, arriba de `apps-script/soporte.gs`): `gestor-asuntos-ies`,
    `bd-alumnado-ies`, `ausencias-guardias-ies`, `normativa-escolarizacion`,
    `migracion-dropbox-drive`, `Disciplina-IES`, `club-tolox-corre`, `comparador-listas`,
-   `Partituras-de-Caja-Clara`, `Cancionero-Parroquia`, `Parroquia_Conteo_Colectas` y
-   `ERP-Nutricion`. (El buzón ya acepta avisos de todos; cada app los manda cuando tenga su botón.)
+   `Partituras-de-Caja-Clara`, `Cancionero-Parroquia`, `Parroquia_Conteo_Colectas`,
+   `ERP-Nutricion` y `Focus_Lingo`. (El buzón ya acepta avisos de todos; cada app los manda cuando tenga su botón.)
 4. «Permissions» → «Repository permissions» → **Contents: Read and write**. Nada más.
 5. «Generate token» y **copia el texto que empieza por `github_pat_`**. Solo se enseña una vez.
 

@@ -35,7 +35,7 @@
    tres columnas (Gestor), de cuatro (con Notas) o apartados «## N. …».
    ============================================================ */
 
-var VERSION_SCRIPT = '2-oct-2026 · fila 261';
+var VERSION_SCRIPT = '4-oct-2026 · fila 262';
 
 /* Los repositorios que pueden mandar avisos (fila 261: todas las apps de
    Francisco). Que uno esté aquí no hace nada por sí solo: hasta que esa app
@@ -52,7 +52,8 @@ var REPOS_PERMITIDOS = [
   'fmargon780/Partituras-de-Caja-Clara',
   'fmargon780/Cancionero-Parroquia',
   'fmargon780/Parroquia_Conteo_Colectas',
-  'fmargon780/ERP-Nutricion'
+  'fmargon780/ERP-Nutricion',
+  'fmargon780/Focus_Lingo'
 ];
 
 var CARPETA_RAIZ = 'SOPORTE-AVISOS';
