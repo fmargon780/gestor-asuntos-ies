@@ -164,3 +164,9 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 259 — control del registro (2-oct-2026)
 
 - Herramientas → «Control del registro»: poner «Revisar desde el día…» y subir los dos listados reales de Séneca (entrada y salida). Comprobar que se leen enteros (eñes y acentos bien) y que los códigos (`26EM0427`…) coinciden con los de los documentos ya registrados en los asuntos. Mirar que «Con asunto» y «Sin asunto» tienen sentido con lo que se conoce. Los documentos de asuntos abiertos anteriores a la fila 239 (registro en el nombre del fichero) no se miran: esos apuntes pueden salir «Sin asunto» aunque el documento exista; se arreglan con «Es de este asunto…».
+
+## Fila 262 — el buzón admite Focus Lingo (4-oct-2026)
+
+- En GitHub, abrir el permiso «Soporte del Gestor» (https://github.com/settings/personal-access-tokens), «Repository access», añadir `Focus_Lingo` y guardar. El permiso *Contents: Read and write* ya lo tiene.
+- Volver a pegar `apps-script/soporte.gs`, ejecutar `prepararTodo` (el registro tiene que decir «Bien: fmargon780/Focus_Lingo») e «Implementar» → «Administrar implementaciones» → «Nueva versión». Es el mismo pegado que el de las filas 240 y 261.
+- Cuando el botón de Focus Lingo esté publicado, enviar un aviso desde allí: sale «Recibido. Gracias.» y aparece una IDEA nueva de Focus Lingo en el Centro de mando.

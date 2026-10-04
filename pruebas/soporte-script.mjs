@@ -199,7 +199,7 @@ function comprobar(titulo, real, esperado) {
 /* ---------- fila 261 ---------- */
 const LISTA = ['gestor-asuntos-ies', 'bd-alumnado-ies', 'ausencias-guardias-ies', 'normativa-escolarizacion', 'migracion-dropbox-drive',
   'Disciplina-IES', 'club-tolox-corre', 'comparador-listas', 'Partituras-de-Caja-Clara', 'Cancionero-Parroquia',
-  'Parroquia_Conteo_Colectas', 'ERP-Nutricion'].map((r) => 'fmargon780/' + r);
+  'Parroquia_Conteo_Colectas', 'ERP-Nutricion', 'Focus_Lingo'].map((r) => 'fmargon780/' + r);
 const COLA4 = '# Cola\n\n| Nº | Instrucción | Estado | Notas |\n|---|---|---|---|\n| 3 | `a` | HECHA | nota \\| con barra |\n| 9 | `b` | PENDIENTE | |\n\n## Más\n\n- algo\n';
 const COLA_APARTADOS = '# Cola de la app\n\n## 1. Primera cosa — HECHA\n\nTexto.\n\n## 4. Otra cosa — PENDIENTE\n\nMás texto.\n';
 
@@ -246,6 +246,20 @@ const COLA_APARTADOS = '# Cola de la app\n\n## 1. Primera cosa — HECHA\n\nText
   comprobar('8. cola que no se entiende: aviso guardado, nada inventado', [envio(mx, BUENO).colaApuntada, mx.ficheros.length, mx.peticiones.filter((p) => p.metodo === 'put').length], [false, 1, 0]);
 }
 
+/* 8b. Focus Lingo (fila 262): cola de cuatro columnas. */
+{
+  const m = montar({ cola: COLA4, respuestasPut: [] });
+  const r = envio(m, { ...BUENO, repo: 'fmargon780/Focus_Lingo' });
+  const f = m.cola().split('\n').find((l) => l.startsWith('| 10 '));
+  comprobar('262. Focus Lingo: se acepta', r.ok, true);
+  comprobar('262. Focus Lingo: cuatro celdas, IDEA (fecha) sola en la tercera y el enlace en la cuarta',
+    [f.split('|').length, f.replace(/https:[^ ]+/, 'ENLACE')],
+    [6, '| 10 | Aviso de usuario: error en «Inicio» | IDEA (30-sep-2026) | Enviada por un usuario desde el botón de soporte · aviso completo: ENLACE |']);
+  comprobar('262. Focus Lingo: nada del usuario en la cola', ['SECRETO', 'Pérez', 'Francisco-Marmol', 'fallo raro'].some((t) => m.cola().indexOf(t) > -1), false);
+  const ro = envio(montar({ cola: COLA, respuestasPut: [] }), { ...BUENO, repo: 'fmargon780/otro-cualquiera' });
+  comprobar('262. otro repositorio se sigue rechazando', [ro.ok, ro.motivo], [false, 'Este repositorio no puede mandar avisos.']);
+}
+
 /* 9. Lo que mandan otras apps de otra forma. */
 {
   const m = montar({ cola: COLA, respuestasPut: [] });
@@ -288,8 +302,8 @@ const COLA_APARTADOS = '# Cola de la app\n\n## 1. Primera cosa — HECHA\n\nText
   comprobar('11. «OJO» si el permiso no llega (403)', m.registro.some((l) => l.indexOf('OJO: fmargon780/bd-alumnado-ies — el permiso de GitHub no llega') === 0), true);
   comprobar('11. «Sin cola» si el permiso llega pero no hay docs/COLA.md', m.registro.some((l) => l.indexOf('Sin cola: fmargon780/club-tolox-corre') === 0), true);
   comprobar('11. 404 con el repositorio invisible: OJO', m.registro.some((l) => l.indexOf('OJO: fmargon780/comparador-listas') === 0), true);
-  comprobar('11. resumen de una línea', m.registro[m.registro.length - 1], 'Resumen: 10 bien, 2 con OJO, de 12 repositorios.');
-  comprobar('11. correo de prueba con el mismo resumen', [m.correos.length, m.correos[0].cuerpo.indexOf('Resumen: 10 bien, 2 con OJO') === 0], [1, true]);
+  comprobar('11. resumen de una línea', m.registro[m.registro.length - 1], 'Resumen: 11 bien, 2 con OJO, de 13 repositorios.');
+  comprobar('11. correo de prueba con el mismo resumen', [m.correos.length, m.correos[0].cuerpo.indexOf('Resumen: 11 bien, 2 con OJO') === 0], [1, true]);
 }
 
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
