@@ -42,15 +42,25 @@
      este ordenador (`gestor-ruta-dropbox`) es más larga, manda ella. */
   var RAIZ_DROPBOX_POR_DEFECTO = 45;
   var SUBCARPETA_VERSIONES = 'Versiones previas';
-  var TOPE_TOTAL_RUTA = 240;
+  var TOPE_TOTAL_RUTA = 259;   /* lo que Windows admite de ruta completa (fila 263) */
   var MINIMO_ASUNTO = 40;
   var MINIMO_DOCUMENTO = 30;
 
+  /* Fila 263: si se sabe dónde está Dropbox de verdad en este ordenador
+     (la copia sin internet, lo apuntado o las rutas completas antiguas),
+     manda eso, sea corto o largo, más la barra que lo separa de lo de
+     dentro. Solo si no se sabe nada, los 45 de siempre. */
   function raizDeEsteOrdenador() {
-    var apuntada = '';
-    try { apuntada = (window.localStorage && window.localStorage.getItem('gestor-ruta-dropbox')) || ''; }
-    catch (e) { apuntada = ''; }
-    return Math.max(RAIZ_DROPBOX_POR_DEFECTO, apuntada.length);
+    var sabida = '';
+    try {
+      sabida = (window.RutaCarpetas && RutaCarpetas.dropboxDeEsteOrdenador &&
+        RutaCarpetas.dropboxDeEsteOrdenador().valor) || '';
+    } catch (e) { sabida = ''; }
+    if (!sabida) {
+      try { sabida = (window.localStorage && window.localStorage.getItem('gestor-ruta-dropbox')) || ''; }
+      catch (e2) { sabida = ''; }
+    }
+    return sabida ? String(sabida).length + 1 : RAIZ_DROPBOX_POR_DEFECTO;
   }
 
   function categoriaMasLarga() {
@@ -194,9 +204,47 @@
     };
   }
 
+  /* ============================================================
+     Los avisos de debajo del nombre en la vista previa (antes en
+     js/nombres.js; se sacan aquí en la fila 263).
+     ============================================================ */
+  var AVISO_RECORTE = 'Nombre demasiado largo: se ha acortado el texto libre.';
+  /* Documentos: ni recortando el texto libre cabe en la ruta (fila 177). En rojo. */
+  var AVISO_NO_CABE = 'El nombre no cabe en la ruta de Dropbox: el tercero o el tipo son demasiado largos. ' +
+    'Mira Ajustes → El centro → Largo de las rutas, o ponle al tipo un nombre corto más breve.';
+  /* Asuntos (fila 263): la ruta larga avisa, pero nunca impide crear ni guardar. En ámbar. */
+  var AVISO_RUTA_LARGA_NUEVO = 'La ruta de esta carpeta sale muy larga. El asunto se crea igual; ' +
+    'puede que Word o Windows protesten al abrir algún documento suyo.';
+  var AVISO_RUTA_LARGA_CAMBIO = 'La ruta de esta carpeta sale muy larga. El cambio se guarda igual; ' +
+    'puede que Word o Windows protesten al abrir algún documento suyo.';
+
+  /* Pone (o quita) esa línea justo debajo de `el`. Para documentos: ámbar
+     si solo se ha recortado, roja si ni así cabe (`noCabe`). Para asuntos
+     (`paraAsunto` = 'nuevo' o 'cambio'): ámbar siempre, con el texto de la
+     ruta larga si `noCabe`. */
+  function avisoRecorte(el, recortado, noCabe, paraAsunto) {
+    if (!el || !el.parentNode || typeof document === 'undefined') return;
+    var sig = el.nextElementSibling;
+    var ya = sig && sig.classList && sig.classList.contains('vista-recorte') ? sig : null;
+    if (!recortado && !noCabe) { if (ya) ya.parentNode.removeChild(ya); return; }
+    var rojo = !!noCabe && !paraAsunto;
+    var texto = noCabe
+      ? (paraAsunto ? (paraAsunto === 'cambio' ? AVISO_RUTA_LARGA_CAMBIO : AVISO_RUTA_LARGA_NUEVO) : AVISO_NO_CABE)
+      : AVISO_RECORTE;
+    var clase = 'vista-recorte aviso-en-vivo ' + (rojo ? 'aviso-rojo' : 'aviso-ambar');
+    if (ya) { ya.textContent = texto; ya.className = clase; return; }
+    var p = document.createElement('div');
+    p.className = clase;
+    p.textContent = texto;
+    el.parentNode.insertBefore(p, el.nextSibling);
+  }
+
   window.Nombres = window.Nombres || {};
   window.Nombres.topes = topes;
   window.Nombres.cabeEnRuta = cabeEnRuta;
   window.Nombres.medidor = medidor;
+  window.Nombres.AVISO_RECORTE = AVISO_RECORTE;
+  window.Nombres.AVISO_NO_CABE = AVISO_NO_CABE;
+  window.Nombres.avisoRecorte = avisoRecorte;
   window.Nombres.SUBCARPETA_PREVIAS = SUBCARPETA_PREVIAS;
 })();

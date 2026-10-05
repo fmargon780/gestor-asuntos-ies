@@ -348,7 +348,7 @@ async function abrirCuadroDeEdicion(a, p, base) {
   function refrescar() {
     var r = nombreConTipoCortoAjustado(piezasDelCuadro());
     $('ed-vista').textContent = r.nombre;
-    Nombres.avisoRecorte($('ed-vista'), r.recortado, r.noCabe);   /* filas 130 y 177 */
+    Nombres.avisoRecorte($('ed-vista'), r.recortado, r.noCabe, 'cambio');   /* filas 130, 177 y 263 */
     refrescarAvisoCategoria();
   }
 
@@ -430,8 +430,7 @@ async function abrirCuadroDeEdicion(a, p, base) {
   var ajustadoFinal = nombreConTipoCortoAjustado(d);
   var nombreNuevo = ajustadoFinal.nombre;
   if (!nombreNuevo || nombreNuevo.length < 8) { U.aviso('Ese nombre se queda demasiado corto.', 'malo'); return { ok: false }; }
-  /* Fila 177: ni recortando el texto libre cabe en la ruta de Dropbox. */
-  if (ajustadoFinal.noCabe) { U.aviso(Nombres.AVISO_NO_CABE, 'malo'); return { ok: false }; }
+  /* Fila 263: una ruta larga avisa en ámbar (vista previa), pero no impide guardar. */
 
   var camposGuardados = {};
   itemsCampos.forEach(function (item, i) {
