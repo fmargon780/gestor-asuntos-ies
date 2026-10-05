@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '267', fecha: '2026-10-05', texto: 'En la ficha de un asunto, junto a «+ Añadir documento», hay un botón «Generar documento» que te lleva al hito actual con sus plantillas ya a la vista.' },
   { id: '266', fecha: '2026-10-05', texto: 'Los datos de una empresa, o de cualquier tercero dado de alta a mano, se pueden cambiar desde la ficha del asunto. Si cambia el NIF o el nombre, las carpetas de sus asuntos abiertos y la suya del archivo cambian de nombre solas.' },
   { id: '265', fecha: '2026-10-05', texto: 'Si al archivar algún documento tiene un nombre demasiado largo para el archivo, la aplicación lo dice y deja acortarlo ahí mismo, en vez de fallar.' },
   { id: '263', fecha: '2026-10-05', texto: 'Un asunto ya no se queda sin crear porque su ruta salga larga: se crea igual y, si de verdad es muy larga, avisa en ámbar.' },

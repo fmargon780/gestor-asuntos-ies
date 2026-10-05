@@ -56,6 +56,13 @@ var HitoMesa = (function () {
     window.scrollTo(0, 0);
   }
 
+  /* Fila 267: la mesa de un hito con un desplegable ya abierto (el atajo
+     «Generar documento» de la ficha). */
+  function abrirConPanel(a, idHito, panel) {
+    panelAbierto = { clave: a.nombre, idHito: idHito, panel: panel };
+    abrir(a, idHito);
+  }
+
   /* Para "Qué me toca": se abrirá en cuanto se pinte ese asunto. */
   function abrirAlPintar(clave, idHito) {
     if (!abierta || abierta.clave !== clave || abierta.idHito !== idHito) tarjetaAbierta = null;
@@ -498,7 +505,7 @@ var HitoMesa = (function () {
   }, true);
 
   return {
-    abrir: abrir, abrirAlPintar: abrirAlPintar, cerrar: cerrar, aplicar: aplicar,
+    abrir: abrir, abrirConPanel: abrirConPanel, abrirAlPintar: abrirAlPintar, cerrar: cerrar, aplicar: aplicar,
     cerrarSiAbierta: cerrarSiAbierta, estaAbierta: estaAbierta,
     abierta: function () { return abierta; }, textoPlazo: textoPlazo,
     cerrarPanelSiAbierto: cerrarPanelSiAbierto,

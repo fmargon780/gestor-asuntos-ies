@@ -519,6 +519,8 @@ cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
   cambia nada del asunto). "Comunicar" no se marca como de solo lectura: ya se apagaba entero en
   consulta antes de esta fila (ninguna de sus dos acciones estaba en la lista blanca), así que
   sigue igual, apagado el botón entero.
+- **«Generar documento»** (fila 267): junto a «+ Añadir documento», lleva al hito actual con su
+  menú abierto (`js/ficha-generar-documento.js`; ver `HITO-MESA.md`); solo con hitos y asunto abierto.
 - **«+ Añadir documento»** (fila 168, `js/ficha-documentos.js`, `ponerBotonAnadir(bloqueEl, a)`;
   antes «Documentos ▾»): en la cabecera del propio bloque, al lado del título, llama a
   `App.verDocumentos(a, { irDirectoAAnadir: true })`; se pinta también con la carpeta vacía

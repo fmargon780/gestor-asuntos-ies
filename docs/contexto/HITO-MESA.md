@@ -126,6 +126,11 @@ apagado si el hito no está vacío).
   154): `js/hitos-panel.js` pone `asunto-con-hitos` en `#pantalla-asunto` al pintar y
   `css/hito-mesa.css` los esconde (siguen en el DOM, con su menú). Como un tipo sin guía recibe la guía
   mínima, en la práctica todo asunto abierto tiene hitos: se comunica y se genera desde la mesa.
+  **Atajo (fila 267)**: «Generar documento» en la tarjeta «Documentos de la carpeta» de la ficha
+  (`js/ficha-generar-documento.js`) no genera: calcula al pulsar el hito actual (o el último si están
+  todos hechos) y llama a `HitoMesa.abrirConPanel(a, idHito, 'generar')`, que deja apuntado
+  `panelAbierto` y abre la mesa con «Generar documento ▾» desplegado. Solo con `asunto-con-hitos`
+  (CSS) y en asunto abierto.
 
 ### Tres tarjetas (fila 147, 25-sep-2026, `docs/MESA-TARJETAS-QUE-SE-ABREN.md`)
 

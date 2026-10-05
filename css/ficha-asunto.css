@@ -162,6 +162,14 @@
 /* «+ Añadir documento», en la cabecera del bloque (fila 168,
    docs/DOCUMENTOS-EN-UN-SOLO-SITIO.md; antes «Documentos ▾»). */
 .ficha-documentos-anadir { margin-left: 8px; padding: 3px 10px; font-size: 12px; }
+/* Fila 267: «Generar documento» solo con hitos; lleva al hito, no genera. */
+.ficha-documentos-generar { display: none; margin-left: 8px; padding: 3px 10px; font-size: 12px; }
+#pantalla-asunto.asunto-con-hitos .ficha-documentos-generar { display: inline-block; }
+/* En la tarjeta, que es estrecha, los dos botones se apilan sin robarle sitio al resumen. */
+.ficha-tarjeta .ficha-documentos-anadir, .ficha-tarjeta .ficha-documentos-generar { margin: 1px 6px 0 0; padding: 0 8px; min-height: 0; height: 20px; line-height: 18px; vertical-align: top; }
+.ficha-tarjeta:has(.ficha-documentos-generar) > .ficha-titulo { margin-bottom: 4px; line-height: 1.2; }
+.ficha-tarjeta:has(.ficha-documentos-generar) { padding-top: 10px; padding-bottom: 8px; }
+.ficha-tarjeta .ficha-documentos-anadir { margin-left: 8px; }
 
 /* Un bloque vacío no gasta una tarjeta entera (18-sep-2026, fila 51,
    docs/FICHA-DISPOSICION.md, 8): título y aviso en una sola línea, con
