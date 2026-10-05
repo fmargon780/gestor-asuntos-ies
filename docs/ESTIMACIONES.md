@@ -5,10 +5,11 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 programar, pruebas, publicar y comprobar. La página «Estado de la cola» de Francisco lee esta
 tabla desde `main`.
 
-Última puesta al día: 05-oct-2026 (fila 263 HECHA; no quedan filas PENDIENTE)
+Última puesta al día: 05-oct-2026 (fila 265 PENDIENTE, diseñada en conversación)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por el revisor: los
 minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
+| 265 | 90 | Código: medir la ruta antes de archivar, cuadro nuevo para acortar nombres, función común de cambiar el nombre de un documento, mensajes de fallo con paso y fichero, dos lotes y una prueba nueva; con revisor |
