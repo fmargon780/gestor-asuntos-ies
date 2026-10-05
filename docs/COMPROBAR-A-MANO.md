@@ -175,3 +175,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 
 - En el ordenador del compañero, con la copia sin internet ya actualizada, repetir el asunto del aviso («Ver todo» → «Crear asunto con él», mismo alumno y mismo tipo): se crea sin ninguna línea de aviso.
 - Guardar un documento en un asunto de antes de la fila 239 con un nombre que no cabe ni recortando: sigue saliendo su aviso rojo y «Guardar» apagado (no se pudo montar con datos de demostración; el código de documentos no se ha tocado).
+
+## Fila 265 — archivar mide antes la ruta (5-oct-2026)
+
+- En el ordenador del compañero, con la copia sin internet ya actualizada, archivar el asunto del aviso (ADMISION, abierto el 28-sep-2026): o se archiva, o sale el cuadro «No cabe en el archivo» y se archiva tras acortar. Si sale otro mensaje rojo, dirá el paso y el fichero: mandarlo por el botón de soporte.

@@ -54,6 +54,24 @@ async function actualizarIndiceAlReabrir(nombre) {
   }
 }
 
+/* Fila 265: el aviso rojo de archivar/reabrir dice en qué paso y con qué
+   fichero ha fallado (`js/carpetas.js` cuelga `paso` y `fichero` del error),
+   y solo dice «No se ha movido nada» cuando es verdad. */
+function conPunto(t) { t = String(t || ''); return /[.!?]$/.test(t) ? t : t + '.'; }
+
+function mensajeDeFallo(verbo, e, sigueEn, dondeCopia) {
+  var texto = 'No se ha podido ' + verbo + ': ';
+  if (!e || !e.paso) return texto + U.mensajeDeError(e);
+  texto += 'ha fallado ' + e.paso + (e.fichero ? ' «' + e.fichero + '»' : '') + '. ';
+  texto += (e.name === 'NotFoundError' && e.destino)
+    ? 'Windows no deja crearlo ahí; suele ser porque la ruta sale demasiado larga o porque Dropbox está sincronizando esa carpeta.'
+    : conPunto(U.mensajeDeError(e));
+  texto += (e.limpiezaFallida || e.copiaAMedias)
+    ? ' Puede haber quedado una copia a medias en ' + dondeCopia + '; al repetir, se juntan.'
+    : ' No se ha movido nada: la carpeta sigue en ' + sigueEn + '.';
+  return texto;
+}
+
 /* ---------- archivar un asunto ----------
 
    El navegador no sabe mover carpetas de un lado a otro: se copia todo
@@ -110,9 +128,33 @@ App.cerrarAsunto = async function (a) {
       'guarda al lado con un (2) detrás.</p>'
     : '';
 
+  /* Fila 265: antes de preguntar nada, se mide la ruta que tendrá cada
+     documento en el archivo. Si la carpeta ya no está en Asuntos abiertos,
+     no hay nada que medir y siguen los avisos de más abajo, como siempre. */
+  var yaPreguntado = false;
+  if (window.ArchivarCabe) {
+    var medida = null;
+    try { medida = await ArchivarCabe.medir(App.E.abiertos, a.nombre, categoria, tercero); } catch (eM) { medida = null; }
+    if (!ArchivarCabe.sinProblema(medida)) {
+      /* Archivar varios de golpe: este se queda donde estaba y el lote avisa al acabar. */
+      if (App.E.archivarSinPreguntar) { ArchivarCabe.anotarNoCabe(a.nombre); return; }
+      var decision = await ArchivarCabe.cuadro(medida, avisoFusion);
+      if (decision.accion === 'cambiar') { await App.editarAsunto(a); return; }
+      if (decision.accion !== 'acortar') return;
+      if (!(await ArchivarCabe.acortar(a, medida, decision.nuevos))) return;
+      var otraVez = null;
+      try { otraVez = await ArchivarCabe.medir(App.E.abiertos, a.nombre, categoria, tercero); } catch (eM2) { otraVez = null; }
+      if (!ArchivarCabe.sinProblema(otraVez)) {
+        U.aviso('Todavía hay documentos que no caben en el archivo. No se ha movido nada.', 'ambar');
+        return;
+      }
+      yaPreguntado = true;
+    }
+  }
+
   /* Fila 141: al repartir un PDF entre terceros se archivan muchos de
      golpe, ya confirmados en su propio resumen (js/repartir-crear.js). */
-  var confirmar = App.E.archivarSinPreguntar ? true : await U.preguntar('Archivar el asunto',
+  var confirmar = (App.E.archivarSinPreguntar || yaPreguntado) ? true : await U.preguntar('Archivar el asunto',
     '<p>Se llevará la carpeta a:</p>' +
     '<div class="vista-previa"><div class="vista-nombre">' +
       U.escapar(App.E.archivo.name + ' / ' + categoria + ' / ' + tercero) +
@@ -153,7 +195,9 @@ App.cerrarAsunto = async function (a) {
       return;
     }
 
-    var destino = await Carpetas.bajar(App.E.archivo, [categoria, tercero], true);
+    var destino;
+    try { destino = await Carpetas.bajar(App.E.archivo, [categoria, tercero], true); }
+    catch (eB) { throw Carpetas.marcar(eB, 'al preparar la carpeta del tercero en el archivo', '', true); }
     /* Antes de mover la carpeta, no después (fila 99): una mirada a la
        carpeta a mitad del traslado ya sabe que esto no es "otro
        ordenador". */
@@ -165,7 +209,7 @@ App.cerrarAsunto = async function (a) {
     if (!haciendoFusion) await Carpetas.mover(App.E.abiertos, a.nombre, destino);
   } catch (e) {
     if (App.E.recienArchivados) delete App.E.recienArchivados[a.nombre];
-    U.fallo('No se ha podido archivar', e);
+    U.aviso(mensajeDeFallo('archivar', e, 'Asuntos abiertos', 'el archivo'), 'malo');
     return;
   }
 
@@ -292,6 +336,6 @@ App.reabrirAsunto = async function (a) {
     await App.verAbiertos();
     await actualizarIndiceAlReabrir(a.nombre);
   } catch (e) {
-    U.aviso('No se ha podido reabrir: ' + U.mensajeDeError(e), 'malo');
+    U.aviso(mensajeDeFallo('reabrir', e, 'el archivo', 'Asuntos abiertos'), 'malo');
   }
 };

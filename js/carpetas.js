@@ -157,22 +157,39 @@ var Carpetas = (function () {
     }
   }
 
+  /* Fila 265: cuelga del error dos datos (`paso`, `fichero`) sin cambiarle
+     el `name`, para que quien archiva diga dónde ha fallado de verdad. Si
+     ya los lleva (el fallo vino de más adentro), no los pisa. `destino`:
+     el fallo fue al crear o escribir en el destino. */
+  function marcar(e, paso, fichero, destino) {
+    if (e && typeof e === 'object' && !e.paso) {
+      e.paso = paso; e.fichero = fichero || '';
+      if (destino) e.destino = true;
+    }
+    return e;
+  }
+
   async function copiarDentro(origen, destino) {
     var copiados = 0;
     for await (var pareja of origen.entries()) {
-      var nombre = pareja[0], h = pareja[1];
+      var nombre = pareja[0], h = pareja[1], enDestino = false;
       if (noSeCopia(nombre, h)) continue;
-      if (h.kind === 'file') {
-        var f = await leerFicheroParaCopiar(h, nombre);
-        var salida = await destino.getFileHandle(nombre, { create: true });
-        var w = await salida.createWritable();
-        await w.write(f);
-        await w.close();
-        copiados++;
-      } else {
-        var sub = await destino.getDirectoryHandle(nombre, { create: true });
-        copiados += await copiarDentro(h, sub);
-      }
+      try {
+        if (h.kind === 'file') {
+          var f = await leerFicheroParaCopiar(h, nombre);
+          enDestino = true;
+          var salida = await destino.getFileHandle(nombre, { create: true });
+          var w = await salida.createWritable();
+          await w.write(f);
+          await w.close();
+          copiados++;
+        } else {
+          enDestino = true;
+          var sub = await destino.getDirectoryHandle(nombre, { create: true });
+          enDestino = false;
+          copiados += await copiarDentro(h, sub);
+        }
+      } catch (e) { throw marcar(e, 'al copiar', nombre, enDestino); }
     }
     return copiados;
   }
@@ -197,7 +214,9 @@ var Carpetas = (function () {
     if (await existe(padreDestino, nombreDestino)) {
       throw new Error('Ya hay una carpeta llamada "' + nombreDestino + '" en el destino.');
     }
-    var esperados = await contarFicheros(origen);
+    var esperados;
+    try { esperados = await contarFicheros(origen); }
+    catch (e0) { throw marcar(e0, 'al leer la carpeta del asunto'); }
     /* La carpeta de destino es nuestra: la hemos creado nosotros justo
        arriba, después de comprobar que no existía. Si algo falla a
        partir de aquí (Dropbox sincronizando, un fichero bloqueado), se
@@ -207,14 +226,17 @@ var Carpetas = (function () {
     try {
       var destino = await padreDestino.getDirectoryHandle(nombreDestino, { create: true });
       await copiarDentro(origen, destino);
-      var llegados = await contarFicheros(destino);
+      var llegados;
+      try { llegados = await contarFicheros(destino); }
+      catch (e1) { throw marcar(e1, 'al comprobar la copia'); }
       if (llegados !== esperados) {
-        throw new Error('La copia no ha salido completa (' + llegados + ' de ' + esperados +
-                        ' ficheros). No se ha borrado nada: la carpeta sigue donde estaba.');
+        throw marcar(new Error('La copia no ha salido completa (' + llegados + ' de ' + esperados +
+                        ' ficheros). No se ha borrado nada: la carpeta sigue donde estaba.'), 'al comprobar la copia');
       }
     } catch (e) {
-      try { await padreDestino.removeEntry(nombreDestino, { recursive: true }); } catch (e2) { /* si no se puede limpiar, se lanza igual el error de arriba */ }
-      throw e;
+      try { await padreDestino.removeEntry(nombreDestino, { recursive: true }); }
+      catch (e2) { if (e && typeof e === 'object') e.limpiezaFallida = true; /* se lanza igual el error de arriba */ }
+      throw marcar(e, 'al crear la carpeta del asunto en el destino', '', true);
     }
     await borrarOrigenYaCopiado(padreOrigen, nombre);
     return esperados;
@@ -284,29 +306,32 @@ var Carpetas = (function () {
     for await (var pareja of origen.entries()) {
       var nombre = pareja[0], h = pareja[1];
       if (noSeCopia(nombre, h)) continue;
-      if (h.kind === 'file') {
-        var f = await leerFicheroParaCopiar(h, nombre);
-        if (await existeFichero(destino, nombre)) {
-          var existente = await (await destino.getFileHandle(nombre)).getFile();
-          if (existente.size === f.size) {
-            rastro.yaEstaban++;
-            rastro.verificar.push({ dir: destino, nombre: nombre, tamano: f.size });
-            continue;
-          }
-          var libre = await nombreLibreConSufijo(destino, nombre);
-          await copiarFicheroDentro(f, destino, libre);
-          rastro.conSufijo.push(libre);
-          rastro.verificar.push({ dir: destino, nombre: libre, tamano: f.size });
-        } else {
-          await copiarFicheroDentro(f, destino, nombre);
-          rastro.copiados++;
-          rastro.verificar.push({ dir: destino, nombre: nombre, tamano: f.size });
-        }
-      } else {
-        var sub = await destino.getDirectoryHandle(nombre, { create: true });
-        await fusionarDentro(h, sub, rastro);
-      }
+      try { await fusionarUno(nombre, h, destino, rastro); }
+      catch (e) { throw marcar(e, 'al copiar', nombre, true); }
     }
+  }
+
+  async function fusionarUno(nombre, h, destino, rastro) {
+    if (h.kind !== 'file') {
+      await fusionarDentro(h, await destino.getDirectoryHandle(nombre, { create: true }), rastro);
+      return;
+    }
+    var f = await leerFicheroParaCopiar(h, nombre);
+    var final = nombre;
+    if (await existeFichero(destino, nombre)) {
+      var existente = await (await destino.getFileHandle(nombre)).getFile();
+      if (existente.size === f.size) {
+        rastro.yaEstaban++;
+        rastro.verificar.push({ dir: destino, nombre: nombre, tamano: f.size });
+        return;
+      }
+      final = await nombreLibreConSufijo(destino, nombre);
+      rastro.conSufijo.push(final);
+    } else {
+      rastro.copiados++;
+    }
+    await copiarFicheroDentro(f, destino, final);
+    rastro.verificar.push({ dir: destino, nombre: final, tamano: f.size });
   }
 
   /* Junta `nombre` (dentro de `padreOrigen`) con `nombreDestino`, que ya
@@ -317,7 +342,8 @@ var Carpetas = (function () {
     var origen = await padreOrigen.getDirectoryHandle(nombre);
     var destino = await padreDestino.getDirectoryHandle(nombreDestino, { create: true });
     var rastro = { copiados: 0, yaEstaban: 0, conSufijo: [], verificar: [] };
-    await fusionarDentro(origen, destino, rastro);
+    try { await fusionarDentro(origen, destino, rastro); }
+    catch (eF) { if (eF && typeof eF === 'object') eF.copiaAMedias = true; throw eF; }
 
     var faltan = 0;
     for (var i = 0; i < rastro.verificar.length; i++) {
@@ -331,8 +357,10 @@ var Carpetas = (function () {
     }
     var total = rastro.verificar.length;
     if (faltan > 0) {
-      throw new Error('La fusión no ha salido completa (' + (total - faltan) + ' de ' + total +
+      var eFus = new Error('La fusión no ha salido completa (' + (total - faltan) + ' de ' + total +
                       ' ficheros). No se ha borrado nada del origen.');
+      eFus.copiaAMedias = true;
+      throw marcar(eFus, 'al comprobar la copia');
     }
 
     /* No se envuelve en `Papelera` a propósito: viviría en el sentido
@@ -560,7 +588,7 @@ var Carpetas = (function () {
     soportado: soportado, elegir: elegir, permiso: permiso,
     subcarpetas: subcarpetas, ficheros: ficheros, contenido: contenido, existe: existe,
     esCarpetaTemporalDeSincronizacion: esCarpetaTemporalDeSincronizacion,
-    crear: crear, bajar: bajar, mover: mover, renombrar: renombrar, trasladar: trasladar,
+    marcar: marcar, noSeCopia: noSeCopia, crear: crear, bajar: bajar, mover: mover, renombrar: renombrar, trasladar: trasladar,
     fusionarEn: fusionarEnOcupado, contarFicheros: contarFicheros,
     existeFichero: existeFichero, fechaFichero: fechaFichero, nombreLibreConSufijo: nombreLibreConSufijo,
     renombrarFichero: renombrarFichero, moverFichero: moverFichero,

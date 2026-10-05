@@ -5,6 +5,12 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 5-oct-2026 — Fila 265: archivar mide antes la ruta y dice dónde falla
+
+Aviso de un usuario: «No se ha podido archivar: No encuentro la carpeta o el fichero…» con la carpeta presente. La causa más probable (sin confirmar) es que al archivar la ruta de algún documento pasa de 259 caracteres y Chrome lo entrega como `NotFoundError`. Decidido con Francisco: medir antes (cuadro «No cabe en el archivo» para acortar el nombre a mano; nada se acorta solo) y, si falla por otra causa, decir el paso y el fichero. Hecho: `Nombres.largoEnArchivo`, `js/archivar-cabe.js`, `js/documento-renombrar.js` (cambia el nombre y pone al día pendientes de registro y hitos), `paso`/`fichero` en los errores de `js/carpetas.js`, un aviso ámbar único en los lotes (reparto y «Por liquidar»). Se añadió, sin que estuviera pedido, que un nombre nuevo tenga que conservar el número `D26-…` del documento, porque los datos del documento en la ficha cuelgan de él. Prueba: `pruebas/archivar-no-cabe.mjs`.
+
+---
+
 ## 2-oct-2026 — Fila 259: control del registro de entrada y de salida
 
 Francisco quería la mayor seguridad posible de que no se escapa ningún asunto que pase por los registros de Séneca. Herramientas → «Control del registro»: se suben a mano los dos CSV de Séneca (el libro se sabe por las columnas, no por el nombre), se revisan desde una fecha, y cada apunte sale en «Sin asunto», «Con asunto», «No necesitan asunto» o «Anulados»; el emparejado se calcula cada vez. Inicio avisa de los apuntes sin asunto y de cuándo toca volver a subir (7 días por defecto, en Ajustes). Detalle en `docs/CONTROL-DEL-REGISTRO.md` y `docs/contexto/DOCUMENTOS.md`.

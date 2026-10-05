@@ -150,6 +150,19 @@
     return { conocido: true, cabe: margen >= 0, margen: margen };
   }
 
+  /* Fila 265: el largo de la ruta completa de algo que va a quedar DENTRO
+     de un asunto ya archivado:
+         <Dropbox>/<ruta de ARCHIVO>/<categoría>/<tercero>/<asunto>/<ruta relativa>
+     `rutaRelativa` puede ir vacía (la propia carpeta del asunto). Devuelve
+     null si no se sabe dónde está el ARCHIVO (`rutas.json` sin señalar):
+     no hay con qué medir. */
+  function largoEnArchivo(categoria, tercero, nombreAsunto, rutaRelativa) {
+    var comun = (window.RutaCarpetas && RutaCarpetas.comunConocido) ? RutaCarpetas.comunConocido('archivo') : '';
+    if (!comun) return null;
+    var piezas = [comun, categoria, tercero, nombreAsunto, rutaRelativa].filter(Boolean);
+    return raizDeEsteOrdenador() + piezas.join('/').length;
+  }
+
   function terceroMasLargo(lista, categoria) {
     var mayor = '';
     (lista || []).forEach(function (p) {
@@ -243,6 +256,8 @@
   window.Nombres.topes = topes;
   window.Nombres.cabeEnRuta = cabeEnRuta;
   window.Nombres.medidor = medidor;
+  window.Nombres.largoEnArchivo = largoEnArchivo;
+  window.Nombres.TOPE_TOTAL_RUTA = TOPE_TOTAL_RUTA;
   window.Nombres.AVISO_RECORTE = AVISO_RECORTE;
   window.Nombres.AVISO_NO_CABE = AVISO_NO_CABE;
   window.Nombres.avisoRecorte = avisoRecorte;

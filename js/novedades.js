@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '265', fecha: '2026-10-05', texto: 'Si al archivar algún documento tiene un nombre demasiado largo para el archivo, la aplicación lo dice y deja acortarlo ahí mismo, en vez de fallar.' },
   { id: '263', fecha: '2026-10-05', texto: 'Un asunto ya no se queda sin crear porque su ruta salga larga: se crea igual y, si de verdad es muy larga, avisa en ámbar.' },
   { id: '259', fecha: '2026-10-02', texto: 'Herramientas → Control del registro: sube los listados de Séneca y mira qué apuntes no tienen asunto; Inicio avisa de los que faltan y de cuándo toca volver a subirlos.' },
   { id: '257', fecha: '2026-10-02', texto: 'Cambiar el asunto: el tipo se busca escribiendo, en una línea como el tercero, y el cuadro cabe entero en pantalla.' },

@@ -69,7 +69,11 @@ de todo el centro (categoría, tercero y tipos más largos) y lo enseña Ajustes
 rutas» (verde; ámbar por debajo de 20; rojo si no cabe, y entonces entra en la comprobación al entrar
 con lo que más ocupa).
 
-Pruebas: `pruebas/nombres-fijos-con-numero.mjs`, `pruebas/ruta-larga-avisa.mjs`.
+Fila 265: `Nombres.largoEnArchivo(categoría, tercero, asunto, rutaRelativa)` da el largo de la ruta de lo que queda
+dentro de un asunto archivado (`null` sin `rutas.json`) y `Nombres.TOPE_TOTAL_RUTA` (259) está a la vista; las usa
+`js/archivar-cabe.js` al archivar.
+
+Pruebas: `pruebas/nombres-fijos-con-numero.mjs`, `pruebas/ruta-larga-avisa.mjs`, `pruebas/archivar-no-cabe.mjs`.
 
 ## Nombres de pila largos (fila 247)
 
