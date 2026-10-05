@@ -250,7 +250,14 @@
            solo en la cabecera de cada hito; la barra de arriba de la
            ficha los esconde (css/hito-mesa.css). */
         var pantalla = $('pantalla-asunto');
-        if (pantalla) pantalla.classList.toggle('asunto-con-hitos', !errorLectura && hitos.length > 0);
+        if (pantalla) {
+          var conHitos = !errorLectura && hitos.length > 0;
+          var cambio = pantalla.classList.contains('asunto-con-hitos') !== conHitos;
+          pantalla.classList.toggle('asunto-con-hitos', conHitos);
+          /* Fila 267: «Generar documento» de la ficha sale o se va con esta marca;
+             la tarjeta de documentos vuelve a contar cuántos renglones le caben. */
+          if (cambio && window.FichaTarjetas && FichaTarjetas.ajustarAlto) FichaTarjetas.ajustarAlto();
+        }
         if (!errorLectura && hitos.length) {
           caja.className = 'hitos-panel';
           caja.appendChild(HitosPanelLista.bloqueDeHitos(a, hitos, datos.ajustes, abierto, nombresDeLaCarpeta));

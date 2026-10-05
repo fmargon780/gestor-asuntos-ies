@@ -266,7 +266,7 @@ var FichaDocumentos = (function () {
     var titulo = bloqueEl.querySelector('.ficha-titulo');
     if (!titulo) return;
     var viejo = titulo.querySelector('.ficha-documentos-anadir');
-    if (viejo) { viejo.onclick = alPulsar; return; }
+    if (viejo) { viejo.onclick = alPulsar; if (window.FichaGenerarDocumento) FichaGenerarDocumento.poner(titulo, a); return; }
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'boton boton-principal ficha-documentos-anadir';
@@ -274,6 +274,7 @@ var FichaDocumentos = (function () {
     b.title = 'Traer un documento del ordenador a esta carpeta, ya con su nombre';
     b.onclick = alPulsar;
     titulo.appendChild(b);
+    if (window.FichaGenerarDocumento) FichaGenerarDocumento.poner(titulo, a);
     async function alPulsar() {
       await App.verDocumentos(a, { irDirectoAAnadir: true });
       pintar(a);

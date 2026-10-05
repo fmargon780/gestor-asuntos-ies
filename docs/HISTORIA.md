@@ -5,6 +5,12 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 5-oct-2026 — Fila 267: «Generar documento» en la ficha, que lleva al hito
+
+Aviso de un usuario que no encontró cómo generar un certificado desde el asunto (desde la fila 154 solo se genera en la mesa del hito). Botón secundario junto a «+ Añadir documento» que no genera: abre el hito actual (el último si están todos hechos) con el menú ya desplegado. Fichero nuevo `js/ficha-generar-documento.js`, `HitoMesa.abrirConPanel`, prueba `pruebas/generar-desde-la-ficha.mjs`. Un asunto sin hitos no existe en la práctica (guía mínima, fila 129): la prueba simula la falta de la marca `asunto-con-hitos`.
+
+---
+
 ## 5-oct-2026 — Fila 266: cambiar los datos del tercero desde el asunto, y que las carpetas le sigan
 
 Aviso de un usuario: «¿Cómo puedo modificar el CIF de una empresa?», desde la ficha de un asunto. No era un error: solo se podía desde Personas y empresas. Ahora «Cambiar los datos» sale también en la tarjeta del tercero de la ficha de un asunto abierto (terceros dados de alta a mano) y, si cambia el texto del tercero (NIF, nombre…), las carpetas de sus asuntos abiertos y la suya del archivo cambian de nombre con una lista y «Adelante». Módulo nuevo `js/tercero-renombrar.js`; el cambio de datos se sacó de `js/archivo-personas.js` a `js/tercero-cambiar-datos.js`; `IndiceArchivo.cambiarTercero`; `App.renombrarAsuntosAbiertosDelTercero` desaparece (el aspirante con Nº escolar va por el mismo camino). De paso se arregla el fallo conocido de `App.reengancharFicha` (aviso rojo «Este asunto ya no está en Asuntos abiertos…» al renombrar desde la ficha): `App.E.recienRenombrados`. Además, `App.sePuedeCambiarElTercero` ya no acepta alumnado matriculado (Séneca). Límite aceptado: no se tocan los relacionados de asuntos archivados ni los `DONDE ESTA ESTE ASUNTO.txt`. Prueba nueva: `pruebas/cambiar-datos-desde-el-asunto.mjs`.
