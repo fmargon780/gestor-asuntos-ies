@@ -5,6 +5,12 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 5-oct-2026 — Fila 266: cambiar los datos del tercero desde el asunto, y que las carpetas le sigan
+
+Aviso de un usuario: «¿Cómo puedo modificar el CIF de una empresa?», desde la ficha de un asunto. No era un error: solo se podía desde Personas y empresas. Ahora «Cambiar los datos» sale también en la tarjeta del tercero de la ficha de un asunto abierto (terceros dados de alta a mano) y, si cambia el texto del tercero (NIF, nombre…), las carpetas de sus asuntos abiertos y la suya del archivo cambian de nombre con una lista y «Adelante». Módulo nuevo `js/tercero-renombrar.js`; el cambio de datos se sacó de `js/archivo-personas.js` a `js/tercero-cambiar-datos.js`; `IndiceArchivo.cambiarTercero`; `App.renombrarAsuntosAbiertosDelTercero` desaparece (el aspirante con Nº escolar va por el mismo camino). De paso se arregla el fallo conocido de `App.reengancharFicha` (aviso rojo «Este asunto ya no está en Asuntos abiertos…» al renombrar desde la ficha): `App.E.recienRenombrados`. Además, `App.sePuedeCambiarElTercero` ya no acepta alumnado matriculado (Séneca). Límite aceptado: no se tocan los relacionados de asuntos archivados ni los `DONDE ESTA ESTE ASUNTO.txt`. Prueba nueva: `pruebas/cambiar-datos-desde-el-asunto.mjs`.
+
+---
+
 ## 5-oct-2026 — Fila 265: archivar mide antes la ruta y dice dónde falla
 
 Aviso de un usuario: «No se ha podido archivar: No encuentro la carpeta o el fichero…» con la carpeta presente. La causa más probable (sin confirmar) es que al archivar la ruta de algún documento pasa de 259 caracteres y Chrome lo entrega como `NotFoundError`. Decidido con Francisco: medir antes (cuadro «No cabe en el archivo» para acortar el nombre a mano; nada se acorta solo) y, si falla por otra causa, decir el paso y el fichero. Hecho: `Nombres.largoEnArchivo`, `js/archivar-cabe.js`, `js/documento-renombrar.js` (cambia el nombre y pone al día pendientes de registro y hitos), `paso`/`fichero` en los errores de `js/carpetas.js`, un aviso ámbar único en los lotes (reparto y «Por liquidar»). Se añadió, sin que estuviera pedido, que un nombre nuevo tenga que conservar el número `D26-…` del documento, porque los datos del documento en la ficha cuelgan de él. Prueba: `pruebas/archivar-no-cabe.mjs`.

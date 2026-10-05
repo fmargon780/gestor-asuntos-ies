@@ -66,11 +66,31 @@ revisión de `js/conflictos.js` (cada cinco minutos, nunca con un guardado en ma
 `revisarFechasDatos`) se mira la fecha de cada CSV de `_GESTOR/datos`; si ha cambiado, se olvida
 esa categoría (`Datos.olvidar`) y se relee la próxima vez que se pida, sin repintar nada.
 
-Botón "Cambiar los datos" en la ficha de Personas y empresas: abre el mismo cuadro del alta,
-relleno, y guarda encima. **Solo para los dados de alta a mano** (`p.deSeneca !== true`). Si
-cambia el nombre, las carpetas de sus asuntos de antes conservan el nombre viejo, y se avisa. El
-cuadro es uno solo para alta y cambio: `App.cuadroDeTercero`, en `js/asuntos-nuevo.js`, escribe
-`Datos.guardarEnLista`. Vive en `js/archivo-personas.js`, se comprueba con `pruebas/empresas.mjs`.
+Botón "Cambiar los datos" en la ficha de Personas y empresas **y, desde la fila 266, en la tarjeta
+del tercero de la ficha de un asunto abierto** (`js/ficha-tercero.js`; no sale en un asunto
+archivado ni si los datos vienen de la foto guardada `persona.foto`): abre el mismo cuadro del
+alta, relleno, y guarda encima. **Solo para los dados de alta a mano** (`App.sePuedeCambiarElTercero`:
+no Séneca, y en ALUMNADO solo `solicitante`). Un solo camino: `App.cambiarDatosDelTercero`
+(`js/tercero-cambiar-datos.js`, sacado de `js/archivo-personas.js`). El cuadro es uno solo para alta
+y cambio: `App.cuadroDeTercero`, en `js/asuntos-nuevo-alta.js`, escribe `Datos.guardarEnLista`.
+
+**Si cambia el texto del tercero** (`App.textoTercero`: NIF, razón social, nombre, documento, Nº
+escolar), `js/tercero-renombrar.js` (`TerceroRenombrar`) hace, en este orden: (1) `preparar` + `preguntar`:
+cuadro «Cambia el nombre de las carpetas» con los asuntos abiertos (carpetas de `App.E.abiertos` que
+terminan en el texto de antes) y la línea del ARCHIVO; «Cancelar» no guarda nada; sin carpetas
+afectadas no sale; (2) `Datos.guardarEnLista`; (3) cada asunto abierto por `AsuntoRenombrar.mover`
+(+ `ficha.tercero` y `ficha.contacto` nuevos); se salta el que está en `App.E.ocupados` o con
+presencia de otro ordenador (aviso ámbar con sus nombres); (4) la carpeta del tercero en el ARCHIVO
+(`<ARCHIVO>/<categoría>/<tercero>`) se renombra, o se fusiona con `Carpetas.fusionarEn` si ya existía
+la nueva, y `IndiceArchivo.cambiarTercero` pone al día `tercero` y `ruta` del índice; (5) se pone al
+día el texto en `ficha.relacionados` de los asuntos abiertos (`App.anotarLista`), en los miembros de
+`grupos.json` y en `r.tercero` de `recurrentes.json`. Los asuntos archivados de dentro no se tocan.
+**Límite aceptado:** no se tocan los relacionados de asuntos ya archivados ni el texto de los
+ficheros `DONDE ESTA ESTE ASUNTO.txt`. Si algún paso accesorio falla, ámbar con el nombre de lo que
+no ha cambiado (los datos quedan guardados). Para que la ficha abierta siga al asunto renombrado sin
+aviso rojo, `App.E.recienRenombrados[viejo] = nuevo` (lo pone quien renombra antes de mover la
+carpeta; lo lee `App.reengancharFicha`, `js/ficha-huella.js`; vale también para «Cambiar el asunto»).
+Se comprueba con `pruebas/cambiar-datos-desde-el-asunto.mjs` y `pruebas/empresas.mjs`.
 
 ### Aspirantes a plaza ("alumnado pendiente")
 
@@ -93,14 +113,10 @@ solicitante" en el buscador y en Personas). Lo que trae esta fila:
   (si `alumno.id` está vacío, no añade nada: nunca inventa un número ni usa el DNI). Lo único nuevo
   es la palabra "pendiente de número" en `App.pieAlumno` (`js/asuntos-nuevo.js`), donde antes decía
   "sin Nº de identificación escolar".
-- **Al escribir el número más tarde** (botón "Cambiar los datos" en la ficha, categoría ALUMNADO,
-  solicitante, sin Nº antes y con Nº después): `App.cambiarDatosDelTercero`
-  (`js/archivo-personas.js`) llama a `App.renombrarAsuntosAbiertosDelTercero` (nueva en
-  `js/asuntos-editar.js`), que busca en `App.E.abiertos` las carpetas que terminan en el texto de
-  tercero de antes (`App.textoTercero`), enseña la lista con `U.preguntar` ("Adelante") y, si se
-  confirma, las renombra una a una con `Carpetas.renombrar` —el mismo camino que
-  `App.editarAsunto`— moviendo también su ficha en `App.E.registro.asuntos` a la clave nueva. Las
-  archivadas no se tocan: no se buscan en `App.E.archivo`, así que nunca entran en la lista.
+- **Al escribir el número más tarde** (botón "Cambiar los datos", categoría ALUMNADO, solicitante): es
+  un cambio más del texto del tercero (nombre + Nº escolar) y va por el mismo camino de arriba
+  (`TerceroRenombrar`, fila 266): cuadro «Cambia el nombre de las carpetas», asuntos abiertos por
+  `AsuntoRenombrar` y carpeta del ARCHIVO renombrada; los asuntos archivados de dentro no se tocan.
 - **El aviso en "Qué me toca"** (`js/que-me-toca.js`): un bloque nuevo arriba del todo, "N
   aspirante(s) sin Nº de identificación escolar", que cuenta `Datos.cargar(..., 'ALUMNADO').lista`
   filtrando `solicitante && !id`. Se pulsa y lleva a Personas y empresas, categoría Alumnado (no

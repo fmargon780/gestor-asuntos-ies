@@ -150,6 +150,8 @@
           (resumen.documento && resumen.documento.falta
             ? puntoHtml() + '<span class="tercero-falta-dni">FALTA EL DNI (' +
               U.escapar(String(resumen.documento.edad)) + ' años, ya debería tenerlo)</span>' : '') +
+          (sePuedeCambiar(persona, a)
+            ? '<button type="button" class="boton tercero-cambiar" id="tercero-cambiar-datos">Cambiar los datos</button>' : '') +
           '<button type="button" class="boton tercero-vertodo" id="tercero-ver-todo">Ver todo</button>' +
         '</div>' +
         (resumen.grupo && resumen.grupo.detalle
@@ -172,6 +174,25 @@
     }
     var btn = document.getElementById('tercero-ver-todo');
     if (btn) btn.onclick = function () { abrirVerTodo(persona, categoria, resumen, a); };
+    var cambiar = document.getElementById('tercero-cambiar-datos');
+    if (cambiar) cambiar.onclick = function () { cambiarDatos(persona, a, cambiar); };
+  }
+
+  /* Fila 266: «Cambiar los datos» del tercero, desde la ficha de un asunto ABIERTO.
+     Solo si los datos son de hoy (no la foto guardada) y es de alta a mano. */
+  function sePuedeCambiar(persona, a) {
+    var N = window.FichaNucleo;
+    if (!persona || persona.foto || !a || !N || N.modoActual !== 'abierto') return false;
+    return !!(App.sePuedeCambiarElTercero && App.sePuedeCambiarElTercero(persona));
+  }
+
+  async function cambiarDatos(persona, a, boton) {
+    var r = await App.cambiarDatosDelTercero(persona, boton);
+    if (!r) return;
+    /* La ficha sigue en el mismo asunto, con el nombre de carpeta nuevo si lo ha cambiado. */
+    var nombre = r.nombres[a.nombre] || a.nombre;
+    if (window.Navegacion && Navegacion.abrirAbierto(nombre)) return;
+    App.volverALaLista();
   }
 
   /* La usa js/ficha-asunto.js (`pintarContacto`): busca al tercero y
