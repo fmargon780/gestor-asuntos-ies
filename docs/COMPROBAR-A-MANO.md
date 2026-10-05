@@ -170,3 +170,8 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 - En GitHub, abrir el permiso «Soporte del Gestor» (https://github.com/settings/personal-access-tokens), «Repository access», añadir `Focus_Lingo` y guardar. El permiso *Contents: Read and write* ya lo tiene.
 - Volver a pegar `apps-script/soporte.gs`, ejecutar `prepararTodo` (el registro tiene que decir «Bien: fmargon780/Focus_Lingo») e «Implementar» → «Administrar implementaciones» → «Nueva versión». Es el mismo pegado que el de las filas 240 y 261.
 - Cuando el botón de Focus Lingo esté publicado, enviar un aviso desde allí: sale «Recibido. Gracias.» y aparece una IDEA nueva de Focus Lingo en el Centro de mando.
+
+## Fila 263 — la ruta larga avisa y no impide crear (5-oct-2026)
+
+- En el ordenador del compañero, con la copia sin internet ya actualizada, repetir el asunto del aviso («Ver todo» → «Crear asunto con él», mismo alumno y mismo tipo): se crea sin ninguna línea de aviso.
+- Guardar un documento en un asunto de antes de la fila 239 con un nombre que no cabe ni recortando: sigue saliendo su aviso rojo y «Guardar» apagado (no se pudo montar con datos de demostración; el código de documentos no se ha tocado).
