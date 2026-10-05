@@ -179,3 +179,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 265 — archivar mide antes la ruta (5-oct-2026)
 
 - En el ordenador del compañero, con la copia sin internet ya actualizada, archivar el asunto del aviso (ADMISION, abierto el 28-sep-2026): o se archiva, o sale el cuadro «No cabe en el archivo» y se archiva tras acortar. Si sale otro mensaje rojo, dirá el paso y el fichero: mandarlo por el botón de soporte.
+
+## Fila 266 — cambiar los datos del tercero desde el asunto (5-oct-2026)
+
+- Con un aspirante real sin Nº escolar y un asunto abierto suyo: escribirle el Nº escolar desde «Cambiar los datos» (en su ficha de Personas o desde la ficha del asunto). Sale «Cambia el nombre de las carpetas», y con «Adelante» cambia solo el asunto abierto y la carpeta suya del archivo; los asuntos archivados de dentro conservan su nombre.
