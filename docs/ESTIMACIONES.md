@@ -5,7 +5,7 @@ La pone al día la sesión que trabaja `docs/COLA.md`, cada vez que marca una fi
 programar, pruebas, publicar y comprobar. La página «Estado de la cola» de Francisco lee esta
 tabla desde `main`.
 
-Última puesta al día: 05-oct-2026 (fila 266 PENDIENTE)
+Última puesta al día: 05-oct-2026 (fila 267 PENDIENTE)
 
 Desde la fila 223, cada fila de código (no solo documentación) pasa antes por el revisor: los
 minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
@@ -13,3 +13,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 | Nº | Minutos | Motivo |
 |---|---|---|
 | 266 | 90 | Botón en la ficha del asunto, módulo nuevo que renombra carpetas abiertas y la del tercero en el ARCHIVO, pone al día índice, relacionados, grupos y recurrentes; prueba nueva de navegador y dos que cambian |
+| 267 | 40 | Botón «Generar documento» en la tarjeta de documentos de la ficha, que abre la mesa del hito actual con su desplegable ya abierto; una función pequeña en la mesa y una prueba nueva de navegador |
