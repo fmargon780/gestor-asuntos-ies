@@ -172,6 +172,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 264 | Aviso de usuario: error en «Nuevo asunto» | DESCARTADA (5-oct-2026): repetida, es el mismo aviso de la fila 263 enviado dos veces |
 | 265 | `docs/ARCHIVAR-MIDE-ANTES-LA-RUTA.md` (aviso de usuario: «No se ha podido archivar» en Inicio; antes de archivar se mide la ruta que tendrá cada documento en el ARCHIVO; si alguno no cabe, cuadro para acortar su nombre ahí mismo y archivar; si falla por otra causa, el mensaje dice el paso y el fichero) | HECHA (5-oct-2026 11:28) · conversación: https://claude.ai/code/session_0192VU1iQQG1BUWEfYhJWNTo · en `main` (fusión 9b9461e, PR 190), servida en gestor-de-asuntos.vercel.app (versión 05-oct-2026 · 11:23) · revisor APROBADA a la segunda (la primera falló por mi preparación, no por el cambio) · aviso completo: https://drive.google.com/file/d/1Q6FCWrUL5acNw2qtQaNFHkpJbBiJAJ8c/view?usp=drivesdk |
 | 266 | Aviso de usuario: error en «Ficha de un asunto» | IDEA (5-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1EPbtfXTFiuJ50X4h_nynzXi1YKu94O5d/view?usp=drivesdk |
+| 267 | Aviso de usuario: error en «Ficha de un asunto» | IDEA (5-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1iNeawuDm6ysWEpwAtGGKYTpLi-GMfbfQ/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
