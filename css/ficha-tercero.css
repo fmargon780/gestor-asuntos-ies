@@ -14,6 +14,8 @@
 .tercero-grupo { }
 .tercero-edad { }
 .tercero-vertodo { margin-left: auto; flex: 0 0 auto; }
+.tercero-cambiar { margin-left: auto; flex: 0 0 auto; }   /* fila 266 */
+.tercero-cambiar + .tercero-vertodo { margin-left: 8px; }
 
 /* La etiqueta de estado, en el sitio del grupo (3.1 del encargo). */
 .tercero-etiqueta {
@@ -52,7 +54,7 @@
 
 
 @media (max-width: 640px) {
-  .tercero-vertodo { margin-left: 0; }
+  .tercero-vertodo, .tercero-cambiar { margin-left: 0; }
 }
 
 /* ============================================================

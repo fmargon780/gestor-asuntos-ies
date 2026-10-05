@@ -355,6 +355,32 @@ var IndiceArchivo = (function () {
     await escribirCursoDisco(curso, previo);
   }
 
+  /* Fila 266: cambia el nombre de un tercero en todas sus entradas (la
+     carpeta del tercero en el ARCHIVO cambió de nombre): `tercero` y el
+     segmento de `ruta` («CATEGORÍA / TERCERO [/ …]»). Recorre solo los
+     ficheros de curso que existen; silencioso si el índice no existe. */
+  function cambiarTercero(categoria, viejo, nuevo) {
+    return enFila(function () { return cambiarTerceroYa(categoria, viejo, nuevo); });
+  }
+
+  async function cambiarTerceroYa(categoria, viejo, nuevo) {
+    var resumen = await leerResumenDisco();
+    if (!resumen || !Array.isArray(resumen.cursos)) return;
+    for (var i = 0; i < resumen.cursos.length; i++) {
+      var previo = await leerCursoDisco(resumen.cursos[i]);
+      if (!previo || !Array.isArray(previo.asuntos)) continue;
+      var tocado = false;
+      previo.asuntos.forEach(function (a) {
+        if (a.categoria !== categoria || a.tercero !== viejo) return;
+        a.tercero = nuevo;
+        var segmentos = String(a.ruta || '').split(' / ');
+        if (segmentos[1] === viejo) { segmentos[1] = nuevo; a.ruta = segmentos.join(' / '); }
+        tocado = true;
+      });
+      if (tocado) await escribirCursoDisco(resumen.cursos[i], previo);
+    }
+  }
+
   function recuentosIguales(a, b) {
     a = a || {}; b = b || {};
     var clavesA = Object.keys(a), clavesB = Object.keys(b);
@@ -434,7 +460,7 @@ var IndiceArchivo = (function () {
   return {
     FICHERO_RESUMEN: FICHERO_RESUMEN, CARPETA: CARPETA, VERSION: VERSION,
     leerDisco: leerDisco, guardar: guardar,
-    anadirEntrada: anadirEntrada, quitarEntrada: quitarEntrada,
+    anadirEntrada: anadirEntrada, quitarEntrada: quitarEntrada, cambiarTercero: cambiarTercero,
     recuentosIguales: recuentosIguales,
     textoDeBusqueda: textoDeBusqueda, resolverHandle: resolverHandle,
     /* Para archivo-indice-construir.js (y para las pruebas). */

@@ -322,7 +322,7 @@ App.verFicha = function (p) {
     b.className = 'boton';
     b.id = 'cambiar-tercero';
     b.textContent = 'Cambiar los datos';
-    b.onclick = function () { App.cambiarDatosDelTercero(p); };
+    b.onclick = function () { App.cambiarDatosDesdePersonas(p); };
     acciones.appendChild(b);
   }
   var nuevoAsunto = document.createElement('button');
@@ -337,77 +337,8 @@ App.verFicha = function (p) {
   App.verAsuntosDeTercero(p);
 };
 
-/* ---------- cambiar los datos de un tercero ----------
-
-   Hasta el 10-sep-2026 un tercero se daba de alta y ya no se podía
-   tocar. En cuanto apareció el nombre comercial de las empresas eso
-   dejó de valer: las que ya estaban dadas de alta no tenían dónde
-   ponerlo, y la única salida habría sido abrir el CSV a mano. Justo lo
-   que no queremos.
-
-   **Solo los dados de alta a mano.** Lo que viene de Séneca no se toca
-   desde aquí: se corrige en Séneca y se vuelve a descargar el fichero,
-   o el cambio se perdería en la siguiente descarga. */
-
-App.sePuedeCambiarElTercero = function (p) {
-  if (!p || !p.categoria) return false;
-  if (!Datos.LISTAS[p.categoria]) return false;
-  return p.deSeneca !== true;
-};
-
-App.cambiarDatosDelTercero = async function (p) {
-  var def = Datos.LISTAS[p.categoria];
-  var nombreAntes = p.nombre;
-
-  var valores = {};
-  def.cabecera.forEach(function (c) { valores[c] = (p.campos && p.campos[c]) || ''; });
-  valores[def.cabecera[0]] = nombreAntes;
-
-  var puestos = await App.cuadroDeTercero(
-    p.categoria, valores, 'Cambiar los datos de ' + nombreAntes, 'Guardar los cambios');
-  if (!puestos) return;
-
-  try {
-    await Datos.guardarEnLista(App.E.datos, p.categoria, nombreAntes, puestos);
-  } catch (e) {
-    U.aviso('No he podido guardar el cambio: ' + U.mensajeDeError(e), 'malo');
-    return;
-  }
-
-  /* Cambiar el nombre no renombra las carpetas de sus asuntos: el
-     nombre de una carpeta es el rastro del día en que se creó.
-
-     La única excepción es el Nº de identificación escolar de un
-     aspirante (17-sep-2026, fila 42, sección 4): si antes no lo tenía y
-     ahora sí, sus asuntos ABIERTOS pasan a llamarse con el número, igual
-     que si se hubiera matriculado. Se pregunta antes con la lista de
-     carpetas (App.renombrarAsuntosAbiertosDelTercero, en
-     js/asuntos-editar.js), y las archivadas no se tocan. */
-  var esAspiranteConNumeroNuevo = p.categoria === 'ALUMNADO' && p.solicitante &&
-    !p.id && (puestos['Nº Id. Escolar'] || '').trim();
-
-  U.aviso(U.normalizar(puestos[def.cabecera[0]]) !== U.normalizar(nombreAntes)
-    ? 'Cambiado. Las carpetas de sus asuntos de antes conservan el nombre viejo.'
-    : 'Cambiado.', 'bueno');
-
-  Datos.olvidar(p.categoria);
-  await App.pintarPersonas();
-  /* Fila 252: la ficha abierta se pone al día con lo que se acaba de guardar. */
-  try {
-    var nombreNuevo = puestos[def.cabecera[0]] || nombreAntes;
-    var nuevo = ((App.personasCargadas && App.personasCargadas.lista) || []).filter(function (x) { return x.nombre === nombreNuevo; })[0];
-    if (nuevo) App.verFicha(nuevo);
-  } catch (e) { /* la ficha se pondrá al día al elegir otra vez a la persona */ }
-
-  if (esAspiranteConNumeroNuevo && App.renombrarAsuntosAbiertosDelTercero) {
-    var textoAntes = App.textoTercero({ categoria: 'ALUMNADO', nombre: nombreAntes, id: '' });
-    var textoDespues = App.textoTercero({
-      categoria: 'ALUMNADO', nombre: puestos[def.cabecera[0]] || nombreAntes,
-      id: (puestos['Nº Id. Escolar'] || '').trim()
-    });
-    await App.renombrarAsuntosAbiertosDelTercero('ALUMNADO', textoAntes, textoDespues);
-  }
-};
+/* Cambiar los datos de un tercero (App.sePuedeCambiarElTercero, App.cambiarDatosDelTercero):
+   js/tercero-cambiar-datos.js (fila 266). */
 
 /* Todos los asuntos de una persona o empresa, los abiertos y los
    archivados: sale sola al abrir la ficha (fila 175, punto 1), y cada

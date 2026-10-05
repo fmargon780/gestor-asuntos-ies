@@ -142,49 +142,9 @@ App.pintarCamposEditar = function (tipo, guardados, ficha, nombreAsunto) {
   };
 };
 
-/* ---------- cuando llega el Nº de identificación escolar de un aspirante ----------
-
-   17-sep-2026, fila 42, docs/TERCEROS-NUEVOS-DESDE-EL-DOCUMENTO.md,
-   sección 4. Un aspirante se pudo dar de alta sin Nº de identificación
-   escolar (carpeta con solo apellidos y nombre); cuando Francisco lo
-   escribe en su ficha, hay que renombrar solas las carpetas de sus
-   asuntos ABIERTOS. Las archivadas no se tocan: su nombre es el rastro
-   del día en que se cerraron.
-
-   Mismo camino que App.editarAsunto: Carpetas.renombrar y mover la
-   ficha de la clave vieja a la nueva en App.E.registro.asuntos. Antes de
-   tocar nada, enseña la lista y espera "Adelante" (U.preguntar). */
-App.renombrarAsuntosAbiertosDelTercero = async function (categoria, textoAntes, textoDespues) {
-  if (!textoAntes || !textoDespues || textoAntes === textoDespues) return;
-
-  var abiertas = await Carpetas.subcarpetas(App.E.abiertos);
-  var afectados = abiertas.filter(function (c) {
-    if (c.nombre.charAt(0) === '_') return false;
-    return c.nombre === textoAntes || c.nombre.slice(-(textoAntes.length + 1)) === ' ' + textoAntes;
-  });
-  if (!afectados.length) return;
-
-  var lista = afectados.map(function (c) { return '<li>' + U.escapar(c.nombre) + '</li>'; }).join('');
-  var ok = await U.preguntar('Cambiar el nombre de las carpetas de sus asuntos abiertos',
-    '<p class="explica">Ya tiene Nº de identificación escolar. Se van a cambiar el nombre de estas ' +
-    afectados.length + ' carpetas de asuntos abiertos suyos. Las archivadas no se tocan.</p>' +
-    '<ul>' + lista + '</ul>', 'Adelante');
-  if (!ok) return;
-
-  var renombrados = 0;
-  for (var i = 0; i < afectados.length; i++) {
-    var nombreViejo = afectados[i].nombre;
-    var nombreNuevo = nombreViejo.slice(0, nombreViejo.length - textoAntes.length) + textoDespues;
-    try {
-      if (await Carpetas.existe(App.E.abiertos, nombreNuevo)) continue;   /* ya está así, no se toca */
-      await Carpetas.renombrar(App.E.abiertos, nombreViejo, nombreNuevo);
-      await AsuntoRenombrar.mover(nombreViejo, nombreNuevo, { tercero: textoDespues });
-      renombrados++;
-    } catch (e) { /* uno que falle no frena a los demás */ }
-  }
-  U.aviso(renombrados + ' carpeta' + (renombrados === 1 ? '' : 's') + ' renombrada' +
-    (renombrados === 1 ? '' : 's') + '.', 'bueno');
-};
+/* Cuando llega el Nº de identificación escolar de un aspirante (fila 42), o cambia
+   cualquier dato que va en el nombre del tercero (fila 266), las carpetas de sus
+   asuntos abiertos cambian de nombre: js/tercero-renombrar.js. */
 
 /* Fila 219, punto 4: dar de alta a alguien nuevo desde el buscador de
    este cuadro no puede abrir un segundo U.preguntar mientras el de
@@ -476,8 +436,11 @@ async function guardarEdicion(a, p, d, nombreNuevo, datos) {
       U.aviso('Ya hay otro asunto abierto que se llama así.', 'malo');
       return;
     }
+    /* Fila 266: la ficha abierta sigue al asunto con su nombre nuevo, sin aviso rojo (js/ficha-huella.js). */
+    (App.E.recienRenombrados = App.E.recienRenombrados || {})[a.nombre] = nombreNuevo;
     await Carpetas.renombrar(App.E.abiertos, a.nombre, nombreNuevo);
   } catch (e) {
+    if (App.E.recienRenombrados) delete App.E.recienRenombrados[a.nombre];
     U.fallo('No se ha podido cambiar', e);
     return;
   }

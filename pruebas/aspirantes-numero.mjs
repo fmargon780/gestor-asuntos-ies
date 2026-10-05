@@ -171,9 +171,10 @@ await comprobar('la carpeta del asunto abierto se renombra con el número',
   nombresAbiertos().then(ns => ns.some(n => n.indexOf('Pendiente De Numero, Nora 1170444') !== -1)), true);
 await comprobar('el asunto viejo ya no está con su nombre de antes',
   nombresAbiertos().then(ns => ns.indexOf(nombreAbierto)), -1);
-await comprobar('la carpeta archivada no se toca', pagina.evaluate(async (nombre) => {
+/* Fila 266: la carpeta del tercero en el archivo cambia de nombre; lo de dentro no se toca. */
+await comprobar('la carpeta archivada no se toca (ahora dentro de la carpeta del tercero con su número)', pagina.evaluate(async (nombre) => {
   const cat = await window.__disco.archivo.getDirectoryHandle('ALUMNADO');
-  const ter = await cat.getDirectoryHandle('Pendiente De Numero, Nora');
+  const ter = await cat.getDirectoryHandle('Pendiente De Numero, Nora 1170444');
   const salida = [];
   for await (const p of ter.entries()) salida.push(p[0]);
   return salida.indexOf(nombre) !== -1;

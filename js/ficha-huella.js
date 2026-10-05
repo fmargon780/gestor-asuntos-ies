@@ -75,6 +75,16 @@
     if (!N.fichaVisible() || N.modoActual !== 'abierto') return Promise.resolve();
     var mismo = App.E.listaAbiertos.filter(function (x) { return x.nombre === N.actual.nombre; })[0];
     if (!mismo) {
+      /* Fila 266: si lo que ha pasado es que su carpeta ha cambiado de nombre
+         (AsuntoRenombrar.mover), la ficha sigue al asunto con su nombre nuevo,
+         sin ningún aviso. */
+      var nombreNuevo = App.E.recienRenombrados && App.E.recienRenombrados[N.actual.nombre];
+      if (nombreNuevo) {
+        var yaEsta = App.E.listaAbiertos.some(function (x) { return x.nombre === nombreNuevo; });
+        if (!yaEsta) return Promise.resolve();   /* la lista aún no lo ve: la próxima pasada lo engancha */
+        delete App.E.recienRenombrados[N.actual.nombre];
+        if (window.Navegacion && window.Navegacion.abrirAbierto(nombreNuevo)) return Promise.resolve();
+      }
       /* Si este mismo ordenador lo acaba de archivar (fila 90,
          docs/ARCHIVAR-SIN-AVISOS-FALSOS.md), el aviso verde de
          App.cerrarAsunto ya lo ha dicho: no hace falta este otro en rojo. */
