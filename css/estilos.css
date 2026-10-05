@@ -592,3 +592,20 @@ body.solo-consulta .exportar-visor, body.solo-consulta .word-visor, body.solo-co
   top: calc(var(--franja-demo-alto, 0px) + var(--franja-consulta-alto));
 }
 body.solo-consulta #lector { height: calc(100vh - var(--franja-demo-alto, 0px) - var(--franja-consulta-alto)); }
+
+/* ---------- «No cabe en el archivo» (fila 265): una caja por documento ---------- */
+.ac-lista { margin-top: 12px; }
+.ac-lista-larga { max-height: 45vh; overflow: auto; padding-right: 6px; }
+.ac-fila {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center; gap: 6px 8px; margin-bottom: 10px;
+}
+.ac-fila .ac-caja { grid-column: 2; width: 100%; }
+.ac-sub { grid-column: 1; color: var(--tinta-suave); font-size: 13px; }
+.ac-fila:not(:has(.ac-sub)) .ac-caja { grid-column: 1 / 3; }
+.ac-ext { color: var(--tinta-suave); }
+.ac-estado { font-weight: 600; white-space: nowrap; min-width: 80px; text-align: right; }
+.ac-sobra { color: var(--rojo-linea); }
+.ac-cabe { color: #15803d; }
+.ac-motivo { grid-column: 1 / -1; color: var(--rojo-linea); font-size: 13px; }
+.ac-motivo:empty { display: none; }

@@ -111,7 +111,9 @@ var RepartirCrear = (function () {
         var destino = await Carpetas.bajar(App.E.archivo, [a.ficha.categoria || 'ALUMNADO', trozo.tercero], false);
         archivado = await Carpetas.existe(destino, nombre);
       } catch (e) { archivado = false; }
-      return archivado ? { ok: true, asunto: nombre } : { ok: false, asunto: nombre, motivo: 'creado, pero no se ha podido archivar' };
+      if (archivado) return { ok: true, asunto: nombre };
+      var noCupo = window.ArchivarCabe && ArchivarCabe.noCupo(nombre);   /* fila 265 */
+      return { ok: false, asunto: nombre, motivo: noCupo ? 'creado, pero algún documento no cabe en el archivo' : 'creado, pero no se ha podido archivar' };
     } catch (e) {
       return { ok: false, asunto: nombre, motivo: U.mensajeDeError(e) };
     }
@@ -142,6 +144,7 @@ var RepartirCrear = (function () {
     datos.numeroDoc = datos.numeroDoc || (await Numeros.reservar('documentos', '')).numero;
     var porHacer = trozos.filter(function (t) { return !t.hecho && (t.quedarse || (t.tercero && !(op.noCrear || {})[t.tercero])); });
     var resultados = [], hechos = 0;
+    if (window.ArchivarCabe) ArchivarCabe.empezarLote();   /* fila 265 */
     for (var i = 0; i < trozos.length; i++) {
       var t = trozos[i];
       var r = { desde: t.desde, hasta: t.hasta, quedarse: !!t.quedarse, tercero: t.tercero || '' };
@@ -183,6 +186,7 @@ var RepartirCrear = (function () {
     } catch (e) {
       U.accesorio('Reparto hecho, pero no he podido apuntarlo en el asunto de origen', e);
     }
+    if (window.ArchivarCabe) ArchivarCabe.avisarLote();   /* fila 265: un solo aviso ámbar */
     try { await App.verAbiertos(); } catch (e2) { /* solo pintar */ }
     return resultados;
   }

@@ -148,6 +148,29 @@ traducirlo.
 Se comprueba con `pruebas/archivar-atascos.mjs`, en navegador de verdad (reutiliza el disco de
 mentira de `pruebas/navegador.mjs`), con los seis escenarios del documento.
 
+### Archivar mide antes la ruta y dice dónde falla (fila 265, 5-oct-2026)
+
+`App.cerrarAsunto` (`js/asuntos-archivar.js`), justo antes de preguntar «Archivar el asunto», llama a
+`ArchivarCabe.medir` (`js/archivar-cabe.js`): la ruta que tendrá cada documento en
+`<Dropbox>/<ARCHIVO>/<categoría>/<tercero>/<asunto>/…` (`Nombres.largoEnArchivo`, tope 259; +7 por fichero, el
+temporal `.crswap` de Chrome; los que `Carpetas.noSeCopia` no copia, fuera). Sin ruta de ARCHIVO conocida, o si la
+carpeta ya no está en Asuntos abiertos (siguen los avisos de siempre), no mide. Todo cabe: el cuadro de siempre.
+Algo no cabe: no se mueve nada y sale **«No cabe en el archivo»** (ancho) con solo esos documentos, cada uno con su
+caja (nombre sin extensión), «Sobran N»/«Cabe» y su motivo si no vale (vacío, caracteres de Windows, repetido en la
+carpeta, o pierde el número `D26-…`); «Acortar y archivar» se enciende cuando todos caben y valen. Cambia los
+nombres de uno en uno con `DocumentoRenombrar.renombrar` (`js/documento-renombrar.js`: fichero + `pendientesRegistro`
++ en `hitos.json` `documentos`, `requisitos[].documento` y `guionHecho[].documento`; los de una subcarpeta, solo
+el fichero), vuelve a medir y archiva sin preguntar otra vez. Si ni un documento de 30 caracteres cabe, el cuadro
+no tiene cajas y lleva a «Cambiar el asunto» (`App.editarAsunto`). En lote (`App.E.archivarSinPreguntar`: reparto
+de un PDF y «Por liquidar») el asunto que no cabe se queda y `ArchivarCabe.avisarLote` da un solo aviso ámbar.
+
+Si archivar o reabrir falla, el aviso rojo dice el paso y el fichero: `js/carpetas.js` cuelga del error `paso`,
+`fichero` y `destino` (`Carpetas.marcar`) sin cambiarle el `name`, y `mensajeDeFallo` monta la frase
+(«…ha fallado al copiar «X.pdf». …»). `NotFoundError` al crear o escribir en el destino dice «Windows no deja crearlo
+ahí…». «No se ha movido nada» solo si es verdad; si la limpieza falla (`limpiezaFallida`) o fue una fusión
+(`copiaAMedias`): «Puede haber quedado una copia a medias… al repetir, se juntan.» Pruebas:
+`pruebas/archivar-no-cabe.mjs`. La causa del aviso original (`NotFoundError` sin más) sigue sin confirmarse.
+
 ### Archivar desde la ficha, sin avisos de más (fila 90, 21-sep-2026)
 
 `docs/ARCHIVAR-SIN-AVISOS-FALSOS.md`. Al archivar un asunto desde su propia ficha (no desde la

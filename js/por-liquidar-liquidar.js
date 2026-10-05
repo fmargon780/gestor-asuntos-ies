@@ -198,6 +198,7 @@ window.PorLiquidarLiquidar = (function () {
     var bytes = await pdfDe(datos);
     try { await asegurarTipoDeDocumento(); } catch (e) { U.accesorio('No he podido dar de alta el tipo de documento LIQUIDACION', e); }
     var hechos = [], fallidos = 0;
+    if (window.ArchivarCabe) ArchivarCabe.empezarLote();   /* fila 265 */
     for (var i = 0; i < asuntos.length; i++) {
       var a = asuntos[i];
       var antes = a.ficha && a.ficha.porLiquidar;
@@ -227,6 +228,7 @@ window.PorLiquidarLiquidar = (function () {
         try { await App.anotar(a.nombre, { porLiquidar: antes || { desde: U.hoyIso(), auto: false } }); } catch (e2) { /* se ve al repintar */ }
       }
     }
+    if (window.ArchivarCabe) ArchivarCabe.avisarLote();   /* fila 265: un solo aviso ámbar */
     PorLiquidar.desmarcar(hechos.map(function (a) { return a.nombre; }));
     if (hechos.length) {
       var s = PorLiquidar.sumar(hechos);
