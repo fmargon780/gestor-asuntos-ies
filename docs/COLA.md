@@ -171,6 +171,7 @@ Las filas 1 a 142 y de la 144 a la 146 están **HECHAS**. **Desde el 27-sep-2026
 | 263 | `docs/RUTA-LARGA-AVISA-Y-NO-BLOQUEA.md` (aviso de usuario: «Nuevo asunto» no dejaba crear un asunto corriente por el largo de la ruta; la cuenta pasa a usar dónde está Dropbox de verdad en cada ordenador y el tope de 259; el largo de la ruta ya nunca impide crear ni cambiar un asunto: si se pasa, línea ámbar bajo el nombre; los documentos no se tocan) | HECHA (5-oct-2026 09:34) · versión 05-oct-2026 · 09:04 · conversación: https://claude.ai/code/session_01NTMjTAEuC47qU5D275QFwh · aviso completo: https://drive.google.com/file/d/1F9hyjEhB_dl1-F8n1iry063PGbkZXlpz/view?usp=drivesdk |
 | 264 | Aviso de usuario: error en «Nuevo asunto» | DESCARTADA (5-oct-2026): repetida, es el mismo aviso de la fila 263 enviado dos veces |
 | 265 | Aviso de usuario: error en «Inicio» («No se ha podido archivar») | EN DISEÑO (5-oct-2026) · conversación: https://claude.ai/code/session_01VLxnnN27Vzegu94s8P7fw8 · enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1Q6FCWrUL5acNw2qtQaNFHkpJbBiJAJ8c/view?usp=drivesdk |
+| 266 | Aviso de usuario: error en «Ficha de un asunto» | IDEA (5-oct-2026): enviada por un usuario desde el botón de soporte · aviso completo: https://drive.google.com/file/d/1EPbtfXTFiuJ50X4h_nynzXi1YKu94O5d/view?usp=drivesdk |
 
 ## Lo que queda por hablar con Francisco (resumen; detalle completo en `docs/HISTORIA.md`)
 
