@@ -17,7 +17,7 @@
       sigue usando.
    7. Nombres cortos de más de 25: «por configurar» en la comprobación,
       lista única para acortarlos, y se sigue pudiendo crear con ellos.
-   8. Largo de las rutas: el margen, y rojo cuando no cabe.
+   8. Largo de las rutas: el margen, y rojo cuando no cabe (en Ajustes; en los asuntos solo ámbar, fila 263).
    9. Un asunto de antes se edita sin recibir número ni cambiar de nombre. */
 import { chromium } from 'playwright';
 import fs from 'fs';
@@ -377,7 +377,7 @@ await comprobar('el veredicto: verde, ámbar por debajo de 20, rojo si no cabe',
   LargoDeRutas.veredicto({ conocido: true, margen: 19, masOcupa: { texto: 'x' } }).clase,
   LargoDeRutas.veredicto({ conocido: true, margen: -3, masOcupa: { texto: 'el tercero más largo' } }).frase
 ]), ['verde', 'ambar', 'La ruta más larga no cabe: se pasa 3 caracteres. Lo que más ocupa es el tercero más largo.']);
-await comprobar('con un tercero larguísimo, la vista previa de Nuevo asunto avisa en rojo y no deja crear', pagina.evaluate(() => {
+await comprobar('con un tercero larguísimo, la cuenta sigue diciendo que no cabe (la pantalla solo avisa en ámbar: fila 263)', pagina.evaluate(() => {
   const r = Nombres.montarAsunto({ fecha: '2026-09-07', tipo: 'MATRICULA', tercero: 'X'.repeat(150), numero: 'A26-0001', categoria: 'ALUMNADO' });
   return [r.noCabe, r.margen < 0];
 }), [true, true]);

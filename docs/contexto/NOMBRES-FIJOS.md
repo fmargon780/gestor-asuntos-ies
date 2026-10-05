@@ -59,14 +59,17 @@ contador por tipo, que guarda al salir de cada casilla. Acortar no renombra nada
 ## Largo de las rutas (`js/nombres-topes.js`, `js/largo-de-rutas.js`)
 
 `Nombres.topes()` queda solo para nombres de antes. `Nombres.cabeEnRuta(nombre, tercero, categoria)`
-cuenta `<Dropbox>/<ARCHIVO>/<CATEGORÍA>/<tercero>/<asunto>/_Previas/<peor documento>` contra 240; si no
-cabe, `montarAsunto` devuelve `noCabe` (aviso rojo al elegir tercero o tipo, y no deja crear). Sin
+cuenta `<Dropbox>/<ARCHIVO>/<CATEGORÍA>/<tercero>/<asunto>/_Previas/<peor documento>` contra **259**, con
+Dropbox donde está de verdad en este ordenador (`RutaCarpetas.dropboxDeEsteOrdenador`, su largo + 1; 45 solo si no
+se sabe nada). Si no cabe, `montarAsunto` devuelve `noCabe`, y en «Nuevo asunto» y «Cambiar el asunto» sale una
+línea **ámbar** (`Nombres.avisoRecorte(el, recortado, noCabe, 'nuevo'|'cambio')`) que nunca impide crear ni guardar
+(fila 263); los documentos siguen con su aviso rojo. Los avisos de la vista previa viven en `js/nombres-topes.js`. Sin
 `rutas.json` señalado no hay con qué calcular y se da por bueno. `Nombres.medidor()` calcula el peor caso
 de todo el centro (categoría, tercero y tipos más largos) y lo enseña Ajustes → El centro → «Largo de las
 rutas» (verde; ámbar por debajo de 20; rojo si no cabe, y entonces entra en la comprobación al entrar
 con lo que más ocupa).
 
-Pruebas: `pruebas/nombres-fijos-con-numero.mjs`.
+Pruebas: `pruebas/nombres-fijos-con-numero.mjs`, `pruebas/ruta-larga-avisa.mjs`.
 
 ## Nombres de pila largos (fila 247)
 

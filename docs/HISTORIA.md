@@ -4362,3 +4362,14 @@ En casa, Francisco trabaja sobre una COPIA de las carpetas del centro (en Drive)
 | 213 | `docs/BOTON-DE-SOPORTE.md` (botón «Soporte» en una esquina: error o mejora, texto y captura opcional; buzón en un script de Google que guarda el aviso en Drive y apunta una IDEA sin datos en la cola; más `docs/PONER-EN-MARCHA-SOPORTE.md` para Francisco) | HECHA (30-sep-2026 04:33) · conversación: https://claude.ai/code/session_019Nv6KhPdNkfsWuifmtR7j6. Revisor: APROBADA (6 puntos, 3 solo Francisco; contra servidor local con el código exacto de `pruebas`, `?demo=1&auto=1`, porque desde la sesión no se llega a `pruebas.fmargon.com` ni la *preview* deja entrar). `npm test` completo: 188 de 192; `tras-cada-accion` (conocida), `ha-llegado-sustituye-la-vista` y `mesa-comunicar-del-paso-y-guion` pasan en solitario, y `hitos-no-huerfanos-al-archivar` dependía de que el aviso ámbar del punto 1 ya se hubiera ido (4,5 s): la prueba ahora lo quita antes del punto 2. Falta la puesta en marcha de Francisco: `docs/PONER-EN-MARCHA-SOPORTE.md`. Detalle en `docs/HISTORIA.md` |
 | 242 | `docs/REVISOR-EN-LOCAL.md` (el revisor prueba siempre en local; cada fila trabaja en su rama `fila-<nº>`, nada espera a Vercel antes del revisor; HECHA solo con el commit en `main` y publicado; rescate de las filas 235, 229 y 231) | HECHA (30-sep-2026 22:38) · conversación: https://claude.ai/code/session_01LiVig4TNYmadfjYvyM5nGb. Solo documentación, directa a `main` (00f2671); no publica nada. Las filas 235, 229 y 231 quedan PENDIENTE con su SHA de rescate (los cuatro SHA responden en GitHub; `pruebas` sigue en `341a22b`). Detalle en `docs/HISTORIA.md` |
 | 237 | Aviso de usuario: error en «Ficha de un asunto» | DESCARTADA (30-sep-2026): descartada por Francisco desde el Centro de mando |
+
+## 5-oct-2026 · fila 263 · La ruta larga avisa, pero no impide crear
+
+Un compañero no pudo crear un asunto corriente: el nombre de carpeta (67 caracteres) daba «no cabe en la
+ruta de Dropbox» y el botón se apagaba. La cuenta (`Nombres.cabeEnRuta`) era demasiado prudente: raíz de
+Dropbox con mínimo de 45 aunque se supiera la real, y tope de 240 en vez de 259. Ahora la raíz es la real
+(`RutaCarpetas.dropboxDeEsteOrdenador`, largo + 1; 45 solo si no se sabe nada) y el tope es 259. En «Nuevo
+asunto» y «Cambiar el asunto» el largo de la ruta ya nunca apaga el botón ni para el guardado: sale una línea
+ámbar con el texto de la fila. Los documentos conservan su aviso rojo. Los avisos de la vista previa se
+movieron de `js/nombres.js` a `js/nombres-topes.js` (nombres.js baja a 609 líneas; sigue por encima de 600,
+pendiente). Prueba nueva: `pruebas/ruta-larga-avisa.mjs`. La fila 264 era el mismo aviso repetido.

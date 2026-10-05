@@ -576,32 +576,6 @@ var Nombres = (function () {
     return { nombre: r.nombre + (ext ? '.' + ext : ''), recortado: r.recortado, noCabe: r.noCabe };
   }
 
-  /* La línea ámbar de la vista previa, si ha habido recorte. */
-  var AVISO_RECORTE = 'Nombre demasiado largo: se ha acortado el texto libre.';
-  /* Fila 177 (docs/ARCHIVO-POR-CURSO-Y-RUTAS.md, punto 2): ni recortando
-     el texto libre cabe en la ruta de Dropbox. En rojo, y no se crea. */
-  var AVISO_NO_CABE = 'El nombre no cabe en la ruta de Dropbox: el tercero o el tipo son demasiado largos. ' +
-    'Mira Ajustes → El centro → Largo de las rutas, o ponle al tipo un nombre corto más breve.';
-
-  /* Pone (o quita) esa línea justo debajo de `el`, el nombre de la
-     vista previa: ámbar si solo se ha recortado, roja si ni así cabe
-     (`noCabe`, fila 177). */
-  function avisoRecorte(el, recortado, noCabe) {
-    if (!el || !el.parentNode || typeof document === 'undefined') return;
-    var sig = el.nextElementSibling;
-    var ya = sig && sig.classList && sig.classList.contains('vista-recorte') ? sig : null;
-    if (!recortado && !noCabe) { if (ya) ya.parentNode.removeChild(ya); return; }
-    if (ya) {
-      ya.textContent = noCabe ? AVISO_NO_CABE : AVISO_RECORTE;
-      ya.className = 'vista-recorte aviso-en-vivo ' + (noCabe ? 'aviso-rojo' : 'aviso-ambar');
-      return;
-    }
-    var p = document.createElement('div');
-    p.className = 'vista-recorte aviso-en-vivo ' + (noCabe ? 'aviso-rojo' : 'aviso-ambar');
-    p.textContent = noCabe ? AVISO_NO_CABE : AVISO_RECORTE;
-    el.parentNode.insertBefore(p, el.nextSibling);
-  }
-
   function extensionDe(nombre) {
     var m = String(nombre || '').match(/\.([A-Za-z0-9]{1,8})$/);
     return m ? m[1].toLowerCase() : '';
@@ -625,7 +599,7 @@ var Nombres = (function () {
     TIPOS_DOCUMENTO_POR_DEFECTO: TIPOS_DOCUMENTO_POR_DEFECTO,
     codigoRegistro: codigoRegistro, montarDocumento: montarDocumento,
     montarAsunto: montarAsunto, montarDocumentoAjustado: montarDocumentoAjustado,
-    TOPE_ASUNTO: TOPE_ASUNTO, TOPE_DOCUMENTO: TOPE_DOCUMENTO, AVISO_RECORTE: AVISO_RECORTE, AVISO_NO_CABE: AVISO_NO_CABE, avisoRecorte: avisoRecorte,
+    TOPE_ASUNTO: TOPE_ASUNTO, TOPE_DOCUMENTO: TOPE_DOCUMENTO,
     extensionDe: extensionDe, cortoDeTipoDocumento: cortoDeTipoDocumento,
     acortarNombrePila: acortarNombrePila, claveDeTercero: claveDeTercero, carpetaDeTercero: carpetaDeTercero,
     terceroAlumno: terceroAlumno, terceroDeResto: terceroDeResto,
