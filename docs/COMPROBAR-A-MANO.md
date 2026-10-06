@@ -201,3 +201,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 272 — datos del tercero junto al nombre del asunto (6-oct-2026)
 
 - Con los datos reales del centro: abrir el asunto de un alumno y ver su unidad de verdad junto al nombre; con «Elegir datos» cambiar los 3 datos de alumnado en un ordenador y comprobar que el compañero, en el otro, los ve igual al recargar. Tampoco se pudo comprobar en la demostración el modo «solo consultar» (el botón se apaga solo, como los demás de la ficha; lo cubre la prueba `datos-favoritos`).
+
+## Fila 277 — tipos de asunto que son el mismo (6-oct-2026)
+
+- En el centro, con los datos reales: al entrar tras publicarse esta fila, o sale la línea verde «ANULACIÓN» era el nombre antiguo de «ANULACIÓN DE MATRÍCULA». Los he unido., o sale en Inicio el aviso de tipos parecidos con esa pareja. Después de unirlos, al elegir tipo solo queda ANULACIÓN DE MATRÍCULA.

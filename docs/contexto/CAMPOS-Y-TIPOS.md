@@ -156,7 +156,16 @@ tipo». La línea de la lista de comprobación «Falta la plantilla del aviso al
    Los asuntos abiertos del tipo que desaparece pasan al que se queda con su carpeta renombrada
    (mismo camino que "Cambiar" un asunto), marcados `tipoUnidoDe` en su ficha para que
    `js/hitos-sincronizar.js` no les lleve los pasos nuevos de la guía del tipo que se queda. El
-   ARCHIVO no se toca. Debajo, el **nombre corto** (20-sep-2026, fila 79, apartado 4.9,
+   ARCHIVO no se toca. **La app se da cuenta sola de los tipos repetidos** (fila 277,
+   `docs/TIPOS-QUE-SON-EL-MISMO.md`, `js/tipos-parecidos.js` y `js/tipos-parecidos-cuadro.js`): al entrar y cuando cambia
+   la lista de tipos (firma de nombres y alias, en segundo plano, nunca con un guardado en marcha ni en solo consulta),
+   un tipo A que es el nombre antiguo de un solo B (`B.alias`) y no tiene nada propio (guía de verdad, campos,
+   plantillas, recurrentes, impresos, palabras clave, ni «reservado»/«liquidar» que B no lleve) se une solo con
+   `TiposUnir.unir(A, B)`, con aviso verde. Lo demás —nombre antiguo con algo propio, y los que `seParecen` (mismas
+   palabras, principio con una palabra de 4 letras, una letra de diferencia, nombre corto)— sale en el trozo
+   `tipos-parecidos` del aviso de Inicio y en su cuadro, con «Unir» («¿Con cuál te quedas?» en la misma fila) y
+   «No son el mismo» (`_GESTOR/tipos-distintos.json`, y quita el alias si era el nombre antiguo). Lo común de después
+   de unir (`despuesDeUnir`, `avisarUnidos`, `textoResumen`) vive en `js/tipos-unir.js`. Debajo, el **nombre corto** (20-sep-2026, fila 79, apartado 4.9,
    `Nombres.tipoParaCarpeta`): lo que entra en el nombre de la carpeta de los asuntos nuevos en
    vez del nombre de arriba; vacío, se comporta como hoy. Aviso ámbar si pasa de 16 caracteres,
    rojo si otro tipo ya lo usa (`U.parecidos`). Cambiarlo no toca ninguna carpeta ya creada.

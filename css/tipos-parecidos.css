@@ -1,0 +1,6 @@
+/* Fila 277: el cuadro «Tipos de asunto parecidos». */
+.tp-lista { display: flex; flex-direction: column; gap: 10px; max-height: 60vh; overflow-y: auto; }
+.tp-fila { border: 1px solid var(--linea); border-radius: 8px; padding: 10px 12px; }
+.tp-nombres { line-height: 1.6; }
+.tp-botones { display: flex; gap: 8px; margin-top: 8px; }
+.tp-opcion { display: block; margin: 4px 0; cursor: pointer; }

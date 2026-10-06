@@ -56,7 +56,7 @@
      fichero de alumnado, fichas sin carpeta, aspirantes. */
   var ORDEN = ['vencidos', 'proximos', 'recurrentes', 'duplicados',
     'papelera-vieja', 'frescura', 'huerfanas', 'aspirantes',
-    'registro-sin-asunto', 'registro-atrasado'];   /* fila 259 */
+    'registro-sin-asunto', 'registro-atrasado', 'tipos-parecidos'];   /* filas 259 y 277 */
 
   var piezas = {};   /* id -> { texto, urgente, alPulsar } */
 
