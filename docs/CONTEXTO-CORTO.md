@@ -138,7 +138,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   completa dentro de Dropbox se cuenta con `Nombres.cabeEnRuta` (tope 259, Dropbox real) y se enseña en Ajustes → El centro; en asuntos solo avisa en ámbar, nunca impide crear ni guardar (filas 239 y 263). Al archivar se mide antes la ruta de cada documento en el ARCHIVO: si alguno no cabe, «No cabe en el archivo» deja acortar su nombre ahí mismo; si archivar falla, el aviso dice el paso y el fichero (fila 265).
 - Botón «Ruta» (copia la ruta normal, con `\` o `/` según la base, nunca `file:///`; ficha, Correo/Séneca): deduce Dropbox; lo de dentro, una vez para el centro. Ficha del tercero: "Datos y contacto" en una línea; «Ver todo» del alumno en
   tarjetas (alumno y tutores). Ficha del asunto (foto, cabecera fija) en tarjetas (una se abre en grande; se vuelve
-  pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas.
+  pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas, con hasta 3 datos del tercero junto al nombre («Elegir datos», por clase, fila 272).
 - Registrar detecta el PDF sellado, y también deja el original en «Versiones previas» como "SIN
   SELLAR" al registrar a mano un fichero distinto (igual que el Word con su PDF); las versiones
   previas quedan plegadas; cada documento, asociable a un hito.

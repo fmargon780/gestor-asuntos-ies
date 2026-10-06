@@ -1,0 +1,17 @@
+/* Fila 272 (docs/DATOS-FAVORITOS-EN-LA-FICHA.md): los datos del tercero
+   junto al nombre del asunto y el botón «Elegir datos». El bloque se
+   pinta vacío con la cabecera y solo se rellena después: no cambia el
+   alto de la línea. */
+.ficha-favoritos { display: flex; align-items: center; gap: 8px; flex: 0 1 auto; min-width: 0; max-width: 100%; }
+.fav-datos { display: flex; align-items: center; gap: 0; min-width: 0; overflow: hidden; white-space: nowrap; font-size: 12px; color: var(--tinta-suave); }
+.fav-dato { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fav-nombre { color: var(--tinta-suave); }
+.fav-valor { color: var(--tinta); }
+.fav-sep { color: var(--tinta-suave); white-space: pre; }
+.fav-elegir { flex: 0 0 auto; padding: 2px 8px; font-size: 12px; }
+.ficha-cabecera.encogida .fav-elegir { display: none; }
+.ficha-cabecera.encogida .fav-datos { text-overflow: ellipsis; }
+.fav-lista { max-height: 50vh; overflow-y: auto; margin-top: 8px; }
+.fav-fila { display: flex; align-items: baseline; gap: 6px; padding: 3px 0; cursor: pointer; }
+.fav-fila-valor { color: var(--tinta-suave); font-size: 12px; }
+#fav-buscar { width: 100%; margin-top: 8px; box-sizing: border-box; }
