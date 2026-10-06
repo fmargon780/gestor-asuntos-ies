@@ -64,7 +64,7 @@ const entradaWord = await menuDe('CERTIFICADO D26');
 await comprobar('1. en el Word hay «Convertir en plantilla» y está encendida', entradaWord.isDisabled(), false);
 await pagina.keyboard.press('Escape');
 const entradaPdf = await menuDe('Fuente Lucena');
-await comprobar('1. en un PDF sin su Word está apagada, con el motivo', [await entradaPdf.isDisabled(), await entradaPdf.getAttribute('title')], [true, 'No encuentro el Word de este PDF.']);
+await comprobar('1. en un PDF sin su Word, desde la fila 281, la entrada está encendida (copia el texto)', [await entradaPdf.isDisabled(), await entradaPdf.getAttribute('title')], [false, null]);
 await pagina.keyboard.press('Escape');
 
 console.log('--- 2. la pantalla y lo que propone ---');
@@ -254,9 +254,11 @@ const entradaDoc = await menuDe('notas antiguas.doc');
 await comprobar('10. un .doc viejo: apagada, con su motivo', [await entradaDoc.isDisabled(), await entradaDoc.getAttribute('title')], [true, 'Solo con Word moderno (.docx) o PDF. Ábrelo en Word y guárdalo como .docx.']);
 await pagina.keyboard.press('Escape');
 await abrirFicha('Aguilar Ponce, Pablo');
-const entradaPablo = await menuDe('.pdf');
-await comprobar('10. un PDF sin Word (otro asunto): apagada, con su motivo', [await entradaPablo.isDisabled(), await entradaPablo.getAttribute('title')], [true, 'No encuentro el Word de este PDF.']);
-await pagina.keyboard.press('Escape');
+const entradaPablo = await menuDe('SOLICITUD');
+await comprobar('10. un PDF sin Word (fila 281): la entrada está encendida; si es una imagen, avisa y no abre nada', [await entradaPablo.isDisabled()], [false]);
+await entradaPablo.click();
+await pagina.waitForTimeout(2500);
+await comprobar('10. aviso ámbar de «imagen escaneada» y ninguna pantalla', [(await avisos()).some((a) => /^Este PDF es una imagen escaneada: no tiene texto que leer\. No se puede convertir en plantilla\.\|ambar$/.test(a)), await pagina.locator('#convertir-plantilla').count()], [true, 0]);
 
 console.log('--- 11. salir sin guardar ---');
 await abrirFicha('Espejo');

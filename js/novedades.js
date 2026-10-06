@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '281', fecha: '2026-10-06', texto: '«Convertir en plantilla» vale también con un PDF que no tiene su Word: la app copia el texto y monta la plantilla con el membrete. Las tablas no se copian.' },
   { id: '280', fecha: '2026-10-06', texto: 'En el menú ⋮ de un documento Word hay una opción nueva, «Convertir en plantilla»: la app cambia sola los datos del asunto por su hueco, pone el membrete y te enseña el resultado junto al original antes de guardar.' },
   { id: '279', fecha: '2026-10-06', texto: 'Al crear un tipo de asunto o cambiarle el nombre, la app avisa si ya hay uno parecido o si ese era el nombre antiguo de otro, y deja usar el que hay o unirlos ahí mismo.' },
   { id: '278', fecha: '2026-10-06', texto: 'El informe en PDF de «Exportar» se puede agrupar por una o dos columnas: cada bloque lleva su título, su número de asuntos y la suma de sus importes.' },

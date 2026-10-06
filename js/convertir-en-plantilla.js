@@ -19,7 +19,8 @@
 var ConvertirEnPlantilla = (function () {
 
   var TEXTO = 'Convertir en plantilla';
-  var MOTIVO_PDF = 'No encuentro el Word de este PDF.';
+  var AVISO_ESCANEADO = 'Este PDF es una imagen escaneada: no tiene texto que leer. No se puede convertir en plantilla.';
+  var AVISO_IMPRESO = 'Este PDF es un impreso con casillas. Los impresos van en «Impresos», no en plantillas.';
   var MOTIVO_VIEJO = 'Solo con Word moderno (.docx) o PDF. Ábrelo en Word y guárdalo como .docx.';
   var cache = {};   /* asunto.nombre -> { carpeta: [{ nombre, handle }], previas: [...] } */
   var estado = null;
@@ -57,13 +58,13 @@ var ConvertirEnPlantilla = (function () {
     return mejor;
   }
 
-  /* { visible, apagada, motivo } de un documento, con el listado ya leído. `gemelo`: lo encontrado para un PDF. */
-  function estadoDe(a, nombre, gemelo) {
+  /* { visible, apagada, motivo } de un documento. */
+  function estadoDe(a, nombre) {
     var e = extension(nombre);
     if (!esAbierto(a) || (window.IndiceExpediente && IndiceExpediente.es(nombre))) return { visible: false, apagada: true, motivo: '' };
     var base;
     if (e === 'docx') base = { visible: true, apagada: false, motivo: '' };
-    else if (e === 'pdf') base = { visible: true, apagada: !gemelo, motivo: gemelo ? '' : MOTIVO_PDF };
+    else if (e === 'pdf') base = { visible: true, apagada: false, motivo: '' };   /* fila 281: sin Word, se copia el texto del PDF */
     else if (e === 'doc' || e === 'odt' || e === 'rtf') base = { visible: true, apagada: true, motivo: MOTIVO_VIEJO };
     else return { visible: false, apagada: true, motivo: '' };
     if (soloConsulta()) { base.apagada = true; base.motivo = base.motivo || 'Estás en «solo consultar».'; }
@@ -75,23 +76,12 @@ var ConvertirEnPlantilla = (function () {
     var salida = {};
     if (!esAbierto(a)) return salida;
     var lis = await listado(a);
-    for (var i = 0; i < lis.carpeta.length; i++) {
-      var n = lis.carpeta[i].nombre;
-      var g = extension(n) === 'pdf' ? await gemeloDe(n, lis) : null;
-      salida[n] = estadoDe(a, n, g);
-    }
+    for (var i = 0; i < lis.carpeta.length; i++) salida[lis.carpeta[i].nombre] = estadoDe(a, lis.carpeta[i].nombre);
     return salida;
   }
 
-  /* El mismo estado, pero sin esperar (la mesa de un hito): con lo último que se leyó de ese asunto. */
-  function estadoRapido(a, nombre) {
-    var lis = cache[a.nombre];
-    if (!lis) { listado(a).catch(function () { /* la próxima vez */ }); return estadoDe(a, nombre, true); }
-    if (extension(nombre) !== 'pdf') return estadoDe(a, nombre, true);
-    var clave = VersionesPrevias.claveGemelo(nombre);
-    var hay = lis.carpeta.concat(lis.previas).some(function (f) { return extension(f.nombre) === 'docx' && VersionesPrevias.claveGemelo(f.nombre) === clave; });
-    return estadoDe(a, nombre, hay);
-  }
+  /* El mismo estado, sin esperar (la mesa de un hito). */
+  function estadoRapido(a, nombre) { return estadoDe(a, nombre); }
 
   function botonDeMenu(a, f, est, hito) {
     var b = document.createElement('button');
@@ -130,18 +120,39 @@ var ConvertirEnPlantilla = (function () {
     return mejor;
   }
 
+  /* Un error que se cuenta con un aviso ámbar y no abre nada; o una salida sin ruido (`cancelado`). */
+  function avisoAmbar(texto) { var e = new Error(texto); e.ambar = texto; return e; }
+
   async function leerOriginal(a, nombre) {
     var lis = await listado(a);
     var f = lis.carpeta.concat(lis.previas).filter(function (x) { return x.nombre === nombre; })[0];
     if (!f) throw new Error('No encuentro el documento «' + nombre + '» en la carpeta.');
-    var origen = f, usaGemelo = false;
     if (extension(nombre) === 'pdf') {
-      origen = await gemeloDe(nombre, lis);
-      if (!origen) throw new Error(MOTIVO_PDF);
-      usaGemelo = true;
+      var gemelo = await gemeloDe(nombre, lis);
+      if (!gemelo) return leerPdfSinWord(f);
+      var delWord = await gemelo.handle.getFile();
+      return { buffer: new Uint8Array(await delWord.arrayBuffer()), usaGemelo: true, modificado: delWord.lastModified, nombreWord: gemelo.nombre };
     }
-    var fichero = await origen.handle.getFile();
-    return { buffer: new Uint8Array(await fichero.arrayBuffer()), usaGemelo: usaGemelo, modificado: fichero.lastModified, nombreWord: origen.nombre };
+    var fichero = await f.handle.getFile();
+    return { buffer: new Uint8Array(await fichero.arrayBuffer()), usaGemelo: false, modificado: fichero.lastModified, nombreWord: f.nombre };
+  }
+
+  /* Fila 281: un PDF sin su Word. Se mira, por este orden, si es una imagen, un impreso o tiene una tabla; si vale,
+     el texto pasa a párrafos y de ahí a un Word nuevo, que es «el original» de todo lo demás. */
+  async function leerPdfSinWord(f) {
+    var fichero = await f.handle.getFile();
+    var pdf = await fichero.arrayBuffer();
+    var paginas = await PdfAParrafos.leer(pdf);
+    if (PdfAParrafos.sinTexto(paginas)) throw avisoAmbar(AVISO_ESCANEADO);
+    if (await PdfAParrafos.tieneCasillas(pdf)) throw avisoAmbar(AVISO_IMPRESO);
+    if (PdfAParrafos.tieneTabla(paginas)) {
+      var sigue = await U.preguntar('Esto parece una tabla',
+        '<p>Parece que este documento tiene una tabla. La tabla no se puede copiar: saldrá como renglones de texto.</p>', 'Seguir');
+      if (!sigue) { var c = new Error('cancelado'); c.cancelado = true; throw c; }
+    }
+    var parrafos = PdfAParrafos.parrafos(paginas);
+    return { buffer: DocxCrear.crear(parrafos), usaGemelo: false, desdePdf: true, pdfBuffer: pdf, parrafosPdf: parrafos,
+             modificado: fichero.lastModified, nombreWord: null };
   }
 
   async function hitoDelDocumento(a, nombre) {
@@ -191,7 +202,8 @@ var ConvertirEnPlantilla = (function () {
     var cargos = await cargosEnFecha(iso);
     var prop = ConvertirEnPlantillaPropuestas.proponer({
       cuerpo: cuerpo, pies: leidos.pies, valores: valores, cargos: cargos, tieneMembrete: tieneMembrete,
-      centro: { nombre: valores.centro, codigo: valores.codigoCentro }
+      centro: { nombre: valores.centro, codigo: valores.codigoCentro },
+      desdePdf: !!orig.desdePdf, repetidos: orig.desdePdf ? orig.parrafosPdf.map(function (p) { return !!p.repetido; }) : null
     });
     var tipo = PlantillasDocumento.tipoDelAsunto(a), categoria = PlantillasDocumento.categoriaDelAsunto(a);
     var tipoDoc = tipoDeDocumentoDe(nombre);
@@ -418,7 +430,8 @@ var ConvertirEnPlantilla = (function () {
       var st = await preparar(op);
       await ConvertirEnPlantillaPantalla.abrir(api(), st);
     } catch (e) {
-      if (String(e && e.message) === MOTIVO_PDF) U.aviso(MOTIVO_PDF, 'ambar');
+      if (e && e.cancelado) return;
+      if (e && e.ambar) U.aviso(e.ambar, 'ambar');
       else U.fallo('No he podido abrir «Convertir en plantilla»', e);
     }
   }
@@ -432,7 +445,7 @@ var ConvertirEnPlantilla = (function () {
   }
 
   return {
-    TEXTO: TEXTO, MOTIVO_PDF: MOTIVO_PDF, MOTIVO_VIEJO: MOTIVO_VIEJO,
+    TEXTO: TEXTO, AVISO_ESCANEADO: AVISO_ESCANEADO, AVISO_IMPRESO: AVISO_IMPRESO, MOTIVO_VIEJO: MOTIVO_VIEJO,
     estados: estados, estadoRapido: estadoRapido, botonDeMenu: botonDeMenu, opcionDeMesa: opcionDeMesa, abrir: abrir,
     /* para las pruebas */
     _fechaDe: fechaDe, _gemeloDe: gemeloDe, _estado: function () { return estado; }, _api: api

@@ -165,6 +165,33 @@ var ConvertirEnPlantillaPantalla = (function () {
     return null;
   }
 
+  /* La línea fija de arriba: de qué se parte, si no es un .docx tal cual. */
+  function avisoDeOrigen() {
+    if (st.orig.desdePdf) return '<div class="cep-aviso-gemelo">Este PDF no tiene su Word: he copiado solo el texto. Las tablas y los recuadros no se copian.</div>';
+    return st.orig.usaGemelo ? '<div class="cep-aviso-gemelo">He encontrado el Word de este PDF y uso ese.</div>' : '';
+  }
+
+  /* El PDF de verdad, página a página (pdf.js), para compararlo con la plantilla. */
+  async function pintarPdf(hoja, buffer) {
+    var caja = hoja.querySelector('.cep-hoja-interior');
+    if (!caja) { caja = document.createElement('div'); caja.className = 'cep-hoja-interior'; hoja.appendChild(caja); }
+    caja.innerHTML = '';
+    try {
+      var pdfjsLib = await App.cargarPdfJs();
+      var doc = await pdfjsLib.getDocument({ data: new Uint8Array(buffer.slice(0)) }).promise;
+      for (var n = 1; n <= doc.numPages; n++) {
+        var pagina = await doc.getPage(n), vista = pagina.getViewport({ scale: 1.1 });
+        var lienzo = document.createElement('canvas');
+        lienzo.className = 'cep-pdf-pagina';
+        lienzo.width = vista.width; lienzo.height = vista.height;
+        caja.appendChild(lienzo);
+        await pagina.render({ canvasContext: lienzo.getContext('2d'), viewport: vista }).promise;
+      }
+    } catch (e) {
+      caja.innerHTML = '<p class="explica">No he podido enseñar este PDF: ' + esc(U.mensajeDeError(e)) + '</p>';
+    }
+  }
+
   /* ---------- paso 1: revisar ---------- */
 
   function textoVeces(n) { return n + (n === 1 ? ' vez' : ' veces'); }
@@ -290,7 +317,7 @@ var ConvertirEnPlantillaPantalla = (function () {
       '<div class="cep-lateral">' +
         '<div class="cep-lineas"></div><div class="cep-membrete"></div><div class="cep-datos"></div>' +
       '</div>';
-    $('.cep-avisos').innerHTML = st.orig.usaGemelo ? '<div class="cep-aviso-gemelo">He encontrado el Word de este PDF y uso ese.</div>' : '';
+    $('.cep-avisos').innerHTML = avisoDeOrigen();
     pintarLineas();
     pintarMembrete();
     pintarDatosDePlantilla();
@@ -461,7 +488,7 @@ var ConvertirEnPlantillaPantalla = (function () {
         '<div class="cep-col" data-col="0"><h3>El original</h3><div class="cep-hoja-ext"></div></div>' +
         '<div class="cep-col" data-col="1"><h3>Con la plantilla nueva</h3><div class="cep-hoja-ext"></div></div>' +
       '</div>';
-    $('.cep-avisos').innerHTML = (st.orig.usaGemelo ? '<div class="cep-aviso-gemelo">He encontrado el Word de este PDF y uso ese.</div>' : '') +
+    $('.cep-avisos').innerHTML = avisoDeOrigen() +
       (relleno.faltan.length ? '<div class="cep-aviso-falta">Hay ' + relleno.faltan.length + (relleno.faltan.length === 1 ? ' dato que' : ' datos que') +
         ' este asunto no tiene: ' + esc(relleno.faltan.join(', ')) + '.</div>' : '');
     Array.prototype.forEach.call(cuerpo.querySelectorAll('.cep-pestana'), function (p) {
@@ -473,7 +500,8 @@ var ConvertirEnPlantillaPantalla = (function () {
     cuerpo.querySelector('.cep-col[data-col="0"]').classList.add('cep-col-visible');
     pintarPie();
     var cols = cuerpo.querySelectorAll('.cep-hoja-ext');
-    await pintarDocumento(cols[0], new Blob([st.orig.buffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }));
+    if (st.orig.desdePdf) await pintarPdf(cols[0], st.orig.pdfBuffer);
+    else await pintarDocumento(cols[0], new Blob([st.orig.buffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }));
     await pintarDocumento(cols[1], relleno.blob);
   }
 

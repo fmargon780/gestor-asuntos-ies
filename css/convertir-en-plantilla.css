@@ -27,6 +27,9 @@ body.con-cep { overflow: hidden; }
 .cep-hoja-interior section.docx:not([style*="padding"]) { width: 210mm; min-height: 297mm; padding: 2.5cm 3cm; box-sizing: border-box; }
 .cep-hueco { background: #ffe34d; color: inherit; border-radius: 2px; cursor: pointer; padding: 0 1px; }
 
+/* El PDF de verdad (fila 281): una página tras otra. */
+.cep-pdf-pagina { display: block; max-width: 100%; height: auto; margin: 0 auto 16px; box-shadow: 0 1px 4px rgba(0, 0, 0, .18); background: #fff; }
+
 /* La lista de cambios. */
 .cep-rotulo { margin: 14px 0 4px; font-weight: 700; color: #334; }
 .cep-rotulo:first-child { margin-top: 0; }

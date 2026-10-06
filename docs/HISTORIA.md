@@ -5,6 +5,17 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 6-oct-2026 — Fila 281: «Convertir en plantilla» con un PDF que no tiene su Word
+
+Francisco preguntó si valía también con PDF. Con Word gemelo, ya valía (fila 280); sin él, la app lee el texto con
+pdf.js, lo agrupa en párrafos (`js/pdf-a-parrafos.js`) y monta un Word nuevo (`js/docx-crear.js`) que sigue el camino
+de la 280 sin tocarlo. Un PDF escaneado o un impreso con casillas avisan y no abren; con una tabla, avisa y deja seguir
+(distinto de lo hablado: la regla puede equivocarse y bloquear un documento que sí vale). En «El original» se pinta el
+PDF con pdf.js en vez del `<iframe>` del visor, para poder comprobarlo en cualquier navegador. De paso, las pruebas de
+la 279 que se habían quedado con textos viejos (menú del documento, Secretaría de la copia de pruebas) ya están al día.
+
+---
+
 ## 6-oct-2026 — Fila 280: «Convertir en plantilla» desde un documento de un asunto
 
 Idea de Francisco: agilizar el diseño de una plantilla a partir de un documento que ya se usa. En el ⋮ de un
