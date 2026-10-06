@@ -12,4 +12,3 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 269 | 45 | Campo «Tu correo» en la ventana de Soporte, pedido una vez y recordado, enviado con el aviso; un fichero y su prueba |
