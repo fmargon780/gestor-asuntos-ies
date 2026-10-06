@@ -123,6 +123,21 @@
     return tipo;
   }
 
+  async function crearReclamacion() {
+    var datos = await App.leerFicheroDeLaApp('datos-biblioteca/biblioteca-centro.json', 'json');
+    var ids = ['b118', 'b120', 'b121'];
+    var modelos = ids.map(function (id) {
+      return HitosBiblioteca._normalizarModelo(datos.modelos.filter(function (m) { return m.id === id; })[0]);
+    });
+    await HitosBiblioteca.cambiar(function (d) {
+      modelos.forEach(function (m) { d.modelos.push(m); });
+      return d;
+    });
+    await crearTipoConGuia('Reclamación de calificaciones', 'ALUMNADO', modelos.map(function (m) {
+      return HitosBiblioteca.modeloAPaso(m, '');
+    }), null);
+  }
+
   async function crearTipos() {
     var matricula = await crearTipoConGuia('MATRICULA', 'ALUMNADO', [
       /* Fila 282: una tarea de «reunir un documento» en cada uno de los dos primeros hitos, para probar «Quitar del hito»
@@ -186,6 +201,10 @@
     ], null);
     consejo.nombreCorto = 'CertConsEsc';
     await App.guardarTipos();
+
+    /* Fila 284: una guía de la tabla de plazos legales (Reclamación de calificaciones), con sus tres hitos
+       sacados de la biblioteca y SIN plazo: el que se lo pone es la pasada de js/plazos-del-centro.js. */
+    await crearReclamacion();
 
     return { MATRICULA: matricula, CERTIFICADO: certificado, 'BAJA MEDICA': bajaMedica, FACTURA: factura,
              'SEGURO ESCOLAR': seguro, 'CERTIFICADO MIEMBRO CONSEJO ESCOLAR': consejo };
@@ -518,6 +537,12 @@
   async function construir(disco) {
     if (construido) return;
     construido = true;
+    window.Demo = window.Demo || {};
+    window.Demo.montando = true;   /* fila 284: ninguna pasada de fondo recarga la app a mitad del montaje */
+    try { await montar(disco); } finally { window.Demo.montando = false; }
+  }
+
+  async function montar(disco) {
     /* La entrada normal ya ha sembrado tipos.json con Nombres.POR_DEFECTO
        (fichero vacío la primera vez): se vacía antes de poner los tipos
        propios de la demo, para no mezclar treinta y tantos tipos reales
@@ -540,6 +565,13 @@
     await crearPapelera();
     await crearSueltos();
     await crearBandeja(disco);
+    /* Fila 284: la copia de pruebas lleva festivos puestos (sin ellos, la pasada avisa en ámbar de que faltan). */
+    await Hitos.guardarFestivos(['2026-10-12', '2026-12-08', '2026-12-25', '2027-01-01', '2027-01-06']);
+    /* Fila 284: la pasada de los plazos legales, ya con la guía de arriba montada (sale su línea verde). */
+    if (window.PlazosDelCentro) {
+      var plazos = await PlazosDelCentro.pasada({ forzar: true });
+      if (plazos) PlazosDelCentro.avisar(plazos);
+    }
   }
 
   window.Demo = window.Demo || {};

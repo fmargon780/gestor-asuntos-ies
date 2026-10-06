@@ -135,7 +135,7 @@ var Guias = (function () {
       /* Fila 131: `cuenta` (hábiles, lectivos o naturales); hábiles si no dice. */
       plazo: (p && p.plazo && p.plazo.dias)
         ? { dias: parseInt(p.plazo.dias, 10) || 0, desde: String(p.plazo.desde || ''),
-            cuenta: (p.plazo.cuenta === 'lectivos' || p.plazo.cuenta === 'naturales') ? p.plazo.cuenta : 'habiles' } : null,
+            cuenta: Plazos.cuentaValida(p.plazo.cuenta) } : null,   /* fila 284: también «meses» */
       /* 20-sep-2026, fila 79, apartados 4.6, 4.7 y 4.1
          (docs/BIBLIOTECA-DE-HITOS.md): igual que lo de arriba, solo
          existen en los pasos de arriba, nunca en una opción. */

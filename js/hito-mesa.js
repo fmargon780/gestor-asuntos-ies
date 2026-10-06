@@ -181,6 +181,7 @@ var HitoMesa = (function () {
     var p = Plazos.de(fecha);
     var quedan = 0;
     var modo = Plazos.cuentaValida ? Plazos.cuentaValida(cuenta) : 'habiles';
+    if (modo === 'meses') modo = 'naturales';   /* fila 284: lo que queda de un plazo en meses se dice en días */
     if (p && p.dias > 0) {
       quedan = Plazos.diasQueQuedan(U.hoyIso(), fecha, modo, (ajustes && ajustes.festivos) || [], (ajustes && ajustes.noLectivos) || []);
     }

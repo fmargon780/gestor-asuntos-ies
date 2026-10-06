@@ -75,7 +75,7 @@
       /* Sin estos dos, editar un hito de la biblioteca los perdía (fila 102). */
       formularios: m.formularios, plantillasDocumento: m.plantillasDocumento,
       guion: m.guion   /* fila 109 */
-    }], opcionesResp, [], { irA: m.id });   /* fila 122: el único hito, ya abierto */
+    }], opcionesResp, [], { irA: m.id, esModelo: true });   /* fila 122: el único hito, ya abierto */
     if (!pasos || !pasos.length) return;
     try {
       await HitosBiblioteca.editar(m.id, pasos[0], usuario());

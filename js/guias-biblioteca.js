@@ -314,7 +314,8 @@ var GuiasBiblioteca = (function () {
     if (traer) {
       var idDeAntes = entrada.paso.id;
       var informativoDeAntes = entrada.paso.soloInformativo;
-      Object.assign(entrada.paso, HitosBiblioteca.modeloAPaso(entrada.modelo));
+      Object.assign(entrada.paso, HitosBiblioteca.modeloAPaso(entrada.modelo,
+        entrada.paso.plazo && entrada.paso.plazo.desde));   /* fila 284: el «desde» de la guía se queda */
       /* El id del hito no cambia (sigue siendo el mismo dentro de la
          guía); "la marca soloInformativo del tipo se conserva, no la
          pisa el modelo" (apartado 4.4). */

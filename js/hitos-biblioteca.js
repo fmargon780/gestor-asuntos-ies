@@ -102,8 +102,8 @@ var HitosBiblioteca = (function () {
       responsable: String((m && m.responsable) || ''),
       estadoAsunto: (m && m.estadoAsunto) || null,
       plazo: (m && m.plazo && m.plazo.dias)
-        ? { dias: parseInt(m.plazo.dias, 10) || 0, desde: String(m.plazo.desde || ''),
-            cuenta: (m.plazo.cuenta === 'lectivos' || m.plazo.cuenta === 'naturales') ? m.plazo.cuenta : 'habiles' } : null,
+        ? { dias: parseInt(m.plazo.dias, 10) || 0, desde: '',   /* fila 284: un modelo no dice «desde qué hito» */
+            cuenta: Plazos.cuentaValida(m.plazo.cuenta) } : null,   /* y se cuenta también en «meses» */
       requisitos: window.Guias ? Guias.normalizarRequisitos(m && m.requisitos) : [],
       comunicacion: window.Guias ? Guias.normalizarComunicacion(m && m.comunicacion) : null,
       soloInformativo: !!(m && m.soloInformativo),
@@ -132,6 +132,8 @@ var HitosBiblioteca = (function () {
     var l = leido || {};
     return {
       version: 1,
+      /* Fila 284: la marca de que js/plazos-del-centro.js ya hizo su pasada (no se repite sola). */
+      plazosDelCentro: parseInt(l.plazosDelCentro, 10) || 0,
       modelos: (Array.isArray(l.modelos) ? l.modelos : []).map(normalizarModelo)
     };
   }
@@ -175,7 +177,8 @@ var HitosBiblioteca = (function () {
       nombre: nombre || paso.titulo || 'Sin nombre',
       revision: revisionPrevia || 1,
       titulo: paso.titulo, explicacion: paso.cuerpo,
-      responsable: paso.responsable, estadoAsunto: paso.estadoAsunto, plazo: paso.plazo,
+      responsable: paso.responsable, estadoAsunto: paso.estadoAsunto,
+      plazo: paso.plazo ? { dias: paso.plazo.dias, cuenta: paso.plazo.cuenta } : null,   /* sin «desde» (fila 284) */
       requisitos: paso.requisitos, comunicacion: paso.comunicacion,
       soloInformativo: paso.soloInformativo, normativa: paso.normativa,
       formularios: paso.formularios,
@@ -189,11 +192,14 @@ var HitosBiblioteca = (function () {
   /* Un modelo, insertado como paso nuevo dentro de una guía (apartado
      4.1: "es una copia"). `origenBiblioteca` es lo único que lo
      distingue de un paso escrito a mano. */
-  function modeloAPaso(modelo) {
+  /* Fila 284: `desde` es el id del paso que queda encima en la guía; el plazo
+     del modelo cuenta desde él. Sin `desde`, el paso llega sin plazo. */
+  function modeloAPaso(modelo, desde) {
     var paso = {
       id: (window.Guias ? Guias.nuevoId() : nuevoId()),
       titulo: modelo.titulo, cuerpo: modelo.explicacion, opciones: [],
-      responsable: modelo.responsable, estadoAsunto: modelo.estadoAsunto, plazo: modelo.plazo,
+      responsable: modelo.responsable, estadoAsunto: modelo.estadoAsunto,
+      plazo: (modelo.plazo && desde) ? { dias: modelo.plazo.dias, desde: desde, cuenta: modelo.plazo.cuenta } : null,
       requisitos: (modelo.requisitos || []).map(function (r) { return Object.assign({}, r); }),
       comunicacion: modelo.comunicacion ? Object.assign({}, modelo.comunicacion) : null,
       soloInformativo: modelo.soloInformativo,
@@ -246,7 +252,7 @@ var HitosBiblioteca = (function () {
     }
     if (valor === null || valor === undefined || valor === '') return '(vacío)';
     if (clave === 'plazo') {
-      return valor.dias ? ((typeof Plazos !== 'undefined' && Plazos.textoPlazo ? Plazos.textoPlazo(valor) : valor.dias + ' días') + ' desde otro hito') : '(vacío)';
+      return valor.dias ? ((typeof Plazos !== 'undefined' && Plazos.textoPlazo ? Plazos.textoPlazo(valor) : valor.dias + ' días')) : '(vacío)';
     }
     if (clave === 'requisitos') {
       var lista = valor || [];

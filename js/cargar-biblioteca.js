@@ -191,6 +191,12 @@ var CargarBiblioteca = (function () {
     await fusionarCampos(datos, mapa, resumen);
     await fusionarModelos(datos, resumen);
     await fusionarGuias(datos, mapa, resumen);
+    /* Fila 284: los plazos legales, con la misma pasada que corre sola al entrar. */
+    resumen.plazosPuestos = 0;
+    if (window.PlazosDelCentro) {
+      var plazos = await PlazosDelCentro.pasada({ forzar: true, datos: datos });
+      if (plazos) resumen.plazosPuestos = plazos.pasos + plazos.modelosConPlazo;
+    }
     return resumen;
   }
 
@@ -332,6 +338,7 @@ window.CargarBiblioteca = CargarBiblioteca;
     lineas.push(filaResumen(
       (r.guiasCreadas ? r.guiasCreadas + ' guía(s) escrita(s)' : 'Ninguna guía nueva') +
       (r.guiasSaltadas.length ? ' · ' + r.guiasSaltadas.length + ' saltada(s) porque ya tenían guía' : '') + '.'));
+    if (r.plazosPuestos) lineas.push(filaResumen(r.plazosPuestos + ' plazo(s) legal(es) puesto(s).'));
     if (r.camposCreados) lineas.push(filaResumen(r.camposCreados + ' campo(s) propio(s) creado(s).'));
     if (r.tiposNoEncontrados.length) {
       lineas.push(filaResumen('No he encontrado estos tipos con el nombre esperado; ' +

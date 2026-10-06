@@ -5,6 +5,18 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 6-oct-2026 — Fila 284: los plazos legales, ya puestos en la biblioteca
+
+De la auditoría de procedimiento: la app sabía contar plazos, pero ningún modelo de la biblioteca traía uno (estaban
+como frase dentro de la explicación) y no había «meses». Ahora un plazo puede contarse en meses, un modelo guarda días
+y cuenta sin «desde» (cada guía lo decide: el hito de arriba), y el contenido del centro trae cinco plazos en modelos
+que ya estaban, una tabla `plazosPorTipo` (cuatro de las seis filas cuentan desde un hito que no es el de arriba) y siete
+modelos comunes (requerir, audiencia, pedir informe y la espera de cada uno, y la espera del recurso de alzada). Llega
+solo, una vez, con `js/plazos-del-centro.js`; lo mismo hace el botón de Mantenimiento. Nada sube una `revision` ni toca los
+asuntos abiertos. Decisión: la marca de «ya hecho» va en el propio `hitos-biblioteca.json` (no hay fichero nuevo). Copia de
+pruebas: guía «Reclamación de calificaciones» con tres hitos de la biblioteca y sin plazo, que la pasada rellena al montar.
+Prueba: `pruebas/plazos-del-centro.mjs`.
+
 ## 6-oct-2026 — Fila 282: quitar un documento de su hito, desde cualquier sitio
 
 Aviso de usuario: «podemos asociar un documento a un hito, pero no desasociarlo». Ya se podía, pero escondido (el «⋯» de

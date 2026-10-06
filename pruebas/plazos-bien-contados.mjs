@@ -79,5 +79,26 @@ comprobar('5. quedan, en lectivos, saltando los no lectivos',
 comprobar('5. quedan, en hábiles, contando las vacaciones',
   Plazos.diasQueQuedan('2026-12-18', '2027-01-05', 'habiles', festivos, noLectivos), 10);
 
+/* 6 (fila 284): el plazo en meses */
+comprobar('6. 6-oct-2026 + 1 mes = 6-nov-2026', Plazos.sumarPlazo('2026-10-06', 1, 'meses', [], []), '2026-11-06');
+comprobar('6. 15-oct-2026 + 1 mes: el 15-nov es domingo, al lunes 16', Plazos.sumarPlazo('2026-10-15', 1, 'meses', [], []), '2026-11-16');
+comprobar('6. 31-ago-2026 + 1 mes = 30-sep-2026 (último día del mes)', Plazos.sumarPlazo('2026-08-31', 1, 'meses', [], []), '2026-09-30');
+comprobar('6. con un festivo en el lunes, al martes', Plazos.sumarPlazo('2026-10-15', 1, 'meses', ['2026-11-16'], []), '2026-11-17');
+comprobar('6. 2 meses', Plazos.sumarPlazo('2026-11-30', 3, 'meses', [], []), '2027-03-01');
+comprobar('6. «1 mes» y «2 meses»', [Plazos.textoPlazo({ dias: 1, cuenta: 'meses' }), Plazos.textoPlazo({ dias: 2, cuenta: 'meses' })], ['1 mes', '2 meses']);
+comprobar('6. «meses» es una cuenta válida', [Plazos.cuentaValida('meses'), Plazos.cuentaValida('raro')], ['meses', 'habiles']);
+comprobar('6. la guía guarda «meses»', Guias.normalizar([{ id: 'a', titulo: 'x', plazo: { dias: 1, desde: 'b', cuenta: 'meses' } }])[0].plazo.cuenta, 'meses');
+const pasosM = Guias.normalizar([
+  { id: 'm1', titulo: 'Notificar' },
+  { id: 'm2', titulo: 'Esperar', plazo: { dias: 1, desde: 'm1', cuenta: 'meses' } }
+]);
+const hitosM = pasosM.map(Hitos.pasoAHito);
+comprobar('6. el hito copia «meses» de su paso', hitosM[1].plazo, { dias: 1, desde: 'm1', cuenta: 'meses' });
+comprobar('6. un hito viejo con «meses» lo conserva', Hitos.normalizarHito({ id: 'h', titulo: 'x', plazo: { dias: 1, desde: 'p', cuenta: 'meses' } }).plazo.cuenta, 'meses');
+Hitos.aplicarPlazosDependientes(hitosM, 'm1', { festivos: [], noLectivos: [] });
+comprobar('6. al hacerse el de arriba, la fecha es el mismo día del mes siguiente (o el hábil siguiente)',
+  hitosM[1].fecha, Plazos.sumarPlazo(hoy, 1, 'meses', [], []));
+comprobar('6. lo que queda de un plazo en meses se lee en días', Plazos.textoDias(31, 'naturales'), '31 días naturales');
+
 if (fallos) { console.log('\n' + fallos + ' fallo(s)'); process.exit(1); }
 console.log('\nTodo bien.');

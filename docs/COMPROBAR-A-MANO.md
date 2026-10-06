@@ -213,3 +213,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 281 — convertir en plantilla un PDF sin Word (6-oct-2026)
 
 - Con un PDF de verdad del centro firmado con AutoFirma, guardado en un asunto real y sin su Word: «Convertir en plantilla». Mirar que el texto sale entero y en orden, y que los sellos de firma y de registro se proponen en «Quitar».
+
+## Fila 284 — plazos legales en la biblioteca (6-oct-2026)
+
+- En el centro, al abrir la app tras actualizarse, sale una vez la línea verde «Plazos legales puestos en N hitos de M guías…». En Ajustes, la guía de «Reclamación de calificaciones»: «Remitir el expediente a la Delegación Territorial» dice «3 días hábiles desde «Registrar la reclamación a la Delegación»». Si faltan los festivos, sale debajo el aviso ámbar con «Ponerlos».

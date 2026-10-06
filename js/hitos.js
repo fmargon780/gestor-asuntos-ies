@@ -80,7 +80,7 @@ var Hitos = (function () {
   }
 
   /* Cómo se cuenta un plazo (fila 131, js/plazos.js): hábiles si no dice. */
-  function cuentaDePlazo(c) { return (c === 'lectivos' || c === 'naturales') ? c : 'habiles'; }
+  function cuentaDePlazo(c) { return Plazos.cuentaValida(c); }   /* fila 284: también «meses» */
 
   /* Un hito, tal y como se guarda. Recursivo: un hito de clase
      "decision" lleva sus opciones, cada una con su propia lista de

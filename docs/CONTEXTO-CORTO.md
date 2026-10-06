@@ -175,7 +175,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   tipo de documento, recurrente) no reaparece por memoria del otro ordenador.
 - Pruebas automáticas en cada subida de código (no con solo `docs/`); en paralelo (`pruebas/ejecutar.mjs`, fila 208). Mientras se trabaja una fila, solo las pruebas de lo tocado (`node pruebas/ejecutar.mjs <palabra>`); la pasada completa, una vez al final, antes de fusionar en `main` (el código pasa antes por el revisor, en local, fila 242).
 - Copia sin internet (`file://`): se actualiza sola (reintenta si se estaba publicando); si no, franja fija arriba; cada 30 min. La web normal también avisa de versión nueva (fila 178), solo con «Recargar».
-- Hitos: cada hito de la guía es un hito de un asunto, con estado, plazo (hábiles, lectivos o naturales), responsable,
+- Hitos: cada hito de la guía es un hito de un asunto, con estado, plazo (hábiles, lectivos, naturales o meses; fila 284), responsable,
   bifurcaciones e historial (si falla su guardado al archivar, se reintenta una vez; el hito no queda huérfano de todas formas). Cada hito se abre a pantalla completa (la mesa), con las acciones solo ahí («Generar documento ▾»,
   «Comunicar ▾», «Registrar») y tres tarjetas: las tareas del hito (lista para marcar; «Detalles:» opcional que deja el cuadro relleno; se marca
   solo al generar, registrar, comunicar o añadir), todos los documentos del asunto («Enviar ▾» por correo o Séneca) y notas.
@@ -201,6 +201,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   asunto), «Explicación» del hito con viñetas (fila 228; Crear y Cambiar) y «¿Dónde se guarda?» («A la guía de
   <tipo>», marcada, o «Solo en este asunto»): a la guía, llega a los asuntos abiertos del tipo, pero solo a los
   hitos vacíos; uno con trabajo no se toca.
+- Plazos legales en la biblioteca (fila 284, `docs/PLAZOS-LEGALES-EN-LA-BIBLIOTECA.md`): un modelo de la biblioteca guarda `plazo.dias` y `plazo.cuenta` con el «desde» vacío; al llegar a una guía (`HitosBiblioteca.modeloAPaso(modelo, idDelDeArriba)`) cuenta desde el hito de arriba, y sin ninguno encima llega sin plazo. «Meses» (`Plazos.sumarPlazo`: mismo día del mes, último día si no existe, y si no es hábil el siguiente). `js/plazos-del-centro.js` (`PlazosDelCentro.pasada`) corre sola una vez al entrar (marca `plazosDelCentro` en `hitos-biblioteca.json`; el botón de Mantenimiento la fuerza): añade los 7 modelos `b-comun-…`, pone el plazo a los modelos y pasos de guía que no lo tengan (tabla `plazosPorTipo` del JSON para el «desde»), sin subir ninguna `revision` ni tocar asuntos abiertos. Prueba: `pruebas/plazos-del-centro.mjs`.
 - **Por liquidar** (fila 249, `docs/POR-LIQUIDAR.md`, `js/por-liquidar.js` y `js/por-liquidar-liquidar.js`): casilla por tipo
   «Al terminar, pasa a «Por liquidar» en vez de archivarse» (`tipo.liquidar`, Ajustes → tipo → «Al terminar el asunto», fila 274). Un asunto de esos tipos, en vez de archivarse, pasa a
   `ficha.porLiquidar = { desde, auto }` (botón «Pasar a Por liquidar» en la ficha y el ⋮ de la tabla, o solo, al dar por hecho
