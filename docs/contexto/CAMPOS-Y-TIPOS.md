@@ -124,12 +124,18 @@ calculada cambia de verdad (una "firma" en `cont.dataset.firma`), para no entrar
 `pruebas/lista-comprobacion-tipo.mjs`.
 
 Debajo, dos columnas (`#tipo-asunto-col-1`/`-2`, CSS `grid-template-columns: 1fr 1fr`, una sola
-por debajo de 1000px), con ocho secciones **plegadas** (fila 105: cada una es un `<details
+por debajo de 1000px), con nueve secciones **plegadas** (fila 105: cada una es un `<details
 class="bloque-ajustes">` con un resumen en el título, ver "Ajustes plegado" más abajo),
 construidas enteras por `App.pintarTipoDeAsunto()`. Desde la fila 198 (apartado 2), **todo se
 guarda al cambiar**: ninguna sección de esta pantalla tiene ya un botón "Guardar" propio (ni
 Campos ni Palabras clave; los cuadros de crear —plantilla, recurrente, campo calculado, campo
 propio— conservan su botón de alta, porque son altas, no guardados de lo ya puesto).
+
+**Al terminar el asunto** (fila 274, `docs/AL-TERMINAR-EL-ASUNTO.md`, `js/ajustes-tipo-al-terminar.js`): apartado
+`al-terminar`, entre «Guía» y «Plazo». Su título dice sin abrirlo «se archiva» o «pasa a Por liquidar» (más « · avisa
+a quien lo pide»). Lleva la casilla de liquidar («Al terminar, pasa a «Por liquidar» en vez de archivarse»,
+`tipo.liquidar`) y «Al cerrar el asunto, avisar a quien lo pide» (con su plantilla), que ya no están en «Datos del
+tipo». La línea de la lista de comprobación «Falta la plantilla del aviso al cerrar» abre este apartado.
 
 1. **Datos del tipo** — nombre, categoría, alias si los tiene, botón "Cambiar el nombre" que
    llama a `App.renombrarTipo` (la misma función de siempre) y repinta la pantalla si el tipo
@@ -253,7 +259,7 @@ separado por `.separador-lateral`; con la barra plegada, el icono de rueda denta
 (`#btn-barra-ajustes`, `js/barra.js`) lleva directo a Ajustes.
 
 Se comprueba con `pruebas/ajustes-agil.mjs` (las tres pestañas, a 1905 píxeles),
-`pruebas/ajustes-por-tipo.mjs` (la pantalla de un tipo: las ocho secciones, cambiar Plazo y
+`pruebas/ajustes-por-tipo.mjs` (la pantalla de un tipo: las nueve secciones, cambiar Plazo y
 Campos, volver sin perder categoría ni buscador, Escape) y `pruebas/lista-comprobacion-tipo.mjs`
 (la lista de comprobación).
 

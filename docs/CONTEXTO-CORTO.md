@@ -202,7 +202,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   <tipo>», marcada, o «Solo en este asunto»): a la guía, llega a los asuntos abiertos del tipo, pero solo a los
   hitos vacíos; uno con trabajo no se toca.
 - **Por liquidar** (fila 249, `docs/POR-LIQUIDAR.md`, `js/por-liquidar.js` y `js/por-liquidar-liquidar.js`): casilla por tipo
-  «Hay que liquidarlo antes de archivar» (`tipo.liquidar`, Ajustes). Un asunto de esos tipos, en vez de archivarse, pasa a
+  «Al terminar, pasa a «Por liquidar» en vez de archivarse» (`tipo.liquidar`, Ajustes → tipo → «Al terminar el asunto», fila 274). Un asunto de esos tipos, en vez de archivarse, pasa a
   `ficha.porLiquidar = { desde, auto }` (botón «Pasar a Por liquidar» en la ficha y el ⋮ de la tabla, o solo, al dar por hecho
   su último hito, con «Deshacer»; `auto` vuelve solo a su pestaña si un hito se desmarca o se añade). Quinta pestaña de Inicio
   «Por liquidar» (solo si hay tipos con la casilla), con casillas, «Marcados: N asuntos · Total: X €» (primer campo propio de

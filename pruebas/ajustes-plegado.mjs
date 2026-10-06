@@ -2,7 +2,7 @@
    fila 105 de docs/COLA.md, docs/AJUSTES-PLEGADO.md).
 
    Lo que comprueba:
-     1. Al abrir un tipo, las ocho secciones salen plegadas y cada título
+     1. Al abrir un tipo, las nueve secciones salen plegadas y cada título
         lleva su resumen (un tipo con 2 campos dice "2 campos"; uno sin
         plazo dice "sin plazo").
      2. Se despliega "Campos", se sale, se entra en otro tipo: "Campos"
@@ -89,13 +89,13 @@ async function abrirTipo(nombre) {
 }
 
 /* ================================================================
-   1. Las ocho secciones, plegadas y con su resumen.
+   1. Las nueve secciones, plegadas y con su resumen.
    ================================================================ */
 console.log('--- 1. la pantalla de un tipo, plegada y con resúmenes ---');
 await abrirTipo('MATRICULA');
 
-await comprobar('hay ocho secciones plegables',
-  pagina.locator('#pantalla-tipo-asunto details.bloque-ajustes').count(), 8);
+await comprobar('hay nueve secciones plegables',
+  pagina.locator('#pantalla-tipo-asunto details.bloque-ajustes').count(), 9);
 await comprobar('ninguna sale desplegada la primera vez',
   pagina.locator('#pantalla-tipo-asunto details[open]').count(), 0);
 await comprobar('"Campos" dice cuántos lleva', resumen('campos'), '2 campos');

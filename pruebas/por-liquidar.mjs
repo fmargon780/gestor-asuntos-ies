@@ -1,6 +1,6 @@
 /* Fila 249 (1-oct-2026, docs/POR-LIQUIDAR.md): los asuntos «Por liquidar». Con
    Chromium real y los datos inventados de la copia de pruebas (?demo=1&auto=1):
-   el seguro escolar es un tipo «Hay que liquidarlo antes de archivar»; tres
+   el seguro escolar es un tipo con la casilla de liquidar; tres
    asuntos ya están en «Por liquidar» (1,12 €, 1,12 € y uno sin importe) y un
    cuarto sigue abierto.
 
@@ -220,8 +220,8 @@ await pagina.click('.pestana[data-pantalla="ajustes"]');
 await pagina.waitForTimeout(400);
 await pagina.locator('#tabla-tipos .tarjeta-tipo').filter({ hasText: 'SEGURO ESCOLAR' }).locator('.tarjeta-tipo-nombre').click();
 await pagina.waitForSelector('#pantalla-tipo-asunto:not(.oculto)');
-const casilla = pagina.locator('#pantalla-tipo-asunto label.interruptor', { hasText: 'Hay que liquidarlo antes de archivar' }).locator('input');
-await comprobar('8. Ajustes: el tipo lleva la casilla «Hay que liquidarlo antes de archivar», desmarcada', casilla.isChecked(), false);
+const casilla = pagina.locator('#pantalla-tipo-asunto label.interruptor', { hasText: 'pasa a «Por liquidar» en vez de archivarse' }).locator('input');
+await comprobar('8. Ajustes: el tipo lleva la casilla «Al terminar, pasa a «Por liquidar» en vez de archivarse», desmarcada', casilla.isChecked(), false);
 await casilla.evaluate((el) => { el.checked = true; el.dispatchEvent(new Event('change')); });
 await pagina.waitForTimeout(500);
 await comprobar('8. al marcarla se guarda en el tipo', pagina.evaluate(() => App.E.tipos.filter((t) => t.tipo === 'SEGURO ESCOLAR')[0].liquidar), true);

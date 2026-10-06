@@ -78,11 +78,11 @@ var ListaComprobacionTipo = (function () {
 
     /* Plantilla de correo: por «Comunicar» en algún hito, o por «Al
        cerrar el asunto, avisar a quien lo pide» (fila 195). Si falta
-       la plantilla del aviso al cerrar, el enlace lleva a "Datos del
-       tipo" (ahí está el interruptor); si falta la de un hito,
+       la plantilla del aviso al cerrar, el enlace lleva a «Al terminar el
+       asunto» (ahí está el interruptor, fila 274); si falta la de un hito,
        a "Guía" (ahí está ese hito). */
     if (tipo.avisarLoPideCierre || algunoConAccion(pasos, 'comunicar')) {
-      var seccionCorreo = tipo.avisarLoPideCierre ? 'datos' : 'pasos';
+      var seccionCorreo = tipo.avisarLoPideCierre ? 'al-terminar' : 'pasos';
       var texto = 'Plantilla de correo', marcado = true;
       if (tipo.avisarLoPideCierre && !tipo.avisarLoPideCierrePlantilla) {
         texto = 'Plantilla de correo — Falta la plantilla del aviso al cerrar';
