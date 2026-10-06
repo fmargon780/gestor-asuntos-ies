@@ -140,17 +140,17 @@ App.crearAsuntoDelFormulario = async function () {
   }
 
   /* Fila 239: el número se gasta ahora, releyendo el disco. Si el otro
-     ordenador se ha quedado el que enseñaba la vista previa, el nombre
-     cambia: se enseña y hay que volver a pulsar «Crear» (el nombre que
-     se guarda es siempre el que se ve). */
+     ordenador se ha quedado el que enseñaba la vista previa, el asunto
+     se crea igual con el siguiente (fila 275) y se dice al final: nadie
+     elige el número, así que no hay nada que revisar. */
+  var avisoNumero = '';
   try {
-    var reserva = await Numeros.reservar('asuntos', App.E.nuevo.numero);
+    var pedido = App.E.nuevo.numero;
+    var reserva = await Numeros.reservar('asuntos', pedido);
     if (reserva.cambio) {
       App.E.nuevo.numero = reserva.numero;
-      App.refrescarVista();
-      U.aviso('Otro ordenador acaba de usar ese número: el asunto pasa a llamarse ' +
-        nombreDeCarpetaAjustado(App.datosDelFormulario()).nombre + '. Revísalo y pulsa «Crear el asunto» otra vez.', 'ambar');
-      return;
+      nombre = nombreDeCarpetaAjustado(d).nombre;
+      avisoNumero = 'Asunto creado como ' + reserva.numero + '; el ' + pedido + ' lo acaba de usar otro ordenador.';
     }
   } catch (eRes) {
     U.fallo('No he podido reservar el número del asunto', eRes);
@@ -242,7 +242,7 @@ App.crearAsuntoDelFormulario = async function () {
       App.pintarPendiente();
     }
 
-    U.aviso('Asunto creado.', 'bueno');
+    U.aviso(avisoNumero || 'Asunto creado.', 'bueno');
     if (falloAlCrear) U.accesorio('Asunto creado, pero no he podido guardar los datos del tercero', falloAlCrear);
     U.copiar(nombre);
     App.E.nuevo = App.nuevoEnBlanco();   /* fila 220: la misma forma en blanco que App.prepararNuevo */

@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '275', fecha: '2026-10-06', texto: 'Si el otro ordenador se queda el número mientras creas un asunto o guardas un documento, se crea con el siguiente y te lo dice; ya no hay que pulsar otra vez.' },
   { id: '271', fecha: '2026-10-06', texto: 'En el cuadro de Correo y en el de Séneca ya puedes elegir «Sin plantilla» y se queda. Si el tipo de asunto no tiene plantilla propia, el cuadro se abre sin plantilla.' },
   { id: '269', fecha: '2026-10-06', texto: 'Al avisar con el botón «Soporte», te pide tu correo una sola vez, para escribirte cuando tu aviso esté resuelto.' },
   { id: '267', fecha: '2026-10-05', texto: 'En la ficha de un asunto, junto a «+ Añadir documento», hay un botón «Generar documento» que te lleva al hito actual con sus plantillas ya a la vista.' },

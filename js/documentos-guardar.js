@@ -117,18 +117,19 @@
     /* Fila 177: por si acaso, se comprueba también aquí antes de guardar. */
     if (ajustadoFinal.noCabe) { U.aviso(Nombres.AVISO_NO_CABE, 'malo'); return; }
     /* Fila 239: el número de documento se gasta ahora, releyendo el disco.
-       Si otro ordenador se ha quedado el que enseñaba la vista previa, el
-       nombre cambia: se enseña y hay que volver a pulsar «Guardar». */
+       Si otro ordenador se ha quedado el que enseñaba la vista previa, se
+       guarda igual con el siguiente (fila 275) y se dice al terminar. */
+    var avisoNumero = '';
     if (opciones.numeroNuevo) {
       try {
-        var reserva = await Numeros.reservar('documentos', opciones.numeroDoc);
+        var pedido = opciones.numeroDoc;
+        var reserva = await Numeros.reservar('documentos', pedido);
         opciones.numeroDoc = reserva.numero;
         opciones.numeroNuevo = false;
         if (reserva.cambio) {
           refrescar();
-          U.aviso('Otro ordenador acaba de usar ese número: el documento pasa a llamarse ' +
-            Nombres.montarDocumentoAjustado(datosDelFormulario(opciones)).nombre + '. Revísalo y pulsa «Guardar» otra vez.', 'ambar');
-          return;
+          nombre = Nombres.montarDocumentoAjustado(datosDelFormulario(opciones)).nombre;
+          avisoNumero = 'Documento guardado como ' + reserva.numero + '; el ' + pedido + ' lo acaba de usar otro ordenador.';
         }
       } catch (eRes) { U.fallo('No he podido reservar el número del documento', eRes); return; }
     }
@@ -143,7 +144,7 @@
       }
       if (opciones.modo === 'anadir') {
         await Carpetas.copiarFicheroEn(N.asuntoActual.handle, opciones.handle, nombre);
-        U.aviso('Documento guardado en la carpeta.', 'bueno');
+        U.aviso(avisoNumero || 'Documento guardado en la carpeta.', 'bueno');
       } else if (nombre === opciones.nombreActual) {
         /* Fila 239: con la estructura fija, cambiar el registro, los campos o
            el texto no cambia el nombre: solo se pone al día la ficha. */
