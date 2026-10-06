@@ -81,6 +81,7 @@
       .sort(function (a, b) { return a.nombre < b.nombre ? -1 : 1; });
 
     contenedor.innerHTML =
+      '<p class="nota">También puedes crear una plantilla desde un documento de un asunto: en su menú ⋮, «Convertir en plantilla».</p>' +
       '<p class="explica">Sube antes el .docx a Dropbox, dentro de la carpeta de asuntos ' +
       'abiertos, en <code>_GESTOR/PLANTILLAS</code>. Aquí se cuelga de este tipo: el botón ' +
       '"Generar documento" de la ficha saca una copia ya rellena, sin preguntar nada.</p>' +

@@ -5,6 +5,22 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 6-oct-2026 — Fila 280: «Convertir en plantilla» desde un documento de un asunto
+
+Idea de Francisco: agilizar el diseño de una plantilla a partir de un documento que ya se usa. En el ⋮ de un
+Word (o de un PDF con su Word) de un asunto abierto, una pantalla a todo el ancho: a la izquierda el documento con
+los huecos resaltados, a la derecha los cambios que propone la app (datos del asunto, quien firma, formas dobles,
+lo de la cabecera antigua por el membrete), lo que se marca a mano al seleccionar texto y los datos de la
+plantilla; en el segundo paso, el original junto a la plantilla rellena con ese mismo asunto. Siempre se trabaja
+sobre copias en memoria (`js/docx-sustituir.js`, desde el original cada vez); al guardar, el `.docx` va a
+`_GESTOR/PLANTILLAS`, la plantilla a `plantillas.json` y, si se eligió hito, la tarea de generar a la guía.
+Efectos laterales: `Plantillas.valoresDeAsunto` respeta `opciones.fecha` también en `hoy`, `hoyLargo` y
+`lugarYFecha` (los demás llamantes pasaban hoy); `PlantillaDeLoEscrito.cambiarDatos` gana `opciones`
+(`sinTildes`, `extra`); `WordVisor.pintarEn`; la Secretaría de la copia de pruebas se escribe «Nombre Apellidos».
+Pruebas: `pruebas/convertir-en-plantilla.mjs` y `pruebas/convertir-en-plantilla-pantalla.mjs`.
+
+---
+
 ## 6-oct-2026 — Fila 279: avisar antes de crear un tipo de asunto repetido
 
 Segunda mitad del diseño de la fila 277. Ninguna puerta miraba los nombres antiguos (`alias`) ni los cortos, y tres no

@@ -315,6 +315,8 @@
       abiertoEl: hace(10) + 'T09:00:00.000Z'
     });
     await marcarPrimerHito(martaClave, 'hecho', 'Parte de baja recibido.');
+    /* Fila 280: lo que necesita «Convertir en plantilla» (js/demo/datos-plantilla.js). */
+    if (window.Demo.plantilla) await Demo.plantilla.construir({ carlaClave: carlaClave, martaClave: martaClave, hace: hace, pdf: PDF_DE_MENTIRA });
 
     /* 6b. fila 241: dos cobros del seguro escolar todavía abiertos, con su importe. */
     var alvaro = Nombres.terceroAlumno({ nombre: 'Bermúdez Ortiz, Álvaro', id: '2100003' });
@@ -518,7 +520,7 @@
     await Carpetas.guardarJson(App.E.gestor, App.FICHERO_TIPOS, []);
     await escribirDatos();
     /* Fila 249: quien ocupa Secretaría, para «Recibe» al liquidar. */
-    try { if (window.Cargos) await Cargos.anadirOcupante('secretaria', 'Reyes Palma, Fernando', '2020-09-01', 'H'); } catch (e) { /* sin cargo, «Recibe» sale vacío */ }
+    try { if (window.Cargos) await Cargos.anadirOcupante('secretaria', 'Fernando Reyes Palma', '2020-09-01', 'H'); } catch (e) { /* sin cargo, «Recibe» sale vacío */ }
     /* La entrada normal ya ha podido leer (y guardar en caché, vacíos)
        los CSV de personas al pintar Inicio, antes de que estos
        existieran: se tira esa caché para que la próxima lectura sí los

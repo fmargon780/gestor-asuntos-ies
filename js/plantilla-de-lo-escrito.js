@@ -34,9 +34,23 @@ var PlantillaDeLoEscrito = (function () {
     return t.replace(/^\s+|\s+$/g, '');
   }
 
-  /* texto + valores -> { texto, cambios: [{ dato, hueco }] }. */
-  function cambiarDatos(texto, valores) {
+  /* Del mismo largo que el texto, sin tildes ni mayúsculas (para buscar «Jose» en «José»). */
+  function sinTildes(t) {
+    var s = String(t), salida = '';
+    for (var i = 0; i < s.length; i++) {
+      var c = s.charAt(i), b = c.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      salida += b.length === 1 ? b.toLowerCase() : c.toLowerCase();
+    }
+    return salida;
+  }
+
+  /* texto + valores -> { texto, cambios: [{ dato, hueco }] }.
+     `opciones` (fila 280, «Convertir en plantilla»): `sinTildes` busca sin distinguir tildes;
+     `extra` son claves de `valores` que también se buscan, antes de las de la fecha y el hito
+     (por ejemplo `lugarYFecha`). Sin opciones, lo de siempre. */
+  function cambiarDatos(texto, valores, opciones) {
     valores = valores || {};
+    opciones = opciones || {};
     var candidatos = [];
     function meter(valor, hueco) {
       var v = String(valor === undefined || valor === null ? '' : valor).trim();
@@ -47,19 +61,33 @@ var PlantillaDeLoEscrito = (function () {
     DATOS.forEach(function (k) { meter(valores[k], '{' + k + '}'); });
     var campos = valores.campos || {};
     Object.keys(campos).forEach(function (k) { meter(campos[k], '{campo:' + k + '}'); });
+    (opciones.extra || []).forEach(function (k) { meter(valores[k], '{' + k + '}'); });
     DATOS_FINALES.forEach(function (k) { meter(valores[k], '{' + k + '}'); });
     /* Primero los más largos: el nombre completo gana a una de sus partes. */
     candidatos.sort(function (a, b) { return (b.valor.length - a.valor.length) || (a.orden - b.orden); });
 
     var salida = String(texto || ''), fichas = [], cambios = [];
     candidatos.forEach(function (c) {
-      var re = new RegExp('(?<![\\p{L}\\p{N}_])' + escaparRe(c.valor) + '(?![\\p{L}\\p{N}_])', 'giu');
       var primero = null;
-      salida = salida.replace(re, function (m) {
-        if (primero === null) primero = m;
-        fichas.push(c.hueco);
-        return '' + (fichas.length - 1) + '';
-      });
+      if (opciones.sinTildes) {
+        var re2 = new RegExp('(?<![\\p{L}\\p{N}_])' + escaparRe(sinTildes(c.valor)) + '(?![\\p{L}\\p{N}_])', 'gu');
+        var norm = sinTildes(salida), partes = [], ultimo = 0, m2;
+        while ((m2 = re2.exec(norm))) {
+          if (primero === null) primero = salida.slice(m2.index, m2.index + m2[0].length);
+          fichas.push(c.hueco);
+          partes.push(salida.slice(ultimo, m2.index), '' + (fichas.length - 1) + '');
+          ultimo = m2.index + m2[0].length;
+        }
+        partes.push(salida.slice(ultimo));
+        salida = partes.join('');
+      } else {
+        var re = new RegExp('(?<![\\p{L}\\p{N}_])' + escaparRe(c.valor) + '(?![\\p{L}\\p{N}_])', 'giu');
+        salida = salida.replace(re, function (m) {
+          if (primero === null) primero = m;
+          fichas.push(c.hueco);
+          return '' + (fichas.length - 1) + '';
+        });
+      }
       if (primero !== null) cambios.push({ dato: primero, hueco: c.hueco, orden: c.orden });
     });
     salida = salida.replace(/(\d+)/g, function (m, i) { return fichas[+i]; });

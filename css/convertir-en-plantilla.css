@@ -1,0 +1,68 @@
+/* ============================================================
+   convertir-en-plantilla.css — la pantalla de «Convertir en plantilla»
+   (fila 280, js/convertir-en-plantilla-pantalla.js). Capa a pantalla
+   completa por encima de la ficha y por debajo de los cuadros (#capa, 50)
+   y de los mensajes. La página no se desplaza: cada columna, sí.
+   ============================================================ */
+.cep { position: fixed; top: var(--franja-demo-alto, 0px); left: 0; right: 0; bottom: 0; z-index: 45; display: flex; flex-direction: column; background: #e9edf2; }
+body.con-cep { overflow: hidden; }
+.cep-barra { display: flex; align-items: baseline; gap: 14px; padding: 10px 16px; background: #fff; border-bottom: 1px solid #d7dde5; }
+.cep-titulo { font-weight: 700; font-size: 16px; }
+.cep-nombre { flex: 1 1 auto; min-width: 0; color: #556; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cep-avisos:empty { display: none; }
+.cep-aviso-gemelo { padding: 6px 16px; background: #eaf3fb; color: #1d4a73; border-bottom: 1px solid #cfe0ee; }
+.cep-aviso-falta { padding: 6px 16px; background: #fff4d6; color: #6b4e00; border-bottom: 1px solid #ecd9a0; }
+.cep-cuerpo { flex: 1 1 auto; min-height: 0; display: flex; }
+.cep-pie { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: #fff; border-top: 1px solid #d7dde5; }
+.cep-pie-texto { flex: 1 1 auto; color: #667; }
+.cep-pie-botones { display: flex; gap: 8px; }
+
+/* Paso 1: el documento a la izquierda, lo demás a la derecha. */
+.cep-paso1 .cep-doc { flex: 1 1 auto; min-width: 0; overflow: auto; padding: 16px; }
+.cep-paso1 .cep-lateral { flex: 0 0 440px; max-width: 46vw; overflow: auto; padding: 12px 16px; background: #fff; border-left: 1px solid #d7dde5; }
+
+/* El documento pintado (docx-preview) y sus huecos. */
+.cep-hoja-interior .docx-wrapper { background: transparent; padding: 0; }
+.cep-hoja-interior section.docx { box-shadow: 0 1px 4px rgba(0, 0, 0, .18); margin: 0 auto 16px; }
+.cep-hoja-interior section.docx:not([style*="padding"]) { width: 210mm; min-height: 297mm; padding: 2.5cm 3cm; box-sizing: border-box; }
+.cep-hueco { background: #ffe34d; color: inherit; border-radius: 2px; cursor: pointer; padding: 0 1px; }
+
+/* La lista de cambios. */
+.cep-rotulo { margin: 14px 0 4px; font-weight: 700; color: #334; }
+.cep-rotulo:first-child { margin-top: 0; }
+.cep-linea { display: flex; align-items: flex-start; gap: 8px; padding: 4px 6px; border-radius: 4px; }
+.cep-linea:hover { background: #f1f5fa; }
+.cep-linea input { margin-top: 3px; flex: 0 0 auto; }
+.cep-linea-texto { cursor: pointer; flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.cep-linea-apagada { opacity: .5; }
+.cep-antes { font-weight: 600; }
+.cep-despues { color: #8a6d00; }
+.cep-veces, .cep-nota { color: #667; font-size: 12px; }
+.cep-destello { background: #fff1a8; }
+.cep-casilla { display: block; margin: 12px 0 2px; cursor: pointer; }
+.cep-casilla-sangrada { margin-left: 22px; margin-top: 2px; }
+.cep-datos { margin-top: 6px; }
+.cep-datos .campo { width: 100%; box-sizing: border-box; }
+
+/* El menú de lo seleccionado. */
+.cep-menu-sel { position: fixed; z-index: 48; display: flex; flex-direction: column; background: #fff; border: 1px solid #c9d2dd; border-radius: 6px; box-shadow: 0 4px 14px rgba(0, 0, 0, .2); padding: 4px; }
+.cep-menu-sel button { text-align: left; background: none; border: 0; padding: 7px 10px; border-radius: 4px; cursor: pointer; font: inherit; }
+.cep-menu-sel button:hover { background: #eef3f9; }
+
+/* Paso 2: dos columnas iguales (por debajo de 1.100 px, una sola con dos pestañas). */
+.cep-paso2 { flex-direction: column; }
+.cep-pestanas { display: none; gap: 6px; padding: 8px 16px 0; }
+.cep-pestana { border: 1px solid #c9d2dd; border-bottom: 0; background: #f4f6f9; padding: 6px 12px; border-radius: 6px 6px 0 0; cursor: pointer; font: inherit; }
+.cep-pestana.activa { background: #fff; font-weight: 600; }
+.cep-comparar { flex: 1 1 auto; min-height: 0; display: flex; }
+.cep-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; border-right: 1px solid #d7dde5; }
+.cep-col:last-child { border-right: 0; }
+.cep-col h3 { margin: 0; padding: 8px 16px; background: #fff; border-bottom: 1px solid #d7dde5; font-size: 14px; }
+.cep-hoja-ext { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 16px; }
+@media (max-width: 1100px) {
+  .cep-pestanas { display: flex; }
+  .cep-col { display: none; }
+  .cep-col.cep-col-visible { display: flex; }
+  .cep-col h3 { display: none; }
+  .cep-paso1 .cep-lateral { flex-basis: 360px; }
+}

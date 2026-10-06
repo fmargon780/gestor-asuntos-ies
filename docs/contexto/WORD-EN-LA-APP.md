@@ -68,3 +68,31 @@ carpeta de cada asunto, creada solo cuando hace falta:
   vez no hay nada que mover.
 
 Prueba: `pruebas/versiones-previas.mjs`.
+
+## «Convertir en plantilla» (fila 280, `docs/CONVERTIR-EN-PLANTILLA.md`)
+
+En el menú ⋮ de un documento de un asunto **abierto** (ficha: `js/ficha-documentos.js`; mesa del hito:
+`js/hitos-documento-menu.js`), «Convertir en plantilla». Un `.docx` vale; un PDF vale si su Word gemelo
+(`VersionesPrevias.claveGemelo`) está en la carpeta del asunto o en `_Previas`; `.doc`/`.odt`/`.rtf` y un PDF
+sin Word salen apagados, con su motivo en `title`; en solo consultar, apagada (`js/solo-consulta.js`).
+
+- **Qué hace cada fichero**: `js/docx-sustituir.js` (puro: cambiar texto dentro del `.docx`, quitar
+  párrafos por su posición, quitar la cabecera, poner `{{MEMBRETE}}`; SIEMPRE desde el original, con
+  `veces` por cambio; un hueco recién puesto se protege con una marca privada); `js/convertir-en-plantilla-propuestas.js`
+  (puro: las líneas de los grupos «Datos de este asunto» —`PlantillaDeLoEscrito.cambiarDatos` con
+  `sinTildes` y `extra: ['lugarYFecha']`—, «Quien firma», «Para que sirva con hombre y con mujer» y
+  «Quitar»); `js/convertir-en-plantilla.js` (de qué fichero se parte, estado, copia de trabajo, plantilla
+  rellena con este asunto, guardado); `js/convertir-en-plantilla-pantalla.js` + `css/convertir-en-plantilla.css`
+  (los dos pasos; usa `WordVisor.pintarEn`).
+- **Reglas que importan**: el original no se toca y en la carpeta del asunto no se escribe nada; la fecha
+  del documento (la de su nombre) manda en `{hoy}`, `{hoyLargo}`, `{lugarYFecha}` y en quién ocupaba cada cargo
+  (`Plantillas.valoresDeAsunto(a, { fecha })` ya la usa para las tres); una forma doble solo se propone si
+  `Genero.resolver`, con el sexo del asunto, devuelve el texto de partida; «Esto se pregunta cada vez» es
+  `{campo:Nombre}` (sale en «Faltan datos» sin tocar `Plantillas.rellenar`); un «D.» pegado a un nombre se cambia
+  junto con ese nombre (`tambien`) y cuelga de su línea.
+- **Al guardar**: nombre repetido en el tipo → rojo; mismo tipo de documento → «Sustituirla» (conserva el
+  `id`, la anterior va a la papelera por `Papelera.mandarDato`) / «Guardar como otra»; el `.docx` va a
+  `_GESTOR/PLANTILLAS`; con hito elegido, `GuiasDelCentro.cambiarPasos` añade la tarea «Generar «X»»
+  (`accion: 'generar'`, `receta.plantilla`) sin duplicarla. Primero el fichero, luego `plantillas.json`, luego la guía.
+- Copia de pruebas: `js/demo/datos-plantilla.js` (Word de Carla, PDF y Word gemelo de Marta, `notas antiguas.doc`, sexos).
+- Pruebas: `pruebas/convertir-en-plantilla.mjs` (sin navegador) y `pruebas/convertir-en-plantilla-pantalla.mjs`.

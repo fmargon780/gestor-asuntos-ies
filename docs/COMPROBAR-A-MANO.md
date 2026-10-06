@@ -205,3 +205,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 277 — tipos de asunto que son el mismo (6-oct-2026)
 
 - En el centro, con los datos reales: al entrar tras publicarse esta fila, o sale la línea verde «ANULACIÓN» era el nombre antiguo de «ANULACIÓN DE MATRÍCULA». Los he unido., o sale en Inicio el aviso de tipos parecidos con esa pareja. Después de unirlos, al elegir tipo solo queda ANULACIÓN DE MATRÍCULA.
+
+## Fila 280 — convertir un documento en plantilla (6-oct-2026)
+
+- Con un documento Word de verdad del centro, guardado en un asunto real: en su menú ⋮, «Convertir en plantilla». Mirar que los huecos propuestos tienen sentido y que en «Con la plantilla nueva» el documento conserva su aspecto (tablas, negritas, sangrías, sellos). No guardar si no convence: «Cancelar» no escribe nada.

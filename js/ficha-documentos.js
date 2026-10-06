@@ -26,6 +26,7 @@ var FichaDocumentos = (function () {
   var alBorrarActual = null;
 
   function $(id) { return document.getElementById(id); }
+  var cepEstados = null;   /* fila 280: { <nombre>: { visible, apagada, motivo } } del asunto que se está pintando */
 
   /* Lo que la aplicación mete cuando entra un correo: el hilo en PDF
      (CORREO, y HILO en las primeras versiones) y sus adjuntos. */
@@ -188,6 +189,10 @@ var FichaDocumentos = (function () {
       })));
     }
 
+    /* Fila 280: «Convertir en plantilla» (js/convertir-en-plantilla.js), antes de «Pasar a versiones previas». */
+    var cep = cepEstados && cepEstados[f.nombre];
+    if (cep && cep.visible && window.ConvertirEnPlantilla) enMenu.push(ConvertirEnPlantilla.botonDeMenu(a, f, cep));
+
     /* Fila 160: «Pasar a versiones previas», para corregir a mano. */
     if (window.VersionesPrevias && !esIndice) {
       var aPrevias = document.createElement('button');
@@ -344,6 +349,8 @@ var FichaDocumentos = (function () {
       var expediente = lista.filter(function (f) { return !esDeCorreo(f.nombre); });
 
       var hitos = await hitosParaAsociar(a);
+      /* Fila 280: qué documentos pueden convertirse en plantilla (los PDF, si tienen su Word). */
+      try { cepEstados = window.ConvertirEnPlantilla ? await ConvertirEnPlantilla.estados(a) : null; } catch (eCep) { cepEstados = null; }
 
       /* Con un solo grupo no hacen falta rótulos: sobran. */
       var conRotulo = correos.length > 0 && expediente.length > 0;

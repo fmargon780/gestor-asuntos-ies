@@ -217,6 +217,9 @@
 
     var persona = await personaDelAsunto(categoria, terceroTexto);
     var registro = await registroDelAsunto(a);
+    /* Fila 280: con `opciones.fecha` (la de un documento ya hecho), «hoy» es esa fecha. Sin ella, la de hoy. */
+    var fechaBase = /^\d{4}-\d{2}-\d{2}$/.test(op.fecha || '') ? op.fecha : '';
+    var dateBase = fechaBase ? new Date(+fechaBase.slice(0, 4), +fechaBase.slice(5, 7) - 1, +fechaBase.slice(8, 10)) : null;
 
     var valores = {
       nombre: soloElNombreDe(terceroTexto),
@@ -234,9 +237,9 @@
       /* Fila 129: el hito actual; en el ARCHIVO, dónde se quedó. */
       estado: !window.EstadoHito || !a.nombre ? '' : (f.estado === 'cerrado' ? EstadoHito.textoArchivado(f) : EstadoHito.textoDeNombre(a.nombre)),
       registro: registro,
-      hoy: U.fechaLegible(U.aAaMmDd(U.hoyIso())),
-      hoyLargo: fechaLargaDe(),
-      lugarYFecha: (datosCentro.localidad ? 'En ' + datosCentro.localidad + ', a ' : 'A ') + fechaLargaDe(),
+      hoy: U.fechaLegible(U.aAaMmDd(fechaBase || U.hoyIso())),
+      hoyLargo: fechaLargaDe(dateBase),
+      lugarYFecha: (datosCentro.localidad ? 'En ' + datosCentro.localidad + ', a ' : 'A ') + fechaLargaDe(dateBase),
       limite: f.limite ? U.fechaLegible(U.aAaMmDd(f.limite)) : '',
       usuario: (window.App && App.E && App.E.usuario) || '',
       centro: datosCentro.centro || I.POR_DEFECTO_CENTRO,

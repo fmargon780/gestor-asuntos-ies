@@ -142,6 +142,11 @@ window.HitosDocumentoMenu = (function () {
         HitoMesaDocumentos.moverAOtroHito(a, hito, entrada ? entrada.hitos : [], [nombre]);
       } });
     }
+    /* Fila 280: «Convertir en plantilla», antes de «Pasar a versiones previas». */
+    if (!falta && window.ConvertirEnPlantilla) {
+      var cep = ConvertirEnPlantilla.opcionDeMesa(a, nombre, hito);
+      if (cep) opciones.push(cep);
+    }
     /* Fila 160: sin sacarlo del hito (se ve plegado en su mesa). */
     if (!falta && window.VersionesPrevias) {
       opciones.push({ texto: 'Pasar a versiones previas', alPulsar: async function () {
