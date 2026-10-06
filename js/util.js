@@ -208,7 +208,8 @@ var U = (function () {
      Pone un botón en el aviso, que dura algo más (8 s) y se cierra al pulsarlo. */
   function aviso(texto, clase, accion) {
     /* Fila 260: un intento de guardar en un ordenador de solo consulta no es un fallo: ámbar y la frase sola. */
-    if (window.SoloConsulta && String(texto).indexOf(SoloConsulta.TEXTO_ERROR) !== -1) { texto = SoloConsulta.TEXTO_ERROR; clase = 'ambar'; }
+    var teSC = window.SoloConsulta && (SoloConsulta.textoError ? SoloConsulta.textoError() : SoloConsulta.TEXTO_ERROR);
+    if (teSC && String(texto).indexOf(teSC) !== -1) { texto = teSC; clase = 'ambar'; }
     var caja = document.getElementById('mensajes');
     var d = document.createElement('div');
     d.className = 'mensaje' + (clase ? ' ' + clase : '');
@@ -289,7 +290,7 @@ var U = (function () {
 
   function mensajeDeError(e) {
     var nombre = e && e.name;
-    if (nombre === 'SoloConsulta') return 'Solo consulta: no se ha guardado nada.';   /* fila 260 */
+    if (nombre === 'SoloConsulta') return (window.SoloConsulta && SoloConsulta.textoError) ? SoloConsulta.textoError() : 'Solo consulta: no se ha guardado nada.';   /* fila 260 */
     if (nombre === 'NotFoundError') {
       return 'No encuentro la carpeta o el fichero. Puede que se haya movido o que lo esté ' +
         'sincronizando Dropbox en este momento.';

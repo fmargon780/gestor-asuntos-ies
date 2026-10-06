@@ -53,6 +53,18 @@
         await $('btn-entrar').onclick();
         document.body.classList.remove('demo-montando');
       }
+      /* Fila 287: con `&usuario=<nombre>`, los datos se montan como Revisor y se entra otra vez con ese nombre
+         (si tiene perfil de directivo, protegido y con su pantalla). */
+      var usuarioDemo = new URLSearchParams(window.location.search).get('usuario') || '';
+      if (usuarioDemo && !soloConsulta && window.Perfil) {
+        document.body.classList.add('demo-montando');
+        await new Promise(function (ok) { setTimeout(ok, 4500); });
+        Perfil._reiniciar();
+        $('campo-usuario').value = usuarioDemo;
+        Demo.reiniciarEscrituras();
+        await $('btn-entrar').onclick();
+        document.body.classList.remove('demo-montando');
+      }
       if (typeof App.irVista === 'function') App.irVista(App.E.vista || 'departamento');
 
       ponerFranja();

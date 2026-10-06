@@ -98,6 +98,7 @@ App.verArchivo = async function () {
     };
   });
   salida.sort(function (a, b) { return a.nombre < b.nombre ? 1 : -1; });
+  if (window.Perfil) salida = salida.filter(Perfil.veAsunto);   /* fila 287 */
   App.E.listaArchivo = salida;
 
   var partes = [salida.length + ' asuntos archivados.'];

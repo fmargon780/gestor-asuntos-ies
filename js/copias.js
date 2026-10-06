@@ -93,7 +93,7 @@ var Copias = (function () {
                    'tipos-documento.json', 'tablon.json', 'recurrentes.json', 'frescura.json',
                    'campos.json', 'papelera.json', 'no-duplicados.json', 'hitos.json', 'grupos.json',
                    'usuarios.json', 'borrados-listas.json', 'hitos-biblioteca.json', 'cargos.json',
-                   'formularios-campos.json', 'papelera-borrados.json'];
+                   'formularios-campos.json', 'papelera-borrados.json', 'perfiles.json'];   /* perfiles.json: fila 287 */
 
   /* Fila 178: el número de esquema de hoy. Cada migración futura que
      cambie el formato de alguno de estos ficheros lo sube. */

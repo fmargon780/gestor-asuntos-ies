@@ -57,6 +57,9 @@ App.verAbiertosPorTurno = async function (yaLeido) {
                busca: buscaSinNotas + ' ' + U.normalizar(notasTexto) };
     });
 
+  /* Fila 287: un directivo ve solo los asuntos de su órgano (Perfil.veAsunto; Administración, todos). */
+  if (window.Perfil) App.E.listaAbiertos = App.E.listaAbiertos.filter(Perfil.veAsunto);
+
   App.E.sueltos = hay.ficheros.filter(function (f) { return App.esDocumentoDeTrabajo(f.nombre); });
 
   /* Un documento que ya se ha metido en su carpeta deja de estar recién
