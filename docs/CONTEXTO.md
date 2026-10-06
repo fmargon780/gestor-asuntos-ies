@@ -123,6 +123,14 @@ si solo se parece, avisa, enseña los parecidos y deja decidir. Se usa en **cinc
 cuadro de documentos, tipos de asunto, estados, tipos de documento y campos propios. Si hace
 falta en otro sitio, se llama desde `js/util.js`: no se copia.
 
+Tipos de asunto (fila 279): las puertas que crean un tipo o le cambian el nombre (Nuevo asunto, caja «Buscar o crear»,
+«Cambiar el asunto», «Añadir X a la lista» de la ficha, «Cambiar el nombre») ya no usan `U.dejaCrear`: llaman a
+`TiposParecidos.confirmarNombre`, que mira también los nombres antiguos (`alias`) y los cortos y abre un solo cuadro,
+«¿Es otro tipo de verdad?» (`BuscarOCrear.confirmarTipo`). «Crear de todas formas» saca el nombre del `alias` de quien lo
+llevaba y apunta la pareja en `tipos-distintos.json`; un nombre igual (o nombre corto de otro) no se crea, y al cambiar
+el nombre a uno que existe se ofrece «Unir con él». La biblioteca del centro y la papelera tratan un nombre antiguo como
+ese tipo (papelera: pregunta). Los tipos de documento siguen con `U.dejaCrear`.
+
 **Aviso de que el RegAlum.csv está viejo.** Se mira la fecha del propio fichero en
 `_GESTOR/datos`: ámbar al pasarse, rojo al doblar el plazo o si no hay ninguno. Cuántos días es
 "viejo" depende de la época del año (día-mes, sin año, pueden dar la vuelta al año), configurable

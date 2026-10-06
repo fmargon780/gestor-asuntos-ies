@@ -293,6 +293,18 @@ window.TiposNombre = TiposNombre;
    día. En su lugar, el nombre viejo se guarda como alias del tipo: las
    carpetas antiguas se siguen reconociendo y se enseñan con el nombre
    nuevo, sin mover un solo fichero. */
+async function unirDesdeCambioDeNombre(tipo, otro) {
+  var ok = await U.preguntar('Ya hay un tipo «' + otro.tipo + '»',
+    '<p>¿Quieres unir «' + U.escapar(tipo.tipo) + '» con «' + U.escapar(otro.tipo) + '»?</p><p>' + TiposUnir.textoResumen(tipo, otro) + '</p>',
+    'Unir con él');
+  if (!ok) return;
+  var resultado;
+  try { resultado = await TiposUnir.unir(tipo, otro); }
+  catch (e) { U.fallo('No se han podido unir', e); return; }
+  await TiposUnir.despuesDeUnir(tipo, otro);
+  TiposUnir.avisarUnidos(otro, resultado);
+}
+
 App.renombrarTipo = async function (tipo) {
   var ok = await U.preguntar('Cambiar el nombre del tipo',
     '<label class="etiqueta">Nombre nuevo</label>' +
@@ -305,10 +317,15 @@ App.renombrarTipo = async function (tipo) {
   var nombreNuevo = U.limpiarNombre($('tipo-nuevo-nombre').value).toUpperCase();
   if (!nombreNuevo || nombreNuevo === tipo.tipo) return;
 
-  var repetido = App.E.tipos.some(function (t) {
-    return t !== tipo && U.normalizar(t.tipo) === U.normalizar(nombreNuevo);
+  /* Fila 279: si ya hay un tipo con ese nombre (o es su nombre corto), se ofrece unirlos; si es un nombre antiguo
+     de otro o se parece, el cuadro común con «Unir con él» en cada fila. Sus propios nombres antiguos no preguntan. */
+  var igual = TiposParecidos.paraNombreNuevo(nombreNuevo, tipo).filter(function (x) { return x.motivo === 'igual'; })[0];
+  if (igual) { await unirDesdeCambioDeNombre(tipo, igual.tipo); return; }
+  var parecidos = await TiposParecidos.confirmarNombre(nombreNuevo, {
+    salvo: tipo, verbo: 'Vas a cambiarle el nombre a', boton: 'Unir con él', seguir: 'Cambiar el nombre de todas formas',
+    alPulsar: function (otro) { setTimeout(function () { unirDesdeCambioDeNombre(tipo, otro); }, 0); }
   });
-  if (repetido) { U.aviso('Ya hay otro tipo con ese nombre.', 'malo'); return; }
+  if (!parecidos) return;
 
   var nombreViejo = tipo.tipo;
   var afectadas = App.E.listaAbiertos.filter(function (a) {
@@ -347,7 +364,9 @@ App.renombrarTipo = async function (tipo) {
      desaparecer al guardar. */
   await Borrados.marcar(App.E.gestor, 'tipos', nombreViejo);
   await Borrados.revivir(App.E.gestor, 'tipos', nombreNuevo);
+  TiposParecidos.alCrearNombre(nombreNuevo, parecidos);   /* fila 279: sale del `alias` de quien lo llevaba */
   await App.guardarTipos();
+  await TiposParecidos.apuntarParejas(nombreNuevo, parecidos);
 
   /* Fila 126: la guía, los campos, las plantillas y los recurrentes se
      van con el tipo. Lo principal (el nombre) ya está guardado: si esto

@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '279', fecha: '2026-10-06', texto: 'Al crear un tipo de asunto o cambiarle el nombre, la app avisa si ya hay uno parecido o si ese era el nombre antiguo de otro, y deja usar el que hay o unirlos ahí mismo.' },
   { id: '278', fecha: '2026-10-06', texto: 'El informe en PDF de «Exportar» se puede agrupar por una o dos columnas: cada bloque lleva su título, su número de asuntos y la suma de sus importes.' },
   { id: '277', fecha: '2026-10-06', texto: 'Si un tipo de asunto es el nombre antiguo de otro, la app los une sola y lo dice. Y si dos tipos se parecen, lo avisa en Inicio para unirlos o decir que no son el mismo.' },
   { id: '276', fecha: '2026-10-06', texto: 'En «+ Añadir campo» de un asunto, un campo que el asunto ya tiene pero está vacío lleva el botón «Rellenar»: pide el valor ahí mismo. Y los botones apagados ahora se ven en gris.' },

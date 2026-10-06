@@ -157,6 +157,16 @@
     var tipo = (ficha.datos && ficha.datos.tipo) || { tipo: ficha.nombre, categoria: 'OTROS' };
     var yaEsta = App.E.tipos.some(function (t) { return t.tipo === tipo.tipo; });
     if (yaEsta) return { ok: false, motivo: 'Ya hay un tipo llamado "' + tipo.tipo + '".' };
+    /* Fila 279: si su nombre es hoy el nombre corto o antiguo de otro tipo, se pregunta antes (habría dos). */
+    var rel = (window.TiposParecidos ? TiposParecidos.paraNombreNuevo(tipo.tipo) : []).filter(function (x) { return x.motivo !== 'parecido'; });
+    if (rel.length) {
+      var otro = rel[0].tipo;
+      var sigue = await U.preguntar('¿Devolver este tipo?',
+        '<p>Ya hay un tipo «' + U.escapar(otro.tipo) + '» (' + (rel[0].motivo === 'antiguo' ? 'antes se llamó «' : 'su nombre corto es «') +
+        U.escapar(tipo.tipo) + '»). Si devuelves «' + U.escapar(tipo.tipo) + '», habrá dos.</p>', 'Devolverlo de todas formas');
+      if (!sigue) return { ok: false, cancelado: true, motivo: 'No lo he devuelto: ya hay un tipo «' + otro.tipo + '».' };
+      TiposParecidos.alCrearNombre(tipo.tipo, rel);
+    }
     await Borrados.revivir(App.E.gestor, 'tipos', tipo.tipo);
     App.E.tipos.push(tipo);
     await App.guardarTipos();

@@ -60,6 +60,12 @@ var CargarBiblioteca = (function () {
       var yaConLargo = App.E.tipos.filter(function (t) {
         return mismo(t.tipo, entrada.nombreLargo) || (entrada.nombreCorto && t.nombreCorto && mismo(t.nombreCorto, entrada.nombreCorto));
       })[0];
+      /* Fila 279: un nombre largo o corto que es el nombre antiguo (`alias`) de un tipo es ese tipo; sin preguntar. */
+      if (!yaConLargo) {
+        yaConLargo = App.E.tipos.filter(function (t) {
+          return (t.alias || []).some(function (a) { return mismo(a, entrada.nombreLargo) || (entrada.nombreCorto && mismo(a, entrada.nombreCorto)); });
+        })[0];
+      }
       if (yaConLargo) { mapa[entrada.nombreLargo] = yaConLargo; return; }
 
       if (entrada.nuevo) {

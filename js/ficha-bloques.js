@@ -244,14 +244,13 @@
   async function anadirTipo(tipo, categoria) {
     var nombre = U.limpiarNombre(tipo).toUpperCase();
     if (!nombre) return;
-    var repetido = App.E.tipos.some(function (t) {
-      return U.normalizar(t.tipo) === U.normalizar(nombre);
+    /* Fila 279: el cuadro común de tipos parecidos (con «Verlo»); un nombre igual no se añade. */
+    var parecidos = await TiposParecidos.confirmarNombre(nombre, {
+      boton: 'Verlo', seguir: 'Crear de todas formas', alPulsar: function (t) { App.verTipoPorNombre(t.tipo); }
     });
-    if (repetido) { U.aviso('Ese tipo ya está en la lista.', 'malo'); return; }
+    if (!parecidos) return;
     try {
-      await Borrados.revivir(App.E.gestor, 'tipos', nombre);
-      App.E.tipos.push({ tipo: nombre, categoria: categoria });
-      await App.guardarTipos();
+      await App.crearTipo({ nombre: nombre, categoria: categoria, parecidos: parecidos });
       /* App.verAbiertos ya reengancha sola la ficha (más arriba en
          este fichero): no hace falta repetir aquí el apaño de volver
          a coger el asunto de la lista fresca. */

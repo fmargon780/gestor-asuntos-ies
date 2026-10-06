@@ -88,19 +88,19 @@ await comprobar('«matriculas» sale como ya existente (mismo nombre, plural)',
 await pagina.fill('#buscar-tipos', 'Posesión Toma');
 await botonCrear.click();
 await pagina.waitForSelector('#capa:not(.oculto)');
-await comprobar('otro orden de palabras también pregunta «¿Seguro…?»',
-  pagina.locator('#cuadro-cuerpo [data-bc-ir="TOMA POSESION"]').count(), 1);
+await comprobar('otro orden de palabras también pregunta «¿Es otro tipo de verdad?»',
+  pagina.locator('#cuadro-cuerpo li:has-text("TOMA POSESION") button').count(), 1);
 await pagina.click('#cuadro-cancelar');
 await pagina.fill('#buscar-tipos', 'MATRICLUA');
 await pagina.waitForTimeout(150);
 await botonCrear.click();
 await pagina.waitForSelector('#capa:not(.oculto)');
-await comprobar('sale «¿Seguro que no es ninguno de estos?»',
-  pagina.locator('#cuadro-titulo').textContent(), '¿Seguro que no es ninguno de estos?');
+await comprobar('sale «¿Es otro tipo de verdad?»',
+  pagina.locator('#cuadro-titulo').textContent(), '¿Es otro tipo de verdad?');
 await comprobar('con MATRICULA en la lista del cuadro',
-  pagina.locator('#cuadro-cuerpo [data-bc-ir="MATRICULA"]').count(), 1);
-await comprobar('y el botón dice «Crearlo igualmente»', pagina.locator('#cuadro-aceptar').textContent(), 'Crearlo igualmente');
-await pagina.click('#cuadro-cuerpo [data-bc-ir="MATRICULA"]');
+  pagina.locator('#cuadro-cuerpo li:has-text("MATRICULA") button').count(), 1);
+await comprobar('y el botón dice «Crear de todas formas»', pagina.locator('#cuadro-aceptar').textContent(), 'Crear de todas formas');
+await pagina.click('#cuadro-cuerpo li:has-text("MATRICULA") button');
 await pagina.waitForSelector('#capa.oculto', { state: 'attached' });
 await comprobar('pulsar uno lleva a ese tipo (se ve MATRICULA)',
   nombresVisibles().then(n => n.indexOf('MATRICULA') !== -1), true);
