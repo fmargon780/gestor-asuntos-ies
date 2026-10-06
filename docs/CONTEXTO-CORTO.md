@@ -141,7 +141,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
   pulsando su pestaña; Documentos: 5 nombres como mucho y «y N más»); cabecera en dos líneas, con hasta 3 datos del tercero junto al nombre («Elegir datos», por clase, fila 272).
 - Registrar detecta el PDF sellado, y también deja el original en «Versiones previas» como "SIN
   SELLAR" al registrar a mano un fichero distinto (igual que el Word con su PDF); las versiones
-  previas quedan plegadas; cada documento, asociable a un hito.
+  previas quedan plegadas; cada documento se asocia, se trae y se quita de su hito desde la ficha y desde la mesa de cualquier hito, y la tarea que se marcó con él se queda marcada, con «Desmarcar» (fila 282).
 - Terceros relacionados con un asunto (altas por grupo: unidad, nivel, grupo propio), destinatarios de
   correo o Séneca; generar para cada relacionado: un documento por persona y un correo a cada una.
 - Menú de la izquierda: Inicio · Nuevo asunto · Archivo · Personas y empresas · Impresos · Cuentas ·

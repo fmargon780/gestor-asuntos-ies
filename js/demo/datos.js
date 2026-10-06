@@ -125,8 +125,12 @@
 
   async function crearTipos() {
     var matricula = await crearTipoConGuia('MATRICULA', 'ALUMNADO', [
-      { titulo: 'Recibir la solicitud', cuerpo: '<p>Comprobar que llega firmada por quien tiene la patria potestad.</p>', responsable: 'yo' },
-      { titulo: 'Comprobar la documentación', cuerpo: '<p>Si es matrícula nueva, comprobamos que trae:</p><ul><li>DNI o NIE</li><li>Libro de familia</li><li>Empadronamiento</li></ul>', responsable: 'yo' },
+      /* Fila 282: una tarea de «reunir un documento» en cada uno de los dos primeros hitos, para probar «Quitar del hito»
+         y «Traer a este hito» (la tarea se marca sola al apuntar el documento y se queda marcada al quitarlo). */
+      { titulo: 'Recibir la solicitud', cuerpo: '<p>Comprobar que llega firmada por quien tiene la patria potestad.</p>', responsable: 'yo',
+        guion: [{ id: 'g-demo-solicitud', texto: 'Reunir la solicitud firmada', reunir: 'documento' }] },
+      { titulo: 'Comprobar la documentación', cuerpo: '<p>Si es matrícula nueva, comprobamos que trae:</p><ul><li>DNI o NIE</li><li>Libro de familia</li><li>Empadronamiento</li></ul>', responsable: 'yo',
+        guion: [{ id: 'g-demo-documentos', texto: 'Reunir el libro de familia', reunir: 'documento' }] },
       { titulo: 'Registrar la matrícula en Séneca', cuerpo: '<p>Dar de alta al alumno o alumna en el grupo que corresponda.</p>', responsable: 'yo' }
     ], 15);
 

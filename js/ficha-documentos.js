@@ -159,29 +159,21 @@ var FichaDocumentos = (function () {
       asociar.textContent = 'Asociar a un hito';
       fila.appendChild(asociar);
 
+      /* Fila 282: «Quitar del hito» y «mover» por la función común (js/hitos-sacar-documento.js): la tarea que se marcó
+         con el documento se queda marcada, con su aviso y «Desmarcar». */
       function accionAsociar(hitoNuevo) {
         return async function () {
-          if ((hitoNuevo && hitoNuevo.id) === (hitoDelDoc && hitoDelDoc.id)) return;
+          if (hitoNuevo && hitoDelDoc && hitoNuevo.id === hitoDelDoc.id) return;
           try {
-            if (hitoDelDoc) await Hitos.quitarDocumento(a.nombre, hitoDelDoc.id, f.nombre);
-            if (hitoNuevo) await Hitos.anadirDocumento(a.nombre, hitoNuevo.id, f.nombre);
-            /* Fila 138: la línea «hay que reunir un documento» del guion. */
-            if (window.HitosRequisitos) {
-              try {
-                if (hitoDelDoc) await HitosRequisitos.desmarcarPorDocumento(a.nombre, hitoDelDoc.id, f.nombre);
-                if (hitoNuevo) await HitosRequisitos.marcarPorDocumento(a.nombre, hitoNuevo.id, f.nombre);
-              } catch (e2) { /* no crítico */ }
-            }
-            if (window.HitosPanel) window.HitosPanel.programarRepintado();
-            pintar(a);
+            if (hitoNuevo) await HitosSacarDocumento.mover(a, [f.nombre], hitoNuevo);
+            else await HitosSacarDocumento.quitar(a, [f.nombre]);   /* ya repinta la tarjeta: sin un segundo pintar a la vez */
           } catch (e) { U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo'); }
         };
       }
 
-      FichaMenus.montar(asociar, [{
-        texto: (hitoDelDoc ? '' : '✓ ') + 'Ninguno',
-        alPulsar: accionAsociar(null)
-      }].concat(hitosVisibles.map(function (h) {
+      FichaMenus.montar(asociar, (hitoDelDoc ? [
+        { texto: 'Quitar del hito', alPulsar: accionAsociar(null) }, { raya: true }
+      ] : []).concat(hitosVisibles.map(function (h) {
         return {
           texto: (hitoDelDoc && hitoDelDoc.id === h.id ? '✓ ' : '') + h.titulo,
           alPulsar: accionAsociar(h)

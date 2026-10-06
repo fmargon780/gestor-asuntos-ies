@@ -100,9 +100,9 @@ await comprobar('1. de partida, ningún documento enseña un hito debajo de su n
 console.log('--- 2. asociar el documento A al primer hito ---');
 await filaDe(DOC_A).locator('.ficha-documento-asociar').click();
 await pagina.waitForTimeout(100);
-await comprobar('2. el menú ofrece "Ninguno" y los dos hitos, en orden',
+await comprobar('2. sin hito, el menú ofrece solo los dos hitos, en orden (fila 282: ya no hay «Ninguno»)',
   pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents(),
-  ['✓ Ninguno', 'Pedir presupuesto', 'Comprobar la factura']);
+  ['Pedir presupuesto', 'Comprobar la factura']);
 await pagina.getByRole('button', { name: 'Pedir presupuesto', exact: true }).click();
 await pagina.waitForFunction(() => {
   const hito = document.querySelector('#ficha-guia .hito');
@@ -120,9 +120,9 @@ await comprobar('2. el hito "Pedir presupuesto" enseña el documento debajo',
 console.log('--- 3. cambiar de hito: se quita del primero, se pone en el segundo ---');
 await filaDe(DOC_A).locator('.ficha-documento-asociar').click();
 await pagina.waitForTimeout(100);
-await comprobar('3. el menú ahora marca el hito elegido',
+await comprobar('3. el menú ahora lleva «Quitar del hito» arriba y marca el hito elegido',
   pagina.locator('.ficha-menu:not(.oculto) .ficha-menu-opcion').allTextContents(),
-  ['Ninguno', '✓ Pedir presupuesto', 'Comprobar la factura']);
+  ['Quitar del hito', '✓ Pedir presupuesto', 'Comprobar la factura']);
 await pagina.getByRole('button', { name: 'Comprobar la factura', exact: true }).click();
 /* El documento se actualiza al momento (lo repinta el propio
    pintar()), pero el panel de hitos vigila por su cuenta y repinta
@@ -148,10 +148,10 @@ await comprobar('3. "Comprobar la factura" lo enseña ahora',
   pagina.locator('#ficha-guia .hito', { hasText: 'Comprobar la factura' }).locator('.hito-documento').textContent()
     .then((t) => t.trim().indexOf(DOC_A) !== -1), true);
 
-console.log('--- 4. "Ninguno" lo suelta del todo ---');
+console.log('--- 4. «Quitar del hito» lo suelta del todo (fila 282: antes «Ninguno») ---');
 await filaDe(DOC_A).locator('.ficha-documento-asociar').click();
 await pagina.waitForTimeout(100);
-await pagina.getByRole('button', { name: 'Ninguno', exact: true }).click();
+await pagina.getByRole('button', { name: 'Quitar del hito', exact: true }).click();
 await pagina.waitForFunction((doc) => {
   const fila = Array.from(document.querySelectorAll('.ficha-documento-fila'))
     .find((f) => f.textContent.indexOf(doc) !== -1);
