@@ -462,3 +462,4 @@ de `App` va después del fichero que lo define.
 | `js/control-registro-avisos.js` | Fila 259: los dos trozos de Inicio («N apuntes de registro sin asunto», «Registro sin revisar desde…») y el campo «Registro de Séneca sin revisar» de Ajustes → Días de aviso |
 | `css/control-registro.css` | Fila 259: la tabla de trabajo del control del registro |
 | `pruebas/control-registro.mjs` | Prueba de la fila 259, sin navegador: lectura de los CSV (`pruebas/control-registro-entrada.csv` y `-salida.csv`, inventados, en Latin-1), subir sin duplicar, emparejado, decisiones, huecos y avisos |
+| `pruebas/numero-cambiado-crea-igual.mjs` | Prueba de la fila 275: con el número ya gastado por otro ordenador, crear un asunto o guardar un documento se hace en una sola pulsación con el número siguiente y el aviso lo dice |

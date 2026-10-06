@@ -13,8 +13,8 @@ silencioso de la fila 130/177. Solo lo creado desde esta versión lleva número 
   ficha (`numero`, o las claves de `documentos`) de todos los asuntos (abiertos y archivados) y el
   índice del ARCHIVO. Si está ocupado se salta al siguiente libre; un número dado no se reutiliza nunca.
 - `Numeros.proximo(clase, fecha)` lo calcula SIN gastarlo (la vista previa); `Numeros.reservar(clase,
-  esperado)` lo gasta y dice `{ numero, cambio }` (`cambio` si otro ordenador se quedó el esperado: se
-  enseña el nombre nuevo y hay que volver a pulsar «Crear»/«Guardar»).
+  esperado)` lo gasta y dice `{ numero, cambio }` (`cambio` si otro ordenador se quedó el esperado: fila 275,
+  quien llama sigue adelante con el número nuevo, recalcula el nombre y lo dice en el aviso verde final).
 - Mismo fichero, mismo número: `Numeros.deOrigen`/`recordarOrigen` (en este ordenador, por nombre +
   tamaño + fecha del fichero de origen) para guardar el mismo documento en dos asuntos. Repartir entre
   terceros da UN número de documento a todas sus copias.
