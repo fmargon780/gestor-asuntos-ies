@@ -628,3 +628,7 @@ por sus palabras clave; con tipo ya puesto, el PDF no lo pisa; sin adjuntos, sin
 adjuntos, y con uno que no se puede leer, la tarjeta se queda exactamente como antes de esta fila.
 El paso de los adjuntos por el cuadro de nombre, con `pruebas/por-clasificar-usa-lo-leido.mjs` y la
 batería completa.
+
+## Con qué plantilla se abre el cuadro (fila 271)
+
+`plantillaElegida` empieza en `null` (sin decidir) en `correo-cuadro.js` y `seneca-cuadro.js`; `''` es «Sin plantilla» elegida y se respeta en cada repintado. Orden de entrada: la pedida (`plantillaPedida`), si está en la lista; si no, la primera plantilla **propia del tipo** (`CorreoNucleo.plantillaDeEntrada`, en `js/correo.js`); si no hay, «Sin plantilla». «Aviso de avance» y «Aviso de cierre» (sin tipo) nunca salen puestas solas. `abrirCuadro` usa el hito actual del asunto (`Hitos.hitoActualDeAsunto`) si no llega `extra.hito`; `HitosComunicar.comunicar` ya pasa `hito`. Prueba: `pruebas/plantilla-que-no-vuelve.mjs`.

@@ -155,6 +155,11 @@ var Guias = (function () {
          nunca en un paso-pregunta (se vacían más abajo). */
       textoDocumentos: String((p && p.textoDocumentos) || ''),
       tipoDocumento: String((p && p.tipoDocumento) || ''),
+      /* Fila 195 (docs/AVISOS-A-QUIEN-LO-PIDE.md): la casilla «Al terminar este
+         hito, avisar a quien lo pide» y su plantilla; sin ellas se perdían
+         al guardar la guía. Igual que lo de arriba: nunca en una pregunta. */
+      avisarLoPide: !!(p && p.avisarLoPide),
+      avisarLoPidePlantilla: (p && p.avisarLoPide) ? String(p.avisarLoPidePlantilla || '') : '',
       origenBiblioteca: (p && p.origenBiblioteca && p.origenBiblioteca.id)
         ? { id: p.origenBiblioteca.id, revision: parseInt(p.origenBiblioteca.revision, 10) || 1,
             divergido: !!p.origenBiblioteca.divergido }
@@ -213,6 +218,8 @@ var Guias = (function () {
         salida.soloInformativo = false;
         salida.textoDocumentos = '';
         salida.tipoDocumento = '';
+        salida.avisarLoPide = false;
+        salida.avisarLoPidePlantilla = '';
       }
       return salida;
     }).filter(function (p) {

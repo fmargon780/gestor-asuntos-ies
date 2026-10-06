@@ -38,7 +38,7 @@ var SenecaCuadro = (function () {
   /* ---------- el cuerpo del cuadro ---------- */
 
   function cuerpoHtml(a, opcionesGrupo) {
-    plantillaElegida = '';
+    plantillaElegida = null; /* fila 271: null = sin decidir; '' = «Sin plantilla» */
     copiadoElAsunto = false;
     var quien = n().aQuien ? n().aQuien(a) : '';
     var documento = n().documentoSeneca ? n().documentoSeneca() : '';
@@ -100,7 +100,7 @@ var SenecaCuadro = (function () {
     /* Fila 164: la receta de un paso trae su plantilla (una vez). */
     var pedida = (n()._interno || {}).plantillaPedida;
     if (pedida && opciones.some(function (p) { return p.id === pedida; })) { plantillaElegida = pedida; n()._interno.plantillaPedida = ''; }
-    if (!plantillaElegida && opciones.length) plantillaElegida = opciones[0].id;
+    if (plantillaElegida === null) plantillaElegida = n().plantillaDeEntrada(a, opciones);
     if (plantillaElegida && !opciones.some(function (p) { return p.id === plantillaElegida; })) {
       plantillaElegida = '';
     }
@@ -120,7 +120,7 @@ var SenecaCuadro = (function () {
               U.escapar(p.nombre) + '</option>';
           }).join('') +
         '</select>' +
-        '<button type="button" class="boton boton-chico" id="seneca-plantilla-editar">Editar plantilla</button>' +
+        '<button type="button" class="boton boton-chico" id="seneca-plantilla-editar">Cambiar la plantilla</button>' +
         '</div>' +
         '<div id="seneca-plantilla-confirmar" class="oculto"></div>'
       : '<p class="nota aviso-en-linea" id="seneca-sin-plantilla">Este tipo de asunto no tiene plantilla de ' +

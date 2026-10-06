@@ -167,7 +167,7 @@ comparten `RegAlum.csv`, que aquí sirve para consultar contacto de alumnado y d
 - Word: lo que falta se pregunta antes; se ve en la app, con «Guardar PDF» (cierra el visor al terminar) e
   «Imprimir» (sin editar aún).
 - Plantillas de correo (con texto propio para Séneca) y de Word por tipo, con huecos que se rellenan solos;
-  también desde el cuadro de Correo/Séneca; las del centro, sacadas de los documentos del compañero (Mantenimiento). Membrete de la Junta (lo dibuja la app; logo opcional), firma de quien ocupaba
+  también desde el cuadro de Correo/Séneca (se abre con la propia del tipo o «Sin plantilla»; «Sin plantilla» se queda); las del centro, sacadas de los documentos del compañero (Mantenimiento). Membrete de la Junta (lo dibuja la app; logo opcional), firma de quien ocupaba
   el cargo en su fecha y «el/la alumno/a» según el sexo de cada persona.
 - Tablas de datos (tutorías de Séneca, Consejo Escolar —por nombre, fila 238—, CSV/Excel) unidas por DNI, con huecos; lo que falta, en amarillo. Certificado de función tutorial
   como el del centro; renuncia a la Junta Electoral, en su hito.

@@ -196,6 +196,13 @@ await comprobar('y enseña los títulos de los dos pasos',
     .then(t => t.indexOf('Pedir el sobre de matrícula') !== -1 &&
                t.indexOf('Comprobar el pago de la Seguridad Escolar') !== -1), true);
 
+/* Fila 271 (casilla «avisar al terminar»): guardar la guía no la pierde. */
+await comprobar('la casilla «avisar a quien lo pide» y su plantilla sobreviven al normalizar la guía',
+  pagina.evaluate(() => {
+    const g = Guias.normalizar([{ titulo: 'Uno', avisarLoPide: true, avisarLoPidePlantilla: 'pl-9' }, { titulo: 'Dos' }]);
+    return [g[0].avisarLoPide, g[0].avisarLoPidePlantilla, g[1].avisarLoPide, g[1].avisarLoPidePlantilla];
+  }), [true, 'pl-9', false, '']);
+
 if (errores.length) { fallos++; console.log('ERRORES EN LA CONSOLA:\n' + errores.join('\n')); }
 console.log(fallos ? '\n' + fallos + ' FALLOS' : '\nTodo bien');
 await navegador.close();
