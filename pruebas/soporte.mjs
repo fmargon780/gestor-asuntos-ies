@@ -14,6 +14,8 @@
       en pequeño, se puede quitar y va en el envío.
    9. ✕, Cancelar y Escape cierran.
    10. Con un buzón sin internet (petición cortada): aviso, texto intacto.
+   12. Fila 269 (docs/SOPORTE-MANDA-EL-CORREO.md): el correo de quien avisa, pedido
+       una vez, recordado, enviado con el aviso, y «Cambiar».
    Reutiliza el disco de mentira de pruebas/navegador.mjs. */
 import { chromium } from 'playwright';
 import fs from 'fs';
@@ -60,9 +62,11 @@ await comprobar('1. abajo a la derecha, sin salirse de la pantalla',
   [true, true, true, true]);
 await comprobar('1. el texto del botón es «Soporte»', pagina.locator('#btn-soporte').textContent(), 'Soporte');
 
-async function abrir() {
+async function abrir(conCorreo = true) {
   await pagina.click('#btn-soporte');
   await pagina.waitForSelector('#capa-soporte');
+  /* Fila 269: la primera vez el correo es obligatorio; las pruebas antiguas lo rellenan. */
+  if (conCorreo && await pagina.locator('#soporte-correo').count()) await pagina.fill('#soporte-correo', 'ana@ejemplo.es');
 }
 const mensaje = () => pagina.locator('#soporte-mensaje').textContent();
 
@@ -236,6 +240,48 @@ await pagina.fill('#soporte-texto', largo);
 await pagina.click('#soporte-enviar');
 await pagina.waitForSelector('#capa-soporte', { state: 'detached' });
 await comprobar('11. un texto de 50.000 caracteres llega entero', (recibidos[recibidos.length - 1] || {}).texto.length, largo.trim().length);
+
+/* 12. Fila 269: el correo de quien avisa. */
+modo = 'bien';
+await pagina.evaluate(() => { localStorage.removeItem('gestor-soporte-correo'); App.ir('abiertos'); });
+await pagina.waitForTimeout(200);
+await abrir(false);
+await comprobarQue('12. la primera vez sale el campo «Tu correo» con su línea', pagina.evaluate(() =>
+  !!document.getElementById('soporte-correo') && document.querySelector('.soporte-cuadro').textContent.indexOf('Te escribiremos a esta dirección cuando tu aviso esté resuelto.') > -1));
+await pagina.click('.soporte-tipo[data-tipo="error"]');
+await pagina.fill('#soporte-texto', 'Texto del aviso');
+const antes12 = recibidos.length;
+await pagina.click('#soporte-enviar');
+await comprobar('12. correo vacío: dice que lo escriba', await mensaje(), 'Escribe tu correo para avisarte cuando esté resuelto.');
+await comprobar('12. y el texto sigue en la ventana', pagina.inputValue('#soporte-texto'), 'Texto del aviso');
+await pagina.fill('#soporte-correo', 'hola');
+await pagina.click('#soporte-enviar');
+await comprobar('12. con mala forma: «Ese correo no parece correcto»', await mensaje(), 'Ese correo no parece correcto. Revísalo.');
+await comprobar('12. no se ha enviado nada', recibidos.length, antes12);
+await pagina.fill('#soporte-correo', 'ana@ejemplo.es');
+await pagina.click('#soporte-enviar');
+await pagina.waitForSelector('#capa-soporte', { state: 'detached' });
+await comprobar('12. con un correo bueno, el aviso lleva `correo`', (recibidos[recibidos.length - 1] || {}).correo, 'ana@ejemplo.es');
+await abrir(false);
+await comprobar('12. la segunda vez no se pregunta: «Te avisaremos en …» y «Cambiar»', pagina.evaluate(() => {
+  const l = document.getElementById('soporte-correo-sabido');
+  return [!document.getElementById('soporte-correo'), l && l.textContent, !!document.getElementById('soporte-cambiar-correo')]; }),
+  [true, 'Te avisaremos en ana@ejemplo.es · Cambiar', true]);
+await pagina.click('.soporte-tipo[data-tipo="mejora"]');
+await pagina.fill('#soporte-texto', 'Otro aviso');
+await pagina.click('#soporte-enviar');
+await pagina.waitForSelector('#capa-soporte', { state: 'detached' });
+await comprobar('12. y el aviso lleva el mismo `correo`', (recibidos[recibidos.length - 1] || {}).correo, 'ana@ejemplo.es');
+await abrir(false);
+await pagina.click('#soporte-cambiar-correo');
+await comprobar('12. «Cambiar» vuelve a poner el campo, con el correo anterior', pagina.inputValue('#soporte-correo'), 'ana@ejemplo.es');
+await pagina.fill('#soporte-correo', 'berta@ejemplo.es');
+await pagina.click('.soporte-tipo[data-tipo="mejora"]');
+await pagina.fill('#soporte-texto', 'Un tercer aviso');
+await pagina.click('#soporte-enviar');
+await pagina.waitForSelector('#capa-soporte', { state: 'detached' });
+await comprobar('12. el siguiente aviso lleva el nuevo', (recibidos[recibidos.length - 1] || {}).correo, 'berta@ejemplo.es');
+await comprobar('12. correoBueno', pagina.evaluate(() => ['a@b.es', 'hola', 'a@b', 'a b@c.es', ''].map(Soporte.correoBueno)), [true, false, false, false, false]);
 
 /* La petición cortada a propósito (punto 10) deja su propio aviso. */
 const propios = errores.filter(t => t.indexOf('ERR_FAILED') === -1);

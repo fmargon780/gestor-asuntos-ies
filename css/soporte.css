@@ -28,3 +28,4 @@ body.con-lector .boton-soporte { right: calc(var(--ancho-lector) + 20px); }
 .soporte-mensaje { padding: 8px 10px; border-radius: 6px; font-size: 13px; margin-top: 8px; }
 .soporte-mal { background: var(--rojo); border: 1px solid #f0b7b1; }
 .soporte-bien { background: #e6f4ea; }
+.soporte-correo { margin-bottom: 4px; }

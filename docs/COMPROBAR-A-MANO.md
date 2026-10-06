@@ -6,6 +6,11 @@ para ir tachando.
 
 ---
 
+- [ ] **El correo de quien avisa (fila 269, `docs/SOPORTE-MANDA-EL-CORREO.md`).** Con la web ya
+      publicada, en un ordenador real: pulsar «Soporte», escribir un aviso con tu correo y enviarlo.
+      Si el vigilante (fila 268) ya está en marcha, cuando la fila del aviso esté HECHA te llega el
+      correo «tu aviso ya está resuelto». Al abrir «Soporte» otra vez, sale «Te avisaremos en…» y
+      «Cambiar».
 - [ ] **El vigilante (fila 268, `docs/VIGILANTE-Y-CORREOS.md`).** Volver a pegar
       `apps-script/soporte.gs`, ejecutar `prepararTodo` y aceptar el permiso nuevo que pida Google
       (una sola vez). Llega un correo de resumen que dice a qué direcciones llegarán los avisos,
