@@ -465,3 +465,5 @@ de `App` va después del fichero que lo define.
 | `pruebas/numero-cambiado-crea-igual.mjs` | Prueba de la fila 275: con el número ya gastado por otro ordenador, crear un asunto o guardar un documento se hace en una sola pulsación con el número siguiente y el aviso lo dice |
 | `js/datos-favoritos.js`, `js/ficha-datos-favoritos.js`, `css/ficha-datos-favoritos.css` | Fila 272: los datos del tercero junto al nombre del asunto (qué datos hay, qué ha elegido el centro, el bloque de la cabecera y el cuadro «Elegir datos») |
 | `pruebas/datos-favoritos.mjs` | Prueba de la fila 272: la unidad del alumnado, elegir hasta 3, una elección por clase, guardado en `_GESTOR`, archivo, modo consulta, cabecera encogida y 1280 px |
+| `js/plantilla-de-lo-escrito.js` | Fila 270: «Guardar como plantilla nueva» de los cuadros de Correo y de Séneca (quitar saludo y firma, cambiar datos por huecos, abrir el editor con lo escrito) |
+| `pruebas/plantilla-de-lo-escrito.mjs` | Prueba de la fila 270: la parte pura y el recorrido en los dos cuadros |

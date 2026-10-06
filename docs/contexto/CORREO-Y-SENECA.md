@@ -463,7 +463,16 @@ crean en Ajustes, pegadas a un tipo de asunto, y se guardan en `_GESTOR/plantill
   `CorreoNucleo.recargarPlantillas` (`js/correo.js`) refresca la caché de plantillas del cuadro, se
   vuelve al formulario con la nueva ya elegida y el cuerpo se rellena con ella — con la misma
   confirmación en línea de siempre (`#correo-plantilla-confirmar`/`#seneca-plantilla-confirmar`) si
-  había algo escrito a mano. Funciona igual abierto desde la ficha o desde «Comunicar» de la mesa
+  había algo escrito a mano.
+  **«Guardar como plantilla nueva»** (fila 270, `js/plantilla-de-lo-escrito.js`, `docs/PLANTILLA-NUEVA-DE-LO-ESCRITO.md`):
+  junto a «Cambiar la plantilla» en los dos cuadros (y «Crear plantilla», con la lista vacía, hace lo
+  mismo). Abre ese mismo editor con lo escrito: sin el saludo ni la firma (solo si coinciden tal cual
+  con `CorreoNucleo.saludoDe(a)`/`firmaDe()`) y con los datos de este asunto cambiados por su hueco
+  (`cambiarDatos`, función pura: valores de `CorreoNucleo.valoresDelCuadro()`, de 4 caracteres o más,
+  palabra entera, los más largos primero). El editor lista los cambios con «Deshacer». Al guardar, la
+  plantilla (para el tipo y la categoría del asunto, sin hito) queda elegida y el texto del mensaje no
+  se toca; con nada escrito se comporta como antes. `montarEditorEnLinea` rechaza ya un nombre repetido
+  en el mismo tipo. Prueba: `pruebas/plantilla-de-lo-escrito.mjs`. Funciona igual abierto desde la ficha o desde «Comunicar» de la mesa
   del hito: los dos acaban en `CorreoNucleo.abrirCuadro`.
 - **En Ajustes**, bloque propio "Plantillas de correo" (vive entero en `js/plantillas.js`, no
   toca `js/ajustes.js`, que ya pasa de 47 KB: se engancha solo con `window.Gestor.alRefrescar`,

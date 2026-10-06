@@ -121,6 +121,7 @@ var SenecaCuadro = (function () {
           }).join('') +
         '</select>' +
         '<button type="button" class="boton boton-chico" id="seneca-plantilla-editar">Cambiar la plantilla</button>' +
+        '<button type="button" class="boton boton-chico" id="seneca-plantilla-desde-escrito">Guardar como plantilla nueva</button>' +
         '</div>' +
         '<div id="seneca-plantilla-confirmar" class="oculto"></div>'
       : '<p class="nota aviso-en-linea" id="seneca-sin-plantilla">Este tipo de asunto no tiene plantilla de ' +
@@ -195,15 +196,7 @@ var SenecaCuadro = (function () {
   function engancharPlantilla(a) {
     var desplegable = $('seneca-plantilla');
     if (desplegable) desplegable.onchange = function () { elegirPlantilla(a, this.value); };
-
-    var editar = $('seneca-plantilla-editar');
-    if (editar) editar.onclick = function () {
-      var opciones = (n().plantillasDelTipo && n().plantillasDelTipo(a)) || [];
-      var existente = opciones.filter(function (p) { return p.id === plantillaElegida; })[0] || null;
-      abrirEditorPlantilla(a, existente);
-    };
-    var crear = $('seneca-plantilla-crear');
-    if (crear) crear.onclick = function () { abrirEditorPlantilla(a, null); };
+    PlantillaDeLoEscrito.engancharBotones(cfgPlantilla, a, function () { return plantillaElegida; });   /* fila 270 */
   }
 
   /* Igual que en js/correo-cuadro.js: la misma confirmación en línea si
@@ -244,28 +237,14 @@ var SenecaCuadro = (function () {
   }
 
   /* ---------- crear/editar la plantilla desde el propio cuadro
-     (25-sep-2026, fila 151, docs/PLANTILLA-DESDE-EL-CUADRO.md) ---------- */
+     (fila 151; el editor y «Guardar como plantilla nueva» de la fila 270
+     viven en js/plantilla-de-lo-escrito.js) ---------- */
 
-  function abrirEditorPlantilla(a, existente) {
-    var formulario = $('seneca-formulario');
-    var editor = $('seneca-plantilla-editor');
-    if (!formulario || !editor || !window.PlantillasAjustes) return;
-    formulario.className = 'oculto';
-    editor.className = '';
-    PlantillasAjustes.montarEditorEnLinea(editor, a, existente, function (guardada) {
-      cerrarEditorPlantilla();
-      (n().recargarPlantillas ? n().recargarPlantillas(a) : Promise.resolve()).then(function () {
-        elegirPlantilla(a, guardada.id);
-      });
-    }, cerrarEditorPlantilla);
+  function dejarElegida(a, id, texto) {
+    cambiarDePlantilla(a, id);
+    if ($('seneca-cuerpo-texto')) $('seneca-cuerpo-texto').value = texto;
   }
-
-  function cerrarEditorPlantilla() {
-    var formulario = $('seneca-formulario');
-    var editor = $('seneca-plantilla-editor');
-    if (editor) editor.className = 'oculto';
-    if (formulario) formulario.className = '';
-  }
+  var cfgPlantilla = { prefijo: 'seneca', elegir: elegirPlantilla, dejarElegida: dejarElegida };
 
   /* Los dos botones numerados (3.4): cada uno copia siempre lo suyo,
      se pulse en el orden que se pulse. El que toca se destaca; al

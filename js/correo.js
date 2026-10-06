@@ -163,17 +163,18 @@
      los huecos que se han quedado sin dato, para el aviso de arriba.
      `paraSeneca` (fila 170): si la plantilla trae `textoSeneca` (Séneca
      no adjunta ficheros), se usa ese; si no, el `texto` de siempre. */
-  function cuerpoDelMedio(a, idPlantilla, paraSeneca) {
+  /* El saludo que la app pone sola (fila 270: la plantilla de lo escrito
+     lo quita, y lo necesita saber tal cual). */
+  function saludoDe(a) {
     var categoria = categoriaDe(a);
     var nombre = soloElNombre(terceroDe(a));
-    var saludo;
-    if (categoria === 'ALUMNADO') {
-      saludo = 'Estimados tutores legales de ' + nombre + ':';
-    } else if (categoria === 'PERSONAL') {
-      saludo = 'Hola' + (nombre ? ', ' + nombre : '') + ':';
-    } else {
-      saludo = 'Buenos días:';
-    }
+    if (categoria === 'ALUMNADO') return 'Estimados tutores legales de ' + nombre + ':';
+    if (categoria === 'PERSONAL') return 'Hola' + (nombre ? ', ' + nombre : '') + ':';
+    return 'Buenos días:';
+  }
+
+  function cuerpoDelMedio(a, idPlantilla, paraSeneca) {
+    var saludo = saludoDe(a);
 
     var medio = '', faltan = [];
 
@@ -354,6 +355,11 @@
     plantillaDeEntrada: plantillaDeEntrada,
     recargarPlantillas: recargarPlantillas,
     cuerpoDelMedio: cuerpoDelMedio,
+    /* Fila 270 (js/plantilla-de-lo-escrito.js): el saludo y la firma que
+       pone la app, y los valores del asunto abierto (con su hito). */
+    saludoDe: saludoDe,
+    firmaDe: textoDeLaFirma,
+    valoresDelCuadro: function () { return valoresActuales; },
     MAXIMO_LETRAS_SENECA: MAXIMO_LETRAS_SENECA,
     /* Abrir un cuadro directamente, sin pasar por el menú "Comunicar":
        lo usa js/hitos-comunicar.js (fila 60) cuando el paso del hito
