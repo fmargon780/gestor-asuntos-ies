@@ -203,6 +203,8 @@ var AjustesPlegado = (function () {
       ponerResumen(secWord, nw ? String(nw) : 'ninguna');
     }
 
+    if (window.AjustesTipoAlTerminar) ponerResumen(seccionDelTipo('al-terminar'), AjustesTipoAlTerminar.resumen(tipo));   /* fila 274 */
+
     ponerResumen(seccionDelTipo('plazo'), tipo.plazo ? plural(tipo.plazo, 'día', 'días') : 'sin plazo');
 
     var palabras = tipo.palabrasClave || [];

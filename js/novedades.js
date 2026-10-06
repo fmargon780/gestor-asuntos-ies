@@ -9,6 +9,7 @@
    internet (file://), donde fetch de un JSON no funciona.
    ============================================================ */
 window.NOVEDADES = [
+  { id: '274', fecha: '2026-10-06', texto: 'En Ajustes de un tipo de asunto hay un apartado nuevo, «Al terminar el asunto»: sin abrirlo dice si el asunto se archiva o pasa a «Por liquidar». Ahí están ahora esa casilla y la de avisar a quien lo pide.' },
   { id: '270', fecha: '2026-10-06', texto: 'En el cuadro de Correo y en el de Séneca hay un botón nuevo, «Guardar como plantilla nueva»: convierte lo que has escrito en una plantilla, con los datos del asunto ya cambiados por su hueco.' },
   { id: '272', fecha: '2026-10-06', texto: 'En la ficha de un asunto, junto al nombre, se ven hasta 3 datos de la persona o empresa (para el alumnado, la unidad). Con «Elegir datos» decides cuáles, para todos los asuntos de esa clase.' },
   { id: '275', fecha: '2026-10-06', texto: 'Si el otro ordenador se queda el número mientras creas un asunto o guardas un documento, se crea con el siguiente y te lo dice; ya no hay que pulsar otra vez.' },

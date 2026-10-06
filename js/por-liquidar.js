@@ -5,8 +5,9 @@
    Hay asuntos que, terminados, aún no se pueden archivar: hay que
    liquidarlos de vez en cuando con otro órgano del centro (el seguro
    escolar que cobra Administración y entrega a Secretaría). Cada tipo
-   de asunto lleva una casilla en Ajustes, «Hay que liquidarlo antes de
-   archivar» (`tipo.liquidar`). Los asuntos de esos tipos, en el momento
+   de asunto lleva una casilla en Ajustes, «Al terminar, pasa a «Por
+   liquidar» en vez de archivarse» (`tipo.liquidar`, apartado «Al terminar
+   el asunto», fila 274). Los asuntos de esos tipos, en el momento
    en que se ofrecería archivarlos, pasan a la pestaña «Por liquidar» de
    Inicio en vez de archivarse.
 

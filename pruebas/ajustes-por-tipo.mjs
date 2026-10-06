@@ -120,13 +120,13 @@ await comprobar('la categoría sale al lado',
 await comprobar('la pantalla de Ajustes ha quedado oculta detrás',
   pagina.locator('#pantalla-ajustes').isHidden(), true);
 
-const SECCIONES = ['Datos del tipo', 'Campos', 'Guía', 'Palabras clave',
+const SECCIONES = ['Datos del tipo', 'Campos', 'Guía', 'Al terminar el asunto', 'Palabras clave',
   'Plantillas de correo y de Séneca', 'Plantilla de documento de Word', 'Plazo', 'Se repite'];
 await pagina.waitForTimeout(300);
-/* Fila 105 (docs/AJUSTES-PLEGADO.md): las ocho secciones nacen
+/* Fila 105 (docs/AJUSTES-PLEGADO.md): las nueve secciones nacen
    plegadas, cada una con su título; para el resto de esta prueba se
    despliegan todas. */
-await comprobar('están las ocho secciones, plegadas, cada una con su título',
+await comprobar('están las nueve secciones, plegadas, cada una con su título',
   pagina.locator('#tipo-asunto-cuerpo .tipo-asunto-seccion > summary .bloque-titulo').allTextContents().then((titulos) => {
     const mismos = SECCIONES.every((s) => titulos.indexOf(s) !== -1);
     return mismos && titulos.length === SECCIONES.length;
