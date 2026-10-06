@@ -164,6 +164,7 @@
 
     var extra = {
       correoPreferente: destinatario.correoPreferente,
+      hito: hito,
       comunicarHito: { claveAsunto: a.nombre, idHito: hito.id, nombreDestinatario: destinatario.nombre }
     };
     /* Fila 150: el «Comunicar» de un paso del guion pasa cuál marcar al

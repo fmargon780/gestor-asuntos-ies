@@ -142,7 +142,7 @@ var CorreoCuadro = (function () {
     cco = {};
     ccoSinCorreo = [];
     documentosAdjuntados = [];
-    plantillaElegida = '';
+    plantillaElegida = null; /* fila 271: null = sin decidir; '' = «Sin plantilla» */
 
     var correos = correosDe(persona);
     /* Un hito con "Comunicar" (fila 60, docs/COMUNICAR-DESDE-EL-HITO.md,
@@ -237,7 +237,7 @@ var CorreoCuadro = (function () {
     /* Fila 164: la receta de una tarea trae su plantilla (una vez). */
     var pedida = (n()._interno || {}).plantillaPedida;
     if (pedida && opciones.some(function (p) { return p.id === pedida; })) { plantillaElegida = pedida; n()._interno.plantillaPedida = ''; }
-    if (!plantillaElegida && opciones.length) plantillaElegida = opciones[0].id;
+    if (plantillaElegida === null) plantillaElegida = n().plantillaDeEntrada(a, opciones);
     if (plantillaElegida && !opciones.some(function (p) { return p.id === plantillaElegida; })) {
       plantillaElegida = '';
     }

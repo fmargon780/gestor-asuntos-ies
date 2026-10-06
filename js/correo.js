@@ -237,6 +237,9 @@
        cambia el botón de cerrar a "Esta vez no" (con lo mismo se
        archiva o se marca el hito: no vuelve a preguntar). */
     I.hitoActual = (extra && extra.hito) || null;
+    if (!I.hitoActual && window.Hitos && Hitos.hitoActualDeAsunto) {
+      try { var hA = Hitos.hitoActualDeAsunto(a); if (hA && hA.id && hA.titulo) I.hitoActual = hA; } catch (e) {}
+    }
     I.avisoLoPide = !!(extra && extra.avisoLoPide);
     if (window.SenecaDestinatarios) SenecaDestinatarios.limpiar();
     I.yaApuntado = false;
@@ -307,6 +310,14 @@
     return Plantillas.deTipo(plantillasDatos, categoria, tipo);
   }
 
+  /* Fila 271 (docs/PLANTILLA-QUE-NO-VUELVE-SOLA.md): con qué plantilla se
+     abre el cuadro cuando nadie la pide: la primera propia del tipo, o
+     «Sin plantilla» (''). Las de aviso, sin tipo, solo se eligen a mano. */
+  function plantillaDeEntrada(a, opciones) {
+    var propia = (opciones || []).filter(function (p) { return !!p.tipo; })[0];
+    return propia ? propia.id : '';
+  }
+
   /* Fila 151: tras crear o editar una plantilla desde el propio cuadro,
      `plantillasDatos` (leído una vez al abrir) se ha quedado viejo:
      se vuelve a leer para que el desplegable y `plantillasDelTipo` vean
@@ -340,6 +351,7 @@
     soloElNombre: soloElNombre,
     asuntoDelCorreo: asuntoDelCorreo,
     plantillasDelTipo: plantillasDelTipo,
+    plantillaDeEntrada: plantillaDeEntrada,
     recargarPlantillas: recargarPlantillas,
     cuerpoDelMedio: cuerpoDelMedio,
     MAXIMO_LETRAS_SENECA: MAXIMO_LETRAS_SENECA,
