@@ -143,6 +143,7 @@ await pagina.click('#ficha-volver');
 await pagina.click('.pestana[data-pantalla="archivo"]');
 await pagina.waitForTimeout(2500);
 await comprobar('3. el Archivo, solo asuntos de Jefatura', pagina.$$eval('#lista-archivo [data-asunto], #lista-archivo .tarjeta-nombre', (e) => e.map((x) => (x.dataset.asunto || x.textContent))).then((l) => l.every((n) => /MATRICULA/i.test(n))), true);
+await comprobar('3. en el Archivo no hay «Reabrir» a la vista', visibles(pagina, '#lista-archivo .accion-de-administracion'), 0);
 await comprobar('3. en el Archivo, un solo asunto archivado', pagina.evaluate(() => App.E.listaArchivo.length), 1);
 await comprobar('3. ni una escritura al entrar ni al pasear', escrituras(), 0);
 /* 5. la puerta */

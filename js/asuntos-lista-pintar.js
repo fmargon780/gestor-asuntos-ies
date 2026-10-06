@@ -285,7 +285,7 @@ App.tarjetaAsunto = function (a, modo) {
   acciones.appendChild(ver);
 
   var principal = document.createElement('button');
-  principal.className = 'boton boton-principal';
+  principal.className = 'boton boton-principal accion-de-administracion';   /* fila 287: un directivo no la ve */
   principal.textContent = modo === 'abierto' ? 'Cerrar' : 'Reabrir';
   principal.onclick = async function () {
     await U.mientrasGuarda(principal, function () {
