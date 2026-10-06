@@ -131,7 +131,7 @@ await pagina.waitForSelector('#liq-fecha');
 const hoy = await pagina.evaluate(() => U.hoyIso());
 await comprobar('5. el cuadro trae la fecha de hoy, quien ha entrado y quien ocupa Secretaría',
   pagina.evaluate(() => ({ f: document.getElementById('liq-fecha').value, e: document.getElementById('liq-entrega').value, r: document.getElementById('liq-recibe').value, usuario: App.E.usuario })).then((x) => ({ f: x.f, e: x.e === x.usuario, r: x.r })),
-  { f: hoy, e: true, r: 'Reyes Palma, Fernando' });
+  { f: hoy, e: true, r: 'Fernando Reyes Palma' });
 await comprobar('5. dice el total', pagina.locator('#cuadro-cuerpo').textContent().then((t) => /3 asuntos · Total: 2,24 € \(1 sin importe\)/.test(t)), true);
 await pagina.fill('#liq-nota', 'Dinero en efectivo');
 const nombresMarcados = await filas();

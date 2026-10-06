@@ -71,11 +71,13 @@ const contexto = {
 contexto.window = contexto;
 contexto.addEventListener = function () {};
 vm.createContext(contexto);
-for (const f of ['util.js', 'util-parecidos.js', 'buscar-o-crear.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas.js', 'copias.js', 'nombres.js', 'nucleo.js', 'borrados-fusion.js', 'ajustes.js', 'tipos-nombre.js']) {
+for (const f of ['util.js', 'util-parecidos.js', 'buscar-o-crear.js', 'util-pantalla.js', 'reintentar-escritura.js', 'carpetas.js', 'copias.js', 'nombres.js', 'nucleo.js', 'borrados-fusion.js', 'ajustes.js', 'tipos-nombre.js', 'tipos-parecidos.js']) {
   vm.runInContext(fs.readFileSync(raiz + f, 'utf8'), contexto, { filename: f });
 }
 const { App, Borrados, U } = contexto;
 contexto.U.preguntar = async function () { return true; };
+/* Fila 279: «ANULACION MATRICULA» se parece a «MATRICULA»: el cuadro común de parecidos, aquí aceptado sin pintarlo. */
+contexto.BuscarOCrear.confirmarTipo = async function () { return true; };
 App.verAbiertos = async function () {};
 
 /* ---------- disco de mentira, igual que en pruebas/copias.mjs ---------- */

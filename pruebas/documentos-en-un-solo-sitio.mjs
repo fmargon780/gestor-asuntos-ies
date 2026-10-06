@@ -89,9 +89,9 @@ await comprobar('lleva «Registrar» y «Cambiar el nombre» a la vista',
   filaDe(PDF).locator(':scope > button').allTextContents().then(ts => ts.map(t => t.trim())
     .filter(t => t === 'Registrar' || t === 'Cambiar el nombre')), ['Registrar', 'Cambiar el nombre']);
 await filaDe(PDF).locator('.fila-menu-btn').click();
-await comprobar('el menú ⋮ trae solo «Pasar a versiones previas» y «Borrar»',
+await comprobar('el menú ⋮ trae «Convertir en plantilla» (fila 280: en un PDF sin Word sale apagada), «Pasar a versiones previas» y «Borrar»',
   filaDe(PDF).locator('.fila-menu button').allTextContents().then(ts => ts.map(t => t.trim())),
-  ['Pasar a versiones previas', 'Borrar']);
+  ['Convertir en plantilla', 'Pasar a versiones previas', 'Borrar']);
 await filaDe(PDF).locator('.fila-menu-btn').click();
 
 console.log('--- el título del bloque ---');
