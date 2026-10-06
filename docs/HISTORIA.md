@@ -5,6 +5,18 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 6-oct-2026 — Fila 279: avisar antes de crear un tipo de asunto repetido
+
+Segunda mitad del diseño de la fila 277. Ninguna puerta miraba los nombres antiguos (`alias`) ni los cortos, y tres no
+tenían guardia. Ahora `TiposParecidos.paraNombreNuevo` (igual / antiguo / parecido) y `confirmarNombre` sirven a todas las
+puertas de tipos de asunto con un solo cuadro («¿Es otro tipo de verdad?», `BuscarOCrear.confirmarTipo`): «Crear de todas
+formas» saca el nombre del `alias` de quien lo llevaba, en el mismo guardado, y apunta la pareja como «No son el mismo».
+«Cambiar el nombre» a uno que existe ofrece «Unir con él». Biblioteca del centro: un nombre antiguo es ese tipo. Papelera:
+pregunta. El punto 5 (dos ventanas: el nombre antiguo no vuelve por `fusionarConDisco`) se probó y ya pasaba: no hizo falta
+tocar `borrados-fusion.js`. Prueba: `pruebas/avisar-antes-de-crear-tipo.mjs`.
+
+---
+
 ## 5-oct-2026 — Fila 267: «Generar documento» en la ficha, que lleva al hito
 
 Aviso de un usuario que no encontró cómo generar un certificado desde el asunto (desde la fila 154 solo se genera en la mesa del hito). Botón secundario junto a «+ Añadir documento» que no genera: abre el hito actual (el último si están todos hechos) con el menú ya desplegado. Fichero nuevo `js/ficha-generar-documento.js`, `HitoMesa.abrirConPanel`, prueba `pruebas/generar-desde-la-ficha.mjs`. Un asunto sin hitos no existe en la práctica (guía mínima, fila 129): la prueba simula la falta de la marca `asunto-con-hitos`.

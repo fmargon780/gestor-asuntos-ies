@@ -408,7 +408,7 @@ App.pintarTiposAjustes = function () {
 
   /* Fila 250: el botón de crear, al final de la lista, solo con texto. */
   BuscarOCrear.pintarZona({
-    zona: $('crear-tipo-zona'), texto: $('buscar-tipos').value,
+    zona: $('crear-tipo-zona'), texto: $('buscar-tipos').value, deTipos: true,
     nombres: App.E.tipos.map(function (t) { return t.tipo; }),
     detalle: function (n) {
       var t = App.E.tipos.filter(function (x) { return x.tipo === n; })[0];
@@ -440,8 +440,11 @@ App.crearTipo = async function (datos) {
   if (datos.nombreCorto) tipo.nombreCorto = datos.nombreCorto;
   if (datos.organo) tipo.organo = datos.organo;   /* fila 134 */
   await Borrados.revivir(App.E.gestor, 'tipos', datos.nombre);
+  /* Fila 279: crear de todas formas — el nombre sale del `alias` de quien lo llevaba, en este mismo guardado. */
+  if (datos.parecidos && window.TiposParecidos) TiposParecidos.alCrearNombre(datos.nombre, datos.parecidos);
   App.E.tipos.push(tipo);
   await App.guardarTipos();
+  if (datos.parecidos && window.TiposParecidos) await TiposParecidos.apuntarParejas(datos.nombre, datos.parecidos);
   return tipo;
 };
 
@@ -456,11 +459,13 @@ App.verTipoPorNombre = function (nombre) {
    si hay parecidos, una pregunta más; después la categoría, con la de
    la pestaña que se está viendo ya marcada. Guarda con `App.crearTipo`. */
 App.crearTipoDesdeCaja = async function (nombre) {
-  var hay = App.E.tipos.map(function (t) { return t.tipo; });
-  if (!await BuscarOCrear.confirmarParecidos(nombre, hay, 'el tipo', App.verTipoPorNombre)) return;
+  var parecidos = await TiposParecidos.confirmarNombre(nombre, {
+    boton: 'Verlo', seguir: 'Crear de todas formas', alPulsar: function (t) { App.verTipoPorNombre(t.tipo); }
+  });
+  if (!parecidos) return;
   var categoria = await BuscarOCrear.preguntarCategoria(nombre, App.E.categoriaAjustes);
   if (!categoria) return;
-  await App.crearTipo({ nombre: nombre, categoria: categoria });
+  await App.crearTipo({ nombre: nombre, categoria: categoria, parecidos: parecidos });
   $('buscar-tipos').value = '';
   App.cambiarCategoriaAjustes(categoria);
   U.aviso('Tipo añadido.', 'bueno');

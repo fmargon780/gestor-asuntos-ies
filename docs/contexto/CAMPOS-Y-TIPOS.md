@@ -156,7 +156,7 @@ tipo». La línea de la lista de comprobación «Falta la plantilla del aviso al
    Los asuntos abiertos del tipo que desaparece pasan al que se queda con su carpeta renombrada
    (mismo camino que "Cambiar" un asunto), marcados `tipoUnidoDe` en su ficha para que
    `js/hitos-sincronizar.js` no les lleve los pasos nuevos de la guía del tipo que se queda. El
-   ARCHIVO no se toca. **La app se da cuenta sola de los tipos repetidos** (fila 277,
+   ARCHIVO no se toca. **Crear un tipo o cambiarle el nombre pregunta antes** (fila 279, `docs/AVISAR-ANTES-DE-CREAR-UN-TIPO-REPETIDO.md`): `TiposParecidos.paraNombreNuevo(nombre, salvo)` clasifica los tipos relacionados en igual (mismo nombre o nombre corto: no se crea), antiguo (`alias`) y parecido; `confirmarNombre` abre `BuscarOCrear.confirmarTipo` (botón por fila: «Usar este» / «Verlo» / «Unir con él»); `App.crearTipo({..., parecidos})` y `App.renombrarTipo` sacan el nombre del `alias` y apuntan «No son el mismo». **La app se da cuenta sola de los tipos repetidos** (fila 277,
    `docs/TIPOS-QUE-SON-EL-MISMO.md`, `js/tipos-parecidos.js` y `js/tipos-parecidos-cuadro.js`): al entrar y cuando cambia
    la lista de tipos (firma de nombres y alias, en segundo plano, nunca con un guardado en marcha ni en solo consulta),
    un tipo A que es el nombre antiguo de un solo B (`B.alias`) y no tiene nada propio (guía de verdad, campos,

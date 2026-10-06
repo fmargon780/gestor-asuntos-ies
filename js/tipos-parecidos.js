@@ -230,6 +230,61 @@ var TiposParecidos = (function () {
     return unidas;
   }
 
+  /* ---------- fila 279: un nombre que se quiere poner (docs/AVISAR-ANTES-DE-CREAR-UN-TIPO-REPETIDO.md) ----------
+     Para crear un tipo o cambiarle el nombre a uno (`salvo`: ese tipo no cuenta). Devuelve los tipos que
+     tienen que ver con el nombre: [{ tipo, motivo: 'igual' | 'antiguo' | 'parecido', corto }], los más
+     fuertes primero. 'igual' no se puede crear (mismo nombre, o es el nombre corto de otro). */
+  function paraNombreNuevo(nombre, salvo) {
+    var k = n(nombre);
+    var otros = tipos().filter(function (t) { return t !== salvo; });
+    var nombres = otros.map(function (t) { return t.tipo; });
+    var cerca = U.parecidos(nombre, nombres), iguales = cerca.filter(function (p) { return p.igual; }).map(function (p) { return p.nombre; });
+    var cercanos = (window.BuscarOCrear && BuscarOCrear.cercanos) ? BuscarOCrear.cercanos(nombre, nombres) : [];
+    var salida = [];
+    otros.forEach(function (t) {
+      var motivo = '', corto = false;
+      if (n(t.tipo) === k || iguales.indexOf(t.tipo) !== -1) motivo = 'igual';
+      else if (t.nombreCorto && n(t.nombreCorto) === k) { motivo = 'igual'; corto = true; }
+      else if ((t.alias || []).some(function (x) { return n(x) === k; })) motivo = 'antiguo';
+      else if (seParecen({ tipo: nombre }, t) || cerca.some(function (p) { return p.nombre === t.tipo; }) || cercanos.indexOf(t.tipo) !== -1) motivo = 'parecido';
+      if (motivo) salida.push({ tipo: t, motivo: motivo, corto: corto });
+    });
+    var peso = { igual: 0, antiguo: 1, parecido: 2 };
+    return salida.sort(function (a, b) { return peso[a.motivo] - peso[b.motivo]; });
+  }
+
+  /* El nombre deja de ser el nombre antiguo de los tipos que lo llevaban (se llama antes de guardar los tipos). */
+  function quitarComoAntiguo(nombre, lista) {
+    var k = n(nombre);
+    (lista || []).forEach(function (x) {
+      if (x.motivo === 'antiguo') x.tipo.alias = (x.tipo.alias || []).filter(function (a) { return n(a) !== k; });
+    });
+  }
+
+  /* «No son el mismo» para el nombre y cada tipo que se enseñó (quien lo crea acaba de decir que es otro). */
+  async function apuntarParejas(nombre, lista) {
+    for (var i = 0; i < (lista || []).length; i++) {
+      try { await apuntarDistinto({ tipo: nombre }, { tipo: lista[i].tipo.tipo }); }
+      catch (e) { U.accesorio('No he podido apuntar que «' + nombre + '» y «' + lista[i].tipo.tipo + '» no son el mismo', e); }
+    }
+  }
+
+  /* La pregunta común de las puertas. Devuelve null si se deja (o si el nombre ya existe), o la lista de lo que se
+     enseñó (puede ir vacía) para que la puerta la pase a `App.crearTipo` / `App.renombrarTipo`. `o`:
+     { boton: 'Usar este' | 'Verlo' | 'Unir con él', seguir, verbo, alPulsar(tipo) }. */
+  async function confirmarNombre(nombre, o) {
+    var lista = paraNombreNuevo(nombre, o.salvo);
+    var igual = lista.filter(function (x) { return x.motivo === 'igual'; })[0];
+    if (igual) { U.aviso('Ese tipo ya existe: ' + igual.tipo.tipo + '.', 'malo'); return null; }
+    if (!lista.length) return [];
+    var sigue = await BuscarOCrear.confirmarTipo(nombre, lista, o);
+    return sigue ? lista.slice(0, 4) : null;
+  }
+
+  /* Lo que se hace al crear de todas formas: el nombre sale del `alias` de los que lo llevaban (el guardado
+     de tipos lo hace quien llama) y las parejas se apuntan después. */
+  function alCrearNombre(nombre, lista) { quitarComoAntiguo(nombre, lista); }
+
   /* En solo consulta, también con la marca puesta pero pausada (la copia de pruebas la pausa mientras monta sus datos). */
   function soloConsulta() {
     if (window.SoloConsulta && SoloConsulta.activo()) return true;
@@ -296,6 +351,7 @@ var TiposParecidos = (function () {
   return {
     seParecen: seParecen, palabras: palabras, claveDePareja: claveDePareja,
     parejas: parejas, antiguos: antiguos, nadaPropio: nadaPropio, apuntarDistinto: apuntarDistinto,
+    paraNombreNuevo: paraNombreNuevo, confirmarNombre: confirmarNombre, alCrearNombre: alCrearNombre, apuntarParejas: apuntarParejas,
     esDistinto: esDistinto, repintarAviso: pintarAviso, ultimas: function () { return ultimas.slice(); },
     /* para las pruebas */
     _pasada: hacerPasada, _mirar: function () { ultimaFirma = null; esperando = false; mirar(); },

@@ -54,16 +54,31 @@ window.BuscarOCrear = (function () {
     if (!nombre) return;
 
     var mismo = U.parecidos(nombre, o.nombres).filter(function (p) { return p.igual; })[0];
+    /* Fila 279 (solo tipos de asunto): su nombre corto cuenta como el mismo; un nombre antiguo, avisa. */
+    var rel = (o.deTipos && window.TiposParecidos) ? TiposParecidos.paraNombreNuevo(nombre) : [];
+    var nota = '';
+    if (!mismo) {
+      var corto = rel.filter(function (x) { return x.motivo === 'igual'; })[0];
+      if (corto) { mismo = { nombre: corto.tipo.tipo }; nota = ' (es su nombre corto)'; }
+    }
     if (mismo) {
       var donde = o.detalle ? o.detalle(mismo.nombre) : '';
       var aviso = document.createElement('div');
       aviso.className = 'aviso-en-vivo aviso-en-vivo-malo';
-      aviso.innerHTML = 'Ya existe: ' + U.escapar(mismo.nombre) + (donde ? ', en ' + U.escapar(donde) : '') +
+      aviso.innerHTML = 'Ya existe: ' + U.escapar(mismo.nombre) + nota + (donde ? ', en ' + U.escapar(donde) : '') +
         '. <button type="button" class="enlace" data-bc="ver">Verlo</button>';
       aviso.querySelector('[data-bc="ver"]').onclick = function () { o.ver(mismo.nombre); };
       zona.appendChild(aviso);
       return;
     }
+    rel.filter(function (x) { return x.motivo === 'antiguo'; }).slice(0, 2).forEach(function (x) {
+      var av = document.createElement('div');
+      av.className = 'aviso-en-vivo aviso-en-vivo-ambar';
+      av.innerHTML = 'Ya existe: ' + U.escapar(x.tipo.tipo) + ' (antes se llamó ' + U.escapar(nombre) + '). ' +
+        '<button type="button" class="enlace" data-bc="ver">Verlo</button>';
+      av.querySelector('[data-bc="ver"]').onclick = function () { o.ver(x.tipo.tipo); };
+      zona.appendChild(av);
+    });
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'boton boton-crear-o-buscar';
@@ -100,6 +115,38 @@ window.BuscarOCrear = (function () {
     return promesa;
   }
 
+  /* Fila 279: el cuadro común de los tipos de asunto, «¿Es otro tipo de verdad?». `lista` viene de
+     TiposParecidos.paraNombreNuevo (sin los «igual»). `o`: { boton, seguir, verbo, alPulsar(tipo) }.
+     true = seguir (crear, o cambiar el nombre, de todas formas); false = cancelar. Cada fila lleva su botón:
+     al pulsarlo se cancela y se llama a `alPulsar(tipo)`. */
+  function confirmarTipo(nombre, lista, o) {
+    var antiguos = lista.filter(function (x) { return x.motivo === 'antiguo'; });
+    var filas = lista.slice(0, 4);
+    var cuerpo = '<p>' + U.escapar(o.verbo || 'Vas a crear') + ' <strong>«' + U.escapar(nombre) + '»</strong>.</p>' +
+      antiguos.map(function (x) {
+        return '<p class="aviso-antiguo">«' + U.escapar(nombre) + '» es como se llamaba antes «' + U.escapar(x.tipo.tipo) + '».</p>';
+      }).join('') +
+      (antiguos.length ? '<p class="nota">Si lo creas, «' + U.escapar(nombre) + '» deja de ser el nombre antiguo de «' +
+        U.escapar(antiguos[0].tipo.tipo) + '»: las carpetas del archivo que se llaman «' + U.escapar(nombre) +
+        '» contarán como del tipo nuevo.</p>' : '') +
+      '<p>Ya hay ' + (filas.length === 1 ? 'uno que tiene que ver' : 'otros que tienen que ver') + ':</p>' +
+      '<ul class="lista-repetidos">' + filas.map(function (x, i) {
+        return '<li><span class="tipo-parecido-nombre">' + U.escapar(x.tipo.tipo) + '</span> ' +
+          '<span class="resultado-categoria">' + U.escapar(x.tipo.categoria || '') + '</span> ' +
+          '<button type="button" class="enlace" data-bc-fila="' + i + '">' + U.escapar(o.boton) + '</button></li>';
+      }).join('') + '</ul>';
+    var promesa = U.preguntar('¿Es otro tipo de verdad?', cuerpo, o.seguir);
+    var caja = document.getElementById('cuadro-cuerpo');
+    Array.prototype.forEach.call(caja.querySelectorAll('[data-bc-fila]'), function (b) {
+      b.onclick = function () {
+        var x = filas[Number(b.getAttribute('data-bc-fila'))];
+        document.getElementById('cuadro-cancelar').click();
+        if (o.alPulsar) o.alPulsar(x.tipo);
+      };
+    });
+    return promesa;
+  }
+
   /* El cuadro de la categoría de un tipo de asunto: la de la pestaña
      que se está viendo, cambiable. Devuelve la categoría o null. */
   async function preguntarCategoria(nombre, porDefecto) {
@@ -118,6 +165,8 @@ window.BuscarOCrear = (function () {
     coincidencias: coincidencias,
     pintarZona: pintarZona,
     confirmarParecidos: confirmarParecidos,
+    confirmarTipo: confirmarTipo,
+    cercanos: cercanos,
     preguntarCategoria: preguntarCategoria
   };
 })();

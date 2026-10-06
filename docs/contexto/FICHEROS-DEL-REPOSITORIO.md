@@ -471,7 +471,7 @@ de `App` va después del fichero que lo define.
 | `js/ajustes-tipo-al-terminar.js` | Fila 274: el apartado «Al terminar el asunto» de la pantalla de un tipo (casilla de liquidar, aviso a quien lo pide al cerrar, y su resumen) |
 | `pruebas/al-terminar-el-asunto.mjs` | Prueba de la fila 274: el apartado, su resumen, las casillas, la lista de comprobación y «Datos del tipo» sin ellas |
 | `pruebas/rellenar-campo-que-ya-esta.mjs` | Prueba de la fila 276: «Rellenar» un campo que el asunto ya tiene vacío, el motivo a la vista, desde la mesa de un hito y el botón principal apagado |
-| `js/tipos-parecidos.js`, `js/tipos-parecidos-cuadro.js`, `css/tipos-parecidos.css` | Fila 277: tipos de asunto que son el mismo — la unión sola del nombre antiguo, la regla de «se parecen», el aviso de Inicio y su cuadro «Unir» / «No son el mismo» |
+| `js/tipos-parecidos.js`, `js/tipos-parecidos-cuadro.js`, `css/tipos-parecidos.css` | Fila 277: tipos de asunto que son el mismo — la unión sola del nombre antiguo, la regla de «se parecen», el aviso de Inicio y su cuadro «Unir» / «No son el mismo»; fila 279: `paraNombreNuevo` y `confirmarNombre`, la pregunta común de las puertas de tipos |
 | `pruebas/tipos-que-son-el-mismo.mjs` | Prueba de la fila 277: unión sola, con algo propio no, solo consulta, guardado en marcha, las reglas de parecido, «No son el mismo» y «Unir» desde el cuadro |
 | `js/exportar-agrupar.js` | Fila 278: el cálculo de los bloques del informe en PDF agrupado por una o dos columnas (orden, meses, «Sin dato», sumas, título y línea de cierre) |
 | `pruebas/informe-agrupado.mjs` | Prueba de la fila 278: el cálculo, la ventana, el informe agrupado de uno y dos niveles, reservados, importes, hitos y el corte de páginas |

@@ -304,6 +304,7 @@
       }
       return;
     }
+    if (r.cancelado) return;   /* fila 279: quien lo devolvía ha dicho que no */
     await U.preguntar('No se puede devolver', '<p>' + U.escapar(r.motivo) + '</p>', 'Vale', true);
   }
 

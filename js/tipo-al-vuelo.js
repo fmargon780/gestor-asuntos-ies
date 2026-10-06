@@ -108,25 +108,30 @@
     var nombre = U.limpiarNombre(campo.value).toUpperCase();
     if (!nombre) { aviso.className = 'aviso-en-vivo'; aviso.innerHTML = ''; crearBtn.disabled = false; return; }
 
-    var nombres = App.E.tipos.map(function (t) { return t.tipo; });
-    var cerca = U.parecidos(nombre, nombres);
-    var mismo = cerca.filter(function (p) { return p.igual; })[0];
-    if (mismo) {
-      var tipoExistente = App.E.tipos.filter(function (t) { return t.tipo === mismo.nombre; })[0];
+    /* Fila 279: mira también los nombres antiguos y los cortos, y cada uno lleva «Usar este». */
+    var rel = TiposParecidos.paraNombreNuevo(nombre);
+    var igual = rel.filter(function (x) { return x.motivo === 'igual'; })[0];
+    if (igual) {
       aviso.className = 'aviso-en-vivo aviso-en-vivo-malo';
-      aviso.innerHTML = 'Ya existe: ' + U.escapar(mismo.nombre) + ', en ' + U.escapar(tipoExistente.categoria) +
+      aviso.innerHTML = 'Ya existe: ' + U.escapar(igual.tipo.tipo) + (igual.corto ? ' (es su nombre corto)' : '') +
+        ', en ' + U.escapar(igual.tipo.categoria) +
         '. <button type="button" class="enlace" id="tipo-al-vuelo-usar-existente">Usar este</button>';
       crearBtn.disabled = true;
-      $('tipo-al-vuelo-usar-existente').onclick = function () { usarExistente(tipoExistente); };
+      $('tipo-al-vuelo-usar-existente').onclick = function () { usarExistente(igual.tipo); };
       return;
     }
     crearBtn.disabled = false;
-    if (cerca.length) {
-      aviso.className = 'aviso-en-vivo aviso-en-vivo-ambar';
-      aviso.textContent = 'Se parece a: ' + cerca.slice(0, 3).map(function (p) { return p.nombre; }).join(', ');
-    } else {
-      aviso.className = 'aviso-en-vivo'; aviso.innerHTML = '';
-    }
+    if (!rel.length) { aviso.className = 'aviso-en-vivo'; aviso.innerHTML = ''; return; }
+    aviso.className = 'aviso-en-vivo aviso-en-vivo-ambar';
+    aviso.innerHTML = rel.slice(0, 3).map(function (x, i) {
+      var texto = x.motivo === 'antiguo'
+        ? U.escapar(nombre) + ' es como se llamaba antes ' + U.escapar(x.tipo.tipo) + '.'
+        : 'Se parece a: ' + U.escapar(x.tipo.tipo) + '.';
+      return '<div>' + texto + ' <button type="button" class="enlace" data-usar="' + i + '">Usar este</button></div>';
+    }).join('');
+    Array.prototype.forEach.call(aviso.querySelectorAll('[data-usar]'), function (b) {
+      b.onclick = function () { usarExistente(rel[Number(b.getAttribute('data-usar'))].tipo); };
+    });
   }
 
   function usarExistente(tipo) {
@@ -141,7 +146,6 @@
     if (!nombre) { campoNombre.focus(); return; }
     var categoria = $('tipo-al-vuelo-categoria').value;
     var nombreCorto = U.limpiarNombre($('tipo-al-vuelo-corto').value).toUpperCase();
-    var hay = App.E.tipos.map(function (t) { return t.tipo; });
     /* Fila 239: lo que entra en el nombre de las carpetas no pasa de 25. */
     if ((nombreCorto || nombre).length > 25) {
       U.aviso('El nombre que entra en las carpetas no puede pasar de 25 caracteres: pon un nombre corto más breve.', 'malo');
@@ -150,8 +154,13 @@
     }
 
     await U.mientrasGuarda($('tipo-al-vuelo-crear'), async function () {
-      if (!await U.dejaCrear(nombre, hay, 'tipo')) return;
-      var datos = { nombre: nombre, categoria: categoria };
+      var elegido = null;
+      var parecidos = await TiposParecidos.confirmarNombre(nombre, {
+        boton: 'Usar este', seguir: 'Crear de todas formas', alPulsar: function (t) { elegido = t; }
+      });
+      if (elegido) { usarExistente(elegido); return; }
+      if (!parecidos) return;
+      var datos = { nombre: nombre, categoria: categoria, parecidos: parecidos };
       if (nombreCorto) datos.nombreCorto = nombreCorto;
       if ($('tipo-al-vuelo-organo') && $('tipo-al-vuelo-organo').value) datos.organo = $('tipo-al-vuelo-organo').value;
       var tipo;

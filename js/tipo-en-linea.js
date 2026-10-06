@@ -136,7 +136,7 @@ window.TipoEnLinea = (function () {
         }
         if (o.alCrear) {
           BuscarOCrear.pintarZona({
-            zona: zona, texto: texto,
+            zona: zona, texto: texto, deTipos: true,
             nombres: (App.E.tipos || []).map(function (t) { return t.tipo; }),
             detalle: function (n) { var t = objeto(n); return t ? t.categoria : ''; },
             ver: function (n) { var t = objeto(n); if (t) elegir(t); },
@@ -188,11 +188,15 @@ window.TipoEnLinea = (function () {
      categoría (la del tipo que tenía, cambiable) y App.crearTipo.
      Devuelve el nombre del tipo creado, o null si se ha dejado. */
   async function crearDesdeEdicion(nombre, categoriaPropuesta) {
-    var hay = App.E.tipos.map(function (t) { return t.tipo; });
-    if (!await BuscarOCrear.confirmarParecidos(nombre, hay, 'el tipo')) return null;
+    var elegido = null;
+    var parecidos = await TiposParecidos.confirmarNombre(nombre, {
+      boton: 'Usar este', seguir: 'Crear de todas formas', alPulsar: function (t) { elegido = t; }
+    });
+    if (elegido) return elegido.tipo;   /* «Usar este»: ese tipo queda elegido y no se crea ninguno */
+    if (!parecidos) return null;
     var categoria = await BuscarOCrear.preguntarCategoria(nombre, categoriaPropuesta || Nombres.CATEGORIAS[0]);
     if (!categoria) return null;
-    var t = await App.crearTipo({ nombre: nombre, categoria: categoria });
+    var t = await App.crearTipo({ nombre: nombre, categoria: categoria, parecidos: parecidos });
     U.aviso('Tipo añadido.', 'bueno');
     return t.tipo;
   }
