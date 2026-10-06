@@ -75,16 +75,13 @@ var HitosDocumentos = (function () {
           if (Hitos.marcarGuionPorAccion) await Hitos.marcarGuionPorAccion(a, h.id, 'anadir');   /* fila 109 */
         }
       }
-      for (var j = 0; j < quitados.length; j++) {
-        await Hitos.quitarDocumento(a.nombre, h.id, quitados[j]);
-        if (window.HitosRequisitos) {
-          try { await HitosRequisitos.desmarcarPorDocumento(a.nombre, h.id, quitados[j]); } catch (e2) { /* no crítico */ }
-        }
-      }
     } catch (e) {
       U.aviso('No he podido guardarlo: ' + U.mensajeDeError(e), 'malo');
       return;
     }
+    /* Fila 282: los que se desmarcan salen por la función común (js/hitos-sacar-documento.js): la tarea que se marcó con
+       ellos se queda marcada, con su aviso y «Desmarcar». */
+    if (quitados.length) await HitosSacarDocumento.quitar(a, quitados);
     window.HitosPanel.programarRepintado();
   }
 

@@ -94,16 +94,10 @@ window.HitosDocumentoMenu = (function () {
   }
 
   async function quitarDelHito(a, hito, nombre) {
-    try {
-      await Hitos.quitarDocumento(a.nombre, hito.id, nombre);
-    } catch (e) {
-      U.aviso('No he podido quitarlo: ' + U.mensajeDeError(e), 'malo');
-      return;
-    }
-    if (window.HitosPanel) {
-      window.HitosPanel.desplegarAlAbrir(a.nombre, hito.id);
-      window.HitosPanel.programarRepintado();
-    }
+    /* Fila 282: por la función común (js/hitos-sacar-documento.js): lo saca de todos los hitos en los que esté y
+       la tarea que se marcó con él se queda marcada, con su aviso y «Desmarcar». */
+    await HitosSacarDocumento.quitar(a, [nombre]);
+    if (window.HitosPanel) window.HitosPanel.desplegarAlAbrir(a.nombre, hito.id);
   }
 
   function opcionesDelMenu(a, hito, nombre, falta) {

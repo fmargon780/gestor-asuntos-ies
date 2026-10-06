@@ -395,6 +395,15 @@
     if (window.HitosPanel) HitosPanel.programarRepintado();
   }
 
+  /* Fila 282: solo leer. La línea del guion que se marcó sola con ese documento (reunir === 'documento', hecha, con ese
+     nombre), o null. La usa js/hitos-sacar-documento.js para avisar de que sigue marcada al quitar el documento. */
+  function tareaMarcadaPorDocumento(a, hito, nombreDocumento) {
+    return guionDe(asuntoDe(a), hito).filter(function (g) {
+      return g.reunir === 'documento' && g.hecho && g.documento === nombreDocumento;
+    })[0] || null;
+  }
+
+  Hitos.tareaMarcadaPorDocumento = tareaMarcadaPorDocumento;
   Hitos.faltanReunir = faltanReunir;
   Hitos.textoLoQueFaltaGuion = textoLoQueFalta;
   Hitos.escribirValorGuion = escribirValorGuion;

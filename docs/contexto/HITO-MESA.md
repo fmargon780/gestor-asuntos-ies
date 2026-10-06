@@ -195,7 +195,7 @@ Cuál se ve lo dice `data-tarjeta` de `.mesa-columnas` (solo CSS: cambiar no rep
 - **Documentos en grande** (fila 164: con **todos los documentos del asunto**, `otrosDelAsunto`: debajo
   de los del hito, «De otros hitos», cada uno con la etiqueta `.mesa-doc-de-hito` «N · título» de su
   hito, y al final «En la carpeta, sin hito», sin gemelos ni ficheros internos; se abren, se envían y se
-  marcan para adjuntar como los propios, sin el ⋯, que es de su hito; `.mesa-doc-ajeno`. El título dice
+  marcan para adjuntar como los propios; `.mesa-doc-ajeno`. Fila 282: con la mesa abierta para trabajar (nunca en solo consulta), llevan su «⋯» (`.mesa-doc-menu-ajeno`, montado por `HitosSacarDocumento.engancharAjenos`): «De otros hitos» → «Traer a este hito» y «Quitar de su hito»; «sin hito» → «Traer a este hito» (no en un hito de decisión). `otrosDelAsunto` devuelve también `idHito`. El título dice
   «Documentos del hito · 2 (y 5 más del asunto)», `cuentaTitulo`): «Añadir documento» junto al título, la barra de marcados encima, la tabla
   (casilla, tipo en negrita y el nombre del fichero entero debajo, fecha, registro `.mesa-doc-registro`,
   estado «Registrado»/«Sin registrar», Abrir `.mesa-doc-abrir`, Enviar y ⋯), los gemelos debajo de su

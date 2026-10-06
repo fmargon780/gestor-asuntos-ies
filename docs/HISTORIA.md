@@ -5,6 +5,18 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 6-oct-2026 — Fila 282: quitar un documento de su hito, desde cualquier sitio
+
+Aviso de usuario: «podemos asociar un documento a un hito, pero no desasociarlo». Ya se podía, pero escondido (el «⋯» de
+la mesa del hito al que pertenece, o «Ninguno» en la ficha). Ahora hay una sola función (`js/hitos-sacar-documento.js`)
+y las filas «De otros hitos» y «sin hito» de la mesa llevan su «⋯» con «Traer a este hito» y «Quitar de su hito»; en la
+ficha, «Ninguno» es «Quitar del hito». La tarea que se marcó sola con el documento se queda marcada en todos los
+sitios, con un aviso que lleva «Desmarcar» (antes la ficha la desmarcaba sola y el «⋯» de la mesa no decía nada). De
+paso, «Mover a otro hito» ya no deja un documento en dos hitos. Copia de pruebas: los dos primeros hitos de MATRICULA
+llevan una tarea de reunir un documento. Prueba: `pruebas/quitar-documento-del-hito.mjs`.
+
+---
+
 ## 6-oct-2026 — Fila 281: «Convertir en plantilla» con un PDF que no tiene su Word
 
 Francisco preguntó si valía también con PDF. Con Word gemelo, ya valía (fila 280); sin él, la app lee el texto con

@@ -10,7 +10,7 @@ Documento hijo de `docs/CONTEXTO.md` (fila 65, `docs/DOCUMENTOS-QUE-QUEPAN.md`, 
 fila de «Documentos de la carpeta» lleva, de izquierda a derecha: el nombre (abre el visor), **⧉**
 (`.ficha-documento-copiar`: copia el nombre sin la extensión con `U.copiar`), la etiqueta del hito,
 «Sin registrar» + «Registrar» (solo sin registro), **«Poner nombre»** (`App.verDocumentos(a,
-{ ponerNombre })`, repinta al cerrar), «Asociar a un hito» y ⋮ con **solo** «Pasar a versiones
+{ ponerNombre })`, repinta al cerrar), «Asociar a un hito» (fila 282: «Quitar del hito» arriba si tiene hito, raya y los hitos; ya no hay «Ninguno») y ⋮ con **solo** «Pasar a versiones
 previas» y «Borrar». En el título, **«+ Añadir documento»** (`irDirectoAAnadir`). El índice del
 expediente no lleva «Poner nombre», «Registrar» ni «Asociar».
 
@@ -479,3 +479,15 @@ PDF sellado suelto.
 ## El control del registro (fila 259)
 
 `js/control-registro.js` compara los listados de Séneca (el registro de entrada y el de salida) con lo que la aplicación conoce. El código de un apunte sale de `Nombres.codigoRegistro` (`2026/29700692/M000000000427` → `26EM0427`), igual que el de los documentos. Un apunte se empareja con un asunto, por este orden: (1) algún documento lleva su código (`ficha.documentos[n].registros[].codigo` en los abiertos, `registros` del índice del ARCHIVO en los archivados); (2) el número del asunto (`A26-0024`) en el extracto; (3) el extracto es el nombre de la carpeta; (4) decisión a mano. Limitación: de un asunto **abierto**, los documentos de antes de la fila 239 (registro en el nombre del fichero) no se miran, porque habría que recorrer el disco; esos apuntes se emparejan por los caminos 2 a 4. Detalle en `docs/CONTROL-DEL-REGISTRO.md`.
+
+## Quitar un documento de su hito (fila 282, `docs/QUITAR-UN-DOCUMENTO-DE-SU-HITO.md`)
+
+Una sola función para sacar o pasar un documento de hito, `HitosSacarDocumento` (`js/hitos-sacar-documento.js`):
+`quitar(a, nombres)` lo deja sin hito en TODOS en los que esté (con sus gemelos de ese hito) y `mover(a, nombres,
+destino)` lo deja solo en el destino (o lo asocia si no tenía). La usan la ficha («Asociar a un hito»), el «⋯» de la
+mesa («Quitar del hito», «Mover a otro hito» y la barra de marcados), los «⋯» de las filas «De otros hitos» y «sin
+hito» y «Apuntar un documento» (los que se desmarcan). **La tarea de reunir que se marcó sola con el documento se
+queda marcada** (`Hitos.tareaMarcadaPorDocumento`, en `js/hitos-guion.js`): el aviso verde lo dice y trae
+«Desmarcar» (`HitosRequisitos.desmarcarPorDocumento`); nada se deshace sin que se vea. «Mover a otro hito» ya no deja
+un documento en dos hitos (sale del hito en el que esté de verdad; «Este hito» es un destino si algún marcado no es
+suyo). La función repinta la tarjeta de documentos de la ficha: quien la llama no vuelve a repintarla a la vez.
