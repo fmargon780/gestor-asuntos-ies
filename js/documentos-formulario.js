@@ -253,6 +253,7 @@
         '<div id="doc-vista" class="vista-nombre"></div>' +
       '</div>' +
 
+      (window.Esperas ? Esperas.casillaHTML(opciones, N.asuntoActual, N.hitoActual) : '') +   /* fila 286 */
       '<div class="cuadro-botones">' +
         '<button type="button" class="boton" id="doc-volver">Volver</button>' +
         '<button type="button" class="boton boton-principal" id="doc-guardar">Guardar</button>' +

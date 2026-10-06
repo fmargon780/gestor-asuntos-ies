@@ -82,6 +82,24 @@
     await Hitos.marcarGuion(clave, h.id, 'g-hacer-generar', { hecho: true });
     await Hitos.guardarCampos(clave, h.id, { cadena: { estado: 'esperando-sello', tarea: 'g-hacer-registrar', documento: nombrePdf,
       quien: 'Revisor', cuando: new Date(Date.now() - 3600000).toISOString() } });
+    await construirEsperas(o);
+  }
+
+  /* Fila 286 (docs/ESPERAS-QUE-SE-CIERRAN.md): un papel suelto del tercero de un asunto que está en espera (el de Marta,
+     «Esperar el parte de alta») y otro asunto en espera con la fecha límite del hito ya pasada. */
+  async function construirEsperas(o) {
+    var PDFLib = await PdfHerramientas.cargarPdfLib();
+    var doc = await PDFLib.PDFDocument.create();
+    var fuente = await doc.embedFont(PDFLib.StandardFonts.Helvetica);
+    doc.addPage([595, 842]).drawText('Parte de alta de Marta Otero Campos (copia de pruebas)', { x: 50, y: 780, size: 12, font: fuente });
+    await Carpetas.escribirBytes(App.E.abiertos, 'parte de alta Otero Campos Marta.pdf', await doc.save(), 'application/pdf');
+
+    var clave = await o.crearAsunto(o.tipoBaja, 'PERSONAL', Nombres.terceroPersonal({ nombre: 'Reyes Palma, Fernando', documento: '22334455B' }), o.hace(12), {
+      abiertoEl: o.hace(12) + 'T09:00:00.000Z'
+    });
+    var hitos = await Hitos.hitosDe(clave);
+    await Hitos.marcar(clave, hitos[0].id, 'hecho', 'Parte de baja recibido.');
+    await Hitos.guardarCampos(clave, hitos[1].id, { fecha: o.hace(5) });
   }
 
   /* Al acabar de montar: que la pasada de fondo coloque el PDF sellado y salga el aviso de Inicio. */

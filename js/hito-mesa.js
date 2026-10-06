@@ -253,7 +253,7 @@ var HitoMesa = (function () {
        «···». El estado solo se ve como etiqueta si está hecho. */
     var decision = h.clase === 'decision';
     var estadoHTML = h.estado === 'hecho'
-      ? '<button type="button" class="mesa-etq mesa-etq-estado mesa-etq-hecho">Hecho</button>'
+      ? '<button type="button" class="mesa-etq mesa-etq-estado mesa-etq-hecho">' + (window.Esperas ? Esperas.textoHecho(h) : 'Hecho') + '</button>'
       : '<button type="button" class="mesa-meta mesa-etq-estado">' + U.escapar(textoEstado(h.estado)) + '</button><span class="mesa-meta-punto">·</span>';
     /* Fila 173, punto 5: sin ningún hito en curso (todos hechos o "No
        aplica"), se enseña aquí mismo, se esté viendo el hito que se esté
@@ -293,6 +293,7 @@ var HitoMesa = (function () {
           (abierto && !decision ? '<div class="mesa-desplegable"><button type="button" class="boton mesa-abrir-panel" data-panel="comunicar" aria-expanded="false">Comunicar ▾</button>' +
             '<div class="mesa-panel mesa-panel-comunicar oculto"><div class="mesa-destinatarios"></div></div></div>' : '') +
           (abierto && !decision ? '<button type="button" class="boton mesa-registrar" title="Registrar un documento de este hito">Registrar</button>' : '') +
+          (abierto && !decision && window.Esperas ? Esperas.botonHTML(a, h) : '') +   /* fila 286 */
           (abierto && !decision
             ? '<button type="button" class="boton' + (h.estado === 'hecho' ? '' : ' boton-principal') + (completo ? ' mesa-hecho-resaltado' : '') + ' mesa-marcar-hecho">' +
               (h.estado === 'hecho' ? 'Hecho ✓ (desmarcar)' : 'Marcar como hecho') + '</button>' : '') +
@@ -315,6 +316,7 @@ var HitoMesa = (function () {
     if (volverHitos) volverHitos.onclick = cerrar;
     engancharPaneles(cab, a, h);
     if (abierto && window.HacerEsteHito) HacerEsteHito.enganchar(cab, a, h);
+    if (abierto && window.Esperas) Esperas.enganchar(cab, a, h);
     var archivarBtn = cab.querySelector('.mesa-archivar-asunto');
     if (archivarBtn) archivarBtn.onclick = function () {
       /* Lo mismo que el botón de la cabecera de la ficha (fila 106,

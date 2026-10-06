@@ -5,6 +5,10 @@ nuevas arriba, de lo más nuevo a lo más viejo.
 
 ---
 
+## 6-oct-2026 — Fila 286: las esperas se cierran al llegar el documento
+
+Segunda mitad de la auditoría de procedimiento: cuando llega lo que se esperaba hay que guardar el documento, abrir el hito, marcar su tarea y darlo por hecho; y si el plazo vence, solo se pone en rojo. Ahora, al ponerle nombre a un documento que entra en un asunto en espera sale una casilla ya marcada que termina la espera (con aviso y «Deshacer», sin cambiar de pantalla), y el hito de espera vencido lleva «No ha llegado nada». Decisiones: el hito se da por hecho con la casilla de siempre sin pintarla (`marcarDesdeCasilla` con un `input` suelto); la marca `sinRespuesta` se escribe después de darlo por hecho (un hito sin hacer la suelta al normalizarse); la copia de pruebas añade un tercer hito a BAJA MEDICA para que «Espera terminada» diga qué toca ahora. Prueba: `pruebas/esperas.mjs`.
+
 ## 6-oct-2026 — Fila 285: «Hacer este hito»
 
 De la auditoría de procedimiento: la app lo prepara todo pero espera un clic en cada paso. Un botón en la mesa del hito

@@ -436,3 +436,7 @@ pregunta es siempre la misma y sale sola, sin ir a buscarla:
 - Inicio: aviso «N listos para enviar» (`AvisosLinea`, clave `listos-para-enviar`, filtra la tabla) y las coletillas «· listo para enviar» / «· esperando el sello» en «Hito actual».
 - Copia de pruebas: tipo CERTIFICADO DE NOTAS con la plantilla «Certificado de notas» (`js/demo/datos-hacer-hito.js`); «Vidal Soto, Irene» sin tocar, «Moreno Sanz, Hugo» esperando el sello con su PDF sellado en la carpeta.
 
+## Esperas que se cierran (6-oct-2026, fila 286, `docs/ESPERAS-QUE-SE-CIERRAN.md`)
+
+- En la cabecera de la mesa de un hito de espera con la fecha límite pasada, «No ha llegado nada» (`Esperas.botonHTML/enganchar`, desde `pintarCabecera`): anota «Venció el … sin respuesta.», da el hito por hecho por el camino de «Marcar como hecho», le pone `sinRespuesta` y abre la mesa del siguiente; «Deshacer» lo reabre (la marca se borra sola). La etiqueta de estado dice «Hecho · sin respuesta» (`Esperas.textoHecho`), igual que la fila de la lista y la exportación.
+- La casilla «Es lo que se esperaba…» vive en el cuadro de nombre (ver `docs/contexto/DOCUMENTOS.md`).
