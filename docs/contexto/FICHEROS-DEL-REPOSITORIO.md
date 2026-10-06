@@ -249,6 +249,7 @@ de `App` va después del fichero que lo define.
 | `js/seneca-destinatarios.js` | La lista de usuarios IdEA del cuadro de Séneca, en chips, con "Copiar la lista"/"Copiar el siguiente" (fila 47) |
 | `js/seneca-ayudante.js`, `css/relacionados.css` (`.marcado-chip-copiado`) | El enlace-marcador que pega los usuarios IdEA uno a uno en Séneca (fila 47) |
 | `js/docx.js` | Rellenar los huecos de una plantilla de Word: ZIP y XML a mano, sin librerías (`window.Docx`). Desde la fila 83, un párrafo que se queda vacío al rellenar desaparece del todo, en vez de dejar una línea suelta. Publica `Docx.interno` (las piezas del ZIP) para los dos de abajo |
+| `js/docx-crear.js`, `js/pdf-a-parrafos.js` | Fila 281: un PDF sin Word a un Word nuevo (el texto en párrafos; `Docx.interno` para el ZIP) |
 | `js/docx-sustituir.js`, `js/convertir-en-plantilla.js`, `js/convertir-en-plantilla-propuestas.js`, `js/convertir-en-plantilla-pantalla.js`, `css/convertir-en-plantilla.css`, `js/demo/datos-plantilla.js` | Fila 280: «Convertir en plantilla» desde un documento de un asunto (ver `docs/contexto/WORD-EN-LA-APP.md`) |
 | `js/docx-imagen.js` | `Docx.ponerImagen`: meter el membrete en `{{MEMBRETE}}` (fila 81; sacado de `js/docx.js` en la fila 110) |
 | `js/docx-tabla.js` | `Docx.ponerTabla`, `Docx.resaltarFaltas` y `Docx.textoDelDocumento`: las tablas de datos en un Word y lo que falta en amarillo (fila 110) |

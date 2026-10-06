@@ -209,3 +209,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 280 — convertir un documento en plantilla (6-oct-2026)
 
 - Con un documento Word de verdad del centro, guardado en un asunto real: en su menú ⋮, «Convertir en plantilla». Mirar que los huecos propuestos tienen sentido y que en «Con la plantilla nueva» el documento conserva su aspecto (tablas, negritas, sangrías, sellos). No guardar si no convence: «Cancelar» no escribe nada.
+
+## Fila 281 — convertir en plantilla un PDF sin Word (6-oct-2026)
+
+- Con un PDF de verdad del centro firmado con AutoFirma, guardado en un asunto real y sin su Word: «Convertir en plantilla». Mirar que el texto sale entero y en orden, y que los sellos de firma y de registro se proponen en «Quitar».

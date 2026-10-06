@@ -186,9 +186,26 @@ var ConvertirEnPlantillaPropuestas = (function () {
     return salida;
   }
 
+  /* Fila 281: de un PDF sin Word, además, lo que se repite en todas las páginas y los sellos de firma y de registro
+     que el PDF lleva como texto. `repetidos`: [bool] por párrafo del cuerpo. */
+  var SELLOS = /Firmado digitalmente|Firmado por|C[oó]digo seguro de verificaci[oó]n|\bCSV\b|Verificaci[oó]n|AutoFirma|huella|\b\d{2}[ES][MA]\d{4,6}\b/i;
+
+  function lineasDeQuitarPdf(parrafos, repetidos) {
+    var salida = [];
+    parrafos.forEach(function (p, i) {
+      var t = String(p.texto || '').trim();
+      if (!t) return;
+      var repite = !!(repetidos && repetidos[i]), sello = SELLOS.test(t);
+      if (!repite && !sello) return;
+      salida.push({ id: 'quitar' + i, grupo: 'quitar', indice: i, buscar: t.length > 70 ? t.slice(0, 70) + '…' : t, poner: '', etiqueta: 'Quitar',
+        veces: 1, nota: repite ? '(se repite en todas las páginas)' : '(sello de firma o de registro)' });
+    });
+    return salida;
+  }
+
   /* ---------- todo junto ---------- */
 
-  /* entrada: { cuerpo: [{ texto, imagen }], pies: [texto], valores, cargos, centro, tieneMembrete }. */
+  /* entrada: { cuerpo: [{ texto, imagen }], pies: [texto], valores, cargos, centro, tieneMembrete, desdePdf, repetidos }. */
   function proponer(entrada) {
     var cuerpo = entrada.cuerpo || [], pies = entrada.pies || [];
     var textos = cuerpo.map(function (p) { return p.texto; }).concat(pies);
@@ -199,12 +216,18 @@ var ConvertirEnPlantillaPropuestas = (function () {
     var firmanteSexo = entrada.firmanteSexo || (cargoFirma && (cargoFirma.sexo || window.Genero.sexoDeTratamiento(cargoFirma.tratamiento))) || '';
     var genero = lineasDeGenero(textos, entrada.valores || {}, datos, firma, firmanteSexo);
     var quitar = entrada.tieneMembrete ? [] : lineasDeQuitar(cuerpo, entrada.centro);
+    if (entrada.desdePdf) {
+      var ya = {};
+      quitar.forEach(function (l) { ya[l.indice] = true; });
+      quitar = quitar.concat(lineasDeQuitarPdf(cuerpo, entrada.repetidos).filter(function (l) { return !ya[l.indice]; }))
+        .sort(function (a, b) { return a.indice - b.indice; });
+    }
     return { datos: datos, firma: firma, genero: genero, quitar: quitar, lineas: datos.concat(firma, genero, quitar) };
   }
 
   return {
     proponer: proponer, lineasDeDatos: lineasDeDatos, lineasDeFirma: lineasDeFirma, lineasDeGenero: lineasDeGenero,
-    lineasDeQuitar: lineasDeQuitar, etiquetaDe: etiquetaDe, variantesDeNombre: variantesDeNombre
+    lineasDeQuitar: lineasDeQuitar, lineasDeQuitarPdf: lineasDeQuitarPdf, etiquetaDe: etiquetaDe, variantesDeNombre: variantesDeNombre
   };
 })();
 window.ConvertirEnPlantillaPropuestas = ConvertirEnPlantillaPropuestas;

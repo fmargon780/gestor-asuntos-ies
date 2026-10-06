@@ -284,6 +284,8 @@
     });
     await marcarPrimerHito(pabloClave, 'hecho', 'Documentación recibida y comprobada.');
     await crearDocumentosDeDemostracion(pabloClave);
+    /* Fila 281: un PDF con texto de dos páginas y uno con una tabla (js/demo/datos-plantilla.js). */
+    if (window.Demo.plantilla) await Demo.plantilla.construirPdf({ pabloClave: pabloClave, hace: hace });
     /* Fila 229: un registro con líneas de los dos tipos (escritas a mano y automáticas)
        en dos hitos distintos, y alguna sin hito. */
     var hitosPablo = await Hitos.hitosDe(pabloClave);

@@ -8,8 +8,14 @@
         antiguas.doc»;
      3. el sexo de Carla (mujer) y de Diego (hombre), para el grupo «Para
         que sirva con hombre y con mujer».
+   Fila 281 (docs/CONVERTIR-EN-PLANTILLA-DESDE-PDF.md), en el asunto de
+   Aguilar Ponce, Pablo: un PDF con texto de dos páginas (`JUSTIFICANTE`) y
+   uno con una tabla (`LISTADO`); los PDF de mentira de siempre, sin texto,
+   sirven de PDF escaneado.
+
    Todo inventado. `Demo.plantilla.construir({ carlaClave, martaClave, hace })`
-   lo llama js/demo/datos.js al crear esos asuntos.
+   y `Demo.plantilla.construirPdf({ pabloClave, hace })` los llama
+   js/demo/datos.js al crear esos asuntos.
    ============================================================ */
 (function () {
   'use strict';
@@ -103,6 +109,42 @@
     } catch (e) { /* sin el dato, las formas dobles se quedan con su barra */ }
   }
 
+  /* Fila 281: PDF con texto de verdad, hechos con pdf-lib. */
+  async function construirPdf(o) {
+    var PDFLib = await PdfHerramientas.cargarPdfLib();
+    var carpeta = await App.E.abiertos.getDirectoryHandle(o.pabloClave);
+
+    /* El justificante: dos páginas, con el mismo renglón de cabecera arriba en las dos. */
+    var fecha = o.hace(2);
+    var doc = await PDFLib.PDFDocument.create();
+    var letra = await doc.embedFont(PDFLib.StandardFonts.Helvetica);
+    var negrita = await doc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+    function texto(pagina, t, x, y, tam, fuente) { pagina.drawText(t, { x: x, y: y, size: tam, font: fuente || letra }); }
+    var cabecera = 'IES Fuente Lucena (copia de pruebas) - Secretaría';
+    var p1 = doc.addPage([595, 842]);
+    texto(p1, cabecera, 50, 800, 9);
+    var titulo = 'JUSTIFICANTE DE MATRÍCULA';
+    texto(p1, titulo, (595 - negrita.widthOfTextAtSize(titulo, 16)) / 2, 740, 16, negrita);
+    texto(p1, 'Se hace constar que Pablo Aguilar Ponce, con número de identificación escolar 2100002,', 50, 690, 11);
+    texto(p1, 'ha formalizado su matrícula en este centro.', 50, 675, 11);
+    texto(p1, 'En Localidad de pruebas, a ' + fechaEnLetra(fecha), 50, 620, 11);
+    var p2 = doc.addPage([595, 842]);
+    texto(p2, cabecera, 50, 800, 9);
+    texto(p2, 'Este justificante no tiene validez sin el sello del centro.', 50, 740, 11);
+    texto(p2, 'Firmado digitalmente por Fernando Reyes Palma', 50, 100, 9);
+    await conNumero(o.pabloClave, carpeta, fecha, 'JUSTIFICANTE', 'pdf', await doc.save(), 'application/pdf');
+
+    /* El listado: tres renglones seguidos con tres columnas bien separadas. */
+    var tabla = await PDFLib.PDFDocument.create();
+    var letraT = await tabla.embedFont(PDFLib.StandardFonts.Helvetica);
+    var pt = tabla.addPage([595, 842]);
+    [['Alumna Marina Aguilar', 'Curso 1 de la ESO', 'Grupo 1 A'], ['Alumno Pablo Aguilar', 'Curso 3 de la ESO', 'Grupo 3 A'],
+     ['Alumna Noa Castro', 'Curso 2 de la ESO', 'Grupo 2 B']].forEach(function (fila, i) {
+      fila.forEach(function (celda, k) { pt.drawText(celda, { x: [50, 230, 420][k], y: 700 - i * 16, size: 11, font: letraT }); });
+    });
+    await conNumero(o.pabloClave, carpeta, o.hace(1), 'LISTADO', 'pdf', await tabla.save(), 'application/pdf');
+  }
+
   window.Demo = window.Demo || {};
-  window.Demo.plantilla = { construir: construir };
+  window.Demo.plantilla = { construir: construir, construirPdf: construirPdf };
 })();

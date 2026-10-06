@@ -73,8 +73,9 @@ Prueba: `pruebas/versiones-previas.mjs`.
 
 En el menú ⋮ de un documento de un asunto **abierto** (ficha: `js/ficha-documentos.js`; mesa del hito:
 `js/hitos-documento-menu.js`), «Convertir en plantilla». Un `.docx` vale; un PDF vale si su Word gemelo
-(`VersionesPrevias.claveGemelo`) está en la carpeta del asunto o en `_Previas`; `.doc`/`.odt`/`.rtf` y un PDF
-sin Word salen apagados, con su motivo en `title`; en solo consultar, apagada (`js/solo-consulta.js`).
+(`VersionesPrevias.claveGemelo`) está en la carpeta del asunto o en `_Previas`; `.doc`/`.odt`/`.rtf` salen
+apagados, con su motivo en `title`; en solo consultar, apagada (`js/solo-consulta.js`). Un PDF sin Word (fila 281)
+también se convierte: ver más abajo.
 
 - **Qué hace cada fichero**: `js/docx-sustituir.js` (puro: cambiar texto dentro del `.docx`, quitar
   párrafos por su posición, quitar la cabecera, poner `{{MEMBRETE}}`; SIEMPRE desde el original, con
@@ -96,3 +97,19 @@ sin Word salen apagados, con su motivo en `title`; en solo consultar, apagada (`
   (`accion: 'generar'`, `receta.plantilla`) sin duplicarla. Primero el fichero, luego `plantillas.json`, luego la guía.
 - Copia de pruebas: `js/demo/datos-plantilla.js` (Word de Carla, PDF y Word gemelo de Marta, `notas antiguas.doc`, sexos).
 - Pruebas: `pruebas/convertir-en-plantilla.mjs` (sin navegador) y `pruebas/convertir-en-plantilla-pantalla.mjs`.
+
+### PDF sin su Word (fila 281, `docs/CONVERTIR-EN-PLANTILLA-DESDE-PDF.md`)
+
+Con un PDF sin gemelo, la entrada funciona y `leerPdfSinWord` (`js/convertir-en-plantilla.js`) mira, por este
+orden: sin texto (menos de 40 caracteres) → aviso ámbar «imagen escaneada» y no abre; con casillas
+(pdf-lib) → aviso ámbar «impreso con casillas»; con tabla → pregunta («Seguir»/«Cancelar»); si vale,
+`PdfAParrafos.parrafos` (`js/pdf-a-parrafos.js`: renglones por altura, párrafo si el salto no pasa de 1,5 veces
+la letra, guion de corte unido, centrado a ±10 puntos, título = primer centrado que no se repite, lo repetido
+en todas las páginas una vez y marcado) y `DocxCrear.crear` (`js/docx-crear.js`: Calibri 11, título centrado,
+negrita, a 16; resto justificado) dan un Word nuevo que es «el original» de la fila 280 (un párrafo del Word por
+párrafo del PDF, así que los índices de «Quitar» valen). `Prop.proponer({ desdePdf, repetidos })` añade a «Quitar»
+lo repetido y los sellos (`Firmado digitalmente`, `CSV`, código de registro…). La pantalla enseña una línea fija
+(«Este PDF no tiene su Word: he copiado solo el texto…») y, en «El original» del paso 2, el PDF de verdad
+pintado con pdf.js (canvas, no el `<iframe>` del visor: se comprueba igual en un navegador sin visor de PDF).
+Copia de pruebas: `JUSTIFICANTE` (2 páginas) y `LISTADO` (tabla) en el asunto de Pablo. Pruebas:
+`pruebas/convertir-en-plantilla-pdf.mjs` y `pruebas/convertir-en-plantilla-pdf-pantalla.mjs`.
