@@ -12,5 +12,4 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 268 | 200 | El vigilante dentro del buzón de soporte: pasada cada diez minutos, cinco casos de aviso por correo, silencio de noche con resumen a las 7:00, comprobación de que cada app abre, respuesta a quien avisó y fichero de estado para el Centro de mando; solo el script y una prueba nueva con dobles, sin navegador |
 | 269 | 45 | Campo «Tu correo» en la ventana de Soporte, pedido una vez y recordado, enviado con el aviso; un fichero y su prueba |
