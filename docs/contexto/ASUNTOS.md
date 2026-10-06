@@ -412,6 +412,15 @@ Datos del trámite) son los de siempre, y los sigue pintando el mismo módulo.
 docs/CABECERA-DEL-ASUNTO.md): cambio de disposición y de agrupación, ninguna acción desaparece ni
 cambia lo que hace. Va después de la fila 51 (da por hecha `.ficha-subtitulo`).
 
+- **Datos del tercero junto al nombre** (6-oct-2026, fila 272, `docs/DATOS-FAVORITOS-EN-LA-FICHA.md`):
+  en `.ficha-linea1`, detrás del nombre (que ya no crece), `#ficha-favoritos` con hasta 3 datos de la
+  persona o empresa («Unidad: 2º B», separados por « · ») y el botón «Elegir datos» (`#fav-elegir`,
+  `js/ficha-datos-favoritos.js`; la parte sin pantalla, `js/datos-favoritos.js`). La elección es de la
+  clase de tercero y de todo el centro: `registro.ajustesAvisos.datosFavoritos = { ALUMNADO: ['unidad'] … }`
+  (sin clave, de fábrica solo la unidad del alumnado; lista vacía, ninguno). Cada dato se guarda por
+  `U.normalizar(título)` (`grupo` es `unidad`); la lista del cuadro sale también de las columnas del
+  CSV (`fuente.cabecera`), no solo de las rellenas. Encogida la cabecera, el botón se esconde. Lo apaga
+  el modo consulta como cualquier botón de la ficha.
 - **La cabecera en dos líneas** (24-sep-2026, fila 112, `docs/CABECERA-COMPACTA.md`): dentro de
   `<header class="ficha-cabecera">`, `.ficha-linea1` (`#ficha-volver` «← Volver», las marcas, el
   `<h2>` con «⋯» y `#ficha-archivar`, a la derecha) y `.ficha-linea2` (`#ficha-acciones` y, a la

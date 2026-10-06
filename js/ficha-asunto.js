@@ -220,6 +220,7 @@
           '</div>' +
           '<div class="ficha-marcas">' + marcasDeFicha(a, tipo) + '</div>' +
           '<h2 class="ficha-nombre"><span class="ficha-nombre-texto">' + U.escapar(a.nombre) + '</span></h2>' +
+          (window.FichaDatosFavoritos ? FichaDatosFavoritos.html(a) : '') +   /* fila 272 */
           '<div class="ficha-archivar" id="ficha-archivar"></div>' +
         '</div>' +
         '<div class="ficha-linea2">' +
@@ -264,6 +265,7 @@
     N.aplicarModoConsulta();
     FichaTarjetas.alPintar(caja, a);
     if (window.CampoDesdeElAsunto) CampoDesdeElAsunto.alPintar(caja, a);   /* fila 245 */
+    if (window.FichaDatosFavoritos) FichaDatosFavoritos.alPintar(caja, a);   /* fila 272 */
   }
 
 
