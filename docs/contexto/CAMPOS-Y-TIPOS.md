@@ -22,6 +22,14 @@ escritura); el ARCHIVO no se toca, porque lo guardado allí se lee igual por la 
 
 **La ventana de elegir campo (fila 254)** es ancha (`.cuadro-campos`, `min(1400px, 94vw)`): una franja fija con pestañas, buscador y «Volver», y debajo una rejilla de una línea por campo (`.campos-catalogo-rejilla`, 3+ columnas a 1280 px, 1 bajo 700 px) que es lo único que se desplaza; en Ajustes es el mismo panel.
 
+**«Rellenar» y el motivo a la vista (fila 276, `docs/RELLENAR-CAMPO-QUE-YA-ESTA.md`)**: en el panel `CamposCatalogo`, una fila cuyo
+campo ya está puesto lleva «Añadir» apagado y su motivo entero en una línea propia (`opciones.textoYaPuesto`: «ya está en este tipo» en
+Ajustes, «ya está en este asunto» desde un asunto). Desde la ficha del asunto (sin hito), `CampoDesdeElAsunto` pasa además los campos
+del asunto con valor vacío (`sinRellenar`): arriba de «De la ficha» el grupo «Ya están en este asunto, sin rellenar» (botón «Rellenar») y
+en «Míos»/«Calculados» el botón «Rellenar» encendido («en este asunto, sin rellenar»). «Rellenar» abre el cuadro del valor sin «¿Dónde se
+guarda?» y escribe solo el valor en la ficha (`escribirEnAsunto(a, clave, { valor })`): no toca `campos.json`. Desde la mesa de un hito no
+hay «Rellenar». Los `.boton:disabled` se ven grises en toda la app (`css/estilos.css`; el principal, como antes).
+
 **Desde un asunto abierto (fila 245, `docs/CAMPO-DESDE-EL-ASUNTO.md`)**: en la tarjeta «Campos del asunto» de la
 ficha (antes «Datos del trámite»; en un asunto abierto sale siempre; fila 254), «+ Añadir campo», siempre a la vista en su título (`js/campo-desde-el-asunto.js`, `botonTituloHtml`), abre el
 panel de `js/campos-catalogo.js` (con `textoVolver`, sin los campos que el asunto ya tiene), pide el

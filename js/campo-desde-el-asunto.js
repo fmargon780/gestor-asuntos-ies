@@ -21,6 +21,10 @@
    lleva «Deshacer» (8 segundos): el tipo vuelve a como estaba y en este
    asunto el campo se queda como «solo aquí», con su valor.
 
+   Fila 276: desde la ficha, un campo que el asunto ya tiene pero está vacío lleva
+   «Rellenar» (en el grupo de arriba de «De la ficha» y en «Míos»/«Calculados»): pide
+   solo el valor, sin «¿Dónde se guarda?», y lo escribe en la ficha del asunto.
+
    Sin tipo, o en el ARCHIVO, no hay nada que preguntar: sin tipo se guarda
    directamente «solo aquí»; en el ARCHIVO no sale el botón.
    ============================================================ */
@@ -79,6 +83,16 @@ window.CampoDesdeElAsunto = (function () {
     } catch (e) { return ''; }
   }
 
+  /* Fila 276: los campos del asunto cuyo valor guardado está vacío (o solo espacios). */
+  function sinRellenar(a, lista) {
+    var campos = fichaFresca(a).campos;
+    campos = (campos && !Array.isArray(campos)) ? campos : {};
+    return lista.filter(function (c) {
+      var g = campos[Campos.claveDeCampo(c)];
+      return !(g && String(g.valor === undefined || g.valor === null ? '' : g.valor).trim());
+    });
+  }
+
   /* ---------- 1. elegir el campo (el panel de Ajustes) ---------- */
 
   async function elegirCampo(a, tipo, categoria, hito) {
@@ -89,11 +103,26 @@ window.CampoDesdeElAsunto = (function () {
     var espera = U.preguntar(hito ? 'Añadir un campo al hito «' + hito.titulo + '»' : 'Añadir un campo',
       '<div id="cad-panel"></div>', 'Cerrar');
     if (capa) capa.classList.add('cuadro-campos');
+    /* Fila 276: desde la ficha (sin hito), los campos del asunto que están vacíos se rellenan. */
+    var vacios = hito ? [] : sinRellenar(a, lista);
+    var clavesVacias = {};
+    vacios.forEach(function (c) { clavesVacias[Campos.claveDeCampo(c)] = true; });
+    function elegirRellenar(c) {
+      if (elegido) return;
+      elegido = Object.assign({}, c, { rellenar: true });
+      $('cuadro-cancelar').click();
+    }
     CamposCatalogo.abrir($('cad-panel'), { tipo: tipo, categoria: categoria }, lista, {
       textoVolver: '← Volver',
+      textoYaPuesto: 'ya está en este asunto',
       /* Fila 255: desde un hito, arriba los campos del asunto que no son de ningún hito. */
-      yaEstan: hito ? lista.filter(function (c) { return !c.hito; }) : null,
+      yaEstan: hito ? lista.filter(function (c) { return !c.hito; }) : vacios,
+      tituloYaEstan: hito ? undefined : 'Ya están en este asunto, sin rellenar',
+      textoBotonYaEstan: hito ? undefined : 'Rellenar',
+      sinRellenar: clavesVacias,
+      onRellenar: elegirRellenar,
       onYaEsta: function (c) {
+        if (!hito) { elegirRellenar(c); return; }
         if (elegido) return;
         elegido = Object.assign({}, c, { yaEsta: true });
         $('cuadro-cancelar').click();
@@ -129,7 +158,7 @@ window.CampoDesdeElAsunto = (function () {
   }
 
   /* { valor, donde: 'tipo' | 'aqui' } o null (Escape o Cancelar). */
-  async function pedirValorYDonde(a, tipo, cfg, categoria, previo, hito) {
+  async function pedirValorYDonde(a, tipo, cfg, categoria, previo, hito, soloValor) {
     var nombre = Campos.nombreDeCampo(cfg, App.E.campos);
     var propio = cfg.origen === 'propio' ? Campos.propioDe(cfg.id, App.E.campos) : null;
     var inicial = previo !== undefined ? previo
@@ -138,10 +167,11 @@ window.CampoDesdeElAsunto = (function () {
     var clase = (propio && propio.clase) || 'texto';
     var control = CamposClases.htmlControl('cad-valor', clase, propio && propio.valores, inicial);
     var tipoCorto = tipo ? DondeSeGuarda.nombreCortoDe(tipo) : '';
-    var conPregunta = !!tipo && (!hito || hito.enGuia);   /* fila 255: un hito solo de este asunto no pregunta */
+    /* Fila 276: «Rellenar» un campo que el asunto ya tiene: sin «¿Dónde se guarda?», nada que decidir. */
+    var conPregunta = !soloValor && !!tipo && (!hito || hito.enGuia);   /* fila 255: un hito solo de este asunto no pregunta */
     var bloque = conPregunta ? DondeSeGuarda.bloqueHTML(opcionesDeDonde(a, tipoCorto, hito)) : '';
-    var espera = U.preguntar('Añadir el campo «' + nombre + '»',
-      '<label class="etiqueta">' + U.escapar(nombre) + ' <span class="suave">(se puede dejar vacío)</span></label>' +
+    var espera = U.preguntar(soloValor ? 'Rellenar el campo «' + nombre + '»' : 'Añadir el campo «' + nombre + '»',
+      '<label class="etiqueta">' + U.escapar(nombre) + (soloValor ? '' : ' <span class="suave">(se puede dejar vacío)</span>') + '</label>' +
       control + bloque, 'Guardar');
     if (conPregunta) DondeSeGuarda.enganchar();
     var campo = $('cad-valor');
@@ -155,7 +185,7 @@ window.CampoDesdeElAsunto = (function () {
     if (!leido.ok) {
       /* Un importe, número o fecha que no se entiende no se guarda: se vuelve a pedir, con lo escrito. */
       U.aviso('Revisa «' + nombre + '»: ' + CamposClases.avisoDeAmbar(clase) + '.', 'ambar');
-      return pedirValorYDonde(a, tipo, cfg, categoria, leido.texto, hito);
+      return pedirValorYDonde(a, tipo, cfg, categoria, leido.texto, hito, soloValor);
     }
     return { valor: leido.valor, donde: donde };
   }
@@ -288,6 +318,24 @@ window.CampoDesdeElAsunto = (function () {
     repintar(a);
   }
 
+  /* Fila 276: «Rellenar» un campo que el asunto ya tiene, vacío. Solo escribe el valor en la
+     ficha: no toca la configuración del tipo ni la lista de «solo aquí». */
+  async function rellenar(a, tipo, cfg, categoria) {
+    var nombre = Campos.nombreDeCampo(cfg, App.E.campos);
+    var r = await pedirValorYDonde(a, tipo, cfg, categoria, undefined, undefined, true);
+    if (!r) return;
+    if (!String(r.valor === undefined || r.valor === null ? '' : r.valor).trim()) {
+      U.aviso('No has escrito nada: «' + nombre + '» sigue vacío.', 'ambar');
+      return;
+    }
+    try {
+      await vigilar(escribirEnAsunto(a, Campos.claveDeCampo(cfg), { valor: r.valor }), 'Sigo guardando el campo «' + nombre +
+        '». Si tarda mucho, mira que Dropbox no esté sincronizando.', 6000);
+    } catch (e) { U.fallo('No he podido rellenar el campo', e); return; }
+    U.aviso('Campo «' + nombre + '» rellenado.', 'bueno');
+    repintar(a);
+  }
+
   /* ---------- el botón «+ Añadir campo» ---------- */
 
   /* `hito` (fila 255): { marca, titulo, enGuia } si se abre desde la pantalla de un hito. */
@@ -298,6 +346,7 @@ window.CampoDesdeElAsunto = (function () {
       var cfg = await elegirCampo(a, tipo, categoria, hito);
       if (!cfg) return;
       var r;
+      if (cfg.rellenar) { await rellenar(a, tipo, cfg, categoria); return; }
       if (cfg.yaEsta) {
         var donde = await pedirSoloDonde(a, tipo, cfg, hito);
         if (!donde) return;

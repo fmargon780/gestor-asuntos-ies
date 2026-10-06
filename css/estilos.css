@@ -68,6 +68,10 @@ code { background: #eef1f5; padding: 1px 5px; border-radius: 4px; font-size: 13p
 .boton-principal { background: var(--azul); color: #fff; border-color: var(--azul); }
 .boton-principal:hover { background: #163d5e; }
 .boton-principal:disabled { background: #b6c3d0; border-color: #b6c3d0; cursor: default; }
+/* Fila 276: un botón apagado se ve apagado (texto gris, sin sombreado ni mano). El principal, como siempre. */
+.boton:disabled:not(.boton-principal) { color: var(--tinta-suave); cursor: default; }
+.boton:disabled:not(.boton-principal):hover { background: var(--papel); }
+.boton-peligro:disabled { border-color: var(--linea); color: var(--tinta-suave); }
 .boton-ancho { width: 100%; margin-top: 18px; padding: 12px; font-size: 15px; }
 .boton-peligro { border-color: var(--rojo-linea); color: var(--rojo-linea); }
 

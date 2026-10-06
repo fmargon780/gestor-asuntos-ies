@@ -470,3 +470,4 @@ de `App` va después del fichero que lo define.
 | `pruebas/guia-siempre-al-dia.mjs` | Prueba de la fila 273 (sin navegador): `GuiasDelCentro.ponerAlDia` — asunto nuevo con la guía guardada, asunto sin hitos de más, hitos nuevos que llegan, sin lecturas de más, guardado en marcha, lectura que falla |
 | `js/ajustes-tipo-al-terminar.js` | Fila 274: el apartado «Al terminar el asunto» de la pantalla de un tipo (casilla de liquidar, aviso a quien lo pide al cerrar, y su resumen) |
 | `pruebas/al-terminar-el-asunto.mjs` | Prueba de la fila 274: el apartado, su resumen, las casillas, la lista de comprobación y «Datos del tipo» sin ellas |
+| `pruebas/rellenar-campo-que-ya-esta.mjs` | Prueba de la fila 276: «Rellenar» un campo que el asunto ya tiene vacío, el motivo a la vista, desde la mesa de un hito y el botón principal apagado |
