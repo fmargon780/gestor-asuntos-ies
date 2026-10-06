@@ -197,3 +197,7 @@ pruebas automáticas, sino para cubrir justo lo que ellas no pueden.
 ## Fila 266 — cambiar los datos del tercero desde el asunto (5-oct-2026)
 
 - Con un aspirante real sin Nº escolar y un asunto abierto suyo: escribirle el Nº escolar desde «Cambiar los datos» (en su ficha de Personas o desde la ficha del asunto). Sale «Cambia el nombre de las carpetas», y con «Adelante» cambia solo el asunto abierto y la carpeta suya del archivo; los asuntos archivados de dentro conservan su nombre.
+
+## Fila 272 — datos del tercero junto al nombre del asunto (6-oct-2026)
+
+- Con los datos reales del centro: abrir el asunto de un alumno y ver su unidad de verdad junto al nombre; con «Elegir datos» cambiar los 3 datos de alumnado en un ordenador y comprobar que el compañero, en el otro, los ve igual al recargar. Tampoco se pudo comprobar en la demostración el modo «solo consultar» (el botón se apaga solo, como los demás de la ficha; lo cubre la prueba `datos-favoritos`).
