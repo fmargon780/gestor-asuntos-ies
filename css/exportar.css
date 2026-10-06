@@ -55,3 +55,13 @@ body.con-exportar-visor { overflow: hidden; }
 .filtros .filtro-fechas { grid-column: span 2; }
 .filtro-fechas-par { flex-wrap: nowrap; }
 .filtro-fechas .campo { width: auto; min-width: 0; }
+
+/* Fila 278: el informe agrupado (títulos de bloque y líneas de cierre) y los dos desplegables de la ventana. */
+.exportar-agrupar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 12px 0 4px; }
+.exportar-agrupar label { font-weight: 600; color: #445; }
+.exportar-agrupar select { width: auto; min-width: 150px; }
+.exportar-bloque-titulo { margin: 14px 0 4px; break-after: avoid; }
+.exportar-bloque-exterior { font-size: 14px; font-weight: 700; }
+.exportar-bloque-interior { font-size: 12px; font-weight: 700; margin-left: 12px; }
+.exportar-cierre { margin: 4px 0 8px; font-size: 11px; }
+.exportar-cierre-exterior { font-weight: 700; border-top: 1px solid #222; padding-top: 4px; margin-bottom: 10px; }

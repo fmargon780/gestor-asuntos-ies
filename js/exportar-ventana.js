@@ -11,6 +11,8 @@
        campos propios de los tipos que salen. La primera vez van las de
        la tabla de Inicio; después, la última elección (por ordenador y
        por separado para la hoja y para el PDF).
+     - «Agrupar por» e «Y dentro, por» (solo el PDF, fila 278): una o dos de
+       las columnas marcadas; se recuerda la última elección.
      - «Incluir los hitos» (solo el PDF; desmarcada).
 
    Se exporta lo que se ve (pestaña abierta, los seis filtros y el
@@ -62,6 +64,63 @@
     return '<p class="exportar-grupo">Del asunto</p><div class="exportar-columnas">' + del + '</div>' + propios;
   }
 
+  /* ---------- «Agrupar por» e «Y dentro, por» (fila 278, solo el PDF) ---------- */
+
+  var CLAVE_AGRUPAR = 'gestor-exportar-agrupar-pdf';
+
+  function agruparGuardado() {
+    try { var v = JSON.parse(window.localStorage.getItem(CLAVE_AGRUPAR) || 'null'); if (Array.isArray(v)) return v.map(String); } catch (e) { /* sin guardado */ }
+    return [];
+  }
+
+  function guardarAgrupar(ids) {
+    try { window.localStorage.setItem(CLAVE_AGRUPAR, JSON.stringify(ids)); } catch (e) { /* no pasa nada */ }
+  }
+
+  /* Las columnas marcadas ahora, con su título y en el orden de la ventana. */
+  function columnasMarcadasConTitulo() {
+    return Array.prototype.filter.call(document.querySelectorAll('#exp-columnas input[data-col]'), function (c) { return c.checked; })
+      .map(function (c) { return { id: c.dataset.col, titulo: c.parentNode.textContent.trim() }; });
+  }
+
+  /* Pone al día los dos desplegables con las columnas marcadas, sin perder lo elegido si sigue marcado. */
+  function refrescarAgrupar(quiere) {
+    var s1 = $('exp-agrupar-1'), s2 = $('exp-agrupar-2');
+    if (!s1 || !s2) return;
+    var marcadas = columnasMarcadasConTitulo();
+    var ids = marcadas.map(function (c) { return c.id; });
+    var v1 = quiere ? quiere[0] : s1.value, v2 = quiere ? quiere[1] : s2.value;
+    if (ids.indexOf(v1) === -1) v1 = '';
+    if (!v1 || ids.indexOf(v2) === -1 || v2 === v1) v2 = '';
+    function opciones(excluir, valor) {
+      return '<option value="">(sin agrupar)</option>' + marcadas.filter(function (c) { return c.id !== excluir; }).map(function (c) {
+        return '<option value="' + U.escapar(c.id) + '"' + (c.id === valor ? ' selected' : '') + '>' + U.escapar(c.titulo) + '</option>';
+      }).join('');
+    }
+    s1.innerHTML = opciones('', v1);
+    s2.innerHTML = opciones(v1, v2);
+    s2.disabled = !v1;
+  }
+
+  function engancharAgrupar() {
+    var s1 = $('exp-agrupar-1'), s2 = $('exp-agrupar-2'), cols = $('exp-columnas');
+    if (!s1 || !s2 || !cols) return;
+    /* Al abrir: la última elección, solo si esas columnas salen marcadas. */
+    var g = agruparGuardado();
+    var ids = columnasMarcadasConTitulo().map(function (c) { return c.id; });
+    var v = (g[0] && ids.indexOf(g[0]) !== -1) ? [g[0], (g[1] && ids.indexOf(g[1]) !== -1) ? g[1] : ''] : ['', ''];
+    refrescarAgrupar(v);
+    s1.onchange = function () { refrescarAgrupar(); };
+    cols.addEventListener('change', function () { refrescarAgrupar(); });
+  }
+
+  /* Tras repintar las columnas (archivados): se vuelve a poner al día. */
+  function agruparElegido() {
+    var s1 = $('exp-agrupar-1'), s2 = $('exp-agrupar-2');
+    if (!s1 || !s1.value) return [];
+    return s2 && s2.value ? [s1.value, s2.value] : [s1.value];
+  }
+
   async function abrirVentana(destino) {
     var datos = E();
     var filtros = datos.filtrosActuales();
@@ -80,7 +139,10 @@
       '<p class="nota exportar-nota oculto" id="exp-nota"></p>' +
       '<div id="exp-columnas">' + columnasHtml(marcadas, camposAbiertos, false) + '</div>' +
       (destino === 'pdf'
-        ? '<label class="exportar-casilla"><input type="checkbox" id="exp-hitos"> Incluir los hitos</label>' : '');
+        /* Fila 278: agrupar el informe por una o dos de las columnas marcadas. */
+        ? '<div class="exportar-agrupar"><label for="exp-agrupar-1">Agrupar por</label><select id="exp-agrupar-1" class="campo"></select>' +
+          '<label for="exp-agrupar-2">Y dentro, por</label><select id="exp-agrupar-2" class="campo"></select></div>' +
+          '<label class="exportar-casilla"><input type="checkbox" id="exp-hitos"> Incluir los hitos</label>' : '');
 
     var promesa = U.preguntar(TITULOS[destino], html, 'Exportar');
     var aceptar = $('cuadro-aceptar');
@@ -138,10 +200,12 @@
       var campos = datos.columnasDeCampos([], todos);
       var caja = $('exp-columnas');
       if (caja) caja.innerHTML = columnasHtml(ahora, campos, conArchivados);
+      refrescarAgrupar();   /* fila 278 */
     }
 
     if ($('exp-archivados')) $('exp-archivados').onchange = alCambiarArchivados;
     pintarVacio();
+    engancharAgrupar();
 
     var ok = await promesa;
     if (aceptar) { aceptar.disabled = false; aceptar.title = ''; }
@@ -149,6 +213,8 @@
 
     var conArchivados = $('exp-archivados') && $('exp-archivados').checked;
     var conHitos = !!($('exp-hitos') && $('exp-hitos').checked);
+    var agruparPor = destino === 'pdf' ? agruparElegido() : [];
+    if (destino === 'pdf') guardarAgrupar(agruparPor);
     var elegidas = marcadasAhora();
     if (conArchivados) elegidas.situacion = true;
     var ids = Object.keys(elegidas);
@@ -157,7 +223,7 @@
     var entradasFinal = entradas;
     turno++;
     await exportar(destino, { filtros: filtros, abiertos: abiertos, conArchivados: conArchivados, conHitos: conHitos,
-                              ids: ids, entradas: entradasFinal, tiposAbiertos: tiposAbiertos });
+                              ids: ids, entradas: entradasFinal, tiposAbiertos: tiposAbiertos, agruparPor: agruparPor });
   }
 
   async function exportar(destino, o) {
@@ -194,7 +260,9 @@
       } else {
         await ExportarInforme.abrir({
           tabla: tabla, registros: registros, filtros: o.filtros, conHitos: o.conHitos,
-          incluyeArchivados: o.conArchivados, por: (App.E && App.E.usuario) || ''
+          incluyeArchivados: o.conArchivados, por: (App.E && App.E.usuario) || '',
+          /* Fila 278: los bloques, si se ha elegido agrupar. */
+          agrupado: (o.agruparPor && o.agruparPor.length && window.ExportarAgrupar) ? ExportarAgrupar.agrupar(tabla, o.agruparPor) : null
         });
       }
     } catch (e) {
