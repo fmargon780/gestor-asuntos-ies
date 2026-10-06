@@ -12,7 +12,6 @@ minutos de abajo cuentan la fila entera, revisor incluido (uno o dos intentos).
 
 | Nº | Minutos | Motivo |
 |---|---|---|
-| 276 | 60 | Arreglo en el panel de campos y en «+ Añadir campo» del asunto (botón «Rellenar», el motivo a la vista, cuadro del valor sin «¿Dónde se guarda?»), una regla de estilo para los botones apagados de toda la app, una prueba nueva con navegador y el revisor con 15 puntos |
 | 278 | 110 | Un fichero nuevo con el cálculo de los bloques (uno o dos niveles, meses, «Sin dato», sumas por bloque), dos desplegables en la ventana de exportar que siguen a las columnas marcadas, el informe en PDF pintado por bloques con el corte de páginas cuidando títulos y líneas de cierre, una prueba nueva y el revisor con 14 puntos |
 | 277 | 110 | Un módulo nuevo (la pasada que une sola al entrar y al cambiar la lista de tipos, la regla de «se parecen», el fichero de parejas «No son el mismo»), un aviso más en Inicio y su cuadro con «Unir» en dos pasos, sacar a una función común lo de después de unir, una prueba nueva con siete casos y el revisor con 17 puntos |
 | 279 | 100 | Un cuadro común de parecidos que mira también nombres antiguos y cortos, siete puertas que lo usan (tres ya avisaban, cuatro no), «Cambiar el nombre» que ofrece unir, una prueba nueva con navegador y otra de dos ventanas, pruebas viejas que cambian de texto y el revisor con 14 puntos |
